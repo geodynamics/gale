@@ -1,0 +1,12 @@
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+	<struct name="components" mergeType="merge">
+		<struct name="ViscousDissipationField">
+			<param name="Type">OperatorFeVariable</param>
+			<param name="Operator">TensorInnerProduct</param>
+			<list name="FeVariables">
+				<param>StrainRateField</param>
+				<param>StressField</param>
+			</list>
+		</struct>
+	</struct>
+</StGermainData>	

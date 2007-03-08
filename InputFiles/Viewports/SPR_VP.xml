@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<struct name="components" mergeType="merge">
+
+	<struct name="recstrainRateInvColourMap">
+		<param name="Type">lucColourMap</param>
+		<param name="colours">Purple Blue Green Yellow Orange Red</param>
+		<param name="dynamicRange">true</param>
+	</struct>
+                <struct name="strainrateTitle" mergeType="replace">
+                        <param name="Type">lucTitle</param>
+                        <param name="FieldVariable">recoveredStrainRateInvariantField</param>
+                </struct>
+
+	<struct name="recoveredStrainRateInvMap">
+		<param name="Type">lucScalarField</param>
+		<param name="FieldVariable">recoveredStrainRateInvariantField</param>
+		<param name="ColourMap">recstrainRateInvColourMap</param>
+	</struct>
+
+	<struct name="recstrainRateInvColourBar">
+		<param name="Type">lucColourBar</param>
+		<param name="ColourMap">recstrainRateInvColourMap</param>
+	</struct>
+
+	<struct name="recoveredStrainRateInvariantVP">
+		<param name="Type">lucViewport</param>
+		<param name="Camera">camera</param>
+		<list name="DrawingObject">
+			<param>strainrateTitle</param>
+			<param>recoveredStrainRateInvMap</param>
+			<param>border</param>
+			<param>recstrainRateInvColourBar</param>
+		</list>
+	</struct>
+</struct>
+
+</StGermainData>

@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+<struct name="components" mergeType="merge">
+	<struct name="recVGrad">
+	      <param name="Type">Variable</param>
+	      <param name="Rank">Vector</param>
+	      <param name="Dependency">decomp-linear</param>
+	      <param name="DataType">Double</param>
+	      <param name="Count">decomp-linear-nodeDomainCount</param>
+	      <param name="VectorComponentCount">4</param>
+	      <list name="names">
+		<param>recoveredVx_dx</param>
+		<param>recoveredVx_dy</param>
+		<param>recoveredVy_dx</param>
+		<param>recoveredVy_dy</param>
+	      </list>
+	</struct>
+
+	<struct name="recVGradDofLayout">
+	      <param name="Type">DofLayout</param>
+	      <param name="Count">decomp-linear-nodeDomainCount</param>
+	      <param name="BaseVariableCount">4</param>
+	       <list name="BaseVariables">
+	        <param>recoveredVx_dx</param>
+		<param>recoveredVx_dy</param>
+		<param>recoveredVy_dx</param>
+		<param>recoveredVy_dy</param>
+	       </list>
+	</struct>
+		
+	<struct name="recoveredVGrad">
+	      <param name="Type">FeVariable</param>
+	      <param name="FEMesh">mesh-linear</param>
+	      <param name="DofLayout">recVGradDofLayout</param>
+	</struct>
+
+	<struct name="recoveredVGradInvariantField"> 
+		<param name="Type">OperatorFeVariable</param>
+		<param name="Operator">TensorInvariant</param>
+		<param name="FeVariable">recoveredVGrad</param>
+	</struct>
+</struct>
+</StGermainData>

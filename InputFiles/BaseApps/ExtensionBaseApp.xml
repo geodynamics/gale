@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+	
+	<list name="plugins" mergeType="Replace">
+		<param>Underworld_MovingMesh</param>
+		<param>StgFEM_StandardConditionFunctions</param>
+	</list>
+
+	<!-- Component Stuff -->
+	<include>StgFEM/ElementLayout.xml                   </include>
+	<include>StgFEM/ConstantMesh.xml                    </include>
+	<include>StgFEM/LinearMesh.xml                      </include>
+	<include>StgFEM/VelocityField.xml                   </include>
+	<include>StgFEM/PressureField.xml                   </include>
+	<include>Underworld/GaussSwarm.xml                  </include>
+	<include>StgFEM/TimeIntegrator.xml                  </include>
+	<include>PICellerator/MaterialPointSwarm.xml        </include>
+	<include>Underworld/StokesFlowUzawaCompressible.xml </include>
+
+</StGermainData>
+

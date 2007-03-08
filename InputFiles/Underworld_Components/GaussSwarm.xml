@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<!-- A StGermain input file -->
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+	
+	<!-- Gauss Swarm Stuff -->
+	<struct name="components" mergeType="merge">
+		<struct name="cellLayout">
+			<param name="Type">SingleCellLayout</param>
+		</struct>
+		<struct name="particleLayout">
+			<param name="Type">GaussParticleLayout</param>
+		</struct>
+		<struct name="gaussSwarm">
+			<param name="Type">IntegrationPointsSwarm</param>
+			<param name="CellLayout">cellLayout</param>
+			<param name="ParticleLayout">particleLayout</param>
+			<param name="FiniteElement_Mesh">mesh-linear</param>
+			<param name="TimeIntegrator">timeIntegrator</param>
+			<param name="IntegrationPointMapper">gaussMapper</param>
+		</struct>
+		<struct name="gaussMapper">
+			<param name="Type">GaussMapper</param>
+			<param name="IntegrationPointsSwarm">gaussSwarm</param>
+			<param name="MaterialPointsSwarm">gaussMaterialSwarm</param>
+		</struct>
+		<struct name="backgroundLayout">
+			<param name="Type">BackgroundParticleLayout</param>
+		</struct>
+		<struct name="gaussMaterialSwarm">
+			<param name="Type">MaterialPointsSwarm</param>
+			<param name="CellLayout">cellLayout</param>
+			<param name="ParticleLayout">backgroundLayout</param>
+			<param name="FiniteElement_Mesh">mesh-linear</param>
+		</struct>
+		<struct name="timeIntegrator" mergeType="replace">
+			<param name="Type">TimeIntegrator</param>
+			<param name="order">timeIntegratorOrder</param>
+			<param name="simultaneous">f</param>
+			<param name="Context">context</param>
+		</struct>
+	</struct>
+
+</StGermainData>

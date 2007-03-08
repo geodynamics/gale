@@ -1,0 +1,32 @@
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+	<struct name="components" mergeType="merge">
+		<struct name="StressField">
+			<param name="Type">StressField</param>
+			<param name="StrainRateField">StrainRateField</param>
+			<param name="Context">context</param>
+			<param name="ConstitutiveMatrix">constitutiveMatrix</param>
+			<param name="Swarm">picIntegrationPoints</param>
+			<param name="Mesh">mesh-linear</param>
+		</struct>
+		<struct name="StressInvariantField"> 
+			<param name="Type">OperatorFeVariable</param>
+			<param name="Operator">SymmetricTensor_Invariant</param>
+			<param name="FeVariable">StressField</param>
+		</struct>		
+		<struct name="StressXXField"> 
+			<param name="Type">OperatorFeVariable</param>
+			<param name="Operator">TakeFirstComponent</param>
+			<param name="FeVariable">StressField</param>
+		</struct>			
+		<struct name="StressYYField"> 
+			<param name="Type">OperatorFeVariable</param>
+			<param name="Operator">TakeSecondComponent</param>
+			<param name="FeVariable">StressField</param>
+		</struct>		
+		<struct name="StressZZField"> 
+			<param name="Type">OperatorFeVariable</param>
+			<param name="Operator">TakeThirdComponent</param>
+			<param name="FeVariable">StressField</param>
+		</struct>		
+	</struct>
+</StGermainData>	

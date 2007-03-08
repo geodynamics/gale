@@ -1,0 +1,108 @@
+<!-- Rayleigh-Taylor lucifer viewports -->
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<struct name="components" mergeType="merge">
+		<!-- Camera And Colour Maps -->
+		<struct name="camera" mergeType="replace">
+			<param name="Type">lucCamera</param>
+			<param name="CentreFieldVariable">VelocityField</param>
+			<param name="coordZ">1.4762</param>
+		</struct>
+		<struct name="strainRateColourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours">Purple Blue Green Yellow Orange Red</param>
+			<param name="dynamicRange">True</param>
+		</struct>
+		<!-- Drawing Objects -->
+		<struct name="particlePrincipleStrainRate0">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="ColourVariable">materialSwarm-PD0</param>
+			<param name="ColourMap">strainColourMap</param>
+			<param name="maskValue">1</param>
+			<param name="maskType">EqualTo</param>
+			<param name="pointSize">2.0</param>
+		</struct>		
+		<struct name="particlePrincipleStrainRate1">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="ColourVariable">materialSwarm-PD1</param>
+			<param name="ColourMap">stressColourMap</param>
+			<param name="maskValue">1</param>
+			<param name="maskType">EqualTo</param>
+			<param name="pointSize">2.0</param>
+		</struct>	
+		<struct name="StrainRateDirectionMax">
+			<param name="Type">lucSwarmVectors</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="colour">black</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskValue">1</param>
+			<param name="maskType">EqualTo</param>
+			<param name="DirectionVariable">materialSwarm-StrainRate_DirectionMax</param>
+			<param name="arrowHeadSize">0.0</param>
+			<param name="length">0.2</param>
+			<param name="thickness">0.001</param>
+		</struct>
+		<struct name="StrainRateDirectionMin">
+			<param name="Type">lucSwarmVectors</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="colour">black</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskValue">1</param>
+			<param name="maskType">EqualTo</param>
+			<param name="DirectionVariable">materialSwarm-StrainRate_DirectionMin</param>
+			<param name="arrowHeadSize">0.0</param>
+			<param name="length">0.2</param>
+			<param name="thickness">0.001</param>
+		</struct>
+	
+		<struct name="border" mergeType="replace">
+			<param name="Type">lucFieldVariableBorder</param>
+			<param name="FieldVariable">VelocityField</param>
+		</struct>
+		<struct name="strainRateColourBar">
+			<param name="Type">lucColourBar</param>
+			<param name="ColourMap">strainRateColourMap</param>
+		</struct>
+		<!-- Viewport -->
+		<struct name="ParticlePrincipleStrainRate0VP">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">camera</param>
+			<list name="DrawingObject">
+				<param>particlePrincipleStrainRate0</param>
+				<param>border</param>
+				<param>strainRateColourBar</param>
+			</list>
+		</struct>
+		<struct name="ParticlePrincipleStrainRate1VP">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">camera</param>
+			<list name="DrawingObject">
+				<param>particlePrincipleStrainRate1</param>
+				<param>border</param>
+				<param>strainRateColourBar</param>
+			</list>
+		</struct>
+		<struct name="StrainRateDirectionMaxVP">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">camera</param>
+			<list name="DrawingObject">
+				<param>StrainRateDirectionMax</param>
+				<param>border</param>
+			</list>
+		</struct>
+		<struct name="StrainRateDirectionMinVP">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">camera</param>
+			<list name="DrawingObject">
+				<param>StrainRateDirectionMin</param>
+				<param>border</param>
+			</list>
+		</struct>
+	</struct>
+
+</StGermainData>

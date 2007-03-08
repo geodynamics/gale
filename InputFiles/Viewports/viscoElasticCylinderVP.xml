@@ -1,0 +1,206 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<struct name="components" mergeType="merge">
+	<struct name="title">
+		<param name="Type">lucTitle</param>
+	</struct>
+		<struct name="particleCamera">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">0.5</param>
+			<param name="coordY">0.5</param>
+			<param name="coordZ">2.4683</param>
+			<param name="focalPointX">0.5</param>
+			<param name="focalPointY">0.5</param>
+			<param name="focalPointZ">0.5</param>
+			<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+			<param name="stereoType">Mono</param>
+			<param name="eyeSeparation">0.2</param>
+			<param name="focalLength">0</param>
+		</struct>
+		<struct name="particleCamera2">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">0.5</param>
+			<param name="coordY">2.4683</param>
+			<param name="coordZ">0.50344</param>
+			<param name="focalPointX">0.5</param>
+			<param name="focalPointY">0.5</param>
+			<param name="focalPointZ">0.5</param>
+			<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+			<param name="stereoType">Mono</param>
+			<param name="eyeSeparation">0.2</param>
+			<param name="focalLength">0</param>
+		</struct>
+		<struct name="BlueToRedColourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours">Blue Green Yellow Orange Red</param>
+			<param name="dynamicRange">true</param>
+			<param name="logScale">true</param>
+		</struct>
+		<struct name="BlueToRedColourBar">
+			<param name="Type">lucColourBar</param>
+			<param name="ColourMap">BlueToRedColourMap</param>
+		</struct>
+
+		<struct name="vizParticles">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="pointSize">0.2</param>
+			<param name="maskValue">1</param>
+			<param name="maskType">EqualTo</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="colour">red</param>
+		</struct>
+		<struct name="vizParticles2">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="pointSize">0.2</param>
+			<param name="maskValue">2</param>
+			<param name="maskType">EqualTo</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="colour">blue</param>
+		</struct>
+		<struct name="vizParticlesVP">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">particleCamera</param>
+			<list name="DrawingObject">
+				<param>title</param>
+				<param>strainRateInvBorder</param>
+				<param>vizParticles</param>
+				<param>vizParticles2</param>
+			</list>
+		</struct>
+		<struct name="vizParticlesVP2">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">particleCamera2</param>
+			<list name="DrawingObject">
+				<param>title</param>
+				<param>strainRateInvBorder</param>
+				<param>vizParticles</param>
+				<param>vizParticles2</param>
+			</list>
+		</struct>
+		
+		<struct name="strainRateColourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours">Purple Blue Green Yellow Orange Red Black</param>
+			<!--param name="logScale">true</param-->
+			<param name="dynamicRange">true</param>
+		</struct>
+		<!--struct name="strainRateInvMap">
+			<param name="Type">lucScalarField</param>
+			<param name="FieldVariable">recoveredStrainRateInvariantField</param>
+			<param name="ColourMap">strainRateColourMap</param>
+		</struct-->
+		<struct name="strainRateInvBorder">
+			<param name="Type">lucFieldVariableBorder</param>
+			<param name="FieldVariable">StrainRateInvariantField</param>
+		</struct>
+		<struct name="strainRateColourBar">
+			<param name="Type">lucColourBar</param>
+			<param name="ColourMap">strainRateColourMap</param>
+		</struct>
+
+
+		<!--struct name="strainRateInvVP">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">particleCamera</param>
+			<list name="DrawingObject">
+				<param>title</param>
+				<param>strainRateInvBorder</param>
+				<param>strainRateInvMap</param>
+				<param>strainRateColourBar</param>
+			</list>
+		</struct-->
+		
+
+		
+		<struct name="cylinderSurfaceWithStrainRateInv">
+			<param name="Type">lucIsosurface</param>
+			<param name="IsosurfaceField">cylinderField</param>
+			<!--param name="Type">lucScalarField</param>
+			<param name="FieldVariable">StrainRateInvariantField</param-->
+			<param name="ColourMap">strainRateColourMap</param>
+			<param name="ColourField">StrainRateInvariantField</param>
+			<param name="isovalue">0.1</param>
+			<param name="drawWalls">true</param>
+		</struct>
+		<struct name="cylinder2SurfaceWithStrainRateInv">
+			<param name="Type">lucIsosurface</param>
+			<param name="IsosurfaceField">cylinderField2</param>
+			<!--param name="Type">lucScalarField</param>
+			<param name="FieldVariable">StrainRateInvariantField</param-->
+			<param name="ColourMap">strainRateColourMap</param>
+			<param name="ColourField">StrainRateInvariantField</param>
+			<param name="isovalue">0.1</param>
+			<param name="drawWalls">true</param>
+		</struct>
+		<struct name="cylinderWithStrainRateInvVP">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">particleCamera</param>
+			<list name="DrawingObject">
+				<param>cylinderSurfaceWithStrainRateInv</param>
+				<param>cylinder2SurfaceWithStrainRateInv</param>
+				<param>title</param>
+				<param>strainRateColourBar</param>
+				<param>strainRateInvBorder</param>
+			</list>
+		</struct>
+		
+		<struct name="cylinderWithStrainRateInvVP2">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">particleCamera2</param>
+			<list name="DrawingObject">
+				<param>cylinderSurfaceWithStrainRateInv</param>
+				<param>title</param>
+				<param>strainRateColourBar</param>
+				<param>strainRateInvBorder</param>
+			</list>
+		</struct>
+	</struct>
+
+	<list name="plugins" mergeType="merge">
+		<param>lucPlugin</param>
+	</list>
+
+	<!--These components are some general ones-->
+	<struct name="components" mergeType="merge">
+		<struct name="renderingEngine">
+			<param name="Type">lucRenderingEngineGL</param>
+		</struct>
+		<struct name="imageOutput">
+			<param name="Type">lucOutputPNG</param>
+		</struct>
+		<struct name="window">
+			<param name="Type">lucDefaultWindow</param>
+			<param name="RenderingEngine">renderingEngine</param>
+			<list name="OutputFormat">
+				<param>imageOutput</param>
+			</list>
+			<param name="height">800</param>
+			<param name="width">960</param>
+			<param name="interactive">false</param>
+			<param name="backgroundColour">white</param>
+		</struct>
+		<struct name="movie">
+			<param name="Type">lucEncoderLibfame</param>
+			<param name="Window">window</param>
+		</struct>	
+	</struct>
+
+	<struct name="components" mergeType="merge">
+		<struct name="window" mergeType="merge">
+			<list name="Viewport">
+				<param> cylinderWithStrainRateInvVP cylinderWithStrainRateInvVP2  </param>
+				<param> vizParticlesVP vizParticlesVP2 </param>
+			</list>
+		</struct>
+	</struct>
+ 
+</StGermainData>

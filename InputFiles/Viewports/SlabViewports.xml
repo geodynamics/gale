@@ -1,0 +1,178 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<list name="plugins" mergeType="merge">
+	<param>lucPlugin</param>
+</list>
+
+<struct name="components" mergeType="merge">
+	<!-- Camera View -->
+	<struct name="topViewCamera">
+		<param name="Type">lucCamera</param>
+        <param name="coordX">0</param>
+        <param name="coordY">3.7869</param>
+        <param name="coordZ">0.0066</param>		
+		<param name="CentreFieldVariable">VelocityField</param>
+	</struct>
+	<struct name="sideViewCamera">
+		<param name="Type">lucCamera</param>
+        <param name="coordX">0.0035</param>
+        <param name="coordY">0.19143</param>
+        <param name="coordZ">3.6527</param>		
+		<param name="CentreFieldVariable">VelocityField</param>
+	</struct>
+	<struct name="frontViewCamera">
+		<param name="Type">lucCamera</param>
+        <param name="coordX">-3.3096</param>
+        <param name="coordY">1.0398</param>
+        <param name="coordZ">0</param>		
+		<param name="CentreFieldVariable">VelocityField</param>
+	</struct>
+	<struct name="perspectiveViewCamera">
+		<param name="Type">lucCamera</param>
+        <param name="coordX">-3.3107</param>
+        <param name="coordY">1.309</param>
+        <param name="coordZ">3.4451</param>		
+		<param name="CentreFieldVariable">VelocityField</param>
+	</struct>
+	<!-- Colour Maps -->
+	<struct name="strainRateColourMap">
+		<param name="Type">lucColourMap</param>
+		<param name="colours">Purple Blue Green Yellow Orange Red Black</param>
+		<param name="minimum">0.0</param>
+		<param name="maximum">1.0</param>
+		<param name="logScale">true</param>
+		<param name="dynamicRange">true</param>		
+	</struct>
+	<struct name="velocityMagColourMap">
+		<param name="Type">lucColourMap</param>
+		<param name="colours">Purple Blue Green Yellow Orange Red Black</param>
+		<param name="minimum">0.0</param>
+		<param name="maximum">1.0</param>
+		<param name="logScale">false</param>
+		<param name="dynamicRange">true</param>		
+	</struct>	
+	<!-- Drawing Objects -->
+	<struct name="slabSurfaceWithStrainRateInv">
+		<param name="Type">lucIsosurface</param>
+		<param name="IsosurfaceField">SlabField</param>
+		<param name="ColourMap">strainRateColourMap</param>
+		<param name="ColourField">StrainRateInvariantField</param>
+		<param name="isovalue">0.1</param>
+		<param name="drawWalls">true</param>
+	</struct>			
+	<struct name="lowerMantleSurface">
+		<param name="Type">lucIsosurface</param>
+		<param name="IsosurfaceField">LowerMantleField</param>
+		<param name="colour">Red</param>
+		<param name="isovalue">0.5</param>
+		<param name="drawWalls">true</param>
+		<param name="resolution">12</param>
+	</struct>
+	<struct name="velocityArrows">
+		<param name="Type">lucVectorArrows</param>
+		<!--  Velocity arrows in a horizontal cross section -->
+		<param name="VectorVariable">VelocityField</param>
+		<param name="colour">Black</param>
+		<!--param name="CrossSection">y=0.8</param-->
+		<param name="arrowHeadSize">0.1</param> 
+		<param name="lengthScale">0.4</param>
+
+		<!-- resolutionX per processor -->
+		<!-- mesh size 32x16x16 on 4 cpus = 32/4 = 8 -->
+		<!-- mesh size 40x20x20 on 4 cpus = 40/4 = 10 -->
+		<param name="resolutionX">10</param>
+
+		<!-- resolutionZ = number of elements in Z direction -->
+		<param name="resolutionZ">elementResK</param>
+	</struct>				
+	<struct name="velocityMagScalarField">
+		<param name="Type">lucScalarField</param>
+		<param name="FieldVariable">VelocityMagnitudeField</param>
+		<param name="ColourMap">velocityMagColourMap</param>
+	</struct>	
+	<struct name="border">
+		<param name="Type">lucFieldVariableBorder</param>
+		<param name="FieldVariable">VelocityField</param>
+	</struct>
+	<struct name="strainRateColourBar">
+		<param name="Type">lucColourBar</param>
+		<param name="ColourMap">strainRateColourMap</param>
+	</struct>
+	<struct name="velocityMagColourBar">
+		<param name="Type">lucColourBar</param>
+		<param name="ColourMap">velocityMagColourMap</param>
+	</struct>
+	<!-- Create Viewports -->
+	<struct name="TopView">
+		<param name="Type">lucViewport</param>
+		<param name="Camera">topViewCamera</param>
+		<list name="DrawingObject">
+			<param>slabSurfaceWithStrainRateInv</param>
+			<param>lowerMantleSurface</param>
+			<param>border</param>
+			<param>strainRateColourBar</param>
+		</list>
+	</struct>
+	<struct name="SideView">
+		<param name="Type">lucViewport</param>
+		<param name="Camera">sideViewCamera</param>
+		<list name="DrawingObject">
+			<param>slabSurfaceWithStrainRateInv</param>
+			<param>lowerMantleSurface</param>
+			<param>border</param>
+			<param>strainRateColourBar</param>
+		</list>
+	</struct>	
+	<struct name="FrontView">
+		<param name="Type">lucViewport</param>
+		<param name="Camera">frontViewCamera</param>
+		<list name="DrawingObject">
+			<param>slabSurfaceWithStrainRateInv</param>
+			<param>lowerMantleSurface</param>
+			<param>border</param>
+			<param>strainRateColourBar</param>
+		</list>
+	</struct>	
+	<struct name="PerspectiveView">
+		<param name="Type">lucViewport</param>
+		<param name="Camera">perspectiveViewCamera</param>
+		<list name="DrawingObject">
+			<param>slabSurfaceWithStrainRateInv</param>
+			<param>velocityMagScalarField</param>
+			<param>lowerMantleSurface</param>
+			<param>border</param>
+			<param>velocityMagColourBar</param>
+		</list>
+	</struct>	
+	<struct name="renderingEngine">
+		<param name="Type">lucRenderingEngineGL</param>
+	</struct>
+	<struct name="pngOutput">
+		<param name="Type">lucOutputPNG</param>
+	</struct>
+	<struct name="window">
+		<param name="Type">lucDefaultWindow</param>
+		<param name="RenderingEngine">renderingEngine</param>
+		<param name="OutputFormat">pngOutput</param>
+		<param name="height">592</param>
+		<param name="width">800</param>
+		<param name="interactive">y</param>
+		<param name="backgroundColour">White</param>
+		<list name="Viewport">
+			<!-- 2x2 viewports -->
+			<!-- Viewports 1 & 2 -->
+			<param>TopView SideView</param>
+			<!-- Viewports 3 & 4 -->
+			<param>FrontView PerspectiveView</param>		
+		</list>
+	</struct>
+	<struct name="movie">
+		<param name="Type">lucEncoderLibfame</param>
+		<param name="Window">window</param>
+	</struct>	
+</struct>
+
+</StGermainData>

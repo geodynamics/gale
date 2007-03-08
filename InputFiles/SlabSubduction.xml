@@ -1,0 +1,171 @@
+<!-- Rayleigh-Taylor app input file -->
+
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<include>Underworld/BaseApps/RayleighTaylor.xml</include>
+
+	<list name="plugins" mergeType="merge">
+		<!-- Output Plugins -->
+		<param>StgFEM_FrequentOutput</param>	
+		<param>Underworld_Vrms</param>	
+		<param>StgFEM_CPUTime</param>
+	</list>
+
+	<struct name="components" mergeType="merge">
+		<!-- Shape Stuff -->
+		<struct name="upperMantleShape">
+			<param name="Type">Everywhere</param>
+		</struct>	
+		<struct name="lowerMantleShape">
+			<param name="Type">Box</param>
+			<param name="startX">0.0</param> <param name="endX">4.0</param>
+			<param name="startY">0.0</param> <param name="endY">0.35</param>
+			<param name="startZ">0.0</param> <param name="endZ">4.0</param>
+		</struct>
+		<struct name="mainSlab">
+			<param name="Type">Box</param>
+			<param name="startX">1.2</param>  <param name="endX">3.4</param>
+			<param name="startY">0.90</param> <param name="endY">1.0</param>
+			<param name="startZ">1.25</param> <param name="endZ">2.75</param>
+		</struct>
+		<struct name="slabPerturbation">
+			<param name="Type">PolygonShape</param>
+			<param name="startZ"> 1.25 </param>  <param name="endZ"> 2.75  </param>
+			<list name="verticies">
+				<asciidata>
+					<columnDefinition name = "x" type="double"/>
+					<columnDefinition name = "y" type="double"/>
+					1.20	1.0 
+					1.20	0.9 
+					1.02	0.8 
+					1.02	0.9 
+				</asciidata>
+			</list>
+		</struct>
+		<struct name="slabShape">
+			<param name="Type">Union</param>
+			<list name="shapes">
+				<param>mainSlab</param>
+				<param>slabPerturbation</param>
+			</list>
+		</struct>
+		
+		<!-- Background Material Stuff -->
+		<struct name="upperMantleViscosity">
+			<param name="Type">MaterialViscosity</param>
+			<param name="eta0">1.0</param>
+		</struct>
+		<struct name="upperMantle">
+			<param name="Type">RheologyMaterial</param>
+			<param name="Shape">upperMantleShape</param>
+			<param name="density">0.0</param>
+			<param name="Rheology">upperMantleViscosity</param>
+		</struct>
+		
+		<!-- Lower Mantle Material Stuff -->
+		<struct name="lowerMantleViscosity">
+			<param name="Type">MaterialViscosity</param>
+			<!-- Viscosity 100 x Upper Mantle -->
+			<param name="eta0">100.0</param>
+		</struct>
+		<struct name="LowerMantle">
+			<param name="Type">RheologyMaterial</param>
+			<param name="Shape">lowerMantleShape</param>
+			<param name="density">0.0</param>
+			<param name="Rheology">lowerMantleViscosity</param>
+		</struct>
+
+		<!-- Slab Stuff -->
+		<struct name="slabViscosity">
+			<param name="Type">MaterialViscosity</param>
+			<!-- Viscosity 200 x Upper Mantle (Background)-->
+			<param name="eta0">200.0</param>
+		</struct>
+		<struct name="slabYielding">
+			<param name="Type">Byerlee</param>
+			<param name="StrainRateField">StrainRateField</param>
+			<param name="BlockGeometry">geometry</param>
+			<param name="FiniteElement_Mesh">mesh-linear</param>
+			<param name="cohesion">0.04</param>
+			<param name="depthCoefficient">0.25</param>
+		</struct>
+		<struct name="Slab">
+			<param name="Type">RheologyMaterial</param>
+			<param name="Shape">slabShape</param>
+			<param name="density">1.0</param>
+			<list name="Rheology">
+				<param>slabViscosity</param>
+				<param>slabYielding</param>
+			</list>
+		</struct>
+		<!-- Slab Field Stuff -->
+		<struct name="SlabField">
+			<param name="Type">MaterialFeVariable</param>
+			<param name="Swarm">picIntegrationPoints</param>
+			<param name="Material">Slab</param>
+			<param name="Context">context</param>
+			<param name="Mesh">mesh-linear</param>
+		</struct>
+
+		<!-- Lower Mantle Field Stuff -->
+		<struct name="LowerMantleField">
+			<param name="Type">MaterialFeVariable</param>
+			<param name="Swarm">picIntegrationPoints</param>
+			<param name="Material">LowerMantle</param>
+			<param name="Context">context</param>
+			<param name="Mesh">mesh-linear</param>
+		</struct>		
+	</struct>
+
+	<include>Underworld/Viewports/SlabViewports.xml</include>
+
+	<param name="journal.info.Context-verbose">true</param>
+	<param name="journal.debug">t</param>
+	<param name="journal-level.info.Stg_ComponentFactory">2</param>
+	<param name="journal-enable-branch.debug.StgFEM">t</param>
+	<param name="journal-level-branch.debug.StgFEM"> 2 </param>
+	<param name="journal-enable-branch.debug.Swarm">f</param>
+	<param name="journal-level-branch.debug.Swarm"> 2 </param>
+	<param name="journal-level.debug.lucDebug">2</param>
+	<param name="journal-enable-branch.debug.lucDebug">f</param>
+
+	<!-- general simulation parameters -->
+	<param name="maxTimeSteps"> 30 </param>
+	<param name="dumpEvery"> 1 </param>
+	<param name="outputPath"> ./output </param>
+	<param name="gravity"> 1.0 </param>
+        <param name="checkpointEvery"> 10 </param>
+
+        <!---  restart from a previous checkpoint -->
+        <!---
+        <param name="restartTimestep"> 10 </param>
+         -->
+
+	<!-- general decomposition parameters -->
+	<param name="dim"> 3 </param>
+	<!-- mesh parameters -->
+	<param name="elementResI"> 32 </param>
+	<param name="elementResJ"> 16 </param>
+	<param name="elementResK"> 32 </param>
+
+	<param name="shadowDepth"> 1 </param>
+	<param name="minX"> 0.0 </param>
+	<param name="minY"> 0.0 </param>
+	<param name="minZ"> 2.0 </param>
+	<param name="maxX"> 4.0 </param>
+	<param name="maxY"> 1.0 </param>
+	<param name="maxZ"> 4.0 </param>
+	<param name="allowUnbalancing"> True </param>
+	<param name="buildElementNodeTbl"> True </param>
+	
+	<!-- Non-linear stuff -->
+	<param name="nonLinearMaxIterations"> 5 </param>	
+
+	<!-- Swarm parameters -->
+	<param name="particlesPerCell"> 20 </param>
+
+	<!-- Boundary conditions -->
+	<include>Underworld/VariableConditions/velocityBCs.freeslip.xml</include>
+
+</StGermainData>	

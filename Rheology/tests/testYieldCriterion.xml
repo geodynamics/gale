@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<searchPath>../../InputFiles/</searchPath>
+	<include> BaseApps/LidDrivenPIC.xml </include>
+	
+	<list name="plugins" mergeType="merge">
+		<param>Underworld_MovingMesh</param>
+		<param>Underworld_IncompressibleExtensionBC</param>
+		
+		<!-- Output Plugins -->
+		<param>StgFEM_FrequentOutput</param>	
+		<param>Underworld_Vrms</param>	
+		<param>StgFEM_CPUTime</param>	
+		<param>Underworld_testYieldCriterion</param>	
+	</list>
+
+	<struct name="components" mergeType="merge">
+		<!-- Shape Stuff -->
+		<struct name="backgroundShape">
+			<param name="Type">Everywhere</param>
+		</struct>	
+		<!-- Background Material Stuff -->
+		<struct name="layerViscosity">
+			<param name="Type">MaterialViscosity</param>
+			<param name="eta0">3.4</param>
+		</struct>	
+		<struct name="materialSwarmParticleLayout" mergeType="replace">
+			<param name="Type">GaussParticleLayout</param>
+		</struct>
+		<struct name="plasticLayer">
+			<param name="Type">RheologyMaterial</param>
+			<param name="Shape">backgroundShape</param>
+			<list name="Rheology">
+				<param>layerViscosity</param>
+				<param>yieldRheology</param>
+			</list>
+		</struct>
+	</struct>
+
+	<!-- Simulation control -->
+	<param name="maxTimeSteps"> 15 </param>
+	<param name="outputPath"> ./output </param>
+	<param name="dumpEvery"> 1 </param>	
+
+	<!-- Non-linear stuff -->
+	<param name="nonLinearMaxIterations"> 500 </param>	
+	
+	<!-- Journal Control -->
+	<param name="journal.info.Context-verbose">True</param>
+	<param name="journal-level.info.Stg_ComponentFactory">2</param>
+	<param name="journal.debug">f</param>
+	<param name="journal-enable-branch.debug.StgFEM">f</param>
+	<param name="journal-level-branch.debug.StgFEM"> 2 </param>	
+	
+	<!-- Geometry & Mesh setup -->
+	<param name="dim"> 2 </param>
+	<param name="elementResI"> 30 </param>
+	<param name="elementResJ"> 10 </param>
+	<param name="elementResK"> 10 </param>
+	<param name="shadowDepth"> 1 </param>
+	<param name="minX"> 0.0 </param>
+	<param name="minY"> 0.0 </param>
+	<param name="minZ"> 0.0 </param>
+	<param name="maxX"> 3.0 </param>
+	<param name="maxY"> 1.0 </param>
+	<param name="maxZ"> 1.0 </param>
+	<param name="allowUnbalancing"> True </param>
+	
+	<param name="particlesPerCell"> 20 </param>
+
+	<!-- Set up BCs and ICs -->
+	<include> velocityBCs.incompressible.xml </include>
+ 
+	<!--
+	<include>./Viewports/StrainRateInvariantVP.xml</include>
+	<include>./Viewports/VelocityMagnitudeVP.xml</include>
+	<include>./Viewports/PressureVP.xml</include>
+	<include>./window.xml</include>
+	 <struct name="components" mergeType="merge">
+ 		<struct name="window" mergeType="merge">
+			<param name="Viewport">StrainRateInvariantVP VelocityMagnitudeVP PressureVP</param>
+		</struct>
+	</struct>
+	-->
+</StGermainData>
