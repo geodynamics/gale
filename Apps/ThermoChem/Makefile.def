@@ -1,0 +1,20 @@
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+##
+## Victorian Partnership for Advanced Computing (VPAC) Ltd, Australia
+## (C) 2003 All Rights Reserved
+##
+## <copyright-release-tag>
+##
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+def_sub = # tests
+
+modName := $(shell basename `pwd` )
+modName := $(shell echo ${modName} | cut -c 1 | tr '[:lower:]' '[:upper:]' )$(shell echo ${modName} | cut -c 2- ) 
+
+def_mod = ${PROJECT}_${modName}
+def_inc = ${PROJECT}/${modName}
+
+def_srcs = $(wildcard *.c)
+
+def_hdrs = $(wildcard *.h)

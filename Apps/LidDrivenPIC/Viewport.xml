@@ -1,0 +1,59 @@
+<!-- Rayleigh-Taylor lucifer viewports -->
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<!-- Viewport stuff -->
+	<struct name="components" mergeType="merge">
+		<!-- Camera And Colour Maps -->
+		<struct name="camera" mergeType="replace">
+			<param name="Type">lucCamera</param>
+			<param name="CentreFieldVariable">VelocityField</param>
+			<param name="coordZ">1.4762</param>
+		</struct>
+		<struct name="pressureColourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours">Black Grey White Orange Red</param>
+			<param name="dynamicRange">true</param>
+		</struct>
+		<!-- Drawing Objects -->
+		<struct name="pressureColourBar">
+			<param name="Type">lucColourBar</param>
+			<param name="ColourMap">pressureColourMap</param>
+		</struct>			
+		<struct name="pressureMap">
+			<param name="Type">lucScalarField</param>
+			<param name="FieldVariable">PressureField</param>
+			<param name="ColourMap">pressureColourMap</param>
+		</struct>
+		<struct name="velocityArrows">
+			<param name="Type">lucVectorArrows</param>
+			<param name="VectorVariable">VelocityField</param>
+			<param name="Colour">black</param>
+			<param name="arrowHeadSize">0.15</param>	
+			<param name="lengthScale">0.15</param>	
+		</struct>		
+		<struct name="particleDots" mergeType="replace">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="colour">black</param>
+			<param name="pointSize">2.0</param>
+		</struct>		
+		<struct name="border">
+			<param name="Type">lucFieldVariableBorder</param>
+			<param name="FieldVariable">VelocityField</param>
+		</struct>
+		<!-- Viewport -->
+		<struct name="SolutionViewport">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">camera</param>
+			<list name="DrawingObject">
+				<param>pressureMap</param>
+				<param>velocityArrows</param>
+				<param>particleDots</param>
+				<param>border</param>
+				<param>pressureColourBar</param>
+			</list>
+		</struct>
+	</struct>
+
+</StGermainData>

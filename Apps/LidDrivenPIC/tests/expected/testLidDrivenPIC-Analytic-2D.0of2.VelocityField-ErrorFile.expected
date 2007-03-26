@@ -1,0 +1,3 @@
+Timestep 0: Total integrated value of 'VelocityField-ErrorMagnitudeField' is outside a tolerance 0.015.
+Timestep 1: Total integrated value of 'VelocityField-ErrorMagnitudeField' is within a tolerance 0.015.
+Timestep 2: Total integrated value of 'VelocityField-ErrorMagnitudeField' is within a tolerance 0.015.

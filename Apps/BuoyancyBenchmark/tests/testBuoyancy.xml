@@ -1,0 +1,15 @@
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<include>../BuoyancyExample.xml</include>
+	
+	<!--include>AnalyticViewports.xml</include-->
+
+	<list name="plugins" mergeType="merge">
+		<param>PICellerator_AnalyticPressure</param>
+	</list>
+	<!-- Making a fairly tight tolerance for Gauss points model
+		given test runs gave value of order 10 ^-6 -->
+	<param name="PressureField-Tolerance">1.5e-6</param>
+
+</StGermainData>	

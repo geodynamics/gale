@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<struct name="components" mergeType="merge">
+		<struct name="analyticPressureColourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours">Black Purple DarkRed Orange Yellow</param>
+			<param name="dynamicRange">true</param>
+		</struct>
+		<!-- Drawing Objects -->
+		<struct name="analyticPressureMap">
+			<param name="Type">lucScalarField</param>
+			<param name="FieldVariable">AnalyticPressureField</param>
+			<param name="ColourMap">analyticPressureColourMap</param>
+		</struct>
+		<struct name="analyticPressureColourBar">
+			<param name="Type">lucColourBar</param>
+			<param name="ColourMap">analyticPressureColourMap</param>
+		</struct>
+		<!-- Put these althogether in a viewport -->
+		<struct name="AnalyticPressureVP">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">camera</param>
+			<list name="DrawingObject">
+				<param>analyticPressureMap</param>
+				<param>border</param>
+				<param>analyticPressureColourBar</param>
+			</list>
+		</struct>
+	</struct>
+</StGermainData>

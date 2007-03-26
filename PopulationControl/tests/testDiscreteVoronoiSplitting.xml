@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<include>testPopulationControl.xml</include>
+	
+	<struct name="components" mergeType="merge">
+		<struct name="discreteVoronoi">
+			<param name="Type">CellularAutomataVoronoi</param>
+			<param name="resolution">16</param>
+			<param name="diagonalNeighbours">true</param>
+		</struct>
+		<struct name="splittingRoutine">
+			<param name="Type">DiscreteVoronoiSplitting</param>
+			<param name="idealParticleCount">100</param>
+			<param name="DiscreteVoronoi">discreteVoronoi</param>
+		</struct>	
+	</struct>
+
+	<param name="maxDiscrepancy">0.14</param>
+	
+</StGermainData>

@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+ 	
+	<list name="plugins" mergeType="merge">
+		<param>lucPlugin</param>
+	</list>
+	<struct name="components" mergeType="merge">
+		<struct name="renderingEngine">
+			<param name="Type">lucRenderingEngineGL</param>
+		</struct>
+		<struct name="imageOutput">
+			<param name="Type">lucOutputPNG</param>
+		</struct>
+		<struct name="window">
+			<param name="Type">lucDefaultWindow</param>
+			<param name="RenderingEngine">renderingEngine</param>
+			<list name="OutputFormat">
+				<param>imageOutput</param>
+			</list>
+			<param name="height">640</param>
+			<param name="width">640</param>
+			<param name="backgroundColour">white</param>
+		</struct>
+		<struct name="movie">
+			<param name="Type">lucEncoderLibfame</param>
+			<param name="Window">window</param>
+		</struct>	
+	</struct>
+
+</StGermainData>

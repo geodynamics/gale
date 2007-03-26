@@ -1,0 +1,16 @@
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<include>../RayTay_Example-flip1.xml</include>
+	
+	<list name="plugins" mergeType="merge">
+		<param>PICellerator_MaterialCentroid</param>
+	</list>
+
+	<param name="MaterialCentroid_Swarm">picIntegrationPoints</param>
+	<param name="CentroidMaterial">lightMaterial</param>
+	<param name="maxTimeSteps"> 2 </param>
+
+	<param name="outputPath">./output</param>
+
+</StGermainData>	

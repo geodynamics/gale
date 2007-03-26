@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<struct name="components" mergeType="merge">
+		<struct name="analyticVelocityMagnitudeColourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours">Purple Blue Green Yellow Orange Red Black</param>
+			<param name="dynamicRange">true</param>
+		</struct>
+		<!-- Drawing Objects -->
+		<struct name="analyticVelocityMagnitudeMap">
+			<param name="Type">lucScalarField</param>
+			<param name="FieldVariable">AnalyticVelocityMagnitudeField</param>
+			<param name="ColourMap">analyticVelocityMagnitudeColourMap</param>
+			<param name="resolution">128</param>
+		</struct>
+		<struct name="analyticVelocityArrows">
+			<param name="Type">lucVectorArrows</param>
+			<param name="VectorVariable">AnalyticVelocityField</param>
+			<param name="Colour">black</param>
+			<param name="arrowHeadSize">0.15</param>	
+			<param name="lengthScale">0.15</param>	
+		</struct>
+		<struct name="analyticVelocityMagnitudeColourBar">
+			<param name="Type">lucColourBar</param>
+			<param name="ColourMap">analyticVelocityMagnitudeColourMap</param>
+		</struct>
+		<!-- Put these althogether in a viewport -->
+		<struct name="AnalyticVelocityMagnitudeVP">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">camera</param>
+			<list name="DrawingObject">
+				<param>analyticVelocityMagnitudeMap</param>
+				<param>border</param>
+				<param>analyticVelocityArrows</param>
+				<param>analyticVelocityMagnitudeColourBar</param>
+			</list>
+		</struct>
+	</struct>
+</StGermainData>

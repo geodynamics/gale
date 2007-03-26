@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+	
+	<include>testElementIntegral.xml</include>
+	
+	<struct name="components" mergeType="merge">
+		<struct name="weights">
+			<param name="Type">DVCWeights</param>
+		</struct>		
+	</struct>
+
+</StGermainData>
