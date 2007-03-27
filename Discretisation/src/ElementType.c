@@ -1,0 +1,559 @@
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**
+** Copyright (C), 2003-2006, Victorian Partnership for Advanced Computing (VPAC) Ltd, 110 Victoria Street,
+**	Melbourne, 3053, Australia.
+**
+** Primary Contributing Organisations:
+**	Victorian Partnership for Advanced Computing Ltd, Computational Software Development - http://csd.vpac.org
+**	Australian Computational Earth Systems Simulator - http://www.access.edu.au
+**	Monash Cluster Computing - http://www.mcc.monash.edu.au
+**	Computational Infrastructure for Geodynamics - http://www.geodynamics.org
+**
+** Contributors:
+**	Patrick D. Sunter, Software Engineer, VPAC. (pds@vpac.org)
+**	Robert Turnbull, Research Assistant, Monash University. (robert.turnbull@sci.monash.edu.au)
+**	Stevan M. Quenette, Senior Software Engineer, VPAC. (steve@vpac.org)
+**	David May, PhD Student, Monash University (david.may@sci.monash.edu.au)
+**	Louis Moresi, Associate Professor, Monash University. (louis.moresi@sci.monash.edu.au)
+**	Luke J. Hodkinson, Computational Engineer, VPAC. (lhodkins@vpac.org)
+**	Alan H. Lo, Computational Engineer, VPAC. (alan@vpac.org)
+**	Raquibul Hassan, Computational Engineer, VPAC. (raq@vpac.org)
+**	Julian Giordani, Research Assistant, Monash University. (julian.giordani@sci.monash.edu.au)
+**	Vincent Lemiale, Postdoctoral Fellow, Monash University. (vincent.lemiale@sci.monash.edu.au)
+**
+**  This library is free software; you can redistribute it and/or
+**  modify it under the terms of the GNU Lesser General Public
+**  License as published by the Free Software Foundation; either
+**  version 2.1 of the License, or (at your option) any later version.
+**
+**  This library is distributed in the hope that it will be useful,
+**  but WITHOUT ANY WARRANTY; without even the implied warranty of
+**  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+**  Lesser General Public License for more details.
+**
+**  You should have received a copy of the GNU Lesser General Public
+**  License along with this library; if not, write to the Free Software
+**  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+**
+** $Id: ElementType.c 656 2006-10-18 06:45:50Z SteveQuenette $
+**
+**~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+#include <mpi.h>
+#include <StGermain/StGermain.h>
+#include "units.h"
+#include "types.h"
+#include "shortcuts.h"
+#include "ElementType.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <assert.h>
+#include <string.h>
+
+
+const Type ElementType_Type = "ElementType";
+
+ElementType* _ElementType_New( 
+		SizeT								_sizeOfSelf,
+		Type								type,
+		Stg_Class_DeleteFunction*						_delete,
+		Stg_Class_PrintFunction*						_print,
+		Stg_Class_CopyFunction*						_copy, 
+		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
+		Stg_Component_ConstructFunction*			_construct,
+		Stg_Component_BuildFunction*		_build,
+		Stg_Component_InitialiseFunction*		_initialise,
+		Stg_Component_ExecuteFunction*		_execute,
+		Stg_Component_DestroyFunction*		_destroy,
+		Name							name,
+		Bool							initFlag,
+		ElementType_EvaluateShapeFunctionsAtFunction*			_evaluateShapeFunctionsAt,
+		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt,
+		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,
+		Index								nodeCount )
+{
+	ElementType*		self;
+	
+	/* Allocate memory */
+	assert( _sizeOfSelf >= sizeof(ElementType) );
+	self = (ElementType*)_Stg_Component_New( _sizeOfSelf, type, _delete, _print, _copy, _defaultConstructor, _construct, _build, 
+			_initialise, _execute, _destroy, name, NON_GLOBAL );
+	
+	/* General info */
+	
+	/* Virtual functions */
+	self->_build = _build;
+	self->_evaluateShapeFunctionsAt = _evaluateShapeFunctionsAt;
+	self->_evaluateShapeFunctionLocalDerivsAt = _evaluateShapeFunctionLocalDerivsAt;
+	self->_convertGlobalCoordToElLocal = _convertGlobalCoordToElLocal;
+	
+	/* ElementType info */
+	
+	_Stg_Class_Init( (Stg_Class*)self );
+	_Stg_Object_Init( (Stg_Object*)self, name, NON_GLOBAL );
+	_Stg_Component_Init( (Stg_Component*)self );
+
+	if( initFlag ){
+		_ElementType_Init( self, nodeCount );
+	}
+	
+	return self;
+}
+
+void _ElementType_Init(
+		ElementType*				self,
+		Index					nodeCount )
+{
+	/* General and Virtual info should already be set */
+	
+	/* ElementType info */
+	self->isConstructed = True;
+	self->nodeCount = nodeCount;
+	self->debug = Stream_RegisterChild( StgFEM_Discretisation_Debug, ElementType_Type );
+}
+
+
+void _ElementType_Delete( void* elementType ) {
+	ElementType* self = (ElementType*)elementType;
+	Journal_DPrintf( self->debug, "In %s\n", __func__ );
+
+	/* Stg_Class_Delete parent*/
+	_Stg_Component_Delete( self );
+}
+
+void _ElementType_Print( void* elementType, Stream* stream ) {
+	ElementType* self = (ElementType*)elementType;
+	
+	/* Set the Journal for printing informations */
+	Stream* elementTypeStream = stream;
+	
+	/* General info */
+	Journal_Printf( elementTypeStream, "ElementType (ptr): %p\n", self );
+	
+	/* Print parent */
+	_Stg_Class_Print( self, elementTypeStream );
+	
+	/* Virtual info */
+	Journal_Printf( elementTypeStream, "\t_build (func ptr): %p\n", self->_build );
+	Journal_Printf( elementTypeStream, "\t_evaluateShapeFunctionsAt (func ptr): %p\n", self->_evaluateShapeFunctionsAt );
+	Journal_Printf( elementTypeStream,  "\t_evaluateShapeFunctionLocalDerivsAt (func ptr): %p\n", self->_evaluateShapeFunctionLocalDerivsAt );
+	
+	/* ElementType info */
+	Journal_Printf( elementTypeStream, "\tnodeCount: %u\n", self->nodeCount );
+}
+
+/* +++ Virtual Function Interfaces +++ */
+
+void ElementType_Build( void* elementType, void *data ) {
+	ElementType* self = (ElementType*)elementType;
+	
+	self->_build( self, data );
+}
+
+
+void ElementType_EvaluateShapeFunctionsAt( void* elementType, const double localCoord[], double* const evaluatedValues ) {
+	ElementType* self = (ElementType*)elementType;
+	
+	self->_evaluateShapeFunctionsAt( self, localCoord, evaluatedValues );
+}
+
+void ElementType_EvaluateShapeFunctionLocalDerivsAt( void* elementType, const double localCoord[], double** const evaluatedDerivatives ) {
+	ElementType* self = (ElementType*)elementType;
+	
+	self->_evaluateShapeFunctionLocalDerivsAt( self, localCoord, evaluatedDerivatives );
+}
+
+
+void ElementType_ConvertGlobalCoordToElLocal(
+		void*		elementType,
+		ElementLayout*	elementLayout,
+		const Coord**	globalNodeCoordPtrsInElement,
+		const Coord	globalCoord,
+		Coord		elLocalCoord ) 
+{
+	ElementType*		self = (ElementType*)elementType;
+
+	self->_convertGlobalCoordToElLocal( self, elementLayout, globalNodeCoordPtrsInElement, globalCoord, elLocalCoord );
+}
+
+
+/* +++ Virtual Function Implementations +++ */
+
+void _ElementType_ConvertGlobalCoordToElLocal(
+		void*           elementType,
+		ElementLayout*  elementLayout,
+		const Coord**   globalNodeCoordPtrsInElement,
+		const Coord     globalCoord,
+		Coord           elLocalCoord ) 
+{		
+	ElementType*		self            = (ElementType*)elementType;
+	TensorArray         jacobiMatrix;
+	double              tolerance       = 0.0001; // TODO put on class
+	double              maxResidual;
+	Iteration_Index     maxIterations   = 100;    // TODO put on class
+	Iteration_Index     iteration_I;
+	Node_Index          node_I;
+	Node_Index          nodeCount       = self->nodeCount;
+	double*             evaluatedShapeFuncs;
+	XYZ                 rightHandSide;
+	XYZ                 xiIncrement;
+	double              shapeFunc;
+	const double*       nodeCoord;
+	double**            GNi;
+	Dimension_Index     dim             = ((HexaEL*) elementLayout)->dim;
+
+	/* This function uses a Newton-Raphson iterative method to find the local coordinate from the global coordinate 
+	 * the equations are ( see FEM/BEM nodes p. 9 )
+	 *
+	 * x = \Sum_n( Ni( \xi, \eta, \zeta ) x_n )
+	 * y = \Sum_n( Ni( \xi, \eta, \zeta ) y_n )
+	 * z = \Sum_n( Ni( \xi, \eta, \zeta ) z_n )
+	 *
+	 * which are non-linear.
+	 *
+	 * This can be formulated into a system of linear equations of the form
+	 *
+	 * [              ][ \xi_{i + 1}   - \xi_i   ]   [ x - \Sum_n( Ni( \xi_i, \eta_i, \zeta_i ) x_n ]
+	 * [   Jacobian   ][ \eta_{i + 1}  - \eta_i  ] = [ y - \Sum_n( Ni( \xi_i, \eta_i, \zeta_i ) y_n ]
+	 * [              ][ \zeta_{i + 1} - \zeta_I ]   [ z - \Sum_n( Ni( \xi_i, \eta_i, \zeta_i ) z_n ]
+	 *
+	 * see http://en.wikipedia.org/wiki/Newton-Raphson_method
+	 *
+	 * */
+
+	evaluatedShapeFuncs = Memory_Alloc_Array( double, nodeCount, "evaluatedShapeFuncs" );
+	GNi = Memory_Alloc_2DArray( double, dim, nodeCount, "localShapeFuncDerivitives" );
+
+	/* Initial guess for element local coordinate is in the centre of the element - ( 0.0, 0.0, 0.0 ) */
+	memset( elLocalCoord, 0, sizeof( Coord ) );
+
+	/* Do Newton-Raphson Iteration */
+	for ( iteration_I = 0 ; iteration_I < maxIterations ; iteration_I++ ) {
+		/* Initialise Values */
+		TensorArray_Zero( jacobiMatrix );
+		memset( rightHandSide, 0, sizeof( XYZ ) );
+
+		/* Evaluate shape functions for rhs */
+		ElementType_EvaluateShapeFunctionsAt( self, elLocalCoord, evaluatedShapeFuncs );
+		self->_evaluateShapeFunctionLocalDerivsAt( self, elLocalCoord, GNi );
+
+
+		for ( node_I = 0 ; node_I < nodeCount ; node_I++ ) {
+			shapeFunc = evaluatedShapeFuncs[node_I];
+			nodeCoord = *(globalNodeCoordPtrsInElement[ node_I ]);
+
+			/* Form jacobi matrix */
+			jacobiMatrix[ MAP_TENSOR( 0, 0, dim ) ] += GNi[0][node_I] * nodeCoord[ I_AXIS ];
+			jacobiMatrix[ MAP_TENSOR( 0, 1, dim ) ] += GNi[1][node_I] * nodeCoord[ I_AXIS ];
+
+			jacobiMatrix[ MAP_TENSOR( 1, 0, dim ) ] += GNi[0][node_I] * nodeCoord[ J_AXIS ];
+			jacobiMatrix[ MAP_TENSOR( 1, 1, dim ) ] += GNi[1][node_I] * nodeCoord[ J_AXIS ];
+			
+
+			/* Form right hand side */
+			rightHandSide[ I_AXIS ] -= shapeFunc * nodeCoord[ I_AXIS ];
+			rightHandSide[ J_AXIS ] -= shapeFunc * nodeCoord[ J_AXIS ];
+
+			if ( dim == 3 ) {
+				jacobiMatrix[ MAP_3D_TENSOR( 0, 2 ) ] += GNi[2][node_I] * nodeCoord[ I_AXIS ];
+				jacobiMatrix[ MAP_3D_TENSOR( 1, 2 ) ] += GNi[2][node_I] * nodeCoord[ J_AXIS ];
+
+				jacobiMatrix[ MAP_3D_TENSOR( 2, 0 ) ] += GNi[0][node_I] * nodeCoord[ K_AXIS ];
+				jacobiMatrix[ MAP_3D_TENSOR( 2, 1 ) ] += GNi[1][node_I] * nodeCoord[ K_AXIS ];
+				jacobiMatrix[ MAP_3D_TENSOR( 2, 2 ) ] += GNi[2][node_I] * nodeCoord[ K_AXIS ];
+				
+				rightHandSide[ K_AXIS ] -= shapeFunc * nodeCoord[ K_AXIS ];
+			}
+		}
+
+		/* Finish building right hand side */
+		rightHandSide[ I_AXIS ] += globalCoord[ I_AXIS ];
+		rightHandSide[ J_AXIS ] += globalCoord[ J_AXIS ];
+		if ( dim == 3 )
+			rightHandSide[ K_AXIS ] += globalCoord[ K_AXIS ];
+
+		/* Solve for xi increment */
+		TensorArray_SolveSystem( jacobiMatrix, xiIncrement, rightHandSide, dim );
+
+		/* Update xi */
+		elLocalCoord[ I_AXIS ] += xiIncrement[ I_AXIS ];
+		elLocalCoord[ J_AXIS ] += xiIncrement[ J_AXIS ];
+		if ( dim == 3 )
+			elLocalCoord[ K_AXIS ] += xiIncrement[ K_AXIS ];
+
+		/* Check for convergence */
+		maxResidual = xiIncrement[ I_AXIS ];
+		if ( maxResidual < xiIncrement[ J_AXIS ] )
+			maxResidual = xiIncrement[ J_AXIS ];
+		if ( dim == 3 && maxResidual < xiIncrement[ K_AXIS ] )
+			maxResidual = xiIncrement[ K_AXIS ];
+
+		if ( maxResidual < tolerance )
+			break;
+	}
+		
+	Memory_Free( evaluatedShapeFuncs );
+	Memory_Free( GNi );
+}				
+
+
+/* +++ Public Functions +++ */
+void ElementType_ShapeFunctionsGlobalDerivs( 
+		void*			elementType,
+		void*			_mesh,
+		Element_DomainIndex	elId, 
+		double*			xi, 
+		int			dim, 
+		double*			detJac, 
+		double**		GNx )
+{
+	ElementType*			self = (ElementType*)elementType;
+	Mesh*				mesh = (Mesh*)_mesh;
+	double				*nodeCoord;
+	
+	double jac[3][3];
+	int rows=3;		/* max dimensions */
+	int cols=20;		/* max nodes per el */
+	double** GNi; 
+	int n, i, j;
+	double globalSF_DerivVal;
+	int dx, dxi;
+	double tmp, D = 0.0;
+	double cof[3][3];	/* cofactors */
+	Index nodesPerEl;
+	
+	
+	GNi = Memory_Alloc_2DArray( double, rows, cols, "GNi" );
+
+	nodesPerEl = self->nodeCount;
+	
+	/*
+	If constant shape function gets passed in here, getLocalDeriv will
+	indicate the error and exit code.
+	*/
+	
+	self->_evaluateShapeFunctionLocalDerivsAt( self, xi, GNi );
+	
+	
+	/* build the jacobian matrix */
+	/*
+	jac = 	\sum_i d/d\xi( N_i ) x_i 		\sum_i d/d\xi( N_i ) y_i
+			\sum_i d/d\eta( N_i ) x_i 		\sum_i d/d\eta( N_i ) y_i
+	*/
+	/* unroll this bugger cause we do it all the time */
+	if( dim == 2 ) {
+		jac[0][0] = jac[0][1] = jac[1][0] = jac[1][1] = 0.0;
+		for( n=0; n<nodesPerEl; n++){	
+			nodeCoord = Mesh_CoordAt( mesh, mesh->elementNodeTbl[elId][n] );
+			jac[0][0] = jac[0][0] + GNi[0][n] * nodeCoord[0];
+			jac[0][1] = jac[0][1] + GNi[0][n] * nodeCoord[1];
+			
+			jac[1][0] = jac[1][0] + GNi[1][n] * nodeCoord[0];
+			jac[1][1] = jac[1][1] + GNi[1][n] * nodeCoord[1];
+		}
+	}
+	
+	if( dim == 3 ) {
+		jac[0][0] = jac[0][1] = jac[0][2] = 0.0;
+		jac[1][0] = jac[1][1] = jac[1][2] = 0.0;
+		jac[2][0] = jac[2][1] = jac[2][2] = 0.0;
+		for( n=0; n<nodesPerEl; n++){	
+			nodeCoord = Mesh_CoordAt( mesh, mesh->elementNodeTbl[elId][n] );
+			jac[0][0] = jac[0][0] + GNi[0][n] * nodeCoord[0];
+			jac[0][1] = jac[0][1] + GNi[0][n] * nodeCoord[1];
+			jac[0][2] = jac[0][2] + GNi[0][n] * nodeCoord[2];
+			
+			jac[1][0] = jac[1][0] + GNi[1][n] * nodeCoord[0];
+			jac[1][1] = jac[1][1] + GNi[1][n] * nodeCoord[1];
+			jac[1][2] = jac[1][2] + GNi[1][n] * nodeCoord[2];
+			
+			jac[2][0] = jac[2][0] + GNi[2][n] * nodeCoord[0];
+			jac[2][1] = jac[2][1] + GNi[2][n] * nodeCoord[1];
+			jac[2][2] = jac[2][2] + GNi[2][n] * nodeCoord[2];
+		}
+	}
+	
+	/* get determinant of the jacobian matrix */
+	if( dim == 2 ) {
+		D = jac[0][0]*jac[1][1] - jac[0][1]*jac[1][0]; 
+	}		
+	if( dim == 3 ) {
+		D = jac[0][0]*( jac[1][1]*jac[2][2] - jac[1][2]*jac[2][1] ) 
+				  - jac[0][1]*( jac[1][0]*jac[2][2] - jac[1][2]*jac[2][0] ) 
+				  + jac[0][2]*( jac[1][0]*jac[2][1] - jac[1][1]*jac[2][0] );
+	}
+	(*detJac) = D;
+	
+	
+	/* invert the jacobian matrix A^-1 = adj(A)/det(A) */
+	if( dim == 2 ) {
+		tmp = jac[0][0];
+		jac[0][0] = jac[1][1]/D;
+		jac[1][1] = tmp/D;
+		jac[0][1] = -jac[0][1]/D;
+		jac[1][0] = -jac[1][0]/D;		
+	}
+	if( dim == 3 ) {
+		/*
+		00 01 02
+		10 11 12
+		20 21 22		
+		*/		
+		cof[0][0] = jac[1][1]*jac[2][2] - jac[1][2]*jac[2][1];
+		cof[1][0] = -(jac[1][0]*jac[2][2] - jac[1][2]*jac[2][0]);
+		cof[2][0] = jac[1][0]*jac[2][1] - jac[1][1]*jac[2][0];
+		
+		cof[0][1] = -(jac[0][1]*jac[2][2] - jac[0][2]*jac[2][1]);
+		cof[1][1] = jac[0][0]*jac[2][2] - jac[0][2]*jac[2][0];
+		cof[2][1] = -(jac[0][0]*jac[2][1] - jac[0][1]*jac[2][0]);
+		
+		cof[0][2] = jac[0][1]*jac[1][2] - jac[0][2]*jac[1][1];
+		cof[1][2] = -(jac[0][0]*jac[1][2] - jac[0][2]*jac[1][0]);
+		cof[2][2] = jac[0][0]*jac[1][1] - jac[0][1]*jac[1][0];
+		
+		for( i=0; i<dim; i++ ) {
+			for( j=0; j<dim; j++ ) {
+				jac[i][j] = cof[i][j]/D;
+			}
+		}
+		
+		
+	}
+	
+	/* get global derivs Ni_x, Ni_y and Ni_z if dim == 3 */
+	for( dx=0; dx<dim; dx++ ) {
+		for( n=0; n<nodesPerEl; n++ ) {
+			
+			globalSF_DerivVal = 0.0;
+			for(dxi=0; dxi<dim; dxi++) {
+				globalSF_DerivVal = globalSF_DerivVal + GNi[dxi][n] * jac[dx][dxi];
+			}
+			
+			GNx[dx][n] = globalSF_DerivVal;
+		}
+	}
+	
+	Memory_Free( GNi );
+}
+
+void ElementType_Jacobian_AxisIndependent( 
+		void*               elementType, 
+		void*               _mesh, 
+		Element_DomainIndex	elId, 
+		double*             xi, 
+		Dimension_Index     dim, 
+		double**            jacobian, 
+		double**            _GNi, 
+		Coord_Index         A_axis, 
+		Coord_Index         B_axis, 
+		Coord_Index         C_axis ) 
+{
+	ElementType* self        = (ElementType*) elementType;
+	Mesh*        mesh        = (Mesh*)_mesh;
+	double*      nodeCoord;
+	double**     GNi;
+	Node_Index   nodesPerEl  = self->nodeCount;
+	Node_Index   node_I;
+	
+	/* If GNi isn't passed in - then evaluate them for you */
+	if (_GNi == NULL) {
+		/* Using 3 here instead of dim so that you can pass in dim = 2 and use axes 0 and 2 for your jacobian */
+		GNi = Memory_Alloc_2DArray( double, 3, nodesPerEl, "Temporary GNi" );
+		self->_evaluateShapeFunctionLocalDerivsAt( self, xi, GNi );
+	}
+	else GNi = _GNi;
+
+	/* build the jacobian matrix */
+	/*
+	jacobian =  \sum_i d/d\xi( N_i ) x_i        \sum_i d/d\xi( N_i ) y_i
+	            \sum_i d/d\eta( N_i ) x_i       \sum_i d/d\eta( N_i ) y_i
+	*/
+	switch (dim) {
+		case 1: 			
+			jacobian[A_axis][A_axis] = 0.0;
+			for( node_I = 0 ; node_I < nodesPerEl; node_I++){
+				nodeCoord = Mesh_CoordAt( mesh, mesh->elementNodeTbl[elId][node_I] );
+				jacobian[A_axis][A_axis] += GNi[A_axis][node_I] * nodeCoord[A_axis];
+			}
+			break;
+		case 2:
+			jacobian[A_axis][A_axis] = jacobian[A_axis][B_axis] = jacobian[B_axis][A_axis] = jacobian[B_axis][B_axis] = 0.0;
+			for( node_I = 0 ; node_I < nodesPerEl; node_I++){
+				nodeCoord = Mesh_CoordAt( mesh, mesh->elementNodeTbl[elId][node_I] );
+				jacobian[A_axis][A_axis] += GNi[A_axis][node_I] * nodeCoord[A_axis];
+				jacobian[A_axis][B_axis] += GNi[A_axis][node_I] * nodeCoord[B_axis];
+
+				jacobian[B_axis][A_axis] += GNi[B_axis][node_I] * nodeCoord[A_axis];
+				jacobian[B_axis][B_axis] += GNi[B_axis][node_I] * nodeCoord[B_axis];
+			}
+			break;
+		case 3:
+			jacobian[A_axis][A_axis] = jacobian[A_axis][B_axis] = jacobian[A_axis][C_axis] = 0.0;
+			jacobian[B_axis][A_axis] = jacobian[B_axis][B_axis] = jacobian[B_axis][C_axis] = 0.0;
+			jacobian[C_axis][A_axis] = jacobian[C_axis][B_axis] = jacobian[C_axis][C_axis] = 0.0;
+			for( node_I = 0 ; node_I < nodesPerEl; node_I++){
+				nodeCoord = Mesh_CoordAt( mesh, mesh->elementNodeTbl[elId][node_I] );
+
+				jacobian[A_axis][A_axis] += GNi[A_axis][node_I] * nodeCoord[A_axis];
+				jacobian[A_axis][B_axis] += GNi[A_axis][node_I] * nodeCoord[B_axis];
+				jacobian[A_axis][C_axis] += GNi[A_axis][node_I] * nodeCoord[C_axis];
+
+				jacobian[B_axis][A_axis] += GNi[B_axis][node_I] * nodeCoord[A_axis];
+				jacobian[B_axis][B_axis] += GNi[B_axis][node_I] * nodeCoord[B_axis];
+				jacobian[B_axis][C_axis] += GNi[B_axis][node_I] * nodeCoord[C_axis];
+
+				jacobian[C_axis][A_axis] += GNi[C_axis][node_I] * nodeCoord[A_axis];
+				jacobian[C_axis][B_axis] += GNi[C_axis][node_I] * nodeCoord[B_axis];
+				jacobian[C_axis][C_axis] += GNi[C_axis][node_I] * nodeCoord[C_axis];
+			}
+			break;
+		/* Mainly here to check unrolled loops above */
+		default: {
+			Coord_Index row_I, column_I;
+			
+			for ( row_I = 0 ; row_I < dim ; row_I++ ) {
+				for ( column_I = 0 ; column_I < dim ; column_I++ ) {
+					/* Initialise */
+					jacobian[row_I][column_I] = 0.0;
+
+					/* Calculate */
+					for( node_I = 0 ; node_I < nodesPerEl; node_I++){
+						nodeCoord = Mesh_CoordAt( mesh, mesh->elementNodeTbl[elId][node_I] );
+				
+						jacobian[row_I][column_I] += GNi[row_I][node_I] * nodeCoord[column_I];
+					}
+				}
+			}
+		}
+	}
+
+	/* Clean up */
+	if (_GNi == NULL) 
+		Memory_Free(GNi);
+}
+
+double ElementType_JacobianDeterminant_AxisIndependent( 
+		void*               elementType, 
+		void*               _mesh, 
+		Element_DomainIndex	elId, 
+		double*             xi, 
+		Dimension_Index     dim, 
+		Coord_Index         A_axis, 
+		Coord_Index         B_axis, 
+		Coord_Index         C_axis ) 
+{
+	double** jacobian;
+	double detJac;
+
+	/* Using 3 here instead of dim so that you can pass in dim = 2 and use axes 0 and 2 for your jacobian */
+	jacobian = Memory_Alloc_2DArray( double, 3, 3, "Temporary Jacobian" );
+
+	ElementType_Jacobian_AxisIndependent( elementType, _mesh, elId, xi, dim, jacobian, NULL, A_axis, B_axis, C_axis );
+	detJac = StGermain_MatrixDeterminant_AxisIndependent( jacobian, dim, A_axis, B_axis, C_axis );
+
+	/* Cleaning up */
+	Memory_Free( jacobian );
+
+	return detJac;
+}
+

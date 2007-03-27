@@ -1,0 +1,51 @@
+StGermain Framework. Copyright (C) 2003-2005 VPAC.
+StGermain Discretisation Library. Copyright (C) 2003-2005 VPAC.
+StGermain FEM Discretisation Framework. Copyright (C) 2003-2005 VPAC.
+StGermain PETSc-LinearAlgebra Interface. Copyright (C) 2003-2005 VPAC.
+Watching rank: 0
+Printing non-zero entries calculation:
+node 0 (global index 0):
+	dof 0 "vx": (BC)
+	dof 1 "vy": (BC)
+node 1 (global index 1):
+	dof 0 "vx": (eq num 4)	local matRow 4: diag entries = 4, off diag = 3
+	dof 1 "vy": (BC)
+node 2 (global index 2):
+	dof 0 "vx": (eq num 13)	not owned by this proc.
+	dof 1 "vy": (BC)
+node 3 (global index 5):
+	dof 0 "vx": (BC)
+	dof 1 "vy": (eq num 0)	local matRow 0: diag entries = 7, off diag = 0
+node 4 (global index 6):
+	dof 0 "vx": (eq num 5)	local matRow 5: diag entries = 7, off diag = 5
+	dof 1 "vy": (eq num 6)	local matRow 6: diag entries = 7, off diag = 5
+node 5 (global index 7):
+	dof 0 "vx": (eq num 14)	not owned by this proc.
+	dof 1 "vy": (eq num 15)	not owned by this proc.
+node 6 (global index 10):
+	dof 0 "vx": (BC)
+	dof 1 "vy": (eq num 1)	local matRow 1: diag entries = 9, off diag = 0
+node 7 (global index 11):
+	dof 0 "vx": (eq num 7)	local matRow 7: diag entries = 9, off diag = 6
+	dof 1 "vy": (eq num 8)	local matRow 8: diag entries = 9, off diag = 6
+node 8 (global index 12):
+	dof 0 "vx": (eq num 16)	not owned by this proc.
+	dof 1 "vy": (eq num 17)	not owned by this proc.
+node 9 (global index 15):
+	dof 0 "vx": (BC)
+	dof 1 "vy": (eq num 2)	local matRow 2: diag entries = 9, off diag = 0
+node 10 (global index 16):
+	dof 0 "vx": (eq num 9)	local matRow 9: diag entries = 9, off diag = 6
+	dof 1 "vy": (eq num 10)	local matRow 10: diag entries = 9, off diag = 6
+node 11 (global index 17):
+	dof 0 "vx": (eq num 18)	not owned by this proc.
+	dof 1 "vy": (eq num 19)	not owned by this proc.
+node 12 (global index 20):
+	dof 0 "vx": (BC)
+	dof 1 "vy": (eq num 3)	local matRow 3: diag entries = 6, off diag = 0
+node 13 (global index 21):
+	dof 0 "vx": (eq num 11)	local matRow 11: diag entries = 6, off diag = 4
+	dof 1 "vy": (eq num 12)	local matRow 12: diag entries = 6, off diag = 4
+node 14 (global index 22):
+	dof 0 "vx": (eq num 20)	not owned by this proc.
+	dof 1 "vy": (eq num 21)	not owned by this proc.

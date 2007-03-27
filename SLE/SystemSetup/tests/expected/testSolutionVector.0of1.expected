@@ -1,0 +1,517 @@
+StGermain Framework. Copyright (C) 2003-2005 VPAC.
+StGermain Discretisation Library. Copyright (C) 2003-2005 VPAC.
+StGermain FEM Discretisation Framework. Copyright (C) 2003-2005 VPAC.
+StGermain PETSc-LinearAlgebra Interface. Copyright (C) 2003-2005 VPAC.
+Watching rank: 0
+0: *** Printing destination array ***
+	destinationArray[(gnode) 0][(dof)0-1]: -1, 
+	destinationArray[(gnode) 1][(dof)0-1]:  0, 
+	destinationArray[(gnode) 2][(dof)0-1]:  1, 
+	destinationArray[(gnode) 3][(dof)0-1]:  2, 
+	destinationArray[(gnode) 4][(dof)0-1]: -1, 
+	destinationArray[(gnode) 5][(dof)0-1]:  3, 
+	destinationArray[(gnode) 6][(dof)0-1]:  4, 
+	destinationArray[(gnode) 7][(dof)0-1]:  5, 
+	destinationArray[(gnode) 8][(dof)0-1]: -1, 
+	destinationArray[(gnode) 9][(dof)0-1]:  6, 
+	destinationArray[(gnode)10][(dof)0-1]:  7, 
+	destinationArray[(gnode)11][(dof)0-1]:  8, 
+	destinationArray[(gnode)12][(dof)0-1]: -1, 
+	destinationArray[(gnode)13][(dof)0-1]:  9, 
+	destinationArray[(gnode)14][(dof)0-1]: 10, 
+	destinationArray[(gnode)15][(dof)0-1]: 11, 
+	destinationArray[(gnode)16][(dof)0-1]: -1, 
+	destinationArray[(gnode)17][(dof)0-1]: 12, 
+	destinationArray[(gnode)18][(dof)0-1]: 13, 
+	destinationArray[(gnode)19][(dof)0-1]: 14, 
+	destinationArray[(gnode)20][(dof)0-1]: -1, 
+	destinationArray[(gnode)21][(dof)0-1]: 15, 
+	destinationArray[(gnode)22][(dof)0-1]: 16, 
+	destinationArray[(gnode)23][(dof)0-1]: 17, 
+	destinationArray[(gnode)24][(dof)0-1]: -1, 
+	destinationArray[(gnode)25][(dof)0-1]: 18, 
+	destinationArray[(gnode)26][(dof)0-1]: 19, 
+	destinationArray[(gnode)27][(dof)0-1]: 20, 
+	destinationArray[(gnode)28][(dof)0-1]: -1, 
+	destinationArray[(gnode)29][(dof)0-1]: 21, 
+	destinationArray[(gnode)30][(dof)0-1]: 22, 
+	destinationArray[(gnode)31][(dof)0-1]: 23, 
+	destinationArray[(gnode)32][(dof)0-1]: -1, 
+	destinationArray[(gnode)33][(dof)0-1]: 24, 
+	destinationArray[(gnode)34][(dof)0-1]: 25, 
+	destinationArray[(gnode)35][(dof)0-1]: 26, 
+	destinationArray[(gnode)36][(dof)0-1]: -1, 
+	destinationArray[(gnode)37][(dof)0-1]: 27, 
+	destinationArray[(gnode)38][(dof)0-1]: 28, 
+	destinationArray[(gnode)39][(dof)0-1]: 29, 
+	destinationArray[(gnode)40][(dof)0-1]: -1, 
+	destinationArray[(gnode)41][(dof)0-1]: 30, 
+	destinationArray[(gnode)42][(dof)0-1]: 31, 
+	destinationArray[(gnode)43][(dof)0-1]: 32, 
+	destinationArray[(gnode)44][(dof)0-1]: -1, 
+	destinationArray[(gnode)45][(dof)0-1]: 33, 
+	destinationArray[(gnode)46][(dof)0-1]: 34, 
+	destinationArray[(gnode)47][(dof)0-1]: 35, 
+	destinationArray[(gnode)48][(dof)0-1]: -1, 
+	destinationArray[(gnode)49][(dof)0-1]: 36, 
+	destinationArray[(gnode)50][(dof)0-1]: 37, 
+	destinationArray[(gnode)51][(dof)0-1]: 38, 
+	destinationArray[(gnode)52][(dof)0-1]: -1, 
+	destinationArray[(gnode)53][(dof)0-1]: 39, 
+	destinationArray[(gnode)54][(dof)0-1]: 40, 
+	destinationArray[(gnode)55][(dof)0-1]: 41, 
+	destinationArray[(gnode)56][(dof)0-1]: -1, 
+	destinationArray[(gnode)57][(dof)0-1]: 42, 
+	destinationArray[(gnode)58][(dof)0-1]: 43, 
+	destinationArray[(gnode)59][(dof)0-1]: 44, 
+	destinationArray[(gnode)60][(dof)0-1]: -1, 
+	destinationArray[(gnode)61][(dof)0-1]: 45, 
+	destinationArray[(gnode)62][(dof)0-1]: 46, 
+	destinationArray[(gnode)63][(dof)0-1]: 47, 
+	destinationArray[(gnode)64][(dof)0-1]: -1, 
+	destinationArray[(gnode)65][(dof)0-1]: 48, 
+	destinationArray[(gnode)66][(dof)0-1]: 49, 
+	destinationArray[(gnode)67][(dof)0-1]: 50, 
+	destinationArray[(gnode)68][(dof)0-1]: -1, 
+	destinationArray[(gnode)69][(dof)0-1]: 51, 
+	destinationArray[(gnode)70][(dof)0-1]: 52, 
+	destinationArray[(gnode)71][(dof)0-1]: 53, 
+	destinationArray[(gnode)72][(dof)0-1]: -1, 
+	destinationArray[(gnode)73][(dof)0-1]: 54, 
+	destinationArray[(gnode)74][(dof)0-1]: 55, 
+	destinationArray[(gnode)75][(dof)0-1]: 56, 
+	destinationArray[(gnode)76][(dof)0-1]: -1, 
+	destinationArray[(gnode)77][(dof)0-1]: 57, 
+	destinationArray[(gnode)78][(dof)0-1]: 58, 
+	destinationArray[(gnode)79][(dof)0-1]: 59, 
+	destinationArray[(gnode)80][(dof)0-1]: -1, 
+	destinationArray[(gnode)81][(dof)0-1]: 60, 
+	destinationArray[(gnode)82][(dof)0-1]: 61, 
+	destinationArray[(gnode)83][(dof)0-1]: 62, 
+	destinationArray[(gnode)84][(dof)0-1]: -1, 
+	destinationArray[(gnode)85][(dof)0-1]: 63, 
+	destinationArray[(gnode)86][(dof)0-1]: 64, 
+	destinationArray[(gnode)87][(dof)0-1]: 65, 
+In FeVariable_PrintLocalDiscreteValues: for FeVariable "velocity":
+node 0 (global index 0):
+	dof 0 "vx":     -1 - (from BC)
+node 1 (global index 1):
+	dof 0 "vx":    101 - (eq num 0)
+node 2 (global index 2):
+	dof 0 "vx":    102 - (eq num 1)
+node 3 (global index 3):
+	dof 0 "vx":    103 - (eq num 2)
+node 4 (global index 4):
+	dof 0 "vx":     -1 - (from BC)
+node 5 (global index 5):
+	dof 0 "vx":    105 - (eq num 3)
+node 6 (global index 6):
+	dof 0 "vx":    106 - (eq num 4)
+node 7 (global index 7):
+	dof 0 "vx":    107 - (eq num 5)
+node 8 (global index 8):
+	dof 0 "vx":     -1 - (from BC)
+node 9 (global index 9):
+	dof 0 "vx":    109 - (eq num 6)
+node 10 (global index 10):
+	dof 0 "vx":    110 - (eq num 7)
+node 11 (global index 11):
+	dof 0 "vx":    111 - (eq num 8)
+node 12 (global index 12):
+	dof 0 "vx":     -1 - (from BC)
+node 13 (global index 13):
+	dof 0 "vx":    113 - (eq num 9)
+node 14 (global index 14):
+	dof 0 "vx":    114 - (eq num 10)
+node 15 (global index 15):
+	dof 0 "vx":    115 - (eq num 11)
+node 16 (global index 16):
+	dof 0 "vx":     -1 - (from BC)
+node 17 (global index 17):
+	dof 0 "vx":    117 - (eq num 12)
+node 18 (global index 18):
+	dof 0 "vx":    118 - (eq num 13)
+node 19 (global index 19):
+	dof 0 "vx":    119 - (eq num 14)
+node 20 (global index 20):
+	dof 0 "vx":     -1 - (from BC)
+node 21 (global index 21):
+	dof 0 "vx":    121 - (eq num 15)
+node 22 (global index 22):
+	dof 0 "vx":    122 - (eq num 16)
+node 23 (global index 23):
+	dof 0 "vx":    123 - (eq num 17)
+node 24 (global index 24):
+	dof 0 "vx":     -1 - (from BC)
+node 25 (global index 25):
+	dof 0 "vx":    125 - (eq num 18)
+node 26 (global index 26):
+	dof 0 "vx":    126 - (eq num 19)
+node 27 (global index 27):
+	dof 0 "vx":    127 - (eq num 20)
+node 28 (global index 28):
+	dof 0 "vx":     -1 - (from BC)
+node 29 (global index 29):
+	dof 0 "vx":    129 - (eq num 21)
+node 30 (global index 30):
+	dof 0 "vx":    130 - (eq num 22)
+node 31 (global index 31):
+	dof 0 "vx":    131 - (eq num 23)
+node 32 (global index 32):
+	dof 0 "vx":     -1 - (from BC)
+node 33 (global index 33):
+	dof 0 "vx":    133 - (eq num 24)
+node 34 (global index 34):
+	dof 0 "vx":    134 - (eq num 25)
+node 35 (global index 35):
+	dof 0 "vx":    135 - (eq num 26)
+node 36 (global index 36):
+	dof 0 "vx":     -1 - (from BC)
+node 37 (global index 37):
+	dof 0 "vx":    137 - (eq num 27)
+node 38 (global index 38):
+	dof 0 "vx":    138 - (eq num 28)
+node 39 (global index 39):
+	dof 0 "vx":    139 - (eq num 29)
+node 40 (global index 40):
+	dof 0 "vx":     -1 - (from BC)
+node 41 (global index 41):
+	dof 0 "vx":    141 - (eq num 30)
+node 42 (global index 42):
+	dof 0 "vx":    142 - (eq num 31)
+node 43 (global index 43):
+	dof 0 "vx":    143 - (eq num 32)
+node 44 (global index 44):
+	dof 0 "vx":     -1 - (from BC)
+node 45 (global index 45):
+	dof 0 "vx":    145 - (eq num 33)
+node 46 (global index 46):
+	dof 0 "vx":    146 - (eq num 34)
+node 47 (global index 47):
+	dof 0 "vx":    147 - (eq num 35)
+node 48 (global index 48):
+	dof 0 "vx":     -1 - (from BC)
+node 49 (global index 49):
+	dof 0 "vx":    149 - (eq num 36)
+node 50 (global index 50):
+	dof 0 "vx":    150 - (eq num 37)
+node 51 (global index 51):
+	dof 0 "vx":    151 - (eq num 38)
+node 52 (global index 52):
+	dof 0 "vx":     -1 - (from BC)
+node 53 (global index 53):
+	dof 0 "vx":    153 - (eq num 39)
+node 54 (global index 54):
+	dof 0 "vx":    154 - (eq num 40)
+node 55 (global index 55):
+	dof 0 "vx":    155 - (eq num 41)
+node 56 (global index 56):
+	dof 0 "vx":     -1 - (from BC)
+node 57 (global index 57):
+	dof 0 "vx":    157 - (eq num 42)
+node 58 (global index 58):
+	dof 0 "vx":    158 - (eq num 43)
+node 59 (global index 59):
+	dof 0 "vx":    159 - (eq num 44)
+node 60 (global index 60):
+	dof 0 "vx":     -1 - (from BC)
+node 61 (global index 61):
+	dof 0 "vx":    161 - (eq num 45)
+node 62 (global index 62):
+	dof 0 "vx":    162 - (eq num 46)
+node 63 (global index 63):
+	dof 0 "vx":    163 - (eq num 47)
+node 64 (global index 64):
+	dof 0 "vx":     -1 - (from BC)
+node 65 (global index 65):
+	dof 0 "vx":    165 - (eq num 48)
+node 66 (global index 66):
+	dof 0 "vx":    166 - (eq num 49)
+node 67 (global index 67):
+	dof 0 "vx":    167 - (eq num 50)
+node 68 (global index 68):
+	dof 0 "vx":     -1 - (from BC)
+node 69 (global index 69):
+	dof 0 "vx":    169 - (eq num 51)
+node 70 (global index 70):
+	dof 0 "vx":    170 - (eq num 52)
+node 71 (global index 71):
+	dof 0 "vx":    171 - (eq num 53)
+node 72 (global index 72):
+	dof 0 "vx":     -1 - (from BC)
+node 73 (global index 73):
+	dof 0 "vx":    173 - (eq num 54)
+node 74 (global index 74):
+	dof 0 "vx":    174 - (eq num 55)
+node 75 (global index 75):
+	dof 0 "vx":    175 - (eq num 56)
+node 76 (global index 76):
+	dof 0 "vx":     -1 - (from BC)
+node 77 (global index 77):
+	dof 0 "vx":    177 - (eq num 57)
+node 78 (global index 78):
+	dof 0 "vx":    178 - (eq num 58)
+node 79 (global index 79):
+	dof 0 "vx":    179 - (eq num 59)
+node 80 (global index 80):
+	dof 0 "vx":     -1 - (from BC)
+node 81 (global index 81):
+	dof 0 "vx":    181 - (eq num 60)
+node 82 (global index 82):
+	dof 0 "vx":    182 - (eq num 61)
+node 83 (global index 83):
+	dof 0 "vx":    183 - (eq num 62)
+node 84 (global index 84):
+	dof 0 "vx":     -1 - (from BC)
+node 85 (global index 85):
+	dof 0 "vx":    185 - (eq num 63)
+node 86 (global index 86):
+	dof 0 "vx":    186 - (eq num 64)
+node 87 (global index 87):
+	dof 0 "vx":    187 - (eq num 65)
+2nd time round: testing new values on mesh loaded correctly onto vec:
+
+In FeVariable_PrintLocalDiscreteValues: for FeVariable "velocity":
+node 0 (global index 0):
+	dof 0 "vx":      0 - (from BC)
+node 1 (global index 1):
+	dof 0 "vx":     10 - (eq num 0)
+node 2 (global index 2):
+	dof 0 "vx":     20 - (eq num 1)
+node 3 (global index 3):
+	dof 0 "vx":     30 - (eq num 2)
+node 4 (global index 4):
+	dof 0 "vx":     40 - (from BC)
+node 5 (global index 5):
+	dof 0 "vx":     50 - (eq num 3)
+node 6 (global index 6):
+	dof 0 "vx":     60 - (eq num 4)
+node 7 (global index 7):
+	dof 0 "vx":     70 - (eq num 5)
+node 8 (global index 8):
+	dof 0 "vx":     80 - (from BC)
+node 9 (global index 9):
+	dof 0 "vx":     90 - (eq num 6)
+node 10 (global index 10):
+	dof 0 "vx":    100 - (eq num 7)
+node 11 (global index 11):
+	dof 0 "vx":    110 - (eq num 8)
+node 12 (global index 12):
+	dof 0 "vx":    120 - (from BC)
+node 13 (global index 13):
+	dof 0 "vx":    130 - (eq num 9)
+node 14 (global index 14):
+	dof 0 "vx":    140 - (eq num 10)
+node 15 (global index 15):
+	dof 0 "vx":    150 - (eq num 11)
+node 16 (global index 16):
+	dof 0 "vx":    160 - (from BC)
+node 17 (global index 17):
+	dof 0 "vx":    170 - (eq num 12)
+node 18 (global index 18):
+	dof 0 "vx":    180 - (eq num 13)
+node 19 (global index 19):
+	dof 0 "vx":    190 - (eq num 14)
+node 20 (global index 20):
+	dof 0 "vx":    200 - (from BC)
+node 21 (global index 21):
+	dof 0 "vx":    210 - (eq num 15)
+node 22 (global index 22):
+	dof 0 "vx":    220 - (eq num 16)
+node 23 (global index 23):
+	dof 0 "vx":    230 - (eq num 17)
+node 24 (global index 24):
+	dof 0 "vx":    240 - (from BC)
+node 25 (global index 25):
+	dof 0 "vx":    250 - (eq num 18)
+node 26 (global index 26):
+	dof 0 "vx":    260 - (eq num 19)
+node 27 (global index 27):
+	dof 0 "vx":    270 - (eq num 20)
+node 28 (global index 28):
+	dof 0 "vx":    280 - (from BC)
+node 29 (global index 29):
+	dof 0 "vx":    290 - (eq num 21)
+node 30 (global index 30):
+	dof 0 "vx":    300 - (eq num 22)
+node 31 (global index 31):
+	dof 0 "vx":    310 - (eq num 23)
+node 32 (global index 32):
+	dof 0 "vx":    320 - (from BC)
+node 33 (global index 33):
+	dof 0 "vx":    330 - (eq num 24)
+node 34 (global index 34):
+	dof 0 "vx":    340 - (eq num 25)
+node 35 (global index 35):
+	dof 0 "vx":    350 - (eq num 26)
+node 36 (global index 36):
+	dof 0 "vx":    360 - (from BC)
+node 37 (global index 37):
+	dof 0 "vx":    370 - (eq num 27)
+node 38 (global index 38):
+	dof 0 "vx":    380 - (eq num 28)
+node 39 (global index 39):
+	dof 0 "vx":    390 - (eq num 29)
+node 40 (global index 40):
+	dof 0 "vx":    400 - (from BC)
+node 41 (global index 41):
+	dof 0 "vx":    410 - (eq num 30)
+node 42 (global index 42):
+	dof 0 "vx":    420 - (eq num 31)
+node 43 (global index 43):
+	dof 0 "vx":    430 - (eq num 32)
+node 44 (global index 44):
+	dof 0 "vx":    440 - (from BC)
+node 45 (global index 45):
+	dof 0 "vx":    450 - (eq num 33)
+node 46 (global index 46):
+	dof 0 "vx":    460 - (eq num 34)
+node 47 (global index 47):
+	dof 0 "vx":    470 - (eq num 35)
+node 48 (global index 48):
+	dof 0 "vx":    480 - (from BC)
+node 49 (global index 49):
+	dof 0 "vx":    490 - (eq num 36)
+node 50 (global index 50):
+	dof 0 "vx":    500 - (eq num 37)
+node 51 (global index 51):
+	dof 0 "vx":    510 - (eq num 38)
+node 52 (global index 52):
+	dof 0 "vx":    520 - (from BC)
+node 53 (global index 53):
+	dof 0 "vx":    530 - (eq num 39)
+node 54 (global index 54):
+	dof 0 "vx":    540 - (eq num 40)
+node 55 (global index 55):
+	dof 0 "vx":    550 - (eq num 41)
+node 56 (global index 56):
+	dof 0 "vx":    560 - (from BC)
+node 57 (global index 57):
+	dof 0 "vx":    570 - (eq num 42)
+node 58 (global index 58):
+	dof 0 "vx":    580 - (eq num 43)
+node 59 (global index 59):
+	dof 0 "vx":    590 - (eq num 44)
+node 60 (global index 60):
+	dof 0 "vx":    600 - (from BC)
+node 61 (global index 61):
+	dof 0 "vx":    610 - (eq num 45)
+node 62 (global index 62):
+	dof 0 "vx":    620 - (eq num 46)
+node 63 (global index 63):
+	dof 0 "vx":    630 - (eq num 47)
+node 64 (global index 64):
+	dof 0 "vx":    640 - (from BC)
+node 65 (global index 65):
+	dof 0 "vx":    650 - (eq num 48)
+node 66 (global index 66):
+	dof 0 "vx":    660 - (eq num 49)
+node 67 (global index 67):
+	dof 0 "vx":    670 - (eq num 50)
+node 68 (global index 68):
+	dof 0 "vx":    680 - (from BC)
+node 69 (global index 69):
+	dof 0 "vx":    690 - (eq num 51)
+node 70 (global index 70):
+	dof 0 "vx":    700 - (eq num 52)
+node 71 (global index 71):
+	dof 0 "vx":    710 - (eq num 53)
+node 72 (global index 72):
+	dof 0 "vx":    720 - (from BC)
+node 73 (global index 73):
+	dof 0 "vx":    730 - (eq num 54)
+node 74 (global index 74):
+	dof 0 "vx":    740 - (eq num 55)
+node 75 (global index 75):
+	dof 0 "vx":    750 - (eq num 56)
+node 76 (global index 76):
+	dof 0 "vx":    760 - (from BC)
+node 77 (global index 77):
+	dof 0 "vx":    770 - (eq num 57)
+node 78 (global index 78):
+	dof 0 "vx":    780 - (eq num 58)
+node 79 (global index 79):
+	dof 0 "vx":    790 - (eq num 59)
+node 80 (global index 80):
+	dof 0 "vx":    800 - (from BC)
+node 81 (global index 81):
+	dof 0 "vx":    810 - (eq num 60)
+node 82 (global index 82):
+	dof 0 "vx":    820 - (eq num 61)
+node 83 (global index 83):
+	dof 0 "vx":    830 - (eq num 62)
+node 84 (global index 84):
+	dof 0 "vx":    840 - (from BC)
+node 85 (global index 85):
+	dof 0 "vx":    850 - (eq num 63)
+node 86 (global index 86):
+	dof 0 "vx":    860 - (eq num 64)
+node 87 (global index 87):
+	dof 0 "vx":    870 - (eq num 65)
+Local vector values are:
+Vec unknown 0 = 10
+Vec unknown 1 = 20
+Vec unknown 2 = 30
+Vec unknown 3 = 50
+Vec unknown 4 = 60
+Vec unknown 5 = 70
+Vec unknown 6 = 90
+Vec unknown 7 = 100
+Vec unknown 8 = 110
+Vec unknown 9 = 130
+Vec unknown 10 = 140
+Vec unknown 11 = 150
+Vec unknown 12 = 170
+Vec unknown 13 = 180
+Vec unknown 14 = 190
+Vec unknown 15 = 210
+Vec unknown 16 = 220
+Vec unknown 17 = 230
+Vec unknown 18 = 250
+Vec unknown 19 = 260
+Vec unknown 20 = 270
+Vec unknown 21 = 290
+Vec unknown 22 = 300
+Vec unknown 23 = 310
+Vec unknown 24 = 330
+Vec unknown 25 = 340
+Vec unknown 26 = 350
+Vec unknown 27 = 370
+Vec unknown 28 = 380
+Vec unknown 29 = 390
+Vec unknown 30 = 410
+Vec unknown 31 = 420
+Vec unknown 32 = 430
+Vec unknown 33 = 450
+Vec unknown 34 = 460
+Vec unknown 35 = 470
+Vec unknown 36 = 490
+Vec unknown 37 = 500
+Vec unknown 38 = 510
+Vec unknown 39 = 530
+Vec unknown 40 = 540
+Vec unknown 41 = 550
+Vec unknown 42 = 570
+Vec unknown 43 = 580
+Vec unknown 44 = 590
+Vec unknown 45 = 610
+Vec unknown 46 = 620
+Vec unknown 47 = 630
+Vec unknown 48 = 650
+Vec unknown 49 = 660
+Vec unknown 50 = 670
+Vec unknown 51 = 690
+Vec unknown 52 = 700
+Vec unknown 53 = 710
+Vec unknown 54 = 730
+Vec unknown 55 = 740
+Vec unknown 56 = 750
+Vec unknown 57 = 770
+Vec unknown 58 = 780
+Vec unknown 59 = 790
+Vec unknown 60 = 810
+Vec unknown 61 = 820
+Vec unknown 62 = 830
+Vec unknown 63 = 850
+Vec unknown 64 = 860
+Vec unknown 65 = 870

@@ -1,0 +1,154 @@
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**
+** Copyright (C), 2003-2006, Victorian Partnership for Advanced Computing (VPAC) Ltd, 110 Victoria Street,
+**	Melbourne, 3053, Australia.
+**
+** Primary Contributing Organisations:
+**	Victorian Partnership for Advanced Computing Ltd, Computational Software Development - http://csd.vpac.org
+**	Australian Computational Earth Systems Simulator - http://www.access.edu.au
+**	Monash Cluster Computing - http://www.mcc.monash.edu.au
+**	Computational Infrastructure for Geodynamics - http://www.geodynamics.org
+**
+** Contributors:
+**	Patrick D. Sunter, Software Engineer, VPAC. (pds@vpac.org)
+**	Robert Turnbull, Research Assistant, Monash University. (robert.turnbull@sci.monash.edu.au)
+**	Stevan M. Quenette, Senior Software Engineer, VPAC. (steve@vpac.org)
+**	David May, PhD Student, Monash University (david.may@sci.monash.edu.au)
+**	Louis Moresi, Associate Professor, Monash University. (louis.moresi@sci.monash.edu.au)
+**	Luke J. Hodkinson, Computational Engineer, VPAC. (lhodkins@vpac.org)
+**	Alan H. Lo, Computational Engineer, VPAC. (alan@vpac.org)
+**	Raquibul Hassan, Computational Engineer, VPAC. (raq@vpac.org)
+**	Julian Giordani, Research Assistant, Monash University. (julian.giordani@sci.monash.edu.au)
+**	Vincent Lemiale, Postdoctoral Fellow, Monash University. (vincent.lemiale@sci.monash.edu.au)
+**
+**  This library is free software; you can redistribute it and/or
+**  modify it under the terms of the GNU Lesser General Public
+**  License as published by the Free Software Foundation; either
+**  version 2.1 of the License, or (at your option) any later version.
+**
+**  This library is distributed in the hope that it will be useful,
+**  but WITHOUT ANY WARRANTY; without even the implied warranty of
+**  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+**  Lesser General Public License for more details.
+**
+**  You should have received a copy of the GNU Lesser General Public
+**  License along with this library; if not, write to the Free Software
+**  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+**
+** $Id: ShapeFunctions.c 656 2006-10-18 06:45:50Z SteveQuenette $
+**
+**~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+#include <mpi.h>
+#include <StGermain/StGermain.h>
+
+#include "StgFEM/Discretisation/Discretisation.h"
+#include "StgFEM/SLE/LinearAlgebra/LinearAlgebra.h"
+#include "StgFEM/SLE/SystemSetup/SystemSetup.h"
+
+#include "types.h"
+#include "AdvectionDiffusionSLE.h"
+#include "UpwindParameter.h"
+#include "ShapeFunctions.h"
+#include "Residual.h"
+
+
+/** See Brooks, Hughes 1982 Section 3.2.4 
+ * All equations refer to this paper if not otherwise indicated 
+ * Returns memory to new shape functions - which then must be free'd */
+double** AdvDiffResidualForceTerm_BuildSUPGShapeFunctions( AdvDiffResidualForceTerm* self, AdvectionDiffusionSLE* sle, Swarm* swarm, Element_LocalIndex lElement_I, Dimension_Index dim ) {
+	FeVariable*                velocityField    = self->velocityField;
+	FiniteElement_Mesh*        mesh             = velocityField->feMesh;
+	double**                   elShapeFunc; 
+	double**                   GNx;
+	double*                    xi;
+	double*                    shapeFunc;
+	double                     upwindDiffusivity;
+	double                     averageDiffusivity;
+	double                     velocity[3];
+	double                     factor;
+	double                     velocityMagnitude;
+	double                     detJac;
+	double                     perturbation;
+	Particle_InCellIndex       cParticle_I;
+	Particle_InCellIndex       particleCount;
+	Cell_Index                 cell_I;
+	ElementType*               elementType = FeMesh_ElementTypeAt( mesh, lElement_I );
+	Node_Index                 nodeCount = elementType->nodeCount;
+	Node_Index                 node_I;
+	IntegrationPoint*          particle;
+	Variable*                  diffusivityVariable = self->diffusivityVariable;
+	Particle_Index             lParticle_I;
+
+	/* Find Number of Particles in Element */
+	cell_I = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
+	particleCount = swarm->cellParticleCountTbl[ cell_I ];
+
+	/* Allocate Space For Shape Functions */
+	elShapeFunc = Memory_Alloc_2DArray( double, particleCount, nodeCount, "Element SU/PG Shape Functions" );
+	GNx         = Memory_Alloc_2DArray( double, dim,           nodeCount, "Global Shape Function Derivatives" );
+	
+	/* Average diffusivity for element */
+	if ( diffusivityVariable ) {
+		averageDiffusivity = 0.0;
+		for ( cParticle_I = 0 ; cParticle_I < particleCount ; cParticle_I++ ) {
+			lParticle_I = swarm->cellParticleTbl[lElement_I][cParticle_I];
+			averageDiffusivity += Variable_GetValueDouble( diffusivityVariable, lParticle_I );
+		}
+		averageDiffusivity /= (double)particleCount;
+	}
+	else {
+		averageDiffusivity = self->defaultDiffusivity;
+	}
+
+	/* Calculate Upwind Diffusivity For Element - See Section 3.3 */
+	upwindDiffusivity = AdvDiffResidualForceTerm_UpwindDiffusivity( self, lElement_I, averageDiffusivity, dim );
+	
+	/* Loop over particles in element */
+	for ( cParticle_I = 0 ; cParticle_I < particleCount ; cParticle_I++ ) {
+		particle  = (IntegrationPoint*)Swarm_ParticleInCellAt( swarm, cell_I, cParticle_I );
+
+		/* Assign Pointers for this particle - (To save time in dereferencing pointers) */
+		xi        = particle->xi;
+		shapeFunc = elShapeFunc[ cParticle_I ];
+
+		/* Get Regular Shape Functions */
+		ElementType_EvaluateShapeFunctionsAt( elementType, xi, shapeFunc );
+
+		/* In the case of per diffusion - just build regular shape functions */
+		if ( fabs(upwindDiffusivity) < 1.0e-20 )
+			continue;
+
+		/* Get Shape Functions Derivatives */
+		ElementType_ShapeFunctionsGlobalDerivs( 
+			elementType,
+			mesh, lElement_I,
+			xi, dim, &detJac, GNx );
+
+		/* Calculate Velocity on Particle */
+		FeVariable_InterpolateWithinElement( velocityField, lElement_I, xi, velocity );
+
+		/* Add upwinding perturbation - See Eq. 3.2.24 */
+		velocityMagnitude = StGermain_VectorMagnitude( velocity, dim );
+		factor = upwindDiffusivity / (velocityMagnitude * velocityMagnitude);
+		for ( node_I = 0 ; node_I < nodeCount ; node_I++ ) {
+			perturbation = velocity[ I_AXIS ] * GNx[ I_AXIS ][ node_I ] + velocity[ J_AXIS ] * GNx[ J_AXIS ][ node_I ];
+			if (dim == 3)
+				perturbation += velocity[ K_AXIS ] * GNx[ K_AXIS ][ node_I ];
+
+			/* p = \frac{\bar \kappa \hat u_j w_j }{ ||u|| } -  Eq. 3.2.25 */
+			perturbation *= factor;
+			shapeFunc[ node_I ] += perturbation;
+		}
+
+	}
+	if (sle->maxDiffusivity < averageDiffusivity)
+		sle->maxDiffusivity = averageDiffusivity;
+
+
+	Memory_Free( GNx );
+	return elShapeFunc;
+}
+		
+	
+

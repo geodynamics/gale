@@ -1,0 +1,183 @@
+StGermain Framework. Copyright (C) 2003-2005 VPAC.
+StGermain Discretisation Library. Copyright (C) 2003-2005 VPAC.
+StGermain FEM Discretisation Framework. Copyright (C) 2003-2005 VPAC.
+Watching rank: 0
+
+Creating Stg_Components from the component-list
+
+	Instantiating Sphere as testShape
+
+Constructing Stg_Components from the live-component register
+
+	Constructing testShape..
+
+***  REGULAR node/element layout tests ***
+
+***  Balanced: 6*1*1 elements ***
+Creating Geometry, Decomps and Layouts:
+Creating F.E. Mesh:
+Creating Vars:
+Creating VC:
+Building:
+Building mesh:
+Building Variable Conditions:
+Creating EQ num:
+Building FE Eq num:
+Initialising:
+Building LM:
+V.C. applied: 	type: WallVC, set: Left
+0: *** Printing destination array ***
+	destinationArray[(gnode) 0][(dof)0-3]: -1,   0,   1, 
+	destinationArray[(gnode) 1][(dof)0-3]: 14,   0,  15, 
+	destinationArray[(gnode) 2][(dof)0-3]: 57,   0,  58, 
+	destinationArray[(gnode) 3]: on another proc
+	destinationArray[(gnode) 4][(dof)0-3]: -1,   2,   1, 
+	destinationArray[(gnode) 5][(dof)0-3]: 16,  17,  18, 
+	destinationArray[(gnode) 6][(dof)0-3]: 59,  17,  60, 
+	destinationArray[(gnode) 7]: on another proc
+	destinationArray[(gnode) 8][(dof)0-3]: -1,   3,   1, 
+	destinationArray[(gnode) 9][(dof)0-3]: 19,  17,  20, 
+	destinationArray[(gnode)10][(dof)0-3]: 61,  17,  62, 
+	destinationArray[(gnode)11]: on another proc
+	destinationArray[(gnode)12][(dof)0-3]: -1,   4,   1, 
+	destinationArray[(gnode)13][(dof)0-3]: 21,  22,  23, 
+	destinationArray[(gnode)14][(dof)0-3]: 63,  64,  65, 
+	destinationArray[(gnode)15]: on another proc
+	destinationArray[(gnode)16][(dof)0-3]: -1,   0,   1, 
+	destinationArray[(gnode)17][(dof)0-3]: 24,   0,  25, 
+	destinationArray[(gnode)18][(dof)0-3]: 66,   0,  67, 
+	destinationArray[(gnode)19]: on another proc
+	destinationArray[(gnode)20][(dof)0-3]: -1,   5,   1, 
+	destinationArray[(gnode)21][(dof)0-3]: 26,  27,  28, 
+	destinationArray[(gnode)22][(dof)0-3]: 68,  69,  70, 
+	destinationArray[(gnode)23]: on another proc
+	destinationArray[(gnode)24][(dof)0-3]: -1,   6,   1, 
+	destinationArray[(gnode)25][(dof)0-3]: 29,  30,  31, 
+	destinationArray[(gnode)26][(dof)0-3]: 71,  72,  73, 
+	destinationArray[(gnode)27]: on another proc
+	destinationArray[(gnode)28][(dof)0-3]: -1,   7,   1, 
+	destinationArray[(gnode)29][(dof)0-3]: 32,  33,  34, 
+	destinationArray[(gnode)30][(dof)0-3]: 74,  75,  76, 
+	destinationArray[(gnode)31]: on another proc
+	destinationArray[(gnode)32][(dof)0-3]: -1,   0,   1, 
+	destinationArray[(gnode)33][(dof)0-3]: 35,   0,  36, 
+	destinationArray[(gnode)34][(dof)0-3]: 77,   0,  78, 
+	destinationArray[(gnode)35]: on another proc
+	destinationArray[(gnode)36][(dof)0-3]: -1,   8,   1, 
+	destinationArray[(gnode)37][(dof)0-3]: 37,  38,  39, 
+	destinationArray[(gnode)38][(dof)0-3]: 79,  80,  81, 
+	destinationArray[(gnode)39]: on another proc
+	destinationArray[(gnode)40][(dof)0-3]: -1,   9,   1, 
+	destinationArray[(gnode)41][(dof)0-3]: 40,  41,  42, 
+	destinationArray[(gnode)42][(dof)0-3]: 82,  83,  84, 
+	destinationArray[(gnode)43]: on another proc
+	destinationArray[(gnode)44][(dof)0-3]: -1,  10,   1, 
+	destinationArray[(gnode)45][(dof)0-3]: 43,  44,  45, 
+	destinationArray[(gnode)46][(dof)0-3]: 85,  86,  87, 
+	destinationArray[(gnode)47]: on another proc
+	destinationArray[(gnode)48][(dof)0-3]: -1,   0,   1, 
+	destinationArray[(gnode)49][(dof)0-3]: 46,   0,  47, 
+	destinationArray[(gnode)50][(dof)0-3]: 88,   0,  89, 
+	destinationArray[(gnode)51]: on another proc
+	destinationArray[(gnode)52][(dof)0-3]: -1,  11,   1, 
+	destinationArray[(gnode)53][(dof)0-3]: 48,  49,  50, 
+	destinationArray[(gnode)54][(dof)0-3]: 90,  91,  92, 
+	destinationArray[(gnode)55]: on another proc
+	destinationArray[(gnode)56][(dof)0-3]: -1,  12,   1, 
+	destinationArray[(gnode)57][(dof)0-3]: 51,  52,  53, 
+	destinationArray[(gnode)58][(dof)0-3]: 93,  94,  95, 
+	destinationArray[(gnode)59]: on another proc
+	destinationArray[(gnode)60][(dof)0-3]: -1,  13,   1, 
+	destinationArray[(gnode)61][(dof)0-3]: 54,  55,  56, 
+	destinationArray[(gnode)62][(dof)0-3]: 96,  97,  98, 
+	destinationArray[(gnode)63]: on another proc
+0: *** Printing location matrix ***
+	LM[(g/l el) 0/ 0][(enodes)0-8]({ 0} -1,  0,  1,), ({ 1} 14,  0, 15,), ({ 4} 16, 17, 18,), ({ 3} -1,  2,  1,), ({12} -1,  0,  1,), ({13} 24,  0, 25,), ({16} 26, 27, 28,), ({15} -1,  5,  1,), 
+	LM[(g/l el) 1/ 1][(enodes)0-8]({ 1} 14,  0, 15,), ({ 2} 57,  0, 58,), ({ 5} 59, 17, 60,), ({ 4} 16, 17, 18,), ({13} 24,  0, 25,), ({14} 66,  0, 67,), ({17} 68, 69, 70,), ({16} 26, 27, 28,), 
+	LM[(g/l el) 2/XXX]: on another proc
+	LM[(g/l el) 3/ 2][(enodes)0-8]({ 3} -1,  2,  1,), ({ 4} 16, 17, 18,), ({ 7} 19, 17, 20,), ({ 6} -1,  3,  1,), ({15} -1,  5,  1,), ({16} 26, 27, 28,), ({19} 29, 30, 31,), ({18} -1,  6,  1,), 
+	LM[(g/l el) 4/ 3][(enodes)0-8]({ 4} 16, 17, 18,), ({ 5} 59, 17, 60,), ({ 8} 61, 17, 62,), ({ 7} 19, 17, 20,), ({16} 26, 27, 28,), ({17} 68, 69, 70,), ({20} 71, 72, 73,), ({19} 29, 30, 31,), 
+	LM[(g/l el) 5/XXX]: on another proc
+	LM[(g/l el) 6/ 4][(enodes)0-8]({ 6} -1,  3,  1,), ({ 7} 19, 17, 20,), ({10} 21, 22, 23,), ({ 9} -1,  4,  1,), ({18} -1,  6,  1,), ({19} 29, 30, 31,), ({22} 32, 33, 34,), ({21} -1,  7,  1,), 
+	LM[(g/l el) 7/ 5][(enodes)0-8]({ 7} 19, 17, 20,), ({ 8} 61, 17, 62,), ({11} 63, 64, 65,), ({10} 21, 22, 23,), ({19} 29, 30, 31,), ({20} 71, 72, 73,), ({23} 74, 75, 76,), ({22} 32, 33, 34,), 
+	LM[(g/l el) 8/XXX]: on another proc
+	LM[(g/l el) 9/ 6][(enodes)0-8]({12} -1,  0,  1,), ({13} 24,  0, 25,), ({16} 26, 27, 28,), ({15} -1,  5,  1,), ({24} -1,  0,  1,), ({25} 35,  0, 36,), ({28} 37, 38, 39,), ({27} -1,  8,  1,), 
+	LM[(g/l el)10/ 7][(enodes)0-8]({13} 24,  0, 25,), ({14} 66,  0, 67,), ({17} 68, 69, 70,), ({16} 26, 27, 28,), ({25} 35,  0, 36,), ({26} 77,  0, 78,), ({29} 79, 80, 81,), ({28} 37, 38, 39,), 
+	LM[(g/l el)11/XXX]: on another proc
+	LM[(g/l el)12/ 8][(enodes)0-8]({15} -1,  5,  1,), ({16} 26, 27, 28,), ({19} 29, 30, 31,), ({18} -1,  6,  1,), ({27} -1,  8,  1,), ({28} 37, 38, 39,), ({31} 40, 41, 42,), ({30} -1,  9,  1,), 
+	LM[(g/l el)13/ 9][(enodes)0-8]({16} 26, 27, 28,), ({17} 68, 69, 70,), ({20} 71, 72, 73,), ({19} 29, 30, 31,), ({28} 37, 38, 39,), ({29} 79, 80, 81,), ({32} 82, 83, 84,), ({31} 40, 41, 42,), 
+	LM[(g/l el)14/XXX]: on another proc
+	LM[(g/l el)15/10][(enodes)0-8]({18} -1,  6,  1,), ({19} 29, 30, 31,), ({22} 32, 33, 34,), ({21} -1,  7,  1,), ({30} -1,  9,  1,), ({31} 40, 41, 42,), ({34} 43, 44, 45,), ({33} -1, 10,  1,), 
+	LM[(g/l el)16/11][(enodes)0-8]({19} 29, 30, 31,), ({20} 71, 72, 73,), ({23} 74, 75, 76,), ({22} 32, 33, 34,), ({31} 40, 41, 42,), ({32} 82, 83, 84,), ({35} 85, 86, 87,), ({34} 43, 44, 45,), 
+	LM[(g/l el)17/XXX]: on another proc
+	LM[(g/l el)18/12][(enodes)0-8]({24} -1,  0,  1,), ({25} 35,  0, 36,), ({28} 37, 38, 39,), ({27} -1,  8,  1,), ({36} -1,  0,  1,), ({37} 46,  0, 47,), ({40} 48, 49, 50,), ({39} -1, 11,  1,), 
+	LM[(g/l el)19/13][(enodes)0-8]({25} 35,  0, 36,), ({26} 77,  0, 78,), ({29} 79, 80, 81,), ({28} 37, 38, 39,), ({37} 46,  0, 47,), ({38} 88,  0, 89,), ({41} 90, 91, 92,), ({40} 48, 49, 50,), 
+	LM[(g/l el)20/XXX]: on another proc
+	LM[(g/l el)21/14][(enodes)0-8]({27} -1,  8,  1,), ({28} 37, 38, 39,), ({31} 40, 41, 42,), ({30} -1,  9,  1,), ({39} -1, 11,  1,), ({40} 48, 49, 50,), ({43} 51, 52, 53,), ({42} -1, 12,  1,), 
+	LM[(g/l el)22/15][(enodes)0-8]({28} 37, 38, 39,), ({29} 79, 80, 81,), ({32} 82, 83, 84,), ({31} 40, 41, 42,), ({40} 48, 49, 50,), ({41} 90, 91, 92,), ({44} 93, 94, 95,), ({43} 51, 52, 53,), 
+	LM[(g/l el)23/XXX]: on another proc
+	LM[(g/l el)24/16][(enodes)0-8]({30} -1,  9,  1,), ({31} 40, 41, 42,), ({34} 43, 44, 45,), ({33} -1, 10,  1,), ({42} -1, 12,  1,), ({43} 51, 52, 53,), ({46} 54, 55, 56,), ({45} -1, 13,  1,), 
+	LM[(g/l el)25/17][(enodes)0-8]({31} 40, 41, 42,), ({32} 82, 83, 84,), ({35} 85, 86, 87,), ({34} 43, 44, 45,), ({43} 51, 52, 53,), ({44} 93, 94, 95,), ({47} 96, 97, 98,), ({46} 54, 55, 56,), 
+	LM[(g/l el)26/XXX]: on another proc
+LinkedDofInfo (ptr): 0x42794f94
+Stg_Class (ptr): 0x42794f94
+	sizeOfSelf: 108
+	_deleteSelf: Yes
+	type: LinkedDofInfo
+	_delete (func ptr): 0x40030137
+	_print (func ptr): 0x40030171
+	_copy (func ptr): 0x40030414
+3 Linked dof sets active:
+	Set 0: has eqNum 0
+	Set 1: has eqNum 1
+	Set 2: has eqNum 17
+Linked dof sets table:
+	Node 0: -1, 0, 1, 
+	Node 1: -1, 0, -1, 
+	Node 2: -1, 0, -1, 
+	Node 3: -1, -1, 1, 
+	Node 4: -1, 2, -1, 
+	Node 5: -1, 2, -1, 
+	Node 6: -1, -1, 1, 
+	Node 7: -1, 2, -1, 
+	Node 8: -1, 2, -1, 
+	Node 9: -1, -1, 1, 
+	Node 10: -1, -1, -1, 
+	Node 11: -1, -1, -1, 
+	Node 12: -1, 0, 1, 
+	Node 13: -1, 0, -1, 
+	Node 14: -1, 0, -1, 
+	Node 15: -1, -1, 1, 
+	Node 16: -1, -1, -1, 
+	Node 17: -1, -1, -1, 
+	Node 18: -1, -1, 1, 
+	Node 19: -1, -1, -1, 
+	Node 20: -1, -1, -1, 
+	Node 21: -1, -1, 1, 
+	Node 22: -1, -1, -1, 
+	Node 23: -1, -1, -1, 
+	Node 24: -1, 0, 1, 
+	Node 25: -1, 0, -1, 
+	Node 26: -1, 0, -1, 
+	Node 27: -1, -1, 1, 
+	Node 28: -1, -1, -1, 
+	Node 29: -1, -1, -1, 
+	Node 30: -1, -1, 1, 
+	Node 31: -1, -1, -1, 
+	Node 32: -1, -1, -1, 
+	Node 33: -1, -1, 1, 
+	Node 34: -1, -1, -1, 
+	Node 35: -1, -1, -1, 
+	Node 36: -1, 0, 1, 
+	Node 37: -1, 0, -1, 
+	Node 38: -1, 0, -1, 
+	Node 39: -1, -1, 1, 
+	Node 40: -1, -1, -1, 
+	Node 41: -1, -1, -1, 
+	Node 42: -1, -1, 1, 
+	Node 43: -1, -1, -1, 
+	Node 44: -1, -1, -1, 
+	Node 45: -1, -1, 1, 
+	Node 46: -1, -1, -1, 
+	Node 47: -1, -1, -1, 
+Cleaning Up:

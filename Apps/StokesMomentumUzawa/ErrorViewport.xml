@@ -1,0 +1,49 @@
+<!-- Rayleigh-Taylor lucifer viewports -->
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<struct name="components" mergeType="merge">
+		<struct name="errorColourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours">Purple Blue Green Yellow Orange Red Black</param>
+			<param name="dynamicRange">true</param>
+		</struct>	
+		<!-- Drawing Objects -->
+		<struct name="errorColourBar">
+			<param name="Type">lucColourBar</param>
+			<param name="ColourMap">errorColourMap</param>
+		</struct>			
+		<struct name="errorMap">
+			<param name="Type">lucScalarField</param>
+			<param name="FieldVariable">ErrorVelocityFieldMagnitude</param>
+			<param name="ColourMap">errorColourMap</param>
+		</struct>
+		<!-- Viewport -->
+		<struct name="ErrorViewport">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">camera</param>
+			<list name="DrawingObject">
+				<param>errorMap</param>
+				<param>border</param>
+				<param>errorColourBar</param>
+			</list>
+		</struct>
+		<!-- Other Stuff -->
+		<struct name="errorWindow">
+			<param name="Type">lucDefaultWindow</param>
+			<param name="RenderingEngine">renderingEngine</param>
+			<list name="OutputFormat">
+				<param>imageOutput</param>
+			</list>
+			<param name="height">592</param>
+			<param name="width">592</param>
+			<param name="interactive">t</param>
+			<param name="backgroundColour">white</param>
+			<list name="Viewport">
+				<param>ErrorViewport</param>
+			</list>
+		</struct>
+	</struct>
+
+	
+</StGermainData>

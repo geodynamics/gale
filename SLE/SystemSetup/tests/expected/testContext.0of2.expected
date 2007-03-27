@@ -1,0 +1,78 @@
+StGermain Framework revision 3885. Copyright (C) 2003-2005 VPAC.
+StGermain Discretisation Library revision 3885. Copyright (C) 2003-2005 VPAC.
+StGermain FEM Discretisation Framework revision 662. Copyright (C) 2003-2005 VPAC.
+StGermain PETSc-LinearAlgebra Interface revision 662. Copyright (C) 2003-2005 VPAC.
+Running with no timestep braking, using  dt that increases 50% each step:
+Run until 10 timeSteps have been run
+TimeStep = 1, Start time = 0 + 0 prev timeStep dt
+TimeStep = 2, Start time = 0 + 1 prev timeStep dt
+TimeStep = 3, Start time = 1 + 1.5 prev timeStep dt
+TimeStep = 4, Start time = 2.5 + 2.25 prev timeStep dt
+TimeStep = 5, Start time = 4.75 + 3.375 prev timeStep dt
+TimeStep = 6, Start time = 8.125 + 5.0625 prev timeStep dt
+TimeStep = 7, Start time = 13.1875 + 7.59375 prev timeStep dt
+TimeStep = 8, Start time = 20.7812 + 11.3906 prev timeStep dt
+TimeStep = 9, Start time = 32.1719 + 17.0859 prev timeStep dt
+TimeStep = 10, Start time = 49.2578 + 25.6289 prev timeStep dt
+
+Turning on timestep braking, at default level, running again:
+Run until 10 timeSteps have been run
+TimeStep = 1, Start time = 0 + 0 prev timeStep dt
+TimeStep = 2, Start time = 0 + 1 prev timeStep dt
+In FiniteElementContext_CalcNewDt(): dt calculated was 1.5 (time), but prev timestep's dt
+was 1 (time) and max allowed increase percentage is 10.00
+, thus limiting current
+dt to 1.1 (time).
+TimeStep = 3, Start time = 1 + 1.1 prev timeStep dt
+In FiniteElementContext_CalcNewDt(): dt calculated was 1.65 (time), but prev timestep's dt
+was 1.1 (time) and max allowed increase percentage is 10.00
+, thus limiting current
+dt to 1.21 (time).
+TimeStep = 4, Start time = 2.1 + 1.21 prev timeStep dt
+In FiniteElementContext_CalcNewDt(): dt calculated was 1.815 (time), but prev timestep's dt
+was 1.21 (time) and max allowed increase percentage is 10.00
+, thus limiting current
+dt to 1.331 (time).
+TimeStep = 5, Start time = 3.31 + 1.331 prev timeStep dt
+In FiniteElementContext_CalcNewDt(): dt calculated was 1.9965 (time), but prev timestep's dt
+was 1.331 (time) and max allowed increase percentage is 10.00
+, thus limiting current
+dt to 1.4641 (time).
+TimeStep = 6, Start time = 4.641 + 1.4641 prev timeStep dt
+In FiniteElementContext_CalcNewDt(): dt calculated was 2.19615 (time), but prev timestep's dt
+was 1.4641 (time) and max allowed increase percentage is 10.00
+, thus limiting current
+dt to 1.61051 (time).
+TimeStep = 7, Start time = 6.1051 + 1.61051 prev timeStep dt
+In FiniteElementContext_CalcNewDt(): dt calculated was 2.41577 (time), but prev timestep's dt
+was 1.61051 (time) and max allowed increase percentage is 10.00
+, thus limiting current
+dt to 1.77156 (time).
+TimeStep = 8, Start time = 7.71561 + 1.77156 prev timeStep dt
+In FiniteElementContext_CalcNewDt(): dt calculated was 2.65734 (time), but prev timestep's dt
+was 1.77156 (time) and max allowed increase percentage is 10.00
+, thus limiting current
+dt to 1.94872 (time).
+TimeStep = 9, Start time = 9.48717 + 1.94872 prev timeStep dt
+In FiniteElementContext_CalcNewDt(): dt calculated was 2.92308 (time), but prev timestep's dt
+was 1.94872 (time) and max allowed increase percentage is 10.00
+, thus limiting current
+dt to 2.14359 (time).
+TimeStep = 10, Start time = 11.4359 + 2.14359 prev timeStep dt
+In FiniteElementContext_CalcNewDt(): dt calculated was 3.21538 (time), but prev timestep's dt
+was 2.14359 (time) and max allowed increase percentage is 10.00
+, thus limiting current
+dt to 2.35795 (time).
+
+Turning on timestep braking, at 80% level, running again - expect same as original:
+Run until 10 timeSteps have been run
+TimeStep = 1, Start time = 0 + 0 prev timeStep dt
+TimeStep = 2, Start time = 0 + 1 prev timeStep dt
+TimeStep = 3, Start time = 1 + 1.5 prev timeStep dt
+TimeStep = 4, Start time = 2.5 + 2.25 prev timeStep dt
+TimeStep = 5, Start time = 4.75 + 3.375 prev timeStep dt
+TimeStep = 6, Start time = 8.125 + 5.0625 prev timeStep dt
+TimeStep = 7, Start time = 13.1875 + 7.59375 prev timeStep dt
+TimeStep = 8, Start time = 20.7812 + 11.3906 prev timeStep dt
+TimeStep = 9, Start time = 32.1719 + 17.0859 prev timeStep dt
+TimeStep = 10, Start time = 49.2578 + 25.6289 prev timeStep dt

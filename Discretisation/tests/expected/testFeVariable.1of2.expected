@@ -1,0 +1,338 @@
+StGermain Framework revision 3605. Copyright (C) 2003-2005 VPAC.
+StGermain Discretisation Library revision 3605. Copyright (C) 2003-2005 VPAC.
+StGermain FEM Discretisation Framework revision 566. Copyright (C) 2003-2005 VPAC.
+Watching rank: 1
+WallVC (ptr): 0x806b570
+	dictionary (ptr): 0x80606e8
+	_dictionaryEntryName (ptr): 0x804b039
+		_dictionaryEntryName: boundaryCondition
+	_wall: Left
+	_entryCount: 1
+	_entryTbl (ptr): 0x806c780
+		_entryTbl[0]:
+			varName (ptr): 0x8060568
+				varName: vx
+			value:
+				type: VC_ValueType_Double
+				asDouble: -1
+	_mesh (ptr): 0x8067840
+VariableCondition (ptr): 0x806b570
+Stg_Component (ptr): 0x806b570
+Stg_Object (ptr): 0x806b570
+	Stg_Class (ptr): 0x806b570
+		sizeOfSelf: 192
+		_deleteSelf: Yes
+		type: WallVC
+		_delete (func ptr): 0xb7e03f77
+		_print (func ptr): 0xb7e03fbd
+		_copy (func ptr): 0xb7e0456e
+	name: WallVC
+	nameAllocationType: NON_GLOBAL
+	_defaultConstructor (func ptr): 0xb7e03248
+	_construct (func ptr): 0xb7e04783
+	_build (func ptr): 0xb7e04741
+	_initialise (func ptr): 0xb7eadde2
+	_execute (func ptr): 0xb7eadea6
+	_destroy (func ptr): 0xb7eaded6
+	isConstructed: True
+	isBuilt: True
+	isInitialised: False
+	hasExecuted: False
+	isDestroyed: False
+	constructor function name: WallVC-Construct
+	build function name: WallVC-Build
+	initialise function name: WallVC-Initialise
+	execute function name: WallVC-Execute
+	destroy function name: WallVC-Destroy
+	_getSet (func ptr): 0xb7e047d2
+	_getVariableCount (func ptr): 0xb7e04b68
+	_getVariableIndex (func ptr): 0xb7e04b7f
+	_getValueIndex (func ptr): 0xb7e04c5a
+	_getValueCount (func ptr): 0xb7e04c62
+	_getValue (func ptr): 0xb7e04c79
+	variable_Register (ptr): 0x8069538
+	conFunc_Register (ptr): (nil)
+	_set (ptr): 0x806c950
+	indexCount: 0
+	indexTbl (ptr): (nil)
+	vcVarCountTbl (ptr): (nil)
+	vcTbl (ptr): (nil)
+	valueCount: 1
+	valueTbl (ptr): 0x806c990
+		valueTbl[0]:
+			type: VC_ValueType_Double
+			asDouble: -1
+1: *** Printing destination array ***
+	destinationArray[(gnode) 0]: on another proc
+	destinationArray[(gnode) 1]: on another proc
+	destinationArray[(gnode) 2][(dof)0-2]: 21,  22, 
+	destinationArray[(gnode) 3][(dof)0-2]: 35,  36, 
+	destinationArray[(gnode) 4][(dof)0-2]: 49,  50, 
+	destinationArray[(gnode) 5][(dof)0-2]: 63,  64, 
+	destinationArray[(gnode) 6][(dof)0-2]: 77,  78, 
+	destinationArray[(gnode) 7]: on another proc
+	destinationArray[(gnode) 8]: on another proc
+	destinationArray[(gnode) 9][(dof)0-2]: 23,  24, 
+	destinationArray[(gnode)10][(dof)0-2]: 37,  38, 
+	destinationArray[(gnode)11][(dof)0-2]: 51,  52, 
+	destinationArray[(gnode)12][(dof)0-2]: 65,  66, 
+	destinationArray[(gnode)13][(dof)0-2]: 79,  80, 
+	destinationArray[(gnode)14]: on another proc
+	destinationArray[(gnode)15]: on another proc
+	destinationArray[(gnode)16][(dof)0-2]: 25,  26, 
+	destinationArray[(gnode)17][(dof)0-2]: 39,  40, 
+	destinationArray[(gnode)18][(dof)0-2]: 53,  54, 
+	destinationArray[(gnode)19][(dof)0-2]: 67,  68, 
+	destinationArray[(gnode)20][(dof)0-2]: 81,  82, 
+	destinationArray[(gnode)21]: on another proc
+	destinationArray[(gnode)22]: on another proc
+	destinationArray[(gnode)23][(dof)0-2]: 27,  28, 
+	destinationArray[(gnode)24][(dof)0-2]: 41,  42, 
+	destinationArray[(gnode)25][(dof)0-2]: 55,  56, 
+	destinationArray[(gnode)26][(dof)0-2]: 69,  70, 
+	destinationArray[(gnode)27][(dof)0-2]: 83,  84, 
+	destinationArray[(gnode)28]: on another proc
+	destinationArray[(gnode)29]: on another proc
+	destinationArray[(gnode)30][(dof)0-2]: 29,  30, 
+	destinationArray[(gnode)31][(dof)0-2]: 43,  44, 
+	destinationArray[(gnode)32][(dof)0-2]: 57,  58, 
+	destinationArray[(gnode)33][(dof)0-2]: 71,  72, 
+	destinationArray[(gnode)34][(dof)0-2]: 85,  86, 
+	destinationArray[(gnode)35]: on another proc
+	destinationArray[(gnode)36]: on another proc
+	destinationArray[(gnode)37][(dof)0-2]: 31,  32, 
+	destinationArray[(gnode)38][(dof)0-2]: 45,  46, 
+	destinationArray[(gnode)39][(dof)0-2]: 59,  60, 
+	destinationArray[(gnode)40][(dof)0-2]: 73,  74, 
+	destinationArray[(gnode)41][(dof)0-2]: 87,  88, 
+	destinationArray[(gnode)42]: on another proc
+	destinationArray[(gnode)43]: on another proc
+	destinationArray[(gnode)44][(dof)0-2]: 33,  34, 
+	destinationArray[(gnode)45][(dof)0-2]: 47,  48, 
+	destinationArray[(gnode)46][(dof)0-2]: 61,  62, 
+	destinationArray[(gnode)47][(dof)0-2]: 75,  76, 
+	destinationArray[(gnode)48][(dof)0-2]: 89,  90, 
+1: *** Printing location matrix ***
+	LM[(g/l el) 0/XXX]: on another proc
+	LM[(g/l el) 1/XXX]: on another proc
+	LM[(g/l el) 2/XXX]: on another proc
+	LM[(g/l el) 3/ 0][(enodes)0-4]({ 0} 35, 36,), ({ 1} 49, 50,), ({ 5} 51, 52,), ({ 4} 37, 38,), 
+	LM[(g/l el) 4/ 1][(enodes)0-4]({ 1} 49, 50,), ({ 2} 63, 64,), ({ 6} 65, 66,), ({ 5} 51, 52,), 
+	LM[(g/l el) 5/ 2][(enodes)0-4]({ 2} 63, 64,), ({ 3} 77, 78,), ({ 7} 79, 80,), ({ 6} 65, 66,), 
+	LM[(g/l el) 6/XXX]: on another proc
+	LM[(g/l el) 7/XXX]: on another proc
+	LM[(g/l el) 8/XXX]: on another proc
+	LM[(g/l el) 9/ 3][(enodes)0-4]({ 4} 37, 38,), ({ 5} 51, 52,), ({ 9} 53, 54,), ({ 8} 39, 40,), 
+	LM[(g/l el)10/ 4][(enodes)0-4]({ 5} 51, 52,), ({ 6} 65, 66,), ({10} 67, 68,), ({ 9} 53, 54,), 
+	LM[(g/l el)11/ 5][(enodes)0-4]({ 6} 65, 66,), ({ 7} 79, 80,), ({11} 81, 82,), ({10} 67, 68,), 
+	LM[(g/l el)12/XXX]: on another proc
+	LM[(g/l el)13/XXX]: on another proc
+	LM[(g/l el)14/XXX]: on another proc
+	LM[(g/l el)15/ 6][(enodes)0-4]({ 8} 39, 40,), ({ 9} 53, 54,), ({13} 55, 56,), ({12} 41, 42,), 
+	LM[(g/l el)16/ 7][(enodes)0-4]({ 9} 53, 54,), ({10} 67, 68,), ({14} 69, 70,), ({13} 55, 56,), 
+	LM[(g/l el)17/ 8][(enodes)0-4]({10} 67, 68,), ({11} 81, 82,), ({15} 83, 84,), ({14} 69, 70,), 
+	LM[(g/l el)18/XXX]: on another proc
+	LM[(g/l el)19/XXX]: on another proc
+	LM[(g/l el)20/XXX]: on another proc
+	LM[(g/l el)21/ 9][(enodes)0-4]({12} 41, 42,), ({13} 55, 56,), ({17} 57, 58,), ({16} 43, 44,), 
+	LM[(g/l el)22/10][(enodes)0-4]({13} 55, 56,), ({14} 69, 70,), ({18} 71, 72,), ({17} 57, 58,), 
+	LM[(g/l el)23/11][(enodes)0-4]({14} 69, 70,), ({15} 83, 84,), ({19} 85, 86,), ({18} 71, 72,), 
+	LM[(g/l el)24/XXX]: on another proc
+	LM[(g/l el)25/XXX]: on another proc
+	LM[(g/l el)26/XXX]: on another proc
+	LM[(g/l el)27/12][(enodes)0-4]({16} 43, 44,), ({17} 57, 58,), ({21} 59, 60,), ({20} 45, 46,), 
+	LM[(g/l el)28/13][(enodes)0-4]({17} 57, 58,), ({18} 71, 72,), ({22} 73, 74,), ({21} 59, 60,), 
+	LM[(g/l el)29/14][(enodes)0-4]({18} 71, 72,), ({19} 85, 86,), ({23} 87, 88,), ({22} 73, 74,), 
+	LM[(g/l el)30/XXX]: on another proc
+	LM[(g/l el)31/XXX]: on another proc
+	LM[(g/l el)32/XXX]: on another proc
+	LM[(g/l el)33/15][(enodes)0-4]({20} 45, 46,), ({21} 59, 60,), ({25} 61, 62,), ({24} 47, 48,), 
+	LM[(g/l el)34/16][(enodes)0-4]({21} 59, 60,), ({22} 73, 74,), ({26} 75, 76,), ({25} 61, 62,), 
+	LM[(g/l el)35/17][(enodes)0-4]({22} 73, 74,), ({23} 87, 88,), ({27} 89, 90,), ({26} 75, 76,), 
+In FeVariable_PrintLocalDiscreteValues: for FeVariable "velocity":
+node 0 (global index 3):
+	dof 0 "vx":      1 - (eq num 35)
+	dof 1 "vy":      1 - (eq num 36)
+node 1 (global index 4):
+	dof 0 "vx":      1 - (eq num 49)
+	dof 1 "vy":      1 - (eq num 50)
+node 2 (global index 5):
+	dof 0 "vx":      1 - (eq num 63)
+	dof 1 "vy":      1 - (eq num 64)
+node 3 (global index 6):
+	dof 0 "vx":      1 - (eq num 77)
+	dof 1 "vy":      1 - (eq num 78)
+node 4 (global index 10):
+	dof 0 "vx": 0.781836 - (eq num 37)
+	dof 1 "vy": 0.781836 - (eq num 38)
+node 5 (global index 11):
+	dof 0 "vx": 0.752447 - (eq num 51)
+	dof 1 "vy": 0.752447 - (eq num 52)
+node 6 (global index 12):
+	dof 0 "vx": 0.741221 - (eq num 65)
+	dof 1 "vy": 0.741221 - (eq num 66)
+node 7 (global index 13):
+	dof 0 "vx": 0.752447 - (eq num 79)
+	dof 1 "vy": 0.752447 - (eq num 80)
+node 8 (global index 17):
+	dof 0 "vx": 0.570611 - (eq num 39)
+	dof 1 "vy": 0.570611 - (eq num 40)
+node 9 (global index 18):
+	dof 0 "vx": 0.523058 - (eq num 53)
+	dof 1 "vy": 0.523058 - (eq num 54)
+node 10 (global index 19):
+	dof 0 "vx": 0.504894 - (eq num 67)
+	dof 1 "vy": 0.504894 - (eq num 68)
+node 11 (global index 20):
+	dof 0 "vx": 0.523058 - (eq num 81)
+	dof 1 "vy": 0.523058 - (eq num 82)
+node 12 (global index 24):
+	dof 0 "vx": 0.370611 - (eq num 41)
+	dof 1 "vy": 0.370611 - (eq num 42)
+node 13 (global index 25):
+	dof 0 "vx": 0.323058 - (eq num 55)
+	dof 1 "vy": 0.323058 - (eq num 56)
+node 14 (global index 26):
+	dof 0 "vx": 0.304894 - (eq num 69)
+	dof 1 "vy": 0.304894 - (eq num 70)
+node 15 (global index 27):
+	dof 0 "vx": 0.323058 - (eq num 83)
+	dof 1 "vy": 0.323058 - (eq num 84)
+node 16 (global index 31):
+	dof 0 "vx": 0.181836 - (eq num 43)
+	dof 1 "vy": 0.181836 - (eq num 44)
+node 17 (global index 32):
+	dof 0 "vx": 0.152447 - (eq num 57)
+	dof 1 "vy": 0.152447 - (eq num 58)
+node 18 (global index 33):
+	dof 0 "vx": 0.141221 - (eq num 71)
+	dof 1 "vy": 0.141221 - (eq num 72)
+node 19 (global index 34):
+	dof 0 "vx": 0.152447 - (eq num 85)
+	dof 1 "vy": 0.152447 - (eq num 86)
+node 20 (global index 38):
+	dof 0 "vx": -3.58788e-08 - (eq num 45)
+	dof 1 "vy": -3.58788e-08 - (eq num 46)
+node 21 (global index 39):
+	dof 0 "vx": -2.9637e-08 - (eq num 59)
+	dof 1 "vy": -2.9637e-08 - (eq num 60)
+node 22 (global index 40):
+	dof 0 "vx": -2.72529e-08 - (eq num 73)
+	dof 1 "vy": -2.72529e-08 - (eq num 74)
+node 23 (global index 41):
+	dof 0 "vx": -2.9637e-08 - (eq num 87)
+	dof 1 "vy": -2.9637e-08 - (eq num 88)
+node 24 (global index 45):
+	dof 0 "vx": -0.181836 - (eq num 47)
+	dof 1 "vy": -0.181836 - (eq num 48)
+node 25 (global index 46):
+	dof 0 "vx": -0.152447 - (eq num 61)
+	dof 1 "vy": -0.152447 - (eq num 62)
+node 26 (global index 47):
+	dof 0 "vx": -0.141222 - (eq num 75)
+	dof 1 "vy": -0.141222 - (eq num 76)
+node 27 (global index 48):
+	dof 0 "vx": -0.152447 - (eq num 89)
+	dof 1 "vy": -0.152447 - (eq num 90)
+
+display of Values in 2D box X:{ 0.00- 1.20}, Y:{ 0.00- 1.20}
+	with 6 elements in X (dx= 0.20) and 6 elements in Y (dy= 0.20)
+
+          |  xNode=  0   |  xNode=  1   |  xNode=  2   |  xNode=  3   |  xNode=  4   |  xNode=  5   |  xNode=  6   |
+          ----------------------------------------------------------------------------------------------------------
+yNode=  6 |XXXXXXXXXXXXXX|XXXXXXXXXXXXXX|XXXXXXXXXXXXXX|(-0.18,-0.18 )|(-0.15,-0.15 )|(-0.14,-0.14 )|(-0.15,-0.15 )|
+          |--------------*--------------*--------------*--------------*--------------*--------------*--------------|
+yNode=  5 |XXXXXXXXXXXXXX|XXXXXXXXXXXXXX|XXXXXXXXXXXXXX|(-0.00,-0.00 )|(-0.00,-0.00 )|(-0.00,-0.00 )|(-0.00,-0.00 )|
+          |--------------*--------------*--------------*--------------*--------------*--------------*--------------|
+yNode=  4 |XXXXXXXXXXXXXX|XXXXXXXXXXXXXX|XXXXXXXXXXXXXX|( 0.18, 0.18 )|( 0.15, 0.15 )|( 0.14, 0.14 )|( 0.15, 0.15 )|
+          |--------------*--------------*--------------*--------------*--------------*--------------*--------------|
+yNode=  3 |XXXXXXXXXXXXXX|XXXXXXXXXXXXXX|XXXXXXXXXXXXXX|( 0.37, 0.37 )|( 0.32, 0.32 )|( 0.30, 0.30 )|( 0.32, 0.32 )|
+          |--------------*--------------*--------------*--------------*--------------*--------------*--------------|
+yNode=  2 |XXXXXXXXXXXXXX|XXXXXXXXXXXXXX|XXXXXXXXXXXXXX|( 0.57, 0.57 )|( 0.52, 0.52 )|( 0.50, 0.50 )|( 0.52, 0.52 )|
+          |--------------*--------------*--------------*--------------*--------------*--------------*--------------|
+yNode=  1 |XXXXXXXXXXXXXX|XXXXXXXXXXXXXX|XXXXXXXXXXXXXX|( 0.78, 0.78 )|( 0.75, 0.75 )|( 0.74, 0.74 )|( 0.75, 0.75 )|
+          |--------------*--------------*--------------*--------------*--------------*--------------*--------------|
+yNode=  0 |XXXXXXXXXXXXXX|XXXXXXXXXXXXXX|XXXXXXXXXXXXXX|( 1.00, 1.00 )|( 1.00, 1.00 )|( 1.00, 1.00 )|( 1.00, 1.00 )|
+          ----------------------------------------------------------------------------------------------------------
+
+
+
+Testing the min and max functions
+	Min global magnitude = 0.000000
+	Max global magnitude = 1.414214
+
+
+Testing the local boundary functions
+	MinLocalXCoord = 0.600000
+	MinLocalYCoord = 0.000000
+	MinLocalZCoord = 0.000000
+	MaxLocalXCoord = 1.200000
+	MaxLocalYCoord = 1.200000
+	MaxLocalZCoord = 0.000000
+Testing the global boundary functions
+	MinGlobalXCoord = 0.000000
+	MinGlobalYCoord = 0.000000
+	MinGlobalZCoord = 0.000000
+	MaxGlobalXCoord = 1.200000
+	MaxGlobalYCoord = 1.200000
+	MaxGlobalZCoord = 0.000000
+
+
+Testing Interpolation at some coords:
+	velocity interpolated at ( 0.00, 0.00) = not found on this proc.
+	velocity derivative interpolated at ( 0.00, 0.00): 
+	not found on this proc, or shadow syncing disabled.
+	velocity interpolated at ( 0.10, 0.10) = not found on this proc.
+	velocity derivative interpolated at ( 0.10, 0.10): 
+	not found on this proc, or shadow syncing disabled.
+	velocity interpolated at ( 0.20, 0.60) = not found on this proc.
+	velocity derivative interpolated at ( 0.20, 0.60): 
+	not found on this proc, or shadow syncing disabled.
+	velocity interpolated at ( 0.55, 0.10) = ( 0.90, 0.90)
+	velocity derivative interpolated at ( 0.55, 0.10): 
+	derivative - 
+	-0.090818     -1.0454     
+	-0.090818     -1.0454     
+	velocity interpolated at ( 0.65, 0.60) = ( 0.36, 0.36)
+	velocity derivative interpolated at ( 0.65, 0.60): 
+	derivative - 
+	-0.23776          -1     
+	-0.23776          -1     
+	velocity interpolated at ( 1.10, 1.10) = (-0.07,-0.07)
+	velocity derivative interpolated at ( 1.10, 1.10): 
+	derivative - 
+	-0.028064     -0.73417     
+	-0.028064     -0.73417     
+	velocity interpolated at ( 1.20, 1.20) = (-0.15,-0.15)
+	velocity derivative interpolated at ( 1.20, 1.20): 
+	derivative - 
+	-0.056129     -0.76224     
+	-0.056129     -0.76224     
+Testing Derivatives at some coords with linear velocity solution:
+	velocity derivative interpolated at ( 0.00, 0.00): 
+	not found on this proc.
+	velocity derivative interpolated at ( 0.10, 0.10): 
+	not found on this proc.
+	velocity derivative interpolated at ( 0.20, 0.60): 
+	not found on this proc.
+	velocity derivative interpolated at ( 0.55, 0.10): 
+	derivative - 
+	    2.3         0.1     
+	     -3           1     
+	velocity derivative interpolated at ( 0.65, 0.60): 
+	derivative - 
+	    2.3         0.1     
+	     -3           1     
+	velocity derivative interpolated at ( 1.10, 1.10): 
+	derivative - 
+	    2.3         0.1     
+	     -3           1     
+	velocity derivative interpolated at ( 1.20, 1.20): 
+	derivative - 
+	    2.3         0.1     
+	     -3           1     
+Testing Set at some nodes:
+	Before update: values at nodes 0 to 10:
+	(1.380000,-1.800000), (1.840000,-2.400000), (2.300000,-3.000000), (2.760000,-3.600000), (1.400000,-1.600000), (1.860000,-2.200000), (2.320000,-2.800000), (2.780000,-3.400000), (1.420000,-1.400000), (1.880000,-2.000000), 
+	After update: values at nodes 0 to 10:
+	(0.000000,0.000000), (100.000000,110.000000), (200.000000,220.000000), (300.000000,330.000000), (400.000000,440.000000), (500.000000,550.000000), (600.000000,660.000000), (700.000000,770.000000), (800.000000,880.000000), (900.000000,990.000000), 

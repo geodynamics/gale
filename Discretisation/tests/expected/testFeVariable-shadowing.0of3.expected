@@ -1,0 +1,179 @@
+StGermain Framework. Copyright (C) 2003-2005 VPAC.
+StGermain Discretisation Library. Copyright (C) 2003-2005 VPAC.
+StGermain FEM Discretisation Framework. Copyright (C) 2003-2005 VPAC.
+Watching rank: 0
+Setting an IC whereby node val based on rank, loc node I, & nodalDof_I
+Before syncing of shadow values
+In FeVariable_PrintDomainDiscreteValues: for FeVariable "velocity":
+node 0 (global index 0):
+	dof 0 "vx":      0 - (from BC)
+	dof 1 "vy":      1 - (eq num 0)
+node 1 (global index 1):
+	dof 0 "vx":     10 - (eq num 7)
+	dof 1 "vy":     11 - (eq num 8)
+node 2 (global index 2):
+	dof 0 "vx":     20 - (eq num 21)
+	dof 1 "vy":     21 - (eq num 22)
+node 3 (global index 7):
+	dof 0 "vx":     30 - (from BC)
+	dof 1 "vy":     31 - (eq num 1)
+node 4 (global index 8):
+	dof 0 "vx":     40 - (eq num 9)
+	dof 1 "vy":     41 - (eq num 10)
+node 5 (global index 9):
+	dof 0 "vx":     50 - (eq num 23)
+	dof 1 "vy":     51 - (eq num 24)
+node 6 (global index 14):
+	dof 0 "vx":     60 - (from BC)
+	dof 1 "vy":     61 - (eq num 2)
+node 7 (global index 15):
+	dof 0 "vx":     70 - (eq num 11)
+	dof 1 "vy":     71 - (eq num 12)
+node 8 (global index 16):
+	dof 0 "vx":     80 - (eq num 25)
+	dof 1 "vy":     81 - (eq num 26)
+node 9 (global index 21):
+	dof 0 "vx":     90 - (from BC)
+	dof 1 "vy":     91 - (eq num 3)
+node 10 (global index 22):
+	dof 0 "vx":    100 - (eq num 13)
+	dof 1 "vy":    101 - (eq num 14)
+node 11 (global index 23):
+	dof 0 "vx":    110 - (eq num 27)
+	dof 1 "vy":    111 - (eq num 28)
+node 12 (global index 28):
+	dof 0 "vx":    120 - (from BC)
+	dof 1 "vy":    121 - (eq num 4)
+node 13 (global index 29):
+	dof 0 "vx":    130 - (eq num 15)
+	dof 1 "vy":    131 - (eq num 16)
+node 14 (global index 30):
+	dof 0 "vx":    140 - (eq num 29)
+	dof 1 "vy":    141 - (eq num 30)
+node 15 (global index 35):
+	dof 0 "vx":    150 - (from BC)
+	dof 1 "vy":    151 - (eq num 5)
+node 16 (global index 36):
+	dof 0 "vx":    160 - (eq num 17)
+	dof 1 "vy":    161 - (eq num 18)
+node 17 (global index 37):
+	dof 0 "vx":    170 - (eq num 31)
+	dof 1 "vy":    171 - (eq num 32)
+node 18 (global index 42):
+	dof 0 "vx":    180 - (from BC)
+	dof 1 "vy":    181 - (eq num 6)
+node 19 (global index 43):
+	dof 0 "vx":    190 - (eq num 19)
+	dof 1 "vy":    191 - (eq num 20)
+node 20 (global index 44):
+	dof 0 "vx":    200 - (eq num 33)
+	dof 1 "vy":    201 - (eq num 34)
+node 21 (global index 3):
+	dof 0 "vx":      0 - (eq num 35)
+	dof 1 "vy":      0 - (eq num 36)
+node 22 (global index 10):
+	dof 0 "vx":      0 - (eq num 37)
+	dof 1 "vy":      0 - (eq num 38)
+node 23 (global index 17):
+	dof 0 "vx":      0 - (eq num 39)
+	dof 1 "vy":      0 - (eq num 40)
+node 24 (global index 24):
+	dof 0 "vx":      0 - (eq num 41)
+	dof 1 "vy":      0 - (eq num 42)
+node 25 (global index 31):
+	dof 0 "vx":      0 - (eq num 43)
+	dof 1 "vy":      0 - (eq num 44)
+node 26 (global index 38):
+	dof 0 "vx":      0 - (eq num 45)
+	dof 1 "vy":      0 - (eq num 46)
+node 27 (global index 45):
+	dof 0 "vx":      0 - (eq num 47)
+	dof 1 "vy":      0 - (eq num 48)
+
+
+After syncing of shadow values
+In FeVariable_PrintDomainDiscreteValues: for FeVariable "velocity":
+node 0 (global index 0):
+	dof 0 "vx":      0 - (from BC)
+	dof 1 "vy":      1 - (eq num 0)
+node 1 (global index 1):
+	dof 0 "vx":     10 - (eq num 7)
+	dof 1 "vy":     11 - (eq num 8)
+node 2 (global index 2):
+	dof 0 "vx":     20 - (eq num 21)
+	dof 1 "vy":     21 - (eq num 22)
+node 3 (global index 7):
+	dof 0 "vx":     30 - (from BC)
+	dof 1 "vy":     31 - (eq num 1)
+node 4 (global index 8):
+	dof 0 "vx":     40 - (eq num 9)
+	dof 1 "vy":     41 - (eq num 10)
+node 5 (global index 9):
+	dof 0 "vx":     50 - (eq num 23)
+	dof 1 "vy":     51 - (eq num 24)
+node 6 (global index 14):
+	dof 0 "vx":     60 - (from BC)
+	dof 1 "vy":     61 - (eq num 2)
+node 7 (global index 15):
+	dof 0 "vx":     70 - (eq num 11)
+	dof 1 "vy":     71 - (eq num 12)
+node 8 (global index 16):
+	dof 0 "vx":     80 - (eq num 25)
+	dof 1 "vy":     81 - (eq num 26)
+node 9 (global index 21):
+	dof 0 "vx":     90 - (from BC)
+	dof 1 "vy":     91 - (eq num 3)
+node 10 (global index 22):
+	dof 0 "vx":    100 - (eq num 13)
+	dof 1 "vy":    101 - (eq num 14)
+node 11 (global index 23):
+	dof 0 "vx":    110 - (eq num 27)
+	dof 1 "vy":    111 - (eq num 28)
+node 12 (global index 28):
+	dof 0 "vx":    120 - (from BC)
+	dof 1 "vy":    121 - (eq num 4)
+node 13 (global index 29):
+	dof 0 "vx":    130 - (eq num 15)
+	dof 1 "vy":    131 - (eq num 16)
+node 14 (global index 30):
+	dof 0 "vx":    140 - (eq num 29)
+	dof 1 "vy":    141 - (eq num 30)
+node 15 (global index 35):
+	dof 0 "vx":    150 - (from BC)
+	dof 1 "vy":    151 - (eq num 5)
+node 16 (global index 36):
+	dof 0 "vx":    160 - (eq num 17)
+	dof 1 "vy":    161 - (eq num 18)
+node 17 (global index 37):
+	dof 0 "vx":    170 - (eq num 31)
+	dof 1 "vy":    171 - (eq num 32)
+node 18 (global index 42):
+	dof 0 "vx":    180 - (from BC)
+	dof 1 "vy":    181 - (eq num 6)
+node 19 (global index 43):
+	dof 0 "vx":    190 - (eq num 19)
+	dof 1 "vy":    191 - (eq num 20)
+node 20 (global index 44):
+	dof 0 "vx":    200 - (eq num 33)
+	dof 1 "vy":    201 - (eq num 34)
+node 21 (global index 3):
+	dof 0 "vx":   1010 - (eq num 35)
+	dof 1 "vy":   1011 - (eq num 36)
+node 22 (global index 10):
+	dof 0 "vx":   1040 - (eq num 37)
+	dof 1 "vy":   1041 - (eq num 38)
+node 23 (global index 17):
+	dof 0 "vx":   1070 - (eq num 39)
+	dof 1 "vy":   1071 - (eq num 40)
+node 24 (global index 24):
+	dof 0 "vx":   1100 - (eq num 41)
+	dof 1 "vy":   1101 - (eq num 42)
+node 25 (global index 31):
+	dof 0 "vx":   1130 - (eq num 43)
+	dof 1 "vy":   1131 - (eq num 44)
+node 26 (global index 38):
+	dof 0 "vx":   1160 - (eq num 45)
+	dof 1 "vy":   1161 - (eq num 46)
+node 27 (global index 45):
+	dof 0 "vx":   1190 - (eq num 47)
+	dof 1 "vy":   1191 - (eq num 48)

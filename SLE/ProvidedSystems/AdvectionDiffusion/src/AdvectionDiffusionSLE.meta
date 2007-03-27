@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">AdvectionDiffusionSLE</param>
+<param name="Author">...</param>
+<param name="Organisation">VPAC</param>
+<param name="Project">StgFEM</param>
+<param name="Location">./StgFEM/SLE/ProvidedSystems/AdvectionDiffusion/src/</param>
+<param name="Project Web">https://csd.vpac.org/twiki/bin/view/Stgfem/WebHome</param>
+<param name="Copyright">Copyright (C) 2004-2005 VPAC.</param>
+<param name="License">https://csd.vpac.org/twiki/bin/view/Stgermain/SoftwareLicense</param>
+<param name="Parent">SystemLinearEquations</param>
+<param name="Reference">...</param>
+<param name="Summary">...</param>
+<param name="Description">...</param>
+
+<!--Now the interesting stuff-->
+
+
+<list name="Params">
+	<struct>
+		<param name="Name">dim</param>
+		<param name="Type">UnsignedInt</param>
+		<param name="Default">0</param>
+		<param name="Description">...</param>
+	</struct>
+	<struct>
+		<param name="Name">courantFactor</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.5</param>
+		<param name="Description">...</param>
+	</struct>
+
+</list>
+
+<list name="Dependencies">
+	<struct>
+		<param name="Essential">True</param>
+		<param name="Name">PhiField</param>
+		<param name="Type">FeVariable</param>
+		<param name="Description">...</param>
+	</struct>
+
+<!-- PLEASE, check the above struct information is accurate, in line number 349 of the c file and then remove this comment afterwards -->
+
+	<struct>
+		<param name="Essential">True</param>
+		<param name="Name">Residual</param>
+		<param name="Type">ForceVector</param>
+		<param name="Description">...</param>
+	</struct>
+
+<!-- PLEASE, check the above struct information is accurate, in line number 350 of the c file and then remove this comment afterwards -->
+
+	<struct>
+		<param name="Essential">True</param>
+		<param name="Name">MassMatrix</param>
+		<param name="Type">Stg_Component</param>
+		<param name="Description">...</param>
+	</struct>
+
+<!-- PLEASE, check the above struct information is accurate, in line number 351 of the c file and then remove this comment afterwards -->
+
+
+</list>
+<!-- Add an exmaple XML if possible -->
+<param name="Example">...</param>
+
+</StGermainData>

@@ -1,0 +1,143 @@
+StGermain Framework revision 3654. Copyright (C) 2003-2005 VPAC.
+StGermain Discretisation Library revision 3654. Copyright (C) 2003-2005 VPAC.
+StGermain Finite Element Framework revision 595. Copyright (C) 2003-2005 VPAC.
+StGermain FEM Discretisation Framework revision 595. Copyright (C) 2003-2005 VPAC.
+StGermain SLE Library revision 595. Copyright (C) 2003-2005 VPAC.
+StGermain PETSc-LinearAlgebra Interface revision 595. Copyright (C) 2003-2005 VPAC.
+StGermain FEM Assembly Library revision 595. Copyright (C) 2003-2005 VPAC.
+StgFEM revision 595. Copyright (C) 2004-2005 VPAC.
+Constructing context..
+	
+	Creating Stg_Components from the component-list
+	
+		Instantiating MeshLayout as meshLayout
+		Instantiating IrregTopology as etopology
+		Instantiating IrregTopology as ntopology
+		Instantiating IrregGeometry as geometry
+		Instantiating CornerNL as nodeLayout
+		Instantiating IrregEL as elementLayout
+		Instantiating DummyMD as decomp-linear
+		Instantiating FiniteElement_Mesh as mesh-linear
+		Instantiating Variable as temperature
+		Instantiating CompositeVC as temperatureBCs
+		Instantiating CompositeVC as temperatureICs
+		Instantiating DofLayout as temperatureDofLayout
+		Instantiating FeVariable as TemperatureField
+		Instantiating OperatorFeVariable as TemperatureGradientsField
+		Instantiating SingleCellLayout as cellLayout
+		Instantiating GaussParticleLayout as particleLayout
+		Instantiating Swarm as gaussSwarm
+		Instantiating SolutionVector as sVector
+		Instantiating ForceVector as fVector
+		Instantiating StiffnessMatrix as kMatrix
+		Instantiating LaplacianStiffnessMatrixTerm as laplacian
+		Instantiating Energy_SLE_Solver as energySolver
+		Instantiating Energy_SLE as energySLE
+	
+	Constructing Stg_Components from the live-component register
+	
+		Constructing meshLayout..
+			elementLayout has not been constructed yet. Constructing now.
+				Constructing elementLayout..
+					etopology has not been constructed yet. Constructing now.
+						Constructing etopology..
+					geometry has not been constructed yet. Constructing now.
+						Constructing geometry..
+			nodeLayout has not been constructed yet. Constructing now.
+				Constructing nodeLayout..
+					ntopology has not been constructed yet. Constructing now.
+						Constructing ntopology..
+			decomp-linear has not been constructed yet. Constructing now.
+				Constructing decomp-linear..
+		Constructing mesh-linear..
+		Constructing temperature..
+		Constructing temperatureBCs..
+		Constructing temperatureICs..
+		Constructing temperatureDofLayout..
+		Constructing TemperatureField..
+		Constructing TemperatureGradientsField..
+		Constructing cellLayout..
+		Constructing particleLayout..
+		Constructing gaussSwarm..
+		Constructing sVector..
+		Constructing fVector..
+		Constructing kMatrix..
+		Constructing laplacian..
+		Constructing energySolver..
+		Constructing energySLE..
+	Constructing StgFEM_PrintFeVariableDiscreteValues..
+	Constructing StgFEM_StandardConditionFunctions..
+TemperatureField Values (at end of timestep 0):
+In FeVariable_PrintLocalDiscreteValues: for FeVariable "TemperatureField":
+node 0 (global index 0):
+	dof 0 "temperature":      1 - (from BC)
+node 1 (global index 1):
+	dof 0 "temperature":      1 - (from BC)
+node 2 (global index 2):
+	dof 0 "temperature":      1 - (from BC)
+node 3 (global index 3):
+	dof 0 "temperature":      1 - (from BC)
+node 4 (global index 4):
+	dof 0 "temperature":      0 - (eq num 0)
+node 5 (global index 5):
+	dof 0 "temperature":      0 - (eq num 1)
+node 6 (global index 6):
+	dof 0 "temperature":      0 - (eq num 2)
+node 7 (global index 7):
+	dof 0 "temperature":      0 - (eq num 3)
+node 8 (global index 8):
+	dof 0 "temperature":      0 - (eq num 4)
+node 9 (global index 9):
+	dof 0 "temperature":      0 - (eq num 5)
+node 10 (global index 10):
+	dof 0 "temperature":      0 - (eq num 6)
+node 11 (global index 11):
+	dof 0 "temperature":      0 - (eq num 7)
+node 12 (global index 12):
+	dof 0 "temperature":      0 - (from BC)
+node 13 (global index 13):
+	dof 0 "temperature":      0 - (from BC)
+node 14 (global index 14):
+	dof 0 "temperature":      0 - (from BC)
+node 15 (global index 15):
+	dof 0 "temperature":      0 - (from BC)
+
+Run until 1 timeSteps have been run
+TimeStep = 1, Start time = 0 + 0 prev timeStep dt
+Linear solver (energySLE-execute) 
+Linear solution time 0.000524044 (secs)
+TemperatureField Values (at end of timestep 1):
+In FeVariable_PrintLocalDiscreteValues: for FeVariable "TemperatureField":
+node 0 (global index 0):
+	dof 0 "temperature":      1 - (from BC)
+node 1 (global index 1):
+	dof 0 "temperature":      1 - (from BC)
+node 2 (global index 2):
+	dof 0 "temperature":      1 - (from BC)
+node 3 (global index 3):
+	dof 0 "temperature":      1 - (from BC)
+node 4 (global index 4):
+	dof 0 "temperature": 0.666666 - (eq num 0)
+node 5 (global index 5):
+	dof 0 "temperature": 0.666667 - (eq num 1)
+node 6 (global index 6):
+	dof 0 "temperature": 0.666668 - (eq num 2)
+node 7 (global index 7):
+	dof 0 "temperature": 0.666666 - (eq num 3)
+node 8 (global index 8):
+	dof 0 "temperature": 0.333333 - (eq num 4)
+node 9 (global index 9):
+	dof 0 "temperature": 0.333333 - (eq num 5)
+node 10 (global index 10):
+	dof 0 "temperature": 0.333333 - (eq num 6)
+node 11 (global index 11):
+	dof 0 "temperature": 0.333333 - (eq num 7)
+node 12 (global index 12):
+	dof 0 "temperature":      0 - (from BC)
+node 13 (global index 13):
+	dof 0 "temperature":      0 - (from BC)
+node 14 (global index 14):
+	dof 0 "temperature":      0 - (from BC)
+node 15 (global index 15):
+	dof 0 "temperature":      0 - (from BC)
+

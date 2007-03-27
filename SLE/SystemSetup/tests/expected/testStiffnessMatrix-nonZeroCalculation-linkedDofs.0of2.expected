@@ -1,0 +1,77 @@
+StGermain Framework revision 3551. Copyright (C) 2003-2005 VPAC.
+StGermain Discretisation Library revision 3551. Copyright (C) 2003-2005 VPAC.
+StGermain FEM Discretisation Framework revision 554. Copyright (C) 2003-2005 VPAC.
+StGermain PETSc-LinearAlgebra Interface revision 554. Copyright (C) 2003-2005 VPAC.
+Watching rank: 0
+0: *** Printing destination array ***
+	destinationArray[(gnode) 0][(dof)0-2]: -1,   0, 
+	destinationArray[(gnode) 1][(dof)0-2]:  5,   6, 
+	destinationArray[(gnode) 2][(dof)0-2]: 15,  16, 
+	destinationArray[(gnode) 3][(dof)0-2]: 25,  26, 
+	destinationArray[(gnode) 4]: on another proc
+	destinationArray[(gnode) 5][(dof)0-2]: -1,   1, 
+	destinationArray[(gnode) 6][(dof)0-2]:  7,   8, 
+	destinationArray[(gnode) 7][(dof)0-2]: 17,  18, 
+	destinationArray[(gnode) 8][(dof)0-2]: 27,  28, 
+	destinationArray[(gnode) 9]: on another proc
+	destinationArray[(gnode)10][(dof)0-2]: -1,   2, 
+	destinationArray[(gnode)11][(dof)0-2]:  9,  10, 
+	destinationArray[(gnode)12][(dof)0-2]: 19,  20, 
+	destinationArray[(gnode)13][(dof)0-2]: 29,  30, 
+	destinationArray[(gnode)14]: on another proc
+	destinationArray[(gnode)15][(dof)0-2]: -1,   3, 
+	destinationArray[(gnode)16][(dof)0-2]: 11,  12, 
+	destinationArray[(gnode)17][(dof)0-2]: 21,  22, 
+	destinationArray[(gnode)18][(dof)0-2]: 31,  32, 
+	destinationArray[(gnode)19]: on another proc
+	destinationArray[(gnode)20][(dof)0-2]: -1,   4, 
+	destinationArray[(gnode)21][(dof)0-2]: 13,  14, 
+	destinationArray[(gnode)22][(dof)0-2]: 23,  24, 
+	destinationArray[(gnode)23][(dof)0-2]: 33,  34, 
+	destinationArray[(gnode)24]: on another proc
+Printing non-zero entries calculation:
+node 0 (global index 0):
+	dof 0 "vx": (BC)
+	dof 1 "vy": (eq num 0)	local matRow 0: diag entries = 6, off diag = 0
+node 1 (global index 1):
+	dof 0 "vx": (eq num 5)	local matRow 5: diag entries = 10, off diag = 0
+	dof 1 "vy": (eq num 6)	local matRow 6: diag entries = 10, off diag = 0
+node 2 (global index 2):
+	dof 0 "vx": (eq num 15)	local matRow 15: diag entries = 8, off diag = 4
+	dof 1 "vy": (eq num 16)	local matRow 16: diag entries = 8, off diag = 4
+node 3 (global index 5):
+	dof 0 "vx": (BC)
+	dof 1 "vy": (eq num 1)	local matRow 1: diag entries = 9, off diag = 0
+node 4 (global index 6):
+	dof 0 "vx": (eq num 7)	local matRow 7: diag entries = 14, off diag = 1
+	dof 1 "vy": (eq num 8)	local matRow 8: diag entries = 14, off diag = 1
+node 5 (global index 7):
+	dof 0 "vx": (eq num 17)	local matRow 17: diag entries = 11, off diag = 7
+	dof 1 "vy": (eq num 18)	local matRow 18: diag entries = 11, off diag = 7
+node 6 (global index 10):
+	dof 0 "vx": (BC)
+	dof 1 "vy": (eq num 2)	local matRow 2: diag entries = 9, off diag = 0
+node 7 (global index 11):
+	dof 0 "vx": (eq num 9)	local matRow 9: diag entries = 12, off diag = 3
+	dof 1 "vy": (eq num 10)	local matRow 10: diag entries = 12, off diag = 3
+node 8 (global index 12):
+	dof 0 "vx": (eq num 19)	local matRow 19: diag entries = 9, off diag = 9
+	dof 1 "vy": (eq num 20)	not owned by this proc.
+node 9 (global index 15):
+	dof 0 "vx": (BC)
+	dof 1 "vy": (eq num 3)	local matRow 3: diag entries = 9, off diag = 0
+node 10 (global index 16):
+	dof 0 "vx": (eq num 11)	local matRow 11: diag entries = 10, off diag = 5
+	dof 1 "vy": (eq num 12)	local matRow 12: diag entries = 10, off diag = 5
+node 11 (global index 17):
+	dof 0 "vx": (eq num 21)	not owned by this proc.
+	dof 1 "vy": (eq num 22)	not owned by this proc.
+node 12 (global index 20):
+	dof 0 "vx": (BC)
+	dof 1 "vy": (eq num 4)	local matRow 4: diag entries = 6, off diag = 0
+node 13 (global index 21):
+	dof 0 "vx": (eq num 13)	local matRow 13: diag entries = 6, off diag = 4
+	dof 1 "vy": (eq num 14)	local matRow 14: diag entries = 6, off diag = 4
+node 14 (global index 22):
+	dof 0 "vx": (eq num 23)	not owned by this proc.
+	dof 1 "vy": (eq num 24)	not owned by this proc.

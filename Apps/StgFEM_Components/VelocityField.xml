@@ -1,0 +1,118 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<!-- A StGermain input file -->
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+	
+	<!-- VelocityField Stuff -->
+	<struct name="components" mergeType="merge">
+		<struct name="velocity">
+			<param name="Type">Variable</param>
+			<param name="Rank">Vector</param>
+			<param name="Dependency">decomp-linear</param>
+			<param name="DataType">Double</param>
+			<param name="Count">decomp-linear-nodeDomainCount</param>
+			<param name="VectorComponentCount">dim</param>
+			<list name="names">
+				<param>vx</param>
+				<param>vy</param>
+				<param>vz</param>
+			</list>
+		</struct>
+		<struct name="velocityBCs">
+			<param name="Type">CompositeVC</param>
+			<param name="Data">mesh-linear</param>
+		</struct>
+		<struct name="velocityICs">
+			<param name="Type">CompositeVC</param>
+			<param name="Data">mesh-linear</param>
+		</struct>		
+		<struct name="velocityDofLayout">
+			<param name="Type">DofLayout</param>
+			<param name="Count">decomp-linear-nodeDomainCount</param>
+			<param name="BaseVariableCount">dim</param>
+			<list name="BaseVariables">
+				<param>vx</param>
+				<param>vy</param>
+				<param>vz</param>
+			</list>
+		</struct>		
+		<struct name="VelocityField">
+			<param name="Type">FeVariable</param>
+			<param name="FEMesh">mesh-linear</param>
+			<param name="DofLayout">velocityDofLayout</param>
+			<param name="BC">velocityBCs</param>
+			<param name="IC">velocityICs</param>
+			<param name="LinkedDofInfo">velocityLinkedDofs</param>
+		</struct>
+
+		<!-- Standard Operators on velocity field -->
+		<struct name="VelocityMagnitudeField"> 
+			<param name="Type">OperatorFeVariable</param>
+			<param name="Operator">Magnitude</param>
+			<param name="FeVariable">VelocityField</param>
+		</struct>
+		<struct name="VelocityGradientsField"> 
+			<param name="Type">OperatorFeVariable</param>
+			<param name="Operator">Gradient</param>
+			<param name="FeVariable">VelocityField</param>
+		</struct>		
+		<struct name="VelocityGradientsInvariantField"> 
+			<param name="Type">OperatorFeVariable</param>
+			<param name="Operator">TensorInvariant</param>
+		<param name="FeVariable">VelocityGradientsField</param>
+		</struct>		
+
+		
+		<struct name="VelocityXXField">
+			<param name="Type">OperatorFeVariable</param>
+			<param name="Operator">TakeFirstComponent</param>
+			<param name="FeVariable">VelocityField</param>
+		</struct>
+		<struct name="VelocityYYField">
+			<param name="Type">OperatorFeVariable</param>
+			<param name="Operator">TakeSecondComponent</param>
+			<param name="FeVariable">VelocityField</param>
+		</struct>
+		<!--
+		<struct name="VelocityZZField">
+			<param name="Type">OperatorFeVariable</param>
+			<param name="Operator">TakeThirdComponent</param>
+			<param name="FeVariable">VelocityField</param>
+		</struct>
+		-->
+		<struct name="StrainRateField"> 
+			<param name="Type">OperatorFeVariable</param>
+			<param name="Operator">TensorSymmetricPart</param>
+			<param name="FeVariable">VelocityGradientsField</param>
+		</struct>		
+		<struct name="VorticityField"> 
+			<param name="Type">OperatorFeVariable</param>
+			<param name="Operator">TensorAntisymmetricPart</param>
+			<param name="FeVariable">VelocityGradientsField</param>
+		</struct>
+		<struct name="StrainRateInvariantField"> 
+			<param name="Type">OperatorFeVariable</param>
+			<param name="Operator">SymmetricTensor_Invariant</param>
+			<param name="FeVariable">StrainRateField</param>
+		</struct>
+		<struct name="StrainRateXXField"> 
+			<param name="Type">OperatorFeVariable</param>
+			<param name="Operator">TakeFirstComponent</param>
+			<param name="FeVariable">StrainRateField</param>
+		</struct>			
+		<struct name="StrainRateYYField"> 
+			<param name="Type">OperatorFeVariable</param>
+			<param name="Operator">TakeSecondComponent</param>
+			<param name="FeVariable">StrainRateField</param>
+		</struct>		
+		<!--
+		<struct name="StrainRateZZField"> 
+			<param name="Type">OperatorFeVariable</param>
+			<param name="Operator">TakeThirdComponent</param>
+			<param name="FeVariable">StrainRateField</param>
+		</struct>		
+		-->	
+	</struct>
+	
+</StGermainData>
