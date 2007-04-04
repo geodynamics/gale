@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<include>testDrawingObject.xml</include>
+
+	<struct name="components" mergeType="merge">
+		<struct name="camera" mergeType="replace">
+			<param name="Type">lucCamera</param>
+			<param name="coordZ">7.0</param>
+		</struct>
+		<!-- Drawing Objects -->
+		<struct name="bathymetryImage">
+			<param name="Type">lucTextureMap</param>
+			<param name="image">Bathymetry.ppm</param>
+			<param name="bottomLeftX">-2.0</param>
+			<param name="bottomLeftY">-2.0</param>
+			<param name="bottomLeftZ">1.0</param>
+			
+			<param name="bottomRightX">2.0</param>
+			<param name="bottomRightY">-2.0</param>
+			<param name="bottomRightZ">1.0</param>
+			
+			<param name="topRightX">2.0</param>
+			<param name="topRightY">2.0</param>
+			<param name="topRightZ">1.0</param>			
+			
+			<param name="topLeftX">-2.0</param>
+			<param name="topLeftY">2.0</param>
+			<param name="topLeftZ">1.0</param>			
+		</struct>	
+		
+		<!-- Put these althogether in a viewport -->
+		<struct name="viewport">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">camera</param>
+			<list name="DrawingObject">
+				<param>bathymetryImage</param>
+			</list>
+		</struct>
+	</struct>
+
+</StGermainData>

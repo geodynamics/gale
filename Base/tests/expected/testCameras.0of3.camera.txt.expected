@@ -1,0 +1,266 @@
+lucCamera: frontOn
+	Stg_Component (ptr): 0x80686d8
+	Stg_Object (ptr): 0x80686d8
+		Stg_Class (ptr): 0x80686d8
+			sizeOfSelf: 212
+			_deleteSelf: Yes
+			type: lucCamera
+			_delete (func ptr): 0xb7fa8ff5
+			_print (func ptr): 0xb7fa902c
+			_copy (func ptr): 0xb7fa9301
+		name: frontOn
+		nameAllocationType: NON_GLOBAL
+		_defaultConstructor (func ptr): 0xb7fa93f8
+		_construct (func ptr): 0xb7fa9489
+		_build (func ptr): 0xb7fa97d7
+		_initialise (func ptr): 0xb7fa97dc
+		_execute (func ptr): 0xb7fa97e1
+		_destroy (func ptr): 0xb7fa97e6
+		isConstructed: True
+		isBuilt: False
+		isInitialised: False
+		hasExecuted: False
+		isDestroyed: False
+		constructor function name: frontOn-Construct
+		build function name: frontOn-Build
+		initialise function name: frontOn-Initialise
+		execute function name: frontOn-Execute
+		destroy function name: frontOn-Destroy
+	self->coord = { 0, 0, 1 }
+	self->focalPoint = { 0, 0, 0 }
+	self->upDirection = { 0, 1, 0 }
+	self->aperture = 45
+	self->stereoType = lucMono
+	self->buffer = lucLeft
+	self->eyeSeparation = 0.2
+lucCamera: stereo
+	Stg_Component (ptr): 0x806b598
+	Stg_Object (ptr): 0x806b598
+		Stg_Class (ptr): 0x806b598
+			sizeOfSelf: 212
+			_deleteSelf: Yes
+			type: lucCamera
+			_delete (func ptr): 0xb7fa8ff5
+			_print (func ptr): 0xb7fa902c
+			_copy (func ptr): 0xb7fa9301
+		name: stereo
+		nameAllocationType: NON_GLOBAL
+		_defaultConstructor (func ptr): 0xb7fa93f8
+		_construct (func ptr): 0xb7fa9489
+		_build (func ptr): 0xb7fa97d7
+		_initialise (func ptr): 0xb7fa97dc
+		_execute (func ptr): 0xb7fa97e1
+		_destroy (func ptr): 0xb7fa97e6
+		isConstructed: True
+		isBuilt: False
+		isInitialised: False
+		hasExecuted: False
+		isDestroyed: False
+		constructor function name: stereo-Construct
+		build function name: stereo-Build
+		initialise function name: stereo-Initialise
+		execute function name: stereo-Execute
+		destroy function name: stereo-Destroy
+	self->coord = { 1, 1, 0 }
+	self->focalPoint = { 1, 0, 0 }
+	self->upDirection = { 1, 0, 0 }
+	self->aperture = 70
+	self->stereoType = lucStereoToeIn
+	self->buffer = lucLeft
+	self->eyeSeparation = 0.3
+************** Checking Camera 'frontOn' **************
+	************** Testing lucCamera_Zoom **************
+	lucCamera: frontOn
+		Stg_Component (ptr): 0x80686d8
+		Stg_Object (ptr): 0x80686d8
+			Stg_Class (ptr): 0x80686d8
+				sizeOfSelf: 212
+				_deleteSelf: Yes
+				type: lucCamera
+				_delete (func ptr): 0xb7fa8ff5
+				_print (func ptr): 0xb7fa902c
+				_copy (func ptr): 0xb7fa9301
+			name: frontOn
+			nameAllocationType: NON_GLOBAL
+			_defaultConstructor (func ptr): 0xb7fa93f8
+			_construct (func ptr): 0xb7fa9489
+			_build (func ptr): 0xb7fa97d7
+			_initialise (func ptr): 0xb7fa97dc
+			_execute (func ptr): 0xb7fa97e1
+			_destroy (func ptr): 0xb7fa97e6
+			isConstructed: True
+			isBuilt: False
+			isInitialised: False
+			hasExecuted: False
+			isDestroyed: False
+			constructor function name: frontOn-Construct
+			build function name: frontOn-Build
+			initialise function name: frontOn-Initialise
+			execute function name: frontOn-Execute
+			destroy function name: frontOn-Destroy
+		self->coord = { 0, 0, 2 }
+		self->focalPoint = { 0, 0, 0 }
+		self->upDirection = { 0, 1, 0 }
+		self->aperture = 45
+		self->stereoType = lucMono
+		self->buffer = lucLeft
+		self->eyeSeparation = 0.2
+	lucCamera: frontOn
+		Stg_Component (ptr): 0x80686d8
+		Stg_Object (ptr): 0x80686d8
+			Stg_Class (ptr): 0x80686d8
+				sizeOfSelf: 212
+				_deleteSelf: Yes
+				type: lucCamera
+				_delete (func ptr): 0xb7fa8ff5
+				_print (func ptr): 0xb7fa902c
+				_copy (func ptr): 0xb7fa9301
+			name: frontOn
+			nameAllocationType: NON_GLOBAL
+			_defaultConstructor (func ptr): 0xb7fa93f8
+			_construct (func ptr): 0xb7fa9489
+			_build (func ptr): 0xb7fa97d7
+			_initialise (func ptr): 0xb7fa97dc
+			_execute (func ptr): 0xb7fa97e1
+			_destroy (func ptr): 0xb7fa97e6
+			isConstructed: True
+			isBuilt: False
+			isInitialised: False
+			hasExecuted: False
+			isDestroyed: False
+			constructor function name: frontOn-Construct
+			build function name: frontOn-Build
+			initialise function name: frontOn-Initialise
+			execute function name: frontOn-Execute
+			destroy function name: frontOn-Destroy
+		self->coord = { 0, 0, 0.25 }
+		self->focalPoint = { 0, 0, 0 }
+		self->upDirection = { 0, 1, 0 }
+		self->aperture = 45
+		self->stereoType = lucMono
+		self->buffer = lucLeft
+		self->eyeSeparation = 0.2
+	************** Testing lucCamera_RotateAroundUpDirection **************
+		Has rotated 45 degrees.
+		Has rotated 90 degrees.
+		Has rotated 135 degrees.
+		Has rotated 180 degrees.
+		Has rotated 135 degrees.
+		Has rotated 90 degrees.
+		Has rotated 45 degrees.
+		Has rotated 0 degrees.
+	************** Testing lucCamera_RotateTowardsUpDirection **************
+		Has rotated 12.25 degrees.
+		Has rotated 24.5 degrees.
+		Has rotated 36.75 degrees.
+		Has rotated 49 degrees.
+		Has rotated 61.25 degrees.
+		Has rotated 73.5 degrees.
+		Has rotated 85.75 degrees.
+		Has rotated 89.9 degrees.
+		Has rotated 12.25 degrees.
+		Has rotated 24.5 degrees.
+		Has rotated 36.75 degrees.
+		Has rotated 49 degrees.
+		Has rotated 61.25 degrees.
+		Has rotated 73.5 degrees.
+		Has rotated 85.75 degrees.
+		Has rotated 89.9 degrees.
+************** Checking Camera 'stereo' **************
+	************** Testing lucCamera_Zoom **************
+	lucCamera: stereo
+		Stg_Component (ptr): 0x806b598
+		Stg_Object (ptr): 0x806b598
+			Stg_Class (ptr): 0x806b598
+				sizeOfSelf: 212
+				_deleteSelf: Yes
+				type: lucCamera
+				_delete (func ptr): 0xb7fa8ff5
+				_print (func ptr): 0xb7fa902c
+				_copy (func ptr): 0xb7fa9301
+			name: stereo
+			nameAllocationType: NON_GLOBAL
+			_defaultConstructor (func ptr): 0xb7fa93f8
+			_construct (func ptr): 0xb7fa9489
+			_build (func ptr): 0xb7fa97d7
+			_initialise (func ptr): 0xb7fa97dc
+			_execute (func ptr): 0xb7fa97e1
+			_destroy (func ptr): 0xb7fa97e6
+			isConstructed: True
+			isBuilt: False
+			isInitialised: False
+			hasExecuted: False
+			isDestroyed: False
+			constructor function name: stereo-Construct
+			build function name: stereo-Build
+			initialise function name: stereo-Initialise
+			execute function name: stereo-Execute
+			destroy function name: stereo-Destroy
+		self->coord = { 1, 2, 0 }
+		self->focalPoint = { 1, 0, 0 }
+		self->upDirection = { 1, 0, 0 }
+		self->aperture = 70
+		self->stereoType = lucStereoToeIn
+		self->buffer = lucLeft
+		self->eyeSeparation = 0.3
+	lucCamera: stereo
+		Stg_Component (ptr): 0x806b598
+		Stg_Object (ptr): 0x806b598
+			Stg_Class (ptr): 0x806b598
+				sizeOfSelf: 212
+				_deleteSelf: Yes
+				type: lucCamera
+				_delete (func ptr): 0xb7fa8ff5
+				_print (func ptr): 0xb7fa902c
+				_copy (func ptr): 0xb7fa9301
+			name: stereo
+			nameAllocationType: NON_GLOBAL
+			_defaultConstructor (func ptr): 0xb7fa93f8
+			_construct (func ptr): 0xb7fa9489
+			_build (func ptr): 0xb7fa97d7
+			_initialise (func ptr): 0xb7fa97dc
+			_execute (func ptr): 0xb7fa97e1
+			_destroy (func ptr): 0xb7fa97e6
+			isConstructed: True
+			isBuilt: False
+			isInitialised: False
+			hasExecuted: False
+			isDestroyed: False
+			constructor function name: stereo-Construct
+			build function name: stereo-Build
+			initialise function name: stereo-Initialise
+			execute function name: stereo-Execute
+			destroy function name: stereo-Destroy
+		self->coord = { 1, 0.25, 0 }
+		self->focalPoint = { 1, 0, 0 }
+		self->upDirection = { 1, 0, 0 }
+		self->aperture = 70
+		self->stereoType = lucStereoToeIn
+		self->buffer = lucLeft
+		self->eyeSeparation = 0.3
+	************** Testing lucCamera_RotateAroundUpDirection **************
+		Has rotated 45 degrees.
+		Has rotated 90 degrees.
+		Has rotated 135 degrees.
+		Has rotated 180 degrees.
+		Has rotated 135 degrees.
+		Has rotated 90 degrees.
+		Has rotated 45 degrees.
+		Has rotated 0 degrees.
+	************** Testing lucCamera_RotateTowardsUpDirection **************
+		Has rotated 12.25 degrees.
+		Has rotated 24.5 degrees.
+		Has rotated 36.75 degrees.
+		Has rotated 49 degrees.
+		Has rotated 61.25 degrees.
+		Has rotated 73.5 degrees.
+		Has rotated 85.75 degrees.
+		Has rotated 89.9 degrees.
+		Has rotated 12.25 degrees.
+		Has rotated 24.5 degrees.
+		Has rotated 36.75 degrees.
+		Has rotated 49 degrees.
+		Has rotated 61.25 degrees.
+		Has rotated 73.5 degrees.
+		Has rotated 85.75 degrees.
+		Has rotated 89.9 degrees.

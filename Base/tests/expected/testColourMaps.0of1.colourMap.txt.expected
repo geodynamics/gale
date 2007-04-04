@@ -1,0 +1,159 @@
+lucColourMap: cIItcomColourMap
+Stg_Component (ptr): 0x806a750
+Stg_Object (ptr): 0x806a750
+	Stg_Class (ptr): 0x806a750
+		sizeOfSelf: 128
+		_deleteSelf: Yes
+		type: lucColourMap
+		_delete (func ptr): 0xb7f084ef
+		_print (func ptr): 0xb7f08526
+		_copy (func ptr): 0xb7f08804
+	name: cIItcomColourMap
+	nameAllocationType: NON_GLOBAL
+	_defaultConstructor (func ptr): 0xb7f088c4
+	_construct (func ptr): 0xb7f08955
+	_build (func ptr): 0xb7f08a6f
+	_initialise (func ptr): 0xb7f08a74
+	_execute (func ptr): 0xb7f08a79
+	_destroy (func ptr): 0xb7f08a7e
+	isConstructed: True
+	isBuilt: False
+	isInitialised: False
+	hasExecuted: False
+	isDestroyed: False
+	constructor function name: cIItcomColourMap-Construct
+	build function name: cIItcomColourMap-Build
+	initialise function name: cIItcomColourMap-Initialise
+	execute function name: cIItcomColourMap-Execute
+	destroy function name: cIItcomColourMap-Destroy
+self->colourCount = 3
+	Colour 0: Red -      0, Green -      0, Blue -      1, Opacity -      1
+	Colour 1: Red -      0, Green -      1, Blue -      0, Opacity -      1
+	Colour 2: Red -      1, Green -      0, Blue -      0, Opacity -      1
+self->minimum = 0
+self->maximum = 1
+self->logScale = False
+self->dynamicRange = True
+[0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;48m
+0                                                                                                    1
+lucColourMap: French Girl
+Stg_Component (ptr): 0x8069190
+Stg_Object (ptr): 0x8069190
+	Stg_Class (ptr): 0x8069190
+		sizeOfSelf: 128
+		_deleteSelf: Yes
+		type: lucColourMap
+		_delete (func ptr): 0xb7f084ef
+		_print (func ptr): 0xb7f08526
+		_copy (func ptr): 0xb7f08804
+	name: French Girl
+	nameAllocationType: NON_GLOBAL
+	_defaultConstructor (func ptr): 0xb7f088c4
+	_construct (func ptr): 0xb7f08955
+	_build (func ptr): 0xb7f08a6f
+	_initialise (func ptr): 0xb7f08a74
+	_execute (func ptr): 0xb7f08a79
+	_destroy (func ptr): 0xb7f08a7e
+	isConstructed: True
+	isBuilt: False
+	isInitialised: False
+	hasExecuted: False
+	isDestroyed: False
+	constructor function name: French Girl-Construct
+	build function name: French Girl-Build
+	initialise function name: French Girl-Initialise
+	execute function name: French Girl-Execute
+	destroy function name: French Girl-Destroy
+self->colourCount = 3
+	Colour 0: Red -      1, Green -      0, Blue -      0, Opacity -      1
+	Colour 1: Red -      1, Green -      1, Blue -      0, Opacity -      1
+	Colour 2: Red -      0, Green -      0, Blue -      0, Opacity -      1
+self->minimum = 0
+self->maximum = 1
+self->logScale = False
+self->dynamicRange = True
+[0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;40m [0;30;40m [0;30;40m [0;30;40m [0;30;40m [0;30;40m [0;30;40m [0;30;40m [0;30;40m [0;30;40m [0;30;40m [0;30;40m [0;30;40m [0;30;40m [0;30;40m [0;30;40m [0;30;40m [0;30;40m [0;30;40m [0;30;40m [0;30;40m [0;30;40m [0;30;40m [0;30;40m [0;30;40m [0;30;48m
+0                                                                                                    1
+lucColourMap: Rainbow2
+Stg_Component (ptr): 0x806c090
+Stg_Object (ptr): 0x806c090
+	Stg_Class (ptr): 0x806c090
+		sizeOfSelf: 128
+		_deleteSelf: Yes
+		type: lucColourMap
+		_delete (func ptr): 0xb7f084ef
+		_print (func ptr): 0xb7f08526
+		_copy (func ptr): 0xb7f08804
+	name: Rainbow2
+	nameAllocationType: NON_GLOBAL
+	_defaultConstructor (func ptr): 0xb7f088c4
+	_construct (func ptr): 0xb7f08955
+	_build (func ptr): 0xb7f08a6f
+	_initialise (func ptr): 0xb7f08a74
+	_execute (func ptr): 0xb7f08a79
+	_destroy (func ptr): 0xb7f08a7e
+	isConstructed: True
+	isBuilt: False
+	isInitialised: False
+	hasExecuted: False
+	isDestroyed: False
+	constructor function name: Rainbow2-Construct
+	build function name: Rainbow2-Build
+	initialise function name: Rainbow2-Initialise
+	execute function name: Rainbow2-Execute
+	destroy function name: Rainbow2-Destroy
+self->colourCount = 7
+	Colour 0: Red -      1, Green -      1, Blue -      1, Opacity -      1
+	Colour 1: Red -  0.627, Green -  0.125, Blue -  0.941, Opacity -      1
+	Colour 2: Red -      0, Green -      0, Blue -      1, Opacity -      1
+	Colour 3: Red -      0, Green -      1, Blue -      0, Opacity -      1
+	Colour 4: Red -      1, Green -      1, Blue -      0, Opacity -      1
+	Colour 5: Red -      1, Green -  0.647, Blue -      0, Opacity -      1
+	Colour 6: Red -      1, Green -      0, Blue -      0, Opacity -      1
+self->minimum = 0
+self->maximum = 1
+self->logScale = False
+self->dynamicRange = True
+[0;30;48m [0;30;48m [0;30;48m [0;30;48m [0;30;48m [0;30;48m [0;30;48m [0;30;48m [0;30;48m [0;30;48m [0;30;45m [0;30;45m [0;30;45m [0;30;45m [0;30;45m [0;30;45m [0;30;45m [0;30;45m [0;30;45m [0;30;45m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;48m
+0                                                                                                    1
+lucColourMap: Rainbow
+Stg_Component (ptr): 0x8068db8
+Stg_Object (ptr): 0x8068db8
+	Stg_Class (ptr): 0x8068db8
+		sizeOfSelf: 128
+		_deleteSelf: Yes
+		type: lucColourMap
+		_delete (func ptr): 0xb7f084ef
+		_print (func ptr): 0xb7f08526
+		_copy (func ptr): 0xb7f08804
+	name: Rainbow
+	nameAllocationType: NON_GLOBAL
+	_defaultConstructor (func ptr): 0xb7f088c4
+	_construct (func ptr): 0xb7f08955
+	_build (func ptr): 0xb7f08a6f
+	_initialise (func ptr): 0xb7f08a74
+	_execute (func ptr): 0xb7f08a79
+	_destroy (func ptr): 0xb7f08a7e
+	isConstructed: True
+	isBuilt: False
+	isInitialised: False
+	hasExecuted: False
+	isDestroyed: False
+	constructor function name: Rainbow-Construct
+	build function name: Rainbow-Build
+	initialise function name: Rainbow-Initialise
+	execute function name: Rainbow-Execute
+	destroy function name: Rainbow-Destroy
+self->colourCount = 6
+	Colour 0: Red -  0.627, Green -  0.125, Blue -  0.941, Opacity -      1
+	Colour 1: Red -      0, Green -      0, Blue -      1, Opacity -      1
+	Colour 2: Red -      0, Green -      1, Blue -      0, Opacity -      1
+	Colour 3: Red -      1, Green -      1, Blue -      0, Opacity -      1
+	Colour 4: Red -      1, Green -  0.647, Blue -      0, Opacity -      1
+	Colour 5: Red -      1, Green -      0, Blue -      0, Opacity -      1
+self->minimum = 0
+self->maximum = 1
+self->logScale = False
+self->dynamicRange = True
+[0;30;45m [0;30;45m [0;30;45m [0;30;45m [0;30;45m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;44m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;42m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;43m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;41m [0;30;48m
+0                                                                                                    1
