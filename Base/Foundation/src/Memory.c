@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Memory.c 4042 2007-03-21 23:29:44Z PatrickSunter $
+** $Id: Memory.c 4064 2007-04-05 08:03:01Z RaquibulHassan $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -1754,15 +1754,23 @@ void* _Memory_InternalMalloc( SizeT size ) {
 	}
 	return result;
 #else
-	unsigned long prev = stgMemory->stgCurrentMemory;
-	stgMemory->stgCurrentMemory += size;
-	stgMemory->stgPeakMemory = MAX( stgMemory->stgCurrentMemory, prev );
+
+	if( stgMemory ){
+		unsigned long prev = stgMemory->stgCurrentMemory;
+		stgMemory->stgCurrentMemory += size;
+		stgMemory->stgPeakMemory = MAX( stgMemory->stgCurrentMemory, prev );
+	}
 	
 	result = malloc( size + sizeof( MemoryTag ) );
 	if ( result == NULL ) {
 		result = malloc( size + sizeof( MemoryTag ) );
 		if ( result == NULL ) {
-			Memory_OutOfMemoryError( size + sizeof( MemoryTag ) );
+			if(stgMemory){
+				Memory_OutOfMemoryError( size + sizeof( MemoryTag ) );
+			}
+			else{
+				fprintf( stderr, "Out of memory in %s\n", __func__ );
+			}
 		}
 	}
 	data = (void*)((ArithPointer)result + sizeof( MemoryTag ));

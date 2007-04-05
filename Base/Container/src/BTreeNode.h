@@ -66,7 +66,7 @@
 
 
 	/** Constructor interface. */
-	BTreeNode *BTreeNode_New ( void );
+	BTreeNode *BTreeNode_New ( MemoryPool *pool );
 	
 	/** Init interface. */
 	void _BTreeNode_Init( BTreeNode *self );

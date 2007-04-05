@@ -33,6 +33,7 @@
 
 #include "types.h"
 #include "BTreeNode.h"
+#include "MemoryPool.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -43,12 +44,19 @@ const Type BTreeNode_Type = "BTreeNode";
 
 BTreeNode terminal = { BTREE_NODE_BLACK, NULL, 0, NIL, NIL, NULL };
 
-BTreeNode* BTreeNode_New( void )
+BTreeNode* BTreeNode_New( MemoryPool *pool )
 {
 	BTreeNode* self;
 	
 	/* Allocate memory */
-	self = ( BTreeNode* ) malloc ( sizeof( BTreeNode ) );
+
+	if( pool ){
+		assert( sizeof( BTreeNode ) == pool->elementSize );
+		self = ( BTreeNode* ) MemoryPool_NewObject( BTreeNode, pool );
+	}
+	else{
+		self = ( BTreeNode* ) malloc ( sizeof( BTreeNode ) );
+	}
 	memset ( self, 0, sizeof ( BTreeNode ) );
 
 	assert ( self );

@@ -63,7 +63,7 @@
 		 * The first argument is the data stored inside a node and the second argument can be a single argument or a 
 		 * struct of arguments that needs to be passed to the user-supplied function */
 	typedef void	(BTree_parseFunction)		( void *, void * );
-	
+
 	/** \def __BTree See __BTree */
 	#define __BTree \
 		/* General info */ \
@@ -72,6 +72,7 @@
 		/* Virtual info */ \
 		\
 		/* BTree info */ \
+		MemoryPool					*pool; \
 		BTreeNode					*root; \
 		BTree_compareFunction*		compareFunction; \
 		BTree_dataCopyFunction*		dataCopyFunction; \
@@ -89,7 +90,7 @@
 		BTree_dataCopyFunction*		dataCopyFunction,
 		BTree_dataDeleteFunction*	dataDeleteFunction,
 		BTree_dataPrintFunction*	dataPrintFunction,
-		BTreeProperty				property);
+		BTreeProperty				property );
 	
 	BTree *_BTree_New(
 			SizeT					_sizeOfSelf,
@@ -105,7 +106,7 @@
 	void BTree_Init( BTree* self );
 
 	/** Stg_Class_Delete Interface */
-	void _BTree_DeleteFunc_Helper( BTreeNode *, BTree_dataDeleteFunction * );
+	void _BTree_DeleteFunc_Helper( BTreeNode *, BTree_dataDeleteFunction *, MemoryPool *pool );
 	void _BTree_DeleteFunc( void *self );
 
 	/** Print Interface */

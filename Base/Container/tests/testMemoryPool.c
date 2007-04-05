@@ -44,14 +44,14 @@ typedef struct Plane_t{
 	double k;
 }Plane;
 
-#define CACHE_SIZE 2000
+#define CACHE_SIZE 200
 
 int main( int argc, char* argv[] ) {
 	MPI_Comm			CommWorld;
 	int				rank;
 	int				numProcessors;
 	int				procToWatch;
-	Plane			*planeRefs[CACHE_SIZE];
+	Plane			*planeRefs[CACHE_SIZE*500];
 	
 	Stream *myStream = NULL;
 	
@@ -76,8 +76,9 @@ int main( int argc, char* argv[] ) {
 		MemoryPool *pool = NULL;
 		Plane *p = NULL;
 		int i = 0, passed = 0;
+		int objCounter = 0;
 
-		pool = MemoryPool_New( Plane, CACHE_SIZE, CACHE_SIZE*0.1 );
+		pool = MemoryPool_New( Plane, CACHE_SIZE, CACHE_SIZE/2 );
 		myStream = Journal_Register( InfoStream_Type, "MemoryPoolStream" );
 
 		passed = 1;
@@ -89,30 +90,37 @@ int main( int argc, char* argv[] ) {
 				passed = 0;
 			}
 			else{
+				objCounter++;
 				planeRefs[i] = p;
 			}
 		}
 		Journal_Printf( myStream, "%s\n", passed?"Passed\n":"Failed\n" );
+
+		Stg_Class_Print( pool, myStream );
 		
 		passed = 1;
 		Journal_Printf( myStream, "Testing out of memory.. " );
 		for( i=0; i<CACHE_SIZE*100; i++ ){
 			p = MemoryPool_NewObject( Plane, pool );
+			planeRefs[objCounter++] = p;
 			if( !p ){
 				passed = 0;
 				break;
 			}
 		}
 		Journal_Printf( myStream, "%s\n", passed?"Passed\n":"Failed\n" );
-		
+
+		Stg_Class_Print( pool, myStream );
+
 		passed = 1;
 		Journal_Printf( myStream, "Testing memory deallocations.. " );
-		for( i=0; i<CACHE_SIZE; i++ ){
+		for( i=0; i<CACHE_SIZE*101; i++ ){
 			if(!MemoryPool_DeleteObject( pool, planeRefs[i] )){
 				passed = 0;
 				break;
 			}
 		}
+
 		Journal_Printf( myStream, "%s\n", passed?"Passed\n":"Failed\n" );
 		
 		passed = 1;

@@ -34,11 +34,15 @@
 #include "types.h"
 #include "BTreeNode.h"
 #include "BTree.h"
+#include "MemoryPool.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
+
+#define  POOL_SIZE 1000
+#define  POOL_DELTA 1000
 
 const Type BTree_Type = "BTree";
 
@@ -73,7 +77,7 @@ BTree *BTree_New(
 		BTree_dataCopyFunction*		dataCopyFunction,
 		BTree_dataDeleteFunction*	dataDeleteFunction,
 		BTree_dataPrintFunction*	dataPrintFunction,
-		BTreeProperty				property)
+		BTreeProperty				property )
 {
 	
 	BTree* self;
@@ -98,7 +102,9 @@ BTree *BTree_New(
 	self->dataPrintFunction = dataPrintFunction;
 	self->property = property;
 
-	BTree_Init( self );	
+	self->pool = NULL;
+
+	_BTree_Init( self );	
 	return self;
 }
 
@@ -107,6 +113,8 @@ void _BTree_Init( BTree* self )
 
 	assert(self);
 	self->root = NIL;
+
+	self->pool = MemoryPool_New( BTreeNode, POOL_SIZE, POOL_DELTA );
 }
 
 void BTree_Init( BTree *self )
@@ -286,7 +294,7 @@ int BTree_InsertNode ( BTree *tree, void *newNodeData, SizeT sizeOfData ){
 	
 	curr = tree->root;
 	
-	newNode = BTreeNode_New();
+	newNode = BTreeNode_New( tree->pool );
 	newNode->sizeOfData = sizeOfData;
 	
 	if ( tree->dataCopyFunction ){
@@ -309,7 +317,14 @@ int BTree_InsertNode ( BTree *tree, void *newNodeData, SizeT sizeOfData ){
 			else{
 				if( tree->dataDeleteFunction )
 					tree->dataDeleteFunction( newNode->data );
-				free( newNode );
+				
+				if( tree->pool ){
+					MemoryPool_DeleteObject( tree->pool, newNode );
+				}
+				else{
+					free ( newNode );
+				}
+
 				return 0;
 			}
 		}
@@ -564,7 +579,13 @@ void BTree_DeleteNode( BTree *tree, BTreeNode *z ) {
 	if ( tree->dataDeleteFunction ){
 		tree->dataDeleteFunction( (void*) y->data );
 	}
-	free ( y );
+
+	if( tree->pool ){
+		MemoryPool_DeleteObject( tree->pool, y );
+	}
+	else{
+		free ( y );
+	}
 	--tree->nodeCount;
 #if	0
 	printf ("nodeCount from delete %d\n", tree->nodeCount);
@@ -610,7 +631,7 @@ void* BTree_GetData( BTreeNode *node )
 	}
 }
 
-void _BTree_DeleteFunc_Helper( BTreeNode *node, BTree_dataDeleteFunction *nodeDataDeleteFunc )
+void _BTree_DeleteFunc_Helper( BTreeNode *node, BTree_dataDeleteFunction *nodeDataDeleteFunc, MemoryPool *pool )
 {
 	BTreeNode *left = NULL;
 	BTreeNode *right = NULL;
@@ -623,7 +644,7 @@ void _BTree_DeleteFunc_Helper( BTreeNode *node, BTree_dataDeleteFunction *nodeDa
 		left = node->left;
 		right = node->right;
 		
-		_BTree_DeleteFunc_Helper( left, nodeDataDeleteFunc );
+		_BTree_DeleteFunc_Helper( left, nodeDataDeleteFunc, pool );
 		
 		if( node->data != NULL ){
 			if( nodeDataDeleteFunc != NULL ){
@@ -636,9 +657,15 @@ void _BTree_DeleteFunc_Helper( BTreeNode *node, BTree_dataDeleteFunction *nodeDa
 			}
 #endif
 		}
-		free( node );
 
-		_BTree_DeleteFunc_Helper( right, nodeDataDeleteFunc );
+		if( pool ){
+			MemoryPool_DeleteObject( pool, node );
+		}
+		else{
+			free( node );
+		}
+
+		_BTree_DeleteFunc_Helper( right, nodeDataDeleteFunc, pool );
 	}
 }
 
@@ -649,9 +676,14 @@ void _BTree_DeleteFunc( void *self )
 	tree = (BTree*) self;
 	assert( tree );
 
-	_BTree_DeleteFunc_Helper( tree->root, tree->dataDeleteFunction );
+	_BTree_DeleteFunc_Helper( tree->root, tree->dataDeleteFunction, tree->pool );
 	tree->nodeCount = 0;
 	/* freeing the tree instead of using class_delete, because it was initially malloced */
+
+	if( tree->pool ){
+		Stg_Class_Delete( tree->pool );
+	}
+
 	free( tree );
 }
 

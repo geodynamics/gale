@@ -454,13 +454,13 @@ void _ParallelDelaunay_Build( void* pd, void* data )
 		self->haloSites[0] = BTree_New( ParallelDelaunayBtreeCompareFunction, NULL, NULL, NULL, BTREE_NO_DUPLICATES );
 		
 		for( i=0; i<self->localTriangulation->qp->numElements; i++ ){
-			if( IS_FREE((QuadEdgeRef)&(self->localTriangulation->qp->elements[0][i*sizeof(QuadEdge)])) ) continue;
+			if( IS_FREE((QuadEdgeRef)&(self->localTriangulation->qp->chunks[0].memory[i*sizeof(QuadEdge)])) ) continue;
 	
-			if( self->mapGlobalToLocal[((Site*)((QuadEdge*)&(self->localTriangulation->qp->elements[0][i*sizeof(QuadEdge)]))->data[0])->id] == numSites )
-				BTree_InsertNode( self->haloSites[0], ((Site*)((QuadEdge*)&(self->localTriangulation->qp->elements[0][i*sizeof(QuadEdge)]))->data[0]), sizeof( Site* ) );
+			if( self->mapGlobalToLocal[((Site*)((QuadEdge*)&(self->localTriangulation->qp->chunks[0].memory[i*sizeof(QuadEdge)]))->data[0])->id] == numSites )
+				BTree_InsertNode( self->haloSites[0], ((Site*)((QuadEdge*)&(self->localTriangulation->qp->chunks[0].memory[i*sizeof(QuadEdge)]))->data[0]), sizeof( Site* ) );
 			
-			if( self->mapGlobalToLocal[((Site*)((QuadEdge*)&(self->localTriangulation->qp->elements[0][i*sizeof(QuadEdge)]))->data[2])->id] == numSites )
-				BTree_InsertNode( self->haloSites[0], ((Site*)((QuadEdge*)&(self->localTriangulation->qp->elements[0][i*sizeof(QuadEdge)]))->data[2]), sizeof( Site* ) );
+			if( self->mapGlobalToLocal[((Site*)((QuadEdge*)&(self->localTriangulation->qp->chunks[0].memory[i*sizeof(QuadEdge)]))->data[2])->id] == numSites )
+				BTree_InsertNode( self->haloSites[0], ((Site*)((QuadEdge*)&(self->localTriangulation->qp->chunks[0].memory[i*sizeof(QuadEdge)]))->data[2]), sizeof( Site* ) );
 		}
 
 		self->localPoints = Memory_Realloc_Array
@@ -503,13 +503,13 @@ void _ParallelDelaunay_Build( void* pd, void* data )
 		self->haloSites[1] = BTree_New( ParallelDelaunayBtreeCompareFunction, NULL, NULL, NULL, BTREE_NO_DUPLICATES );
 		
 		for( i=0; i<self->localTriangulation->qp->numElements; i++ ){
-			if( IS_FREE((QuadEdgeRef)&(self->localTriangulation->qp->elements[0][i*sizeof(QuadEdge)])) ) continue;
+			if( IS_FREE((QuadEdgeRef)&(self->localTriangulation->qp->chunks[0].memory[i*sizeof(QuadEdge)])) ) continue;
 	
-			if( self->mapGlobalToLocal[((Site*)((QuadEdge*)&(self->localTriangulation->qp->elements[0][i*sizeof(QuadEdge)]))->data[0])->id] == numSites )
-				BTree_InsertNode( self->haloSites[1], ((Site*)((QuadEdge*)&(self->localTriangulation->qp->elements[0][i*sizeof(QuadEdge)]))->data[0]), sizeof( Site* ) );
+			if( self->mapGlobalToLocal[((Site*)((QuadEdge*)&(self->localTriangulation->qp->chunks[0].memory[i*sizeof(QuadEdge)]))->data[0])->id] == numSites )
+				BTree_InsertNode( self->haloSites[1], ((Site*)((QuadEdge*)&(self->localTriangulation->qp->chunks[0].memory[i*sizeof(QuadEdge)]))->data[0]), sizeof( Site* ) );
 			
-			if( self->mapGlobalToLocal[((Site*)((QuadEdge*)&(self->localTriangulation->qp->elements[0][i*sizeof(QuadEdge)]))->data[2])->id] == numSites )
-				BTree_InsertNode( self->haloSites[1], ((Site*)((QuadEdge*)&(self->localTriangulation->qp->elements[0][i*sizeof(QuadEdge)]))->data[2]), sizeof( Site* ) );
+			if( self->mapGlobalToLocal[((Site*)((QuadEdge*)&(self->localTriangulation->qp->chunks[0].memory[i*sizeof(QuadEdge)]))->data[2])->id] == numSites )
+				BTree_InsertNode( self->haloSites[1], ((Site*)((QuadEdge*)&(self->localTriangulation->qp->chunks[0].memory[i*sizeof(QuadEdge)]))->data[2]), sizeof( Site* ) );
 		}
 
 		self->localPoints = Memory_Realloc_Array
@@ -602,7 +602,7 @@ void ParallelDelaunay_BuildTriangleIndices( ParallelDelaunay *pd )
 	
 	triIndices = delaunay->triangleIndices;
 	
-	edges = (QuadEdge*)delaunay->qp->elements[0];
+	edges = (QuadEdge*)delaunay->qp->chunks[0].memory;
 	sites = delaunay->sites;
 	rank = pd->rank;
 	maxEdges = delaunay->qp->numElements;

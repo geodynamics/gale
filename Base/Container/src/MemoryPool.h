@@ -47,6 +47,12 @@
 	/** Textual name for List class. */
 	extern const Type MemoryPool_Type;
 	
+	typedef struct Chunk_t{
+		char *memory;
+		unsigned int maxFree;
+		unsigned int numFree;
+	}Chunk;
+
 	/** \def __List See __List */
 	#define __MemoryPool \
 		/* General info */ \
@@ -61,7 +67,7 @@
 		int		numElementsFree; \
 		int		numChunks; \
 		int		delta; \
-		char	**elements; \
+		Chunk	*chunks; \
 		char	**pool;
 
 	struct MemoryPool { __MemoryPool };
@@ -106,6 +112,8 @@
 	Bool MemoryPool_DeleteObject( MemoryPool *memPool, void *object );
 
 	void MemoryPool_Extend( MemoryPool *memPool );
+	
+	void MemPool_Shrink( MemoryPool *memPool );
 	
 	/** Private Functions */
 	

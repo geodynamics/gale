@@ -696,7 +696,7 @@ void Delaunay_BuildTriangleIndices( Delaunay *delaunay )
 		
 	triIndices = delaunay->triangleIndices;
 	
-	edges = (QuadEdge*)delaunay->qp->elements[0];
+	edges = (QuadEdge*)delaunay->qp->chunks[0].memory;
 	sites = delaunay->sites;
 	maxEdges = delaunay->qp->numElements;
 		
@@ -729,13 +729,13 @@ void Delaunay_BuildTriangleIndices( Delaunay *delaunay )
 								triIndices[triCount][2] = (((Site*)DEST(eOnext))->id);
 
 								if( delaunay->attributes->BuildTriangleNeighbours ){
-									index = (int)(((QuadEdge*)((void*)e)) - (QuadEdge*)delaunay->qp->elements[0]);
+									index = (int)(((QuadEdge*)((void*)e)) - (QuadEdge*)delaunay->qp->chunks[0].memory);
 									edgeToTriangle[index][COUNT(e)] = triCount;
 								
-									index = (int)(((QuadEdge*)((void*)eOnext)) - (QuadEdge*)delaunay->qp->elements[0]);
+									index = (int)(((QuadEdge*)((void*)eOnext)) - (QuadEdge*)delaunay->qp->chunks[0].memory);
 									edgeToTriangle[index][COUNT(eOnext)] = triCount;
 								
-									index = (int)(((QuadEdge*)((void*)eLnext)) - (QuadEdge*)delaunay->qp->elements[0]);
+									index = (int)(((QuadEdge*)((void*)eLnext)) - (QuadEdge*)delaunay->qp->chunks[0].memory);
 									edgeToTriangle[index][COUNT(eLnext)] = triCount;
 								}
 								
@@ -748,13 +748,13 @@ void Delaunay_BuildTriangleIndices( Delaunay *delaunay )
 							triIndices[triCount][2] = (((Site*)DEST(eOnext))->id);
 							
 							if( delaunay->attributes->BuildTriangleNeighbours ){
-								index = (int)(((QuadEdge*)((void*)e)) - (QuadEdge*)delaunay->qp->elements[0]);
+								index = (int)(((QuadEdge*)((void*)e)) - (QuadEdge*)delaunay->qp->chunks[0].memory);
 								edgeToTriangle[index][COUNT(e)] = triCount;
 								
-								index = (int)(((QuadEdge*)((void*)eOnext)) - (QuadEdge*)delaunay->qp->elements[0]);
+								index = (int)(((QuadEdge*)((void*)eOnext)) - (QuadEdge*)delaunay->qp->chunks[0].memory);
 								edgeToTriangle[index][COUNT(eOnext)] = triCount;
 								
-								index = (int)(((QuadEdge*)((void*)eLnext)) - (QuadEdge*)delaunay->qp->elements[0]);
+								index = (int)(((QuadEdge*)((void*)eLnext)) - (QuadEdge*)delaunay->qp->chunks[0].memory);
 								edgeToTriangle[index][COUNT(eLnext)] = triCount;
 							}
 
@@ -779,7 +779,7 @@ void Delaunay_BuildTriangleIndices( Delaunay *delaunay )
 		memset( triangleNeighbourCount, 0, sizeof( int ) * delaunay->numFaces );
 		
 		for( i=0; i<delaunay->qp->numElements; i++ ){
-			if( IS_FREE( (QuadEdgeRef)(&(delaunay->qp->elements[0][i*sizeof(QuadEdge)])) ) ) continue;
+			if( IS_FREE( (QuadEdgeRef)(&(delaunay->qp->chunks[0].memory[i*sizeof(QuadEdge)])) ) ) continue;
 
 		
 			if( edgeToTriangle[i][0] != (delaunay->numFaces-1) )
@@ -806,7 +806,7 @@ void Delaunay_BuildVoronoiVertices( Delaunay *delaunay )
 
 	assert( delaunay );
 	
-	edges = (QuadEdge*)delaunay->qp->elements[0];
+	edges = (QuadEdge*)delaunay->qp->chunks[0].memory;
 	sites = delaunay->sites;
 	maxEdges = delaunay->qp->numElements;
 		
@@ -877,7 +877,7 @@ void Delaunay_FindNeighbours( Delaunay *delaunay )
 
 	attr = delaunay->attributes;
 	sites = delaunay->sites;
-	edges = (QuadEdge*)delaunay->qp->elements[0];
+	edges = (QuadEdge*)delaunay->qp->chunks[0].memory;
 	maxEdges = delaunay->qp->numElements;
 	numSites = delaunay->numSites;
 	

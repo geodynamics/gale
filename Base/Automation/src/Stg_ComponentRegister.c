@@ -96,7 +96,7 @@ void _Stg_ComponentRegister_Init( Stg_ComponentRegister* self )
 							NULL,
 							constructorElementDeleteFunction,
 							constructorElementPrintFunction,
-							BTREE_NO_DUPLICATES);
+							BTREE_NO_DUPLICATES );
 }
 	
 void Stg_ComponentRegister_Init( Stg_ComponentRegister* self )

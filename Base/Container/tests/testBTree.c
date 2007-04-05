@@ -42,7 +42,7 @@
 #include <math.h>
 
 #define NUM_DATA 100
-#define NUM_DATA_LARGE 100000
+#define NUM_DATA_LARGE 10000
 
 typedef struct praseFunctionArguments_t{
 	double result;
@@ -258,6 +258,7 @@ int main( int argc, char* argv[] ) {
 		
 		Journal_Printf( myStream, "\nDeleting the Tree\n" );
 		Stg_Class_Delete( (void*)numList );
+		Stg_Class_Delete( (void*)iterator );
 
 		for(i=0; i<NUM_DATA; i++){
 			free( array[i] );
