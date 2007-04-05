@@ -49,11 +49,15 @@ endif
 endif
 ifdef HAVE_LIBFAME
 
-# Run the libfame test depending of 32/64 bits. The encoded results differ slightly depending on platform
-ifeq (${SYSTEM_64},0)
-	checks += testEncoderLibfame.0of1.sh
-else
+# The encoded results differ slightly depending on platform
+ifneq (${SYSTEM_64},0)
 	checks += testEncoderLibfame-64bit.0of1.sh
+else
+ifeq (${SYSTEM},Darwin)
+	checks += testEncoderLibfame-darwin.0of1.sh
+else
+	checks += testEncoderLibfame.0of1.sh
+endif
 endif
 
 endif
