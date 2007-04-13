@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AbstractContext.c 4014 2007-02-23 02:15:16Z KathleenHumble $
+** $Id: AbstractContext.c 4067 2007-04-13 05:19:23Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -345,7 +345,7 @@ void _AbstractContext_Init(
 		ContextEntryPoint_New( AbstractContext_EP_UpdateClass, EntryPoint_Class_VoidPtr_CastType ) );
 	self->syncK = Context_AddEntryPoint( 
 		self, 
-		ContextEntryPoint_New( AbstractContext_EP_Sync, EntryPoint_VoidPtr_CastType ) );
+		ContextEntryPoint_New( AbstractContext_EP_Sync, EntryPoint_Class_VoidPtr_CastType ) );
 	self->frequentOutputK =	Context_AddEntryPoint( 
 		self, 
 		ContextEntryPoint_New( AbstractContext_EP_FrequentOutput, EntryPoint_VoidPtr_CastType ) );
@@ -957,7 +957,7 @@ void _AbstractContext_Step( Context* context, double dt ) {
 	self->_setDt( self, dt );
 	KeyCall( self, self->solveK, EntryPoint_VoidPtr_CallCast* )( KeyHandle(self,self->solveK), self );
 	KeyCall( self, self->updateClassK, EntryPoint_Class_VoidPtr_CallCast* )( KeyHandle(self,self->updateClassK), self );
-	KeyCall( self, self->syncK, EntryPoint_VoidPtr_CallCast* )( KeyHandle(self,self->syncK), self );
+	KeyCall( self, self->syncK, EntryPoint_Class_VoidPtr_CallCast* )( KeyHandle(self,self->syncK), self );
 }
 
 
