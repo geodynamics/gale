@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Operator.c 3896 2006-11-20 04:59:16Z JulianGiordani $
+** $Id: Operator.c 4073 2007-04-18 02:00:13Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -156,17 +156,25 @@ void Operator_VectorSquare( void* operator, double* operand0, double* result ) {
 
 void Operator_Magnitude( void* operator, double* operand0, double* result ) {
 	Operator* self            = (Operator*) operator;
+	Index     val_I;
 
 	Operator_FirewallUnary( self );
 	Operator_FirewallResultDofs( self, 1 );
 
 	switch ( self->operandDofs ) {
+		
 		case 2:
 			*result = sqrt( SQUARE_VECTOR2D( operand0 ) ); break;
 		case 3:
 			*result = sqrt( SQUARE_VECTOR3D( operand0 ) ); break;
 		case 1:
 			*result = fabs( *operand0 ); break;
+		case 6:
+			*result = 0;
+			for( val_I = 0; val_I < self->operandDofs ; val_I++ ) 
+				*result += operand0[val_I]*operand0[val_I];
+
+			*result = sqrt( *result ); break;
 		default:
 			Journal_Printf( self->errorStream, 
 					"Error in %s for %s '%s': Incorrect number of degrees of freedom for what you are operating on.\n",
@@ -277,6 +285,12 @@ void Operator_Addition( void* operator, double* operand0, double* operand1, doub
 	Operator_FirewallEqualOperandAndResultDofs( self );
 	
 	switch (self->operandDofs) {
+		case 6:
+			result[5] = operand0[5] + operand1[5];
+		case 5:
+			result[4] = operand0[4] + operand1[4];
+		case 4:
+			result[3] = operand0[3] + operand1[3];
 		case 3:
 			result[2] = operand0[2] + operand1[2];
 		case 2:
@@ -298,6 +312,12 @@ void Operator_Subtraction( void* operator, double* operand0, double* operand1, d
 	Operator_FirewallEqualOperandAndResultDofs( self );
 	
 	switch (self->operandDofs) {
+		case 6:
+			result[5] = operand0[5] - operand1[5];
+		case 5:
+			result[4] = operand0[4] - operand1[4];
+		case 4:
+			result[3] = operand0[3] - operand1[3];
 		case 3:
 			result[2] = operand0[2] - operand1[2];
 		case 2:
