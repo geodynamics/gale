@@ -121,6 +121,7 @@ int main( int argc, char* argv[] ) {
 	parseFunctionArguments parseArguments;
 	int idealComplexity = 0, hops = 0;
 	BTreeIterator *iterator = NULL;
+	double epsilon  = 1e-5;
 		
 	
 	/* Initialise MPI, get world info */
@@ -245,7 +246,7 @@ int main( int argc, char* argv[] ) {
 		BTree_ParseTree( numList, treeParseFunction, (void*) &parseArguments );
 		parsedAverage = parseArguments.result / NUM_DATA_LARGE;
 	
-		if( average == parsedAverage ){
+		if( fabs(average - parsedAverage) < epsilon ){
 			Journal_Printf( myStream, "Average calculated corrrectly\n" );
 		}
 		else{
