@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ExtensionManager.c 3547 2006-05-06 12:35:05Z AlanLo $
+** $Id: ExtensionManager.c 4075 2007-04-24 04:30:55Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -435,7 +435,6 @@ void* _ExtensionManager_Copy( void* extensionManager, void* dest, Bool deep, Nam
 	}
 
 	if ( self->_array ) {
-		Index obj_I;
 		/* Array case */
 		newExtensionManager->_array = PtrMap_Find( map, self->_array );
 		if ( newExtensionManager->_array == NULL ) {
@@ -463,7 +462,7 @@ void* _ExtensionManager_Copy( void* extensionManager, void* dest, Bool deep, Nam
 		}
 
 		/* Add each item of array to pointer map */
-		for ( obj_I = 0; obj_I < self->count; ++obj_I ) {
+		for ( item_I = 0; item_I < self->count; ++item_I ) {
 			PtrMap_Append(
 				map,
 				(void*)( ((ArithPointer)self->_array) + (self->itemSize * item_I) ),

@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: HexaMD.c 3883 2006-10-26 05:00:23Z KathleenHumble $
+** $Id: HexaMD.c 4075 2007-04-24 04:30:55Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -1308,8 +1308,8 @@ void _HexaMD_GetBoundarySet(
 
 void _HexaMD_BuildShadowSets( HexaMD* self, Processor_Index procIndexToBuildFor ) {
 	Dimension_Index   shadowAxis;
-	int               lowerStartShadowRegions[3]; 
-	int               upperStartShadowRegions[3]; 
+	IJK               lowerStartShadowRegions;
+	IJK               upperStartShadowRegions;
 	unsigned int      lowerAdjustedShadowDepth;
 	unsigned int      upperAdjustedShadowDepth;
 	unsigned int      shadowRegionTotalWidth[3];
@@ -1371,7 +1371,8 @@ void _HexaMD_BuildShadowSets( HexaMD* self, Processor_Index procIndexToBuildFor 
 		Journal_DPrintfL( debug, 2, "calculating lower shadow elements for Axis %d:\n", shadowAxis );
 		_HexaMD_CalculateLowerShadowStartAndEnd( self, shadowAxis, ELEMENT_ITEM_TYPE,
 			currProcMin[shadowAxis], self->elementGlobal3DCounts[shadowAxis],
-			&lowerStartShadowRegions[shadowAxis], &lowerAdjustedShadowDepth );
+			(int*)&lowerStartShadowRegions[shadowAxis],
+			&lowerAdjustedShadowDepth );
 
 		shadowElementsFoundCount += _HexaMD_AddItemsInSliceToSet( self, shadowAxis,
 			lowerStartShadowRegions[shadowAxis], lowerAdjustedShadowDepth,
@@ -1382,7 +1383,8 @@ void _HexaMD_BuildShadowSets( HexaMD* self, Processor_Index procIndexToBuildFor 
 		Journal_DPrintfL( debug, 2, "calculating upper shadow elements for Axis %d:\n", shadowAxis );
 		_HexaMD_CalculateUpperShadowStartAndEnd( self, shadowAxis, ELEMENT_ITEM_TYPE,
 			currProcMax[shadowAxis], self->elementGlobal3DCounts[shadowAxis],
-			&upperStartShadowRegions[shadowAxis], &upperAdjustedShadowDepth );
+			(int*)&upperStartShadowRegions[shadowAxis],
+			&upperAdjustedShadowDepth );
 
 		shadowElementsFoundCount += _HexaMD_AddItemsInSliceToSet( self, shadowAxis,
 			upperStartShadowRegions[shadowAxis], upperAdjustedShadowDepth,
@@ -1423,7 +1425,8 @@ void _HexaMD_BuildShadowSets( HexaMD* self, Processor_Index procIndexToBuildFor 
 		Journal_DPrintfL( debug, 2, "calculating lower shadow nodes in Axis %d:\n", shadowAxis );
 		_HexaMD_CalculateLowerShadowStartAndEnd( self, shadowAxis, NODE_ITEM_TYPE,
 			currProcMin[shadowAxis], self->nodeGlobal3DCounts[shadowAxis],
-			&lowerStartShadowRegions[shadowAxis], &lowerAdjustedShadowDepth );
+			(int*)&lowerStartShadowRegions[shadowAxis],
+			&lowerAdjustedShadowDepth );
 
 		shadowNodesFoundCount += _HexaMD_AddItemsInSliceToSet( self, shadowAxis,
 			lowerStartShadowRegions[shadowAxis], lowerAdjustedShadowDepth, currProcMin, currProcMax,
@@ -1433,7 +1436,8 @@ void _HexaMD_BuildShadowSets( HexaMD* self, Processor_Index procIndexToBuildFor 
 		Journal_DPrintfL( debug, 2, "calculating upper shadow nodes in Axis %d:\n", shadowAxis );
 		_HexaMD_CalculateUpperShadowStartAndEnd( self, shadowAxis, NODE_ITEM_TYPE,
 			currProcMax[shadowAxis], self->nodeGlobal3DCounts[shadowAxis],
-			&upperStartShadowRegions[shadowAxis], &upperAdjustedShadowDepth );
+			(int*)&upperStartShadowRegions[shadowAxis],
+			&upperAdjustedShadowDepth );
 
 		shadowNodesFoundCount += _HexaMD_AddItemsInSliceToSet( self, shadowAxis,
 			upperStartShadowRegions[shadowAxis], upperAdjustedShadowDepth, currProcMin, currProcMax,
@@ -1741,9 +1745,9 @@ void _HexaMD_DecomposeDimension(
 {
 	Partition_Index		procCountToUse = procCount;
 	Partition_Index		proc_I;
-	Partition_Index		div;
-	Partition_Index		rem;
-	Index				offsetIncrement;
+	Partition_Index		div = 0;
+	Partition_Index		rem = 0;
+	Index			offsetIncrement;
 	
 	/* We need at least one processor */
 	assert( procCount );

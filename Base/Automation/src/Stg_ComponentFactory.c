@@ -30,7 +30,7 @@
 **
 ** Comments:
 **
-** $Id: Stg_ComponentFactory.c 3851 2006-10-12 08:57:22Z SteveQuenette $
+** $Id: Stg_ComponentFactory.c 4075 2007-04-24 04:30:55Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -266,8 +266,9 @@ void Stg_ComponentFactory_ConstructComponents( Stg_ComponentFactory* self, void*
 	
 	assert( self );
 	
+	stream = self->infoStream;
+
 	if( self->componentDict ){
-		stream = self->infoStream;
 		Journal_Printf( stream, "\nConstructing Stg_Components from the live-component register\n\n" );
 		Stream_Indent( stream );
 	

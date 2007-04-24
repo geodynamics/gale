@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: HexaEL.c 3883 2006-10-26 05:00:23Z KathleenHumble $
+** $Id: HexaEL.c 4075 2007-04-24 04:30:55Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -844,7 +844,7 @@ Bool _HexaEL_FindTriBarycenter( const Coord crds[4], const Coord pnt, double* bc
 		if( ind_i == 3 ) {
 			if( topo && topo->domains && bndStatus == EXCLUSIVE_UPPER_BOUNDARY ) {
 				Decomp*		decomp;
-				unsigned	telInd;
+				unsigned	telInd = 0;
 				unsigned	dElInd = Decomp_Sync_GlobalToDomain( topo->domains[MT_FACE], gElInd );
 
 				assert( dElInd < MeshTopology_GetDomainSize( topo, MT_FACE ) );

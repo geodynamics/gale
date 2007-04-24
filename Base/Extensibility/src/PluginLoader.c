@@ -128,10 +128,14 @@ PluginLoader* PluginLoader_NewLocal( Name pluginName, Stg_ObjectList* directorie
 				Journal_Printf( debug, "found in load path %s.\n", fullPathName );
 				break;
 			}
+			else {
+				Journal_Printf( debug, "\n\t...not found in load path %s:\n"
+					"potential error: %s\n", fullPathName, dlerror() );
+			}
 		}
 		/* If it failed alltogether, print a error message. */
 		if ( dir_i == directories->count) {
-			Journal_Printf( debug, "failed - dlerror(): %s\n", dlerror() );
+			Journal_Printf( debug, "failed to find in any of directories above, or had error.\n" );
 		}
 	}
 		

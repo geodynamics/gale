@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Dictionary_Entry_Value.c 3743 2006-08-03 03:14:38Z KentHumphries $
+** $Id: Dictionary_Entry_Value.c 4075 2007-04-24 04:30:55Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -298,7 +298,7 @@ void Dictionary_Entry_Value_AddElement( Dictionary_Entry_Value* self, Dictionary
 {
 	/* check type - convert to a list if not so... */
 	if (Dictionary_Entry_Value_Type_List != self->type) {
-		Dictionary_Entry_Value* copy;
+		Dictionary_Entry_Value* copy = NULL;
 		
 		switch (self->type) {
 			case Dictionary_Entry_Value_Type_String:
@@ -348,7 +348,7 @@ void Dictionary_Entry_Value_AddElementWithSource( Dictionary_Entry_Value* self, 
 {
 	/* check type - convert to a list if not so... */
 	if (Dictionary_Entry_Value_Type_List != self->type) {
-		Dictionary_Entry_Value* copy;
+		Dictionary_Entry_Value* copy = NULL;
 		
 		switch (self->type) {
 			case Dictionary_Entry_Value_Type_String:

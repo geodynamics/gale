@@ -453,7 +453,8 @@ void SemiRegDeform_Deform( void* srd ) {
 			GRM_Lift( &self->grm, self->beginInds[strip_i], begin );
 			GRM_Lift( &self->grm, self->endInds[strip_i], end );
 			conDim = self->conDims[strip_i];
-			assert( (len = end[conDim] - begin[conDim] + 1) > 1 );
+			len = end[conDim] - begin[conDim] + 1;
+			assert( len > 1 );
 			first = GET_VAL( Sync_MapGlobal( self->sync, self->beginInds[strip_i] ) )[conDim];
 			step = GET_VAL( Sync_MapGlobal( self->sync, self->endInds[strip_i] ) )[conDim];
 			step = (step - first) / (len - 1);

@@ -199,8 +199,8 @@ int main( int argc, char* argv[] ) {
 		/* Testing regular polygons with a single node at the centre. */
 		printf( "Testing triangulation of regular polygons:\n" );
 		{
-			float theta = 0, area = 0, a = 0;
-			float side, voronoiArea = 0;
+			float theta = 0.0, area = 0.0, a = 0.0;
+			float side = 0.0, voronoiArea = 0.0;
 			#define epsilon 0.001
 			int pass = 1;
 			
