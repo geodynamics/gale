@@ -35,7 +35,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 535 2006-04-11 13:07:34Z PatrickSunter $
+## $Id: makefile 818 2007-04-24 04:44:27Z PatrickSunter $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -51,7 +51,7 @@ checks = $(wildcard *.sh)
 SRCS = $(wildcard *.c)
 
 EXTERNAL_INCLUDES = -I${INC_DIR}/${PROJECT} 
-EXTERNAL_LIBS= -L${LIB_DIR} -l${PROJECT}_${NAME}
+EXTERNAL_LIBS= -L${LIB_DIR} -l${PROJECT}_${NAME} ${RPATH_LFLAGS}
 
 packages = STGERMAIN PETSC MPI XML MATH DL HYPRE
 
