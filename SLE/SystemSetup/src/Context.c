@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Context.c 748 2007-02-23 02:21:46Z KathleenHumble $
+** $Id: Context.c 819 2007-04-24 04:47:17Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -457,6 +457,7 @@ void _FiniteElementContext_SaveFeVariables( void* context ) {
 	FiniteElementContext*     self = (FiniteElementContext*) context;
 	Index                     var_I = 0;
 	FieldVariable*            fieldVar = NULL;
+	FeVariable*               feVar = NULL;
 	char*                     outputPathString = NULL;
 	Index                     outputStrLen = 0;
 	Dictionary*               dictionary = self->dictionary;
@@ -475,47 +476,25 @@ void _FiniteElementContext_SaveFeVariables( void* context ) {
 		sprintf( outputPathString, "%s/", self->outputPath );
 	}
 
-	/* Case insensitive search */
-	feVarsList = Dictionary_Get( dictionary, "fieldVariablesToCheckpoint" );
-	if ( NULL == feVarsList ) {
-		feVarsList = Dictionary_Get( dictionary, "FieldVariablesToCheckpoint" );
-	}	
+	/* Save the variables that have had their "isCheckpointedAndReloaded" flag enabled - 
+	 *  default is true, but the user may restrict the list by specifying the "FieldVariablesToCheckpoint"
+	 *  flag in their constructor - see _FeVariable_Construct().
+	 */ 	
+	for ( var_I = 0; var_I < self->fieldVariable_Register->objects->count; var_I++ ) {
+		fieldVar = FieldVariable_Register_GetByIndex( self->fieldVariable_Register, var_I );
 
-	if (feVarsList != NULL ) {
-		/* Dump the requested subset of feVars */
-		Index                    listLength = Dictionary_Entry_Value_GetCount( feVarsList );
-		Index                    var_I = 0;
-		Dictionary_Entry_Value*  feVarDictValue = NULL;
-		
-		for ( var_I = 0; var_I < listLength; var_I++ ) {
-			feVarDictValue = Dictionary_Entry_Value_GetElement( feVarsList, var_I );
-			fieldVar = FieldVariable_Register_GetByName( self->fieldVariable_Register,
-				Dictionary_Entry_Value_AsString( feVarDictValue ) );
-				
-			if ( NULL == fieldVar ) {
-				Stream* errorStr = Journal_Register( Error_Type, self->type );
-				Journal_Printf( errorStr, "WARNING - in %s: requested feVariable to "
-					"save \"%s\" doesn't exist. Skipping.\n",
-					__func__, Dictionary_Entry_Value_AsString( feVarDictValue ) );
-				continue;	
-			}
-			else if ( Stg_Class_IsInstance( fieldVar, FeVariable_Type ) ) {
-				FeVariable_SaveToFile( fieldVar, outputPathString, self->timeStep );
+		if ( Stg_Class_IsInstance( fieldVar, FeVariable_Type ) ) {
+			feVar = (FeVariable*)fieldVar;
+
+			if ( feVar->isCheckpointedAndReloaded ) {
+				FeVariable_SaveToFile( feVar, outputPathString, self->timeStep );
 			}
 		}
-	}
-	else {
-		/* Just dump all feVars */
-		for ( var_I = 0; var_I < self->fieldVariable_Register->objects->count; var_I++ ) {
-			fieldVar = FieldVariable_Register_GetByIndex( self->fieldVariable_Register, var_I );
-			if ( Stg_Class_IsInstance( fieldVar, FeVariable_Type ) ) {
-				FeVariable_SaveToFile( fieldVar, outputPathString, self->timeStep );
-			}
-		}	
 	}
 
 	Memory_Free( outputPathString );
 }
+
 
 void _FiniteElementContext_SaveSwarms( void* context ) {
 	

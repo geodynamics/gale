@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeVariable.c 796 2007-03-27 07:22:24Z PatrickSunter $
+** $Id: FeVariable.c 819 2007-04-24 04:47:17Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -594,7 +594,7 @@ void _FeVariable_Initialise( void* variable, void* data ) {
 		Journal_DPrintf( self->debug, "applying the I.C.s for this Variable:\n" ); 
 		Stream_Indent( self->debug );
 	
-		if ( self->ics && !(context && (True == context->loadFromCheckPoint) ) ) {
+		if ( self->ics && !(context && (True == context->loadFromCheckPoint) && (True == self->isCheckpointedAndReloaded)) ) {
 			Journal_DPrintf( self->debug, "regular (non-restart) mode -> applying ICs specified in XML/constructor\n" );
 			Initialise( self->ics, data, False );
 			VariableCondition_Apply( self->ics, data );
@@ -2115,18 +2115,18 @@ void FeVariable_ReadNodalValuesFromFile_StgFEM_Native( void* feVariable, const c
 		MPI_Barrier( self->feMesh->layout->decomp->communicator );
 
 		if ( proc_I == self->feMesh->layout->decomp->rank ) {	
-			inputFile = fopen( filename, "r" );
 			/* Do the following since in parallel on some systems, the file
 			 * doesn't get re-opened at the start automatically. */
-			rewind( inputFile );
+			inputFile = fopen( filename, "r" );
 
 			if ( False == inputFile ) {
 				Stream*    errorStr = Journal_Register( Error_Type, self->type );
-				Journal_Printf( errorStr, "Error- in %s(), for feVariable \"%s\": Couldn't find checkpoint file with "
+				Journal_Firewall( 0, errorStr, "Error- in %s(), for feVariable \"%s\": Couldn't find checkpoint file with "
 					"prefix \"%s\", timestep %d - thus full filename \"%s\" - aborting.\n", __func__, self->name,
 					prefixStr, timeStep, filename );
-				exit(EXIT_FAILURE);	
+					
 			}
+			rewind( inputFile );
 	
 		}
 	}
