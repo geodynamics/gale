@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+	<include> StgFEM/TimeIntegrator.xml </include>
+	
+	<struct name="components" mergeType="merge">
+			
+		 			
+		<struct name="TracerPoints">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">passiveTracerSwarm</param>
+			<param name="colour">green</param>
+			<param name="pointSize">2.0</param>
+		</struct>
+		
+		<struct name="TracerTitle">
+			<param name="Type">lucTitle</param>
+			<param name="string">Passive Tracers</param>
+		</struct>
+
+		<struct name="TracerVP">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">camera</param>
+			<list name="DrawingObject">
+				<param>border</param>
+				<param>TracerTitle</param>
+				<param>TracerPoints</param>
+			</list>	
+		</struct>	
+	</struct>
+ 
+</StGermainData>
