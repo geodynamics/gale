@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FieldVariable.c 3942 2007-01-05 01:12:49Z KathleenHumble $
+** $Id: FieldVariable.c 4076 2007-04-24 04:37:28Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -114,7 +114,7 @@ FieldVariable* FieldVariable_New(
 			_getMinAndMaxGlobalCoords,
 			fieldComponentCount,
 			dim,
-            isCheckpointedAndReloaded,
+			isCheckpointedAndReloaded,
 			communicator,
 			fieldVariable_Register );
 }
@@ -134,22 +134,22 @@ FieldVariable* _FieldVariable_New(
 		Name                                        name,
 		Bool                                        initFlag,
 		FieldVariable_InterpolateValueAtFunction*   _interpolateValueAt,
-		FieldVariable_GetValueFunction*                    _getMinGlobalFieldMagnitude,
-		FieldVariable_GetValueFunction*                    _getMaxGlobalFieldMagnitude,		
-		FieldVariable_GetCoordFunction*                    _getMinAndMaxLocalCoords,
-		FieldVariable_GetCoordFunction*                    _getMinAndMaxGlobalCoords,
-		Index                                              fieldComponentCount,
-		Dimension_Index                                    dim,
-		Bool                                               isCheckpointedAndReloaded,
-		MPI_Comm                                           communicator,
-		FieldVariable_Register*                            fieldVariable_Register )		
+		FieldVariable_GetValueFunction*             _getMinGlobalFieldMagnitude,
+		FieldVariable_GetValueFunction*             _getMaxGlobalFieldMagnitude,		
+		FieldVariable_GetCoordFunction*             _getMinAndMaxLocalCoords,
+		FieldVariable_GetCoordFunction*             _getMinAndMaxGlobalCoords,
+		Index                                       fieldComponentCount,
+		Dimension_Index                             dim,
+		Bool                                        isCheckpointedAndReloaded,
+		MPI_Comm                                    communicator,
+		FieldVariable_Register*                     fieldVariable_Register )		
 {
 	FieldVariable*		self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(FieldVariable) );
-	self = (FieldVariable*)_Stg_Component_New( _sizeOfSelf, type, _delete, _print, _copy, _defaultConstructor,
-			_construct, _build, _initialise, _execute, _destroy,
+	self = (FieldVariable*)_Stg_Component_New( _sizeOfSelf, type, _delete, _print, _copy,
+		_defaultConstructor, _construct, _build, _initialise, _execute, _destroy,
 		name, NON_GLOBAL );
 	
 	/* Virtual functions */
@@ -219,7 +219,6 @@ void _FieldVariable_Init(
 	self->dim                         = dim;
 	self->communicator                = communicator;
 	self->fieldVariable_Register      = fV_Register;
-	//TODO put comment here
 	self->isCheckpointedAndReloaded   = isCheckpointedAndReloaded;
 	if (self != NULL && fV_Register != NULL)	
 		FieldVariable_Register_Add( fV_Register, self );
