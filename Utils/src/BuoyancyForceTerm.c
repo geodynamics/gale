@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: BuoyancyForceTerm.c 376 2006-10-18 06:58:41Z SteveQuenette $
+** $Id: BuoyancyForceTerm.c 456 2007-04-27 06:21:01Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -135,9 +135,9 @@ void _BuoyancyForceTerm_Init(
 {
 	self->temperatureField    = temperatureField;
 	self->gravity             = gravity;
+	self->gHat		  = NULL;
 	self->adjust              = adjust;
 	self->materials_Register  = materials_Register;
-
 }
 
 void BuoyancyForceTerm_InitAll( 
@@ -159,6 +159,7 @@ void _BuoyancyForceTerm_Delete( void* forceTerm ) {
 	BuoyancyForceTerm* self = (BuoyancyForceTerm*)forceTerm;
 	Index i;
 
+	FreeArray( self->gHat );
 	for ( i = 0; i < self->materialSwarmCount; ++i ) {
 		Stg_Class_Delete( self->densitySwarmVariables[i] );
 		Stg_Class_Delete( self->alphaSwarmVariables[i] );
@@ -199,22 +200,50 @@ void* _BuoyancyForceTerm_DefaultNew( Name name ) {
 
 void _BuoyancyForceTerm_Construct( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
 	BuoyancyForceTerm*          self             = (BuoyancyForceTerm*)forceTerm;
+	Dictionary*		dict;
+	Dictionary_Entry_Value*	tmp;
+	char*			rootKey;
 	FeVariable*                 temperatureField;
 	double                      gravity;
 	Bool                        adjust;
 	Materials_Register*         materials_Register;
+	unsigned		    nDims;
+	Dictionary_Entry_Value*	    direcList;
+	double*			    direc;
+	unsigned		d_i;
 
 	/* Construct Parent */
 	_ForceTerm_Construct( self, cf, data );
 
+	dict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( cf->componentDict, self->name ) );
 	temperatureField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "TemperatureField", FeVariable, False, data ) ;
 	gravity          = Stg_ComponentFactory_GetDouble( cf, self->name, "gravity", 0.0 );
 	adjust           = Stg_ComponentFactory_GetBool( cf, self->name, "adjust", False );
+
+	direcList = Dictionary_Get( dict, "gravityDirection" );
+	if( direcList ) {
+		nDims = Dictionary_Entry_Value_GetCount( direcList );
+		direc = AllocArray( double, nDims );
+		for( d_i = 0; d_i < nDims; d_i++ ) {
+			tmp = Dictionary_Entry_Value_GetElement( direcList, d_i );
+			rootKey = Dictionary_Entry_Value_AsString( tmp );
+			if( !Stg_StringIsNumeric( rootKey ) )
+				tmp = Dictionary_Get( cf->rootDict, rootKey );
+			direc[d_i] = Dictionary_Entry_Value_AsDouble( tmp );
+		}
+		if( nDims == 2 )
+			Vec_Norm2D( direc, direc );
+		else
+			Vec_Norm3D( direc, direc );
+	}
+	else
+		direc = NULL;
 
 	materials_Register = Stg_ObjectList_Get( cf->registerRegister, "Materials_Register" );
 	assert( materials_Register );
 
 	_BuoyancyForceTerm_Init( self, temperatureField, gravity, adjust, materials_Register );
+	self->gHat = direc;
 }
 
 void _BuoyancyForceTerm_Build( void* forceTerm, void* data ) {
@@ -276,8 +305,6 @@ void _BuoyancyForceTerm_Build( void* forceTerm, void* data ) {
 		Stg_Component_Build( self->densitySwarmVariables[materialSwarm_I], data, False );
 		Stg_Component_Build( self->alphaSwarmVariables[materialSwarm_I],   data, False );
 	}
-
-
 }
 
 void _BuoyancyForceTerm_Initialise( void* forceTerm, void* data ) {
@@ -313,7 +340,7 @@ void _BuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVect
 	Element_NodeIndex                elementNodeCount;
 	Dimension_Index                  dim                = forceVector->dim;
 	IntegrationPointsSwarm*          swarm              = (IntegrationPointsSwarm*)self->integrationSwarm;
-	FiniteElement_Mesh*              mesh               = forceVector->feVariable->feMesh;
+	FeMesh*              mesh               = forceVector->feVariable->feMesh;
 	Node_ElementLocalIndex           eNode_I;
 	Cell_Index                       cell_I;
 	ElementType*                     elementType;
@@ -327,15 +354,18 @@ void _BuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVect
 	Material*                        material;
 	FeVariable*                      temperatureField   = self->temperatureField;
 	double                           temperature        = 0.0;
+	double*				 gHat;
+	unsigned			d_i;
 
 	double totalWeight = 0.0;
 	double adjustFactor = 0.0;
 
-	elementType       = FeMesh_ElementTypeAt( mesh, lElement_I );
+	elementType       = FeMesh_GetElementType( mesh, lElement_I );
 	elementNodeCount  = elementType->nodeCount;
 	nodeDofCount      = dim;
 	cell_I            = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
 	cellParticleCount = swarm->cellParticleCountTbl[cell_I];
+	gHat		  = self->gHat;
 
 	/* adjust & adjustFactor -- 20060411 Alan
 	 *
@@ -355,7 +385,7 @@ void _BuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVect
 	else {
 		adjustFactor = 1.0;
 	}
-			
+
 	for( cParticle_I = 0 ; cParticle_I < cellParticleCount ; cParticle_I++ ) {
 		particle = (IntegrationPoint*) Swarm_ParticleInCellAt( swarm, cell_I, cParticle_I );
 		xi       = particle->xi;
@@ -375,8 +405,14 @@ void _BuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVect
 		factor = detJac * particle->weight * adjustFactor * force;
 
 		/* Apply force in verticle direction */
-		for( eNode_I = 0 ; eNode_I < elementNodeCount; eNode_I++ ) { 		
-			elForceVec[ eNode_I * nodeDofCount + J_AXIS ] += factor * Ni[ eNode_I ] ;
+		for( eNode_I = 0 ; eNode_I < elementNodeCount; eNode_I++ ) {
+			if( gHat ) {
+				for( d_i = 0; d_i < dim; d_i++ )
+					elForceVec[ eNode_I * nodeDofCount + d_i ] += gHat[d_i] * factor * Ni[ eNode_I ] ;
+			}
+			else {
+				elForceVec[ eNode_I * nodeDofCount + J_AXIS ] += factor * Ni[ eNode_I ] ;
+			}
 		}
 	}
 	

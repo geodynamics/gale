@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testPeriodicBCs.c 427 2007-02-23 02:37:11Z KathleenHumble $
+** $Id: testPeriodicBCs.c 456 2007-04-27 06:21:01Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -161,10 +161,10 @@ int main( int argc, char* argv[] ) {
 	Dictionary_Add( dictionary, "particlesPerCell", Dictionary_Entry_Value_FromUnsignedInt( 1 ) );
 	Dictionary_Add( dictionary, "seed", Dictionary_Entry_Value_FromUnsignedInt( 13 ) );
 	Dictionary_Add( dictionary, "shadowDepth", Dictionary_Entry_Value_FromUnsignedInt( 1 ) );
-	// TODO: a 2nd test with the periodic shadowing enabled. Its handy to keep the orig one
-	//	without it though.
-	//Dictionary_Add( dictionary, "isPeriodicI", Dictionary_Entry_Value_FromBool( True ) );
-	//Dictionary_Add( dictionary, "isPeriodicJ", Dictionary_Entry_Value_FromBool( True ) );
+	/*  TODO: a 2nd test with the periodic shadowing enabled. Its handy to keep the orig one */
+	/* 	without it though. */
+	/* Dictionary_Add( dictionary, "isPeriodicI", Dictionary_Entry_Value_FromBool( True ) ); */
+	/* Dictionary_Add( dictionary, "isPeriodicJ", Dictionary_Entry_Value_FromBool( True ) ); */
 	decompDims = 1;
 
 	/* Run the mesher */

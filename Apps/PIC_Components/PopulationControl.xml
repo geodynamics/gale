@@ -14,7 +14,7 @@
 			<param name="Type">ReseedSplitting</param>
 			<param name="idealParticleCount">particlesPerCell</param> 
 			<param name="DiscreteVoronoi">discreteVoronoi</param> 
-		</struct>	
+		</struct>
 	</struct>
 
 </StGermainData>

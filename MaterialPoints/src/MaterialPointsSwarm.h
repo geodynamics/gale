@@ -62,7 +62,7 @@
 	#define __MaterialPointsSwarm \
 		__Swarm \
 		\
-		FiniteElement_Mesh*                   mesh;                 \
+		FeMesh*                   mesh;                 \
 		SwarmAdvector*                        swarmAdvector;        \
 		RemovalRoutine*                       removalRoutine;       \
 		SplittingRoutine*                     splittingRoutine;     \
@@ -87,7 +87,7 @@
 		SizeT                                 particleSize,
 		Particle_InCellIndex                  cellParticleTblDelta,
 		double                                extraParticlesFactor,
-		FiniteElement_Mesh*                   mesh,
+		FeMesh*                   	      mesh,
 		RemovalRoutine*                       removalRoutine,
 		SplittingRoutine*                     splittingRoutine,
 		EscapedRoutine*                       escapedRoutine, 
@@ -139,7 +139,7 @@ void _MaterialPointsSwarm_Construct( void* shape, Stg_ComponentFactory* cf, void
 
 void _MaterialPointsSwarm_Init( 
 		void*                                 swarm,
-		FiniteElement_Mesh*                   mesh,
+		FeMesh*                   mesh,
 		RemovalRoutine*                       removalRoutine,
 		SplittingRoutine*                     splittingRoutine,
 		EscapedRoutine*                       escapedRoutine, 

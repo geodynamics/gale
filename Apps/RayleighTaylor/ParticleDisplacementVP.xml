@@ -37,10 +37,6 @@
 			<param name="Type">lucTitle</param>
 			<param name="string">Particle displacement</param>
 		</struct>
-		<struct name="meshView" mergeType="replace">
-			<param name="Type">lucMeshViewer</param>
-			<param name="Mesh">mesh-linear</param>
-		</struct>
 		<struct name="displacementArrows">
 			<param name="Type">lucSwarmVectors</param>
 			<param name="Swarm">materialSwarm</param>
@@ -68,7 +64,6 @@
 				-->
 				<param>displacementParticleDots</param>
 				<param>displacementColourBar</param>
-				<param>meshView</param>
 			</list>
 		</struct>
 	</struct>

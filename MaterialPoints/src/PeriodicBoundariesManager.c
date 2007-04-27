@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: PeriodicBoundariesManager.c 376 2006-10-18 06:58:41Z SteveQuenette $
+** $Id: PeriodicBoundariesManager.c 456 2007-04-27 06:21:01Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -82,7 +82,7 @@ void* _PeriodicBoundariesManager_DefaultNew( Name name ) {
 
 PeriodicBoundariesManager* PeriodicBoundariesManager_New( 
 		Name                        name,
-		BlockGeometry*              geometry,
+		Mesh*			    mesh, 
 		Swarm*                      swarm,
 		Dictionary*                 dictionary )
 {
@@ -100,7 +100,7 @@ PeriodicBoundariesManager* PeriodicBoundariesManager_New(
 		_PeriodicBoundariesManager_Destroy,
 		name,
 		True,
-		geometry,
+		mesh, 
 		swarm,
 		dictionary );
 }	
@@ -120,7 +120,7 @@ PeriodicBoundariesManager* _PeriodicBoundariesManager_New(
 		Stg_Component_DestroyFunction*         _destroy,
 		Name                                   name,
 		Bool                                   initFlag,
-		BlockGeometry*                         geometry,
+		Mesh*				       mesh, 
 		Swarm*                                 swarm,
 		Dictionary*                            dictionary )		
 {
@@ -147,7 +147,7 @@ PeriodicBoundariesManager* _PeriodicBoundariesManager_New(
 	/* Virtual info */
 	
 	if( initFlag ){
-		_PeriodicBoundariesManager_Init( self, geometry, swarm, dictionary );
+		_PeriodicBoundariesManager_Init( self, mesh, swarm, dictionary );
 	}
 	
 	return self;
@@ -156,7 +156,7 @@ PeriodicBoundariesManager* _PeriodicBoundariesManager_New(
 
 void _PeriodicBoundariesManager_Init(
 		void*             periodicBCsManager,
-		BlockGeometry*    geometry,
+		Mesh*		  mesh, 
 		Swarm*            swarm,
 		Dictionary*       dictionary )
 {
@@ -164,7 +164,7 @@ void _PeriodicBoundariesManager_Init(
 
 	self->isConstructed = True;
 	self->dictionary = dictionary;
-	self->geometry = geometry;
+	self->mesh = mesh;
 	self->swarm = swarm;
 	self->count = 0;
 	self->delta = 0;
@@ -177,14 +177,14 @@ void _PeriodicBoundariesManager_Init(
 void _PeriodicBoundariesManager_Construct( void* periodicBCsManager, Stg_ComponentFactory* cf, void* data ) {
 	PeriodicBoundariesManager*	self = (PeriodicBoundariesManager*)periodicBCsManager;
 	Dictionary*			dictionary = NULL;
-	BlockGeometry*                  geometry = NULL;
+	Mesh*				mesh = NULL;
 	Swarm*                          swarm = NULL;
 
 	dictionary = Dictionary_GetDictionary( cf->componentDict, self->name );
-	geometry =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "Geometry", BlockGeometry,  True, data  ) ;
+	mesh =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "mesh", Mesh,  True, data  ) ;
 	swarm =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "Swarm", Swarm,  True, data  ) ;
 
-	_PeriodicBoundariesManager_Init( self, geometry, swarm, dictionary );
+	_PeriodicBoundariesManager_Init( self, mesh, swarm, dictionary );
 }
 
 
@@ -240,7 +240,7 @@ void* _PeriodicBoundariesManager_Copy( void* periodicBCsManager, void* dest, Boo
 
 	if ( deep ) {
 		newPeriodicBCsManager->dictionary = (Dictionary*)Stg_Class_Copy( self->dictionary, NULL, deep, nameExt, map );
-		newPeriodicBCsManager->geometry = (BlockGeometry*)Stg_Class_Copy( self->geometry, NULL, deep, nameExt, map );
+		newPeriodicBCsManager->mesh = (Mesh*)Stg_Class_Copy( self->mesh, NULL, deep, nameExt, map );
 		newPeriodicBCsManager->swarm = (Swarm*)Stg_Class_Copy( self->swarm, NULL, deep, nameExt, map );
 		newPeriodicBCsManager->debug = self->debug;
 		newPeriodicBCsManager->boundaries = Memory_Alloc_Array( PeriodicBoundary, self->size,
@@ -249,7 +249,7 @@ void* _PeriodicBoundariesManager_Copy( void* periodicBCsManager, void* dest, Boo
 	}
 	else {
 		newPeriodicBCsManager->dictionary = self->dictionary;
-		newPeriodicBCsManager->geometry = self->geometry;
+		newPeriodicBCsManager->mesh = self->mesh;
 		newPeriodicBCsManager->swarm = self->swarm;
 		newPeriodicBCsManager->boundaries = self->boundaries;
 		newPeriodicBCsManager->debug = self->debug;
@@ -318,6 +318,9 @@ void _PeriodicBoundariesManager_Destroy( void* periodicBCsManager, void* data ) 
 void PeriodicBoundariesManager_AddPeriodicBoundary( void* periodicBCsManager, Axis axis ) {
 	PeriodicBoundariesManager*	self = (PeriodicBoundariesManager*)periodicBCsManager;	
 	PeriodicBoundary*		newPeriodicBoundary;
+	double				min[3], max[3];
+
+	Mesh_GetGlobalCoordRange( self->mesh, min, max );
 	
 	if ( self->count == self->size ) {
 		self->size += self->delta;
@@ -325,8 +328,8 @@ void PeriodicBoundariesManager_AddPeriodicBoundary( void* periodicBCsManager, Ax
 	}
 	newPeriodicBoundary = &self->boundaries[self->count];
 	newPeriodicBoundary->axis = axis;
-	newPeriodicBoundary->minWall = self->geometry->min[axis];
-	newPeriodicBoundary->maxWall = self->geometry->max[axis];
+	newPeriodicBoundary->minWall = min[axis];
+	newPeriodicBoundary->maxWall = max[axis];
 	newPeriodicBoundary->particlesUpdatedMinEndCount = 0;	
 	newPeriodicBoundary->particlesUpdatedMaxEndCount = 0;	
 	self->count++;

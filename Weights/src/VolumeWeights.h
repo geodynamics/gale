@@ -39,7 +39,7 @@
 	#define __VolumeWeights \
 		__WeightsCalculator \
 		Stg_Shape*              shape; \
-		FiniteElement_Mesh*     mesh; 
+		FeMesh*     mesh; 
 
 	struct VolumeWeights { __VolumeWeights };
 	
@@ -47,7 +47,7 @@
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Constructors
 	*/
-	VolumeWeights* VolumeWeights_New( Name name, Dimension_Index dim, Stg_Shape* shape, FiniteElement_Mesh* mesh );
+	VolumeWeights* VolumeWeights_New( Name name, Dimension_Index dim, Stg_Shape* shape, FeMesh* mesh );
 	VolumeWeights* _VolumeWeights_New(
 		SizeT                                 _sizeOfSelf, 
 		Type                                  type,
@@ -63,8 +63,8 @@
 		WeightsCalculator_CalculateFunction*  _calculate,
 		Name                                  name );
 
-	void _VolumeWeights_Init( void* weights, Stg_Shape* shape, FiniteElement_Mesh* mesh ) ;
-	void VolumeWeights_InitAll( void* weights, Dimension_Index dim, Stg_Shape* shape, FiniteElement_Mesh* mesh ) ;
+	void _VolumeWeights_Init( void* weights, Stg_Shape* shape, FeMesh* mesh ) ;
+	void VolumeWeights_InitAll( void* weights, Dimension_Index dim, Stg_Shape* shape, FeMesh* mesh ) ;
 
 
 	/* Stg_Class_Delete VolumeWeights implementation */

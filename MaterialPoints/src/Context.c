@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Context.c 376 2006-10-18 06:58:41Z SteveQuenette $
+** $Id: Context.c 456 2007-04-27 06:21:01Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -170,9 +170,9 @@ void _PICelleratorContext_Init( void* context ) {
 
 	ContextEP_Prepend( self, AbstractContext_EP_ConstructExtensions, PICelleratorContext_CreateDefaultMaterial );
 
-	// TODO want to append an EP to the end of the time integration that makes sure that after all integration 
-	// swarms have been updated, each element has at least one integration point from one swarm in it, or else
-	// we will fail the next timestep
+/* 	 TODO want to append an EP to the end of the time integration that makes sure that after all integration  */
+/* 	 swarms have been updated, each element has at least one integration point from one swarm in it, or else */
+/* 	 we will fail the next timestep */
 }
 
 

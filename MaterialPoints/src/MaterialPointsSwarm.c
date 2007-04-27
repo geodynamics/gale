@@ -68,7 +68,7 @@ MaterialPointsSwarm* MaterialPointsSwarm_New(
 		SizeT                                 particleSize,
 		Particle_InCellIndex                  cellParticleTblDelta,
 		double                                extraParticlesFactor,
-		FiniteElement_Mesh*                   mesh,
+		FeMesh*                   mesh,
 		RemovalRoutine*                       removalRoutine,
 		SplittingRoutine*                     splittingRoutine,
 		EscapedRoutine*                       escapedRoutine, 
@@ -161,7 +161,7 @@ MaterialPointsSwarm* _MaterialPointsSwarm_New(
 
 void _MaterialPointsSwarm_Init( 
 		void*                                 swarm,
-		FiniteElement_Mesh*                   mesh,
+		FeMesh*                   mesh,
 		RemovalRoutine*                       removalRoutine,
 		SplittingRoutine*                     splittingRoutine,
 		EscapedRoutine*                       escapedRoutine, 
@@ -265,7 +265,7 @@ void* _MaterialPointsSwarm_DefaultNew( Name name ) {
 
 void _MaterialPointsSwarm_Construct( void* swarm, Stg_ComponentFactory* cf, void* data ) {
 	MaterialPointsSwarm*	        self          = (MaterialPointsSwarm*) swarm;
-	FiniteElement_Mesh*             mesh;
+	FeMesh*             mesh;
 	RemovalRoutine*                 removalRoutine;
 	SplittingRoutine*               splittingRoutine;
 	EscapedRoutine*                 escapedRoutine;
@@ -274,7 +274,7 @@ void _MaterialPointsSwarm_Construct( void* swarm, Stg_ComponentFactory* cf, void
 
 	_Swarm_Construct( self, cf, data );
 
-	mesh             = Stg_ComponentFactory_ConstructByKey( cf, self->name, "FiniteElement_Mesh", FiniteElement_Mesh, True, data );
+	mesh             = Stg_ComponentFactory_ConstructByKey( cf, self->name, "FeMesh", FeMesh, True, data );
 	removalRoutine   = Stg_ComponentFactory_ConstructByKey( cf, self->name, "RemovalRoutine",     RemovalRoutine,     False, data );
 	splittingRoutine = Stg_ComponentFactory_ConstructByKey( cf, self->name, "SplittingRoutine",   SplittingRoutine,   False, data );
 	escapedRoutine   = Stg_ComponentFactory_ConstructByKey( cf, self->name, "EscapedRoutine",     EscapedRoutine,     False, data );
@@ -343,7 +343,7 @@ void _MaterialPointsSwarm_Destroy( void* swarm, void* data ) {
 
 void _MaterialPointsSwarm_UpdateHook( void* timeIntegrator, void* swarm ) {
 	MaterialPointsSwarm* self               = (MaterialPointsSwarm*)swarm;
-	FiniteElement_Mesh*  mesh               = self->mesh;
+	FeMesh*  mesh               = self->mesh;
 	Index                cell;
 	Index                point_I;
 	MaterialPoint*       materialPoint;
@@ -367,7 +367,7 @@ void _MaterialPointsSwarm_UpdateHook( void* timeIntegrator, void* swarm ) {
 			materialPoint = (MaterialPoint*)Swarm_ParticleAt( self, point_I );
 			cell = materialPoint->owningCell;
 			Journal_Firewall(
-				cell < mesh->elementLocalCount,
+					 cell < FeMesh_GetElementLocalSize( mesh ), 
 				Journal_MyStream( Error_Type, self ),
 				"In func %s: MaterialPoint '%d' outside element. Coord = {%g, %g, %g}\n",
 				__func__,

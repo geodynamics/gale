@@ -30,7 +30,7 @@
 			<param name="Type">IntegrationPointsSwarm</param>
 			<param name="CellLayout">elementCellLayout</param>
 			<param name="ParticleLayout">localLayout</param>
-			<param name="FiniteElement_Mesh">mesh-linear</param>
+			<param name="FeMesh">mesh-linear</param>
 			<param name="WeightsCalculator">weights</param>
 			<param name="TimeIntegrator">timeIntegrator</param>
 			<param name="IntegrationPointMapper">mapper</param>
@@ -49,7 +49,7 @@
 			<param name="Type">MaterialPointsSwarm</param>
 			<param name="CellLayout">elementCellLayout</param>
 			<param name="ParticleLayout">picIntegrationPointsParticleLayout</param>
-			<param name="FiniteElement_Mesh">mesh-linear</param>
+			<param name="FeMesh">mesh-linear</param>
 
 			<!-- These guys may or may not be created -->
 			<param name="SwarmAdvector">materialSwarmAdvector</param>
@@ -67,7 +67,7 @@
 			<param name="Type">IntegrationPointsSwarm</param>
 			<param name="CellLayout">cellLayout</param>
 			<param name="ParticleLayout">particleLayout</param>
-			<param name="FiniteElement_Mesh">mesh-linear</param>
+			<param name="FeMesh">mesh-linear</param>
 			<param name="TimeIntegrator">timeIntegrator</param>
 			<param name="IntegrationPointMapper">backgroundMapper</param>
 		</struct>
@@ -83,7 +83,7 @@
 			<param name="Type">MaterialPointsSwarm</param>
 			<param name="CellLayout">cellLayout</param>
 			<param name="ParticleLayout">backgroundLayout</param>
-			<param name="FiniteElement_Mesh">mesh-linear</param>
+			<param name="FeMesh">mesh-linear</param>
 			<param name="Material">denseMaterial</param>
 		</struct>
 

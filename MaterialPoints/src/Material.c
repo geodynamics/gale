@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Material.c 435 2007-03-04 10:42:10Z PatrickSunter $
+** $Id: Material.c 456 2007-04-27 06:21:01Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -241,7 +241,7 @@ void Material_Layout( void* material, MaterialPointsSwarm* swarm ) {
 
 double Material_Volume( void* material, IntegrationPointsSwarm* swarm, Coord centroid ) {
 	Material*            self               = (Material*)material;
-	FiniteElement_Mesh*  feMesh             = swarm->mesh;
+	FeMesh*  feMesh             = swarm->mesh;
 	ElementType*         elementType;
 	IntegrationPoint*    particle;
 	Coord                globalCoord;
@@ -262,7 +262,7 @@ double Material_Volume( void* material, IntegrationPointsSwarm* swarm, Coord cen
 
 	/* Loop over all cells in domain */
 	for ( lCell_I = 0 ; lCell_I < cellLocalCount ; lCell_I++ ) {
-		elementType = FeMesh_ElementTypeAt( feMesh, lCell_I );
+		elementType = FeMesh_GetElementType( feMesh, lCell_I );
 		for( cParticle_I = 0 ; cParticle_I < swarm->cellParticleCountTbl[lCell_I] ; cParticle_I++ ) {
 			lParticle_I = swarm->cellParticleTbl[lCell_I][cParticle_I];
 			particle = (IntegrationPoint*)Swarm_ParticleAt( swarm, lParticle_I );
@@ -278,7 +278,7 @@ double Material_Volume( void* material, IntegrationPointsSwarm* swarm, Coord cen
 			/* Sum Volume */
 			volume += detJac * particle->weight;
 
-			FiniteElement_Mesh_CalcGlobalCoordFromLocalCoord( feMesh, dim, lCell_I, particle->xi, globalCoord );
+			FeMesh_CoordLocalToGlobal( feMesh, lCell_I, particle->xi, globalCoord );
 				
 			/* Sum centroid */
 			localCentroid[ I_AXIS ] += detJac * particle->weight * globalCoord[ I_AXIS ];
@@ -312,7 +312,7 @@ void Material_IntegrateField(
 		double*                 result ) 
 {
 	Material*            self               = (Material*)material;
-	FiniteElement_Mesh*  feMesh             = swarm->mesh;
+	FeMesh*  feMesh             = swarm->mesh;
 	ElementType*         elementType;
 	IntegrationPoint*    particle;
 	Cell_Index           lCell_I;
@@ -337,7 +337,7 @@ void Material_IntegrateField(
 
 	/* Loop over all cells in domain */
 	for ( lCell_I = 0 ; lCell_I < cellLocalCount ; lCell_I++ ) {
-		elementType = FeMesh_ElementTypeAt( feMesh, lCell_I );
+		elementType = FeMesh_GetElementType( feMesh, lCell_I );
 		for( cParticle_I = 0 ; cParticle_I < swarm->cellParticleCountTbl[lCell_I] ; cParticle_I++ ) {
 			lParticle_I = swarm->cellParticleTbl[lCell_I][cParticle_I];
 			particle = (IntegrationPoint*) Swarm_ParticleAt( swarm, lParticle_I );

@@ -69,6 +69,7 @@
 		/* BuoyancyForceTerm info */ \
 		FeVariable*                                         temperatureField;                  \
 		double                                              gravity;                           \
+		double*						    gHat;			       \
 		Bool                                                adjust;                            \
 		Materials_Register*                                 materials_Register;                \
 		ExtensionInfo_Index                                 materialExtHandle;                 \

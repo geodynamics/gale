@@ -49,7 +49,7 @@
 **
 ** Comments:
 **
-** $Id: IntegrationPointsSwarm.h 435 2007-03-04 10:42:10Z PatrickSunter $
+** $Id: IntegrationPointsSwarm.h 456 2007-04-27 06:21:01Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -63,7 +63,7 @@
 	#define __IntegrationPointsSwarm \
 		__Swarm \
 		\
-		FiniteElement_Mesh*                   mesh;                 \
+		FeMesh*                   mesh;                 \
 		TimeIntegrator*                       timeIntegrator;       \
 		WeightsCalculator*                    weights;              \
 		IntegrationPointMapper*               mapper;               \
@@ -88,7 +88,7 @@
 		SizeT                                 particleSize,
 		Particle_InCellIndex                  cellParticleTblDelta,
 		double                                extraParticlesFactor,
-		FiniteElement_Mesh*                   mesh,
+		FeMesh*				      mesh, 
 		TimeIntegrator*                       timeIntegrator,
 		WeightsCalculator*                    weights,
 		IntegrationPointMapper*               mapper,
@@ -121,7 +121,7 @@
 		SizeT                                           particleSize, 
 		Particle_InCellIndex                            cellParticleTblDelta, 
 		double                                          extraParticlesFactor,
-		FiniteElement_Mesh*                             mesh, 
+		FeMesh*         		                mesh, 
 		TimeIntegrator*                                 timeIntegrator,
 		WeightsCalculator*                              weights,
 		IntegrationPointMapper*                         mapper,
@@ -136,7 +136,7 @@
 
 	void _IntegrationPointsSwarm_Init(
 		void*                                           swarm,
-		FiniteElement_Mesh*                             mesh, 
+		FeMesh*                             mesh, 
 		TimeIntegrator*                                 timeIntegrator,
 		WeightsCalculator*                              weights,
 		IntegrationPointMapper*                         mapper,

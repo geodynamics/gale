@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SwarmAdvector.c 376 2006-10-18 06:58:41Z SteveQuenette $
+** $Id: SwarmAdvector.c 456 2007-04-27 06:21:01Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -133,7 +133,7 @@ void _SwarmAdvector_Init(
 		MaterialPointsSwarm*                       swarm,
 		PeriodicBoundariesManager*                 periodicBCsManager )
 {
-	// TODO - commented out by Pat Sunter 20060428 since we need to use gauss layout initially for testing sometimes
+/* 	 TODO - commented out by Pat Sunter 20060428 since we need to use gauss layout initially for testing sometimes */
 	/*
 	Journal_Firewall(
 		swarm->particleLayout->coordSystem == GlobalCoordSystem,

@@ -308,7 +308,7 @@ void _BuoyancyForceTermThermoChem_AssembleElement( void* forceTerm, ForceVector*
 	Element_NodeIndex                elementNodeCount;
 	Dimension_Index                  dim                = forceVector->dim;
 	IntegrationPointsSwarm*          swarm              = (IntegrationPointsSwarm*)self->integrationSwarm;
-	FiniteElement_Mesh*              mesh               = forceVector->feVariable->feMesh;
+	FeMesh*		                 mesh               = forceVector->feVariable->feMesh;
 	Node_ElementLocalIndex           eNode_I;
 	Cell_Index                       cell_I;
 	ElementType*                     elementType;
@@ -327,7 +327,7 @@ void _BuoyancyForceTermThermoChem_AssembleElement( void* forceTerm, ForceVector*
 	double totalWeight = 0.0;
 	double adjustFactor = 0.0;
 
-	elementType       = FeMesh_ElementTypeAt( mesh, lElement_I );
+	elementType       = FeMesh_GetElementType( mesh, lElement_I );
 	elementNodeCount  = elementType->nodeCount;
 	nodeDofCount      = dim;
 	cell_I            = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );

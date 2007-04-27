@@ -217,8 +217,7 @@ void _CoincidentMapper_Map( void* mapper ) {
 	MaterialPoint*          materialPoint;
 	MaterialPointRef*       ref;
 
-	FiniteElement_Mesh*     mesh                   = materialSwarm->mesh;
-	ElementLayout*          layout                 = mesh->layout->elementLayout;
+	FeMesh*     mesh                   = materialSwarm->mesh;
 
 	Particle_Index          particle_lI;
 	Cell_Index              cell_dI;
@@ -273,9 +272,9 @@ void _CoincidentMapper_Map( void* mapper ) {
 
 		/* Convert global to local coordinates */
 		ElementType_ConvertGlobalCoordToElLocal(
-				FiniteElement_Mesh_ElementTypeAt( mesh, cell_dI ),
-				layout,
-				(const Coord**)materialSwarm->cellPointTbl[cell_dI],
+				FeMesh_GetElementType( mesh, cell_dI ),
+				mesh, 
+				cell_dI, 
 				materialPoint->coord,
 				integrationPoint->xi );
 

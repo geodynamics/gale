@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: CellularAutomataVoronoi.c 376 2006-10-18 06:58:41Z SteveQuenette $
+** $Id: CellularAutomataVoronoi.c 456 2007-04-27 06:21:01Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -430,7 +430,7 @@ Particle_InCellIndex CellularAutomataVoronoi_Battle(
 	Cell_LocalIndex           lCell_I;
 	Particle_InCellIndex*     battlePair;
 
-	FiniteElement_Mesh*       mesh;
+	FeMesh*       mesh;
 
 	/* Check if battle has already been fought */
 	for ( battle_I = 0 ; battle_I < battleCount ; battle_I++ ) {
@@ -445,7 +445,7 @@ Particle_InCellIndex CellularAutomataVoronoi_Battle(
 	cellCentroid        = cell->centroid;
 	champion            = Swarm_ParticleInCellAt( swarm, lCell_I, champion_I );
 	contender           = Swarm_ParticleInCellAt( swarm, lCell_I, contender_I );
-	mesh                = (FiniteElement_Mesh*)(((ElementCellLayout*)swarm->cellLayout)->mesh); /* Assume ElementCellLayout */
+	mesh                = (FeMesh*)(((ElementCellLayout*)swarm->cellLayout)->mesh); /* Assume ElementCellLayout */
 	
 	if ( swarm->particleLayout->coordSystem == GlobalCoordSystem ) {
 		memcpy( championCoord, ((GlobalParticle*)champion)->coord, sizeof(Coord) );
@@ -453,18 +453,8 @@ Particle_InCellIndex CellularAutomataVoronoi_Battle(
 	}
 	else {
 		/* LocalCoordSystem need to convert to global */
-		FiniteElement_Mesh_CalcGlobalCoordFromLocalCoord(
-			mesh,
-			swarm->dim,
-			lCell_I,
-			((LocalParticle*)champion)->xi,
-			championCoord );
-		FiniteElement_Mesh_CalcGlobalCoordFromLocalCoord(
-			mesh,
-			swarm->dim,
-			lCell_I,
-			((LocalParticle*)contender)->xi,
-			contenderCoord );
+		FeMesh_CoordLocalToGlobal( mesh, lCell_I, ((LocalParticle*)champion)->xi, championCoord );
+		FeMesh_CoordLocalToGlobal( mesh, lCell_I, ((LocalParticle*)contender)->xi, contenderCoord );
 	}
 						
 
@@ -576,10 +566,10 @@ void CellularAutomataVoronoi_Seed( void* cellularAutomataVoronoi ) {
 	Dimension_Index                      dim               = self->dim;
 	Dimension_Index                      dim_I;
 	Index*                               resolution        = self->resolution;
-	FiniteElement_Mesh*                  mesh;
+	FeMesh*                  mesh;
 	Coord                                localCoord;
 
-	mesh                = (FiniteElement_Mesh*)(((ElementCellLayout*)swarm->cellLayout)->mesh); /* Assume ElementCellLayout */
+	mesh                = (FeMesh*)(((ElementCellLayout*)swarm->cellLayout)->mesh); /* Assume ElementCellLayout */
 
 	/* Loop over all the particles in the cell - assigning it to the a voronoi cell it is in */
 	for ( cParticle_I = 0 ; cParticle_I < cellParticleCount ; cParticle_I++ ) {
@@ -587,10 +577,7 @@ void CellularAutomataVoronoi_Seed( void* cellularAutomataVoronoi ) {
 
 		if ( swarm->particleLayout->coordSystem == GlobalCoordSystem ) {
 			/* Must convert global to local. */
-			FiniteElement_Mesh_CalcLocalCoordFromGlobalCoord( mesh, 
-									  lCell_I, 
-									  ((GlobalParticle*)particle)->coord, 
-									  localCoord );
+			FeMesh_CoordGlobalToLocal( mesh, lCell_I, ((GlobalParticle*)particle)->coord, localCoord );
 		}
 		else {
 			/* Now we need to coordinate in locals. */
@@ -713,7 +700,7 @@ void CellularAutomataVoronoi_CalcSubCells( CellularAutomataVoronoi* self, Swarm*
 }
 
 void CellularAutomataVoronoi_CalcSubCells2D( CellularAutomataVoronoi* self, Swarm* swarm, unsigned cellInd ) {
-	FiniteElement_Mesh*	mesh;
+	FeMesh*	mesh;
 	unsigned		nSubCells;
 	unsigned*		res;
 	double**		gCrds;
@@ -727,7 +714,7 @@ void CellularAutomataVoronoi_CalcSubCells2D( CellularAutomataVoronoi* self, Swar
 	/* Shortcuts. */
 	nSubCells = self->claimedCellCount;
 	res = self->resolution;
-	mesh = (FiniteElement_Mesh*)(((ElementCellLayout*)swarm->cellLayout)->mesh);
+	mesh = (FeMesh*)(((ElementCellLayout*)swarm->cellLayout)->mesh);
 
 	/* NOTE: It is assumed in an earlier function that the cell layout is based on the
 	   mesh's elements; I continue that assumption here. */
@@ -753,13 +740,8 @@ void CellularAutomataVoronoi_CalcSubCells2D( CellularAutomataVoronoi* self, Swar
 			lCrds[3][0] = (double)(d_i + 1) * self->dx[0] - 1.0;
 
 			/* Map the local coordinates back to globals. */
-			for( c_i = 0; c_i < 4; c_i++ ) {
-				FiniteElement_Mesh_CalcGlobalCoordFromLocalCoord( mesh, 
-										  self->dim, 
-										  cellInd, 
-										  lCrds[c_i], 
-										  gCrds[c_i] );
-			}
+			for( c_i = 0; c_i < 4; c_i++ )
+				FeMesh_CoordLocalToGlobal( mesh, cellInd, lCrds[c_i], gCrds[c_i] );
 
 			/* Calculate the volume. */
 			self->cellVolumes[subCellInd] = CellularAutomataVoronoi_QuadArea( self, gCrds );
@@ -779,12 +761,11 @@ void CellularAutomataVoronoi_CalcSubCells3D( CellularAutomataVoronoi* self, Swar
 	const double		sign[3][8] = {{-1, 1, -1, 1, -1, 1, -1, 1}, 
 					      {-1, -1, 1, 1, -1, -1, 1, 1}, 
 					      {-1, -1, -1, -1, 1, 1, 1, 1}};
-	FiniteElement_Mesh*	mesh;
+	FeMesh*	mesh;
 	unsigned		nSubCells;
 	unsigned*		res;
 	double**		gCrds;
 	double**		lCrds;
-	Coord*			gCrdPtrs[8];
 	ElementType*		elType;
 	unsigned		d_i, d_j, d_k;
 
@@ -795,8 +776,8 @@ void CellularAutomataVoronoi_CalcSubCells3D( CellularAutomataVoronoi* self, Swar
 	/* Shortcuts. */
 	nSubCells = self->claimedCellCount;
 	res = self->resolution;
-	mesh = (FiniteElement_Mesh*)(((ElementCellLayout*)swarm->cellLayout)->mesh);
-	elType = FiniteElement_Mesh_ElementTypeAt( mesh, cellInd );
+	mesh = (FeMesh*)(((ElementCellLayout*)swarm->cellLayout)->mesh);
+	elType = FeMesh_GetElementType( mesh, cellInd );
 
 	/* NOTE: It is assumed in an earlier function that the cell layout is based on the
 	   mesh's elements; I continue that assumption here. */
@@ -844,15 +825,8 @@ void CellularAutomataVoronoi_CalcSubCells3D( CellularAutomataVoronoi* self, Swar
 
 				/* Map the local coordinates back to globals. */
 				for( c_i = 0; c_i < 8; c_i++ ) {
-					/* Build a list of global coordinate pointers. */
-					gCrdPtrs[c_i] = (Coord*)(gCrds + c_i);
-
 					/* Convert to local coordinates. */
-					FiniteElement_Mesh_CalcGlobalCoordFromLocalCoord( mesh, 
-											  self->dim, 
-											  cellInd, 
-											  lCrds[c_i], 
-											  gCrds[c_i] );
+					FeMesh_CoordLocalToGlobal( mesh, cellInd, lCrds[c_i], gCrds[c_i] );
 
 					/* Calculate the jacobian. */
 					jac[0][0] += 0.125 * sign[0][c_i] * gCrds[c_i][0];
@@ -907,7 +881,7 @@ double CellularAutomataVoronoi_QuadArea( CellularAutomataVoronoi* self, double**
 	return area;
 }
 
-void CellularAutomataVoronoi_QuadCentroid( CellularAutomataVoronoi* self, double** gCrds, Coord centroid ) {
+void CellularAutomataVoronoi_QuadCentroid( CellularAutomataVoronoi* self, double** gCrds, double* centroid ) {
 	unsigned	c_i;
 
 	/* Sanity check. */
@@ -925,7 +899,7 @@ void CellularAutomataVoronoi_QuadCentroid( CellularAutomataVoronoi* self, double
 	centroid[1] *= 0.25;
 }
 
-void CellularAutomataVoronoi_HexCentroid( CellularAutomataVoronoi* self, double** gCrds, Coord centroid ) {
+void CellularAutomataVoronoi_HexCentroid( CellularAutomataVoronoi* self, double** gCrds, double* centroid ) {
 	unsigned	c_i;
 
 	/* Sanity check. */

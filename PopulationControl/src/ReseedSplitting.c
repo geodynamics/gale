@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ReseedSplitting.c 376 2006-10-18 06:58:41Z SteveQuenette $
+** $Id: ReseedSplitting.c 456 2007-04-27 06:21:01Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -172,8 +172,7 @@ void _ReseedSplitting_SplitParticlesInCell( void* reseedSplitting, void* _swarm,
 	Dimension_Index         dim_I;
 	Dimension_Index         dim               = self->dim;
 	double                  regionLength;
-	FiniteElement_Mesh*     mesh              = (FiniteElement_Mesh*)((ElementCellLayout*)swarm->cellLayout)->mesh;
-	ElementLayout*          elementLayout     = mesh->layout->elementLayout;
+	FeMesh*     mesh              = (FeMesh*)((ElementCellLayout*)swarm->cellLayout)->mesh;
 
 	/* Initialise all Bools to false */
 	memset( self->regionContainsParticleTbl, 0, self->regionCount * sizeof(Bool) );
@@ -188,9 +187,9 @@ void _ReseedSplitting_SplitParticlesInCell( void* reseedSplitting, void* _swarm,
 		
 		/* Calculate local coordinates */
 		ElementType_ConvertGlobalCoordToElLocal(
-				FiniteElement_Mesh_ElementTypeAt( mesh, lCell_I ),
-				elementLayout,
-				(const Coord**) swarm->cellPointTbl[lCell_I],
+				FeMesh_GetElementType( mesh, lCell_I ),
+				mesh, 
+				lCell_I, 
 				particle->coord,
 				xi );
 
@@ -216,7 +215,7 @@ void _ReseedSplitting_SplitParticlesInCell( void* reseedSplitting, void* _swarm,
 		}
 
 		/* Convert Local Coordinate to Global Coordinate */
-		FiniteElement_Mesh_CalcGlobalCoordFromLocalCoord( mesh, dim, lCell_I, xi, newCoord );
+		FeMesh_CoordLocalToGlobal( mesh, lCell_I, xi, newCoord );
 			
 		/* Work out particle to split by finding closest particle in this cell */
 		cParticle_I = Swarm_FindClosestParticleInCell( swarm, lCell_I, dim, newCoord, NULL );

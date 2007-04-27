@@ -19,13 +19,9 @@
 			<param name="Type">lucTitle</param>
 			<param name="string">Particle dots - light is red, heavy blue</param>
 		</struct>
-		<struct name="meshView">
-			<param name="Type">lucMeshViewer</param>
-			<param name="Mesh">mesh-linear</param>
-		</struct>
 		<struct name="velocityArrows">
 			<param name="Type">lucVectorArrows</param>
-			<param name="Mesh">mesh-linear</param>
+			<param name="Mesh">linearMesh</param>
 			<param name="VectorVariable">VelocityField</param>
 			<param name="Colour">black</param>
 			<param name="arrowHeadSize">0.15</param>	
@@ -46,7 +42,6 @@
 				<param>title</param>
 				<param>velocityArrows</param>
 				<param>particleDots</param>
-				<param>meshView</param>
 			</list>
 		</struct>
 	</struct>

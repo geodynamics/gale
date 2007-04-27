@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ParticleFeVariable.c 381 2006-11-23 01:41:37Z EinatLev $
+** $Id: ParticleFeVariable.c 456 2007-04-27 06:21:01Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -194,11 +194,11 @@ void _ParticleFeVariable_Construct( void* materialFeVariable, Stg_ComponentFacto
 	ParticleFeVariable*     self            = (ParticleFeVariable*) materialFeVariable;
 	IntegrationPointsSwarm* swarm;
 	FiniteElementContext*   context;
-	FiniteElement_Mesh*     mesh;
+	FeMesh*     mesh;
 
 	swarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm", IntegrationPointsSwarm, True, data );
 	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, True, data );
-	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Mesh", FiniteElement_Mesh, True, data );
+	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Mesh", FeMesh, True, data );
 
 	/* Construct Parent */
 	_FieldVariable_Construct( self, cf, data );
@@ -211,7 +211,7 @@ void _ParticleFeVariable_Build( void* materialFeVariable, void* data ) {
 	ParticleFeVariable* self = (ParticleFeVariable*) materialFeVariable;
 	
 	Stg_Component_Build( self->feMesh, data, False );
-	self->data = Memory_Alloc_Array( double, self->feMesh->nodeDomainCount * self->fieldComponentCount, "data" );
+	self->data = Memory_Alloc_Array( double, FeMesh_GetNodeDomainSize( self->feMesh ) * self->fieldComponentCount, "data" );
 
 	/* Do a Variable_Update() first as well as last, since if we are loading from checkpoint we need
 	to make sure the variable exists to put ICs onto - and we only just allocated it */
@@ -269,7 +269,7 @@ void ParticleFeVariable_Update( void* materialFeVariable ) {
 	ForceVector_Assemble( self->assemblyVector );
 	ForceVector_Assemble( self->massMatrix );
 
-	Vector_PointwiseDivide( self->assemblyVector->vector, self->massMatrix->vector, self->assemblyVector->vector );
+	Vector_PointwiseDivide( self->assemblyVector->vector, self->assemblyVector->vector, self->massMatrix->vector );
 
 	SolutionVector_UpdateSolutionOntoNodes( self->assemblyVector );
 }
@@ -279,9 +279,9 @@ void ParticleFeVariable_AssembleElement( void* _forceTerm, ForceVector* forceVec
 	ForceTerm*                 forceTerm         = (ForceTerm*) _forceTerm;
 	ParticleFeVariable*        self              = Stg_CheckType( forceVector->feVariable, ParticleFeVariable );
 	IntegrationPointsSwarm*    swarm             = (IntegrationPointsSwarm*)forceTerm->integrationSwarm;
-	FiniteElement_Mesh*        mesh              = self->feMesh;
-	Element_NodeIndex          elementNodeCount  = mesh->elementNodeCountTbl[ lElement_I ];
-	ElementType*               elementType       = FeMesh_ElementTypeAt( mesh, lElement_I );
+	FeMesh*        mesh              = self->feMesh;
+	Element_NodeIndex          elementNodeCount  = FeMesh_GetElementNodeSize( mesh, lElement_I );
+	ElementType*               elementType       = FeMesh_GetElementType( mesh, lElement_I );
 	Cell_Index                 cell_I            = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
 	Particle_InCellIndex       cellParticleCount;
 	Particle_InCellIndex       cParticle_I;
@@ -315,9 +315,9 @@ void ParticleFeVariable_AssembleElementShapeFunc( void* _forceTerm, ForceVector*
 	ForceTerm*                 forceTerm         = (ForceTerm*) _forceTerm;
 	ParticleFeVariable*        self              = Stg_CheckType( forceVector->feVariable, ParticleFeVariable );
 	Swarm*                     swarm             = forceTerm->integrationSwarm;
-	FiniteElement_Mesh*        mesh              = self->feMesh;
-	Element_NodeIndex          elementNodeCount  = mesh->elementNodeCountTbl[ lElement_I ];
-	ElementType*               elementType       = FeMesh_ElementTypeAt( mesh, lElement_I );
+	FeMesh*        mesh              = self->feMesh;
+	Element_NodeIndex          elementNodeCount  = FeMesh_GetElementNodeSize( mesh, lElement_I );
+	ElementType*               elementType       = FeMesh_GetElementType( mesh, lElement_I );
 	Cell_Index                 cell_I            = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
 	Particle_InCellIndex       cellParticleCount;
 	Particle_InCellIndex       cParticle_I;

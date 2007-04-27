@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: IntegrationPointsSwarm.c 436 2007-03-05 06:11:35Z KathleenHumble $
+** $Id: IntegrationPointsSwarm.c 456 2007-04-27 06:21:01Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -69,7 +69,7 @@ IntegrationPointsSwarm* IntegrationPointsSwarm_New(
 		SizeT                                 particleSize,
 		Particle_InCellIndex                  cellParticleTblDelta,
 		double                                extraParticlesFactor,
-		FiniteElement_Mesh*                   mesh,
+		FeMesh*                   	      mesh,
 		TimeIntegrator*                       timeIntegrator,
 		WeightsCalculator*                    weights,
 		IntegrationPointMapper*               mapper,
@@ -167,7 +167,7 @@ IntegrationPointsSwarm* _IntegrationPointsSwarm_New(
 		SizeT                                           particleSize,
 		Particle_InCellIndex                            cellParticleTblDelta,
 		double                                          extraParticlesFactor,
-		FiniteElement_Mesh*                             mesh, 
+		FeMesh*     		                        mesh, 
 		TimeIntegrator*                                 timeIntegrator,
 		WeightsCalculator*                              weights,
 		IntegrationPointMapper*                         mapper,
@@ -222,7 +222,7 @@ IntegrationPointsSwarm* _IntegrationPointsSwarm_New(
 
 void _IntegrationPointsSwarm_Construct( void* integrationPoints, Stg_ComponentFactory* cf, void* data ) {
 	IntegrationPointsSwarm*	        self          = (IntegrationPointsSwarm*) integrationPoints;
-	FiniteElement_Mesh*             mesh;
+	FeMesh*             		mesh;
 	TimeIntegrator*                 timeIntegrator;
 	WeightsCalculator*              weights;
 	IntegrationPointMapper*         mapper;
@@ -232,7 +232,7 @@ void _IntegrationPointsSwarm_Construct( void* integrationPoints, Stg_ComponentFa
 	/* This will also call _Swarm_Init */
 	_Swarm_Construct( self, cf, data );
 
-	mesh           = Stg_ComponentFactory_ConstructByKey( cf, self->name, "FiniteElement_Mesh", FiniteElement_Mesh, True, data );
+	mesh           = Stg_ComponentFactory_ConstructByKey( cf, self->name, "FeMesh", FeMesh, True, data );
 	timeIntegrator = Stg_ComponentFactory_ConstructByKey( cf, self->name, "TimeIntegrator", TimeIntegrator, True, data );
 	weights        = Stg_ComponentFactory_ConstructByKey( cf, self->name, "WeightsCalculator", WeightsCalculator, False, data );
 	mapper         = Stg_ComponentFactory_ConstructByKey( cf, self->name, "IntegrationPointMapper", IntegrationPointMapper, True, data );
@@ -258,7 +258,7 @@ void _IntegrationPointsSwarm_Construct( void* integrationPoints, Stg_ComponentFa
 
 void _IntegrationPointsSwarm_Init( 
 		void*                                 swarm,
-		FiniteElement_Mesh*                   mesh, 
+		FeMesh*                   mesh, 
 		TimeIntegrator*                       timeIntegrator,
 		WeightsCalculator*                    weights,
 		IntegrationPointMapper*               mapper,
@@ -342,7 +342,7 @@ void* _IntegrationPointsSwarm_Copy( void* integrationPoints, void* dest, Bool de
 	
 	newIntegrationPointsSwarm = (IntegrationPointsSwarm*)_Swarm_Copy( self, dest, deep, nameExt, ptrMap );
 
-	newIntegrationPointsSwarm->mesh = (FiniteElement_Mesh*)Stg_Class_Copy(
+	newIntegrationPointsSwarm->mesh = (FeMesh*)Stg_Class_Copy(
 				self->mesh,
 				NULL,
 				deep,

@@ -38,7 +38,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 277 2006-04-11 11:28:01Z PatrickSunter $
+## $Id: makefile 456 2007-04-27 06:21:01Z LukeHodkinson $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -48,6 +48,6 @@ PROJ_ROOT := $(shell until test -r ./Makefile.system ; do cd .. ; done ; echo `p
 include ${PROJ_ROOT}/Makefile.system
 
 # Subdirectories
-subdirs := src tests
+subdirs := src
 
 include ${PROJ_ROOT}/Makefile.vmake

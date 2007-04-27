@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: MaterialFeVariable.c 376 2006-10-18 06:58:41Z SteveQuenette $
+** $Id: MaterialFeVariable.c 456 2007-04-27 06:21:01Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -110,33 +110,11 @@ MaterialFeVariable* _MaterialFeVariable_New(
 
 void _MaterialFeVariable_Init( MaterialFeVariable* self, Material* material ) {
 	IntegrationPointsSwarm* swarm;
-	Name tmpName;
-	Variable_Register* variable_Register = NULL;
 
 	/* Assign Pointers */
 	swarm = Stg_CheckType( self->assemblyTerm->integrationSwarm, IntegrationPointsSwarm );
 	self->picIntegrationPoints = swarm;
 	self->material       = material;
-
-	/* Create Dof Layout */
-	if ( swarm->swarmVariable_Register )
-		variable_Register = swarm->swarmVariable_Register->variable_Register;
-
-	tmpName = Stg_Object_AppendSuffix( self, "DataVariable" );
-	self->dataVariable = Variable_NewScalar( 	
-			tmpName,
-			Variable_DataType_Double, 
-			&self->feMesh->nodeDomainCount, 
-			(void**)&self->data, 
-			variable_Register );
-	Memory_Free( tmpName );
-	self->fieldComponentCount = 1;
-	
-	tmpName = Stg_Object_AppendSuffix( self, "DofLayout" );
-	self->dofLayout = DofLayout_New( tmpName, variable_Register, self->feMesh->layout->decomp->nodeDomainCount );
-	DofLayout_AddAllFromVariableArray( self->dofLayout, 1, &self->dataVariable );
-	Memory_Free( tmpName );
-	self->eqNum->dofLayout = self->dofLayout;
 }
 
 /* --- Virtual Function Implementations --- */
@@ -211,6 +189,32 @@ void _MaterialFeVariable_Construct( void* materialFeVariable, Stg_ComponentFacto
 
 void _MaterialFeVariable_Build( void* materialFeVariable, void* data ) {
 	MaterialFeVariable* self = (MaterialFeVariable*) materialFeVariable;
+	IntegrationPointsSwarm* swarm;
+	Name tmpName;
+	Variable_Register* variable_Register = NULL;
+
+	Build( self->feMesh, data, False );
+
+	/* Create Dof Layout */
+	swarm = self->picIntegrationPoints;
+	if ( swarm->swarmVariable_Register )
+		variable_Register = swarm->swarmVariable_Register->variable_Register;
+
+	tmpName = Stg_Object_AppendSuffix( self, "DataVariable" );
+	self->dataVariable = Variable_NewScalar( 
+			tmpName,
+			Variable_DataType_Double, 
+			&self->feMesh->topo->domains[MT_VERTEX]->nDomains, 
+			(void**)&self->data, 
+			variable_Register );
+	Memory_Free( tmpName );
+	self->fieldComponentCount = 1;
+	
+	tmpName = Stg_Object_AppendSuffix( self, "DofLayout" );
+	self->dofLayout = DofLayout_New( tmpName, variable_Register, self->feMesh->topo->domains[MT_VERTEX]->nDomains, NULL );
+	DofLayout_AddAllFromVariableArray( self->dofLayout, 1, &self->dataVariable );
+	Memory_Free( tmpName );
+	self->eqNum->dofLayout = self->dofLayout;
 	
 	_ParticleFeVariable_Build( self, data );
 }

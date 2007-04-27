@@ -625,8 +625,8 @@ void _DVCWeights_ConstructGrid2D(struct cell2d **cell_list, int m, int l,
 double _DVCWeights_DistanceSquared(double x0, double y0, double z0, double x1, double y1, double z1){
 	double  position0[3], position1[3], vectorDistance[3];
 	double  dist;
-	Vector_SetScalar( position0, x0, y0, z0 );	
-	Vector_SetScalar( position1, x1, y1, z1 );
+	Vec_SetScalar3D( position0, x0, y0, z0 );	
+	Vec_SetScalar3D( position1, x1, y1, z1 );
 	StGermain_VectorSubtraction( vectorDistance, position0, position1, 3 ) ;
 	dist = StGermain_VectorDotProduct(vectorDistance, vectorDistance, 3);
 	return dist;
@@ -636,8 +636,8 @@ double _DVCWeights_DistanceSquared(double x0, double y0, double z0, double x1, d
 double _DVCWeights_DistanceSquared2D(double x0, double y0,double x1, double y1){
 	double  position0[2], position1[2], vectorDistance[2];
 	double dist;
-	Vector_SetScalar2D( position0, x0, y0);	
-	Vector_SetScalar2D( position1, x1, y1);
+	Vec_SetScalar2D( position0, x0, y0);	
+	Vec_SetScalar2D( position1, x1, y1);
 	StGermain_VectorSubtraction( vectorDistance, position0, position1, 2 ) ;
 	dist = StGermain_VectorDotProduct(vectorDistance, vectorDistance, 2);
 	return dist;

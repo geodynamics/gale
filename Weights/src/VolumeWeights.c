@@ -41,7 +41,7 @@ const Type VolumeWeights_Type = "VolumeWeights";
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Constructors
 */
-VolumeWeights* VolumeWeights_New( Name name, Dimension_Index dim, Stg_Shape* shape, FiniteElement_Mesh* mesh ) {
+VolumeWeights* VolumeWeights_New( Name name, Dimension_Index dim, Stg_Shape* shape, FeMesh* mesh ) {
 	VolumeWeights* self = (VolumeWeights*) _VolumeWeights_DefaultNew( name );
 
 	VolumeWeights_InitAll( self, dim, shape, mesh );
@@ -91,7 +91,7 @@ VolumeWeights* _VolumeWeights_New(
 	return self;
 }
 
-void _VolumeWeights_Init( void* weights, Stg_Shape* shape, FiniteElement_Mesh* mesh ) {
+void _VolumeWeights_Init( void* weights, Stg_Shape* shape, FeMesh* mesh ) {
 	VolumeWeights* self = (VolumeWeights*)weights;
 	
 	self->isConstructed = True;
@@ -100,7 +100,7 @@ void _VolumeWeights_Init( void* weights, Stg_Shape* shape, FiniteElement_Mesh* m
 	self->mesh  = mesh;
 
 }
-void VolumeWeights_InitAll( void* weights, Dimension_Index dim, Stg_Shape* shape, FiniteElement_Mesh* mesh ) {
+void VolumeWeights_InitAll( void* weights, Dimension_Index dim, Stg_Shape* shape, FeMesh* mesh ) {
 	VolumeWeights* self = (VolumeWeights*)weights;
 
 	WeightsCalculator_InitAll( self, dim );
@@ -158,12 +158,12 @@ void* _VolumeWeights_DefaultNew( Name name ) {
 void _VolumeWeights_Construct( void* weights, Stg_ComponentFactory* cf, void* data ) {
 	VolumeWeights*	     self          = (VolumeWeights*) weights;
 	Stg_Shape*           shape;
-	FiniteElement_Mesh*  mesh;
+	FeMesh*  mesh;
 
 	_WeightsCalculator_Construct( self, cf, data );
 
 	shape = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Shape", Stg_Shape, True, data );
-	mesh  = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Mesh", FiniteElement_Mesh, True, data );
+	mesh  = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Mesh", FeMesh, True, data );
 /*
 	Journal_Firewall(
 			Stg_Class_IsInstance( shape, Sphere_Type ),
@@ -208,7 +208,7 @@ void _VolumeWeights_Calculate( void* weights, void* _swarm, Cell_LocalIndex lCel
 	double                       dy;
 	double                       dz;
 	double                       weight;
-	IJK                          size; /* mesh resolution */
+	Grid*				vertGrid;
 	
 	MPI_Allreduce( 
 		&(swarm->particleLocalCount),
@@ -220,12 +220,16 @@ void _VolumeWeights_Calculate( void* weights, void* _swarm, Cell_LocalIndex lCel
 
 	volume = Stg_Shape_CalculateVolume( shape );
 
-	memcpy(&size, &(((IJKTopology*)self->mesh->layout->nodeLayout->topology)->size), sizeof(IJK) );
+	/*
+	** NOTE: Big assumption that the mesh is regular.
+	*/
+	vertGrid = *(Grid**)ExtensionManager_Get( self->mesh->info, self->mesh, 
+						  ExtensionManager_GetHandle( self->mesh->info, "vertexGrid" ) );
 	
-	dx = 1.0 / (double)(size[0] - 1); /* size of an element */
-	dy = 1.0 / (double)(size[1] - 1);
+	dx = 1.0 / (double)(vertGrid->sizes[0] - 1); /* size of an element */
+	dy = 1.0 / (double)(vertGrid->sizes[1] - 1);
 	if ( self->dim > 2 ) {
-		dz = 1.0 / (double)(size[2] - 1);
+		dz = 1.0 / (double)(vertGrid->sizes[2] - 1);
 	}
 	else {
 		dz = 1.0;

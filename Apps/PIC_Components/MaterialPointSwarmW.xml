@@ -7,7 +7,7 @@
 	<struct name="components" mergeType="merge">
 		<struct name="elementCellLayout">
 			<param name="Type">ElementCellLayout</param>
-			<param name="Mesh">mesh-linear</param>
+			<param name="Mesh">elementMesh</param>
 		</struct>
 		<struct name="discreteVoronoi">
 			<param name="Type">CellularAutomataVoronoi</param>
@@ -35,7 +35,7 @@
 			<param name="Type">IntegrationPointsSwarm</param>
 			<param name="CellLayout">elementCellLayout</param>
 			<param name="ParticleLayout">localLayout</param>
-			<param name="FiniteElement_Mesh">mesh-linear</param>
+			<param name="FeMesh">elementMesh</param>
 			<param name="WeightsCalculator">weights</param>
 			<param name="TimeIntegrator">timeIntegrator</param>
 			<param name="IntegrationPointMapper">mapper</param>
@@ -53,7 +53,7 @@
 			<param name="Type">MaterialPointsSwarm</param>
 			<param name="CellLayout">elementCellLayout</param>
 			<param name="ParticleLayout">materialSwarmParticleLayout</param>
-			<param name="FiniteElement_Mesh">mesh-linear</param>
+			<param name="FeMesh">elementMesh</param>
 
 			<!-- These guys may or may not be created -->
 			<param name="SplittingRoutine">splittingRoutine</param>

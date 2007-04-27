@@ -46,7 +46,7 @@
 **
 ** Comments:
 **
-** $Id: CellularAutomataVoronoi.h 374 2006-10-12 08:59:41Z SteveQuenette $
+** $Id: CellularAutomataVoronoi.h 456 2007-04-27 06:21:01Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -168,7 +168,7 @@ void _CellularAutomataVoronoi_Construct( void* cellularAutomataVoronoi, Stg_Comp
 	void CellularAutomataVoronoi_CalcSubCells2D( CellularAutomataVoronoi* self, Swarm* swarm, unsigned cellInd );
 	void CellularAutomataVoronoi_CalcSubCells3D( CellularAutomataVoronoi* self, Swarm* swarm, unsigned cellInd );
 	double CellularAutomataVoronoi_QuadArea( CellularAutomataVoronoi* self, double** gCrds );
-	void CellularAutomataVoronoi_QuadCentroid( CellularAutomataVoronoi* self, double** gCrds, Coord centroid );
-	void CellularAutomataVoronoi_HexCentroid( CellularAutomataVoronoi* self, double** gCrds, Coord centroid );
+	void CellularAutomataVoronoi_QuadCentroid( CellularAutomataVoronoi* self, double** gCrds, double* centroid );
+	void CellularAutomataVoronoi_HexCentroid( CellularAutomataVoronoi* self, double** gCrds, double* centroid );
 	
 #endif 

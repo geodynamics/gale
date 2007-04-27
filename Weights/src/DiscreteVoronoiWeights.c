@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: DiscreteVoronoiWeights.c 376 2006-10-18 06:58:41Z SteveQuenette $
+** $Id: DiscreteVoronoiWeights.c 456 2007-04-27 06:21:01Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -165,7 +165,7 @@ void _DiscreteVoronoiWeights_Initialise( void* discreteVoronoiWeights, void* dat
 void _DiscreteVoronoiWeights_Calculate( void* discreteVoronoiWeights, void* _swarm, Cell_LocalIndex lCell_I ) {
 	DiscreteVoronoiWeights*     self            = (DiscreteVoronoiWeights*)  discreteVoronoiWeights;
 	Swarm*                      swarm           = (Swarm*) _swarm;
-	FiniteElement_Mesh*         feMesh          = (FiniteElement_Mesh*)((ElementCellLayout*)swarm->cellLayout)->mesh;
+	FeMesh*         feMesh          = (FeMesh*)((ElementCellLayout*)swarm->cellLayout)->mesh;
 	Voronoi_CellIndex           claimedVoronoiCellsCount;
 	Voronoi_CellIndex           voronoiCell_I;
 	ElementType*                elementType;
@@ -184,7 +184,7 @@ void _DiscreteVoronoiWeights_Calculate( void* discreteVoronoiWeights, void* _swa
 	}
 
 	WeightsCalculator_ZeroWeightsInCell( self, swarm, lCell_I );
-	elementType    = FeMesh_ElementTypeAt( feMesh, lCell_I );
+	elementType    = FeMesh_GetElementType( feMesh, lCell_I );
 
 	/* Do Discrete Voronoi for this Cell */
 	DiscreteVoronoi_CalculateForCell( self->discreteVoronoi, swarm, lCell_I );

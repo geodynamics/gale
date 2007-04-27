@@ -47,7 +47,7 @@
 **
 ** Comments:
 **
-** $Id: types.h 420 2007-02-09 05:09:54Z RobertTurnbull $
+** $Id: types.h 456 2007-04-27 06:21:01Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -57,6 +57,6 @@
 	typedef struct MaterialSwarmVariable            MaterialSwarmVariable;
 	typedef struct BuoyancyForceTerm                BuoyancyForceTerm;
 	typedef struct BuoyancyForceTermThermoChem      BuoyancyForceTermThermoChem;
-        typedef struct PCDVC                        PCDVC;
+        typedef struct PCDVC                        	PCDVC;
 
 #endif 

@@ -47,7 +47,7 @@
 **
 ** Comments:
 **
-** $Id: PeriodicBoundariesManager.h 374 2006-10-12 08:59:41Z SteveQuenette $
+** $Id: PeriodicBoundariesManager.h 456 2007-04-27 06:21:01Z LukeHodkinson $
 *
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -69,7 +69,7 @@
 		__Stg_Component \
 		\
 		Dictionary*		dictionary; \
-		BlockGeometry*          geometry; \
+		Mesh*			mesh; \
 		Index			count; \
 		Index			size; \
 		Index			delta; \
@@ -83,7 +83,7 @@
 
 	PeriodicBoundariesManager* PeriodicBoundariesManager_New( 
 		Name                    			name,
-		BlockGeometry*                                  geometry,
+		Mesh*						mesh, 
 		Swarm*                                          swarm,
 		Dictionary*					dictionary );
 
@@ -101,13 +101,13 @@
 		Stg_Component_DestroyFunction*         _destroy,
 		Name                                   name,
 		Bool                                   initFlag,
-		BlockGeometry*                         geometry,
+		Mesh*				       mesh, 
 		Swarm*                                 swarm,
 		Dictionary*                            dictionary );
 
 	void _PeriodicBoundariesManager_Init(
 		void*             periodicBCsManager,
-		BlockGeometry*    geometry,
+		Mesh*		  mesh, 
 		Swarm*            swarm,
 		Dictionary*       dictionary );
 		

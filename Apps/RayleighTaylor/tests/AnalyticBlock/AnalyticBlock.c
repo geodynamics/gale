@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AnalyticBlock.c 376 2006-10-18 06:58:41Z SteveQuenette $
+** $Id: AnalyticBlock.c 456 2007-04-27 06:21:01Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -55,6 +55,8 @@ const Type AnalyticBlock_Type = "AnalyticBlock";
 
 typedef struct {
 	__AnalyticSolution
+	FeVariable* velocityField;
+	FeVariable* pressureField;
 	double startBlockX;
 	double endBlockX;
 	double startBlockY;
@@ -1719,24 +1721,31 @@ void _AnalyticBlock_PressureFunction( void* analyticSolution, FeVariable* analyt
 
 void _AnalyticBlock_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	AnalyticBlock*           self           = (AnalyticBlock*)analyticSolution;
-	FeVariable*              velocityField;
-	FeVariable*              pressureField;
 
 	/* Construct Parent */
 	_AnalyticSolution_Construct( self, cf, data );
 
 	/* Create Analytic Fields */
-	velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data ); 
-	AnalyticSolution_CreateAnalyticField( self, velocityField, _AnalyticBlock_VelocityFunction );
-
-	pressureField = Stg_ComponentFactory_ConstructByName( cf, "PressureField", FeVariable, True, data ); 
-	AnalyticSolution_CreateAnalyticField( self, pressureField, _AnalyticBlock_PressureFunction );
+	self->velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data ); 
+	self->pressureField = Stg_ComponentFactory_ConstructByName( cf, "PressureField", FeVariable, True, data ); 
 
 	self->startBlockX = Stg_ComponentFactory_GetRootDictDouble( cf, "startBlockX", 0.0 );
 	self->endBlockX = Stg_ComponentFactory_GetRootDictDouble( cf, "endBlockX", 0.0 );
 	self->startBlockY = Stg_ComponentFactory_GetRootDictDouble( cf, "startBlockY", 0.0 );
 }
 
+void _AnalyticBlock_Build( void* analyticSolution, void* data ) {
+	AnalyticBlock*	self = (AnalyticBlock*)analyticSolution;
+
+	assert( self && Stg_CheckType( self, AnalyticBlock ) );
+
+	Build( self->velocityField, data, False );
+	Build( self->pressureField, data, False );
+	AnalyticSolution_CreateAnalyticField( self, self->velocityField, _AnalyticBlock_VelocityFunction );
+	AnalyticSolution_CreateAnalyticField( self, self->pressureField, _AnalyticBlock_PressureFunction );
+
+	_AnalyticSolution_Build( self, data );
+}
 
 void* _AnalyticBlock_DefaultNew( Name name ) {
 	return _AnalyticSolution_New(
@@ -1747,7 +1756,7 @@ void* _AnalyticBlock_DefaultNew( Name name ) {
 			_AnalyticSolution_Copy,
 			_AnalyticBlock_DefaultNew,
 			_AnalyticBlock_Construct,
-			_AnalyticSolution_Build,
+			_AnalyticBlock_Build,
 			_AnalyticSolution_Initialise,
 			_AnalyticSolution_Execute,
 			_AnalyticSolution_Destroy,

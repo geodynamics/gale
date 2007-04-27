@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AnalyticPressure.c 376 2006-10-18 06:58:41Z SteveQuenette $
+** $Id: AnalyticPressure.c 456 2007-04-27 06:21:01Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -53,6 +53,7 @@ const Type AnalyticPressure_Type = "AnalyticPressure";
 
 typedef struct {
 	__AnalyticSolution
+	FeVariable*		pressureField;
 	double                  density;
 	double                  gravity;
 	double                  maxY;
@@ -74,19 +75,28 @@ void _AnalyticPressure_PressureFunction( void* analyticSolution, FeVariable* ana
 	
 void _AnalyticPressure_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	AnalyticPressure*        self           = (AnalyticPressure*)analyticSolution;
-	FeVariable*              pressureField;
 
 	/* Construct Parent */
 	_AnalyticSolution_Construct( self, cf, data );
 
 	/* Create Analytic Fields */
-	pressureField = Stg_ComponentFactory_ConstructByName( cf, "PressureField", FeVariable, True, data ); 
-	AnalyticSolution_CreateAnalyticField( self, pressureField, _AnalyticPressure_PressureFunction );
+	self->pressureField = Stg_ComponentFactory_ConstructByName( cf, "PressureField", FeVariable, True, data ); 
 	
 	self->density  = Stg_ComponentFactory_GetDouble( cf, "layer", "density", 0.0 );
 	self->gravity  = Stg_ComponentFactory_GetRootDictDouble( cf, "gravity", 0 );
 	self->maxY     = Stg_ComponentFactory_GetRootDictDouble( cf, "maxY", 0 );
 	self->minY     = Stg_ComponentFactory_GetRootDictDouble( cf, "minY", 0 );
+}
+
+void _AnalyticPressure_Build( void* analyticSolution, void* data ) {
+	AnalyticPressure*	self = (AnalyticPressure*)analyticSolution;
+
+	assert( self && Stg_CheckType( self, AnalyticPressure ) );
+
+	Build( self->pressureField, data, False );
+	AnalyticSolution_CreateAnalyticField( self, self->pressureField, _AnalyticPressure_PressureFunction );
+
+	_AnalyticSolution_Build( self, data );
 }
 
 void* _AnalyticPressure_DefaultNew( Name name ) {
@@ -98,7 +108,7 @@ void* _AnalyticPressure_DefaultNew( Name name ) {
 			_AnalyticSolution_Copy,
 			_AnalyticPressure_DefaultNew,
 			_AnalyticPressure_Construct,
-			_AnalyticSolution_Build,
+			_AnalyticPressure_Build,
 			_AnalyticSolution_Initialise,
 			_AnalyticSolution_Execute,
 			_AnalyticSolution_Destroy,

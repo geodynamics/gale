@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AnalyticColumn.c 376 2006-10-18 06:58:41Z SteveQuenette $
+** $Id: AnalyticColumn.c 456 2007-04-27 06:21:01Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -55,6 +55,8 @@ const Type AnalyticColumn_Type = "AnalyticColumn";
 
 typedef struct {
 	__AnalyticSolution
+	FeVariable*		velocityField;
+	FeVariable*		pressureField;
 	Dimension_Index         dim;
 	double                  sigma;
 	double                  viscosity;
@@ -293,18 +295,13 @@ void _AnalyticColumn_PressureFunction( void* analyticSolution, FeVariable* analy
 	
 void _AnalyticColumn_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	AnalyticColumn*          self           = (AnalyticColumn*)analyticSolution;
-	FeVariable*              velocityField;
-	FeVariable*              pressureField;
 
 	/* Construct Parent */
 	_AnalyticSolution_Construct( self, cf, data );
 
 	/* Create Analytic Fields */
-	velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data ); 
-	AnalyticSolution_CreateAnalyticField( self, velocityField, _AnalyticColumn_VelocityFunction );
-
-	pressureField = Stg_ComponentFactory_ConstructByName( cf, "PressureField", FeVariable, True, data ); 
-	AnalyticSolution_CreateAnalyticField( self, pressureField, _AnalyticColumn_PressureFunction );
+	self->velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data ); 
+	self->pressureField = Stg_ComponentFactory_ConstructByName( cf, "PressureField", FeVariable, True, data ); 
 
 	self->dim          = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
 	self->startColumnX = Stg_ComponentFactory_GetRootDictDouble( cf, "startColumnX", 0.0 );
@@ -313,6 +310,19 @@ void _AnalyticColumn_Construct( void* analyticSolution, Stg_ComponentFactory* cf
 	self->endColumnZ   = Stg_ComponentFactory_GetRootDictDouble( cf, "endColumnZ", 0.0 );
 	self->viscosity    = Stg_ComponentFactory_GetRootDictDouble( cf, "viscosity", 1.0 );
 	self->sigma        = Stg_ComponentFactory_GetRootDictDouble( cf, "sigma", 1.0 );
+}
+
+void _AnalyticColumn_Build( void* analyticSolution, void* data ) {
+	AnalyticColumn*	self = (AnalyticColumn*)analyticSolution;
+
+	assert( self && Stg_CheckType( self, AnalyticColumn ) );
+
+	Build( self->velocityField, data, False );
+	Build( self->pressureField, data, False );
+	AnalyticSolution_CreateAnalyticField( self, self->velocityField, _AnalyticColumn_VelocityFunction );
+	AnalyticSolution_CreateAnalyticField( self, self->pressureField, _AnalyticColumn_PressureFunction );
+
+	_AnalyticSolution_Build( self, data );
 }
 
 void* _AnalyticColumn_DefaultNew( Name name ) {
@@ -324,7 +334,7 @@ void* _AnalyticColumn_DefaultNew( Name name ) {
 			_AnalyticSolution_Copy,
 			_AnalyticColumn_DefaultNew,
 			_AnalyticColumn_Construct,
-			_AnalyticSolution_Build,
+			_AnalyticColumn_Build,
 			_AnalyticSolution_Initialise,
 			_AnalyticSolution_Execute,
 			_AnalyticSolution_Destroy,

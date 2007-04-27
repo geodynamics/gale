@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: WeightsCalculator.c 374 2006-10-12 08:59:41Z SteveQuenette $
+** $Id: WeightsCalculator.c 456 2007-04-27 06:21:01Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -160,19 +160,19 @@ void _WeightsCalculator_Construct( void* weightsCalculator, Stg_ComponentFactory
 }
 
 void _WeightsCalculator_Build( void* weightsCalculator, void* data ) {
-	//WeightsCalculator*	self = (WeightsCalculator*)weightsCalculator;
+/* 	WeightsCalculator*	self = (WeightsCalculator*)weightsCalculator; */
 
 }
 void _WeightsCalculator_Initialise( void* weightsCalculator, void* data ) {
-	//WeightsCalculator*	self = (WeightsCalculator*)weightsCalculator;
+/* 	WeightsCalculator*	self = (WeightsCalculator*)weightsCalculator; */
 	
 }
 void _WeightsCalculator_Execute( void* weightsCalculator, void* data ) {
-//	WeightsCalculator*	self = (WeightsCalculator*)weightsCalculator;
+/* 	WeightsCalculator*	self = (WeightsCalculator*)weightsCalculator; */
 	
 }
 void _WeightsCalculator_Destroy( void* weightsCalculator, void* data ) {
-	//WeightsCalculator*	self = (WeightsCalculator*)weightsCalculator;
+/* 	WeightsCalculator*	self = (WeightsCalculator*)weightsCalculator; */
 	
 }
 
@@ -223,7 +223,7 @@ void WeightsCalculator_CalculateAll( void* weightsCalculator, void* _swarm ) {
 	for ( lCell_I = 0 ; lCell_I < cellLocalCount ; lCell_I++ ) {
 /*		WeightsCalculator_CheckEmptyCell( self, swarm, lCell_I );*/
 		WeightsCalculator_CalculateCell( self, swarm, lCell_I );
-		// TODO: parallelise
+/* 		 TODO: parallelise */
 
 		if ( (lCell_I+1) >= nextCompletedCellCountToPrint ) {
 			nextPlusOneCompletedCellCountToPrint = ceil(( cellLocalCount

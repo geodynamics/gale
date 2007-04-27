@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Materials_Register.c 376 2006-10-18 06:58:41Z SteveQuenette $
+** $Id: Materials_Register.c 456 2007-04-27 06:21:01Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -99,7 +99,7 @@ void Materials_Register_SetupSwarm( void* materialRegister, MaterialPointsSwarm*
 	assert( swarm != NULL );
 
 	_Materials_Register_LayoutGeometry( self, swarm );
-	//Materials_Register_SetupParticleToMaterialMappings( self, swarm );
+/* 	Materials_Register_SetupParticleToMaterialMappings( self, swarm ); */
 	Materials_Register_AssignParticleProperties( self, swarm, swarm->swarmVariable_Register->variable_Register );
 }
 
@@ -189,8 +189,8 @@ void Materials_Register_AssignParticleProperties(
 
 		
 		if ( /*(swarm->myRank == 0) && */ ((lParticle_I+1) >= nextCompletedParticleCountToPrint ) ) {
-			// TODO: parallelise : non-master CPUs send a non-blocking update to the master to report
-			// status. Master does blocking receive on all updates before printing
+/* 			 TODO: parallelise : non-master CPUs send a non-blocking update to the master to report */
+/* 			 status. Master does blocking receive on all updates before printing */
 
 			/* Special case for really small swarms, or really small increments - may cross more than one
 				at once */

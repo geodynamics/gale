@@ -219,6 +219,7 @@ void _PCDVC_Construct( void* pcdvc, Stg_ComponentFactory* cf, void *data ) {
 	Stream*  stream = Journal_Register( Info_Type, materialPointsSwarm->type );
 	
 
+	stream = Journal_Register( Info_Type, materialPointsSwarm->type );
 	upT = Stg_ComponentFactory_GetDouble( cf, self->name, "upperT", 25 );
 	lowT = Stg_ComponentFactory_GetDouble( cf, self->name, "lowerT", 0.6 );
 	maxD = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "maxDeletions", 2);
@@ -511,7 +512,7 @@ void splitIntParticleByIndexWithinCell( IntegrationPointsSwarm*  intSwarm, Mater
       Coord                   newCoord;
 //      Coord                   xi;
 
-      FiniteElement_Mesh*     mesh              = (FiniteElement_Mesh*)((ElementCellLayout*)matSwarm->cellLayout)->mesh;
+      FeMesh*     mesh              = (FeMesh*)((ElementCellLayout*)matSwarm->cellLayout)->mesh;
 
 	      
       //intParticleToSplit_IndexWithinCell = maxI;
@@ -541,7 +542,7 @@ void splitIntParticleByIndexWithinCell( IntegrationPointsSwarm*  intSwarm, Mater
       memcpy( intNewParticle->xi, xi, sizeof(Coord) );
 	      
       /* Get new Global Coordinates from the Local Coordinates */
-      FiniteElement_Mesh_CalcGlobalCoordFromLocalCoord( mesh, matSwarm->dim, lCell_I, xi, newCoord );
+      FeMesh_CoordLocalToGlobal( mesh, lCell_I, xi, newCoord );
 
       /* Copy new global position to coord on new mat particle */
       memcpy( matNewParticle->coord, newCoord, sizeof(Coord) );
@@ -577,7 +578,7 @@ void splitIntParticleByIndexOnCPU( IntegrationPointsSwarm*  intSwarm, MaterialPo
 
       Cell_LocalIndex lCell_I;
 
-      FiniteElement_Mesh*     mesh              = (FiniteElement_Mesh*)((ElementCellLayout*)matSwarm->cellLayout)->mesh;
+      FeMesh*     mesh              = (FeMesh*)((ElementCellLayout*)matSwarm->cellLayout)->mesh;
 
 	      
       //intParticleToSplit_IndexWithinCell = maxI;
@@ -616,7 +617,7 @@ void splitIntParticleByIndexOnCPU( IntegrationPointsSwarm*  intSwarm, MaterialPo
       memcpy( intNewParticle->xi, xi, sizeof(Coord) );
 	      
       /* Get new Global Coordinates from the Local Coordinates */
-      FiniteElement_Mesh_CalcGlobalCoordFromLocalCoord( mesh, matSwarm->dim, lCell_I, xi, newCoord );
+      FeMesh_CoordLocalToGlobal( mesh, lCell_I, xi, newCoord );
 
       /* Copy new global position to coord on new mat particle */
       memcpy( matNewParticle->coord, newCoord, sizeof(Coord) );

@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testAdvection.c 376 2006-10-18 06:58:41Z SteveQuenette $
+** $Id: testAdvection.c 456 2007-04-27 06:21:01Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -117,8 +117,8 @@ void check( PICelleratorContext* context ) {
 		currentRadius  = StGermain_VectorMagnitude( coord, 2 );
 		originalRadius = StGermain_VectorMagnitude( originalCoord, 2 );
 		
-		//if ( originalRadius >= 1.0 || currentRadius >= 1.0 )
-		//	continue;
+		/* if ( originalRadius >= 1.0 || currentRadius >= 1.0 ) */
+		/* 	continue; */
 
 		originalTheta = acos( originalCoord[ I_AXIS ]/originalRadius );
 		if ( originalCoord[ J_AXIS ] < 0.0 )

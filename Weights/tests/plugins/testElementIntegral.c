@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testElementIntegral.c 445 2007-03-22 01:04:29Z KathleenHumble $
+** $Id: testElementIntegral.c 456 2007-04-27 06:21:01Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -148,7 +148,7 @@ void testElementIntegral_CompareAgainstReferenceSolution(DiscretisationContext* 
 void PICellerator_testElementIntegral( DiscretisationContext* context ) {
 	Swarm*              integrationSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "swarm" );
 	Swarm*              materialSwarm    = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "picIntegrationPoints" );
-	FiniteElement_Mesh* mesh             = (FiniteElement_Mesh*) LiveComponentRegister_Get( context->CF->LCRegister, "mesh-linear" );
+	FeMesh* mesh             = (FeMesh*) LiveComponentRegister_Get( context->CF->LCRegister, "mesh-linear" );
 	WeightsCalculator*  weights          = (WeightsCalculator*) LiveComponentRegister_Get( context->CF->LCRegister, "weights" );
 	FeVariable*         feVariable;
 	Element_LocalIndex  lElement_I       = 0;
