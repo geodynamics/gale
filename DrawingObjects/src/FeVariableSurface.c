@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: FeVariableSurface.c 631 2006-10-18 06:20:15Z SteveQuenette $
+** $Id: FeVariableSurface.c 686 2007-04-27 06:24:08Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -222,12 +222,12 @@ void _lucFeVariableSurface_CleanUp( void* drawingObject, void* _context ) {
 void _lucFeVariableSurface_BuildDisplayList( void* drawingObject, void* _context ) {
 	lucFeVariableSurface*          self               = (lucFeVariableSurface*)drawingObject;
 	FeVariable*                    feVariable         = (FeVariable*) self->feVariable;
-	FiniteElement_Mesh*            mesh               = feVariable->feMesh;
+	FeMesh*    		       mesh               = feVariable->feMesh;
 	lucColourMap*                  colourMap          = self->colourMap;
 	Element_LocalIndex             lElement_I;
-	Element_LocalIndex             elementLocalCount  = mesh->elementLocalCount;
+	Element_LocalIndex             elementLocalCount  = FeMesh_GetElementLocalSize( mesh );
 	Element_NodeIndex              eNode_I;
-	Element_NodeIndex              elementNodeCount;
+	Element_NodeIndex              elementNodeCount, *elementNodes;
 	Node_LocalIndex                lNode_I;
 	double                         nodeValue;
 	double                         height;
@@ -249,11 +249,11 @@ void _lucFeVariableSurface_BuildDisplayList( void* drawingObject, void* _context
 		lucColour_SetOpenGLColour( &self->colour );
 
 	for ( lElement_I = 0 ; lElement_I < elementLocalCount ; lElement_I++ ) {
-		elementNodeCount = mesh->elementNodeCountTbl[ lElement_I ];
+		FeMesh_GetElementNodes( mesh, lElement_I, &elementNodeCount, &elementNodes );
 
 		glBegin( GL_POLYGON );
 		for ( eNode_I = 0 ; eNode_I < elementNodeCount ; eNode_I++ ) {
-			lNode_I = mesh->elementNodeTbl[ lElement_I ][ eNode_I ];
+			lNode_I = elementNodes[ eNode_I ];
 			/* Get Value at node */
 			nodeValue = FeVariable_GetScalarAtNode( feVariable, lNode_I );
 
@@ -265,7 +265,7 @@ void _lucFeVariableSurface_BuildDisplayList( void* drawingObject, void* _context
 			height = nodeValue * self->scaleHeight;
 
 			/* Plot Vertex */
-			glVertex3d( mesh->nodeCoord[ lNode_I ][ I_AXIS ], mesh->nodeCoord[ lNode_I ][ J_AXIS ], height );
+			glVertex3d( mesh->verts[ lNode_I ][ I_AXIS ], mesh->verts[ lNode_I ][ J_AXIS ], height );
 		}
 		glEnd();
 	}

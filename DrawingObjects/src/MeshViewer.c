@@ -64,8 +64,11 @@
 #include <glu.h>
 #include <string.h>
 
-/* Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
+
+/* Textual name of this class - This is a global pointer which is used for 
+   times when you need to refer to class and not a particular instance of a class */
 const Type lucMeshViewer_Type = "lucMeshViewer";
+
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
 lucMeshViewer* _lucMeshViewer_New( 
@@ -88,7 +91,10 @@ lucMeshViewer* _lucMeshViewer_New(
 {
 	lucMeshViewer*					self;
 
-	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
+	/* Call private constructor of parent - this will set virtual functions of 
+	   parent and continue up the hierarchy tree. At the beginning of the tree 
+	   it will allocate memory of the size of object and initialise all the 
+	   memory to zero. */
 	assert( sizeOfSelf >= sizeof(lucMeshViewer) );
 	self = (lucMeshViewer*) _lucOpenGLDrawingObject_New( 
 			sizeOfSelf,
@@ -125,6 +131,8 @@ void _lucMeshViewer_Init(
 	memcpy( &(self->shadowColour), &shadowColour, sizeof(lucColour) );
 	memcpy( &(self->vacantColour), &vacantColour, sizeof(lucColour) );
 	assert( Stg_Class_IsInstance( mesh, Mesh_Type ) );
+
+	self->renderEdges = NULL;
 }
 
 void _lucMeshViewer_Delete( void* drawingObject ) {
@@ -147,9 +155,6 @@ void* _lucMeshViewer_Copy( void* drawingObject, void* dest, Bool deep, Name name
 	memcpy( &(newDrawingObject->localColour),       &(self->localColour),       sizeof(lucColour) );
 	memcpy( &(newDrawingObject->shadowColour),       &(self->shadowColour),       sizeof(lucColour) );
 	memcpy( &(newDrawingObject->vacantColour),       &(self->vacantColour),       sizeof(lucColour) );
-
-
-
 
 	/* TODO */
 	abort();
@@ -196,11 +201,9 @@ void _lucMeshViewer_Construct( void* drawingObject, Stg_ComponentFactory* cf, vo
 	self->elementNumbers = Stg_ComponentFactory_GetBool( cf, self->name, "elementNumbers", False);
 	self->displayNodes = Stg_ComponentFactory_GetBool( cf, self->name, "displayNodes", False);
 
-
 	lucColour_FromString( &self->localColour, localColourName );
 	lucColour_FromString( &self->shadowColour, shadowColourName );
 	lucColour_FromString( &self->vacantColour, vacantColourName );
-
    
 	_lucMeshViewer_Init( 
 			self, 
@@ -215,11 +218,23 @@ void _lucMeshViewer_Build( void* drawingObject, void* data ) {
 }
 
 void _lucMeshViewer_Initialise( void* drawingObject, void* data ) {
+	lucMeshViewer*	self = (lucMeshViewer*)drawingObject;
+
+	assert( self );
+
+	if( Mesh_HasIncidence( self->mesh, MT_EDGE, MT_VERTEX ) )
+		self->renderEdges = lucMeshViewer_RenderEdges_WithInc;
+	else {
+		lucMeshViewer_BuildEdges( self );
+		self->renderEdges = lucMeshViewer_RenderEdges;
+	}
 }
 
+void _lucMeshViewer_Execute( void* drawingObject, void* data ) {
+}
 
-void _lucMeshViewer_Execute( void* drawingObject, void* data ) {}
-void _lucMeshViewer_Destroy( void* drawingObject, void* data ) {}
+void _lucMeshViewer_Destroy( void* drawingObject, void* data ) {
+}
 
 void _lucMeshViewer_Setup( void* drawingObject, void* _context ) {
 	lucMeshViewer*          self                = (lucMeshViewer*)drawingObject;
@@ -228,8 +243,9 @@ void _lucMeshViewer_Setup( void* drawingObject, void* _context ) {
 	 lucMeshViewer_UpdateVariables( self );
 	
 }
+
 void lucMeshViewer_UpdateVariables( void* drawingObject ) {
-}	
+}
 
 void _lucMeshViewer_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* viewportInfo, void* _context ) {
 	lucMeshViewer*          self          = (lucMeshViewer*)drawingObject;
@@ -241,7 +257,6 @@ void _lucMeshViewer_Draw( void* drawingObject, lucWindow* window, lucViewportInf
 	_lucOpenGLDrawingObject_Draw( self, window, viewportInfo, _context );
 }
 
-
 void _lucMeshViewer_CleanUp( void* drawingObject, void* context ) {
 	lucMeshViewer*          self          = (lucMeshViewer*)drawingObject;
 	
@@ -249,105 +264,20 @@ void _lucMeshViewer_CleanUp( void* drawingObject, void* context ) {
 }
 
 void _lucMeshViewer_BuildDisplayList( void* drawingObject, void* _context ) {
-	lucMeshViewer*          self                = (lucMeshViewer*)drawingObject;
-	lucColour              colour;
+	lucMeshViewer*	self = (lucMeshViewer*)drawingObject;
+	lucColour	colour;
 
-	/*Geometry*		geometry;*/
-	Node_GlobalIndex	point_I;
-	Edge_Index          edge_I;
-	ElementLayout*      elementLayout;
-	Partition_Index		rank_I;
-
-	/* Stuff to construct the layout */
-	MeshDecomp*		decomp;
-	MeshLayout*		meshLayout;
-	Dimension_Index		numPartitionedDims;
-	Partition_Index		maxRank = 0;
-  	Node_Index nodeCount;
-
-	/*TODO*/     
-	numPartitionedDims = 2;
-	
-	meshLayout =  self->mesh->layout;
-	decomp = meshLayout->decomp;
-
-	/* Make sure "StoreAll" is set so proc 0 can get all info */
-	maxRank = decomp->procsInUse;
-	
-/*TODO	if( rank == 0 ) {
-		glMesh = GLMesh_New();
-		GLMesh_BuildFromMesh( glMesh, meshLayout );
-	}
-*/	
-
-   /* Ensure everything is already freed*/ 
-	_lucMeshViewer_CleanMem( self, NULL );
-	
-	/* Copy the vertices */
-	self->vertCnt = meshLayout->nodeLayout->nodeCount;
-	self->verts = Memory_Alloc_Array( GLdouble, self->vertCnt * 3, "lucMeshViewer->verts" );
-
-	assert( self->verts );
-
-	nodeCount = self->mesh->nodeLocalCount;
-	
-	for( point_I = 0; point_I < nodeCount; point_I++ ) {
-		double* nodeCoord = Mesh_CoordAt( self->mesh, point_I );
-		unsigned	vert_I = point_I * 3;
-			
-		self->verts[vert_I] = (GLdouble)nodeCoord[0];
-		self->verts[vert_I + 1] = (GLdouble)nodeCoord[1];
-		self->verts[vert_I + 2] = (GLdouble)nodeCoord[2];
-
-	}
-	
-	/* Build the edges */
-	elementLayout = meshLayout->elementLayout;
-	self->edgeCnt = elementLayout->edgeCount;
-	self->edges = Memory_Alloc_Array( unsigned, self->edgeCnt * 2, "lucMeshViewer->edges" );
-	assert( self->edges );
-
-	for( edge_I = 0; edge_I < elementLayout->edgeCount; edge_I++ ) {
-		unsigned	glEdge_I = edge_I * 2;
-		Edge		edge;
-		
-		elementLayout->edgeAt( elementLayout, edge_I, edge );
-		self->edges[glEdge_I] = (unsigned)edge[0];
-		self->edges[glEdge_I + 1] = (unsigned)edge[1];
-	}
-	
-	/* Build local edge indices */
-	self->rankCnt = meshLayout->decomp->procsInUse;
-	self->localEdgeCnts = Memory_Alloc_Array( unsigned, self->rankCnt, "lucMeshViewer->localEdgeCnts" );
-	memset( self->localEdgeCnts, 0, sizeof(unsigned) * self->rankCnt );
-	self->localEdges = Memory_Alloc_Array( unsigned*, self->rankCnt, "lucMeshViewer->localEdges" );
-	memset( self->localEdges, 0, sizeof(unsigned*) * self->rankCnt );
-	self->shadowEdgeCnts = Memory_Alloc_Array( unsigned, self->rankCnt, "lucMeshViewer->localEdges" );
-	memset( self->shadowEdgeCnts, 0, sizeof(unsigned) * self->rankCnt );
-	self->shadowEdges = Memory_Alloc_Array( unsigned*, self->rankCnt, "lucMeshViewer->shadowEdges" );
-	memset( self->shadowEdges, 0, sizeof(unsigned*) * self->rankCnt );
-	self->vacantEdgeCnts = Memory_Alloc_Array( unsigned, self->rankCnt, "lucMeshViewer->vacantEdgeCnts" );
-	memset( self->vacantEdgeCnts, 0, sizeof(unsigned) * self->rankCnt );
-	self->vacantEdges = Memory_Alloc_Array( unsigned*, self->rankCnt, "lucMeshViewer->vacantEdges" );
-	memset( self->vacantEdges, 0, sizeof(unsigned*) * self->rankCnt );
-	
-	for( rank_I = 0; rank_I < self->rankCnt; rank_I++ ) {
-		_lucMeshViewer_BuildLocalEdges( self, meshLayout, rank_I );
-		_lucMeshViewer_BuildShadowEdges( self, meshLayout, rank_I );
-		_lucMeshViewer_BuildVacantEdges( self, meshLayout, rank_I );
-	}
-
-	
 	/* Initialise colour value */
 	memcpy( &colour, &self->colour, sizeof(lucColour) );
 	lucColour_SetOpenGLColour( &colour );
 
 	glPointSize( 1.0 );
-	
+
 	/* Plot the mesh */
-	lucMeshViewer_RenderRank( drawingObject, 0 );
+	lucMeshViewer_Render( drawingObject );
 }
 
+#if 0
 void lucMeshViewer_RenderGlobal( void* drawingObject ) {
 	lucMeshViewer*		self = (lucMeshViewer*)drawingObject;
 	unsigned	edge_I;
@@ -373,9 +303,6 @@ void lucMeshViewer_RenderGlobal( void* drawingObject ) {
 	}
 	glEnd();
 }
-
-
-
 
 void lucMeshViewer_PrintAllElementsNumber( void* drawingObject, Partition_Index rank ) {
 	lucMeshViewer*	     self = (lucMeshViewer*)drawingObject;
@@ -452,69 +379,6 @@ void lucMeshViewer_PrintAllNodesNumber( void* drawingObject, Partition_Index ran
 
 }
 
-
-void lucMeshViewer_ClosestNode( void* self, Coord crd, int* nodeNumber ) {
-	Bool		done;
-        Mesh*		mesh = ((lucMeshViewer*)self)->mesh; 
-	Coord*		nodeCrds = mesh->nodeCoord;
-	unsigned	curNode;
-	unsigned        nDims;
-	
-	nDims  = ((HexaEL*)(mesh->layout->elementLayout))->dim ;
-
-	/* Begin somewhere in the middle. */
-	curNode = mesh->nodeLocalCount / 2;
-
-	if(!mesh->nodeNeighbourCountTbl){
-		Mesh_ActivateNodeNeighbourTbl( mesh ); 
-	}
-
-	/* Loop until we've found closest local node. */
-	do {
-		unsigned	nNbrs = mesh->nodeNeighbourCountTbl[curNode];
-		unsigned*	nbrs = mesh->nodeNeighbourTbl[curNode];
-		double		dist;
-		double		tmp;
-		unsigned	nbr_i, d_i;
-
-		/* Assume we'll be done after this loop. */
-		done = True;
-
-		/* Calc distance squared to current node. */
-		tmp = nodeCrds[curNode][0] - crd[0];
-		dist = tmp * tmp;
-		for( d_i = 1; d_i < nDims; d_i++ ) {
-			tmp = nodeCrds[curNode][d_i] - crd[d_i];
-			dist += tmp * tmp;
-		}
-
-		/* Compare to neighbours. */
-		for( nbr_i = 0; nbr_i < nNbrs; nbr_i++ ) {
-			double	nbrDist;
-
-			/* Just in case... */
-			if( nbrs[nbr_i] >= mesh->nodeLocalCount )
-				continue;
-
-			tmp = nodeCrds[nbrs[nbr_i]][0] - crd[0];
-			nbrDist = tmp * tmp;
-			for( d_i = 1; d_i < nDims; d_i++ ) {
-				tmp = nodeCrds[nbrs[nbr_i]][d_i] - crd[d_i];
-				nbrDist += tmp * tmp;
-			}
-
-			if( nbrDist < dist ) {
-				curNode = nbrs[nbr_i];
-				dist = nbrDist;
-				done = False;
-			}
-		}
-	}
-	while( !done );
-
-	*nodeNumber = curNode;
-}
-
 void lucMeshViewer_PrintNodeNumber( void* drawingObject, Coord coord, int* nodeNumber ) {
 	lucMeshViewer*	     self = (lucMeshViewer*)drawingObject;
 	char                 nodeNumString[100];
@@ -535,39 +399,6 @@ void lucMeshViewer_PrintNodeNumber( void* drawingObject, Coord coord, int* nodeN
 
 	lucPrintString( nodeNumString );
 }
-
-void lucMeshViewer_FindElementNumber(void* drawingObject, Coord coord, int* elementNumber){
-	Mesh*		mesh = ((lucMeshViewer*)drawingObject)->mesh; 
-	MeshLayout*		mLayout = mesh->layout;
-	ElementLayout*		eLayout = mLayout->elementLayout;
- 	Element_DomainIndex	elementCoordIn = (unsigned)-1;
-	
-	/* locate which mesh element given coord is in : use inclusive upper boundaries to save
-		the need to use shadow space if possible */
-	if( eLayout->type == ParallelPipedHexaEL_Type ) {
-		elementCoordIn = eLayout->elementWithPoint( eLayout, mLayout->decomp, coord, mesh, 
-							    INCLUSIVE_UPPER_BOUNDARY, 0, NULL );
-	}
-	else {
-		unsigned	cNode;
- 
-		/* Find closest node to point. */
-		lucMeshViewer_ClosestNode( drawingObject, coord, (int*)&cNode );
-
-		/* Find with hint of incident elements. */
-		elementCoordIn = eLayout->elementWithPoint( eLayout, mLayout->decomp, coord, mesh, 
-							    INCLUSIVE_UPPER_BOUNDARY, 
-							    mesh->nodeElementCountTbl[cNode], mesh->nodeElementTbl[cNode] );
-
-		/* If still no cigar, brute force. */
-		if ( elementCoordIn >= mesh->elementDomainCount ) {
-			elementCoordIn = eLayout->elementWithPoint( eLayout, mLayout->decomp, coord, mesh, 
-								    INCLUSIVE_UPPER_BOUNDARY, 0, NULL );
-		}
-	}
-      	*elementNumber = 	elementCoordIn;
-}
-
 
 void lucMeshViewer_PrintElementNumber( void* drawingObject, Coord coord, int* elementNumber ) {
 	lucMeshViewer*	     self = (lucMeshViewer*)drawingObject;
@@ -615,68 +446,58 @@ void lucMeshViewer_PrintElementNumber( void* drawingObject, Coord coord, int* el
 
 	lucPrintString( elementNumString );
 	glEnable(GL_LIGHTING);
-
 }
+#endif
 
+void lucMeshViewer_RenderLocal( void* drawingObject ) {
+	lucMeshViewer*	self = (lucMeshViewer*)drawingObject;
+	Mesh*		mesh;
+	vertexFuncType*	vertexFunc;
 
+	assert( self );
+	assert( Mesh_GetDomainSize( self->mesh, MT_VERTEX ) );
+	assert( self->renderEdges );
 
-void lucMeshViewer_RenderLocal( void* drawingObject, Partition_Index rank ) {
-	lucMeshViewer*		self = (lucMeshViewer*)drawingObject;
-	unsigned	lEdge_I;
-	Node_LocalIndex      node_lI;
-	unsigned	     edge_I;
-	Node_LocalIndex      node1_lI;
-	Node_LocalIndex      node2_lI;
-	double*              coord1;
-	double*              coord2;
-	
-	assert( rank < self->rankCnt );
-	
-	if( !self->localEdgeCnts[rank] || !self->localEdges[rank] ) {
-		return;
-	}
-	
+	/* Shortcuts. */
+	mesh = self->mesh;
+
+	/* Pick the correct dimension. */
+	if( Mesh_GetDimSize( mesh ) == 3 )
+		vertexFunc = glVertex3dv;
+	else
+		vertexFunc = glVertex2dv;
+
+	/* Set color. */
 	glColor3f( self->localColour.red, self->localColour.green, self->localColour.blue );
-	
-	/* Render nodes */
+
+	/* Render vertices. */
 	if(self->displayNodes){
+		unsigned	nVerts;
+		unsigned	v_i;
+
+		nVerts = Mesh_GetLocalSize( mesh, MT_VERTEX );
 		glPointSize( 5 );
 		glBegin( GL_POINTS );
-		for( node_lI = 0; node_lI < self->mesh->nodeLocalCount; node_lI ++ ) {
-			glVertex3dv( self->mesh->nodeCoord[node_lI] );
-		}
+		for( v_i = 0; v_i < nVerts; v_i ++ )
+			vertexFunc( Mesh_GetVertex( mesh, v_i ) );
 		glEnd();
 	}
-	
+
 	/* Render edges */
-	glDisable(GL_LIGHTING);
-	glBegin( GL_LINES );
-	for( lEdge_I = 0; lEdge_I < self->localEdgeCnts[rank]; lEdge_I++ ) {
-		edge_I = self->localEdges[rank][lEdge_I] * 2;
+	self->renderEdges( self, vertexFunc );
 
-		node1_lI = Mesh_NodeMapGlobalToLocal( self->mesh, self->edges[edge_I] );
-		node2_lI = Mesh_NodeMapGlobalToLocal( self->mesh, self->edges[edge_I + 1] );
-
-		coord1 = self->mesh->nodeCoord[node1_lI];	
-		coord2 = self->mesh->nodeCoord[node2_lI];	
-		
-		glVertex3dv( coord1 );
-		glVertex3dv( coord2 );
-	}
-	glEnd();
-	glEnable(GL_LIGHTING);
-
+#if 0
 	/* Prints the element numbers */
-	if(self->elementNumbers)
-		lucMeshViewer_PrintAllElementsNumber(self, rank);
+	if( self->elementNumbers )
+		lucMeshViewer_PrintAllElementsNumber( self );
 
 	/* Prints the node numbers */
-	if(self->nodeNumbers)
-		lucMeshViewer_PrintAllNodesNumber(self, rank);
-	
+	if( self->nodeNumbers )
+		lucMeshViewer_PrintAllNodesNumber( self );
+#endif
 }
 
-
+#if 0
 void lucMeshViewer_RenderShadow( void* drawingObject, Partition_Index rank ) {
 	lucMeshViewer*		self = (lucMeshViewer*)drawingObject;
 	unsigned	sEdge_I;
@@ -706,10 +527,7 @@ void lucMeshViewer_RenderShadow( void* drawingObject, Partition_Index rank ) {
 		glVertex3dv( coord2 );
 	}
 	glEnd();
-
-	
 }
-
 
 void lucMeshViewer_RenderVacant( void* drawingObject, Partition_Index rank ) {
 	lucMeshViewer*		self = (lucMeshViewer*)drawingObject;
@@ -745,204 +563,66 @@ void lucMeshViewer_RenderVacant( void* drawingObject, Partition_Index rank ) {
 	}
 	glEnd();
 }
+#endif
 
-
-void lucMeshViewer_RenderRank( void* drawingObject, Partition_Index rank ) {
+void lucMeshViewer_Render( void* drawingObject ) {
 	lucMeshViewer*		self = (lucMeshViewer*)drawingObject;
-	Processor_Index         myRank = self->mesh->layout->decomp->rank;
 
-	if ( rank == myRank ) {
-		lucMeshViewer_RenderLocal( self, myRank );
-		lucMeshViewer_RenderShadow( self, myRank );
-        }
-	else{
-		lucMeshViewer_RenderVacant( self, myRank );
-	}
+	lucMeshViewer_RenderLocal( self );
 }
-
 
 
 /*--------------------------------------------------------------------------------------------------------------------------
 ** Private Member functions
 */
 
-void _lucMeshViewer_BuildLocalEdges( void* meshViewer, MeshLayout* mesh, Partition_Index rank ) {
-	lucMeshViewer*		self = (lucMeshViewer*)meshViewer;
-	Index		localElementCnt;
-	Index*		localElementSet;
-	int		lEl_i;
-	
-	/* Old code:
-	** IndexSet_GetMembers( mesh->decomp->localElementSets[rank], &localElementCnt, &localElementSet );
-	**
-	** This should really use a StGermain mesh, not the mesh layout. */
-	localElementCnt = mesh->decomp->elementLocalCount;
-	localElementSet = Memory_Alloc_Array( unsigned, localElementCnt, "localElementSet" );
-	for( lEl_i = 0; lEl_i < localElementCnt; lEl_i++ ) {
-		localElementSet[lEl_i] = mesh->decomp->elementMapLocalToGlobal( mesh->decomp, lEl_i );
-	}
-	
-	
-	if( localElementCnt ) {
-		if( self->localEdges[rank] ) {
-			Memory_Free( self->localEdges );
-		}
-		
-		self->localEdgeCnts[rank] = ElementLayout_BuildEdgeSubset( mesh->elementLayout, 
-									   localElementCnt, 
-									   localElementSet, 
-									   &self->localEdges[rank] );
-	}
-	
-	Memory_Free( localElementSet );
+void lucMeshViewer_BuildEdges( lucMeshViewer* self ) {
+#if 0
+	assert( self );
+
+	nVerts = Mesh_GetLocalSize( );
+	done = AllocArray( Bool, nVerts );
+#endif
 }
 
+void lucMeshViewer_RenderEdges_WithInc( lucMeshViewer* self, vertexFuncType* vertexFunc ) {
+	unsigned	nEdges;
+	unsigned	nIncVerts, *incVerts;
+	unsigned	e_i;
 
-void _lucMeshViewer_BuildShadowEdges( void* meshViewer, MeshLayout* mesh, Partition_Index rank ) {
-	lucMeshViewer*		self = (lucMeshViewer*)meshViewer;
-	Index		shadowElementCnt;
-	Index*		shadowElementSet;
-	
-	if( !mesh->decomp->shadowElementSets || !mesh->decomp->shadowElementSets[rank] ) {
-		return;
+	assert( self );
+	assert( Mesh_GetDomainSize( self->mesh, MT_EDGE ) && 
+		Mesh_HasIncidence( self->mesh, MT_EDGE, MT_VERTEX ) );
+
+	nEdges = Mesh_GetLocalSize( self->mesh, MT_EDGE );
+	glDisable(GL_LIGHTING);
+	glBegin( GL_LINES );
+	for( e_i = 0; e_i < nEdges; e_i++ ) {
+		Mesh_GetIncidence( self->mesh, MT_EDGE, e_i, MT_VERTEX, &nIncVerts, &incVerts );
+		assert( nIncVerts == 2 );
+
+		vertexFunc( Mesh_GetVertex( self->mesh, incVerts[0] ) );
+		vertexFunc( Mesh_GetVertex( self->mesh, incVerts[1] ) );
 	}
-	
-	IndexSet_GetMembers( mesh->decomp->shadowElementSets[rank], &shadowElementCnt, &shadowElementSet );
-	
-	if( shadowElementCnt ) {
-		IndexSet*	localEdgeSet;
-		IndexSet*	shadowEdgeSet;
-		Index		lEdge_I;
-		Index		sEdge_I;
-		
-		localEdgeSet = IndexSet_New( mesh->decomp->elementLayout->edgeCount );
-		for( lEdge_I = 0; lEdge_I < self->localEdgeCnts[rank]; lEdge_I++ ) {
-			IndexSet_Add( localEdgeSet, self->localEdges[rank][lEdge_I] );
-		}
-		
-		if( self->shadowEdges[rank] ) {
-			Memory_Free( self->shadowEdges );
-		}
-		self->shadowEdgeCnts[rank] = ElementLayout_BuildEdgeSubset( mesh->elementLayout, 
-									   shadowElementCnt, 
-									   shadowElementSet, 
-									   &self->shadowEdges[rank] );
-		shadowEdgeSet = IndexSet_New( mesh->decomp->elementLayout->edgeCount );
-		for( sEdge_I = 0; sEdge_I < self->shadowEdgeCnts[rank]; sEdge_I++ ) {
-			if( !IndexSet_IsMember( localEdgeSet, self->shadowEdges[rank][sEdge_I] ) ) {
-				IndexSet_Add( shadowEdgeSet, self->shadowEdges[rank][sEdge_I] );
-			}
-		}
-		
-		Memory_Free( self->shadowEdges[rank] );
-		IndexSet_GetMembers( shadowEdgeSet, &self->shadowEdgeCnts[rank], &self->shadowEdges[rank] );
-		Stg_Class_Delete( shadowEdgeSet );
-	}
-	
-	Memory_Free( shadowElementSet );
+	glEnd();
+	glEnable(GL_LIGHTING);
 }
 
+void lucMeshViewer_RenderEdges( lucMeshViewer* self, vertexFuncType* vertexFunc ) {
+	unsigned	nEdges, **edges;
+	unsigned	e_i;
 
-void _lucMeshViewer_BuildVacantEdges( void* meshViewer, MeshLayout* mesh, Partition_Index rank ) {
-	lucMeshViewer*		self = (lucMeshViewer*)meshViewer;
-	ElementLayout*	elementLayout = mesh->decomp->elementLayout;
-	IndexSet*	domainEdgeSet;
-	IndexSet*	vacantEdgeSet;
-	Index		gEdge_I;
-	
-	domainEdgeSet = IndexSet_New( elementLayout->edgeCount );
-	
-	if( self->localEdgeCnts && self->localEdgeCnts[rank] ) {
-		unsigned	lEdge_I;
-		
-		for( lEdge_I = 0; lEdge_I < self->localEdgeCnts[rank]; lEdge_I++ ) {
-			IndexSet_Add( domainEdgeSet, self->localEdges[rank][lEdge_I] );
-		}
-	}
-	
-	if( self->shadowEdgeCnts && self->shadowEdgeCnts[rank] ) {
-		unsigned	sEdge_I;
-		
-		for( sEdge_I = 0; sEdge_I < self->shadowEdgeCnts[rank]; sEdge_I++ ) {
-			IndexSet_Add( domainEdgeSet, self->shadowEdges[rank][sEdge_I] );
-		}
-	}
-	
-	vacantEdgeSet = IndexSet_New( elementLayout->edgeCount );
-	
-	for( gEdge_I = 0; gEdge_I < elementLayout->edgeCount; gEdge_I++ ) {
-		if( !IndexSet_IsMember( domainEdgeSet, gEdge_I ) ) {
-			IndexSet_Add( vacantEdgeSet, gEdge_I );
-		}
-	}
-	
-	IndexSet_GetMembers( vacantEdgeSet, &self->vacantEdgeCnts[rank], &self->vacantEdges[rank] );
-	
-	Stg_Class_Delete( domainEdgeSet );
-	Stg_Class_Delete( vacantEdgeSet );
-}
+	assert( self );
+	assert( self->nEdges && self->edges );
 
-void _lucMeshViewer_CleanMem( void* drawingObject, void* data ) {
-	lucMeshViewer*		self = (lucMeshViewer*)drawingObject;
-	
-	if( self->verts ) {
-		Memory_Free( self->verts );
-		self->verts = NULL;
+	nEdges = self->nEdges;
+	edges = self->edges;
+	glDisable(GL_LIGHTING);
+	glBegin( GL_LINES );
+	for( e_i = 0; e_i < nEdges; e_i++ ) {
+		vertexFunc( Mesh_GetVertex( self->mesh, edges[e_i][0] ) );
+		vertexFunc( Mesh_GetVertex( self->mesh, edges[e_i][1] ) );
 	}
-	
-	if( self->edges ) {
-		Memory_Free( self->edges );
-		self->edges = NULL;
-	}
-	
-	if( self->localEdgeCnts ) {
-		Memory_Free( self->localEdgeCnts );
-		self->localEdgeCnts = NULL;
-	}
-	
-	if( self->localEdges ) {
-		Partition_Index		rank_I;
-		
-		for( rank_I = 0; rank_I < self->rankCnt; rank_I++ ) {
-			if( self->localEdges[rank_I] ) {
-				Memory_Free( self->localEdges[rank_I] );
-			}
-		}
-		Memory_Free( self->localEdges );
-		self->localEdges = NULL;
-	}
-	
-	if( self->shadowEdgeCnts ) {
-		Memory_Free( self->shadowEdgeCnts );
-		self->shadowEdgeCnts = NULL;
-	}
-	
-	if( self->shadowEdges ) {
-		Partition_Index		rank_I;
-		
-		for( rank_I = 0; rank_I < self->rankCnt; rank_I++ ) {
-			if( self->shadowEdges[rank_I] ) {
-				Memory_Free( self->shadowEdges[rank_I] );
-			}
-		}
-		Memory_Free( self->shadowEdges );
-		self->shadowEdges = NULL;
-	}
-	
-	if( self->vacantEdgeCnts ) {
-		Memory_Free( self->vacantEdgeCnts );
-		self->vacantEdgeCnts = NULL;
-	}
-	
-	if( self->vacantEdges ) {
-		Partition_Index		rank_I;
-		
-		for( rank_I = 0; rank_I < self->rankCnt; rank_I++ ) {
-			if( self->vacantEdges[rank_I] ) {
-				Memory_Free( self->vacantEdges[rank_I] );
-			}
-		}
-		Memory_Free( self->vacantEdges );
-		self->vacantEdges = NULL;
-	}
+	glEnd();
+	glEnable(GL_LIGHTING);
 }

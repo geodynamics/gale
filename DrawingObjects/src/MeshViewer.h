@@ -47,45 +47,40 @@
 #ifndef __lucMeshViewer_h__
 #define __lucMeshViewer_h__
 
-	typedef void (lucMeshViewer_PlotParticleFunction) ( void* object, void* context, Particle_Index lParticle_I );
+	typedef void (vertexFuncType)( double* );
+	typedef void (lucMeshViewer_RenderEdgesFunc)( lucMeshViewer* self, 
+						      vertexFuncType* vertexFunc );
 
-	/** Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
+	/* Textual name of this class - This is a global pointer which is used for 
+	   times when you need to refer to class and not a particular instance of a class */
 	extern const Type lucMeshViewer_Type;
-		
-	/** Class contents - this is defined as a macro so that sub-classes of this class can use this macro at the start of the definition of their struct */
-	#define __lucMeshViewer \
-		/* Macro defining parent goes here - This means you can cast this class as its parent */ \
-		__lucOpenGLDrawingObject \
-		/* Virtual functions go here */ \
-	        Mesh*                                             mesh;          \
-		lucMeshViewer_PlotParticleFunction*               _plotParticle;          \
-		/* Other info */ \
-		/* Colour Stuff */ \
-		lucColour                                          colour;                 \
-	        /* Other Stuff */ \
-		/* Stg_Class info */ \
-		unsigned		vertCnt; \
-		/*GLdouble*		verts; */\
-		double*                 verts;\
-		unsigned		edgeCnt; \
-		unsigned*		edges; \
-		unsigned		rankCnt; \
-		unsigned*		localEdgeCnts; \
-		unsigned**		localEdges; \
-		unsigned*		shadowEdgeCnts; \
-		unsigned**		shadowEdges; \
-		unsigned*		vacantEdgeCnts; \
-		unsigned**		vacantEdges; \
-	        lucColour		localColour; \
-		lucColour		shadowColour; \
-		lucColour		vacantColour; \
-		Bool                    nodeNumbers; \
-		Bool                    elementNumbers;\
-		Bool                    displayNodes;
 
+	/* Class contents - this is defined as a macro so that sub-classes of 
+	   this class can use this macro at the start of the definition of their struct */
+	#define __lucMeshViewer							\
+		/* Macro defining parent goes here - This means you can */	\
+		/* cast this class as its parent */				\
+		__lucOpenGLDrawingObject					\
+		/* Virtual functions go here */					\
+	        Mesh*					mesh;			\
+		/* Other info */						\
+		/* Colour Stuff */						\
+		lucColour				colour;			\
+	        /* Other Stuff */						\
+		/* Stg_Class info */						\
+		unsigned				nEdges;			\
+		unsigned**				edges;			\
+		lucMeshViewer_RenderEdgesFunc*		renderEdges;		\
+										\
+	        lucColour				localColour;		\
+		lucColour				shadowColour;		\
+		lucColour				vacantColour;		\
+		Bool                    		nodeNumbers;		\
+		Bool                    		elementNumbers;		\
+		Bool                    		displayNodes;
 
 	struct lucMeshViewer { __lucMeshViewer };
-	
+
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
 	lucMeshViewer* _lucMeshViewer_New( 
 		SizeT                                              sizeOfSelf,
@@ -123,24 +118,19 @@
 
 	void _lucMeshViewer_BuildDisplayList( void* drawingObject, void* _context ) ;
 
-        void _lucMeshViewer_CleanMem( void* drawingObject, void* data );
-
 	void lucMeshViewer_UpdateVariables( void* drawingObject ) ;
 	
-	void _lucMeshViewer_BuildLocalEdges( void* meshViewer, MeshLayout* mesh, Partition_Index rank ) ;
-	void _lucMeshViewer_BuildShadowEdges( void* meshViewer, MeshLayout* mesh, Partition_Index rank ) ;
-	void _lucMeshViewer_BuildVacantEdges( void* meshViewer, MeshLayout* mesh, Partition_Index rank );
-
 	void lucMeshViewer_RenderGlobal( void* drawingObject );
-	void lucMeshViewer_RenderLocal( void* drawingObject, Partition_Index rank );
+	void lucMeshViewer_RenderLocal( void* drawingObject );
 	void lucMeshViewer_RenderShadow( void* drawingObject, Partition_Index rank );
 	void lucMeshViewer_RenderVacant( void* drawingObject, Partition_Index rank );
-	void lucMeshViewer_RenderRank( void* drawingObject, Partition_Index rank );
+	void lucMeshViewer_Render( void* drawingObject );
 
         void lucMeshViewer_PrintNodeNumber( void* drawingObject, Coord coord, int* nodeNumber );
-	void lucMeshViewer_ClosestNode(void* self, Coord coord, int* NodeNumber);
-	void lucMeshViewer_FindElementNumber(void* self, Coord coord, int* elementNumber); 
 	void lucMeshViewer_PrintElementNumber( void* drawingObject, Coord coord, int* elementNumber );
 
+	void lucMeshViewer_BuildEdges( lucMeshViewer* self );
+	void lucMeshViewer_RenderEdges_WithInc( lucMeshViewer* self, vertexFuncType* vertexFunc );
+	void lucMeshViewer_RenderEdges( lucMeshViewer* self, vertexFuncType* vertexFunc );
 
 #endif

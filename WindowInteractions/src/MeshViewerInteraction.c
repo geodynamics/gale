@@ -199,8 +199,6 @@ void _lucMeshViewerInteraction_KeyboardEvent( void* windowInteraction, lucWindow
 
 	
 	/* Stuff to construct the layout */
-	MeshDecomp*		decomp;
-	MeshLayout*		meshLayout;
 	Partition_Index		maxRank = 0;
 
 	/* This function works when the key pressed is 'r' */
@@ -229,9 +227,7 @@ void _lucMeshViewerInteraction_KeyboardEvent( void* windowInteraction, lucWindow
 		/* Check if this drawing object is a scalar field */
 		if ( Stg_Class_IsInstance( object, lucMeshViewer_Type ) ) {
 			meshViewer = (lucMeshViewer*) object;
-			meshLayout =  meshViewer->mesh->layout;
-			decomp = meshLayout->decomp;
-			maxRank = decomp->procsInUse;	
+			/*maxRank = decomp->procsInUse;*/
 
 		
 		        /* TODO  Window interaction do not work well in parallel... As the rank switching feature does not
@@ -249,16 +245,20 @@ void _lucMeshViewerInteraction_KeyboardEvent( void* windowInteraction, lucWindow
 			if ( key == 'n' ){
 			        /* Prints out the node number */
 				/* Get spatial coordinate that the user clicked on */
+/*
 				lucViewportInfo_GetCoordFromPixel( viewportInfo, xpos, ypos, coord );
 				lucMeshViewer_ClosestNode( meshViewer, coord, (int*)&nodeNumber);
 				Journal_Printf( stream, "Closest node is %d \n", nodeNumber );
+*/
 			}
 			if ( key == 'e' ){
 			        /* Prints out the element number */
 				/* Get spatial coordinate that the user clicked on */
+/*
 				lucViewportInfo_GetCoordFromPixel( viewportInfo, xpos, ypos, coord );
 				lucMeshViewer_FindElementNumber( meshViewer, coord, (int*)&elementNumber);
 				Journal_Printf( stream, "Closest element is %d \n", elementNumber );
+*/
 			}
 
 		}

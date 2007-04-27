@@ -300,6 +300,7 @@ void lucScalarFieldOnMeshCrossSection_DrawCrossSection( void* drawingObject, dou
 	Node_LocalIndex      node_lI;
 	Node_Index           elNode_I;
 	Element_LocalIndex   element_lI;
+	unsigned	 nIncVerts, *incVerts;
 
 	
 	glDisable(GL_LIGHTING);
@@ -374,18 +375,21 @@ void lucScalarFieldOnMeshCrossSection_DrawCrossSection( void* drawingObject, dou
 	 /* TODO: The elements could have nodes insides...... !!!*/
 	#define NORMAL_LUCSCALARFIELD_BEHAVIOUR
 	#ifdef NORMAL_LUCSCALARFIELD_BEHAVIOUR
-	for ( element_lI = 0; element_lI < mesh->elementLocalCount; element_lI++ ) {
+	for ( element_lI = 0; element_lI < Mesh_GetLocalSize( mesh, Mesh_GetDimSize( mesh ) ); element_lI++ ) {
+		Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), element_lI, MT_VERTEX, 
+				   &nIncVerts, &incVerts );
+
 		/* Normal general case, the element can have whatever number of nodes */
 		glBegin(GL_POLYGON);
-			for ( elNode_I=0; elNode_I < mesh->elementNodeCountTbl[element_lI]; elNode_I++ ) {
-				node_lI = mesh->elementNodeTbl[element_lI][elNode_I];
+			for ( elNode_I=0; elNode_I < nIncVerts; elNode_I++ ) {
+				node_lI = incVerts[elNode_I];
 				//printf("elNode_I is %d node_lI is %d  displayVal[node_lI] is %f \n", elNode_I, node_lI, displayVal[node_lI]);
 			
 				// Should be there when no test
-				memcpy( interpolationCoord, mesh->nodeCoord[node_lI], sizeof(Coord) );
+				memcpy( interpolationCoord, mesh->verts[node_lI], sizeof(Coord) );
 				
 				// Plot the node 
-				lucScalarFieldOnMeshCrossSection_PlotColouredVertex( self, interpolationCoord, mesh->nodeCoord[node_lI]);
+				lucScalarFieldOnMeshCrossSection_PlotColouredVertex( self, interpolationCoord, mesh->verts[node_lI]);
 
 				#ifdef TEST
 				// Plot the node 
@@ -404,27 +408,29 @@ void lucScalarFieldOnMeshCrossSection_DrawCrossSection( void* drawingObject, dou
 
 	/** testing the quad_strip way --- ASSUMES only 4 nodes per element */
 	/* checking that there is 4 nodes per element - If yes, the quad strips can be used */
-	if( mesh->elementNodeCountTbl[element_lI] == 4 ){
+	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), element_lI, MT_VERTEX, 
+			   &nIncVerts, &incVerts );
+	if( nIncVerts == 4 ){
 		glBegin(GL_QUAD_STRIP);
 			/* The nodes are for 10, 10 msh for instance instance 0,1,10,9 We want to display 0,9 
 			and 1,10 for the quads, so display node 0,3,1,2 */
 			
-			node_0 = mesh->elementNodeTbl[element_lI][0];
-			node_1 = mesh->elementNodeTbl[element_lI][3];
-			node_2 = mesh->elementNodeTbl[element_lI][1];
-			node_3 = mesh->elementNodeTbl[element_lI][2];
+			node_0 = incVerts[0];
+			node_1 = incVerts[3];
+			node_2 = incVerts[1];
+			node_3 = incVerts[2];
 							
-			memcpy( interpolationCoord, mesh->nodeCoord[node_0], sizeof(Coord) );
-			lucScalarFieldOnMeshCrossSection_PlotColouredVertex( self, interpolationCoord, mesh->nodeCoord[node_0]);
+			memcpy( interpolationCoord, mesh->verts[node_0], sizeof(Coord) );
+			lucScalarFieldOnMeshCrossSection_PlotColouredVertex( self, interpolationCoord, mesh->verts[node_0]);
 			
-			memcpy( interpolationCoord, mesh->nodeCoord[node_1], sizeof(Coord) ); 
-			lucScalarFieldOnMeshCrossSection_PlotColouredVertex( self, interpolationCoord, mesh->nodeCoord[node_1]);
+			memcpy( interpolationCoord, mesh->verts[node_1], sizeof(Coord) ); 
+			lucScalarFieldOnMeshCrossSection_PlotColouredVertex( self, interpolationCoord, mesh->verts[node_1]);
 			
-			memcpy( interpolationCoord, mesh->nodeCoord[node_2], sizeof(Coord) );
-			lucScalarFieldOnMeshCrossSection_PlotColouredVertex( self, interpolationCoord, mesh->nodeCoord[node_2]);
+			memcpy( interpolationCoord, mesh->verts[node_2], sizeof(Coord) );
+			lucScalarFieldOnMeshCrossSection_PlotColouredVertex( self, interpolationCoord, mesh->verts[node_2]);
 			
-			memcpy( interpolationCoord, mesh->nodeCoord[node_3], sizeof(Coord) );
-			lucScalarFieldOnMeshCrossSection_PlotColouredVertex( self, interpolationCoord, mesh->nodeCoord[node_3]);
+			memcpy( interpolationCoord, mesh->verts[node_3], sizeof(Coord) );
+			lucScalarFieldOnMeshCrossSection_PlotColouredVertex( self, interpolationCoord, mesh->verts[node_3]);
 		
 		glEnd();
       	}
