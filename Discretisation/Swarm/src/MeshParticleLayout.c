@@ -242,8 +242,8 @@ void _MeshParticleLayout_InitialiseParticlesOfCell( void* meshParticleLayout, vo
 	Coord               	max = {1.0, 1.0, 1.0};
 	Coord			localCoord;
 	double			basis[8];
-	unsigned		nDims = self->mesh->nSpaceDims;
-	Coord*			nodeCoords = self->mesh->nodeCoord;
+	unsigned		nDims = Mesh_GetDimSize( self->mesh );
+	double**		nodeCoords = self->mesh->verts;
 	unsigned		nNodes, *incNodes;
 	Particle_InCellIndex	particlesThisCell = swarm->cellParticleCountTbl[cell_I];
 	Particle_InCellIndex	cParticle_I = 0;
@@ -252,8 +252,8 @@ void _MeshParticleLayout_InitialiseParticlesOfCell( void* meshParticleLayout, vo
 
 	assert( nDims == 2 || nDims == 3 );
 
-	nNodes = self->mesh->elementNodeCountTbl[cell_I];
-	incNodes = self->mesh->elementNodeTbl[cell_I];
+	Mesh_GetIncidence( self->mesh, nDims, cell_I, MT_VERTEX, 
+			   &nNodes, &incNodes );
 
 	for ( cParticle_I = 0; cParticle_I < particlesThisCell; cParticle_I++ ) {	
 		particle = (GlobalParticle*)Swarm_ParticleInCellAt( swarm, cell_I, cParticle_I );
@@ -267,18 +267,18 @@ void _MeshParticleLayout_InitialiseParticlesOfCell( void* meshParticleLayout, vo
 		if( nDims == 2 ) {
 			basis[0] = 0.25 * (1.0 - localCoord[0]) * (1.0 - localCoord[1]);
 			basis[1] = 0.25 * (1.0 + localCoord[0]) * (1.0 - localCoord[1]);
-			basis[3] = 0.25 * (1.0 - localCoord[0]) * (1.0 + localCoord[1]);
-			basis[2] = 0.25 * (1.0 + localCoord[0]) * (1.0 + localCoord[1]);
+			basis[2] = 0.25 * (1.0 - localCoord[0]) * (1.0 + localCoord[1]);
+			basis[3] = 0.25 * (1.0 + localCoord[0]) * (1.0 + localCoord[1]);
 		}
 		else {
 			basis[0] = 0.125 * (1.0 - localCoord[0]) * (1.0 - localCoord[1]) * (1.0 - localCoord[2]);
 			basis[1] = 0.125 * (1.0 + localCoord[0]) * (1.0 - localCoord[1]) * (1.0 - localCoord[2]);
-			basis[3] = 0.125 * (1.0 - localCoord[0]) * (1.0 + localCoord[1]) * (1.0 - localCoord[2]);
-			basis[2] = 0.125 * (1.0 + localCoord[0]) * (1.0 + localCoord[1]) * (1.0 - localCoord[2]);
+			basis[2] = 0.125 * (1.0 - localCoord[0]) * (1.0 + localCoord[1]) * (1.0 - localCoord[2]);
+			basis[3] = 0.125 * (1.0 + localCoord[0]) * (1.0 + localCoord[1]) * (1.0 - localCoord[2]);
 			basis[4] = 0.125 * (1.0 - localCoord[0]) * (1.0 - localCoord[1]) * (1.0 + localCoord[2]);
 			basis[5] = 0.125 * (1.0 + localCoord[0]) * (1.0 - localCoord[1]) * (1.0 + localCoord[2]);
-			basis[7] = 0.125 * (1.0 - localCoord[0]) * (1.0 + localCoord[1]) * (1.0 + localCoord[2]);
-			basis[6] = 0.125 * (1.0 + localCoord[0]) * (1.0 + localCoord[1]) * (1.0 + localCoord[2]);
+			basis[6] = 0.125 * (1.0 - localCoord[0]) * (1.0 + localCoord[1]) * (1.0 + localCoord[2]);
+			basis[7] = 0.125 * (1.0 + localCoord[0]) * (1.0 + localCoord[1]) * (1.0 + localCoord[2]);
 		}
 
 		memset( particle->coord, 0, sizeof(double) * nDims );

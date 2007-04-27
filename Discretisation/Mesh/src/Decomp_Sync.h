@@ -47,22 +47,6 @@
 	/** Virtual function types */
 
 	/** Mesh class contents */
-	typedef struct {
-		void*		snkArray;
-		unsigned	snkStride;
-		unsigned*	snkDisps;
-		unsigned*	snkSizes;
-		unsigned*	snkOffs;
-
-		void*		srcArray;
-		unsigned	srcStride;
-		unsigned*	srcDisps;
-		unsigned*	srcSizes;
-		unsigned*	srcOffs;
-
-		size_t		itemSize;
-	} Decomp_Sync_Array;
-
 	#define __Decomp_Sync				\
 		/* General info */			\
 		__Stg_Component				\
@@ -72,17 +56,15 @@
 		/* Decomp_Sync info */			\
 		Decomp*			decomp;		\
 		CommTopology*		commTopo;	\
-		RangeSet**		isects;		\
 							\
-		Decomp_Sync_Claim*	claim;		\
-		Decomp_Sync_Negotiate*	negotiate;	\
-							\
+		unsigned		nDomains;	\
 		unsigned		nRemotes;	\
 		unsigned*		remotes;	\
 		unsigned		nShared;	\
 		unsigned*		shared;		\
 		unsigned*		nSharers;	\
 		unsigned**		sharers;	\
+		unsigned*		owners;		\
 							\
 		UIntMap*		grMap;		\
 		UIntMap*		dsMap;		\
@@ -94,8 +76,7 @@
 		unsigned*		nSnks;		\
 		unsigned**		snks;		\
 							\
-		unsigned		nArrays;	\
-		Decomp_Sync_Array**	arrays;
+		List*			arrays;
 
 	struct Decomp_Sync { __Decomp_Sync };
 
@@ -104,12 +85,12 @@
 	*/
 
 	#define DECOMP_SYNC_DEFARGS	\
-		STG_COMPONENT_DEFARGS
+		STG_CLASS_DEFARGS
 
 	#define DECOMP_SYNC_PASSARGS	\
-		STG_COMPONENT_PASSARGS
+		STG_CLASS_PASSARGS
 
-	Decomp_Sync* Decomp_Sync_New( Name name );
+	Decomp_Sync* Decomp_Sync_New();
 	Decomp_Sync* _Decomp_Sync_New( DECOMP_SYNC_DEFARGS );
 	void _Decomp_Sync_Init( Decomp_Sync* self );
 
@@ -120,55 +101,76 @@
 	void _Decomp_Sync_Delete( void* sync );
 	void _Decomp_Sync_Print( void* sync, Stream* stream );
 
-	#define Decomp_Sync_Copy( self ) \
-		(Mesh*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
-	#define Decomp_Sync_DeepCopy( self ) \
-		(Mesh*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _Decomp_Sync_Copy( void* sync, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
-
-	void _Decomp_Sync_Construct( void* sync, Stg_ComponentFactory* cf, void* data );
-	void _Decomp_Sync_Build( void* sync, void* data );
-	void _Decomp_Sync_Initialise( void* sync, void* data );
-	void _Decomp_Sync_Execute( void* sync, void* data );
-	void _Decomp_Sync_Destroy( void* sync, void* data );
-
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Public functions
 	*/
 
 	void Decomp_Sync_SetDecomp( void* sync, Decomp* decomp );
-	void Decomp_Sync_SetClaim( void* sync, Decomp_Sync_Claim* claim );
-	void Decomp_Sync_SetNegotiate( void* sync, Decomp_Sync_Negotiate* negotiate );
+	void Decomp_Sync_SetCommTopology( void* sync, CommTopology* commTopo );
+	void Decomp_Sync_AddRemoteRanks( void* sync, unsigned nRanks, unsigned* ranks );
 	void Decomp_Sync_SetRemotes( void* sync, unsigned nRemotes, unsigned* remotes );
-	void Decomp_Sync_Decompose( void* sync, unsigned nRequired, unsigned* required );
+	void Decomp_Sync_AddRemotes( void* sync, unsigned nRemotes, unsigned* remotes );
+	void Decomp_Sync_SetSources( void* sync, unsigned nRanks, unsigned* ranks, 
+				     unsigned* nSources, unsigned** sources );
+	void Decomp_Sync_SetSinks( void* sync, unsigned nRanks, unsigned* ranks, 
+				   unsigned* nSinks, unsigned** sinks );
+	void Decomp_Sync_AddSources( void* sync, unsigned nRanks, unsigned* ranks, 
+				     unsigned* nSources, unsigned** sources );
+	void Decomp_Sync_AddSinks( void* sync, unsigned nRanks, unsigned* ranks, 
+				   unsigned* nSinks, unsigned** sinks );
+	void Decomp_Sync_SetRequired( void* sync, unsigned nRequired, unsigned* required );
+	void Decomp_Sync_AddRequired( void* sync, unsigned nRequired, unsigned* required );
+	void Decomp_Sync_BuildShared( void* sync );
 
+	unsigned Decomp_Sync_GetGlobalSize( void* sync );
+	unsigned Decomp_Sync_GetLocalSize( void* sync );
+	unsigned Decomp_Sync_GetRemoteSize( void* sync );
 	unsigned Decomp_Sync_GetDomainSize( void* sync );
-	Bool Decomp_Sync_IsDomain( void* sync, unsigned global );
-	Bool Decomp_Sync_IsRemote( void* sync, unsigned domain );
-	Bool Decomp_Sync_IsShared( void* sync, unsigned domain );
-	unsigned Decomp_Sync_GlobalToDomain( void* sync, unsigned global );
+	unsigned Decomp_Sync_GetSharedSize( void* sync );
+	Decomp* Decomp_Sync_GetDecomp( void* sync );
+	CommTopology* Decomp_Sync_GetCommTopology( void* sync );
+	void Decomp_Sync_GetRemotes( void* sync, unsigned* nRemotes, unsigned** remotes );
+	unsigned Decomp_Sync_GetOwner( void* sync, unsigned remote );
+	void Decomp_Sync_GetSharers( void* sync, unsigned shared, 
+				     unsigned* nSharers, unsigned** sharers );
+	void Decomp_Sync_GetSources( void* sync, unsigned rank, unsigned* nSources, unsigned** sources );
+	void Decomp_Sync_GetSinks( void* sync, unsigned rank, unsigned* nSinks, unsigned** sinks );
+
+	Bool Decomp_Sync_GlobalToDomain( void* sync, unsigned global, unsigned* domain );
 	unsigned Decomp_Sync_DomainToGlobal( void* sync, unsigned domain );
-	unsigned Decomp_Sync_DomainToShared( void* sync, unsigned domain );
+	Bool Decomp_Sync_DomainToShared( void* sync, unsigned domain, unsigned* shared );
 	unsigned Decomp_Sync_SharedToDomain( void* sync, unsigned shared );
 
-	Decomp_Sync_Array* Decomp_Sync_AddArray( void* sync, void* localArray, void* remoteArray, 
-						 size_t localStride, size_t remoteStride, size_t itemSize );
-	void Decomp_Sync_RemoveArray( void* sync, Decomp_Sync_Array* array );
-	void Decomp_Sync_Sync( void* sync );
-	void Decomp_Sync_SyncArray( void* self, Decomp_Sync_Array* array );
+	void Decomp_Sync_SyncArray( void* sync, Decomp_Sync_Array* array );
+
+	void Decomp_Sync_Update( void* sync );
+
+	void Decomp_Sync_AddRef( void* sync );
+	void Decomp_Sync_RemoveRef( void* sync );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Private Member functions
 	*/
 
-	void Decomp_Sync_BuildIntersections( Decomp_Sync* self, unsigned nIndices, unsigned* indices );
-	void Decomp_Sync_BuildShared( Decomp_Sync* self );
-	void Decomp_Sync_BuildGRMap( Decomp_Sync* self );
+	void Decomp_Sync_InitArrays( Decomp_Sync* self );
+	void Decomp_Sync_ExpandArrays( Decomp_Sync* self, unsigned nNewRanks );
 
-	void Decomp_Sync_BuildArray( Decomp_Sync* self, Decomp_Sync_Array* array );
+	void Decomp_Sync_SplitRemotes( Decomp_Sync* self, unsigned nRemotes, unsigned* remotes, 
+				       unsigned* nSrcs, unsigned** srcs, 
+				       unsigned* nSnks, unsigned** snks );
+
 	void Decomp_Sync_Destruct( Decomp_Sync* self );
+	void Decomp_Sync_DestructDecomp( Decomp_Sync* self );
+	void Decomp_Sync_DestructComm( Decomp_Sync* self );
 	void Decomp_Sync_DestructRemotes( Decomp_Sync* self );
+	void Decomp_Sync_DestructSources( Decomp_Sync* self );
+	void Decomp_Sync_DestructSinks( Decomp_Sync* self );
 	void Decomp_Sync_DestructArrays( Decomp_Sync* self );
-	void Decomp_Sync_DestructArray( Decomp_Sync_Array* array );
+
+#ifndef NDEBUG
+	Bool Decomp_Sync_ValidateRemotes( Decomp_Sync* self, unsigned nRemotes, unsigned* remotes );
+	Bool Decomp_Sync_ValidateSinks( Decomp_Sync* self, unsigned nSinks, unsigned* sinks );
+	Bool Decomp_Sync_ValidateComms( Decomp_Sync* self );
+#endif
 
 #endif /* __Discretisaton_Mesh_Decomp_Sync_h__ */

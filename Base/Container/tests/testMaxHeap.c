@@ -70,7 +70,7 @@ int compareFunction(void *data1, void *data2)
 void** extendArray( int newCount, void ***array )
 {
 	assert( array );
-	//TODO Check if this is executed by creating memory
+	/* TODO Check if this is executed by creating memory */
 	(*(int***)array) = (int**)Memory_Realloc((*(int***)array), newCount * sizeof( int** ));
 	if( ((*(int***)array) == NULL) ){
 		Journal_Firewall( 0, Journal_Register(ErrorStream_Type, "testMaxHeap"), "Memory allocation failed in '%s'!!\n Aborting..!!\n", __func__ );

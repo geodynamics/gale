@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Journal.c 3855 2006-10-13 07:20:36Z KathleenHumble $
+** $Id: Journal.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -51,7 +51,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#ifndef NO_UNISTD
 #include <unistd.h>
+#endif
 
 
 Journal* stJournal = NULL;
@@ -606,10 +608,12 @@ int Journal_Firewall( int expression, void* _stream, char* fmt, ... )
 			exit( EXIT_FAILURE );
 		*/
 
-		// SGI MPI on the ess does not always print out everything before it exits
-		// To ensure all output is displayed before the program quits on firewall, sleep for one second
-		// Alan & Kath 20061006
+		/* SGI MPI on the ess does not always print out everything before it exits
+		 To ensure all output is displayed before the program quits on firewall, sleep for one second
+		 Alan & Kath 20061006 */
+#ifndef NO_UNISTD
 		sleep( 1 );
+#endif
 		if ( nProc == 1 ) {
 			exit(EXIT_SUCCESS);
 		}

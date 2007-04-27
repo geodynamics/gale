@@ -39,43 +39,6 @@
 #include "Discretisation/Mesh/Mesh.h"
 
 
-Bool testSetElements( unsigned rank, unsigned nProcs, unsigned watch );
-void buildElements( unsigned rank, unsigned nProcs, 
-		    unsigned* nEls, unsigned** els );
-
-
-#define nTests	1
-
-TestSuite_Test	tests[nTests] = {{"set elements", testSetElements}};
-
-
-Bool testSetElements( unsigned rank, unsigned nProcs, unsigned watch ) {
-	MeshTopology*	topo;
-	unsigned	nDims = 3;
-	unsigned	nEls = 0;
-	unsigned*	els = NULL;
-
-	buildElements( rank, nProcs, &nEls, &els );
-	topo = MeshTopology_New( "" );
-	MeshTopology_SetNDims( topo, nDims );
-	MeshTopology_SetElements( topo, MT_VERTEX, nEls, els );
-
-	if( rank == watch ) {
-		if( topo->nDims != 3 || topo->nTDims != 4 || 
-		    !topo->domains || !topo->domains[MT_VERTEX] || !topo->domains[MT_VERTEX]->decomp )
-		{
-			FreeArray( els );
-			FreeObject( topo );
-			return False;
-		}
-	}
-
-	FreeArray( els );
-	FreeObject( topo );
-
-	return True;
-}
-
 void buildElements( unsigned rank, unsigned nProcs, 
 		    unsigned* nEls, unsigned** els )
 {
@@ -90,6 +53,65 @@ void buildElements( unsigned rank, unsigned nProcs,
 		(*els)[e_i] = start + e_i;
 }
 
+void buildAll( unsigned rank, unsigned nProcs ) {
+}
+
+
+Bool testSetElements( unsigned rank, unsigned nProcs, unsigned watch ) {
+	Bool		result = True;
+	MeshTopology*	topo;
+	unsigned	nDims = 3;
+	unsigned	nEls, *els;
+
+	buildElements( rank, nProcs, &nEls, &els );
+	topo = MeshTopology_New( "meshTopology" );
+	MeshTopology_SetDimSize( topo, nDims );
+	MeshTopology_SetElements( topo, MT_VERTEX, nEls, els );
+
+	if( rank == watch ) {
+		if( topo->nDims != 3 || topo->nTDims != 4 || 
+		    !topo->domains || !topo->domains[MT_VERTEX] || !topo->domains[MT_VERTEX]->decomp )
+		{
+			result = False;
+			goto done;
+		}
+	}
+
+done:
+	FreeArray( els );
+	FreeObject( topo );
+
+	return result;
+}
+
+Bool testShadows( unsigned rank, unsigned nProcs, unsigned watch ) {
+	Bool		result = True;
+	MeshTopology*	topo;
+	unsigned	nDims = 3;
+	unsigned	nEls, *els;
+
+	buildElements( rank, nProcs, &nEls, &els );
+	topo = MeshTopology_New( "meshTopology" );
+	MeshTopology_SetDimSize( topo, nDims );
+	MeshTopology_SetElements( topo, MT_VERTEX, nEls, els );
+	MeshTopology_SetShadowDepth( topo, 1 );
+
+	if( rank == watch ) {
+	}
+
+done:
+	FreeArray( els );
+	FreeObject( topo );
+
+	return result;
+}
+
+
+#define nTests	2
+
+TestSuite_Test	tests[nTests] = {{"set elements", testSetElements, 10}, 
+				 {"shadow depth", testShadows, 10}};
+
 
 int main( int argc, char* argv[] ) {
 	TestSuite*	suite;
@@ -98,9 +120,7 @@ int main( int argc, char* argv[] ) {
 	MPI_Init( &argc, &argv );
 
 	/* Initialise StGermain. */
-	BaseFoundation_Init( &argc, &argv );
-	BaseIO_Init( &argc, &argv );
-	BaseContainer_Init( &argc, &argv );
+	Base_Init( &argc, &argv );
 
 	/* Create the test suite. */
 	suite = TestSuite_New();
@@ -114,9 +134,7 @@ int main( int argc, char* argv[] ) {
 	FreeObject( suite );
 
 	/* Finalise StGermain. */
-	BaseContainer_Finalise();
-	BaseIO_Finalise();
-	BaseFoundation_Finalise();
+	Base_Finalise();
 
 	/* Close off MPI */
 	MPI_Finalize();

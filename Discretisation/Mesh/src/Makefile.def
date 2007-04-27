@@ -24,75 +24,66 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: Makefile.def 3860 2006-10-14 18:12:14Z LukeHodkinson $
+## $Id: Makefile.def 4081 2007-04-27 06:20:07Z LukeHodkinson $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 def_lib = StGermainDiscretisationMesh
 def_inc = StGermain/Discretisation/Mesh
 
-def_srcs = \
-	Grid.c \
-	CommTopology.c \
-	Decomp.c \
-	Decomp_Sync.c \
-	Decomp_Sync_Claim.c \
-	Decomp_Sync_Negotiate.c \
-	DecompTransfer.c \
-	MeshTopology.c \
-	MeshGenerator.c \
-	CartesianGenerator.c \
-	MeshAdaptor.c \
-	SurfaceAdaptor.c \
-	MeshDecomp.c \
-	ElementLayout.c \
-	HexaEL.c \
-	ParallelPipedHexaEL.c \
-	IrregEL.c \
-	NodeLayout.c \
-	CornerNL.c \
-	BodyNL.c \
-	HexaMD.c \
-	DummyMD.c \
-	MeshGeometry.c \
-	MeshLayout.c \
-	MeshClass.c \
-	Init.c \
-	Finalise.c \
-	# StencilMD.c \
+def_srcs =				\
+	Grid.c				\
+	CommTopology.c			\
+	Decomp.c			\
+	Decomp_Sync.c			\
+	Decomp_Sync_Array.c		\
+	Decomposer.c			\
+	DecompTransfer.c		\
+	MeshTopology.c			\
+	Mesh_ElementType.c		\
+	Mesh_HexType.c			\
+	Mesh_CentroidType.c		\
+	Mesh_Algorithms.c		\
+	Mesh_HexAlgorithms.c		\
+	Mesh_RegularAlgorithms.c	\
+	Mesh_CentroidAlgorithms.c	\
+	MeshClass.c			\
+	MeshGenerator.c			\
+	CartesianGenerator.c		\
+	MeshAdaptor.c			\
+	SurfaceAdaptor.c		\
+	CompressionAdaptor.c		\
+	MeshVariable.c			\
+	Init.c				\
+	Finalise.c
 
-def_hdrs = \
-	types.h \
-	shortcuts.h \
-	Grid.h \
-	CommTopology.h \
-	Decomp.h \
-	Decomp_Sync.h \
-	Decomp_Sync_Claim.h \
-	Decomp_Sync_Negotiate.h \
-	DecompTransfer.h \
-	MeshTopology.h \
-	MeshGenerator.h \
-	CartesianGenerator.h \
-	MeshAdaptor.h \
-	SurfaceAdaptor.h \
-	ShadowInfo.h \
-	ElementLayout.h \
-	HexaEL.h \
-	ParallelPipedHexaEL.h \
-	IrregEL.h \
-	NodeLayout.h \
-	CornerNL.h \
-	BodyNL.h \
-	MeshDecomp.h \
-	HexaMD.h \
-	DummyMD.h \
-	MeshGeometry.h \
-	MeshLayout.h \
-	MeshClass.h \
-	Init.h \
-	Finalise.h \
-	Mesh.h \
-	# StencilMD.h \
+def_hdrs =				\
+	types.h				\
+	shortcuts.h			\
+	Grid.h				\
+	CommTopology.h			\
+	Decomp.h			\
+	Decomp_Sync.h			\
+	Decomp_Sync_Array.h		\
+	Decomposer.h			\
+	DecompTransfer.h		\
+	MeshTopology.h			\
+	Mesh_ElementType.h		\
+	Mesh_HexType.h			\
+	Mesh_CentroidType.h		\
+	Mesh_Algorithms.h		\
+	Mesh_HexAlgorithms.h		\
+	Mesh_RegularAlgorithms.h	\
+	Mesh_CentroidAlgorithms.h	\
+	MeshClass.h			\
+	MeshGenerator.h			\
+	CartesianGenerator.h		\
+	MeshAdaptor.h			\
+	SurfaceAdaptor.h		\
+	CompressionAdaptor.h		\
+	MeshVariable.h			\
+	Init.h				\
+	Finalise.h			\
+	Mesh.h
 
 def_objlists = 

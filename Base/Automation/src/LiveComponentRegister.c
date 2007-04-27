@@ -108,7 +108,7 @@ void _LiveComponentRegister_Delete( void* liveComponentRegister )
 
 	assert( self );
 
-	// TODO: add some debug printing about this...
+/* 	 TODO: add some debug printing about this... */
 	LiveComponentRegister_DeleteAll( self );
 	Stg_Class_Delete( self->componentList );
 
@@ -215,7 +215,7 @@ void LiveComponentRegister_DeleteAll( void* liveComponentRegister ) {
 	some other components */
 	for ( index = 0 ; index < LiveComponentRegister_GetCount( self ) ; index++ ) {
 		component = LiveComponentRegister_At( self, index );
-		//printf( "Freeing component \"%s\" (type %s)\n", component->name, component->type );
+/* 		printf( "Freeing component \"%s\" (type %s)\n", component->name, component->type ); */
 		Stg_Class_Delete( component );
 	}
 	self->componentList->count = 0;

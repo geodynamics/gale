@@ -77,8 +77,8 @@ void _RangeSet_Init( RangeSet* self ) {
 	assert( self );
 
 	self->nInds = 0;
-	self->nRanges = 0;
-	self->ranges = NULL;
+	self->btree = BTree_New( RangeSet_DataCompare, RangeSet_DataCopy, RangeSet_DataDelete, NULL, 
+				 BTREE_NO_DUPLICATES );
 }
 
 
@@ -92,6 +92,7 @@ void _RangeSet_Delete( void* rangeSet ) {
 	assert( self );
 
 	RangeSet_Destruct( self );
+	FreeObject( self->btree );
 
 	/* Delete the parent. */
 	_Stg_Class_Delete( self );
@@ -112,14 +113,13 @@ void _RangeSet_Print( void* rangeSet, Stream* stream ) {
 void* _RangeSet_Copy( void* rangeSet, void* destProc_I, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	RangeSet*	self = (RangeSet*)rangeSet;
 	RangeSet*	newRangeSet;
+	unsigned	nInds, *inds;
 
+	inds = NULL;
+	RangeSet_GetIndices( self, &nInds, &inds );
 	newRangeSet = RangeSet_New();
-	newRangeSet->nInds = self->nInds;
-	newRangeSet->nRanges = self->nRanges;
-	if( self->nRanges ) {
-		newRangeSet->ranges = Memory_Alloc_Array( RangeSet_Range, self->nRanges, "RangeSet::ranges" );
-		memcpy( newRangeSet->ranges, self->ranges, self->nRanges * sizeof(RangeSet_Range) );
-	}
+	RangeSet_SetIndices( newRangeSet, nInds, inds );
+	FreeArray( inds );
 
 	return (void*)newRangeSet;
 }
@@ -146,51 +146,66 @@ void RangeSet_SetIndices( void* rangeSet, unsigned nInds, unsigned* inds ) {
 	qsort( tmpInds, nInds, sizeof(unsigned), RangeSet_SortCmp );
 
 	while( curInd < nInds ) {
-		RangeSet_Range*	range;
+		RangeSet_Range	rng;
 
-		if( !self->ranges ) {
-			self->ranges = Memory_Alloc_Array( RangeSet_Range, ++self->nRanges, "RangeSet::ranges" );
-		}
-		else {
-			self->ranges = Memory_Realloc_Array( self->ranges, RangeSet_Range, ++self->nRanges );
-		}
-
-		range = self->ranges + self->nRanges - 1;
-
-		range->begin = tmpInds[curInd++];
+		rng.begin = tmpInds[curInd++];
 		while( curInd < nInds && tmpInds[curInd] == tmpInds[curInd - 1] ) {
 			curInd++;
 			self->nInds--;
 		}
-
 		if( curInd == nInds ) {
-			range->end = range->begin + 1;
-			range->step = 1;
+			rng.end = rng.begin + 1;
+			rng.step = 1;
+			BTree_InsertNode( self->btree, &rng, sizeof(RangeSet_Range) );
 			break;
 		}
 
-		range->end = tmpInds[curInd++];
-		while( curInd < nInds && tmpInds[curInd] == range->end ) {
+		rng.end = tmpInds[curInd++];
+		while( curInd < nInds && tmpInds[curInd] == rng.end ) {
 			curInd++;
 			self->nInds--;
 		}
+		rng.step = rng.end - rng.begin;
 
-		range->step = range->end - range->begin;
-
-		while( curInd < nInds && tmpInds[curInd] - range->end == range->step ) {
-			range->end = tmpInds[curInd++];
-			while( curInd < nInds && tmpInds[curInd] == range->end ) {
+		while( curInd < nInds && tmpInds[curInd] - rng.end == rng.step ) {
+			rng.end = tmpInds[curInd++];
+			while( curInd < nInds && tmpInds[curInd] == rng.end ) {
 				curInd++;
 				self->nInds--;
 			}
 		}
+		rng.end++;
 
-		range->end++;
+		BTree_InsertNode( self->btree, &rng, sizeof(RangeSet_Range) );
 	}
 
 	FreeArray( tmpInds );
 }
 
+void RangeSet_AddIndices( void* rangeSet, unsigned nInds, unsigned* inds ) {
+	RangeSet*	self = (RangeSet*)rangeSet;
+	RangeSet*	tmpSet;
+
+	assert( self );
+
+	tmpSet = RangeSet_New();
+	RangeSet_SetIndices( tmpSet, nInds, inds );
+	RangeSet_Union( self, tmpSet );
+}
+
+void RangeSet_SetRange( void* rangeSet, unsigned begin, unsigned end, unsigned step ) {
+	RangeSet*	self = (RangeSet*)rangeSet;
+	RangeSet_Range	rng;
+
+	assert( self );
+
+	RangeSet_Destruct( self );
+	self->nInds = (end - begin) / step;
+	rng.begin = begin;
+	rng.end = end;
+	rng.step = step;
+	BTree_InsertNode( self->btree, &rng, sizeof(RangeSet_Range) );
+}
 
 void RangeSet_Clear( void* rangeSet ) {
 	RangeSet*	self = (RangeSet*)rangeSet;
@@ -200,94 +215,164 @@ void RangeSet_Clear( void* rangeSet ) {
 	RangeSet_Destruct( self );
 }
 
+void RangeSet_GetIndices( void* rangeSet, unsigned* nInds, unsigned** inds ) {
+	RangeSet*		self = (RangeSet*)rangeSet;
+	RangeSet_ParseStruct	parse;
+
+	assert( self );
+
+	parse.nInds = 0;
+	parse.inds = (*inds) ? *inds : AllocArray( unsigned, self->nInds );
+	BTree_ParseTree( self->btree, RangeSet_GetIndicesParse, &parse );
+
+	*nInds = parse.nInds;
+	*inds = parse.inds;
+
+	/* Sanity check. */
+	assert( *nInds == self->nInds );
+}
+
+unsigned RangeSet_GetSize( void* rangeSet ) {
+	RangeSet*	self = (RangeSet*)rangeSet;
+
+	assert( self );
+
+	return self->nInds;
+}
+
+unsigned RangeSet_GetNumRanges( void* rangeSet ) {
+	RangeSet*	self = (RangeSet*)rangeSet;
+
+	assert( self );
+	assert( self->btree );
+
+	return self->btree->nodeCount;
+}
+
+RangeSet_Range* RangeSet_GetRange( void* rangeSet, unsigned index ) {
+	RangeSet*		self = (RangeSet*)rangeSet;
+	RangeSet_ParseStruct	parse;
+
+	assert( self );
+	assert( self->btree );
+	assert( index < self->btree->nodeCount );
+
+	parse.nInds = index;
+	parse.curInd = 0;
+	BTree_ParseTree( self->btree, RangeSet_GetRangeParse, &parse );
+
+	return parse.range;
+}
+
+Bool RangeSet_HasIndex( void* rangeSet, unsigned index ) {
+	RangeSet*	self = (RangeSet*)rangeSet;
+	RangeSet_Range	rng;
+	BTreeNode*	node;
+
+	assert( self );
+
+	rng.begin = index;
+	rng.end = index + 1;
+	rng.step = 1;
+	node = BTree_FindNode( self->btree, &rng );
+
+	if( node )
+		return RangeSet_Range_HasIndex( node->data, index );
+	else
+		return False;
+}
 
 void RangeSet_Union( void* rangeSet, RangeSet* rSet ) {
 	RangeSet*	self = (RangeSet*)rangeSet;
-	unsigned	maxInds;
-	unsigned	nInds = 0;
-	unsigned*	inds;
-	unsigned	r_i;
+	unsigned	nInds, *inds, *tmpInds;
 
 	assert( self );
 	assert( rSet );
 
-	maxInds = rSet->nInds + self->nInds;
-	inds = Memory_Alloc_Array_Unnamed( unsigned, maxInds );
-	for( r_i = 0; r_i < self->nRanges; r_i++ ) {
-		RangeSet_Range*	range = self->ranges + r_i;
-		unsigned	ind_i;
+	inds = AllocArray( unsigned, rSet->nInds + self->nInds );
+	RangeSet_GetIndices( self, &nInds, &inds );
+	assert( nInds == self->nInds );
+	tmpInds = inds + self->nInds;
+	RangeSet_GetIndices( rSet, &nInds, &tmpInds );
 
-		for( ind_i = range->begin; ind_i < range->end; ind_i += range->step )
-			inds[nInds++] = ind_i;
-	}
-	for( r_i = 0; r_i < rSet->nRanges; r_i++ ) {
-		RangeSet_Range*	range = rSet->ranges + r_i;
-		unsigned	ind_i;
-
-		for( ind_i = range->begin; ind_i < range->end; ind_i += range->step )
-			inds[nInds++] = ind_i;
-	}
-
-	RangeSet_SetIndices( self, nInds, inds );
+	RangeSet_SetIndices( self, rSet->nInds + self->nInds, inds );
 	FreeArray( inds );
 }
-
 
 void RangeSet_Intersection( void* rangeSet, RangeSet* rSet ) {
-	RangeSet*	self = (RangeSet*)rangeSet;
-	unsigned	maxInds;
-	unsigned	nInds = 0;
-	unsigned*	inds;
-	unsigned	r_i;
+	RangeSet*		self = (RangeSet*)rangeSet;
+	RangeSet_ParseStruct	parse;
 
 	assert( self );
 	assert( rSet );
 
-	maxInds = (rSet->nInds > self->nInds) ? rSet->nInds : self->nInds;
-	inds = Memory_Alloc_Array_Unnamed( unsigned, maxInds );
+	parse.operand = rSet;
+	parse.nInds = 0;
+	parse.inds = AllocArray( unsigned, (self->nInds > rSet->nInds) ? self->nInds : rSet->nInds );
+	BTree_ParseTree( self->btree, RangeSet_IntersectionParse, &parse );
 
-	for( r_i = 0; r_i < self->nRanges; r_i++ ) {
-		RangeSet_Range*	range = self->ranges + r_i;
-		unsigned	ind_i;
+	RangeSet_SetIndices( self, parse.nInds, parse.inds );
+	FreeArray( parse.inds );
 
-		for( ind_i = range->begin; ind_i < range->end; ind_i += range->step ) {
-			if( RangeSet_HasIndex( rSet, ind_i ) )
-				inds[nInds++] = ind_i;
-		}
-	}
+#if 0
+	RangeSet*		self = (RangeSet*)rangeSet;
+	RangeSet_ParseStruct	parse;
 
-	RangeSet_SetIndices( self, nInds, inds );
-	FreeArray( inds );
+	assert( self );
+	assert( rSet );
+
+	parse.self = self;
+	parse.operand = rSet;
+	parse.range = NULL;
+	parse.newTree = BTree_New( RangeSet_DataCompare, RangeSet_DataCopy, RangeSet_DataDelete, NULL, 
+					 BTREE_NO_DUPLICATES );
+	parse.nInds = 0;
+	BTree_ParseTree( self->btree, RangeSet_IntersectionParse, &parse );
+
+	FreeObject( self->btree );
+	self->btree = parse.newTree;
+	self->nInds = parse.nInds;
+#endif
 }
-
 
 void RangeSet_Subtraction( void* rangeSet, RangeSet* rSet ) {
-	RangeSet*	self = (RangeSet*)rangeSet;
-	unsigned	maxInds;
-	unsigned	nInds = 0;
-	unsigned*	inds;
-	unsigned	r_i;
+	RangeSet*		self = (RangeSet*)rangeSet;
+	RangeSet_ParseStruct	parse;
 
 	assert( self );
 	assert( rSet );
 
-	maxInds = self->nInds;
-	inds = Memory_Alloc_Array_Unnamed( unsigned, maxInds );
+	parse.operand = rSet;
+	parse.nInds = 0;
+	parse.inds = AllocArray( unsigned, self->nInds );
+	BTree_ParseTree( self->btree, RangeSet_SubtractionParse, &parse );
 
-	for( r_i = 0; r_i < self->nRanges; r_i++ ) {
-		RangeSet_Range*	range = self->ranges + r_i;
-		unsigned	ind_i;
-
-		for( ind_i = range->begin; ind_i < range->end; ind_i += range->step ) {
-			if( !RangeSet_HasIndex( rSet, ind_i ) )
-				inds[nInds++] = ind_i;
-		}
-	}
-
-	RangeSet_SetIndices( self, nInds, inds );
-	FreeArray( inds );
+	RangeSet_SetIndices( self, parse.nInds, parse.inds );
+	FreeArray( parse.inds );
 }
 
+void RangeSet_Pickle( void* rangeSet, unsigned* nBytes, Stg_Byte** bytes ) {
+	RangeSet*	self = (RangeSet*)rangeSet;
+
+	assert( self );
+	assert( nBytes );
+	assert( bytes );
+
+	if( self->nInds ) {
+		RangeSet_ParseStruct	parse;
+
+		*nBytes = sizeof(unsigned) + self->btree->nodeCount * sizeof(RangeSet_Range);
+		*bytes = AllocArray( Stg_Byte, *nBytes );
+		((unsigned*)*bytes)[0] = self->nInds;
+		parse.bytes = *bytes;
+		parse.curInd = 0;
+		BTree_ParseTree( self->btree, RangeSet_PickleParse, &parse );
+	}
+	else {
+		*nBytes = 0;
+		*bytes = NULL;
+	}
+}
 
 void RangeSet_Unpickle( void* rangeSet, unsigned nBytes, Stg_Byte* bytes ) {
 	RangeSet*	self = (RangeSet*)rangeSet;
@@ -301,107 +386,85 @@ void RangeSet_Unpickle( void* rangeSet, unsigned nBytes, Stg_Byte* bytes ) {
 	if( nBytes ) {
 		self->nInds = ((unsigned*)bytes)[0];
 		if( self->nInds ) {
-			self->nRanges = (nBytes - sizeof(unsigned)) / sizeof(RangeSet_Range);
-			self->ranges = Memory_Alloc_Array( RangeSet_Range, self->nRanges, "RangeSet::ranges" );
-			memcpy( self->ranges, bytes + sizeof(unsigned), nBytes - sizeof(unsigned) );
+			unsigned	nRngs;
+			RangeSet_Range*	rng;
+			unsigned	r_i;
+
+			nRngs = (nBytes - sizeof(unsigned)) / sizeof(RangeSet_Range);
+			for( r_i = 0; r_i < nRngs; r_i++ ) {
+				rng = (RangeSet_Range*)(bytes + sizeof(unsigned) + r_i * sizeof(RangeSet_Range));
+				BTree_InsertNode( self->btree, rng, sizeof(RangeSet_Range) );
+			}
 		}
 	}
 }
 
-
-void RangeSet_GetIndices( void* rangeSet, unsigned* nInds, unsigned** inds ) {
-	RangeSet*	self = (RangeSet*)rangeSet;
-	unsigned	r_i;
+unsigned RangeSet_Range_GetNumIndices( RangeSet_Range* self ) {
+	unsigned	w;
 
 	assert( self );
+
+	w = self->end - self->begin;
+	return w / self->step + ((w % self->step) ? 1 : 0);
+}
+
+void RangeSet_Range_GetIndices( RangeSet_Range* self, unsigned* nInds, unsigned** inds ) {
+	unsigned	ind_i;
+
+	assert( self );
+
+	if( !(*inds) )
+		*inds = AllocArray( unsigned, RangeSet_Range_GetNumIndices( self ) );
 
 	*nInds = 0;
-	if( self->nInds )
-		*inds = Memory_Alloc_Array_Unnamed( unsigned, self->nInds );
-	else
-		*inds = NULL;
-
-	for( r_i = 0; r_i < self->nRanges; r_i++ ) {
-		RangeSet_Range*	range = self->ranges + r_i;
-		unsigned	ind_i;
-
-		for( ind_i = range->begin; ind_i < range->end; ind_i += range->step )
-			(*inds)[(*nInds)++] = ind_i;
-	}
-
-	/* Sanity check. */
-	assert( *nInds == self->nInds );
+	for( ind_i = self->begin; ind_i < self->end; ind_i += self->step )
+		(*inds)[(*nInds)++] = ind_i;
 }
 
-
-Bool RangeSet_HasIndex( void* rangeSet, unsigned ind ) {
-	RangeSet*	self = (RangeSet*)rangeSet;
-	unsigned	r_i;
-
+Bool RangeSet_Range_HasIndex( RangeSet_Range* self, unsigned index ) {
 	assert( self );
+	assert( self->step > 0 );
 
-	for( r_i = 0; r_i < self->nRanges; r_i++ ) {
-		RangeSet_Range*	range = self->ranges + r_i;
+	if( index < self->begin || index >= self->end )
+		return False;
 
-		if( ind >= range->begin && ind < range->end ) {
-			if( !((ind - range->begin) % range->step) )
-				return True;
-		}
-		else if( ind < range->begin )
+	return ((index - self->begin) % self->step) ? False : True;
+}
+
+void RangeSet_Range_Intersection( RangeSet_Range* left, RangeSet_Range* right, RangeSet_Range* result ) {
+	unsigned	a, b, t;
+	unsigned	ind_i;
+
+	assert( left );
+	assert( right );
+	assert( result );
+
+	/* Find start point. */
+	for( ind_i = right->begin; ind_i < right->end; ind_i += right->step ) {
+		if( RangeSet_Range_HasIndex( left, ind_i ) )
 			break;
 	}
-
-	return False;
-}
-
-
-unsigned RangeSet_GetNIndices( void* rangeSet ) {
-	RangeSet*	self = (RangeSet*)rangeSet;
-
-	assert( self );
-
-	return self->nInds;
-}
-
-
-unsigned RangeSet_GetNRanges( void* rangeSet ) {
-	RangeSet*	self = (RangeSet*)rangeSet;
-
-	assert( self );
-
-	return self->nRanges;
-}
-
-
-void RangeSet_GetRange( void* rangeSet, unsigned ind, RangeSet_Range* range ) {
-	RangeSet*	self = (RangeSet*)rangeSet;
-
-	assert( self );
-	assert( ind < self->nRanges );
-	assert( range );
-
-	memcpy( range, self->ranges + ind, sizeof(RangeSet_Range) );
-}
-
-
-void RangeSet_Pickle( void* rangeSet, unsigned* nBytes, Stg_Byte** bytes ) {
-	RangeSet*	self = (RangeSet*)rangeSet;
-
-	assert( self );
-	assert( nBytes );
-	assert( bytes );
-
-	if( self->nInds ) {
-		*nBytes = sizeof(unsigned) + self->nRanges * sizeof(RangeSet_Range);
-		*bytes = Memory_Alloc_Array_Unnamed( Stg_Byte, *nBytes );
-		((unsigned*)*bytes)[0] = self->nInds;
-		if( self->nRanges )
-			memcpy( *bytes + sizeof(unsigned), self->ranges, *nBytes - sizeof(unsigned) );
+	if( ind_i >= right->end ) {
+		result->begin = 0;
+		result->end = 0;
+		result->step = 1;
 	}
-	else {
-		*nBytes = 0;
-		*bytes = NULL;
+	else
+		result->begin = ind_i;
+
+	/* Calculate step size using Euclid's theorem. */
+	a = left->step;
+	b = right->step;
+	while( b != 0 ) {
+		t = b;
+		b = a % b;
+		a = t;
 	}
+	result->step = a;
+
+	/* Calculate end point. */
+	t = (left->end > right->end) ? left->end : right->end;
+	result->end = (t / result->step) * result->step;
 }
 
 
@@ -409,16 +472,140 @@ void RangeSet_Pickle( void* rangeSet, unsigned* nBytes, Stg_Byte** bytes ) {
 ** Private Functions
 */
 
+void RangeSet_GetIndicesParse( void* data, void* _parse ) {
+	RangeSet_Range*		range = (RangeSet_Range*)data;
+	RangeSet_ParseStruct*	parse = (RangeSet_ParseStruct*)_parse;
+	unsigned		nInds, *tmpInds;
+
+	assert( range );
+	assert( parse );
+
+	tmpInds = parse->inds + parse->nInds;
+	RangeSet_Range_GetIndices( range, &nInds, &tmpInds );
+	parse->nInds += nInds;
+}
+
+void RangeSet_GetRangeParse( void* data, void* _parse ) {
+	RangeSet_Range*		range = (RangeSet_Range*)data;
+	RangeSet_ParseStruct*	parse = (RangeSet_ParseStruct*)_parse;
+
+	assert( range );
+	assert( parse );
+
+	if( parse->curInd++ == parse->nInds )
+		parse->range = range;
+}
+
+void RangeSet_IntersectionParse( void* data, void* _parse ) {
+	RangeSet_Range*		range = (RangeSet_Range*)data;
+	RangeSet_ParseStruct*	parse = (RangeSet_ParseStruct*)_parse;
+	unsigned		ind_i;
+
+	assert( range );
+	assert( parse );
+
+	for( ind_i = range->begin; ind_i < range->end; ind_i += range->step ) {
+		if( RangeSet_HasIndex( parse->operand, ind_i ) )
+			parse->inds[parse->nInds++] = ind_i;
+	}
+
+#if 0
+	RangeSet_Range*		range = (RangeSet_Range*)data;
+	RangeSet_ParseStruct*	parse = (RangeSet_ParseStruct*)_parse;
+
+	assert( range );
+	assert( parse );
+
+	parse->range = data;
+	RangeSet_RangeIntersectionParse( parse->operand->btree->root, parse );
+#endif
+}
+
+void RangeSet_SubtractionParse( void* data, void* _parse ) {
+	RangeSet_Range*		range = (RangeSet_Range*)data;
+	RangeSet_ParseStruct*	parse = (RangeSet_ParseStruct*)_parse;
+	unsigned		ind_i;
+
+	assert( range );
+	assert( parse );
+
+	for( ind_i = range->begin; ind_i < range->end; ind_i += range->step ) {
+		if( !RangeSet_HasIndex( parse->operand, ind_i ) )
+			parse->inds[parse->nInds++] = ind_i;
+	}
+}
+
+void RangeSet_PickleParse( void* data, void* _parse ) {
+	RangeSet_Range*		range = (RangeSet_Range*)data;
+	RangeSet_ParseStruct*	parse = (RangeSet_ParseStruct*)_parse;
+
+	assert( range );
+	assert( parse );
+
+	memcpy( parse->bytes + sizeof(unsigned) + parse->curInd, range, sizeof(RangeSet_Range) );
+	parse->curInd += sizeof(RangeSet_Range);
+}
+
+#if 0
+void RangeSet_RangeIntersectionParse( BTreeNode* node, RangeSet_ParseStruct* parse ) {
+	RangeSet_Range*		range;
+	RangeSet_Range		newRng;
+	unsigned		nInds;
+
+	assert( node );
+	assert( node->data );
+	assert( parse );
+
+	range = (RangeSet_Range*)node->data;
+
+	if( range->end > parse->range->begin && range->begin < parse->range->end ) {
+		RangeSet_Range_Intersection( range, parse->range, &newRng );
+		nInds = RangeSet_Range_GetNumIndices( &newRng );
+		if( nInds ) {
+			parse->nInds += nInds;
+			BTree_InsertNode( parse->newTree, &newRng, sizeof(RangeSet_Range) );
+		}
+	}
+
+	if( range->begin < parse->range->begin && node->left != NIL )
+		RangeSet_RangeIntersectionParse( node->left, parse );
+	if( range->end > parse->range->end && node->right != NIL )
+		RangeSet_RangeIntersectionParse( node->right, parse );
+}
+#endif
+
 int RangeSet_SortCmp( const void* itema, const void* itemb ) {
 	assert( itema && itemb );
 	return *((unsigned*)itema) - *((unsigned*)itemb);
+}
+
+int RangeSet_DataCompare( void* left, void* right ) {
+	RangeSet_Range*	a = (RangeSet_Range*)left;
+	RangeSet_Range*	b = (RangeSet_Range*)right;
+
+	if( a->begin >= b->end )
+		return 1;
+	else if( a->end <= b->begin )
+		return -1;
+	else
+		return 0;
+}
+
+void RangeSet_DataCopy( void** dstData, void* data, SizeT size ) {
+	*dstData = AllocArray( RangeSet_Range, 1 );
+	memcpy( *dstData, data, sizeof(RangeSet_Range) );
+}
+
+void RangeSet_DataDelete( void* data ) {
+	FreeArray( data );
 }
 
 
 void RangeSet_Destruct( RangeSet* self ) {
 	assert( self );
 
-	KillArray( self->ranges );
-	self->nRanges = 0;
 	self->nInds = 0;
+	FreeObject( self->btree );
+	self->btree = BTree_New( RangeSet_DataCompare, RangeSet_DataCopy, RangeSet_DataDelete, NULL, 
+				 BTREE_NO_DUPLICATES );
 }

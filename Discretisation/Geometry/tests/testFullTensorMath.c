@@ -43,7 +43,7 @@ int main( int argc, char* argv[] ) {
 	int rank;
 	int numProcessors;
 	int procToWatch;
-	Stream*  stream;
+	Stream*  stream = Journal_Register( InfoStream_Type, "FullTensorMath" );
 	
 	/* Initialise MPI, get world info */
 	MPI_Init( &argc, &argv );
@@ -56,8 +56,6 @@ int main( int argc, char* argv[] ) {
 	DiscretisationGeometry_Init( &argc, &argv );
 	MPI_Barrier( CommWorld ); /* Ensures copyright info always come first in output */
 	
-	stream = Journal_Register( InfoStream_Type, "FullTensorMath" );
-
 	stJournal->firewallProducesAssert = False;
 	Stream_RedirectFile(Journal_Register( Error_Type, "FullTensorMath"), "FullTensorMath.txt");
 	Stream_RedirectFile(stream, "FullTensorMath.txt");

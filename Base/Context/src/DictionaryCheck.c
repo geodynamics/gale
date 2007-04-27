@@ -74,10 +74,10 @@ void CheckDictionaryKeys( Dictionary* dictionary, char* errorMessage)
 					dictionary->entryPtr[index_J]->key)) )
 				{
 
-					//preserve indexes index_I, index_J
+/* 					preserve indexes index_I, index_J */
 					keyIndexArray[errCount][0] = index_I;
 					keyIndexArray[errCount][1] = index_J;					
-					//increment counter
+/* 					increment counter */
 					errCount++;
 					
 				}
@@ -100,7 +100,7 @@ void CheckDictionaryKeys( Dictionary* dictionary, char* errorMessage)
 			Journal_Printf(errStream, "\"%s\"\n",					 
 				dictionary->entryPtr[keyIndexArray[errIndex][1]]->key );
 		}
-		//Do I need this one here if Journal_Firewall exits prog?
+/* 		Do I need this one here if Journal_Firewall exits prog? */
 		Stream_UnIndent(errStream);
 		Journal_Firewall(errCount == 0, errStream, 
 					"Error in %s with %d entries in dictionary keys\n",

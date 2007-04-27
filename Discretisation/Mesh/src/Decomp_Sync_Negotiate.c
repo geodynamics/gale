@@ -180,13 +180,13 @@ void Decomp_Sync_Negotiate_Select( void* negotiate, Decomp_Sync* sync ) {
 
 	/* Shortcuts. */
 	commTopo = sync->commTopo;
-	MPI_Comm_rank( commTopo->comm, (int*)&rank );
+	rank = CommTopology_GetGlobalCommRank( commTopo );
 
 	/* Locate remote indices. */
 	Decomp_Sync_Negotiate_RemoteSearch( self, sync, &nFound, &found );
 
 	/* Get processor incidence. */
-	CommTopology_GetIncidence( commTopo, rank, &nInc, &inc );
+	CommTopology_GetIncidence( commTopo, &nInc, &inc );
 
 	if( nInc ) {
 		/* Set up the source arrays. */
@@ -277,9 +277,6 @@ void Decomp_Sync_Negotiate_Select( void* negotiate, Decomp_Sync* sync ) {
 			sync->netSnks += sync->nSnks[p_i];
 		}
 	}
-
-	/* Return incidence. */
-	CommTopology_ReturnIncidence( commTopo, rank, &nInc, &inc );
 }
 
 

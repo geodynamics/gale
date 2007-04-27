@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Operator.c 4073 2007-04-18 02:00:13Z JulianGiordani $
+** $Id: Operator.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -101,13 +101,13 @@ void _Operator_Delete(void* operator) {
 }
 
 void _Operator_Print(void* operator, Stream* stream) {
-	//Operator* self = (Operator*) operator;
+  /*Operator* self = (Operator*) operator; */
 
 	abort();
 }
 
 void* _Operator_Copy( void* operator, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
-	//Operator* self = (Operator*) operator;
+  /*Operator* self = (Operator*) operator; */
 	abort();
 }
 
@@ -375,7 +375,7 @@ void Operator_VectorScale( void* operator, double* operand0, double* operand1, d
 
 void Operator_Rounding( void* operator, double* operand0, double* result ) {
 	Operator*     self = (Operator*) operator;
-	// TODO: read this in from somewhere instead of just hard-coding it....
+	/* TODO: read this in from somewhere instead of just hard-coding it.... */
 	unsigned int  nSigFigsToRoundTo = 6;
 	Index         val_I;
 
@@ -418,7 +418,7 @@ void Operator_SymmetricTensorInnerProduct( void* operator, double* operand0, dou
 	
 	Operator_FirewallBinary( self );
 
-	// Must be symmetric Tensors
+	/* Must be symmetric Tensors */
 	if( self->dim == 2 ) {
 		*result = operand0[0] * operand1[0] + operand0[1] * operand1[1] + ( 2 * operand0[2] * operand1[2] );
 	} else {
@@ -434,7 +434,7 @@ void Operator_TensorInvariant( void* operator, double* operand0, double* result 
 
 	Operator_FirewallUnary( self );
 
-	// Must be a full Tensor
+	/* Must be a full Tensor */
 	*result = TensorArray_2ndInvariant( operand0, self->dim );
 }
 

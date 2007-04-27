@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: CompositeVC.c 3881 2006-10-26 03:14:19Z KathleenHumble $
+** $Id: CompositeVC.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -318,10 +318,10 @@ void _CompositeVC_Construct( void* compositeVC, Stg_ComponentFactory* cf, void* 
 	vcName = Stg_ComponentFactory_GetString( cf, self->name, "vcName", self->name );
 	if ( cf->rootDict )
 		vcDict = Dictionary_GetDictionary( cf->rootDict, vcName );
-//	Journal_Firewall(
-//			vcDict != NULL,
-//			Journal_Register( Error_Type, self->type ),
-//			"For %s '%s' - Cannont find variable condition dictionary '%s'\n", self->type, self->name, vcName );
+/* 	Journal_Firewall( */
+/* 			vcDict != NULL, */
+/* 			Journal_Register( Error_Type, self->type ), */
+/* 			"For %s '%s' - Cannont find variable condition dictionary '%s'\n", self->type, self->name, vcName ); */
 	
 	initData = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Data", Stg_Component, False, data );
 	

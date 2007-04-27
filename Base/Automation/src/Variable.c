@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Variable.c 4051 2007-03-26 10:36:19Z PatrickSunter $
+** $Id: Variable.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -226,6 +226,50 @@ Variable* Variable_NewVector(
 	return self;
 }
 
+Variable* Variable_NewVector2( 
+		Name						name,
+		Variable_DataType				dataType,
+		Index						dataTypeCount,
+		Index*						arraySizePtr,
+		void**						arrayPtrPtr,
+		Variable_Register*				vr,
+		char**						dataNames )
+{
+	Variable*		self;
+	SizeT			dataOffsets[] = { 0 };
+	Variable_DataType	dataTypes[] = { 0 };
+	Index			dataTypeCounts[] = { 0 };
+
+	dataTypes[0] = dataType;
+	dataTypeCounts[0] = dataTypeCount;
+
+	self = _Variable_New( 
+		sizeof(Variable), 
+		Variable_Type, 
+		_Variable_Delete, 
+		_Variable_Print, 
+		_Variable_Copy, 
+		(void*)Variable_DefaultNew,
+		_Variable_Construct,
+		_Variable_Build, 
+		_Variable_Initialise, 
+		_Variable_Execute, 
+		_Variable_Destroy,
+		name,
+		True,
+		1, 
+		dataOffsets, 
+		dataTypes, 
+		dataTypeCounts, 
+		dataNames,
+		0, /* means work out from dataType at build phase */
+		arraySizePtr,
+		arrayPtrPtr, 
+		vr );
+
+	return self;
+}
+
 
 void Variable_Init(
 		Name						name,
@@ -302,7 +346,7 @@ Variable* _Variable_New(
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(Variable) );
 	self = (Variable*)_Stg_Component_New( _sizeOfSelf, type, _delete, _print, _copy, _defaultConstructor,
-										_construct, _build, _initialise, _execute, _destroy, name, NON_GLOBAL );
+					      _construct, _build, _initialise, _execute, _destroy, name, NON_GLOBAL );
 	
 	/* General info */
 	
@@ -351,6 +395,7 @@ void _Variable_Init(
 	self->structSizePtr = structSizePtr;
 	self->arraySizePtr = arraySizePtr;
 	self->arrayPtrPtr = arrayPtrPtr;
+	self->parent = NULL;
 
 	/* Use of this class has increased... can't assume the info arrays are on persistant memory... copy by default. They will
 	   be deleted. */
@@ -416,6 +461,7 @@ void _Variable_Init(
 						self->arraySizePtr,
 						self->arrayPtrPtr,
 						vr );
+					self->components[component_I]->parent = self;
 				}
 			}
 		}
@@ -459,6 +505,7 @@ void _Variable_Init(
 						self->arraySizePtr,
 						self->arrayPtrPtr,
 						vr );
+					self->components[vector_I]->parent = self;
 				}
 			}
 		}
@@ -697,6 +744,11 @@ void _Variable_Build( void* variable, void* data ) {
 	Variable*	self = (Variable*)variable;
 	Index 		component_I;
 	Index 		subVariable_I;
+
+/*
+	if( self->parent )
+		Build( self->parent, NULL, False );
+*/
 	
 	/* Obtain the actual array size, and array pointer */
 	Journal_Firewall( 

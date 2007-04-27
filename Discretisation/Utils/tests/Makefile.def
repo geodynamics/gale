@@ -24,7 +24,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: Makefile.def 3821 2006-10-03 05:26:46Z KathleenHumble $
+## $Id: Makefile.def 4081 2007-04-27 06:20:07Z LukeHodkinson $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -41,8 +41,6 @@ def_srcs = \
 	testDofLayout.c \
 	testDofLayout-remap.c \
 	testDofLayout-saveAndLoad.c \
-	testMeshCoarsener_Hexa.c \
-	testSync.c \
 	testSobolGenerator.c \
 	testSemiRegDeform.c \
 	testTimeIntegration.c \
@@ -73,9 +71,6 @@ def_checks = \
 	testDofLayout.0of1.sh \
 	testDofLayout-remap.0of1.sh \
 	testDofLayout-saveAndLoad.0of1.sh \
-	testMeshCoarsener_Hexa.0of1.sh \
-	testMeshCoarsener_Hexa.0of2.sh \
-	testMeshCoarsener_Hexa.1of2.sh \
 	testTimeIntegrationEuler.0of1.sh \
 	testTimeIntegrationRK2.0of1.sh \
 	testTimeIntegrationRK4.0of1.sh \

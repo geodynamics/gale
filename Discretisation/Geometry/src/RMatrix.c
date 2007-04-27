@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: RMatrix.c 3462 2006-02-19 06:53:24Z WalterLandry $
+** $Id: RMatrix.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -36,6 +36,7 @@
 #include "types.h"
 #include "VectorMath.h"
 #include "RMatrix.h"
+#include "TrigMath.h"
 
 #include <math.h>
 #include <assert.h>
@@ -51,10 +52,10 @@ void RMatrix_BuildOrientation( RMatrix dest, Coord zAxis, Coord xAxis ) {
 	
 	RMatrix_LoadIdentity( dest );
 	RMatrix_ApplyRotationY( dest, ArcTan( zAxis[0], zAxis[2] ) );
-	RMatrix_ApplyRotationX( dest, asin( zAxis[1] / Vector_Mag( zAxis ) ) );
+	RMatrix_ApplyRotationX( dest, asin( zAxis[1] / Vec_Mag3D( zAxis ) ) );
 	
 	RMatrix_VectorMult( nxa, dest, xAxis );
-	RMatrix_ApplyRotationZ( dest, asin( nxa[1] / Vector_Mag( nxa ) ) );
+	RMatrix_ApplyRotationZ( dest, asin( nxa[1] / Vec_Mag3D( nxa ) ) );
 }
 
 
@@ -115,5 +116,5 @@ void RMatrix_VectorMult( Coord dest, RMatrix mat, Coord vec ) {
 	tmp[1] = mat[3] * vec[0] + mat[4] * vec[1] + mat[5] * vec[2];
 	tmp[2] = mat[6] * vec[0] + mat[7] * vec[1] + mat[8] * vec[2];
 	
-	Vector_Set( dest, tmp );
+	Vec_Set3D( dest, tmp );
 }

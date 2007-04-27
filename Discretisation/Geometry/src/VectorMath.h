@@ -36,98 +36,93 @@
 **    may be one and the same; it may be assumed that such an occurence will be
 **    handled.
 **
-** $Id: VectorMath.h 3926 2007-01-02 04:53:16Z KathleenHumble $
+** $Id: VectorMath.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #ifndef __Discretisation_Geometry_VectorMath_h__
 #define __Discretisation_Geometry_VectorMath_h__
-	
-	
+
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Macros
 	*/
-	
-	/*
-	** Base operations.
-	*/
-	
-	/** copy src onto dest */
-	#define Vector_Set( dest, src )		\
-		(dest)[0] = (src)[0];		\
-		(dest)[1] = (src)[1];		\
-		(dest)[2] = (src)[2]
-	
-	
-	/** set dest's components to src */
-	#define Vector_SetScalar( dest, x, y, z )		\
-		(dest)[0] = x;					\
-		(dest)[1] = y;					\
-		(dest)[2] = z
-	/** set dest's components to src vector in 2d */
-	#define Vector_SetScalar2D( dest, x, y )                \
-		(dest)[0] = x;                                  \
-		(dest)[1] = y	
-	
-	/** dest = a + b */
-	#define Vector_Add( dest, a, b )		\
-		(dest)[0] = (a)[0] + (b)[0];		\
-		(dest)[1] = (a)[1] + (b)[1];		\
-		(dest)[2] = (a)[2] + (b)[2]
-		
-	
-	/** dest = a - b */
-	#define Vector_Sub( dest, a, b )		\
-		(dest)[0] = (a)[0] - (b)[0];		\
-		(dest)[1] = (a)[1] - (b)[1];		\
-		(dest)[2] = (a)[2] - (b)[2]
-		
-	
-	/** returns the dot product of a and b */
-	#define Vector_Dot( a, b )						\
-		((a)[0] * (b)[0] + (a)[1] * (b)[1] + (a)[2] * (b)[2])
-		
-	
-	/** dest = a * s */
-	#define Vector_Mult( dest, a, s )		\
-		(dest)[0] = (a)[0] * (s);		\
-		(dest)[1] = (a)[1] * (s);		\
-		(dest)[2] = (a)[2] * (s)
-		
-	
-	/** returns the magnitude of a */
-	#define Vector_Mag( a )								\
-		sqrt( (a)[0] * (a)[0] + (a)[1] * (a)[1] + (a)[2] * (a)[2] )
-		
-		
-	/*
-	** Combinations of base operations.
-	*/
-	
-	/** vector projection of a onto b, store result in dest */
-	#define Vector_Proj( dest, a, b )					\
-		Vector_Norm( (dest), (b) );					\
-		Vector_Mult( (dest), (dest), Vector_Dot( a, b ) )
+
+	#define Vec_Set2D( dst, src )			\
+		((dst)[0] = (src)[0],			\
+		 (dst)[1] = (src)[1], 0)
+
+	#define Vec_Set3D( dst, src )			\
+		(Vec_Set2D( dst, src ),			\
+		 (dst)[2] = (src)[2], 0)
+
+	#define Vec_SetScalar2D( dst, x, y )		\
+		((dst)[0] = x,				\
+		 (dst)[1] = y, 0)
+
+	#define Vec_SetScalar3D( dst, x, y, z )		\
+		(Vec_SetScalar2D( dst, x, y ),		\
+		 (dst)[2] = z, 0)
+
+	#define Vec_Add2D( dst, a, b )			\
+		((dst)[0] = (a)[0] + (b)[0],		\
+		 (dst)[1] = (a)[1] + (b)[1], 0)
+
+	#define Vec_Add3D( dst, a, b )			\
+		(Vec_Add2D( dst, a, b ),		\
+		 (dst)[2] = (a)[2] + (b)[2], 0)
+
+	#define Vec_Sub2D( dst, a, b )			\
+		((dst)[0] = (a)[0] - (b)[0],		\
+		 (dst)[1] = (a)[1] - (b)[1], 0)
+
+	#define Vec_Sub3D( dst, a, b )			\
+		(Vec_Sub2D( dst, a, b ),		\
+		 (dst)[2] = (a)[2] - (b)[2], 0)
+
+	#define Vec_Dot2D( a, b )			\
+		((a)[0] * (b)[0] + (a)[1] * (b)[1])
+
+	#define Vec_Dot3D( a, b )			\
+		(Vec_Dot2D( a, b ) + (a)[2] * (b)[2])
+
+	#define Vec_Scale2D( dst, a, s )		\
+		((dst)[0] = (a)[0] * (s),		\
+		 (dst)[1] = (a)[1] * (s), 0)
+
+	#define Vec_Scale3D( dst, a, s )		\
+		(Vec_Scale2D( dst, a, s ),		\
+		 (dst)[2] = (a)[2] * (s), 0)
+
+	#define Vec_MagSq2D( a )			\
+		Vec_Dot2D( a, a )
+
+	#define Vec_MagSq3D( a )			\
+		Vec_Dot3D( a, a )
+
+	#define Vec_Mag2D( a )				\
+		sqrt( Vec_MagSq2D( a ) )
+
+	#define Vec_Mag3D( a )				\
+		sqrt( Vec_MagSq3D( a ) )
+
+	#define Vec_Proj2D( dst, a, b )					\
+		(Vec_Norm2D( dst, b ),					\
+		 Vec_Scale2D( dst, dst, Vec_Dot2D( a, b ) ), 0)
+
+	#define Vec_Proj3D( dst, a, b )					\
+		(Vec_Norm3D( dst, b ),					\
+		 Vec_Scale3D( dst, dst, Vec_Dot3D( a, b ) ), 0)
 
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Functions
 	*/
-	
-	/*
-	** Base operations.
-	*/
-	
-	/* Initialise a Vecotor with zeros */
-	void ZeroVector( double* vector, Index length );
-	/* Vector cross-product. */
-	void Vector_Cross( Coord dst, Coord a, Coord b );
-	
-	/* dest = a / s */
-	void Vector_Div( Coord dest, Coord a, double s );
-	
-	/* normalise a, store in dest */
-	void Vector_Norm( Coord dest, Coord a );
+
+	void Vec_Cross3D( double* dst, double* a, double* b );
+	void Vec_Div2D( double* dst, double* a, double s );
+	void Vec_Div3D( double* dst, double* a, double s );
+	void Vec_Norm2D( double* dst, double* a );
+	void Vec_Norm3D( double* dst, double* a );
 
 	void StGermain_RotateVector(double* rotatedVector, double* vector, double* w, double theta) ;
 	void StGermain_RotateCoordinateAxis( double* rotatedVector, double* vector, Index axis, double theta ) ;
@@ -146,20 +141,22 @@
 
 	void StGermain_TriangleCentroid( double* centroid, double* pos0, double* pos1, double* pos2, Index dim) ;
 	double StGermain_TriangleArea( double* pos0, double* pos1, double* pos2, Index dim ) ;
-	double StGermain_ConvexQuadrilateralArea( double* vertexCoord1, double* vertexCoord2, double* vertexCoord3, double* vertexCoord4, Dimension_Index dim ) ;
-	double StGermain_ParallelepipedVolume( 
-		double* coordLeftBottomFront, 
-		double* coordRightBottomFront, 
-		double* coordLeftTopFront, 
-		double* coordLeftBottomBack );
+	double StGermain_ConvexQuadrilateralArea( double* vertexCoord1, double* vertexCoord2, 
+						  double* vertexCoord3, double* vertexCoord4, 
+						  Dimension_Index dim ) ;
+	double StGermain_ParallelepipedVolume( double* coordLeftBottomFront, 
+					       double* coordRightBottomFront, 
+					       double* coordLeftTopFront, 
+					       double* coordLeftBottomBack );
 	double StGermain_ParallelepipedVolumeFromCoordList( Coord_List list ) ;
 	
 	void StGermain_AverageCoord( double* coord, double** coordList, Index count, Dimension_Index dim ) ;
 	void StGermain_PrintVector( Stream* stream, double* vector, Index dim ) ;
+
 	/** Print a named vector. Name comes from vector variable in file*/
-	#define StGermain_PrintNamedVector(stream, vector, dim) \
-		do {	\
-			Journal_Printf( stream, #vector " - " ); \
+	#define StGermain_PrintNamedVector(stream, vector, dim)		\
+		do {							\
+			Journal_Printf( stream, #vector " - " );	\
 			StGermain_PrintVector( stream, vector, dim );	\
 		} while(0)
 

@@ -32,7 +32,7 @@
 **
 ** Comments:
 **
-** $Id: Plane.h 3462 2006-02-19 06:53:24Z WalterLandry $
+** $Id: Plane.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -46,19 +46,19 @@
 	
 	/* calculate a plane equation from two non-parallel vectors and a point */
 	#define Plane_CalcFromVec( dest, axisA, axisB, pointOnPlane )		\
-		Vector_Cross( dest, axisA, axisB );				\
-		Vector_Norm( dest, dest );					\
-		dest[3] = Vector_Dot( dest, pointOnPlane )
+		Vec_Cross3D( dest, axisA, axisB );				\
+		Vec_Norm3D( dest, dest );					\
+		dest[3] = Vec_Dot3D( dest, pointOnPlane )
 		
 	
 	/* return the plane's normal in dest */
 	#define Plane_Normal( dest, plane )		\
-		Vector_Set( dest, plane )
+		Vec_Set3D( dest, plane )
 		
 	
 	/* calculate the shortest distance from plane to point */
 	#define Plane_DistanceToPoint( plane, point )		\
-		(Vector_Dot( plane, point ) - plane[3])
+		(Vec_Dot3D( plane, point ) - plane[3])
 	
 	
 	/* determines if point is in front of the plane based on the direction of the plane's normal */
@@ -68,7 +68,7 @@
 	
 	/* determines if the point is situated on the plane */
 	#define Plane_PointIsOnPlane( plane, point )				\
-		(Vector_Dot( plane, point ) == plane[3] ? True : False)
+		(Vec_Dot3D( plane, point ) == plane[3] ? True : False)
 		
 
 	/*--------------------------------------------------------------------------------------------------------------------------

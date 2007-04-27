@@ -24,7 +24,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: Makefile.def 4063 2007-04-04 02:51:49Z RaquibulHassan $
+## $Id: Makefile.def 4081 2007-04-27 06:20:07Z LukeHodkinson $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -36,15 +36,12 @@ def_srcs = \
 	testIndexSet-badAccess.c \
 	testPtrMap.c \
 	testIndexMap.c \
-	testList.c \
 	testArray.c \
-	testUniqueList.c \
 	testLinkedList.c \
 	testLinkedListIterator.c \
 	testSet.c \
 	testHashTable.c \
 	testPtrSet.c \
-	testMap.c \
 	testBTree.c \
 	testMaxHeap.c \
 	testMPIRoutines.c \
@@ -56,7 +53,6 @@ def_checks = \
 	testIndexSet.0of1.sh \
 	testPtrMap.0of1.sh \
 	testIndexMap.0of1.sh \
-	testList.0of1.sh \
 	testArray.0of1.sh \
 	testLinkedList.0of1.sh \
 	testLinkedListIterator.0of1.sh \

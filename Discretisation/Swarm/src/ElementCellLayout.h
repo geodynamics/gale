@@ -37,7 +37,7 @@
 **	Created with Snac in mind.
 **	"Mesh*"  in the constuctor can be set to 0, but must then be set manually before the ensemble is created.
 **
-** $Id: ElementCellLayout.h 3851 2006-10-12 08:57:22Z SteveQuenette $
+** $Id: ElementCellLayout.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -56,7 +56,8 @@
 		/* Virtual info */ \
 		\
 		/* ElementCellLayout info */ \
-		Mesh*					mesh;
+		Mesh*					mesh; \
+		ShadowInfo				cellShadowInfo;
 
 	struct ElementCellLayout { __ElementCellLayout };
 	
@@ -137,10 +138,10 @@
 	
 	/* Returns the cell point array... this is the mesh's element node array */
 	void _ElementCellLayout_InitialisePoints( void* elementCellLayout, Cell_Index cellIndex, Cell_PointIndex pointCount, 
-		Cell_Points points );
+		double*** points );
 	
 	/** Implements CellLayout_MapElementIdToCellId(): just returns a cell number, after checking size */
-	Cell_Index _ElementCellLayout_MapElementIdToCellId( void* cellLayout, Element_DomainIndex element_dI ); 
+	Cell_Index _ElementCellLayout_MapElementIdToCellId( void* cellLayout, unsigned element_dI ); 
 	
 	/* Specify whether a particle is in a given cell enough */
 	Bool _ElementCellLayout_IsInCell( void* elementCellLayout, Cell_Index cellIndex, void* particle );
@@ -150,5 +151,7 @@
 
 	/* Get the shadow info: uses the mesh's element one */
 	ShadowInfo* _ElementCellLayout_GetShadowInfo( void* elementCellLayout );
+
+	void ElementCellLayout_BuildShadowInfo( ElementCellLayout* self );
 	
 #endif /* __Discretisation_Swarm_ElementCellLayout_h__ */

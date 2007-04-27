@@ -25,13 +25,14 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ComplexMath.c 3733 2006-08-01 07:36:27Z KathleenHumble $
+** $Id: ComplexMath.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #include <mpi.h>
 #include "Base/Base.h"
 
+#include "TrigMath.h"
 #include "ComplexMath.h"
 #include <math.h>
 #include <string.h>
@@ -154,8 +155,8 @@ double Cmplx_Argument( Cmplx self ) {
 		undefined if b == 0.0 
 		-\pi/2    if b < 0.0 */
 	else {
-		if      ( b > 0.0 ) return  M_PI_2;
-		else if ( b < 0.0 ) return -M_PI_2;
+		if      ( b > 0.0 ) return  M_PI/2;
+		else if ( b < 0.0 ) return -M_PI/2;
 		else                return  0.0;
 	}
 }

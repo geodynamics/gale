@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Class.c 3462 2006-02-19 06:53:24Z WalterLandry $
+** $Id: Class.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -85,6 +85,7 @@ void _Stg_Class_Init( Stg_Class* self ) {
 	/* General and Virtual info should already be set */
 	
 	/* Stg_Class info */
+	self->nRefs = 0;
 }
 
 void Stg_Class_Delete( void* _class ) {
@@ -213,4 +214,22 @@ Type Stg_Class_GetTypeFunc( void* _class ) {
 	Stg_Class* self = (Stg_Class*)_class;
 	
 	return Stg_Class_GetTypeMacro( self );
+}
+
+
+void Stg_Class_AddRef( void* _class ) {
+	Stg_Class*	self = (Stg_Class*)_class;
+
+	assert( self );
+
+	self->nRefs++;
+}
+
+void Stg_Class_RemoveRef( void* _class ) {
+	Stg_Class*	self = (Stg_Class*)_class;
+
+	assert( self );
+
+	if( !(--self->nRefs) )
+		Stg_Class_Delete( self );
 }

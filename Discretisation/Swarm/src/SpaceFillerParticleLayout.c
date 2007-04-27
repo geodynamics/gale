@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SpaceFillerParticleLayout.c 3851 2006-10-12 08:57:22Z SteveQuenette $
+** $Id: SpaceFillerParticleLayout.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -44,6 +44,7 @@
 
 #include "SwarmClass.h"
 #include "StandardParticle.h"
+#include "ShadowInfo.h"
 #include "CellLayout.h"
 #include "ElementCellLayout.h"
 
@@ -261,8 +262,8 @@ void _SpaceFillerParticleLayout_InitialiseParticle(
 {
 	SpaceFillerParticleLayout*  self     = (SpaceFillerParticleLayout*)spaceFillerParticleLayout;
 	Swarm*                      swarm    = (Swarm*)_swarm;
-	Coord                       min;
-	Coord                       max;
+	double				minCrd[3];
+	double				maxCrd[3];
 	Dimension_Index             dim_I;
 	double*                     coord;
 	GlobalParticle*             particle = (GlobalParticle*)_particle;
@@ -271,18 +272,15 @@ void _SpaceFillerParticleLayout_InitialiseParticle(
 	should be available as part of all cell layouts */
 	Mesh*			    mesh = ((ElementCellLayout*)swarm->cellLayout)->mesh;
 
-	for ( dim_I=0; dim_I < self->dim; dim_I++ ) {
-		min[dim_I] = ((BlockGeometry*) mesh->layout->elementLayout->geometry)->min[dim_I];
-		max[dim_I] = ((BlockGeometry*) mesh->layout->elementLayout->geometry)->max[dim_I];
-	}	
-	
+	Mesh_GetGlobalCoordRange( mesh, minCrd, maxCrd );
+
 	coord = particle->coord;
 	memset( coord, 0, sizeof(Coord) );
+
 	for ( dim_I = 0; dim_I < self->dim; dim_I++ ) {
 		coord[ dim_I ] = SobolGenerator_GetNextNumber_WithMinMax(
-					self->sobolGenerator[ dim_I ], 
-					min[ dim_I ], 
-					max[ dim_I ]);
+			self->sobolGenerator[ dim_I ], 
+			minCrd[ dim_I ], 
+			maxCrd[ dim_I ]);
 	}
 }
-

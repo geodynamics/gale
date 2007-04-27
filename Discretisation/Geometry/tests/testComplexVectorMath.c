@@ -43,7 +43,7 @@ int main( int argc, char* argv[] ) {
 	int rank;
 	int numProcessors;
 	int procToWatch;
-	Stream* stream;
+	Stream* stream = Journal_Register( Info_Type, "ComplexVectorMath" );
 	
 	/* Initialise MPI, get world info */
 	MPI_Init( &argc, &argv );
@@ -55,8 +55,6 @@ int main( int argc, char* argv[] ) {
 	
 	DiscretisationGeometry_Init( &argc, &argv );
 	MPI_Barrier( CommWorld ); /* Ensures copyright info always come first in output */
-	
-	stream = Journal_Register( Info_Type, "ComplexVectorMath" );
 	
 	if( argc >= 2 ) {
 		procToWatch = atoi( argv[1] );
@@ -395,7 +393,6 @@ int main( int argc, char* argv[] ) {
 		Journal_Printf( stream, "\n****************************\n");
 		Journal_Printf( stream, "Check Dot Product Function\n");
 		Journal_Printf( stream, "value = A . B \n");
-		
 		
 		for (d = 0; d <=6; d++) {
 		StGermain_ComplexVectorDotProduct(A, B, d, dotProductResult);			

@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: MeshContext.c 3851 2006-10-12 08:57:22Z SteveQuenette $
+** $Id: MeshContext.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -61,7 +61,6 @@ MeshContext* _MeshContext_New(
 		AbstractContext_SetDt*		_setDt,
 		double				start,
 		double				stop,
-		MeshLayout*			meshLayout,
 		SizeT				nodeSize,
 		SizeT				elementSize,
 		MPI_Comm			communicator,
@@ -78,23 +77,18 @@ MeshContext* _MeshContext_New(
 	
 	/* Virtual info */
 	
-	_MeshContext_Init( self, meshLayout, nodeSize, elementSize );
+	_MeshContext_Init( self, nodeSize, elementSize );
 	
 	return self;
 }
 
-void _MeshContext_Init( MeshContext* self, MeshLayout* meshLayout, SizeT nodeSize, SizeT elementSize ) {
+void _MeshContext_Init( MeshContext* self, SizeT nodeSize, SizeT elementSize ) {
 	Dictionary* meshDict;
 
 	/* General and Virtual info should already be set */
 	
 	/* MeshContext info */
-	self->meshLayout = meshLayout;
-	meshDict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( self->dictionary, "mesh" ) );
-	self->mesh = Mesh_New( "Mesh", self->meshLayout, nodeSize, elementSize, self->extensionMgr_Register,
-		meshDict ? meshDict : self->dictionary );
-	self->meshExtensionMgr = ExtensionManager_New_OfExistingObject( "mesh", self->mesh );
-	ExtensionManager_Register_Add( self->extensionMgr_Register, self->meshExtensionMgr ); 
+	self->mesh = NULL;
 	
 	/* Add hooks to entry points */
 	EntryPoint_Append( Context_GetEntryPoint( self, AbstractContext_EP_Build ), "defaultMeshBuild",
@@ -116,7 +110,7 @@ void _MeshContext_Delete( void* meshContext ) {
 		ExtensionManager_Free( self->meshExtensionMgr, self->mesh );
 	}
 	#endif
-	Stg_Class_Delete( self->mesh );
+	FreeObject( self->mesh );
 	
 	/* Stg_Class_Delete parent */
 	_AbstractContext_Delete( meshContext );
@@ -131,9 +125,10 @@ void _MeshContext_Print( void* meshContext, Stream* stream ) {
 	/* Virtual info */
 	
 	/* MeshContext info */
-	Print( self->meshLayout, stream );
-	Print( self->mesh, stream );
-	Print( self->meshExtensionMgr, stream );
+	if( self->mesh )
+		Print( self->mesh, stream );
+	if( self->meshExtensionMgr )
+		Print( self->meshExtensionMgr, stream );
 	
 	/* Print parent */
 	_AbstractContext_Print( meshContext, stream );
@@ -145,7 +140,8 @@ void _MeshContext_Build( Context* context, void* data ) {
 	
 	Journal_Printf( self->debug, "In: %s\n", __func__ );
 	
-	Build( self->mesh, data, False );
+	if( self->mesh )
+		Build( self->mesh, data, False );
 }
 
 void _MeshContext_InitialConditions( Context* context, void* data ) {
@@ -153,5 +149,6 @@ void _MeshContext_InitialConditions( Context* context, void* data ) {
 	
 	Journal_Printf( self->debug, "In: %s\n", __func__ );
 	
-	Initialise( self->mesh, data, False );
+	if( self->mesh )
+		Initialise( self->mesh, data, False );
 }

@@ -42,28 +42,27 @@
 #define __Discretisaton_Mesh_Decomp_h__
 
 	/** Textual name of this class */
-	extern const Type Decomp_Type;
+	extern const Type	Decomp_Type;
 
 	/** Virtual function types */
 
 	/** Class contents */
-	#define __Decomp				\
-		/* General info */			\
-		__Stg_Component				\
-							\
-		/* Virtual info */			\
-							\
-		/* Decomp info */			\
-		MPI_Comm		comm;		\
-							\
-		unsigned		nGlobals;	\
-		unsigned		nLocals;	\
-		unsigned*		locals;		\
-							\
-		UIntMap*		glMap;		\
-							\
-		unsigned		nSyncs;		\
-		Decomp_Sync**		syncs;
+	#define __Decomp			\
+		/* General info */		\
+		__Stg_Class			\
+						\
+		/* Virtual info */		\
+						\
+		/* Decomp info */		\
+		MPI_Comm	comm;		\
+						\
+		unsigned	nGlobals;	\
+		unsigned	nLocals;	\
+		unsigned*	locals;		\
+						\
+		UIntMap*	glMap;		\
+						\
+		List*		syncs;
 
 	struct Decomp { __Decomp };
 
@@ -72,12 +71,12 @@
 	*/
 
 	#define DECOMP_DEFARGS		\
-		STG_COMPONENT_DEFARGS
+		STG_CLASS_DEFARGS
 
 	#define DECOMP_PASSARGS		\
-		STG_COMPONENT_PASSARGS
+		STG_CLASS_PASSARGS
 
-	Decomp* Decomp_New( Name name );
+	Decomp* Decomp_New();
 	Decomp* _Decomp_New( DECOMP_DEFARGS );
 	void _Decomp_Init( Decomp* self );
 
@@ -88,29 +87,20 @@
 	void _Decomp_Delete( void* decomp );
 	void _Decomp_Print( void* decomp, Stream* stream );
 
-	#define Decomp_Copy( self ) \
-		(Mesh*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
-	#define Decomp_DeepCopy( self ) \
-		(Mesh*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _Decomp_Copy( void* decomp, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
-
-	void _Decomp_Construct( void* decomp, Stg_ComponentFactory* cf, void* data );
-	void _Decomp_Build( void* decomp, void* data );
-	void _Decomp_Initialise( void* decomp, void* data );
-	void _Decomp_Execute( void* decomp, void* data );
-	void _Decomp_Destroy( void* decomp, void* data );
-
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Public functions
 	*/
 
 	void Decomp_SetComm( void* decomp, MPI_Comm comm );
 	void Decomp_SetLocals( void* decomp, unsigned nLocals, unsigned* locals );
-	void Decomp_AddSync( void* decomp, Decomp_Sync* sync );
-	void Decomp_RemoveSync( void* decomp, Decomp_Sync* sync );
 
-	Bool Decomp_IsLocal( void* decomp, unsigned global );
-	unsigned Decomp_GlobalToLocal( void* decomp, unsigned global );
+	MPI_Comm Decomp_GetComm( void* decomp );
+	unsigned Decomp_GetGlobalSize( void* decomp );
+	unsigned Decomp_GetLocalSize( void* decomp );
+	void Decomp_GetLocals( void* decomp, unsigned* nLocals, unsigned** locals );
+	List* Decomp_GetSyncList( void* decomp );
+
+	Bool Decomp_GlobalToLocal( void* decomp, unsigned global, unsigned* local );
 	unsigned Decomp_LocalToGlobal( void* decomp, unsigned local );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -118,9 +108,14 @@
 	*/
 
 	void Decomp_BuildGLMap( Decomp* self );
-	void Decomp_ValidateDomain( Decomp* self, unsigned* status );
+	void Decomp_CalcGlobalSize( Decomp* self );
+	void Decomp_UpdateSyncs( Decomp* self );
+
 	void Decomp_Destruct( Decomp* self );
-	void Decomp_DestructLocals( Decomp* self );
 	void Decomp_DestructSyncs( Decomp* self );
+
+#ifndef NDEBUG
+	Bool Decomp_ValidateDomain( Decomp* self, unsigned nLocals, unsigned* locals );
+#endif
 
 #endif /* __Discretisaton_Mesh_Decomp_h__ */

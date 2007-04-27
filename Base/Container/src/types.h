@@ -35,7 +35,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: types.h 3789 2006-09-11 03:26:19Z RaquibulHassan $
+** $Id: types.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -50,6 +50,9 @@
 	typedef struct PtrMap				PtrMap;
 	typedef struct IndexMap				IndexMap;
 	typedef struct List				List;
+	typedef struct Hasher				Hasher;
+	typedef struct NumberHasher			NumberHasher;
+	typedef struct Mapping				Mapping;
 	typedef struct Array				Array;
 	typedef struct LinkedListNode			LinkedListNode;
 	typedef struct LinkedList			LinkedList;
@@ -57,10 +60,8 @@
 	typedef struct HashTable_Entry		HashTable_Entry;
 	typedef struct HashTable_Index		HashTable_Index;
 	typedef struct HashTable			HashTable;
-	typedef struct UniqueList			UniqueList;
 	typedef struct Set				Set;
 	typedef struct PtrSet				PtrSet;
-	typedef struct Map				Map;
 	typedef struct _Heap			_Heap;
 	typedef struct MaxHeap			MaxHeap;
 	typedef struct UIntMap			UIntMap;
@@ -105,6 +106,25 @@
 
 #define LinkedListIterator_Next( it ) \
 	(it==NULL)?NULL:(it->curr == NULL)?NULL:((it->curr = it->curr->next)==NULL)?NULL:it->curr->data
+
+
+	typedef struct {
+		unsigned	begin;
+		unsigned	end;
+		unsigned	step;
+	} RangeSet_Range;
+
+	typedef struct {
+		RangeSet*	self;
+		RangeSet*	operand;
+		RangeSet_Range*	range;
+		BTree*		newTree;
+		unsigned	nInds;
+		unsigned*	inds;
+		unsigned	curInd;
+		Stg_Byte*	bytes;
+	} RangeSet_ParseStruct;
+
 
 #endif /* __Base_Container_types_h__ */
 

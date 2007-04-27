@@ -205,7 +205,7 @@ http://mathworld.wolfram.com/EulerParameters.html */
 void StGermain_RotateComplexVector(Cmplx* vector, double alpha, double beta, 
 			double gama, Cmplx* rotatedVector) {
 	double rotationMatrix[3][3]; 	/* Indicies [Column][Row][Real or Imag] */
-	//double e0, e1, e2, e3;
+	/*double e0, e1, e2, e3; */
 				
 	Cmplx r_0, r_1, r_2, tmp ;
 
@@ -222,7 +222,7 @@ void StGermain_RotateComplexVector(Cmplx* vector, double alpha, double beta,
 	rotationMatrix[2][2] = 	cos(alpha) * cos(beta);		
 				
 
-	// x direction
+	/* x direction */
 	Cmplx_RealMultiply(vector[0], rotationMatrix[0][0], r_0);
 	Cmplx_RealMultiply(vector[1], rotationMatrix[0][1], r_1);
 	Cmplx_RealMultiply(vector[2], rotationMatrix[0][2], r_2);
@@ -231,7 +231,7 @@ void StGermain_RotateComplexVector(Cmplx* vector, double alpha, double beta,
 	Cmplx_Add(tmp, r_2, rotatedVector[0]);
 
 	
-	// y direction
+	/* y direction */
 	Cmplx_RealMultiply(vector[0], rotationMatrix[1][0], r_0);
 	Cmplx_RealMultiply(vector[1], rotationMatrix[1][1], r_1);
 	Cmplx_RealMultiply(vector[2], rotationMatrix[1][2], r_2);
@@ -239,7 +239,7 @@ void StGermain_RotateComplexVector(Cmplx* vector, double alpha, double beta,
 	Cmplx_Add(r_0, r_1, tmp);
 	Cmplx_Add(tmp, r_2, rotatedVector[1]);
 	
-	// z direction
+	/* z direction */
 	Cmplx_RealMultiply(vector[0], rotationMatrix[2][0], r_0);
 	Cmplx_RealMultiply(vector[1], rotationMatrix[2][1], r_1);
 	Cmplx_RealMultiply(vector[2], rotationMatrix[2][2], r_2);
@@ -259,7 +259,7 @@ void StGermain_RotateCoordinateAxisComplex( Cmplx* vector,
 	/* Rotation around one axis will always leave the component on that axis alone */
 	rotatedVector[axis][REAL_PART] = vector[axis][REAL_PART];
 	rotatedVector[axis][IMAG_PART] = vector[axis][IMAG_PART];
-	//printf("axis %d, %2.3f", axis, vector[axis][REAL_PART]); 				
+	/*printf("axis %d, %2.3f", axis, vector[axis][REAL_PART]); 				 */
 	switch (axis) {
 		case K_AXIS: /* Rotate around Z axis */
 			Cmplx_RealMultiply(vector[0], cos(theta), r_1);
@@ -338,7 +338,7 @@ void StGermain_ComplexVectorAddition(Cmplx* destination, Cmplx* vector1, Cmplx* 
 			Index d;
 			for ( d = 0 ; d < dim ; d++ ) 
 				Cmplx_Add(vector1[d], vector2[d], destination[d]);	
-				//printf("%f, %f", destination[d][REAL_PART], destination[d][IMAG_PART]);
+                        /*printf("%f, %f", destination[d][REAL_PART], destination[d][IMAG_PART]); */
 			return;
 		}
 	}	
@@ -395,16 +395,16 @@ From MathWorld--A Wolfram Web Resource. http://mathworld.wolfram.com/CrossProduc
 Tested against http://www.engplanet.com/redirect.html?3859 */
 void StGermain_ComplexVectorCrossProduct(Cmplx* destination, Cmplx* vector1, Cmplx* vector2) {
 	Cmplx c_1, c_2;
-	//x direction
+	/*x direction */
 	Cmplx_Multiply(vector1[1], vector2[2], c_1);
 	Cmplx_Multiply(vector1[2], vector2[1], c_2);
 	Cmplx_Subtract(c_1, c_2, destination[0]);
 
-	//y direction
+	/*y direction */
 	Cmplx_Multiply(vector1[2], vector2[0], c_1);
 	Cmplx_Multiply(vector1[0], vector2[2], c_2);
 	Cmplx_Subtract(c_1, c_2, destination[1]);
-	//z direction
+	/*z direction */
 	Cmplx_Multiply(vector1[0], vector2[1], c_1);
 	Cmplx_Multiply(vector1[1], vector2[0], c_2);
 	Cmplx_Subtract(c_1, c_2, destination[2]);

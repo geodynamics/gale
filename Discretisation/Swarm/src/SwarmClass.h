@@ -40,7 +40,7 @@
 **	to appropriate processor immediately.)
 **	Communication is more efficient when shadow depth is equal to at least 1
 **
-** $Id: SwarmClass.h 4044 2007-03-21 23:35:21Z PatrickSunter $
+** $Id: SwarmClass.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -64,8 +64,8 @@
 		Dimension_Index                 dim;             \
 		ExtensionManager_Register*      extension_Register; \
 		Stream*                         debug; \
-		Partition_Index                 myRank; \
-		Partition_Index                 nProc; \
+		unsigned	                 myRank; \
+		unsigned        	         nProc; \
 		MPI_Comm                        comm; \
 		/** Used to tell the Swarm_UpdateParticleOwners function whether or not
 		 * parallel comms is necessary. */ \

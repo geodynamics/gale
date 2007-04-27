@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: TensorMath.c 3909 2006-12-19 04:43:56Z JulianGiordani $
+** $Id: TensorMath.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -36,6 +36,7 @@
 #include "types.h"
 #include "TensorMath.h"
 #include "VectorMath.h"
+#include "TrigMath.h"
 
 #include <math.h>
 #include <string.h>

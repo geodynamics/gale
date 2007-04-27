@@ -65,8 +65,12 @@ Bool testAll( unsigned rank, unsigned nProcs, unsigned watch ) {
 	Decomp_SetLocals( decomps[1], nLocals[1], locals[1] );
 
 	map = UIntMap_New();
-	for( ind_i = 0; ind_i < nLocals[0]; ind_i++ )
-		UIntMap_Insert( map, Decomp_GlobalToLocal( decomps[0], locals[0][ind_i] ), locals[1][ind_i] );
+	for( ind_i = 0; ind_i < nLocals[0]; ind_i++ ) {
+		unsigned	 mappedInd;
+
+		insist( Decomp_GlobalToLocal( decomps[0], locals[0][ind_i], &mappedInd ) );
+		UIntMap_Insert( map, mappedInd, locals[1][ind_i] );
+	}
 
 	transfer = DecompTransfer_New( "" );
 	DecompTransfer_SetDecomps( transfer, decomps[0], decomps[1], map );

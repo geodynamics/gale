@@ -189,9 +189,9 @@ void MPIArray_Allgather( unsigned arraySize, void* array,
 	FreeArray( tmpArray1D );
 }
 
-void MPIArray2D_Alltoall( unsigned* arraySizes, void** arrays, 
-			  unsigned** dstSizes, void*** dstArrays, 
-			  size_t itemSize, MPI_Comm comm )
+void MPIArray_Alltoall( unsigned* arraySizes, void** arrays, 
+			unsigned** dstSizes, void*** dstArrays, 
+			size_t itemSize, MPI_Comm comm )
 {
 	unsigned	nProcs;
 	unsigned	rank;
@@ -265,7 +265,7 @@ void MPIArray2D_Alltoall( unsigned* arraySizes, void** arrays,
 void Array_1DTo2D( unsigned nBlocks, unsigned* sizes, void* srcArray, 
 		   void*** dstArrays, size_t itemSize )
 {
-	Stg_Byte**		tmp;
+	Stg_Byte**	tmp;
 	unsigned*	tmpSizes;
 	unsigned	curPos = 0;
 	unsigned	b_i;
@@ -275,17 +275,23 @@ void Array_1DTo2D( unsigned nBlocks, unsigned* sizes, void* srcArray,
 		return;
 	}
 
+	/* Allocate base array. */
+
+
 	/* Calculate sizes. */
 	tmpSizes = Memory_Alloc_Array_Unnamed( unsigned, nBlocks );
 	for( b_i = 0; b_i < nBlocks; b_i++ )
 		tmpSizes[b_i] = sizes[b_i] * (unsigned)itemSize;
 
 	/* Allocate. */
-	tmp = Memory_Alloc_2DComplex_Unnamed( Stg_Byte, nBlocks, tmpSizes );
+	tmp = Memory_Alloc_Array_Unnamed( Stg_Byte*, nBlocks );
 	for( b_i = 0; b_i < nBlocks; b_i++ ) {
-		if( sizes[b_i] == 0 )
+		if( sizes[b_i] == 0 ) {
+			tmp[b_i] = NULL;
 			continue;
+		}
 
+		tmp[b_i] = Memory_Alloc_Array_Unnamed( Stg_Byte, tmpSizes[b_i] );
 		memcpy( tmp[b_i], (Stg_Byte*)srcArray + curPos, tmpSizes[b_i] );
 		curPos += tmpSizes[b_i];
 	}
@@ -327,7 +333,7 @@ void Array_2DTo1D( unsigned nBlocks, unsigned* sizes, void** srcArrays,
 			void*	tmpArray;
 			char*	dest;
 			
-			tmpArray = Memory_Alloc_Array_Bytes_Unnamed( itemSize, netSize, "unknown" );
+			tmpArray = Memory_Alloc_Array_Bytes_Unnamed( itemSize, netSize, "" );
 
 			for( b_i = 0; b_i < nBlocks; b_i++ ) {
 				dest = tmpArray;

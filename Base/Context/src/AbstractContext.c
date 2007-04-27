@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AbstractContext.c 4067 2007-04-13 05:19:23Z JulianGiordani $
+** $Id: AbstractContext.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -49,7 +49,6 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
 #include <time.h>
 
 /* AbstractContext entry point names */
@@ -285,7 +284,7 @@ void _AbstractContext_Init(
 	self->gracefulQuit = False;
 
 
-	// TODO: does this need to be read from checkpoint file???
+	/* TODO: does this need to be read from checkpoint file??? */
 	self->currentTime = self->startTime;
 	self->timeStep = 0;
 	self->timeStepSinceJobRestart = 0;
@@ -519,7 +518,7 @@ void _AbstractContext_Construct_EP_Run( void* entryPoint, void* data0, void* dat
 		    context... need to "re-self" this EP. */
 		context = *ptrToContext;
 		self = KeyHandle( context, context->constructK );
-//context->entryPoint_Register
+                /*context->entryPoint_Register */
 	}
 	
 	#ifdef USE_PROFILE

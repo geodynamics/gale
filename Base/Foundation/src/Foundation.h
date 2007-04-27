@@ -34,13 +34,14 @@
 ** <b>Comments:</b>
 **	None
 **
-** $Id: Foundation.h 3760 2006-08-08 23:34:44Z LukeHodkinson $
+** $Id: Foundation.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **/
 
 #ifndef __Base_Foundation_h__
 #define __Base_Foundation_h__
 	
+	#include <assert.h>
 	#include "types.h"
 	#include "shortcuts.h"
 	#include "CommonRoutines.h"
@@ -57,6 +58,7 @@
 	#include "NamedObject_Register.h"
 	#include "TimeMonitor.h"
 	#include "MemMonitor.h"
+	#include "Numerics.h"
 	#include "TestSuite.h"
 	#include "Init.h"
 	#include "Finalise.h"

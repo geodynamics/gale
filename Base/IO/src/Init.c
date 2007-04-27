@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Init.c 3573 2006-05-15 07:51:14Z AlanLo $
+** $Id: Init.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -53,6 +53,7 @@ Stream*        LiveDebug = NULL;
 Bool BaseIO_Init( int* argc, char** argv[] )
 {
 	Stream* typedStream;
+	Stream*	general;
 
 	stgStreamFormatter_Buffer = StreamFormatter_Buffer_New(); 
 
@@ -119,6 +120,10 @@ Bool BaseIO_Init( int* argc, char** argv[] )
 	LiveDebug = Journal_Register( Info_Type, LiveDebugName );
 	Stream_Enable( LiveDebug, True );
 	Stream_SetLevel( LiveDebug, 1 );
+
+	/* General stream. */
+	general = Journal_Register( Info_Type, "general" );
+	Stream_SetPrintingRank( general, 0 );
 	
 	return True;
 }

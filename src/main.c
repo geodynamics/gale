@@ -44,7 +44,7 @@
 	#include <Python.h>
 #endif
 #include <mpi.h>
-//EP_APPLICATIONS_FINALISE defined in StGermain.h
+/* EP_APPLICATIONS_FINALISE defined in StGermain.h */
 #include <StGermain/StGermain.h>
 
 #include <stdio.h>
@@ -66,7 +66,7 @@ int main( int argc, char* argv[] )
 	
 	/* context */
 	AbstractContext*		context = NULL;
-	//This context may be initialised iff application plugins are loaded.
+	/* This context may be initialised iff application plugins are loaded. */
 	AbstractContext*		replacedContext = NULL;
 	EntryPoint*			applicationsFinalise_EP;
 
@@ -128,20 +128,20 @@ int main( int argc, char* argv[] )
 
 	/* Destruct phase ---------------------------------------------------------------------------------------------------*/
 
-	//Finalise any application plugins.
+	/* Finalise any application plugins. */
 	applicationsFinalise_EP = Context_GetEntryPoint( context, EP_APPLICATIONS_FINALISE );
-	//If there exists an applications Finalise Entry Point, get in there and run hooks!
+	/* If there exists an applications Finalise Entry Point, get in there and run hooks! */
 	if(applicationsFinalise_EP != NULL)
 		((EntryPoint_VoidPtr_CallCast*) applicationsFinalise_EP->run)( applicationsFinalise_EP, NULL);
 
-	//If the context got replaced, replacedContext != NULL & needs to be deleted.
+	/* If the context got replaced, replacedContext != NULL & needs to be deleted. */
 	Stg_Component_Destroy( context, 0 /* dummy */, False );
 	if(replacedContext != NULL)
 		Stg_Class_Delete( replacedContext );
 	Stg_Class_Delete( context );
 	Stg_Class_Delete( dictionary );
 
-	//if( rank == procToWatch ) Memory_Print();
+	/* if( rank == procToWatch ) Memory_Print(); */
 	#ifdef HAVE_PYTHON
 		Py_Finalize();
 	#endif

@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: CellLayout.c 3462 2006-02-19 06:53:24Z WalterLandry $
+** $Id: CellLayout.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -189,7 +189,7 @@ void CellLayout_InitialiseCellPoints( void* cellLayout, Cell_Index cell_I, Cell_
 }
 
 
-Cell_Index CellLayout_MapElementIdToCellId( void* cellLayout, Element_DomainIndex element_dI ) {
+Cell_Index CellLayout_MapElementIdToCellId( void* cellLayout, unsigned element_dI ) {
 	CellLayout* self = (CellLayout*)cellLayout;
 	
 	return self->_mapElementIdToCellId( self, element_dI );

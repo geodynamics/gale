@@ -35,7 +35,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: types.h 3888 2006-11-06 11:27:18Z PatrickSunter $
+** $Id: types.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -50,7 +50,7 @@
 	typedef struct _CornerVC			CornerVC;
 	typedef struct ShapeVC				ShapeVC;
 	typedef struct _FrictionVC			FrictionVC;
-	typedef struct _SplitFrictionWallVC		SplitFrictionWallVC;
+	typedef struct SplitFrictionWallVC		SplitFrictionWallVC;
 	typedef struct _DofLayout			DofLayout;
 	typedef struct _EmbeddedSurface			EmbeddedSurface;
 	typedef struct Operator      		Operator;

@@ -35,7 +35,7 @@
 ** Comments:
 **	None so far.
 **
-** $Id: Container.h 3784 2006-09-06 10:01:39Z RaquibulHassan $
+** $Id: Container.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -53,13 +53,11 @@
 	#include "List.h"
 	#include "HashTable.h"
 	#include "Array.h"
-	#include "UniqueList.h"
 	#include "LinkedListNode.h"
 	#include "LinkedList.h"
 	#include "LinkedListIterator.h"
 	#include "Set.h"
 	#include "PtrSet.h"
-	#include "Map.h"
 	#include "Heap.h"
 	#include "MaxHeap.h"
 	#include "MPIRoutines.h"

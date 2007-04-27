@@ -24,7 +24,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: Makefile.def 3760 2006-08-08 23:34:44Z LukeHodkinson $
+## $Id: Makefile.def 4081 2007-04-27 06:20:07Z LukeHodkinson $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -45,6 +45,7 @@ def_srcs = \
 	NamedObject_Register.c \
 	TimeMonitor.c \
 	MemMonitor.c \
+	Numerics.c \
 	TestSuite.c \
 	Init.c \
 	Finalise.c
@@ -66,6 +67,7 @@ def_hdrs = \
 	NamedObject_Register.h \
 	TimeMonitor.h \
 	MemMonitor.h \
+	Numerics.h \
 	TestSuite.h \
 	Init.h \
 	Finalise.h \

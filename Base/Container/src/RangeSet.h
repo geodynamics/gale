@@ -47,12 +47,6 @@
 	/** Virtual function types */
 
 	/** Mesh class contents */
-	typedef struct {
-		unsigned	begin;
-		unsigned	end;
-		unsigned	step;
-	} RangeSet_Range;
-
 	#define __RangeSet				\
 		/* General info */			\
 		__Stg_Class				\
@@ -61,8 +55,7 @@
 							\
 		/* RangeSet info */			\
 		unsigned		nInds;		\
-		unsigned		nRanges;	\
-		RangeSet_Range*		ranges;
+		BTree*			btree;
 
 	struct RangeSet { __RangeSet };
 
@@ -70,10 +63,10 @@
 	** Constructors
 	*/
 
-	#define RANGESET_DEFARGS		\
+	#define RANGESET_DEFARGS \
 		STG_CLASS_DEFARGS
 
-	#define RANGESET_PASSARGS	\
+	#define RANGESET_PASSARGS \
 		STG_CLASS_PASSARGS
 
 	RangeSet* RangeSet_New();
@@ -98,24 +91,45 @@
 	*/
 
 	void RangeSet_SetIndices( void* rangeSet, unsigned nInds, unsigned* inds );
+	void RangeSet_AddIndices( void* rangeSet, unsigned nInds, unsigned* inds );
+	void RangeSet_SetRange( void* rangeSet, unsigned begin, unsigned end, unsigned step );
 	void RangeSet_Clear( void* rangeSet );
+
+	void RangeSet_GetIndices( void* rangeSet, unsigned* nInds, unsigned** inds );
+	unsigned RangeSet_GetSize( void* rangeSet );
+	unsigned RangeSet_GetNumRanges( void* rangeSet );
+	RangeSet_Range* RangeSet_GetRange( void* rangeSet, unsigned index );
+	Bool RangeSet_HasIndex( void* rangeSet, unsigned index );
+
 	void RangeSet_Union( void* rangeSet, RangeSet* rSet );
 	void RangeSet_Intersection( void* rangeSet, RangeSet* rSet );
 	void RangeSet_Subtraction( void* rangeSet, RangeSet* rSet );
+
+	void RangeSet_Pickle( void* rangeSet, unsigned* nBytes, Stg_Byte** bytes );
 	void RangeSet_Unpickle( void* rangeSet, unsigned nBytes, Stg_Byte* bytes );
 
-	void RangeSet_GetIndices( void* rangeSet, unsigned* nInds, unsigned** inds );
-	Bool RangeSet_HasIndex( void* rangeSet, unsigned ind );
-	unsigned RangeSet_GetNIndices( void* rangeSet );
-	unsigned RangeSet_GetNRanges( void* rangeSet );
-	void RangeSet_GetRange( void* rangeSet, unsigned ind, RangeSet_Range* range );
-	void RangeSet_Pickle( void* rangeSet, unsigned* nBytes, Stg_Byte** bytes );
+	void RangeSet_Range_Intersection( RangeSet_Range* left, RangeSet_Range* right, RangeSet_Range* result );
+	Bool RangeSet_Range_HasIndex( RangeSet_Range* self, unsigned index );
+	unsigned RangeSet_Range_GetNumIndices( RangeSet_Range* self );
+	void RangeSet_Range_GetIndices( RangeSet_Range* self, unsigned* nInds, unsigned** inds );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Private Member functions
 	*/
 
+	void RangeSet_GetIndicesParse( void* data, void* _parseStruct );
+	void RangeSet_GetRangeParse( void* data, void* _parseStruct );
+	void RangeSet_IntersectionParse( void* data, void* _parse );
+	void RangeSet_SubtractionParse( void* data, void* _parse );
+	void RangeSet_PickleParse( void* data, void* _parse );
+#if 0
+	void RangeSet_RangeIntersectionParse( BTreeNode* node, RangeSet_ParseStruct* parse );
+#endif
 	int RangeSet_SortCmp( const void* itema, const void* itemb );
+	int RangeSet_DataCompare( void* left, void* right );
+	void RangeSet_DataCopy( void** dstData, void* data, SizeT size );
+	void RangeSet_DataDelete( void* data );
+
 	void RangeSet_Destruct( RangeSet* self );
 
 #endif /* __Base_Container_RangeSet_h__ */

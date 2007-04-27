@@ -27,7 +27,7 @@
 ** Role:
 **	Tests MeshContext in the most basic sence... creation on default values, run, and delete.
 **
-** $Id: testMeshContext0.c 3996 2007-02-07 02:22:40Z PatrickSunter $
+** $Id: testMeshContext0.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -96,11 +96,6 @@ int main( int argc, char* argv[] ) {
 	int numProcessors;
 	int procToWatch;
 	Dictionary* dictionary;
-	Topology*			nTopology;
-	ElementLayout*			eLayout;
-	NodeLayout*			nLayout;
-	MeshDecomp*			decomp;
-	MeshLayout*			meshLayout;
 	MeshContext* meshContext;
 	
 	/* Initialise MPI, get world info */
@@ -136,11 +131,6 @@ int main( int argc, char* argv[] ) {
 	dictionary->add( dictionary, "maxZ", Dictionary_Entry_Value_FromDouble( 300.0f ) );
 	
 	/* Build the context */
-	nTopology = (Topology*)IJK6Topology_New( "IJKTopology", dictionary );
-	eLayout = (ElementLayout*)ParallelPipedHexaEL_New( "PPHexaEL", 3, dictionary );
-	nLayout = (NodeLayout*)CornerNL_New( "CornerNL", dictionary, eLayout, nTopology );
-	decomp = (MeshDecomp*)HexaMD_New( "HexaMD", dictionary, MPI_COMM_WORLD, eLayout, nLayout );
-	meshLayout = MeshLayout_New( "MeshLayout", eLayout, nLayout, decomp );
 	meshContext = _MeshContext_New( 
 		sizeof(MeshContext), 
 		"TestContext", 
@@ -158,7 +148,6 @@ int main( int argc, char* argv[] ) {
 		MySetDt, 
 		0, 
 		10, 
-		meshLayout, 
 		sizeof(Node), 
 		sizeof(Element), 
 		CommWorld, 
@@ -200,12 +189,6 @@ int main( int argc, char* argv[] ) {
 	
 	/* Stg_Class_Delete stuff */
 	Stg_Component_Destroy( meshContext, 0 /* dummy */, False );
-	Stg_Class_Delete( meshContext );
-	Stg_Class_Delete( meshLayout );
-	Stg_Class_Delete( decomp );
-	Stg_Class_Delete( nLayout );
-	Stg_Class_Delete( eLayout );
-	Stg_Class_Delete( nTopology );
 	Stg_Class_Delete( dictionary );
 	
 	FD_Finalise();

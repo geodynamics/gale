@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ShapeClass.c 3869 2006-10-16 13:42:59Z SteveQuenette $
+** $Id: ShapeClass.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -274,7 +274,7 @@ void Stg_Shape_TransformCoord( void* shape, Coord coord, Coord transformedCoord 
 void Stg_Shape_TranslateCoord( void* shape, Coord coord, Coord translatedCoord ) {
 	Stg_Shape* self              = (Stg_Shape*)shape;
 
-	Vector_Sub( translatedCoord, coord, self->centre );
+	Vec_Sub3D( translatedCoord, coord, self->centre );
 }
 
 

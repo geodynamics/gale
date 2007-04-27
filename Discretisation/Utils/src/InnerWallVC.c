@@ -60,10 +60,10 @@ const char* InnerWallVC_InnerWallEnumToStr[InnerWallVC_InnerWall_Size] = {
 */
 
 VariableCondition* InnerWallVC_Factory(
-		Variable_Register*				variable_Register, 
-		ConditionFunction_Register*			conFunc_Register, 
-		Dictionary*					dictionary,
-		void*						data )
+	Variable_Register*				variable_Register, 
+	ConditionFunction_Register*			conFunc_Register, 
+	Dictionary*					dictionary,
+	void*						data )
 {
 	return (VariableCondition*)InnerWallVC_New( defaultInnerWallVCName, NULL, variable_Register, conFunc_Register, dictionary, (Mesh*)data );
 }
@@ -102,12 +102,12 @@ InnerWallVC*	InnerWallVC_DefaultNew( Name name )
 }
 
 InnerWallVC*	InnerWallVC_New(
-		Name						name,
-		Name						_dictionaryEntryName, 
-		Variable_Register*				variable_Register, 
-		ConditionFunction_Register*			conFunc_Register, 
-		Dictionary*					dictionary,
-		void*						_mesh )
+	Name						name,
+	Name						_dictionaryEntryName, 
+	Variable_Register*				variable_Register, 
+	ConditionFunction_Register*			conFunc_Register, 
+	Dictionary*					dictionary,
+	void*						_mesh )
 {
 	return _InnerWallVC_New(
 		sizeof(InnerWallVC), 
@@ -141,13 +141,13 @@ InnerWallVC*	InnerWallVC_New(
 
 
 void InnerWallVC_Init(
-		InnerWallVC*						self,
-		Name						name,
-		Name						_dictionaryEntryName, 
-		Variable_Register*				variable_Register, 
-		ConditionFunction_Register*			conFunc_Register, 
-		Dictionary*					dictionary,
-		void*						_mesh )
+	InnerWallVC*						self,
+	Name						name,
+	Name						_dictionaryEntryName, 
+	Variable_Register*				variable_Register, 
+	ConditionFunction_Register*			conFunc_Register, 
+	Dictionary*					dictionary,
+	void*						_mesh )
 {
 	/* General info */
 	self->type = InnerWallVC_Type;
@@ -185,33 +185,33 @@ void InnerWallVC_Init(
 
 
 InnerWallVC* _InnerWallVC_New( 
-		SizeT						_sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*				_delete,
-		Stg_Class_PrintFunction*				_print,
-		Stg_Class_CopyFunction*				_copy, 
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*			_construct,
-		Stg_Component_BuildFunction*			_build,
-		Stg_Component_InitialiseFunction*			_initialise,
-		Stg_Component_ExecuteFunction*			_execute,
-		Stg_Component_DestroyFunction*			_destroy,
-		Name								name, 
-		Bool								initFlag,
-		VariableCondition_BuildSelfFunc*		_buildSelf, 
-		VariableCondition_PrintConciseFunc*		_printConcise,
-		VariableCondition_ReadDictionaryFunc*		_readDictionary,
-		VariableCondition_GetSetFunc*			_getSet,
-		VariableCondition_GetVariableCountFunc*		_getVariableCount,
-		VariableCondition_GetVariableIndexFunc*		_getVariableIndex,
-		VariableCondition_GetValueIndexFunc*		_getValueIndex,
-		VariableCondition_GetValueCountFunc*		_getValueCount,
-		VariableCondition_GetValueFunc*			_getValue,
-		Name						_dictionaryEntryName, 
-		Variable_Register*				variable_Register, 
-		ConditionFunction_Register*			conFunc_Register, 
-		Dictionary*					dictionary,
-		void*						_mesh)
+	SizeT						_sizeOfSelf, 
+	Type						type,
+	Stg_Class_DeleteFunction*				_delete,
+	Stg_Class_PrintFunction*				_print,
+	Stg_Class_CopyFunction*				_copy, 
+	Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
+	Stg_Component_ConstructFunction*			_construct,
+	Stg_Component_BuildFunction*			_build,
+	Stg_Component_InitialiseFunction*			_initialise,
+	Stg_Component_ExecuteFunction*			_execute,
+	Stg_Component_DestroyFunction*			_destroy,
+	Name								name, 
+	Bool								initFlag,
+	VariableCondition_BuildSelfFunc*		_buildSelf, 
+	VariableCondition_PrintConciseFunc*		_printConcise,
+	VariableCondition_ReadDictionaryFunc*		_readDictionary,
+	VariableCondition_GetSetFunc*			_getSet,
+	VariableCondition_GetVariableCountFunc*		_getVariableCount,
+	VariableCondition_GetVariableIndexFunc*		_getVariableIndex,
+	VariableCondition_GetValueIndexFunc*		_getValueIndex,
+	VariableCondition_GetValueCountFunc*		_getValueCount,
+	VariableCondition_GetValueFunc*			_getValue,
+	Name						_dictionaryEntryName, 
+	Variable_Register*				variable_Register, 
+	ConditionFunction_Register*			conFunc_Register, 
+	Dictionary*					dictionary,
+	void*						_mesh)
 {
 	InnerWallVC*	self;
 	
@@ -256,9 +256,9 @@ InnerWallVC* _InnerWallVC_New(
 
 
 void _InnerWallVC_Init(
-		void*						innerWallVC, 
-		Name						_dictionaryEntryName, 
-		void*						_mesh )
+	void*						innerWallVC, 
+	Name						_dictionaryEntryName, 
+	void*						_mesh )
 {
 	InnerWallVC*			self = (InnerWallVC*)innerWallVC;
 
@@ -343,10 +343,10 @@ void _InnerWallVC_ReadDictionary( void* variableCondition, void* dictionary ) {
 					Stream*	errorStr = Journal_Register( Error_Type, self->type );
 
 					Journal_Printf( errorStr, "Error- in %s: While parsing "
-						"definition of innerWallVC \"%s\" (applies to innerWall \"%s\"), the cond. func. applied to "
-						"variable \"%s\" - \"%s\" - wasn't found in the c.f. register.\n",
-						__func__, self->_dictionaryEntryName, InnerWallVC_InnerWallEnumToStr[self->_innerWall],
-						self->_entryTbl[entry_I].varName, funcName );
+							"definition of innerWallVC \"%s\" (applies to innerWall \"%s\"), the cond. func. applied to "
+							"variable \"%s\" - \"%s\" - wasn't found in the c.f. register.\n",
+							__func__, self->_dictionaryEntryName, InnerWallVC_InnerWallEnumToStr[self->_innerWall],
+							self->_entryTbl[entry_I].varName, funcName );
 					Journal_Printf( errorStr, "(Available functions in the C.F. register are: ");	
 					ConditionFunction_Register_PrintNameOfEachFunc( self->conFunc_Register, errorStr );
 					Journal_Printf( errorStr, ")\n");	
@@ -362,7 +362,7 @@ void _InnerWallVC_ReadDictionary( void* variableCondition, void* dictionary ) {
 				self->_entryTbl[entry_I].value.type = VC_ValueType_DoubleArray;
 				self->_entryTbl[entry_I].value.as.typeArray.size = Dictionary_Entry_Value_GetCount(valueEntry);
 				self->_entryTbl[entry_I].value.as.typeArray.array = Memory_Alloc_Array( double,
-					self->_entryTbl[entry_I].value.as.typeArray.size, "InnerWallVC->_entryTbl[].value.as.typeArray.array" );
+													self->_entryTbl[entry_I].value.as.typeArray.size, "InnerWallVC->_entryTbl[].value.as.typeArray.array" );
 					
 				for (i = 0; i < self->_entryTbl[entry_I].value.as.typeArray.size; i++)
 				{
@@ -372,7 +372,7 @@ void _InnerWallVC_ReadDictionary( void* variableCondition, void* dictionary ) {
 				}
 			}
 			else if( 0 == strcasecmp( valType, "double" ) || 0 == strcasecmp( valType, "d" ) ||
-				0 == strcasecmp( valType, "float" ) || 0 == strcasecmp( valType, "f" ) )
+				 0 == strcasecmp( valType, "float" ) || 0 == strcasecmp( valType, "f" ) )
 			{
 				self->_entryTbl[entry_I].value.type = VC_ValueType_Double;
 				self->_entryTbl[entry_I].value.as.typeDouble = Dictionary_Entry_Value_AsDouble( valueEntry );
@@ -443,9 +443,9 @@ void _InnerWallVC_Print(void* innerWallVC, Stream* stream)
 	if (self->_dictionaryEntryName)
 		Journal_Printf( info, "\t\t_dictionaryEntryName: %s\n", self->_dictionaryEntryName);
 	Journal_Printf( info, "\t_innerWall: %s\n", self->_innerWall == InnerWallVC_InnerWall_Front ? "Front" :
-		self->_innerWall == InnerWallVC_InnerWall_Back ? "Back" : self->_innerWall == InnerWallVC_InnerWall_Left ? "Left" :
-		self->_innerWall == InnerWallVC_InnerWall_Right ? "Right" : self->_innerWall == InnerWallVC_InnerWall_Top ? "Top" :
-		self->_innerWall == InnerWallVC_InnerWall_Bottom ? "Bottom" : "None");
+			self->_innerWall == InnerWallVC_InnerWall_Back ? "Back" : self->_innerWall == InnerWallVC_InnerWall_Left ? "Left" :
+			self->_innerWall == InnerWallVC_InnerWall_Right ? "Right" : self->_innerWall == InnerWallVC_InnerWall_Top ? "Top" :
+			self->_innerWall == InnerWallVC_InnerWall_Bottom ? "Bottom" : "None");
 	Journal_Printf( info, "\t_entryCount: %u\n", self->_entryCount);
 	Journal_Printf( info, "\t_entryTbl (ptr): %p\n", self->_entryTbl);
 	if (self->_entryTbl)
@@ -458,46 +458,46 @@ void _InnerWallVC_Print(void* innerWallVC, Stream* stream)
 			Journal_Printf( info, "\t\t\tvalue:\n");
 			switch (self->_entryTbl[entry_I].value.type)
 			{
-				case VC_ValueType_Double:
-					Journal_Printf( info, "\t\t\t\ttype: VC_ValueType_Double\n" );
-					Journal_Printf( info, "\t\t\t\tasDouble: %g\n", self->_entryTbl[entry_I].value.as.typeDouble );
-					break;
+			case VC_ValueType_Double:
+				Journal_Printf( info, "\t\t\t\ttype: VC_ValueType_Double\n" );
+				Journal_Printf( info, "\t\t\t\tasDouble: %g\n", self->_entryTbl[entry_I].value.as.typeDouble );
+				break;
 					
-				case VC_ValueType_Int:
-					Journal_Printf( info, "\t\t\t\ttype: VC_ValueType_Int\n" );
-					Journal_Printf( info, "\t\t\t\tasInt: %i\n", self->_entryTbl[entry_I].value.as.typeInt );
-					break;
+			case VC_ValueType_Int:
+				Journal_Printf( info, "\t\t\t\ttype: VC_ValueType_Int\n" );
+				Journal_Printf( info, "\t\t\t\tasInt: %i\n", self->_entryTbl[entry_I].value.as.typeInt );
+				break;
 					
-				case VC_ValueType_Short:
-					Journal_Printf( info, "\t\t\t\ttype: VC_ValueType_Short\n" );
-					Journal_Printf( info, "\t\t\t\tasShort: %i\n", self->_entryTbl[entry_I].value.as.typeShort );
-					break;
+			case VC_ValueType_Short:
+				Journal_Printf( info, "\t\t\t\ttype: VC_ValueType_Short\n" );
+				Journal_Printf( info, "\t\t\t\tasShort: %i\n", self->_entryTbl[entry_I].value.as.typeShort );
+				break;
 					
-				case VC_ValueType_Char:
-					Journal_Printf( info, "\t\t\t\ttype: VC_ValueType_Char\n");
-					Journal_Printf( info, "\t\t\t\tasChar: %c\n", self->_entryTbl[entry_I].value.as.typeChar );
-					break;
+			case VC_ValueType_Char:
+				Journal_Printf( info, "\t\t\t\ttype: VC_ValueType_Char\n");
+				Journal_Printf( info, "\t\t\t\tasChar: %c\n", self->_entryTbl[entry_I].value.as.typeChar );
+				break;
 					
-				case VC_ValueType_Ptr:
-					Journal_Printf( info, "\t\t\t\ttype: VC_ValueType_Ptr\n");
-					Journal_Printf( info, "\t\t\t\tasPtr: %g\n", self->_entryTbl[entry_I].value.as.typePtr );
-					break;
+			case VC_ValueType_Ptr:
+				Journal_Printf( info, "\t\t\t\ttype: VC_ValueType_Ptr\n");
+				Journal_Printf( info, "\t\t\t\tasPtr: %g\n", self->_entryTbl[entry_I].value.as.typePtr );
+				break;
 					
-				case VC_ValueType_DoubleArray:
-					Journal_Printf( info, "\t\t\t\ttype: VC_ValueType_DoubleArray\n");
-					Journal_Printf( info, "\t\t\t\tarraySize: %u\n", self->_entryTbl[entry_I].value.as.typeArray.size);
-					Journal_Printf( info, "\t\t\t\tasDoubleArray (ptr): %p\n", 
+			case VC_ValueType_DoubleArray:
+				Journal_Printf( info, "\t\t\t\ttype: VC_ValueType_DoubleArray\n");
+				Journal_Printf( info, "\t\t\t\tarraySize: %u\n", self->_entryTbl[entry_I].value.as.typeArray.size);
+				Journal_Printf( info, "\t\t\t\tasDoubleArray (ptr): %p\n", 
 						self->_entryTbl[entry_I].value.as.typeArray.array);
-					if (self->_entryTbl[entry_I].value.as.typeArray.array)
-						for (i = 0; i < self->_entryTbl[entry_I].value.as.typeArray.size; i++)
-							Journal_Printf( info, "\t\t\t\tasDoubleArray[%u]: %g\n", i,
+				if (self->_entryTbl[entry_I].value.as.typeArray.array)
+					for (i = 0; i < self->_entryTbl[entry_I].value.as.typeArray.size; i++)
+						Journal_Printf( info, "\t\t\t\tasDoubleArray[%u]: %g\n", i,
 								self->_entryTbl[entry_I].value.as.typeArray.array[i]);
-					break;
+				break;
 					
-				case VC_ValueType_CFIndex:
-					Journal_Printf( info, "\t\t\t\ttype: VC_ValueType_CFIndex\n");
-					Journal_Printf( info, "\t\t\t\tasCFIndex: %u\n", self->_entryTbl[entry_I].value.as.typeCFIndex);
-					break;
+			case VC_ValueType_CFIndex:
+				Journal_Printf( info, "\t\t\t\ttype: VC_ValueType_CFIndex\n");
+				Journal_Printf( info, "\t\t\t\tasCFIndex: %u\n", self->_entryTbl[entry_I].value.as.typeCFIndex);
+				break;
 			}
 		}
 	Journal_Printf( info, "\t_mesh (ptr): %p\n", self->_mesh);
@@ -582,87 +582,92 @@ IndexSet* _InnerWallVC_GetSet(void* variableCondition)
 {
 	InnerWallVC*		self = (InnerWallVC*)variableCondition;
 	IndexSet	*set = NULL;
-	HexaMD*		hexaMD = (HexaMD*)self->_mesh->layout->decomp;
 	Stream*		warningStr = Journal_Register( Error_Type, self->type );
+	unsigned	nDims;
+	unsigned*	gSize;
 
+	nDims = Mesh_GetDimSize( self->_mesh );
+	gSize = (unsigned*)ExtensionManager_Get( self->_mesh->info, self->_mesh, 
+						 ExtensionManager_GetHandle( self->_mesh->info, 
+									     "cartesianGlobalSize" ) );
 	
 	switch (self->_innerWall) {
-		case InnerWallVC_InnerWall_Front:
-			if ( 1 == hexaMD->nodeGlobal3DCounts[K_AXIS] ) {
-				Journal_Printf( warningStr, "Warning - in %s: Can't build a %s innerWall VC "
+	case InnerWallVC_InnerWall_Front:
+		if ( nDims < 3 || !gSize[2] ) {
+			Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
 					"when mesh has no elements in the %s axis. Returning an empty set.\n", __func__,
 					InnerWallVC_InnerWallEnumToStr[self->_innerWall], "K" );
-				set = IndexSet_New(hexaMD->nodeDomainCount);	
-			}
-			else {
-				set = RegularMeshUtils_CreateGlobalInnerFrontSet(self->_mesh);
-			}
-			break;
+			set = IndexSet_New( Mesh_GetDomainSize( self->_mesh, MT_VERTEX ) );
+		}
+		else {
+			set = RegularMeshUtils_CreateGlobalInnerFrontSet( self->_mesh );
+		}
+		break;
 			
-		case InnerWallVC_InnerWall_Back:
-			if ( 1 == hexaMD->nodeGlobal3DCounts[K_AXIS] ) {
-				Journal_Printf( warningStr, "Warning - in %s: Can't build a %s innerWall VC "
+	case InnerWallVC_InnerWall_Back:
+		if ( nDims < 3 || !gSize[2] ) {
+			Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
 					"when mesh has no elements in the %s axis. Returning an empty set.\n", __func__,
 					InnerWallVC_InnerWallEnumToStr[self->_innerWall], "K" );
-				set = IndexSet_New(hexaMD->nodeDomainCount);	
-			}
-			else {
-				set = RegularMeshUtils_CreateGlobalInnerBackSet(self->_mesh);
-			}	
-			break;
+			set = IndexSet_New( Mesh_GetDomainSize( self->_mesh, MT_VERTEX ) );
+		}
+		else {
+			set = RegularMeshUtils_CreateGlobalInnerBackSet( self->_mesh );
+		}	
+		break;
 			
-		case InnerWallVC_InnerWall_Top:
-			if ( 1 == hexaMD->nodeGlobal3DCounts[J_AXIS] ) {
-				Journal_Printf( warningStr, "Warning - in %s: Can't build a %s innerWall VC "
+	case InnerWallVC_InnerWall_Top:
+		if ( nDims < 2 || !gSize[1] ) {
+			Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
 					"when mesh has no elements in the %s axis. Returning an empty set.\n", __func__,
 					InnerWallVC_InnerWallEnumToStr[self->_innerWall], "J" );
-				set = IndexSet_New(hexaMD->nodeDomainCount);	
-			}
-			else {
-				set = RegularMeshUtils_CreateGlobalInnerTopSet(self->_mesh);
-			}	
-			break;
+			set = IndexSet_New( Mesh_GetDomainSize( self->_mesh, MT_VERTEX ) );
+		}
+		else {
+			set = RegularMeshUtils_CreateGlobalInnerTopSet(self->_mesh);
+		}	
+		break;
 			
-		case InnerWallVC_InnerWall_Bottom:
-			if ( 1 == hexaMD->nodeGlobal3DCounts[J_AXIS] ) {
-				Journal_Printf( warningStr, "Warning - in %s: Can't build a %s innerWall VC "
+	case InnerWallVC_InnerWall_Bottom:
+		if ( nDims < 2 || !gSize[1] ) {
+			Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
 					"when mesh has no elements in the %s axis. Returning an empty set.\n", __func__,
 					InnerWallVC_InnerWallEnumToStr[self->_innerWall], "J" );
-				set = IndexSet_New(hexaMD->nodeDomainCount);	
-			}
-			else {
-				set = RegularMeshUtils_CreateGlobalInnerBottomSet(self->_mesh);
-			}	
-			break;
+			set = IndexSet_New( Mesh_GetDomainSize( self->_mesh, MT_VERTEX ) );
+		}
+		else {
+			set = RegularMeshUtils_CreateGlobalInnerBottomSet(self->_mesh);
+		}	
+		break;
 			
-		case InnerWallVC_InnerWall_Left:
-			if ( 1 == hexaMD->nodeGlobal3DCounts[I_AXIS] ) {
-				Journal_Printf( warningStr, "Warning - in %s: Can't build a %s innerWall VC "
+	case InnerWallVC_InnerWall_Left:
+		if ( nDims < 1 ) {
+			Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
 					"when mesh has no elements in the %s axis. Returning an empty set.\n", __func__,
 					InnerWallVC_InnerWallEnumToStr[self->_innerWall], "I" );
-				set = IndexSet_New(hexaMD->nodeDomainCount);	
-			}
-			else {
-				set = RegularMeshUtils_CreateGlobalInnerLeftSet(self->_mesh);
-			}	
-			break;
+			set = IndexSet_New( Mesh_GetDomainSize( self->_mesh, MT_VERTEX ) );
+		}
+		else {
+			set = RegularMeshUtils_CreateGlobalInnerLeftSet(self->_mesh);
+		}	
+		break;
 			
-		case InnerWallVC_InnerWall_Right:
-			if ( 1 == hexaMD->nodeGlobal3DCounts[I_AXIS] ) {
-				Journal_Printf( warningStr, "Warning - in %s: Can't build a %s innerWall VC "
+	case InnerWallVC_InnerWall_Right:
+		if( nDims < 1 ) {
+			Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
 					"when mesh has no elements in the %s axis. Returning an empty set.\n", __func__,
 					InnerWallVC_InnerWallEnumToStr[self->_innerWall], "I" );
-				set = IndexSet_New(hexaMD->nodeDomainCount);	
-			}
-			else {
-				set = RegularMeshUtils_CreateGlobalInnerRightSet(self->_mesh);
-			}
-			break;
+			set = IndexSet_New( Mesh_GetDomainSize( self->_mesh, MT_VERTEX ) );
+		}
+		else {
+			set = RegularMeshUtils_CreateGlobalInnerRightSet(self->_mesh);
+		}
+		break;
 			
-		case InnerWallVC_InnerWall_Size:
-		default:
-			assert(0);
-			break;
+	case InnerWallVC_InnerWall_Size:
+	default:
+		assert(0);
+		break;
 	}
 	
 	return set;
@@ -688,17 +693,17 @@ Variable_Index _InnerWallVC_GetVariableIndex(void* variableCondition, Index glob
 	searchedIndex = Variable_Register_GetIndex(self->variable_Register, varName );
 	
 	Journal_Firewall( ( searchedIndex < self->variable_Register->count ), errorStr, "Error- in %s: searching for index of "
-		"varIndex %u (\"%s\") at global node number %u failed - register returned index %u, greater than "
-		"count %u.\n", __func__, varIndex, varName, globalIndex, searchedIndex, self->variable_Register->count );
+			  "varIndex %u (\"%s\") at global node number %u failed - register returned index %u, greater than "
+			  "count %u.\n", __func__, varIndex, varName, globalIndex, searchedIndex, self->variable_Register->count );
 
 	return searchedIndex; 
 }
 
 
 VariableCondition_ValueIndex _InnerWallVC_GetValueIndex(
-		void*				variableCondition, 
-		Index				globalIndex, 
-		VariableCondition_VariableIndex	varIndex)
+	void*				variableCondition, 
+	Index				globalIndex, 
+	VariableCondition_VariableIndex	varIndex)
 {
 	return varIndex;
 }
@@ -724,12 +729,12 @@ void _InnerWallVC_PrintConcise( void* variableCondition, Stream* stream ) {
 	
 	Journal_Printf( stream, "\ttype: %s, set: ", self->type );
 	Journal_Printf( stream, "%s\n", 
-		self->_innerWall == InnerWallVC_InnerWall_Front ? "Front" :
-		self->_innerWall == InnerWallVC_InnerWall_Back ? "Back" : 
-		self->_innerWall == InnerWallVC_InnerWall_Left ? "Left" :
-		self->_innerWall == InnerWallVC_InnerWall_Right ? "Right" : 
-		self->_innerWall == InnerWallVC_InnerWall_Top ? "Top" :
-		self->_innerWall == InnerWallVC_InnerWall_Bottom ? "Bottom" : "None" );
+			self->_innerWall == InnerWallVC_InnerWall_Front ? "Front" :
+			self->_innerWall == InnerWallVC_InnerWall_Back ? "Back" : 
+			self->_innerWall == InnerWallVC_InnerWall_Left ? "Left" :
+			self->_innerWall == InnerWallVC_InnerWall_Right ? "Right" : 
+			self->_innerWall == InnerWallVC_InnerWall_Top ? "Top" :
+			self->_innerWall == InnerWallVC_InnerWall_Bottom ? "Bottom" : "None" );
 }
 
 /*--------------------------------------------------------------------------------------------------------------------------

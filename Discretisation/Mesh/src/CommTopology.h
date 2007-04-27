@@ -47,19 +47,18 @@
 	/** Virtual function types */
 
 	/** Class contents */
-	#define __CommTopology				\
-		/* General info */			\
-		__Stg_Component				\
-							\
-		/* Virtual info */			\
-							\
-		/* CommTopology info */			\
-		MPI_Comm		comm;		\
-		unsigned		nProcs;		\
-		unsigned		rank; 		\
-							\
-		unsigned		nInc;		\
-		unsigned*		inc;
+	#define __CommTopology			\
+		/* General info */		\
+		__Stg_Class			\
+						\
+		/* Virtual info */		\
+						\
+		/* CommTopology info */		\
+		MPI_Comm	comm;		\
+		unsigned	nIncRanks;	\
+		unsigned*	incRanks;	\
+		unsigned*	order;		\
+		UIntMap*	glMap;
 
 	struct CommTopology { __CommTopology };
 
@@ -68,12 +67,12 @@
 	*/
 
 	#define COMMTOPOLOGY_DEFARGS	\
-		STG_COMPONENT_DEFARGS
+		STG_CLASS_DEFARGS
 
 	#define COMMTOPOLOGY_PASSARGS	\
-		STG_COMPONENT_PASSARGS
+		STG_CLASS_PASSARGS
 
-	CommTopology* CommTopology_New( Name name );
+	CommTopology* CommTopology_New();
 	CommTopology* _CommTopology_New( COMMTOPOLOGY_DEFARGS );
 	void _CommTopology_Init( CommTopology* self );
 
@@ -81,40 +80,52 @@
 	** Virtual functions
 	*/
 
-	void _CommTopology_Delete( void* generator );
-	void _CommTopology_Print( void* generator, Stream* stream );
-
-	#define CommTopology_Copy( self )				\
-		(Mesh*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
-	#define CommTopology_DeepCopy( self )				\
-		(Mesh*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _CommTopology_Copy( void* generator, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
-
-	void _CommTopology_Construct( void* generator, Stg_ComponentFactory* cf, void* data );
-	void _CommTopology_Build( void* generator, void* data );
-	void _CommTopology_Initialise( void* generator, void* data );
-	void _CommTopology_Execute( void* generator, void* data );
-	void _CommTopology_Destroy( void* generator, void* data );
+	void _CommTopology_Delete( void* commTopology );
+	void _CommTopology_Print( void* commTopology, Stream* stream );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Public functions
 	*/
 
 	void CommTopology_SetComm( void* commTopology, MPI_Comm comm );
-	void CommTopology_SetIncidence( void* commTopology, unsigned nInc, unsigned* inc );
+	void CommTopology_SetIncidence( void* commTopology, unsigned nIncRanks, unsigned* incRanks );
+	void CommTopology_AddIncidence( void* commTopology, unsigned nIncRanks, unsigned* incRanks );
 
-	void CommTopology_GetIncidence( void* commTopology, unsigned proc, 
-					unsigned* nInc, unsigned** inc );
-	void CommTopology_ReturnIncidence( void* commTopology, unsigned proc, 
-					   unsigned* nInc, unsigned** inc );
-	void CommTopology_Allgather( void* commTopology, 
-				     unsigned srcSize, void* srcArray, 
+	MPI_Comm CommTopology_GetComm( void* commTopology );
+	unsigned CommTopology_GetCommSize( void* commTopology );
+	unsigned CommTopology_GetCommRank( void* commTopology );
+	unsigned CommTopology_GetIncidenceSize( void* commTopology );
+	void CommTopology_GetIncidence( void* commTopology, unsigned* nIncRanks, unsigned** incRanks );
+
+	unsigned CommTopology_LocalToGlobal( void* commTopology, unsigned local );
+	Bool CommTopology_GlobalToLocal( void* commTopology, unsigned global, unsigned* local );
+
+	void _CommTopology_Allgather( void* commTopology, 
+				      unsigned srcSize, void* srcArray, 
+				      unsigned** dstSizes, void*** dstArrays, 
+				      unsigned itemSize );
+	void _CommTopology_Alltoall( void* commTopology, 
+				     unsigned* srcSizes, void** srcArrays, 
 				     unsigned** dstSizes, void*** dstArrays, 
 				     unsigned itemSize );
-	void CommTopology_Alltoall( void* commTopology, 
-				    unsigned* srcSizes, void** srcArrays, 
-				    unsigned** dstSizes, void*** dstArrays, 
-				    unsigned itemSize );
+
+	#define CommTopology_Allgather( commTopology, 			\
+					srcSize, srcArray,		\
+					dstSizes, dstArrays,		\
+					itemSize )			\
+		_CommTopology_Allgather( commTopology,			\
+					 srcSize, (void*)srcArray,	\
+					 dstSizes, (void***)dstArrays,	\
+					 itemSize )
+
+	#define CommTopology_Alltoall( commTopology, 			\
+				       srcSizes, srcArrays,		\
+				       dstSizes, dstArrays,		\
+				       itemSize )			\
+		_CommTopology_Alltoall( commTopology,			\
+					srcSizes, (void**)srcArrays,	\
+					dstSizes, (void***)dstArrays,	\
+					itemSize )
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Private Member functions
@@ -122,5 +133,9 @@
 
 	int CommTopology_CmpRanks( const void* rank0, const void* rank1 );
 	void CommTopology_Destruct( CommTopology* self );
+
+#ifndef NDEBUG
+	Bool CommTopology_ValidateIncidence( CommTopology* self, unsigned nIncRanks, unsigned* incRanks );
+#endif
 
 #endif /* __Discretisaton_Mesh_CommTopology_h__ */

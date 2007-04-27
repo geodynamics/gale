@@ -39,23 +39,12 @@
 #include "Base/Container/Container.h"
 
 
-Bool testConstruct( unsigned rank, unsigned nProcs, unsigned watch ) {
-	RangeSet*	set;
-
-	set = RangeSet_New();
-	FreeObject( set );
-
-	return True;
-}
-
-
 Bool testIndices( unsigned rank, unsigned nProcs, unsigned watch ) {
 	Bool		result = True;
 	unsigned	nInds = 100;
 	unsigned	inds[100];
 	RangeSet*	set;
-	unsigned	nDstInds;
-	unsigned*	dstInds;
+	unsigned	nDstInds, *dstInds;
 	unsigned	i;
 
 	for( i = 0; i < nInds; i++ )
@@ -65,14 +54,15 @@ Bool testIndices( unsigned rank, unsigned nProcs, unsigned watch ) {
 
 	RangeSet_SetIndices( set, nInds, inds );
 	if( rank == watch ) {
-		if( set->nInds != nInds || 
-		    set->nRanges != 1 )
+		if( RangeSet_GetSize( set ) != nInds || 
+		    RangeSet_GetNumRanges( set ) != 1 )
 		{
 			result = False;
 			goto done;
 		}
 	}
 
+	dstInds = NULL;
 	RangeSet_GetIndices( set, &nDstInds, &dstInds );
 	if( rank == watch ) {
 		unsigned	ind_i;
@@ -98,12 +88,12 @@ done:
 	return result;
 }
 
-
 Bool testRanges( unsigned rank, unsigned nProcs, unsigned watch ) {
 	Bool		result = True;
 	unsigned	nInds = 100;
 	unsigned	inds[100];
 	RangeSet*	set;
+	unsigned	nDstInds, *dstInds;
 	unsigned	i;
 
 	for( i = 0; i < nInds; i++ )
@@ -113,17 +103,20 @@ Bool testRanges( unsigned rank, unsigned nProcs, unsigned watch ) {
 
 	RangeSet_SetIndices( set, nInds, inds );
 	if( rank == watch ) {
-		if( set->nInds != nInds || 
-		    set->nRanges != nInds/10 )
+		if( RangeSet_GetSize( set ) != nInds || 
+		    RangeSet_GetNumRanges( set ) != nInds/10 )
 		{
 			result = False;
 			goto done;
 		}
 
 		for( i = 0; i < nInds; i++ ) {
-			if( set->ranges[i/10].begin != (i/10)*20 || 
-			    set->ranges[i/10].end != (i/10)*20 + 10 || 
-			    set->ranges[i/10].step != 1 )
+			RangeSet_Range*	rng;
+
+			rng = RangeSet_GetRange( set, i / 10 );
+			if( rng->begin != (i/10)*20 || 
+			    rng->end != (i/10)*20 + 10 || 
+			    rng->step != 1 )
 			{
 				result = False;
 				goto done;
@@ -131,18 +124,21 @@ Bool testRanges( unsigned rank, unsigned nProcs, unsigned watch ) {
 		}
 	}
 
+	dstInds = NULL;
+	RangeSet_GetIndices( set, &nDstInds, &dstInds );
+
 done:
 	FreeObject( set );
 
 	return result;
 }
 
-
 Bool testUnion( unsigned rank, unsigned nProcs, unsigned watch ) {
 	unsigned	nInds = 100;
 	unsigned	inds[100];
 	RangeSet*	set0;
 	RangeSet*	set1;
+	unsigned	nDstInds, *dstInds;
 	unsigned	i;
 
 	for( i = 0; i < nInds; i++ )
@@ -158,25 +154,28 @@ Bool testUnion( unsigned rank, unsigned nProcs, unsigned watch ) {
 	RangeSet_Union( set0, set1 );
 	FreeObject( set1 );
 	if( rank == watch ) {
-		if( RangeSet_GetNIndices( set0 ) != nInds + nInds / 2 || 
-		    RangeSet_GetNRanges( set0 ) != nInds / 10 + nInds / 20 )
+		if( RangeSet_GetSize( set0 ) != nInds + nInds / 2 || 
+		    RangeSet_GetNumRanges( set0 ) != nInds / 10 + nInds / 20 )
 		{
 			FreeObject( set0 );
 			return False;
 		}
 	}
 
+	dstInds = NULL;
+	RangeSet_GetIndices( set0, &nDstInds, &dstInds );
+
 	FreeObject( set0 );
 
 	return True;
 }
-
 
 Bool testIntersection( unsigned rank, unsigned nProcs, unsigned watch ) {
 	unsigned	nInds = 100;
 	unsigned	inds[100];
 	RangeSet*	set0;
 	RangeSet*	set1;
+	unsigned	nDstInds, *dstInds;
 	unsigned	i;
 
 	for( i = 0; i < nInds; i++ )
@@ -192,25 +191,28 @@ Bool testIntersection( unsigned rank, unsigned nProcs, unsigned watch ) {
 	RangeSet_Intersection( set0, set1 );
 	FreeObject( set1 );
 	if( rank == watch ) {
-		if( RangeSet_GetNIndices( set0 ) != nInds / 2 || 
-		    RangeSet_GetNRanges( set0 ) != nInds / 20 )
+		if( RangeSet_GetSize( set0 ) != nInds / 2 || 
+		    RangeSet_GetNumRanges( set0 ) != nInds / 20 )
 		{
 			FreeObject( set0 );
 			return False;
 		}
 	}
 
+	dstInds = NULL;
+	RangeSet_GetIndices( set0, &nDstInds, &dstInds );
+
 	FreeObject( set0 );
 
 	return True;
 }
-
 
 Bool testSubtraction( unsigned rank, unsigned nProcs, unsigned watch ) {
 	unsigned	nInds = 100;
 	unsigned	inds[100];
 	RangeSet*	set0;
 	RangeSet*	set1;
+	unsigned	nDstInds, *dstInds;
 	unsigned	i;
 
 	for( i = 0; i < nInds; i++ )
@@ -226,26 +228,29 @@ Bool testSubtraction( unsigned rank, unsigned nProcs, unsigned watch ) {
 	RangeSet_Subtraction( set0, set1 );
 	FreeObject( set1 );
 	if( rank == watch ) {
-		if( RangeSet_GetNIndices( set0 ) != nInds / 2 || 
-		    RangeSet_GetNRanges( set0 ) != nInds / 20 )
+		if( RangeSet_GetSize( set0 ) != nInds / 2 || 
+		    RangeSet_GetNumRanges( set0 ) != nInds / 20 )
 		{
 			FreeObject( set0 );
 			return False;
 		}
 	}
 
+	dstInds = NULL;
+	RangeSet_GetIndices( set0, &nDstInds, &dstInds );
+
 	FreeObject( set0 );
 
 	return True;
 }
-
 
 Bool testPickle( unsigned rank, unsigned nProcs, unsigned watch ) {
 	unsigned	nInds = 100;
 	unsigned	inds[100];
 	RangeSet*	set;
 	unsigned	nBytes;
-	Stg_Byte*		bytes;
+	Stg_Byte*	bytes;
+	unsigned	nDstInds, *dstInds;
 	unsigned	i;
 
 	for( i = 0; i < nInds; i++ )
@@ -258,17 +263,20 @@ Bool testPickle( unsigned rank, unsigned nProcs, unsigned watch ) {
 	RangeSet_Unpickle( set, nBytes, bytes );
 
 	if( rank == watch ) {
-		if( set->nInds != nInds || 
-		    set->nRanges != nInds/10 )
+		if( RangeSet_GetSize( set ) != nInds || 
+		    RangeSet_GetNumRanges( set ) != nInds/10 )
 		{
 			FreeObject( set );
 			return False;
 		}
 
 		for( i = 0; i < nInds; i++ ) {
-			if( set->ranges[i/10].begin != (i/10)*20 || 
-			    set->ranges[i/10].end != (i/10)*20 + 10 || 
-			    set->ranges[i/10].step != 1 )
+			RangeSet_Range*	rng;
+
+			rng = RangeSet_GetRange( set, i / 10 );
+			if( rng->begin != (i/10)*20 || 
+			    rng->end != (i/10)*20 + 10 || 
+			    rng->step != 1 )
 			{
 				FreeObject( set );
 				return False;
@@ -276,16 +284,18 @@ Bool testPickle( unsigned rank, unsigned nProcs, unsigned watch ) {
 		}
 	}
 
+	dstInds = NULL;
+	RangeSet_GetIndices( set, &nDstInds, &dstInds );
+
 	FreeObject( set );
 
 	return True;
 }
 
 
-#define nTests	7
+#define nTests	6
 
-TestSuite_Test	tests[nTests] = {{"construct", testConstruct, 10}, 
-				 {"set indices", testIndices, 10}, 
+TestSuite_Test	tests[nTests] = {{"set indices", testIndices, 10}, 
 				 {"ranges", testRanges, 10 }, 
 				 {"union", testUnion, 10}, 
 				 {"intersection", testIntersection, 10}, 

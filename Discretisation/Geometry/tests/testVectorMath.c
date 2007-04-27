@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testVectorMath.c 3926 2007-01-02 04:53:16Z KathleenHumble $
+** $Id: testVectorMath.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -67,27 +67,27 @@ int main( int argc, char* argv[] ) {
 
 		printf( "Basic tests:\n" );
 		printf( "d = { %g, %g, %g }\n", d[0], d[1], d[2] );
-		Vector_SetScalar( d, 2.0, 0.5, 1.5 );
+		Vec_SetScalar3D( d, 2.0, 0.5, 1.5 );
 		printf( "d = { %g, %g, %g }\n", d[0], d[1], d[2] );
 
-		Vector_Set( c, d );
+		Vec_Set3D( c, d );
 		printf( "c = d = { %g, %g, %g }\n", c[0], c[1], c[2] );
 
-		Vector_Add( b, c, d );
+		Vec_Add3D( b, c, d );
 		printf( "b = c + d = {%g, %g, %g}\n", b[0], b[1], b[2] );
 
-		Vector_Sub( a, d, b );
+		Vec_Sub3D( a, d, b );
 		printf( "a = d - b = {%g, %g, %g}\n", a[0], a[1], a[2] );
 
-		Vector_Cross( d, a, e );
+		Vec_Cross3D( d, a, e );
 		printf( "d = a x e = {%g, %g, %g}\n", d[0], d[1], d[2] );
 
-		printf( "a . c = %g\n", Vector_Dot( a, c ) );
+		printf( "a . c = %g\n", Vec_Dot3D( a, c ) );
 
-		Vector_Mult( b, b, 2.0 );
+		Vec_Scale3D( b, b, 2.0 );
 		printf( "b = 2b = { %g, %g, %g }\n", b[0], b[1], b[2] );
 
-		Vector_Norm( b, b );
+		Vec_Norm3D( b, b );
 		printf( "b^ = { %g, %g, %g }\n", b[0], b[1], b[2] );
 
 		printf( "Complete test:\n" );
@@ -110,13 +110,13 @@ int main( int argc, char* argv[] ) {
 					a[2] = 10.0 / (double)k;
 					b[2] = 30.0 / (double)k;
 
-					Vector_Proj( c, a, b );
+					Vec_Proj3D( c, a, b );
 
 					printf( "{ %g, %g, %g }\n", c[0], c[1], c[2] );
 				}
 			}
 		}
-		Vector_SetScalar2D( a, 5.0, 9.0);
+		Vec_SetScalar2D( a, 5.0, 9.0);
 		printf( "2D: { %g, %g }\n", a[0], a[1]);
 		
 

@@ -33,7 +33,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: testSingleCellLayout0.c 3555 2006-05-10 07:05:46Z PatrickSunter $
+** $Id: testSingleCellLayout0.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -111,8 +111,13 @@ int main( int argc, char* argv[] ) {
 	
 	if( rank == procToWatch ) {
 		Cell_Index cell;
-		Coord**				cellPoints = NULL;
-		Coord testCoord = { 0, 0, 0 };
+		double***				cellPoints = NULL;
+		double					*testCoord;
+
+		testCoord = Memory_Alloc_Array_Unnamed( double, 3 );
+		testCoord[0] = 0;
+		testCoord[1] = 0;
+		testCoord[2] = 0;
 		
 		for( cell = 0; cell < singleCellLayout->_cellLocalCount( singleCellLayout ); cell++ ) {
 			Cell_PointIndex			point;
@@ -120,7 +125,7 @@ int main( int argc, char* argv[] ) {
 			
 			count = singleCellLayout->_pointCount( singleCellLayout, cell );
 			printf( "cellPointTbl  [%2u][0-%u]:\n", cell, count );
-			cellPoints = Memory_Alloc_Array( Coord*, count, "cellsPoints" );
+			cellPoints = Memory_Alloc_Array( double**, count, "cellsPoints" );
 			singleCellLayout->_initialisePoints( singleCellLayout, cell, count, cellPoints );
 			for( point = 0; point < count; point++ ) {
 				printf( "\t{%.3g %.3g %.3g}\n", (*cellPoints[point])[I_AXIS], (*cellPoints[point])[J_AXIS], 
@@ -150,6 +155,8 @@ int main( int argc, char* argv[] ) {
 		printf( "For particle {2,1,1}: %u\n",
 			CellLayout_IsInCell( singleCellLayout, 0, &testCoord ) );
 		Memory_Free( cellPoints );
+
+		Memory_Free( testCoord );
 	}
 	
 
@@ -164,7 +171,7 @@ int main( int argc, char* argv[] ) {
 	DiscretisationShape_Finalise();
 	DiscretisationGeometry_Finalise();
 	
-	//Memory_Print_Leak();
+	/* Memory_Print_Leak(); */
 	
 	Base_Finalise();
 	

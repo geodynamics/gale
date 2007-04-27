@@ -35,7 +35,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: types.h 3860 2006-10-14 18:12:14Z LukeHodkinson $
+** $Id: types.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -130,33 +130,24 @@
 	typedef struct CommTopology			CommTopology;
 	typedef struct Decomp				Decomp;
 	typedef struct Decomp_Sync			Decomp_Sync;
-	typedef struct Decomp_Sync_Claim		Decomp_Sync_Claim;
-	typedef struct Decomp_Sync_Negotiate		Decomp_Sync_Negotiate;
+	typedef struct Decomp_Sync_Array		Decomp_Sync_Array;
+	typedef struct Decomposer			Decomposer;
 	typedef struct DecompTransfer			DecompTransfer;
 	typedef struct MeshTopology			MeshTopology;
+	typedef struct Mesh_ElementType			Mesh_ElementType;
+	typedef struct Mesh_HexType			Mesh_HexType;
+	typedef struct Mesh_CentroidType		Mesh_CentroidType;
+	typedef struct Mesh_Algorithms			Mesh_Algorithms;
+	typedef struct Mesh_HexAlgorithms		Mesh_HexAlgorithms;
+	typedef struct Mesh_RegularAlgorithms		Mesh_RegularAlgorithms;
+	typedef struct Mesh_CentroidAlgorithms		Mesh_CentroidAlgorithms;
+	typedef struct Mesh				Mesh;
 	typedef struct MeshGenerator			MeshGenerator;
 	typedef struct CartesianGenerator		CartesianGenerator;
 	typedef struct MeshAdaptor			MeshAdaptor;
 	typedef struct SurfaceAdaptor			SurfaceAdaptor;
-
-	typedef struct ProcNbrInfo			ProcNbrInfo;
-	typedef struct ShadowInfo			ShadowInfo;
-	typedef struct _ElementLayout			ElementLayout;
-	typedef struct _HexaEL				HexaEL;
-	typedef struct _ParallelPipedHexaEL		ParallelPipedHexaEL;
-	typedef struct _IrregEL				IrregEL;
-	typedef struct _NodeLayout			NodeLayout;
-	typedef struct _CornerNL			CornerNL;
-	typedef struct _BodyNL				BodyNL;
-	typedef struct MeshDecomp			MeshDecomp;
-	typedef struct _HexaMD				HexaMD;
-	typedef struct _StencilMD			StencilMD;
-	typedef struct _DummyMD				DummyMD;
-	typedef struct MeshGeometry			MeshGeometry;
-	typedef struct _MeshLayout			MeshLayout;
-	typedef struct _Mesh				Mesh;
-	typedef struct _HMesh				HMesh;
-	typedef struct _MeshCoarsener_Hexa		MeshCoarsener_Hexa;
+	typedef struct CompressionAdaptor		CompressionAdaptor;
+	typedef struct MeshVariable			MeshVariable;
 
 	/* Streams */
 	extern Stream*	Mesh_VerboseConfig;

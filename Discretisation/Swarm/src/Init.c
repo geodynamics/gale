@@ -24,56 +24,26 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Init.c 3887 2006-11-06 05:19:51Z LukeHodkinson $
+** $Id: Init.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+#include <stdio.h>
 #include <mpi.h>
-#include "Base/Base.h"
 
+#include "Base/Base.h"
 #include "Discretisation/Geometry/Geometry.h"
 #include "Discretisation/Shape/Shape.h"
 #include "Discretisation/Mesh/Mesh.h"
 #include "Discretisation/Utils/Utils.h"
-
-#include "types.h"
-#include "shortcuts.h"
-#include "Init.h"
-
-#include "ParticleLayout.h"
-#include "PerCellParticleLayout.h"
-#include "GaussParticleLayout.h"
-#include "TriGaussParticleLayout.h"
-#include "RandomParticleLayout.h"
-#include "GlobalParticleLayout.h"
-#include "SpaceFillerParticleLayout.h"
-#include "WithinShapeParticleLayout.h"
-#include "ManualParticleLayout.h"
-#include "LineParticleLayout.h"
-#include "PlaneParticleLayout.h"
-#include "FileParticleLayout.h"
-#include "CellLayout.h"
-#include "SingleCellLayout.h"
-#include "ElementCellLayout.h"
-#include "Swarm.h"
-#include "Swarm_Register.h"
-#include "SwarmVariable_Register.h"
-#include "SwarmVariable.h"
-#include "OperatorSwarmVariable.h"
-#include "SwarmOutput.h"
-#include "SwarmDump.h"
-
-#include "StandardParticle.h"
-#include "IntegrationPoint.h"
-
 #include "Swarm.h"
 
-#include <stdio.h>
 
 Stream* Swarm_VerboseConfig = NULL;
 Stream* Swarm_Debug = NULL;
 Stream* Swarm_Warning = NULL;
 Stream* Swarm_Error = NULL;
+
 
 Bool DiscretisationSwarm_Init( int* argc, char** argv[] ) {
 	Swarm_VerboseConfig = Journal_Register( Info_Type, "Swarm_VerboseConfig" );

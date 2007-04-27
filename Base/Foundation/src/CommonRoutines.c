@@ -134,7 +134,11 @@ int Stg_vasprintf( char** string, char* format, va_list ap ) {
 
 	while ( trying ) {
 		/* See is we can print to this string with this size */
+#ifdef NO_VA_COPY
+                apCopy=ap;
+#else
 		va_copy( apCopy, ap );
+#endif
 		sizeOfString = vsnprintf( *string, allocStringSize, format, apCopy );
 		va_end( apCopy );
 

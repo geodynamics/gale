@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Union.c 3869 2006-10-16 13:42:59Z SteveQuenette $
+** $Id: Union.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -225,10 +225,10 @@ void _Union_Construct( void* combination, Stg_ComponentFactory* cf, void* data )
 	_Stg_Shape_Construct( self, cf, data );
 
 	optionsList = Dictionary_Get( dictionary, "shapes" );
-//	Journal_Firewall( vertexList != NULL, 
-//		Journal_Register( Error_Type, self->type ),
-//		"In func %s: vertexList specifying the combination is NULL.\n",
-//		__func__);
+        /*	Journal_Firewall( vertexList != NULL,  */
+        /*		Journal_Register( Error_Type, self->type ), */
+        /*		"In func %s: vertexList specifying the combination is NULL.\n", */
+        /*		__func__); */
 
 	shapeCount = Dictionary_Entry_Value_GetCount(optionsList);
 
@@ -238,15 +238,15 @@ void _Union_Construct( void* combination, Stg_ComponentFactory* cf, void* data )
 	memset( shapeList,     0, shapeCount * sizeof(Stg_Shape*) );
 	memset( isComplement,  0, shapeCount * sizeof(Bool) );
 	
-	// TALK ABOUT WITH ROB, will there be some Flag for Union or Intersection type in the XML file.
-	// If so do we need another variable on the combination class which is this flag, and then use that flag 
-	// to determine the method of test if a particle is inside or outside the shape
+	/* TALK ABOUT WITH ROB, will there be some Flag for Union or Intersection type in the XML file. */
+	/* If so do we need another variable on the combination class which is this flag, and then use that flag  */
+	/* to determine the method of test if a particle is inside or outside the shape */
 
 
 	
 	Stream_Indent( stream );
 	for ( shape_I = 0 ; shape_I < shapeCount ; shape_I++) { 
-		// gets the textual name corresponding to the shape elements //	
+          /* gets the textual name corresponding to the shape elements	 */
 		nameShape = Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( optionsList, shape_I));
 
 		if ( nameShape[0] == '!' ) {

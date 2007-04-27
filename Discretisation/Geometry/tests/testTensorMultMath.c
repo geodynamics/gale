@@ -44,7 +44,7 @@ int main( int argc, char* argv[] ) {
 	int rank;
 	int numProcessors;
 	int procToWatch;
-	Stream*  stream;
+	Stream*  stream = Journal_Register( InfoStream_Type, "TensorMultMath" );
 	
 	/* Initialise MPI, get world info */
 	MPI_Init( &argc, &argv );
@@ -57,12 +57,10 @@ int main( int argc, char* argv[] ) {
 	DiscretisationGeometry_Init( &argc, &argv );
 	MPI_Barrier( CommWorld ); /* Ensures copyright info always come first in output */
 	
-	
-	stream = Journal_Register( InfoStream_Type, "TensorMultMath" );
 	/* stout -> file redirect code */
-	//stJournal->firewallProducesAssert = False;
-	//Stream_RedirectFile(Journal_Register( Error_Type, "TensorMultMath"), "TensorMultMath.txt");
-	//Stream_RedirectFile(stream, "TensorMultMath.txt");
+	/* stJournal->firewallProducesAssert = False; */
+	/* Stream_RedirectFile(Journal_Register( Error_Type, "TensorMultMath"), "TensorMultMath.txt"); */
+	/* Stream_RedirectFile(stream, "TensorMultMath.txt"); */
 	
 	
 	if( argc >= 2 ) {
@@ -734,12 +732,11 @@ int main( int argc, char* argv[] ) {
 		Journal_Printf(stream, "\n/*******************    Test 17   ************************/\n");
 		Journal_Printf( stream, "Test function Journal_PrintNonSquareMatrix \n\n");
 
-
 		nonSquareMatrixA = Memory_Alloc_2DArray(double, 3, 4, "NonSquareMatrixA" );
 		nonSquareMatrixB = Memory_Alloc_2DArray(double, 4, 2, "NonSquareMatrixB" );
 		nonSquareMatrixAT = Memory_Alloc_2DArray(double, 4, 3, "NonSquareMatrixAT" );
 		nonSquareMatrixResult = Memory_Alloc_2DArray(double, 3, 2, "NonSquareMatrixResult" );
-		//Matrix A
+		/* Matrix A */
 		nonSquareMatrixA[0][0] = 0; 	nonSquareMatrixA[1][0] =  4;
 		nonSquareMatrixA[0][1] = 1;		nonSquareMatrixA[1][1] =  5;
 		nonSquareMatrixA[0][2] = 2;		nonSquareMatrixA[1][2] =  6;		
@@ -749,7 +746,7 @@ int main( int argc, char* argv[] ) {
 		nonSquareMatrixA[2][1] = 9;
 		nonSquareMatrixA[2][2] = 10;
 		nonSquareMatrixA[2][3] = 11;
-		//Matrix B
+		/* Matrix B */
 		nonSquareMatrixB[0][0] = 0; 	nonSquareMatrixB[1][0] =  2;
 		nonSquareMatrixB[0][1] = 1;		nonSquareMatrixB[1][1] =  3;
 		

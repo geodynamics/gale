@@ -24,7 +24,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 3865 2006-10-16 09:33:43Z SteveQuenette $
+## $Id: makefile 4081 2007-04-27 06:20:07Z LukeHodkinson $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -44,7 +44,7 @@ SRCS = ${def_srcs}
 
 PROJ_LIBS = ${def_libs}
 EXTERNAL_INCLUDES = -I${INC_DIR}/StGermain
-EXTERNAL_LIBS=${LIB_DIR}/libStGermain.a
+EXTERNAL_LIBS=-lStGermain
 
 packages = MPI XML MATH DL 
 

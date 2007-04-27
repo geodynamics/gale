@@ -58,7 +58,7 @@ Stg_ComponentMeta_Value* Stg_ComponentMeta_Value_New( Name name, Type metaType, 
 			Stg_ComponentMeta_Value_Type,
 			_Stg_ComponentMeta_Value_Delete,
 			NULL,
-			_Stg_ComponentMeta_Value_Copy,//NULL,
+			_Stg_ComponentMeta_Value_Copy,/*NULL, */
 			name,
 			NON_GLOBAL );
 	self->metaType = metaType;

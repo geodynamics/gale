@@ -47,7 +47,51 @@
 #endif
 #ifndef MIN
 #define MIN( a, b ) ( ( (a) < (b) ) ? (a) : (b) )
-#endif	
+#endif
+
+
+#ifndef NDEBUG
+#define VirtualCall( self, method, ... )						\
+	(assert( self ), assert( (self)->method ), (self)->method( __VA_ARGS__ ))
+#else
+#define VirtualCall( self, method, ... )	\
+	(self)->method( __VA_ARGS__ )
+#endif
+
+
+#define AllocArray( type, size )					\
+	((size) ? Memory_Alloc_Array_Unnamed( type, size ) : NULL)
+
+#define AllocNamedArray( type, size, name )				\
+	((size) ? Memory_Alloc_Array( type, size, name ) : NULL)
+
+#define AllocArray2D( type, size0, size1 )						\
+	((size0 && size1) ? Memory_Alloc_2DArray_Unnamed( type, size0, size1 ) : NULL)
+
+#define AllocNamedArray2D( type, size0, size1, name )					\
+	((size0 && size1) ? Memory_Alloc_2DArray( type, size0, size1, name ) : NULL)
+
+#define AllocComplex2D( type, base, sizes )						\
+	((base && sizes) ? Memory_Alloc_2DComplex_Unnamed( type, base, sizes ) : NULL)
+
+#define AllocNamedComplex2D( type, base, sizes, name )					\
+	((base && sizes) ? Memory_Alloc_2DComplex( type, base, sizes, name ) : NULL)
+
+#define ReallocArray( ptr, type, size )					\
+	((ptr) ? ((size) ? Memory_Realloc_Array( ptr, type, size ) : 	\
+		  (Memory_Free( ptr ), NULL)) : 			\
+	 (size) ? Memory_Alloc_Array_Unnamed( type, size ) : NULL)
+
+#define ReallocNamedArray( ptr, type, size, name )			\
+	((ptr) ? ((size) ? Memory_Realloc_Array( ptr, type, size ) : 	\
+		  (Memory_Free( ptr ), NULL)) : 			\
+	 ((size) ? Memory_Alloc_Array( type, size, name ) : NULL))
+
+#define ReallocArray2D( ptr, type, size0, size1 )						\
+	((ptr) ? ((size0 && size1) ? Memory_Realloc_2DArray( ptr, type, size0, size1 ) :	\
+		  (Memory_Free( ptr ), NULL)) : 						\
+	 (size0 && size1) ? Memory_Alloc_2DArray_Unnamed( type, size0, size1 ) : NULL)
+
 
 #define FreeArray( ptr )			\
 	if( ptr )				\
@@ -125,7 +169,7 @@
 #ifndef NDEBUG
 #define insist( expr ) assert( expr )
 #else
-#define insist( expt ) expr
+#define insist( expr ) expr
 #endif
 	
 #endif /* __Base_Foundation_shortcuts_h__ */

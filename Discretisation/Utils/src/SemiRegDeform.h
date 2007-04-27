@@ -41,51 +41,36 @@
 #ifndef __Discretisation_Utils_SemiRegDeform_h__
 #define __Discretisation_Utils_SemiRegDeform_h__
 	
-
-	/* A support structure for this class. */
-	typedef struct {
-	      Mesh*		mesh;
-	      unsigned short	nDims;
-	      unsigned		nNodes[3];
-	      unsigned		basis[3];
-	} GRM;
-
 	/* Textual name of this class */
 	extern const Type SemiRegDeform_Type;
 
 	/* Virtual function types */
 	
 	/* Class contents */
-	#define __SemiRegDeform \
-		/* General info */ \
-		__Stg_Component \
-		\
-		/* Virtual info */ \
-		\
-		/* SemiRegDeform info ... */ \
-		GRM					grm; \
-		unsigned				nStrips; \
-		unsigned*				beginInds; \
-		unsigned*				endInds; \
-		unsigned*				conDims; \
-		\
-		Sync*					sync; \
-		unsigned				nRemotes; \
-		Coord*					remotes;
+	#define __SemiRegDeform						\
+		/* General info */					\
+		__Stg_Component						\
+									\
+		/* Virtual info */					\
+									\
+		/* SemiRegDeform info ... */				\
+		Mesh*					mesh;		\
+		Decomp_Sync*				sync;		\
+		Decomp_Sync_Array*			syncArray;	\
+									\
+		double**				remVerts;	\
+		unsigned				nStrips;	\
+		unsigned*				beginInds;	\
+		unsigned*				endInds;	\
+		unsigned*				conDims;
 
 	struct SemiRegDeform { __SemiRegDeform };
-	
 	
 	/*-----------------------------------------------------------------------------------------------------------------------------
 	** Constructors
 	*/
 	
-	/* Create a SemiRegDeform */
-	SemiRegDeform* SemiRegDeform_DefaultNew( Name name );
-	
 	SemiRegDeform* SemiRegDeform_New( Name name );
-	
-	/* Creation implementation */
 	SemiRegDeform* _SemiRegDeform_New(SizeT						_sizeOfSelf, 
 					  Type						type,
 					  Stg_Class_DeleteFunction*			_delete,
@@ -98,65 +83,32 @@
 					  Stg_Component_ExecuteFunction*		_execute,
 					  Stg_Component_DestroyFunction*		_destroy, 
 					  Name						name );
-	
-	
-	/* Initialise a SemiRegDeform */
-	void SemiRegDeform_Init( SemiRegDeform* self, Name name );
-	
-	/* Initialisation implementation functions */
 	void _SemiRegDeform_Init( SemiRegDeform* self );
-	
 	
 	/*-----------------------------------------------------------------------------------------------------------------------------
 	** Virtual functions
 	*/
 	
-	/* Stg_Class_Delete implementation */
 	void _SemiRegDeform_Delete( void* srd );
-	
-	/* Print implementation */
 	void _SemiRegDeform_Print( void* srd, Stream* stream );
-	
-	/* Construct implementation */
 	void _SemiRegDeform_Construct( void* srd, Stg_ComponentFactory* cf, void* data );
-	
-	/* Build implementation */
 	void _SemiRegDeform_Build( void* srd, void* data );
-	
-	/* Component implementation */
 	void _SemiRegDeform_Initialise( void* srd, void* data );
-	
-	/* Execute implementation */
 	void _SemiRegDeform_Execute( void* srd, void* data );
-	
-	/* Destroy implementation */
 	void _SemiRegDeform_Destroy( void* srd, void* data );
-	
 	
 	/*-----------------------------------------------------------------------------------------------------------------------------
 	** Public functions
 	*/
 
 	void SemiRegDeform_SetMesh( void* srd, Mesh* mesh );
-
 	void SemiRegDeform_AddStrip( void* srd, unsigned begin, unsigned end );
-
 	void SemiRegDeform_Deform( void* srd );
-	
 	
 	/*-----------------------------------------------------------------------------------------------------------------------------
 	** Private Member functions
 	*/
-
-	void _SemiRegDeform_SyncInit( void* srd );
-
-	void _SemiRegDeform_FreeInternal( void* srd );
-
-	void RegMesh_Generalise( Mesh* mesh, GRM* grm );
-
-	void GRM_Lift( GRM* grm, unsigned ind, unsigned* dimInds );
-
-	void GRM_Project( GRM* grm, unsigned* dimInds, unsigned* ind );
-	
+	void SemiRegDeform_InitSync( SemiRegDeform* self );
+	void SemiRegDeform_Destruct( SemiRegDeform* self );
 	
 #endif /* __Discretisation_Utils_SemiRegDeform_h__ */

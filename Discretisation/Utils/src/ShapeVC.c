@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ShapeVC.c 3851 2006-10-12 08:57:22Z SteveQuenette $
+** $Id: ShapeVC.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -458,16 +458,26 @@ void _ShapeVC_ReadDictionary( void* variableCondition, void* dictionary ) {
 }
 
 IndexSet* _ShapeVC_GetSet(void* variableCondition) {
-	ShapeVC*		self = (ShapeVC*)variableCondition;
+	ShapeVC*	self = (ShapeVC*)variableCondition;
+	Mesh*		mesh = self->_mesh;
+	IndexSet*	set;
+	unsigned	v_i;
 
-	Stg_Component_Initialise( self->_mesh, NULL, False );
+	Stg_Component_Initialise( mesh, NULL, False );
 
-	return Mesh_CreateIndexSetFromShape( self->_mesh, self->_shape );
+	set = IndexSet_New( Mesh_GetDomainSize( mesh, MT_VERTEX ) );
+
+	for( v_i = 0; v_i < Mesh_GetDomainSize( mesh, MT_VERTEX ); v_i++ ) {
+		if( Stg_Shape_IsCoordInside( self->_shape, Mesh_GetVertex( mesh, v_i ) ) )
+			IndexSet_Add( set, v_i );
+	}
+
+	return set;
 }
 
 VariableCondition_VariableIndex _ShapeVC_GetVariableCount(void* variableCondition, Index globalIndex) {
 	ShapeVC*	self = (ShapeVC*)variableCondition;
-	
+
 	return self->_entryCount;
 }
 

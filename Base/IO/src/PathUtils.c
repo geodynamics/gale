@@ -316,7 +316,11 @@ Bool Stg_CreateDirectory( const char* path ) {
 			Memory_Free( parent );
 		}
 
+#ifdef NO_SYS_STAT
+		ret = mkdir( path);
+#else
 		ret = mkdir( path, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH );
+#endif
 
 		return ret == 0;
 	}
@@ -330,7 +334,7 @@ Bool Stg_FileExists( const char* path ) {
 	if ( stat( path, &info ) < 0 ) {
 		return False;
 	}
-	return S_ISREG( info.st_mode );
+        return (info.st_mode & S_IFREG);
 }
 
 Bool Stg_DirectoryExists( const char* path ) {
@@ -339,5 +343,5 @@ Bool Stg_DirectoryExists( const char* path ) {
 	if ( stat( path, &info ) < 0 ) {
 		return False;
 	}
-	return S_ISDIR( info.st_mode );
+        return (info.st_mode & S_IFDIR);
 }

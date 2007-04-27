@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: VariableCondition.c 4046 2007-03-22 08:29:13Z PatrickSunter $
+** $Id: VariableCondition.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -126,6 +126,7 @@ void _VariableCondition_Init(
 	self->vcTbl = NULL;
 	self->valueCount = 0;
 	self->valueTbl = NULL;
+	self->mapping = NULL;
 }
 
 
@@ -395,6 +396,11 @@ void _VariableCondition_Build( void* variableCondition, void* data ) {
 	self->valueTbl = Memory_Alloc_Array( VariableCondition_Value, self->valueCount, "VC->valueTbl" );
 	for (val_I = 0; val_I < self->valueCount; val_I++)
 		self->valueTbl[val_I] = self->_getValue(self, val_I);
+
+	/* Build mapping. */
+	self->mapping = UIntMap_New();
+	for( i = 0; i < self->indexCount; i++ )
+		UIntMap_Insert( self->mapping, self->indexTbl[i], i );
 }
 
 void _VariableCondition_Initialise( void* variableCondition, void* data ) {
@@ -454,13 +460,9 @@ void VariableCondition_ApplyToIndex( void* variableCondition, Index localIndex, 
 	ConditionFunction*		cf;
 	Index				index, i;
 	Stream*				errorStr = Journal_Register( Error_Type, self->type );
-	
+
 	/* Ensure that the index provided (localIndex) has a condition attached to it */
-	for (index = 0; index < self->indexCount; index++)
-		if (self->indexTbl[index] == localIndex)
-			break;
-	if (index == self->indexCount)
-		return;
+	insist( UIntMap_Map( self->mapping, localIndex, &index ) );
 	
 	/* For each variable that has a condition at this index */
 	for (i = 0; i < self->vcVarCountTbl[index]; i++)

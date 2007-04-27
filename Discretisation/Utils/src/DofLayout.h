@@ -41,7 +41,7 @@
 **
 **	This general DofLayout should have subclasses which add a set of dofs to each node of a mesh, etc.
 **
-** $Id: DofLayout.h 3851 2006-10-12 08:57:22Z SteveQuenette $
+** $Id: DofLayout.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -76,6 +76,11 @@
 		/** 2D Array: for each index (e.g. each node), stores an array (of size dofCounts[i]) containing
 		the indexes into the DofLayout::_variableRegister of the Variable s at that index. */ \
 		Variable_Index**	varIndices; \
+						    \
+		Mesh*			mesh;	\
+		unsigned		nBaseVariables; \
+		Variable**		baseVariables;
+
 
 	/** Allows the user to lay out which Variables exist at each index in a structure (eg nodes of a mesh) - see
 	 DofLayout.h for details. */
@@ -88,9 +93,9 @@
 	
 	DofLayout*	DofLayout_DefaultNew( Name name );
 	
-	DofLayout*	DofLayout_New( Name name, Variable_Register* variableRegister, Index numItemsInLayout );
+	DofLayout*	DofLayout_New( Name name, Variable_Register* variableRegister, Index numItemsInLayout, void* mesh );
 	
-	void		DofLayout_Init(DofLayout* self, Name name, Variable_Register* variableRegister, Index numItemsInLayout );
+	void		DofLayout_Init(DofLayout* self, Name name, Variable_Register* variableRegister, Index numItemsInLayout, void* mesh );
 	
 	DofLayout*	_DofLayout_New( 
 				SizeT						_sizeOfSelf, 
@@ -107,9 +112,10 @@
 				Name							name,
 				Bool							initFlag,
 				Variable_Register*				variableRegister,
-				Index						numItemsInLayout);
+				Index						numItemsInLayout, 
+				void*						mesh );
 	
-	void _DofLayout_Init(void* dofLayout, Variable_Register* variableRegister, Index numItemsInLayout, Variable_Index baseVariableCount, Variable** baseVariableArray );
+	void _DofLayout_Init(void* dofLayout, Variable_Register* variableRegister, Index numItemsInLayout, Variable_Index baseVariableCount, Variable** baseVariableArray, void* mesh );
 	
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -195,9 +201,9 @@
 	void DofLayout_AddAllFromVariableArray( void* dofLayout, Variable_Index variableCount, Variable** variableArray ) ;
 
 	/** Saves all variables used by this dofLayout to files */
-	void DofLayout_SaveAllVariablesToFiles( void* dofLayout, char* prefixString, Processor_Index rank );
+	void DofLayout_SaveAllVariablesToFiles( void* dofLayout, char* prefixString, unsigned rank );
 
 	/** Saves all variables used by this dofLayout to files */
-	void DofLayout_LoadAllVariablesFromFiles( void* dofLayout, char* prefixString, Processor_Index rank );
+	void DofLayout_LoadAllVariablesFromFiles( void* dofLayout, char* prefixString, unsigned rank );
 
 #endif /* __Discretisation_Utils_DofLayout_h__ */

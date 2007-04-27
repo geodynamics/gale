@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ElementCellLayout.c 4044 2007-03-21 23:35:21Z PatrickSunter $
+** $Id: ElementCellLayout.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -36,6 +36,7 @@
 
 #include "types.h"
 #include "shortcuts.h"
+#include "ShadowInfo.h"
 #include "CellLayout.h"
 #include "ElementCellLayout.h"
 
@@ -191,12 +192,6 @@ void _ElementCellLayout_Init( ElementCellLayout* self, void* mesh ) {
 	/* ElementCellInfo info */
 	self->mesh = (Mesh*)mesh;
 	self->isConstructed = True;
-	if (False == self->mesh->buildElementNodeTbl ) {
-		Stream* elementCellLayoutStream = Journal_Register( ErrorStream_Type, self->type );
-		Journal_Printf( elementCellLayoutStream, "Warning: Mesh not configured to build element node table. "
-			"Activating it now.\n" );
-		Mesh_ActivateElementNodeTbl( self->mesh );
-	}
 }
 
 
@@ -264,8 +259,18 @@ void _ElementCellLayout_Construct( void* elementCellLayout, Stg_ComponentFactory
 }
 	
 void _ElementCellLayout_Build( void *elementCellLayout, void *data ){
-	ElementCellLayout* self = (ElementCellLayout*)elementCellLayout;
-	Build( self->mesh, data, False );
+	ElementCellLayout*	self = (ElementCellLayout*)elementCellLayout;
+
+	Build( self->mesh, NULL, False );
+
+	if( !Mesh_HasIncidence( self->mesh, Mesh_GetDimSize( self->mesh ), MT_VERTEX ) ) {
+		Stream* elementCellLayoutStream = Journal_Register( ErrorStream_Type, self->type );
+		Journal_Printf( elementCellLayoutStream, "Warning: Mesh not configured to build element node table. "
+			"Activating it now.\n" );
+		abort();
+	}
+
+	ElementCellLayout_BuildShadowInfo( self );
 }
 	
 void _ElementCellLayout_Initialise( void *elementCellLayout, void *data ){
@@ -283,41 +288,51 @@ void _ElementCellLayout_Destroy( void *elementCellLayout, void *data ){
 
 Cell_Index _ElementCellLayout_CellLocalCount( void* elementCellLayout ) {
 	ElementCellLayout* self = (ElementCellLayout*)elementCellLayout;
-	return self->mesh->elementLocalCount;
+	return Mesh_GetLocalSize( self->mesh, Mesh_GetDimSize( self->mesh ) );
 }
 
 Cell_Index _ElementCellLayout_CellShadowCount( void* elementCellLayout ) {
 	ElementCellLayout* self = (ElementCellLayout*)elementCellLayout;
-	return self->mesh->elementShadowCount;
+	return Mesh_GetRemoteSize( self->mesh, Mesh_GetDimSize( self->mesh ) );
 }
 
 Cell_PointIndex _ElementCellLayout_PointCount( void* elementCellLayout, Cell_Index cellIndex ) {
 	ElementCellLayout* self = (ElementCellLayout*)elementCellLayout;
-	return self->mesh->elementNodeCountTbl[cellIndex];
+	unsigned		nInc;
+	unsigned*		inc;
+
+	Mesh_GetIncidence( self->mesh, Mesh_GetDimSize( self->mesh ), cellIndex, MT_VERTEX, 
+			   &nInc, &inc );
+	return nInc;
 }
 
 void _ElementCellLayout_InitialisePoints( void* elementCellLayout, Cell_Index cellIndex, Cell_PointIndex pointCount, 
-		Cell_Points points ) 
+					  double*** points )
 {
 	ElementCellLayout* self = (ElementCellLayout*)elementCellLayout;
 	Cell_PointIndex point_I;
 	
 	/* point to the mesh's node's coordinates */
 	for( point_I = 0; point_I < pointCount; point_I++ ) {
-		points[point_I] = &self->mesh->nodeCoord[self->mesh->elementNodeTbl[cellIndex][point_I]];
+		unsigned	nInc;
+		unsigned*	inc;
+
+	   	Mesh_GetIncidence( self->mesh, Mesh_GetDimSize( self->mesh ), cellIndex, MT_VERTEX, 
+				   &nInc, &inc );
+		points[point_I] = &self->mesh->verts[inc[point_I]];
 	}
 }
 
 
-Cell_Index _ElementCellLayout_MapElementIdToCellId( void* elementCellLayout, Element_DomainIndex element_dI ) {
+Cell_Index _ElementCellLayout_MapElementIdToCellId( void* elementCellLayout, unsigned element_dI ) {
 	
 	#ifdef CAUTIOUS
 	{
 		ElementCellLayout*      self = (ElementCellLayout*)elementCellLayout;
 		Stream* errorStr = Journal_Register( Error_Type, self->type );
-		Journal_Firewall( element_dI < self->mesh->elementDomainCount, errorStr, "Error - in %s(): User asked "
+		Journal_Firewall( element_dI < Mesh_GetDomainSize( self->mesh, Mesh_GetDimSize( self->mesh ) ), errorStr, "Error - in %s(): User asked "
 			"for cell corresponding to element %d, but the mesh that this cell layout is based on only "
-			"has %d elements.\n", __func__, element_dI, self->mesh->elementDomainCount );
+			"has %d elements.\n", __func__, element_dI, Mesh_GetDomainSize( self->mesh, Mesh_GetDimSize( self->mesh ) ) );
 	}	
 	#endif
 	
@@ -327,95 +342,110 @@ Cell_Index _ElementCellLayout_MapElementIdToCellId( void* elementCellLayout, Ele
 
 Bool _ElementCellLayout_IsInCell( void* elementCellLayout, Cell_Index cellIndex, void* _particle ) {
 	ElementCellLayout*      self     = (ElementCellLayout*)elementCellLayout;
-	ElementLayout*		eLayout  = self->mesh->layout->elementLayout;
 	GlobalParticle*	        particle = (GlobalParticle*)_particle;
-	Index                   element_I = 0;
+	unsigned		elDim, elInd;
 
-	/* If we already have an owning cell, use that as a hint as to where the particle may now be. */
-	if( particle->owningCell < self->mesh->layout->decomp->elementDomainCount ) {
-		Mesh*		mesh = self->mesh;
-		unsigned	elInd = particle->owningCell;
-
-		/* Check current cell. */
-		element_I = eLayout->elementWithPoint( eLayout, self->mesh->layout->decomp, particle->coord, self->mesh, 
-						       EXCLUSIVE_UPPER_BOUNDARY, 
-						       1, &elInd );
-
-		if( element_I >= mesh->layout->decomp->elementDomainCount ) {
-			/* Check neighbours. */
-			if( mesh->elementNeighbourCountTbl && mesh->elementNeighbourTbl ) {
-				element_I = eLayout->elementWithPoint( eLayout, self->mesh->layout->decomp, particle->coord, 
-								       self->mesh, 
-								       EXCLUSIVE_UPPER_BOUNDARY, 
-								       mesh->elementNeighbourCountTbl[elInd], 
-								       mesh->elementNeighbourTbl[elInd] );
-			}
-
-			if( element_I >= mesh->layout->decomp->elementDomainCount ) {
-				/* Check the lot. */
-				/* Use exclusive upper boundaries, since we want a unique answer across the processors as to
-				   which proc owns a certain particle in its local space */
-				element_I = Mesh_ElementWithPoint( self->mesh, particle->coord, EXCLUSIVE_UPPER_BOUNDARY );
-			}
-		}
-	}
-	else {
-		/* Check the lot. */
-		/* Use exclusive upper boundaries, since we want a unique answer across the processors as to
-		   which proc owns a certain particle in its local space */
-		element_I = Mesh_ElementWithPoint( self->mesh, particle->coord, EXCLUSIVE_UPPER_BOUNDARY );
-	}
-
-	return element_I == cellIndex ? True : False;
+	return Mesh_ElementHasPoint( self->mesh, cellIndex, particle->coord, &elDim, &elInd );
 }
 
 Cell_Index _ElementCellLayout_CellOf( void* elementCellLayout, void* _particle ) {
 	ElementCellLayout*      self     = (ElementCellLayout*)elementCellLayout;
-	ElementLayout*		eLayout  = self->mesh->layout->elementLayout;
 	GlobalParticle*	        particle = (GlobalParticle*)_particle;
-	unsigned		element_I;
+	unsigned		elInd;
 
-	/* If we already have an owning cell, use that as a hint as to where the particle may now be. */
-	if( particle->owningCell < self->mesh->layout->decomp->elementDomainCount ) {
-		Mesh*		mesh = self->mesh;
-		unsigned	elInd = particle->owningCell;
+	if( !Mesh_SearchElements( self->mesh, particle->coord, &elInd ) )
+		elInd = Mesh_GetDomainSize( self->mesh, Mesh_GetDimSize( self->mesh ) );
 
-		/* Check current cell. */
-		element_I = eLayout->elementWithPoint( eLayout, self->mesh->layout->decomp, particle->coord, self->mesh, 
-						       EXCLUSIVE_UPPER_BOUNDARY, 
-						       1, &elInd );
-
-		if( element_I >= mesh->layout->decomp->elementDomainCount ) {
-			/* Check neighbours. */
-			if( mesh->elementNeighbourCountTbl && mesh->elementNeighbourTbl ) {
-				element_I = eLayout->elementWithPoint( eLayout, self->mesh->layout->decomp, particle->coord,
-								       self->mesh, 
-								       EXCLUSIVE_UPPER_BOUNDARY, 
-								       mesh->elementNeighbourCountTbl[elInd], 
-								       mesh->elementNeighbourTbl[elInd] );
-			}
-
-			if( element_I >= mesh->layout->decomp->elementDomainCount ) {
-				/* Check the lot. */
-				/* Use exclusive upper boundaries, since we want a unique answer across the processors as to
-				   which proc owns a certain particle in its local space */
-				element_I = Mesh_ElementWithPoint( self->mesh, particle->coord, EXCLUSIVE_UPPER_BOUNDARY );
-			}
-		}
-	}
-	else {
-		/* Check the lot. */
-		/* Use exclusive upper boundaries, since we want a unique answer across the processors as to
-		   which proc owns a certain particle in its local space */
-		element_I = Mesh_ElementWithPoint( self->mesh, particle->coord, EXCLUSIVE_UPPER_BOUNDARY );
-	}
-
-	return element_I;
+	return elInd;
 }
 
 
 ShadowInfo* _ElementCellLayout_GetShadowInfo( void* elementCellLayout ) {
 	ElementCellLayout*      self = (ElementCellLayout*)elementCellLayout;
 
-	return self->mesh->elementShadowInfo;
+	return &self->cellShadowInfo;
+}
+
+
+void ElementCellLayout_BuildShadowInfo( ElementCellLayout* self ) {
+	unsigned	nDims;
+	CommTopology*	commTopo;
+	unsigned	nIncProcs;
+	unsigned*	incProcs;
+	unsigned	n_i;
+
+	nDims = Mesh_GetDimSize( self->mesh );
+	commTopo = Mesh_GetCommTopology( self->mesh, nDims );
+	CommTopology_GetIncidence( commTopo, &nIncProcs, &incProcs );
+
+	/* Extract neighbouring proc information. */
+	self->cellShadowInfo.procNbrInfo = Memory_Alloc_Unnamed( ProcNbrInfo );
+	self->cellShadowInfo.procNbrInfo->procNbrCnt = nIncProcs;
+	self->cellShadowInfo.procNbrInfo->procNbrTbl = AllocArray( unsigned, nIncProcs );
+	memcpy( self->cellShadowInfo.procNbrInfo->procNbrTbl, incProcs, nIncProcs * sizeof(unsigned) );
+
+	/* Count shadow info. */
+	if( nIncProcs ) {
+		self->cellShadowInfo.procShadowedCnt = AllocArray( unsigned, nIncProcs );
+		memset( self->cellShadowInfo.procShadowedCnt, 0, nIncProcs * sizeof(unsigned) );
+		self->cellShadowInfo.procShadowCnt = AllocArray( unsigned, nIncProcs );
+		memset( self->cellShadowInfo.procShadowCnt, 0, nIncProcs * sizeof(unsigned) );
+	}
+	for( n_i = 0; n_i < Mesh_GetSharedSize( self->mesh, nDims ); n_i++ ) {
+		unsigned	nSharers;
+		unsigned*	sharers;
+		unsigned	s_i;
+
+		if( Mesh_SharedToDomain( self->mesh, nDims, n_i ) >= Mesh_GetLocalSize( self->mesh, nDims ) )
+			continue;
+
+		Mesh_GetSharers( self->mesh, nDims, n_i, 
+				 &nSharers, &sharers );
+		for( s_i = 0; s_i < nSharers; s_i++ )
+			self->cellShadowInfo.procShadowedCnt[sharers[s_i]]++;
+	}
+	for( n_i = 0; n_i < Mesh_GetRemoteSize( self->mesh, nDims ); n_i++ ) {
+		unsigned	owner;
+
+		owner = Mesh_GetOwner( self->mesh, nDims, n_i );
+		self->cellShadowInfo.procShadowCnt[owner]++;
+	}
+
+	/* Build shadow info indices. */
+	if( nIncProcs ) {
+		self->cellShadowInfo.procShadowedTbl = Memory_Alloc_2DComplex_Unnamed( unsigned, nIncProcs, 
+										       self->cellShadowInfo.procShadowedCnt );
+		self->cellShadowInfo.procShadowTbl = Memory_Alloc_2DComplex_Unnamed( unsigned, nIncProcs, 
+										     self->cellShadowInfo.procShadowCnt );
+		memset( self->cellShadowInfo.procShadowedCnt, 0, nIncProcs * sizeof(unsigned) );
+		memset( self->cellShadowInfo.procShadowCnt, 0, nIncProcs * sizeof(unsigned) );
+	}
+	for( n_i = 0; n_i < Mesh_GetSharedSize( self->mesh, nDims ); n_i++ ) {
+		unsigned	local;
+		unsigned	curInd;
+		unsigned	nSharers;
+		unsigned*	sharers;
+		unsigned	s_i;
+
+		local = Mesh_SharedToDomain( self->mesh, nDims, n_i );
+		if( local >= Mesh_GetLocalSize( self->mesh, nDims ) )
+			continue;
+
+		Mesh_GetSharers( self->mesh, nDims, n_i, 
+				 &nSharers, &sharers );
+		for( s_i = 0; s_i < nSharers; s_i++ ) {
+			curInd = self->cellShadowInfo.procShadowedCnt[sharers[s_i]]++;
+			self->cellShadowInfo.procShadowedTbl[sharers[s_i]][curInd] = local;
+		}
+	}
+	for( n_i = 0; n_i < Mesh_GetRemoteSize( self->mesh, nDims ); n_i++ ) {
+		unsigned	domain;
+		unsigned	curInd;
+		unsigned	owner;
+
+		domain = Mesh_GetLocalSize( self->mesh, nDims ) + n_i;
+		owner = Mesh_GetOwner( self->mesh, nDims, n_i );
+		curInd = self->cellShadowInfo.procShadowCnt[owner]++;
+		self->cellShadowInfo.procShadowTbl[owner][curInd] = domain;
+	}
 }

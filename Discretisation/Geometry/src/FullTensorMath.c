@@ -194,7 +194,7 @@ void TensorArray_CalcAllEigenFunctions(TensorArray tensor, Dimension_Index dim, 
     double* rightEigenVec;
 	
 	int row_I, col_I; 
-	//char* 	errorStringValues;
+	/*char* 	errorStringValues; */
 	Stream* errorStream = Journal_Register( ErrorStream_Type, "FullTensorMath" );
 	
 	/* Set size of workspace to pass to function */

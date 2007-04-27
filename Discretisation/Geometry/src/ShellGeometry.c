@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ShellGeometry.c 3882 2006-10-26 04:41:18Z KathleenHumble $
+** $Id: ShellGeometry.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
@@ -36,6 +36,7 @@
 #include "types.h"
 #include "GeometryClass.h"
 #include "ShellGeometry.h"
+#include "TrigMath.h"
 
 #include <stdio.h>
 #include <stdlib.h>

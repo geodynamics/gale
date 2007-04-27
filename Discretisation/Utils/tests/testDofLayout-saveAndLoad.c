@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testDofLayout-saveAndLoad.c 3555 2006-05-10 07:05:46Z PatrickSunter $
+** $Id: testDofLayout-saveAndLoad.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -95,7 +95,7 @@ int main( int argc, char *argv[] ) {
 		}	
 
 		/* Simple test */
-		dof = DofLayout_New( "dofLayout", variableRegister, arraySize );
+		dof = DofLayout_New( "dofLayout", variableRegister, arraySize, NULL );
 		for (ii = 0; ii < arraySize; ii++) {
 			for (var_I = 0; var_I < 6; var_I++) {
 				DofLayout_AddDof_ByVarName(dof, varName[var_I], ii);

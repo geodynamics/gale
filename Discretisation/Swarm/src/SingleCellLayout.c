@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SingleCellLayout.c 3851 2006-10-12 08:57:22Z SteveQuenette $
+** $Id: SingleCellLayout.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -225,8 +225,12 @@ void* _SingleCellLayout_Copy( void* singleCellLayout, void* dest, Bool deep, Nam
 	
 	if( deep ) {
 		if( (newSingleCellLayout->cellPointCoords = PtrMap_Find( map, self->cellPointCoords )) == NULL && self->cellPointCoords ) {
-			newSingleCellLayout->cellPointCoords = Memory_Alloc_Array( Coord, newSingleCellLayout->pointCount, "SingleCellLayout->cellPoints" );
-			memcpy( newSingleCellLayout->cellPointCoords, self->cellPointCoords, sizeof(Coord) * newSingleCellLayout->pointCount );
+			unsigned	p_i;
+
+			newSingleCellLayout->cellPointCoords = Memory_Alloc_2DArray( double, newSingleCellLayout->pointCount, 3, "SingleCellLayout->cellPoints" );
+			for( p_i = 0; p_i < newSingleCellLayout->pointCount; p_i++ )
+				memcpy( newSingleCellLayout->cellPointCoords[p_i], self->cellPointCoords[p_i], 
+					sizeof(double) * 3 * newSingleCellLayout->pointCount );
 			PtrMap_Append( map, self->cellPointCoords, newSingleCellLayout->cellPointCoords );
 		}
 	}
@@ -351,7 +355,7 @@ void _SingleCellLayout_InitialiseGlobalCellPointPositions( SingleCellLayout* sel
 	tempCoord[1] = self->min[J_AXIS];
 	tempCoord[2] = self->min[K_AXIS];
 	 
-	self->cellPointCoords = Memory_Alloc_Array( Coord, self->pointCount, "SingleCellLayout->cellPoints" );
+	self->cellPointCoords = Memory_Alloc_2DArray( double, self->pointCount, 3, "SingleCellLayout->cellPoints" );
 	
 	/* Now generate the coordinates */
 	for ( k=0; k <= self->dimExists[K_AXIS]; k++ ) {
@@ -397,7 +401,7 @@ Cell_Index _SingleCellLayout_MapElementIdToCellId( void* cellLayout, Element_Dom
 
 Bool _SingleCellLayout_IsInCell( void* singleCellLayout, Cell_Index cellIndex, void* particle ) {
 	SingleCellLayout* self = (SingleCellLayout*)singleCellLayout;
-	Coord* coord = (Coord*)particle;
+	double** coord = (double**)particle;
 	Index dim_I = 0;
 	
 	for (dim_I=0; dim_I < 3; dim_I++ ) {

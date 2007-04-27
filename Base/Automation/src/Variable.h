@@ -42,7 +42,7 @@
 **
 **	Note that Variables can be applied to any piece of contiguous memory.
 **
-** $Id: Variable.h 4043 2007-03-21 23:32:51Z PatrickSunter $
+** $Id: Variable.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **/
 
@@ -86,13 +86,42 @@
 		Index                           subVariablesCount;      /**< The number of subvariables. Necessary since determined by whether user passes in names or not at init time. */ \
 		Variable**			components;		/**< For each component of this variable that we made a variable for, the pointer to the variable. */ \
 		Bool				allocateSelf;		\
-		Variable_Register*		vr;
+		Variable_Register*		vr;			\
+									\
+		Variable*			parent;
 
 	struct _Variable { __Variable };
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Constructors
 	*/
+
+	#define VARIABLE_DEFARGS							\
+		STG_CLASS_DEFARGS,							\
+		Stg_Component_DefaultConstructorFunction*	_defaultConstructor, 	\
+		Stg_Component_ConstructFunction*		_construct, 		\
+		Stg_Component_BuildFunction*			_build, 		\
+		Stg_Component_InitialiseFunction*		_initialise, 		\
+		Stg_Component_ExecuteFunction*			_execute, 		\
+		Stg_Component_DestroyFunction*			_destroy, 		\
+		Name						name, 			\
+		Bool						initFlag, 		\
+		Index						dataCount,		\
+		SizeT*						dataOffsets,		\
+		Variable_DataType*				dataTypes,		\
+		Index*						dataTypeCounts,		\
+		Name*						dataNames,		\
+		SizeT*						structSizePtr,		\
+		Index*						arraySizePtr,		\
+		void**						arrayPtrPtr,		\
+		Variable_Register*				vr
+
+	#define VARIABLE_PASSARGS						\
+		STG_CLASS_PASSARGS, _defaultConstructor, _construct, 		\
+		_build, _initialise, _execute, _destroy, name, initFlag,	\
+		dataCount, dataOffsets, dataTypes, dataTypeCounts,		\
+		dataNames, structSizePtr, arraySizePtr,				\
+		arrayPtrPtr, vr
 	
 	/** Creates a new Variable. A Variable holds the run-time information of a complex data type created by the programmer.
 	  * Essentially it associates a textual name to a variable in the program that the user can use to access or modify.
@@ -156,6 +185,15 @@
 		void**						arrayPtrPtr,
 		Variable_Register*				vr,
 		... 						/* vector component names */ );
+
+	Variable* Variable_NewVector2( 
+		Name						name,
+		Variable_DataType				dataType,
+		Index						dataTypeCount,
+		Index*						arraySizePtr,
+		void**						arrayPtrPtr,
+		Variable_Register*				vr,
+		char**						dataNames );
 	
 	/** Constructor interface. */
 	Variable* _Variable_New(
@@ -260,7 +298,7 @@
 		/** Implementation of "get" the structure in an array that the requested data member is in if CAUTIOUS is defined.
 		 *  It ensures that array_I is within its bounds. Private (Do not directly use!) */
 		#define _Variable_GetStructPtr( self, array_I ) \
-			( (array_I) < (self)->arraySize ? \
+			( ((array_I) < (self)->arraySize) ? \
 				__Variable_GetStructPtr( (self), (array_I) ) : \
 				/*TODO : call J_Firewall, then return NULL. */ \
 				(void*)(Journal_Firewall( \
@@ -285,7 +323,7 @@
 		/** Implementation of "get" the requested data member in a structure in an array if CAUTIOUS is defined.
 		 *  It ensures that component_I  and array_I are within its bounds. Private (Do not directly use!) */
 		#define _Variable_GetPtr( self, array_I, component_I, vector_I ) \
-			( (component_I) < (self)->offsetCount ? \
+			( ((component_I) < (self)->offsetCount) ? \
 				__Variable_GetPtr( (self), (array_I), (component_I), (vector_I) ) :\
 				(void*)(Journal_Firewall( \
 					0, \
@@ -311,7 +349,7 @@
 		/** Assuming this is a Variable of a "char" inbuilt type, return a pointer to that char (type casted to char*).
 		 *  It ensures the Variable is of a "char" and is not complex. */
 		#define Variable_GetPtrChar( self, array_I ) \
-			( (self)->offsetCount == 1 && (self)->dataTypes[0] == Variable_DataType_Char ? \
+			( ((self)->offsetCount == 1 && (self)->dataTypes[0] == Variable_DataType_Char) ? \
 				_Variable_GetPtrChar( (self), (array_I) ) : \
 				(char*)(Journal_Firewall( \
 					0, \
@@ -331,7 +369,7 @@
 		/** Assuming this is a Variable of a vector "char" inbuilt type, return that char. It ensures that vector_I is
 		 *  within range. */
 		#define Variable_GetValueAtChar( self, array_I, vector_I ) \
-			( (vector_I) < (self)->dataTypeCounts[0] ? \
+			( ((vector_I) < (self)->dataTypeCounts[0]) ? \
 				_Variable_GetValueAtChar( (self), (array_I), (vector_I) ) : \
 				(char)Journal_Firewall( \
 					0, \
@@ -415,7 +453,7 @@
 		/** Assuming this is a Variable of a "short" inbuilt type, return a pointer to that short (type casted to short*).
 		 *  It ensures the Variable is of a "short" and is not complex. */
 		#define Variable_GetPtrShort( self, array_I ) \
-			( (self)->offsetCount == 1 && (self)->dataTypes[0] == Variable_DataType_Short ? \
+			( ((self)->offsetCount == 1 && (self)->dataTypes[0] == Variable_DataType_Short) ? \
 				_Variable_GetPtrShort( (self), (array_I) ) : \
 				(short*)(Journal_Firewall( \
 					0, \
@@ -435,7 +473,7 @@
 		/** Assuming this is a Variable of a vector "short" inbuilt type, return that short. It ensures that vector_I is
 		 *  within range. */
 		#define Variable_GetValueAtShort( self, array_I, vector_I ) \
-			( (vector_I) < (self)->dataTypeCounts[0] ? \
+			( ((vector_I) < (self)->dataTypeCounts[0]) ? \
 				_Variable_GetValueAtShort( (self), (array_I), (vector_I) ) : \
 				(short)Journal_Firewall( \
 					0, \
@@ -520,7 +558,7 @@
 		/** Assuming this is a Variable of a "int" inbuilt type, return a pointer to that int (type casted to int*).
 		 *  It ensures the Variable is of a "int" and is not complex. */
 		#define Variable_GetPtrInt( self, array_I ) \
-			( (self)->offsetCount == 1 && (self)->dataTypes[0] == Variable_DataType_Int ? \
+			( ((self)->offsetCount == 1 && (self)->dataTypes[0] == Variable_DataType_Int) ? \
 				_Variable_GetPtrInt( (self), (array_I) ) : \
 				(int*)(Journal_Firewall( \
 					0, \
@@ -540,7 +578,7 @@
 		/** Assuming this is a Variable of a vector "int" inbuilt type, return that int. It ensures that vector_I is
 		 *  within range. */
 		#define Variable_GetValueAtInt( self, array_I, vector_I ) \
-			( (vector_I) < (self)->dataTypeCounts[0] ? \
+			( ((vector_I) < (self)->dataTypeCounts[0]) ? \
 				_Variable_GetValueAtInt( (self), (array_I), (vector_I) ) : \
 				(int)Journal_Firewall( \
 					0, \
@@ -623,7 +661,7 @@
 		/** Assuming this is a Variable of a "float" inbuilt type, return a pointer to that float (type casted to float*).
 		 *  It ensures the Variable is of a "float" and is not complex. */
 		#define Variable_GetPtrFloat( self, array_I ) \
-			( (self)->offsetCount == 1 && (self)->dataTypes[0] == Variable_DataType_Float ? \
+			( ((self)->offsetCount == 1 && (self)->dataTypes[0] == Variable_DataType_Float) ? \
 				_Variable_GetPtrFloat( (self), (array_I) ) : \
 				(float*)(Journal_Firewall( \
 					0, \
@@ -643,7 +681,7 @@
 		/** Assuming this is a Variable of a vector "float" inbuilt type, return that float. It ensures that vector_I is
 		 *  within range. */
 		#define Variable_GetValueAtFloat( self, array_I, vector_I ) \
-			( (vector_I) < (self)->dataTypeCounts[0] ? \
+			( ((vector_I) < (self)->dataTypeCounts[0]) ? \
 				_Variable_GetValueAtFloat( (self), (array_I), (vector_I) ) : \
 				(float)Journal_Firewall( \
 					0, \
@@ -728,7 +766,7 @@
 		/** Assuming this is a Variable of a "double" inbuilt type, return a pointer to that double (type casted to
 		 *  double*). It ensures the Variable is of a "double" and is not complex. */
 		#define Variable_GetPtrDouble( self, array_I ) \
-			( (self)->offsetCount == 1 && (self)->dataTypes[0] == Variable_DataType_Double ? \
+			( ((self)->offsetCount == 1 && (self)->dataTypes[0] == Variable_DataType_Double) ? \
 				_Variable_GetPtrDouble( (self), (array_I) ) : \
 				(double*)(Journal_Firewall( \
 					0, \
@@ -748,7 +786,7 @@
 		/** Assuming this is a Variable of a vector "double" inbuilt type, return that double. It ensures that vector_I is
 		 *  within range. */
 		#define Variable_GetValueAtDouble( self, array_I, vector_I ) \
-			( (vector_I) < (self)->dataTypeCounts[0] ? \
+			( ((vector_I) < (self)->dataTypeCounts[0]) ? \
 				_Variable_GetValueAtDouble( (self), (array_I), (vector_I) ) : \
 				(double)Journal_Firewall( \
 					0, \
@@ -841,7 +879,7 @@
 		/** Assuming this is a Variable of a "pointer" inbuilt type, return a pointer to that pointer (type casted to
 		 *  void**). It ensures the Variable is of a "pointer" and is not complex. */
 		#define Variable_GetPtrPointer( self, array_I ) \
-			( (self)->offsetCount == 1 && (self)->dataTypes[0] == Variable_DataType_Pointer ? \
+			( ((self)->offsetCount == 1 && (self)->dataTypes[0] == Variable_DataType_Pointer) ? \
 				_Variable_GetPtrPointer( (self), (array_I) ) : \
 				(void**)(Journal_Firewall( \
 					0, \
@@ -861,7 +899,7 @@
 		/** Assuming this is a Variable of a vector "pointer" inbuilt type, return that pointer. It ensures that vector_I is
 		 *  within range. */
 		#define Variable_GetValueAtPointer( self, array_I, vector_I ) \
-			( (vector_I) < (self)->dataTypeCounts[0] ? \
+			( ((vector_I) < (self)->dataTypeCounts[0]) ? \
 				_Variable_GetValueAtPointer( (self), (array_I), (vector_I) ) : \
 				(void*)(Journal_Firewall( \
 					0, \
@@ -941,11 +979,11 @@
 	/** Assuming this is a Variable of any inbuilt type, return a char (type casted to char). Private. (Do not directly
 	 *  use!). Resolution order: char, short, int, float, double, pointer. */
 	#define _Variable_GetValueAsChar( self, array_I ) \
-		( (self)->dataTypes[0] == Variable_DataType_Char ?	Variable_GetValueChar( (self), (array_I) ) : \
-		  (self)->dataTypes[0] == Variable_DataType_Short ?	Variable_GetValueShortAsChar( (self), (array_I) ) : \
-		  (self)->dataTypes[0] == Variable_DataType_Int ?	Variable_GetValueIntAsChar( (self), (array_I) ) : \
-		  (self)->dataTypes[0] == Variable_DataType_Float ?	Variable_GetValueFloatAsChar( (self), (array_I) ) : \
-		  (self)->dataTypes[0] == Variable_DataType_Double ?	Variable_GetValueDoubleAsChar( (self), (array_I) ) : \
+		( ((self)->dataTypes[0] == Variable_DataType_Char) ?	Variable_GetValueChar( (self), (array_I) ) : \
+		  ((self)->dataTypes[0] == Variable_DataType_Short) ?	Variable_GetValueShortAsChar( (self), (array_I) ) : \
+		  ((self)->dataTypes[0] == Variable_DataType_Int) ?	Variable_GetValueIntAsChar( (self), (array_I) ) : \
+		  ((self)->dataTypes[0] == Variable_DataType_Float) ?	Variable_GetValueFloatAsChar( (self), (array_I) ) : \
+		  ((self)->dataTypes[0] == Variable_DataType_Double) ?	Variable_GetValueDoubleAsChar( (self), (array_I) ) : \
 		  (char)Journal_Firewall( \
 			0, \
 			Journal_Register( Error_Type, Variable_Type ), \
@@ -954,7 +992,7 @@
 		/** Assuming this is a Variable of any inbuilt type, return a char (type casted to char). It ensures the Variable
 		 * is not complex. Resolution order: char, short, int, float, double, pointer. */
 		#define Variable_GetValueAsChar( self, array_I ) \
-			( (self)->offsetCount == 1 ? \
+			( ((self)->offsetCount == 1) ? \
 				_Variable_GetValueAsChar( (self), (array_I) ) : \
 				(char)Journal_Firewall( \
 					0, \
@@ -969,11 +1007,11 @@
 	/** Assuming this is a Variable of any inbuilt type, return a short (type casted to short). Private. (Do not directly
 	 *  use!). Resolution order: char, short, int, float, double, pointer. */
 	#define _Variable_GetValueAsShort( self, array_I ) \
-		( (self)->dataTypes[0] == Variable_DataType_Char ?	Variable_GetValueCharAsShort( (self), (array_I) ) : \
-		  (self)->dataTypes[0] == Variable_DataType_Short ?	Variable_GetValueShort( (self), (array_I) ) : \
-		  (self)->dataTypes[0] == Variable_DataType_Int ?	Variable_GetValueIntAsShort( (self), (array_I) ) : \
-		  (self)->dataTypes[0] == Variable_DataType_Float ?	Variable_GetValueFloatAsShort( (self), (array_I) ) : \
-		  (self)->dataTypes[0] == Variable_DataType_Double ?	Variable_GetValueDoubleAsShort( (self), (array_I) ) : \
+		( ((self)->dataTypes[0] == Variable_DataType_Char) ?	Variable_GetValueCharAsShort( (self), (array_I) ) : \
+		  ((self)->dataTypes[0] == Variable_DataType_Short) ?	Variable_GetValueShort( (self), (array_I) ) : \
+		  ((self)->dataTypes[0] == Variable_DataType_Int) ?	Variable_GetValueIntAsShort( (self), (array_I) ) : \
+		  ((self)->dataTypes[0] == Variable_DataType_Float) ?	Variable_GetValueFloatAsShort( (self), (array_I) ) : \
+		  ((self)->dataTypes[0] == Variable_DataType_Double) ?	Variable_GetValueDoubleAsShort( (self), (array_I) ) : \
 		  (short)Journal_Firewall( \
 			0, \
 			Journal_Register( Error_Type, Variable_Type ), \
@@ -982,7 +1020,7 @@
 		/** Assuming this is a Variable of any inbuilt type, return a short (type casted to short). It ensures the Variable
 		 * is not complex. Resolution order: char, short, int, float, double, pointer. */
 		#define Variable_GetValueAsShort( self, array_I ) \
-			( (self)->offsetCount == 1 ? \
+			( ((self)->offsetCount == 1) ? \
 				_Variable_GetValueAsShort( (self), (array_I) ) : \
 				(short)Journal_Firewall( \
 					0, \

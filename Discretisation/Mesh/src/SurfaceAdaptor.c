@@ -78,6 +78,7 @@ SurfaceAdaptor* SurfaceAdaptor_New( Name name ) {
 				    _SurfaceAdaptor_Destroy, 
 				    name, 
 				    NON_GLOBAL, 
+				    _MeshGenerator_SetDimSize, 
 				    SurfaceAdaptor_Generate );
 }
 
@@ -199,10 +200,9 @@ void SurfaceAdaptor_Generate( void* adaptor, void* _mesh ) {
 	SurfaceAdaptor*			self = (SurfaceAdaptor*)adaptor;
 	Mesh*				mesh = (Mesh*)_mesh;
 	SurfaceAdaptor_DeformFunc*	deformFunc;
-	unsigned*			gSize;
-	Grid*				grid;
+	Grid				*grid;
 	unsigned*			inds;
-	unsigned			d_i, n_i;
+	unsigned			n_i;
 
 	/* Build base mesh, which is assumed to be cartesian. */
 	MeshGenerator_Generate( self->generator, mesh );
@@ -227,18 +227,9 @@ void SurfaceAdaptor_Generate( void* adaptor, void* _mesh ) {
 	};
 
 	/* Extract the cartesian information. */
-	gSize = (unsigned*)ExtensionManager_Get( mesh->info, mesh, 
-						 ExtensionManager_GetHandle( mesh->info, "cartesianGlobalSize" ) );
-
-	/* Build grid and space for indices. */
-	grid = Grid_New();
-	Grid_SetNDims( grid, mesh->topo->nDims );
-	for( d_i = 0; d_i < mesh->topo->nDims; d_i++ )
-		gSize[d_i]++;
-	Grid_SetSizes( grid, gSize );
-	for( d_i = 0; d_i < mesh->topo->nDims; d_i++ )
-		gSize[d_i]--;
-	inds = Memory_Alloc_Array_Unnamed( unsigned, mesh->topo->nDims );
+	grid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
+					      ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+	inds = AllocArray( unsigned, Mesh_GetDimSize( mesh ) );
 
 	/* Loop over domain nodes. */
 	for( n_i = 0; n_i < MeshTopology_GetDomainSize( mesh->topo, MT_VERTEX ); n_i++ ) {
@@ -249,15 +240,14 @@ void SurfaceAdaptor_Generate( void* adaptor, void* _mesh ) {
 		Grid_Lift( grid, gNode, inds );
 
 		/* Calculate a height percentage. */
-		height = (double)inds[1] / (double)(gSize[1] - 1);
+		height = (double)inds[1] / (double)(grid->sizes[1] - 1);
 
 		/* Deform this node. */
-		mesh->nodeCoord[n_i][1] += height * deformFunc( self, mesh, gSize, n_i, inds );
+		mesh->verts[n_i][1] += height * deformFunc( self, mesh, grid->sizes, n_i, inds );
 	}
 
 	/* Free resources. */
 	FreeArray( inds );
-	FreeObject( grid );
 }
 
 
@@ -268,8 +258,8 @@ void SurfaceAdaptor_Generate( void* adaptor, void* _mesh ) {
 double SurfaceAdaptor_Wedge( SurfaceAdaptor* self, Mesh* mesh, 
 			     unsigned* globalSize, unsigned vertex, unsigned* vertexInds )
 {
-	if( mesh->nodeCoord[vertex][0] >= self->info.wedge.offs )
-		return (mesh->nodeCoord[vertex][0] - self->info.wedge.offs) * self->info.wedge.grad;
+	if( mesh->verts[vertex][0] >= self->info.wedge.offs )
+		return (mesh->verts[vertex][0] - self->info.wedge.offs) * self->info.wedge.grad;
 	else
 		return 0.0;
 }
@@ -280,10 +270,10 @@ double SurfaceAdaptor_Sine( SurfaceAdaptor* self, Mesh* mesh,
 	double	dx, dy;
 	double	rad;
 
-	dx = mesh->nodeCoord[vertex][0] - self->info.trig.origin[0];
+	dx = mesh->verts[vertex][0] - self->info.trig.origin[0];
 	rad = dx * dx;
 	if( mesh->topo->nDims == 3 ) {
-		dy = mesh->nodeCoord[vertex][1] - self->info.trig.origin[1];
+		dy = mesh->verts[vertex][1] - self->info.trig.origin[1];
 		rad += dy * dy;
 	}
 	rad = sqrt( rad );
@@ -297,10 +287,10 @@ double SurfaceAdaptor_Cosine( SurfaceAdaptor* self, Mesh* mesh,
 	double	dx, dy;
 	double	rad;
 
-	dx = mesh->nodeCoord[vertex][0] - self->info.trig.origin[0];
+	dx = mesh->verts[vertex][0] - self->info.trig.origin[0];
 	rad = dx * dx;
 	if( mesh->topo->nDims == 3 ) {
-		dy = mesh->nodeCoord[vertex][1] - self->info.trig.origin[1];
+		dy = mesh->verts[vertex][1] - self->info.trig.origin[1];
 		rad += dy * dy;
 	}
 	rad = sqrt( rad );

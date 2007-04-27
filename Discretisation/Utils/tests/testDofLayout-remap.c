@@ -88,7 +88,7 @@ int main( int argc, char *argv[] ) {
 		}
 
 		/* Simple test */
-		dof = DofLayout_New( "dofLayout", variableRegister, 27 );
+		dof = DofLayout_New( "dofLayout", variableRegister, 27, NULL );
 		for (i = 0; i < 6; i++) {
 			for (j = 0; j < 27; j++) {
 				DofLayout_AddDof_ByVarName(dof, varName[i], j);

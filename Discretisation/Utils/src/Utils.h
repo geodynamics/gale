@@ -35,13 +35,14 @@
 ** Comments:
 **	None so far.
 **
-** $Id: Utils.h 3542 2006-05-01 13:02:49Z RobertTurnbull $
+** $Id: Utils.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #ifndef __Discretisation_Utils_h__
 #define __Discretisation_Utils_h__
-	
+
+	#include <assert.h>
 	#include "types.h"
 	#include "RegularMeshUtils.h"
 	#include "AllElementsVC.h"
@@ -57,18 +58,17 @@
 	#include "FieldVariable_Register.h"
 	#include "FieldVariable.h"
 	#include "OperatorFieldVariable.h"
-	#include "MeshCoarsener_Hexa.h"
 	#include "DiscretisationContext.h"
 	#include "LinearRegression.h"
 	#include "SobolGenerator.h"
 	#include "Remesher.h"
 	#include "StripRemesher.h"
+	#include "CellRemesher.h"
 	
 	#include "TimeIntegratee.h"
 	#include "TimeIntegrator.h"
 	#include "ShapeAdvector.h"
 
-	#include "Sync.h"
 	#include "SemiRegDeform.h"
 	#include "Init.h"
 	#include "Finalise.h"

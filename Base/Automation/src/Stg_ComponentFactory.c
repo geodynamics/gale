@@ -30,7 +30,7 @@
 **
 ** Comments:
 **
-** $Id: Stg_ComponentFactory.c 4075 2007-04-24 04:30:55Z PatrickSunter $
+** $Id: Stg_ComponentFactory.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -419,7 +419,7 @@ unsigned int _Stg_ComponentFactory_GetUnsignedInt( void* cf, Name componentName,
 	retVal = Dictionary_Entry_Value_AsUnsignedInt( 
 			_Stg_ComponentFactory_GetNumericalValue( cf, componentName, key, 
 				Dictionary_Entry_Value_FromUnsignedInt( defaultVal )));
-	// TODO : Possible memory leak if defaultVal not added to the dictionary
+/* 	 TODO : Possible memory leak if defaultVal not added to the dictionary */
 	return retVal;
 }	
 Bool Stg_ComponentFactory_GetBool( void* cf, Name componentName, Dictionary_Entry_Key key, Bool defaultVal ) {
@@ -568,7 +568,7 @@ Stg_Component* _Stg_ComponentFactory_ConstructByKey(
 	Stg_ComponentFactory*	self              = (Stg_ComponentFactory*)cf;
 	Dictionary*		thisComponentDict = NULL;
 	Dictionary*		componentDict     = NULL;
-	Name			componentName;
+	Name			componentName, redirect;
 	Dictionary_Entry_Value*	componentEntryVal;
 	Stream*			errorStream       = Journal_Register( Error_Type, self->type );
 
@@ -592,6 +592,13 @@ Stg_Component* _Stg_ComponentFactory_ConstructByKey(
 	}
 		
 	componentName = Dictionary_Entry_Value_AsString( componentEntryVal );
+
+	/* If we can find the component's name in the root dictionary, use that value instead. */
+	if( self->rootDict ) {
+		redirect = Dictionary_GetString_WithDefault( self->rootDict, componentName, "" );
+		if( strcmp( redirect, "" ) )
+			componentName = redirect;
+	}
 
 	return self->constructByName( self, componentName, type, isEssential, data );
 }

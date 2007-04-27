@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testDofLayout.c 3555 2006-05-10 07:05:46Z PatrickSunter $
+** $Id: testDofLayout.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -96,7 +96,7 @@ int main( int argc, char *argv[] ) {
 		}	
 
 		/* Simple test */
-		dof = DofLayout_New( "dofLayout", variableRegister, arraySize );
+		dof = DofLayout_New( "dofLayout", variableRegister, arraySize, NULL );
 		for (ii = 0; ii < arraySize; ii++)
 			for (var_I = 0; var_I < 6; var_I++)
 				DofLayout_AddDof_ByVarName(dof, varName[var_I], ii);
@@ -110,7 +110,7 @@ int main( int argc, char *argv[] ) {
 		Stg_Class_Delete(dof);
 
 		/* Advanced test */
-		dof = DofLayout_New( "dofLayout1", variableRegister, arraySize );
+		dof = DofLayout_New( "dofLayout1", variableRegister, arraySize, NULL );
 		for (ii = 0; ii < 12; ii++)
 			for (var_I = 0; var_I < 2; var_I++)
 				DofLayout_AddDof_ByVarName(dof, varName[var_I], ii);
@@ -129,8 +129,8 @@ int main( int argc, char *argv[] ) {
 
 		/* Copy test */
 
-		dof = DofLayout_New( "dofLayout2", variableRegister, arraySize );
-		destDof = DofLayout_New( "dofLayout3", variableRegister, arraySize );
+		dof = DofLayout_New( "dofLayout2", variableRegister, arraySize, NULL );
+		destDof = DofLayout_New( "dofLayout3", variableRegister, arraySize, NULL );
 		for (ii = 0; ii < arraySize; ii++) {
 			for (var_I = 0; var_I < 3; var_I++) {
 				DofLayout_AddDof_ByVarName(dof, varName[var_I], ii);

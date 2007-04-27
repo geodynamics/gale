@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Memory.c 4064 2007-04-05 08:03:01Z RaquibulHassan $
+** $Id: Memory.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -547,7 +547,7 @@ void* _Memory_Alloc_2DComplex_Func(
 	size = Memory_Length_2DComplex( itemSize, xLength, yLengths );
 	
 	if ( 0 == size ) {
-		Journal_Printf( stgMemory->errorStream, "Warning: %s() called to allocate a 2D variable "
+		Journal_Printf( stgMemory->errorStream, "Warning: () called to allocate a 2D variable "
 			"length array where the total size calculated was 0. Returning NULL.\n", __func__ );
 		return NULL;
 	}

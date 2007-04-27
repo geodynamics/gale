@@ -41,6 +41,8 @@
 
 #include "types.h"
 #include "shortcuts.h"
+#include "Decomp_Sync.h"
+#include "MeshTopology.h"
 #include "MeshClass.h"
 #include "MeshGenerator.h"
 
@@ -53,13 +55,14 @@ const Type MeshGenerator_Type = "MeshGenerator";
 */
 
 MeshGenerator* _MeshGenerator_New( MESHGENERATOR_DEFARGS ) {
-	MeshGenerator* self;
-	
+	MeshGenerator*	self;
+
 	/* Allocate memory */
 	assert( sizeOfSelf >= sizeof(MeshGenerator) );
 	self = (MeshGenerator*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
 
 	/* Virtual info */
+	self->setDimSizeFunc = setDimSizeFunc;
 	self->generateFunc = generateFunc;
 
 	/* MeshGenerator info */
@@ -72,6 +75,9 @@ void _MeshGenerator_Init( MeshGenerator* self ) {
 	self->comm = MPI_COMM_WORLD;
 	self->nMeshes = 0;
 	self->meshes = NULL;
+	self->nDims = 0;
+	self->enabledDims = NULL;
+	self->enabledInc = NULL;
 }
 
 
@@ -82,7 +88,7 @@ void _MeshGenerator_Init( MeshGenerator* self ) {
 void _MeshGenerator_Delete( void* meshGenerator ) {
 	MeshGenerator*	self = (MeshGenerator*)meshGenerator;
 
-	FreeArray( self->meshes );
+	MeshGenerator_Destruct( self );
 
 	/* Delete the parent. */
 	_Stg_Component_Delete( self );
@@ -100,44 +106,12 @@ void _MeshGenerator_Print( void* meshGenerator, Stream* stream ) {
 	_Stg_Component_Print( self, stream );
 }
 
-void* _MeshGenerator_Copy( void* meshGenerator, void* destProc_I, Bool deep, Name nameExt, PtrMap* ptrMap ) {
-#if 0
-	MeshGenerator*	self = (MeshGenerator*)meshGenerator;
-	MeshGenerator*	newMeshGenerator;
-	PtrMap*	map = ptrMap;
-	Bool	ownMap = False;
-
-	/* Damn me for making copying so difficult... what was I thinking? */
-	
-	/* We need to create a map if it doesn't already exist. */
-	if( !map ) {
-		map = PtrMap_New( 10 );
-		ownMap = True;
-	}
-	
-	newMeshGenerator = (MeshGenerator*)_Mesh_Copy( self, destProc_I, deep, nameExt, map );
-	
-	/* Copy the virtual methods here. */
-
-	/* Deep or shallow? */
-	if( deep ) {
-	}
-	else {
-	}
-	
-	/* If we own the map, get rid of it here. */
-	if( ownMap ) Stg_Class_Delete( map );
-	
-	return (void*)newMeshGenerator;
-#endif
-
-	return NULL;
-}
-
 void _MeshGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* cf, void* data ) {
 	MeshGenerator*		self = (MeshGenerator*)meshGenerator;
 	Dictionary*		dict;
+	unsigned		nDims;
 	Dictionary_Entry_Value*	meshList;
+	Dictionary_Entry_Value	*enabledDimsList, *enabledIncList;
 	Mesh*			mesh;
 
 	assert( self );
@@ -171,21 +145,45 @@ void _MeshGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* cf, vo
 		}
 	}
 
-	/* Add to live component register. */
-	LiveComponentRegister_Add( cf->LCRegister, (Stg_Component*)self );
+	/* Read dimensions and state. */
+	nDims = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "dims", 2 );
+	MeshGenerator_SetDimSize( self, nDims );
+	enabledDimsList = Dictionary_Get( dict, "enabledDims" );
+	enabledIncList = Dictionary_Get( dict, "enabledIncidence" );
+	if( enabledDimsList || enabledIncList ) {
+		unsigned	d_i;
+
+		memset( self->enabledDims, 0, (nDims + 1) * sizeof(Bool) );
+		for( d_i = 0; d_i <= nDims; d_i++ )
+			memset( self->enabledInc[d_i], 0, (nDims + 1) * sizeof(Bool) );
+	}
+	if( enabledDimsList ) {
+		unsigned	nEnabledDims;
+		unsigned	dim;
+		unsigned	d_i;
+
+		nEnabledDims = Dictionary_Entry_Value_GetCount( enabledDimsList );
+		for( d_i = 0; d_i < nEnabledDims; d_i++ ) {
+			dim = Dictionary_Entry_Value_AsUnsignedInt( Dictionary_Entry_Value_GetElement( enabledDimsList, d_i ) );
+			MeshGenerator_SetDimState( self, dim, True );
+		}
+	}
+	if( enabledIncList ) {
+		unsigned	nEnabledInc;
+		unsigned	fromDim, toDim;
+		unsigned	d_i;
+
+		nEnabledInc = Dictionary_Entry_Value_GetCount( enabledIncList );
+		assert( nEnabledInc % 2 == 0 );
+		for( d_i = 0; d_i < nEnabledInc; d_i += 2 ) {
+			fromDim = Dictionary_Entry_Value_AsUnsignedInt( Dictionary_Entry_Value_GetElement( enabledIncList, d_i ) );
+			toDim = Dictionary_Entry_Value_AsUnsignedInt( Dictionary_Entry_Value_GetElement( enabledIncList, d_i + 1 ) );
+			MeshGenerator_SetIncidenceState( self, fromDim, toDim, True );
+		}
+	}
 }
 
 void _MeshGenerator_Build( void* meshGenerator, void* data ) {
-	MeshGenerator*	self = (MeshGenerator*)meshGenerator;
-	unsigned	m_i;
-
-	/* Sanity check. */
-	assert( self );
-	assert( !self->nMeshes || self->meshes );
-
-	/* Generate each mesh in our list. */
-	for( m_i = 0; m_i < self->nMeshes; m_i++ )
-		MeshGenerator_Generate( self, self->meshes[m_i] );
 }
 
 void _MeshGenerator_Initialise( void* meshGenerator, void* data ) {
@@ -195,6 +193,33 @@ void _MeshGenerator_Execute( void* meshGenerator, void* data ) {
 }
 
 void _MeshGenerator_Destroy( void* meshGenerator, void* data ) {
+}
+
+void _MeshGenerator_SetDimSize( void* meshGenerator, unsigned nDims ) {
+	MeshGenerator*	self = (MeshGenerator*)meshGenerator;
+	unsigned	d_i, d_j;
+
+	assert( self && Stg_CheckType( self, MeshGenerator ) );
+
+	self->nDims = nDims;
+	self->enabledDims = ReallocArray( self->enabledDims, Bool, nDims + 1 );
+	self->enabledInc = ReallocArray2D( self->enabledInc, Bool, nDims + 1, nDims + 1 );
+	for( d_i = 0; d_i <= nDims; d_i++ ) {
+		if( d_i == 0 || d_i == nDims )
+			self->enabledDims[d_i] = True;
+		else
+			self->enabledDims[d_i] = False;
+		for( d_j = 0; d_j <= nDims; d_j++ ) {
+			if( (d_i == 0 || d_i == nDims) && (d_j == 0 || d_j == nDims) ) {
+				if( d_i == d_j && d_j == nDims )
+					self->enabledInc[d_i][d_j] = False;
+				else
+					self->enabledInc[d_i][d_j] = True;
+			}
+			else
+				self->enabledInc[d_i][d_j] = False;
+		}
+	}
 }
 
 /*--------------------------------------------------------------------------------------------------------------------------
@@ -233,6 +258,49 @@ void MeshGenerator_AddMesh( void* meshGenerator, void* mesh ) {
 	((Mesh*)mesh)->generator = self;
 }
 
+void MeshGenerator_SetDimState( void* meshGenerator, unsigned dim, Bool state ) {
+	MeshGenerator*	self = (MeshGenerator*)meshGenerator;
+
+	assert( self && Stg_CheckType( self, MeshGenerator ) );
+	assert( dim <= self->nDims );
+	assert( self->enabledDims );
+
+	self->enabledDims[dim] = state;
+}
+
+void MeshGenerator_ClearIncidenceStates( void* meshGenerator ) {
+	MeshGenerator*	self = (MeshGenerator*)meshGenerator;
+	unsigned	d_i, d_j;
+
+	assert( self && Stg_CheckType( self, MeshGenerator ) );
+
+	for( d_i = 0; d_i <= self->nDims; d_i++ ) {
+		for( d_j = 0; d_j <= self->nDims; d_j++ )
+			self->enabledInc[d_i][d_j] = False;
+	}
+}
+
+void MeshGenerator_SetIncidenceState( void* meshGenerator, unsigned fromDim, unsigned toDim, Bool state ) {
+	MeshGenerator*	self = (MeshGenerator*)meshGenerator;
+
+	assert( self && Stg_CheckType( self, MeshGenerator ) );
+	assert( fromDim <= self->nDims );
+	assert( toDim <= self->nDims );
+	assert( self->enabledInc );
+
+	self->enabledInc[fromDim][toDim] = state;
+}
+
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Private Functions
 */
+
+void MeshGenerator_Destruct( MeshGenerator* self ) {
+	assert( self && Stg_CheckType( self, MeshGenerator ) );
+
+	KillArray( self->enabledDims );
+	KillArray( self->enabledInc );
+	KillArray( self->meshes );
+	self->nMeshes = 0;
+	self->nDims = 0;
+}

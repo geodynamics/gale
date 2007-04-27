@@ -33,7 +33,7 @@
 **
 ** Comments:
 **
-** $Id: VariableCondition.h 3851 2006-10-12 08:57:22Z SteveQuenette $
+** $Id: VariableCondition.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -123,6 +123,8 @@
 		/** Array of values which are available to apply (which index/var pairs they apply to is determined
 		by VariableCondition::vcTbl). */ \
 		VariableCondition_Value*			valueTbl; \
+									\
+		UIntMap*		mapping;
 	
 	/** Abstract class for specifying (1 or more) conditions that apply to (1 or more) variables in an array - 
 	see VariableCondition.h for details */

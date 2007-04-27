@@ -34,13 +34,13 @@
 ** <b>Comments:</b>
 **	None as yet.
 **
-** $Id: types.h 3758 2006-08-08 09:17:16Z LukeHodkinson $
+** $Id: types.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **/
 
 #ifndef __Base_Foundation_types_h__
 #define __Base_Foundation_types_h__
-	
+
 	typedef void*				Pointer;		/**< General Pointer. */
 	typedef unsigned long			Stg_Word;		/**< A word on the cpu architecture */
 	typedef unsigned long			ArithPointer;		/**< Used to do arithmetic on a pointer. Usually a long. */

@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ParticleCommHandler.c 3885 2006-10-26 05:52:26Z KathleenHumble $
+** $Id: ParticleCommHandler.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -41,6 +41,7 @@
 #include "ParticleCommHandler.h"
 
 #include "SwarmClass.h"
+#include "ShadowInfo.h"
 #include "CellLayout.h"
 #include "ElementCellLayout.h"
 #include "StandardParticle.h"
@@ -593,7 +594,7 @@ void _ParticleCommHandler_HandleParticleMovementBetweenProcs( void* pCommsHandle
 				maxProcTime = procTimes[proc_I];
 			}
 		}
-		// TODO: print some stats on max particles sent/recvd and total sent/recvd
+		/* TODO: print some stats on max particles sent/recvd and total sent/recvd */
 		Journal_Printf( info, "...Max Communication time by any proc was %.2f (secs)\n", maxProcTime );
 	}
 	Memory_Free( procTimes );
@@ -1046,7 +1047,7 @@ void _ParticleCommHandler_ShareAndUpdateParticlesThatHaveMovedOutsideDomains(
 		particlesLeavingMyDomain = Memory_Alloc_Bytes( particlesLeavingDomainSizeBytes, "Particle",
 			"particlesLeavingMyDomain" );
 
-		// TODO: investigate doing this with an MPI_Indexed datatype instead...
+		/* TODO: investigate doing this with an MPI_Indexed datatype instead... */
 		Journal_DPrintfL( self->debug, 2, "Copying particles leaving my domain to temp. transfer array\n" );
 		Stream_IndentBranch( Swarm_Debug );
 
@@ -1054,7 +1055,7 @@ void _ParticleCommHandler_ShareAndUpdateParticlesThatHaveMovedOutsideDomains(
 		MPI_Type_indexed( 
 			self->particlesOutsideDomainTotalCount,
 			blocklens,
-			self->particlesOutsideDomainIndices,//change to contiguous indices?
+			self->particlesOutsideDomainIndices,/*change to contiguous indices?*/
 			MPI_BYTE,
 			ParticlesLeavingDomainTransferIndexed
 			);

@@ -151,7 +151,7 @@ int main( int argc, char* argv[] ) {
 
 	Journal_Printf( myStream, "\nDeleting the List\n" );
 	Stg_Class_Delete( (void*)numList );
-	//Adding because it seems missing ,though probably isn't
+	/* Adding because it seems missing ,though probably isn't */
         for(i=0; i<NUM_DATA; i++)
           Memory_Free(array[i]);
 	BaseContainer_Finalise();

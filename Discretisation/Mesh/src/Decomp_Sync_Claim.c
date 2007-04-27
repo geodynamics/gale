@@ -196,20 +196,22 @@ void Decomp_Sync_Claim_ClaimOwnership( Decomp_Sync_Claim* self, CommTopology* to
 				       unsigned* nLocals, unsigned** locals, unsigned* nRemotes, unsigned** remotes )
 {
 	unsigned	rank, nProcs;
+	MPI_Comm	comm;
 	unsigned	nInc;
 	unsigned*	inc;
 	unsigned	nBytes;
-	Stg_Byte*		bytes;
+	Stg_Byte*	bytes;
 	RangeSet*	tmpClaimed;
 	unsigned	tag = 6669;
 	unsigned	p_i, p_j;
 
 	/* Get basic MPI info. */
-	MPI_Comm_rank( topo->comm, (int*)&rank );
-	MPI_Comm_size( topo->comm, (int*)&nProcs );
+	rank = CommTopology_GetGlobalCommRank( topo );
+	nProcs = CommTopology_GetGlobalCommSize( topo );
+	comm = CommTopology_GetGlobalComm( topo );
 
 	/* Extract our neighbouring processors. */
-	CommTopology_GetIncidence( topo, rank, &nInc, &inc );
+	CommTopology_GetIncidence( topo, &nInc, &inc );
 
 	/* Figure out where info is coming from and going to. Note that the incidence
 	   is always ordered from lowest to highest rank. */
@@ -221,9 +223,9 @@ void Decomp_Sync_Claim_ClaimOwnership( Decomp_Sync_Claim* self, CommTopology* to
 			break;
 
 		/* Receive from neighbour which indices it has taken. */
-		MPI_Recv( &nBytes, 1, MPI_UNSIGNED, inc[p_i], tag, topo->comm, &status );
+		MPI_Recv( &nBytes, 1, MPI_UNSIGNED, inc[p_i], tag, comm, &status );
 		bytes = Memory_Alloc_Array_Unnamed( Stg_Byte, nBytes );
-		MPI_Recv( bytes, nBytes, MPI_BYTE, inc[p_i], tag, topo->comm, &status );
+		MPI_Recv( bytes, nBytes, MPI_BYTE, inc[p_i], tag, comm, &status );
 		RangeSet_Unpickle( tmpClaimed, nBytes, bytes );
 		FreeArray( bytes );
 
@@ -243,13 +245,10 @@ void Decomp_Sync_Claim_ClaimOwnership( Decomp_Sync_Claim* self, CommTopology* to
 		intersect = RangeSet_DeepCopy( isects[p_j] );
 		RangeSet_Intersection( intersect, lSet );
 		RangeSet_Pickle( intersect, &nBytes, &bytes );
-		MPI_Send( &nBytes, 1, MPI_UNSIGNED, inc[p_j], tag, topo->comm );
-		MPI_Send( bytes, nBytes, MPI_BYTE, inc[p_j], tag, topo->comm );
+		MPI_Send( &nBytes, 1, MPI_UNSIGNED, inc[p_j], tag, comm );
+		MPI_Send( bytes, nBytes, MPI_BYTE, inc[p_j], tag, comm );
 		FreeArray( bytes );
 	}
-
-	/* Return incidence. */
-	CommTopology_ReturnIncidence( topo, rank, &nInc, &inc );
 }
 
 void Decomp_Sync_Claim_BuildIndices( Decomp_Sync_Claim* self, unsigned nRequired, unsigned* required, RangeSet* claimed, 

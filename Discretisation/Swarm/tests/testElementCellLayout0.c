@@ -33,7 +33,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: testElementCellLayout0.c 3555 2006-05-10 07:05:46Z PatrickSunter $
+** $Id: testElementCellLayout0.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -49,8 +49,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define ConvertNode(node) \
-	(node == 2 ? 3 : node == 3 ? 2 : node == 6 ? 7 : node == 7 ? 6 : node)
+#define ConvertNode(node) node
+
 
 struct _Node {
 	double temp;
@@ -60,21 +60,44 @@ struct _Element {
 	double temp;
 };
 
+Mesh* buildMesh( unsigned nDims, unsigned* size, 
+		     double* minCrds, double* maxCrds, 
+		     ExtensionManager_Register* emReg )
+{
+	CartesianGenerator*	gen;
+	Mesh*			mesh;
+	unsigned		maxDecomp[3] = {1, 0, 1};
+
+	gen = CartesianGenerator_New( "" );
+	CartesianGenerator_SetDimSize( gen, nDims );
+	CartesianGenerator_SetTopologyParams( gen, size, 0, NULL, maxDecomp );
+	CartesianGenerator_SetGeometryParams( gen, minCrds, maxCrds );
+
+	mesh = Mesh_New( "" );
+	Mesh_SetExtensionManagerRegister( mesh, emReg );
+	Mesh_SetGenerator( mesh, gen );
+
+	Build( mesh, NULL, False );
+	Initialise( mesh, NULL, False );
+
+	KillObject( mesh->generator );
+
+	return mesh;
+}
+
 int main( int argc, char* argv[] ) {
 	MPI_Comm			CommWorld;
 	int				rank;
 	int				numProcessors;
 	int				procToWatch;
-	Dictionary*			dictionary;
-	Topology*			nTopology;
-	ElementLayout*			eLayout;
-	NodeLayout*			nLayout;
-	MeshDecomp*			decomp;
-	MeshLayout*			layout;
+	unsigned	nDims = 3;
+	unsigned	meshSize[3] = {2, 3, 2};
+	double		minCrds[3] = {0.0, 0.0, 0.0};
+	double		maxCrds[3] = {300.0, 12.0, 300.0};
 	ExtensionManager_Register*		extensionMgr_Register;
 	Mesh*				mesh;
 	ElementCellLayout*		elementCellLayout;
-	
+
 	/* Initialise MPI, get world info */
 	MPI_Init( &argc, &argv );
 	MPI_Comm_dup( MPI_COMM_WORLD, &CommWorld );
@@ -98,32 +121,9 @@ int main( int argc, char* argv[] ) {
 	}
 	if( rank == procToWatch ) printf( "Watching rank: %i\n", rank );
 	
-	/* Read input */
-	dictionary = Dictionary_New();
-	Dictionary_Add( dictionary, "rank", Dictionary_Entry_Value_FromUnsignedInt( rank ) );
-	Dictionary_Add( dictionary, "numProcessors", Dictionary_Entry_Value_FromUnsignedInt( numProcessors ) );
-	Dictionary_Add( dictionary, "meshSizeI", Dictionary_Entry_Value_FromUnsignedInt( 3 ) );
-	Dictionary_Add( dictionary, "meshSizeJ", Dictionary_Entry_Value_FromUnsignedInt( 4 ) );
-	Dictionary_Add( dictionary, "meshSizeK", Dictionary_Entry_Value_FromUnsignedInt( 3 ) );
-	Dictionary_Add( dictionary, "allowUnbalancing", Dictionary_Entry_Value_FromBool( True ) );
-	Dictionary_Add( dictionary, "buildElementNodeTbl", Dictionary_Entry_Value_FromBool( True ) );
-	Dictionary_Add( dictionary, "minX", Dictionary_Entry_Value_FromDouble( 0.0f ) );
-	Dictionary_Add( dictionary, "minY", Dictionary_Entry_Value_FromDouble( 0.0f ) );
-	Dictionary_Add( dictionary, "minZ", Dictionary_Entry_Value_FromDouble( 0.0f ) );
-	Dictionary_Add( dictionary, "maxX", Dictionary_Entry_Value_FromDouble( 300.0f ) );
-	Dictionary_Add( dictionary, "maxY", Dictionary_Entry_Value_FromDouble( 12.0f ) );
-	Dictionary_Add( dictionary, "maxZ", Dictionary_Entry_Value_FromDouble( 300.0f ) );
-	
-	/* Run the mesher */
-	nTopology = (Topology*)IJK6Topology_New( "IJK6Topology", dictionary );
-	eLayout = (ElementLayout*)ParallelPipedHexaEL_New( "PPHexaEL", 3, dictionary );
-	nLayout = (NodeLayout*)CornerNL_New( "CornerNL", dictionary, eLayout, nTopology );
-	decomp = (MeshDecomp*)HexaMD_New( "HexaMD", dictionary, MPI_COMM_WORLD, eLayout, nLayout );
-	layout = MeshLayout_New( "MeshLayout", eLayout, nLayout, decomp );
-	
 	/* Init mesh */
 	extensionMgr_Register = ExtensionManager_Register_New();
-	mesh = Mesh_New( "Mesh", layout, sizeof(Node), sizeof(Element), extensionMgr_Register, dictionary );
+	mesh = buildMesh( nDims, meshSize, minCrds, maxCrds, extensionMgr_Register );
 	
 	/* Configure the element-cell-layout */
 	elementCellLayout = ElementCellLayout_New( "elementCellLayout", mesh );
@@ -137,10 +137,10 @@ int main( int argc, char* argv[] ) {
 		Element_DomainIndex	element;
 		GlobalParticle          testParticle;
 		
-		for( element = 0; element < mesh->elementLocalCount; element++ ) {
+		for( element = 0; element < Mesh_GetLocalSize( mesh, nDims ); element++ ) {
 			Cell_PointIndex			point;
 			Cell_PointIndex			count;
-			Coord**				cellPoints;
+			double***			cellPoints;
 			Bool				result;
 
 			cell = CellLayout_MapElementIdToCellId( elementCellLayout, element );
@@ -153,7 +153,7 @@ int main( int argc, char* argv[] ) {
 
 			count = elementCellLayout->_pointCount( elementCellLayout, cell );
 			printf( "cellPointTbl  [%2u][0-%u]:\n", cell, count );
-			cellPoints = Memory_Alloc_Array( Coord*, count, "cellPoints" );
+			cellPoints = Memory_Alloc_Array( double**, count, "cellPoints" );
 			elementCellLayout->_initialisePoints( elementCellLayout, cell, count, cellPoints );
 			for( point = 0; point < count; point++ ) {
 				printf( "\t{%.3g %.3g %.3g}\n", (*cellPoints[ConvertNode(point)])[0], (*cellPoints[ConvertNode(point)])[1], 
@@ -162,16 +162,16 @@ int main( int argc, char* argv[] ) {
 			printf( "\n" );
 
 			testParticle.coord[0] = ( (*cellPoints[0])[0] + (*cellPoints[1])[0] ) / 2;
-			testParticle.coord[1] = ( (*cellPoints[0])[1] + (*cellPoints[3])[1] ) / 2;
+			testParticle.coord[1] = ( (*cellPoints[0])[1] + (*cellPoints[2])[1] ) / 2;
 			testParticle.coord[2] = ( (*cellPoints[0])[2] + (*cellPoints[4])[2] ) / 2;
 			printf( "Testing if test particle at (%f,%f,%f) is in the cell: ",
 				testParticle.coord[0], testParticle.coord[1], testParticle.coord[2] );
 			result = CellLayout_IsInCell( elementCellLayout, cell, &testParticle );
 			printf( "%d\n\n", result );
 
-			testParticle.coord[0] = (*cellPoints[count-1])[0] + 1;
-			testParticle.coord[1] = (*cellPoints[count-1])[1] + 1;
-			testParticle.coord[2] = (*cellPoints[count-1])[2] + 1;
+			testParticle.coord[0] = (*cellPoints[count-2])[0] + 1;
+			testParticle.coord[1] = (*cellPoints[count-2])[1] + 1;
+			testParticle.coord[2] = (*cellPoints[count-2])[2] + 1;
 			printf( "Testing if test particle at (%f,%f,%f) is in the cell: ",
 				testParticle.coord[0], testParticle.coord[1], testParticle.coord[2] );
 			result = CellLayout_IsInCell( elementCellLayout, cell, &testParticle );
@@ -185,12 +185,6 @@ int main( int argc, char* argv[] ) {
 	Stg_Class_Delete( elementCellLayout );
 	Stg_Class_Delete( mesh );
 	Stg_Class_Delete( extensionMgr_Register );
-	Stg_Class_Delete( layout );
-	Stg_Class_Delete( decomp );
-	Stg_Class_Delete( nLayout );
-	Stg_Class_Delete( eLayout );
-	Stg_Class_Delete( nTopology );
-	Stg_Class_Delete( dictionary );
 	
 	DiscretisationSwarm_Finalise();
 	DiscretisationUtils_Finalise();

@@ -39,12 +39,35 @@
 #include "Discretisation/Mesh/Mesh.h"
 
 
-#define nTests	2
-
-
-Bool testLocals( unsigned rank, unsigned nProcs, unsigned watch ) {
+Bool testSetEmpty( unsigned rank, unsigned nProcs, unsigned watch ) {
+	Bool		result = True;
 	Decomp*		decomp = Decomp_New( "" );
-	unsigned	nLocals = 100;
+	unsigned	nLocals = 0;
+	unsigned*	locals = NULL;;
+
+	decomp =  Decomp_New( "" );
+	Decomp_SetLocals( decomp, nLocals, locals );
+
+	if( rank == watch ) {
+		if( Decomp_GetGlobalSize( decomp ) != 0 || 
+		    Decomp_GetLocalSize( decomp ) != 0 ||
+		    decomp->locals != NULL )
+		{
+			result = False;
+			goto done;
+		}
+	}
+
+done:
+	FreeObject( decomp );
+
+	return result;
+}
+
+Bool testSetLocals( unsigned rank, unsigned nProcs, unsigned watch ) {
+	Bool		result = True;
+	Decomp*		decomp = Decomp_New( "" );
+	unsigned	nLocals = 10;
 	unsigned	nGlobals = nProcs * nLocals;
 	unsigned*	locals;
 	unsigned	l_i;
@@ -55,71 +78,54 @@ Bool testLocals( unsigned rank, unsigned nProcs, unsigned watch ) {
 
 	Decomp_SetLocals( decomp, nLocals, locals );
 
-	if( decomp->nGlobals != nGlobals ) {
-		FreeArray( locals );
-		FreeObject( decomp );
-		return False;
-	}
+	if( rank == watch ) {
+		unsigned	g_i;
 
-	for( l_i = 0; l_i < nLocals; l_i++ ) {
-		if( decomp->locals[l_i] != locals[l_i] ) {
-			FreeArray( locals );
-			FreeObject( decomp );
-			return False;
-		}
-	}
-
-	FreeArray( locals );
-	FreeObject( decomp );
-
-	return True;
-}
-
-Bool testMaps( unsigned rank, unsigned nProcs, unsigned watch ) {
-	Decomp*		decomp = Decomp_New( "" );
-	unsigned	nLocals = 100;
-	unsigned	nGlobals = nProcs * nLocals;
-	unsigned*	locals;
-	unsigned	l_i, g_i;
-
-	locals = Memory_Alloc_Array_Unnamed( unsigned, nLocals );
-	for( l_i = 0; l_i < nLocals; l_i++ )
-		locals[l_i] = rank * nLocals + l_i;
-
-	Decomp_SetLocals( decomp, nLocals, locals );
-
-	for( l_i = 0; l_i < nLocals; l_i++ ) {
-		if( !Decomp_IsLocal( decomp, locals[l_i] ) || 
-		    Decomp_LocalToGlobal( decomp, l_i ) != locals[l_i] )
+		if( Decomp_GetGlobalSize( decomp ) != nGlobals || 
+		    Decomp_GetLocalSize( decomp ) != nLocals || 
+		    decomp->locals == NULL )
 		{
-			FreeObject( decomp );
-			return False;
+			result = False;
+			goto done;
+		}
+
+		for( l_i = 0; l_i < nLocals; l_i++ ) {
+			if( Decomp_LocalToGlobal( decomp, l_i ) != locals[l_i] ) {
+				result = False;
+				goto done;
+			}
+		}
+
+		for( g_i = 0; g_i < nGlobals; g_i++ ) {
+			Bool		mapRes;
+			unsigned	local;
+
+			mapRes = Decomp_GlobalToLocal( decomp, g_i, &local );
+			if( g_i >= rank * nLocals && g_i < (rank + 1) * nLocals && 
+			    (!mapRes || local != g_i - rank * nLocals) )
+			{
+				result = False;
+				goto done;
+			}
 		}
 	}
 
+done:
 	FreeArray( locals );
-
-	for( g_i = 0; g_i < nGlobals; g_i++ ) {
-		if( !Decomp_IsLocal( decomp, g_i ) )
-			continue;
-
-		if( Decomp_GlobalToLocal( decomp, g_i ) != g_i % nLocals ) {
-			FreeObject( decomp );
-			return False;
-		}
-	}
-
 	FreeObject( decomp );
 
-	return True;
+	return result;
 }
+
+
+#define nTests	2
+
+TestSuite*	suite;
+TestSuite_Test	tests[nTests] = {{"set empty", testSetEmpty, 10}, 
+				 {"set locals", testSetLocals, 10}};
 
 
 int main( int argc, char* argv[] ) {
-	TestSuite*	suite;
-	TestSuite_Test	tests[nTests] = {{"set locals", testLocals}, 
-					 {"mappings", testMaps}};
-
 	/* Initialise MPI, get world info. */
 	MPI_Init( &argc, &argv );
 

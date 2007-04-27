@@ -35,7 +35,7 @@
 **	This is a class, of which subclasses can be defined, which can override default methods.
 **	Currently built with only MeshPIC_Context in mind (for Snac).
 **
-** $Id: MeshContext.h 3462 2006-02-19 06:53:24Z WalterLandry $
+** $Id: MeshContext.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -53,7 +53,6 @@
 		/* Virtual info */ \
 		\
 		/* MeshContext info */ \
-		MeshLayout*			meshLayout; \
 		Mesh*				mesh; \
 		ExtensionManager*		meshExtensionMgr;
 	struct MeshContext { __MeshContext };
@@ -79,14 +78,13 @@
 		AbstractContext_SetDt*		_setDt,
 		double				start,
 		double				stop,
-		MeshLayout*			meshLayout,
 		SizeT				nodeSize,
 		SizeT				elementSize,
 		MPI_Comm			communicator,
 		Dictionary*			dictionary );
 	
 	/* Initialisation implementation */
-	void _MeshContext_Init( MeshContext* self, MeshLayout* meshLayout, SizeT nodeSize, SizeT elementSize );
+	void _MeshContext_Init( MeshContext* self, SizeT nodeSize, SizeT elementSize );
 	
 	
 	/* Stg_Class_Delete implementation */

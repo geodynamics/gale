@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AllNodesVC.c 3884 2006-10-26 05:26:19Z KathleenHumble $
+** $Id: AllNodesVC.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -537,8 +537,9 @@ void _AllNodesVC_BuildSelf( void* allNodesVC, void* data ) {
 
 IndexSet* _AllNodesVC_GetSet( void* variableCondition ) {
 	AllNodesVC*		self = (AllNodesVC*)variableCondition;
-	IndexSet*		set = IndexSet_New(self->mesh->layout->decomp->nodeDomainCount);
-	
+	IndexSet*		set;
+
+	set = IndexSet_New( Mesh_GetDomainSize( self->mesh, MT_VERTEX ) );
 	IndexSet_AddAll( set );
 	
 	return set;

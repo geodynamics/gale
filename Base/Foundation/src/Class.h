@@ -34,7 +34,7 @@
 ** <b>Comments:</b>
 **	None
 **
-** $Id: Class.h 3654 2006-06-27 04:34:03Z LukeHodkinson $
+** $Id: Class.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **/
 
@@ -59,6 +59,7 @@
 		SizeT				_sizeOfSelf;		/**< Size of the final class type */ \
 		Bool				_deleteSelf;		/**< True it is to be deallocated in Delete */ \
 		Type				type;			/**< Global const char* to string of class' name */ \
+		unsigned			nRefs;			/* Reference counting. */ \
 									\
 		/* Virtual info */ 					\
 		Stg_Class_DeleteFunction*	_delete;		/**< Virtual function for deleting a class. */ \
@@ -137,6 +138,9 @@
 		/** Get the class type */
 		#define Stg_Class_GetType Stg_Class_GetTypeMacro
 	#endif
+
+	void Stg_Class_AddRef( void* _class );
+	void Stg_Class_RemoveRef( void* _class );
 	
 	
 	/* Private member functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

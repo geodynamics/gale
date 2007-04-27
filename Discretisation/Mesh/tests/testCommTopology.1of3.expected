@@ -1,0 +1,7 @@
+   Running test 'set communicator'... passed
+   Running test 'empty incidence'... passed
+   Running test 'partial incidence'... passed
+   Running test 'complete incidence'... passed
+   Running test 'adding incidence'... passed
+   Running test 'all gather'... passed
+   Running test 'all to all'... passed

@@ -1,0 +1,4 @@
+   Running test 'set remotes'... passed
+   Running test 'sink/sources'... passed
+   Running test 'arrays'... passed
+   Running test 'claim'... passed

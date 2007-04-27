@@ -58,7 +58,7 @@
 		SplitFrictionWallVC_Entry*			_entryTbl; \
 		Mesh*				_mesh;
 
-	struct _SplitFrictionWallVC { __SplitFrictionWallVC };
+	struct SplitFrictionWallVC { __SplitFrictionWallVC };
 	
 	
 	/*--------------------------------------------------------------------------------------------------------------------------

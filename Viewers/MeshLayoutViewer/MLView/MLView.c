@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: MLView.c 3462 2006-02-19 06:53:24Z WalterLandry $
+** $Id: MLView.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -85,7 +85,7 @@ void glPrintf(char *fmt, ...)
 
 void initGL(void)
 {
-//	GLfloat pda[3] = {0.0, 0.3, 0.0};
+/* 	GLfloat pda[3] = {0.0, 0.3, 0.0}; */
 	int i;
 
 	glClearColor(0.3, 0.3, 0.3, 1.0);
@@ -96,7 +96,7 @@ void initGL(void)
 	glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ONE);
 	
 	glPointSize(5.0);
-//	glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION, pda);
+/* 	glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION, pda); */
 
 	fontBase = glGenLists(127);
 	for (i = 0; i < 127; i++)
@@ -392,7 +392,7 @@ int main(int argc, char **argv)
 	glutDisplayFunc(displayHandler);
 	glutReshapeFunc(reshapeHandler);
 	glutKeyboardFunc(keyboardHandler);
-//	glutSpecialFunc(specialHandler);
+/* 	glutSpecialFunc(specialHandler); */
 	glutMouseFunc(mouseHandler);
 	glutMotionFunc(motionHandler);
 	

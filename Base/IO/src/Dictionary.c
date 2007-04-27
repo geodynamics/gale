@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Dictionary.c 3743 2006-08-03 03:14:38Z KentHumphries $
+** $Id: Dictionary.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -225,7 +225,7 @@ Dictionary_Entry* Dictionary_GetEntry( void* dictionary, Dictionary_Entry_Key ke
 Dictionary_Entry* Dictionary_GetEntryByIndex( void* dictionary, Dictionary_Index index) {
 	Dictionary* self = dictionary;
 
-	// Check that self->entryPtr[index] is NOT NULL
+	/* Check that self->entryPtr[index] is NOT NULL */
 	if( ! self->entryPtr[index] )
 		return 0;
 	else

@@ -53,6 +53,33 @@ void exponential(Index index, Variable_Index var_I, void* context, void* result)
 }
 
 
+Mesh* buildMesh( unsigned nDims, unsigned* size, 
+		 double* minCrds, double* maxCrds, 
+		 ExtensionManager_Register* emReg )
+{
+	CartesianGenerator*	gen;
+	Mesh*			mesh;
+	unsigned		maxDecomp[3] = {0, 1, 1};
+
+	gen = CartesianGenerator_New( "" );
+	gen->shadowDepth = 0;
+	CartesianGenerator_SetDimSize( gen, nDims );
+	CartesianGenerator_SetTopologyParams( gen, size, 0, NULL, maxDecomp );
+	CartesianGenerator_SetGeometryParams( gen, minCrds, maxCrds );
+
+	mesh = Mesh_New( "" );
+	Mesh_SetExtensionManagerRegister( mesh, emReg );
+	Mesh_SetGenerator( mesh, gen );
+
+	Build( mesh, NULL, False );
+	Initialise( mesh, NULL, False );
+
+	KillObject( mesh->generator );
+
+	return mesh;
+}
+
+
 int main(int argc, char *argv[])
 {
 	MPI_Comm                    CommWorld;
@@ -64,12 +91,12 @@ int main(int argc, char *argv[])
 	Dictionary*                 dictionary;
 	XML_IO_Handler*             io_handler;
 	
-	Topology*                   nTopology;
-	ElementLayout*              eLayout;
-	NodeLayout*                 nLayout;
-	MeshDecomp*                 decomp;
-	MeshLayout*                 layout;
-	Mesh*                       mesh;
+	unsigned	nDims = 3;
+	unsigned	meshSize[3] = {3, 3, 3};
+	double		minCrds[3] = {0.0, 0.0, 0.0};
+	double		maxCrds[3] = {1.0, 1.0, 1.0};
+	Mesh*           mesh;
+	unsigned	nDomains;
 	
 	Variable*                   var[9];
 	Variable_Register*          variable_Register;
@@ -80,21 +107,21 @@ int main(int argc, char *argv[])
 
 	double*                     array[7];
 	char*                       vcKey[] = {	"CornerVC_BottomLeftFront",
-											"CornerVC_BottomRightFront",
-											"CornerVC_TopLeftFront",
-											"CornerVC_TopRightFront",
-											"CornerVC_BottomLeftBack",
-											"CornerVC_BottomRightBack",
-											"CornerVC_TopLeftBack",
-											"CornerVC_TopRightBack" };
+						"CornerVC_BottomRightFront",
+						"CornerVC_TopLeftFront",
+						"CornerVC_TopRightFront",
+						"CornerVC_BottomLeftBack",
+						"CornerVC_BottomRightBack",
+						"CornerVC_TopLeftBack",
+						"CornerVC_TopRightBack" };
 	char*                       vcKeyName[] = {	"CornerVC_BottomLeftFrontName",
-											"CornerVC_BottomRightFrontName",
-											"CornerVC_TopLeftFrontName",
-											"CornerVC_TopRightFrontName",
-											"CornerVC_BottomLeftBackName",
-											"CornerVC_BottomRightBackName",
-											"CornerVC_TopLeftBackName",
-											"CornerVC_TopRightBackName" };
+							"CornerVC_BottomRightFrontName",
+							"CornerVC_TopLeftFrontName",
+							"CornerVC_TopRightFrontName",
+							"CornerVC_BottomLeftBackName",
+							"CornerVC_BottomRightBackName",
+							"CornerVC_TopLeftBackName",
+							"CornerVC_TopRightBackName" };
 	char*                       varName[] = {"x", "y", "z", "vx", "vy", "vz", "temp"};
 	
 	Index                       i;
@@ -125,21 +152,12 @@ int main(int argc, char *argv[])
 	IO_Handler_ReadAllFromFile(io_handler, "data/cornerVC.xml", dictionary);
 	fflush(stdout);
 	MPI_Barrier(MPI_COMM_WORLD);
-	Dictionary_Add(dictionary, "rank", Dictionary_Entry_Value_FromUnsignedInt(rank));
-	Dictionary_Add(dictionary, "numProcessors", Dictionary_Entry_Value_FromUnsignedInt(procCount));
-	Dictionary_Add(dictionary, "meshSizeI", Dictionary_Entry_Value_FromUnsignedInt(4));
-	Dictionary_Add(dictionary, "meshSizeJ", Dictionary_Entry_Value_FromUnsignedInt(4));
-	Dictionary_Add(dictionary, "meshSizeK", Dictionary_Entry_Value_FromUnsignedInt(4));
-	Dictionary_Add(dictionary, "allowUnbalancing", Dictionary_Entry_Value_FromBool(True));
 
 	extensionMgr_Register = ExtensionManager_Register_New();	
 	
-	nTopology = (Topology*)IJK6Topology_New( "IJK6Topology", dictionary );
-	eLayout = (ElementLayout*)ParallelPipedHexaEL_New( "PPHexaEL", 3, dictionary );
-	nLayout = (NodeLayout*)CornerNL_New( "CornerNL", dictionary, eLayout, nTopology );
-	decomp = (MeshDecomp*)HexaMD_New( "HexaMD", dictionary, MPI_COMM_WORLD, eLayout, nLayout );
-	layout = MeshLayout_New( "MeshLayout", eLayout, nLayout, decomp );
-	mesh = Mesh_New( "Mesh", layout, 0, 0, extensionMgr_Register, dictionary );
+	/* Create a mesh. */
+	mesh = buildMesh( nDims, meshSize, minCrds, maxCrds, extensionMgr_Register );
+	nDomains = Mesh_GetDomainSize( mesh, MT_VERTEX );
 	
 	/* Create CF stuff */
 	conFunc_Register = ConditionFunction_Register_New();
@@ -149,14 +167,14 @@ int main(int argc, char *argv[])
 	/* Create variables */
 	for (i = 0; i < 7; i++) {
 		array[i] = Memory_Alloc_Array(  double, 
-										decomp->nodeLocalCount, 
-										"array[i]" );
+						nDomains, 
+						"array[i]" );
 		
 		var[i] =   Variable_NewScalar(  varName[i], 
-										Variable_DataType_Double, 
-										&decomp->nodeLocalCount, 
-										(void**)&array[i], 
-										0 ); 
+						Variable_DataType_Double, 
+						&nDomains, 
+						(void**)&array[i], 
+						0 ); 
 		Variable_Register_Add(variable_Register, var[i]);
 	}
 	
@@ -170,7 +188,7 @@ int main(int argc, char *argv[])
 		_CornerVC_ReadDictionary(vc, dictionary);
 		Build( vc, 0, False );
 		for (j = 0; j < 7; j++) {
-			memset(array[j], 0, sizeof(double)* decomp->nodeLocalCount );
+			memset(array[j], 0, sizeof(double)* nDomains );
 		}
 		VariableCondition_Apply(vc, NULL);
 		
@@ -182,7 +200,7 @@ int main(int argc, char *argv[])
 			for (j = 0; j < 7; j++)
 			{
 				printf("\nvar[%u]: %.2lf", j, array[j][0]);
-				for (k = 1; k < decomp->nodeLocalCount; k++)
+				for (k = 1; k < nDomains; k++)
 					printf(", %.2lf", array[j][k]);
 			}
 
@@ -190,7 +208,7 @@ int main(int argc, char *argv[])
 			
 			for (j = 0; j < 6; j++)
 			{
-				for (k = 0; k < decomp->nodeLocalCount; k++)
+				for (k = 0; k < nDomains; k++)
 					printf("%s ", VariableCondition_IsCondition(vc, k, j) ? "True " : "False");
 				printf("\n");
 			}
@@ -198,7 +216,7 @@ int main(int argc, char *argv[])
 			
 			for (j = 0; j < 6; j++)
 			{
-				for (k = 0; k < decomp->nodeLocalCount; k++)
+				for (k = 0; k < nDomains; k++)
 				{
 					VariableCondition_ValueIndex	valIndex;
 					
@@ -223,12 +241,8 @@ int main(int argc, char *argv[])
 		if (array[i]) Memory_Free(array[i]);
 	}
 	Stg_Class_Delete(conFunc_Register);
-	Stg_Class_Delete(layout);
-	Stg_Class_Delete(decomp);
-	Stg_Class_Delete(nLayout);
-	Stg_Class_Delete(eLayout);
-	Stg_Class_Delete(nTopology);
 	Stg_Class_Delete(dictionary);
+	FreeObject( mesh );
 	
 	DiscretisationUtils_Finalise();
 	DiscretisationMesh_Finalise();

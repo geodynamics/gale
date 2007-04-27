@@ -33,7 +33,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: testSwarm.c 3986 2007-01-29 07:31:46Z PatrickSunter $
+** $Id: testSwarm.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -61,6 +61,30 @@ struct _Element {
 struct _Particle {
 	__GlobalParticle
 };
+
+Mesh* buildMesh( unsigned nDims, unsigned* size, 
+		     double* minCrds, double* maxCrds, 
+		     ExtensionManager_Register* emReg )
+{
+	CartesianGenerator*	gen;
+	Mesh*			mesh;
+
+	gen = CartesianGenerator_New( "" );
+	CartesianGenerator_SetDimSize( gen, nDims );
+	CartesianGenerator_SetTopologyParams( gen, size, 0, NULL, NULL );
+	CartesianGenerator_SetGeometryParams( gen, minCrds, maxCrds );
+
+	mesh = Mesh_New( "" );
+	Mesh_SetExtensionManagerRegister( mesh, emReg );
+	Mesh_SetGenerator( mesh, gen );
+
+	Build( mesh, NULL, False );
+	Initialise( mesh, NULL, False );
+
+	KillObject( mesh->generator );
+
+	return mesh;
+}
 
 void TestParticleSearchFunc( Swarm* swarm, Coord coord, Stream* stream ) {
 	double              distance;
@@ -98,24 +122,18 @@ int main( int argc, char* argv[] ) {
 	int				numProcessors;
 	int				procToWatch;
 	Dictionary*			dictionary;
-	Topology*			nTopology;
-	ElementLayout*			eLayout;
-	NodeLayout*			nLayout;
-	MeshDecomp*			decomp;
-	MeshLayout*			layout;
+	unsigned	nDims = 3;
+	unsigned	meshSize[3] = {2, 3, 2};
+	double		minCrds[3] = {0.0, 0.0, 0.0};
+	double		maxCrds[3] = {300.0, 12.0, 300.0};
 	ExtensionManager_Register*		extensionMgr_Register;
 	Mesh*				mesh;
 	ElementCellLayout*		elementCellLayout;
 	RandomParticleLayout*		randomParticleLayout;
 	Swarm*				swarm;
 	Stream*				stream;
-	Coord                           coord = { 120, 2, 210 };
-	double                          minX, minY, minZ, maxX, maxY, maxZ; 
+	Coord                coord = { 120, 2, 210 };
 
-	minX = minY = minZ = 0.0;
-	maxX = 300;
-	maxY = 12;
-	maxZ = 300;
 	
 	/* Initialise MPI, get world info */
 	MPI_Init( &argc, &argv );
@@ -144,29 +162,10 @@ int main( int argc, char* argv[] ) {
 	
 	/* Read input */
 	dictionary = Dictionary_New();
-	Dictionary_Add( dictionary, "rank", Dictionary_Entry_Value_FromUnsignedInt( rank ) );
-	Dictionary_Add( dictionary, "numProcessors", Dictionary_Entry_Value_FromUnsignedInt( numProcessors ) );
-	Dictionary_Add( dictionary, "meshSizeI", Dictionary_Entry_Value_FromUnsignedInt( 3 ) );
-	Dictionary_Add( dictionary, "meshSizeJ", Dictionary_Entry_Value_FromUnsignedInt( 4 ) );
-	Dictionary_Add( dictionary, "meshSizeK", Dictionary_Entry_Value_FromUnsignedInt( 3 ) );
-	Dictionary_Add( dictionary, "allowUnbalancing", Dictionary_Entry_Value_FromBool( True ) );
-	Dictionary_Add( dictionary, "minX", Dictionary_Entry_Value_FromDouble( minX ) );
-	Dictionary_Add( dictionary, "minY", Dictionary_Entry_Value_FromDouble( minY ) );
-	Dictionary_Add( dictionary, "minZ", Dictionary_Entry_Value_FromDouble( minZ ) );
-	Dictionary_Add( dictionary, "maxX", Dictionary_Entry_Value_FromDouble( maxX ) );
-	Dictionary_Add( dictionary, "maxY", Dictionary_Entry_Value_FromDouble( maxY ) );
-	Dictionary_Add( dictionary, "maxZ", Dictionary_Entry_Value_FromDouble( maxZ ) );
-	
-	/* Run the mesher */
-	nTopology = (Topology*)IJK6Topology_New( "IJK6Topology", dictionary );
-	eLayout = (ElementLayout*)ParallelPipedHexaEL_New( "PPHexaEL", 3, dictionary );
-	nLayout = (NodeLayout*)CornerNL_New( "CornerNL", dictionary, eLayout, nTopology );
-	decomp = (MeshDecomp*)HexaMD_New( "HexaMD", dictionary, MPI_COMM_WORLD, eLayout, nLayout );
-	layout = MeshLayout_New( "MeshLayout", eLayout, nLayout, decomp );
 	
 	/* Init mesh */
 	extensionMgr_Register = ExtensionManager_Register_New();
-	mesh = Mesh_New( "Mesh", layout, sizeof(Node), sizeof(Element), extensionMgr_Register, dictionary );
+	mesh = buildMesh( nDims, meshSize, minCrds, maxCrds, extensionMgr_Register );
 	
 	/* Build the mesh */
 	Build( mesh, 0, False );
@@ -203,73 +202,6 @@ int main( int argc, char* argv[] ) {
 			coord[ I_AXIS ] = 0.2*300; coord[ J_AXIS ] = 0.9*12; coord[ K_AXIS ] = 0.120*300;
 			TestParticleSearchFunc( swarm, coord, stream );
 		}
-
-		/* Test some particle deletion ... remember that in parallel the particles per proc is lower, so delete low numbers */
-		Journal_Printf( stream, "\nAbout to test deletion of particles (current local count is %u)\n",
-			swarm->particleLocalCount );
-
-		Journal_Printf( stream, "About to delete particle 0:\n" );
-		Swarm_DeleteParticle( swarm, 0 );
-		Journal_Printf( stream, "(local particle count is now %u)\n", swarm->particleLocalCount );
-
-		Journal_Printf( stream, "About to delete particle %u:\n", swarm->particleLocalCount / 2 );
-		Swarm_DeleteParticle( swarm, swarm->particleLocalCount / 2 );
-		Journal_Printf( stream, "(local particle count is now %u)\n", swarm->particleLocalCount );
-
-		Journal_Printf( stream, "About to delete particle %u (last particle):\n", swarm->particleLocalCount - 1 );
-		Swarm_DeleteParticle( swarm, swarm->particleLocalCount - 1 );
-		Journal_Printf( stream, "(local particle count is now %u)\n", swarm->particleLocalCount );
-	
-		Journal_Printf( stream, "\nAfter deletions, particles remaining:\n" );
-		Swarm_PrintParticleCoords( swarm, stream );
-		Journal_Printf( stream, "\n" );
-		Swarm_PrintParticleCoords_ByCell( swarm, stream );
-
-		{
-			GlobalParticle   newParticles[3];
-			Cell_Index       newParticle_Cells[3];
-			Particle_Index   particle_I;
-
-			minX = ((ParallelPipedHexaEL*)eLayout)->minLocalThisPartition[0];
-			minY = ((ParallelPipedHexaEL*)eLayout)->minLocalThisPartition[1];
-			minZ = ((ParallelPipedHexaEL*)eLayout)->minLocalThisPartition[2];
-			maxX = ((ParallelPipedHexaEL*)eLayout)->maxLocalThisPartition[0];
-			maxY = ((ParallelPipedHexaEL*)eLayout)->maxLocalThisPartition[1];
-			maxZ = ((ParallelPipedHexaEL*)eLayout)->maxLocalThisPartition[2];
-
-			for( particle_I = 0; particle_I < 3; particle_I++) {
-				newParticles[particle_I].coord[0] = ( ( rand() / (double)RAND_MAX ) * (maxX - minX)) + minX;
-				newParticles[particle_I].coord[1] = ( ( rand() / (double)RAND_MAX ) * (maxY - minY)) + minY;
-				newParticles[particle_I].coord[2] = ( ( rand() / (double)RAND_MAX ) * (maxZ - minZ)) + minZ;
-				newParticle_Cells[particle_I] = CellLayout_CellOf( swarm->cellLayout, &newParticles[particle_I] );
-			}
-			
-			Journal_Printf( stream, "\nAbout to test deletion of particles, and replacing with new (current local count is %u)\n",
-				swarm->particleLocalCount );
-
-			Journal_Printf( stream, "About to delete particle 0 and replace with new at (%.2f,%.2f,%.2f) - cell %u:\n",
-				newParticles[0].coord[0], newParticles[0].coord[1], newParticles[0].coord[2],
-				newParticle_Cells[0] );
-			Swarm_DeleteParticleAndReplaceWithNew( swarm, 0, &newParticles[0], newParticle_Cells[0] );
-
-			Journal_Printf( stream, "About to delete particle %u and replace with new at (%.2f,%.2f,%.2f) - cell %u:\n",
-				swarm->particleLocalCount / 2, newParticles[1].coord[0], newParticles[1].coord[1],
-				newParticles[1].coord[2], newParticle_Cells[1] );
-			Swarm_DeleteParticleAndReplaceWithNew( swarm, swarm->particleLocalCount / 2, &newParticles[1],
-				newParticle_Cells[1] );
-
-			Journal_Printf( stream, "About to delete particle %u (last particle) and replace with new at "
-				"(%.2f,%.2f,%.2f) - cell %u:\n",
-				swarm->particleLocalCount - 1, newParticles[2].coord[0], newParticles[2].coord[1],
-				newParticles[2].coord[2], newParticle_Cells[2] );
-			Swarm_DeleteParticleAndReplaceWithNew( swarm, swarm->particleLocalCount - 1, &newParticles[2],
-				newParticle_Cells[2] );
-		
-			Journal_Printf( stream, "\nAfter deletions and replacing, particles are:\n" );
-			Swarm_PrintParticleCoords( swarm, stream );
-			Journal_Printf( stream, "\n" );
-			Swarm_PrintParticleCoords_ByCell( swarm, stream );
-		}
 	}
 	
 	/* Destroy stuff */
@@ -278,11 +210,6 @@ int main( int argc, char* argv[] ) {
 	Stg_Class_Delete( elementCellLayout );
 	Stg_Class_Delete( mesh );
 	Stg_Class_Delete( extensionMgr_Register );
-	Stg_Class_Delete( layout );
-	Stg_Class_Delete( decomp );
-	Stg_Class_Delete( nLayout );
-	Stg_Class_Delete( eLayout );
-	Stg_Class_Delete( nTopology );
 	Stg_Class_Delete( dictionary );
 	
 	DiscretisationSwarm_Finalise();

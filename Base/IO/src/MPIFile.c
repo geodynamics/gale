@@ -43,7 +43,6 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
-#include <unistd.h>
 
 
 const Type MPIFile_Type = "MPIFile";
@@ -119,10 +118,8 @@ Bool _MPIFile_Open( void* file, char* fileName )
 {
 	MPIFile* self = (MPIFile*) file;
 
-	/* Remove the file if it is already there */
-	if ( access( fileName, F_OK ) == 0 ) {
-		remove( fileName );
-	}
+	/* Remove the file */
+        remove( fileName );
 
 	MPI_File_open( MPI_COMM_WORLD, fileName, MPI_MODE_CREATE | MPI_MODE_WRONLY | MPI_MODE_EXCL, 
 			MPI_INFO_NULL, &(self->mpiFile) );

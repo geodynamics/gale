@@ -45,26 +45,56 @@
 	extern const Type CartesianGenerator_Type;
 
 	/** Virtual function types */
+	typedef void (CartesianGenerator_SetTopologyParamsFunc)( void* meshGenerator, unsigned* sizes, 
+								 unsigned maxDecompDims, unsigned* minDecomp, unsigned* maxDecomp );
+	typedef void (CartesianGenerator_GenElementsFunc)( void* meshGenerator, MeshTopology* topo, Grid*** grids );
+	typedef void (CartesianGenerator_GenFacesFunc)( void* meshGenerator, MeshTopology* topo, Grid*** grids );
+	typedef void (CartesianGenerator_GenEdgesFunc)( void* meshGenerator, MeshTopology* topo, Grid*** grids );
+	typedef void (CartesianGenerator_GenVerticesFunc)( void* meshGenerator, MeshTopology* topo, Grid*** grids );
+	typedef void (CartesianGenerator_GenElementVertexIncFunc)( void* meshGenerator, MeshTopology* topo, Grid*** grids );
+	typedef void (CartesianGenerator_GenVolumeEdgeIncFunc)( void* meshGenerator, MeshTopology* topo, Grid*** grids );
+	typedef void (CartesianGenerator_GenVolumeFaceIncFunc)( void* meshGenerator, MeshTopology* topo, Grid*** grids );
+	typedef void (CartesianGenerator_GenFaceVertexIncFunc)( void* meshGenerator, MeshTopology* topo, Grid*** grids );
+	typedef void (CartesianGenerator_GenFaceEdgeIncFunc)( void* meshGenerator, MeshTopology* topo, Grid*** grids );
+	typedef void (CartesianGenerator_GenEdgeVertexIncFunc)( void* meshGenerator, MeshTopology* topo, Grid*** grids );
+	typedef void (CartesianGenerator_GenElementTypesFunc)( void* meshGenerator, Mesh* mesh );
 
 	/** CartesianGenerator class contents */
-	#define __CartesianGenerator		\
-		/* General info */		\
-		__MeshGenerator			\
-						\
-		/* Virtual info */		\
-						\
-		/* CartesianGenerator info */	\
-		unsigned	maxDecompDims;	\
-		unsigned*	minDecomp;	\
-		unsigned*	maxDecomp;	\
-		unsigned	shadowDepth;	\
-		double*		crdMin;		\
-		double*		crdMax;		\
-						\
-		Grid*		topoGrid;	\
-		Grid*		procGrid;	\
-		unsigned*	origin;		\
-		unsigned*	range;
+	#define __CartesianGenerator								\
+		/* General info */								\
+		__MeshGenerator									\
+												\
+		/* Virtual info */								\
+		CartesianGenerator_SetTopologyParamsFunc*	setTopologyParamsFunc;		\
+		CartesianGenerator_GenElementsFunc*		genElementsFunc;		\
+		CartesianGenerator_GenFacesFunc*		genFacesFunc;			\
+		CartesianGenerator_GenEdgesFunc*		genEdgesFunc;			\
+		CartesianGenerator_GenVerticesFunc*		genVerticesFunc;		\
+		CartesianGenerator_GenElementVertexIncFunc*	genElementVertexIncFunc;	\
+		CartesianGenerator_GenVolumeEdgeIncFunc*	genVolumeEdgeIncFunc;		\
+		CartesianGenerator_GenVolumeFaceIncFunc*	genVolumeFaceIncFunc;		\
+		CartesianGenerator_GenFaceVertexIncFunc*	genFaceVertexIncFunc;		\
+		CartesianGenerator_GenFaceEdgeIncFunc*		genFaceEdgeIncFunc;		\
+		CartesianGenerator_GenEdgeVertexIncFunc*	genEdgeVertexIncFunc;		\
+		CartesianGenerator_GenElementTypesFunc*		genElementTypesFunc;		\
+												\
+		/* CartesianGenerator info */							\
+		CommTopology*	commTopo;							\
+		Bool		regular;							\
+		unsigned	maxDecompDims;							\
+		unsigned*	minDecomp;							\
+		unsigned*	maxDecomp;							\
+		unsigned	shadowDepth;							\
+		double*		crdMin;								\
+		double*		crdMax;								\
+												\
+		Grid*		vertGrid;							\
+		Grid*		elGrid;								\
+		Grid*		procGrid;							\
+		unsigned*	origin;								\
+		unsigned*	range;								\
+		unsigned*	vertOrigin;							\
+		unsigned*	vertRange;
 
 	struct CartesianGenerator { __CartesianGenerator };
 
@@ -72,11 +102,35 @@
 	** Constructors
 	*/
 
-	#define CARTESIANGENERATOR_DEFARGS	\
-		MESHGENERATOR_DEFARGS
+	#define CARTESIANGENERATOR_DEFARGS							\
+		MESHGENERATOR_DEFARGS,								\
+		CartesianGenerator_SetTopologyParamsFunc*	setTopologyParamsFunc, 		\
+		CartesianGenerator_GenElementsFunc*		genElementsFunc, 		\
+		CartesianGenerator_GenFacesFunc*		genFacesFunc, 			\
+		CartesianGenerator_GenEdgesFunc*		genEdgesFunc, 			\
+		CartesianGenerator_GenVerticesFunc*		genVerticesFunc, 		\
+		CartesianGenerator_GenElementVertexIncFunc*	genElementVertexIncFunc, 	\
+		CartesianGenerator_GenVolumeEdgeIncFunc*	genVolumeEdgeIncFunc, 		\
+		CartesianGenerator_GenVolumeFaceIncFunc*	genVolumeFaceIncFunc, 		\
+		CartesianGenerator_GenFaceVertexIncFunc*	genFaceVertexIncFunc, 		\
+		CartesianGenerator_GenFaceEdgeIncFunc*		genFaceEdgeIncFunc, 		\
+		CartesianGenerator_GenEdgeVertexIncFunc*	genEdgeVertexIncFunc,		\
+		CartesianGenerator_GenElementTypesFunc*		genElementTypesFunc
 
 	#define CARTESIANGENERATOR_PASSARGS	\
-		MESHGENERATOR_PASSARGS
+		MESHGENERATOR_PASSARGS, 	\
+		setTopologyParamsFunc, 		\
+		genElementsFunc, 		\
+		genFacesFunc, 			\
+		genEdgesFunc, 			\
+		genVerticesFunc, 		\
+		genElementVertexIncFunc, 	\
+		genVolumeEdgeIncFunc, 		\
+		genVolumeFaceIncFunc, 		\
+		genFaceVertexIncFunc, 		\
+		genFaceEdgeIncFunc, 		\
+		genEdgeVertexIncFunc,		\
+		genElementTypesFunc
 
 	CartesianGenerator* CartesianGenerator_New( Name name );
 	CartesianGenerator* _CartesianGenerator_New( CARTESIANGENERATOR_DEFARGS );
@@ -86,30 +140,61 @@
 	** Virtual functions
 	*/
 
-	void _CartesianGenerator_Delete( void* generator );
-	void _CartesianGenerator_Print( void* generator, Stream* stream );
+	void _CartesianGenerator_Delete( void* meshGenerator );
+	void _CartesianGenerator_Print( void* meshGenerator, Stream* stream );
+	void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* cf, void* data );
+	void _CartesianGenerator_Build( void* meshGenerator, void* data );
+	void _CartesianGenerator_Initialise( void* meshGenerator, void* data );
+	void _CartesianGenerator_Execute( void* meshGenerator, void* data );
+	void _CartesianGenerator_Destroy( void* meshGenerator, void* data );
 
-	#define CartesianGenerator_Copy( self ) \
-		(Mesh*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
-	#define CartesianGenerator_DeepCopy( self ) \
-		(Mesh*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _CartesianGenerator_Copy( void* generator, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void CartesianGenerator_SetDimSize( void* meshGenerator, unsigned nDims );
+	void CartesianGenerator_Generate( void* meshGenerator, void* mesh );
+	void _CartesianGenerator_SetTopologyParams( void* meshGenerator, unsigned* sizes, 
+						    unsigned maxDecompDims, unsigned* minDecomp, unsigned* maxDecomp );
+	void _CartesianGenerator_GenElements( void* meshGenerator, MeshTopology* topo, Grid*** grids );
+	void _CartesianGenerator_GenFaces( void* meshGenerator, MeshTopology* topo, Grid*** grids );
+	void _CartesianGenerator_GenEdges( void* meshGenerator, MeshTopology* topo, Grid*** grids );
+	void _CartesianGenerator_GenVertices( void* meshGenerator, MeshTopology* topo, Grid*** grids );
+	void _CartesianGenerator_GenElementVertexInc( void* meshGenerator, MeshTopology* topo, Grid*** grids );
+	void _CartesianGenerator_GenVolumeEdgeInc( void* meshGenerator, MeshTopology* topo, Grid*** grids );
+	void _CartesianGenerator_GenVolumeFaceInc( void* meshGenerator, MeshTopology* topo, Grid*** grids );
+	void _CartesianGenerator_GenFaceVertexInc( void* meshGenerator, MeshTopology* topo, Grid*** grids );
+	void _CartesianGenerator_GenFaceEdgeInc( void* meshGenerator, MeshTopology* topo, Grid*** grids );
+	void _CartesianGenerator_GenEdgeVertexInc( void* meshGenerator, MeshTopology* topo, Grid*** grids );
+	void _CartesianGenerator_GenElementTypes( void* meshGenerator, Mesh* mesh );
 
-	void _CartesianGenerator_Construct( void* generator, Stg_ComponentFactory* cf, void* data );
-	void _CartesianGenerator_Build( void* generator, void* data );
-	void _CartesianGenerator_Initialise( void* generator, void* data );
-	void _CartesianGenerator_Execute( void* generator, void* data );
-	void _CartesianGenerator_Destroy( void* generator, void* data );
-
-	void CartesianGenerator_Generate( void* generator, void* _mesh );
+	#define CartesianGenerator_SetTopologyParams( self, sizes, maxDecompDims, minDecomp, maxDecomp )	\
+		VirtualCall( self, setTopologyParamsFunc, self, sizes, maxDecompDims, minDecomp, maxDecomp )
+	#define CartesianGenerator_GenElements( self, topo, grids )						\
+		VirtualCall( self, genElementsFunc, self, topo, grids )
+	#define CartesianGenerator_GenFaces( self, topo, grids )						\
+		VirtualCall( self, genFacesFunc, self, topo, grids )
+	#define CartesianGenerator_GenEdges( self, topo, grids )						\
+		VirtualCall( self, genEdgesFunc, self, topo, grids )
+	#define CartesianGenerator_GenVertices( self, topo, grids )						\
+		VirtualCall( self, genVerticesFunc, self, topo, grids )
+	#define CartesianGenerator_GenElementVertexInc( self, topo, grids )					\
+		VirtualCall( self, genElementVertexIncFunc, self, topo, grids )
+	#define CartesianGenerator_GenVolumeEdgeInc( self, topo, grids )					\
+		VirtualCall( self, genVolumeEdgeIncFunc, self, topo, grids )
+	#define CartesianGenerator_GenVolumeFaceInc( self, topo, grids )					\
+		VirtualCall( self, genVolumeFaceIncFunc, self, topo, grids )
+	#define CartesianGenerator_GenFaceVertexInc( self, topo, grids )					\
+		VirtualCall( self, genFaceVertexIncFunc, self, topo, grids )
+	#define CartesianGenerator_GenFaceEdgeInc( self, topo, grids )						\
+		VirtualCall( self, genFaceEdgeIncFunc, self, topo, grids )
+	#define CartesianGenerator_GenEdgeVertexInc( self, topo, grids )					\
+		VirtualCall( self, genEdgeVertexIncFunc, self, topo, grids )
+	#define CartesianGenerator_GenElementTypes( self, mesh )						\
+		VirtualCall( self, genElementTypesFunc, self, mesh )
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Public functions
 	*/
 
-	void CartesianGenerator_SetTopologyParams( void* generator, unsigned nDims, unsigned* sizes, 
-						   unsigned maxDecompDims, unsigned* minDecomp, unsigned* maxDecomp );
-	void CartesianGenerator_SetGeometryParams( void* generator, double* min, double* max );
+	void CartesianGenerator_SetGeometryParams( void* meshGenerator, double* min, double* max );
+	void CartesianGenerator_SetShadowDepth( void* meshGenerator, unsigned depth );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Private Member functions
@@ -121,19 +206,14 @@
 						unsigned* nSubDomains, 
 						unsigned* nPos, unsigned*** posNSubDomains );
 	void CartesianGenerator_GenTopo( CartesianGenerator* self, MeshTopology* topo );
-	void CartesianGenerator_GenElements( CartesianGenerator* self, MeshTopology* topo, Grid*** grids );
-	void CartesianGenerator_GenVertices( CartesianGenerator* self, MeshTopology* topo, Grid*** grids );
-	void CartesianGenerator_GenEdges( CartesianGenerator* self, MeshTopology* topo, Grid*** grids );
 	void CartesianGenerator_GenEdges2D( CartesianGenerator* self, MeshTopology* topo, Grid*** grids );
 	void CartesianGenerator_GenEdges3D( CartesianGenerator* self, MeshTopology* topo, Grid*** grids );
-	void CartesianGenerator_GenFaces( CartesianGenerator* self, MeshTopology* topo, Grid*** grids );
-	void CartesianGenerator_GenElementVertexInc( CartesianGenerator* self, MeshTopology* topo, Grid*** grids );
-	void CartesianGenerator_GenVolumeFaceInc( CartesianGenerator* self, MeshTopology* topo, Grid*** grids );
-	void CartesianGenerator_GenFaceEdgeInc( CartesianGenerator* self, MeshTopology* topo, Grid*** grids );
-	void CartesianGenerator_GenEdgeVertexInc( CartesianGenerator* self, MeshTopology* topo, Grid*** grids );
+	void CartesianGenerator_CompleteVertexNeighbours( CartesianGenerator* self, MeshTopology* topo, Grid*** grids );
 	void CartesianGenerator_MapToDomain( CartesianGenerator* self, Decomp_Sync* sync, 
 					     unsigned size, unsigned* nIncEls, unsigned** incEls );
 	void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh );
 	void CartesianGenerator_Destruct( CartesianGenerator* self );
+	void CartesianGenerator_DestructTopology( CartesianGenerator* self );
+	void CartesianGenerator_DestructGeometry( CartesianGenerator* self );
 
 #endif /* __Discretisaton_Mesh_CartesianGenerator_h__ */

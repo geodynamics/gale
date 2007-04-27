@@ -53,7 +53,6 @@ typedef struct {
 /* Textual name of this class */
 const Type UIntMap_Type = "UIntMap";
 
-
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Constructors
 */
@@ -150,16 +149,34 @@ void* _UIntMap_Copy( void* generator, void* destProc_I, Bool deep, Name nameExt,
 ** Public Functions
 */
 
-void UIntMap_Insert( void* map, unsigned key, unsigned val ) {
+void UIntMap_Insert( void* map, unsigned key, unsigned value ) {
 	UIntMap*	self = (UIntMap*)map;
-	unsigned	data[2];
+	BTreeNode*	node;
 
 	assert( self );
 
-	data[0] = key;
-	data[1] = val;
-	BTree_InsertNode( self->btree, data, 2 * sizeof(unsigned) );
-	self->size = self->btree->nodeCount;
+	node = BTree_FindNode( self->btree, &key );
+	if( node )
+		((unsigned*)node->data)[1] = value;
+	else {
+		unsigned	data[2];
+
+		data[0] = key;
+		data[1] = value;
+		BTree_InsertNode( self->btree, data, 2 * sizeof(unsigned) );
+		self->size = self->btree->nodeCount;
+	}
+}
+
+void UIntMap_Remove( void* map, unsigned key ) {
+	UIntMap*	self = (UIntMap*)map;
+	BTreeNode*	node;
+
+	assert( self );
+
+	node = BTree_FindNode( self->btree, &key );
+	assert( node );
+	BTree_DeleteNode( self->btree, node );
 }
 
 void UIntMap_Clear( void* map ) {
@@ -172,24 +189,19 @@ void UIntMap_Clear( void* map ) {
 				  BTREE_NO_DUPLICATES );
 }
 
-Bool UIntMap_HasKey( void* map, unsigned key ) {
-	UIntMap*	self = (UIntMap*)map;
-
-	assert( self );
-
-	return (BTree_FindNode( self->btree, &key ) != NULL) ? True : False;
-}
-
-unsigned UIntMap_Map( void* map, unsigned key ) {
+Bool UIntMap_Map( void* map, unsigned key, unsigned* value ) {
 	UIntMap*	self = (UIntMap*)map;
 	BTreeNode*	node;
 
 	assert( self );
 
 	node = BTree_FindNode( self->btree, &key );
-	assert( node );
+	if( node ) {
+		*value = ((unsigned*)node->data)[1];
+		return True;
+	}
 
-	return ((unsigned*)node->data)[1];
+	return False;
 }
 
 void UIntMap_GetItems( void* map, unsigned* nItems, unsigned** keys, unsigned** values ) {
@@ -206,6 +218,14 @@ void UIntMap_GetItems( void* map, unsigned* nItems, unsigned** keys, unsigned** 
 	*nItems = self->size;
 	*keys = parseStruct.keys;
 	*values = parseStruct.vals;
+}
+
+unsigned UIntMap_GetSize( void* map ) {
+	UIntMap*	self = (UIntMap*)map;
+
+	assert( self );
+
+	return self->size;
 }
 
 /*----------------------------------------------------------------------------------------------------------------------------------

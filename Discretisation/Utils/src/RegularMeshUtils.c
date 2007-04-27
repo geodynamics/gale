@@ -24,24 +24,23 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: RegularMeshUtils.c 3574 2006-05-15 11:30:33Z PatrickSunter $
+** $Id: RegularMeshUtils.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <assert.h>
 #include <mpi.h>
-#include "Base/Base.h"
 
+#include "Base/Base.h"
 #include "Discretisation/Geometry/Geometry.h"
 #include "Discretisation/Shape/Shape.h"
 #include "Discretisation/Mesh/Mesh.h"
 
 #include "types.h"
 #include "RegularMeshUtils.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
 
 
 Index RegularMeshUtils_ascendingIJK_ToHughesNodeNumberMap[8] = { 0, 1, 3, 2, 4, 5, 7, 6 };
@@ -51,839 +50,819 @@ Index RegularMeshUtils_ascendingIJK_ToHughesNodeNumberMap[8] = { 0, 1, 3, 2, 4, 
 ** Mapping functions
 */
 
-Node_LocalIndex RegularMeshUtils_Node_Global3DToLocal1D( HexaMD* hexaMD, Index i, Index j, Index k ) {		
-	Dimension_Index        dim_I;
-	IJK                    ijk = { i, j, k };
+void RegularMeshUtils_Node_1DTo3D( void* _mesh, unsigned global, unsigned* inds ) {
+	Mesh*	mesh = (Mesh*)_mesh;
+	Grid**	grid;
 
-	for ( dim_I = 0; dim_I < 3; dim_I++ ) {
-		if ( ijk[dim_I] < (hexaMD)->_nodeOffsets[(hexaMD)->rank][dim_I] ||
-			ijk[dim_I]  >= ((hexaMD)->_nodeOffsets[(hexaMD)->rank][dim_I]
-				+ (hexaMD)->nodeLocal3DCounts[(hexaMD)->rank][dim_I] ) )
-		{
-			return MD_N_Invalid( hexaMD );
-		}
-	}
-	
-	return RegularMeshUtils_Node_Local3DTo1D( hexaMD,
-		i - (hexaMD)->_nodeOffsets[(hexaMD)->rank][I_AXIS],
-		j - (hexaMD)->_nodeOffsets[(hexaMD)->rank][J_AXIS],
-		k - (hexaMD)->_nodeOffsets[(hexaMD)->rank][K_AXIS] );
-}			
+	assert( mesh );
+	assert( global < Mesh_GetGlobalSize( mesh, MT_VERTEX ) );
+	assert( inds );
+
+	grid = (Grid**)ExtensionManager_Get( mesh->info, mesh, 
+					     ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+	Grid_Lift( *grid, global, inds );
+}
+
+unsigned RegularMeshUtils_Node_3DTo1D( void* _mesh, unsigned* inds ) {
+	Mesh*		mesh = (Mesh*)_mesh;
+	Grid**		grid;
+
+	assert( mesh );
+	assert( inds );
+
+	grid = (Grid**)ExtensionManager_Get( mesh->info, mesh, 
+					     ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+
+	return Grid_Project( *grid, inds );
+}
+
+void RegularMeshUtils_Element_1DTo3D( void* _mesh, unsigned global, unsigned* inds ) {
+	Mesh*	mesh = (Mesh*)_mesh;
+	Grid**	grid;
+
+	assert( mesh );
+	assert( global < Mesh_GetGlobalSize( mesh, MT_VERTEX ) );
+	assert( inds );
+
+	grid = (Grid**)ExtensionManager_Get( mesh->info, mesh, 
+					     ExtensionManager_GetHandle( mesh->info, "elementGrid" ) );
+	Grid_Lift( *grid, global, inds );
+}
+
+unsigned RegularMeshUtils_Element_3DTo1D( void* _mesh, unsigned* inds ) {
+	Mesh*		mesh = (Mesh*)_mesh;
+	Grid**		grid;
+
+	assert( mesh );
+	assert( inds );
+
+	grid = (Grid**)ExtensionManager_Get( mesh->info, mesh, 
+					     ExtensionManager_GetHandle( mesh->info, "elementGrid" ) );
+
+	return Grid_Project( *grid, inds );
+}
+
 
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Set functions
 */
 
-/* TODO: There are more efficient ways to do the below, given me know the number of nodes in each direction */
-
 IndexSet* RegularMeshUtils_CreateGlobalTopSet( void* _mesh ) {
-	Mesh*			mesh = (Mesh*)_mesh;
-	MeshLayout*		meshLayout = mesh->layout;
-	HexaMD*			decomp = (HexaMD*)meshLayout->decomp;
-	Node_DomainIndex	node_I;
-	Node_DomainIndex	nodeDomainCount;
-	IndexSet*		is;
-	
-	nodeDomainCount = decomp->nodeDomainCount;
-	is = IndexSet_New( nodeDomainCount );
-	for( node_I = 0; node_I < nodeDomainCount; node_I++ ) {
-		IJK			ijk;
-		
-		RegularMeshUtils_Node_1DTo3D( decomp, Mesh_NodeMapDomainToGlobal( mesh, node_I ),
-			&ijk[0], &ijk[1], &ijk[2] );
-		if( ijk[1] == ( decomp->nodeGlobal3DCounts[1] - 1 ) ) {
-			IndexSet_Add( is, node_I );
-		}
+	Mesh*		mesh = (Mesh*)_mesh;
+	Grid*		grid;
+	unsigned	nNodes;
+	IndexSet*	set;
+	IJK		ijk;
+	unsigned	n_i;
+
+	assert( mesh );
+	assert( Mesh_GetDimSize( mesh ) >= 2 );
+
+	grid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
+					      ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+
+	nNodes = Mesh_GetDomainSize( mesh, MT_VERTEX );
+	set = IndexSet_New( nNodes );
+
+	for( n_i = 0; n_i < nNodes; n_i++ ) {
+		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
+		if( ijk[1] == grid->sizes[1] - 1 )
+			IndexSet_Add( set, n_i );
 	}
-	
-	return is;
+
+	return set;
 }
 
 IndexSet* RegularMeshUtils_CreateGlobalBottomSet( void* _mesh ) {
-	Mesh*			mesh = (Mesh*)_mesh;
-	MeshLayout*		meshLayout = mesh->layout;
-	HexaMD*			decomp = (HexaMD*)meshLayout->decomp;
-	Node_DomainIndex	node_I;
-	Node_DomainIndex	nodeDomainCount;
-	IndexSet*		is;
-	
-	nodeDomainCount = decomp->nodeDomainCount;
-	is = IndexSet_New( nodeDomainCount );
-	for( node_I = 0; node_I < nodeDomainCount; node_I++ ) {
-		IJK			ijk;
-		
-		RegularMeshUtils_Node_1DTo3D( decomp, Mesh_NodeMapDomainToGlobal( mesh, node_I ),
-			&ijk[0], &ijk[1], &ijk[2] );      
-		if( ijk[1] == 0 ) {
-			IndexSet_Add( is, node_I );
-		}
+	Mesh*		mesh = (Mesh*)_mesh;
+	unsigned	nNodes;
+	IndexSet*	set;
+	IJK		ijk;
+	unsigned	n_i;
+
+	assert( mesh );
+	assert( Mesh_GetDimSize( mesh ) >= 2 );
+
+	nNodes = Mesh_GetDomainSize( mesh, MT_VERTEX );
+	set = IndexSet_New( nNodes );
+
+	for( n_i = 0; n_i < nNodes; n_i++ ) {
+		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
+		if( ijk[1] == 0 )
+			IndexSet_Add( set, n_i );
 	}
-	
-	return is;
+
+	return set;
 }
 
 IndexSet* RegularMeshUtils_CreateGlobalLeftSet( void* _mesh ) {
-	Mesh*			mesh = (Mesh*)_mesh;
-	MeshLayout*		meshLayout = mesh->layout;
-	HexaMD*			decomp = (HexaMD*)meshLayout->decomp;
-	Node_DomainIndex	node_I;
-	Node_DomainIndex	nodeDomainCount;
-	IndexSet*		is;
-	
-	nodeDomainCount = decomp->nodeDomainCount;
-	is = IndexSet_New( nodeDomainCount );
-	for( node_I = 0; node_I < nodeDomainCount; node_I++ ) {
-		IJK			ijk;
-		
-		RegularMeshUtils_Node_1DTo3D( decomp, Mesh_NodeMapDomainToGlobal( mesh, node_I ), 
-			&ijk[0], &ijk[1], &ijk[2] );
-		if( ijk[0] == 0 ) {
-			IndexSet_Add( is, node_I );
-		}
+	Mesh*		mesh = (Mesh*)_mesh;
+	unsigned	nNodes;
+	IndexSet*	set;
+	IJK		ijk;
+	unsigned	n_i;
+
+	assert( mesh );
+
+	nNodes = Mesh_GetDomainSize( mesh, MT_VERTEX );
+	set = IndexSet_New( nNodes );
+
+	for( n_i = 0; n_i < nNodes; n_i++ ) {
+		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
+		if( ijk[0] == 0 )
+			IndexSet_Add( set, n_i );
 	}
-	
-	return is;
+
+	return set;
 }
 
 IndexSet* RegularMeshUtils_CreateGlobalRightSet( void* _mesh ) {
-	Mesh*			mesh = (Mesh*)_mesh;
-	MeshLayout*		meshLayout = mesh->layout;
-	HexaMD*			decomp = (HexaMD*)meshLayout->decomp;
-	Node_DomainIndex	node_I;
-	Node_DomainIndex	nodeDomainCount;
-	IndexSet*		is;
-	
-	nodeDomainCount = decomp->nodeDomainCount;
-	is = IndexSet_New( nodeDomainCount );
-	for( node_I = 0; node_I < nodeDomainCount; node_I++ ) {
-		IJK			ijk;
-		
-		RegularMeshUtils_Node_1DTo3D( decomp, Mesh_NodeMapDomainToGlobal( mesh, node_I ), 
-			&ijk[0], &ijk[1], &ijk[2] );      
-		if( ijk[0] == ( decomp->nodeGlobal3DCounts[0] - 1 ) ) {
-			IndexSet_Add( is, node_I );
-		}
+	Mesh*		mesh = (Mesh*)_mesh;
+	Grid*		grid;
+	unsigned	nNodes;
+	IndexSet*	set;
+	IJK		ijk;
+	unsigned	n_i;
+
+	assert( mesh );
+
+	grid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
+					      ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+
+	nNodes = Mesh_GetDomainSize( mesh, MT_VERTEX );
+	set = IndexSet_New( nNodes );
+
+	for( n_i = 0; n_i < nNodes; n_i++ ) {
+		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
+		if( ijk[0] == grid->sizes[0] - 1 )
+			IndexSet_Add( set, n_i );
 	}
-	
-	return is;
+
+	return set;
 }
 
 IndexSet* RegularMeshUtils_CreateGlobalFrontSet( void* _mesh ) {
-	Mesh*			mesh = (Mesh*)_mesh;
-	MeshLayout*		meshLayout = mesh->layout;
-	HexaMD*			decomp = (HexaMD*)meshLayout->decomp;
-	Node_DomainIndex	node_I;
-	Node_DomainIndex	nodeDomainCount;
-	IndexSet*		is;
-	
-	nodeDomainCount = decomp->nodeDomainCount;
-	is = IndexSet_New( nodeDomainCount );
-	for( node_I = 0; node_I < nodeDomainCount; node_I++ ) {
-		IJK			ijk;
-		
-		RegularMeshUtils_Node_1DTo3D( decomp, Mesh_NodeMapDomainToGlobal( mesh, node_I ), 
-			&ijk[0], &ijk[1], &ijk[2] );      
-		if( ijk[2] == ( decomp->nodeGlobal3DCounts[2] - 1 ) ) {
-			IndexSet_Add( is, node_I );
-		}
+	Mesh*		mesh = (Mesh*)_mesh;
+	Grid*		grid;
+	unsigned	nNodes;
+	IndexSet*	set;
+	IJK		ijk;
+	unsigned	n_i;
+
+	assert( mesh );
+	assert( Mesh_GetDimSize( mesh ) >= 3 );
+
+	grid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
+					      ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+
+	nNodes = Mesh_GetDomainSize( mesh, MT_VERTEX );
+	set = IndexSet_New( nNodes );
+
+	for( n_i = 0; n_i < nNodes; n_i++ ) {
+		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
+		if( ijk[2] == grid->sizes[2] - 1 )
+			IndexSet_Add( set, n_i );
 	}
-	
-	return is;
+
+	return set;
 }
 
 IndexSet* RegularMeshUtils_CreateGlobalBackSet( void* _mesh ) {
-	Mesh*			mesh = (Mesh*)_mesh;
-	MeshLayout*		meshLayout = mesh->layout;
-	HexaMD*			decomp = (HexaMD*)meshLayout->decomp;
-	Node_DomainIndex	node_I;
-	Node_DomainIndex	nodeDomainCount;
-	IndexSet*		is;
-	
-	nodeDomainCount = decomp->nodeDomainCount;
-	is = IndexSet_New( nodeDomainCount );
-	for( node_I = 0; node_I < nodeDomainCount; node_I++ ) {
-		IJK			ijk;
-		
-		RegularMeshUtils_Node_1DTo3D( decomp, Mesh_NodeMapDomainToGlobal( mesh, node_I ), 
-			&ijk[0], &ijk[1], &ijk[2] );      
-		if( ijk[2] == 0 ) {
-			IndexSet_Add( is, node_I );
-		}
+	Mesh*		mesh = (Mesh*)_mesh;
+	unsigned	nNodes;
+	IndexSet*	set;
+	IJK		ijk;
+	unsigned	n_i;
+
+	assert( mesh );
+	assert( Mesh_GetDimSize( mesh ) >= 3 );
+
+	nNodes = Mesh_GetDomainSize( mesh, MT_VERTEX );
+	set = IndexSet_New( nNodes );
+
+	for( n_i = 0; n_i < nNodes; n_i++ ) {
+		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
+		if( ijk[2] == 0 )
+			IndexSet_Add( set, n_i );
 	}
-	
-	return is;
+
+	return set;
 }
 
-
-
 IndexSet* RegularMeshUtils_CreateGlobalInnerTopSet( void* _mesh ) {
-	Mesh*			mesh = (Mesh*)_mesh;
-	MeshLayout*		meshLayout = mesh->layout;
-	HexaMD*			decomp = (HexaMD*)meshLayout->decomp;
-	Node_DomainIndex	node_I;
-	Node_DomainIndex	nodeDomainCount;
-	IndexSet*		is;
-	
-	nodeDomainCount = decomp->nodeDomainCount;
-	is = IndexSet_New( nodeDomainCount );
-	for( node_I = 0; node_I < nodeDomainCount; node_I++ ) {
-		IJK			ijk;
-		
-		RegularMeshUtils_Node_1DTo3D( decomp, Mesh_NodeMapDomainToGlobal( mesh, node_I ),
-			&ijk[0], &ijk[1], &ijk[2] );
-		if( ijk[1] == ( decomp->nodeGlobal3DCounts[1] - 1 ) 
-			&& ( ijk[0] != ( decomp->nodeGlobal3DCounts[0] -1 ) || ijk[2] != ( decomp->nodeGlobal3DCounts[2] - 1 ) )
-			&& ( ijk[0] != 0 || ijk[2] != ( decomp->nodeGlobal3DCounts[2] - 1 ) )
-			&& ( ijk[0] != ( decomp->nodeGlobal3DCounts[0] -1 ) || ijk[2] != 0 )
-			&& ( ijk[0] != 0 || ijk[2] != 0 ) ) {
-			IndexSet_Add( is, node_I );
+	Mesh*		mesh = (Mesh*)_mesh;
+	Grid*		grid;
+	unsigned	nNodes;
+	IndexSet*	set;
+	IJK		ijk;
+	unsigned	n_i;
+
+	assert( mesh );
+	assert( Mesh_GetDimSize( mesh ) >= 2 );
+
+	grid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
+					      ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+
+	nNodes = Mesh_GetDomainSize( mesh, MT_VERTEX );
+	set = IndexSet_New( nNodes );
+
+	for( n_i = 0; n_i < nNodes; n_i++ ) {
+		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
+		if( ijk[1] == grid->sizes[1] - 1 && 
+		    (ijk[0] != grid->sizes[0] - 1 || ijk[2] != grid->sizes[2] - 1 ) && 
+		    (ijk[0] != 0 || ijk[2] != grid->sizes[2] - 1 ) && 
+		    (ijk[0] != grid->sizes[0] - 1 || ijk[2] != 0 ) && 
+		    (ijk[0] != 0 || ijk[2] != 0 ) )
+		{
+			IndexSet_Add( set, n_i );
 		}
 	}
-	
-	return is;
+
+	return set;
 }
 
 IndexSet* RegularMeshUtils_CreateGlobalInnerBottomSet( void* _mesh ) {
-	Mesh*			mesh = (Mesh*)_mesh;
-	MeshLayout*		meshLayout = mesh->layout;
-	HexaMD*			decomp = (HexaMD*)meshLayout->decomp;
-	Node_DomainIndex	node_I;
-	Node_DomainIndex	nodeDomainCount;
-	IndexSet*		is;
-	
-	nodeDomainCount = decomp->nodeDomainCount;
-	is = IndexSet_New( nodeDomainCount );
-	for( node_I = 0; node_I < nodeDomainCount; node_I++ ) {
-		IJK			ijk;
-		
-		RegularMeshUtils_Node_1DTo3D( decomp, Mesh_NodeMapDomainToGlobal( mesh, node_I ),
-			&ijk[0], &ijk[1], &ijk[2] );      
-		if( ijk[1] == 0 
-			&& ( ijk[0] != ( decomp->nodeGlobal3DCounts[0] - 1 ) || ijk[2] != ( decomp->nodeGlobal3DCounts[2] - 1 ) )
-			&& ( ijk[0] != 0 || ijk[2] != ( decomp->nodeGlobal3DCounts[2] - 1 ) )
-			&& ( ijk[0] != ( decomp->nodeGlobal3DCounts[0] - 1 ) || ijk[2] != 0 )
-			&& ( ijk[0] != 0 || ijk[2] != 0 ) ) {
-			IndexSet_Add( is, node_I );
+	Mesh*		mesh = (Mesh*)_mesh;
+	Grid*		grid;
+	unsigned	nNodes;
+	IndexSet*	set;
+	IJK		ijk;
+	unsigned	n_i;
+
+	assert( mesh );
+	assert( Mesh_GetDimSize( mesh ) >= 2 );
+
+	grid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
+					      ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+
+	nNodes = Mesh_GetDomainSize( mesh, MT_VERTEX );
+	set = IndexSet_New( nNodes );
+
+	for( n_i = 0; n_i < nNodes; n_i++ ) {
+		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
+		if( ijk[1] == 0 && 
+		    (ijk[0] != grid->sizes[0] - 1 || ijk[2] != grid->sizes[2] - 1 ) && 
+		    (ijk[0] != 0 || ijk[2] != grid->sizes[2] - 1 ) && 
+		    (ijk[0] != grid->sizes[0] - 1 || ijk[2] != 0 ) && 
+		    (ijk[0] != 0 || ijk[2] != 0 ) )
+		{
+			IndexSet_Add( set, n_i );
 		}
 	}
-	
-	return is;
+
+	return set;
 }
 
 IndexSet* RegularMeshUtils_CreateGlobalInnerLeftSet( void* _mesh ) {
-	Mesh*			mesh = (Mesh*)_mesh;
-	MeshLayout*		meshLayout = mesh->layout;
-	HexaMD*			decomp = (HexaMD*)meshLayout->decomp;
-	Node_DomainIndex	node_I;
-	Node_DomainIndex	nodeDomainCount;
-	IndexSet*		is;
-	
-	nodeDomainCount = decomp->nodeDomainCount;
-	is = IndexSet_New( nodeDomainCount );
-	for( node_I = 0; node_I < nodeDomainCount; node_I++ ) {
-		IJK			ijk;
-		
-		RegularMeshUtils_Node_1DTo3D( decomp, Mesh_NodeMapDomainToGlobal( mesh, node_I ), 
-			&ijk[0], &ijk[1], &ijk[2] );
-		if( ijk[0] == 0 
-			&& ( ijk[1] != ( decomp->nodeGlobal3DCounts[1] - 1 ) || ijk[2] != ( decomp->nodeGlobal3DCounts[2] - 1 ) )
-			&& ( ijk[1] != 0 || ijk[2] != ( decomp->nodeGlobal3DCounts[2] - 1 ) )
-			&& ( ijk[1] != ( decomp->nodeGlobal3DCounts[1] - 1 ) || ijk[2] != 0 )
-			&& ( ijk[1] != 0 || ijk[2] != 0 ) ) {
-			IndexSet_Add( is, node_I );
+	Mesh*		mesh = (Mesh*)_mesh;
+	Grid*		grid;
+	unsigned	nNodes;
+	IndexSet*	set;
+	IJK		ijk;
+	unsigned	n_i;
+
+	assert( mesh );
+	assert( Mesh_GetDimSize( mesh ) >= 2 );
+
+	grid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
+					      ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+
+	nNodes = Mesh_GetDomainSize( mesh, MT_VERTEX );
+	set = IndexSet_New( nNodes );
+
+	for( n_i = 0; n_i < nNodes; n_i++ ) {
+		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
+		if( ijk[0] == 0 && 
+		    (ijk[1] != grid->sizes[1] - 1 || ijk[2] != grid->sizes[2] - 1 ) && 
+		    (ijk[1] != 0 || ijk[2] != grid->sizes[2] - 1 ) && 
+		    (ijk[1] != grid->sizes[1] - 1 || ijk[2] != 0 ) && 
+		    (ijk[1] != 0 || ijk[2] != 0 ) )
+		{
+			IndexSet_Add( set, n_i );
 		}
 	}
-	
-	return is;
+
+	return set;
 }
 
 IndexSet* RegularMeshUtils_CreateGlobalInnerRightSet( void* _mesh ) {
-	Mesh*			mesh = (Mesh*)_mesh;
-	MeshLayout*		meshLayout = mesh->layout;
-	HexaMD*			decomp = (HexaMD*)meshLayout->decomp;
-	Node_DomainIndex	node_I;
-	Node_DomainIndex	nodeDomainCount;
-	IndexSet*		is;
-	
-	nodeDomainCount = decomp->nodeDomainCount;
-	is = IndexSet_New( nodeDomainCount );
-	for( node_I = 0; node_I < nodeDomainCount; node_I++ ) {
-		IJK			ijk;
-		
-		RegularMeshUtils_Node_1DTo3D( decomp, Mesh_NodeMapDomainToGlobal( mesh, node_I ), 
-			&ijk[0], &ijk[1], &ijk[2] );      
-		if( ijk[0] == ( decomp->nodeGlobal3DCounts[0] - 1 ) 
-			&& ( ijk[1] != ( decomp->nodeGlobal3DCounts[1] - 1 ) || ijk[2] != ( decomp->nodeGlobal3DCounts[2] - 1 ) )
-			&& ( ijk[1] != 0 || ijk[2] != ( decomp->nodeGlobal3DCounts[2] - 1 ) )
-			&& ( ijk[1] != ( decomp->nodeGlobal3DCounts[1] - 1 ) || ijk[2] != 0 )
-			&& ( ijk[1] != 0 || ijk[2] != 0 ) ) {
-			IndexSet_Add( is, node_I );
+	Mesh*		mesh = (Mesh*)_mesh;
+	Grid*		grid;
+	unsigned	nNodes;
+	IndexSet*	set;
+	IJK		ijk;
+	unsigned	n_i;
+
+	assert( mesh );
+	assert( Mesh_GetDimSize( mesh ) >= 2 );
+
+	grid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
+					      ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+
+	nNodes = Mesh_GetDomainSize( mesh, MT_VERTEX );
+	set = IndexSet_New( nNodes );
+
+	for( n_i = 0; n_i < nNodes; n_i++ ) {
+		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
+		if( ijk[0] == grid->sizes[0] - 1 && 
+		    (ijk[1] != grid->sizes[1] - 1 || ijk[2] != grid->sizes[2] - 1 ) && 
+		    (ijk[1] != 0 || ijk[2] != grid->sizes[2] - 1 ) && 
+		    (ijk[1] != grid->sizes[1] - 1 || ijk[2] != 0 ) && 
+		    (ijk[1] != 0 || ijk[2] != 0 ) )
+		{
+			IndexSet_Add( set, n_i );
 		}
 	}
-	
-	return is;
+
+	return set;
 }
 
 IndexSet* RegularMeshUtils_CreateGlobalInnerFrontSet( void* _mesh ) {
-	Mesh*			mesh = (Mesh*)_mesh;
-	MeshLayout*		meshLayout = mesh->layout;
-	HexaMD*			decomp = (HexaMD*)meshLayout->decomp;
-	Node_DomainIndex	node_I;
-	Node_DomainIndex	nodeDomainCount;
-	IndexSet*		is;
-	
-	nodeDomainCount = decomp->nodeDomainCount;
-	is = IndexSet_New( nodeDomainCount );
-	for( node_I = 0; node_I < nodeDomainCount; node_I++ ) {
-		IJK			ijk;
-		
-		RegularMeshUtils_Node_1DTo3D( decomp, Mesh_NodeMapDomainToGlobal( mesh, node_I ), 
-			&ijk[0], &ijk[1], &ijk[2] );      
-		if( ijk[2] == ( decomp->nodeGlobal3DCounts[2] - 1 ) 
-			&& ( ijk[0] != ( decomp->nodeGlobal3DCounts[0] - 1 ) || ijk[1] != ( decomp->nodeGlobal3DCounts[1] - 1 ) )
-			&& ( ijk[0] != 0 || ijk[1] != ( decomp->nodeGlobal3DCounts[1] - 1 ) )
-			&& ( ijk[0] != ( decomp->nodeGlobal3DCounts[0] - 1 ) || ijk[1] != 0 )
-			&& ( ijk[0] != 0 || ijk[1] != 0 ) ) {
-			IndexSet_Add( is, node_I );
+	Mesh*		mesh = (Mesh*)_mesh;
+	Grid*		grid;
+	unsigned	nNodes;
+	IndexSet*	set;
+	IJK		ijk;
+	unsigned	n_i;
+
+	assert( mesh );
+	assert( Mesh_GetDimSize( mesh ) >= 2 );
+
+	grid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
+					      ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+
+	nNodes = Mesh_GetDomainSize( mesh, MT_VERTEX );
+	set = IndexSet_New( nNodes );
+
+	for( n_i = 0; n_i < nNodes; n_i++ ) {
+		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
+		if( ijk[0] == grid->sizes[2] - 1 && 
+		    (ijk[0] != grid->sizes[0] - 1 || ijk[1] != grid->sizes[1] - 1 ) && 
+		    (ijk[0] != 0 || ijk[1] != grid->sizes[1] - 1 ) && 
+		    (ijk[0] != grid->sizes[0] - 1 || ijk[1] != 0 ) && 
+		    (ijk[0] != 0 || ijk[1] != 0 ) )
+		{
+			IndexSet_Add( set, n_i );
 		}
 	}
-	
-	return is;
+
+	return set;
 }
 
 IndexSet* RegularMeshUtils_CreateGlobalInnerBackSet( void* _mesh ) {
-	Mesh*			mesh = (Mesh*)_mesh;
-	MeshLayout*		meshLayout = mesh->layout;
-	HexaMD*			decomp = (HexaMD*)meshLayout->decomp;
-	Node_DomainIndex	node_I;
-	Node_DomainIndex	nodeDomainCount;
-	IndexSet*		is;
-	
-	nodeDomainCount = decomp->nodeDomainCount;
-	is = IndexSet_New( nodeDomainCount );
-	for( node_I = 0; node_I < nodeDomainCount; node_I++ ) {
-		IJK			ijk;
-		
-		RegularMeshUtils_Node_1DTo3D( decomp, Mesh_NodeMapDomainToGlobal( mesh, node_I ), 
-			&ijk[0], &ijk[1], &ijk[2] );      
-		if( ijk[2] == 0 
-			&& ( ijk[0] != ( decomp->nodeGlobal3DCounts[0] - 1 ) || ijk[1] != ( decomp->nodeGlobal3DCounts[1] - 1 ) )
-			&& ( ijk[0] != 0 || ijk[1] != ( decomp->nodeGlobal3DCounts[1] - 1 ) )
-			&& ( ijk[0] != ( decomp->nodeGlobal3DCounts[0] - 1 ) || ijk[1] != 0 )
-			&& ( ijk[0] != 0 || ijk[1] != 0 ) ) {
-			IndexSet_Add( is, node_I );
+	Mesh*		mesh = (Mesh*)_mesh;
+	Grid*		grid;
+	unsigned	nNodes;
+	IndexSet*	set;
+	IJK		ijk;
+	unsigned	n_i;
+
+	assert( mesh );
+	assert( Mesh_GetDimSize( mesh ) >= 2 );
+
+	grid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
+					      ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+
+	nNodes = Mesh_GetDomainSize( mesh, MT_VERTEX );
+	set = IndexSet_New( nNodes );
+
+	for( n_i = 0; n_i < nNodes; n_i++ ) {
+		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
+		if( ijk[0] == 0 && 
+		    (ijk[0] != grid->sizes[0] - 1 || ijk[1] != grid->sizes[1] - 1 ) && 
+		    (ijk[0] != 0 || ijk[1] != grid->sizes[1] - 1 ) && 
+		    (ijk[0] != grid->sizes[0] - 1 || ijk[1] != 0 ) && 
+		    (ijk[0] != 0 || ijk[1] != 0 ) )
+		{
+			IndexSet_Add( set, n_i );
 		}
 	}
-	
-	return is;
-}
 
+	return set;
+}
 
 IndexSet* RegularMeshUtils_CreateGlobalBottomLeftFrontSet( void* _mesh ) {
-	Mesh*			mesh = (Mesh*)_mesh;
-	MeshLayout*		meshLayout = mesh->layout;
-	HexaMD*			decomp = (HexaMD*)meshLayout->decomp;
-	Node_DomainIndex	node_I;
-	Node_DomainIndex	nodeDomainCount;
-	IndexSet*		is;
-	
-	nodeDomainCount = decomp->nodeDomainCount;
-	is = IndexSet_New( nodeDomainCount );
-	for( node_I = 0; node_I < nodeDomainCount; node_I++ ) {
-		IJK			ijk;
-		
-		RegularMeshUtils_Node_1DTo3D( decomp, Mesh_NodeMapDomainToGlobal( mesh, node_I ), 
-			&ijk[0], &ijk[1], &ijk[2] );      
-		if( ijk[0] == 0 
-			&& ijk[1] == 0
-			&& ijk[2] == ( decomp->nodeGlobal3DCounts[2] - 1 ) ) {
-			IndexSet_Add( is, node_I );
+	Mesh*		mesh = (Mesh*)_mesh;
+	Grid*		grid;
+	unsigned	nNodes;
+	IndexSet*	set;
+	IJK		ijk;
+	unsigned	n_i;
+
+	assert( mesh );
+	assert( Mesh_GetDimSize( mesh ) >= 2 );
+
+	grid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
+					      ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+
+	nNodes = Mesh_GetDomainSize( mesh, MT_VERTEX );
+	set = IndexSet_New( nNodes );
+
+	for( n_i = 0; n_i < nNodes; n_i++ ) {
+		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
+		if( ijk[0] == 0 && 
+		    ijk[1] == 0 && 
+		    ijk[2] == grid->sizes[2] - 1 )
+		{
+			IndexSet_Add( set, n_i );
 		}
 	}
-	
-	return is;
-}	
+
+	return set;
+}
+
 IndexSet* RegularMeshUtils_CreateGlobalBottomRightFrontSet( void* _mesh ) {
-	Mesh*			mesh = (Mesh*)_mesh;
-	MeshLayout*		meshLayout = mesh->layout;
-	HexaMD*			decomp = (HexaMD*)meshLayout->decomp;
-	Node_DomainIndex	node_I;
-	Node_DomainIndex	nodeDomainCount;
-	IndexSet*		is;
-	
-	nodeDomainCount = decomp->nodeDomainCount;
-	is = IndexSet_New( nodeDomainCount );
-	for( node_I = 0; node_I < nodeDomainCount; node_I++ ) {
-		IJK			ijk;
-		
-		RegularMeshUtils_Node_1DTo3D( decomp, Mesh_NodeMapDomainToGlobal( mesh, node_I ), 
-			&ijk[0], &ijk[1], &ijk[2] );      
-		if( ijk[0] == ( decomp->nodeGlobal3DCounts[0] - 1 )
-			&& ijk[1] == 0
-			&& ijk[2] == (decomp->nodeGlobal3DCounts[2] - 1 ) ) {
-			IndexSet_Add( is, node_I );
+	Mesh*		mesh = (Mesh*)_mesh;
+	Grid*		grid;
+	unsigned	nNodes;
+	IndexSet*	set;
+	IJK		ijk;
+	unsigned	n_i;
+
+	assert( mesh );
+	assert( Mesh_GetDimSize( mesh ) >= 2 );
+
+	grid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
+					      ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+
+	nNodes = Mesh_GetDomainSize( mesh, MT_VERTEX );
+	set = IndexSet_New( nNodes );
+
+	for( n_i = 0; n_i < nNodes; n_i++ ) {
+		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
+		if( ijk[0] == grid->sizes[0] - 1 && 
+		    ijk[1] == 0 && 
+		    ijk[2] == grid->sizes[2] - 1 )
+		{
+			IndexSet_Add( set, n_i );
 		}
 	}
-	
-	return is;
+
+	return set;
 }
+
 IndexSet* RegularMeshUtils_CreateGlobalTopLeftFrontSet( void* _mesh ) {
-	Mesh*			mesh = (Mesh*)_mesh;
-	MeshLayout*		meshLayout = mesh->layout;
-	HexaMD*			decomp = (HexaMD*)meshLayout->decomp;
-	Node_DomainIndex	node_I;
-	Node_DomainIndex	nodeDomainCount;
-	IndexSet*		is;
-	
-	nodeDomainCount = decomp->nodeDomainCount;
-	is = IndexSet_New( nodeDomainCount );
-	for( node_I = 0; node_I < nodeDomainCount; node_I++ ) {
-		IJK			ijk;
-		
-		RegularMeshUtils_Node_1DTo3D( decomp, Mesh_NodeMapDomainToGlobal( mesh, node_I ), 
-			&ijk[0], &ijk[1], &ijk[2] );      
-		if( ijk[0] == 0 
-			&& ijk[1] == ( decomp->nodeGlobal3DCounts[1] - 1 )
-			&& ijk[2] == ( decomp->nodeGlobal3DCounts[2] - 1 ) ) {
-			IndexSet_Add( is, node_I );
+	Mesh*		mesh = (Mesh*)_mesh;
+	Grid*		grid;
+	unsigned	nNodes;
+	IndexSet*	set;
+	IJK		ijk;
+	unsigned	n_i;
+
+	assert( mesh );
+	assert( Mesh_GetDimSize( mesh ) >= 2 );
+
+	grid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
+					      ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+
+	nNodes = Mesh_GetDomainSize( mesh, MT_VERTEX );
+	set = IndexSet_New( nNodes );
+
+	for( n_i = 0; n_i < nNodes; n_i++ ) {
+		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
+		if( ijk[0] == 0 && 
+		    ijk[1] == grid->sizes[1] - 1 && 
+		    ijk[2] == grid->sizes[2] - 1 )
+		{
+			IndexSet_Add( set, n_i );
 		}
 	}
-	
-	return is;
+
+	return set;
 }
+
 IndexSet* RegularMeshUtils_CreateGlobalTopRightFrontSet( void* _mesh ) {
-	Mesh*			mesh = (Mesh*)_mesh;
-	MeshLayout*		meshLayout = mesh->layout;
-	HexaMD*			decomp = (HexaMD*)meshLayout->decomp;
-	Node_DomainIndex	node_I;
-	Node_DomainIndex	nodeDomainCount;
-	IndexSet*		is;
-	
-	nodeDomainCount = decomp->nodeDomainCount;
-	is = IndexSet_New( nodeDomainCount );
-	for( node_I = 0; node_I < nodeDomainCount; node_I++ ) {
-		IJK			ijk;
-		
-		RegularMeshUtils_Node_1DTo3D( decomp, Mesh_NodeMapDomainToGlobal( mesh, node_I ), 
-			&ijk[0], &ijk[1], &ijk[2] );      
-		if( ijk[0] == ( decomp->nodeGlobal3DCounts[0] - 1 )
-			&& ijk[1] == ( decomp->nodeGlobal3DCounts[1] - 1 )
-			&& ijk[2] == ( decomp->nodeGlobal3DCounts[2] - 1 ) ) {
-			IndexSet_Add( is, node_I );
+	Mesh*		mesh = (Mesh*)_mesh;
+	Grid*		grid;
+	unsigned	nNodes;
+	IndexSet*	set;
+	IJK		ijk;
+	unsigned	n_i;
+
+	assert( mesh );
+	assert( Mesh_GetDimSize( mesh ) >= 2 );
+
+	grid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
+					      ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+
+	nNodes = Mesh_GetDomainSize( mesh, MT_VERTEX );
+	set = IndexSet_New( nNodes );
+
+	for( n_i = 0; n_i < nNodes; n_i++ ) {
+		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
+		if( ijk[0] == grid->sizes[0] - 1 && 
+		    ijk[1] == grid->sizes[1] - 1 && 
+		    ijk[2] == grid->sizes[2] - 1 )
+		{
+			IndexSet_Add( set, n_i );
 		}
 	}
-	
-	return is;
+
+	return set;
 }
+
 IndexSet* RegularMeshUtils_CreateGlobalBottomLeftBackSet( void* _mesh ) {
-	Mesh*			mesh = (Mesh*)_mesh;
-	MeshLayout*		meshLayout = mesh->layout;
-	HexaMD*			decomp = (HexaMD*)meshLayout->decomp;
-	Node_DomainIndex	node_I;
-	Node_DomainIndex	nodeDomainCount;
-	IndexSet*		is;
-	
-	nodeDomainCount = decomp->nodeDomainCount;
-	is = IndexSet_New( nodeDomainCount );
-	for( node_I = 0; node_I < nodeDomainCount; node_I++ ) {
-		IJK			ijk;
-		
-		RegularMeshUtils_Node_1DTo3D( decomp, Mesh_NodeMapDomainToGlobal( mesh, node_I ), 
-			&ijk[0], &ijk[1], &ijk[2] );      
-		if( ijk[0] == 0 
-			&& ijk[1] == 0
-			&& ijk[2] == 0 ) {
-			IndexSet_Add( is, node_I );
+	Mesh*		mesh = (Mesh*)_mesh;
+	Grid*		grid;
+	unsigned	nNodes;
+	IndexSet*	set;
+	IJK		ijk;
+	unsigned	n_i;
+
+	assert( mesh );
+	assert( Mesh_GetDimSize( mesh ) >= 2 );
+
+	grid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
+					      ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+
+	nNodes = Mesh_GetDomainSize( mesh, MT_VERTEX );
+	set = IndexSet_New( nNodes );
+
+	for( n_i = 0; n_i < nNodes; n_i++ ) {
+		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
+		if( ijk[0] == 0 && 
+		    ijk[1] == 0 && 
+		    ijk[2] == 0 )
+		{
+			IndexSet_Add( set, n_i );
 		}
 	}
-	
-	return is;
+
+	return set;
 }
+
 IndexSet* RegularMeshUtils_CreateGlobalBottomRightBackSet( void* _mesh ) {
-	Mesh*			mesh = (Mesh*)_mesh;
-	MeshLayout*		meshLayout = mesh->layout;
-	HexaMD*			decomp = (HexaMD*)meshLayout->decomp;
-	Node_DomainIndex	node_I;
-	Node_DomainIndex	nodeDomainCount;
-	IndexSet*		is;
-	
-	nodeDomainCount = decomp->nodeDomainCount;
-	is = IndexSet_New( nodeDomainCount );
-	for( node_I = 0; node_I < nodeDomainCount; node_I++ ) {
-		IJK			ijk;
-		
-		RegularMeshUtils_Node_1DTo3D( decomp, Mesh_NodeMapDomainToGlobal( mesh, node_I ), 
-			&ijk[0], &ijk[1], &ijk[2] );      
-		if( ijk[0] == ( decomp->nodeGlobal3DCounts[0] - 1 )
-			&& ijk[1] == 0
-			&& ijk[2] == 0 ) {
-			IndexSet_Add( is, node_I );
+	Mesh*		mesh = (Mesh*)_mesh;
+	Grid*		grid;
+	unsigned	nNodes;
+	IndexSet*	set;
+	IJK		ijk;
+	unsigned	n_i;
+
+	assert( mesh );
+	assert( Mesh_GetDimSize( mesh ) >= 2 );
+
+	grid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
+					      ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+
+	nNodes = Mesh_GetDomainSize( mesh, MT_VERTEX );
+	set = IndexSet_New( nNodes );
+
+	for( n_i = 0; n_i < nNodes; n_i++ ) {
+		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
+		if( ijk[0] == grid->sizes[0] - 1 && 
+		    ijk[1] == 0 && 
+		    ijk[2] == 0 )
+		{
+			IndexSet_Add( set, n_i );
 		}
 	}
-	
-	return is;
+
+	return set;
 }
+
 IndexSet* RegularMeshUtils_CreateGlobalTopLeftBackSet( void* _mesh ) {
-	Mesh*			mesh = (Mesh*)_mesh;
-	MeshLayout*		meshLayout = mesh->layout;
-	HexaMD*			decomp = (HexaMD*)meshLayout->decomp;
-	Node_DomainIndex	node_I;
-	Node_DomainIndex	nodeDomainCount;
-	IndexSet*		is;
-	
-	nodeDomainCount = decomp->nodeDomainCount;
-	is = IndexSet_New( nodeDomainCount );
-	for( node_I = 0; node_I < nodeDomainCount; node_I++ ) {
-		IJK			ijk;
-		
-		RegularMeshUtils_Node_1DTo3D( decomp, Mesh_NodeMapDomainToGlobal( mesh, node_I ), 
-			&ijk[0], &ijk[1], &ijk[2] );      
-		if( ijk[0] == 0
-			&& ijk[1] == ( decomp->nodeGlobal3DCounts[1] - 1 )
-			&& ijk[2] == 0 ) {
-			IndexSet_Add( is, node_I );
+	Mesh*		mesh = (Mesh*)_mesh;
+	Grid*		grid;
+	unsigned	nNodes;
+	IndexSet*	set;
+	IJK		ijk;
+	unsigned	n_i;
+
+	assert( mesh );
+	assert( Mesh_GetDimSize( mesh ) >= 2 );
+
+	grid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
+					      ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+
+	nNodes = Mesh_GetDomainSize( mesh, MT_VERTEX );
+	set = IndexSet_New( nNodes );
+
+	for( n_i = 0; n_i < nNodes; n_i++ ) {
+		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
+		if( ijk[0] == 0 && 
+		    ijk[1] == grid->sizes[1] - 1 && 
+		    ijk[2] == 0 )
+		{
+			IndexSet_Add( set, n_i );
 		}
 	}
-	
-	return is;
+
+	return set;
 }
+
 IndexSet* RegularMeshUtils_CreateGlobalTopRightBackSet( void* _mesh ) {
-	Mesh*			mesh = (Mesh*)_mesh;
-	MeshLayout*		meshLayout = mesh->layout;
-	HexaMD*			decomp = (HexaMD*)meshLayout->decomp;
-	Node_DomainIndex	node_I;
-	Node_DomainIndex	nodeDomainCount;
-	IndexSet*		is;
-	
-	nodeDomainCount = decomp->nodeDomainCount;
-	is = IndexSet_New( nodeDomainCount );
-	for( node_I = 0; node_I < nodeDomainCount; node_I++ ) {
-		IJK			ijk;
-		
-		RegularMeshUtils_Node_1DTo3D( decomp, Mesh_NodeMapDomainToGlobal( mesh, node_I ), 
-			&ijk[0], &ijk[1], &ijk[2] );      
-		if( ijk[0] == ( decomp->nodeGlobal3DCounts[0] - 1 )
-			&& ijk[1] == ( decomp->nodeGlobal3DCounts[1] - 1 )
-			&& ijk[2] == 0 ) {
-			IndexSet_Add( is, node_I );
+	Mesh*		mesh = (Mesh*)_mesh;
+	Grid*		grid;
+	unsigned	nNodes;
+	IndexSet*	set;
+	IJK		ijk;
+	unsigned	n_i;
+
+	assert( mesh );
+	assert( Mesh_GetDimSize( mesh ) >= 2 );
+
+	grid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
+					      ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+
+	nNodes = Mesh_GetDomainSize( mesh, MT_VERTEX );
+	set = IndexSet_New( nNodes );
+
+	for( n_i = 0; n_i < nNodes; n_i++ ) {
+		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
+		if( ijk[0] == grid->sizes[0] - 1 && 
+		    ijk[1] == grid->sizes[1] - 1 && 
+		    ijk[2] == 0 )
+		{
+			IndexSet_Add( set, n_i );
 		}
 	}
-	
-	return is;
+
+	return set;
 }
-
-
-
-IndexSet* RegularMeshUtils_CreateLocalTopSet( void* _mesh ) {
-	Mesh*			mesh = (Mesh*)_mesh;
-	MeshLayout*		meshLayout = mesh->layout;
-	HexaMD*			decomp = (HexaMD *)meshLayout->decomp;
-	Node_LocalIndex		node_I;
-	Node_LocalIndex		nodeLocalCount;
-	IndexSet*		is;
-	
-	nodeLocalCount = decomp->nodeLocalCount;
-	is = IndexSet_New( nodeLocalCount );
-	for( node_I = 0; node_I < nodeLocalCount; node_I++ ) {
-		IJK			ijk;
-		
-		RegularMeshUtils_Node_Local1DTo3D( decomp, node_I, &ijk[0], &ijk[1], &ijk[2] );
-		if( ijk[1] == ( decomp->nodeLocal3DCounts[decomp->rank][1] - 1 ) ) {
-			IndexSet_Add( is, node_I );
-		}
-	}
-	
-	return is;
-}
-
-IndexSet* RegularMeshUtils_CreateLocalBottomSet( void* _mesh ) {
-	Mesh*			mesh = (Mesh*)_mesh;
-	MeshLayout*		meshLayout = mesh->layout;
-	HexaMD*			decomp = (HexaMD *)meshLayout->decomp;
-	Node_LocalIndex		node_I;
-	Node_LocalIndex		nodeLocalCount;
-	IndexSet*		is;
-	
-	nodeLocalCount = decomp->nodeLocalCount;
-	is = IndexSet_New( nodeLocalCount );
-	for( node_I = 0; node_I < nodeLocalCount; node_I++ ) {
-		IJK			ijk;
-		
-		RegularMeshUtils_Node_Local1DTo3D( decomp, node_I, &ijk[0], &ijk[1], &ijk[2] );      
-		if( ijk[1] == 0 ) {
-			IndexSet_Add( is, node_I );
-		}
-	}
-	
-	return is;
-}
-
-IndexSet* RegularMeshUtils_CreateLocalLeftSet( void* _mesh ) {
-	Mesh*			mesh = (Mesh*)_mesh;
-	MeshLayout*		meshLayout = mesh->layout;
-	HexaMD*			decomp = (HexaMD *)meshLayout->decomp;
-	Node_LocalIndex		node_I;
-	Node_LocalIndex		nodeLocalCount;
-	IndexSet*		is;
-	
-	nodeLocalCount = decomp->nodeLocalCount;
-	is = IndexSet_New( nodeLocalCount );
-	for( node_I = 0; node_I < nodeLocalCount; node_I++ ) {
-		IJK			ijk;
-		
-		RegularMeshUtils_Node_Local1DTo3D( decomp, node_I, &ijk[0], &ijk[1], &ijk[2] );      
-		if( ijk[0] == 0 ) {
-			IndexSet_Add( is, node_I );
-		}
-	}
-	
-	return is;
-}
-
-IndexSet* RegularMeshUtils_CreateLocalRightSet( void* _mesh ) {
-	Mesh*			mesh = (Mesh*)_mesh;
-	MeshLayout*		meshLayout = mesh->layout;
-	HexaMD*			decomp = (HexaMD*)meshLayout->decomp;
-	Node_LocalIndex		node_I;
-	Node_LocalIndex		nodeLocalCount;
-	IndexSet*		is;
-	
-	nodeLocalCount = decomp->nodeLocalCount;
-	is = IndexSet_New( nodeLocalCount );
-	for( node_I = 0; node_I < nodeLocalCount; node_I++ ) {
-		IJK			ijk;
-		
-		RegularMeshUtils_Node_Local1DTo3D( decomp, node_I, &ijk[0], &ijk[1], &ijk[2] );      
-		if( ijk[0] == ( decomp->nodeLocal3DCounts[decomp->rank][0] - 1 ) ) {
-			IndexSet_Add( is, node_I );
-		}
-	}
-	
-	return is;
-}
-
-IndexSet* RegularMeshUtils_CreateLocalFrontSet( void* _mesh ) {
-	Mesh*			mesh = (Mesh*)_mesh;
-	MeshLayout*		meshLayout = mesh->layout;
-	HexaMD*			decomp = (HexaMD *)meshLayout->decomp;
-	Node_LocalIndex		node_I;
-	Node_LocalIndex		nodeLocalCount;
-	IndexSet*		is;
-	
-	nodeLocalCount = decomp->nodeLocalCount;
-	is = IndexSet_New( nodeLocalCount );
-	for( node_I = 0; node_I < nodeLocalCount; node_I++ ) {
-		IJK			ijk;
-		
-		RegularMeshUtils_Node_Local1DTo3D( decomp, node_I, &ijk[0], &ijk[1], &ijk[2] );      
-		if( ijk[2] == ( decomp->nodeLocal3DCounts[decomp->rank][2] - 1 ) ) {
-			IndexSet_Add( is, node_I );
-		}
-	}
-	
-	return is;
-}
-
-IndexSet* RegularMeshUtils_CreateLocalBackSet( void* _mesh ) {
-	Mesh*			mesh = (Mesh*)_mesh;
-	MeshLayout*		meshLayout = mesh->layout;
-	HexaMD*			decomp = (HexaMD *)meshLayout->decomp;
-	Node_LocalIndex		node_I;
-	Node_LocalIndex		nodeLocalCount;
-	IndexSet*		is;
-	
-	nodeLocalCount = decomp->nodeLocalCount;
-	is = IndexSet_New( nodeLocalCount );
-	for( node_I = 0; node_I < nodeLocalCount; node_I++ ) {
-		IJK			ijk;
-		
-		RegularMeshUtils_Node_Local1DTo3D( decomp, node_I, &ijk[0], &ijk[1], &ijk[2] );      
-		if( ijk[2] == 0 ) {
-			IndexSet_Add( is, node_I );
-		}
-	}
-	
-	return is;
-}
-
-/* These fellas do the same as the 'Local' set creation, but isntead of
-   using the local walls, it maps the local index to global walls.  This
-   is useful for the exchanger. */
 
 IndexSet* RegularMeshUtils_CreateLocalInGlobalTopSet( void* _mesh ) {
-	Mesh*			mesh = (Mesh*)_mesh;
-	MeshLayout*		meshLayout = mesh->layout;
-	HexaMD*			decomp = (HexaMD *)meshLayout->decomp;
-	Node_LocalIndex		node_I;
-	Node_LocalIndex		nodeLocalCount;
-	IndexSet*		is;
-	
-	nodeLocalCount = decomp->nodeLocalCount;
-	is = IndexSet_New( nodeLocalCount );
-	for( node_I = 0; node_I < nodeLocalCount; node_I++ ) {
-		IJK			ijk;
-		Node_GlobalIndex	node_gI;
-		
-		node_gI = decomp->nodeMapLocalToGlobal( decomp, node_I );
-		RegularMeshUtils_Node_1DTo3D( decomp, node_gI, &ijk[0], &ijk[1], &ijk[2] );
-		if( ijk[1] == ( decomp->nodeGlobal3DCounts[1] - 1 ) ) {
-			IndexSet_Add( is, node_I );
-		}
+	Mesh*		mesh = (Mesh*)_mesh;
+	Grid*		grid;
+	unsigned	nNodes;
+	IndexSet*	set;
+	IJK		ijk;
+	unsigned	n_i;
+
+	assert( mesh );
+	assert( Mesh_GetDimSize( mesh ) >= 2 );
+
+	grid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
+					      ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+
+	nNodes = Mesh_GetLocalSize( mesh, MT_VERTEX );
+	set = IndexSet_New( nNodes );
+
+	for( n_i = 0; n_i < nNodes; n_i++ ) {
+		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
+		if( ijk[1] == grid->sizes[1] - 1 )
+			IndexSet_Add( set, n_i );
 	}
-	
-	return is;
+
+	return set;
 }
 
 IndexSet* RegularMeshUtils_CreateLocalInGlobalBottomSet( void* _mesh ) {
-	Mesh*			mesh = (Mesh*)_mesh;
-	MeshLayout*		meshLayout = mesh->layout;
-	HexaMD*			decomp = (HexaMD *)meshLayout->decomp;
-	Node_LocalIndex		node_I;
-	Node_LocalIndex		nodeLocalCount;
-	IndexSet*		is;
-	
-	nodeLocalCount = decomp->nodeLocalCount;
-	is = IndexSet_New( nodeLocalCount );
-	for( node_I = 0; node_I < nodeLocalCount; node_I++ ) {
-		IJK			ijk;
-		Node_GlobalIndex	node_gI;
-		
-		node_gI = decomp->nodeMapLocalToGlobal( decomp, node_I );
-		RegularMeshUtils_Node_1DTo3D( decomp, node_gI, &ijk[0], &ijk[1], &ijk[2] );
-		if( ijk[1] == ( 0 ) ) {
-			IndexSet_Add( is, node_I );
-		}
-	}
-	
-	return is;
-}
+	Mesh*		mesh = (Mesh*)_mesh;
+	unsigned	nNodes;
+	IndexSet*	set;
+	IJK		ijk;
+	unsigned	n_i;
 
-IndexSet* RegularMeshUtils_CreateLocalInGlobalRightSet( void* _mesh ) {
-	Mesh*			mesh = (Mesh*)_mesh;
-	MeshLayout*		meshLayout = mesh->layout;
-	HexaMD*			decomp = (HexaMD *)meshLayout->decomp;
-	Node_LocalIndex		node_I;
-	Node_LocalIndex		nodeLocalCount;
-	IndexSet*		is;
-	
-	nodeLocalCount = decomp->nodeLocalCount;
-	is = IndexSet_New( nodeLocalCount );
-	for( node_I = 0; node_I < nodeLocalCount; node_I++ ) {
-		IJK			ijk;
-		Node_GlobalIndex	node_gI;
-		
-		node_gI = decomp->nodeMapLocalToGlobal( decomp, node_I );
-		RegularMeshUtils_Node_1DTo3D( decomp, node_gI, &ijk[0], &ijk[1], &ijk[2] );
-		if( ijk[0] == ( decomp->nodeGlobal3DCounts[0] - 1 ) ) {
-			IndexSet_Add( is, node_I );
-		}
+	assert( mesh );
+	assert( Mesh_GetDimSize( mesh ) >= 2 );
+
+	nNodes = Mesh_GetLocalSize( mesh, MT_VERTEX );
+	set = IndexSet_New( nNodes );
+
+	for( n_i = 0; n_i < nNodes; n_i++ ) {
+		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
+		if( ijk[1] == 0 )
+			IndexSet_Add( set, n_i );
 	}
-	
-	return is;
+
+	return set;
 }
 
 IndexSet* RegularMeshUtils_CreateLocalInGlobalLeftSet( void* _mesh ) {
-	Mesh*			mesh = (Mesh*)_mesh;
-	MeshLayout*		meshLayout = mesh->layout;
-	HexaMD*			decomp = (HexaMD *)meshLayout->decomp;
-	Node_LocalIndex		node_I;
-	Node_LocalIndex		nodeLocalCount;
-	IndexSet*		is;
-	
-	nodeLocalCount = decomp->nodeLocalCount;
-	is = IndexSet_New( nodeLocalCount );
-	for( node_I = 0; node_I < nodeLocalCount; node_I++ ) {
-		IJK			ijk;
-		Node_GlobalIndex	node_gI;
-		
-		node_gI = decomp->nodeMapLocalToGlobal( decomp, node_I );
-		RegularMeshUtils_Node_1DTo3D( decomp, node_gI, &ijk[0], &ijk[1], &ijk[2] );
-		if( ijk[0] == ( 0 ) ) {
-			IndexSet_Add( is, node_I );
-		}
+	Mesh*		mesh = (Mesh*)_mesh;
+	unsigned	nNodes;
+	IndexSet*	set;
+	IJK		ijk;
+	unsigned	n_i;
+
+	assert( mesh );
+
+	nNodes = Mesh_GetLocalSize( mesh, MT_VERTEX );
+	set = IndexSet_New( nNodes );
+
+	for( n_i = 0; n_i < nNodes; n_i++ ) {
+		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
+		if( ijk[0] == 0 )
+			IndexSet_Add( set, n_i );
 	}
-	
-	return is;
+
+	return set;
+}
+
+IndexSet* RegularMeshUtils_CreateLocalInGlobalRightSet( void* _mesh ) {
+	Mesh*		mesh = (Mesh*)_mesh;
+	Grid*		grid;
+	unsigned	nNodes;
+	IndexSet*	set;
+	IJK		ijk;
+	unsigned	n_i;
+
+	assert( mesh );
+
+	grid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
+					      ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+
+	nNodes = Mesh_GetLocalSize( mesh, MT_VERTEX );
+	set = IndexSet_New( nNodes );
+
+	for( n_i = 0; n_i < nNodes; n_i++ ) {
+		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
+		if( ijk[0] == grid->sizes[0] - 1 )
+			IndexSet_Add( set, n_i );
+	}
+
+	return set;
 }
 
 IndexSet* RegularMeshUtils_CreateLocalInGlobalFrontSet( void* _mesh ) {
-	Mesh*			mesh = (Mesh*)_mesh;
-	MeshLayout*		meshLayout = mesh->layout;
-	HexaMD*			decomp = (HexaMD *)meshLayout->decomp;
-	Node_LocalIndex		node_I;
-	Node_LocalIndex		nodeLocalCount;
-	IndexSet*		is;
-	
-	nodeLocalCount = decomp->nodeLocalCount;
-	is = IndexSet_New( nodeLocalCount );
-	for( node_I = 0; node_I < nodeLocalCount; node_I++ ) {
-		IJK			ijk;
-		Node_GlobalIndex	node_gI;
-		
-		node_gI = decomp->nodeMapLocalToGlobal( decomp, node_I );
-		RegularMeshUtils_Node_1DTo3D( decomp, node_gI, &ijk[0], &ijk[1], &ijk[2] );
-		if( ijk[2] == ( decomp->nodeGlobal3DCounts[2] - 1 ) ) {
-			IndexSet_Add( is, node_I );
-		}
+	Mesh*		mesh = (Mesh*)_mesh;
+	Grid*		grid;
+	unsigned	nNodes;
+	IndexSet*	set;
+	IJK		ijk;
+	unsigned	n_i;
+
+	assert( mesh );
+	assert( Mesh_GetDimSize( mesh ) >= 3 );
+
+	grid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
+					      ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+
+	nNodes = Mesh_GetLocalSize( mesh, MT_VERTEX );
+	set = IndexSet_New( nNodes );
+
+	for( n_i = 0; n_i < nNodes; n_i++ ) {
+		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
+		if( ijk[2] == grid->sizes[2] - 1 )
+			IndexSet_Add( set, n_i );
 	}
-	
-	return is;
+
+	return set;
 }
 
 IndexSet* RegularMeshUtils_CreateLocalInGlobalBackSet( void* _mesh ) {
-	Mesh*			mesh = (Mesh*)_mesh;
-	MeshLayout*		meshLayout = mesh->layout;
-	HexaMD*			decomp = (HexaMD *)meshLayout->decomp;
-	Node_LocalIndex		node_I;
-	Node_LocalIndex		nodeLocalCount;
-	IndexSet*		is;
-	
-	nodeLocalCount = decomp->nodeLocalCount;
-	is = IndexSet_New( nodeLocalCount );
-	for( node_I = 0; node_I < nodeLocalCount; node_I++ ) {
-		IJK			ijk;
-		Node_GlobalIndex	node_gI;
-		
-		node_gI = decomp->nodeMapLocalToGlobal( decomp, node_I );
-		RegularMeshUtils_Node_1DTo3D( decomp, node_gI, &ijk[0], &ijk[1], &ijk[2] );
-		if( ijk[2] == ( 0 ) ) {
-			IndexSet_Add( is, node_I );
-		}
+	Mesh*		mesh = (Mesh*)_mesh;
+	unsigned	nNodes;
+	IndexSet*	set;
+	IJK		ijk;
+	unsigned	n_i;
+
+	assert( mesh );
+	assert( Mesh_GetDimSize( mesh ) >= 3 );
+
+	nNodes = Mesh_GetLocalSize( mesh, MT_VERTEX );
+	set = IndexSet_New( nNodes );
+
+	for( n_i = 0; n_i < nNodes; n_i++ ) {
+		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
+		if( ijk[2] == 0 )
+			IndexSet_Add( set, n_i );
 	}
-	
-	return is;
+
+	return set;
 }
 
-Node_DomainIndex RegularMeshUtils_GetDiagOppositeAcrossElementNodeIndex( void* _mesh, Element_DomainIndex refElement_dI, Node_DomainIndex refNode_dI ) {
+Node_DomainIndex RegularMeshUtils_GetDiagOppositeAcrossElementNodeIndex( void* _mesh, 
+									 Element_DomainIndex refElement_dI, 
+									 Node_DomainIndex refNode_dI )
+{
 	Mesh*              mesh = (Mesh*)_mesh;
-	const Node_Index   oppositeNodesMap2D[] = { 2, 3, 0, 1 };
-	Node_Index         oppositeNodesMap3D[] = { 6, 7, 4, 5, 2, 3, 0, 1 };
+	const Node_Index   oppositeNodesMap2D[] = { 3, 2, 1, 0 };
+	Node_Index         oppositeNodesMap3D[] = { 7, 6, 5, 4, 3, 2, 1, 0 };
 	Node_DomainIndex*  currElementNodes = NULL;
 	Node_Index         currElementNodeCount = 0;
 	Node_Index         refNode_eI = 0;
 	Node_DomainIndex   oppositeNode_dI = 0;
 	Node_Index         oppositeNode_eI = 0;
-	Stream*            errorStr = Journal_Register( Error_Type, "RegularMeshUtils" );
+	Stream*            errorStrm = Journal_Register( Error_Type, "RegularMeshUtils" );
 
+	Journal_Firewall( Mesh_GetElementType( mesh, refElement_dI )->type == Mesh_HexType_Type, errorStrm, 
+			  "Error (%s:%s:%d):\n\tIncorrect element type (%s); require %s.\n", 
+			  __func__, __FILE__, __LINE__, Mesh_GetElementType( mesh, refElement_dI )->type, 
+			  Mesh_HexType_Type );
+
+#if 0
 	Journal_Firewall( CornerNL_Type == mesh->layout->nodeLayout->type , errorStr,
 		"Error- in %s: Given mesh has node layout of type \"%s\", different to "
 		"required type \"%s\".\n", __func__, mesh->layout->nodeLayout->type, CornerNL_Type );
+#endif
 
-	currElementNodes = mesh->elementNodeTbl[refElement_dI];
-	currElementNodeCount = mesh->elementNodeCountTbl[refElement_dI];
+	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), refElement_dI, MT_VERTEX, 
+			   &currElementNodeCount, &currElementNodes );
 
 	/* Find index of reference node within reference element */
 	for( refNode_eI = 0; refNode_eI < currElementNodeCount; refNode_eI++ ) {
 		if ( refNode_dI == currElementNodes[refNode_eI] )
 			break;
 	}
-	Journal_Firewall( refNode_eI < currElementNodeCount, errorStr,
+	Journal_Firewall( refNode_eI < currElementNodeCount, errorStrm,
 		"Error - in %s(): Reference node %d (domain) not found within reference element %d (domain).\n",
 		__func__, refNode_dI, refElement_dI );
 
 	/* Use mapping table to get diagonally opposite node, then convert back to domain index */
 	
-	if ( ((HexaEL*)mesh->layout->elementLayout)->dim == 2 ) {	
+	if ( Mesh_GetDimSize( mesh ) == 2 ) {
 		oppositeNode_eI = oppositeNodesMap2D[refNode_eI];
 	}
 	else {
@@ -893,4 +872,3 @@ Node_DomainIndex RegularMeshUtils_GetDiagOppositeAcrossElementNodeIndex( void* _
 	oppositeNode_dI = currElementNodes[oppositeNode_eI];
 	return oppositeNode_dI;
 }
-

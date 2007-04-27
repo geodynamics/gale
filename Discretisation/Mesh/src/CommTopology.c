@@ -36,33 +36,23 @@
 
 #include "Base/Base.h"
 #include "Discretisation/Geometry/Geometry.h"
-
-#include "types.h"
-#include "shortcuts.h"
-#include "CommTopology.h"
+#include "Mesh.h"
 
 
 /* Textual name of this class */
 const Type CommTopology_Type = "CommTopology";
 
+
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Constructors
 */
 
-CommTopology* CommTopology_New( Name name ) {
+CommTopology* CommTopology_New() {
 	return _CommTopology_New( sizeof(CommTopology), 
 				  CommTopology_Type, 
 				  _CommTopology_Delete, 
 				  _CommTopology_Print, 
-				  _CommTopology_Copy, 
-				  (void* (*)(Name))_CommTopology_New, 
-				  _CommTopology_Construct, 
-				  _CommTopology_Build, 
-				  _CommTopology_Initialise, 
-				  _CommTopology_Execute, 
-				  _CommTopology_Destroy, 
-				  name, 
-				  NON_GLOBAL );
+				  NULL );
 }
 
 CommTopology* _CommTopology_New( COMMTOPOLOGY_DEFARGS ) {
@@ -70,7 +60,7 @@ CommTopology* _CommTopology_New( COMMTOPOLOGY_DEFARGS ) {
 	
 	/* Allocate memory */
 	assert( sizeOfSelf >= sizeof(CommTopology) );
-	self = (CommTopology*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
+	self = (CommTopology*)_Stg_Class_New( STG_CLASS_PASSARGS );
 
 	/* Virtual info */
 
@@ -82,10 +72,9 @@ CommTopology* _CommTopology_New( COMMTOPOLOGY_DEFARGS ) {
 
 void _CommTopology_Init( CommTopology* self ) {
 	self->comm = MPI_COMM_WORLD;
-	MPI_Comm_size( self->comm, (int*)&self->nProcs );
-	MPI_Comm_rank( self->comm, (int*)&self->rank );
-	self->nInc = 0;
-	self->inc = NULL;
+	self->nIncRanks = 0;
+	self->incRanks = NULL;
+	self->glMap = UIntMap_New();
 }
 
 
@@ -93,75 +82,28 @@ void _CommTopology_Init( CommTopology* self ) {
 ** Virtual functions
 */
 
-void _CommTopology_Delete( void* generator ) {
-	CommTopology*	self = (CommTopology*)generator;
+void _CommTopology_Delete( void* commTopology ) {
+	CommTopology*	self = (CommTopology*)commTopology;
 
 	CommTopology_Destruct( self );
+	FreeObject( self->glMap );
 
 	/* Delete the parent. */
-	_Stg_Component_Delete( self );
+	_Stg_Class_Delete( self );
 }
 
-void _CommTopology_Print( void* generator, Stream* stream ) {
-	CommTopology*	self = (CommTopology*)generator;
+void _CommTopology_Print( void* commTopology, Stream* stream ) {
+	CommTopology*	self = (CommTopology*)commTopology;
 	
 	/* Set the Journal for printing informations */
-	Stream* generatorStream;
-	generatorStream = Journal_Register( InfoStream_Type, "CommTopologyStream" );
+	Stream* commTopologyStream;
+	commTopologyStream = Journal_Register( InfoStream_Type, "CommTopologyStream" );
 
 	/* Print parent */
 	Journal_Printf( stream, "CommTopology (ptr): (%p)\n", self );
-	_Stg_Component_Print( self, stream );
+	_Stg_Class_Print( self, stream );
 }
 
-void* _CommTopology_Copy( void* generator, void* destProc_I, Bool deep, Name nameExt, PtrMap* ptrMap ) {
-#if 0
-	CommTopology*	self = (CommTopology*)generator;
-	CommTopology*	newCommTopology;
-	PtrMap*	map = ptrMap;
-	Bool	ownMap = False;
-
-	/* Damn me for making copying so difficult... what was I thinking? */
-	
-	/* We need to create a map if it doesn't already exist. */
-	if( !map ) {
-		map = PtrMap_New( 10 );
-		ownMap = True;
-	}
-	
-	newCommTopology = (CommTopology*)_Mesh_Copy( self, destProc_I, deep, nameExt, map );
-	
-	/* Copy the virtual methods here. */
-
-	/* Deep or shallow? */
-	if( deep ) {
-	}
-	else {
-	}
-	
-	/* If we own the map, get rid of it here. */
-	if( ownMap ) Stg_Class_Delete( map );
-	
-	return (void*)newCommTopology;
-#endif
-
-	return NULL;
-}
-
-void _CommTopology_Construct( void* generator, Stg_ComponentFactory* cf, void* data ) {
-}
-
-void _CommTopology_Build( void* generator, void* data ) {
-}
-
-void _CommTopology_Initialise( void* generator, void* data ) {
-}
-
-void _CommTopology_Execute( void* generator, void* data ) {
-}
-
-void _CommTopology_Destroy( void* generator, void* data ) {
-}
 
 /*--------------------------------------------------------------------------------------------------------------------------
 ** Public Functions
@@ -174,90 +116,126 @@ void CommTopology_SetComm( void* commTopology, MPI_Comm comm ) {
 
 	CommTopology_Destruct( self );
 	self->comm = comm;
-	MPI_Comm_size( comm, (int*)&self->nProcs );
-	MPI_Comm_rank( comm, (int*)&self->rank );
 }
 
-
-void CommTopology_SetIncidence( void* commTopology, unsigned nInc, unsigned* inc ) {
+void CommTopology_SetIncidence( void* commTopology, unsigned nIncRanks, unsigned* incRanks ) {
 	CommTopology*	self = (CommTopology*)commTopology;
 
 	assert( self );
-	assert( !nInc || inc );
-#ifndef NDEBUG
-	{
-		unsigned	inc_i;
+	assert( !nIncRanks || incRanks );
 
-		for( inc_i = 0; inc_i < nInc; inc_i++ ) {
-			assert( inc[inc_i] < self->nProcs );
-			assert( inc[inc_i] != self->rank );
+	CommTopology_Destruct( self );
+	CommTopology_AddIncidence( self, nIncRanks, incRanks );
+}
+
+void CommTopology_AddIncidence( void* commTopology, unsigned nIncRanks, unsigned* incRanks ) {
+	CommTopology*	self = (CommTopology*)commTopology;
+	unsigned	r_i;
+
+	assert( self );
+	assert( !nIncRanks || incRanks );
+	assert( CommTopology_ValidateIncidence( self, nIncRanks, incRanks ) );
+
+	if( nIncRanks ) {
+		unsigned*	order;
+
+		for( r_i = 0; r_i < nIncRanks; r_i++ )
+			UIntMap_Insert( self->glMap, incRanks[r_i], self->nIncRanks + r_i );
+
+		self->incRanks = ReallocNamedArray( self->incRanks, unsigned, self->nIncRanks + nIncRanks, 
+						    "CommTopology::incRanks" );
+		memcpy( self->incRanks + self->nIncRanks, incRanks, nIncRanks * sizeof(unsigned) );
+		self->nIncRanks += nIncRanks;
+
+		order = AllocArray( unsigned, self->nIncRanks * 2 );
+		for( r_i = 0; r_i < self->nIncRanks; r_i++ ) {
+			order[2 * r_i] = self->incRanks[r_i];
+			order[2 * r_i + 1] = r_i;
 		}
-	}
-#endif
-
-	self->nInc = nInc;
-	if( nInc ) {
-		if( !self->inc )
-			self->inc = Memory_Alloc_Array( unsigned, nInc, "CommTopology::inc" );
-		else
-			self->inc = Memory_Realloc_Array( self->inc, unsigned, nInc );
-		memcpy( self->inc, inc, nInc * sizeof(unsigned) );
-		qsort( self->inc, nInc, sizeof(unsigned), CommTopology_CmpRanks );
-	}
-	else {
-		KillArray( self->inc );
+		qsort( order, self->nIncRanks, 2 * sizeof(unsigned), CommTopology_CmpRanks );
+		self->order = ReallocNamedArray( self->order, unsigned, self->nIncRanks, "CommTopology::order" );
+		for( r_i = 0; r_i < self->nIncRanks; r_i++ )
+			self->order[r_i] = order[2 * r_i + 1];
+		FreeArray( order );
 	}
 }
 
-
-void CommTopology_GetIncidence( void* commTopology, unsigned proc, 
-				unsigned* nInc, unsigned** inc )
-{
+MPI_Comm CommTopology_GetComm( void* commTopology ) {
 	CommTopology*	self = (CommTopology*)commTopology;
 
 	assert( self );
-	assert( proc < self->nProcs );
-	assert( nInc && inc );
 
-	if( proc == self->rank ) {
-		*nInc = self->nInc;
-		*inc = self->inc;
-	}
-	else {
-		fprintf( stderr, "*** Error: Processor topology does not yet support retrieving\n" );
-		fprintf( stderr, "***        incidence from other processors.\n" );
-		abort();
-	}
+	return self->comm;
 }
 
+unsigned CommTopology_GetCommSize( void* commTopology ) {
+	CommTopology*	self = (CommTopology*)commTopology;
+	unsigned	nProcs;
 
-void CommTopology_ReturnIncidence( void* commTopology, unsigned proc, 
-				   unsigned* nInc, unsigned** inc )
-{
+	assert( self );
+
+	MPI_Comm_size( self->comm, (int*)&nProcs );
+
+	return nProcs;
+}
+
+unsigned CommTopology_GetCommRank( void* commTopology ) {
+	CommTopology*	self = (CommTopology*)commTopology;
+	unsigned	rank;
+
+	assert( self );
+
+	MPI_Comm_rank( self->comm, (int*)&rank );
+
+	return rank;
+}
+
+unsigned CommTopology_GetIncidenceSize( void* commTopology ) {
 	CommTopology*	self = (CommTopology*)commTopology;
 
 	assert( self );
-	assert( proc < self->nProcs );
-	assert( nInc && inc );
 
-	if( proc != self->rank )
-		KillArray( *inc );
-	else
-		*inc = NULL;
-	*nInc = 0;
+	return self->nIncRanks;
 }
 
+void CommTopology_GetIncidence( void* commTopology, unsigned* nIncRanks, unsigned** incRanks ) {
+	CommTopology*	self = (CommTopology*)commTopology;
 
-void CommTopology_Allgather( void* commTopology, 
-			     unsigned srcSize, void* srcArray, 
-			     unsigned** dstSizes, void*** dstArrays, 
-			     unsigned itemSize )
+	assert( self );
+	assert( nIncRanks && incRanks );
+
+	*nIncRanks = self->nIncRanks;
+	*incRanks = self->incRanks;
+}
+
+unsigned CommTopology_LocalToGlobal( void* commTopology, unsigned local ) {
+	CommTopology*	self = (CommTopology*)commTopology;
+
+	assert( self );
+	assert( local < self->nIncRanks );
+	assert( self->incRanks );
+	assert( self->order );
+
+	return self->incRanks[local];
+}
+
+Bool CommTopology_GlobalToLocal( void* commTopology, unsigned global, unsigned* local ) {
+	CommTopology*	self = (CommTopology*)commTopology;
+
+	assert( self );
+
+	return UIntMap_Map( self->glMap, global, local );
+}
+
+void _CommTopology_Allgather( void* commTopology, 
+			      unsigned srcSize, void* srcArray, 
+			      unsigned** dstSizes, void*** dstArrays, 
+			      unsigned itemSize )
 {
 	CommTopology*	self = (CommTopology*)commTopology;
 	unsigned	tag = 669;
 	MPI_Status	status;
 	unsigned*	nbrSizes;
-	unsigned*	tmpSizes;
 	Stg_Byte**	nbrArrays;
 	unsigned	p_i;
 
@@ -267,59 +245,54 @@ void CommTopology_Allgather( void* commTopology,
 	assert( dstArrays );
 
 	/* Skip this if we have no neighbours. */
-	if( !self->nInc ) {
+	if( !self->nIncRanks ) {
 		*dstSizes = NULL;
 		*dstArrays = NULL;
 		return;
 	}
 
-	/* Need space for neighbour sizes. */
-	nbrSizes = Memory_Alloc_Array_Unnamed( unsigned, self->nInc );
-	tmpSizes = Memory_Alloc_Array_Unnamed( unsigned, self->nInc );
+	/* Allocate base arrays. */
+	nbrSizes = AllocArray( unsigned, self->nIncRanks );
+	nbrArrays = AllocArray( Stg_Byte*, self->nIncRanks );
 
 	/* Send/recv with each neighbour.  There won't be deadlocks because the neighbouring
 	   ranks are ordered from lowest to highest. Start with sizes. */
-	for( p_i = 0; p_i < self->nInc; p_i++ ) {
-		unsigned	nbr = self->inc[p_i];
+	for( p_i = 0; p_i < self->nIncRanks; p_i++ ) {
+		unsigned	pos = self->order[p_i];
+		unsigned	nbr = self->incRanks[pos];
+		unsigned	tmpSize;
 
 		MPI_Sendrecv( &srcSize, 1, MPI_UNSIGNED, nbr, tag, 
-			      nbrSizes + p_i, 1, MPI_UNSIGNED, nbr, tag, 
+			      nbrSizes + pos, 1, MPI_UNSIGNED, nbr, tag, 
 			      self->comm, &status );
 
-		tmpSizes[p_i] = nbrSizes[p_i] * itemSize;
-	}
+		tmpSize = nbrSizes[pos] * itemSize;
 
-	/* Allocate space for results. */
-	nbrArrays = Memory_Alloc_2DComplex_Unnamed( Stg_Byte, self->nInc, tmpSizes );
-
-	/* Transfer arrays. */
-	for( p_i = 0; p_i < self->nInc; p_i++ ) {
-		unsigned	nbr = self->inc[p_i];
+		/* Alloc storage. */
+		if( tmpSize )
+			nbrArrays[pos] = AllocArray( Stg_Byte, tmpSize );
+		else
+			nbrArrays[pos] = NULL;
 
 		MPI_Sendrecv( srcArray, srcSize * itemSize, MPI_BYTE, nbr, tag, 
-			      nbrArrays[p_i], tmpSizes[p_i], MPI_BYTE, nbr, tag, 
+			      nbrArrays[pos], tmpSize, MPI_BYTE, nbr, tag, 
 			      self->comm, &status );
 	}
-
-	/* Free temporary sizes. */
-	FreeArray( tmpSizes );
 
 	/* Store results. */
 	*dstSizes = nbrSizes;
 	*dstArrays = (void**)nbrArrays;
 }
 
-
-void CommTopology_Alltoall( void* commTopology, 
-			    unsigned* srcSizes, void** srcArrays, 
-			    unsigned** dstSizes, void*** dstArrays, 
-			    unsigned itemSize )
+void _CommTopology_Alltoall( void* commTopology, 
+			     unsigned* srcSizes, void** srcArrays, 
+			     unsigned** dstSizes, void*** dstArrays, 
+			     unsigned itemSize )
 {
 	CommTopology*	self = (CommTopology*)commTopology;
 	unsigned	tag = 669;
 	MPI_Status	status;
 	unsigned*	nbrSizes;
-	unsigned*	tmpSizes;
 	Stg_Byte**	nbrArrays;
 	unsigned	p_i;
 
@@ -329,42 +302,40 @@ void CommTopology_Alltoall( void* commTopology,
 	assert( dstArrays );
 
 	/* Skip this if we have no neighbours. */
-	if( !self->nInc ) {
+	if( !self->nIncRanks ) {
 		*dstSizes = NULL;
 		*dstArrays = NULL;
 		return;
 	}
 
-	/* Need space for neighbour sizes. */
-	nbrSizes = Memory_Alloc_Array_Unnamed( unsigned, self->nInc );
-	tmpSizes = Memory_Alloc_Array_Unnamed( unsigned, self->nInc );
+	/* Allocate base array. */
+	nbrSizes = AllocArray( unsigned, self->nIncRanks );
+	nbrArrays = AllocArray( Stg_Byte*, self->nIncRanks );
 
 	/* Send/recv with each neighbour.  There won't be deadlocks because the neighbouring
 	   ranks are ordered from lowest to highest. Start with sizes. */
-	for( p_i = 0; p_i < self->nInc; p_i++ ) {
-		unsigned	nbr = self->inc[p_i];
+	for( p_i = 0; p_i < self->nIncRanks; p_i++ ) {
+		unsigned	pos = self->order[p_i];
+		unsigned	nbr = self->incRanks[pos];
+		unsigned	tmpSize;
 
-		MPI_Sendrecv( srcSizes + p_i, 1, MPI_UNSIGNED, nbr, tag, 
-			      nbrSizes + p_i, 1, MPI_UNSIGNED, nbr, tag, 
+		MPI_Sendrecv( srcSizes + pos, 1, MPI_UNSIGNED, nbr, tag, 
+			      nbrSizes + pos, 1, MPI_UNSIGNED, nbr, tag, 
 			      self->comm, &status );
 
-		tmpSizes[p_i] = nbrSizes[p_i] * itemSize;
-	}
+		tmpSize = nbrSizes[pos] * itemSize;
 
-	/* Allocate space for results. */
-	nbrArrays = Memory_Alloc_2DComplex_Unnamed( Stg_Byte, self->nInc, tmpSizes );
+		/* Alloc storage. */
+		if( tmpSize )
+			nbrArrays[pos] = AllocArray( Stg_Byte, tmpSize );
+		else
+			nbrArrays[pos] = NULL;
 
-	/* Transfer arrays. */
-	for( p_i = 0; p_i < self->nInc; p_i++ ) {
-		unsigned	nbr = self->inc[p_i];
-
-		MPI_Sendrecv( srcArrays[p_i], srcSizes[p_i] * itemSize, MPI_BYTE, nbr, tag, 
-			      nbrArrays[p_i], tmpSizes[p_i], MPI_BYTE, nbr, tag, 
+		/* Transfer between current neighbour. */
+		MPI_Sendrecv( srcArrays[pos], srcSizes[pos] * itemSize, MPI_BYTE, nbr, tag, 
+			      nbrArrays[pos], tmpSize, MPI_BYTE, nbr, tag, 
 			      self->comm, &status );
 	}
-
-	/* Free temporary sizes. */
-	FreeArray( tmpSizes );
 
 	/* Store results. */
 	*dstSizes = nbrSizes;
@@ -386,6 +357,41 @@ int CommTopology_CmpRanks( const void* rank0, const void* rank1 ) {
 }
 
 void CommTopology_Destruct( CommTopology* self ) {
-	KillArray( self->inc );
-	self->nInc = 0;
+	KillArray( self->incRanks );
+	self->nIncRanks = 0;
+	UIntMap_Clear( self->glMap );
 }
+
+#ifndef NDEBUG
+Bool CommTopology_ValidateIncidence( CommTopology* self, unsigned nIncRanks, unsigned* incRanks ) {
+	RangeSet	*exSet, *newSet;
+	unsigned	nProcs, rank;
+	unsigned	size;
+	unsigned	inc_i;
+
+	assert( self );
+	assert( !nIncRanks || incRanks );
+
+	/* Validate basics. */
+	MPI_Comm_size( self->comm, (int*)&nProcs );
+	MPI_Comm_rank( self->comm, (int*)&rank );
+	for( inc_i = 0; inc_i < nIncRanks; inc_i++ ) {
+		if( incRanks[inc_i] >= nProcs || incRanks[inc_i] == rank )
+			return False;
+	}
+
+	/* Ensure no existing overlap. */
+	exSet = RangeSet_New();
+	newSet = RangeSet_New();
+	RangeSet_SetIndices( exSet, self->nIncRanks, self->incRanks );
+	RangeSet_SetIndices( newSet, nIncRanks, incRanks );
+	RangeSet_Intersection( newSet, exSet );
+	size = RangeSet_GetSize( newSet );
+	FreeObject( newSet );
+	FreeObject( exSet );
+	if( size )
+		return False;
+
+	return True;
+}
+#endif

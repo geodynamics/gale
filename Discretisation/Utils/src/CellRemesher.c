@@ -186,8 +186,6 @@ void _CellRemesher_Construct( void* cellRemesher, Stg_ComponentFactory* cf, void
 
 	/* Get the number of dimensions. */
 	dict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( cf->componentDict, self->name ) );
-	self->nDims = Dictionary_GetUnsignedInt( dict, "dims" );
-	assert( self->nDims > 0 );
 
 	/* Extract cell mesh. */
 	cmName = Dictionary_GetString( dict, "cellMesh" );
@@ -212,6 +210,7 @@ void _CellRemesher_Build( void* cellRemesher, void* data ) {
 
 	/* Build the cell mesh. */
 	Build( self->cellMesh, data, False );
+	self->nDims = Mesh_GetDimSize( self->cellMesh );
 }
 
 
@@ -230,32 +229,38 @@ void _CellRemesher_Initialise( void* cellRemesher, void* data ) {
 
 void _CellRemesher_Execute( void* cellRemesher, void* data ) {
 	CellRemesher*	self = (CellRemesher*)cellRemesher;
-	Coord*		meshCrds;
-	Coord*		cellCrds;
+	double**	meshCrds;
+	double**	cellCrds;
 	unsigned	e_i;
 
 	assert( self );
 	assert( self->mesh );
+	assert( self->mesh->generator );
+	assert( self->cellMesh );
+	assert( self->cellMesh->generator );
 	/* TODO: remaining asserts */
 
-	meshCrds = self->mesh->nodeCoord;
-	cellCrds = self->cellMesh->nodeCoord;
+	meshCrds = self->mesh->verts;
+	cellCrds = self->cellMesh->verts;
 
 	/* Center the cell mesh's node coordinates in the cell mesh's elements. We assume identical
 	   ordering. */
-	for( e_i = 0; e_i < self->cellMesh->elementLocalCount; e_i++ ) {
-		unsigned	nElNodes = self->cellMesh->elementNodeCountTbl[e_i];
-		unsigned*	elNodes = self->cellMesh->elementNodeTbl[e_i];
-		double		fac = 1.0 / (double)nElNodes;
+	for( e_i = 0; e_i < Mesh_GetLocalSize( self->cellMesh, self->nDims ); e_i++ ) {
+		unsigned	nElNodes;
+		unsigned*	elNodes;
+		double		fac;
 		unsigned	d_i;
 
-		memset( meshCrds[e_i], 0, sizeof(Coord) );
+		Mesh_GetIncidence( self->cellMesh, self->nDims, e_i, MT_VERTEX, 
+				   &nElNodes, &elNodes );
+		fac = 1.0 / (double)nElNodes;
+
+		memset( meshCrds[e_i], 0, self->nDims * sizeof(double) );
 		for( d_i = 0; d_i < self->nDims; d_i++ ) {
 			unsigned	en_i;
 
-			for( en_i = 0; en_i < nElNodes; en_i++ ) {
+			for( en_i = 0; en_i < nElNodes; en_i++ )
 				meshCrds[e_i][d_i] += cellCrds[elNodes[en_i]][d_i];
-			}
 			meshCrds[e_i][d_i] *= fac;
 		}
 	}

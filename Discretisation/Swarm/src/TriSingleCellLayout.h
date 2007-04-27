@@ -37,7 +37,7 @@ given mesh layout.
 **	At the moment, only does a rectangular or hexahedral cell - need to generalise for triangular mesh shapes
 **		(more info. needs to be provided on the meshLayout).
 **
-** $Id: TriSingleCellLayout.h 3851 2006-10-12 08:57:22Z SteveQuenette $
+** $Id: TriSingleCellLayout.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -140,7 +140,7 @@ given mesh layout.
 		Cell_Points		points );
 	
 	/** Implements CellLayout_MapElementIdToCellId(): always return 0, since all elements correspond to the same cell */
-	Cell_Index _TriSingleCellLayout_MapElementIdToCellId( void* cellLayout, Element_DomainIndex element_dI );		
+	Cell_Index _TriSingleCellLayout_MapElementIdToCellId( void* cellLayout, unsigned element_dI );		
 
 	/* Specify whether a particle is in a given cell */
 	Bool _TriSingleCellLayout_IsInCell( void* triSingleCellLayout, Cell_Index cellIndex, void* particle );

@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FileParticleLayout.c 3851 2006-10-12 08:57:22Z SteveQuenette $
+** $Id: FileParticleLayout.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -44,6 +44,7 @@
 
 #include "SwarmClass.h"
 #include "StandardParticle.h"
+#include "ShadowInfo.h"
 #include "CellLayout.h"
 #include "ElementCellLayout.h"
 

@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SwarmVariable.c 3851 2006-10-12 08:57:22Z SteveQuenette $
+** $Id: SwarmVariable.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -345,7 +345,7 @@ double _SwarmVariable_GetMinGlobalMagnitude( void* swarmVariable ) {
 		if ( dofCount == 1 )
 			magnitude = value[0];
 		else 
-			assert(0); //TODO
+                  assert(0); /*TODO */
 
 		if ( localMin > magnitude )
 			localMin = magnitude;
@@ -378,7 +378,7 @@ double _SwarmVariable_GetMaxGlobalMagnitude( void* swarmVariable ) {
 		if ( dofCount == 1 )
 			magnitude = value[0];
 		else 
-			assert(0); //TODO
+                  assert(0); /*TODO */
 
 		if ( localMax < magnitude )
 			localMax = magnitude;

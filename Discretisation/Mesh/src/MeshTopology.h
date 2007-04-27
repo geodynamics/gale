@@ -63,13 +63,10 @@
 		/* MeshTopology info */			\
 		unsigned		nDims;		\
 		unsigned		nTDims;		\
-							\
 		Decomp_Sync**		domains;	\
-		unsigned*		nRentals;	\
-		unsigned**		rentals;	\
-		unsigned*		nDomainEls;	\
+		unsigned		nBndVerts;	\
+		unsigned*		bndVerts;	\
 		unsigned		shadowDepth;	\
-							\
 		unsigned***		nIncEls;	\
 		unsigned****		incEls;
 
@@ -95,13 +92,6 @@
 
 	void _MeshTopology_Delete( void* topo );
 	void _MeshTopology_Print( void* topo, Stream* stream );
-
-	#define MeshTopology_Copy( self ) \
-		(Mesh*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
-	#define MeshTopology_DeepCopy( self ) \
-		(Mesh*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _MeshTopology_Copy( void* topo, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
-
 	void _MeshTopology_Construct( void* topo, Stg_ComponentFactory* cf, void* data );
 	void _MeshTopology_Build( void* topo, void* data );
 	void _MeshTopology_Initialise( void* topo, void* data );
@@ -112,33 +102,84 @@
 	** Public functions
 	*/
 
-	void MeshTopology_SetNDims( void* topo, unsigned nDims );
-	void MeshTopology_SetElements( void* topo, MeshTopology_Dim dim, unsigned nEls, unsigned* els );
+	void MeshTopology_SetDimSize( void* topo, unsigned nDims );
+	void MeshTopology_SetElements( void* topo, MeshTopology_Dim dim, unsigned nElements, unsigned* elements );
 	void MeshTopology_SetIncidence( void* topo, MeshTopology_Dim fromDim, MeshTopology_Dim toDim, 
 					unsigned* nIncEls, unsigned** incEls );
-	void MeshTopology_Complete( void* topo );
+	void MeshTopology_SetBoundaryVertices( void* topo, unsigned nVerts, unsigned* verts );
 	void MeshTopology_SetShadowDepth( void* topo, unsigned depth );
+	void MeshTopology_SetSync( void* topo, MeshTopology_Dim dim, Decomp_Sync* sync );
+
+	unsigned MeshTopology_GetGlobalSize( void* mesh, MeshTopology_Dim dim );
+	unsigned MeshTopology_GetLocalSize( void* meshTopology, MeshTopology_Dim dim );
+	unsigned MeshTopology_GetRemoteSize( void* meshTopology, MeshTopology_Dim dim );
+	unsigned MeshTopology_GetDomainSize( void* meshTopology, MeshTopology_Dim dim );
+	unsigned MeshTopology_GetSharedSize( void* meshTopology, MeshTopology_Dim dim );
+	void MeshTopology_GetLocalElements( void* meshTopology, MeshTopology_Dim dim, unsigned* nEls, unsigned** els );
+	void MeshTopology_GetRemoteElements( void* meshTopology, MeshTopology_Dim dim, unsigned* nEls, unsigned** els );
+	unsigned MeshTopology_GetOwner( void* meshTopology, MeshTopology_Dim dim, unsigned remote );
+	void MeshTopology_GetSharers( void* meshTopology, MeshTopology_Dim dim, unsigned shared, 
+				      unsigned* nSharers, unsigned** sharers );
+	CommTopology* MeshTopology_GetCommTopology( void* meshTopology, MeshTopology_Dim dim );
+	Decomp_Sync* MeshTopology_GetSync( void* meshTopology, MeshTopology_Dim dim );
+
+	void MeshTopology_Complete( void* topo );
 	void MeshTopology_Invert( void* topo, MeshTopology_Dim fromDim, MeshTopology_Dim toDim );
 	void MeshTopology_Cascade( void* topo, MeshTopology_Dim fromDim, MeshTopology_Dim toDim );
 	void MeshTopology_Neighbourhood( void* topo, MeshTopology_Dim dim );
 
-	unsigned MeshTopology_GetLocalSize( void* meshTopology, MeshTopology_Dim dim );
-	unsigned MeshTopology_GetShadowSize( void* meshTopology, MeshTopology_Dim dim );
-	unsigned MeshTopology_GetDomainSize( void* meshTopology, MeshTopology_Dim dim );
+	Bool MeshTopology_GlobalToDomain( void* meshTopology, MeshTopology_Dim dim, unsigned global, unsigned* domain );
 	unsigned MeshTopology_DomainToGlobal( void* meshTopology, MeshTopology_Dim dim, unsigned domain );
-	unsigned MeshTopology_GlobalToDomain( void* meshTopology, MeshTopology_Dim dim, unsigned global );
+	Bool MeshTopology_DomainToShared( void* meshTopology, MeshTopology_Dim dim, unsigned domain, unsigned* shared );
+	unsigned MeshTopology_SharedToDomain( void* meshTopology, MeshTopology_Dim dim, unsigned shared );
+
+	Bool MeshTopology_HasIncidence( void* meshTopology, MeshTopology_Dim fromDim, MeshTopology_Dim toDim );
+	unsigned MeshTopology_GetIncidenceSize( void* meshTopology, MeshTopology_Dim fromDim, unsigned fromInd, 
+						MeshTopology_Dim toDim );
+	void MeshTopology_GetIncidence( void* meshTopology, MeshTopology_Dim fromDim, unsigned fromInd, MeshTopology_Dim toDim, 
+					unsigned* nInc, unsigned** inc );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Private Member functions
 	*/
 
-	void MeshTopology_BuildTopShadows( void* meshTopology, RangeSet*** shadows );
-	void MeshTopology_ExpandShadows( void* meshTopology, IndexSet* shadows, IndexSet* boundary );
-	void MeshTopology_BuildAllShadows( void* meshTopology, RangeSet*** shadows );
-	void MeshTopology_BuildShadowInc( void* meshTopology, RangeSet*** shadows, 
-					  unsigned*** incSizes, unsigned**** shadowInc );
-	void MeshTopology_SendRecvShadows( void* meshTopology, RangeSet*** shadows, 
-					   unsigned** incSizes, unsigned*** shadowInc );
+	void MeshTopology_ClearElements( MeshTopology* self, MeshTopology_Dim dim );
+	void MeshTopology_ClearIncidence( MeshTopology* self, MeshTopology_Dim dim );
+	void MeshTopology_CommUnion( MeshTopology* self );
+	void MeshTopology_BuildShadows( MeshTopology* self );
+	void MeshTopology_BuildShadowedElements( MeshTopology* self, MeshTopology_Dim dim, 
+						 unsigned** nShadowedEls, unsigned*** shadowedEls, 
+						 unsigned** nExternalEls, unsigned*** externalEls );
+	void MeshTopology_BuildTopShadowedElements( MeshTopology* self, unsigned** nShadowedEls, unsigned*** shadowedEls, 
+						    unsigned** nExternalEls, unsigned*** externalEls );
+	void MeshTopology_ExpandShadows( MeshTopology* self, IndexSet* shadows, IndexSet* boundary );
+	void MeshTopology_BuildMidShadowedElements( MeshTopology* self, MeshTopology_Dim dim, 
+						    unsigned** nShadowedEls, unsigned*** shadowedEls, 
+						    unsigned** nExternalEls, unsigned*** externalEls );
+	void MeshTopology_BuildShadowedIncidence( MeshTopology* self, MeshTopology_Dim dim, 
+						  unsigned* nShadowedEls, unsigned** shadowedEls, 
+						  unsigned* nShadowedInc, Stg_Byte** shadowedInc );
+	void MeshTopology_ExchangeShadowedElements( MeshTopology* self, MeshTopology_Dim dim, 
+						    unsigned* nShadowedEls, unsigned** shadowedEls );
+	void MeshTopology_ExchangeExternalElements( MeshTopology* self, MeshTopology_Dim dim, 
+						    unsigned* nExternalEls, unsigned** externalEls, 
+						    unsigned** nShadowedEls, unsigned*** shadowedEls );
+	void MeshTopology_ExchangeShadowedIncidence( MeshTopology* self, MeshTopology_Dim dim, 
+						     unsigned* nShadowedInc, Stg_Byte** shadowedInc );
+	void MeshTopology_ExchangeElements( MeshTopology* self, MeshTopology_Dim dim, 
+					    unsigned* nSendElements, unsigned** sendElements, 
+					    unsigned* nRecvElements, unsigned** recvElements );
+
+	void MeshTopology_PickleIncidence( MeshTopology* self, MeshTopology_Dim fromDim, MeshTopology_Dim toDim, 
+					   unsigned nEls, unsigned* els, 
+					   unsigned* nBytes, Stg_Byte** bytes );
+	void MeshTopology_UnpickleIncidence( MeshTopology* self, MeshTopology_Dim fromDim, MeshTopology_Dim toDim, 
+					     unsigned nBytes, Stg_Byte* bytes );
+
 	void MeshTopology_Destruct( MeshTopology* self );
+
+#ifndef NDEBUG
+	Bool MeshTopology_ValidateElements( MeshTopology* self, MeshTopology_Dim dim, unsigned nEls, unsigned* els );
+#endif
 
 #endif /* __Discretisaton_Mesh_MeshTopology_h__ */

@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testCompositeVC-dictionary.c 3995 2007-02-07 02:20:14Z PatrickSunter $
+** $Id: testCompositeVC-dictionary.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -53,6 +53,33 @@ void exponential(Index index, Variable_Index var_I, void* context, void* result)
 }
 
 
+Mesh* buildMesh( unsigned nDims, unsigned* size, 
+		     double* minCrds, double* maxCrds, 
+		     ExtensionManager_Register* emReg )
+{
+	CartesianGenerator*	gen;
+	Mesh*			mesh;
+	unsigned		maxDecomp[3] = {0, 1, 1};
+
+	gen = CartesianGenerator_New( "" );
+	gen->shadowDepth = 0;
+	CartesianGenerator_SetDimSize( gen, nDims );
+	CartesianGenerator_SetTopologyParams( gen, size, 0, NULL, maxDecomp );
+	CartesianGenerator_SetGeometryParams( gen, minCrds, maxCrds );
+
+	mesh = Mesh_New( "" );
+	Mesh_SetExtensionManagerRegister( mesh, emReg );
+	Mesh_SetGenerator( mesh, gen );
+
+	Build( mesh, NULL, False );
+	Initialise( mesh, NULL, False );
+
+	KillObject( mesh->generator );
+
+	return mesh;
+}
+
+
 int main(int argc, char *argv[])
 {
 	MPI_Comm		CommWorld;
@@ -64,13 +91,11 @@ int main(int argc, char *argv[])
 	Dictionary*		dictionary;
 	XML_IO_Handler*		io_handler;
 	
-	Topology*       nTopology;
-	ElementLayout*	eLayout;
-	NodeLayout*	nLayout;
-	MeshDecomp*	decomp;
-	MeshLayout*	layout;
+	unsigned	nDims = 3;
+	unsigned	meshSize[3] = {2, 2, 2};
+	double		minCrds[3] = {0.0, 0.0, 0.0};
+	double		maxCrds[3] = {1.0, 1.0, 1.0};
 	Mesh*		mesh;
-	
 	
 	Variable*			var[7];
 	Variable_Register*		variable_Register;
@@ -82,6 +107,8 @@ int main(int argc, char *argv[])
 	
 	double*		array[7];
 	char*		varName[] = {"x", "y", "z", "vx", "vy", "vz", "temp"};
+
+	unsigned	nDomains;
 	
 	Index	i, j, k;
 	
@@ -108,20 +135,12 @@ int main(int argc, char *argv[])
 	dictionary = Dictionary_New();
 	Dictionary_Add(dictionary, "outputPath", Dictionary_Entry_Value_FromString("./output"));
 	IO_Handler_ReadAllFromFile(io_handler, "data/compositeVC.xml", dictionary);
-	Dictionary_Add(dictionary, "rank", Dictionary_Entry_Value_FromUnsignedInt(rank));
-	Dictionary_Add(dictionary, "numProcessors", Dictionary_Entry_Value_FromUnsignedInt(procCount));
-	Dictionary_Add(dictionary, "meshSizeI", Dictionary_Entry_Value_FromUnsignedInt(3));
-	Dictionary_Add(dictionary, "meshSizeJ", Dictionary_Entry_Value_FromUnsignedInt(3));
-	Dictionary_Add(dictionary, "meshSizeK", Dictionary_Entry_Value_FromUnsignedInt(3));
 	
 	extensionMgr_Register = ExtensionManager_Register_New();
 	
-	nTopology = (Topology*)IJK6Topology_New( "IJK6Topology", dictionary );
-	eLayout = (ElementLayout*)ParallelPipedHexaEL_New( "PPHexaEL", 3, dictionary );
-	nLayout = (NodeLayout*)CornerNL_New( "CornerNL", dictionary, eLayout, nTopology );
-	decomp = (MeshDecomp*)HexaMD_New( "HexaMD", dictionary, MPI_COMM_WORLD, eLayout, nLayout );
-	layout = MeshLayout_New( "MeshLayout", eLayout, nLayout, decomp );
-	mesh = Mesh_New( "Mesh", layout, 0, 0, extensionMgr_Register, dictionary );
+	/* Create a mesh. */
+	mesh = buildMesh( nDims, meshSize, minCrds, maxCrds, extensionMgr_Register );
+	nDomains = Mesh_GetDomainSize( mesh, MT_VERTEX );
 	
 	/* Create CF stuff */
 	quadCF = ConditionFunction_New(quadratic, "quadratic");
@@ -136,11 +155,11 @@ int main(int argc, char *argv[])
 	/* Create variables */
 	for (i = 0; i < 6; i++) {
 		array[i] = Memory_Alloc_Array( double, 3*3*3, "array[i]" );
-		var[i] = Variable_NewScalar( varName[i], Variable_DataType_Double, &decomp->nodeLocalCount, (void**)&array[i], 0 ); 
+		var[i] = Variable_NewScalar( varName[i], Variable_DataType_Double, &nDomains, (void**)&array[i], 0 ); 
 		Variable_Register_Add(variable_Register, var[i]);
 	}
 	array[6] = Memory_Alloc_Array( double, 3*3*3*5, "array[6]" );
-	var[6] = Variable_NewVector( varName[6], Variable_DataType_Double, 5, &decomp->nodeLocalCount, (void**)&array[6], 0 );
+	var[6] = Variable_NewVector( varName[6], Variable_DataType_Double, 5, &nDomains, (void**)&array[6], 0 );
 	Variable_Register_Add(variable_Register, var[6]);
 	Variable_Register_BuildAll(variable_Register);
 	
@@ -203,12 +222,8 @@ int main(int argc, char *argv[])
 	Stg_Class_Delete(conFunc_Register);
 	Stg_Class_Delete(quadCF);
 	Stg_Class_Delete(expCF);
-	Stg_Class_Delete(layout);
-	Stg_Class_Delete(decomp);
-	Stg_Class_Delete(nLayout);
-	Stg_Class_Delete(eLayout);
-	Stg_Class_Delete(nTopology);
 	Stg_Class_Delete(dictionary);
+	FreeObject( mesh );
 	
 	DiscretisationUtils_Finalise();
 	DiscretisationMesh_Finalise();

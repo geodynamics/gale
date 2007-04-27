@@ -233,7 +233,7 @@ void DecompTransfer_Transfer( void* decompTransfer ) {
 void DecompTransfer_TransferArray( void* decompTransfer, DecompTransfer_Array* array ) {
 	DecompTransfer*	self = (DecompTransfer*)decompTransfer;
 	CommTopology*	commTopo;
-	unsigned	rank;
+	MPI_Comm	comm;
 	unsigned	nInc;
 	unsigned*	inc;
 	Stg_Byte*	snkArray;
@@ -247,7 +247,7 @@ void DecompTransfer_TransferArray( void* decompTransfer, DecompTransfer_Array* a
 
 	/* Shortcuts. */
 	commTopo = self->commTopo;
-	MPI_Comm_rank( commTopo->comm, (int*)&rank );
+	comm = CommTopology_GetComm( commTopo );
 
 	/* Pack from locals to a contiguous array. */
 	if( self->netSnks > 0 ) {
@@ -270,7 +270,7 @@ void DecompTransfer_TransferArray( void* decompTransfer, DecompTransfer_Array* a
 		srcArray = NULL;
 
 	/* Get incidence. */
-	CommTopology_GetIncidence( commTopo, rank, &nInc, &inc );
+	CommTopology_GetIncidence( commTopo, &nInc, &inc );
 
 	/* Transfer. */
 	for( p_i = 0; p_i < nInc; p_i++ ) {
@@ -283,7 +283,7 @@ void DecompTransfer_TransferArray( void* decompTransfer, DecompTransfer_Array* a
 
 		MPI_Sendrecv( snkArray + snkDisp, snkSize, MPI_BYTE, inc[p_i], tag, 
 			      srcArray + srcDisp, srcSize, MPI_BYTE, inc[p_i], tag, 
-			      commTopo->comm, &status );
+			      comm, &status );
 	}
 
 	/* Free the sink array. */
@@ -348,7 +348,7 @@ void DecompTransfer_BuildTables( DecompTransfer* self ) {
 	** Shortcuts.
 	*/
 
-	comm = self->decomps[0]->comm;
+	comm = Decomp_GetComm( self->decomps[0] );
 	MPI_Comm_size( comm, (int*)&nProcs );
 	MPI_Comm_rank( comm, (int*)&rank );
 
@@ -373,8 +373,7 @@ void DecompTransfer_BuildTables( DecompTransfer* self ) {
 	for( ind_i = 0; ind_i < self->nIncIndices; ind_i++ ) {
 		unsigned	mappedInd;
 
-		if( Decomp_IsLocal( self->decomps[1], self->incIndices[1][ind_i] ) ) {
-			mappedInd = Decomp_GlobalToLocal( self->decomps[1], self->incIndices[1][ind_i] );
+		if( Decomp_GlobalToLocal( self->decomps[1], self->incIndices[1][ind_i], &mappedInd ) ) {
 			self->srcLocalInds[self->nLocalInds] = self->incIndices[0][ind_i];
 			self->dstLocalInds[self->nLocalInds++] = mappedInd;
 		}
@@ -439,7 +438,7 @@ void DecompTransfer_BuildTables( DecompTransfer* self ) {
 	*/
 
 	retSets = Memory_Alloc_Array_Unnamed( RangeSet*, nProcs );
-	MPIArray2D_Alltoall( nFndBytes, (void**)fndBytes, &nRetBytes, (void***)&retBytes, sizeof(unsigned), comm );
+	MPIArray_Alltoall( nFndBytes, (void**)fndBytes, &nRetBytes, (void***)&retBytes, sizeof(unsigned), comm );
 	for( p_i = 0; p_i < nProcs; p_i++ ) {
 		if( p_i == rank || !nRetBytes[p_i] ) {
 			retSets[p_i] = NULL;
@@ -474,34 +473,38 @@ void DecompTransfer_BuildTables( DecompTransfer* self ) {
 	** Dump range sets into source and sink arrays.
 	*/
 
-	if( self->commTopo->nInc ) {
-	self->nSnks = Memory_Alloc_Array( unsigned, self->commTopo->nInc, "DecompTransfer::nSnks" );
-	self->nSrcs = Memory_Alloc_Array( unsigned, self->commTopo->nInc, "DecompTransfer::nSrcs" );
-	self->snks = Memory_Alloc_Array( unsigned*, self->commTopo->nInc, "DecompTransfer::nSnks" );
-	self->srcs = Memory_Alloc_Array( unsigned*, self->commTopo->nInc, "DecompTransfer::nSrcs" );
-	for( p_i = 0; p_i < nProcs; p_i++ ) {
-		unsigned	incRank;
+	if( self->commTopo->nIncRanks ) {
+		self->nSnks = Memory_Alloc_Array( unsigned, self->commTopo->nIncRanks, "DecompTransfer::nSnks" );
+		self->nSrcs = Memory_Alloc_Array( unsigned, self->commTopo->nIncRanks, "DecompTransfer::nSrcs" );
+		self->snks = Memory_Alloc_Array( unsigned*, self->commTopo->nIncRanks, "DecompTransfer::nSnks" );
+		self->srcs = Memory_Alloc_Array( unsigned*, self->commTopo->nIncRanks, "DecompTransfer::nSrcs" );
+		for( p_i = 0; p_i < nProcs; p_i++ ) {
+			unsigned	incRank;
 
-		incRank = self->commTopo->inc[p_i];
-		if( retSets[incRank] )
-			RangeSet_GetIndices( retSets[incRank], self->nSnks + p_i, self->snks + p_i );
-		else {
-			self->nSnks[p_i] = 0;
-			self->snks[p_i] = NULL;
+			incRank = self->commTopo->incRanks[p_i];
+			if( retSets[incRank] ) {
+				self->snks[p_i] = NULL;
+				RangeSet_GetIndices( retSets[incRank], self->nSnks + p_i, self->snks + p_i );
+			}
+			else {
+				self->nSnks[p_i] = 0;
+				self->snks[p_i] = NULL;
+			}
+
+			if( fndSets[incRank] ) {
+				self->srcs[p_i] = NULL;
+				RangeSet_GetIndices( fndSets[incRank], self->nSrcs + p_i, self->srcs + p_i );
+			}
+			else {
+				self->nSrcs[p_i] = 0;
+				self->srcs[p_i] = NULL;
+			}
+
+			FreeObject( retSets[incRank] );
+			FreeObject( fndSets[incRank] );
 		}
-
-		if( fndSets[incRank] )
-			RangeSet_GetIndices( fndSets[incRank], self->nSrcs + p_i, self->srcs + p_i );
-		else {
-			self->nSrcs[p_i] = 0;
-			self->srcs[p_i] = NULL;
-		}
-
-		FreeObject( retSets[incRank] );
-		FreeObject( fndSets[incRank] );
-	}
-	FreeArray( retSets );
-	FreeArray( fndSets );
+		FreeArray( retSets );
+		FreeArray( fndSets );
 	}
 	else {
 		self->nSnks = NULL;
@@ -516,35 +519,29 @@ void DecompTransfer_BuildTables( DecompTransfer* self ) {
 
 	self->netSnks = 0;
 	self->netSrcs = 0;
-	for( p_i = 0; p_i < self->commTopo->nInc; p_i++ ) {
+	for( p_i = 0; p_i < self->commTopo->nIncRanks; p_i++ ) {
 		self->netSnks += self->nSnks[p_i];
 		for( ind_i = 0; ind_i < self->nSnks[p_i]; ind_i++ ) {
-			self->snks[p_i][ind_i] = UIntMap_Map( invMap, self->snks[p_i][ind_i] );
-			self->snks[p_i][ind_i] = Decomp_GlobalToLocal( self->decomps[0], self->snks[p_i][ind_i] );
+			insist( UIntMap_Map( invMap, self->snks[p_i][ind_i], &self->snks[p_i][ind_i] ) );
+			insist( Decomp_GlobalToLocal( self->decomps[0], self->snks[p_i][ind_i], self->snks[p_i] + ind_i ) );
 		}
 
 		self->netSrcs += self->nSrcs[p_i];
 		for( ind_i = 0; ind_i < self->nSrcs[p_i]; ind_i++ )
-			self->srcs[p_i][ind_i] = Decomp_GlobalToLocal( self->decomps[1], self->srcs[p_i][ind_i] );
+			insist( Decomp_GlobalToLocal( self->decomps[1], self->srcs[p_i][ind_i], self->srcs[p_i] + ind_i ) );
 	}
 	FreeObject( invMap );
 }
 
 void DecompTransfer_BuildArray( DecompTransfer* self, DecompTransfer_Array* array ) {
-	CommTopology*	commTopo;
-	unsigned	rank;
 	unsigned	nInc;
 	unsigned*	inc;
 
 	assert( self );
 	assert( self->commTopo );
 
-	/* Shortcuts. */
-	commTopo = self->commTopo;
-	MPI_Comm_rank( commTopo->comm, (int*)&rank );
-
 	/* Extract incidence. */
-	CommTopology_GetIncidence( commTopo, rank, &nInc, &inc );
+	CommTopology_GetIncidence( self->commTopo, &nInc, &inc );
 
 	if( nInc ) {
 		/* Determine sink (local) information. */

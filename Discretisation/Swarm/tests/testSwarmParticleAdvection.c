@@ -35,7 +35,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: testSwarmParticleAdvection.c 4014 2007-02-23 02:15:16Z KathleenHumble $
+** $Id: testSwarmParticleAdvection.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -72,7 +72,7 @@ double Dt( void* context ) {
 	return 2.0;
 }
 
-// TODO: should be removed once we get saving of swarms onto disc context...
+/*  TODO: should be removed once we get saving of swarms onto disc context... */
 void SaveSwarms( void* context );
 
 /** Global so other funcs can use */
@@ -211,7 +211,7 @@ int main( int argc, char* argv[] ) {
 	}
 	
 	if( rank == procToWatch ) {
-		//Print( swarm, stream );
+          /* Print( swarm, stream ); */
 	}	
 
 	Stg_Component_Build( context, 0 /* dummy */, False );
@@ -230,8 +230,8 @@ int main( int argc, char* argv[] ) {
 
 	/* Delete stuff */
 	/* Deleting the component factory automatically deletes all components in it */
-	// TODO: should the component factory be renamed a comp. manager? Since it deletes
-	//	components as well?
+	/* TODO: should the component factory be renamed a comp. manager? Since it deletes */
+	/* 	components as well? */
 	Stg_Class_Delete( cf );
 	/* Remaining registers etc that don't live on the context or anything */
 	Stg_Class_Delete( extensionMgr_Register );

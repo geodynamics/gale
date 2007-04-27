@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: DofLayout.c 3884 2006-10-26 05:26:19Z KathleenHumble $
+** $Id: DofLayout.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -79,10 +79,11 @@ DofLayout* DofLayout_DefaultNew( Name name )
 			name,
 			False,
 			NULL, 
-			0);
+			0, 
+			NULL );
 }
 
-DofLayout* DofLayout_New( Name name, Variable_Register* variableRegister, Index numItemsInLayout )
+DofLayout* DofLayout_New( Name name, Variable_Register* variableRegister, Index numItemsInLayout, void* mesh )
 {
 	return _DofLayout_New(
 			sizeof(DofLayout), 
@@ -99,11 +100,12 @@ DofLayout* DofLayout_New( Name name, Variable_Register* variableRegister, Index 
 			name, 
 			True,
 			variableRegister, 
-			numItemsInLayout);
+			numItemsInLayout, 
+			mesh );
 }
 
 
-void DofLayout_Init(DofLayout* self, Name name, Variable_Register* variableRegister, Index numItemsInLayout )
+void DofLayout_Init(DofLayout* self, Name name, Variable_Register* variableRegister, Index numItemsInLayout, void* mesh )
 {
 	/* General info */
 	self->type = Variable_Type;
@@ -123,7 +125,7 @@ void DofLayout_Init(DofLayout* self, Name name, Variable_Register* variableRegis
 	_Stg_Class_Init((Stg_Class*)self);
 	
 	/* Stg_Class info */
-	_DofLayout_Init(self, variableRegister, numItemsInLayout, 0, NULL);
+	_DofLayout_Init(self, variableRegister, numItemsInLayout, 0, NULL, mesh);
 }
 
 DofLayout* _DofLayout_New( 
@@ -141,7 +143,8 @@ DofLayout* _DofLayout_New(
 		Name						name,
 		Bool						initFlag,
 		Variable_Register*				variableRegister,
-		Index						numItemsInLayout )
+		Index						numItemsInLayout, 
+		void*						mesh )
 {
 	DofLayout*	self;
 	
@@ -156,20 +159,22 @@ DofLayout* _DofLayout_New(
 	
 	/* Stg_Class info */
 	if( initFlag ){
-		_DofLayout_Init(self, variableRegister, numItemsInLayout, 0, NULL );
+		_DofLayout_Init(self, variableRegister, numItemsInLayout, 0, NULL, mesh );
 	}
 	
 	return self;
 }
 
 
-void _DofLayout_Init(void* dofLayout, Variable_Register* variableRegister, Index numItemsInLayout, Variable_Index baseVariableCount, Variable** baseVariableArray )
+void _DofLayout_Init(void* dofLayout, Variable_Register* variableRegister, 
+		     Index numItemsInLayout, Variable_Index baseVariableCount, Variable** baseVariableArray, void* _mesh )
 {
 	DofLayout*	self = (DofLayout*)dofLayout;
+	Mesh*		mesh = (Mesh*)_mesh;
 	
 	self->isConstructed = True;
 	self->_variableRegister = variableRegister;
-	
+
 	self->_numItemsInLayout = numItemsInLayout;
 	self->_variableEnabledSets = NULL;
 	self->_totalVarCount = 0;
@@ -177,8 +182,9 @@ void _DofLayout_Init(void* dofLayout, Variable_Register* variableRegister, Index
 	
 	self->dofCounts = NULL;
 
-	/* Adds each variable in this list as a base degree of freedom to each item in DofLayout */
-	DofLayout_AddAllFromVariableArray( self, baseVariableCount, baseVariableArray );
+	self->mesh = mesh;
+	self->nBaseVariables = baseVariableCount;
+	self->baseVariables = baseVariableArray;
 }
 
 
@@ -282,26 +288,20 @@ void _DofLayout_Construct( void* dofLayout, Stg_ComponentFactory* cf, void* data
 {
 	DofLayout *             self              = (DofLayout*)dofLayout;
 	Dictionary*             thisComponentDict = NULL;
-	Name                    countName         = NULL;
 	void*                   variableRegister  = NULL;
-	void*                   pointerRegister   = NULL;
-	int*                    count             = NULL;
 	Dictionary_Entry_Value* list;
 	Variable_Index          baseVariableCount = 0;
 	Variable**              baseVariableList  = NULL;
+	Mesh*			mesh;
 
-	// Get component's dictionary setup //
+	/* Get component's dictionary setup */
 	assert( cf->componentDict );
 	thisComponentDict = Dictionary_GetDictionary( cf->componentDict, self->name );
 	assert( thisComponentDict );
-	
-	countName = Stg_ComponentFactory_GetString( cf, self->name, "Count", "");
-	pointerRegister = (Stg_ObjectList*)Stg_ObjectList_Get( cf->registerRegister, "Pointer_Register" );
-	assert( pointerRegister );
 
-	count = Stg_ObjectList_Get( pointerRegister, countName );
-	assert( count );
-	
+	/* Get the mesh. */
+	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "mesh", Mesh, True, data );
+
 	variableRegister = (void*)Stg_ObjectList_Get( cf->registerRegister, "Variable_Register" );
 	assert( variableRegister );
 
@@ -328,10 +328,7 @@ void _DofLayout_Construct( void* dofLayout, Stg_ComponentFactory* cf, void* data
 		}
 	}
 	
-	_DofLayout_Init( self, variableRegister, *count, baseVariableCount, baseVariableList );
-
-	if (baseVariableList)
-		Memory_Free( baseVariableList );
+	_DofLayout_Init( self, variableRegister, 0, baseVariableCount, baseVariableList, mesh );
 }
 
 void _DofLayout_Build( void* dofLayout, void* data ) {
@@ -339,7 +336,18 @@ void _DofLayout_Build( void* dofLayout, void* data ) {
 	Index		indexCount;
 	Index*		indices;
 	Index		set_I, i, pos;
-	
+
+	assert( self );
+
+	/* Build mesh and extract domain size, if required. */
+	if( self->mesh ) {
+		Build( self->mesh, data, False );
+		self->_numItemsInLayout = Mesh_GetDomainSize( self->mesh, MT_VERTEX );
+	}
+
+	/* Adds each variable in this list as a base degree of freedom to each item in DofLayout */
+	DofLayout_AddAllFromVariableArray( self, self->nBaseVariables, self->baseVariables );
+
 	/* ensure variables are built */
 	for( i = 0; i < self->_totalVarCount; i++ )
 		Build( Variable_Register_GetByIndex( self->_variableRegister, self->_varIndicesMapping[i] ), data, False );
@@ -448,7 +456,6 @@ Dof_Index _DofLayout_AddVariable_ByName(void* dofLayout, Name varName) {
 /*--------------------------------------------------------------------------------------------------------------------------
 ** Public functions
 */
-
 
 void DofLayout_AddDof_ByVarIndex(void* dofLayout, Variable_Index varIndex, Index index) {
 	DofLayout*	self = (DofLayout*)dofLayout;
@@ -607,7 +614,7 @@ void DofLayout_AddAllFromVariableArray( void* dofLayout, Variable_Index variable
 }
 
 
-void DofLayout_SaveAllVariablesToFiles( void* dofLayout, char* prefixString, Processor_Index rank ) {
+void DofLayout_SaveAllVariablesToFiles( void* dofLayout, char* prefixString, unsigned rank ) {
 	DofLayout*  self = (DofLayout*) dofLayout;
 	Index       ownedVar_I, var_I;
 	Variable*   variable = NULL;
@@ -639,7 +646,7 @@ void DofLayout_SaveAllVariablesToFiles( void* dofLayout, char* prefixString, Pro
 }
 
 
-void DofLayout_LoadAllVariablesFromFiles( void* dofLayout, char* prefixString, Processor_Index rank ) {
+void DofLayout_LoadAllVariablesFromFiles( void* dofLayout, char* prefixString, unsigned rank ) {
 	DofLayout*  self = (DofLayout*) dofLayout;
 	Index       ownedVar_I, var_I;
 	Variable*   variable = NULL;

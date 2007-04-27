@@ -147,7 +147,7 @@
 	void *HashTable_FindEntryFunction( HashTable *ht, const void *voidKey, unsigned int keyLen );
 		
 	#define HashTable_FindEntry( ht, voidKey, keyLen, type ) \
-		(type*) HashTable_FindEntryFunction( ht, voidKey, keyLen );
+		(type*) HashTable_FindEntryFunction( ht, voidKey, keyLen )
 	
 	/** Deletes a node from the list with the node-data being passed in as a parameter */
 	int HashTable_DeleteEntry( HashTable *ht, const void *voidKey, unsigned int keyLen );

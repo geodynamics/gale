@@ -35,7 +35,7 @@
 ** Comments:
 **	None so far.
 **
-** $Id: Mesh.h 3860 2006-10-14 18:12:14Z LukeHodkinson $
+** $Id: Mesh.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -44,36 +44,31 @@
 	
 	#include "types.h"
 	#include "shortcuts.h"
+
 	#include "Grid.h"
 	#include "CommTopology.h"
 	#include "Decomp.h"
 	#include "Decomp_Sync.h"
-	#include "Decomp_Sync_Claim.h"
-	#include "Decomp_Sync_Negotiate.h"
+	#include "Decomp_Sync_Array.h"
+	#include "Decomposer.h"
 	#include "DecompTransfer.h"
 	#include "MeshTopology.h"
+	#include "Mesh_ElementType.h"
+	#include "Mesh_HexType.h"
+	#include "Mesh_CentroidType.h"
+	#include "Mesh_Algorithms.h"
+	#include "Mesh_HexAlgorithms.h"
+	#include "Mesh_RegularAlgorithms.h"
+	#include "Mesh_CentroidAlgorithms.h"
+	#include "MeshClass.h"
 	#include "MeshGenerator.h"
 	#include "CartesianGenerator.h"
 	#include "MeshAdaptor.h"
 	#include "SurfaceAdaptor.h"
+	#include "CompressionAdaptor.h"
+	#include "MeshVariable.h"
 
-	#include "ElementLayout.h"
-	#include "HexaEL.h"
-	#include "ParallelPipedHexaEL.h"
-	#include "IrregEL.h"
-	#include "NodeLayout.h"
-	#include "CornerNL.h"
-	#include "BodyNL.h"
-	#include "MeshDecomp.h"
-	#include "HexaMD.h"
-	/*#include "StencilMD.h"*/
-	#include "DummyMD.h"
-	#include "MeshGeometry.h"
-	#include "MeshLayout.h"
-	#include "MeshClass.h"
-	#include "ShadowInfo.h"
 	#include "Init.h"
 	#include "Finalise.h"
 
 #endif /* __Discretisaton_Mesh_h__ */
-

@@ -45,19 +45,14 @@ CommTopology* buildCompleteIncidence( unsigned rank, unsigned nProcs,
 	CommTopology*	commTopo;
 	unsigned	inc_i;
 
-	commTopo = CommTopology_New( "" );
+	commTopo = CommTopology_New();
 
 	*nInc = nProcs - 1;
-	if( nProcs > 1 ) {
-		*inc = Memory_Alloc_Array_Unnamed( unsigned, *nInc );
+	*inc = AllocArray( unsigned, *nInc );
+	for( inc_i = 0; inc_i < *nInc; inc_i++ )
+		(*inc)[inc_i] = (rank + inc_i + 1) % nProcs;
 
-		for( inc_i = 0; inc_i < *nInc; inc_i++ )
-			(*inc)[inc_i] = (rank + 1) % nProcs;
-
-		CommTopology_SetIncidence( commTopo, *nInc, *inc );
-	}
-	else
-		*inc = NULL;
+	CommTopology_SetIncidence( commTopo, *nInc, *inc );
 
 	return commTopo;
 }
@@ -67,7 +62,7 @@ CommTopology* buildPartialIncidence( unsigned rank, unsigned nProcs,
 {
 	CommTopology*	commTopo;
 
-	commTopo = CommTopology_New( "" );
+	commTopo = CommTopology_New();
 
 	if( nProcs > 1 ) {
 		*nInc = (rank == 0 || rank == nProcs - 1) ? 1 : 2;
@@ -79,6 +74,35 @@ CommTopology* buildPartialIncidence( unsigned rank, unsigned nProcs,
 			(*inc)[(rank > 0) ? 1 : 0] = rank + 1;
 
 		CommTopology_SetIncidence( commTopo, *nInc, *inc );
+	}
+	else {
+		*nInc = 0;
+		*inc = NULL;
+	}
+
+	return commTopo;
+}
+
+CommTopology* buildAddIncidence( unsigned rank, unsigned nProcs, 
+				 unsigned* nInc, unsigned** inc )
+{
+	CommTopology*	commTopo;
+
+	commTopo = CommTopology_New();
+
+	if( nProcs > 1 ) {
+		*nInc = (rank == 0 || rank == nProcs - 1) ? 1 : 2;
+		*inc = AllocArray( unsigned, *nInc );
+
+		if( rank > 0 )
+			(*inc)[0] = rank - 1;
+		CommTopology_SetIncidence( commTopo, (rank > 0) ? 1 : 0, *inc );
+
+		if( rank < nProcs - 1 )
+			(*inc)[(rank > 0) ? 1 : 0] = rank + 1;
+		CommTopology_AddIncidence( commTopo, 
+					   (rank < nProcs - 1) ? 1 : 0, 
+					   (*inc) + ((rank > 0) ? 1 : 0) );
 	}
 	else {
 		*nInc = 0;
@@ -102,17 +126,19 @@ void buildGatherArrays( unsigned rank, unsigned nProcs,
 void buildAlltoallArrays( unsigned rank, unsigned nProcs, CommTopology* commTopo, 
 			  unsigned** srcSizes, unsigned*** srcs )
 {
+	unsigned	nIncRanks;
 	unsigned	p_i, p_j;
 
-	if( !commTopo->nInc ) {
-		*srcSizes = NULL;
+	if( nProcs == 1 ) {
+		*srcSizes = 0;
 		*srcs = NULL;
 		return;
 	}
 
-	*srcSizes = Memory_Alloc_Array_Unnamed( unsigned, commTopo->nInc );
-	*srcs = Memory_Alloc_2DArray_Unnamed( unsigned, commTopo->nInc, nProcs );
-	for( p_i = 0; p_i < commTopo->nInc; p_i++ ) {
+	nIncRanks = CommTopology_GetIncidenceSize( commTopo );
+	*srcSizes = Memory_Alloc_Array_Unnamed( unsigned, nIncRanks );
+	*srcs = Memory_Alloc_2DArray_Unnamed( unsigned, nIncRanks, nProcs );
+	for( p_i = 0; p_i < nIncRanks; p_i++ ) {
 		(*srcSizes)[p_i] = nProcs;
 		for( p_j = 0; p_j < nProcs; p_j++ )
 			(*srcs)[p_i][p_j] = rank;
@@ -120,26 +146,19 @@ void buildAlltoallArrays( unsigned rank, unsigned nProcs, CommTopology* commTopo
 }
 
 
-Bool testConstruct( unsigned rank, unsigned nProcs, unsigned watch ) {
-	CommTopology*	commTopo;
-
-	commTopo = CommTopology_New( "" );
-	FreeObject( commTopo );
-
-	return True;
-}
-
 Bool testSetComm( unsigned rank, unsigned nProcs, unsigned watch ) {
 	CommTopology*	commTopo;
 	Bool		result = True;
 
-	commTopo = CommTopology_New( "" );
+	commTopo = CommTopology_New();
 
 	CommTopology_SetComm( commTopo, MPI_COMM_WORLD );
 	if( rank == watch ) {
 		if( commTopo->comm != MPI_COMM_WORLD || 
-		    commTopo->nInc != 0 || 
-		    commTopo->inc != NULL )
+		    commTopo->nIncRanks != 0 || 
+		    commTopo->incRanks != NULL || 
+		    commTopo->order != NULL || 
+		    UIntMap_GetSize( commTopo->glMap ) )
 		{
 			result = False;
 			goto done;
@@ -156,13 +175,15 @@ Bool testEmptyInc( unsigned rank, unsigned nProcs, unsigned watch ) {
 	CommTopology*	commTopo;
 	Bool		result = True;
 
-	commTopo = CommTopology_New( "" );
+	commTopo = CommTopology_New();
 	CommTopology_SetIncidence( commTopo, 0, NULL );
 
 	if( rank == watch ) {
 		if( commTopo->comm != MPI_COMM_WORLD || 
-		    commTopo->nInc != 0 || 
-		    commTopo->inc != NULL )
+		    commTopo->nIncRanks != 0 || 
+		    commTopo->incRanks != NULL || 
+		    commTopo->order != NULL || 
+		    UIntMap_GetSize( commTopo->glMap ) )
 		{
 			result = False;
 			goto done;
@@ -186,14 +207,31 @@ Bool testCompInc( unsigned rank, unsigned nProcs, unsigned watch ) {
 
 	if( rank == watch ) {
 		if( commTopo->comm != MPI_COMM_WORLD || 
-		    commTopo->nInc != nInc )
+		    commTopo->nIncRanks != nInc )
 		{
 			result = False;
 			goto done;
 		}
 
-		for( inc_i = 0; inc_i < nInc; inc_i++ )
-			if( commTopo->inc[inc_i] != inc[inc_i] ) break;
+		if( nProcs > 1 && 
+		    (!commTopo->incRanks || 
+		     !commTopo->order || 
+		     !UIntMap_GetSize( commTopo->glMap )) )
+		{
+			result = False;
+			goto done;
+		}
+
+		for( inc_i = 0; inc_i < nInc; inc_i++ ) {
+			unsigned	local;
+
+			if( CommTopology_LocalToGlobal( commTopo, inc_i ) != inc[inc_i] || 
+			    !CommTopology_GlobalToLocal( commTopo, inc[inc_i], &local ) || 
+			    local != inc_i )
+			{
+				break;
+			}
+		}
 		if( inc_i < nInc ) {
 			result = False;
 			goto done;
@@ -218,14 +256,80 @@ Bool testPartInc( unsigned rank, unsigned nProcs, unsigned watch ) {
 
 	if( rank == watch ) {
 		if( commTopo->comm != MPI_COMM_WORLD || 
-		    commTopo->nInc != nInc )
+		    commTopo->nIncRanks != nInc )
 		{
 			result = False;
 			goto done;
 		}
 
-		for( inc_i = 0; inc_i < nInc; inc_i++ )
-			if( commTopo->inc[inc_i] != inc[inc_i] ) break;
+		if( nProcs > 1 && 
+		    (!commTopo->incRanks || 
+		     !commTopo->order || 
+		     !UIntMap_GetSize( commTopo->glMap )) )
+		{
+			result = False;
+			goto done;
+		}
+
+		for( inc_i = 0; inc_i < nInc; inc_i++ ) {
+			unsigned	local;
+
+			if( CommTopology_LocalToGlobal( commTopo, inc_i ) != inc[inc_i] || 
+			    !CommTopology_GlobalToLocal( commTopo, inc[inc_i], &local ) || 
+			    local != inc_i )
+			{
+				break;
+			}
+		}
+		if( inc_i < nInc ) {
+			result = False;
+			goto done;
+		}
+	}
+
+done:
+	FreeArray( inc );
+	FreeObject( commTopo );
+
+	return result;
+}
+
+Bool testAddInc( unsigned rank, unsigned nProcs, unsigned watch ) {
+	CommTopology*	commTopo;
+	Bool		result = True;
+	unsigned	nInc;
+	unsigned*	inc;
+	unsigned	inc_i;
+
+	commTopo = buildAddIncidence( rank, nProcs, &nInc, &inc );
+
+	if( rank == watch ) {
+		if( commTopo->comm != MPI_COMM_WORLD || 
+		    commTopo->nIncRanks != nInc )
+		{
+			result = False;
+			goto done;
+		}
+
+		if( nProcs > 1 && 
+		    (!commTopo->incRanks || 
+		     !commTopo->order || 
+		     !UIntMap_GetSize( commTopo->glMap )) )
+		{
+			result = False;
+			goto done;
+		}
+
+		for( inc_i = 0; inc_i < nInc; inc_i++ ) {
+			unsigned	local;
+
+			if( CommTopology_LocalToGlobal( commTopo, inc_i ) != inc[inc_i] || 
+			    !CommTopology_GlobalToLocal( commTopo, inc[inc_i], &local ) || 
+			    local != inc_i )
+			{
+				break;
+			}
+		}
 		if( inc_i < nInc ) {
 			result = False;
 			goto done;
@@ -253,12 +357,15 @@ Bool testAllgather( unsigned rank, unsigned nProcs, unsigned watch ) {
 	commTopo = buildPartialIncidence( rank, nProcs, &nInc, &inc );
 	buildGatherArrays( rank, nProcs, &srcSize, &src );
 
-	CommTopology_Allgather( commTopo, srcSize, src, &dstSizes, (void***)&dst, sizeof(unsigned) );
+	CommTopology_Allgather( commTopo, 
+				srcSize, src, 
+				&dstSizes, (void***)&dst, 
+				sizeof(unsigned) );
 
 	if( rank == watch ) {
-		for( p_i = 0; p_i < commTopo->nInc; p_i++ ) {
+		for( p_i = 0; p_i < nInc; p_i++ ) {
 			for( e_i = 0; e_i < srcSize; e_i++ ) {
-				if( dst[p_i][e_i] != commTopo->inc[p_i] ) {
+				if( dst[p_i][e_i] != inc[p_i] ) {
 					result = False;
 					goto done;
 				}
@@ -289,12 +396,15 @@ Bool testAlltoall( unsigned rank, unsigned nProcs, unsigned watch ) {
 	commTopo = buildPartialIncidence( rank, nProcs, &nInc, &inc );
 	buildAlltoallArrays( rank, nProcs, commTopo, &srcSizes, &srcs );
 
-	CommTopology_Alltoall( commTopo, srcSizes, srcs, &dstSizes, (void***)&dst, sizeof(unsigned) );
+	CommTopology_Alltoall( commTopo, 
+			       srcSizes, (void**)srcs, 
+			       &dstSizes, (void***)&dst, 
+			       sizeof(unsigned) );
 
 	if( rank == watch ) {
-		for( p_i = 0; p_i < commTopo->nInc; p_i++ ) {
+		for( p_i = 0; p_i < nInc; p_i++ ) {
 			for( e_i = 0; e_i < srcSizes[p_i]; e_i++ ) {
-				if( dst[p_i][e_i] != commTopo->inc[p_i] ) {
+				if( dst[p_i][e_i] != inc[p_i] ) {
 					result = False;
 					goto done;
 				}
@@ -315,11 +425,11 @@ done:
 
 #define nTests	7
 
-TestSuite_Test	tests[nTests] = {{"construct", testConstruct, 10}, 
-				 {"set communicator", testSetComm, 10}, 
+TestSuite_Test	tests[nTests] = {{"set communicator", testSetComm, 10}, 
 				 {"empty incidence", testEmptyInc, 10 }, 
 				 {"partial incidence", testPartInc, 10}, 
 				 {"complete incidence", testCompInc, 10}, 
+				 {"adding incidence", testAddInc, 10}, 
 				 {"all gather", testAllgather, 10}, 
 				 {"all to all", testAlltoall, 10}};
 

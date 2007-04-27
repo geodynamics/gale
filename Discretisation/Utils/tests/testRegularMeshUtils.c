@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testRegularMeshUtils.c 3555 2006-05-10 07:05:46Z PatrickSunter $
+** $Id: testRegularMeshUtils.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -39,7 +39,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <mpi.h>
 
 struct _Node
 {
@@ -52,22 +51,46 @@ struct _Element
 };
 
 
+Mesh* buildMesh( unsigned nDims, unsigned* size, 
+		     double* minCrds, double* maxCrds, 
+		     ExtensionManager_Register* emReg )
+{
+	CartesianGenerator*	gen;
+	Mesh*			mesh;
+	unsigned		maxDecomp[3] = {0, 1, 1};
+
+	gen = CartesianGenerator_New( "" );
+	CartesianGenerator_SetDimSize( gen, nDims );
+	CartesianGenerator_SetTopologyParams( gen, size, 0, NULL, maxDecomp );
+	CartesianGenerator_SetGeometryParams( gen, minCrds, maxCrds );
+
+	mesh = Mesh_New( "" );
+	Mesh_SetExtensionManagerRegister( mesh, emReg );
+	Mesh_SetGenerator( mesh, gen );
+
+	Build( mesh, NULL, False );
+	Initialise( mesh, NULL, False );
+
+	KillObject( mesh->generator );
+
+	return mesh;
+}
+
+
 int main(int argc, char *argv[])
 {
-	MPI_Comm		CommWorld;
-	int			rank;
-	int			procCount;
-	int			procToWatch;
-	Dictionary*		dictionary;
+	MPI_Comm			CommWorld;
+	int				rank;
+	int				procCount;
+	int				procToWatch;
 	ExtensionManager_Register*	extensionMgr_Register;
-	Topology*		nTopology;
-	ElementLayout*		eLayout;
-	NodeLayout*		nLayout;
-	MeshDecomp*		decomp;
-	MeshLayout*		ml;
-	Mesh*			mesh;
-	Stream*			stream;
+	Stream*				stream;
 
+	unsigned	nDims = 3;
+	unsigned	meshSize[3] = {6, 6, 6};
+	double		minCrds[3] = {0.0, 0.0, 0.0};
+	double		maxCrds[3] = {1.0, 1.0, 1.0};
+	Mesh*		mesh;
 	
 	/* Initialise MPI, get world info */
 	MPI_Init(&argc, &argv);
@@ -84,84 +107,41 @@ int main(int argc, char *argv[])
 	stream = Journal_Register (Info_Type, "myStream");
 	procToWatch = argc >= 2 ? atoi(argv[1]) : 0;
 	
-	dictionary = Dictionary_New();
-	Dictionary_Add( dictionary, "rank", Dictionary_Entry_Value_FromUnsignedInt( rank ) );
-	Dictionary_Add( dictionary, "numProcessors", Dictionary_Entry_Value_FromUnsignedInt( procCount ) );
-	Dictionary_Add( dictionary, "meshSizeI", Dictionary_Entry_Value_FromUnsignedInt( 7 ) );
-	Dictionary_Add( dictionary, "meshSizeJ", Dictionary_Entry_Value_FromUnsignedInt( 7 ) );
-	Dictionary_Add( dictionary, "meshSizeK", Dictionary_Entry_Value_FromUnsignedInt( 7 ) );
-	Dictionary_Add( dictionary, "allowUnusedCPUs", Dictionary_Entry_Value_FromBool( False ) );
-	Dictionary_Add( dictionary, "allowPartitionOnNode", Dictionary_Entry_Value_FromBool( True ) );
-	Dictionary_Add( dictionary, "allowUnbalancing", Dictionary_Entry_Value_FromBool( False ) );
-	Dictionary_Add( dictionary, "shadowDepth", Dictionary_Entry_Value_FromUnsignedInt( 1 ) );
-	
-	nTopology = (Topology*)IJK6Topology_New( "IJK6Topology", dictionary );
-	eLayout = (ElementLayout*)ParallelPipedHexaEL_New( "PPHexaEL", 3, dictionary );
-	nLayout = (NodeLayout*)CornerNL_New( "CornerNL", dictionary, eLayout, nTopology );
-	decomp = (MeshDecomp*)HexaMD_New( "HexaMD", dictionary, MPI_COMM_WORLD, eLayout, nLayout );
-	ml = MeshLayout_New( "MeshLayout", eLayout, nLayout, decomp );
-	
 	extensionMgr_Register = ExtensionManager_Register_New();
-	mesh = Mesh_New( "Mesh", ml, sizeof(Node), sizeof(Element), extensionMgr_Register, dictionary );
-	
-	mesh->buildNodeLocalToGlobalMap = True;
-	mesh->buildNodeDomainToGlobalMap = True;
-	mesh->buildNodeGlobalToLocalMap = True;
-	mesh->buildNodeGlobalToDomainMap = True;
-	mesh->buildNodeNeighbourTbl = True;
-	mesh->buildNodeElementTbl = True;
-	mesh->buildElementLocalToGlobalMap = True;
-	mesh->buildElementDomainToGlobalMap = True;
-	mesh->buildElementGlobalToDomainMap = True;
-	mesh->buildElementGlobalToLocalMap = True;
-	mesh->buildElementNeighbourTbl = True;
-	mesh->buildElementNodeTbl = True;
-	
-	Build( mesh, 0, False );
-	Initialise(mesh, 0, False );
-	
-
+	mesh = buildMesh( nDims, meshSize, minCrds, maxCrds, extensionMgr_Register );
 	
 	if (rank == procToWatch)
 	{
-		Node_Index				currElementNodesCount=0;	
-		Node_Index*         	currElementNodes = NULL;
-		Element_Index          	element_dI = 0;
-		Node_Index             	refNode_eI = 0;
-		Node_Index				node_Diagonal = 0;
-		Node_Index				node_Diagonal_gI = 0;
+		unsigned		currElementNodesCount=0;	
+		unsigned*         	currElementNodes = NULL;
+		unsigned          	element_dI = 0;
+		unsigned             	refNode_eI = 0;
+		unsigned		node_Diagonal = 0;
+		unsigned		node_Diagonal_gI = 0;
 		
-		// only use this while setting up the test
-		//Print(mesh, stream);
+		/* only use this while setting up the test
+		   Print(mesh, stream);
 				
-		// Some tests involving RegularMeshUtils_GetDiagOppositeAcrossElementNodeIndex()
+		   Some tests involving RegularMeshUtils_GetDiagOppositeAcrossElementNodeIndex() */
 		
-		
-		for (element_dI=0; element_dI < mesh->elementDomainCount; element_dI++) {
-			
-			currElementNodes = mesh->elementNodeTbl[element_dI];
-			currElementNodesCount = mesh->elementNodeCountTbl[element_dI];
+		for (element_dI=0; element_dI < Mesh_GetDomainSize( mesh, nDims ); element_dI++) {
+			Mesh_GetIncidence( mesh, nDims, element_dI, MT_VERTEX, 
+					   &currElementNodesCount, &currElementNodes );
 			
 			for (refNode_eI = 0; refNode_eI < currElementNodesCount; refNode_eI++ ) {
 				
 				node_Diagonal = RegularMeshUtils_GetDiagOppositeAcrossElementNodeIndex(mesh, element_dI, 
 					currElementNodes[refNode_eI]) ;
-				node_Diagonal_gI = Mesh_NodeMapDomainToGlobal( mesh, node_Diagonal );
-				//print message stating: Element #, curr node #, diag opp node #
+				node_Diagonal_gI = Mesh_DomainToGlobal( mesh, MT_VERTEX, node_Diagonal );
+				/*print message stating: Element #, curr node #, diag opp node #*/
 				printf("Element #: %d, Current Node #: %d, Diagonal Node #: %d, (%d) \n",
 					element_dI, currElementNodes[refNode_eI], node_Diagonal, node_Diagonal_gI);
 				
 			}
-		}	
+		}
 	}
 	
 	Stg_Class_Delete(mesh);
-	Stg_Class_Delete(ml);
-	Stg_Class_Delete(decomp);
-	Stg_Class_Delete(nLayout);
-	Stg_Class_Delete(eLayout);
-	Stg_Class_Delete( nTopology );
-	Stg_Class_Delete(dictionary);
 	
 	DiscretisationMesh_Finalise();
 	DiscretisationShape_Finalise();

@@ -47,14 +47,15 @@
 	/** Virtual function types */
 
 	/** MeshAdaptor class contents */
-	#define __MeshAdaptor					\
-		/* General info */				\
-		__MeshGenerator					\
-								\
-		/* Virtual info */				\
-								\
-		/* MeshAdaptor info */				\
-		MeshGenerator*		generator;
+	#define __MeshAdaptor				\
+		/* General info */			\
+		__MeshGenerator				\
+							\
+		/* Virtual info */			\
+							\
+		/* MeshAdaptor info */			\
+		MeshGenerator*		generator;	\
+		Mesh*			srcMesh;
 
 	struct MeshAdaptor { __MeshAdaptor };
 
@@ -62,10 +63,10 @@
 	** Constructors
 	*/
 
-	#define MESHADAPTOR_DEFARGS	\
+	#define MESHADAPTOR_DEFARGS \
 		MESHGENERATOR_DEFARGS
 
-	#define MESHADAPTOR_PASSARGS	\
+	#define MESHADAPTOR_PASSARGS \
 		MESHGENERATOR_PASSARGS
 
 	MeshAdaptor* _MeshAdaptor_New( MESHADAPTOR_DEFARGS );
@@ -75,26 +76,20 @@
 	** Virtual functions
 	*/
 
-	void _MeshAdaptor_Delete( void* meshAdaptor );
-	void _MeshAdaptor_Print( void* meshAdaptor, Stream* stream );
-
-	#define MeshAdaptor_Copy( self ) \
-		(Mesh*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
-	#define MeshAdaptor_DeepCopy( self ) \
-		(Mesh*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _MeshAdaptor_Copy( void* meshAdaptor, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
-
-	void _MeshAdaptor_Construct( void* meshAdaptor, Stg_ComponentFactory* cf, void* data );
-	void _MeshAdaptor_Build( void* meshAdaptor, void* data );
-	void _MeshAdaptor_Initialise( void* meshAdaptor, void* data );
-	void _MeshAdaptor_Execute( void* meshAdaptor, void* data );
-	void _MeshAdaptor_Destroy( void* meshAdaptor, void* data );
+	void _MeshAdaptor_Delete( void* adaptor );
+	void _MeshAdaptor_Print( void* adaptor, Stream* stream );
+	void _MeshAdaptor_Construct( void* adaptor, Stg_ComponentFactory* cf, void* data );
+	void _MeshAdaptor_Build( void* adaptor, void* data );
+	void _MeshAdaptor_Initialise( void* adaptor, void* data );
+	void _MeshAdaptor_Execute( void* adaptor, void* data );
+	void _MeshAdaptor_Destroy( void* adaptor, void* data );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Public functions
 	*/
 
-	void MeshAdaptor_SetGenerator( void* meshAdaptor, void* generator );
+	void MeshAdaptor_SetGenerator( void* adaptor, void* generator );
+	void MeshAdaptor_SetSourceMesh( void* adaptor, void* mesh );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Private Member functions

@@ -35,7 +35,7 @@
 ** Comments:
 **	None so far.
 **
-** $Id: Swarm.h 3887 2006-11-06 05:19:51Z LukeHodkinson $
+** $Id: Swarm.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -45,6 +45,7 @@
 	#include "types.h"
 	#include "shortcuts.h"
 
+	#include "ShadowInfo.h"
 	#include "StandardParticle.h"
 	#include "IntegrationPoint.h"
 	#include "CellLayout.h"

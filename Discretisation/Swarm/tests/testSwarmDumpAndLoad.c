@@ -34,7 +34,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: testSwarmDumpAndLoad.c 3634 2006-06-13 09:51:29Z PatrickSunter $
+** $Id: testSwarmDumpAndLoad.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -66,6 +66,38 @@ struct _Particle {
 	unsigned int        testValue;
 };
 
+Mesh* buildMesh( unsigned nDims, unsigned* size, 
+		 double* minCrds, double* maxCrds, 
+		 ExtensionManager_Register* emReg )
+{
+	CartesianGenerator*	gen;
+	Mesh*			mesh;
+
+	gen = CartesianGenerator_New( "" );
+	CartesianGenerator_SetDimSize( gen, nDims );
+	MeshGenerator_SetDimState( gen, 2, False );
+	MeshGenerator_SetDimState( gen, 1, True );
+	MeshGenerator_ClearIncidenceStates( gen );
+	MeshGenerator_SetIncidenceState( gen, 3, 0, True );
+	MeshGenerator_SetIncidenceState( gen, 1, 0, True );
+	MeshGenerator_SetIncidenceState( gen, 0, 3, True );
+	MeshGenerator_SetIncidenceState( gen, 0, 1, True );
+	MeshGenerator_SetIncidenceState( gen, 0, 0, True );
+	CartesianGenerator_SetTopologyParams( gen, size, 0, NULL, NULL );
+	CartesianGenerator_SetGeometryParams( gen, minCrds, maxCrds );
+
+	mesh = Mesh_New( "" );
+	Mesh_SetExtensionManagerRegister( mesh, emReg );
+	Mesh_SetGenerator( mesh, gen );
+
+	Build( mesh, NULL, False );
+	Initialise( mesh, NULL, False );
+
+	KillObject( mesh->generator );
+
+	return mesh;
+}
+
 void UpdateParticlePositionsTowardsAttractor( 
 		Swarm* swarm,
 		Coord attractorPoint,
@@ -78,11 +110,10 @@ int main( int argc, char* argv[] ) {
 	int				numProcessors;
 	int				procToWatch;
 	Dictionary*			dictionary;
-	Topology*			nTopology;
-	ElementLayout*			eLayout;
-	NodeLayout*			nLayout;
-	MeshDecomp*			decomp;
-	MeshLayout*			layout;
+	unsigned	nDims = 3;
+	unsigned	meshSize[3] = {32, 32, 32};
+	double		minCrds[3] = {0.0, 0.0, 0.0};
+	double		maxCrds[3] = {1.0, 1.0, 1.0};
 	ExtensionManager_Register*	extensionMgr_Register;
 	Mesh*				mesh;
 	ElementCellLayout*		elementCellLayout;
@@ -90,7 +121,6 @@ int main( int argc, char* argv[] ) {
 	Swarm*				swarm;
 	Stream*				stream;
 	Index				timeStep;
-	BlockGeometry*			blockGeom;
 	Coord				attractorPoint;
 	Index				dim_I;
 	AbstractContext*                context = NULL;
@@ -140,33 +170,13 @@ int main( int argc, char* argv[] ) {
 	
 	/* Read input */
 	dictionary = Dictionary_New();
-	Dictionary_Add( dictionary, "rank", Dictionary_Entry_Value_FromUnsignedInt( rank ) );
-	Dictionary_Add( dictionary, "numProcessors", Dictionary_Entry_Value_FromUnsignedInt( numProcessors ) );
-	Dictionary_Add( dictionary, "dim", Dictionary_Entry_Value_FromUnsignedInt( 3 ) );
-	Dictionary_Add( dictionary, "meshSizeI", Dictionary_Entry_Value_FromUnsignedInt( 33 ) );
-	Dictionary_Add( dictionary, "meshSizeJ", Dictionary_Entry_Value_FromUnsignedInt( 33 ) );
-	Dictionary_Add( dictionary, "meshSizeK", Dictionary_Entry_Value_FromUnsignedInt( 33 ) );
-	Dictionary_Add( dictionary, "allowUnbalancing", Dictionary_Entry_Value_FromBool( True ) );
-	Dictionary_Add( dictionary, "minX", Dictionary_Entry_Value_FromDouble( 0.0f ) );
-	Dictionary_Add( dictionary, "minY", Dictionary_Entry_Value_FromDouble( 0.0f ) );
-	Dictionary_Add( dictionary, "minZ", Dictionary_Entry_Value_FromDouble( 0.0f ) );
-	Dictionary_Add( dictionary, "maxX", Dictionary_Entry_Value_FromDouble( 1.0f ) );
-	Dictionary_Add( dictionary, "maxY", Dictionary_Entry_Value_FromDouble( 1.0f ) );
-	Dictionary_Add( dictionary, "maxZ", Dictionary_Entry_Value_FromDouble( 1.0f ) );
 	Dictionary_Add( dictionary, "particlesPerCell", Dictionary_Entry_Value_FromUnsignedInt( 1 ) );
 	Dictionary_Add( dictionary, "seed", Dictionary_Entry_Value_FromUnsignedInt( 13 ) );
 	Dictionary_Add( dictionary, "shadowDepth", Dictionary_Entry_Value_FromUnsignedInt( 1 ) );
 	
-	/* Run the mesher */
-	nTopology = (Topology*)IJK6Topology_New( "IJK6Topology", dictionary );
-	eLayout = (ElementLayout*)ParallelPipedHexaEL_New( "PPHexaEL", 3, dictionary );
-	nLayout = (NodeLayout*)CornerNL_New( "CornerNL", dictionary, eLayout, nTopology );
-	decomp = (MeshDecomp*)HexaMD_New( "HexaMD", dictionary, CommWorld, eLayout, nLayout );
-	layout = MeshLayout_New( "Meshlayout", eLayout, nLayout, decomp );
-	
 	/* Init mesh */
 	extensionMgr_Register = ExtensionManager_Register_New();
-	mesh = Mesh_New( "Mesh", layout, sizeof(Node), sizeof(Element), extensionMgr_Register, dictionary );
+	mesh = buildMesh( nDims, meshSize, minCrds, maxCrds, extensionMgr_Register );
 	
 	/* Configure the element-cell-layout */
 	elementCellLayout = ElementCellLayout_New( "elementCellLayout", mesh );
@@ -190,9 +200,8 @@ int main( int argc, char* argv[] ) {
 	Initialise( mesh, 0, False );
 	Initialise( swarm, 0, False );
 	
-	blockGeom = (BlockGeometry*)eLayout->geometry;
 	for ( dim_I=0; dim_I < 3; dim_I++ ) {
-		attractorPoint[dim_I] = ( blockGeom->max[dim_I] - blockGeom->min[dim_I] ) / 3;
+		attractorPoint[dim_I] = ( maxCrds[dim_I] - minCrds[dim_I] ) / 3;
 	}
 	if( rank == procToWatch ) {
 		printf("Calculated attractor point is at (%f,%f,%f):\n", attractorPoint[0], attractorPoint[1], attractorPoint[2] );
@@ -294,11 +303,6 @@ int main( int argc, char* argv[] ) {
 	Stg_Class_Delete( elementCellLayout );
 	Stg_Class_Delete( mesh );
 	Stg_Class_Delete( extensionMgr_Register );
-	Stg_Class_Delete( layout );
-	Stg_Class_Delete( decomp );
-	Stg_Class_Delete( nLayout );
-	Stg_Class_Delete( eLayout );
-	Stg_Class_Delete( nTopology );
 	Stg_Class_Delete( dictionary );
 	
 	DiscretisationSwarm_Finalise();
@@ -329,7 +333,7 @@ void UpdateParticlePositionsTowardsAttractor(
 
 	for ( lCell_I=0; lCell_I < swarm->cellLocalCount; lCell_I++ ) {
 		if( rank == procToWatch ) {
-			//printf("\tUpdating Particles positions in local cell %d:\n", lCell_I );
+			/*printf("\tUpdating Particles positions in local cell %d:\n", lCell_I );*/
 		}	
 		for ( cParticle_I=0; cParticle_I < swarm->cellParticleCountTbl[lCell_I]; cParticle_I++ ) {
 			Coord movementVector = {0,0,0};
@@ -339,7 +343,7 @@ void UpdateParticlePositionsTowardsAttractor(
 			currParticle = (Particle*)Swarm_ParticleInCellAt( swarm, lCell_I, cParticle_I );
 			oldCoord = &currParticle->coord;
 			if( rank == procToWatch ) {
-				//printf("\t\tUpdating particleInCell %d:\n", cParticle_I );
+				/*printf("\t\tUpdating particleInCell %d:\n", cParticle_I );*/
 			}	
 
 			for ( dim_I=0; dim_I < 3; dim_I++ ) {

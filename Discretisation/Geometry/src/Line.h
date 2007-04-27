@@ -31,7 +31,7 @@
 **
 ** Comments:
 **
-** $Id: Line.h 3462 2006-02-19 06:53:24Z WalterLandry $
+** $Id: Line.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -47,11 +47,11 @@
 		(line)[0] = (a)[1] - (b)[1]; \
 		(line)[1] = (b)[0] - (a)[0]; \
 		(line)[2] = 0.0; \
-		Vector_Norm( line, line ); \
-		(line)[3] = Vector_Dot( line, a )
+		Vec_Norm3D( line, line ); \
+		(line)[3] = Vec_Dot3D( line, a )
 	
 	#define Stg_Line_PointIsInside( line, point ) \
-		((Vector_Dot( line, point) >= line[3]) ? True : False)
+		((Vec_Dot3D( line, point) >= line[3]) ? True : False)
 
 
 	/*--------------------------------------------------------------------------------------------------------------------------

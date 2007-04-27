@@ -35,16 +35,12 @@
 #include <mpi.h>
 
 #include "Base/Base.h"
-
-#include "types.h"
-#include "shortcuts.h"
-#include "CommTopology.h"
-#include "Decomp_Sync.h"
-#include "Decomp.h"
+#include "Mesh.h"
 
 
 /* Textual name of this class */
 const Type Decomp_Type = "Decomp";
+
 
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Constructors
@@ -55,15 +51,7 @@ Decomp* Decomp_New( Name name ) {
 			    Decomp_Type, 
 			    _Decomp_Delete, 
 			    _Decomp_Print, 
-			    _Decomp_Copy, 
-			    (void* (*)(Name))_Decomp_New, 
-			    _Decomp_Construct, 
-			    _Decomp_Build, 
-			    _Decomp_Initialise, 
-			    _Decomp_Execute, 
-			    _Decomp_Destroy, 
-			    name, 
-			    NON_GLOBAL );
+			    NULL );
 }
 
 Decomp* _Decomp_New( DECOMP_DEFARGS ) {
@@ -71,7 +59,7 @@ Decomp* _Decomp_New( DECOMP_DEFARGS ) {
 	
 	/* Allocate memory */
 	assert( sizeOfSelf >= sizeof(Decomp) );
-	self = (Decomp*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
+	self = (Decomp*)_Stg_Class_New( STG_CLASS_PASSARGS );
 
 	/* Virtual info */
 
@@ -88,7 +76,10 @@ void _Decomp_Init( Decomp* self ) {
 	self->nLocals = 0;
 	self->locals = NULL;
 
-	self->glMap = NULL;
+	self->glMap = UIntMap_New();
+
+	self->syncs = List_New();
+	List_SetItemSize( self->syncs, sizeof(Decomp_Sync*) );
 }
 
 
@@ -100,9 +91,11 @@ void _Decomp_Delete( void* decomp ) {
 	Decomp*	self = (Decomp*)decomp;
 
 	Decomp_Destruct( self );
+	FreeObject( self->glMap );
+	FreeObject( self->syncs );
 
 	/* Delete the parent. */
-	_Stg_Component_Delete( self );
+	_Stg_Class_Delete( self );
 }
 
 void _Decomp_Print( void* decomp, Stream* stream ) {
@@ -114,56 +107,7 @@ void _Decomp_Print( void* decomp, Stream* stream ) {
 
 	/* Print parent */
 	Journal_Printf( stream, "Decomp (ptr): (%p)\n", self );
-	_Stg_Component_Print( self, stream );
-}
-
-void* _Decomp_Copy( void* decomp, void* destProc_I, Bool deep, Name nameExt, PtrMap* ptrMap ) {
-#if 0
-	Decomp*	self = (Decomp*)decomp;
-	Decomp*	newDecomp;
-	PtrMap*	map = ptrMap;
-	Bool	ownMap = False;
-
-	/* Damn me for making copying so difficult... what was I thinking? */
-	
-	/* We need to create a map if it doesn't already exist. */
-	if( !map ) {
-		map = PtrMap_New( 10 );
-		ownMap = True;
-	}
-	
-	newDecomp = (Decomp*)_Mesh_Copy( self, destProc_I, deep, nameExt, map );
-	
-	/* Copy the virtual methods here. */
-
-	/* Deep or shallow? */
-	if( deep ) {
-	}
-	else {
-	}
-	
-	/* If we own the map, get rid of it here. */
-	if( ownMap ) Stg_Class_Delete( map );
-	
-	return (void*)newDecomp;
-#endif
-
-	return NULL;
-}
-
-void _Decomp_Construct( void* decomp, Stg_ComponentFactory* cf, void* data ) {
-}
-
-void _Decomp_Build( void* decomp, void* data ) {
-}
-
-void _Decomp_Initialise( void* decomp, void* data ) {
-}
-
-void _Decomp_Execute( void* decomp, void* data ) {
-}
-
-void _Decomp_Destroy( void* decomp, void* data ) {
+	_Stg_Class_Print( self, stream );
 }
 
 
@@ -171,82 +115,85 @@ void _Decomp_Destroy( void* decomp, void* data ) {
 ** Public Functions
 */
 
-#define DECOMP_OK		0x0000
-#define DECOMP_OVERLAPPING	0x0001
-#define DECOMP_INCOMPLETE	0x0002
-
 void Decomp_SetComm( void* decomp, MPI_Comm comm ) {
 	Decomp*	self = (Decomp*)decomp;
 
 	assert( self );
 
 	Decomp_Destruct( self );
-
 	self->comm = comm;
 }
 
 void Decomp_SetLocals( void* decomp, unsigned nLocals, unsigned* locals ) {
-	Decomp*		self = (Decomp*)decomp;
-	unsigned	status;
-
-	assert( self );
-	assert( !nLocals || locals );
-
-	Decomp_DestructLocals( self );
-
-	/* Store local information. */
-	self->nLocals = nLocals;
-	self->locals = Memory_Alloc_Array( unsigned, nLocals, "Decomp::locals" );
-	memcpy( self->locals, locals, nLocals * sizeof(unsigned) );
-
-	/* Validate the domain. */
-	Decomp_ValidateDomain( self, &status );
-	assert( status == DECOMP_OK );
-
-	/* Build global to local map. */
-	Decomp_BuildGLMap( self );
-}
-
-void Decomp_AddSync( void* decomp, Decomp_Sync* sync ) {
-	Decomp*		self = (Decomp*)decomp;
-
-	assert( self );
-	assert( sync );
-
-	if( !self->nSyncs )
-		self->syncs = Memory_Alloc_Array( Decomp_Sync*, ++self->nSyncs, "Decomp::syncs" );
-	else
-		self->syncs = Memory_Realloc_Array( self->syncs, Decomp_Sync*, ++self->nSyncs );
-	self->syncs[self->nSyncs - 1] = sync;
-}
-
-void Decomp_RemoveSync( void* decomp, Decomp_Sync* sync ) {
-	Decomp*		self = (Decomp*)decomp;
-	unsigned	s_i = 0;
-
-	assert( self );
-	assert( sync );
-
-	while( self->syncs[s_i++] != sync && s_i < self->nSyncs );
-	assert( s_i <= self->nSyncs );
-	for( ; s_i < self->nSyncs; s_i++ )
-		self->syncs[s_i - 1] = self->syncs[s_i];
-
-	if( --self->nSyncs == 0 ) {
-		KillArray( self->syncs );
-	}
-	else
-		self->syncs = Memory_Realloc_Array( self->syncs, Decomp_Sync*, self->nSyncs );
-}
-
-Bool Decomp_IsLocal( void* decomp, unsigned global ) {
 	Decomp*	self = (Decomp*)decomp;
 
 	assert( self );
-	assert( global < self->nGlobals );
-	assert( self->glMap );
+	assert( !nLocals || locals );
+	assert( Decomp_ValidateDomain( self, nLocals, locals ) );
 
-	return UIntMap_HasKey( self->glMap, global );
+	Decomp_Destruct( self );
+	self->nLocals = nLocals;
+	if( self->nLocals ) {
+		self->locals = AllocNamedArray( unsigned, nLocals, "Decomp::locals" );
+		memcpy( self->locals, locals, nLocals * sizeof(unsigned) );
+	}
+
+	Decomp_CalcGlobalSize( self );
+	Decomp_BuildGLMap( self );
+	Decomp_UpdateSyncs( self );
+}
+
+MPI_Comm Decomp_GetComm( void* decomp ) {
+	Decomp*	self = (Decomp*)decomp;
+
+	assert( self );
+
+	return self->comm;
+}
+
+unsigned Decomp_GetGlobalSize( void* decomp ) {
+	Decomp*	self = (Decomp*)decomp;
+
+	assert( self );
+
+	return self->nGlobals;
+}
+
+unsigned Decomp_GetLocalSize( void* decomp ) {
+	Decomp*	self = (Decomp*)decomp;
+
+	assert( self );
+
+	return self->nLocals;
+}
+
+void Decomp_GetLocals( void* decomp, unsigned* nLocals, unsigned** locals ) {
+	Decomp*	self = (Decomp*)decomp;
+
+	assert( self );
+	assert( nLocals );
+	assert( locals );
+
+	*nLocals = self->nLocals;
+	*locals = self->locals;
+}
+
+List* Decomp_GetSyncList( void* decomp ) {
+	Decomp*	self = (Decomp*)decomp;
+
+	assert( self );
+
+	return self->syncs;
+}
+
+Bool Decomp_GlobalToLocal( void* decomp, unsigned global, unsigned* local ) {
+	Decomp*		self = (Decomp*)decomp;
+
+	assert( self );
+	assert( global < self->nGlobals );
+	assert( local );
+
+	return UIntMap_Map( self->glMap, global, local );
 }
 
 unsigned Decomp_LocalToGlobal( void* decomp, unsigned local ) {
@@ -259,46 +206,78 @@ unsigned Decomp_LocalToGlobal( void* decomp, unsigned local ) {
 	return self->locals[local];
 }
 
-unsigned Decomp_GlobalToLocal( void* decomp, unsigned global ) {
-	Decomp*	self = (Decomp*)decomp;
-
-	assert( self );
-	assert( global < self->nGlobals );
-	assert( self->glMap );
-
-	return UIntMap_Map( self->glMap, global );
-}
-
 
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Private Functions
 */
 
 void Decomp_BuildGLMap( Decomp* self ) {
-	UIntMap*	map;
 	unsigned	l_i;
-
-	FreeObject( self->glMap );
-
-	map = UIntMap_New();
-	for( l_i = 0; l_i < self->nLocals; l_i++ )
-		UIntMap_Insert( map, self->locals[l_i], l_i );
-	self->glMap = map;
-}
-
-void Decomp_ValidateDomain( Decomp* self, unsigned* status ) {
-	unsigned	rank, nProcs;
-	unsigned	nBytes;
-	Stg_Byte*		bytes;
-	unsigned	tag = 6669;
-	RangeSet*	lSet;
-	RangeSet*	gSet;
-	unsigned	netInds;
 
 	assert( self );
 
-	/* Clear the status. */
-	*status = DECOMP_OK;
+	UIntMap_Clear( self->glMap );
+	for( l_i = 0; l_i < self->nLocals; l_i++ )
+		UIntMap_Insert( self->glMap, self->locals[l_i], l_i );
+}
+
+void Decomp_CalcGlobalSize( Decomp* self ) {
+	assert( self );
+
+	MPI_Allreduce( &self->nLocals, &self->nGlobals, 1, MPI_UNSIGNED, MPI_SUM, self->comm );
+}
+
+void Decomp_UpdateSyncs( Decomp* self ) {
+	unsigned	s_i;
+
+	assert( self );
+
+	for( s_i = 0; s_i < List_GetSize( self->syncs ); s_i++ ) {
+		Decomp_Sync*	sync;
+
+		sync = *List_Get( self->syncs, s_i, Decomp_Sync* );
+		Decomp_Sync_Update( sync );
+	}
+}
+
+void Decomp_Destruct( Decomp* self ) {
+	assert( self );
+
+	Decomp_DestructSyncs( self );
+
+	self->nLocals = 0;
+	KillArray( self->locals );
+	UIntMap_Clear( self->glMap );
+}
+
+void Decomp_DestructSyncs( Decomp* self ) {
+	unsigned	s_i;
+
+	assert( self );
+
+	for( s_i = 0; s_i < List_GetSize( self->syncs ); s_i++ ) {
+		Decomp_Sync*	sync;
+
+		sync = *List_Get( self->syncs, s_i, Decomp_Sync* );
+		Decomp_Sync_SetDecomp( sync, NULL );
+	}
+
+	List_Clear( self->syncs );
+}
+
+#ifndef NDEBUG
+Bool Decomp_ValidateDomain( Decomp* self, unsigned nLocals, unsigned* locals ) {
+	unsigned	rank, nProcs;
+	unsigned	nBytes;
+	Stg_Byte*	bytes;
+	unsigned	tag = 5559;
+	RangeSet*	lSet;
+	RangeSet*	gSet;
+	unsigned	netInds;
+	unsigned	nGlobals;
+
+	assert( self );
+	assert( !nLocals || locals );
 
 	/* Get basic MPI info. */
 	MPI_Comm_rank( self->comm, (int*)&rank );
@@ -306,7 +285,7 @@ void Decomp_ValidateDomain( Decomp* self, unsigned* status ) {
 
 	/* Create a local range set. */
 	lSet = RangeSet_New();
-	RangeSet_SetIndices( lSet, self->nLocals, self->locals );
+	RangeSet_SetIndices( lSet, nLocals, locals );
 
 	/* Create a global range set. */
 	gSet = RangeSet_New();
@@ -316,7 +295,7 @@ void Decomp_ValidateDomain( Decomp* self, unsigned* status ) {
 		MPI_Status	mpiStatus;
 
 		MPI_Recv( &nBytes, 1, MPI_UNSIGNED, rank - 1, tag, self->comm, &mpiStatus );
-		bytes = Memory_Alloc_Array_Unnamed( Stg_Byte, nBytes );
+		bytes = AllocArray( Stg_Byte, nBytes );
 		MPI_Recv( bytes, nBytes, MPI_BYTE, rank - 1, tag, self->comm, &mpiStatus );
 		RangeSet_Unpickle( gSet, nBytes, bytes );
 		FreeArray( bytes );
@@ -332,43 +311,23 @@ void Decomp_ValidateDomain( Decomp* self, unsigned* status ) {
 		FreeArray( bytes );
 	}
 	else {
-		self->nGlobals = RangeSet_GetNIndices( gSet );
-		if( RangeSet_GetNRanges( gSet ) > 1 )
-			*status |= DECOMP_INCOMPLETE;
+		nGlobals = RangeSet_GetSize( gSet );
+		if( RangeSet_GetNumRanges( gSet ) > 1 )
+			return False;
 	}
 
 	/* Transfer global count to all. */
-	MPI_Bcast( &self->nGlobals, 1, MPI_UNSIGNED, nProcs - 1, self->comm );
+	MPI_Bcast( &nGlobals, 1, MPI_UNSIGNED, nProcs - 1, self->comm );
 
 	/* Check for overlap. */
 	MPI_Allreduce( &lSet->nInds, &netInds, 1, MPI_UNSIGNED, MPI_SUM, self->comm );
-	if( netInds != self->nGlobals )
-		*status |= DECOMP_OVERLAPPING;
+	if( netInds != nGlobals )
+		return False;
 
 	/* Free the sets. */
 	FreeObject( lSet );
 	FreeObject( gSet );
-}
 
-void Decomp_Destruct( Decomp* self ) {
-	Decomp_DestructLocals( self );
+	return True;
 }
-
-void Decomp_DestructLocals( Decomp* self ) {
-	Decomp_DestructSyncs( self );
-	self->nLocals = 0;
-	KillArray( self->locals );
-	KillObject( self->glMap );
-}
-
-void Decomp_DestructSyncs( Decomp* self ) {
-	unsigned	s_i;
-	unsigned	tmpNSyncs;
-	Decomp_Sync**	tmpSyncs;
-
-	tmpNSyncs = self->nSyncs;
-	tmpSyncs = Memory_Alloc_Array_Unnamed( Decomp_Sync*, tmpNSyncs );
-	memcpy( tmpSyncs, self->syncs, tmpNSyncs * sizeof(Decomp_Sync*) );
-	for( s_i = 0; s_i < tmpNSyncs; s_i++ )
-		Decomp_Sync_SetDecomp( tmpSyncs[s_i], NULL );
-}
+#endif

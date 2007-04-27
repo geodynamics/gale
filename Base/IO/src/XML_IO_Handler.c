@@ -506,9 +506,9 @@ MPI_Comm_rank( MPI_COMM_WORLD, &rank );
 
 	/* 1. Current directory */
 	{
-		// $PWD does not work for all ranks, in all mpi implementations
-		// "./" however does so far.
-		//    char* pwd = getenv( "PWD" );
+          /* $PWD does not work for all ranks, in all mpi implementations
+             "./" however does so far.
+             char* pwd = getenv( "PWD" ); */
 		char* pwd = "./";
 		if ( pwd != NULL ) {
 			_XML_IO_Handler_AddSearchPath( self, pwd );
@@ -1592,8 +1592,12 @@ static xmlChar* _XML_IO_Handler_StripLeadingTrailingWhiteSpace( XML_IO_Handler* 
 				self->resource );
 			exit( EXIT_FAILURE );
 		}
-		
-		snprintf( (char*)newString, newLength+1, "%s", startCharPtr );
+                {
+                  int i;
+                  for(i=0;i<newLength;++i)
+                    newString[i]=startCharPtr[i];
+                  newString[newLength]='\0';
+                }
 		
 		return newString;
 	}
@@ -1678,7 +1682,7 @@ Bool _XML_IO_Handler_WriteAllToFile( void* xml_io_handler, const char* filename,
 	
 	/* Memory_Free memory */
 	xmlFreeDoc( self->currDoc );
-	//xmlCleanupParser();
+	/*xmlCleanupParser(); */
 	/* TODO if updating, xmlCleanupParser(); */
 	self->currDoc = NULL;
 	self->currNameSpace = NULL;
@@ -1718,7 +1722,7 @@ Bool _XML_IO_Handler_WriteEntryToFile( void* xml_io_handler, const char* filenam
 	assert( filename );
 	assert( name );
 	assert( value );
-	//Do not assert source -> it may well be NULL.
+	/*Do not assert source -> it may well be NULL.*/
 #endif
 	Journal_Printf(stream, "_XML_IO_Handler_WriteEntryToFile called to write dictionary entry %s to file %s.\n", name, filename ); 
 	/* if overwrite/new */
@@ -1758,7 +1762,7 @@ Bool _XML_IO_Handler_WriteEntryToFile( void* xml_io_handler, const char* filenam
 	}
 	
 	xmlFreeDoc( self->currDoc );
-	//xmlCleanupParser();
+	/*xmlCleanupParser();*/
 	/* TODO if updating, xmlCleanupParser(); */
 	self->currDoc = NULL;
 	self->currNameSpace = NULL;

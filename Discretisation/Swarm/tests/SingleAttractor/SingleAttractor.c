@@ -30,18 +30,20 @@ void StGermain_SingleAttractor_UpdatePositions( DiscretisationContext* context )
 	Index				dim_I;
 	Swarm*                          swarm = (Swarm*) LiveComponentRegister_Get( context->CF->LCRegister, "swarm" );
 	Coord                           attractorPoint;
-	BlockGeometry*                  blockGeometry;
+	Mesh*				mesh;
 	Stream*                         stream = Journal_Register( Info_Type, "particleUpdate" );
 	unsigned int                    movementSpeedDivisor = 0;
 	int                             movementSign = 1;
 	unsigned int                    explosionPeriod = 20;
+	double				minCrd[3], maxCrd[3];
 
 	Stream_SetPrintingRank( stream, Dictionary_GetUnsignedInt_WithDefault( context->dictionary, "procToWatch", 0 ) );
 	movementSpeedDivisor = Dictionary_GetDouble_WithDefault( context->dictionary, "movementSpeedDivisor", 10 );
 	
-	blockGeometry = (BlockGeometry*) LiveComponentRegister_Get( context->CF->LCRegister, "geometry" );
+	mesh = (Mesh*)LiveComponentRegister_Get( context->CF->LCRegister, "mesh-linear" );
+	Mesh_GetGlobalCoordRange( mesh, minCrd, maxCrd );
 	for ( dim_I=0; dim_I < 3; dim_I++ ) {
-		attractorPoint[dim_I] = ( blockGeometry->max[dim_I] - blockGeometry->min[dim_I] ) / 3;
+		attractorPoint[dim_I] = (maxCrd[dim_I] - minCrd[dim_I]) / 3;
 	}
 	Journal_Printf( stream, "Calculated attractor point is at (%f,%f,%f):\n", attractorPoint[0], attractorPoint[1], attractorPoint[2] );
 	

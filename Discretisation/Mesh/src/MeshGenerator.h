@@ -45,6 +45,7 @@
 	extern const Type MeshGenerator_Type;
 
 	/** Virtual function types */
+	typedef void (MeshGenerator_SetDimSizeFunc)( void* meshGenerator, unsigned nDims );
 	typedef void (MeshGenerator_GenerateFunc)( void* meshGenerator, void* _mesh );
 
 	/** MeshGenerator class contents */
@@ -53,12 +54,17 @@
 		__Stg_Component					\
 								\
 		/* Virtual info */				\
+		MeshGenerator_SetDimSizeFunc*	setDimSizeFunc;	\
 		MeshGenerator_GenerateFunc*	generateFunc;	\
 								\
 		/* MeshGenerator info */			\
-		MPI_Comm			comm;		\
-		unsigned			nMeshes;	\
-		Mesh**				meshes;
+		MPI_Comm		comm;			\
+		unsigned		nMeshes;		\
+		Mesh**			meshes;			\
+								\
+		unsigned		nDims;			\
+		Bool*			enabledDims;		\
+		Bool**			enabledInc;
 
 	struct MeshGenerator { __MeshGenerator };
 
@@ -68,10 +74,13 @@
 
 	#define MESHGENERATOR_DEFARGS				\
 		STG_COMPONENT_DEFARGS,				\
+		MeshGenerator_SetDimSizeFunc*	setDimSizeFunc,	\
 		MeshGenerator_GenerateFunc*	generateFunc
 
-	#define MESHGENERATOR_PASSARGS			\
-		STG_COMPONENT_PASSARGS, generateFunc
+	#define MESHGENERATOR_PASSARGS		\
+		STG_COMPONENT_PASSARGS,		\
+		setDimSizeFunc,			\
+		generateFunc
 
 	MeshGenerator* _MeshGenerator_New( MESHGENERATOR_DEFARGS );
 	void _MeshGenerator_Init( MeshGenerator* self );
@@ -95,13 +104,13 @@
 	void _MeshGenerator_Execute( void* meshGenerator, void* data );
 	void _MeshGenerator_Destroy( void* meshGenerator, void* data );
 
-#ifndef NDEBUG
+	void _MeshGenerator_SetDimSize( void* meshGenerator, unsigned nDims );
+
+	#define MeshGenerator_SetDimSize( self, nDims )			\
+		VirtualCall( self, setDimSizeFunc, self, nDims )
+
 	#define MeshGenerator_Generate( self, mesh )			\
-		(assert( self ), (self)->generateFunc( self, mesh ))
-#else
-	#define MeshGenerator_Generate( self, mesh )	\
-		(self)->generateFunc( self, mesh )
-#endif
+		VirtualCall( self, generateFunc, self, mesh )
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Public functions
@@ -109,9 +118,14 @@
 
 	void MeshGenerator_SetComm( void* meshGenerator, MPI_Comm comm );
 	void MeshGenerator_AddMesh( void* meshGenerator, void* mesh );
+	void MeshGenerator_SetDimState( void* meshGenerator, unsigned dim, Bool state );
+	void MeshGenerator_ClearIncidenceStates( void* meshGenerator );
+	void MeshGenerator_SetIncidenceState( void* meshGenerator, unsigned fromDim, unsigned toDim, Bool state );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Private Member functions
 	*/
+
+	void MeshGenerator_Destruct( MeshGenerator* self );
 
 #endif /* __Discretisaton_Mesh_MeshGenerator_h__ */

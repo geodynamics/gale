@@ -39,51 +39,213 @@
 #include "Discretisation/Mesh/Mesh.h"
 
 
-Bool testSetParams( unsigned rank, unsigned nProcs, unsigned watch ) {
-	CartesianGenerator*	gen;
-	unsigned		sizes[3];
-
-	sizes[0] = 5;
-	sizes[1] = 2;
-	sizes[2] = 2;
-
-	gen = CartesianGenerator_New( "" );
-	CartesianGenerator_SetTopologyParams( gen, 3, sizes, 0, NULL, NULL );
-
-	FreeObject( gen );
-
-	return True;
-}
-
-Bool testGen( unsigned rank, unsigned nProcs, unsigned watch ) {
+Bool testGen1D( unsigned rank, unsigned nProcs, unsigned watch ) {
+	Bool			result = True;
 	CartesianGenerator*	gen;
 	Mesh*			mesh;
 	unsigned		sizes[3];
-	double			min[3] = {0, 0, 0};
-	double			max[3] = {1, 1, 1};
+	double			minCrd[3];
+	double			maxCrd[3];
 
-	sizes[0] = 12;
-	sizes[1] = 12;
-	sizes[2] = 12;
+	/*
+	** Generate a single element per CPU.
+	*/
+
+	sizes[0] = nProcs;
+	minCrd[0] = 0.0;
+	maxCrd[0] = (double)nProcs;
 
 	gen = CartesianGenerator_New( "" );
-	mesh = Mesh_DefaultNew( "" );
-	mesh->topo = MeshTopology_New( "" );
-	mesh->info = ExtensionManager_New_OfExistingObject( "mesh_info", mesh );
-	CartesianGenerator_SetTopologyParams( gen, 3, sizes, 0, NULL, NULL );
-	CartesianGenerator_SetGeometryParams( gen, min, max );
+	MeshGenerator_SetDimSize( gen, 1 );
+	CartesianGenerator_SetShadowDepth( gen, 0 );
+	CartesianGenerator_SetTopologyParams( gen, sizes, 0, NULL, NULL );
+	CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
+
+	mesh = Mesh_New( "" );
 	CartesianGenerator_Generate( gen, mesh );
 
-	FreeObject( gen );
+	if( rank == watch ) {
+		if( Mesh_GetDimSize( mesh ) != 1 || 
+		    Mesh_GetGlobalSize( mesh, MT_VERTEX ) != nProcs + 1 || 
+		    Mesh_GetGlobalSize( mesh, MT_EDGE ) != nProcs )
+		{
+			result = False;
+			goto done;
+		}
 
-	return True;
+		if( rank == 0 ) {
+			if( nProcs > 1 ) {
+				if( Mesh_GetLocalSize( mesh, MT_VERTEX ) != 2 || 
+				    Mesh_GetLocalSize( mesh, MT_EDGE ) != 1 || 
+				    Mesh_GetRemoteSize( mesh, MT_VERTEX ) != 0 || 
+				    Mesh_GetRemoteSize( mesh, MT_EDGE ) != 0 || 
+				    Mesh_GetDomainSize( mesh, MT_VERTEX ) != 2 || 
+				    Mesh_GetDomainSize( mesh, MT_EDGE ) != 1 || 
+				    Mesh_GetSharedSize( mesh, MT_VERTEX ) != 1 || 
+				    Mesh_GetSharedSize( mesh, MT_EDGE ) != 0 )
+				{
+					result = False;
+					goto done;
+				}
+			}
+			else {
+				if( Mesh_GetLocalSize( mesh, MT_VERTEX ) != 2 || 
+				    Mesh_GetLocalSize( mesh, MT_EDGE ) != 1 || 
+				    Mesh_GetRemoteSize( mesh, MT_VERTEX ) != 0 || 
+				    Mesh_GetRemoteSize( mesh, MT_EDGE ) != 0 || 
+				    Mesh_GetDomainSize( mesh, MT_VERTEX ) != 2 || 
+				    Mesh_GetDomainSize( mesh, MT_EDGE ) != 1 || 
+				    Mesh_GetSharedSize( mesh, MT_VERTEX ) != 0 || 
+				    Mesh_GetSharedSize( mesh, MT_EDGE ) != 0 )
+				{
+					result = False;
+					goto done;
+				}
+			}
+		}
+		else if( rank == nProcs - 1 ) {
+			if( Mesh_GetLocalSize( mesh, MT_VERTEX ) != 1 || 
+			    Mesh_GetLocalSize( mesh, MT_EDGE ) != 1 || 
+			    Mesh_GetRemoteSize( mesh, MT_VERTEX ) != 1 || 
+			    Mesh_GetRemoteSize( mesh, MT_EDGE ) != 0 || 
+			    Mesh_GetDomainSize( mesh, MT_VERTEX ) != 2 || 
+			    Mesh_GetDomainSize( mesh, MT_EDGE ) != 1 || 
+			    Mesh_GetSharedSize( mesh, MT_VERTEX ) != 0 || 
+			    Mesh_GetSharedSize( mesh, MT_EDGE ) != 0 )
+			{
+				result = False;
+				goto done;
+			}
+		}
+		else {
+			if( Mesh_GetLocalSize( mesh, MT_VERTEX ) != 1 || 
+			    Mesh_GetLocalSize( mesh, MT_EDGE ) != 1 || 
+			    Mesh_GetRemoteSize( mesh, MT_VERTEX ) != 1 || 
+			    Mesh_GetRemoteSize( mesh, MT_EDGE ) != 0 || 
+			    Mesh_GetDomainSize( mesh, MT_VERTEX ) != 2 || 
+			    Mesh_GetDomainSize( mesh, MT_EDGE ) != 1 || 
+			    Mesh_GetSharedSize( mesh, MT_VERTEX ) != 1 || 
+			    Mesh_GetSharedSize( mesh, MT_EDGE ) != 0 )
+			{
+				result = False;
+				goto done;
+			}
+		}
+	}
+
+done:
+	FreeObject( gen );
+	FreeObject( mesh );
+
+	return result;
+}
+
+Bool testShadow1D( unsigned rank, unsigned nProcs, unsigned watch ) {
+	Bool			result = True;
+	CartesianGenerator*	gen;
+	Mesh*			mesh;
+	unsigned		sizes[3];
+	double			minCrd[3];
+	double			maxCrd[3];
+
+	/*
+	** Generate a single element per CPU.
+	*/
+
+	sizes[0] = nProcs;
+	minCrd[0] = 0.0;
+	maxCrd[0] = (double)nProcs;
+
+	gen = CartesianGenerator_New( "" );
+	MeshGenerator_SetDimSize( gen, 1 );
+	CartesianGenerator_SetShadowDepth( gen, 1 );
+	CartesianGenerator_SetTopologyParams( gen, sizes, 0, NULL, NULL );
+	CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
+
+	mesh = Mesh_New( "" );
+	CartesianGenerator_Generate( gen, mesh );
+
+	if( rank == watch ) {
+		if( Mesh_GetDimSize( mesh ) != 1 || 
+		    Mesh_GetGlobalSize( mesh, MT_VERTEX ) != nProcs + 1 || 
+		    Mesh_GetGlobalSize( mesh, MT_EDGE ) != nProcs )
+		{
+			result = False;
+			goto done;
+		}
+
+		if( rank == 0 ) {
+			if( nProcs > 1 ) {
+				if( Mesh_GetLocalSize( mesh, MT_VERTEX ) != 2 || 
+				    Mesh_GetLocalSize( mesh, MT_EDGE ) != 1 || 
+				    Mesh_GetRemoteSize( mesh, MT_VERTEX ) != 1 || 
+				    Mesh_GetRemoteSize( mesh, MT_EDGE ) != 1 || 
+				    Mesh_GetDomainSize( mesh, MT_VERTEX ) != 3 || 
+				    Mesh_GetDomainSize( mesh, MT_EDGE ) != 2 || 
+				    Mesh_GetSharedSize( mesh, MT_VERTEX ) != 2 || 
+				    Mesh_GetSharedSize( mesh, MT_EDGE ) != 1 )
+				{
+					result = False;
+					goto done;
+				}
+			}
+			else {
+				if( Mesh_GetLocalSize( mesh, MT_VERTEX ) != 2 || 
+				    Mesh_GetLocalSize( mesh, MT_EDGE ) != 1 || 
+				    Mesh_GetRemoteSize( mesh, MT_VERTEX ) != 0 || 
+				    Mesh_GetRemoteSize( mesh, MT_EDGE ) != 0 || 
+				    Mesh_GetDomainSize( mesh, MT_VERTEX ) != 2 || 
+				    Mesh_GetDomainSize( mesh, MT_EDGE ) != 1 || 
+				    Mesh_GetSharedSize( mesh, MT_VERTEX ) != 0 || 
+				    Mesh_GetSharedSize( mesh, MT_EDGE ) != 0 )
+				{
+					result = False;
+					goto done;
+				}
+			}
+		}
+		else if( rank == nProcs - 1 ) {
+			if( Mesh_GetLocalSize( mesh, MT_VERTEX ) != 1 || 
+			    Mesh_GetLocalSize( mesh, MT_EDGE ) != 1 || 
+			    Mesh_GetRemoteSize( mesh, MT_VERTEX ) != 2 || 
+			    Mesh_GetRemoteSize( mesh, MT_EDGE ) != 1 || 
+			    Mesh_GetDomainSize( mesh, MT_VERTEX ) != 3 || 
+			    Mesh_GetDomainSize( mesh, MT_EDGE ) != 2 || 
+			    Mesh_GetSharedSize( mesh, MT_VERTEX ) != 1 || 
+			    Mesh_GetSharedSize( mesh, MT_EDGE ) != 1 )
+			{
+				result = False;
+				goto done;
+			}
+		}
+		else {
+			if( Mesh_GetLocalSize( mesh, MT_VERTEX ) != 1 || 
+			    Mesh_GetLocalSize( mesh, MT_EDGE ) != 1 || 
+			    Mesh_GetRemoteSize( mesh, MT_VERTEX ) != 3 || 
+			    Mesh_GetRemoteSize( mesh, MT_EDGE ) != 2 || 
+			    Mesh_GetDomainSize( mesh, MT_VERTEX ) != 4 || 
+			    Mesh_GetDomainSize( mesh, MT_EDGE ) != 3 || 
+			    Mesh_GetSharedSize( mesh, MT_VERTEX ) != 1 || 
+			    Mesh_GetSharedSize( mesh, MT_EDGE ) != 1 )
+			{
+				result = False;
+				goto done;
+			}
+		}
+	}
+
+done:
+	FreeObject( gen );
+	FreeObject( mesh );
+
+	return result;
 }
 
 
 #define nTests	2
 
-TestSuite_Test	tests[nTests] = {{"set parameters", testSetParams, 0}, 
-				 {"generate mesh", testGen, 1}};
+TestSuite_Test	tests[nTests] = {{"generate 1D mesh", testGen1D, 10}, 
+				 {"generate shadowed 1D mesh", testShadow1D, 10}};
 
 
 int main( int argc, char* argv[] ) {
@@ -93,9 +255,8 @@ int main( int argc, char* argv[] ) {
 	MPI_Init( &argc, &argv );
 
 	/* Initialise StGermain. */
-	BaseFoundation_Init( &argc, &argv );
-	BaseIO_Init( &argc, &argv );
-	BaseContainer_Init( &argc, &argv );
+	Base_Init( &argc, &argv );
+	DiscretisationMesh_Init( &argc, &argv );
 
 	/* Create the test suite. */
 	suite = TestSuite_New();
@@ -109,9 +270,8 @@ int main( int argc, char* argv[] ) {
 	FreeObject( suite );
 
 	/* Finalise StGermain. */
-	BaseContainer_Finalise();
-	BaseIO_Finalise();
-	BaseFoundation_Finalise();
+	DiscretisationMesh_Finalise();
+	Base_Finalise();
 
 	/* Close off MPI */
 	MPI_Finalize();

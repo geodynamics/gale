@@ -54,10 +54,10 @@ const char* SplitFrictionWallVC_WallEnumToStr[SplitFrictionWallVC_Wall_Size] = {
 */
 
 VariableCondition* SplitFrictionWallVC_Factory(
-		Variable_Register*				variable_Register, 
-		ConditionFunction_Register*			conFunc_Register, 
-		Dictionary*					dictionary,
-		void*						data )
+	Variable_Register*				variable_Register, 
+	ConditionFunction_Register*			conFunc_Register, 
+	Dictionary*					dictionary,
+	void*						data )
 {
 	return (VariableCondition*)SplitFrictionWallVC_New( defaultSplitFrictionWallVCName, NULL, variable_Register, conFunc_Register, dictionary, (Mesh*)data );
 }
@@ -96,12 +96,12 @@ SplitFrictionWallVC*	SplitFrictionWallVC_DefaultNew( Name name )
 }
 
 SplitFrictionWallVC*	SplitFrictionWallVC_New(
-		Name						name,
-		Name						_dictionaryEntryName, 
-		Variable_Register*				variable_Register, 
-		ConditionFunction_Register*			conFunc_Register, 
-		Dictionary*					dictionary,
-		void*						_mesh )
+	Name						name,
+	Name						_dictionaryEntryName, 
+	Variable_Register*				variable_Register, 
+	ConditionFunction_Register*			conFunc_Register, 
+	Dictionary*					dictionary,
+	void*						_mesh )
 {
 	return _SplitFrictionWallVC_New(
 		sizeof(SplitFrictionWallVC), 
@@ -135,13 +135,13 @@ SplitFrictionWallVC*	SplitFrictionWallVC_New(
 
 
 void SplitFrictionWallVC_Init(
-		SplitFrictionWallVC*						self,
-		Name						name,
-		Name						_dictionaryEntryName, 
-		Variable_Register*				variable_Register, 
-		ConditionFunction_Register*			conFunc_Register, 
-		Dictionary*					dictionary,
-		void*						_mesh )
+	SplitFrictionWallVC*						self,
+	Name						name,
+	Name						_dictionaryEntryName, 
+	Variable_Register*				variable_Register, 
+	ConditionFunction_Register*			conFunc_Register, 
+	Dictionary*					dictionary,
+	void*						_mesh )
 {
 	/* General info */
 	self->type = SplitFrictionWallVC_Type;
@@ -179,33 +179,33 @@ void SplitFrictionWallVC_Init(
 
 
 SplitFrictionWallVC* _SplitFrictionWallVC_New( 
-		SizeT						_sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*				_delete,
-		Stg_Class_PrintFunction*				_print,
-		Stg_Class_CopyFunction*				_copy, 
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*			_construct,
-		Stg_Component_BuildFunction*			_build,
-		Stg_Component_InitialiseFunction*			_initialise,
-		Stg_Component_ExecuteFunction*			_execute,
-		Stg_Component_DestroyFunction*			_destroy,
-		Name								name, 
-		Bool								initFlag,
-		VariableCondition_BuildSelfFunc*		_buildSelf, 
-		VariableCondition_PrintConciseFunc*		_printConcise,
-		VariableCondition_ReadDictionaryFunc*		_readDictionary,
-		VariableCondition_GetSetFunc*			_getSet,
-		VariableCondition_GetVariableCountFunc*		_getVariableCount,
-		VariableCondition_GetVariableIndexFunc*		_getVariableIndex,
-		VariableCondition_GetValueIndexFunc*		_getValueIndex,
-		VariableCondition_GetValueCountFunc*		_getValueCount,
-		VariableCondition_GetValueFunc*			_getValue,
-		Name						_dictionaryEntryName, 
-		Variable_Register*				variable_Register, 
-		ConditionFunction_Register*			conFunc_Register, 
-		Dictionary*					dictionary,
-		void*						_mesh)
+	SizeT						_sizeOfSelf, 
+	Type						type,
+	Stg_Class_DeleteFunction*				_delete,
+	Stg_Class_PrintFunction*				_print,
+	Stg_Class_CopyFunction*				_copy, 
+	Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
+	Stg_Component_ConstructFunction*			_construct,
+	Stg_Component_BuildFunction*			_build,
+	Stg_Component_InitialiseFunction*			_initialise,
+	Stg_Component_ExecuteFunction*			_execute,
+	Stg_Component_DestroyFunction*			_destroy,
+	Name								name, 
+	Bool								initFlag,
+	VariableCondition_BuildSelfFunc*		_buildSelf, 
+	VariableCondition_PrintConciseFunc*		_printConcise,
+	VariableCondition_ReadDictionaryFunc*		_readDictionary,
+	VariableCondition_GetSetFunc*			_getSet,
+	VariableCondition_GetVariableCountFunc*		_getVariableCount,
+	VariableCondition_GetVariableIndexFunc*		_getVariableIndex,
+	VariableCondition_GetValueIndexFunc*		_getValueIndex,
+	VariableCondition_GetValueCountFunc*		_getValueCount,
+	VariableCondition_GetValueFunc*			_getValue,
+	Name						_dictionaryEntryName, 
+	Variable_Register*				variable_Register, 
+	ConditionFunction_Register*			conFunc_Register, 
+	Dictionary*					dictionary,
+	void*						_mesh)
 {
 	SplitFrictionWallVC*	self;
 	
@@ -250,9 +250,9 @@ SplitFrictionWallVC* _SplitFrictionWallVC_New(
 
 
 void _SplitFrictionWallVC_Init(
-		void*						wallVC, 
-		Name						_dictionaryEntryName, 
-		void*						_mesh )
+	void*						wallVC, 
+	Name						_dictionaryEntryName, 
+	void*						_mesh )
 {
 	SplitFrictionWallVC*			self = (SplitFrictionWallVC*)wallVC;
 
@@ -338,10 +338,10 @@ void _SplitFrictionWallVC_ReadDictionary( void* variableCondition, void* diction
 					Stream*	errorStr = Journal_Register( Error_Type, self->type );
 
 					Journal_Printf( errorStr, "Error- in %s: While parsing "
-						"definition of wallVC \"%s\" (applies to wall \"%s\"), the cond. func. applied to "
-						"variable \"%s\" - \"%s\" - wasn't found in the c.f. register.\n",
-						__func__, self->_dictionaryEntryName, SplitFrictionWallVC_WallEnumToStr[self->_wall],
-						self->_entryTbl[entry_I].varName, funcName );
+							"definition of wallVC \"%s\" (applies to wall \"%s\"), the cond. func. applied to "
+							"variable \"%s\" - \"%s\" - wasn't found in the c.f. register.\n",
+							__func__, self->_dictionaryEntryName, SplitFrictionWallVC_WallEnumToStr[self->_wall],
+							self->_entryTbl[entry_I].varName, funcName );
 					Journal_Printf( errorStr, "(Available functions in the C.F. register are: ");	
 					ConditionFunction_Register_PrintNameOfEachFunc( self->conFunc_Register, errorStr );
 					Journal_Printf( errorStr, ")\n");	
@@ -357,7 +357,7 @@ void _SplitFrictionWallVC_ReadDictionary( void* variableCondition, void* diction
 				self->_entryTbl[entry_I].value.type = VC_ValueType_DoubleArray;
 				self->_entryTbl[entry_I].value.as.typeArray.size = Dictionary_Entry_Value_GetCount(valueEntry);
 				self->_entryTbl[entry_I].value.as.typeArray.array = Memory_Alloc_Array( double,
-					self->_entryTbl[entry_I].value.as.typeArray.size, "SplitFrictionWallVC->_entryTbl[].value.as.typeArray.array" );
+													self->_entryTbl[entry_I].value.as.typeArray.size, "SplitFrictionWallVC->_entryTbl[].value.as.typeArray.array" );
 					
 				for (i = 0; i < self->_entryTbl[entry_I].value.as.typeArray.size; i++)
 				{
@@ -367,7 +367,7 @@ void _SplitFrictionWallVC_ReadDictionary( void* variableCondition, void* diction
 				}
 			}
 			else if( 0 == strcasecmp( valType, "double" ) || 0 == strcasecmp( valType, "d" ) ||
-				0 == strcasecmp( valType, "float" ) || 0 == strcasecmp( valType, "f" ) )
+				 0 == strcasecmp( valType, "float" ) || 0 == strcasecmp( valType, "f" ) )
 			{
 				self->_entryTbl[entry_I].value.type = VC_ValueType_Double;
 				self->_entryTbl[entry_I].value.as.typeDouble = Dictionary_Entry_Value_AsDouble( valueEntry );
@@ -438,9 +438,9 @@ void _SplitFrictionWallVC_Print(void* wallVC, Stream* stream)
 	if (self->_dictionaryEntryName)
 		Journal_Printf( info, "\t\t_dictionaryEntryName: %s\n", self->_dictionaryEntryName);
 	Journal_Printf( info, "\t_wall: %s\n", self->_wall == SplitFrictionWallVC_Wall_Front ? "Front" :
-		self->_wall == SplitFrictionWallVC_Wall_Back ? "Back" : self->_wall == SplitFrictionWallVC_Wall_Left ? "Left" :
-		self->_wall == SplitFrictionWallVC_Wall_Right ? "Right" : self->_wall == SplitFrictionWallVC_Wall_Top ? "Top" :
-		self->_wall == SplitFrictionWallVC_Wall_Bottom ? "Bottom" : "None");
+			self->_wall == SplitFrictionWallVC_Wall_Back ? "Back" : self->_wall == SplitFrictionWallVC_Wall_Left ? "Left" :
+			self->_wall == SplitFrictionWallVC_Wall_Right ? "Right" : self->_wall == SplitFrictionWallVC_Wall_Top ? "Top" :
+			self->_wall == SplitFrictionWallVC_Wall_Bottom ? "Bottom" : "None");
 	Journal_Printf( info, "\t_entryCount: %u\n", self->_entryCount);
 	Journal_Printf( info, "\t_entryTbl (ptr): %p\n", self->_entryTbl);
 	if (self->_entryTbl)
@@ -453,46 +453,46 @@ void _SplitFrictionWallVC_Print(void* wallVC, Stream* stream)
 			Journal_Printf( info, "\t\t\tvalue:\n");
 			switch (self->_entryTbl[entry_I].value.type)
 			{
-				case VC_ValueType_Double:
-					Journal_Printf( info, "\t\t\t\ttype: VC_ValueType_Double\n" );
-					Journal_Printf( info, "\t\t\t\tasDouble: %g\n", self->_entryTbl[entry_I].value.as.typeDouble );
-					break;
+			case VC_ValueType_Double:
+				Journal_Printf( info, "\t\t\t\ttype: VC_ValueType_Double\n" );
+				Journal_Printf( info, "\t\t\t\tasDouble: %g\n", self->_entryTbl[entry_I].value.as.typeDouble );
+				break;
 					
-				case VC_ValueType_Int:
-					Journal_Printf( info, "\t\t\t\ttype: VC_ValueType_Int\n" );
-					Journal_Printf( info, "\t\t\t\tasInt: %i\n", self->_entryTbl[entry_I].value.as.typeInt );
-					break;
+			case VC_ValueType_Int:
+				Journal_Printf( info, "\t\t\t\ttype: VC_ValueType_Int\n" );
+				Journal_Printf( info, "\t\t\t\tasInt: %i\n", self->_entryTbl[entry_I].value.as.typeInt );
+				break;
 					
-				case VC_ValueType_Short:
-					Journal_Printf( info, "\t\t\t\ttype: VC_ValueType_Short\n" );
-					Journal_Printf( info, "\t\t\t\tasShort: %i\n", self->_entryTbl[entry_I].value.as.typeShort );
-					break;
+			case VC_ValueType_Short:
+				Journal_Printf( info, "\t\t\t\ttype: VC_ValueType_Short\n" );
+				Journal_Printf( info, "\t\t\t\tasShort: %i\n", self->_entryTbl[entry_I].value.as.typeShort );
+				break;
 					
-				case VC_ValueType_Char:
-					Journal_Printf( info, "\t\t\t\ttype: VC_ValueType_Char\n");
-					Journal_Printf( info, "\t\t\t\tasChar: %c\n", self->_entryTbl[entry_I].value.as.typeChar );
-					break;
+			case VC_ValueType_Char:
+				Journal_Printf( info, "\t\t\t\ttype: VC_ValueType_Char\n");
+				Journal_Printf( info, "\t\t\t\tasChar: %c\n", self->_entryTbl[entry_I].value.as.typeChar );
+				break;
 					
-				case VC_ValueType_Ptr:
-					Journal_Printf( info, "\t\t\t\ttype: VC_ValueType_Ptr\n");
-					Journal_Printf( info, "\t\t\t\tasPtr: %g\n", self->_entryTbl[entry_I].value.as.typePtr );
-					break;
+			case VC_ValueType_Ptr:
+				Journal_Printf( info, "\t\t\t\ttype: VC_ValueType_Ptr\n");
+				Journal_Printf( info, "\t\t\t\tasPtr: %g\n", self->_entryTbl[entry_I].value.as.typePtr );
+				break;
 					
-				case VC_ValueType_DoubleArray:
-					Journal_Printf( info, "\t\t\t\ttype: VC_ValueType_DoubleArray\n");
-					Journal_Printf( info, "\t\t\t\tarraySize: %u\n", self->_entryTbl[entry_I].value.as.typeArray.size);
-					Journal_Printf( info, "\t\t\t\tasDoubleArray (ptr): %p\n", 
+			case VC_ValueType_DoubleArray:
+				Journal_Printf( info, "\t\t\t\ttype: VC_ValueType_DoubleArray\n");
+				Journal_Printf( info, "\t\t\t\tarraySize: %u\n", self->_entryTbl[entry_I].value.as.typeArray.size);
+				Journal_Printf( info, "\t\t\t\tasDoubleArray (ptr): %p\n", 
 						self->_entryTbl[entry_I].value.as.typeArray.array);
-					if (self->_entryTbl[entry_I].value.as.typeArray.array)
-						for (i = 0; i < self->_entryTbl[entry_I].value.as.typeArray.size; i++)
-							Journal_Printf( info, "\t\t\t\tasDoubleArray[%u]: %g\n", i,
+				if (self->_entryTbl[entry_I].value.as.typeArray.array)
+					for (i = 0; i < self->_entryTbl[entry_I].value.as.typeArray.size; i++)
+						Journal_Printf( info, "\t\t\t\tasDoubleArray[%u]: %g\n", i,
 								self->_entryTbl[entry_I].value.as.typeArray.array[i]);
-					break;
+				break;
 					
-				case VC_ValueType_CFIndex:
-					Journal_Printf( info, "\t\t\t\ttype: VC_ValueType_CFIndex\n");
-					Journal_Printf( info, "\t\t\t\tasCFIndex: %u\n", self->_entryTbl[entry_I].value.as.typeCFIndex);
-					break;
+			case VC_ValueType_CFIndex:
+				Journal_Printf( info, "\t\t\t\ttype: VC_ValueType_CFIndex\n");
+				Journal_Printf( info, "\t\t\t\tasCFIndex: %u\n", self->_entryTbl[entry_I].value.as.typeCFIndex);
+				break;
 			}
 		}
 	Journal_Printf( info, "\t_mesh (ptr): %p\n", self->_mesh);
@@ -577,87 +577,91 @@ IndexSet* _SplitFrictionWallVC_GetSet(void* variableCondition)
 {
 	SplitFrictionWallVC*		self = (SplitFrictionWallVC*)variableCondition;
 	IndexSet	*set = NULL;
-	HexaMD*		hexaMD = (HexaMD*)self->_mesh->layout->decomp;
-	Stream*		warningStr = Journal_Register( Error_Type, self->type );
+	Stream*     warningStr = Journal_Register( Error_Type, self->type );
+	unsigned	nDims;
+	unsigned*	gSize;
 
-	
+	nDims = Mesh_GetDimSize( self->_mesh );
+	gSize = (unsigned*)ExtensionManager_Get( self->_mesh->info, self->_mesh, 
+						 ExtensionManager_GetHandle( self->_mesh->info, 
+									     "cartesianGlobalSize" ) );
 	switch (self->_wall) {
-		case SplitFrictionWallVC_Wall_Front:
-			if ( 1 == hexaMD->nodeGlobal3DCounts[K_AXIS] ) {
-				Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
+	case SplitFrictionWallVC_Wall_Front:
+		if ( nDims < 3 || !gSize[2] ) {
+			Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
 					"when mesh has no elements in the %s axis. Returning an empty set.\n", __func__,
 					SplitFrictionWallVC_WallEnumToStr[self->_wall], "K" );
-				set = IndexSet_New(hexaMD->nodeDomainCount);	
-			}
-			else {
-				set = RegularMeshUtils_CreateGlobalFrontSet(self->_mesh);
-			}
-			break;
+			set = IndexSet_New(Mesh_GetDomainSize( self->_mesh, MT_VERTEX ));	
+		}
+		else {
+			set = RegularMeshUtils_CreateGlobalFrontSet(self->_mesh);
+		}
+		break;
 			
-		case SplitFrictionWallVC_Wall_Back:
-			if ( 1 == hexaMD->nodeGlobal3DCounts[K_AXIS] ) {
-				Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
+	case SplitFrictionWallVC_Wall_Back:
+		if ( nDims < 3 || !gSize[2] ) {
+			Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
 					"when mesh has no elements in the %s axis. Returning an empty set.\n", __func__,
 					SplitFrictionWallVC_WallEnumToStr[self->_wall], "K" );
-				set = IndexSet_New(hexaMD->nodeDomainCount);	
-			}
-			else {
-				set = RegularMeshUtils_CreateGlobalBackSet(self->_mesh);
-			}	
-			break;
+			set = IndexSet_New(Mesh_GetDomainSize( self->_mesh, MT_VERTEX ));	
+		}
+		else {
+			set = RegularMeshUtils_CreateGlobalBackSet(self->_mesh);
+		}	
+		break;
 			
-		case SplitFrictionWallVC_Wall_Top:
-			if ( 1 == hexaMD->nodeGlobal3DCounts[J_AXIS] ) {
-				Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
+	case SplitFrictionWallVC_Wall_Top:
+		if ( nDims < 2 || !gSize[1] ) {
+			Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
 					"when mesh has no elements in the %s axis. Returning an empty set.\n", __func__,
 					SplitFrictionWallVC_WallEnumToStr[self->_wall], "J" );
-				set = IndexSet_New(hexaMD->nodeDomainCount);	
-			}
-			else {
-				set = RegularMeshUtils_CreateGlobalTopSet(self->_mesh);
-			}	
-			break;
+			set = IndexSet_New(Mesh_GetDomainSize( self->_mesh, MT_VERTEX ));	
+		}
+		else {
+			set = RegularMeshUtils_CreateGlobalTopSet(self->_mesh);
+		}	
+		break;
 			
-		case SplitFrictionWallVC_Wall_Bottom:
-			if ( 1 == hexaMD->nodeGlobal3DCounts[J_AXIS] ) {
-				Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
+	case SplitFrictionWallVC_Wall_Bottom:
+		if ( nDims < 2 || !gSize[1] ) {
+			Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
 					"when mesh has no elements in the %s axis. Returning an empty set.\n", __func__,
 					SplitFrictionWallVC_WallEnumToStr[self->_wall], "J" );
-				set = IndexSet_New(hexaMD->nodeDomainCount);	
-			}
-			else {
-				set = RegularMeshUtils_CreateGlobalBottomSet(self->_mesh);
-			}	
-			break;
+			set = IndexSet_New(Mesh_GetDomainSize( self->_mesh, MT_VERTEX ));	
+		}
+		else {
+			set = RegularMeshUtils_CreateGlobalBottomSet(self->_mesh);
+		}	
+		break;
 			
-		case SplitFrictionWallVC_Wall_Left:
-			if ( 1 == hexaMD->nodeGlobal3DCounts[I_AXIS] ) {
-				Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
+	case SplitFrictionWallVC_Wall_Left:
+		if ( !gSize[0] ) {
+			Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
 					"when mesh has no elements in the %s axis. Returning an empty set.\n", __func__,
 					SplitFrictionWallVC_WallEnumToStr[self->_wall], "I" );
-				set = IndexSet_New(hexaMD->nodeDomainCount);	
-			}
-			else {
-				set = RegularMeshUtils_CreateGlobalLeftSet(self->_mesh);
-			}	
-			break;
+			set = IndexSet_New(Mesh_GetDomainSize( self->_mesh, MT_VERTEX ));	
+		}
+		else {
+			set = RegularMeshUtils_CreateGlobalLeftSet(self->_mesh);
+		}	
+		break;
 			
-		case SplitFrictionWallVC_Wall_Right:
-			if ( 1 == hexaMD->nodeGlobal3DCounts[I_AXIS] ) {
-				Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
+	case SplitFrictionWallVC_Wall_Right:
+		if ( !gSize[0] ) {
+			Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
 					"when mesh has no elements in the %s axis. Returning an empty set.\n", __func__,
 					SplitFrictionWallVC_WallEnumToStr[self->_wall], "I" );
-				set = IndexSet_New(hexaMD->nodeDomainCount);	
-			}
-			else {
-				set = RegularMeshUtils_CreateGlobalRightSet(self->_mesh);
-			}
-			break;
+			set = IndexSet_New(Mesh_GetDomainSize( self->_mesh, MT_VERTEX ));	
+		}
+		else {
+			set = RegularMeshUtils_CreateGlobalRightSet(self->_mesh);
+		}
+		break;
 			
-		case SplitFrictionWallVC_Wall_Size:
-		default:
-			assert(0);
-			break;
+	case SplitFrictionWallVC_Wall_Size:
+	default:
+		assert(0);
+		break;
 	}
 	
 	return set;
@@ -683,17 +687,17 @@ Variable_Index _SplitFrictionWallVC_GetVariableIndex(void* variableCondition, In
 	searchedIndex = Variable_Register_GetIndex(self->variable_Register, varName );
 	
 	Journal_Firewall( ( searchedIndex < self->variable_Register->count ), errorStr, "Error- in %s: searching for index of "
-		"varIndex %u (\"%s\") at global node number %u failed - register returned index %u, greater than "
-		"count %u.\n", __func__, varIndex, varName, globalIndex, searchedIndex, self->variable_Register->count );
+			  "varIndex %u (\"%s\") at global node number %u failed - register returned index %u, greater than "
+			  "count %u.\n", __func__, varIndex, varName, globalIndex, searchedIndex, self->variable_Register->count );
 
 	return searchedIndex; 
 }
 
 
 VariableCondition_ValueIndex _SplitFrictionWallVC_GetValueIndex(
-		void*				variableCondition, 
-		Index				globalIndex, 
-		VariableCondition_VariableIndex	varIndex)
+	void*				variableCondition, 
+	Index				globalIndex, 
+	VariableCondition_VariableIndex	varIndex)
 {
 	return varIndex;
 }
@@ -719,12 +723,12 @@ void _SplitFrictionWallVC_PrintConcise( void* variableCondition, Stream* stream 
 	
 	Journal_Printf( stream, "\ttype: %s, set: ", self->type );
 	Journal_Printf( stream, "%s\n", 
-		self->_wall == SplitFrictionWallVC_Wall_Front ? "Front" :
-		self->_wall == SplitFrictionWallVC_Wall_Back ? "Back" : 
-		self->_wall == SplitFrictionWallVC_Wall_Left ? "Left" :
-		self->_wall == SplitFrictionWallVC_Wall_Right ? "Right" : 
-		self->_wall == SplitFrictionWallVC_Wall_Top ? "Top" :
-		self->_wall == SplitFrictionWallVC_Wall_Bottom ? "Bottom" : "None" );
+			self->_wall == SplitFrictionWallVC_Wall_Front ? "Front" :
+			self->_wall == SplitFrictionWallVC_Wall_Back ? "Back" : 
+			self->_wall == SplitFrictionWallVC_Wall_Left ? "Left" :
+			self->_wall == SplitFrictionWallVC_Wall_Right ? "Right" : 
+			self->_wall == SplitFrictionWallVC_Wall_Top ? "Top" :
+			self->_wall == SplitFrictionWallVC_Wall_Bottom ? "Bottom" : "None" );
 }
 
 /*--------------------------------------------------------------------------------------------------------------------------

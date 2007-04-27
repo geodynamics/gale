@@ -24,44 +24,20 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Init.c 3884 2006-10-26 05:26:19Z KathleenHumble $
+** $Id: Init.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+#include <stdio.h>
 #include <mpi.h>
-#include "Base/Base.h"
 
+#include "Base/Base.h"
 #include "Discretisation/Geometry/Geometry.h"
 #include "Discretisation/Shape/Shape.h"
 #include "Discretisation/Mesh/Mesh.h"
 
-#include "types.h"
-#include "Init.h"
-#include "AllElementsVC.h"
-#include "AllNodesVC.h"
-#include "DiscretisationContext.h"
-#include "MeshCoarsener_Hexa.h"
-#include "WallVC.h"
-#include "CornerVC.h"
-#include "InnerWallVC.h"
-#include "ShapeVC.h"
-#include "FrictionVC.h"
-#include "SplitFrictionWallVC.h"
-#include "Sync.h"
-#include "DofLayout.h"
-#include "Operator.h"
-#include "FieldVariable.h"
-#include "FieldVariable_Register.h"
-#include "LinearRegression.h"
-#include "OperatorFieldVariable.h"
-#include "TimeIntegrator.h"
-#include "TimeIntegratee.h"
-#include "ShapeAdvector.h"
-#include "Remesher.h"
-#include "StripRemesher.h"
-#include "CellRemesher.h"
+#include "Utils.h"
 
-#include <stdio.h>
 
 Bool DiscretisationUtils_Init( int* argc, char** argv[] ) {
 	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
@@ -75,24 +51,41 @@ Bool DiscretisationUtils_Init( int* argc, char** argv[] ) {
 	VariableCondition_Register_Add( variableCondition_Register, FrictionVC_Type, FrictionVC_Factory );
 	VariableCondition_Register_Add( variableCondition_Register, SplitFrictionWallVC_Type, SplitFrictionWallVC_Factory );
 	
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), AllElementsVC_Type, "0", (Stg_Component_DefaultConstructorFunction*)AllElementsVC_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), AllNodesVC_Type, "0", (Stg_Component_DefaultConstructorFunction*)AllNodesVC_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), DofLayout_Type, "0", (Stg_Component_DefaultConstructorFunction*)DofLayout_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), FieldVariable_Type, "0", (Stg_Component_DefaultConstructorFunction*)FieldVariable_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), OperatorFieldVariable_Type, "0", (Stg_Component_DefaultConstructorFunction*)OperatorFieldVariable_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), WallVC_Type, "0", (Stg_Component_DefaultConstructorFunction*)WallVC_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), CornerVC_Type, "0", (Stg_Component_DefaultConstructorFunction*)CornerVC_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), InnerWallVC_Type, "0", (Stg_Component_DefaultConstructorFunction*)InnerWallVC_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), ShapeVC_Type, "0", _ShapeVC_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), FrictionVC_Type, "0", (Stg_Component_DefaultConstructorFunction*)FrictionVC_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), SplitFrictionWallVC_Type, "0", (Stg_Component_DefaultConstructorFunction*)SplitFrictionWallVC_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), Remesher_Type, "0", (Stg_Component_DefaultConstructorFunction*)_Remesher_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), StripRemesher_Type, "0", (Stg_Component_DefaultConstructorFunction*)_StripRemesher_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), CellRemesher_Type, "0", (Stg_Component_DefaultConstructorFunction*)_CellRemesher_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), AllElementsVC_Type, 
+				   "0", (void* (*)(Name))AllElementsVC_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), AllNodesVC_Type, 
+				   "0", (void* (*)(Name))AllNodesVC_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), DofLayout_Type, 
+				   "0", (void* (*)(Name))DofLayout_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), FieldVariable_Type, "0", 
+				   (void* (*)(Name))FieldVariable_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), OperatorFieldVariable_Type, 
+				   "0", (void* (*)(Name))OperatorFieldVariable_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), WallVC_Type, 
+				   "0", (void* (*)(Name))WallVC_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), CornerVC_Type, 
+				   "0", (void* (*)(Name))CornerVC_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), InnerWallVC_Type, 
+				   "0", (void* (*)(Name))InnerWallVC_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), ShapeVC_Type, 
+				   "0", (void*  (*)(Name))_ShapeVC_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), FrictionVC_Type, 
+				   "0", (void* (*)(Name))FrictionVC_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), SplitFrictionWallVC_Type, 
+				   "0", (void* (*)(Name))SplitFrictionWallVC_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), Remesher_Type, 
+				   "0", (void* (*)(Name))_Remesher_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), StripRemesher_Type, 
+				   "0", (void* (*)(Name))_StripRemesher_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), CellRemesher_Type, 
+				   "0", (void* (*)(Name))_CellRemesher_DefaultNew );
 
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), TimeIntegrator_Type,"0", _TimeIntegrator_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), TimeIntegratee_Type,"0", _TimeIntegratee_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), ShapeAdvector_Type,"0", _ShapeAdvector_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), TimeIntegrator_Type, 
+				   "0", (void*  (*)(Name))_TimeIntegrator_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), TimeIntegratee_Type, 
+				   "0", (void*  (*)(Name))_TimeIntegratee_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), ShapeAdvector_Type, 
+				   "0", (void*  (*)(Name))_ShapeAdvector_DefaultNew );
 
 	RegisterParent( DiscretisationContext_Type,    AbstractContext_Type );
 
@@ -106,8 +99,6 @@ Bool DiscretisationUtils_Init( int* argc, char** argv[] ) {
 	RegisterParent( FrictionVC_Type,               VariableCondition_Type );
 	RegisterParent( SplitFrictionWallVC_Type,      VariableCondition_Type );
 	RegisterParent( DofLayout_Type,                Stg_Component_Type );
-	RegisterParent( MeshCoarsener_Hexa_Type,       Stg_Component_Type );
-	RegisterParent( Sync_Type,                     Stg_Component_Type );
 	RegisterParent( Remesher_Type,                 Stg_Component_Type );
 	RegisterParent( StripRemesher_Type,            Remesher_Type );
 	RegisterParent( CellRemesher_Type,            Remesher_Type );

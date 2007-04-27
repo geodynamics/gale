@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Intersection.c 3869 2006-10-16 13:42:59Z SteveQuenette $
+** $Id: Intersection.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -238,15 +238,15 @@ void _Intersection_Construct( void* intersection, Stg_ComponentFactory* cf, void
 	memset( shapeList,     0, shapeCount * sizeof(Stg_Shape*) );
 	memset( isComplement,  0, shapeCount * sizeof(Bool) );
 	
-	// TALK ABOUT WITH ROB, will there be some Flag for Union or Intersection type in the XML file.
-	// If so do we need another variable on the intersection class which is this flag, and then use that flag 
-	// to determine the method of test if a particle is inside or outside the shape
+	/* TALK ABOUT WITH ROB, will there be some Flag for Union or Intersection type in the XML file. */
+	/* If so do we need another variable on the intersection class which is this flag, and then use that flag  */
+	/* to determine the method of test if a particle is inside or outside the shape */
 
 
 	
 	Stream_Indent( stream );
 	for ( shape_I = 0 ; shape_I < shapeCount ; shape_I++) { 
-		// gets the textual name corresponding to the shape elements //	
+          /* gets the textual name corresponding to the shape elements	 */
 		nameShape = Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( optionsList, shape_I));
 
 		if ( nameShape[0] == '!' ) {

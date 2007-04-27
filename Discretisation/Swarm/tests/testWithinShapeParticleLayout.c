@@ -33,7 +33,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: testWithinShapeParticleLayout.c 3555 2006-05-10 07:05:46Z PatrickSunter $
+** $Id: testWithinShapeParticleLayout.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -61,24 +61,46 @@ struct _Particle {
 	__GlobalParticle
 };
 
+Mesh* buildMesh( unsigned nDims, unsigned* size, 
+		     double* minCrds, double* maxCrds, 
+		     ExtensionManager_Register* emReg )
+{
+	CartesianGenerator*	gen;
+	Mesh*			mesh;
+
+	gen = CartesianGenerator_New( "" );
+	CartesianGenerator_SetDimSize( gen, nDims );
+	CartesianGenerator_SetTopologyParams( gen, size, 0, NULL, NULL );
+	CartesianGenerator_SetGeometryParams( gen, minCrds, maxCrds );
+
+	mesh = Mesh_New( "" );
+	Mesh_SetExtensionManagerRegister( mesh, emReg );
+	Mesh_SetGenerator( mesh, gen );
+
+	Build( mesh, NULL, False );
+	Initialise( mesh, NULL, False );
+
+	KillObject( mesh->generator );
+
+	return mesh;
+}
+
 int main( int argc, char* argv[] ) {
 	MPI_Comm                    CommWorld;
 	int                         rank;
 	int                         numProcessors;
 	int                         procToWatch;
 	Dictionary*                 dictionary;
-	Topology*                   nTopology;
-	ElementLayout*              eLayout;
-	NodeLayout*                 nLayout;
-	MeshDecomp*                 decomp;
-	MeshLayout*                 layout;
+	unsigned	nDims = 3;
+	unsigned	meshSize[3] = {5, 3, 2};
+	double		minCrds[3] = {0.0, 0.0, 0.0};
+	double		maxCrds[3] = {1.0, 1.0, 1.0};
 	ExtensionManager_Register*  extensionMgr_Register;
 	Mesh*                       mesh;
 	WithinShapeParticleLayout*        particleLayout;
 	ElementCellLayout*          elementCellLayout;
 	Swarm*                      swarm;
 	Stream*                     stream;
-	Dimension_Index             dim;
 	Stg_Shape*                  shape;
 	XYZ                         centre;
 	
@@ -98,7 +120,7 @@ int main( int argc, char* argv[] ) {
 	MPI_Barrier( CommWorld ); /* Ensures copyright info always come first in output */
 
 	stream = Journal_Register (Info_Type, "myStream");
-	//Stream_RedirectFile_WithPrependedPath( stream, "output", "withinShapeParticleLayout.dat" );
+	/* Stream_RedirectFile_WithPrependedPath( stream, "output", "withinShapeParticleLayout.dat" ); */
 
 	if( argc >= 2 ) {
 		procToWatch = atoi( argv[1] );
@@ -110,33 +132,13 @@ int main( int argc, char* argv[] ) {
 	
 	/* Read input */
 	dictionary = Dictionary_New();
-	Dictionary_Add( dictionary, "rank", Dictionary_Entry_Value_FromUnsignedInt( rank ) );
-	Dictionary_Add( dictionary, "numProcessors", Dictionary_Entry_Value_FromUnsignedInt( numProcessors ) );
-	Dictionary_Add( dictionary, "meshSizeI", Dictionary_Entry_Value_FromUnsignedInt( 5 ) );
-	Dictionary_Add( dictionary, "meshSizeJ", Dictionary_Entry_Value_FromUnsignedInt( 3 ) );
-	Dictionary_Add( dictionary, "meshSizeK", Dictionary_Entry_Value_FromUnsignedInt( 2 ) );
-	Dictionary_Add( dictionary, "minX", Dictionary_Entry_Value_FromDouble( 0.0f ) );
-	Dictionary_Add( dictionary, "minY", Dictionary_Entry_Value_FromDouble( 0.0f ) );
-	Dictionary_Add( dictionary, "minZ", Dictionary_Entry_Value_FromDouble( 0.0f ) );
-	Dictionary_Add( dictionary, "maxX", Dictionary_Entry_Value_FromDouble( 1.0f ) );
-	Dictionary_Add( dictionary, "maxY", Dictionary_Entry_Value_FromDouble( 1.0f ) );
-	Dictionary_Add( dictionary, "maxZ", Dictionary_Entry_Value_FromDouble( 1.0f ) );
 	Dictionary_Add( dictionary, "dim", Dictionary_Entry_Value_FromUnsignedInt( 3 ) );
 	Dictionary_Add( dictionary, "averageInitialParticlesPerCell", Dictionary_Entry_Value_FromUnsignedInt( 20 ) );
 	
 	
-	/* Run the mesher */
-	dim       = Dictionary_GetUnsignedInt( dictionary, "dim" );
-
-	nTopology = (Topology*)IJK6Topology_New( "IJK6Topology", dictionary );
-	eLayout   = (ElementLayout*)ParallelPipedHexaEL_New( "PPHexaEL", 3, dictionary );
-	nLayout   = (NodeLayout*)CornerNL_New( "CornerNL", dictionary, eLayout, nTopology );
-	decomp    = (MeshDecomp*)HexaMD_New( "HexaMD", dictionary, MPI_COMM_WORLD, eLayout, nLayout );
-	layout    = MeshLayout_New( "MeshLayout", eLayout, nLayout, decomp );
-	
 	/* Init mesh */
 	extensionMgr_Register = ExtensionManager_Register_New();
-	mesh = Mesh_New( "Mesh", layout, sizeof(Node), sizeof(Element), extensionMgr_Register, dictionary );
+	mesh = buildMesh( nDims, meshSize, minCrds, maxCrds, extensionMgr_Register );
 	
 	/* Configure the element-cell-layout */
 	elementCellLayout = ElementCellLayout_New( "elementCellLayout", mesh );
@@ -146,13 +148,13 @@ int main( int argc, char* argv[] ) {
 	Initialise( mesh, 0, False );
 	
 	centre[I_AXIS] = centre[J_AXIS] = centre[K_AXIS] = 0.5;
-	shape = (Stg_Shape*)Sphere_New( "testSphere", dim, centre, 0, 0, 0, 0.05 );
+	shape = (Stg_Shape*)Sphere_New( "testSphere", nDims, centre, 0, 0, 0, 0.05 );
 	
 	/* Configure the gauss-particle-layout */
-	particleLayout = WithinShapeParticleLayout_New( "withinShapeParticleLayout", dim, 10, shape );
+	particleLayout = WithinShapeParticleLayout_New( "withinShapeParticleLayout", nDims, 10, shape );
 	
 	/* Configure the swarm */
-	swarm = Swarm_New(  "testSwarm", elementCellLayout, particleLayout, dim, sizeof(Particle),
+	swarm = Swarm_New(  "testSwarm", elementCellLayout, particleLayout, nDims, sizeof(Particle),
 		extensionMgr_Register, NULL, CommWorld );
 	
 	/* Build the swarm */
@@ -171,11 +173,6 @@ int main( int argc, char* argv[] ) {
 	Stg_Class_Delete( swarm );
 	Stg_Class_Delete( mesh );
 	Stg_Class_Delete( extensionMgr_Register );
-	Stg_Class_Delete( layout );
-	Stg_Class_Delete( decomp );
-	Stg_Class_Delete( nLayout );
-	Stg_Class_Delete( eLayout );
-	Stg_Class_Delete( nTopology );
 	Stg_Class_Delete( dictionary );
 	
 	DiscretisationSwarm_Finalise();

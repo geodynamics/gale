@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: PluginsManager.c 4053 2007-03-28 01:48:56Z KathleenHumble $
+** $Id: PluginsManager.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -453,7 +453,7 @@ void PluginsManager_ConstructPlugins( void* plugins, Stg_ComponentFactory* cf, v
 	int i;
 
 	for ( i = 0; i < self->codelets->count; ++i ) {
-		Stg_Component_Construct( self->codelets->data[i], cf, data, False );// True );
+          Stg_Component_Construct( self->codelets->data[i], cf, data, False );/* True ); */
 	}
 }
 
@@ -461,7 +461,7 @@ void PluginsManager_ConstructPlugins( void* plugins, Stg_ComponentFactory* cf, v
 Bool PluginsManager_ConstructPlugin( void* plugins, Name pluginName, Stg_ComponentFactory* cf, void* data ) {
 	PluginsManager* self = (PluginsManager*)plugins;
 
-	//Get the codelet for the plugin we're wanting to construct.
+	/*Get the codelet for the plugin we're wanting to construct. */
 	void* codelet = Stg_ObjectList_Get(self->codelets, pluginName);
 				
 	if(codelet == NULL)

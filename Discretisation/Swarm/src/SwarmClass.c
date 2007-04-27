@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SwarmClass.c 4044 2007-03-21 23:35:21Z PatrickSunter $
+** $Id: SwarmClass.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -41,6 +41,7 @@
 #include "SwarmClass.h"
 
 #include "StandardParticle.h"
+#include "ShadowInfo.h"
 #include "CellLayout.h"
 #include "ElementCellLayout.h"
 #include "ParticleLayout.h"
@@ -358,10 +359,10 @@ void _Swarm_Print( void* swarm, Stream* stream ) {
 		for( cParticle_I = 0; cParticle_I < self->cellParticleCountTbl[cell_I]; cParticle_I++ ) {
 			dParticle_I = self->cellParticleTbl[cell_I][cParticle_I];
 			Journal_Printf( swarmStream, "\t\t\t(part. index) %d\n", dParticle_I );
-			// TODO: should probably handle this by having a particle print E.P.
-			// which the swarm holds, which can be extended to print the 
-			// particles correctly.
-			// Check how the mesh handles this for elements and nodes...
+			/* TODO: should probably handle this by having a particle print E.P.
+			   which the swarm holds, which can be extended to print the 
+			   particles correctly.
+			   Check how the mesh handles this for elements and nodes... */
 			#if 0
 			Journal_Printf( swarmStream, "\t\t\t(ptr) %p\n", Swarm_ParticleAt( self, dParticle_I ) );
 			Journal_Printf( swarmStream, "\t\t\t%g %g %g\n", 
@@ -592,6 +593,9 @@ void _Swarm_Build( void* swarm, void* data ) {
 	
 	Journal_DPrintf( self->debug, "In %s(): for swarm \"%s\" (of type %s)\n", __func__, self->name, self->type ); 
 	Stream_IndentBranch( Swarm_Debug );
+
+	Build( self->cellLayout, data, False );
+	Build( self->particleLayout, data, False );
 	
 	Journal_DPrintf( self->debug, "allocating memory for cell->particle mappings:\n" );
 	_Swarm_BuildCells( self, data );
@@ -981,7 +985,6 @@ Particle_Index Swarm_FindClosestParticle( void* _swarm, Dimension_Index dim, dou
 	GlobalParticle       testParticle;
 	double               minDistance;
 	double               distanceToParticle;
-	Topology*            topology;
 	NeighbourIndex       neighbourCount;
 	NeighbourIndex       neighbour_I;
 	NeighbourIndex*      neighbourList;
@@ -1005,16 +1008,12 @@ Particle_Index Swarm_FindClosestParticle( void* _swarm, Dimension_Index dim, dou
 	closestParticle_I = swarm->cellParticleTbl[ lCell_I ][ cParticle_I ];
 
 	/* Find neighbours to this cell - TODO This Assumes ElementCellLayout */
-	topology = ((ElementCellLayout*)swarm->cellLayout)->mesh->layout->elementLayout->topology;
-	neighbourCount = Topology_NeighbourCount( topology, lCell_I );
-	neighbourList  = Memory_Alloc_Array( NeighbourIndex, neighbourCount, "ElementNeighbours" );
-	Topology_BuildNeighbours( topology, lCell_I, neighbourList );
+	Mesh_GetIncidence( ((ElementCellLayout*)swarm->cellLayout)->mesh, dim, lCell_I, dim, 
+			   &neighbourCount, &neighbourList );
 
 	/* Loop over neighbours */
 	for ( neighbour_I = 0 ; neighbour_I < neighbourCount ; neighbour_I++ ) {
 		lCell_I = neighbourList[ neighbour_I ];
-		if ( lCell_I == Topology_Invalid( topology ) )
-			continue;
 
 		/* TODO - Be more clever than checking every particle in this cell */
 		cParticle_I = Swarm_FindClosestParticleInCell( swarm, lCell_I, dim, coord, &distanceToParticle );
@@ -1025,7 +1024,6 @@ Particle_Index Swarm_FindClosestParticle( void* _swarm, Dimension_Index dim, dou
 			closestParticle_I = swarm->cellParticleTbl[ lCell_I ][ cParticle_I ];
 		}
 	}
-	Memory_Free( neighbourList );
 
 	/* Return Distance to this particle */
 	if (distance != NULL)

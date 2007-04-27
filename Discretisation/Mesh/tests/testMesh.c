@@ -24,130 +24,513 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testMesh.c 3664 2006-07-04 04:26:57Z PatrickSunter $
+** $Id: testMesh.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-#include <mpi.h>
-#include "Base/Base.h"
-
-#include "Discretisation/Geometry/Geometry.h"
-#include "Discretisation/Shape/Shape.h"
-#include "Discretisation/Mesh/Mesh.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
+#include <mpi.h>
 #include <mpi.h>
 
-struct _Node
-{
-	double temp;
-};
-
-struct _Element
-{
-	double temp;
-};
+#include "Base/Base.h"
+#include "Discretisation/Geometry/Geometry.h"
+#include "Discretisation/Shape/Shape.h"
+#include "Discretisation/Mesh/Mesh.h"
 
 
-int main(int argc, char *argv[])
-{
-	MPI_Comm		CommWorld;
-	int			rank;
-	int			procCount;
-	int			procToWatch;
-	Dictionary*		dictionary;
-	ExtensionManager_Register*	extensionMgr_Register;
-	Topology*		nTopology;
-	ElementLayout*		eLayout;
-	NodeLayout*		nLayout;
-	MeshDecomp*		decomp;
-	MeshLayout*		ml;
+Bool testNearVert( unsigned rank, unsigned nProcs, unsigned watch ) {
+	Bool			result = True;
+	CartesianGenerator*	gen;
 	Mesh*			mesh;
-	Stream*			stream;
-	
-	/* Initialise MPI, get world info */
-	MPI_Init(&argc, &argv);
-	MPI_Comm_dup( MPI_COMM_WORLD, &CommWorld );
-	MPI_Comm_size(CommWorld, &procCount);
-	MPI_Comm_rank(CommWorld, &rank);
+	unsigned		sizes[3];
+	double			minCrd[3];
+	double			maxCrd[3];
 
-	Base_Init( &argc, &argv );
-	
-	DiscretisationGeometry_Init( &argc, &argv );
-	DiscretisationShape_Init( &argc, &argv );
-	DiscretisationMesh_Init( &argc, &argv );
-	MPI_Barrier( CommWorld ); /* Ensures copyright info always come first in output */
+	sizes[0] = sizes[1] = sizes[2] = nProcs;
+	minCrd[0] = minCrd[1] = minCrd[2] = 0.0;
+	maxCrd[0] = maxCrd[1] = maxCrd[2] = (double)nProcs;
 
-	stream = Journal_Register (Info_Type, "myStream");
-	procToWatch = argc >= 2 ? atoi(argv[1]) : 0;
-	
-	dictionary = Dictionary_New();
-	Dictionary_Add( dictionary, "rank", Dictionary_Entry_Value_FromUnsignedInt( rank ) );
-	Dictionary_Add( dictionary, "numProcessors", Dictionary_Entry_Value_FromUnsignedInt( procCount ) );
-	Dictionary_Add( dictionary, "meshSizeI", Dictionary_Entry_Value_FromUnsignedInt( 4 ) );
-	Dictionary_Add( dictionary, "meshSizeJ", Dictionary_Entry_Value_FromUnsignedInt( 4 ) );
-	Dictionary_Add( dictionary, "meshSizeK", Dictionary_Entry_Value_FromUnsignedInt( 4 ) );
-	Dictionary_Add( dictionary, "allowUnusedCPUs", Dictionary_Entry_Value_FromBool( True ) );
-	Dictionary_Add( dictionary, "allowPartitionOnElement", Dictionary_Entry_Value_FromBool( True ) );
-	Dictionary_Add( dictionary, "allowPartitionOnNode", Dictionary_Entry_Value_FromBool( True ) );
-	Dictionary_Add( dictionary, "allowUnbalancing", Dictionary_Entry_Value_FromBool( False ) );
-	Dictionary_Add( dictionary, "shadowDepth", Dictionary_Entry_Value_FromUnsignedInt( 0 ) );
-	
-	nTopology = (Topology*)IJK6Topology_New( "IJK6Topology", dictionary );
-	eLayout = (ElementLayout*)ParallelPipedHexaEL_New( "PPHexaEL", 3, dictionary );
-	nLayout = (NodeLayout*)CornerNL_New( "CornerNL", dictionary, eLayout, nTopology );
-	decomp = (MeshDecomp*)HexaMD_New( "HexaMD", dictionary, MPI_COMM_WORLD, eLayout, nLayout );
-	ml = MeshLayout_New( "MeshLayout", eLayout, nLayout, decomp );
-	
-	extensionMgr_Register = ExtensionManager_Register_New();
-	mesh = Mesh_New( "Mesh", ml, sizeof(Node), sizeof(Element), extensionMgr_Register, dictionary );
-	
-	mesh->buildNodeLocalToGlobalMap = True;
-	mesh->buildNodeDomainToGlobalMap = True;
-	mesh->buildNodeGlobalToLocalMap = True;
-	mesh->buildNodeGlobalToDomainMap = True;
-	mesh->buildNodeNeighbourTbl = True;
-	mesh->buildNodeElementTbl = True;
-	mesh->buildElementLocalToGlobalMap = True;
-	mesh->buildElementDomainToGlobalMap = True;
-	mesh->buildElementGlobalToDomainMap = True;
-	mesh->buildElementGlobalToLocalMap = True;
-	mesh->buildElementNeighbourTbl = True;
-	mesh->buildElementNodeTbl = True;
-	Build( mesh, 0, False );
-	Initialise(mesh, 0, False );
-	
-	if (rank == procToWatch)
-	{
-		Element_DomainIndex	element_dI = 0;
+	gen = CartesianGenerator_New( "" );
+	MeshGenerator_SetDimSize( gen, 3 );
+	CartesianGenerator_SetTopologyParams( gen, sizes, 0, NULL, NULL );
+	CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
 
-		Print(mesh, stream);
-		
-		Journal_Printf( stream, "Test that the getNodeCoordPtrsOfElement() function works\n" );
-		for ( element_dI = 0; element_dI < mesh->elementDomainCount; element_dI++ ) {
-			Journal_Printf( stream, "Element %u:\n\t", element_dI );
-			Mesh_PrintNodeCoordsOfElement( mesh, element_dI, stream );
+	mesh = Mesh_New( "" );
+	Mesh_SetGenerator( mesh, gen );
+	Build( mesh, NULL, False );
+
+	if( rank == watch ) {
+		unsigned	e_i;
+
+		for( e_i = 0; e_i < Mesh_GetDomainSize( mesh, MT_VOLUME ); e_i++ ) {
+			unsigned	nInc, *inc;
+			unsigned	inc_i;
+
+			Mesh_GetIncidence( mesh, MT_VOLUME, e_i, MT_VERTEX, &nInc, &inc );
+			for( inc_i = 0; inc_i < nInc; inc_i++ ) {
+				double*	vert;
+
+				vert = Mesh_GetVertex( mesh, inc[inc_i] );
+				if( Mesh_NearestVertex( mesh, vert ) != inc[inc_i] ) {
+					result = False;
+					goto done;
+				}
+			}
 		}
 	}
-	
-	Stg_Class_Delete(mesh);
-	Stg_Class_Delete(ml);
-	Stg_Class_Delete(decomp);
-	Stg_Class_Delete(nLayout);
-	Stg_Class_Delete(eLayout);
-	Stg_Class_Delete( nTopology );
-	Stg_Class_Delete(dictionary);
-	
+
+done:
+	FreeObject( gen );
+	FreeObject( mesh );
+
+	return result;
+}
+
+Bool testElSearch1D( unsigned rank, unsigned nProcs, unsigned watch ) {
+	Bool			result = True;
+	CartesianGenerator*	gen;
+	Mesh*			mesh;
+	unsigned		sizes[1];
+	double			minCrd[1];
+	double			maxCrd[1];
+
+	sizes[0] = nProcs * 5;
+	minCrd[0] = 0.0;
+	maxCrd[0] = (double)nProcs;
+
+	gen = CartesianGenerator_New( "" );
+	MeshGenerator_SetDimSize( gen, 1 );
+	CartesianGenerator_SetTopologyParams( gen, sizes, 0, NULL, NULL );
+	CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
+
+	mesh = Mesh_New( "" );
+	Mesh_SetGenerator( mesh, gen );
+	Build( mesh, NULL, False );
+
+	if( rank == watch ) {
+		unsigned	e_i;
+
+		for( e_i = 0; e_i < Mesh_GetDomainSize( mesh, MT_EDGE ); e_i++ ) {
+			unsigned	nInc, *inc;
+			double		point[1];
+			unsigned	elDim, elInd;
+			unsigned	inc_i;
+
+			Mesh_GetIncidence( mesh, MT_EDGE, e_i, MT_VERTEX, &nInc, &inc );
+			for( inc_i = 0; inc_i < nInc; inc_i++ ) {
+				double*	vert;
+
+				vert = Mesh_GetVertex( mesh, inc[inc_i] );
+				if( !Mesh_Search( mesh, vert, &elDim, &elInd ) || 
+				    elDim != MT_VERTEX || 
+				    elInd != inc[inc_i] )
+				{
+					result = False;
+					goto done;
+				}
+			}
+
+			Mesh_GetIncidence( mesh, MT_EDGE, e_i, MT_VERTEX, &nInc, &inc );
+			point[0] = 0.0;
+			for( inc_i = 0; inc_i < nInc; inc_i++ )
+				point[0] += Mesh_GetVertex( mesh, inc[inc_i] )[0];
+			point[0] /= (double)nInc;
+			if( !Mesh_Search( mesh, point, &elDim, &elInd ) || 
+			    elDim != MT_EDGE || 
+			    elInd != e_i )
+			{
+				result = False;
+				goto done;
+			}
+		}
+	}
+
+done:
+	FreeObject( gen );
+	FreeObject( mesh );
+
+	return result;
+}
+
+Bool testElSearch2D( unsigned rank, unsigned nProcs, unsigned watch ) {
+	Bool			result = True;
+	CartesianGenerator*	gen;
+	Mesh*			mesh;
+	unsigned		sizes[2];
+	double			minCrd[2];
+	double			maxCrd[2];
+
+	sizes[0] = sizes[1] = nProcs * 3;
+	minCrd[0] = minCrd[1] = 0.0;
+	maxCrd[0] = maxCrd[1] = (double)nProcs;
+
+	gen = CartesianGenerator_New( "" );
+	MeshGenerator_SetDimSize( gen, 2 );
+	CartesianGenerator_SetTopologyParams( gen, sizes, 0, NULL, NULL );
+	CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
+
+	mesh = Mesh_New( "" );
+	Mesh_SetGenerator( mesh, gen );
+	Build( mesh, NULL, False );
+
+	if( rank == watch ) {
+		unsigned	e_i;
+
+		for( e_i = 0; e_i < Mesh_GetDomainSize( mesh, MT_FACE ); e_i++ ) {
+			unsigned	nInc, *inc;
+			double		point[2];
+			unsigned	elDim, elInd;
+			unsigned	inc_i;
+
+			Mesh_GetIncidence( mesh, MT_FACE, e_i, MT_VERTEX, &nInc, &inc );
+			for( inc_i = 0; inc_i < nInc; inc_i++ ) {
+				double*	vert;
+
+				vert = Mesh_GetVertex( mesh, inc[inc_i] );
+				if( !Mesh_Search( mesh, vert, &elDim, &elInd ) || 
+				    elDim != MT_VERTEX || 
+				    elInd != inc[inc_i] )
+				{
+					result = False;
+					goto done;
+				}
+			}
+
+			Mesh_GetIncidence( mesh, MT_FACE, e_i, MT_EDGE, &nInc, &inc );
+			for( inc_i = 0; inc_i < nInc; inc_i++ ) {
+				unsigned	nEdgeInc, *edgeInc;
+				unsigned	inc_j;
+
+				Mesh_GetIncidence( mesh, MT_EDGE, inc[inc_i], MT_VERTEX, &nEdgeInc, &edgeInc );
+				point[0] = point[1] = 0.0;
+				for( inc_j = 0; inc_j < nEdgeInc; inc_j++ ) {
+					point[0] += Mesh_GetVertex( mesh, edgeInc[inc_j] )[0];
+					point[1] += Mesh_GetVertex( mesh, edgeInc[inc_j] )[1];
+				}
+				point[0] /= (double)nEdgeInc;
+				point[1] /= (double)nEdgeInc;
+				if( !Mesh_Search( mesh, point, &elDim, &elInd ) || 
+				    elDim != MT_EDGE || 
+				    elInd != inc[inc_i] )
+				{
+					result = False;
+					goto done;
+				}
+			}
+
+			Mesh_GetIncidence( mesh, MT_FACE, e_i, MT_VERTEX, &nInc, &inc );
+			point[0] = point[1] = 0.0;
+			for( inc_i = 0; inc_i < nInc; inc_i++ ) {
+				point[0] += Mesh_GetVertex( mesh, inc[inc_i] )[0];
+				point[1] += Mesh_GetVertex( mesh, inc[inc_i] )[1];
+			}
+			point[0] /= (double)nInc;
+			point[1] /= (double)nInc;
+			if( !Mesh_Search( mesh, point, &elDim, &elInd ) || 
+			    elDim != MT_FACE || 
+			    elInd != e_i )
+			{
+				result = False;
+				goto done;
+			}
+		}
+	}
+
+done:
+	FreeObject( gen );
+	FreeObject( mesh );
+
+	return result;
+}
+
+Bool testElSearch3D( unsigned rank, unsigned nProcs, unsigned watch ) {
+	Bool			result = True;
+	CartesianGenerator*	gen;
+	Mesh*			mesh;
+	unsigned		sizes[3];
+	double			minCrd[3];
+	double			maxCrd[3];
+
+	sizes[0] = sizes[1] = sizes[2] = nProcs;
+	minCrd[0] = minCrd[1] = minCrd[2] = 0.0;
+	maxCrd[0] = maxCrd[1] = maxCrd[2] = (double)nProcs;
+
+	gen = CartesianGenerator_New( "" );
+	MeshGenerator_SetDimSize( gen, 3 );
+	CartesianGenerator_SetTopologyParams( gen, sizes, 0, NULL, NULL );
+	CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
+
+	mesh = Mesh_New( "" );
+	Mesh_SetGenerator( mesh, gen );
+	Build( mesh, NULL, False );
+
+	if( rank == watch ) {
+		unsigned	e_i;
+
+		for( e_i = 0; e_i < Mesh_GetDomainSize( mesh, MT_VOLUME ); e_i++ ) {
+			unsigned	nInc, *inc;
+			double		point[3];
+			unsigned	elDim, elInd;
+			unsigned	inc_i;
+
+			Mesh_GetIncidence( mesh, MT_VOLUME, e_i, MT_VERTEX, &nInc, &inc );
+			for( inc_i = 0; inc_i < nInc; inc_i++ ) {
+				double*	vert;
+
+				vert = Mesh_GetVertex( mesh, inc[inc_i] );
+				if( !Mesh_Search( mesh, vert, &elDim, &elInd ) || 
+				    elDim != MT_VERTEX || 
+				    elInd != inc[inc_i] )
+				{
+					result = False;
+					goto done;
+				}
+			}
+
+			Mesh_GetIncidence( mesh, MT_VOLUME, e_i, MT_EDGE, &nInc, &inc );
+			for( inc_i = 0; inc_i < nInc; inc_i++ ) {
+				unsigned	nEdgeInc, *edgeInc;
+				unsigned	inc_j;
+
+				Mesh_GetIncidence( mesh, MT_EDGE, inc[inc_i], MT_VERTEX, &nEdgeInc, &edgeInc );
+				point[0] = point[1] = point[2] = 0.0;
+				for( inc_j = 0; inc_j < nEdgeInc; inc_j++ ) {
+					point[0] += Mesh_GetVertex( mesh, edgeInc[inc_j] )[0];
+					point[1] += Mesh_GetVertex( mesh, edgeInc[inc_j] )[1];
+					point[2] += Mesh_GetVertex( mesh, edgeInc[inc_j] )[2];
+				}
+				point[0] /= (double)nEdgeInc;
+				point[1] /= (double)nEdgeInc;
+				point[2] /= (double)nEdgeInc;
+				if( !Mesh_Search( mesh, point, &elDim, &elInd ) || 
+				    elDim != MT_EDGE || 
+				    elInd != inc[inc_i] )
+				{
+					result = False;
+					goto done;
+				}
+			}
+
+			Mesh_GetIncidence( mesh, MT_VOLUME, e_i, MT_FACE, &nInc, &inc );
+			for( inc_i = 0; inc_i < nInc; inc_i++ ) {
+				unsigned	nFaceInc, *faceInc;
+				unsigned	inc_j;
+
+				Mesh_GetIncidence( mesh, MT_FACE, inc[inc_i], MT_VERTEX, &nFaceInc, &faceInc );
+				point[0] = point[1] = point[2] = 0.0;
+				for( inc_j = 0; inc_j < nFaceInc; inc_j++ ) {
+					point[0] += Mesh_GetVertex( mesh, faceInc[inc_j] )[0];
+					point[1] += Mesh_GetVertex( mesh, faceInc[inc_j] )[1];
+					point[2] += Mesh_GetVertex( mesh, faceInc[inc_j] )[2];
+				}
+				point[0] /= (double)nFaceInc;
+				point[1] /= (double)nFaceInc;
+				point[2] /= (double)nFaceInc;
+				if( !Mesh_Search( mesh, point, &elDim, &elInd ) || 
+				    elDim != MT_FACE || 
+				    elInd != inc[inc_i] )
+				{
+					result = False;
+					goto done;
+				}
+			}
+
+			Mesh_GetIncidence( mesh, MT_VOLUME, e_i, MT_VERTEX, &nInc, &inc );
+			point[0] = point[1] = point[2] = 0.0;
+			for( inc_i = 0; inc_i < nInc; inc_i++ ) {
+				point[0] += Mesh_GetVertex( mesh, inc[inc_i] )[0];
+				point[1] += Mesh_GetVertex( mesh, inc[inc_i] )[1];
+				point[2] += Mesh_GetVertex( mesh, inc[inc_i] )[2];
+			}
+			point[0] /= (double)nInc;
+			point[1] /= (double)nInc;
+			point[2] /= (double)nInc;
+			if( !Mesh_Search( mesh, point, &elDim, &elInd ) || 
+			    elDim != MT_VOLUME || 
+			    elInd != e_i )
+			{
+				result = False;
+				goto done;
+			}
+		}
+	}
+
+done:
+	FreeObject( gen );
+	FreeObject( mesh );
+
+	return result;
+}
+
+Bool testMinElSearch3D( unsigned rank, unsigned nProcs, unsigned watch ) {
+	Bool			result = True;
+	CartesianGenerator*	gen;
+	Mesh*			mesh;
+	unsigned		sizes[3];
+	double			minCrd[3];
+	double			maxCrd[3];
+
+	sizes[0] = sizes[1] = sizes[2] = nProcs;
+	minCrd[0] = minCrd[1] = minCrd[2] = 0.0;
+	maxCrd[0] = maxCrd[1] = maxCrd[2] = (double)nProcs;
+
+	gen = CartesianGenerator_New( "" );
+	MeshGenerator_SetDimSize( gen, 3 );
+	MeshGenerator_SetDimState( gen, 2, False );
+	MeshGenerator_SetDimState( gen, 1, True );
+	MeshGenerator_ClearIncidenceStates( gen );
+	MeshGenerator_SetIncidenceState( gen, 3, 0, True );
+	MeshGenerator_SetIncidenceState( gen, 1, 0, True );
+	MeshGenerator_SetIncidenceState( gen, 0, 3, True );
+	MeshGenerator_SetIncidenceState( gen, 0, 1, True );
+	MeshGenerator_SetIncidenceState( gen, 0, 0, True );
+	CartesianGenerator_SetTopologyParams( gen, sizes, 0, NULL, NULL );
+	CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
+
+	mesh = Mesh_New( "" );
+	Mesh_SetGenerator( mesh, gen );
+	Build( mesh, NULL, False );
+
+#if 0
+	if( rank == watch ) {
+		unsigned	e_i;
+
+		for( e_i = 0; e_i < Mesh_GetDomainSize( mesh, MT_VOLUME ); e_i++ ) {
+			unsigned	nInc, *inc;
+			double		point[3];
+			unsigned	elDim, elInd;
+			unsigned	inc_i;
+
+			Mesh_GetIncidence( mesh, MT_VOLUME, e_i, MT_VERTEX, &nInc, &inc );
+			for( inc_i = 0; inc_i < nInc; inc_i++ ) {
+				double*	vert;
+
+				vert = Mesh_GetVertex( mesh, inc[inc_i] );
+				if( !Mesh_Search( mesh, vert, &elDim, &elInd ) || 
+				    elDim != MT_VERTEX || 
+				    elInd != inc[inc_i] )
+				{
+					result = False;
+					goto done;
+				}
+			}
+
+			Mesh_GetIncidence( mesh, MT_VOLUME, e_i, MT_EDGE, &nInc, &inc );
+			for( inc_i = 0; inc_i < nInc; inc_i++ ) {
+				unsigned	nEdgeInc, *edgeInc;
+				unsigned	inc_j;
+
+				Mesh_GetIncidence( mesh, MT_EDGE, inc[inc_i], MT_VERTEX, &nEdgeInc, &edgeInc );
+				point[0] = point[1] = point[2] = 0.0;
+				for( inc_j = 0; inc_j < nEdgeInc; inc_j++ ) {
+					point[0] += Mesh_GetVertex( mesh, edgeInc[inc_j] )[0];
+					point[1] += Mesh_GetVertex( mesh, edgeInc[inc_j] )[1];
+					point[2] += Mesh_GetVertex( mesh, edgeInc[inc_j] )[2];
+				}
+				point[0] /= (double)nEdgeInc;
+				point[1] /= (double)nEdgeInc;
+				point[2] /= (double)nEdgeInc;
+				if( !Mesh_Search( mesh, point, &elDim, &elInd ) || 
+				    elDim != MT_EDGE || 
+				    elInd != inc[inc_i] )
+				{
+					result = False;
+					goto done;
+				}
+			}
+
+			Mesh_GetIncidence( mesh, MT_VOLUME, e_i, MT_FACE, &nInc, &inc );
+			for( inc_i = 0; inc_i < nInc; inc_i++ ) {
+				unsigned	nFaceInc, *faceInc;
+				unsigned	inc_j;
+
+				Mesh_GetIncidence( mesh, MT_FACE, inc[inc_i], MT_VERTEX, &nFaceInc, &faceInc );
+				point[0] = point[1] = point[2] = 0.0;
+				for( inc_j = 0; inc_j < nFaceInc; inc_j++ ) {
+					point[0] += Mesh_GetVertex( mesh, faceInc[inc_j] )[0];
+					point[1] += Mesh_GetVertex( mesh, faceInc[inc_j] )[1];
+					point[2] += Mesh_GetVertex( mesh, faceInc[inc_j] )[2];
+				}
+				point[0] /= (double)nFaceInc;
+				point[1] /= (double)nFaceInc;
+				point[2] /= (double)nFaceInc;
+				if( !Mesh_Search( mesh, point, &elDim, &elInd ) || 
+				    elDim != MT_FACE || 
+				    elInd != inc[inc_i] )
+				{
+					result = False;
+					goto done;
+				}
+			}
+
+			Mesh_GetIncidence( mesh, MT_VOLUME, e_i, MT_VERTEX, &nInc, &inc );
+			point[0] = point[1] = point[2] = 0.0;
+			for( inc_i = 0; inc_i < nInc; inc_i++ ) {
+				point[0] += Mesh_GetVertex( mesh, inc[inc_i] )[0];
+				point[1] += Mesh_GetVertex( mesh, inc[inc_i] )[1];
+				point[2] += Mesh_GetVertex( mesh, inc[inc_i] )[2];
+			}
+			point[0] /= (double)nInc;
+			point[1] /= (double)nInc;
+			point[2] /= (double)nInc;
+			if( !Mesh_Search( mesh, point, &elDim, &elInd ) || 
+			    elDim != MT_VOLUME || 
+			    elInd != e_i )
+			{
+				result = False;
+				goto done;
+			}
+		}
+	}
+#endif
+
+done:
+	FreeObject( gen );
+	FreeObject( mesh );
+
+	return result;
+}
+
+
+#define nTests	5
+
+TestSuite_Test	tests[nTests] = {{"test nearest vertex", testNearVert, 1}, 
+				 {"test element search (1D)", testElSearch1D, 1}, 
+				 {"test element search (2D)", testElSearch2D, 1}, 
+				 {"test element search (3D)", testElSearch3D, 1}, 
+				 {"test minimum element search (3D)", testMinElSearch3D, 1}};
+
+
+int main( int argc, char* argv[] ) {
+	TestSuite*	suite;
+
+	/* Initialise MPI, get world info. */
+	MPI_Init( &argc, &argv );
+
+	/* Initialise StGermain. */
+	Base_Init( &argc, &argv );
+	DiscretisationMesh_Init( &argc, &argv );
+
+	/* Create the test suite. */
+	suite = TestSuite_New();
+	TestSuite_SetProcToWatch( suite, (argc >= 2) ? atoi( argv[1] ) : 0 );
+	TestSuite_SetTests( suite, nTests, tests );
+
+	/* Run the tests. */
+	TestSuite_Run( suite );
+
+	/* Destroy test suites. */
+	FreeObject( suite );
+
+	/* Finalise StGermain. */
 	DiscretisationMesh_Finalise();
-	DiscretisationShape_Finalise();
-	DiscretisationGeometry_Finalise();
-	
 	Base_Finalise();
-	
+
 	/* Close off MPI */
 	MPI_Finalize();
-	
-	return 0; /* success */
+
+	return MPI_SUCCESS;
 }

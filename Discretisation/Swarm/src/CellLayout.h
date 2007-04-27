@@ -35,22 +35,21 @@
 ** Comments:
 **	Currently built with only ElementCellLayout in mind (for Snac).
 **
-** $Id: CellLayout.h 3462 2006-02-19 06:53:24Z WalterLandry $
+** $Id: CellLayout.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #ifndef __Discretisation_Swarm_CellLayout_h__
 #define __Discretisation_Swarm_CellLayout_h__
 	
-
 	/* Child classes must define these abstract functions */
 	typedef Cell_Index	(CellLayout_CellCountFunction)		( void* cellLayout );
 	typedef Cell_PointIndex	(CellLayout_PointCountFunction)		( void* cellLayout, Cell_Index cell_I );
 	typedef void		(CellLayout_InitialisePointsFunction)	( void* cellLayout, 
 										Cell_Index cell_I, 
 										Cell_PointIndex pointCount, 
-										Cell_Points points );
-	typedef Cell_Index	(CellLayout_MapElementIdToCellIdFunction)	( void* cellLayout, Element_DomainIndex element_dI ); 
+										double*** points );
+	typedef Cell_Index	(CellLayout_MapElementIdToCellIdFunction)	( void* cellLayout, unsigned element_dI ); 
 	typedef Bool		(CellLayout_IsInCellFunction)		( void* cellLayout, Cell_Index cell_I, void* particle );
 	typedef Cell_Index	(CellLayout_CellOfFunction)		( void* cellLayout, void* particle );
 	typedef ShadowInfo*	(CellLayout_GetShadowInfoFunction)	( void* cellLayout );
@@ -136,7 +135,7 @@
 
 	/** Get the Cell ID corresponding to a mesh element (only makes sense when the cell layout is used with a mesh
 	 * in the same app */
-	Cell_Index CellLayout_MapElementIdToCellId( void* cellLayout, Element_DomainIndex element_dI ); 
+	Cell_Index CellLayout_MapElementIdToCellId( void* cellLayout, unsigned element_dI ); 
 
 	/* Specify whether a particle is in a given cell */
 	Bool CellLayout_IsInCell( void* cellLayout, Cell_Index cellIndex, void* particle );

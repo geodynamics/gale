@@ -63,7 +63,7 @@
 **
 **	http://csd.vpac.org/twiki/bin/view/Stgermain/MemoryStats
 **
-** $Id: Memory.h 3462 2006-02-19 06:53:24Z WalterLandry $
+** $Id: Memory.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **/
 
@@ -733,10 +733,10 @@
 		_Memory_InternalMalloc( (itemSize) * (xLength) * (yLength) * (zLength) * (wLength) )
 	
 	#define _Memory_Realloc_Macro( ptr, newSize ) \
-		_Memory_InternalRealloc( (ptr), (newSize) );
+		_Memory_InternalRealloc( (ptr), (newSize) )
 
 	#define _Memory_Realloc_Array_Macro( ptr, itemSize, newLength ) \
-		_Memory_InternalRealloc( (ptr), (itemSize) * (newLength) );
+		_Memory_InternalRealloc( (ptr), (itemSize) * (newLength) )
 
 	#define _Memory_Free_Macro( ptr ) \
 		_Memory_InternalFree( (ptr) )

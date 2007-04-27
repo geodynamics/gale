@@ -38,7 +38,7 @@
 **	textual name for the DOF that will be used in the I/O of the DOF (e.g. for initial and boundary conditions), and "offset" is
 **	the memory offset of the DOF in the construct that it will be used (e.g. node.vel[0]-node ).
 **
-** $Id: Variable_Register.h 4076 2007-04-24 04:37:28Z PatrickSunter $
+** $Id: Variable_Register.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -61,6 +61,7 @@
 		SizeT                                   _size; \
 		SizeT                                   _delta; \
 		Variable**                              _variable; \
+		Stream*					errorStream;
 		
 	struct _Variable_Register { __Variable_Register };
 	

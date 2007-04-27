@@ -35,18 +35,12 @@
 #include <mpi.h>
 
 #include "Base/Base.h"
-
-#include "types.h"
-#include "shortcuts.h"
-#include "CommTopology.h"
-#include "Decomp.h"
-#include "Decomp_Sync_Claim.h"
-#include "Decomp_Sync_Negotiate.h"
-#include "Decomp_Sync.h"
+#include "Mesh.h"
 
 
 /* Textual name of this class */
 const Type Decomp_Sync_Type = "Decomp_Sync";
+
 
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Constructors
@@ -57,15 +51,7 @@ Decomp_Sync* Decomp_Sync_New( Name name ) {
 				 Decomp_Sync_Type, 
 				 _Decomp_Sync_Delete, 
 				 _Decomp_Sync_Print, 
-				 _Decomp_Sync_Copy, 
-				 (void* (*)(Name))_Decomp_Sync_New, 
-				 _Decomp_Sync_Construct, 
-				 _Decomp_Sync_Build, 
-				 _Decomp_Sync_Initialise, 
-				 _Decomp_Sync_Execute, 
-				 _Decomp_Sync_Destroy, 
-				 name, 
-				 NON_GLOBAL );
+				 NULL );
 }
 
 Decomp_Sync* _Decomp_Sync_New( DECOMP_SYNC_DEFARGS ) {
@@ -73,7 +59,7 @@ Decomp_Sync* _Decomp_Sync_New( DECOMP_SYNC_DEFARGS ) {
 	
 	/* Allocate memory */
 	assert( sizeOfSelf >= sizeof(Decomp_Sync) );
-	self = (Decomp_Sync*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
+	self = (Decomp_Sync*)_Stg_Class_New( STG_CLASS_PASSARGS );
 
 	/* Virtual info */
 
@@ -85,15 +71,20 @@ Decomp_Sync* _Decomp_Sync_New( DECOMP_SYNC_DEFARGS ) {
 
 void _Decomp_Sync_Init( Decomp_Sync* self ) {
 	self->decomp = NULL;
-	self->commTopo = NULL;
+	self->commTopo = CommTopology_New();
+	Stg_Class_AddRef( self->commTopo );
 
-	self->claim = Decomp_Sync_Claim_New( "" );
-	self->negotiate = Decomp_Sync_Negotiate_New( "" );
-
+	self->nDomains = 0;
 	self->nRemotes = 0;
 	self->remotes = NULL;
 	self->nShared = 0;
 	self->shared = NULL;
+	self->nSharers = NULL;
+	self->sharers = NULL;
+	self->owners = NULL;
+
+	self->grMap = UIntMap_New();
+	self->dsMap = UIntMap_New();
 
 	self->netSrcs = 0;
 	self->nSrcs = NULL;
@@ -102,8 +93,8 @@ void _Decomp_Sync_Init( Decomp_Sync* self ) {
 	self->nSnks = NULL;
 	self->snks = NULL;
 
-	self->nArrays = 0;
-	self->arrays = NULL;
+	self->arrays = List_New();
+	List_SetItemSize( self->arrays, sizeof(Decomp_Sync_Array*) );
 }
 
 
@@ -115,11 +106,10 @@ void _Decomp_Sync_Delete( void* sync ) {
 	Decomp_Sync*	self = (Decomp_Sync*)sync;
 
 	Decomp_Sync_Destruct( self );
-	FreeObject( self->claim );
-	FreeObject( self->negotiate );
+	FreeObject( self->arrays );
 
 	/* Delete the parent. */
-	_Stg_Component_Delete( self );
+	_Stg_Class_Delete( self );
 }
 
 void _Decomp_Sync_Print( void* sync, Stream* stream ) {
@@ -131,56 +121,7 @@ void _Decomp_Sync_Print( void* sync, Stream* stream ) {
 
 	/* Print parent */
 	Journal_Printf( stream, "Decomp_Sync (ptr): (%p)\n", self );
-	_Stg_Component_Print( self, stream );
-}
-
-void* _Decomp_Sync_Copy( void* sync, void* destProc_I, Bool deep, Name nameExt, PtrMap* ptrMap ) {
-#if 0
-	Decomp_Sync*	self = (Decomp_Sync*)sync;
-	Decomp_Sync*	newDecomp_Sync;
-	PtrMap*	map = ptrMap;
-	Bool	ownMap = False;
-
-	/* Damn me for making copying so difficult... what was I thinking? */
-	
-	/* We need to create a map if it doesn't already exist. */
-	if( !map ) {
-		map = PtrMap_New( 10 );
-		ownMap = True;
-	}
-	
-	newDecomp_Sync = (Decomp_Sync*)_Mesh_Copy( self, destProc_I, deep, nameExt, map );
-	
-	/* Copy the virtual methods here. */
-
-	/* Deep or shallow? */
-	if( deep ) {
-	}
-	else {
-	}
-	
-	/* If we own the map, get rid of it here. */
-	if( ownMap ) Stg_Class_Delete( map );
-	
-	return (void*)newDecomp_Sync;
-#endif
-
-	return NULL;
-}
-
-void _Decomp_Sync_Construct( void* sync, Stg_ComponentFactory* cf, void* data ) {
-}
-
-void _Decomp_Sync_Build( void* sync, void* data ) {
-}
-
-void _Decomp_Sync_Initialise( void* sync, void* data ) {
-}
-
-void _Decomp_Sync_Execute( void* sync, void* data ) {
-}
-
-void _Decomp_Sync_Destroy( void* sync, void* data ) {
+	_Stg_Class_Print( self, stream );
 }
 
 
@@ -192,139 +133,552 @@ void Decomp_Sync_SetDecomp( void* sync, Decomp* decomp ) {
 	Decomp_Sync*	self = (Decomp_Sync*)sync;
 
 	assert( self );
+	assert( Decomp_Sync_ValidateComms( self ) );
 
-	Decomp_Sync_Destruct( self );
-
+	Decomp_Sync_DestructDecomp( self );
 	self->decomp = decomp;
-	if( decomp )
-		Decomp_AddSync( decomp, self );
+	assert( Decomp_Sync_ValidateComms( self ) );
+
+	if( decomp ) {
+		self->nDomains = Decomp_GetLocalSize( decomp );
+		List_Append( Decomp_GetSyncList( decomp ), &self );
+	}
+	Decomp_Sync_InitArrays( self );
 }
 
-void Decomp_Sync_SetClaim( void* sync, Decomp_Sync_Claim* claim ) {
+void Decomp_Sync_SetCommTopology( void* sync, CommTopology* commTopo ) {
 	Decomp_Sync*	self = (Decomp_Sync*)sync;
 
 	assert( self );
 
-	Decomp_Sync_DestructRemotes( self );
-	FreeObject( self->claim );
+	Decomp_Sync_DestructComm( self );
+	if( commTopo ) {
+		self->commTopo = commTopo;
+		Stg_Class_AddRef( commTopo );
+	}
+	else {
+		self->commTopo = CommTopology_New();
+		Stg_Class_AddRef( commTopo );
+		if( self->decomp )
+			CommTopology_SetComm( self->commTopo, Decomp_GetComm( self->decomp ) );
+	}
+	assert( Decomp_Sync_ValidateComms( self ) );
 
-	if( claim )
-		self->claim = claim;
-	else
-		self->claim = Decomp_Sync_Claim_New( "" );
+	Decomp_Sync_InitArrays( self );
 }
 
-void Decomp_Sync_SetNegotiate( void* sync, Decomp_Sync_Negotiate* negotiate ) {
+void Decomp_Sync_AddRemoteRanks( void* sync, unsigned nRanks, unsigned* ranks ) {
 	Decomp_Sync*	self = (Decomp_Sync*)sync;
 
 	assert( self );
+	assert( !nRanks || ranks );
 
-	Decomp_Sync_DestructRemotes( self );
-	FreeObject( self->negotiate );
-
-	if( negotiate )
-		self->negotiate = negotiate;
-	else
-		self->negotiate = Decomp_Sync_Negotiate_New( "" );
+	CommTopology_AddIncidence( self->commTopo, nRanks, ranks );
+	Decomp_Sync_ExpandArrays( self, nRanks );
 }
 
 void Decomp_Sync_SetRemotes( void* sync, unsigned nRemotes, unsigned* remotes ) {
 	Decomp_Sync*	self = (Decomp_Sync*)sync;
-	RangeSet*	lSet;
-	RangeSet*	rSet;
-	unsigned	nInds;
-	unsigned*	inds;
+
+	assert( self );
+
+	Decomp_Sync_DestructRemotes( self );
+	Decomp_Sync_AddRemotes( self, nRemotes, remotes );
+}
+
+void Decomp_Sync_AddRemotes( void* sync, unsigned nRemotes, unsigned* remotes ) {
+	Decomp_Sync*	self = (Decomp_Sync*)sync;
+	unsigned	nIncRanks, *incRanks, *ranks;
+	unsigned	*nSrcRemotes, **srcRemotes;
+	unsigned	*nSnkRemotes, **snkRemotes;
+	unsigned	p_i;
 
 	assert( self );
 	assert( self->decomp );
 	assert( !nRemotes || remotes );
-#ifndef NDEBUG
-	{
-		lSet = RangeSet_New();
-		rSet = RangeSet_New();
-		RangeSet_SetIndices( lSet, self->decomp->nLocals, self->decomp->locals );
-		RangeSet_SetIndices( rSet, nRemotes, remotes );
-		RangeSet_Intersection( rSet, lSet );
-		assert( !RangeSet_GetNIndices( rSet ) );
-		FreeObject( lSet );
-		FreeObject( rSet );
-	}
-#endif
+	assert( Decomp_Sync_ValidateRemotes( self, nRemotes, remotes ) );
 
-	Decomp_Sync_DestructRemotes( self );
+	/* If we're not connected to anything, just exit. */
+	CommTopology_GetIncidence( self->commTopo, &nIncRanks, &incRanks );
+	if( !nIncRanks )
+		return;
 
-	/* Store remote values. */
-	self->nRemotes = nRemotes;
-	if( nRemotes ) {
-		self->remotes = Memory_Alloc_Array( unsigned, nRemotes, "Decomp_Sync::remotes" );
-		memcpy( self->remotes, remotes, nRemotes * sizeof(unsigned) );
-	}
-	else
-		self->remotes = NULL;
+	/* Prepare source and sink arrays. */
+	nSrcRemotes = AllocArray( unsigned, nIncRanks );
+	nSnkRemotes = AllocArray( unsigned, nIncRanks );
+	srcRemotes = AllocArray( unsigned*, nIncRanks );
+	snkRemotes = AllocArray( unsigned*, nIncRanks );
 
-	/* Build a communication topology and intersections. */
-	lSet = RangeSet_New();
-	rSet = RangeSet_New();
-	RangeSet_SetIndices( lSet, self->decomp->nLocals, self->decomp->locals );
-	RangeSet_SetIndices( rSet, nRemotes, remotes );
-	RangeSet_Union( lSet, rSet );
-	FreeObject( rSet );
-	RangeSet_GetIndices( lSet, &nInds, &inds );
-	FreeObject( lSet );
-	Decomp_Sync_BuildIntersections( self, nInds, inds );
-	FreeArray( inds );
+	/* Split these remotes for each processor. */
+	Decomp_Sync_SplitRemotes( self, nRemotes, remotes, 
+				  nSrcRemotes, srcRemotes, 
+				  nSnkRemotes, snkRemotes );
 
-	/* Negotiate sources and sinks. */
-	Decomp_Sync_Negotiate_Select( self->negotiate, self );
-
-	/* Build the global to remote map. */
-	Decomp_Sync_BuildGRMap( self );
-
-	/* Build shared information. */
+	/* Add them. */
+	ranks = AllocArray( unsigned, nIncRanks );
+	for( p_i = 0; p_i < nIncRanks; p_i++ )
+		ranks[p_i] = p_i;
+	Decomp_Sync_AddSources( self, nIncRanks, ranks, nSrcRemotes, srcRemotes );
+	Decomp_Sync_AddSinks( self, nIncRanks, ranks, nSnkRemotes, snkRemotes );
 	Decomp_Sync_BuildShared( self );
+	FreeArray( ranks );
+
+	/* Free the space. */
+	FreeArray( nSrcRemotes );
+	FreeArray( nSnkRemotes );
+	FreeArray2D( nIncRanks, srcRemotes );
+	FreeArray2D( nIncRanks, snkRemotes );
 }
 
-void Decomp_Sync_Decompose( void* sync, unsigned nRequired, unsigned* required ) {
+void Decomp_Sync_SetSources( void* sync, unsigned nRanks, unsigned* ranks, 
+			     unsigned* nSources, unsigned** sources )
+{
 	Decomp_Sync*	self = (Decomp_Sync*)sync;
-	Decomp*		decomp;
-	unsigned	nLocals;
-	unsigned*	locals;
+	unsigned	p_i, s_i;
+
+	assert( nRanks <= CommTopology_GetIncidenceSize( self->commTopo ) );
+	assert( !nRanks || ranks );
+
+	for( p_i = 0; p_i < nRanks; p_i++ ) {
+		assert( ranks[p_i] < CommTopology_GetIncidenceSize( self->commTopo ) );
+		for( s_i = 0; s_i < self->nSrcs[ranks[p_i]]; s_i++ )
+			UIntMap_Remove( self->grMap, Decomp_Sync_DomainToGlobal( self, self->srcs[ranks[p_i]][s_i] ) );
+		KillArray( self->srcs[ranks[p_i]] );
+		self->netSrcs -= self->nSrcs[ranks[p_i]];
+		self->nDomains -= self->nSrcs[ranks[p_i]];
+		self->nRemotes -= self->nSrcs[ranks[p_i]];
+		self->nSrcs[ranks[p_i]] = 0;
+	}
+
+	Decomp_Sync_AddSources( self, nRanks, ranks, nSources, sources );
+}
+
+void Decomp_Sync_SetSinks( void* sync, unsigned nRanks, unsigned* ranks, 
+			   unsigned* nSinks, unsigned** sinks )
+{
+	Decomp_Sync*	self = (Decomp_Sync*)sync;
+	unsigned	p_i;
+
+	assert( nRanks <= CommTopology_GetIncidenceSize( self->commTopo ) );
+	assert( !nRanks || ranks );
+
+	for( p_i = 0; p_i < nRanks; p_i++ ) {
+		assert( ranks[p_i] < CommTopology_GetIncidenceSize( self->commTopo ) );
+		KillArray( self->snks[ranks[p_i]] );
+		self->netSnks -= self->nSnks[ranks[p_i]];
+		self->nSnks[ranks[p_i]] = 0;
+	}
+
+	Decomp_Sync_AddSinks( self, nRanks, ranks, nSinks, sinks );
+}
+
+void Decomp_Sync_AddSources( void* sync, unsigned nRanks, unsigned* ranks, 
+			     unsigned* nSources, unsigned** sources )
+{
+	Decomp_Sync*	self = (Decomp_Sync*)sync;
+	unsigned	nNewRemotes;
+	unsigned	domainInd;
+	unsigned	offs;
+	unsigned	p_i;
 
 	assert( self );
 	assert( self->decomp );
-	assert( !nRequired || required );
+	assert( nRanks <= CommTopology_GetIncidenceSize( self->commTopo ) );
+	assert( !nRanks || ranks );
+	assert( nSources && sources );
 
-	/* Destroy self. */
-	decomp = self->decomp;
-	Decomp_Sync_Destruct( self );
-	self->decomp = decomp;
+	nNewRemotes = 0;
+	for( p_i = 0; p_i < nRanks; p_i++ ) {
+		assert( ranks[p_i] < CommTopology_GetIncidenceSize( self->commTopo ) );
+		assert( Decomp_Sync_ValidateRemotes( self, nSources[p_i], sources[p_i] ) );
+		nNewRemotes += nSources[p_i];
+	}
 
-	/* Build index intersections and communication topology. */
-	Decomp_Sync_BuildIntersections( self, nRequired, required );
+	if( nNewRemotes ) {
+		self->remotes = ReallocNamedArray( self->remotes, unsigned, self->nRemotes + nNewRemotes, 
+						   "Decomp_Sync::remotes" );
+		self->owners = ReallocNamedArray( self->owners, unsigned, self->nRemotes + nNewRemotes, 
+						  "Decomp_Sync::owners" );
+		offs = self->nRemotes;
+		for( p_i = 0; p_i < nRanks; p_i++ ) {
+			unsigned	r_i;
 
-	/* Claim ownership. */
-	Decomp_Sync_Claim_Select( self->claim, self, nRequired, required, 
-				  &nLocals, &locals );
+			for( r_i = 0; r_i < nSources[p_i]; r_i++ ) {
+				self->remotes[offs] = sources[p_i][r_i];
+				UIntMap_Insert( self->grMap, sources[p_i][r_i], offs );
+				self->owners[offs++] = ranks[p_i];
+			}
+		}
+		self->nRemotes += nNewRemotes;
+		self->nDomains += nNewRemotes;
+	}
 
-	/* Reset the decomposition. */
-	Decomp_SetLocals( decomp, nLocals, locals );
-	self->decomp = decomp;
-	Decomp_AddSync( decomp, self );
-	Decomp_Sync_Negotiate_Select( self->negotiate, self );
-	Decomp_Sync_BuildGRMap( self );
+	for( p_i = 0; p_i < nRanks; p_i++ ) {
+		unsigned	rank = ranks[p_i];
+		unsigned	s_i;
+
+		self->srcs[rank] = ReallocArray( self->srcs[rank], unsigned, self->nSrcs[rank] + nSources[p_i] );
+		for( s_i = 0; s_i < nSources[p_i]; s_i++ ) {
+			insist( Decomp_Sync_GlobalToDomain( self, sources[p_i][s_i], &domainInd ) );
+			self->srcs[rank][self->nSrcs[rank] + s_i] = domainInd;
+		}
+		self->nSrcs[rank] += nSources[p_i];
+		self->netSrcs += nSources[p_i];
+	}
+}
+
+void Decomp_Sync_AddSinks( void* sync, unsigned nRanks, unsigned* ranks, 
+			   unsigned* nSinks, unsigned** sinks )
+{
+	Decomp_Sync*	self = (Decomp_Sync*)sync;
+	unsigned	domainInd;
+	unsigned	p_i;
+
+	assert( self );
+	assert( self->decomp );
+	assert( nRanks <= CommTopology_GetIncidenceSize( self->commTopo ) );
+	assert( !nRanks || ranks );
+	assert( nSinks && sinks );
+
+	for( p_i = 0; p_i < nRanks; p_i++ ) {
+		unsigned	rank = ranks[p_i];
+		unsigned	s_i;
+
+		assert( rank < CommTopology_GetIncidenceSize( self->commTopo ) );
+		assert( Decomp_Sync_ValidateSinks( self, nSinks[p_i], sinks[p_i] ) );
+		self->snks[rank] = ReallocArray( self->snks[rank], unsigned, self->nSnks[rank] + nSinks[p_i] );
+		for( s_i = 0; s_i < nSinks[p_i]; s_i++ ) {
+			insist( Decomp_Sync_GlobalToDomain( self, sinks[p_i][s_i], &domainInd ) );
+			self->snks[rank][self->nSnks[rank] + s_i] = domainInd;
+		}
+		self->nSnks[rank] += nSinks[p_i];
+		self->netSnks += nSinks[p_i];
+	}
+}
+
+void Decomp_Sync_SetRequired( void* sync, unsigned nRequired, unsigned* required ) {
+	Decomp_Sync*	self = (Decomp_Sync*)sync;
+
+	assert( self );
+
+	Decomp_Sync_DestructRemotes( self );
+	Decomp_Sync_AddRequired( self, nRequired, required );
+}
+
+void Decomp_Sync_AddRequired( void* sync, unsigned nRequired, unsigned* required ) {
+	Decomp_Sync*	self = (Decomp_Sync*)sync;
+	MPI_Comm	comm;
+	unsigned	nProcs, rank;
+	RangeSet	*reqSet, *remReqSet, *lSet;
+	unsigned	nLocals, *locals;
+	unsigned	nOldIncRanks, nIncRanks;
+	unsigned	nBytes;
+	Stg_Byte*	bytes;
+	unsigned	tag = 8849;
+	unsigned	p_i;
+
+	assert( self && Stg_CheckType( self, Decomp_Sync ) );
+	assert( Decomp_Sync_ValidateRemotes( self, nRequired, required ) );
+
+	comm = CommTopology_GetComm( self->commTopo );
+	MPI_Comm_rank( comm, (int*)&rank );
+	MPI_Comm_size( comm, (int*)&nProcs );
+
+	reqSet = RangeSet_New();
+	RangeSet_SetIndices( reqSet, nRequired, required );
+
+	Decomp_GetLocals( self->decomp, &nLocals, &locals );
+	lSet = RangeSet_New();
+	RangeSet_SetIndices( lSet, nLocals, locals );
+
+	nOldIncRanks = nIncRanks;
+	remReqSet = RangeSet_New();
+	for( p_i = 0; p_i < nProcs; p_i++ ) {
+		Stg_Byte	state;
+		unsigned	nInds, *inds;
+		unsigned	localRank;
+
+		if( rank == p_i )
+			RangeSet_Pickle( reqSet, &nBytes, &bytes );
+		MPI_Bcast( &nBytes, 1, MPI_UNSIGNED, p_i, comm );
+		if( rank != p_i )
+			bytes = AllocArray( Stg_Byte, nBytes );
+		MPI_Bcast( bytes, nBytes, MPI_BYTE, p_i, comm );
+
+		if( rank != p_i ) {
+			RangeSet_Unpickle( remReqSet, nBytes, bytes );
+			FreeArray( bytes );
+
+			RangeSet_Intersection( remReqSet, lSet );
+			if( RangeSet_GetSize( remReqSet ) ) {
+				state = 1;
+				MPI_Gather( &state, 1, MPI_BYTE, NULL, 1, MPI_BYTE, p_i, comm );
+
+				RangeSet_Pickle( remReqSet, &nBytes, &bytes );
+				MPI_Send( &nBytes, 1, MPI_UNSIGNED, p_i, tag, comm );
+				MPI_Send( bytes, nBytes, MPI_BYTE, p_i, tag, comm );
+				FreeArray( bytes );
+
+				inds = NULL;
+				RangeSet_GetIndices( remReqSet, &nInds, &inds );
+				if( !CommTopology_GlobalToLocal( self->commTopo, p_i, &localRank ) ) {
+					Decomp_Sync_AddRemoteRanks( self, 1, &p_i );
+					insist( CommTopology_GlobalToLocal( self->commTopo, p_i, &localRank ) );
+					nIncRanks = CommTopology_GetIncidenceSize( self->commTopo );
+				}
+				Decomp_Sync_AddSinks( sync, 1, &localRank, &nInds, &inds );
+				FreeArray( inds );
+			}
+			else {
+				state = 0;
+				MPI_Gather( &state, 1, MPI_BYTE, NULL, 1, MPI_BYTE, p_i, comm );
+			}
+		}
+		else {
+			Stg_Byte*	states;
+			unsigned	nActive, *active;
+			MPI_Status	status;
+			unsigned	nNewRanks, *newRanks;
+			unsigned	p_j;
+
+			FreeArray( bytes );
+
+			state = 0;
+			states = AllocArray( Stg_Byte, nProcs );
+			MPI_Gather( &state, 1, MPI_BYTE, states, 1, MPI_BYTE, p_i, comm );
+			nActive = 0;
+			nNewRanks = 0;
+			for( p_j = 0; p_j < nProcs; p_j++ ) {
+				if( states[p_j] ) {
+					nActive++;
+					if( !CommTopology_GlobalToLocal( self->commTopo, p_j, &localRank ) )
+						nNewRanks++;
+				}
+			}
+			active = AllocArray( unsigned, nActive );
+			newRanks = AllocArray( unsigned, nNewRanks );
+			nActive = 0;
+			nNewRanks = 0;
+			for( p_j = 0; p_j < nProcs; p_j++ ) {
+				if( states[p_j] ) {
+					active[nActive++] = p_j;
+					if( !CommTopology_GlobalToLocal( self->commTopo, p_j, &localRank ) )
+						newRanks[nNewRanks++] = p_j;
+				}
+			}
+			FreeArray( states );
+
+			Decomp_Sync_AddRemoteRanks( sync, nNewRanks, newRanks );
+			if( nNewRanks )
+				nIncRanks = CommTopology_GetIncidenceSize( self->commTopo );
+			FreeArray( newRanks );
+
+			for( p_j = 0; p_j < nActive; p_j++ ) {
+				MPI_Recv( &nBytes, 1, MPI_UNSIGNED, active[p_j], tag, comm, &status );
+				bytes = AllocArray( Stg_Byte, nBytes );
+				MPI_Recv( bytes, nBytes, MPI_BYTE, active[p_j], tag, comm, &status );
+				RangeSet_Unpickle( reqSet, nBytes, bytes );
+				FreeArray( bytes );
+				inds = NULL;
+				RangeSet_GetIndices( reqSet, &nInds, &inds );
+				insist( CommTopology_GlobalToLocal( self->commTopo, active[p_j], &localRank ) );
+				Decomp_Sync_AddSources( sync, 1, &localRank, &nInds, &inds );
+				FreeArray( inds );
+			}
+
+			FreeArray( active );
+		}
+	}
+
+	FreeObject( reqSet );
+	FreeObject( remReqSet );
+	FreeObject( lSet );
+
 	Decomp_Sync_BuildShared( self );
+}
+
+void Decomp_Sync_BuildShared( void* sync ) {
+	Decomp_Sync*	self = (Decomp_Sync*)sync;
+	unsigned	nIncRanks;
+	RangeSet	*dSet, **rSets, *allSet;
+	unsigned	nLocals, *locals;
+	unsigned	nSendBytes, *nRecvBytes;
+	Stg_Byte	*sendBytes, **recvBytes;
+	unsigned	**sharers;
+	unsigned	nInds, *inds;
+	unsigned	r_i, s_i, ind_i;
+
+	assert( self && Stg_CheckType( self, Decomp_Sync ) );
+
+	/* Free shared info. */
+	FreeArray( self->shared );
+	FreeArray( self->nSharers );
+	FreeArray( self->sharers );
+
+	nIncRanks = CommTopology_GetIncidenceSize( self->commTopo );
+
+	/* Communicate a range set of my domain indices to all neighbours. */
+	dSet = RangeSet_New();
+	RangeSet_SetIndices( dSet, self->nRemotes, self->remotes );
+	Decomp_GetLocals( self->decomp, &nLocals, &locals );
+	RangeSet_AddIndices( dSet, nLocals, locals );
+	RangeSet_Pickle( dSet, &nSendBytes, &sendBytes );
+	CommTopology_Allgather( self->commTopo, 
+				nSendBytes, sendBytes, 
+				&nRecvBytes, &recvBytes, 
+				sizeof(Stg_Byte) );
+	FreeArray( sendBytes );
+	rSets = AllocArray( RangeSet*, nIncRanks );
+	allSet = RangeSet_New();
+	for( r_i = 0; r_i < nIncRanks; r_i++ ) {
+		rSets[r_i] = RangeSet_New();
+		RangeSet_Unpickle( rSets[r_i], nRecvBytes[r_i], recvBytes[r_i] );
+		RangeSet_Intersection( rSets[r_i], dSet );
+		RangeSet_Union( allSet, rSets[r_i] );
+		FreeArray( recvBytes[r_i] );
+	}
+	FreeArray( recvBytes );
+	FreeArray( nRecvBytes );
+
+	/* Use the 'allSet' to generate the shared indices. */
+	self->shared = NULL;
+	RangeSet_GetIndices( allSet, &self->nShared, &self->shared );
+	FreeObject( allSet );
+	for( s_i = 0; s_i < self->nShared; s_i++ ) {
+		insist( Decomp_Sync_GlobalToDomain( self, self->shared[s_i], self->shared + s_i ) );
+		UIntMap_Insert( self->dsMap, self->shared[s_i], s_i );
+	}
+
+	/* Now that we have each intersection, convert to shared arrays. */
+	self->nSharers = AllocArray( unsigned, self->nShared );
+	memset( self->nSharers, 0, self->nShared * sizeof(unsigned) );
+	sharers = AllocArray2D( unsigned, self->nShared, nIncRanks );
+	for( r_i = 0; r_i < nIncRanks; r_i++ ) {
+		inds = NULL;
+		RangeSet_GetIndices( rSets[r_i], &nInds, &inds );
+		FreeObject( rSets[r_i] );
+		for( ind_i = 0; ind_i < nInds; ind_i++ ) {
+			insist( Decomp_Sync_GlobalToDomain( self, inds[ind_i], inds + ind_i ) );
+			insist( Decomp_Sync_DomainToShared( self, inds[ind_i], inds + ind_i ) );
+			sharers[inds[ind_i]][self->nSharers[inds[ind_i]]++] = r_i;
+		}
+		FreeArray( inds );
+	}
+	FreeArray( rSets );
+
+	/* Store final array. */
+	self->sharers = AllocComplex2D( unsigned, self->nShared, self->nSharers );
+	for( s_i = 0; s_i < self->nShared; s_i++ )
+		memcpy( self->sharers[s_i], sharers[s_i], self->nSharers[s_i] * sizeof(unsigned) );
+	FreeArray( sharers );
+
+#if 0
+	/* Create a range set of all sinks and sources. */
+	nIncRanks = CommTopology_GetIncidenceSize( self->commTopo );
+	shareSet = RangeSet_New();
+	tmpSet = RangeSet_New();
+	for( p_i = 0; p_i < nIncRanks; p_i++ ) {
+		RangeSet_SetIndices( tmpSet, self->nSnks[p_i], self->snks[p_i] );
+		RangeSet_Union( shareSet, tmpSet );
+		RangeSet_SetIndices( tmpSet, self->nSrcs[p_i], self->srcs[p_i] );
+		RangeSet_Union( shareSet, tmpSet );
+	}
+	FreeObject( tmpSet );
+
+	/* These indices are the shared elements. */
+	self->shared = NULL;
+	RangeSet_GetIndices( shareSet, &self->nShared, &self->shared );
+	FreeObject( shareSet );
+
+	/* If there are no shared indices, exit now. */
+	if( !self->nShared )
+		return;
+
+	/* Build the shared mapping. */
+	for( s_i = 0; s_i < self->nShared; s_i++ )
+		UIntMap_Insert( self->dsMap, self->shared[s_i], s_i );
+
+	/* Create temporary storage for the sharers. */
+	self->nSharers = AllocNamedArray( unsigned, self->nShared, "Decomp_Sync::nSharers" );
+	sharers = Memory_Alloc_2DArray_Unnamed( unsigned, self->nShared, nIncRanks );
+	memset( self->nSharers, 0, self->nShared * sizeof(unsigned) );
+
+	/* Build the sharer lists. */
+	for( p_i = 0; p_i < nIncRanks; p_i++ ) {
+		for( s_i = 0; s_i < self->nSnks[p_i]; s_i++ ) {
+			unsigned	sharedInd;
+			unsigned	curSharer;
+
+			insist( UIntMap_Map( self->dsMap, self->snks[p_i][s_i], &sharedInd ) );
+			curSharer = self->nSharers[sharedInd]++;
+			sharers[sharedInd][curSharer] = p_i;
+		}
+	}
+
+	/* Transfer to final storage. */
+	self->sharers = Memory_Alloc_2DComplex( unsigned, self->nShared, self->nSharers, "Decomp_Sync::sharers" );
+	for( s_i = 0; s_i < self->nShared; s_i++ )
+		memcpy( self->sharers[s_i], sharers[s_i], self->nSharers[s_i] * sizeof(unsigned) );
+
+	/* Free the old sharers array. */
+	FreeArray( sharers );
+#endif
+}
+
+unsigned Decomp_Sync_GetGlobalSize( void* sync ) {
+	Decomp_Sync*	self = (Decomp_Sync*)sync;
+
+	assert( self );
+	assert( self->decomp );
+
+	return Decomp_GetGlobalSize( self->decomp );
+}
+
+unsigned Decomp_Sync_GetLocalSize( void* sync ) {
+	Decomp_Sync*	self = (Decomp_Sync*)sync;
+
+	assert( self );
+	assert( self->decomp );
+
+	return Decomp_GetLocalSize( self->decomp );
+}
+
+unsigned Decomp_Sync_GetRemoteSize( void* sync ) {
+	Decomp_Sync*	self = (Decomp_Sync*)sync;
+
+	assert( self );
+
+	return self->nRemotes;
 }
 
 unsigned Decomp_Sync_GetDomainSize( void* sync ) {
 	Decomp_Sync*	self = (Decomp_Sync*)sync;
 
 	assert( self );
-	assert( self->decomp );
 
-	return self->decomp->nLocals + self->nRemotes;
+	return self->nDomains;
 }
 
-Bool Decomp_Sync_IsDomain( void* sync, unsigned global ) {
+unsigned Decomp_Sync_GetSharedSize( void* sync ) {
+	Decomp_Sync*	self = (Decomp_Sync*)sync;
+
+	assert( self );
+
+	return self->nShared;
+}
+
+void Decomp_Sync_GetRemotes( void* sync, unsigned* nRemotes, unsigned** remotes ) {
+	Decomp_Sync*	self = (Decomp_Sync*)sync;
+
+	assert( self );
+	assert( nRemotes );
+	assert( remotes );
+
+	*nRemotes = self->nRemotes;
+	*remotes = self->remotes;
+}
+
+Bool Decomp_Sync_GlobalToDomain( void* sync, unsigned global, unsigned* domain ) {
 	Decomp_Sync*	self = (Decomp_Sync*)sync;
 
 	assert( self );
@@ -332,33 +686,16 @@ Bool Decomp_Sync_IsDomain( void* sync, unsigned global ) {
 	assert( global < self->decomp->nGlobals );
 	assert( self->decomp->glMap );
 	assert( self->grMap );
+	assert( domain );
 
-	return Decomp_IsLocal( self->decomp, global ) || UIntMap_HasKey( self->grMap, global );
-}
+	if( Decomp_GlobalToLocal( self->decomp, global, domain ) )
+		return True;
+	else if( UIntMap_Map( self->grMap, global, domain ) ) {
+		*domain += Decomp_GetLocalSize( self->decomp );
+		return True;
+	}
 
-Bool Decomp_Sync_IsRemote( void* sync, unsigned domain ) {
-	Decomp_Sync*	self = (Decomp_Sync*)sync;
-
-	assert( self );
-	assert( self->decomp );
-	assert( domain < self->decomp->nLocals + self->nRemotes );
-
-	return domain >= self->decomp->nLocals;
-}
-
-unsigned Decomp_Sync_GlobalToDomain( void* sync, unsigned global ) {
-	Decomp_Sync*	self = (Decomp_Sync*)sync;
-
-	assert( self );
-	assert( self->decomp );
-	assert( global < self->decomp->nGlobals );
-	assert( self->decomp->glMap );
-	assert( self->grMap );
-
-	if( Decomp_IsLocal( self->decomp, global ) )
-		return Decomp_GlobalToLocal( self->decomp, global );
-	else
-		return self->decomp->nLocals + UIntMap_Map( self->grMap, global );
+	return False;
 }
 
 unsigned Decomp_Sync_DomainToGlobal( void* sync, unsigned domain ) {
@@ -371,18 +708,19 @@ unsigned Decomp_Sync_DomainToGlobal( void* sync, unsigned domain ) {
 	if( domain < self->decomp->nLocals )
 		return Decomp_LocalToGlobal( self->decomp, domain );
 	else
-		return self->remotes[domain - self->decomp->nLocals];
+		return self->remotes[domain - Decomp_GetLocalSize( self->decomp )];
 }
 
-unsigned Decomp_Sync_DomainToShared( void* sync, unsigned domain ) {
+Bool Decomp_Sync_DomainToShared( void* sync, unsigned domain, unsigned* shared ) {
 	Decomp_Sync*	self = (Decomp_Sync*)sync;
 
 	assert( self );
 	assert( self->decomp );
-	assert( domain < self->decomp->nLocals + self->nRemotes );
+	assert( domain < self->nDomains );
 	assert( self->dsMap );
+	assert( shared );
 
-	return UIntMap_Map( self->dsMap, domain );
+	return UIntMap_Map( self->dsMap, domain, shared );
 }
 
 unsigned Decomp_Sync_SharedToDomain( void* sync, unsigned shared ) {
@@ -395,79 +733,74 @@ unsigned Decomp_Sync_SharedToDomain( void* sync, unsigned shared ) {
 	return self->shared[shared];
 }
 
-Decomp_Sync_Array* Decomp_Sync_AddArray( void* sync, void* localArray, void* remoteArray, 
-					 size_t localStride, size_t remoteStride, size_t itemSize )
+unsigned Decomp_Sync_GetOwner( void* sync, unsigned remote ) {
+	Decomp_Sync*	self = (Decomp_Sync*)sync;
+
+	assert( self );
+	assert( remote < self->nRemotes );
+	assert( self->owners );
+
+	return self->owners[remote];
+}
+
+void Decomp_Sync_GetSharers( void* sync, unsigned shared, 
+			     unsigned* nSharers, unsigned** sharers )
 {
-	Decomp_Sync*		self = (Decomp_Sync*)sync;
-	Decomp_Sync_Array*	array;
+	Decomp_Sync*	self = (Decomp_Sync*)sync;
 
-	/* Sanity checks. */
 	assert( self );
-	assert( self->decomp );
-	assert( !self->decomp->nLocals || localArray );
-	assert( !self->nRemotes || remoteArray );
-	assert( itemSize );
+	assert( shared < self->nShared );
+	assert( self->nSharers );
+	assert( self->sharers );
+	assert( nSharers );
+	assert( sharers );
 
-	/* Resize the array array (?). */
-	if( self->nArrays ) {
-		self->arrays = Memory_Realloc_Array( self->arrays, Decomp_Sync_Array*, ++self->nArrays );
-	}
-	else {
-		self->arrays = Memory_Alloc_Array( Decomp_Sync_Array*, ++self->nArrays, "Decomp_Sync::Arrays" );
-	}
-	self->arrays[self->nArrays - 1] = Memory_Alloc_Array_Unnamed( Decomp_Sync_Array, 1 );
-	array = self->arrays[self->nArrays - 1];
-
-	/* Store information. */
-	array->snkArray = localArray;
-	array->snkStride = localStride;
-	array->srcArray = remoteArray;
-	array->srcStride = remoteStride;
-	array->itemSize = itemSize;
-
-	/* Build this array. */
-	Decomp_Sync_BuildArray( self, array );
-
-	return array;
+	*nSharers = self->nSharers[shared];
+	*sharers = self->sharers[shared];
 }
 
-void Decomp_Sync_RemoveArray( void* sync, Decomp_Sync_Array* array ) {
+void Decomp_Sync_GetSources( void* sync, unsigned rank, unsigned* nSources, unsigned** sources ) {
 	Decomp_Sync*	self = (Decomp_Sync*)sync;
-	unsigned	a_i;
 
 	assert( self );
+	assert( rank < CommTopology_GetIncidenceSize( self->commTopo ) );
+	assert( nSources && sources );
+	assert( self->nSrcs && self->srcs );
 
-	a_i = 0;
-	while( self->arrays[a_i++] != array && a_i < self->nArrays );
-	assert( a_i <= self->nArrays );
-	for( ; a_i < self->nArrays; a_i++ )
-		self->arrays[a_i - 1] = self->arrays[a_i];
-
-	if( --self->nArrays == 0 ) {
-		KillArray( self->arrays );
-	}
-	else
-		self->arrays = Memory_Realloc_Array( self->arrays, Decomp_Sync_Array*, self->nArrays );
-
-	Decomp_Sync_DestructArray( array );
+	*nSources = self->nSrcs[rank];
+	*sources = self->srcs[rank];
 }
 
-void Decomp_Sync_Sync( void* sync ) {
+void Decomp_Sync_GetSinks( void* sync, unsigned rank, unsigned* nSinks, unsigned** sinks ) {
 	Decomp_Sync*	self = (Decomp_Sync*)sync;
-	unsigned	a_i;
 
-	/* Sanity checks. */
 	assert( self );
-	assert( !self->nArrays || self->arrays );
+	assert( rank < CommTopology_GetIncidenceSize( self->commTopo ) );
+	assert( nSinks && sinks );
+	assert( self->nSnks && self->snks );
 
-	for( a_i = 0; a_i < self->nArrays; a_i++ )
-		Decomp_Sync_SyncArray( self, self->arrays[a_i] );
+	*nSinks = self->nSnks[rank];
+	*sinks = self->snks[rank];
+}
+
+Decomp* Decomp_Sync_GetDecomp( void* sync ) {
+	Decomp_Sync*	self = (Decomp_Sync*)sync;
+
+	assert( self );
+
+	return self->decomp;
+}
+
+CommTopology* Decomp_Sync_GetCommTopology( void* sync ) {
+	Decomp_Sync*	self = (Decomp_Sync*)sync;
+
+	assert( self );
+
+	return self->commTopo;
 }
 
 void Decomp_Sync_SyncArray( void* sync, Decomp_Sync_Array* array ) {
 	Decomp_Sync*	self = (Decomp_Sync*)sync;
-	CommTopology*	commTopo;
-	unsigned	rank;
 	unsigned	nInc;
 	unsigned*	inc;
 	Stg_Byte*	snkArray;
@@ -476,18 +809,14 @@ void Decomp_Sync_SyncArray( void* sync, Decomp_Sync_Array* array ) {
 
 	/* Sanity checks. */
 	assert( self );
-	assert( self->commTopo );
+	assert( self->decomp );
 	assert( array );
-
-	/* Shortcuts. */
-	commTopo = self->commTopo;
-	MPI_Comm_rank( commTopo->comm, (int*)&rank );
 
 	/* Pack from locals to a contiguous array. */
 	if( self->netSnks > 0 ) {
 		unsigned	snk_i;
 
-		snkArray = Memory_Alloc_Array_Unnamed( Stg_Byte, self->netSnks * array->itemSize );
+		snkArray = AllocArray( Stg_Byte, self->netSnks * array->itemSize );
 		for( snk_i = 0; snk_i < self->netSnks; snk_i++ ) {
 			memcpy( snkArray + snk_i * array->itemSize, 
 				(Stg_Byte*)array->snkArray + array->snkOffs[snk_i], 
@@ -498,13 +827,10 @@ void Decomp_Sync_SyncArray( void* sync, Decomp_Sync_Array* array ) {
 		snkArray = NULL;
 
 	/* Allocate for sources. */
-	if( self->netSrcs > 0 )
-		srcArray = Memory_Alloc_Array_Unnamed( Stg_Byte, self->netSrcs * array->itemSize );
-	else
-		srcArray = NULL;
+	srcArray = AllocArray( Stg_Byte, self->netSrcs * array->itemSize );
 
 	/* Get incidence. */
-	CommTopology_GetIncidence( commTopo, rank, &nInc, &inc );
+	CommTopology_GetIncidence( self->commTopo, &nInc, &inc );
 
 	/* Transfer. */
 	for( p_i = 0; p_i < nInc; p_i++ ) {
@@ -517,17 +843,14 @@ void Decomp_Sync_SyncArray( void* sync, Decomp_Sync_Array* array ) {
 
 		MPI_Sendrecv( snkArray + snkDisp, snkSize, MPI_BYTE, inc[p_i], tag, 
 			      srcArray + srcDisp, srcSize, MPI_BYTE, inc[p_i], tag, 
-			      commTopo->comm, &status );
+			      CommTopology_GetComm( self->commTopo ), &status );
 	}
-
-	/* Return incidence. */
-	CommTopology_ReturnIncidence( commTopo, rank, &nInc, &inc );
 
 	/* Free the sink array. */
 	FreeArray( snkArray );
 
 	/* Unpack sources. */
-	if( self->netSnks > 0 ) {
+	if( self->netSrcs > 0 ) {
 		unsigned	src_i;
 
 		for( src_i = 0; src_i < self->netSrcs; src_i++ ) {
@@ -541,417 +864,260 @@ void Decomp_Sync_SyncArray( void* sync, Decomp_Sync_Array* array ) {
 	FreeArray( srcArray );
 }
 
+void Decomp_Sync_Update( void* sync ) {
+	Decomp_Sync*	self = (Decomp_Sync*)sync;
+
+	assert( self );
+
+	Decomp_Sync_DestructRemotes( self );
+}
+
 
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Private Functions
 */
 
-void Decomp_Sync_BuildIntersections( Decomp_Sync* self, unsigned nIndices, unsigned* indices ) {
-	unsigned	rank, nProcs;
-	RangeSet*	lSet;
-	MPI_Group	worldGroup;
-	unsigned*	worldRanks;
-	unsigned*	subRanks;
-	unsigned	nCommInc;
-	unsigned*	commInc;
-	RangeSet**	iSets;
-	unsigned	nInc;
-	unsigned*	inc;
+void Decomp_Sync_InitArrays( Decomp_Sync* self ) {
+	unsigned	nIncRanks;
+
+	assert( self );
+
+	if( self->commTopo ) {
+		nIncRanks = CommTopology_GetIncidenceSize( self->commTopo );
+		if( nIncRanks ) {
+			self->nSrcs = AllocNamedArray( unsigned, nIncRanks, "Decomp_Sync::nSrcs" );
+			self->srcs = AllocNamedArray( unsigned*, nIncRanks, "Decomp_Sync::srcs" );
+			self->nSnks = AllocNamedArray( unsigned, nIncRanks, "Decomp_Sync::nSnks" );
+			self->snks = AllocNamedArray( unsigned*, nIncRanks, "Decomp_Sync::snks" );
+			memset( self->nSrcs, 0, nIncRanks * sizeof(unsigned) );
+			memset( self->srcs, 0, nIncRanks * sizeof(unsigned*) );
+			memset( self->nSnks, 0, nIncRanks * sizeof(unsigned) );
+			memset( self->snks, 0, nIncRanks * sizeof(unsigned*) );
+		}
+	}
+}
+
+void Decomp_Sync_ExpandArrays( Decomp_Sync* self, unsigned nNewRanks ) {
+	unsigned	nIncRanks, nOldIncRanks;
+
+	assert( self );
+	assert( !self->nShared || (self->nSharers && self->sharers) );
+	assert( !self->nRemotes || self->owners );
+
+	nIncRanks = CommTopology_GetIncidenceSize( self->commTopo );
+	nOldIncRanks = nIncRanks - nNewRanks;
+	self->nSrcs = ReallocNamedArray( self->nSrcs, unsigned, nIncRanks, "Decomp_Sync::nSrcs" );
+	self->srcs = ReallocNamedArray( self->srcs, unsigned*, nIncRanks, "Decomp_Sync::srcs" );
+	self->nSnks = ReallocNamedArray( self->nSnks, unsigned, nIncRanks, "Decomp_Sync::nSnks" );
+	self->snks = ReallocNamedArray( self->snks, unsigned*, nIncRanks, "Decomp_Sync::snks" );
+	memset( self->nSrcs + nOldIncRanks, 0, nNewRanks * sizeof(unsigned) );
+	memset( self->srcs + nOldIncRanks, 0, nNewRanks * sizeof(unsigned*) );
+	memset( self->nSnks + nOldIncRanks, 0, nNewRanks * sizeof(unsigned) );
+	memset( self->snks + nOldIncRanks, 0, nNewRanks * sizeof(unsigned*) );
+}
+
+void Decomp_Sync_SplitRemotes( Decomp_Sync* self, unsigned nRemotes, unsigned* remotes, 
+			       unsigned* nSrcs, unsigned** srcs, 
+			       unsigned* nSnks, unsigned** snks )
+{
+	unsigned	nLocals, *locals;
+	unsigned	nIncRanks;
+	RangeSet	*remSet, *locSet;
+	unsigned	nBytes, *nRemBytes, *nFndBytes;
+	Stg_Byte	*bytes, **remBytes, **fndBytes;
 	unsigned	p_i;
 
 	assert( self );
-	assert( !nIndices || indices );
+	assert( self->decomp );
 
-	/* Get basic MPI info. */
-	MPI_Comm_rank( self->decomp->comm, (int*)&rank );
-	MPI_Comm_size( self->decomp->comm, (int*)&nProcs );
+	/* Make a range set of our remotes. */
+	remSet = RangeSet_New();
+	RangeSet_SetIndices( remSet, nRemotes, remotes );
+	RangeSet_Pickle( remSet, &nBytes, &bytes );
 
-	/* We'll need to modify the world group. */
-	MPI_Comm_group( self->decomp->comm, &worldGroup );
-	worldRanks = Memory_Alloc_Array_Unnamed( unsigned, nProcs );
-	subRanks = Memory_Alloc_Array_Unnamed( unsigned, nProcs );
+	/* Collect neighbouring remotes. */
+	CommTopology_Allgather( self->commTopo, 
+				nBytes, bytes, 
+				&nRemBytes, (void***)&remBytes, 
+				sizeof(Stg_Byte) );
 
-	/* We need space to store index intersections. */
-	iSets = Memory_Alloc_Array_Unnamed( RangeSet*, nProcs );
-	memset( iSets, 0, nProcs * sizeof(RangeSet*) );
+	/* Done with the bytes. */
+	FreeArray( bytes );
 
-	/* Create a local set of required indices. */
-	lSet = RangeSet_New();
-	RangeSet_SetIndices( lSet, nIndices, indices );
+	/* Build a range set of our locals. */
+	locSet = RangeSet_New();
+	Decomp_GetLocals( self->decomp, &nLocals, &locals );
+	RangeSet_SetIndices( locSet, nLocals, locals );
 
-	/* Tackle each processor one at a time. */
-	for( p_i = 0; p_i < nProcs - 1; p_i++ ) {
-		int		groupRange[3];
-		MPI_Group	subGroup;
-		MPI_Comm	subComm;
-		unsigned	p_j;
+	/* Intersect our locals and our neighbours remotes to build our sink sets. */
+	nIncRanks = CommTopology_GetIncidenceSize( self->commTopo );
+	remSet = RangeSet_New();
+	for( p_i = 0; p_i < nIncRanks; p_i++ ) {
+		RangeSet_Unpickle( remSet, nRemBytes[p_i], remBytes[p_i] );
 
-		/* Set the processor range. */
-		groupRange[0] = p_i;
-		groupRange[1] = nProcs - 1;
-		groupRange[2] = 1;
+		/* Done with the remote bytes. */
+		FreeArray( remBytes[p_i] );
 
-		/* We'll need a new group, as we only want to communicate using a triangular scheme. */
-		MPI_Group_range_incl( worldGroup, 1, &groupRange, &subGroup );
-		MPI_Comm_create( self->decomp->comm, subGroup, &subComm );
-
-		/* Only continue if we're part of the sub-communicator. */
-		if( rank >= p_i ) {
-			unsigned	nBytes;
-			Stg_Byte*	bytes;
-			unsigned*	nFounds;
-			Stg_Byte**	founds;
-
-			/* Create a mapping between ranks. */
-			for( p_j = p_i; p_j < nProcs; p_j++ )
-				subRanks[p_j] = p_j - p_i;
-			MPI_Group_translate_ranks( subGroup, nProcs - p_i, (int*)(subRanks + p_i), 
-						   worldGroup, (int*)worldRanks );
-
-			if( p_i == rank )
-				RangeSet_Pickle( lSet, &nBytes, &bytes );
-
-			MPIArray_Bcast( &nBytes, (void**)&bytes, sizeof(Stg_Byte), subRanks[p_i], subComm );
-
-			if( p_i != rank ) {
-				/* Create the intersection. */
-				iSets[p_i] = RangeSet_New();
-				RangeSet_Unpickle( iSets[p_i], nBytes, bytes );
-				RangeSet_Intersection( iSets[p_i], lSet );
-
-				/* Pickle the intersection to send back. */
-				FreeArray( bytes );
-				RangeSet_Pickle( iSets[p_i], &nBytes, &bytes );
-			}
-			else {
-				KillArray( bytes );
-				nBytes = 0;
-			}
-
-			/* Retrieve the results and unpickle each of them. */
-			MPIArray_Gather( nBytes, bytes, &nFounds, (void***)&founds, sizeof(Stg_Byte), 
-					 subRanks[p_i], subComm );
-			if( p_i == rank ) {
-				for( p_j = 0; p_j < nProcs - p_i; p_j++ ) {
-					if( !nFounds[p_j] )
-						continue;
-
-					iSets[worldRanks[p_j]] = RangeSet_New();
-					RangeSet_Unpickle( iSets[worldRanks[p_j]], nFounds[p_j], founds[p_j] );
-				}
-
-				/* Free the found arrays. */
-				FreeArray( nFounds );
-				FreeArray( founds );
-			}
-			else {
-				/* Free pickled range set. */
-				FreeArray( bytes );
-			}
-
-			/* Destroy the sub-communicator. */
-			MPI_Comm_free( &subComm );
-		}
-
-		/* Destroy the sub-group. */
-		MPI_Group_free( &subGroup );
+		RangeSet_Intersection( remSet, locSet );
+		snks[p_i] = NULL;
+		RangeSet_GetIndices( remSet, nSnks + p_i, snks + p_i );
+		RangeSet_Pickle( remSet, nRemBytes + p_i, remBytes + p_i );
 	}
 
-	/* Free rank translation arrays and local range set. */
-	FreeArray( worldRanks );
-	FreeArray( subRanks );
+	/* Local set is no longer needed. */
+	FreeObject( locSet );
 
-	/* Build a set of communication incidence. */
-	nCommInc = 0;
-	commInc = Memory_Alloc_Array_Unnamed( unsigned, nProcs );
-	for( p_i = 0; p_i < nProcs; p_i++ ) {
-		if( iSets[p_i] && iSets[p_i]->nInds )
-			commInc[nCommInc++] = p_i;
+	/* Return what we've found. */
+	CommTopology_Alltoall( self->commTopo, 
+			       nRemBytes, (void**)remBytes, 
+			       &nFndBytes, (void***)&fndBytes, 
+			       sizeof(Stg_Byte) );
+
+	/* Done with the remote bytes arrays. */
+	FreeArray( nRemBytes );
+	FreeArray2D( nIncRanks, remBytes );
+
+	/* Construct our source arrays with what was found. */
+	for( p_i = 0; p_i < nIncRanks; p_i++ ) {
+		RangeSet_Unpickle( remSet, nFndBytes[p_i], fndBytes[p_i] );
+
+		/* Empty the internal found arrays. */
+		FreeArray( fndBytes[p_i] );
+
+		srcs[p_i] = NULL;
+		RangeSet_GetIndices( remSet, nSrcs + p_i, srcs + p_i );
 	}
 
-	/* Create the communication topology. */
-	self->commTopo = CommTopology_New( "Decomp_Sync::commTopo" );
-	CommTopology_SetComm( self->commTopo, self->decomp->comm );
-	CommTopology_SetIncidence( self->commTopo, nCommInc, commInc );
-	FreeArray( commInc );
-
-	/* Build final intersections. */
-	CommTopology_GetIncidence( self->commTopo, rank, &nInc, &inc );
-	if( nInc ) {
-		unsigned	inc_i;
-
-		self->isects = Memory_Alloc_Array_Unnamed( RangeSet*, nInc );
-		for( inc_i = 0; inc_i < nInc; inc_i++ )
-			self->isects[inc_i] = iSets[inc[inc_i]];
-	}
-	else
-		self->isects = NULL;
-	CommTopology_ReturnIncidence( self->commTopo, rank, &nInc, &inc );
-
-	/* Free intersection array. */
-	FreeArray( iSets );
-}
-
-void Decomp_Sync_BuildShared( Decomp_Sync* self ) {
-	unsigned	rank;
-	RangeSet*	sharedSet;
-	unsigned	nInc;
-	unsigned*	inc;
-	unsigned**	sharers;
-	unsigned	s_i, p_i;
-
-	assert( self );
-	assert( self->commTopo );
-
-	/* Get basic MPI info. */
-	MPI_Comm_rank( self->decomp->comm, (int*)&rank );
-
-	/* Get incidence. */
-	CommTopology_GetIncidence( self->commTopo, rank, &nInc, &inc );
-
-	if( nInc ) {
-		assert( self->isects );
-
-		/* Take the union of all intersections to determine how many shared indices we have. */
-		sharedSet = RangeSet_New();
-		for( p_i = 0; p_i < nInc; p_i++ )
-			RangeSet_Union( sharedSet, self->isects[p_i] );
-
-		/* Build table and map. */
-		RangeSet_GetIndices( sharedSet, &self->nShared, &self->shared );
-		self->dsMap = UIntMap_New();
-		for( s_i = 0; s_i < self->nShared; s_i++ ) {
-			self->shared[s_i] = Decomp_Sync_GlobalToDomain( self, self->shared[s_i] );
-			UIntMap_Insert( self->dsMap, self->shared[s_i], s_i );
-		}
-		FreeObject( sharedSet );
-
-		/* Allocate enough space to hold maximum results. */
-		self->nSharers = Memory_Alloc_Array( unsigned, self->nShared, "Decomp_Sync::nSharers" );
-		sharers = Memory_Alloc_2DArray_Unnamed( unsigned, self->nShared, nInc );
-		memset( self->nSharers, 0, self->nShared * sizeof(unsigned) );
-
-		/* Collect processors. */
-		for( p_i = 0; p_i < nInc; p_i++ ) {
-			unsigned	nInds;
-			unsigned*	inds;
-			unsigned	ind_i;
-
-			RangeSet_GetIndices( self->isects[p_i], &nInds, &inds );
-			for( ind_i = 0; ind_i < nInds; ind_i++ ) {
-				unsigned	dInd = Decomp_Sync_GlobalToDomain( self, inds[ind_i] );
-				unsigned       	sInd = Decomp_Sync_DomainToShared( self, dInd );
-
-				sharers[sInd][self->nSharers[sInd]++] = p_i;
-			}
-			FreeArray( inds );
-		}
-
-		/* Transfer results to self. */
-		self->sharers = Memory_Alloc_2DComplex( unsigned, self->nShared, self->nSharers, "Decomp_Sync::sharers" );
-		for( s_i = 0; s_i < self->nShared; s_i++ )
-			memcpy( self->sharers[s_i], sharers[s_i], self->nSharers[s_i] * sizeof(unsigned) );
-
-		/* Cleanup. */
-		FreeArray( sharers );
-	}
-
-	/* Return incidence. */
-	CommTopology_ReturnIncidence( self->commTopo, rank, &nInc, &inc );
-}
-
-void Decomp_Sync_BuildGRMap( Decomp_Sync* self ) {
-	UIntMap*	map;
-	unsigned	r_i;
-
-	FreeObject( self->grMap );
-
-	map = UIntMap_New();
-	for( r_i = 0; r_i < self->nRemotes; r_i++ )
-		UIntMap_Insert( map, self->remotes[r_i], r_i );
-	self->grMap = map;
-}
-
-void Decomp_Sync_BuildArray( Decomp_Sync* self, Decomp_Sync_Array* array ) {
-	CommTopology*	commTopo;
-	Decomp*		decomp;
-	unsigned	rank;
-	unsigned	nInc;
-	unsigned*	inc;
-
-	assert( self );
-	assert( self->commTopo );
-
-	/* Shortcuts. */
-	decomp = self->decomp;
-	commTopo = self->commTopo;
-	MPI_Comm_rank( commTopo->comm, (int*)&rank );
-
-	/* Extract incidence. */
-	CommTopology_GetIncidence( commTopo, rank, &nInc, &inc );
-
-	if( nInc ) {
-		/* Determine sink (local) information. */
-		if( self->netSnks > 0 ) {
-			unsigned*	snkOffs;
-			unsigned*	snkSizes;
-			unsigned*	snkDisps;
-			unsigned	snkInd = 0;
-			unsigned	p_i;
-
-			/* Allocate/reallocate memory. */
-			snkDisps = Memory_Alloc_Array( unsigned, nInc, "Decomp_Sync_Array::snkDisps" );
-			snkSizes = Memory_Alloc_Array( unsigned, nInc, "Decomp_Sync_Array::snkSizes" );
-			snkOffs = Memory_Alloc_Array( unsigned, self->netSnks, "Decomp_Sync_Array::snkOffs" );
-
-			/* Calculate offsets and sizes. */
-			for( p_i = 0; p_i < nInc; p_i++ ) {
-				unsigned	snk_i;
-
-				snkSizes[p_i] = 0;
-				for( snk_i = 0; snk_i < self->nSnks[p_i]; snk_i++ ) {
-					unsigned	dInd = Decomp_Sync_GlobalToDomain( self, self->snks[p_i][snk_i] );
-
-					snkOffs[snkInd] = dInd * array->snkStride;
-					snkSizes[p_i] += array->itemSize;
-					snkInd++;
-				}
-			}
-
-			/* Calculate the displacements. */
-			snkDisps[0] = 0;
-			for( p_i = 1; p_i < nInc; p_i++ )
-				snkDisps[p_i] = snkDisps[p_i - 1] + snkSizes[p_i - 1];
-
-			/* Store arrays. */
-			array->snkOffs = snkOffs;
-			array->snkDisps = snkDisps;
-			array->snkSizes = snkSizes;
-		}
-		else {
-			/* Store null information. */
-			array->snkOffs = NULL;
-			array->snkDisps = Memory_Alloc_Array( unsigned, nInc, "Decomp_Sync_Array::snkDisps" );
-			array->snkSizes = Memory_Alloc_Array( unsigned, nInc, "Decomp_Sync_Array::snkSizes" );
-			memset( array->snkDisps, 0, nInc * sizeof(unsigned) );
-			memset( array->snkSizes, 0, nInc * sizeof(unsigned) );
-		}
-
-		/* Determine source (shadow) information. */
-		if( self->netSrcs > 0 ) {
-			unsigned*	srcOffs;
-			unsigned*	srcSizes;
-			unsigned*	srcDisps;
-			unsigned	srcInd = 0;
-			unsigned	p_i;
-
-			/* Allocate/reallocate memory. */
-			srcDisps = Memory_Alloc_Array( unsigned, nInc, "Decomp_Sync_Array::srcDisps" );
-			srcSizes = Memory_Alloc_Array( unsigned, nInc, "Decomp_Sync_Array::srcSizes" );
-			srcOffs = Memory_Alloc_Array( unsigned, self->netSrcs, "Decomp_Sync_Array::srcOffs" );
-
-			/* Calculate offsets and sizes. */
-			for( p_i = 0; p_i < nInc; p_i++ ) {
-				unsigned	src_i;
-
-				srcSizes[p_i] = 0;
-				for( src_i = 0; src_i < self->nSrcs[p_i]; src_i++ ) {
-					unsigned	sInd = Decomp_Sync_GlobalToDomain( self, self->srcs[p_i][src_i] );
-
-					assert( sInd >= decomp->nLocals );
-					sInd -= decomp->nLocals;
-					srcOffs[srcInd] = sInd * array->srcStride;
-					srcSizes[p_i] += array->itemSize;
-					srcInd++;
-				}
-			}
-
-			/* Calculate the displacements. */
-			srcDisps[0] = 0;
-			for( p_i = 1; p_i < nInc; p_i++ )
-				srcDisps[p_i] = srcDisps[p_i - 1] + srcSizes[p_i - 1];
-
-			/* Store arrays. */
-			array->srcOffs = srcOffs;
-			array->srcDisps = srcDisps;
-			array->srcSizes = srcSizes;
-		}
-		else {
-			/* Store null information. */
-			array->srcOffs = NULL;
-			array->srcDisps = Memory_Alloc_Array( unsigned, nInc, "Decomp_Sync_Array::srcDisps" );
-			array->srcSizes = Memory_Alloc_Array( unsigned, nInc, "Decomp_Sync_Array::srcSizes" );
-			memset( array->srcDisps, 0, nInc * sizeof(unsigned) );
-			memset( array->srcSizes, 0, nInc * sizeof(unsigned) );
-		}
-	}
-	else {
-		array->snkOffs = NULL;
-		array->snkDisps = NULL;
-		array->snkSizes = NULL;
-		array->srcOffs = NULL;
-		array->srcDisps = NULL;
-		array->srcSizes = NULL;
-	}
-
-	/* Return incidence. */
-	CommTopology_ReturnIncidence( commTopo, rank, &nInc, &inc );
+	/* Free everything else. */
+	FreeArray( nFndBytes );
+	FreeArray( fndBytes );
+	FreeObject( remSet );
 }
 
 void Decomp_Sync_Destruct( Decomp_Sync* self ) {
-	Decomp_Sync_DestructRemotes( self );
+	assert( self );
 
+	Decomp_Sync_DestructDecomp( self );
+	Decomp_Sync_DestructComm( self );
+}
+
+void Decomp_Sync_DestructDecomp( Decomp_Sync* self ) {
+	assert( self );
+
+	Decomp_Sync_DestructRemotes( self );
 	if( self->decomp ) {
-		Decomp_RemoveSync( self->decomp, self );
+		List_Remove( Decomp_GetSyncList( self->decomp ), &self );
 		self->decomp = NULL;
 	}
 }
 
+void Decomp_Sync_DestructComm( Decomp_Sync* self ) {
+	assert( self );
+
+	Decomp_Sync_DestructRemotes( self );
+	Stg_Class_RemoveRef( self->commTopo );
+	self->commTopo = NULL;
+	KillArray( self->nSrcs );
+	KillArray( self->srcs );
+	KillArray( self->nSnks );
+	KillArray( self->snks );
+}
+
 void Decomp_Sync_DestructRemotes( Decomp_Sync* self ) {
+	assert( self );
+
 	Decomp_Sync_DestructArrays( self );
+	Decomp_Sync_DestructSources( self );
+	Decomp_Sync_DestructSinks( self );
+}
 
-	if( self->commTopo ) {
-		unsigned	p_i;
+void Decomp_Sync_DestructSources( Decomp_Sync* self ) {
+	unsigned	nIncRanks;
+	unsigned	p_i;
 
-		for( p_i = 0; p_i < self->commTopo->nInc; p_i++ )
-			FreeObject( self->isects[p_i] );
-	}
-	KillArray( self->isects );
-	KillObject( self->commTopo );
+	assert( self );
+
+	if( self->commTopo )
+		nIncRanks = CommTopology_GetIncidenceSize( self->commTopo );
+
+	if( self->decomp )
+		self->nDomains = Decomp_GetLocalSize( self->decomp );
 
 	KillArray( self->remotes );
 	self->nRemotes = 0;
+	UIntMap_Clear( self->grMap );
+	self->netSrcs = 0;
+	for( p_i = 0; p_i < nIncRanks; p_i++ )
+		KillArray( self->srcs[p_i] );
+}
+
+void Decomp_Sync_DestructSinks( Decomp_Sync* self ) {
+	unsigned	nIncRanks;
+	unsigned	p_i;
+
+	if( self->commTopo )
+		nIncRanks = CommTopology_GetIncidenceSize( self->commTopo );
+
 	KillArray( self->shared );
 	self->nShared = 0;
 	KillArray( self->nSharers );
 	KillArray( self->sharers );
-
-	KillObject( self->grMap );
-	KillObject( self->dsMap );
-
-	self->netSrcs = 0;
-	KillArray( self->nSrcs );
-	KillArray( self->srcs );
+	UIntMap_Clear( self->dsMap );
 	self->netSnks = 0;
-	KillArray( self->nSnks );
-	KillArray( self->snks );
+	for( p_i = 0; p_i < nIncRanks; p_i++ )
+		KillArray( self->snks[p_i] );
 }
 
 void Decomp_Sync_DestructArrays( Decomp_Sync* self ) {
 	unsigned	a_i;
 
-	for( a_i = 0; a_i < self->nArrays; a_i++ )
-		Decomp_Sync_DestructArray( self->arrays[a_i] );
-	KillArray( self->arrays );
-	self->nArrays = 0;
+	for( a_i = 0; a_i < List_GetSize( self->arrays ); a_i++ ) {
+		Decomp_Sync_Array*	array = *(Decomp_Sync_Array**)List_GetItem( self->arrays, a_i );
+
+		Decomp_Sync_Array_SetSync( array, self );
+	}
+
+	List_Clear( self->arrays );
 }
 
-void Decomp_Sync_DestructArray( Decomp_Sync_Array* array ) {
-	FreeArray( array->snkDisps );
-	FreeArray( array->snkSizes );
-	FreeArray( array->snkOffs );
-	FreeArray( array->srcDisps );
-	FreeArray( array->srcSizes );
-	FreeArray( array->srcOffs );
-	FreeArray( array );
+#ifndef NDEBUG
+Bool Decomp_Sync_ValidateRemotes( Decomp_Sync* self, unsigned nRemotes, unsigned* remotes ) {
+	unsigned	domainInd;
+	unsigned	r_i;
+
+	for( r_i = 0; r_i < nRemotes; r_i++ ) {
+		if( Decomp_Sync_GlobalToDomain( self, remotes[r_i], &domainInd ) )
+			return False;
+	}
+
+	return True;
 }
+
+Bool Decomp_Sync_ValidateSinks( Decomp_Sync* self, unsigned nSinks, unsigned* sinks ) {
+	RangeSet	*lSet, *sSet;
+	unsigned	nLocals, *locals;
+	unsigned	nInds;
+
+	Decomp_GetLocals( self->decomp, &nLocals, &locals );
+
+	lSet = RangeSet_New();
+	sSet = RangeSet_New();
+	RangeSet_SetIndices( lSet, nLocals, locals );
+	RangeSet_SetIndices( sSet, nSinks, sinks );
+	RangeSet_Subtraction( sSet, lSet );
+	nInds = RangeSet_GetSize( sSet );
+	FreeObject( lSet );
+	FreeObject( sSet );
+
+	return !nInds;
+}
+
+Bool Decomp_Sync_ValidateComms( Decomp_Sync* self ) {
+	assert( self );
+
+	if( self->decomp && self->commTopo )
+		return Decomp_GetComm( self->decomp ) == CommTopology_GetComm( self->commTopo );
+	else
+		return True;
+}
+#endif

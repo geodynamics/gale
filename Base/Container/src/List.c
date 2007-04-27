@@ -24,23 +24,21 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: List.c 2192 2004-10-15 02:45:38Z LukeHodkinson $
+** $Id: List.c 3584 2006-05-16 11:11:07Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-#include <mpi.h>
-#include "Base/Foundation/Foundation.h"
-#include "Base/IO/IO.h"
-
-#include "units.h"
-#include "types.h"
-#include "List.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
 #include <assert.h>
+#include <mpi.h>
+
+#include "Base/Foundation/Foundation.h"
+#include "Base/IO/IO.h"
+
+#include "types.h"
+#include "List.h"
 
 
 /* Textual name of this class */
@@ -51,94 +49,35 @@ const Type List_Type = "List";
 ** Constructors
 */
 
-List* List_New_Param(
-		SizeT						elementSize, 
-		unsigned					delta )
-{
-	return _List_New( 
-		sizeof(List), 
-		List_Type, 
-		_List_Delete, 
-		_List_Print, 
-		NULL, 
-		_List_Append,
-		_List_Mutate, 
-		elementSize,
-		delta );
+List* List_New( Name name ) {
+	return _List_New( sizeof(List), 
+			  List_Type, 
+			  _List_Delete, 
+			  _List_Print, 
+			  NULL );
 }
 
-
-void List_Init(
-		List*						self,
-		SizeT						elementSize, 
-		unsigned					delta )
-{
-	/* General info */
-	self->type = List_Type;
-	self->_sizeOfSelf = sizeof(List);
-	self->_deleteSelf = False;
-	
-	/* Virtual info */
-	self->_delete = _List_Delete;
-	self->_print = _List_Print;
-	self->_copy = NULL;
-	self->_append = _List_Append;
-	self->_mutate = _List_Mutate;
-	_Stg_Class_Init( (Stg_Class*)self );
-	
-	/* List info */
-	_List_Init( self, elementSize, delta );
-}
-
-
-List* _List_New(
-		SizeT						_sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*				_delete,
-		Stg_Class_PrintFunction*				_print, 
-		Stg_Class_CopyFunction*				_copy, 
-		List_AppendFunc*				_append,
-		List_MutateFunc*				_mutate, 
-		SizeT						elementSize, 
-		unsigned					delta )
-{
-	List*			self;
+List* _List_New( LIST_DEFARGS ) {
+	List*	self;
 	
 	/* Allocate memory */
-	self = (List*)_Stg_Class_New(
-		_sizeOfSelf,
-		type,
-		_delete,
-		_print, 
-		_copy );
-	
-	/* General info */
-	
+	assert( sizeOfSelf >= sizeof(List) );
+	self = (List*)_Stg_Class_New( STG_CLASS_PASSARGS );
+
 	/* Virtual info */
-	self->_append = _append;
-	self->_mutate = _mutate;
-	
+
 	/* List info */
-	_List_Init( self, elementSize, delta );
-	
+	_List_Init( self );
+
 	return self;
 }
 
-
-void _List_Init(
-		List*						self,
-		SizeT						elementSize, 
-		unsigned					delta )
-{
-	/* General and Virtual info should already be set */
-	
-	/* List info */
-	self->elementSize = elementSize;
-	self->delta = delta;
-	self->maxElements = self->delta;
-	self->elements = Memory_Alloc_Bytes_Unnamed( self->elementSize * self->maxElements, "char");
-	assert( self->elements ); 
-	self->elementCnt = 0;
+void _List_Init( List* self ) {
+	self->nItems = 0;
+	self->items = NULL;
+	self->itemSize = 0;
+	self->maxItems = 0;
+	self->delta = 10;
 }
 
 
@@ -147,57 +86,24 @@ void _List_Init(
 */
 
 void _List_Delete( void* list ) {
-	List*			self = (List*)list;
-	
-	/* Stg_Class_Delete the class itself */
-	if( self->elements )
-		Memory_Free( self->elements );
-	
-	/* Stg_Class_Delete parent */
+	List*	self = (List*)list;
+
+	List_Destruct( self );
+
+	/* Delete the parent. */
 	_Stg_Class_Delete( self );
 }
 
-
 void _List_Print( void* list, Stream* stream ) {
-	List*			self = (List*)list;
+	List*	self = (List*)list;
 	
 	/* Set the Journal for printing informations */
-	Stream*			myStream;
-	myStream = Journal_Register( InfoStream_Type, "ListStream" );
+	Stream* listStream;
+	listStream = Journal_Register( InfoStream_Type, "ListStream" );
 
 	/* Print parent */
+	Journal_Printf( stream, "List (ptr): (%p)\n", self );
 	_Stg_Class_Print( self, stream );
-	
-	/* General info */
-	Journal_Printf( myStream, "List (ptr): (%p)\n", self );
-	
-	/* Virtual info */
-	
-	/* List info */
-	Journal_Printf( myStream, "\telementSize: %d\n", self->elementSize );
-	Journal_Printf( myStream, "\tdelta: %d\n", self->delta );
-	Journal_Printf( myStream, "\tmaxElements: %d\n", self->maxElements );
-	Journal_Printf( myStream, "\telementCnt: %d\n", self->elementCnt );
-	Journal_Printf( myStream, "\telements (ptr): %p\n", self->elements );
-}
-
-
-unsigned _List_Append( void* list, void* data ) {
-	List*			self = (List*)list;
-	
-	List_Resize( self, self->elementCnt + 1 );
-	memcpy( &((unsigned char*)self->elements)[self->elementSize * (self->elementCnt - 1)], data,
-		sizeof(unsigned char) * self->elementSize );
-	
-	return self->elementCnt - 1;
-}
-
-
-void _List_Mutate( void* list, unsigned index, void* data ) {
-	List*		self = (List*)list;
-	
-	memcpy( &((unsigned char*)self->elements)[self->elementSize * index], data,
-		sizeof(unsigned char) * self->elementSize );
 }
 
 
@@ -205,32 +111,152 @@ void _List_Mutate( void* list, unsigned index, void* data ) {
 ** Public Functions
 */
 
-void List_Resize( void* list, unsigned size ) {
+void List_SetDelta( void* list, unsigned delta ) {
+	List*	self = (List*)list;
+
+	assert( self );
+	assert( delta );
+
+	self->delta = delta;
+}
+
+void List_SetItemSize( void* list, unsigned itemSize ) {
+	List*	self = (List*)list;
+
+	assert( self );
+	assert( itemSize );
+
+	List_Destruct( self );
+
+	self->itemSize = itemSize;
+}
+
+void List_Clear( void* list ) {
+	List*	self = (List*)list;
+
+	assert( self );
+
+	self->nItems = 0;
+	KillArray( self->items );
+	self->maxItems = 0;
+}
+
+void List_Insert( void* list, unsigned index, void* data ) {
 	List*		self = (List*)list;
-	
-	if( size >= self->maxElements ) {
-		unsigned		factor;
-		void*			newElements;
-		
-		factor = ceil( (float)(size - self->maxElements) / (float)self->delta );
-		self->maxElements += factor * self->delta;
-		
-		newElements = Memory_Alloc_Bytes_Unnamed( self->elementSize * self->maxElements, "char" );
-		assert( newElements ); 
-		if( self->elements ) {
-			memcpy( newElements, self->elements, self->elementSize * self->elementCnt );
-			Memory_Free( self->elements );
-		}
-		self->elements = newElements;
+	unsigned	item_i;
+
+	assert( self );
+	assert( index <= self->nItems );
+	assert( data );
+	assert( self->itemSize );
+
+	if( self->nItems == self->maxItems )
+		List_Expand( self );
+
+	for( item_i = self->nItems; item_i > index; item_i-- )
+		memcpy( self->items + self->itemSize * item_i, 
+			self->items + self->itemSize * (item_i - 1), 
+			self->itemSize );
+
+	memcpy( self->items + self->itemSize * index, data, self->itemSize );
+
+	self->nItems++;
+}
+
+void List_Append( void* list, void* data ) {
+	List*	self = (List*)list;
+
+	assert( self );
+
+	List_Insert( self, self->nItems, data );
+}
+
+void List_Prepend( void* list, void* data ) {
+	List_Insert( list, 0, data );
+}
+
+void List_Remove( void* list, void* data ) {
+	List*		self = (List*)list;
+	unsigned	item_i;
+
+	assert( self );
+	assert( data );
+
+	for( item_i = 0; item_i < self->nItems; item_i++ ) {
+		if( !memcmp( self->items + self->itemSize * item_i, data, self->itemSize ) )
+			break;
 	}
-	else if( size < self->elementCnt ) {
-		Journal_Firewall( 0, Journal_Register( ErrorStream_Type, "List" ), "error in '%s'\n", __func__); 
+	assert( item_i < self->nItems );
+
+	for( item_i++; item_i < self->nItems; item_i++ ) {
+		memcpy( self->items + self->itemSize * (item_i - 1), 
+			self->items + self->itemSize * item_i, 
+			self->itemSize );
 	}
-	
-	self->elementCnt = size;
+
+	if( --self->nItems % self->delta == 0 )
+		List_Contract( self );
+}
+
+void* List_GetItem( void* list, unsigned index ) {
+	List*	self = (List*)list;
+
+	assert( self );
+	assert( index < self->nItems );
+
+	return self->items + self->itemSize * index;
+}
+
+unsigned List_GetSize( void* list ) {
+	List*	self = (List*)list;
+
+	assert( self );
+
+	return self->nItems;
+}
+
+Bool List_Exists( void* list, void* data ) {
+	List*		self = (List*)list;
+	unsigned	item_i;
+
+	assert( self );
+
+	for( item_i = 0; item_i < self->nItems; item_i++ ) {
+		if( !memcmp( self->items + self->itemSize * item_i, data, self->itemSize ) )
+			break;
+	}
+
+	return (item_i < self->nItems) ? True : False;
 }
 
 
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Private Functions
 */
+
+void List_Expand( List* self ) {
+	self->maxItems += self->delta;
+	if( !self->items )
+		self->items = Memory_Alloc_Array_Bytes( self->itemSize, self->maxItems, "", "List::items" );
+	else
+		self->items = Memory_Realloc_Array_Bytes( self->items, self->itemSize, self->maxItems );
+}
+
+void List_Contract( List* self ) {
+	if( self->delta > self->maxItems )
+		self->maxItems = 0;
+	else
+		self->maxItems -= self->delta;
+
+	if( !self->maxItems )
+		KillArray( self->items );
+	else
+		self->items = Memory_Realloc_Array_Bytes( self->items, self->itemSize, self->maxItems );
+}
+
+void List_Destruct( List* self ) {
+	self->nItems = 0;
+	KillArray( self->items );
+	self->itemSize = 0;
+	self->maxItems = 0;
+}

@@ -34,128 +34,81 @@
 **
 ** Comments:
 **
-** $Id: List.h 2225 1970-01-02 13:48:23Z LukeHodkinson $
+** $Id: List.h 3584 2006-05-16 11:11:07Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #ifndef __Base_Container_List_h__
-#define __Base_Container_List_h__
-	
+#define __Base_Contianer_List_h__
 
 	/** Textual name of this class */
 	extern const Type List_Type;
 
-	/* Virtual function types */
-	typedef	unsigned		(List_AppendFunc)	( void* list, void* data );
-	typedef void			(List_MutateFunc)	( void* list, unsigned index, void* data );
-	
-	/** List class contents */
-	#define __List \
-		/* General info */ \
-		__Stg_Class \
-		\
-		/* Virtual info */ \
-		List_AppendFunc*			_append; \
-		List_MutateFunc*			_mutate; \
-		\
-		/* List info ... */ \
-		SizeT					elementSize; \
-		unsigned				delta; \
-		unsigned				maxElements; \
-		unsigned				elementCnt; \
-		void*					elements;
+	/** Virtual function types */
+
+	/** Class contents */
+	#define __List				\
+		/* General info */		\
+		__Stg_Class			\
+						\
+		/* Virtual info */		\
+						\
+		/* List info */			\
+		unsigned	nItems;		\
+		Stg_Byte*	items;		\
+		unsigned	itemSize;	\
+		unsigned	maxItems;	\
+		unsigned	delta;
 
 	struct List { __List };
-	
-	
+
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Constructors
 	*/
-	
-	/* Create a List */
-	#define List_New( elementSize ) \
-		List_New_Param( elementSize, 10 )
-	
-	List* List_New_Param( 
-		SizeT						elementSize, 
-		unsigned					delta );
-	
-	/* Creation implementation */
-	List* _List_New(
-		SizeT						_sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*				_delete,
-		Stg_Class_PrintFunction*				_print, 
-		Stg_Class_CopyFunction*				_copy, 
-		List_AppendFunc*				_append,
-		List_MutateFunc*				_mutate, 
-		SizeT						elementSize, 
-		unsigned					delta );
-	
-	
-	/* Initialise a List */
-	void List_Init(
-		List*						self,
-		SizeT						elementSize, 
-		unsigned					delta );
-	
-	/* Initialisation implementation functions */
-	void _List_Init(
-		List*						self,
-		SizeT						elementSize, 
-		unsigned					delta );
-	
-	
+
+	#define LIST_DEFARGS		\
+		STG_CLASS_DEFARGS
+
+	#define LIST_PASSARGS		\
+		STG_CLASS_PASSARGS
+
+	List* List_New();
+	List* _List_New( LIST_DEFARGS );
+	void _List_Init( List* self );
+
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Virtual functions
 	*/
-	
-	/* Stg_Class_Delete mesh implementation */
+
 	void _List_Delete( void* list );
-	
-	/* Print mesh implementation */
 	void _List_Print( void* list, Stream* stream );
-	
-	/* Append implementation */
-	unsigned _List_Append( void* list, void* data );
-	
-	/* Mutate implementation */
-	void _List_Mutate( void* list, unsigned index, void* data );
-	
-	
+
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Public functions
 	*/
-	
-	/* Use this to get the current size of the list */
-	#define List_Size( self ) ((self)->elementCnt)
-	
-	/* Use this to check if a given index is within the list's bounds */
-	#define List_IsValidIndex( self, index ) (index < (self)->elementCnt)
-	
-	/* This guy gives access to the list's elements directly.  This is kind of dangerous
-	   as inherited lists, such as UniqueList, rely on elements only being added with one
-	   of 'Append', 'Prepend' or 'Insert*'. */
-	#define List_ElementAt( self, type, index ) (((type*)((List*)self)->elements)[index])
-	
-	/* Used to resize the list's maximum size */
-	void List_Resize( void* list, unsigned size );
-	
-	/* The standard means of adding an element to the list. */
-	#define List_Append( self, data ) (self)->_append( self, data )
-	
-	/* Modify the content of list element */
-	#define List_Mutate( self, index, data ) \
-		(self)->_mutate( self, index, data )
-	
-	/* Get the list's array */
-	#define List_Array( self, type ) \
-		(type*)(self)->elements
-	
-	
+
+	void List_SetDelta( void* list, unsigned delta );
+	void List_SetItemSize( void* list, unsigned itemSize );
+	void List_Clear( void* list );
+
+	void List_Insert( void* list, unsigned index, void* data );
+	void List_Append( void* list, void* data );
+	void List_Prepend( void* list, void* data );
+	void List_Remove( void* list, void* data );
+
+	void* List_GetItem( void* list, unsigned index );
+	unsigned List_GetSize( void* list );
+	Bool List_Exists( void* list, void* data );
+
+	#define List_Get( list, index, type )		\
+		((type*)List_GetItem( list, index ))
+
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Private Member functions
 	*/
-	
+
+	void List_Expand( List* self );
+	void List_Contract( List* self );
+	void List_Destruct( List* self );
 
 #endif /* __Base_Container_List_h__ */

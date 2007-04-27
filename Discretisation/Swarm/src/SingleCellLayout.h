@@ -35,7 +35,7 @@
 ** Comments:
 **	User needs to pass in an array, saying which dimensions exist ( can be generated from the MeshDecomp)
 **
-** $Id: SingleCellLayout.h 3851 2006-10-12 08:57:22Z SteveQuenette $
+** $Id: SingleCellLayout.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -57,7 +57,7 @@
 		Bool            dimExists[3];    /** Defines whether each dimension exists in current sim*/\
 		XYZ             min;             /** Max top-right-back corner of cell */\
 		XYZ             max;             /** Min bottom-left-front corner of cell */ \
-		Coord*          cellPointCoords; /** Generated cell points in single cell */\
+		double**        cellPointCoords; /** Generated cell points in single cell */\
 		Cell_PointIndex pointCount;	     /** Count of points in single cell */\
 
 	struct SingleCellLayout { __SingleCellLayout };
@@ -127,7 +127,7 @@
 		Cell_Points points );
 	
 	/** Implements CellLayout_MapElementIdToCellId(): always return 0, since all elements correspond to the same cell */
-	Cell_Index _SingleCellLayout_MapElementIdToCellId( void* cellLayout, Element_DomainIndex element_dI );
+	Cell_Index _SingleCellLayout_MapElementIdToCellId( void* cellLayout, unsigned element_dI );
 	
 	/* Specify whether a particle is in a given cell */
 	Bool _SingleCellLayout_IsInCell( void* singleCellLayout, Cell_Index cellIndex, void* particle );

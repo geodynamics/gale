@@ -112,11 +112,12 @@ Bool testMap( unsigned rank, unsigned nProcs, unsigned watch ) {
 	if( rank == watch ) {
 		unsigned	size = 5;
 		UIntMap*	map = UIntMap_New();
+		unsigned	val;
 		unsigned	i;
 
 		fillMap( map, size );
 		for( i = 0; i < size; i++ )
-			if( UIntMap_Map( map, i ) != size + i ) break;
+			if( !UIntMap_Map( map, i, &val ) || val != size + i ) break;
 		if( i < size ) {
 			FreeObject( map );
 			return False;
@@ -133,6 +134,7 @@ Bool testMemory( unsigned rank, unsigned nProcs, unsigned watch ) {
 		unsigned	size = 5;
 		unsigned	nReps = 10;
 		UIntMap*	map;
+		unsigned	val;
 		unsigned	r_i;
 
 		for( r_i = 0; r_i < nReps; r_i++ ) {
@@ -141,7 +143,7 @@ Bool testMemory( unsigned rank, unsigned nProcs, unsigned watch ) {
 			map = UIntMap_New();
 			fillMap( map, size );
 			for( i = 0; i < size; i++ )
-				if( UIntMap_Map( map, i ) != size + i ) break;
+				if( !UIntMap_Map( map, i, &val ) || val != size + i ) break;
 			if( i < size ) {
 				FreeObject( map );
 				return False;

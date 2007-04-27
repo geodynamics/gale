@@ -32,7 +32,7 @@
 **
 ** Comments:
 **
-** $Id: types.h 3986 2007-01-29 07:31:46Z PatrickSunter $
+** $Id: types.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -41,6 +41,9 @@
 	
 	/* Types user needs to define */
 	typedef struct _Particle			Particle;
+
+	typedef struct ProcNbrInfo	ProcNbrInfo;
+	typedef struct ShadowInfo	ShadowInfo;
 
 	/** Types of coordinate system a particle/swarm is using */
 	typedef enum {
@@ -54,7 +57,7 @@
 	typedef Index					Cell_DomainIndex;
 	typedef Index					Cell_ShadowIndex;
 	typedef Index					Cell_ShadowTransferIndex;
-	typedef Coord*					Cell_Point;
+	typedef double**				Cell_Point;
 	typedef Cell_Point*				Cell_Points;
 	typedef Cell_Points*				Cell_PointsList;
 	typedef Index					Cell_PointIndex;

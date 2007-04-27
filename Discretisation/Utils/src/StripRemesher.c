@@ -279,7 +279,7 @@ void StripRemesher_SetDims( void* stripRemesher, Bool* dims ) {
 	self->srd = SemiRegDeform_New( "" );
 	SemiRegDeform_SetMesh( self->srd, self->mesh );
 
-	for( d_i = 0; d_i < self->srd->grm.nDims; d_i++ ) {
+	for( d_i = 0; d_i < Mesh_GetDimSize( self->srd->mesh ); d_i++ ) {
 		IJK	ijkLow;
 		IJK	ijkUpp;
 
@@ -315,10 +315,14 @@ void _StripRemesher_BuildStrips( SemiRegDeform* srd, unsigned dim, unsigned defo
 				 IJK ijkLow, IJK ijkUpp )
 {
 	unsigned	n_i;
+	Grid*		vertGrid;
 
-	if( dim < srd->grm.nDims ) {
+	vertGrid = *(Grid**)ExtensionManager_Get( srd->mesh->info, srd->mesh, 
+						  ExtensionManager_GetHandle( srd->mesh->info, "vertexGrid" ) );
+
+	if( dim < Mesh_GetDimSize( srd->mesh ) ) {
 		if( dim != deformDim ) {
-			for( n_i = 0; n_i < srd->grm.nNodes[dim]; n_i++ ) {
+			for( n_i = 0; n_i < vertGrid->sizes[dim]; n_i++ ) {
 				ijkLow[dim] = n_i;
 				ijkUpp[dim] = n_i;
 				_StripRemesher_BuildStrips( srd, dim + 1, deformDim, 
@@ -327,7 +331,7 @@ void _StripRemesher_BuildStrips( SemiRegDeform* srd, unsigned dim, unsigned defo
 		}
 		else {
 			ijkLow[dim] = 0;
-			ijkUpp[dim] = srd->grm.nNodes[dim] - 1;
+			ijkUpp[dim] = vertGrid->sizes[dim] - 1;
 			_StripRemesher_BuildStrips( srd, dim + 1, deformDim, 
 						    ijkLow, ijkUpp );
 		}
@@ -335,8 +339,8 @@ void _StripRemesher_BuildStrips( SemiRegDeform* srd, unsigned dim, unsigned defo
 	else {
 		unsigned	low, upp;
 
-		GRM_Project( &srd->grm, ijkLow, &low );
-		GRM_Project( &srd->grm, ijkUpp, &upp );
+		low = Grid_Project( vertGrid, ijkLow );
+		upp = Grid_Project( vertGrid, ijkUpp );
 		SemiRegDeform_AddStrip( srd, low, upp );
 	}
 }

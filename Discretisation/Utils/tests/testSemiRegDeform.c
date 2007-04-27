@@ -31,6 +31,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 #include <mpi.h>
 
 #include "Base/Base.h"
@@ -51,22 +52,46 @@ struct _Element {
 };
 
 
+Mesh* buildMesh( unsigned nDims, unsigned* size, 
+		     double* minCrds, double* maxCrds, 
+		     ExtensionManager_Register* emReg )
+{
+	CartesianGenerator*	gen;
+	Mesh*			mesh;
+
+	gen = CartesianGenerator_New( "" );
+	CartesianGenerator_SetDimSize( gen, nDims );
+	CartesianGenerator_SetTopologyParams( gen, size, 0, NULL, NULL );
+	CartesianGenerator_SetGeometryParams( gen, minCrds, maxCrds );
+
+	mesh = Mesh_New( "" );
+	Mesh_SetExtensionManagerRegister( mesh, emReg );
+	Mesh_SetGenerator( mesh, gen );
+
+	Build( mesh, NULL, False );
+	Initialise( mesh, NULL, False );
+
+	KillObject( mesh->generator );
+
+	return mesh;
+}
+
+
 int main( int argc, char* argv[] ) {
 	MPI_Comm			commWorld;
 	int				rank;
 	int				nProcs;
 	int				procToWatch;
-	Dictionary*			dict;
-	ExtensionManager_Register*	extMgrReg;
-	Topology*			nTopo;
-	ElementLayout*			eLyt;
-	NodeLayout*			nLyt;
-	MeshDecomp*			decomp;
-	MeshLayout*			mLyt;
-	Mesh*				mesh;
+	ExtensionManager_Register*	extensionMgr_Register;
 	Stream*				stream;
 	SemiRegDeform*			srd;
 
+	unsigned	nDims = 3;
+	unsigned	meshSize[3] = {4, 4, 4};
+	double		minCrds[3] = {0.0, 0.0, 0.0};
+	double		maxCrds[3] = {1.0, 1.0, 1.0};
+	Mesh*		mesh;
+	Grid*		vertGrid;
 
 	/*
 	** Initialise MPI, StGermain Base, get world info.
@@ -87,62 +112,12 @@ int main( int argc, char* argv[] ) {
 	procToWatch = argc >= 2 ? atoi(argv[1]) : 0;
 
 	/*
-	** Polpulate the dictionary.
-	*/
-
-	dict = Dictionary_New();
-	Dictionary_Add( dict, "rank", Dictionary_Entry_Value_FromUnsignedInt( rank ) );
-	Dictionary_Add( dict, "numProcessors", Dictionary_Entry_Value_FromUnsignedInt( nProcs ) );
-	Dictionary_Add( dict, "meshSizeI", Dictionary_Entry_Value_FromUnsignedInt( 4 ) );
-	Dictionary_Add( dict, "meshSizeJ", Dictionary_Entry_Value_FromUnsignedInt( 5 ) );
-	Dictionary_Add( dict, "meshSizeK", Dictionary_Entry_Value_FromUnsignedInt( 4 ) );
-	Dictionary_Add( dict, "allowUnusedCPUs", Dictionary_Entry_Value_FromBool( False ) );
-	Dictionary_Add( dict, "allowPartitionOnElement", Dictionary_Entry_Value_FromBool( False ) );
-	Dictionary_Add( dict, "allowPartitionOnNode", Dictionary_Entry_Value_FromBool( True ) );
-	Dictionary_Add( dict, "allowUnbalancing", Dictionary_Entry_Value_FromBool( False ) );
-	Dictionary_Add( dict, "shadowDepth", Dictionary_Entry_Value_FromUnsignedInt( 0 ) );
-
-
-	/*
 	** Create the mesh.
 	*/
 
-	nTopo = (Topology*)IJK6Topology_New( "IJK6Topology", dict );
-	eLyt = (ElementLayout*)ParallelPipedHexaEL_New( "PPHexaEL", 3, dict );
-	nLyt = (NodeLayout*)CornerNL_New( "CornerNL", dict, eLyt, nTopo );
-	decomp = (MeshDecomp*)HexaMD_New( "HexaMD", dict, commWorld, eLyt, nLyt );
-	mLyt = MeshLayout_New( "MeshLayout", eLyt, nLyt, decomp );
-	
-	extMgrReg = ExtensionManager_Register_New();
-	mesh = Mesh_New( "Mesh", mLyt, sizeof(Node), sizeof(Element), extMgrReg, dict );
-
-	mesh->buildNodeLocalToGlobalMap = True;
-	mesh->buildNodeDomainToGlobalMap = True;
-	mesh->buildNodeGlobalToLocalMap = True;
-	mesh->buildNodeGlobalToDomainMap = True;
-	mesh->buildNodeNeighbourTbl = True;
-	mesh->buildNodeElementTbl = True;
-	mesh->buildElementLocalToGlobalMap = True;
-	mesh->buildElementDomainToGlobalMap = True;
-	mesh->buildElementGlobalToDomainMap = True;
-	mesh->buildElementGlobalToLocalMap = True;
-	mesh->buildElementNeighbourTbl = True;
-	mesh->buildElementNodeTbl = True;
-
-
-	/*
-	** Build phase.
-	*/
-
-	Build( mesh, 0, False );
-
-
-	/*
-	** Initialisation phase.
-	*/
-
-	Initialise(mesh, 0, False );
-
+	mesh = buildMesh( nDims, meshSize, minCrds, maxCrds, extensionMgr_Register );
+	vertGrid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
+						  ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
 
 	/*
 	** Create the deformation.
@@ -156,13 +131,13 @@ int main( int argc, char* argv[] ) {
 		SemiRegDeform_SetMesh( srd, mesh );
 
 		/* Set up strips to remesh in the y direction. */
-		for( ijk[2] = 0; ijk[2] < ((HexaMD*)decomp)->nodeGlobal3DCounts[2]; ijk[2]++ ) {
-			for( ijk[0] = 0; ijk[0] < ((HexaMD*)decomp)->nodeGlobal3DCounts[0]; ijk[0]++ ) {
+		for( ijk[2] = 0; ijk[2] < meshSize[2]; ijk[2]++ ) {
+			for( ijk[0] = 0; ijk[0] < meshSize[0]; ijk[0]++ ) {
 				ijk[1] = 0;
-				GRM_Project( &srd->grm, ijk, &lower );
+				lower = Grid_Project( vertGrid, ijk );
 
-				ijk[1] = ((HexaMD*)decomp)->nodeGlobal3DCounts[1] - 1;
-				GRM_Project( &srd->grm, ijk, &upper );
+				ijk[1] = meshSize[1] - 1;
+				upper = Grid_Project( vertGrid, ijk );
 
 				SemiRegDeform_AddStrip( srd, lower, upper );
 			}
@@ -191,17 +166,17 @@ int main( int argc, char* argv[] ) {
 		SemiRegDeform_SetMesh( srd, mesh );
 
 		/* Set up strips to remesh in the y direction. */
-		for( ijk[2] = 0; ijk[2] < ((HexaMD*)decomp)->nodeGlobal3DCounts[2]; ijk[2]++ ) {
-			for( ijk[0] = 0; ijk[0] < ((HexaMD*)decomp)->nodeGlobal3DCounts[0]; ijk[0]++ ) {
+		for( ijk[2] = 0; ijk[2] < meshSize[2]; ijk[2]++ ) {
+			for( ijk[0] = 0; ijk[0] < meshSize[0]; ijk[0]++ ) {
 				ijk[1] = 0;
-				GRM_Project( &srd->grm, ijk, &lower );
-				ijk[1] = ((HexaMD*)decomp)->nodeGlobal3DCounts[1] - 2;
-				GRM_Project( &srd->grm, ijk, &upper );
+				lower = Grid_Project( vertGrid, ijk );
+				ijk[1] = meshSize[1] - 2;
+				upper = Grid_Project( vertGrid, ijk );
 				SemiRegDeform_AddStrip( srd, lower, upper );
 
 				lower = upper;
-				ijk[1] = ((HexaMD*)decomp)->nodeGlobal3DCounts[1] - 1;
-				GRM_Project( &srd->grm, ijk, &upper );
+				ijk[1] = meshSize[1] - 1;
+				upper = Grid_Project( vertGrid, ijk );
 				SemiRegDeform_AddStrip( srd, lower, upper );
 			}
 		}
@@ -224,12 +199,6 @@ int main( int argc, char* argv[] ) {
 	*/
 	
 	Stg_Class_Delete( mesh );
-	Stg_Class_Delete( mLyt );
-	Stg_Class_Delete( decomp );
-	Stg_Class_Delete( nLyt );
-	Stg_Class_Delete( eLyt );
-	Stg_Class_Delete( nTopo );
-	Stg_Class_Delete( dict );
 
 	DiscretisationMesh_Finalise();
 	DiscretisationShape_Finalise();

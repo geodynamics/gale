@@ -24,7 +24,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: Makefile.def 3960 2007-01-11 02:20:49Z KathleenHumble $
+## $Id: Makefile.def 4081 2007-04-27 06:20:07Z LukeHodkinson $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -57,7 +57,9 @@ def_srcs = \
 	Init.c \
 	Finalise.c \
 	ComplexVectorMath.c \
-	TensorMultMath.c
+	TensorMultMath.c \
+	Simplex.c \
+	Hex.c
 
 def_hdrs = \
 	units.h \
@@ -91,6 +93,8 @@ def_hdrs = \
 	ComplexVectorMath.h \
 	stg_lapack.h \
 	FullTensorMath.h \
-	TensorMultMath.h	
+	TensorMultMath.h \
+	Simplex.h \
+	Hex.h
 
 def_objlists =

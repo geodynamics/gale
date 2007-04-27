@@ -35,7 +35,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: StGermain.h 3851 2006-10-12 08:57:22Z SteveQuenette $
+** $Id: StGermain.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -43,8 +43,8 @@
 #define __StGermain_StGermain_h__
 
 	#define EP_APPLICATIONS_FINALISE "StGermain_EP_ApplicationsFinalise"
-// TODO: ensure safe to remove (i.e. evertthing compiles). Shoud just append the context's contruct
-//	#define EP_APPLICATIONS_POST_COMPONENTS_CONSTRUCT "StGermain_EP_ApplicationsPostComponentsConstruct"
+/* TODO: ensure safe to remove (i.e. evertthing compiles). Shoud just append the context's contruct */
+/*	#define EP_APPLICATIONS_POST_COMPONENTS_CONSTRUCT "StGermain_EP_ApplicationsPostComponentsConstruct" */
 
 	#include "Base/Base.h"
 	#include "Discretisation/Discretisation.h"

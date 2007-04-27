@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testTensorMath.c 3751 2006-08-07 04:56:57Z KathleenHumble $
+** $Id: testTensorMath.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -411,10 +411,10 @@ int main( int argc, char* argv[] ) {
 
 		Journal_Printf(stream, "\n/*************************************/\n");
 		Journal_Printf( stream, "Test function EigenvectorList_Sort\n");
-		// Matrix that gives eigenvalues and vectors 
-		//| 1.000 1.000 2.000 |
-		//| 1.000 2.000 1.000 |
-		//| 2.000 1.000 1.000 |
+		/*  Matrix that gives eigenvalues and vectors  */
+		/* | 1.000 1.000 2.000 | */
+		/* | 1.000 2.000 1.000 | */
+		/* | 2.000 1.000 1.000 | */
 		Journal_Printf( stream, " 3-D\n");
 		eigenvectorList[0].eigenvalue = 4;
 		eigenvectorList[1].eigenvalue = -1;
@@ -455,9 +455,9 @@ int main( int argc, char* argv[] ) {
 
 		Journal_Printf( stream, "2-D\n");
 		
-		// Matrix that gives eigenvalues and vectors 
-		//| 5.000 1.000 |
-		//| 1.000 5.000 |
+		/*  Matrix that gives eigenvalues and vectors  */
+		/* | 5.000 1.000 | */
+		/* | 1.000 5.000 | */
 
 		eigenvectorList[0].eigenvalue = 6;
 		eigenvectorList[1].eigenvalue = 4;

@@ -1,14 +1,25 @@
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ##
-## Copyright (C), 2003, Victorian Partnership for Advanced Computing (VPAC) Ltd, 110 Victoria Street, Melbourne, 3053, Australia.
+## Copyright (C), 2003-2006, Victorian Partnership for Advanced Computing (VPAC) Ltd, 110 Victoria Street,
+##	Melbourne, 3053, Australia.
 ##
-## Authors:
-##	Stevan M. Quenette, Senior Software Engineer, VPAC. (steve@vpac.org)
+## Primary Contributing Organisations:
+##	Victorian Partnership for Advanced Computing Ltd, Computational Software Development - http://csd.vpac.org
+##	Australian Computational Earth Systems Simulator - http://www.access.edu.au
+##	Monash Cluster Computing - http://www.mcc.monash.edu.au
+##	Computational Infrastructure for Geodynamics - http://www.geodynamics.org
+##
+## Contributors:
 ##	Patrick D. Sunter, Software Engineer, VPAC. (pds@vpac.org)
+##	Robert Turnbull, Research Assistant, Monash University. (robert.turnbull@sci.monash.edu.au)
+##	Stevan M. Quenette, Senior Software Engineer, VPAC. (steve@vpac.org)
+##	David May, PhD Student, Monash University (david.may@sci.monash.edu.au)
+##	Louis Moresi, Associate Professor, Monash University. (louis.moresi@sci.monash.edu.au)
 ##	Luke J. Hodkinson, Computational Engineer, VPAC. (lhodkins@vpac.org)
-##	Siew-Ching Tan, Software Engineer, VPAC. (siew@vpac.org)
 ##	Alan H. Lo, Computational Engineer, VPAC. (alan@vpac.org)
 ##	Raquibul Hassan, Computational Engineer, VPAC. (raq@vpac.org)
+##	Julian Giordani, Research Assistant, Monash University. (julian.giordani@sci.monash.edu.au)
+##	Vincent Lemiale, Postdoctoral Fellow, Monash University. (vincent.lemiale@sci.monash.edu.au)
 ##
 ##  This library is free software; you can redistribute it and/or
 ##  modify it under the terms of the GNU Lesser General Public
@@ -24,29 +35,27 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 3982 2007-01-23 03:52:15Z KathleenHumble $
+## $Id: makefile 4081 2007-04-27 06:20:07Z LukeHodkinson $
 ##
-##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-include Makefile.def
-
-tests = ${def_tst}
-
-checks = ${def_checks}
-
-SRCS = ${def_srcs}
-
-PROJ_LIBS = ${def_libs}
-EXTERNAL_INCLUDES = -I${INC_DIR}/StGermain
-EXTERNAL_LIBS = -L${LIB_DIR} -lStGermainDiscretisationMesh -lStGermainDiscretisationShape -lStGermainDiscretisationGeometry -lStGermainBase ${RPATH_LFLAGS}
-
-packages = MPI XML MATH
-
-# obtain defaults for required variables according to system and project location, and then run the build.
-ifndef PROJ_ROOT
-	PROJ_ROOT=../../..
-endif
+#Finds the Absolute path to the Project Root directory
+SHELL := /bin/bash
+PROJ_ROOT := $(shell until test -r ./Makefile.system ; do cd .. ; done ; echo `pwd`)
 include ${PROJ_ROOT}/Makefile.system
+
+NAME = $(shell basename `pwd | sed s/tests//g`)
+
+tests = lib${PROJECT}_${NAME}
+checks = $(wildcard *.sh)
+SRCS = $(wildcard *.c)
+
+EXTERNAL_INCLUDES = -I${INC_DIR}/${PROJECT} 
+EXTERNAL_LIBS = -L${LIB_DIR} -lStGermainDiscretisationMesh -lStGermainDiscretisationShape \
+	-lStGermainDiscretisationGeometry -lStGermainBase ${RPATH_LFLAGS}
+
+packages = PETSC MPI XML MATH DL HYPRE
+
 
 ifdef USE_OPTIONAL_MATH
 	# For full tensor math it needs some blas lapack functions only if available

@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ConvexHull.c 3869 2006-10-16 13:42:59Z SteveQuenette $
+** $Id: ConvexHull.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -118,7 +118,7 @@ ConvexHull* _ConvexHull_New(
 void _ConvexHull_Init( void* convexHull, Coord_List vertexList, Index vertexCount) {
 	ConvexHull* self = (ConvexHull*)convexHull;
 	Index       numberOfFaces;
-	Index       dimensions; // this probably doesn't need to be here
+	Index       dimensions; /* this probably doesn't need to be here */
 	Index       vertex_I;
 	
 	double        tmpVector1[3];
@@ -134,14 +134,14 @@ void _ConvexHull_Init( void* convexHull, Coord_List vertexList, Index vertexCoun
 	
 	/* Now Construct normal and store them in self->facesList */
 	
-	// 1st allocate memory	
+	/* 1st allocate memory	 */
 	if(vertexCount == 3) numberOfFaces = 3; 
 	else                 numberOfFaces = 4; 
 	
 	self->facesList = Memory_Alloc_Array( XYZ, numberOfFaces, "facesList" );
 
-	// 2nd Calculate Normals on faces
-	// in 2-D
+	/* 2nd Calculate Normals on faces */
+	/* in 2-D */
 	if( numberOfFaces == 3 ) {
 	printf("THE VERTEXCOUNT IS %d\n", vertexCount);
 		for( vertex_I = 0; vertex_I < vertexCount ; vertex_I++ ) {
@@ -152,7 +152,7 @@ void _ConvexHull_Init( void* convexHull, Coord_List vertexList, Index vertexCoun
 			tmpVector3[0] = tmpVector1[1];
 			tmpVector3[1] = -1 * tmpVector1[0];
 			tmpVector3[2] = 0;
-//			Now Vec3 is possibly normal vector
+                        /*			Now Vec3 is possibly normal vector */
 				if( StGermain_VectorDotProduct(tmpVector3, tmpVector2, dimensions) < 0 )
 				{ tmpVector3[0] = -1*tmpVector3[0]; tmpVector3[1] = -1 * tmpVector3[1]; }
 			
@@ -166,7 +166,7 @@ void _ConvexHull_Init( void* convexHull, Coord_List vertexList, Index vertexCoun
 			StGermain_VectorSubtraction( tmpVector2, vertexList[ vertex_I % 4 ], vertexList[ (vertex_I+3) % 4 ], dimensions);
 
 			if( StGermain_VectorDotProduct(tmpVector3, tmpVector2, dimensions) < 0 ) 
-				{ Vector_Div( tmpVector3, tmpVector3, -1.0 ); }
+				{ Vec_Div3D( tmpVector3, tmpVector3, -1.0 ); }
 			printf("vector normal = (%g, %g, %g)\n", tmpVector3[0], tmpVector3[1],  tmpVector3[2] ); 
 			memcpy( self->facesList[ vertex_I ], tmpVector3, sizeof(XYZ) );
 
@@ -337,10 +337,10 @@ Bool _ConvexHull_IsCoordInside( void* convexHull, Coord point ) {
 	ConvexHull*     self                 = (ConvexHull*)convexHull;
 	Index           vertex_I;
 	XYZ             tmpVector;
-	//Stream*                 stream     = cf->infoStream;
+	/*Stream*                 stream     = cf->infoStream; */
 
 
-	// for the particle to be inside the shape, the dot product of its position vector with the shape face normal's must be non-positive
+	/* for the particle to be inside the shape, the dot product of its position vector with the shape face normal's must be non-positive */
 	for( vertex_I = 0 ; vertex_I < self->vertexCount ; vertex_I++ ) {
 		StGermain_VectorSubtraction(tmpVector, point, self->vertexList[ vertex_I ], self->dim );
 		if( StGermain_VectorDotProduct(self->facesList[ vertex_I ], tmpVector, self->dim ) > 0 ) {

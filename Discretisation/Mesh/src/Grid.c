@@ -32,10 +32,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-
 #include <mpi.h>
-#include "Base/Base.h"
 
+#include "Base/Base.h"
 #include "Discretisation/Geometry/Geometry.h"
 #include "Discretisation/Shape/Shape.h"
 
@@ -56,12 +55,12 @@ Grid* Grid_New() {
 			  Grid_Type, 
 			  _Grid_Delete, 
 			  _Grid_Print, 
-			  _Grid_Copy );
+			  NULL );
 }
 
 Grid* _Grid_New( GRID_DEFARGS ) {
-	Grid* self;
-	
+	Grid*	self;
+
 	/* Allocate memory */
 	assert( sizeOfSelf >= sizeof(Grid) );
 	self = (Grid*)_Stg_Class_New( STG_CLASS_PASSARGS );
@@ -79,6 +78,9 @@ void _Grid_Init( Grid* self ) {
 	self->sizes = NULL;
 	self->basis = NULL;
 	self->nPoints = 0;
+
+	self->map = NULL;
+	self->invMap = NULL;
 }
 
 
@@ -95,7 +97,7 @@ void _Grid_Delete( void* grid ) {
 
 void _Grid_Print( void* grid, Stream* stream ) {
 	Grid*	self = (Grid*)grid;
-	
+
 	/* Set the Journal for printing informations */
 	Stream* gridStream;
 	gridStream = Journal_Register( InfoStream_Type, "GridStream" );
@@ -105,45 +107,12 @@ void _Grid_Print( void* grid, Stream* stream ) {
 	_Stg_Class_Print( self, stream );
 }
 
-void* _Grid_Copy( void* grid, void* destProc_I, Bool deep, Name nameExt, PtrMap* ptrMap ) {
-#if 0
-	Grid*	self = (Grid*)grid;
-	Grid*	newGrid;
-	PtrMap*	map = ptrMap;
-	Bool	ownMap = False;
-
-	/* Damn me for making copying so difficult... what was I thinking? */
-	
-	/* We need to create a map if it doesn't already exist. */
-	if( !map ) {
-		map = PtrMap_New( 10 );
-		ownMap = True;
-	}
-	
-	newGrid = (Grid*)_Mesh_Copy( self, destProc_I, deep, nameExt, map );
-	
-	/* Copy the virtual methods here. */
-
-	/* Deep or shallow? */
-	if( deep ) {
-	}
-	else {
-	}
-	
-	/* If we own the map, get rid of it here. */
-	if( ownMap ) Stg_Class_Delete( map );
-	
-	return (void*)newGrid;
-#endif
-
-	return NULL;
-}
 
 /*--------------------------------------------------------------------------------------------------------------------------
 ** Public Functions
 */
 
-void Grid_SetNDims( void* grid, unsigned nDims ) {
+void Grid_SetNumDims( void* grid, unsigned nDims ) {
 	Grid*	self = (Grid*)grid;
 
 	/* Sanity check. */
@@ -190,6 +159,48 @@ void Grid_SetSizes( void* grid, unsigned* sizes ) {
 	}
 }
 
+void Grid_SetMapping( void* grid, HashTable* mapping, HashTable* inverse ) {
+	Grid*	self = (Grid*)grid;
+
+	assert( self );
+
+	self->map = mapping;
+	self->invMap = inverse;
+}
+
+unsigned Grid_GetNumDims( void* grid ) {
+	Grid*	self = (Grid*)grid;
+
+	assert( self );
+
+	return self->nDims;
+}
+
+unsigned* Grid_GetSizes( void* grid ) {
+	Grid*	self = (Grid*)grid;
+
+	assert( self );
+
+	return self->sizes;
+}
+
+unsigned Grid_GetNumPoints( void* grid ) {
+	Grid*	self = (Grid*)grid;
+
+	assert( self );
+
+	return self->nPoints;
+}
+
+void Grid_GetMapping( void* grid, HashTable** mapping, HashTable** inverse ) {
+	Grid*	self = (Grid*)grid;
+
+	assert( self );
+
+	*mapping = self->map;
+	*inverse = self->invMap;
+}
+
 void Grid_Lift( void* grid, unsigned ind, unsigned* params ) {
 	Grid*		self = (Grid*)grid;
 	unsigned	rem;
@@ -206,7 +217,19 @@ void Grid_Lift( void* grid, unsigned ind, unsigned* params ) {
 	** space.
 	*/
 
-	rem = ind;
+	if( self->map ) {
+#ifndef NDEBUG
+		unsigned*	remPtr;
+
+		assert( remPtr = HashTable_FindEntry( self->map, &ind, sizeof(unsigned), unsigned ) );
+		rem = *remPtr;
+#else
+		rem = *HashTable_FindEntry( self->map, &ind, sizeof(unsigned), unsigned );
+#endif
+	}
+	else
+		rem = ind;
+
 	for( d_i = self->nDims; d_i > 0; d_i-- ) {
 		unsigned	dimInd = d_i - 1;
 		div_t		divRes;
@@ -238,6 +261,17 @@ unsigned Grid_Project( void* grid, unsigned* params ) {
 	for( d_i = 0; d_i < self->nDims; d_i++ ) {
 		assert( params[d_i] < self->sizes[d_i] );
 		ind += params[d_i] * self->basis[d_i];
+	}
+
+	if( self->invMap ) {
+#ifndef NDEBUG
+		unsigned*	indPtr;
+
+		assert( indPtr = HashTable_FindEntry( self->invMap, &ind, sizeof(unsigned), unsigned ) );
+		ind = *indPtr;
+#else
+		ind = *HashTable_FindEntry( self->invMap, &ind, sizeof(unsigned), unsigned );
+#endif
 	}
 
 	return ind;

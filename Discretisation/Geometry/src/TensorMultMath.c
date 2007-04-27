@@ -592,8 +592,8 @@ void NonSquareMatrix_CumulativeMultiplicationByNonSquareMatrix( double **AMatrix
 					 double **BMatrix, int rowDimB, int colDimB, 
 					 double** resultMatrix ) {
 			
-	int row_I, col_I; // location with resultMatrix 
-	int counter;      // counter which facilitates the multiplication of AMatrix and BMatrix
+  int row_I, col_I; /* location with resultMatrix  */
+  int counter;      /* counter which facilitates the multiplication of AMatrix and BMatrix */
 	/** Error Checking Code */
 	Stream* error = Journal_Register( ErrorStream_Type, "TensorMultMath" );
 					 
@@ -624,7 +624,7 @@ void NonSquareMatrix_CumulativeMultiplicationByNonSquareMatrix( double **AMatrix
 	resultMatrix_ij = AMatrix_ij x BVector_j */
 void NonSquareMatrix_MatrixVectorMultiplication( double** AMatrix, int rowsInA, int colsInA,
 		     double* BVec, int rowsInB,double* resultVector ) {
-	//This assumes the resultVector is of the correct length.
+  /*This assumes the resultVector is of the correct length. */
 	memset(resultVector,0,sizeof(double)* rowsInA);		 
 	NonSquareMatrix_CumulativeMatrixVectorMultiplication( AMatrix, rowsInA, colsInA,
 		                     BVec, rowsInB, resultVector);						   
@@ -636,7 +636,7 @@ to the passed in 'solution Vector'. It requires the column
 */
 void NonSquareMatrix_CumulativeMatrixVectorMultiplication( double** AMatrix, int rowsInA, int colsInA,
 		                               double* BVec, int rowsInB, double* resultVector ) {
-	int row_I, col_I; // counters through matrix rows and columns respectively
+  int row_I, col_I; /* counters through matrix rows and columns respectively */
 	Stream* error = Journal_Register( ErrorStream_Type, "TensorMultMath" );
 	Journal_Firewall( ( colsInA == rowsInB ), error,
 			"In func '%s' column dimensions of A_Matrix = %d is not equal to the row dimensions of B_Vec = %d\n",

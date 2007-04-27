@@ -285,7 +285,7 @@ Bool testAlltoall( unsigned rank, unsigned nProcs, unsigned watch ) {
 		srcArrays[i][0] = i;
 	}
 
-	MPIArray2D_Alltoall( srcSizes, (void**)srcArrays, &dstSizes, (void***)&dstArrays, sizeof(unsigned), MPI_COMM_WORLD );
+	MPIArray_Alltoall( srcSizes, (void**)srcArrays, &dstSizes, (void***)&dstArrays, sizeof(unsigned), MPI_COMM_WORLD );
 	FreeArray( srcSizes );
 	FreeArray( srcArrays );
 	if( rank == watch ) {

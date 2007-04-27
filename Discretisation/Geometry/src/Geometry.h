@@ -35,7 +35,7 @@
 ** Comments:
 **	None so far.
 **
-** $Id: Geometry.h 3728 2006-07-31 03:14:51Z KathleenHumble $
+** $Id: Geometry.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -71,6 +71,8 @@
 	#include "stg_lapack.h"
 	#include "FullTensorMath.h"
 	#include "TensorMultMath.h"
+	#include "Simplex.h"
+	#include "Hex.h"
 	#include "Init.h"
 	#include "Finalise.h"
 

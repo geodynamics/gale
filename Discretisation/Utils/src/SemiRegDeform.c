@@ -33,7 +33,6 @@
 #include <string.h>
 #include <math.h>
 #include <assert.h>
-
 #include <mpi.h>
 
 #include "Base/Base.h"
@@ -42,7 +41,6 @@
 #include "Discretisation/Mesh/Mesh.h"
 
 #include "types.h"
-#include "Sync.h"
 #include "SemiRegDeform.h"
 
 
@@ -70,7 +68,6 @@ SemiRegDeform* SemiRegDeform_DefaultNew( Name name ) {
 		name );
 }
 
-
 SemiRegDeform* SemiRegDeform_New( Name name ) {
 	return _SemiRegDeform_New( 
 		sizeof(SemiRegDeform), 
@@ -86,7 +83,6 @@ SemiRegDeform* SemiRegDeform_New( Name name ) {
 		_SemiRegDeform_Destroy, 
 		name );
 }
-
 
 SemiRegDeform* _SemiRegDeform_New( SizeT					_sizeOfSelf, 
 				   Type						type,
@@ -129,7 +125,6 @@ SemiRegDeform* _SemiRegDeform_New( SizeT					_sizeOfSelf,
 	return self;
 }
 
-
 void SemiRegDeform_Init( SemiRegDeform* self, Name name ) {
 	/* General info */
 	self->type = SemiRegDeform_Type;
@@ -154,19 +149,11 @@ void SemiRegDeform_Init( SemiRegDeform* self, Name name ) {
 	_SemiRegDeform_Init( self );
 }
 
-
 void _SemiRegDeform_Init( SemiRegDeform* self ) {
-	/* General and Virtual info should already be set */
-	
-	/* SemiRegDeform info */
-	self->grm.mesh = NULL;
 	self->nStrips = 0;
 	self->beginInds = NULL;
 	self->endInds = NULL;
 	self->conDims = NULL;
-	self->sync = NULL;
-	self->nRemotes = 0;
-	self->remotes = NULL;
 }
 
 
@@ -178,12 +165,11 @@ void _SemiRegDeform_Delete( void* srd ) {
 	SemiRegDeform*	self = (SemiRegDeform*)srd;
 	
 	/* Delete the class itself */
-	_SemiRegDeform_FreeInternal( self );
+	SemiRegDeform_Destruct( self );
 	
 	/* Delete parent */
 	_Stg_Class_Delete( self );
 }
-
 
 void _SemiRegDeform_Print( void* srd, Stream* stream ) {
 	SemiRegDeform*	self = (SemiRegDeform*)srd;
@@ -203,14 +189,11 @@ void _SemiRegDeform_Print( void* srd, Stream* stream ) {
 	/* SemiRegDeform info */
 }
 
-
 void _SemiRegDeform_Construct( void* srd, Stg_ComponentFactory* cf, void* data ) {
 }
 
-
 void _SemiRegDeform_Build( void* srd, void* data ) {
 }
-
 
 void _SemiRegDeform_Initialise( void* srd, void* data ) {
 	SemiRegDeform*	self = (SemiRegDeform*)srd;
@@ -230,13 +213,11 @@ void _SemiRegDeform_Initialise( void* srd, void* data ) {
 	** Initialise the synchronisation.
 	*/
 
-	_SemiRegDeform_SyncInit( self );
+	SemiRegDeform_InitSync( self );
 }
 
-	
 void _SemiRegDeform_Execute( void* srd, void* data ) {
 }
-
 
 void _SemiRegDeform_Destroy( void* srd, void* data ) {
 }
@@ -251,31 +232,36 @@ void SemiRegDeform_SetMesh( void* srd, Mesh* mesh ) {
 
 	assert( !self->isInitialised );
 
-	_SemiRegDeform_FreeInternal( self );
-	RegMesh_Generalise( mesh, &self->grm );
+	SemiRegDeform_Destruct( self );
+	self->mesh = mesh;
 }
-
 
 void SemiRegDeform_AddStrip( void* srd, unsigned begin, unsigned end ) {
 	SemiRegDeform*	self = (SemiRegDeform*)srd;
+	Grid*		vertGrid;
 	unsigned short	conDim;
 	IJK		inds[2];
 	Bool		store;
 	unsigned	s_i;
 
-	assert( self->grm.mesh );
+	assert( self->mesh );
 	assert( !self->isInitialised );
 
+	/* Get the vertex grid. */
+	vertGrid = *(Grid**)ExtensionManager_Get( self->mesh->info, self->mesh, 
+						  ExtensionManager_GetHandle( self->mesh->info, "vertexGrid" ) );
 
 	/*
 	** Ensure the specified strip has not already been added.
 	*/
 
+#ifndef NDEBUG
 	for( s_i = 0; s_i < self->nStrips; s_i++ ) {
 		if( self->beginInds[s_i] == begin && self->endInds[s_i] == end ) {
 			assert( 0 );
 		}
 	}
+#endif
 
 
 	/*
@@ -286,12 +272,12 @@ void SemiRegDeform_AddStrip( void* srd, unsigned begin, unsigned end ) {
 		Bool		found;
 		unsigned	d_i;
 
-		GRM_Lift( &self->grm, begin, inds[0] );
-		GRM_Lift( &self->grm, end, inds[1] );
+		Grid_Lift( vertGrid, begin, inds[0] );
+		Grid_Lift( vertGrid, end, inds[1] );
 
 		/* Find the one dimension that is not in-line. */
 		found = False;
-		for( d_i = 0; d_i < self->grm.nDims; d_i++ ) {
+		for( d_i = 0; d_i < Mesh_GetDimSize( self->mesh ); d_i++ ) {
 			if( inds[0][d_i] != inds[1][d_i] ) {
 				/* Check if we have found multiple connected dimensions. */
 				assert( found == False );
@@ -315,10 +301,12 @@ void SemiRegDeform_AddStrip( void* srd, unsigned begin, unsigned end ) {
 		store = False;
 		memcpy( cur, inds[0], sizeof(IJK) );
 		for( n_i = 0; n_i < len; n_i++ ) {
-			unsigned	gInd;
+			unsigned	gInd, dInd;
 
-			GRM_Project( &self->grm, cur, &gInd );
-			if( Mesh_NodeMapGlobalToLocal( self->grm.mesh, gInd ) < self->grm.mesh->nodeLocalCount ) {
+			gInd = Grid_Project( vertGrid, cur );
+			if( Mesh_GlobalToDomain( self->mesh, MT_VERTEX, gInd, &dInd ) && 
+			    dInd < Mesh_GetLocalSize( self->mesh, MT_VERTEX ) )
+			{
 				store = True;
 				break;
 			}
@@ -326,10 +314,8 @@ void SemiRegDeform_AddStrip( void* srd, unsigned begin, unsigned end ) {
 		}
 	}
 
-	if( !store ) {
+	if( !store )
 		return;
-	}
-
 
 	/*
 	** Store.
@@ -344,119 +330,59 @@ void SemiRegDeform_AddStrip( void* srd, unsigned begin, unsigned end ) {
 	self->nStrips++;
 }
 
-
-void _SemiRegDeform_SyncInit( void* srd ) {
-	SemiRegDeform*	self = (SemiRegDeform*)srd;
-	unsigned	nGlobals;
-	unsigned	nLocals;
-	unsigned*	locals;
-	unsigned	nRequired;
-	unsigned*	required;
-	unsigned	loc_i, strip_i;
-
-	assert( self );
-
-
-	/*
-	** Setup the synchronisation component.
-	*/
-
-	self->sync = Sync_New( "SemiRegDeform" );
-
-	/* How many globals do we have? */
-	nGlobals = self->grm.mesh->nodeGlobalCount;
-
-	/* Build the set of local nodes. */
-	nLocals = self->grm.mesh->nodeLocalCount;
-	locals = Memory_Alloc_Array( unsigned, nLocals, "SemiRegDeform" );
-	for( loc_i = 0; loc_i < nLocals; loc_i++ ) {
-		locals[loc_i] = Mesh_NodeMapLocalToGlobal( self->grm.mesh, loc_i );
-	}
-
-	/* Build required indices. */
-	nRequired = 0;
-	required = Memory_Alloc_Array( unsigned, self->nStrips * 2, "SemiRegDeform" );
-	for( strip_i = 0; strip_i < self->nStrips; strip_i++ ) {
-		if( Mesh_NodeMapGlobalToLocal( self->grm.mesh, self->beginInds[strip_i] ) >= 
-		    self->grm.mesh->nodeLocalCount )
-		{
-			required[nRequired++] = self->beginInds[strip_i];
-		}
-
-		if( Mesh_NodeMapGlobalToLocal( self->grm.mesh, self->endInds[strip_i] ) >= 
-		    self->grm.mesh->nodeLocalCount )
-		{
-			required[nRequired++] = self->endInds[strip_i];
-		}
-	}
-	required = Memory_Realloc_Array( required, unsigned, nRequired );
-
-	/* Negotiate sources. */
-	Sync_Negotiate( self->sync, 
-			nGlobals, 
-			locals, nLocals, 
-			NULL, 0, 
-			required, nRequired, 
-			self->grm.mesh->layout->decomp->communicator );
-
-	/* Free arrays. */
-	FreeArray( locals );
-	FreeArray( required );
-
-	/* Allocate for sources. */
-	self->nRemotes = self->sync->netSource;
-	self->remotes = Memory_Alloc_Array( Coord, self->nRemotes, "SemiRegDeform" );
-
-	/* Initialise transfer. */
-	Sync_SetSplitArrays( self->sync, 
-			     sizeof(Coord), 
-			     sizeof(Coord), self->grm.mesh->nodeCoord, 
-			     sizeof(Coord), self->remotes );
-}
-
-
-#define GET_VAL( ind )						\
-	(((ind) < self->grm.mesh->nodeLocalCount) ? self->grm.mesh->nodeCoord[ind] : \
-	 self->remotes[ind - self->grm.mesh->nodeLocalCount])
-
+#define GET_VAL( ind )							\
+	(((ind) < Mesh_GetLocalSize( self->mesh, MT_VERTEX )) ? self->mesh->verts[ind] : \
+	 self->remVerts[ind - Mesh_GetLocalSize( self->mesh, MT_VERTEX )])
 
 void SemiRegDeform_Deform( void* srd ) {
 	SemiRegDeform*	self = (SemiRegDeform*)srd;
+	Grid*		vertGrid;
 
 	assert( self );
 
+	/* Get the vertex grid. */
+	vertGrid = *(Grid**)ExtensionManager_Get( self->mesh->info, self->mesh, 
+						  ExtensionManager_GetHandle( self->mesh->info, "vertexGrid" ) );
 
 	/*
 	** Actually deform the specified strips.
 	*/
 
 	/* Import remote values. */
-	Sync_SendRecv( self->sync );
+	Decomp_Sync_SyncArray( self->sync, self->syncArray );
 
 	/* Interpolate each strip. */
 	{
+		unsigned	nDims;
 		unsigned*	begin;
 		unsigned*	end;
 		unsigned	strip_i;
 
+		/* Get dimensionality. */
+		nDims = Mesh_GetDimSize( self->mesh );
+
 		/* Allocate for the dimensions. */
-		begin = Memory_Alloc_Array( unsigned, self->grm.nDims, "SemiRegDeform" );
-		end = Memory_Alloc_Array( unsigned, self->grm.nDims, "SemiRegDeform" );
+		begin = Memory_Alloc_Array( unsigned, nDims, "SemiRegDeform" );
+		end = Memory_Alloc_Array( unsigned, nDims, "SemiRegDeform" );
 
 		for( strip_i = 0; strip_i < self->nStrips; strip_i++ ) {
 			unsigned	len;
 			unsigned	conDim;
 			double		first, step;
+			unsigned	dInd;
 			unsigned	node_i;
 
 			/* Extract the basics. */
-			GRM_Lift( &self->grm, self->beginInds[strip_i], begin );
-			GRM_Lift( &self->grm, self->endInds[strip_i], end );
+			Grid_Lift( vertGrid, self->beginInds[strip_i], begin );
+			Grid_Lift( vertGrid, self->endInds[strip_i], end );
 			conDim = self->conDims[strip_i];
 			len = end[conDim] - begin[conDim] + 1;
 			assert( len > 1 );
-			first = GET_VAL( Sync_MapGlobal( self->sync, self->beginInds[strip_i] ) )[conDim];
-			step = GET_VAL( Sync_MapGlobal( self->sync, self->endInds[strip_i] ) )[conDim];
+
+			insist( Decomp_Sync_GlobalToDomain( self->sync, self->beginInds[strip_i], &dInd ) );
+			first = GET_VAL( dInd )[conDim];
+			insist( Decomp_Sync_GlobalToDomain( self->sync, self->endInds[strip_i], &dInd ) );
+			step = GET_VAL( dInd )[conDim];
 			step = (step - first) / (len - 1);
 
 			/* Loop and interpolate. */
@@ -464,10 +390,9 @@ void SemiRegDeform_Deform( void* srd ) {
 				unsigned	ind;
 
 				begin[conDim]++;
-				GRM_Project( &self->grm, begin, &ind );
-				if( Sync_MapGlobal( self->sync, ind ) != (unsigned)-1 ) {
-					GET_VAL( Sync_MapGlobal( self->sync, ind ) )[conDim] = 
-						first + (double)node_i * step;
+				ind = Grid_Project( vertGrid, begin );
+				if( Decomp_Sync_GlobalToDomain( self->sync, ind, &dInd ) ) {
+					GET_VAL( dInd )[conDim] = first + (double)node_i * step;
 				}
 			}
 		}
@@ -477,107 +402,71 @@ void SemiRegDeform_Deform( void* srd ) {
 }
 
 
-void RegMesh_Generalise( Mesh* mesh, GRM* grm ) {
-	HexaMD*		decomp;
-	unsigned	d_i;
-
-	assert( mesh );
-	assert( mesh->layout );
-	assert( mesh->layout->decomp );
-
-	decomp = (HexaMD*)mesh->layout->decomp;
-
-	assert( decomp->type == HexaMD_Type );
-	assert( grm );
-
-
-	/*
-	** Remove any dependance on dimension, storing necessary maps and information in the GRM
-	** (Generalised Regular Mesh) structure.
-	*/
-
-	/* Calculate the number of topological dimensions and their mapping. */
-	for( grm->nDims = 0, d_i = 0; d_i < 3; d_i++ ) {
-		if( decomp->nodeGlobal3DCounts[d_i] > 1 ) {
-			grm->nNodes[grm->nDims] = decomp->nodeGlobal3DCounts[d_i];
-			grm->nDims++;
-		}
-	}
-
-	/* Calculate the basis. */
-	grm->basis[0] = 1;
-	for( d_i = 1; d_i < grm->nDims; d_i++ ) {
-		grm->basis[d_i] = grm->basis[d_i - 1] * grm->nNodes[d_i - 1];
-	}
-
-	/* Store the mesh. */
-	grm->mesh = mesh;
-}
-
-
-void GRM_Lift( GRM* grm, unsigned ind, unsigned* dimInds ) {
-	unsigned	rem;
-	unsigned	d_i;
-
-	assert( grm );
-	assert( grm->nDims <= 3 );
-	assert( dimInds );
-
-
-	/*
-	** Take a one dimensional array index and lift it into a regular mesh topological
-	** space.
-	*/
-
-	rem = ind;
-	for( d_i = grm->nDims; d_i > 0; d_i-- ) {
-		unsigned short	dimInd = d_i - 1;
-		div_t		divRes;
-
-		divRes = div( rem, grm->basis[dimInd] );
-		dimInds[dimInd] = divRes.quot;
-		rem = divRes.rem;
-
-		/* Ensure this is a valid lifting. */
-		assert( dimInds[dimInd] < grm->nNodes[dimInd] );
-	}
-}
-
-
-void GRM_Project( GRM* grm, unsigned* dimInds, unsigned* ind ) {
-	unsigned short	d_i;
-
-	assert( grm );
-	assert( grm->nDims > 0 && grm->nDims <= 3 );
-	assert( dimInds );
-	assert( ind );
-
-
-	/*
-	** Project an n-dimensional set of topological indices into a one-dimensional, unique space.
-	*/
-
-	*ind = 0;
-	for( d_i = 0; d_i < grm->nDims; d_i++ ) {
-		assert( dimInds[d_i] < grm->nNodes[d_i] );
-		*ind += dimInds[d_i] * grm->basis[d_i];
-	}
-}
-
-
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Private Functions
 */
 
-void _SemiRegDeform_FreeInternal( void* srd ) {
-	SemiRegDeform*	self = (SemiRegDeform*)srd;
+
+void SemiRegDeform_InitSync( SemiRegDeform* self ) {
+	unsigned	nRequired;
+	unsigned*	required;
+	unsigned	nDims;
+	unsigned	strip_i;
+
+	assert( self );
+
+	/*
+	** Setup the synchronisation component.
+	*/
+
+	/* Build required indices. */
+	nRequired = 0;
+	required = Memory_Alloc_Array( unsigned, self->nStrips * 2, "SemiRegDeform" );
+	for( strip_i = 0; strip_i < self->nStrips; strip_i++ ) {
+		unsigned	dInd;
+
+		if( !Mesh_GlobalToDomain( self->mesh, MT_VERTEX, self->beginInds[strip_i], &dInd ) || 
+		    dInd >= Mesh_GetLocalSize( self->mesh, MT_VERTEX ) )
+		{
+			required[nRequired++] = self->beginInds[strip_i];
+		}
+		if( !Mesh_GlobalToDomain( self->mesh, MT_VERTEX, self->endInds[strip_i], &dInd ) || 
+		    dInd >= Mesh_GetLocalSize( self->mesh, MT_VERTEX ) )
+		{
+			required[nRequired++] = self->endInds[strip_i];
+		}
+	}
+	required = Memory_Realloc_Array( required, unsigned, nRequired );
+
+	self->sync = Decomp_Sync_New( "" );
+	Decomp_Sync_SetDecomp( self->sync, self->mesh->topo->domains[MT_VERTEX]->decomp );
+	Decomp_Sync_SetRequired( self->sync, nRequired, required );
+
+	/* Free arrays. */
+	FreeArray( required );
+
+	/* Allocate for sources. */
+	nDims = Mesh_GetDimSize( self->mesh );
+	self->remVerts = AllocNamedArray2D( double, Decomp_Sync_GetRemoteSize( self->sync ), nDims, 
+					    "SemiRegDeform::remVerts" );
+
+	/* Initialise array. */
+	self->syncArray = Decomp_Sync_Array_New();
+	Decomp_Sync_Array_SetSync( self->syncArray, self->sync );
+	Decomp_Sync_Array_SetMemory( self->syncArray, 
+				     self->mesh->verts[0], self->remVerts ? self->remVerts[0] : NULL, 
+				     sizeof(double) * nDims, sizeof(double) * nDims, 
+				     sizeof(double) * nDims );
+}
+
+void SemiRegDeform_Destruct( SemiRegDeform* self ) {
+	assert( self );
+
+	self->mesh = NULL;
+	KillObject( self->syncArray );
+	KillObject( self->sync );
 
 	KillArray( self->beginInds );
 	KillArray( self->endInds );
 	KillArray( self->conDims );
-	KillArray( self->remotes );
-	if( self->sync ) {
-		Stg_Class_Delete( self->sync );
-		self->sync = NULL;
-	}
 }

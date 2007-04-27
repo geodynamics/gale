@@ -90,12 +90,12 @@
 	** Public functions
 	*/
 
-	void UIntMap_Insert( void* map, unsigned key, unsigned val );
+	void UIntMap_Insert( void* map, unsigned key, unsigned value );
+	void UIntMap_Remove( void* map, unsigned key );
 	void UIntMap_Clear( void* map );
-
-	Bool UIntMap_HasKey( void* map, unsigned key );
-	unsigned UIntMap_Map( void* map, unsigned key );
+	Bool UIntMap_Map( void* map, unsigned key, unsigned* value );
 	void UIntMap_GetItems( void* map, unsigned* nItems, unsigned** keys, unsigned** values );
+	unsigned UIntMap_GetSize( void* map );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Private Member functions

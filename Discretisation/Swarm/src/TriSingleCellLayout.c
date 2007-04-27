@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: TriSingleCellLayout.c 3885 2006-10-26 05:52:26Z KathleenHumble $
+** $Id: TriSingleCellLayout.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -287,9 +287,9 @@ void _TriSingleCellLayout_InitialisePoints(
 		case 1:
 			assert( 0 );
 		case 2:
-			points[0] = Memory_Alloc( Coord, "points[0]" );
-			points[1] = Memory_Alloc( Coord, "points[1]" );
-			points[2] = Memory_Alloc( Coord, "points[2]" );
+			*points[0] = Memory_Alloc_Array( double, self->dim, "points[0]" );
+			*points[1] = Memory_Alloc_Array( double, self->dim, "points[1]" );
+			*points[2] = Memory_Alloc_Array( double, self->dim, "points[2]" );
 			
 			(*points[0])[0] = 0.0f;
 			(*points[0])[1] = 0.0f;
@@ -326,7 +326,7 @@ Cell_Index _TriSingleCellLayout_CellOf( void* triSingleCellLayout, void* particl
 
 
 ShadowInfo* _TriSingleCellLayout_GetShadowInfo( void* triSingleCellLayout ) {
-	//TriSingleCellLayout*      self = (TriSingleCellLayout*)triSingleCellLayout;
+  /*TriSingleCellLayout*      self = (TriSingleCellLayout*)triSingleCellLayout; */
 
 	/* TODO: this should return a shadow info with at least nbr info for my processors */
 	Journal_Firewall( 0, Swarm_Warning, "Error: %s not implemented yet!\n", __func__ );

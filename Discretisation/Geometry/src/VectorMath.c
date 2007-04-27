@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: VectorMath.c 3943 2007-01-05 01:17:01Z KathleenHumble $
+** $Id: VectorMath.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -36,10 +36,11 @@
 #include "units.h"
 #include "types.h"
 #include "VectorMath.h"
+#include "TrigMath.h"
 
 #include <math.h>
 #include <assert.h>
-#include <string.h>
+
 /*--------------------------------------------------------------------------------------------------------------------------
 ** Macros
 */
@@ -49,47 +50,45 @@
 ** Functions
 */
 
-/*
-** Base operations.
-*/
-
-void ZeroVector( double* vector, Index length ) {
-	memset( vector, 0, length*sizeof(double) );
-}
-
 /** (Assumes 3D) Define a cross product of 2 vectors */
-void Vector_Cross( Coord dst, Coord a, Coord b ) {
-	Coord	tmp;
-	
+void Vec_Cross3D( double* dst, double* a, double* b ) {
+	double	tmp[3];
+
 	tmp[0] = a[1] * b[2] - a[2] * b[1];
 	tmp[1] = a[2] * b[0] - a[0] * b[2];
 	tmp[2] = a[0] * b[1] - a[1] * b[0];
-	
-	Vector_Set( dst, tmp );
+
+	Vec_Set3D( dst, tmp );
 }
 
 /** (Assumes 3D) Divide a vector by a real */
-void Vector_Div( Coord dest, Coord a, double s )
-{
+void Vec_Div2D( double* dst, double* a, double s ) {
 	double	inv = 1.0 / s;
-	
-	dest[0] = a[0] * inv;
-	dest[1] = a[1] * inv;
-	dest[2] = a[2] * inv;
+
+	Vec_Scale2D( dst, a, inv );
+}
+
+void Vec_Div3D( double* dst, double* a, double s ) {
+	double	inv = 1.0 / s;
+
+	Vec_Scale3D( dst, a, inv );
 }
 
 /** Calculate the normal of the vector. (ie length = 1 )*/
-void Vector_Norm( Coord dest, Coord a )
-{
-	double	invMag = 1.0 / sqrt( a[0] * a[0] + a[1] * a[1] + a[2] * a[2] );
-	
-	dest[0] = a[0] * invMag;
-	dest[1] = a[1] * invMag;
-	dest[2] = a[2] * invMag;
+void Vec_Norm3D( double* dst, double* a ) {
+	double	invMag = 1.0 / Vec_Mag3D( a );
+
+	Vec_Scale3D( dst, a, invMag );
+}
+
+void Vec_Norm2D( double* dst, double* a ) {
+	double	invMag = 1.0 / Vec_Mag2D( a );
+
+	Vec_Scale2D( dst, a, invMag );
 }
 
 /** Swap coordinates according to i,j, k index */
-void Vector_Swizzle( Coord dst, Coord src, unsigned char iInd, unsigned char jInd, unsigned char kInd ) {
+void Vec_Swizzle( double* dst, double* src, unsigned char iInd, unsigned char jInd, unsigned char kInd ) {
 	assert( iInd < 3 && jInd < 3 && kInd < 3 );
 	
 	dst[0] = src[iInd];
