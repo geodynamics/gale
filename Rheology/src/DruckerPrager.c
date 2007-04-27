@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: DruckerPrager.c 358 2006-10-18 06:17:30Z SteveQuenette $
+** $Id: DruckerPrager.c 466 2007-04-27 06:24:33Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -193,7 +193,7 @@ void _DruckerPrager_Construct( void* druckerPrager, Stg_ComponentFactory* cf, vo
 	/* Construct Parent */
 	_VonMises_Construct( self, cf, data );
 	
-	// TODO: KeyFallback soon to be deprecated/updated
+	/* TODO: KeyFallback soon to be deprecated/updated */
 	pressureField      = Stg_ComponentFactory_ConstructByNameWithKeyFallback(
                         cf, self->name, "PressureField", "PressureField", FeVariable, True, data );
 	/*pressureField      = Stg_ComponentFactory_ConstructByKey( 

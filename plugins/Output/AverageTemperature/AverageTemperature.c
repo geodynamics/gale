@@ -80,7 +80,7 @@ Index Underworld_AverageTemperature_Register( PluginsManager* pluginsManager ) {
 void Underworld_AverageTemperature_Output( void* _context ) {
 	UnderworldContext* context       = (UnderworldContext*) _context;
 	FeVariable*        temperatureFe = context->temperatureField;
-	FiniteElement_Mesh* mesh         = temperatureFe->feMesh;
+	FeMesh*		   mesh         = temperatureFe->feMesh;
 	IntegrationPointsSwarm* swarm    = (IntegrationPointsSwarm*)context->gaussSwarm;
 	IntegrationPoint*  particle;
 	ElementType*       elementType;
@@ -97,11 +97,11 @@ void Underworld_AverageTemperature_Output( void* _context ) {
 
 	dim = context->dim;
 
-	for( lElement_I = 0 ; lElement_I < mesh->elementLocalCount ; lElement_I++ ) {
-		elementType       = FeMesh_ElementTypeAt( mesh, lElement_I );
+	for( lElement_I = 0 ; lElement_I < FeMesh_GetElementLocalSize( mesh ); lElement_I++ ) {
+		elementType       = FeMesh_GetElementType( mesh, lElement_I );
 		lCell_I           = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
 		cellParticleCount = swarm->cellParticleCountTbl[ lCell_I ];
-		// get particles in each element that makes up the patch
+		/* get particles in each element that makes up the patch */
 		for( cParticle_I = 0 ; cParticle_I < cellParticleCount ; cParticle_I++ ) {
 			particle = (IntegrationPoint*) Swarm_ParticleInCellAt( swarm, lCell_I, cParticle_I );
 			FeVariable_InterpolateWithinElement( temperatureFe, lElement_I, particle->xi, &particleTemperature );

@@ -38,11 +38,12 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: IncompressibleExtensionBC.c 358 2006-10-18 06:17:30Z SteveQuenette $
+** $Id: IncompressibleExtensionBC.c 466 2007-04-27 06:24:33Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #include <mpi.h>
+#include <assert.h>
 #include <StGermain/StGermain.h>
 #include <StgFEM/StgFEM.h>
 #include <PICellerator/PICellerator.h>
@@ -54,9 +55,7 @@ const Type Underworld_IncompressibleExtensionBC_Type = "Underworld_Incompressibl
 
 void CalculateVelocities( UnderworldContext* context, double* V_c, double* V_d )  {
 	FeVariable*         velocityField  = context->velocityField;
-	FiniteElement_Mesh* mesh           = velocityField->feMesh;
-	IJKTopology*        topology       = Stg_CheckType( mesh->layout->nodeLayout->topology, IJKTopology );
-	MeshDecomp*         meshDecomp     = mesh->layout->decomp;
+	FeMesh* mesh           = velocityField->feMesh;
 	double              V_a, V_b;
 	double              h_1, h_2;
 	double              x;
@@ -69,6 +68,7 @@ void CalculateVelocities( UnderworldContext* context, double* V_c, double* V_d )
 	XYZ                 velocity;
 	XYZ                 min, max;
 	double              width;
+	Grid*		    vertGrid;
 
 	/*
 	                 ^ V_c
@@ -91,30 +91,33 @@ void CalculateVelocities( UnderworldContext* context, double* V_c, double* V_d )
 
 	x = Dictionary_GetDouble_WithDefault( context->dictionary, "constantHeight", 0.0 );
 
+	vertGrid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
+						  ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+
 	/* Grab V_a and V_b (i.e. velocities at left and right walls) */
 	leftWall_global_IJK[ I_AXIS ] = 0;
 	leftWall_global_IJK[ J_AXIS ] = 0;
 	leftWall_global_IJK[ K_AXIS ] = 0;
 
-	rightWall_global_IJK[ I_AXIS ] = topology->size[ I_AXIS ] - 1;
+	rightWall_global_IJK[ I_AXIS ] = vertGrid->sizes[ I_AXIS ] - 1;
 	rightWall_global_IJK[ J_AXIS ] = 0;
 	rightWall_global_IJK[ K_AXIS ] = 0;
 	
 	/* Grab global indicies for these nodes */
-	IJK_3DTo1D( topology, leftWall_global_IJK,  &leftWall_globalIndex );
-	IJK_3DTo1D( topology, rightWall_global_IJK, &rightWall_globalIndex );
+	leftWall_globalIndex = Grid_Project( vertGrid, leftWall_global_IJK );
+	rightWall_globalIndex = Grid_Project( vertGrid, rightWall_global_IJK );
 	
 	/* Grab local indicies for these nodes */
-	leftWall_localIndex  = meshDecomp->nodeMapGlobalToLocal( meshDecomp, leftWall_globalIndex );
-	rightWall_localIndex = meshDecomp->nodeMapGlobalToLocal( meshDecomp, rightWall_globalIndex );
+	insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, leftWall_globalIndex, &leftWall_localIndex ) );
+	insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, rightWall_globalIndex, &rightWall_localIndex ) );
 
 	/* Check if the left wall is on processor */
-	if ( leftWall_localIndex < mesh->nodeLocalCount ) {
+	if ( leftWall_localIndex < FeMesh_GetNodeLocalSize( mesh ) ) {
 		FeVariable_GetValueAtNode( velocityField, leftWall_localIndex, velocity );
 		V_b = velocity[ I_AXIS ];
 	}
 	/* Check if the right wall is on processor */
-	if ( rightWall_localIndex < mesh->nodeLocalCount ) {
+	if ( rightWall_localIndex < FeMesh_GetNodeLocalSize( mesh ) ) {
 		FeVariable_GetValueAtNode( velocityField, rightWall_localIndex, velocity );
 		V_a = velocity[ I_AXIS ];
 	}

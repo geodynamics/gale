@@ -22,6 +22,7 @@
 		/* Virtual functions go here */ \
 		\
 		/* Passed in parameters */ \
+		Variable_Register*				  variable_Register; \
 		ConstitutiveMatrix*                               constitutiveMatrix;             \
 		
 	struct ViscosityField { __ViscosityField };

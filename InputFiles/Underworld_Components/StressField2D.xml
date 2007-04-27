@@ -5,7 +5,7 @@
 			<param name="StrainRateField">StrainRateField</param>
 			<param name="Context">context</param>
 			<param name="Swarm">picIntegrationPoints</param>
-			<param name="Mesh">mesh-linear</param>
+			<param name="Mesh">elementMesh</param>
 			<param name="ConstitutiveMatrix">constitutiveMatrix</param>
 			<param name="StressVariable">materialSwarm-Stress</param>
 		</struct>

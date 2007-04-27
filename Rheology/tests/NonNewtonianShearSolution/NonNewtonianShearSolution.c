@@ -10,9 +10,13 @@
 typedef struct {
 	__AnalyticSolution
 	MaterialViscosity*               materialViscosity;
+	Mesh*				 mesh;
 	NonNewtonian*                    nonNewtonianRheology;
-	BlockGeometry*                   geometry;
 	double                           velocityTopOfBox;
+	FeVariable*			 velocityField;
+	FeVariable*			 strainRateField;
+	FeVariable*			 stressField;
+	FeVariable*			 viscosityField;
 } NonNewtonianShearSolution;
 
 const Type NonNewtonianShearSolution_Type = "NonNewtonianShearSolution";
@@ -20,9 +24,11 @@ const Type NonNewtonianShearSolution_Type = "NonNewtonianShearSolution";
 void NonNewtonianShearSolution_VelocityFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* velocity ) {
 	NonNewtonianShearSolution*   self = (NonNewtonianShearSolution*)analyticSolution;
 	double                       height;
+	double			     min[3], max[3];
 	
 	/* Get Parameters */
-	height = self->geometry->max[J_AXIS] - self->geometry->min[J_AXIS];
+	Mesh_GetGlobalCoordRange( self->mesh, min, max );
+	height = max[J_AXIS] - min[J_AXIS];
 
 	velocity[ I_AXIS ] = coord[J_AXIS] / height * self->velocityTopOfBox;
 	velocity[ J_AXIS ] = 0.0;
@@ -31,9 +37,11 @@ void NonNewtonianShearSolution_VelocityFunction( void* analyticSolution, FeVaria
 void NonNewtonianShearSolution_StrainRateFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* strainRate ) {
 	NonNewtonianShearSolution*   self = (NonNewtonianShearSolution*)analyticSolution;
 	double                       height;
+	double			     min[3], max[3];
 	
 	/* Get Parameters */
-	height = self->geometry->max[J_AXIS] - self->geometry->min[J_AXIS];
+	Mesh_GetGlobalCoordRange( self->mesh, min, max );
+	height = max[J_AXIS] - min[J_AXIS];
 
 	strainRate[ 0 ] = 0.0;
 	strainRate[ 1 ] = 0.0;
@@ -46,11 +54,13 @@ void NonNewtonianShearSolution_StressFunction( void* analyticSolution, FeVariabl
 	double                         height;
 	double                         tau;
 	double                         n;
+	double			     min[3], max[3];
 	
 	/* Get Parameters */
+	Mesh_GetGlobalCoordRange( self->mesh, min, max );
 	eta = self->materialViscosity->eta0;
 	n = self->nonNewtonianRheology->stressExponent;
-	height = self->geometry->max[J_AXIS] - self->geometry->min[J_AXIS];
+	height = max[J_AXIS] - min[J_AXIS];
 
 	/* Calculate stress - without considering cohesion */
 	tau = pow( eta * self->velocityTopOfBox / height, 1/n);
@@ -67,11 +77,13 @@ void NonNewtonianShearSolution_ViscosityFunction( void* analyticSolution, FeVari
 	double                         eta0;
 	double                         height;
 	double                         n;
+	double			     min[3], max[3];
 	
 	/* Get Parameters */
 	eta0 = self->materialViscosity->eta0;
 	n = self->nonNewtonianRheology->stressExponent;
-	height = self->geometry->max[J_AXIS] - self->geometry->min[J_AXIS];
+	Mesh_GetGlobalCoordRange( self->mesh, min, max );
+	height = max[J_AXIS] - min[J_AXIS];
 
 	/* Calculate stress - without considering cohesion */
 	*viscosity = eta0 * pow( eta0 * self->velocityTopOfBox / height, 1/n-1.0);
@@ -92,10 +104,6 @@ void NonNewtonianShearSolution_VelocityBC( Node_LocalIndex node_lI, Variable_Ind
 void _NonNewtonianShearSolution_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	NonNewtonianShearSolution* self = (NonNewtonianShearSolution*)analyticSolution;
 	FiniteElementContext*          context;
-	FeVariable*                    velocityField;
-	FeVariable*                    strainRateField;
-	FeVariable*                    stressField;
-	FeVariable*                    viscosityField;
 
 	/* Construct parent */
 	_AnalyticSolution_Construct( self, cf, data );
@@ -105,31 +113,41 @@ void _NonNewtonianShearSolution_Construct( void* analyticSolution, Stg_Component
 			ConditionFunction_New( NonNewtonianShearSolution_VelocityBC, "ShearTrigger") );	
 
 	/* Create Analytic Velocity Field */
-	velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data );
-	AnalyticSolution_CreateAnalyticVectorField( self, velocityField, NonNewtonianShearSolution_VelocityFunction );
+	self->velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data );
 
 	/* Create Analytic Strain Rate Field */
-	strainRateField = Stg_ComponentFactory_ConstructByName( cf, "StrainRateField", FeVariable, True, data );
-	AnalyticSolution_CreateAnalyticSymmetricTensorField( 
-			self, strainRateField, NonNewtonianShearSolution_StrainRateFunction );
+	self->strainRateField = Stg_ComponentFactory_ConstructByName( cf, "StrainRateField", FeVariable, True, data );
 
 	/* Create Analytic Stress Field */
-	stressField = Stg_ComponentFactory_ConstructByName( cf, "StressField", FeVariable, True, data );
-	AnalyticSolution_CreateAnalyticSymmetricTensorField( self, stressField, NonNewtonianShearSolution_StressFunction );
+	self->stressField = Stg_ComponentFactory_ConstructByName( cf, "StressField", FeVariable, True, data );
 
 	/* Create Analytic Viscosity Field */
-	viscosityField = Stg_ComponentFactory_ConstructByName( cf, "ViscosityField", FeVariable, True, data );
-	AnalyticSolution_CreateAnalyticField( self, viscosityField, NonNewtonianShearSolution_ViscosityFunction );
+	self->viscosityField = Stg_ComponentFactory_ConstructByName( cf, "ViscosityField", FeVariable, True, data );
 
 	self->materialViscosity = Stg_ComponentFactory_ConstructByName( cf, "layerViscosity", MaterialViscosity, True, data );
 	self->nonNewtonianRheology = 
 		Stg_ComponentFactory_ConstructByName( cf, "nonNewtonianRheology", NonNewtonian, True, data );
-	self->geometry = Stg_ComponentFactory_ConstructByName( cf, "geometry", BlockGeometry, True, data );
+	self->mesh = Stg_ComponentFactory_ConstructByName( cf, "mesh-linear", Mesh, True, data );
 
 	/* Set Velocity Stuff */
 	EP_AppendClassHook( Context_GetEntryPoint( context, AbstractContext_EP_UpdateClass ),
-								NonNewtonianShearSolution_UpdateVelocityBC, self );
+			    NonNewtonianShearSolution_UpdateVelocityBC, self );
 	self->velocityTopOfBox = Stg_ComponentFactory_GetRootDictDouble( cf, "velocityTopOfBox", 0.5 );
+}
+
+void _NonNewtonianShearSolution_Build( void* analyticSolution, void* data ) {
+	NonNewtonianShearSolution* self = (NonNewtonianShearSolution*)analyticSolution;
+
+	AnalyticSolution_CreateAnalyticVectorField( self, self->velocityField, 
+						    NonNewtonianShearSolution_VelocityFunction );
+	AnalyticSolution_CreateAnalyticSymmetricTensorField( self, self->strainRateField, 
+							     NonNewtonianShearSolution_StrainRateFunction );
+	AnalyticSolution_CreateAnalyticSymmetricTensorField( self, self->stressField, 
+							     NonNewtonianShearSolution_StressFunction );
+	AnalyticSolution_CreateAnalyticField( self, self->viscosityField, 
+					      NonNewtonianShearSolution_ViscosityFunction );
+
+	_AnalyticSolution_Build( self, data );
 }
 
 

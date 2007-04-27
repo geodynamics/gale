@@ -18,43 +18,43 @@ double dt( void* class, PICelleratorContext* context ) {
 void MovingMeshTestVelBCs_IncreasingWithY( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
 	DiscretisationContext*	context            = (DiscretisationContext*)_context;
 	FeVariable*             feVariable         = NULL;
-	FiniteElement_Mesh*     mesh               = NULL;
-	BlockGeometry*          geometry           = NULL;
+	FeMesh*     		mesh               = NULL;
 	double*                 result             = (double*) _result;
+	double			min[3], max[3];
 	double*                 coord;
 	
 	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
 	mesh       = feVariable->feMesh;
-	geometry = (BlockGeometry*)((ParallelPipedHexaEL*)mesh->layout->elementLayout)->geometry;
 
 	/* Find coordinate of node */
-	coord = Mesh_CoordAt( mesh, node_lI );
+	Mesh_GetGlobalCoordRange( mesh, min, max );
+	coord = Mesh_GetVertex( mesh, node_lI );
 	
-	*result = ( coord[J_AXIS] - geometry->min[J_AXIS] ) / ( geometry->max[J_AXIS] - geometry->min[J_AXIS] );
+	*result = ( coord[J_AXIS] - min[J_AXIS] ) / ( max[J_AXIS] - min[J_AXIS] );
 }
 
 
 void MovingMeshTestVelBCs_ToCentreY( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
 	DiscretisationContext*	context            = (DiscretisationContext*)_context;
 	FeVariable*             feVariable         = NULL;
-	FiniteElement_Mesh*     mesh               = NULL;
-	BlockGeometry*          geometry           = NULL;
+	FeMesh* 		mesh               = NULL;
 	double*                 result             = (double*) _result;
 	double*                 coord;
 	double                  toCentreJ_Max = 0;
 	double                  boxHeight = 0;
 	double                  centreInJ = 0;
 	double                  coordJ_RelativeToCentreJ = 0;
+	double			min[3], max[3];
 	
 	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
 	mesh       = feVariable->feMesh;
-	geometry = (BlockGeometry*)((ParallelPipedHexaEL*)mesh->layout->elementLayout)->geometry;
 
 	/* Find coordinate of node */
-	coord = Mesh_CoordAt( mesh, node_lI );
+	Mesh_GetGlobalCoordRange( mesh, min, max );
+	coord = Mesh_GetVertex( mesh, node_lI );
 	
-	boxHeight = geometry->max[J_AXIS] - geometry->min[J_AXIS];
-	centreInJ = ( geometry->max[J_AXIS] + geometry->min[J_AXIS] ) / 2;
+	boxHeight = max[J_AXIS] - min[J_AXIS];
+	centreInJ = ( max[J_AXIS] + min[J_AXIS] ) / 2;
 	coordJ_RelativeToCentreJ = coord[J_AXIS] - centreInJ;
 
 	toCentreJ_Max  = Dictionary_GetDouble_WithDefault( context->dictionary, "toCentreJ_Max", 1.0 );

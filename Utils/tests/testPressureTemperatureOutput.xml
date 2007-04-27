@@ -4,7 +4,6 @@
 
 	<include>StgFEM/ConstantMesh.xml             </include>
 	<include>StgFEM/LinearMesh.xml               </include>
-	<include>StgFEM/ElementLayout.xml            </include>
 	<include>StgFEM/PressureField.xml            </include>
 	<include>StgFEM/TemperatureField.xml         </include>
 
@@ -28,10 +27,19 @@
 			<param name="PressureField">PressureField</param>
 			<param name="TemperatureField">TemperatureField</param>
 		</struct>
+
+		<struct name="linearMesh-generator" mergeType="merge">
+			<param name="maxDecomposedDims"> 1 </param>
+			<list name="maxDecompositions">
+				<param> 0 </param>
+				<param> 1 </param>
+				<param> 1 </param>
+			</list>
+		</struct>
 	</struct>
 
 	<list name="plugins" mergeType="Replace">
-		<param>StgFEM_StandardConditionFunctions</param>	
+		<param>StgFEM_StandardConditionFunctions</param>
 	</list>
 	<include>Underworld/VariableConditions/temperatureICs.sinusoid.xml </include>
  
@@ -45,16 +53,16 @@
 	<param name="outputPath">./output</param> 
 	<param name="dim">2</param>
 	<param name="elementResI">10</param>
-	<param name="elementResJ">10</param> 
-	<param name="elementResK">1</param> 
+	<param name="elementResJ">10</param>
+	<param name="elementResK">1</param>
 	<param name="shadowDepth">1</param>
-	<param name="allowUnbalancing">True</param> 
+	<param name="allowUnbalancing">True</param>
 	<param name="buildElementNodeTbl">True</param>
-	<param name="maxTimeSteps">4</param> 
-	<param name="minX">0.0</param> 
-	<param name="minY">0.0</param> 
+	<param name="maxTimeSteps">4</param>
+	<param name="minX">0.0</param>
+	<param name="minY">0.0</param>
 	<param name="minZ">0.0</param>
-	<param name="maxX">1.0</param> 
+	<param name="maxX">1.0</param>
 	<param name="maxY">1.0</param>
 	<param name="maxZ">1.0</param>
  

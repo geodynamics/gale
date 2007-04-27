@@ -13,7 +13,7 @@ const Type Underworld_testYieldCriterion_Type = "Underworld_testYieldCriterion";
 typedef struct {
 	__Codelet
 	YieldRheology_HasYieldedFunction* realHasYieldedFunction;
-	FiniteElement_Mesh*               mesh;
+	FeMesh* 		          mesh;
 	XYZ                               min;
 	XYZ                               max;
 	Bool                              hasYielded;
@@ -108,7 +108,7 @@ void _Underworld_testYieldCriterion_Construct( void* component, Stg_ComponentFac
 					Underworld_testYieldCriterion_Type );
 
 	/* get pointer to the mesh */
-	self->mesh = Stg_ComponentFactory_ConstructByName( cf, "mesh-linear", FiniteElement_Mesh, True, data ); 
+	self->mesh = Stg_ComponentFactory_ConstructByName( cf, "mesh-linear", FeMesh, True, data ); 
 	
 	/* Get a pointer the yield rheology that we are trying to test */
 	yieldRheology = (YieldRheology*) LiveComponentRegister_Get( context->CF->LCRegister, "yieldRheology" );

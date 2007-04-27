@@ -12,7 +12,7 @@
 		__Rheology \
 		/* Virtual functions go here */ \
 		/* Material Parameters */\
-		FiniteElement_Mesh*                                 feMesh;                             \
+		FeMesh*    		                            feMesh;                             \
 		double                                              eta0;                               \
 		double                                              gamma;                              \
 		Axis                                                variationAxis;                      \

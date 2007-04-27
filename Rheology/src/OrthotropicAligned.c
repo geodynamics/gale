@@ -88,8 +88,8 @@ void _OrthotropicAligned_Init( OrthotropicAligned* self,
 			       double viscosity1, double viscosity2, 
 			       double viscosity3, double viscosity4, 
 			       double viscosity5, double viscosity6 ) {
-//	self->director         = director;
-//	self->viscosityRatio  = viscosityRatio;
+  /*	self->director         = director; */
+  /*	self->viscosityRatio  = viscosityRatio; */
 /*	OrthotropicAligned_ParticleExt*   particleExt;
 	StandardParticle                  materialPoint;
 	
@@ -122,7 +122,7 @@ void* _OrthotropicAligned_DefaultNew( Name name ) {
 
 void _OrthotropicAligned_Construct( void* rheology, Stg_ComponentFactory* cf, void* data ){
 	OrthotropicAligned*     self = (OrthotropicAligned*)rheology;
-//	Director*        director;
+        /*	Director*        director; */
 	double viscosity1;
 	double viscosity2;
 	double viscosity3;
@@ -133,7 +133,7 @@ void _OrthotropicAligned_Construct( void* rheology, Stg_ComponentFactory* cf, vo
 	/* Construct Parent */
 	_Rheology_Construct( self, cf, data );
 	
-//	director =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "Director", Director,  True  ) ;
+        /*	director =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "Director", Director,  True  ) ; */
 	viscosity1 = Stg_ComponentFactory_GetDouble( cf, self->name, "viscosity1",  True );
 	viscosity2 = Stg_ComponentFactory_GetDouble( cf, self->name, "viscosity2",  True );
 	viscosity3 = Stg_ComponentFactory_GetDouble( cf, self->name, "viscosity3",  True );
@@ -154,7 +154,7 @@ void _OrthotropicAligned_Construct( void* rheology, Stg_ComponentFactory* cf, vo
 /* how does this get called eventually? */
 void _OrthotropicAligned_ModifyConstitutiveMatrix( 
 		void*                                              rheology, 
-		ConstitutiveMatrix*                                constitutiveMatrix, // constitutive matrix
+		ConstitutiveMatrix*                                constitutiveMatrix, /* constitutive matrix */
 		MaterialPointsSwarm*                               swarm,
 		Element_LocalIndex                                 lElement_I,
 		MaterialPoint*                                     materialPoint,
@@ -162,18 +162,18 @@ void _OrthotropicAligned_ModifyConstitutiveMatrix(
 {
 	OrthotropicAligned*	                self = (OrthotropicAligned*) rheology;
 	Dimension_Index                   dim  = swarm->dim;
-//	double                          isotropicViscosity = ConstitutiveMatrix_GetIsotropicViscosity( constitutiveMatrix );
-//	double                          deltaViscosity;
-//	XYZ                             normal;
+        /*	double                          isotropicViscosity = ConstitutiveMatrix_GetIsotropicViscosity( constitutiveMatrix ); */
+        /*	double                          deltaViscosity; */
+        /*	XYZ                             normal; */
 	int i,j;
 	double**   D  = constitutiveMatrix->matrixData;
-//	static int flag = 0;
-//	deltaViscosity = isotropicViscosity * (1.0 - self->viscosityRatio);
-//	Director_GetNormal( self->director, materialPoint, normal );
+        /*	static int flag = 0; */
+        /*	deltaViscosity = isotropicViscosity * (1.0 - self->viscosityRatio); */
+        /*	Director_GetNormal( self->director, materialPoint, normal ); */
 
-//	ConstitutiveMatrix_SetSecondViscosity( constitutiveMatrix, deltaViscosity, normal );
+        /*	ConstitutiveMatrix_SetSecondViscosity( constitutiveMatrix, deltaViscosity, normal ); */
 	
-//	if(!flag){/* if not visited modify matrix else no need to update */
+        /*	if(!flag){/* if not visited modify matrix else no need to update *\/ */
         /* Snark dies if I only allow this to be called once.. */
 	/* ahh need to allow it to be called once for every particle */
 	   for(i=0;i<dim*(dim+1)/2;i++){
@@ -191,9 +191,9 @@ void _OrthotropicAligned_ModifyConstitutiveMatrix(
 	      D[5][5] = self->viscosity6;
 	   }
 	   constitutiveMatrix->isDiagonal = True;	   
-//	   printf("In %s OK\n\n",__func__);
-//	   flag = 1;
-//	}
+           /*	   printf("In %s OK\n\n",__func__); */
+           /*	   flag = 1; */
+           /*	} */
 /* 	for(i=0;i<dim*(dim+1)/2;i++){ */
 /* 	   for(j=0;j<dim*(dim+1)/2;j++){ */
 /* 	      printf("Matrix Data = %g [%d %d]\n",constitutiveMatrix->matrixData[i][j],i,j); */

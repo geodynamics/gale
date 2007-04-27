@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: Arrhenius.c 402 2007-01-02 01:17:26Z JulianGiordani $
+** $Id: Arrhenius.c 466 2007-04-27 06:24:33Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 #include <mpi.h>
@@ -96,14 +96,11 @@ Arrhenius* _Arrhenius_New(
 void _Arrhenius_Init( Arrhenius* self, FeVariable* temperatureField, double eta0, double activationEnergy, double activationVolume, double referenceTemp ) 
 {
 	self->temperatureField = temperatureField;
+	self->feMesh	       = temperatureField->feMesh;
 	self->eta0             = eta0;
 	self->activationEnergy = activationEnergy;
 	self->activationVolume = activationVolume;
 	self->referenceTemp    = referenceTemp;
-
-	self->blockGeometry    = (BlockGeometry*) temperatureField->feMesh->layout->elementLayout->geometry;
-	assert ( Stg_Class_IsInstance( self->blockGeometry, BlockGeometry_Type ) );
-		
 }
 
 void* _Arrhenius_DefaultNew( Name name ) {
@@ -130,7 +127,7 @@ void _Arrhenius_Construct( void* rheology, Stg_ComponentFactory* cf, void* data 
 	/* Construct Parent */
 	_Rheology_Construct( self, cf, data );
 	
-	// TODO: 'KeyFallback' soon to be deprecated/updated
+	/* TODO: 'KeyFallback' soon to be deprecated/updated */
 	temperatureField = Stg_ComponentFactory_ConstructByNameWithKeyFallback(
                         cf, self->name, "TemperatureField", "TemperatureField", FeVariable, True, data );
 	/*temperatureField = Stg_ComponentFactory_ConstructByKey( 
@@ -163,6 +160,7 @@ void _Arrhenius_ModifyConstitutiveMatrix(
 	double                            viscosity;
 	double                            depth;
 	double                            height;
+	Coord				  min, max;	
 	Coord                             coord;
 
 	eta0             = self->eta0;
@@ -170,17 +168,20 @@ void _Arrhenius_ModifyConstitutiveMatrix(
 	activationVolume = self->activationVolume;
 	referenceTemp    = self->referenceTemp;
 
+	/* Extract geometric extents. */
+	Mesh_GetGlobalCoordRange( self->feMesh, min, max );
+
 	/* Calculate Parameters */
 	FeVariable_InterpolateWithinElement( temperatureField, lElement_I, xi, &temperature );
 	
 	/* If activationVolume is 0 there is no need to calculate the depth of the particle see viscosity line below. */
 	if( activationVolume > (0.0 + 1e-12 )  ) {
 		/* Calculate Depth */
-		height = self->blockGeometry->max[ J_AXIS ];
+		height = max[ J_AXIS ];
 
 		/* This rheology assumes particle is an integration points thats can be mapped to a particle
 		 * that has no meaningful coord. Best to re-calc the global from local */
-		FiniteElement_Mesh_CalcGlobalCoordFromLocalCoord( swarm->mesh, swarm->dim, lElement_I, xi, coord );
+		FeMesh_CoordLocalToGlobal( swarm->mesh, lElement_I, xi, coord );
 		depth = height - coord[ J_AXIS ];
 		/* Calculate New Viscosity */
 		viscosity = eta0 * exp(( activationEnergy + activationVolume * depth)/ (temperature + referenceTemp));

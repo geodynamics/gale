@@ -1,20 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
-<!--
 
-	A 3D extension model for timing purposes which runs 20 timesteps with no visualisation. This case is large enough to allow some decomposition, but small enough to run on modest, single proc machines. The choice of physical parameterization is not special but should not be changed.
-	 
-	
-Some rough timings - 
--- PETSC defaults (GMRES)
--- Using 10 particles per cell; with PCDVC (Voronoi weights / repopulation)
-	1 proc, 2.5 GHz Quad G5 MacOS X desktop	-  ????s / ~ GB real mem usage
-
-	1 proc, ?? GHz Opteron	-  ????s / ~ GB real mem usage
-		
-	
--->
 	<include> Underworld/BaseApps/ExtensionBaseApp.xml </include>
 	<list name="plugins" mergeType="merge">
 <!-- Output Plugins -->
@@ -215,14 +202,9 @@ Some rough timings -
 <!-- Geometry & Mesh setup -->
 	<param name="dim"> 3 </param>
 	
-<!-- Note : for proper resolution of the problem, it is strongly recommended you run
-	     this problem in parallel, with at least 100 * 50 * 100 elements. The values below are for
-	     small testing / demonstration only. -->
-	
-	
-	<param name="elementResI"> 64 </param>
-	<param name="elementResJ"> 64 </param>
-	<param name="elementResK"> 32 </param>
+	<param name="elementResI"> 32 </param>
+	<param name="elementResJ"> 32 </param>
+	<param name="elementResK"> 16 </param>
 	<param name="shadowDepth"> 1 </param>
 	<param name="minX"> 0.0 </param>
 	<param name="minY"> 0.0 </param>

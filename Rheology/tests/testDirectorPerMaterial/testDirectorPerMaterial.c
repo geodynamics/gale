@@ -34,10 +34,10 @@ void Underworld_testDirectorPerMaterial_Function( PICelleratorContext* context )
 	director = alignment->director;
 	materialsCount = Materials_Register_GetCount( materials_Register);
 	
-	// construct test for testDirectorPerMaterial.xml 
-	//assume a direction for each material and check that
-	//each particle has the same direction for it's material type.
-	//and that it's equal to the default value for each material.
+	/*  construct test for testDirectorPerMaterial.xml  */
+	/* assume a direction for each material and check that */
+	/* each particle has the same direction for it's material type. */
+	/* and that it's equal to the default value for each material. */
 	/* get materials and their initial directions */
 	
 	/* check that there are at least 3 materials */
@@ -61,7 +61,7 @@ void Underworld_testDirectorPerMaterial_Function( PICelleratorContext* context )
 	matDirectionVectors[2][DIR_Y_AXIS] = 1.0;
 	matDirectionVectors[2][DIR_Z_AXIS] = 0.0;
 	
-	//set error counters
+	/* set error counters */
 	for (material_I=0; material_I < DIR_TEST_NUM_MAT; material_I++) {
 		materialErrorCounts[material_I] = 0;
 		accumulatedErrors[material_I] = 0;

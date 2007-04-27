@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: BoundaryLayers.c 358 2006-10-18 06:17:30Z SteveQuenette $
+** $Id: BoundaryLayers.c 466 2007-04-27 06:24:33Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -163,6 +163,7 @@ void Underworld_BoundaryLayers_Output( UnderworldContext* context ) {
 
 double Underworld_BoundaryLayers_InternalTemperature( UnderworldContext* context, double hotLayerThickness, double coldLayerThickness ) {
 	Dimension_Index     dim                    = context->dim;
+	double		    maxCrd[3], minCrd[3];
 	double              volume;
 	double              internalTemperature;
 	double              integral               = 0.0;
@@ -172,12 +173,11 @@ double Underworld_BoundaryLayers_InternalTemperature( UnderworldContext* context
 	double              bottomLayerHeight;
 	double              topLayerHeight;
 	FeVariable*         temperatureField       = context->temperatureField;
-	FiniteElement_Mesh* mesh                   = temperatureField->feMesh;
-	BlockGeometry*      geometry               = (BlockGeometry*) mesh->layout->elementLayout->geometry;
+	FeMesh*		    mesh                   = temperatureField->feMesh;
 	Element_LocalIndex  lElement_I;
 	Node_LocalIndex    	nodeAtElementBottom;
 	Node_LocalIndex    	nodeAtElementTop;
-	Node_Index    	    elementNodeCount;
+	Node_Index    	    elementNodeCount, *elementNodes;
 	double              elementBottomHeight;
 	double              elementTopHeight;
 	double              detJac;
@@ -188,28 +188,27 @@ double Underworld_BoundaryLayers_InternalTemperature( UnderworldContext* context
 	Particle_Index      gaussPointCount        = gaussSwarm->particleLocalCount;
 	ElementType*        elementType;
 
-	assert( Stg_Class_IsInstance( geometry, BlockGeometry_Type ) );
-	
-	bottomLayerHeight = geometry->min[ J_AXIS ] + hotLayerThickness;  
-	topLayerHeight    = geometry->max[ J_AXIS ] - coldLayerThickness; 
+	Mesh_GetGlobalCoordRange( mesh, minCrd, maxCrd );
+	bottomLayerHeight = minCrd[ J_AXIS ] + hotLayerThickness;  
+	topLayerHeight    = maxCrd[ J_AXIS ] - coldLayerThickness; 
 	
 	/* volume (or area) Integrating and Averaging over */
-	volume = (geometry->max[ I_AXIS ] - geometry->min[ I_AXIS ]) * (topLayerHeight - bottomLayerHeight);
+	volume = (maxCrd[ I_AXIS ] - minCrd[ I_AXIS ]) * (topLayerHeight - bottomLayerHeight);
 	if (dim == 3)
-		volume *= geometry->max[ K_AXIS ] - geometry->min[ K_AXIS ];
+		volume *= maxCrd[ K_AXIS ] - minCrd[ K_AXIS ];
 	
 	/************************************** Do Integration ************************************************/
 	
 	/* Loop over Elements */
-	for ( lElement_I = 0 ; lElement_I < mesh->elementLocalCount ; lElement_I++ ) {
-		elementType         = FeMesh_ElementTypeAt( mesh, lElement_I );
-		elementNodeCount    = mesh->elementNodeCountTbl[lElement_I];
+	for ( lElement_I = 0 ; lElement_I < FeMesh_GetElementLocalSize( mesh ) ; lElement_I++ ) {
+		elementType         = FeMesh_GetElementType( mesh, lElement_I );
+		FeMesh_GetElementNodes( mesh, lElement_I, &elementNodeCount, &elementNodes );
 
-		nodeAtElementBottom = mesh->elementNodeTbl[ lElement_I ][ 0 ] ;
-		nodeAtElementTop    = mesh->elementNodeTbl[ lElement_I ][ 2 ] ;
+		nodeAtElementBottom = elementNodes[ 0 ] ;
+		nodeAtElementTop    = elementNodes[ 2 ] ;
 
-		elementBottomHeight = Mesh_CoordAt( mesh, nodeAtElementBottom )[ J_AXIS ];
-		elementTopHeight    = Mesh_CoordAt( mesh, nodeAtElementTop    )[ J_AXIS ];
+		elementBottomHeight = Mesh_GetVertex( mesh, nodeAtElementBottom )[ J_AXIS ];
+		elementTopHeight    = Mesh_GetVertex( mesh, nodeAtElementTop    )[ J_AXIS ];
 		
 		/* Test where elements are relative to boundaries */
 		if ( elementTopHeight < bottomLayerHeight || elementBottomHeight > topLayerHeight ) {
@@ -235,7 +234,7 @@ double Underworld_BoundaryLayers_InternalTemperature( UnderworldContext* context
 				FeVariable_InterpolateWithinElement( temperatureField, lElement_I, xi, &temperature );
 				detJac = factor * ElementType_JacobianDeterminant( elementType, mesh, lElement_I, xi, dim );
 				integral += particle->weight * temperature * detJac;
-			}			
+			}
 		}
 		else if (elementBottomHeight <= bottomLayerHeight) {		
 			/* Element in intersection at Hot Bottom Boundary*/

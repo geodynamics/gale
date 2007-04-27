@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: main.c 358 2006-10-18 06:17:30Z SteveQuenette $
+** $Id: main.c 466 2007-04-27 06:24:33Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -115,7 +115,7 @@ int main( int argc, char* argv[] ) {
 	Stg_Class_Delete( context );
 	Stg_Class_Delete( dictionary );
 
-	//if( rank == procToWatch ) Memory_Print();
+	/*if( rank == procToWatch ) Memory_Print(); */
 	
 	#ifdef HAVE_PYTHON
 	Py_Finalize();

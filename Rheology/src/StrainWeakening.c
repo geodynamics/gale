@@ -38,11 +38,12 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: StrainWeakening.c 358 2006-10-18 06:17:30Z SteveQuenette $
+** $Id: StrainWeakening.c 466 2007-04-27 06:24:33Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
+#include <stdlib.h>
 #include <mpi.h>
 #include <StGermain/StGermain.h>
 #include <StgFEM/StgFEM.h>
@@ -280,7 +281,7 @@ void _StrainWeakening_Initialise( void* strainWeakening, void* data ) {
 	the particle-based variables will be set correcty when we re-load the Swarm. */
 	if ( !(context && (True == context->loadFromCheckPoint)) ) {
 		/* Initialise random number generator */
-		srand48( self->randomSeed );
+		srand( self->randomSeed );
 			
 		for ( lParticle_I = 0 ; lParticle_I < particleLocalCount ; lParticle_I++ ) {
 			/* Initialise Increment to Zero */
@@ -290,7 +291,7 @@ void _StrainWeakening_Initialise( void* strainWeakening, void* data ) {
 			 * There is a certain fraction of the number of particles which are given initial strain */
 			postFailureWeakening = 0.0;
 			
-			if ( drand48() < self->initialDamageFraction ) {
+			if ( rand() < RAND_MAX*self->initialDamageFraction ) {
 
 				coord = Variable_GetPtrDouble( positionVariable, lParticle_I );
 
@@ -299,7 +300,7 @@ void _StrainWeakening_Initialise( void* strainWeakening, void* data ) {
 					continue;
 				}
 				
-				postFailureWeakening = self->initialDamageFactor * drand48() * self->softeningStrain;
+				postFailureWeakening = self->initialDamageFactor * rand() * self->softeningStrain/RAND_MAX;
 
 				if ( self->initialDamageWavenumber > 0.0 ) {				
 					coord = Variable_GetPtrDouble( positionVariable, lParticle_I );

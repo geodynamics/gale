@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: Compressible.c 430 2007-02-07 00:10:36Z PatrickSunter $
+** $Id: Compressible.c 466 2007-04-27 06:24:33Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 #include <mpi.h>
@@ -95,7 +95,7 @@ Compressible* _Compressible_New(
 
 void _Compressible_Init(
 		Compressible*        self, 
-		FiniteElement_Mesh*  geometryMesh, 
+		FeMesh*		     geometryMesh, 
 		Materials_Register*  materials_Register,
 		double               oneOnLambda )
 {
@@ -140,12 +140,12 @@ void* _Compressible_DefaultNew( Name name ) {
 
 void _Compressible_Construct( void* compressible, Stg_ComponentFactory* cf, void* data ){
 	Compressible*    self = (Compressible*)compressible;
-	FiniteElement_Mesh* geometryMesh;
+	FeMesh*		 geometryMesh;
 	Materials_Register* materials_Register;
 
 	_StiffnessMatrixTerm_Construct( self, cf, data );
 
-	geometryMesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "GeometryMesh", FiniteElement_Mesh, True, data );
+	geometryMesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "GeometryMesh", FeMesh, True, data );
 
 	materials_Register = Stg_ObjectList_Get( cf->registerRegister, "Materials_Register" );
 	assert( materials_Register );
@@ -197,17 +197,17 @@ void _Compressible_AssembleElement(
 	Cell_Index                cell_I;
 	ElementType*              elementType;
 	Dof_Index                 dofCount;
-	FiniteElement_Mesh*       mesh                = variable1->feMesh;
+	FeMesh*       		  mesh                = variable1->feMesh;
 	double                    Ni[8];
 	double*                   xi;
 	double                    factor;
-	FiniteElement_Mesh*       geometryMesh        = self->geometryMesh;
+	FeMesh*  		  geometryMesh        = self->geometryMesh;
 	ElementType*              geometryElementType;
 	Particle_Index            lParticle_I;
 
 	/* Set the element type */
-	elementType         = FeMesh_ElementTypeAt( mesh, lElement_I );
-	geometryElementType = FeMesh_ElementTypeAt( geometryMesh, lElement_I );
+	elementType         = FeMesh_GetElementType( mesh, lElement_I );
+	geometryElementType = FeMesh_GetElementType( geometryMesh, lElement_I );
 	elementNodeCount    = elementType->nodeCount;
 	dofCount            = elementNodeCount;
 

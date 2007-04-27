@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: ConstitutiveMatrixCartesian.c 430 2007-02-07 00:10:36Z PatrickSunter $
+** $Id: ConstitutiveMatrixCartesian.c 466 2007-04-27 06:24:33Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -250,7 +250,7 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
 	Index                   tensorComponents    = StGermain_nSymmetricTensorVectorComponents( dim );
 
 	/* Set the element type */
-	elementType       = FeMesh_ElementTypeAt( variable1->feMesh, lElement_I );
+	elementType       = FeMesh_GetElementType( variable1->feMesh, lElement_I );
 	elementNodeCount  = elementType->nodeCount;
 	nodeDofCount      = dim;
 

@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: VonMises.c 358 2006-10-18 06:17:30Z SteveQuenette $
+** $Id: VonMises.c 466 2007-04-27 06:24:33Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -151,7 +151,7 @@ void _VonMises_Construct( void* rheology, Stg_ComponentFactory* cf, void* data )
 	/* Construct Parent */
 	_YieldRheology_Construct( self, cf, data );
 	
-	// TODO: soon to be deprecated/updated
+	/* TODO: soon to be deprecated/updated */
 	strainRateField = Stg_ComponentFactory_ConstructByNameWithKeyFallback(
         	cf, 
 		self->name, 
@@ -160,8 +160,8 @@ void _VonMises_Construct( void* rheology, Stg_ComponentFactory* cf, void* data )
 		FeVariable, 
 		True,
 		data );
-	//strainRateField = Stg_ComponentFactory_ConstructByKey( 
-	//		cf, self->name, "StrainRateField", FeVariable, True );
+	/*strainRateField = Stg_ComponentFactory_ConstructByKey(  */
+	/*		cf, self->name, "StrainRateField", FeVariable, True ); */
 	
 	
 	_VonMises_Init( 

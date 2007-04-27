@@ -6,7 +6,7 @@
 			<param name="Context">context</param>
 			<param name="ConstitutiveMatrix">constitutiveMatrix</param>
 			<param name="Swarm">picIntegrationPoints</param>
-			<param name="Mesh">mesh-linear</param>
+			<param name="Mesh">elementMesh</param>
 		</struct>
 		<struct name="StressInvariantField"> 
 			<param name="Type">OperatorFeVariable</param>

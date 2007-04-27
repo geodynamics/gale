@@ -11,7 +11,7 @@ setUpdateModeFromArg ${1}
 
 # Extract out names
 testname="`basename $0 .sh`"
-nproc=`echo ${testname} | cut -d . -f 2 | cut -d f -f 2`
+nproc=`echo ${testname} | cut -d . -f 2 | cut -c 4`
 procToWatch=`echo ${testname} | cut -d . -f 2 | cut -f 1 -d 'o'`
 #partTestname=`echo $testname | cut -f 1 -d '-'`
 partTestname=testRayleighTaylorBenchmark

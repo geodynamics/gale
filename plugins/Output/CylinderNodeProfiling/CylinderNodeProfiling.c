@@ -51,6 +51,7 @@
 const Type ExperimentalUnderworld_CylinderNodeProfiling = "ExperimentalUnderworld_CylinderNodeProfiling";
 
 void ExperimentalUnderworld_NodeTempProfile( PICelleratorContext* context ) {
+#if 0
 	static FeVariable*          temperatureFe;
 	FiniteElement_Mesh*         mesh;
 	double*                     nodeCoord;
@@ -103,17 +104,17 @@ void ExperimentalUnderworld_NodeTempProfile( PICelleratorContext* context ) {
 	Journal_Printf( stream, "\t\tNode Profile in Y direction, starting at (%.6g, %.6g, %.6g)\tat temperature = %g\n",
 				nodeCoord[0], nodeCoord[1], nodeCoord[2], nodeTemp );
 
-	newNodeID = mesh->nodeNeighbourTbl[ startProfileNodeID ][ 1 ]; // 1 = +y direction, 2 = +z direction
-	if( newNodeID >= mesh->nodeLocalCount ) { // is node NOT a local, thus stop profiling
+	newNodeID = mesh->nodeNeighbourTbl[ startProfileNodeID ][ 1 ]; /* 1 = +y direction, 2 = +z direction */
+	if( newNodeID >= mesh->nodeLocalCount ) { /* is node NOT a local, thus stop profiling */
 		Journal_Printf( stream, "\t\tProfiling has reached the boundary of the local processor\n");
-	} else {  // continue profiling
+	} else {  /* continue profiling */
 		nodeTemp = FeVariable_GetScalarAtNode( temperatureFe, newNodeID );
 		while( nodeTemp > 0.0 ) {
 			nodeCoord = Mesh_CoordAt( mesh, newNodeID );
 			Journal_Printf( stream, "\t\t (%.6g, %.6g, %.6g)\tat temperature = %g\n", nodeCoord[0], nodeCoord[1], nodeCoord[2], nodeTemp );
 			newNodeID = mesh->nodeNeighbourTbl[ newNodeID ][ 1 ];
 			if( newNodeID >= mesh->nodeLocalCount ) {
-				// is node not a local i.e. not on processor, tus stop profiling	
+                          /* is node not a local i.e. not on processor, tus stop profiling	 */
 				Journal_Printf( stream, "\t\tProfiling has reached the boundary of the local processor\n");
 				break;
 			}
@@ -122,13 +123,14 @@ void ExperimentalUnderworld_NodeTempProfile( PICelleratorContext* context ) {
 	}
 	Memory_Free( maxTempList );
 	MPI_Barrier( context->communicator );
+#endif
 }
 
 void _ExperimentalUnderworld_CylinderNodeProfiling_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
 
 	AbstractContext* context;
 	FeVariable*  temperatureField  = Stg_ComponentFactory_ConstructByName( cf, "TemperatureField", FeVariable, True, data );
-	FiniteElement_Mesh* mesh     = temperatureField->feMesh;
+	FeMesh* mesh     = temperatureField->feMesh;
 
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
 	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, ExperimentalUnderworld_NodeTempProfile );

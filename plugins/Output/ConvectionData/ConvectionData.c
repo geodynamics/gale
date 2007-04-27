@@ -87,7 +87,7 @@ void Underworld_ConvectionData_Setup( void* _context ) {
 	
 	rheology = (Rheology*)Stg_ComponentFactory_ConstructByName( context->CF, "temperatureDependence", Rheology, False, 0 /* dummy */ );	
 	nonNewtonian = (NonNewtonian*)LiveComponentRegister_Get( context->CF->LCRegister, NonNewtonian_Type );
-		//(NonNewtonian*)Stg_ComponentFactory_ConstructByName( context->CF, "nonNewtonian", NonNewtonian, True, 0 /* dummy */ );	
+        /* (NonNewtonian*)Stg_ComponentFactory_ConstructByName( context->CF, "nonNewtonian", NonNewtonian, True, 0 */ /* dummy */ /* );	*/
 	(nonNewtonian == NULL) ?  (self->stressExponent = 1) :
 		       	(self->stressExponent = nonNewtonian->stressExponent) ;
 
@@ -104,8 +104,8 @@ void Underworld_ConvectionData_Setup( void* _context ) {
 	self->Ra = Stg_ComponentFactory_GetRootDictDouble( context->CF, "Ra", 1.0 );
 	
 	self->eta0 = ( arrhenius != NULL ? arrhenius->eta0 : frankKamenetskii->eta0 );
-//	self->stressExponent = nonNewtonian->stressExponent;
-	self->rheologyName = rheology->type;//( arrhenius != NULL ? StG_Strdup(arrhenius->type) : StG_Strdup(frankKamenetskii->type) );
+        /*	self->stressExponent = nonNewtonian->stressExponent; */
+	self->rheologyName = rheology->type;/*( arrhenius != NULL ? StG_Strdup(arrhenius->type) : StG_Strdup(frankKamenetskii->type) ); */
 	self->boundaryLayersPlugin = (Underworld_BoundaryLayers*)LiveComponentRegister_Get(
 					context->CF->LCRegister,
 					Underworld_BoundaryLayers_Type );
@@ -129,7 +129,7 @@ void Underworld_ConvectionData_Setup( void* _context ) {
 	Stg_asprintf( &filename, "ConvectionData.%dof%d.dat", context->rank, context->nproc );
 	Stream_RedirectFile_WithPrependedPath( dataStream, context->outputPath, filename );
 	Stream_SetAutoFlush( dataStream, True );
-	// Print Header
+	/* Print Header */
 	Journal_Printf( dataStream, "#Rheology | etaContrast | Ra | UpperVrms | LowerVrms | UTBL | LTBL | SurfaceMobility\n");
 	Memory_Free( filename );
 
@@ -138,7 +138,8 @@ void Underworld_ConvectionData_Setup( void* _context ) {
 void Underworld_ConvectionData_Dump( void* _context ) {
 	UnderworldContext*         context = (UnderworldContext*) _context;
 	Underworld_ConvectionData* self;
-	BlockGeometry*             geometry;      
+	Mesh*			   mesh;
+	double		    	   maxCrd[3], minCrd[3];
 	double                     topVrms;
 	double                     bottomVrms;
 	double                     Upper_tbl_Thinckness;
@@ -150,17 +151,20 @@ void Underworld_ConvectionData_Dump( void* _context ) {
 					context->CF->LCRegister,
 					Underworld_ConvectionData_Type );
 
-	geometry = Stg_CheckType( self->velocitySquaredField->feMesh->layout->elementLayout->geometry, BlockGeometry );
+	Journal_Printf( dataStream, "ID = %s_%.3g_%.3g_%.3g\n", self->rheologyName, self->stressExponent, self->eta0, self->Ra ); 
+
+	mesh = (Mesh*)self->velocitySquaredField->feMesh;
+	Mesh_GetGlobalCoordRange( mesh, minCrd, maxCrd );
 
 	assert( self->stressExponent != 0 );
 	deltaViscosity = pow(self->eta0, (-1/self->stressExponent) );
 	Journal_Printf( dataStream, "%s %g %g ", self->rheologyName, deltaViscosity, self->Ra ); 
 	
-	// Prints out Surface Vrms 
-	topVrms = Underworld_ConvectionData_XZPlaneVrms( context, geometry->max[ J_AXIS ] );
+	/* Prints out Surface Vrms  */
+	topVrms = Underworld_ConvectionData_XZPlaneVrms( context, maxCrd[ J_AXIS ] );
 	Journal_Printf( dataStream, " %g", topVrms );
 
-	bottomVrms = Underworld_ConvectionData_XZPlaneVrms( context, geometry->min[ J_AXIS ] );
+	bottomVrms = Underworld_ConvectionData_XZPlaneVrms( context, minCrd[ J_AXIS ] );
 	Journal_Printf( dataStream, " %g", bottomVrms );
 	
 	Upper_tbl_Thinckness = self->boundaryLayersPlugin->hotLayerThickness;
@@ -178,12 +182,16 @@ void Underworld_ConvectionData_Dump( void* _context ) {
 	
 
 double Underworld_ConvectionData_XZPlaneVrms( UnderworldContext* context, double yCoord_Of_XZPlane ) {
-	BlockGeometry*                       geometry;
+	Mesh*			   	     mesh;
+	double		    	  	     maxCrd[3], minCrd[3];
 	double                               integral;
 	double                               samplingSpace = 0.0;
 	Dimension_Index                      dim           = context->dim;
 
 	Underworld_ConvectionData* self;
+
+	mesh = (Mesh*)self->velocitySquaredField->feMesh;
+	Mesh_GetGlobalCoordRange( mesh, minCrd, maxCrd );
 
 	/*
 	TODO:PAT help:
@@ -193,16 +201,14 @@ double Underworld_ConvectionData_XZPlaneVrms( UnderworldContext* context, double
 					context->CF->LCRegister,
 					Underworld_ConvectionData_Type );
 	
-	geometry = Stg_CheckType( self->velocitySquaredField->feMesh->layout->elementLayout->geometry, BlockGeometry );
-
 	/* Sum integral */
 	integral = FeVariable_IntegratePlane( self->velocitySquaredField, J_AXIS, yCoord_Of_XZPlane );
 
 	/* Get Volume of Mesh - TODO Make general for irregular meshes */
-	samplingSpace = ( geometry->max[ I_AXIS ] - geometry->min[ I_AXIS ] ); 
+	samplingSpace = ( maxCrd[ I_AXIS ] - minCrd[ I_AXIS ] ); 
 		
 	if ( dim == 3 ) 
-		samplingSpace *= geometry->max[ K_AXIS ] - geometry->min[ K_AXIS ];
+		samplingSpace *= maxCrd[ K_AXIS ] - minCrd[ K_AXIS ];
 
 	/* Calculate ConvectionData 
 	 * V_{rms} = \sqrt{ \frac{ \int_\Omega \mathbf{u . u} d\Omega }{\Omega} } */
@@ -232,7 +238,7 @@ void* _Underworld_ConvectionData_DefaultNew( Name name ) {
 		sizeof(Underworld_ConvectionData),
 		Underworld_ConvectionData_Type,
 		_Underworld_ConvectionData_Delete,
-		//_Codelet_Delete,
+		/*_Codelet_Delete, */
 		_Codelet_Print,
 		_Codelet_Copy,
 		_Underworld_ConvectionData_DefaultNew,

@@ -39,7 +39,7 @@
 *+		Julian Giordani
 *+		Kathleen Humble
 *+
-** $Id: Director.c 358 2006-10-18 06:17:30Z SteveQuenette $
+** $Id: Director.c 466 2007-04-27 06:24:33Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -202,7 +202,7 @@ void _Director_Construct( void* director, Stg_ComponentFactory* cf, void* data )
 	_TimeIntegratee_Construct( self, cf, data );
 	
 	/* Construct 'Director' stuff */
-	// TODO: 'KeyFallback' soon to be deprecated/updated
+	/* TODO: 'KeyFallback' soon to be deprecated/updated */
         velGradField   = Stg_ComponentFactory_ConstructByNameWithKeyFallback(
                cf, self->name, "VelocityGradientsField", "VelocityGradientsField", FeVariable, True, data );
 	/*

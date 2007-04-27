@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: MovingMesh.c 358 2006-10-18 06:17:30Z SteveQuenette $
+** $Id: MovingMesh.c 466 2007-04-27 06:24:33Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -65,32 +65,25 @@ void _Underworld_MovingMesh_Construct( void* meshExtender, Stg_ComponentFactory*
 		(Bool)context, 
 		Journal_Register( Error_Type, Underworld_MovingMesh_Type ), 
 		"No context found\n" );
-	
+
+	self->context = (AbstractContext*)context;	
 	self->velocityField = context->velocityField;
 
-	Journal_Firewall( 
-		(Bool)self->velocityField, 
-		Journal_Register( Error_Type, Underworld_MovingMesh_Type ), 
-		"The required velocity field component has not been created or placed on the context.\n");
-	Journal_Firewall( 
-		True == Stg_Class_IsInstance( self->velocityField->feMesh->layout->decomp, HexaMD_Type ),
-		Journal_Register( Error_Type, Underworld_MovingMesh_Type ), 
-		"Error: in %s: provided Velocity field's mesh doesn't have a regular decomposition.\n",
-		__func__ );
-	
-	self->context = (AbstractContext*)context;
+	Journal_Firewall( (Bool)self->velocityField, 
+			  Journal_Register( Error_Type, Underworld_MovingMesh_Type ), 
+			  "The required velocity field component has not been created or placed on the context.\n");
 
 	self->remeshAccordingToAxis[I_AXIS] = 		
 		Dictionary_GetBool_WithDefault( context->dictionary, "remeshAccordingToIAxis", True );
 	self->remeshAccordingToAxis[J_AXIS] = 		
 		Dictionary_GetBool_WithDefault( context->dictionary, "remeshAccordingToJAxis", True );
 	if ( self->velocityField->dim == 2 ) {
-		self->remeshAccordingToAxis[K_AXIS] = False;		
+		self->remeshAccordingToAxis[K_AXIS] = False;
 	}
 	else {
 		self->remeshAccordingToAxis[K_AXIS] = 		
 			Dictionary_GetBool_WithDefault( context->dictionary, "remeshAccordingToKAxis", True );
-	}	
+	}
 
 	axisToRemeshOnTotal = 0;
 	for ( dim_I = 0; dim_I < self->velocityField->dim; dim_I++ ) {
@@ -108,7 +101,7 @@ void _Underworld_MovingMesh_Construct( void* meshExtender, Stg_ComponentFactory*
 		__func__ );
 
 	/*  */ 
-	// TODO: this timeIntegrator interface seems weird. Would have thought you'd pass a ptr to self.
+	/* TODO: this timeIntegrator interface seems weird. Would have thought you'd pass a ptr to self. */
 	TimeIntegrator_PrependFinishEP( 
 			context->timeIntegrator, "Underworld_MovingMesh_Remesh", Underworld_MovingMesh_Remesh, 
 			CURR_MODULE_NAME, self );
@@ -117,22 +110,38 @@ void _Underworld_MovingMesh_Construct( void* meshExtender, Stg_ComponentFactory*
 	LiveComponentRegister_Add( context->CF->LCRegister, (Stg_Component*) self );
 }
 
+void Underworld_MovingMesh_Build( void* meshExtender, void* data ) {
+	MeshExtender*       self = (MeshExtender*)meshExtender;
+	Mesh*		    mesh;
+
+	mesh = (Mesh*)self->velocityField->feMesh;
+
+	Journal_Firewall( ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) != (unsigned)-1, 
+			  Journal_Register( Error_Type, Underworld_MovingMesh_Type ), 
+			  "Error: in %s: provided Velocity field's mesh doesn't have a regular decomposition.\n",
+			  __func__ );
+}
+
 
 void Underworld_MovingMesh_Remesh( TimeIntegrator* timeIntegrator, MeshExtender* self ) {
 	FeVariable*           velocityField = self->velocityField;
 	Mesh*                 mesh          = (Mesh*) velocityField->feMesh;
-	HexaMD*   	      meshDecomp    = (HexaMD*)mesh->layout->decomp;
+	unsigned	      rank;
 	Stream*               debug = Journal_Register( Debug_Type, Underworld_MovingMesh_Type );
 	Stream*               info = Journal_Register( Info_Type, self->type );
 	double                remeshTime, remeshTimeStart, remeshTimeEnd;
 	Dimension_Index       dim_I = 0;
 	Dimension_Index       axisToRemeshOnTotal = 0;
 	double                dt = 0.0;
+	MPI_Comm	      comm;
 	#if DEBUG
 	Index                 element_dI;
 	#endif
 
-	Journal_Printf( info, "%d: starting remeshing of mesh \"%s\":\n", meshDecomp->rank, mesh->name );
+	comm = CommTopology_GetComm( Mesh_GetCommTopology( mesh, MT_VERTEX ) );
+	MPI_Comm_rank( comm, (int*)&rank );
+
+	Journal_Printf( info, "%d: starting remeshing of mesh \"%s\":\n", rank, mesh->name );
 	axisToRemeshOnTotal = 0;
 	Journal_Printf( info, "Axis set to remesh on are : " );
 	for ( dim_I = 0; dim_I < velocityField->dim; dim_I++ ) {
@@ -166,37 +175,40 @@ void Underworld_MovingMesh_Remesh( TimeIntegrator* timeIntegrator, MeshExtender*
 	
 	remeshTimeStart = MPI_Wtime();
 
-	Journal_Firewall( 
-		True == Stg_Class_IsInstance( velocityField->feMesh->layout->decomp, HexaMD_Type ),
-		Journal_Register( Error_Type, Underworld_MovingMesh_Type ), 
-		"Error: in %s: provided Velocity field's mesh doesn't have a regular decomposition.\n",
-		__func__ );
+	Journal_Firewall( ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) != (unsigned)-1, 
+			  Journal_Register( Error_Type, Underworld_MovingMesh_Type ), 
+			  "Error: in %s: provided Velocity field's mesh doesn't have a regular decomposition.\n",
+			  __func__ );
 
+	/*
 	Journal_Firewall( 
 		True == Stg_Class_IsInstance( velocityField->feMesh->layout->elementLayout, ParallelPipedHexaEL_Type ),
 		Journal_Register( Error_Type, Underworld_MovingMesh_Type ), 
 		"Error: in %s: provided Velocity field's mesh doesn't have a %s elementLayout.\n",
 		__func__, ParallelPipedHexaEL_Type );
+	*/
 
 	Underworld_MovingMesh_RemeshAccordingToSidewalls( self, velocityField );
 	
 	Journal_DPrintf( debug, "remeshing complete.\n" );
 
+	/*
 	#if DEBUG
 	if ( Stream_IsEnable( debug ) && Stream_IsPrintableLevel( debug, 3 ) ) {
 		Journal_DPrintfL( debug, 3, "Updated node coords:\n" );
 		Stream_Indent( debug );
-		for ( element_dI = 0; element_dI < velocityField->feMesh->elementDomainCount; element_dI++ ) {
+		for ( element_dI = 0; element_dI < Mesh_GetDomainSize( velocityField->feMesh, MT_VERTEX ); element_dI++ ) {
 			Journal_DPrintfL( debug, 3, "In Element %3d: ", element_dI );
 			Mesh_PrintNodeCoordsOfElement( velocityField->feMesh, element_dI, debug );
 		}	
 		Stream_UnIndent( debug );
 	}	
 	#endif
+	*/
 
 	remeshTimeEnd = MPI_Wtime();
 	remeshTime = remeshTimeEnd - remeshTimeStart;
-	Journal_Printf( info, "%d: finished remeshing: took %f sec.\n", meshDecomp->rank, remeshTime );
+	Journal_Printf( info, "%d: finished remeshing: took %f sec.\n", rank, remeshTime );
 
 	Stream_UnIndent( debug );
 
@@ -214,8 +226,8 @@ void Underworld_MovingMesh_RemeshAccordingToSidewalls( MeshExtender* self, FeVar
 		}	
 	}
 
-	/* Update Element Layouts */
-	_ParallelPipedHexaEL_Build( mesh->layout->elementLayout, mesh->layout->decomp );
+	/* Update mesh details. */
+	Mesh_DeformationUpdate( mesh );
 }
 
 
@@ -225,10 +237,9 @@ void Underworld_MovingMesh_RemeshAccordingToSidewall_SingleAxis(
 		Dimension_Index  remeshAxis )
 {
 	Mesh*                      mesh          = (Mesh*) velocityField->feMesh;
-	HexaMD*   	           meshDecomp    = (HexaMD*)mesh->layout->decomp;
+	double			   maxCrd[3], minCrd[3];
+	Grid*			   vertGrid;
 	/* Assume IJK Topology */
-	IJKTopology*               topology      = (IJKTopology*) mesh->layout->nodeLayout->topology;
-	BlockGeometry*             geometry      = (BlockGeometry*) mesh->layout->elementLayout->geometry;
 	double*                    minGlobal;
 	double*                    maxGlobal;
 	Node_Index                 sideWallNodeCount;
@@ -244,25 +255,33 @@ void Underworld_MovingMesh_RemeshAccordingToSidewall_SingleAxis(
 	double                     newElementWidthInRemeshAxis;
 	double                     minGlobalCoord =  HUGE_VAL;
 	double                     maxGlobalCoord = -HUGE_VAL;
-	Bool                       nodeG2DBuiltTemporarily = False;
+	/*Bool                       nodeG2DBuiltTemporarily = False;*/
 	double                     newCoordInRemeshAxis = 0;
-	double                     tolerance = (geometry->max[remeshAxis] - geometry->min[remeshAxis]) * 1e-9;
+	double                     tolerance;
 
 	Stream* debug = Journal_Register( Debug_Type, Underworld_MovingMesh_Type );
 
 	Journal_DPrintf( debug, "In %s(): for remeshAxis %c\n", __func__, IJKTopology_DimNumToDimLetter[remeshAxis] );
 	Stream_Indent( debug );	
 
-	sideWallNodeCount = topology->size[ otherAxisA ] * topology->size[ otherAxisB ];
+	Mesh_GetGlobalCoordRange( mesh, minCrd, maxCrd );
+	tolerance = (maxCrd[remeshAxis] - minCrd[remeshAxis]) * 1e-9;
+
+	vertGrid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
+						  ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+
+	sideWallNodeCount = vertGrid->sizes[ otherAxisA ] * vertGrid->sizes[ otherAxisB ];
 	minGlobal = Memory_Alloc_Array( double, sideWallNodeCount, "min node coords" );
 	maxGlobal = Memory_Alloc_Array( double, sideWallNodeCount, "max node coords" );
 
 	/* As long as memory not too tight, create temporary tables to massively speed up
 	   necessary global to local calculations. */
+	/*
 	if ( (mesh->buildTemporaryGlobalTables == True) && (mesh->nodeG2D == 0) ) {
 		mesh->nodeG2D = MeshDecomp_BuildNodeGlobalToDomainMap( meshDecomp );
 		nodeG2DBuiltTemporarily = True;
 	}
+	*/
 	
 	/* calc min and max wall new coords given velocity field */
 	Underworld_MovingMesh_CalculateMinOrMaxCoordsOnSidewall(
@@ -278,40 +297,44 @@ void Underworld_MovingMesh_RemeshAccordingToSidewall_SingleAxis(
 			maxGlobalCoord = maxGlobal[ sideWallNode_I ];
 	}	
 
-	if ( ( fabs( minGlobalCoord - geometry->min[ remeshAxis ] ) < tolerance ) &&
-		( fabs( maxGlobalCoord - geometry->max[ remeshAxis ] ) < tolerance ) )
+	if ( ( fabs( minGlobalCoord - minCrd[ remeshAxis ] ) < tolerance ) &&
+		( fabs( maxGlobalCoord - maxCrd[ remeshAxis ] ) < tolerance ) )
 	{
 		Journal_DPrintfL( debug, 1, "Found no extension/compression in remeshAxis %c: thus not "
 			"updating node coords.\n", IJKTopology_DimNumToDimLetter[remeshAxis] );
 		Memory_Free( minGlobal );
 		Memory_Free( maxGlobal );
+		/*
 		if ( nodeG2DBuiltTemporarily ) {
 			Memory_Free( mesh->nodeG2D );
 			mesh->nodeG2D = NULL;
 		}
+		*/
 		Stream_UnIndent( debug );	
 		return;
 	}
 
 	/* Change Geometry */
+	/*
 	Journal_DPrintfL( debug, 3, "Updating mesh's BlockGeometry \"%s\" with new global "
 		"min and max in remesh axis %c: min=%.3f, max=%.3f\n",
 		geometry->name, IJKTopology_DimNumToDimLetter[remeshAxis], minGlobalCoord, maxGlobalCoord );
 
-	geometry->min[ remeshAxis ] = minGlobalCoord;
-	geometry->max[ remeshAxis ] = maxGlobalCoord;
+	minCrd[ remeshAxis ] = minGlobalCoord;
+	maxCrd[ remeshAxis ] = maxGlobalCoord;
+	*/
 
 	Journal_DPrintfL( debug, 2, "Looping over all nodes, updating coordinates in remeshAxis %c based on "
 		"stretch/compression on the relevant side walls.\n", IJKTopology_DimNumToDimLetter[remeshAxis] );
 	Stream_Indent( debug );	
 	sideWallNode_I = 0;
-	for ( aNode_I = 0 ; aNode_I < topology->size[ otherAxisA ] ; aNode_I++ ) {
+	for ( aNode_I = 0 ; aNode_I < vertGrid->sizes[ otherAxisA ] ; aNode_I++ ) {
 		nodeIJK[ otherAxisA ] = aNode_I;
-		for ( bNode_I = 0 ; bNode_I < topology->size[ otherAxisB ] ; bNode_I++ ) {
+		for ( bNode_I = 0 ; bNode_I < vertGrid->sizes[ otherAxisB ] ; bNode_I++ ) {
 			nodeIJK[ otherAxisB ] = bNode_I;
 
 			newElementWidthInRemeshAxis = (maxGlobal[ sideWallNode_I ] - minGlobal[ sideWallNode_I ])
-				/ ( (double)topology->size[ remeshAxis ] - 1.0 );
+				/ ( (double)vertGrid->sizes[ remeshAxis ] - 1.0 );
 
 			Journal_DPrintfL( debug, 3, "For slice with aNode_I=%u in otherAxisA=%c and bNode_I=%u in "
 				"otherAxisB=%c: calculated new element width in remesh axis= %.3f\n",
@@ -320,22 +343,23 @@ void Underworld_MovingMesh_RemeshAccordingToSidewall_SingleAxis(
 				newElementWidthInRemeshAxis );
 			Stream_Indent( debug );	
 
-			for ( remeshAxisNode_I = 0 ; remeshAxisNode_I < topology->size[ remeshAxis ] ; remeshAxisNode_I++ ) {
+			for ( remeshAxisNode_I = 0 ; remeshAxisNode_I < vertGrid->sizes[ remeshAxis ] ; remeshAxisNode_I++ ) {
 				nodeIJK[ remeshAxis ] = remeshAxisNode_I;
 
 				/* Find this local coord */
-				IJK_3DTo1D( topology, nodeIJK, &nodeGlobal_I );
-				nodeDomain_I = Mesh_NodeMapGlobalToDomain( mesh, nodeGlobal_I ); 
+				nodeGlobal_I = Grid_Project( vertGrid, nodeIJK );
 
 				/* Adjust position if this node is on my processor */
-				if ( nodeDomain_I < mesh->nodeDomainCount ) {
+				if ( Mesh_GlobalToDomain( mesh, MT_VERTEX, nodeGlobal_I, &nodeDomain_I ) && 
+				     nodeDomain_I < Mesh_GetDomainSize( mesh, MT_VERTEX ) )
+				{
 					newCoordInRemeshAxis = minGlobal[ sideWallNode_I ] +
 						newElementWidthInRemeshAxis * (double) remeshAxisNode_I;
 					Journal_DPrintfL( debug, 3, "updating node coord[%u] at IJK(%u,%u,%u) (domain "
 						"node I %u) from %.3f to %.3f\n", remeshAxis, nodeIJK[0], nodeIJK[1], nodeIJK[2],
-						nodeDomain_I, Mesh_CoordAt( mesh, nodeDomain_I )[ remeshAxis ],
+						nodeDomain_I, Mesh_GetVertex( mesh, nodeDomain_I )[ remeshAxis ],
 						newCoordInRemeshAxis );
-					Mesh_CoordAt( mesh, nodeDomain_I )[ remeshAxis ] = newCoordInRemeshAxis;
+					Mesh_GetVertex( mesh, nodeDomain_I )[ remeshAxis ] = newCoordInRemeshAxis;
 				}		
 			}
 			Stream_UnIndent( debug );	
@@ -346,13 +370,21 @@ void Underworld_MovingMesh_RemeshAccordingToSidewall_SingleAxis(
 	}
 	Stream_UnIndent( debug );	
 
+	/*
 	if ( nodeG2DBuiltTemporarily ) {
 		Memory_Free( mesh->nodeG2D );
 		mesh->nodeG2D = NULL;
 	}
+	*/
 
 	/* Update the element layout's partition info based on geometry changes... */
+	/*
 	ParallelPipedHexaEL_UpdateGeometryPartitionInfo( mesh->layout->elementLayout, mesh->layout->decomp );
+	*/
+
+	/* Update mesh information. */
+	Mesh_Sync( mesh );
+	Mesh_DeformationUpdate( mesh );
 
 	Memory_Free( minGlobal );
 	Memory_Free( maxGlobal );
@@ -368,9 +400,8 @@ void Underworld_MovingMesh_CalculateMinOrMaxCoordsOnSidewall(
 		double*          newWallCoordsInRemeshAxisGlobal )
 {
 	Mesh*                      mesh          = (Mesh*) velocityField->feMesh;
-	HexaMD*   	           meshDecomp    = (HexaMD*)mesh->layout->decomp;
-	IJKTopology*               topology      = (IJKTopology*) mesh->layout->nodeLayout->topology;
-	BlockGeometry*             geometry      = (BlockGeometry*) mesh->layout->elementLayout->geometry;
+	Grid*			   vertGrid;
+	double			   maxCrd[3], minCrd[3];
 	IJK                        wallNodeIJK;
 	Node_Index                 sideWallNode_I;
 	Node_LocalIndex            wallNode_lI;
@@ -387,12 +418,19 @@ void Underworld_MovingMesh_CalculateMinOrMaxCoordsOnSidewall(
 	double*                    currNodeCoord;
 	double                     velVector[3];
 	/* Somewhat arbitrary tolerance to check that extension of the mesh is not irregular in the current axis */
-	double                     tolerance = (geometry->max[remeshAxis] - geometry->min[remeshAxis]) * 1e-9;
+	double                     tolerance;
 	double                     differenceBetweenCurrAndPrev = 0;
 	double                     dt = AbstractContext_Dt( self->context );
 	Bool                       atLeastOneLocalSideNodeProcessed = False;
+	MPI_Comm		   comm;
 
-	sideWallNodeCount = topology->size[ otherAxisA ] * topology->size[ otherAxisB ];
+	Mesh_GetGlobalCoordRange( mesh, minCrd, maxCrd );
+	tolerance = (maxCrd[remeshAxis] - minCrd[remeshAxis]) * 1e-9;
+
+	vertGrid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
+						  ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+
+	sideWallNodeCount = vertGrid->sizes[ otherAxisA ] * vertGrid->sizes[ otherAxisB ];
 	newWallCoordsInRemeshAxis = Memory_Alloc_Array( double, sideWallNodeCount, "newWallCoordsInRemeshAxis" );
 
 	if ( minOrMaxFlag == MIN_COORDS ) {
@@ -401,29 +439,31 @@ void Underworld_MovingMesh_CalculateMinOrMaxCoordsOnSidewall(
 	}
 	else {
 		/* Loop over all nodes on the maximum side wall */
-		wallNodeIJK[ remeshAxis ] = topology->size[ remeshAxis ] - 1 ;
+		wallNodeIJK[ remeshAxis ] = vertGrid->sizes[ remeshAxis ] - 1 ;
 	}
 
 	sideWallNode_I = 0;
-	for ( aNode_I = 0 ; aNode_I < topology->size[ otherAxisA ] ; aNode_I++ ) {
+	for ( aNode_I = 0 ; aNode_I < vertGrid->sizes[ otherAxisA ] ; aNode_I++ ) {
 		wallNodeIJK[ otherAxisA ] = aNode_I;
-		for ( bNode_I = 0 ; bNode_I < topology->size[ otherAxisB ] ; bNode_I++ ) {
+		for ( bNode_I = 0 ; bNode_I < vertGrid->sizes[ otherAxisB ] ; bNode_I++ ) {
 			wallNodeIJK[ otherAxisB ] = bNode_I;
 
 			/* Convert to Local Index */
-			wallNode_lI = RegularMeshUtils_Node_Global3DToLocal1D(
-						meshDecomp, wallNodeIJK[0], wallNodeIJK[1], wallNodeIJK[2] );
+			wallNode_lI = RegularMeshUtils_Node_3DTo1D( mesh, wallNodeIJK );
 
 			/* Check to see whether this wall node is on this processor */
-			if ( wallNode_lI < mesh->nodeLocalCount ) {
+			if ( Mesh_GlobalToDomain( mesh, MT_VERTEX, wallNode_lI, &wallNode_lI ) && 
+			     wallNode_lI < Mesh_GetLocalSize( mesh, MT_VERTEX ) )
+			{
 				/* Record the current coord at this node */
-				currNodeCoord = Mesh_CoordAt( mesh, wallNode_lI );
+				currNodeCoord = Mesh_GetVertex( mesh, wallNode_lI );
 				newWallCoordsInRemeshAxis[sideWallNode_I] = currNodeCoord[remeshAxis];
 				/* Now add the velocity BC / solved velocity on this wall to see where it will move to */
 				FeVariable_GetValueAtNode( velocityField, wallNode_lI, velVector );
 				newWallCoordsInRemeshAxis[sideWallNode_I] += velVector[remeshAxis] * dt;
 				/* make sure that all the side wall stretches are the same if this is for a
 				 * parallelPipedHexa mesh */
+				/*
 				if ( ( True == atLeastOneLocalSideNodeProcessed ) &&
 					Stg_Class_IsInstance( mesh->layout->elementLayout, ParallelPipedHexaEL_Type ) )
 				{
@@ -451,7 +491,8 @@ void Underworld_MovingMesh_CalculateMinOrMaxCoordsOnSidewall(
 						velVector[remeshAxis], dt,
 						lastCalculatedWallNode_sideI, lastCalculatedWallNode_lI,
 						lastCalculatedNewWallCoordInRemeshAxis );
-				}	
+				}
+				*/
 				/* Copy values for comparison */
 				lastCalculatedWallNode_sideI = sideWallNode_I;
 				lastCalculatedWallNode_lI = wallNode_lI;
@@ -479,10 +520,11 @@ void Underworld_MovingMesh_CalculateMinOrMaxCoordsOnSidewall(
 		mpiOperation = MPI_MAX;
 	}	
 
+	comm = CommTopology_GetComm( Mesh_GetCommTopology( mesh, MT_VERTEX ) );
 	MPI_Allreduce( newWallCoordsInRemeshAxis, newWallCoordsInRemeshAxisGlobal, sideWallNodeCount,
-		MPI_DOUBLE, mpiOperation, meshDecomp->communicator );
+		       MPI_DOUBLE, mpiOperation, comm );
 
-	// TODO : should really do another iteration over all the nodes, checking identical 	
+	/* TODO : should really do another iteration over all the nodes, checking identical 	 */
 
 	Memory_Free( newWallCoordsInRemeshAxis );	
 }

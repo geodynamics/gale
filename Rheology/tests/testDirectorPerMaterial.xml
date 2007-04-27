@@ -5,7 +5,6 @@
 	
 	<!-- Component Stuff -->
 	<include>StgFEM/LinearMesh.xml                </include>
-	<include>StgFEM/ElementLayout.xml             </include>
 	<include>StgFEM/VelocityField.xml             </include>
 	<include>StgFEM/TimeIntegrator.xml            </include>
 	<include>PICellerator/MaterialPointSwarm.xml  </include>
@@ -21,7 +20,7 @@
 		<!-- Periodic boundary conditions -->
 		<struct name="periodicBCsManager">
 			<param name="Type">PeriodicBoundariesManager</param>
-			<param name="Geometry">geometry</param>
+			<param name="mesh">mesh-linear</param>
 			<param name="Swarm">materialSwarm</param>
 			<param name="TimeIntegrator">timeIntegrator</param>
 			

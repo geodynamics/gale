@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: StoreStress.c 358 2006-10-18 06:17:30Z SteveQuenette $
+** $Id: StoreStress.c 466 2007-04-27 06:24:33Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 #include <mpi.h>
@@ -176,7 +176,7 @@ void _StoreStress_Construct( void* rheology, Stg_ComponentFactory* cf, void* dat
 		MaterialPointsSwarm, 
 		True,
 		data );
-	// TODO : 'KeyFallback' soon to be deprecated/updated
+	/* TODO : 'KeyFallback' soon to be deprecated/updated */
 	strainRateField = Stg_ComponentFactory_ConstructByNameWithKeyFallback( 
 		cf, 
 		self->name,

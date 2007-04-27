@@ -39,24 +39,29 @@
 
 	void _Underworld_EulerDeform_Destroy( void* component, void* data );
 
+	Variable* EulerDeform_RegisterLocalNodeCoordsAsVariables( EulerDeform_System* sys, void* _variable_Register, 
+								  Variable** variableList );
+
 	void EulerDeform_IntegrationSetup( void* _timeIntegrator, void* _velField );
 
 	Bool EulerDeform_TimeDeriv( void* crdAdvector, Index arrayInd, double* timeDeriv );
 
 	void EulerDeform_Remesh( TimeIntegratee* crdAdvector, EulerDeform_Context* edCtx );
 
-	void EulerDeform_InterpVar( FieldVariable* field, Variable* var, Mesh* mesh, Coord* newCrds );
+	void EulerDeform_InterpVar( FieldVariable* field, Variable* var, Mesh* mesh, double** newCrds );
 
-	void EulerDeform_WrapTopSurface( EulerDeform_System* sys, Coord* oldCrds );
+	void EulerDeform_WrapTopSurface( EulerDeform_System* sys, double** oldCrds );
 
-	void EulerDeform_WrapBottomSurface( EulerDeform_System* sys, Coord* oldCrds );
+	void EulerDeform_WrapBottomSurface( EulerDeform_System* sys, double** oldCrds );
 
-	void EulerDeform_WrapLeftSurface( EulerDeform_System* sys, Coord* oldCrds );
+	void EulerDeform_WrapLeftSurface( EulerDeform_System* sys, double** oldCrds );
 
-	void EulerDeform_TopInternalLoop( EulerDeform_System* sys, GRM* grm, Coord* oldCrds, unsigned* ijk, unsigned curDim );
+	void EulerDeform_TopInternalLoop( EulerDeform_System* sys, Grid* grm, double** oldCrds, unsigned* ijk, unsigned curDim );
 
-	void EulerDeform_BottomInternalLoop( EulerDeform_System* sys, GRM* grm, Coord* oldCrds, unsigned* ijk, unsigned curDim );
+#if 0
+	void EulerDeform_BottomInternalLoop( EulerDeform_System* sys, Grid* grm, double** oldCrds, unsigned* ijk, unsigned curDim );
 
-	void EulerDeform_LeftInternalLoop( EulerDeform_System* sys, GRM* grm, Coord* oldCrds, unsigned* ijk, unsigned curDim );
+	void EulerDeform_LeftInternalLoop( EulerDeform_System* sys, Grid* grm, double** oldCrds, unsigned* ijk, unsigned curDim );
+#endif
 
 #endif

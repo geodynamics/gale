@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: Byerlee.c 358 2006-10-18 06:17:30Z SteveQuenette $
+** $Id: Byerlee.c 466 2007-04-27 06:24:33Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 #include <mpi.h>
@@ -105,7 +105,7 @@ Byerlee* _Byerlee_New(
 	return self;
 }
 
-void _Byerlee_Init( Byerlee* self, BlockGeometry* geometry, FiniteElement_Mesh* mesh, double depthCoefficient ) {
+void _Byerlee_Init( Byerlee* self, BlockGeometry* geometry, FeMesh* mesh, double depthCoefficient ) {
 	self->geometry = geometry;
 	self->mesh = mesh;
 	self->depthCoefficient = depthCoefficient;
@@ -134,15 +134,17 @@ void* _Byerlee_DefaultNew( Name name ) {
 void _Byerlee_Construct( void* rheology, Stg_ComponentFactory* cf, void* data ){
 	Byerlee*            self           = (Byerlee*)rheology;
 	BlockGeometry*      geometry;
-	FiniteElement_Mesh* mesh;
+	FeMesh*		    mesh;
 
 	/* Construct Parent */
 	_VonMises_Construct( self, cf, data );
-	// TODO: "KeyFallback' soon to be deprecated/updated
+	/* TODO: "KeyFallback' soon to be deprecated/updated */
+	/*
 	geometry = Stg_ComponentFactory_ConstructByNameWithKeyFallback(
                         cf, self->name, "geometry", "BlockGeometry", BlockGeometry, True, data );
+	*/
 	mesh     = Stg_ComponentFactory_ConstructByNameWithKeyFallback(
-                        cf, self->name, "mesh-linear", "FiniteElement_Mesh", FiniteElement_Mesh, True, data );
+                        cf, self->name, "mesh-linear", "FeMesh", FeMesh, True, data );
 	/*geometry = Stg_ComponentFactory_ConstructByKey( 
 			cf, self->name, "BlockGeometry", BlockGeometry, True );
 	mesh     = Stg_ComponentFactory_ConstructByKey( 
@@ -167,14 +169,16 @@ double _Byerlee_GetYieldCriterion(
 	Byerlee*                         self             = (Byerlee*) rheology;
 	double                           depth = 0.0;
 	double                           height;
+	Coord				 min, max;
 	Coord                            coord;
 
 	/* Calculate Depth */
-	height = self->geometry->max[ J_AXIS ];
+	Mesh_GetGlobalCoordRange( self->mesh, min, max );
+	height = max[ J_AXIS ];
 
 	/* This rheology assumes particle is an integration points thats can be mapped to a particle
 	 * that has no meaningful coord. Best to re-calc the global from local */
-	FiniteElement_Mesh_CalcGlobalCoordFromLocalCoord( self->mesh, constitutiveMatrix->dim, lElement_I, xi, coord );
+	FeMesh_CoordLocalToGlobal( self->mesh, lElement_I, xi, coord );
 	depth = height - coord[ J_AXIS ];
 	
 	return self->cohesion + self->depthCoefficient * depth;

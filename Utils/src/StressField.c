@@ -82,15 +82,12 @@ void _StressField_Init(
 		Variable*                                         stressVariable,
 		Variable_Register*                                variable_Register )
 {
-	Name              tmpName;
-	Name              variableName[6];
-	Index             variable_I;
-	Node_DomainIndex  node_I;
-	Dimension_Index   dim               = constitutiveMatrix->dim;
+	Dimension_Index   dim = constitutiveMatrix->dim;
 
 	/* Assign Pointers */
 	self->strainRateField    = strainRateField;
 	self->constitutiveMatrix = constitutiveMatrix;
+	self->variable_Register = variable_Register;
 
 	self->fieldComponentCount = StGermain_nSymmetricTensorVectorComponents( dim );
 
@@ -98,52 +95,6 @@ void _StressField_Init(
 		self->stressVariable = stressVariable;
 		self->_valueAtParticle = _StressField_ValueAtParticle_FromVariable;
 	}
-
-	if ( dim == 2 ) {
-		variableName[0] = StG_Strdup( "tau_xx" );
-		variableName[1] = StG_Strdup( "tau_yy" );
-		variableName[2] = StG_Strdup( "tau_xy" );
-	}
-	else {
-		variableName[0] = StG_Strdup( "tau_xx" );
-		variableName[1] = StG_Strdup( "tau_yy" );
-		variableName[2] = StG_Strdup( "tau_zz" );
-		variableName[3] = StG_Strdup( "tau_xy" );
-		variableName[4] = StG_Strdup( "tau_xz" );
-		variableName[5] = StG_Strdup( "tau_yz" );
-	}
-
-	/* Create Variable to store data */
-	tmpName = Stg_Object_AppendSuffix( self, "DataVariable" );
-	self->dataVariable = Variable_NewVector( 	
-			tmpName,
-			Variable_DataType_Double, 
-			self->fieldComponentCount,
-			&self->feMesh->nodeDomainCount, 
-			(void**)&self->data, 
-			variable_Register,
-			variableName[0],
-			variableName[1],
-			variableName[2],
-			variableName[3],
-			variableName[4],
-			variableName[5] );
-	Memory_Free( tmpName );
-	
-	/* Create Dof Layout */
-	tmpName = Stg_Object_AppendSuffix( self, "DofLayout" );
-	self->dofLayout = DofLayout_New( tmpName, variable_Register, self->feMesh->layout->decomp->nodeDomainCount );
-	for( variable_I = 0; variable_I < self->fieldComponentCount ; variable_I++ ) {
-		self->dataVariableList[ variable_I ] = Variable_Register_GetByName( variable_Register, variableName[ variable_I ] );
-		for( node_I = 0; node_I < self->feMesh->layout->decomp->nodeDomainCount ; node_I++ ) {
-			DofLayout_AddDof_ByVarName( self->dofLayout, variableName[variable_I], node_I );
-		}
-		/* Free Name */
-		Memory_Free( variableName[ variable_I ] );
-	}
-	Memory_Free( tmpName );
-	self->eqNum->dofLayout = self->dofLayout;
-	
 		
 	/* Set pointers to swarm to be the same as the one on the constitutive matrix */
 	self->assemblyTerm->integrationSwarm = self->constitutiveMatrix->integrationSwarm;
@@ -237,7 +188,60 @@ void _StressField_Construct( void* stressField, Stg_ComponentFactory* cf, void* 
 
 void _StressField_Build( void* stressField, void* data ) {
 	StressField* self = (StressField*) stressField;
+	Name              tmpName;
+	Name              variableName[6];
+	Dimension_Index   dim = self->constitutiveMatrix->dim;
 	Variable_Index variable_I;
+	Node_DomainIndex  node_I;
+
+	Build( self->feMesh, data, False );
+
+	if ( dim == 2 ) {
+		variableName[0] = StG_Strdup( "tau_xx" );
+		variableName[1] = StG_Strdup( "tau_yy" );
+		variableName[2] = StG_Strdup( "tau_xy" );
+	}
+	else {
+		variableName[0] = StG_Strdup( "tau_xx" );
+		variableName[1] = StG_Strdup( "tau_yy" );
+		variableName[2] = StG_Strdup( "tau_zz" );
+		variableName[3] = StG_Strdup( "tau_xy" );
+		variableName[4] = StG_Strdup( "tau_xz" );
+		variableName[5] = StG_Strdup( "tau_yz" );
+	}
+
+	/* Create Variable to store data */
+	tmpName = Stg_Object_AppendSuffix( self, "DataVariable" );
+	self->dataVariable = Variable_NewVector( 	
+			tmpName,
+			Variable_DataType_Double, 
+			self->fieldComponentCount,
+			&self->feMesh->topo->domains[MT_VERTEX]->nDomains, 
+			(void**)&self->data, 
+			self->variable_Register,
+			variableName[0],
+			variableName[1],
+			variableName[2],
+			variableName[3],
+			variableName[4],
+			variableName[5] );
+	Memory_Free( tmpName );
+	
+	/* Create Dof Layout */
+	tmpName = Stg_Object_AppendSuffix( self, "DofLayout" );
+	self->dofLayout = DofLayout_New( tmpName, self->variable_Register, 0, self->feMesh );
+	self->dofLayout->_numItemsInLayout = FeMesh_GetNodeDomainSize( self->feMesh );
+	for( variable_I = 0; variable_I < self->fieldComponentCount ; variable_I++ ) {
+		self->dataVariableList[ variable_I ] = Variable_Register_GetByName( self->variable_Register, 
+										    variableName[ variable_I ] );
+		for( node_I = 0; node_I < FeMesh_GetNodeDomainSize( self->feMesh ); node_I++ ) {
+			DofLayout_AddDof_ByVarName( self->dofLayout, variableName[variable_I], node_I );
+		}
+		/* Free Name */
+		Memory_Free( variableName[ variable_I ] );
+	}
+	Memory_Free( tmpName );
+	self->eqNum->dofLayout = self->dofLayout;
 
 	/* Build and Update all Variables that this component has created */
 	Stg_Component_Build( self->dataVariable, data, False); Variable_Update( self->dataVariable );

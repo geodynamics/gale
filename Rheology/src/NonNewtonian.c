@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: NonNewtonian.c 358 2006-10-18 06:17:30Z SteveQuenette $
+** $Id: NonNewtonian.c 466 2007-04-27 06:24:33Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 #include <mpi.h>
@@ -126,7 +126,7 @@ void _NonNewtonian_Construct( void* rheology, Stg_ComponentFactory* cf, void* da
 	/* Construct Parent */
 	_Rheology_Construct( self, cf, data );
 	
-	// TODO: 'Keyfallback' soon to be deprecated/updated
+	/* TODO: 'Keyfallback' soon to be deprecated/updated */
 	strainRateInvField = Stg_ComponentFactory_ConstructByNameWithKeyFallback( 
 		cf, 
 		self->name,

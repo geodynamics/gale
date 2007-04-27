@@ -79,28 +79,9 @@ void _ViscosityField_Init(
 		ConstitutiveMatrix*                               constitutiveMatrix,
 		Variable_Register*                                variable_Register )
 {
-	Name              tmpName;
-
 	/* Assign Pointers */
+	self->variable_Register = variable_Register;
 	self->constitutiveMatrix = constitutiveMatrix;
-
-	/* Create Dof Layout */
-	tmpName = Stg_Object_AppendSuffix( self, "DataVariable" );
-	self->dataVariable = Variable_NewScalar( 	
-			tmpName,
-			Variable_DataType_Double, 
-			&self->feMesh->nodeDomainCount, 
-			(void**)&self->data, 
-			variable_Register );
-	Memory_Free( tmpName );
-	self->fieldComponentCount = 1;
-	
-	tmpName = Stg_Object_AppendSuffix( self, "DofLayout" );
-	self->dofLayout = DofLayout_New( tmpName, variable_Register, self->feMesh->layout->decomp->nodeDomainCount );
-	DofLayout_AddAllFromVariableArray( self->dofLayout, 1, &self->dataVariable );
-	Memory_Free( tmpName );
-	self->eqNum->dofLayout = self->dofLayout;
-	
 	
 	/* Set pointers to swarm to be the same as the one on the constitutive matrix */
 	self->assemblyTerm->integrationSwarm = self->constitutiveMatrix->integrationSwarm;
@@ -185,6 +166,27 @@ void _ViscosityField_Construct( void* viscosityField, Stg_ComponentFactory* cf, 
 
 void _ViscosityField_Build( void* viscosityField, void* data ) {
 	ViscosityField* self = (ViscosityField*) viscosityField;
+	Name              tmpName;
+
+	Build( self->feMesh, data, False );
+
+	/* Create Dof Layout */
+	tmpName = Stg_Object_AppendSuffix( self, "DataVariable" );
+	self->dataVariable = Variable_NewScalar( 	
+			tmpName,
+			Variable_DataType_Double, 
+			&self->feMesh->topo->domains[MT_VERTEX]->nDomains, 
+			(void**)&self->data, 
+			self->variable_Register );
+	Memory_Free( tmpName );
+	self->fieldComponentCount = 1;
+	
+	tmpName = Stg_Object_AppendSuffix( self, "DofLayout" );
+	self->dofLayout = DofLayout_New( tmpName, self->variable_Register, 0, self->feMesh );
+	self->dofLayout->_numItemsInLayout = FeMesh_GetNodeDomainSize( self->feMesh );
+	DofLayout_AddAllFromVariableArray( self->dofLayout, 1, &self->dataVariable );
+	Memory_Free( tmpName );
+	self->eqNum->dofLayout = self->dofLayout;
 
 	_ParticleFeVariable_Build( self, data );
 }

@@ -89,14 +89,14 @@ void _DensityField_Init(
 	self->dataVariable = Variable_NewScalar( 	
 			tmpName,
 			Variable_DataType_Double, 
-			&self->feMesh->nodeDomainCount, 
+			&self->feMesh->topo->domains[MT_VERTEX]->nDomains, 
 			(void**)&self->data, 
 			variable_Register );
 	Memory_Free( tmpName );
 	self->fieldComponentCount = 1;
 	
 	tmpName = Stg_Object_AppendSuffix( self, "DofLayout" );
-	self->dofLayout = DofLayout_New( tmpName, variable_Register, self->feMesh->layout->decomp->nodeDomainCount );
+	self->dofLayout = DofLayout_New( tmpName, variable_Register, 0, self->feMesh );
 	DofLayout_AddAllFromVariableArray( self->dofLayout, 1, &self->dataVariable );
 	Memory_Free( tmpName );
 	self->eqNum->dofLayout = self->dofLayout;

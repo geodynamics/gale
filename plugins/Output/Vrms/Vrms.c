@@ -38,10 +38,11 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: Vrms.c 358 2006-10-18 06:17:30Z SteveQuenette $
+** $Id: Vrms.c 466 2007-04-27 06:24:33Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 #include <mpi.h>
+#include <assert.h>
 #include <StGermain/StGermain.h>
 #include <StgFEM/StgFEM.h>
 #include <PICellerator/PICellerator.h>
@@ -62,6 +63,22 @@ void _Underworld_Vrms_Construct( void* component, Stg_ComponentFactory* cf, void
 	ContextEP_Append( context, AbstractContext_EP_FrequentOutput     , Underworld_Vrms_Dump );
 }
 
+void _Underworld_Vrms_Build( void* component, void* data ) {
+	Underworld_Vrms*	self = (Underworld_Vrms*)component;
+
+	assert( self );
+
+	Build( self->velocitySquaredField, data, False );
+}
+
+void _Underworld_Vrms_Initialise( void* component, void* data ) {
+	Underworld_Vrms*	self = (Underworld_Vrms*)component;
+
+	assert( self );
+
+	Initialise( self->velocitySquaredField, data, False );
+}
+
 void* _Underworld_Vrms_DefaultNew( Name name ) {
 	return _Codelet_New(
 		sizeof(Underworld_Vrms),
@@ -71,8 +88,8 @@ void* _Underworld_Vrms_DefaultNew( Name name ) {
 		_Codelet_Copy,
 		_Underworld_Vrms_DefaultNew,
 		_Underworld_Vrms_Construct,
-		_Codelet_Build,
-		_Codelet_Initialise,
+		_Underworld_Vrms_Build,
+		_Underworld_Vrms_Initialise,
 		_Codelet_Execute,
 		_Codelet_Destroy,
 		name );
@@ -110,7 +127,8 @@ void Underworld_Vrms_Setup( void* _context ) {
 /* Integrate Every Step and dump to file */
 void Underworld_Vrms_Dump( void* _context ) {
 	UnderworldContext*                   context       = (UnderworldContext*) _context;
-	BlockGeometry*                       geometry;
+	Mesh*			   	     mesh;
+	double		    	  	     maxCrd[3], minCrd[3];
 	double                               integral;
 	double                               vrms;
 	double                               volume        = 0.0;
@@ -121,16 +139,18 @@ void Underworld_Vrms_Dump( void* _context ) {
 	self = (Underworld_Vrms*)LiveComponentRegister_Get(
 					context->CF->LCRegister,
 					Underworld_Vrms_Type );
+
+	mesh = (Mesh*)self->velocitySquaredField->feMesh;
+	Mesh_GetGlobalCoordRange( mesh, minCrd, maxCrd );
 	
 	/* Sum integral */
 	integral = FeVariable_Integrate( self->velocitySquaredField, context->gaussSwarm );
 
 	/* Get Volume of Mesh - TODO Make general for irregular meshes */
-	geometry = Stg_CheckType( self->velocitySquaredField->feMesh->layout->elementLayout->geometry, BlockGeometry );
-	volume = ( geometry->max[ I_AXIS ] - geometry->min[ I_AXIS ] ) * 
-		( geometry->max[ J_AXIS ] - geometry->min[ J_AXIS ] );
+	volume = ( maxCrd[ I_AXIS ] - minCrd[ I_AXIS ] ) * 
+		( maxCrd[ J_AXIS ] - minCrd[ J_AXIS ] );
 	if ( dim == 3 ) 
-		volume *= geometry->max[ K_AXIS ] - geometry->min[ K_AXIS ];
+		volume *= maxCrd[ K_AXIS ] - minCrd[ K_AXIS ];
 
 	/* Calculate Vrms 
 	 * V_{rms} = \sqrt{ \frac{ \int_\Omega \mathbf{u . u} d\Omega }{\Omega} } */

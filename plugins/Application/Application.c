@@ -47,16 +47,16 @@
 #endif
 
 #include <mpi.h>
-//EP_APPLICATIONS_FINALISE defined in StGermain.h
+/*EP_APPLICATIONS_FINALISE defined in StGermain.h */
 #include <StGermain/StGermain.h>
-//Must include StgFEM library, but WON'T call Stg_FEM_Init in this plugin.
+/*Must include StgFEM library, but WON'T call Stg_FEM_Init in this plugin. */
 #include <StgFEM/StgFEM.h>
 #include <PICellerator/PICellerator.h>
 #include <Underworld/Underworld.h>
 #include "Application.h"
 
 #include <stdio.h>
-//for strcmp
+/*for strcmp */
 #include <string.h>
 
 const Type Underworld_Application_Type = "Underworld_Application";
@@ -72,53 +72,53 @@ void _Underworld_Application_Construct( void* component, Stg_ComponentFactory* c
 	EntryPoint* applicationsPostConstruct_EP;
 	#endif
 
-	//Get the existing abstract context, as defined by StGermain.
-	//Get it up here, so the communicator can be used for messages.
+	/*Get the existing abstract context, as defined by StGermain. */
+	/*Get it up here, so the communicator can be used for messages. */
 	prevContext = (AbstractContext*)Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
 
-	//Only need to initialise a new context, and copy all relevant registers over IF this is the first application
-	//plugin to be constructed.
-	//The first application plugin to be constructed is Guaranteed to have the 'largest' context.
-	//			(ie is an inherited child of ALL other application plugins about to be loaded)
+	/*Only need to initialise a new context, and copy all relevant registers over IF this is the first application */
+	/*plugin to be constructed. */
+	/*The first application plugin to be constructed is Guaranteed to have the 'largest' context. */
+	/*			(ie is an inherited child of ALL other application plugins about to be loaded) */
 	if( prevContext->type == AbstractContext_Type )
 	{
-		//Set the existing abstract context.
+          /*Set the existing abstract context. */
 		currAbstractContext = prevContext;
-		//Create a new, empty UnderworldContext.
+		/*Create a new, empty UnderworldContext. */
 		context = UnderworldContext_New( "context", 0, 0, currAbstractContext->communicator, cf->rootDict );
 	
 		context->dictionary = cf->rootDict;
 	
-		//Initialise Abstract parts of UnderworldContext
+		/*Initialise Abstract parts of UnderworldContext */
 		_AbstractContext_Init((AbstractContext*)context, 0, 0, MPI_COMM_WORLD );
-		//Initialise Discretisation parts of UnderworldContext
+		/*Initialise Discretisation parts of UnderworldContext */
 		_DiscretisationContext_Init((DiscretisationContext*)context );
-		//Initialise FiniteElement parts of UnderworldContext
+		/*Initialise FiniteElement parts of UnderworldContext */
 		_FiniteElementContext_Init( (FiniteElementContext*)context );
-		//Initialise PIcellerator parts of UnderworldContext
+		/*Initialise PIcellerator parts of UnderworldContext */
 		_PICelleratorContext_Init( (PICelleratorContext*)context );
-		//Initialise Underworld parts of UnderworldContext
+		/*Initialise Underworld parts of UnderworldContext */
 		_UnderworldContext_Init( context );
 	
-	       	//Need to get the old CF from currAbstractContext, and use that in my new context.
-	        //Now I CANNOT delete this currAbstractContext or I'll lose the CF. :(
+	       	/*Need to get the old CF from currAbstractContext, and use that in my new context. */
+	        /*Now I CANNOT delete this currAbstractContext or I'll lose the CF. :( */
 	        context->CF = currAbstractContext->CF;
 
-	        //Need to get the LCRegister componentList, and replace the existing (abstract) context 
-		//with the newly created (Underworld) context!!!
+	        /*Need to get the LCRegister componentList, and replace the existing (abstract) context  */
+		/*with the newly created (Underworld) context!!! */
 	        Stg_ObjectList_Replace( context->CF->LCRegister->componentList,
                                 	((Stg_Component*) currAbstractContext)->name, 
 					KEEP, 
 					(Stg_Component*) context);
 	
-		//Recreate the registerRegister link in CF.
+		/*Recreate the registerRegister link in CF. */
 		context->CF->registerRegister = context->register_Register;
 
-		//Create the EntryPoint for all application plugins' finalise functions to hook into.
+		/*Create the EntryPoint for all application plugins' finalise functions to hook into. */
 	        applicationsFinalise_EP = EntryPoint_New( EP_APPLICATIONS_FINALISE, EntryPoint_VoidPtr_CastType );
 	        EntryPoint_Register_Add(context->entryPoint_Register, (void*)applicationsFinalise_EP);
-	} //close of if(context->type == AbstractContext_Type)
-	else //prevContext was NOT an abstract context -> that is does NOT need to be replaced
+	} /*close of if(context->type == AbstractContext_Type) */
+	else /*prevContext was NOT an abstract context -> that is does NOT need to be replaced */
 		context = (UnderworldContext*) prevContext;
 
         EntryPoint_Append( Context_GetEntryPoint( context, EP_APPLICATIONS_FINALISE ),
@@ -151,7 +151,7 @@ void* _Underworld_Application_DefaultNew( Name name ) {
 
 Index Underworld_Application_Register( PluginsManager* pluginsManager ) 
 {
-	//Initialise the Underworld context.
+  /*Initialise the Underworld context. */
         Underworld_Init( NULL, NULL);
 	#ifdef HAVE_PYTHON
 	Py_Initialize();

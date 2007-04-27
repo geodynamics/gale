@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: DepthDependentViscosity.c 358 2006-10-18 06:17:30Z SteveQuenette $
+** $Id: DepthDependentViscosity.c 466 2007-04-27 06:24:33Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 #include <mpi.h>
@@ -95,7 +95,7 @@ DepthDependentViscosity* _DepthDependentViscosity_New(
 	return self;
 }
 
-void _DepthDependentViscosity_Init( DepthDependentViscosity* self, FiniteElement_Mesh* feMesh, double eta0, double gamma, Axis variationAxis, double referencePoint ) {
+void _DepthDependentViscosity_Init( DepthDependentViscosity* self, FeMesh* feMesh, double eta0, double gamma, Axis variationAxis, double referencePoint ) {
 	self->feMesh          = feMesh;
 	self->eta0            = eta0;
 	self->gamma           = gamma;
@@ -122,7 +122,7 @@ void* _DepthDependentViscosity_DefaultNew( Name name ) {
 
 void _DepthDependentViscosity_Construct( void* rheology, Stg_ComponentFactory* cf, void* data ){
 	DepthDependentViscosity*  self                   = (DepthDependentViscosity*)rheology;
-	FiniteElement_Mesh*       feMesh;
+	FeMesh*  		  feMesh;
 	Axis                      variationAxis          = 0;
 	Name                      variationAxisName;
 	Stream*                   errorStream            = Journal_Register( Error_Type, self->type );
@@ -130,7 +130,7 @@ void _DepthDependentViscosity_Construct( void* rheology, Stg_ComponentFactory* c
 	/* Construct Parent */
 	_Rheology_Construct( self, cf, data );
 	
-	feMesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Mesh", FiniteElement_Mesh, True, data ) ;
+	feMesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Mesh", FeMesh, True, data ) ;
 
 	variationAxisName = Stg_ComponentFactory_GetString( cf, self->name, "variationAxis", "Y" );
 
@@ -181,7 +181,7 @@ void _DepthDependentViscosity_ModifyConstitutiveMatrix(
 	 * that has no meaningful coord. Best to re-calc the global from local */
 
 	/* Calculate distance */
-	FiniteElement_Mesh_CalcGlobalCoordFromLocalCoord( swarm->mesh, swarm->dim, lElement_I, xi, coord );
+	FeMesh_CoordLocalToGlobal( swarm->mesh, lElement_I, xi, coord );
 	distance = coord[ self->variationAxis ];
 
 	/* Calculate New Viscosity */

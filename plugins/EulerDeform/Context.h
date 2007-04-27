@@ -33,6 +33,7 @@
 
 	struct EulerDeform_System {
 		Mesh*		mesh;
+		double*		verts;
 		Remesher*	remesher;
 		FieldVariable*	velField;
 		unsigned	nFields;
@@ -43,7 +44,7 @@
 		Bool		wrapLeft;
 
 		Bool		staticSides;
-		Coord*		sideCoords;
+		double**	sideCoords;
 	};
 
 #endif

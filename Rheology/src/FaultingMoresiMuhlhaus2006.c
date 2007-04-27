@@ -38,11 +38,12 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: FaultingMoresiMuhlhaus2006.c 358 2006-10-18 06:17:30Z SteveQuenette $
+** $Id: FaultingMoresiMuhlhaus2006.c 466 2007-04-27 06:24:33Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
+#include <stdlib.h>
 #include <mpi.h>
 #include <StGermain/StGermain.h>
 #include <StgFEM/StgFEM.h>
@@ -340,12 +341,12 @@ void _FaultingMoresiMuhlhaus2006_Initialise( void* rheology, void* data ) {
 			
 			initialDamageFraction = StrainWeakening_GetInitialDamageFraction( self->strainWeakening, materialPoint );
 		
-			if (drand48() < initialDamageFraction) {
+			if (rand() < RAND_MAX*initialDamageFraction) {
 				normalLength2 = 0.0;
 				
 				for( dof_I=0; dof_I < dim ; dof_I++) {
 					
-					normal[dof_I] = 1.0 - 2.0 * drand48(); 
+					normal[dof_I] = 1.0 - (2.0 * rand())/RAND_MAX; 
 					normalLength2 += normal[dof_I] * normal[dof_I];
 				}
 				
@@ -926,7 +927,7 @@ void _FaultingMoresiMuhlhaus2006_UpdateDrawParameters( void* rheology ) {
 		opacity    = (slipRate/globalMaxSlipRate);
 		
 		if (opacity > 0.90)
-			opacity = 1.0;//this condition is to make sure we have enough planes that will be clearly seen.
+			opacity = 1.0;/* this condition is to make sure we have enough planes that will be clearly seen. */ /*
 
 		Variable_SetValueFloat( self->brightness->variable, lParticle_I, brightness );
 		Variable_SetValueFloat( self->opacity->variable,    lParticle_I, opacity );

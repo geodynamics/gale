@@ -180,7 +180,7 @@
 
 
 	<!-- Simulation control -->
-	<param name="maxTimeSteps"> 300 </param>
+	<param name="maxTimeSteps"> 10 </param>
 	<param name="outputPath"> ./output </param>
 	<param name="dumpEvery"> 1 </param>	
 
@@ -197,7 +197,7 @@
 	<param name="journal-level-branch.debug.StgFEM"> 2 </param>	
 	
 	<!-- Geometry & Mesh setup -->
-	<param name="dim"> 3 </param>
+	<param name="dim"> 2 </param>
 	<!-- Note : for proper resolution of the problem, it is strongly recommended you run
 	     this problem in parallel, with at least 100 * 50 * 100 elements. The values below are for
 	     small testing / demonstration only. -->
@@ -222,12 +222,9 @@
 
 	<!-- Integration Scheme configuration -->
 
-	<!--
-	<param name="Gravity">10.0</param>
-	-->
+	<!--param name="Gravity">10.0</param-->
+
 	<!-- Visualisation stuff -->
 	<include>Underworld/Viewports/Extension3DVP.xml</include>
-<!--
--->
 
 </StGermainData>

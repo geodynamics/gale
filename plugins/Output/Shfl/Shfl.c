@@ -91,18 +91,18 @@ void Underworld_Shfl_Setup( UnderworldContext* context ) {
 			Underworld_Error,
 			"Cannot find gauss swarm. Cannot use %s.\n", CURR_MODULE_NAME );
 
-	// Create Some FeVariables to calculate shear heat flux 
+	/* Create Some FeVariables to calculate shear heat flux  */
 	temperatureField          = FieldVariable_Register_GetByName( fV_Register, "TemperatureField" );
 	velocityField             = FieldVariable_Register_GetByName( fV_Register, "VelocityField" );
 	temperatureGradientsField = FieldVariable_Register_GetByName( fV_Register, "TemperatureGradientsField" );
 	
-	// get uT
+	/* get uT */
 	advectiveHeatFluxField = OperatorFeVariable_NewBinary(  
 			"AdvectiveHeatFluxField",
 			temperatureField, 
 			velocityField, 
 			"VectorScale" );
-	// get dTdz - uT
+	/* get dTdz - uT */
 	temperatureTotalDerivField = OperatorFeVariable_NewBinary(  
 			"TemperatureTotalDerivField",
 			advectiveHeatFluxField, 
@@ -130,7 +130,7 @@ void Underworld_Shfl_Output( UnderworldContext* context ) {
 				context->CF->LCRegister,
 				Underworld_Shfl_Type );
 
-	// get_layer value
+	/* get_layer value */
 	self->shfl = FeVariable_AveragePlane( self->dTField, J_AXIS, 1.0 );
 	temp =   FeVariable_AveragePlane( temperatureField, J_AXIS, 0.0 );
 	

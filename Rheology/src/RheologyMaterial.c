@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: RheologyMaterial.c 446 2007-03-04 09:55:46Z PatrickSunter $
+** $Id: RheologyMaterial.c 466 2007-04-27 06:24:33Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -220,7 +220,7 @@ void _RheologyMaterial_Init(
 	for ( rheology_I = 0 ; rheology_I < rheologyCount ; rheology_I++ ) 
 		Rheology_Register_Add( self->rheology_Register, rheologyList[ rheology_I ] );
 
-//	self->debug = Journal_Register( Debug_Type, self->type ); /* TODO make child of Underworld_Debug */
+        /*	self->debug = Journal_Register( Debug_Type, self->type ); /* TODO make child of Underworld_Debug */
 }
 
 

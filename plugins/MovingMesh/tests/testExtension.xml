@@ -11,7 +11,6 @@
 
 	<!-- Component Stuff -->
 	<include>StgFEM/ConstantMesh.xml               </include>
-	<include>StgFEM/ElementLayout.xml              </include>
 	<include>StgFEM/LinearMesh.xml                 </include>
 	<include>StgFEM/VelocityField.xml              </include>
 	<include>StgFEM/TimeIntegrator.xml             </include>
@@ -58,6 +57,7 @@
 	<param name="minZ"> 0.0 </param>
 	<param name="maxX"> 1.0 </param>
 	<param name="maxY"> 1.0 </param>
+	<param name="maxZ"> 1.0 </param>
 
 	<!-- Remeshing control -->
 	<param name="remeshAccordingToIAxis"> True </param>

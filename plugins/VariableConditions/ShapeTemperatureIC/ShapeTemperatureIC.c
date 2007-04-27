@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: ShapeTemperatureIC.c 358 2006-10-18 06:17:30Z SteveQuenette $
+** $Id: ShapeTemperatureIC.c 466 2007-04-27 06:24:33Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -59,7 +59,7 @@ typedef struct {
 void Underworld_ShapeTemperatureICFunction( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
 	UnderworldContext*      context            = (UnderworldContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
-	FiniteElement_Mesh*     mesh               = NULL;
+	FeMesh*			mesh               = NULL;
 	double*                 result             = (double*) _result;
 	Stg_Shape*              shape;
 	Name                    shapeName;
@@ -72,7 +72,7 @@ void Underworld_ShapeTemperatureICFunction( Node_LocalIndex node_lI, Variable_In
 	assert( shape );
 
 	/* Find coordinate of node */
-	coord = Mesh_CoordAt( mesh, node_lI );
+	coord = Mesh_GetVertex( mesh, node_lI );
 
 	if ( Stg_Shape_IsCoordInside( shape, coord ) ) 
 		*result = 1.0;

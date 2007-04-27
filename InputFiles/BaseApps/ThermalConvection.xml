@@ -8,7 +8,6 @@
 	</list>
 
 	<!-- Component Stuff -->
-	<include>StgFEM/ElementLayout.xml          </include>
 	<include>StgFEM/ConstantMesh.xml           </include>
 	<include>StgFEM/LinearMesh.xml             </include>
 	<include>StgFEM/VelocityField.xml          </include>
@@ -17,6 +16,7 @@
 	<include>Underworld/GaussSwarm.xml         </include>
 	<include>Underworld/StokesFlowUzawa.xml    </include>
 	<include>StgFEM/TempAdvDiff.xml            </include>
+
 	<struct name="components" mergeType="merge">
 		<struct name="buoyancyForceTerm">
 			<param name="Type">ThermalBuoyancyForceTerm</param>

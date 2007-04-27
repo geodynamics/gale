@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: FrankKamenetskii.c 358 2006-10-18 06:17:30Z SteveQuenette $
+** $Id: FrankKamenetskii.c 466 2007-04-27 06:24:33Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 #include <mpi.h>
@@ -124,7 +124,7 @@ void _FrankKamenetskii_Construct( void* rheology, Stg_ComponentFactory* cf, void
 	/* Construct Parent */
 	_Rheology_Construct( self, cf, data );
 	
-	// TODO: KeyFallback soon to be deprecated/updated
+	/* TODO: KeyFallback soon to be deprecated/updated */
 	temperatureField = Stg_ComponentFactory_ConstructByNameWithKeyFallback( 
 		cf, 
 		self->name, 
@@ -133,7 +133,7 @@ void _FrankKamenetskii_Construct( void* rheology, Stg_ComponentFactory* cf, void
 		FeVariable, 
 		True,
 		data );
-	//temperatureField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "TemperatureField", FeVariable, True );
+	/*temperatureField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "TemperatureField", FeVariable, True ); */
 	
 	_FrankKamenetskii_Init( 
 			self, 

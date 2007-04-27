@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: Nusselt.c 358 2006-10-18 06:17:30Z SteveQuenette $
+** $Id: Nusselt.c 466 2007-04-27 06:24:33Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -63,6 +63,14 @@ void _Underworld_Nusselt_Construct( void* component, Stg_ComponentFactory* cf, v
 	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, Underworld_Nusselt_Output );
 }
 
+void _Underworld_Nusselt_Build( void* component, void* data ) {
+	Underworld_Nusselt*	self = (Underworld_Nusselt*)component;
+
+	Build( self->advectiveHeatFluxField, data, False );
+	Build( self->temperatureTotalDerivField, data, False );
+	Build( self->temperatureVertDerivField, data, False );
+}
+
 void* _Underworld_Nusselt_DefaultNew( Name name ) {
 	return _Codelet_New(
 		sizeof(Underworld_Nusselt),
@@ -72,7 +80,7 @@ void* _Underworld_Nusselt_DefaultNew( Name name ) {
 		_Codelet_Copy,
 		_Underworld_Nusselt_DefaultNew,
 		_Underworld_Nusselt_Construct,
-		_Codelet_Build,
+		_Underworld_Nusselt_Build,
 		_Codelet_Initialise,
 		_Codelet_Execute,
 		_Codelet_Destroy,
@@ -88,8 +96,6 @@ void Underworld_Nusselt_Setup( UnderworldContext* context ) {
 	FieldVariable*                       temperatureGradientsField;
 	FieldVariable*                       velocityField;
 	FieldVariable*                       temperatureField;
-	OperatorFeVariable*                  advectiveHeatFluxField;
-	OperatorFeVariable*                  temperatureTotalDerivField;
 
 	Underworld_Nusselt* self;
 
@@ -109,27 +115,27 @@ void Underworld_Nusselt_Setup( UnderworldContext* context ) {
 	velocityField             = FieldVariable_Register_GetByName( fV_Register, "VelocityField" );
 	temperatureGradientsField = FieldVariable_Register_GetByName( fV_Register, "TemperatureGradientsField" );
 	
-	advectiveHeatFluxField = OperatorFeVariable_NewBinary(  
+	self->advectiveHeatFluxField = OperatorFeVariable_NewBinary(  
 			"AdvectiveHeatFluxField",
 			temperatureField, 
 			velocityField, 
 			"VectorScale" );
 
-	temperatureTotalDerivField = OperatorFeVariable_NewBinary(  
+	self->temperatureTotalDerivField = OperatorFeVariable_NewBinary(  
 			"TemperatureTotalDerivField",
-			advectiveHeatFluxField, 
+			self->advectiveHeatFluxField, 
 			temperatureGradientsField, 
 			"Subtraction" );
 	
 	self->temperatureVertDerivField = (FeVariable*) OperatorFeVariable_NewUnary(  
 			"VerticalAdvectiveHeatFluxField",
-			temperatureTotalDerivField, 
+			self->temperatureTotalDerivField, 
 			"TakeSecondComponent" );
 	self->temperatureVertDerivField->feMesh = ((FeVariable*)velocityField)->feMesh;
 
 	/* Add the variables to register so we can checkpoint & examine if necessary */
-	FieldVariable_Register_Add( fV_Register, advectiveHeatFluxField );
-	FieldVariable_Register_Add( fV_Register, temperatureTotalDerivField );
+	FieldVariable_Register_Add( fV_Register, self->advectiveHeatFluxField );
+	FieldVariable_Register_Add( fV_Register, self->temperatureTotalDerivField );
 	FieldVariable_Register_Add( fV_Register, self->temperatureVertDerivField );
 
 }

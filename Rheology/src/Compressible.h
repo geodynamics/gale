@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: Compressible.h 430 2007-02-07 00:10:36Z PatrickSunter $
+** $Id: Compressible.h 466 2007-04-27 06:24:33Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -56,7 +56,7 @@
 		/* Virtual functions go here */ \
 		/* Material Parameters */\
 		double                                              oneOnLambda;                                \
-		FiniteElement_Mesh*                                 geometryMesh;                               \
+		FeMesh*   		                            geometryMesh;                               \
 		Materials_Register*                                 materials_Register;
 
 	struct Compressible { __Compressible };

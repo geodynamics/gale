@@ -202,8 +202,8 @@
 	
 	<!-- Geometry & Mesh setup -->
 	<param name="dim"> 2 </param>             <!--this is a 2D problem-->
-	<param name="elementResI"> 120 </param>   <!--number of elements in x-direction-->
-	<param name="elementResJ"> 60 </param>    <!--number of elements in y-direction-->
+	<param name="elementResI"> 60 </param>   <!--number of elements in x-direction-->
+	<param name="elementResJ"> 30 </param>    <!--number of elements in y-direction-->
 	<param name="elementResK"> 10 </param>    <!--number of elements in z-direction (not necessary here)-->
 	<param name="shadowDepth"> 1 </param>     <!--used for parallel purpose-->
 

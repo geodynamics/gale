@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: Byerlee.h 354 2006-10-12 08:19:27Z SteveQuenette $
+** $Id: Byerlee.h 466 2007-04-27 06:24:33Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -56,7 +56,7 @@
 		/* Virtual functions go here */ \
 		/* Material Parameters */\
 		BlockGeometry*                      geometry;                                 \
-		FiniteElement_Mesh*                 mesh;                                     \
+		FeMesh*                 	    mesh;                                     \
 		double                              depthCoefficient;
 	
 	struct Byerlee { __Byerlee };

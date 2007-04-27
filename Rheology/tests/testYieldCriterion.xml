@@ -14,7 +14,7 @@
 		<param>StgFEM_FrequentOutput</param>	
 		<param>Underworld_Vrms</param>	
 		<param>StgFEM_CPUTime</param>	
-		<param>Underworld_testYieldCriterion</param>	
+		<param>Underworld_testYieldCriterion</param>
 	</list>
 
 	<struct name="components" mergeType="merge">

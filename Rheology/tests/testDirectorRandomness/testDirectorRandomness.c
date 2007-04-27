@@ -80,7 +80,7 @@ void Underworld_testDirectorRandomness_Function( FiniteElementContext* context )
 	}
 	/* Calculate standard deviation */
 	circleAngleStdDev = sqrt(circleAngleSum / (36-1));
-	//Journal_Printf( stream, "Standard Deviation = %.2f\n", circleAngleStdDev);
+	/* Journal_Printf( stream, "Standard Deviation = %.2f\n", circleAngleStdDev); */
 	
 	
 	

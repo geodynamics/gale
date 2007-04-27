@@ -22,6 +22,7 @@
 		/* Virtual functions go here */ \
 		\
 		/* Passed in parameters */ \
+		Variable_Register*				  variable_Register;	\
 		FeVariable*                                       strainRateField;                \
 		ConstitutiveMatrix*                               constitutiveMatrix;             \
 		Variable*                                         dataVariableList[6];            \

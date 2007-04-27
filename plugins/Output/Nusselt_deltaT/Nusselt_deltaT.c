@@ -129,8 +129,8 @@ void Underworld_Nusselt_deltaT_Output( UnderworldContext* context ) {
 				context->CF->LCRegister,
 				Underworld_Nusselt_deltaT_Type );
 
-	// get_layer value
-	//self->shfl = FeVariable_AverageTopLayer( self->dTField, context->gaussSwarm, NULL, J_AXIS );
+	/* get_layer value */
+	/*self->shfl = FeVariable_AverageTopLayer( self->dTField, context->gaussSwarm, NULL, J_AXIS ); */
 	self->shfl = FeVariable_AverageTopLayer( self->dTField, context->gaussSwarm, J_AXIS );
 	
 	temp =   FeVariable_AveragePlane( temperatureField, J_AXIS, 0.0 );

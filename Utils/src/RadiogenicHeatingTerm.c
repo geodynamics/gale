@@ -209,7 +209,7 @@ void _RadiogenicHeatingTerm_AssembleElement( void* forceTerm, ForceVector* force
 	Element_NodeIndex                    elementNodeCount;
 	Dimension_Index                      dim                = forceVector->dim;
 	Swarm*                               swarm              = self->integrationSwarm;
-	FiniteElement_Mesh*                  mesh               = forceVector->feVariable->feMesh;
+	FeMesh*       		             mesh               = forceVector->feVariable->feMesh;
 	Node_ElementLocalIndex               eNode_I;
 	Cell_Index                           cell_I;
 	ElementType*                         elementType;
@@ -224,7 +224,7 @@ void _RadiogenicHeatingTerm_AssembleElement( void* forceTerm, ForceVector* force
 	Index                                heatingElementCount;
 	Index                                heatingElement_I;
 
-	elementType       = FeMesh_ElementTypeAt( mesh, lElement_I );
+	elementType       = FeMesh_GetElementType( mesh, lElement_I );
 	elementNodeCount  = elementType->nodeCount;
 	cell_I            = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
 	cellParticleCount = swarm->cellParticleCountTbl[cell_I];

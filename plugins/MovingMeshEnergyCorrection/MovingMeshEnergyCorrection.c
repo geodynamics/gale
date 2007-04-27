@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: MovingMeshEnergyCorrection.c 358 2006-10-18 06:17:30Z SteveQuenette $
+** $Id: MovingMeshEnergyCorrection.c 466 2007-04-27 06:24:33Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -66,9 +66,8 @@ void FeVariable_GetSideWallValues( void* feVariable, Dimension_Index planeAxis, 
 {
 	FeVariable*                self          = (FeVariable*)  feVariable;
 	Mesh*                      mesh          = (Mesh*)        self->feMesh;
+	Grid*			   vertGrid;
 	/* Assume IJK Topology */
-	IJKTopology*               topology      = (IJKTopology*) mesh->layout->nodeLayout->topology;
-	MeshDecomp*                meshDecomp    = mesh->layout->decomp;
 
 	double*                    valueMinSideWallLocal;
 	double*                    valueMaxSideWallLocal;
@@ -86,11 +85,15 @@ void FeVariable_GetSideWallValues( void* feVariable, Dimension_Index planeAxis, 
 	Node_LocalIndex            minNodeLocal_I;
 	Node_LocalIndex            maxNodeLocal_I;
 	Node_Index                 sideNodeCount;
-	MPI_Comm                   comm           = meshDecomp->communicator;
+	MPI_Comm                   comm;
 	Dof_Index                  dof            = self->fieldComponentCount;
 	Dof_Index                  dof_I;
+
+	comm = CommTopology_GetComm( Mesh_GetCommTopology( mesh, MT_VERTEX ) );
+	vertGrid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
+						  ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
 	
-	sideNodeCount = topology->size[ aAxis ] * topology->size[ bAxis ];
+	sideNodeCount = vertGrid->sizes[ aAxis ] * vertGrid->sizes[ bAxis ];
 
 	valueMinSideWallLocal = Memory_Alloc_Array( double, sideNodeCount*dof, "valueMinSideWallLocal" );
 	valueMaxSideWallLocal = Memory_Alloc_Array( double, sideNodeCount*dof, "valueMaxSideWallLocal" );
@@ -99,24 +102,23 @@ void FeVariable_GetSideWallValues( void* feVariable, Dimension_Index planeAxis, 
 
 	/* Loop over all nodes on the minimum side wall and the maximum side wall */
 	minNodeIJK[ planeAxis ] = 0;
-	maxNodeIJK[ planeAxis ] = topology->size[ planeAxis ] - 1 ;
+	maxNodeIJK[ planeAxis ] = vertGrid->sizes[ planeAxis ] - 1 ;
 	array_I = 0;
-	for ( aNode_I = 0 ; aNode_I < topology->size[ aAxis ] ; aNode_I++ ) {
+	for ( aNode_I = 0 ; aNode_I < vertGrid->sizes[ aAxis ] ; aNode_I++ ) {
 		minNodeIJK[ aAxis ] = maxNodeIJK[ aAxis ] = aNode_I;
-		for ( bNode_I = 0 ; bNode_I < topology->size[ bAxis ] ; bNode_I++ ) {
+		for ( bNode_I = 0 ; bNode_I < vertGrid->sizes[ bAxis ] ; bNode_I++ ) {
 			minNodeIJK[ bAxis ] = maxNodeIJK[ bAxis ] = bNode_I;
 
 			/* Get Global Node Indicies for the node at these walls */
-			IJK_3DTo1D( topology, minNodeIJK, &minNodeGlobal_I );
-			IJK_3DTo1D( topology, maxNodeIJK, &maxNodeGlobal_I );
-
-			/* Convert to Local Index */
-			minNodeLocal_I = meshDecomp->nodeMapGlobalToLocal( meshDecomp, minNodeGlobal_I );
-			maxNodeLocal_I = meshDecomp->nodeMapGlobalToLocal( meshDecomp, maxNodeGlobal_I );
+			minNodeGlobal_I = Grid_Project( vertGrid, minNodeIJK );
+			maxNodeGlobal_I = Grid_Project( vertGrid, maxNodeIJK );
 
 			/* Check to see whether this min node is on this processor */
-			if ( minNodeLocal_I < mesh->nodeLocalCount ) 
+			if ( Mesh_GlobalToDomain( mesh, MT_VERTEX, minNodeGlobal_I, &minNodeGlobal_I ) && 
+			     minNodeLocal_I < Mesh_GetLocalSize( mesh, MT_VERTEX ) )
+			{
 				FeVariable_GetValueAtNode( feVariable, minNodeLocal_I, &valueMinSideWallLocal[ array_I*dof ] );
+			}
 			else {
 				for ( dof_I = 0 ; dof_I < dof ; dof_I++ ) 
 					/* Initialise all values to some really large value so that 
@@ -125,8 +127,11 @@ void FeVariable_GetSideWallValues( void* feVariable, Dimension_Index planeAxis, 
 			}
 			
 			/* Check to see whether this max node is on this processor */
-			if ( maxNodeLocal_I < mesh->nodeLocalCount ) 
+			if ( Mesh_GlobalToDomain( mesh, MT_VERTEX, maxNodeGlobal_I, &maxNodeGlobal_I ) && 
+			     maxNodeLocal_I < Mesh_GetLocalSize( mesh, MT_VERTEX ) )
+			{
 				FeVariable_GetValueAtNode( feVariable, maxNodeLocal_I, &valueMaxSideWallLocal[ array_I*dof ] );
+			}
 			else {
 				for ( dof_I = 0 ; dof_I < dof ; dof_I++ ) 
 					/* Initialise all values to some really large value so that 
@@ -157,14 +162,12 @@ typedef enum {
 
 void MovingMeshEnergyCorrection_AddCorrection( FeVariable* velocityField, double* xLeftVelocities, double* xRightVelocities, CorrectionFlag flag ) {
 	Mesh*                      mesh               = (Mesh*)        velocityField->feMesh;
-	IJKTopology*               topology           = (IJKTopology*) mesh->layout->nodeLayout->topology;
-	BlockGeometry*             geometry           = (BlockGeometry*) mesh->layout->elementLayout->geometry;
-	Node_LocalIndex            nodeGlobalCount    = mesh->nodeGlobalCount;
-	Node_LocalIndex            nodeLocalCount     = mesh->nodeLocalCount;
-	MeshDecomp*                meshDecomp         = mesh->layout->decomp;
+	Grid*			   vertGrid;
+	Node_LocalIndex            nodeGlobalCount;
+	Node_LocalIndex            nodeLocalCount;
 	Dof_Index                  dof                = velocityField->fieldComponentCount;
-	double*                    min                = geometry->min;
-	double*                    max                = geometry->max;
+	double                     min[3];
+	double                     max[3];
 	Node_LocalIndex            localNode_I;
 	Node_LocalIndex            globalNode_I;
 	double*                    coord;
@@ -175,17 +178,24 @@ void MovingMeshEnergyCorrection_AddCorrection( FeVariable* velocityField, double
 	Variable*                  currVariable;
 	double*                    nodeDataPtr;
 
+	nodeGlobalCount = Mesh_GetGlobalSize( mesh, MT_VERTEX );
+	nodeLocalCount = Mesh_GetLocalSize( mesh, MT_VERTEX );
+	Mesh_GetGlobalCoordRange( mesh, min, max );
+	vertGrid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
+						  ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+
 	for ( globalNode_I = 0 ; globalNode_I < nodeGlobalCount ; globalNode_I++ ) {
-		localNode_I = meshDecomp->nodeMapGlobalToLocal( meshDecomp, globalNode_I );
-
 		/* Check if node is on processor */
-		if ( localNode_I >= nodeLocalCount )
+		if ( !Mesh_GlobalToDomain( mesh, MT_VERTEX, globalNode_I, &localNode_I ) || 
+		     localNode_I >= nodeLocalCount )
+		{
 			continue;
+		}
 
-		coord = Mesh_CoordAt( mesh, localNode_I );
-		IJK_1DTo3D( topology, globalNode_I, globalNodeIJK );
+		coord = Mesh_GetVertex( mesh, localNode_I );
+		Grid_Lift( vertGrid, globalNode_I, globalNodeIJK );
 
-		array_I = globalNodeIJK[ J_AXIS ] * dof; // TODO GET TO WORK IN 3D
+		array_I = globalNodeIJK[ J_AXIS ] * dof; /* TODO GET TO WORK IN 3D */
 		movingMeshVelocity[ I_AXIS ] = 
 			(coord[ I_AXIS ] - min[ I_AXIS ])/(max[ I_AXIS ] - min[ I_AXIS ]) * 
 			( xRightVelocities[ array_I ] - xLeftVelocities[ array_I ] ) + xLeftVelocities[ array_I ];

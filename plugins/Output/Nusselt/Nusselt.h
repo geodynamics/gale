@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: Nusselt.h 116 2006-01-13 03:12:11Z RobertTurnbull $
+** $Id: Nusselt.h 466 2007-04-27 06:24:33Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -49,6 +49,8 @@
 	extern const Type Underworld_Nusselt_Type;
 	typedef struct {
 		__Codelet
+		OperatorFeVariable* advectiveHeatFluxField;
+		OperatorFeVariable* temperatureTotalDerivField;
 		FeVariable* temperatureVertDerivField;
 		double      nusseltNumber;
 	} Underworld_Nusselt;

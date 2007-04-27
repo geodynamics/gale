@@ -181,7 +181,7 @@ void _Orthotropic_Construct( void* rheology, Stg_ComponentFactory* cf, void* dat
 /* how does this get called eventually? */
 void _Orthotropic_ModifyConstitutiveMatrix( 
 		void*                                              rheology, 
-		ConstitutiveMatrix*                                constitutiveMatrix, // constitutive matrix
+		ConstitutiveMatrix*                                constitutiveMatrix, /* constitutive matrix */
 		MaterialPointsSwarm*                               swarm,
 		Element_LocalIndex                                 lElement_I,
 		MaterialPoint*                                     materialPoint,
@@ -286,9 +286,9 @@ void _Orthotropic_ModifyConstitutiveMatrix(
 
  
 	   constitutiveMatrix->isDiagonal = False;	   
-//	   printf("In %s OK\n\n",__func__);
-//	   flag = 1;
-//	}
+           /*	   printf("In %s OK\n\n",__func__); */
+           /*	   flag = 1; */
+           /*	} */
 /* 	for(i=0;i<dim*(dim+1)/2;i++){ */
 /* 	   for(j=0;j<dim*(dim+1)/2;j++){ */
 /* 	      printf("Matrix Data = %g [%d %d]\n",constitutiveMatrix->matrixData[i][j],i,j); */

@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: Arrhenius.h 354 2006-10-12 08:19:27Z SteveQuenette $
+** $Id: Arrhenius.h 466 2007-04-27 06:24:33Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -56,11 +56,11 @@
 		/* Virtual functions go here */ \
 		/* Other Info */\
 		FeVariable*                                         temperatureField;        \
-		BlockGeometry*                                      blockGeometry;           \
+		FeMesh*						    feMesh;		     \
 		double                                              eta0;                    \
 		double                                              activationEnergy;        \
 		double                                              activationVolume;        \
-		double                                              referenceTemp;	
+		double                                              referenceTemp;
 
 	struct Arrhenius { __Arrhenius };
 	

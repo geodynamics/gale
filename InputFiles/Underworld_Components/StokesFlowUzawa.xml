@@ -46,6 +46,7 @@
 			<param name="RowVariable">VelocityField</param>
 			<param name="ColumnVariable">PressureField</param>	
 			<param name="RHS">cont_force</param>
+			<!--param name="transposeRHS">cont_force</param-->
 			<param name="allowZeroElementContributions">False</param>
 		</struct>
 		<struct name="gradientStiffnessMatrixTerm">
@@ -70,6 +71,7 @@
 
 		<struct name="uzawa">
 			<param name="Type">Stokes_SLE_UzawaSolver</param>
+			<param name="velocitySolver">matrixSolver</param>
 			<param name="Preconditioner">preconditioner</param>
 			<param name="tolerance">1.0e-5</param>
 			<param name="maxIterations">5000</param>

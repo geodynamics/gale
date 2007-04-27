@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: LateralViscosityAnalytic.c 358 2006-10-18 06:17:30Z SteveQuenette $
+** $Id: LateralViscosityAnalytic.c 466 2007-04-27 06:24:33Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -61,6 +61,7 @@ typedef struct {
 	double                  beta;
 	int                     wavenumberX;
 	int                     wavenumberY;
+	FeVariable*		velocityField;
 } LateralViscosityAnalytic;
 
 /** Analytic Solution taken from 
@@ -70,8 +71,7 @@ typedef struct {
 void LateralViscosityAnalytic_TemperatureIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
 	DiscretisationContext*  context            = (DiscretisationContext*)_context;
 	FeVariable*             temperatureField   = (FeVariable*) FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
-	FiniteElement_Mesh*     mesh               = temperatureField->feMesh;
-	BlockGeometry*          geometry           = (BlockGeometry*) mesh->layout->elementLayout->geometry;
+	FeMesh* 		mesh               = temperatureField->feMesh;
 	double*                 result             = (double*) _result;
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 coord;
@@ -81,17 +81,19 @@ void LateralViscosityAnalytic_TemperatureIC( Node_LocalIndex node_lI, Variable_I
 	double                  ky;
 	int                     wavenumberX;
 	int                     wavenumberY;
+	Coord			min, max;
 	double                  L;
 	
 	/* Find coordinate of node */
-	coord = Mesh_CoordAt( mesh, node_lI );
+	coord = Mesh_GetVertex( mesh, node_lI );
 
 	/* Make sure that the box has right dimensions */
-	assert( ( geometry->max[ J_AXIS ] - geometry->min[ J_AXIS ] - 1.0 ) < SMALL );
-	L = geometry->max[ I_AXIS ] - geometry->min[ I_AXIS ];
+	Mesh_GetGlobalCoordRange( mesh, min, max );
+	assert( ( max[ J_AXIS ] - min[ J_AXIS ] - 1.0 ) < SMALL );
+	L = max[ I_AXIS ] - min[ I_AXIS ];
 
-	x = coord[ I_AXIS ] - geometry->min[ I_AXIS ];
-	y = coord[ J_AXIS ] - geometry->min[ J_AXIS ];
+	x = coord[ I_AXIS ] - min[ I_AXIS ];
+	y = coord[ J_AXIS ] - min[ J_AXIS ];
 
 	wavenumberX = Dictionary_GetInt_WithDefault( dictionary, "wavenumberX", 1 );
 	wavenumberY = Dictionary_GetInt_WithDefault( dictionary, "wavenumberY", 1 );
@@ -104,7 +106,8 @@ void LateralViscosityAnalytic_TemperatureIC( Node_LocalIndex node_lI, Variable_I
 
 void _LateralViscosityAnalytic_VelocityFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* velocity ) {
 	LateralViscosityAnalytic*         self               = (LateralViscosityAnalytic*)analyticSolution;
-	BlockGeometry*          geometry           = (BlockGeometry*) analyticFeVariable->feMesh->layout->elementLayout->geometry;
+	FeMesh*			mesh = analyticFeVariable->feMesh;
+	Coord			min, max;
 	Cmplx                   N                  = {0,0};
 	double                  chi1;
 	double                  chi2;
@@ -153,14 +156,15 @@ void _LateralViscosityAnalytic_VelocityFunction( void* analyticSolution, FeVaria
 	int                     wavenumberY;
 	double                  sqRootValue;
 
-	x = coord[ I_AXIS ] - geometry->min[ I_AXIS ];
-	y = coord[ J_AXIS ] - geometry->min[ J_AXIS ];
+	Mesh_GetGlobalCoordRange( mesh, min, max );
+	x = coord[ I_AXIS ] - min[ I_AXIS ];
+	y = coord[ J_AXIS ] - min[ J_AXIS ];
 
 	beta = self->beta;
 	wavenumberX = self->wavenumberX;
 	wavenumberY = self->wavenumberY;
 	
-	L    = geometry->max[ I_AXIS ] - geometry->min[ I_AXIS ];
+	L    = max[ I_AXIS ] - min[ I_AXIS ];
 	kx   = wavenumberX * M_PI/ L;
 	ky   = wavenumberY * M_PI;
 	kn   = ky; 
@@ -400,7 +404,6 @@ void _LateralViscosityAnalytic_VelocityFunction( void* analyticSolution, FeVaria
 
 void _LateralViscosityAnalytic_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	LateralViscosityAnalytic*         self           = (LateralViscosityAnalytic*)analyticSolution;
-	FeVariable*             velocityField;
 	AbstractContext*        context;
 	ConditionFunction*      condFunc;
 	
@@ -414,12 +417,19 @@ void _LateralViscosityAnalytic_Construct( void* analyticSolution, Stg_ComponentF
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 	
 	/* Create Analytic Fields */
-	velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data ); 
-	AnalyticSolution_CreateAnalyticField( self, velocityField, _LateralViscosityAnalytic_VelocityFunction );
+	self->velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data ); 
 
 	self->beta = Stg_ComponentFactory_GetRootDictDouble( cf, "beta", 0.0 );
 	self->wavenumberX = Stg_ComponentFactory_GetRootDictInt( cf, "wavenumberX", 1 );
 	self->wavenumberY = Stg_ComponentFactory_GetRootDictInt( cf, "wavenumberY", 1 );
+}
+
+void _LateralViscosityAnalytic_Build( void* analyticSolution, void* data ) {
+	LateralViscosityAnalytic*         self = (LateralViscosityAnalytic*)analyticSolution;
+
+	AnalyticSolution_CreateAnalyticField( self, self->velocityField, _LateralViscosityAnalytic_VelocityFunction );
+
+	_AnalyticSolution_Build( self, data );
 }
 
 
@@ -432,7 +442,7 @@ void* _LateralViscosityAnalytic_DefaultNew( Name name ) {
 			_AnalyticSolution_Copy,
 			_LateralViscosityAnalytic_DefaultNew,
 			_LateralViscosityAnalytic_Construct,
-			_AnalyticSolution_Build,
+			_LateralViscosityAnalytic_Build,
 			_AnalyticSolution_Initialise,
 			_AnalyticSolution_Execute,
 			_AnalyticSolution_Destroy,
