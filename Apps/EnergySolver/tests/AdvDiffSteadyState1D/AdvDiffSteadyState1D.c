@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AdvDiffSteadyState1D.c 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: AdvDiffSteadyState1D.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -53,6 +53,7 @@ typedef struct {
 	double                    A;
 	double                    B;
 	double                    c;
+	FeVariable*		  temperatureField;
 } AdvDiffSteadyState1D;
 
 void AdvDiffSteadyState1D_TemperatureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* temperature ) {
@@ -68,12 +69,12 @@ void AdvDiffSteadyState1D_TemperatureBC( Node_LocalIndex node_lI, Variable_Index
 	DiscretisationContext*	context    = (DiscretisationContext*)_context;
 	AdvDiffSteadyState1D*   self       = Stg_ComponentFactory_ConstructByName( context->CF, AdvDiffSteadyState1D_Type, AdvDiffSteadyState1D, True, 0 /* dummy */ );
 	FeVariable*             feVariable = NULL;
-	FiniteElement_Mesh*     mesh       = NULL;
+	FeMesh*     mesh       = NULL;
 	double*                 coord;
 	
 	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
 	mesh       = feVariable->feMesh;
-	coord      = Mesh_CoordAt( mesh, node_lI );
+	coord      = Mesh_GetVertex( mesh, node_lI );
 
 	AdvDiffSteadyState1D_TemperatureFunction( self, NULL, coord, temperature );
 }
@@ -86,6 +87,8 @@ void _AdvDiffSteadyState1D_Build( void* analyticSolution, void* data ) {
 	Stream*               errorStream   = Journal_MyStream( Error_Type, self );
 	AllNodesVC*           allNodesVC;
 	AllNodesVC_Entry*     vcEntry;
+
+	AnalyticSolution_CreateAnalyticField( self, self->temperatureField, AdvDiffSteadyState1D_TemperatureFunction );
 
 	_AnalyticSolution_Build( self, data );
 
@@ -119,14 +122,12 @@ void _AdvDiffSteadyState1D_Build( void* analyticSolution, void* data ) {
 
 void _AdvDiffSteadyState1D_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	AdvDiffSteadyState1D*  self = (AdvDiffSteadyState1D*)analyticSolution;
-	FeVariable*            temperatureField;
 	AbstractContext*       context;
 	ConditionFunction*     condFunc;
 
 	_AnalyticSolution_Construct( self, cf, data );
 
-	temperatureField = Stg_ComponentFactory_ConstructByName( cf, "TemperatureField", FeVariable, True, data );
-	AnalyticSolution_CreateAnalyticField( self, temperatureField, AdvDiffSteadyState1D_TemperatureFunction );
+	self->temperatureField = Stg_ComponentFactory_ConstructByName( cf, "TemperatureField", FeVariable, True, data );
 
 	self->residual = Stg_ComponentFactory_ConstructByName( cf, "defaultResidualForceTerm", AdvDiffResidualForceTerm, True, data );
 

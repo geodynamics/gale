@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Timestep.c 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: Timestep.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 #include "mpi.h"
@@ -99,7 +99,7 @@ double AdvectionDiffusionSLE_AdvectiveTimestep( void* advectionDiffusionSLE ) {
 	AdvectionDiffusionSLE*    self              = (AdvectionDiffusionSLE*) advectionDiffusionSLE;
 	AdvDiffResidualForceTerm* residualForceTerm = self->advDiffResidualForceTerm;
 	FeVariable*               velocityField     = residualForceTerm->velocityField;
-	Node_LocalIndex           nodeLocalCount    = velocityField->feMesh->nodeLocalCount;
+	Node_LocalIndex           nodeLocalCount    = Mesh_GetLocalSize( velocityField->feMesh, MT_VERTEX );
 	Node_LocalIndex           node_I;
 	Dimension_Index           dim               = self->dim;
 	Dimension_Index           dim_I;

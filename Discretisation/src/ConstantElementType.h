@@ -45,7 +45,7 @@
 **
 ** Comments:
 **
-** $Id: ConstantElementType.h 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: ConstantElementType.h 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -126,8 +126,9 @@
 	*/
 	void _ConstantElementType_ConvertGlobalCoordToElLocal(
 		void*		elementType,
-		ElementLayout*	elementLayout,
-		const Coord**	globalNodeCoordPtrsInElement,
-		const Coord	globalCoord,
-		Coord		elLocalCoord );
+		Mesh*		mesh, 
+		unsigned	element, 
+		const double*	globalCoord,
+		double*		elLocalCoord );
+
 #endif /* __StgFEM_Discretisation_ConstantElementType_h__ */

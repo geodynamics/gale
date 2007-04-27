@@ -46,7 +46,7 @@
 ** Comments:
 **	None so far.
 **
-** $Id: SystemSetup.h 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: SystemSetup.h 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -64,6 +64,11 @@
 	#include "SolutionVector.h"
 	#include "ForceVector.h"
 	#include "ForceTerm.h"
+	#include "Assembler.h"
+
+#ifdef HAVE_PETSC
+	#include "PETScShellMatrix.h"
+#endif
 
 	#include "SystemLinearEquations.h"
 	#include "SLE_Solver.h"

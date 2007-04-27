@@ -12,10 +12,10 @@
 		<struct name="massMatrix">
 			<param name="Type">ForceVector</param>
 			<param name="FeVariable">TemperatureField</param>
-		</struct>		
+		</struct>
 		<struct name="predictorMulticorrector">
 			<param name="Type">AdvDiffMulticorrector</param>
-		</struct>		
+		</struct>
 		<struct name="EnergyEqn">
 			<param name="Type">AdvectionDiffusionSLE</param>
 			<param name="SLE_Solver">predictorMulticorrector</param> 

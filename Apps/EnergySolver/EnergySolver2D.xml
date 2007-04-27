@@ -32,18 +32,16 @@
 	<param name="elementResI"> 10 </param>
 	<param name="elementResJ"> 10 </param>
 	<param name="elementResK"> 10 </param>
-	<param name="allowUnbalancing"> True </param>
 	
 	<!-- Integration Scheme configuration -->
 	<param name="gaussParticlesX"> 2 </param>
 	<param name="gaussParticlesY"> 2 </param>
 	<param name="gaussParticlesZ"> 2 </param>
 	
-	<include>StgFEM/ElementLayout.xml</include>
-	<include>StgFEM/LinearMesh.xml</include>
-	<include>StgFEM/VelocityField.xml</include>
-	<include>StgFEM/TemperatureField.xml</include>
-	<include>StgFEM/GaussSwarm.xml</include>
-	<include>StgFEM/TempAdvDiff.xml</include>
+	<include>../StgFEM_Components/LinearMesh.xml</include>
+	<include>../StgFEM_Components/VelocityField.xml</include>
+	<include>../StgFEM_Components/TemperatureField.xml</include>
+	<include>../StgFEM_Components/GaussSwarm.xml</include>
+	<include>../StgFEM_Components/TempAdvDiff.xml</include>
 	
 </StGermainData>

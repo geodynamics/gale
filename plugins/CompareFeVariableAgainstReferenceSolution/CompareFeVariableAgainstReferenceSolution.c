@@ -249,8 +249,8 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 	char*                    tmpName2;
 	Bool                     scalar;
         Dof_Index                componentsCount;
-				// TODO: hardcode for now - should be read in constructor, or read from the reference
-				// feVar type, or file reader or something
+/* 				 TODO: hardcode for now - should be read in constructor, or read from the reference */
+/* 				 feVar type, or file reader or something */
 	unsigned int             numSigFigsInReferenceFeVar = 15;
 	
 	char*                    refName;
@@ -278,13 +278,13 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 		referenceDataVariable = Variable_NewScalar(
 			tmpName,
 			Variable_DataType_Double,
-			&feVarToTest->feMesh->nodeDomainCount,
+			&feVarToTest->feMesh->topo->domains[MT_VERTEX]->nDomains, 
 			(void**)NULL,
 			variable_Register );
 		roundedDataVariable = Variable_NewScalar(
 			tmpName2,
 			Variable_DataType_Double,
-			&feVarToTest->feMesh->nodeDomainCount,
+			&feVarToTest->feMesh->topo->domains[MT_VERTEX]->nDomains, 
 			(void**)NULL,
 			variable_Register );
 	}
@@ -311,7 +311,7 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 				tmpName,
 				Variable_DataType_Double,
 				componentsCount,
-				&feVarToTest->feMesh->nodeDomainCount,
+				&feVarToTest->feMesh->topo->domains[MT_VERTEX]->nDomains, 
 				(void**)NULL,
 				variable_Register,
 				referenceVariableName[0],
@@ -327,7 +327,7 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 				tmpName2,
 				Variable_DataType_Double,
 				componentsCount,
-				&feVarToTest->feMesh->nodeDomainCount,
+				&feVarToTest->feMesh->topo->domains[MT_VERTEX]->nDomains, 
 				(void**)NULL,
 				variable_Register,
 				roundedVariableName[0],
@@ -354,8 +354,10 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 	/* Create Dof layout for this variable based on its own DataVariable */
 	tmpName = Stg_Object_AppendSuffix( feVarToTest, "Reference-DofLayout" );
 	tmpName2 = Stg_Object_AppendSuffix( feVarToTest, "Rounded-DofLayout" );
-	referenceDofLayout = DofLayout_New( tmpName, variable_Register, feVarToTest->feMesh->layout->decomp->nodeDomainCount );
-	roundedDofLayout = DofLayout_New( tmpName2, variable_Register, feVarToTest->feMesh->layout->decomp->nodeDomainCount );
+	referenceDofLayout = DofLayout_New( tmpName, variable_Register, 
+					    Mesh_GetDomainSize( feVarToTest->feMesh, MT_VERTEX ), NULL );
+	roundedDofLayout = DofLayout_New( tmpName2, variable_Register, 
+					  Mesh_GetDomainSize( feVarToTest->feMesh, MT_VERTEX ), NULL );
 	if ( scalar ) {
 		DofLayout_AddAllFromVariableArray( referenceDofLayout, 1, &referenceDataVariable );
 		DofLayout_AddAllFromVariableArray( roundedDofLayout, 1, &roundedDataVariable );
@@ -363,7 +365,7 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 	else {
 		for ( variable_I = 0 ; variable_I < componentsCount ; variable_I++ ) {
 			/* Assign variable to each node */
-			for( dNode_I = 0; dNode_I < feVarToTest->feMesh->layout->decomp->nodeDomainCount ; dNode_I++ ) {
+			for( dNode_I = 0; dNode_I < Mesh_GetDomainSize( feVarToTest->feMesh, MT_VERTEX ); dNode_I++ ) {
 				DofLayout_AddDof_ByVarName( referenceDofLayout, referenceVariableName[variable_I], dNode_I );
 				DofLayout_AddDof_ByVarName( roundedDofLayout, roundedVariableName[variable_I], dNode_I );
 			}
@@ -424,7 +426,7 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 	}
 
 	/* now we need to round off the feVar we are testing, and copy the result to the roundedFeVar */
-	for( dNode_I = 0; dNode_I < feVarToTest->feMesh->nodeDomainCount; dNode_I++ ) {
+	for( dNode_I = 0; dNode_I < Mesh_GetDomainSize( feVarToTest->feMesh, MT_VERTEX ); dNode_I++ ) {
 		dofCountAtNode = feVarToTest->dofLayout->dofCounts[dNode_I];
 		
 		if ( dofCountAtNode != dofCountAtPrevNode ) {

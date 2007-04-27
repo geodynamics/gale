@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testStiffnessMatrix-nonZeroCalculation-linkedDofs.c 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: testStiffnessMatrix-nonZeroCalculation-linkedDofs.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -63,6 +63,7 @@ struct _Particle {
 
 
 int main( int argc, char* argv[] ) {
+#if 0
 	MPI_Comm			CommWorld;
 	int				rank;
 	int				numProcessors;
@@ -321,4 +322,5 @@ int main( int argc, char* argv[] ) {
 	MPI_Finalize();
 	
 	return 0; /* success */
+#endif
 }

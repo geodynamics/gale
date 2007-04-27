@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testStiffnessMatrixCompare.c 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: testStiffnessMatrixCompare.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -76,12 +76,16 @@ void testStiffnessMatrixCompareFunction( FiniteElementContext* context ) {
 		Journal_Printf( infoStream, "Patching file '%s'\n", filename );
 	}
 
-	savedMatrix = Matrix_NewFromFile( filename );
+#ifndef HAVE_PETSC
+#error No PETSc!
+#endif
+	savedMatrix = (Matrix*)PETScMatrix_New( "" );
+	Matrix_Load( savedMatrix, filename );
 
 	/* Get Error */
-	matrixNorm = Matrix_L2_Norm( savedMatrix );
-	Matrix_AddScaledMatrix( savedMatrix, -1.0, matrix->matrix );
-	errorNorm = Matrix_L2_Norm( savedMatrix );
+	matrixNorm = Matrix_L2Norm( savedMatrix );
+	Matrix_AddScaled( savedMatrix, -1.0, matrix->matrix );
+	errorNorm = Matrix_L2Norm( savedMatrix );
 
 	Journal_PrintValue( infoStream, matrixNorm );
 	Journal_PrintValue( infoStream, errorNorm );
@@ -97,7 +101,7 @@ void testStiffnessMatrixCompareFunction( FiniteElementContext* context ) {
 			tolerance );
 
 	/* Clean Up */
-	Matrix_Destroy( savedMatrix );
+	FreeObject( savedMatrix );
 	Stream_CloseFile( stream );
 }
 

@@ -35,7 +35,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 535 2006-04-11 13:07:34Z PatrickSunter $
+## $Id: makefile 822 2007-04-27 06:20:35Z LukeHodkinson $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -49,9 +49,20 @@ includes = ${PROJECT}/SLE/LinearAlgebra
 libstatic = yes
 libdynamic = yes
 
-SRCS = $(wildcard *.c)
-HDRS = $(wildcard *.h)
+SRCS = Vector.c Matrix.c MatrixSolver.c MultigridSolver.c MGOpGenerator.c SROpGenerator.c \
+	Init.c Finalise.c
+HDRS = Vector.h Matrix.h MatrixSolver.h MultigridSolver.h MGOpGenerator.h SROpGenerator.h \
+	Init.h Finalise.h LinearAlgebra.h types.h
 
 packages = STGERMAIN MPI XML MATH
+
+ifeq (true,$(shell if test -r $(PETSC_INCDIR)/petsc.h; then echo true; fi ))
+	SRCS += PETScVector.c PETScMatrix.c PETScMatrixSolver.c PETScMGSolver.c
+	HDRS += PETScVector.h PETScMatrix.h PETScMatrixSolver.h PETScMGSolver.h PETScErrorChecking.h
+	USER_CFLAGS += -DHAVE_PETSC
+	packages += PETSC
+endif
+
+EXTERNAL_INCLUDES = -I${INC_DIR}/${PROJECT}
 
 include ${PROJ_ROOT}/Makefile.vmake

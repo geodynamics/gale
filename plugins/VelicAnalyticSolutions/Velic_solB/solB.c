@@ -264,9 +264,9 @@ void Velic_solB_StrainRateFunction( void* analyticSolution, FeVariable* analytic
 	ss          = Calculate_ss( self, x, z, y );
 
 	if( analyticFeVariable->dim == 2 ) {
-		strainRate[1] = kn*ss_z*cos(kn*x);                // zz 
-		strainRate[0] = -strainRate[1];                   // xx 
-		strainRate[2] = -0.5*(ss_zz+kn*kn*ss)*sin(kn*x); // xz 
+		strainRate[1] = kn*ss_z*cos(kn*x);                /*  zz  */
+		strainRate[0] = -strainRate[1];                   /*  xx  */
+		strainRate[2] = -0.5*(ss_zz+kn*kn*ss)*sin(kn*x); /*  xz  */
 	}
 
 }

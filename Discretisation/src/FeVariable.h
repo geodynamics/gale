@@ -55,7 +55,7 @@
 	/** Textual name of this class */
 	extern const Type FeVariable_Type;
 
-	typedef void (FeVariable_InterpolateWithinElementFunction) (void* fieldVariable, Element_DomainIndex dElement_I, Coord xi, double* value );
+	typedef void (FeVariable_InterpolateWithinElementFunction) (void* fieldVariable, Element_DomainIndex dElement_I, double* xi, double* value );
 	typedef void (FeVariable_GetValueAtNodeFunction) (void* feVariable, Node_DomainIndex dNode_I, double* value );
 	
 	/* Function prototypes for import / export */
@@ -99,13 +99,14 @@
 		\
 		Stream*                                           debug; \
 		/** Mesh that this variable is discretised over */ \
-		FiniteElement_Mesh*                               feMesh; \
+		FeMesh*						feMesh; \
 		/** The mesh that this variable can create the determinant of the jacobian from */ \
-		FiniteElement_Mesh*                               geometryMesh; \
+		FeMesh*						geometryMesh; \
 		/** DofLayout for this variable: relates each mesh node to the Variable's */ \
 		DofLayout*                                        dofLayout; \
 		/** Boundary conditions applied to this variable - Compulsory, so the eq num table can be worked out*/ \
 		VariableCondition*                                bcs; \
+		Bool						removeBCs;	\
 		/** Boundary conditions applied to this variable - Optional, may be NULL */ \
 		VariableCondition*                                ics; \
 		/** Info on which dofs are linked together: optional, may be NULL */ \
@@ -266,7 +267,7 @@
 	void FeVariable_ApplyBCs( void* variable, void* data );
 	
 	/** Interpolate the value of the FE variable at a particular coord **/
-	InterpolationResult _FeVariable_InterpolateValueAt( void* variable, Coord coord, double* value );
+	InterpolationResult _FeVariable_InterpolateValueAt( void* variable, double* coord, double* value );
 	
 	/* Implementations of the min and max val functions */
 	double _FeVariable_GetMinGlobalFieldMagnitude( void* feVariable );
@@ -274,9 +275,9 @@
 	double _FeVariable_GetMaxGlobalFieldMagnitude( void* feVariable );
 	
 	/* Implementations of the coord-getting functions */
-	void _FeVariable_GetMinAndMaxLocalCoords( void* feVariable, Coord min, Coord max ) ;
+	void _FeVariable_GetMinAndMaxLocalCoords( void* feVariable, double* min, double* max ) ;
 
-	void _FeVariable_GetMinAndMaxGlobalCoords( void* feVariable, Coord min, Coord max ) ;
+	void _FeVariable_GetMinAndMaxGlobalCoords( void* feVariable, double* min, double* max ) ;
 
 	/** Prints out the value at each DOF for this FeVariable */
 	void FeVariable_PrintLocalDiscreteValues( void* variable, Stream* stream );
@@ -291,8 +292,8 @@
 
 	/** Calculates the domain element & element local coord that a particular global coord lives in.
 		Same return status conventions as for the InterpolateValueAt function. */
-	InterpolationResult FeVariable_GetElementLocalCoordAtGlobalCoord( void* feVariable, Coord globalCoord,
-		Coord elLocalCoord, Element_DomainIndex* elementCoordInPtr );
+	InterpolationResult FeVariable_GetElementLocalCoordAtGlobalCoord( void* feVariable, double* globalCoord,
+		double* elLocalCoord, Element_DomainIndex* elementCoordInPtr );
 
 	/** Updates a single component of the value at a certain node */
 	#define FeVariable_SetComponentAtNode( feVariable, dNode_I, dof_I, componentVal ) \
@@ -320,9 +321,9 @@
 	void FeVariable_ReadNodalValuesFromFile_StgFEM_Native( void* feVariable, const char* prefixStr, unsigned int timeStep );
 
 	/** Evaluates Spatial Derivatives using shape functions */
-	Bool FeVariable_InterpolateDerivativesAt( void* variable, Coord globalCoord, double* value ) ;
+	Bool FeVariable_InterpolateDerivativesAt( void* variable, double* globalCoord, double* value ) ;
 	
-	void FeVariable_InterpolateDerivativesToElLocalCoord( void* _feVariable, Element_LocalIndex lElement_I, Coord elLocalCoord, double* value ) ;
+	void FeVariable_InterpolateDerivativesToElLocalCoord( void* _feVariable, Element_LocalIndex lElement_I, double* elLocalCoord, double* value ) ;
 	
 	void FeVariable_InterpolateDerivatives_WithGNx( void* _feVariable, Element_LocalIndex lElement_I, double** GNx, double* value ) ;
 	
@@ -367,7 +368,7 @@
 	/* --- Private Functions --- */
 
 	/** Evaluates the value at a point within a given element, based on the current values of the nodes in that element */
-	void _FeVariable_InterpolateNodeValuesToElLocalCoord( void* self, Element_DomainIndex element_lI, Coord elLocalCoord, double* value );
+	void _FeVariable_InterpolateNodeValuesToElLocalCoord( void* self, Element_DomainIndex element_lI, double* elLocalCoord, double* value );
 
 	/** Utility function:- saves duplication of the print local and print domain functions */
 	void _FeVariable_PrintLocalOrDomainValues( void* variable, Index localOrDomainCount, Stream* stream );

@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AnalyticSolution.c 667 2006-11-17 00:57:47Z JulianGiordani $
+** $Id: AnalyticSolution.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -45,7 +45,7 @@
 #include "AnalyticSolution.h"
 #include "FeVariable.h"
 #include "OperatorFeVariable.h"
-#include "Mesh.h"
+#include "FeMesh.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -232,6 +232,7 @@ void AnalyticSolution_PutAnalyticSolutionOntoNodes( void* analyticSolution, Inde
 	double*                                      value;
 	Stream*                                      infoStream = Journal_MyStream( Info_Type, self );
 	FeVariable*                                  feVariable;
+	FeMesh*						mesh;
 
 	/* Do some error checking */
 	assert( Stg_ObjectList_Count( self->analyticFeVariableList ) >= analyticFeVariable_I );
@@ -239,6 +240,7 @@ void AnalyticSolution_PutAnalyticSolutionOntoNodes( void* analyticSolution, Inde
 	/* Grab pointers */
 	analyticFeVariable = 
 		Stg_CheckType( Stg_ObjectList_At( self->analyticFeVariableList, analyticFeVariable_I ), FeVariable );
+	mesh = analyticFeVariable->feMesh;
 	solutionFunction   = (AnalyticSolution_FeVariableSolutionFunction*) 
 		Stg_ObjectList_ObjectAt( self->analyticFeVariableFuncList, analyticFeVariable_I );
 	feVariable = AnalyticSolution_GetFeVariableFromAnalyticFeVariable( self, analyticFeVariable );
@@ -248,8 +250,8 @@ void AnalyticSolution_PutAnalyticSolutionOntoNodes( void* analyticSolution, Inde
 	value = Memory_Alloc_Array( double, dofAtEachNodeCount, "value" );
 
 	/* Loop over all the nodes - applying the analytic solution */
-	for ( dNode_I = 0 ; dNode_I < analyticFeVariable->feMesh->nodeDomainCount ; dNode_I++ ) {
-		coord = Mesh_CoordAt( analyticFeVariable->feMesh, dNode_I );
+	for ( dNode_I = 0 ; dNode_I < Mesh_GetDomainSize( mesh, MT_VERTEX ); dNode_I++ ) {
+		coord = Mesh_GetVertex( mesh, dNode_I );
 
 		/* Calculate value at node */
 		memset( value, 0, dofAtEachNodeCount * sizeof(double) );
@@ -352,17 +354,27 @@ FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVari
 	Stream*                                      stream;
 	Index                                        count;
 
+	Build( feVariable->feMesh, NULL, False );
+
 	/* Create new data Variable */
 	tmpName = Stg_Object_AppendSuffix( feVariable, "Analytic-DataVariable" );
 	if ( scalar ) {
+		Decomp_Sync*	sync;
+
+		sync = Mesh_GetSync( feVariable->feMesh, MT_VERTEX );
 		dataVariable = Variable_NewScalar( 	
 			tmpName,
 			Variable_DataType_Double, 
-			&feVariable->feMesh->nodeDomainCount, 
+			&sync->nDomains, 
 			(void**)NULL, 
 			variable_Register );
 	}
 	else {
+		Decomp_Sync*	sync;
+		unsigned	c_i;
+
+		sync = Mesh_GetSync( feVariable->feMesh, MT_VERTEX );
+
 		/* Create names of variables */
 		assert( componentsCount <= 9 );
 		for ( variable_I = 0 ; variable_I < componentsCount ; variable_I++ ) {
@@ -372,7 +384,7 @@ FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVari
 				tmpName,
 				Variable_DataType_Double, 
 				componentsCount,
-				&feVariable->feMesh->nodeDomainCount, 
+				&sync->nDomains, 
 				(void**)NULL, 
 				variable_Register,
 				variableName[0],
@@ -384,13 +396,15 @@ FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVari
 				variableName[6],
 				variableName[7],
 				variableName[8] );
+		for( c_i = 0; c_i < dataVariable->dataTypeCounts[0]; c_i++ )
+			dataVariable->components[c_i]->allocateSelf = True;
 	}
 	Memory_Free( tmpName );
 	dataVariable->allocateSelf = True;
 	
 	/* Create new dof layout */
 	tmpName = Stg_Object_AppendSuffix( feVariable, "Analytic-DofLayout" );
-	dofLayout = DofLayout_New( tmpName, variable_Register, feVariable->feMesh->layout->decomp->nodeDomainCount );
+	dofLayout = DofLayout_New( tmpName, variable_Register, Mesh_GetDomainSize( feVariable->feMesh, MT_VERTEX ), NULL );
 	if ( scalar ) {
 		DofLayout_AddAllFromVariableArray( dofLayout, 1, &dataVariable );
 	}
@@ -402,7 +416,7 @@ FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVari
 			variable->arrayPtrPtr = &dataVariable->arrayPtr;
 
 			/* Assign variable to each node */
-			for( node_I = 0; node_I < feVariable->feMesh->layout->decomp->nodeDomainCount ; node_I++ ) {
+			for( node_I = 0; node_I < Mesh_GetDomainSize( feVariable->feMesh, MT_VERTEX ); node_I++ ) {
 				DofLayout_AddDof_ByVarName( dofLayout, variableName[variable_I], node_I );
 			}
 			/* Free Name */

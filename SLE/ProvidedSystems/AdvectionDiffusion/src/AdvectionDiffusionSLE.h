@@ -62,6 +62,9 @@
 		double                                             currentDt;                      \
 		double                                             courantFactor;                  \
 		double                                             maxDiffusivity;                 \
+									\
+		Variable_Register*		variableReg;		\
+		FieldVariable_Register*		fieldVariableReg;
 	
 	struct AdvectionDiffusionSLE { __AdvectionDiffusionSLE };
 		

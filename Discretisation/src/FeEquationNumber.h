@@ -67,7 +67,7 @@
 **	Just in case it causes problems with the lowestLocalEqNum 
 **	calculations.
 **
-** $Id: FeEquationNumber.h 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: FeEquationNumber.h 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -99,7 +99,7 @@
 		Stream*					debugLM; \
 		Stream*					warning; \
 		/** attached feMesh */ \
-		FiniteElement_Mesh*			feMesh; \
+		FeMesh*					feMesh; \
 		/** DofLayout describing the discretisation of an FeVariable over the mesh */ \
 		DofLayout*				dofLayout; \
 		/** LinkedEquationInfo - information on which dofs are linked together */ \
@@ -239,7 +239,7 @@
 	Partition_Index FeEquationNumber_CalculateOwningProcessorOfEqNum( void* self, Dof_EquationNumber eqNum );
 
 	/** build the processor's location matrix mapping elements, element node, dof -> eq num */
-	void FeEquationNumber_BuildLocationMatrix( FeEquationNumber* self );
+	void FeEquationNumber_BuildLocationMatrix( void* feEquationNumber );
 	
 	/** Build an element's local location matrix */
 	Dof_EquationNumber** FeEquationNumber_BuildOneElementLocationMatrix( void* feEquationNumber, Element_LocalIndex lElement_I );

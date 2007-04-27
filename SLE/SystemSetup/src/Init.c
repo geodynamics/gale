@@ -35,28 +35,18 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Init.c 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: Init.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+#include <stdio.h>
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+
 #include "StgFEM/Discretisation/Discretisation.h"
 #include "StgFEM/SLE/LinearAlgebra/LinearAlgebra.h"
-#include "units.h"
-#include "types.h"
-#include "shortcuts.h"
-#include "Init.h"
+#include "SystemSetup.h"
 
-#include "SolutionVector.h"
-#include "StiffnessMatrix.h"
-#include "StiffnessMatrixTerm.h"
-#include "ForceVector.h"
-#include "ForceTerm.h"
-#include "SystemLinearEquations.h"
-#include "SLE_Solver.h"
-#include "Context.h"
-#include <stdio.h>
 
 Stream* StgFEM_SLE_Debug = NULL;
 Stream* StgFEM_SLE_SystemSetup_Debug = NULL;
@@ -77,6 +67,8 @@ Bool StgFEM_SLE_SystemSetup_Init( int* argc, char** argv[] ) {
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), StiffnessMatrixTerm_Type, "0", _StiffnessMatrixTerm_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), SystemLinearEquations_Type, "0", _SystemLinearEquations_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), ForceTerm_Type, "0", _ForceTerm_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), 
+				   PETScShellMatrix_Type, "0", (void*(*)(Name))PETScShellMatrix_New );
 
 	RegisterParent( SystemLinearEquations_Type,    Stg_Component_Type );
 	RegisterParent( SLE_Solver_Type,               Stg_Component_Type );
@@ -85,6 +77,8 @@ Bool StgFEM_SLE_SystemSetup_Init( int* argc, char** argv[] ) {
 	RegisterParent( SolutionVector_Type,           Stg_Component_Type );
 	RegisterParent( ForceVector_Type,              SolutionVector_Type );
 	RegisterParent( ForceTerm_Type,                Stg_Component_Type );
+	RegisterParent( PETScShellMatrix_Type,         PETScMatrix_Type );
+	RegisterParent( Assembler_Type, Stg_Class_Type );
 	
 	RegisterParent( FiniteElementContext_Type,     DiscretisationContext_Type );
 

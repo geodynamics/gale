@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: LaplacianStiffnessMatrixTerm.c 733 2007-02-07 00:55:26Z PatrickSunter $
+** $Id: LaplacianStiffnessMatrixTerm.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -212,7 +212,7 @@ void _LaplacianStiffnessMatrixTerm_AssembleElement(
 	ElementType*                        elementType;
 	
 	/* Set the element type */
-	elementType = FeMesh_ElementTypeAt( variable1->feMesh, lElement_I );
+	elementType = FeMesh_GetElementType( variable1->feMesh, lElement_I );
 	nodesPerEl = elementType->nodeCount;
 	
 	/* allocate */

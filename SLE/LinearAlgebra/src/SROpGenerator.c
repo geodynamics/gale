@@ -1,0 +1,617 @@
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**
+** Copyright (C), 2003, Victorian Partnership for Advanced Computing (VPAC) Ltd, 110 Victoria Street, Melbourne, 3053, Australia.
+**
+** Authors:
+**	Stevan M. Quenette, Senior Software Engineer, VPAC. (steve@vpac.org)
+**	Patrick D. Sunter, Software Engineer, VPAC. (pds@vpac.org)
+**	Luke J. Hodkinson, Computational Engineer, VPAC. (lhodkins@vpac.org)
+**	Siew-Ching Tan, Software Engineer, VPAC. (siew@vpac.org)
+**	Alan H. Lo, Computational Engineer, VPAC. (alan@vpac.org)
+**	Raquibul Hassan, Computational Engineer, VPAC. (raq@vpac.org)
+**
+**  This library is free software; you can redistribute it and/or
+**  modify it under the terms of the GNU Lesser General Public
+**  License as published by the Free Software Foundation; either
+**  version 2.1 of the License, or (at your option) any later version.
+**
+**  This library is distributed in the hope that it will be useful,
+**  but WITHOUT ANY WARRANTY; without even the implied warranty of
+**  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+**  Lesser General Public License for more details.
+**
+**  You should have received a copy of the GNU Lesser General Public
+**  License along with this library; if not, write to the Free Software
+**  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+**
+** $Id: SROpGenerator.c 3584 2006-05-16 11:11:07Z PatrickSunter $
+**
+**~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <assert.h>
+
+#include <mpi.h>
+#include "StGermain/StGermain.h"
+#include "Discretisation/Discretisation.h"
+#include "LinearAlgebra.h"
+
+
+/* Textual name of this class */
+const Type SROpGenerator_Type = "SROpGenerator";
+
+
+/*----------------------------------------------------------------------------------------------------------------------------------
+** Constructors
+*/
+
+SROpGenerator* SROpGenerator_New( Name name ) {
+	return _SROpGenerator_New( sizeof(SROpGenerator), 
+				   SROpGenerator_Type, 
+				   _SROpGenerator_Delete, 
+				   _SROpGenerator_Print, 
+				   NULL, 
+				   (void* (*)(Name))SROpGenerator_New, 
+				   _SROpGenerator_Construct, 
+				   _SROpGenerator_Build, 
+				   _SROpGenerator_Initialise, 
+				   _SROpGenerator_Execute, 
+				   _SROpGenerator_Destroy, 
+				   name, 
+				   NON_GLOBAL, 
+				   _MGOpGenerator_SetNumLevels, 
+				   SROpGenerator_HasExpired, 
+				   SROpGenerator_Generate );
+}
+
+SROpGenerator* _SROpGenerator_New( SROPGENERATOR_DEFARGS ) {
+	SROpGenerator*	self;
+
+	/* Allocate memory */
+	assert( sizeOfSelf >= sizeof(SROpGenerator) );
+	self = (SROpGenerator*)_MGOpGenerator_New( MGOPGENERATOR_PASSARGS );
+
+	/* Virtual info */
+
+	/* SROpGenerator info */
+	_SROpGenerator_Init( self );
+
+	return self;
+}
+
+void _SROpGenerator_Init( SROpGenerator* self ) {
+	assert( self && Stg_CheckType( self, SROpGenerator ) );
+
+	self->fineVar = NULL;
+	self->fineEqNum = NULL;
+	self->meshes = NULL;
+	self->topMaps = NULL;
+	self->eqNums = NULL;
+	self->nLocalEqNums = NULL;
+}
+
+
+/*----------------------------------------------------------------------------------------------------------------------------------
+** Virtual functions
+*/
+
+void _SROpGenerator_Delete( void* srOpGenerator ) {
+	SROpGenerator*	self = (SROpGenerator*)srOpGenerator;
+
+	assert( self && Stg_CheckType( self, SROpGenerator ) );
+
+	/* Delete the parent. */
+	_MGOpGenerator_Delete( self );
+}
+
+void _SROpGenerator_Print( void* srOpGenerator, Stream* stream ) {
+	SROpGenerator*	self = (SROpGenerator*)srOpGenerator;
+	
+	/* Set the Journal for printing informations */
+	Stream* srOpGeneratorStream;
+	srOpGeneratorStream = Journal_Register( InfoStream_Type, "SROpGeneratorStream" );
+
+	assert( self && Stg_CheckType( self, SROpGenerator ) );
+
+	/* Print parent */
+	Journal_Printf( stream, "SROpGenerator (ptr): (%p)\n", self );
+	_MGOpGenerator_Print( self, stream );
+}
+
+void _SROpGenerator_Construct( void* srOpGenerator, Stg_ComponentFactory* cf, void* data ) {
+	SROpGenerator*	self = (SROpGenerator*)srOpGenerator;
+	FeVariable*	var;
+
+	assert( self && Stg_CheckType( self, SROpGenerator ) );
+
+	var = Stg_ComponentFactory_ConstructByKey( cf, self->name, "fineVariable", FeVariable, 
+						     True, data );
+	SROpGenerator_SetFineVariable( self, var );
+}
+
+void _SROpGenerator_Build( void* srOpGenerator, void* data ) {
+}
+
+void _SROpGenerator_Initialise( void* srOpGenerator, void* data ) {
+}
+
+void _SROpGenerator_Execute( void* srOpGenerator, void* data ) {
+}
+
+void _SROpGenerator_Destroy( void* srOpGenerator, void* data ) {
+}
+
+Bool SROpGenerator_HasExpired( void* srOpGenerator ) {
+	SROpGenerator*	self = (SROpGenerator*)srOpGenerator;
+
+	assert( self && Stg_CheckType( self, SROpGenerator ) );
+
+	return False;
+}
+
+void SROpGenerator_Generate( void* srOpGenerator, Matrix*** pOps, Matrix*** rOps ) {
+	SROpGenerator*	self = (SROpGenerator*)srOpGenerator;
+
+	assert( self && Stg_CheckType( self, SROpGenerator ) );
+	assert( pOps && rOps );
+
+	*pOps = AllocArray( Matrix*, self->nLevels );
+	*rOps = AllocArray( Matrix*, self->nLevels );
+	memset( *pOps, 0, self->nLevels * sizeof(Matrix*) );
+	memset( *rOps, 0, self->nLevels * sizeof(Matrix*) );
+
+	self->fineEqNum = self->fineVar->eqNum;
+	SROpGenerator_GenMeshes( self );
+	SROpGenerator_GenOps( self, *pOps, *rOps );
+	SROpGenerator_DestructMeshes( self );
+}
+
+
+/*--------------------------------------------------------------------------------------------------------------------------
+** Public Functions
+*/
+
+void SROpGenerator_SetFineVariable( void* srOpGenerator, void* _variable ) {
+	SROpGenerator*	self = (SROpGenerator*)srOpGenerator;
+	FeVariable*	variable = (FeVariable*)_variable;
+
+	assert( self && Stg_CheckType( self, SROpGenerator ) );
+	assert( !variable || Stg_CheckType( variable, FeVariable ) );
+
+	SROpGenerator_DestructMeshes( self );
+	self->fineVar = variable;
+	self->fineEqNum = NULL;
+}
+
+
+/*----------------------------------------------------------------------------------------------------------------------------------
+** Private Functions
+*/
+
+void SROpGenerator_GenMeshes( SROpGenerator* self ) {
+	unsigned	nLevels;
+	unsigned	l_i;
+
+	assert( self && Stg_CheckType( self, SROpGenerator ) );
+
+	nLevels = self->nLevels;
+	self->meshes = AllocArray( Mesh*, nLevels );
+	memset( self->meshes, 0, nLevels * sizeof(Mesh*) );
+	self->topMaps = AllocArray( unsigned*, nLevels );
+	memset( self->topMaps, 0, nLevels * sizeof(unsigned*) );
+	self->eqNums = AllocArray( unsigned**, nLevels );
+	memset( self->eqNums, 0, nLevels * sizeof(unsigned**) );
+	self->nLocalEqNums = AllocArray( unsigned, nLevels );
+	memset( self->nLocalEqNums, 0, nLevels * sizeof(unsigned) );
+	self->eqNumBases = AllocArray( unsigned, nLevels );
+	memset( self->eqNumBases, 0, nLevels * sizeof(unsigned) );
+
+	self->meshes[nLevels - 1] = (Mesh*)self->fineEqNum->feMesh;
+	self->eqNumBases[nLevels - 1] = self->fineEqNum->firstOwnedEqNum;
+	for( l_i = nLevels - 2; l_i < nLevels; l_i-- ) {
+		SROpGenerator_GenLevelMesh( self, l_i );
+		SROpGenerator_GenLevelTopMap( self, l_i );
+		SROpGenerator_GenLevelEqNums( self, l_i );
+	}
+}
+
+void SROpGenerator_GenLevelMesh( SROpGenerator* self, unsigned level ) {
+	Stream*			errorStream = Journal_Register( ErrorStream_Type, "SROpGenerator::GenLevelMesh" );
+	Mesh			*fMesh, *cMesh;
+	CartesianGenerator	*fGen, *cGen;
+	unsigned		nDims;
+	unsigned*		cSize;
+	double			crdMin[3], crdMax[3];
+	unsigned		d_i;
+
+	assert( self && Stg_CheckType( self, SROpGenerator ) );
+	assert( self->meshes );
+	assert( level < self->nLevels );
+
+	fMesh = self->meshes[level + 1];
+	nDims = Mesh_GetDimSize( fMesh );
+	fGen = (CartesianGenerator*)fMesh->generator;
+	Journal_Firewall( fGen && !strcmp( fGen->type, CartesianGenerator_Type ), 
+			  errorStream, 
+			  "\n" \
+			  "****************************************************************\n" \
+			  "* Error: Simple regular multigrid operator generation requires *\n" \
+			  "*        a fine mesh that has been generated with a            *\n" \
+			  "*        cartesian generator.                                  *\n" \
+			  "****************************************************************\n" \
+			  "\n" );
+
+	cGen = CartesianGenerator_New( "" );
+	CartesianGenerator_SetDimSize( cGen, nDims );
+	cSize = AllocArray( unsigned, nDims );
+	for( d_i = 0; d_i < nDims; d_i++ )
+		cSize[d_i] = fGen->elGrid->sizes[d_i] / 2;
+	CartesianGenerator_SetTopologyParams( cGen, cSize, fGen->maxDecompDims, fGen->minDecomp, fGen->maxDecomp );
+	Mesh_GetGlobalCoordRange( fMesh, crdMin, crdMax );
+	CartesianGenerator_SetGeometryParams( cGen, crdMin, crdMax );
+	CartesianGenerator_SetShadowDepth( cGen, 0 );
+	FreeArray( cSize );
+
+	cMesh = (Mesh*)FeMesh_New( "" );
+	Mesh_SetGenerator( cMesh, cGen );
+	FeMesh_SetElementFamily( cMesh, ((FeMesh*)fMesh)->feElFamily );
+	Build( cMesh, NULL, False );
+	Initialise( cMesh, NULL, False );
+	self->meshes[level] = cMesh;
+}
+
+void SROpGenerator_GenLevelTopMap( SROpGenerator* self, unsigned level ) {
+	Stream*		errorStream = Journal_Register( ErrorStream_Type, "SROpGenerator::GenLevelTopMap" );
+	Mesh		*fMesh, *cMesh;
+	unsigned	nDomainNodes;
+	unsigned	nLevels;
+	unsigned	nDims;
+	unsigned	nearest;
+	double		*cVert, *fVert;
+	unsigned	d_i, n_i;
+
+	assert( self && Stg_CheckType( self, SROpGenerator ) );
+	assert( self->meshes );
+	assert( level < self->nLevels );
+
+	fMesh = self->meshes[level + 1];
+	cMesh = self->meshes[level];
+	nDims = Mesh_GetDimSize( fMesh );
+	nLevels = self->nLevels;
+	nDomainNodes = Mesh_GetDomainSize( cMesh, MT_VERTEX );
+	self->topMaps[level] = ReallocArray( self->topMaps[level], unsigned, nDomainNodes );
+	for( n_i = 0; n_i < nDomainNodes; n_i++ ) {
+		cVert = Mesh_GetVertex( cMesh, n_i );
+		nearest = Mesh_NearestVertex( fMesh, cVert );
+		fVert = Mesh_GetVertex( fMesh, nearest );
+		for( d_i = 0; d_i < nDims; d_i++ ) {
+			if( !Num_Approx( cVert[d_i], fVert[d_i] ) )
+				break;
+		}
+
+		Journal_Firewall( d_i == nDims, 
+				  errorStream, 
+				  "\n" \
+				  "*****************************************************************\n" \
+				  "* Error: The finest grid could not be sub-sampled to all coarse *\n" \
+				  "*        levels. This is due to the size of the finest grid.    *\n" \
+				  "*****************************************************************\n" \
+				  "\n" );
+
+		if( level < nLevels - 2 )
+			self->topMaps[level][n_i] = self->topMaps[level + 1][nearest];
+		else
+			self->topMaps[level][n_i] = nearest;
+	}
+}
+
+void SROpGenerator_GenLevelEqNums( SROpGenerator* self, unsigned level ) {
+	Mesh*			cMesh;
+	unsigned*		nNodalDofs;
+	unsigned		nDomainNodes, nLocalNodes;
+	DofLayout*		dofLayout;
+	unsigned**		dstArray;
+	unsigned		curEqNum;
+	unsigned		maxDofs;
+	unsigned		topNode;
+	unsigned		base, subTotal;
+	MPI_Comm		comm;
+	unsigned		nProcs, rank;
+	MPI_Status		status;	
+	unsigned*		tuples;
+	Decomp_Sync*		sync;
+	Decomp_Sync_Array*	array;
+	unsigned		n_i, dof_i;
+
+	assert( self && Stg_CheckType( self, SROpGenerator ) );
+	assert( self->meshes && self->topMaps && self->eqNums );
+	assert( level < self->nLevels );
+
+	cMesh = self->meshes[level];
+	nDomainNodes = Mesh_GetDomainSize( cMesh, MT_VERTEX );
+	nLocalNodes = Mesh_GetLocalSize( cMesh, MT_VERTEX );
+	dofLayout = self->fineEqNum->dofLayout;
+	comm = CommTopology_GetComm( Mesh_GetCommTopology( cMesh, MT_VERTEX ) );
+	MPI_Comm_size( comm, (int*)&nProcs );
+	MPI_Comm_rank( comm, (int*)&rank );
+
+	/* Allocate for destination array. */
+	nNodalDofs = AllocArray( unsigned, nDomainNodes );
+	for( n_i = 0; n_i < nDomainNodes; n_i++ )
+		nNodalDofs[n_i] = dofLayout->dofCounts[self->topMaps[level][n_i]];
+	dstArray = AllocComplex2D( unsigned, nDomainNodes, nNodalDofs );
+
+	/* Build initial destination array and store max dofs. */
+	curEqNum = 0;
+	maxDofs = 0;
+	for( n_i = 0; n_i < nLocalNodes; n_i++ ) {
+		if( nNodalDofs[n_i] > maxDofs )
+			maxDofs = nNodalDofs[n_i];
+
+		topNode = self->topMaps[level][n_i];
+		for( dof_i = 0; dof_i < nNodalDofs[n_i]; dof_i++ ) {
+			if( self->fineEqNum->destinationArray[topNode][dof_i] != (unsigned)-1 )
+				dstArray[n_i][dof_i] = curEqNum++;
+			else
+				dstArray[n_i][dof_i] = (unsigned)-1;
+		}
+	}
+
+	/* Order the equation numbers based on processor rank; cascade counts forward. */
+	base = 0;
+	subTotal = curEqNum;
+	if( rank > 0 ) {
+		insist( !MPI_Recv( &base, 1, MPI_UNSIGNED, rank - 1, 6669, comm, &status ) );
+		subTotal = base + curEqNum;
+	}
+	if( rank < nProcs - 1 )
+		insist( !MPI_Send( &subTotal, 1, MPI_UNSIGNED, rank + 1, 6669, comm ) );
+
+	/* Modify existing destination array and dump to a tuple array. */
+	tuples = AllocArray( unsigned, nDomainNodes * maxDofs );
+	for( n_i = 0; n_i < nLocalNodes; n_i++ ) {
+		for( dof_i = 0; dof_i < nNodalDofs[n_i]; dof_i++ ) {
+			if( dstArray[n_i][dof_i] != (unsigned)-1 )
+				dstArray[n_i][dof_i] += base;
+			tuples[n_i * maxDofs + dof_i] = dstArray[n_i][dof_i];
+		}
+	}
+
+	/* Update all other procs. */
+	sync = Mesh_GetSync( cMesh, MT_VERTEX );
+	array = Decomp_Sync_Array_New();
+	Decomp_Sync_Array_SetSync( array, sync );
+	Decomp_Sync_Array_SetMemory( array, tuples, tuples + nLocalNodes * maxDofs, 
+				     maxDofs * sizeof(unsigned), maxDofs * sizeof(unsigned), 
+				     maxDofs * sizeof(unsigned) );
+	Decomp_Sync_Array_Sync( array );
+	FreeObject( array );
+
+	/* Update destination array's domain indices. */
+	for( n_i = nLocalNodes; n_i < nDomainNodes; n_i++ ) {
+		topNode = self->topMaps[level][n_i];
+		for( dof_i = 0; dof_i < nNodalDofs[n_i]; dof_i++ ) {
+			if( self->fineEqNum->destinationArray[topNode][dof_i] != (unsigned)-1 )
+				dstArray[n_i][dof_i] = tuples[n_i * maxDofs + dof_i];
+			else
+				dstArray[n_i][dof_i] = -1;
+		}
+	}
+
+	/* Destroy arrays. */
+	FreeArray( nNodalDofs );
+	FreeArray( tuples );
+
+	self->eqNums[level] = dstArray;
+	self->nLocalEqNums[level] = curEqNum;
+	self->eqNumBases[level] = base;
+}
+
+void SROpGenerator_GenOps( SROpGenerator* self, Matrix** pOps, Matrix** rOps ) {
+	unsigned	nLevels;
+	Matrix		*fineMat, *P;
+	unsigned	nRows, nCols;
+	unsigned	l_i;
+
+	assert( self && Stg_CheckType( self, SROpGenerator ) );
+	assert( pOps && rOps );
+
+	fineMat = MatrixSolver_GetMatrix( self->solver );
+	nLevels = self->nLevels;
+
+	for( l_i = nLevels - 1; l_i > 0; l_i-- ) {
+		nRows = self->eqNums[l_i] ? self->nLocalEqNums[l_i] : 
+			self->fineEqNum->localEqNumsOwnedCount;
+		nCols = self->nLocalEqNums[l_i - 1];
+
+		Matrix_Duplicate( fineMat, (void**)&P );
+		Matrix_SetComm( P, fineMat->comm );
+		Matrix_SetLocalSize( P, nRows, nCols );
+		if( !strcmp( P->type, PETScMatrix_Type ) ) {
+			unsigned	*nDiagNonZeros, *nOffDiagNonZeros;
+
+			SROpGenerator_CalcOpNonZeros( self, l_i, &nDiagNonZeros, &nOffDiagNonZeros );
+			PETScMatrix_SetNonZeroStructure( (PETScMatrix*)P, 0, nDiagNonZeros, nOffDiagNonZeros );
+			FreeArray( nDiagNonZeros );
+			FreeArray( nOffDiagNonZeros );
+		}
+
+		SROpGenerator_GenLevelOp( self, l_i, P );
+		pOps[l_i] = P;
+		Stg_Class_AddRef( P );
+		rOps[l_i] = P;
+		Stg_Class_AddRef( P );
+	}
+}
+
+void SROpGenerator_GenLevelOp( SROpGenerator* self, unsigned level, Matrix* P ) {
+	Mesh		*fMesh, *cMesh;
+	unsigned	nDims;
+	unsigned	nLocalFineNodes;
+	DofLayout*	dofLayout;
+	unsigned	ind;
+	unsigned	nInc, *inc;
+	unsigned	maxInc;
+	unsigned	fTopNode, cTopNode;
+	unsigned	fEqNum, cEqNum;
+	double		*localCoord, *basis;
+	unsigned	n_i, dof_i, inc_i, e_i;
+
+	assert( self && Stg_CheckType( self, SROpGenerator ) );
+	assert( self->meshes );
+	assert( level < self->nLevels );
+	assert( P );
+
+	fMesh = self->meshes[level];
+	cMesh = self->meshes[level - 1];
+	nDims = Mesh_GetDimSize( fMesh );
+	nLocalFineNodes = Mesh_GetLocalSize( fMesh, MT_VERTEX );
+	dofLayout = self->fineEqNum->dofLayout;
+	localCoord = AllocArray( double, nDims );
+
+	maxInc = 0;
+	for( e_i = 0; e_i < Mesh_GetDomainSize( cMesh, nDims ); e_i++ ) {
+		nInc = Mesh_GetIncidenceSize( cMesh, nDims, e_i, MT_VERTEX );
+		if( nInc > maxInc )
+			maxInc = nInc;
+	}
+	basis = AllocArray( double, maxInc );
+
+	for( n_i = 0; n_i < nLocalFineNodes; n_i++ ) {
+		if( self->topMaps[level] )
+			fTopNode = self->topMaps[level][n_i];
+		else
+			fTopNode = n_i;
+
+		for( dof_i = 0; dof_i < dofLayout->dofCounts[fTopNode]; dof_i++ ) {
+			if( self->eqNums[level] )
+				fEqNum = self->eqNums[level][n_i][dof_i];
+			else
+				fEqNum = self->fineEqNum->destinationArray[fTopNode][dof_i];
+
+			if( fEqNum == (unsigned)-1 )
+				continue;
+
+			insist( Mesh_SearchElements( cMesh, Mesh_GetVertex( fMesh, n_i ), &ind ) );
+			FeMesh_CoordGlobalToLocal( cMesh, ind, Mesh_GetVertex( fMesh, n_i ), localCoord );
+			FeMesh_EvalBasis( cMesh, ind, localCoord, basis );
+			Mesh_GetIncidence( cMesh, nDims, ind, MT_VERTEX, &nInc, &inc );
+			for( inc_i = 0; inc_i < nInc; inc_i++ ) {
+				cTopNode = self->topMaps[level - 1][inc[inc_i]];
+				cEqNum = self->eqNums[level - 1][inc[inc_i]][dof_i];
+				if( cEqNum != (unsigned)-1 && !Num_Approx( basis[inc_i], 0.0 ) )
+					Matrix_InsertEntries( P, 1, &fEqNum, 1, &cEqNum, basis + inc_i );
+			}
+		}
+	}
+
+	FreeArray( localCoord );
+	FreeArray( basis );
+
+	Matrix_AssemblyBegin( P );
+	Matrix_AssemblyEnd( P );
+}
+
+void SROpGenerator_CalcOpNonZeros( SROpGenerator* self, unsigned level, 
+				   unsigned** nDiagNonZeros, unsigned** nOffDiagNonZeros )
+{
+	Mesh		*fMesh, *cMesh;
+	unsigned	nLocalFineNodes;
+	DofLayout*	dofLayout;
+	unsigned	dim, ind;
+	unsigned	nInc, *inc;
+	unsigned	fTopNode, cTopNode;
+	unsigned	fEqNum, cEqNum;
+	unsigned	nLocalEqNums;
+	unsigned	n_i, dof_i, dof_j, inc_i;
+
+	assert( self && Stg_CheckType( self, SROpGenerator ) );
+	assert( self->meshes );
+	assert( level < self->nLevels );
+
+	fMesh = self->meshes[level];
+	cMesh = self->meshes[level - 1];
+	nLocalFineNodes = Mesh_GetLocalSize( fMesh, MT_VERTEX );
+	dofLayout = self->fineEqNum->dofLayout;
+	if( self->eqNums[level] )
+		nLocalEqNums = self->nLocalEqNums[level];
+	else
+		nLocalEqNums = self->fineEqNum->localEqNumsOwnedCount;
+
+	*nDiagNonZeros = AllocArray( unsigned, nLocalEqNums );
+	memset( *nDiagNonZeros, 0, nLocalEqNums * sizeof(unsigned) );
+	*nOffDiagNonZeros = AllocArray( unsigned, nLocalEqNums );
+	memset( *nOffDiagNonZeros, 0, nLocalEqNums * sizeof(unsigned) );
+
+	for( n_i = 0; n_i < nLocalFineNodes; n_i++ ) {
+		if( self->topMaps[level] )
+			fTopNode = self->topMaps[level][n_i];
+		else
+			fTopNode = n_i;
+
+		for( dof_i = 0; dof_i < dofLayout->dofCounts[fTopNode]; dof_i++ ) {
+			if( self->eqNums[level] )
+				fEqNum = self->eqNums[level][n_i][dof_i];
+			else
+				fEqNum = self->fineEqNum->destinationArray[fTopNode][dof_i];
+
+			if( fEqNum == (unsigned)-1 )
+				continue;
+
+			insist( Mesh_SearchElements( cMesh, Mesh_GetVertex( fMesh, n_i ), &ind ) );
+			dim = Mesh_GetDimSize( fMesh );
+			if( dim == MT_VERTEX ) {
+				cTopNode = self->topMaps[level - 1][ind];
+				for( dof_j = 0; dof_j < dofLayout->dofCounts[cTopNode]; dof_j++ ) {
+					cEqNum = self->eqNums[level - 1][ind][dof_j];
+					if( cEqNum == (unsigned)-1 )
+						continue;
+
+					if( cEqNum - self->eqNumBases[level - 1] < nLocalEqNums )
+						(*nDiagNonZeros)[fEqNum - self->eqNumBases[level]]++;
+					else
+						(*nOffDiagNonZeros)[fEqNum - self->eqNumBases[level]]++;
+				}
+			}
+			else {
+				Mesh_GetIncidence( cMesh, dim, ind, MT_VERTEX, &nInc, &inc );
+				for( inc_i = 0; inc_i < nInc; inc_i++ ) {
+					cTopNode = self->topMaps[level - 1][inc[inc_i]];
+					for( dof_j = 0; dof_j < dofLayout->dofCounts[cTopNode]; dof_j++ ) {
+						cEqNum = self->eqNums[level - 1][inc[inc_i]][dof_j];
+						if( cEqNum == (unsigned)-1 )
+							continue;
+
+						if( cEqNum - self->eqNumBases[level - 1] < nLocalEqNums )
+							(*nDiagNonZeros)[fEqNum - self->eqNumBases[level]]++;
+						else
+							(*nOffDiagNonZeros)[fEqNum - self->eqNumBases[level]]++;
+					}
+				}
+			}
+		}
+	}
+}
+
+void SROpGenerator_DestructMeshes( SROpGenerator* self ) {
+	unsigned	nLevels;
+	unsigned	l_i;
+
+	assert( self && Stg_CheckType( self, SROpGenerator ) );
+
+	if( self->meshes ) {
+		nLevels = self->nLevels;
+		for( l_i = 0; l_i < nLevels - 1; l_i++ ) {
+			FreeObject( self->meshes[l_i] );
+			FreeArray( self->topMaps[l_i] );
+			FreeArray( self->eqNums[l_i] );
+		}
+		KillArray( self->meshes );
+		KillArray( self->topMaps );
+		KillArray( self->eqNums );
+		KillArray( self->nLocalEqNums );
+		KillArray( self->eqNumBases );
+	}
+}

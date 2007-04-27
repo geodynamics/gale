@@ -7,6 +7,12 @@
 		__AnalyticSolution
 		double sigma;
 		double Z;
+		FeVariable* velocityField;
+		FeVariable* pressureField;
+		FeVariable* stressField;
+		FeVariable* strainRateField;
+		FeVariable* recoveredStrainRateField;
+		FeVariable* recoveredStressField;
 	} Velic_solA;
 
 	void Velic_solA_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* pressure );

@@ -61,7 +61,7 @@ void Velic_solCA_MirkoFunction( void* analyticSolution, double* coord, int whatW
    double t1,t2,t3,t4,t5,t6,t7,t8,t10,t11;
    double t12,t14,t16,t21;
 
-   // XML input and coord
+   /*  XML input and coord */
    /*************************************************************************/
    /*************************************************************************/
    sigma = self->sigma;
@@ -162,15 +162,15 @@ void Velic_solCA_MirkoFunction( void* analyticSolution, double* coord, int whatW
 	 sum3 += -sigma*dx*(0.5-z); /* now have total zz stress */
 	 sum6 += -sigma*dx*(0.5-z); /* now have total xx stress */
 	 mag=sqrt(sum1*sum1+sum2*sum2);
-	 //printf("%0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f\n",x,z,sum1,sum2,sum3,sum4,sum5,sum6,mag,sum7);
+	 /* printf("%0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f\n",x,z,sum1,sum2,sum3,sum4,sum5,sum6,mag,sum7); */
 	 
 	 if ( whatWeWant == 1 ) { 
-		 result[0] = sum2; //vx
-		 result[1] = sum1; //vz
+		 result[0] = sum2; /* vx */
+		 result[1] = sum1; /* vz */
 	 }else if( whatWeWant == 2 ) {
-		 result[0] = sum6; //txx
-		 result[1] = sum3; //tzz
-		 result[2] = sum4; //txz
+		 result[0] = sum6; /* txx */
+		 result[1] = sum3; /* tzz */
+		 result[2] = sum4; /* txz */
 	 } else if (whatWeWant == 3 ) {
 		 *result = sum5;
 	 } else if( whatWeWant == 4 ) {

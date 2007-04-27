@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ForceVector.c 657 2006-10-19 02:08:32Z AlanLo $
+** $Id: ForceVector.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -55,6 +55,11 @@
 #include <assert.h>
 #include <string.h>
 #include "EntryPoint.h"
+#include "Assembler.h"
+
+
+Bool ForceVector_BCAsm_RowR( void* forceVec, Assembler* assm );
+
 
 /* Textual name of this class */
 const Type ForceVector_Type = "ForceVector";
@@ -62,94 +67,95 @@ const Type ForceVector_Type = "ForceVector";
 /** Name of this class' entry points */
 static const char	ForceVector_assembleForceVectorStr[] = "assembleForceVector";
 
+
 void* _ForceVector_DefaultNew( Name name ) {
 	return _ForceVector_New( 
-			sizeof(ForceVector), 
-			ForceVector_Type, 
-			_ForceVector_Delete,
-			_ForceVector_Print,
-			_ForceVector_Copy,
-			_ForceVector_DefaultNew, 
-			_ForceVector_Construct,
-			_ForceVector_Build, 
-			_ForceVector_Initialise,
-			_ForceVector_Execute, 
-			_ForceVector_Destroy,
-			name,
-			False,
-			NULL,
-			0,
-			NULL,
-			MPI_COMM_WORLD );
+		sizeof(ForceVector), 
+		ForceVector_Type, 
+		_ForceVector_Delete,
+		_ForceVector_Print,
+		_ForceVector_Copy,
+		_ForceVector_DefaultNew, 
+		_ForceVector_Construct,
+		_ForceVector_Build, 
+		_ForceVector_Initialise,
+		_ForceVector_Execute, 
+		_ForceVector_Destroy,
+		name,
+		False,
+		NULL,
+		0,
+		NULL,
+		MPI_COMM_WORLD );
 }
 
 
 ForceVector* ForceVector_New(
-		Name                                  name,
-		FeVariable*                           feVariable,
-		Dimension_Index                       dim,
-		void*                                 entryPoint_Register,
-		MPI_Comm                              comm )		
+	Name                                  name,
+	FeVariable*                           feVariable,
+	Dimension_Index                       dim,
+	void*                                 entryPoint_Register,
+	MPI_Comm                              comm )		
 {
 	return _ForceVector_New( 
-			sizeof(ForceVector), 
-			ForceVector_Type, 
-			_ForceVector_Delete,
-			_ForceVector_Print,
-			_ForceVector_Copy,
-			_ForceVector_DefaultNew, 
-			_ForceVector_Construct,
-			_ForceVector_Build, 
-			_ForceVector_Initialise,
-			_ForceVector_Execute, 
-			_ForceVector_Destroy,
-			name,
-			True,
-			feVariable,
-			dim,
-			entryPoint_Register,
-			comm );
+		sizeof(ForceVector), 
+		ForceVector_Type, 
+		_ForceVector_Delete,
+		_ForceVector_Print,
+		_ForceVector_Copy,
+		_ForceVector_DefaultNew, 
+		_ForceVector_Construct,
+		_ForceVector_Build, 
+		_ForceVector_Initialise,
+		_ForceVector_Execute, 
+		_ForceVector_Destroy,
+		name,
+		True,
+		feVariable,
+		dim,
+		entryPoint_Register,
+		comm );
 }
 
 ForceVector* _ForceVector_New( 
-		SizeT                                 _sizeOfSelf,
-		Type                                  type,
-		Stg_Class_DeleteFunction*             _delete,
-		Stg_Class_PrintFunction*              _print,
-		Stg_Class_CopyFunction*               _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*      _construct,
-		Stg_Component_BuildFunction*          _build,
-		Stg_Component_InitialiseFunction*     _initialise,
-		Stg_Component_ExecuteFunction*        _execute,
-		Stg_Component_DestroyFunction*        _destroy,
-		Name                                  name,
-		Bool                                  initFlag,
-		FeVariable*                           feVariable,
-		Dimension_Index                       dim,
-		void*                                 entryPoint_Register,
-		MPI_Comm                              comm )
+	SizeT                                 _sizeOfSelf,
+	Type                                  type,
+	Stg_Class_DeleteFunction*             _delete,
+	Stg_Class_PrintFunction*              _print,
+	Stg_Class_CopyFunction*               _copy, 
+	Stg_Component_DefaultConstructorFunction* _defaultConstructor,
+	Stg_Component_ConstructFunction*      _construct,
+	Stg_Component_BuildFunction*          _build,
+	Stg_Component_InitialiseFunction*     _initialise,
+	Stg_Component_ExecuteFunction*        _execute,
+	Stg_Component_DestroyFunction*        _destroy,
+	Name                                  name,
+	Bool                                  initFlag,
+	FeVariable*                           feVariable,
+	Dimension_Index                       dim,
+	void*                                 entryPoint_Register,
+	MPI_Comm                              comm )
 {
 	ForceVector*		self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(ForceVector) );
 	self = (ForceVector*)_SolutionVector_New( 
-			_sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			name,
-			initFlag,
-			comm,
-			feVariable );
+		_sizeOfSelf,
+		type, 
+		_delete,
+		_print,
+		_copy,
+		_defaultConstructor,
+		_construct,
+		_build,
+		_initialise,
+		_execute,
+		_destroy,
+		name,
+		initFlag,
+		comm,
+		feVariable );
 	
 	if ( initFlag ) {
 		_ForceVector_Init( self, dim, entryPoint_Register );
@@ -160,9 +166,9 @@ ForceVector* _ForceVector_New(
 
 
 void _ForceVector_Init(
-		void*                                     forceVector,
-		Dimension_Index                           dim,
-		EntryPoint_Register*                      entryPoint_Register )
+	void*                                     forceVector,
+	Dimension_Index                           dim,
+	EntryPoint_Register*                      entryPoint_Register )
 {
 	ForceVector* self = (ForceVector*)  forceVector;
 	
@@ -177,13 +183,15 @@ void _ForceVector_Init(
 	/* Create Entry Point for assembleForceVector */
 	Stg_asprintf( &self->_assembleForceVectorEPName, "%s-%s", self->name, ForceVector_assembleForceVectorStr );
 	self->assembleForceVector = FeEntryPoint_New( self->_assembleForceVectorEPName,
-		FeEntryPoint_AssembleForceVector_CastType );
+						      FeEntryPoint_AssembleForceVector_CastType );
 	EntryPoint_Register_Add( self->entryPoint_Register, self->assembleForceVector );	
 
 	/* Add default hook to assembleForceVector entry point */
 	EP_ReplaceAll( self->assembleForceVector, ForceVector_GlobalAssembly_General );
 
 	self->forceTermList = Stg_ObjectList_New();
+
+	self->bcAsm = Assembler_New();
 }
 
 
@@ -304,8 +312,21 @@ void _ForceVector_Build( void* forceVector, void* data ) {
 	
 	/* Allocate the vector */
 	Journal_DPrintfL( self->debug, 2, "Allocating the L.A. Force Vector with %d local entries.\n", self->localSize );
-	self->vector = Vector_New_SpecifyLocalSize( self->comm, self->localSize );
+#ifdef HAVE_PETSC
+	self->vector = (Vector*)PETScVector_New( "" );
+#else
+#error *** No linear algebra package found.
+#endif
+	Vector_SetComm( self->vector, self->comm );
+	Vector_SetLocalSize( self->vector, self->localSize );
 	Stream_UnIndentBranch( StgFEM_Debug );
+
+	Assembler_SetVariables( self->bcAsm, self->feVariable, NULL );
+	Assembler_SetCallbacks( self->bcAsm, 
+				NULL, 
+				ForceVector_BCAsm_RowR, NULL, 
+				NULL, NULL, 
+				self );
 }
 
 
@@ -331,7 +352,7 @@ void ForceVector_Assemble( void* forceVector ) {
 	ForceVector* self = (ForceVector*)forceVector;
 	
 	Journal_DPrintf( self->debug, "In %s - for vector \"%s\" - calling the \"%s\" E.P.\n", __func__, self->name,
-		self->assembleForceVector->name );
+			 self->assembleForceVector->name );
 
 	/* Call the Entry point directly from the base class */
 	/* Note that it may be empty: this is deliberate. */
@@ -346,25 +367,32 @@ void ForceVector_Assemble( void* forceVector ) {
 
 
 void ForceVector_PrintElementForceVector(
-		ForceVector* self,
-		Element_LocalIndex element_lI,
-		Dof_EquationNumber** elementLM,
-		double* elForceVecToAdd )
+	ForceVector* self,
+	Element_LocalIndex element_lI,
+	Dof_EquationNumber** elementLM,
+	double* elForceVecToAdd )
 {
-	Dof_Index		dofsPerNode = self->feVariable->dofLayout->dofCounts[ self->feVariable->feMesh->elementNodeTbl[element_lI][0] ];
-	Node_LocalIndex		nodesThisEl = self->feVariable->feMesh->elementNodeCountTbl[element_lI];
+	DofLayout*		dofLayout = self->feVariable->dofLayout;
+	FeMesh*			feMesh = self->feVariable->feMesh;
+	unsigned		nInc, *inc;
+	Dof_Index		dofsPerNode;
+	Node_LocalIndex		nodesThisEl;
 	Node_LocalIndex		node_I;
 	Dof_Index		dof_I;
 	Index			vec_I;
+
+	FeMesh_GetElementNodes( feMesh, element_lI, &nInc, &inc );
+	dofsPerNode = dofLayout->dofCounts[inc[0]];
+	nodesThisEl = nInc;
 
 	for ( node_I=0; node_I < nodesThisEl; node_I++ ) {
 		for ( dof_I = 0; dof_I < dofsPerNode; dof_I++ ) {
 			vec_I = node_I * dofsPerNode + dof_I;
 
 			Journal_DPrintf( self->debug, "Entry[%d][%d] (LM (%4d)) = %.3f\n",
-				node_I, dof_I,
-				elementLM[node_I][dof_I],
-				elForceVecToAdd[vec_I] ); 
+					 node_I, dof_I,
+					 elementLM[node_I][dof_I],
+					 elForceVecToAdd[vec_I] ); 
 		}			
 	}
 }
@@ -390,83 +418,90 @@ void ForceVector_GlobalAssembly_General( void* forceVector ) {
 	
 	Stream_IndentBranch( StgFEM_Debug );
 	
-	if ( Stg_ObjectList_Count( self->forceTermList ) == 0 ) {
-		Journal_DPrintf( self->debug, "No ForceTerms registered - returning.\n" );
-		Stream_UnIndentBranch( StgFEM_Debug );
-		return;
-	}
+	if ( Stg_ObjectList_Count( self->forceTermList ) > 0 ) {
+		elementLocalCount = FeMesh_GetElementLocalSize( feVar->feMesh );
 
-	elementLocalCount = feVar->feMesh->elementLocalCount;
-
-	/* Initialise Vector */
-	outputInterval = (int)( (outputPercentage/100.0)*(double)(elementLocalCount) );
-	if( outputInterval == 0 ) { outputInterval = elementLocalCount; }
+		/* Initialise Vector */
+		outputInterval = (int)( (outputPercentage/100.0)*(double)(elementLocalCount) );
+		if( outputInterval == 0 ) { outputInterval = elementLocalCount; }
 	
-	for( element_lI = 0; element_lI < elementLocalCount; element_lI++ ) {  
+		for( element_lI = 0; element_lI < elementLocalCount; element_lI++ ) {  
+			unsigned	nInc, *inc;
 		
-		nodeCountCurrElement = feVar->feMesh->elementNodeCountTbl[ element_lI ];
-		/* Get the local node ids */
-		nodeIdsInCurrElement = feVar->feMesh->elementNodeTbl[ element_lI ];
+			FeMesh_GetElementNodes( feVar->feMesh, element_lI, &nInc, &inc );
+			nodeCountCurrElement = nInc;
+			/* Get the local node ids */
+			nodeIdsInCurrElement = inc;
 
-		/* Set value of elementLM: will automatically just index into global LM table if built */
-		elementLM = FeEquationNumber_BuildOneElementLocationMatrix( feVar->eqNum, element_lI );
+			/* Set value of elementLM: will automatically just index into global LM table if built */
+			elementLM = FeEquationNumber_BuildOneElementLocationMatrix( feVar->eqNum, element_lI );
 
-		/* work out number of dofs at the node, using LM */
-		/* Since: Number of entries in LM table for this element = (by defn.) Number of dofs this element */
-		dofCountLastNode = feVar->dofLayout->dofCounts[nodeIdsInCurrElement[nodeCountCurrElement-1]]; 
-		totalDofsThisElement = &elementLM[nodeCountCurrElement-1][dofCountLastNode-1] - &elementLM[0][0] + 1;
+			/* work out number of dofs at the node, using LM */
+			/* Since: Number of entries in LM table for this element = (by defn.) Number of dofs this element */
+			dofCountLastNode = feVar->dofLayout->dofCounts[nodeIdsInCurrElement[nodeCountCurrElement-1]]; 
+			totalDofsThisElement = &elementLM[nodeCountCurrElement-1][dofCountLastNode-1] - &elementLM[0][0] + 1;
 
-		if ( totalDofsThisElement > totalDofsPrevElement ) {
-			if (elForceVecToAdd) Memory_Free( elForceVecToAdd );
-			Journal_DPrintfL( self->debug, 2, "Reallocating elForceVecToAdd to size %d\n", totalDofsThisElement );
-			elForceVecToAdd = Memory_Alloc_Array( double, totalDofsThisElement, "elForceVecToAdd" );
-		}
+			if ( totalDofsThisElement > totalDofsPrevElement ) {
+				if (elForceVecToAdd) Memory_Free( elForceVecToAdd );
+				Journal_DPrintfL( self->debug, 2, "Reallocating elForceVecToAdd to size %d\n", totalDofsThisElement );
+				elForceVecToAdd = Memory_Alloc_Array( double, totalDofsThisElement, "elForceVecToAdd" );
+			}
 
-		/* Initialise Values to Zero */
-		memset( elForceVecToAdd, 0, totalDofsThisElement * sizeof(double) );
+			/* Initialise Values to Zero */
+			memset( elForceVecToAdd, 0, totalDofsThisElement * sizeof(double) );
 		
-		/* Assemble this element's element force vector: going through each force term in list */
-		ForceVector_AssembleElement( self, element_lI, elForceVecToAdd );
+			/* Assemble this element's element force vector: going through each force term in list */
+			ForceVector_AssembleElement( self, element_lI, elForceVecToAdd );
 
-		#if DEBUG
-		if ( Stream_IsPrintableLevel( self->debug, 3 ) ) {
-			Journal_DPrintf( self->debug, "Handling Element %d:\n", element_lI );
-			FeEquationNumber_PrintElementLocationMatrix( feVar->eqNum, elementLM,
-				element_lI, self->debug );
+/*
+  #if DEBUG
+  if ( Stream_IsPrintableLevel( self->debug, 3 ) ) {
+  Journal_DPrintf( self->debug, "Handling Element %d:\n", element_lI );
+  FeEquationNumber_PrintElementLocationMatrix( feVar->eqNum, elementLM,
+  element_lI, self->debug );
 				
-			Journal_DPrintf( self->debug, "El force Vec about to be added:\n" );
-			ForceVector_PrintElementForceVector( self, element_lI, elementLM, elForceVecToAdd );
-		}	
-		#endif
+  Journal_DPrintf( self->debug, "El force Vec about to be added:\n" );
+  ForceVector_PrintElementForceVector( self, element_lI, elementLM, elForceVecToAdd );
+  }	
+  #endif
+*/
 
-		/* Ok, assemble into global matrix */
-		Vector_AddTo( self->vector, totalDofsThisElement, (Index*)(elementLM[0]), elForceVecToAdd );
+			/* Ok, assemble into global matrix */
+			Vector_AddEntries( self->vector, totalDofsThisElement, (Index*)(elementLM[0]), elForceVecToAdd );
 
-		#if DEBUG
-		if( element_lI % outputInterval == 0 ) {
-			Journal_DPrintfL( self->debug, 2, "done %d percent of global force vector assembly (general) \n",
-				(int)(100.0*((double)element_lI/(double)elementLocalCount)) );
+#if DEBUG
+			if( element_lI % outputInterval == 0 ) {
+				Journal_DPrintfL( self->debug, 2, "done %d percent of global force vector assembly (general) \n",
+						  (int)(100.0*((double)element_lI/(double)elementLocalCount)) );
+			}
+#endif
+
+			/* Cleanup: If we haven't built the big LM for all elements, free the temporary one */
+			if ( False == feVar->eqNum->locationMatrixBuilt ) {
+				Memory_Free( elementLM );
+			}
+			totalDofsPrevElement = totalDofsThisElement;
 		}
-		#endif
 
-		/* Cleanup: If we haven't built the big LM for all elements, free the temporary one */
-		if ( False == feVar->eqNum->locationMatrixBuilt ) {
-			Memory_Free( elementLM );
-		}
-		totalDofsPrevElement = totalDofsThisElement;
+		Memory_Free( elForceVecToAdd );
+	}
+	else {
+		Journal_DPrintf( self->debug, "No ForceTerms registered - returning.\n" );
 	}
 
-	Memory_Free( elForceVecToAdd );
+	/* If we're keeping BCs, insert them into the force vector. */
+	if( !feVar->eqNum->removeBCs )
+		Assembler_LoopVector( self->bcAsm );
 
 	Vector_AssemblyBegin( self->vector );
 	Vector_AssemblyEnd( self->vector ); 
 
-	#if DEBUG
+#if DEBUG
 	if ( Stream_IsPrintableLevel( self->debug, 3 ) ) {
 		Journal_DPrintf( self->debug, "Completely built vector %s is:\n", self->name );
 		Vector_View( self->vector, self->debug );
 	}
-	#endif
+#endif
 
 	Stream_UnIndentBranch( StgFEM_Debug );
 }
@@ -488,4 +523,14 @@ void ForceVector_AddForceTerm( void* forceVector, ForceTerm* forceTerm ) {
 	ForceVector*            self                 = (ForceVector*) forceVector;
 
 	Stg_ObjectList_Append( self->forceTermList, Stg_CheckType( forceTerm, ForceTerm ) );
+}
+
+Bool ForceVector_BCAsm_RowR( void* forceVec, Assembler* assm ) {
+	double	bc;
+
+	bc = DofLayout_GetValueDouble( assm->rowVar->dofLayout, 
+				       assm->rowNodeInd, 
+				       assm->rowDofInd );
+	Vector_InsertEntries( ((ForceVector*)forceVec)->vector, 1, &assm->rowEq, &bc );
+	return True;
 }

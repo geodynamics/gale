@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: LidDrivenIsoviscousAnalytic.c 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: LidDrivenIsoviscousAnalytic.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -50,6 +50,8 @@ typedef struct {
 	__AnalyticSolution 
 	unsigned int wavenumber;
 	double A, B, C, D;
+	FeVariable* velocityField;
+	FeVariable* pressureField;
 } LidDrivenIsoviscousAnalytic;
 
 
@@ -123,20 +125,27 @@ void LidDrivenIsoviscousAnalytic_PressureFunction( void* analyticSolution, FeVar
 
 void _LidDrivenIsoviscousAnalytic_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	LidDrivenIsoviscousAnalytic *self = (LidDrivenIsoviscousAnalytic*)analyticSolution;
-	FeVariable*       velocityField;
-	FeVariable*       pressureField;
 
 	_AnalyticSolution_Construct( self, cf, data );
 
-	velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data ); 
-	AnalyticSolution_CreateAnalyticVectorField( self, velocityField, LidDrivenIsoviscousAnalytic_VelocityFunction );
-
-	pressureField = Stg_ComponentFactory_ConstructByName( cf, "PressureField", FeVariable, True, data ); 
-	AnalyticSolution_CreateAnalyticField( self, pressureField, LidDrivenIsoviscousAnalytic_PressureFunction );
+	self->velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data ); 
+	self->pressureField = Stg_ComponentFactory_ConstructByName( cf, "PressureField", FeVariable, True, data ); 
 
 	/* Set constants */
 	self->wavenumber = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "sinusoidalLidWavenumber", 1 );
 	LidDrivenIsoviscousAnalytic_CalculateConstants( self );
+}
+
+void _LidDrivenIsoviscousAnalytic_Build( void* analyticSolution, void* data ) {
+	LidDrivenIsoviscousAnalytic *self = (LidDrivenIsoviscousAnalytic*)analyticSolution;
+
+	Build( self->velocityField, data, False );
+	Build( self->velocityField, data, False );
+
+	AnalyticSolution_CreateAnalyticVectorField( self, self->velocityField, LidDrivenIsoviscousAnalytic_VelocityFunction );
+	AnalyticSolution_CreateAnalyticField( self, self->pressureField, LidDrivenIsoviscousAnalytic_PressureFunction );
+
+	_AnalyticSolution_Build( self, data );
 }
 
 void* _LidDrivenIsoviscousAnalytic_DefaultNew( Name name ) {
@@ -148,7 +157,7 @@ void* _LidDrivenIsoviscousAnalytic_DefaultNew( Name name ) {
 			_AnalyticSolution_Copy,
 			_LidDrivenIsoviscousAnalytic_DefaultNew,
 			_LidDrivenIsoviscousAnalytic_Construct,
-			_AnalyticSolution_Build,
+			_LidDrivenIsoviscousAnalytic_Build, 
 			_AnalyticSolution_Initialise,
 			_AnalyticSolution_Execute,
 			_AnalyticSolution_Destroy,

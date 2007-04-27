@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeEquationNumber.c 742 2007-02-13 02:44:01Z PatrickSunter $
+** $Id: FeEquationNumber.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -47,7 +47,7 @@
 #include "ElementType.h"
 #include "ElementType_Register.h"
 #include "Element.h"
-#include "Mesh.h"
+#include "FeMesh.h"
 #include "FeEquationNumber.h"
 #include "LinkedDofInfo.h"
 #include <stdio.h>
@@ -89,6 +89,7 @@ MPI_Datatype MPI_critPointInfoType;
 
 /*###### Private Function Declarations ######*/
 
+#if 0
 static void _FeEquationNumber_BuildRemappedNodeInfoTable( void* feEquationNumber );
 
 static void _FeEquationNumber_CalculateDomainKnownCriticalPoints( FeEquationNumber* self, Node_DomainIndex nodeDomainCount,
@@ -131,7 +132,7 @@ static void _FeEquationNumber_AddAllPartialTotals( FeEquationNumber* self, CritP
 						   Index maxSubTotalsPerProc );
 
 Node_RemappedGlobalIndex _FeEquationNumber_RemapNode( 
-	HexaMD* hexaMD,
+	Mesh* mesh, 
 	Index newDimOrder[3],
 	Node_GlobalIndex gNode_I );
 
@@ -140,6 +141,7 @@ Node_RemappedGlobalIndex _FeEquationNumber_RemapNode(
 static Bool _FeEquationNumber_IHaveCritPoint(
 	FeEquationNumber* self,
 	Node_RemappedGlobalIndex critPoint );
+#endif
 
 /*###### Function Definitions ######*/
 
@@ -260,7 +262,7 @@ void _FeEquationNumber_Init(
 	
 	/* FinteElementMesh info */
 	self->isConstructed = True;
-	self->feMesh = (FiniteElement_Mesh*)feMesh;
+	self->feMesh = (FeMesh*)feMesh;
 	self->globalSumUnconstrainedDofs = 0;
 	self->isBuilt = False;
 	self->locationMatrixBuilt = False;
@@ -300,14 +302,14 @@ void _FeEquationNumber_Delete( void* feEquationNumber ) {
 	Journal_DPrintfL( self->debug, 1, "In %s\n",  __func__ );
 	Stream_IndentBranch( StgFEM_Debug );
 
-	Memory_Free( self->remappedNodeInfos );
+	FreeArray( self->remappedNodeInfos );
 	/* free destination array memory */
 	Journal_DPrintfL( self->debug, 2, "Freeing I.D. Array\n" );
-	Memory_Free( self->destinationArray );
+	FreeArray( self->destinationArray );
 	
 	if (self->locationMatrix) {
 		Journal_DPrintfL( self->debug, 2, "Freeing Full L.M. Array\n" );
-		Memory_Free( self->locationMatrix );
+		FreeArray( self->locationMatrix );
 	}
 
 	if( self->bcEqNums ) {
@@ -349,10 +351,14 @@ void _FeEquationNumber_Print( void* mesh, Stream* stream ) {
 
 
 void* _FeEquationNumber_Copy( void* feEquationNumber, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+#if 0
 	FeEquationNumber*	self = (FeEquationNumber*)feEquationNumber;
+	Mesh*			mesh;
 	FeEquationNumber*	newFeEquationNumber;
 	PtrMap*			map = ptrMap;
 	Bool			ownMap = False;
+
+	mesh = (Mesh*)self->feMesh;
 	
 	if( !map ) {
 		map = PtrMap_New( 10 );
@@ -381,14 +387,15 @@ void* _FeEquationNumber_Copy( void* feEquationNumber, void* dest, Bool deep, Nam
 		newFeEquationNumber->debug = (Stream*)Stg_Class_Copy( self->debug, NULL, deep, nameExt, map );
 		newFeEquationNumber->debugLM = (Stream*)Stg_Class_Copy( self->debugLM, NULL, deep, nameExt, map );
 		newFeEquationNumber->warning = (Stream*)Stg_Class_Copy( self->warning, NULL, deep, nameExt, map );
-		newFeEquationNumber->feMesh = (FiniteElement_Mesh*)Stg_Class_Copy( self->feMesh, NULL, deep, nameExt, map );
+		newFeEquationNumber->feMesh = (FeMesh*)Stg_Class_Copy( self->feMesh, NULL, deep, nameExt, map );
 		newFeEquationNumber->dofLayout = (DofLayout*)Stg_Class_Copy( self->dofLayout, NULL, deep, nameExt, map );
 		newFeEquationNumber->bcs = (VariableCondition*)Stg_Class_Copy( self->bcs, NULL, deep, nameExt, map );
 		newFeEquationNumber->linkedDofInfo = (LinkedDofInfo*)Stg_Class_Copy( self->linkedDofInfo, NULL, deep, nameExt, map );
 		
 		if( (newFeEquationNumber->remappedNodeInfos = PtrMap_Find( map, self->remappedNodeInfos )) == NULL && self->remappedNodeInfos ) {
-			MeshDecomp*		meshDecomp = self->feMesh->layout->decomp;
-			Node_DomainIndex	nodeDomainCount = meshDecomp->nodeDomainCount;
+			Node_DomainIndex	nodeDomainCount;
+
+			nodeDomainCount = Mesh_GetDomainSize( mesh, MT_VERTEX );
 			
 			newFeEquationNumber->remappedNodeInfos = Memory_Alloc_Array( RemappedNodeInfo, nodeDomainCount, "FeEquationNumber->remappedNodeInfos" );
 			memcpy( newFeEquationNumber->remappedNodeInfos, self->remappedNodeInfos, sizeof(RemappedNodeInfo) * nodeDomainCount );
@@ -396,9 +403,10 @@ void* _FeEquationNumber_Copy( void* feEquationNumber, void* dest, Bool deep, Nam
 		}
 		
 		if( (newFeEquationNumber->destinationArray = PtrMap_Find( map, self->destinationArray )) == NULL && self->destinationArray ) {
-			MeshDecomp*		meshDecomp = self->feMesh->layout->decomp;
-			Node_DomainIndex	nodeDomainCount = meshDecomp->nodeDomainCount;
+			Node_DomainIndex	nodeDomainCount;
 			Node_DomainIndex	node_dI;
+
+			nodeDomainCount = Mesh_GetDomainSize( mesh, MT_VERTEX );
 			
 			newFeEquationNumber->destinationArray = Memory_Alloc_2DComplex( Dof_EquationNumber, nodeDomainCount, self->dofLayout->dofCounts, "FeEquationNumber->destinationArray" );
 			for( node_dI = 0; node_dI < nodeDomainCount; node_dI++ ) {
@@ -408,8 +416,9 @@ void* _FeEquationNumber_Copy( void* feEquationNumber, void* dest, Bool deep, Nam
 		}
 		
 		if( (newFeEquationNumber->_lowestGlobalEqNums = PtrMap_Find( map, self->_lowestGlobalEqNums )) == NULL && self->_lowestGlobalEqNums ) {
-			MeshDecomp*		meshDecomp = self->feMesh->layout->decomp;
-			Partition_Index		nProc = meshDecomp->nproc;
+			Partition_Index		nProc;
+
+			nProc = Mesh_GetCommTopology( mesh, MT_VERTEX )->nProcs;
 			
 			newFeEquationNumber->_lowestGlobalEqNums = Memory_Alloc_Array( Dof_EquationNumber, nProc, "FeEquationNumber->_lowestGlobalEqNums" );
 			memcpy( newFeEquationNumber->_lowestGlobalEqNums, self->_lowestGlobalEqNums, sizeof(Dof_EquationNumber) * nProc );
@@ -417,7 +426,7 @@ void* _FeEquationNumber_Copy( void* feEquationNumber, void* dest, Bool deep, Nam
 		}
 		
 		if( (newFeEquationNumber->locationMatrix = PtrMap_Find( map, self->locationMatrix )) == NULL && self->locationMatrix ) {
-			FiniteElement_Mesh*	mesh = self->feMesh;
+			FeMesh*	mesh = self->feMesh;
 			Element_LocalIndex	lElement_I;
 			Node_LocalIndex		numNodesThisElement;
 			Node_LocalIndex		elLocalNode_I;
@@ -467,6 +476,8 @@ void* _FeEquationNumber_Copy( void* feEquationNumber, void* dest, Bool deep, Nam
 	}
 	
 	return (void*)newFeEquationNumber;
+#endif
+	abort();
 }
 
 
@@ -482,16 +493,18 @@ void FeEquationNumber_Build( void* feEquationNumber ) {
 
 void _FeEquationNumber_Build( void* feEquationNumber ) {
 	FeEquationNumber* self = (FeEquationNumber*) feEquationNumber;
-#if DEBUG
+
 	assert(self);
-#endif
 	
 	Journal_DPrintf( self->debug, "In %s:\n",  __func__ );
 	Stream_IndentBranch( StgFEM_Debug );
 
+#if 0
 	/* If we have new mesh topology information, do this differently. */
 	if( self->feMesh->topo->domains && self->feMesh->topo->domains[MT_VERTEX] ) {
+#endif
 		FeEquationNumber_BuildWithTopology( self );
+#if 0
 	}
 	else {
 		_FeEquationNumber_BuildRemappedNodeInfoTable( self );
@@ -499,13 +512,12 @@ void _FeEquationNumber_Build( void* feEquationNumber ) {
 		_FeEquationNumber_CalculateGlobalUnconstrainedDofTotal( self );
 		_FeEquationNumber_CalculateEqNumsDecomposition( self );
 	}
+#endif
 
-#if DEBUG
 	if ( Stream_IsPrintableLevel( self->debug, 3 ) ) {
 		FeEquationNumber_PrintDestinationArray( self, self->debug );
 	}
-#endif
-	
+
 	Stream_UnIndentBranch( StgFEM_Debug );
 }
 
@@ -526,6 +538,7 @@ void _FeEquationNumber_Initialise( void* feEquationNumber ) {
 }
 
 
+#if 0
 Node_RemappedGlobalIndex _FeEquationNumber_RemapNode( 
 	HexaMD* hexaMD,
 	Index newDimOrder[3],
@@ -554,14 +567,14 @@ Node_RemappedGlobalIndex _FeEquationNumber_RemapNode(
 
 static void _FeEquationNumber_BuildRemappedNodeInfoTable( void* feEquationNumber ) {
 	FeEquationNumber* self = (FeEquationNumber*) feEquationNumber;
-	FiniteElement_Mesh* mesh = self->feMesh;
-	MeshDecomp* meshDecomp = self->feMesh->layout->decomp;
-	Node_DomainIndex nodeDomainCount = meshDecomp->nodeDomainCount;
+	FeMesh* mesh = self->feMesh;
+	Node_DomainIndex nodeDomainCount = Mesh_GetDomainSize( mesh, MT_VERTEX );
+	CommTopology*	commTopo = Mesh_GetCommTopology( mesh, MT_VERTEX );
 	Node_GlobalIndex gNode_I = 0;
 	Node_DomainIndex dNode_I = 0;
-#if DEBUG
+/*#if DEBUG*/
 	RemappedNodeInfo_Index rNodeInfo_I;
-#endif
+/*#endif*/
 	
 	Journal_DPrintfL( self->debug, 1, "In %s:\n",  __func__ );
 	Stream_IndentBranch( StgFEM_Debug );
@@ -569,7 +582,7 @@ static void _FeEquationNumber_BuildRemappedNodeInfoTable( void* feEquationNumber
 	self->remappedNodeInfos = Memory_Alloc_Array( RemappedNodeInfo, nodeDomainCount, 
 						      "FeEquationNumber->remappedNodeInfos" );
 	
-	if ( 1 == meshDecomp->procsInUse ) {
+	if ( 1 == commTopo->nProcs ) {
 		Journal_DPrintfL( self->debug, 1, "Serial code: No remapping required...filling remapping table with normal values.\n" );
 		for (dNode_I = 0; dNode_I < nodeDomainCount; dNode_I++ ) {
 			gNode_I = mesh->nodeD2G[dNode_I];
@@ -723,7 +736,7 @@ static void _FeEquationNumber_BuildRemappedNodeInfoTable( void* feEquationNumber
 		Stream_UnIndentBranch( StgFEM_Debug );
 	}
 
-#if DEBUG
+/*#if DEBUG*/
 	if ( Stream_IsPrintableLevel( self->debug, 3 ) ) {
 		Journal_DPrintf( self->debug, "Calculated remapped node info table as:\n{\n" );
 		for (rNodeInfo_I = 0; rNodeInfo_I < nodeDomainCount; rNodeInfo_I++ ) {
@@ -733,7 +746,7 @@ static void _FeEquationNumber_BuildRemappedNodeInfoTable( void* feEquationNumber
 		}
 		Journal_DPrintf( self->debug, "}\n");
 	}
-#endif
+/*#endif*/
 	Stream_UnIndentBranch( StgFEM_Debug );
 }	
 
@@ -831,7 +844,7 @@ void _FeEquationNumber_BuildDestinationArray( FeEquationNumber* self ) {
 
 	/* If not removing BCs, construct a table of which equation numbers are actually BCs. */
 	if( !self->removeBCs ) {
-		FiniteElement_Mesh*	feMesh = self->feMesh;
+		FeMesh*	feMesh = self->feMesh;
 		DofLayout*		dofLayout = self->dofLayout;
 		VariableCondition*	bcs = self->bcs;
 		unsigned		lNode_i;
@@ -930,7 +943,7 @@ static void _FeEquationNumber_CalculateDomainKnownCriticalPoints(
 		}
 	}
 
-#if DEBUG
+/*#if DEBUG*/
 	if ( Stream_IsPrintableLevel( self->debug, 2 ) ) {
 		Index cPoint_I;
 
@@ -946,7 +959,7 @@ static void _FeEquationNumber_CalculateDomainKnownCriticalPoints(
 		}
 		Journal_DPrintf( self->debug, "]\n" );
 	}
-#endif
+/*#endif*/
 	Stream_UnIndentBranch( StgFEM_Debug );
 }
 
@@ -1055,7 +1068,7 @@ static void _FeEquationNumber_CalculateCritPointsIHave( FeEquationNumber* self,
 			}	
 		}		
 	}			
-#if DEBUG
+/*#if DEBUG*/
 	if ( Stream_IsPrintableLevel( self->debug, 2 ) ) {
 		Journal_DPrintf( self->debug, "Calculated crit points I Have:\n[" );
 		for ( myCritPoint_I = 0; myCritPoint_I < (*critPointsIHaveTotal); myCritPoint_I++ ) {
@@ -1067,7 +1080,7 @@ static void _FeEquationNumber_CalculateCritPointsIHave( FeEquationNumber* self,
 		}
 		Journal_DPrintf( self->debug, "]\n");
 	}	
-#endif
+/*#endif*/
 	
 	Memory_Free( allWantedCriticalPoints );
 	Memory_Free( procWantedCritPointsTotals );
@@ -1124,16 +1137,16 @@ static void _FeEquationNumber_ShareCriticalPoints(
 {
 	MeshDecomp* meshDecomp = self->feMesh->layout->decomp;
 	Partition_Index proc_I; 
-#if DEBUG
+/*#if DEBUG*/
 	Index point_I = 0;
-#endif
+/*#endif*/
 
 	Journal_DPrintf( self->debug, "In %s\n", __func__ );
 	Stream_IndentBranch( StgFEM_Debug );
 	
 	(*maxCritPointsPerProc) = 0;
 	
-#if DEBUG
+/*#if DEBUG*/
 	if ( Stream_IsPrintableLevel( self->debug, 2 ) ) {
 		Journal_DPrintf( self->debug, "myCriticalPointsTotal=%u\n",  myCriticalPointsTotal);
 		Journal_DPrintf( self->debug, "myCritPoints:(" );
@@ -1143,7 +1156,7 @@ static void _FeEquationNumber_ShareCriticalPoints(
 		}	
 		Journal_DPrintf( self->debug, ")\n");
 	}	
-#endif
+/*#endif*/
 
 	/* First, we allocate and calculate how many critical points are on each node (this way, we don't have to guess
 	   how much memory to allocate in the main array.) */
@@ -1159,14 +1172,14 @@ static void _FeEquationNumber_ShareCriticalPoints(
 			(*maxCritPointsPerProc) = (*procCritPointsTotals)[proc_I];
 	}
 
-#if DEBUG
+/*#if DEBUG*/
 	Journal_DPrintfL( self->debug, 2, "procCritPoints totals:(");
 	for (proc_I = 0; proc_I < meshDecomp->nproc; proc_I++) {
 		Journal_DPrintfL( self->debug, 2, "%d, ", (*procCritPointsTotals)[proc_I]);
 	}
 	Journal_DPrintfL( self->debug, 2, ")\n");
 	Journal_DPrintfL( self->debug, 2, "MaxCritPointsPerProc = %d\n", (*maxCritPointsPerProc));
-#endif
+/*#endif*/
 
 	/* Now share the actual point values */
 	(*myCriticalPoints) = Memory_Realloc_Array( (*myCriticalPoints), Node_GlobalIndex, *maxCritPointsPerProc );
@@ -1177,7 +1190,7 @@ static void _FeEquationNumber_ShareCriticalPoints(
 		       (*allCriticalPoints), (*maxCritPointsPerProc), MPI_UNSIGNED,
 		       meshDecomp->communicator );
 
-#if DEBUG
+/*#if DEBUG*/
 	Journal_DPrintfL( self->debug, 2, "procCritPoints:(" );
 	for (proc_I = 0; proc_I < meshDecomp->nproc; proc_I++) {
 		for ( point_I = 0; point_I < (*procCritPointsTotals)[proc_I]; point_I++)
@@ -1187,7 +1200,7 @@ static void _FeEquationNumber_ShareCriticalPoints(
 		}	
 	}
 	Journal_DPrintfL( self->debug, 2, ")\n");
-#endif
+/*#endif*/
 	Stream_UnIndentBranch( StgFEM_Debug );
 }
 
@@ -1207,15 +1220,15 @@ static void _FeEquationNumber_ShareCritPointInfo(
 {
 	MeshDecomp* meshDecomp = self->feMesh->layout->decomp;
 	Partition_Index proc_I; 
-#if DEBUG
+/*#if DEBUG*/
 	Index point_I = 0;
-#endif
+/*#endif*/
 
 	Journal_DPrintfL( self->debug, 1, "In %s\n",  __func__ );
 	Stream_IndentBranch( StgFEM_Debug );
 	(*maxCritPointInfoPerProc) = 0;
 
-	// allgather the totals (to save allocating unnecessary memory)
+	/* allgather the totals (to save allocating unnecessary memory) */
 	(*procCritPointInfoTotals) = Memory_Alloc_Array( Node_GlobalIndex, meshDecomp->nproc, "*procCritPointInfoTotals" ); 
 
 	MPI_Allgather( &myCritPointInfoTotal, 1, MPI_INT, (*procCritPointInfoTotals), 1, MPI_INT,
@@ -1226,7 +1239,7 @@ static void _FeEquationNumber_ShareCritPointInfo(
 			(*maxCritPointInfoPerProc) = (*procCritPointInfoTotals)[proc_I];
 	}
 
-#if DEBUG
+/*#if DEBUG*/
 	if ( Stream_IsPrintableLevel( self->debug, 2 ) ) {
 		Journal_DPrintf( self->debug, "procCritPointInfo totals:(" );
 		for (proc_I = 0; proc_I < meshDecomp->nproc; proc_I++) {
@@ -1235,7 +1248,7 @@ static void _FeEquationNumber_ShareCritPointInfo(
 		Journal_DPrintf( self->debug, ")\n");
 		Journal_DPrintf( self->debug, "MaxCritPointInfoPerProc = %d\n", (*maxCritPointInfoPerProc));
 	}	
-#endif
+/*#endif*/
 
 	/* Now share the actual critPointInfo arrays */
 	(*allCritPointInfo) = Memory_Alloc_Array( CritPointInfo, meshDecomp->nproc * (*maxCritPointInfoPerProc), 
@@ -1246,7 +1259,7 @@ static void _FeEquationNumber_ShareCritPointInfo(
 		       (*allCritPointInfo), (*maxCritPointInfoPerProc), MPI_critPointInfoType,
 		       meshDecomp->communicator );
 	
-#if DEBUG
+/*#if DEBUG*/
 	if ( Stream_IsPrintableLevel( self->debug, 2 ) ) {	
 		Journal_DPrintf( self->debug, "procCritPointInfos" );
 		if ( DONT_PRINT_VALUES == printValuesFlag ) {
@@ -1266,7 +1279,7 @@ static void _FeEquationNumber_ShareCritPointInfo(
 		}
 		Journal_DPrintf( self->debug, ")\n");
 	}	
-#endif
+/*#endif*/
 	Stream_UnIndentBranch( StgFEM_Debug );
 }
 
@@ -1295,29 +1308,29 @@ static void _FeEquationNumber_DoPartialTotals( FeEquationNumber* self,
 	
 		_FeEquationNumber_HandleNode( self, dNode_I, &currSubTotalEqNum );
 
-		// if the node is next critical point
+		/* if the node is next critical point */
 		if ( ( haveCritPoint_I < critPointsIHaveTotal ) 
 		     && ( remappedGlobal_I == critPointsIHave[haveCritPoint_I].index ) ) 
 		{
 			Journal_DPrintfL( self->debug, 3, "storing c.p. subtotal at remapped global index %u = %d\n", 
 					  remappedGlobal_I, currSubTotalEqNum );
-			// store current value
+			/* store current value */
 			critPointsIHave[haveCritPoint_I++].eqNum = currSubTotalEqNum;
 
-			// check if its also a to send point
+			/* check if its also a to send point */
 			if ( ( sendCritPoint_I < critPointsToSendTotal )
 			     && ( remappedGlobal_I == critPointsToSend[sendCritPoint_I].index ) )
 			{
-				// store current value
+                          /* store current value */
 				critPointsToSend[sendCritPoint_I++].eqNum = currSubTotalEqNum;
 			}
-			// reset counter and move to next point
+			/* reset counter and move to next point */
 			currSubTotalEqNum = 0;
 		}	
 		rNodeInfo_I++;
 	}
 
-#if DEBUG
+/*#if DEBUG*/
 	if ( Stream_IsPrintableLevel( self->debug, 2 ) ) {
 		Journal_DPrintf( self->debug, "Totals I have:[ " );
 		haveCritPoint_I = 0;
@@ -1334,7 +1347,7 @@ static void _FeEquationNumber_DoPartialTotals( FeEquationNumber* self,
 		}	
 		Journal_Printf( self->debug, "]\n" );
 	}
-#endif
+/*#endif*/
 	Stream_UnIndentBranch( StgFEM_Debug );
 }
 
@@ -1346,7 +1359,7 @@ static void _FeEquationNumber_AddAllPartialTotals( FeEquationNumber* self, CritP
 						   Index maxSubTotalsPerProc )
 {	
 	Partition_Index proc_I;
-	FiniteElement_Mesh* mesh = self->feMesh;
+	FeMesh* mesh = self->feMesh;
 	MeshDecomp* meshDecomp = self->feMesh->layout->decomp;
 	Index myRank = meshDecomp->rank;
 	Node_GlobalIndex nodeDomainCount = meshDecomp->nodeDomainCount;
@@ -1408,7 +1421,7 @@ static void _FeEquationNumber_AddAllPartialTotals( FeEquationNumber* self, CritP
 		for ( proc_I = 0; proc_I < meshDecomp->nproc; proc_I++ ) {
 			if ( proc_I == myRank ) continue;
 
-			// reset the add list back to start
+			/* reset the add list back to start */
 			addListPtr = addListStart;
 			addListPrev = NULL;
 			
@@ -1485,7 +1498,7 @@ static void _FeEquationNumber_AddAllPartialTotals( FeEquationNumber* self, CritP
 				if( !self->bcs || !VariableCondition_IsCondition( self->bcs, dNode_I,
 										  self->dofLayout->varIndices[dNode_I][nodeLocalDof_I] ) )
 				{
-					if ( (NULL == self->linkedDofInfo) ||	// TAG: bcs
+                                  if ( (NULL == self->linkedDofInfo) ||	/* TAG: bcs */
 					     ( self->linkedDofInfo->linkedDofTbl[dNode_I][nodeLocalDof_I] == -1 ) )
 					{
 						/* A normal point, so increment */
@@ -1509,7 +1522,7 @@ static void _FeEquationNumber_AddAllPartialTotals( FeEquationNumber* self, CritP
 					currEqNum = self->destinationArray[dNode_I][nodeLocalDof_I];
 					/* If current node not a shadow, then check totals */
 					if ( dNode_I < mesh->nodeLocalCount ) {
-						if ( currEqNum != -1 ) {	// TAG: bcs
+                                          if ( currEqNum != -1 ) {	/* TAG: bcs */
 							if ( self->_lowestLocalEqNum == -1 ) {
 								/* We need this if statement to initialise this */
 								self->_lowestLocalEqNum = currEqNum;
@@ -1568,16 +1581,16 @@ static void _FeEquationNumber_HandleNode( FeEquationNumber* self, const Node_Dom
 {
 	Dof_Index	currNodeNumDofs;
 	Dof_Index	nodeLocalDof_I;
-#if DEBUG
+/*#if DEBUG*/
 	Stream*		error;
-#endif
+/*#endif*/
 	
 	Journal_DPrintfL( self->debug, 3, "In %s:",  __func__ );
-#if DEBUG
+/*#if DEBUG*/
 	error = Journal_Register( Error_Type, self->type );
 	Journal_Firewall( (dNode_I < self->feMesh->nodeDomainCount), error, "Stuffup: %s() asked to operate on node %d, bigger "
 			  "than domain count %d. Exiting.\n", __func__, dNode_I, self->feMesh->nodeDomainCount );
-#endif
+/*#endif*/
 	
 	/* get the number of dofs */
 	currNodeNumDofs = self->dofLayout->dofCounts[ dNode_I ];
@@ -1733,7 +1746,7 @@ void _FeEquationNumber_PostProcessLinkedDofs( FeEquationNumber* self ) {
 
 			currEqNum = self->destinationArray[dNode_I][nodeLocalDof_I];
 			if ( dNode_I < self->feMesh->nodeLocalCount ) {
-				if ( currEqNum != -1 ) {	// TAG: bcs
+                          if ( currEqNum != -1 ) {	/* TAG: bcs */
 					if ( self->_lowestLocalEqNum == -1 ) {
 						/* We need this if statement to initialise this */
 						self->_lowestLocalEqNum = currEqNum;
@@ -1754,6 +1767,7 @@ void _FeEquationNumber_PostProcessLinkedDofs( FeEquationNumber* self ) {
 
 	Memory_Free( adjustDueToNonLocalLinkedDofsTbl );
 }
+#endif
 
 
 Index FeEquationNumber_CalculateActiveEqCountAtNode(
@@ -1781,15 +1795,70 @@ Index FeEquationNumber_CalculateActiveEqCountAtNode(
 	return activeEqsAtCurrRowNode;
 }
 
+
+void FeEquationNumber_BuildLocationMatrix( void* feEquationNumber ) {
+	FeEquationNumber*	self = (FeEquationNumber*)feEquationNumber;
+	FeMesh*			feMesh;
+	unsigned		nDims;
+	unsigned		nDomainEls;
+	unsigned		nLocalNodes;
+	unsigned*		nNodalDofs;
+	unsigned		nElNodes;
+	unsigned*		elNodes;
+	int**			dstArray;
+	int***			locMat;
+	unsigned		e_i, n_i, dof_i;
+
+	assert( self );
+
+	/* Don't build if already done. */
+	if( self->locationMatrixBuilt ) {
+		Journal_DPrintf( self->debugLM, "In %s: LM already built, so just returning.\n",  __func__ );
+		Stream_UnIndentBranch( StgFEM_Debug );
+		return;
+	}
+
+	/* Shortcuts. */
+	feMesh = self->feMesh;
+	nDims = Mesh_GetDimSize( feMesh );
+	nDomainEls = FeMesh_GetElementDomainSize( feMesh );
+	nLocalNodes = FeMesh_GetNodeLocalSize( feMesh );
+	nNodalDofs = self->dofLayout->dofCounts;
+	dstArray = self->destinationArray;
+
+	/* Allocate for the location matrix. */
+	locMat = AllocArray( int**, nDomainEls );
+	for( e_i = 0; e_i < nDomainEls; e_i++ ) {
+		FeMesh_GetElementNodes( feMesh, e_i, &nElNodes, &elNodes );
+		locMat[e_i] = AllocArray( int*, nElNodes );
+		for( n_i = 0; n_i < nElNodes; n_i++ )
+			locMat[e_i][n_i] = AllocArray( int, nNodalDofs[elNodes[n_i]] );
+	}
+
+	/* Build location matrix. */
+	for( e_i = 0; e_i < nDomainEls; e_i++ ) {
+		FeMesh_GetElementNodes( feMesh, e_i, &nElNodes, &elNodes );
+		for( n_i = 0; n_i < nElNodes; n_i++ ) {
+			for( dof_i = 0; dof_i < nNodalDofs[elNodes[n_i]]; dof_i++ )
+				locMat[e_i][n_i][dof_i] = dstArray[elNodes[n_i]][dof_i];
+		}
+	}
+
+	/* Store result. */
+	self->locationMatrix = locMat;
+}
+
+
+#if 0
 /** build the element location matrix mapping elements, element node, dof -> eq num */
 void FeEquationNumber_BuildLocationMatrix( FeEquationNumber* self ) {
-	FiniteElement_Mesh* mesh = self->feMesh;
+	FeMesh* mesh = self->feMesh;
 	Element_LocalIndex lElement_I;
 	Node_LocalIndex numNodesThisElement = 0;
 	Node_LocalIndex elLocalNode_I = 0;
 	Dof_Index numDofsThisNode = 0;
 	Dof_Index** dofCountsAtElementNodesArray = NULL;
-	Element_LocalIndex elementLocalCount = self->feMesh->elementLocalCount;
+	Element_LocalIndex elementLocalCount = Mesh_GetLocalSize( mesh, Mesh_GetDimSize( mesh ) );
 
 	Journal_DPrintf( self->debug, "In %s():\n", __func__ );
 	Stream_IndentBranch( StgFEM_Debug );
@@ -1799,11 +1868,12 @@ void FeEquationNumber_BuildLocationMatrix( FeEquationNumber* self ) {
 		Stream_UnIndentBranch( StgFEM_Debug );
 		return;
 	}
-		
+
 	Journal_DPrintf( self->debugLM, "In %s: building over %d elements.\n",  __func__, elementLocalCount );
 
 	/* Allocate the LM 3D array using the Memory module, in 2 stage process */
-	dofCountsAtElementNodesArray = Memory_Alloc_3DSetup( elementLocalCount, mesh->elementNodeCountTbl );
+	dofCountsAtElementNodesArray = Memory_Alloc_3DSetup( elementLocalCount, 
+							     mesh->topo->nIncEls[nDims][MT_VERTEX] );
 
 	for ( lElement_I = 0; lElement_I < elementLocalCount; lElement_I++ ) {
 		numNodesThisElement = mesh->elementNodeCountTbl[lElement_I];
@@ -1828,18 +1898,23 @@ void FeEquationNumber_BuildLocationMatrix( FeEquationNumber* self ) {
 	self->locationMatrixBuilt = True;
 	Stream_UnIndentBranch( StgFEM_Debug );
 }
+#endif
 
 
 /** Build an element's local location matrix */
 Dof_EquationNumber** FeEquationNumber_BuildOneElementLocationMatrix( void* feEquationNumber, Element_LocalIndex lElement_I ) {
 	FeEquationNumber* self = (FeEquationNumber*)feEquationNumber;
 	Node_DomainIndex elLocalNode_I;
-	Node_DomainIndex numNodesThisElement;
+	Node_DomainIndex numNodesThisElement, *elInc;
 	Dof_EquationNumber** localLocationMatrix = NULL;
-	FiniteElement_Mesh* mesh = self->feMesh;
+	FeMesh* feMesh = self->feMesh;
 	Dof_Index numDofsThisNode = 0;
 
-	numNodesThisElement = mesh->elementNodeCountTbl[lElement_I];
+	FeMesh_GetElementNodes( feMesh, lElement_I, &numNodesThisElement, &elInc );
+
+	/* HACK: Make sure global element location matrix is built. */
+	if( !self->locationMatrixBuilt )
+		abort();
 
 	/* if ( big LM allocated ) set pointer into it correctly */
 	if ( self->locationMatrix ) {
@@ -1847,6 +1922,8 @@ Dof_EquationNumber** FeEquationNumber_BuildOneElementLocationMatrix( void* feEqu
 		localLocationMatrix = self->locationMatrix[lElement_I];
 		Journal_DPrintfL( self->debugLM, 3, "set localLocationMatrix to pt. to big LM[%d] = %p\n",  lElement_I, self->locationMatrix[lElement_I] ) ;
 	}
+
+#if 0
 	else {
 		Dof_Index* numDofsEachNode = NULL;
 
@@ -1862,7 +1939,9 @@ Dof_EquationNumber** FeEquationNumber_BuildOneElementLocationMatrix( void* feEqu
 							      "localLocationMatrix (set of ptrs to dof lists, indexed by element-local node)" );
 		Memory_Free( numDofsEachNode );
 	}
+#endif
 
+#if 0
 	/* If we haven't yet built full LM, copy ID values across */
 	if ( False == self->locationMatrixBuilt ) {
 		/* for (each el-local node) */
@@ -1878,32 +1957,27 @@ Dof_EquationNumber** FeEquationNumber_BuildOneElementLocationMatrix( void* feEqu
 				self->destinationArray[procDomainNode], numDofsThisNode * sizeof(Dof_EquationNumber) );
 		}
 	}
+#endif
 
 	return localLocationMatrix;
 }
 
 
 void FeEquationNumber_PrintDestinationArray( void* feFeEquationNumber, Stream* stream ) {
-	FeEquationNumber*    self = (FeEquationNumber*) feFeEquationNumber;
-	FiniteElement_Mesh*  mesh = self->feMesh;
-	MeshDecomp*          meshDecomp = self->feMesh->layout->decomp;
-	Node_GlobalIndex     gNode_I; 
-	Node_GlobalIndex     nodeGlobalCount = meshDecomp->nodeGlobalCount;
-	Bool                 nodeG2DBuiltTemporarily = False;
+	FeEquationNumber* self = (FeEquationNumber*) feFeEquationNumber;
+	FeMesh*		feMesh = self->feMesh;
+	MPI_Comm comm = CommTopology_GetComm( Mesh_GetCommTopology( feMesh, MT_VERTEX ) );
+	unsigned rank;
+	Node_GlobalIndex gNode_I;
+	Node_GlobalIndex nodeGlobalCount = FeMesh_GetNodeGlobalSize( feMesh );
 
-	Journal_Printf( stream, "%d: *** Printing destination array ***\n", mesh->layout->decomp->rank );
-
-	/* Modification: build the temporary global tables for speed here. Important for parallel runs.
- 	 *  -- PatrickSunter, 13 Feb 2007 */
-	if ( (self->feMesh->buildTemporaryGlobalTables == True) && (self->feMesh->nodeG2D == 0) ) {
-		self->feMesh->nodeG2D = MeshDecomp_BuildNodeGlobalToDomainMap( self->feMesh->layout->decomp );
-		nodeG2DBuiltTemporarily = True;
-	}
+	MPI_Comm_rank( comm, (int*)&rank );
+	Journal_Printf( stream, "%d: *** Printing destination array ***\n", rank );
 
 	for (gNode_I =0; gNode_I < nodeGlobalCount; gNode_I++) {
-		Node_DomainIndex dNode_I = Mesh_NodeMapGlobalToDomain( mesh, gNode_I );
+		Node_DomainIndex dNode_I;
 
-		if ( nodeGlobalCount == dNode_I ) {
+		if ( !Mesh_GlobalToDomain( feMesh, MT_VERTEX, gNode_I, &dNode_I ) ) {
 			Journal_Printf( stream, "\tdestinationArray[(gnode)%2d]: on another proc\n", gNode_I);
 		}
 		else {
@@ -1917,45 +1991,45 @@ void FeEquationNumber_PrintDestinationArray( void* feFeEquationNumber, Stream* s
 			Journal_Printf( stream, "\n" );
 		}
 	}		
-
-	if ( nodeG2DBuiltTemporarily ) {
-		Memory_Free( self->feMesh->nodeG2D );
-		self->feMesh->nodeG2D = NULL;
-	}
 }
 
 
 void FeEquationNumber_PrintLocationMatrix( void* feFeEquationNumber, Stream* stream ) {
-	FeEquationNumber*     self = (FeEquationNumber*) feFeEquationNumber;
-	FiniteElement_Mesh*   mesh = self->feMesh;
-	MeshDecomp*           meshDecomp = self->feMesh->layout->decomp;
-	Element_GlobalIndex   gEl_I;
-	Element_GlobalIndex   elementGlobalCount = meshDecomp->elementGlobalCount;
-	Bool                  elementG2LBuiltTemporarily = False;
+	FeEquationNumber* self = (FeEquationNumber*) feFeEquationNumber;
+	FeMesh*		feMesh = self->feMesh;
+	MPI_Comm comm = CommTopology_GetComm( Mesh_GetCommTopology( feMesh, MT_VERTEX ) );
+	unsigned rank;
+	Element_GlobalIndex gEl_I;
+	unsigned nDims = Mesh_GetDimSize( feMesh );
+	Element_GlobalIndex elementGlobalCount = FeMesh_GetElementGlobalSize( feMesh );
+	unsigned nLocalEls = FeMesh_GetElementLocalSize( feMesh );
 
-	Journal_Printf( stream, "%d: *** Printing location matrix ***\n", mesh->layout->decomp->rank  );
+	Journal_Printf( stream, "%d: *** Printing location matrix ***\n", rank  );
+
+	MPI_Comm_rank( comm, (int*)&rank );
 	
-	/* Modification: build the temporary global tables for speed here. Important for parallel runs. */
-	if ( (self->feMesh->buildTemporaryGlobalTables == True) && (self->feMesh->elementG2L == 0) ) {
-		self->feMesh->elementG2L = MeshDecomp_BuildElementGlobalToLocalMap( self->feMesh->layout->decomp );
-		elementG2LBuiltTemporarily = True;
-	}
-
 	for (gEl_I =0; gEl_I < elementGlobalCount; gEl_I++ ) {
-		Element_LocalIndex lEl_I = Mesh_ElementMapGlobalToLocal( mesh, gEl_I );
+		Element_LocalIndex lEl_I;
 
-		if ( elementGlobalCount == lEl_I ) {
+		if ( !Mesh_GlobalToDomain( feMesh, nDims, gEl_I, &lEl_I ) || lEl_I >= nLocalEls ) {
 			Journal_Printf( stream, "\tLM[(g/l el)%2d/XXX]: on another proc\n", gEl_I);
 		}
 		else {
-			Node_LocalIndex numNodesAtElement = self->feMesh->elementNodeCountTbl[lEl_I];
+			Node_LocalIndex numNodesAtElement;
 			Node_LocalIndex elLocalNode_I;
+			unsigned*	incNodes;
+
+			FeMesh_GetElementNodes( self->feMesh, lEl_I, &numNodesAtElement, &incNodes );
 
 			Journal_Printf( stream, "\tLM[(g/l el)%2d/%2d][(enodes)0-%d]", gEl_I, lEl_I, numNodesAtElement);	
 			/* print the nodes and dofs */
 			for ( elLocalNode_I = 0; elLocalNode_I < numNodesAtElement; elLocalNode_I++ ) {
 				/* look up processor local node number. */
-				Element_LocalIndex currNode = self->feMesh->elementNodeTbl[lEl_I][elLocalNode_I];
+				Element_LocalIndex currNode = incNodes[elLocalNode_I == 2 ? 3 : 
+								       elLocalNode_I == 3 ? 2 : 
+								       elLocalNode_I == 6 ? 7 : 
+								       elLocalNode_I == 7 ? 6 : 
+								       elLocalNode_I];
 				/* get the number of dofs at current node */
 				Dof_Index currNodeNumDofs = self->dofLayout->dofCounts[ currNode ];
 				Dof_Index nodeLocalDof_I;
@@ -1969,15 +2043,12 @@ void FeEquationNumber_PrintLocationMatrix( void* feFeEquationNumber, Stream* str
 
 			Journal_Printf( stream, "\n" );
 		}
-	}
 
-	if ( elementG2LBuiltTemporarily ) {
-		Memory_Free( self->feMesh->elementG2L );
-		self->feMesh->elementG2L = NULL;
 	}
 }
 
 
+#if 0
 void FeEquationNumber_PrintElementLocationMatrix(
 	void*			feEquationNumber,
 	Dof_EquationNumber**	elementLM,
@@ -2093,26 +2164,26 @@ void _FeEquationNumber_CalculateEqNumsDecomposition( FeEquationNumber* self ) {
 
 	Stream_UnIndentBranch( StgFEM_Debug );
 }
+#endif
 
 
 Partition_Index FeEquationNumber_CalculateOwningProcessorOfEqNum( void* feEquationNumber, Dof_EquationNumber eqNum ) {
 	FeEquationNumber* self = (FeEquationNumber*)feEquationNumber;
-
 	Partition_Index ownerProc = (unsigned int)-1;
+	CommTopology*	commTopo = Mesh_GetCommTopology( self->feMesh, MT_VERTEX );
+	MPI_Comm	comm = CommTopology_GetComm( commTopo );
+	unsigned	nProcs;
+	unsigned	p_i;
 
-	/* If we used the new mesh topology junk, do something a little different. */
-	if( self->feMesh->topo->domains && self->feMesh->topo->domains[MT_VERTEX] ) {
-		CommTopology*	commTopo = self->feMesh->topo->domains[0]->commTopo;
-		unsigned	p_i;
-
-		for( p_i = 1; p_i < commTopo->nProcs; p_i++ ) {
-			if( eqNum < self->_lowestGlobalEqNums[p_i] )
-				break;
-		}
-
-		return p_i - 1;
+	MPI_Comm_size( comm, (int*)&nProcs );
+	for( p_i = 1; p_i < nProcs; p_i++ ) {
+		if( eqNum < self->_lowestGlobalEqNums[p_i] )
+			break;
 	}
-	else {
+
+	return p_i - 1;
+
+#if 0
 		if ( (self->remappingActivated) && ( (self->linkedDofInfo == NULL) || (self->linkedDofInfo->linkedDofSetsCount == 0 ) ) ) {
 			MeshDecomp*		meshDecomp = self->feMesh->layout->decomp;
 			Partition_Index		myRank = meshDecomp->rank;
@@ -2154,9 +2225,11 @@ Partition_Index FeEquationNumber_CalculateOwningProcessorOfEqNum( void* feEquati
 	}
 
 	return ownerProc;
+#endif
 }	
 
 
+#if 0
 void FeEquationNumber_Create_CritPointInfo_MPI_Datatype( void ) {
 #define CRIT_POINT_INFO_NBLOCKS 2
 	MPI_Aint indexExtent = 0;
@@ -2173,19 +2246,24 @@ void FeEquationNumber_Create_CritPointInfo_MPI_Datatype( void ) {
 	
 	MPI_Type_commit( &MPI_critPointInfoType );
 }
+#endif
 
 
 void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
-	MeshTopology*		topo;
+	Stream*			stream;
+	double			startTime, endTime;
+	FeMesh*			feMesh;
+	Decomp_Sync*		sync;
 	CommTopology*		commTopo;
+	MPI_Comm		comm;
+	unsigned		rank, nProcs;
+	unsigned		nDims;
 	unsigned		nDomainNodes, nDomainEls;
 	unsigned		nLocalNodes;
 	unsigned*		nNodalDofs;
-	unsigned*		nElNodes;
-	unsigned**		elNodes;
+	unsigned		nElNodes, *elNodes;
 	int**			dstArray;
-	unsigned**		nLocMatDofs;
-	int***			locMat;
+	int			*nLocMatDofs, ***locMat;
 	unsigned		varInd;
 	unsigned		curEqNum;
 	unsigned		base;
@@ -2194,111 +2272,149 @@ void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
 	unsigned		maxDofs;
 	unsigned*		tuples;
 	Decomp_Sync_Array*	array;
+	LinkedDofInfo*		links;
 	unsigned		e_i, n_i, dof_i;
-	Bool                    nodeG2DBuiltTemporarily = False;
 
 	assert( self );
 
+	stream = Journal_Register( Info_Type, self->type );
+	Journal_Printf( stream, "FeEquationNumber: '%s'\n", self->name );
+	Stream_Indent( stream );
+	Journal_Printf( stream, "Generating equation numbers...\n" );
+	Stream_Indent( stream );
+	if( self->removeBCs )
+		Journal_Printf( stream, "BCs set to be removed.\n" );
+	else
+		Journal_Printf( stream, "BCs will not be removed.\n" );
+
+	startTime = MPI_Wtime();
+
 	/* Shortcuts. */
-	topo = self->feMesh->topo;
-	commTopo = topo->domains[MT_VERTEX]->commTopo;
-	nDomainNodes = self->feMesh->nodeDomainCount;
-	nDomainEls = self->feMesh->elementDomainCount;
-	nLocalNodes = MeshTopology_GetLocalSize( topo, MT_VERTEX );
+	feMesh = self->feMesh;
+	commTopo = Mesh_GetCommTopology( feMesh, MT_VERTEX );
+	comm = CommTopology_GetComm( commTopo );
+	MPI_Comm_size( comm, (int*)&nProcs );
+	MPI_Comm_rank( comm, (int*)&rank );
+	nDims = Mesh_GetDimSize( feMesh );
+	nDomainNodes = FeMesh_GetNodeDomainSize( feMesh );
+	nDomainEls = FeMesh_GetElementDomainSize( feMesh );
+	nLocalNodes = FeMesh_GetNodeLocalSize( feMesh );
 	nNodalDofs = self->dofLayout->dofCounts;
-	nElNodes = self->feMesh->elementNodeCountTbl;
-	elNodes = self->feMesh->elementNodeTbl;
+	links = self->linkedDofInfo;
 
 	/* Allocate for destination array. */
 	dstArray = Memory_Alloc_2DComplex( int, nDomainNodes, nNodalDofs, 
 					   "FeEquationNumber::destinationArray" );
 
+	/* If needed, allocate for linked equation numbers. */
+	if( links ) {
+		unsigned	s_i;
+
+		links->eqNumsOfLinkedDofs = ReallocArray( links->eqNumsOfLinkedDofs, int, links->linkedDofSetsCount );
+		for( s_i = 0; s_i < links->linkedDofSetsCount; s_i++ )
+			links->eqNumsOfLinkedDofs[s_i] = -1;
+	}
+
 	/* Allocate for the location matrix. */
-	nLocMatDofs = Memory_Alloc_2DComplex_Unnamed( unsigned, nDomainEls, nElNodes );
+	nLocMatDofs = NULL;
+	locMat = AllocArray( int**, nDomainEls );
 	for( e_i = 0; e_i < nDomainEls; e_i++ ) {
-		for( n_i = 0; n_i < nElNodes[e_i]; n_i++ )
-			nLocMatDofs[e_i][n_i] = nNodalDofs[elNodes[e_i][n_i]];
+		FeMesh_GetElementNodes( feMesh, e_i, &nElNodes, &elNodes );
+		nLocMatDofs = ReallocArray( nLocMatDofs, int, nElNodes );
+		for( n_i = 0; n_i < nElNodes; n_i++ )
+			nLocMatDofs[n_i] = nNodalDofs[elNodes[n_i]];
+		locMat[e_i] = AllocComplex2D( int, nElNodes, nLocMatDofs );
 	}
-	locMat = Memory_Alloc_3DComplex( int, nDomainEls, nElNodes, nLocMatDofs, 
-					 "FeEquationNumber::locationMatrix" );
 	FreeArray( nLocMatDofs );
-
-
-	/* Modification: build the temporary global tables for speed here. Important for parallel runs.
- 	 *  -- PatrickSunter, 13 Feb 2007 */
-	if ( (self->feMesh->buildTemporaryGlobalTables == True) && (self->feMesh->nodeG2D == 0) ) {
-		self->feMesh->nodeG2D = MeshDecomp_BuildNodeGlobalToDomainMap( self->feMesh->layout->decomp );
-		nodeG2DBuiltTemporarily = True;
-	}
 
 	/* Build initial destination array and store max dofs. */
 	curEqNum = 0;
 	maxDofs = 0;
-
 	for( n_i = 0; n_i < nLocalNodes; n_i++ ) {
-		unsigned	lInd;
+		if( nNodalDofs[n_i] > maxDofs )
+			maxDofs = nNodalDofs[n_i];
 
-		lInd = MeshTopology_DomainToGlobal( topo, MT_VERTEX, n_i );
-		lInd = Mesh_NodeMapGlobalToDomain( self->feMesh, lInd );
-
-		if( nNodalDofs[lInd] > maxDofs )
-			maxDofs = nNodalDofs[lInd];
-
-		for( dof_i = 0; dof_i < nNodalDofs[lInd]; dof_i++ ) {
-			varInd = self->dofLayout->varIndices[lInd][dof_i];
-			if( !self->bcs || !VariableCondition_IsCondition( self->bcs, lInd, varInd ) )
-				dstArray[lInd][dof_i] = curEqNum++;
+		for( dof_i = 0; dof_i < nNodalDofs[n_i]; dof_i++ ) {
+			varInd = self->dofLayout->varIndices[n_i][dof_i];
+			if( !self->bcs || !VariableCondition_IsCondition( self->bcs, n_i, varInd ) || 
+			    !self->removeBCs )
+			{
+				if( links && links->linkedDofTbl[n_i][dof_i] != -1 ) {
+					if( links->eqNumsOfLinkedDofs[links->linkedDofTbl[n_i][dof_i]] == -1 )
+						links->eqNumsOfLinkedDofs[links->linkedDofTbl[n_i][dof_i]] = curEqNum++;
+					dstArray[n_i][dof_i] = links->eqNumsOfLinkedDofs[links->linkedDofTbl[n_i][dof_i]];
+				}
+				else
+					dstArray[n_i][dof_i] = curEqNum++;
+			}
 			else
-				dstArray[lInd][dof_i] = -1;
+				dstArray[n_i][dof_i] = -1;
 		}
 	}
 
 	/* Order the equation numbers based on processor rank; cascade counts forward. */
 	base = 0;
 	subTotal = curEqNum;
-	if( commTopo->rank > 0 ) {
-		MPI_Recv( &base, 1, MPI_UNSIGNED, commTopo->rank - 1, 6669, commTopo->comm, &status );
+	if( rank > 0 ) {
+		MPI_Recv( &base, 1, MPI_UNSIGNED, rank - 1, 6669, comm, &status );
 		subTotal = base + curEqNum;
 	}
-	if( commTopo->rank < commTopo->nProcs - 1 )
-		MPI_Send( &subTotal, 1, MPI_UNSIGNED, commTopo->rank + 1, 6669, commTopo->comm );
+	if( rank < nProcs - 1 )
+		MPI_Send( &subTotal, 1, MPI_UNSIGNED, rank + 1, 6669, comm );
+
+	/* Reduce to find lowest linked DOFs. */
+	if( links ) {
+		unsigned	lowest, highest;
+		unsigned	s_i;
+
+		for( s_i = 0; s_i < links->linkedDofSetsCount; s_i++ ) {
+			if( links->eqNumsOfLinkedDofs[s_i] != -1 )
+				links->eqNumsOfLinkedDofs[s_i] += base;
+			MPI_Allreduce( links->eqNumsOfLinkedDofs + s_i, &lowest, 1, MPI_UNSIGNED, MPI_MIN, comm );
+			MPI_Allreduce( links->eqNumsOfLinkedDofs + s_i, &highest, 1, MPI_UNSIGNED, MPI_MIN, comm );
+			assert( (lowest == (unsigned)-1) ? lowest == highest : 1 );
+			links->eqNumsOfLinkedDofs[s_i] = lowest;
+		}
+	}
 
 	/* Modify existing destination array and dump to a tuple array. */
-	tuples = Memory_Alloc_Array_Unnamed( unsigned, nDomainNodes * maxDofs );
+	tuples = AllocArray( unsigned, nDomainNodes * maxDofs );
 	for( n_i = 0; n_i < nLocalNodes; n_i++ ) {
-		unsigned	lInd;
-
-		lInd = MeshTopology_DomainToGlobal( topo, MT_VERTEX, n_i );
-		lInd = Mesh_NodeMapGlobalToDomain( self->feMesh, lInd );
-
-		for( dof_i = 0; dof_i < nNodalDofs[lInd]; dof_i++ ) {
-			varInd = self->dofLayout->varIndices[lInd][dof_i];
-			if( !self->bcs || !VariableCondition_IsCondition( self->bcs, lInd, varInd ) )
-				dstArray[lInd][dof_i] += base;
-			tuples[n_i * maxDofs + dof_i] = dstArray[lInd][dof_i];
+		for( dof_i = 0; dof_i < nNodalDofs[n_i]; dof_i++ ) {
+			varInd = self->dofLayout->varIndices[n_i][dof_i];
+			if( !self->bcs || !VariableCondition_IsCondition( self->bcs, n_i, varInd ) || 
+			    !self->removeBCs )
+			{
+				if( links && links->linkedDofTbl[n_i][dof_i] != -1 )
+					dstArray[n_i][dof_i] = links->eqNumsOfLinkedDofs[links->linkedDofTbl[n_i][dof_i]];
+				else
+					dstArray[n_i][dof_i] += base;
+			}
+			tuples[n_i * maxDofs + dof_i] = dstArray[n_i][dof_i];
 		}
 	}
 
 	/* Update all other procs. */
-	array = Decomp_Sync_AddArray( topo->domains[MT_VERTEX], tuples, tuples + nLocalNodes * maxDofs, 
-				      maxDofs * sizeof(unsigned), maxDofs * sizeof(unsigned), 
-				      maxDofs * sizeof(unsigned) );
-	Decomp_Sync_SyncArray( topo->domains[MT_VERTEX], array );
-	Decomp_Sync_RemoveArray( topo->domains[MT_VERTEX], array );
+	sync = Mesh_GetSync( feMesh, MT_VERTEX );
+	array = Decomp_Sync_Array_New();
+	Decomp_Sync_Array_SetSync( array, sync );
+	Decomp_Sync_Array_SetMemory( array, tuples, tuples + nLocalNodes * maxDofs, 
+				     maxDofs * sizeof(unsigned), maxDofs * sizeof(unsigned), 
+				     maxDofs * sizeof(unsigned) );
+	Decomp_Sync_Array_Sync( array );
+	FreeObject( array );
 
 	/* Update destination array's domain indices. */
 	for( n_i = nLocalNodes; n_i < nDomainNodes; n_i++ ) {
-		unsigned	dInd;
-
-		dInd = MeshTopology_DomainToGlobal( topo, MT_VERTEX, n_i );
-		dInd = Mesh_NodeMapGlobalToDomain( self->feMesh, dInd );
-
-		for( dof_i = 0; dof_i < nNodalDofs[dInd]; dof_i++ ) {
-			varInd = self->dofLayout->varIndices[dInd][dof_i];
-			if( !self->bcs || !VariableCondition_IsCondition( self->bcs, dInd, varInd ) )
-				dstArray[dInd][dof_i] = tuples[n_i * maxDofs + dof_i];
+		for( dof_i = 0; dof_i < nNodalDofs[n_i]; dof_i++ ) {
+			varInd = self->dofLayout->varIndices[n_i][dof_i];
+			if( !self->bcs || !VariableCondition_IsCondition( self->bcs, n_i, varInd ) || 
+			    !self->removeBCs )
+			{
+				dstArray[n_i][dof_i] = tuples[n_i * maxDofs + dof_i];
+			}
 			else
-				dstArray[dInd][dof_i] = -1;
+				dstArray[n_i][dof_i] = -1;
 		}
 	}
 
@@ -2307,9 +2423,10 @@ void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
 
 	/* Build location matrix. */
 	for( e_i = 0; e_i < nDomainEls; e_i++ ) {
-		for( n_i = 0; n_i < nElNodes[e_i]; n_i++ ) {
-			for( dof_i = 0; dof_i < nNodalDofs[elNodes[e_i][n_i]]; dof_i++ )
-				locMat[e_i][n_i][dof_i] = dstArray[elNodes[e_i][n_i]][dof_i];
+		FeMesh_GetElementNodes( feMesh, e_i, &nElNodes, &elNodes );
+		for( n_i = 0; n_i < nElNodes; n_i++ ) {
+			for( dof_i = 0; dof_i < nNodalDofs[elNodes[n_i]]; dof_i++ )
+				locMat[e_i][n_i][dof_i] = dstArray[elNodes[n_i]][dof_i];
 		}
 	}
 
@@ -2321,18 +2438,56 @@ void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
 	self->localEqNumsOwnedCount = curEqNum;
 	self->firstOwnedEqNum = base;
 	self->lastOwnedEqNum = subTotal - 1;
+	self->_lowestLocalEqNum = self->firstOwnedEqNum;
 
 	/* Bcast global sum from highest rank. */
-	MPI_Bcast( &self->globalSumUnconstrainedDofs, 1, MPI_UNSIGNED, commTopo->nProcs - 1, commTopo->comm );
+	if( rank == nProcs - 1 )
+		self->globalSumUnconstrainedDofs = self->lastOwnedEqNum + 1;
+	MPI_Bcast( &self->globalSumUnconstrainedDofs, 1, MPI_UNSIGNED, nProcs - 1, comm );
 
 	/* Construct lowest global equation number list. */
-	self->_lowestGlobalEqNums = Memory_Alloc_Array_Unnamed( int, self->feMesh->topo->domains[0]->commTopo->nProcs );
-	MPI_Allgather( &self->firstOwnedEqNum, 1, MPI_UNSIGNED, self->_lowestGlobalEqNums, 1, MPI_UNSIGNED, 
-		       self->feMesh->topo->domains[0]->commTopo->comm );
+	self->_lowestGlobalEqNums = AllocArray( int, nProcs );
+	MPI_Allgather( &self->firstOwnedEqNum, 1, MPI_UNSIGNED, self->_lowestGlobalEqNums, 1, MPI_UNSIGNED, comm );
 
-	if ( nodeG2DBuiltTemporarily ) {
-		Memory_Free( self->feMesh->nodeG2D );
-		self->feMesh->nodeG2D = NULL;
-	}
+	endTime = MPI_Wtime();
 
+	Journal_Printf( stream, "Assigned %d global equation numbers.\n", self->globalSumUnconstrainedDofs );
+	Journal_Printf( stream, "Assigned %d local equation numbers.\n", self->lastOwnedEqNum - self->firstOwnedEqNum + 1 );
+	Journal_Printf( stream, "Local equation numbers in the range %d to %d.\n", 
+			self->firstOwnedEqNum, self->lastOwnedEqNum + 1 );
+	Stream_UnIndent( stream );
+	Journal_Printf( stream, "... Completed in %g seconds.\n", endTime - startTime );
+	Stream_UnIndent( stream );
 }
+
+#if 0
+void FeEquationNumber_Invert( void* feEqNum, int equation, unsigned* node, unsigned* dof ) {
+	FeEquationNumber*	self = (FeEquationNumber*)feEqNum;
+
+	assert( self && Stg_CheckType( self, FeEquationNumber ) );
+	assert( equation - self->firstOwnedEqNum < self->localEqNumsOwnedCount );
+	assert( node );
+	assert( dof );
+
+	eq = equation - self->firstOwnedEqNum;
+	*node = self->eqToNode[eq];
+	*dof = self->eqToDof[eq];
+}
+
+Bool FeEquationNumber_IsKnown( void* feEqNum, int equation ) {
+	FeEquationNumber*	self = (FeEquationNumber*)feEqNum;
+	unsigned		node, dof;
+	unsigned		varInd;
+
+	assert( self && Stg_CheckType( self, FeEquationNumber ) );
+
+	if( !self->bcs ) return False;
+	FeEquationNumber_Invert( self, equation, &node, &dof );
+
+	assert( self->dofLayout );
+	assert( self->dofLayout->varIndices );
+	assert( self->dofLayout->varIndices[node] );
+	varInd = self->dofLayout->varIndices[node][dof];
+	return VariableCondition_IsCondition( self->bcs, n_i, varInd );
+}
+#endif

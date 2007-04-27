@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ThermalBuoyancyForceTerm.c 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: ThermalBuoyancyForceTerm.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -213,7 +213,7 @@ void _ThermalBuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* fo
 	Dimension_Index         dim                = forceVector->dim;
 	IntegrationPoint*       particle;
 	FeVariable*             temperatureField;
-	FiniteElement_Mesh*     mesh;
+	FeMesh*			mesh;
 	double*                 xi;
 	Particle_InCellIndex    cParticle_I;
 	Particle_InCellIndex    cellParticleCount;
@@ -235,7 +235,7 @@ void _ThermalBuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* fo
 	mesh             = temperatureField->feMesh;
 	
 	/* Set the element type */
-	elementType      = FeMesh_ElementTypeAt( temperatureField->feMesh, lElement_I );
+	elementType      = FeMesh_GetElementType( temperatureField->feMesh, lElement_I );
 	elementNodeCount = elementType->nodeCount;
 
 	/* assumes constant number of dofs per element */

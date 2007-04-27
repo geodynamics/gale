@@ -35,7 +35,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 535 2006-04-11 13:07:34Z PatrickSunter $
+## $Id: makefile 822 2007-04-27 06:20:35Z LukeHodkinson $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -50,7 +50,7 @@ bin = ${PROJECT}
 SRCS = $(wildcard *.c)
 
 PROJ_LIBS = 
-EXTERNAL_LIBS =  -l${PROJECT} -l${PROJECT}_SLE_PETScLinearAlgebra ${EXPORT_DYNAMIC_LFLAGS} 
+EXTERNAL_LIBS =  -l${PROJECT} -l${PROJECT}_SLE_LinearAlgebra ${EXPORT_DYNAMIC_LFLAGS} 
 EXTERNAL_INCLUDES = -DMODULE_EXT=\"${MODULE_EXT}\"
 
 packages = STGERMAIN PETSC MPI XML MATH DL HYPRE 

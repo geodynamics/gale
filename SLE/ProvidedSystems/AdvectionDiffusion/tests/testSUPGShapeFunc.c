@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testSUPGShapeFunc.c 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: testSUPGShapeFunc.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -70,7 +70,7 @@ void PutParticlesOnBoundary( Swarm* swarm, double value, Dimension_Index boundar
 		particle->xi[valueAxis]    = value;
 	}
 }
-void CheckShapeFunc( AdvectionDiffusionSLE* advDiffSLE, AdvDiffResidualForceTerm* residualForceTerm, Swarm* gaussSwarm, Element_Index lElement_I, Dimension_Index dim, FiniteElement_Mesh* feMesh, Stream* stream ) {
+void CheckShapeFunc( AdvectionDiffusionSLE* advDiffSLE, AdvDiffResidualForceTerm* residualForceTerm, Swarm* gaussSwarm, Element_Index lElement_I, Dimension_Index dim, FeMesh* feMesh, Stream* stream ) {
 	double**                   shapeFunc;
 	Node_Index                 nodeCount;
 	ElementType*               elementType;
@@ -84,18 +84,52 @@ void CheckShapeFunc( AdvectionDiffusionSLE* advDiffSLE, AdvDiffResidualForceTerm
 
 	/* Print Shape Funcions */
 	cell_I = CellLayout_MapElementIdToCellId( gaussSwarm->cellLayout, lElement_I );
-	elementType = FeMesh_ElementTypeAt( feMesh, lElement_I );
+	elementType = FeMesh_GetElementType( feMesh, lElement_I );
 	nodeCount = elementType->nodeCount;
 	for ( node_I = 0 ; node_I < nodeCount ; node_I++ ) {
+		unsigned	nodeInd;
+
+		nodeInd = (node_I == 2) ? 3 : (node_I == 3) ? 2 : node_I;
 		for ( cParticle_I = 0 ; cParticle_I < gaussSwarm->cellParticleCountTbl[ cell_I ] ; cParticle_I++ ) {
 			particle = (IntegrationPoint*)Swarm_ParticleInCellAt( gaussSwarm, cell_I, cParticle_I );
 
 			ElementType_EvaluateShapeFunctionsAt( elementType, particle->xi, Ni );
 
-			Journal_Printf( stream, "%12.6g %12.6g %12.6g %12.6g %12.6g\n", (double)node_I, particle->xi[0], particle->xi[1], shapeFunc[ cParticle_I ][ node_I ], Ni[ node_I ] );
+			Journal_Printf( stream, "%12.6g %12.6g %12.6g %12.6g %12.6g\n", (double)node_I, particle->xi[0], particle->xi[1], shapeFunc[ cParticle_I ][ nodeInd ], Ni[ nodeInd ] );
 		}
 	}
 }
+
+
+FeMesh* buildFeMesh( unsigned nDims, unsigned* size, 
+		     double* minCrds, double* maxCrds, 
+		     ExtensionManager_Register* emReg, 
+		     ElementType_Register* etReg )
+{
+	CartesianGenerator*	gen;
+	FeMesh*			feMesh;
+	unsigned		maxDecomp[3] = {0, 1, 1};
+
+	gen = CartesianGenerator_New( "" );
+	gen->shadowDepth = 0;
+	CartesianGenerator_SetDimSize( gen, nDims );
+	CartesianGenerator_SetTopologyParams( gen, size, 0, NULL, maxDecomp );
+	CartesianGenerator_SetGeometryParams( gen, minCrds, maxCrds );
+
+	feMesh = FeMesh_New( "" );
+	Mesh_SetExtensionManagerRegister( feMesh, emReg );
+	Mesh_SetGenerator( feMesh, gen );
+	FeMesh_SetElementFamily( feMesh, "linear" );
+
+	Mesh_SetTopologyDataSize( feMesh, MT_VERTEX, sizeof(Node) );
+	Mesh_SetTopologyDataSize( feMesh, nDims, sizeof(Element) );
+
+	Build( feMesh, NULL, False );
+	Initialise( feMesh, NULL, False );
+
+	return feMesh;
+}
+
 
 int main( int argc, char* argv[] ) {
 	MPI_Comm                   CommWorld;
@@ -103,15 +137,18 @@ int main( int argc, char* argv[] ) {
 	int                        numProcessors;
 	int                        procToWatch;
 	Dictionary*                dictionary;
-	Topology*                  nTopology;
-	ElementLayout*             eLayout;
-	NodeLayout*                nLayout;
-	MeshDecomp*                decomp;
-	MeshLayout*                meshLayout;
+
+	unsigned	nDims = 2;
+	unsigned	meshSize[3] = {6, 6, 0};
+	double		minCrds[3] = {0.0, 0.0, 0.0};
+	double		maxCrds[3] = {1.2, 2.2, 1.2};
+	FeMesh*		feMesh;
+	unsigned	nDomainVerts;
+	Node*		nodes;
+
 	DofLayout*                 dofs;
 	ElementType_Register*      elementType_Register;
 	ExtensionManager_Register* extensionMgr_Register;
-	FiniteElement_Mesh*        feMesh;
 	FeVariable*                feVariable;
 	Variable_Register*         variableRegister;
 	DiscretisationContext*     context;
@@ -128,8 +165,6 @@ int main( int argc, char* argv[] ) {
 	Particle_InCellIndex       particlesPerDim[] = {2,2,2};
 	ForceVector*               residual;
 	AdvDiffResidualForceTerm*  residualForceTerm;
-
-
 	
 	/* Initialise MPI, get world info */
 	MPI_Init( &argc, &argv );
@@ -158,18 +193,6 @@ int main( int argc, char* argv[] ) {
 	dictionary = Dictionary_New();
 	Dictionary_Add( dictionary, "rank", Dictionary_Entry_Value_FromUnsignedInt( rank ) );
 	Dictionary_Add( dictionary, "numProcessors", Dictionary_Entry_Value_FromUnsignedInt( numProcessors ) );
-	Dictionary_Add( dictionary, "dim", Dictionary_Entry_Value_FromUnsignedInt( 2 ) );
-	Dictionary_Add( dictionary, "meshSizeI", Dictionary_Entry_Value_FromUnsignedInt( 7 ) );
-	Dictionary_Add( dictionary, "meshSizeJ", Dictionary_Entry_Value_FromUnsignedInt( 7 ) );
-	Dictionary_Add( dictionary, "meshSizeK", Dictionary_Entry_Value_FromUnsignedInt( 1 ) );
-	Dictionary_Add( dictionary, "minX", Dictionary_Entry_Value_FromDouble( 0.0f ) );
-	Dictionary_Add( dictionary, "minY", Dictionary_Entry_Value_FromDouble( 0.0f ) );
-	Dictionary_Add( dictionary, "minZ", Dictionary_Entry_Value_FromDouble( 0.0f ) );
-	Dictionary_Add( dictionary, "maxX", Dictionary_Entry_Value_FromDouble( 1.2f ) );
-	Dictionary_Add( dictionary, "maxY", Dictionary_Entry_Value_FromDouble( 2.2f ) );
-	Dictionary_Add( dictionary, "maxZ", Dictionary_Entry_Value_FromDouble( 1.2f ) );
-	Dictionary_Add( dictionary, "allowPartitionOnElement", Dictionary_Entry_Value_FromBool( False ) );
-	Dictionary_Add( dictionary, "buildElementNodeTbl", Dictionary_Entry_Value_FromBool( True ) );
 	Dictionary_Add( dictionary, "gaussParticlesX", Dictionary_Entry_Value_FromUnsignedInt( 2 ) );
 	Dictionary_Add( dictionary, "gaussParticlesY", Dictionary_Entry_Value_FromUnsignedInt( 2 ) );
 	
@@ -193,19 +216,16 @@ int main( int argc, char* argv[] ) {
 			CommWorld, dictionary );
 	
 	/* create the layout, dof and mesh to use */
-	nTopology = (Topology*)IJK6Topology_New( "IJK6Topology", dictionary );
-	eLayout = (ElementLayout*)ParallelPipedHexaEL_New( "ElementLayout", 2, dictionary );
-	nLayout = (NodeLayout*)CornerNL_New( "CornerNL", dictionary, eLayout, nTopology );
-	decomp = (MeshDecomp*)HexaMD_New( "HexaMD", dictionary, MPI_COMM_WORLD, eLayout, nLayout );
-	meshLayout = MeshLayout_New( "MeshLayout", eLayout, nLayout, decomp );
-	
 	extensionMgr_Register = ExtensionManager_Register_New();
 	elementType_Register = ElementType_Register_New("elementTypeRegister");
 	ElementType_Register_Add( elementType_Register, (ElementType*)ConstantElementType_New("constantElementType") );
 	ElementType_Register_Add( elementType_Register, (ElementType*)BilinearElementType_New("BilinearElementType") );
 	ElementType_Register_Add( elementType_Register, (ElementType*)TrilinearElementType_New("TrilinearElementType") );
-	feMesh = FiniteElement_Mesh_New( "testMesh", meshLayout, sizeof(Node), sizeof(Element), extensionMgr_Register,
-		elementType_Register, dictionary );
+
+	feMesh = buildFeMesh( nDims, meshSize, minCrds, maxCrds, 
+			      extensionMgr_Register, elementType_Register );
+	nDomainVerts = Mesh_GetDomainSize( feMesh, MT_VERTEX );
+	nodes = Mesh_GetTopologyData( feMesh, MT_VERTEX );
 	
 	/* Create variable register */
 	variableRegister = Variable_Register_New();
@@ -215,16 +235,16 @@ int main( int argc, char* argv[] ) {
 		"velocity", 
 		Variable_DataType_Double, 
 		3, 
-		&feMesh->nodeDomainCount, 
-		(void**)&feMesh->node, 
+		&nDomainVerts, 
+		(void**)&nodes, 
 		variableRegister, 
 		"vx", 
 		"vy", 
 		"vz" );
 
 
-	dofs = DofLayout_New( "dofLayout", variableRegister, decomp->nodeLocalCount );
-	for (node_I = 0; node_I < decomp->nodeLocalCount; node_I++)	{
+	dofs = DofLayout_New( "dofLayout", variableRegister, nDomainVerts, NULL );
+	for (node_I = 0; node_I < nDomainVerts; node_I++) {
 		DofLayout_AddDof_ByVarName(dofs, "vx", node_I);
 		DofLayout_AddDof_ByVarName(dofs, "vy", node_I);
 	}
@@ -312,28 +332,38 @@ int main( int argc, char* argv[] ) {
 
 	Journal_Printf(stream, "#Checking pure diffusion\n");
 	/* Apply some arbitrary initial conditions */
-	for ( node_I = 0; node_I < decomp->nodeDomainCount; node_I++ ) {
-		feMesh->node[node_I].velocity[0] = 0.0;
-		feMesh->node[node_I].velocity[1] = 0.0;
-		feMesh->node[node_I].velocity[2] = 0.0;
+	for ( node_I = 0; node_I < nDomainVerts; node_I++ ) {
+		unsigned	d_i;
+
+		for( d_i = 0; d_i < Mesh_GetDimSize( feMesh ); d_i++ ) {
+			nodes[node_I].velocity[d_i] = 0.0;
+		}
 	}
 	residualForceTerm->defaultDiffusivity = 1.0;
 	CheckShapeFunc( advDiffSLE, residualForceTerm, gaussSwarm, lElement_I, context->dim, feMesh, stream );
 	
 	Journal_Printf(stream, "#Checking pure advection vx = 1.0\n");
-	for ( node_I = 0; node_I < decomp->nodeDomainCount; node_I++ ) {
-		feMesh->node[node_I].velocity[0] = 1.0;
-		feMesh->node[node_I].velocity[1] = 0.0;
-		feMesh->node[node_I].velocity[2] = 0.0;
+	for ( node_I = 0; node_I < nDomainVerts; node_I++ ) {
+		unsigned	d_i;
+
+		nodes[node_I].velocity[0] = 1.0;
+		for( d_i = 1; d_i < Mesh_GetDimSize( feMesh ); d_i++ ) {
+			nodes[node_I].velocity[d_i] = 0.0;
+		}
 	}
 	residualForceTerm->defaultDiffusivity = 0.0;
 	CheckShapeFunc( advDiffSLE, residualForceTerm, gaussSwarm, lElement_I, context->dim, feMesh, stream );
 	
 	Journal_Printf(stream, "#Checking pure advection vy = 1.0\n");
-	for ( node_I = 0; node_I < decomp->nodeDomainCount; node_I++ ) {
-		feMesh->node[node_I].velocity[0] = 0.0;
-		feMesh->node[node_I].velocity[1] = 1.0;
-		feMesh->node[node_I].velocity[2] = 0.0;
+	for ( node_I = 0; node_I < nDomainVerts; node_I++ ) {
+		unsigned	d_i;
+
+		for( d_i = 0; d_i < Mesh_GetDimSize( feMesh ); d_i++ ) {
+			if( d_i == 1 )
+				nodes[node_I].velocity[d_i] = 1.0;
+			else
+				nodes[node_I].velocity[d_i] = 0.0;
+		}
 	}
 	residualForceTerm->defaultDiffusivity = 0.0;
 	CheckShapeFunc( advDiffSLE, residualForceTerm, gaussSwarm, lElement_I, context->dim, feMesh, stream );
@@ -346,11 +376,6 @@ int main( int argc, char* argv[] ) {
 	Stg_Class_Delete( elementType_Register );
 	Stg_Class_Delete( extensionMgr_Register );
 	Stg_Class_Delete( dofs );
-	Stg_Class_Delete( meshLayout );
-	Stg_Class_Delete( decomp );
-	Stg_Class_Delete( nLayout );
-	Stg_Class_Delete( eLayout );
-	Stg_Class_Delete( nTopology );
 	Stg_Class_Delete( dictionary );
 	
 	StgFEM_SLE_SystemSetup_Finalise();

@@ -206,9 +206,11 @@ void _MGCoarsener_RegCartesian_Coarsen( void* coarsener, unsigned level, MGMappi
 	IJK				newElSizes;
 	IJK				prevElSizes;
 	IJK				topElSizes;
-	IJK				dimMap;
 	unsigned			denom;
 	unsigned			nDims;
+	Mesh*				mesh;
+	Grid*				vertGrid;
+	unsigned			*localOrigin, *localRange;
 
 	void _MGCoarsener_RegCartesian_Coarsen3D( MGCoarsener_RegCartesian* self, 
 						  IJK newElSizes, IJK prevElSizes, 
@@ -223,13 +225,20 @@ void _MGCoarsener_RegCartesian_Coarsen( void* coarsener, unsigned level, MGMappi
 						  unsigned denom, 
 						  MGMapping* dstMap );
 
+	mesh = self->mesh;
+	nDims = Mesh_GetDimSize( mesh );
+	vertGrid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
+						  ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+	localOrigin = (unsigned*)ExtensionManager_Get( mesh->info, mesh, 
+						       ExtensionManager_GetHandle( mesh->info, "localOrigin" ) );
+	localRange = (unsigned*)ExtensionManager_Get( mesh->info, mesh, 
+						      ExtensionManager_GetHandle( mesh->info, "localRange" ) );
 
 	/*
 	** Calculate the new dimensional element counts as well as a few other things.
 	*/
 	
 	{
-		HexaMD*		decomp = (HexaMD*)self->mesh->layout->decomp;
 		unsigned	el_k, el_j, el_i;
 		unsigned	dim_i;
 		
@@ -239,35 +248,45 @@ void _MGCoarsener_RegCartesian_Coarsen( void* coarsener, unsigned level, MGMappi
 			denom *= 2;
 		}
 
-		nDims = 0;
-		for( dim_i = 0; dim_i < 3; dim_i++ ) {
+		for( dim_i = 0; dim_i < nDims; dim_i++ ) {
 			div_t	res;
 
-			if( decomp->nodeGlobal3DCounts[dim_i] == 1 ) {
+			if( vertGrid->sizes[dim_i] == 1 ) {
 				newElSizes[dim_i] = 0;
 				prevElSizes[dim_i] = 0;
 				continue;
 			}
 			
-			res = div( decomp->elementLocal3DCounts[decomp->rank][dim_i], denom );
+			res = div( localRange[dim_i], denom );
 			assert( res.rem == 0 );
 			
 			newElSizes[dim_i] = res.quot;
 			prevElSizes[dim_i] = newElSizes[dim_i] * 2;
-			topElSizes[dim_i] = decomp->elementLocal3DCounts[decomp->rank][dim_i];
-			dimMap[nDims++] = dim_i;
+			topElSizes[dim_i] = localRange[dim_i];
+		}
+
+		if( nDims <= 2 ) {
+			newElSizes[2] = 0;
+			prevElSizes[2] = 0;
+			topElSizes[2] = 0;
+		}
+
+		if( nDims <= 1 ) {
+			newElSizes[1] = 0;
+			prevElSizes[1] = 0;
+			topElSizes[1] = 0;
 		}
 
 		/* Calc the number of coarse elements. */
 		dstMap->nEls = 1;
 		for( dim_i = 0; dim_i < nDims; dim_i++ ) {
-			dstMap->nEls *= newElSizes[dimMap[dim_i]];
+			dstMap->nEls *= newElSizes[dim_i];
 		}
 
 		/* ... and the number of coarse nodes. */
 		dstMap->nNodes = 1;
 		for( dim_i = 0; dim_i < nDims; dim_i++ ) {
-			dstMap->nNodes *= (newElSizes[dimMap[dim_i]] + 1);
+			dstMap->nNodes *= (newElSizes[dim_i] + 1);
 		}
 
 		/* Map the coarse nodes to top-level nodes. */
@@ -276,12 +295,17 @@ void _MGCoarsener_RegCartesian_Coarsen( void* coarsener, unsigned level, MGMappi
 			for( el_j = 0; el_j < (newElSizes[1] + 1); el_j++ ) {
 				for( el_i = 0; el_i < (newElSizes[0] + 1); el_i++ ) {
 					unsigned	ind;
+					unsigned	topInds[3];
 
 					ind = el_k * (newElSizes[1] + 1) * (newElSizes[0] + 1) + el_j * (newElSizes[0] + 1) + el_i;
-					dstMap->nodesTop[ind] = RegularMeshUtils_Node_Local3DTo1D( decomp, 
-												   el_i * denom, 
-												   el_j * denom, 
-												   el_k * denom );
+					topInds[0] = el_i * denom + localOrigin[0];
+					if( nDims >= 2 )
+						topInds[1] = el_j * denom + localOrigin[1];
+					if( nDims >= 3 )
+						topInds[2] = el_k * denom + localOrigin[2];
+					dstMap->nodesTop[ind] = RegularMeshUtils_Node_3DTo1D( mesh, topInds );
+					insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, dstMap->nodesTop[ind], 
+								     dstMap->nodesTop + ind ) );
 				}
 			}
 		}
@@ -299,21 +323,14 @@ void _MGCoarsener_RegCartesian_Coarsen( void* coarsener, unsigned level, MGMappi
 						     dstMap );
 	}
 	else if( nDims == 2 ) {
-		IJK	newMappedSizes = { newElSizes[dimMap[0]], newElSizes[dimMap[1]], 0 };
-		IJK	prevMappedSizes = { prevElSizes[dimMap[0]], prevElSizes[dimMap[1]], 0 };
-		IJK	topMappedSizes = { topElSizes[dimMap[0]], topElSizes[dimMap[1]], 0 };
-
 		_MGCoarsener_RegCartesian_Coarsen2D( self, 
-						     newMappedSizes, prevMappedSizes, topMappedSizes, 
+						     newElSizes, prevElSizes, topElSizes, 
 						     denom, 
 						     dstMap );
 	}
 	else {
-		IJK	newMappedSizes = { newElSizes[dimMap[0]], 0, 0 };
-		IJK	prevMappedSizes = { prevElSizes[dimMap[0]], 0, 0 };
-
 		_MGCoarsener_RegCartesian_Coarsen1D( self, 
-						     newMappedSizes, prevMappedSizes, 
+						     newElSizes, prevElSizes, 
 						     denom, 
 						     dstMap );
 	}
@@ -325,7 +342,6 @@ void _MGCoarsener_RegCartesian_Coarsen3D( MGCoarsener_RegCartesian* self,
 					  unsigned denom, 
 					  MGMapping* dstMap )
 {
-	HexaMD*		decomp = (HexaMD*)self->mesh->layout->decomp;
 	unsigned	el_i, el_j, el_k;
 	unsigned	node_i, node_j, node_k;
 

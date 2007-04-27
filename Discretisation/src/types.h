@@ -44,7 +44,7 @@
 **
 ** Comments:
 **
-** $Id: types.h 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: types.h 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -57,9 +57,17 @@
 	typedef struct ConstantElementType       ConstantElementType;
 	typedef struct BilinearElementType       BilinearElementType;
 	typedef struct TrilinearElementType      TrilinearElementType;
+	typedef struct RegularTrilinear			RegularTrilinear;
+	typedef struct RegularBilinear			RegularBilinear;
+	typedef struct Biquadratic		Biquadratic;
+	typedef struct P1			P1;
 	typedef struct LinearTriangleElementType LinearTriangleElementType;
 	typedef struct FiniteElement_Element     FiniteElement_Element;
-	typedef struct FiniteElement_Mesh        FiniteElement_Mesh;
+	typedef struct FeMesh			FeMesh;
+	typedef struct FeMesh_ElementType	FeMesh_ElementType;
+	typedef struct C0Generator		C0Generator;
+	typedef struct C2Generator		C2Generator;
+	typedef struct P1Generator		P1Generator;
 	typedef struct LinkedDofInfo             LinkedDofInfo;
 	typedef struct FeEquationNumber          FeEquationNumber;
 	typedef struct FeVariable                FeVariable;

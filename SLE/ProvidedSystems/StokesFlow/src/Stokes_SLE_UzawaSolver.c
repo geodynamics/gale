@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Stokes_SLE_UzawaSolver.c 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: Stokes_SLE_UzawaSolver.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -74,7 +74,6 @@ void* _Stokes_SLE_UzawaSolver_DefaultNew( Name name ) {
 		_Stokes_SLE_UzawaSolver_SolverSetup, 
 		_Stokes_SLE_UzawaSolver_Solve, 
 		_Stokes_SLE_UzawaSolver_GetResidual,
-		_SLE_Solver_MG_SetupSmoother, 
 		name );
 }
 
@@ -111,7 +110,6 @@ Stokes_SLE_UzawaSolver* _Stokes_SLE_UzawaSolver_New(
 		SLE_Solver_SolverSetupFunction*             _solverSetup,
 		SLE_Solver_SolveFunction*                   _solve,
 		SLE_Solver_GetResidualFunc*                 _getResidual, 
-		SLE_Solver_MG_SetupSmootherFunc*            _mgSetupSmoother, 
 		Name                                        name )
 {
 	Stokes_SLE_UzawaSolver* self;
@@ -133,7 +131,6 @@ Stokes_SLE_UzawaSolver* _Stokes_SLE_UzawaSolver_New(
 		_solverSetup,
 		_solve,
 		_getResidual, 
-		_mgSetupSmoother, 
 		name );
 	
 	/* Virtual info */
@@ -177,16 +174,15 @@ void _Stokes_SLE_UzawaSolver_Delete( void* solver ) {
 
 	Stream_IndentBranch( StgFEM_Debug );
 	Journal_DPrintfL( self->debug, 2, "Deleting Solver contexts.\n" );
-	MatrixSolver_Destroy( self->velSolver );
-	if ( self->pcSolver )
-		MatrixSolver_Destroy( self->pcSolver );
+	FreeObject( self->velSolver );
+	FreeObject( self->pcSolver );
 
 	Journal_DPrintfL( self->debug, 2, "Deleting temporary solver vectors.\n" );
-	Vector_Destroy( self->pTempVec );
-	Vector_Destroy( self->rVec ); 
-	Vector_Destroy( self->sVec );
-	Vector_Destroy( self->fTempVec );
-	Vector_Destroy( self->vStarVec );
+	FreeObject( self->pTempVec );
+	FreeObject( self->rVec ); 
+	FreeObject( self->sVec );
+	FreeObject( self->fTempVec );
+	FreeObject( self->vStarVec );
 	Stream_UnIndentBranch( StgFEM_Debug );
 }       
 
@@ -231,7 +227,7 @@ void _Stokes_SLE_UzawaSolver_Build( void* solver, void* stokesSLE ) {
 	Stream_IndentBranch( StgFEM_Debug );
 	
  	Journal_DPrintfL( self->debug, 2, "building a standard solver for the velocity system.\n" );
-	self->velSolver = MatrixSolver_Build( sle->comm, sle->kStiffMat->matrix );
+	MatrixSolver_SetComm( self->velSolver, sle->comm );
 	
 	/* Build Preconditioner */
 	if ( self->preconditioner ) {
@@ -239,18 +235,24 @@ void _Stokes_SLE_UzawaSolver_Build( void* solver, void* stokesSLE ) {
 		SystemLinearEquations_AddStiffnessMatrix( sle, self->preconditioner );
 
 		Journal_DPrintfL( self->debug, 2, "build a standard solver for the preconditioner system.\n" );
-		self->pcSolver = MatrixSolver_Build( sle->comm, self->preconditioner->matrix );
+		self->pcSolver = (MatrixSolver*)PETScMatrixSolver_New( "" );
+		MatrixSolver_SetComm( self->pcSolver, sle->comm );
 	}
 	else 
 		self->pcSolver = NULL;
-		
+
  	Journal_DPrintfL( self->debug, 2, "Allocate the auxillary vectors pTemp, r, s, fTemp and vStar.\n" ); 
-	Vector_Duplicate( sle->pSolnVec->vector, &self->pTempVec );
-	Vector_Duplicate( sle->pSolnVec->vector, &self->rVec );
-	Vector_Duplicate( sle->pSolnVec->vector, &self->sVec );
+	Vector_Duplicate( sle->pSolnVec->vector, (void**)&self->pTempVec );
+	Vector_SetLocalSize( self->pTempVec, Vector_GetLocalSize( sle->pSolnVec->vector ) );
+	Vector_Duplicate( sle->pSolnVec->vector, (void**)&self->rVec );
+	Vector_SetLocalSize( self->rVec, Vector_GetLocalSize( sle->pSolnVec->vector ) );
+	Vector_Duplicate( sle->pSolnVec->vector, (void**)&self->sVec );
+	Vector_SetLocalSize( self->sVec, Vector_GetLocalSize( sle->pSolnVec->vector ) );
 	
-	Vector_Duplicate( sle->fForceVec->vector, &self->fTempVec );
-	Vector_Duplicate( sle->fForceVec->vector, &self->vStarVec );
+	Vector_Duplicate( sle->fForceVec->vector, (void**)&self->fTempVec );
+	Vector_SetLocalSize( self->fTempVec, Vector_GetLocalSize( sle->fForceVec->vector ) );
+	Vector_Duplicate( sle->fForceVec->vector, (void**)&self->vStarVec );
+	Vector_SetLocalSize( self->vStarVec, Vector_GetLocalSize( sle->fForceVec->vector ) );
 	Stream_UnIndentBranch( StgFEM_Debug );
 }
 
@@ -270,6 +272,16 @@ void _Stokes_SLE_UzawaSolver_Construct( void* solver, Stg_ComponentFactory* cf, 
 	preconditioner = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Preconditioner", StiffnessMatrix, False, data );
 
 	_Stokes_SLE_UzawaSolver_Init( self, preconditioner, maxUzawaIterations, tolerance, useAbsoluteTolerance );
+
+	self->velSolver = Stg_ComponentFactory_ConstructByKey( cf, self->name, "velocitySolver", MatrixSolver, 
+							       False, data );
+	if( !self->velSolver ) {
+#ifdef HAVE_PETSC
+		self->velSolver = (MatrixSolver*)PETScMatrixSolver_New( "" );
+#else
+		self->velSolver = NULL;
+#endif
+	}
 }
 
 void _Stokes_SLE_UzawaSolver_Execute( void* solver, void* data ) {
@@ -285,11 +297,6 @@ void _Stokes_SLE_UzawaSolver_Initialise( void* solver, void* stokesSLE ) {
 	/* Initialise Parent */
 	_SLE_Solver_Initialise( self, sle );
 	
-	/* MG: If multi-grid is enabled, enable it on the velocity matrix solver. */
-	if( sle->mgEnabled ) {
-		MultiGrid_InitMatrixSolver( sle->mgHandles[0], self->velSolver );
-	}
-
 	if ( sle->context && (True == sle->context->loadFromCheckPoint) ) {
 		/* The previous timestep's velocity solution will be helpful in iterating to a better
 		solution faster - and thus make restarting from checkpoint more repeatable compared
@@ -311,22 +318,11 @@ void _Stokes_SLE_UzawaSolver_SolverSetup( void* solver, void* stokesSLE ) {
 	Stream_IndentBranch( StgFEM_Debug );
 
 	Journal_DPrintfL( self->debug, 1, "Setting up MatrixSolver for the velocity eqn.\n" );
-	MatrixSolver_Setup( self->velSolver, sle->kStiffMat->matrix );
+	MatrixSolver_SetMatrix( self->velSolver, sle->kStiffMat->matrix );
 
 	if( self->pcSolver ) {
 		Journal_DPrintfL( self->debug, 1, "Setting up MatrixSolver for the Preconditioner.\n" );
-		MatrixSolver_Setup( self->pcSolver, self->preconditioner->matrix );
-	}
-
-	if( sle->mgEnabled ) {
-		if( sle->mgUpdate ) {
-			MultiGrid_BuildGridOps( sle->mgHandles[0] );
-			MultiGrid_BuildWorkVectors( sle->mgHandles[0] );
-			sle->mgUpdate = False;
-		}
-
-		MultiGrid_BuildSmoothers( sle->mgHandles[0] );
-		MultiGrid_UpdateMatrixSolver( sle->mgHandles[0], self->velSolver, (SLE_Solver*)self );
+		MatrixSolver_SetMatrix( self->pcSolver, self->preconditioner->matrix );
 	}
 
 	Stream_UnIndentBranch( StgFEM_Debug );
@@ -354,8 +350,8 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	Vector*                 fTempVec        = self->fTempVec;
 	Vector*                 vStarVec        = self->vStarVec; 
 	
-	MatrixSolver*           velSolver       = self->velSolver;	// Inner velocity solver
-	MatrixSolver*           pcSolver        = self->pcSolver;   // Preconditioner 
+	MatrixSolver*           velSolver       = self->velSolver;	/*  Inner velocity solver */
+	MatrixSolver*           pcSolver        = self->pcSolver;   /*  Preconditioner  */
 
 	Iteration_Index         maxIterations   = self->maxUzawaIterations;	
 	Iteration_Index         iteration_I     = 0;
@@ -377,24 +373,24 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	Iteration_Index         innerLoopIterations;
 	Stream*                 errorStream     = Journal_Register( Error_Type, Stokes_SLE_UzawaSolver_Type );
 	
-	double                  qGlobalProblemScale = sqrt((double) Vector_GlobalSize( qTempVec ));
+	double                  qGlobalProblemScale = sqrt( (double)Vector_GetGlobalSize( qTempVec ) );
 	double                  qReciprocalGlobalProblemScale = 1.0 / qGlobalProblemScale;
 	
 
 
 	/*	DEFINITIONS:
-	//				See accompanying documentation
-	//				u - the displacement / velocity solution (to which constraints are applied)
-	//				q - the pressure-like variable which constrains the divergence displacement / velocity	(= pressure for incompressible)	
-	//				F - standard FE force vector
-	//				Fhat - Uzawa RHS = K^{-1} G F  - h 
-	//				K - standard FE stiffness matrix
-	//				Khat - Uzawa transformed stiffness matrix = G^T K^{-1} G
-	//				G matrix - discrete gradient operator
-	//				D matrix - discrete divergence operator = G^T for this particular algorithm
-	//				C matrix - Mass matrix (M) for compressibility 
-	//				
-	//	LM & DAM			
+					See accompanying documentation
+					u - the displacement / velocity solution (to which constraints are applied)
+					q - the pressure-like variable which constrains the divergence displacement / velocity	(= pressure for incompressible)	
+					F - standard FE force vector
+					Fhat - Uzawa RHS = K^{-1} G F  - h 
+					K - standard FE stiffness matrix
+					Khat - Uzawa transformed stiffness matrix = G^T K^{-1} G
+					G matrix - discrete gradient operator
+					D matrix - discrete divergence operator = G^T for this particular algorithm
+					C matrix - Mass matrix (M) for compressibility 
+					
+		LM & DAM			
 	*/
 
 	/* CHOICE OF RESIDUAL: 
@@ -405,7 +401,7 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	*/ 
 
 	
-	if ( Vector_L2_Norm( fVec ) / sqrt((double) Vector_GlobalSize( fVec )) <= 1e-99 ) {
+	if ( Vector_L2Norm( fVec ) / sqrt( (double)Vector_GetGlobalSize( fVec ) ) <= 1e-99 ) {
 		Journal_Printf( errorStream,
 			"Error in func %s: The momentum force vector \"%s\" is zero. "
 			"The force vector should be non-zero either because of your chosen boundary "
@@ -415,7 +411,7 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 		if ( sle->fForceVec->assembleForceVector->hooks->count > 0 ) {
 			Journal_Printf( errorStream, "You used the following force vector assembly terms:\n" );
 			EntryPoint_PrintConcise( sle->fForceVec->assembleForceVector, errorStream );
-			// TODO : need to print the elementForceVector assembly, not the global guy!!
+/* 			 TODO : need to print the elementForceVector assembly, not the global guy!! */
 		}	
 		Journal_Printf( errorStream,
 			"Please check values for building the force vector.\n" );
@@ -473,39 +469,40 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	#endif
 	
 	/* STEP 1: Estimate the magnitude of the RHS for the transformed problem
-	//		   we compute (usually to lower accuracy than elsewhere) the RHS (Fhat - h) 
-	//         and store the result in qTempVec.
-	//	LM & DAM			
+			   we compute (usually to lower accuracy than elsewhere) the RHS (Fhat - h) 
+	         and store the result in qTempVec.
+		LM & DAM			
 	*/
 	
 	Journal_DPrintfL( self->debug, 2, "Building Fhat - h.\n" );
 	
-	MatrixSolver_SetRelativeTolerance( velSolver, self->tolerance );  	
-	innerLoopIterations = MatrixSolver_Solve( velSolver, vStarVec, fVec );
+	MatrixSolver_SetRelativeTolerance( velSolver, self->tolerance );
+	MatrixSolver_Solve( velSolver, fVec, vStarVec );
+	innerLoopIterations = MatrixSolver_GetIterations( velSolver );
 	
 	Journal_DPrintfL( self->debug, 2, "Fhat inner solution: Number of iterations: %d\n", innerLoopIterations );
 	
-	MatrixTransposeMultiply( G_Mat, vStarVec, qTempVec ); 
- 	Vector_AddScaledVector( qTempVec, -1.0, hVec );	
+	Matrix_TransposeMultiply( G_Mat, vStarVec, qTempVec );
+ 	Vector_AddScaled( qTempVec, -1.0, hVec );
 	
 	/*  WARNING:
-	//		If D != G^T then the resulting \hat{K} is not likely to be symmetric, positive definite as
-	//		required by this implementation of the Uzawa iteration.  This next piece of code
-	//		is VERY unlikely to work properly so it's in the sin bin for the time being - LM.
-	//		
-	//		if ( D_Mat ) {
-	//			MatrixMultiply( D_Mat, vStarVec, qTempVec );
-	//		}
-	//		else {
-	//			MatrixTransposeMultiply( G_Mat, vStarVec, qTempVec );
-	//		}
-	//	LM & DAM			
+			If D != G^T then the resulting \hat{K} is not likely to be symmetric, positive definite as
+			required by this implementation of the Uzawa iteration.  This next piece of code
+			is VERY unlikely to work properly so it's in the sin bin for the time being - LM.
+			
+			if ( D_Mat ) {
+				MatrixMultiply( D_Mat, vStarVec, qTempVec );
+			}
+			else {
+				MatrixTransposeMultiply( G_Mat, vStarVec, qTempVec );
+			}
+		LM & DAM			
 	*/	
 
 	
 	/* STEP 2: The problem scaling - optionally normalize the uzawa residual by the magnitude of the RHS (use a relative tolerance)
-	//		For the inner velocity solver,  Citcom uses a relative tolerance equal to that used for the Uzawa iteration as a whole
-	//	LM & DAM			
+			For the inner velocity solver,  Citcom uses a relative tolerance equal to that used for the Uzawa iteration as a whole
+		LM & DAM			
 	*/
 	
 	if (self->useAbsoluteTolerance) {
@@ -521,7 +518,7 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	}
 	
 	Journal_DPrintfL( self->debug, 2, "Determining scaling factor for residual:\n" );
-	uzawaRhsScale = Vector_L2_Norm( qTempVec ) * qReciprocalGlobalProblemScale;
+	uzawaRhsScale = Vector_L2Norm( qTempVec ) * qReciprocalGlobalProblemScale;
 	
 	Journal_DPrintfL( self->debug, 2, "uzawaRhsScale = %f\n", uzawaRhsScale );	
 	Journal_Firewall( isGoodNumber( uzawaRhsScale ), errorStream, 
@@ -529,32 +526,32 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	
 	
 	/* STEP 3: Calculate initial residual for transformed equation  (\hat{F} - h - \hat{K} q_0)
-	//    Compute the solution to K u_0 = F - G q_0  (u_0 unknown)
-	//	  Then G^T u* = \hat{F} - \hat{K} q_0 
-	//    u_0 is also the initial velocity solution to which the constraint is applied by the subsequent iteration
-	//	LM & DAM			
+	    Compute the solution to K u_0 = F - G q_0  (u_0 unknown)
+		  Then G^T u* = \hat{F} - \hat{K} q_0 
+	    u_0 is also the initial velocity solution to which the constraint is applied by the subsequent iteration
+		LM & DAM			
 	*/
 	
 	Journal_DPrintfL( self->debug, 2, "Solving for transformed Uzawa RHS.\n" );
 	
-	Vector_CopyContents( fVec, fTempVec );
-	Vector_ScaleContents( fTempVec, -1.0 );
-	MatrixMultiplyAdd( G_Mat, qVec, fTempVec, fTempVec );
-	Vector_ScaleContents( fTempVec, -1.0 );
-	MatrixSolver_Solve( velSolver, uVec, fTempVec ); 
+	Vector_CopyEntries( fVec, fTempVec );
+	Vector_Scale( fTempVec, -1.0 );
+	Matrix_MultiplyAdd( G_Mat, qVec, fTempVec, fTempVec );
+	Vector_Scale( fTempVec, -1.0 );
+	MatrixSolver_Solve( velSolver, fTempVec, uVec ); 
 	
 	/* Handling for NON-SYMMETRIC: relegated to sin bin (see comment above) 
-	// if ( D_Mat ) {
-    //	MatrixMultiply( D_Mat, uVec, rVec );
-	// }
-	// else {
-	//	 MatrixTransposeMultiply( G_Mat, uVec, rVec );
-	// }	
-	//	LM & DAM			
+	 if ( D_Mat ) {
+    	MatrixMultiply( D_Mat, uVec, rVec );
+	 }
+	 else {
+		 MatrixTransposeMultiply( G_Mat, uVec, rVec );
+	 }	
+		LM & DAM			
 	*/
 	
-	MatrixTransposeMultiply( G_Mat, uVec, rVec );
-	divU = Vector_L2_Norm( rVec ) / Vector_L2_Norm( uVec );  
+	Matrix_TransposeMultiply( G_Mat, uVec, rVec );
+	divU = Vector_L2Norm( rVec ) / Vector_L2Norm( uVec );  
 	
 	Journal_PrintfL( self->info, 2, "Initial l2Norm( Div u ) / l2Norm( u ) = %f \n", divU);
 	
@@ -566,9 +563,9 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	Journal_DPrintfL( self->debug, 2, "Adding compressibility and prescribed divergence terms.\n" );
 	
 	if ( M_Mat ) {
-		MatrixMultiplyAdd( M_Mat, qVec, rVec, rVec );
+		Matrix_MultiplyAdd( M_Mat, qVec, rVec, rVec );
 	}	
-	Vector_AddScaledVector( rVec, -1.0, hVec );
+	Vector_AddScaled( rVec, -1.0, hVec );
 			
 			
 	/* STEP 4: Preconditioned conjugate gradient iteration loop */	
@@ -581,84 +578,85 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 		Stream_IndentBranch( StgFEM_Debug );
 		
 		/* STEP 4.1: Preconditioner
-		//	Solve:
-		//		Q_\hat{K} z_1 =  r_1
-		//		Q_\hat{K} is an approximation to \hat{K} which is simple / trivial / quick to invert
-		//	LM & DAM			
+			Solve:
+				Q_\hat{K} z_1 =  r_1
+				Q_\hat{K} is an approximation to \hat{K} which is simple / trivial / quick to invert
+			LM & DAM			
 		*/
 		
 		if ( pcSolver ) 
-			MatrixSolver_Solve( pcSolver, qTempVec, rVec );  
+			MatrixSolver_Solve( pcSolver, rVec, qTempVec );
 		else
-			Vector_CopyContents( rVec, qTempVec );
+			Vector_CopyEntries( rVec, qTempVec );
 				
 		/* STEP 4.2: Calculate s_I, the pressure search direction
-		//		z_{I-1} . r_{I-1}  
-		//		\beta = (z_{I-1} . r_{I-1}) / (z_{I-2} . r_{I-2})  
-		//			\beta = 0 for the first iteration
-		//      s_I = z_(I-1) + \beta * s_(I-1) 
-		//	LM & DAM			
+				z_{I-1} . r_{I-1}  
+				\beta = (z_{I-1} . r_{I-1}) / (z_{I-2} . r_{I-2})  
+					\beta = 0 for the first iteration
+		      s_I = z_(I-1) + \beta * s_(I-1) 
+			LM & DAM			
 		*/ 
 		
-		Vector_DotProduct( qTempVec, rVec, &zdotr_current);
+		zdotr_current = Vector_DotProduct( qTempVec, rVec );
 		
 		Journal_DPrintfL( self->debug, 2, "l2Norm (qTempVec) %g; (rVec) %g \n", 
-			Vector_L2_Norm( qTempVec ) * qReciprocalGlobalProblemScale, 
-			Vector_L2_Norm( rVec ) * qReciprocalGlobalProblemScale );
+			Vector_L2Norm( qTempVec ) * qReciprocalGlobalProblemScale, 
+			Vector_L2Norm( rVec ) * qReciprocalGlobalProblemScale );
 		
 		if ( iteration_I == 0 ) {
-			Vector_CopyContents( qTempVec, sVec );
+			Vector_CopyEntries( qTempVec, sVec );
 		}
 		else {
 			beta = zdotr_current/zdotr_previous;
-			Vector_ScaleAndAddVector( sVec, beta, qTempVec );
+			Vector_ScaleAdd( sVec, beta, qTempVec );
 		}
 		
 		/* STEP 4.3: Velocity search direction corresponding to s_I is found by solving
-		//		K u* = G s_I
-		//	LM & DAM			
+				K u* = G s_I
+			LM & DAM			
 		*/
 			
-		MatrixMultiply( G_Mat, sVec, fTempVec );
+		Matrix_Multiply( G_Mat, sVec, fTempVec );
 		
 		Journal_DPrintfL( self->debug, 2, "Uzawa inner iteration step\n");
-		innerLoopIterations = MatrixSolver_Solve( velSolver, vStarVec, fTempVec ); 
+		MatrixSolver_Solve( velSolver, fTempVec, vStarVec );
+		innerLoopIterations = MatrixSolver_GetIterations( velSolver );
 		Journal_DPrintfL( self->debug, 2, "Completed Uzawa inner iteration in '%u' iterations \n", innerLoopIterations );
 				
 		
 		/* STEP 4.4: Calculate the step size ( \alpha = z_{I-1} . r_{I-1} / (s_I . \hat{K} s_I) )
-		//		 \hat{K} s_I = G^T u* - M s_I (u* from step 4.3) 	
-		//	LM & DAM			
+				 \hat{K} s_I = G^T u* - M s_I (u* from step 4.3) 	
+			LM & DAM			
 		*/ 
 		
-		MatrixTransposeMultiply( G_Mat, vStarVec, qTempVec );
+		Matrix_TransposeMultiply( G_Mat, vStarVec, qTempVec );
 		
 		/* Handling for NON-SYMMETRIC: relegated to sin bin (see comment above) 
-		//
-		//	if ( D_Mat ) {
-		//		MatrixMultiply( D_Mat, vStarVec, qTempVec );
-		//	}
-		//	else {
-		//		MatrixTransposeMultiply( G_Mat, vStarVec, qTempVec );
-		//	}
-		//	LM & DAM			
+		
+			if ( D_Mat ) {
+				MatrixMultiply( D_Mat, vStarVec, qTempVec );
+			}
+			else {
+				MatrixTransposeMultiply( G_Mat, vStarVec, qTempVec );
+			}
+			LM & DAM			
 		*/
 
 		if ( M_Mat ) {
 			Journal_DPrintfL( self->debug, 2, "Correcting for Compressibility\n" );
-			Vector_ScaleContents( qTempVec, -1.0 );
-			MatrixMultiplyAdd( M_Mat, sVec, qTempVec, qTempVec );
-			Vector_ScaleContents( qTempVec, -1.0 );
+			Vector_Scale( qTempVec, -1.0 );
+			Matrix_MultiplyAdd( M_Mat, sVec, qTempVec, qTempVec );
+			Vector_Scale( qTempVec, -1.0 );
 		}
 
-		Vector_DotProduct( sVec, qTempVec, &sdotGTrans_v );
+		sdotGTrans_v = Vector_DotProduct( sVec, qTempVec );
 		
 		alpha = zdotr_current/sdotGTrans_v;
 		
 		
 		/* STEP 4.5: Update pressure, velocity and value of residual
-		//		 by \alpha times corresponding search direction 
-		//	LM & DAM			
+				 by \alpha times corresponding search direction 
+			LM & DAM			
 		*/
 		
 		Journal_DPrintfL( self->debug, 2, "zdotr_current = %g \n", zdotr_current);
@@ -671,17 +669,17 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 				"Error in func '%s' for %s '%s' - zdotr_current, sdotGTrans_v or alpha has an illegal value: '%g','%g' or '%g'\n",
 				__func__, self->type, self->name, zdotr_current, sdotGTrans_v, alpha );
 		
-		Vector_AddScaledVector( qVec, alpha, sVec );
-		Vector_AddScaledVector( uVec, -alpha, vStarVec );
-		Vector_AddScaledVector( rVec, -alpha, qTempVec );
+		Vector_AddScaled( qVec, alpha, sVec );
+		Vector_AddScaled( uVec, -alpha, vStarVec );
+		Vector_AddScaled( rVec, -alpha, qTempVec );
 		
 		/* STEP 4.6: store the value of z_{I-1} . r_{I-1} for the next iteration
-		// LM & DAM
+		 LM & DAM
 		*/
 		
 		zdotr_previous = zdotr_current; 
 		
-		absResidual = Vector_L2_Norm( rVec ) * qReciprocalGlobalProblemScale;  
+		absResidual = Vector_L2Norm( rVec ) * qReciprocalGlobalProblemScale;  
 		relResidual = absResidual / uzawaRhsScale;
 		
 		Stream_UnIndentBranch( StgFEM_Debug );
@@ -699,7 +697,7 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 				errorStream, "In func %s: Reached maximum number of iterations %u without converging; absResidual = %.5g, relResidual = %.5g \n",
 				__func__, iteration_I, absResidual, relResidual );
 
-		// TODO: test for small change in 10 iterations and if so restart?
+/* 		 TODO: test for small change in 10 iterations and if so restart? */
 			
 	iteration_I++;  
 	}  while (*chosenResidual > self->tolerance );  
@@ -713,58 +711,58 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	
 	/* This information should be in an info stream */
 	Journal_PrintfL( self->info, 1, "Summary: Uzawa_its = %04d; Uzawa Residual  = %.8e\n", iteration_I, relResidual );  
-	MatrixTransposeMultiply( G_Mat, uVec, rVec );	
-	divU = Vector_L2_Norm( rVec ) / Vector_L2_Norm( uVec );  
+	Matrix_TransposeMultiply( G_Mat, uVec, rVec );	
+	divU = Vector_L2Norm( rVec ) / Vector_L2Norm( uVec );  
 	Journal_PrintfL( self->info, 1, "Summary: || Div ( u ) || / || u ||         = %.8e\n", divU);
 	
 	/* Residual for the momentum equation 
-	//	Compute r = || F - Ku - Gp || / || F ||
+		Compute r = || F - Ku - Gp || / || F ||
 	*/
 	
-	MatrixMultiply( G_Mat, qVec, vStarVec );	
-	MatrixMultiplyAdd( K_Mat, uVec, vStarVec, fTempVec );
-	Vector_ScaleAndAddVector( fTempVec, -1.0, fVec );
+	Matrix_Multiply( G_Mat, qVec, vStarVec );	
+	Matrix_MultiplyAdd( K_Mat, uVec, vStarVec, fTempVec );
+	Vector_ScaleAdd( fTempVec, -1.0, fVec );
 	
-	momentumEquationResidual = Vector_L2_Norm( fTempVec ) / Vector_L2_Norm( fVec ); 
+	momentumEquationResidual = Vector_L2Norm( fTempVec ) / Vector_L2Norm( fVec ); 
 	Journal_PrintfL( self->info, 1, "Summary: || F - Ku - Gp || / || F ||       = %.8e\n", momentumEquationResidual );
 	Journal_Firewall( isGoodNumber( momentumEquationResidual ), errorStream, 
 			"Bad residual for the momentum equation (|| F - Ku - Gp || / || F || = %g):\n"
 			"\tCheck to see if forcing term is zero or nan - \n\t|| F - Ku - Gp || = %g \n\t|| F || = %g.\n", 
 			momentumEquationResidual,
-			Vector_L2_Norm( fTempVec ),
-			Vector_L2_Norm( fVec ) );
+			Vector_L2Norm( fTempVec ),
+			Vector_L2Norm( fVec ) );
 		
 	/* "Preconditioned"	residual for the momentum equation 
-	// 		r_{w} = || Q_{K}(r) || / || Q_{K}(F)
-	//		fTempVec contains the residual but is overwritten once used
-	//		vStarVec is used to hold the diagonal preconditioner Q_{K} 
+	 		r_{w} = || Q_{K}(r) || / || Q_{K}(F)
+			fTempVec contains the residual but is overwritten once used
+			vStarVec is used to hold the diagonal preconditioner Q_{K} 
 	*/
 			
 	Matrix_GetDiagonal( K_Mat, vStarVec );
 	Vector_Reciprocal( vStarVec );	
 
 	Vector_PointwiseMultiply( vStarVec, fTempVec, fTempVec );	
-	weightedResidual = Vector_L2_Norm( fTempVec );
+	weightedResidual = Vector_L2Norm( fTempVec );
 	
 	Vector_PointwiseMultiply( vStarVec, fVec, fTempVec );	
-	weightedVelocityScale = Vector_L2_Norm( fTempVec );
+	weightedVelocityScale = Vector_L2Norm( fTempVec );
 		
 	Journal_PrintfL( self->info, 1, "Summary: || F - Ku - Gp ||_w / || F ||_w   = %.8e\n", 
 		weightedResidual / weightedVelocityScale );
 		
 		
 	/* Report back on the solution - velocity and pressure 
-	// Note - correction for dof in Vrms ??
+	 Note - correction for dof in Vrms ??
 	*/
 	
 	Journal_PrintfL( self->info, 1, "Summary: Max velocity component = %.8e; Velocity magnitude = %.8e\n",
-		Vector_Linf_Norm( uVec ),
-		Vector_L2_Norm( uVec ) / sqrt((double) Vector_GlobalSize( uVec ))  );
+		Vector_LInfNorm( uVec ),
+		Vector_L2Norm( uVec ) / sqrt( (double)Vector_GetGlobalSize( uVec ) )  );
 		
 	
 	Journal_PrintfL( self->info, 1, "Summary: Max pressure value     = %.8e; Pressure magnitude = %.8e\n",
-		Vector_Linf_Norm( qVec ),
-		Vector_L2_Norm( qVec ) / sqrt((double) Vector_GlobalSize( qVec ))  );
+		Vector_LInfNorm( qVec ),
+		Vector_L2Norm( qVec ) / sqrt( (double)Vector_GetGlobalSize( qVec ) ) );
 		
 	}	
 

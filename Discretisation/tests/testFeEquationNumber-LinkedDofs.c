@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testFeEquationNumber-LinkedDofs.c 732 2007-02-07 00:38:34Z PatrickSunter $
+** $Id: testFeEquationNumber-LinkedDofs.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -63,7 +63,8 @@ struct _Particle {
 void _SetDt( void* context, double dt ) {
 }
 
-void Test_FeEquationNumberRun_Regular( Dictionary* dictionary, void* context, const char* nLayoutType, IJK elSizes, Partition_Index rank, Partition_Index procToWatch );
+void Test_FeEquationNumberRun_Regular( Dictionary* dictionary, void* context, IJK elSizes, 
+				       unsigned rank, unsigned nProcs, unsigned procToWatch );
 
 int main( int argc, char* argv[] ) {
 	MPI_Comm			CommWorld;
@@ -156,7 +157,7 @@ int main( int argc, char* argv[] ) {
 	MPI_Barrier( CommWorld );
 
 	elSizes[I_AXIS] = 3; elSizes[J_AXIS] = 3; elSizes[K_AXIS] = 3;
-	Test_FeEquationNumberRun_Regular( dictionary, context, "corner", elSizes, rank, procToWatch );
+	Test_FeEquationNumberRun_Regular( dictionary, context, elSizes, rank, numProcessors, procToWatch );
 
 	Stg_Class_Delete( context );
 	Stg_Class_Delete( dictionary );
@@ -172,104 +173,88 @@ int main( int argc, char* argv[] ) {
 }
 
 
-void Test_FeEquationNumberRun_Regular( Dictionary* dictionary, void* context, const char* nLayoutType, IJK elSizes,
-	Partition_Index rank, Partition_Index procToWatch )
+FeEquationNumber* buildEqNum( unsigned nProcs, unsigned* sizes, Dictionary* dict, Context* context, 
+			      VariableCondition** bcs )
 {
-	Topology*			nTopology;
-	ElementLayout*			eLayout;
-	NodeLayout*			nLayout;
-	MeshDecomp*			decomp;
-	MeshLayout*			meshLayout;
-	ElementType_Register*		elementType_Register;
-	ExtensionManager_Register*		extensionMgr_Register;
-	FiniteElement_Mesh*		feMesh;
+	CartesianGenerator*		gen;
+	FeMesh*				feMesh;
+	DofLayout*			dofs;
+	FeEquationNumber*		eqNum;
+	Variable_Register*		varReg;
+	unsigned			maxDecomp[3] = {0, 1, 1};
+	double				minCrd[3];
+	double				maxCrd[3];
+	char*				varNames[] = {"x", "y", "z"};
+	LinkedDofInfo*			linkedDofInfo;
+
+	minCrd[0] = minCrd[1] = minCrd[2] = 0.0;
+	maxCrd[0] = maxCrd[1] = maxCrd[2] = 1.0;
+
+	gen = CartesianGenerator_New( "" );
+	CartesianGenerator_SetDimSize( gen, 3 );
+	CartesianGenerator_SetTopologyParams( gen, sizes, 0, NULL, maxDecomp );
+	CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
+	CartesianGenerator_SetShadowDepth( gen, 1 );
+
+	feMesh = FeMesh_New( "" );
+	Mesh_SetGenerator( feMesh, gen );
+	FeMesh_SetElementFamily( feMesh, "linear" );
+	Build( feMesh, NULL, False );
+
+	varReg = Variable_Register_New();
+
+	Variable_NewVector( "coords", Variable_DataType_Double, 3, 
+			    &feMesh->topo->domains[0]->nDomains, (void**)&feMesh->verts, 
+			    varReg, 
+			    varNames[0], 
+			    varNames[1], 
+			    varNames[2] );
+
+	dofs = DofLayout_New( "", varReg, 0, feMesh );
+	dofs->nBaseVariables = 3;
+	dofs->baseVariables = Memory_Alloc_Array_Unnamed( Variable*, 3 );
+	dofs->baseVariables[0] = Variable_Register_GetByName( varReg, varNames[0] );
+	dofs->baseVariables[1] = Variable_Register_GetByName( varReg, varNames[1] );
+	dofs->baseVariables[2] = Variable_Register_GetByName( varReg, varNames[2] );
+	Build( dofs, NULL, False );
+	Initialise( dofs, NULL, False );
+
+	*bcs = (VariableCondition*)WallVC_New( "WallVC", "wallBC", varReg, NULL, dict, feMesh );
+	Build( *bcs, NULL, False );
+	Initialise( *bcs, NULL, False );
+
+	linkedDofInfo = LinkedDofInfo_New( "linkedDofInfo", feMesh, dofs, dict );
+	Build( linkedDofInfo, context, False );
+
+	eqNum = FeEquationNumber_New( "feEquationNumber", feMesh, dofs, *bcs, linkedDofInfo );
+	Build( eqNum, NULL, False );
+	Initialise( eqNum, NULL, False );
+
+	return eqNum;
+}
+
+
+void Test_FeEquationNumberRun_Regular( Dictionary* dictionary, void* context, IJK elSizes, 
+				       unsigned rank, unsigned nProcs, unsigned procToWatch )
+{
 	VariableCondition*		vc;
 	FeEquationNumber*		feEquationNumber;
-	char*				varNames[] = {"x", "y", "z"};
-	Index				i, j;
-	Node_GlobalIndex		nodeCount;
-	Index				numVars = 3;
-	Variable_Register*		variableRegister;
-	DofLayout*			dofs;
 	Stream*				stream;
-	LinkedDofInfo*			linkedDofInfo = NULL;
-	int                             dim = Dictionary_GetUnsignedInt_WithDefault( dictionary, "dim", 3 );
-	#if 0
-	IndexSet*			bottomSet;
-	IndexSet*			leftSet;
-	IndexSet*			rightSet;
-	#endif
 
 	if( rank == procToWatch ) printf("Creating Geometry, Decomps and Layouts:\n");
 	Dictionary_Set( dictionary, "meshSizeI", Dictionary_Entry_Value_FromUnsignedInt( elSizes[0]+1 ) );
 	Dictionary_Set( dictionary, "meshSizeJ", Dictionary_Entry_Value_FromUnsignedInt( elSizes[1]+1 ) );
 	Dictionary_Set( dictionary, "meshSizeK", Dictionary_Entry_Value_FromUnsignedInt( elSizes[2]+1 ) );
-	/* create the layout, dof and mesh to use */
-	eLayout = (ElementLayout*)ParallelPipedHexaEL_New( "PPHexaEL", dim, dictionary );
-	if ("corner" == nLayoutType) {
-		nTopology = (Topology*)IJK6Topology_New( "IJK6Topology", dictionary );
-		nLayout = (NodeLayout*)CornerNL_New( "CornerNL", dictionary, eLayout, nTopology );
-	}
-	decomp = (MeshDecomp*)HexaMD_New( "HexaMD", dictionary, MPI_COMM_WORLD, eLayout, nLayout );
-	meshLayout = MeshLayout_New( "MeshLayout", eLayout, nLayout, decomp );
 
 	stream = Journal_Register (Info_Type, "myStream");
 
-	extensionMgr_Register = ExtensionManager_Register_New();
-	elementType_Register = ElementType_Register_New("elementTypeRegister");
-	ElementType_Register_Add( elementType_Register, (ElementType*)ConstantElementType_New("constant") );
-	ElementType_Register_Add( elementType_Register, (ElementType*)BilinearElementType_New("bilinear") );
-	ElementType_Register_Add( elementType_Register, (ElementType*)TrilinearElementType_New("trilinear") );
-	ElementType_Register_Add( elementType_Register, (ElementType*)LinearTriangleElementType_New("linear") );
 	if( rank == procToWatch ) printf("Creating F.E. Mesh:\n");
-	feMesh = FiniteElement_Mesh_New( "testMesh", meshLayout, sizeof(Node), sizeof(Element), extensionMgr_Register,
-		elementType_Register, dictionary );
-	
-	/* Create variable register */
-	variableRegister = Variable_Register_New();
-	
-	/* Create variables */
 	if( rank == procToWatch ) printf("Creating Vars:\n");
-	Variable_NewVector( 
-		"coords", 
-		Variable_DataType_Double, 
-		3, 
-		&feMesh->nodeLocalCount, 
-		(void**)&feMesh->nodeCoord, 
-		variableRegister, 
-		varNames[0], 
-		varNames[1], 
-		varNames[2] );
-
-
-	nodeCount = feMesh->layout->decomp->nodeLocalCount;
-	dofs = DofLayout_New( "dofLayout", variableRegister, nodeCount );
-
-	for (i = 0; i < nodeCount; i++)
-	{
-		for (j = 0; j < numVars; j++) {
-			DofLayout_AddDof_ByVarName(dofs, varNames[j], i);
-		}
-	}
-	Build(dofs, 0, False);
-	
 	if( rank == procToWatch ) printf("Creating VC:\n");
-	if ( IrregEL_Type == meshLayout->elementLayout->type) {
-		vc = (VariableCondition*) SetVC_New( "SetVC", "setBC", variableRegister, NULL, dictionary );
-	}
-	else {
-		vc = (VariableCondition*) WallVC_New( "WallVC", "wallBC", variableRegister, NULL, dictionary, feMesh );
-	}
-	
 	if( rank == procToWatch ) printf("Building:\n");
-	/* Build and initialise system */
 	if( rank == procToWatch ) printf("Building mesh:\n");
-	Build( feMesh, context, False );
 	if( rank == procToWatch ) printf("Building Variable Conditions:\n");
-	Build( vc, context, False );
-	
-	linkedDofInfo = LinkedDofInfo_New( "linkedDofInfo", feMesh, dofs, dictionary );
-	Build( linkedDofInfo, context, False );
+
 	/* Demonstration of setting up linked dof info through code */
 	#if 0
 	LinkedDofInfo_AddDofSet( linkedDofInfo );
@@ -284,44 +269,21 @@ void Test_FeEquationNumberRun_Regular( Dictionary* dictionary, void* context, co
 	#endif
 
 	if( rank == procToWatch ) printf("Creating EQ num:\n");
-	/* Create the finite element equation number utility */
-	feEquationNumber = FeEquationNumber_New( "feEquationNumber", feMesh, dofs, vc, linkedDofInfo );
-
-	
 	if( rank == procToWatch ) printf("Building FE Eq num:\n");
-	FeEquationNumber_Build( feEquationNumber );
-	
 	if( rank == procToWatch ) printf("Initialising:\n");
-	Initialise( feMesh, 0, False );
-	FeEquationNumber_Initialise( feEquationNumber );
-	
 	if( rank == procToWatch ) printf("Building LM:\n");
-	FeEquationNumber_BuildLocationMatrix( feEquationNumber );
+
+	feEquationNumber = buildEqNum( nProcs, elSizes, dictionary, context, &vc );
 	
 	if( rank == procToWatch ) {
-	
 		Journal_Printf( stream, "V.C. applied: " );
 		VariableCondition_PrintConcise( vc, stream );
 		FeEquationNumber_PrintDestinationArray( feEquationNumber, stream );
 		FeEquationNumber_PrintLocationMatrix( feEquationNumber, stream );
-		Print( linkedDofInfo, stream );
+		Print( feEquationNumber->linkedDofInfo, stream );
 	}
-	
 	
 	/* Destroy stuff */
 	if( rank == procToWatch ) printf("Cleaning Up:\n");
 	Stg_Class_Delete( feEquationNumber );
-	Stg_Class_Delete( vc );
-	Stg_Class_Delete( feMesh );
-	Stg_Class_Delete( extensionMgr_Register );
-	Stg_Class_Delete( elementType_Register );
-	Stg_Class_Delete( variableRegister );
-	Stg_Class_Delete( dofs );
-
-
-	Stg_Class_Delete( meshLayout );
-	Stg_Class_Delete( decomp );
-	Stg_Class_Delete( nLayout );
-	Stg_Class_Delete( eLayout );
-	Stg_Class_Delete( nTopology );
 }

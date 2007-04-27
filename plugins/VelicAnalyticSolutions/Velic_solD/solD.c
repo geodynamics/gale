@@ -37,7 +37,7 @@
 *+		David May
 *+		David Stegman
 *+		Patrick Sunter
-** $Id: solD.c 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: solD.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -1172,7 +1172,7 @@ void Velic_solD_StressFunction( void* analyticSolution, FeVariable* analyticFeVa
 }
 
 void Velic_solD_StrainRateFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* strainRate ) {
-//	Velic_solD* self = (Velic_solD*) analyticSolution;
+  /*	Velic_solD* self = (Velic_solD*) analyticSolution; */
 	
 	
 	
@@ -1199,7 +1199,7 @@ void _Velic_solD_Construct( void* analyticSolution, Stg_ComponentFactory* cf, vo
 	FeVariable*              velocityField;
 	FeVariable*              pressureField;
 	FeVariable*              stressField;
-	//FeVariable*              strainRateField;
+	/*FeVariable*              strainRateField; */
 
 	/* Construct Parent */
 	_AnalyticSolution_Construct( self, cf, data );

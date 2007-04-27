@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Init.c 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: Init.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -47,7 +47,6 @@
 #include "StgFEM/SLE/ProvidedSystems/ProvidedSystems.h"
 
 #include "types.h"
-#include "StiffRemesher.h"
 #include "Init.h"
 
 #include <stdio.h>
@@ -69,10 +68,6 @@ Bool StgFEM_SLE_Init( int* argc, char** argv[] ) {
 	StgFEM_SLE_LinearAlgebra_Init( argc, argv );
 	StgFEM_SLE_SystemSetup_Init( argc, argv );
 	StgFEM_SLE_ProvidedSystems_Init( argc, argv );
-
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), StiffRemesher_Type, "0", _StiffRemesher_DefaultNew );
-
-	RegisterParent( StiffRemesher_Type, Remesher_Type );
 
 	return True;
 }

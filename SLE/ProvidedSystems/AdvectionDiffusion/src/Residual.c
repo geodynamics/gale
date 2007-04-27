@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Residual.c 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: Residual.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -283,7 +283,7 @@ void _AdvDiffResidualForceTerm_AssembleElement( void* forceTerm, ForceVector* fo
 	double                     totalDerivative, diffusionTerm;
 	double                     diffusivity         = self->defaultDiffusivity;
 	Variable*                  diffusivityVariable = self->diffusivityVariable;
-	ElementType*               elementType         = FeMesh_ElementTypeAt( phiField->feMesh, lElement_I );
+	ElementType*               elementType         = FeMesh_GetElementType( phiField->feMesh, lElement_I );
 	Node_Index                 elementNodeCount    = elementType->nodeCount;
 	Node_Index                 node_I;
 	double                     factor;

@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: main.c 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: main.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -80,7 +80,7 @@ int main( int argc, char* argv[] )
 	MPI_Comm_dup( MPI_COMM_WORLD, &CommWorld );
 	MPI_Comm_size( CommWorld, &numProcessors );
 	MPI_Comm_rank( CommWorld, &rank );
-	
+
 	StGermain_Init( &argc, &argv );
 	StgFEM_Init( &argc, &argv );
 	#ifdef HAVE_PYTHON
@@ -126,14 +126,14 @@ int main( int argc, char* argv[] )
 	Stg_Class_Delete( context );
 	Stg_Class_Delete( dictionary );
 
-	//if( rank == procToWatch ) Memory_Print();
+/* 	if( rank == procToWatch ) Memory_Print(); */
 	#ifdef HAVE_PYTHON
 		Py_Finalize();
 	#endif
 
 	StgFEM_Finalise();
 	StGermain_Finalise();
-		
+
 	/* Close off MPI */
 	MPI_Finalize();
 	

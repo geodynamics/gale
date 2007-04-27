@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: GradientStiffnessMatrixTerm.c 733 2007-02-07 00:55:26Z PatrickSunter $
+** $Id: GradientStiffnessMatrixTerm.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -221,10 +221,10 @@ void _GradientStiffnessMatrixTerm_AssembleElement(
 	ElementType*                        elementType_col;
 	
 	/* Set the element type */
-	elementType_row = FeMesh_ElementTypeAt( variable_row->feMesh, lElement_I );
+	elementType_row = FeMesh_GetElementType( variable_row->feMesh, lElement_I );
 	nodesPerEl_row = elementType_row->nodeCount;
 	
-	elementType_col = FeMesh_ElementTypeAt( variable_col->feMesh, lElement_I );
+	elementType_col = FeMesh_GetElementType( variable_col->feMesh, lElement_I );
 	nodesPerEl_col = elementType_col->nodeCount;
 		
 	dofPerNode_row = dim;	/* velocity */

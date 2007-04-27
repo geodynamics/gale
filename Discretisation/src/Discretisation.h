@@ -46,7 +46,7 @@
 ** Comments:
 **	None so far.
 **
-** $Id: Discretisation.h 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: Discretisation.h 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -55,20 +55,27 @@
 	
 	#include "units.h"
 	#include "types.h"
-	#include "shortcuts.h"
-		
+
 	#include "ElementType.h"
 	#include "ElementType_Register.h"
 	#include "ConstantElementType.h"
 	#include "BilinearElementType.h"
 	#include "TrilinearElementType.h"
+	#include "RegularTrilinear.h"
+	#include "RegularBilinear.h"
+	#include "Biquadratic.h"
+	#include "P1.h"
 	#include "LinearTriangleElementType.h"
 
 	#include "Element.h"
-	#include "Mesh.h"
+	#include "FeMesh.h"
+	#include "C0Generator.h"
+	#include "C2Generator.h"
+	#include "P1Generator.h"
 	#include "LinkedDofInfo.h"
 	#include "FeEquationNumber.h"
 	#include "FeVariable.h"
+	#include "ShapeFeVariable.h"
 	#include "OperatorFeVariable.h"
 	#include "FeSwarmVariable.h"
 	#include "AnalyticSolution.h"

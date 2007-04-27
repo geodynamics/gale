@@ -7,23 +7,21 @@
 	<!-- PressureField Stuff -->
 	<struct name="components" mergeType="merge">
 		<struct name="pressure">
-			<param name="Type">Variable</param>
+			<param name="Type">MeshVariable</param>
+			<param name="mesh">pressureMesh</param>
 			<param name="Rank">Scalar</param>
-			<param name="Dependency">decomp-constant</param>
 			<param name="DataType">Double</param>
-			<param name="Count">decomp-constant-nodeDomainCount</param>
 		</struct>
 		<struct name="pressureDofLayout">
 			<param name="Type">DofLayout</param>
-			<param name="Count">decomp-constant-nodeDomainCount</param>
+			<param name="mesh">pressureMesh</param>
 			<list name="BaseVariables">
 				<param>pressure</param>
 			</list>
 		</struct>		
 		<struct name="PressureField">
 			<param name="Type">FeVariable</param>
-			<param name="FEMesh">mesh-constant</param>
-			<param name="GeometryMesh">mesh-linear</param>
+			<param name="FEMesh">pressureMesh</param>
 			<param name="DofLayout">pressureDofLayout</param>
 			<param name="LinkedDofInfo">pressureLinkedDofs</param>
 		</struct>

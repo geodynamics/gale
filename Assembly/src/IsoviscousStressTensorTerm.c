@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: IsoviscousStressTensorTerm.c 733 2007-02-07 00:55:26Z PatrickSunter $
+** $Id: IsoviscousStressTensorTerm.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -228,7 +228,7 @@ void _IsoviscousStressTensorTerm_AssembleElement(
 	Index                               colIndex;
 	
 	/* Set the element type */
-	elementType = FeMesh_ElementTypeAt( variable1->feMesh, lElement_I );
+	elementType = FeMesh_GetElementType( variable1->feMesh, lElement_I );
 	nodesPerEl = elementType->nodeCount;
 
 	/* assumes constant number of dofs per element */
@@ -270,7 +270,7 @@ void _IsoviscousStressTensorTerm_AssembleElement(
 		
 		/* then build one set of the off diagonal blocks of K, and copy to the other off diags using symmetry */
 		for( rowNode_I=0; rowNode_I < nodesPerEl; rowNode_I++ ) {
-			for( rowDof_I=0; rowDof_I < dofsPerNode-1; rowDof_I++ ) {	// dont need to do anything in last row
+                  for( rowDof_I=0; rowDof_I < dofsPerNode-1; rowDof_I++ ) {	/* dont need to do anything in last row */
 				for( colNode_I=0; colNode_I < nodesPerEl; colNode_I++ ) {
 					for( colDof_I=rowDof_I+1; colDof_I < dofsPerNode; colDof_I++ ) {
 						rowIndex = rowNode_I*dofsPerNode + rowDof_I;

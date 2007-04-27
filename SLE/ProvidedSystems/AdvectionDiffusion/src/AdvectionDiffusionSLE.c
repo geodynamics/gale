@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AdvectionDiffusionSLE.c 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: AdvectionDiffusionSLE.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -155,9 +155,6 @@ void _AdvectionDiffusionSLE_Init(
 		FieldVariable_Register*                            fieldVariable_Register )		
 {
 	AdvectionDiffusionSLE* self          = (AdvectionDiffusionSLE*)sle;
-	Variable*              variable;
-	unsigned int           *nodeDomainCountPtr;
-	Node_DomainIndex       node_I;
 
 	self->isConstructed = True;
 
@@ -187,34 +184,8 @@ void _AdvectionDiffusionSLE_Init(
 		SystemLinearEquations_AddStiffnessMatrix( self, massMatrix );
 	}
 
-	/* Create New FeVariable for Phi Dot */
-	if (phiField) {
-		nodeDomainCountPtr = &phiField->feMesh->layout->decomp->nodeDomainCount;
-		Variable_NewScalar( 
-			"phiDot", 
-			Variable_DataType_Double, 
-			nodeDomainCountPtr, 
-			(void**)&self->phiDotArray, 
-			variable_Register );
-
-		variable = Variable_Register_GetByName( variable_Register, "phiDot" );
-		self->phiDotDofLayout = DofLayout_New( "dofLayout1", variable_Register, *nodeDomainCountPtr );
-		for( node_I = 0; node_I < *nodeDomainCountPtr ; node_I++ ) 
-			DofLayout_AddDof_ByVarName( self->phiDotDofLayout, variable->name, node_I );
-
-		self->phiDotField = FeVariable_New_FromTemplate(
-			"phiDotField",
-			self->phiField,
-			self->phiDotDofLayout,
-			NULL,
-			self->phiField->importFormatType,
-			self->phiField->exportFormatType,
-			fieldVariable_Register );
-
-		/* Construct Solution Vectors */
-		self->phiVector    = SolutionVector_New( "PhiVector", phiField->communicator, phiField );
-		self->phiDotVector = SolutionVector_New( "PhiDotVector", phiField->communicator, self->phiDotField );
-	}
+	self->variableReg = variable_Register;
+	self->fieldVariableReg = fieldVariable_Register;
 
 	if ( self->context ) 
 		EP_AppendClassHook( self->context->calcDtEP, AdvectionDiffusionSLE_CalculateDt, self );
@@ -401,8 +372,48 @@ void _AdvectionDiffusionSLE_Build( void* sle, void* data ) {
 	Index                   forceTerm_I;
 	Index                   forceTermCount = Stg_ObjectList_Count( self->residual->forceTermList );
 	ForceTerm*              forceTerm;
+	unsigned int           *nodeDomainCountPtr;
+	Variable*              variable;
+	Node_DomainIndex       node_I;
 
 	Journal_DPrintf( self->debug, "In %s()\n", __func__ );
+
+	/* Create New FeVariable for Phi Dot */
+	if (self->phiField) {
+		Variable_Register*	variable_Register;
+		FieldVariable_Register*	fieldVariable_Register;
+
+		variable_Register = self->variableReg;
+		fieldVariable_Register = self->fieldVariableReg;
+
+		Build( self->phiField->feMesh, NULL, False );
+
+		nodeDomainCountPtr = &self->phiField->feMesh->topo->domains[MT_VERTEX]->nDomains;
+		Variable_NewScalar( 
+			"phiDot", 
+			Variable_DataType_Double, 
+			nodeDomainCountPtr, 
+			(void**)&self->phiDotArray, 
+			variable_Register );
+
+		variable = Variable_Register_GetByName( variable_Register, "phiDot" );
+		self->phiDotDofLayout = DofLayout_New( "dofLayout1", variable_Register, *nodeDomainCountPtr, NULL );
+		for( node_I = 0; node_I < *nodeDomainCountPtr ; node_I++ ) 
+			DofLayout_AddDof_ByVarName( self->phiDotDofLayout, variable->name, node_I );
+
+		self->phiDotField = FeVariable_New_FromTemplate(
+			"phiDotField",
+			self->phiField,
+			self->phiDotDofLayout,
+			NULL,
+			self->phiField->importFormatType,
+			self->phiField->exportFormatType,
+			fieldVariable_Register );
+
+		/* Construct Solution Vectors */
+		self->phiVector    = SolutionVector_New( "PhiVector", self->phiField->communicator, self->phiField );
+		self->phiDotVector = SolutionVector_New( "PhiDotVector", self->phiField->communicator, self->phiDotField );
+	}
 
 	_SystemLinearEquations_Build( self, data );
 
@@ -432,7 +443,7 @@ void _AdvectionDiffusionSLE_Build( void* sle, void* data ) {
 
 	if ( self->phiDotField ) {
 		self->phiDotArray = Memory_Alloc_Array( 
-				double, self->phiDotField->feMesh->layout->decomp->nodeDomainCount, "phiDotArray" );
+			double, Mesh_GetDomainSize( self->phiDotField->feMesh, MT_VERTEX ), "phiDotArray" );
 	}
 
 	/* Force Vectors */
@@ -458,8 +469,8 @@ void _AdvectionDiffusionSLE_Initialise( void* sle, void* data ) {
 	
 	Stg_Component_Initialise( self->phiDotField, data, False );
 
-	//Stream* stream = Journal_Register( Info_Type, self->type );
-	//FeVariable_PrintLocalDiscreteValues( self->phiDotField, stream );
+/* 	Stream* stream = Journal_Register( Info_Type, self->type ); */
+/* 	FeVariable_PrintLocalDiscreteValues( self->phiDotField, stream ); */
 	
 	if ( False == context->loadFromCheckPoint ) {
 		DofLayout_SetAllToZero( self->phiDotField->dofLayout );

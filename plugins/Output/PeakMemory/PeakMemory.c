@@ -62,8 +62,19 @@ void StgFEM_PeakMemory_PrintMemoryInfo( AbstractContext* context ) {
 	MPI_Allreduce( &stgMem, &ave, 1, MPI_INT, MPI_SUM, context->communicator );
 	ave /= context->nproc * 1000 * 1000;
 	StgFEM_FrequentOutput_PrintValue( context, ave );
-	
-	laMem = LinearAlgebra_GetMemoryUsage();
+
+#ifdef HAVE_PETSC
+	{
+		PetscScalar	petscMem;
+		PetscErrorCode	ec;
+
+		ec = PetscMallocGetCurrentUsage( &petscMem );
+		CheckPETScError( ec );
+		laMem += (size_t)petscMem;
+	}
+#else
+	laMem = 0;
+#endif
 	MPI_Allreduce( &laMem, &ave, 1, MPI_INT, MPI_SUM, context->communicator );
 	ave /= context->nproc * 1000 * 1000;
 	StgFEM_FrequentOutput_PrintValue( context, ave );

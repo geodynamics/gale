@@ -43,34 +43,65 @@
 **
 ** Comments:
 **
-** $Id: types.h 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: types.h 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #ifndef __StgFEM_SLE_LinearAlgrebra_types_h__
 #define __StgFEM_SLE_LinearAlgrebra_types_h__
 	
-	/* Types user needs to define */
-	typedef struct _Matrix          Matrix;
-	typedef struct _Vector          Vector;
-	typedef struct _MatrixSolver    MatrixSolver;
+	/* Classes. */
+	typedef struct Vector			Vector;
+	typedef struct Matrix			Matrix;
+	typedef struct MatrixSolver		MatrixSolver;
+	typedef struct MultigridSolver		MultigridSolver;
+	typedef struct MGOpGenerator		MGOpGenerator;
+	typedef struct SROpGenerator		SROpGenerator;
+#ifdef HAVE_PETSC
+	typedef struct PETScVector		PETScVector;
+	typedef struct PETScMatrix		PETScMatrix;
+	typedef struct PETScMatrixSolver	PETScMatrixSolver;
+	typedef struct PETScMGSolver		PETScMGSolver;
+#endif
 
+	typedef enum {
+		MatrixSolver_Status_ConvergedRelative = 2, 
+		MatrixSolver_Status_ConvergedAbsolute = 3, 
+		MatrixSolver_Status_ConvergedIterations = 4, 
+		MatrixSolver_Status_DivergedNull = -2, 
+		MatrixSolver_Status_DivergedIterations = -3, 
+		MatrixSolver_Status_DivergedTolerance = -4, 
+		MatrixSolver_Status_Iterating = 0
+	} MatrixSolver_Status;
 
 	/* KSP enumerations. */
 	typedef enum {
-		richardson, 
-		gmRes, 
-		preOnly
-	} MatrixSolver_KSP;
+		PETScMatrixSolver_KSPType_Richardson, 
+		PETScMatrixSolver_KSPType_GMRes, 
+		PETScMatrixSolver_KSPType_CG, 
+		PETScMatrixSolver_KSPType_PreOnly
+	} PETScMatrixSolver_KSPType;
 
 	/* PC enumerations. */
 	typedef enum {
-		jacobi, 
-		blockJacobi, 
-		sor, 
-		lu, 
-		ilu
-	} MatrixSolver_PC;
+		PETScMatrixSolver_PCType_Jacobi, 
+		PETScMatrixSolver_PCType_BlockJacobi, 
+		PETScMatrixSolver_PCType_SOR, 
+		PETScMatrixSolver_PCType_ParallelSOR, 
+		PETScMatrixSolver_PCType_LU, 
+		PETScMatrixSolver_PCType_RedundantLU, 
+		PETScMatrixSolver_PCType_ILU, 
+		PETScMatrixSolver_PCType_Multigrid, 
+		PETScMatrixSolver_PCType_None
+	} PETScMatrixSolver_PCType;
+
+	/* Norm enumerations. */
+	typedef enum {
+		PETScMatrixSolver_NormType_None = 0, 
+		PETScMatrixSolver_NormType_Preconditioned = 1, 
+		PETScMatrixSolver_NormType_Unpreconditioned = 2, 
+		PETScMatrixSolver_NormType_Natural = 3
+	} PETScMatrixSolver_NormType;
 
 
 #endif /* __StgFEM_SLE_LinearAlgrebra_types_h__ */

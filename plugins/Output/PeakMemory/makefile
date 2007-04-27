@@ -35,7 +35,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 656 2006-10-18 06:45:50Z SteveQuenette $
+## $Id: makefile 822 2007-04-27 06:20:35Z LukeHodkinson $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -53,7 +53,12 @@ includes = ${PROJECT}/${modName}
 SRCS = $(wildcard *.c)
 HDRS = $(wildcard *.h)
 
-packages = STGERMAIN PETSC MPI XML
+packages = STGERMAIN MPI XML
 EXTERNAL_LIBS = -lStgFEM
+
+ifeq (true,$(shell if test -r $(PETSC_INCDIR)/petsc.h; then echo true; fi ))
+	USER_CFLAGS += -DHAVE_PETSC
+	EXTERNAL_INCLUDES += -I${PETSC_INCDIR} -I${PETSC_BMAKEDIR}
+endif
 
 include ${PROJ_ROOT}/Makefile.vmake

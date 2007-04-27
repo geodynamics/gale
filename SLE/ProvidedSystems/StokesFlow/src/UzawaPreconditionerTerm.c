@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: UzawaPreconditionerTerm.c 733 2007-02-07 00:55:26Z PatrickSunter $
+** $Id: UzawaPreconditionerTerm.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -199,13 +199,13 @@ void _UzawaPreconditionerTerm_AssembleElement(
 	Stokes_SLE*            sle              = Stg_DCheckType( _sle, Stokes_SLE );
 	StiffnessMatrix*       gMatrix          = sle->gStiffMat;
 	FeVariable*            gFeVariable_col  = gMatrix->columnVariable;
-	ElementType*           gElementType_col = FeMesh_ElementTypeAt( gFeVariable_col->feMesh, lElement_I );
+	ElementType*           gElementType_col = FeMesh_GetElementType( gFeVariable_col->feMesh, lElement_I );
 	Node_ElementLocalIndex gColCount        = gElementType_col->nodeCount;
 	double**               gElementMatrix;
 
 	StiffnessMatrix*       kMatrix          = sle->kStiffMat;
 	FeVariable*            kFeVariable_row  = kMatrix->rowVariable;
-	ElementType*           kElementType_row = FeMesh_ElementTypeAt( kFeVariable_row->feMesh, lElement_I );
+	ElementType*           kElementType_row = FeMesh_GetElementType( kFeVariable_row->feMesh, lElement_I );
 	Node_ElementLocalIndex kRowCount        = kElementType_row->nodeCount;
 
 	Index                  velocityDofCount;

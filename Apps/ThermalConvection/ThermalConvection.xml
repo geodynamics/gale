@@ -11,15 +11,14 @@
 	</list>
 
 	<!-- Include Components that define the basic model -->
-	<include>StgFEM/ElementLayout.xml          </include>
-	<include>StgFEM/ConstantMesh.xml           </include>
-	<include>StgFEM/LinearMesh.xml             </include>
-	<include>StgFEM/VelocityField.xml          </include>
-	<include>StgFEM/TemperatureField.xml       </include>
-	<include>StgFEM/PressureField.xml          </include>
-	<include>StgFEM/GaussSwarm.xml             </include>
-	<include>StgFEM/StokesFlowUzawa.xml        </include>
-	<include>StgFEM/TempAdvDiff.xml            </include>
+	<include>StgFEM/ConstantMesh.xml</include>
+	<include>StgFEM/LinearMesh.xml</include>
+	<include>StgFEM/VelocityField.xml</include>
+	<include>StgFEM/TemperatureField.xml</include>
+	<include>StgFEM/PressureField.xml</include>
+	<include>StgFEM/GaussSwarm.xml</include>
+	<include>StgFEM/StokesFlowUzawa.xml</include>
+	<include>StgFEM/TempAdvDiff.xml</include>
 
 	<!-- Specialised components for this particular model -->
 	<struct name="components" mergeType="merge">
@@ -33,11 +32,11 @@
 	</struct>
 
 	<!-- Simulation control -->
-	<param name="maxTimeSteps"> 1 </param>
+	<param name="maxTimeSteps"> 10 </param>
 	<param name="outputPath"> ./output </param>
-	<param name="dumpEvery"> 1 </param>	
-	<param name="checkpointEvery"> 1 </param>	
-	
+	<param name="dumpEvery"> 100 </param>	
+	<param name="checkpointEvery"> 100 </param>	
+
 	<!-- Control Journal output -->
 	<param name="journal.info.Context-verbose">True</param>
 	<param name="journal-level.info.Stg_ComponentFactory"> 2 </param>
@@ -50,8 +49,12 @@
 	
 	<!-- Geometry & Mesh setup -->
 	<param name="dim"> 2 </param>
-	<param name="elementResI"> 32 </param>
-	<param name="elementResJ"> 32 </param>
+	<param name="velocityMesh">linearMesh</param>
+	<param name="pressureMesh">constantMesh</param>
+	<param name="temperatureMesh">linearMesh</param>
+	<param name="elementMesh">linearMesh</param>
+	<param name="elementResI"> 10 </param>
+	<param name="elementResJ"> 10 </param>
 	<param name="elementResK"> 1 </param>
 	<param name="shadowDepth"> 1 </param>
 	<param name="minX"> 0.0f </param>
@@ -60,7 +63,6 @@
 	<param name="maxX"> 1.0f </param>
 	<param name="maxY"> 1.0f </param>
 	<param name="maxZ"> 1.0f </param>
-	<param name="allowUnbalancing"> True </param>
 
 	<!-- Integration Scheme configuration -->
 	<param name="gaussParticlesX"> 2 </param>

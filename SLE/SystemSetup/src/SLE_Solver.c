@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SLE_Solver.c 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: SLE_Solver.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -68,7 +68,6 @@ SLE_Solver* _SLE_Solver_New(
 		SLE_Solver_SolverSetupFunction*            _solverSetup,
 		SLE_Solver_SolveFunction*                  _solve,
 		SLE_Solver_GetResidualFunc*                _getResidual, 
-		SLE_Solver_MG_SetupSmootherFunc*           _mgSetupSmoother,
 		Name                                       name )
 {	
 	SLE_Solver*		self;
@@ -84,7 +83,6 @@ SLE_Solver* _SLE_Solver_New(
 	self->_solverSetup = _solverSetup;
 	self->_solve = _solve;
 	self->_getResidual = _getResidual;
-	self->_mgSetupSmoother = _mgSetupSmoother;
 
 	return self;
 
@@ -122,7 +120,6 @@ void* _SLE_Solver_Copy( void* sleSolver, void* dest, Bool deep, Name nameExt, Pt
 	/* virtual functions */
 	newSleSolver->_solverSetup  = self->_solverSetup;
 	newSleSolver->_solve        = self->_solve;
-	newSleSolver->_mgSetupSmoother = self->_mgSetupSmoother;
 	newSleSolver->maxIterations = self->maxIterations;
 	
 	if( deep ) {
@@ -214,28 +211,4 @@ void SLE_Solver_Solve( void* sleSolver, void* sle ) {
 	SLE_Solver*		self = (SLE_Solver*)sleSolver;
 	
 	self->_solve( self, sle );
-}
-
-
-void SLE_Solver_MG_SetupSmoother( void* sleSolver, 
-				  MatrixSolver* smoother, Matrix* mat, 
-				  unsigned level, unsigned maxLevels )
-{
-	SLE_Solver*	self = (SLE_Solver*)sleSolver;
-	
-	assert( self->_mgSetupSmoother );
-	self->_mgSetupSmoother( self, smoother, mat, level, maxLevels );
-}
-
-
-void _SLE_Solver_MG_SetupSmoother( void* sleSolver, 
-				   MatrixSolver* smoother, Matrix* mat, 
-				   unsigned level, unsigned maxLevels )
-{
-	
-	/*
-	** As this is the abstract version, we won't change anything about the default smoother, just set it up.
-	*/
-
-	MatrixSolver_Setup( smoother, mat );
 }

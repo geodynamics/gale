@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ConstantElementType.c 654 2006-10-12 08:58:49Z SteveQuenette $
+** $Id: ConstantElementType.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -222,10 +222,10 @@ void _ConstantElementType_SF_allLocalDerivs_allNodes( void* elementType, const d
 
 void _ConstantElementType_ConvertGlobalCoordToElLocal(
 		void*		elementType,
-		ElementLayout*	elementLayout,
-		const Coord**	globalNodeCoordPtrsInElement,
-		const Coord	globalCoord,
-		Coord		elLocalCoord ) 
+		Mesh*		mesh, 
+		unsigned	element, 
+		const double*	globalCoord,
+		double*		elLocalCoord )
 {
 	/* See header file function introduction for explanation... */
 	elLocalCoord[0] = elLocalCoord[1] = elLocalCoord[2] = 0;

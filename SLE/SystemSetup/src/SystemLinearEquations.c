@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SystemLinearEquations.c 733 2007-02-07 00:55:26Z PatrickSunter $
+** $Id: SystemLinearEquations.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -232,12 +232,12 @@ void SystemLinearEquations_InitAll(
 			sle, 
 			solver,
 			context,
-			False, //TODO: A hack put in place for setting the convergence stream to 'off' if the SLE class is created from within the code, not via an xml
+			False, /* TODO: A hack put in place for setting the convergence stream to 'off' if the SLE class is created from within the code, not via an xml */
 			isNonLinear,
 			nonLinearTolerance, 
 			nonLinearMaxIterations,
 			killNonConvergent, 
-			1,//TODO : hack for setting the minimum number of iterations to 1- same hack as above
+			1,/* TODO : hack for setting the minimum number of iterations to 1- same hack as above */
 			entryPoint_Register,
 			comm );
 }
@@ -257,7 +257,7 @@ void _SystemLinearEquations_Delete( void* sle ) {
 	Stg_Class_Delete( self->forceVectors ); 
 	Stg_Class_Delete( self->solutionVectors ); 
 
-	// delete parent
+/* 	 delete parent */
 	_Stg_Component_Delete( self );
 	Stream_UnIndentBranch( StgFEM_Debug );
 }
@@ -667,19 +667,19 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 
 	/* TODO - Give option which solution vector to test */
 	currentVector   = SystemLinearEquations_GetSolutionVectorAt( self, 0 )->vector; 
-	Vector_Duplicate( currentVector, &previousVector );
-	
+	Vector_Duplicate( currentVector, (void**)&previousVector );
+	Vector_SetLocalSize( previousVector, Vector_GetLocalSize( currentVector ) );
 	
 	for ( self->nonLinearIteration_I = 1 ; self->nonLinearIteration_I < maxIterations ; self->nonLinearIteration_I++ ) {
-		Vector_CopyContents( currentVector, previousVector );
+		Vector_CopyEntries( currentVector, previousVector );
 	
 		Journal_Printf(self->info,"Non linear solver - iteration %d\n", self->nonLinearIteration_I);
 			
 		self->linearExecute( self, _context );
 
 		/* Calculate Residual */
-		Vector_AddScaledVector( previousVector, -1.0, currentVector );
-		residual = Vector_L2_Norm( previousVector ) / Vector_L2_Norm( currentVector );
+		Vector_AddScaled( previousVector, -1.0, currentVector );
+		residual = Vector_L2Norm( previousVector ) / Vector_L2Norm( currentVector );
 
 		Journal_Printf( self->info, "In func %s: Iteration %u of %u - Residual %.5g - Tolerance = %.5g\n", 
 				__func__, self->nonLinearIteration_I, maxIterations, residual, tolerance );
@@ -716,7 +716,7 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 			
 	Stream_UnIndentBranch( StgFEM_Debug );
 
-	Vector_Destroy( previousVector );
+	FreeObject( previousVector );
 }
 
 void SystemLinearEquations_SetToNonLinear( void* sle ) {

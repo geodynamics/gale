@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testFeEquationNumber-LinkedDofs2.c 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: testFeEquationNumber-LinkedDofs2.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -64,6 +64,7 @@ struct _Particle {
 void Test_FeEquationNumberRun_Regular( Dictionary* dictionary, const char* nLayoutType, IJK elSizes, Partition_Index rank, Partition_Index procToWatch );
 
 int main( int argc, char* argv[] ) {
+#if 0
 	MPI_Comm			CommWorld;
 	int				rank;
 	int				numProcessors;
@@ -156,7 +157,7 @@ int main( int argc, char* argv[] ) {
 
 	Stg_Class_Delete( dictionary );
 	Stg_Class_Delete( geomIO_Handler );
-	//if( rank == procToWatch ) Memory_Print();
+	/* if( rank == procToWatch ) Memory_Print(); */
 
 	StgFEM_Discretisation_Finalise();
 	StGermain_Finalise();
@@ -298,7 +299,7 @@ void Test_FeEquationNumberRun_Regular( Dictionary* dictionary, const char* nLayo
 		Journal_Printf( stream, "V.C. applied: " );
 		VariableCondition_PrintConcise( vc, stream );
 		FeEquationNumber_PrintDestinationArray( feEquationNumber, stream );
-		//FeEquationNumber_PrintLocationMatrix( feEquationNumber, stream );
+		/* FeEquationNumber_PrintLocationMatrix( feEquationNumber, stream ); */
 		Print( linkedDofInfo, stream );
 	}
 	
@@ -319,4 +320,5 @@ void Test_FeEquationNumberRun_Regular( Dictionary* dictionary, const char* nLayo
 	Stg_Class_Delete( nLayout );
 	Stg_Class_Delete( eLayout );
 	Stg_Class_Delete( nTopology );
+#endif
 }	

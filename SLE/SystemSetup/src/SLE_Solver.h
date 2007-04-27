@@ -46,23 +46,13 @@
 **	Note - as 1 September 2004 (rev 1994), the functioality for building Matrices etc
 **	that was in this class is back in the SLE_Solver class.
 **
-** $Id: SLE_Solver.h 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: SLE_Solver.h 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 	
 #ifndef __StgFEM_SLE_SystemSetup_SLE_Solver_h__
 #define __StgFEM_SLE_SystemSetup_SLE_Solver_h__
 	
-	/*
-	** Unfortunately, these forward declarations are required for multi-grid.
-	*/
-	
-	void MultiGrid_InitMatrixSolver( unsigned handle, MatrixSolver* matSolver );
-	void MultiGrid_UpdateMatrixSolver( unsigned handle, MatrixSolver* matSolver, SLE_Solver* sleSolver );
-	void MultiGrid_BuildGridOps( unsigned handle );
-	void MultiGrid_BuildSmoothers( unsigned handle );
-	void MultiGrid_BuildWorkVectors( unsigned handle );
-		
 
 	/** Textual name of this class */
 	extern const Type SLE_Solver_Type;
@@ -71,9 +61,6 @@
 	typedef void		(SLE_Solver_SolverSetupFunction)	( void* sleSolver, void* sle );
 	typedef void		(SLE_Solver_SolveFunction)		( void* sleSolver, void* sle );
 	typedef Vector*	(SLE_Solver_GetResidualFunc)		( void* sleSolver, Index fvIndex );
-	typedef void		(SLE_Solver_MG_SetupSmootherFunc)	( void* sleSolver, 
-												  MatrixSolver* smoother, Matrix* mat, 
-												  unsigned level, unsigned maxLevels );
 
 	/** SLE_Solver class contents */
 	#define __SLE_Solver \
@@ -84,7 +71,6 @@
 		SLE_Solver_SolverSetupFunction*    _solverSetup;     \
 		SLE_Solver_SolveFunction*          _solve;           \
 		SLE_Solver_GetResidualFunc*        _getResidual;	  \
-		SLE_Solver_MG_SetupSmootherFunc*   _mgSetupSmoother; \
 		\
 		/* SLE_Solver info */ \
 		Stream*                            debug;            \
@@ -117,7 +103,6 @@
 		SLE_Solver_SolverSetupFunction*            _solverSetup,
 		SLE_Solver_SolveFunction*                  _solve,
 		SLE_Solver_GetResidualFunc*                _getResidual, 
-		SLE_Solver_MG_SetupSmootherFunc*           _mgSetupSmoother,
 		Name                                       name );
 
 
@@ -163,16 +148,5 @@
 	#define SLE_Solver_GetResidual( self, fvIndex ) \
 		(self)->_getResidual( self, fvIndex )
 	
-	
-	/*
-	** MG Stuff.
-	*/
-	
-	void SLE_Solver_MG_SetupSmoother( void* sleSolver, 
-							    MatrixSolver* smoother, Matrix* mat, 
-							    unsigned level, unsigned maxLevels );
-	void _SLE_Solver_MG_SetupSmoother( void* sleSolver, 
-								MatrixSolver* smoother, Matrix* mat, 
-								unsigned level, unsigned maxLevels );
 
 #endif

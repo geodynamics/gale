@@ -31,8 +31,9 @@
 		<!-- Matricies -->
 		<struct name="k_matrix">
 			<param name="Type">StiffnessMatrix</param>
+			<param name="matrix">kMat</param>
 			<param name="RowVariable">VelocityField</param>
-			<param name="ColumnVariable">VelocityField</param>	
+			<param name="ColumnVariable">VelocityField</param>
 			<param name="RHS">mom_force</param>
 			<param name="allowZeroElementContributions">False</param>
 		</struct>
@@ -44,9 +45,11 @@
 		</struct>
 		<struct name="g_matrix">
 			<param name="Type">StiffnessMatrix</param>
+			<param name="matrix">gMat</param>
 			<param name="RowVariable">VelocityField</param>
-			<param name="ColumnVariable">PressureField</param>	
+			<param name="ColumnVariable">PressureField</param>
 			<param name="RHS">cont_force</param>
+			<!--param name="transposeRHS">cont_force</param-->
 			<param name="allowZeroElementContributions">False</param>
 		</struct>
 		<struct name="gradientStiffnessMatrixTerm">
@@ -58,11 +61,12 @@
 		<!-- Solver Stuff -->
 		<struct name="preconditioner">
 			<param name="Type">StiffnessMatrix</param>
+			<param name="matrix">cMat</param>
 			<param name="RowVariable">PressureField</param>
 			<param name="ColumnVariable">PressureField</param>	
 			<param name="RHS">cont_force</param>
 			<param name="allowZeroElementContributions">True</param>
-		</struct>		
+		</struct>
 		<struct name="preconditionerTerm">
 			<param name="Type">UzawaPreconditionerTerm</param>
 			<param name="Swarm">gaussSwarm</param>
@@ -71,6 +75,7 @@
 
 		<struct name="uzawa">
 			<param name="Type">Stokes_SLE_UzawaSolver</param>
+			<param name="velocitySolver">matrixSolver</param>
 			<param name="Preconditioner">preconditioner</param>
 			<param name="tolerance">1.0e-5</param>
 			<param name="maxIterations">5000</param>

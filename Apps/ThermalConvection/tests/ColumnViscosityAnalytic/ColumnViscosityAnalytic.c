@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ColumnViscosityAnalytic.c 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: ColumnViscosityAnalytic.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -54,6 +54,9 @@ typedef struct {
 	double ZB;
 	double xc;
 	double C1A,C2A,C3A,C4A,C1B,C2B,C3B,C4B;
+	FeVariable* velocityField;
+	FeVariable* pressureField;
+	FeVariable* stressField;
 } ColumnViscosityAnalytic;
 
 #define SMALL 1.0e-5
@@ -67,8 +70,7 @@ typedef struct {
 void ColumnViscosityAnalytic_TemperatureIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
 	DiscretisationContext*  context            = (DiscretisationContext*)_context;
 	FeVariable*             temperatureField   = (FeVariable*) FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
-	FiniteElement_Mesh*     mesh               = temperatureField->feMesh;
-	BlockGeometry*          geometry           = (BlockGeometry*) mesh->layout->elementLayout->geometry;
+	FeMesh*     mesh               = temperatureField->feMesh;
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
 	double*                 coord;
@@ -79,16 +81,18 @@ void ColumnViscosityAnalytic_TemperatureIC( Node_LocalIndex node_lI, Variable_In
 	int                     wavenumberX;
 	int                     wavenumberY;
 	double                  L;
+	double			min[3], max[3];
 	
 	/* Find coordinate of node */
-	coord = Mesh_CoordAt( mesh, node_lI );
+	coord = Mesh_GetVertex( mesh, node_lI );
 
 	/* Make sure that the box has right dimensions */
-	assert( ( geometry->max[ J_AXIS ] - geometry->min[ J_AXIS ] - 1.0 ) < SMALL );
-	L = geometry->max[ I_AXIS ] - geometry->min[ I_AXIS ];
+	Mesh_GetGlobalCoordRange( mesh, min, max );
+	assert( ( max[ J_AXIS ] - min[ J_AXIS ] - 1.0 ) < SMALL );
+	L = max[ I_AXIS ] - min[ I_AXIS ];
 
-	x = coord[ I_AXIS ] - geometry->min[ I_AXIS ];
-	y = coord[ J_AXIS ] - geometry->min[ J_AXIS ];
+	x = coord[ I_AXIS ] - min[ I_AXIS ];
+	y = coord[ J_AXIS ] - min[ J_AXIS ];
 
 	wavenumberX = Dictionary_GetInt_WithDefault( dictionary, "wavenumberX", 1 );
 	wavenumberY = Dictionary_GetInt_WithDefault( dictionary, "wavenumberY", 1 );
@@ -2565,9 +2569,6 @@ void _ColumnViscosityAnalytic_Construct( void* analyticSolution, Stg_ComponentFa
 	ColumnViscosityAnalytic* self = (ColumnViscosityAnalytic*)analyticSolution;
 	AbstractContext*         context;
 	ConditionFunction*       condFunc;
-	FeVariable*              velocityField;
-	FeVariable*              pressureField;
-	FeVariable*              stressField;
 
 	/* Construct Parent */
 	_AnalyticSolution_Construct( self, cf, data );
@@ -2575,15 +2576,9 @@ void _ColumnViscosityAnalytic_Construct( void* analyticSolution, Stg_ComponentFa
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
 	
 	/* Create Analytic Fields */
-	velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data ); 
-	AnalyticSolution_CreateAnalyticField( self, velocityField, ColumnViscosityAnalytic_VelocityFunction );
-
-	pressureField = Stg_ComponentFactory_ConstructByName( cf, "PressureField", FeVariable, True, data ); 
-	AnalyticSolution_CreateAnalyticField( self, pressureField, ColumnViscosityAnalytic_PressureFunction );
-
-	stressField = Stg_ComponentFactory_ConstructByName( cf, "StressField", FeVariable, False, data ); 
-	if ( stressField ) 
-		AnalyticSolution_CreateAnalyticField( self, stressField, ColumnViscosityAnalytic_StressFunction );
+	self->velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data ); 
+	self->pressureField = Stg_ComponentFactory_ConstructByName( cf, "PressureField", FeVariable, True, data ); 
+	self->stressField = Stg_ComponentFactory_ConstructByName( cf, "StressField", FeVariable, False, data ); 
 
 	/* Add condition function for temperature */
 	condFunc = ConditionFunction_New( ColumnViscosityAnalytic_TemperatureIC, "ColumnViscosityAnalytic_TemperatureIC" );
@@ -2598,6 +2593,22 @@ void _ColumnViscosityAnalytic_Construct( void* analyticSolution, Stg_ComponentFa
 	ColumnViscosityAnalytic_Constants( self );
 }
 
+void _ColumnViscosityAnalytic_Build( void* analyticSolution, void* data ) {
+	ColumnViscosityAnalytic* self = (ColumnViscosityAnalytic*)analyticSolution;
+
+	Build( self->velocityField, data, False );
+	Build( self->pressureField, data, False );
+	if( self->stressField )
+		Build( self->stressField, data, False );
+
+	AnalyticSolution_CreateAnalyticField( self, self->velocityField, ColumnViscosityAnalytic_VelocityFunction );
+	AnalyticSolution_CreateAnalyticField( self, self->pressureField, ColumnViscosityAnalytic_PressureFunction );
+	if( self->stressField ) 
+		AnalyticSolution_CreateAnalyticField( self, self->stressField, ColumnViscosityAnalytic_StressFunction );
+
+	_AnalyticSolution_Build( self, data );
+}
+
 void* _ColumnViscosityAnalytic_DefaultNew( Name name ) {
 	return _AnalyticSolution_New(
 			sizeof(ColumnViscosityAnalytic),
@@ -2607,7 +2618,7 @@ void* _ColumnViscosityAnalytic_DefaultNew( Name name ) {
 			_AnalyticSolution_Copy,
 			_ColumnViscosityAnalytic_DefaultNew,
 			_ColumnViscosityAnalytic_Construct,
-			_AnalyticSolution_Build,
+			_ColumnViscosityAnalytic_Build, 
 			_AnalyticSolution_Initialise,
 			_AnalyticSolution_Execute,
 			_AnalyticSolution_Destroy,

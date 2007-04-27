@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Energy_SLE_Solver.c 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: Energy_SLE_Solver.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -71,7 +71,6 @@ void* Energy_SLE_Solver_DefaultNew( Name name ) {
 		_Energy_SLE_Solver_SolverSetup, 
 		_Energy_SLE_Solver_Solve, 
 		_Energy_SLE_GetResidual, 
-		_SLE_Solver_MG_SetupSmoother, 
 		name );
 }
 
@@ -99,7 +98,6 @@ Energy_SLE_Solver* _Energy_SLE_Solver_New(
 		SLE_Solver_SolverSetupFunction*         _solverSetup,
 		SLE_Solver_SolveFunction*               _solve,
 		SLE_Solver_GetResidualFunc*             _getResidual, 
-		SLE_Solver_MG_SetupSmootherFunc*        _mgSetupSmoother,
 		Name									name )
 {
 	Energy_SLE_Solver* self;
@@ -121,7 +119,6 @@ Energy_SLE_Solver* _Energy_SLE_Solver_New(
 		_solverSetup,
 		_solve,
 		_getResidual, 
-		_mgSetupSmoother,
 		name );
 	
 	/* Virtual info */
@@ -132,6 +129,7 @@ Energy_SLE_Solver* _Energy_SLE_Solver_New(
 void _Energy_SLE_Solver_Init( Energy_SLE_Solver* self ) {
 	self->isConstructed = True;
 	self->residual = NULL;
+	self->matrixSolver = NULL;
 }
 void Energy_SLE_Solver_InitAll( Energy_SLE_Solver* solver, Bool useStatSolve, int statReps ) {
 	Energy_SLE_Solver* self = (Energy_SLE_Solver*)solver;
@@ -142,10 +140,10 @@ void Energy_SLE_Solver_InitAll( Energy_SLE_Solver* solver, Bool useStatSolve, in
 void _Energy_SLE_Solver_Delete( void* sle ) {
 	Energy_SLE_Solver* self = (Energy_SLE_Solver*)sle;
 
-	MatrixSolver_Destroy( self->matrixSolver );
+	FreeObject( self->matrixSolver );
 
 	if( self->residual ) {
-		Vector_Destroy( self->residual );
+		FreeObject( self->residual );
 	}
 }
 
@@ -166,7 +164,7 @@ void _Energy_SLE_Solver_Print( void* solver, Stream* stream ) {
 void* _Energy_SLE_Solver_Copy( void* standardSleSolver, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	Energy_SLE_Solver*	self = (Energy_SLE_Solver*)standardSleSolver;
 	Energy_SLE_Solver*	newEnergySleSolver;
-	
+
 	newEnergySleSolver = _SLE_Solver_Copy( self, dest, deep, nameExt, ptrMap );
 	
 	newEnergySleSolver->matrixSolver = self->matrixSolver;
@@ -175,11 +173,22 @@ void* _Energy_SLE_Solver_Copy( void* standardSleSolver, void* dest, Bool deep, N
 }
 
 void _Energy_SLE_Solver_Construct( void* sleSolver, Stg_ComponentFactory* cf, void* data ) {
-	Energy_SLE_Solver *self = (Energy_SLE_Solver*)sleSolver;
+	Energy_SLE_Solver	*self = (Energy_SLE_Solver*)sleSolver;
+
+	assert( self && Stg_CheckType( self, Energy_SLE_Solver ) );
+	assert( cf && Stg_CheckType( cf, Stg_ComponentFactory ) );
 
 	_SLE_Solver_Construct( self, cf, data );
 
-	_Energy_SLE_Solver_Init( self );
+	self->matrixSolver = Stg_ComponentFactory_ConstructByKey( cf, self->name, "matrixSolver", MatrixSolver, 
+								  False, data );
+	if( !self->matrixSolver ) {
+#ifdef HAVE_PETSC
+		self->matrixSolver = (MatrixSolver*)PETScMatrixSolver_New( "" );
+#else
+		self->matrixSolver = NULL;
+#endif
+	}
 }
 
 /* Build */
@@ -191,10 +200,15 @@ void _Energy_SLE_Solver_Build( void* sleSolver, void* standardSLE ) {
 	Journal_DPrintf( self->debug, "In %s()\n", __func__ );
 	Stream_IndentBranch( StgFEM_SLE_ProvidedSystems_Energy_Debug );
 	Journal_DPrintf( self->debug, "building a standard L.A. solver for the \"%s\" matrix.\n", stiffMat->name );
-	self->matrixSolver = MatrixSolver_Build( sle->comm, stiffMat->matrix );
-	Stream_UnIndentBranch( StgFEM_SLE_ProvidedSystems_Energy_Debug );
 
-	Vector_Duplicate( ((ForceVector**)sle->forceVectors->data)[0]->vector, &self->residual );
+	Build( stiffMat, standardSLE, False );
+
+	if( self->matrixSolver ) {
+		MatrixSolver_SetComm( self->matrixSolver, sle->comm );
+		Build( self->matrixSolver, NULL, False );
+	}
+
+	Stream_UnIndentBranch( StgFEM_SLE_ProvidedSystems_Energy_Debug );
 }
 
 
@@ -204,22 +218,15 @@ void _Energy_SLE_Solver_Initialise( void* sleSolver, void* standardSLE ) {
 	
 	/* Initialise parent. */
 	_SLE_Solver_Initialise( self, sle );
-	
-	/* MG: If multi-grid is enabled, enable it on the velocity matrix solver. */
-	if( sle->mgEnabled ) {
-		MultiGrid_InitMatrixSolver( sle->mgHandles[0], self->matrixSolver );
-		
-		MultiGrid_BuildGridOps( sle->mgHandles[0] );
-		MultiGrid_BuildWorkVectors( sle->mgHandles[0] );
-	}
+
+	if( self->matrixSolver )
+		Initialise( self->matrixSolver, NULL, False );
 }
 
 void _Energy_SLE_Solver_Execute( void* sleSolver, void* data ) {
-	
 }
 	
 void _Energy_SLE_Solver_Destroy( void* sleSolver, void* data ) {
-	
 }
 
 void _Energy_SLE_Solver_SolverSetup( void* sleSolver, void* standardSLE ) {
@@ -231,14 +238,16 @@ void _Energy_SLE_Solver_SolverSetup( void* sleSolver, void* standardSLE ) {
 	Stream_IndentBranch( StgFEM_SLE_ProvidedSystems_Energy_Debug );
 	
 	Journal_DPrintf( self->debug, "Initialising the L.A. solver for the \"%s\" matrix.\n", stiffMat->name );
-	MatrixSolver_Setup( self->matrixSolver, stiffMat->matrix );
+	MatrixSolver_SetMatrix( self->matrixSolver, stiffMat->matrix );
 	Stream_UnIndentBranch( StgFEM_SLE_ProvidedSystems_Energy_Debug );
 	
-	if( !sle->mgEnabled ) {
-		if( self->maxIterations > 0 ) {
-			MatrixSolver_SetMaxIts( self->matrixSolver, self->maxIterations );
-		}
+	if( self->maxIterations > 0 ) {
+		MatrixSolver_SetMaxIterations( self->matrixSolver, self->maxIterations );
 	}
+
+	Vector_Duplicate( ((ForceVector**)sle->forceVectors->data)[0]->vector, (void**)&self->residual );
+	Vector_SetLocalSize( self->residual, 
+			     Vector_GetLocalSize( ((ForceVector**)sle->forceVectors->data)[0]->vector ) );
 }
 
 
@@ -263,32 +272,21 @@ void _Energy_SLE_Solver_Solve( void* sleSolver, void* standardSLE ) {
 		Journal_Printf( warning, "Warning: More than 1 solution vector provided to standard sle. Ignoring second and subsequent"
 			" solution vectors.\n" );
 	}
-	
-	/* Handle MG. */
-	if( sle->mgEnabled ) {
-		MultiGrid_BuildSmoothers( sle->mgHandles[0] );
-		MultiGrid_UpdateMatrixSolver( sle->mgHandles[0], self->matrixSolver, (SLE_Solver*)self );
-	}
-	
-	/* If a stat solve was specified then do so. */
-	if( self->useStatSolve ) {
-		iterations = MatrixSolver_StatSolve( self->matrixSolver,
-									  ((SolutionVector*) sle->solutionVectors->data[0])->vector,
-									  ((ForceVector*) sle->forceVectors->data[0])->vector, 
-									  self->nStatReps );
-	}
-	else {
-		iterations = MatrixSolver_Solve( self->matrixSolver, 
-								   ((SolutionVector*) sle->solutionVectors->data[0])->vector,
-								   ((ForceVector*) sle->forceVectors->data[0])->vector );
-	}
+
+	MatrixSolver_Solve( self->matrixSolver, 
+			    ((ForceVector*) sle->forceVectors->data[0])->vector, 
+			    ((SolutionVector*) sle->solutionVectors->data[0])->vector );
+	iterations = MatrixSolver_GetIterations( self->matrixSolver );
+
 	Journal_DPrintf( self->debug, "Solved after %u iterations.\n", iterations );
 	Stream_UnIndentBranch( StgFEM_SLE_ProvidedSystems_Energy_Debug );
 	
 	/* calculate the residual */
 	/* TODO: need to make this optional */
-	MatrixMultiply( ((StiffnessMatrix**)sle->stiffnessMatrices->data)[0]->matrix, ((SolutionVector**)sle->solutionVectors->data)[0]->vector, self->residual );
-	Vector_ScaleAndAddVector( self->residual, -1.0, ((ForceVector**)sle->forceVectors->data)[0]->vector );
+	Matrix_Multiply( ((StiffnessMatrix**)sle->stiffnessMatrices->data)[0]->matrix, 
+			 ((SolutionVector**)sle->solutionVectors->data)[0]->vector, 
+			 self->residual );
+	Vector_ScaleAdd( self->residual, -1.0, ((ForceVector**)sle->forceVectors->data)[0]->vector );
 }
 
 

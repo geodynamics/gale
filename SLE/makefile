@@ -35,7 +35,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 535 2006-04-11 13:07:34Z PatrickSunter $
+## $Id: makefile 822 2007-04-27 06:20:35Z LukeHodkinson $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -45,6 +45,6 @@ PROJ_ROOT := $(shell until test -r ./Makefile.system ; do cd .. ; done ; echo `p
 include ${PROJ_ROOT}/Makefile.system
 
 # Subdirectories
-subdirs := LinearAlgebra SystemSetup MultiGrid ProvidedSystems src
+subdirs := LinearAlgebra SystemSetup ProvidedSystems src
 
 include ${PROJ_ROOT}/Makefile.vmake

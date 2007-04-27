@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: HomogeneousNaturalBCs.c 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: HomogeneousNaturalBCs.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -47,6 +47,7 @@ const Type HomogeneousNaturalBCs_Type = "HomogeneousNaturalBCs";
 typedef struct { 
 	__AnalyticSolution
 	double angle;
+	FeVariable* temperatureField;
 } HomogeneousNaturalBCs;
 
 
@@ -83,28 +84,25 @@ void HomogeneousNaturalBCs_TemperatureBC( Node_LocalIndex node_lI, Variable_Inde
 		True,
 		0 );
 	FeVariable*             feVariable = NULL;
-	FiniteElement_Mesh*     mesh       = NULL;
+	FeMesh*			mesh       = NULL;
 	double*                 result     = (double*) _result;
 	double*                 coord;
 	
 	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
 	mesh       = feVariable->feMesh;
-	coord = Mesh_CoordAt( mesh, node_lI );
+	coord = Mesh_GetVertex( mesh, node_lI );
 
 	HomogeneousNaturalBCs_TemperatureFunction( self, feVariable, coord, result );
 }
 
 void _HomogeneousNaturalBCs_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	HomogeneousNaturalBCs* self = (HomogeneousNaturalBCs*)analyticSolution;
-	FeVariable*            temperatureField;
 	AbstractContext*       context;
 	ConditionFunction*     condFunc;
 
 	_AnalyticSolution_Construct( self, cf, data );
 
-	temperatureField = Stg_ComponentFactory_ConstructByName( cf, "TemperatureField", FeVariable, True, data ); 
-
-	AnalyticSolution_CreateAnalyticField( self, temperatureField, HomogeneousNaturalBCs_TemperatureFunction );
+	self->temperatureField = Stg_ComponentFactory_ConstructByName( cf, "TemperatureField", FeVariable, True, data ); 
 
 	/* Create Condition Functions */
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
@@ -112,6 +110,14 @@ void _HomogeneousNaturalBCs_Construct( void* analyticSolution, Stg_ComponentFact
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 	condFunc = ConditionFunction_New( HomogeneousNaturalBCs_TemperatureBC, "Temperature_StepFunction" );
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+}
+
+void _HomogeneousNaturalBCs_Build( void* analyticSolution, void* data ) {
+	HomogeneousNaturalBCs* self = (HomogeneousNaturalBCs*)analyticSolution;	
+
+	AnalyticSolution_CreateAnalyticField( self, self->temperatureField, HomogeneousNaturalBCs_TemperatureFunction );
+
+	_AnalyticSolution_Build( self, data );
 }
 
 void* _HomogeneousNaturalBCs_DefaultNew( Name name ) {
@@ -123,7 +129,7 @@ void* _HomogeneousNaturalBCs_DefaultNew( Name name ) {
 			_AnalyticSolution_Copy,
 			_HomogeneousNaturalBCs_DefaultNew,
 			_HomogeneousNaturalBCs_Construct,
-			_AnalyticSolution_Build,
+			_HomogeneousNaturalBCs_Build,
 			_AnalyticSolution_Initialise,
 			_AnalyticSolution_Execute,
 			_AnalyticSolution_Destroy,

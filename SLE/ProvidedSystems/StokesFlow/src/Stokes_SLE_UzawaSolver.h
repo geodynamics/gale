@@ -54,7 +54,7 @@
 **	TODO: Need to handle Non-symmetric problems where Divergence isn't just G transpose. This will require a 
 **	fn pointer or entry point to MatMult certain things based on D.
 **
-** $Id: Stokes_SLE_UzawaSolver.h 654 2006-10-12 08:58:49Z SteveQuenette $
+** $Id: Stokes_SLE_UzawaSolver.h 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -120,7 +120,6 @@
 		SLE_Solver_SolverSetupFunction*             _solverSetup,
 		SLE_Solver_SolveFunction*                   _solve,
 		SLE_Solver_GetResidualFunc*                 _getResidual, 
-		SLE_Solver_MG_SetupSmootherFunc*            _mgSetupSmoother, 
 		Name                                        name );
 
 	/** Class member variable initialisation */

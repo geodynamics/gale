@@ -35,7 +35,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 535 2006-04-11 13:07:34Z PatrickSunter $
+## $Id: makefile 822 2007-04-27 06:20:35Z LukeHodkinson $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #Finds the Absolute path to the Project Root directory
@@ -45,6 +45,11 @@ include ${PROJ_ROOT}/Makefile.system
 
 # External Libraries and Headers
 packages = STGERMAIN MPI XML 
+
+ifeq (true,$(shell if test -r $(PETSC_INCDIR)/petsc.h; then echo true; fi ))
+	USER_CFLAGS += -DHAVE_PETSC
+	EXTERNAL_INCLUDES += -I${PETSC_INCDIR} -I${PETSC_BMAKEDIR}
+endif
 
 # Note don't put the .c extension. just the base name of the plugin
 plugins := testStressTensor testStiffnessMatrixCompare

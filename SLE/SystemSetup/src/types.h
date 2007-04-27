@@ -44,7 +44,7 @@
 **
 ** Comments:
 **
-** $Id: types.h 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: types.h 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -58,9 +58,11 @@
 	typedef struct ForceVector                  ForceVector;
 	typedef struct ForceTerm                    ForceTerm;
 	typedef struct SolutionVector               SolutionVector;
+	typedef struct PETScShellMatrix		PETScShellMatrix;
 	typedef struct SystemLinearEquations        SystemLinearEquations;
 	typedef struct SLE_Solver                   SLE_Solver;
 	typedef struct FiniteElementContext         FiniteElementContext;
+	typedef struct Assembler		Assembler;
 
 	/* types for lists etc ... for readability */
 	typedef Index                       StiffnessMatrix_Index;

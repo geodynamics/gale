@@ -44,7 +44,7 @@
 	extern const Type StgFEM_CPUTime_Type;
 
 	typedef struct {
-		__Codelet;
+		__Codelet
 		double    initialTime;
 	} StgFEM_CPUTime;
 

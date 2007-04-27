@@ -35,7 +35,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 535 2006-04-11 13:07:34Z PatrickSunter $
+## $Id: makefile 822 2007-04-27 06:20:35Z LukeHodkinson $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -53,7 +53,7 @@ SRCS = $(wildcard *.c)
 HDRS = $(wildcard *.h)
 
 PROJ_LIBS = 
-PROJ_OBJLISTS = ${PROJECT}_SLE_SystemSetup ${PROJECT}_SLE_MultiGrid ${PROJECT}_SLE_ProvidedSystems
+PROJ_OBJLISTS = ${PROJECT}_SLE_SystemSetup ${PROJECT}_SLE_ProvidedSystems
 EXTERNAL_LIBS = -L${LIB_DIR} 
 
 EXTERNAL_INCLUDES = -I${INC_DIR}/${PROJECT} 

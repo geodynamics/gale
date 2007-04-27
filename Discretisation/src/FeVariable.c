@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeVariable.c 819 2007-04-24 04:47:17Z PatrickSunter $
+** $Id: FeVariable.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -43,11 +43,10 @@
 #include <StGermain/StGermain.h>
 #include "units.h"
 #include "types.h"
-#include "shortcuts.h"
 #include "ElementType.h"
 #include "ElementType_Register.h"
 #include "Element.h"
-#include "Mesh.h"
+#include "FeMesh.h"
 #include "FeEquationNumber.h"
 #include "FeVariable.h"
 #include "LinkedDofInfo.h"
@@ -134,7 +133,7 @@ FeVariable* FeVariable_New(
 	    isCheckpointedAndReloaded,
 		importFormatType,
 		exportFormatType,
-		((Mesh*)feMesh)->layout->decomp->communicator,
+		((FeMesh*)feMesh)->topo->domains[MT_VERTEX]->commTopo->comm, 
 		fV_Register );
 }
 
@@ -328,11 +327,11 @@ void _FeVariable_Init(
 	/* FeVariable info */
 	self->isConstructed = True;
 	self->debug = Stream_RegisterChild( StgFEM_Discretisation_Debug, self->type );
-	self->feMesh = Stg_CheckType( feMesh, FiniteElement_Mesh );
+	self->feMesh = Stg_CheckType( feMesh, FeMesh );
 	/* Set pointer for geometry mesh - if none is provided then it'll use the feMesh */
 	self->geometryMesh = ( geometryMesh ? 
-			Stg_CheckType( geometryMesh, FiniteElement_Mesh ) : 
-			Stg_CheckType( feMesh, FiniteElement_Mesh ) );
+			Stg_CheckType( geometryMesh, FeMesh ) : 
+			Stg_CheckType( feMesh, FeMesh ) );
 	self->dofLayout = dofLayout;
 	if ( bcs )
 		self->bcs = Stg_CheckType( bcs, VariableCondition );
@@ -350,6 +349,7 @@ void _FeVariable_Init(
 	else {
 		self->eqNum = FeEquationNumber_New( defaultFeVariableFeEquationNumberName, self->feMesh,
 			self->dofLayout, self->bcs, linkedDofInfo );
+		self->eqNum->removeBCs = self->removeBCs;
 	}
 
 	self->importFormatType = StG_Strdup( importFormatType );
@@ -471,7 +471,7 @@ void* _FeVariable_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, P
 	
 	if( deep ) {
 		newFeVariable->debug = self->debug; 
-		newFeVariable->feMesh = (FiniteElement_Mesh*)Stg_Class_Copy( self->feMesh, NULL, deep, nameExt, map );
+		newFeVariable->feMesh = (FeMesh*)Stg_Class_Copy( self->feMesh, NULL, deep, nameExt, map );
 		newFeVariable->dofLayout = (DofLayout*)Stg_Class_Copy( self->dofLayout, NULL, deep, nameExt, map );
 		newFeVariable->bcs = (VariableCondition*)Stg_Class_Copy( self->bcs, NULL, deep, nameExt, map );
 		newFeVariable->ics = self->ics ? (VariableCondition*)Stg_Class_Copy( self->ics, NULL, deep, nameExt, map ) : NULL;
@@ -533,6 +533,9 @@ void _FeVariable_Build( void* variable, void* data ) {
 		if ( self->linkedDofInfo ) {
 			Build( self->linkedDofInfo, data, False );
 		}
+
+		/* Extract component count. */
+		self->fieldComponentCount = self->dofLayout->_totalVarCount;
 		
 		/* build the e.q. number array */
 		FeEquationNumber_Build( self->eqNum );
@@ -544,8 +547,8 @@ void _FeVariable_Build( void* variable, void* data ) {
 void _FeVariable_Construct( void* variable, Stg_ComponentFactory* cf, void* data ) 
 {
 	FeVariable*         self          = (FeVariable*)variable;
-	FiniteElement_Mesh* feMesh        = NULL;
-	FiniteElement_Mesh* geometryMesh  = NULL;
+	FeMesh*			feMesh        = NULL;
+	FeMesh*			geometryMesh  = NULL;
 	DofLayout*          dofLayout     = NULL;
 	VariableCondition*  bc            = NULL;
 	VariableCondition*  ic            = NULL;
@@ -555,8 +558,8 @@ void _FeVariable_Construct( void* variable, Stg_ComponentFactory* cf, void* data
 
 	_FieldVariable_Construct( self, cf, data );
 
-	feMesh        = Stg_ComponentFactory_ConstructByKey( cf, self->name, "FEMesh",        FiniteElement_Mesh, True, data );
-	geometryMesh  = Stg_ComponentFactory_ConstructByKey( cf, self->name, "GeometryMesh",  FiniteElement_Mesh, False, data );
+	feMesh        = Stg_ComponentFactory_ConstructByKey( cf, self->name, "FEMesh",        FeMesh, True, data );
+	geometryMesh  = Stg_ComponentFactory_ConstructByKey( cf, self->name, "GeometryMesh",  FeMesh, False, data );
 	dofLayout     = Stg_ComponentFactory_ConstructByKey( cf, self->name, DofLayout_Type,  DofLayout,          True, data );
 	importFormatType =  Stg_ComponentFactory_GetString( cf, self->name, "importFormatType",
 		StgFEM_Native_ImportExportType );
@@ -566,8 +569,7 @@ void _FeVariable_Construct( void* variable, Stg_ComponentFactory* cf, void* data
 	ic            = Stg_ComponentFactory_ConstructByKey( cf, self->name, "IC",            VariableCondition,  False, data );
 	bc            = Stg_ComponentFactory_ConstructByKey( cf, self->name, "BC",            VariableCondition,  False, data );
 	linkedDofInfo = Stg_ComponentFactory_ConstructByKey( cf, self->name, "LinkedDofInfo", LinkedDofInfo,      False, data );
-
-	self->fieldComponentCount = dofLayout->_totalVarCount;
+	self->removeBCs = Stg_ComponentFactory_GetBool( cf, self->name, "removeBCs", True );
 
 	_FeVariable_Init( self, feMesh, geometryMesh, dofLayout, bc, ic, linkedDofInfo, NULL,
 		importFormatType, exportFormatType );
@@ -659,68 +661,17 @@ void FeVariable_PrintLocalDiscreteValues( void* variable, Stream* stream ) {
 
 	Journal_Printf( stream, "In %s: for FeVariable \"%s\":\n", __func__, self->name );
 
-	_FeVariable_PrintLocalOrDomainValues( variable, self->feMesh->nodeLocalCount, stream );
+	_FeVariable_PrintLocalOrDomainValues( variable, FeMesh_GetNodeLocalSize( self->feMesh ), stream );
 }
 
 
-unsigned _FeVariable_ClosestNode( FeVariable* self, Coord crd ) {
-	Bool		done;
-	Mesh*		mesh = (Mesh*)self->feMesh;
-	Coord*		nodeCrds = mesh->nodeCoord;
-	unsigned	curNode;
-	unsigned	nDims = self->dim;
-
-	/* Begin somewhere in the middle. */
-	curNode = mesh->nodeLocalCount / 2;
-
-	/* Loop until we've found closest local node. */
-	do {
-		unsigned	nNbrs = mesh->nodeNeighbourCountTbl[curNode];
-		unsigned*	nbrs = mesh->nodeNeighbourTbl[curNode];
-		double		dist;
-		double		tmp;
-		unsigned	nbr_i, d_i;
-
-		/* Assume we'll be done after this loop. */
-		done = True;
-
-		/* Calc distance squared to current node. */
-		tmp = nodeCrds[curNode][0] - crd[0];
-		dist = tmp * tmp;
-		for( d_i = 1; d_i < nDims; d_i++ ) {
-			tmp = nodeCrds[curNode][d_i] - crd[d_i];
-			dist += tmp * tmp;
-		}
-
-		/* Compare to neighbours. */
-		for( nbr_i = 0; nbr_i < nNbrs; nbr_i++ ) {
-			double	nbrDist;
-
-			/* Just in case... */
-			if( nbrs[nbr_i] >= mesh->nodeLocalCount )
-				continue;
-
-			tmp = nodeCrds[nbrs[nbr_i]][0] - crd[0];
-			nbrDist = tmp * tmp;
-			for( d_i = 1; d_i < nDims; d_i++ ) {
-				tmp = nodeCrds[nbrs[nbr_i]][d_i] - crd[d_i];
-				nbrDist += tmp * tmp;
-			}
-
-			if( nbrDist < dist ) {
-				curNode = nbrs[nbr_i];
-				dist = nbrDist;
-				done = False;
-			}
-		}
-	}
-	while( !done );
-
-	return curNode;
+unsigned _FeVariable_ClosestNode( FeVariable* self, double* crd ) {
+	assert( self );
+	return Mesh_NearestVertex( self->feMesh, crd );
 }
 
 
-InterpolationResult _FeVariable_InterpolateValueAt( void* variable, Coord globalCoord, double* value ) {
+InterpolationResult _FeVariable_InterpolateValueAt( void* variable, double* globalCoord, double* value ) {
 	FeVariable*		self = (FeVariable*)variable;
 	Element_DomainIndex	elementCoordIn = (unsigned)-1;
 	Coord			elLocalCoord={0,0,0};
@@ -751,13 +702,13 @@ InterpolationResult _FeVariable_InterpolateValueAt( void* variable, Coord global
 
 
 double _FeVariable_GetMinGlobalFieldMagnitude( void* feVariable ) {
-	FeVariable*			self = (FeVariable*)feVariable;
-	FiniteElement_Mesh*		mesh = self->feMesh;
-	int				node_lI=0;
-	int				nodeLocalCount = mesh->nodeLocalCount;
-	double				min = 0;
-	double				globalMin = 0;
-	double				currValue;
+	FeVariable*	self = (FeVariable*)feVariable;
+	FeMesh*		feMesh = self->feMesh;
+	int		node_lI=0;
+	int		nodeLocalCount = FeMesh_GetNodeLocalSize( feMesh );
+	double		min = 0;
+	double		globalMin = 0;
+	double		currValue;
 
 	min = FeVariable_GetScalarAtNode( self, 0 );
 	
@@ -776,13 +727,12 @@ double _FeVariable_GetMinGlobalFieldMagnitude( void* feVariable ) {
 
 
 double _FeVariable_GetMaxGlobalFieldMagnitude( void* feVariable ) {
-	FeVariable*			self = (FeVariable*)feVariable;
-	FiniteElement_Mesh*		mesh = self->feMesh;
-	int				node_lI=0;
-	int				nodeLocalCount = mesh->nodeLocalCount;
-	double				max = 0;
-	double				globalMax = 0;
-	double				currValue;
+	FeVariable*	self = (FeVariable*)feVariable;
+	int		node_lI=0;
+	int		nodeLocalCount = FeMesh_GetNodeLocalSize( self->feMesh );
+	double		max = 0;
+	double		globalMax = 0;
+	double		currValue;
 
 	max = FeVariable_GetScalarAtNode( self, 0 );
 	
@@ -799,55 +749,21 @@ double _FeVariable_GetMaxGlobalFieldMagnitude( void* feVariable ) {
 	return globalMax;
 }
 
-void _FeVariable_GetMinAndMaxLocalCoords( void* feVariable, Coord min, Coord max ) {
-	FeVariable*		self = (FeVariable*)feVariable;
-	FiniteElement_Mesh*	mesh = self->feMesh;
-	ElementLayout*		eLayout = mesh->layout->elementLayout;
-	double*			currCoord = NULL;
-	Dimension_Index		dim_I = 0;
-	Node_LocalIndex		node_lI = 0;
+void _FeVariable_GetMinAndMaxLocalCoords( void* feVariable, double* min, double* max ) {
+	FeVariable*	self = (FeVariable*)feVariable;
 
-	if ( True == eLayout->getStaticMinAndMaxLocalCoords( eLayout, min, max ) ) {
-		return;
-	}
-	else {
-		/* Make sure that the mesh is initialised */
-		assert( mesh->isInitialised );
+	assert( self && Stg_CheckType( self, FeVariable ) );
 
-		/* No shortcut, so just loop through every node coord, and record min & max */
-		for (dim_I = 0; dim_I < self->dim ; dim_I++ ) {
-			min[dim_I] = mesh->nodeCoord[0][dim_I];
-			max[dim_I] = mesh->nodeCoord[0][dim_I];
-		}
-
-		for ( node_lI = 1; node_lI < mesh->nodeLocalCount; node_lI++ ) {
-			currCoord = mesh->nodeCoord[node_lI];
-
-			for (dim_I = 0; dim_I < self->dim ; dim_I++ ) {
-				if ( currCoord[dim_I] < min[dim_I] ) {
-					min[dim_I] = currCoord[dim_I];
-				}
-				else if ( currCoord[dim_I] > max[dim_I] ) {
-					max[dim_I] = currCoord[dim_I];
-				}
-			}
-		}
-	}
+	Mesh_GetLocalCoordRange( self->feMesh, min, max );
 }
 
 
-void _FeVariable_GetMinAndMaxGlobalCoords( void* feVariable, Coord min, Coord max ) {
-	FeVariable*		self = (FeVariable*)feVariable;
-	FiniteElement_Mesh*	mesh = self->feMesh;
-	ElementLayout*		eLayout = mesh->layout->elementLayout;
+void _FeVariable_GetMinAndMaxGlobalCoords( void* feVariable, double* min, double* max ) {
+	FeVariable*	self = (FeVariable*)feVariable;
 
-	if ( True == eLayout->getStaticMinAndMaxGlobalCoords( eLayout, min, max ) ) {
-		return;
-	}
-	else {
-		/* Use the default approach of each processor calculating min, then reduce */
-		_FieldVariable_GetMinAndMaxGlobalCoords( feVariable, min, max );
-	}
+	assert( self && Stg_CheckType( self, FeVariable ) );
+
+	Mesh_GetGlobalCoordRange( self->feMesh, min, max );
 }
 
 double FeVariable_GetScalarAtNode( void* feVariable, Node_LocalIndex lNode_I ) {
@@ -897,7 +813,7 @@ void FeVariable_ZeroField( void* feVariable ) {
 
 	memset( values, 0, self->fieldComponentCount * sizeof(double) );
 
-	for( lNode_I = 0 ; lNode_I < self->feMesh->nodeLocalCount ; lNode_I++ ) {
+	for( lNode_I = 0 ; lNode_I < FeMesh_GetNodeLocalSize( self->feMesh ); lNode_I++ ) {
 		FeVariable_SetValueAtNode( self, lNode_I, values );
 	}
 
@@ -906,54 +822,21 @@ void FeVariable_ZeroField( void* feVariable ) {
 	
 /* --- Public Functions --- */
 
-InterpolationResult FeVariable_GetElementLocalCoordAtGlobalCoord( void* feVariable, Coord globalCoord, Coord elLocalCoord,
+InterpolationResult FeVariable_GetElementLocalCoordAtGlobalCoord( void* feVariable, double* globalCoord, double* elLocalCoord,
 		Element_DomainIndex* elementCoordInPtr )
 {
 	FeVariable*		self = (FeVariable*)feVariable;
-	MeshLayout*		mLayout = self->feMesh->layout;
-	ElementLayout*		eLayout = mLayout->elementLayout;
 	InterpolationResult	retValue;
+	unsigned		elInd;
 
-	(*elementCoordInPtr) = (unsigned)-1;
-	
 	/* locate which mesh element given coord is in : use inclusive upper boundaries to save
-		the need to use shadow space if possible */
-	(*elementCoordInPtr) = Mesh_ElementWithPoint( self->feMesh, globalCoord, INCLUSIVE_UPPER_BOUNDARY );
-#if 0
-	if( eLayout->type == ParallelPipedHexaEL_Type ) {
-		(*elementCoordInPtr) = eLayout->elementWithPoint( eLayout, mLayout->decomp, globalCoord,
-							    INCLUSIVE_UPPER_BOUNDARY, 0, NULL );
-	}
-	else {
-		unsigned	cNode;
-
-		/* Find closest node to point. */
-		cNode = _FeVariable_ClosestNode( self, globalCoord );
-
-		/* Find with hint of incident elements. */
-		(*elementCoordInPtr) = eLayout->elementWithPoint( eLayout, mLayout->decomp, globalCoord,
-							    INCLUSIVE_UPPER_BOUNDARY, 
-							    self->feMesh->nodeElementCountTbl[cNode], self->feMesh->nodeElementTbl[cNode] );
-
-		/* If still no cigar, brute force. */
-		if ( (*elementCoordInPtr) >= self->feMesh->elementDomainCount ) {
-			(*elementCoordInPtr) = eLayout->elementWithPoint( eLayout, mLayout->decomp, globalCoord,
-								    INCLUSIVE_UPPER_BOUNDARY, 0, NULL );
-		}
-	}
-#endif
-
-	if ( (*elementCoordInPtr) >= self->feMesh->elementDomainCount ) {
+	   the need to use shadow space if possible */
+	if( !Mesh_SearchElements( self->feMesh, globalCoord, &elInd ) ) {
 		Bool			outsideGlobal = False;
-		Coord			min, max;
+		double			min[3], max[3];
 		Dimension_Index		dim_I=0;
-		Bool			checkResult;
-		Stream*			errorStr = Journal_Register( Error_Type, self->type );
 
-		checkResult = ElementLayout_GetStaticMinAndMaxGlobalCoords( mLayout->elementLayout, min, max );
-		Journal_Firewall( True == checkResult, errorStr, "Error - in %s: current mesh doesn't"
-			"know how to calculate global max and min values.\n", __func__ );
-		
+		FieldVariable_GetMinAndMaxGlobalCoords( self, min, max );
 		for ( dim_I = 0; dim_I < self->dim; dim_I++ ) {
 			if ( ( globalCoord[dim_I] < min[dim_I] ) || (globalCoord[dim_I] > max[dim_I] ) ) {
 				outsideGlobal = True;
@@ -965,14 +848,13 @@ InterpolationResult FeVariable_GetElementLocalCoordAtGlobalCoord( void* feVariab
 		}
 		else {
 			return OTHER_PROC;
-		}	
-	}	
+		}
+	}
 	else /* We found the coord is within a local or shadow element */ {
-		Node_LocalIndex		currElementNodeCount=0;
-		Coord**			globalNodeCoordPtrs=NULL;
 		ElementType*		elementType = NULL;
-	
-		if ( (*elementCoordInPtr) < self->feMesh->elementLocalCount ) {
+
+		*elementCoordInPtr = elInd;
+		if ( elInd < FeMesh_GetElementLocalSize( self->feMesh ) ) {
 			retValue = LOCAL;
 		}
 		else {
@@ -980,16 +862,10 @@ InterpolationResult FeVariable_GetElementLocalCoordAtGlobalCoord( void* feVariab
 		}
 
 		/* convert global coordinate to local co-ordinates of element the coord is in */
-		currElementNodeCount = self->feMesh->elementNodeCountTbl[(*elementCoordInPtr)];
-		globalNodeCoordPtrs = Memory_Alloc_Array( Coord*, currElementNodeCount, "globalNodeCoordPtrs" );
-		Mesh_GetNodeCoordPtrsOfElement( self->feMesh, (*elementCoordInPtr), globalNodeCoordPtrs );
-
-		elementType = FeMesh_ElementTypeAt( self->feMesh, (*elementCoordInPtr) );
-		ElementType_ConvertGlobalCoordToElLocal( elementType, eLayout,
-			(const Coord**) globalNodeCoordPtrs, globalCoord, elLocalCoord );
-
-		Memory_Free( globalNodeCoordPtrs );
-	}	
+		elementType = FeMesh_GetElementType( self->feMesh, (*elementCoordInPtr) );
+		ElementType_ConvertGlobalCoordToElLocal( elementType, self->feMesh, *elementCoordInPtr, 
+							 globalCoord, elLocalCoord );
+	}
 
 	return retValue;
 }
@@ -1009,47 +885,69 @@ void FeVariable_SetValueAtNode( void* feVariable, Node_DomainIndex dNode_I, doub
 
 
 void FeVariable_PrintLocalDiscreteValues_2dBox( void* variable, Stream* stream ) {
-	FeVariable*			self = (FeVariable*)variable;
-	FiniteElement_Mesh*		mesh = self->feMesh;
-	ParallelPipedHexaEL*		elementLayout = (ParallelPipedHexaEL*)mesh->layout->elementLayout;
-	Node_LocalIndex			node_lI=0;
-	Index				x_I, y_I;
-	Index				ii;
-	Dof_Index			dof_I=0;
-	Dof_Index			currNodeNumDofs=0;
-	BlockGeometry*			bGeometry = (BlockGeometry*)elementLayout->geometry;
-	Index				nx = 0;
-	Index				ny = 0;
-	double				dx = 0;
-	double				dy = 0;
-	DofLayout*			dofLayout = self->dofLayout;
-	Stream*				eStream = Journal_Register( Error_Type, self->type );
-	HexaMD*				hexaMD = (HexaMD*)mesh->layout->decomp;
-	Index				minLocalNodeX;
-	Index				minLocalNodeY;
-	Index				maxLocalNodeX;
-	Index				maxLocalNodeY;
+	FeVariable*		self = (FeVariable*)variable;
+	Node_LocalIndex		node_lI=0;
+	Index			x_I, y_I;
+	Index			ii;
+	Dof_Index		dof_I=0;
+	Dof_Index		currNodeNumDofs=0;
+	Index			nx = 0;
+	Index			ny = 0;
+	double			dx = 0;
+	double			dy = 0;
+	DofLayout*		dofLayout = self->dofLayout;
+	Stream*			eStream = Journal_Register( Error_Type, self->type );
+	Index			minLocalNodeX;
+	Index			minLocalNodeY;
+	Index			maxLocalNodeX;
+	Index			maxLocalNodeY;
+	Grid*			vertGrid;
+	unsigned		inds[2];
+	unsigned		vertInd;
+	double*			verts[2];
+	unsigned		*localOrigin, *localRange;
+	double			min[2], max[2];
 
-
-	if ( elementLayout->type != ParallelPipedHexaEL_Type && elementLayout->dim == 2 ) {
+	if( ExtensionManager_GetHandle( self->feMesh->info, "vertexGrid" ) == (unsigned)-1 || 
+	    Mesh_GetDimSize( self->feMesh ) != 2 )
+	  {
 		Journal_Printf( eStream, "Warning: %s called on variable \"%s\", but this isn't stored on a "
-			"regular 2D (%s) mesh - so just returning.\n", __func__, self->name, ParallelPipedHexaEL_Type );
+			"regular 2D mesh - so just returning.\n", __func__, self->name );
 		return;
-	}	
-	
-	nx = bGeometry->size[I_AXIS];
-	ny = bGeometry->size[J_AXIS];
-	dx = elementLayout->elementLengthEachDim[I_AXIS];
-	dy = elementLayout->elementLengthEachDim[J_AXIS];
+	}
 
-	minLocalNodeX = hexaMD->_nodeOffsets[hexaMD->rank][I_AXIS];
-	minLocalNodeY = hexaMD->_nodeOffsets[hexaMD->rank][J_AXIS];
-	maxLocalNodeX = minLocalNodeX + hexaMD->nodeLocal3DCounts[hexaMD->rank][I_AXIS];
-	maxLocalNodeY = minLocalNodeY + hexaMD->nodeLocal3DCounts[hexaMD->rank][J_AXIS];
+	vertGrid = *(Grid**)ExtensionManager_Get( self->feMesh->info, self->feMesh, 
+					      ExtensionManager_GetHandle( self->feMesh->info, "vertexGrid" ) );
+	localOrigin = (unsigned*)ExtensionManager_Get( self->feMesh->info, self->feMesh, 
+						       ExtensionManager_GetHandle( self->feMesh->info, "localOrigin" ) );
+	localRange = (unsigned*)ExtensionManager_Get( self->feMesh->info, self->feMesh, 
+						      ExtensionManager_GetHandle( self->feMesh->info, "localRange" ) );
+
+	memcpy( inds, localOrigin, Mesh_GetDimSize( self->feMesh ) * sizeof(unsigned) );
+	insist( Mesh_GlobalToDomain( self->feMesh, MT_VERTEX, Grid_Project( vertGrid, inds ), &vertInd ) );
+	verts[0] = Mesh_GetVertex( self->feMesh, vertInd );
+	inds[0]++;
+	inds[1]++;
+	insist( Mesh_GlobalToDomain( self->feMesh, MT_VERTEX, Grid_Project( vertGrid, inds ), &vertInd ) );
+	verts[1] = Mesh_GetVertex( self->feMesh, vertInd );
+	
+	nx = vertGrid->sizes[0];
+	ny = vertGrid->sizes[1];
+	dx = verts[1][0] - verts[0][0];
+	dy = verts[1][1] - verts[0][1];
+
+
+
+	minLocalNodeX = localOrigin[0];
+	minLocalNodeY = localOrigin[1];
+	maxLocalNodeX = minLocalNodeX + localRange[0] + 1;
+	maxLocalNodeY = minLocalNodeY + localRange[1] + 1;
+
+	Mesh_GetGlobalCoordRange( self->feMesh, min, max );
 
 	Journal_Printf( stream, "display of Values in 2D box X:{%5.2f-%5.2f}, Y:{%5.2f-%5.2f}\n",
-		bGeometry->min[I_AXIS], bGeometry->max[I_AXIS],
-		bGeometry->min[J_AXIS], bGeometry->max[J_AXIS] );
+		min[I_AXIS], max[I_AXIS],
+		min[J_AXIS], max[J_AXIS] );
 	Journal_Printf( stream, "\twith %d elements in X (dx=%5.2f) and %d elements in Y (dy=%5.2f)\n\n",
 		nx-1, dx, ny-1, dy );
 
@@ -1090,7 +988,10 @@ void FeVariable_PrintLocalDiscreteValues_2dBox( void* variable, Stream* stream )
 			if ( ( y_I >= minLocalNodeY ) && ( y_I < maxLocalNodeY )
 				&& ( x_I >= minLocalNodeX ) && ( x_I < maxLocalNodeX ) ) {
 
-				node_lI = RegularMeshUtils_Node_Global3DToLocal1D( hexaMD, x_I, y_I, 0 );
+				inds[0] = x_I;
+				inds[1] = y_I;
+				node_lI = RegularMeshUtils_Node_3DTo1D( self->feMesh, inds );
+				insist( Mesh_GlobalToDomain( self->feMesh, MT_VERTEX, node_lI, &node_lI ) );
 				currNodeNumDofs = dofLayout->dofCounts[node_lI];
 
 				if ( currNodeNumDofs == 1 ) {
@@ -1125,14 +1026,9 @@ void FeVariable_PrintLocalDiscreteValues_2dBox( void* variable, Stream* stream )
 }
 
 
-Bool FeVariable_InterpolateDerivativesAt( void* variable, Coord globalCoord, double* value ) {
+Bool FeVariable_InterpolateDerivativesAt( void* variable, double* globalCoord, double* value ) {
 	FeVariable*	        self                 = (FeVariable*)variable;
-	MeshLayout*	        mLayout              = self->feMesh->layout;
-	ElementLayout*	    eLayout              = mLayout->elementLayout;
 	Element_DomainIndex	elementCoordIn       = (unsigned)-1;
-	Node_LocalIndex	    currElementNodeCount = 0;
-	Coord**			    globalNodeCoordPtrs  = NULL;
-	ElementType*		elementType          = NULL;
 	Coord               elLocalCoord         = {0,0,0};
 
 	/* Need a special rule for points on this processor's boundary: instead of the normal
@@ -1140,14 +1036,14 @@ Bool FeVariable_InterpolateDerivativesAt( void* variable, Coord globalCoord, dou
 	
 	/* locate which mesh element given coord is in : use inclusive upper boundaries to save
 		the need to use shadow space if possible */
-	elementCoordIn = Mesh_ElementWithPoint( self->feMesh, globalCoord, INCLUSIVE_UPPER_BOUNDARY );
-
-	if ( elementCoordIn >= self->feMesh->elementDomainCount ) {
+	if ( !Mesh_Algorithms_SearchElements( self->feMesh->algorithms, globalCoord, 
+					     &elementCoordIn ) )
+	{
 		/* If coord isn't inside domain elements list, bail out */
 		return False;
 	}	
 	else /* We found the coord is within a local or shadow element */ {
-		if ( elementCoordIn >= self->feMesh->elementLocalCount ) {
+		if ( elementCoordIn >= FeMesh_GetElementLocalSize( self->feMesh ) ) {
 			if ( False == self->shadowValuesSynchronised ) {
 				Stream* warningStr = Journal_Register( Error_Type, self->type );
 				Journal_Printf( warningStr, "Warning - in %s: user asking to interpolate derivatives "
@@ -1157,18 +1053,12 @@ Bool FeVariable_InterpolateDerivativesAt( void* variable, Coord globalCoord, dou
 				return False;	
 			}
 		}
-		/* convert global coordinate to local co-ordinates of element the coord is in */
-		currElementNodeCount = self->feMesh->elementNodeCountTbl[elementCoordIn];
-		globalNodeCoordPtrs = Memory_Alloc_Array( Coord*, currElementNodeCount, "globalNodeCoordPtrs" );
-		Mesh_GetNodeCoordPtrsOfElement( self->feMesh, elementCoordIn, globalNodeCoordPtrs );
 
-		elementType = FeMesh_ElementTypeAt( self->feMesh, elementCoordIn );
-		ElementType_ConvertGlobalCoordToElLocal( elementType, eLayout,
-			(const Coord**) globalNodeCoordPtrs, globalCoord, elLocalCoord );
+		/* convert global coordinate to local co-ordinates of element the coord is in */
+		FeMesh_CoordGlobalToLocal( self->feMesh, elementCoordIn, globalCoord, elLocalCoord );
 
 		/* Now interpolate the value at that coordinate, using shape functions */
 		FeVariable_InterpolateDerivativesToElLocalCoord( self, elementCoordIn, elLocalCoord, value );
-		Memory_Free( globalNodeCoordPtrs );
 	}	
 	
 	return True;
@@ -1176,7 +1066,7 @@ Bool FeVariable_InterpolateDerivativesAt( void* variable, Coord globalCoord, dou
 
 void FeVariable_InterpolateDerivativesToElLocalCoord( void* _feVariable, Element_DomainIndex lElement_I, Coord elLocalCoord, double* value ) {
 	FeVariable*    self             = (FeVariable*) _feVariable;
-	ElementType*            elementType      = FeMesh_ElementTypeAt( self->feMesh, lElement_I );
+	ElementType*            elementType      = FeMesh_GetElementType( self->feMesh, lElement_I );
 	Node_Index              elementNodeCount = elementType->nodeCount;
 	double**                GNx; 
 	double                  detJac;
@@ -1198,14 +1088,13 @@ void FeVariable_InterpolateDerivativesToElLocalCoord( void* _feVariable, Element
 
 void FeVariable_InterpolateDerivatives_WithGNx( void* _feVariable, Element_LocalIndex lElement_I, double** GNx, double* value ) {
 	FeVariable*             self        = (FeVariable*) _feVariable;
-	ElementType*            elementType = FeMesh_ElementTypeAt( self->feMesh, lElement_I );
 	Node_ElementLocalIndex  elLocalNode_I;
-	Node_ElementLocalIndex  elNodeCount = elementType->nodeCount;
 	Node_LocalIndex         lNode_I;
 	Dof_Index               dof_I;
 	Dof_Index               dofCount;
 	Variable*               dofVariable;
 	double                  nodeValue;
+	unsigned		nInc, *inc;
 	Dimension_Index         dim         = self->dim;
 
 	/* Gets number of degrees of freedom - assuming it is the same throughout the mesh */
@@ -1214,10 +1103,12 @@ void FeVariable_InterpolateDerivatives_WithGNx( void* _feVariable, Element_Local
 	/* Initialise */
 	memset( value, 0, sizeof( double ) * dofCount * dim );
 
+	FeMesh_GetElementNodes( self->feMesh, lElement_I, &nInc, &inc );
+
 	for ( dof_I = 0 ; dof_I < dofCount ; dof_I++ ) {
 		/* Interpolate derivative from nodes */
-		for ( elLocalNode_I = 0 ; elLocalNode_I < elNodeCount ; elLocalNode_I++) {
-			lNode_I      = self->feMesh->elementNodeTbl[ lElement_I ][ elLocalNode_I ];
+		for ( elLocalNode_I = 0 ; elLocalNode_I < nInc ; elLocalNode_I++) {
+			lNode_I      = inc[ elLocalNode_I ];
 			dofVariable  = DofLayout_GetVariable( self->dofLayout, lNode_I, dof_I );
 			nodeValue    = Variable_GetValueDouble( dofVariable, lNode_I );
 			
@@ -1228,142 +1119,71 @@ void FeVariable_InterpolateDerivatives_WithGNx( void* _feVariable, Element_Local
 		}
 	}
 }
-	
 
-void FeVariable_GetMinimumSeparation( void* feVariable, double* minSeparationPtr, double minSeparationEachDim[3] )
-{
-	FeVariable*            self = (FeVariable*) feVariable;
-	ParallelPipedHexaEL*   eLayout = (ParallelPipedHexaEL*) self->feMesh->layout->elementLayout;
-	FiniteElement_Mesh*    mesh = self->feMesh;
 
-	if ( Stg_Class_IsInstance( eLayout, ParallelPipedHexaEL_Type ) ) {
-		(*minSeparationPtr) = eLayout->elementLengthEachDim[I_AXIS];
-		minSeparationEachDim[I_AXIS] = eLayout->elementLengthEachDim[I_AXIS];
-		
-		if ( eLayout->elementLengthEachDim[J_AXIS] < *minSeparationPtr ) {
-			*minSeparationPtr = eLayout->elementLengthEachDim[J_AXIS];
-		}
-		minSeparationEachDim[J_AXIS] = eLayout->elementLengthEachDim[J_AXIS];
+void FeVariable_GetMinimumSeparation( void* feVariable, double* minSeparationPtr, double minSeparationEachDim[3] ) {
+	FeVariable*	self = (FeVariable*)feVariable;
 
-		if ( self->dim == 3 ) {
-			if ( eLayout->elementLengthEachDim[K_AXIS] < *minSeparationPtr ) {
-				*minSeparationPtr = eLayout->elementLengthEachDim[K_AXIS];
-			}
-			minSeparationEachDim[K_AXIS] = eLayout->elementLengthEachDim[K_AXIS];
-		}
-		else {
-			minSeparationEachDim[K_AXIS] = 0;
-		}
-	}
-	else if ( Stg_Class_IsInstance( eLayout, HexaEL_Type ) ) {
-		double              currElementSeparation[3] = {0,0,0};
-		double              currPairSeparation[3] = {0,0,0};
-		Element_LocalIndex  element_lI = 0;
+	assert( self && Stg_CheckType( self, FeVariable ) );
 
-		minSeparationEachDim[I_AXIS] = HUGE_VAL;
-		minSeparationEachDim[J_AXIS] = HUGE_VAL;
-		minSeparationEachDim[K_AXIS] = HUGE_VAL;
-		*minSeparationPtr = HUGE_VAL;
-
-		for ( element_lI = 0; element_lI < mesh->elementLocalCount; element_lI++ ) {
-			/* Axis 0 (I) */
-			currPairSeparation[0] = mesh->nodeCoord[mesh->elementNodeTbl[element_lI][1]][0]
-				- mesh->nodeCoord[mesh->elementNodeTbl[element_lI][0]][0];
-			currElementSeparation[0] = currPairSeparation[0];
-
-			currPairSeparation[0] = mesh->nodeCoord[mesh->elementNodeTbl[element_lI][2]][0]
-				- mesh->nodeCoord[mesh->elementNodeTbl[element_lI][3]][0];
-			if ( currPairSeparation[0] < currElementSeparation[0] ) {
-				currElementSeparation[0] = currPairSeparation[0];
-			}
-			
-			if ( self->dim == 3 ) {
-				currPairSeparation[0] = mesh->nodeCoord[mesh->elementNodeTbl[element_lI][5]][0]
-					- mesh->nodeCoord[mesh->elementNodeTbl[element_lI][4]][0];
-				if ( currPairSeparation[0] < currElementSeparation[0] ) {
-					currElementSeparation[0] = currPairSeparation[0];
-				}
-				currPairSeparation[0] = mesh->nodeCoord[mesh->elementNodeTbl[element_lI][6]][0]
-					- mesh->nodeCoord[mesh->elementNodeTbl[element_lI][7]][0];
-				if ( currPairSeparation[0] < currElementSeparation[0] ) {
-					currElementSeparation[0] = currPairSeparation[0];
-				}
-			}
-			if ( currElementSeparation[0] < minSeparationEachDim[0] ) {
-				minSeparationEachDim[0] = currElementSeparation[0];
-			}
-			/* Axis 1 (J) */
-			currPairSeparation[1] = mesh->nodeCoord[mesh->elementNodeTbl[element_lI][3]][1]
-				- mesh->nodeCoord[mesh->elementNodeTbl[element_lI][0]][1];
-			currElementSeparation[1] = currPairSeparation[1];
-
-			currPairSeparation[1] = mesh->nodeCoord[mesh->elementNodeTbl[element_lI][2]][1]
-				- mesh->nodeCoord[mesh->elementNodeTbl[element_lI][1]][1];
-			if ( currPairSeparation[1] < currElementSeparation[1] ) {
-				currElementSeparation[1] = currPairSeparation[1];
-			}
-			
-			if ( self->dim == 3 ) {
-				currPairSeparation[1] = mesh->nodeCoord[mesh->elementNodeTbl[element_lI][7]][1]
-					- mesh->nodeCoord[mesh->elementNodeTbl[element_lI][4]][1];
-				if ( currPairSeparation[1] < currElementSeparation[1] ) {
-					currElementSeparation[1] = currPairSeparation[1];
-				}
-				currPairSeparation[1] = mesh->nodeCoord[mesh->elementNodeTbl[element_lI][6]][1]
-					- mesh->nodeCoord[mesh->elementNodeTbl[element_lI][5]][1];
-				if ( currPairSeparation[1] < currElementSeparation[1] ) {
-					currElementSeparation[1] = currPairSeparation[1];
-				}
-			}
-			if ( currElementSeparation[1] < minSeparationEachDim[1] ) {
-				minSeparationEachDim[1] = currElementSeparation[1];
-			}
-			/* Axis 2 (K) */
-			if ( self->dim == 3 ) {
-				currPairSeparation[2] = mesh->nodeCoord[mesh->elementNodeTbl[element_lI][4]][2]
-					- mesh->nodeCoord[mesh->elementNodeTbl[element_lI][0]][2];
-				currElementSeparation[2] = currPairSeparation[2];
-
-				currPairSeparation[2] = mesh->nodeCoord[mesh->elementNodeTbl[element_lI][5]][2]
-					- mesh->nodeCoord[mesh->elementNodeTbl[element_lI][1]][2];
-				if ( currPairSeparation[2] < currElementSeparation[2] ) {
-					currElementSeparation[2] = currPairSeparation[2];
-				}
-			
-				currPairSeparation[2] = mesh->nodeCoord[mesh->elementNodeTbl[element_lI][7]][2]
-					- mesh->nodeCoord[mesh->elementNodeTbl[element_lI][3]][2];
-				if ( currPairSeparation[2] < currElementSeparation[2] ) {
-					currElementSeparation[2] = currPairSeparation[2];
-				}
-				currPairSeparation[2] = mesh->nodeCoord[mesh->elementNodeTbl[element_lI][6]][2]
-					- mesh->nodeCoord[mesh->elementNodeTbl[element_lI][2]][2];
-				if ( currPairSeparation[2] < currElementSeparation[2] ) {
-					currElementSeparation[2] = currPairSeparation[2];
-				}
-				if ( currElementSeparation[2] < minSeparationEachDim[2] ) {
-					minSeparationEachDim[2] = currElementSeparation[2];
-				}
-			}
-			else {
-				minSeparationEachDim[2] = 0;
-			}
-		}	
-		*minSeparationPtr = minSeparationEachDim[0];
-		*minSeparationPtr = minSeparationEachDim[1] < *minSeparationPtr ? minSeparationEachDim[1] : *minSeparationPtr;
-		if ( self->dim == 3 ) {
-			*minSeparationPtr = minSeparationEachDim[2] < *minSeparationPtr ? minSeparationEachDim[2] : *minSeparationPtr;
-		}
-	}
-	else  {
-		Stream*    errorStr = Journal_Register( Error_Type, self->type );
-		Journal_Firewall( 0, errorStr, "Error: in %s - Don't know how to find minSeparation for element type %s.\n",
-			__func__, eLayout->type );
-	}
+	Mesh_GetMinimumSeparation( self->feMesh, minSeparationPtr, minSeparationEachDim );
 }	
 
 
 void FeVariable_SyncShadowValues( void* feVariable ) {
-	FeVariable*			self = (FeVariable*)feVariable;
+	FeVariable*		self = (FeVariable*)feVariable;
+	DofLayout*		dofLayout;
+	Decomp_Sync*		vertSync;
+	Decomp_Sync_Array*	array;
+	unsigned		var_i;
+
+	assert( self );
+
+	/* Shortcuts. */
+	dofLayout = self->dofLayout;
+
+	/* Create a distributed array based on the mesh's vertices. */
+	vertSync = Mesh_GetSync( self->feMesh, MT_VERTEX );
+	array = Decomp_Sync_Array_New();
+	Decomp_Sync_Array_SetSync( array, vertSync );
+
+	/*
+	** For each variable in the dof layout, we need to create a distributed array and update
+	** shadow values.
+	*/
+
+	for( var_i = 0; var_i < dofLayout->_totalVarCount; var_i++ ) {
+		unsigned	varInd;
+		Variable*	var;
+		unsigned	field_i;
+
+		/* Get the variable. */
+		varInd = dofLayout->_varIndicesMapping[var_i];
+		var = Variable_Register_GetByIndex( dofLayout->_variableRegister, varInd );
+
+		/* Each field of the variable will need to be handled individually. */
+		for( field_i = 0; field_i < var->offsetCount; field_i++ ) {
+			unsigned	offs, size;
+			Stg_Byte	*arrayStart, *arrayEnd;
+
+			offs = var->offsets[field_i];
+			size = var->dataSizes[field_i];
+
+			arrayStart = (Stg_Byte*)var->arrayPtr + offs;
+			arrayEnd = arrayStart + var->structSize * FeMesh_GetNodeLocalSize( self->feMesh );
+			Decomp_Sync_Array_SetMemory( array, 
+						     arrayStart, arrayEnd, 
+						     var->structSize, var->structSize, 
+						     size );
+
+			Decomp_Sync_Array_Sync( array );
+		}
+	}
+
+	self->shadowValuesSynchronised = True;
+	FreeObject( array );
+
+#if 0
 	Neighbour_Index			nbr_I = 0;
 	Node_Index			node_stI = 0;
 	Node_DomainIndex		node_dI = 0;
@@ -1374,13 +1194,12 @@ void FeVariable_SyncShadowValues( void* feVariable ) {
 	double**			incomingDofValues = NULL;
 	MPI_Request**			incomingDofValRequests = NULL;
 	Node_Index			myShadowNodesOnThisNbrCount = 0;
-	Dof_Index			incomingDof_I;
-	Index*				outgoingDofTotals = NULL;			
-	double**			outgoingDofValues = NULL;
-	MPI_Request**			outgoingDofValRequests = NULL;
-	Node_Index			nbrShadowNodesOnMeCount = 0;
-	Dof_Index			outgoingDof_I;
-	FiniteElement_Mesh*		mesh = self->feMesh;
+	Dof_Index		incomingDof_I;
+	Index*			outgoingDofTotals = NULL;
+	double**		outgoingDofValues = NULL;
+	MPI_Request**		outgoingDofValRequests = NULL;
+	Node_Index		nbrShadowNodesOnMeCount = 0;
+	Dof_Index		outgoingDof_I;
 	MPI_Status			status;
 	int				incomingDofValueSetsYetToReceive;
 	Bool*				incomingDofValueSetsReceived;
@@ -1543,6 +1362,7 @@ void FeVariable_SyncShadowValues( void* feVariable ) {
 	Memory_Free( outgoingDofValRequests );
 	
 	Stream_UnIndent( self->debug );
+#endif
 }
 
 
@@ -1551,14 +1371,13 @@ void FeVariable_PrintDomainDiscreteValues( void* variable, Stream* stream ) {
 
 	Journal_Printf( stream, "In %s: for FeVariable \"%s\":\n", __func__, self->name );
 
-	_FeVariable_PrintLocalOrDomainValues( variable, self->feMesh->nodeDomainCount, stream );
+	_FeVariable_PrintLocalOrDomainValues( variable, FeMesh_GetNodeDomainSize( self->feMesh ), stream );
 }
 
 void FeVariable_PrintCoordsAndValues( void* _feVariable, Stream* stream ) {
 	FeVariable*         self            = (FeVariable*) _feVariable;
-	FiniteElement_Mesh* mesh            = self->feMesh;
 	Node_LocalIndex     node_I          = 0;
-	Node_LocalIndex     nodeLocalCount  = mesh->nodeLocalCount;
+	Node_LocalIndex     nodeLocalCount  = FeMesh_GetNodeLocalSize( self->feMesh );
 	Dof_Index           currNodeNumDofs;
 	Dof_Index           nodeLocalDof_I;
 	Variable*           currVariable;
@@ -1579,7 +1398,7 @@ void FeVariable_PrintCoordsAndValues( void* _feVariable, Stream* stream ) {
 		currNodeNumDofs = self->dofLayout->dofCounts[ node_I ];
 
 		/* Get Coordinate of Node */
-		nodeCoord = Mesh_CoordAt( mesh, node_I );
+		nodeCoord = Mesh_GetVertex( self->feMesh, node_I );
 		Journal_Printf( stream, "%12.6g   %12.6g   %12.6g   ", 
 				nodeCoord[ I_AXIS ], nodeCoord[ J_AXIS ], nodeCoord[ K_AXIS ] );
 		
@@ -1601,19 +1420,20 @@ void _FeVariable_InterpolateNodeValuesToElLocalCoord( void* feVariable, Element_
 	Dof_Index		nodeLocalDof_I=0;
 	Dof_Index		dofCountThisNode=0;
 	Node_ElementLocalIndex	elLocalNode_I=0;
-	Node_ElementLocalIndex	nodeCountThisElement=0;
 	double*			shapeFuncsEvaluatedAtCoord=NULL;
 	Node_LocalIndex		lNode_I=0;
 	Variable*		currVariable=NULL;
 	double			dofValueAtCurrNode=0;
+	unsigned		nInc, *inc;
 
-	nodeCountThisElement = self->feMesh->elementNodeCountTbl[element_lI];
+	FeMesh_GetElementNodes( self->feMesh, element_lI, &nInc, &inc );
+
 	/* Gets number of degrees of freedom - assuming it is the same throughout the mesh */
 	dofCountThisNode = self->dofLayout->dofCounts[lNode_I];
 
 	/* evaluate shape function values of current element at elLocalCoords */
-	elementType = FeMesh_ElementTypeAt( self->feMesh, element_lI );
-	shapeFuncsEvaluatedAtCoord = Memory_Alloc_Array_Unnamed( double, elementType->nodeCount );
+	elementType = FeMesh_GetElementType( self->feMesh, element_lI );
+	shapeFuncsEvaluatedAtCoord = AllocArray( double, nInc );
 	ElementType_EvaluateShapeFunctionsAt( elementType, elLocalCoord, shapeFuncsEvaluatedAtCoord );
 
 	for ( nodeLocalDof_I=0; nodeLocalDof_I < dofCountThisNode; nodeLocalDof_I++ ) {
@@ -1621,8 +1441,8 @@ void _FeVariable_InterpolateNodeValuesToElLocalCoord( void* feVariable, Element_
 	}
 
 	/* Now for each node, add that node's contribution at point */
-	for ( elLocalNode_I=0; elLocalNode_I < nodeCountThisElement; elLocalNode_I++ ) {
-		lNode_I = self->feMesh->elementNodeTbl[element_lI][elLocalNode_I];
+	for ( elLocalNode_I=0; elLocalNode_I < nInc; elLocalNode_I++ ) {
+		lNode_I = inc[elLocalNode_I];
 		
 		for ( nodeLocalDof_I=0; nodeLocalDof_I < dofCountThisNode; nodeLocalDof_I++ ) {
 			currVariable = DofLayout_GetVariable( self->dofLayout, lNode_I, nodeLocalDof_I );
@@ -1630,7 +1450,7 @@ void _FeVariable_InterpolateNodeValuesToElLocalCoord( void* feVariable, Element_
 			value[nodeLocalDof_I] += dofValueAtCurrNode * shapeFuncsEvaluatedAtCoord[elLocalNode_I];
 		}	
 	}
-	Memory_Free( shapeFuncsEvaluatedAtCoord );
+	FreeArray( shapeFuncsEvaluatedAtCoord );
 }
 
 
@@ -1644,7 +1464,7 @@ void _FeVariable_PrintLocalOrDomainValues( void* variable, Index localOrDomainCo
 	Variable*		currVariable;
 	
 	for( node_I=0; node_I < localOrDomainCount; node_I++ ) {
-		gNode_I = self->feMesh->nodeD2G[node_I];
+		gNode_I = FeMesh_NodeDomainToGlobal( self->feMesh, node_I );
 		Journal_Printf( stream, "node %d (global index %d):\n", node_I, gNode_I );
 		
 		currNodeNumDofs = self->fieldComponentCount;
@@ -1676,10 +1496,9 @@ double FeVariable_IntegrateElement_AxisIndependent(
 {
 	FeVariable*          self               = (FeVariable*)         feVariable;
 	Swarm*               swarm              = (Swarm*)              _swarm;
-	FiniteElement_Mesh*  feMesh             = self->feMesh;
-	FiniteElement_Mesh*  geometryMesh       = self->geometryMesh;
+	FeMesh*			feMesh             = self->feMesh;
+	FeMesh*			mesh;
 	ElementType*         elementType;
-	ElementType*         geometryElementType;
 	Cell_LocalIndex      cell_I;
 	Particle_InCellIndex cParticle_I;
 	Particle_InCellIndex cellParticleCount;
@@ -1692,8 +1511,11 @@ double FeVariable_IntegrateElement_AxisIndependent(
 	integral = 0.0;
 
 	/* Use feVariable's mesh as geometry mesh if one isn't passed in */
-	elementType = FeMesh_ElementTypeAt( feMesh, dElement_I );
-	geometryElementType = FeMesh_ElementTypeAt( geometryMesh, dElement_I );
+	if( Stg_Class_IsInstance( feMesh->algorithms, Mesh_CentroidAlgorithms_Type ) )
+		mesh = (FeMesh*)((Mesh_CentroidAlgorithms*)feMesh->algorithms)->elMesh;
+	else
+		mesh = feMesh;
+	elementType = FeMesh_GetElementType( mesh, dElement_I );
 
 	/* Determine number of particles in element */
 	cell_I = CellLayout_MapElementIdToCellId( swarm->cellLayout, dElement_I );
@@ -1709,7 +1531,7 @@ double FeVariable_IntegrateElement_AxisIndependent(
 
 		/* Calculate Determinant of Jacobian */
 		detJac = ElementType_JacobianDeterminant_AxisIndependent( 
-				geometryElementType, geometryMesh, dElement_I, particle->xi, dim, axis0, axis1, axis2 );
+				elementType, mesh, dElement_I, particle->xi, dim, axis0, axis1, axis2 );
 
 		/* Sum Integral */
 		integral += detJac * particle->weight * value;
@@ -1721,9 +1543,9 @@ double FeVariable_IntegrateElement_AxisIndependent(
 double FeVariable_Integrate( void* feVariable, void* _swarm ) {
 	FeVariable*          self               = (FeVariable*)         feVariable;
 	Swarm*               swarm              = (Swarm*)              _swarm;
-	FiniteElement_Mesh*  feMesh             = self->feMesh;
+	FeMesh*			feMesh             = self->feMesh;
 	Element_LocalIndex   lElement_I;
-	Element_LocalIndex   elementLocalCount  = feMesh->elementLocalCount;
+	Element_LocalIndex   elementLocalCount  = FeMesh_GetElementLocalSize( feMesh );
 	double               integral, integralGlobal;
 	
 	/* Initialise Summation of Integral */
@@ -1741,12 +1563,12 @@ double FeVariable_Integrate( void* feVariable, void* _swarm ) {
 
 double FeVariable_AverageTopLayer( void* feVariable, void* swarm, Axis layerAxis ) {
 	FeVariable*                self               = (FeVariable*)         feVariable;
-	FiniteElement_Mesh*        feMesh             = self->feMesh;
-	ElementLayout*             elementLayout      = feMesh->layout->elementLayout;
-	IJKTopology*               elementTopology    = (IJKTopology*) elementLayout->topology;
-	Index                      layerIndex         = elementTopology->size[ layerAxis ] - 1;
+	Grid*			elGrid;
 
-	return FeVariable_AverageLayer( self, swarm, layerAxis, layerIndex );
+	elGrid = *(Grid**)ExtensionManager_Get( self->feMesh->info, self->feMesh, 
+						ExtensionManager_GetHandle( self->feMesh->info, "elementGrid" ) );
+
+	return FeVariable_AverageLayer( self, swarm, layerAxis, elGrid->sizes[1] - 1 );
 }
 
 double FeVariable_AverageBottomLayer( void* feVariable, void* swarm, Axis layerAxis ) {
@@ -1760,19 +1582,52 @@ double FeVariable_AverageLayer( void* feVariable, void* swarm, Axis layerAxis, I
 	Axis                       aAxis              = ( layerAxis == I_AXIS ? J_AXIS : I_AXIS );
 	Axis                       bAxis              = ( layerAxis == K_AXIS ? J_AXIS : K_AXIS );
 	Dimension_Index            dim                = self->dim;
-	FiniteElement_Mesh*        feMesh             = self->feMesh;
-	BlockGeometry*             geometry           = (BlockGeometry*)feMesh->layout->elementLayout->geometry;
 	double                     integral;
 	double                     layerThickness     = 0.0;
+	double			sendThickness;
+	Grid*			vertGrid;
+	unsigned*		inds;
+	double			heights[2];
+	unsigned		localInd[2], globalInd[2];
+	double			*min, *max;
+	unsigned		d_i;
 	
 	integral = FeVariable_IntegrateLayer( self, swarm, layerAxis, layerIndex );
 
-	/* Calculate Layer Thickness */
-	layerThickness = ((ParallelPipedHexaEL*) feMesh->layout->elementLayout)->elementLengthEachDim[ layerAxis ];
+	/* Calculate layer thickness.  This assumes the mesh is regular. */
+	vertGrid = *(Grid**)ExtensionManager_Get( self->feMesh->info, self->feMesh, 
+						  ExtensionManager_GetHandle( self->feMesh->info, "vertexGrid" ) );
+	inds = Memory_Alloc_Array_Unnamed( unsigned, Mesh_GetDimSize( self->feMesh ) );
+	for( d_i = 0; d_i < Mesh_GetDimSize( self->feMesh ); d_i++ ) {
+		if( d_i != layerAxis )
+			inds[d_i] = 0;
+		else
+			inds[d_i] = layerIndex;
+	}
+	globalInd[0] = Grid_Project( vertGrid, inds );
+	inds[layerAxis]++;
+	globalInd[1] = Grid_Project( vertGrid, inds );
+	if( Mesh_GlobalToDomain( self->feMesh, MT_VERTEX, globalInd[0], &localInd[0] ) && 
+	    Mesh_GlobalToDomain( self->feMesh, MT_VERTEX, globalInd[1], &localInd[1] ) )
+	{
+		heights[0] = Mesh_GetVertex( self->feMesh, localInd[0] )[layerAxis];
+		heights[1] = Mesh_GetVertex( self->feMesh, localInd[1] )[layerAxis];
+		sendThickness = heights[1] - heights[0];
+	}
+	else {
+		sendThickness = 0.0;
+	}
+	MPI_Allreduce( &sendThickness, &layerThickness, 1, MPI_DOUBLE, MPI_MAX, self->communicator );
+	FreeArray( inds );
 
-	integral /= layerThickness * ( geometry->max[ aAxis ] - geometry->min[ aAxis ] );
+	min = Memory_Alloc_Array_Unnamed( double, Mesh_GetDimSize( self->feMesh ) );
+	max = Memory_Alloc_Array_Unnamed( double, Mesh_GetDimSize( self->feMesh ) );
+	Mesh_GetGlobalCoordRange( self->feMesh, min, max );
+	integral /= layerThickness * (max[aAxis] - min[aAxis]);
 	if ( dim == 3 )
-		integral /= geometry->max[ bAxis ] - geometry->min[ bAxis ];
+		integral /= max[ bAxis ] - min[ bAxis ];
+	FreeArray( min );
+	FreeArray( max );
 
 	return integral;
 }
@@ -1785,53 +1640,38 @@ double FeVariable_IntegrateLayer_AxisIndependent(
 { 
 	FeVariable*                self               = (FeVariable*)         feVariable;
 	Swarm*                     swarm              = (Swarm*)              _swarm;
-	FiniteElement_Mesh*        feMesh             = self->feMesh;
-	ElementLayout*             elementLayout      = feMesh->layout->elementLayout;
-	IJKTopology*               elementTopology    = (IJKTopology*) elementLayout->topology;
 	Element_LocalIndex         lElement_I;
 	Element_GlobalIndex        gElement_I;
 	IJK                        elementIJK;
-	Element_LocalIndex         elementLocalCount  = feMesh->elementLocalCount;
 	double                     elementIntegral;
 	double                     integral;
 	double                     integralGlobal;
-	Bool                       elementG2LBuiltTemporarily = False;
 
 	Journal_DPrintf( self->debug, "In %s() for FeVariable \"%s\":\n", __func__, self->name );
-
-	/* Modification: build the temporary global tables for speed here. Important for parallel runs. */
-	if ( (self->feMesh->buildTemporaryGlobalTables == True) && (self->feMesh->elementG2L == 0) ) {
-		self->feMesh->elementG2L = MeshDecomp_BuildElementGlobalToLocalMap( self->feMesh->layout->decomp );
-		elementG2LBuiltTemporarily = True;
-	}
 
 	/* Initialise Sumation of Integral */
 	integral = 0.0;
 
 	Stream_Indent( self->debug );
-	for ( gElement_I = 0 ; gElement_I < feMesh->elementGlobalCount ; gElement_I++ ) {
-		IJK_1DTo3D( elementTopology, gElement_I, elementIJK );
+	for ( gElement_I = 0 ; gElement_I < FeMesh_GetElementGlobalSize( self->feMesh ); gElement_I++ ) {
+		RegularMeshUtils_Element_1DTo3D( self->feMesh, gElement_I, elementIJK );
 
 		/* Check if element is in layer plane */
 		if ( elementIJK[ layerAxis ] != layerIndex )
 			continue;
 
 		/* Check if element is local */
-		lElement_I = Mesh_ElementMapGlobalToLocal( self->feMesh, gElement_I );
-
-		if ( lElement_I >= elementLocalCount ) 
+		if( !FeMesh_ElementGlobalToDomain( self->feMesh, gElement_I, &lElement_I ) || 
+		    lElement_I >= FeMesh_GetElementLocalSize( self->feMesh ) )
+		{
 			continue;
+		}
 
 		elementIntegral = FeVariable_IntegrateElement_AxisIndependent( self, swarm, lElement_I, dim, axis0, axis1, axis2 );
 		Journal_DPrintfL( self->debug, 2, "Integral of element %d was %f\n", lElement_I, elementIntegral );
 		integral += elementIntegral;
 	}
 	Stream_UnIndent( self->debug );
-
-	if ( elementG2LBuiltTemporarily ) {
-		Memory_Free( self->feMesh->elementG2L );
-		self->feMesh->elementG2L = NULL;
-	}
 
 
 	/* Gather and sum integrals from other processors */
@@ -1848,27 +1688,25 @@ double FeVariable_AveragePlane( void* feVariable, Axis planeAxis, double planeHe
 	Axis                       aAxis              = ( planeAxis == I_AXIS ? J_AXIS : I_AXIS );
 	Axis                       bAxis              = ( planeAxis == K_AXIS ? J_AXIS : K_AXIS );
 	Dimension_Index            dim                = self->dim;
-	BlockGeometry*             geometry           = (BlockGeometry*) self->feMesh->layout->elementLayout->geometry;
+	double				min[3], max[3];
 	
 	integral = FeVariable_IntegratePlane( self, planeAxis, planeHeight );
 
-	integral /= geometry->max[ aAxis ] - geometry->min[ aAxis ];
+	Mesh_GetGlobalCoordRange( self->feMesh, min, max );
+
+	integral /= max[ aAxis ] - min[ aAxis ];
 	if ( dim == 3 )
-		integral /= geometry->max[ bAxis ] - geometry->min[ bAxis ];
+		integral /= max[ bAxis ] - min[ bAxis ];
 
 	return integral;
 }
 
 double FeVariable_IntegratePlane( void* feVariable, Axis planeAxis, double planeHeight ) {
 	FeVariable*                self               = (FeVariable*)         feVariable;
-	FiniteElement_Mesh*        feMesh             = self->feMesh;
-	MeshDecomp*                meshDecomp         = feMesh->layout->decomp;
-	ElementLayout*             elementLayout      = feMesh->layout->elementLayout;
-	IJKTopology*               elementTopology    = (IJKTopology*) elementLayout->topology;
 	IJK                        planeIJK;
 	Element_LocalIndex         lElement_I;
 	Element_GlobalIndex        gElement_I;
-	Element_LocalIndex         elementLocalCount  = feMesh->elementLocalCount;
+	Element_LocalIndex         elementLocalCount  = FeMesh_GetElementLocalSize( self->feMesh );
 	Axis                       aAxis              = ( planeAxis == I_AXIS ? J_AXIS : I_AXIS );
 	Axis                       bAxis              = ( planeAxis == K_AXIS ? J_AXIS : K_AXIS );
 	double                     integral;
@@ -1883,9 +1721,6 @@ double FeVariable_IntegratePlane( void* feVariable, Axis planeAxis, double plane
 	/* Plane location stuff */
 	double                     storedXi_J_AXIS;
 	Coord                      planeCoord;
-	Element_NodeIndex          elementNodeCount;
-	Coord**                    globalNodeCoordPtrs;
-	ElementType*               elementType;
 	double                     planeXi           = -1;
 	double                     planeXiGlobal;
 	Index                      planeLayer        = 0;
@@ -1893,27 +1728,21 @@ double FeVariable_IntegratePlane( void* feVariable, Axis planeAxis, double plane
 	Particle_InCellIndex       particlesPerDim[] = {2,2,2};
 
 	/* Find Elements which plane cuts through */
-	memcpy( planeCoord, Mesh_CoordAt( feMesh, 0 ), sizeof( Coord ) );
+	memcpy( planeCoord, Mesh_GetVertex( self->feMesh, 0 ), sizeof( Coord ) );
 	planeCoord[ planeAxis ] = planeHeight;
-	lElement_I = elementLayout->elementWithPoint( elementLayout, meshDecomp, planeCoord, feMesh, 
-						      EXCLUSIVE_UPPER_BOUNDARY, 0, NULL );
 
-	if ( lElement_I < elementLocalCount ) {
-		Coord planeXiCoord;
-		gElement_I = _MeshDecomp_Element_LocalToGlobal1D( meshDecomp, lElement_I );
-		IJK_1DTo3D( elementTopology, gElement_I, planeIJK );
+	if( Mesh_Algorithms_SearchElements( self->feMesh->algorithms, planeCoord, &lElement_I ) && 
+	    lElement_I < elementLocalCount )
+	{
+		Coord		planeXiCoord;
+
+		gElement_I = FeMesh_ElementDomainToGlobal( self->feMesh, lElement_I );
+		RegularMeshUtils_Element_1DTo3D( self->feMesh, gElement_I, planeIJK );
 		planeLayer = planeIJK[ planeAxis ];
 		
 		/* Find Local Coordinate of plane */
-		elementNodeCount = feMesh->elementNodeCountTbl[lElement_I];
-		globalNodeCoordPtrs = Memory_Alloc_Array( Coord*, elementNodeCount, "globalNodeCoordPtrs" );
-		Mesh_GetNodeCoordPtrsOfElement( feMesh, lElement_I, globalNodeCoordPtrs );
-
-		elementType = FeMesh_ElementTypeAt( feMesh, lElement_I );
-		ElementType_ConvertGlobalCoordToElLocal( elementType, elementLayout,
-			(const Coord**) globalNodeCoordPtrs, planeCoord, planeXiCoord );
+		FeMesh_CoordGlobalToLocal( self->feMesh, lElement_I, planeCoord, planeXiCoord );
 		planeXi = planeXiCoord[ planeAxis ];
-		Memory_Free( globalNodeCoordPtrs );
 	}
 	
 	/* Should be broadcast */
@@ -2016,9 +1845,13 @@ void FeVariable_SaveNodalValuesToFile_StgFEM_Native( void* feVariable, const cha
 	double             variableValues[MAX_FIELD_COMPONENTS];	
 	const int          FINISHED_WRITING_TAG = 100;
 	int                confirmation = 0;
-	int                myRank = self->feMesh->layout->decomp->rank; 
+	MPI_Comm	comm = CommTopology_GetComm( Mesh_GetCommTopology( self->feMesh, MT_VERTEX ) );
+	int                myRank;
+	int                nProcs;
 	MPI_Status         status;
-	MPI_Comm           comm = self->feMesh->layout->decomp->communicator;
+
+	MPI_Comm_size( comm, (int*)&nProcs );
+	MPI_Comm_rank( comm, (int*)&myRank );
 	
 	/*                                                prefix             self->name       . 00000 .  dat \0 */
 	filename = Memory_Alloc_Array_Unnamed( char, strlen(prefixStr) + strlen(self->name) + 1 + 5 + 1 + 3 + 1 );
@@ -2039,11 +1872,17 @@ void FeVariable_SaveNodalValuesToFile_StgFEM_Native( void* feVariable, const cha
 	/* Note: assumes same number of dofs at each node */
 	dofAtEachNodeCount = self->fieldComponentCount;
 
-	for ( lNode_I = 0; lNode_I < self->feMesh->nodeLocalCount; lNode_I++ ) {
-		gNode_I = self->feMesh->nodeL2G[lNode_I];
+	for ( lNode_I = 0; lNode_I < FeMesh_GetNodeLocalSize( self->feMesh ); lNode_I++ ) {
+		gNode_I = FeMesh_NodeDomainToGlobal( self->feMesh, lNode_I );
 		fprintf( outputFile, "%u ", gNode_I );
-		coord = self->feMesh->nodeCoord[lNode_I];
-		fprintf( outputFile, "%.15g %.15g %.15g ", coord[0], coord[1], coord[2] );
+		coord = Mesh_GetVertex( self->feMesh, lNode_I );
+                if(self->dim==2)
+                  fprintf( outputFile, "%.15g %.15g 0 ", coord[0],
+                           coord[1]);
+                else
+                  fprintf( outputFile, "%.15g %.15g %.15g ", coord[0],
+                           coord[1], coord[2] );
+                  
 		FeVariable_GetValueAtNode( self, lNode_I, variableValues );
 		for ( dof_I = 0; dof_I < dofAtEachNodeCount; dof_I++ ) {
 			fprintf( outputFile, "%.15g ", variableValues[dof_I] );
@@ -2054,7 +1893,7 @@ void FeVariable_SaveNodalValuesToFile_StgFEM_Native( void* feVariable, const cha
 	fclose( outputFile );
 	
 	/* send go-ahead from process ranked lower than me, to avoid competition writing to file */
-	if ( myRank != (self->feMesh->layout->decomp->nproc-1) ) {
+	if ( myRank != nProcs - 1 ) {
 		MPI_Ssend( &confirmation, 1, MPI_INT, myRank + 1, FINISHED_WRITING_TAG, comm );
 	}	
 	
@@ -2077,6 +1916,9 @@ void FeVariable_ReadFromFile( void* feVariable, const char* prefixStr, unsigned 
 							self->importFormatType );
 		assert( importExportInfo );
 		importExportInfo->readNodalValuesFromFile( feVariable, prefixStr, timeStep );
+
+		/* Need to re-sync the values. */
+		FeVariable_SyncShadowValues( self );
 	}
 }
 
@@ -2095,14 +1937,15 @@ void FeVariable_ReadNodalValuesFromFile_StgFEM_Native( void* feVariable, const c
 	const unsigned int MAX_LINE_LENGTH = MAX_LINE_LENGTH_DEFINE;
 	Processor_Index    proc_I=0;
 	Dimension_Index    dim_I=0;
-	BlockGeometry*     geometry = (BlockGeometry*)self->feMesh->layout->elementLayout->geometry;
 	Coord              localGeometryMin;
 	Coord              localGeometryMax;
-	Bool               nodeG2LBuiltTemporarily = False;
-	
-	/* Necessary for now since we need to update the geometry min and max - see comment below */
-	geometry = Stg_CheckType( geometry, BlockGeometry );
+	MPI_Comm	comm = CommTopology_GetComm( Mesh_GetCommTopology( self->feMesh, MT_VERTEX ) );
+	unsigned		rank;
+	unsigned		nProcs;
 
+	MPI_Comm_rank( comm, (int*)&rank );
+	MPI_Comm_size( comm, (int*)&nProcs );
+	
 	/*                                                prefix            self->name        . 00000 .  dat \0 */
 	filename = Memory_Alloc_Array_Unnamed( char, strlen(prefixStr) + strlen(self->name) + 1 + 5 + 1 + 3 + 1 );
 	sprintf( filename, "%s%s.%.5u.dat", prefixStr, self->name, timeStep );
@@ -2111,10 +1954,9 @@ void FeVariable_ReadNodalValuesFromFile_StgFEM_Native( void* feVariable, const c
 	
 	/* This loop used to stop 2 processors trying to open the file at the same time, which
 	  * seems to cause problems */
-	for ( proc_I = 0; proc_I < self->feMesh->layout->decomp->nproc; proc_I++ ) {
-		MPI_Barrier( self->feMesh->layout->decomp->communicator );
-
-		if ( proc_I == self->feMesh->layout->decomp->rank ) {	
+	for ( proc_I = 0; proc_I < nProcs; proc_I++ ) {
+		MPI_Barrier( comm );
+		if ( proc_I == rank ) {
 			/* Do the following since in parallel on some systems, the file
 			 * doesn't get re-opened at the start automatically. */
 			inputFile = fopen( filename, "r" );
@@ -2140,27 +1982,23 @@ void FeVariable_ReadNodalValuesFromFile_StgFEM_Native( void* feVariable, const c
 		localGeometryMax[dim_I] = -HUGE_VAL;
 	}
 
-	/* Modification: build the temporary global tables for speed here. Important for parallel runs. */
-	if ( (self->feMesh->buildTemporaryGlobalTables == True) && (self->feMesh->nodeG2L == 0) ) {
-		self->feMesh->nodeG2L = MeshDecomp_BuildNodeGlobalToLocalMap( self->feMesh->layout->decomp );
-		nodeG2LBuiltTemporarily = True;
-	}
-
 	while ( !feof(inputFile) ) {
 		fscanf( inputFile, "%u ", &gNode_I );
-		lNode_I = Mesh_NodeMapGlobalToLocal( self->feMesh, gNode_I );
-		if ( lNode_I != Mesh_Node_Invalid( self->feMesh ) ) {
+		if( FeMesh_NodeGlobalToDomain( self->feMesh, gNode_I, &lNode_I ) && 
+		    lNode_I < FeMesh_GetNodeLocalSize( self->feMesh ) )
+		{
 			/* Note: until we have proper mesh geometry, topology etc checkpointing, we re-load the 
 			node co-ords from the feVariable file - and also update the geometry */
-			fscanf( inputFile, "%lg %lg %lg ", &self->feMesh->nodeCoord[lNode_I][0], &self->feMesh->nodeCoord[lNode_I][1],
-				&self->feMesh->nodeCoord[lNode_I][2] );
+			fscanf( inputFile, "%lg %lg %lg ", Mesh_GetVertex( self->feMesh, lNode_I ), 
+				Mesh_GetVertex( self->feMesh, lNode_I ) + 1, 
+				Mesh_GetVertex( self->feMesh, lNode_I ) + 2 );
 
 			for ( dim_I = 0; dim_I < 3; dim_I++ ) {
-				if ( self->feMesh->nodeCoord[lNode_I][dim_I] < localGeometryMin[dim_I] ) {
-					localGeometryMin[dim_I] = self->feMesh->nodeCoord[lNode_I][dim_I];
+				if ( Mesh_GetVertex( self->feMesh, lNode_I )[dim_I] < localGeometryMin[dim_I] ) {
+					localGeometryMin[dim_I] = Mesh_GetVertex( self->feMesh, lNode_I )[dim_I];
 				}
-				else if ( self->feMesh->nodeCoord[lNode_I][dim_I] > localGeometryMax[dim_I] ) {
-					localGeometryMax[dim_I] = self->feMesh->nodeCoord[lNode_I][dim_I];
+				else if ( Mesh_GetVertex( self->feMesh, lNode_I )[dim_I] > localGeometryMax[dim_I] ) {
+					localGeometryMax[dim_I] = Mesh_GetVertex( self->feMesh, lNode_I )[dim_I];
 				}
 			}
 			
@@ -2174,27 +2012,4 @@ void FeVariable_ReadNodalValuesFromFile_StgFEM_Native( void* feVariable, const c
 		}
 	}
 	fclose( inputFile );
-
-	if ( nodeG2LBuiltTemporarily ) {
-		Memory_Free( self->feMesh->nodeG2L );
-		self->feMesh->nodeG2L = NULL;
-	}
-
-	/* Note: this is a bit of a hack - we really should be loading the mesh from a separate checkpoint file
-	anyway - but for now, we'll just check that its a CornerNL type eg velocity, since BodyNL node points
-	are at the centroids, and would hence stuff the Geometry object */
-	if ( self->feMesh->layout->nodeLayout->type == CornerNL_Type ) {
-		/* TODO: separate into re-usable function */
-		/* Since we could be loading in parallel, need to find global min and max of geometry */
-		for ( dim_I = 0; dim_I < 3; dim_I++ ) {
-			MPI_Allreduce( localGeometryMin, geometry->min, 3, MPI_DOUBLE, MPI_MIN, 
-				self->feMesh->layout->decomp->communicator );
-			MPI_Allreduce( localGeometryMax, geometry->max, 3, MPI_DOUBLE, MPI_MAX, 
-				self->feMesh->layout->decomp->communicator );
-		}
-	}
-
-	if ( Stg_Class_IsInstance( self->feMesh->layout->elementLayout, ParallelPipedHexaEL_Type ) ) {
-		ParallelPipedHexaEL_UpdateGeometryPartitionInfo( self->feMesh->layout->elementLayout, self->feMesh->layout->decomp );
-	}
 }

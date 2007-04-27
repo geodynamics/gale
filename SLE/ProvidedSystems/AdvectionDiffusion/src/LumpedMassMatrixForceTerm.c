@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: LumpedMassMatrixForceTerm.c 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: LumpedMassMatrixForceTerm.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -187,14 +187,18 @@ void _LumpedMassMatrixForceTerm_Destroy( void* forceTerm, void* data ) {
 void _LumpedMassMatrixForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVector ,Element_LocalIndex lElement_I, double* elForceVector ) {
 	LumpedMassMatrixForceTerm* self              = Stg_CheckType( forceTerm, LumpedMassMatrixForceTerm );
 	FeVariable*                feVariable        = forceVector->feVariable;
-	FiniteElement_Mesh*        mesh              = feVariable->feMesh;
-		
+	FeMesh*				feMesh              = feVariable->feMesh;
+
+#if 0
 	if ( Stg_Class_IsInstance( mesh->layout->elementLayout, ParallelPipedHexaEL_Type ) ) {
 		ForceTerm_SetAssembleElementFunction( self, _LumpedMassMatrixForceTerm_AssembleElement_Box  );
 	}
 	else {
+#endif
 		ForceTerm_SetAssembleElementFunction( self, _LumpedMassMatrixForceTerm_AssembleElement_General  );
+#if 0
 	}
+#endif
 
 	ForceTerm_AssembleElement( self, forceVector, lElement_I, elForceVector );
 }
@@ -204,9 +208,8 @@ void _LumpedMassMatrixForceTerm_AssembleElement_General( void* forceTerm, ForceV
 	FeVariable*                feVariable        = forceVector->feVariable;
 	Dimension_Index            dim               = forceVector->dim;
 	Swarm*                     swarm             = self->integrationSwarm;
-	FiniteElement_Mesh*        mesh              = feVariable->feMesh;
-	Element_NodeIndex          elementNodeCount  = mesh->elementNodeCountTbl[ lElement_I ];
-	ElementType*               elementType       = FeMesh_ElementTypeAt( mesh, lElement_I );
+	FeMesh*				feMesh              = feVariable->feMesh;
+	ElementType*               elementType       = FeMesh_GetElementType( feMesh, lElement_I );
 	Cell_Index                 cell_I            = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
 	Particle_InCellIndex       cellParticleCount;
 	Particle_InCellIndex       cParticle_I;
@@ -216,7 +219,9 @@ void _LumpedMassMatrixForceTerm_AssembleElement_General( void* forceTerm, ForceV
 	double                     factor;
 	double                     detJac;
 	double                     shapeFunc[8];
+	unsigned			elementNodeCount;
 
+	elementNodeCount = FeMesh_GetElementNodeSize( feMesh, lElement_I );
 	cellParticleCount = swarm->cellParticleCountTbl[ cell_I ];
 	
 	for( cParticle_I = 0 ; cParticle_I < cellParticleCount; cParticle_I++ ) {
@@ -225,7 +230,7 @@ void _LumpedMassMatrixForceTerm_AssembleElement_General( void* forceTerm, ForceV
 
 		/* Evalutate Shape Functions and Jacobian Determinant */
 		ElementType_EvaluateShapeFunctionsAt( elementType, particle->xi, shapeFunc );
-		detJac = ElementType_JacobianDeterminant( elementType, mesh, lElement_I, particle->xi, dim );
+		detJac = ElementType_JacobianDeterminant( elementType, feMesh, lElement_I, particle->xi, dim );
 	
 		/* Integrate \int_{\Omgea} N_i N_i d\Omega and lump onto vector in one step */
 		factor = detJac * particle->weight;
@@ -239,14 +244,17 @@ void _LumpedMassMatrixForceTerm_AssembleElement_General( void* forceTerm, ForceV
 void _LumpedMassMatrixForceTerm_AssembleElement_Box( void* forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elForceVector ) {
 	FeVariable*                feVariable        = forceVector->feVariable;
 	Dimension_Index            dim               = forceVector->dim;
-	FiniteElement_Mesh*        mesh              = feVariable->feMesh;
-	Element_NodeIndex          elementNodeCount  = mesh->elementNodeCountTbl[ lElement_I ];
-	ElementType*               elementType       = FeMesh_ElementTypeAt( mesh, lElement_I );
+	FeMesh*			feMesh              = feVariable->feMesh;
+	Element_NodeIndex          elementNodeCount;
+	ElementType*               elementType;
 	Node_Index                 node_I;
 	double                     detJac;
 	Coord                      xi = {0.0,0.0,0.0};
+
+	elementNodeCount = FeMesh_GetElementNodeSize( feMesh, lElement_I );
+	elementType = FeMesh_GetElementType( feMesh, lElement_I );
 	
-	detJac = ElementType_JacobianDeterminant( elementType, mesh, lElement_I, xi, dim );
+	detJac = ElementType_JacobianDeterminant( elementType, feMesh, lElement_I, xi, dim );
 	for ( node_I = 0 ; node_I < elementNodeCount ; node_I++ ) 
 		elForceVector[ node_I ] = detJac;
 }

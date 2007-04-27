@@ -7,41 +7,40 @@
 	<!-- TemperatureField Stuff -->
 	<struct name="components" mergeType="merge">
 		<struct name="temperature">
-			<param name="Type">Variable</param>
-			<param name="Rank">Scalar</param>
-			<param name="Dependency">decomp-linear</param>
-			<param name="DataType">Double</param>
-			<param name="Count">decomp-linear-nodeDomainCount</param>
+			<param name="Type"> MeshVariable </param>
+			<param name="Rank"> Scalar </param>
+			<param name="DataType"> Double </param>
+			<param name="mesh"> temperatureMesh </param>
 		</struct>
 		<struct name="temperatureBCs">
-			<param name="Type">CompositeVC</param>
-			<param name="Data">mesh-linear</param>
+			<param name="Type"> CompositeVC </param>
+			<param name="Data"> temperatureMesh </param>
 		</struct>
 		<struct name="temperatureICs">
-			<param name="Type">CompositeVC</param>
-			<param name="Data">mesh-linear</param>
-		</struct>		
+			<param name="Type"> CompositeVC </param>
+			<param name="Data"> temperatureMesh </param>
+		</struct>
 		<struct name="temperatureDofLayout">
-			<param name="Type">DofLayout</param>
-			<param name="Count">decomp-linear-nodeDomainCount</param>
+			<param name="Type"> DofLayout </param>
+			<param name="mesh"> temperatureMesh </param>
 			<list name="BaseVariables">
 				<param>temperature</param>
 			</list>
-		</struct>		
+		</struct>
 		<struct name="TemperatureField">
-			<param name="Type">FeVariable</param>
-			<param name="FEMesh">mesh-linear</param>
-			<param name="DofLayout">temperatureDofLayout</param>
-			<param name="BC">temperatureBCs</param>
-			<param name="IC">temperatureICs</param>
-			<param name="LinkedDofInfo">temperatureLinkedDofs</param>
+			<param name="Type"> FeVariable </param>
+			<param name="FEMesh"> temperatureMesh </param>
+			<param name="DofLayout"> temperatureDofLayout </param>
+			<param name="BC"> temperatureBCs </param>
+			<param name="IC"> temperatureICs </param>
+			<param name="LinkedDofInfo"> temperatureLinkedDofs </param>
 		</struct>
 
 		<!-- Standard Operators on velocity field -->
 		<struct name="TemperatureGradientsField"> 
-			<param name="Type">OperatorFeVariable</param>
-			<param name="Operator">Gradient</param>
-			<param name="FeVariable">TemperatureField</param>
+			<param name="Type"> OperatorFeVariable </param>
+			<param name="Operator"> Gradient </param>
+			<param name="FeVariable"> TemperatureField </param>
 		</struct>	
 	</struct>
 

@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: TrilinearElementType.c 654 2006-10-12 08:58:49Z SteveQuenette $
+** $Id: TrilinearElementType.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -127,11 +127,25 @@ void _TrilinearElementType_Init( TrilinearElementType* self ) {
 		self->elLocalLength[dim_I] = self->maxElLocalCoord[dim_I] - self->minElLocalCoord[dim_I];
 	}
 
+	/* Set up the tetrahedral indices. */
+	self->tetInds = Memory_Alloc_2DArray( unsigned, 10, 4, "Mesh_HexType::tetInds" );
+	self->tetInds[0][0] = 0; self->tetInds[0][1] = 1; self->tetInds[0][2] = 2; self->tetInds[0][3] = 4;
+	self->tetInds[1][0] = 1; self->tetInds[1][1] = 2; self->tetInds[1][2] = 3; self->tetInds[1][3] = 7;
+	self->tetInds[2][0] = 1; self->tetInds[2][1] = 4; self->tetInds[2][2] = 5; self->tetInds[2][3] = 7;
+	self->tetInds[3][0] = 2; self->tetInds[3][1] = 4; self->tetInds[3][2] = 6; self->tetInds[3][3] = 7;
+	self->tetInds[4][0] = 1; self->tetInds[4][1] = 2; self->tetInds[4][2] = 4; self->tetInds[4][3] = 7;
+	self->tetInds[5][0] = 0; self->tetInds[5][1] = 1; self->tetInds[5][2] = 3; self->tetInds[5][3] = 5;
+	self->tetInds[6][0] = 0; self->tetInds[6][1] = 4; self->tetInds[6][2] = 5; self->tetInds[6][3] = 6;
+	self->tetInds[7][0] = 0; self->tetInds[7][1] = 2; self->tetInds[7][2] = 3; self->tetInds[7][3] = 6;
+	self->tetInds[8][0] = 3; self->tetInds[8][1] = 5; self->tetInds[8][2] = 6; self->tetInds[8][3] = 7;
+	self->tetInds[9][0] = 0; self->tetInds[9][1] = 3; self->tetInds[9][2] = 5; self->tetInds[9][3] = 6;
 }
 
 void _TrilinearElementType_Delete( void* elementType ) {
 	TrilinearElementType* self = (TrilinearElementType*)elementType;
 	Journal_DPrintf( self->debug, "In %s\n", __func__ );
+
+	FreeArray( self->tetInds );
 	
 	/* Stg_Class_Delete parent*/
 	_ElementType_Delete( self );
@@ -227,13 +241,13 @@ void _TrilinearElementType_SF_allNodes( void* elementType, const double localCoo
 	zeta = localCoord[2];	
 	
 	evaluatedValues[0] = 0.125*( 1.0-xi )*( 1.0-eta )*( 1.0-zeta );
-	evaluatedValues[3] = 0.125*( 1.0-xi )*( 1.0+eta )*( 1.0-zeta );
-	evaluatedValues[2] = 0.125*( 1.0+xi )*( 1.0+eta )*( 1.0-zeta );
+	evaluatedValues[2] = 0.125*( 1.0-xi )*( 1.0+eta )*( 1.0-zeta );
+	evaluatedValues[3] = 0.125*( 1.0+xi )*( 1.0+eta )*( 1.0-zeta );
 	evaluatedValues[1] = 0.125*( 1.0+xi )*( 1.0-eta )*( 1.0-zeta );
 	
 	evaluatedValues[4] = 0.125*( 1.0-xi )*( 1.0-eta )*( 1.0+zeta );
-	evaluatedValues[7] = 0.125*( 1.0-xi )*( 1.0+eta )*( 1.0+zeta );
-	evaluatedValues[6] = 0.125*( 1.0+xi )*( 1.0+eta )*( 1.0+zeta );
+	evaluatedValues[6] = 0.125*( 1.0-xi )*( 1.0+eta )*( 1.0+zeta );
+	evaluatedValues[7] = 0.125*( 1.0+xi )*( 1.0+eta )*( 1.0+zeta );
 	evaluatedValues[5] = 0.125*( 1.0+xi )*( 1.0-eta )*( 1.0+zeta );
 }
 
@@ -249,107 +263,65 @@ void _TrilinearElementType_SF_allLocalDerivs_allNodes( void* elementType, const 
 	
 	/* derivatives wrt xi */
 	evaluatedDerivatives[0][0] = - 0.125*( 1.0-eta )*( 1.0-zeta );
-	evaluatedDerivatives[0][3] = - 0.125*( 1.0+eta )*( 1.0-zeta );
-	evaluatedDerivatives[0][2] =   0.125*( 1.0+eta )*( 1.0-zeta );
+	evaluatedDerivatives[0][2] = - 0.125*( 1.0+eta )*( 1.0-zeta );
+	evaluatedDerivatives[0][3] =   0.125*( 1.0+eta )*( 1.0-zeta );
 	evaluatedDerivatives[0][1] =   0.125*( 1.0-eta )*( 1.0-zeta );
 	evaluatedDerivatives[0][4] = - 0.125*( 1.0-eta )*( 1.0+zeta );
-	evaluatedDerivatives[0][7] = - 0.125*( 1.0+eta )*( 1.0+zeta );
-	evaluatedDerivatives[0][6] =   0.125*( 1.0+eta )*( 1.0+zeta );
+	evaluatedDerivatives[0][6] = - 0.125*( 1.0+eta )*( 1.0+zeta );
+	evaluatedDerivatives[0][7] =   0.125*( 1.0+eta )*( 1.0+zeta );
 	evaluatedDerivatives[0][5] =   0.125*( 1.0-eta )*( 1.0+zeta );
 	
 	/* derivatives wrt eta */	
 	evaluatedDerivatives[1][0] = - 0.125*( 1.0-xi )*( 1.0-zeta );
-	evaluatedDerivatives[1][3] =   0.125*( 1.0-xi )*( 1.0-zeta );
-	evaluatedDerivatives[1][2] =   0.125*( 1.0+xi )*( 1.0-zeta );
+	evaluatedDerivatives[1][2] =   0.125*( 1.0-xi )*( 1.0-zeta );
+	evaluatedDerivatives[1][3] =   0.125*( 1.0+xi )*( 1.0-zeta );
 	evaluatedDerivatives[1][1] = - 0.125*( 1.0+xi )*( 1.0-zeta );
 	evaluatedDerivatives[1][4] = - 0.125*( 1.0-xi )*( 1.0+zeta );
-	evaluatedDerivatives[1][7] =   0.125*( 1.0-xi )*( 1.0+zeta );
-	evaluatedDerivatives[1][6] =   0.125*( 1.0+xi )*( 1.0+zeta );
+	evaluatedDerivatives[1][6] =   0.125*( 1.0-xi )*( 1.0+zeta );
+	evaluatedDerivatives[1][7] =   0.125*( 1.0+xi )*( 1.0+zeta );
 	evaluatedDerivatives[1][5] = - 0.125*( 1.0+xi )*( 1.0+zeta );
 	
 	/* derivatives wrt zeta */		
 	evaluatedDerivatives[2][0] = -0.125*( 1.0-xi )*( 1.0-eta );
-	evaluatedDerivatives[2][3] = -0.125*( 1.0-xi )*( 1.0+eta );
-	evaluatedDerivatives[2][2] = -0.125*( 1.0+xi )*( 1.0+eta );
+	evaluatedDerivatives[2][2] = -0.125*( 1.0-xi )*( 1.0+eta );
+	evaluatedDerivatives[2][3] = -0.125*( 1.0+xi )*( 1.0+eta );
 	evaluatedDerivatives[2][1] = -0.125*( 1.0+xi )*( 1.0-eta );
 	evaluatedDerivatives[2][4] =  0.125*( 1.0-xi )*( 1.0-eta );
-	evaluatedDerivatives[2][7] =  0.125*( 1.0-xi )*( 1.0+eta );
-	evaluatedDerivatives[2][6] =  0.125*( 1.0+xi )*( 1.0+eta );
+	evaluatedDerivatives[2][6] =  0.125*( 1.0-xi )*( 1.0+eta );
+	evaluatedDerivatives[2][7] =  0.125*( 1.0+xi )*( 1.0+eta );
 	evaluatedDerivatives[2][5] =  0.125*( 1.0+xi )*( 1.0-eta );
 }
 
 
 void _TrilinearElementType_ConvertGlobalCoordToElLocal(
 		void*		elementType,
-		ElementLayout*	elementLayout,
-		const Coord**	globalNodeCoordPtrsInElement,
-		const Coord	globalCoord,
-		Coord		elLocalCoord )
+		void*		_mesh, 
+		unsigned	element, 
+		const double*	globalCoord,
+		double*		elLocalCoord )
 {
 	TrilinearElementType*	self = (TrilinearElementType*)elementType;
-	Dimension_Index		dim_I = 0;
-	double			globalToElLocalScaling[3] = {0.0,0.0,0.0};
-	Coord			relToBottomLeftGlobalCoord = {0.0,0.0,0.0};
+	Mesh*			mesh = (Mesh*)_mesh;
+	unsigned		inside;
+	double			bc[4];
+	static double		lCrds[8][3] = {{-1.0, -1.0, -1.0}, {1.0, -1.0, -1.0}, 
+					       {-1.0, 1.0, -1.0}, {1.0, 1.0, -1.0}, 
+					       {-1.0, -1.0, 1.0}, {1.0, -1.0, 1.0}, 
+					       {-1.0, 1.0, 1.0}, {1.0, 1.0, 1.0}};
+	unsigned		nInc, *inc;
+	unsigned		bc_i;
 
-	if ( elementLayout->type == ParallelPipedHexaEL_Type ) {
-		double	elLen[3];
-		elLen[0] = (*(globalNodeCoordPtrsInElement[1]))[0] - (*(globalNodeCoordPtrsInElement[0]))[0];
-		elLen[1] = (*(globalNodeCoordPtrsInElement[3]))[1] - (*(globalNodeCoordPtrsInElement[0]))[1];
-		elLen[2] = (*(globalNodeCoordPtrsInElement[4]))[2] - (*(globalNodeCoordPtrsInElement[0]))[2];
-		
-		/*
-		** Storing the element length in each dimension on the element layout is causing a bit of hassle with MG.
-		** I'm going to change it so that this is calculated from the global node coords passed in.  This shouldn't
-		** affect anything really.  If anyone can think of any reasons why this is a bad idea, let me know as we'll
-		** have to figure out a compromise for MG.  Luke - 03/08/2005
-		*/
+	Mesh_GetIncidence( mesh, MT_VOLUME, element, MT_VERTEX, &nInc, &inc );
+	assert( nInc == 8 );
 
-		/* Initially set elLocalCoord to (0,0,0) */
-		memset( elLocalCoord, 0, sizeof( Coord ) );
-	
-		for( dim_I=0; dim_I < 3; dim_I++ ) {
-			globalToElLocalScaling[dim_I] = self->elLocalLength[dim_I] / elLen[dim_I];
-			/* The bottom left node is always at index zero */
-			relToBottomLeftGlobalCoord[dim_I] = globalCoord[dim_I] - (*(globalNodeCoordPtrsInElement[0]))[dim_I];
+	insist( Simplex_Search3D( mesh->verts, inc, 10, self->tetInds, (double*)globalCoord, bc, &inside ) );
 
-			elLocalCoord[dim_I] =  self->minElLocalCoord[dim_I] + relToBottomLeftGlobalCoord[dim_I] * globalToElLocalScaling[dim_I];
-		}	
-	}
-	else if( elementLayout->type == HexaEL_Type ) {
-		Coord		crds[8];
-		double		bc[4];
-		unsigned	inds[4];
-		Coord		lCrds[8] = {{-1.0, -1.0, -1.0}, {1.0, -1.0, -1.0}, 
-					    {-1.0, 1.0, -1.0}, {1.0, 1.0, -1.0}, 
-					    {-1.0, -1.0, 1.0}, {1.0, -1.0, 1.0}, 
-					    {-1.0, 1.0, 1.0}, {1.0, 1.0, 1.0}};
-		unsigned	bc_i;
-
-		memcpy( crds[0], *(globalNodeCoordPtrsInElement[0]), sizeof(Coord) );
-		memcpy( crds[1], *(globalNodeCoordPtrsInElement[1]), sizeof(Coord) );
-		memcpy( crds[2], *(globalNodeCoordPtrsInElement[3]), sizeof(Coord) );
-		memcpy( crds[3], *(globalNodeCoordPtrsInElement[2]), sizeof(Coord) );
-		memcpy( crds[4], *(globalNodeCoordPtrsInElement[4]), sizeof(Coord) );
-		memcpy( crds[5], *(globalNodeCoordPtrsInElement[5]), sizeof(Coord) );
-		memcpy( crds[6], *(globalNodeCoordPtrsInElement[7]), sizeof(Coord) );
-		memcpy( crds[7], *(globalNodeCoordPtrsInElement[6]), sizeof(Coord) );
-#ifndef NDEBUG
-		assert( _HexaEL_FindTetBarycenter( crds, globalCoord, bc, inds, INCLUSIVE_UPPER_BOUNDARY, NULL, 0 ) );
-#else
-		_HexaEL_FindTetBarycenter( crds, globalCoord, bc, inds, INCLUSIVE_UPPER_BOUNDARY, NULL, 0 );
-#endif
-
-		/* Interpolate. */
-		memset( elLocalCoord, 0, sizeof(Coord) );
-		for( bc_i = 0; bc_i < 4; bc_i++ ) {
-			elLocalCoord[0] += bc[bc_i] * lCrds[inds[bc_i]][0];
-			elLocalCoord[1] += bc[bc_i] * lCrds[inds[bc_i]][1];
-			elLocalCoord[2] += bc[bc_i] * lCrds[inds[bc_i]][2];
-		}
-	}
-	else {
-		/* Not a box element -> Just use the general version */
-		_ElementType_ConvertGlobalCoordToElLocal( self, elementLayout, globalNodeCoordPtrsInElement,
-			globalCoord, elLocalCoord );
+	elLocalCoord[0] = bc[0] * lCrds[self->tetInds[inside][0]][0];
+	elLocalCoord[1] = bc[0] * lCrds[self->tetInds[inside][0]][1];
+	elLocalCoord[2] = bc[0] * lCrds[self->tetInds[inside][0]][2];
+	for( bc_i = 1; bc_i < 4; bc_i++ ) {
+		elLocalCoord[0] += bc[bc_i] * lCrds[self->tetInds[inside][bc_i]][0];
+		elLocalCoord[1] += bc[bc_i] * lCrds[self->tetInds[inside][bc_i]][1];
+		elLocalCoord[2] += bc[bc_i] * lCrds[self->tetInds[inside][bc_i]][2];
 	}
 }

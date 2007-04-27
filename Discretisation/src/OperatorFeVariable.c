@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: OperatorFeVariable.c 654 2006-10-12 08:58:49Z SteveQuenette $
+** $Id: OperatorFeVariable.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -268,35 +268,7 @@ void _OperatorFeVariable_Init( void* oFeVar, Name operatorName, Index feVariable
 
 	/* Assign values to object */
 	self->feVariableCount     = feVariableCount;
-
-	/* Check if we are using a gradient operator */
-	if ( strcasecmp( operatorName, "gradient" ) == 0 ) {
-		self->useGradient = True;
-		assert( feVariableCount == 1 );
-		self->fieldComponentCount = feVariableList[0]->fieldComponentCount * self->dim;
-	}
-	else {
-		/* just use normal operator */
-		self->useGradient = False;
-		/* Added 5 May 2006 by P Sunter: in the case of VectorScale, the fieldComponentCount should be based
-		on the 2nd operator. Also make sure the 2nd operator has at least as may dofs per node as the first. */
-		if ( feVariableCount == 2 ) {
-			Journal_Firewall( feVariableList[1]->fieldComponentCount >= feVariableList[0]->fieldComponentCount,
-				errorStream, "Error - in %s: tried to create a %s operator from feVariables \"%s\" "
-				"and \"%s\" - who have fieldCounts %d and %d - unsupported since operations "
-				"such as VectorScale require the 2nd feVariable to have >= the first's field count.\n",
-				__func__, operatorName, feVariableList[0]->name, feVariableList[1]->name,
-				feVariableList[0]->fieldComponentCount, feVariableList[1]->fieldComponentCount );
-			self->_operator  = Operator_NewFromName( operatorName, feVariableList[1]->fieldComponentCount,
-				self->dim );
-		}
-		else {	
-			self->_operator  = Operator_NewFromName( operatorName, feVariableList[0]->fieldComponentCount,
-				self->dim );
-		}
-
-		self->fieldComponentCount = self->_operator->resultDofs; /* reset this value from that which is from operator */
-	}
+	self->operatorName = operatorName;
 
 	/* Copy field variable list */
 	self->feVariableList      = Memory_Alloc_Array( FeVariable*, feVariableCount, "Array of Field Variables" );
@@ -309,8 +281,6 @@ void _OperatorFeVariable_Init( void* oFeVar, Name operatorName, Index feVariable
 		Journal_Firewall( feVariable->fieldComponentCount <= MAX_FIELD_COMPONENTS,
 				errorStream, "In func %s: Field Variable '%s' has too many components.\n", __func__, feVariable->name );
 	}
-	_OperatorFeVariable_SetFunctions( self );
-
 }
 
 void _OperatorFeVariable_Delete( void* _feVariable ) {
@@ -395,7 +365,7 @@ void _OperatorFeVariable_Construct( void* feVariable, Stg_ComponentFactory* cf, 
 
 	_FeVariable_Init( (FeVariable*) self, feVariableList[0]->feMesh, feVariableList[0]->geometryMesh,
 		NULL, NULL, NULL, NULL, NULL,
-		// TODO: hack as always StgFEM native for now - PatrickSunter 7/7/2006
+/* 		 TODO: hack as always StgFEM native for now - PatrickSunter 7/7/2006 */
 		StgFEM_Native_ImportExportType, StgFEM_Native_ImportExportType );
 	_OperatorFeVariable_Init( self, operatorName, feVariableCount, feVariableList );
 
@@ -405,9 +375,40 @@ void _OperatorFeVariable_Construct( void* feVariable, Stg_ComponentFactory* cf, 
 void _OperatorFeVariable_Build( void* feVariable, void* data ) {
 	OperatorFeVariable* self = (OperatorFeVariable*) feVariable;
 	Index                  feVariable_I;
+	Stream*                     errorStream       = Journal_Register( Error_Type, self->type );
 
 	for ( feVariable_I = 0 ; feVariable_I < self->feVariableCount ; feVariable_I++ ) 
 		Build( self->feVariableList[ feVariable_I ] , data, False );
+
+	/* Check if we are using a gradient operator */
+	if ( strcasecmp( self->operatorName, "gradient" ) == 0 ) {
+		self->useGradient = True;
+		assert( self->feVariableCount == 1 );
+		self->fieldComponentCount = self->feVariableList[0]->fieldComponentCount * self->dim;
+	}
+	else {
+		/* just use normal operator */
+		self->useGradient = False;
+		/* Added 5 May 2006 by P Sunter: in the case of VectorScale, the fieldComponentCount should be based
+		on the 2nd operator. Also make sure the 2nd operator has at least as may dofs per node as the first. */
+		if ( self->feVariableCount == 2 ) {
+			Journal_Firewall( self->feVariableList[1]->fieldComponentCount >= self->feVariableList[0]->fieldComponentCount,
+				errorStream, "Error - in %s: tried to create a %s operator from feVariables \"%s\" "
+				"and \"%s\" - who have fieldCounts %d and %d - unsupported since operations "
+				"such as VectorScale require the 2nd feVariable to have >= the first's field count.\n",
+				__func__, self->operatorName, self->feVariableList[0]->name, self->feVariableList[1]->name,
+				self->feVariableList[0]->fieldComponentCount, self->feVariableList[1]->fieldComponentCount );
+			self->_operator  = Operator_NewFromName( self->operatorName, self->feVariableList[1]->fieldComponentCount,
+				self->dim );
+		}
+		else {	
+			self->_operator  = Operator_NewFromName( self->operatorName, self->feVariableList[0]->fieldComponentCount,
+				self->dim );
+		}
+
+		self->fieldComponentCount = self->_operator->resultDofs; /* reset this value from that which is from operator */
+	}
+	_OperatorFeVariable_SetFunctions( self );
 }
 
 void _OperatorFeVariable_Initialise( void* feVariable, void* data ) {
@@ -581,7 +582,7 @@ void OperatorFeVariable_GradientValueAtNodeFunc( void* feVariable, Node_DomainIn
 	Mesh*               mesh            = (Mesh*) self->feMesh;
 	double*             coord;
 
-	coord = Mesh_CoordAt( mesh, dNode_I );
+	coord = Mesh_GetVertex( mesh, dNode_I );
 
 	memset( value, 0, self->fieldComponentCount * sizeof(double) );
 	FeVariable_InterpolateDerivativesAt( self->feVariableList[0], coord, value );

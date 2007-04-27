@@ -42,12 +42,12 @@
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
-//EP_APPLICATIONS_FINALISE defined in StGermain.h
+/* EP_APPLICATIONS_FINALISE defined in StGermain.h */
 #include <StgFEM/StgFEM.h>
 #include "Application.h"
 
 #include <stdio.h>
-//For strcmp
+/* For strcmp */
 #include <string.h>
 
 const Type StgFEM_Application_Type = "StgFEM_Application";
@@ -60,54 +60,54 @@ void _StgFEM_Application_Construct( void* component, Stg_ComponentFactory* cf, v
 	AbstractContext* prevContext;
         EntryPoint* applicationsFinalise_EP;
 
-	//Get the existing context, as defined by StGermain, or an alternative plugin application.
+	/* Get the existing context, as defined by StGermain, or an alternative plugin application. */
 	prevContext = (AbstractContext*)Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
 
 
-       //Only need to initialise a new context, and copy all relevant registers over IF this is the first application
-        //plugin to be constructed.
-        //The first application plugin to be constructed is Guaranteed to have the 'largest' context.
-        //                      (ie is an inherited child of ALL other application plugins about to be loaded)
+       /* Only need to initialise a new context, and copy all relevant registers over IF this is the first application */
+        /* plugin to be constructed. */
+        /* The first application plugin to be constructed is Guaranteed to have the 'largest' context. */
+        /*                       (ie is an inherited child of ALL other application plugins about to be loaded) */
         if( prevContext->type == AbstractContext_Type )
         {
-                //Set the existing abstract context.
+                /* Set the existing abstract context. */
                 currAbstractContext = prevContext;
 
-		//Create a new, empty FiniteElementContext.
+		/* Create a new, empty FiniteElementContext. */
 		context = FiniteElementContext_New( "context", 0, 0, currAbstractContext->communicator, cf->rootDict );
 
                 context->dictionary = cf->rootDict;
 
-                //Initialise Abstract parts of FiniteElementContext
+                /* Initialise Abstract parts of FiniteElementContext */
                 _AbstractContext_Init((AbstractContext*)context, 0, 0, MPI_COMM_WORLD );
-                //Initialise Discretisation parts of FiniteElementContext
+                /* Initialise Discretisation parts of FiniteElementContext */
                 _DiscretisationContext_Init((DiscretisationContext*)context );
-                //Initialise FiniteElement parts of FintieElementContext
+                /* Initialise FiniteElement parts of FintieElementContext */
                 _FiniteElementContext_Init( (FiniteElementContext*)context );
 
-               //Need to get the old CF from currAbstractContext, and use that in my new context.
-                //Now I CANNOT delete this currAbstractContext or I'll lose the CF. :(
+               /* Need to get the old CF from currAbstractContext, and use that in my new context. */
+                /* Now I CANNOT delete this currAbstractContext or I'll lose the CF. :( */
                 context->CF = currAbstractContext->CF;
 
-                //Need to get the LCRegister componentList, and replace the existing (abstract) context
-                //with the newly created (PICellerator) context!!!
+                /* Need to get the LCRegister componentList, and replace the existing (abstract) context */
+                /* with the newly created (PICellerator) context!!! */
                 Stg_ObjectList_Replace( context->CF->LCRegister->componentList,
                                         ((Stg_Component*) currAbstractContext)->name,
                                         KEEP,
                                         (Stg_Component*) context);
 
-                //Recreate the registerRegister link in CF.
+                /* Recreate the registerRegister link in CF. */
                 context->CF->registerRegister = context->register_Register;
 
-                //Create the EntryPoint for all application plugins' finalise functions to hook into.
+                /* Create the EntryPoint for all application plugins' finalise functions to hook into. */
                 applicationsFinalise_EP = EntryPoint_New( EP_APPLICATIONS_FINALISE, EntryPoint_VoidPtr_CastType );
                 EntryPoint_Register_Add(context->entryPoint_Register, (void*)applicationsFinalise_EP);
 
-        } //close of if( prevContext->type == AbstractContext_Type)
-	else //prevContext was NOT an abstract context -> that is does NOT need to be replaced
+        } /* close of if( prevContext->type == AbstractContext_Type) */
+	else /* prevContext was NOT an abstract context -> that is does NOT need to be replaced */
 		context = (FiniteElementContext*) prevContext;
 
-	//Change to append -> THESE plugins are now CONSTRUCTED IN REVERSE ORDER!!!
+	/* Change to append -> THESE plugins are now CONSTRUCTED IN REVERSE ORDER!!! */
 	EntryPoint_Append( 
 			Context_GetEntryPoint( context, EP_APPLICATIONS_FINALISE ),
 			"StgFEM App Finalise",
@@ -116,7 +116,7 @@ void _StgFEM_Application_Construct( void* component, Stg_ComponentFactory* cf, v
 }
 
 
-//StgFEM finalise entry point -> needs to be called if this plugin was loaded.
+/* StgFEM finalise entry point -> needs to be called if this plugin was loaded. */
 void StgFEM_Application_Finalise()
 {
 	Stream* finaliseStream=Journal_Register(Info_Type,"StgFEM_Application");
@@ -139,7 +139,7 @@ void* _StgFEM_Application_DefaultNew( Name name ) {
 
 Index StgFEM_Application_Register( PluginsManager* pluginsManager ) 
 {
-	//Initialise StgFEM context.
+	/* Initialise StgFEM context. */
 	StgFEM_Init(NULL, NULL);
 
 	return PluginsManager_Submit( pluginsManager, StgFEM_Application_Type, "0", _StgFEM_Application_DefaultNew );

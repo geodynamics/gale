@@ -46,7 +46,7 @@
 ** Comments:
 **	None so far.
 **
-** $Id: SLE.h 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: SLE.h 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -55,11 +55,9 @@
 	
 	#include "LinearAlgebra/LinearAlgebra.h"
 	#include "SystemSetup/SystemSetup.h"
-	#include "MultiGrid/MultiGrid.h"
 	#include "ProvidedSystems/ProvidedSystems.h"
 
 	#include "types.h"
-	#include "StiffRemesher.h"
 
 	#include "Init.h"
 	#include "Finalise.h"

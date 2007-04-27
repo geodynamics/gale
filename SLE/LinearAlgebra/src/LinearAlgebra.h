@@ -46,7 +46,7 @@
 ** Comments:
 **	None so far.
 **
-** $Id: LinearAlgebra.h 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: LinearAlgebra.h 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -54,10 +54,26 @@
 #define __StgFEM_SLE_LinearAlgebra_h__
 	
 	#include "types.h"
-	#include "Utils.h"
 	#include "Vector.h"
 	#include "Matrix.h"
 	#include "MatrixSolver.h"
+	#include "MultigridSolver.h"
+	#include "MGOpGenerator.h"
+	#include "SROpGenerator.h"
+
+#ifdef HAVE_PETSC
+	#include <petsc.h>
+	#include <petscvec.h>
+	#include <petscmat.h>
+	#include <petscksp.h>
+	#include <petscmg.h>
+	#include "PETScErrorChecking.h"
+	#include "PETScVector.h"
+	#include "PETScMatrix.h"
+	#include "PETScMatrixSolver.h"
+	#include "PETScMGSolver.h"
+#endif
+
 	#include "Init.h"
 	#include "Finalise.h"
 

@@ -47,7 +47,7 @@
 **	Is there a better name for this class? IE at least FeElementType.
 **	Perhaps FE_ElementDiscretisation?
 **
-** $Id: ElementType.h 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: ElementType.h 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -65,8 +65,10 @@
 		double** const evaluatedDerivatives );
 
 	typedef void	(ElementType_ConvertGlobalCoordToElLocalFunction)		( void* elementType,
-		ElementLayout* elementLayout, const Coord** globalNodeCoordPtrsInElement, const Coord globalCoord,
-		Coord elLocalCoord );
+		void*		mesh, 
+		unsigned	element, 
+		const double*	globalCoord,
+		double*		elLocalCoord );
 
 	typedef void	(ElementType_BuildFunction)					( void* elementType, void *arg );
 	
@@ -85,6 +87,45 @@
 		Stream*								debug;
 
 	struct ElementType { __ElementType };
+
+
+	#define ELEMENTTYPE_DEFARGS											\
+		SizeT								_sizeOfSelf,				\
+		Type								type,					\
+		Stg_Class_DeleteFunction*					_delete,				\
+		Stg_Class_PrintFunction*					_print,					\
+		Stg_Class_CopyFunction*						_copy, 					\
+		Stg_Component_DefaultConstructorFunction*			_defaultConstructor,			\
+		Stg_Component_ConstructFunction*				_construct,				\
+		Stg_Component_BuildFunction*					_build,					\
+		Stg_Component_InitialiseFunction*				_initialise,				\
+		Stg_Component_ExecuteFunction*					_execute,				\
+		Stg_Component_DestroyFunction*					_destroy,				\
+		Name								name,					\
+		Bool								initFlag,				\
+		ElementType_EvaluateShapeFunctionsAtFunction*			_evaluateShapeFunctionsAt,		\
+		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt,	\
+		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,		\
+		Index								nodeCount
+
+	#define ELEMENTTYPE_PASSARGS											\
+		_sizeOfSelf,				\
+		type,					\
+		_delete,				\
+		_print,					\
+		_copy, 					\
+		_defaultConstructor,			\
+		_construct,				\
+		_build,					\
+		_initialise,				\
+		_execute,				\
+		_destroy,				\
+		name,					\
+		initFlag,				\
+		_evaluateShapeFunctionsAt,		\
+		_evaluateShapeFunctionLocalDerivsAt,	\
+		_convertGlobalCoordToElLocal,		\
+		nodeCount
 	
 	
 	/* No "ElementType_New" and "ElementType_Init" as this is an abstract class */
@@ -123,7 +164,7 @@
 	
 	/** Build the element type */
 	void ElementType_Build( void* elementType, void *data );
-	
+
 	/** Evaluate the value of the shape functions at a local coordinate.
 	Note that in Hughes FEM notation, localCoord -> Xi, and evaluatedValues -> Ni */
 	void ElementType_EvaluateShapeFunctionsAt( void* elementType, const double localCoord[], double* const evaluatedValues );
@@ -137,19 +178,19 @@
 	(eg if its a "brick" element). */
 	void ElementType_ConvertGlobalCoordToElLocal(
 		void*		elementType,
-		ElementLayout*	elementLayout,
-		const Coord**	globalNodeCoordPtrsInElement,
-		const Coord	globalCoord,
-		Coord		elLocalCoord );
+		void*		mesh, 
+		unsigned	element, 
+		const double*	globalCoord,
+		double*		elLocalCoord );
 	
 	/** General implementation of ElementType_ConvertGlobalCoordToElLocal(). Solves the system of FE elLocal->global
 	coordinate equations. */
 	void _ElementType_ConvertGlobalCoordToElLocal(
 		void*		elementType,
-		ElementLayout*	elementLayout,
-		const Coord**	globalNodeCoordPtrsInElement,
-		const Coord	globalCoord,
-		Coord		elLocalCoord );
+		void*		mesh, 
+		unsigned	element, 
+		const double*	globalCoord,
+		double*		elLocalCoord );
 	
 	/** Calculate the shape function global derivatives for all degrees of freedom for all nodes */
 	void ElementType_ShapeFunctionsGlobalDerivs( 

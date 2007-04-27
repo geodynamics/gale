@@ -79,7 +79,6 @@
 		SLE_Solver_SolverSetupFunction*                     _solverSetup,
 		SLE_Solver_SolveFunction*                           _solve,
 		SLE_Solver_GetResidualFunc*                         _getResidual, 
-		SLE_Solver_MG_SetupSmootherFunc*                    _mgSetupSmoother,
 		Name                                                name );
 
 	void _AdvDiffMulticorrector_Init( 

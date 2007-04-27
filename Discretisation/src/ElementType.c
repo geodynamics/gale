@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ElementType.c 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: ElementType.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -150,7 +150,6 @@ void ElementType_Build( void* elementType, void *data ) {
 	self->_build( self, data );
 }
 
-
 void ElementType_EvaluateShapeFunctionsAt( void* elementType, const double localCoord[], double* const evaluatedValues ) {
 	ElementType* self = (ElementType*)elementType;
 	
@@ -166,31 +165,32 @@ void ElementType_EvaluateShapeFunctionLocalDerivsAt( void* elementType, const do
 
 void ElementType_ConvertGlobalCoordToElLocal(
 		void*		elementType,
-		ElementLayout*	elementLayout,
-		const Coord**	globalNodeCoordPtrsInElement,
-		const Coord	globalCoord,
-		Coord		elLocalCoord ) 
+		void*		mesh, 
+		unsigned	element, 
+		const double*	globalCoord,
+		double*		elLocalCoord )
 {
-	ElementType*		self = (ElementType*)elementType;
+	ElementType*	self = (ElementType*)elementType;
 
-	self->_convertGlobalCoordToElLocal( self, elementLayout, globalNodeCoordPtrsInElement, globalCoord, elLocalCoord );
+	self->_convertGlobalCoordToElLocal( self, mesh, element, globalCoord, elLocalCoord );
 }
 
 
 /* +++ Virtual Function Implementations +++ */
 
 void _ElementType_ConvertGlobalCoordToElLocal(
-		void*           elementType,
-		ElementLayout*  elementLayout,
-		const Coord**   globalNodeCoordPtrsInElement,
-		const Coord     globalCoord,
-		Coord           elLocalCoord ) 
+		void*		elementType,
+		void*		_mesh, 
+		unsigned	element, 
+		const double*	globalCoord,
+		double*		elLocalCoord )
 {		
 	ElementType*		self            = (ElementType*)elementType;
+	Mesh*			mesh = (Mesh*)_mesh;
 	TensorArray         jacobiMatrix;
-	double              tolerance       = 0.0001; // TODO put on class
+	double              tolerance       = 0.0001; /* TODO put on class */
 	double              maxResidual;
-	Iteration_Index     maxIterations   = 100;    // TODO put on class
+	Iteration_Index     maxIterations   = 100;    /*  TODO put on class */
 	Iteration_Index     iteration_I;
 	Node_Index          node_I;
 	Node_Index          nodeCount       = self->nodeCount;
@@ -198,9 +198,10 @@ void _ElementType_ConvertGlobalCoordToElLocal(
 	XYZ                 rightHandSide;
 	XYZ                 xiIncrement;
 	double              shapeFunc;
-	const double*       nodeCoord;
+	double*       	    nodeCoord;
 	double**            GNi;
-	Dimension_Index     dim             = ((HexaEL*) elementLayout)->dim;
+	unsigned	    nInc, *inc;
+	Dimension_Index     dim             = Mesh_GetDimSize( mesh );
 
 	/* This function uses a Newton-Raphson iterative method to find the local coordinate from the global coordinate 
 	 * the equations are ( see FEM/BEM nodes p. 9 )
@@ -224,6 +225,8 @@ void _ElementType_ConvertGlobalCoordToElLocal(
 	evaluatedShapeFuncs = Memory_Alloc_Array( double, nodeCount, "evaluatedShapeFuncs" );
 	GNi = Memory_Alloc_2DArray( double, dim, nodeCount, "localShapeFuncDerivitives" );
 
+	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), element, MT_VERTEX, &nInc, &inc );
+
 	/* Initial guess for element local coordinate is in the centre of the element - ( 0.0, 0.0, 0.0 ) */
 	memset( elLocalCoord, 0, sizeof( Coord ) );
 
@@ -240,7 +243,7 @@ void _ElementType_ConvertGlobalCoordToElLocal(
 
 		for ( node_I = 0 ; node_I < nodeCount ; node_I++ ) {
 			shapeFunc = evaluatedShapeFuncs[node_I];
-			nodeCoord = *(globalNodeCoordPtrsInElement[ node_I ]);
+			nodeCoord = Mesh_GetVertex( mesh, inc[node_I] );
 
 			/* Form jacobi matrix */
 			jacobiMatrix[ MAP_TENSOR( 0, 0, dim ) ] += GNi[0][node_I] * nodeCoord[ I_AXIS ];
@@ -320,12 +323,15 @@ void ElementType_ShapeFunctionsGlobalDerivs(
 	int dx, dxi;
 	double tmp, D = 0.0;
 	double cof[3][3];	/* cofactors */
+	unsigned nInc, *inc;
 	Index nodesPerEl;
 	
 	
 	GNi = Memory_Alloc_2DArray( double, rows, cols, "GNi" );
 
 	nodesPerEl = self->nodeCount;
+
+	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), elId, MT_VERTEX, &nInc, &inc );
 	
 	/*
 	If constant shape function gets passed in here, getLocalDeriv will
@@ -344,7 +350,7 @@ void ElementType_ShapeFunctionsGlobalDerivs(
 	if( dim == 2 ) {
 		jac[0][0] = jac[0][1] = jac[1][0] = jac[1][1] = 0.0;
 		for( n=0; n<nodesPerEl; n++){	
-			nodeCoord = Mesh_CoordAt( mesh, mesh->elementNodeTbl[elId][n] );
+			nodeCoord = Mesh_GetVertex( mesh, inc[n] );
 			jac[0][0] = jac[0][0] + GNi[0][n] * nodeCoord[0];
 			jac[0][1] = jac[0][1] + GNi[0][n] * nodeCoord[1];
 			
@@ -358,7 +364,7 @@ void ElementType_ShapeFunctionsGlobalDerivs(
 		jac[1][0] = jac[1][1] = jac[1][2] = 0.0;
 		jac[2][0] = jac[2][1] = jac[2][2] = 0.0;
 		for( n=0; n<nodesPerEl; n++){	
-			nodeCoord = Mesh_CoordAt( mesh, mesh->elementNodeTbl[elId][n] );
+			nodeCoord = Mesh_GetVertex( mesh, inc[n] );
 			jac[0][0] = jac[0][0] + GNi[0][n] * nodeCoord[0];
 			jac[0][1] = jac[0][1] + GNi[0][n] * nodeCoord[1];
 			jac[0][2] = jac[0][2] + GNi[0][n] * nodeCoord[2];
@@ -454,6 +460,9 @@ void ElementType_Jacobian_AxisIndependent(
 	double**     GNi;
 	Node_Index   nodesPerEl  = self->nodeCount;
 	Node_Index   node_I;
+	unsigned	nInc, *inc;
+
+	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), elId, MT_VERTEX, &nInc, &inc );
 	
 	/* If GNi isn't passed in - then evaluate them for you */
 	if (_GNi == NULL) {
@@ -472,14 +481,14 @@ void ElementType_Jacobian_AxisIndependent(
 		case 1: 			
 			jacobian[A_axis][A_axis] = 0.0;
 			for( node_I = 0 ; node_I < nodesPerEl; node_I++){
-				nodeCoord = Mesh_CoordAt( mesh, mesh->elementNodeTbl[elId][node_I] );
+				nodeCoord = Mesh_GetVertex( mesh, inc[node_I] );
 				jacobian[A_axis][A_axis] += GNi[A_axis][node_I] * nodeCoord[A_axis];
 			}
 			break;
 		case 2:
 			jacobian[A_axis][A_axis] = jacobian[A_axis][B_axis] = jacobian[B_axis][A_axis] = jacobian[B_axis][B_axis] = 0.0;
 			for( node_I = 0 ; node_I < nodesPerEl; node_I++){
-				nodeCoord = Mesh_CoordAt( mesh, mesh->elementNodeTbl[elId][node_I] );
+				nodeCoord = Mesh_GetVertex( mesh, inc[node_I] );
 				jacobian[A_axis][A_axis] += GNi[A_axis][node_I] * nodeCoord[A_axis];
 				jacobian[A_axis][B_axis] += GNi[A_axis][node_I] * nodeCoord[B_axis];
 
@@ -492,7 +501,7 @@ void ElementType_Jacobian_AxisIndependent(
 			jacobian[B_axis][A_axis] = jacobian[B_axis][B_axis] = jacobian[B_axis][C_axis] = 0.0;
 			jacobian[C_axis][A_axis] = jacobian[C_axis][B_axis] = jacobian[C_axis][C_axis] = 0.0;
 			for( node_I = 0 ; node_I < nodesPerEl; node_I++){
-				nodeCoord = Mesh_CoordAt( mesh, mesh->elementNodeTbl[elId][node_I] );
+				nodeCoord = Mesh_GetVertex( mesh, inc[node_I] );
 
 				jacobian[A_axis][A_axis] += GNi[A_axis][node_I] * nodeCoord[A_axis];
 				jacobian[A_axis][B_axis] += GNi[A_axis][node_I] * nodeCoord[B_axis];
@@ -518,7 +527,7 @@ void ElementType_Jacobian_AxisIndependent(
 
 					/* Calculate */
 					for( node_I = 0 ; node_I < nodesPerEl; node_I++){
-						nodeCoord = Mesh_CoordAt( mesh, mesh->elementNodeTbl[elId][node_I] );
+						nodeCoord = Mesh_GetVertex( mesh, inc[node_I] );
 				
 						jacobian[row_I][column_I] += GNi[row_I][node_I] * nodeCoord[column_I];
 					}

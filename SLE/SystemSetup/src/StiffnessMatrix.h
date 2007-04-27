@@ -49,7 +49,7 @@
 **	very customisable. They both default to empty, in case we have a matrix
 **	that doesn't need element-based information to be assembled.
 **
-** $Id: StiffnessMatrix.h 733 2007-02-07 00:55:26Z PatrickSunter $
+** $Id: StiffnessMatrix.h 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -81,6 +81,7 @@
 		FeVariable*                                       rowVariable;                    \
 		FeVariable*                                       columnVariable;                 \
 		ForceVector*                                      rhs;                            \
+		ForceVector*					  transRHS;			  \
 		Matrix*                                           matrix;                         \
 		Stg_Component*                                    applicationDepInfo;             \
 		Bool                                              isNonLinear;                    \
@@ -98,6 +99,15 @@
 		Index*                                            diagonalNonZeroIndices;         \
 		Index                                             offDiagonalNonZeroCount;        \
 		Index*                                            offDiagonalNonZeroIndices;      \
+												\
+		Assembler*					zeroBCsAsm;			\
+		Assembler*					bcAsm;				\
+		Assembler*					transBCAsm;			\
+		Assembler*					diagBCsAsm;			\
+		double**					elStiffMat;			\
+		double*						bcVals;				\
+		unsigned					nRowDofs;			\
+		unsigned					nColDofs;
 		
 	struct StiffnessMatrix { __StiffnessMatrix };
 	
@@ -203,6 +213,8 @@
 	*/
 	void StiffnessMatrix_GlobalAssembly_General( void* stiffnessMatrix, Bool bcRemoveQuery, void* _sle, void* _context );
 
+	void StiffnessMatrix_ShellAssembly( void* stiffnessMatrix, Bool removeBCs, void* data );
+
 	/* +++ Private Functions +++ */
 
 	void _StiffnessMatrix_CalcAndUpdateNonZeroEntriesAtRowNode(
@@ -239,7 +251,8 @@
 		Dof_Index*		totalDofsThisElement[MAX_FE_VARS],
 		Dof_Index*		bcLM_Id[MAX_FE_VARS],
 		double*			bcValues[MAX_FE_VARS],
-		int			nBC_NodalDof_Row );
+		int			nBC_NodalDof_Row, 
+		unsigned		elementInd /* NEW ONE */ );
 	
 	void _StiffnessMatrix_PrintElementStiffnessMatrix(
 		StiffnessMatrix*	self,
@@ -268,5 +281,12 @@
 		Index elStiffMatToAddColSize );
 	
 	void StiffnessMatrix_AddStiffnessMatrixTerm( void* stiffnessMatrixVector, StiffnessMatrixTerm* stiffnessMatrixTerm ) ;
+
+	void StiffnessMatrix_RefreshMatrix( StiffnessMatrix* self );
+
+	void StiffnessMatrix_CalcNonZeros( void* stiffnessMatrix );
+
+	void StiffnessMatrix_TrackUniqueEqs( StiffnessMatrix* self, unsigned rowEq, unsigned colEq, 
+					     unsigned* nNonZeros, unsigned** nonZeros );
 	
 #endif /* __StgFEM_SLE_SystemSetup_StiffnessMatrix_h__ */

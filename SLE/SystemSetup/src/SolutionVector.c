@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SolutionVector.c 733 2007-02-07 00:55:26Z PatrickSunter $
+** $Id: SolutionVector.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -195,9 +195,7 @@ void _SolutionVector_Delete( void* solutionVector ) {
 	
 	Journal_DPrintf( self->debug, "In %s - for soln. vector %s\n", __func__, self->name );
 	Stream_IndentBranch( StgFEM_Debug );
-	if ( self->vector ) {
-		Vector_Destroy(self->vector);
-	}
+	FreeObject( self->vector );
 	
 	/* Stg_Class_Delete parent*/
 	_Stg_Component_Delete( self );
@@ -281,7 +279,13 @@ void _SolutionVector_Build( void* solutionVector, void* data ) {
 		Build( self->feVariable, 0, False );
 
 	/* Allocate the vector */
-	self->vector = Vector_New_SpecifyLocalSize( self->comm, self->feVariable->eqNum->localEqNumsOwnedCount );
+#ifdef HAVE_PETSC
+	self->vector = PETScVector_New( "" );
+#else
+	assert( 0 );
+#endif
+	Vector_SetComm( self->vector, self->comm );
+	Vector_SetLocalSize( self->vector, self->feVariable->eqNum->localEqNumsOwnedCount );
 
 	Stream_UnIndentBranch( StgFEM_Debug );
 }
@@ -323,7 +327,8 @@ void SolutionVector_UpdateSolutionOntoNodes( void* solutionVector ) {
 	Dof_Index		nodeLocalDof_I;
 	Partition_Index		ownerProc;
 	FeVariable*		feVar = self->feVariable;
-	FiniteElement_Mesh*	feMesh = feVar->feMesh;
+	FeMesh*			feMesh = feVar->feMesh;
+	MPI_Comm		comm;
 	FeEquationNumber*	eqNum = feVar->eqNum;
 	Dof_EquationNumber	currEqNum;
 	Index			indexIntoLocalSolnVecValues;
@@ -331,8 +336,9 @@ void SolutionVector_UpdateSolutionOntoNodes( void* solutionVector ) {
 	Index*			reqFromOthersSizes;
 	RequestInfo**		reqFromOthersInfos;
 	Dof_EquationNumber**	reqFromOthers;
-	Partition_Index		nProc = self->feVariable->feMesh->layout->decomp->nproc;
-	Partition_Index		myRank = self->feVariable->feMesh->layout->decomp->rank;
+	CommTopology*		commTopo;
+	Partition_Index		nProc;
+	Partition_Index		myRank;
 	Partition_Index		proc_I;
 	double			initialGuessAtNonLocalEqNumsRatio = 0.1;
 	double			ratioToIncreaseRequestArraySize = 1.5;
@@ -347,6 +353,11 @@ void SolutionVector_UpdateSolutionOntoNodes( void* solutionVector ) {
 		Vector_View( self->vector, self->debug );
 	}
 	#endif
+
+	commTopo = Mesh_GetCommTopology( feMesh, MT_VERTEX );
+	comm = CommTopology_GetComm( commTopo );
+	MPI_Comm_size( comm, (int*)&nProc );
+	MPI_Comm_rank( comm, (int*)&myRank );
 
 	/* allocate arrays for nodes that I want on each processor */
 	reqFromOthersCounts = Memory_Alloc_Array( Index, nProc, "reqFromOthersCounts" );
@@ -372,9 +383,9 @@ void SolutionVector_UpdateSolutionOntoNodes( void* solutionVector ) {
 	}
 	
 	/* Get the locally held part of the vector */
-	Vector_Get( self->vector, &localSolnVecValues );
+	Vector_GetArray( self->vector, &localSolnVecValues );
 	
-	for( lNode_I=0; lNode_I < feMesh->nodeLocalCount; lNode_I++ ) {
+	for( lNode_I=0; lNode_I < Mesh_GetLocalSize( feMesh, MT_VERTEX ); lNode_I++ ) {
 		currNodeNumDofs = feVar->dofLayout->dofCounts[ lNode_I ];
 		Journal_DPrintfL( self->debug, 3, "getting solutions for local node %d, has %d dofs.\n", lNode_I, currNodeNumDofs );
 		
@@ -446,7 +457,13 @@ void SolutionVector_UpdateSolutionOntoNodes( void* solutionVector ) {
 	Memory_Free( reqFromOthersCounts );
 	Memory_Free( reqFromOthersSizes );
 
-	Vector_Restore( self->vector, &localSolnVecValues );
+	Vector_RestoreArray( self->vector, &localSolnVecValues );
+
+	/*
+	** Syncronise the FEVariable in question.
+	*/
+
+	FeVariable_SyncShadowValues( feVar );
 
 	Stream_UnIndentBranch( StgFEM_Debug );
 }
@@ -461,11 +478,12 @@ void _SolutionVector_ShareValuesNotStoredLocally(
 {
 
 	FeVariable*		feVar = self->feVariable;
-	FiniteElement_Mesh*	feMesh = feVar->feMesh;
+	FeMesh*			feMesh = feVar->feMesh;
 	FeEquationNumber*	eqNum = feVar->eqNum;
-	MeshDecomp*		meshDecomp = feMesh->layout->decomp;
-	Partition_Index		nProc = self->feVariable->feMesh->layout->decomp->nproc;
-	Partition_Index		myRank = self->feVariable->feMesh->layout->decomp->rank;
+	CommTopology*		commTopo;
+	MPI_Comm		comm;
+	Partition_Index		nProc;
+	Partition_Index		myRank;
 	Partition_Index		proc_I;
 	Index			req_I;
 	Index			indexIntoLocalSolnVecValues;
@@ -484,6 +502,11 @@ void _SolutionVector_ShareValuesNotStoredLocally(
 
 	Journal_DPrintf( self->debug, "In %s - for \"%s\"\n", __func__, self->name );
 	Stream_IndentBranch( StgFEM_Debug );
+
+	commTopo = Mesh_GetCommTopology( feMesh, MT_VERTEX );
+	comm = CommTopology_GetComm( commTopo );
+	MPI_Comm_size( comm, (int*)&nProc );
+	MPI_Comm_rank( comm, (int*)&myRank );
 
 	reqFromMeCounts = Memory_Alloc_Array( Index, nProc, "reqFromMeCounts" );
 	reqFromOthersHandles = Memory_Alloc_Array_Unnamed( MPI_Request*, nProc );
@@ -511,7 +534,7 @@ void _SolutionVector_ShareValuesNotStoredLocally(
 	
 	/* send out my request counts, receive the req. counts others want from me */
 	MPI_Alltoall( reqFromOthersCounts, 1, MPI_UNSIGNED,
-		reqFromMeCounts, 1, MPI_UNSIGNED, meshDecomp->communicator );
+		      reqFromMeCounts, 1, MPI_UNSIGNED, comm );
 
 	Journal_DPrintf( self->debug, "After MPI_Alltoall- counts are:\n" );
 	totalRequestedFromOthers = 0;
@@ -551,7 +574,7 @@ void _SolutionVector_ShareValuesNotStoredLocally(
 	Stream_Indent( self->debug );
 	for( proc_I=0; proc_I < nProc; proc_I++) {
 		if ( proc_I == myRank ) continue; 
-//Journal_Printf( Journal_Register( Info_Type, "mpi" ),  "!!! line %d, proc_I %d: count = %u\n", __LINE__, proc_I, reqFromOthersCounts[proc_I] );
+/* Journal_Printf( Journal_Register( Info_Type, "mpi" ),  "!!! line %d, proc_I %d: count = %u\n", __LINE__, proc_I, reqFromOthersCounts[proc_I] ); */
 		if ( reqFromOthersCounts[proc_I] > 0 ) {
 			Journal_DPrintfL( self->debug, 2, "Sending to proc %d the list of %d vector entry indices I want from it:\n"
 				"\t(tracking via reqFromOthersHandles[%d], tag %d)\n", proc_I,
@@ -559,7 +582,7 @@ void _SolutionVector_ShareValuesNotStoredLocally(
 
 			reqFromOthersHandles[proc_I] = Memory_Alloc_Unnamed( MPI_Request );
 			MPI_Isend( reqFromOthers[proc_I], reqFromOthersCounts[proc_I], MPI_UNSIGNED,
-				proc_I, VALUE_REQUEST_TAG, meshDecomp->communicator, reqFromOthersHandles[proc_I] );
+				proc_I, VALUE_REQUEST_TAG, comm, reqFromOthersHandles[proc_I] );
 		}	
 	}
 	Stream_UnIndent( self->debug );
@@ -575,7 +598,7 @@ void _SolutionVector_ShareValuesNotStoredLocally(
 				reqFromOthersCounts[proc_I], proc_I, VALUE_TAG );
 			reqValuesFromOthersHandles[proc_I] = Memory_Alloc_Unnamed( MPI_Request );
 			MPI_Irecv( reqValuesFromOthers[proc_I], reqFromOthersCounts[proc_I], MPI_DOUBLE,
-				proc_I, VALUE_TAG, meshDecomp->communicator, reqValuesFromOthersHandles[proc_I] );
+				proc_I, VALUE_TAG, comm, reqValuesFromOthersHandles[proc_I] );
 		}	
 	}
 	Stream_UnIndent( self->debug );
@@ -587,10 +610,10 @@ void _SolutionVector_ShareValuesNotStoredLocally(
 	reqValuesFromMe = Memory_Alloc_2DComplex( double, nProc, reqFromMeCounts, "reqValuesFromMe" );
 	for( proc_I=0; proc_I < nProc; proc_I++) {
 		if ( proc_I == myRank ) continue; 
-///Journal_Printf( Journal_Register( Info_Type, "mpi" ),  "!!! line %d, proc_I %d: count = %u\n", __LINE__, proc_I, reqFromMeCounts[proc_I] );
+/* /Journal_Printf( Journal_Register( Info_Type, "mpi" ),  "!!! line %d, proc_I %d: count = %u\n", __LINE__, proc_I, reqFromMeCounts[proc_I] ); */
 		if ( reqFromMeCounts[proc_I] > 0 ) {
 			MPI_Recv( reqFromMe[proc_I], reqFromMeCounts[proc_I], MPI_UNSIGNED,
-				proc_I, VALUE_REQUEST_TAG, meshDecomp->communicator, &status );
+				proc_I, VALUE_REQUEST_TAG, comm, &status );
 			Journal_DPrintfL( self->debug, 3, "Received a list of %u requested vector entry indices from proc %u, "
 				"with tag %d\n", reqFromMeCounts[proc_I], proc_I, status.MPI_TAG );
 		}	
@@ -636,7 +659,7 @@ void _SolutionVector_ShareValuesNotStoredLocally(
 				"\t(tracking via reqValuesFromMe[%d], tag %d)\n", proc_I,
 				reqFromMeCounts[proc_I], proc_I, VALUE_TAG );
 			MPI_Isend( reqValuesFromMe[proc_I], reqFromMeCounts[proc_I], MPI_DOUBLE,
-				proc_I, VALUE_TAG, meshDecomp->communicator, reqValuesFromMeHandles[proc_I] );
+				proc_I, VALUE_TAG, comm, reqValuesFromMeHandles[proc_I] );
 		}	
 	}
 	Stream_UnIndent( self->debug );
@@ -759,17 +782,17 @@ void _SolutionVector_ShareValuesNotStoredLocally(
 void SolutionVector_LoadCurrentFeVariableValuesOntoVector( void* solutionVector ) {
 	SolutionVector*		self = (SolutionVector*)solutionVector;
 	FeVariable*		feVar = self->feVariable;
-	FiniteElement_Mesh*	feMesh = feVar->feMesh;
+	FeMesh*			feMesh = feVar->feMesh;
 	Node_LocalIndex		node_lI = 0;
 	Dof_Index		dof_I = 0;
 	double			value = 0;
 	Index			insertionIndex = 0;
 	
-	for ( node_lI = 0; node_lI < feMesh->nodeLocalCount; node_lI++ ) {
+	for ( node_lI = 0; node_lI < FeMesh_GetNodeLocalSize( feMesh ); node_lI++ ) {
 		for ( dof_I = 0; dof_I < feVar->dofLayout->dofCounts[node_lI]; dof_I++ ) {
 			value = DofLayout_GetValueDouble( feVar->dofLayout, node_lI, dof_I );
 			insertionIndex = feVar->eqNum->destinationArray[node_lI][dof_I];
-			Vector_Insert( self->vector, 1, &insertionIndex, &value );
+			Vector_InsertEntries( self->vector, 1, &insertionIndex, &value );
 		}	
 	}
 

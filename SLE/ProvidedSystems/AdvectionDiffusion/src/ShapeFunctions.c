@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ShapeFunctions.c 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: ShapeFunctions.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -58,7 +58,7 @@
  * Returns memory to new shape functions - which then must be free'd */
 double** AdvDiffResidualForceTerm_BuildSUPGShapeFunctions( AdvDiffResidualForceTerm* self, AdvectionDiffusionSLE* sle, Swarm* swarm, Element_LocalIndex lElement_I, Dimension_Index dim ) {
 	FeVariable*                velocityField    = self->velocityField;
-	FiniteElement_Mesh*        mesh             = velocityField->feMesh;
+	FeMesh*				feMesh             = velocityField->feMesh;
 	double**                   elShapeFunc; 
 	double**                   GNx;
 	double*                    xi;
@@ -73,7 +73,7 @@ double** AdvDiffResidualForceTerm_BuildSUPGShapeFunctions( AdvDiffResidualForceT
 	Particle_InCellIndex       cParticle_I;
 	Particle_InCellIndex       particleCount;
 	Cell_Index                 cell_I;
-	ElementType*               elementType = FeMesh_ElementTypeAt( mesh, lElement_I );
+	ElementType*               elementType = FeMesh_GetElementType( feMesh, lElement_I );
 	Node_Index                 nodeCount = elementType->nodeCount;
 	Node_Index                 node_I;
 	IntegrationPoint*          particle;
@@ -122,7 +122,7 @@ double** AdvDiffResidualForceTerm_BuildSUPGShapeFunctions( AdvDiffResidualForceT
 		/* Get Shape Functions Derivatives */
 		ElementType_ShapeFunctionsGlobalDerivs( 
 			elementType,
-			mesh, lElement_I,
+			feMesh, lElement_I,
 			xi, dim, &detJac, GNx );
 
 		/* Calculate Velocity on Particle */

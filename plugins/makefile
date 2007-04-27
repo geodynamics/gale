@@ -35,19 +35,16 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 674 2006-12-16 03:43:37Z PatrickSunter $
+## $Id: makefile 822 2007-04-27 06:20:35Z LukeHodkinson $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 subdirs = \
-	MultiGrid \
 	Output \
 	StandardConditionFunctions \
 	Document \
-	LevelSetPlugin \
 	VelicAnalyticSolutions \
 	CompareFeVariableAgainstReferenceSolution \
-	EulerDeform \
 	Application \
 	FeVariableImportExporters
 

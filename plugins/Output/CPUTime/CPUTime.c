@@ -35,12 +35,9 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: CPUTime.c 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: CPUTime.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-#include <time.h>
-#include <sys/times.h>
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>

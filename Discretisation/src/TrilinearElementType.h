@@ -43,7 +43,7 @@
 **
 ** Comments:
 **
-** $Id: TrilinearElementType.h 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: TrilinearElementType.h 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -64,6 +64,8 @@
 		Coord	minElLocalCoord; /** Bottom corner in elLocal mathematical space */ \
 		Coord	maxElLocalCoord; /** Top corner in elLocal mathematical space */ \
 		double	elLocalLength[3]; /** Length of element in elLocal space */ \
+		\
+		unsigned**	tetInds;
 		
 	struct TrilinearElementType { __TrilinearElementType };
 	
@@ -124,9 +126,9 @@
 	Uses a shortcut approach if using "box" elements - otherwise uses the general function. */
 	void _TrilinearElementType_ConvertGlobalCoordToElLocal(
 		void*		elementType,
-		ElementLayout*	elementLayout,
-		const Coord**	globalNodeCoordPtrsInElement,
-		const Coord	globalCoord,
-		Coord		elLocalCoord );
+		void*		mesh, 
+		unsigned	element, 
+		const double*	globalCoord,
+		double*		elLocalCoord );
 	
 #endif /* __StgFEM_Discretisation_TrilinearElementType_h__ */

@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: UpwindParameter.c 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: UpwindParameter.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -58,7 +58,7 @@
  * All equations refer to this paper if not otherwise indicated */
 double AdvDiffResidualForceTerm_UpwindDiffusivity( AdvDiffResidualForceTerm* self, Element_LocalIndex lElement_I, double diffusivity, Dimension_Index dim ){
 	FeVariable*                velocityField   = self->velocityField;
-	FiniteElement_Mesh*        mesh            = velocityField->feMesh;
+	FeMesh*				feMesh            = velocityField->feMesh;
 	Coord                      xiElementCentre = {0.0,0.0,0.0};
 	double                     xiUpwind;
 	double                     velocityCentre[3];
@@ -69,6 +69,7 @@ double AdvDiffResidualForceTerm_UpwindDiffusivity( AdvDiffResidualForceTerm* sel
 	double*                    leastCoord;
 	double*                    greatestCoord;
 	Node_LocalIndex            nodeIndex_LeastValues, nodeIndex_GreatestValues;
+	unsigned			nInc, *inc;
 	
 	/* Change Diffusivity if it is too small */
 	if ( diffusivity < MIN_DIFFUSIVITY ) 
@@ -78,10 +79,11 @@ double AdvDiffResidualForceTerm_UpwindDiffusivity( AdvDiffResidualForceTerm* sel
 	FeVariable_InterpolateWithinElement( velocityField, lElement_I, xiElementCentre, velocityCentre );
 
 	/* Calculate Length Scales - See Fig 3.4 - ASSUMES BOX MESH TODO - fix */
-	nodeIndex_LeastValues = mesh->elementNodeTbl[lElement_I][0];
-	nodeIndex_GreatestValues = (dim == 2) ?  mesh->elementNodeTbl[lElement_I][2] : mesh->elementNodeTbl[lElement_I][6];
-	leastCoord    = Mesh_CoordAt( mesh, nodeIndex_LeastValues );
-	greatestCoord = Mesh_CoordAt( mesh, nodeIndex_GreatestValues );
+	FeMesh_GetElementNodes( feMesh, lElement_I, &nInc, &inc );
+	nodeIndex_LeastValues = inc[0];
+	nodeIndex_GreatestValues = (dim == 2) ? inc[3] : inc[7];
+	leastCoord    = Mesh_GetVertex( feMesh, nodeIndex_LeastValues );
+	greatestCoord = Mesh_GetVertex( feMesh, nodeIndex_GreatestValues );
 
 	upwindDiffusivity = 0.0;
 	for ( dim_I = 0 ; dim_I < dim ; dim_I++ ) {

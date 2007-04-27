@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: BilinearElementType.c 659 2006-10-26 02:03:34Z KathleenHumble $
+** $Id: BilinearElementType.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -127,8 +127,6 @@ BilinearElementType* _BilinearElementType_New(
 	return self;
 }
 
-
-
 void _BilinearElementType_Init( BilinearElementType* self ) {
 	Dimension_Index dim_I=0;
 	/* General and Virtual info should already be set */
@@ -140,10 +138,16 @@ void _BilinearElementType_Init( BilinearElementType* self ) {
 		self->maxElLocalCoord[dim_I] = 1;
 		self->elLocalLength[dim_I] = self->maxElLocalCoord[dim_I] - self->minElLocalCoord[dim_I];
 	}
+
+	self->triInds = Memory_Alloc_2DArray( unsigned, 2, 3, "BilinearElementType::triInds" );
+	self->triInds[0][0] = 0; self->triInds[0][1] = 1; self->triInds[0][2] = 2;
+	self->triInds[1][0] = 1; self->triInds[1][1] = 3; self->triInds[1][2] = 2;
 }
 
 void _BilinearElementType_Delete( void* elementType ) {
 	BilinearElementType* self = (BilinearElementType*)elementType;
+
+	FreeArray( self->triInds );
 	
 	Journal_DPrintf( self->debug, "In %s\n", __func__ );
 	/* Stg_Class_Delete parent*/
@@ -223,8 +227,8 @@ void _BilinearElementType_SF_allNodes( void* elementType, const double localCoor
 	
 	evaluatedValues[0] = 0.25*( 1.0-xi )*( 1.0-eta );
 	evaluatedValues[1] = 0.25*( 1.0+xi )*( 1.0-eta );
-	evaluatedValues[2] = 0.25*( 1.0+xi )*( 1.0+eta );
-	evaluatedValues[3] = 0.25*( 1.0-xi )*( 1.0+eta );
+	evaluatedValues[3] = 0.25*( 1.0+xi )*( 1.0+eta );
+	evaluatedValues[2] = 0.25*( 1.0-xi )*( 1.0+eta );
 }
 
 
@@ -239,14 +243,14 @@ void _BilinearElementType_SF_allLocalDerivs_allNodes( void* elementType, const d
 	/* derivatives wrt xi */
 	evaluatedDerivatives[0][0] = - 0.25*( 1.0 - eta );
 	evaluatedDerivatives[0][1] =   0.25*( 1.0 - eta );
-	evaluatedDerivatives[0][2] =   0.25*( 1.0 + eta );
-	evaluatedDerivatives[0][3] = - 0.25*( 1.0 + eta );
+	evaluatedDerivatives[0][3] =   0.25*( 1.0 + eta );
+	evaluatedDerivatives[0][2] = - 0.25*( 1.0 + eta );
 	
 	/* derivatives wrt eta */
 	evaluatedDerivatives[1][0] = - 0.25*( 1.0 - xi );
 	evaluatedDerivatives[1][1] = - 0.25*( 1.0 + xi );
-	evaluatedDerivatives[1][2] =   0.25*( 1.0 + xi );
-	evaluatedDerivatives[1][3] =   0.25*( 1.0 - xi );
+	evaluatedDerivatives[1][3] =   0.25*( 1.0 + xi );
+	evaluatedDerivatives[1][2] =   0.25*( 1.0 - xi );
 }
 
 
@@ -254,84 +258,31 @@ void _BilinearElementType_SF_allLocalDerivs_allNodes( void* elementType, const d
 ** Calculates the barycenter of a triangle with respect to some point.
 */
 
-#if 0
-void _BilinearElementType_TriBarycenter( Coord tri[3], const Coord pnt, Coord dst ) {
-	double	a = tri[1][0] - tri[0][0];
-	double	b = tri[2][0] - tri[0][0];
-	double	c = tri[1][1] - tri[0][1];
-	double	d = tri[2][1] - tri[0][1];
-	double	e = pnt[0] - tri[0][0];
-	double	f = pnt[1] - tri[0][1];
-	double	aInv = 1.0 / a;
-
-	dst[2] = (f - (c * e * aInv)) / (d - (c * b * aInv));
-	dst[1] = (e - b * dst[1]) * aInv;
-	dst[0] = 1.0 - dst[1] - dst[2];
-}
-#endif
-
 void _BilinearElementType_ConvertGlobalCoordToElLocal(
 		void*		elementType,
-		ElementLayout*	elementLayout,
-		const Coord**	globalNodeCoordPtrsInElement,
-		const Coord	globalCoord,
-		Coord		elLocalCoord )
+		void*		_mesh, 
+		unsigned	element, 
+		const double*	globalCoord,
+		double*		elLocalCoord )
 {
 	BilinearElementType*	self = (BilinearElementType*)elementType;
-	Dimension_Index		dim_I = 0;
-	double			globalToElLocalScaling[2] = {0.0,0.0};
-	Coord			relToBottomLeftGlobalCoord = {0.0,0.0,0.0};
+	Mesh*			mesh = (Mesh*)_mesh;
+	unsigned		inside;
+	double			bc[3];
+	static double		lCrds[4][3] = {{-1.0, -1.0, 0.0}, {1.0, -1.0, 0.0}, 
+					       {-1.0, 1.0, 0.0}, {1.0, 1.0, 0.0}};
+	unsigned		nInc, *inc;
+	unsigned		bc_i;
 
-	if ( elementLayout->type == ParallelPipedHexaEL_Type ) {
-		double	elLen[2];
-		elLen[0] = (*(globalNodeCoordPtrsInElement[1]))[0] - (*(globalNodeCoordPtrsInElement[0]))[0];
-		elLen[1] = (*(globalNodeCoordPtrsInElement[3]))[1] - (*(globalNodeCoordPtrsInElement[0]))[1];
-		
-		/* Initially set elLocalCoord to (0,0,0) */
-		memset( elLocalCoord, 0, sizeof( Coord ) );
-	
-		for( dim_I=0; dim_I < 2; dim_I++ ) {
-			globalToElLocalScaling[dim_I] = self->elLocalLength[dim_I] / elLen[dim_I];
+	Mesh_GetIncidence( mesh, MT_FACE, element, MT_VERTEX, &nInc, &inc );
+	assert( nInc == 4 );
 
-			/* The bottom left node is always at index zero */
-			relToBottomLeftGlobalCoord[dim_I] = globalCoord[dim_I] - (*(globalNodeCoordPtrsInElement[0]))[dim_I];
-			
-			elLocalCoord[dim_I] =  
-				self->minElLocalCoord[dim_I] + relToBottomLeftGlobalCoord[dim_I] * globalToElLocalScaling[dim_I];
-			assert( elLocalCoord[dim_I] >= -1.0 || elLocalCoord[dim_I] <= 1.0 );
-		}
-	}
-	else if( elementLayout->type == HexaEL_Type ) {
-		Coord		crds[4];
-		Coord		bc;
-		unsigned	inds[3];
-		Coord		lCrds[4] = {{-1.0, -1.0, 0.0}, {1.0, -1.0, 0.0}, 
-					    {-1.0, 1.0, 0.0}, {1.0, 1.0, 0.0}};
-		/*unsigned	gElInd;*/
-		unsigned	bc_i;
+	insist( Simplex_Search2D( mesh->verts, inc, 2, self->triInds, (double*)globalCoord, bc, &inside ) );
 
-		/* Check first triangle. */
-		memcpy( crds[0], *(globalNodeCoordPtrsInElement[0]), sizeof(Coord) );
-		memcpy( crds[1], *(globalNodeCoordPtrsInElement[1]), sizeof(Coord) );
-		memcpy( crds[2], *(globalNodeCoordPtrsInElement[3]), sizeof(Coord) );
-		memcpy( crds[3], *(globalNodeCoordPtrsInElement[2]), sizeof(Coord) );
-#ifndef NDEBUG
-		if( !_HexaEL_FindTriBarycenter( (const Coord*)crds, globalCoord, bc, inds, INCLUSIVE_UPPER_BOUNDARY, NULL, 0 ) )
-			assert( 0 );
-#else
-		_HexaEL_FindTriBarycenter( crds, globalCoord, bc, inds, INCLUSIVE_UPPER_BOUNDARY, NULL, 0 );
-#endif
-
-		/* Interpolate. */
-		memset( elLocalCoord, 0, sizeof(Coord) );
-		for( bc_i = 0; bc_i < 3; bc_i++ ) {
-			elLocalCoord[0] += bc[bc_i] * lCrds[inds[bc_i]][0];
-			elLocalCoord[1] += bc[bc_i] * lCrds[inds[bc_i]][1];
-		}
-	}
-	else {
-		/* Not a rectangular element -> Just use the general version */
-		_ElementType_ConvertGlobalCoordToElLocal( self, elementLayout, globalNodeCoordPtrsInElement,
-			globalCoord, elLocalCoord );
+	elLocalCoord[0] = bc[0] * lCrds[self->triInds[inside][0]][0];
+	elLocalCoord[1] = bc[0] * lCrds[self->triInds[inside][0]][1];
+	for( bc_i = 1; bc_i < 3; bc_i++ ) {
+		elLocalCoord[0] += bc[bc_i] * lCrds[self->triInds[inside][bc_i]][0];
+		elLocalCoord[1] += bc[bc_i] * lCrds[self->triInds[inside][bc_i]][1];
 	}
 }

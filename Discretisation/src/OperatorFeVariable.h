@@ -44,7 +44,7 @@
 **
 ** Comments:
 **
-**	$Id: OperatorFeVariable.h 782 2007-03-13 11:20:22Z PatrickSunter $
+**	$Id: OperatorFeVariable.h 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -62,6 +62,7 @@
 		__FeVariable \
 		\
 		/* Other info */ \
+		char*							    operatorName;	\
 		Operator*                                                   _operator;           \
 		Index                                                       feVariableCount;  \
 		FeVariable**                                                feVariableList;   \

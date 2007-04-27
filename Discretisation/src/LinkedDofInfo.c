@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: LinkedDofInfo.c 654 2006-10-12 08:58:49Z SteveQuenette $
+** $Id: LinkedDofInfo.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -387,8 +387,8 @@ void _LinkedDofInfo_Build( void* linkedDofInfo, void* data ) {
 				
 	shape = Stg_ComponentFactory_ConstructByName( context->CF, shapeStr, Stg_Shape, True, data ) ;
 				
-				for ( lNode_I = 0; lNode_I < self->mesh->nodeLocalCount; lNode_I++ ) {
-					if ( Stg_Shape_IsCoordInside( shape, self->mesh->nodeCoord[lNode_I] ) ) {
+				for ( lNode_I = 0; lNode_I < Mesh_GetLocalSize( self->mesh, MT_VERTEX ); lNode_I++ ) {
+					if ( Stg_Shape_IsCoordInside( shape, Mesh_GetVertex( self->mesh, lNode_I ) ) ) {
 						LinkedDofInfo_AddDofToSet( self, dofSet, lNode_I, nodalDof );
 					}
 				}	
@@ -433,7 +433,7 @@ void _LinkedDofInfo_Build( void* linkedDofInfo, void* data ) {
 				/* In parallel, there may be several processors in the middle who aren't holding the
 				 * walls, but need to know they exist. Hence use an MPI_Allreduce to get the count */
 				MPI_Allreduce( &numExtraDofSetsNeeded, &globallyKnownExtraDofSetsNeeded, 1, MPI_UNSIGNED,
-					MPI_MAX, self->mesh->layout->decomp->communicator );
+					       MPI_MAX, Mesh_GetCommTopology( self->mesh, MT_VERTEX )->comm );
 
 				for( dofSet_I = 0; dofSet_I < globallyKnownExtraDofSetsNeeded; dofSet_I++ ) {	
 					LinkedDofInfo_AddDofSet( linkedDofInfo );

@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Multicorrector.c 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: Multicorrector.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -83,7 +83,6 @@ AdvDiffMulticorrector* _AdvDiffMulticorrector_New(
 		SLE_Solver_SolverSetupFunction*                     _solverSetup,
 		SLE_Solver_SolveFunction*                           _solve,
 		SLE_Solver_GetResidualFunc*                         _getResidual, 
-		SLE_Solver_MG_SetupSmootherFunc*                    _mgSetupSmoother,
 		Name                                                name )
 {
 	AdvDiffMulticorrector* self;
@@ -105,7 +104,6 @@ AdvDiffMulticorrector* _AdvDiffMulticorrector_New(
 		_solverSetup,
 		_solve,
 		_getResidual, 
-		_mgSetupSmoother, 
 		name );
 	
 	/* Virtual info */
@@ -136,8 +134,7 @@ void AdvDiffMulticorrector_InitAll(
 void _AdvDiffMulticorrector_Delete( void* solver ) {
 	AdvDiffMulticorrector* self = (AdvDiffMulticorrector*)solver;
 
-	if ( self->matrixSolver )
-		MatrixSolver_Destroy( self->matrixSolver );
+	FreeObject( self->matrixSolver );
 
 	_SLE_Solver_Delete( self );
 }
@@ -167,7 +164,6 @@ void* _AdvDiffMulticorrector_DefaultNew( Name name ) {
 		_AdvDiffMulticorrector_SolverSetup,
 		_AdvDiffMulticorrector_Solve,
 		NULL, /*_AdvDiffMulticorrector_GetResidual, */
-		_SLE_Solver_MG_SetupSmoother,
 		name );
 }
 
@@ -183,6 +179,16 @@ void _AdvDiffMulticorrector_Construct( void* solver, Stg_ComponentFactory* cf, v
 	multiCorrectorIterations = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "multiCorrectorIterations", 2 );
 
 	_AdvDiffMulticorrector_Init( self, gamma, multiCorrectorIterations );
+
+	self->matrixSolver = Stg_ComponentFactory_ConstructByKey( cf, self->name, "matrixSolver", MatrixSolver, 
+								  False, data );
+	if( !self->matrixSolver ) {
+#ifdef HAVE_PETSC
+		self->matrixSolver = (MatrixSolver*)PETScMatrixSolver_New( "" );
+#else
+		self->matrixSolver = NULL;
+#endif
+	}
 }
 
 void _AdvDiffMulticorrector_Build( void* solver, void* data ) {
@@ -211,7 +217,8 @@ void _AdvDiffMulticorrector_SolverSetup( void* solver, void* data ) {
 	
 	if ( self->matrixSolver && Stg_Class_IsInstance( sle->massMatrix, StiffnessMatrix_Type ) ) {
 		StiffnessMatrix* massMatrix = Stg_CheckType( sle->massMatrix, StiffnessMatrix );
-		MatrixSolver_Setup( self->matrixSolver, massMatrix->matrix );
+
+		MatrixSolver_SetMatrix( self->matrixSolver, massMatrix->matrix );
 	}
 }
 
@@ -234,7 +241,8 @@ void _AdvDiffMulticorrector_Solve( void* solver, void* _sle ) {
 	AdvDiffMulticorrector_Predictors( self, sle, dt );
 
 	/* Allocate Memory For Corrector Step */
-	Vector_Duplicate( sle->phiVector->vector, &deltaPhiDot );
+	Vector_Duplicate( sle->phiVector->vector, (void**)&deltaPhiDot );
+	Vector_SetLocalSize( deltaPhiDot, Vector_GetLocalSize( sle->phiVector->vector ) );
 
 	/* Multi-corrector Steps */
 	for ( iteration_I = 0 ; iteration_I < self->multiCorrectorIterations ; iteration_I++ ) {
@@ -249,7 +257,7 @@ void _AdvDiffMulticorrector_Solve( void* solver, void* _sle ) {
 	}
 
 	/* Clean Up */
-	Vector_Destroy( deltaPhiDot );
+	FreeObject( deltaPhiDot );
 }
 
 /** See Eqns. 4.2.3-4 */
@@ -279,7 +287,7 @@ void AdvDiffMulticorrector_Predictors( AdvDiffMulticorrector* self, AdvectionDif
 
 	/* Calculate Predictor for \phi - 
 	 * Eq. 4.2.3: \phi_{n+1}^{(0)} = \phi_n + \Delta t(1 - \gamma)\dot \phi_n */
-	Vector_AddScaledVector( sle->phiVector->vector, factor, sle->phiDotVector->vector ); 
+	Vector_AddScaled( sle->phiVector->vector, factor, sle->phiDotVector->vector ); 
 	
 	/* Calculate Predictor for \dot \phi - 
 	 * Eq. 4.2.4: \dot \phi_{n+1}^{(0)} = 0 */
@@ -321,10 +329,10 @@ void AdvDiffMulticorrector_Correctors( AdvDiffMulticorrector* self, AdvectionDif
 	Journal_DPrintf( sle->debug, "In func %s:\n", __func__ );
 
 	/* Add correction to \phi - Eq. 4.2.7 */
-	Vector_AddScaledVector( sle->phiVector->vector, factor, deltaPhiDot );
+	Vector_AddScaled( sle->phiVector->vector, factor, deltaPhiDot );
 	
 	/* Add correction to \dot \phi - Eq. 4.2.8 */
-	Vector_AddScaledVector( sle->phiDotVector->vector, 1.0, deltaPhiDot );
+	Vector_AddScaled( sle->phiDotVector->vector, 1.0, deltaPhiDot );
 }
 
 
@@ -347,7 +355,7 @@ void _AdvDiffMulticorrector_CalculatePhiDot_Explicit( AdvDiffMulticorrector* sel
 	ForceVector* massMatrix = Stg_CheckType( sle->massMatrix, ForceVector );
 
 	/* Calculate change in \dot \phi - See Eq. 4.2.5 */
-	Vector_PointwiseDivide( sle->residual->vector, massMatrix->vector, deltaPhiDot );
+	Vector_PointwiseDivide( deltaPhiDot, sle->residual->vector, massMatrix->vector );
 }
 
 void _AdvDiffMulticorrector_CalculatePhiDot_Implicit( AdvDiffMulticorrector* self, AdvectionDiffusionSLE* sle, Vector* deltaPhiDot ) {

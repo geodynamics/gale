@@ -21,8 +21,9 @@
 	<param name="journal.debug">f</param>
 	<param name="journal-enable-branch.debug.StgFEM">f</param>
 	<param name="journal-level-branch.debug.StgFEM"> 1 </param>
-	
+
 	<!-- Geometry & Mesh setup -->
+	<param name="temperatureMesh">linearMesh</param>
 	<param name="dim"> 2 </param>
 	<param name="shadowDepth"> 1 </param>
 	<param name="minX"> 0.0f </param>
@@ -34,8 +35,7 @@
 	<param name="elementResI"> 5 </param>
 	<param name="elementResJ"> 5 </param>
 	<param name="elementResK"> 5 </param>
-	<param name="allowUnbalancing"> True </param>
-	
+
 	<!-- Set up BCs -->
 	<include>standardTempBCs.xml</include>
 
@@ -43,15 +43,14 @@
 	<param name="gaussParticlesX"> 2 </param>
 	<param name="gaussParticlesY"> 2 </param>
 	<param name="gaussParticlesZ"> 2 </param>
-	
+
 	<list name="PrintFeVariableDiscreteValues">
 		<param>TemperatureField</param>
 	</list>
-	
-	<include>StgFEM/ElementLayout.xml       </include>
-	<include>StgFEM/LinearMesh.xml          </include>
-	<include>StgFEM/TemperatureField.xml    </include>
-	<include>StgFEM/GaussSwarm.xml          </include>
-	<include>StgFEM/TempDiffusionSolver.xml </include>
+
+	<include>StgFEM/LinearMesh.xml</include>
+	<include>StgFEM/TemperatureField.xml</include>
+	<include>StgFEM/GaussSwarm.xml</include>
+	<include>StgFEM/TempDiffusionSolver.xml</include>
 
 </StGermainData>

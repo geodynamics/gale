@@ -35,35 +35,21 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Init.c 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: Init.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #include <mpi.h>
-#include <StGermain/StGermain.h>
-#include "units.h"
-#include "types.h"
-#include "shortcuts.h"
-#include "Init.h"
-
-#include "FeEquationNumber.h"
-#include "FeVariable.h"
-#include "OperatorFeVariable.h"
-#include "ShapeFeVariable.h"
-#include "FeSwarmVariable.h"
-#include "Mesh.h"
-#include "ElementType.h"
-#include "ElementType_Register.h"
-#include "BilinearElementType.h"
-#include "TrilinearElementType.h"
-#include "ConstantElementType.h"
-#include "LinearTriangleElementType.h"
-#include "LinkedDofInfo.h"
 #include <stdio.h>
+
+#include "StGermain/StGermain.h"
+#include "Discretisation.h"
+
 
 Stream* StgFEM_Debug = NULL;
 Stream* StgFEM_Warning = NULL;
 Stream* StgFEM_Discretisation_Debug = NULL;
+
 
 /** Initialises the Linear Algebra package, then any init for this package
 such as streams etc */
@@ -91,19 +77,28 @@ Bool StgFEM_Discretisation_Init( int* argc, char** argv[] ) {
 	Stg_ComponentRegister_Add( componentRegister, OperatorFeVariable_Type, "0", OperatorFeVariable_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, ShapeFeVariable_Type,    "0", ShapeFeVariable_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, FeSwarmVariable_Type,    "0", _FeSwarmVariable_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, FiniteElement_Mesh_Type, "0", FiniteElement_Mesh_DefaultNew );
+	Stg_ComponentRegister_Add( componentRegister, FeMesh_Type, "0", FeMesh_New );
+	Stg_ComponentRegister_Add( componentRegister, C0Generator_Type, "0", C0Generator_New );
+	Stg_ComponentRegister_Add( componentRegister, C2Generator_Type, "0", C2Generator_New );
+	Stg_ComponentRegister_Add( componentRegister, P1Generator_Type, "0", P1Generator_New );
 
 	/** Register Parents for type checking */
 	RegisterParent( ElementType_Type,                  Stg_Component_Type );
 	RegisterParent( BilinearElementType_Type,          ElementType_Type );
 	RegisterParent( TrilinearElementType_Type,         ElementType_Type );
+	RegisterParent( Biquadratic_Type, 		Biquadratic_Type );
+	RegisterParent( P1_Type, 			P1_Type );
+	RegisterParent( RegularTrilinear_Type,			TrilinearElementType_Type );
 	RegisterParent( ConstantElementType_Type,          ElementType_Type );
 	RegisterParent( LinearTriangleElementType_Type,    ElementType_Type );
 	RegisterParent( ElementType_Register_Type,         Stg_Component_Type );
 
 	RegisterParent( FeEquationNumber_Type,             Stg_Component_Type );
 	RegisterParent( LinkedDofInfo_Type,                Stg_Component_Type );
-	RegisterParent( FiniteElement_Mesh_Type,           Mesh_Type );
+	RegisterParent( FeMesh_Type, Mesh_Type );
+	RegisterParent( C0Generator_Type, MeshGenerator_Type );
+	RegisterParent( C2Generator_Type, CartesianGenerator_Type );
+	RegisterParent( P1Generator_Type, MeshGenerator_Type );
 	
 	RegisterParent( FeVariable_Type,                   FieldVariable_Type );
 	RegisterParent( OperatorFeVariable_Type,           FeVariable_Type );
@@ -111,7 +106,7 @@ Bool StgFEM_Discretisation_Init( int* argc, char** argv[] ) {
 	RegisterParent( FeSwarmVariable_Type,              SwarmVariable_Type );
 
 	/* initialise new MPI types */
-	FeEquationNumber_Create_CritPointInfo_MPI_Datatype();
+	/*FeEquationNumber_Create_CritPointInfo_MPI_Datatype();*/
 
 	/* Initialise singletons / registers */
 	FeVariable_FileFormatImportExportList = Stg_ObjectList_New();

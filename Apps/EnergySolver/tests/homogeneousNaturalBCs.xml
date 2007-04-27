@@ -38,7 +38,7 @@
 				</list>
 			</struct>			
 		</list>
-	</struct>			
+	</struct>
 	<struct name="temperatureBCs" mergeType="replace">
 		<param name="type">CompositeVC</param>
 		<list name="vcList">

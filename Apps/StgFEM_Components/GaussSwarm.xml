@@ -11,6 +11,9 @@
 		</struct>
 		<struct name="particleLayout">
 			<param name="Type">GaussParticleLayout</param>
+			<param name="gaussParticlesX">gaussParticlesX</param>
+			<param name="gaussParticlesY">gaussParticlesY</param>
+			<param name="gaussParticlesZ">gaussParticlesZ</param>
 		</struct>
 		<struct name="gaussSwarm">
 			<param name="Type">Swarm</param>

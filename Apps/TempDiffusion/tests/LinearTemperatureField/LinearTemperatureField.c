@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: LinearTemperatureField.c 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: LinearTemperatureField.c 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -44,7 +44,7 @@
 
 const Type LinearTemperatureField_Type = "LinearTemperatureField";
 
-typedef struct { __AnalyticSolution } LinearTemperatureField;
+typedef struct { __AnalyticSolution FeVariable* temperatureField; } LinearTemperatureField;
 
 void LinearTemperatureField_TemperatureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* value ) {
 	*value = 1.0 - coord[ J_AXIS ];
@@ -53,13 +53,18 @@ void LinearTemperatureField_TemperatureFunction( void* analyticSolution, FeVaria
 
 void _LinearTemperatureField_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	LinearTemperatureField *self = (LinearTemperatureField*)analyticSolution;
-	FeVariable*       temperatureField;
 
 	_AnalyticSolution_Construct( self, cf, data );
 
-	temperatureField = Stg_ComponentFactory_ConstructByName( cf, "TemperatureField", FeVariable, True, data ); 
+	self->temperatureField = Stg_ComponentFactory_ConstructByName( cf, "TemperatureField", FeVariable, True, data ); 
+}
 
-	AnalyticSolution_CreateAnalyticField( self, temperatureField, LinearTemperatureField_TemperatureFunction );
+void _LinearTemperatureField_Build( void* analyticSolution, void* data ) {
+	LinearTemperatureField *self = (LinearTemperatureField*)analyticSolution;
+
+	AnalyticSolution_CreateAnalyticField( self, self->temperatureField, LinearTemperatureField_TemperatureFunction );
+
+	_AnalyticSolution_Build( self, data );
 }
 
 void* _LinearTemperatureField_DefaultNew( Name name ) {
@@ -71,7 +76,7 @@ void* _LinearTemperatureField_DefaultNew( Name name ) {
 			_AnalyticSolution_Copy,
 			_LinearTemperatureField_DefaultNew,
 			_LinearTemperatureField_Construct,
-			_AnalyticSolution_Build,
+			_LinearTemperatureField_Build,
 			_AnalyticSolution_Initialise,
 			_AnalyticSolution_Execute,
 			_AnalyticSolution_Destroy,

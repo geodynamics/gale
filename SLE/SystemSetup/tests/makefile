@@ -35,7 +35,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 818 2007-04-24 04:44:27Z PatrickSunter $
+## $Id: makefile 822 2007-04-27 06:20:35Z LukeHodkinson $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -51,7 +51,7 @@ checks = $(wildcard *.sh)
 SRCS = $(wildcard *.c)
 
 EXTERNAL_INCLUDES = -I${INC_DIR}/${PROJECT} -DLIB_DIR=\"${LIB_DIR}\" 
-EXTERNAL_LIBS= -L${LIB_DIR} -l${PROJECT}_SLE_SystemSetup -l${PROJECT}_SLE_PETScLinearAlgebra -l${PROJECT}_Discretisation ${RPATH_LFLAGS}
+EXTERNAL_LIBS= -L${LIB_DIR} -l${PROJECT}_SLE_SystemSetup -l${PROJECT}_SLE_LinearAlgebra -l${PROJECT}_Discretisation ${RPATH_LFLAGS}
 
 packages = STGERMAIN PETSC MPI XML MATH DL HYPRE
 

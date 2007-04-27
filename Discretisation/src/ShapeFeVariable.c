@@ -44,7 +44,7 @@
 #include <StGermain/StGermain.h>
 
 #include "types.h"
-#include "Mesh.h"
+#include "FeMesh.h"
 #include "FeVariable.h"
 #include "ShapeFeVariable.h"
 
@@ -165,7 +165,7 @@ void _ShapeFeVariable_Init( void* shapeFeVariable, Stg_Shape* shape ) {
 
 	self->shape = shape;
 	
-	//EP_AppendClassHook( Context_GetEntryPoint( context, AbstractContext_EP_UpdateClass ),	ParticleFeVariable_Update, self );
+/* 	EP_AppendClassHook( Context_GetEntryPoint( context, AbstractContext_EP_UpdateClass ),	ParticleFeVariable_Update, self ); */
 }
 
 void _ShapeFeVariable_Delete( void* _shapeFeVariable ) {
@@ -185,7 +185,7 @@ void _ShapeFeVariable_Print( void* _shapeFeVariable, Stream* stream ) {
 
 
 void* _ShapeFeVariable_Copy( void* shapeFeVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
-	//ShapeFeVariable*	self = (ShapeFeVariable*)shapeFeVariable;
+/* 	ShapeFeVariable*	self = (ShapeFeVariable*)shapeFeVariable; */
 	ShapeFeVariable*	newShapeFeVariable;
 	
 	assert(0);
@@ -217,13 +217,13 @@ void _ShapeFeVariable_Initialise( void* shapeFeVariable, void* data ) {
 	_FeVariable_Initialise( self, data );
 
 	/* Set up the basic "level set" describiing if nodes are inside the shape or not */
-	for ( node_dI = 0; node_dI < self->feMesh->nodeDomainCount; node_dI++ ) {
-		if ( True == Stg_Shape_IsCoordInside( self->shape, self->feMesh->nodeCoord[node_dI] ) ) {
-			//set value = 1
+	for ( node_dI = 0; node_dI < Mesh_GetDomainSize( self->feMesh, MT_VERTEX ); node_dI++ ) {
+		if ( True == Stg_Shape_IsCoordInside( self->shape, Mesh_GetVertex( self->feMesh, node_dI ) ) ) {
+/* 			set value = 1 */
 			FeVariable_SetComponentAtNode( self, node_dI, 0, 1 );
 		}		
 		else {
-			//set value = 0
+/* 			set value = 0 */
 			FeVariable_SetComponentAtNode( self, node_dI, 0, 0 );
 		}
 	}

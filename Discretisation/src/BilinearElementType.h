@@ -44,7 +44,7 @@
 **
 ** Comments:
 **
-** $Id: BilinearElementType.h 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: BilinearElementType.h 822 2007-04-27 06:20:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -65,6 +65,8 @@
 		double	minElLocalCoord[2]; /** Bottom corner in elLocal mathematical space */ \
 		double	maxElLocalCoord[2]; /** Top corner in elLocal mathematical space */ \
 		double	elLocalLength[2]; /** Length of element in elLocal space */ \
+		\
+		unsigned**		triInds;
 		
 	struct BilinearElementType { __BilinearElementType };
 	
@@ -124,8 +126,9 @@
 		then calculates this using a faster shortcut. */
 	void _BilinearElementType_ConvertGlobalCoordToElLocal(
 		void*		elementType,
-		ElementLayout*	elementLayout,
-		const Coord**	globalNodeCoordPtrsInElement,
-		const Coord	globalCoord,
-		Coord		elLocalCoord );
+		void*		mesh, 
+		unsigned	element, 
+		const double*	globalCoord,
+		double*		elLocalCoord );
+
 #endif /* __StgFEM_Discretisation_BilinearElementType_h__ */

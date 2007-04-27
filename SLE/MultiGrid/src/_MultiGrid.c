@@ -483,7 +483,7 @@ void MultiGrid_UpdateMatrixSolver( unsigned handle, MatrixSolver* solver, SLE_So
 		if( level_i > 0 ) {
 			/* For all but the finest. */
 			fprintf(stderr,"*** MG: Setting down smoother for level %d to %s \n",level_i,info->downSmoothers[level_i]);
-			SLE_Solver_MG_SetupSmoother( sleSolver, down, info->smoothers[level_i - 1], level_i, info->nLevels + 1 );  //!! i-1
+			SLE_Solver_MG_SetupSmoother( sleSolver, down, info->smoothers[level_i - 1], level_i, info->nLevels + 1 );  /* !! i-1 */
 			if( level_j > 0 ) {
 				fprintf(stderr,"*** MG: Setting up smoother for level %d to %s \n",level_i,info->upSmoothers[level_i]);
 				SLE_Solver_MG_SetupSmoother( sleSolver, up, info->smoothers[level_i - 1], level_i, info->nLevels + 1 );
@@ -527,7 +527,7 @@ void MultiGrid_UpdateMatrixSolver( unsigned handle, MatrixSolver* solver, SLE_So
 		/* Set this level's operators aswell as the residual function, except for the coarse level. */
 		if( level_i < info->nLevels ) {
 			MatrixSolver_MG_SetRestrictionOp( solver, level_j, info->rOps[level_i] );
-			MatrixSolver_MG_SetInterpolationOp( solver, level_j, info->rOps[level_i] ); // ROPS <-> POPS
+			MatrixSolver_MG_SetInterpolationOp( solver, level_j, info->rOps[level_i] ); /*  ROPS <-> POPS */
 		}
 
 		/* Set this level's work vectors. */
@@ -1088,7 +1088,7 @@ void MultiGrid_BuildSmoothers( unsigned handle ) {
 	assert( info );
 	assert( info->stiffMat );
 	assert( info->rOps );
-	// assert( info->pOps );
+	/*  assert( info->pOps ); */
 	
 	
 	/*
