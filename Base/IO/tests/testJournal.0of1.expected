@@ -48,6 +48,9 @@ Stream "info":
 		Stream "LiveDebug":
 			Enabled: True
 			Level: 1
+		Stream "general":
+			Enabled: True
+			Level: 1
 		Stream "myComponent":
 			Enabled: True
 			Level: 1
@@ -96,4 +99,4 @@ Stream "MPIStream":
 	Enabled: True
 	Level: 1
 
-StGermain IO Report - File Flush called 85 times.
+StGermain IO Report - File Flush called 88 times.
