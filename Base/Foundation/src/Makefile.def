@@ -24,7 +24,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: Makefile.def 4081 2007-04-27 06:20:07Z LukeHodkinson $
+## $Id: Makefile.def 4083 2007-04-29 22:02:21Z LukeHodkinson $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -32,6 +32,7 @@ def_lib = StGermainBaseFoundation
 def_inc = StGermain/Base/Foundation
 
 def_srcs = \
+	debug.c \
 	CommonRoutines.c \
 	MemoryField.c \
 	MemoryPointer.c \
@@ -69,6 +70,8 @@ def_hdrs = \
 	MemMonitor.h \
 	Numerics.h \
 	TestSuite.h \
+	TestBegin.h \
+	TestEnd.h \
 	Init.h \
 	Finalise.h \
 	Foundation.h

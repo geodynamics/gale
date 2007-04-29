@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Foundation_TestSuite_h__
-#define __Base_Foundation_TestSuite_h__
+#ifndef __StGermain_Base_Foundation_TestSuite_h__
+#define __StGermain_Base_Foundation_TestSuite_h__
 
 	/** Textual name of this class */
 	extern const Type TestSuite_Type;
@@ -76,10 +76,10 @@
 	** Constructors
 	*/
 
-	#define TESTSUITE_DEFARGS		\
+	#define TESTSUITE_DEFARGS \
 		STG_CLASS_DEFARGS
 
-	#define TESTSUITE_PASSARGS	\
+	#define TESTSUITE_PASSARGS \
 		STG_CLASS_PASSARGS
 
 	TestSuite* TestSuite_New();
@@ -114,4 +114,4 @@
 
 	void TestSuite_Destruct( TestSuite* self );
 
-#endif /* __Base_Foundation_TestSuite_h__ */
+#endif /* __StGermain_Base_Foundation_TestSuite_h__ */
