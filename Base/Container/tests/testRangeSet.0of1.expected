@@ -1,4 +1,3 @@
-   Running test 'construct'... passed
    Running test 'set indices'... passed
    Running test 'ranges'... passed
    Running test 'union'... passed
