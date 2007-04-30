@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Stokes_SLE_UzawaSolver.c 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: Stokes_SLE_UzawaSolver.c 823 2007-04-30 01:33:45Z KathleenHumble $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -448,19 +448,21 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	if ( Stream_IsPrintableLevel( self->debug, 3 ) ) {
 		Journal_DPrintf( self->debug, "Matrices and Vectors to solve are:\n" );
 		Journal_DPrintf( self->debug, "K Matrix:\n" );
-		Matrix_View( sle->kStiffMat->matrix, self->debug );
+		/* No nice way of viewing Matrices, so commented out as incompatible with
+		 * new 3D decomp at present --Kathleen Humble 30-04-07 
+		 * Matrix_View( sle->kStiffMat->matrix, self->debug ); */
 		Journal_DPrintf( self->debug, "G Matrix:\n" );
-		Matrix_View( G_Mat, self->debug );
+		/*Matrix_View( G_Mat, self->debug ); */
 		if ( D_Mat ) {
 			Journal_DPrintf( self->debug, "D Matrix:\n" );
-			Matrix_View( D_Mat, self->debug );
+			/*Matrix_View( D_Mat, self->debug );*/
 		}	
 		if ( M_Mat ) {
 			Journal_DPrintf( self->debug, "M Matrix:\n" );
-			Matrix_View( M_Mat, self->debug );
+			/*Matrix_View( M_Mat, self->debug );*/
 		}	
 		Journal_DPrintf( self->debug, "Z (preconditioner) Matrix:\n" );
-		Matrix_View( self->preconditioner->matrix, self->debug );
+		/*Matrix_View( self->preconditioner->matrix, self->debug ); */
 		Journal_DPrintf( self->debug, "f Vector:\n" );
 		Vector_View( fVec, self->debug );
 		Journal_DPrintf( self->debug, "h Vector:\n" );
