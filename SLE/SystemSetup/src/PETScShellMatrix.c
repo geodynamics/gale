@@ -321,7 +321,7 @@ void PETScShellMatrix_UpdateAssembly( void* matrix ) {
 PetscErrorCode PETScShellMatrix_MatMult( Mat A, Vec x, Vec y ) {
 	PetscErrorCode	ec;
 
-	ec = VecZeroEntries( y );
+	ec = VecSet( y, 0.0 );
 	CheckPETScError( ec );
 
 	return PETScShellMatrix_MatMultAdd( A, x, y );
@@ -433,7 +433,7 @@ PetscErrorCode PETScShellMatrix_MatMultTranspose( Mat A, Vec x, Vec y ) {
 	CheckPETScError( ec );
 	assert( self );
 
-	ec = VecZeroEntries( y );
+	ec = VecSet( y, 0.0 );
 	CheckPETScError( ec );
 
 	ec = VecGetArray( x, &xVals );
@@ -516,7 +516,7 @@ PetscErrorCode PETScShellMatrix_MatGetDiagonal( Mat A, Vec x ) {
 	CheckPETScError( ec );
 	assert( self );
 
-	ec = VecZeroEntries( x );
+	ec = VecSet( x, 0.0 );
 	CheckPETScError( ec );
 
 	stiffMat = self->stiffMat;
