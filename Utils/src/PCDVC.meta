@@ -5,25 +5,93 @@
 <param name="Name">PCDVC</param>
 <param name="Author">Mirko Velic</param>
 <param name="Organisation">MCC</param>
-<param name="Project">Underworld</param>
+<param name="Project">PICellerator</param>
 <param name="Location">./PICellerator/Utils/src/</param>
-<param name="Project Web">http://mcc.monash.edu.au/Underworld</param>
-<param name="Copyright">Copyright (C) 2006 Monash Cluster Computing.</param>
-<param name="License">http://www.opensource.org/licenses/bsd-license.php</param>
+<param name="Project Web">https://csd.vpac.org/twiki/bin/view/PICellerator/WebHome</param>
+<param name="Copyright">Copyright (C) 2005 VPAC and Monash Cluster Computing.</param>
+<param name="License">https://csd.vpac.org/twiki/bin/view/Stgermain/SoftwareLicense http://www.opensource.org/licenses/bsd-license.php</param>
 <param name="Parent">DVCWeights</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
 <param name="Description">Calculates PIC integration weights and handles Population Control in 3D and 2D using a Voronoi diagram. The integration points are set to the centroid of a Voronoi cell and
  the weight is the volume of the cell.</param>
 
+<!--Now the interesting stuff-->
+
 
 <list name="Params">
+	<struct>
+		<param name="Name">upperT</param>
+		<param name="Type">Double</param>
+		<param name="Default">25</param>
+		<param name="Description">Threshold percentage, of weight, where voronio cell will be flaged for a split into 2 voronio cells</param>
+	</struct>
+	<struct>
+		<param name="Name">lowerT</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.6</param>
+		<param name="Description">Threshold percentage, of weight, where voronio cells will be flaged for deletion</param>
+	</struct>
+	<struct>
+		<param name="Name">maxDeletions</param>
+		<param name="Type">UnsignedInt</param>
+		<param name="Default">2</param>
+		<param name="Description">Sets the maximum number of deletions that can occur</param>
+	</struct>
+	<struct>
+		<param name="Name">maxSplits</param>
+		<param name="Type">UnsignedInt</param>
+		<param name="Default">3</param>
+		<param name="Description">Sets the maximum number of deletions that can occur</param>
+	</struct>
+	<struct>
+		<param name="Name">splitInInterfaceCells</param>
+		<param name="Type">Bool</param>
+		<param name="Default">False</param>
+		<param name="Description">Perform split operations in cells where multiple material point swarms exist. Warning could cause numerical diffusion, also consider if you have visualisation swarms or passive tracer swarm and how they are defined</param>
+	</struct>
+	<struct>
+		<param name="Name">resolution</param>
+		<param name="Type">UnsignedInt</param>
+		<param name="Default">10</param>
+		<param name="Description">Discrete voronio resolution in all dimensions, or you can specified individually using resolutionX/Y/Z</param>
+	</struct>
+	<struct>
+		<param name="Name">resolutionX</param>
+		<param name="Type">UnsignedInt</param>
+		<param name="Default">defaultResolution</param>
+		<param name="Description">Discrete voronio resolution in X axis</param>
+	</struct>
+	<struct>
+		<param name="Name">resolutionY</param>
+		<param name="Type">UnsignedInt</param>
+		<param name="Default">defaultResolution</param>
+		<param name="Description">Discrete voronio resolution in Y axis</param>
+	</struct>
+	<struct>
+		<param name="Name">resolutionZ</param>
+		<param name="Type">UnsignedInt</param>
+		<param name="Default">defaultResolution</param>
+		<param name="Description">Discrete voronio resolution in Z axis</param>
+	</struct>
 
 </list>
 
 <list name="Dependencies">
-   <param name="Type">DVCWeights</param>
+	<struct>
+		<param name="Essential">True</param>
+		<param name="Name">MaterialPointsSwarm</param>
+		<param name="Type">MaterialPointsSwarm</param>
+		<param name="Description">Material points swarm to perform population control on</param>
+	</struct>
+
+<!-- PLEASE, check the above struct information is accurate, in line number 218 of the c file and then remove this comment afterwards -->
+
+
 </list>
+<!-- Add an exmaple XML if possible -->
+<param name="Example">Underworld/InputFiles/PIC_Components/MaterialPointsSwarm.xml</param>
+
 
 <!-- Example Usage -->
 <!-- Use this struct -->
@@ -75,10 +143,8 @@
 <!-- You need this too -->
 <struct name="mapper">
    <param name="Type">CoincidentMapper</param>
-   <param name="IntegrationPointsSwarm">materialPoints</param>
+   <param name="IntegrationPointsSwarm">picIntegrationPoints</param>
    <param name="MaterialPointsSwarm">materialSwarm</param>
 </struct>
 
 <!-- See MaterialPointsSwarm.xml in Underworld/InputFiles/PIC_Components for an example -->
-
-</StGermainData>
