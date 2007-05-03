@@ -41,7 +41,9 @@
 			<param name="Type"> OperatorFeVariable </param>
 			<param name="Operator"> Gradient </param>
 			<param name="FeVariable"> TemperatureField </param>
-		</struct>	
+		</struct>
 	</struct>
+
+	<param name="temperatureMesh"> linearMesh </param>
 
 </StGermainData>

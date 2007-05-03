@@ -27,4 +27,7 @@
 		</struct>
 	</struct>
 
+	<param name="elementMesh"> linearMesh </param>
+	<param name="pressureMesh"> constantMesh </param>
+
 </StGermainData>

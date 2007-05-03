@@ -112,5 +112,7 @@
 		</struct>
 		-->
 	</struct>
+
+	<param name="velocityMesh"> linearMesh </param>
 	
 </StGermainData>
