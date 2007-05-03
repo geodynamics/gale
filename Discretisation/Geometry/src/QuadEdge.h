@@ -69,10 +69,15 @@
 #define COUNT(e)  ((QuadEdge *)((e)&WORD))->count
 
 /* Defining macros for operating on bit flags */
-#define IS_IN_USE(e)	(((QuadEdge *)((e)&WORD))->attributes & IN_USE)
-#define IS_FREE(e)		(!(((QuadEdge *)((e)&WORD))->attributes & IN_USE))
-#define SET_IN_USE(e)	(((QuadEdge *)((e)&WORD))->attributes |= IN_USE)
-#define SET_FREE(e)		(((QuadEdge *)((e)&WORD))->attributes &= ~IN_USE)
+/*#define IS_IN_USE(e)	(((QuadEdge *)((e)&WORD))->attributes == IN_USE)
+#define IS_FREE(e)		(!(((QuadEdge *)((e)&WORD))->attributes == IN_USE))
+#define SET_IN_USE(e)	(((QuadEdge *)((e)&WORD))->attributes = IN_USE)
+#define SET_FREE(e)		(((QuadEdge *)((e)&WORD))->attributes = 0)*/
+
+#define IS_IN_USE(e)   (((QuadEdge *)((e)&WORD))->attributes & IN_USE)
+#define IS_FREE(e)             (!(((QuadEdge *)((e)&WORD))->attributes & IN_USE))
+#define SET_IN_USE(e)  (((QuadEdge *)((e)&WORD))->attributes |= IN_USE)
+#define SET_FREE(e)            (((QuadEdge *)((e)&WORD))->attributes &= ~IN_USE)
 
 /* Edge orientation operators: */
 
@@ -115,7 +120,7 @@
 /* Macro for calculating the area of a triangle */
 #define CCW(a, b, c, result)\
 	do{\
-		double ax, ay, bx, by, cx, cy; \
+		double ax=0, ay=0, bx=0, by=0, cx=0, cy=0; \
 		ax = (*(a))[0]; ay = (*(a))[1];\
 		bx = (*(b))[0]; by = (*(b))[1];\
 		cx = (*(c))[0]; cy = (*(c))[1];\

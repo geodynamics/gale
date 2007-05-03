@@ -65,9 +65,12 @@
 
 QuadEdgeRef MakeQuadEdge( MemoryPool *qp )
 {
+	QuadEdge *qe = (QuadEdge*)NULL;
 	QuadEdgeRef e = 0;
 
-	e = (QuadEdgeRef) MemoryPool_NewObject( QuadEdge, qp );
+	qe = MemoryPool_NewObject( QuadEdge, qp );
+	memset( qe, 0, sizeof( QuadEdge ) );
+	e = (QuadEdgeRef) qe;
 	SET_IN_USE( (QuadEdgeRef)e );
 	
 	if( e == 0 ){

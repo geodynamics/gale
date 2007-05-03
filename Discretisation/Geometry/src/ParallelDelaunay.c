@@ -262,12 +262,15 @@ int ParallelDelaunayBtreeCompareFunction( void *a, void *b )
 #define epsilon 0.0001
 #define LOAD_TAG 1
 #define DATA_TAG 1<<1
+#define NEW_SITE_FACTOR 100
 void _ParallelDelaunay_Init( ParallelDelaunay* self )
 {
 	assert( self );
 
 	self->numHaloSites[0] = 0;
 	self->numHaloSites[1] = 0;
+	self->sitePool = MemoryPool_New( Site, NEW_SITE_FACTOR, NEW_SITE_FACTOR );
+	self->coordPool = MemoryPool_New( CoordF, NEW_SITE_FACTOR, NEW_SITE_FACTOR );
 }
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -291,6 +294,8 @@ void _ParallelDelaunay_Delete( void* pd )
 	Memory_Free( self->attributes );
 
 	Stg_Class_Delete( self->localTriangulation );
+	Stg_Class_Delete( self->sitePool );
+	Stg_Class_Delete( self->coordPool );
 	_Delaunay_Delete( self );
 }
 
@@ -399,14 +404,38 @@ void _ParallelDelaunay_Build( void* pd, void* data )
 		self->numLocalSites = self->processorLoad[MASTER_PROC];
 		self->localPoints = Memory_Alloc_Array_Unnamed( CoordF, self->numLocalSites );
 		
-		count = 0;
-		for( i=0; i<numSites; i++ ){
-			if( self->processor[i] == MASTER_PROC ){
-				memcpy( &(self->localPoints[count++]), self->sites[i].coord, sizeof(CoordF) );
+		{
+			CoordF **procCoords = NULL;
+			int *procCoordCounter = NULL;
+
+			procCoordCounter = malloc( sizeof(int)*numProcs );
+			memset( procCoordCounter, 0, sizeof(int)*numProcs );
+
+			procCoords = malloc( sizeof( CoordF* ) * numProcs );
+			for( i=MASTER_PROC+1; i<numProcs; i++ ){
+				procCoords[i] = malloc( sizeof(CoordF) * self->processorLoad[i] );
+				memset( procCoords[i], 0, sizeof( CoordF ) * self->processorLoad[i] );
 			}
-			else{
-				MPI_Send( self->sites[i].coord, sizeof( CoordF ), MPI_BYTE, self->processor[i], DATA_TAG, *self->comm );
-			}			
+
+			count = 0;
+			for( i=0; i<numSites; i++ ){
+				if( self->processor[i] == MASTER_PROC ){
+					memcpy( &(self->localPoints[count++]), self->sites[i].coord, sizeof(CoordF) );
+				}
+				else{
+					memcpy( &(procCoords[self->processor[i]][procCoordCounter[self->processor[i]]++]), self->sites[i].coord,  sizeof(CoordF) );
+				}			
+			}
+			
+			for( i=MASTER_PROC+1; i<numProcs; i++ ){
+				MPI_Send( procCoords[i], sizeof( CoordF )*self->processorLoad[i], MPI_BYTE, i, DATA_TAG, *self->comm );
+			}
+
+			free( procCoordCounter );
+			for( i=MASTER_PROC+1; i<numProcs; i++ ){
+				free( procCoords[i] );
+			}
+			free( procCoords );
 		}
 
 		Memory_Free( alloced );
@@ -418,9 +447,7 @@ void _ParallelDelaunay_Build( void* pd, void* data )
 
 		self->localPoints = Memory_Alloc_Array_Unnamed( CoordF, self->numLocalSites );
 
-		for( i=0; i<self->numLocalSites; i++ ){
-			MPI_Recv( &(self->localPoints[i]), sizeof(CoordF), MPI_BYTE, MASTER_PROC, DATA_TAG, *self->comm, &status );
-		}
+		MPI_Recv( self->localPoints, sizeof(CoordF)*self->numLocalSites, MPI_BYTE, MASTER_PROC, DATA_TAG, *self->comm, &status );
 	}
 
 	MPI_Bcast( self->processorLoad, numProcs, MPI_INT, MASTER_PROC, *self->comm );
@@ -676,8 +703,7 @@ void ParallelDelaunay_GatherTriangulation( ParallelDelaunay *pd )
 	MPI_Status st;
 	int numNeighboursSum = 0;
 	int stride = 0;
-	int translationArray[MAX_NEIGHBOURS] = { 0 };
-
+	
 	assert( pd );
 
 	if( pd->rank == MASTER_PROC ){
@@ -693,25 +719,70 @@ void ParallelDelaunay_GatherTriangulation( ParallelDelaunay *pd )
 		count = 0;
 		count1 = 0;
 		numNeighboursSum = 0;
-		for( i=0; i<pd->numInputSites; i++ ){
-			if( pd->attributes->CalculateVoronoiSurfaceArea ){
-				if( pd->processor[i] == MASTER_PROC ){
-					memcpy( &(pd->voronoiArea[pd->initialOrder[i]]), &(pd->localTriangulation->voronoiArea[count++]), sizeof( float ) );
+
+		{
+			float **procVoronoi = NULL;
+			int **procNumNeighbours = NULL;
+			int *procVoronoiCounter = NULL;
+			int *procNumNeighboursCounter = NULL;
+
+			procVoronoiCounter = malloc( sizeof( int ) * pd->numProcs );
+			memset( procVoronoiCounter, 0, sizeof( int ) * pd->numProcs );
+			
+			procNumNeighboursCounter = malloc( sizeof( int ) * pd->numProcs );
+			memset( procNumNeighboursCounter, 0, sizeof( int ) * pd->numProcs );
+
+			procVoronoi = malloc( sizeof( float* ) * pd->numProcs ); memset( procVoronoi, 0, sizeof(float*)*pd->numProcs );
+			procNumNeighbours = malloc( sizeof( int* ) * pd->numProcs ); memset( procNumNeighbours, 0, sizeof(int*)*pd->numProcs );
+
+			for( i=MASTER_PROC+1; i<pd->numProcs; i++ ){
+
+				if( pd->attributes->CalculateVoronoiSurfaceArea ){
+					procVoronoi[i] = malloc( sizeof(float)*pd->processorLoad[i] );
+					memset( procVoronoi[i], 0, sizeof( float ) * pd->processorLoad[i] );
+					MPI_Recv( procVoronoi[i], pd->processorLoad[i], MPI_FLOAT, i, VORONOI_AREA_TAG, (*pd->comm), &st );
 				}
-				else{
-					MPI_Recv( &(pd->voronoiArea[pd->initialOrder[i]]), 1, MPI_FLOAT, pd->processor[i], VORONOI_AREA_TAG, (*pd->comm), &st );
+
+				if( pd->attributes->FindNeighbours ){
+					procNumNeighbours[i] = malloc( sizeof(int)*pd->processorLoad[i] );
+					memset( procNumNeighbours[i], 0, sizeof(int) * pd->processorLoad[i] );
+					MPI_Recv( procNumNeighbours[i], pd->processorLoad[i], MPI_INT, i, NUM_NEIGHBOUR_TAG, (*pd->comm), &st );
+				}
+			}
+
+			for( i=0; i<pd->numInputSites; i++ ){
+				int proc, order;
+				proc = pd->processor[i];
+				order = pd->initialOrder[i];
+
+				if( pd->attributes->CalculateVoronoiSurfaceArea ){
+					if( pd->processor[i] == MASTER_PROC ){
+						memcpy( &(pd->voronoiArea[pd->initialOrder[i]]), &(pd->localTriangulation->voronoiArea[count++]), sizeof( float ) );
+					}
+					else{
+						memcpy( &(pd->voronoiArea[order]), &(procVoronoi[proc][procVoronoiCounter[proc]++]), sizeof(float) );
+					}
+				}
+			
+				if( pd->attributes->FindNeighbours ){
+					if( pd->processor[i] == MASTER_PROC ){
+						memcpy( &(pd->numNeighbours[pd->initialOrder[i]]), &(pd->localTriangulation->numNeighbours[count1++]), sizeof( int ) );
+					}
+					else{
+						memcpy( &(pd->numNeighbours[pd->initialOrder[i]]), &(procNumNeighbours[proc][procNumNeighboursCounter[proc]++]), sizeof( int ) );
+					}
+					numNeighboursSum += pd->numNeighbours[pd->initialOrder[i]];
 				}
 			}
 			
-			if( pd->attributes->FindNeighbours ){
-				if( pd->processor[i] == MASTER_PROC ){
-					memcpy( &(pd->numNeighbours[pd->initialOrder[i]]), &(pd->localTriangulation->numNeighbours[count1++]), sizeof( int ) );
-				}
-				else{
-					MPI_Recv( &(pd->numNeighbours[pd->initialOrder[i]]), 1, MPI_INT, pd->processor[i], NUM_NEIGHBOUR_TAG, (*pd->comm), &st );
-				}
-				numNeighboursSum += pd->numNeighbours[pd->initialOrder[i]];
+			for( i=MASTER_PROC+1; i<pd->numProcs; i++ ){
+				if( procVoronoi[i] ) free( procVoronoi[i] );
+				if( procNumNeighbours[i] ) free( procNumNeighbours[i] );
 			}
+			free( procVoronoi );
+			free( procNumNeighbours );
+			free( procVoronoiCounter );
+			free( procNumNeighboursCounter );
 		}
 
 		if( pd->attributes->FindNeighbours ){
@@ -739,58 +810,124 @@ void ParallelDelaunay_GatherTriangulation( ParallelDelaunay *pd )
 			}
 		}
 		
-		count = 0;
-		for(j=0; j<pd->numInputSites; j++){
-			if( pd->processor[j] == MASTER_PROC ){
+		{
+			float **procVoronoiSides = NULL;
+			float **procNeighbours = NULL;
+			int *procVoronoiSidesCounter = NULL;
+			int *procNeighboursCounter = NULL;
+			int *procNumNeighboursCount = NULL;
+
+			procVoronoiSidesCounter = malloc( sizeof( int ) * pd->numProcs );
+			memset( procVoronoiSidesCounter, 0, sizeof( int ) * pd->numProcs );
+			
+			procNeighboursCounter = malloc( sizeof( int ) * pd->numProcs );
+			memset( procNeighboursCounter, 0, sizeof( int ) * pd->numProcs );
+			
+			procNumNeighboursCount = malloc( sizeof( int ) * pd->numProcs );
+			memset( procNumNeighboursCount, 0, sizeof( int ) * pd->numProcs );
+
+			procVoronoiSides = malloc( sizeof( float* ) * pd->numProcs ); memset( procVoronoiSides, 0, sizeof(float*)*pd->numProcs );
+			procNeighbours = malloc( sizeof( unsigned int* ) * pd->numProcs ); memset( procNeighbours, 0, sizeof(unsigned int*)*pd->numProcs );
+
+			for( i=0; i<pd->numInputSites; i++ ){
+				procNumNeighboursCount[pd->processor[i]]+=pd->numNeighbours[pd->initialOrder[i]];
+			}
+
+			for( i=MASTER_PROC+1; i<pd->numProcs; i++ ){
 				if( pd->attributes->CalculateVoronoiSides ){
-					memcpy( (pd->voronoiSides[pd->initialOrder[j]]), (pd->localTriangulation->voronoiSides[count]), sizeof(float)*pd->localTriangulation->numNeighbours[count] );
+					procVoronoiSides[i] = malloc( sizeof(float)*procNumNeighboursCount[i] );
+					memset( procVoronoiSides[i], 0, sizeof( float ) * procNumNeighboursCount[i] );
+					MPI_Recv( procVoronoiSides[i], procNumNeighboursCount[i], MPI_FLOAT, i, VORONOI_SIDES_TAG, (*pd->comm), &st );
 				}
+
 				if( pd->attributes->FindNeighbours ){
-					memcpy( (pd->neighbours[pd->initialOrder[j]]), (pd->localTriangulation->neighbours[count]), sizeof(int)*pd->localTriangulation->numNeighbours[count] );
-					for( i=0; i<pd->numNeighbours[pd->initialOrder[j]]; i++ ){
-						pd->neighbours[pd->initialOrder[j]][i] = pd->initialOrder[ParallelDelaunay_TranslateLocalToGlobal(pd, pd->neighbours[pd->initialOrder[j]][i])];
+					procNeighbours[i] = malloc( sizeof(unsigned int)*procNumNeighboursCount[i] );
+					memset( procNeighbours[i], 0, sizeof(unsigned int) * procNumNeighboursCount[i] );
+					MPI_Recv( procNeighbours[i], procNumNeighboursCount[i], MPI_INT, i, NEIGHBOURS_TAG, (*pd->comm), &st );
+				}
+			}
+
+			count = 0;
+			for(j=0; j<pd->numInputSites; j++){
+				int proc, order;
+				proc = pd->processor[j];
+				order = pd->initialOrder[j];
+				
+				if( pd->processor[j] == MASTER_PROC ){
+					if( pd->attributes->CalculateVoronoiSides ){
+						memcpy( (pd->voronoiSides[pd->initialOrder[j]]), (pd->localTriangulation->voronoiSides[count]),
+								sizeof(float)*pd->localTriangulation->numNeighbours[count] );
+					}
+					if( pd->attributes->FindNeighbours ){
+						memcpy( (pd->neighbours[pd->initialOrder[j]]), (pd->localTriangulation->neighbours[count]),
+								sizeof(int)*pd->localTriangulation->numNeighbours[count] );
+						for( i=0; i<pd->numNeighbours[pd->initialOrder[j]]; i++ ){
+							pd->neighbours[pd->initialOrder[j]][i] = 
+								pd->initialOrder[ParallelDelaunay_TranslateLocalToGlobal(pd, pd->neighbours[pd->initialOrder[j]][i])];
+						}
+					}
+					count++;
+				}
+				else{
+					if( pd->attributes->CalculateVoronoiSides ){
+						memcpy( (pd->voronoiSides[pd->initialOrder[j]]),
+								&(procVoronoiSides[proc][procVoronoiSidesCounter[proc]]),
+								sizeof(float)*pd->numNeighbours[order] );
+						procVoronoiSidesCounter[proc]+=pd->numNeighbours[order];
+					}
+					if( pd->attributes->FindNeighbours ){
+						memcpy( (pd->neighbours[pd->initialOrder[j]]),
+								&(procNeighbours[proc][procNeighboursCounter[proc]]),
+								sizeof(int)*pd->numNeighbours[order] );
+						procNeighboursCounter[proc]+=pd->numNeighbours[order];
+
+						for( i=0; i<pd->numNeighbours[pd->initialOrder[j]]; i++ ){
+							pd->neighbours[pd->initialOrder[j]][i] = pd->initialOrder[pd->neighbours[pd->initialOrder[j]][i]];
+						}
 					}
 				}
-				count++;
 			}
-			else{
-				if( pd->attributes->CalculateVoronoiSides ){
-					MPI_Recv( (pd->voronoiSides[pd->initialOrder[j]]), pd->numNeighbours[pd->initialOrder[j]], MPI_FLOAT, pd->processor[j], VORONOI_SIDES_TAG, *(pd->comm), &st );
-				}
-				if( pd->attributes->FindNeighbours ){
-					MPI_Recv( (pd->neighbours[pd->initialOrder[j]]), pd->numNeighbours[pd->initialOrder[j]], MPI_INT, pd->processor[j], NEIGHBOURS_TAG, *(pd->comm), &st );
-					for( i=0; i<pd->numNeighbours[pd->initialOrder[j]]; i++ ){
-						pd->neighbours[pd->initialOrder[j]][i] = pd->initialOrder[pd->neighbours[pd->initialOrder[j]][i]];
-					}
-				}
+
+			for( i=MASTER_PROC+1; i<pd->numProcs; i++ ){
+				if( procVoronoiSides[i] ) free( procVoronoiSides[i] );
+				if( procNeighbours[i] ) free( procNeighbours[i] );
 			}
+			free( procVoronoiSides );
+			free( procNeighbours );
+			free( procVoronoiSidesCounter );
+			free( procNeighboursCounter );			
+			free( procNumNeighboursCount );			
 		}
 	}
 	else{
-		for( i=0; i<pd->numLocalSites; i++ ){
-			if( pd->attributes->CalculateVoronoiSurfaceArea ){
-				MPI_Send( &(pd->localTriangulation->voronoiArea[i]), 1, MPI_FLOAT, MASTER_PROC, VORONOI_AREA_TAG, (*pd->comm) );
-			}
+		if( pd->attributes->CalculateVoronoiSurfaceArea ){
+			MPI_Send( (pd->localTriangulation->voronoiArea), pd->numLocalSites, MPI_FLOAT, MASTER_PROC, VORONOI_AREA_TAG, (*pd->comm) );
+		}
 			
-			if( pd->attributes->FindNeighbours ){
-				MPI_Send( &(pd->localTriangulation->numNeighbours[i]), 1, MPI_INT, MASTER_PROC, NUM_NEIGHBOUR_TAG, (*pd->comm) );
-			}
+		if( pd->attributes->FindNeighbours ){
+			MPI_Send( (pd->localTriangulation->numNeighbours), pd->numLocalSites, MPI_INT, MASTER_PROC, NUM_NEIGHBOUR_TAG, (*pd->comm) );
 		}
 		
-		for( i=0; i<pd->numLocalSites; i++ ){
-			if( pd->attributes->CalculateVoronoiSides ){
-				MPI_Send( (pd->localTriangulation->voronoiSides[i]), pd->localTriangulation->numNeighbours[i], MPI_FLOAT, MASTER_PROC, VORONOI_SIDES_TAG, *(pd->comm));
+		if( pd->attributes->CalculateVoronoiSides ){
+			int sum = 0;
+			for( i=0; i<pd->numLocalSites; i++ ){
+				sum+=pd->localTriangulation->numNeighbours[i];
 			}
-			if( pd->attributes->FindNeighbours ){
-				memset( translationArray, 0, sizeof( translationArray ) );
+			MPI_Send( pd->localTriangulation->voronoiSides[0], sum, 
+					MPI_FLOAT, MASTER_PROC, VORONOI_SIDES_TAG, *(pd->comm));
+		}
+
+		if( pd->attributes->FindNeighbours ){
+			int sum = 0;
+			for( i=0; i<pd->numLocalSites; i++ ){
+				sum+=pd->localTriangulation->numNeighbours[i];
 				
 				for( j=0; j<pd->localTriangulation->numNeighbours[i]; j++ ){
-					translationArray[j] = ParallelDelaunay_TranslateLocalToGlobal( pd, pd->localTriangulation->neighbours[i][j] );
+					pd->localTriangulation->neighbours[i][j] = ParallelDelaunay_TranslateLocalToGlobal( pd, pd->localTriangulation->neighbours[i][j] );
 				}
-				
-				MPI_Send( translationArray, pd->localTriangulation->numNeighbours[i], MPI_INT, MASTER_PROC, NEIGHBOURS_TAG, *(pd->comm) );
 			}
-		}	
+			MPI_Send( pd->localTriangulation->neighbours[0], sum, MPI_INT, MASTER_PROC, NEIGHBOURS_TAG, *(pd->comm) );
+		}
 	}
 	
 	if( pd->attributes->BuildTriangleIndices ){
@@ -826,7 +963,7 @@ void ParallelDelaunay_GatherTriangulation( ParallelDelaunay *pd )
 			}
 
 			triCountArray[0] = triCount;
-			for( i=1; i<pd->numProcs; i++ ){
+			for( i=MASTER_PROC+1; i<pd->numProcs; i++ ){
 				MPI_Recv( &(triCountArray[i]), 1, MPI_INT, i, DATA_TAG, MPI_COMM_WORLD, &st );					
 			}
 
@@ -846,11 +983,14 @@ void ParallelDelaunay_GatherTriangulation( ParallelDelaunay *pd )
 				memcpy( pd->triangleIndices[j], triIndices[j], sizeof(int)*3 );
 			}
 		
-			for( i=1; i<pd->numProcs; i++ ){
-				for( count=0; count < triCountArray[i]; count++ ){
-					MPI_Recv( pd->triangleIndices[j], 3, MPI_INT, i, DATA_TAG, MPI_COMM_WORLD, &st );					
-					j++;
+			stride = j;
+			for( i=MASTER_PROC+1; i<pd->numProcs; i++ ){
+				unsigned int *temp = malloc( sizeof(unsigned int)*triCountArray[i]*3 );
+					MPI_Recv( temp, triCountArray[i]*3, MPI_INT, i, DATA_TAG, MPI_COMM_WORLD, &st );					
+				for(j=0; j<triCountArray[i]*3; j+=3){
+					memcpy( pd->triangleIndices[stride++], &(temp[j]), sizeof(int)*3 );
 				}
+				free( temp );
 			}
 
 			for( i=0; i<pd->numTriangles; i++ ){
@@ -938,9 +1078,7 @@ void ParallelDelaunay_GatherTriangulation( ParallelDelaunay *pd )
 		}
 		else{
 			MPI_Send( &triCount, 1, MPI_INT, MASTER_PROC, DATA_TAG, MPI_COMM_WORLD );
-			for( j=0; j<triCount; j++ ){
-				MPI_Send( triIndices[j], 3, MPI_INT, MASTER_PROC, DATA_TAG, MPI_COMM_WORLD );
-			}
+			MPI_Send( triIndices[0], 3*triCount, MPI_INT, MASTER_PROC, DATA_TAG, MPI_COMM_WORLD );
 		}
 
 		Memory_Free( triCountArray );
@@ -975,8 +1113,7 @@ int ParallelDelaunay_TranslateLocalToGlobal( ParallelDelaunay *self, int id )
 	}
 }
 
-#define ORG_TAG 101
-#define DEST_TAG 102
+#define EDGE_TAG 102
 #define BREAK_TAG 103
 typedef struct SitePacket_t{
 	int id;
@@ -984,51 +1121,51 @@ typedef struct SitePacket_t{
 }SitePacket;
 void ParallelDelaunaySendEdge( QuadEdgeRef edge, int rank, MPI_Comm *comm, MPI_Request *req )
 {
-	SitePacket sp;
+	SitePacket sp[2];
 	assert(edge);
 
-	memcpy( sp.xyz, ((Site*)ORG(edge))->coord, sizeof( CoordF ) );
-	sp.id = ((Site*)ORG(edge))->id;
-	MPI_Isend( &sp, sizeof(SitePacket), MPI_BYTE, rank, ORG_TAG, *comm, &(req[0]) );
+	memcpy( sp[0].xyz, ((Site*)ORG(edge))->coord, sizeof( CoordF ) );
+	sp[0].id = ((Site*)ORG(edge))->id;
 	
-	memcpy( sp.xyz, ((Site*)DEST(edge))->coord, sizeof( CoordF ) );
-	sp.id = ((Site*)DEST(edge))->id;
-	MPI_Isend( &sp, sizeof(SitePacket), MPI_BYTE, rank, DEST_TAG, *comm, &(req[1]) );
+	memcpy( sp[1].xyz, ((Site*)DEST(edge))->coord, sizeof( CoordF ) );
+	sp[1].id = ((Site*)DEST(edge))->id;
+	MPI_Isend( sp, sizeof(SitePacket)*2, MPI_BYTE, rank, EDGE_TAG, *comm, req );
 }
 
-QuadEdgeRef ParallelDelaunayRecvEdge( Delaunay *d, int rank, MPI_Comm *comm )
+QuadEdgeRef ParallelDelaunayRecvEdge( ParallelDelaunay *pd, int rank, MPI_Comm *comm )
 {
 	QuadEdgeRef edge = 0;
-	CoordF *c;
-	Site *s;
+	CoordF *c[2];
+	Site *s[2];
 	MPI_Status st;
 	SitePacket sp[2];
+	Delaunay *d = NULL;
 	
-	assert( d );
+	assert( pd );
+	d = pd->localTriangulation;
 	
 	edge = MakeQuadEdge( d->qp );
 	
 	assert(edge);
 
-	s = Memory_Alloc_Array_Unnamed( Site, 2 );
-	memset( s, 0, sizeof( Site ) * 2 );
+	s[0] = MemoryPool_NewObject( Site, pd->sitePool );
+	s[1] = MemoryPool_NewObject( Site, pd->sitePool );
 	
-	c = Memory_Alloc_Array_Unnamed( CoordF, 2 );
-	memset( c, 0, sizeof( CoordF ) * 2 );
+	c[0] = MemoryPool_NewObject( CoordF, pd->coordPool );
+	c[1] = MemoryPool_NewObject( CoordF, pd->coordPool );
 	
-	MPI_Recv( &(sp[0]), sizeof(SitePacket), MPI_BYTE, rank, ORG_TAG, *comm, &st );
-	MPI_Recv( &(sp[1]), sizeof(SitePacket), MPI_BYTE, rank, DEST_TAG, *comm, &st );
+	MPI_Recv( sp, sizeof(SitePacket)*2, MPI_BYTE, rank, EDGE_TAG, *comm, &st );
 
-	memcpy( &(c[0]), sp[0].xyz, sizeof( CoordF ) );
-	memcpy( &(c[1]), sp[1].xyz, sizeof( CoordF ) );
+	memcpy( (c[0]), sp[0].xyz, sizeof( CoordF ) );
+	memcpy( (c[1]), sp[1].xyz, sizeof( CoordF ) );
 
-	s[0].id = sp[0].id;
-	s[0].coord = &(c[0]);
-	s[1].id = sp[1].id;
-	s[1].coord = &(c[1]);
+	s[0]->id = sp[0].id;
+	s[0]->coord = (c[0]);
+	s[1]->id = sp[1].id;
+	s[1]->coord = (c[1]);
 	
-	ORG(edge)=&(s[0]);
-	DEST(edge)=&(s[1]);
+	ORG(edge)=(s[0]);
+	DEST(edge)=(s[1]);
 
 	return edge;
 }
@@ -1059,8 +1196,8 @@ void ParallelDelaunayListDeleteFunction( void *a )
 QuadEdgeRef ParallelDelaunayFindLowestQuadEdge( ParallelDelaunay *pd, MPI_Comm *comm, int rank )
 {
 	QuadEdgeRef ldi=0, rdi=0;
-	MPI_Request r[2];
-	MPI_Status s[2];
+	MPI_Request r;
+	MPI_Status s;
 	int globalBreak, localBreak;
 	LinkedList *list = NULL;
 	LinkedListIterator *iter;
@@ -1087,15 +1224,16 @@ QuadEdgeRef ParallelDelaunayFindLowestQuadEdge( ParallelDelaunay *pd, MPI_Comm *
 	
 	localBreak = 0;
 	globalBreak = 0;
+
 	while (1) 
 	{
 		localBreak = 0;
 		globalBreak = 0;
 
 		if( rank == pd->leftProc ){
-			ParallelDelaunaySendEdge( rdi, rank, comm, &(r[0]) );
-			ldi = ParallelDelaunayRecvEdge( d, rank, comm );
-			MPI_Waitall( 2, r, s );
+			ParallelDelaunaySendEdge( rdi, rank, comm, &r );
+			ldi = ParallelDelaunayRecvEdge( pd, rank, comm );
+			MPI_Wait( &r, &s );
 			LinkedList_InsertNode( list, (void*)ldi, sizeof( QuadEdgeRef* ) );
 			
 			if (RightOf(ORG(ldi), rdi)){
@@ -1107,9 +1245,9 @@ QuadEdgeRef ParallelDelaunayFindLowestQuadEdge( ParallelDelaunay *pd, MPI_Comm *
 		}
 		
 		if( rank == pd->rightProc ){
-			ParallelDelaunaySendEdge( ldi, rank, comm, &(r[0]) );
-			rdi = ParallelDelaunayRecvEdge( d, rank, comm );
-			MPI_Waitall( 2, r, s );
+			ParallelDelaunaySendEdge( ldi, rank, comm, &r );
+			rdi = ParallelDelaunayRecvEdge( pd, rank, comm );
+			MPI_Wait( &r, &s );
 			LinkedList_InsertNode( list, (void*)rdi, sizeof( QuadEdgeRef* ) );
 			
 			if (LeftOf(ORG(rdi), ldi)){
@@ -1120,9 +1258,9 @@ QuadEdgeRef ParallelDelaunayFindLowestQuadEdge( ParallelDelaunay *pd, MPI_Comm *
 			}
 		}
 
-		MPI_Isend( &localBreak, 1, MPI_INT, rank, BREAK_TAG, *comm, &(r[0]) );
-		MPI_Recv( &(globalBreak), 1, MPI_INT, rank, BREAK_TAG, *comm, &(s[0]) );
-		MPI_Waitall( 1, r, s );
+		MPI_Isend( &localBreak, 1, MPI_INT, rank, BREAK_TAG, *comm, &r );
+		MPI_Recv( &(globalBreak), 1, MPI_INT, rank, BREAK_TAG, *comm, &s );
+		MPI_Wait( &r, &s );
 		globalBreak |= localBreak;
 		
 		if( globalBreak == 0 ){
@@ -1133,13 +1271,7 @@ QuadEdgeRef ParallelDelaunayFindLowestQuadEdge( ParallelDelaunay *pd, MPI_Comm *
 	for( result=(QuadEdgeRef)((void*)LinkedListIterator_First(iter));
 			result != 0;
 			result=(QuadEdgeRef)((void*)LinkedListIterator_Next(iter)) ){
-		Site *s;
 
-		s = (Site*)ORG(result);
-
-		Memory_Free( s->coord );
-		Memory_Free( s );
-		
 		DeleteQuadEdge( d->qp, result );
 	}
 
@@ -1159,8 +1291,8 @@ QuadEdgeRef ParallelDelaunayFindLowestQuadEdge( ParallelDelaunay *pd, MPI_Comm *
 void ParallelDelaunayMerge( ParallelDelaunay *pd, MPI_Comm *comm, int rank )
 {
 	QuadEdgeRef lowest = 0, lcand = 0, rcand = 0, basel = 0, baselPrev;
-	MPI_Request r[2];
-	MPI_Status s[2];
+	MPI_Request r;
+	MPI_Status s;
 	int localBreak=0, globalBreak=0;
 	double result = 0.0f;
 	Delaunay *d = NULL;
@@ -1182,10 +1314,9 @@ void ParallelDelaunayMerge( ParallelDelaunay *pd, MPI_Comm *comm, int rank )
 	if( rank == pd->leftProc ){
 		rcand = lowest;
 		
-		ParallelDelaunaySendEdge( lowest, rank, comm, &(r[0]) );
-		lcand = ParallelDelaunayRecvEdge( d, rank, comm );
-		
-		MPI_Waitall( 2, r, s );
+		ParallelDelaunaySendEdge( lowest, rank, comm, &r );
+		lcand = ParallelDelaunayRecvEdge( pd, rank, comm );
+		MPI_Wait( &r, &s );
 		
 		basel = MakeQuadEdge( d->qp );
 		ORG(basel) = DEST(SYM(rcand));
@@ -1211,18 +1342,18 @@ void ParallelDelaunayMerge( ParallelDelaunay *pd, MPI_Comm *comm, int rank )
 			
 			if (!RightOf(DEST(rcand), basel)) localBreak = 1;
 
-			MPI_Isend( &localBreak, 1, MPI_INT, rank, BREAK_TAG, *comm, &(r[0]) );
-			MPI_Recv( &(globalBreak), 1, MPI_INT, rank, BREAK_TAG, *comm, &(s[0]) );
-			MPI_Waitall( 1, r, s );
+			MPI_Isend( &localBreak, 1, MPI_INT, rank, BREAK_TAG, *comm, &r );
+			MPI_Recv( &(globalBreak), 1, MPI_INT, rank, BREAK_TAG, *comm, &s );
+			MPI_Wait( &r, &s );
 			globalBreak &= localBreak;
 
 			if( globalBreak ){
 				break;
 			}
 
-			ParallelDelaunaySendEdge( rcand, rank, comm, &(r[0]) );
-			lcand = ParallelDelaunayRecvEdge( d, rank, comm );
-			MPI_Waitall( 2, r, s );
+			ParallelDelaunaySendEdge( rcand, rank, comm, &r );
+			lcand = ParallelDelaunayRecvEdge( pd, rank, comm );
+			MPI_Wait( &r, &s );
 
 			if ( !RightOf(DEST(lcand), basel) ||
 				( RightOf(DEST(rcand), basel) && 
@@ -1247,10 +1378,9 @@ void ParallelDelaunayMerge( ParallelDelaunay *pd, MPI_Comm *comm, int rank )
 	else if( rank == pd->rightProc ){
 		lcand = lowest;
 		
-		ParallelDelaunaySendEdge( lowest, rank, comm, &(r[0]) );
-		rcand = ParallelDelaunayRecvEdge( d, rank, comm );
-
-		MPI_Waitall( 2, r, s );
+		ParallelDelaunaySendEdge( lowest, rank, comm, &r );
+		rcand = ParallelDelaunayRecvEdge( pd, rank, comm );
+		MPI_Wait( &r, &s );
 		
 		basel = MakeQuadEdge(d->qp);
 		ORG(basel) = DEST(SYM(rcand));
@@ -1276,18 +1406,18 @@ void ParallelDelaunayMerge( ParallelDelaunay *pd, MPI_Comm *comm, int rank )
 			
 			if (!RightOf(DEST(lcand), basel)) localBreak = 1;
 
-			MPI_Isend( &localBreak, 1, MPI_INT, rank, BREAK_TAG, *comm, &(r[0]) );
-			MPI_Recv( &(globalBreak), 1, MPI_INT, rank, BREAK_TAG, *comm, &(s[0]) );
-			MPI_Waitall( 1, r, s );
+			MPI_Isend( &localBreak, 1, MPI_INT, rank, BREAK_TAG, *comm, &r );
+			MPI_Recv( &(globalBreak), 1, MPI_INT, rank, BREAK_TAG, *comm, &s );
+			MPI_Wait( &r, &s );
 			globalBreak &= localBreak;
 
 			if( globalBreak ){
 				break;
 			}
 			
-			ParallelDelaunaySendEdge( lcand, rank, comm, &(r[0]) );
-			rcand = ParallelDelaunayRecvEdge( d, rank, comm );
-			MPI_Waitall( 2, r, s );
+			ParallelDelaunaySendEdge( lcand, rank, comm, &r );
+			rcand = ParallelDelaunayRecvEdge( pd, rank, comm );
+			MPI_Wait( &r, &s );
 
 			if ( !RightOf(DEST(lcand), basel) ||
 				( RightOf(DEST(rcand), basel) && 

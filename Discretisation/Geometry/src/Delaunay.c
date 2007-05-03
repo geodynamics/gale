@@ -512,7 +512,7 @@ void Delaunay_SortSites(Site *sites, int numSites )
 /* Function to check if a point is to the right of an edge */
 int RightOf(Site *s, QuadEdgeRef e)
 {
-	double result;
+	double result=0;
 
 	CCW(s->coord, ((Site*)DEST(e))->coord, ((Site*)ORG(e))->coord, &result);
 
@@ -522,7 +522,7 @@ int RightOf(Site *s, QuadEdgeRef e)
 /* Function to check if a point is to the left of an edge */
 int LeftOf(Site *s, QuadEdgeRef e)
 {
-	double result;
+	double result=0;
 	CCW(s->coord, ((Site*)ORG(e))->coord, ((Site*)DEST(e))->coord, &result);
 
 	return result > 0.0;
@@ -789,6 +789,7 @@ void Delaunay_BuildTriangleIndices( Delaunay *delaunay )
 				delaunay->triangleNeighbours[edgeToTriangle[i][1]][triangleNeighbourCount[edgeToTriangle[i][1]]++] = edgeToTriangle[i][0];
 		}
 		
+		Memory_Free( edgeToTriangle[0] );
 		Memory_Free( edgeToTriangle );
 		Memory_Free( triangleNeighbourCount );
 	}

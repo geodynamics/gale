@@ -63,6 +63,8 @@
 		int			rank; \
 		int			numLocalSites; \
 		int			numTotalLocalSites; \
+		MemoryPool	*sitePool; \
+		MemoryPool	*coordPool; \
 		MPI_Comm	*comm;
 	struct ParallelDelaunay { __ParallelDelaunay };
 	
@@ -149,7 +151,8 @@
 	*/
 	void ParallelDelaunay_BuildTriangleIndices( ParallelDelaunay *pd );
 	void ParallelDelaunaySendEdge( QuadEdgeRef edge, int rank, MPI_Comm *comm, MPI_Request *req );
-	QuadEdgeRef ParallelDelaunayRecvEdge( Delaunay *d, int rank, MPI_Comm *comm );
+	QuadEdgeRef ParallelDelaunayRecvEdge( ParallelDelaunay *pd, int rank, MPI_Comm *comm );
+
 	QuadEdgeRef ParallelDelaunayFindLowestQuadEdge( ParallelDelaunay *pd, MPI_Comm *comm, int rank );
 	void ParallelDelaunayMerge( ParallelDelaunay *pd, MPI_Comm *comm, int rank );
 	int ParallelDelaunay_TranslateLocalToGlobal( ParallelDelaunay *self, int id );
