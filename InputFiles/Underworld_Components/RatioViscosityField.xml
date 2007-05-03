@@ -3,7 +3,7 @@
 		<struct name="RatioViscosityField">
 			<param name="Type">RatioViscosityField</param>
 			<param name="Swarm">gaussSwarm</param>
-			<param name="Mesh">mesh-linear</param>
+			<param name="Mesh">linearMesh</param>
 			<param name="Context">context</param>
 			<param name="ConstitutiveMatrix">constitutiveMatrix</param>
 			<param name="MultiRheologyMaterial">material</param>

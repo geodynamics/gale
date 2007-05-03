@@ -40,7 +40,7 @@
 		
 	<struct name="recoveredEpsilonField">
 	      <param name="Type">FeVariable</param>
-	      <param name="FEMesh">mesh-linear</param>
+	      <param name="FEMesh">linearMesh</param>
 	      <param name="DofLayout">epsilonDofLayout</param>
 	</struct>
 	    

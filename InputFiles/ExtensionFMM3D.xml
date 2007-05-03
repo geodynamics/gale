@@ -78,7 +78,7 @@
 		</struct>	
 		<struct name="compresibility">
 			<param name="Type">Compressible</param>
-			<param name="GeometryMesh">mesh-linear</param>
+			<param name="GeometryMesh">elementMesh</param>
 			<param name="StiffnessMatrix">c_matrix</param>
 			<param name="Swarm">picIntegrationPoints</param>
 			<param name="oneOnLambda">10.0</param>
@@ -165,7 +165,7 @@
 			<param name="Swarm">picIntegrationPoints</param>
 			<param name="Material">mantle</param>
 			<param name="Context">context</param>
-			<param name="Mesh">mesh-linear</param>
+			<param name="Mesh">linearMesh</param>
 		</struct>	
 
 		<!-- Compressible Field Stuff -->
@@ -174,7 +174,7 @@
 			<param name="Swarm">picIntegrationPoints</param>
 			<param name="Material">background</param>
 			<param name="Context">context</param>
-			<param name="Mesh">mesh-linear</param>
+			<param name="Mesh">linearMesh</param>
 		</struct>	
 	</struct>
 
@@ -197,13 +197,16 @@
 	<param name="journal-level-branch.debug.StgFEM"> 2 </param>	
 	
 	<!-- Geometry & Mesh setup -->
+	<param name="elementMesh"> linearMesh </param>
+	<param name="velocityMesh"> linearMesh </param>
+	<param name="pressureMesh"> constantMesh </param>
 	<param name="dim"> 2 </param>
 	<!-- Note : for proper resolution of the problem, it is strongly recommended you run
 	     this problem in parallel, with at least 100 * 50 * 100 elements. The values below are for
 	     small testing / demonstration only. -->
-	<param name="elementResI"> 32 </param>
-	<param name="elementResJ"> 16 </param>
-	<param name="elementResK"> 32 </param>
+	<param name="elementResI"> 8 </param>
+	<param name="elementResJ"> 4 </param>
+	<param name="elementResK"> 8 </param>
 	<param name="shadowDepth"> 1 </param>
 	<param name="minX"> 0.0 </param>
 	<param name="minY"> 0.0 </param>

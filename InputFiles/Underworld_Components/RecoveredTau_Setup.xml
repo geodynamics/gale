@@ -40,7 +40,7 @@
 		
 	<struct name="recoveredTauField">
 	      <param name="Type">FeVariable</param>
-	      <param name="FEMesh">mesh-linear</param>
+	      <param name="FEMesh">linearMesh</param>
 	      <param name="DofLayout">tauDofLayout</param>
 	</struct>
 	    

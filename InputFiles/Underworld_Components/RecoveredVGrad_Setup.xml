@@ -32,7 +32,7 @@
 		
 	<struct name="recoveredVGrad">
 	      <param name="Type">FeVariable</param>
-	      <param name="FEMesh">mesh-linear</param>
+	      <param name="FEMesh">linearMesh</param>
 	      <param name="DofLayout">recVGradDofLayout</param>
 	</struct>
 
