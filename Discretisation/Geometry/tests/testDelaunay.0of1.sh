@@ -6,4 +6,4 @@ until test -r ${TEST_SCRIPT} ; do
 done
 . ${TEST_SCRIPT}
 
-runAndHandleSystemTest "testDelaunay " "$0" "$@"
+runAndHandleSystemTest "testDelaunay small.txt" "$0" "$@"

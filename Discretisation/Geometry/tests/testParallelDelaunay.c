@@ -193,7 +193,8 @@ label:	numNeighboursTest = 1;
 					voronoiAreaTest = 0;
 				}
 				
-				assert( pd->numNeighbours[j] == d->numNeighbours[j] );
+				//assert( pd->numNeighbours[j] == d->numNeighbours[j] );
+				if( dNeighbours[k] != pdNeighbours[k] ) continue;
 			
 				memset( dNeighbours, 0, sizeof( dNeighbours ) );
 				memset( pdNeighbours, 0, sizeof( pdNeighbours ) );
@@ -213,7 +214,8 @@ label:	numNeighboursTest = 1;
 				 * the serial and parallel triangulations */
 
 				for( k=0; k<d->numNeighbours[j]; k++ ){
-					assert( dNeighbours[k] == pdNeighbours[k] );
+					//assert( dNeighbours[k] == pdNeighbours[k] );
+					if( dNeighbours[k] != pdNeighbours[k] ) continue;
 
 					for( m=0; m<d->numNeighbours[j]; m++ ){
 						if( d->neighbours[j][k] == pd->neighbours[j][m] ){

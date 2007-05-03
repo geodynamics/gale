@@ -204,16 +204,31 @@ int main( int argc, char* argv[] ) {
 			#define epsilon 0.001
 			int pass = 1;
 			
-			for( i=10; i<210; i++ ){
-				
+			do{
+				FILE *f = NULL;
 				p = Polygon;
+				if( argc < 3 ){
+					printf( "Expects file name. Aborting..\n" );
+					exit(0);
+				}
+	
+				if( ( f = fopen(argv[2], "r+") ) == NULL ){
+					printf( "Failed to open %s. Aborting..\n", argv[1] );
+					exit(0);
+				}
+	
+				fscanf( f, "%d", &i );
+				/*printf( "reading %d points from %s..\n", i, argv[1] );*/
 			
 				theta = 2*PI/((float)(i-1));
 				
 				sites = Memory_Alloc_Array(CoordF, i, "TestDelauney_CoordF_regPolygon" );
 				memset( sites, 0, sizeof( CoordF ) * i );
-		
-				generatePoints( sites, i, &p );
+
+				j = 0;
+				while( fscanf( f, "%f %f", &(sites[j][0]), &(sites[j][1]) ) != EOF ){
+					j++;
+				}
 			
 				d = Delaunay_New( "Delaunay", dictionary, sites, i, 0, &attr );
 		
@@ -234,10 +249,11 @@ int main( int argc, char* argv[] ) {
 					pass = 0;
 				}
 			
+				fclose( f );
 				Stg_Class_Delete( d );
 
 				Memory_Free( sites );
-			}
+			}while(0);
 
 			printf( "Regular polygon triangulation test %s\n", pass?"passed..":"failed..!" );
 		}
