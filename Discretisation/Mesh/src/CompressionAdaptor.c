@@ -98,7 +98,7 @@ CompressionAdaptor* _CompressionAdaptor_New( COMPRESSIONADAPTOR_DEFARGS ) {
 }
 
 void _CompressionAdaptor_Init( CompressionAdaptor* self ) {
-	self->grad = 0.0;
+	self->compressionfactor  = 0.0;
 }
 
 
@@ -134,7 +134,11 @@ void _CompressionAdaptor_Construct( void* adaptor, Stg_ComponentFactory* cf, voi
 	/* Call parent construct. */
 	_MeshAdaptor_Construct( self, cf, data );
 
-	self->grad = Stg_ComponentFactory_GetDouble( cf, self->name, "initialSeparation", 0.0 );
+	self->compressionfactor = Stg_ComponentFactory_GetDouble( cf, self->name, "compressionfactor", 0.0 );
+	if(self->compressionfactor == 0.0){
+		printf("cannot have a zero compression factor exiting program\n");
+		abort();
+	}
 }
 
 void _CompressionAdaptor_Build( void* adaptor, void* data ) {
@@ -160,9 +164,9 @@ void CompressionAdaptor_Generate( void* adaptor, void* _mesh ) {
 	Mesh*				mesh = (Mesh*)_mesh;
 	Grid				*grid;
 	unsigned*			inds;
-	double				min;
+	double				min,max[3],min2[3];
 	unsigned			gNode;
-	double				x;
+	double				x,b;
 	unsigned			d_i, n_i;
 
 	/* Build base mesh, which is assumed to be cartesian. */
@@ -176,6 +180,10 @@ void CompressionAdaptor_Generate( void* adaptor, void* _mesh ) {
 	grid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
 					      ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
 	inds = AllocArray( unsigned, Mesh_GetDimSize( mesh ) );
+        
+	//get factor b so that there is always a 1 to 1 relationship with the top position normally and top position when compressed
+	Mesh_GetGlobalCoordRange( mesh, min2, max);
+	b = (max[1] - min2[1])/(pow((max[1] - min2[1]), (1.0/self->compressionfactor)));
 	for( d_i = 0; d_i < Mesh_GetDimSize( mesh ); d_i++ )
 		inds[d_i] = 0;
 	gNode = Grid_Project( grid, inds );
@@ -189,7 +197,8 @@ void CompressionAdaptor_Generate( void* adaptor, void* _mesh ) {
 
 		/* Deform this node. */
 		x = mesh->verts[n_i][1] - min;
-		mesh->verts[n_i][1] = 0.5 * self->grad * x * x + x + min;
+		//a compressionfactor function, eg if compression factor = 3 then would be a cubed root function
+		mesh->verts[n_i][1] = b*(pow(x, (1.0/self->compressionfactor)));
 	}
 
 	/* Free resources. */

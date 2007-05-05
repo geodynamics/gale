@@ -52,7 +52,7 @@
 		/* Virtual info */			\
 							\
 		/* CompressionAdaptor info */		\
-		double			grad;
+		double			compressionfactor;
 
 	struct CompressionAdaptor { __CompressionAdaptor };
 
