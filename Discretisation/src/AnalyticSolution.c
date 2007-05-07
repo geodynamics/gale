@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AnalyticSolution.c 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: AnalyticSolution.c 827 2007-05-07 05:03:14Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -433,7 +433,7 @@ FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVari
 		feVariable->fieldVariable_Register );
 
 	/* Add new FeVariable to list */
-	Stg_ObjectList_Append( self->feVariableList,         feVariable );
+	//Stg_ObjectList_Append( self->feVariableList,         feVariable );
 	Stg_ObjectList_Append( self->analyticFeVariableList, analyticFeVariable );
 
 	/* Add function to list */
