@@ -42,7 +42,7 @@
 		</struct>
 		<struct name="linearMeshView" mergeType="replace">
 			<param name="Type">lucMeshViewer</param>
-			<param name="Mesh">mesh-linear</param>
+			<param name="Mesh">linearMesh</param>
 			<param name="localColour">black</param>
 		</struct>	
 		<!-- Viewport -->
