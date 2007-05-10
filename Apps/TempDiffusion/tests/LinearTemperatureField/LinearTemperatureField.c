@@ -35,34 +35,42 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: LinearTemperatureField.c 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: LinearTemperatureField.c 830 2007-05-10 06:45:16Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+#include <string.h>
 #include <StGermain/StGermain.h>
 #include <StgFEM/StgFEM.h>
 
 const Type LinearTemperatureField_Type = "LinearTemperatureField";
 
-typedef struct { __AnalyticSolution FeVariable* temperatureField; } LinearTemperatureField;
+typedef struct { __AnalyticSolution } LinearTemperatureField;
 
 void LinearTemperatureField_TemperatureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* value ) {
 	*value = 1.0 - coord[ J_AXIS ];
 }
 
-
 void _LinearTemperatureField_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	LinearTemperatureField *self = (LinearTemperatureField*)analyticSolution;
+	FeVariable* temperatureField;
 
 	_AnalyticSolution_Construct( self, cf, data );
 
-	self->temperatureField = Stg_ComponentFactory_ConstructByName( cf, "TemperatureField", FeVariable, True, data ); 
+	temperatureField = Stg_ComponentFactory_ConstructByName( cf, "TemperatureField", FeVariable, True, data ); 
+	Stg_ObjectList_Append( self->feVariableList, temperatureField );
 }
 
 void _LinearTemperatureField_Build( void* analyticSolution, void* data ) {
 	LinearTemperatureField *self = (LinearTemperatureField*)analyticSolution;
+	FeVariable* feVariable       = (FeVariable*) Stg_ObjectList_At( self->feVariableList, 0 );
+	char* feName                 = feVariable->name;
 
-	AnalyticSolution_CreateAnalyticField( self, self->temperatureField, LinearTemperatureField_TemperatureFunction );
+	Stg_Component_Build( feVariable, data, False );
+	if( !strcmp( feName, "TemperatureField" ) )
+		AnalyticSolution_CreateAnalyticVectorField( self, feVariable, LinearTemperatureField_TemperatureFunction );
+	else
+		assert(0);
 
 	_AnalyticSolution_Build( self, data );
 }
