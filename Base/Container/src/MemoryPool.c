@@ -294,7 +294,6 @@ void MemPool_Shrink( MemoryPool *memPool )
 	}
 
 	if( deleteFlag ){
-		printf( "shrinking the pool\n" );
 		int numObjs = 0;
 		numObjs = memPool->chunks[chunkIdx].maxFree*memPool->elementSize;
 
