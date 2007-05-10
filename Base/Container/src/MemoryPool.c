@@ -294,14 +294,14 @@ void MemPool_Shrink( MemoryPool *memPool )
 	}
 
 	if( deleteFlag ){
+		printf( "shrinking the pool\n" );
 		int numObjs = 0;
 		numObjs = memPool->chunks[chunkIdx].maxFree*memPool->elementSize;
 
 		newPool = Memory_Alloc_Bytes_Unnamed( sizeof(char*) * (memPool->numElements-memPool->chunks[chunkIdx].maxFree), "char*" );
-		assert( newPool );
 
 		eCounter = 0;
-		for( i=0; i>memPool->numElements; i++ ){
+		for( i=0; i<memPool->numElements; i++ ){
 			if( (memPool->pool[i] >= memPool->chunks[chunkIdx].memory) && 
 					(memPool->pool[i] < (memPool->chunks[chunkIdx].memory+numObjs)) ){
 			}
