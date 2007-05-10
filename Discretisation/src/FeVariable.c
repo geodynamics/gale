@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeVariable.c 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: FeVariable.c 829 2007-05-10 04:12:32Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -1937,8 +1937,6 @@ void FeVariable_ReadNodalValuesFromFile_StgFEM_Native( void* feVariable, const c
 	const unsigned int MAX_LINE_LENGTH = MAX_LINE_LENGTH_DEFINE;
 	Processor_Index    proc_I=0;
 	Dimension_Index    dim_I=0;
-	Coord              localGeometryMin;
-	Coord              localGeometryMax;
 	MPI_Comm	comm = CommTopology_GetComm( Mesh_GetCommTopology( self->feMesh, MT_VERTEX ) );
 	unsigned		rank;
 	unsigned		nProcs;
@@ -1977,11 +1975,6 @@ void FeVariable_ReadNodalValuesFromFile_StgFEM_Native( void* feVariable, const c
 
 	/* Need to re-set the geometry here, in case we're loading from a checkpoint that had compression/squashing BCs,
 		and hence ended up with a smaller mesh than the original */
-	for ( dim_I = 0; dim_I < 3; dim_I++ ) {
-		localGeometryMin[dim_I] = HUGE_VAL;
-		localGeometryMax[dim_I] = -HUGE_VAL;
-	}
-
 	while ( !feof(inputFile) ) {
 		fscanf( inputFile, "%u ", &gNode_I );
 		if( FeMesh_NodeGlobalToDomain( self->feMesh, gNode_I, &lNode_I ) && 
@@ -1992,15 +1985,6 @@ void FeVariable_ReadNodalValuesFromFile_StgFEM_Native( void* feVariable, const c
 			fscanf( inputFile, "%lg %lg %lg ", Mesh_GetVertex( self->feMesh, lNode_I ), 
 				Mesh_GetVertex( self->feMesh, lNode_I ) + 1, 
 				Mesh_GetVertex( self->feMesh, lNode_I ) + 2 );
-
-			for ( dim_I = 0; dim_I < 3; dim_I++ ) {
-				if ( Mesh_GetVertex( self->feMesh, lNode_I )[dim_I] < localGeometryMin[dim_I] ) {
-					localGeometryMin[dim_I] = Mesh_GetVertex( self->feMesh, lNode_I )[dim_I];
-				}
-				else if ( Mesh_GetVertex( self->feMesh, lNode_I )[dim_I] > localGeometryMax[dim_I] ) {
-					localGeometryMax[dim_I] = Mesh_GetVertex( self->feMesh, lNode_I )[dim_I];
-				}
-			}
 			
 			for ( dof_I = 0; dof_I < dofAtEachNodeCount; dof_I++ ) {
 				fscanf( inputFile, "%lg ", &variableVal );
@@ -2012,4 +1996,6 @@ void FeVariable_ReadNodalValuesFromFile_StgFEM_Native( void* feVariable, const c
 		}
 	}
 	fclose( inputFile );
+
+	Mesh_DeformationUpdate( self->feMesh );
 }
