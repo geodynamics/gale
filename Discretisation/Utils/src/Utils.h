@@ -35,7 +35,7 @@
 ** Comments:
 **	None so far.
 **
-** $Id: Utils.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: Utils.h 4103 2007-05-16 01:09:50Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -62,14 +62,18 @@
 	#include "LinearRegression.h"
 	#include "SobolGenerator.h"
 	#include "Remesher.h"
+/*
 	#include "StripRemesher.h"
 	#include "CellRemesher.h"
+*/
 	
 	#include "TimeIntegratee.h"
 	#include "TimeIntegrator.h"
 	#include "ShapeAdvector.h"
 
+/*
 	#include "SemiRegDeform.h"
+*/
 	#include "Init.h"
 	#include "Finalise.h"
 	

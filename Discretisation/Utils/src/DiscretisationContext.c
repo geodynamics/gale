@@ -167,7 +167,7 @@ void _DiscretisationContext_Print( void* context, Stream* stream ) {
 	_AbstractContext_Print( self, stream );
 
 	Journal_Printf( (void*) stream, "\tfieldVariables (ptr): %p\n", self->fieldVariable_Register );
-	Print( self->fieldVariable_Register, stream );
+	Stg_Class_Print( self->fieldVariable_Register, stream );
 }
 
 

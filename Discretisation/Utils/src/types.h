@@ -35,7 +35,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: types.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: types.h 4103 2007-05-16 01:09:50Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -59,7 +59,6 @@
 	typedef struct OperatorFieldVariable		OperatorFieldVariable;
 	typedef struct DiscretisationContext		DiscretisationContext;
 	typedef struct LinearRegression     	LinearRegression;
-	typedef struct Sync				Sync;
 	typedef struct SemiRegDeform		SemiRegDeform;
 	typedef struct SobolGenerator            SobolGenerator;
 	typedef struct TimeIntegratee            TimeIntegratee;

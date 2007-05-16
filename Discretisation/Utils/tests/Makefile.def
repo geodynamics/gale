@@ -24,7 +24,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: Makefile.def 4081 2007-04-27 06:20:07Z LukeHodkinson $
+## $Id: Makefile.def 4103 2007-05-16 01:09:50Z LukeHodkinson $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -42,9 +42,9 @@ def_srcs = \
 	testDofLayout-remap.c \
 	testDofLayout-saveAndLoad.c \
 	testSobolGenerator.c \
-	testSemiRegDeform.c \
 	testTimeIntegration.c \
-	testCornerVC.c \
+	testCornerVC.c
+#	testSemiRegDeform.c \
 
 def_checks = \
 	testFieldVariable_Register.0of1.sh \

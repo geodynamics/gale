@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testFieldVariable_Register.c 3884 2006-10-26 05:26:19Z KathleenHumble $
+** $Id: testFieldVariable_Register.c 4103 2007-05-16 01:09:50Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
 			fV_Register );
 	}	
 
-	Print( fV_Register, stream );
+	Stg_Class_Print( fV_Register, stream );
 
 	/* test the get functions */
 	fV_Index = FieldVariable_Register_GetIndex( fV_Register, fvNames[1] );

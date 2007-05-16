@@ -195,7 +195,7 @@ int main(int argc, char *argv[])
 		if (rank == procToWatch)
 		{
 			printf("Testing for %s\n", vcKey[i]);
-			Print(vc, stream);
+			Stg_Class_Print(vc, stream);
 			printf("\n");
 			for (j = 0; j < 7; j++)
 			{

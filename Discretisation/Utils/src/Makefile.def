@@ -24,7 +24,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: Makefile.def 4081 2007-04-27 06:20:07Z LukeHodkinson $
+## $Id: Makefile.def 4103 2007-05-16 01:09:50Z LukeHodkinson $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -52,12 +52,12 @@ def_srcs = \
 	TimeIntegratee.c \
 	ShapeAdvector.c \
 	SobolGenerator.c \
-	SemiRegDeform.c \
 	Remesher.c \
-	StripRemesher.c \
-	CellRemesher.c \
 	Init.c \
 	Finalise.c
+#	SemiRegDeform.c \
+#	StripRemesher.c \
+#	CellRemesher.c \
 
 def_hdrs = \
 	types.h \
@@ -81,12 +81,12 @@ def_hdrs = \
 	TimeIntegratee.h \
 	ShapeAdvector.h \
 	SobolGenerator.h \
-	SemiRegDeform.h \
 	Remesher.h \
-	StripRemesher.h \
-	CellRemesher.h \
 	Init.h \
 	Finalise.h \
 	Utils.h
+#	SemiRegDeform.h \
+#	StripRemesher.h \
+#	CellRemesher.h \
 
 def_objlists = 

@@ -55,8 +55,7 @@
 									\
 		/* SemiRegDeform info ... */				\
 		Mesh*					mesh;		\
-		Decomp_Sync*				sync;		\
-		Decomp_Sync_Array*			syncArray;	\
+		Sync*					sync;		\
 									\
 		double**				remVerts;	\
 		unsigned				nStrips;	\

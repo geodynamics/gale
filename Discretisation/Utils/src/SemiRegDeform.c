@@ -379,9 +379,9 @@ void SemiRegDeform_Deform( void* srd ) {
 			len = end[conDim] - begin[conDim] + 1;
 			assert( len > 1 );
 
-			insist( Decomp_Sync_GlobalToDomain( self->sync, self->beginInds[strip_i], &dInd ) );
+			insist( Sync_GlobalToDomain( self->sync, self->beginInds[strip_i], &dInd ), == True );
 			first = GET_VAL( dInd )[conDim];
-			insist( Decomp_Sync_GlobalToDomain( self->sync, self->endInds[strip_i], &dInd ) );
+			insist( Sync_GlobalToDomain( self->sync, self->endInds[strip_i], &dInd ), == True );
 			step = GET_VAL( dInd )[conDim];
 			step = (step - first) / (len - 1);
 
@@ -391,7 +391,7 @@ void SemiRegDeform_Deform( void* srd ) {
 
 				begin[conDim]++;
 				ind = Grid_Project( vertGrid, begin );
-				if( Decomp_Sync_GlobalToDomain( self->sync, ind, &dInd ) ) {
+				if( Sync_GlobalToDomain( self->sync, ind, &dInd ) ) {
 					GET_VAL( dInd )[conDim] = first + (double)node_i * step;
 				}
 			}
