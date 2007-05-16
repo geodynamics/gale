@@ -4,6 +4,7 @@ PROJ_ROOT := $(shell until test -r ./Makefile.system ; do cd .. ; done ; echo `p
 include ${PROJ_ROOT}/Makefile.system
 
 # Subdirectories
-subdirs := $(shell find * -type d -follow -prune ! -name .svn )
+#subdirs := $(shell find * -type d -follow -prune ! -name .svn )
+subdirs = Application MaterialThermalDiffusivity VariableConditions EulerDeform ExtractPetscObjects IncompressibleExtensionBC Output
 
 include ${PROJ_ROOT}/Makefile.vmake
