@@ -58,7 +58,7 @@
 		MeshGenerator_GenerateFunc*	generateFunc;	\
 								\
 		/* MeshGenerator info */			\
-		MPI_Comm		comm;			\
+		MPI_Comm		mpiComm;		\
 		unsigned		nMeshes;		\
 		Mesh**			meshes;			\
 								\
@@ -116,7 +116,7 @@
 	** Public functions
 	*/
 
-	void MeshGenerator_SetComm( void* meshGenerator, MPI_Comm comm );
+	void MeshGenerator_SetMPIComm( void* meshGenerator, MPI_Comm mpiComm );
 	void MeshGenerator_AddMesh( void* meshGenerator, void* mesh );
 	void MeshGenerator_SetDimState( void* meshGenerator, unsigned dim, Bool state );
 	void MeshGenerator_ClearIncidenceStates( void* meshGenerator );

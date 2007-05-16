@@ -522,13 +522,13 @@ void DecompTransfer_BuildTables( DecompTransfer* self ) {
 	for( p_i = 0; p_i < self->commTopo->nIncRanks; p_i++ ) {
 		self->netSnks += self->nSnks[p_i];
 		for( ind_i = 0; ind_i < self->nSnks[p_i]; ind_i++ ) {
-			insist( UIntMap_Map( invMap, self->snks[p_i][ind_i], &self->snks[p_i][ind_i] ) );
-			insist( Decomp_GlobalToLocal( self->decomps[0], self->snks[p_i][ind_i], self->snks[p_i] + ind_i ) );
+			insist( UIntMap_Map( invMap, self->snks[p_i][ind_i], &self->snks[p_i][ind_i] ), == True );
+			insist( Decomp_GlobalToLocal( self->decomps[0], self->snks[p_i][ind_i], self->snks[p_i] + ind_i ), == True );
 		}
 
 		self->netSrcs += self->nSrcs[p_i];
 		for( ind_i = 0; ind_i < self->nSrcs[p_i]; ind_i++ )
-			insist( Decomp_GlobalToLocal( self->decomps[1], self->srcs[p_i][ind_i], self->srcs[p_i] + ind_i ) );
+			insist( Decomp_GlobalToLocal( self->decomps[1], self->srcs[p_i][ind_i], self->srcs[p_i] + ind_i ), == True );
 	}
 	FreeObject( invMap );
 }

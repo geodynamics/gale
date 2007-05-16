@@ -35,40 +35,40 @@
 ** Comments:
 **	None so far.
 **
-** $Id: Mesh.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: Mesh.h 4100 2007-05-16 01:07:26Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #ifndef __Discretisaton_Mesh_h__
 #define __Discretisaton_Mesh_h__
 	
-	#include "types.h"
-	#include "shortcuts.h"
+#include "types.h"
+#include "shortcuts.h"
 
-	#include "Grid.h"
-	#include "CommTopology.h"
-	#include "Decomp.h"
-	#include "Decomp_Sync.h"
-	#include "Decomp_Sync_Array.h"
+#include "Grid.h"
+#include "Decomp.h"
+#include "Sync.h"
+#include "MeshTopology.h"
+/*
 	#include "Decomposer.h"
 	#include "DecompTransfer.h"
-	#include "MeshTopology.h"
-	#include "Mesh_ElementType.h"
-	#include "Mesh_HexType.h"
-	#include "Mesh_CentroidType.h"
-	#include "Mesh_Algorithms.h"
-	#include "Mesh_HexAlgorithms.h"
-	#include "Mesh_RegularAlgorithms.h"
-	#include "Mesh_CentroidAlgorithms.h"
-	#include "MeshClass.h"
-	#include "MeshGenerator.h"
-	#include "CartesianGenerator.h"
-	#include "MeshAdaptor.h"
-	#include "SurfaceAdaptor.h"
-	#include "CompressionAdaptor.h"
-	#include "MeshVariable.h"
+*/
+#include "Mesh_ElementType.h"
+#include "Mesh_HexType.h"
+#include "Mesh_CentroidType.h"
+#include "Mesh_Algorithms.h"
+#include "Mesh_HexAlgorithms.h"
+#include "Mesh_RegularAlgorithms.h"
+#include "Mesh_CentroidAlgorithms.h"
+#include "MeshClass.h"
+#include "MeshGenerator.h"
+#include "CartesianGenerator.h"
+#include "MeshAdaptor.h"
+#include "SurfaceAdaptor.h"
+#include "CompressionAdaptor.h"
+#include "MeshVariable.h"
 
-	#include "Init.h"
-	#include "Finalise.h"
+#include "Init.h"
+#include "Finalise.h"
 
 #endif /* __Discretisaton_Mesh_h__ */

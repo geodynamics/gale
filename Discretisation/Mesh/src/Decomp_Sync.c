@@ -319,7 +319,7 @@ void Decomp_Sync_AddSources( void* sync, unsigned nRanks, unsigned* ranks,
 
 		self->srcs[rank] = ReallocArray( self->srcs[rank], unsigned, self->nSrcs[rank] + nSources[p_i] );
 		for( s_i = 0; s_i < nSources[p_i]; s_i++ ) {
-			insist( Decomp_Sync_GlobalToDomain( self, sources[p_i][s_i], &domainInd ) );
+			insist( Decomp_Sync_GlobalToDomain( self, sources[p_i][s_i], &domainInd ), == True );
 			self->srcs[rank][self->nSrcs[rank] + s_i] = domainInd;
 		}
 		self->nSrcs[rank] += nSources[p_i];
@@ -348,7 +348,7 @@ void Decomp_Sync_AddSinks( void* sync, unsigned nRanks, unsigned* ranks,
 		assert( Decomp_Sync_ValidateSinks( self, nSinks[p_i], sinks[p_i] ) );
 		self->snks[rank] = ReallocArray( self->snks[rank], unsigned, self->nSnks[rank] + nSinks[p_i] );
 		for( s_i = 0; s_i < nSinks[p_i]; s_i++ ) {
-			insist( Decomp_Sync_GlobalToDomain( self, sinks[p_i][s_i], &domainInd ) );
+			insist( Decomp_Sync_GlobalToDomain( self, sinks[p_i][s_i], &domainInd ), == True );
 			self->snks[rank][self->nSnks[rank] + s_i] = domainInd;
 		}
 		self->nSnks[rank] += nSinks[p_i];
@@ -423,7 +423,7 @@ void Decomp_Sync_AddRequired( void* sync, unsigned nRequired, unsigned* required
 				RangeSet_GetIndices( remReqSet, &nInds, &inds );
 				if( !CommTopology_GlobalToLocal( self->commTopo, p_i, &localRank ) ) {
 					Decomp_Sync_AddRemoteRanks( self, 1, &p_i );
-					insist( CommTopology_GlobalToLocal( self->commTopo, p_i, &localRank ) );
+					insist( CommTopology_GlobalToLocal( self->commTopo, p_i, &localRank ), == True );
 					nIncRanks = CommTopology_GetIncidenceSize( self->commTopo );
 				}
 				Decomp_Sync_AddSinks( sync, 1, &localRank, &nInds, &inds );
@@ -481,7 +481,7 @@ void Decomp_Sync_AddRequired( void* sync, unsigned nRequired, unsigned* required
 				FreeArray( bytes );
 				inds = NULL;
 				RangeSet_GetIndices( reqSet, &nInds, &inds );
-				insist( CommTopology_GlobalToLocal( self->commTopo, active[p_j], &localRank ) );
+				insist( CommTopology_GlobalToLocal( self->commTopo, active[p_j], &localRank ), == True );
 				Decomp_Sync_AddSources( sync, 1, &localRank, &nInds, &inds );
 				FreeArray( inds );
 			}
@@ -545,7 +545,7 @@ void Decomp_Sync_BuildShared( void* sync ) {
 	RangeSet_GetIndices( allSet, &self->nShared, &self->shared );
 	FreeObject( allSet );
 	for( s_i = 0; s_i < self->nShared; s_i++ ) {
-		insist( Decomp_Sync_GlobalToDomain( self, self->shared[s_i], self->shared + s_i ) );
+		insist( Decomp_Sync_GlobalToDomain( self, self->shared[s_i], self->shared + s_i ), == True );
 		UIntMap_Insert( self->dsMap, self->shared[s_i], s_i );
 	}
 
@@ -558,8 +558,8 @@ void Decomp_Sync_BuildShared( void* sync ) {
 		RangeSet_GetIndices( rSets[r_i], &nInds, &inds );
 		FreeObject( rSets[r_i] );
 		for( ind_i = 0; ind_i < nInds; ind_i++ ) {
-			insist( Decomp_Sync_GlobalToDomain( self, inds[ind_i], inds + ind_i ) );
-			insist( Decomp_Sync_DomainToShared( self, inds[ind_i], inds + ind_i ) );
+			insist( Decomp_Sync_GlobalToDomain( self, inds[ind_i], inds + ind_i ), == True );
+			insist( Decomp_Sync_DomainToShared( self, inds[ind_i], inds + ind_i ), == True );
 			sharers[inds[ind_i]][self->nSharers[inds[ind_i]]++] = r_i;
 		}
 		FreeArray( inds );
@@ -609,7 +609,7 @@ void Decomp_Sync_BuildShared( void* sync ) {
 			unsigned	sharedInd;
 			unsigned	curSharer;
 
-			insist( UIntMap_Map( self->dsMap, self->snks[p_i][s_i], &sharedInd ) );
+			insist( UIntMap_Map( self->dsMap, self->snks[p_i][s_i], &sharedInd ), == True );
 			curSharer = self->nSharers[sharedInd]++;
 			sharers[sharedInd][curSharer] = p_i;
 		}

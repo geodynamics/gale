@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: MeshClass.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: MeshClass.c 4100 2007-05-16 01:07:26Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -82,7 +82,6 @@ Mesh* _Mesh_New( MESH_DEFARGS ) {
 void _Mesh_Init( Mesh* self ) {
 	self->topo = MeshTopology_New( "" );
 	self->verts = NULL;
-	self->vertSyncArray = NULL;
 
 	self->vars = List_New();
 	List_SetItemSize( self->vars, sizeof(MeshVariable*) );
@@ -105,7 +104,6 @@ void _Mesh_Init( Mesh* self ) {
 	self->topoDataSizes = UIntMap_New();
 	self->topoDataInfos = NULL;
 	self->topoDatas = NULL;
-	self->dataSyncArrays = NULL;
 	self->info = ExtensionManager_New_OfExistingObject( "mesh_info", self );
 
 	self->generator = NULL;
@@ -122,8 +120,10 @@ void _Mesh_Delete( void* mesh ) {
 
 	Mesh_Destruct( self );
 	KillObject( self->algorithms );
-	KillObject( self->topo );
+	NewClass_Delete( self->topo );
 	KillObject( self->info );
+	KillObject( self->vars );
+	KillObject( self->topoDataSizes );
 
 	/* Delete the parent. */
 	_Stg_Component_Delete( self );
@@ -160,16 +160,8 @@ void _Mesh_Build( void* mesh, void* data ) {
 	if( !nDims )
 		return;
 
-	self->vertSyncArray = Decomp_Sync_Array_New();
-	Decomp_Sync_Array_SetSync( self->vertSyncArray, self->topo->domains[MT_VERTEX] );
-	Decomp_Sync_Array_SetMemory( self->vertSyncArray, 
-				     self->verts[0], self->verts[Mesh_GetLocalSize( self, MT_VERTEX )], 
-				     nDims * sizeof(double), nDims * sizeof(double), 
-				     nDims * sizeof(double) );
-
 	self->topoDataInfos = Memory_Alloc_Array( ExtensionManager*, nDims, "mesh::topoDataInfos" );
 	self->topoDatas = Memory_Alloc_Array( void*, nDims, "mesh::topoDatas" );
-	self->dataSyncArrays = Memory_Alloc_Array( Decomp_Sync_Array*, nDims, "mesh::dataSyncArrays" );
 
 	for( d_i = 0; d_i < nDims; d_i++ ) {
 		char		name[20];
@@ -180,22 +172,12 @@ void _Mesh_Build( void* mesh, void* data ) {
 		{
 			self->topoDataInfos[d_i] = NULL;
 			self->topoDatas[d_i] = NULL;
-			self->dataSyncArrays[d_i] = NULL;
 			continue;
 		}
 
 		sprintf( name, "topoData(%d)", d_i );
 		self->topoDataInfos[d_i] = ExtensionManager_New_OfStruct( name, size );
 		self->topoDatas[d_i] = (void*)ExtensionManager_Malloc( self->topoDataInfos[d_i], Mesh_GetDomainSize( self, d_i ) );
-
-		self->dataSyncArrays[d_i] = Decomp_Sync_Array_New();
-		Decomp_Sync_Array_SetSync( self->dataSyncArrays[d_i], self->topo->domains[MT_VERTEX] );
-		/* TODO: Why setting verts as the memory to be synced?
-		Decomp_Sync_Array_SetMemory( self->dataSyncArrays[d_i], 
-					     self->verts[0], self->verts[Mesh_GetLocalSize( self, d_i )], 
-					     size, size, 
-					     size );
-		*/
 	}
 
 	/*
@@ -283,7 +265,7 @@ unsigned Mesh_GetGlobalSize( void* mesh, MeshTopology_Dim dim ) {
 	assert( self );
 	assert( self->topo );
 
-	return MeshTopology_GetGlobalSize( self->topo, dim );
+	return Decomp_GetNumGlobals( Sync_GetDecomp( MeshTopology_GetDomain( self->topo, dim ) ) );
 }
 
 unsigned Mesh_GetLocalSize( void* mesh, MeshTopology_Dim dim ) {
@@ -292,7 +274,7 @@ unsigned Mesh_GetLocalSize( void* mesh, MeshTopology_Dim dim ) {
 	assert( self );
 	assert( self->topo );
 
-	return MeshTopology_GetLocalSize( self->topo, dim );
+	return Decomp_GetNumLocals( Sync_GetDecomp( MeshTopology_GetDomain( self->topo, dim ) ) );
 }
 
 unsigned Mesh_GetRemoteSize( void* mesh, MeshTopology_Dim dim ) {
@@ -301,7 +283,7 @@ unsigned Mesh_GetRemoteSize( void* mesh, MeshTopology_Dim dim ) {
 	assert( self );
 	assert( self->topo );
 
-	return MeshTopology_GetRemoteSize( self->topo, dim );
+	return Sync_GetNumRemotes( MeshTopology_GetDomain( self->topo, dim ) );
 }
 
 unsigned Mesh_GetDomainSize( void* mesh, MeshTopology_Dim dim ) {
@@ -310,7 +292,7 @@ unsigned Mesh_GetDomainSize( void* mesh, MeshTopology_Dim dim ) {
 	assert( self );
 	assert( self->topo );
 
-	return MeshTopology_GetDomainSize( self->topo, dim );
+	return Sync_GetNumDomains( MeshTopology_GetDomain( self->topo, dim ) );
 }
 
 unsigned Mesh_GetSharedSize( void* mesh, MeshTopology_Dim dim ) {
@@ -319,7 +301,7 @@ unsigned Mesh_GetSharedSize( void* mesh, MeshTopology_Dim dim ) {
 	assert( self );
 	assert( self->topo );
 
-	return MeshTopology_GetSharedSize( self->topo, dim );
+	return Sync_GetNumShared( MeshTopology_GetDomain( self->topo, dim ) );
 }
 
 MeshTopology* Mesh_GetTopology( void* mesh ) {
@@ -330,12 +312,12 @@ MeshTopology* Mesh_GetTopology( void* mesh ) {
 	return self->topo;
 }
 
-Decomp_Sync* Mesh_GetSync( void* mesh, MeshTopology_Dim dim ) {
+Sync* Mesh_GetSync( void* mesh, MeshTopology_Dim dim ) {
 	Mesh*	self = (Mesh*)mesh;
 
 	assert( self );
 
-	return MeshTopology_GetSync( self->topo, dim );
+	return (Sync*)MeshTopology_GetDomain( self->topo, dim );
 }
 
 Bool Mesh_GlobalToDomain( void* mesh, MeshTopology_Dim dim, unsigned global, unsigned* domain ) {
@@ -344,7 +326,7 @@ Bool Mesh_GlobalToDomain( void* mesh, MeshTopology_Dim dim, unsigned global, uns
 	assert( self );
 	assert( self->topo );
 
-	return MeshTopology_GlobalToDomain( self->topo, dim, global, domain );
+	return Sync_GlobalToDomain( MeshTopology_GetDomain( self->topo, dim ), global, domain );
 }
 
 unsigned Mesh_DomainToGlobal( void* mesh, MeshTopology_Dim dim, unsigned domain ) {
@@ -353,25 +335,25 @@ unsigned Mesh_DomainToGlobal( void* mesh, MeshTopology_Dim dim, unsigned domain 
 	assert( self );
 	assert( self->topo );
 
-	return MeshTopology_DomainToGlobal( self->topo, dim, domain );
+	return Sync_DomainToGlobal( MeshTopology_GetDomain( self->topo, dim ), domain );
 }
 
-Bool Mesh_DomainToShared( void* mesh, MeshTopology_Dim dim, unsigned domain, unsigned* shared ) {
+Bool Mesh_LocalToShared( void* mesh, MeshTopology_Dim dim, unsigned domain, unsigned* shared ) {
 	Mesh*	self = (Mesh*)mesh;
 
 	assert( self );
 	assert( self->topo );
 
-	return MeshTopology_DomainToShared( self->topo, dim, domain, shared );
+	return Sync_LocalToShared( MeshTopology_GetDomain( self->topo, dim ), domain, shared );
 }
 
-unsigned Mesh_SharedToDomain( void* mesh, MeshTopology_Dim dim, unsigned shared ) {
+unsigned Mesh_SharedToLocal( void* mesh, MeshTopology_Dim dim, unsigned shared ) {
 	Mesh*	self = (Mesh*)mesh;
 
 	assert( self );
 	assert( self->topo );
 
-	return MeshTopology_SharedToDomain( self->topo, dim, shared );
+	return Sync_SharedToLocal( MeshTopology_GetDomain( self->topo, dim ), shared );
 }
 
 unsigned Mesh_GetOwner( void* mesh, MeshTopology_Dim dim, unsigned remote ) {
@@ -379,7 +361,7 @@ unsigned Mesh_GetOwner( void* mesh, MeshTopology_Dim dim, unsigned remote ) {
 
 	assert( self );
 
-	return MeshTopology_GetOwner( self->topo, dim, remote );
+	return Sync_GetOwner( MeshTopology_GetDomain( self->topo, dim ), remote );
 }
 
 void Mesh_GetSharers( void* mesh, MeshTopology_Dim dim, unsigned shared, 
@@ -390,7 +372,7 @@ void Mesh_GetSharers( void* mesh, MeshTopology_Dim dim, unsigned shared,
 	assert( self );
 	assert( self->topo );
 
-	MeshTopology_GetSharers( self->topo, dim, shared, nSharers, sharers );
+	Sync_GetSharers( MeshTopology_GetDomain( self->topo, dim ), shared, nSharers, sharers );
 }
 
 Bool Mesh_HasIncidence( void* mesh, MeshTopology_Dim fromDim, MeshTopology_Dim toDim ) {
@@ -420,7 +402,7 @@ void Mesh_GetIncidence( void* mesh, MeshTopology_Dim fromDim, unsigned fromInd, 
 	assert( self );
 	assert( self->topo );
 
-	MeshTopology_GetIncidence( self->topo, fromDim, fromInd, toDim, nInc, inc );
+	MeshTopology_GetIncidence( self->topo, fromDim, fromInd, toDim, nInc, (const int**)inc );
 }
 
 unsigned Mesh_NearestVertex( void* mesh, double* point ) {
@@ -476,12 +458,12 @@ Mesh_ElementType* Mesh_GetElementType( void* mesh, unsigned element ) {
 	return self->elTypes[self->elTypeMap[element]];
 }
 
-CommTopology* Mesh_GetCommTopology( void* mesh, MeshTopology_Dim dim ) {
+Comm* Mesh_GetCommTopology( void* mesh, MeshTopology_Dim dim ) {
 	Mesh*	self = (Mesh*)mesh;
 
 	assert( self );
 
-	return MeshTopology_GetCommTopology( self->topo, dim );
+	return (Comm*)MeshTopology_GetComm( self->topo );
 }
 
 double* Mesh_GetVertex( void* mesh, unsigned domain ) {
@@ -561,12 +543,19 @@ void Mesh_DeformationUpdate( void* mesh ) {
 
 void Mesh_Sync( void* mesh ) {
 	Mesh*	self = (Mesh*)mesh;
+	const Sync* sync;
+	int nDims, nLocals;
 
 	assert( self );
 
-	if( self->vertSyncArray )
-		Decomp_Sync_Array_Sync( self->vertSyncArray );
+	sync = Mesh_GetSync( self, 0 );
+	nDims = Mesh_GetDimSize( self );
+	nLocals = Mesh_GetLocalSize( self, 0 );
+	Sync_SyncArray( sync, self->verts, nDims * sizeof(double), 
+			self->verts + nDims * nLocals, nDims * sizeof(double), 
+			nDims * sizeof(double) );
 
+	/* TODO
 	if( self->dataSyncArrays ) {
 		unsigned	d_i;
 
@@ -575,6 +564,7 @@ void Mesh_Sync( void* mesh ) {
 				Decomp_Sync_Array_Sync( self->dataSyncArrays[d_i] );
 		}
 	}
+	*/
 }
 
 
@@ -592,11 +582,11 @@ void Mesh_Destruct( Mesh* self ) {
 	self->nElTypes = 0;
 
 	KillArray( self->verts );
-	KillObject( self->vertSyncArray );
 
 	self->generator = NULL;
 	self->emReg = NULL;
 
+	/*
 	for( v_i = 0; v_i < List_GetSize( self->vars ); v_i++ ) {
 		MeshVariable*	var;
 
@@ -604,4 +594,5 @@ void Mesh_Destruct( Mesh* self ) {
 		MeshVariable_SetMesh( var, NULL );
 	}
 	List_Clear( self->vars );
+	*/
 }

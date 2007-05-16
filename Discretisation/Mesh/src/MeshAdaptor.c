@@ -42,7 +42,6 @@
 #include "types.h"
 #include "shortcuts.h"
 #include "Decomp.h"
-#include "Decomp_Sync.h"
 #include "MeshTopology.h"
 #include "MeshClass.h"
 #include "MeshGenerator.h"

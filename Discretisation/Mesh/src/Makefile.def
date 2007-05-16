@@ -24,7 +24,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: Makefile.def 4081 2007-04-27 06:20:07Z LukeHodkinson $
+## $Id: Makefile.def 4100 2007-05-16 01:07:26Z LukeHodkinson $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -33,12 +33,8 @@ def_inc = StGermain/Discretisation/Mesh
 
 def_srcs =				\
 	Grid.c				\
-	CommTopology.c			\
 	Decomp.c			\
-	Decomp_Sync.c			\
-	Decomp_Sync_Array.c		\
-	Decomposer.c			\
-	DecompTransfer.c		\
+	Sync.c				\
 	MeshTopology.c			\
 	Mesh_ElementType.c		\
 	Mesh_HexType.c			\
@@ -57,17 +53,18 @@ def_srcs =				\
 	Init.c				\
 	Finalise.c
 
+
 def_hdrs =				\
 	types.h				\
 	shortcuts.h			\
 	Grid.h				\
-	CommTopology.h			\
+	Decomp.def			\
 	Decomp.h			\
-	Decomp_Sync.h			\
-	Decomp_Sync_Array.h		\
-	Decomposer.h			\
-	DecompTransfer.h		\
+	Sync.def			\
+	Sync.h				\
+	MeshTopology.def		\
 	MeshTopology.h			\
+	Mesh.h				\
 	Mesh_ElementType.h		\
 	Mesh_HexType.h			\
 	Mesh_CentroidType.h		\
@@ -83,7 +80,7 @@ def_hdrs =				\
 	CompressionAdaptor.h		\
 	MeshVariable.h			\
 	Init.h				\
-	Finalise.h			\
-	Mesh.h
+	Finalise.h
+
 
 def_objlists = 

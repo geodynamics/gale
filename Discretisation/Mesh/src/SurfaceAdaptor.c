@@ -44,7 +44,7 @@
 #include "shortcuts.h"
 #include "Grid.h"
 #include "Decomp.h"
-#include "Decomp_Sync.h"
+#include "Sync.h"
 #include "MeshTopology.h"
 #include "MeshClass.h"
 #include "MeshGenerator.h"
@@ -199,6 +199,7 @@ void _SurfaceAdaptor_Destroy( void* adaptor, void* data ) {
 void SurfaceAdaptor_Generate( void* adaptor, void* _mesh ) {
 	SurfaceAdaptor*			self = (SurfaceAdaptor*)adaptor;
 	Mesh*				mesh = (Mesh*)_mesh;
+	const Sync*			sync;
 	SurfaceAdaptor_DeformFunc*	deformFunc;
 	Grid				*grid;
 	unsigned*			inds;
@@ -232,11 +233,12 @@ void SurfaceAdaptor_Generate( void* adaptor, void* _mesh ) {
 	inds = AllocArray( unsigned, Mesh_GetDimSize( mesh ) );
 
 	/* Loop over domain nodes. */
-	for( n_i = 0; n_i < MeshTopology_GetDomainSize( mesh->topo, MT_VERTEX ); n_i++ ) {
+	sync = MeshTopology_GetDomain( mesh->topo, MT_VERTEX );
+	for( n_i = 0; n_i < Sync_GetNumDomains( sync ); n_i++ ) {
 		unsigned	gNode;
 		double		height;
 
-		gNode = MeshTopology_DomainToGlobal( mesh->topo, MT_VERTEX, n_i );
+		gNode = Sync_DomainToGlobal( sync, n_i );
 		Grid_Lift( grid, gNode, inds );
 
 		/* Calculate a height percentage. */

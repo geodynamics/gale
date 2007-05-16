@@ -41,7 +41,7 @@
 
 #include "types.h"
 #include "shortcuts.h"
-#include "Decomp_Sync.h"
+#include "Sync.h"
 #include "MeshTopology.h"
 #include "MeshClass.h"
 #include "MeshGenerator.h"
@@ -72,7 +72,7 @@ MeshGenerator* _MeshGenerator_New( MESHGENERATOR_DEFARGS ) {
 }
 
 void _MeshGenerator_Init( MeshGenerator* self ) {
-	self->comm = MPI_COMM_WORLD;
+	self->mpiComm = MPI_COMM_WORLD;
 	self->nMeshes = 0;
 	self->meshes = NULL;
 	self->nDims = 0;
@@ -121,7 +121,7 @@ void _MeshGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* cf, vo
 	dict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( cf->componentDict, self->name ) );
 
 	/* Set the communicator to a default. */
-	MeshGenerator_SetComm( self, MPI_COMM_WORLD );
+	MeshGenerator_SetMPIComm( self, MPI_COMM_WORLD );
 
 	/* Read the individual mesh if specified. */
 	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "mesh", Mesh, False, data );
@@ -226,14 +226,14 @@ void _MeshGenerator_SetDimSize( void* meshGenerator, unsigned nDims ) {
 ** Public Functions
 */
 
-void MeshGenerator_SetComm( void* meshGenerator, MPI_Comm comm ) {
+void MeshGenerator_SetMPIComm( void* meshGenerator, MPI_Comm mpiComm ) {
 	MeshGenerator*	self = (MeshGenerator*)meshGenerator;
 
 	/* Sanity check. */
 	assert( self );
 
 	/* Should probably kill some stuff when I do this. Oh well. */
-	self->comm = comm;
+	self->mpiComm = mpiComm;
 }
 
 void MeshGenerator_AddMesh( void* meshGenerator, void* mesh ) {

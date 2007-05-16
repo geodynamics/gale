@@ -35,12 +35,12 @@
  ** <b>Comments:</b>
  **	None
  **
- ** $Id: MeshTopology.h 3904 2006-12-14 00:52:06Z LukeHodkinson $
+ ** $Id: Sync.h 3904 2006-12-14 00:52:06Z LukeHodkinson $
  **
  **/
  
-#ifndef __StGermain_Discretisation_Mesh_MeshTopology_h__
-#define __StGermain_Discretisation_Mesh_MeshTopology_h__
+#ifndef __StGermain_Discretisation_Mesh_Sync_h__
+#define __StGermain_Discretisation_Mesh_Sync_h__
 
 #ifdef CURRENTDIR
 #undef CURRENTDIR
@@ -50,8 +50,8 @@
 #ifdef CLASSNAME
 #undef CLASSNAME
 #endif
-#define CLASSNAME MeshTopology
+#define CLASSNAME Sync
 
 #include "StGermain/Base/Foundation/ClassHdr.h"
 
-#endif /* __StGermain_Discretisation_Mesh_MeshTopology_h__ */
+#endif /* __StGermain_Discretisation_Mesh_Sync_h__ */

@@ -234,7 +234,7 @@ Bool _Mesh_Algorithms_SearchElements( void* algorithms, double* point,
 					lowest = global;
 			}
 
-			insist( Mesh_GlobalToDomain( mesh, nDims, lowest, elInd) );
+			insist( Mesh_GlobalToDomain( mesh, nDims, lowest, elInd), == True );
 		}
 		else
 			*elInd = ind;
@@ -356,7 +356,7 @@ void _Mesh_Algorithms_GetGlobalCoordRange( void* algorithms, double* min, double
 	localMin = Memory_Alloc_Array_Unnamed( double, nDims );
 	localMax = Memory_Alloc_Array_Unnamed( double, nDims );
 
-	comm = CommTopology_GetComm( Mesh_GetCommTopology( mesh, MT_VERTEX ) );
+	comm = Comm_GetMPIComm( Mesh_GetCommTopology( mesh, MT_VERTEX ) );
 	Mesh_Algorithms_GetLocalCoordRange( self, localMin, localMax );
 	for( d_i = 0; d_i < Mesh_GetDimSize( mesh ); d_i++ ) {
 		MPI_Allreduce( localMin + d_i, min + d_i, 1, MPI_DOUBLE, MPI_MIN, comm );
@@ -568,7 +568,7 @@ Bool Mesh_Algorithms_SearchWithMinIncidence( void* algorithms, double* point,
 		}
 	}
 	if( lowest != (unsigned)-1 ) {
-		insist( Mesh_GlobalToDomain( mesh, nDims, lowest, ind ) );
+		insist( Mesh_GlobalToDomain( mesh, nDims, lowest, ind ), == True );
 		*dim = nDims;
 		return True;
 	}
@@ -586,7 +586,7 @@ Bool Mesh_Algorithms_SearchWithMinIncidence( void* algorithms, double* point,
 		}
 	}
 	if( lowest != (unsigned)-1 ) {
-		insist( Mesh_GlobalToDomain( mesh, nDims, lowest, ind ) );
+		insist( Mesh_GlobalToDomain( mesh, nDims, lowest, ind ), == True );
 		*dim = nDims;
 		return True;
 	}

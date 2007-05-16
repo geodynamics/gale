@@ -91,6 +91,9 @@ void _Grid_Init( Grid* self ) {
 void _Grid_Delete( void* grid ) {
 	Grid*	self = (Grid*)grid;
 
+	FreeArray( self->sizes );
+	FreeArray( self->basis );
+
 	/* Delete the parent. */
 	_Stg_Class_Delete( self );
 }

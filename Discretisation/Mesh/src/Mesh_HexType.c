@@ -40,7 +40,7 @@
 #include "types.h"
 #include "shortcuts.h"
 #include "Decomp.h"
-#include "Decomp_Sync.h"
+#include "Sync.h"
 #include "MeshTopology.h"
 #include "Mesh_ElementType.h"
 #include "MeshClass.h"

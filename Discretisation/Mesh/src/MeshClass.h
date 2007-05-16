@@ -34,7 +34,7 @@
 **
 ** Comments:
 **
-** $Id: MeshClass.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: MeshClass.h 4100 2007-05-16 01:07:26Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -56,7 +56,6 @@
 		/* Mesh info */					\
 		MeshTopology*			topo;		\
 		double**			verts;		\
-		Decomp_Sync_Array*		vertSyncArray;	\
 								\
 		List*				vars;		\
 								\
@@ -77,7 +76,6 @@
 		UIntMap*			topoDataSizes;	\
 		ExtensionManager**		topoDataInfos;	\
 		void**				topoDatas;	\
-		Decomp_Sync_Array**		dataSyncArrays;	\
 		ExtensionManager*		info;		\
 								\
 		MeshGenerator*			generator;	\
@@ -129,12 +127,12 @@
 	unsigned Mesh_GetDomainSize( void* mesh, MeshTopology_Dim dim );
 	unsigned Mesh_GetSharedSize( void* mesh, MeshTopology_Dim dim );
 	MeshTopology* Mesh_GetTopology( void* mesh );
-	Decomp_Sync* Mesh_GetSync( void* mesh, MeshTopology_Dim dim );
+	Sync* Mesh_GetSync( void* mesh, MeshTopology_Dim dim );
 
 	Bool Mesh_GlobalToDomain( void* mesh, MeshTopology_Dim dim, unsigned global, unsigned* domain );
 	unsigned Mesh_DomainToGlobal( void* mesh, MeshTopology_Dim dim, unsigned domain );
-	Bool Mesh_DomainToShared( void* meshTopology, MeshTopology_Dim dim, unsigned domain, unsigned* shared );
-	unsigned Mesh_SharedToDomain( void* meshTopology, MeshTopology_Dim dim, unsigned shared );
+	Bool Mesh_LocalToShared( void* meshTopology, MeshTopology_Dim dim, unsigned domain, unsigned* shared );
+	unsigned Mesh_SharedToLocal( void* meshTopology, MeshTopology_Dim dim, unsigned shared );
 
 	unsigned Mesh_GetOwner( void* mesh, MeshTopology_Dim dim, unsigned remote );
 	void Mesh_GetSharers( void* mesh, MeshTopology_Dim dim, unsigned shared, 
@@ -154,7 +152,7 @@
 				   MeshTopology_Dim* dim, unsigned* ind );
 	Mesh_ElementType* Mesh_GetElementType( void* mesh, unsigned element );
 
-	CommTopology* Mesh_GetCommTopology( void* mesh, MeshTopology_Dim dim );
+	Comm* Mesh_GetCommTopology( void* mesh, MeshTopology_Dim dim );
 	double* Mesh_GetVertex( void* mesh, unsigned domain );
 
 	void Mesh_GetMinimumSeparation( void* mesh, double* minSep, double* axial );

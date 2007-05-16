@@ -44,7 +44,7 @@
 #include "shortcuts.h"
 #include "Grid.h"
 #include "Decomp.h"
-#include "Decomp_Sync.h"
+#include "Sync.h"
 #include "MeshTopology.h"
 #include "MeshClass.h"
 #include "MeshGenerator.h"
@@ -162,6 +162,7 @@ void _CompressionAdaptor_Destroy( void* adaptor, void* data ) {
 void CompressionAdaptor_Generate( void* adaptor, void* _mesh ) {
 	CompressionAdaptor*		self = (CompressionAdaptor*)adaptor;
 	Mesh*				mesh = (Mesh*)_mesh;
+	const Sync*			sync;
 	Grid				*grid;
 	unsigned*			inds;
 	double				min,max[3],min2[3];
@@ -187,12 +188,13 @@ void CompressionAdaptor_Generate( void* adaptor, void* _mesh ) {
 	for( d_i = 0; d_i < Mesh_GetDimSize( mesh ); d_i++ )
 		inds[d_i] = 0;
 	gNode = Grid_Project( grid, inds );
-	insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, gNode, &gNode ) );
+	insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, gNode, &gNode ), == True );
 	min = mesh->verts[gNode][1];
 
 	/* Loop over domain nodes. */
-	for( n_i = 0; n_i < MeshTopology_GetDomainSize( mesh->topo, MT_VERTEX ); n_i++ ) {
-		gNode = MeshTopology_DomainToGlobal( mesh->topo, MT_VERTEX, n_i );
+	sync = MeshTopology_GetDomain( mesh->topo, MT_VERTEX );
+	for( n_i = 0; n_i < Sync_GetNumDomains( sync ); n_i++ ) {
+		gNode = Sync_DomainToGlobal( sync, n_i );
 		Grid_Lift( grid, gNode, inds );
 
 		/* Deform this node. */

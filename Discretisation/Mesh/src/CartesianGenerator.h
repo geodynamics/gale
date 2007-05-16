@@ -79,7 +79,7 @@
 		CartesianGenerator_GenElementTypesFunc*		genElementTypesFunc;		\
 												\
 		/* CartesianGenerator info */							\
-		CommTopology*	commTopo;							\
+		Comm*		comm;								\
 		Bool		regular;							\
 		unsigned	maxDecompDims;							\
 		unsigned*	minDecomp;							\
@@ -209,8 +209,8 @@
 	void CartesianGenerator_GenEdges2D( CartesianGenerator* self, MeshTopology* topo, Grid*** grids );
 	void CartesianGenerator_GenEdges3D( CartesianGenerator* self, MeshTopology* topo, Grid*** grids );
 	void CartesianGenerator_CompleteVertexNeighbours( CartesianGenerator* self, MeshTopology* topo, Grid*** grids );
-	void CartesianGenerator_MapToDomain( CartesianGenerator* self, Decomp_Sync* sync, 
-					     unsigned size, unsigned* nIncEls, unsigned** incEls );
+	void CartesianGenerator_MapToDomain( CartesianGenerator* self, Sync* sync, 
+					     unsigned nIncEls, unsigned* incEls );
 	void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh );
 	void CartesianGenerator_Destruct( CartesianGenerator* self );
 	void CartesianGenerator_DestructTopology( CartesianGenerator* self );

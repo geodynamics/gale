@@ -35,19 +35,24 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: types.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: types.h 4100 2007-05-16 01:07:26Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #ifndef __Discretisaton_Mesh_types_h__
 #define __Discretisaton_Mesh_types_h__
-	
-	/* Types user needs to define */
-	typedef struct _Node			Node;
-	typedef struct _Element			Element;
 
-	/** Enum for functions that need to know type of mesh item they are operating on */
-	typedef enum MeshItemType { ELEMENT_ITEM_TYPE, NODE_ITEM_TYPE } MeshItemType;
+typedef struct Grid Grid;
+typedef struct Decomp Decomp;
+typedef struct Sync Sync;
+typedef struct MeshTopology MeshTopology;
+
+typedef enum {
+   MT_VERTEX, 
+   MT_EDGE, 
+   MT_FACE, 
+   MT_VOLUME
+} MeshTopology_Dim;
 
 	/* Basic indexes */
 	typedef unsigned int			GlobalIndex;			/* global 1D index, not constrained */
@@ -64,7 +69,6 @@
 	typedef LocalIndex			Node_LocalIndex;		/* local 1D, 0 -> localNodeCount, > is error */
 	typedef ShadowIndex			Node_ShadowIndex;		/* shadow 1D, 0 -> shadowNodeCount, > is error */
 	typedef Index				Node_ElementLocalIndex;		/* element local 1D, 0 -> count at given el.*/
-	typedef Node*				Node_List;			/* array of Nodes */
 	typedef Node_GlobalIndex		Node_GlobalIJK[3];
 	typedef Node_LocalIndex			Node_LocalIJK[3];
 	typedef Node_ShadowIndex		Node_ShadowIJK[3];
@@ -77,7 +81,6 @@
 	typedef Element_GlobalIndex		Element_Index;			/* index, positive, not constrained */
 	typedef LocalIndex			Element_LocalIndex;		/* local 1D, 0 -> localNodeCount, > is error */
 	typedef ShadowIndex			Element_ShadowIndex;		/* shadow 1D, 0 -> shadowNodeCount, > is error */
-	typedef Element*			Element_List;			/* array of Elements */
 	typedef Element_GlobalIndex		Element_GlobalIJK[3];
 	typedef Element_LocalIndex		Element_LocalIJK[3];
 	typedef Element_ShadowIndex		Element_ShadowIJK[3];
@@ -106,14 +109,6 @@
 	typedef Element_Neighbours*		Element_NeighboursList;		/* array of "element's neighbours" */
 	typedef Element_NeighbourIndex*		Element_NeighbourIndexList;	/* array of counts of "element's neighbours" */
 	
-	typedef enum PartitionBoundaryStatus {
-		EXCLUSIVE_UPPER_BOUNDARY,	/** The upper boundary of a processor's domain is not considered
-						  * to be owned by that processor -except in the special case
-						  * of the upper boundary of the entire mesh */
-		INCLUSIVE_UPPER_BOUNDARY	/** The upper boundary of a processor's domain is always
-						  * considered to be owned by the local processor. */
-	} PartitionBoundaryStatus;
-	
 	/* Parallel types */
 	typedef Index 				Partition_Index;			/* rank / domain partition index */
 	typedef Partition_Index			PartitionIndex;
@@ -126,14 +121,6 @@
 	typedef Neighbour_Index			Nbr_Index;
 	
 	/* Classes */
-	typedef struct Grid				Grid;
-	typedef struct CommTopology			CommTopology;
-	typedef struct Decomp				Decomp;
-	typedef struct Decomp_Sync			Decomp_Sync;
-	typedef struct Decomp_Sync_Array		Decomp_Sync_Array;
-	typedef struct Decomposer			Decomposer;
-	typedef struct DecompTransfer			DecompTransfer;
-	typedef struct MeshTopology			MeshTopology;
 	typedef struct Mesh_ElementType			Mesh_ElementType;
 	typedef struct Mesh_HexType			Mesh_HexType;
 	typedef struct Mesh_CentroidType		Mesh_CentroidType;

@@ -1,6 +1,7 @@
-/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 **
-** Copyright (C), 2003, Victorian Partnership for Advanced Computing (VPAC) Ltd, 110 Victoria Street, Melbourne, 3053, Australia.
+** Copyright (C), 2003, Victorian Partnership for Advanced Computing (VPAC) Ltd, 
+** 110 Victoria Street, Melbourne, 3053, Australia.
 **
 ** Authors:
 **	Stevan M. Quenette, Senior Software Engineer, VPAC. (steve@vpac.org)
@@ -23,99 +24,34 @@
 **  You should have received a copy of the GNU Lesser General Public
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-**
-*/
+**~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 /** \file
-**  Role:
-**
-** Assumptions:
-**
-** Invariants:
-**
-** Comments:
-**
-** $Id: Decomp.h 3584 2006-05-16 11:11:07Z PatrickSunter $
-**
-**~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+ ** <b>Role:</b>
+ **	Abstract class faciliting how class inheritance is done.
+ **
+ ** <b>Assumptions:</b>
+ **	None
+ **
+ ** <b>Comments:</b>
+ **	None
+ **
+ ** $Id: Decomp.h 3904 2006-12-14 00:52:06Z LukeHodkinson $
+ **
+ **/
+ 
+#ifndef __StGermain_Discretisation_Mesh_Decomp_h__
+#define __StGermain_Discretisation_Mesh_Decomp_h__
 
-#ifndef __Discretisaton_Mesh_Decomp_h__
-#define __Discretisaton_Mesh_Decomp_h__
-
-	/** Textual name of this class */
-	extern const Type	Decomp_Type;
-
-	/** Virtual function types */
-
-	/** Class contents */
-	#define __Decomp			\
-		/* General info */		\
-		__Stg_Class			\
-						\
-		/* Virtual info */		\
-						\
-		/* Decomp info */		\
-		MPI_Comm	comm;		\
-						\
-		unsigned	nGlobals;	\
-		unsigned	nLocals;	\
-		unsigned*	locals;		\
-						\
-		UIntMap*	glMap;		\
-						\
-		List*		syncs;
-
-	struct Decomp { __Decomp };
-
-	/*--------------------------------------------------------------------------------------------------------------------------
-	** Constructors
-	*/
-
-	#define DECOMP_DEFARGS		\
-		STG_CLASS_DEFARGS
-
-	#define DECOMP_PASSARGS		\
-		STG_CLASS_PASSARGS
-
-	Decomp* Decomp_New();
-	Decomp* _Decomp_New( DECOMP_DEFARGS );
-	void _Decomp_Init( Decomp* self );
-
-	/*--------------------------------------------------------------------------------------------------------------------------
-	** Virtual functions
-	*/
-
-	void _Decomp_Delete( void* decomp );
-	void _Decomp_Print( void* decomp, Stream* stream );
-
-	/*--------------------------------------------------------------------------------------------------------------------------
-	** Public functions
-	*/
-
-	void Decomp_SetComm( void* decomp, MPI_Comm comm );
-	void Decomp_SetLocals( void* decomp, unsigned nLocals, unsigned* locals );
-
-	MPI_Comm Decomp_GetComm( void* decomp );
-	unsigned Decomp_GetGlobalSize( void* decomp );
-	unsigned Decomp_GetLocalSize( void* decomp );
-	void Decomp_GetLocals( void* decomp, unsigned* nLocals, unsigned** locals );
-	List* Decomp_GetSyncList( void* decomp );
-
-	Bool Decomp_GlobalToLocal( void* decomp, unsigned global, unsigned* local );
-	unsigned Decomp_LocalToGlobal( void* decomp, unsigned local );
-
-	/*--------------------------------------------------------------------------------------------------------------------------
-	** Private Member functions
-	*/
-
-	void Decomp_BuildGLMap( Decomp* self );
-	void Decomp_CalcGlobalSize( Decomp* self );
-	void Decomp_UpdateSyncs( Decomp* self );
-
-	void Decomp_Destruct( Decomp* self );
-	void Decomp_DestructSyncs( Decomp* self );
-
-#ifndef NDEBUG
-	Bool Decomp_ValidateDomain( Decomp* self, unsigned nLocals, unsigned* locals );
+#ifdef CURRENTDIR
+#undef CURRENTDIR
 #endif
+#define CURRENTDIR StGermain/Discretisation/Mesh
 
-#endif /* __Discretisaton_Mesh_Decomp_h__ */
+#ifdef CLASSNAME
+#undef CLASSNAME
+#endif
+#define CLASSNAME Decomp
+
+#include "StGermain/Base/Foundation/ClassHdr.h"
+
+#endif /* __StGermain_Discretisation_Mesh_Decomp_h__ */
