@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SystemLinearEquations.c 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: SystemLinearEquations.c 833 2007-05-16 01:12:22Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -271,9 +271,9 @@ void _SystemLinearEquations_Print( void* sle, Stream* stream ) {
 	_Stg_Component_Print( self, stream );
 	
 	/* Virtual info */
-	Print( self->stiffnessMatrices, stream );
-	Print( self->forceVectors, stream );
-	Print( self->solutionVectors, stream );
+	Stg_Class_Print( self->stiffnessMatrices, stream );
+	Stg_Class_Print( self->forceVectors, stream );
+	Stg_Class_Print( self->solutionVectors, stream );
 
 	/* other info */
 	Journal_PrintPointer( stream, self->extensionManager );

@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testLumpedMassMatrix.c 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: testLumpedMassMatrix.c 833 2007-05-16 01:12:22Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -51,11 +51,15 @@
 #include <assert.h>
 #include "petsc.h"
 
-struct _Node {
+
+typedef struct Node Node;
+typedef struct Element Element;
+
+struct Node {
 	double phi;
 };
 
-struct _Element {
+struct Element {
 	__FiniteElement_Element
 };
 

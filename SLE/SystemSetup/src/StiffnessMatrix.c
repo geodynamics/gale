@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StiffnessMatrix.c 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: StiffnessMatrix.c 833 2007-05-16 01:12:22Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -499,7 +499,7 @@ void _StiffnessMatrix_Build( void* stiffnessMatrix, void* data ) {
 
 	/* If we don't have a communicator, grab one off the mesh. */
 	if( !self->comm ) {
-		self->comm = Mesh_GetCommTopology( self->rowVariable->feMesh, MT_VERTEX )->comm;
+		self->comm = Mesh_GetCommTopology( self->rowVariable->feMesh, MT_VERTEX )->mpiComm;
 		Journal_Firewall( (self->comm != 0), self->debug, "Error: NULL Comm provided to \"%s\" %s.\n",
 				  self->name, self->type );
 	}
@@ -894,7 +894,7 @@ void StiffnessMatrix_GlobalAssembly_General( void* stiffnessMatrix, Bool bcRemov
 	feVars[1] = self->columnVariable;
 
 	/* Get communicator. */
-	comm = Mesh_GetCommTopology( feVars[0]->feMesh, MT_VERTEX )->comm;
+	comm = Mesh_GetCommTopology( feVars[0]->feMesh, MT_VERTEX )->mpiComm;
 	
 	startTime = MPI_Wtime();
 

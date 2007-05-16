@@ -321,8 +321,7 @@ void SROpGenerator_GenLevelEqNums( SROpGenerator* self, unsigned level ) {
 	unsigned		nProcs, rank;
 	MPI_Status		status;	
 	unsigned*		tuples;
-	Decomp_Sync*		sync;
-	Decomp_Sync_Array*	array;
+	Sync*			sync;
 	unsigned		n_i, dof_i;
 
 	assert( self && Stg_CheckType( self, SROpGenerator ) );
@@ -333,7 +332,7 @@ void SROpGenerator_GenLevelEqNums( SROpGenerator* self, unsigned level ) {
 	nDomainNodes = Mesh_GetDomainSize( cMesh, MT_VERTEX );
 	nLocalNodes = Mesh_GetLocalSize( cMesh, MT_VERTEX );
 	dofLayout = self->fineEqNum->dofLayout;
-	comm = CommTopology_GetComm( Mesh_GetCommTopology( cMesh, MT_VERTEX ) );
+	comm = Comm_GetMPIComm( Mesh_GetCommTopology( cMesh, MT_VERTEX ) );
 	MPI_Comm_size( comm, (int*)&nProcs );
 	MPI_Comm_rank( comm, (int*)&rank );
 
@@ -363,11 +362,11 @@ void SROpGenerator_GenLevelEqNums( SROpGenerator* self, unsigned level ) {
 	base = 0;
 	subTotal = curEqNum;
 	if( rank > 0 ) {
-		insist( !MPI_Recv( &base, 1, MPI_UNSIGNED, rank - 1, 6669, comm, &status ) );
+		insist( MPI_Recv( &base, 1, MPI_UNSIGNED, rank - 1, 6669, comm, &status ), == MPI_SUCCESS );
 		subTotal = base + curEqNum;
 	}
 	if( rank < nProcs - 1 )
-		insist( !MPI_Send( &subTotal, 1, MPI_UNSIGNED, rank + 1, 6669, comm ) );
+		insist( MPI_Send( &subTotal, 1, MPI_UNSIGNED, rank + 1, 6669, comm ), == MPI_SUCCESS );
 
 	/* Modify existing destination array and dump to a tuple array. */
 	tuples = AllocArray( unsigned, nDomainNodes * maxDofs );
@@ -381,13 +380,9 @@ void SROpGenerator_GenLevelEqNums( SROpGenerator* self, unsigned level ) {
 
 	/* Update all other procs. */
 	sync = Mesh_GetSync( cMesh, MT_VERTEX );
-	array = Decomp_Sync_Array_New();
-	Decomp_Sync_Array_SetSync( array, sync );
-	Decomp_Sync_Array_SetMemory( array, tuples, tuples + nLocalNodes * maxDofs, 
-				     maxDofs * sizeof(unsigned), maxDofs * sizeof(unsigned), 
-				     maxDofs * sizeof(unsigned) );
-	Decomp_Sync_Array_Sync( array );
-	FreeObject( array );
+	Sync_SyncArray( sync, tuples, maxDofs * sizeof(unsigned), 
+			tuples + nLocalNodes * maxDofs, maxDofs * sizeof(unsigned), 
+			maxDofs * sizeof(unsigned) );
 
 	/* Update destination array's domain indices. */
 	for( n_i = nLocalNodes; n_i < nDomainNodes; n_i++ ) {
@@ -494,7 +489,7 @@ void SROpGenerator_GenLevelOp( SROpGenerator* self, unsigned level, Matrix* P ) 
 			if( fEqNum == (unsigned)-1 )
 				continue;
 
-			insist( Mesh_SearchElements( cMesh, Mesh_GetVertex( fMesh, n_i ), &ind ) );
+			insist( Mesh_SearchElements( cMesh, Mesh_GetVertex( fMesh, n_i ), &ind ), == True );
 			FeMesh_CoordGlobalToLocal( cMesh, ind, Mesh_GetVertex( fMesh, n_i ), localCoord );
 			FeMesh_EvalBasis( cMesh, ind, localCoord, basis );
 			Mesh_GetIncidence( cMesh, nDims, ind, MT_VERTEX, &nInc, &inc );
@@ -560,7 +555,7 @@ void SROpGenerator_CalcOpNonZeros( SROpGenerator* self, unsigned level,
 			if( fEqNum == (unsigned)-1 )
 				continue;
 
-			insist( Mesh_SearchElements( cMesh, Mesh_GetVertex( fMesh, n_i ), &ind ) );
+			insist( Mesh_SearchElements( cMesh, Mesh_GetVertex( fMesh, n_i ), &ind ), == True );
 			dim = Mesh_GetDimSize( fMesh );
 			if( dim == MT_VERTEX ) {
 				cTopNode = self->topMaps[level - 1][ind];

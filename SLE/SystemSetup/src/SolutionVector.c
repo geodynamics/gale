@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SolutionVector.c 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: SolutionVector.c 833 2007-05-16 01:12:22Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -219,7 +219,7 @@ void _SolutionVector_Print( void* solutionVector, Stream* stream ) {
 	
 	/* SolutionVector info */
 
-	Print( self->feVariable, solutionVectorStream );
+	Stg_Class_Print( self->feVariable, solutionVectorStream );
 	Journal_Printf( solutionVectorStream, "\tComm: %u\n", self->comm );
 }
 
@@ -328,7 +328,7 @@ void SolutionVector_UpdateSolutionOntoNodes( void* solutionVector ) {
 	Partition_Index		ownerProc;
 	FeVariable*		feVar = self->feVariable;
 	FeMesh*			feMesh = feVar->feMesh;
-	MPI_Comm		comm;
+	MPI_Comm		mpiComm;
 	FeEquationNumber*	eqNum = feVar->eqNum;
 	Dof_EquationNumber	currEqNum;
 	Index			indexIntoLocalSolnVecValues;
@@ -336,7 +336,7 @@ void SolutionVector_UpdateSolutionOntoNodes( void* solutionVector ) {
 	Index*			reqFromOthersSizes;
 	RequestInfo**		reqFromOthersInfos;
 	Dof_EquationNumber**	reqFromOthers;
-	CommTopology*		commTopo;
+	Comm*			comm;
 	Partition_Index		nProc;
 	Partition_Index		myRank;
 	Partition_Index		proc_I;
@@ -354,10 +354,10 @@ void SolutionVector_UpdateSolutionOntoNodes( void* solutionVector ) {
 	}
 	#endif
 
-	commTopo = Mesh_GetCommTopology( feMesh, MT_VERTEX );
-	comm = CommTopology_GetComm( commTopo );
-	MPI_Comm_size( comm, (int*)&nProc );
-	MPI_Comm_rank( comm, (int*)&myRank );
+	comm = Mesh_GetCommTopology( feMesh, MT_VERTEX );
+	mpiComm = Comm_GetMPIComm( comm );
+	MPI_Comm_size( mpiComm, (int*)&nProc );
+	MPI_Comm_rank( mpiComm, (int*)&myRank );
 
 	/* allocate arrays for nodes that I want on each processor */
 	reqFromOthersCounts = Memory_Alloc_Array( Index, nProc, "reqFromOthersCounts" );
@@ -480,8 +480,8 @@ void _SolutionVector_ShareValuesNotStoredLocally(
 	FeVariable*		feVar = self->feVariable;
 	FeMesh*			feMesh = feVar->feMesh;
 	FeEquationNumber*	eqNum = feVar->eqNum;
-	CommTopology*		commTopo;
-	MPI_Comm		comm;
+	Comm*			comm;
+	MPI_Comm		mpiComm;
 	Partition_Index		nProc;
 	Partition_Index		myRank;
 	Partition_Index		proc_I;
@@ -503,10 +503,10 @@ void _SolutionVector_ShareValuesNotStoredLocally(
 	Journal_DPrintf( self->debug, "In %s - for \"%s\"\n", __func__, self->name );
 	Stream_IndentBranch( StgFEM_Debug );
 
-	commTopo = Mesh_GetCommTopology( feMesh, MT_VERTEX );
-	comm = CommTopology_GetComm( commTopo );
-	MPI_Comm_size( comm, (int*)&nProc );
-	MPI_Comm_rank( comm, (int*)&myRank );
+	comm = Mesh_GetCommTopology( feMesh, MT_VERTEX );
+	mpiComm = Comm_GetMPIComm( comm );
+	MPI_Comm_size( mpiComm, (int*)&nProc );
+	MPI_Comm_rank( mpiComm, (int*)&myRank );
 
 	reqFromMeCounts = Memory_Alloc_Array( Index, nProc, "reqFromMeCounts" );
 	reqFromOthersHandles = Memory_Alloc_Array_Unnamed( MPI_Request*, nProc );
@@ -534,7 +534,7 @@ void _SolutionVector_ShareValuesNotStoredLocally(
 	
 	/* send out my request counts, receive the req. counts others want from me */
 	MPI_Alltoall( reqFromOthersCounts, 1, MPI_UNSIGNED,
-		      reqFromMeCounts, 1, MPI_UNSIGNED, comm );
+		      reqFromMeCounts, 1, MPI_UNSIGNED, mpiComm );
 
 	Journal_DPrintf( self->debug, "After MPI_Alltoall- counts are:\n" );
 	totalRequestedFromOthers = 0;
@@ -582,7 +582,7 @@ void _SolutionVector_ShareValuesNotStoredLocally(
 
 			reqFromOthersHandles[proc_I] = Memory_Alloc_Unnamed( MPI_Request );
 			MPI_Isend( reqFromOthers[proc_I], reqFromOthersCounts[proc_I], MPI_UNSIGNED,
-				proc_I, VALUE_REQUEST_TAG, comm, reqFromOthersHandles[proc_I] );
+				proc_I, VALUE_REQUEST_TAG, mpiComm, reqFromOthersHandles[proc_I] );
 		}	
 	}
 	Stream_UnIndent( self->debug );
@@ -598,7 +598,7 @@ void _SolutionVector_ShareValuesNotStoredLocally(
 				reqFromOthersCounts[proc_I], proc_I, VALUE_TAG );
 			reqValuesFromOthersHandles[proc_I] = Memory_Alloc_Unnamed( MPI_Request );
 			MPI_Irecv( reqValuesFromOthers[proc_I], reqFromOthersCounts[proc_I], MPI_DOUBLE,
-				proc_I, VALUE_TAG, comm, reqValuesFromOthersHandles[proc_I] );
+				proc_I, VALUE_TAG, mpiComm, reqValuesFromOthersHandles[proc_I] );
 		}	
 	}
 	Stream_UnIndent( self->debug );
@@ -613,7 +613,7 @@ void _SolutionVector_ShareValuesNotStoredLocally(
 /* /Journal_Printf( Journal_Register( Info_Type, "mpi" ),  "!!! line %d, proc_I %d: count = %u\n", __LINE__, proc_I, reqFromMeCounts[proc_I] ); */
 		if ( reqFromMeCounts[proc_I] > 0 ) {
 			MPI_Recv( reqFromMe[proc_I], reqFromMeCounts[proc_I], MPI_UNSIGNED,
-				proc_I, VALUE_REQUEST_TAG, comm, &status );
+				proc_I, VALUE_REQUEST_TAG, mpiComm, &status );
 			Journal_DPrintfL( self->debug, 3, "Received a list of %u requested vector entry indices from proc %u, "
 				"with tag %d\n", reqFromMeCounts[proc_I], proc_I, status.MPI_TAG );
 		}	
@@ -659,7 +659,7 @@ void _SolutionVector_ShareValuesNotStoredLocally(
 				"\t(tracking via reqValuesFromMe[%d], tag %d)\n", proc_I,
 				reqFromMeCounts[proc_I], proc_I, VALUE_TAG );
 			MPI_Isend( reqValuesFromMe[proc_I], reqFromMeCounts[proc_I], MPI_DOUBLE,
-				proc_I, VALUE_TAG, comm, reqValuesFromMeHandles[proc_I] );
+				proc_I, VALUE_TAG, mpiComm, reqValuesFromMeHandles[proc_I] );
 		}	
 	}
 	Stream_UnIndent( self->debug );

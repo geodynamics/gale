@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Context.c 819 2007-04-24 04:47:17Z PatrickSunter $
+** $Id: Context.c 833 2007-05-16 01:12:22Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -281,10 +281,10 @@ void _FiniteElementContext_Print( void* context, Stream* stream ) {
 	_DiscretisationContext_Print( self, stream );
 
 	Journal_Printf( (void*) stream, "\tslEquations (ptr): %p\n", self->slEquations );
-	Print( self->slEquations, stream );
+	Stg_Class_Print( self->slEquations, stream );
 
 	Journal_Printf( (void*) stream, "\telementType_Register (ptr): %p\n", self->elementType_Register );
-	Print( self->elementType_Register, stream );
+	Stg_Class_Print( self->elementType_Register, stream );
 }
 
 

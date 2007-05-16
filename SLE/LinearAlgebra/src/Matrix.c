@@ -191,7 +191,7 @@ void Matrix_Dump( void* matrix, const char* filename ) {
 
 	assert( self && Stg_CheckType( self, Matrix ) );
 
-	insist( fp = fopen( filename, "w" ) );
+	insist( fp = fopen( filename, "w" ), != NULL );
 
 	Matrix_GetLocalSize( self, &nRows, NULL );
 	for( row_i = 0; row_i < nRows; row_i++ ) {

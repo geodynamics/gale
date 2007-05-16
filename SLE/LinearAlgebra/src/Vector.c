@@ -187,7 +187,7 @@ void Vector_Dump( void* vector, const char* filename ) {
 
 	assert( self && Stg_CheckType( self, Vector ) );
 
-	insist( fp = fopen( filename, "w" ) );
+	insist( fp = fopen( filename, "w" ), != NULL );
 
 	size = Vector_GetLocalSize( self );
 	Vector_GetArray( self, &array );

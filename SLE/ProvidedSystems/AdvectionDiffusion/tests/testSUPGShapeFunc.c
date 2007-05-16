@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testSUPGShapeFunc.c 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: testSUPGShapeFunc.c 833 2007-05-16 01:12:22Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -49,11 +49,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct _Node {
+typedef struct Node Node;
+typedef struct Element Element;
+
+struct Node {
 	double velocity[3];
 };
 
-struct _Element {
+struct Element {
 	__FiniteElement_Element
 };
 
