@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeVariable_ImportExport_ABAQUS.c 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: FeVariable_ImportExport_ABAQUS.c 835 2007-05-16 02:54:29Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -78,7 +78,7 @@ void FeVariable_ReadNodalValuesFromFile_ABAQUS( void* _feVariable, const char* p
 	Stream_Indent( debugStream );
 
 	nDims = Mesh_GetDimSize( mesh );
-	comm = CommTopology_GetComm( Mesh_GetCommTopology( mesh, MT_VERTEX ) );
+	comm = Comm_GetMPIComm( Mesh_GetCommTopology( mesh, MT_VERTEX ) );
 	MPI_Comm_rank( comm, (int*)&rank );
 	MPI_Comm_size( comm, (int*)&nProcs );
 	
