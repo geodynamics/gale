@@ -128,7 +128,7 @@ void _IntegrationPointMapper_Print( void* mapper, Stream* stream ) {
 
 	Stream_Indent( stream );
 
-	Print( self->integrationSwarm, stream );
+	Stg_Class_Print( self->integrationSwarm, stream );
 
 	Stream_UnIndent( stream );
 }

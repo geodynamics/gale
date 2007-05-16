@@ -135,7 +135,7 @@ void _OneToOneMapper_Print( void* mapper, Stream* stream ) {
 	
 	_IntegrationPointMapper_Print( self, stream );
 	Stream_Indent( stream );
-	Print( self->materialSwarm, stream );
+	Stg_Class_Print( self->materialSwarm, stream );
 	Stream_UnIndent( stream );
 }
 void* _OneToOneMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {

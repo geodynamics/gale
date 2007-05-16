@@ -145,7 +145,7 @@ void _ManyToOneMapper_Print( void* mapper, Stream* stream ) {
 	if ( self->materialSwarms != NULL ) {
 		Stream_Indent( stream );
 		for ( i = 0; i < self->materialSwarmCount; ++i ) {
-			Print( self->materialSwarms[i], stream );
+			Stg_Class_Print( self->materialSwarms[i], stream );
 		}
 		Stream_UnIndent( stream );
 	}

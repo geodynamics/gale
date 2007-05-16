@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: MaterialFeVariable.c 456 2007-04-27 06:21:01Z LukeHodkinson $
+** $Id: MaterialFeVariable.c 462 2007-05-16 01:13:21Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -204,14 +204,14 @@ void _MaterialFeVariable_Build( void* materialFeVariable, void* data ) {
 	self->dataVariable = Variable_NewScalar( 
 			tmpName,
 			Variable_DataType_Double, 
-			&self->feMesh->topo->domains[MT_VERTEX]->nDomains, 
+			&self->feMesh->topo->remotes[MT_VERTEX]->nDomains, 
 			(void**)&self->data, 
 			variable_Register );
 	Memory_Free( tmpName );
 	self->fieldComponentCount = 1;
 	
 	tmpName = Stg_Object_AppendSuffix( self, "DofLayout" );
-	self->dofLayout = DofLayout_New( tmpName, variable_Register, self->feMesh->topo->domains[MT_VERTEX]->nDomains, NULL );
+	self->dofLayout = DofLayout_New( tmpName, variable_Register, self->feMesh->topo->remotes[MT_VERTEX]->nDomains, NULL );
 	DofLayout_AddAllFromVariableArray( self->dofLayout, 1, &self->dataVariable );
 	Memory_Free( tmpName );
 	self->eqNum->dofLayout = self->dofLayout;
