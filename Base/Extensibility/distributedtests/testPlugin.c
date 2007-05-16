@@ -72,7 +72,7 @@ int main( int argc, char* argv[] ) {
 	Journal_Firewall( plugin != NULL, stream, "Failed!\n" );
 
 	Journal_Printf( stream, "PluginLoader_GetName(): %s\n", PluginLoader_GetName( plugin ) );
-	Print( plugin, stream );
+	Stg_Class_Print( plugin, stream );
 
 	Stg_Class_Delete( plugin );
 	Stg_Class_Delete( directories );

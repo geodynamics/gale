@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AbstractContext.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: AbstractContext.c 4099 2007-05-16 01:01:12Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -458,7 +458,7 @@ void _AbstractContext_Print( void* abstractContext, Stream* stream ) {
 	Journal_Printf( stream, "\trestartTimestep: %u\n", self->restartTimestep );
 	Journal_Printf( stream, "\tcheckPointPrefixString: %s\n", self->checkPointPrefixString );
 	
-	Print( self->entryPoint_Register, stream );
+	Stg_Class_Print( self->entryPoint_Register, stream );
 	
 	Journal_Printf( (void*) stream, "\tconstructK: %u\n", self->constructK );
 	Journal_Printf( (void*) stream, "\tconstructExtensionsK: %u\n", self->constructExtensionsK );
@@ -473,7 +473,7 @@ void _AbstractContext_Print( void* abstractContext, Stream* stream ) {
 	Journal_Printf( (void*) stream, "\tsolveK: %u\n", self->solveK );
 	Journal_Printf( (void*) stream, "\tsyncK: %u\n", self->syncK );
 	
-	Print( self->extensionMgr_Register, stream );
+	Stg_Class_Print( self->extensionMgr_Register, stream );
 	
 	/* Print parent */
 	_Stg_Class_Print( self, stream );

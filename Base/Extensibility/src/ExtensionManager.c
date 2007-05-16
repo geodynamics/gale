@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ExtensionManager.c 4075 2007-04-24 04:30:55Z PatrickSunter $
+** $Id: ExtensionManager.c 4099 2007-05-16 01:01:12Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -362,7 +362,7 @@ void _ExtensionManager_Print( void* extension, Stream* stream ) {
 	Journal_Printf( (void*) stream, "\tcount: %u\n", self->extInfos->count );
 	
 	Journal_Printf( (void*) stream, "\textInfos (ptr): %p\n", (void*)self->extInfos );
-	Print( self->extInfos, stream );
+	Stg_Class_Print( self->extInfos, stream );
 	
 	Journal_Printf( (void*)stream, "\t_extensionsToExisting (ptr): %p\n", self->_extensionsToExisting );
 	Journal_Printf( (void*)stream, "\t_existingObject (ptr): %p\n", self->_existingObject );

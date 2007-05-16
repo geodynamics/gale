@@ -90,7 +90,7 @@ int main( int argc, char* argv[] ) {
 
 	((EntryPoint_VoidPtr_CallCast*) context->ep->run)( context->ep, context );
 
-	Print( context->plugins, stream );
+	Stg_Class_Print( context->plugins, stream );
 
 	Stg_Class_Delete( ioHandler );
 	Stg_Class_Delete( context );

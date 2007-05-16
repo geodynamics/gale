@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ExtensionManager_Register.c 3462 2006-02-19 06:53:24Z WalterLandry $
+** $Id: ExtensionManager_Register.c 4099 2007-05-16 01:01:12Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -126,7 +126,7 @@ void _ExtensionManager_Register_Print( void* extensionMgr_Register, Stream* stre
 	Journal_Printf( (void*)stream, "\tcount: %u\n", self->extensions->count );
 	
 	Journal_Printf( (void*)stream, "\textensions (ptr): %p\n", self->extensions );
-	Print( self->extensions, stream );
+	Stg_Class_Print( self->extensions, stream );
 }
 
 ExtensionManager_Index ExtensionManager_Register_Add( void* extensionMgr_Register, void* extension ) {
