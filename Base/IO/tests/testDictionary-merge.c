@@ -27,7 +27,7 @@
 ** Role:
 **	Tests the dictionary functionality
 **
-** $Id: testDictionary-merge.c 3462 2006-02-19 06:53:24Z WalterLandry $
+** $Id: testDictionary-merge.c 4096 2007-05-16 00:54:10Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -75,7 +75,7 @@ int main( int argc, char* argv[] ) {
 	Dictionary_Entry_Value_AddMember( tmpVal0, "list_one", tmpVal1 );
 	Dictionary_AddMerge( dictionary, "one", tmpVal0, Dictionary_MergeType_Append );
 	
-	Print( dictionary, stream );
+	Stg_Class_Print( dictionary, stream );
 	Stg_Class_Delete( dictionary );
 	
 	dictionary = Dictionary_New();
@@ -102,7 +102,7 @@ int main( int argc, char* argv[] ) {
 	Dictionary_Entry_Value_AddMember( tmpVal0, "list_one", tmpVal1 );
 	Dictionary_AddMerge( dictionary, "one", tmpVal0, Dictionary_MergeType_Merge );
 	
-	Print( dictionary, stream );
+	Stg_Class_Print( dictionary, stream );
 	Stg_Class_Delete( dictionary );
 	
 	dictionary = Dictionary_New();
@@ -129,7 +129,7 @@ int main( int argc, char* argv[] ) {
 	Dictionary_Entry_Value_AddMember( tmpVal0, "list_one", tmpVal1 );
 	Dictionary_AddMerge( dictionary, "one", tmpVal0, Dictionary_MergeType_Replace );
 	
-	Print( dictionary, stream );
+	Stg_Class_Print( dictionary, stream );
 	Stg_Class_Delete( dictionary );
 	
 	BaseIO_Finalise();

@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Stream.c 3594 2006-05-18 06:34:43Z PatrickSunter $
+** $Id: Stream.c 4096 2007-05-16 00:54:10Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -187,7 +187,7 @@ void _Stream_Print( void* stream, Stream* paramStream )
 
 	Stream_Indent( paramStream );
 
-	Print( self->_children, paramStream );
+	Stg_Class_Print( self->_children, paramStream );
 
 	Stream_UnIndent( paramStream );
 

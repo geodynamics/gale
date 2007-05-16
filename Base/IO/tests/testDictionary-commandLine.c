@@ -27,7 +27,7 @@
 ** Role:
 **	Tests the IO handler
 **
-** $Id: testDictionary-commandLine.c 3462 2006-02-19 06:53:24Z WalterLandry $
+** $Id: testDictionary-commandLine.c 4096 2007-05-16 00:54:10Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -51,7 +51,7 @@ int main( int argc, char* argv[] ) {
 	dictionary = Dictionary_New();
 
 	Dictionary_ReadAllParamFromCommandLine( dictionary, argc, argv );
-	Print( dictionary, stream );
+	Stg_Class_Print( dictionary, stream );
 	
 	Stg_Class_Delete( dictionary );
 	

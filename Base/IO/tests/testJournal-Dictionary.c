@@ -27,7 +27,7 @@
 ** Role:
 **	Tests the journal functionality
 **
-** $Id: testJournal-Dictionary.c 3462 2006-02-19 06:53:24Z WalterLandry $
+** $Id: testJournal-Dictionary.c 4096 2007-05-16 00:54:10Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -113,8 +113,8 @@ int main( int argc, char* argv[] ) {
 		propTest1 = Journal_Register( Info_Type, "propertiestest1" );
 		propTest2 = Journal_Register( Info_Type, "propertiestest2" );
 
-		Print( propTest1, infoTest1 );
-		Print( propTest2, infoTest1 );
+		Stg_Class_Print( propTest1, infoTest1 );
+		Stg_Class_Print( propTest2, infoTest1 );
 		
 		Stg_Class_Delete( io_handler );
 		Stg_Class_Delete( dictionary );
