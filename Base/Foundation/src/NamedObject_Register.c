@@ -111,7 +111,7 @@ void _NamedObject_Register_Print( void* namedObjectRegister, struct Stream* stre
 	_Stg_Class_Print( self, stream );
 	
 	/* Print the list of registered objects */
-	Print( self->objects, stream );	
+	Stg_Class_Print( self->objects, stream );	
 	
 	Stream_UnIndent( stream );
 }

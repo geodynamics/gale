@@ -63,7 +63,7 @@
 **
 **	http://csd.vpac.org/twiki/bin/view/Stgermain/MemoryStats
 **
-** $Id: Memory.h 4085 2007-04-30 05:25:40Z LukeHodkinson $
+** $Id: Memory.h 4094 2007-05-16 00:50:44Z LukeHodkinson $
 **
 **/
 
@@ -746,10 +746,12 @@
  * Shortcuts.
  */
 
-#define MemAlloc	Memory_Alloc
-#define MemArray	Memory_Alloc_Array
-#define MemArray2D	Memory_Alloc_2DArray
-#define MemAlloc3D	Memory_Alloc_3DArray
-#define MemFree		Memory_Free
+#define MemAlloc			Memory_Alloc
+#define MemRealloc( a, b, c )		Memory_Realloc( a, b )
+#define MemArray			Memory_Alloc_Array
+#define MemRearray( a, b, c, d )	Memory_Realloc_Array( a, b, c )
+#define MemArray2D			Memory_Alloc_2DArray
+#define MemArray3D			Memory_Alloc_3DArray
+#define MemFree				Memory_Free
 
 #endif /* __Base_Foundation_Memory_h__ */

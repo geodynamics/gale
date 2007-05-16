@@ -34,16 +34,16 @@
 ** <b>Comments:</b>
 **	None
 **
-** $Id: Foundation.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: Foundation.h 4094 2007-05-16 00:50:44Z LukeHodkinson $
 **
 **/
 
 #ifndef __Base_Foundation_h__
 #define __Base_Foundation_h__
 	
-	#include <assert.h>
 	#include "types.h"
 	#include "shortcuts.h"
+	#include "debug.h"
 	#include "CommonRoutines.h"
 	#include "MemoryTag.h"
 	#include "MemoryPointer.h"
@@ -51,6 +51,7 @@
 	#include "MemoryReport.h"
 	#include "Memory.h"
 	#include "Class.h"
+	#include "NewClass.h"
 	#include "Object.h"
 	#include "ObjectAdaptor.h"
 	#include "PrimitiveObject.h"

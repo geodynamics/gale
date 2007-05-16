@@ -34,7 +34,7 @@
 ** <b>Comments:</b>
 **	None
 **
-** $Id: Class.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: Class.h 4094 2007-05-16 00:50:44Z LukeHodkinson $
 **
 **/
 
@@ -100,7 +100,9 @@
 	void Stg_Class_Print( void* _class, struct Stream* stream );
 
 	/** Prints any instance of Stg_Class or a sub-class. */
+/*
 	#define Print Stg_Class_Print
+*/
 	
 	/** Generic copy function caller */
 	void* Stg_Generic_Copy( 

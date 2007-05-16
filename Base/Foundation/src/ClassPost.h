@@ -1,0 +1,44 @@
+#undef __INCLUDECLASS
+#undef _INCLUDECLASS
+#undef INCLUDECLASS
+#undef _INCLUDEHDR
+#undef INCLUDEHDR
+
+#undef _CLASSTYPE
+#undef CLASSTYPE
+
+#ifdef PARENT
+#undef PARENT
+#endif
+
+#undef __VIRTUALMETHOD
+#undef _VIRTUALMETHOD
+#undef VIRTUALMETHOD
+#undef __VOIDVIRTUALMETHOD
+#undef _VOIDVIRTUALMETHOD
+#undef VOIDVIRTUALMETHOD
+#undef __ABSTRACTMETHOD
+#undef _ABSTRACTMETHOD
+#undef ABSTRACTMETHOD
+#undef __VOIDABSTRACTMETHOD
+#undef _VOIDABSTRACTMETHOD
+#undef VOIDABSTRACTMETHOD
+#undef OVERRIDE
+#undef VOIDOVERRIDE
+#undef __METHOD
+#undef _METHOD
+#undef METHOD
+#undef MEMBER
+
+#ifdef _CLASSNEW
+#undef _CLASSNEW
+#endif
+#ifdef CLASSNEW
+#undef CLASSNEW
+#endif
+#ifdef _CLASSINIT
+#undef _CLASSINIT
+#endif
+#ifdef CLASSINIT
+#undef CLASSINIT
+#endif

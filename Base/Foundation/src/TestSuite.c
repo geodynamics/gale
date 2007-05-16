@@ -31,12 +31,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 #include <mpi.h>
 
 #include "types.h"
 #include "shortcuts.h"
 #include "forwardDecl.h"
+#include "debug.h"
 #include "MemoryTag.h"
 #include "Memory.h"
 #include "Class.h"
@@ -77,9 +77,10 @@ TestSuite* _TestSuite_New( TESTSUITE_DEFARGS ) {
 void _TestSuite_Init( TestSuite* self ) {
 	assert( self );
 
+	insist( MPI_Comm_size( MPI_COMM_WORLD, &self->nProcs ), == MPI_SUCCESS );
+	insist( MPI_Comm_rank( MPI_COMM_WORLD, &self->rank ), == MPI_SUCCESS );
 	self->nTests = 0;
 	self->tests = NULL;
-	self->watch = 0;
 }
 
 
@@ -160,67 +161,26 @@ void TestSuite_SetTests( void* testSuite, unsigned nTests, TestSuite_Test* tests
 	}
 }
 
-void TestSuite_SetProcToWatch( void* testSuite, unsigned watch ) {
-	TestSuite*	self = (TestSuite*)testSuite;
-
-	assert( self );
-#ifndef NDEBUG
-	{
-		unsigned	nProcs;
-
-		MPI_Comm_size( MPI_COMM_WORLD, (int*)&nProcs );
-		assert( watch < nProcs );
-	}
-#endif
-
-	self->watch = watch;
-}
-
 void TestSuite_Run( void* testSuite ) {
 	TestSuite*	self = (TestSuite*)testSuite;
-	unsigned	nProcs;
-	unsigned	rank;
 	unsigned	t_i;
 
 	assert( self );
 
-	MPI_Comm_size( MPI_COMM_WORLD, (int*)&nProcs );
-	MPI_Comm_rank( MPI_COMM_WORLD, (int*)&rank );
-
 	for( t_i = 0; t_i < self->nTests; t_i++ ) {
 		TestSuite_Test*	test = self->tests + t_i;
-		unsigned	success = 0;
-		unsigned	failure = 1;
-		unsigned	r_i;
+		Bool		result;
 
 		assert( test );
 		assert( test->name );
 		assert( test->func );
 
-		if( rank == self->watch )
+		if( !self->rank )
 			printf( "   Running test '%s'... ", test->name );
-
-		for( r_i = 0; r_i < test->nReps; r_i++ ) {
-			Bool	result = test->func( rank, nProcs, self->watch );
-
-			if( rank == self->watch ) {
-				if( result )
-					MPI_Bcast( &success, 1, MPI_UNSIGNED, self->watch, MPI_COMM_WORLD );
-				else {
-					MPI_Bcast( &failure, 1, MPI_UNSIGNED, self->watch, MPI_COMM_WORLD );
-					break;
-				}
-			}
-			else {
-				unsigned	status;
-
-				MPI_Bcast( &status, 1, MPI_UNSIGNED, self->watch, MPI_COMM_WORLD );
-				if( status == failure ) break;
-			}
-		}
-
-		if( rank == self->watch )
-			printf( "%s\n", (r_i == test->nReps) ? "passed" : "failed" );
+		result = test->func( self );
+		if( !self->rank )
+			printf( "%s\n", result ? "passed" : "failed" );
+		insist( MPI_Barrier( MPI_COMM_WORLD ), == MPI_SUCCESS );
 	}
 }
 

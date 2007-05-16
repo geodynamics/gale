@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Memory.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: Memory.c 4094 2007-05-16 00:50:44Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -1219,6 +1219,8 @@ void* _Memory_Realloc_3DArrayAs1D_Func(
 void _Memory_Free_Func( void* ptr )
 {
 	MemoryPointer* memoryPointer = NULL;
+
+	if( !ptr ) return;
 	
 	memoryPointer = Memory_Find_Pointer( ptr );
 	
@@ -1226,8 +1228,8 @@ void _Memory_Free_Func( void* ptr )
 	{
 		Memory_Free_Pointer( memoryPointer );
 	}
-else
-{
+	else
+	{
 		_Memory_InternalFree( ptr );
 	}
 }
@@ -1747,6 +1749,10 @@ void Memory_Relocate_3DArray(
 void* _Memory_InternalMalloc( SizeT size ) {
 	void* result;
 	void* data;
+
+	if( !size )
+	  return NULL;
+
 #ifdef NOEXPERIMENT			
 	result = malloc( size );
 	if ( result == NULL ) {
@@ -1822,6 +1828,7 @@ void* _Memory_InternalRealloc( void* ptr, SizeT size ) {
 }
 
 void _Memory_InternalFree( void* ptr ) {
+	if( !ptr ) return;
 #ifdef NOEXPERIMENT
 	free( ptr );
 #else

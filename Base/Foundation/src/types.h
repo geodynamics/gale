@@ -34,12 +34,18 @@
 ** <b>Comments:</b>
 **	None as yet.
 **
-** $Id: types.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: types.h 4094 2007-05-16 00:50:44Z LukeHodkinson $
 **
 **/
 
 #ifndef __Base_Foundation_types_h__
 #define __Base_Foundation_types_h__
+
+typedef unsigned char StgByte;
+typedef void* (NewFunc)();
+typedef void (InitFunc)( void* self );
+
+typedef struct NewClass		NewClass;
 
 	typedef void*				Pointer;		/**< General Pointer. */
 	typedef unsigned long			Stg_Word;		/**< A word on the cpu architecture */

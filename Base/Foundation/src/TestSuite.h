@@ -51,12 +51,11 @@
 	/** Virtual function types */
 
 	/** Class contents */
-	typedef Bool (TestSuite_TestFunc)( unsigned rank, unsigned nProcs, unsigned watch );
+	typedef Bool (TestSuite_TestFunc)( TestSuite* suite );
 
 	typedef struct {
 		const char*		name;
 		TestSuite_TestFunc*	func;
-		unsigned		nReps;
 	} TestSuite_Test;
 
 	#define __TestSuite				\
@@ -66,9 +65,10 @@
 		/* Virtual info */			\
 							\
 		/* TestSuite info */			\
+		int			nProcs;		\
+		int			rank;		\
 		unsigned		nTests;		\
-		TestSuite_Test*		tests;		\
-		unsigned		watch;
+		TestSuite_Test*		tests;
 
 	struct TestSuite { __TestSuite };
 
@@ -104,8 +104,6 @@
 	*/
 
 	void TestSuite_SetTests( void* testSuite, unsigned nTests, TestSuite_Test* tests );
-	void TestSuite_SetProcToWatch( void* testSuite, unsigned watch );
-
 	void TestSuite_Run( void* testSuite );
 
 	/*--------------------------------------------------------------------------------------------------------------------------

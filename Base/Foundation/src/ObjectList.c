@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ObjectList.c 3488 2006-03-15 00:42:31Z RobertTurnbull $
+** $Id: ObjectList.c 4094 2007-05-16 00:50:44Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -560,7 +560,7 @@ void Stg_ObjectList_PrintAllObjects( void* objectList, void* _stream ) {
 	Index            objectIndex = 0;
 	
 	for ( objectIndex = 0; objectIndex < self->count; objectIndex++ ) {
-		Print( self->data[ objectIndex ], stream ) ;
+		Stg_Class_Print( self->data[ objectIndex ], stream ) ;
 	}
 }
 

@@ -167,9 +167,9 @@
 
 
 #ifndef NDEBUG
-#define insist( expr ) assert( expr )
+#define insist( stmnt, expr ) assert( (stmnt) expr )
 #else
-#define insist( expr ) expr
+#define insist( stmnt, expr ) stmnt
 #endif
 	
 #endif /* __Base_Foundation_shortcuts_h__ */

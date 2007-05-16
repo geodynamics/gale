@@ -1,0 +1,23 @@
+#undef CLASSNAME
+#define CLASSNAME NewClass
+
+VOIDVIRTUALMETHOD( Construct, void, (void* self), (self) )
+VOIDVIRTUALMETHOD( Destruct, void, (void* self), (self) )
+VOIDVIRTUALMETHOD( Copy, void, (void* self, const void* op), (self, op) )
+VOIDVIRTUALMETHOD( Print, void, (void* self, struct Stream* stream), (self, stream) )
+VIRTUALMETHOD( CalcMem, SizeT, (const void* self, struct PtrMap* ptrs), (self, ptrs) )
+
+METHOD( Delete, void, (void* self), (self) )
+METHOD( AddRef, void, (void* self), (self) )
+METHOD( RemoveRef, void, (void* self), (self) )
+
+METHOD( Dup, void*, (const void* self), (self) )
+METHOD( GetType, Type, (const void* self), (self) )
+METHOD( GetMemUsage, SizeT, (const void* self), (self) )
+
+MEMBER( NewFunc*, newFunc )
+MEMBER( InitFunc*, initFunc )
+MEMBER( SizeT, sizeOfSelf )
+MEMBER( Type, type )
+MEMBER( int, nRefsToSelf )
+MEMBER( SizeT, curAllocd )

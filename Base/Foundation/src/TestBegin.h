@@ -1,6 +1,7 @@
-/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 **
-** Copyright (C), 2003, Victorian Partnership for Advanced Computing (VPAC) Ltd, 110 Victoria Street, Melbourne, 3053, Australia.
+** Copyright (C), 2003, Victorian Partnership for Advanced Computing (VPAC) Ltd, 
+** 110 Victoria Street, Melbourne, 3053, Australia.
 **
 ** Authors:
 **	Stevan M. Quenette, Senior Software Engineer, VPAC. (steve@vpac.org)
@@ -23,52 +24,96 @@
 **  You should have received a copy of the GNU Lesser General Public
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-**
-*/
+**~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 /** \file
-**  Role:
-**
-** Assumptions:
-**
-** Invariants:
-**
-** Comments:
-**
-** $Id: TestBegin.h 3584 2006-05-16 11:11:07Z PatrickSunter $
-**
-**~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+ ** <b>Role:</b>
+ **	Abstract class faciliting how class inheritance is done.
+ **
+ ** <b>Assumptions:</b>
+ **	None
+ **
+ ** <b>Comments:</b>
+ **	None
+ **
+ ** $Id: ISet.h 3904 2006-12-14 00:52:06Z LukeHodkinson $
+ **
+ **/
 
 #ifndef __StGermain_Base_Foundation_TestBegin_h__
 #define __StGermain_Base_Foundation_TestBegin_h__
 
 #include <mpi.h>
+#include "debug.h"
 
-#define TestBegin( name ) Bool test##name { Bool ut_passed = False;
-#define TestEnd done:; return passed; }
-#define TestFail passed = False; goto done
+#define TestBegin( name ) 				\
+   Bool test##name( TestSuite* suite ) {		\
+      Bool _passed = True;
 
-#define TestTrue( expr )			\
-   assert_jmpEnabled = True;			\
-   if( !setjmp( assert_env ) ) {		\
-      if( !(expr) ) { TestFail; }		\
-      assert_jmpEnabled = False;		\
-   }						\
-   else { TestFail; }
+#define TestEnd						\
+   return _passed;					\
+   }
 
-#define TestAssert( stmnt )			\
-   assert_jmpEnabled = True;			\
-   if( !setjmp( assert_env ) ) {		\
-      stmnt;					\
-      TestFail;					\
-   }						\
-   assert_jmpEnabled = False;
+#define TestBarrier					\
+   do {							\
+      Bool _result;					\
+      MPI_Allreduce( &_passed, &_result, 1, MPI_INT, 	\
+		     MPI_MIN, MPI_COMM_WORLD );		\
+      _passed = _result;				\
+      if( !_passed ) goto done;				\
+   } while( 0 )
 
-#define TestNoAssert( stmnt )			\
-   assert_jmpEnabled = True;			\
-   if( !setjmp( assert_env )) {			\
-      stmnt;					\
-      assert_jmpEnabled = False;		\
-   }						\
-   else { TestFail; }
+#define TestFail					\
+   _passed = False;					\
+   TestBarrier
 
-#endif __StGermain_Base_Foundation_TestBegin_h__
+#ifndef NDEBUG
+
+#define TestTrue( expr )				\
+   do {							\
+      assert_jmpEnabled = True;				\
+      if( !setjmp( assert_env ) ) {			\
+	 if( !(expr) ) { TestFail; }			\
+	 assert_jmpEnabled = False;			\
+	 TestBarrier;					\
+      }							\
+      else { TestFail; }				\
+   } while( 0 )
+
+#define TestAssert( stmnt )				\
+   do {							\
+      assert_jmpEnabled = True;				\
+      if( !setjmp( assert_env ) ) {			\
+	 stmnt;						\
+	 TestFail;					\
+      }							\
+      else {						\
+	 assert_jmpEnabled = False;			\
+	 TestBarrier;					\
+      }							\
+   } while( 0 )
+
+#define TestNoAssert( stmnt )				\
+   do {							\
+      assert_jmpEnabled = True;				\
+      if( !setjmp( assert_env )) {			\
+	 stmnt;						\
+	 assert_jmpEnabled = False;			\
+	 TestBarrier;					\
+      }							\
+      else { TestFail; }				\
+   } while( 0 )
+
+#else
+
+#define TestTrue( expr )				\
+   do {							\
+      if( !(expr) ) { TestFail; }			\
+      TestBarrier;					\
+   } while( 0 )
+
+#define TestAssert( stmnt ) stmnt
+#define TestNoAssert( stmnt ) stmnt
+
+#endif
+
+#endif /* __StGermain_Base_Foundation_TestBegin_h__ */

@@ -53,16 +53,25 @@
 extern Bool	assert_jmpEnabled;
 extern jmp_buf	assert_env;
 
-#define __assert( e, file, line )						\
+#ifdef stgAssert
+#undef stgAssert
+#endif
+#define stgAssert( e, file, line )						\
    (printf( "%s:%u: failed assertion `%s'\n", file, line, e ), abort(), 0)
 
+#ifdef assert
+#undef assert
+#endif
 #define assert( expr ) ((void)((expr) ? 0 : assert_jmpEnabled ?			\
-			     (longjmp( asser_tenv, ASSERT_FAIL), 0 ) :		\
-			     __assert( #expr, __FILE__, __LINE__)) )
+			     (longjmp( assert_env, ASSERT_FAIL), 0 ) :		\
+			     stgAssert( #expr, __FILE__, __LINE__)) )
 #else
 
+#ifdef assert
+#undef assert
+#endif
 #define assert( expr ) ((void)0)
 
 #endif
 
-#endif __StGermain_Base_Foundation_debug_hh__
+#endif /*__StGermain_Base_Foundation_debug_hh__*/
