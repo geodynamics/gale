@@ -1,6 +1,7 @@
-/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 **
-** Copyright (C), 2003, Victorian Partnership for Advanced Computing (VPAC) Ltd, 110 Victoria Street, Melbourne, 3053, Australia.
+** Copyright (C), 2003, Victorian Partnership for Advanced Computing (VPAC) Ltd, 
+110 Victoria Street, Melbourne, 3053, Australia.
 **
 ** Authors:
 **	Stevan M. Quenette, Senior Software Engineer, VPAC. (steve@vpac.org)
@@ -24,120 +25,95 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testMeshTopology.c 2136 2004-09-30 02:47:13Z PatrickSunter $
+** $Id: testMeshTopology.c 3952 2007-01-09 06:24:06Z LukeHodkinson $
 **
-**~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+**~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 #include <mpi.h>
+#include "StGermain/Base/Base.h"
+#include "StGermain/Discretisation/Mesh/Mesh.h"
 
-#include "Base/Base.h"
-#include "Discretisation/Geometry/Geometry.h"
-#include "Discretisation/Mesh/Mesh.h"
+#include "StGermain/Base/Foundation/TestBegin.h"
 
 
-void buildElements( unsigned rank, unsigned nProcs, 
-		    unsigned* nEls, unsigned** els )
-{
-	unsigned	start;
-	unsigned	e_i;
-
-	*nEls = 100;
-	*els = Memory_Alloc_Array_Unnamed( unsigned, *nEls );
-	start = rank * (*nEls - 10);
-
-	for( e_i = 0; e_i < *nEls; e_i++ )
-		(*els)[e_i] = start + e_i;
+void testSetup( int* argc, char** argv[] ) {
+   Base_Init( argc, argv );
+   /*DiscretisationMesh_Init( argc, argv );*/
 }
 
-void buildAll( unsigned rank, unsigned nProcs ) {
+void testTeardown() {
+   /*DiscretisationMesh_Finalise();*/
+   Base_Finalise();
 }
 
+TestBegin( Construct ) {
+   MeshTopology* topo;
 
-Bool testSetElements( unsigned rank, unsigned nProcs, unsigned watch ) {
-	Bool		result = True;
-	MeshTopology*	topo;
-	unsigned	nDims = 3;
-	unsigned	nEls, *els;
+   TestNoAssert( topo = MeshTopology_New() );
+   TestTrue( topo );
 
-	buildElements( rank, nProcs, &nEls, &els );
-	topo = MeshTopology_New( "meshTopology" );
-	MeshTopology_SetDimSize( topo, nDims );
-	MeshTopology_SetElements( topo, MT_VERTEX, nEls, els );
-
-	if( rank == watch ) {
-		if( topo->nDims != 3 || topo->nTDims != 4 || 
-		    !topo->domains || !topo->domains[MT_VERTEX] || !topo->domains[MT_VERTEX]->decomp )
-		{
-			result = False;
-			goto done;
-		}
-	}
-
-done:
-	FreeArray( els );
-	FreeObject( topo );
-
-	return result;
+  done:
+   NewClass_Delete( topo );
 }
+TestEnd
 
-Bool testShadows( unsigned rank, unsigned nProcs, unsigned watch ) {
-	Bool		result = True;
-	MeshTopology*	topo;
-	unsigned	nDims = 3;
-	unsigned	nEls, *els;
+TestBegin( SetDims ) {
+   MeshTopology* topo;
+   int d_i, d_j;
 
-	buildElements( rank, nProcs, &nEls, &els );
-	topo = MeshTopology_New( "meshTopology" );
-	MeshTopology_SetDimSize( topo, nDims );
-	MeshTopology_SetElements( topo, MT_VERTEX, nEls, els );
-	MeshTopology_SetShadowDepth( topo, 1 );
+   topo = MeshTopology_New();
+   TestNoAssert( MeshTopology_SetNumDims( topo, 3 ) );
+   TestTrue( MeshTopology_GetNumDims( topo ) == 3 && topo->nTDims == 4 );
+   TestTrue( topo->locals && topo->remotes );
+   TestTrue( topo->nIncEls && topo->incEls );
+   for( d_i = 0; d_i < 4; d_i++ ) {
+      TestTrue( topo->locals[d_i] && topo->remotes[d_i] );
+      TestTrue( Sync_GetDecomp( topo->remotes[d_i] ) == topo->locals[d_i] );
+      TestTrue( topo->nIncEls[d_i] && topo->incEls[d_i] );
+      TestTrue( topo->incEls[d_i] );
+      for( d_j = 0; d_j < 4; d_j++ ) {
+	 TestTrue( !topo->nIncEls[d_i][d_j] && !topo->incEls[d_i][d_j] );
+      }
+   }
 
-	if( rank == watch ) {
-	}
+   TestNoAssert( MeshTopology_SetNumDims( topo, 0 ) );
+   TestTrue( !MeshTopology_GetNumDims( topo ) && !topo->nTDims );
+   TestTrue( !topo->locals && !topo->remotes );
+   TestTrue( !topo->nIncEls && !topo->incEls );
 
-done:
-	FreeArray( els );
-	FreeObject( topo );
-
-	return result;
+  done:
+   NewClass_Delete( topo );
 }
+TestEnd
 
+TestBegin( SetComm ) {
+   MeshTopology* topo;
+   Comm* comm;
+   int d_i;
 
-#define nTests	2
+   comm = Comm_New();
+   topo = MeshTopology_New();
+   MeshTopology_SetNumDims( topo, 3 );
 
-TestSuite_Test	tests[nTests] = {{"set elements", testSetElements, 10}, 
-				 {"shadow depth", testShadows, 10}};
+   TestNoAssert( MeshTopology_SetComm( topo, comm ) );
+   TestTrue( MeshTopology_GetComm( topo ) == comm );
+   for( d_i = 0; d_i < 4; d_i++ ) {
+      TestTrue( Decomp_GetComm( topo->locals[d_i] ) == comm );
+   }
 
-
-int main( int argc, char* argv[] ) {
-	TestSuite*	suite;
-
-	/* Initialise MPI, get world info. */
-	MPI_Init( &argc, &argv );
-
-	/* Initialise StGermain. */
-	Base_Init( &argc, &argv );
-
-	/* Create the test suite. */
-	suite = TestSuite_New();
-	TestSuite_SetProcToWatch( suite, (argc >= 2) ? atoi( argv[1] ) : 0 );
-	TestSuite_SetTests( suite, nTests, tests );
-
-	/* Run the tests. */
-	TestSuite_Run( suite );
-
-	/* Destroy test suites. */
-	FreeObject( suite );
-
-	/* Finalise StGermain. */
-	Base_Finalise();
-
-	/* Close off MPI */
-	MPI_Finalize();
-
-	return MPI_SUCCESS;
+  done:
+   NewClass_Delete( topo );
 }
+TestEnd
+
+
+#define nTests 3
+TestSuite_Test tests[nTests] = {{"construct", testConstruct}, 
+				{"set number of dimensions", testSetDims}, 
+				{"set communicator", testSetComm}};
+
+
+#include "Base/Foundation/TestEnd.h"
