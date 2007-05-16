@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: lucTestCameras.c 628 2006-10-12 08:23:07Z SteveQuenette $
+** $Id: lucTestCameras.c 691 2007-05-16 01:14:04Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 #include <mpi.h>
@@ -131,12 +131,12 @@ void lucTestThisCamera( AbstractContext* context, lucCamera* camera, Stream* str
 
 	Journal_Printf( stream, "************** Testing lucCamera_Zoom **************\n");
 	lucCamera_Zoom( camera, 2.0 ) ;
-	Print( camera, stream );
+	Stg_Class_Print( camera, stream );
 	testCamera( camera, stream, context );
 	lucCamera_Reset( camera );
 
 	lucCamera_Zoom( camera, 0.25 ) ;
-	Print( camera, stream );
+	Stg_Class_Print( camera, stream );
 	testCamera( camera, stream, context );
 	lucCamera_Reset( camera );
 
@@ -191,8 +191,8 @@ void lucTestAllCameras( AbstractContext* context ) {
 	/* Note: this func gets added to construct extensions... may it should be changed to take in the tummy too? */
 	frontOn = Stg_ComponentFactory_ConstructByName( context->CF, "frontOn", lucCamera, True, 0 /* dummy */ ); 
 	stereo = Stg_ComponentFactory_ConstructByName( context->CF, "stereo", lucCamera, True, 0 /* dummy */ ); 
-	Print( frontOn, stream );
-	Print( stereo, stream );
+	Stg_Class_Print( frontOn, stream );
+	Stg_Class_Print( stereo, stream );
 	lucTestThisCamera( context, frontOn, stream );
 	lucTestThisCamera( context, stereo, stream );
 }
