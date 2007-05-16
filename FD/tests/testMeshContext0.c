@@ -27,7 +27,7 @@
 ** Role:
 **	Tests MeshContext in the most basic sence... creation on default values, run, and delete.
 **
-** $Id: testMeshContext0.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: testMeshContext0.c 4104 2007-05-16 01:10:19Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -40,6 +40,7 @@
 
 Stream* testInfoStream;
 
+/*
 struct _Node {
 	Coord coord;
 	double temp;
@@ -49,6 +50,7 @@ struct _Element {
 	Coord coord;
 	double temp;
 };
+*/
 
 void MyDelete( void* meshContext ) {
 	_MeshContext_Delete( meshContext );
@@ -148,8 +150,8 @@ int main( int argc, char* argv[] ) {
 		MySetDt, 
 		0, 
 		10, 
-		sizeof(Node), 
-		sizeof(Element), 
+		0, 
+		0, 
 		CommWorld, 
 		dictionary );
 

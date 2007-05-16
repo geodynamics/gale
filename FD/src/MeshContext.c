@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: MeshContext.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: MeshContext.c 4104 2007-05-16 01:10:19Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -126,9 +126,9 @@ void _MeshContext_Print( void* meshContext, Stream* stream ) {
 	
 	/* MeshContext info */
 	if( self->mesh )
-		Print( self->mesh, stream );
+		Stg_Class_Print( self->mesh, stream );
 	if( self->meshExtensionMgr )
-		Print( self->meshExtensionMgr, stream );
+		Stg_Class_Print( self->meshExtensionMgr, stream );
 	
 	/* Print parent */
 	_AbstractContext_Print( meshContext, stream );
