@@ -133,7 +133,7 @@ int main( int argc, char* argv[] ) {
 		}
 	
 		Journal_Printf(myStream, "\nPrinting the list\n");
-		Print( (void*)numList, myStream );
+		Stg_Class_Print( (void*)numList, myStream );
 		
 		Journal_Printf(myStream, "\nDeleting half the nodes previously inserted into the list\n");
 		for(i=0; i<NUM_DATA/2; i++){
@@ -141,7 +141,7 @@ int main( int argc, char* argv[] ) {
 		}
 		
 		Journal_Printf(myStream, "\nPrinting the list\n");
-		Print( (void*)numList, myStream );
+		Stg_Class_Print( (void*)numList, myStream );
 		
 
 		Journal_Printf(myStream, "\nRetrieving the data held in the list as an array\n");

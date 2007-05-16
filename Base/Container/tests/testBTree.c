@@ -163,7 +163,7 @@ int main( int argc, char* argv[] ) {
 		}
 	
 		Journal_Printf(myStream, "\nPrinting the tree\n");
-		Print( (void*)numList, myStream );
+		Stg_Class_Print( (void*)numList, myStream );
 		
 		Journal_Printf(myStream, "\nDeleting half the nodes previously inserted into the tree\n");
 		for(i=0; i<NUM_DATA/2; i++){
@@ -175,7 +175,7 @@ int main( int argc, char* argv[] ) {
 		}
 		
 		Journal_Printf(myStream, "\nPrinting the tree\n");
-		Print( (void*)numList, myStream );
+		Stg_Class_Print( (void*)numList, myStream );
 		
 		Journal_Printf( myStream, "\nSearching for Node data in the tree\n" );
 		for(i=1; i<NUM_DATA/4; i++){
@@ -190,7 +190,7 @@ int main( int argc, char* argv[] ) {
 
 		iterator = BTreeIterator_New( numList );
 		Journal_Printf( myStream, "\nPrinting the iterator\n" );
-		Print( (void*)iterator, myStream );
+		Stg_Class_Print( (void*)iterator, myStream );
 		Journal_Printf( myStream, "\nIterating over all the nodes and printing them\n" );
 		for( treeData = BTreeIterator_First( iterator ); treeData != NULL; treeData = BTreeIterator_Next( iterator ) ){
 			Journal_Printf( myStream, "%d\n", *(int*)treeData );

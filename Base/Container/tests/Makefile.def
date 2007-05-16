@@ -24,19 +24,21 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: Makefile.def 4081 2007-04-27 06:20:07Z LukeHodkinson $
+## $Id: Makefile.def 4097 2007-05-16 00:57:11Z LukeHodkinson $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 def_tst = libStGermainBaseContainer
 
 def_srcs = \
+	testIArray.c \
+	testISet.c \
+	testIMap.c \
 	testIndexSet.c \
 	testIndexSet-badAssign.c \
 	testIndexSet-badAccess.c \
 	testPtrMap.c \
 	testIndexMap.c \
-	testArray.c \
 	testLinkedList.c \
 	testLinkedListIterator.c \
 	testSet.c \
@@ -46,14 +48,12 @@ def_srcs = \
 	testMaxHeap.c \
 	testMPIRoutines.c \
 	testUIntMap.c \
-	testMemoryPool.c \
-	testRangeSet.c
+	testMemoryPool.c
 
 def_checks = \
 	testIndexSet.0of1.sh \
 	testPtrMap.0of1.sh \
 	testIndexMap.0of1.sh \
-	testArray.0of1.sh \
 	testLinkedList.0of1.sh \
 	testLinkedListIterator.0of1.sh \
 	testBTree.0of1.sh \
@@ -71,8 +71,7 @@ def_checks = \
 	testUIntMap.0of3.sh \
 	testUIntMap.1of3.sh \
 	testUIntMap.2of3.sh \
-	testMemoryPool.0of1.sh \
-	testRangeSet.0of1.sh
+	testMemoryPool.0of1.sh
 
 ifdef USE_CAUTIOUS
 	def_checks += \

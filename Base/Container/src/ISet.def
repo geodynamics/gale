@@ -1,0 +1,26 @@
+#include PARENT( StGermain/Base/Foundation/NewClass )
+
+#undef CLASSNAME
+#define CLASSNAME ISet
+
+VOIDOVERRIDE( Construct, void, (void* self), (self) )
+VOIDOVERRIDE( Destruct, void, (void* self), (self) )
+VOIDOVERRIDE( Copy, void, (void* self, const void* op), (self, op) )
+
+METHOD( UseArray, void, (void* self, int nItms, const int* itms), (self, nItms, itms) )
+METHOD( Insert, void, (void* self, int key), (self, key) )
+METHOD( TryInsert, void, (void* self, int key), (self, key) )
+METHOD( Clear, void, (void* self), (self) )
+METHOD( Balance, void, (void* self), (self) )
+
+METHOD( GetNumItems, int, (const void* self), (self) )
+METHOD( GetArray, void, (const void* self, int* nItms, int* itms), (self, nItms, itms) )
+METHOD( Has, Bool, (const void* self, int key), (self, key) )
+METHOD( Union, void, (const void* self, const void* op, void* dst), (self, op, dst) )
+METHOD( Isect, void, (const void* self, const void* op, void* dst), (self, op, dst) )
+METHOD( Subtr, void, (const void* self, const void* op, void* dst), (self, op, dst) )
+METHOD( First, void, (const void* self, ISetIter* iter), (self, iter) )
+
+MEMBER( int, nItms )
+MEMBER( int, depth )
+MEMBER( ISetItem*, root )

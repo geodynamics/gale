@@ -1,0 +1,19 @@
+#include PARENT( StGermain/Base/Foundation/NewClass )
+
+#undef CLASSNAME
+#define CLASSNAME IArray
+
+VOIDOVERRIDE( Construct, void, (void* self), (self) )
+VOIDOVERRIDE( Destruct, void, (void* self), (self) )
+VOIDOVERRIDE( Copy, void, (void* self, const void* op), (self, op) )
+
+METHOD( Set, void, (void* self, int nItms, const int* itms), (self, nItms, itms) )
+METHOD( Add, void, (void* self, int nItms, const int* itms), (self, nItms, itms) )
+METHOD( Remove, void, (void* self, int nItms, const int* locals, IMap* map), (self, nItms, locals, map) )
+METHOD( Clear, void, (void* self), (self) )
+
+METHOD( GetSize, int, (const void* self), (self) )
+METHOD( GetPtr, const int*, (const void* self), (self) )
+
+MEMBER( int, size )
+MEMBER( int*, ptr )

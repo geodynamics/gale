@@ -123,7 +123,7 @@ int main( int argc, char* argv[] ) {
 		}
 		
 		Journal_Printf( myStream, "Printing the hash table\n\n" );
-		Print( table, myStream );
+		Stg_Class_Print( table, myStream );
 
 		Journal_Printf( myStream, "Searching for items in the table:\n\n" );
 		
@@ -175,7 +175,7 @@ int main( int argc, char* argv[] ) {
 		}
 		
 		Journal_Printf( myStream, "Printing the hash table\n\n" );
-		Print( ptrTable, myStream );
+		Stg_Class_Print( ptrTable, myStream );
 
 		Journal_Printf( myStream, "Searching for items in the table:\n\n" );
 		

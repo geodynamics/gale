@@ -1,0 +1,27 @@
+#include PARENT( StGermain/Base/Foundation/NewClass )
+
+#undef CLASSNAME
+#define CLASSNAME IMap
+
+VOIDOVERRIDE( Construct, void, (void* self), (self) )
+VOIDOVERRIDE( Destruct, void, (void* self), (self) )
+VOIDOVERRIDE( Copy, void, (void* self, const void* op), (self, op) )
+
+METHOD( SetMaxItems, void, (void* self, int maxItms), (self, maxItms) )
+METHOD( Insert, void, (void* self, int key, int val), (self, key, val) )
+METHOD( SetValue, void, (void* self, int key, int val), (self, key, val) )
+METHOD( Remove, void, (void* self, int key), (self, key) )
+METHOD( Clear, void, (void* self), (self) )
+
+METHOD( GetNumItems, int, (const void* self), (self) )
+METHOD( Map, int, (const void* self, int key), (self, key) )
+METHOD( Try, Bool, (const void* self, int key, int* val), (self, key, val) )
+METHOD( Has, Bool, (const void* self, int key), (self, key) )
+METHOD( Hash, int, (const void* self, int key), (self, key) )
+METHOD( First, void, (const void* self, IMapIter* iter), (self, iter) )
+
+MEMBER( int, maxItms )
+MEMBER( int, nItms )
+MEMBER( int, tblSize )
+MEMBER( IMapItem*, tbl )
+MEMBER( Bool*, used )

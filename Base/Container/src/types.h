@@ -35,12 +35,33 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: types.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: types.h 4097 2007-05-16 00:57:11Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #ifndef __Base_Container_types_h__
 #define __Base_Container_types_h__
+
+typedef struct Iter Iter;
+typedef struct IArray IArray;
+typedef struct ISet ISet;
+typedef struct ISetItem ISetItem;
+typedef struct ISetIter ISetIter;
+typedef struct IMap IMap;
+typedef struct IMapItem IMapItem;
+typedef struct IMapIter IMapIter;
+
+struct ISetItem {
+  int key;
+  ISetItem* left;
+  ISetItem* right;
+};
+
+struct IMapItem {
+  int key;
+  int val;
+  IMapItem* next;
+};
 	
 	/* IndexSet types */
 	typedef Index					IndexSet_Index;
@@ -53,7 +74,6 @@
 	typedef struct Hasher				Hasher;
 	typedef struct NumberHasher			NumberHasher;
 	typedef struct Mapping				Mapping;
-	typedef struct Array				Array;
 	typedef struct LinkedListNode			LinkedListNode;
 	typedef struct LinkedList			LinkedList;
 	typedef struct LinkedListIterator	LinkedListIterator;

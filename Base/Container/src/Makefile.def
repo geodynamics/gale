@@ -24,7 +24,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: Makefile.def 4081 2007-04-27 06:20:07Z LukeHodkinson $
+## $Id: Makefile.def 4097 2007-05-16 00:57:11Z LukeHodkinson $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -32,12 +32,17 @@ def_lib = StGermainBaseContainer
 def_inc = StGermain/Base/Container
 
 def_srcs = \
+	Iter.c \
+	IArray.c \
+	ISet.c \
+	ISetIter.c \
+	IMap.c \
+	IMapIter.c \
 	MPIRoutines.c \
 	IndexSet.c \
 	PtrMap.c \
 	IndexMap.c \
 	List.c \
-	Array.c \
 	BTreeNode.c \
 	BTree.c \
 	BTreeIterator.c \
@@ -58,6 +63,18 @@ def_srcs = \
 def_hdrs = \
 	units.h \
 	types.h \
+	Iter.def \
+	Iter.h \
+	IArray.def \
+	IArray.h \
+	ISet.def \
+	ISet.h \
+	ISetIter.def \
+	ISetIter.h \
+	IMap.def \
+	IMap.h \
+	IMapIter.def \
+	IMapIter.h \
 	MPIRoutines.h \
 	BTreeNode.h \
 	BTree.h \
@@ -72,7 +89,6 @@ def_hdrs = \
 	PtrMap.h \
 	IndexMap.h \
 	List.h \
-	Array.h \
 	Set.h \
 	PtrSet.h \
 	Heap.h \

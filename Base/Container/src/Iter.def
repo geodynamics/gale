@@ -1,0 +1,12 @@
+#include PARENT( Base/Foundation/NewClass )
+
+#undef CLASSNAME
+#define CLASSNAME Iter
+
+VOIDOVERRIDE( Construct, void, (void* self), (self) )
+VOIDOVERRIDE( Copy, void, (void* self, const void* op), (self, op) )
+VOIDABSTRACTMETHOD( Next, void, (void* self), (self) )
+
+METHOD( IsValid, Bool, (void* self), (self) )
+
+MEMBER( Bool, valid )

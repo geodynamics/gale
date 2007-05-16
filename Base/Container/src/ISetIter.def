@@ -1,0 +1,16 @@
+#include PARENT( Iter )
+
+#undef CLASSNAME
+#define CLASSNAME ISetIter
+
+VOIDOVERRIDE( Construct, void, (void* self), (self) )
+VOIDOVERRIDE( Destruct, void, (void* self), (self) )
+VOIDOVERRIDE( Copy, void, (void* self, const void* op), (self, op) )
+VOIDOVERRIDE( Next, void, (void* self), (self) )
+
+METHOD( GetKey, int, (const void* self), (self) )
+
+MEMBER( ISet*, iset )
+MEMBER( int, depth )
+MEMBER( ISetItem**, stack )
+MEMBER( ISetItem*, cur )

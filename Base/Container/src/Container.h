@@ -35,7 +35,7 @@
 ** Comments:
 **	None so far.
 **
-** $Id: Container.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: Container.h 4097 2007-05-16 00:57:11Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -44,6 +44,9 @@
 	
 	#include "units.h"
 	#include "types.h"
+	#include "IArray.h"
+	#include "ISet.h"
+	#include "IMap.h"
 	#include "BTreeNode.h"
 	#include "BTree.h"
 	#include "BTreeIterator.h"
@@ -52,7 +55,6 @@
 	#include "IndexMap.h"
 	#include "List.h"
 	#include "HashTable.h"
-	#include "Array.h"
 	#include "LinkedListNode.h"
 	#include "LinkedList.h"
 	#include "LinkedListIterator.h"

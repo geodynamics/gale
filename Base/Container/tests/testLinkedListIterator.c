@@ -137,7 +137,7 @@ int main( int argc, char* argv[] ) {
 		}
 	
 		Journal_Printf(myStream, "\nPrinting the list\n");
-		Print( (void*)numList, myStream );
+		Stg_Class_Print( (void*)numList, myStream );
 		
 		Journal_Printf( myStream, "Calculating sum.. \n");
 		sum = 0;
