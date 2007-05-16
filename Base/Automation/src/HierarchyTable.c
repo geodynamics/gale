@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: HierarchyTable.c 3652 2006-06-27 01:11:50Z AlanLo $
+** $Id: HierarchyTable.c 4098 2007-05-16 01:00:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -127,7 +127,7 @@ void HierarchyTable_PrintChildren( void* hierarchyTable, Type parentType, Stream
 }
 
 
-Stg_Class* Stg_Class_CheckType( void* classPtr, Type possibleParentType ) {
+Stg_Class* Stg_Class_CheckType( const void* classPtr, const char* possibleParentType ) {
 	Stg_Class* self = (Stg_Class*) classPtr;
 	/* Check if the pointer is null */
 	Journal_Firewall(

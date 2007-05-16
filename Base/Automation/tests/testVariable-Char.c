@@ -120,7 +120,7 @@ int main( int argc, char *argv[] ) {
 
 		Variable_Register_BuildAll( reg );
 
-		Print( reg, stream );
+		Stg_Class_Print( reg, stream );
 
 		for ( test_I = 0; test_I < testValueCount; ++test_I ) {	
 

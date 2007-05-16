@@ -34,7 +34,7 @@
 ** <b>Comments:</b>
 **	None.
 **
-** $Id: Automation.h 3614 2006-06-01 08:58:48Z SteveQuenette $
+** $Id: Automation.h 4098 2007-05-16 01:00:35Z LukeHodkinson $
 **
 **/
 
@@ -44,6 +44,7 @@
 	#include "types.h"
 	#include "shortcuts.h"
 	#include "offsets.h"
+	#include "Comm.h"
 	#include "Stg_Component.h"
 	#include "Stg_ComponentMeta.h"
 	#include "Stg_ComponentRegister.h"

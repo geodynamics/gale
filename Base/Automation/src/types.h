@@ -35,12 +35,14 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: types.h 3614 2006-06-01 08:58:48Z SteveQuenette $
+** $Id: types.h 4098 2007-05-16 01:00:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #ifndef __Base_Automation_types_h__
 #define __Base_Automation_types_h__
+
+typedef struct Comm Comm;
 
 	/* types/classes */
 	typedef struct Stg_Component			Stg_Component;

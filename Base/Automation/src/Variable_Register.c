@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Variable_Register.c 4028 2007-03-15 07:07:00Z KathleenHumble $
+** $Id: Variable_Register.c 4098 2007-05-16 01:00:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -147,7 +147,7 @@ void _Variable_Register_Print(void* variable_Register, Stream* stream)
 		Variable_Index	var_I;
 		
 		for (var_I = 0; var_I < self->count; var_I++)
-			Print(self->_variable[var_I], stream);
+			Stg_Class_Print(self->_variable[var_I], stream);
 	}
 	
 	/* Print parent */

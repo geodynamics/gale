@@ -323,7 +323,7 @@ int main( int argc, char *argv[] ) {
 			stuff->y = (float)ii;
 			stuff->z = '0' + ii;
 		}
-		Print( context, stream );
+		Stg_Class_Print( context, stream );
 	
 		/* No name extension! otherwise Variable_Register_GetByName() will fail */
 		contextCopy = (MockContext*)Stg_Class_Copy( context, NULL, True, NULL, NULL );
@@ -334,7 +334,7 @@ int main( int argc, char *argv[] ) {
 			"Variable Copying",
 			"Can the variable register and variables be copied" );
 
-		Print( contextCopy, stream );
+		Stg_Class_Print( contextCopy, stream );
 
 		Stg_Class_Delete( context );
 		Stg_Class_Delete( contextCopy );

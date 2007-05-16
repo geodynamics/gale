@@ -33,7 +33,7 @@
 **
 ** Comments:
 **
-** $Id: HierarchyTable.h 3462 2006-02-19 06:53:24Z WalterLandry $
+** $Id: HierarchyTable.h 4098 2007-05-16 01:00:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -105,7 +105,7 @@
 			(possibleParentTypedef*) (classPtr)
 	#endif
 
-	Stg_Class* Stg_Class_CheckType( void* classPtr, Type possibleParentType );
+	Stg_Class* Stg_Class_CheckType( const void* classPtr, const char* possibleParentType );
 
 	void HierarchyTable_PrintParents( void* hierarchyTable, Type childType, Stream* stream ) ;
 	void HierarchyTable_PrintChildren( void* hierarchyTable, Type parentType, Stream* stream ) ;

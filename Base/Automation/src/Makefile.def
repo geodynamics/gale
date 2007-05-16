@@ -32,6 +32,7 @@ def_lib = StGermainBaseAutomation
 def_inc = StGermain/Base/Automation
 
 def_srcs = \
+	Comm.c \
 	Variable.c \
 	Variable_Register.c \
 	VariableDumpStream.c \
@@ -54,6 +55,8 @@ def_srcs = \
 	Finalise.c
 
 def_hdrs = \
+	Comm.def \
+	Comm.h \
 	Variable.h \
 	Variable_Register.h \
 	VariableDumpStream.h \

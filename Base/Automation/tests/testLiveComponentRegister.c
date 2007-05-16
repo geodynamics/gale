@@ -119,7 +119,7 @@ int main( int argc, char *argv[] ) {
 		LiveComponentRegister_Add( LCRegister, (Stg_Component*) vecVar[2] );
 
 		Journal_Printf( stream, "Printing the LiveComponentRegister:" );
-		Print( LCRegister, stream );
+		Stg_Class_Print( LCRegister, stream );
 		
 		Journal_Printf( stream, "Retrieving live component references from the LiveComponentRegistry\n" );
 	

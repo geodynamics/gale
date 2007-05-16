@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testConditionFunction.c 3462 2006-02-19 06:53:24Z WalterLandry $
+** $Id: testConditionFunction.c 4098 2007-05-16 01:00:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -76,7 +76,7 @@ int main( int argc, char *argv[] ) {
 		ConditionFunction*	cf;
 
 		cf = ConditionFunction_New(func, "quadratic");
-		Print(cf, stream);
+		Stg_Class_Print(cf, stream);
 
 		ConditionFunction_Apply(cf, 4, 2, NULL, NULL);
 

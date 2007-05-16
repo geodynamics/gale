@@ -116,8 +116,8 @@ void Stg_ComponentA_Print( void* class, Stream* s ) {
 	Journal_Printf(
 		s,
 		"%s %s %d,\n", self->name, self->type, Memory_CountGet( self ) );
-	Print( self->b, s );
-	Print( self->c, s );
+	Stg_Class_Print( self->b, s );
+	Stg_Class_Print( self->c, s );
 }
 void* Stg_ComponentA_Copy( void* class, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	Stg_ComponentA* self = (Stg_ComponentA*)class;
@@ -262,7 +262,7 @@ void Stg_ComponentC_Print( void* class, Stream* s ) {
 	Journal_Printf(
 		s,
 		"%s %s %d,\n", self->name, self->type, Memory_CountGet( self ) );
-	Print( self->b, s );
+	Stg_Class_Print( self->b, s );
 }
 void* Stg_ComponentC_Copy( void* class, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	Stg_ComponentC* self = (Stg_ComponentC*)class;
@@ -381,7 +381,7 @@ int main( int argc, char *argv[] ) {
 				"Can we create the components from dictionary" );
 
 			if ( a ) {
-				Print( a, stream );
+				Stg_Class_Print( a, stream );
 				
 				aCopy = Stg_Class_Copy( a, NULL, True, "_dup", NULL );
 
@@ -400,7 +400,7 @@ int main( int argc, char *argv[] ) {
 					"Can we copy the components and subcomponents correctly" );
 
 				if ( aCopy ) {
-					Print( aCopy, stream );
+					Stg_Class_Print( aCopy, stream );
 				}
 
 				RegressionTest_Check(
@@ -411,7 +411,7 @@ int main( int argc, char *argv[] ) {
 					"Instance counter",
 					"Are the instance counters correct" );
 				
-				Print( cf->LCRegister, stream );
+				Stg_Class_Print( cf->LCRegister, stream );
 			}
 
 		}

@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testConditionFunction_Register.c 3462 2006-02-19 06:53:24Z WalterLandry $
+** $Id: testConditionFunction_Register.c 4098 2007-05-16 01:00:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -79,7 +79,7 @@ int main( int argc, char *argv[] ) {
 			cf[i] = ConditionFunction_New(NULL, name[i]);
 
 		reg = ConditionFunction_Register_New();
-		Print(reg, stream);
+		Stg_Class_Print(reg, stream);
 
 		printf("Add test:\n");
 		for (i = 0; i < 10; i++)

@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: VariableCondition.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: VariableCondition.c 4098 2007-05-16 01:00:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -462,7 +462,7 @@ void VariableCondition_ApplyToIndex( void* variableCondition, Index localIndex, 
 	Stream*				errorStr = Journal_Register( Error_Type, self->type );
 
 	/* Ensure that the index provided (localIndex) has a condition attached to it */
-	insist( UIntMap_Map( self->mapping, localIndex, &index ) );
+	insist( UIntMap_Map( self->mapping, localIndex, &index ), == True );
 	
 	/* For each variable that has a condition at this index */
 	for (i = 0; i < self->vcVarCountTbl[index]; i++)
@@ -696,7 +696,7 @@ Bool VariableCondition_IsCondition( void* variableCondition, Index localIndex, V
 			 * actually one of those - in which case we should consider it has a condition applied to it. */
 			
 			for ( subVariable_I = 0; subVariable_I < variableToTryMatch->subVariablesCount; subVariable_I++ ) {
-				// TODO: next few lines bit slow! Maybe need to cache subvar indices on variable
+			  /* TODO: next few lines bit slow! Maybe need to cache subvar indices on variable */
 				subVariableToTryMatch = variableToTryMatch->components[subVariable_I];
 				if ( subVariableToTryMatch == NULL ) continue;
 				

@@ -30,7 +30,7 @@
 **
 ** Comments:
 **
-** $Id: Stg_ComponentFactory.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: Stg_ComponentFactory.c 4098 2007-05-16 01:00:35Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -192,7 +192,7 @@ void _Stg_ComponentFactory_Print( void* cf, Stream* stream )
 	_Stg_Class_Print( self, stream );
 	
 	Journal_Printf( (void*) stream, "LiveComponentRegister (ptr): %p\n", self->LCRegister );
-	Print( self->LCRegister, stream );
+	Stg_Class_Print( self->LCRegister, stream );
 }
 
 /*--------------------------------------------------------------------------------------------------------------------------
