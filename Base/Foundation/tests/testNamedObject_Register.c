@@ -85,11 +85,11 @@ int main(int argc, char *argv[])
 		NamedObject_Register_Add( reg, TestObject_New( "d" ) );
 		NamedObject_Register_Add( reg, TestObject_New( "e" ) );
 	
-		Print( reg, stream );
+		Stg_Class_Print( reg, stream );
 
 		Journal_Printf( stream, "Index of \"b\": %d\n", NamedObject_Register_GetIndex( reg, "b" ) );
-		Print( NamedObject_Register_GetByName( reg, "d" ), stream );
-		Print( NamedObject_Register_GetByIndex( reg, 2 ), stream );
+		Stg_Class_Print( NamedObject_Register_GetByName( reg, "d" ), stream );
+		Stg_Class_Print( NamedObject_Register_GetByIndex( reg, 2 ), stream );
 	}
 
 	BaseFoundation_Finalise();
