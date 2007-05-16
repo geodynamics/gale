@@ -134,8 +134,6 @@ void _ExperimentalUnderworld_CylinderNodeProfiling_Construct( void* component, S
 
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
 	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, ExperimentalUnderworld_NodeTempProfile );
-	
-	Mesh_ActivateNodeNeighbourTbl( mesh );
 }
 
 

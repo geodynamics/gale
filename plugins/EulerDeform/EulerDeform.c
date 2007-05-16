@@ -283,7 +283,7 @@ Variable* EulerDeform_RegisterLocalNodeCoordsAsVariables( EulerDeform_System* sy
 		variableName, 
 		Variable_DataType_Double, 
 		Mesh_GetDimSize( self ), 
-		&self->topo->domains[MT_VERTEX]->decomp->nLocals, 
+		&self->topo->locals[MT_VERTEX]->locals->size, 
 		(void**)&sys->verts, 
 		variable_Register, 
 		variableNameX,
@@ -787,13 +787,13 @@ void EulerDeform_TopInternalLoop( EulerDeform_System* sys, Grid* grm, double** o
 			/* Are we left or right? */
 			if( newCrd[0] < oldCrd[0] ) {
 				ijk[0]--; ind = Grid_Project( grm, ijk ); ijk[0]++;
-				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ) );
+				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), == True );
 				memcpy( crds[0], oldCrds[ind], nDims * sizeof(double) );
 				memcpy( crds[1], oldCrd, nDims * sizeof(double) );
 			}
 			else {
 				ijk[0]++; ind = Grid_Project( grm, ijk ); ijk[0]--;
-				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ) );
+				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), == True );
 				memcpy( crds[1], oldCrds[ind], nDims * sizeof(double) );
 				memcpy( crds[0], oldCrd, nDims * sizeof(double) );
 			}
@@ -835,19 +835,19 @@ void EulerDeform_TopInternalLoop( EulerDeform_System* sys, Grid* grm, double** o
 			/* Handle internal nodes. */
 			if( ijk[0] > 0 && ijk[2] > 0 ) {
 				ijk[0]--; ijk[2]--; ind = Grid_Project( grm, ijk );
-				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ) );
+				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), == True );
 				memcpy( crds[0], oldCrds[ind], nDims * sizeof(double) );
 
 				ijk[0]++; ind = Grid_Project( grm, ijk );
-				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ) );
+				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), == True );
 				memcpy( crds[1], oldCrds[ind], nDims * sizeof(double) );
 
 				ijk[0]--; ijk[2]++; ind = Grid_Project( grm, ijk );
-				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ) );
+				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), == True );
 				memcpy( crds[2], oldCrds[ind], nDims * sizeof(double) );
 
 				ijk[0]++; ind = Grid_Project( grm, ijk );
-				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ) );
+				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), == True );
 				memcpy( crds[3], oldCrds[ind], nDims * sizeof(double) );
 
 				if( _EulerDeform_QuadYInterp( crds, newCrd, &mesh->verts[centerInd][1] ) ) {
@@ -858,19 +858,19 @@ void EulerDeform_TopInternalLoop( EulerDeform_System* sys, Grid* grm, double** o
 
 			if( ijk[0] > 0 && ijk[2] < grm->sizes[2] - 1 ) {
 				ijk[0]--; ind = Grid_Project( grm, ijk );
-				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ) );
+				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), == True );
 				memcpy( crds[0], oldCrds[ind], nDims * sizeof(double) );
 
 				ijk[0]++; ind = Grid_Project( grm, ijk );
-				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ) );
+				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), == True );
 				memcpy( crds[1], oldCrds[ind], nDims * sizeof(double) );
 
 				ijk[0]--; ijk[2]++; ind = Grid_Project( grm, ijk );
-				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ) );
+				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), == True );
 				memcpy( crds[2], oldCrds[ind], nDims * sizeof(double) );
 
 				ijk[0]++; ind = Grid_Project( grm, ijk );
-				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ) );
+				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), == True );
 				memcpy( crds[3], oldCrds[ind], nDims * sizeof(double) );
 
 				ijk[2]--;
@@ -882,19 +882,19 @@ void EulerDeform_TopInternalLoop( EulerDeform_System* sys, Grid* grm, double** o
 
 			if( ijk[0] < grm->sizes[0] - 1 && ijk[2] > 0 ) {
 				ijk[2]--; ind = Grid_Project( grm, ijk );
-				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ) );
+				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), == True );
 				memcpy( crds[0], oldCrds[ind], nDims * sizeof(double) );
 
 				ijk[0]++; ind = Grid_Project( grm, ijk );
-				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ) );
+				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), == True );
 				memcpy( crds[1], oldCrds[ind], nDims * sizeof(double) );
 
 				ijk[0]--; ijk[2]++; ind = Grid_Project( grm, ijk );
-				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ) );
+				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), == True );
 				memcpy( crds[2], oldCrds[ind], nDims * sizeof(double) );
 
 				ijk[0]++; ind = Grid_Project( grm, ijk );
-				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ) );
+				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), == True );
 				memcpy( crds[3], oldCrds[ind], nDims * sizeof(double) );
 
 				ijk[0]--;
@@ -906,19 +906,19 @@ void EulerDeform_TopInternalLoop( EulerDeform_System* sys, Grid* grm, double** o
 
 			if( ijk[0] < grm->sizes[0] - 1 && ijk[2] < grm->sizes[2] - 1 ) {
 				ind = Grid_Project( grm, ijk );
-				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ) );
+				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), == True );
 				memcpy( crds[0], oldCrds[ind], nDims * sizeof(double) );
 
 				ijk[0]++; ind = Grid_Project( grm, ijk );
-				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ) );
+				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), == True );
 				memcpy( crds[1], oldCrds[ind], nDims * sizeof(double) );
 
 				ijk[0]--; ijk[2]++; ind = Grid_Project( grm, ijk );
-				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ) );
+				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), == True );
 				memcpy( crds[2], oldCrds[ind], nDims * sizeof(double) );
 
 				ijk[0]++; ind = Grid_Project( grm, ijk );
-				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ) );
+				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), == True );
 				memcpy( crds[3], oldCrds[ind], nDims * sizeof(double) );
 
 				ijk[0]--; ijk[2]--;

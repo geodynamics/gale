@@ -89,7 +89,7 @@ void _DensityField_Init(
 	self->dataVariable = Variable_NewScalar( 	
 			tmpName,
 			Variable_DataType_Double, 
-			&self->feMesh->topo->domains[MT_VERTEX]->nDomains, 
+			&self->feMesh->topo->remotes[MT_VERTEX]->nDomains, 
 			(void**)&self->data, 
 			variable_Register );
 	Memory_Free( tmpName );

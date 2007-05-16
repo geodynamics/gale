@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: IncompressibleExtensionBC.c 466 2007-04-27 06:24:33Z LukeHodkinson $
+** $Id: IncompressibleExtensionBC.c 470 2007-05-16 01:14:50Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -108,8 +108,8 @@ void CalculateVelocities( UnderworldContext* context, double* V_c, double* V_d )
 	rightWall_globalIndex = Grid_Project( vertGrid, rightWall_global_IJK );
 	
 	/* Grab local indicies for these nodes */
-	insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, leftWall_globalIndex, &leftWall_localIndex ) );
-	insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, rightWall_globalIndex, &rightWall_localIndex ) );
+	insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, leftWall_globalIndex, &leftWall_localIndex ), == True );
+	insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, rightWall_globalIndex, &rightWall_localIndex ), == True );
 
 	/* Check if the left wall is on processor */
 	if ( leftWall_localIndex < FeMesh_GetNodeLocalSize( mesh ) ) {
