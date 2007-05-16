@@ -32,7 +32,7 @@
 **
 ** Comments:
 **
-** $Id: types.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: types.h 4106 2007-05-16 09:09:46Z RaquibulHassan $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -96,6 +96,8 @@
 	typedef struct Swarm_Register			Swarm_Register;
 	typedef struct SwarmDump			SwarmDump;
 	typedef struct ParticleCommHandler		ParticleCommHandler;
+	typedef struct ParticleMovementHandler 	ParticleMovementHandler;
+	typedef struct ParticleShadowSync		ParticleShadowSync;
 	typedef struct SwarmVariable_Register	SwarmVariable_Register;
 	typedef struct SwarmVariable			SwarmVariable;
 	typedef struct OperatorSwarmVariable		OperatorSwarmVariable;

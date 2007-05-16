@@ -70,6 +70,8 @@ MemoryPool* _MemoryPool_New(
 	self->numElements = numElements;
 	self->numInitialElements = numElements;
 	self->numElementsFree = numElements;
+	self->callbackFunc = NULL;
+	self->callbackFuncArg = NULL;
 
 	return self;
 }
@@ -161,7 +163,9 @@ void _MemoryPool_DeleteFunc( void *memPool )
 	assert (self);
 	
 	for( i=0; i<self->numChunks; i++ ){
-		Memory_Free( self->chunks[i].memory );
+		if( self->chunks[i].memory != ((char*)NULL) ){
+			Memory_Free( self->chunks[i].memory );
+		}
 	}
 
 	Memory_Free( self->chunks );
@@ -226,7 +230,7 @@ Bool MemoryPool_DeleteObject( MemoryPool *memPool, void *object )
 		if( valid ){
 			memset( (char*)object, 0, memPool->elementSize );
 			memPool->pool[memPool->numElementsFree++] = (char*)object;
-			MemPool_Shrink( memPool );
+			MemoryPool_Shrink( memPool );
 			return 1;
 		}
 		else{
@@ -268,9 +272,13 @@ void MemoryPool_Extend( MemoryPool *memPool )
 	memPool->pool = newPool;
 	memPool->numElements+=memPool->delta;
 	memPool->numElementsFree=memPool->delta;
+
+	if( memPool->callbackFunc ){
+		memPool->callbackFunc( memPool->callbackFuncArg );
+	}
 }
 
-void MemPool_Shrink( MemoryPool *memPool )
+void MemoryPool_Shrink( MemoryPool *memPool )
 {
 	int i = 0;
 	Bool deleteFlag = 0;
@@ -316,6 +324,8 @@ void MemPool_Shrink( MemoryPool *memPool )
 		memPool->numElementsFree-=memPool->chunks[chunkIdx].maxFree;
 
 		Memory_Free( memPool->chunks[chunkIdx].memory );
+		memPool->chunks[chunkIdx].memory = (char*)NULL;
+
 		if( chunkIdx == (memPool->numChunks-1) ){
 			memPool->numChunks--;
 			memPool->chunks = (Chunk*)Memory_Realloc( memPool->chunks, sizeof(Chunk)*memPool->numChunks );
@@ -328,5 +338,21 @@ void MemPool_Shrink( MemoryPool *memPool )
 			assert( memPool->chunks );
 		}
 	}
+	
+	if( memPool->callbackFunc ){
+		memPool->callbackFunc( memPool->callbackFuncArg );
+	}
+}
+
+void MemoryPool_SetCallbackFunc( MemoryPool *memPool, MemoryPool_ResizeCallbackFunc *f )
+{
+	assert( memPool );
+	memPool->callbackFunc = f;
+}
+
+void MemoryPool_SetCallbackFuncArg( MemoryPool *memPool, void *callbackFuncArg )
+{
+	assert( memPool );
+	memPool->callbackFuncArg = callbackFuncArg;
 }
 

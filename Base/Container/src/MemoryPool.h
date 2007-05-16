@@ -53,6 +53,8 @@
 		unsigned int numFree;
 	}Chunk;
 
+	typedef void ( MemoryPool_ResizeCallbackFunc ) ( void * );
+	
 	/** \def __List See __List */
 	#define __MemoryPool \
 		/* General info */ \
@@ -68,14 +70,17 @@
 		int		numChunks; \
 		int		delta; \
 		Chunk	*chunks; \
-		char	**pool;
+		char	**pool; \
+		MemoryPool_ResizeCallbackFunc *callbackFunc; \
+		void	*callbackFuncArg;
 
 	struct MemoryPool { __MemoryPool };
 	
 	/** Constructor interface. */
 	#define MemoryPool_New( type, numElements, delta )\
 		MemoryPool_NewFunc( sizeof(type), numElements, delta )
-	
+
+
 	MemoryPool* MemoryPool_NewFunc( SizeT elementSize, int numElements, int delta );
 
 	MemoryPool* _MemoryPool_New(
@@ -106,14 +111,17 @@
 	/** Public functions */
 #define MemoryPool_NewObject( type, memPool ) \
 	(type*)MemoryPool_NewObjectFunc( sizeof(type), memPool )
-	
+
 	void *MemoryPool_NewObjectFunc( SizeT elementSize, MemoryPool *memPool );
 		
 	Bool MemoryPool_DeleteObject( MemoryPool *memPool, void *object );
 
 	void MemoryPool_Extend( MemoryPool *memPool );
 	
-	void MemPool_Shrink( MemoryPool *memPool );
+	void MemoryPool_Shrink( MemoryPool *memPool );
+
+	void MemoryPool_SetCallbackFunc( MemoryPool *memPool, MemoryPool_ResizeCallbackFunc *f );
+	void MemoryPool_SetCallbackFuncArg( MemoryPool *memPool, void *callbackFuncArg );
 	
 	/** Private Functions */
 	

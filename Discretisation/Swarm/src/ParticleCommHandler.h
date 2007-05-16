@@ -36,34 +36,65 @@
 **	interface and we'll have separate instantiation classes. Can't see that need in the short
 **	term though so we'll just use the one class for now.
 **
-** $Id: ParticleCommHandler.h 3851 2006-10-12 08:57:22Z SteveQuenette $
+** $Id: ParticleCommHandler.h 4106 2007-05-16 09:09:46Z RaquibulHassan $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 	
 #ifndef __Discretisation_Swarm_ParticleCommHandler_h__
 #define __Discretisation_Swarm_ParticleCommHandler_h__
 
-	typedef void (ParticleCommHandler_HandleParticleMovementBetweenProcsFunction)	( void* pCommHandler );
 	
 	/** Textual name of this class */
 	extern const Type ParticleCommHandler_Type;
 
+	typedef void (ParticleCommHandler_CommFunction)	( ParticleCommHandler * );
+	typedef void (ParticleCommHandler_AllocateOutgoingCountArrays) ( ParticleCommHandler * );
+	typedef void (ParticleCommHandler_AllocateOutgoingParticleArrays) ( ParticleCommHandler * );
+	typedef void (ParticleCommHandler_FreeOutgoingArrays) ( ParticleCommHandler * );
+	
+	typedef void (ParticleCommHandler_AllocateIncomingCountArrays) ( ParticleCommHandler * );
+	typedef void (ParticleCommHandler_AllocateIncomingParticleArrays) ( ParticleCommHandler * );
+	typedef void (ParticleCommHandler_FreeIncomingArrays) ( ParticleCommHandler * );
+	
+	typedef void (ParticleCommHandler_BeginReceiveOfIncomingParticleCounts) ( ParticleCommHandler * );
+	typedef void (ParticleCommHandler_FinishReceiveOfIncomingParticleCounts) ( ParticleCommHandler * );
+	
+	typedef void (ParticleCommHandler_BeginReceiveOfIncomingParticles) ( ParticleCommHandler * );
+	typedef void (ParticleCommHandler_FinishReceiveOfIncomingParticlesAndUpdateIndices) ( ParticleCommHandler * );
+	typedef void (ParticleCommHandler_SendOutgoingParticleCounts) ( ParticleCommHandler * );
+	typedef void (ParticleCommHandler_BeginSendingParticles) ( ParticleCommHandler * );
+	typedef void (ParticleCommHandler_ConfirmOutgoingSendsCompleted) ( ParticleCommHandler * );
+
 	#define __ParticleCommHandler \
 		__Stg_Component \
 		/* Virtual info */ \
-		ParticleCommHandler_HandleParticleMovementBetweenProcsFunction* \
-			_handleParticleMovementBetweenProcs;\
-		/* General info */ \
+		ParticleCommHandler_AllocateOutgoingCountArrays						*allocateOutgoingCountArrays; \
+		ParticleCommHandler_AllocateOutgoingParticleArrays						*allocateOutgoingParticleArrays; \
+		ParticleCommHandler_FreeOutgoingArrays									*freeOutgoingArrays; \
+		ParticleCommHandler_AllocateIncomingCountArrays						*allocateIncomingCountArrays; \
+		ParticleCommHandler_AllocateIncomingParticleArrays						*allocateIncomingParticleArrays; \
+		ParticleCommHandler_FreeIncomingArrays									*freeIncomingArrays; \
+		ParticleCommHandler_BeginReceiveOfIncomingParticleCounts				*beginReceiveOfIncomingParticleCounts; \
+		ParticleCommHandler_FinishReceiveOfIncomingParticleCounts				*finishReceiveOfIncomingParticleCounts; \
+		ParticleCommHandler_BeginReceiveOfIncomingParticles					*beginReceiveOfIncomingParticles; \
+		ParticleCommHandler_FinishReceiveOfIncomingParticlesAndUpdateIndices	*finishReceiveOfIncomingParticlesAndUpdateIndices; \
+		ParticleCommHandler_SendOutgoingParticleCounts							*sendOutgoingParticleCounts; \
+		ParticleCommHandler_BeginSendingParticles								*beginSendingParticles; \
+		ParticleCommHandler_ConfirmOutgoingSendsCompleted						*confirmOutgoingSendsCompleted; \
+		ParticleCommHandler_CommFunction										*_commFunction;\
+		/* Member info */ \
 		Stream*				debug; \
 		Swarm*				swarm; \
 		Particle_Index* 		shadowParticlesLeavingMeIndices; \
 		Index				shadowParticlesLeavingMeTotalCount; \
 		Index				shadowParticlesLeavingMeUnfilledCount; \
 		Index				currShadowParticleLeavingMeIndex; \
+		Index				currParticleLeavingMyDomainIndex; \
+		\
 		Particle_Index* 		particlesOutsideDomainIndices; \
 		Index				particlesOutsideDomainTotalCount; \
 		Index				particlesOutsideDomainUnfilledCount; \
-		Index				currParticleLeavingMyDomainIndex; \
+		\
 		/** cnts of [nbr][st_cell] outgoing particles */ \
 		Particle_Index**		shadowParticlesLeavingMeCountsPerCell; \
 		/** cnts of [nbr] total outgoing particles via my shadow cells to nbr procs */ \
@@ -78,41 +109,50 @@
 		Particle_Index*			particlesArrivingFromNbrShadowCellsTotalCounts; \
 		/** transfer array [nbr] of particles to recv */ \
 		Particle**			particlesArrivingFromNbrShadowCells; \
-		MPI_Request**			particlesArrivingFromNbrShadowCellsHandles; \
-		Bool				defensive;
-
+		MPI_Request**			particlesArrivingFromNbrShadowCellsHandles;
 
 	struct ParticleCommHandler { __ParticleCommHandler };	
 
 	/* --- virtual functions --- */
 
 	/** Constructor interface */
-	ParticleCommHandler* ParticleCommHandler_DefaultNew( Name name );
-	
-	ParticleCommHandler* ParticleCommHandler_New(
-			Name name,
-			void* swarm );
 	
 	/** Private Constructor */
 	ParticleCommHandler* _ParticleCommHandler_New( 
-		SizeT								_sizeOfSelf,
-		Type								type,
-		Stg_Class_DeleteFunction*						_delete,
-		Stg_Class_PrintFunction*						_print,
-		Stg_Class_CopyFunction*						_copy, 
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*			_construct,
-		Stg_Component_BuildFunction*		_build,
-		Stg_Component_InitialiseFunction*		_initialise,
-		Stg_Component_ExecuteFunction*		_execute,
-		Stg_Component_DestroyFunction*		_destroy,
-		Name							name,
-		Bool							initFlag,
-		ParticleCommHandler_HandleParticleMovementBetweenProcsFunction	handleParticleMovementBetweenProcs,
-		void*								swarm );
+		SizeT                                                           _sizeOfSelf,
+		Type                                                            type,
+		Stg_Class_DeleteFunction*                                       _delete,
+		Stg_Class_PrintFunction*                                        _print,
+		Stg_Class_CopyFunction*                                         _copy, 
+		Stg_Component_DefaultConstructorFunction*                       _defaultConstructor,
+		Stg_Component_ConstructFunction*                                _construct,
+		Stg_Component_BuildFunction*                                    _build,
+		Stg_Component_InitialiseFunction*                               _initialise,
+		Stg_Component_ExecuteFunction*                                  _execute,
+		Stg_Component_DestroyFunction*                                  _destroy,
+		Name                                                            name,
+		Bool                                                            initFlag,
+		ParticleCommHandler_AllocateOutgoingCountArrays						*_allocateOutgoingCountArrays,
+		ParticleCommHandler_AllocateOutgoingParticleArrays						*_allocateOutgoingParticleArrays,
+		ParticleCommHandler_FreeOutgoingArrays									*_freeOutgoingArrays,
+		ParticleCommHandler_AllocateIncomingCountArrays						*_allocateIncomingCountArrays,
+		ParticleCommHandler_AllocateIncomingParticleArrays						*_allocateIncomingParticleArrays,
+		ParticleCommHandler_FreeIncomingArrays									*_freeIncomingArrays,
+		ParticleCommHandler_BeginReceiveOfIncomingParticleCounts				*_beginReceiveOfIncomingParticleCounts,
+		ParticleCommHandler_FinishReceiveOfIncomingParticleCounts				*_finishReceiveOfIncomingParticleCounts,
+		ParticleCommHandler_BeginReceiveOfIncomingParticles					*_beginReceiveOfIncomingParticles,
+		ParticleCommHandler_FinishReceiveOfIncomingParticlesAndUpdateIndices	*_finishReceiveOfIncomingParticlesAndUpdateIndices,
+		ParticleCommHandler_SendOutgoingParticleCounts							*_sendOutgoingParticleCounts,
+		ParticleCommHandler_BeginSendingParticles								*_beginSendingParticle,
+		ParticleCommHandler_ConfirmOutgoingSendsCompleted						*_confirmOutgoingSendsCompleted,
+		ParticleCommHandler_CommFunction										*_commFunction,
+		void*                                               swarm );
 	
 	/** Variable initialiser */
-	void _ParticleCommHandler_Init( ParticleCommHandler* self, void* swarm );
+	void _ParticleCommHandler_Init(
+		ParticleCommHandler*     self,
+		void*                    swarm
+		);
 
 	/** Stg_Class_Print() implementation */
 	void _ParticleCommHandler_Print( void* pCommsHandler, Stream* stream );
@@ -138,41 +178,37 @@
 	/** Stg_Class_Delete() implementation */
 	void _ParticleCommHandler_Delete(void* pCommsHandler );
 	
-	/* --- Public functions --- */
+	/* --- Public virtual function interfaces --- */
 	
-	/** Handle particle movement between processors */
-	void ParticleCommHandler_HandleParticleMovementBetweenProcs( void* pCommsHandler );
-	/** ParticleCommHandler_HandleParticleMovementBetweenProcs() implementation */
-	void _ParticleCommHandler_HandleParticleMovementBetweenProcs( void* pCommsHandler );
+	/* --- virtual function implementations --- */
 
 	/* --- private functions --- */
 
+	/* +++ Comms via shadow cell related +++ */
+
+	void _ParticleCommHandler_AllocateOutgoingCountArrays( ParticleCommHandler* self );
+	void _ParticleCommHandler_AllocateOutgoingParticlesArrays( ParticleCommHandler* self );
+	void _ParticleCommHandler_FreeOutgoingArrays( ParticleCommHandler* self );
+
+	void _ParticleCommHandler_AllocateIncomingCountArrays( ParticleCommHandler* self );
+	void _ParticleCommHandler_AllocateIncomingParticlesArrays( ParticleCommHandler* self );
+	void _ParticleCommHandler_FreeIncomingArrays( ParticleCommHandler* self );
+
+	void _ParticleCommHandler_BeginReceiveOfIncomingParticleCounts( ParticleCommHandler* self );
+	void _ParticleCommHandler_FinishReceiveOfIncomingParticleCounts( ParticleCommHandler* self );
+
+	void _ParticleCommHandler_BeginReceiveOfIncomingParticles( ParticleCommHandler* self );
+	void _ParticleCommHandler_FinishReceiveAndUpdateShadowParticlesEnteringMyDomain( ParticleCommHandler* self );
+
 	void _ParticleCommHandler_SendParticleTotalsInShadowCellsToNbrs( ParticleCommHandler* self );
 
-	void _ParticleCommHandler_NonBlockingSendParticlesInShadowCellsToNbrs( ParticleCommHandler* self );
+	void _ParticleCommHandler_BeginSendingParticlesInShadowCellsToNbrs( ParticleCommHandler* self );
+	void _ParticleCommHandler_ConfirmOutgoingSendsCompleted( ParticleCommHandler* self );
 
-	void _ParticleCommHandler_ReceiveAndUpdateShadowParticlesEnteringMyDomain( ParticleCommHandler* self );
+	void _ParticleCommHandler_ZeroShadowCommStrategyCounters( ParticleCommHandler* self );
 
-	void _ParticleCommHandler_FindParticlesThatHaveMovedOutsideMyDomain( ParticleCommHandler* self );
 
-	void
-	_ParticleCommHandler_ShareAndUpdateParticlesThatHaveMovedOutsideDomains(
-		ParticleCommHandler* self,
-		Particle_Index*      globalParticlesArrivingMyDomainCountPtr,
-		Particle_Index*      globalParticlesOutsideDomainTotalPtr );
-
-	void _ParticleCommHandler_GetCountOfParticlesOutsideDomainPerProcessor(
-		ParticleCommHandler*	self,
-		Particle_Index**	globalParticlesOutsideDomainCountsPtr,
-		Particle_Index*		maxGlobalParticlesOutsideDomainCountPtr,
-		Particle_Index*		globalParticlesOutsideDomainTotalPtr );
-		
-	Particle_Index _ParticleCommHandler_FindFreeSlotAndPrepareForInsertion( ParticleCommHandler* self );
-
-	void _ParticleCommHandler_FillRemainingHolesInLocalParticlesArray( ParticleCommHandler*	self );
-
-	Particle_Index* _ParticleCommHandler_MergeListsOfUnfilledParticleSlots( ParticleCommHandler* self );
-
-	void _ParticleCommHandler_PrintParticleSlotsYetToFill( ParticleCommHandler* self );
+	/* +++ Statistics Printing +++ */
+	void _ParticleCommHandler_PrintCommunicationVolumeStats( ParticleCommHandler* self, double startTime, Stream* info );
 
 #endif
