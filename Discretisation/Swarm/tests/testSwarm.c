@@ -33,7 +33,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: testSwarm.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: testSwarm.c 4102 2007-05-16 01:09:00Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -186,7 +186,7 @@ int main( int argc, char* argv[] ) {
 	Initialise( swarm, 0, False );
 	
 	if( rank == procToWatch ) {
-		Print( swarm, stream );
+		Stg_Class_Print( swarm, stream );
 
 		Journal_Printf( stream, "\n" );
 		Swarm_PrintParticleCoords( swarm, stream );

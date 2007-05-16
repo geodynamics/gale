@@ -33,7 +33,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: testGaussLayoutSingleCell.c 3555 2006-05-10 07:05:46Z PatrickSunter $
+** $Id: testGaussLayoutSingleCell.c 4102 2007-05-16 01:09:00Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -144,7 +144,7 @@ int main( int argc, char* argv[] ) {
 	Initialise( swarm, 0, False );
 	
 	if( rank == procToWatch ) {
-		Print( gaussParticleLayout, stream );
+		Stg_Class_Print( gaussParticleLayout, stream );
 	}
 	
 	/* Print out the particles on any cell (they should all be the same) */

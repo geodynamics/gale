@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ElementCellLayout.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: ElementCellLayout.c 4102 2007-05-16 01:09:00Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -369,14 +369,14 @@ ShadowInfo* _ElementCellLayout_GetShadowInfo( void* elementCellLayout ) {
 
 void ElementCellLayout_BuildShadowInfo( ElementCellLayout* self ) {
 	unsigned	nDims;
-	CommTopology*	commTopo;
+	Comm*		comm;
 	unsigned	nIncProcs;
 	unsigned*	incProcs;
 	unsigned	n_i;
 
 	nDims = Mesh_GetDimSize( self->mesh );
-	commTopo = Mesh_GetCommTopology( self->mesh, nDims );
-	CommTopology_GetIncidence( commTopo, &nIncProcs, &incProcs );
+	comm = Mesh_GetCommTopology( self->mesh, nDims );
+	Comm_GetNeighbours( comm, &nIncProcs, &incProcs );
 
 	/* Extract neighbouring proc information. */
 	self->cellShadowInfo.procNbrInfo = Memory_Alloc_Unnamed( ProcNbrInfo );
@@ -395,9 +395,6 @@ void ElementCellLayout_BuildShadowInfo( ElementCellLayout* self ) {
 		unsigned	nSharers;
 		unsigned*	sharers;
 		unsigned	s_i;
-
-		if( Mesh_SharedToDomain( self->mesh, nDims, n_i ) >= Mesh_GetLocalSize( self->mesh, nDims ) )
-			continue;
 
 		Mesh_GetSharers( self->mesh, nDims, n_i, 
 				 &nSharers, &sharers );
@@ -427,9 +424,7 @@ void ElementCellLayout_BuildShadowInfo( ElementCellLayout* self ) {
 		unsigned*	sharers;
 		unsigned	s_i;
 
-		local = Mesh_SharedToDomain( self->mesh, nDims, n_i );
-		if( local >= Mesh_GetLocalSize( self->mesh, nDims ) )
-			continue;
+		local = Mesh_SharedToLocal( self->mesh, nDims, n_i );
 
 		Mesh_GetSharers( self->mesh, nDims, n_i, 
 				 &nSharers, &sharers );

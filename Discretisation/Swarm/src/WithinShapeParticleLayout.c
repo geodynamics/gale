@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: WithinShapeParticleLayout.c 3851 2006-10-12 08:57:22Z SteveQuenette $
+** $Id: WithinShapeParticleLayout.c 4102 2007-05-16 01:09:00Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -155,7 +155,7 @@ void _WithinShapeParticleLayout_Print( void* withinShapeParticleLayout, Stream* 
 	_SpaceFillerParticleLayout_Print( self, stream );
 	
 	/* WithinShapeParticleLayout */
-	Print( self->shape, stream );
+	Stg_Class_Print( self->shape, stream );
 	
 	Stream_UnIndent( stream );
 }

@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SwarmClass.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: SwarmClass.c 4102 2007-05-16 01:09:00Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -306,8 +306,8 @@ void _Swarm_Print( void* swarm, Stream* stream ) {
 	/* Virtual info */
 
 	/* Swarm info */
-	Print( self->cellLayout, stream );
-	Print( self->particleLayout, stream );
+	Stg_Class_Print( self->cellLayout, stream );
+	Stg_Class_Print( self->particleLayout, stream );
 	Journal_Printf( swarmStream, "\tcellLocalCount: %u\n", self->cellLocalCount );
 	Journal_Printf( swarmStream, "\tcellDomainCount: %u\n", self->cellDomainCount );
 	Journal_Printf( swarmStream, "\tcellShadowCount: %u\n", self->cellShadowCount );

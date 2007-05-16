@@ -33,7 +33,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: testGaussLayout.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: testGaussLayout.c 4102 2007-05-16 01:09:00Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -174,7 +174,7 @@ int main( int argc, char* argv[] ) {
 	Initialise( swarm, 0, False );
 	
 	if( rank == procToWatch ) {
-		Print( gaussParticleLayout, stream );
+		Stg_Class_Print( gaussParticleLayout, stream );
 	}
 	
 	
