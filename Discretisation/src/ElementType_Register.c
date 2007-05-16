@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ElementType_Register.c 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: ElementType_Register.c 832 2007-05-16 01:11:18Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -207,7 +207,7 @@ void _ElementType_Register_Print( void* elementType_Register, Stream* stream ) {
 	Journal_Printf( stream, "\telementType[0-%u]:\n", self->count );
 	for( elementType_I = 0; elementType_I < self->count; elementType_I++ ) {
 		Journal_Printf( stream, "elementType[%u]: ", elementType_I );
-		Print( self->elementType[elementType_I], elementType_RegisterStream );
+		Stg_Class_Print( self->elementType[elementType_I], elementType_RegisterStream );
 	}
 	Journal_Printf( stream, "\t]\n" );
 }

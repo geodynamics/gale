@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: LinkedDofInfo.c 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: LinkedDofInfo.c 832 2007-05-16 01:11:18Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -433,7 +433,7 @@ void _LinkedDofInfo_Build( void* linkedDofInfo, void* data ) {
 				/* In parallel, there may be several processors in the middle who aren't holding the
 				 * walls, but need to know they exist. Hence use an MPI_Allreduce to get the count */
 				MPI_Allreduce( &numExtraDofSetsNeeded, &globallyKnownExtraDofSetsNeeded, 1, MPI_UNSIGNED,
-					       MPI_MAX, Mesh_GetCommTopology( self->mesh, MT_VERTEX )->comm );
+					       MPI_MAX, Mesh_GetCommTopology( self->mesh, MT_VERTEX )->mpiComm );
 
 				for( dofSet_I = 0; dofSet_I < globallyKnownExtraDofSetsNeeded; dofSet_I++ ) {	
 					LinkedDofInfo_AddDofSet( linkedDofInfo );

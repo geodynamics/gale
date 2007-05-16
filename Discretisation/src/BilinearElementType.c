@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: BilinearElementType.c 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: BilinearElementType.c 832 2007-05-16 01:11:18Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -277,7 +277,7 @@ void _BilinearElementType_ConvertGlobalCoordToElLocal(
 	Mesh_GetIncidence( mesh, MT_FACE, element, MT_VERTEX, &nInc, &inc );
 	assert( nInc == 4 );
 
-	insist( Simplex_Search2D( mesh->verts, inc, 2, self->triInds, (double*)globalCoord, bc, &inside ) );
+	insist( Simplex_Search2D( mesh->verts, inc, 2, self->triInds, (double*)globalCoord, bc, &inside ), == True );
 
 	elLocalCoord[0] = bc[0] * lCrds[self->triInds[inside][0]][0];
 	elLocalCoord[1] = bc[0] * lCrds[self->triInds[inside][0]][1];

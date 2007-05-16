@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testElementType_Register.c 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: testElementType_Register.c 832 2007-05-16 01:11:18Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -133,7 +133,7 @@ int main( int argc, char* argv[] ) {
 		1 ) );
 	
 	
-	Print( elementType_Register, stream );
+	Stg_Class_Print( elementType_Register, stream );
 	
 	/* Destroy stuff */
 	Stg_Class_Delete( elementType_Register );

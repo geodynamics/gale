@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AnalyticSolution.c 827 2007-05-07 05:03:14Z JulianGiordani $
+** $Id: AnalyticSolution.c 832 2007-05-16 01:11:18Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -359,7 +359,7 @@ FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVari
 	/* Create new data Variable */
 	tmpName = Stg_Object_AppendSuffix( feVariable, "Analytic-DataVariable" );
 	if ( scalar ) {
-		Decomp_Sync*	sync;
+		Sync*	sync;
 
 		sync = Mesh_GetSync( feVariable->feMesh, MT_VERTEX );
 		dataVariable = Variable_NewScalar( 	
@@ -370,7 +370,7 @@ FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVari
 			variable_Register );
 	}
 	else {
-		Decomp_Sync*	sync;
+		Sync*		sync;
 		unsigned	c_i;
 
 		sync = Mesh_GetSync( feVariable->feMesh, MT_VERTEX );

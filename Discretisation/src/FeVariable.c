@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeVariable.c 829 2007-05-10 04:12:32Z LukeHodkinson $
+** $Id: FeVariable.c 832 2007-05-16 01:11:18Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -133,7 +133,7 @@ FeVariable* FeVariable_New(
 	    isCheckpointedAndReloaded,
 		importFormatType,
 		exportFormatType,
-		((FeMesh*)feMesh)->topo->domains[MT_VERTEX]->commTopo->comm, 
+		((FeMesh*)feMesh)->topo->locals[MT_VERTEX]->comm->mpiComm, 
 		fV_Register );
 }
 
@@ -418,35 +418,35 @@ void _FeVariable_Print( void* variable, Stream* stream ) {
 	/* Virtual info */
 	
 	/* FeVariable info */
-	Print( self->feMesh, stream );
+	Stg_Class_Print( self->feMesh, stream );
 	if ( self->dofLayout ) {
-		Print( self->dofLayout, stream );
+		Stg_Class_Print( self->dofLayout, stream );
 	}
 	else {
 		Journal_Printf( stream, "\tdofLayout: (null)... not provided (may be Operator type)\n" );
 	}
 	if ( self->bcs ) {
-		Print( self->bcs, stream );
+		Stg_Class_Print( self->bcs, stream );
 	}
 	else {
 		Journal_Printf( stream, "\tbcs: (null)... not provided (may be Operator type)\n" );
 	}
 	if ( self->ics ) {
-		Print( self->ics, stream );
+		Stg_Class_Print( self->ics, stream );
 	}
 	else {
 		Journal_Printf( stream, "\tics: (null)... not provided (may be Operator type)\n" );
 	}
 
 	if ( self->linkedDofInfo ) {
-		Print( self->linkedDofInfo, stream );
+		Stg_Class_Print( self->linkedDofInfo, stream );
 	}
 	else {
 		Journal_Printf( stream, "\tlinkedDofInfo: (null)... not provided\n" );
 	}
 	
 	if( self->eqNum ) {
-		Print( self->eqNum, stream );
+		Stg_Class_Print( self->eqNum, stream );
 	}
 	else {
 		Journal_Printf( stream, "\teqNum: (null)... not built yet\n" );
@@ -924,11 +924,11 @@ void FeVariable_PrintLocalDiscreteValues_2dBox( void* variable, Stream* stream )
 						      ExtensionManager_GetHandle( self->feMesh->info, "localRange" ) );
 
 	memcpy( inds, localOrigin, Mesh_GetDimSize( self->feMesh ) * sizeof(unsigned) );
-	insist( Mesh_GlobalToDomain( self->feMesh, MT_VERTEX, Grid_Project( vertGrid, inds ), &vertInd ) );
+	insist( Mesh_GlobalToDomain( self->feMesh, MT_VERTEX, Grid_Project( vertGrid, inds ), &vertInd ), == True );
 	verts[0] = Mesh_GetVertex( self->feMesh, vertInd );
 	inds[0]++;
 	inds[1]++;
-	insist( Mesh_GlobalToDomain( self->feMesh, MT_VERTEX, Grid_Project( vertGrid, inds ), &vertInd ) );
+	insist( Mesh_GlobalToDomain( self->feMesh, MT_VERTEX, Grid_Project( vertGrid, inds ), &vertInd ), == True );
 	verts[1] = Mesh_GetVertex( self->feMesh, vertInd );
 	
 	nx = vertGrid->sizes[0];
@@ -991,7 +991,7 @@ void FeVariable_PrintLocalDiscreteValues_2dBox( void* variable, Stream* stream )
 				inds[0] = x_I;
 				inds[1] = y_I;
 				node_lI = RegularMeshUtils_Node_3DTo1D( self->feMesh, inds );
-				insist( Mesh_GlobalToDomain( self->feMesh, MT_VERTEX, node_lI, &node_lI ) );
+				insist( Mesh_GlobalToDomain( self->feMesh, MT_VERTEX, node_lI, &node_lI ), == True );
 				currNodeNumDofs = dofLayout->dofCounts[node_lI];
 
 				if ( currNodeNumDofs == 1 ) {
@@ -1133,8 +1133,7 @@ void FeVariable_GetMinimumSeparation( void* feVariable, double* minSeparationPtr
 void FeVariable_SyncShadowValues( void* feVariable ) {
 	FeVariable*		self = (FeVariable*)feVariable;
 	DofLayout*		dofLayout;
-	Decomp_Sync*		vertSync;
-	Decomp_Sync_Array*	array;
+	Sync*		vertSync;
 	unsigned		var_i;
 
 	assert( self );
@@ -1144,8 +1143,6 @@ void FeVariable_SyncShadowValues( void* feVariable ) {
 
 	/* Create a distributed array based on the mesh's vertices. */
 	vertSync = Mesh_GetSync( self->feMesh, MT_VERTEX );
-	array = Decomp_Sync_Array_New();
-	Decomp_Sync_Array_SetSync( array, vertSync );
 
 	/*
 	** For each variable in the dof layout, we need to create a distributed array and update
@@ -1171,17 +1168,13 @@ void FeVariable_SyncShadowValues( void* feVariable ) {
 
 			arrayStart = (Stg_Byte*)var->arrayPtr + offs;
 			arrayEnd = arrayStart + var->structSize * FeMesh_GetNodeLocalSize( self->feMesh );
-			Decomp_Sync_Array_SetMemory( array, 
-						     arrayStart, arrayEnd, 
-						     var->structSize, var->structSize, 
-						     size );
-
-			Decomp_Sync_Array_Sync( array );
+			Sync_SyncArray( vertSync, arrayStart, var->structSize, 
+					arrayEnd, var->structSize, 
+					size );
 		}
 	}
 
 	self->shadowValuesSynchronised = True;
-	FreeObject( array );
 
 #if 0
 	Neighbour_Index			nbr_I = 0;
@@ -1845,7 +1838,7 @@ void FeVariable_SaveNodalValuesToFile_StgFEM_Native( void* feVariable, const cha
 	double             variableValues[MAX_FIELD_COMPONENTS];	
 	const int          FINISHED_WRITING_TAG = 100;
 	int                confirmation = 0;
-	MPI_Comm	comm = CommTopology_GetComm( Mesh_GetCommTopology( self->feMesh, MT_VERTEX ) );
+	MPI_Comm	comm = Comm_GetMPIComm( Mesh_GetCommTopology( self->feMesh, MT_VERTEX ) );
 	int                myRank;
 	int                nProcs;
 	MPI_Status         status;
@@ -1937,7 +1930,7 @@ void FeVariable_ReadNodalValuesFromFile_StgFEM_Native( void* feVariable, const c
 	const unsigned int MAX_LINE_LENGTH = MAX_LINE_LENGTH_DEFINE;
 	Processor_Index    proc_I=0;
 	Dimension_Index    dim_I=0;
-	MPI_Comm	comm = CommTopology_GetComm( Mesh_GetCommTopology( self->feMesh, MT_VERTEX ) );
+	MPI_Comm	comm = Comm_GetMPIComm( Mesh_GetCommTopology( self->feMesh, MT_VERTEX ) );
 	unsigned		rank;
 	unsigned		nProcs;
 
@@ -1975,6 +1968,7 @@ void FeVariable_ReadNodalValuesFromFile_StgFEM_Native( void* feVariable, const c
 
 	/* Need to re-set the geometry here, in case we're loading from a checkpoint that had compression/squashing BCs,
 		and hence ended up with a smaller mesh than the original */
+
 	while ( !feof(inputFile) ) {
 		fscanf( inputFile, "%u ", &gNode_I );
 		if( FeMesh_NodeGlobalToDomain( self->feMesh, gNode_I, &lNode_I ) && 

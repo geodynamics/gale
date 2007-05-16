@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeEquationNumber.c 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: FeEquationNumber.c 832 2007-05-16 01:11:18Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -1966,7 +1966,7 @@ Dof_EquationNumber** FeEquationNumber_BuildOneElementLocationMatrix( void* feEqu
 void FeEquationNumber_PrintDestinationArray( void* feFeEquationNumber, Stream* stream ) {
 	FeEquationNumber* self = (FeEquationNumber*) feFeEquationNumber;
 	FeMesh*		feMesh = self->feMesh;
-	MPI_Comm comm = CommTopology_GetComm( Mesh_GetCommTopology( feMesh, MT_VERTEX ) );
+	MPI_Comm comm = Comm_GetMPIComm( Mesh_GetCommTopology( feMesh, MT_VERTEX ) );
 	unsigned rank;
 	Node_GlobalIndex gNode_I;
 	Node_GlobalIndex nodeGlobalCount = FeMesh_GetNodeGlobalSize( feMesh );
@@ -1997,7 +1997,7 @@ void FeEquationNumber_PrintDestinationArray( void* feFeEquationNumber, Stream* s
 void FeEquationNumber_PrintLocationMatrix( void* feFeEquationNumber, Stream* stream ) {
 	FeEquationNumber* self = (FeEquationNumber*) feFeEquationNumber;
 	FeMesh*		feMesh = self->feMesh;
-	MPI_Comm comm = CommTopology_GetComm( Mesh_GetCommTopology( feMesh, MT_VERTEX ) );
+	MPI_Comm comm = Comm_GetMPIComm( Mesh_GetCommTopology( feMesh, MT_VERTEX ) );
 	unsigned rank;
 	Element_GlobalIndex gEl_I;
 	unsigned nDims = Mesh_GetDimSize( feMesh );
@@ -2170,12 +2170,12 @@ void _FeEquationNumber_CalculateEqNumsDecomposition( FeEquationNumber* self ) {
 Partition_Index FeEquationNumber_CalculateOwningProcessorOfEqNum( void* feEquationNumber, Dof_EquationNumber eqNum ) {
 	FeEquationNumber* self = (FeEquationNumber*)feEquationNumber;
 	Partition_Index ownerProc = (unsigned int)-1;
-	CommTopology*	commTopo = Mesh_GetCommTopology( self->feMesh, MT_VERTEX );
-	MPI_Comm	comm = CommTopology_GetComm( commTopo );
+	Comm*	comm = Mesh_GetCommTopology( self->feMesh, MT_VERTEX );
+	MPI_Comm	mpiComm = Comm_GetMPIComm( comm );
 	unsigned	nProcs;
 	unsigned	p_i;
 
-	MPI_Comm_size( comm, (int*)&nProcs );
+	MPI_Comm_size( mpiComm, (int*)&nProcs );
 	for( p_i = 1; p_i < nProcs; p_i++ ) {
 		if( eqNum < self->_lowestGlobalEqNums[p_i] )
 			break;
@@ -2253,9 +2253,9 @@ void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
 	Stream*			stream;
 	double			startTime, endTime;
 	FeMesh*			feMesh;
-	Decomp_Sync*		sync;
-	CommTopology*		commTopo;
-	MPI_Comm		comm;
+	Sync*			sync;
+	Comm*			comm;
+	MPI_Comm		mpiComm;
 	unsigned		rank, nProcs;
 	unsigned		nDims;
 	unsigned		nDomainNodes, nDomainEls;
@@ -2271,7 +2271,6 @@ void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
 	MPI_Status		status;
 	unsigned		maxDofs;
 	unsigned*		tuples;
-	Decomp_Sync_Array*	array;
 	LinkedDofInfo*		links;
 	unsigned		e_i, n_i, dof_i;
 
@@ -2291,10 +2290,10 @@ void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
 
 	/* Shortcuts. */
 	feMesh = self->feMesh;
-	commTopo = Mesh_GetCommTopology( feMesh, MT_VERTEX );
-	comm = CommTopology_GetComm( commTopo );
-	MPI_Comm_size( comm, (int*)&nProcs );
-	MPI_Comm_rank( comm, (int*)&rank );
+	comm = Mesh_GetCommTopology( feMesh, MT_VERTEX );
+	mpiComm = Comm_GetMPIComm( comm );
+	MPI_Comm_size( mpiComm, (int*)&nProcs );
+	MPI_Comm_rank( mpiComm, (int*)&rank );
 	nDims = Mesh_GetDimSize( feMesh );
 	nDomainNodes = FeMesh_GetNodeDomainSize( feMesh );
 	nDomainEls = FeMesh_GetElementDomainSize( feMesh );
@@ -2356,11 +2355,11 @@ void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
 	base = 0;
 	subTotal = curEqNum;
 	if( rank > 0 ) {
-		MPI_Recv( &base, 1, MPI_UNSIGNED, rank - 1, 6669, comm, &status );
+		MPI_Recv( &base, 1, MPI_UNSIGNED, rank - 1, 6669, mpiComm, &status );
 		subTotal = base + curEqNum;
 	}
 	if( rank < nProcs - 1 )
-		MPI_Send( &subTotal, 1, MPI_UNSIGNED, rank + 1, 6669, comm );
+		MPI_Send( &subTotal, 1, MPI_UNSIGNED, rank + 1, 6669, mpiComm );
 
 	/* Reduce to find lowest linked DOFs. */
 	if( links ) {
@@ -2370,8 +2369,8 @@ void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
 		for( s_i = 0; s_i < links->linkedDofSetsCount; s_i++ ) {
 			if( links->eqNumsOfLinkedDofs[s_i] != -1 )
 				links->eqNumsOfLinkedDofs[s_i] += base;
-			MPI_Allreduce( links->eqNumsOfLinkedDofs + s_i, &lowest, 1, MPI_UNSIGNED, MPI_MIN, comm );
-			MPI_Allreduce( links->eqNumsOfLinkedDofs + s_i, &highest, 1, MPI_UNSIGNED, MPI_MIN, comm );
+			MPI_Allreduce( links->eqNumsOfLinkedDofs + s_i, &lowest, 1, MPI_UNSIGNED, MPI_MIN, mpiComm );
+			MPI_Allreduce( links->eqNumsOfLinkedDofs + s_i, &highest, 1, MPI_UNSIGNED, MPI_MIN, mpiComm );
 			assert( (lowest == (unsigned)-1) ? lowest == highest : 1 );
 			links->eqNumsOfLinkedDofs[s_i] = lowest;
 		}
@@ -2396,13 +2395,9 @@ void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
 
 	/* Update all other procs. */
 	sync = Mesh_GetSync( feMesh, MT_VERTEX );
-	array = Decomp_Sync_Array_New();
-	Decomp_Sync_Array_SetSync( array, sync );
-	Decomp_Sync_Array_SetMemory( array, tuples, tuples + nLocalNodes * maxDofs, 
-				     maxDofs * sizeof(unsigned), maxDofs * sizeof(unsigned), 
-				     maxDofs * sizeof(unsigned) );
-	Decomp_Sync_Array_Sync( array );
-	FreeObject( array );
+	Sync_SyncArray( sync, tuples, maxDofs * sizeof(unsigned), 
+			tuples + nLocalNodes * maxDofs, maxDofs * sizeof(unsigned), 
+			maxDofs * sizeof(unsigned) );
 
 	/* Update destination array's domain indices. */
 	for( n_i = nLocalNodes; n_i < nDomainNodes; n_i++ ) {
@@ -2443,11 +2438,11 @@ void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
 	/* Bcast global sum from highest rank. */
 	if( rank == nProcs - 1 )
 		self->globalSumUnconstrainedDofs = self->lastOwnedEqNum + 1;
-	MPI_Bcast( &self->globalSumUnconstrainedDofs, 1, MPI_UNSIGNED, nProcs - 1, comm );
+	MPI_Bcast( &self->globalSumUnconstrainedDofs, 1, MPI_UNSIGNED, nProcs - 1, mpiComm );
 
 	/* Construct lowest global equation number list. */
 	self->_lowestGlobalEqNums = AllocArray( int, nProcs );
-	MPI_Allgather( &self->firstOwnedEqNum, 1, MPI_UNSIGNED, self->_lowestGlobalEqNums, 1, MPI_UNSIGNED, comm );
+	MPI_Allgather( &self->firstOwnedEqNum, 1, MPI_UNSIGNED, self->_lowestGlobalEqNums, 1, MPI_UNSIGNED, mpiComm );
 
 	endTime = MPI_Wtime();
 

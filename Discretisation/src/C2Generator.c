@@ -162,12 +162,12 @@ void C2Generator_SetTopologyParams( void* meshGenerator, unsigned* sizes,
 void C2Generator_GenElementVertexInc( void* meshGenerator, MeshTopology* topo, Grid*** grids ) {
 	C2Generator*	self = (C2Generator*)meshGenerator;
 	Stream*		stream = Journal_Register( Info_Type, self->type );
-	unsigned*	nIncEls;
-	unsigned**	incEls;
+	unsigned*	incEls;
 	unsigned*	dimInds;
 	unsigned	vertsPerEl;
 	unsigned	nDims;
 	unsigned	e_i, d_i;
+	int nDomainEls;
 
 	assert( self && Stg_CheckType( self, C2Generator ) );
 	assert( topo && Stg_CheckType( topo, MeshTopology ) );
@@ -179,100 +179,98 @@ void C2Generator_GenElementVertexInc( void* meshGenerator, MeshTopology* topo, G
 	vertsPerEl = (topo->nDims == 1) ? 3 : (topo->nDims == 2) ? 9 : 27;
 
 	nDims = topo->nDims;
-	nIncEls = Memory_Alloc_Array_Unnamed( unsigned, topo->domains[topo->nDims]->nDomains );
-	incEls = Memory_Alloc_2DArray_Unnamed( unsigned, topo->domains[topo->nDims]->nDomains, vertsPerEl );
+	nDomainEls = Sync_GetNumDomains( MeshTopology_GetDomain( topo, nDims ) );
+	incEls = Memory_Alloc_Array_Unnamed( unsigned, vertsPerEl );
 	dimInds = Memory_Alloc_Array_Unnamed( unsigned, topo->nDims );
-	for( e_i = 0; e_i < topo->domains[topo->nDims]->nDomains; e_i++ ) {
-		unsigned	gInd = Decomp_Sync_DomainToGlobal( topo->domains[topo->nDims], e_i );
+	for( e_i = 0; e_i < nDomainEls; e_i++ ) {
+		unsigned	gInd = Sync_DomainToGlobal( MeshTopology_GetDomain( topo, nDims ), e_i );
 		unsigned	curNode = 0;
 
-		nIncEls[e_i] = vertsPerEl;
 		Grid_Lift( grids[topo->nDims][0], gInd, dimInds );
 		for( d_i = 0; d_i < nDims; d_i++ )
 			dimInds[d_i] *= 2;
 
-		incEls[e_i][curNode++] = Grid_Project( grids[0][0], dimInds );
+		incEls[curNode++] = Grid_Project( grids[0][0], dimInds );
 		dimInds[0]++;
-		incEls[e_i][curNode++] = Grid_Project( grids[0][0], dimInds );
+		incEls[curNode++] = Grid_Project( grids[0][0], dimInds );
 		dimInds[0]++;
-		incEls[e_i][curNode++] = Grid_Project( grids[0][0], dimInds );
+		incEls[curNode++] = Grid_Project( grids[0][0], dimInds );
 		dimInds[0] -= 2;
 
 		if( topo->nDims >= 2 ) {
 			dimInds[1]++;
-			incEls[e_i][curNode++] = Grid_Project( grids[0][0], dimInds );
+			incEls[curNode++] = Grid_Project( grids[0][0], dimInds );
 			dimInds[0]++;
-			incEls[e_i][curNode++] = Grid_Project( grids[0][0], dimInds );
+			incEls[curNode++] = Grid_Project( grids[0][0], dimInds );
 			dimInds[0]++;
-			incEls[e_i][curNode++] = Grid_Project( grids[0][0], dimInds );
+			incEls[curNode++] = Grid_Project( grids[0][0], dimInds );
 			dimInds[0] -= 2;
 			dimInds[1]++;
-			incEls[e_i][curNode++] = Grid_Project( grids[0][0], dimInds );
+			incEls[curNode++] = Grid_Project( grids[0][0], dimInds );
 			dimInds[0]++;
-			incEls[e_i][curNode++] = Grid_Project( grids[0][0], dimInds );
+			incEls[curNode++] = Grid_Project( grids[0][0], dimInds );
 			dimInds[0]++;
-			incEls[e_i][curNode++] = Grid_Project( grids[0][0], dimInds );
+			incEls[curNode++] = Grid_Project( grids[0][0], dimInds );
 			dimInds[0] -= 2;
 			dimInds[1] -= 2;
 
 			if( topo->nDims >= 3 ) {
 				dimInds[2]++;
-				incEls[e_i][curNode++] = Grid_Project( grids[0][0], dimInds );
+				incEls[curNode++] = Grid_Project( grids[0][0], dimInds );
 				dimInds[0]++;
-				incEls[e_i][curNode++] = Grid_Project( grids[0][0], dimInds );
+				incEls[curNode++] = Grid_Project( grids[0][0], dimInds );
 				dimInds[0]++;
-				incEls[e_i][curNode++] = Grid_Project( grids[0][0], dimInds );
+				incEls[curNode++] = Grid_Project( grids[0][0], dimInds );
 				dimInds[0] -= 2;
 				dimInds[1]++;
-				incEls[e_i][curNode++] = Grid_Project( grids[0][0], dimInds );
+				incEls[curNode++] = Grid_Project( grids[0][0], dimInds );
 				dimInds[0]++;
-				incEls[e_i][curNode++] = Grid_Project( grids[0][0], dimInds );
+				incEls[curNode++] = Grid_Project( grids[0][0], dimInds );
 				dimInds[0]++;
-				incEls[e_i][curNode++] = Grid_Project( grids[0][0], dimInds );
+				incEls[curNode++] = Grid_Project( grids[0][0], dimInds );
 				dimInds[0] -= 2;
 				dimInds[1]++;
-				incEls[e_i][curNode++] = Grid_Project( grids[0][0], dimInds );
+				incEls[curNode++] = Grid_Project( grids[0][0], dimInds );
 				dimInds[0]++;
-				incEls[e_i][curNode++] = Grid_Project( grids[0][0], dimInds );
+				incEls[curNode++] = Grid_Project( grids[0][0], dimInds );
 				dimInds[0]++;
-				incEls[e_i][curNode++] = Grid_Project( grids[0][0], dimInds );
+				incEls[curNode++] = Grid_Project( grids[0][0], dimInds );
 				dimInds[0] -= 2;
 				dimInds[1] -= 2;
 				dimInds[2]++;
-				incEls[e_i][curNode++] = Grid_Project( grids[0][0], dimInds );
+				incEls[curNode++] = Grid_Project( grids[0][0], dimInds );
 				dimInds[0]++;
-				incEls[e_i][curNode++] = Grid_Project( grids[0][0], dimInds );
+				incEls[curNode++] = Grid_Project( grids[0][0], dimInds );
 				dimInds[0]++;
-				incEls[e_i][curNode++] = Grid_Project( grids[0][0], dimInds );
+				incEls[curNode++] = Grid_Project( grids[0][0], dimInds );
 				dimInds[0] -= 2;
 				dimInds[1]++;
-				incEls[e_i][curNode++] = Grid_Project( grids[0][0], dimInds );
+				incEls[curNode++] = Grid_Project( grids[0][0], dimInds );
 				dimInds[0]++;
-				incEls[e_i][curNode++] = Grid_Project( grids[0][0], dimInds );
+				incEls[curNode++] = Grid_Project( grids[0][0], dimInds );
 				dimInds[0]++;
-				incEls[e_i][curNode++] = Grid_Project( grids[0][0], dimInds );
+				incEls[curNode++] = Grid_Project( grids[0][0], dimInds );
 				dimInds[0] -= 2;
 				dimInds[1]++;
-				incEls[e_i][curNode++] = Grid_Project( grids[0][0], dimInds );
+				incEls[curNode++] = Grid_Project( grids[0][0], dimInds );
 				dimInds[0]++;
-				incEls[e_i][curNode++] = Grid_Project( grids[0][0], dimInds );
+				incEls[curNode++] = Grid_Project( grids[0][0], dimInds );
 				dimInds[0]++;
-				incEls[e_i][curNode++] = Grid_Project( grids[0][0], dimInds );
+				incEls[curNode++] = Grid_Project( grids[0][0], dimInds );
 				dimInds[0] -= 2;
 				dimInds[1] -= 2;
 				dimInds[2] -= 2;
 			}
 		}
+		CartesianGenerator_MapToDomain( (CartesianGenerator*)self, MeshTopology_GetDomain( topo, 0), 
+						vertsPerEl, incEls );
+		MeshTopology_SetIncidence( topo, topo->nDims, e_i, MT_VERTEX, vertsPerEl, incEls );
 	}
 
-	CartesianGenerator_MapToDomain( (CartesianGenerator*)self, topo->domains[MT_VERTEX], topo->domains[topo->nDims]->nDomains, 
-					nIncEls, incEls );
-	MeshTopology_SetIncidence( topo, topo->nDims, MT_VERTEX, nIncEls, incEls );
-	FreeArray( nIncEls );
 	FreeArray( incEls );
 	FreeArray( dimInds );
 
-	MPI_Barrier( topo->domains[MT_VERTEX]->decomp->comm );
+	MPI_Barrier( self->mpiComm );
 	Journal_Printf( stream, "... done.\n" );
 	Stream_UnIndent( stream );
 }
@@ -311,7 +309,7 @@ void C2Generator_GenElementTypes( void* meshGenerator, Mesh* mesh ) {
 	if( self->regular )
 		Mesh_SetAlgorithms( mesh, Mesh_RegularAlgorithms_New( "" ) );
 
-	MPI_Barrier( mesh->topo->domains[MT_VERTEX]->decomp->comm );
+	MPI_Barrier( self->mpiComm );
 	Journal_Printf( stream, "... element types are '%s',\n", mesh->elTypes[0]->type );
 	Journal_Printf( stream, "... mesh algorithm type is '%s',\n", mesh->algorithms->type );
 	Journal_Printf( stream, "... done.\n" );

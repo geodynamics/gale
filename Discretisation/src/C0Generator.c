@@ -180,7 +180,7 @@ void C0Generator_SetElementMesh( void* generator, void* mesh ) {
 void C0Generator_BuildTopology( C0Generator* self, FeMesh* mesh ) {
 	Mesh*		elMesh;
 	MeshTopology	*topo, *elTopo;
-	Decomp_Sync*	elSync;
+	Sync*		elSync;
 	unsigned	nDims;
 	unsigned	*nIncEls, **incEls;
 	unsigned	nDomainEls;
@@ -192,13 +192,14 @@ void C0Generator_BuildTopology( C0Generator* self, FeMesh* mesh ) {
 	elMesh = self->elMesh;
 	nDims = Mesh_GetDimSize( elMesh );
 	elTopo = Mesh_GetTopology( elMesh );
-	elSync = MeshTopology_GetSync( elTopo, nDims );
+	elSync = Mesh_GetSync( elMesh, nDims );
 
 	topo = Mesh_GetTopology( mesh );
-	MeshTopology_SetDimSize( topo, nDims );
-	MeshTopology_SetSync( topo, nDims, elSync );
-	MeshTopology_SetSync( topo, MT_VERTEX, elSync );
-	topo->shadowDepth = elTopo->shadowDepth;
+	MeshTopology_SetComm( topo, MeshTopology_GetComm( elTopo ) );
+	MeshTopology_SetNumDims( topo, nDims );
+	MeshTopology_SetDomain( topo, nDims, elSync );
+	MeshTopology_SetDomain( topo, MT_VERTEX, elSync );
+	topo->shadDepth = elTopo->shadDepth;
 
 	nDomainEls = Mesh_GetDomainSize( elMesh, nDims );
 	nIncEls = AllocArray( unsigned, nDomainEls );
@@ -206,12 +207,12 @@ void C0Generator_BuildTopology( C0Generator* self, FeMesh* mesh ) {
 	for( e_i = 0; e_i < nDomainEls; e_i++ ) {
 		nIncEls[e_i] = 1;
 		incEls[e_i][0] = e_i;
+		MeshTopology_SetIncidence( topo, nDims, e_i, MT_VERTEX, nIncEls[e_i], incEls[e_i] );
 	}
-	MeshTopology_SetIncidence( topo, nDims, MT_VERTEX, nIncEls, incEls );
 	FreeArray( nIncEls );
 	FreeArray( incEls );
 
-	MeshTopology_Invert( topo, MT_VERTEX, nDims );
+	MeshTopology_InvertIncidence( topo, MT_VERTEX, nDims );
 }
 
 void C0Generator_BuildGeometry( C0Generator* self, FeMesh* mesh ) {

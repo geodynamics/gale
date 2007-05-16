@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testFeEquationNumber-LinkedDofs.c 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: testFeEquationNumber-LinkedDofs.c 832 2007-05-16 01:11:18Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -204,7 +204,7 @@ FeEquationNumber* buildEqNum( unsigned nProcs, unsigned* sizes, Dictionary* dict
 	varReg = Variable_Register_New();
 
 	Variable_NewVector( "coords", Variable_DataType_Double, 3, 
-			    &feMesh->topo->domains[0]->nDomains, (void**)&feMesh->verts, 
+			    &feMesh->topo->remotes[0]->nDomains, (void**)&feMesh->verts, 
 			    varReg, 
 			    varNames[0], 
 			    varNames[1], 
@@ -280,7 +280,7 @@ void Test_FeEquationNumberRun_Regular( Dictionary* dictionary, void* context, IJ
 		VariableCondition_PrintConcise( vc, stream );
 		FeEquationNumber_PrintDestinationArray( feEquationNumber, stream );
 		FeEquationNumber_PrintLocationMatrix( feEquationNumber, stream );
-		Print( feEquationNumber->linkedDofInfo, stream );
+		Stg_Class_Print( feEquationNumber->linkedDofInfo, stream );
 	}
 	
 	/* Destroy stuff */
