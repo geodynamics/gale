@@ -92,7 +92,7 @@ C2Generator* _C2Generator_New( C2GENERATOR_DEFARGS ) {
 }
 
 void _C2Generator_Init( C2Generator* self ) {
-	assert( self && Stg_CheckType( self, C2Generator ) );
+	assert( self );
 }
 
 
@@ -114,7 +114,7 @@ void _C2Generator_Print( void* meshGenerator, Stream* stream ) {
 	Stream* meshGeneratorStream;
 	meshGeneratorStream = Journal_Register( InfoStream_Type, "C2GeneratorStream" );
 
-	assert( self && Stg_CheckType( self, C2Generator ) );
+	assert( self );
 
 	/* Print parent */
 	Journal_Printf( stream, "C2Generator (ptr): (%p)\n", self );
@@ -145,7 +145,7 @@ void C2Generator_SetTopologyParams( void* meshGenerator, unsigned* sizes,
 	unsigned*	vertSizes;
 	unsigned	d_i;
 
-	assert( self && Stg_CheckType( self, C2Generator ) );
+	assert( self );
 
 	_CartesianGenerator_SetTopologyParams( self, sizes, 
 					       maxDecompDims, minDecomp, maxDecomp );
@@ -169,8 +169,8 @@ void C2Generator_GenElementVertexInc( void* meshGenerator, MeshTopology* topo, G
 	unsigned	e_i, d_i;
 	int nDomainEls;
 
-	assert( self && Stg_CheckType( self, C2Generator ) );
-	assert( topo && Stg_CheckType( topo, MeshTopology ) );
+	assert( self );
+	assert( topo );
 	assert( grids );
 
 	Journal_Printf( stream, "Generating element-vertex incidence...\n" );
@@ -290,7 +290,7 @@ void C2Generator_GenElementTypes( void* meshGenerator, Mesh* mesh ) {
 	unsigned	vertMap[8] = {0, 2, 6, 8, 18, 20, 24, 26};
 	unsigned	e_i;
 
-	assert( self && Stg_CheckType( self, C2Generator ) );
+	assert( self );
 
 	stream = Journal_Register( Info_Type, self->type );
 	Journal_Printf( stream, "Generating element types...\n" );
