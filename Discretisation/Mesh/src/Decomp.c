@@ -59,6 +59,7 @@ void _Decomp_Destruct( void* _self ) {
    Decomp_Clear( self );
    IArray_Destruct( self->locals );
    IMap_Destruct( self->inv );
+   NewClass_RemoveRef( self->comm );
    _NewClass_Destruct( self );
 }
 
