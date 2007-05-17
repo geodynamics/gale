@@ -328,8 +328,11 @@ void MemoryPool_Shrink( MemoryPool *memPool )
 
 		if( chunkIdx == (memPool->numChunks-1) ){
 			memPool->numChunks--;
-			memPool->chunks = (Chunk*)Memory_Realloc( memPool->chunks, sizeof(Chunk)*memPool->numChunks );
-			assert( memPool->chunks );
+
+			if( memPool->numChunks>0 ){
+				memPool->chunks = (Chunk*)Memory_Realloc( memPool->chunks, sizeof(Chunk)*memPool->numChunks );
+				assert( memPool->chunks );
+			}
 		}
 		else{
 			memcpy( &(memPool->chunks[chunkIdx]), &(memPool->chunks[chunkIdx+1]), sizeof(Chunk)*(memPool->numChunks - (chunkIdx+1)) );
