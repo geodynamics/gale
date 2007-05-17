@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Memory.c 4094 2007-05-16 00:50:44Z LukeHodkinson $
+** $Id: Memory.c 4109 2007-05-17 06:22:56Z RaquibulHassan $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -1804,6 +1804,11 @@ void* _Memory_InternalRealloc( void* ptr, SizeT size ) {
 	if ( ptr == 0 ) {
 		return _Memory_InternalMalloc( size );
 	}
+	if( size == 0 ) {
+		Memory_Free( ptr );
+		return NULL;
+	}
+
 	count = Memory_CountGet( ptr );		/* Store previous count */
 	stgMemory->stgCurrentMemory -= Memory_SizeGet( ptr );
 	

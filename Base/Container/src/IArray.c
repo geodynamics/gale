@@ -81,7 +81,7 @@ void IArray_Resize( void* _self, int size ) {
    IArray* self = (IArray*)_self;
 
    assert( self && self->delta );
-   self->maxSize = size / self->delta + (size % self->delta) ? 1 : 0;
+   self->maxSize = size / self->delta + ((size % self->delta) ? 1 : 0);
    self->maxSize *= self->delta;
    self->size = size;
    self->ptr = Class_Rearray( self, self->ptr, int, self->maxSize );
