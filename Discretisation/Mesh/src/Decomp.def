@@ -26,7 +26,8 @@ METHOD( GetLocals, void, (const void* self, int* nLocals, const int** locals),
 	(self, nLocals, locals) )
 
 METHOD( LocalToGlobal, int, (const void* self, int local), (self, local) )
-METHOD( GlobalToLocal, Bool, (const void* self, int global, int* local), 
+METHOD( GlobalToLocal, int, (const void* self, int global), (self, global) )
+METHOD( TryGlobalToLocal, Bool, (const void* self, int global, int* local), 
 	(self, global, local) )
 
 MEMBER( Comm*, comm )

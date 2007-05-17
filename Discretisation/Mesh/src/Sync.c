@@ -125,7 +125,7 @@ void Sync_AddRemotes( void* _self, int nRemotes, const int* remotes ) {
    int r_i;
 
    assert( self && self->decomp );
-   IMap_SetMaxItems( self->gr, IArray_GetSize( self->remotes ) + nRemotes );
+   IMap_SetMaxSize( self->gr, IArray_GetSize( self->remotes ) + nRemotes );
    IArray_Add( self->remotes, nRemotes, remotes );
    for( r_i = 0; r_i < nRemotes; r_i++ )
       IMap_Insert( self->gr, remotes[r_i], r_i );
@@ -242,7 +242,7 @@ int Sync_RemoteToGlobal( const void* self, int remote ) {
 
 Bool Sync_GlobalToRemote( const void* self, int global, int* remote ) {
    assert( self && global < Decomp_GetNumGlobals( ((Sync*)self)->decomp ) );
-   return IMap_Try( ((Sync*)self)->gr, global, remote );
+   return IMap_TryMap( ((Sync*)self)->gr, global, remote );
 }
 
 int Sync_DomainToGlobal( const void* self, int domain ) {
@@ -260,11 +260,13 @@ int Sync_DomainToGlobal( const void* self, int domain ) {
 Bool Sync_GlobalToDomain( const void* self, int global, int* domain ) {
    assert( self );
    assert( global < Decomp_GetNumGlobals( ((Sync*)self)->decomp ) );
-   if( !Decomp_GlobalToLocal( ((Sync*)self)->decomp, global, domain ) ) {
-      if( IMap_Try( ((Sync*)self)->gr, global, domain ) ) {
+   if( !Decomp_TryGlobalToLocal( ((Sync*)self)->decomp, global, domain ) ) {
+      if( IMap_TryMap( ((Sync*)self)->gr, global, domain ) ) {
 	 *domain += Decomp_GetNumLocals( ((Sync*)self)->decomp );
 	 return True;
       }
+      else
+	 return False;
    }
    else
       return True;
@@ -278,7 +280,7 @@ int Sync_SharedToLocal( const void* self, int shared ) {
 Bool Sync_LocalToShared( const void* self, int local, int* shared ) {
    assert( self && local < Decomp_GetNumLocals( ((Sync*)self)->decomp ) );
    assert( shared );
-   return IMap_Try( ((Sync*)self)->ls, local, shared );
+   return IMap_TryMap( ((Sync*)self)->ls, local, shared );
 }
 
 void Sync_SyncArray( const void* _self, 
@@ -334,7 +336,6 @@ void Sync_UpdateTables( Sync* self ) {
    int nNbrs;
    ISet theirRemsObj, *theirRems = &theirRemsObj;
    ISet myLocsObj, *myLocs = &myLocsObj;
-   ISet isectObj, *isect = &isectObj;
    int nLocals, nRems;
    const int *locals, *rems;
    int* nAllRems, **allRems;
@@ -346,7 +347,6 @@ void Sync_UpdateTables( Sync* self ) {
    nNbrs = Comm_GetNumNeighbours( comm );
    ISet_Init( theirRems );
    ISet_Init( myLocs );
-   ISet_Init( isect );
    Decomp_GetLocals( self->decomp, &nLocals, &locals );
    ISet_UseArray( myLocs, nLocals, locals );
    nRems = IArray_GetSize( self->remotes );
@@ -362,12 +362,13 @@ void Sync_UpdateTables( Sync* self ) {
 
    for( n_i = 0; n_i < nNbrs; n_i++ ) {
       ISet_UseArray( theirRems, nAllRems[n_i], allRems[n_i] );
-      ISet_Isect( myLocs, theirRems, isect );
-      ISet_Clear( theirRems );
-      allRems[n_i] = Class_Rearray( self, allRems[n_i], int, 
-				    ISet_GetNumItems( isect ) );
-      ISet_GetArray( isect, nAllRems + n_i, allRems[n_i] );
+      ISet_Isect( theirRems, myLocs );
+      nAllRems[n_i] = ISet_GetSize( theirRems );
+      allRems[n_i] = Class_Rearray( self, allRems[n_i], int, nAllRems[n_i] );
+      ISet_GetArray( theirRems, allRems[n_i] );
    }
+   ISet_Destruct( theirRems );
+   ISet_Destruct( myLocs );
 
    nFnds = Class_Array( self, int, nNbrs );
    fnds = Class_Array( self, int*, nNbrs );
@@ -376,10 +377,6 @@ void Sync_UpdateTables( Sync* self ) {
       fnds[n_i] = Class_Array( self, int, nFnds[n_i] );
    Comm_AlltoallBegin( comm, (const void**)allRems, (void**)fnds );
    Comm_AlltoallEnd( comm );
-
-   ISet_Destruct( theirRems );
-   ISet_Destruct( myLocs );
-   ISet_Destruct( isect );
 
    self->nSrcs = nFnds;
    self->srcs = fnds;
@@ -392,8 +389,8 @@ void Sync_UpdateTables( Sync* self ) {
 				      self->srcs[n_i] + s_i ), == True );
       }
       for( s_i = 0; s_i < self->nSnks[n_i]; s_i++ ) {
-	 insist( Decomp_GlobalToLocal( self->decomp, self->snks[n_i][s_i], 
-				       self->snks[n_i] + s_i ), == True );
+	 self->snks[n_i][s_i] = Decomp_GlobalToLocal( self->decomp, 
+						      self->snks[n_i][s_i] );
       }
    }
 }
@@ -415,13 +412,13 @@ void Sync_UpdateShared( Sync* self ) {
       for( s_i = 0; s_i < self->nSnks[n_i]; s_i++ )
 	 ISet_TryInsert( sharedSet, self->snks[n_i][s_i] );
    }
-   self->nShared = ISet_GetNumItems( sharedSet );
+   self->nShared = ISet_GetSize( sharedSet );
    self->shared = Class_Rearray( self, self->shared, int, self->nShared );
-   ISet_GetArray( sharedSet, NULL, self->shared );
+   ISet_GetArray( sharedSet, self->shared );
    ISet_Destruct( sharedSet );
 
    IMap_Clear( self->ls );
-   IMap_SetMaxItems( self->ls, self->nShared );
+   IMap_SetMaxSize( self->ls, self->nShared );
    for( s_i = 0; s_i < self->nShared; s_i++ )
       IMap_Insert( self->ls, self->shared[s_i], s_i );
 

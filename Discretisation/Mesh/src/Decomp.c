@@ -108,7 +108,7 @@ void Decomp_SetLocals( void* _self, int nLocals, const int* locals ) {
    IArray_Set( self->locals, nLocals, locals );
    Decomp_Update( self );
    IMap_Clear( self->inv );
-   IMap_SetMaxItems( self->inv, nLocals );
+   IMap_SetMaxSize( self->inv, nLocals );
    for( l_i = 0; l_i < nLocals; l_i++ )
       IMap_Insert( self->inv, locals[l_i], l_i );
 }
@@ -118,7 +118,7 @@ void Decomp_AddLocals( void* _self, int nLocals, const int* locals ) {
    int l_i;
 
    assert( self && (!nLocals || locals) );
-   IMap_SetMaxItems( self->inv, IArray_GetSize( self->locals ) + nLocals );
+   IMap_SetMaxSize( self->inv, IArray_GetSize( self->locals ) + nLocals );
    IArray_Add( self->locals, nLocals, locals );
    Decomp_Update( self );
    for( l_i = 0; l_i < nLocals; l_i++ )
@@ -136,7 +136,7 @@ void Decomp_RemoveLocals( void* _self, int nLocals, const int* locals, IMap* map
    Decomp_Update( self );
    for( l_i = 0; l_i < nLocals; l_i++ )
       IMap_Remove( self->inv, locals[l_i] );
-   IMap_SetMaxItems( self->inv, oldSize - nLocals );
+   IMap_SetMaxSize( self->inv, oldSize - nLocals );
 }
 
 void Decomp_Clear( void* _self ) {
@@ -183,9 +183,14 @@ int Decomp_LocalToGlobal( const void* self, int local ) {
    return IArray_GetPtr( ((Decomp*)self)->locals )[local];
 }
 
-Bool Decomp_GlobalToLocal( const void* self, int global, int* local ) {
+int Decomp_GlobalToLocal( const void* self, int global ) {
    assert( self && global < ((Decomp*)self)->nGlobals );
-   return IMap_Try( ((Decomp*)self)->inv, global, local );
+   return IMap_Map( ((Decomp*)self)->inv, global );
+}
+
+Bool Decomp_TryGlobalToLocal( const void* self, int global, int* local ) {
+   assert( self && global < ((Decomp*)self)->nGlobals );
+   return IMap_TryMap( ((Decomp*)self)->inv, global, local );
 }
 
 void Decomp_Update( Decomp* self ) {
