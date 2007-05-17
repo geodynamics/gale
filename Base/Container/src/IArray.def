@@ -7,13 +7,19 @@ VOIDOVERRIDE( Construct, void, (void* self), (self) )
 VOIDOVERRIDE( Destruct, void, (void* self), (self) )
 VOIDOVERRIDE( Copy, void, (void* self, const void* op), (self, op) )
 
+METHOD( SetDelta, void, (void* self, int delta), (self, delta) )
+METHOD( Resize, void, (void* self, int size), (self, size) )
 METHOD( Set, void, (void* self, int nItms, const int* itms), (self, nItms, itms) )
 METHOD( Add, void, (void* self, int nItms, const int* itms), (self, nItms, itms) )
-METHOD( Remove, void, (void* self, int nItms, const int* locals, IMap* map), (self, nItms, locals, map) )
+METHOD( Remove, void, (void* self, int nItms, const int* locals, IMap* map), 
+	(self, nItms, locals, map) )
+METHOD( Append, void, (void* self, int itm), (self, itm) )
 METHOD( Clear, void, (void* self), (self) )
 
 METHOD( GetSize, int, (const void* self), (self) )
 METHOD( GetPtr, const int*, (const void* self), (self) )
 
+MEMBER( int, delta )
+MEMBER( int, maxSize )
 MEMBER( int, size )
 MEMBER( int*, ptr )

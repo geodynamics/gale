@@ -62,19 +62,18 @@ void _IMapIter_Next( void* _self ) {
    IMapIter* self = (IMapIter*)_self;
 
    assert( self );
-   assert( self->tblInd < self->imap->maxItms && 
+   assert( self->tblInd < self->imap->maxSize && 
 	   self->imap->used[self->tblInd] );
    assert( self->cur );
    assert( self->valid );
-
    if( !self->cur->next ) {
       int i_i;
 
-      for( i_i = self->tblInd + 1; i_i < self->imap->maxItms; i_i++ ) {
+      for( i_i = self->tblInd + 1; i_i < self->imap->maxSize; i_i++ ) {
 	 if( self->imap->used[i_i] )
 	    break;
       }
-      if( i_i < self->imap->maxItms ) {
+      if( i_i < self->imap->maxSize ) {
 	self->tblInd = i_i;
 	self->cur = self->imap->tbl + i_i;
       }

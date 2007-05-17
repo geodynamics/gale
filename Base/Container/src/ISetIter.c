@@ -45,15 +45,8 @@ void _ISetIter_Construct( void* _self ) {
 
    _Iter_Construct( self );
    self->iset = NULL;
-   self->depth = 0;
-   self->stack = NULL;
+   self->tblInd = 0;
    self->cur = NULL;
-}
-
-void _ISetIter_Destruct( void* self ) {
-   assert( self );
-   Class_Free( self, ((ISetIter*)self)->stack );
-   _NewClass_Destruct( self );
 }
 
 void _ISetIter_Copy( void* _self, const void* _op ) {
@@ -62,13 +55,7 @@ void _ISetIter_Copy( void* _self, const void* _op ) {
 
    _Iter_Copy( self, op );
    self->iset = op->iset;
-   self->depth = op->depth;
-   if( op->stack && op->iset ) {
-      self->stack = Class_Array( self, ISetItem*, op->depth );
-      memcpy( self->stack, op->stack, sizeof(ISetItem*) * op->depth );
-   }
-   else
-      self->stack = NULL;
+   self->tblInd = op->tblInd;
    self->cur = op->cur;
 }
 
@@ -76,21 +63,26 @@ void _ISetIter_Next( void* _self ) {
    ISetIter* self = (ISetIter*)_self;
 
    assert( self );
-   assert( self->stack && self->cur && self->valid );
+   assert( self->tblInd < self->iset->maxSize && 
+	   self->iset->used[self->tblInd] );
+   assert( self->cur );
+   assert( self->valid );
+   if( !self->cur->next ) {
+      int i_i;
 
-   if( self->cur->right ) {
-      self->cur = self->cur->right;
-      while( self->cur->left ) {
-	 self->stack[self->depth++] = self->cur;
-	 self->cur = self->cur->left;
+      for( i_i = self->tblInd + 1; i_i < self->iset->maxSize; i_i++ ) {
+	 if( self->iset->used[i_i] )
+	    break;
       }
-   }
-   else {
-      if( self->depth )
-	 self->cur = self->stack[--self->depth];
+      if( i_i < self->iset->maxSize ) {
+	self->tblInd = i_i;
+	self->cur = self->iset->tbl + i_i;
+      }
       else
-	 self->valid = False;
+	self->valid = False;
    }
+   else
+      self->cur = self->cur->next;
 }
 
 int ISetIter_GetKey( const void* self ) {

@@ -119,7 +119,7 @@ TestBegin( Remove ) {
    TestTrue( IArray_GetSize( arr ) == 3 );
    TestTrue( (ptr = IArray_GetPtr( arr )) != 0 );
    TestTrue( ptr[0] == 0 && ptr[1] == 4 && ptr[2] == 2 );
-   TestTrue( IMap_GetNumItems( map ) == 1 );
+   TestTrue( IMap_GetSize( map ) == 1 );
    TestTrue( IMap_Has( map, 4 ) );
    TestTrue( IMap_Map( map, 4 ) == 1 );
 

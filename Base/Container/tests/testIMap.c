@@ -58,8 +58,8 @@ TestBegin( Construct ) {
 
    TestNoAssert( map = IMap_New() );
    TestTrue( map );
-   TestTrue( map->maxItms == 0 );
-   TestTrue( map->nItms == 0 );
+   TestTrue( map->maxSize == 0 );
+   TestTrue( map->curSize == 0 );
    TestTrue( map->tblSize == 0 );
    TestTrue( map->tbl == NULL );
    TestTrue( map->used == NULL );
@@ -69,15 +69,15 @@ TestBegin( Construct ) {
 }
 TestEnd
 
-TestBegin( SetMaxItms ) {
+TestBegin( SetMaxSize ) {
    IMap* map;
 
    map = IMap_New();
-   TestNoAssert( IMap_SetMaxItems( map, 10 ) );
-   TestTrue( map->maxItms == 10 );
+   TestNoAssert( IMap_SetMaxSize( map, 10 ) );
+   TestTrue( map->maxSize == 10 );
    TestTrue( map->tblSize >= 10 );
-   TestNoAssert( IMap_SetMaxItems( map, 20 ) );
-   TestTrue( map->maxItms == 20 );
+   TestNoAssert( IMap_SetMaxSize( map, 20 ) );
+   TestTrue( map->maxSize == 20 );
    TestTrue( map->tblSize >= 20 );
 
   done:
@@ -90,12 +90,12 @@ TestBegin( Insert ) {
    int i_i;
 
    map = IMap_New();
-   IMap_SetMaxItems( map, 10 );
+   IMap_SetMaxSize( map, 10 );
    for( i_i = 0; i_i < 20; i_i += 2 ) {
       TestNoAssert( IMap_Insert( map, i_i, i_i + 100 ) );
    }
    TestAssert( IMap_Insert( map, 0, 100 ) );
-   TestTrue( IMap_GetNumItems( map ) == 10 );
+   TestTrue( IMap_GetSize( map ) == 10 );
    for( i_i = 0; i_i < 20; i_i += 2 ) {
       TestTrue( IMap_Has( map, i_i ) );
    }
@@ -110,7 +110,7 @@ TestBegin( Map ) {
    int i_i;
 
    map = IMap_New();
-   IMap_SetMaxItems( map, 10 );
+   IMap_SetMaxSize( map, 10 );
    for( i_i = 0; i_i < 20; i_i += 2 ) {
       IMap_Insert( map, i_i, i_i + 100 );
    }
@@ -128,7 +128,7 @@ TestBegin( Remove ) {
    int i_i;
 
    map = IMap_New();
-   IMap_SetMaxItems( map, 10 );
+   IMap_SetMaxSize( map, 10 );
    for( i_i = 0; i_i < 20; i_i += 2 ) {
       IMap_Insert( map, i_i, i_i + 100 );
    }
@@ -136,7 +136,7 @@ TestBegin( Remove ) {
       TestNoAssert( IMap_Remove( map, i_i ) );
    }
    TestAssert( IMap_Remove( map, 0 ) );
-   TestTrue( IMap_GetNumItems( map ) == 5 );
+   TestTrue( IMap_GetSize( map ) == 5 );
    for( i_i = 0; i_i < 20; i_i += 4 ) {
       if( i_i % 4 ) {
 	 TestTrue( IMap_Has( map, i_i ) );
@@ -154,7 +154,7 @@ TestEnd
 
 #define nTests 5
 TestSuite_Test tests[nTests] = {{"construct", testConstruct}, 
-				{"set maximum items", testSetMaxItms}, 
+				{"set maximum items", testSetMaxSize}, 
 				{"insert", testInsert}, 
 				{"map", testMap}, 
 				{"remove", testRemove}};

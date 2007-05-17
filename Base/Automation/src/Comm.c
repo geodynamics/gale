@@ -87,7 +87,7 @@ SizeT _Comm_CalcMem( const void* _self, PtrMap* ptrs ) {
    const Comm* self = (const Comm*)_self;
    SizeT mem;
 
-   if( PtrMap_Find( ptrs, self ) )
+   if( PtrMap_Find( ptrs, (void*)self ) )
       return 0;
    mem = _NewClass_CalcMem( self, ptrs );
    mem += NewClass_CalcMem( &self->nbrs, ptrs );
@@ -117,7 +117,7 @@ void Comm_SetNeighbours( void* _self, int nNbrs, const int* nbrs ) {
    assert( self );
    IArray_Set( &self->nbrs, nNbrs, nbrs );
    IMap_Clear( &self->inv );
-   IMap_SetMaxItems( &self->inv, nNbrs );
+   IMap_SetMaxSize( &self->inv, nNbrs );
    for( n_i = 0; n_i < nNbrs; n_i++ )
       IMap_Insert( &self->inv, nbrs[n_i], n_i );
    self->recvs = Class_Rearray( self, self->recvs, MPI_Request, nNbrs );
@@ -133,7 +133,7 @@ void Comm_AddNeighbours( void* _self, int nNbrs, const int* nbrs ) {
    assert( self );
    IArray_Add( &self->nbrs, nNbrs, nbrs );
    netNbrs = IArray_GetSize( &self->nbrs );
-   IMap_SetMaxItems( &self->inv, netNbrs );
+   IMap_SetMaxSize( &self->inv, netNbrs );
    for( n_i = 0; n_i < nNbrs; n_i++ )
       IMap_Insert( &self->inv, nbrs[n_i], netNbrs + n_i );
    self->recvs = Class_Rearray( self, self->recvs, MPI_Request, netNbrs );
@@ -151,7 +151,7 @@ void Comm_RemoveNeighbours( void* _self, int nNbrs, const int* nbrs, IMap* map )
    netNbrs = IArray_GetSize( &self->nbrs );
    for( n_i = 0; n_i < nNbrs; n_i++ )
       IMap_Remove( &self->inv, nbrs[n_i] );
-   IMap_SetMaxItems( &self->inv, netNbrs );
+   IMap_SetMaxSize( &self->inv, netNbrs );
    self->recvs = Class_Rearray( self, self->recvs, MPI_Request, netNbrs );
    self->sends = Class_Rearray( self, self->sends, MPI_Request, netNbrs );
    self->stats = Class_Rearray( self, self->stats, MPI_Status, netNbrs );
@@ -181,7 +181,7 @@ int Comm_RankLocalToGlobal( const void* self, int local ) {
 
 Bool Comm_RankGlobalToLocal( const void* self, int global, int* local ) {
    assert( self );
-   return IMap_Try( &((Comm*)self)->inv, global, local );
+   return IMap_TryMap( &((Comm*)self)->inv, global, local );
 }
 
 void Comm_AllgatherInit( const void* _self, int srcSize, 

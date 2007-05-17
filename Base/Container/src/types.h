@@ -35,7 +35,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: types.h 4097 2007-05-16 00:57:11Z LukeHodkinson $
+** $Id: types.h 4107 2007-05-17 03:59:32Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -53,8 +53,7 @@ typedef struct IMapIter IMapIter;
 
 struct ISetItem {
   int key;
-  ISetItem* left;
-  ISetItem* right;
+  ISetItem* next;
 };
 
 struct IMapItem {

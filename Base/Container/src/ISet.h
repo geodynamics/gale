@@ -42,6 +42,8 @@
 #ifndef __StGermain_Base_Container_ISet_h__
 #define __StGermain_Base_Container_ISet_h__
 
+extern const double ISet_TableFactor;
+
 #ifdef CURRENTDIR
 #undef CURRENTDIR
 #endif

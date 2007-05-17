@@ -47,8 +47,8 @@ void _IMap_Construct( void* _self ) {
    IMap* self = (IMap*)_self;
 
    _NewClass_Construct( self );
-   self->maxItms = 0;
-   self->nItms = 0;
+   self->maxSize = 0;
+   self->curSize = 0;
    self->tblSize = 0;
    self->tbl = NULL;
    self->used = NULL;
@@ -67,16 +67,15 @@ void _IMap_Copy( void* _self, const void* _op ) {
    IMapIter iter;
 
    assert( self && op );
-
    IMap_Clear( self );
-   IMap_SetMaxItems( self, op->maxItms );
+   IMap_SetMaxSize( self, op->maxSize );
    IMapIter_Init( &iter );
    for( IMap_First( op, &iter ); Iter_IsValid( &iter ); IMapIter_Next( &iter ) )
       IMap_Insert( self, IMapIter_GetKey( &iter ), IMapIter_GetValue( &iter ) );
    NewClass_Destruct( &iter );
 }
 
-void IMap_SetMaxItems( void* _self, int maxItms ) {
+void IMap_SetMaxSize( void* _self, int maxSize ) {
    IMap* self = (IMap*)_self;
    int nOldItms, *keys, *vals;
    IMapIter iterObj, *iter = &iterObj;
@@ -84,10 +83,9 @@ void IMap_SetMaxItems( void* _self, int maxItms ) {
    int i_i;
 
    assert( self );
-
-   nOldItms = self->nItms;
-   keys = Class_Array( self, int, self->nItms );
-   vals = Class_Array( self, int, self->nItms );
+   nOldItms = self->curSize;
+   keys = Class_Array( self, int, self->curSize );
+   vals = Class_Array( self, int, self->curSize );
    IMapIter_Init( iter );
    for( i_i = 0, IMap_First( self, iter );
 	Iter_IsValid( iter );
@@ -99,9 +97,9 @@ void IMap_SetMaxItems( void* _self, int maxItms ) {
    NewClass_Destruct( iter );
 
    IMap_Clear( self );
-   self->maxItms = maxItms;
-   self->nItms = 0;
-   self->tblSize = (int)((double)maxItms * IMap_TableFactor);
+   self->maxSize = maxSize;
+   self->curSize = 0;
+   self->tblSize = (int)((double)maxSize * IMap_TableFactor);
    self->tblSize += (self->tblSize % 2) ? 0 : 1;
    self->tbl = Class_Rearray( self, self->tbl, IMapItem, self->tblSize );
    for( i_i = 0; i_i < self->tblSize; i_i++ ) {
@@ -125,7 +123,6 @@ void IMap_Insert( void* _self, int key, int val ) {
    int ind;
 
    assert( self );
-
    ind = IMap_Hash( self, key );
    assert( ind < self->tblSize );
    itm = self->tbl + ind;
@@ -149,7 +146,7 @@ void IMap_Insert( void* _self, int key, int val ) {
       itm->next->val = val;
       itm->next->next = cur;
    }
-   insist( ++self->nItms, <= self->maxItms );
+   insist( ++self->curSize, <= self->maxSize );
 }
 
 void IMap_SetValue( void* _self, int key, int val ) {
@@ -158,7 +155,6 @@ void IMap_SetValue( void* _self, int key, int val ) {
    int ind;
 
    assert( self );
-
    ind = IMap_Hash( self, key );
    assert( ind < self->tblSize );
    assert( self->used[ind] );
@@ -178,7 +174,6 @@ void IMap_Remove( void* _self, int key ) {
    int ind;
 
    assert( self );
-
    ind = IMap_Hash( self, key );
    assert( ind < self->tblSize );
    assert( self->used[ind] );
@@ -208,7 +203,7 @@ void IMap_Remove( void* _self, int key ) {
    }
    if( toDel )
       Class_Free( self, toDel );
-   self->nItms--;
+   self->curSize--;
 }
 
 void IMap_Clear( void* _self ) {
@@ -217,7 +212,6 @@ void IMap_Clear( void* _self ) {
    int i_i;
 
    assert( self );
-
    for( i_i = 0; i_i < self->tblSize; i_i++ ) {
       self->used[i_i] = False;
       itm = self->tbl + i_i;
@@ -229,12 +223,12 @@ void IMap_Clear( void* _self ) {
       }
       itm->next = NULL;
    }
-   self->nItms = 0;
+   self->curSize = 0;
 }
 
-int IMap_GetNumItems( const void* self ) {
+int IMap_GetSize( const void* self ) {
    assert( self );
-   return ((IMap*)self)->nItms;
+   return ((IMap*)self)->curSize;
 }
 
 int IMap_Map( const void* _self, int key ) {
@@ -243,7 +237,6 @@ int IMap_Map( const void* _self, int key ) {
    int ind;
 
    assert( self );
-
    ind = IMap_Hash( self, key );
    assert( ind < self->tblSize );
    assert( self->used[ind] );
@@ -257,13 +250,12 @@ int IMap_Map( const void* _self, int key ) {
    return itm->val;
 }
 
-Bool IMap_Try( const void* _self, int key, int* val ) {
+Bool IMap_TryMap( const void* _self, int key, int* val ) {
    const IMap* self = (const IMap*)_self;
    IMapItem* itm;
    int ind;
 
    assert( self && val );
-
    ind = IMap_Hash( self, key );
    assert( ind < self->tblSize );
    if( !self->used[ind] )
@@ -286,7 +278,6 @@ Bool IMap_Has( const void* _self, int key ) {
    int ind;
 
    assert( self );
-
    ind = IMap_Hash( self, key );
    assert( ind < self->tblSize );
    if( !self->used[ind] )
@@ -310,8 +301,7 @@ void IMap_First( const void* _self, IMapIter* iter ) {
    int i_i;
 
    assert( self && iter );
-
-   for( i_i = 0; i_i < self->maxItms; i_i++ ) {
+   for( i_i = 0; i_i < self->maxSize; i_i++ ) {
       if( self->used[i_i] ) {
 	 iter->imap = (IMap*)self;
 	 iter->tblInd = i_i;
@@ -320,6 +310,5 @@ void IMap_First( const void* _self, IMapIter* iter ) {
 	 return;
       }
    }
-
    iter->valid = False;
 }

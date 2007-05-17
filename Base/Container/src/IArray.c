@@ -40,17 +40,20 @@
 #include "StGermain/Base/Foundation/ClassDef.h"
 
 
+int IArray_Cmp( const void* l, const void* r );
+
+
 void _IArray_Construct( void* _self ) {
    IArray* self = (IArray*)_self;
 
    _NewClass_Construct( self );
+   self->delta = 100;
+   self->maxSize = 0;
    self->size = 0;
    self->ptr = NULL;
 }
 
-void _IArray_Destruct( void* _self ) {
-   IArray* self = (IArray*)_self;
-
+void _IArray_Destruct( void* self ) {
    IArray_Clear( self );
    _NewClass_Destruct( self );
 }
@@ -60,44 +63,62 @@ void _IArray_Copy( void* _self, const void* _op ) {
    const IArray* op = (const IArray*)_op;
 
    assert( self );
+   self->delta = op->delta;
+   self->maxSize = op->maxSize;
    self->size = op->size;
    self->ptr = Class_Array( self, int, self->size );
    memcpy( self->ptr, op->ptr, sizeof(int) * self->size );
+}
+
+void IArray_SetDelta( void* _self, int delta ) {
+   IArray* self = (IArray*)_self;
+
+   assert( self );
+   self->delta = delta;
+}
+
+void IArray_Resize( void* _self, int size ) {
+   IArray* self = (IArray*)_self;
+
+   assert( self && self->delta );
+   self->maxSize = size / self->delta + (size % self->delta) ? 1 : 0;
+   self->maxSize *= self->delta;
+   self->size = size;
+   self->ptr = Class_Rearray( self, self->ptr, int, self->maxSize );
 }
 
 void IArray_Set( void* _self, int nItms, const int* itms ) {
    IArray* self = (IArray*)_self;
 
    assert( self && (!nItms || itms) );
-   self->size = nItms;
-   self->ptr = Class_Rearray( self, self->ptr, int, nItms );
+   IArray_Resize( self, nItms );
    memcpy( self->ptr, itms, nItms * sizeof(int) );
 }
 
 void IArray_Add( void* _self, int nItms, const int* itms ) {
    IArray* self = (IArray*)_self;
+   int oldSize;
 
    assert( self && (!nItms || itms) );
-   self->ptr = Class_Rearray( self, self->ptr, int, self->size + nItms );
-   memcpy( self->ptr + self->size, itms, nItms * sizeof(int) );
-   self->size += nItms;
+   oldSize = self->size;
+   IArray_Resize( self, oldSize + nItms );
+   memcpy( self->ptr + oldSize, itms, nItms * sizeof(int) );
 }
 
 void IArray_Remove( void* _self, int nItms, const int* locals, IMap* map ) {
    IArray* self = (IArray*)_self;
    ISet toRemObj, *toRem = &toRemObj;
-   int* ord;
-   int pos;
+   int* ord, pos;
    int i_i;
 
    assert( self );
-
    ISet_Init( toRem );
    ISet_UseArray( toRem, nItms, locals );
-   ord = Class_Array( self, int, ISet_GetNumItems( toRem ) );
-   ISet_GetArray( toRem, NULL, ord );
+   ord = Class_Array( self, int, ISet_GetSize( toRem ) );
+   memcpy( ord, locals, nItms * sizeof(int) );
+   qsort( ord, nItms, sizeof(int), IArray_Cmp );
    IMap_Clear( map );
-   IMap_SetMaxItems( map, nItms );
+   IMap_SetMaxSize( map, nItms );
    for( i_i = 0, pos = self->size - 1; 
 	i_i < nItms && pos > ord[i_i];
 	i_i++, pos-- )
@@ -109,22 +130,27 @@ void IArray_Remove( void* _self, int nItms, const int* locals, IMap* map ) {
       self->ptr[ord[i_i]] = self->ptr[pos];
       IMap_Insert( map, pos, ord[i_i] );
    }
-   if( IMap_GetNumItems( map ) < nItms )
-      IMap_SetMaxItems( map, IMap_GetNumItems( map ) );
+   if( IMap_GetSize( map ) < nItms )
+      IMap_SetMaxSize( map, IMap_GetSize( map ) );
    ISet_Destruct( toRem );
    Class_Free( self, ord );
 
-   self->size -= nItms;
-   self->ptr = Class_Rearray( self, self->ptr, int, self->size );
+   IArray_Resize( self, self->size - nItms );
 }
 
-void IArray_Clear( void* _self ) {
+void IArray_Append( void* _self, int itm ) {
    IArray* self = (IArray*)_self;
 
    assert( self );
-   Class_Free( self, self->ptr );
-   self->size = 0;
-   self->ptr = NULL;
+   if( self->size == self->maxSize )
+      IArray_Resize( self, self->size + 1 );
+   else
+      self->size++;
+   self->ptr[self->size - 1] = itm;
+}
+
+void IArray_Clear( void* self ) {
+   IArray_Resize( self, 0 );
 }
 
 int IArray_GetSize( const void* self ) {
@@ -137,3 +163,7 @@ const int* IArray_GetPtr( const void* self ) {
    return ((IArray*)self)->ptr;
 }
 
+int IArray_Cmp( const void* l, const void* r ) {
+   assert( *(int*)l != *(int*)r );
+   return (*(int*)l > *(int*)r) ? 1 : -1;
+}

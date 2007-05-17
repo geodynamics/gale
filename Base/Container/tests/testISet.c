@@ -58,9 +58,11 @@ TestBegin( Construct ) {
 
    TestNoAssert( set = ISet_New() );
    TestTrue( set );
-   TestTrue( set->nItms == 0 );
-   TestTrue( set->depth == 0 );
-   TestTrue( set->root == NULL );
+   TestTrue( set->maxSize == 0 );
+   TestTrue( set->curSize == 0 );
+   TestTrue( set->tblSize == 0 );
+   TestTrue( set->tbl == NULL );
+   TestTrue( set->used == NULL );
 
   done:
    NewClass_Delete( set );
@@ -72,13 +74,14 @@ TestBegin( Insert ) {
    int i_i;
 
    set = ISet_New();
+   ISet_SetMaxSize( set, 20 );
    for( i_i = 0; i_i < 20; i_i += 2 ) {
       TestNoAssert( ISet_Insert( set, i_i ) );
    }
    for( i_i = 1; i_i < 20; i_i += 2 ) {
       TestNoAssert( ISet_Insert( set, i_i ) );
    }
-   TestTrue( ISet_GetNumItems( set ) == 20 );
+   TestTrue( ISet_GetSize( set ) == 20 );
    TestAssert( ISet_Insert( set, 0 ) );
    TestNoAssert( ISet_TryInsert( set, 0 ) );
    for( i_i = 0; i_i < 20; i_i++ ) {
@@ -98,8 +101,7 @@ TestBegin( UseArray ) {
 
    set = ISet_New();
    TestNoAssert( ISet_UseArray( set, 10, array ) );
-   TestTrue( ISet_GetNumItems( set ) == 10 );
-   TestTrue( set->depth == 3 );
+   TestTrue( ISet_GetSize( set ) == 10 );
    for( i_i = 0; i_i < 10; i_i++ ) {
       TestTrue( ISet_Has( set, i_i ) );
    }
@@ -113,75 +115,69 @@ TestEnd
 TestBegin( Union ) {
    int array0[5] = {0, 1, 2, 3, 4};
    int array1[5] = {3, 4, 5, 6, 7};
-   ISet *set0, *set1, *set2;
+   ISet *set0, *set1;
    int i_i;
 
    set0 = ISet_New();
    ISet_UseArray( set0, 5, array0 );
    set1 = ISet_New();
    ISet_UseArray( set1, 5, array1 );
-   set2 = ISet_New();
-   ISet_Union( set0, set1, set2 );
-   TestTrue( ISet_GetNumItems( set2 ) == 8 );
+   ISet_Union( set0, set1 );
+   TestTrue( ISet_GetSize( set0 ) == 8 );
    for( i_i = 0; i_i < 8; i_i++ ) {
-      TestTrue( ISet_Has( set2, i_i ) );
+      TestTrue( ISet_Has( set0, i_i ) );
    }
-   TestTrue( !ISet_Has( set2, 10 ) );
+   TestTrue( !ISet_Has( set0, 10 ) );
 
   done:
    NewClass_Delete( set0 );
    NewClass_Delete( set1 );
-   NewClass_Delete( set2 );
 }
 TestEnd
 
 TestBegin( Isect ) {
    int array0[5] = {0, 1, 2, 3, 4};
    int array1[5] = {3, 4, 5, 6, 7};
-   ISet *set0, *set1, *set2;
+   ISet *set0, *set1;
    int i_i;
 
    set0 = ISet_New();
    ISet_UseArray( set0, 5, array0 );
    set1 = ISet_New();
    ISet_UseArray( set1, 5, array1 );
-   set2 = ISet_New();
-   ISet_Isect( set0, set1, set2 );
-   TestTrue( ISet_GetNumItems( set2 ) == 2 );
+   ISet_Isect( set0, set1 );
+   TestTrue( ISet_GetSize( set0 ) == 2 );
    for( i_i = 3; i_i < 5; i_i++ ) {
-      TestTrue( ISet_Has( set2, i_i ) );
+      TestTrue( ISet_Has( set0, i_i ) );
    }
-   TestTrue( !ISet_Has( set2, 1 ) );
+   TestTrue( !ISet_Has( set0, 1 ) );
 
   done:
    NewClass_Delete( set0 );
    NewClass_Delete( set1 );
-   NewClass_Delete( set2 );
 }
 TestEnd
 
 TestBegin( Subtr ) {
    int array0[5] = {0, 1, 2, 3, 4};
    int array1[5] = {3, 4, 5, 6, 7};
-   ISet *set0, *set1, *set2;
+   ISet *set0, *set1;
    int i_i;
 
    set0 = ISet_New();
    ISet_UseArray( set0, 5, array0 );
    set1 = ISet_New();
    ISet_UseArray( set1, 5, array1 );
-   set2 = ISet_New();
-   ISet_Subtr( set0, set1, set2 );
-   TestTrue( ISet_GetNumItems( set2 ) == 3 );
+   ISet_Subtr( set0, set1 );
+   TestTrue( ISet_GetSize( set0 ) == 3 );
    for( i_i = 0; i_i < 3; i_i++ ) {
-      TestTrue( ISet_Has( set2, i_i ) );
+      TestTrue( ISet_Has( set0, i_i ) );
    }
-   TestTrue( !ISet_Has( set2, 3 ) );
+   TestTrue( !ISet_Has( set0, 3 ) );
 
   done:
    NewClass_Delete( set0 );
    NewClass_Delete( set1 );
-   NewClass_Delete( set2 );
 }
 TestEnd
 
