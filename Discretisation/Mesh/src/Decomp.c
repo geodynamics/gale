@@ -44,8 +44,7 @@ void _Decomp_Construct( void* _self ) {
    Decomp* self = (Decomp*)_self;
 
    _NewClass_Construct( self );
-   self->comm = Comm_New();
-   NewClass_AddRef( self->comm );
+   self->mpiComm = MPI_COMM_WORLD;
    self->nGlobals = 0;
    self->locals = &self->localsObj;
    IArray_Init( self->locals );
@@ -59,7 +58,6 @@ void _Decomp_Destruct( void* _self ) {
    Decomp_Clear( self );
    IArray_Destruct( self->locals );
    IMap_Destruct( self->inv );
-   NewClass_RemoveRef( self->comm );
    _NewClass_Destruct( self );
 }
 
@@ -68,9 +66,7 @@ void _Decomp_Copy( void* _self, const void* _op ) {
    const Decomp* op = (const Decomp*)_op;
 
    assert( self && op );
-   NewClass_RemoveRef( self->comm );
-   self->comm = op->comm;
-   NewClass_AddRef( self->comm );
+   self->mpiComm = op->mpiComm;
    self->nGlobals = op->nGlobals;
    IArray_Copy( self->locals, op->locals );
    IMap_Copy( self->inv, op->inv );
@@ -83,22 +79,16 @@ SizeT _Decomp_CalcMem( const void* _self, PtrMap* ptrs ) {
    if( PtrMap_Find( ptrs, (void*)self ) )
       return 0;
    mem = _NewClass_CalcMem( self, ptrs );
-   if( self->comm )
-      mem += NewClass_CalcMem( self->comm, ptrs );
    mem += NewClass_CalcMem( self->locals, ptrs );
    mem += NewClass_CalcMem( self->inv, ptrs );
    return mem;
 }
 
-void Decomp_SetComm( void* _self, const Comm* comm ) {
+void Decomp_SetMPIComm( void* _self, MPI_Comm mpiComm ) {
    Decomp* self = (Decomp*)_self;
 
    assert( self );
-   NewClass_RemoveRef( self->comm );
-   self->comm = (Comm*)comm;
-   if( !self->comm )
-      self->comm = Comm_New();
-   NewClass_AddRef( self->comm );
+   self->mpiComm = mpiComm;
 }
 
 void Decomp_SetLocals( void* _self, int nLocals, const int* locals ) {
@@ -144,9 +134,7 @@ void Decomp_Clear( void* _self ) {
    Decomp* self = (Decomp*)_self;
 
    Decomp_ClearLocals( self );
-   NewClass_RemoveRef( self->comm );
-   self->comm = Comm_New();
-   NewClass_AddRef( self->comm );
+   self->mpiComm = MPI_COMM_WORLD;
    self->nGlobals = 0;
 }
 
@@ -158,9 +146,9 @@ void Decomp_ClearLocals( void* _self ) {
    IMap_Clear( self->inv );
 }
 
-const Comm* Decomp_GetComm( const void* self ) {
+MPI_Comm Decomp_GetComm( const void* self ) {
    assert( self );
-   return ((Decomp*)self)->comm;
+   return ((Decomp*)self)->mpiComm;
 }
 
 int Decomp_GetNumGlobals( const void* self ) {
@@ -195,15 +183,13 @@ Bool Decomp_TryGlobalToLocal( const void* self, int global, int* local ) {
 }
 
 void Decomp_Update( Decomp* self ) {
-   MPI_Comm mpiComm;
    int nLocals;
 
    assert( self );
-   if( self->comm ) {
-      mpiComm = Comm_GetMPIComm( self->comm );
+   if( self->mpiComm ) {
       nLocals = IArray_GetSize( self->locals );
       insist( MPI_Allreduce( &nLocals, &self->nGlobals, 1, MPI_INT, MPI_SUM, 
-			     mpiComm ), == MPI_SUCCESS );
+			     self->mpiComm ), == MPI_SUCCESS );
    }
    else
       self->nGlobals = 0;

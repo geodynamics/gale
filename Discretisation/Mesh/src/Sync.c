@@ -42,14 +42,17 @@ void Sync_UpdateTables( Sync* self );
 void Sync_UpdateShared( Sync* self );
 void Sync_UpdateOwners( Sync* self );
 void Sync_ClearTables( Sync* self );
+void Sync_ClearShared( Sync* self );
+void Sync_ClearOwners( Sync* self );
 
 
 void _Sync_Construct( void* _self ) {
    Sync* self = (Sync*)_self;
 
    _NewClass_Construct( self );
-   self->nDomains = 0;
    self->decomp = NULL;
+   self->comm = NULL;
+   self->nDomains = 0;
    self->remotes = &self->remotesObj;
    IArray_Init( self->remotes );
    self->owners = NULL;
@@ -102,11 +105,24 @@ SizeT _Sync_CalcMem( const void* _self, PtrMap* ptrs ) {
 void Sync_SetDecomp( void* _self, const Decomp* decomp ) {
    Sync* self = (Sync*)_self;
 
-   Sync_Clear( self );
+   Sync_ClearDecomp( self );
    self->decomp = (Decomp*)decomp;
    if( self->decomp ) {
       NewClass_AddRef( self->decomp );
       self->nDomains = Decomp_GetNumLocals( self->decomp );
+      Sync_UpdateTables( self );
+      Sync_UpdateShared( self );
+      Sync_UpdateOwners( self );
+   }
+}
+
+void Sync_SetComm( void* _self, const Comm* comm ) {
+   Sync* self = (Sync*)_self;
+
+   Sync_ClearComm( self );
+   self->comm = (Comm*)comm;
+   if( self->comm ) {
+      NewClass_AddRef( self->comm );
       Sync_UpdateTables( self );
       Sync_UpdateShared( self );
       Sync_UpdateOwners( self );
@@ -124,7 +140,7 @@ void Sync_AddRemotes( void* _self, int nRemotes, const int* remotes ) {
    Sync* self = (Sync*)_self;
    int r_i;
 
-   assert( self && self->decomp );
+   assert( self && self->decomp && self->comm );
    IMap_SetMaxSize( self->gr, IArray_GetSize( self->remotes ) + nRemotes );
    IArray_Add( self->remotes, nRemotes, remotes );
    for( r_i = 0; r_i < nRemotes; r_i++ )
@@ -138,7 +154,7 @@ void Sync_AddRemotes( void* _self, int nRemotes, const int* remotes ) {
 void Sync_RemoveRemotes( void* _self, int nRemotes, const int* remotes, IMap* map ) {
    Sync* self = (Sync*)_self;
 
-   assert( self && self->decomp );
+   assert( self && self->decomp && self->comm );
    IArray_Remove( self->remotes, nRemotes, remotes, map );
    Sync_UpdateTables( self );
    Sync_UpdateShared( self );
@@ -150,10 +166,32 @@ void Sync_Clear( void* _self ) {
    Sync* self = (Sync*)_self;
 
    Sync_ClearRemotes( self );
-   if( self->decomp )
-      NewClass_RemoveRef( self->decomp );
+   NewClass_RemoveRef( self->decomp );
+   self->decomp = NULL;
+   NewClass_RemoveRef( self->comm );
+   self->comm = NULL;
+   self->nDomains = 0;
+}
+
+void Sync_ClearDecomp( void* _self ) {
+   Sync* self = (Sync*)_self;
+
+   Sync_ClearRemotes( self );
+   NewClass_RemoveRef( self->decomp );
    self->decomp = NULL;
    self->nDomains = 0;
+}
+
+void Sync_ClearComm( void* _self ) {
+   Sync* self = (Sync*)_self;
+
+   Sync_ClearRemotes( self );
+   NewClass_RemoveRef( self->comm );
+   self->comm = NULL;
+   if( self->decomp )
+      self->nDomains = Decomp_GetNumLocals( self->decomp );
+   else
+      self->nDomains = 0;
 }
 
 void Sync_ClearRemotes( void* _self ) {
@@ -184,6 +222,11 @@ void Sync_ClearRemotes( void* _self ) {
 const Decomp* Sync_GetDecomp( const void* self ) {
    assert( self );
    return ((Sync*)self)->decomp;
+}
+
+const Comm* Sync_GetComm( const void* self ) {
+   assert( self );
+   return ((Sync*)self)->comm;
 }
 
 int Sync_GetNumRemotes( const void* self ) {
@@ -289,15 +332,13 @@ void Sync_SyncArray( const void* _self,
 		     size_t itmSize )
 {
    Sync* self = (Sync*)_self;
-   const Comm* comm;
    int nNbrs;
    int* nSrcs;
    StgByte **srcs, **snks;
    int n_i, s_i;
 
    assert( self );
-   comm = Decomp_GetComm( self->decomp );
-   nNbrs = Comm_GetNumNeighbours( comm );
+   nNbrs = Comm_GetNumNeighbours( self->comm );
    snks = Class_Array( self, StgByte*, nNbrs );
    for( n_i = 0; n_i < nNbrs; n_i++ ) {
       snks[n_i] = Class_Array( self, StgByte, self->nSnks[n_i] * itmSize );
@@ -309,12 +350,12 @@ void Sync_SyncArray( const void* _self,
    }
 
    nSrcs = Class_Array( self, int, nNbrs );
-   Comm_AlltoallInit( comm, self->nSnks, nSrcs, itmSize );
+   Comm_AlltoallInit( self->comm, self->nSnks, nSrcs, itmSize );
    srcs = Class_Array( self, StgByte*, nNbrs );
    for( n_i = 0; n_i < nNbrs; n_i++ )
       srcs[n_i] = Class_Array( self, StgByte, nSrcs[n_i] * itmSize );
-   Comm_AlltoallBegin( comm, (const void**)snks, (void**)srcs );
-   Comm_AlltoallEnd( comm );
+   Comm_AlltoallBegin( self->comm, (const void**)snks, (void**)srcs );
+   Comm_AlltoallEnd( self->comm );
    Class_Free( self, nSrcs );
    for( n_i = 0; n_i < nNbrs; n_i++ )
       Class_Free( self, snks[n_i] );
@@ -332,7 +373,6 @@ void Sync_SyncArray( const void* _self,
 }
 
 void Sync_UpdateTables( Sync* self ) {
-   const Comm* comm;
    int nNbrs;
    ISet theirRemsObj, *theirRems = &theirRemsObj;
    ISet myLocsObj, *myLocs = &myLocsObj;
@@ -343,8 +383,10 @@ void Sync_UpdateTables( Sync* self ) {
    int n_i, s_i;
 
    Sync_ClearTables( self );
-   comm = Decomp_GetComm( self->decomp );
-   nNbrs = Comm_GetNumNeighbours( comm );
+   if( !self->comm || !self->decomp )
+      return;
+
+   nNbrs = Comm_GetNumNeighbours( self->comm );
    ISet_Init( theirRems );
    ISet_Init( myLocs );
    Decomp_GetLocals( self->decomp, &nLocals, &locals );
@@ -354,11 +396,11 @@ void Sync_UpdateTables( Sync* self ) {
 
    nAllRems = Class_Array( self, int, nNbrs );
    allRems = Class_Array( self, int*, nNbrs );
-   Comm_AllgatherInit( comm, nRems, nAllRems, sizeof(int) );
+   Comm_AllgatherInit( self->comm, nRems, nAllRems, sizeof(int) );
    for( n_i = 0; n_i < nNbrs; n_i++ )
       allRems[n_i] = Class_Array( self, int, nAllRems[n_i] );
-   Comm_AllgatherBegin( comm, rems, (void**)allRems );
-   Comm_AllgatherEnd( comm );
+   Comm_AllgatherBegin( self->comm, rems, (void**)allRems );
+   Comm_AllgatherEnd( self->comm );
 
    for( n_i = 0; n_i < nNbrs; n_i++ ) {
       ISet_UseArray( theirRems, nAllRems[n_i], allRems[n_i] );
@@ -372,11 +414,11 @@ void Sync_UpdateTables( Sync* self ) {
 
    nFnds = Class_Array( self, int, nNbrs );
    fnds = Class_Array( self, int*, nNbrs );
-   Comm_AlltoallInit( comm, nAllRems, nFnds, sizeof(int) );
+   Comm_AlltoallInit( self->comm, nAllRems, nFnds, sizeof(int) );
    for( n_i = 0; n_i < nNbrs; n_i++ )
       fnds[n_i] = Class_Array( self, int, nFnds[n_i] );
-   Comm_AlltoallBegin( comm, (const void**)allRems, (void**)fnds );
-   Comm_AlltoallEnd( comm );
+   Comm_AlltoallBegin( self->comm, (const void**)allRems, (void**)fnds );
+   Comm_AlltoallEnd( self->comm );
 
    self->nSrcs = nFnds;
    self->srcs = fnds;
@@ -397,16 +439,15 @@ void Sync_UpdateTables( Sync* self ) {
 
 void Sync_UpdateShared( Sync* self ) {
    ISet sharedSetObj, *sharedSet = &sharedSetObj;
-   const Comm* comm;
    int shared, nNbrs;
    int n_i, s_i;
 
    assert( self );
-   for( s_i = 0; s_i < self->nShared; s_i++ )
-      Class_Free( self, self->sharers[s_i] );
+   Sync_ClearShared( self );
+   if( !self->comm || !self->decomp )
+      return;
 
-   comm = Decomp_GetComm( self->decomp );
-   nNbrs = Comm_GetNumNeighbours( comm );
+   nNbrs = Comm_GetNumNeighbours( self->comm );
    ISet_Init( sharedSet );
    for( n_i = 0; n_i < nNbrs; n_i++ ) {
       for( s_i = 0; s_i < self->nSnks[n_i]; s_i++ )
@@ -443,13 +484,15 @@ void Sync_UpdateShared( Sync* self ) {
 }
 
 void Sync_UpdateOwners( Sync* self ) {
-   const Comm* comm;
    int nRemotes, nNbrs;
    int n_i, s_i;
 
    assert( self );
-   comm = Decomp_GetComm( self->decomp );
-   nNbrs = Comm_GetNumNeighbours( comm );
+   Sync_ClearOwners( self );
+   if( !self->comm || !self->decomp )
+      return;
+
+   nNbrs = Comm_GetNumNeighbours( self->comm );
    nRemotes = IArray_GetSize( self->remotes );
    self->owners = Class_Rearray( self, self->owners, int, nRemotes );
    for( n_i = 0; n_i < nNbrs; n_i++ ) {
@@ -459,14 +502,12 @@ void Sync_UpdateOwners( Sync* self ) {
 }
 
 void Sync_ClearTables( Sync* self ) {
-   const Comm* comm;
    int n_i;
 
    assert( self );
    if( self->decomp ) {
-      comm = Decomp_GetComm( self->decomp );
-      if( comm ) {
-	 for( n_i = 0; n_i < Comm_GetNumNeighbours( comm ); n_i++ ) {
+      if( self->comm ) {
+	 for( n_i = 0; n_i < Comm_GetNumNeighbours( self->comm ); n_i++ ) {
 	    if( self->srcs )
 	       Class_Free( self, self->srcs[n_i] );
 	    if( self->snks )
@@ -482,4 +523,27 @@ void Sync_ClearTables( Sync* self ) {
    self->srcs = NULL;
    self->nSnks = NULL;
    self->snks = NULL;
+}
+
+void Sync_ClearShared( Sync* self ) {
+   int s_i;
+
+   assert( self );
+   for( s_i = 0; s_i < self->nShared; s_i++ )
+      Class_Free( self, self->sharers[s_i] );
+   Class_Free( self, self->shared );
+   Class_Free( self, self->nSharers );
+   Class_Free( self, self->sharers );
+   self->nShared = 0;
+   self->shared = NULL;
+   self->nSharers = NULL;
+   self->sharers = NULL;
+}
+
+void Sync_ClearOwners( Sync* self ) {
+   int s_i;
+
+   assert( self );
+   Class_Free( self, self->owners );
+   self->owners = NULL;
 }

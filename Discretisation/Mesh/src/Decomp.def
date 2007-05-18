@@ -8,8 +8,8 @@ VOIDOVERRIDE( Destruct, void, (void* self), (self) )
 VOIDOVERRIDE( Copy, void, (void* self, const void* op), (self, op) )
 OVERRIDE( CalcMem, SizeT, (const void* self, PtrMap* ptrs), (self, ptrs) )
 
-METHOD( SetComm, void, (void* self, const Comm* comm), 
-	(self, comm) )
+METHOD( SetMPIComm, void, (void* self, MPI_Comm mpiComm), 
+	(self, mpiComm) )
 METHOD( SetLocals, void, (void* self, int nLocals, const int* locals), 
 	(self, nLocals, locals) )
 METHOD( AddLocals, void, (void* self, int nLocals, const int* locals), 
@@ -19,7 +19,7 @@ METHOD( RemoveLocals, void, (void* self, int nLocals, const int* locals, IMap* m
 METHOD( Clear, void, (void* self), (self) )
 METHOD( ClearLocals, void, (void* self), (self) )
 
-METHOD( GetComm, const Comm*, (const void* self), (self) )
+METHOD( GetMPIComm, MPI_Comm, (const void* self), (self) )
 METHOD( GetNumGlobals, int, (const void* self), (self) )
 METHOD( GetNumLocals, int, (const void* self), (self) )
 METHOD( GetLocals, void, (const void* self, int* nLocals, const int** locals), 
@@ -30,7 +30,7 @@ METHOD( GlobalToLocal, int, (const void* self, int global), (self, global) )
 METHOD( TryGlobalToLocal, Bool, (const void* self, int global, int* local), 
 	(self, global, local) )
 
-MEMBER( Comm*, comm )
+MEMBER( MPI_Comm, mpiComm )
 MEMBER( int, nGlobals )
 MEMBER( IArray*, locals )
 MEMBER( IArray, localsObj )

@@ -8,8 +8,8 @@ VOIDOVERRIDE( Destruct, void, (void* self), (self) )
 VOIDOVERRIDE( Copy, void, (void* self, const void* op), (self, op) )
 OVERRIDE( CalcMem, SizeT, (const void* self, PtrMap* ptrs), (self, ptrs) )
 
-METHOD( SetDecomp, void, (void* self, const Decomp* decomp), 
-	(self, decomp) )
+METHOD( SetDecomp, void, (void* self, const Decomp* decomp), (self, decomp) )
+METHOD( SetComm, void, (void* self, const Comm* comm), (self, comm) )
 METHOD( SetRemotes, void, (void* self, int nRemotes, const int* remotes), 
 	(self, nRemotes, remotes) )
 METHOD( AddRemotes, void, (void* self, int nRemotes, const int* remotes), 
@@ -17,9 +17,12 @@ METHOD( AddRemotes, void, (void* self, int nRemotes, const int* remotes),
 METHOD( RemoveRemotes, void, (void* self, int nRemotes, const int* remotes, IMap* map), 
 	(self, nRemotes, remotes, map) )
 METHOD( Clear, void, (void* self), (self) )
+METHOD( ClearDecomp, void, (void* self), (self) )
+METHOD( ClearComm, void, (void* self), (self) )
 METHOD( ClearRemotes, void, (void* self), (self) )
 
 METHOD( GetDecomp, const Decomp*, (const void* self), (self) )
+METHOD( GetComm, const Comm*, (const void* self), (self) )
 METHOD( GetNumRemotes, int, (const void* self), (self) )
 METHOD( GetNumDomains, int, (const void* self), (self) )
 METHOD( GetNumShared, int, (const void* self), (self) )
@@ -49,6 +52,7 @@ METHOD( SyncArray, void, (const void* self,
 	(self, local, localStride, remote, remoteStride, itmSize) )
 
 MEMBER( Decomp*, decomp )
+MEMBER( Comm*, comm )
 MEMBER( int, nDomains )
 MEMBER( IArray*, remotes )
 MEMBER( IArray, remotesObj )

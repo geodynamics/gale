@@ -354,8 +354,8 @@ void CartesianGenerator_Generate( void* meshGenerator, void* _mesh ) {
 		Journal_Printf( stream, "\n" );
 
 		/* Fill topological values. */
-		MeshTopology_SetNumDims( mesh->topo, self->elGrid->nDims );
 		MeshTopology_SetComm( mesh->topo, self->comm );
+		MeshTopology_SetNumDims( mesh->topo, self->elGrid->nDims );
 		CartesianGenerator_GenTopo( self, mesh->topo );
 
 		/* Fill geometric values. */

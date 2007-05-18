@@ -103,8 +103,11 @@ void MeshTopology_SetNumDims( void* _self, int nDims ) {
       NewClass_AddRef( self->locals[d_i] );
       self->remotes[d_i] = Sync_New();
       NewClass_AddRef( self->remotes[d_i] );
-      Decomp_SetComm( self->locals[d_i], self->comm );
+      if( self->comm )
+	 Decomp_SetMPIComm( self->locals[d_i], Comm_GetMPIComm( self->comm ) );
       Sync_SetDecomp( self->remotes[d_i], self->locals[d_i] );
+      if( self->comm )
+	 Sync_SetComm( self->remotes[d_i], self->comm );
       memset( self->nIncEls[d_i], 0, sizeof(int**) * self->nTDims );
       memset( self->incEls[d_i], 0, sizeof(int***) * self->nTDims );
    }
@@ -120,9 +123,11 @@ void MeshTopology_SetComm( void* _self, const Comm* comm ) {
    if( comm ) {
       NewClass_AddRef( (Comm*)comm );
       for( d_i = 0; d_i < self->nTDims; d_i++ ) {
-	 curComm = Decomp_GetComm( self->locals[d_i] );
-	 if( curComm != comm )
-	    Decomp_SetComm( self->locals[d_i], self->comm );
+	 curComm = Sync_GetComm( self->remotes[d_i] );
+	 if( curComm != comm ) {
+	    Sync_SetComm( self->remotes[d_i], self->comm );
+	    Decomp_SetMPIComm( self->locals[d_i], Comm_GetMPIComm( self->comm ) );
+	 }
       }
    }
 }
@@ -310,7 +315,7 @@ void MeshTopology_InvertIncidence( void* _self, int fromDim, int toDim ) {
    for( e_i = 0; e_i < toSize; e_i++ ) {
       for( inc_i = 0; inc_i < nInvIncEls[e_i]; inc_i++ )
 	 elInd = invIncEls[e_i][inc_i];
-	 incEls[elInd][nIncEls[elInd]++] = e_i;
+      incEls[elInd][nIncEls[elInd]++] = e_i;
    }
 
    for( e_i = 0; e_i < fromSize; e_i++ ) {
@@ -331,57 +336,57 @@ void MeshTopology_SetGhostVertices( void* _self, int nGhosts, const int* globals
 }
 
 void MeshTopology_SetShadowDepth( void* _self, int depth ) {
-/*
-  MeshTopology* self = (MeshTopology*)_self;
-  int nLocals;
-  const int* locals;
+#if 0
+   MeshTopology* self = (MeshTopology*)_self;
+   int nLocals;
+   const int* locals;
 
-  assert( self && depth >= 0 );
-  assert( self->comm );
+   assert( self && depth >= 0 );
+   assert( self->comm );
 
-  nNbrs = Comm_GetNumNeighbours( self->comm );
-  nNbrGhosts = Class_Array( self, int, nNbrs );
-  nbrGhosts = Class_Array( self, int*, nNbrs );
-  Comm_AllgatherInit( self->comm, self->nGhosts, nNbrGhosts, sizeof(int) );
-  for( n_i = 0; n_i < nNbrs; n_i++ )
-  nbrGhosts[n_i] = Class_Array( self, int, nNbrGhosts[n_i] );
-  Comm_AllgatherBegin( self->comm, self->ghosts, nbrGhosts );
-  Comm_AllgatherEnd( self->comm );
+   nNbrs = Comm_GetNumNeighbours( self->comm );
+   nNbrGhosts = Class_Array( self, int, nNbrs );
+   nbrGhosts = Class_Array( self, int*, nNbrs );
+   Comm_AllgatherInit( self->comm, self->nGhosts, nNbrGhosts, sizeof(int) );
+   for( n_i = 0; n_i < nNbrs; n_i++ )
+      nbrGhosts[n_i] = Class_Array( self, int, nNbrGhosts[n_i] );
+   Comm_AllgatherBegin( self->comm, self->ghosts, nbrGhosts );
+   Comm_AllgatherEnd( self->comm );
 
-  ISet_Init( locSet );
-  ISet_Init( ghostSet );
-  ISet_Init( isect );
-  Decomp_GetLocals( self->locals[0], &nLocals, &locals );
-  ISet_UseArray( locSet, nLocals, locals );
-  for( n_i = 0; n_i < nNbrs; n_i++ ) {
-  ISet_UseArray( ghostSet, nNbrGhosts[n_i], nbrGhosts[n_i] );
-  Class_Free( self, nbrGhosts[n_i] );
-  ISet_Isect( locSet, ghostSet, isect );
-  ISet_Clear( ghostSet );
-  nNbrGhosts[n_i] = ISet_GetSize( isect );
-  nbrGhosts[n_i] = Class_Array( self, int, nNbrGhosts[n_i] );
-  ISet_GetArray( isect, nNbrGhosts + n_i, nbrGhosts[n_i] );
-  ISet_Clear( isect );
-  }
-  ISet_Destruct( locSet );
-  ISet_Destruct( ghostSet );
+   ISet_Init( locSet );
+   ISet_Init( ghostSet );
+   ISet_Init( isect );
+   Decomp_GetLocals( self->locals[0], &nLocals, &locals );
+   ISet_UseArray( locSet, nLocals, locals );
+   for( n_i = 0; n_i < nNbrs; n_i++ ) {
+      ISet_UseArray( ghostSet, nNbrGhosts[n_i], nbrGhosts[n_i] );
+      Class_Free( self, nbrGhosts[n_i] );
+      ISet_Isect( locSet, ghostSet, isect );
+      ISet_Clear( ghostSet );
+      nNbrGhosts[n_i] = ISet_GetSize( isect );
+      nbrGhosts[n_i] = Class_Array( self, int, nNbrGhosts[n_i] );
+      ISet_GetArray( isect, nNbrGhosts + n_i, nbrGhosts[n_i] );
+      ISet_Clear( isect );
+   }
+   ISet_Destruct( locSet );
+   ISet_Destruct( ghostSet );
 
-  for( n_i = 0; n_i < nNbrs; n_i++ ) {
-  for( v_i = 0; v_i < nNbrGhosts[n_i]; v_i++ ) {
-  insist( Decomp_GlobalToLocal( self->locals[0], nbrGhosts[n_i][v_i], &loc ) );
-  for( inc_i = 0; inc_i < self->nIncEls[0][nDims][loc]; inc_i++ )
-  ISet_TryInsert( isect, self->incEls[0][nDims][loc][inc_i] );
-  }
-  nNbrGhosts[n_i] = ISet_GetSize( isect );
-  nbrGhosts[n_i] = Class_Rearray( self, nbrGhosts[n_i], int, nNbrGhosts[n_i] );
-  ISet_GetArray( isect, nNbrGhosts + n_i, nbrGhosts[n_i] );
-  for( s_i = 0; s_i < depth - 1; s_i++ )
-  MeshTopology_ExpandShadows( self, nNbrGhosts + n_i, nbrGhosts + n_i, isect );
-  ISet_Clear( isect );
-  }
+   for( n_i = 0; n_i < nNbrs; n_i++ ) {
+      for( v_i = 0; v_i < nNbrGhosts[n_i]; v_i++ ) {
+	 insist( Decomp_GlobalToLocal( self->locals[0], nbrGhosts[n_i][v_i], &loc ) );
+	 for( inc_i = 0; inc_i < self->nIncEls[0][nDims][loc]; inc_i++ )
+	    ISet_TryInsert( isect, self->incEls[0][nDims][loc][inc_i] );
+      }
+      nNbrGhosts[n_i] = ISet_GetSize( isect );
+      nbrGhosts[n_i] = Class_Rearray( self, nbrGhosts[n_i], int, nNbrGhosts[n_i] );
+      ISet_GetArray( isect, nNbrGhosts + n_i, nbrGhosts[n_i] );
+      for( s_i = 0; s_i < depth - 1; s_i++ )
+	 MeshTopology_ExpandShadows( self, nNbrGhosts + n_i, nbrGhosts + n_i, isect );
+      ISet_Clear( isect );
+   }
 
-  Comm_AlltoallInit( self->comm, nNbr
-*/
+   Comm_AlltoallInit( self->comm, nNbr);
+#endif
 }
 
 void MeshTopology_Clear( void* self ) {
