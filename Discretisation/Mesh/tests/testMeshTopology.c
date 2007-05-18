@@ -101,7 +101,7 @@ TestBegin( SetComm ) {
    TestNoAssert( MeshTopology_SetComm( topo, comm ) );
    TestTrue( MeshTopology_GetComm( topo ) == comm );
    for( d_i = 0; d_i < 4; d_i++ ) {
-      TestTrue( Decomp_GetComm( topo->locals[d_i] ) == comm );
+      TestTrue( Sync_GetComm( topo->remotes[d_i] ) == comm );
    }
 
   done:
