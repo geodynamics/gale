@@ -39,6 +39,33 @@
 #include "StGermain/Base/Foundation/TestBegin.h"
 
 
+Mesh* buildMesh() {
+   CartesianGenerator* gen;
+   int nRanks;
+   unsigned sizes[3];
+   double minCrd[3];
+   double maxCrd[3];
+   Mesh* mesh;
+   int rank;
+
+   insist( MPI_Comm_size( MPI_COMM_WORLD, &nRanks ), == MPI_SUCCESS );
+   sizes[0] = sizes[1] = sizes[2] = nRanks * 2;
+   minCrd[0] = minCrd[1] = minCrd[2] = 0.0;
+   maxCrd[0] = minCrd[1] = minCrd[2] = (double)nRanks;
+
+   gen = CartesianGenerator_New( "" );
+   MeshGenerator_SetDimSize( gen, 3 );
+   CartesianGenerator_SetShadowDepth( gen, 1 );
+   CartesianGenerator_SetTopologyParams( gen, sizes, 0, NULL, NULL );
+   CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
+
+   mesh = Mesh_New( "" );
+   CartesianGenerator_Generate( gen, mesh );
+   FreeObject( gen );
+
+   return mesh;
+}
+
 void testSetup( int* argc, char** argv[] ) {
    Base_Init( argc, argv );
    DiscretisationMesh_Init( argc, argv );
@@ -71,13 +98,13 @@ TestBegin( Gen ) {
    unsigned long netMem, mem, syncMem;
 
    insist( MPI_Comm_size( MPI_COMM_WORLD, &nRanks ), == MPI_SUCCESS );
-   sizes[0] = sizes[1] = sizes[2] = nRanks;
+   sizes[0] = sizes[1] = sizes[2] = 4;
    minCrd[0] = minCrd[1] = minCrd[2] = 0.0;
    maxCrd[0] = minCrd[1] = minCrd[2] = (double)nRanks;
 
    gen = CartesianGenerator_New( "" );
    MeshGenerator_SetDimSize( gen, 3 );
-   CartesianGenerator_SetShadowDepth( gen, 0 );
+   CartesianGenerator_SetShadowDepth( gen, 1 );
    CartesianGenerator_SetTopologyParams( gen, sizes, 0, NULL, NULL );
    CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
 
@@ -90,10 +117,91 @@ TestBegin( Gen ) {
 }
 TestEnd
 
+TestBegin( Inc ) {
+   Mesh* mesh;
+   MeshTopology* topo;
+   const Sync *elSync, *vertSync;
+   Grid *elGrid, *vertGrid;
+   int nEls, nDims;
+   int* elParam;
+   int nIncEls;
+   const int* incEls;
+   int elGlobal, incGlobal, vertGlobal;
+   int e_i;
 
-#define nTests 2
+   mesh = buildMesh();
+   topo = mesh->topo;
+   nDims = MeshTopology_GetNumDims( topo );
+   elSync = MeshTopology_GetDomain( topo, nDims );
+   elGrid = *Mesh_GetExtension( mesh, Grid**, "elementGrid" );
+   vertSync = MeshTopology_GetDomain( topo, 0 );
+   vertGrid = *Mesh_GetExtension( mesh, Grid**, "vertexGrid" );
+   nEls = Sync_GetNumDomains( elSync );
+   elParam = MemArray( int, nDims, "testInc" );
+   for( e_i = 0; e_i < nEls; e_i++ ) {
+      elGlobal = Sync_DomainToGlobal( elSync, e_i );
+      Grid_Lift( elGrid, elGlobal, elParam );
+      MeshTopology_GetIncidence( topo, nDims, e_i, 0, &nIncEls, &incEls );
+      TestTrue( nIncEls == 8 );
+
+      vertGlobal = Grid_Project( vertGrid, elParam );
+      incGlobal = Sync_DomainToGlobal( vertSync, incEls[0] );
+      assert( incGlobal == vertGlobal );
+
+      elParam[0]++;
+      vertGlobal = Grid_Project( vertGrid, elParam );
+      incGlobal = Sync_DomainToGlobal( vertSync, incEls[1] );
+      assert( incGlobal == vertGlobal );
+      elParam[0]--;
+
+      elParam[1]++;
+      vertGlobal = Grid_Project( vertGrid, elParam );
+      incGlobal = Sync_DomainToGlobal( vertSync, incEls[2] );
+      assert( incGlobal == vertGlobal );
+
+      elParam[0]++;
+      vertGlobal = Grid_Project( vertGrid, elParam );
+      incGlobal = Sync_DomainToGlobal( vertSync, incEls[3] );
+      assert( incGlobal == vertGlobal );
+      elParam[0]--;
+      elParam[1]--;
+
+      elParam[2]++;
+      vertGlobal = Grid_Project( vertGrid, elParam );
+      incGlobal = Sync_DomainToGlobal( vertSync, incEls[4] );
+      assert( incGlobal == vertGlobal );
+
+      elParam[0]++;
+      vertGlobal = Grid_Project( vertGrid, elParam );
+      incGlobal = Sync_DomainToGlobal( vertSync, incEls[5] );
+      assert( incGlobal == vertGlobal );
+      elParam[0]--;
+
+      elParam[1]++;
+      vertGlobal = Grid_Project( vertGrid, elParam );
+      incGlobal = Sync_DomainToGlobal( vertSync, incEls[6] );
+      assert( incGlobal == vertGlobal );
+
+      elParam[0]++;
+      vertGlobal = Grid_Project( vertGrid, elParam );
+      incGlobal = Sync_DomainToGlobal( vertSync, incEls[7] );
+      assert( incGlobal == vertGlobal );
+      elParam[0]--;
+      elParam[1]--;
+      elParam[2]--;
+   }
+
+  done:
+   MemFree( elParam );
+   FreeObject( mesh );
+}
+TestEnd
+
+
+#define nTests 3
 TestSuite_Test tests[nTests] = {{"construct", testConstruct}, 
-				{"generate", testGen}};
+				{"generate", testGen}, 
+				{"incidence", testInc}};
 
 
 #include "Base/Foundation/TestEnd.h"

@@ -34,7 +34,7 @@
 **
 ** Comments:
 **
-** $Id: MeshClass.h 4100 2007-05-16 01:07:26Z LukeHodkinson $
+** $Id: MeshClass.h 4115 2007-05-21 00:28:33Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -154,6 +154,10 @@
 
 	Comm* Mesh_GetCommTopology( void* mesh, MeshTopology_Dim dim );
 	double* Mesh_GetVertex( void* mesh, unsigned domain );
+
+	#define Mesh_GetExtension( mesh, type, name ) \
+		(type)_Mesh_GetExtension( mesh, name )
+	void* _Mesh_GetExtension( void* mesh, const char* name );
 
 	void Mesh_GetMinimumSeparation( void* mesh, double* minSep, double* axial );
 	void Mesh_GetLocalCoordRange( void* mesh, double* min, double* max );

@@ -11,6 +11,8 @@ OVERRIDE( CalcMem, SizeT, (const void* self, PtrMap* ptrs), (self, ptrs) )
 METHOD( SetNumDims, void, (void* self, int nDims), (self, nDims) )
 METHOD( SetComm, void, (void* self, const Comm* comm), (self, comm) )
 METHOD( SetDomain, void, (void* self, int dim, Sync* sync), (self, dim, comm) )
+METHOD( SetElements, void, (void* self, int dim, int nEls, const int* globals), 
+	(self, dim, nEls, globals) )
 METHOD( SetLocalElements, void, (void* self, int dim, int nEls, 
 				 const int* globals), 
 	(self, dim, nEls, globals) )
@@ -32,10 +34,11 @@ METHOD( RemoveRemoteElements, void, (void* self, int dim, int nEls,
 METHOD( SetIncidence, void, (void* self, int fromDim, int fromEl, 
 			     int toDim, int nIncEls, const int* incEls ), 
 	(self, fromDim, fromEl, toDim, nIncEls, incEls) )
+METHOD( RemoveIncidence, void, (void* self, int fromDim, int toDim), 
+	(self, fromDim, toDim) )
 METHOD( InvertIncidence, void, (void* self, int fromDim, int toDim), 
 	(self, fromDim, toDim) )
-METHOD( SetGhostVertices, void, (void* self, int nGhosts, const int* globals), 
-	(self, nGhosts, ghosts) )
+METHOD( ExpandIncidence, void, (void* self, int dim), (self, dim) )
 METHOD( SetShadowDepth, void, (void* self, int depth), (self, depth) )
 METHOD( Clear, void, (void* self), (self) )
 METHOD( ClearDims, void, (void* self), (self) )
@@ -56,13 +59,14 @@ METHOD( GetIncidence, void, (const void* self, int fromDim, int fromEl,
 			     int toDim, int* nIncEls, const int** incEls), 
 	(self, fromDim, fromEl, toDim, nIncEls, incEls) )
 
+METHOD( PrintIncidence, void, (const void* self, int fromDim, int toDim), 
+	(self, fromDim, toDim) )
+
 MEMBER( int, nDims )
 MEMBER( int, nTDims )
 MEMBER( int, shadDepth )
 MEMBER( Comm*, comm )
 MEMBER( Decomp**, locals )
 MEMBER( Sync**, remotes )
-MEMBER( int, nGhosts )
-MEMBER( int*, ghosts )
 MEMBER( int***, nIncEls )
 MEMBER( int****, incEls )

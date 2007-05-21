@@ -39,6 +39,15 @@
 #include "StGermain/Base/Foundation/ClassDef.h"
 
 
+void MeshTopology_PickleIncidenceInit( MeshTopology* self, int dim, 
+				       int nEls, int* els, int* nBytes );
+void MeshTopology_PickleIncidence( MeshTopology* self, int dim, 
+				   int nEls, int* els, StgByte* bytes );
+void MeshTopology_UnpickleIncidence( MeshTopology* self, int dim, 
+				     int nBytes, StgByte* bytes );
+int MeshTopology_Cmp( const void* l, const void* r );
+
+
 void _MeshTopology_Construct( void* _self ) {
    MeshTopology* self = (MeshTopology*)_self;
 
@@ -49,8 +58,6 @@ void _MeshTopology_Construct( void* _self ) {
    self->comm = NULL;
    self->locals = NULL;
    self->remotes = NULL;
-   self->nGhosts = 0;
-   self->ghosts = NULL;
    self->nIncEls = NULL;
    self->incEls = NULL;
 }
@@ -144,6 +151,101 @@ void MeshTopology_SetDomain( void* _self, int dim, Sync* sync ) {
       self->locals[dim] = (Decomp*)Sync_GetDecomp( sync );
       NewClass_AddRef( self->locals[dim] );
    }
+}
+
+void MeshTopology_SetElements( void* _self, int dim, int nEls, 
+			       const int* globals )
+{
+   MeshTopology* self = (MeshTopology*)_self;
+   int rank;
+   int nNbrs;
+   const int *nbrs;
+   int nSubEls;
+   const int *subEls;
+   int rem, netRem;
+   int *nNbrEls, **nbrEls;
+   IArray** isects;
+   ISet localsObj, *locals = &localsObj;
+   ISet remotesObj, *remotes = &remotesObj;
+   int nCurEls, *curEls;
+   MPI_Comm mpiComm;
+   int n_i, e_i;
+
+   assert( self && dim < self->nTDims );
+   assert( !nEls || globals );
+   assert( self->comm );
+
+   Comm_GetNeighbours( self->comm, &nNbrs, &nbrs );
+   if( !nNbrs ) {
+      MeshTopology_SetLocalElements( self, dim, nEls, globals );
+      return;
+   }
+
+   ISet_Init( locals );
+   mpiComm = Comm_GetMPIComm( self->comm );
+   insist( MPI_Comm_rank( mpiComm, &rank ), == MPI_SUCCESS );
+   isects = Class_Array( self, IArray*, nNbrs );
+   for( n_i = 0; n_i < nNbrs; n_i++ )
+      isects[n_i] = IArray_New();
+
+   ISet_UseArray( locals, nEls, globals );
+   nSubEls = (nEls < 1000) ? nEls : 1000;
+   rem = nEls;
+   subEls = globals;
+   nNbrEls = Class_Array( self, int, nNbrs );
+   nbrEls = Class_Array( self, int*, nNbrs );
+   do {
+      Comm_AllgatherInit( self->comm, nSubEls, nNbrEls, sizeof(int) );
+      for( n_i = 0; n_i < nNbrs; n_i++ )
+	 nbrEls[n_i] = Class_Array( self, int, nNbrEls[n_i] );
+      Comm_AllgatherBegin( self->comm, subEls, (void**)nbrEls );
+      Comm_AllgatherEnd( self->comm );
+
+      for( n_i = 0; n_i < nNbrs; n_i++ ) {
+	 for( e_i = 0; e_i < nNbrEls[n_i]; e_i++ ) {
+	    if( ISet_Has( locals, nbrEls[n_i][e_i] ) )
+	       IArray_Append( isects[n_i], nbrEls[n_i][e_i] );
+	 }
+	 Class_Free( self, nbrEls[n_i] );
+      }
+
+      subEls += nSubEls;
+      rem -= nSubEls;
+      nSubEls = (rem < 1000) ? rem : 1000;
+      insist( MPI_Allreduce( &rem, &netRem, 1, MPI_INT, MPI_SUM, 
+			     mpiComm ), == MPI_SUCCESS );
+   } while( netRem );
+   Class_Free( self, nNbrEls );
+   Class_Free( self, nbrEls );
+
+   ISet_Init( remotes );
+   ISet_SetMaxSize( remotes, nEls );
+   for( n_i = 0; n_i < nNbrs; n_i++ ) {
+      IArray_GetArray( isects[n_i], &nCurEls, (const int**)&curEls );
+      if( nbrs[n_i] < rank ) {
+	 for( e_i = 0; e_i < nCurEls; e_i++ ) {
+	    ISet_TryRemove( locals, curEls[e_i] );
+	    ISet_TryInsert( remotes, curEls[e_i] );
+	 }
+      }
+      NewClass_Destruct( isects[n_i] );
+   }
+   Class_Free( self, isects );
+
+   nCurEls = ISet_GetSize( locals );
+   curEls = Class_Array( self, int, nCurEls );
+   ISet_GetArray( locals, curEls );
+   ISet_Destruct( locals );
+   qsort( curEls, nCurEls, sizeof(int), MeshTopology_Cmp );
+   MeshTopology_SetLocalElements( self, dim, nCurEls, curEls );
+   Class_Free( self, curEls );
+   nCurEls = ISet_GetSize( remotes );
+   curEls = Class_Array( self, int, nCurEls );
+   ISet_GetArray( remotes, curEls );
+   ISet_Destruct( remotes );
+   qsort( curEls, nCurEls, sizeof(int), MeshTopology_Cmp );
+   MeshTopology_SetRemoteElements( self, dim, nCurEls, curEls );
+   Class_Free( self, curEls );
 }
 
 void MeshTopology_SetLocalElements( void* _self, int dim, int nEls, 
@@ -247,7 +349,7 @@ void MeshTopology_AddRemoteElements( void* _self, int dim, int nEls,
    for( d_i = 0; d_i < self->nTDims; d_i++ ) {
       if( self->nIncEls[dim][d_i] ) {
 	 nDoms = Sync_GetNumDomains( self->remotes[dim] );;
-	 self->nIncEls[dim][d_i] = Class_Rearray( self, self->incEls[dim][d_i], 
+	 self->nIncEls[dim][d_i] = Class_Rearray( self, self->nIncEls[dim][d_i], 
 						  int, nDoms );
 	 self->incEls[dim][d_i] = Class_Rearray( self, self->incEls[dim][d_i], 
 						 int*, nDoms );
@@ -288,6 +390,24 @@ void MeshTopology_SetIncidence( void* _self, int fromDim, int fromEl,
    memcpy( self->incEls[fromDim][toDim][fromEl], incEls, nIncEls * sizeof(int) );
 }
 
+void MeshTopology_RemoveIncidence( void* _self, int fromDim, int toDim ) {
+   MeshTopology* self = (MeshTopology*)_self;
+   int nEls;
+   int e_i;
+
+   assert( self );
+   assert( fromDim < self->nTDims );
+   assert( toDim < self->nTDims );
+
+   nEls = Sync_GetNumDomains( self->remotes[fromDim] );
+   for( e_i = 0; e_i < nEls; e_i++ )
+      Class_Free( self, self->incEls[fromDim][toDim][e_i] );
+   Class_Free( self, self->incEls[fromDim][toDim] );
+   Class_Free( self, self->nIncEls[fromDim][toDim] );
+   self->incEls[fromDim][toDim] = NULL;
+   self->nIncEls[fromDim][toDim] = NULL;
+}
+
 void MeshTopology_InvertIncidence( void* _self, int fromDim, int toDim ) {
    MeshTopology* self = (MeshTopology*)_self;
    int fromSize, toSize;
@@ -302,91 +422,319 @@ void MeshTopology_InvertIncidence( void* _self, int fromDim, int toDim ) {
    nInvIncEls = self->nIncEls[toDim][fromDim];
    invIncEls = self->incEls[toDim][fromDim];
    nIncEls = Class_Array( self, int, fromSize );
-   incEls = Class_Array( self, int*, fromSize );
    memset( nIncEls, 0, fromSize * sizeof(int) );
    for( e_i = 0; e_i < toSize; e_i++ ) {
       for( inc_i = 0; inc_i < nInvIncEls[e_i]; inc_i++ )
 	 nIncEls[invIncEls[e_i][inc_i]]++;
    }
 
+   incEls = Class_Array( self, int*, fromSize );
    for( e_i = 0; e_i < fromSize; e_i++ )
       incEls[e_i] = Class_Array( self, int, nIncEls[e_i] );
    memset( nIncEls, 0, fromSize * sizeof(unsigned) );
    for( e_i = 0; e_i < toSize; e_i++ ) {
-      for( inc_i = 0; inc_i < nInvIncEls[e_i]; inc_i++ )
+      for( inc_i = 0; inc_i < nInvIncEls[e_i]; inc_i++ ) {
 	 elInd = invIncEls[e_i][inc_i];
-      incEls[elInd][nIncEls[elInd]++] = e_i;
+	 incEls[elInd][nIncEls[elInd]++] = e_i;
+      }
    }
 
    for( e_i = 0; e_i < fromSize; e_i++ ) {
-      MeshTopology_SetIncidence( self, fromDim, e_i, toDim, nIncEls[e_i], incEls[e_i] );
+      MeshTopology_SetIncidence( self, fromDim, e_i, toDim, 
+				 nIncEls[e_i], incEls[e_i] );
       Class_Free( self, incEls[e_i] );
    }
-   FreeArray( nIncEls );
-   FreeArray( incEls );
+   Class_Free( self, nIncEls );
+   Class_Free( self, incEls );
 }
 
-void MeshTopology_SetGhostVertices( void* _self, int nGhosts, const int* globals ) {
+void MeshTopology_ExpandIncidence( void* _self, int dim ) {
    MeshTopology* self = (MeshTopology*)_self;
+   ISet nbrSetObj, *nbrSet = &nbrSetObj;
+   int nEls;
+   int nCurNbrs, maxNbrs;
+   int nIncEls, *incEls;
+   int nUpEls, *upEls;
+   int e_i, inc_i, inc_j;
 
-   assert( self && (!nGhosts || globals) );
-   self->ghosts = Class_Rearray( self, self->ghosts, int, nGhosts );
-   memcpy( self->ghosts, globals, nGhosts * sizeof(int) );
-   self->nGhosts = nGhosts;
+   assert( self );
+   assert( dim < self->nTDims );
+   assert( dim > 0 );
+   assert( self->nIncEls[dim][0] );
+
+   nEls = Sync_GetNumDomains( self->remotes[dim] );
+   maxNbrs = 0;
+   for( e_i = 0; e_i < nEls; e_i++ ) {
+      nCurNbrs = 0;
+      nIncEls = self->nIncEls[dim][0][e_i];
+      incEls = self->incEls[dim][0][e_i];
+      for( inc_i = 0; inc_i < nIncEls; inc_i++ )
+	 nCurNbrs += self->nIncEls[0][dim][incEls[inc_i]];
+      if( nCurNbrs > maxNbrs )
+	 maxNbrs = nCurNbrs;
+   }
+
+   ISet_Init( nbrSet );
+   ISet_SetMaxSize( nbrSet, maxNbrs );
+   if( !self->nIncEls[dim][dim] ) {
+      self->nIncEls[dim][dim] = Class_Array( self, int, nEls );
+      memset( self->nIncEls[dim][dim], 0, nEls * sizeof(int) );
+   }
+   if( !self->incEls[dim][dim] ) {
+      self->incEls[dim][dim] = Class_Array( self, int*, nEls );
+      memset( self->incEls[dim][dim], 0, nEls * sizeof(int*) );
+   }
+   for( e_i = 0; e_i < nEls; e_i++ ) {
+      nIncEls = self->nIncEls[dim][0][e_i];
+      incEls = self->incEls[dim][0][e_i];
+      for( inc_i = 0; inc_i < nIncEls; inc_i++ ) {
+	 nUpEls = self->nIncEls[0][dim][incEls[inc_i]];
+	 upEls = self->incEls[0][dim][incEls[inc_i]];
+	 for( inc_j = 0; inc_j < nUpEls; inc_j++ ) {
+	    if( upEls[inc_j] == e_i )
+	       continue;
+	    ISet_TryInsert( nbrSet, upEls[inc_j] );
+	 }
+      }
+      self->nIncEls[dim][dim][e_i] = ISet_GetSize( nbrSet );
+      self->incEls[dim][dim][e_i] = 
+	 Class_Rearray( self, self->incEls[dim][dim][e_i], int, 
+			self->nIncEls[dim][dim][e_i] );
+      ISet_GetArray( nbrSet, self->incEls[dim][dim][e_i] );
+      ISet_Clear( nbrSet );
+   }
+   ISet_Destruct( nbrSet );
 }
 
 void MeshTopology_SetShadowDepth( void* _self, int depth ) {
-#if 0
    MeshTopology* self = (MeshTopology*)_self;
-   int nLocals;
-   const int* locals;
+   int nNbrs, nDims;
+   Sync* vertSync;
+   ISet ghostSetObj, *ghostSet = &ghostSetObj;
+   ISet mySetObj, *mySet = &mySetObj;
+   IArray* isects;
+   int nGhosts, *ghosts;
+   int nLocals, nRemotes;
+   const int* locals, *remotes;
+   int *nNbrGhosts, **nbrGhosts;
+   int *nBytes, *nRecvBytes;
+   StgByte **bytes, **recvBytes;
+   int nIncEls, *incEls;
+   int *nLowEls, **lowEls;
+   int *nShdEls, **shdEls;
+   int el, dom;
+   int n_i, s_i, l_i, inc_i;
+   int v_i, g_i, e_i, d_i;
 
    assert( self && depth >= 0 );
-   assert( self->comm );
+   assert( self->comm && self->nTDims );
 
+   /* Build ghost set. */
+   nDims = self->nDims;
    nNbrs = Comm_GetNumNeighbours( self->comm );
-   nNbrGhosts = Class_Array( self, int, nNbrs );
-   nbrGhosts = Class_Array( self, int*, nNbrs );
-   Comm_AllgatherInit( self->comm, self->nGhosts, nNbrGhosts, sizeof(int) );
+   vertSync = self->remotes[0];
+   nGhosts = 0;
    for( n_i = 0; n_i < nNbrs; n_i++ )
-      nbrGhosts[n_i] = Class_Array( self, int, nNbrGhosts[n_i] );
-   Comm_AllgatherBegin( self->comm, self->ghosts, nbrGhosts );
-   Comm_AllgatherEnd( self->comm );
-
-   ISet_Init( locSet );
+      nGhosts += vertSync->nSnks[n_i] + vertSync->nSrcs[n_i];
    ISet_Init( ghostSet );
-   ISet_Init( isect );
-   Decomp_GetLocals( self->locals[0], &nLocals, &locals );
-   ISet_UseArray( locSet, nLocals, locals );
+   ISet_SetMaxSize( ghostSet, nGhosts );
    for( n_i = 0; n_i < nNbrs; n_i++ ) {
-      ISet_UseArray( ghostSet, nNbrGhosts[n_i], nbrGhosts[n_i] );
-      Class_Free( self, nbrGhosts[n_i] );
-      ISet_Isect( locSet, ghostSet, isect );
-      ISet_Clear( ghostSet );
-      nNbrGhosts[n_i] = ISet_GetSize( isect );
-      nbrGhosts[n_i] = Class_Array( self, int, nNbrGhosts[n_i] );
-      ISet_GetArray( isect, nNbrGhosts + n_i, nbrGhosts[n_i] );
-      ISet_Clear( isect );
+      for( s_i = 0; s_i < vertSync->nSnks[n_i]; s_i++ ) {
+	 el = Decomp_LocalToGlobal( self->locals[0], 
+				    vertSync->snks[n_i][s_i] );
+	 ISet_TryInsert( ghostSet, el );
+      }
+      for( s_i = 0; s_i < vertSync->nSrcs[n_i]; s_i++ ) {
+	 el = Sync_RemoteToGlobal( vertSync, vertSync->srcs[n_i][s_i] );
+	 ISet_TryInsert( ghostSet, el );
+      }
    }
-   ISet_Destruct( locSet );
+   nGhosts = ISet_GetSize( ghostSet );
+   ghosts = Class_Array( self, int, nGhosts );
+   ISet_GetArray( ghostSet, ghosts );
    ISet_Destruct( ghostSet );
 
+   /* Gather neighbouring ghost sets. */
+   nNbrGhosts = Class_Array( self, int, nNbrs );
+   nbrGhosts = Class_Array( self, int*, nNbrs );
+   Comm_AllgatherInit( self->comm, nGhosts, nNbrGhosts, sizeof(int) );
+   for( n_i = 0; n_i < nNbrs; n_i++ )
+      nbrGhosts[n_i] = Class_Array( self, int, nNbrGhosts[n_i] );
+   Comm_AllgatherBegin( self->comm, ghosts, (void**)nbrGhosts );
+   Comm_AllgatherEnd( self->comm );
+   Class_Free( self, ghosts );
+
+   /* Build intersections. */
+   ISet_Init( mySet );
+   ISet_SetMaxSize( mySet, Sync_GetNumDomains( vertSync ) );
+   Decomp_GetLocals( self->locals[0], &nLocals, &locals );
+   for( l_i = 0; l_i < nLocals; l_i++ )
+      ISet_Insert( mySet, locals[l_i] );
+   Sync_GetRemotes( self->remotes[0], &nRemotes, &remotes );
+   for( l_i = 0; l_i < nRemotes; l_i++ )
+      ISet_Insert( mySet, remotes[l_i] );
+   isects = Class_Array( self, IArray, nNbrs );
    for( n_i = 0; n_i < nNbrs; n_i++ ) {
-      for( v_i = 0; v_i < nNbrGhosts[n_i]; v_i++ ) {
-	 insist( Decomp_GlobalToLocal( self->locals[0], nbrGhosts[n_i][v_i], &loc ) );
-	 for( inc_i = 0; inc_i < self->nIncEls[0][nDims][loc]; inc_i++ )
-	    ISet_TryInsert( isect, self->incEls[0][nDims][loc][inc_i] );
+      IArray_Init( isects + n_i );
+      for( g_i = 0; g_i < nNbrGhosts[n_i]; g_i++ ) {
+	 if( ISet_Has( mySet, nbrGhosts[n_i][g_i] ) )
+	    IArray_Append( isects + n_i, nbrGhosts[n_i][g_i] );
       }
-      nNbrGhosts[n_i] = ISet_GetSize( isect );
-      nbrGhosts[n_i] = Class_Rearray( self, nbrGhosts[n_i], int, nNbrGhosts[n_i] );
-      ISet_GetArray( isect, nNbrGhosts + n_i, nbrGhosts[n_i] );
-      for( s_i = 0; s_i < depth - 1; s_i++ )
-	 MeshTopology_ExpandShadows( self, nNbrGhosts + n_i, nbrGhosts + n_i, isect );
-      ISet_Clear( isect );
+      Class_Free( self, nbrGhosts[n_i] );
    }
 
-   Comm_AlltoallInit( self->comm, nNbr);
-#endif
+   /* Convert vertices to shadowed elements. */
+   ISet_Clear( mySet );
+   ISet_SetMaxSize( mySet, Decomp_GetNumLocals( self->locals[self->nDims] ) );
+   for( n_i = 0; n_i < nNbrs; n_i++ ) {
+      IArray_GetArray( isects + n_i, nNbrGhosts + n_i, 
+		       (const int**)(nbrGhosts + n_i) );
+      for( v_i = 0; v_i < nNbrGhosts[n_i]; v_i++ ) {
+	 dom = Sync_GlobalToDomain( vertSync, nbrGhosts[n_i][v_i] );
+	 for( inc_i = 0; inc_i < self->nIncEls[0][nDims][dom]; inc_i++ ) {
+	    el = self->incEls[0][nDims][dom][inc_i];
+	    if( el < Decomp_GetNumLocals( self->locals[nDims] ) ) {
+	       el = Decomp_LocalToGlobal( self->locals[nDims], el );
+	       ISet_TryInsert( mySet, el );
+	    }
+	 }
+      }
+      IArray_Destruct( isects + n_i );
+      nNbrGhosts[n_i] = ISet_GetSize( mySet );
+      nbrGhosts[n_i] = Class_Array( self, int, nNbrGhosts[n_i] );
+      ISet_GetArray( mySet, nbrGhosts[n_i] );
+      ISet_Clear( mySet );
+   }
+   Class_Free( self, isects );
+   ISet_SetMaxSize( mySet, 0 );
+
+   /* Transfer elements. */
+   nShdEls = Class_Array( self, int, nNbrs );
+   shdEls = Class_Array( self, int*, nNbrs );
+   Comm_AlltoallInit( self->comm, nNbrGhosts, nShdEls, sizeof(int) );
+   for( n_i = 0; n_i < nNbrs; n_i++ )
+      shdEls[n_i] = Class_Array( self, int, nShdEls[n_i] );
+   Comm_AlltoallBegin( self->comm, (const void**)nbrGhosts, (void**)shdEls );
+   Comm_AlltoallEnd( self->comm );
+   dom = 0;
+   for( n_i = 0; n_i < nNbrs; n_i++ )
+      dom += nShdEls[n_i];
+   ISet_SetMaxSize( mySet, dom );
+   for( n_i = 0; n_i < nNbrs; n_i++ ) {
+      for( e_i = 0; e_i < nShdEls[n_i]; e_i++ )
+	 ISet_Insert( mySet, shdEls[n_i][e_i] );
+      Class_Free( self, shdEls[n_i] );
+   }
+   nShdEls[0] = ISet_GetSize( mySet );
+   shdEls[0] = Class_Array( self, int, nShdEls[0] );
+   ISet_GetArray( mySet, shdEls[0] );
+   ISet_Clear( mySet );
+   ISet_SetMaxSize( mySet, 0 );
+   qsort( shdEls[0], nShdEls[0], sizeof(int), MeshTopology_Cmp );
+   MeshTopology_AddRemoteElements( self, nDims, nShdEls[0], shdEls[0] );
+   Class_Free( self, shdEls[0] );
+
+   /* Transfer lower level shadowed elements. */
+   for( n_i = 0; n_i < nNbrs; n_i++ ) {
+      for( e_i = 0; e_i < nNbrGhosts[n_i]; e_i++ ) {
+	 nbrGhosts[n_i][e_i] = Decomp_GlobalToLocal( self->locals[nDims], 
+						     nbrGhosts[n_i][e_i] );
+      }
+   }
+   nLowEls = Class_Array( self, int, nNbrs );
+   lowEls = Class_Array( self, int*, nNbrs );
+   for( d_i = nDims - 1; d_i >= 0; d_i-- ) {
+     if( !self->nIncEls[nDims][d_i] )
+	 continue;
+      ISet_SetMaxSize( mySet, Decomp_GetNumLocals( self->locals[d_i] ) );
+      for( n_i = 0; n_i < nNbrs; n_i++ ) {
+	 for( e_i = 0; e_i < nNbrGhosts[n_i]; e_i++ ) {
+	    nIncEls = self->nIncEls[nDims][d_i][nbrGhosts[n_i][e_i]];
+	    incEls = self->incEls[nDims][d_i][nbrGhosts[n_i][e_i]];
+	    for( inc_i = 0; inc_i < nIncEls; inc_i++ ) {
+	       if( incEls[inc_i] >= Decomp_GetNumLocals( self->locals[d_i] ) )
+		  continue;
+	       el = Decomp_LocalToGlobal( self->locals[d_i], incEls[inc_i] );
+	       ISet_TryInsert( mySet, el );
+	    }
+	 }
+	 nLowEls[n_i] = ISet_GetSize( mySet );
+	 lowEls[n_i] = Class_Array( self, int, nLowEls[n_i] );
+	 ISet_GetArray( mySet, lowEls[n_i] );
+	 ISet_Clear( mySet );
+      }
+
+      Comm_AlltoallInit( self->comm, nLowEls, nShdEls, sizeof(int) );
+      for( n_i = 0; n_i < nNbrs; n_i++ )
+	 shdEls[n_i] = Class_Array( self, int, nShdEls[n_i] );
+      Comm_AlltoallBegin( self->comm, (const void**)lowEls, (void**)shdEls );
+      Comm_AlltoallEnd( self->comm );
+      for( n_i = 0; n_i < nNbrs; n_i++ )
+	 Class_Free( self, lowEls[n_i] );
+
+      dom = 0;
+      for( n_i = 0; n_i < nNbrs; n_i++ )
+	 dom += nShdEls[n_i];
+      ISet_SetMaxSize( mySet, dom );
+      for( n_i = 0; n_i < nNbrs; n_i++ ) {
+	 for( s_i = 0; s_i < nShdEls[n_i]; s_i++ ) {
+	    if( !Sync_TryGlobalToDomain( self->remotes[d_i], 
+					 shdEls[n_i][s_i], &el ) )
+	    {
+	       ISet_Insert( mySet, shdEls[n_i][s_i] );
+	    }
+	 }
+	 Class_Free( self, shdEls[n_i] );
+      }
+      nShdEls[0] = ISet_GetSize( mySet );
+      shdEls[0] = Class_Array( self, int, nShdEls[0] );
+      ISet_GetArray( mySet, shdEls[0] );
+      ISet_Clear( mySet );
+      qsort( shdEls[0], nShdEls[0], sizeof(int), MeshTopology_Cmp );
+      MeshTopology_AddRemoteElements( self, d_i, nShdEls[0], shdEls[0] );
+      Class_Free( self, shdEls[0] );
+   }
+   ISet_Destruct( mySet );
+   Class_Free( self, lowEls );
+   Class_Free( self, nLowEls );
+   Class_Free( self, shdEls );
+   Class_Free( self, nShdEls );
+
+   /* Transfer shadowed incidence. */
+   nBytes = Class_Array( self, int, nNbrs );
+   bytes = Class_Array( self, StgByte*, nNbrs );
+   for( n_i = 0; n_i < nNbrs; n_i++ ) {
+      MeshTopology_PickleIncidenceInit( self, self->nDims, 
+					nNbrGhosts[n_i], nbrGhosts[n_i], 
+					nBytes + n_i );
+      bytes[n_i] = Class_Array( self, StgByte, nBytes[n_i] );
+      MeshTopology_PickleIncidence( self, self->nDims, 
+				    nNbrGhosts[n_i], nbrGhosts[n_i], 
+				    bytes[n_i] );
+      Class_Free( self, nbrGhosts[n_i] );
+   }
+   Class_Free( self, nbrGhosts );
+   Class_Free( self, nNbrGhosts );
+
+   nRecvBytes = Class_Array( self, int, nNbrs );
+   recvBytes = Class_Array( self, StgByte*, nNbrs );
+   Comm_AlltoallInit( self->comm, nBytes, nRecvBytes, sizeof(StgByte) );
+   for( n_i = 0; n_i < nNbrs; n_i++ )
+      recvBytes[n_i] = Class_Array( self, StgByte, nRecvBytes[n_i] );
+   Comm_AlltoallBegin( self->comm, (const void**)bytes, (void**)recvBytes );
+   Comm_AlltoallEnd( self->comm );
+   for( n_i = 0; n_i < nNbrs; n_i++ )
+      Class_Free( self, bytes[n_i] );
+   Class_Free( self, nBytes );
+   Class_Free( self, bytes );
+
+   for( n_i = 0; n_i < nNbrs; n_i++ ) {
+      MeshTopology_UnpickleIncidence( self, self->nDims, 
+				      nRecvBytes[n_i], recvBytes[n_i] );
+      Class_Free( self, recvBytes[n_i] );
+   }
+   Class_Free( self, recvBytes );
+   Class_Free( self, nRecvBytes );
 }
 
 void MeshTopology_Clear( void* self ) {
@@ -442,7 +790,7 @@ void MeshTopology_ClearIncidence( void* _self ) {
    for( d_i = 0; d_i < self->nTDims; d_i++ ) {
       for( d_j = 0; d_j < self->nTDims; d_j++ ) {
 	 if( self->nIncEls[d_i][d_j] ) {
-	    for( e_i = 0; e_i < Decomp_GetNumLocals( self->locals[d_i] ); e_i++ )
+	    for( e_i = 0; e_i < Sync_GetNumDomains( self->remotes[d_i] ); e_i++ )
 	       Class_Free( self, self->incEls[d_i][d_j][e_i] );
 	    Class_Free( self, self->incEls[d_i][d_j] );
 	    Class_Free( self, self->nIncEls[d_i][d_j] );
@@ -500,4 +848,142 @@ void MeshTopology_GetIncidence( const void* self, int fromDim, int fromEl,
    assert( fromEl < Sync_GetNumDomains( ((MeshTopology*)self)->remotes[fromDim] ) );
    *nIncEls = ((MeshTopology*)self)->nIncEls[fromDim][toDim][fromEl];
    *incEls = ((MeshTopology*)self)->incEls[fromDim][toDim][fromEl];
+}
+
+void MeshTopology_PrintIncidence( const void* _self, int fromDim, int toDim ) {
+   MeshTopology* self = (MeshTopology*)_self;
+   int nEls, global;
+   int nIncEls, *incEls;
+   int e_i, inc_i;
+
+   assert( self );
+   assert( toDim < self->nTDims );
+   assert( fromDim < self->nTDims );
+
+   nEls = Sync_GetNumDomains( self->remotes[fromDim] );
+   printf( "Printing incidence for %d elements:\n", nEls );
+   for( e_i = 0; e_i < nEls; e_i++ ) {
+      global = Sync_DomainToGlobal( self->remotes[fromDim], e_i );
+      nIncEls = self->nIncEls[fromDim][toDim][e_i];
+      incEls = self->incEls[fromDim][toDim][e_i];
+      printf( "   %d, %d incident elements:\n", global, nIncEls );
+      for( inc_i = 0; inc_i < nIncEls; inc_i++ ) {
+	 printf( "      %d\n", incEls[inc_i] );
+      }
+   }
+}
+
+void MeshTopology_PickleIncidenceInit( MeshTopology* self, int dim, 
+				       int nEls, int* els, int* nBytes )
+{
+   int size;
+   int d_i, e_i;
+
+   assert( self );
+   assert( dim < self->nTDims );
+   assert( !nEls || els );
+   assert( nBytes );
+
+   size = 1;
+   for( e_i = 0; e_i < nEls; e_i++ ) {
+      size += 1;
+      for( d_i = 0; d_i < dim; d_i++ ) {
+	 size += 1;
+	 if( self->nIncEls[dim][d_i] )
+	    size += self->nIncEls[dim][d_i][els[e_i]];
+      }
+   }
+   *nBytes = size * sizeof(int);
+}
+
+void MeshTopology_PickleIncidence( MeshTopology* self, int dim, 
+				   int nEls, int* els, 
+				   StgByte* bytes )
+{
+   Sync* sync;
+   int curEntry, *entries;
+   int nIncEls, *incEls;
+   int inc_i, d_i, e_i;
+
+   assert( self );
+   assert( dim < self->nTDims );
+   assert( !nEls || els );
+   assert( bytes );
+
+   sync = self->remotes[dim];
+   entries = (int*)bytes;
+   entries[0] = nEls;
+   curEntry = 1;
+   for( e_i = 0; e_i < nEls; e_i++ ) {
+      entries[curEntry++] = Sync_DomainToGlobal( sync, els[e_i] );
+      for( d_i = 0; d_i < dim; d_i++ ) {
+	 if( !self->nIncEls[dim][d_i] ) {
+	    entries[curEntry++] = 0;
+	    continue;
+	 }
+	 nIncEls = self->nIncEls[dim][d_i][els[e_i]];
+	 entries[curEntry++] = nIncEls;
+	 incEls = self->incEls[dim][d_i][els[e_i]];
+	 for( inc_i = 0; inc_i < nIncEls; inc_i++ ) {
+	    entries[curEntry++] = Sync_DomainToGlobal( self->remotes[d_i], 
+						       incEls[inc_i] );
+	 }
+      }
+   }
+}
+
+void MeshTopology_UnpickleIncidence( MeshTopology* self, int dim, 
+				     int nBytes, StgByte* bytes )
+{
+   Sync* sync;
+   int nEls, el;
+   int nIncEls, **incEls;
+   int curEntry, *entries;
+   int inc_i, e_i, d_i;
+
+   assert( self );
+   assert( dim < self->nTDims );
+   assert( nBytes && bytes );
+
+   sync = self->remotes[dim];
+   entries = (int*)bytes;
+   nEls = entries[0];
+   curEntry = 1;
+   for( e_i = 0; e_i < nEls; e_i++ ) {
+      el = Sync_GlobalToDomain( sync, entries[curEntry++] );
+      for( d_i = 0; d_i < dim; d_i++ ) {
+	 nIncEls = entries[curEntry++];
+	 if( !self->nIncEls[dim][d_i] ) {
+	    if( !nIncEls )
+	       continue;
+	    self->nIncEls[dim][d_i] = Class_Array( self, int, 
+						   Sync_GetNumDomains( sync ) );
+	    memset( self->nIncEls[dim][d_i], 0, 
+		    sizeof(int) * Sync_GetNumDomains( sync ) );
+	 }
+	 self->nIncEls[dim][d_i][el] = nIncEls;
+	 if( !nIncEls ) {
+	    if( self->incEls[dim][d_i] )
+	       Class_Free( self, self->incEls[dim][d_i][el] );
+	    continue;
+	 }
+	 if( !self->incEls[dim][d_i] ) {
+	    self->incEls[dim][d_i] = Class_Array( self, int*, 
+						  Sync_GetNumDomains( sync ) );
+	    memset( self->incEls[dim][d_i], 0, 
+		    Sync_GetNumDomains( sync ) * sizeof(int*) );
+	 }
+	 incEls = self->incEls[dim][d_i];
+	 incEls[el] = Class_Rearray( self, incEls[el], int, nIncEls );
+	 for( inc_i = 0; inc_i < nIncEls; inc_i++ ) {
+	    incEls[el][inc_i] = Sync_GlobalToDomain( self->remotes[d_i], 
+						     entries[curEntry++] );
+	 }
+      }
+   }
+}
+
+int MeshTopology_Cmp( const void* l, const void* r ) {
+   assert( *(int*)l != *(int*)r );
+   return (*(int*)l < *(int*)r) ? -1 : 1;
 }

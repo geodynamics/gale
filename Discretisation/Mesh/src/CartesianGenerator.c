@@ -517,7 +517,9 @@ void _CartesianGenerator_GenVertices( void* meshGenerator, MeshTopology* topo, G
 	for( d_i = 1; d_i < grid->nDims; d_i++ )
 		nEls *= grid->sizes[d_i];
 	locals = Memory_Alloc_Array_Unnamed( unsigned, nEls );
+/*
 	remotes = Memory_Alloc_Array_Unnamed( unsigned, nEls );
+*/
 
 	dimInds = Memory_Alloc_Array_Unnamed( unsigned, self->elGrid->nDims );
 	rankInds = Memory_Alloc_Array_Unnamed( unsigned, self->elGrid->nDims );
@@ -527,6 +529,7 @@ void _CartesianGenerator_GenVertices( void* meshGenerator, MeshTopology* topo, G
 	nRemotes = 0;
 	for( e_i = 0; e_i < nEls; e_i++ ) {
 		Grid_Lift( grid, e_i, dimInds );
+/*
 		for( d_i = 0; d_i < grid->nDims; d_i++ ) {
 			if( dimInds[d_i] == 0 && rankInds[d_i] > 0 )
 				break;
@@ -536,9 +539,12 @@ void _CartesianGenerator_GenVertices( void* meshGenerator, MeshTopology* topo, G
 			dstCount = &nRemotes;
 		}
 		else {
+*/
 			dstArray = locals;
 			dstCount = &nLocals;
+/*
 		}
+*/
 
 		for( d_i = 0; d_i < grid->nDims; d_i++ )
 			dimInds[d_i] += self->vertOrigin[d_i];
@@ -546,10 +552,15 @@ void _CartesianGenerator_GenVertices( void* meshGenerator, MeshTopology* topo, G
 		dstArray[(*dstCount)++] = Grid_Project( globalGrid, dimInds );
 	}
 
+/*
 	MeshTopology_SetLocalElements( topo, 0, nLocals, locals );
 	MeshTopology_SetRemoteElements( topo, 0, nRemotes, remotes );
+*/
+	MeshTopology_SetElements( topo, 0, nLocals, locals );
 	FreeArray( locals );
+/*
 	FreeArray( remotes );
+*/
 	FreeArray( dimInds );
 	FreeArray( rankInds );
 	FreeObject( grid );
@@ -1533,24 +1544,20 @@ void CartesianGenerator_GenTopo( CartesianGenerator* self, MeshTopology* topo ) 
 		}
 	}
 
-#if 0
 	/* Set the shadow depth and correct incidence. */
 	comm = MeshTopology_GetComm( topo );
-	if( self->shadowDepth && Comm_GetNumNeighbours( commTopo ) > 0 ) {
+	if( self->shadowDepth && Comm_GetNumNeighbours( comm ) > 0 ) {
 		/* Build enough incidence to set shadow depth. */
 		MeshTopology_InvertIncidence( topo, MT_VERTEX, topo->nDims );
-		MeshTopology_Neighbourhood( topo, topo->nDims );
+		MeshTopology_ExpandIncidence( topo, topo->nDims );
 
 		/* Set the shadow depth. */
 		MeshTopology_SetShadowDepth( topo, self->shadowDepth );
 
 		/* Kill up relations and neighbours. */
-		KillArray( topo->nIncEls[topo->nDims][topo->nDims] );
-		KillArray2D( topo->domains[topo->nDims]->nDomains, topo->incEls[topo->nDims][topo->nDims] );
-		KillArray( topo->nIncEls[MT_VERTEX][topo->nDims] );
-		KillArray2D( topo->domains[MT_VERTEX]->nDomains, topo->incEls[MT_VERTEX][topo->nDims] );
+		MeshTopology_RemoveIncidence( topo, topo->nDims, topo->nDims );
+		MeshTopology_RemoveIncidence( topo, 0, topo->nDims );
 	}
-#endif
 
 	/* Complete all required relations. */
 	for( d_i = 0; d_i < self->nDims; d_i++ ) {
@@ -1796,7 +1803,7 @@ void CartesianGenerator_CompleteVertexNeighbours( CartesianGenerator* self, Mesh
 		if( inds[0] > 0 ) {
 			inds[0]--;
 			domain = Grid_Project( grids[0][0], inds );
-			if( Sync_GlobalToDomain( sync, domain, &domain ) ) {
+			if( Sync_TryGlobalToDomain( sync, domain, &domain ) ) {
 				nbrs[v_i][nNbrs[v_i]] = domain;
 				nNbrs[v_i]++;
 			}
@@ -1806,7 +1813,7 @@ void CartesianGenerator_CompleteVertexNeighbours( CartesianGenerator* self, Mesh
 		if( inds[0] < grids[0][0]->sizes[0] - 1 ) {
 			inds[0]++;
 			domain = Grid_Project( grids[0][0], inds );
-			if( Sync_GlobalToDomain( sync, domain, &domain ) ) {
+			if( Sync_TryGlobalToDomain( sync, domain, &domain ) ) {
 				nbrs[v_i][nNbrs[v_i]] = domain;
 				nNbrs[v_i]++;
 			}
@@ -1817,7 +1824,7 @@ void CartesianGenerator_CompleteVertexNeighbours( CartesianGenerator* self, Mesh
 			if( inds[1] > 0 ) {
 				inds[1]--;
 				domain = Grid_Project( grids[0][0], inds );
-				if( Sync_GlobalToDomain( sync, domain, &domain ) ) {
+				if( Sync_TryGlobalToDomain( sync, domain, &domain ) ) {
 					nbrs[v_i][nNbrs[v_i]] = domain;
 					nNbrs[v_i]++;
 				}
@@ -1827,7 +1834,7 @@ void CartesianGenerator_CompleteVertexNeighbours( CartesianGenerator* self, Mesh
 			if( inds[1] < grids[0][0]->sizes[1] - 1 ) {
 				inds[1]++;
 				domain = Grid_Project( grids[0][0], inds );
-				if( Sync_GlobalToDomain( sync, domain, &domain ) ) {
+				if( Sync_TryGlobalToDomain( sync, domain, &domain ) ) {
 					nbrs[v_i][nNbrs[v_i]] = domain;
 					nNbrs[v_i]++;
 				}
@@ -1838,7 +1845,7 @@ void CartesianGenerator_CompleteVertexNeighbours( CartesianGenerator* self, Mesh
 				if( inds[2] > 0 ) {
 					inds[2]--;
 					domain = Grid_Project( grids[0][0], inds );
-					if( Sync_GlobalToDomain( sync, domain, &domain ) ) {
+					if( Sync_TryGlobalToDomain( sync, domain, &domain ) ) {
 						nbrs[v_i][nNbrs[v_i]] = domain;
 						nNbrs[v_i]++;
 					}
@@ -1848,7 +1855,7 @@ void CartesianGenerator_CompleteVertexNeighbours( CartesianGenerator* self, Mesh
 				if( inds[2] < grids[0][0]->sizes[2] - 1 ) {
 					inds[2]++;
 					domain = Grid_Project( grids[0][0], inds );
-					if( Sync_GlobalToDomain( sync, domain, &domain ) ) {
+					if( Sync_TryGlobalToDomain( sync, domain, &domain ) ) {
 						nbrs[v_i][nNbrs[v_i]] = domain;
 						nNbrs[v_i]++;
 					}
@@ -1880,7 +1887,7 @@ void CartesianGenerator_MapToDomain( CartesianGenerator* self, Sync* sync,
 	assert( incEls );
 
 	for( inc_i = 0; inc_i < nIncEls; inc_i++ )
-		insist( Sync_GlobalToDomain( sync, incEls[inc_i], incEls + inc_i ), == True );
+		incEls[inc_i] = Sync_GlobalToDomain( sync, incEls[inc_i] );
 }
 
 void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh ) {

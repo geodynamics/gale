@@ -37,13 +37,16 @@ METHOD( GetSharers, void, (const void* self, int shared,
 	(self, shared, nSharers, sharers) )
 
 METHOD( RemoteToGlobal, int, (const void* self, int remote), (self, remote) )
-METHOD( GlobalToRemote, Bool, (const void* self, int global, int* remote), 
+METHOD( GlobalToRemote, int, (const void* self, int global), (self, global) )
+METHOD( TryGlobalToRemote, Bool, (const void* self, int global, int* remote), 
 	(self, global, remote) )
 METHOD( DomainToGlobal, int, (const void* self, int domain), (self, domain) )
-METHOD( GlobalToDomain, Bool, (const void* self, int global, int* domain), 
+METHOD( GlobalToDomain, int, (const void* self, int global), (self, global) )
+METHOD( TryGlobalToDomain, Bool, (const void* self, int global, int* domain), 
 	(self, global, domain) )
 METHOD( SharedToLocal, int, (const void* self, int shared), (self, shared) )
-METHOD( LocalToShared, Bool, (const void* self, int local, int* shared), 
+METHOD( LocalToShared, int, (const void* self, int local), (self, global) )
+METHOD( TryLocalToShared, Bool, (const void* self, int local, int* shared), 
 	(self, global, shared) )
 METHOD( SyncArray, void, (const void* self, 
 			  const void* local, size_t localStride, 

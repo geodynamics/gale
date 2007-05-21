@@ -138,13 +138,15 @@ void Sync_SetRemotes( void* _self, int nRemotes, const int* remotes ) {
 
 void Sync_AddRemotes( void* _self, int nRemotes, const int* remotes ) {
    Sync* self = (Sync*)_self;
+   int nOldRems;
    int r_i;
 
    assert( self && self->decomp && self->comm );
+   nOldRems = IArray_GetSize( self->remotes );
    IMap_SetMaxSize( self->gr, IArray_GetSize( self->remotes ) + nRemotes );
    IArray_Add( self->remotes, nRemotes, remotes );
    for( r_i = 0; r_i < nRemotes; r_i++ )
-      IMap_Insert( self->gr, remotes[r_i], r_i );
+      IMap_Insert( self->gr, remotes[r_i], nOldRems + r_i );
    Sync_UpdateTables( self );
    Sync_UpdateShared( self );
    Sync_UpdateOwners( self );
@@ -283,8 +285,14 @@ int Sync_RemoteToGlobal( const void* self, int remote ) {
    return IArray_GetPtr( ((Sync*)self)->remotes )[remote];
 }
 
-Bool Sync_GlobalToRemote( const void* self, int global, int* remote ) {
+int Sync_GlobalToRemote( const void* self, int global ) {
    assert( self && global < Decomp_GetNumGlobals( ((Sync*)self)->decomp ) );
+   return IMap_Map( ((Sync*)self)->gr, global );
+}
+
+Bool Sync_TryGlobalToRemote( const void* self, int global, int* remote ) {
+   assert( self && remote );
+   assert( global < Decomp_GetNumGlobals( ((Sync*)self)->decomp ) );
    return IMap_TryMap( ((Sync*)self)->gr, global, remote );
 }
 
@@ -300,8 +308,23 @@ int Sync_DomainToGlobal( const void* self, int domain ) {
    }
 }
 
-Bool Sync_GlobalToDomain( const void* self, int global, int* domain ) {
+int Sync_GlobalToDomain( const void* self, int global ) {
+  int domain;
+
    assert( self );
+   assert( global < Decomp_GetNumGlobals( ((Sync*)self)->decomp ) );
+   if( !Decomp_TryGlobalToLocal( ((Sync*)self)->decomp, global, &domain ) ) {
+      if( !IMap_Has( ((Sync*)self)->gr, global ) )
+	 abort();
+      return IMap_Map( ((Sync*)self)->gr, global ) + 
+	 Decomp_GetNumLocals( ((Sync*)self)->decomp );
+   }
+   else
+      return domain;
+}
+
+Bool Sync_TryGlobalToDomain( const void* self, int global, int* domain ) {
+   assert( self && domain );
    assert( global < Decomp_GetNumGlobals( ((Sync*)self)->decomp ) );
    if( !Decomp_TryGlobalToLocal( ((Sync*)self)->decomp, global, domain ) ) {
       if( IMap_TryMap( ((Sync*)self)->gr, global, domain ) ) {
@@ -320,7 +343,12 @@ int Sync_SharedToLocal( const void* self, int shared ) {
    return ((Sync*)self)->shared[shared];
 }
 
-Bool Sync_LocalToShared( const void* self, int local, int* shared ) {
+int Sync_LocalToShared( const void* self, int local ) {
+   assert( self && local < Decomp_GetNumLocals( ((Sync*)self)->decomp ) );
+   return IMap_Map( ((Sync*)self)->ls, local );
+}
+
+Bool Sync_TryLocalToShared( const void* self, int local, int* shared ) {
    assert( self && local < Decomp_GetNumLocals( ((Sync*)self)->decomp ) );
    assert( shared );
    return IMap_TryMap( ((Sync*)self)->ls, local, shared );
@@ -427,8 +455,8 @@ void Sync_UpdateTables( Sync* self ) {
 
    for( n_i = 0; n_i < nNbrs; n_i++ ) {
       for( s_i = 0; s_i < self->nSrcs[n_i]; s_i++ ) {
-	 insist( Sync_GlobalToRemote( self, self->srcs[n_i][s_i], 
-				      self->srcs[n_i] + s_i ), == True );
+	 self->srcs[n_i][s_i] = Sync_GlobalToRemote( self, 
+						     self->srcs[n_i][s_i] ); 
       }
       for( s_i = 0; s_i < self->nSnks[n_i]; s_i++ ) {
 	 self->snks[n_i][s_i] = Decomp_GlobalToLocal( self->decomp, 
@@ -449,6 +477,7 @@ void Sync_UpdateShared( Sync* self ) {
 
    nNbrs = Comm_GetNumNeighbours( self->comm );
    ISet_Init( sharedSet );
+   ISet_SetMaxSize( sharedSet, Decomp_GetNumLocals( self->decomp ) );
    for( n_i = 0; n_i < nNbrs; n_i++ ) {
       for( s_i = 0; s_i < self->nSnks[n_i]; s_i++ )
 	 ISet_TryInsert( sharedSet, self->snks[n_i][s_i] );
@@ -541,8 +570,6 @@ void Sync_ClearShared( Sync* self ) {
 }
 
 void Sync_ClearOwners( Sync* self ) {
-   int s_i;
-
    assert( self );
    Class_Free( self, self->owners );
    self->owners = NULL;

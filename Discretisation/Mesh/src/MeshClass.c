@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: MeshClass.c 4100 2007-05-16 01:07:26Z LukeHodkinson $
+** $Id: MeshClass.c 4115 2007-05-21 00:28:33Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -326,7 +326,7 @@ Bool Mesh_GlobalToDomain( void* mesh, MeshTopology_Dim dim, unsigned global, uns
 	assert( self );
 	assert( self->topo );
 
-	return Sync_GlobalToDomain( MeshTopology_GetDomain( self->topo, dim ), global, domain );
+	return Sync_TryGlobalToDomain( MeshTopology_GetDomain( self->topo, dim ), global, domain );
 }
 
 unsigned Mesh_DomainToGlobal( void* mesh, MeshTopology_Dim dim, unsigned domain ) {
@@ -344,7 +344,7 @@ Bool Mesh_LocalToShared( void* mesh, MeshTopology_Dim dim, unsigned domain, unsi
 	assert( self );
 	assert( self->topo );
 
-	return Sync_LocalToShared( MeshTopology_GetDomain( self->topo, dim ), domain, shared );
+	return Sync_TryLocalToShared( MeshTopology_GetDomain( self->topo, dim ), domain, shared );
 }
 
 unsigned Mesh_SharedToLocal( void* mesh, MeshTopology_Dim dim, unsigned shared ) {
@@ -474,6 +474,17 @@ double* Mesh_GetVertex( void* mesh, unsigned domain ) {
 	assert( self->verts );
 
 	return self->verts[domain];
+}
+
+void* _Mesh_GetExtension( void* mesh, const char* name ) {
+	Mesh* self = (Mesh*)mesh;
+
+	assert( self );
+	assert( ExtensionManager_GetHandle( self->info, name ) != -1 );
+
+	return ExtensionManager_Get( self->info, self, 
+				     ExtensionManager_GetHandle( self->info, 
+								 name ) );
 }
 
 void* Mesh_GetTopologyData( void* mesh, MeshTopology_Dim dim ) {
