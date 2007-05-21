@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeVariable.c 832 2007-05-16 01:11:18Z LukeHodkinson $
+** $Id: FeVariable.c 839 2007-05-21 00:29:27Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -133,7 +133,7 @@ FeVariable* FeVariable_New(
 	    isCheckpointedAndReloaded,
 		importFormatType,
 		exportFormatType,
-		((FeMesh*)feMesh)->topo->locals[MT_VERTEX]->comm->mpiComm, 
+		((FeMesh*)feMesh)->topo->remotes[MT_VERTEX]->comm->mpiComm, 
 		fV_Register );
 }
 
