@@ -39,13 +39,14 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: ScalarFieldCrossSection.c 628 2006-10-12 08:23:07Z SteveQuenette $
+** $Id: ScalarFieldCrossSection.c 693 2007-05-21 22:10:05Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgFEM/StgFEM.h>
 
 #include <glucifer/Base/Base.h>
 #include <glucifer/RenderingEngines/RenderingEngines.h>
@@ -288,6 +289,9 @@ void lucScalarFieldCrossSection_DrawCrossSection( void* drawingObject, double cr
 	double         aLength;
 	double         bLength;
 	Dimension_Index dim_I;
+
+	/* Ensure the field is synchronised. */
+	FeVariable_SyncShadowValues( self->fieldVariable );
 	
 	glDisable(GL_LIGHTING);
 	
@@ -362,6 +366,7 @@ void lucScalarFieldCrossSection_DrawCrossSection( void* drawingObject, double cr
 
 Bool lucScalarFieldCrossSection_PlotColouredVertex( void* drawingObject, Coord interpolationCoord, Coord plotCoord ) {
 	lucScalarFieldCrossSection*       self            = (lucScalarFieldCrossSection*)drawingObject;
+	Bool result;
 	FieldVariable* fieldVariable = self->fieldVariable;
 	lucColourMap*  cmap          = self->colourMap;
 	double         quantity;
@@ -370,7 +375,8 @@ Bool lucScalarFieldCrossSection_PlotColouredVertex( void* drawingObject, Coord i
 			__func__, interpolationCoord[0], interpolationCoord[1], interpolationCoord[2] );
 
 	/* Interpolate value to this position */
-	if ( LOCAL == FieldVariable_InterpolateValueAt( fieldVariable, interpolationCoord, &quantity )) {
+	result = FieldVariable_InterpolateValueAt( fieldVariable, interpolationCoord, &quantity );
+	if ( LOCAL == result || SHADOW == result ) {
 		/* Get colour for this value from colour map */
 		lucColourMap_SetOpenGLColourFromValue( cmap, quantity );
 
