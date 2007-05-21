@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ParticleFeVariable.c 456 2007-04-27 06:21:01Z LukeHodkinson $
+** $Id: ParticleFeVariable.c 465 2007-05-21 22:08:05Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -104,6 +104,7 @@ ParticleFeVariable* _ParticleFeVariable_New(
 			_getMinAndMaxGlobalCoords,
 			_interpolateWithinElement,
 			_getValueAtNode,
+			_FeVariable_SyncShadowValues, 
 			NULL,
 			NULL,
 			NULL,
