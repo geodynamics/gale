@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testElementIntegral.c 463 2007-05-21 00:30:51Z LukeHodkinson $
+** $Id: testElementIntegral.c 464 2007-05-21 04:11:40Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -220,7 +220,7 @@ void PICellerator_testElementIntegral( DiscretisationContext* context ) {
 	for ( loop_I = 0 ; loop_I < count ; loop_I++ ) {
 		/* Layout Particles */
 		Swarm_Random_Seed( (long) loop_I );
-		_Swarm_InitialiseParticles( materialSwarm, data );
+		_Swarm_InitialiseParticles( materialSwarm );
 
 		_IntegrationPointsSwarm_UpdateHook( NULL, integrationSwarm );
 		
