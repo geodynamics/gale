@@ -283,10 +283,11 @@ double _Mesh_Algorithms_GetMinimumSeparation( void* algorithms, double* perDim )
 void _Mesh_Algorithms_GetLocalCoordRange( void* algorithms, double* min, double* max ) {
 	Mesh_Algorithms*	self = (Mesh_Algorithms*)algorithms;
 	Mesh*			mesh;
-	unsigned		nVerts;
+	unsigned		nVerts, nEls;
+	unsigned*		verts;
 	double*			vert;
 	unsigned		nDims;
-	unsigned		v_i, d_i;
+	unsigned		v_i, e_i, d_i;
 
 	assert( self );
 	assert( self->mesh );
@@ -295,16 +296,19 @@ void _Mesh_Algorithms_GetLocalCoordRange( void* algorithms, double* min, double*
 
 	mesh = self->mesh;
 	nDims = Mesh_GetDimSize( mesh );
-	nVerts = Mesh_GetLocalSize( mesh, MT_VERTEX );
+	nEls = Mesh_GetLocalSize( mesh, nDims );
 	memcpy( min, Mesh_GetVertex( mesh, 0 ), nDims * sizeof(double) );
 	memcpy( max, Mesh_GetVertex( mesh, 0 ), nDims * sizeof(double) );
-	for( v_i = 1; v_i < nVerts; v_i++ ) {
-		vert = Mesh_GetVertex( mesh, v_i );
-		for( d_i = 0; d_i < nDims; d_i++ ) {
-			if( vert[d_i] < min[d_i] )
-				min[d_i] = vert[d_i];
-			if( vert[d_i] > max[d_i] )
-				max[d_i] = vert[d_i];
+	for( e_i = 0; e_i < nEls; e_i++ ) {
+		Mesh_GetIncidence( mesh, nDims, e_i, 0, &nVerts, &verts );
+		for( v_i = 0; v_i < nVerts; v_i++ ) {
+			vert = Mesh_GetVertex( mesh, verts[v_i] );
+			for( d_i = 0; d_i < nDims; d_i++ ) {
+				if( vert[d_i] < min[d_i] )
+					min[d_i] = vert[d_i];
+				if( vert[d_i] > max[d_i] )
+					max[d_i] = vert[d_i];
+			}
 		}
 	}
 }
