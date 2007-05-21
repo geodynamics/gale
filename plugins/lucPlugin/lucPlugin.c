@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: lucPlugin.c 676 2007-03-22 07:00:43Z PatrickSunter $
+** $Id: lucPlugin.c 692 2007-05-21 04:55:10Z JulianGiordani $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -142,8 +142,8 @@ void lucPlugin_VisualOnlyRun( Context* _context ) {
 					Memory_Free( swarm->cellParticleSizeTbl );
 					Memory_Free( swarm->cellParticleTbl );
 					ExtensionManager_Free( swarm->particleExtensionMgr, swarm->particles );
-					_Swarm_BuildParticles( swarm, context );
-					_Swarm_InitialiseParticles( swarm, context );
+					_Swarm_BuildParticles( swarm );
+					_Swarm_InitialiseParticles( swarm );
 				}
 			}	
 
