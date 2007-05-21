@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeEquationNumber.c 832 2007-05-16 01:11:18Z LukeHodkinson $
+** $Id: FeEquationNumber.c 840 2007-05-21 05:48:30Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -2272,7 +2272,8 @@ void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
 	unsigned		maxDofs;
 	unsigned*		tuples;
 	LinkedDofInfo*		links;
-	unsigned		e_i, n_i, dof_i;
+	unsigned		highest;
+	unsigned		e_i, n_i, dof_i, s_i;
 
 	assert( self );
 
@@ -2339,6 +2340,10 @@ void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
 			    !self->removeBCs )
 			{
 				if( links && links->linkedDofTbl[n_i][dof_i] != -1 ) {
+					if( rank > 0 ) {
+						dstArray[n_i][dof_i] = -2;
+						continue;
+					}
 					if( links->eqNumsOfLinkedDofs[links->linkedDofTbl[n_i][dof_i]] == -1 )
 						links->eqNumsOfLinkedDofs[links->linkedDofTbl[n_i][dof_i]] = curEqNum++;
 					dstArray[n_i][dof_i] = links->eqNumsOfLinkedDofs[links->linkedDofTbl[n_i][dof_i]];
@@ -2353,26 +2358,25 @@ void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
 
 	/* Order the equation numbers based on processor rank; cascade counts forward. */
 	base = 0;
-	subTotal = curEqNum;
-	if( rank > 0 ) {
+	if( rank > 0 )
 		MPI_Recv( &base, 1, MPI_UNSIGNED, rank - 1, 6669, mpiComm, &status );
-		subTotal = base + curEqNum;
-	}
+	subTotal = base + curEqNum;
 	if( rank < nProcs - 1 )
 		MPI_Send( &subTotal, 1, MPI_UNSIGNED, rank + 1, 6669, mpiComm );
 
-	/* Reduce to find lowest linked DOFs. */
 	if( links ) {
-		unsigned	lowest, highest;
-		unsigned	s_i;
-
+		/* Reduce to find lowest linked DOFs. */
 		for( s_i = 0; s_i < links->linkedDofSetsCount; s_i++ ) {
 			if( links->eqNumsOfLinkedDofs[s_i] != -1 )
 				links->eqNumsOfLinkedDofs[s_i] += base;
-			MPI_Allreduce( links->eqNumsOfLinkedDofs + s_i, &lowest, 1, MPI_UNSIGNED, MPI_MIN, mpiComm );
-			MPI_Allreduce( links->eqNumsOfLinkedDofs + s_i, &highest, 1, MPI_UNSIGNED, MPI_MIN, mpiComm );
+/*
+			MPI_Allreduce( links->eqNumsOfLinkedDofs + s_i, &lowest, 1, MPI_UNSIGNED, MPI_MAX, mpiComm );
+*/
+			MPI_Allreduce( links->eqNumsOfLinkedDofs + s_i, &highest, 1, MPI_INT, MPI_MAX, mpiComm );
+/*
 			assert( (lowest == (unsigned)-1) ? lowest == highest : 1 );
-			links->eqNumsOfLinkedDofs[s_i] = lowest;
+*/
+			links->eqNumsOfLinkedDofs[s_i] = highest;
 		}
 	}
 
@@ -2384,8 +2388,10 @@ void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
 			if( !self->bcs || !VariableCondition_IsCondition( self->bcs, n_i, varInd ) || 
 			    !self->removeBCs )
 			{
-				if( links && links->linkedDofTbl[n_i][dof_i] != -1 )
-					dstArray[n_i][dof_i] = links->eqNumsOfLinkedDofs[links->linkedDofTbl[n_i][dof_i]];
+				if( links && links->linkedDofTbl[n_i][dof_i] != -1 ) {
+					highest = links->eqNumsOfLinkedDofs[links->linkedDofTbl[n_i][dof_i]];
+					dstArray[n_i][dof_i] = highest;
+				}
 				else
 					dstArray[n_i][dof_i] += base;
 			}
