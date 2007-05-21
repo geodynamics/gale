@@ -95,7 +95,7 @@
 		        <!--This component is necessary when you use a compressible layer-->
 		        <!--Fortunately, you don't have to change anything here-->
 			<param name="Type">Compressible</param>
-			<param name="GeometryMesh">mesh-linear</param>
+			<param name="GeometryMesh">linearMesh</param>
 			<param name="StiffnessMatrix">c_matrix</param>
 			<param name="Swarm">picIntegrationPoints</param>			
 			<param name="oneOnLambda">10.0</param>

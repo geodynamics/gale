@@ -86,7 +86,7 @@
 			<param name="Type">Byerlee</param>
 			<param name="StrainRateField">StrainRateField</param>
 			<param name="BlockGeometry">geometry</param>
-			<param name="FiniteElement_Mesh">mesh-linear</param>
+			<param name="FiniteElement_Mesh">linearMesh</param>
 			<param name="cohesion">0.04</param>
 			<param name="depthCoefficient">0.25</param>
 		</struct>
@@ -105,7 +105,7 @@
 			<param name="Swarm">picIntegrationPoints</param>
 			<param name="Material">Slab</param>
 			<param name="Context">context</param>
-			<param name="Mesh">mesh-linear</param>
+			<param name="Mesh">linearMesh</param>
 		</struct>
 
 		<!-- Lower Mantle Field Stuff -->
@@ -114,7 +114,7 @@
 			<param name="Swarm">picIntegrationPoints</param>
 			<param name="Material">LowerMantle</param>
 			<param name="Context">context</param>
-			<param name="Mesh">mesh-linear</param>
+			<param name="Mesh">linearMesh</param>
 		</struct>		
 	</struct>
 

@@ -18,7 +18,7 @@
 	<struct name="components" mergeType="merge">
 		<struct name="rheology">
 			<param name="Type">DepthDependentViscosity</param>
-			<param name="Mesh">mesh-linear</param>
+			<param name="Mesh">linearMesh</param>
 			<param name="eta0">1.0e6</param>
 			<param name="gamma">13.815510558</param>
 			<param name="referencePoint">1.0</param>

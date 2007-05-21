@@ -25,7 +25,7 @@
 			<param name="Type">Byerlee</param>
 			<param name="StrainRateField">StrainRateField</param>
 			<param name="BlockGeometry">geometry</param>
-			<param name="FiniteElement_Mesh">mesh-linear</param>
+			<param name="FiniteElement_Mesh">linearMesh</param>
 			<param name="cohesion"> 5e5 </param>	
 			<param name="depthCoefficient"> 1e7 </param>	
 		</struct>		
