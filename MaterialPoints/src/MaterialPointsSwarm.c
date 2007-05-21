@@ -197,8 +197,10 @@ void _MaterialPointsSwarm_Init(
 			Variable_DataType_Int ); /* Should be unsigned int */
 
 	/* If we have an escaped routine, clear the defensive flag. */
+#if 0
 	if( self->escapedRoutine )
 		self->particleCommunicationHandler->defensive = False;
+#endif
 }
 
 /*------------------------------------------------------------------------------------------------------------------------
