@@ -111,7 +111,7 @@ void IArray_Remove( void* _self, int nItms, const int* locals, IMap* map ) {
    int* ord, pos;
    int i_i;
 
-   assert( self );
+   assert( self && (!nItms || locals) && map );
    ISet_Init( toRem );
    ISet_UseArray( toRem, nItms, locals );
    ord = Class_Array( self, int, ISet_GetSize( toRem ) );
@@ -161,6 +161,13 @@ int IArray_GetSize( const void* self ) {
 const int* IArray_GetPtr( const void* self ) {
    assert( self );
    return ((IArray*)self)->ptr;
+}
+
+void IArray_GetArray( const void* self, int* size, const int** ptr ) {
+   assert( self );
+   if( size )
+      *size = ((IArray*)self)->size;
+   *ptr = ((IArray*)self)->ptr;
 }
 
 int IArray_Cmp( const void* l, const void* r ) {

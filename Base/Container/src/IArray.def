@@ -18,6 +18,8 @@ METHOD( Clear, void, (void* self), (self) )
 
 METHOD( GetSize, int, (const void* self), (self) )
 METHOD( GetPtr, const int*, (const void* self), (self) )
+METHOD( GetArray, void, (const void* self, int* size, const int** ptr), 
+	(self, size, ptr) )
 
 MEMBER( int, delta )
 MEMBER( int, maxSize )

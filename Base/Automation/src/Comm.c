@@ -169,8 +169,7 @@ int Comm_GetNumNeighbours( const void* self ) {
 
 void Comm_GetNeighbours( const void* self, int* nNbrs, const int** nbrs ) {
    assert( self );
-   *nNbrs = IArray_GetSize( &((Comm*)self)->nbrs );
-   *nbrs = IArray_GetPtr( &((Comm*)self)->nbrs );
+   IArray_GetArray( &((Comm*)self)->nbrs, nNbrs, nbrs );
 }
 
 int Comm_RankLocalToGlobal( const void* self, int local ) {

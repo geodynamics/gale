@@ -134,7 +134,9 @@ void ISet_Insert( void* _self, int key ) {
 #ifndef NDEBUG
       cur = itm;
       do {
-	 assert( cur->key != key );
+	 if( cur->key == key ) {
+	    assert( cur->key != key );
+	 }
 	 cur = cur->next;
       } while( cur );
 #endif
@@ -211,6 +213,46 @@ void ISet_Remove( void* _self, int key ) {
    if( toDel )
       Class_Free( self, toDel );
    self->curSize--;
+}
+
+Bool ISet_TryRemove( void* _self, int key ) {
+   ISet* self = (ISet*)_self;
+   ISetItem *itm, *prev, *toDel;
+   int ind;
+
+   assert( self );
+   ind = ISet_Hash( self, key );
+   assert( ind < self->tblSize );
+   if( !self->used[ind] )
+      return False;
+   itm = self->tbl + ind;
+   if( itm->key == key ) {
+      toDel = itm->next;
+      if( toDel ) {
+	 itm->key = toDel->key;
+	 itm->next = toDel->next;
+      }
+      else
+	 self->used[ind] = False;
+   }
+   else {
+      prev = itm;
+      toDel = itm->next;
+      while( toDel ) {
+	 if( toDel->key == key ) {
+	    prev->next = toDel->next;
+	    break;
+	 }
+	 prev = toDel;
+	 toDel = toDel->next;
+      }
+      if( !toDel )
+	 return False;
+   }
+   if( toDel )
+      Class_Free( self, toDel );
+   self->curSize--;
+   return True;
 }
 
 void ISet_Clear( void* _self ) {
@@ -371,7 +413,7 @@ void ISet_First( const void* _self, ISetIter* iter ) {
    int i_i;
 
    assert( self && iter );
-   for( i_i = 0; i_i < self->maxSize; i_i++ ) {
+   for( i_i = 0; i_i < self->tblSize; i_i++ ) {
       if( self->used[i_i] ) {
 	 iter->iset = (ISet*)self;
 	 iter->tblInd = i_i;

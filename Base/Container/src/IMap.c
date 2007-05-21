@@ -301,7 +301,7 @@ void IMap_First( const void* _self, IMapIter* iter ) {
    int i_i;
 
    assert( self && iter );
-   for( i_i = 0; i_i < self->maxSize; i_i++ ) {
+   for( i_i = 0; i_i < self->tblSize; i_i++ ) {
       if( self->used[i_i] ) {
 	 iter->imap = (IMap*)self;
 	 iter->tblInd = i_i;

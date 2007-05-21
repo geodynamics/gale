@@ -60,20 +60,19 @@ void _IMapIter_Copy( void* _self, const void* _op ) {
 
 void _IMapIter_Next( void* _self ) {
    IMapIter* self = (IMapIter*)_self;
+   int i_i;
 
    assert( self );
-   assert( self->tblInd < self->imap->maxSize && 
+   assert( self->tblInd < self->imap->tblSize && 
 	   self->imap->used[self->tblInd] );
    assert( self->cur );
    assert( self->valid );
    if( !self->cur->next ) {
-      int i_i;
-
-      for( i_i = self->tblInd + 1; i_i < self->imap->maxSize; i_i++ ) {
+      for( i_i = self->tblInd + 1; i_i < self->imap->tblSize; i_i++ ) {
 	 if( self->imap->used[i_i] )
 	    break;
       }
-      if( i_i < self->imap->maxSize ) {
+      if( i_i < self->imap->tblSize ) {
 	self->tblInd = i_i;
 	self->cur = self->imap->tbl + i_i;
       }

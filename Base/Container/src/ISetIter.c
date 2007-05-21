@@ -61,20 +61,19 @@ void _ISetIter_Copy( void* _self, const void* _op ) {
 
 void _ISetIter_Next( void* _self ) {
    ISetIter* self = (ISetIter*)_self;
+   int i_i;
 
    assert( self );
-   assert( self->tblInd < self->iset->maxSize && 
+   assert( self->tblInd < self->iset->tblSize && 
 	   self->iset->used[self->tblInd] );
    assert( self->cur );
    assert( self->valid );
    if( !self->cur->next ) {
-      int i_i;
-
-      for( i_i = self->tblInd + 1; i_i < self->iset->maxSize; i_i++ ) {
+      for( i_i = self->tblInd + 1; i_i < self->iset->tblSize; i_i++ ) {
 	 if( self->iset->used[i_i] )
 	    break;
       }
-      if( i_i < self->iset->maxSize ) {
+      if( i_i < self->iset->tblSize ) {
 	self->tblInd = i_i;
 	self->cur = self->iset->tbl + i_i;
       }
