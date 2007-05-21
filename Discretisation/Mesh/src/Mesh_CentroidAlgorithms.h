@@ -90,6 +90,9 @@
 					     MeshTopology_Dim* dim, unsigned* ind );
 	Bool Mesh_CentroidAlgorithms_SearchElements( void* centroidAlgorithms, double* point, 
 						     unsigned* elInd );
+	void Mesh_CentroidAlgorithms_GetLocalCoordRange( void* algorithms, double* min, double* max );
+	void Mesh_CentroidAlgorithms_GetDomainCoordRange( void* algorithms, double* min, double* max );
+	void Mesh_CentroidAlgorithms_GetGlobalCoordRange( void* algorithms, double* min, double* max );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Public functions

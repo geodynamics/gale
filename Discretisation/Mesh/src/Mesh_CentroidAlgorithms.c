@@ -67,9 +67,9 @@ Mesh_CentroidAlgorithms* Mesh_CentroidAlgorithms_New( Name name ) {
 					     Mesh_CentroidAlgorithms_Search, 
 					     Mesh_CentroidAlgorithms_SearchElements, 
 					     _Mesh_Algorithms_GetMinimumSeparation, 
-					     _Mesh_Algorithms_GetLocalCoordRange, 
-					     _Mesh_Algorithms_GetDomainCoordRange, 
-					     _Mesh_Algorithms_GetGlobalCoordRange );
+					     Mesh_CentroidAlgorithms_GetLocalCoordRange, 
+					     Mesh_CentroidAlgorithms_GetDomainCoordRange, 
+					     Mesh_CentroidAlgorithms_GetGlobalCoordRange );
 }
 
 Mesh_CentroidAlgorithms* _Mesh_CentroidAlgorithms_New( MESH_HEXALGORITHMS_DEFARGS ) {
@@ -171,6 +171,27 @@ Bool Mesh_CentroidAlgorithms_SearchElements( void* centroidAlgorithms, double* p
 	assert( self && Stg_CheckType( self, Mesh_CentroidAlgorithms ) );
 
 	return Mesh_SearchElements( self->elMesh, point, elInd );
+}
+
+void Mesh_CentroidAlgorithms_GetLocalCoordRange( void* algorithms, double* min, double* max ) {
+	Mesh_CentroidAlgorithms* self = (Mesh_CentroidAlgorithms*)algorithms;
+
+	assert( self );
+	Mesh_GetLocalCoordRange( self->elMesh, min, max );
+}
+
+void Mesh_CentroidAlgorithms_GetDomainCoordRange( void* algorithms, double* min, double* max ) {
+	Mesh_CentroidAlgorithms* self = (Mesh_CentroidAlgorithms*)algorithms;
+
+	assert( self );
+	Mesh_GetDomainCoordRange( self->elMesh, min, max );
+}
+
+void Mesh_CentroidAlgorithms_GetGlobalCoordRange( void* algorithms, double* min, double* max ) {
+	Mesh_CentroidAlgorithms* self = (Mesh_CentroidAlgorithms*)algorithms;
+
+	assert( self );
+	Mesh_GetGlobalCoordRange( self->elMesh, min, max );
 }
 
 
