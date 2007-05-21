@@ -32,8 +32,8 @@
 	<param name="maxX"> 1.0f </param>
 	<param name="maxY"> 1.0f </param>
 	<param name="maxZ"> 1.0f </param>
-	<param name="elementResI"> 8 </param>
-	<param name="elementResJ"> 8 </param>
+	<param name="elementResI"> 9 </param>
+	<param name="elementResJ"> 9 </param>
 	<param name="elementResK"> 2 </param>
 
 	<!-- Integration Scheme configuration -->
