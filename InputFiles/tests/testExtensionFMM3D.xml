@@ -78,7 +78,7 @@
 		</struct>	
 		<struct name="compresibility">
 			<param name="Type">Compressible</param>
-			<param name="GeometryMesh">mesh-linear</param>
+			<param name="GeometryMesh">linearMesh</param>
 			<param name="StiffnessMatrix">c_matrix</param>
 			<param name="Swarm">picIntegrationPoints</param>
 			<param name="oneOnLambda">10.0</param>
@@ -165,7 +165,7 @@
 			<param name="Swarm">picIntegrationPoints</param>
 			<param name="Material">mantle</param>
 			<param name="Context">context</param>
-			<param name="Mesh">mesh-linear</param>
+			<param name="Mesh">linearMesh</param>
 		</struct>	
 
 		<!-- Compressible Field Stuff -->
@@ -174,7 +174,7 @@
 			<param name="Swarm">picIntegrationPoints</param>
 			<param name="Material">background</param>
 			<param name="Context">context</param>
-			<param name="Mesh">mesh-linear</param>
+			<param name="Mesh">linearMesh</param>
 		</struct>	
 	</struct>
 
