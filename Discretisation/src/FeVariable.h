@@ -57,6 +57,7 @@
 
 	typedef void (FeVariable_InterpolateWithinElementFunction) (void* fieldVariable, Element_DomainIndex dElement_I, double* xi, double* value );
 	typedef void (FeVariable_GetValueAtNodeFunction) (void* feVariable, Node_DomainIndex dNode_I, double* value );
+	typedef void (FeVariable_SyncShadowValuesFunc)( void* feVariable );
 	
 	/* Function prototypes for import / export */
 	typedef void (FeVariable_ReadNodalValuesFromFile_Function) (void* feVariable, const char* prefixStr, unsigned int timeStep );
@@ -94,6 +95,7 @@
 		/* Virtual info */ \
 		FeVariable_InterpolateWithinElementFunction*      _interpolateWithinElement; \
 		FeVariable_GetValueAtNodeFunction*                _getValueAtNode;          \
+		FeVariable_SyncShadowValuesFunc*		_syncShadowValues; \
 		\
 		/* FeVariable info */ \
 		\
@@ -199,6 +201,7 @@
 		FieldVariable_GetCoordFunction*                 _getMinAndMaxGlobalCoords,		
 		FeVariable_InterpolateWithinElementFunction*    _interpolateWithinElement,	
 		FeVariable_GetValueAtNodeFunction*              _getValueAtNode,
+		FeVariable_SyncShadowValuesFunc*		_syncShadowValues, 
 		void*                                           feMesh,
 		void*                                           geometryMesh,
 		DofLayout*                                      dofLayout, 
@@ -236,6 +239,9 @@
 
 	#define FeVariable_GetValueAtNode( feVariable, dNode_I, value ) \
 		( ((FeVariable*) feVariable)->_getValueAtNode( feVariable, dNode_I, value ) )
+
+	#define FeVariable_SyncShadowValues( feVariable ) \
+		( ((FeVariable*) feVariable)->_syncShadowValues( feVariable ) )
 
 	/** Print the contents of an FeVariable construct */
 	void _FeVariable_Print( void* variable, Stream* stream );
@@ -331,7 +337,7 @@
 
 	/** Synchronises each processor's shadow dof values to be the same as the values on their "home" processors.
 	 * Collective. */
-	void FeVariable_SyncShadowValues( void* feVariable );
+	void _FeVariable_SyncShadowValues( void* feVariable );
 
 	/** Perhaps should be moved into feVariable interface? */
 	void FeVariable_PrintDomainDiscreteValues( void* feVariable, Stream* stream );

@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeVariable.c 839 2007-05-21 00:29:27Z LukeHodkinson $
+** $Id: FeVariable.c 843 2007-05-21 22:07:31Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -88,6 +88,7 @@ void* FeVariable_DefaultNew( Name name )
 		_FeVariable_GetMinAndMaxGlobalCoords,
 		_FeVariable_InterpolateNodeValuesToElLocalCoord,
 		_FeVariable_GetValueAtNode,
+		_FeVariable_SyncShadowValues, 
 		NULL,
 		NULL,
 		NULL,
@@ -210,6 +211,7 @@ FeVariable* FeVariable_New_Full(
 		_FeVariable_GetMinAndMaxGlobalCoords,
 		_FeVariable_InterpolateNodeValuesToElLocalCoord,
 		_FeVariable_GetValueAtNode,
+		_FeVariable_SyncShadowValues, 
 		feMesh,
 		geometryMesh,
 		dofLayout,
@@ -248,6 +250,7 @@ FeVariable* _FeVariable_New(
 		FieldVariable_GetCoordFunction*                 _getMinAndMaxGlobalCoords,		
 		FeVariable_InterpolateWithinElementFunction*    _interpolateWithinElement,	
 		FeVariable_GetValueAtNodeFunction*              _getValueAtNode,	
+		FeVariable_SyncShadowValuesFunc*		_syncShadowValues, 
 		void*                                           feMesh,
 		void*                                           geometryMesh,
 		DofLayout*                                      dofLayout, 
@@ -299,6 +302,7 @@ FeVariable* _FeVariable_New(
 	/* Virtual functions */
 	self->_interpolateWithinElement = _interpolateWithinElement;
 	self->_getValueAtNode           = _getValueAtNode;
+	self->_syncShadowValues = _syncShadowValues;
 	
 	/* FeVariable info */
 	if( initFlag ){
@@ -1130,7 +1134,7 @@ void FeVariable_GetMinimumSeparation( void* feVariable, double* minSeparationPtr
 }	
 
 
-void FeVariable_SyncShadowValues( void* feVariable ) {
+void _FeVariable_SyncShadowValues( void* feVariable ) {
 	FeVariable*		self = (FeVariable*)feVariable;
 	DofLayout*		dofLayout;
 	Sync*		vertSync;
@@ -1140,6 +1144,10 @@ void FeVariable_SyncShadowValues( void* feVariable ) {
 
 	/* Shortcuts. */
 	dofLayout = self->dofLayout;
+	if( !dofLayout ) {
+		self->shadowValuesSynchronised = True;
+		return;
+	}
 
 	/* Create a distributed array based on the mesh's vertices. */
 	vertSync = Mesh_GetSync( self->feMesh, MT_VERTEX );

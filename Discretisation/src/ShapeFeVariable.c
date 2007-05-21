@@ -141,6 +141,7 @@ ShapeFeVariable* _ShapeFeVariable_New(
 			_getMinAndMaxGlobalCoords,
 			_interpolateWithinElement,
 			_getValueAtNode,
+			_FeVariable_SyncShadowValues, 
 			feMesh,
 			geometryMesh,
 			dofLayout, /* dofLayout */

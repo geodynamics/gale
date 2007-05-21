@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: OperatorFeVariable.c 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: OperatorFeVariable.c 843 2007-05-21 22:07:31Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -237,6 +237,7 @@ OperatorFeVariable* _OperatorFeVariable_New(
 			_getMinAndMaxGlobalCoords,
 			interpolateWithinElement,
 			getValueAtNode,
+			_OperatorFeVariable_SyncShadowValues, 
 			feMesh,
 			geometryMesh,
 			NULL, /* dofLayout */
@@ -458,6 +459,15 @@ void _OperatorFeVariable_GetValueAtNode( void* feVariable, Node_DomainIndex dNod
 
 	_OperatorFeVariable_SetFunctions( self );
 	FeVariable_GetValueAtNode( self, dNode_I, value );
+}
+
+void _OperatorFeVariable_SyncShadowValues( void* feVariable ) {
+	OperatorFeVariable* self            = (OperatorFeVariable*) feVariable;
+	int v_i;
+
+	assert( self );
+	for( v_i = 0; v_i < self->feVariableCount; v_i++ )
+		FeVariable_SyncShadowValues( self->feVariableList[v_i] );
 }
 
 

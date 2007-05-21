@@ -44,7 +44,7 @@
 **
 ** Comments:
 **
-**	$Id: OperatorFeVariable.h 822 2007-04-27 06:20:35Z LukeHodkinson $
+**	$Id: OperatorFeVariable.h 843 2007-05-21 22:07:31Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -147,6 +147,7 @@ void _OperatorFeVariable_Construct( void* feVariable, Stg_ComponentFactory* cf, 
 	void _OperatorFeVariable_InterpolateWithinElement( void* feVariable, Element_DomainIndex dElement_I, Coord coord, double* value ) ;
 	void _OperatorFeVariable_GetValueAtNode( void* feVariable, Node_DomainIndex dNode_I, double* value);
 	InterpolationResult _OperatorFeVariable_InterpolateValueAt( void* variable, Coord globalCoord, double* value ) ;
+	void _OperatorFeVariable_SyncShadowValues( void* feVariable );
 
 	/** Private Functions */
 	Bool _OperatorFeVariable_CheckIfValidToInterpolateInShadowSpace( OperatorFeVariable* self );
