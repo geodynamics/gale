@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: OperatorFeVariable.c 843 2007-05-21 22:07:31Z LukeHodkinson $
+** $Id: OperatorFeVariable.c 844 2007-05-22 03:17:18Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -468,6 +468,7 @@ void _OperatorFeVariable_SyncShadowValues( void* feVariable ) {
 	assert( self );
 	for( v_i = 0; v_i < self->feVariableCount; v_i++ )
 		FeVariable_SyncShadowValues( self->feVariableList[v_i] );
+	self->shadowValuesSynchronised = True;
 }
 
 
@@ -479,7 +480,7 @@ Bool _OperatorFeVariable_CheckIfValidToInterpolateInShadowSpace( OperatorFeVaria
 
 	for ( feVar_I=0; feVar_I < self->feVariableCount; feVar_I++ ) {
 		currFeVar = self->feVariableList[feVar_I];
-		if( 0 == strcmp( currFeVar->type, FeVariable_Type ) ) {
+		if( Stg_Class_IsInstance( currFeVar, FeVariable_Type ) ) {
 			if ( False == currFeVar->shadowValuesSynchronised ) {
         	        	return False;
         	}
