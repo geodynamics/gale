@@ -1,37 +1,10 @@
-StGermain Framework revision 4089. Copyright (C) 2003-2005 VPAC.
-Cartesian generator: ''
-	Target mesh: ''
-	Global element size: 32x32x32
-	Local offset of rank 0: 0x0x0
-	Local range of rank 0: 32x32x16
-	Generating vertices...
-		... done.
-	Generating elements...
-		... done.
-	Generating edges...
-		... done.
-	Generating element-vertex incidence...
-		... done.
-	Generating edge-vertex incidence...
-		... done.
-	Generating vertex neighbours...
-		... done.
-	Generating geometry...
-		... done.
-	Generating element types...
-		... element types are 'Mesh_HexType',
-		... mesh algorithm type is 'Mesh_RegularAlgorithms',
-		... done.
-	- time taken = 0.02 (secs)
+StGermain Framework revision 3913. Copyright (C) 2003-2005 VPAC.
 Watching rank: 1
 Calculated attractor point is at (0.333333,0.333333,0.333333):
 
 Starting timestep 1:
-	- time taken = 0.02 (secs)
-	- time taken = 0.03 (secs)
 
 Starting timestep 2:
-	- time taken = 0.06 (secs)
 
 Comparing the 9565 local Particles between old and new swarms:
 	Passed: swarms are identical.

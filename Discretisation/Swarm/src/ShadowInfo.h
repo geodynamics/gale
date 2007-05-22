@@ -54,7 +54,7 @@ struct ProcNbrInfo {
 processors. */
 struct ShadowInfo {
 	/** Info on neigbouring processor indices */
-	struct ProcNbrInfo*	procNbrInfo;
+	ProcNbrInfo*	procNbrInfo;
 	/** For each nbr processor, count of how many of its shadow nodes
 	live on the current processor */
 	Index*		procShadowedCnt;

@@ -1,23 +1,4 @@
-StGermain Framework revision 4089. Copyright (C) 2003-2005 VPAC.
-Cartesian generator: ''
-	Target mesh: ''
-	Global element size: 2x3x2
-	Local offset of rank 0: 0x0x0
-	Local range of rank 0: 2x2x2
-	Generating vertices...
-		... done.
-	Generating elements...
-		... done.
-	Generating element-vertex incidence...
-		... done.
-	Generating vertex neighbours...
-		... done.
-	Generating geometry...
-		... done.
-	Generating element types...
-		... element types are 'Mesh_HexType',
-		... mesh algorithm type is 'Mesh_RegularAlgorithms',
-		... done.
+StGermain Framework. Copyright (C) 2003-2005 VPAC.
 Watching rank: 1
 cellPointTbl  [ 0][0-8]:
 	{0 8 0}

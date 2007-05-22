@@ -1,23 +1,4 @@
-StGermain Framework revision 4089. Copyright (C) 2003-2005 VPAC.
-Cartesian generator: 'cartesianGenerator'
-	Target mesh: 'mesh-linear'
-	Global element size: 12x12x1
-	Local offset of rank 0: 0x0x0
-	Local range of rank 0: 4x12x1
-	Generating vertices...
-		... done.
-	Generating elements...
-		... done.
-	Generating element-vertex incidence...
-		... done.
-	Generating vertex neighbours...
-		... done.
-	Generating geometry...
-		... done.
-	Generating element types...
-		... element types are 'Mesh_HexType',
-		... mesh algorithm type is 'Mesh_RegularAlgorithms',
-		... done.
+StGermain Framework revision 3570. Copyright (C) 2003-2005 VPAC.
 Watching rank: 1
 Run until 5 timeSteps have been run
 TimeStep = 1, Start time = 0 + 2 prev timeStep dt
@@ -167,9 +148,6 @@ Timestep 1 - Implosive mode
 	Updating Particles positions in local cell 47:
 		Updating particleInCell 0:
 		Changing its coords from (0.584985,0.924249,0.233312) to (0.501101,0.727277,0.266652):
-	- time taken = 0.04 (secs)
-	- time taken = 0.04 (secs)
-	- time taken = 0.04 (secs)
 TimeStep = 2, Start time = 2 + 2 prev timeStep dt
 Calculated attractor point is at (0.333333,0.333333,0.333333):
 Timestep 2 - Implosive mode
@@ -365,9 +343,6 @@ Timestep 2 - Implosive mode
 	Updating Particles positions in local cell 45:
 	Updating Particles positions in local cell 46:
 	Updating Particles positions in local cell 47:
-	- time taken = 0.05 (secs)
-	- time taken = 0.04 (secs)
-	- time taken = 0.05 (secs)
 TimeStep = 3, Start time = 4 + 2 prev timeStep dt
 Calculated attractor point is at (0.333333,0.333333,0.333333):
 Timestep 3 - Implosive mode
@@ -611,9 +586,6 @@ Timestep 3 - Implosive mode
 	Updating Particles positions in local cell 45:
 	Updating Particles positions in local cell 46:
 	Updating Particles positions in local cell 47:
-	- time taken = 0.01 (secs)
-	- time taken = 0.01 (secs)
-	- time taken = 0.00 (secs)
 TimeStep = 4, Start time = 6 + 2 prev timeStep dt
 Calculated attractor point is at (0.333333,0.333333,0.333333):
 Timestep 4 - Implosive mode
@@ -857,9 +829,6 @@ Timestep 4 - Implosive mode
 	Updating Particles positions in local cell 45:
 	Updating Particles positions in local cell 46:
 	Updating Particles positions in local cell 47:
-	- time taken = 0.01 (secs)
-	- time taken = 0.00 (secs)
-	- time taken = 0.01 (secs)
 TimeStep = 5, Start time = 8 + 2 prev timeStep dt
 Calculated attractor point is at (0.333333,0.333333,0.333333):
 Timestep 5 - Implosive mode
@@ -1103,6 +1072,3 @@ Timestep 5 - Implosive mode
 	Updating Particles positions in local cell 45:
 	Updating Particles positions in local cell 46:
 	Updating Particles positions in local cell 47:
-	- time taken = 0.01 (secs)
-	- time taken = 0.00 (secs)
-	- time taken = 0.01 (secs)

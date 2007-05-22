@@ -37,25 +37,10 @@
 			<param name="Type">ElementCellLayout</param>
 			<param name="Mesh">mesh-linear</param>
 		</struct>
-
-		<struct name="pMovementHandler"> 
-			<param name="Type">ParticleMovementHandler</param>
-			<param name="Swarm">swarm</param>
-		</struct>
-		
-		<struct name="pShadowSync"> 
-			<param name="Type">ParticleShadowSync</param>
-			<param name="Swarm">swarm</param>
-		</struct>
-		
 		<struct name="swarm">
 			<param name="Type">Swarm</param>
 			<param name="CellLayout">elementCellLayout</param>
 			<param name="ParticleLayout">particleLayout</param>
-			<list name="ParticleCommHandlers">
-				<param>pMovementHandler</param>
-				<param>pShadowSync</param>
-			</list>			
 		</struct>
 	</struct>
  

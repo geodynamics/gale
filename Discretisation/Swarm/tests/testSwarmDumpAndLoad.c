@@ -34,7 +34,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: testSwarmDumpAndLoad.c 4106 2007-05-16 09:09:46Z RaquibulHassan $
+** $Id: testSwarmDumpAndLoad.c 4118 2007-05-22 02:01:25Z RaquibulHassan $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -131,7 +131,6 @@ int main( int argc, char* argv[] ) {
 	Swarm*                          swarmList[1];
 	Particle_Index                  lParticle_I = 0;
 	Index                           errorCount = 0;
-	ParticleMovementHandler			*movementHandler = NULL;
 	
 	/* Initialise MPI, get world info */
 	MPI_Init( &argc, &argv );
@@ -189,9 +188,6 @@ int main( int argc, char* argv[] ) {
 	swarm = Swarm_New( "testSwarm", elementCellLayout, randomParticleLayout, 3, sizeof(Particle),
 		extensionMgr_Register, NULL, CommWorld );
 	
-	movementHandler = ParticleMovementHandler_New( "movementHandler", swarm, True );
-	Swarm_AddCommHandler( swarm, movementHandler );
-
 	/* +++ BUILD PHASE +++ */
 	
 	/* Build the mesh */
@@ -263,7 +259,7 @@ int main( int argc, char* argv[] ) {
 	Build( newSwarm, 0, False );
 	Initialise( newSwarm, 0, False );
 
-	/*assert( newSwarm->particleLocalCount == swarm->particleLocalCount );*/
+	assert( newSwarm->particleLocalCount == swarm->particleLocalCount );
 
 	if( rank == procToWatch ) {
 		printf( "\nComparing the %d local Particles between old and new swarms:\n", swarm->particleLocalCount );

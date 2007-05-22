@@ -1,42 +1,23 @@
-StGermain Framework revision 4089. Copyright (C) 2003-2005 VPAC.
+StGermain Framework revision 4038. Copyright (C) 2003-2005 VPAC.
 Watching rank: 0
-Cartesian generator: ''
-	Target mesh: ''
-	Global element size: 2x3x2
-	Local offset of rank 0: 0x0x0
-	Local range of rank 0: 2x3x2
-	Generating vertices...
-		... done.
-	Generating elements...
-		... done.
-	Generating element-vertex incidence...
-		... done.
-	Generating vertex neighbours...
-		... done.
-	Generating geometry...
-		... done.
-	Generating element types...
-		... element types are 'Mesh_HexType',
-		... mesh algorithm type is 'Mesh_RegularAlgorithms',
-		... done.
-Swarm (ptr): 0x80a1840
-Stg_Component (ptr): 0x80a1840
-Stg_Object (ptr): 0x80a1840
-	Stg_Class (ptr): 0x80a1840
-		sizeOfSelf: 244
+Swarm (ptr): 0x649950
+Stg_Component (ptr): 0x649950
+Stg_Object (ptr): 0x649950
+	Stg_Class (ptr): 0x649950
+		sizeOfSelf: 384
 		_deleteSelf: Yes
 		type: Swarm
-		_delete (func ptr): 0x4003832e
-		_print (func ptr): 0x4003850b
-		_copy (func ptr): 0x40038af6
+		_delete (func ptr): 0xb7f5e007
+		_print (func ptr): 0xb7f5e119
+		_copy (func ptr): 0xb7f5e6fa
 	name: testSwarm
 	nameAllocationType: NON_GLOBAL
-	_defaultConstructor (func ptr): 0x40039779
-	_construct (func ptr): 0x40039858
-	_build (func ptr): 0x40039bac
-	_initialise (func ptr): 0x40039dca
-	_execute (func ptr): 0x40039ea5
-	_destroy (func ptr): 0x40039eaa
+	_defaultConstructor (func ptr): 0xb7f5efff
+	_construct (func ptr): 0xb7f5f0de
+	_build (func ptr): 0xb7f5f36b
+	_initialise (func ptr): 0xb7f5f55d
+	_execute (func ptr): 0xb7f5f646
+	_destroy (func ptr): 0xb7f5f64b
 	isConstructed: True
 	isBuilt: True
 	isInitialised: True
@@ -47,28 +28,28 @@ Stg_Object (ptr): 0x80a1840
 	initialise function name: testSwarm-Initialise
 	execute function name: testSwarm-Execute
 	destroy function name: testSwarm-Destroy
-ElementCellLayout (ptr): 0x8073a60
-CellLayout (ptr): 0x8073a60
-Stg_Component (ptr): 0x8073a60
-Stg_Object (ptr): 0x8073a60
-	Stg_Class (ptr): 0x8073a60
-		sizeOfSelf: 156
+ElementCellLayout (ptr): 0x6342a0
+CellLayout (ptr): 0x6342a0
+Stg_Component (ptr): 0x6342a0
+Stg_Object (ptr): 0x6342a0
+	Stg_Class (ptr): 0x6342a0
+		sizeOfSelf: 296
 		_deleteSelf: Yes
 		type: ElementCellLayout
-		_delete (func ptr): 0x4002ad53
-		_print (func ptr): 0x4002ad7c
-		_copy (func ptr): 0x4002adf0
+		_delete (func ptr): 0xb7f519cd
+		_print (func ptr): 0xb7f519f6
+		_copy (func ptr): 0xb7f51a6a
 	name: elementCellLayout
 	nameAllocationType: NON_GLOBAL
-	_defaultConstructor (func ptr): 0x4002a940
-	_construct (func ptr): 0x4002aec8
-	_build (func ptr): 0x4002af45
-	_initialise (func ptr): 0x4002affa
-	_execute (func ptr): 0x4002b038
-	_destroy (func ptr): 0x4002b03d
+	_defaultConstructor (func ptr): 0xb7f514fc
+	_construct (func ptr): 0xb7f51b42
+	_build (func ptr): 0xb7f51bbf
+	_initialise (func ptr): 0xb7f51bfd
+	_execute (func ptr): 0xb7f51c3b
+	_destroy (func ptr): 0xb7f51c40
 	isConstructed: True
 	isBuilt: True
-	isInitialised: False
+	isInitialised: True
 	hasExecuted: False
 	isDestroyed: False
 	constructor function name: elementCellLayout-Construct
@@ -76,39 +57,39 @@ Stg_Object (ptr): 0x8073a60
 	initialise function name: elementCellLayout-Initialise
 	execute function name: elementCellLayout-Execute
 	destroy function name: elementCellLayout-Destroy
-	_cellLocalCount (func ptr): 0x4002b042
-	_cellShadowCount (func ptr): 0x4002b088
-	_pointCount (func ptr): 0x4002b0ce
-	_initialisePoints (func ptr): 0x4002b134
-	_mapElementIdToCellId (func ptr): 0x4002b1dd
-	_isInCell (func ptr): 0x4002b1e5
-	_cellOf (func ptr): 0x4002b239
-	_getShadowInfo (func ptr): 0x4002b2b1
-	mesh (ptr): 0x807b238
-RandomParticleLayout (ptr): 0x80a1450:
-PerCellParticleLayout (ptr): 0x80a1450
-ParticleLayout (ptr): 0x80a1450
-Stg_Class (ptr): 0x80a1450
-	sizeOfSelf: 136
+	_cellLocalCount (func ptr): 0xb7f51c45
+	_cellShadowCount (func ptr): 0xb7f51c62
+	_pointCount (func ptr): 0xb7f51c7f
+	_initialisePoints (func ptr): 0xb7f51ca7
+	_mapElementIdToCellId (func ptr): 0xb7f51d1c
+	_isInCell (func ptr): 0xb7f51daf
+	_cellOf (func ptr): 0xb7f51fb7
+	_getShadowInfo (func ptr): 0xb7f521af
+	mesh (ptr): 0x8065fd0
+RandomParticleLayout (ptr): 0x80684f0:
+PerCellParticleLayout (ptr): 0x80684f0
+ParticleLayout (ptr): 0x80684f0
+Stg_Class (ptr): 0x80684f0
+	sizeOfSelf: 132
 	_deleteSelf: Yes
 	type: RandomParticleLayout
-	_delete (func ptr): 0x4003656e
-	_print (func ptr): 0x40036597
-	_copy (func ptr): 0x4003662d
-	_setInitialCounts (func ptr): 0x40035965
-	_initialiseParticles (func ptr): 0x40035b1a
+	_delete (func ptr): 0xb7f5c2ef
+	_print (func ptr): 0xb7f5c318
+	_copy (func ptr): 0xb7f5c3ab
+	_setInitialCounts (func ptr): 0xb7f5b6e9
+	_initialiseParticles (func ptr): 0xb7f5b89e
 	coordSystem: GlobalCoordSystem
 	weightsInitialisedAtStartup : False
-	_initialCount (func ptr): 0x4003680c
-	_initialiseParticlesOfCell (func ptr): 0x40036823
+	_initialCount (func ptr): 0xb7f5c584
+	_initialiseParticlesOfCell (func ptr): 0xb7f5c598
 	cellParticleCount: 4
 	seed: 13
 	cellLocalCount: 12
 	cellDomainCount: 12
 	cellShadowCount: 0
-	cellPointCountTbl (ptr): 0x80a2760
+	cellPointCountTbl (ptr): 0x64b7d0
 	cellPointCountTbl[0-12]: 008 008 008 008 008 008 008 008 008 008 008 008 
-	cellPointTbl (ptr): 0x80a27a0
+	cellPointTbl (ptr): 0x64b820
 	cellPointTbl[0-12]: {
 	cellPointTbl[0][0-8]: {0 0 0} {150 0 0} {0 4 0} {150 4 0} {0 0 150} {150 0 150} {0 4 150} {150 4 150} 
 	cellPointTbl[1][0-8]: {150 0 0} {300 0 0} {150 4 0} {300 4 0} {150 0 150} {300 0 150} {150 4 150} {300 4 150} 
@@ -124,11 +105,11 @@ Stg_Class (ptr): 0x80a1450
 	cellPointTbl[11][0-8]: {150 8 150} {300 8 150} {150 12 150} {300 12 150} {150 8 300} {300 8 300} {150 12 300} {300 12 300} 
 }
 
-	cellParticleCountTbl (ptr): 0x80a2960
+	cellParticleCountTbl (ptr): 0x64bba0
 	cellParticleCountTbl[0-12]: 004 004 004 004 004 004 004 004 004 004 004 004 
-	cellParticleSizeTbl (ptr): 0x80a29a0
+	cellParticleSizeTbl (ptr): 0x64bbf0
 	cellParticleSizeTbl[0-12]: 004 004 004 004 004 004 004 004 004 004 004 004 
-	cellParticleTbl (ptr): 0x80a29e0
+	cellParticleTbl (ptr): 0x64bc40
 	cellParticleTbl [0-12]: {
 		cellParticleTbl[0][0-4]:
 			(part. index) 0

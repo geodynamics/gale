@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Init.c 4106 2007-05-16 09:09:46Z RaquibulHassan $
+** $Id: Init.c 4118 2007-05-22 02:01:25Z RaquibulHassan $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -37,8 +37,7 @@
 #include "Discretisation/Mesh/Mesh.h"
 #include "Discretisation/Utils/Utils.h"
 #include "Swarm.h"
-#include "ParticleMovementHandler.h"
-#include "ParticleShadowSync.h"
+
 
 Stream* Swarm_VerboseConfig = NULL;
 Stream* Swarm_Debug = NULL;
@@ -73,8 +72,6 @@ Bool DiscretisationSwarm_Init( int* argc, char** argv[] ) {
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), OperatorSwarmVariable_Type, "0", _OperatorSwarmVariable_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), SwarmOutput_Type, "0", _SwarmOutput_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), SwarmDump_Type, "0", _SwarmDump_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), ParticleShadowSync_Type, "0", ParticleShadowSync_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), ParticleMovementHandler_Type, "0", ParticleMovementHandler_DefaultNew );
 
 	RegisterParent( CellLayout_Type, Stg_Component_Type );
 	RegisterParent( ElementCellLayout_Type, CellLayout_Type );
@@ -108,8 +105,6 @@ Bool DiscretisationSwarm_Init( int* argc, char** argv[] ) {
 	RegisterParent( ParticleCommHandler_Type, Stg_Component_Type );
 	RegisterParent( Swarm_Type, Stg_Component_Type );
 	RegisterParent( Swarm_Register_Type, Stg_Class_Type );
-	RegisterParent( ParticleMovementHandler_Type, ParticleCommHandler_Type);
-	RegisterParent( ParticleShadowSync_Type, ParticleCommHandler_Type);
 
 	/* Create the singletons */
 	stgSwarm_Register = Swarm_Register_New(); 

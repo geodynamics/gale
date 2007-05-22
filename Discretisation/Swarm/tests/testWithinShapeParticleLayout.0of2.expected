@@ -1,60 +1,41 @@
-StGermain Framework revision 4089. Copyright (C) 2003-2005 VPAC.
+StGermain Framework revision 3605. Copyright (C) 2003-2005 VPAC.
 Watching rank: 0
-Cartesian generator: ''
-	Target mesh: ''
-	Global element size: 5x3x2
-	Local offset of rank 0: 0x0x0
-	Local range of rank 0: 3x3x2
-	Generating vertices...
-		... done.
-	Generating elements...
-		... done.
-	Generating element-vertex incidence...
-		... done.
-	Generating vertex neighbours...
-		... done.
-	Generating geometry...
-		... done.
-	Generating element types...
-		... element types are 'Mesh_HexType',
-		... mesh algorithm type is 'Mesh_RegularAlgorithms',
-		... done.
-WithinShapeParticleLayout (ptr): 0x8125cb8:
-	SpaceFillerParticleLayout (ptr): 0x8125cb8:
-		GlobalParticleLayout (ptr): 0x8125cb8
-		ParticleLayout (ptr): 0x8125cb8
-		Stg_Class (ptr): 0x8125cb8
-			sizeOfSelf: 156
+WithinShapeParticleLayout (ptr): 0x8062708:
+	SpaceFillerParticleLayout (ptr): 0x8062708:
+		GlobalParticleLayout (ptr): 0x8062708
+		ParticleLayout (ptr): 0x8062708
+		Stg_Class (ptr): 0x8062708
+			sizeOfSelf: 148
 			_deleteSelf: Yes
 			type: WithinShapeParticleLayout
-			_delete (func ptr): 0x4004038f
-			_print (func ptr): 0x400403b8
-			_copy (func ptr): 0x40040432
-			_setInitialCounts (func ptr): 0x4002cf0a
-			_initialiseParticles (func ptr): 0x40040668
+			_delete (func ptr): 0xb7f63e9f
+			_print (func ptr): 0xb7f63ec8
+			_copy (func ptr): 0xb7f63f42
+			_setInitialCounts (func ptr): 0xb7f54e93
+			_initialiseParticles (func ptr): 0xb7f64169
 			coordSystem: GlobalCoordSystem
 			weightsInitialisedAtStartup : False
-			_initialiseParticle (func ptr): 0x40037ce3
+			_initialiseParticle (func ptr): 0xb7f5ce1e
 			totalInitialParticles: 10
-			averageInitialParticlesPerCell: 0.333333
+			averageInitialParticlesPerCell: 1.25
 		self->dim = 3
-	Stg_Component (ptr): 0x8125998
-	Stg_Object (ptr): 0x8125998
-		Stg_Class (ptr): 0x8125998
-			sizeOfSelf: 228
+	Stg_Component (ptr): 0x8062458
+	Stg_Object (ptr): 0x8062458
+		Stg_Class (ptr): 0x8062458
+			sizeOfSelf: 224
 			_deleteSelf: Yes
 			type: Sphere
-			_delete (func ptr): 0x400dd405
-			_print (func ptr): 0x400dd42e
-			_copy (func ptr): 0x400dd45e
+			_delete (func ptr): 0xb7edde5d
+			_print (func ptr): 0xb7edde86
+			_copy (func ptr): 0xb7eddeb6
 		name: testSphere
 		nameAllocationType: NON_GLOBAL
-		_defaultConstructor (func ptr): 0x400dd4bb
-		_construct (func ptr): 0x400dd560
-		_build (func ptr): 0x400dd5d1
-		_initialise (func ptr): 0x400dd601
-		_execute (func ptr): 0x400dd631
-		_destroy (func ptr): 0x400dd661
+		_defaultConstructor (func ptr): 0xb7eddf13
+		_construct (func ptr): 0xb7eddfb8
+		_build (func ptr): 0xb7ede026
+		_initialise (func ptr): 0xb7ede056
+		_execute (func ptr): 0xb7ede086
+		_destroy (func ptr): 0xb7ede0b6
 		isConstructed: True
 		isBuilt: False
 		isInitialised: False
@@ -65,34 +46,15 @@ WithinShapeParticleLayout (ptr): 0x8125cb8:
 		initialise function name: testSphere-Initialise
 		execute function name: testSphere-Execute
 		destroy function name: testSphere-Destroy
-	Stg_Shape (ptr): (0x8125998)
-	self->_isCoordInside = (ptr)0x400dd691
+	Stg_Shape (ptr): (0x8062458)
+	self->_isCoordInside = (ptr)0xb7ede0e6
 Printing coords of all local particles, cell-by-cell:
 	Local Cell   0:
 	Local Cell   1:
+		part. InCell   0 (local index      1): (0.47058, 0.49744, 0.52234)
+		part. InCell   1 (local index      2): (0.49191, 0.48135, 0.53531)
+		part. InCell   2 (local index      3): (0.47269, 0.49191, 0.48593)
 	Local Cell   2:
 	Local Cell   3:
-	Local Cell   4:
-	Local Cell   5:
-		part. InCell   0 (local index      0): (    0.5,     0.5,     0.5)
-		part. InCell   1 (local index      1): (0.49976, 0.50269, 0.49487)
-		part. InCell   2 (local index      3): (0.52942, 0.49963, 0.48059)
-		part. InCell   3 (local index      4): (0.50827, 0.48257, 0.46768)
-		part. InCell   4 (local index      7): (0.47269, 0.49191, 0.48593)
-		part. InCell   5 (local index      8): (0.46072, 0.52487, 0.49155)
-	Local Cell   6:
-	Local Cell   7:
-	Local Cell   8:
-	Local Cell   9:
-	Local Cell  10:
-	Local Cell  11:
-	Local Cell  12:
-	Local Cell  13:
-	Local Cell  14:
-		part. InCell   0 (local index      2): (0.47058, 0.49744, 0.52234)
-		part. InCell   1 (local index      5): (0.49191, 0.48135, 0.53531)
-		part. InCell   2 (local index      6): (0.53909, 0.52707, 0.51328)
-		part. InCell   3 (local index      9): (0.52713, 0.48972, 0.51108)
-	Local Cell  15:
-	Local Cell  16:
-	Local Cell  17:
+		part. InCell   0 (local index      0): (0.49976, 0.50269, 0.49487)
+		part. InCell   1 (local index      4): (0.46072, 0.52487, 0.49155)

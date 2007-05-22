@@ -35,7 +35,7 @@
 ** Comments:
 **	None so far.
 **
-** $Id: Swarm.h 4106 2007-05-16 09:09:46Z RaquibulHassan $
+** $Id: Swarm.h 4118 2007-05-22 02:01:25Z RaquibulHassan $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -53,8 +53,6 @@
 	#include "SwarmClass.h"
 	#include "Swarm_Register.h"
 	#include "ParticleCommHandler.h"
-	#include "ParticleMovementHandler.h"
-	#include "ParticleShadowSync.h"
 	#include "SingleCellLayout.h"
 	#include "ElementCellLayout.h"
 	#include "SingleCellLayout.h"
