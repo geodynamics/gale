@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: FeVariableSurface.c 686 2007-04-27 06:24:08Z LukeHodkinson $
+** $Id: FeVariableSurface.c 694 2007-05-22 03:17:41Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -232,6 +232,7 @@ void _lucFeVariableSurface_BuildDisplayList( void* drawingObject, void* _context
 	double                         nodeValue;
 	double                         height;
 
+	FeVariable_SyncShadowValues( feVariable );
 
 	/* Give option to draw surface as wireframe */
 	if (self->wireframe) 

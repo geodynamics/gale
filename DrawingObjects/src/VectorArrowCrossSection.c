@@ -39,13 +39,14 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: VectorArrowCrossSection.c 665 2007-02-27 07:10:48Z JulianGiordani $
+** $Id: VectorArrowCrossSection.c 694 2007-05-22 03:17:41Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgFEM/StgFEM.h>
 
 #include <glucifer/Base/Base.h>
 #include <glucifer/RenderingEngines/RenderingEngines.h>
@@ -274,6 +275,8 @@ void _lucVectorArrowCrossSection_DrawCrossSection( void* drawingObject, Dimensio
 	
 	Journal_DPrintf( self->debugStream, "In %s():\n", __func__ );
 	Stream_Indent( self->debugStream );
+
+	FeVariable_SyncShadowValues( vectorVariable );
 
 	if ( True == self->dynamicRange ) {
 		scaleValue = 1 / FieldVariable_GetMaxGlobalFieldMagnitude( vectorVariable );

@@ -39,13 +39,14 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: Isosurface.c 628 2006-10-12 08:23:07Z SteveQuenette $
+** $Id: Isosurface.c 694 2007-05-22 03:17:41Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgFEM/StgFEM.h>
 
 #include <glucifer/Base/Base.h>
 #include <glucifer/RenderingEngines/RenderingEngines.h>
@@ -251,6 +252,8 @@ void _lucIsosurface_Setup( void* drawingObject, void* _context ) {
 	Coord                    max;
 	Dimension_Index          dim             = context->dim;
 
+	FeVariable_SyncShadowValues( self->isosurfaceField );
+
 	/* Initialise Variables */
 	self->triangleCount = 0;
 	nx = self->resolution[ I_AXIS ];
@@ -340,6 +343,11 @@ void _lucIsosurface_Draw( void* drawingObject, lucWindow* window, lucViewportInf
 	XYZ                      fudgeFactor   = { 0.0, 0.0, 0.0 };
 	Index                    dof_I;
 
+	FeVariable_SyncShadowValues( self->isosurfaceField );
+	if( colourField )
+		FeVariable_SyncShadowValues( colourField );
+	if( self->maskField )
+		FeVariable_SyncShadowValues( self->maskField );
 
 	/* Calibrate Colour Map using Colour Variable */
 	if ( colourMap && colourField ) {
@@ -376,6 +384,11 @@ void _lucIsosurface_BuildDisplayList( void* drawingObject, void* _context ) {
 	XYZ                      fudgeFactor   = { 0.0, 0.0, 0.0 };
 	Index                    dof_I;
 
+	FeVariable_SyncShadowValues( self->isosurfaceField );
+	if( colourField )
+		FeVariable_SyncShadowValues( colourField );
+	if( maskField )
+		FeVariable_SyncShadowValues( maskField );
 
 	/* Give option to draw surface as wireframe */
 	if (self->wireframe) 
