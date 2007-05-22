@@ -33,7 +33,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: testSwarm.c 4118 2007-05-22 02:01:25Z RaquibulHassan $
+** $Id: testSwarm.c 4119 2007-05-22 07:35:46Z RaquibulHassan $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -73,6 +73,7 @@ Mesh* buildMesh( unsigned nDims, unsigned* size,
 	CartesianGenerator_SetDimSize( gen, nDims );
 	CartesianGenerator_SetTopologyParams( gen, size, 0, NULL, NULL );
 	CartesianGenerator_SetGeometryParams( gen, minCrds, maxCrds );
+	MeshGenerator_SetIncidenceState( gen, nDims, nDims, True );
 
 	mesh = Mesh_New( "" );
 	Mesh_SetExtensionManagerRegister( mesh, emReg );

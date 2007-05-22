@@ -40,7 +40,7 @@
 **	to appropriate processor immediately.)
 **	Communication is more efficient when shadow depth is equal to at least 1
 **
-** $Id: SwarmClass.h 4118 2007-05-22 02:01:25Z RaquibulHassan $
+** $Id: SwarmClass.h 4119 2007-05-22 07:35:46Z RaquibulHassan $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -102,13 +102,23 @@
 		Particle_Index                  particlesArraySize; \
 		Particle_Index                  particlesArrayDelta; \
 		double                          extraParticlesFactor; \
+		/*shaodw info*/								\
+		/** The indices of each shadow particle... */ \
+		Bool							shadowTablesBuilt; \
+		Cell_ParticlesList              shadowCellParticleTbl; \
+		/** The count of how many shadow particles are in each cell */ \
+		Cell_ParticlesIndexList         shadowCellParticleCountTbl; \
+		/** The actual shadow particles */ \
+		Particle_List                   shadowParticles; \
+		Particle_Index                  shadowParticleCount; \
 		/** Variable Stuff */ \
 		SwarmVariable_Register*         swarmVariable_Register; \
 		SwarmVariable*                  owningCellVariable; \
 		/** Extension manager for particles */ \
 		ExtensionManager*               particleExtensionMgr; \
 		/** Particle Communication handler */ \
-		ParticleCommHandler*            particleCommunicationHandler; \
+		\
+		Stg_ObjectList					*commHandlerList; \
 		\
 		Index                           swarmReg_I; /**< Own index inside the Swarm_Register */
 
@@ -174,6 +184,9 @@
 	
 	#define Swarm_ParticleAt( self, dParticle_I ) \
 		( ParticleAt( (self)->particles, (dParticle_I), (self)->particleExtensionMgr->finalSize ) )
+	
+	#define Swarm_ShadowParticleAt( self, dParticle_I ) \
+		( ParticleAt( (self)->shadowParticles, (dParticle_I), (self)->particleExtensionMgr->finalSize ) )
 
 	#define ParticleAt( array, particle_I, particleSize ) \
 		((StandardParticle*)((ArithPointer)(array) + (particle_I) * (particleSize)))
@@ -243,6 +256,7 @@
 
 	/** Adds a particle to a cell: the cell will now have that particle's index stored in its table of owned cells. */
 	void Swarm_AddParticleToCell( void* swarm, Cell_DomainIndex dCell_I, Particle_Index particle_I );
+	void Swarm_AddShadowParticleToShadowCell( void* swarm, Cell_DomainIndex dCell_I, Particle_Index shadowParticle_I );
 
 	/** Utility function to get a particle's PIC index within a cell from its index in the array of all local particles */
 	Particle_InCellIndex Swarm_GetParticleIndexWithinCell( void* swarm, Cell_DomainIndex owningCell, Particle_Index particle_I);
@@ -285,6 +299,8 @@
 	
 	/* Build particles */
 	void _Swarm_BuildParticles( void* swarm, void* data );
+
+	void _Swarm_BuildShadowParticles( void* swarm );
 	
 	/* Initialise cells */
 	void _Swarm_InitialiseCells( void* swarm, void* data );
@@ -300,5 +316,7 @@
 
 	/** simple function that determines logic for creating a swarm checkpoint filename */
 	void Swarm_GetCheckpointFilenameForGivenTimestep( Swarm* self, AbstractContext* context, char* swarmSaveFileName );
+
+	Bool Swarm_AddCommHandler( Swarm *self, void *commHandler );
 
 #endif /* __Discretisation_Swarm_SwarmClass_h__ */

@@ -34,7 +34,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: testSwarmDumpAndLoad.c 4118 2007-05-22 02:01:25Z RaquibulHassan $
+** $Id: testSwarmDumpAndLoad.c 4119 2007-05-22 07:35:46Z RaquibulHassan $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -131,6 +131,7 @@ int main( int argc, char* argv[] ) {
 	Swarm*                          swarmList[1];
 	Particle_Index                  lParticle_I = 0;
 	Index                           errorCount = 0;
+	ParticleMovementHandler			*movementHandler = NULL;
 	
 	/* Initialise MPI, get world info */
 	MPI_Init( &argc, &argv );
@@ -187,6 +188,9 @@ int main( int argc, char* argv[] ) {
 	/* Configure the swarm */
 	swarm = Swarm_New( "testSwarm", elementCellLayout, randomParticleLayout, 3, sizeof(Particle),
 		extensionMgr_Register, NULL, CommWorld );
+    
+	movementHandler = ParticleMovementHandler_New( "movementHandler", True );
+	Swarm_AddCommHandler( swarm, movementHandler );
 	
 	/* +++ BUILD PHASE +++ */
 	

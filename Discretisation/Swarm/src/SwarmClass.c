@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SwarmClass.c 4118 2007-05-22 02:01:25Z RaquibulHassan $
+** $Id: SwarmClass.c 4119 2007-05-22 07:35:46Z RaquibulHassan $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -49,6 +49,8 @@
 #include "SingleCellLayout.h"
 #include "FileParticleLayout.h"
 #include "ParticleCommHandler.h"
+#include "ParticleMovementHandler.h"
+#include "ParticleShadowSync.h"
 #include "IntegrationPoint.h"
 #include "SwarmVariable_Register.h"
 #include "SwarmVariable.h"
@@ -153,6 +155,7 @@ Swarm* _Swarm_New(
 			NON_GLOBAL );
 
 	self->particleSize = particleSize;
+	self->commHandlerList = Stg_ObjectList_New();
 	
 	/* Swarm info */
 	if( initFlag )
@@ -212,13 +215,20 @@ void _Swarm_Init(
 	self->cellParticleTbl = NULL;
 	self->cellParticleCountTbl = NULL;
 	self->cellParticleSizeTbl = NULL;
+	self->shadowCellParticleTbl = NULL;
+	self->shadowCellParticleCountTbl = NULL;
+	self->shadowParticleCount = 0;
 	self->cellParticleTblDelta = cellParticleTblDelta;
 	
 	self->particles = NULL;
+	self->shadowParticles = NULL;
 	self->particleLocalCount = 0;
 	self->particlesArraySize = 0;
 	self->particlesArrayDelta = 0;
 	self->extraParticlesFactor = extraParticlesFactor;
+
+	self->shadowTablesBuilt = False;
+
 	Journal_Firewall( extraParticlesFactor > 0.0, errorStream, "Error - in %s: extraParticlesFactor "
 		"given as %.3f, but this must be greater than zero to allow swarm to be realloc'ed larger "
 		"if necessary\n", extraParticlesFactor );
@@ -232,8 +242,6 @@ void _Swarm_Init(
 
 	self->particleExtensionMgr = ExtensionManager_New_OfStruct( "particle", self->particleSize );
 	ExtensionManager_Register_Add( extensionMgr_Register, self->particleExtensionMgr );
-
-	self->particleCommunicationHandler = ParticleCommHandler_New( defaultSwarmParticleCommHandlerName, self );
 
 	self->owningCellVariable = Swarm_NewScalarVariable(
 			self,
@@ -264,14 +272,32 @@ void _Swarm_Delete( void* swarm ) {
 	Swarm*			self = (Swarm*)swarm;
 	Cell_LocalIndex		cell_I;
 	
-	Stg_Class_Delete( self->particleCommunicationHandler );
-	
+	Stg_ObjectList_DeleteAllObjects( self->commHandlerList );
+	Stg_Class_Delete( self->commHandlerList );
+
 	Memory_Free( self->cellPointTbl );
 	Memory_Free( self->cellPointCountTbl );
 	
-	for( cell_I = 0; cell_I < self->cellLocalCount; cell_I++ ) {
-		Memory_Free( self->cellParticleTbl[cell_I] );
+	for( cell_I = 0; cell_I < self->cellDomainCount; cell_I++ ) {
+		if( self->cellParticleTbl[cell_I] ){
+			Memory_Free( self->cellParticleTbl[cell_I] );
+		}
+
+		if(self->shadowTablesBuilt){
+			if( self->shadowCellParticleTbl[cell_I] ){
+				Memory_Free( self->shadowCellParticleTbl[cell_I] );
+			}
+		}
 	}
+
+	if( self->shadowTablesBuilt ){
+		Memory_Free( self->shadowCellParticleTbl );
+		Memory_Free( self->shadowCellParticleCountTbl );
+		if ( self->shadowParticles ) {
+			ExtensionManager_Free( self->particleExtensionMgr, self->shadowParticles );
+		}
+	}
+
 	Memory_Free( self->cellParticleTbl );
 	Memory_Free( self->cellParticleCountTbl );
 	Memory_Free( self->cellParticleSizeTbl );
@@ -406,6 +432,10 @@ void* _Swarm_Copy( void* swarm, void* dest, Bool deep, Name nameExt, PtrMap* ptr
 	newSwarm->particlesArrayDelta = self->particlesArrayDelta;
 	newSwarm->extraParticlesFactor = self->extraParticlesFactor;
 	
+	if( self->shadowTablesBuilt ){
+		newSwarm->shadowParticleCount = self->shadowParticleCount;
+	}
+
 	if( deep ) {
 		/* Classes */
 		newSwarm->cellLayout = (CellLayout*)Stg_Class_Copy( self->cellLayout, NULL, deep, nameExt, map );
@@ -413,7 +443,7 @@ void* _Swarm_Copy( void* swarm, void* dest, Bool deep, Name nameExt, PtrMap* ptr
 		newSwarm->debug = (Stream*)Stg_Class_Copy( self->debug, NULL, deep, nameExt, map );
 		newSwarm->particleExtensionMgr = (ExtensionManager*)Stg_Class_Copy( self->particleExtensionMgr, NULL, deep, nameExt, map 
 );
-		newSwarm->particleCommunicationHandler = (ParticleCommHandler*)Stg_Class_Copy( self->particleCommunicationHandler, NULL, deep, nameExt, map );
+		newSwarm->commHandlerList = (Stg_ObjectList*)Stg_Class_Copy( self->commHandlerList, NULL, deep, nameExt, map );
 		
 		/* Arrays */
 		if( (newSwarm->cellPointCountTbl = PtrMap_Find( map, self->cellPointCountTbl )) == NULL ) {
@@ -495,6 +525,56 @@ void* _Swarm_Copy( void* swarm, void* dest, Bool deep, Name nameExt, PtrMap* ptr
 				newSwarm->particles = NULL;
 			}
 		}
+
+		/*shadow info*/
+		if( self->shadowTablesBuilt ){
+
+			if( (newSwarm->shadowCellParticleCountTbl = PtrMap_Find( map, self->shadowCellParticleCountTbl )) == NULL ) {
+				if( self->shadowCellParticleCountTbl ) {
+					newSwarm->shadowCellParticleCountTbl = Memory_Alloc_Array( Particle_InCellIndex, newSwarm->cellDomainCount, "Swarm->shadowCellParticleCountTbl" );
+					memcpy( newSwarm->shadowCellParticleCountTbl, self->shadowCellParticleCountTbl, newSwarm->cellDomainCount * sizeof( Particle_InCellIndex ) );
+					PtrMap_Append( map, self->shadowCellParticleCountTbl, newSwarm->shadowCellParticleCountTbl );
+				}
+				else {
+					newSwarm->shadowCellParticleCountTbl = NULL;
+				}
+			}
+		
+			if( (newSwarm->shadowCellParticleTbl = PtrMap_Find( map, self->shadowCellParticleTbl )) == NULL ) {
+				if( newSwarm->shadowCellParticleCountTbl && self->shadowCellParticleTbl ) {
+					Index	cell_I;
+				
+					newSwarm->shadowCellParticleTbl = Memory_Alloc_Array( Cell_Particles, newSwarm->cellDomainCount, "Swarm->shadowCellParticleTbl" );
+					for( cell_I = 0; cell_I < newSwarm->cellDomainCount; cell_I++ ) {
+						if( newSwarm->shadowCellParticleCountTbl[cell_I] ) {
+							newSwarm->shadowCellParticleTbl[cell_I] = Memory_Alloc_Array( Particle_Index, newSwarm->shadowCellParticleCountTbl[cell_I],
+									"Swarm->shadowCellParticleTbl[]" );
+							memcpy( newSwarm->shadowCellParticleTbl[cell_I], self->shadowCellParticleTbl[cell_I],
+									newSwarm->shadowCellParticleCountTbl[cell_I] * sizeof(Particle_Index) );
+						}
+						else {
+							newSwarm->shadowCellParticleTbl[cell_I] = NULL;
+						}
+					}
+					PtrMap_Append( map, self->shadowCellParticleTbl, newSwarm->shadowCellParticleTbl );
+				}
+				else {
+					newSwarm->shadowCellParticleTbl = NULL;
+				}
+			}
+		
+			if( (newSwarm->shadowParticles = PtrMap_Find( map, self->shadowParticles )) == NULL ) {
+				if( self->shadowParticles ) {
+					newSwarm->shadowParticles = (Particle_List)ExtensionManager_Malloc( newSwarm->particleExtensionMgr, newSwarm->shadowParticleCount);
+					memcpy( newSwarm->shadowParticles, self->shadowParticles,
+							newSwarm->shadowParticleCount* ExtensionManager_GetFinalSize( newSwarm->particleExtensionMgr ) );
+					PtrMap_Append( map, self->shadowParticles, newSwarm->shadowParticles );
+				}
+				else {
+					newSwarm->shadowParticles = NULL;
+				}
+			}		
+		}
 	}
 	else {
 		newSwarm->cellLayout = self->cellLayout;
@@ -506,8 +586,13 @@ void* _Swarm_Copy( void* swarm, void* dest, Bool deep, Name nameExt, PtrMap* ptr
 		newSwarm->cellParticleCountTbl = self->cellParticleCountTbl;
 		newSwarm->cellParticleSizeTbl = self->cellParticleSizeTbl;
 		newSwarm->particles = self->particles;
+
+		newSwarm->shadowCellParticleTbl = self->shadowCellParticleTbl;
+		newSwarm->shadowCellParticleCountTbl = self->shadowCellParticleCountTbl;
+		newSwarm->shadowParticles = self->shadowParticles;
+
 		newSwarm->particleExtensionMgr = self->particleExtensionMgr;
-		newSwarm->particleCommunicationHandler = self->particleCommunicationHandler;
+		newSwarm->commHandlerList = self->commHandlerList;
 	}
 	
 	if( ownMap ) {
@@ -574,6 +659,32 @@ void _Swarm_Construct( void* swarm, Stg_ComponentFactory* cf, void* data ) {
 	extraParticlesFactor = 
 		Stg_ComponentFactory_GetDouble( cf, self->name, "extraParticlesFactor", DEFAULT_EXTRA_PARTICLES_FACTOR );
 	
+	{
+		unsigned int count = 0;
+		int i = 0;
+		Stg_Component **components = NULL;
+
+		components = (Stg_Component**)Stg_ComponentFactory_ConstructByList( 
+		cf, 
+		self->name, 
+		"ParticleCommHandlers", 
+		Stg_ComponentFactory_Unlimited, 
+		ParticleCommHandler, 
+		False, 
+		&count, 
+		data );
+
+		if( count == 0 ){
+ 			Journal_Printf( self->debug, "Warning: Swarm has 0 Communication handlers..!\n" );
+ 		}
+ 		else{
+ 			for( i=0; i<count; i++ ){
+ 				Stg_ObjectList_Append( self->commHandlerList, components[i] );
+ 			}
+ 			Memory_Free( components );
+		}
+	}
+
 	_Swarm_Init( 
 			self,
 			cellLayout,
@@ -714,6 +825,21 @@ void _Swarm_BuildParticles( void* swarm, void* data ) {
 	self->particles = (Particle_List)ExtensionManager_Malloc( self->particleExtensionMgr, self->particlesArraySize );
 }
 
+void _Swarm_BuildShadowParticles( void* swarm ) {
+	Swarm*			self = (Swarm*)swarm;
+	int i = 0;
+	
+	self->shadowTablesBuilt = True;
+
+	self->shadowCellParticleCountTbl = Memory_Alloc_Array( Particle_InCellIndex, self->cellDomainCount,
+		"Swarm->shadowCellParticleCountTbl" );
+	self->shadowCellParticleTbl = Memory_Alloc_Array( Cell_Particles, self->cellDomainCount, "Swarm->shadowCellParticleTbl" );
+	for( i=0; i<self->cellDomainCount; i++ ){
+		self->shadowCellParticleTbl[i] = NULL;
+	}
+	
+	self->shadowParticles = NULL;
+}
 
 void _Swarm_InitialiseCells( void* swarm, void* data ) {
 	Swarm*			self = (Swarm*)swarm;
@@ -760,19 +886,29 @@ void Swarm_UpdateAllParticleOwners( void* swarm ) {
 		/* Assumption: Local coord layouts don't go through advection so no need to update */
 		return;
 	}
-
+	
 	Journal_DPrintfL( self->debug, 1, "In %s() for Swarm \"%s\"\n", __func__, self->name );
 	Stream_IndentBranch( Swarm_Debug );	
 	for ( lParticle_I=0; lParticle_I < self->particleLocalCount; lParticle_I++ ) {
 		Swarm_UpdateParticleOwner( self, lParticle_I );
-	}	
+	}
 
 	/* UpdateAllParticleOwners is called during initialisation,to set up initial
 	 * ownership relationships, and if that's the case we don't want to invoke
 	 * the ParticleCommHandler since we know there's been no movement between
 	 * processors yet. */
 	if ( False == self->stillDoingInitialisation ) { 
-		ParticleCommHandler_HandleParticleMovementBetweenProcs( self->particleCommunicationHandler );
+		/*Stg_Component_Execute( self->particleCommunicationHandler[0], NULL, True );
+		Stg_Component_Execute( self->particleCommunicationHandler[1], NULL, True );*/
+		{
+			int ii;
+			for( ii=0; ii<self->commHandlerList->count; ii++ ){
+				ParticleCommHandler *pComm = NULL;
+
+				pComm = (ParticleCommHandler*)(Stg_ObjectList_At(self->commHandlerList, ii));
+				Stg_Component_Execute( pComm, self, True);
+			}
+		}
 	}
 
 	Stream_UnIndentBranch( Swarm_Debug );	
@@ -959,6 +1095,32 @@ void Swarm_AddParticleToCell( void* swarm, Cell_DomainIndex dCell_I, Particle_In
 	Journal_DPrintfL( self->debug, 3, "\n" );
 }
 
+void Swarm_AddShadowParticleToShadowCell( void* swarm, Cell_DomainIndex dCell_I, Particle_Index shadowParticle_I ) {
+	Swarm* 			self = (Swarm*)swarm;
+	
+	if( self->shadowTablesBuilt ){
+		Particle_InCellIndex*	newCountPtr = &self->shadowCellParticleCountTbl[dCell_I];
+		#ifdef CAUTIOUS
+		Stream*                 errorStream = Journal_Register( Error_Type, self->type );
+		#endif
+
+		Journal_DPrintfL( self->debug, 3, "Adding shadow particle %d to shadow cell %d: shadow cell's particle count now %d",
+			shadowParticle_I, dCell_I, (*newCountPtr)+1 );
+
+		#ifdef CAUTIOUS
+		Journal_Firewall( dCell_I < self->cellDomainCount, errorStream,
+				"Error - in %s(): cannot add particle %u to req. domain cell, since "
+			"dCell_I passed in of %u is greater than the count of domain cells %u.\n",
+			__func__, particle_I, dCell_I, self->cellDomainCount );
+		#endif
+
+		Swarm_ShadowParticleAt( self, shadowParticle_I)->owningCell = dCell_I;
+
+		self->shadowCellParticleTbl[dCell_I][*newCountPtr] = shadowParticle_I;
+		(*newCountPtr)++;
+		Journal_DPrintfL( self->debug, 3, "\n" );
+	}
+}
 
 Particle_InCellIndex Swarm_GetParticleIndexWithinCell( void* swarm, Cell_DomainIndex owningCell, Particle_Index particle_I) {
 	Swarm* 			self = (Swarm*)swarm;
@@ -1421,6 +1583,20 @@ void Swarm_GetCheckpointFilenameForGivenTimestep( Swarm* self, AbstractContext* 
 	else {
 		sprintf( swarmSaveFileName, "%s/%s.%05d.dat", context->outputPath,
 			self->name, context->restartTimestep );
+	}
+}
+
+Bool Swarm_AddCommHandler( Swarm *self, void *commHandler )
+{
+	assert( commHandler );
+
+	if( IsChild( ((Stg_Component*)commHandler)->type, ParticleCommHandler_Type ) ){
+		Stg_ObjectList_Append( self->commHandlerList, commHandler );
+		return True;
+	}
+	else{
+		Journal_Firewall( 0, self->debug, "Trying to add a class which is not of the type ParticleCommHandler..!\n " );
+		return False;
 	}
 }
 
