@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SwarmClass.c 4119 2007-05-22 07:35:46Z RaquibulHassan $
+** $Id: SwarmClass.c 4121 2007-05-23 10:46:14Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -1109,9 +1109,9 @@ void Swarm_AddShadowParticleToShadowCell( void* swarm, Cell_DomainIndex dCell_I,
 
 		#ifdef CAUTIOUS
 		Journal_Firewall( dCell_I < self->cellDomainCount, errorStream,
-				"Error - in %s(): cannot add particle %u to req. domain cell, since "
+				"Error - in %s(): cannot add particle %u to req. shadow cell, since "
 			"dCell_I passed in of %u is greater than the count of domain cells %u.\n",
-			__func__, particle_I, dCell_I, self->cellDomainCount );
+			__func__, shadowParticle_I, dCell_I, self->cellDomainCount );
 		#endif
 
 		Swarm_ShadowParticleAt( self, shadowParticle_I)->owningCell = dCell_I;
