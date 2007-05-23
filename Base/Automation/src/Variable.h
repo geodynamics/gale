@@ -42,7 +42,7 @@
 **
 **	Note that Variables can be applied to any piece of contiguous memory.
 **
-** $Id: Variable.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: Variable.h 4123 2007-05-23 12:36:17Z PatrickSunter $
 **
 **/
 
@@ -304,7 +304,9 @@
 				(void*)(Journal_Firewall( \
 					0, \
 					Journal_Register( Error_Type, Variable_Type ), \
-					"Array array_I %d out of range\n", array_I ), NULL) )
+					"Variable %s, in macro _Variable_GetStructPtr: requested array index %d " \
+					"out of range (array size is %d). Exiting.\n", (self)->name, array_I, \
+					(self)->arraySize ), NULL) )
 	#else
 		/** Implementation of "get" the structure in an array, that the requested data member is in if CAUTIOUS is NOT
 		 *  defined. It DOES NOT ensure that array_I is within its bounds. Private (Do not directly use!) */
