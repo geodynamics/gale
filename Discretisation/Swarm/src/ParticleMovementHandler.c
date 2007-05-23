@@ -721,7 +721,7 @@ void ParticleMovementHandler_FillRemainingHolesInLocalParticlesArray( ParticleCo
 	}
 	#if DEBUG
 	if ( Stream_IsPrintableLevel( self->debug, 2 ) ) {
-		_ParticleCommHandler_PrintParticleSlotsYetToFill( self );
+		ParticleMovementHandler_PrintParticleSlotsYetToFill( self );
 	}	
 	#endif
 
