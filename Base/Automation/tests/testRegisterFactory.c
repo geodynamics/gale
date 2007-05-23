@@ -94,7 +94,7 @@ int main( int argc, char *argv[] ) {
 		NamedObject_Register_Add( reg, TestObject_New( "b" ) );
 		NamedObject_Register_Add( reg, TestObject_New( "c" ) );
 	
-		Print( factory, stream );
+		Stg_Class_Print( factory, stream );
 	
 		Stg_Class_Delete( reg );
 		Stg_Class_Delete( factory );

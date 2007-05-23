@@ -128,7 +128,7 @@ void _RegisterFactory_Print( void* factory, Stream* stream ) {
 	
 	Journal_Printf( stream, "RegisterFactory\n" );
 	_Stg_Class_Print( self, stream );
-	Print( self->constructors, stream );
+	Stg_Class_Print( self->constructors, stream );
 }
 
 void RegisterFactory_Register( void* factory, Name name, void* _constructorFunction )

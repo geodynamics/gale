@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testVariable.c 3462 2006-02-19 06:53:24Z WalterLandry $
+** $Id: testVariable.c 4120 2007-05-23 10:43:41Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -115,7 +115,7 @@ int main( int argc, char *argv[] ) {
 		
 		Variable_Register_BuildAll( vr );
 		/*for( var_I = 0; var_I < vr->count; var_I++ ) {
-			Print( vr->_variable[var_I], stream );
+			Stg_Class_Print( vr->_variable[var_I], stream );
 		}*/
 		
 		Journal_Printf( stream, "Variable building is working fine.\n" );

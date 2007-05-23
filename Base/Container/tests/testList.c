@@ -75,7 +75,7 @@ int main( int argc, char* argv[] ) {
 			List_ElementAt( list, unsigned, idx ) = 100 - idx;
 		}
 		
-		Print( list, stream );
+		Stg_Class_Print( list, stream );
 		
 		printf( "List Data:\n" );
 		for( idx = 0; idx < 100; idx++ )

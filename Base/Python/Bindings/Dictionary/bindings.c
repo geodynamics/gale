@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: bindings.c 3462 2006-02-19 06:53:24Z WalterLandry $
+** $Id: bindings.c 4120 2007-05-23 10:43:41Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -70,7 +70,7 @@ PyObject* Dictionary_Python_Print( PyObject* self, PyObject* args) {
 	dictionary = (Dictionary*)( PyCObject_AsVoidPtr( pyDictionary ) );
 	
 	/* Run function */
-	Print( dictionary, stream );
+	Stg_Class_Print( dictionary, stream );
 	
 	/* Return */
 	Py_INCREF( Py_None );

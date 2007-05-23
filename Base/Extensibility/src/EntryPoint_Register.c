@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: EntryPoint_Register.c 3462 2006-02-19 06:53:24Z WalterLandry $
+** $Id: EntryPoint_Register.c 4120 2007-05-23 10:43:41Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -147,7 +147,7 @@ void _EntryPoint_Register_Print( void* entryPoint_Register, Stream* stream ) {
 	#ifdef DEBUG
 		for( entryPoint_I = 0; entryPoint_I < self->count; entryPoint_I++ ) {
 			Journal_Printf( (void*) stream, "entryPoint[%u]: ", entryPoint_I );
-			Print( self->entryPoint[entryPoint_I], stream);
+			Stg_Class_Print( self->entryPoint[entryPoint_I], stream);
 		}
 	#else
 		Journal_Printf( (void*) stream, "...\n" );

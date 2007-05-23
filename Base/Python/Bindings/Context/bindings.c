@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: bindings.c 3867 2006-10-16 12:38:24Z SteveQuenette $
+** $Id: bindings.c 4120 2007-05-23 10:43:41Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -68,7 +68,7 @@ PyObject* Context_Python_Print( PyObject* self, PyObject* args ) {
 	context = (Context*)( PyCObject_AsVoidPtr( pyContext ) );
 	
 	/* Run function */
-	Print( context, stream );
+	Stg_Class_Print( context, stream );
 	
 	/* Return */
 	Py_INCREF( Py_None );

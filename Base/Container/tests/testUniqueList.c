@@ -79,7 +79,7 @@ int main( int argc, char* argv[] ) {
 			printf( "\tadding %d at index %d\n", idx, UniqueList_Append( list, &idx ) );
 		}
 		
-		Print( list, stream );
+		Stg_Class_Print( list, stream );
 		
 		printf( "List Data:\n" );
 		for( idx = 0; idx < 100; idx++ ) {
