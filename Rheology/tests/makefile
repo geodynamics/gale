@@ -6,6 +6,6 @@ include ${PROJ_ROOT}/Makefile.system
 
 checks = $(wildcard *.sh)
 
-subdirs := testConstitutiveMatrix testStiffnessMatrixAssembly LateralViscosityAnalytic  testDirector testDirectorRandomness testDirectorPerMaterial testYieldCriterion NonNewtonianShearSolution
+subdirs := testConstitutiveMatrix testStiffnessMatrixAssembly testDirector testDirectorRandomness testDirectorPerMaterial testYieldCriterion NonNewtonianShearSolution #LateralViscosityAnalytic
 
 include ${PROJ_ROOT}/Makefile.vmake

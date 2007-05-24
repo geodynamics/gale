@@ -114,20 +114,24 @@ void _NonNewtonianShearSolution_Construct( void* analyticSolution, Stg_Component
 
 	/* Create Analytic Velocity Field */
 	self->velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data );
+	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, self->velocityField, NonNewtonianShearSolution_VelocityFunction );
 
 	/* Create Analytic Strain Rate Field */
 	self->strainRateField = Stg_ComponentFactory_ConstructByName( cf, "StrainRateField", FeVariable, True, data );
+	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, self->strainRateField, NonNewtonianShearSolution_StrainRateFunction );
 
 	/* Create Analytic Stress Field */
 	self->stressField = Stg_ComponentFactory_ConstructByName( cf, "StressField", FeVariable, True, data );
+	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, self->stressField, NonNewtonianShearSolution_StressFunction );
 
 	/* Create Analytic Viscosity Field */
 	self->viscosityField = Stg_ComponentFactory_ConstructByName( cf, "ViscosityField", FeVariable, True, data );
+	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, self->viscosityField, NonNewtonianShearSolution_ViscosityFunction );
 
 	self->materialViscosity = Stg_ComponentFactory_ConstructByName( cf, "layerViscosity", MaterialViscosity, True, data );
 	self->nonNewtonianRheology = 
 		Stg_ComponentFactory_ConstructByName( cf, "nonNewtonianRheology", NonNewtonian, True, data );
-	self->mesh = Stg_ComponentFactory_ConstructByName( cf, "mesh-linear", Mesh, True, data );
+	self->mesh = Stg_ComponentFactory_ConstructByName( cf, "linearMesh", Mesh, True, data );
 
 	/* Set Velocity Stuff */
 	EP_AppendClassHook( Context_GetEntryPoint( context, AbstractContext_EP_UpdateClass ),
@@ -138,14 +142,7 @@ void _NonNewtonianShearSolution_Construct( void* analyticSolution, Stg_Component
 void _NonNewtonianShearSolution_Build( void* analyticSolution, void* data ) {
 	NonNewtonianShearSolution* self = (NonNewtonianShearSolution*)analyticSolution;
 
-	AnalyticSolution_CreateAnalyticVectorField( self, self->velocityField, 
-						    NonNewtonianShearSolution_VelocityFunction );
-	AnalyticSolution_CreateAnalyticSymmetricTensorField( self, self->strainRateField, 
-							     NonNewtonianShearSolution_StrainRateFunction );
-	AnalyticSolution_CreateAnalyticSymmetricTensorField( self, self->stressField, 
-							     NonNewtonianShearSolution_StressFunction );
-	AnalyticSolution_CreateAnalyticField( self, self->viscosityField, 
-					      NonNewtonianShearSolution_ViscosityFunction );
+	AnalyticSolution_BuildAllAnalyticFields( self );
 
 	_AnalyticSolution_Build( self, data );
 }
