@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AnalyticSolution.c 837 2007-05-17 05:25:34Z LukeHodkinson $
+** $Id: AnalyticSolution.c 845 2007-05-24 08:28:36Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -335,7 +335,50 @@ void AnalyticSolution_TestAll( void* analyticSolution, void* data ) {
 	}
 }
 
-FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVariable* feVariable, AnalyticSolution_FeVariableSolutionFunction* solutionFunction ) {
+void AnalyticSolution_RegisterFeVariableWithAnalyticFunction( void* analyticSolution, FeVariable* feVariable, AnalyticSolution_FeVariableSolutionFunction* solutionFunction) {
+	AnalyticSolution* self    = (AnalyticSolution*) analyticSolution;
+	char*             tmpName = Stg_Object_AppendSuffix( feVariable, "Analytic" );
+
+	/* Add feVariable to list */
+	Stg_ObjectList_Append( self->feVariableList, feVariable );
+	/* Add function to list */
+	Stg_ObjectList_GlobalPointerAppend( self->analyticFeVariableFuncList, solutionFunction, tmpName );
+	Memory_Free( tmpName );	
+}
+
+void AnalyticSolution_BuildAllAnalyticFields( void* analyticSolution ) {
+	AnalyticSolution* self       = (AnalyticSolution*) analyticSolution;
+	FeVariable*       feVariable = NULL;
+	Stream*           errStream  = Journal_Register( Error_Type, "AnalyticSolution" );
+	unsigned          feVar_I, feVarCount;
+
+	feVarCount = Stg_ObjectList_Count( self->feVariableList );
+
+	for( feVar_I = 0 ; feVar_I < feVarCount ; feVar_I++ ) {
+		feVariable = (FeVariable*)Stg_ObjectList_At( self->feVariableList, feVar_I );
+		if( feVariable->fieldComponentCount == 1 ) {
+			if( NULL == AnalyticSolution_CreateAnalyticField( self, feVariable ) ) {
+
+				Journal_Firewall( 0 , errStream,
+				"Error in function %s: Error in building analyticSolution for the feVariable %s,\n",
+				__func__ , feVariable );
+			}
+		} else {
+			if( NULL == AnalyticSolution_CreateAnalyticSymmetricTensorField( self, feVariable ) ) {
+
+				Journal_Firewall( 0 , errStream,
+				"Error in function %s: Error in building analyticSolution for the feVariable %s,\n",
+				__func__ , feVariable );
+			}
+		}
+
+	}
+
+
+}
+
+FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVariable* feVariable ) {
+//FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVariable* feVariable, AnalyticSolution_FeVariableSolutionFunction* solutionFunction ) {
 	AnalyticSolution*                            self = (AnalyticSolution*) analyticSolution;
 	Name                                         tmpName;
 	FeVariable*                                  analyticFeVariable;
@@ -432,14 +475,15 @@ FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVari
 		feVariable->importFormatType, feVariable->exportFormatType, 
 		feVariable->fieldVariable_Register );
 
+	/* Add new analyticFeVariable to list */
 	/* Add new FeVariable to list */
-	Stg_ObjectList_Append( self->feVariableList,         feVariable );
+	//Stg_ObjectList_Append( self->feVariableList,         feVariable );
 	Stg_ObjectList_Append( self->analyticFeVariableList, analyticFeVariable );
 
-	/* Add function to list */
+	/* Add function to list 
 	Stg_ObjectList_GlobalPointerAppend( self->analyticFeVariableFuncList, solutionFunction, tmpName );
 	Memory_Free( tmpName );
-
+	*/
 	/* Create Magnitude Field */
 	tmpName = Stg_Object_AppendSuffix( analyticFeVariable, "Magnitude" );
 	analyticMagField = OperatorFeVariable_NewUnary( tmpName, analyticFeVariable, "Magnitude" );
@@ -496,18 +540,21 @@ FeVariable* AnalyticSolution_CreateAnalyticVectorField( void* analyticSolution, 
 	AnalyticSolution*                            self = (AnalyticSolution*) analyticSolution;
 	FeVariable*                                  analyticVectorField;
 
-	analyticVectorField = AnalyticSolution_CreateAnalyticField( self, vectorField, solutionFunction );
+	//analyticVectorField = AnalyticSolution_CreateAnalyticField( self, vectorField, solutionFunction );
+	analyticVectorField = AnalyticSolution_CreateAnalyticField( self, vectorField );
 
 	return analyticVectorField;
 }
 
-FeVariable* AnalyticSolution_CreateAnalyticSymmetricTensorField( void* analyticSolution, FeVariable* vectorField, AnalyticSolution_FeVariableSolutionFunction* solutionFunction ) {
+//FeVariable* AnalyticSolution_CreateAnalyticSymmetricTensorField( void* analyticSolution, FeVariable* vectorField, AnalyticSolution_FeVariableSolutionFunction* solutionFunction ) {
+FeVariable* AnalyticSolution_CreateAnalyticSymmetricTensorField( void* analyticSolution, FeVariable* vectorField ) {
 	AnalyticSolution*                            self = (AnalyticSolution*) analyticSolution;
 	FeVariable*                                  analyticVectorField;
 	OperatorFeVariable*                          analyticVectorInvField;
 	Name                                         tmpName;
 
-	analyticVectorField = AnalyticSolution_CreateAnalyticField( self, vectorField, solutionFunction );
+	//analyticVectorField = AnalyticSolution_CreateAnalyticField( self, vectorField, solutionFunction );
+	analyticVectorField = AnalyticSolution_CreateAnalyticField( self, vectorField );
 
 	/* Create Invariant Field */
 	tmpName = Stg_Object_AppendSuffix( analyticVectorField, "Invariant" );

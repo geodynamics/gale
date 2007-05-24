@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: HomogeneousNaturalBCs.c 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: HomogeneousNaturalBCs.c 845 2007-05-24 08:28:36Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -103,6 +103,7 @@ void _HomogeneousNaturalBCs_Construct( void* analyticSolution, Stg_ComponentFact
 	_AnalyticSolution_Construct( self, cf, data );
 
 	self->temperatureField = Stg_ComponentFactory_ConstructByName( cf, "TemperatureField", FeVariable, True, data ); 
+	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, self->temperatureField, HomogeneousNaturalBCs_TemperatureFunction );
 
 	/* Create Condition Functions */
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
@@ -115,7 +116,7 @@ void _HomogeneousNaturalBCs_Construct( void* analyticSolution, Stg_ComponentFact
 void _HomogeneousNaturalBCs_Build( void* analyticSolution, void* data ) {
 	HomogeneousNaturalBCs* self = (HomogeneousNaturalBCs*)analyticSolution;	
 
-	AnalyticSolution_CreateAnalyticField( self, self->temperatureField, HomogeneousNaturalBCs_TemperatureFunction );
+	AnalyticSolution_BuildAllAnalyticFields( self );
 
 	_AnalyticSolution_Build( self, data );
 }

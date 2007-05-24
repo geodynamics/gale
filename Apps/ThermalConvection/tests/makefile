@@ -35,7 +35,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 715 2007-01-17 13:00:01Z SteveQuenette $
+## $Id: makefile 845 2007-05-24 08:28:36Z JulianGiordani $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -49,7 +49,7 @@ modName = $(shell basename `pwd | sed s/tests//g`)
 tests = ${PROJECT}-${modName}-tests
 checks = $(wildcard *.sh)
 
-subdirs = ColumnViscosityAnalytic
+subdirs = #ColumnViscosityAnalytic
 
 PROJ_LIBS =
 EXTERNAL_INCLUDES = -I${INC_DIR}/${PROJECT} 

@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: LidDrivenIsoviscousAnalytic.c 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: LidDrivenIsoviscousAnalytic.c 845 2007-05-24 08:28:36Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -129,7 +129,10 @@ void _LidDrivenIsoviscousAnalytic_Construct( void* analyticSolution, Stg_Compone
 	_AnalyticSolution_Construct( self, cf, data );
 
 	self->velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data ); 
+	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, self->velocityField, LidDrivenIsoviscousAnalytic_VelocityFunction );
+	
 	self->pressureField = Stg_ComponentFactory_ConstructByName( cf, "PressureField", FeVariable, True, data ); 
+	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, self->pressureField, LidDrivenIsoviscousAnalytic_PressureFunction );
 
 	/* Set constants */
 	self->wavenumber = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "sinusoidalLidWavenumber", 1 );
@@ -139,11 +142,10 @@ void _LidDrivenIsoviscousAnalytic_Construct( void* analyticSolution, Stg_Compone
 void _LidDrivenIsoviscousAnalytic_Build( void* analyticSolution, void* data ) {
 	LidDrivenIsoviscousAnalytic *self = (LidDrivenIsoviscousAnalytic*)analyticSolution;
 
+	/*Build( self->velocityField, data, False );
 	Build( self->velocityField, data, False );
-	Build( self->velocityField, data, False );
-
-	AnalyticSolution_CreateAnalyticVectorField( self, self->velocityField, LidDrivenIsoviscousAnalytic_VelocityFunction );
-	AnalyticSolution_CreateAnalyticField( self, self->pressureField, LidDrivenIsoviscousAnalytic_PressureFunction );
+*/
+	AnalyticSolution_BuildAllAnalyticFields( self );
 
 	_AnalyticSolution_Build( self, data );
 }

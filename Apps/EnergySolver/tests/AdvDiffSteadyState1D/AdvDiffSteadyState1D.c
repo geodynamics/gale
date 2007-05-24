@@ -35,9 +35,13 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AdvDiffSteadyState1D.c 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: AdvDiffSteadyState1D.c 845 2007-05-24 08:28:36Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+/* This analytic solutions is just the advection of a diffusing temperature for one time step.
+ *  The advection is in the direction of one of the i,j,k axis 
+ *  */
 
 #include <StGermain/StGermain.h>
 #include <StgFEM/StgFEM.h>
@@ -48,6 +52,7 @@ const Type AdvDiffSteadyState1D_Type = "AdvDiffSteadyState1D";
 typedef struct { 
 	__AnalyticSolution
 	AdvDiffResidualForceTerm* residual;
+	/* Velocity in this analyticSolution is constant */
 	double                    velocity;
 	Axis                      velocityDirection;
 	double                    A;
@@ -88,7 +93,7 @@ void _AdvDiffSteadyState1D_Build( void* analyticSolution, void* data ) {
 	AllNodesVC*           allNodesVC;
 	AllNodesVC_Entry*     vcEntry;
 
-	AnalyticSolution_CreateAnalyticField( self, self->temperatureField, AdvDiffSteadyState1D_TemperatureFunction );
+	AnalyticSolution_BuildAllAnalyticFields( self );
 
 	_AnalyticSolution_Build( self, data );
 
@@ -128,6 +133,7 @@ void _AdvDiffSteadyState1D_Construct( void* analyticSolution, Stg_ComponentFacto
 	_AnalyticSolution_Construct( self, cf, data );
 
 	self->temperatureField = Stg_ComponentFactory_ConstructByName( cf, "TemperatureField", FeVariable, True, data );
+	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, self->temperatureField, AdvDiffSteadyState1D_TemperatureFunction );
 
 	self->residual = Stg_ComponentFactory_ConstructByName( cf, "defaultResidualForceTerm", AdvDiffResidualForceTerm, True, data );
 

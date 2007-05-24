@@ -35,42 +35,40 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: LinearTemperatureField.c 830 2007-05-10 06:45:16Z JulianGiordani $
+** $Id: LinearTemperatureField.c 845 2007-05-24 08:28:36Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#include <string.h>
+/** Pretty simple.
+ * One time step with the diffusion coefficiants K = 1
+ * TempBCs Bottom BC = 1, top BC = 0, sides = 0
+ */
 #include <StGermain/StGermain.h>
 #include <StgFEM/StgFEM.h>
 
 const Type LinearTemperatureField_Type = "LinearTemperatureField";
 
-typedef struct { __AnalyticSolution } LinearTemperatureField;
+typedef struct { __AnalyticSolution FeVariable* temperatureField; } LinearTemperatureField;
 
 void LinearTemperatureField_TemperatureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* value ) {
 	*value = 1.0 - coord[ J_AXIS ];
 }
 
+
 void _LinearTemperatureField_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	LinearTemperatureField *self = (LinearTemperatureField*)analyticSolution;
-	FeVariable* temperatureField;
 
 	_AnalyticSolution_Construct( self, cf, data );
 
-	temperatureField = Stg_ComponentFactory_ConstructByName( cf, "TemperatureField", FeVariable, True, data ); 
-	Stg_ObjectList_Append( self->feVariableList, temperatureField );
+	self->temperatureField = Stg_ComponentFactory_ConstructByName( cf, "TemperatureField", FeVariable, True, data ); 
+
+	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, self->temperatureField, LinearTemperatureField_TemperatureFunction );
 }
 
 void _LinearTemperatureField_Build( void* analyticSolution, void* data ) {
 	LinearTemperatureField *self = (LinearTemperatureField*)analyticSolution;
-	FeVariable* feVariable       = (FeVariable*) Stg_ObjectList_At( self->feVariableList, 0 );
-	char* feName                 = feVariable->name;
 
-	Stg_Component_Build( feVariable, data, False );
-	if( !strcmp( feName, "TemperatureField" ) )
-		AnalyticSolution_CreateAnalyticVectorField( self, feVariable, LinearTemperatureField_TemperatureFunction );
-	else
-		assert(0);
+	AnalyticSolution_BuildAllAnalyticFields( self );
 
 	_AnalyticSolution_Build( self, data );
 }
