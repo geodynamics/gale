@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AnalyticPressure.c 456 2007-04-27 06:21:01Z LukeHodkinson $
+** $Id: AnalyticPressure.c 467 2007-05-24 08:30:12Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -81,6 +81,8 @@ void _AnalyticPressure_Construct( void* analyticSolution, Stg_ComponentFactory* 
 
 	/* Create Analytic Fields */
 	self->pressureField = Stg_ComponentFactory_ConstructByName( cf, "PressureField", FeVariable, True, data ); 
+	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, self->pressureField, _AnalyticPressure_PressureFunction );
+	
 	
 	self->density  = Stg_ComponentFactory_GetDouble( cf, "layer", "density", 0.0 );
 	self->gravity  = Stg_ComponentFactory_GetRootDictDouble( cf, "gravity", 0 );
@@ -93,9 +95,8 @@ void _AnalyticPressure_Build( void* analyticSolution, void* data ) {
 
 	assert( self && Stg_CheckType( self, AnalyticPressure ) );
 
-	Build( self->pressureField, data, False );
-	AnalyticSolution_CreateAnalyticField( self, self->pressureField, _AnalyticPressure_PressureFunction );
-
+	AnalyticSolution_BuildAllAnalyticFields( self );
+	
 	_AnalyticSolution_Build( self, data );
 }
 

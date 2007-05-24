@@ -38,7 +38,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 409 2007-01-17 13:01:26Z SteveQuenette $
+## $Id: makefile 467 2007-05-24 08:30:12Z JulianGiordani $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -48,7 +48,7 @@ PROJ_ROOT := $(shell until test -r ./Makefile.system ; do cd .. ; done ; echo `p
 
 include ${PROJ_ROOT}/Makefile.system
 
-subdirs = AnalyticColumn AnalyticBlock
+subdirs = #AnalyticColumn AnalyticBlock
 
 modName = $(shell basename `pwd | sed s/tests//g`)
 
