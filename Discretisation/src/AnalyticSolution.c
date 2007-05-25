@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AnalyticSolution.c 845 2007-05-24 08:28:36Z JulianGiordani $
+** $Id: AnalyticSolution.c 846 2007-05-25 06:39:04Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -191,7 +191,7 @@ void _AnalyticSolution_Build( void* analyticSolution, void* data ) {
 	assert( analyticFeVariableCount == Stg_ObjectList_Count( self->analyticFeVariableFuncList ) );
 
 	for ( analyticFeVariable_I = 0 ; analyticFeVariable_I < analyticFeVariableCount ; analyticFeVariable_I++ ) {
-		Stg_Component_Build( Stg_ObjectList_At( self->feVariableList, analyticFeVariable_I ), data, False ) ;
+		//Stg_Component_Build( Stg_ObjectList_At( self->feVariableList, analyticFeVariable_I ), data, False ) ;
 		Stg_Component_Build( Stg_ObjectList_At( self->analyticFeVariableList, analyticFeVariable_I ), data, False ) ;
 		Stg_Component_Build( Stg_ObjectList_At( self->errorMagnitudeFieldList, analyticFeVariable_I ), data, False ) ;
 		Stg_Component_Build( Stg_ObjectList_At( self->relativeErrorMagnitudeFieldList, analyticFeVariable_I ), data, False ) ;
@@ -246,7 +246,8 @@ void AnalyticSolution_PutAnalyticSolutionOntoNodes( void* analyticSolution, Inde
 	feVariable = AnalyticSolution_GetFeVariableFromAnalyticFeVariable( self, analyticFeVariable );
 
 	/* Get number of degrees of freedom at each node (assuming they are the same) */
-	dofAtEachNodeCount = analyticFeVariable->dofLayout->dofCounts[0];
+	//dofAtEachNodeCount = analyticFeVariable->dofLayout->dofCounts[0];
+	dofAtEachNodeCount = analyticFeVariable->fieldComponentCount;
 	value = Memory_Alloc_Array( double, dofAtEachNodeCount, "value" );
 
 	/* Loop over all the nodes - applying the analytic solution */
@@ -346,7 +347,7 @@ void AnalyticSolution_RegisterFeVariableWithAnalyticFunction( void* analyticSolu
 	Memory_Free( tmpName );	
 }
 
-void AnalyticSolution_BuildAllAnalyticFields( void* analyticSolution ) {
+void AnalyticSolution_BuildAllAnalyticFields( void* analyticSolution, void* data ) {
 	AnalyticSolution* self       = (AnalyticSolution*) analyticSolution;
 	FeVariable*       feVariable = NULL;
 	Stream*           errStream  = Journal_Register( Error_Type, "AnalyticSolution" );
@@ -356,6 +357,8 @@ void AnalyticSolution_BuildAllAnalyticFields( void* analyticSolution ) {
 
 	for( feVar_I = 0 ; feVar_I < feVarCount ; feVar_I++ ) {
 		feVariable = (FeVariable*)Stg_ObjectList_At( self->feVariableList, feVar_I );
+		/* Build the FeVariable here ensuring the analytic "copy" of it has valid values */
+		Stg_Component_Build( feVariable, data, False ) ;
 		if( feVariable->fieldComponentCount == 1 ) {
 			if( NULL == AnalyticSolution_CreateAnalyticField( self, feVariable ) ) {
 

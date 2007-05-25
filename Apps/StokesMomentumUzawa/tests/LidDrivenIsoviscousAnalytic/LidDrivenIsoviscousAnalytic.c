@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: LidDrivenIsoviscousAnalytic.c 845 2007-05-24 08:28:36Z JulianGiordani $
+** $Id: LidDrivenIsoviscousAnalytic.c 846 2007-05-25 06:39:04Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -142,10 +142,7 @@ void _LidDrivenIsoviscousAnalytic_Construct( void* analyticSolution, Stg_Compone
 void _LidDrivenIsoviscousAnalytic_Build( void* analyticSolution, void* data ) {
 	LidDrivenIsoviscousAnalytic *self = (LidDrivenIsoviscousAnalytic*)analyticSolution;
 
-	/*Build( self->velocityField, data, False );
-	Build( self->velocityField, data, False );
-*/
-	AnalyticSolution_BuildAllAnalyticFields( self );
+	AnalyticSolution_BuildAllAnalyticFields( self, data );
 
 	_AnalyticSolution_Build( self, data );
 }
