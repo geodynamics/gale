@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: LateralViscosityAnalytic.c 466 2007-04-27 06:24:33Z LukeHodkinson $
+** $Id: LateralViscosityAnalytic.c 478 2007-05-25 06:44:20Z JulianGiordani $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -418,6 +418,7 @@ void _LateralViscosityAnalytic_Construct( void* analyticSolution, Stg_ComponentF
 	
 	/* Create Analytic Fields */
 	self->velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data ); 
+	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, self->velocityField, _LateralViscosityAnalytic_VelocityFunction );
 
 	self->beta = Stg_ComponentFactory_GetRootDictDouble( cf, "beta", 0.0 );
 	self->wavenumberX = Stg_ComponentFactory_GetRootDictInt( cf, "wavenumberX", 1 );
@@ -427,7 +428,7 @@ void _LateralViscosityAnalytic_Construct( void* analyticSolution, Stg_ComponentF
 void _LateralViscosityAnalytic_Build( void* analyticSolution, void* data ) {
 	LateralViscosityAnalytic*         self = (LateralViscosityAnalytic*)analyticSolution;
 
-	AnalyticSolution_CreateAnalyticField( self, self->velocityField, _LateralViscosityAnalytic_VelocityFunction );
+	AnalyticSolution_BuildAllAnalyticFields( self, data );
 
 	_AnalyticSolution_Build( self, data );
 }
