@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AnalyticPressure.c 467 2007-05-24 08:30:12Z JulianGiordani $
+** $Id: AnalyticPressure.c 468 2007-05-25 06:39:39Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -95,7 +95,7 @@ void _AnalyticPressure_Build( void* analyticSolution, void* data ) {
 
 	assert( self && Stg_CheckType( self, AnalyticPressure ) );
 
-	AnalyticSolution_BuildAllAnalyticFields( self );
+	AnalyticSolution_BuildAllAnalyticFields( self, data );
 	
 	_AnalyticSolution_Build( self, data );
 }
