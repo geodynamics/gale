@@ -70,11 +70,22 @@
 			<param name="Type">SpaceFillerParticleLayout</param>
 			<param name="averageInitialParticlesPerCell">particlesPerCell</param>
 		</struct>
+		<struct name="pMovementHandler"> 
+			<param name="Type">ParticleMovementHandler</param>
+		</struct>
+		
+		<struct name="pShadowSync"> 
+			<param name="Type">ParticleShadowSync</param>
+		</struct>
 		<struct name="materialSwarm">
 			<param name="Type">MaterialPointsSwarm</param>
 			<param name="CellLayout">elementCellLayout</param>
 			<param name="ParticleLayout">materialSwarmParticleLayout</param>
 			<param name="FeMesh">elementMesh</param>
+			<list name="ParticleCommHandlers">
+				<param>pMovementHandler</param>
+				<param>pShadowSync</param>
+			</list>
 
 			<!-- These guys may or may not be created -->
 			<param name="SplittingRoutine">splittingRoutine</param>
