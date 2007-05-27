@@ -113,6 +113,7 @@ void _OneToOneMapper_Init( void* mapper, IntegrationPointsSwarm* integrationSwar
 
 	_IntegrationPointMapper_Init( mapper, integrationSwarm );
 	
+	self->errorStream = Journal_MyStream( Error_Type, self );
 	self->materialSwarm = materialSwarm;
 
 	ExtensionManager_SetLockDown( self->integrationSwarm->particleExtensionMgr, False );
@@ -200,14 +201,14 @@ MaterialPoint* OneToOneMapper_GetMaterialPoint( void* mapper, void* integrationP
 	ref = OneToOneMapper_GetMaterialRef( self, integrationPoint );
 	Journal_Firewall(
 			ref != NULL,
-			Journal_MyStream( Error_Type, self ),
+			self->errorStream, 
 			"In func %s, no MaterialPointRef found on point\n",
 			__func__ );
 
 	swarm = (MaterialPointsSwarm*)Swarm_Register_At( Swarm_Register_GetSwarm_Register(), ref->swarm_I );
 	Journal_Firewall(
 			swarm != NULL,
-			Journal_MyStream( Error_Type, self ),
+			self->errorStream, 
 			"In func %s, no swarm found on for index %d\n",
 			__func__,
 			ref->swarm_I );
@@ -218,7 +219,7 @@ MaterialPoint* OneToOneMapper_GetMaterialPoint( void* mapper, void* integrationP
 	materialPoint = (MaterialPoint*)Swarm_ParticleAt( swarm, ref->particle_I );
 	Journal_Firewall(
 			materialPoint != NULL,
-			Journal_MyStream( Error_Type, self ),
+			self->errorStream, 
 			"In func %s, no MaterialPoint found for swarm index %d, point index %d\n",
 			__func__,
 			ref->swarm_I,

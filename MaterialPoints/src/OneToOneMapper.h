@@ -65,6 +65,7 @@
 	#define __OneToOneMapper \
 		__IntegrationPointMapper \
 		\
+		Stream*				errorStream; \
 		MaterialPointsSwarm*		materialSwarm; \
 		Index                           materialRefHandle; /**< Extension handle to reference struct of material points */
 
