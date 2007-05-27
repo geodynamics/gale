@@ -1573,9 +1573,7 @@ void CartesianGenerator_GenTopo( CartesianGenerator* self, MeshTopology* topo ) 
 			if( d_i == 0 )
 				CartesianGenerator_CompleteVertexNeighbours( self, topo, grids );
 			else {
-				abort();
-				/* TODO
-				  MeshTopology_Neighbourhood( topo, d_i );*/
+				MeshTopology_ExpandIncidence( topo, d_i );
 			}
 		}
 	}

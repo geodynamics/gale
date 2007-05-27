@@ -189,7 +189,7 @@ Bool Mesh_RegularAlgorithms_SearchElements( void* algorithms, double* point, uns
 	double			out, frac, integer;
 	unsigned		d_i;
 
-	assert( self && Stg_CheckType( self, Mesh_RegularAlgorithms ) );
+	assert( self );
 	assert( Mesh_GetDimSize( self->mesh ) <= 3 );
 	assert( elInd );
 
@@ -198,14 +198,17 @@ Bool Mesh_RegularAlgorithms_SearchElements( void* algorithms, double* point, uns
 	elGrid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
 						ExtensionManager_GetHandle( mesh->info, "elementGrid" ) );
 	for( d_i = 0; d_i < nDims; d_i++ ) {
-		if( point[d_i] < self->minCrd[d_i] || point[d_i] > self->maxCrd[d_i] )
+		if( Num_Approx( point[d_i] - self->maxCrd[d_i], 0.0 ) )
+			inds[d_i] = elGrid->sizes[d_i] - 1;
+		else if( point[d_i] < self->minCrd[d_i] || point[d_i] > self->maxCrd[d_i] )
 			return False;
-
-		out = (point[d_i] - self->minCrd[d_i]) / self->sep[d_i];
-		frac = modf( out, &integer );
-		inds[d_i] = (unsigned)integer;
-		if( inds[d_i] > 0 && Num_Approx( frac, 0.0 ) )
-			inds[d_i]--;
+		else {
+			out = (point[d_i] - self->minCrd[d_i]) / self->sep[d_i];
+			frac = modf( out, &integer );
+			inds[d_i] = (unsigned)integer;
+			if( inds[d_i] > 0 && Num_Approx( frac, 0.0 ) )
+				inds[d_i]--;
+		}
 	}
 
 	*elInd = Grid_Project( elGrid, inds );

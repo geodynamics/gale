@@ -144,8 +144,8 @@ void _Mesh_Algorithms_Destroy( void* algorithms, void* data ) {
 void _Mesh_Algorithms_SetMesh( void* algorithms, void* mesh ) {
 	Mesh_Algorithms*	self = (Mesh_Algorithms*)algorithms;
 
-	assert( self && Stg_CheckType( self, Mesh_Algorithms ) );
-	assert( !mesh || Stg_CheckType( mesh, Mesh ) );
+	assert( self );
+	assert( mesh );
 
 	self->mesh = (Mesh*)mesh;
 }
@@ -155,7 +155,7 @@ void _Mesh_Algorithms_Update( void* algorithms ) {
 	unsigned		nDims;
 	unsigned		d_i;
 
-	assert( self && Stg_CheckType( self, Mesh_Algorithms ) );
+	assert( self );
 
 	if( !self->mesh )
 		return;
@@ -181,7 +181,7 @@ void _Mesh_Algorithms_Update( void* algorithms ) {
 unsigned _Mesh_Algorithms_NearestVertex( void* algorithms, double* point ) {
 	Mesh_Algorithms*	self = (Mesh_Algorithms*)algorithms;
 
-	assert( self && Stg_CheckType( self, Mesh_Algorithms ) );
+	assert( self );
 	assert( self->nearestVertex );
 
 	return self->nearestVertex( self, point );
@@ -192,7 +192,7 @@ Bool _Mesh_Algorithms_Search( void* algorithms, double* point,
 {
 	Mesh_Algorithms*	self = (Mesh_Algorithms*)algorithms;
 
-	assert( self && Stg_CheckType( self, Mesh_Algorithms ) );
+	assert( self );
 	assert( self->search );
 
 	return self->search( self, point, dim, ind );
@@ -445,8 +445,8 @@ unsigned Mesh_Algorithms_NearestVertexGeneral( void* algorithms, double* point )
 	double			curSep, minSep;
 	unsigned		v_i;
 
-	assert( self && Stg_CheckType( self, Mesh_Algorithms ) );
-	assert( self->mesh && Stg_CheckType( self->mesh, Mesh ) );
+	assert( self );
+	assert( self->mesh );
 	assert( Mesh_GetDomainSize( self->mesh, MT_VERTEX ) );
 
 	/* TODO: This is going to be hella slow, need to use some kind of spatial partitioning scheme. */

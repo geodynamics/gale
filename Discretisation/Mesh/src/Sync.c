@@ -46,24 +46,24 @@ void Sync_ClearShared( Sync* self );
 void Sync_ClearOwners( Sync* self );
 
 
-void _Sync_Construct( void* _self ) {
+void _Sync_Init( void* _self ) {
    Sync* self = (Sync*)_self;
 
-   _NewClass_Construct( self );
+   _NewClass_Init( self );
    self->decomp = NULL;
    self->comm = NULL;
    self->nDomains = 0;
    self->remotes = &self->remotesObj;
-   IArray_Init( self->remotes );
+   IArray_Construct( self->remotes );
    self->owners = NULL;
    self->nShared = 0;
    self->shared = NULL;
    self->nSharers = NULL;
    self->sharers = NULL;
    self->gr = &self->grObj;
-   IMap_Init( self->gr );
+   IMap_Construct( self->gr );
    self->ls = &self->lsObj;
-   IMap_Init( self->ls );
+   IMap_Construct( self->ls );
    self->nSrcs = NULL;
    self->srcs = NULL;
    self->nSnks = NULL;
@@ -362,26 +362,26 @@ void Sync_SyncArray( const void* _self,
    Sync* self = (Sync*)_self;
    int nNbrs;
    int* nSrcs;
-   StgByte **srcs, **snks;
+   stgByte **srcs, **snks;
    int n_i, s_i;
 
    assert( self );
    nNbrs = Comm_GetNumNeighbours( self->comm );
-   snks = Class_Array( self, StgByte*, nNbrs );
+   snks = Class_Array( self, stgByte*, nNbrs );
    for( n_i = 0; n_i < nNbrs; n_i++ ) {
-      snks[n_i] = Class_Array( self, StgByte, self->nSnks[n_i] * itmSize );
+      snks[n_i] = Class_Array( self, stgByte, self->nSnks[n_i] * itmSize );
       for( s_i = 0; s_i < self->nSnks[n_i]; s_i++ ) {
 	 memcpy( snks[n_i] + s_i * itmSize, 
-		 (StgByte*)local + self->snks[n_i][s_i] * localStride, 
+		 (stgByte*)local + self->snks[n_i][s_i] * localStride, 
 		 itmSize );
       }
    }
 
    nSrcs = Class_Array( self, int, nNbrs );
    Comm_AlltoallInit( self->comm, self->nSnks, nSrcs, itmSize );
-   srcs = Class_Array( self, StgByte*, nNbrs );
+   srcs = Class_Array( self, stgByte*, nNbrs );
    for( n_i = 0; n_i < nNbrs; n_i++ )
-      srcs[n_i] = Class_Array( self, StgByte, nSrcs[n_i] * itmSize );
+      srcs[n_i] = Class_Array( self, stgByte, nSrcs[n_i] * itmSize );
    Comm_AlltoallBegin( self->comm, (const void**)snks, (void**)srcs );
    Comm_AlltoallEnd( self->comm );
    Class_Free( self, nSrcs );
@@ -391,7 +391,7 @@ void Sync_SyncArray( const void* _self,
 
    for( n_i = 0; n_i < nNbrs; n_i++ ) {
       for( s_i = 0; s_i < self->nSrcs[n_i]; s_i++ ) {
-	 memcpy( (StgByte*)remote + self->srcs[n_i][s_i] * remoteStride, 
+	 memcpy( (stgByte*)remote + self->srcs[n_i][s_i] * remoteStride, 
 		 srcs[n_i] + s_i * itmSize, 
 		 itmSize );
       }
@@ -415,8 +415,8 @@ void Sync_UpdateTables( Sync* self ) {
       return;
 
    nNbrs = Comm_GetNumNeighbours( self->comm );
-   ISet_Init( theirRems );
-   ISet_Init( myLocs );
+   ISet_Construct( theirRems );
+   ISet_Construct( myLocs );
    Decomp_GetLocals( self->decomp, &nLocals, &locals );
    ISet_UseArray( myLocs, nLocals, locals );
    nRems = IArray_GetSize( self->remotes );
@@ -476,7 +476,7 @@ void Sync_UpdateShared( Sync* self ) {
       return;
 
    nNbrs = Comm_GetNumNeighbours( self->comm );
-   ISet_Init( sharedSet );
+   ISet_Construct( sharedSet );
    ISet_SetMaxSize( sharedSet, Decomp_GetNumLocals( self->decomp ) );
    for( n_i = 0; n_i < nNbrs; n_i++ ) {
       for( s_i = 0; s_i < self->nSnks[n_i]; s_i++ )

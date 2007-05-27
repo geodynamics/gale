@@ -40,16 +40,16 @@
 void Decomp_Update( Decomp* self );
 
 
-void _Decomp_Construct( void* _self ) {
+void _Decomp_Init( void* _self ) {
    Decomp* self = (Decomp*)_self;
 
-   _NewClass_Construct( self );
+   _NewClass_Init( self );
    self->mpiComm = MPI_COMM_WORLD;
    self->nGlobals = 0;
    self->locals = &self->localsObj;
-   IArray_Init( self->locals );
+   IArray_Construct( self->locals );
    self->inv = &self->invObj;
-   IMap_Init( self->inv );
+   IMap_Construct( self->inv );
 }
 
 void _Decomp_Destruct( void* _self ) {

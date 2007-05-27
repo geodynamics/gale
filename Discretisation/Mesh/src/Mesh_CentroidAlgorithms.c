@@ -139,7 +139,7 @@ unsigned Mesh_CentroidAlgorithms_NearestVertex( void* centroidAlgorithms, double
 	Mesh_CentroidAlgorithms*	self = (Mesh_CentroidAlgorithms*)centroidAlgorithms;
 	unsigned			elInd;
 
-	assert( self && Stg_CheckType( self, Mesh_CentroidAlgorithms ) );
+	assert( self );
 
 	if( Mesh_SearchElements( self->elMesh, point, &elInd ) ) {
 		unsigned	nInc, *inc;
@@ -158,7 +158,7 @@ Bool Mesh_CentroidAlgorithms_Search( void* centroidAlgorithms, double* point,
 {
 	Mesh_CentroidAlgorithms*	self = (Mesh_CentroidAlgorithms*)centroidAlgorithms;
 
-	assert( self && Stg_CheckType( self, Mesh_CentroidAlgorithms ) );
+	assert( self );
 
 	return Mesh_Search( self->elMesh, point, dim, ind );
 }
@@ -168,7 +168,7 @@ Bool Mesh_CentroidAlgorithms_SearchElements( void* centroidAlgorithms, double* p
 {
 	Mesh_CentroidAlgorithms*	self = (Mesh_CentroidAlgorithms*)centroidAlgorithms;
 
-	assert( self && Stg_CheckType( self, Mesh_CentroidAlgorithms ) );
+	assert( self );
 
 	return Mesh_SearchElements( self->elMesh, point, elInd );
 }

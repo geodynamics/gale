@@ -3,7 +3,7 @@
 #undef CLASSNAME
 #define CLASSNAME Sync
 
-VOIDOVERRIDE( Construct, void, (void* self), (self) )
+VOIDOVERRIDE( Init, void, (void* self), (self) )
 VOIDOVERRIDE( Destruct, void, (void* self), (self) )
 VOIDOVERRIDE( Copy, void, (void* self, const void* op), (self, op) )
 OVERRIDE( CalcMem, SizeT, (const void* self, PtrMap* ptrs), (self, ptrs) )

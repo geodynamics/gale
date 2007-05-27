@@ -42,16 +42,16 @@
 void MeshTopology_PickleIncidenceInit( MeshTopology* self, int dim, 
 				       int nEls, int* els, int* nBytes );
 void MeshTopology_PickleIncidence( MeshTopology* self, int dim, 
-				   int nEls, int* els, StgByte* bytes );
+				   int nEls, int* els, stgByte* bytes );
 void MeshTopology_UnpickleIncidence( MeshTopology* self, int dim, 
-				     int nBytes, StgByte* bytes );
+				     int nBytes, stgByte* bytes );
 int MeshTopology_Cmp( const void* l, const void* r );
 
 
-void _MeshTopology_Construct( void* _self ) {
+void _MeshTopology_Init( void* _self ) {
    MeshTopology* self = (MeshTopology*)_self;
 
-   _NewClass_Construct( self );
+   _NewClass_Init( self );
    self->nDims = 0;
    self->nTDims = 0;
    self->shadDepth = 0;
@@ -181,7 +181,7 @@ void MeshTopology_SetElements( void* _self, int dim, int nEls,
       return;
    }
 
-   ISet_Init( locals );
+   ISet_Construct( locals );
    mpiComm = Comm_GetMPIComm( self->comm );
    insist( MPI_Comm_rank( mpiComm, &rank ), == MPI_SUCCESS );
    isects = Class_Array( self, IArray*, nNbrs );
@@ -218,7 +218,7 @@ void MeshTopology_SetElements( void* _self, int dim, int nEls,
    Class_Free( self, nNbrEls );
    Class_Free( self, nbrEls );
 
-   ISet_Init( remotes );
+   ISet_Construct( remotes );
    ISet_SetMaxSize( remotes, nEls );
    for( n_i = 0; n_i < nNbrs; n_i++ ) {
       IArray_GetArray( isects[n_i], &nCurEls, (const int**)&curEls );
@@ -474,7 +474,7 @@ void MeshTopology_ExpandIncidence( void* _self, int dim ) {
 	 maxNbrs = nCurNbrs;
    }
 
-   ISet_Init( nbrSet );
+   ISet_Construct( nbrSet );
    ISet_SetMaxSize( nbrSet, maxNbrs );
    if( !self->nIncEls[dim][dim] ) {
       self->nIncEls[dim][dim] = Class_Array( self, int, nEls );
@@ -518,7 +518,7 @@ void MeshTopology_SetShadowDepth( void* _self, int depth ) {
    const int* locals, *remotes;
    int *nNbrGhosts, **nbrGhosts;
    int *nBytes, *nRecvBytes;
-   StgByte **bytes, **recvBytes;
+   stgByte **bytes, **recvBytes;
    int nIncEls, *incEls;
    int *nLowEls, **lowEls;
    int *nShdEls, **shdEls;
@@ -536,7 +536,7 @@ void MeshTopology_SetShadowDepth( void* _self, int depth ) {
    nGhosts = 0;
    for( n_i = 0; n_i < nNbrs; n_i++ )
       nGhosts += vertSync->nSnks[n_i] + vertSync->nSrcs[n_i];
-   ISet_Init( ghostSet );
+   ISet_Construct( ghostSet );
    ISet_SetMaxSize( ghostSet, nGhosts );
    for( n_i = 0; n_i < nNbrs; n_i++ ) {
       for( s_i = 0; s_i < vertSync->nSnks[n_i]; s_i++ ) {
@@ -565,7 +565,7 @@ void MeshTopology_SetShadowDepth( void* _self, int depth ) {
    Class_Free( self, ghosts );
 
    /* Build intersections. */
-   ISet_Init( mySet );
+   ISet_Construct( mySet );
    ISet_SetMaxSize( mySet, Sync_GetNumDomains( vertSync ) );
    Decomp_GetLocals( self->locals[0], &nLocals, &locals );
    for( l_i = 0; l_i < nLocals; l_i++ )
@@ -575,7 +575,7 @@ void MeshTopology_SetShadowDepth( void* _self, int depth ) {
       ISet_Insert( mySet, remotes[l_i] );
    isects = Class_Array( self, IArray, nNbrs );
    for( n_i = 0; n_i < nNbrs; n_i++ ) {
-      IArray_Init( isects + n_i );
+      IArray_Construct( isects + n_i );
       for( g_i = 0; g_i < nNbrGhosts[n_i]; g_i++ ) {
 	 if( ISet_Has( mySet, nbrGhosts[n_i][g_i] ) )
 	    IArray_Append( isects + n_i, nbrGhosts[n_i][g_i] );
@@ -702,12 +702,12 @@ void MeshTopology_SetShadowDepth( void* _self, int depth ) {
 
    /* Transfer shadowed incidence. */
    nBytes = Class_Array( self, int, nNbrs );
-   bytes = Class_Array( self, StgByte*, nNbrs );
+   bytes = Class_Array( self, stgByte*, nNbrs );
    for( n_i = 0; n_i < nNbrs; n_i++ ) {
       MeshTopology_PickleIncidenceInit( self, self->nDims, 
 					nNbrGhosts[n_i], nbrGhosts[n_i], 
 					nBytes + n_i );
-      bytes[n_i] = Class_Array( self, StgByte, nBytes[n_i] );
+      bytes[n_i] = Class_Array( self, stgByte, nBytes[n_i] );
       MeshTopology_PickleIncidence( self, self->nDims, 
 				    nNbrGhosts[n_i], nbrGhosts[n_i], 
 				    bytes[n_i] );
@@ -717,10 +717,10 @@ void MeshTopology_SetShadowDepth( void* _self, int depth ) {
    Class_Free( self, nNbrGhosts );
 
    nRecvBytes = Class_Array( self, int, nNbrs );
-   recvBytes = Class_Array( self, StgByte*, nNbrs );
-   Comm_AlltoallInit( self->comm, nBytes, nRecvBytes, sizeof(StgByte) );
+   recvBytes = Class_Array( self, stgByte*, nNbrs );
+   Comm_AlltoallInit( self->comm, nBytes, nRecvBytes, sizeof(stgByte) );
    for( n_i = 0; n_i < nNbrs; n_i++ )
-      recvBytes[n_i] = Class_Array( self, StgByte, nRecvBytes[n_i] );
+      recvBytes[n_i] = Class_Array( self, stgByte, nRecvBytes[n_i] );
    Comm_AlltoallBegin( self->comm, (const void**)bytes, (void**)recvBytes );
    Comm_AlltoallEnd( self->comm );
    for( n_i = 0; n_i < nNbrs; n_i++ )
@@ -898,7 +898,7 @@ void MeshTopology_PickleIncidenceInit( MeshTopology* self, int dim,
 
 void MeshTopology_PickleIncidence( MeshTopology* self, int dim, 
 				   int nEls, int* els, 
-				   StgByte* bytes )
+				   stgByte* bytes )
 {
    Sync* sync;
    int curEntry, *entries;
@@ -933,7 +933,7 @@ void MeshTopology_PickleIncidence( MeshTopology* self, int dim,
 }
 
 void MeshTopology_UnpickleIncidence( MeshTopology* self, int dim, 
-				     int nBytes, StgByte* bytes )
+				     int nBytes, stgByte* bytes )
 {
    Sync* sync;
    int nEls, el;
