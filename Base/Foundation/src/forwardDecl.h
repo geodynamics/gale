@@ -50,6 +50,8 @@
 	
 	void Stream_Indent( void* );
 	void Stream_UnIndent( void* );
+
+	extern Stream* stgErrorStream;
 	
 	
 	/* Forward Declaration of Journal ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

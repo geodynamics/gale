@@ -39,10 +39,10 @@
 #include "Base/Foundation/ClassDef.h"
 
 
-void _IMapIter_Construct( void* _self ) {
+void _IMapIter_Init( void* _self ) {
    IMapIter* self = (IMapIter*)_self;
 
-   _Iter_Construct( self );
+   _Iter_Init( self );
    self->imap = NULL;
    self->tblInd = 0;
    self->cur = NULL;

@@ -36,7 +36,7 @@
 ** <b>Comments:</b>
 **	None
 **
-** $Id: Init.h 3473 2006-03-06 07:34:22Z PatrickSunter $
+** $Id: Init.h 4124 2007-05-27 23:18:25Z LukeHodkinson $
 **
 **/
 
@@ -47,7 +47,9 @@
 	/** A global stream for interactive debugging through GDB. Note that the 
 	    code shouldn't send output to this stream */
 	extern Stream*       LiveDebug;
-	
+
+	extern Stream* stgErrorStream;
+
 	Bool      BaseIO_Init( int* argc, char** argv[] );
 	
 #endif /* __Base_BaseIO_Init_h__ */

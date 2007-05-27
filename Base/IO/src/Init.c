@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Init.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: Init.c 4124 2007-05-27 23:18:25Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -49,6 +49,8 @@
 
 const Name     LiveDebugName = "LiveDebug";
 Stream*        LiveDebug = NULL;
+
+Stream* stgErrorStream;
 
 Bool BaseIO_Init( int* argc, char** argv[] )
 {
@@ -121,9 +123,10 @@ Bool BaseIO_Init( int* argc, char** argv[] )
 	Stream_Enable( LiveDebug, True );
 	Stream_SetLevel( LiveDebug, 1 );
 
-	/* General stream. */
+	/* General streams. */
 	general = Journal_Register( Info_Type, "general" );
 	Stream_SetPrintingRank( general, 0 );
+	stgErrorStream = Journal_Register( Error_Type, "stgErrorStream" );
 	
 	return True;
 }

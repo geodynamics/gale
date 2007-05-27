@@ -44,10 +44,10 @@
 const double ISet_TableFactor = 1.18;
 
 
-void _ISet_Construct( void* _self ) {
+void _ISet_Init( void* _self ) {
    ISet* self = (ISet*)_self;
 
-   _NewClass_Construct( self );
+   _NewClass_Init( self );
    self->maxSize = 0;
    self->curSize = 0;
    self->tblSize = 0;
@@ -70,7 +70,7 @@ void _ISet_Copy( void* _self, const void* _op ) {
    assert( self && op );
    ISet_Clear( self );
    ISet_SetMaxSize( self, op->maxSize );
-   ISetIter_Init( iter );
+   ISetIter_Construct( iter );
    for( ISet_First( op, iter ); Iter_IsValid( iter ); ISetIter_Next( iter ) )
       ISet_Insert( self, ISetIter_GetKey( iter ) );
    NewClass_Destruct( iter );
@@ -285,8 +285,8 @@ void ISet_Union( void* _self, const void* _op ) {
    int i_i;
 
    assert( self && op );
-   ISetIter_Init( iter );
-   IArray_Init( array );
+   ISetIter_Construct( iter );
+   IArray_Construct( array );
    for( ISet_First( op, iter ); Iter_IsValid( iter ); ISetIter_Next( iter ) ) {
       key = ISetIter_GetKey( iter );
       if( !ISet_Has( self, key ) )
@@ -312,8 +312,8 @@ void ISet_Isect( void* _self, const void* _op ) {
    int i_i;
 
    assert( self && op );
-   ISetIter_Init( iter );
-   IArray_Init( array );
+   ISetIter_Construct( iter );
+   IArray_Construct( array );
    for( ISet_First( op, iter ); Iter_IsValid( iter ); ISetIter_Next( iter ) ) {
       key = ISetIter_GetKey( iter );
       if( ISet_Has( self, key ) )
@@ -340,8 +340,8 @@ void ISet_Subtr( void* _self, const void* _op ) {
    int i_i;
 
    assert( self && op );
-   ISetIter_Init( iter );
-   IArray_Init( array );
+   ISetIter_Construct( iter );
+   IArray_Construct( array );
    for( ISet_First( self, iter ); Iter_IsValid( iter ); ISetIter_Next( iter ) ) {
       key = ISetIter_GetKey( iter );
       if( !ISet_Has( op, key ) )
@@ -374,7 +374,7 @@ void ISet_GetArray( const void* _self, int* keys ) {
    int i_i;
 
    assert( self );
-   ISetIter_Init( iter );
+   ISetIter_Construct( iter );
    for( i_i = 0, ISet_First( self, iter );
 	Iter_IsValid( iter );
 	i_i++, ISetIter_Next( iter ) )

@@ -40,13 +40,13 @@
 #include "StGermain/Base/Foundation/ClassDef.h"
 
 
-void _Comm_Construct( void* _self ) {
+void _Comm_Init( void* _self ) {
    Comm* self = (Comm*)_self;
 
-   _NewClass_Construct( self );
+   _NewClass_Init( self );
    self->mpiComm = MPI_COMM_WORLD;
-   IArray_Init( &self->nbrs );
-   IMap_Init( &self->inv );
+   IArray_Construct( &self->nbrs );
+   IMap_Construct( &self->inv );
    self->recvs = NULL;
    self->sends = NULL;
    self->stats = NULL;

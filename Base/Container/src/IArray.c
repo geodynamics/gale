@@ -43,10 +43,10 @@
 int IArray_Cmp( const void* l, const void* r );
 
 
-void _IArray_Construct( void* _self ) {
+void _IArray_Init( void* _self ) {
    IArray* self = (IArray*)_self;
 
-   _NewClass_Construct( self );
+   _NewClass_Init( self );
    self->delta = 100;
    self->maxSize = 0;
    self->size = 0;
@@ -112,7 +112,7 @@ void IArray_Remove( void* _self, int nItms, const int* locals, IMap* map ) {
    int i_i;
 
    assert( self && (!nItms || locals) && map );
-   ISet_Init( toRem );
+   ISet_Construct( toRem );
    ISet_UseArray( toRem, nItms, locals );
    ord = Class_Array( self, int, ISet_GetSize( toRem ) );
    memcpy( ord, locals, nItms * sizeof(int) );

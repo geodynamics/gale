@@ -40,10 +40,10 @@
 #include "StGermain/Base/Foundation/ClassDef.h"
 
 
-void _ISetIter_Construct( void* _self ) {
+void _ISetIter_Init( void* _self ) {
    ISetIter* self = (ISetIter*)_self;
 
-   _Iter_Construct( self );
+   _Iter_Init( self );
    self->iset = NULL;
    self->tblInd = 0;
    self->cur = NULL;

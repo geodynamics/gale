@@ -37,8 +37,8 @@
 #include "Base/Foundation/ClassDef.h"
 
 
-void _Iter_Construct( void* self ) {
-   _NewClass_Construct( self );
+void _Iter_Init( void* self ) {
+   _NewClass_Init( self );
    ((Iter*)self)->valid = False;
 }
 

@@ -43,10 +43,10 @@
 const double IMap_TableFactor = 1.18;
 
 
-void _IMap_Construct( void* _self ) {
+void _IMap_Init( void* _self ) {
    IMap* self = (IMap*)_self;
 
-   _NewClass_Construct( self );
+   _NewClass_Init( self );
    self->maxSize = 0;
    self->curSize = 0;
    self->tblSize = 0;
@@ -69,7 +69,7 @@ void _IMap_Copy( void* _self, const void* _op ) {
    assert( self && op );
    IMap_Clear( self );
    IMap_SetMaxSize( self, op->maxSize );
-   IMapIter_Init( &iter );
+   IMapIter_Construct( &iter );
    for( IMap_First( op, &iter ); Iter_IsValid( &iter ); IMapIter_Next( &iter ) )
       IMap_Insert( self, IMapIter_GetKey( &iter ), IMapIter_GetValue( &iter ) );
    NewClass_Destruct( &iter );
@@ -86,7 +86,7 @@ void IMap_SetMaxSize( void* _self, int maxSize ) {
    nOldItms = self->curSize;
    keys = Class_Array( self, int, self->curSize );
    vals = Class_Array( self, int, self->curSize );
-   IMapIter_Init( iter );
+   IMapIter_Construct( iter );
    for( i_i = 0, IMap_First( self, iter );
 	Iter_IsValid( iter );
 	i_i++, IMapIter_Next( iter ) )

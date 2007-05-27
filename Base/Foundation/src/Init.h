@@ -36,13 +36,13 @@
 ** <b>Comments:</b>
 **	None
 **
-** $Id: Init.h 3462 2006-02-19 06:53:24Z WalterLandry $
+** $Id: Init.h 4124 2007-05-27 23:18:25Z LukeHodkinson $
 **
 **/
 
 #ifndef __Base_BaseFoundation_Init_h__
 #define __Base_BaseFoundation_Init_h__
-	
+
 	Bool BaseFoundation_Init( int* argc, char** argv[] );
 	
 #endif /* __Base_BaseFoundation_Init_h__ */
