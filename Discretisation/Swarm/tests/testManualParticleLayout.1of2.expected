@@ -1,20 +1,39 @@
-StGermain Framework revision 3378. Copyright (C) 2003-2005 VPAC.
+StGermain Framework revision 4125. Copyright (C) 2003-2005 VPAC.
+Cartesian generator: ''
+	Target mesh: ''
+	Global element size: 4x2x1
+	Local offset of rank 0: 0x0x0
+	Local range of rank 0: 2x2x1
+	Generating vertices...
+		... done.
+	Generating elements...
+		... done.
+	Generating element-vertex incidence...
+		... done.
+	Generating vertex neighbours...
+		... done.
+	Generating geometry...
+		... done.
+	Generating element types...
+		... element types are 'Mesh_HexType',
+		... mesh algorithm type is 'Mesh_RegularAlgorithms',
+		... done.
 Watching rank: 1
-ManualParticleLayout (ptr): 0x8063acc:
-	GlobalParticleLayout (ptr): 0x8063acc
-	ParticleLayout (ptr): 0x8063acc
-	Stg_Class (ptr): 0x8063acc
-		sizeOfSelf: 112
+ManualParticleLayout (ptr): 0x807d8d0:
+	GlobalParticleLayout (ptr): 0x807d8d0
+	ParticleLayout (ptr): 0x807d8d0
+	Stg_Class (ptr): 0x807d8d0
+		sizeOfSelf: 140
 		_deleteSelf: Yes
 		type: ManualParticleLayout
-		_delete (func ptr): 0xb7f5395a
-		_print (func ptr): 0xb7f53983
-		_copy (func ptr): 0xb7f539e5
-		_setInitialCounts (func ptr): 0xb7f523f3
-		_initialiseParticles (func ptr): 0xb7f5262d
+		_delete (func ptr): 0xb7f1bc4c
+		_print (func ptr): 0xb7f1bc75
+		_copy (func ptr): 0xb7f1bcd7
+		_setInitialCounts (func ptr): 0xb7f1a1fe
+		_initialiseParticles (func ptr): 0xb7f1a586
 		coordSystem: GlobalCoordSystem
 		weightsInitialisedAtStartup : False
-		_initialiseParticle (func ptr): 0xb7f53b56
+		_initialiseParticle (func ptr): 0xb7f1be48
 		totalInitialParticles: 4
 		averageInitialParticlesPerCell: 0.5
 Printing coords of all local particles, cell-by-cell:

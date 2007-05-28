@@ -1,4 +1,23 @@
-StGermain Framework revision 3556. Copyright (C) 2003-2005 VPAC.
+StGermain Framework revision 4125. Copyright (C) 2003-2005 VPAC.
+Cartesian generator: 'cartesianGenerator'
+	Target mesh: 'mesh-linear'
+	Global element size: 12x12x1
+	Local offset of rank 0: 0x0x0
+	Local range of rank 0: 4x12x1
+	Generating vertices...
+		... done.
+	Generating elements...
+		... done.
+	Generating element-vertex incidence...
+		... done.
+	Generating vertex neighbours...
+		... done.
+	Generating geometry...
+		... done.
+	Generating element types...
+		... element types are 'Mesh_HexType',
+		... mesh algorithm type is 'Mesh_RegularAlgorithms',
+		... done.
 Watching rank: 2
 Run until 5 timeSteps have been run
 TimeStep = 1, Start time = 0 + 2 prev timeStep dt

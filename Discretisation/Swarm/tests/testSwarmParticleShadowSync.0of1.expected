@@ -1,15 +1,13 @@
 StGermain Framework revision 4125. Copyright (C) 2003-2005 VPAC.
 Watching rank: 0
-Cartesian generator: ''
-	Target mesh: ''
-	Global element size: 32x32x32
+Cartesian generator: 'cartesianGenerator'
+	Target mesh: 'mesh-linear'
+	Global element size: 12x12x1
 	Local offset of rank 0: 0x0x0
-	Local range of rank 0: 32x32x32
+	Local range of rank 0: 12x12x1
 	Generating vertices...
 		... done.
 	Generating elements...
-		... done.
-	Generating edges...
 		... done.
 	Generating element-vertex incidence...
 		... done.
@@ -21,11 +19,9 @@ Cartesian generator: ''
 		... element types are 'Mesh_HexType',
 		... mesh algorithm type is 'Mesh_RegularAlgorithms',
 		... done.
-Calculated attractor point is at (0.333333,0.333333,0.333333):
-
-Starting timestep 1:
-
-Starting timestep 2:
-
-Comparing the 32768 local Particles between old and new swarms:
-	Passed: swarms are identical.
+Run until 5 timeSteps have been run
+TimeStep = 1, Start time = 0 + 2 prev timeStep dt
+TimeStep = 2, Start time = 2 + 2 prev timeStep dt
+TimeStep = 3, Start time = 4 + 2 prev timeStep dt
+TimeStep = 4, Start time = 6 + 2 prev timeStep dt
+TimeStep = 5, Start time = 8 + 2 prev timeStep dt
