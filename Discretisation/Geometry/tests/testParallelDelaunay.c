@@ -174,6 +174,7 @@ label:	numNeighboursTest = 1;
 		
 		pd = ParallelDelaunay_New( "Delaunay", dictionary, sites, numSites, rank, numProcessors, &CommWorld, &attr );
 		Stg_Component_Build( pd, NULL, True );
+		Stg_Component_Execute( pd, NULL, True );
 
 		ParallelDelaunay_GatherTriangulation( pd );
 		MPI_Barrier( CommWorld );

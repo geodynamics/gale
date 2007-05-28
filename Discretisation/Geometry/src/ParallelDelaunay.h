@@ -149,6 +149,12 @@
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Private Member functions
 	*/
+	typedef enum Direction_t{
+		LEFT,
+		RIGHT
+	}Direction;
+
+	void ParallelDelaunay_RetriangulateAfterMerge( ParallelDelaunay *pd, Direction d );
 	void ParallelDelaunay_BuildTriangleIndices( ParallelDelaunay *pd );
 	void ParallelDelaunaySendEdge( QuadEdgeRef edge, int rank, MPI_Comm *comm, MPI_Request *req );
 	QuadEdgeRef ParallelDelaunayRecvEdge( ParallelDelaunay *pd, int rank, MPI_Comm *comm );
