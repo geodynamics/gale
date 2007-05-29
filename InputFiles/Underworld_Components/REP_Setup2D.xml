@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+<struct name="components" mergeType="merge">
+	<struct name="Stress">
+		<param name="Type">MeshVariable</param>
+		<param name="mesh">velocityMesh</param>
+		<param name="Rank">Vector</param>
+		<param name="DataType">Double</param>
+		<param name="VectorComponentCount">3</param>
+		<list name="names">
+			<param>StressXX</param>
+			<param>StressYY</param>
+			<param>StressXY</param>
+		</list>
+	</struct>
+				
+	<struct name="stressDofLayout">
+		<param name="Type">DofLayout</param>
+		<param name="mesh">velocityMesh</param>
+		<param name="BaseVariableCount">3</param>
+		<list name="BaseVariables">
+			<param>StressXX</param>
+			<param>StressYY</param>
+			<param>StressXY</param>
+		</list>
+	</struct>
+	
+	<struct name="recoveredStressInvariantField"> 
+		<param name="Type">OperatorFeVariable</param>
+	     	<param name="Operator">SymmetricTensor_Invariant</param>
+		<param name="FeVariable">recoveredStressField</param>
+	</struct>
+	<struct name="recStressXXField"> 
+		<param name="Type">OperatorFeVariable</param>
+		<param name="Operator">TakeFirstComponent</param>
+		<param name="FeVariable">recoveredStressField</param>
+	</struct>			
+	<struct name="recStressYYField"> 
+		<param name="Type">OperatorFeVariable</param>
+		<param name="Operator">TakeSecondComponent</param>
+		<param name="FeVariable">recoveredStressField</param>
+	</struct>		
+	<struct name="recStressXYField"> 
+		<param name="Type">OperatorFeVariable</param>
+		<param name="Operator">TakeThirdComponent</param>
+		<param name="FeVariable">recoveredStressField</param>
+	</struct>
+
+	<!--
+	<struct name="recoveredPressureField"> 
+		<param name="Type">OperatorFeVariable</param>
+		<param name="Operator">SymmetricTensor_NegAverageTrace</param>
+		<param name="FeVariable">recoveredStressField</param>
+	</struct>
+	-->
+</struct>
+</StGermainData>

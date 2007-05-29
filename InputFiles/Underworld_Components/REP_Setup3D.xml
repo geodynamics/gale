@@ -10,12 +10,12 @@
 	      	<param name="DataType">Double</param>
 	      	<param name="VectorComponentCount">6</param>
 		<list name="names">
-			<param>recoveredStrainRateXX</param>
-			<param>recoveredStrainRateYY</param>
-			<param>recoveredStrainRateZZ</param>
-			<param>recoveredStrainRateXY</param>
-			<param>recoveredStrainRateXZ</param>
-			<param>recoveredStrainRateYZ</param>
+			<param>StressXX</param>
+			<param>StressYY</param>
+			<param>StressZZ</param>
+			<param>StressXY</param>
+			<param>StressXZ</param>
+			<param>StressYZ</param>
 		</list>
 
 	</struct>
@@ -24,37 +24,37 @@
 		<param name="mesh">velocityMesh</param>
 		<param name="BaseVariableCount">6</param>
 		<list name="BaseVariables">
-			<param>recoveredStrainRateXX</param>
-			<param>recoveredStrainRateYY</param>
-			<param>recoveredStrainRateZZ</param>
-			<param>recoveredStrainRateXY</param>
-			<param>recoveredStrainRateXZ</param>
-			<param>recoveredStrainRateYZ</param>
+			<param>StressXX</param>
+			<param>StressYY</param>
+			<param>StressZZ</param>
+			<param>StressXY</param>
+			<param>StressXZ</param>
+			<param>StressYZ</param>
 		</list>
 	</struct>
 		
-	<struct name="recoveredStrainRateInvariantField">
+	<struct name="recoveredStressInvariantField">
 	      <param name="Type">OperatorFeVariable</param>
 	      <param name="Operator">SymmetricTensor_Invariant</param>
-	      <param name="FeVariable">recoveredStrainRateField</param>
+	      <param name="FeVariable">recoveredStressField</param>
 	</struct>
 
-	<struct name="R_StrainRateXX">
+	<struct name="R_StressXX">
 	      <param name="Type">OperatorFeVariable</param>
 	      <param name="Operator">TakeFirstComponent</param>
-	      <param name="FeVariable">recoveredStrainRateField</param>
+	      <param name="FeVariable">recoveredStressField</param>
 	</struct>
 
-	<struct name="R_StrainRateYY">
+	<struct name="R_StressYY">
 	      <param name="Type">OperatorFeVariable</param>
 	      <param name="Operator">TakeSecondComponent</param>
-	      <param name="FeVariable">recoveredStrainRateField</param>
+	      <param name="FeVariable">recoveredStressField</param>
 	</struct>
 
-	<struct name="R_StrainRateZZ">
+	<struct name="R_StressZZ">
 	      <param name="Type">OperatorFeVariable</param>
 	      <param name="Operator">TakeThirdComponent</param>
-	      <param name="FeVariable">recoveredStrainRateField</param>
+	      <param name="FeVariable">recoveredStressField</param>
 	</struct>
-	</struct>
+</struct>
 </StGermainData>
