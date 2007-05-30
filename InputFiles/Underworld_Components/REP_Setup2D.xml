@@ -48,12 +48,10 @@
 		<param name="FeVariable">recoveredStressField</param>
 	</struct>
 
-	<!--
 	<struct name="recoveredPressureField"> 
 		<param name="Type">OperatorFeVariable</param>
 		<param name="Operator">SymmetricTensor_NegAverageTrace</param>
 		<param name="FeVariable">recoveredStressField</param>
 	</struct>
-	-->
 </struct>
 </StGermainData>
