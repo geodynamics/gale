@@ -35,16 +35,16 @@
  ** <b>Comments:</b>
  **	None
  **
- ** $Id: IMapIter.h 3904 2006-12-14 00:52:06Z LukeHodkinson $
+ ** $Id: Component.h 3904 2006-12-14 00:52:06Z LukeHodkinson $
  **
  **/
  
-#ifndef __StGermain_Base_Container_IMapIter_h__
-#define __StGermain_Base_Container_IMapIter_h__
+#ifndef __StGermain_Base_Automation_Component_h__
+#define __StGermain_Base_Automation_Component_h__
 
 #include "StGermain/Base/Foundation/ClassClear.h"
-#define CLASSDIR StGermain/Base/Container
-#define CLASSNAME IMapIter
+#define CLASSDIR StGermain/Base/Automation
+#define CLASSNAME Component
 #include "StGermain/Base/Foundation/ClassHdr.h"
 
-#endif /* __StGermain_Base_Container_IMapIter_h__ */
+#endif /* __StGermain_Base_Automation_Component_h__ */

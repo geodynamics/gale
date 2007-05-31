@@ -92,6 +92,9 @@ Stream "error":
 	Enabled: True
 	Level: 1
 	Children:
+		Stream "stgErrorStream":
+			Enabled: True
+			Level: 1
 		Stream "myError":
 			Enabled: True
 			Level: 1
@@ -99,4 +102,4 @@ Stream "MPIStream":
 	Enabled: True
 	Level: 1
 
-StGermain IO Report - File Flush called 88 times.
+StGermain IO Report - File Flush called 91 times.

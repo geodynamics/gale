@@ -1,5 +1,5 @@
-#define PARENT( classPath )							\
-    INCLUDEPARENT( classPath )
+#define INHERIT( par ) \
+    INCLUDEPARENT( par )
 #define __VIRTUALMETHOD( pre, className, methodName, type, argTypes, argNames ) \
    ((pre##className*)self)->_##methodName = _##pre##className##_##methodName;
 #define __VOIDVIRTUALMETHOD( pre, className, methodName, type, argTypes, argNames ) \
@@ -19,7 +19,9 @@
       assert( self );								\
       ((pre##className*)self)->type = (char*)pre##className##_Type;		\
       ((pre##className*)self)->newFunc = (NewFunc*)pre##className##_New;	\
-      ((pre##className*)self)->constructFunc = pre##className##_Construct;
+      ((pre##className*)self)->constructFunc = pre##className##_Construct;	\
+      ((pre##className*)self)->isSuperFunc = pre##className##_IsSuper;		\
+      ((pre##className*)self)->sizeOfSelf = sizeof(pre##className);
 #define CLASSCONSTRUCT( pre, className )		\
    _CLASSCONSTRUCT( pre, className )
 #define _CLASSINIT( pre, className )		\
@@ -32,7 +34,7 @@ CLASSCONSTRUCT( PREFIX, CLASSNAME )
 CLASSINIT( PREFIX, CLASSNAME )
 }
 
-#undef PARENT
+#undef INHERIT
 #undef __VIRTUALMETHOD
 #undef __VOIDVIRTUALMETHOD
 #undef __ABSTRACTMETHOD

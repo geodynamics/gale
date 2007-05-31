@@ -6,17 +6,24 @@
    void pre##className##_Construct( void* self );
 #define CLASSCONSTRUCT( pre, className ) \
    _CLASSCONSTRUCT( pre, className )
+#define _CLASSISSUPER( pre, className ) \
+   Bool pre##className##_IsSuper( const char* type );
+#define CLASSISSUPER( pre, className ) \
+   _CLASSISSUPER( pre, className )
 
 CLASSNEW( PREFIX, CLASSNAME )
 CLASSCONSTRUCT( PREFIX, CLASSNAME )
+CLASSISSUPER( PREFIX, CLASSNAME )
 
 #undef _CLASSNEW
 #undef CLASSNEW
 #undef _CLASSCONSTRUCT
 #undef CLASSCONSTRUCT
+#undef _CLASSISSUPER
+#undef CLASSISSUPER
 
-#define PARENT( classPath ) \
-   INCLUDEFILE( StGermain/Base/Foundation, NoClass.h )
+#define INHERIT( par ) \
+   INCLUDEFILE( StGermain/Base/Foundation, ClassEmpty.h )
 #define __VIRTUALMETHOD( pre, className, methodName, type, argTypes, argNames ) \
    type _##pre##className##_##methodName argTypes;				\
    type pre##className##_##methodName argTypes;
@@ -36,7 +43,7 @@ CLASSCONSTRUCT( PREFIX, CLASSNAME )
 
 #include INCLUDECLASS( CLASSNAME )
 
-#undef PARENT
+#undef INHERIT
 #undef __VIRTUALMETHOD
 #undef __VOIDVIRTUALMETHOD
 #undef __ABSTRACTMETHOD

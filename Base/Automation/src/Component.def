@@ -1,0 +1,36 @@
+#include INHERIT( StGermain/Base/Foundation/NewClass )
+#include "StGermain/Base/Foundation/ClassClear.h"
+
+#define PARENTDIR StGermain/Base/Foundation
+#define PARENT NewObject
+#define CLASSDIR StGermain/Base/Automation
+#define CLASSNAME Component
+#define PREFIX stg
+#include "StGermain/Base/Foundation/ClassSetup.h"
+
+VOIDOVERRIDE( Init, void, (void* self), (self) )
+VOIDOVERRIDE( Copy, void, (void* self, const void* op), (self, op) )
+VOIDABSTRACTMETHOD( InstantiateSelf, void, (void* self, Stg_ComponentFactory* cf, void* data), 
+		   (self, cf, data) )
+VOIDABSTRACTMETHOD( BuildSelf, void, (void* self, void* data), (self, data) )
+VOIDABSTRACTMETHOD( InitialiseSelf, void, (void* self, void* data), (self, data) )
+VOIDABSTRACTMETHOD( ExecuteSelf, void, (void* self, void* data), (self, data) )
+
+METHOD( Instantiate, void, (void* self, Stg_ComponentFactory* cf, void* data, Bool force), 
+	(self, cf, data, force) )
+METHOD( Build, void, (void* self, void* data, Bool force), 
+	(self, data, force) )
+METHOD( Initialise, void, (void* self, void* data, Bool force), 
+	(self, data, force) )
+METHOD( Execute, void, (void* self, void* data, Bool force), 
+	(self, data, force) )
+
+METHOD( IsInstantiated, Bool, (const void* self), (self) )
+METHOD( IsBuilt, Bool, (const void* self), (self) )
+METHOD( IsInitialised, Bool, (const void* self), (self) )
+METHOD( HasExecuted, Bool, (const void* self), (self) )
+
+MEMBER( Bool, isInstantiated )
+MEMBER( Bool, isBuilt )
+MEMBER( Bool, isInitialised )
+MEMBER( Bool, hasExecuted )

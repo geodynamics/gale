@@ -1,5 +1,5 @@
-#define PARENT( classPath ) \
-   INCLUDEPARENT( classPath )
+#define INHERIT( par ) \
+   INCLUDEPARENT( par )
 #define __VIRTUALMETHOD( pre, className, methodName, type, argTypes, argNames ) \
    pre##className##_##methodName##Func* _##methodName;
 #define __VOIDVIRTUALMETHOD( pre, className, methodName, type, argTypes, argNames ) \
@@ -22,7 +22,7 @@ CLASSDECL( PREFIX, CLASSNAME ) {
 #include INCLUDECLASS( CLASSNAME )
 };
 
-#undef PARENT
+#undef INHERIT
 #undef __VIRTUALMETHOD
 #undef __VOIDVIRTUALMETHOD
 #undef __ABSTRACTMETHOD

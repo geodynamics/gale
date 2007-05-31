@@ -62,7 +62,6 @@ int main( int argc, char* argv[] ) {
 	BaseFoundation_Init( &argc, &argv );
 	BaseIO_Init( &argc, &argv );
 	
-
 	stream = Journal_Register( Info_Type, Dictionary_Type );
 	stJournal->firewallProducesAssert = False;
 	Stream_RedirectFile(Journal_Register( Error_Type, "DictionaryCheck"), "DictionaryCheck.txt");

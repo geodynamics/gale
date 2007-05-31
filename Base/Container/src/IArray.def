@@ -1,7 +1,11 @@
-#include PARENT( StGermain/Base/Foundation/NewClass )
+#include INHERIT( StGermain/Base/Foundation/NewClass )
+#include "StGermain/Base/Foundation/ClassClear.h"
 
-#undef CLASSNAME
+#define PARENTDIR StGermain/Base/Foundation
+#define PARENT NewClass
+#define CLASSDIR StGermain/Base/Container
 #define CLASSNAME IArray
+#include "StGermain/Base/Foundation/ClassSetup.h"
 
 VOIDOVERRIDE( Init, void, (void* self), (self) ) 
 VOIDOVERRIDE( Destruct, void, (void* self), (self) )

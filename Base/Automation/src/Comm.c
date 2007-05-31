@@ -41,7 +41,7 @@
 
 
 void _Comm_Init( void* _self ) {
-   Comm* self = (Comm*)_self;
+   Comm* self = Class_Cast( _self, Comm );
 
    _NewClass_Init( self );
    self->mpiComm = MPI_COMM_WORLD;
@@ -57,9 +57,8 @@ void _Comm_Init( void* _self ) {
 }
 
 void _Comm_Destruct( void* _self ) {
-   Comm* self = (Comm*)_self;
+   Comm* self = Class_Cast( _self, Comm );
 
-   assert( self );
    IArray_Destruct( &self->nbrs );
    IMap_Destruct( &self->inv );
    Class_Free( self, self->recvs );
@@ -69,11 +68,11 @@ void _Comm_Destruct( void* _self ) {
 }
 
 void _Comm_Copy( void* _self, const void* _op ) {
-   Comm* self = (Comm*)_self;
-   const Comm* op = (const Comm*)_op;
+   Comm* self = Class_Cast( _self, Comm );
+   const Comm* op = Class_ConstCast( _op, Comm );
    int nNbrs;
 
-   assert( self );
+   _NewClass_Copy( self, op );
    self->mpiComm = op->mpiComm;
    IArray_Copy( &self->nbrs, &op->nbrs );
    IMap_Copy( &self->inv, &op->inv );
@@ -84,7 +83,7 @@ void _Comm_Copy( void* _self, const void* _op ) {
 }
 
 SizeT _Comm_CalcMem( const void* _self, PtrMap* ptrs ) {
-   const Comm* self = (const Comm*)_self;
+   const Comm* self = Class_ConstCast( _self, Comm );
    SizeT mem;
 
    if( PtrMap_Find( ptrs, (void*)self ) )
@@ -96,9 +95,8 @@ SizeT _Comm_CalcMem( const void* _self, PtrMap* ptrs ) {
 }
 
 void Comm_SetMPIComm( void* _self, MPI_Comm mpiComm ) {
-   Comm* self = (Comm*)_self;
+   Comm* self = Class_Cast( _self, Comm );
 
-   assert( self );
    self->mpiComm = mpiComm;
    IArray_Set( &self->nbrs, 0, NULL );
    IMap_Clear( &self->inv );
@@ -111,10 +109,9 @@ void Comm_SetMPIComm( void* _self, MPI_Comm mpiComm ) {
 }
 
 void Comm_SetNeighbours( void* _self, int nNbrs, const int* nbrs ) {
-   Comm* self = (Comm*)_self;
+   Comm* self = Class_Cast( _self, Comm );
    int n_i;
 
-   assert( self );
    IArray_Set( &self->nbrs, nNbrs, nbrs );
    IMap_Clear( &self->inv );
    IMap_SetMaxSize( &self->inv, nNbrs );
@@ -126,11 +123,10 @@ void Comm_SetNeighbours( void* _self, int nNbrs, const int* nbrs ) {
 }
 
 void Comm_AddNeighbours( void* _self, int nNbrs, const int* nbrs ) {
-   Comm* self = (Comm*)_self;
+   Comm* self = Class_Cast( _self, Comm );
    int netNbrs;
    int n_i;
 
-   assert( self );
    IArray_Add( &self->nbrs, nNbrs, nbrs );
    netNbrs = IArray_GetSize( &self->nbrs );
    IMap_SetMaxSize( &self->inv, netNbrs );
@@ -142,11 +138,10 @@ void Comm_AddNeighbours( void* _self, int nNbrs, const int* nbrs ) {
 }
 
 void Comm_RemoveNeighbours( void* _self, int nNbrs, const int* nbrs, IMap* map ) {
-   Comm* self = (Comm*)_self;
+   Comm* self = Class_Cast( _self, Comm );
    int netNbrs;
    int n_i;
 
-   assert( self );
    IArray_Remove( &self->nbrs, nNbrs, nbrs, map );
    netNbrs = IArray_GetSize( &self->nbrs );
    for( n_i = 0; n_i < nNbrs; n_i++ )
@@ -158,42 +153,43 @@ void Comm_RemoveNeighbours( void* _self, int nNbrs, const int* nbrs, IMap* map )
 }
 
 MPI_Comm Comm_GetMPIComm( const void* self ) {
-   assert( self );
+   assert( Class_IsSuper( self, Comm ) );
    return ((Comm*)self)->mpiComm;
 }
 
 int Comm_GetNumNeighbours( const void* self ) {
-   assert( self );
+   assert( Class_IsSuper( self, Comm ) );
    return IArray_GetSize( &((Comm*)self)->nbrs );
 }
 
 void Comm_GetNeighbours( const void* self, int* nNbrs, const int** nbrs ) {
-   assert( self );
+   assert( Class_IsSuper( self, Comm ) );
    IArray_GetArray( &((Comm*)self)->nbrs, nNbrs, nbrs );
 }
 
 int Comm_RankLocalToGlobal( const void* self, int local ) {
-   assert( self );
+   assert( Class_IsSuper( self, Comm ) );
    assert( local < IArray_GetSize( &((Comm*)self)->nbrs ) );
    return IArray_GetPtr( &((Comm*)self)->nbrs )[local];
 }
 
 Bool Comm_RankGlobalToLocal( const void* self, int global, int* local ) {
-   assert( self );
+   assert( Class_IsSuper( self, Comm ) );
    return IMap_TryMap( &((Comm*)self)->inv, global, local );
 }
 
 void Comm_AllgatherInit( const void* _self, int srcSize, 
 			 int* dstSizes, int itmSize )
 {
-   Comm* self = (Comm*)_self;
+   Comm* self = Class_Cast( _self, Comm );
    const int sizeTag = 1001;
    int nNbrs;
    const int* nbrs;
    int n_i;
 
-   assert( self && itmSize );
+   assert( itmSize );
    assert( !self->srcSize && !self->recvSizes );
+
    nNbrs = IArray_GetSize( &self->nbrs );
    nbrs = IArray_GetPtr( &self->nbrs );
    for( n_i = 0; n_i < nNbrs; n_i++ ) {
@@ -217,13 +213,12 @@ void Comm_AllgatherInit( const void* _self, int srcSize,
 void Comm_AllgatherBegin( const void* _self, const void* srcArray, 
 			  void** dstArrays )
 {
-   Comm* self = (Comm*)_self;
+   Comm* self = Class_Cast( _self, Comm );
    const int dataTag = 2002;
    int nNbrs;
    const int* nbrs;
    int n_i;
 
-   assert( self );
    nNbrs = IArray_GetSize( &self->nbrs );
    nbrs = IArray_GetPtr( &self->nbrs );
    for( n_i = 0; n_i < nNbrs; n_i++ ) {
@@ -239,11 +234,10 @@ void Comm_AllgatherBegin( const void* _self, const void* srcArray,
 }
 
 void Comm_AllgatherEnd( const void* _self ) {
-   Comm* self = (Comm*)_self;
+   Comm* self = Class_Cast( _self, Comm );
    int nNbrs;
    int n_i;
 
-   assert( self );
    nNbrs = IArray_GetSize( &self->nbrs );
    for( n_i = 0; n_i < nNbrs; n_i++ )
       insist( MPI_Wait( self->sends + n_i, self->stats + n_i ), == MPI_SUCCESS );

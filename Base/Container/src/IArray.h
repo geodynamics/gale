@@ -42,16 +42,9 @@
 #ifndef __StGermain_Base_Container_IArray_h__
 #define __StGermain_Base_Container_IArray_h__
 
-#ifdef CURRENTDIR
-#undef CURRENTDIR
-#endif
-#define CURRENTDIR StGermain/Base/Container
-
-#ifdef CLASSNAME
-#undef CLASSNAME
-#endif
+#include "StGermain/Base/Foundation/ClassClear.h"
+#define CLASSDIR StGermain/Base/Container
 #define CLASSNAME IArray
-
 #include "StGermain/Base/Foundation/ClassHdr.h"
 
 #endif /* __StGermain_Base_Container_IArray_h__ */

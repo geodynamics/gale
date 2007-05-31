@@ -42,21 +42,9 @@
 #ifndef __StGermain_Base_Container_Iter_h__
 #define __StGermain_Base_Container_Iter_h__
 
-#ifdef CLASSDIR
-#undef CLASSDIR
-#endif
-#define CLASSDIR Base/Foundation
-
-#ifdef CURRENTDIR
-#undef CURRENTDIR
-#endif
-#define CURRENTDIR Base/Container
-
-#ifdef CLASSNAME
-#undef CLASSNAME
-#endif
+#include "StGermain/Base/Foundation/ClassClear.h"
+#define CLASSDIR StGermain/Base/Container
 #define CLASSNAME Iter
-
-#include "Base/Foundation/ClassHdr.h"
+#include "StGermain/Base/Foundation/ClassHdr.h"
 
 #endif /* __StGermain_Base_Container_Iter_h__ */

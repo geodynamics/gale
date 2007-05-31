@@ -248,7 +248,7 @@ TestBegin( RemNbrs ) {
    }
    else
       nNbrs = 0;
-   IMap_Init( map );
+   IMap_Construct( map );
    TestNoAssert( Comm_RemoveNeighbours( comm, nNbrs, nbrs, map ) );
 
    if( nRanks > 1 ) {

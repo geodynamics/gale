@@ -42,16 +42,9 @@
 #ifndef __StGermain_Base_Automation_Comm_h__
 #define __StGermain_Base_Automation_Comm_h__
 
-#ifdef CURRENTDIR
-#undef CURRENTDIR
-#endif
-#define CURRENTDIR StGermain/Base/Automation
-
-#ifdef CLASSNAME
-#undef CLASSNAME
-#endif
+#include "StGermain/Base/Foundation/ClassClear.h"
+#define CLASSDIR StGermain/Base/Automation
 #define CLASSNAME Comm
-
 #include "StGermain/Base/Foundation/ClassHdr.h"
 
 #endif /* __StGermain_Base_Automation_Comm_h__ */

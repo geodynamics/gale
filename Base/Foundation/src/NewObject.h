@@ -1,6 +1,7 @@
-/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 **
-** Copyright (C), 2003, Victorian Partnership for Advanced Computing (VPAC) Ltd, 110 Victoria Street, Melbourne, 3053, Australia.
+** Copyright (C), 2003, Victorian Partnership for Advanced Computing (VPAC) Ltd, 
+** 110 Victoria Street, Melbourne, 3053, Australia.
 **
 ** Authors:
 **	Stevan M. Quenette, Senior Software Engineer, VPAC. (steve@vpac.org)
@@ -23,7 +24,7 @@
 **  You should have received a copy of the GNU Lesser General Public
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-**~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+**~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 /** \file
  ** <b>Role:</b>
  **	Abstract class faciliting how class inheritance is done.
@@ -34,11 +35,16 @@
  ** <b>Comments:</b>
  **	None
  **
- ** $Id: Class.h 3904 2006-12-14 00:52:06Z LukeHodkinson $
+ ** $Id: NewObject.h 3904 2006-12-14 00:52:06Z LukeHodkinson $
  **
  **/
+ 
+#ifndef __StGermain_Base_Foundation_NewObject_h__
+#define __StGermain_Base_Foundation_NewObject_h__
 
-#ifndef __StGermain_Base_Foundation_NoClass_h__
-#define __StGermain_Base_Foundation_NoClass_h__
+#include "StGermain/Base/Foundation/ClassClear.h"
+#define CLASSDIR StGermain/Base/Foundation
+#define CLASSNAME NewObject
+#include "StGermain/Base/Foundation/ClassHdr.h"
 
-#endif /* __StGermain_Base_Foundation_NoClass_h__ */
+#endif /* __StGermain_Base_Foundation_NewObject_h__ */

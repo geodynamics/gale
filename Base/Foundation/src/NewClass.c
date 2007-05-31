@@ -42,20 +42,19 @@
 #include "ClassDef.h"
 
 
-void _NewClass_Init( void* self ) {
-   assert( self );
+void _NewClass_Init( void* _self ) {
+   NewClass* self = Class_Cast( _self, NewClass );
 
    ((NewClass*)self)->nRefsToSelf = 0;
    ((NewClass*)self)->curAllocd = 0;
 }
 
 void _NewClass_Destruct( void* _self ) {
-   NewClass* self = (NewClass*)_self;
-   assert( self );
+   NewClass* self = Class_Cast( _self, NewClass );
 
 #ifndef NDEBUG
    if( ((NewClass*)self)->curAllocd != 0 ) {
-      fprintf( stderr, "While destructing a class memory has been leaked.\n"
+      fprintf( stderr, "\nWhile destructing a class memory has been leaked.\n"
 	       "Class type:    %s\n"
 	       "Memory leaked: %ld\n", 
 	       self->type, self->curAllocd );
@@ -65,15 +64,16 @@ void _NewClass_Destruct( void* _self ) {
 }
 
 void _NewClass_Copy( void* self, const void* op ) {
-   assert( self && op );
+   assert( self );
+   assert( op );
 }
 
 void _NewClass_Print( const void* self, Stream* stream ) {
 }
 
 SizeT _NewClass_CalcMem( const void* _self, struct PtrMap* ptrs ) {
-   const NewClass* self = (const NewClass*)_self;
-   assert( self && ptrs );
+   const NewClass* self = Class_ConstCast( _self, NewClass );
+   assert( ptrs );
 
    if( PtrMap_Find( ptrs, (void*)self ) )
       return 0;
@@ -88,20 +88,22 @@ void NewClass_Delete( void* self ) {
 }
 
 void NewClass_AddRef( void* _self ) {
-   NewClass* self = (NewClass*)_self;
+   NewClass* self;
 
-   if( !self ) return;
+   if( !_self ) return;
+   self = Class_Cast( _self, NewClass );
    assert( self->nRefsToSelf >= 0 );
    self->nRefsToSelf++;
 }
 
 void NewClass_RemoveRef( void* _self ) {
-   NewClass* self = (NewClass*)_self;
+   NewClass* self;
 
-   if( !self ) return;
+   if( !_self ) return;
+   self = Class_Cast( _self, NewClass );
 #ifndef NDEBUG
    if( self->nRefsToSelf == 0 ) {
-      fprintf( stderr, "Removing a reference from a class with no pre-existing"
+      fprintf( stderr, "\nRemoving a reference from a class with no pre-existing\n"
 	       "references.\n"
 	       "Class type: %s\n", 
 	       self->type );
@@ -113,9 +115,8 @@ void NewClass_RemoveRef( void* _self ) {
 }
 
 void* NewClass_Dup( const void* _self ) {
-   const NewClass* self = (const NewClass*)_self;
+   const NewClass* self = Class_ConstCast( _self, NewClass );
    void* dup;
-   assert( self );
 
    dup = self->newFunc();
    NewClass_Copy( dup, self );
@@ -123,17 +124,14 @@ void* NewClass_Dup( const void* _self ) {
 }
 
 Type NewClass_GetType( const void* _self ) {
-   const NewClass* self = (const NewClass*)_self;
-   assert( self );
-
+   const NewClass* self = Class_ConstCast( _self, NewClass );
    return self->type;
 }
 
 SizeT NewClass_GetMemUsage( const void* _self ) {
-   const NewClass* self = (const NewClass*)_self;
+   const NewClass* self = Class_ConstCast( _self, NewClass );
    struct PtrMap* ptrs;
    SizeT mem;
-   assert( self );
 
    ptrs = PtrMap_New( 10 );
    mem = NewClass_CalcMem( self, ptrs );

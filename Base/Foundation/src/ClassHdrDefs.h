@@ -1,5 +1,5 @@
-#define PARENT( classPath )				\
-   INCLUDEFILE( StGermain/Base/Foundation, NoClass.h )
+#define INHERIT( par ) \
+   INCLUDEFILE( StGermain/Base/Foundation, ClassEmpty.h )
 #define __VIRTUALMETHOD( pre, className, methodName, type, argTypes, argNames ) \
    typedef type (pre##className##_##methodName##Func)argTypes;
 #define __VOIDVIRTUALMETHOD( pre, className, methodName, type, argTypes, argNames ) \
@@ -15,7 +15,7 @@
 
 #include INCLUDECLASS( CLASSNAME )
 
-#undef PARENT
+#undef INHERIT
 #undef __VIRTUALMETHOD
 #undef __VOIDVIRTUALMETHOD
 #undef __ABSTRACTMETHOD

@@ -7,9 +7,9 @@
 
 #undef CLASSTYPE
 
-#ifdef PARENT
-#undef PARENT
-#endif
+#undef PARENTINC
+#undef PARENTOP
+#undef CLASSOP
 
 #undef _VIRTUALMETHOD
 #undef VIRTUALMETHOD

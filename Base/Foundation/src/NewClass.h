@@ -47,43 +47,49 @@ struct Stream;
 struct PtrMap;
 
 /* Some macros to do memory recording. */
-#define Class_Alloc( self, itmType )					\
-  (assert( self ), 							\
-   ((NewClass*)self)->curAllocd += sizeof(itmType),			\
-   MemAlloc( itmType, ((NewClass*)self)->type ))
+#define Class_Alloc( self, itmType )			\
+   (assert( self ),					\
+    ((NewClass*)self)->curAllocd += sizeof(itmType),	\
+    MemAlloc( itmType, ((NewClass*)self)->type ))
 
-#define Class_Array( self, itmType, nItms )				\
-  (assert( self ),							\
-   ((NewClass*)self)->curAllocd += sizeof(itmType) * (nItms),		\
-   MemArray( itmType, nItms, ((NewClass*)self)->type ))
+#define Class_Array( self, itmType, nItms )			\
+   (assert( self ),						\
+    ((NewClass*)self)->curAllocd += sizeof(itmType) * (nItms),	\
+    MemArray( itmType, nItms, ((NewClass*)self)->type ))
 
 #define Class_Array2D( self, itmType, nItmsX, nItmsY )			\
-  (assert( self ),							\
-   ((NewClass*)self)->curAllocd += sizeof(itmType) * 			\
-   (nItmsX) * (nItmsY) + sizeof(itmType*) * (nItmsX),			\
-   MemArray2D( itmType, nItmsX, nItmsY, ((NewClass*)self)->type ))
+   (assert( self ),							\
+    ((NewClass*)self)->curAllocd += sizeof(itmType) * 			\
+    (nItmsX) * (nItmsY) + sizeof(itmType*) * (nItmsX),			\
+    MemArray2D( itmType, nItmsX, nItmsY, ((NewClass*)self)->type ))
 
 #define Class_Rearray( self, ptr, itmType, nItms )			\
-  (assert( self ),							\
-   (ptr) ? ((NewClass*)self)->curAllocd -= Memory_SizeGet( ptr ) : 0,	\
-   ((NewClass*)self)->curAllocd += sizeof(itmType) * (nItms),		\
-   MemRearray( ptr, itmType, nItms, ((NewClass*)self)->type ))
+   (assert( self ),							\
+    (ptr) ? ((NewClass*)self)->curAllocd -= Memory_SizeGet( ptr ) : 0,	\
+    ((NewClass*)self)->curAllocd += sizeof(itmType) * (nItms),		\
+    MemRearray( ptr, itmType, nItms, ((NewClass*)self)->type ))
 
 #define Class_Free( self, ptr )						\
-  (assert( self ),							\
-   (ptr) ? ((NewClass*)self)->curAllocd -= Memory_SizeGet( ptr ) : 0,	\
-   MemFree( ptr ))
+   (assert( self ),							\
+    (ptr) ? ((NewClass*)self)->curAllocd -= Memory_SizeGet( ptr ) : 0,	\
+    MemFree( ptr ))
 
-#ifndef CURRENTDIR
-#undef CURRENTDIR
-#endif
-#define CURRENTDIR StGermain/Base/Foundation
+/* Macros to handle type checked type casting. */
+#define Class_IsSuper( ptr, typeName )				\
+   (assert( ptr ), assert( ((NewClass*)ptr)->isSuperFunc ),	\
+    ((NewClass*)ptr)->isSuperFunc( typeName##_Type ))
 
-#ifdef CLASSNAME
-#undef CLASSNAME
-#endif
+#define Class_Cast( ptr, typeName )		\
+   (assert( Class_IsSuper( ptr, typeName ) ),	\
+    (typeName*)ptr )
+
+#define Class_ConstCast( ptr, typeName )	\
+   (assert( Class_IsSuper( ptr, typeName ) ),	\
+    (const typeName*)ptr )
+
+#include "StGermain/Base/Foundation/ClassClear.h"
+#define CLASSDIR StGermain/Base/Foundation
 #define CLASSNAME NewClass
-
-#include "ClassHdr.h"
+#include "StGermain/Base/Foundation/ClassHdr.h"
 
 #endif /* __StGermain_Base_Foundation_NewClass_h__ */

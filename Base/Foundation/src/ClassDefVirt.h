@@ -1,5 +1,5 @@
-#define PARENT( classPath )							\
-  INCLUDEFILE( StGermain/Base/Foundation, NoClass.h )
+#define INHERIT( par ) \
+  INCLUDEFILE( StGermain/Base/Foundation, ClassEmpty.h )
 #define __VIRTUALMETHOD( pre, className, methodName, type, argTypes, argNames ) \
   type pre##className##_##methodName argTypes {					\
     assert( self );								\
@@ -25,7 +25,7 @@
 
 #include INCLUDECLASS( CLASSNAME )
 
-#undef PARENT
+#undef INHERIT
 #undef __VIRTUALMETHOD
 #undef __VOIDVIRTUALMETHOD
 #undef __ABSTRACTMETHOD

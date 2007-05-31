@@ -44,16 +44,9 @@
 
 extern const double ISet_TableFactor;
 
-#ifdef CURRENTDIR
-#undef CURRENTDIR
-#endif
-#define CURRENTDIR StGermain/Base/Container
-
-#ifdef CLASSNAME
-#undef CLASSNAME
-#endif
+#include "StGermain/Base/Foundation/ClassClear.h"
+#define CLASSDIR StGermain/Base/Container
 #define CLASSNAME ISet
-
 #include "StGermain/Base/Foundation/ClassHdr.h"
 
 #endif /* __StGermain_Base_Container_ISet_h__ */

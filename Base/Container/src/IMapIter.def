@@ -1,7 +1,11 @@
-#include PARENT( Iter )
+#include INHERIT( StGermain/Base/Container/Iter )
+#include "StGermain/Base/Foundation/ClassClear.h"
 
-#undef CLASSNAME
+#define PARENTDIR StGermain/Base/Container
+#define PARENT Iter
+#define CLASSDIR StGermain/Base/Container
 #define CLASSNAME IMapIter
+#include "StGermain/Base/Foundation/ClassSetup.h"
 
 VOIDOVERRIDE( Init, void, (void* self), (self) )
 VOIDOVERRIDE( Copy, void, (void* self, const void* op), (self, op) )

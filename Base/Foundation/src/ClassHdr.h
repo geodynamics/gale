@@ -1,11 +1,8 @@
-#ifndef CURRENTDIR
-#error Error: No 'CURRENTDIR' precompiler definition found.
-#endif
-#ifndef PREFIX
-#define PREFIX
+#ifndef CLASSDIR
+#error *** StGermain class error: class directory not defined.
 #endif
 #ifndef CLASSNAME
-#error Error: No 'CLASSNAME' precompiler definition found.
+#error *** StGermain class error: class name not defined.
 #endif
 
 #include "ClassPre.h"

@@ -1,5 +1,9 @@
-#undef CLASSNAME
+#include "StGermain/Base/Foundation/ClassClear.h"
+
+#define CLASSDIR StGermain/Base/Foundation
 #define CLASSNAME NewClass
+
+#include "StGermain/Base/Foundation/ClassSetup.h"
 
 VOIDVIRTUALMETHOD( Init, void, (void* self), (self) )
 VOIDVIRTUALMETHOD( Destruct, void, (void* self), (self) )
@@ -18,6 +22,7 @@ METHOD( GetMemUsage, SizeT, (const void* self), (self) )
 
 MEMBER( NewFunc*, newFunc )
 MEMBER( ConstructFunc*, constructFunc )
+MEMBER( IsSuperFunc*, isSuperFunc )
 MEMBER( SizeT, sizeOfSelf )
 MEMBER( Type, type )
 MEMBER( int, nRefsToSelf )

@@ -24,27 +24,56 @@
 **  You should have received a copy of the GNU Lesser General Public
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+**
+** $Id: NewObject.c 3952 2007-01-09 06:24:06Z LukeHodkinson $
+**
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-/** \file
- ** <b>Role:</b>
- **	Abstract class faciliting how class inheritance is done.
- **
- ** <b>Assumptions:</b>
- **	None
- **
- ** <b>Comments:</b>
- **	None
- **
- ** $Id: IMapIter.h 3904 2006-12-14 00:52:06Z LukeHodkinson $
- **
- **/
- 
-#ifndef __StGermain_Base_Container_IMapIter_h__
-#define __StGermain_Base_Container_IMapIter_h__
 
-#include "StGermain/Base/Foundation/ClassClear.h"
-#define CLASSDIR StGermain/Base/Container
-#define CLASSNAME IMapIter
-#include "StGermain/Base/Foundation/ClassHdr.h"
+#include <stdlib.h>
+#include <string.h>
+#include "types.h"
+#include "debug.h"
+#include "MemoryTag.h"
+#include "Memory.h"
+#include "NewClass.h"
+#include "NewObject.h"
+#include "StGermain/Base/Foundation/ClassDef.h"
 
-#endif /* __StGermain_Base_Container_IMapIter_h__ */
+
+void _NewObject_Init( void* _self ) {
+   NewObject* self = (NewObject*)_self;
+
+   _NewClass_Init( self );
+   self->name = NULL;
+}
+
+void _NewObject_Destruct( void* _self ) {
+   NewObject* self = (NewObject*)_self;
+   assert( self );
+
+   Class_Free( self, self->name );
+   _NewClass_Destruct( self );
+}
+
+void _NewObject_Copy( void* self, const void* op ) {
+   _NewClass_Copy( self, op );
+   NewObject_SetName( self, ((NewObject*)op)->name );
+}
+
+void NewObject_SetName( void* _self, const char* name ) {
+   NewObject* self = (NewObject*)_self;
+   int len;
+   assert( self );
+
+   len = name ? strlen( name ) + 1 : 0;
+   self->name = Class_Rearray( self, self->name, char, len );
+   if( name )
+      strcpy( self->name, name );
+}
+
+const char* NewObject_GetName( void* self ) {
+   assert( self );
+
+   return ((NewObject*)self)->name;
+}
+

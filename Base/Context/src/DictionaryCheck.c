@@ -102,9 +102,8 @@ void CheckDictionaryKeys( Dictionary* dictionary, char* errorMessage)
 		}
 /* 		Do I need this one here if Journal_Firewall exits prog? */
 		Stream_UnIndent(errStream);
-		Journal_Firewall(errCount == 0, errStream, 
-					"Error in %s with %d entries in dictionary keys\n",
-					__func__, errCount);
+		Journal_Printf(errStream, "Error in %s with %d entries in dictionary keys\n",
+			       __func__, errCount);
 		
 	}
 	Memory_Free(keyIndexArray);

@@ -34,7 +34,7 @@
 ** <b>Comments:</b>
 **	None
 **
-** $Id: Foundation.h 4094 2007-05-16 00:50:44Z LukeHodkinson $
+** $Id: Foundation.h 4129 2007-05-31 01:26:41Z LukeHodkinson $
 **
 **/
 
@@ -53,6 +53,7 @@
 	#include "Class.h"
 	#include "NewClass.h"
 	#include "Object.h"
+	#include "NewObject.h"
 	#include "ObjectAdaptor.h"
 	#include "PrimitiveObject.h"
 	#include "ObjectList.h"

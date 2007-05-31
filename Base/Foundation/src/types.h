@@ -34,18 +34,36 @@
 ** <b>Comments:</b>
 **	None as yet.
 **
-** $Id: types.h 4124 2007-05-27 23:18:25Z LukeHodkinson $
+** $Id: types.h 4129 2007-05-31 01:26:41Z LukeHodkinson $
 **
 **/
 
 #ifndef __Base_Foundation_types_h__
 #define __Base_Foundation_types_h__
 
+	/*
+	 * #ifdef barrier for Bool type. Added 07-Sep-2004 -- Alan
+	 *
+	 * Change for Cecile so that she may procede with gLucifier work.
+	 * This was causing problems when compiling StGermain with gLucifier/vtk using g++.
+	 * It seems to suggest that this line was trying to redefine the int primitive.
+	 *
+	 * Grep searches reveal that neither gLucifier or vtk use the "Bool" word.
+	 *
+	 * TODO: Find a more elegant way to fix this issue.
+	 */
+	#ifndef Bool	
+		/** Boolean type in StGermain. */
+		typedef enum			Bool { False=0, True=1 } Bool;
+	#endif
+
 typedef unsigned char stgByte;
 typedef void* (NewFunc)();
 typedef void (ConstructFunc)( void* );
+typedef Bool (IsSuperFunc)( const char* );
 
 typedef struct NewClass NewClass;
+typedef struct NewObject NewObject;
 
 	typedef void*				Pointer;		/**< General Pointer. */
 	typedef unsigned long			Stg_Word;		/**< A word on the cpu architecture */
@@ -84,23 +102,6 @@ typedef struct NewClass NewClass;
 	/** Unique ID of a type/class. (runtime-proc persistance). Pointer used as ID. Must point to a valid string. */
 	typedef char*				Type;
 	#define					Type_Invalid	0	/**< An invalid or empty type. */
-	
-	
-	/*
-	 * #ifdef barrier for Bool type. Added 07-Sep-2004 -- Alan
-	 *
-	 * Change for Cecile so that she may procede with gLucifier work.
-	 * This was causing problems when compiling StGermain with gLucifier/vtk using g++.
-	 * It seems to suggest that this line was trying to redefine the int primitive.
-	 *
-	 * Grep searches reveal that neither gLucifier or vtk use the "Bool" word.
-	 *
-	 * TODO: Find a more elegant way to fix this issue.
-	 */
-	#ifndef Bool	
-		/** Boolean type in StGermain. */
-		typedef enum			Bool { False=0, True=1 } Bool;
-	#endif
 	
 
 	typedef enum MemoryPointerStatus_t{
