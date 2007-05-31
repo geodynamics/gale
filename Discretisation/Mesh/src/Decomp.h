@@ -42,16 +42,9 @@
 #ifndef __StGermain_Discretisation_Mesh_Decomp_h__
 #define __StGermain_Discretisation_Mesh_Decomp_h__
 
-#ifdef CURRENTDIR
-#undef CURRENTDIR
-#endif
-#define CURRENTDIR StGermain/Discretisation/Mesh
-
-#ifdef CLASSNAME
-#undef CLASSNAME
-#endif
+#include "StGermain/Base/Foundation/ClassClear.h"
+#define CLASSDIR StGermain/Discretisation/Mesh
 #define CLASSNAME Decomp
-
 #include "StGermain/Base/Foundation/ClassHdr.h"
 
 #endif /* __StGermain_Discretisation_Mesh_Decomp_h__ */

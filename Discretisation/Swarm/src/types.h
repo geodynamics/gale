@@ -32,7 +32,7 @@
 **
 ** Comments:
 **
-** $Id: types.h 4119 2007-05-22 07:35:46Z RaquibulHassan $
+** $Id: types.h 4130 2007-05-31 01:27:17Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -82,6 +82,7 @@
 	typedef struct PerCellParticleLayout		PerCellParticleLayout;
 	typedef struct RandomParticleLayout		RandomParticleLayout;
 	typedef struct MeshParticleLayout		MeshParticleLayout;
+	typedef struct CentroidParticleLayout		CentroidParticleLayout;
 	typedef struct GaussParticleLayout		GaussParticleLayout;
 	typedef struct TriGaussParticleLayout		TriGaussParticleLayout;
 	typedef struct GlobalParticleLayout		GlobalParticleLayout;
