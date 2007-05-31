@@ -35,7 +35,7 @@
 ** Comments:
 **	None so far.
 **
-** $Id: Swarm.h 4130 2007-05-31 01:27:17Z LukeHodkinson $
+** $Id: Swarm.h 4131 2007-05-31 01:41:51Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -63,7 +63,6 @@
 	#include "PerCellParticleLayout.h"
 	#include "RandomParticleLayout.h"
 	#include "MeshParticleLayout.h"
-	#include "CentroidParticleLayout.h"
 	#include "GaussParticleLayout.h"
 	#include "TriGaussParticleLayout.h"
 	#include "GlobalParticleLayout.h"
