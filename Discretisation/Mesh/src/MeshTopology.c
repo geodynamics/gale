@@ -58,6 +58,8 @@ void _MeshTopology_Init( void* _self ) {
    self->comm = NULL;
    self->locals = NULL;
    self->remotes = NULL;
+   self->nBndEls = NULL;
+   self->bndEls = NULL;
    self->nIncEls = NULL;
    self->incEls = NULL;
 }
@@ -368,6 +370,27 @@ void MeshTopology_RemoveRemoteElements( void* _self, int dim, int nEls,
 
    assert( 0 );
    /* TODO: Method body goes here */
+}
+
+void MeshTopology_SetBoundaryElements( void* _self, int dim, 
+				       int nEls, const int* els )
+{
+   MeshTopology* self = Class_Cast( _self, MeshTopology );
+
+   assert( !nEls || els );
+   assert( dim < self->nTDims );
+
+   if( !self->nBndEls ) {
+      self->nBndEls = Class_Array( self, int, self->nTDims );
+      memset( self->nBndEls, 0, sizeof(int) * self->nTDims );
+   }
+   if( !self->bndEls ) {
+      self->bndEls = Class_Array( self, int*, self->nTDims );
+      memset( self->bndEls, 0, sizeof(int*) * self->nTDims );
+   }
+   self->nBndEls[dim] = nEls;
+   self->bndEls[dim] = Class_Rearray( self, self->bndEls[dim], int, nEls );
+   memcpy( self->bndEls[dim], els, sizeof(int) * nEls );
 }
 
 void MeshTopology_SetIncidence( void* _self, int fromDim, int fromEl, 
@@ -779,7 +802,11 @@ void MeshTopology_ClearElements( void* _self ) {
 	 Decomp_ClearLocals( self->locals[d_i] );
       if( self->remotes && self->remotes[d_i] )
 	 Sync_ClearRemotes( self->remotes[d_i] );
+      if( self->bndEls )
+	 Class_Free( self, self->bndEls[d_i] );
    }
+   Class_Free( self, self->bndEls );
+   Class_Free( self, self->nBndEls );
 }
 
 void MeshTopology_ClearIncidence( void* _self ) {
@@ -820,6 +847,20 @@ Bool MeshTopology_HasDomain( const void* self, int dim ) {
 const Sync* MeshTopology_GetDomain( const void* self, int dim ) {
    assert( self && dim < ((MeshTopology*)self)->nTDims );
    return ((MeshTopology*)self)->remotes[dim];
+}
+
+void MeshTopology_GetBoundaryElements( const void* self, int dim, 
+				       int* nEls, const int** els )
+{
+   assert( Class_IsSuper( self, MeshTopology ) );
+   assert( dim < ((MeshTopology*)self)->nTDims );
+   assert( nEls );
+   assert( els );
+
+   *nEls = ((MeshTopology*)self)->nBndEls ? 
+      ((MeshTopology*)self)->nBndEls[dim] : 0;
+   *els = ((MeshTopology*)self)->bndEls ? 
+      ((MeshTopology*)self)->bndEls[dim] : NULL;
 }
 
 Bool MeshTopology_HasIncidence( const void* self, int fromDim, int toDim ) {

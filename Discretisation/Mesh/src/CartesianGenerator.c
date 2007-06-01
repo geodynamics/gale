@@ -1578,6 +1578,9 @@ void CartesianGenerator_GenTopo( CartesianGenerator* self, MeshTopology* topo ) 
 		}
 	}
 
+	/* Generate any boundary elements required. */
+	CartesianGenerator_GenBndVerts( self, topo, grids );
+
 	/* Free allocated grids. */
 	grids[topo->nDims][0] = NULL;
 	for( d_i = 1; d_i < topo->nDims; d_i++ ) {
@@ -1768,6 +1771,41 @@ void CartesianGenerator_GenEdges3D( CartesianGenerator* self, MeshTopology* topo
 	FreeObject( grid );
 	FreeObject( globalGrid );
 */
+}
+
+void CartesianGenerator_GenBndVerts( CartesianGenerator* self, MeshTopology* topo, Grid*** grids ) {
+	IArray bndElsObj, *bndEls = &bndElsObj;
+	int nDims, nVerts, nBndEls;
+	const int* ptr;
+	int global;
+	int* inds;
+	const Sync* sync;
+	int v_i, d_i;
+
+	assert( self );
+	assert( topo );
+	assert( grids );
+
+	nDims = MeshTopology_GetNumDims( topo );
+	inds = Class_Array( self, int, nDims );
+	IArray_Construct( bndEls );
+	sync = MeshTopology_GetDomain( topo, 0 );
+	nVerts = Sync_GetNumDomains( sync );
+	for( v_i = 0; v_i < nVerts; v_i++ ) {
+		global = Sync_DomainToGlobal( sync, v_i );
+		Grid_Lift( grids[0][0], global, inds );
+		for( d_i = 0; d_i < nDims; d_i++ ) {
+			if( inds[d_i] == 0 || inds[d_i] == grids[0][0]->sizes[d_i] - 1 )
+				break;
+		}
+		if( d_i < nDims )
+			IArray_Append( bndEls, v_i );
+	}
+	Class_Free( self, inds );
+
+	IArray_GetArray( bndEls, &nBndEls, &ptr );
+	MeshTopology_SetBoundaryElements( topo, 0, nBndEls, ptr );
+	IArray_Destruct( bndEls );
 }
 
 void CartesianGenerator_CompleteVertexNeighbours( CartesianGenerator* self, MeshTopology* topo, Grid*** grids ) {

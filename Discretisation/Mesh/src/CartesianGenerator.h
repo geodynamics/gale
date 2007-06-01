@@ -208,6 +208,7 @@
 	void CartesianGenerator_GenTopo( CartesianGenerator* self, MeshTopology* topo );
 	void CartesianGenerator_GenEdges2D( CartesianGenerator* self, MeshTopology* topo, Grid*** grids );
 	void CartesianGenerator_GenEdges3D( CartesianGenerator* self, MeshTopology* topo, Grid*** grids );
+	void CartesianGenerator_GenBndVerts( CartesianGenerator* self, MeshTopology* topo, Grid*** grids );
 	void CartesianGenerator_CompleteVertexNeighbours( CartesianGenerator* self, MeshTopology* topo, Grid*** grids );
 	void CartesianGenerator_MapToDomain( CartesianGenerator* self, Sync* sync, 
 					     unsigned nIncEls, unsigned* incEls );

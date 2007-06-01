@@ -35,6 +35,9 @@ METHOD( AddRemoteElements, void, (void* self, int dim, int nEls,
 METHOD( RemoveRemoteElements, void, (void* self, int dim, int nEls, 
 				     const int* globals, IMap* map), 
 	(self, dim, nEls, globals, map) )
+METHOD( SetBoundaryElements, void, (void* self, int dim, 
+				    int nEls, const int* els ), 
+	(self, dim, nEls, els) )
 METHOD( SetIncidence, void, (void* self, int fromDim, int fromEl, 
 			     int toDim, int nIncEls, const int* incEls ), 
 	(self, fromDim, fromEl, toDim, nIncEls, incEls) )
@@ -53,6 +56,9 @@ METHOD( GetNumDims, int, (const void* self), (self) )
 METHOD( GetComm, const Comm*, (const void* self), (self) )
 METHOD( HasDomain, Bool, (const void* self, int dim), (self, dim) )
 METHOD( GetDomain, const Sync*, (const void* self, int dim), (self) )
+METHOD( GetBoundaryElements, void, (const void* self, int dim, 
+				    int* nEls, const int** els), 
+	(self, dim, nEls, els) )
 METHOD( HasIncidence, Bool, (const void* self, int fromDim, 
 			     int toDim), 
 	(self, fromDim, toDim) )
@@ -72,5 +78,7 @@ MEMBER( int, shadDepth )
 MEMBER( Comm*, comm )
 MEMBER( Decomp**, locals )
 MEMBER( Sync**, remotes )
+MEMBER( int*, nBndEls )
+MEMBER( int**, bndEls )
 MEMBER( int***, nIncEls )
 MEMBER( int****, incEls )
