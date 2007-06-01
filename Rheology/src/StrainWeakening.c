@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: StrainWeakening.c 466 2007-04-27 06:24:33Z LukeHodkinson $
+** $Id: StrainWeakening.c 483 2007-06-01 00:56:27Z StuartClark $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -112,19 +112,21 @@ void _StrainWeakening_Init(
 		double                                             softeningStrain,
 		double                                             initialDamageFraction,
 		double                                             initialDamageWavenumber,
+		double                                             initialDamageWavenumberJ,
 		double                                             initialDamageFactor,
 		long int                                           randomSeed,
 		Stg_Shape*                                         initialStrainShape )
 {
 	/* Assign Values */
-	self->swarm                   = swarm;
-	self->healingRate             = healingRate;
-	self->softeningStrain         = softeningStrain;
-	self->initialDamageFraction   = initialDamageFraction;
-	self->initialDamageWavenumber = initialDamageWavenumber;
-	self->initialDamageFactor     = initialDamageFactor;
-	self->randomSeed              = randomSeed;
-	self->initialStrainShape      = initialStrainShape;
+	self->swarm                    = swarm;
+	self->healingRate              = healingRate;
+	self->softeningStrain          = softeningStrain;
+	self->initialDamageFraction    = initialDamageFraction;
+	self->initialDamageWavenumber  = initialDamageWavenumber;
+	self->initialDamageWavenumberJ = initialDamageWavenumberJ;
+	self->initialDamageFactor      = initialDamageFactor;
+	self->randomSeed               = randomSeed;
+	self->initialStrainShape       = initialStrainShape;
 	
 	/****** Setup Variables *****/
 
@@ -208,6 +210,7 @@ void _StrainWeakening_Construct( void* strainWeakening, Stg_ComponentFactory* cf
 	double                  softeningStrain;
 	double                  initialDamageFraction;
 	double                  initialDamageWavenumber;
+	double                  initialDamageWavenumberJ;
 	double                  initialDamageFactor;
 	long int                randomSeed;
 	Stg_Shape*              initialStrainShape;
@@ -223,13 +226,14 @@ void _StrainWeakening_Construct( void* strainWeakening, Stg_ComponentFactory* cf
 		True,
 		data );
 
-	healingRate             = Stg_ComponentFactory_GetDouble( cf, self->name, "healingRate",              0.0 );
-	softeningStrain         = Stg_ComponentFactory_GetDouble( cf, self->name, "softeningStrain",          HUGE_VAL );
-	initialDamageFraction   = Stg_ComponentFactory_GetDouble( cf, self->name, "initialDamageFraction",    0.0 );
-	initialDamageWavenumber = Stg_ComponentFactory_GetDouble( cf, self->name, "initialDamageWavenumber", -1.0 );
-	initialDamageFactor     = Stg_ComponentFactory_GetDouble( cf, self->name, "initialDamageFactor",      1.0 );
-	randomSeed              = (long int) Stg_ComponentFactory_GetInt( cf, self->name, "randomSeed",       0 );
-	initialStrainShape      = Stg_ComponentFactory_ConstructByKey( cf, self->name, "initialStrainShape", Stg_Shape, False, data );
+	healingRate              = Stg_ComponentFactory_GetDouble( cf, self->name, "healingRate",              0.0 );
+	softeningStrain          = Stg_ComponentFactory_GetDouble( cf, self->name, "softeningStrain",          HUGE_VAL );
+	initialDamageFraction    = Stg_ComponentFactory_GetDouble( cf, self->name, "initialDamageFraction",    0.0 );
+	initialDamageWavenumber  = Stg_ComponentFactory_GetDouble( cf, self->name, "initialDamageWavenumber",  -1.0 );
+	initialDamageWavenumberJ = Stg_ComponentFactory_GetDouble( cf, self->name, "initialDamageWavenumberJ", -1.0 );
+	initialDamageFactor      = Stg_ComponentFactory_GetDouble( cf, self->name, "initialDamageFactor",       1.0 );
+	randomSeed               = (long int) Stg_ComponentFactory_GetInt( cf, self->name, "randomSeed",        0 );
+	initialStrainShape       = Stg_ComponentFactory_ConstructByKey( cf, self->name, "initialStrainShape", Stg_Shape, False, data );
 
 	_StrainWeakening_Init(
 			self, 
@@ -238,6 +242,7 @@ void _StrainWeakening_Construct( void* strainWeakening, Stg_ComponentFactory* cf
 			softeningStrain,
 			initialDamageFraction,
 			initialDamageWavenumber, 
+			initialDamageWavenumberJ, 
 			initialDamageFactor,
 			randomSeed,
 			initialStrainShape );
@@ -279,6 +284,7 @@ void _StrainWeakening_Initialise( void* strainWeakening, void* data ) {
 
 	/* We should only set initial conditions if in regular non-restart mode. If in restart mode, then
 	the particle-based variables will be set correcty when we re-load the Swarm. */
+	
 	if ( !(context && (True == context->loadFromCheckPoint)) ) {
 		/* Initialise random number generator */
 		srand( self->randomSeed );
@@ -302,10 +308,19 @@ void _StrainWeakening_Initialise( void* strainWeakening, void* data ) {
 				
 				postFailureWeakening = self->initialDamageFactor * rand() * self->softeningStrain/RAND_MAX;
 
+				/* Modulate the initial weakening by a harmonic-squared function with wavenumber(s) specified by
+					the user. */
+				
 				if ( self->initialDamageWavenumber > 0.0 ) {				
 					coord = Variable_GetPtrDouble( positionVariable, lParticle_I );
-
-					postFailureWeakening *= pow(sin(M_PI * coord[ I_AXIS ] * self->initialDamageWavenumber),2.0);
+					postFailureWeakening *= 
+						pow(sin(M_PI * coord[ I_AXIS ] * self->initialDamageWavenumber),2.0);
+				}
+				
+				if ( self->initialDamageWavenumberJ > 0.0 ) {				
+					coord = Variable_GetPtrDouble( positionVariable, lParticle_I ); /* This could be done more efficiently */
+					postFailureWeakening *= 
+						pow(sin(M_PI * coord[ J_AXIS ] * self->initialDamageWavenumberJ),2.0);
 				}
 			}
 		

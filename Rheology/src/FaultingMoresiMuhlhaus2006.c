@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: FaultingMoresiMuhlhaus2006.c 466 2007-04-27 06:24:33Z LukeHodkinson $
+** $Id: FaultingMoresiMuhlhaus2006.c 483 2007-06-01 00:56:27Z StuartClark $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -330,22 +330,23 @@ void _FaultingMoresiMuhlhaus2006_Initialise( void* rheology, void* data ) {
 	if ( !(context && (True == context->loadFromCheckPoint) ) ) {
 		for ( lParticle_I = 0 ; lParticle_I < particleLocalCount ; lParticle_I++ ) { 
 			Variable_SetValueChar( self->hasYieldedVariable->variable, lParticle_I, False );
-
 			Variable_SetValueDouble( self->slipRate->variable, lParticle_I, 0.0 );
 			
 			ptr = Variable_GetPtrDouble( self->slip->variable, lParticle_I );
 			
 			materialPoint = (MaterialPoint*)Swarm_ParticleAt( self->materialPointsSwarm, lParticle_I );
-			
 			normalDirector = Director_GetNormalPtr( self->director, materialPoint);
-			
 			initialDamageFraction = StrainWeakening_GetInitialDamageFraction( self->strainWeakening, materialPoint );
+			
+			/*  Is this out of sync with the other damage model ??
+				Surely the orientation should be randomized for all particles where the initial damage is non-zero ??
+				LM  */
 		
-			if (rand() < RAND_MAX*initialDamageFraction) {
+		
+			if (1 || rand() < RAND_MAX*initialDamageFraction) {
 				normalLength2 = 0.0;
 				
 				for( dof_I=0; dof_I < dim ; dof_I++) {
-					
 					normal[dof_I] = 1.0 - (2.0 * rand())/RAND_MAX; 
 					normalLength2 += normal[dof_I] * normal[dof_I];
 				}
@@ -356,7 +357,10 @@ void _FaultingMoresiMuhlhaus2006_Initialise( void* rheology, void* data ) {
 					normal[dof_I] *= invNormalLength; 
 				}
 				
-				/*TODO : improve this initialisation (is it really needed ?)*/
+				/*TODO : improve this initialisation (is it really needed ?)
+					Dear Dr TODO, If you mean "is the slip really needed" then
+					I think the answer is "no" .... LM 
+				*/
 				slip[0] = - normal[1];
 				slip[1] =   normal[0];
 				slip[2] =   0.0;
@@ -596,6 +600,7 @@ Bool _FaultingMoresiMuhlhaus2006_OldOrientationStillSoftening( void* rheology, M
 
 	/* We should only continue testing this plane if it is also in the 
 	 * softening orientation with respect to the strain-rate gradient rather than hardening */
+	
 	return (dVparalleldXperpendicular1 < dVparalleldXperpendicular);
 }
 
@@ -770,11 +775,13 @@ void _FaultingMoresiMuhlhaus2006_UpdateDrawParameters( void* rheology ) {
 	StandardParticle*                materialPoint;
 	double                           slipRate;
 	
+	double 							 ratio;
 	double                           length;
 	double                           brightness;
 	double                           opacity;
 	double                           strainWeakeningRatio;
 	double                           localMaxStrainIncrement;
+	double                           localMinStrainIncrement;
 	double                           localMaxSlipRate;
 	double                           localMeanStrainIncrement;
 	double                           localMeanSlipRate;
@@ -782,6 +789,7 @@ void _FaultingMoresiMuhlhaus2006_UpdateDrawParameters( void* rheology ) {
 	
 	double                           globalMaxSlipRate;
 	double                           globalMaxStrainIncrement;
+	double                           globalMinStrainIncrement;
 	double                           globalMeanStrainIncrement;
 	double                           globalMeanSlipRate;
 	Particle_Index                   globalFailed;
@@ -801,7 +809,8 @@ void _FaultingMoresiMuhlhaus2006_UpdateDrawParameters( void* rheology ) {
 	 * that define this dependency are hard coded here. We need to have a more flexible way
 	 * to construct the viz parameters as functions of material parameters */
 	
-	localMaxStrainIncrement = 0.0;
+	localMaxStrainIncrement = -1.0e30;
+	localMinStrainIncrement =  1.0e30;
 	localMeanStrainIncrement = 0.0;
 	localMaxSlipRate = 0.0;
 	localMeanSlipRate = 0.0;
@@ -826,24 +835,28 @@ void _FaultingMoresiMuhlhaus2006_UpdateDrawParameters( void* rheology ) {
 			postFailureWeakeningIncrement = 
 				Variable_GetValueDouble( strainWeakening->postFailureWeakeningIncrement->variable, lParticle_I );
 			
-			localMeanSlipRate += slipRate;
-			localMeanStrainIncrement += postFailureWeakeningIncrement;
+			localMeanSlipRate += slipRate; /* Always positive */
+			localMeanStrainIncrement += fabs(postFailureWeakeningIncrement); /* Positive in failure, negative in healing */
 			
 			if(localMaxSlipRate < slipRate)
 				localMaxSlipRate = slipRate;
 		
 			if(localMaxStrainIncrement < postFailureWeakeningIncrement)
 				localMaxStrainIncrement = postFailureWeakeningIncrement;
+				
+			if(localMinStrainIncrement > postFailureWeakeningIncrement)
+				localMinStrainIncrement = postFailureWeakeningIncrement;
 		}
 	}
 	
 	MPI_Allreduce( &localMaxSlipRate,         &globalMaxSlipRate,         1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD );
 	MPI_Allreduce( &localMaxStrainIncrement,  &globalMaxStrainIncrement,  1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD );
+	MPI_Allreduce( &localMinStrainIncrement,  &globalMinStrainIncrement,  1, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD );
 	MPI_Allreduce( &localMeanSlipRate,        &globalMeanSlipRate,        1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
 	MPI_Allreduce( &localMeanStrainIncrement, &globalMeanStrainIncrement, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
 	MPI_Allreduce( &localFailed,              &globalFailed,              1, MPI_INT,    MPI_SUM, MPI_COMM_WORLD );
 	
-	if(globalFailed == 0) 
+	if(localFailed == 0 || globalFailed == 0) 
 		return;
 				
 	globalMeanStrainIncrement /= (double) globalFailed;
@@ -857,6 +870,18 @@ void _FaultingMoresiMuhlhaus2006_UpdateDrawParameters( void* rheology ) {
 		0.5 * averagedGlobalMaxSlipRate + 
 		0.25 * globalMaxSlipRate +
 		0.25 * globalMeanSlipRate;
+	
+	fprintf(stderr,"globalMeanStrainIncrement = %g\n",globalMeanStrainIncrement);
+	fprintf(stderr,"globalMaxStrainIncrement  = %g\n",globalMaxStrainIncrement);
+	fprintf(stderr,"globalMinStrainIncrement  = %g\n",globalMinStrainIncrement);
+	fprintf(stderr,"averagedGlobalMaxStrainIncrement = %g\n",averagedGlobalMaxStrainIncrement);
+	
+	fprintf(stderr,"globalMeanSlipRate = %g\n",globalMeanSlipRate); 
+	fprintf(stderr,"averagedGlobalMaxSlipRate = %g\n",averagedGlobalMaxSlipRate);
+	
+	fprintf(stderr,"Number of particles failing = %d\n",localFailed);
+	
+	
 	
 	/* Let's simply assume that twice the mean is a good place to truncate these values */
 	oneOverGlobalMaxSlipRate = 1.0 / averagedGlobalMaxSlipRate;
@@ -878,13 +903,43 @@ void _FaultingMoresiMuhlhaus2006_UpdateDrawParameters( void* rheology ) {
 		slipRate = Variable_GetValueDouble( self->slipRate->variable, lParticle_I );
 		strainWeakeningRatio = StrainWeakening_CalcRatio( strainWeakening, materialPoint );
 		
+		postFailureWeakeningIncrement = 
+			Variable_GetValueDouble( strainWeakening->postFailureWeakeningIncrement->variable, lParticle_I );
 		
+		
+		/* Distinguish between healing (e.g. dark) and softening (e.g. light) branches 
+		
+			1. The intensity of the colouring should be proportional to strain rate
+			2. Size of square is proportional to total strain
+			3. The opacity is used to mask out the "uninteresting cases"
+		
+		*/
+		
+				length = 0.025 * strainWeakeningRatio;
+				
+				ratio = postFailureWeakeningIncrement / globalMeanStrainIncrement; // healing v. not 
+				if( ratio < -0.0) {  /* Healing - don't bother with the ones which are fading fast */
+					brightness = 0.0;	
+					opacity = 1.0 + ratio;
+					if(opacity < 0.0)
+						opacity = 0.0;
+				}
+				else {  /* Growing  */
+					brightness = slipRate * oneOverGlobalMaxSlipRate;
+					opacity = 0.25 * (ratio < 1.0 ? ratio : 1.0);
+					
+				}
+				
+					
+					
+		/*
 		length     = 0.005 + 0.005 * strainWeakeningRatio;
 		length *= 10;
 		brightness = strainWeakeningRatio * slipRate * oneOverGlobalMaxSlipRate;
 		if( brightness > 1.0 )
 			brightness = 1.0;
-		opacity    = 0.5 * pow(brightness,3.0); 
+		opacity    = 0.1 + 0.05 * pow(brightness,3.0); 
+		*/
 
 		Variable_SetValueFloat( self->brightness->variable, lParticle_I, brightness );
 		Variable_SetValueFloat( self->opacity->variable,    lParticle_I, opacity );

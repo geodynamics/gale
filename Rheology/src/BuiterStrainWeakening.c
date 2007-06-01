@@ -114,13 +114,18 @@ void _BuiterStrainWeakening_Init(
 		double                                             softeningStrain,
 		double                                             initialDamageFraction,
 		double                                             initialDamageWavenumber,
+		double                                             initialDamageWavenumberJ,
 		double                                             initialDamageFactor,
 		long int                                           randomSeed,
 		Stg_Shape*                                         initialStrainShape  )
 {
 	_StrainWeakening_Init( (StrainWeakening*)self, 
-				swarm, healingRate, softeningStrain, 
-				initialDamageFraction, initialDamageWavenumber, 				initialDamageFactor, randomSeed,
+				swarm, healingRate, 
+				softeningStrain, 
+				initialDamageFraction,
+				initialDamageWavenumber,
+				initialDamageWavenumberJ,
+				initialDamageFactor, randomSeed,
 				initialStrainShape );
 }
 

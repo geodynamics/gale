@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: StrainWeakening.h 354 2006-10-12 08:19:27Z SteveQuenette $
+** $Id: StrainWeakening.h 483 2007-06-01 00:56:27Z StuartClark $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -80,6 +80,7 @@
 		double                                 softeningStrain;                   \
 		double                                 initialDamageFraction;             \
 		double                                 initialDamageWavenumber;           \
+		double                                 initialDamageWavenumberJ;           \
 		double                                 initialDamageFactor;               \
 		Stg_Shape*                             initialStrainShape;                \
 		long int                               randomSeed;
@@ -111,6 +112,7 @@
 		double                                             softeningStrain,
 		double                                             initialDamageFraction,
 		double                                             initialDamageWavenumber,
+		double                                             initialDamageWavenumberJ,
 		double                                             initialDamageFactor,
 		long int                                           randomSeed,
 		Stg_Shape*                                         initialStrainShape  );
