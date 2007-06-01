@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: SwarmSquares.c 667 2007-03-01 06:43:11Z RobertTurnbull $
+** $Id: SwarmSquares.c 696 2007-06-01 01:17:56Z StuartClark $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -266,16 +266,19 @@ void _lucSwarmSquares_CleanUp( void* drawingObject, void* _context ) {
 void _lucSwarmSquares_BuildDisplayList( void* drawingObject, void* _context ) {
 	lucSwarmViewer*          self                = (lucSwarmViewer*)drawingObject;
 
-        /* Hack to allow the transparency to work properly 
-	 *See : http://www.oreillynet.com/pub/a/network/2000/06/23/magazine/opengl_render.html?page=2 
-	 * ROB IS COMMENTING THESE OUT NOW TO GET IT TO WORK - HAVE TO TRY THIS ANOTHER TIME - 1st MARCH 2007
+     /* 
+		Hack to allow the transparency to work properly 
+	 	See : http://www.oreillynet.com/pub/a/network/2000/06/23/magazine/opengl_render.html?page=2 
+	  	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+		
+		This isn't so great either ... it's hard to overlay darker colours on 
+		light with this choice of blending.
 	 */
-//	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	
 	
 	_lucSwarmViewerBase_BuildDisplayList( self, _context );
 	
-	/* Put back the blending to what it was by default */
-//	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	/* glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); */
 }
 
 void _lucSwarmSquares_PlotParticle( void* drawingObject, void* _context, Particle_Index lParticle_I ) {
@@ -294,8 +297,14 @@ void _lucSwarmSquares_PlotParticle( void* drawingObject, void* _context, Particl
 	if ( lengthVariable )
 		SwarmVariable_ValueAt( lengthVariable, lParticle_I, &length );
 
-		
-	luc_OpenGlFatSquare( context->dim, coord, normal, NULL, length, length * 0.1);
+	glEnable(GL_BLEND);
+	
+	/*  The fat square has a pizza box shape ... i.e. edges and two faces 
+		which have opposite normals */
+	
+	luc_OpenGlFatSquare( context->dim, coord, normal, NULL, length, length * 0.1);  
+	/* luc_OpenGlSquare( context->dim, coord, normal, NULL, length); */
+
 }
 
 void lucSwarmSquares_UpdateVariables( void* drawingObject ) {
