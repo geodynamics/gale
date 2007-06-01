@@ -39,12 +39,13 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: OutputPNG.c 628 2006-10-12 08:23:07Z SteveQuenette $
+** $Id: OutputPNG.c 697 2007-06-01 02:29:32Z RobertTurnbull $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 #ifdef HAVE_PNG
 
 #include <mpi.h>
+#include <png.h>
 #include <StGermain/StGermain.h>
 
 #include <glucifer/Base/Base.h>
@@ -55,8 +56,6 @@
 #include <assert.h>
 #include <string.h>
 
-#include <png.h>
-#include <setjmp.h>
 
 /* Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 const Type lucOutputPNG_Type = "lucOutputPNG";
