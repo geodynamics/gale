@@ -34,9 +34,18 @@ METHOD( GlobalToLocal, int, (const void* self, int global), (self, global) )
 METHOD( TryGlobalToLocal, Bool, (const void* self, int global, int* local), 
 	(self, global, local) )
 
+METHOD( FindOwners, void, 
+	(const void* self, int nGlobals, const int* globals, 
+	 int* ranks), 
+	(self, nGlobals, globals, ranks) )
+
 MEMBER( MPI_Comm, mpiComm )
 MEMBER( int, nGlobals )
 MEMBER( IArray*, locals )
 MEMBER( IArray, localsObj )
 MEMBER( IMap*, inv )
 MEMBER( IMap, invObj )
+MEMBER( int, rngBegin )
+MEMBER( int, rngEnd )
+MEMBER( IMap*, owners )
+MEMBER( IMap, ownersObj )

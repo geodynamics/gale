@@ -116,6 +116,36 @@ void Sync_SetDecomp( void* _self, const Decomp* decomp ) {
    }
 }
 
+void Sync_FindRemotes( void* _self, int nRemotes, const int* remotes ) {
+   Sync *self = Class_Cast( _self, Sync );
+   int *owners;
+   ISet nbrSetObj, *nbrSet = &nbrSetObj;
+   Comm* comm;
+   int nNbrs, *nbrs;
+   int r_i;
+
+   assert( !nRemotes || remotes );
+
+   owners = Class_Array( self, int, nRemotes );
+   Decomp_FindOwners( self->decomp, nRemotes, remotes, owners );
+   ISet_Construct( nbrSet );
+   for( r_i = 0; r_i < nRemotes; r_i++ )
+      ISet_TryInsert( nbrSet, owners[r_i] );
+   Class_Free( self, owners );
+   nNbrs = ISet_GetSize( nbrSet );
+   nbrs = Class_Array( self, int, nNbrs );
+   ISet_GetArray( nbrSet, nbrs );
+   ISet_Destruct( nbrSet );
+
+   comm = Comm_New();
+   Comm_SetMPIComm( self->comm, Decomp_GetMPIComm( self->decomp ) );
+   Comm_SetNeighbours( self->comm, nNbrs, nbrs );
+   Class_Free( self, nbrs );
+   Sync_SetComm( self, comm );
+
+   Sync_SetRemotes( self, nRemotes, remotes );
+}
+
 void Sync_SetComm( void* _self, const Comm* comm ) {
    Sync* self = (Sync*)_self;
 

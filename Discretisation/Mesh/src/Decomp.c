@@ -30,6 +30,7 @@
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #include <stdlib.h>
+#include <string.h>
 #include <mpi.h>
 #include "StGermain/Base/Base.h"
 #include "types.h"
@@ -38,6 +39,13 @@
 
 
 void Decomp_Update( Decomp* self );
+void Decomp_UpdateOwnerMap( Decomp* self );
+
+
+int stgCmpIntNE( const void* l, const void* r ) {
+   assert( *(int*)l != *(int*)r );
+   return (*(int*)l < *(int*)r) ? -1 : 1;
+}
 
 
 void _Decomp_Init( void* _self ) {
@@ -50,6 +58,10 @@ void _Decomp_Init( void* _self ) {
    IArray_Construct( self->locals );
    self->inv = &self->invObj;
    IMap_Construct( self->inv );
+   self->rngBegin = 0;
+   self->rngEnd = 0;
+   self->owners = &self->ownersObj;
+   IMap_Construct( self->owners );
 }
 
 void _Decomp_Destruct( void* _self ) {
@@ -144,10 +156,18 @@ void Decomp_ClearLocals( void* _self ) {
    assert( self );
    IArray_Clear( self->locals );
    IMap_Clear( self->inv );
+   self->rngBegin = 0;
+   self->rngEnd = 0;
+   IMap_Clear( self->owners );
 }
 
 MPI_Comm Decomp_GetComm( const void* self ) {
    assert( self );
+   return ((Decomp*)self)->mpiComm;
+}
+
+MPI_Comm Decomp_GetMPIComm( const void* self ) {
+   assert( Class_IsSuper( self, Decomp ) );
    return ((Decomp*)self)->mpiComm;
 }
 
@@ -182,6 +202,104 @@ Bool Decomp_TryGlobalToLocal( const void* self, int global, int* local ) {
    return IMap_TryMap( ((Decomp*)self)->inv, global, local );
 }
 
+void Decomp_FindOwners( const void* _self, int nGlobals, const int* globals, 
+		       int* ranks )
+{
+   const Decomp* self = Class_Cast( _self, Decomp );
+   IMap ordMapObj, *ordMap = &ordMapObj;
+   int rangeSize;
+   int *ord;
+   int **ptrs, *sizes;
+   int begin, end, len, pos, ind;
+   int *recvSizes, **recvArrays;
+   int *dupSizes, **recvRanks;
+   int nRanks, rank;
+   int g_i, r_i, i_i;
+
+   assert( !nGlobals || globals );
+   assert( !nGlobals || ranks );
+
+   insist( MPI_Comm_size( self->mpiComm, &nRanks ), == MPI_SUCCESS );
+   insist( MPI_Comm_rank( self->mpiComm, &rank ), == MPI_SUCCESS );
+
+   IMap_Construct( ordMap );
+   IMap_SetMaxSize( ordMap, nGlobals );
+   for( g_i = 0; g_i < nGlobals; g_i++ )
+      IMap_Insert( ordMap, globals[g_i], g_i );
+   ord = Class_Array( self, int, nGlobals );
+   memcpy( ord, globals, nGlobals * sizeof(int) );
+   qsort( ord, nGlobals, sizeof(int), stgCmpIntNE );
+
+   ptrs = Class_Array( self, int*, nRanks );
+   sizes = Class_Array( self, int, nRanks );
+
+   rangeSize = self->nGlobals / nRanks;
+   if( rank < self->nGlobals % nRanks )
+      rangeSize++;
+
+   pos = 0;
+   begin = end = 0;
+   for( r_i = 0; r_i < nRanks; r_i++ ) {
+      end += self->nGlobals / nRanks;
+      if( r_i < self->nGlobals % nRanks )
+	 end++;
+
+      if( pos < nGlobals && ord[pos] >= begin && ord[pos] < end ) {
+	 len = 0;
+	 while( pos + len < nGlobals && ord[pos + len] < end ) {
+	    if( r_i == rank ) {
+	       ind = IMap_Map( ordMap, ord[pos + len] );
+	       ranks[ind] = IMap_Map( self->owners, ord[pos + len] );
+	    }
+	    len++;
+	 }
+	 if( r_i != rank ) {
+	    ptrs[r_i] = ord + pos;
+	    sizes[r_i] = len;
+	 }
+	 else {
+	    ptrs[r_i] = NULL;
+	    sizes[r_i] = 0;
+	 }
+	 pos += len;
+      }
+      else {
+	 ptrs[r_i] = NULL;
+	 sizes[r_i] = 0;
+      }
+
+      begin = end;
+   }
+
+   MPIArray_Alltoall( (unsigned*)sizes, (void**)ptrs, 
+		      (unsigned**)&recvSizes, (void***)&recvArrays, 
+		      sizeof(int), self->mpiComm );
+
+   for( r_i = 0; r_i < nRanks; r_i++ ) {
+      for( i_i = 0; i_i < recvSizes[r_i]; i_i++ )
+	 recvArrays[r_i][i_i] = IMap_Map( self->owners, recvArrays[r_i][i_i] );
+   }
+
+   MPIArray_Alltoall( (unsigned*)recvSizes, (void**)recvArrays, 
+		      (unsigned**)&dupSizes, (void***)&recvRanks, 
+		      sizeof(int), self->mpiComm );
+   MemFree( dupSizes );
+   MemFree( recvArrays );
+
+   for( r_i = 0; r_i < nRanks; r_i++ ) {
+      for( i_i = 0; i_i < recvSizes[r_i]; i_i++ ) {
+	 ind = IMap_Map( ordMap, ptrs[r_i][i_i] );
+	 ranks[ind] = recvRanks[r_i][i_i];
+      }
+   }
+   IMap_Destruct( ordMap );
+   MemFree( recvRanks );
+   MemFree( recvSizes );
+   Class_Free( self, sizes );
+   Class_Free( self, ptrs );
+   Class_Free( self, ord );
+}
+
 void Decomp_Update( Decomp* self ) {
    int nLocals;
 
@@ -193,4 +311,87 @@ void Decomp_Update( Decomp* self ) {
    }
    else
       self->nGlobals = 0;
+
+   Decomp_UpdateOwnerMap( self );
+}
+
+void Decomp_UpdateOwnerMap( Decomp* self ) {
+   int rangeSize;
+   int nLocals;
+   const int *locals;
+   int *ord;
+   int **ptrs, *sizes;
+   int begin, end, len, pos;
+   int *recvSizes, **recvArrays;
+   int nRanks, rank;
+   int r_i, i_i;
+
+   assert( Class_IsSuper( self, Decomp ) );
+
+   insist( MPI_Comm_size( self->mpiComm, &nRanks ), == MPI_SUCCESS );
+   insist( MPI_Comm_rank( self->mpiComm, &rank ), == MPI_SUCCESS );
+
+   IArray_GetArray( self->locals, &nLocals, &locals );
+   ord = Class_Array( self, int, nLocals );
+   memcpy( ord, locals, nLocals * sizeof(int) );
+   qsort( ord, nLocals, sizeof(int), stgCmpIntNE );
+
+   ptrs = Class_Array( self, int*, nRanks );
+   sizes = Class_Array( self, int, nRanks );
+
+   rangeSize = self->nGlobals / nRanks;
+   if( rank < self->nGlobals % nRanks )
+      rangeSize++;
+   IMap_Clear( self->owners );
+   IMap_SetMaxSize( self->owners, rangeSize );
+
+   pos = 0;
+   begin = end = 0;
+   for( r_i = 0; r_i < nRanks; r_i++ ) {
+      end += self->nGlobals / nRanks;
+      if( r_i < self->nGlobals % nRanks )
+	 end++;
+      if( r_i == rank ) {
+	 self->rngBegin = begin;
+	 self->rngEnd = end;
+      }
+
+      if( pos < nLocals && ord[pos] >= begin && ord[pos] < end ) {
+	 len = 0;
+	 while( pos + len < nLocals && ord[pos + len] < end ) {
+	    if( r_i == rank )
+	       IMap_Insert( self->owners, ord[pos + len], r_i );
+	    len++;
+	 }
+	 if( r_i != rank ) {
+	    ptrs[r_i] = ord + pos;
+	    sizes[r_i] = len;
+	 }
+	 else {
+	    ptrs[r_i] = NULL;
+	    sizes[r_i] = 0;
+	 }
+	 pos += len;
+      }
+      else {
+	 ptrs[r_i] = NULL;
+	 sizes[r_i] = 0;
+      }
+
+      begin = end;
+   }
+
+   MPIArray_Alltoall( (unsigned*)sizes, (void**)ptrs, 
+		      (unsigned**)&recvSizes, (void***)&recvArrays, 
+		      sizeof(int), self->mpiComm );
+   Class_Free( self, sizes );
+   Class_Free( self, ptrs );
+   Class_Free( self, ord );
+
+   for( r_i = 0; r_i < nRanks; r_i++ ) {
+      for( i_i = 0; i_i < recvSizes[r_i]; i_i++ )
+	 IMap_Insert( self->owners, recvArrays[r_i][i_i], r_i );
+   }
+   MemFree( recvSizes );
+   MemFree( recvArrays );
 }

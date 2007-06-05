@@ -13,6 +13,8 @@ VOIDOVERRIDE( Copy, void, (void* self, const void* op), (self, op) )
 OVERRIDE( CalcMem, SizeT, (const void* self, PtrMap* ptrs), (self, ptrs) )
 
 METHOD( SetDecomp, void, (void* self, const Decomp* decomp), (self, decomp) )
+METHOD( FindRemotes, void, (void* self, int nRemotes, const int* remotes), 
+	(self, nRemotes, remotes) )
 METHOD( SetComm, void, (void* self, const Comm* comm), (self, comm) )
 METHOD( SetRemotes, void, (void* self, int nRemotes, const int* remotes), 
 	(self, nRemotes, remotes) )
