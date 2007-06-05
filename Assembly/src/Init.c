@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Init.c 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: Init.c 856 2007-06-05 00:15:05Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -72,11 +72,15 @@ Bool StgFEM_Assembly_Init( int* argc, char** argv[] ) {
 	Stg_ComponentRegister_Add( componentRegister, GradientStiffnessMatrixTerm_Type, "0", _GradientStiffnessMatrixTerm_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, LaplacianStiffnessMatrixTerm_Type, "0", _LaplacianStiffnessMatrixTerm_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, IsoviscousStressTensorTerm_Type, "0", _IsoviscousStressTensorTerm_DefaultNew );
+	Stg_ComponentRegister_Add( componentRegister, PressureGradMatrixTerm_Type, "0", _PressureGradMatrixTerm_DefaultNew );
+	Stg_ComponentRegister_Add( componentRegister, PressureGradForceTerm_Type, "0", _PressureGradForceTerm_DefaultNew );
 
 	RegisterParent( ThermalBuoyancyForceTerm_Type,     ForceTerm_Type );
 	RegisterParent( GradientStiffnessMatrixTerm_Type,  StiffnessMatrixTerm_Type );
 	RegisterParent( LaplacianStiffnessMatrixTerm_Type, StiffnessMatrixTerm_Type );
 	RegisterParent( IsoviscousStressTensorTerm_Type,   StiffnessMatrixTerm_Type );
+	RegisterParent( PressureGradMatrixTerm_Type,   StiffnessMatrixTerm_Type );
+	RegisterParent( PressureGradForceTerm_Type,     ForceTerm_Type );
 	
 	return True;
 }

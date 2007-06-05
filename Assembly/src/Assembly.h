@@ -46,7 +46,7 @@
 ** Comments:
 **	None so far.
 **
-** $Id: Assembly.h 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: Assembly.h 856 2007-06-05 00:15:05Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -61,6 +61,8 @@
 	#include "GradientStiffnessMatrixTerm.h"
 	#include "LaplacianStiffnessMatrixTerm.h"
 	#include "IsoviscousStressTensorTerm.h"
+	#include "PressureGradMatrixTerm.h"
+	#include "PressureGradForceTerm.h"
 	
 	#include "Init.h"
 	#include "Finalise.h"

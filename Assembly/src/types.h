@@ -44,7 +44,7 @@
 **
 ** Comments:
 **
-** $Id: types.h 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: types.h 856 2007-06-05 00:15:05Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -56,6 +56,8 @@
 	typedef struct GradientStiffnessMatrixTerm             GradientStiffnessMatrixTerm;
 	typedef struct LaplacianStiffnessMatrixTerm            LaplacianStiffnessMatrixTerm;
 	typedef struct IsoviscousStressTensorTerm              IsoviscousStressTensorTerm;
+	typedef struct PressureGradForceTerm			PressureGradForceTerm;
+	typedef struct PressureGradMatrixTerm			PressureGradMatrixTerm;
 
 	/* output streams: initialised in StgFEM_Assembly_Init() */
 	extern Stream* StgSLE_Assembly_Debug;
