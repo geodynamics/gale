@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StandardConditionFunctions.c 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: StandardConditionFunctions.c 858 2007-06-05 01:16:52Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -708,9 +708,11 @@ void StgFEM_StandardConditionFunctions_StepFunction( Node_LocalIndex node_lI, Va
 	double*                 result             = (double*) _result;
         double*                 coord;
 	double                  offset;
-	double                  value;
+	/* double                  value; */
 	unsigned		dim;
-	Bool			less;
+	/* Bool			less; */
+	double			left;
+	double			right;
 	double			grad;
 	Bool			useGrad;
 
@@ -719,13 +721,15 @@ void StgFEM_StandardConditionFunctions_StepFunction( Node_LocalIndex node_lI, Va
 	coord      = Mesh_GetVertex( feMesh, node_lI );
 
 	offset = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionOffset", 0.0 );
-	value = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionValue", 0.0 );
+	/* value = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionValue", 0.0 ); */
 	dim = Dictionary_GetUnsignedInt_WithDefault( dictionary, "StepFunctionDim", 0 );
-	less = Dictionary_GetBool_WithDefault( dictionary, "StepFunctionLessThan", True );
+	/* less = Dictionary_GetBool_WithDefault( dictionary, "StepFunctionLessThan", True ); */
+	left = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionLeftSide", 0.0 );
+	right = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionRightSide", 0.0 );
 	grad = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionGradient", 0.0 );
 	useGrad = Dictionary_GetBool_WithDefault( dictionary, "StepFunctionUseGradient", False );
 
-	if( less ) {
+	/*if( less ) {
 		if( coord[dim] < offset ) {
 			if( useGrad )
 				*result = (offset - coord[dim])*grad;
@@ -744,6 +748,22 @@ void StgFEM_StandardConditionFunctions_StepFunction( Node_LocalIndex node_lI, Va
 		}
 		else
 			*result = 0;
+	}*/
+	/*
+	 * have changed the step function such that it takes two different input values, one for each side
+	 * of the offset - dave, 24.05.07
+	 */
+	if( coord[dim] < offset ) {
+		if( useGrad )
+			*result = (offset - coord[dim])*grad;
+		else
+			*result = left;
+	}
+	else if( coord[dim] >= offset ) {
+		if( useGrad )
+			*result = (coord[dim] - offset)*grad;
+		else
+			*result = right;
 	}
 
 /*         if(coord[0] < 5.0) */
