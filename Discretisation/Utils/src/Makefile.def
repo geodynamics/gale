@@ -24,7 +24,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: Makefile.def 4103 2007-05-16 01:09:50Z LukeHodkinson $
+## $Id: Makefile.def 4135 2007-06-05 23:23:55Z LukeHodkinson $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -81,6 +81,8 @@ def_hdrs = \
 	TimeIntegratee.h \
 	ShapeAdvector.h \
 	SobolGenerator.h \
+	NewRemesher.def \
+	NewRemesher.h \
 	Remesher.h \
 	Init.h \
 	Finalise.h \

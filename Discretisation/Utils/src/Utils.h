@@ -35,7 +35,7 @@
 ** Comments:
 **	None so far.
 **
-** $Id: Utils.h 4103 2007-05-16 01:09:50Z LukeHodkinson $
+** $Id: Utils.h 4135 2007-06-05 23:23:55Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -61,6 +61,7 @@
 	#include "DiscretisationContext.h"
 	#include "LinearRegression.h"
 	#include "SobolGenerator.h"
+	#include "NewRemesher.h"
 	#include "Remesher.h"
 /*
 	#include "StripRemesher.h"
