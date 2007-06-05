@@ -1,24 +1,32 @@
+/* Inherit from a parent class and clear any pre-existing 
+   class definitions. */
+/*#include INHERIT( <path to parent> ) */
 #include "StGermain/Base/Foundation/ClassClear.h"
+
+
+/*
+** Class parameter declarations. Here we need to define:
+**   CLASSDIR and
+**   CLASSNAME.
+**
+** We can optionally define:
+**   PREFIX, 
+**   PARENTDIR and
+**   PARENT.
+*/
 
 #define CLASSDIR StGermain/Base/Foundation
 #define CLASSNAME NewClass
 
+/* Do standard class initialisation. */
 #include "StGermain/Base/Foundation/ClassSetup.h"
 
-VOIDVIRTUALMETHOD( Init, void, (void* self), (self) )
-VOIDVIRTUALMETHOD( Destruct, void, (void* self), (self) )
-VOIDVIRTUALMETHOD( Copy, void, (void* self, const void* op), (self, op) )
-VOIDVIRTUALMETHOD( Print, void, (const void* self, struct Stream* stream), 
-		   (self, stream) )
-VIRTUALMETHOD( CalcMem, SizeT, (const void* self, struct PtrMap* ptrs), (self, ptrs) )
 
-METHOD( Delete, void, (void* self), (self) )
-METHOD( AddRef, void, (void* self), (self) )
-METHOD( RemoveRef, void, (void* self), (self) )
-
-METHOD( Dup, void*, (const void* self), (self) )
-METHOD( GetType, Type, (const void* self), (self) )
-METHOD( GetMemUsage, SizeT, (const void* self), (self) )
+/*
+** Declare all class members using the MEMBER command.  Accepted
+** parameters are:
+**   ( <type>, <name> )
+*/
 
 MEMBER( NewFunc*, newFunc )
 MEMBER( ConstructFunc*, constructFunc )
@@ -27,3 +35,83 @@ MEMBER( SizeT, sizeOfSelf )
 MEMBER( Type, type )
 MEMBER( int, nRefsToSelf )
 MEMBER( SizeT, curAllocd )
+
+
+/*
+** Declare all virtual, abstract and overridden methods.
+**
+** Available method types are:
+**   VIRTUALMETHOD, 
+**   VOIDVIRTUALMETHOD, 
+**   ABSTRACTMETHOD, 
+**   VOIDABSTRACTMETHOD, 
+**   OVERRIDE and
+**   VOIDOVERRIDE.
+**
+** All method types accept the following parameters:
+**   ( <name>, 
+**     <return type>, 
+**     <arg definitions>, 
+**     <arg names> )
+**
+** where:
+**   <name> is the method name, 
+**   <return type> is the type to be returned by the method, 
+**   <arg definitions> is a parenthesised list of method arguments and 
+**   <arg names> is a parenthesised list of method argument names.
+**
+** Note that any virtual, abstract or overridden method that returns
+** void must be declared as VOIDVIRTUALMETHOD, VOIDABSTRACTMETHOD or
+** VOIDOVERRIDE.
+*/
+
+VOIDVIRTUALMETHOD( Init, void, 
+		   (void* self), 
+		   (self) )
+
+VOIDVIRTUALMETHOD( Destruct, void, 
+		   (void* self), 
+		   (self) )
+
+VOIDVIRTUALMETHOD( Copy, void, 
+		   (void* self, const void* op), 
+		   (self, op) )
+
+VOIDVIRTUALMETHOD( Print, void, 
+		   (const void* self, struct Stream* stream), 
+		   (self, stream) )
+
+VIRTUALMETHOD( CalcMem, SizeT, 
+	       (const void* self, struct PtrMap* ptrs), 
+	       (self, ptrs) )
+
+
+/*
+** Declare all local methods using the METHOD command.  Local method 
+** declarations accept the same parameters as virtual methods, however 
+** there are no separate declarations required for void return types.
+*/
+
+METHOD( Delete, void, 
+	(void* self), 
+	(self) )
+
+METHOD( AddRef, void, 
+	(void* self), 
+	(self) )
+
+METHOD( RemoveRef, void, 
+	(void* self), 
+	(self) )
+
+METHOD( Dup, void*, 
+	(const void* self), 
+	(self) )
+
+METHOD( GetType, Type, 
+	(const void* self), 
+	(self) )
+
+METHOD( GetMemUsage, SizeT, 
+	(const void* self), 
+	(self) )
