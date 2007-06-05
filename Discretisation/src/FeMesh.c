@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeMesh.c 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: FeMesh.c 859 2007-06-05 06:55:16Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -149,7 +149,7 @@ void _FeMesh_Build( void* feMesh, void* data ) {
 		if( nDims == 2 )
 			elType = (ElementType*)Biquadratic_New( "" );
 		else
-			abort();
+			elType = (ElementType*)Triquadratic_New( "" );
 	}
 	else if( !strcmp( self->feElFamily, "linear" ) ) {
 		unsigned	nDims;

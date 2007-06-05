@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ElementType.c 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: ElementType.c 859 2007-06-05 06:55:16Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -315,8 +315,8 @@ void ElementType_ShapeFunctionsGlobalDerivs(
 	double				*nodeCoord;
 	
 	double jac[3][3];
-	int rows=3;		/* max dimensions */
-	int cols=20;		/* max nodes per el */
+	int rows;		/* max dimensions */
+	int cols;		/* max nodes per el */
 	double** GNi; 
 	int n, i, j;
 	double globalSF_DerivVal;
@@ -325,7 +325,9 @@ void ElementType_ShapeFunctionsGlobalDerivs(
 	double cof[3][3];	/* cofactors */
 	unsigned nInc, *inc;
 	Index nodesPerEl;
-	
+
+	rows=Mesh_GetDimSize( mesh );
+	cols=self->nodeCount;	
 	
 	GNi = Memory_Alloc_2DArray( double, rows, cols, "GNi" );
 

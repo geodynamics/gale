@@ -44,7 +44,7 @@
 **
 ** Comments:
 **
-** $Id: types.h 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: types.h 859 2007-06-05 06:55:16Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -75,6 +75,7 @@
 	typedef struct OperatorFeVariable        OperatorFeVariable;
 	typedef struct FeSwarmVariable           FeSwarmVariable;
 	typedef struct AnalyticSolution          AnalyticSolution;
+	typedef struct Triquadratic              Triquadratic;
 
 	/* types for lists etc ... for readability */
 	typedef FeVariable*				FeVariablePtr;
