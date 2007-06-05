@@ -85,6 +85,7 @@ void _Assembler_Init( Assembler* self ) {
 
 	self->elInd = 0;
 	self->particle = NULL;
+	self->shapeFuncs = NULL;
 	self->detJac = 0.0;
 	self->globalDerivs = NULL;
 	self->rowInd = 0;
@@ -107,6 +108,7 @@ void _Assembler_Delete( void* assembler ) {
 
 	assert( self && Stg_CheckType( self, Assembler ) );
 
+	FreeArray( self->shapeFuncs );
 	FreeArray( self->globalDerivs );
 
 	/* Delete the parent. */
@@ -189,6 +191,7 @@ void Assembler_Update( void* assembler ) {
 				nDerivs = FeMesh_GetElementNodeSize( mesh, e_i );
 		}
 	}
+	self->shapeFuncs = ReallocArray( self->shapeFuncs, double, nDerivs );
 	self->globalDerivs = ReallocArray2D( self->globalDerivs, double, nDims, nDerivs );
 }
 
@@ -203,7 +206,6 @@ void Assembler_IntegrateMatrixElement( void* assembler, unsigned element ) {
 
 	assert( self && Stg_CheckType( self, Assembler ) );
 	assert( self->rowVar && self->colVar );
-	assert( self->globalDerivs );
 
 	mesh = self->rowVar->feMesh;
 	nDims = Mesh_GetDimSize( mesh );
@@ -217,6 +219,7 @@ void Assembler_IntegrateMatrixElement( void* assembler, unsigned element ) {
 	for( p_i = 0; p_i < nParticles; p_i++ ) {
 		self->particle = (IntegrationPoint*)Swarm_ParticleInCellAt( swarm, cellInd, p_i );
 		assert( self->particle );
+		ElementType_EvaluateShapeFunctionsAt( elType, self->particle->xi, self->shapeFuncs );
 		ElementType_ShapeFunctionsGlobalDerivs( elType, mesh, element, self->particle->xi, nDims, 
 							&self->detJac, self->globalDerivs );
 		if( self->partCB )
@@ -272,6 +275,7 @@ void Assembler_LoopMatrixElement( void* assembler, unsigned element ) {
 			rowEq = rowEqNum->locationMatrix[element][n_i][dof_i];
 
 			self->rowInd = rowInd++;
+			self->rowElNodeInd = n_i;
 			self->rowNodeInd = rowElNodes[n_i];
 			self->rowDofInd = dof_i;
 			self->rowEq = rowEq;
@@ -293,6 +297,7 @@ void Assembler_LoopMatrixElement( void* assembler, unsigned element ) {
 					colEq = colEqNum->locationMatrix[element][n_j][dof_j];
 
 					self->colInd = colInd++;
+					self->colElNodeInd = n_j;
 					self->colNodeInd = colElNodes[n_j];
 					self->colDofInd = dof_j;
 					self->colEq = colEq;

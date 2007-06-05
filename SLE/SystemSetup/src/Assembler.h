@@ -68,13 +68,16 @@
 							\
 		unsigned		elInd;		\
 		IntegrationPoint*	particle;	\
+		double*			shapeFuncs;	\
 		double			detJac;		\
 		double**		globalDerivs;	\
 		unsigned		rowInd;		\
+		unsigned		rowElNodeInd;	\
 		unsigned		rowNodeInd;	\
 		unsigned		rowDofInd;	\
 		unsigned		rowEq;		\
 		unsigned		colInd;		\
+		unsigned		colElNodeInd;	\
 		unsigned		colNodeInd;	\
 		unsigned		colDofInd;	\
 		unsigned		colEq;
@@ -117,6 +120,7 @@
 				     void* object );
 	void Assembler_Update( void* assembler );
 
+	void Assembler_IntegrateMatrixElement( void* assembler, unsigned element );
 	void Assembler_LoopMatrixElement( void* assembler, unsigned element );
 	void Assembler_LoopMatrixDiagonal( void* assembler );
 
