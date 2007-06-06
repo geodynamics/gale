@@ -13,6 +13,9 @@
 		<struct name="yteparticleDotsrgb">
 			<param name="Type">lucSwarmRGBColourViewer</param>
 			<param name="Swarm">materialSwarm</param>
+			<param name="MaskVariable">materialSwarm-HasYielded</param>
+			<param name="maskValue">1</param>
+			<param name="maskType">EqualTo</param>
 			<param name="OpacityVariable">materialSwarm-YieldTypeOpacity</param>
 			<param name="ColourRedVariable">materialSwarm-YieldTypeExtension</param>
 			<param name="ColourBlueVariable">materialSwarm-YieldTypeCompression</param>
