@@ -6,4 +6,4 @@ until test -r ${TEST_SCRIPT} ; do
 done
 . ${TEST_SCRIPT}
 
-runAndHandleSystemTest "testSwarmParticleAdvection testSwarmParticleShadowSync.xml " "$0" "$@"
+runAndHandleSystemTest "testSwarmParticleShadowSync testSwarmParticleShadowSync.xml " "$0" "$@"

@@ -51,7 +51,6 @@
 
 		<struct name="pShadowSync"> 
 			<param name="Type">ParticleShadowSync</param>
-			<param name="Swarm">swarm</param>
 		</struct>
 		
 		<struct name="swarm">
