@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: Vrms.c 466 2007-04-27 06:24:33Z LukeHodkinson $
+** $Id: Vrms.c 487 2007-06-07 05:48:32Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 #include <mpi.h>
@@ -68,7 +68,7 @@ void _Underworld_Vrms_Build( void* component, void* data ) {
 
 	assert( self );
 
-	Build( self->velocitySquaredField, data, False );
+	Stg_Component_Build( self->velocitySquaredField, data, False );
 }
 
 void _Underworld_Vrms_Initialise( void* component, void* data ) {
@@ -76,7 +76,7 @@ void _Underworld_Vrms_Initialise( void* component, void* data ) {
 
 	assert( self );
 
-	Initialise( self->velocitySquaredField, data, False );
+	Stg_Component_Initialise( self->velocitySquaredField, data, False );
 }
 
 void* _Underworld_Vrms_DefaultNew( Name name ) {

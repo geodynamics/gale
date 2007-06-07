@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: Nusselt.c 466 2007-04-27 06:24:33Z LukeHodkinson $
+** $Id: Nusselt.c 487 2007-06-07 05:48:32Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -66,9 +66,9 @@ void _Underworld_Nusselt_Construct( void* component, Stg_ComponentFactory* cf, v
 void _Underworld_Nusselt_Build( void* component, void* data ) {
 	Underworld_Nusselt*	self = (Underworld_Nusselt*)component;
 
-	Build( self->advectiveHeatFluxField, data, False );
-	Build( self->temperatureTotalDerivField, data, False );
-	Build( self->temperatureVertDerivField, data, False );
+	Stg_Component_Build( self->advectiveHeatFluxField, data, False );
+	Stg_Component_Build( self->temperatureTotalDerivField, data, False );
+	Stg_Component_Build( self->temperatureVertDerivField, data, False );
 }
 
 void* _Underworld_Nusselt_DefaultNew( Name name ) {

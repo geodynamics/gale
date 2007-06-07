@@ -194,7 +194,7 @@ void _StressField_Build( void* stressField, void* data ) {
 	Variable_Index variable_I;
 	Node_DomainIndex  node_I;
 
-	Build( self->feMesh, data, False );
+	Stg_Component_Build( self->feMesh, data, False );
 
 	if ( dim == 2 ) {
 		variableName[0] = StG_Strdup( "tau_xx" );

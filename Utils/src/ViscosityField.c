@@ -168,7 +168,7 @@ void _ViscosityField_Build( void* viscosityField, void* data ) {
 	ViscosityField* self = (ViscosityField*) viscosityField;
 	Name              tmpName;
 
-	Build( self->feMesh, data, False );
+	Stg_Component_Build( self->feMesh, data, False );
 
 	/* Create Dof Layout */
 	tmpName = Stg_Object_AppendSuffix( self, "DataVariable" );
