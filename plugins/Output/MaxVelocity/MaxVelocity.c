@@ -48,20 +48,57 @@
 #include <Underworld/Underworld.h>
 #include <StgFEM/FrequentOutput/FrequentOutput.h>
 
+/* Every plugin or component should have a Type (a class name), which specifies the name of the data structure it is */ 
 const Type Underworld_MaxVelocity_Type = "Underworld_MaxVelocity";
+
 void Underworld_MaxVelocity_PrintHeaderToFile( void* context );
 void Underworld_MaxVelocity_Output( void* _context );
+void _Underworld_MaxVelocity_Construct( void* plugin, Stg_ComponentFactory* cf, void* data );
+void* _Underworld_MaxVelocity_DefaultNew( Name name );
 
-void _Underworld_MaxVelocity_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
-	UnderworldContext*  context;
 
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data );
+Index Underworld_MaxVelocity_Register( PluginsManager* pluginsManager ) {
+/*
+ * 	Purpose:
+ * 		Registers the Plugin, by linking the function _Underworld_MaxVelocity_DefaultNew
+ * 		to the place holder (string type) Underworld_MaxVelocity_Type.
+ * 		When the place holder is read from the input file the plugin manager needs to
+ * 		identify the place holder string to the creation of a plugin data structure. 
+ *
+ * 	Inputs:
+ * 		Inputs are all automatic and this code never needs to be called explicitly
+ *
+ * 	Interactions:
+ * 		It's VERY IMPORTANT that the name of this function (prefix of the function name)
+ * 		is spelt exactly the same as the Type place holder string.
+ * 		In this case Underworld_MaxVelocity_Register, where the
+ * 		prefix = "Underworld_MaxVelocity", is exactly the same as 
+ * 		Underworld_MaxVelocity_Type = "Underworld_MaxVelocity".
+ * 		
+ * 		The function PluginsManager_Submit, needs to be given an Instantiation function
+ * 		as it's final argument. This argument should define the functionality of the plugin
+ */
 
-	Underworld_MaxVelocity_PrintHeaderToFile( context );
-	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, Underworld_MaxVelocity_Output );
+	return PluginsManager_Submit( pluginsManager, Underworld_MaxVelocity_Type, "0", _Underworld_MaxVelocity_DefaultNew );
 }
 
 void* _Underworld_MaxVelocity_DefaultNew( Name name ) {
+/*
+ * 	Purpose:
+ * 		Registers the 'key' StGermain functions that will be used by this plugin.
+ * 		The 'key' functions are called during the different StGermain 'phases'.
+ * 		The important 'phases' are: Construct, Build, Initialise, Exectute, Destroy.
+ *
+ * 	Inputs:
+ * 		Inputs are all automatic.
+ *
+ * 	Interactions:
+ * 		The Instantiation funtion calls a New function that contains either 
+ * 		functions defined within this plugin OR a parent plugin. Depending on the level
+ * 		of complexity of the plugin you may need to defined custom _Build or _Initialise
+ * 		functions; in this case the plugin is straight forward and no overriding is
+ * 		needed  
+ */
 	return Codelet_New(
 		Underworld_MaxVelocity_Type,
 		_Underworld_MaxVelocity_DefaultNew,
@@ -73,16 +110,81 @@ void* _Underworld_MaxVelocity_DefaultNew( Name name ) {
 		name );
 }
 
-Index Underworld_MaxVelocity_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, Underworld_MaxVelocity_Type, "0", _Underworld_MaxVelocity_DefaultNew );
+void _Underworld_MaxVelocity_Construct( void* plugin, Stg_ComponentFactory* cf, void* data ) {
+/*
+ * 	Purpose:
+ * 		This function is called on the 'Construct phase' as defined by the
+ * 		Codelet_New(.....) above. The construct phase is called at the beginning of the 
+ * 		code. 
+ * 		In this function all data structures (objects or components) that this 
+ * 		plugin needs should be collected. To be more specific, the objects that
+ * 		are defined in the inputfile (and thus are static) should be collected here.
+ *
+ * 		Also the user functionily (as opposed to non StGermain functionality) 
+ * 		should be defined in here. 
+ * 		So users defined functions should be attached to EntryPoints. These user
+ * 		defined functions are called Hooks. So StGermain executes entry points, which
+ * 		kick off user defined Hooks.
+ *
+ * 	Input:
+ * 		Inputs are all automatic. 
+ * 		1st args is the plugin pointer itself. (Not used here)
+ * 		2nd is the component factory. Will be used to collect components from
+ * 			the inputfile.
+ * 		3rd Ask Steve.
+ *
+ * 	Interactions:
+ * 		The context is generally gathered first from the ComponentFactory in
+ * 		every plugin's construction phase. This allows the plugin we're constructing
+ * 		to have access to a wide range of data. (Note this is not the behaviour of components;
+ * 		they only access the data structures they need).
+ * 		Once the context has been gathered we append a hook to the EP called 
+ * 		AbstractContext_EP_FrequentOutput. A list of StGermain entry points can
+ * 		be found in StGermain/Base/Context/src/AbstractContext.c
+ * 		
+ *
+ */
+	UnderworldContext*  context;
+
+	/* Gather context from the ComponentFactory here */
+	context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data );
+
+	/* Simple user defined function which belong to no EntryPoint */
+	Underworld_MaxVelocity_PrintHeaderToFile( context );
+
+	/* Append user defined function, Underworld_MaxVelocity_Output, onto the EntryPoint
+	 * AbstractContext_EP_FrequentOutput */
+	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, Underworld_MaxVelocity_Output );
 }
 
+
+
 void Underworld_MaxVelocity_Output( void* _context ) {
+/*
+ * 	Purpose:
+ * 		User defined function. In this case is just prints out the max velocity to 
+ * 		the FrequentOutput.dat file.
+ *
+ * 	Inputs:
+ * 		The context, which can be used to control any other object in the code.
+ * 		As this function is on the AbstractContext_EP_FrequentOutput it
+ * 		receives the input which is defined for that entry point. Other entry points
+ * 		have a different set of input args so be sure your user defined plugin is receiving
+ * 		the right data structure as the void*. 
+ * 		(Note some entry point specify multiple input args).
+ *
+ * 	Interactions:
+ * 		Using the velocityField, which is pointered to from the context, the max velocity
+ * 		component value is gathered and piped to the frequent output file. 
+ */
+
 	UnderworldContext* context       = (UnderworldContext*) _context;
-	FeVariable*        velocityFe = context->velocityField;
+	FeVariable*        velocityFe    = context->velocityField;
 	double             maxVel;
 
+	/* Find the max field component */
 	maxVel = _FeVariable_GetMaxGlobalFieldMagnitude( velocityFe );
+	/* Print to the FrequentOutput stream */
 	StgFEM_FrequentOutput_PrintValue( context, maxVel );
 }
 
