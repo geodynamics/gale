@@ -35,7 +35,7 @@
 ** Comments:
 **	None so far.
 **
-** $Id: Utils.h 4135 2007-06-05 23:23:55Z LukeHodkinson $
+** $Id: Utils.h 4137 2007-06-07 05:46:46Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -63,6 +63,8 @@
 	#include "SobolGenerator.h"
 	#include "NewRemesher.h"
 	#include "Remesher.h"
+	#include "RegularRemesher.h"
+	#include "RegularRemesherCmpt.h"
 /*
 	#include "StripRemesher.h"
 	#include "CellRemesher.h"

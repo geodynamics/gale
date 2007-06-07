@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: VariableCondition.c 4098 2007-05-16 01:00:35Z LukeHodkinson $
+** $Id: VariableCondition.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -387,7 +387,7 @@ void _VariableCondition_Build( void* variableCondition, void* data ) {
 
 				/* Force the building of the variable (to be safe) */
 				var = self->variable_Register->_variable[self->vcTbl[i][vcVar_I].varIndex];
-				Build( var, data, False );
+				Stg_Component_Build( var, data, False );
 			}
 		}
 	}	
@@ -415,7 +415,7 @@ void _VariableCondition_Initialise( void* variableCondition, void* data ) {
 			
 			/* Force the building of the variable (to be safe) */
 			var = self->variable_Register->_variable[self->vcTbl[i][vcVar_I].varIndex];
-			Initialise( var, data, False );
+			Stg_Component_Initialise( var, data, False );
 		}
 	}
 }

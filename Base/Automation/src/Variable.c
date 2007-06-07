@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Variable.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: Variable.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -864,7 +864,7 @@ void _Variable_Build( void* variable, void* data ) {
 	 * "velocity-x" etc are automatically build also. */	
 	for ( subVariable_I = 0; subVariable_I < self->subVariablesCount; subVariable_I++ ) {
 		if ( self->components[subVariable_I] ) {
-			Build( self->components[subVariable_I], data, False );
+			Stg_Component_Build( self->components[subVariable_I], data, False );
 		}
 	}
 }
@@ -876,7 +876,7 @@ void _Variable_Initialise( void* variable, void* data ) {
 
 	for ( subVariable_I = 0; subVariable_I < self->subVariablesCount; subVariable_I++ ) {
 		if ( self->components[subVariable_I] ) {
-			Initialise( self->components[subVariable_I], data, False );
+			Stg_Component_Initialise( self->components[subVariable_I], data, False );
 		}
 	}
 }

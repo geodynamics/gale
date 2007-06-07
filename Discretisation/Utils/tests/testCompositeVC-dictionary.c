@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testCompositeVC-dictionary.c 4103 2007-05-16 01:09:50Z LukeHodkinson $
+** $Id: testCompositeVC-dictionary.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -71,8 +71,8 @@ Mesh* buildMesh( unsigned nDims, unsigned* size,
 	Mesh_SetExtensionManagerRegister( mesh, emReg );
 	Mesh_SetGenerator( mesh, gen );
 
-	Build( mesh, NULL, False );
-	Initialise( mesh, NULL, False );
+	Stg_Component_Build( mesh, NULL, False );
+	Stg_Component_Initialise( mesh, NULL, False );
 
 	KillObject( mesh->generator );
 
@@ -165,7 +165,7 @@ int main(int argc, char *argv[])
 	
 	/* Create CompositeVC */
 	cvc = CompositeVC_New( "CompositeVC", variable_Register, conFunc_Register, dictionary, mesh );
-	Build( cvc, 0, False );
+	Stg_Component_Build( cvc, 0, False );
 	
 	for (j = 0; j < 6; j++)
 		memset(array[j], 0, sizeof(double)*3*3*3);

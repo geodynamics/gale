@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: OperatorFieldVariable.c 3884 2006-10-26 05:26:19Z KathleenHumble $
+** $Id: OperatorFieldVariable.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -323,7 +323,7 @@ void _OperatorFieldVariable_Build( void* fieldVariable, void* data ) {
 	Index                  fieldVariable_I;
 
 	for ( fieldVariable_I = 0 ; fieldVariable_I < self->fieldVariableCount ; fieldVariable_I++ ) 
-		Build( self->fieldVariableList[ fieldVariable_I ] , data, False );
+		Stg_Component_Build( self->fieldVariableList[ fieldVariable_I ] , data, False );
 }
 
 void _OperatorFieldVariable_Execute( void* fieldVariable, void* data ) {}
@@ -335,7 +335,7 @@ void _OperatorFieldVariable_Initialise( void* fieldVariable, void* data ) {
 	Index                  fieldVariable_I;
 
 	for ( fieldVariable_I = 0 ; fieldVariable_I < self->fieldVariableCount ; fieldVariable_I++ ) 
-		Initialise( self->fieldVariableList[ fieldVariable_I ] , data, False );
+		Stg_Component_Initialise( self->fieldVariableList[ fieldVariable_I ] , data, False );
 }
 
 /* TODO - Think of something clever for these */

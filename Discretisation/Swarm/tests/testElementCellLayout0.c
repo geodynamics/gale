@@ -33,7 +33,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: testElementCellLayout0.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: testElementCellLayout0.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -77,8 +77,8 @@ Mesh* buildMesh( unsigned nDims, unsigned* size,
 	Mesh_SetExtensionManagerRegister( mesh, emReg );
 	Mesh_SetGenerator( mesh, gen );
 
-	Build( mesh, NULL, False );
-	Initialise( mesh, NULL, False );
+	Stg_Component_Build( mesh, NULL, False );
+	Stg_Component_Initialise( mesh, NULL, False );
 
 	KillObject( mesh->generator );
 
@@ -129,8 +129,8 @@ int main( int argc, char* argv[] ) {
 	elementCellLayout = ElementCellLayout_New( "elementCellLayout", mesh );
 	
 	/* Build the mesh */
-	Build( mesh, 0, False );
-	Initialise( mesh, 0, False );
+	Stg_Component_Build( mesh, 0, False );
+	Stg_Component_Initialise( mesh, 0, False );
 	
 	if( rank == procToWatch ) {
 		Cell_Index cell;

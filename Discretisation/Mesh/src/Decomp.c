@@ -212,7 +212,7 @@ void Decomp_FindOwners( const void* _self, int nGlobals, const int* globals,
    int **ptrs, *sizes;
    int begin, end, len, pos, ind;
    int *recvSizes, **recvArrays;
-   int *dupSizes, **recvRanks;
+   int *remSizes, **remRanks;
    int nRanks, rank;
    int g_i, r_i, i_i;
 
@@ -281,20 +281,20 @@ void Decomp_FindOwners( const void* _self, int nGlobals, const int* globals,
    }
 
    MPIArray_Alltoall( (unsigned*)recvSizes, (void**)recvArrays, 
-		      (unsigned**)&dupSizes, (void***)&recvRanks, 
+		      (unsigned**)&remSizes, (void***)&remRanks, 
 		      sizeof(int), self->mpiComm );
-   MemFree( dupSizes );
+   MemFree( recvSizes );
    MemFree( recvArrays );
 
    for( r_i = 0; r_i < nRanks; r_i++ ) {
-      for( i_i = 0; i_i < recvSizes[r_i]; i_i++ ) {
+      for( i_i = 0; i_i < remSizes[r_i]; i_i++ ) {
 	 ind = IMap_Map( ordMap, ptrs[r_i][i_i] );
-	 ranks[ind] = recvRanks[r_i][i_i];
+	 ranks[ind] = remRanks[r_i][i_i];
       }
    }
    IMap_Destruct( ordMap );
-   MemFree( recvRanks );
-   MemFree( recvSizes );
+   MemFree( remRanks );
+   MemFree( remSizes );
    Class_Free( self, sizes );
    Class_Free( self, ptrs );
    Class_Free( self, ord );

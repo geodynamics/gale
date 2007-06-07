@@ -188,7 +188,7 @@ void LiveComponentRegister_BuildAll( void* liveComponentRegister, void* data ) {
 	
 	for ( index = 0 ; index < count ; index++ ) {
 		component = LiveComponentRegister_At( self, index );
-		Build( component, data, False );
+		Stg_Component_Build( component, data, False );
 	}
 }
 
@@ -201,7 +201,7 @@ void LiveComponentRegister_InitialiseAll( void* liveComponentRegister, void* dat
 	
 	for ( index = 0 ; index < count ; index++ ) {
 		component = LiveComponentRegister_At( self, index );
-		Initialise( component, data, False );
+		Stg_Component_Initialise( component, data, False );
 	}
 }
 

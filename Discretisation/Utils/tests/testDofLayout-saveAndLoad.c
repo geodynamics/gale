@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testDofLayout-saveAndLoad.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: testDofLayout-saveAndLoad.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -84,8 +84,8 @@ int main( int argc, char *argv[] ) {
 			varArrays[var_I] = Memory_Alloc_Array_Unnamed( double, arraySize );
 			var[var_I] = Variable_NewScalar( varName[var_I], Variable_DataType_Double, &arraySize, 
 				(void**)&(varArrays[var_I]), variableRegister );
-			Build( var[var_I], 0, False );	
-			Initialise( var[var_I], 0, False );	
+			Stg_Component_Build( var[var_I], 0, False );	
+			Stg_Component_Initialise( var[var_I], 0, False );	
 		}
 			
 		for (ii = 0; ii < arraySize; ii++) {
@@ -101,7 +101,7 @@ int main( int argc, char *argv[] ) {
 				DofLayout_AddDof_ByVarName(dof, varName[var_I], ii);
 			}
 		}	
-		Build(dof, 0, False);
+		Stg_Component_Build(dof, 0, False);
 
 		DofLayout_SaveAllVariablesToFiles( dof, "output/testDofSave", rank );
 

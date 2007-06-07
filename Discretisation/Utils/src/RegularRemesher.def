@@ -1,6 +1,6 @@
 /* Inherit from a parent class and clear any pre-existing 
    class definitions. */
-#include INHERIT( StGermain/Base/Foundation/NewClass )
+#include INHERIT( StGermain/Discretisation/Utils/NewRemesher )
 #include "StGermain/Base/Foundation/ClassClear.h"
 
 
@@ -15,10 +15,10 @@
 **   PARENT.
 */
 
-#define PARENTDIR StGermain/Base/Foundation
-#define PARENT NewClass
+#define PARENTDIR StGermain/Discretisation/Utils
+#define PARENT Remesher
 #define CLASSDIR StGermain/Discretisation/Utils
-#define CLASSNAME NewRemesher
+#define CLASSNAME RegularRemesher
 
 /* Do standard class initialisation. */
 #include "StGermain/Base/Foundation/ClassSetup.h"
@@ -30,7 +30,14 @@
 **   ( <type>, <name> )
 */
 
-MEMBER( Mesh*, mesh )
+MEMBER( int, nDims )
+MEMBER( ISet*, remeshDims )
+MEMBER( ISet**, staticWalls )
+MEMBER( Sync**, syncs )
+MEMBER( double**, crds )
+MEMBER( int**, nWallVerts )
+MEMBER( int***, wallVerts )
+MEMBER( double***, wallCrds )
 
 
 /*
@@ -69,13 +76,17 @@ VOIDOVERRIDE( Copy, void,
 	      (void* self, const void* op), 
 	      (self, op) )
 
+VOIDOVERRIDE( Destruct, void, 
+	      (void* self), 
+	      (self) )
+
 VOIDOVERRIDE( Print, void, 
 	      (const void* self, Stream* stream), 
 	      (self, stream) )
 
-VOIDABSTRACTMETHOD( Remesh, void, 
-		    (void* self), 
-		    (self) )
+VOIDOVERRIDE( Remesh, void, 
+	      (void* self), 
+	      (self) )
 
 
 /*
@@ -84,10 +95,14 @@ VOIDABSTRACTMETHOD( Remesh, void,
 ** there are no separate declarations required for void return types.
 */
 
-METHOD( SetMesh, void, 
-	(void* self, void* mesh), 
-	(self, mesh) )
-
-METHOD( GetMesh, Mesh*, 
-	(const void* self), 
+METHOD( Build, void, 
+	(void* self), 
 	(self) )
+
+METHOD( SetRemeshState, void, 
+	(void* self, int dim, Bool state), 
+	(self, dim, state) )
+
+METHOD( SetStaticWall, void, 
+	(void* self, int dim, int wall, Bool state), 
+	(self, dim, int wall, state) )

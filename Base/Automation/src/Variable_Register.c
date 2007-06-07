@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Variable_Register.c 4098 2007-05-16 01:00:35Z LukeHodkinson $
+** $Id: Variable_Register.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -220,7 +220,7 @@ void Variable_Register_BuildAll(void* variable_Register)
 	Variable_Index		var_I;
 	
 	for (var_I = 0; var_I < self->count; var_I++)
-		Build( self->_variable[var_I], 0, False );
+		Stg_Component_Build( self->_variable[var_I], 0, False );
 }
 
 

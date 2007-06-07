@@ -34,7 +34,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: testSwarmDumpAndLoad.c 4119 2007-05-22 07:35:46Z RaquibulHassan $
+** $Id: testSwarmDumpAndLoad.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -90,8 +90,8 @@ Mesh* buildMesh( unsigned nDims, unsigned* size,
 	Mesh_SetExtensionManagerRegister( mesh, emReg );
 	Mesh_SetGenerator( mesh, gen );
 
-	Build( mesh, NULL, False );
-	Initialise( mesh, NULL, False );
+	Stg_Component_Build( mesh, NULL, False );
+	Stg_Component_Initialise( mesh, NULL, False );
 
 	KillObject( mesh->generator );
 
@@ -195,14 +195,14 @@ int main( int argc, char* argv[] ) {
 	/* +++ BUILD PHASE +++ */
 	
 	/* Build the mesh */
-	Build( mesh, 0, False );
+	Stg_Component_Build( mesh, 0, False );
 	/* Build the swarm */
-	Build( swarm, 0, False );
+	Stg_Component_Build( swarm, 0, False );
 
 	/* +++ INITIALISE PHASE +++ */
 
-	Initialise( mesh, 0, False );
-	Initialise( swarm, 0, False );
+	Stg_Component_Initialise( mesh, 0, False );
+	Stg_Component_Initialise( swarm, 0, False );
 	
 	for ( dim_I=0; dim_I < 3; dim_I++ ) {
 		attractorPoint[dim_I] = ( maxCrds[dim_I] - minCrds[dim_I] ) / 3;
@@ -260,8 +260,8 @@ int main( int argc, char* argv[] ) {
 	fileParticleLayout = FileParticleLayout_New( "fileParticleLayout", filename );
 	newSwarm = Swarm_New( "testSwarm2", elementCellLayout, fileParticleLayout, 3, sizeof(Particle),
 		extensionMgr_Register, NULL, CommWorld );
-	Build( newSwarm, 0, False );
-	Initialise( newSwarm, 0, False );
+	Stg_Component_Build( newSwarm, 0, False );
+	Stg_Component_Initialise( newSwarm, 0, False );
 
 	assert( newSwarm->particleLocalCount == swarm->particleLocalCount );
 

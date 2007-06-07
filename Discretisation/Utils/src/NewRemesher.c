@@ -31,7 +31,7 @@
 
 #include <stdlib.h>
 #include <StGermain/Base/Base.h>
-#include <StGermain/Base/Discretisation/Mesh/Mesh.h>
+#include <StGermain/Discretisation/Mesh/Mesh.h>
 #include "types.h"
 #include "NewRemesher.h"
 #include "StGermain/Base/Foundation/ClassDef.h"
@@ -40,7 +40,7 @@
 void _NewRemesher_Init( void* _self ) {
    NewRemesher* self = Class_Cast( _self, NewRemesher );
 
-   NewClass_Init( self );
+   _NewClass_Init( self );
    self->mesh = NULL;
 }
 
@@ -48,20 +48,20 @@ void _NewRemesher_Copy( void* _self, const void* _op ) {
    NewRemesher* self = Class_Cast( _self, NewRemesher );
    const NewRemesher* op = Class_Cast( _op, NewRemesher );
 
-   NewClass_Copy( self, op );
-   self->mesh = mesh;
+   _NewClass_Copy( self, op );
+   self->mesh = op->mesh;
 }
 
-void _NewRemesher_Print( const void* _self ) {
+void _NewRemesher_Print( const void* _self, Stream* stream ) {
    NewRemesher* self = Class_Cast( _self, NewRemesher );
 
-   NewClass_Print( self );
+   _NewClass_Print( self, stream );
 }
 
 void NewRemesher_SetMesh( void* _self, void* mesh ) {
    NewRemesher* self = Class_Cast( _self, NewRemesher );
 
-   assert( Class_IsSuper( mesh, Mesh ) );
+   /*assert( Class_IsSuper( mesh, Mesh ) );*/
 
    self->mesh = (Mesh*)mesh;
 }

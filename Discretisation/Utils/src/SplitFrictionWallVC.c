@@ -568,7 +568,7 @@ void _SplitFrictionWallVC_BuildSelf(  void* wallVC, void* data ) {
 	SplitFrictionWallVC*			self = (SplitFrictionWallVC*)wallVC;
 	
 	if( self->_mesh ) {
-		Build( self->_mesh, data, False );
+		Stg_Component_Build( self->_mesh, data, False );
 	}
 }
 

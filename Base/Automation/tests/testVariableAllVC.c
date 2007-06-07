@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
 	
 	vc = VariableAllVC_New( "variableAllVC", "VariableAllVC", variable_Register, conFunc_Register, dictionary, NULL );
 	
-	Build( vc, 0, False );
+	Stg_Component_Build( vc, 0, False );
 	
 	VariableCondition_Apply(vc, NULL);
 	

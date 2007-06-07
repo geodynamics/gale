@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testAllNodesVC.c 4103 2007-05-16 01:09:50Z LukeHodkinson $
+** $Id: testAllNodesVC.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -64,8 +64,8 @@ Mesh* buildMesh( unsigned nDims, unsigned* size,
 	Mesh_SetExtensionManagerRegister( mesh, emReg );
 	Mesh_SetGenerator( mesh, gen );
 
-	Build( mesh, NULL, False );
-	Initialise( mesh, NULL, False );
+	Stg_Component_Build( mesh, NULL, False );
+	Stg_Component_Initialise( mesh, NULL, False );
 
 	KillObject( mesh->generator );
 
@@ -156,7 +156,7 @@ int main( int argc, char* argv[] )
 	
 	/* Create AllVC */
 	vc = (VariableCondition*)AllNodesVC_New( "AllNodesVC", vcKey, variable_Register, conFunc_Register, dictionary, mesh );
-	Build( vc, 0, False );
+	Stg_Component_Build( vc, 0, False );
 		
 	for (j = 0; j < 6; j++)
 		memset(array[j], 0, sizeof(double)*nDomains);

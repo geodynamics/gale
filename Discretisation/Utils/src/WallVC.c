@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: WallVC.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: WallVC.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -573,7 +573,7 @@ void _WallVC_BuildSelf(  void* wallVC, void* data ) {
 	WallVC*			self = (WallVC*)wallVC;
 	
 	if( self->_mesh ) {
-		Build( self->_mesh, data, False );
+		Stg_Component_Build( self->_mesh, data, False );
 	}
 }
 

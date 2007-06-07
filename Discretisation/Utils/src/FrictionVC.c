@@ -568,7 +568,7 @@ void _FrictionVC_BuildSelf(  void* wallVC, void* data ) {
 	FrictionVC*			self = (FrictionVC*)wallVC;
 	
 	if( self->_mesh ) {
-		Build( self->_mesh, data, False );
+		Stg_Component_Build( self->_mesh, data, False );
 	}
 }
 

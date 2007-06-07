@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: MeshClass.c 4115 2007-05-21 00:28:33Z LukeHodkinson $
+** $Id: MeshClass.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -151,10 +151,8 @@ void _Mesh_Build( void* mesh, void* data ) {
 
 	assert( self );
 
-	if( !self->generator )
-		return;
-
-	MeshGenerator_Generate( self->generator, self );
+	if( self->generator )
+		MeshGenerator_Generate( self->generator, self );
 
 	nDims = Mesh_GetDimSize( self );
 	if( !nDims )
@@ -476,6 +474,15 @@ double* Mesh_GetVertex( void* mesh, unsigned domain ) {
 	return self->verts[domain];
 }
 
+Bool Mesh_HasExtension( void* mesh, const char* name ) {
+	Mesh* self = (Mesh*)mesh;
+
+	assert( self );
+
+	return (ExtensionManager_GetHandle( self->info, name ) != -1) ?
+		True : False;
+}
+
 void* _Mesh_GetExtension( void* mesh, const char* name ) {
 	Mesh* self = (Mesh*)mesh;
 
@@ -562,8 +569,9 @@ void Mesh_Sync( void* mesh ) {
 	sync = Mesh_GetSync( self, 0 );
 	nDims = Mesh_GetDimSize( self );
 	nLocals = Mesh_GetLocalSize( self, 0 );
-	Sync_SyncArray( sync, self->verts, nDims * sizeof(double), 
-			self->verts + nDims * nLocals, nDims * sizeof(double), 
+	Sync_SyncArray( sync, 
+			self->verts[0], nDims * sizeof(double), 
+			self->verts[nLocals], nDims * sizeof(double), 
 			nDims * sizeof(double) );
 
 	/* TODO

@@ -140,8 +140,8 @@ void Stg_ComponentA_Construct( void* component, Stg_ComponentFactory* cf, void* 
 void Stg_ComponentA_Build( void* component, void* data ) {
 	Stg_ComponentA* self = (Stg_ComponentA*)component;
 	
-	Build( self->b, data, False );
-	Build( self->c, data, False );
+	Stg_Component_Build( self->b, data, False );
+	Stg_Component_Build( self->c, data, False );
 }
 void Stg_ComponentA_Initialise( void* component, void* data ) {
 
@@ -283,7 +283,7 @@ void Stg_ComponentC_Construct( void* component, Stg_ComponentFactory* cf, void* 
 void Stg_ComponentC_Build( void* component, void* data ) {
 	Stg_ComponentC* self = (Stg_ComponentC*)component;
 	
-	Build( self->b, data, False );
+	Stg_Component_Build( self->b, data, False );
 }
 void Stg_ComponentC_Initialise( void* component, void* data ) {
 

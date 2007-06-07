@@ -33,7 +33,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: testGaussLayoutSingleCell.c 4102 2007-05-16 01:09:00Z LukeHodkinson $
+** $Id: testGaussLayoutSingleCell.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -140,8 +140,8 @@ int main( int argc, char* argv[] ) {
 		sizeof(Particle), extensionMgr_Register, NULL, CommWorld );
 	
 	/* Build the swarm */
-	Build( swarm, 0, False );
-	Initialise( swarm, 0, False );
+	Stg_Component_Build( swarm, 0, False );
+	Stg_Component_Initialise( swarm, 0, False );
 	
 	if( rank == procToWatch ) {
 		Stg_Class_Print( gaussParticleLayout, stream );

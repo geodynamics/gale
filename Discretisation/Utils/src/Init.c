@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Init.c 4103 2007-05-16 01:09:50Z LukeHodkinson $
+** $Id: Init.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -73,6 +73,9 @@ Bool DiscretisationUtils_Init( int* argc, char** argv[] ) {
 				   "0", (void* (*)(Name))FrictionVC_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), SplitFrictionWallVC_Type, 
 				   "0", (void* (*)(Name))SplitFrictionWallVC_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), 
+				   RegularRemesherCmpt_Type, 
+				   "0", (void* (*)(Name))_RegularRemesherCmpt_DefaultNew );
 /*
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), Remesher_Type, 
 				   "0", (void* (*)(Name))_Remesher_DefaultNew );
@@ -101,6 +104,7 @@ Bool DiscretisationUtils_Init( int* argc, char** argv[] ) {
 	RegisterParent( FrictionVC_Type,               VariableCondition_Type );
 	RegisterParent( SplitFrictionWallVC_Type,      VariableCondition_Type );
 	RegisterParent( DofLayout_Type,                Stg_Component_Type );
+	RegisterParent( RegularRemesherCmpt_Type,      Remesher_Type );
 /*
 	RegisterParent( Remesher_Type,                 Stg_Component_Type );
 	RegisterParent( StripRemesher_Type,            Remesher_Type );

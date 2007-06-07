@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testDofLayout.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: testDofLayout.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -85,8 +85,8 @@ int main( int argc, char *argv[] ) {
 			varArrays[var_I] = Memory_Alloc_Array_Unnamed( double, arraySize );
 			var[var_I] = Variable_NewScalar( varName[var_I], Variable_DataType_Double, &arraySize, 
 				(void**)&(varArrays[var_I]), variableRegister );
-			Build( var[var_I], 0, False );	
-			Initialise( var[var_I], 0, False );	
+			Stg_Component_Build( var[var_I], 0, False );	
+			Stg_Component_Initialise( var[var_I], 0, False );	
 		}
 			
 		for (ii = 0; ii < arraySize; ii++) {
@@ -101,7 +101,7 @@ int main( int argc, char *argv[] ) {
 			for (var_I = 0; var_I < 6; var_I++)
 				DofLayout_AddDof_ByVarName(dof, varName[var_I], ii);
 
-		Build(dof, 0, False);
+		Stg_Component_Build(dof, 0, False);
 
 		printf("Simple test:\n");
 		for (ii = 0; ii < arraySize; ii++)
@@ -119,7 +119,7 @@ int main( int argc, char *argv[] ) {
 			for (var_I = 2; var_I < 6; var_I++)
 				DofLayout_AddDof_ByVarName(dof, varName[var_I], ii);
 
-		Build(dof, 0, False);
+		Stg_Component_Build(dof, 0, False);
 
 		printf("\nAdvanced test:\n");
 		for (ii = 0; ii < arraySize; ii++)
@@ -140,8 +140,8 @@ int main( int argc, char *argv[] ) {
 			}	
 		}		
 
-		Build(dof, NULL, False);
-		Build(destDof, NULL, False);
+		Stg_Component_Build(dof, NULL, False);
+		Stg_Component_Build(destDof, NULL, False);
 
 		for (ii = 0; ii < arraySize; ii++) {
 			for (dof_I = 0; dof_I < 3; dof_I++) {

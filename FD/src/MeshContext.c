@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: MeshContext.c 4104 2007-05-16 01:10:19Z LukeHodkinson $
+** $Id: MeshContext.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -141,7 +141,7 @@ void _MeshContext_Build( Context* context, void* data ) {
 	Journal_Printf( self->debug, "In: %s\n", __func__ );
 	
 	if( self->mesh )
-		Build( self->mesh, data, False );
+		Stg_Component_Build( self->mesh, data, False );
 }
 
 void _MeshContext_InitialConditions( Context* context, void* data ) {
@@ -150,5 +150,5 @@ void _MeshContext_InitialConditions( Context* context, void* data ) {
 	Journal_Printf( self->debug, "In: %s\n", __func__ );
 	
 	if( self->mesh )
-		Initialise( self->mesh, data, False );
+		Stg_Component_Initialise( self->mesh, data, False );
 }

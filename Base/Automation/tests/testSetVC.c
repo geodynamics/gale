@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testSetVC.c 4098 2007-05-16 01:00:35Z LukeHodkinson $
+** $Id: testSetVC.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
 	
 	/* Create AllVC */
 	vc = (VariableCondition*)SetVC_New( "SetVC", vcKey, variable_Register, conFunc_Register, dictionary );
-	Build( vc, 0, False );
+	Stg_Component_Build( vc, 0, False );
 	
 	for (j = 0; j < 6; j++)
 		memset(array[j], 0, sizeof(double)*4*4*4);

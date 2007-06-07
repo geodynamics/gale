@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testRegularMeshUtils.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: testRegularMeshUtils.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -68,8 +68,8 @@ Mesh* buildMesh( unsigned nDims, unsigned* size,
 	Mesh_SetExtensionManagerRegister( mesh, emReg );
 	Mesh_SetGenerator( mesh, gen );
 
-	Build( mesh, NULL, False );
-	Initialise( mesh, NULL, False );
+	Stg_Component_Build( mesh, NULL, False );
+	Stg_Component_Initialise( mesh, NULL, False );
 
 	KillObject( mesh->generator );
 

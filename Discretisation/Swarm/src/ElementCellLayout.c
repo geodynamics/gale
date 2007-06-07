@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ElementCellLayout.c 4102 2007-05-16 01:09:00Z LukeHodkinson $
+** $Id: ElementCellLayout.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -261,7 +261,7 @@ void _ElementCellLayout_Construct( void* elementCellLayout, Stg_ComponentFactory
 void _ElementCellLayout_Build( void *elementCellLayout, void *data ){
 	ElementCellLayout*	self = (ElementCellLayout*)elementCellLayout;
 
-	Build( self->mesh, NULL, False );
+	Stg_Component_Build( self->mesh, NULL, False );
 
 	if( !Mesh_HasIncidence( self->mesh, Mesh_GetDimSize( self->mesh ), MT_VERTEX ) ) {
 		Stream* elementCellLayoutStream = Journal_Register( ErrorStream_Type, self->type );
@@ -275,7 +275,7 @@ void _ElementCellLayout_Build( void *elementCellLayout, void *data ){
 	
 void _ElementCellLayout_Initialise( void *elementCellLayout, void *data ){
 	ElementCellLayout* self = (ElementCellLayout*)elementCellLayout;
-	Initialise( self->mesh, data, False );
+	Stg_Component_Initialise( self->mesh, data, False );
 }
 	
 void _ElementCellLayout_Execute( void *elementCellLayout, void *data ){

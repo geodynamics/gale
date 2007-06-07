@@ -182,7 +182,7 @@ void _Remesher_Build( void* remesher, void* data ) {
 	assert( self->mesh );
 
 	/* Build the mesh. */
-	Build( self->mesh, NULL, False );
+	Stg_Component_Build( self->mesh, NULL, False );
 	Remesher_SetMesh( self, self->mesh );
 }
 

@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SwarmClass.c 4121 2007-05-23 10:46:14Z PatrickSunter $
+** $Id: SwarmClass.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -705,8 +705,8 @@ void _Swarm_Build( void* swarm, void* data ) {
 	Journal_DPrintf( self->debug, "In %s(): for swarm \"%s\" (of type %s)\n", __func__, self->name, self->type ); 
 	Stream_IndentBranch( Swarm_Debug );
 
-	Build( self->cellLayout, data, False );
-	Build( self->particleLayout, data, False );
+	Stg_Component_Build( self->cellLayout, data, False );
+	Stg_Component_Build( self->particleLayout, data, False );
 	
 	Journal_DPrintf( self->debug, "allocating memory for cell->particle mappings:\n" );
 	_Swarm_BuildCells( self, data );

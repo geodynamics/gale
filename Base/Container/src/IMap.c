@@ -52,6 +52,7 @@ void _IMap_Init( void* _self ) {
    self->tblSize = 0;
    self->tbl = NULL;
    self->used = NULL;
+   IMap_SetMaxSize( self, 0 );
 }
 
 void _IMap_Destruct( void* self ) {

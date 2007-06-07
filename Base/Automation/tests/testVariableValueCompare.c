@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testVariableValueCompare.c 3462 2006-02-19 06:53:24Z WalterLandry $
+** $Id: testVariableValueCompare.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -106,8 +106,8 @@ int main( int argc, char *argv[] ) {
 				"compare2",
 				"compare3",
 				"compare4" );
-		Build( orig, 0, False );
-		Build( compare, 0, False );
+		Stg_Component_Build( orig, 0, False );
+		Stg_Component_Build( compare, 0, False );
 
 		Journal_PrintDouble( stream, Variable_ValueCompare( orig, compare ) );
 		Journal_PrintBool( stream, Variable_ValueCompareWithinTolerance( orig, compare, tolerance ) );

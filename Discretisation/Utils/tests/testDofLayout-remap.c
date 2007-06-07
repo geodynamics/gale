@@ -110,7 +110,7 @@ int main( int argc, char *argv[] ) {
 		DofLayout_Remap( dof, 14, map );
 		Stg_Class_Delete( map );
 
-		Build(dof, 0, False);
+		Stg_Component_Build(dof, 0, False);
 
 		printf("Simple test:\n");
 		for (i = 0; i < 14; i++)

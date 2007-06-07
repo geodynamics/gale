@@ -30,7 +30,7 @@
 **
 ** Comments:
 **
-** $Id: Stg_ComponentFactory.c 4098 2007-05-16 01:00:35Z LukeHodkinson $
+** $Id: Stg_ComponentFactory.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -539,6 +539,17 @@ Stg_Component* _Stg_ComponentFactory_ConstructByName( void* cf, Name componentNa
 		Memory_CountInc( component );
 	}
 	else {
+		Name			redirect;
+
+		/* If we can find the component's name in the root dictionary, use that value instead. */
+		if( self->rootDict ) {
+			redirect = Dictionary_GetString_WithDefault( self->rootDict, componentName, "" );
+			if( strcmp( redirect, "" ) ) {
+				componentName = redirect;
+				return self->constructByName( self, componentName, type, isEssential, data );
+			}
+		}
+
 		Journal_PrintfL( stream, 2, "Not found.\n" );
 
 		if ( isEssential ) {

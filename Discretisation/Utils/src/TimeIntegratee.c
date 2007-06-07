@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: TimeIntegratee.c 3851 2006-10-12 08:57:22Z SteveQuenette $
+** $Id: TimeIntegratee.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -215,14 +215,14 @@ void _TimeIntegratee_Build( void* timeIntegratee, void* data ) {
 
 	Journal_DPrintf( self->debug, "In %s for %s '%s'\n", __func__, self->type, self->name );
 
-	Build( self->variable, NULL, False );
+	Stg_Component_Build( self->variable, NULL, False );
 }
 
 void _TimeIntegratee_Initialise( void* timeIntegratee, void* data ) {
 	TimeIntegratee* self = (TimeIntegratee*)timeIntegratee;
 	
 	Journal_DPrintf( self->debug, "In %s for %s '%s'\n", __func__, self->type, self->name );
-	Initialise( self->variable, NULL, False );
+	Stg_Component_Initialise( self->variable, NULL, False );
 }
 
 void _TimeIntegratee_Execute( void* timeIntegratee, void* data ) {

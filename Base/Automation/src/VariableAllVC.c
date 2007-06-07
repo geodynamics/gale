@@ -512,7 +512,7 @@ void _VariableAllVC_BuildSelf( void* allElementsVC, void* data ) {
 	VariableAllVC*		self = (VariableAllVC*)allElementsVC;
 	
 	if( self->data ) {
-		Build( self->data, data, False );
+		Stg_Component_Build( self->data, data, False );
 	}
 }
 

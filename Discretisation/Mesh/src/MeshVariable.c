@@ -305,7 +305,7 @@ void _MeshVariable_Build( void* meshVariable, void* data ) {
 
 	assert( self );
 
-	Build( self->mesh, data, False );
+	Stg_Component_Build( self->mesh, data, False );
 
 	self->meshArraySize = Mesh_GetDomainSize( self->mesh, self->topoDim );
 	_Variable_Build( self, data );

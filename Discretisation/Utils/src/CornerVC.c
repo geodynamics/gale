@@ -585,7 +585,7 @@ void _CornerVC_BuildSelf(  void* cornerVC, void* data ) {
    CornerVC*        self = (CornerVC*)cornerVC;
 	
    if( self->_mesh ) {
-      Build( self->_mesh, data, False );
+      Stg_Component_Build( self->_mesh, data, False );
    }
 }
 

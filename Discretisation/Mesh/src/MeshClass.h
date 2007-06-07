@@ -34,7 +34,7 @@
 **
 ** Comments:
 **
-** $Id: MeshClass.h 4115 2007-05-21 00:28:33Z LukeHodkinson $
+** $Id: MeshClass.h 4137 2007-06-07 05:46:46Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -155,6 +155,7 @@
 	Comm* Mesh_GetCommTopology( void* mesh, MeshTopology_Dim dim );
 	double* Mesh_GetVertex( void* mesh, unsigned domain );
 
+	Bool Mesh_HasExtension( void* mesh, const char* name );
 	#define Mesh_GetExtension( mesh, type, name ) \
 		(type)_Mesh_GetExtension( mesh, name )
 	void* _Mesh_GetExtension( void* mesh, const char* name );

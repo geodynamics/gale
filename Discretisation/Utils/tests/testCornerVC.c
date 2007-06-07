@@ -71,8 +71,8 @@ Mesh* buildMesh( unsigned nDims, unsigned* size,
 	Mesh_SetExtensionManagerRegister( mesh, emReg );
 	Mesh_SetGenerator( mesh, gen );
 
-	Build( mesh, NULL, False );
-	Initialise( mesh, NULL, False );
+	Stg_Component_Build( mesh, NULL, False );
+	Stg_Component_Initialise( mesh, NULL, False );
 
 	KillObject( mesh->generator );
 
@@ -186,7 +186,7 @@ int main(int argc, char *argv[])
 		
 		vc = CornerVC_New( vcKeyName[i], vcKey[i], variable_Register, conFunc_Register, dictionary, mesh );
 		_CornerVC_ReadDictionary(vc, dictionary);
-		Build( vc, 0, False );
+		Stg_Component_Build( vc, 0, False );
 		for (j = 0; j < 7; j++) {
 			memset(array[j], 0, sizeof(double)* nDomains );
 		}

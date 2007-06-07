@@ -122,24 +122,46 @@ void Sync_FindRemotes( void* _self, int nRemotes, const int* remotes ) {
    ISet nbrSetObj, *nbrSet = &nbrSetObj;
    Comm* comm;
    int nNbrs, *nbrs;
+   int nRanks;
+   Bool *sendFlags, *recvFlags;
+   MPI_Comm mpiComm;
    int r_i;
 
    assert( !nRemotes || remotes );
 
+   mpiComm = Decomp_GetMPIComm( self->decomp );
+   insist( MPI_Comm_size( mpiComm, &nRanks ), == MPI_SUCCESS );
+
    owners = Class_Array( self, int, nRemotes );
    Decomp_FindOwners( self->decomp, nRemotes, remotes, owners );
    ISet_Construct( nbrSet );
+   ISet_SetMaxSize( nbrSet, nRemotes );
    for( r_i = 0; r_i < nRemotes; r_i++ )
       ISet_TryInsert( nbrSet, owners[r_i] );
    Class_Free( self, owners );
+
+   sendFlags = Class_Array( self, Bool, nRanks );
+   recvFlags = Class_Array( self, Bool, nRanks );
+   for( r_i = 0; r_i < nRanks; r_i++ )
+      sendFlags[r_i] = ISet_Has( nbrSet, r_i );
+   insist( MPI_Alltoall( sendFlags, 1, MPI_INT, 
+			 recvFlags, 1, MPI_INT, 
+			 mpiComm ), == MPI_SUCCESS );
+   Class_Free( self, sendFlags );
+   for( r_i = 0; r_i < nRanks; r_i++ ) {
+      if( recvFlags[r_i] )
+	 ISet_TryInsert( nbrSet, r_i );
+   }
+   Class_Free( self, recvFlags );
+
    nNbrs = ISet_GetSize( nbrSet );
    nbrs = Class_Array( self, int, nNbrs );
    ISet_GetArray( nbrSet, nbrs );
    ISet_Destruct( nbrSet );
 
    comm = Comm_New();
-   Comm_SetMPIComm( self->comm, Decomp_GetMPIComm( self->decomp ) );
-   Comm_SetNeighbours( self->comm, nNbrs, nbrs );
+   Comm_SetMPIComm( comm, Decomp_GetMPIComm( self->decomp ) );
+   Comm_SetNeighbours( comm, nNbrs, nbrs );
    Class_Free( self, nbrs );
    Sync_SetComm( self, comm );
 

@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: DofLayout.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: DofLayout.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -341,7 +341,7 @@ void _DofLayout_Build( void* dofLayout, void* data ) {
 
 	/* Build mesh and extract domain size, if required. */
 	if( self->mesh ) {
-		Build( self->mesh, data, False );
+		Stg_Component_Build( self->mesh, data, False );
 		self->_numItemsInLayout = Mesh_GetDomainSize( self->mesh, MT_VERTEX );
 	}
 
@@ -350,7 +350,7 @@ void _DofLayout_Build( void* dofLayout, void* data ) {
 
 	/* ensure variables are built */
 	for( i = 0; i < self->_totalVarCount; i++ )
-		Build( Variable_Register_GetByIndex( self->_variableRegister, self->_varIndicesMapping[i] ), data, False );
+		Stg_Component_Build( Variable_Register_GetByIndex( self->_variableRegister, self->_varIndicesMapping[i] ), data, False );
 	
 	self->dofCounts = Memory_Alloc_Array( Index, self->_numItemsInLayout, "DofLayout->dofCounts" );
 	memset(self->dofCounts, 0, sizeof(Index)*self->_numItemsInLayout);
@@ -387,7 +387,7 @@ void _DofLayout_Initialise( void* dofLayout, void* data ) {
 	/* Initialise all the Variables used - in some cases they don't allocate themselves properly until
 		this is done */
 	for( var_I = 0; var_I < self->_totalVarCount; var_I++ ) {
-		Initialise( Variable_Register_GetByIndex( self->_variableRegister, self->_varIndicesMapping[var_I] ),
+		Stg_Component_Initialise( Variable_Register_GetByIndex( self->_variableRegister, self->_varIndicesMapping[var_I] ),
 			data, False );
 	}	
 }

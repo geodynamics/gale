@@ -72,7 +72,7 @@ TestBegin( NearVert ) {
    CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
    mesh = Mesh_New( "" );
    Mesh_SetGenerator( mesh, gen );
-   Build( mesh, NULL, False );
+   Stg_Component_Build( mesh, NULL, False );
 
    for( e_i = 0; e_i < Mesh_GetDomainSize( mesh, MT_VOLUME ); e_i++ ) {
       Mesh_GetIncidence( mesh, MT_VOLUME, e_i, MT_VERTEX, &nInc, &inc );
@@ -115,7 +115,7 @@ TestBegin( ElSearch3D ) {
    CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
    mesh = Mesh_New( "" );
    Mesh_SetGenerator( mesh, gen );
-   Build( mesh, NULL, False );
+   Stg_Component_Build( mesh, NULL, False );
 
    for( e_i = 0; e_i < Mesh_GetDomainSize( mesh, MT_VOLUME ); e_i++ ) {
       Mesh_GetIncidence( mesh, MT_VOLUME, e_i, MT_VERTEX, &nInc, &inc );

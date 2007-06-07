@@ -35,7 +35,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: types.h 4135 2007-06-05 23:23:55Z LukeHodkinson $
+** $Id: types.h 4137 2007-06-07 05:46:46Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -43,6 +43,8 @@
 #define __Discretisation_Utils_types_h__
 
 typedef struct NewRemesher NewRemesher;
+typedef struct RegularRemesher RegularRemesher;
+typedef struct RegularRemesherCmpt RegularRemesherCmpt;
 	
 	/* Classes */
 	typedef struct _AllElementsVC			AllElementsVC;

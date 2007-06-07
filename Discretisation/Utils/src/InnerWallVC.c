@@ -573,7 +573,7 @@ void _InnerWallVC_BuildSelf(  void* innerWallVC, void* data ) {
 	InnerWallVC*			self = (InnerWallVC*)innerWallVC;
 	
 	if( self->_mesh ) {
-		Build( self->_mesh, data, False );
+		Stg_Component_Build( self->_mesh, data, False );
 	}
 }
 

@@ -33,7 +33,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: testSpaceFillerParticleLayout.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: testSpaceFillerParticleLayout.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -78,8 +78,8 @@ Mesh* buildMesh( unsigned nDims, unsigned* size,
 	Mesh_SetGenerator( mesh, gen );
 	Mesh_SetAlgorithms( mesh, Mesh_RegularAlgorithms_New( "" ) );
 
-	Build( mesh, NULL, False );
-	Initialise( mesh, NULL, False );
+	Stg_Component_Build( mesh, NULL, False );
+	Stg_Component_Initialise( mesh, NULL, False );
 
 	KillObject( mesh->generator );
 
@@ -140,8 +140,8 @@ int main( int argc, char* argv[] ) {
 	elementCellLayout = ElementCellLayout_New( "elementCellLayout", mesh );
 	
 	/* Build the mesh */
-	Build( mesh, 0, False );
-	Initialise( mesh, 0, False );
+	Stg_Component_Build( mesh, 0, False );
+	Stg_Component_Initialise( mesh, 0, False );
 	
 	particleLayout = SpaceFillerParticleLayout_New( "spaceFillerParticleLayout", nDims, SpaceFillerParticleLayout_Invalid, 20 );
 	
@@ -150,8 +150,8 @@ int main( int argc, char* argv[] ) {
 		extensionMgr_Register, NULL, CommWorld );
 	
 	/* Build the swarm */
-	Build( swarm, 0, False );
-	Initialise( swarm, 0, False );
+	Stg_Component_Build( swarm, 0, False );
+	Stg_Component_Initialise( swarm, 0, False );
 	
 	if( rank == procToWatch ) {
 		Stg_Class_Print( particleLayout, stream );

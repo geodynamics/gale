@@ -53,6 +53,7 @@ void _ISet_Init( void* _self ) {
    self->tblSize = 0;
    self->tbl = NULL;
    self->used = NULL;
+   ISet_SetMaxSize( self, 0 );
 }
 
 void _ISet_Destruct( void* self ) {

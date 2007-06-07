@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: OperatorSwarmVariable.c 3851 2006-10-12 08:57:22Z SteveQuenette $
+** $Id: OperatorSwarmVariable.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -296,7 +296,7 @@ void _OperatorSwarmVariable_Build( void* swarmVariable, void* data ) {
 	Index                  swarmVariable_I;
 
 	for ( swarmVariable_I = 0 ; swarmVariable_I < self->swarmVariableCount ; swarmVariable_I++ ) 
-		Build( self->swarmVariableList[ swarmVariable_I ] , data, False );
+		Stg_Component_Build( self->swarmVariableList[ swarmVariable_I ] , data, False );
 }
 
 void _OperatorSwarmVariable_Execute( void* swarmVariable, void* data ) {}
@@ -308,7 +308,7 @@ void _OperatorSwarmVariable_Initialise( void* swarmVariable, void* data ) {
 	Index                  swarmVariable_I;
 
 	for ( swarmVariable_I = 0 ; swarmVariable_I < self->swarmVariableCount ; swarmVariable_I++ ) 
-		Initialise( self->swarmVariableList[ swarmVariable_I ] , data, False );
+		Stg_Component_Initialise( self->swarmVariableList[ swarmVariable_I ] , data, False );
 }
 
 double _OperatorSwarmVariable_GetMinGlobalMagnitude( void* swarmVariable ) { 

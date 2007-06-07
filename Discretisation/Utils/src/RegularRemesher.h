@@ -1,6 +1,7 @@
-/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 **
-** Copyright (C), 2003, Victorian Partnership for Advanced Computing (VPAC) Ltd, 110 Victoria Street, Melbourne, 3053, Australia.
+** Copyright (C), 2003, Victorian Partnership for Advanced Computing (VPAC) Ltd, 
+** 110 Victoria Street, Melbourne, 3053, Australia.
 **
 ** Authors:
 **	Stevan M. Quenette, Senior Software Engineer, VPAC. (steve@vpac.org)
@@ -23,33 +24,27 @@
 **  You should have received a copy of the GNU Lesser General Public
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-**
-*/
+**~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 /** \file
-**  Role:
-**	Shortcuts to complex types in the eyes of the Base user.
-**
-** Assumptions:
-**	None as yet.
-**
-** Comments:
-**	None as yet.
-**
-** $Id: shortcuts.h 4137 2007-06-07 05:46:46Z LukeHodkinson $
-**
-**~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+ ** <b>Role:</b>
+ **	Abstract class faciliting how class inheritance is done.
+ **
+ ** <b>Assumptions:</b>
+ **	None
+ **
+ ** <b>Comments:</b>
+ **	None
+ **
+ ** $Id: RegularRemesher.h 3904 2006-12-14 00:52:06Z LukeHodkinson $
+ **
+ **/
+ 
+#ifndef __StGermain_Discretisation_Utils_RegularRemesher_h__
+#define __StGermain_Discretisation_Utils_RegularRemesher_h__
 
-#ifndef __Base_Automation_shortcuts_h__
-#define __Base_Automation_shortcuts_h__
-	
-	/* VTK uses Stg_Class_Delete as a standard class member...so if an app
-	uses St. G and VTK, then we can't use this macro */
-/*
-	#ifndef __vtkObject_h
-		#define Build			Stg_Component_Build
-		#define Initialise		Stg_Component_Initialise
-		#define Execute			Stg_Component_Execute
-	#endif
-*/
-	
-#endif /* __Base_Automation_shortcuts_h__ */
+#include "StGermain/Base/Foundation/ClassClear.h"
+#define CLASSDIR StGermain/Discretisation/Utils
+#define CLASSNAME RegularRemesher
+#include "StGermain/Base/Foundation/ClassHdr.h"
+
+#endif /* __StGermain_Discretisation_Utils_RegularRemesher_h__ */
