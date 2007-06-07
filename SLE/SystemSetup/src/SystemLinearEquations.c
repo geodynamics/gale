@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SystemLinearEquations.c 833 2007-05-16 01:12:22Z LukeHodkinson $
+** $Id: SystemLinearEquations.c 860 2007-06-07 05:47:20Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -403,23 +403,23 @@ void _SystemLinearEquations_Build( void* sle, void* _context ) {
 	/* build the matrices */
 	for ( index = 0; index < self->stiffnessMatrices->count; index++ ) {
 		/* Update rowSize and colSize if boundary conditions have been applied */		
-		Build( self->stiffnessMatrices->data[index], _context, False );
+		Stg_Component_Build( self->stiffnessMatrices->data[index], _context, False );
 	}	
 	
 	/* and the vectors */
 	for ( index = 0; index < self->forceVectors->count; index++ ) {
 		/* Build the force vectors - includes updateing matrix size based on Dofs */
-		Build( self->forceVectors->data[index], _context, False );
+		Stg_Component_Build( self->forceVectors->data[index], _context, False );
 	}
 	
 	/* and the solutions */
 	for ( index = 0; index < self->solutionVectors->count; index++ ) {
 		/* Build the force vectors - includes updateing matrix size based on Dofs */
-		Build( self->solutionVectors->data[index], _context, False );
+		Stg_Component_Build( self->solutionVectors->data[index], _context, False );
 	}
 	
 	/* lastly, the solver */
-	Build( self->solver, self, False );
+	Stg_Component_Build( self->solver, self, False );
 
 	Stream_UnIndentBranch( StgFEM_Debug );
 }
@@ -435,19 +435,19 @@ void _SystemLinearEquations_Initialise( void* sle, void* _context ) {
 	/* initialise the matrices */
 	for ( index = 0; index < self->stiffnessMatrices->count; index++ ) {
 		/* Update rowSize and colSize if boundary conditions have been applied */		
-		Initialise( self->stiffnessMatrices->data[index], _context, False );
+		Stg_Component_Initialise( self->stiffnessMatrices->data[index], _context, False );
 	}	
 	
 	/* and the vectors */
 	for ( index = 0; index < self->forceVectors->count; index++ ) {
 		/* Initialise the force vectors - includes updateing matrix size based on Dofs */
-		Initialise( self->forceVectors->data[index], _context, False );
+		Stg_Component_Initialise( self->forceVectors->data[index], _context, False );
 	}
 	
 	/* and the solutions */
 	for ( index = 0; index < self->solutionVectors->count; index++ ) {
 		/* Initialise the force vectors - includes updateing matrix size based on Dofs */
-		Initialise( self->solutionVectors->data[index], _context, False );
+		Stg_Component_Initialise( self->solutionVectors->data[index], _context, False );
 	}
 
 	/* Check to see if any of the components need to make the SLE non-linear */
@@ -457,7 +457,7 @@ void _SystemLinearEquations_Initialise( void* sle, void* _context ) {
 	SystemLinearEquations_LM_Setup( self, _context );
 
 	/* lastly, the solver */
-	Initialise( self->solver, self, False );
+	Stg_Component_Initialise( self->solver, self, False );
 	Stream_UnIndentBranch( StgFEM_Debug );
 }
 
@@ -482,7 +482,7 @@ void SystemLinearEquations_ExecuteSolver( void* sle, void* _context ) {
 	Journal_Printf(self->info,"Linear solver (%s) \n",self->executeEPName);
 		
 	wallTime = MPI_Wtime();		
-	Execute( self->solver, self, True );
+	Stg_Component_Execute( self->solver, self, True );
 	
 	Journal_Printf(self->info,"Linear solution time %g (secs)\n",MPI_Wtime() - wallTime);
 		

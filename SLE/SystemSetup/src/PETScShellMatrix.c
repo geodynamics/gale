@@ -162,8 +162,8 @@ void _PETScShellMatrix_Build( void* matrix, void* data ) {
 
 	assert( self && Stg_CheckType( self, PETScShellMatrix ) );
 
-	Build( self->sle, data, False );
-	Build( self->stiffMat, data, False );
+	Stg_Component_Build( self->sle, data, False );
+	Stg_Component_Build( self->stiffMat, data, False );
 }
 
 void _PETScShellMatrix_Initialise( void* matrix, void* data ) {
@@ -171,8 +171,8 @@ void _PETScShellMatrix_Initialise( void* matrix, void* data ) {
 
 	assert( self && Stg_CheckType( self, PETScShellMatrix ) );
 
-	Initialise( self->sle, data, False );
-	Initialise( self->stiffMat, data, False );
+	Stg_Component_Initialise( self->sle, data, False );
+	Stg_Component_Initialise( self->stiffMat, data, False );
 
 	PETScShellMatrix_UpdateAssembly( self );
 }

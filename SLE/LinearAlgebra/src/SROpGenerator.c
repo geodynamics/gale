@@ -257,8 +257,8 @@ void SROpGenerator_GenLevelMesh( SROpGenerator* self, unsigned level ) {
 	cMesh = (Mesh*)FeMesh_New( "" );
 	Mesh_SetGenerator( cMesh, cGen );
 	FeMesh_SetElementFamily( cMesh, ((FeMesh*)fMesh)->feElFamily );
-	Build( cMesh, NULL, False );
-	Initialise( cMesh, NULL, False );
+	Stg_Component_Build( cMesh, NULL, False );
+	Stg_Component_Initialise( cMesh, NULL, False );
 	self->meshes[level] = cMesh;
 }
 

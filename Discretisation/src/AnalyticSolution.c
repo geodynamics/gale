@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AnalyticSolution.c 846 2007-05-25 06:39:04Z JulianGiordani $
+** $Id: AnalyticSolution.c 860 2007-06-07 05:47:20Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -400,7 +400,7 @@ FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVari
 	Stream*                                      stream;
 	Index                                        count;
 
-	Build( feVariable->feMesh, NULL, False );
+	Stg_Component_Build( feVariable->feMesh, NULL, False );
 
 	/* Create new data Variable */
 	tmpName = Stg_Object_AppendSuffix( feVariable, "Analytic-DataVariable" );

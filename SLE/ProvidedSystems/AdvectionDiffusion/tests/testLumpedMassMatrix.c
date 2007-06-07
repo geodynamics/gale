@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testLumpedMassMatrix.c 833 2007-05-16 01:12:22Z LukeHodkinson $
+** $Id: testLumpedMassMatrix.c 860 2007-06-07 05:47:20Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -91,8 +91,8 @@ FeMesh* buildFeMesh( unsigned nDims, unsigned* size,
 	Mesh_SetTopologyDataSize( feMesh, MT_VERTEX, sizeof(Node) );
 	Mesh_SetTopologyDataSize( feMesh, nDims, sizeof(Element) );
 
-	Build( feMesh, NULL, False );
-	Initialise( feMesh, NULL, False );
+	Stg_Component_Build( feMesh, NULL, False );
+	Stg_Component_Initialise( feMesh, NULL, False );
 
 	return feMesh;
 }
@@ -240,22 +240,22 @@ int main( int argc, char* argv[] ) {
 	ForceTerm_SetAssembleElementFunction( massMatrixForceTerm, _LumpedMassMatrixForceTerm_AssembleElement_General );
 
 	/* Build */
-	Build( feMesh, context, False );
+	Stg_Component_Build( feMesh, context, False );
 	Variable_Register_BuildAll(variableRegister);
-	Build( wallVC, context, False );
-	Build( dofs, context, False);
-	Build( feVariable, context, False );
+	Stg_Component_Build( wallVC, context, False );
+	Stg_Component_Build( dofs, context, False);
+	Stg_Component_Build( feVariable, context, False );
 	FeEquationNumber_BuildLocationMatrix( feVariable->eqNum );
-	Build( singleCellLayout,    context, False );
-	Build( gaussParticleLayout, context, False );
-	Build( swarm,               context, False );
-	Build( massMatrix,          context, False );
+	Stg_Component_Build( singleCellLayout,    context, False );
+	Stg_Component_Build( gaussParticleLayout, context, False );
+	Stg_Component_Build( swarm,               context, False );
+	Stg_Component_Build( massMatrix,          context, False );
 
 	/* Initialise */
-	Initialise( feMesh,     context, False );
-	Initialise( feVariable, context, False );
-	Initialise( swarm,      context, False );
-	Initialise( massMatrix, context, False );
+	Stg_Component_Initialise( feMesh,     context, False );
+	Stg_Component_Initialise( feVariable, context, False );
+	Stg_Component_Initialise( swarm,      context, False );
+	Stg_Component_Initialise( massMatrix, context, False );
 
 	/* Assemble */
 	ForceVector_Assemble( massMatrix );

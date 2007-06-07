@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Context.c 833 2007-05-16 01:12:22Z LukeHodkinson $
+** $Id: Context.c 860 2007-06-07 05:47:20Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -345,7 +345,7 @@ void _FiniteElementContext_Build( void* context ) {
 
 	/* build all the systems of linear equations */
 	for ( sle_I = 0; sle_I < self->slEquations->count; sle_I++ ) {
-		Build( self->slEquations->data[sle_I], self, False );
+		Stg_Component_Build( self->slEquations->data[sle_I], self, False );
 	}
 
 	/* TODO:
@@ -370,7 +370,7 @@ void _FiniteElementContext_Initialise( void* context ) {
 
 	/* initialise all the systems of linear equations */
 	for ( sle_I = 0; sle_I < self->slEquations->count; sle_I++ ) {
-		Initialise( self->slEquations->data[sle_I], self, False );
+		Stg_Component_Initialise( self->slEquations->data[sle_I], self, False );
 	}
 
 	Stream_UnIndentBranch( StgFEM_Debug );
@@ -391,7 +391,7 @@ void _FiniteElementContext_Solve( void* context ) {
 		/* TODO: FeVariable should have the option of rebuilding ID and LM, based on sim.
 		loop if geometry or BCs change...need to improve interface. */
 		/* We set the "force" flag to True here - want the SLE to be re-solved every timestep */
-		Execute( currentSLE, self, True );
+		Stg_Component_Execute( currentSLE, self, True );
 	}
 	
 	Stream_UnIndentBranch( StgFEM_Debug );

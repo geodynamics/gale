@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Energy_SLE_Solver.c 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: Energy_SLE_Solver.c 860 2007-06-07 05:47:20Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -201,11 +201,11 @@ void _Energy_SLE_Solver_Build( void* sleSolver, void* standardSLE ) {
 	Stream_IndentBranch( StgFEM_SLE_ProvidedSystems_Energy_Debug );
 	Journal_DPrintf( self->debug, "building a standard L.A. solver for the \"%s\" matrix.\n", stiffMat->name );
 
-	Build( stiffMat, standardSLE, False );
+	Stg_Component_Build( stiffMat, standardSLE, False );
 
 	if( self->matrixSolver ) {
 		MatrixSolver_SetComm( self->matrixSolver, sle->comm );
-		Build( self->matrixSolver, NULL, False );
+		Stg_Component_Build( self->matrixSolver, NULL, False );
 	}
 
 	Stream_UnIndentBranch( StgFEM_SLE_ProvidedSystems_Energy_Debug );
@@ -220,7 +220,7 @@ void _Energy_SLE_Solver_Initialise( void* sleSolver, void* standardSLE ) {
 	_SLE_Solver_Initialise( self, sle );
 
 	if( self->matrixSolver )
-		Initialise( self->matrixSolver, NULL, False );
+		Stg_Component_Initialise( self->matrixSolver, NULL, False );
 }
 
 void _Energy_SLE_Solver_Execute( void* sleSolver, void* data ) {

@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AdvectionDiffusionSLE.c 833 2007-05-16 01:12:22Z LukeHodkinson $
+** $Id: AdvectionDiffusionSLE.c 860 2007-06-07 05:47:20Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -386,7 +386,7 @@ void _AdvectionDiffusionSLE_Build( void* sle, void* data ) {
 		variable_Register = self->variableReg;
 		fieldVariable_Register = self->fieldVariableReg;
 
-		Build( self->phiField->feMesh, NULL, False );
+		Stg_Component_Build( self->phiField->feMesh, NULL, False );
 
 		nodeDomainCountPtr = &self->phiField->feMesh->topo->remotes[MT_VERTEX]->nDomains;
 		Variable_NewScalar( 

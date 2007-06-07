@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeVariable.c 843 2007-05-21 22:07:31Z LukeHodkinson $
+** $Id: FeVariable.c 860 2007-06-07 05:47:20Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -524,18 +524,18 @@ void _FeVariable_Build( void* variable, void* data ) {
 		Stream_IndentBranch( StgFEM_Debug );
 
 		/* build the BCs */
-		Build( self->feMesh, data, False );
-		Build( self->dofLayout, data, False );
+		Stg_Component_Build( self->feMesh, data, False );
+		Stg_Component_Build( self->dofLayout, data, False );
 		if ( self->bcs ){
-			Build( self->bcs, data, False );
+			Stg_Component_Build( self->bcs, data, False );
 		}
 		/* only bother building the ics specified via XML/construct if we are not in restart mode
 		  - otherwise, we will use the checkpointed values anyway */
 		if ( self->ics && !(context && (True == context->loadFromCheckPoint) ) ) {
-			Build( self->ics, data, False );
+			Stg_Component_Build( self->ics, data, False );
 		}
 		if ( self->linkedDofInfo ) {
-			Build( self->linkedDofInfo, data, False );
+			Stg_Component_Build( self->linkedDofInfo, data, False );
 		}
 
 		/* Extract component count. */
@@ -587,11 +587,11 @@ void _FeVariable_Initialise( void* variable, void* data ) {
 	Stream_IndentBranch( StgFEM_Debug );
 	
 	/* do basic mesh initialisation */
-	Initialise( self->feMesh, data, False );
-	Initialise( self->dofLayout, data, False );
+	Stg_Component_Initialise( self->feMesh, data, False );
+	Stg_Component_Initialise( self->dofLayout, data, False );
 
 	if ( self->linkedDofInfo ) {
-		Initialise( self->linkedDofInfo, data, False );
+		Stg_Component_Initialise( self->linkedDofInfo, data, False );
 	}
 	
 	FeEquationNumber_Initialise( self->eqNum );
@@ -602,7 +602,7 @@ void _FeVariable_Initialise( void* variable, void* data ) {
 	
 		if ( self->ics && !(context && (True == context->loadFromCheckPoint) && (True == self->isCheckpointedAndReloaded)) ) {
 			Journal_DPrintf( self->debug, "regular (non-restart) mode -> applying ICs specified in XML/constructor\n" );
-			Initialise( self->ics, data, False );
+			Stg_Component_Initialise( self->ics, data, False );
 			VariableCondition_Apply( self->ics, data );
 		}
 		else {
@@ -634,7 +634,7 @@ void _FeVariable_Initialise( void* variable, void* data ) {
 	Stream_UnIndent( self->debug );
 
 	if ( self->bcs ) {
-		Initialise( self->bcs, data, False );
+		Stg_Component_Initialise( self->bcs, data, False );
 		Journal_DPrintf( self->debug, "applying the B.C.s for this Variable.\n" ); 
 		VariableCondition_Apply( self->bcs, data );
 	}
@@ -1768,10 +1768,10 @@ double FeVariable_IntegratePlane( void* feVariable, Axis planeAxis, double plane
 			extensionMgr_Register, 
 			NULL,
 			self->communicator );
-	Build( swarm, NULL, False );
+	Stg_Component_Build( swarm, NULL, False );
 
 	/* Change Positions of the particles */
-	Initialise( swarm, NULL, False );
+	Stg_Component_Initialise( swarm, NULL, False );
 	for ( lParticle_I = 0 ; lParticle_I < swarm->particleLocalCount ; lParticle_I++ ) {
 		particle = (IntegrationPoint*) Swarm_ParticleAt( swarm, lParticle_I );
 

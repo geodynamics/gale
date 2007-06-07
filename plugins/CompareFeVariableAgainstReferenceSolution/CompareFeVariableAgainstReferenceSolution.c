@@ -346,10 +346,10 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 	referenceDataVariable->allocateSelf = True;
 	roundedDataVariable->allocateSelf = True;
 
-	Build( referenceDataVariable, NULL, False );
-	Initialise( referenceDataVariable, NULL, False );
-	Build( roundedDataVariable, NULL, False );
-	Initialise( roundedDataVariable, NULL, False );
+	Stg_Component_Build( referenceDataVariable, NULL, False );
+	Stg_Component_Initialise( referenceDataVariable, NULL, False );
+	Stg_Component_Build( roundedDataVariable, NULL, False );
+	Stg_Component_Initialise( roundedDataVariable, NULL, False );
 
 	/* Create Dof layout for this variable based on its own DataVariable */
 	tmpName = Stg_Object_AppendSuffix( feVarToTest, "Reference-DofLayout" );
@@ -377,10 +377,10 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 	Memory_Free( tmpName );
 	Memory_Free( tmpName2 );
 	
-	Build( referenceDofLayout, NULL, False );
-	Initialise( referenceDofLayout, NULL, False );
-	Build( roundedDofLayout, NULL, False );
-	Initialise( roundedDofLayout, NULL, False );
+	Stg_Component_Build( referenceDofLayout, NULL, False );
+	Stg_Component_Initialise( referenceDofLayout, NULL, False );
+	Stg_Component_Build( roundedDofLayout, NULL, False );
+	Stg_Component_Initialise( roundedDofLayout, NULL, False );
 
 	/* Instantiate FeVariable, pre-reading reference */
 	if ( strlen( self->referenceFeVariableSuffix ) > 0 ) {
@@ -410,10 +410,10 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 			feVarToTest->fieldVariable_Register );
 	Memory_Free( tmpName );
 
-	Build( referenceFeVar, NULL, False );
-	Initialise( referenceFeVar, NULL, False );
-	Build( roundedFeVar, NULL, False );
-	Initialise( roundedFeVar, NULL, False );
+	Stg_Component_Build( referenceFeVar, NULL, False );
+	Stg_Component_Initialise( referenceFeVar, NULL, False );
+	Stg_Component_Build( roundedFeVar, NULL, False );
+	Stg_Component_Initialise( roundedFeVar, NULL, False );
 
 	Stg_asprintf( &prefix, "%s/", self->referencePath );
 	FeVariable_ReadFromFile( referenceFeVar, prefix, self->context->timeStep );

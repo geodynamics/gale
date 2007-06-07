@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testElementType.c 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: testElementType.c 860 2007-06-07 05:47:20Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -82,7 +82,7 @@ FeMesh* buildFeMesh( unsigned nDims ) {
 	feMesh = FeMesh_New( "" );
 	Mesh_SetGenerator( feMesh, gen );
 	FeMesh_SetElementFamily( feMesh, "linear" );
-	Build( feMesh, NULL, False );
+	Stg_Component_Build( feMesh, NULL, False );
 
 	return feMesh;
 }
@@ -158,8 +158,8 @@ int main( int argc, char* argv[] ) {
 	/* create the layout, dof and mesh to use */
 	extensionMgr_Register = ExtensionManager_Register_New();
 	feMesh = buildFeMesh( context->dim );
-	Build( feMesh, 0, False );
-	Initialise( feMesh, 0, False );
+	Stg_Component_Build( feMesh, 0, False );
+	Stg_Component_Initialise( feMesh, 0, False );
 
 	srand48(0);
 	for ( test_I = 0 ; test_I < maxTests ; test_I++ ) {

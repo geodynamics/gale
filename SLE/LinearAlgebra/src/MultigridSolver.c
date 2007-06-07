@@ -161,7 +161,7 @@ void _MultigridSolver_Build( void* matrixSolver, void* data ) {
 
 	self->stream = Journal_Register( InfoStream_Type, "general" );
 	if( self->opGen )
-		Build( self->opGen, data, False );
+		Stg_Component_Build( self->opGen, data, False );
 }
 
 void _MultigridSolver_Initialise( void* matrixSolver, void* data ) {
@@ -170,7 +170,7 @@ void _MultigridSolver_Initialise( void* matrixSolver, void* data ) {
 	assert( self && Stg_CheckType( self, MultigridSolver ) );
 
 	if( self->opGen )
-		Initialise( self->opGen, data, False );
+		Stg_Component_Initialise( self->opGen, data, False );
 }
 
 void _MultigridSolver_Execute( void* matrixSolver, void* data ) {

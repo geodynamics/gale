@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: OperatorFeVariable.c 844 2007-05-22 03:17:18Z LukeHodkinson $
+** $Id: OperatorFeVariable.c 860 2007-06-07 05:47:20Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -379,7 +379,7 @@ void _OperatorFeVariable_Build( void* feVariable, void* data ) {
 	Stream*                     errorStream       = Journal_Register( Error_Type, self->type );
 
 	for ( feVariable_I = 0 ; feVariable_I < self->feVariableCount ; feVariable_I++ ) 
-		Build( self->feVariableList[ feVariable_I ] , data, False );
+		Stg_Component_Build( self->feVariableList[ feVariable_I ] , data, False );
 
 	/* Check if we are using a gradient operator */
 	if ( strcasecmp( self->operatorName, "gradient" ) == 0 ) {
@@ -417,7 +417,7 @@ void _OperatorFeVariable_Initialise( void* feVariable, void* data ) {
 	Index                  feVariable_I;
 
 	for ( feVariable_I = 0 ; feVariable_I < self->feVariableCount ; feVariable_I++ ) 
-		Initialise( self->feVariableList[ feVariable_I ] , data, False );
+		Stg_Component_Initialise( self->feVariableList[ feVariable_I ] , data, False );
 }
 
 void _OperatorFeVariable_Execute( void* feVariable, void* data ) {}

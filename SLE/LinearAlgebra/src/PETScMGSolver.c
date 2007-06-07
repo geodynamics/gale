@@ -166,7 +166,7 @@ void _PETScMGSolver_Build( void* matrixSolver, void* data ) {
 	assert( self && Stg_CheckType( self, PETScMGSolver ) );
 
 	if( self->opGen )
-		Build( self->opGen, data, False );
+		Stg_Component_Build( self->opGen, data, False );
 }
 
 void _PETScMGSolver_Initialise( void* matrixSolver, void* data ) {
@@ -175,7 +175,7 @@ void _PETScMGSolver_Initialise( void* matrixSolver, void* data ) {
 	assert( self && Stg_CheckType( self, PETScMGSolver ) );
 
 	if( self->opGen )
-		Initialise( self->opGen, data, False );
+		Stg_Component_Initialise( self->opGen, data, False );
 }
 
 void _PETScMGSolver_Execute( void* matrixSolver, void* data ) {

@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testFeEquationNumber-LinkedDofs.c 832 2007-05-16 01:11:18Z LukeHodkinson $
+** $Id: testFeEquationNumber-LinkedDofs.c 860 2007-06-07 05:47:20Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -199,7 +199,7 @@ FeEquationNumber* buildEqNum( unsigned nProcs, unsigned* sizes, Dictionary* dict
 	feMesh = FeMesh_New( "" );
 	Mesh_SetGenerator( feMesh, gen );
 	FeMesh_SetElementFamily( feMesh, "linear" );
-	Build( feMesh, NULL, False );
+	Stg_Component_Build( feMesh, NULL, False );
 
 	varReg = Variable_Register_New();
 
@@ -216,19 +216,19 @@ FeEquationNumber* buildEqNum( unsigned nProcs, unsigned* sizes, Dictionary* dict
 	dofs->baseVariables[0] = Variable_Register_GetByName( varReg, varNames[0] );
 	dofs->baseVariables[1] = Variable_Register_GetByName( varReg, varNames[1] );
 	dofs->baseVariables[2] = Variable_Register_GetByName( varReg, varNames[2] );
-	Build( dofs, NULL, False );
-	Initialise( dofs, NULL, False );
+	Stg_Component_Build( dofs, NULL, False );
+	Stg_Component_Initialise( dofs, NULL, False );
 
 	*bcs = (VariableCondition*)WallVC_New( "WallVC", "wallBC", varReg, NULL, dict, feMesh );
-	Build( *bcs, NULL, False );
-	Initialise( *bcs, NULL, False );
+	Stg_Component_Build( *bcs, NULL, False );
+	Stg_Component_Initialise( *bcs, NULL, False );
 
 	linkedDofInfo = LinkedDofInfo_New( "linkedDofInfo", feMesh, dofs, dict );
-	Build( linkedDofInfo, context, False );
+	Stg_Component_Build( linkedDofInfo, context, False );
 
 	eqNum = FeEquationNumber_New( "feEquationNumber", feMesh, dofs, *bcs, linkedDofInfo );
-	Build( eqNum, NULL, False );
-	Initialise( eqNum, NULL, False );
+	Stg_Component_Build( eqNum, NULL, False );
+	Stg_Component_Initialise( eqNum, NULL, False );
 
 	return eqNum;
 }

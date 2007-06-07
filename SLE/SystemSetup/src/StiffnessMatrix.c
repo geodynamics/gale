@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StiffnessMatrix.c 833 2007-05-16 01:12:22Z LukeHodkinson $
+** $Id: StiffnessMatrix.c 860 2007-06-07 05:47:20Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -495,7 +495,7 @@ void _StiffnessMatrix_Build( void* stiffnessMatrix, void* data ) {
 
 	/* ensure variables are built */
 	if( self->rowVariable )
-		Build( self->rowVariable, data, False );
+		Stg_Component_Build( self->rowVariable, data, False );
 
 	/* If we don't have a communicator, grab one off the mesh. */
 	if( !self->comm ) {
@@ -505,7 +505,7 @@ void _StiffnessMatrix_Build( void* stiffnessMatrix, void* data ) {
 	}
 	
 	if( self->columnVariable )
-		Build( self->columnVariable, data, False );
+		Stg_Component_Build( self->columnVariable, data, False );
 	
 	
 #if DEBUG
@@ -572,10 +572,10 @@ void _StiffnessMatrix_Initialise( void* stiffnessMatrix, void* data ) {
 	Journal_DPrintf( self->debug, "In %s - for matrix %s\n", __func__, self->name );
 	/* ensure variables are initialised */
 	if( self->rowVariable )
-		Initialise( self->rowVariable, data, False );
+		Stg_Component_Initialise( self->rowVariable, data, False );
 	
 	if( self->columnVariable )
-		Initialise( self->columnVariable, data, False );
+		Stg_Component_Initialise( self->columnVariable, data, False );
 }
 
 

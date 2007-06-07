@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StandardConditionFunctions.c 858 2007-06-05 01:16:52Z DavidLee $
+** $Id: StandardConditionFunctions.c 860 2007-06-07 05:47:20Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -715,6 +715,7 @@ void StgFEM_StandardConditionFunctions_StepFunction( Node_LocalIndex node_lI, Va
 	double			right;
 	double			grad;
 	Bool			useGrad;
+	double			leftBegin, rightEnd;
 
 	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
 	feMesh       = feVariable->feMesh;
@@ -726,6 +727,8 @@ void StgFEM_StandardConditionFunctions_StepFunction( Node_LocalIndex node_lI, Va
 	/* less = Dictionary_GetBool_WithDefault( dictionary, "StepFunctionLessThan", True ); */
 	left = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionLeftSide", 0.0 );
 	right = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionRightSide", 0.0 );
+	leftBegin = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionLeftBegin", 0.0 );
+	rightEnd = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionRightEnd", 0.0 );
 	grad = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionGradient", 0.0 );
 	useGrad = Dictionary_GetBool_WithDefault( dictionary, "StepFunctionUseGradient", False );
 
@@ -753,7 +756,10 @@ void StgFEM_StandardConditionFunctions_StepFunction( Node_LocalIndex node_lI, Va
 	 * have changed the step function such that it takes two different input values, one for each side
 	 * of the offset - dave, 24.05.07
 	 */
-	if( coord[dim] < offset ) {
+	if( coord[dim] < leftBegin || coord[dim] > rightEnd ) {
+		*result = 0.0;
+	}
+	else if( coord[dim] < offset ) {
 		if( useGrad )
 			*result = (offset - coord[dim])*grad;
 		else

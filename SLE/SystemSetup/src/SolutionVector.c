@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SolutionVector.c 833 2007-05-16 01:12:22Z LukeHodkinson $
+** $Id: SolutionVector.c 860 2007-06-07 05:47:20Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -276,7 +276,7 @@ void _SolutionVector_Build( void* solutionVector, void* data ) {
 
 	/* ensure variables are built */
 	if( self->feVariable )
-		Build( self->feVariable, 0, False );
+		Stg_Component_Build( self->feVariable, 0, False );
 
 	/* Allocate the vector */
 #ifdef HAVE_PETSC
@@ -298,7 +298,7 @@ void _SolutionVector_Initialise( void* solutionVector, void* data ) {
 	Stream_IndentBranch( StgFEM_Debug );
 	/* ensure variables are initialised */
 	if( self->feVariable ) {
-		Initialise( self->feVariable, 0, False );
+		Stg_Component_Initialise( self->feVariable, 0, False );
 	}
 		
 	Stream_UnIndentBranch( StgFEM_Debug );

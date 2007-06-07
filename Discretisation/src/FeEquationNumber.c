@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeEquationNumber.c 840 2007-05-21 05:48:30Z LukeHodkinson $
+** $Id: FeEquationNumber.c 860 2007-06-07 05:47:20Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -2460,6 +2460,34 @@ void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
 	Journal_Printf( stream, "... Completed in %g seconds.\n", endTime - startTime );
 	Stream_UnIndent( stream );
 }
+
+#if 0
+void FeEquationNumber_BuildVariableIndices( FeEquationNumber* self, int* nInds, int** inds, int* maxDofs ) {
+	int maxDofs;
+	ISet indSetObj, *indSet = &indSetObj;
+
+	*maxDofs = 0;
+	for( n_i = 0; n_i < nLocalNodes; n_i++ ) {
+		if( nNodalDofs[n_i] > *maxDofs )
+			*maxDofs = nNodalDofs[n_i];
+	}
+
+	ISet_Construct( indSet );
+	ISet_SetMaxSize( indSet, *maxDofs );
+	for( n_i = 0; n_i < nLocalNodes; n_i++ ) {
+		for( dof_i = 0; dof_i < nNodalDofs[n_i]; dof_i++ ) {
+			varInd = self->dofLayout->varIndices[n_i][dof_i];
+			ISet_TryInsert( indSet, varInd );
+		}
+	}
+
+	*nInds = ISet_GetSize( indSet );
+	*inds = MemArray( int, *nInds, FeEquationNumber_Type );
+	ISet_GetArray( indSet, NULL, inds );
+	ISet_Destruct( indSet );
+}
+#endif
+
 
 #if 0
 void FeEquationNumber_Invert( void* feEqNum, int equation, unsigned* node, unsigned* dof ) {

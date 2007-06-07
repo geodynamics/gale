@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Stokes_SLE_UzawaSolver.c 823 2007-04-30 01:33:45Z KathleenHumble $
+** $Id: Stokes_SLE_UzawaSolver.c 860 2007-06-07 05:47:20Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -231,7 +231,7 @@ void _Stokes_SLE_UzawaSolver_Build( void* solver, void* stokesSLE ) {
 	
 	/* Build Preconditioner */
 	if ( self->preconditioner ) {
-		Build( self->preconditioner, stokesSLE, False );
+		Stg_Component_Build( self->preconditioner, stokesSLE, False );
 		SystemLinearEquations_AddStiffnessMatrix( sle, self->preconditioner );
 
 		Journal_DPrintfL( self->debug, 2, "build a standard solver for the preconditioner system.\n" );

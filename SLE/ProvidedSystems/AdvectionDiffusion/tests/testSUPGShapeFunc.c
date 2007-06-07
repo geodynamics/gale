@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testSUPGShapeFunc.c 833 2007-05-16 01:12:22Z LukeHodkinson $
+** $Id: testSUPGShapeFunc.c 860 2007-06-07 05:47:20Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -127,8 +127,8 @@ FeMesh* buildFeMesh( unsigned nDims, unsigned* size,
 	Mesh_SetTopologyDataSize( feMesh, MT_VERTEX, sizeof(Node) );
 	Mesh_SetTopologyDataSize( feMesh, nDims, sizeof(Element) );
 
-	Build( feMesh, NULL, False );
-	Initialise( feMesh, NULL, False );
+	Stg_Component_Build( feMesh, NULL, False );
+	Stg_Component_Initialise( feMesh, NULL, False );
 
 	return feMesh;
 }
@@ -312,22 +312,22 @@ int main( int argc, char* argv[] ) {
 			context->fieldVariable_Register );
 			
 	/* Build and initialise system */
-	Build(dofs, 0, False);
-	Build( feVariable, 0, False );
+	Stg_Component_Build(dofs, 0, False);
+	Stg_Component_Build( feVariable, 0, False );
 	/* Build Swarm */
-	Build( singleCellLayout, 0, False );
-	Build( gaussParticleLayout, 0, False );
-	Build( gaussSwarm, 0, False );
-	Build( feMesh, 0, False );
+	Stg_Component_Build( singleCellLayout, 0, False );
+	Stg_Component_Build( gaussParticleLayout, 0, False );
+	Stg_Component_Build( gaussSwarm, 0, False );
+	Stg_Component_Build( feMesh, 0, False );
 	Variable_Register_BuildAll(variableRegister);
 	FeEquationNumber_BuildLocationMatrix( feVariable->eqNum );
 
-	Initialise( feMesh, 0, False );
-	Initialise( singleCellLayout, 0, False );
-	Initialise( gaussParticleLayout, 0, False );
-	Initialise( gaussSwarm, 0, False );
-	Initialise(dofs, 0, False);
-	Initialise( feVariable, 0, False );
+	Stg_Component_Initialise( feMesh, 0, False );
+	Stg_Component_Initialise( singleCellLayout, 0, False );
+	Stg_Component_Initialise( gaussParticleLayout, 0, False );
+	Stg_Component_Initialise( gaussSwarm, 0, False );
+	Stg_Component_Initialise(dofs, 0, False);
+	Stg_Component_Initialise( feVariable, 0, False );
 	Variable_Update( Variable_Register_GetByName( variableRegister, "vx" ) );
 	Variable_Update( Variable_Register_GetByName( variableRegister, "vy" ) );
 	
