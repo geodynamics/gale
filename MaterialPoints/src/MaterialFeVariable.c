@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: MaterialFeVariable.c 462 2007-05-16 01:13:21Z LukeHodkinson $
+** $Id: MaterialFeVariable.c 472 2007-06-07 05:47:49Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -193,7 +193,7 @@ void _MaterialFeVariable_Build( void* materialFeVariable, void* data ) {
 	Name tmpName;
 	Variable_Register* variable_Register = NULL;
 
-	Build( self->feMesh, data, False );
+	Stg_Component_Build( self->feMesh, data, False );
 
 	/* Create Dof Layout */
 	swarm = self->picIntegrationPoints;
