@@ -543,7 +543,7 @@ void MeshTopology_SetShadowDepth( void* _self, int depth ) {
    int *nBytes, *nRecvBytes;
    stgByte **bytes, **recvBytes;
    int nIncEls, *incEls;
-   int *nLowEls, **lowEls;
+   int **nLowEls, ***lowEls;
    int *nShdEls, **shdEls;
    int el, dom;
    int n_i, s_i, l_i, inc_i;
@@ -664,11 +664,16 @@ void MeshTopology_SetShadowDepth( void* _self, int depth ) {
 						     nbrGhosts[n_i][e_i] );
       }
    }
-   nLowEls = Class_Array( self, int, nNbrs );
-   lowEls = Class_Array( self, int*, nNbrs );
+   nLowEls = Class_Array( self, int*, self->nTDims );
+   lowEls = Class_Array( self, int**, self->nTDims );
    for( d_i = nDims - 1; d_i >= 0; d_i-- ) {
-     if( !self->nIncEls[nDims][d_i] )
+      if( !self->nIncEls[nDims][d_i] ) {
+	 nLowEls[d_i] = NULL;
+	 lowEls[d_i] = NULL;
 	 continue;
+      }
+      nLowEls[d_i] = Class_Array( self, int, nNbrs );
+      lowEls[d_i] = Class_Array( self, int*, nNbrs );
       ISet_SetMaxSize( mySet, Decomp_GetNumLocals( self->locals[d_i] ) );
       for( n_i = 0; n_i < nNbrs; n_i++ ) {
 	 for( e_i = 0; e_i < nNbrGhosts[n_i]; e_i++ ) {
@@ -681,19 +686,17 @@ void MeshTopology_SetShadowDepth( void* _self, int depth ) {
 	       ISet_TryInsert( mySet, el );
 	    }
 	 }
-	 nLowEls[n_i] = ISet_GetSize( mySet );
-	 lowEls[n_i] = Class_Array( self, int, nLowEls[n_i] );
-	 ISet_GetArray( mySet, lowEls[n_i] );
+	 nLowEls[d_i][n_i] = ISet_GetSize( mySet );
+	 lowEls[d_i][n_i] = Class_Array( self, int, nLowEls[d_i][n_i] );
+	 ISet_GetArray( mySet, lowEls[d_i][n_i] );
 	 ISet_Clear( mySet );
       }
 
-      Comm_AlltoallInit( self->comm, nLowEls, nShdEls, sizeof(int) );
+      Comm_AlltoallInit( self->comm, nLowEls[d_i], nShdEls, sizeof(int) );
       for( n_i = 0; n_i < nNbrs; n_i++ )
 	 shdEls[n_i] = Class_Array( self, int, nShdEls[n_i] );
-      Comm_AlltoallBegin( self->comm, (const void**)lowEls, (void**)shdEls );
+      Comm_AlltoallBegin( self->comm, (const void**)lowEls[d_i], (void**)shdEls );
       Comm_AlltoallEnd( self->comm );
-      for( n_i = 0; n_i < nNbrs; n_i++ )
-	 Class_Free( self, lowEls[n_i] );
 
       dom = 0;
       for( n_i = 0; n_i < nNbrs; n_i++ )
@@ -718,44 +721,60 @@ void MeshTopology_SetShadowDepth( void* _self, int depth ) {
       Class_Free( self, shdEls[0] );
    }
    ISet_Destruct( mySet );
-   Class_Free( self, lowEls );
-   Class_Free( self, nLowEls );
    Class_Free( self, shdEls );
    Class_Free( self, nShdEls );
 
    /* Transfer shadowed incidence. */
    nBytes = Class_Array( self, int, nNbrs );
    bytes = Class_Array( self, stgByte*, nNbrs );
-   for( n_i = 0; n_i < nNbrs; n_i++ ) {
-      MeshTopology_PickleIncidenceInit( self, self->nDims, 
-					nNbrGhosts[n_i], nbrGhosts[n_i], 
-					nBytes + n_i );
-      bytes[n_i] = Class_Array( self, stgByte, nBytes[n_i] );
-      MeshTopology_PickleIncidence( self, self->nDims, 
-				    nNbrGhosts[n_i], nbrGhosts[n_i], 
-				    bytes[n_i] );
-      Class_Free( self, nbrGhosts[n_i] );
-   }
-   Class_Free( self, nbrGhosts );
-   Class_Free( self, nNbrGhosts );
-
    nRecvBytes = Class_Array( self, int, nNbrs );
    recvBytes = Class_Array( self, stgByte*, nNbrs );
-   Comm_AlltoallInit( self->comm, nBytes, nRecvBytes, sizeof(stgByte) );
-   for( n_i = 0; n_i < nNbrs; n_i++ )
-      recvBytes[n_i] = Class_Array( self, stgByte, nRecvBytes[n_i] );
-   Comm_AlltoallBegin( self->comm, (const void**)bytes, (void**)recvBytes );
-   Comm_AlltoallEnd( self->comm );
-   for( n_i = 0; n_i < nNbrs; n_i++ )
-      Class_Free( self, bytes[n_i] );
+   nLowEls[nDims] = nNbrGhosts;
+   lowEls[nDims] = nbrGhosts;
+   for( d_i = 0; d_i < nDims; d_i++ ) {
+      if( !nLowEls[d_i] ) continue;
+      for( n_i = 0; n_i < nNbrs; n_i++ ) {
+	 for( e_i = 0; e_i < nLowEls[d_i][n_i]; e_i++ ) {
+	    lowEls[d_i][n_i][e_i] = Decomp_GlobalToLocal( self->locals[d_i], 
+							  lowEls[d_i][n_i][e_i] );
+	 }
+      }
+   }
+   for( d_i = nDims; d_i > 0; d_i-- ) {
+      if( !nLowEls[d_i] )
+	 continue;
+
+      for( n_i = 0; n_i < nNbrs; n_i++ ) {
+	 MeshTopology_PickleIncidenceInit( self, d_i, 
+					   nLowEls[d_i][n_i], lowEls[d_i][n_i], 
+					   nBytes + n_i );
+	 bytes[n_i] = Class_Array( self, stgByte, nBytes[n_i] );
+	 MeshTopology_PickleIncidence( self, d_i, 
+				       nLowEls[d_i][n_i], lowEls[d_i][n_i], 
+				       bytes[n_i] );
+	 Class_Free( self, lowEls[d_i][n_i] );
+      }
+      Class_Free( self, nLowEls[d_i] );
+      Class_Free( self, lowEls[d_i] );
+
+      Comm_AlltoallInit( self->comm, nBytes, nRecvBytes, sizeof(stgByte) );
+      for( n_i = 0; n_i < nNbrs; n_i++ )
+	 recvBytes[n_i] = Class_Array( self, stgByte, nRecvBytes[n_i] );
+      Comm_AlltoallBegin( self->comm, (const void**)bytes, (void**)recvBytes );
+      Comm_AlltoallEnd( self->comm );
+      for( n_i = 0; n_i < nNbrs; n_i++ )
+	 Class_Free( self, bytes[n_i] );
+
+      for( n_i = 0; n_i < nNbrs; n_i++ ) {
+	 MeshTopology_UnpickleIncidence( self, d_i, 
+					 nRecvBytes[n_i], recvBytes[n_i] );
+	 Class_Free( self, recvBytes[n_i] );
+      }
+   }
    Class_Free( self, nBytes );
    Class_Free( self, bytes );
-
-   for( n_i = 0; n_i < nNbrs; n_i++ ) {
-      MeshTopology_UnpickleIncidence( self, self->nDims, 
-				      nRecvBytes[n_i], recvBytes[n_i] );
-      Class_Free( self, recvBytes[n_i] );
-   }
+   Class_Free( self, lowEls );
+   Class_Free( self, nLowEls );
    Class_Free( self, recvBytes );
    Class_Free( self, nRecvBytes );
 }
