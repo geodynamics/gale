@@ -369,7 +369,7 @@ void _MaterialPointsSwarm_UpdateHook( void* timeIntegrator, void* swarm ) {
 			materialPoint = (MaterialPoint*)Swarm_ParticleAt( self, point_I );
 			cell = materialPoint->owningCell;
 			Journal_Firewall(
-					 cell < FeMesh_GetElementLocalSize( mesh ), 
+					 cell < FeMesh_GetElementDomainSize( mesh ), 
 				Journal_MyStream( Error_Type, self ),
 				"In func %s: MaterialPoint '%d' outside element. Coord = {%g, %g, %g}\n",
 				__func__,
