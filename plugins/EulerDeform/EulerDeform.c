@@ -141,8 +141,6 @@ void _Underworld_EulerDeform_Construct( void* component, Stg_ComponentFactory* c
 			sys->mesh = Stg_ComponentFactory_ConstructByName( cf, meshName, Mesh, True, data );
 			sys->velField = Stg_ComponentFactory_ConstructByName( cf, velFieldName, FieldVariable, True, data );
 
-			sys->staticSides = Dictionary_GetBool_WithDefault( sysDict, "staticSides", False );
-
 			/* Read the list of variables to interpolate. */
 			varLst = Dictionary_Entry_Value_GetMember( Dictionary_Entry_Value_GetElement( sysLst, sys_i ), "fields" );
 			if( varLst ) {
@@ -309,76 +307,18 @@ Variable* EulerDeform_RegisterLocalNodeCoordsAsVariables( EulerDeform_System* sy
 void EulerDeform_IntegrationSetup( void* _timeIntegrator, void* context ) {
 	TimeIntegrator*		timeIntegrator = (TimeIntegrator*)_timeIntegrator;
 	EulerDeform_Context*	edCtx = (EulerDeform_Context*)context;
-	unsigned		sys_i;
-
-	FeVariable_SyncShadowValues( edCtx->systems[0].velField );
-
-	/* 
-	** We'll need to store side values that we require to be static here, for later
-	** return to the mesh.
-	*/
+	unsigned		sys_i, sys_j;
 
 	for( sys_i = 0; sys_i < edCtx->nSystems; sys_i++ ) {
-		EulerDeform_System*	sys = edCtx->systems + sys_i;
-
-		if( sys->staticSides ) {
-			IndexSet	*tmpIndSet;
-			RangeSet	*sideSet, *tmpSet;
-			unsigned	nInds, *inds;
-			unsigned	nDims;
-			unsigned	ind_i;
-
-			/* Collect indices of all sides except top surface. */
-			sideSet = RangeSet_New();
-			tmpSet = RangeSet_New();
-
-			tmpIndSet = RegularMeshUtils_CreateGlobalLeftSet( sys->mesh );
-			IndexSet_GetMembers( tmpIndSet, &nInds, &inds );
-			RangeSet_SetIndices( sideSet, nInds, inds );
-			FreeArray( inds );
-			FreeObject( tmpIndSet );
-
-			tmpIndSet = RegularMeshUtils_CreateGlobalRightSet( sys->mesh );
-			IndexSet_GetMembers( tmpIndSet, &nInds, &inds );
-			RangeSet_SetIndices( tmpSet, nInds, inds );
-			RangeSet_Union( sideSet, tmpSet );
-			FreeArray( inds );
-			FreeObject( tmpIndSet );
-
-			tmpIndSet = RegularMeshUtils_CreateGlobalBottomSet( sys->mesh );
-			IndexSet_GetMembers( tmpIndSet, &nInds, &inds );
-			RangeSet_SetIndices( tmpSet, nInds, inds );
-			RangeSet_Union( sideSet, tmpSet );
-			FreeArray( inds );
-			FreeObject( tmpIndSet );
-
-			if( sys->mesh->topo->nDims == 3 ) {
-				tmpIndSet = RegularMeshUtils_CreateGlobalBottomSet( sys->mesh );
-				IndexSet_GetMembers( tmpIndSet, &nInds, &inds );
-				RangeSet_SetIndices( tmpSet, nInds, inds );
-				RangeSet_Union( sideSet, tmpSet );
-				FreeArray( inds );
-				FreeObject( tmpIndSet );
-
-				tmpIndSet = RegularMeshUtils_CreateGlobalBottomSet( sys->mesh );
-				IndexSet_GetMembers( tmpIndSet, &nInds, &inds );
-				RangeSet_SetIndices( tmpSet, nInds, inds );
-				RangeSet_Union( sideSet, tmpSet );
-				FreeArray( inds );
-				FreeObject( tmpIndSet );
-			}
-
-			RangeSet_GetIndices( sideSet, &nInds, &inds );
-			FreeObject( sideSet );
-			FreeObject( tmpSet );
-
-			/* Copy coords to temporary array. */
-			nDims = Mesh_GetDimSize( sys->mesh );
-			sys->sideCoords = AllocArray2D( double, nInds, nDims );
-			for( ind_i = 0; ind_i < nInds; ind_i++ )
-				memcpy( sys->sideCoords[ind_i], sys->mesh->verts[inds[ind_i]], nDims * sizeof(double) );
+		for( sys_j = 0; sys_j < sys_i; sys_j++ ) {
+			if( edCtx->systems[sys_i].velField == edCtx->systems[sys_j].velField )
+				break;
 		}
+		if( sys_j < sys_i )
+			continue;
+		FeVariable_SyncShadowValues( edCtx->systems[sys_i].velField );
 	}
+
 
 	/* Update advection arrays. */
 	for( sys_i = 0; sys_i < edCtx->nSystems; sys_i++ ) {
@@ -428,109 +368,42 @@ void EulerDeform_Remesh( TimeIntegratee* crdAdvector, EulerDeform_Context* edCtx
 
 	for( sys_i = 0; sys_i < edCtx->nSystems; sys_i++ ) {
 		EulerDeform_System*	sys = edCtx->systems + sys_i;
-		double**		oldCrds;
-		double**		newCrds;
-		unsigned		nDomainNodes;
+		double*			oldCrds;
+		unsigned		nLocals;
 		unsigned		nDims;
 		unsigned		var_i, n_i;
 
 		nDims = Mesh_GetDimSize( sys->mesh );
 
 		/* Update all local coordinates. */
-		for( n_i = 0; n_i < Mesh_GetLocalSize( sys->mesh, MT_VERTEX ); n_i++ )
+		nLocals = Mesh_GetLocalSize( sys->mesh, MT_VERTEX );
+		for( n_i = 0; n_i < nLocals; n_i++ )
 			memcpy( sys->mesh->verts[n_i], sys->verts + n_i * nDims, nDims * sizeof(double) );
 
-		/* Revert side coordinates if required. */
-		if( sys->staticSides ) {
-			IndexSet	*tmpIndSet;
-			RangeSet	*sideSet, *tmpSet;
-			unsigned	nInds, *inds;
-			unsigned	ind_i;
-
-			/* Collect indices of all sides except top surface. */
-			sideSet = RangeSet_New();
-			tmpSet = RangeSet_New();
-
-			tmpIndSet = RegularMeshUtils_CreateGlobalLeftSet( sys->mesh );
-			IndexSet_GetMembers( tmpIndSet, &nInds, &inds );
-			RangeSet_SetIndices( sideSet, nInds, inds );
-			FreeArray( inds );
-			FreeObject( tmpIndSet );
-
-			tmpIndSet = RegularMeshUtils_CreateGlobalRightSet( sys->mesh );
-			IndexSet_GetMembers( tmpIndSet, &nInds, &inds );
-			RangeSet_SetIndices( tmpSet, nInds, inds );
-			RangeSet_Union( sideSet, tmpSet );
-			FreeArray( inds );
-			FreeObject( tmpIndSet );
-
-			tmpIndSet = RegularMeshUtils_CreateGlobalBottomSet( sys->mesh );
-			IndexSet_GetMembers( tmpIndSet, &nInds, &inds );
-			RangeSet_SetIndices( tmpSet, nInds, inds );
-			RangeSet_Union( sideSet, tmpSet );
-			FreeArray( inds );
-			FreeObject( tmpIndSet );
-
-			if( sys->mesh->topo->nDims == 3 ) {
-				tmpIndSet = RegularMeshUtils_CreateGlobalBottomSet( sys->mesh );
-				IndexSet_GetMembers( tmpIndSet, &nInds, &inds );
-				RangeSet_SetIndices( tmpSet, nInds, inds );
-				RangeSet_Union( sideSet, tmpSet );
-				FreeArray( inds );
-				FreeObject( tmpIndSet );
-
-				tmpIndSet = RegularMeshUtils_CreateGlobalBottomSet( sys->mesh );
-				IndexSet_GetMembers( tmpIndSet, &nInds, &inds );
-				RangeSet_SetIndices( tmpSet, nInds, inds );
-				RangeSet_Union( sideSet, tmpSet );
-				FreeArray( inds );
-				FreeObject( tmpIndSet );
+		/* Only if remesher specified. */
+		if( sys->remesher ) {
+			/* Store old coordinates. */
+			oldCrds = MemArray( double, nLocals * nDims, "EulerDeform" );
+			for( n_i = 0; n_i < nLocals; n_i++ ) {
+				memcpy( oldCrds + n_i * nDims, 
+					sys->verts + n_i * nDims, 
+					nDims * sizeof(double) );
 			}
 
-			RangeSet_GetIndices( sideSet, &nInds, &inds );
-			FreeObject( sideSet );
-			FreeObject( tmpSet );
+			/* Remesh the system. */
+			Mesh_Sync( sys->mesh );
+			Mesh_DeformationUpdate( sys->mesh );
+			Stg_Component_Execute( sys->remesher, NULL, True );
 
-			/* Copy back coords. */
-			for( ind_i = 0; ind_i < nInds; ind_i++ )
-				memcpy( sys->mesh->verts[inds[ind_i]], sys->sideCoords[ind_i], nDims * sizeof(double) );
-			FreeArray( sys->sideCoords );
+#if 0
+			/* Interpolate the variables. */
+			for( var_i = 0; var_i < sys->nFields; var_i++ )
+				EulerDeform_InterpVar( sys->fields[var_i], sys->vars[var_i], sys->mesh, sys->verts );
+#endif
+
+			/* Free old coordinates. */
+			MemFree( oldCrds );
 		}
-
-		/* Every system should synchronise the mesh coordinates. */
-		Mesh_Sync( sys->mesh );
-		Mesh_DeformationUpdate( sys->mesh );
-
-		/* Only if remesher specified. */
-		if( !sys->remesher ) {
-			continue;
-		}
-
-		/* Store old coordinates. */
-		nDomainNodes = FeMesh_GetNodeDomainSize( sys->mesh );
-		oldCrds = AllocArray2D( double, nDomainNodes, nDims );
-		for( n_i = 0; n_i < nDomainNodes; n_i++ )
-			memcpy( oldCrds[n_i], sys->mesh->verts[n_i], nDims * sizeof(double) );
-
-		/* Remesh the system. */
-		Stg_Component_Execute( sys->remesher, NULL, True );
-		Mesh_Sync( sys->mesh );
-
-		/* Shrink wrap the top/bottom surface. */
-		if( sys->wrapTop )
-			EulerDeform_WrapTopSurface( sys, oldCrds );
-
-		/* Swap old coordinates back in temporarily. */
-		newCrds = sys->mesh->verts;
-		sys->mesh->verts = oldCrds;
-
-		/* Interpolate the variables. */
-		for( var_i = 0; var_i < sys->nFields; var_i++ )
-			EulerDeform_InterpVar( sys->fields[var_i], sys->vars[var_i], sys->mesh, newCrds );
-
-		/* Swap back coordinates and free memory. */
-		sys->mesh->verts = newCrds;
-		FreeArray( oldCrds );
 
 		/* Re-sync with new coordinates. */
 		Mesh_Sync( sys->mesh );
