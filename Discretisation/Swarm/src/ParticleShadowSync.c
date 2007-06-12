@@ -251,7 +251,7 @@ void _ParticleShadowSync_FinishReceiveOfIncomingParticleCounts( ParticleCommHand
 			Index shadowCell = 0;
 
 			shadowCell = cellShadowInfo->procShadowTbl[nbr_I][i];
-			self->swarm->shadowCellParticleCountTbl[shadowCell] = 0;
+			self->swarm->shadowCellParticleCountTbl[shadowCell-self->swarm->cellLocalCount] = 0;
 
 			self->swarm->shadowCellParticleTbl[shadowCell] = Memory_Realloc_Array( self->swarm->shadowCellParticleTbl[shadowCell], Particle_Index,
 																	(self->particlesArrivingFromNbrShadowCellCounts[nbr_I][i]) );

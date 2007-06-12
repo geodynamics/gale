@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SwarmClass.c 4139 2007-06-12 02:39:52Z LukeHodkinson $
+** $Id: SwarmClass.c 4140 2007-06-12 06:11:08Z RaquibulHassan $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -1103,7 +1103,7 @@ void Swarm_AddShadowParticleToShadowCell( void* swarm, Cell_DomainIndex dCell_I,
 	Swarm* 			self = (Swarm*)swarm;
 	
 	if( self->shadowTablesBuilt ){
-		Particle_InCellIndex*	newCountPtr = &self->shadowCellParticleCountTbl[dCell_I];
+		Particle_InCellIndex*	newCountPtr = &self->shadowCellParticleCountTbl[dCell_I-self->cellLocalCount];
 		#ifdef CAUTIOUS
 		Stream*                 errorStream = Journal_Register( Error_Type, self->type );
 		#endif
