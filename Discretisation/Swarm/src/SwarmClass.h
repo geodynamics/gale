@@ -40,7 +40,7 @@
 **	to appropriate processor immediately.)
 **	Communication is more efficient when shadow depth is equal to at least 1
 **
-** $Id: SwarmClass.h 4119 2007-05-22 07:35:46Z RaquibulHassan $
+** $Id: SwarmClass.h 4139 2007-06-12 02:39:52Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -119,6 +119,8 @@
 		/** Particle Communication handler */ \
 		\
 		Stg_ObjectList					*commHandlerList; \
+		int				nSwarmVars; \
+		SwarmVariable			**swarmVars; \
 		\
 		Index                           swarmReg_I; /**< Own index inside the Swarm_Register */
 
@@ -318,5 +320,6 @@
 	void Swarm_GetCheckpointFilenameForGivenTimestep( Swarm* self, AbstractContext* context, char* swarmSaveFileName );
 
 	Bool Swarm_AddCommHandler( Swarm *self, void *commHandler );
+	void Swarm_AddVariable( Swarm* self, SwarmVariable* swarmVar );
 
 #endif /* __Discretisation_Swarm_SwarmClass_h__ */

@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SwarmVariable.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: SwarmVariable.c 4139 2007-06-12 02:39:52Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -113,6 +113,8 @@ void _SwarmVariable_Init( SwarmVariable* self, Swarm* swarm, Variable* variable,
 	self->swarmVariable_Register = swarm->swarmVariable_Register;
 	self->dim                    = swarm->dim;
 	
+	if( swarm )
+		Swarm_AddVariable( swarm, self );
 	if ( self->swarmVariable_Register != NULL )	
 		SwarmVariable_Register_Add( self->swarmVariable_Register, self );
 }

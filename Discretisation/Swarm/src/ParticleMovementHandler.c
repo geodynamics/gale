@@ -675,6 +675,7 @@ Particle_Index ParticleMovementHandler_FindFreeSlotAndPrepareForInsertion( Parti
 			"particles\n-> slot to insert into is end of array %d\n", 
 			self->swarm->particleLocalCount );
 		lParticle_I = self->swarm->particleLocalCount;
+		/*
 		if ( self->swarm->particleLocalCount == self->swarm->particlesArraySize ) {
 			Journal_DPrintfL( self->debug, 3, "Particles array memory used up "
 				"-> increasing from %d entries by %d\n",
@@ -685,7 +686,9 @@ Particle_Index ParticleMovementHandler_FindFreeSlotAndPrepareForInsertion( Parti
 				self->swarm->particleExtensionMgr->finalSize,
 				self->swarm->particlesArraySize );
 		}
+		*/
 		self->swarm->particleLocalCount++;
+		Swarm_Realloc( self->swarm );
 	}
 
 	return lParticle_I;
@@ -850,10 +853,13 @@ void ParticleMovementHandler_FillRemainingHolesInLocalParticlesArray( ParticleCo
 	if ( self->swarm->particlesArraySize < prevParticlesArraySize ) {
 		Journal_DPrintfL( self->debug, 2, "Reducing particles array entries from %d to %d\n",
 			prevParticlesArraySize, self->swarm->particlesArraySize );
+		Swarm_Realloc( self->swarm );
+		/*
 		self->swarm->particles = Memory_Realloc_Array_Bytes(
 			self->swarm->particles,
 			self->swarm->particleExtensionMgr->finalSize,
 			self->swarm->particlesArraySize );
+		*/
 	}	
 
 	Stream_UnIndentBranch( Swarm_Debug );

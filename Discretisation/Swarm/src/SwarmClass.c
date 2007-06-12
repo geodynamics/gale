@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SwarmClass.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
+** $Id: SwarmClass.c 4139 2007-06-12 02:39:52Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -156,6 +156,8 @@ Swarm* _Swarm_New(
 
 	self->particleSize = particleSize;
 	self->commHandlerList = Stg_ObjectList_New();
+	self->nSwarmVars = 0;
+	self->swarmVars = NULL;
 	
 	/* Swarm info */
 	if( initFlag )
@@ -274,6 +276,8 @@ void _Swarm_Delete( void* swarm ) {
 	
 	Stg_ObjectList_DeleteAllObjects( self->commHandlerList );
 	Stg_Class_Delete( self->commHandlerList );
+
+	FreeArray( self->swarmVars );
 
 	Memory_Free( self->cellPointTbl );
 	Memory_Free( self->cellPointCountTbl );
@@ -1457,6 +1461,7 @@ void Swarm_Realloc( void* swarm ) {
 	Swarm*         self               = (Swarm*) swarm;
 	Particle_Index particleLocalCount = self->particleLocalCount;
 	Particle_Index delta              = self->particlesArrayDelta;
+	int v_i;
 
 	if ( particleLocalCount <= self->particlesArraySize - delta ) {
 		/* Decrease size of array if necessary */
@@ -1476,6 +1481,14 @@ void Swarm_Realloc( void* swarm ) {
 			self->particles,
 			self->particleExtensionMgr->finalSize,
 			self->particlesArraySize );
+
+	/*
+	** FUCK: NEED TO UPDATE THINGS IF ARRAYS ARE REALLOC'D
+	*/
+	for( v_i = 0; v_i < self->nSwarmVars; v_i++ ) {
+		if( self->swarmVars[v_i]->variable )
+			Variable_Update( self->swarmVars[v_i]->variable );
+	}
 
 
 #ifdef DEBUG
@@ -1600,3 +1613,12 @@ Bool Swarm_AddCommHandler( Swarm *self, void *commHandler )
 	}
 }
 
+void Swarm_AddVariable( Swarm* self, SwarmVariable* swarmVar ) {
+	assert( self );
+	assert( swarmVar );
+
+	self->swarmVars = MemRearray( self->swarmVars, SwarmVariable*, self->nSwarmVars + 1, 
+				      SwarmClass_Type );
+	self->swarmVars[self->nSwarmVars] = swarmVar;
+	self->nSwarmVars++;
+}
