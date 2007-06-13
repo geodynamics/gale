@@ -315,9 +315,9 @@ void CartesianGenerator_SetDimSize( void* meshGenerator, unsigned nDims ) {
 
 	_MeshGenerator_SetDimSize( self, nDims );
 
-	self->minDecomp = AllocArray( unsigned, self->nDims );
+	self->minDecomp = MemRearray( self->minDecomp, unsigned, self->nDims, CartesianGenerator_Type );
 	memset( self->minDecomp, 0, nDims * sizeof(unsigned) );
-	self->maxDecomp = AllocArray( unsigned, self->nDims );
+	self->maxDecomp = MemRearray( self->maxDecomp, unsigned, self->nDims, CartesianGenerator_Type );
 	memset( self->maxDecomp, 0, nDims * sizeof(unsigned) );
 }
 
@@ -593,7 +593,6 @@ void _CartesianGenerator_GenEdges( void* meshGenerator, MeshTopology* topo, Grid
 }
 
 void _CartesianGenerator_GenFaces( void* meshGenerator, MeshTopology* topo, Grid*** grids ) {
-  /*
 	CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
 	Stream*			stream = Journal_Register( Info_Type, self->type );
 	Grid*			globalGrid;
@@ -605,7 +604,7 @@ void _CartesianGenerator_GenFaces( void* meshGenerator, MeshTopology* topo, Grid
 	unsigned		d_i, e_i;
 
 	assert( self && Stg_CheckType( self, CartesianGenerator ) );
-	assert( topo && Stg_CheckType( topo, MeshTopology ) );
+	assert( topo );
 	assert( grids );
 	assert( self->elGrid->nDims == 3 );
 
@@ -694,7 +693,6 @@ void _CartesianGenerator_GenFaces( void* meshGenerator, MeshTopology* topo, Grid
 	MPI_Barrier( self->mpiComm );
 	Journal_Printf( stream, "... done.\n" );
 	Stream_UnIndent( stream );
-  */
 }
 
 void _CartesianGenerator_GenElementVertexInc( void* meshGenerator, MeshTopology* topo, Grid*** grids ) {
@@ -774,182 +772,174 @@ void _CartesianGenerator_GenElementVertexInc( void* meshGenerator, MeshTopology*
 }
 
 void _CartesianGenerator_GenVolumeEdgeInc( void* meshGenerator, MeshTopology* topo, Grid*** grids ) {
-/*
 	CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
 	Stream*			stream = Journal_Register( Info_Type, self->type );
-	unsigned*		nIncEls;
-	unsigned**		incEls;
+	unsigned		nIncEls;
+	unsigned*		incEls;
 	unsigned*		dimInds;
 	unsigned		e_i;
 
 	assert( self && Stg_CheckType( self, CartesianGenerator ) );
-	assert( topo && Stg_CheckType( topo, MeshTopology ) );
+	assert( topo );
 	assert( grids );
 	assert( topo->nDims >= 3 );
 
 	Journal_Printf( stream, "Generating volume-edge incidence...\n" );
 	Stream_Indent( stream );
 
-	nIncEls = Memory_Alloc_Array_Unnamed( unsigned, topo->domains[topo->nDims]->nDomains );
-	incEls = Memory_Alloc_2DArray_Unnamed( unsigned, topo->domains[topo->nDims]->nDomains, 12 );
+	incEls = Memory_Alloc_Array_Unnamed( unsigned, 12 );
 	dimInds = Memory_Alloc_Array_Unnamed( unsigned, topo->nDims );
-	for( e_i = 0; e_i < topo->domains[MT_VOLUME]->nDomains; e_i++ ) {
-		unsigned	gInd = Sync_DomainToGlobal( topo->domains[MT_VOLUME], e_i );
+	for( e_i = 0; e_i < topo->remotes[3]->nDomains; e_i++ ) {
+		unsigned	gInd = Sync_DomainToGlobal( topo->remotes[3], e_i );
 
-		nIncEls[e_i] = 12;
+		nIncEls = 12;
 		Grid_Lift( grids[topo->nDims][0], gInd, dimInds );
 
-		incEls[e_i][0] = Grid_Project( grids[1][0], dimInds );
+		incEls[0] = Grid_Project( grids[1][0], dimInds );
 
 		dimInds[1]++;
-		incEls[e_i][1] = Grid_Project( grids[1][0], dimInds );
+		incEls[1] = Grid_Project( grids[1][0], dimInds );
 		dimInds[1]--;
 
-		incEls[e_i][2] = Grid_Project( grids[1][1], dimInds ) + grids[1][0]->nPoints;
+		incEls[2] = Grid_Project( grids[1][1], dimInds ) + grids[1][0]->nPoints;
 
 		dimInds[0]++;
-		incEls[e_i][3] = Grid_Project( grids[1][1], dimInds ) + grids[1][0]->nPoints;
+		incEls[3] = Grid_Project( grids[1][1], dimInds ) + grids[1][0]->nPoints;
 		dimInds[0]--;
 
 		dimInds[2]++;
-		incEls[e_i][4] = Grid_Project( grids[1][0], dimInds );
+		incEls[4] = Grid_Project( grids[1][0], dimInds );
 
 		dimInds[1]++;
-		incEls[e_i][5] = Grid_Project( grids[1][0], dimInds );
+		incEls[5] = Grid_Project( grids[1][0], dimInds );
 		dimInds[1]--;
 
-		incEls[e_i][6] = Grid_Project( grids[1][1], dimInds ) + grids[1][0]->nPoints;
+		incEls[6] = Grid_Project( grids[1][1], dimInds ) + grids[1][0]->nPoints;
 
 		dimInds[0]++;
-		incEls[e_i][7] = Grid_Project( grids[1][1], dimInds ) + grids[1][0]->nPoints;
+		incEls[7] = Grid_Project( grids[1][1], dimInds ) + grids[1][0]->nPoints;
 		dimInds[0]--;
 		dimInds[2]--;
 
-		incEls[e_i][8] = Grid_Project( grids[1][2], dimInds ) + grids[1][0]->nPoints + grids[1][1]->nPoints;
+		incEls[8] = Grid_Project( grids[1][2], dimInds ) + grids[1][0]->nPoints + grids[1][1]->nPoints;
 
 		dimInds[0]++;
-		incEls[e_i][9] = Grid_Project( grids[1][2], dimInds ) + grids[1][0]->nPoints + grids[1][1]->nPoints;
+		incEls[9] = Grid_Project( grids[1][2], dimInds ) + grids[1][0]->nPoints + grids[1][1]->nPoints;
 		dimInds[0]--;
 
 		dimInds[1]++;
-		incEls[e_i][10] = Grid_Project( grids[1][2], dimInds ) + grids[1][0]->nPoints + grids[1][1]->nPoints;
+		incEls[10] = Grid_Project( grids[1][2], dimInds ) + grids[1][0]->nPoints + grids[1][1]->nPoints;
 
 		dimInds[0]++;
-		incEls[e_i][11] = Grid_Project( grids[1][2], dimInds ) + grids[1][0]->nPoints + grids[1][1]->nPoints;
+		incEls[11] = Grid_Project( grids[1][2], dimInds ) + grids[1][0]->nPoints + grids[1][1]->nPoints;
 		dimInds[0]--;
 		dimInds[1]--;
+
+		CartesianGenerator_MapToDomain( self, (Sync*)MeshTopology_GetDomain( topo, 1 ), 
+						nIncEls, incEls );
+		MeshTopology_SetIncidence( topo, topo->nDims, e_i, 1, nIncEls, incEls );
 	}
 
-	CartesianGenerator_MapToDomain( self, topo->domains[MT_EDGE], topo->domains[MT_VOLUME]->nDomains, 
-					nIncEls, incEls );
-	MeshTopology_SetIncidence( topo, MT_VOLUME, MT_EDGE, nIncEls, incEls );
-	FreeArray( nIncEls );
 	FreeArray( incEls );
 	FreeArray( dimInds );
 
 	MPI_Barrier( self->mpiComm );
 	Journal_Printf( stream, "... done.\n" );
 	Stream_UnIndent( stream );
-*/
 }
 
 void _CartesianGenerator_GenVolumeFaceInc( void* meshGenerator, MeshTopology* topo, Grid*** grids ) {
-/*
 	CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
 	Stream*			stream = Journal_Register( Info_Type, self->type );
-	unsigned*		nIncEls;
-	unsigned**		incEls;
+	unsigned		nIncEls;
+	unsigned*		incEls;
 	unsigned*		dimInds;
 	unsigned		e_i;
 
 	assert( self && Stg_CheckType( self, CartesianGenerator ) );
-	assert( topo && Stg_CheckType( topo, MeshTopology ) );
+	assert( topo );
 	assert( grids );
 	assert( topo->nDims >= 3 );
 
 	Journal_Printf( stream, "Generating volume-face incidence...\n" );
 	Stream_Indent( stream );
 
-	nIncEls = Memory_Alloc_Array_Unnamed( unsigned, topo->domains[topo->nDims]->nDomains );
-	incEls = Memory_Alloc_2DArray_Unnamed( unsigned, topo->domains[topo->nDims]->nDomains, 6 );
+	incEls = Memory_Alloc_Array_Unnamed( unsigned, 6 );
 	dimInds = Memory_Alloc_Array_Unnamed( unsigned, topo->nDims );
-	for( e_i = 0; e_i < topo->domains[MT_VOLUME]->nDomains; e_i++ ) {
-		unsigned	gInd = Sync_DomainToGlobal( topo->domains[MT_VOLUME], e_i );
+	for( e_i = 0; e_i < topo->remotes[MT_VOLUME]->nDomains; e_i++ ) {
+		unsigned	gInd = Sync_DomainToGlobal( topo->remotes[MT_VOLUME], e_i );
 
-		nIncEls[e_i] = 6;
+		nIncEls = 6;
 		Grid_Lift( grids[topo->nDims][0], gInd, dimInds );
 
-		incEls[e_i][0] = Grid_Project( grids[2][0], dimInds );
+		incEls[0] = Grid_Project( grids[2][0], dimInds );
 
 		dimInds[2]++;
-		incEls[e_i][1] = Grid_Project( grids[2][0], dimInds );
+		incEls[1] = Grid_Project( grids[2][0], dimInds );
 		dimInds[2]--;
 
-		incEls[e_i][2] = Grid_Project( grids[2][1], dimInds ) + grids[2][0]->nPoints;
+		incEls[2] = Grid_Project( grids[2][1], dimInds ) + grids[2][0]->nPoints;
 
 		dimInds[1]++;
-		incEls[e_i][3] = Grid_Project( grids[2][1], dimInds ) + grids[2][0]->nPoints;
+		incEls[3] = Grid_Project( grids[2][1], dimInds ) + grids[2][0]->nPoints;
 		dimInds[1]--;
 
-		incEls[e_i][4] = Grid_Project( grids[2][2], dimInds ) + grids[2][0]->nPoints + grids[2][1]->nPoints;
+		incEls[4] = Grid_Project( grids[2][2], dimInds ) + grids[2][0]->nPoints + grids[2][1]->nPoints;
 
 		dimInds[0]++;
-		incEls[e_i][5] = Grid_Project( grids[2][2], dimInds ) + grids[2][0]->nPoints + grids[2][1]->nPoints;
+		incEls[5] = Grid_Project( grids[2][2], dimInds ) + grids[2][0]->nPoints + grids[2][1]->nPoints;
 		dimInds[0]--;
+
+		CartesianGenerator_MapToDomain( self, (Sync*)MeshTopology_GetDomain( topo, 2 ), 
+						nIncEls, incEls );
+		MeshTopology_SetIncidence( topo, topo->nDims, e_i, 2, nIncEls, incEls );
 	}
 
-	CartesianGenerator_MapToDomain( self, topo->domains[MT_FACE], topo->domains[MT_VOLUME]->nDomains, 
-					nIncEls, incEls );
-	MeshTopology_SetIncidence( topo, MT_VOLUME, MT_FACE, nIncEls, incEls );
-	FreeArray( nIncEls );
 	FreeArray( incEls );
 	FreeArray( dimInds );
 
 	MPI_Barrier( self->mpiComm );
 	Journal_Printf( stream, "... done.\n" );
 	Stream_UnIndent( stream );
-*/
 }
 
 void _CartesianGenerator_GenFaceVertexInc( void* meshGenerator, MeshTopology* topo, Grid*** grids ) {
-/*
 	CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
 	Stream*			stream = Journal_Register( Info_Type, self->type );
-	unsigned*		nIncEls;
-	unsigned**		incEls;
+	unsigned		nIncEls;
+	unsigned*		incEls;
 	unsigned*		dimInds;
 	unsigned		e_i;
 
 	assert( self && Stg_CheckType( self, CartesianGenerator ) );
-	assert( topo && Stg_CheckType( topo, MeshTopology ) );
+	assert( topo );
 	assert( grids );
 	assert( topo->nDims >= 2 );
 
 	Journal_Printf( stream, "Generating face-vertex incidence...\n" );
 	Stream_Indent( stream );
 
-	nIncEls = Memory_Alloc_Array_Unnamed( unsigned, topo->domains[MT_FACE]->nDomains );
-	incEls = Memory_Alloc_2DArray_Unnamed( unsigned, topo->domains[MT_FACE]->nDomains, 4 );
+	incEls = Memory_Alloc_Array_Unnamed( unsigned, 4 );
 	dimInds = Memory_Alloc_Array_Unnamed( unsigned, topo->nDims );
-	for( e_i = 0; e_i < topo->domains[MT_FACE]->nDomains; e_i++ ) {
-		unsigned	gInd = Sync_DomainToGlobal( topo->domains[MT_FACE], e_i );
+	for( e_i = 0; e_i < topo->remotes[MT_FACE]->nDomains; e_i++ ) {
+		unsigned	gInd = Sync_DomainToGlobal( topo->remotes[MT_FACE], e_i );
 
-		nIncEls[e_i] = 4;
+		nIncEls = 4;
 
 		if( gInd < grids[2][0]->nPoints ) {
 			Grid_Lift( grids[2][0], gInd, dimInds );
 
-			incEls[e_i][0] = Grid_Project( grids[0][0], dimInds );
+			incEls[0] = Grid_Project( grids[0][0], dimInds );
 
 			dimInds[0]++;
-			incEls[e_i][1] = Grid_Project( grids[0][0], dimInds );
+			incEls[1] = Grid_Project( grids[0][0], dimInds );
 			dimInds[0]--;
 
 			dimInds[1]++;
-			incEls[e_i][2] = Grid_Project( grids[0][0], dimInds );
+			incEls[2] = Grid_Project( grids[0][0], dimInds );
 
 			dimInds[0]++;
-			incEls[e_i][3] = Grid_Project( grids[0][0], dimInds );
+			incEls[3] = Grid_Project( grids[0][0], dimInds );
 			dimInds[0]--;
 			dimInds[1]--;
 		}
@@ -958,17 +948,17 @@ void _CartesianGenerator_GenFaceVertexInc( void* meshGenerator, MeshTopology* to
 
 			Grid_Lift( grids[2][1], gInd - grids[2][0]->nPoints, dimInds );
 
-			incEls[e_i][0] = Grid_Project( grids[0][0], dimInds );
+			incEls[0] = Grid_Project( grids[0][0], dimInds );
 
 			dimInds[0]++;
-			incEls[e_i][1] = Grid_Project( grids[0][0], dimInds );
+			incEls[1] = Grid_Project( grids[0][0], dimInds );
 			dimInds[0]--;
 
 			dimInds[2]++;
-			incEls[e_i][2] = Grid_Project( grids[0][0], dimInds );
+			incEls[2] = Grid_Project( grids[0][0], dimInds );
 
 			dimInds[0]++;
-			incEls[e_i][3] = Grid_Project( grids[0][0], dimInds );
+			incEls[3] = Grid_Project( grids[0][0], dimInds );
 			dimInds[0]--;
 			dimInds[2]--;
 		}
@@ -978,33 +968,32 @@ void _CartesianGenerator_GenFaceVertexInc( void* meshGenerator, MeshTopology* to
 
 			Grid_Lift( grids[2][2], gInd - grids[2][0]->nPoints - grids[2][1]->nPoints, dimInds );
 
-			incEls[e_i][0] = Grid_Project( grids[0][0], dimInds );
+			incEls[0] = Grid_Project( grids[0][0], dimInds );
 
 			dimInds[1]++;
-			incEls[e_i][1] = Grid_Project( grids[0][0], dimInds );
+			incEls[1] = Grid_Project( grids[0][0], dimInds );
 			dimInds[1]--;
 
 			dimInds[2]++;
-			incEls[e_i][2] = Grid_Project( grids[0][0], dimInds );
+			incEls[2] = Grid_Project( grids[0][0], dimInds );
 
 			dimInds[1]++;
-			incEls[e_i][3] = Grid_Project( grids[0][0], dimInds );
+			incEls[3] = Grid_Project( grids[0][0], dimInds );
 			dimInds[1]--;
 			dimInds[2]--;
 		}
+
+		CartesianGenerator_MapToDomain( self, (Sync*)MeshTopology_GetDomain( topo, 0 ), 
+						nIncEls, incEls );
+		MeshTopology_SetIncidence( topo, 2, e_i, 0, nIncEls, incEls );
 	}
 
-	CartesianGenerator_MapToDomain( self, topo->domains[MT_VERTEX], topo->domains[MT_FACE]->nDomains, 
-					nIncEls, incEls );
-	MeshTopology_SetIncidence( topo, MT_FACE, MT_VERTEX, nIncEls, incEls );
-	FreeArray( nIncEls );
 	FreeArray( incEls );
 	FreeArray( dimInds );
 
 	MPI_Barrier( self->mpiComm );
 	Journal_Printf( stream, "... done.\n" );
 	Stream_UnIndent( stream );
-*/
 }
 
 void _CartesianGenerator_GenFaceEdgeInc( void* meshGenerator, MeshTopology* topo, Grid*** grids ) {
@@ -1360,6 +1349,7 @@ void CartesianGenerator_BuildDecomp( CartesianGenerator* self ) {
 	FreeArray( myRankInds );
 	FreeArray( rankInds );
 
+	NewClass_RemoveRef( self->comm );
 	self->comm = Comm_New();
 	NewClass_AddRef( self->comm );
 	Comm_SetMPIComm( self->comm, self->mpiComm );
@@ -1450,19 +1440,19 @@ void CartesianGenerator_GenTopo( CartesianGenerator* self, MeshTopology* topo ) 
 	grids[topo->nDims][0] = self->elGrid;
 	grids[0][0] = self->vertGrid;
 
-	grids[1][0] = Grid_New();
-	Grid_SetNumDims( grids[1][0], topo->nDims );
-	for( d_i = 0; d_i < topo->nDims; d_i++ ) {
-		if( d_i == 0 ) continue;
-		grids[topo->nDims][0]->sizes[d_i]++;
-	}
-	Grid_SetSizes( grids[1][0], grids[topo->nDims][0]->sizes );
-	for( d_i = 0; d_i < topo->nDims; d_i++ ) {
-		if( d_i == 0 ) continue;
-		grids[topo->nDims][0]->sizes[d_i]--;
-	}
-
 	if( topo->nDims >= 2 ) {
+		grids[1][0] = Grid_New();
+		Grid_SetNumDims( grids[1][0], topo->nDims );
+		for( d_i = 0; d_i < topo->nDims; d_i++ ) {
+			if( d_i == 0 ) continue;
+			grids[topo->nDims][0]->sizes[d_i]++;
+		}
+		Grid_SetSizes( grids[1][0], grids[topo->nDims][0]->sizes );
+		for( d_i = 0; d_i < topo->nDims; d_i++ ) {
+			if( d_i == 0 ) continue;
+			grids[topo->nDims][0]->sizes[d_i]--;
+		}
+
 		grids[1][1] = Grid_New();
 		Grid_SetNumDims( grids[1][1], topo->nDims );
 		for( d_i = 0; d_i < topo->nDims; d_i++ ) {
@@ -1660,7 +1650,6 @@ void CartesianGenerator_GenEdges2D( CartesianGenerator* self, MeshTopology* topo
 }
 
 void CartesianGenerator_GenEdges3D( CartesianGenerator* self, MeshTopology* topo, Grid*** grids ) {
-/*
 	Grid*		globalGrid;
 	unsigned	nGlobalEls[2];
 	Grid*		grid;
@@ -1764,7 +1753,6 @@ void CartesianGenerator_GenEdges3D( CartesianGenerator* self, MeshTopology* topo
 	FreeArray( els );
 	FreeObject( grid );
 	FreeObject( globalGrid );
-*/
 }
 
 void CartesianGenerator_GenBndVerts( CartesianGenerator* self, MeshTopology* topo, Grid*** grids ) {

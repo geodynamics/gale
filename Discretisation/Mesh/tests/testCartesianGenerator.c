@@ -49,7 +49,7 @@ Mesh* buildMesh() {
    int rank;
 
    insist( MPI_Comm_size( MPI_COMM_WORLD, &nRanks ), == MPI_SUCCESS );
-   sizes[0] = sizes[1] = sizes[2] = nRanks * 2;
+   sizes[0] = sizes[1] = sizes[2] = nRanks * 4;
    minCrd[0] = minCrd[1] = minCrd[2] = 0.0;
    maxCrd[0] = minCrd[1] = minCrd[2] = (double)nRanks;
 
@@ -69,6 +69,10 @@ Mesh* buildMesh() {
 void testSetup( int* argc, char** argv[] ) {
    Base_Init( argc, argv );
    DiscretisationMesh_Init( argc, argv );
+   Stream_Enable( Journal_GetTypedStream( Debug_Type ), False );
+   Stream_Enable( Journal_GetTypedStream( Info_Type ), False );
+   Stream_Enable( Journal_GetTypedStream( Dump_Type ), False );
+   Stream_Enable( Journal_GetTypedStream( Error_Type ), False );
 }
 
 void testTeardown() {
@@ -98,7 +102,7 @@ TestBegin( Gen ) {
    unsigned long netMem, mem, syncMem;
 
    insist( MPI_Comm_size( MPI_COMM_WORLD, &nRanks ), == MPI_SUCCESS );
-   sizes[0] = sizes[1] = sizes[2] = 4;
+   sizes[0] = sizes[1] = sizes[2] = nRanks * 4;
    minCrd[0] = minCrd[1] = minCrd[2] = 0.0;
    maxCrd[0] = minCrd[1] = minCrd[2] = (double)nRanks;
 
@@ -142,54 +146,64 @@ TestBegin( Inc ) {
       elGlobal = Sync_DomainToGlobal( elSync, e_i );
       Grid_Lift( elGrid, elGlobal, elParam );
       MeshTopology_GetIncidence( topo, nDims, e_i, 0, &nIncEls, &incEls );
-      TestTrue( nIncEls == 8 );
+      if( nIncEls != 8 )
+	 break;
 
       vertGlobal = Grid_Project( vertGrid, elParam );
       incGlobal = Sync_DomainToGlobal( vertSync, incEls[0] );
-      assert( incGlobal == vertGlobal );
+      if( incGlobal != vertGlobal )
+	 break;
 
       elParam[0]++;
       vertGlobal = Grid_Project( vertGrid, elParam );
       incGlobal = Sync_DomainToGlobal( vertSync, incEls[1] );
-      assert( incGlobal == vertGlobal );
+      if( incGlobal != vertGlobal )
+	 break;
       elParam[0]--;
 
       elParam[1]++;
       vertGlobal = Grid_Project( vertGrid, elParam );
       incGlobal = Sync_DomainToGlobal( vertSync, incEls[2] );
-      assert( incGlobal == vertGlobal );
+      if( incGlobal != vertGlobal )
+	 break;
 
       elParam[0]++;
       vertGlobal = Grid_Project( vertGrid, elParam );
       incGlobal = Sync_DomainToGlobal( vertSync, incEls[3] );
-      assert( incGlobal == vertGlobal );
+      if( incGlobal != vertGlobal )
+	 break;
       elParam[0]--;
       elParam[1]--;
 
       elParam[2]++;
       vertGlobal = Grid_Project( vertGrid, elParam );
       incGlobal = Sync_DomainToGlobal( vertSync, incEls[4] );
-      assert( incGlobal == vertGlobal );
+      if( incGlobal != vertGlobal )
+	 break;
 
       elParam[0]++;
       vertGlobal = Grid_Project( vertGrid, elParam );
       incGlobal = Sync_DomainToGlobal( vertSync, incEls[5] );
-      assert( incGlobal == vertGlobal );
+      if( incGlobal != vertGlobal )
+	 break;
       elParam[0]--;
 
       elParam[1]++;
       vertGlobal = Grid_Project( vertGrid, elParam );
       incGlobal = Sync_DomainToGlobal( vertSync, incEls[6] );
-      assert( incGlobal == vertGlobal );
+      if( incGlobal != vertGlobal )
+	 break;
 
       elParam[0]++;
       vertGlobal = Grid_Project( vertGrid, elParam );
       incGlobal = Sync_DomainToGlobal( vertSync, incEls[7] );
-      assert( incGlobal == vertGlobal );
+      if( incGlobal != vertGlobal )
+	 break;
       elParam[0]--;
       elParam[1]--;
       elParam[2]--;
    }
+   TestTrue( e_i == nEls );
 
   done:
    MemFree( elParam );

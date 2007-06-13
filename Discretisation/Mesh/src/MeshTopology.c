@@ -128,6 +128,9 @@ void MeshTopology_SetComm( void* _self, const Comm* comm ) {
    int d_i;
 
    assert( self );
+
+   MeshTopology_ClearElements( self );
+   NewClass_RemoveRef( self->comm );
    self->comm = (Comm*)comm;
    if( comm ) {
       NewClass_AddRef( (Comm*)comm );
@@ -230,7 +233,7 @@ void MeshTopology_SetElements( void* _self, int dim, int nEls,
 	    ISet_TryInsert( remotes, curEls[e_i] );
 	 }
       }
-      NewClass_Destruct( isects[n_i] );
+      NewClass_Delete( isects[n_i] );
    }
    Class_Free( self, isects );
 
@@ -350,7 +353,7 @@ void MeshTopology_AddRemoteElements( void* _self, int dim, int nEls,
    Sync_AddRemotes( self->remotes[dim], nEls, globals );
    for( d_i = 0; d_i < self->nTDims; d_i++ ) {
       if( self->nIncEls[dim][d_i] ) {
-	 nDoms = Sync_GetNumDomains( self->remotes[dim] );;
+	 nDoms = Sync_GetNumDomains( self->remotes[dim] );
 	 self->nIncEls[dim][d_i] = Class_Rearray( self, self->nIncEls[dim][d_i], 
 						  int, nDoms );
 	 self->incEls[dim][d_i] = Class_Rearray( self, self->incEls[dim][d_i], 
@@ -406,10 +409,12 @@ void MeshTopology_SetIncidence( void* _self, int fromDim, int fromEl,
       nDoms = Sync_GetNumDomains( self->remotes[fromDim] );
       self->nIncEls[fromDim][toDim] = Class_Array( self, int, nDoms );
       self->incEls[fromDim][toDim] = Class_Array( self, int*, nDoms );
+      memset( self->incEls[fromDim][toDim], 0, sizeof(int*) * nDoms );
    }
 
    self->nIncEls[fromDim][toDim][fromEl] = nIncEls;
-   self->incEls[fromDim][toDim][fromEl] = Class_Array( self, int, nIncEls );
+   self->incEls[fromDim][toDim][fromEl] = 
+	   Class_Rearray( self, self->incEls[fromDim][toDim][fromEl], int, nIncEls );
    memcpy( self->incEls[fromDim][toDim][fromEl], incEls, nIncEls * sizeof(int) );
 }
 
@@ -740,9 +745,16 @@ void MeshTopology_SetShadowDepth( void* _self, int depth ) {
 	 }
       }
    }
-   for( d_i = nDims; d_i > 0; d_i-- ) {
+   for( d_i = nDims; d_i >= 0; d_i-- ) {
       if( !nLowEls[d_i] )
 	 continue;
+      if( d_i == 0 ) {
+	 for( n_i = 0; n_i < nNbrs; n_i++ )
+	    Class_Free( self, lowEls[0][n_i] );
+	 Class_Free( self, lowEls[0] );
+	 Class_Free( self, nLowEls[0] );
+	 continue;
+      }
 
       for( n_i = 0; n_i < nNbrs; n_i++ ) {
 	 MeshTopology_PickleIncidenceInit( self, d_i, 
@@ -826,6 +838,8 @@ void MeshTopology_ClearElements( void* _self ) {
    }
    Class_Free( self, self->bndEls );
    Class_Free( self, self->nBndEls );
+   self->bndEls = NULL;
+   self->nBndEls = NULL;
 }
 
 void MeshTopology_ClearIncidence( void* _self ) {

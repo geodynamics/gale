@@ -1,6 +1,3 @@
-StGermain Framework revision 3913. Copyright (C) 2003-2005 VPAC.
-   Running test 'test nearest vertex'... passed
-   Running test 'test element search (1D)'... passed
-   Running test 'test element search (2D)'... passed
-   Running test 'test element search (3D)'... passed
-   Running test 'test minimum element search (3D)'... passed
+StGermain Framework revision 4139. Copyright (C) 2003-2005 VPAC.
+   Running test 'nearest vertex'... passed
+   Running test 'search'... passed

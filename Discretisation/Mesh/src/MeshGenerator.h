@@ -118,6 +118,7 @@
 
 	void MeshGenerator_SetMPIComm( void* meshGenerator, MPI_Comm mpiComm );
 	void MeshGenerator_AddMesh( void* meshGenerator, void* mesh );
+	void MeshGenerator_SetFullIncidence( void* meshGenerator );
 	void MeshGenerator_SetDimState( void* meshGenerator, unsigned dim, Bool state );
 	void MeshGenerator_ClearIncidenceStates( void* meshGenerator );
 	void MeshGenerator_SetIncidenceState( void* meshGenerator, unsigned fromDim, unsigned toDim, Bool state );

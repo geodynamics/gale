@@ -195,6 +195,19 @@ void _MeshGenerator_Execute( void* meshGenerator, void* data ) {
 void _MeshGenerator_Destroy( void* meshGenerator, void* data ) {
 }
 
+void MeshGenerator_SetFullIncidence( void* meshGenerator ) {
+	MeshGenerator* self = (MeshGenerator*)meshGenerator;
+	int d_i, d_j;
+
+	assert( self );
+
+	for( d_i = 0; d_i <= self->nDims; d_i++ ) {
+		self->enabledDims[d_i] = True;
+		for( d_j = 0; d_j <= self->nDims; d_j++ )
+			self->enabledInc[d_i][d_j] = True;
+	}
+}
+
 void _MeshGenerator_SetDimSize( void* meshGenerator, unsigned nDims ) {
 	MeshGenerator*	self = (MeshGenerator*)meshGenerator;
 	unsigned	d_i, d_j;

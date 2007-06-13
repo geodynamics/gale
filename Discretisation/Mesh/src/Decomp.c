@@ -70,6 +70,7 @@ void _Decomp_Destruct( void* _self ) {
    Decomp_Clear( self );
    IArray_Destruct( self->locals );
    IMap_Destruct( self->inv );
+   IMap_Destruct( self->owners );
    _NewClass_Destruct( self );
 }
 
@@ -284,6 +285,8 @@ void Decomp_FindOwners( const void* _self, int nGlobals, const int* globals,
 		      (unsigned**)&remSizes, (void***)&remRanks, 
 		      sizeof(int), self->mpiComm );
    MemFree( recvSizes );
+   for( r_i = 0; r_i < nRanks; r_i++ )
+      MemFree( recvArrays[r_i] );
    MemFree( recvArrays );
 
    for( r_i = 0; r_i < nRanks; r_i++ ) {
@@ -291,6 +294,7 @@ void Decomp_FindOwners( const void* _self, int nGlobals, const int* globals,
 	 ind = IMap_Map( ordMap, ptrs[r_i][i_i] );
 	 ranks[ind] = remRanks[r_i][i_i];
       }
+      MemFree( remRanks[r_i] );
    }
    IMap_Destruct( ordMap );
    MemFree( remRanks );
@@ -391,6 +395,7 @@ void Decomp_UpdateOwnerMap( Decomp* self ) {
    for( r_i = 0; r_i < nRanks; r_i++ ) {
       for( i_i = 0; i_i < recvSizes[r_i]; i_i++ )
 	 IMap_Insert( self->owners, recvArrays[r_i][i_i], r_i );
+      MemFree( recvArrays[r_i] );
    }
    MemFree( recvSizes );
    MemFree( recvArrays );
