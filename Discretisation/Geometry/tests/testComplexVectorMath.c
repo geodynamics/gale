@@ -43,7 +43,7 @@ int main( int argc, char* argv[] ) {
 	int rank;
 	int numProcessors;
 	int procToWatch;
-	Stream* stream = Journal_Register( Info_Type, "ComplexVectorMath" );
+	Stream* stream;
 	
 	/* Initialise MPI, get world info */
 	MPI_Init( &argc, &argv );
@@ -55,6 +55,8 @@ int main( int argc, char* argv[] ) {
 	
 	DiscretisationGeometry_Init( &argc, &argv );
 	MPI_Barrier( CommWorld ); /* Ensures copyright info always come first in output */
+
+	stream = Journal_Register( Info_Type, "ComplexVectorMath" );
 	
 	if( argc >= 2 ) {
 		procToWatch = atoi( argv[1] );

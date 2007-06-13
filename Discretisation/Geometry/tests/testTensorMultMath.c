@@ -44,7 +44,7 @@ int main( int argc, char* argv[] ) {
 	int rank;
 	int numProcessors;
 	int procToWatch;
-	Stream*  stream = Journal_Register( InfoStream_Type, "TensorMultMath" );
+	Stream* stream;
 	
 	/* Initialise MPI, get world info */
 	MPI_Init( &argc, &argv );
@@ -56,6 +56,8 @@ int main( int argc, char* argv[] ) {
 	
 	DiscretisationGeometry_Init( &argc, &argv );
 	MPI_Barrier( CommWorld ); /* Ensures copyright info always come first in output */
+
+	stream = Journal_Register( InfoStream_Type, "TensorMultMath" );
 	
 	/* stout -> file redirect code */
 	/* stJournal->firewallProducesAssert = False; */
