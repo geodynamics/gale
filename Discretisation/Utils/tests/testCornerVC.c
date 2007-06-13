@@ -141,6 +141,8 @@ int main(int argc, char *argv[])
 	DiscretisationUtils_Init( &argc, &argv );
 	MPI_Barrier( CommWorld ); /* Ensures copyright info always come first in output */
 
+	Journal_Enable_NamedStream( Info_Type, CartesianGenerator_Type, False );
+
 	io_handler = XML_IO_Handler_New();
 
 	stream = Journal_Register (Info_Type, "myStream");

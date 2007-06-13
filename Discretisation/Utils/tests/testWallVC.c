@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testWallVC.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
+** $Id: testWallVC.c 4144 2007-06-13 04:33:59Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -128,6 +128,8 @@ int main(int argc, char *argv[])
 	DiscretisationMesh_Init( &argc, &argv );
 	DiscretisationUtils_Init( &argc, &argv );
 	MPI_Barrier( CommWorld ); /* Ensures copyright info always come first in output */
+
+	Journal_Enable_NamedStream( Info_Type, CartesianGenerator_Type, False );
 
 	io_handler = XML_IO_Handler_New();
 
