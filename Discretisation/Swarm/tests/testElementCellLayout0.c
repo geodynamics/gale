@@ -33,7 +33,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: testElementCellLayout0.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
+** $Id: testElementCellLayout0.c 4142 2007-06-13 01:26:58Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -119,7 +119,7 @@ int main( int argc, char* argv[] ) {
 	else {
 		procToWatch = 0;
 	}
-	if( rank == procToWatch ) printf( "Watching rank: %i\n", rank );
+/*	if( rank == procToWatch ) printf( "Watching rank: %i\n", rank );*/
 	
 	/* Init mesh */
 	extensionMgr_Register = ExtensionManager_Register_New();

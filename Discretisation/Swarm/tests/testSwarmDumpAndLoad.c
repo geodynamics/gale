@@ -34,7 +34,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: testSwarmDumpAndLoad.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
+** $Id: testSwarmDumpAndLoad.c 4142 2007-06-13 01:26:58Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -79,9 +79,9 @@ Mesh* buildMesh( unsigned nDims, unsigned* size,
 	MeshGenerator_SetDimState( gen, 1, True );
 	MeshGenerator_ClearIncidenceStates( gen );
 	MeshGenerator_SetIncidenceState( gen, 3, 0, True );
-	MeshGenerator_SetIncidenceState( gen, 1, 0, True );
+/*	MeshGenerator_SetIncidenceState( gen, 1, 0, True );*/
 	MeshGenerator_SetIncidenceState( gen, 0, 3, True );
-	MeshGenerator_SetIncidenceState( gen, 0, 1, True );
+/*	MeshGenerator_SetIncidenceState( gen, 0, 1, True );*/
 	MeshGenerator_SetIncidenceState( gen, 0, 0, True );
 	CartesianGenerator_SetTopologyParams( gen, size, 0, NULL, NULL );
 	CartesianGenerator_SetGeometryParams( gen, minCrds, maxCrds );
@@ -165,7 +165,7 @@ int main( int argc, char* argv[] ) {
 	else {
 		procToWatch = 0;
 	}
-	if( rank == procToWatch ) printf( "Watching rank: %i\n", rank );
+/*	if( rank == procToWatch ) printf( "Watching rank: %i\n", rank );*/
 	
 	Stream_Enable( Journal_Register( Info_Type, SwarmDump_Type ), False );
 	

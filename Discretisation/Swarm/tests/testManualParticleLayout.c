@@ -33,7 +33,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: testManualParticleLayout.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
+** $Id: testManualParticleLayout.c 4142 2007-06-13 01:26:58Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -128,7 +128,7 @@ int main( int argc, char* argv[] ) {
 	else {
 		procToWatch = 0;
 	}
-	if( rank == procToWatch ) printf( "Watching rank: %i\n", rank );
+/*	if( rank == procToWatch ) printf( "Watching rank: %i\n", rank );*/
 	
 	/* Read input */
 	dictionary = Dictionary_New();

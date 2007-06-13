@@ -18,7 +18,6 @@ Cartesian generator: ''
 		... element types are 'Mesh_HexType',
 		... mesh algorithm type is 'Mesh_RegularAlgorithms',
 		... done.
-Watching rank: 1
 Swarm (ptr): 0x807da10
 Stg_Component (ptr): 0x807da10
 Stg_Object (ptr): 0x807da10
