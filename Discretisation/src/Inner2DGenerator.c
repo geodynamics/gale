@@ -270,8 +270,18 @@ void Inner2DGenerator_BuildGeometry( Inner2DGenerator* self, FeMesh* mesh ) {
 	nDomainEls = Mesh_GetDomainSize( elMesh, nDims );
 	mesh->verts = AllocArray2D( double, nDomainEls, nDims );
 	for( e_i = 0; e_i < nDomainEls; e_i++ ) {
+		unsigned elInd = e_i * 3;
+
 		FeMesh_CoordLocalToGlobal( elMesh, e_i, localCrds[0], globalCrd );
 		vert = Mesh_GetVertex( mesh, e_i );
+		memcpy( vert, globalCrd, nDims * sizeof(double) );
+
+		FeMesh_CoordLocalToGlobal( elMesh, e_i + 1, localCrds[1], globalCrd );
+		vert = Mesh_GetVertex( mesh, e_i + 1 );
+		memcpy( vert, globalCrd, nDims * sizeof(double) );
+
+		FeMesh_CoordLocalToGlobal( elMesh, e_i + 2, localCrds[2], globalCrd );
+		vert = Mesh_GetVertex( mesh, e_i + 2 );
 		memcpy( vert, globalCrd, nDims * sizeof(double) );
 	}
 }
