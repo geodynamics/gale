@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Init.c 859 2007-06-05 06:55:16Z DavidLee $
+** $Id: Init.c 865 2007-06-14 02:16:20Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -83,6 +83,8 @@ Bool StgFEM_Discretisation_Init( int* argc, char** argv[] ) {
 /*
 	Stg_ComponentRegister_Add( componentRegister, P1Generator_Type, "0", P1Generator_New );
 */
+	Stg_ComponentRegister_Add( componentRegister, Inner2DGenerator_Type, "0", 
+				   Inner2DGenerator_New );
 
 	/** Register Parents for type checking */
 	RegisterParent( ElementType_Type,                  Stg_Component_Type );
@@ -105,6 +107,7 @@ Bool StgFEM_Discretisation_Init( int* argc, char** argv[] ) {
 /*
 	RegisterParent( P1Generator_Type, MeshGenerator_Type );
 */
+	RegisterParent( Inner2DGenerator_Type, MeshGenerator_Type );
 	
 	RegisterParent( FeVariable_Type,                   FieldVariable_Type );
 	RegisterParent( OperatorFeVariable_Type,           FeVariable_Type );

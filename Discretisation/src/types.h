@@ -44,7 +44,7 @@
 **
 ** Comments:
 **
-** $Id: types.h 859 2007-06-05 06:55:16Z DavidLee $
+** $Id: types.h 865 2007-06-14 02:16:20Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -68,6 +68,7 @@
 	typedef struct C0Generator		C0Generator;
 	typedef struct C2Generator		C2Generator;
 	typedef struct P1Generator		P1Generator;
+	typedef struct Inner2DGenerator		Inner2DGenerator;
 	typedef struct LinkedDofInfo             LinkedDofInfo;
 	typedef struct FeEquationNumber          FeEquationNumber;
 	typedef struct FeVariable                FeVariable;

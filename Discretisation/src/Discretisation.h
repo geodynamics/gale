@@ -46,7 +46,7 @@
 ** Comments:
 **	None so far.
 **
-** $Id: Discretisation.h 859 2007-06-05 06:55:16Z DavidLee $
+** $Id: Discretisation.h 865 2007-06-14 02:16:20Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -73,6 +73,7 @@
 	#include "C0Generator.h"
 	#include "C2Generator.h"
 	#include "P1Generator.h"
+	#include "Inner2DGenerator.h"
 	#include "LinkedDofInfo.h"
 	#include "FeEquationNumber.h"
 	#include "FeVariable.h"
