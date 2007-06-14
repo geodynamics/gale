@@ -135,19 +135,40 @@ void _Mesh_CentroidAlgorithms_Destroy( void* centroidAlgorithms, void* data ) {
 void Mesh_CentroidAlgorithms_Update( void* centroidAlgorithms ) {
 }
 
+#define Vec_Sep( nDims, v0, v1 )									\
+	(((v0)[0] - (v1)[0]) * ((v0)[0] - (v1)[0]) +							\
+	 (((nDims) >= 2) ? (((v0)[1] - (v1)[1]) * ((v0)[1] - (v1)[1]) + 				\
+			    (((nDims) == 3) ? (((v0)[2] - (v1)[2]) * ((v0)[2] - (v1)[2])) : 0)) : 0))
+
 unsigned Mesh_CentroidAlgorithms_NearestVertex( void* centroidAlgorithms, double* point ) {
 	Mesh_CentroidAlgorithms*	self = (Mesh_CentroidAlgorithms*)centroidAlgorithms;
 	unsigned			elInd;
+	double dist, nearDist;
+	unsigned near;
+	unsigned nDims;
+	double* vert;
+	unsigned inc_i;
 
 	assert( self );
 
 	if( Mesh_SearchElements( self->elMesh, point, &elInd ) ) {
 		unsigned	nInc, *inc;
 
+		nDims = Mesh_GetDimSize( self->mesh );
 		Mesh_GetIncidence( self->elMesh, Mesh_GetDimSize( self->mesh ), elInd, MT_VERTEX, 
 				   &nInc, &inc );
-		assert( nInc == 1 );
-		return inc[0];
+		near = inc[0];
+		vert = Mesh_GetVertex( self->mesh, inc[0] );
+		nearDist = Vec_Sep( nDims, vert, point );
+		for( inc_i = 1; inc_i < nInc; inc_i++ ) {
+			vert = Mesh_GetVertex( self->mesh, inc[inc_i] );
+			dist = Vec_Sep( nDims, vert, point );
+			if( dist < nearDist ) {
+				near = inc[inc_i];
+				nearDist = dist;
+			}
+		}
+		return near;
 	}
 	else
 		return _Mesh_Algorithms_NearestVertex( self, point );
