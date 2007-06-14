@@ -268,7 +268,7 @@ void Inner2DGenerator_BuildGeometry( Inner2DGenerator* self, FeMesh* mesh ) {
 	elMesh = self->elMesh;
 	nDims = Mesh_GetDimSize( elMesh );
 	nDomainEls = Mesh_GetDomainSize( elMesh, nDims );
-	mesh->verts = AllocArray2D( double, nDomainEls, nDims );
+	mesh->verts = AllocArray2D( double, nDomainEls * 3, nDims );
 	for( e_i = 0; e_i < nDomainEls; e_i++ ) {
 		unsigned elInd = e_i * 3;
 
