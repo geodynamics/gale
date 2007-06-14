@@ -210,9 +210,9 @@ void Inner2DGenerator_BuildTopology( Inner2DGenerator* self, FeMesh* mesh ) {
 	locals = MemArray( int, nLocals, Inner2DGenerator_Type );
 	for( l_i = 0; l_i < Decomp_GetNumLocals( elDecomp ); l_i++ ) {
 		global = Decomp_LocalToGlobal( elDecomp, l_i );
-		locals[l_i + 0] = global * 3;
-		locals[l_i + 1] = global * 3 + 1;
-		locals[l_i + 2] = global * 3 + 2;
+		locals[l_i * 3 + 0] = global * 3;
+		locals[l_i * 3 + 1] = global * 3 + 1;
+		locals[l_i * 3 + 2] = global * 3 + 2;
 	}
 	Decomp_SetLocals( nodeDecomp, nLocals, locals );
 	MemFree( locals );
@@ -223,9 +223,9 @@ void Inner2DGenerator_BuildTopology( Inner2DGenerator* self, FeMesh* mesh ) {
 	remotes = MemArray( int, nRemotes, Inner2DGenerator_Type );
 	for( r_i = 0; r_i < Sync_GetNumRemotes( elSync ); r_i++ ) {
 		global = Sync_RemoteToGlobal( elSync, r_i );
-		remotes[r_i + 0] = global * 3;
-		remotes[r_i + 1] = global * 3 + 1;
-		remotes[r_i + 2] = global * 3 + 2;
+		remotes[r_i * 3 + 0] = global * 3;
+		remotes[r_i * 3 + 1] = global * 3 + 1;
+		remotes[r_i * 3 + 2] = global * 3 + 2;
 	}
 	Sync_SetRemotes( nodeDecomp, nRemotes, remotes );
 	MemFree( remotes );
