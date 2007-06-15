@@ -9,7 +9,6 @@
 	</list>
 
 	<!-- Component Stuff -->
-	<include>StgFEM/ElementLayout.xml            </include>
 	<include>StgFEM/ConstantMesh.xml             </include>
 	<include>StgFEM/LinearMesh.xml               </include>
 	<include>StgFEM/VelocityField.xml            </include>

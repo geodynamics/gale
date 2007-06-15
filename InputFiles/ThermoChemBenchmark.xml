@@ -2,9 +2,6 @@
         P.E. van Keken et al, 'A comparison of methods for 
 		the modelling of thermochemical convection', JGR, 1997  -->
 		
-<?xml version="1.0"?>
-<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
-
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
  
  	<include>Underworld/BaseApps/ThermoChem.xml</include>
@@ -66,7 +63,7 @@
 
 	<!-- Simulation control -->
 	<param name="maxTimeSteps"> 100000000 </param>
-	<param name="outputPath"> ./output/ </param>
+	<param name="outputPath"> ./output/testIng </param>
 	<param name="dumpEvery"> 10 </param>	
 	
 	<param name="RaT"> 3.0e5 </param>	
