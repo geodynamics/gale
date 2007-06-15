@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Residual.c 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: Residual.c 876 2007-06-15 06:48:50Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -128,10 +128,12 @@ AdvDiffResidualForceTerm* _AdvDiffResidualForceTerm_New(
 void _AdvDiffResidualForceTerm_Init( 
 		AdvDiffResidualForceTerm*                           self, 
 		FeVariable*                                         velocityField,
+		FeVariable*                                         phiField,
 		Variable*                                           diffusivityVariable,
 		double                                              defaultDiffusivity,
 		AdvDiffResidualForceTerm_UpwindParamFuncType        upwindFuncType )
 {
+	self->phiField            = phiField;
 	self->velocityField       = velocityField;
 	self->diffusivityVariable = diffusivityVariable;
 	self->defaultDiffusivity  = defaultDiffusivity;
@@ -150,7 +152,7 @@ void AdvDiffResidualForceTerm_InitAll(
 	AdvDiffResidualForceTerm* self = (AdvDiffResidualForceTerm*) residual;
 
 	ForceTerm_InitAll( self, forceVector, integrationSwarm, sle );
-	_AdvDiffResidualForceTerm_Init( self, velocityField, diffusivityVariable, defaultDiffusivity, upwindFuncType );
+	_AdvDiffResidualForceTerm_Init( self, velocityField, NULL, diffusivityVariable, defaultDiffusivity, upwindFuncType );
 }
 
 void _AdvDiffResidualForceTerm_Delete( void* residual ) {
@@ -204,6 +206,7 @@ void* _AdvDiffResidualForceTerm_DefaultNew( Name name ) {
 void _AdvDiffResidualForceTerm_Construct( void* residual, Stg_ComponentFactory* cf, void* data ) {
 	AdvDiffResidualForceTerm*            self             = (AdvDiffResidualForceTerm*)residual;
 	FeVariable*                          velocityField;
+	FeVariable*                          phiField;
 	Variable*                            diffusivityVariable;
 	Name                                 upwindParamFuncName;
 	double                               defaultDiffusivity;
@@ -213,6 +216,7 @@ void _AdvDiffResidualForceTerm_Construct( void* residual, Stg_ComponentFactory* 
 	_ForceTerm_Construct( self, cf, data );
 
 	velocityField       = Stg_ComponentFactory_ConstructByKey( cf, self->name, "VelocityField",       FeVariable, True,  data );
+	phiField            = Stg_ComponentFactory_ConstructByKey( cf, self->name, "PhiField",       FeVariable, False,  data );
 	diffusivityVariable = Stg_ComponentFactory_ConstructByKey( cf, self->name, "DiffusivityVariable", Variable,   False, data );
 
 
@@ -229,7 +233,7 @@ void _AdvDiffResidualForceTerm_Construct( void* residual, Stg_ComponentFactory* 
 
 	defaultDiffusivity = Stg_ComponentFactory_GetDouble( cf, self->name, "defaultDiffusivity", 1.0 );
 
-	_AdvDiffResidualForceTerm_Init( self, velocityField, diffusivityVariable, defaultDiffusivity, upwindFuncType );
+	_AdvDiffResidualForceTerm_Init( self, velocityField, phiField, diffusivityVariable, defaultDiffusivity, upwindFuncType );
 }
 
 void _AdvDiffResidualForceTerm_Build( void* residual, void* data ) {
@@ -238,6 +242,8 @@ void _AdvDiffResidualForceTerm_Build( void* residual, void* data ) {
 	_ForceTerm_Build( self, data );
 
 	Stg_Component_Build( self->velocityField, data, False );
+	if( self->phiField )
+		Stg_Component_Build( self->phiField, data, False );
 	if ( self->diffusivityVariable )
 		Stg_Component_Build( self->diffusivityVariable, data, False );
 }
@@ -248,6 +254,8 @@ void _AdvDiffResidualForceTerm_Initialise( void* residual, void* data ) {
 	_ForceTerm_Initialise( self, data );
 
 	Stg_Component_Initialise( self->velocityField, data, False );
+	if( self->phiField )
+		Stg_Component_Initialise( self->phiField, data, False );
 	if ( self->diffusivityVariable )
 		Stg_Component_Initialise( self->diffusivityVariable, data, False );
 }
@@ -287,6 +295,7 @@ void _AdvDiffResidualForceTerm_AssembleElement( void* forceTerm, ForceVector* fo
 	Node_Index                 elementNodeCount    = elementType->nodeCount;
 	Node_Index                 node_I;
 	double                     factor;
+	double                     tmpGlobalCoord[3];
 
 	GNx     = Memory_Alloc_2DArray( double, dim, elementNodeCount, "Global Shape Function Derivatives" );
 	phiGrad = Memory_Alloc_Array( double, dim, "Gradient of Phi" );
@@ -313,7 +322,19 @@ void _AdvDiffResidualForceTerm_AssembleElement( void* forceTerm, ForceVector* fo
 			xi, dim, &detJac, GNx );
 		
 		/* Calculate Velocity */
+		/*
 		_FeVariable_InterpolateNodeValuesToElLocalCoord( self->velocityField, lElement_I, xi, velocity );
+		*/
+		if( self->phiField ) {
+			// this is confusing - note difference b/w self->phiField and phiField
+			FeMesh_CoordLocalToGlobal( self->phiField->feMesh,
+						lElement_I, 
+						xi, 
+						tmpGlobalCoord );
+			_FeVariable_InterpolateValueAt( self->velocityField, tmpGlobalCoord, velocity );
+		} else {
+			_FeVariable_InterpolateNodeValuesToElLocalCoord( self->velocityField, lElement_I, xi, velocity );	
+		}
 
 		/* Calculate phi on particle */
 		_FeVariable_InterpolateNodeValuesToElLocalCoord( phiField, lElement_I, xi, &phi );
@@ -328,8 +349,12 @@ void _AdvDiffResidualForceTerm_AssembleElement( void* forceTerm, ForceVector* fo
 		totalDerivative = phiDot + StGermain_VectorDotProduct( velocity, phiGrad, dim );
 
 		/* Get Diffusivity */
+		/* diffusivityVariable will only be NOT NULL if:
+		 * 1) The MaterialDiffusivityPlugin is used. It's in Underworld/Plugins
+		 * 2) A special user defined DiffusivityVariable is given during the Construction phase
+		 */  
 		if ( diffusivityVariable != NULL )
-			diffusivity = Variable_GetValueDouble( diffusivityVariable, lParticle_I );
+			diffusivity = self->_getDiffusivityFromIntPoint( self, particle );
 
 		/* Add to element residual */
 		factor = particle->weight * detJac;

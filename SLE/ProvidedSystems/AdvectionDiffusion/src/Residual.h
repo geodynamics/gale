@@ -45,6 +45,8 @@
 	
 	typedef enum { Exact, DoublyAsymptoticAssumption, CriticalAssumption } AdvDiffResidualForceTerm_UpwindParamFuncType;
 
+	typedef double (AdvDiffResidualForceTerm_GetDiffusivityFromIntPoint)( void* self, void* lParticle_I );
+
 	/** Textual name of this class */
 	extern const Type AdvDiffResidualForceTerm_Type;
 
@@ -55,9 +57,11 @@
 		\
 		/* Virtual info */ \
 		AdvDiffResidualForceTerm_UpwindParamFunction*       _upwindParam;                   \
+		AdvDiffResidualForceTerm_GetDiffusivityFromIntPoint* _getDiffusivityFromIntPoint;  \
 		\
 		/* AdvDiffResidualForceTerm info */ \
 		FeVariable*                                         velocityField;                  \
+		FeVariable*                                         phiField;                  \
 		double                                              defaultDiffusivity;             \
 		Variable*                                           diffusivityVariable;            \
 		AdvDiffResidualForceTerm_UpwindParamFuncType        upwindParamType;

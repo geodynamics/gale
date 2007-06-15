@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ShapeFunctions.c 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: ShapeFunctions.c 876 2007-06-15 06:48:50Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -93,7 +93,8 @@ double** AdvDiffResidualForceTerm_BuildSUPGShapeFunctions( AdvDiffResidualForceT
 		averageDiffusivity = 0.0;
 		for ( cParticle_I = 0 ; cParticle_I < particleCount ; cParticle_I++ ) {
 			lParticle_I = swarm->cellParticleTbl[lElement_I][cParticle_I];
-			averageDiffusivity += Variable_GetValueDouble( diffusivityVariable, lParticle_I );
+			particle    = (IntegrationPoint*)Swarm_ParticleInCellAt( swarm, cell_I, cParticle_I );
+			averageDiffusivity += self->_getDiffusivityFromIntPoint( self, particle );
 		}
 		averageDiffusivity /= (double)particleCount;
 	}
