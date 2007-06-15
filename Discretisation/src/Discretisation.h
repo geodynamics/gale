@@ -46,7 +46,7 @@
 ** Comments:
 **	None so far.
 **
-** $Id: Discretisation.h 865 2007-06-14 02:16:20Z LukeHodkinson $
+** $Id: Discretisation.h 872 2007-06-15 03:36:50Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -67,6 +67,7 @@
 	#include "Triquadratic.h"
 	#include "P1.h"
 	#include "LinearTriangleElementType.h"
+	#include "BilinearInnerElType.h"
 
 	#include "Element.h"
 	#include "FeMesh.h"

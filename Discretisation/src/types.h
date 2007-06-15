@@ -44,7 +44,7 @@
 **
 ** Comments:
 **
-** $Id: types.h 865 2007-06-14 02:16:20Z LukeHodkinson $
+** $Id: types.h 872 2007-06-15 03:36:50Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -77,6 +77,7 @@
 	typedef struct FeSwarmVariable           FeSwarmVariable;
 	typedef struct AnalyticSolution          AnalyticSolution;
 	typedef struct Triquadratic              Triquadratic;
+	typedef struct BilinearInnerElType       BilinearInnerElType;
 
 	/* types for lists etc ... for readability */
 	typedef FeVariable*				FeVariablePtr;

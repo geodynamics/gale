@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeMesh.c 859 2007-06-05 06:55:16Z DavidLee $
+** $Id: FeMesh.c 872 2007-06-15 03:36:50Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -146,10 +146,12 @@ void _FeMesh_Build( void* feMesh, void* data ) {
 		unsigned	nDims;
 
 		nDims = Mesh_GetDimSize( self );
-		if( nDims == 2 )
+		if( nDims == 3 )
+			elType = (ElementType*)Triquadratic_New( "" );
+		else if( nDims == 2 )
 			elType = (ElementType*)Biquadratic_New( "" );
 		else
-			elType = (ElementType*)Triquadratic_New( "" );
+			abort();
 	}
 	else if( !strcmp( self->feElFamily, "linear" ) ) {
 		unsigned	nDims;
@@ -170,6 +172,15 @@ void _FeMesh_Build( void* feMesh, void* data ) {
 			elType = (ElementType*)RegularTrilinear_New( "" );
 		else if( nDims == 2 )
 			elType = (ElementType*)RegularBilinear_New( "" );
+		else
+			abort();
+	}
+	else if( !strcmp( self->feElFamily, "linear-inner" ) ) {
+		unsigned	nDims;
+
+		nDims = Mesh_GetDimSize( self );
+		if( nDims == 2 )
+			elType = (ElementType*)BilinearInnerElType_New( "" );
 		else
 			abort();
 	}

@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Init.c 865 2007-06-14 02:16:20Z LukeHodkinson $
+** $Id: Init.c 872 2007-06-15 03:36:50Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -92,7 +92,7 @@ Bool StgFEM_Discretisation_Init( int* argc, char** argv[] ) {
 	RegisterParent( TrilinearElementType_Type,         ElementType_Type );
 	RegisterParent( Biquadratic_Type, 		Biquadratic_Type );
 	/* i'm assuming this is ok - doesn't seem to complain without it though - dave, 29.05.07 */
-	RegisterParent( Triquadratic_Type, 		Triquadratic_Type );
+	RegisterParent( Triquadratic_Type,		Triquadratic_Type );
 	RegisterParent( P1_Type, 			P1_Type );
 	RegisterParent( RegularTrilinear_Type,			TrilinearElementType_Type );
 	RegisterParent( ConstantElementType_Type,          ElementType_Type );
