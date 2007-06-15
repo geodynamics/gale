@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: MaterialThermalDiffusivity.c 358 2006-10-18 06:17:30Z SteveQuenette $
+** $Id: MaterialThermalDiffusivity.c 490 2007-06-15 06:56:48Z JulianGiordani $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -49,35 +49,80 @@
 #include <Underworld/Underworld.h>
 #include <assert.h>
 
+double Underworld_MaterialThermalDiffusivity_GetDiffusivityFromIntPoint( void* _residualForceTerm, void* particle ) {
+
+	/* A function which should will only ever be called via a function pointer 
+	 * hanging off the residualForceTerm data structure.
+	 *
+	 * Role: 
+	 * Input: residualForceTerm and IntegrationPoint although both these are cast as void*
+	 * Return: the diffusivity which is 'mapped' to that materialPoint
+	 */
+	AdvDiffResidualForceTerm* residualForceTerm   = (AdvDiffResidualForceTerm*)_residualForceTerm;
+	IntegrationPointsSwarm*   integrationSwarm    = (IntegrationPointsSwarm*)residualForceTerm->integrationSwarm;
+	IntegrationPoint*         integrationParticle = (IntegrationPoint*)particle;
+	MaterialPointRef*         materialRef;
+
+	materialRef = OneToOneMapper_GetMaterialRef( (OneToOneMapper*)integrationSwarm->mapper, integrationParticle );
+	return Variable_GetValueDouble( residualForceTerm->diffusivityVariable, materialRef->particle_I );
+}
+
 void Underworld_MaterialThermalDiffusivity_Setup( UnderworldContext* context ) {
+	/* 
+	 * Role:
+	 * 1) create a new variable on the material Swarm, called thermalDiffusivity.
+	 * 2) modify the residualForceTerm used in the advection diffusion solver. The
+	 * 	modifications enables the materialSwarm parameters for thermalDiffusivity to
+	 * 	be used by the ResidualForceTerm instead of the default diffusivity
+	 *
+	 * Assumptions:
+	 * 	A OneToOneMapper is used
+	 *	AdvDiffResidualForceTerm setup and execution is compatible with it
+	 */
+
+
 	AdvectionDiffusionSLE*    energySLE           = context->energySLE;
-	IntegrationPointsSwarm*   picIntegrationPoints      = context->picIntegrationPoints;
+        /* TODO: This assumes OneToOne mapping of intPoints to matPoints, should be fixed in future */
+	OneToOneMapper*           mapper              = (OneToOneMapper*)context->picIntegrationPoints->mapper;
+
+	MaterialPointsSwarm*      materialSwarm = mapper->materialSwarm;
 	ExtensionInfo_Index       particleExtHandle;
 	SwarmVariable*            swarmVariable;
 	ForceVector*              residual;
 	AdvDiffResidualForceTerm* residualForceTerm;
 
 	assert( energySLE );
-	assert( picIntegrationPoints );
+	assert( materialSwarm );
+
+	 	
 
 	/* Add Material Extension */
-	particleExtHandle = ExtensionManager_Add( picIntegrationPoints->particleExtensionMgr, 
+	particleExtHandle = ExtensionManager_Add( materialSwarm->particleExtensionMgr, 
 				CURR_MODULE_NAME, sizeof( double ) );
 
 	swarmVariable = Swarm_NewScalarVariable(
-			picIntegrationPoints,
+			materialSwarm,
 			"thermalDiffusivity",
-			(ArithPointer) ExtensionManager_Get( picIntegrationPoints->particleExtensionMgr, 0, particleExtHandle ),
+			(ArithPointer) ExtensionManager_Get( materialSwarm->particleExtensionMgr, 0, particleExtHandle ),
 			Variable_DataType_Double );
 
 	/* Set Pointers */
 	residual = energySLE->residual;
 	residualForceTerm = Stg_CheckType( Stg_ObjectList_At( residual->forceTermList, 0 ), AdvDiffResidualForceTerm );
 	residualForceTerm->diffusivityVariable = swarmVariable->variable;
-	residualForceTerm->integrationSwarm    = (Swarm*) picIntegrationPoints;
+	residualForceTerm->integrationSwarm    = (Swarm*) context->picIntegrationPoints;
+	/* Important that this function is defined here, but is used in 
+	 * StgFEM/SLE/ProvidedSystems/AdvectionDiffusion/src/Residual.c
+	 * see its _AdvDiffResidualForceTerm_AssembleElement for details
+	 */
+	residualForceTerm->_getDiffusivityFromIntPoint = Underworld_MaterialThermalDiffusivity_GetDiffusivityFromIntPoint;
 }
 
 void Underworld_MaterialThermalDiffusivity_Assign( UnderworldContext* context ) {
+	/* 
+	 * Role: 
+	 * Assign diffusivity values given via the input dictionary to the materialPoints.
+	 */ 
 	Materials_Register*               materialRegister = context->materials_Register;
 	Material*                         material;
 	Material_Index                    material_I;
@@ -85,14 +130,14 @@ void Underworld_MaterialThermalDiffusivity_Assign( UnderworldContext* context ) 
 	Dictionary*                       dictionary;
 	double*                           materialThermalDiffusivity;
 	Particle_Index                    lParticle_I;
-	MaterialPointsSwarm*           	  materialPoints;               
+	MaterialPointsSwarm*           	  materialSwarm;               
 	AdvectionDiffusionSLE*            energySLE           = context->energySLE;
 	ForceVector*                      residual;
 	AdvDiffResidualForceTerm*         residualForceTerm;
 	Variable*                         variable;
 
-	materialPoints = (MaterialPointsSwarm*)Stg_ComponentFactory_ConstructByName( context->CF, "materialPoints", MaterialPointsSwarm, True, 0 /* dummy */ );
-	assert(materialPoints);
+	materialSwarm = (MaterialPointsSwarm*)Stg_ComponentFactory_ConstructByName( context->CF, "materialSwarm", MaterialPointsSwarm, True, 0 /* dummy */ );
+	assert(materialSwarm);
 	residual = energySLE->residual;
 	residualForceTerm = Stg_CheckType( Stg_ObjectList_At( residual->forceTermList, 0 ), AdvDiffResidualForceTerm );
 	variable = residualForceTerm->diffusivityVariable;
@@ -102,6 +147,7 @@ void Underworld_MaterialThermalDiffusivity_Assign( UnderworldContext* context ) 
 	/* Loop over materials and get material properties from dictionary */
 	for ( material_I = 0 ; material_I < materialsCount ; material_I++ ) {
 		material    = Materials_Register_GetByIndex( materialRegister, material_I );
+		/* Get the material's dictionary */
 		dictionary  = material->dictionary;
 
 		materialThermalDiffusivity[ material_I ] = 
@@ -109,11 +155,11 @@ void Underworld_MaterialThermalDiffusivity_Assign( UnderworldContext* context ) 
 	}
 
 	/* Assign value to particle */
-	for ( lParticle_I = 0 ; lParticle_I < materialPoints->particleLocalCount ; lParticle_I++ ) {
+	for ( lParticle_I = 0 ; lParticle_I < materialSwarm->particleLocalCount ; lParticle_I++ ) {
 		Variable_SetValueDouble( 
 			variable, 
 			lParticle_I, 
-			materialThermalDiffusivity[ MaterialPointsSwarm_GetMaterialIndexAt( materialPoints, lParticle_I ) ] );
+			materialThermalDiffusivity[ MaterialPointsSwarm_GetMaterialIndexAt( materialSwarm, lParticle_I ) ] );
 	}
 
 	Memory_Free( materialThermalDiffusivity );
