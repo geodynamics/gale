@@ -200,7 +200,7 @@
 	<param name="elementMesh"> linearMesh </param>
 	<param name="velocityMesh"> linearMesh </param>
 	<param name="pressureMesh"> constantMesh </param>
-	<param name="dim"> 2 </param>
+	<param name="dim"> 3 </param>
 	<!-- Note : for proper resolution of the problem, it is strongly recommended you run
 	     this problem in parallel, with at least 100 * 50 * 100 elements. The values below are for
 	     small testing / demonstration only. -->
