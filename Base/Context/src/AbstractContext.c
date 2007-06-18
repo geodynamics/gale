@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AbstractContext.c 4099 2007-05-16 01:01:12Z LukeHodkinson $
+** $Id: AbstractContext.c 4146 2007-06-18 05:04:04Z DavidMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -236,7 +236,8 @@ void _AbstractContext_Init(
 		/* See man localtime() for why to adjust these */
 		adjustedYear = 1900 + timeInfo->tm_year;
 		adjustedMonth = 1 + timeInfo->tm_mon;
-		Stg_asprintf( &inputfileRecordWithDateTimeStamp, "%s/%s.%d%d%d.%d.%d.%d.%s", self->outputPath, "input", 
+		/* Format; path/input-YYYY.MM.DD-HH.MM.SS.xml */	
+		Stg_asprintf( &inputfileRecordWithDateTimeStamp, "%s/%s-%.4d.%.2d.%.2d-%.2d.%.2d.%.2d.%s", self->outputPath, "input", 
 			adjustedYear, adjustedMonth, timeInfo->tm_mday,
 			timeInfo->tm_hour, timeInfo->tm_min, timeInfo->tm_sec ,
 			"xml" );
