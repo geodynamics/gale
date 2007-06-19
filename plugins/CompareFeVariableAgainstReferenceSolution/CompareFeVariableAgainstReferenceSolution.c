@@ -450,6 +450,12 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 	errorMagnitudeField = OperatorFeVariable_NewUnary( tmpName, errorField, "Magnitude" );
 	Memory_Free( tmpName );
 
+	/* Build and Initialise the newly-created OperatorFeVariables - else we can't use them */
+	Stg_Component_Build( errorField, self->context, False );
+	Stg_Component_Build( errorMagnitudeField, self->context, False );
+	Stg_Component_Initialise( errorField, self->context, False );
+	Stg_Component_Initialise( errorMagnitudeField, self->context, False );
+
         result = FeVariable_Integrate( errorMagnitudeField, self->integrationSwarm );
 
 	Journal_Printf( 
