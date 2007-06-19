@@ -49,12 +49,18 @@
 	/* Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 	extern const Type Underworld_SwarmOutput_Type;
 
+	typedef void (Underworld_SwarmOutput_GetFeVariableValues)(Underworld_SwarmOutput* uwSwarmOutput, FeVariable* feVariable, MaterialPointsSwarm* swarm, FILE* outputFile);
+	typedef void (Underworld_SwarmOutput_PrintStandardFormat)( MaterialPoint* particle, unsigned particleID, double* result, unsigned fieldComponentCount, FILE* outputFile );
+
 	/* Underworld_SwarmOutput information */
 	#define __Underworld_SwarmOutput \
 		/* Macro defining parent goes here - This means you can cast this class as its parent */ \
-		__SwarmOutput \
+		__Stg_Component \
 		/* Virtual Info */\
-		FieldVariable**           feVariableList; \
+		Underworld_SwarmOutput_GetFeVariableValues* _getFeValuesFunc; \
+		Underworld_SwarmOutput_PrintStandardFormat* _printFunc; \
+		MaterialPointsSwarm*      materialSwarm; \
+		FeVariable**              feVariableList; \
 		Index                     sizeList; \
 		Stream*                   infoStream; \
 		Stream*                   errorStream; \
@@ -103,6 +109,8 @@ void _Underworld_SwarmOutput_Construct( void* shape, Stg_ComponentFactory* cf, v
 	** Private functions
 	*/
 	
+	void _Underworld_SwarmOutput_GetFeVariableValues(Underworld_SwarmOutput* uwSwarmOutput, FeVariable* feVariable, MaterialPointsSwarm* swarm, FILE* outputFile );
+	void _Underworld_SwarmOutput_PrintStandardFormat( MaterialPoint* particle, unsigned particleID, double* result, unsigned fieldComponentCount, FILE* outputFile  );
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Entry Point Hooks
 	*/

@@ -117,62 +117,28 @@ Underworld_SwarmOutput* _Underworld_SwarmOutput_New(
 	return self;
 }
 
-void _Underworld_SwarmOutput_Init( 
-		void*                                 swarmOutput,
-		Stg_ComponentFactory*                 cf,
-	        void*                                 data )
-{
-	Underworld_SwarmOutput*       self       = (Underworld_SwarmOutput*)swarmOutput;
-	Dictionary*             dictionary;
-	Dictionary_Entry_Value* list;
-	Index                   listCount, list_I;
-	char*                   varName;
-
-	self->infoStream = Journal_Register( Info_Type, "Underworld_SwarmOutput Info" );
-	self->errorStream = Journal_Register( Error_Type, "Underworld_SwarmOutput Error" );
-  
-	dictionary = Dictionary_GetDictionary( cf->componentDict, self->name );
-	/* Find how many FeVariables to Display */
-	list = Dictionary_Get( dictionary, "FieldVariables" );
-	Journal_Firewall( list > 0, self->errorStream, "Error in %s:\nNo list of FieldVariables could be found\n", __FILE__ ); 
-
-	listCount = Dictionary_Entry_Value_GetCount( list );
-	if( listCount < 1 ) Journal_Printf( self->infoStream, "Warning in %s: 0 fields have been specified to be used for swarm ouput, is this what you want ???\n");
-	self->sizeList = listCount;
-
-	/* Allocate the memory to store pointers to them */
-	self->feVariableList = Memory_Alloc_Array( FieldVariable*, listCount, "List of FeVariables to output from" );
-
-	/* Assign pointers */
-	for( list_I = 0 ; list_I < listCount ; list_I++ ) {
-		varName = Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( list, list_I ) );
-		self->feVariableList[ list_I ] = 
-			Stg_ComponentFactory_ConstructByName( cf, varName, FieldVariable, True, data );
-	}
-}
-
 
 /*------------------------------------------------------------------------------------------------------------------------
 ** Virtual functions
 */
 
-void _Underworld_SwarmOutput_Delete( void* swarmOutput ) {
-	Underworld_SwarmOutput* self = (Underworld_SwarmOutput*)swarmOutput;
+void _Underworld_SwarmOutput_Delete( void* uwSwarmOutput ) {
+	Underworld_SwarmOutput* self = (Underworld_SwarmOutput*)uwSwarmOutput;
 
 	/* Delete parent */
 	_SwarmOutput_Delete( self );
 }
 
 
-void _Underworld_SwarmOutput_Print( void* swarmOutput, Stream* stream ) {
-	Underworld_SwarmOutput* self = (Underworld_SwarmOutput*)swarmOutput;
+void _Underworld_SwarmOutput_Print( void* uwSwarmOutput, Stream* stream ) {
+	Underworld_SwarmOutput* self = (Underworld_SwarmOutput*)uwSwarmOutput;
 	
 	/* Print parent */
 	_SwarmOutput_Print( self, stream );
 }
 
-void* _Underworld_SwarmOutput_Copy( void* swarmOutput, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
-	Underworld_SwarmOutput*	self = (Underworld_SwarmOutput*)swarmOutput;
+void* _Underworld_SwarmOutput_Copy( void* uwSwarmOutput, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+	Underworld_SwarmOutput*	self = (Underworld_SwarmOutput*)uwSwarmOutput;
 	Underworld_SwarmOutput*	newUnderworld_SwarmOutput;
 	
 	newUnderworld_SwarmOutput = (Underworld_SwarmOutput*)_SwarmOutput_Copy( self, dest, deep, nameExt, ptrMap );
@@ -199,73 +165,149 @@ void* _Underworld_SwarmOutput_DefaultNew( Name name ) {
 }
 
 
-void _Underworld_SwarmOutput_Construct( void* swarmOutput, Stg_ComponentFactory* cf, void* data ) {
-	Underworld_SwarmOutput*  self          = (Underworld_SwarmOutput*) swarmOutput;
+void _Underworld_SwarmOutput_Construct( void* uwSwarmOutput, Stg_ComponentFactory* cf, void* data ) {
+	Underworld_SwarmOutput*  self          = (Underworld_SwarmOutput*) uwSwarmOutput;
 
-	_SwarmOutput_Construct( self, cf, data );
-	
-	_Underworld_SwarmOutput_Init( self, cf, data );
+	MaterialPointsSwarm*    materialSwarm;
+	Dictionary*             dictionary = Dictionary_GetDictionary( cf->componentDict, self->name );
+	Dictionary_Entry_Value* list;
+	unsigned int            listCount, feVar_I;
+	char*                   varName;
 
+	materialSwarm = (MaterialPointsSwarm*)Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm", MaterialPointsSwarm, True, data );
+	/* Get all Swarms specified in input file, under swarms */
+	list = Dictionary_Get( dictionary, "FeVariables" );
+	listCount = Dictionary_Entry_Value_GetCount( list );
+
+	/* Allocate the memory to store pointers to them */
+	self->feVariableList = Memory_Alloc_Array( FeVariable*, listCount, "List FeVariables" );
+
+	for( feVar_I = 0 ; feVar_I < listCount ; feVar_I++ ) {
+		varName = Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( list, feVar_I ) );
+		self->feVariableList[ feVar_I ] = Stg_ComponentFactory_ConstructByName( cf, varName, FeVariable, True, data );
+	}
+
+	self->materialSwarm = materialSwarm;
+	self->sizeList = listCount;
+	self->_getFeValuesFunc = _Underworld_SwarmOutput_GetFeVariableValues;
+	self->_printFunc = _Underworld_SwarmOutput_PrintStandardFormat;
 }
 
-void _Underworld_SwarmOutput_Build( void* swarmOutput, void* data ) {
-	Underworld_SwarmOutput*	self = (Underworld_SwarmOutput*) swarmOutput;
+void _Underworld_SwarmOutput_Build( void* uwSwarmOutput, void* data ) {
+	Underworld_SwarmOutput*	self = (Underworld_SwarmOutput*) uwSwarmOutput;
+	unsigned int feVar_I, feVarNum;
+	
+	/* Build all StGermain based data structure this component uses */
+	feVarNum = self->sizeList;
+	for( feVar_I = 0 ; feVar_I < feVarNum; feVar_I++ ) 
+		Stg_Component_Build( self->feVariableList[feVar_I], data, False );
 
-	_SwarmOutput_Build( self, data );
+	Stg_Component_Build( self->materialSwarm, data, False );
 }
-void _Underworld_SwarmOutput_Initialise( void* swarmOutput, void* data ) {
-	Underworld_SwarmOutput*	self = (Underworld_SwarmOutput*) swarmOutput;
+void _Underworld_SwarmOutput_Initialise( void* uwSwarmOutput, void* data ) {
+	Underworld_SwarmOutput*	self = (Underworld_SwarmOutput*) uwSwarmOutput;
+	unsigned int feVar_I, feVarNum;
 	
-	_SwarmOutput_Initialise( self, data );
-}
-void _Underworld_SwarmOutput_Execute( void* swarmOutput, void* data ) {
-	Underworld_SwarmOutput*	self = (Underworld_SwarmOutput*)swarmOutput;
-	
-	_SwarmOutput_Execute( self, data );
-}
-void _Underworld_SwarmOutput_Destroy( void* swarmOutput, void* data ) {
-	Underworld_SwarmOutput*	self = (Underworld_SwarmOutput*)swarmOutput;
-	
-	_SwarmOutput_Destroy( self, data );
+	/* Initialise all StGermain based data structure this component uses */
+	feVarNum = self->sizeList;
+	for( feVar_I = 0 ; feVar_I < feVarNum; feVar_I++ ) 
+		Stg_Component_Initialise( self->feVariableList[feVar_I], data, False );
 
+	Stg_Component_Initialise( self->materialSwarm, data, False );
+}
+
+void _Underworld_SwarmOutput_Execute( void* uwSwarmOutput, void* data ) {
+	Underworld_SwarmOutput*	self = (Underworld_SwarmOutput*)uwSwarmOutput;
+	PICelleratorContext*    context = (PICelleratorContext*)data;
+	MaterialPointsSwarm*    materialSwarm;
+	FeVariable*             feVar;
+	char*                   filename;
+	unsigned int            feVar_I, feVarNum, timeStep;
+
+	FILE*              outputFile;
+	MPI_Comm	   comm;
+	int                myRank;
+	int                nProcs;
+	MPI_Status         status;
+	const int          FINISHED_WRITING_TAG = 100;
+	int                confirmation = 0;
+
+	MPI_Comm_size( comm, (int*)&nProcs );
+	MPI_Comm_rank( comm, (int*)&myRank );
+	
+	timeStep = context->timeStep;
+	feVarNum = self->sizeList;
+	materialSwarm = self->materialSwarm;
+	
+	/* for each field create file and then write */
+	for( feVar_I = 0 ; feVar_I < feVarNum; feVar_I++ ) {
+		feVar = self->feVariableList[feVar_I];
+		comm = Comm_GetMPIComm( Mesh_GetCommTopology( feVar->feMesh, MT_VERTEX ) );
+
+		/*                                                FieldName             SwarmName                . time  .  dat \0 */
+		filename = Memory_Alloc_Array_Unnamed( char, strlen(feVar->name) + strlen(materialSwarm->name) + 1 + 5 + 1 + 3 + 1 );
+		sprintf( filename, "%s.%.5u.dat", filename, timeStep );
+		/* wait for go-ahead from process ranked lower than me, to avoid competition writing to file */
+		if ( myRank != 0 ) {
+			MPI_Recv( &confirmation, 1, MPI_INT, myRank - 1, FINISHED_WRITING_TAG, comm, &status );
+		}	
+
+		/* if myRank is 0, create file, otherwise append to file */
+		(myRank == 0) ?
+		       	( outputFile = fopen( filename, "w" ) ) :
+		       	( outputFile = fopen( filename, "a" ) ) ;
+
+		self->_getFeValuesFunc( self, feVar, materialSwarm, outputFile );
+		fclose( outputFile );
+	}
+	Memory_Free( filename );
+}
+
+void _Underworld_SwarmOutput_Destroy( void* uwSwarmOutput, void* data ) {
+	Underworld_SwarmOutput*	self = (Underworld_SwarmOutput*)uwSwarmOutput;
+	
 	Memory_Free( self->feVariableList );
 }
 
-void _Underworld_SwarmOutput_PrintHeader( void* swarmOutput, Stream* stream, Particle_Index lParticle_I, void* context ){
-	Underworld_SwarmOutput*	self = (Underworld_SwarmOutput*)swarmOutput;
-	Index                   list_I;
-	
-	_SwarmOutput_PrintHeader( self, stream, lParticle_I, context );
-	
-	for( list_I = 0; list_I < self->sizeList ; list_I++ ) 
-		SwarmOutput_PrintString( self, stream, self->feVariableList[list_I]->name );
-	
+void _Underworld_SwarmOutput_PrintStandardFormat( MaterialPoint* particle, unsigned particleID, double* result, unsigned fieldComponentCount, FILE* outputFile ) {
+		unsigned dof_I;
+		fprintf( outputFile, "%u ", particleID );
+                fprintf( outputFile, "%.15g %.15g %.15g ", particle->coord[0],particle->coord[1], particle->coord[2] ); 
+		for ( dof_I = 0; dof_I < fieldComponentCount; dof_I++ ) 
+			fprintf( outputFile, "%.15g ", result[dof_I] );
+			
+		fprintf( outputFile, "\n" );
 }
-
-void _Underworld_SwarmOutput_PrintData( void* swarmOutput, Stream* stream, Particle_Index lParticle_I, void* context ){
-	Underworld_SwarmOutput*	self                = (Underworld_SwarmOutput*)swarmOutput;
-	Swarm*                  swarm               = self->swarm;
-	GlobalParticle*         particle            = (GlobalParticle*)Swarm_ParticleAt( swarm, lParticle_I );
-	double*                 coord               = particle->coord;
-	double                  value[50];  /* Assume no field has more than 50 components */
-	InterpolationResult     result;
-	Index                   list_I;
-
-	Journal_Firewall(
-		swarm->particleLayout->coordSystem == GlobalCoordSystem,
-		Journal_MyStream( Error_Type, self ),
-		"Swarm is not using global coord system! Modify this code to use both systems\n" );
-
-	_SwarmOutput_PrintData( self, stream, lParticle_I, context );
-
-	for( list_I = 0 ; list_I < self->sizeList ; list_I++ ) {
-		result = FieldVariable_InterpolateValueAt( (FieldVariable*)self->feVariableList[list_I], coord, value );
-		if( result == OTHER_PROC || result == OUTSIDE_GLOBAL )
-			assert( 0 );
-
-		SwarmOutput_PrintTuple( self, stream, value, self->feVariableList[list_I]->fieldComponentCount );
-	}
 	
+void _Underworld_SwarmOutput_GetFeVariableValues(Underworld_SwarmOutput* uwSwarmOutput, FeVariable* feVariable, MaterialPointsSwarm* swarm, FILE* outputFile) {
+	Underworld_SwarmOutput*	self = (Underworld_SwarmOutput*)uwSwarmOutput;
+	MaterialPoint*          particle;
+	unsigned int            localElementCount, lElement_I; 
+	unsigned int            cellID, cellParticleCount, cParticle_I, particleID;
+	unsigned int            fieldComponentCount = feVariable->fieldComponentCount;
+	FeMesh*                 feMesh = feVariable->feMesh;
+	double*                 result = Memory_Alloc_Array( double, fieldComponentCount, "Answer to Life?" );
+
+	localElementCount = FeMesh_GetElementLocalSize( feMesh );
+
+	/* Loop over local elements in problem */
+	for( lElement_I = 0 ; lElement_I < localElementCount ; lElement_I++ ) {
+		cellID            = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
+		cellParticleCount = swarm->cellParticleCountTbl[ cellID ];
+
+		/* Loop over materialPoints in element */
+		for ( cParticle_I = 0 ; cParticle_I < cellParticleCount ; cParticle_I++ ) {
+			particle = (MaterialPoint*)Swarm_ParticleInCellAt( swarm, cellID, cParticle_I );
+			particleID = swarm->cellParticleTbl[cellID][cParticle_I];
+			/* Interpolate field to particle location (is Global because it uses the
+			 * material Points Swarm, could be a bit slow ???*/
+			_FeVariable_InterpolateValueAt( feVariable, particle->coord, result );
+
+			self->_printFunc( particle, particleID, result, fieldComponentCount, outputFile );
+
+		}
+	}
+	Memory_Free( result );
 }
 
 /*-------------------------------------------------------------------------------------------------------------------------
