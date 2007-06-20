@@ -133,9 +133,9 @@ void Underworld_BuoyancyIntegrals_Setup( void *_context )
         }
 
 
-	ctx->beta = Stg_ComponentFactory_GetRootDictDouble( context->CF, "diffusivity", -1 );
+	ctx->beta = Stg_ComponentFactory_GetRootDictDouble( context->CF, "alpha", -1 );
 	if( (int)ctx->beta == -1 ) {
-		printf("******************** ERROR DIFFUSIVITY IS UNINITIALISED ******************************** \n");
+		printf("******************** ERROR ALPHA IS UNINITIALISED ******************************** \n");
 	}
 
 	ctx->gravity = Stg_ComponentFactory_GetRootDictDouble( context->CF, "gravity", -1 );
