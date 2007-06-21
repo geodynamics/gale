@@ -82,8 +82,6 @@
 		Stg_Component_InitialiseFunction*                  _initialise,
 		Stg_Component_ExecuteFunction*                     _execute,
 		Stg_Component_DestroyFunction*                     _destroy,		
-		SwarmOutput_PrintHeaderFunction*                   _printHeader,		
-		SwarmOutput_PrintDataFunction*                     _printData,		
 		Name                                               name );
 
 	/* Stg_Class_Delete Underworld_SwarmOutput implementation */

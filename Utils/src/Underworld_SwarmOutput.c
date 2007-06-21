@@ -85,29 +85,26 @@ Underworld_SwarmOutput* _Underworld_SwarmOutput_New(
 		Stg_Component_InitialiseFunction*                  _initialise,
 		Stg_Component_ExecuteFunction*                     _execute,
 		Stg_Component_DestroyFunction*                     _destroy,		
-		SwarmOutput_PrintHeaderFunction*                   _printHeader,		
-		SwarmOutput_PrintDataFunction*                     _printData,		
 		Name                                               name )
 {
 	Underworld_SwarmOutput* self;
 	
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
 	assert( _sizeOfSelf >= sizeof(Underworld_SwarmOutput) );
-	self = (Underworld_SwarmOutput*)_SwarmOutput_New( 
-			_sizeOfSelf,
-			type,
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,		
-			_printHeader,
-			_printData,
-			name );
+	self = (Underworld_SwarmOutput*)_Stg_Component_New( 
+					_sizeOfSelf,
+					type,
+					_delete,
+					_print,
+					_copy,
+					_defaultConstructor,
+					_construct,
+					_build,
+					_initialise,
+					_execute,
+					_destroy,		
+					name,
+					NON_GLOBAL );
 
 	
 	/* General info */
@@ -159,8 +156,6 @@ void* _Underworld_SwarmOutput_DefaultNew( Name name ) {
 			_Underworld_SwarmOutput_Initialise,
 			_Underworld_SwarmOutput_Execute,
 			_Underworld_SwarmOutput_Destroy,
-			_Underworld_SwarmOutput_PrintHeader,
-			_Underworld_SwarmOutput_PrintData,
 			name );
 }
 
