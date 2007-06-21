@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StandardConditionFunctions.c 860 2007-06-07 05:47:20Z LukeHodkinson $
+** $Id: StandardConditionFunctions.c 881 2007-06-21 02:09:32Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -105,6 +105,9 @@ void _StgFEM_StandardConditionFunctions_Construct( void* component, Stg_Componen
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_StepFunction, "StepFunction");
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpecRidge3D, "SpecRidge3D");
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ConstantVelocity, "ConstantVelocity");
@@ -836,4 +839,63 @@ void StgFEM_StandardConditionFunctions_ConstantVelocity( Node_LocalIndex node_lI
 	result[ J_AXIS ] = velocity[ J_AXIS ];
 	if( feVariable->dim == 3 )
 		result[ K_AXIS ] = velocity[ K_AXIS ];
+}
+
+/* error function for use in 3D spec ridge top BC */
+double errorFunction(double z, int n) {
+	double		pi	= 3.1415926535;
+	double 		a;
+	double 		erf 	= 0.0;
+	int		denom;
+	int		i, j;
+
+	a = 2.0/sqrt( pi );
+
+	for( i=0 ; i<n ; i++ ) {
+		
+		denom = 1;
+		for( j=1 ; j<=2*i+1 ; j+=2 ) denom *= j; 
+		
+		erf += pow( 2, i )*pow( z, 2*i+1 )/denom;
+
+	}
+
+	return erf *= a*exp( -1.0*z*z );
+}
+
+/* 3D spec ridge top BC (for milestone 1 of magma project) 
+ * to be applied to the top x-z plane of the domain */
+void StgFEM_StandardConditionFunctions_SpecRidge3D( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	FiniteElementContext *	context            = (FiniteElementContext*)_context;
+	FeVariable*             feVariable         = NULL;
+	FeMesh*			feMesh             = NULL;
+	Dictionary*             dictionary         = context->dictionary;
+	double*                 result             = (double*) _result;
+        double*                 coord;
+
+	double			leftVal;
+	double			rightVal;
+	double			xOffset1;
+	double			xOffset2;
+	double			yOffset;
+
+
+	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
+	feMesh       = feVariable->feMesh;
+	coord      = Mesh_GetVertex( feMesh, node_lI );
+
+	leftVal = Dictionary_GetDouble_WithDefault( dictionary, "SpecRidge3DLeftSide", 0.0 );
+	rightVal = Dictionary_GetDouble_WithDefault( dictionary, "SpecRidge3DRightSide", 0.0 );
+	xOffset1 = Dictionary_GetDouble_WithDefault( dictionary, "SpecRidge3DXOffset1", 0.0 );
+	xOffset2 = Dictionary_GetDouble_WithDefault( dictionary, "SpecRidge3DXOffset2", 0.0 );
+	yOffset = Dictionary_GetDouble_WithDefault( dictionary, "SpecRidge3DZOffset", 0.0 );
+
+	printf("\n\ninto SpecRidge3D BC.\n\n");
+
+	if( coord[0] < xOffset1 )
+		*result = leftVal;
+	else if( coord[0] < xOffset2 && coord[2] > yOffset )
+		*result = leftVal;
+	else
+		*result = rightVal;
 }
