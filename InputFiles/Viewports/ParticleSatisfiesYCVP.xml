@@ -13,10 +13,14 @@
 		
 		<struct name="hassatisfiedColourMap">
 			<param name="Type">lucColourMap</param>
-			<param name="colours">Blue Yellow</param>
+			<param name="colours">Yellow Blue White</param>
 			<param name="dynamicRange">True</param>
 		</struct>
-	
+		<struct name="hassatisfiedColourBar">
+			<param name="Type">lucColourBar</param>
+			<param name="ColourMap">hassatisfiedColourMap</param>
+		</struct>
+
 		<!-- Drawing Objects -->
 		<struct name="ParticleSatisfiesYC">
 			<param name="Type">lucSwarmViewer</param>
@@ -28,6 +32,7 @@
 			<param name="ColourMap">hassatisfiedColourMap</param>
 			<!--param name="Colour">Green</param>
 			<param name="OpacityVariable">materialSwarm-YieldTypeOpacity</param-->
+			<param name="pointSize">2.0</param>
 		</struct>
 
 		
@@ -50,6 +55,7 @@
 				<param>ParticleSatisfiesYC</param>
 				<param>hsborder</param>
 				<param>hstitle</param>
+				<param>hassatisfiedColourBar</param>
 			</list>
 		</struct>
 	</struct>
