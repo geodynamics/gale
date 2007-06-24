@@ -9,19 +9,15 @@
 			<param name="CentreFieldVariable">VelocityField</param>
 			<param name="coordZ">1.4762</param>
 		</struct>
-		<struct name="yieldedColourMap">
-			<param name="Type">lucColourMap</param>
-			<param name="colours">Yellow Green</param>
-			<param name="dynamicRange">False</param>
-			<param name="minimum">0.0</param>
-			<param name="maximum">1.0</param>
-		</struct>
+		
 		<!-- Drawing Objects -->
 		<struct name="hyparticleDots">
 			<param name="Type">lucSwarmViewer</param>
 			<param name="Swarm">materialSwarm</param>
-			<param name="ColourVariable">materialSwarm-HasYielded</param>
-			<param name="ColourMap">yieldedColourMap</param>
+			<param name="MaskVariable">materialSwarm-HasYielded</param>
+			<param name="maskValue">1</param>
+			<param name="maskType">EqualTo</param>
+			<param name="colour">Green</param>
 			<param name="pointSize">2.0</param>
 		</struct>		
 		<struct name="hyborder">
