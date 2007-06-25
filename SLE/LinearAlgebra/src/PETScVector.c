@@ -175,6 +175,7 @@ void PETScVector_SetComm( void* vector, MPI_Comm comm ) {
 		VecDestroy( self->petscVec );
 	ec = VecCreate( comm, &self->petscVec );
 	CheckPETScError( ec );
+
 }
 
 void PETScVector_SetGlobalSize( void* vector, unsigned size ) {
@@ -187,6 +188,11 @@ void PETScVector_SetGlobalSize( void* vector, unsigned size ) {
 	CheckPETScError( ec );
 	ec = VecSetFromOptions( self->petscVec );
 	CheckPETScError( ec );
+
+        #if( (PETSC_VERSION_MINOR == 3) && (PETSC_VERSION_SUBMINOR > 2) )
+        VecSetOption( self->petscVec, VEC_IGNORE_NEGATIVE_INDICES );
+        #endif
+
 }
 
 void PETScVector_SetLocalSize( void* vector, unsigned size ) {
@@ -199,6 +205,11 @@ void PETScVector_SetLocalSize( void* vector, unsigned size ) {
 	CheckPETScError( ec );
 	ec = VecSetFromOptions( self->petscVec );
 	CheckPETScError( ec );
+
+        #if( (PETSC_VERSION_MINOR == 3) && (PETSC_VERSION_SUBMINOR > 2) )
+        VecSetOption( self->petscVec, VEC_IGNORE_NEGATIVE_INDICES );
+        #endif
+
 }
 
 void PETScVector_AddEntries( void* vector, unsigned nEntries, unsigned* indices, double* values ) {
@@ -422,6 +433,7 @@ void PETScVector_RestoreArray( void* vector, double** array ) {
 	CheckPETScError( ec );
 }
 
+/* Why isn't VecDuplicate() being used Luke ?? */
 void PETScVector_Duplicate( void* vector, void** dstVector ) {
 	PETScVector*	self = (PETScVector*)vector;
 	PetscErrorCode	ec;
@@ -434,6 +446,8 @@ void PETScVector_Duplicate( void* vector, void** dstVector ) {
 	CheckPETScError( ec );
 
 	ec = VecCreate( self->comm, &((PETScVector*)*dstVector)->petscVec );
+
+
 	CheckPETScError( ec );
 }
 
