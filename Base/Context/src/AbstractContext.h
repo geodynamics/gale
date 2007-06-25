@@ -35,7 +35,7 @@
 **	This is a class, of which subclasses can be defined, which can override default methods.
 **	Currently built with only MeshPIC_Context in mind (for Snac).
 **
-** $Id: AbstractContext.h 3857 2006-10-14 18:06:05Z LukeHodkinson $
+** $Id: AbstractContext.h 4147 2007-06-25 05:50:03Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -260,6 +260,10 @@
 
 	Bool AbstractContext_CheckPointExists( void* context, Index timeStep );
 	char* AbstractContext_GetTimeInfoFileNameForGivenTimeStep( void* context, Index timeStep );
+
+	/* Works out the prefix string to use for checkpoint files (input path + C.P. prefix)
+	 * Note this allocates a string which the user needs to free when done. */ 
+	char* Context_GetCheckPointInputPrefixString( void* context );
 	
 	/* Context private methods ************************************************************************************************/
 	

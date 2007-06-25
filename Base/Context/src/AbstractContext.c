@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AbstractContext.c 4146 2007-06-18 05:04:04Z DavidMay $
+** $Id: AbstractContext.c 4147 2007-06-25 05:50:03Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -1044,4 +1044,26 @@ char* AbstractContext_GetTimeInfoFileNameForGivenTimeStep( void* context, Index 
 	sprintf( timeInfoFileName, "%stimeInfo.%.5u.dat", timeInfoFileName, timeStep );
 
 	return timeInfoFileName;
+}
+
+
+char* Context_GetCheckPointInputPrefixString( void* context ) {
+	AbstractContext*       self = context;	
+	Index                  inputStrLen = 0;
+	char*                  inputPathString = NULL;
+
+	inputStrLen = strlen(self->outputPath) + 1 + 1;
+	if ( strlen(self->checkPointPrefixString) > 0 ) {
+		inputStrLen += strlen(self->checkPointPrefixString) + 1;
+	}
+	inputPathString = Memory_Alloc_Array( char, inputStrLen, "inputPathString" );
+
+	if ( strlen(self->checkPointPrefixString) > 0 ) {
+		sprintf( inputPathString, "%s/%s.", self->outputPath, self->checkPointPrefixString );
+	}
+	else {
+		sprintf( inputPathString, "%s/", self->outputPath );
+	}
+
+	return inputPathString;
 }
