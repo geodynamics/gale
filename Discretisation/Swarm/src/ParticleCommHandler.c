@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ParticleCommHandler.c 4119 2007-05-22 07:35:46Z RaquibulHassan $
+** $Id: ParticleCommHandler.c 4148 2007-06-26 03:49:27Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -693,6 +693,7 @@ void _ParticleCommHandler_PrintCommunicationVolumeStats( ParticleCommHandler* se
 			Stream_UnIndent( stream );
 		}
 	}
+	MPI_Barrier( self->swarm->comm );
 
 	procTimes = Memory_Alloc_Array( double, self->swarm->nProc, "procTimes" );
 	MPI_Gather( &myProcTime, 1, MPI_DOUBLE, procTimes, 1, MPI_DOUBLE, 0, self->swarm->comm );
