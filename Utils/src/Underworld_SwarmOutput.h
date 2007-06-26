@@ -50,7 +50,7 @@
 	extern const Type Underworld_SwarmOutput_Type;
 
 	typedef void (Underworld_SwarmOutput_GetFeVariableValues)(Underworld_SwarmOutput* uwSwarmOutput, FeVariable* feVariable, MaterialPointsSwarm* swarm, FILE* outputFile);
-	typedef void (Underworld_SwarmOutput_PrintStandardFormat)( MaterialPoint* particle, unsigned particleID, double* result, unsigned fieldComponentCount, FILE* outputFile );
+	typedef void (Underworld_SwarmOutput_PrintStandardFormat)( MaterialPoint* particle, double* result, unsigned fieldComponentCount, FILE* outputFile );
 
 	/* Underworld_SwarmOutput information */
 	#define __Underworld_SwarmOutput \
@@ -108,7 +108,7 @@ void _Underworld_SwarmOutput_Construct( void* shape, Stg_ComponentFactory* cf, v
 	*/
 	
 	void _Underworld_SwarmOutput_GetFeVariableValues(Underworld_SwarmOutput* uwSwarmOutput, FeVariable* feVariable, MaterialPointsSwarm* swarm, FILE* outputFile );
-	void _Underworld_SwarmOutput_PrintStandardFormat( MaterialPoint* particle, unsigned particleID, double* result, unsigned fieldComponentCount, FILE* outputFile  );
+	void _Underworld_SwarmOutput_PrintStandardFormat( MaterialPoint* particle, double* result, unsigned fieldComponentCount, FILE* outputFile  );
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Entry Point Hooks
 	*/

@@ -159,16 +159,29 @@ void* _Underworld_SwarmOutput_DefaultNew( Name name ) {
 			name );
 }
 
+void _Underworld_SwarmOutput( Underworld_SwarmOutput* self,
+				PICelleratorContext*  context,
+				MaterialPointsSwarm*  materialSwarm,
+				unsigned int          listCount ) {
+	self->materialSwarm = materialSwarm;
+	self->sizeList = listCount;
+	self->_getFeValuesFunc = _Underworld_SwarmOutput_GetFeVariableValues;
+	self->_printFunc = _Underworld_SwarmOutput_PrintStandardFormat;
+
+	EP_AppendClassHook( Context_GetEntryPoint( context, AbstractContext_EP_DumpClass ), _Underworld_SwarmOutput_Execute, self );
+}
 
 void _Underworld_SwarmOutput_Construct( void* uwSwarmOutput, Stg_ComponentFactory* cf, void* data ) {
 	Underworld_SwarmOutput*  self          = (Underworld_SwarmOutput*) uwSwarmOutput;
 
+	PICelleratorContext*    context;
 	MaterialPointsSwarm*    materialSwarm;
 	Dictionary*             dictionary = Dictionary_GetDictionary( cf->componentDict, self->name );
 	Dictionary_Entry_Value* list;
 	unsigned int            listCount, feVar_I;
 	char*                   varName;
 
+	context      =  Stg_ComponentFactory_ConstructByName(  cf,  "context", PICelleratorContext,  True, data ) ;
 	materialSwarm = (MaterialPointsSwarm*)Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm", MaterialPointsSwarm, True, data );
 	/* Get all Swarms specified in input file, under swarms */
 	list = Dictionary_Get( dictionary, "FeVariables" );
@@ -182,10 +195,11 @@ void _Underworld_SwarmOutput_Construct( void* uwSwarmOutput, Stg_ComponentFactor
 		self->feVariableList[ feVar_I ] = Stg_ComponentFactory_ConstructByName( cf, varName, FeVariable, True, data );
 	}
 
-	self->materialSwarm = materialSwarm;
-	self->sizeList = listCount;
-	self->_getFeValuesFunc = _Underworld_SwarmOutput_GetFeVariableValues;
-	self->_printFunc = _Underworld_SwarmOutput_PrintStandardFormat;
+	_Underworld_SwarmOutput( self,
+				 context,
+				 materialSwarm,
+				 listCount );
+
 }
 
 void _Underworld_SwarmOutput_Build( void* uwSwarmOutput, void* data ) {
@@ -217,6 +231,7 @@ void _Underworld_SwarmOutput_Execute( void* uwSwarmOutput, void* data ) {
 	MaterialPointsSwarm*    materialSwarm;
 	FeVariable*             feVar;
 	char*                   filename;
+	char*                   outputPath = context->outputPath;
 	unsigned int            feVar_I, feVarNum, timeStep;
 
 	FILE*              outputFile;
@@ -227,8 +242,6 @@ void _Underworld_SwarmOutput_Execute( void* uwSwarmOutput, void* data ) {
 	const int          FINISHED_WRITING_TAG = 100;
 	int                confirmation = 0;
 
-	MPI_Comm_size( comm, (int*)&nProcs );
-	MPI_Comm_rank( comm, (int*)&myRank );
 	
 	timeStep = context->timeStep;
 	feVarNum = self->sizeList;
@@ -237,24 +250,38 @@ void _Underworld_SwarmOutput_Execute( void* uwSwarmOutput, void* data ) {
 	/* for each field create file and then write */
 	for( feVar_I = 0 ; feVar_I < feVarNum; feVar_I++ ) {
 		feVar = self->feVariableList[feVar_I];
+
 		comm = Comm_GetMPIComm( Mesh_GetCommTopology( feVar->feMesh, MT_VERTEX ) );
 
-		/*                                                FieldName             SwarmName                . time  .  dat \0 */
-		filename = Memory_Alloc_Array_Unnamed( char, strlen(feVar->name) + strlen(materialSwarm->name) + 1 + 5 + 1 + 3 + 1 );
-		sprintf( filename, "%s.%.5u.dat", filename, timeStep );
+		MPI_Comm_size( comm, (int*)&nProcs );
+		MPI_Comm_rank( comm, (int*)&myRank );
+
+		filename = Memory_Alloc_Array_Unnamed( char,
+		        /*           OutputPath     .      FieldName        .      SwarmName                . time . dat\0 */
+			       	strlen(outputPath) +1+ strlen(feVar->name) +1+ strlen(materialSwarm->name) +1+ 5 + 1+ 3 +1 );
+		sprintf( filename, "%s/%s.%s.%.5u.dat", outputPath, feVar->name, materialSwarm->name, timeStep );
 		/* wait for go-ahead from process ranked lower than me, to avoid competition writing to file */
 		if ( myRank != 0 ) {
 			MPI_Recv( &confirmation, 1, MPI_INT, myRank - 1, FINISHED_WRITING_TAG, comm, &status );
 		}	
 
 		/* if myRank is 0, create file, otherwise append to file */
-		(myRank == 0) ?
-		       	( outputFile = fopen( filename, "w" ) ) :
-		       	( outputFile = fopen( filename, "a" ) ) ;
+		if (myRank == 0) {
+			outputFile = fopen( filename, "w" );
+			fprintf( outputFile, "# FORMAT is:\n# MaterialID, Xpos, Ypos, Zpos, (values of field)\n" );
+		} else {
+		       	outputFile = fopen( filename, "a" );
+		}
 
 		self->_getFeValuesFunc( self, feVar, materialSwarm, outputFile );
 		fclose( outputFile );
 	}
+
+	/* send go-ahead from process ranked lower than me, to avoid competition writing to file */
+	if ( myRank != nProcs - 1 ) {
+		MPI_Ssend( &confirmation, 1, MPI_INT, myRank + 1, FINISHED_WRITING_TAG, comm );
+	}
+
 	Memory_Free( filename );
 }
 
@@ -264,10 +291,10 @@ void _Underworld_SwarmOutput_Destroy( void* uwSwarmOutput, void* data ) {
 	Memory_Free( self->feVariableList );
 }
 
-void _Underworld_SwarmOutput_PrintStandardFormat( MaterialPoint* particle, unsigned particleID, double* result, unsigned fieldComponentCount, FILE* outputFile ) {
+void _Underworld_SwarmOutput_PrintStandardFormat( MaterialPoint* particle, double* result, unsigned fieldComponentCount, FILE* outputFile ) {
 		unsigned dof_I;
-		fprintf( outputFile, "%u ", particleID );
-                fprintf( outputFile, "%.15g %.15g %.15g ", particle->coord[0],particle->coord[1], particle->coord[2] ); 
+		fprintf( outputFile, "%u ", particle->materialIndex );
+                fprintf( outputFile, "%.15g %.15g %.15g ", particle->coord[0], particle->coord[1], particle->coord[2] ); 
 		for ( dof_I = 0; dof_I < fieldComponentCount; dof_I++ ) 
 			fprintf( outputFile, "%.15g ", result[dof_I] );
 			
@@ -278,7 +305,7 @@ void _Underworld_SwarmOutput_GetFeVariableValues(Underworld_SwarmOutput* uwSwarm
 	Underworld_SwarmOutput*	self = (Underworld_SwarmOutput*)uwSwarmOutput;
 	MaterialPoint*          particle;
 	unsigned int            localElementCount, lElement_I; 
-	unsigned int            cellID, cellParticleCount, cParticle_I, particleID;
+	unsigned int            cellID, cellParticleCount, cParticle_I;
 	unsigned int            fieldComponentCount = feVariable->fieldComponentCount;
 	FeMesh*                 feMesh = feVariable->feMesh;
 	double*                 result = Memory_Alloc_Array( double, fieldComponentCount, "Answer to Life?" );
@@ -293,12 +320,11 @@ void _Underworld_SwarmOutput_GetFeVariableValues(Underworld_SwarmOutput* uwSwarm
 		/* Loop over materialPoints in element */
 		for ( cParticle_I = 0 ; cParticle_I < cellParticleCount ; cParticle_I++ ) {
 			particle = (MaterialPoint*)Swarm_ParticleInCellAt( swarm, cellID, cParticle_I );
-			particleID = swarm->cellParticleTbl[cellID][cParticle_I];
 			/* Interpolate field to particle location (is Global because it uses the
 			 * material Points Swarm, could be a bit slow ???*/
 			_FeVariable_InterpolateValueAt( feVariable, particle->coord, result );
 
-			self->_printFunc( particle, particleID, result, fieldComponentCount, outputFile );
+			self->_printFunc( particle, result, fieldComponentCount, outputFile );
 
 		}
 	}
