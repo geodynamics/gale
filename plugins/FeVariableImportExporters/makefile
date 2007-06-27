@@ -39,7 +39,7 @@
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-subdirs = FeVariable_ImportExport_ABAQUS 
+subdirs = FeVariable_ImportExport_ABAQUS FeVariable_ImportExport_SpecRidge2D
 
 # obtain defaults for required variables according to system and project location, and then run the build.
 SHELL := $(shell which bash)
