@@ -411,9 +411,10 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 	Memory_Free( tmpName );
 
 	Stg_Component_Build( referenceFeVar, NULL, False );
-	Stg_Component_Initialise( referenceFeVar, NULL, False );
+	/*Stg_Component_Initialise( referenceFeVar, NULL, False );*/
+	Stg_Component_Initialise( referenceFeVar, self->context, False );
 	Stg_Component_Build( roundedFeVar, NULL, False );
-	Stg_Component_Initialise( roundedFeVar, NULL, False );
+	Stg_Component_Initialise( roundedFeVar, self->context, False );
 
 	Stg_asprintf( &prefix, "%s/", self->referencePath );
 	FeVariable_ReadFromFile( referenceFeVar, prefix, self->context->timeStep );
