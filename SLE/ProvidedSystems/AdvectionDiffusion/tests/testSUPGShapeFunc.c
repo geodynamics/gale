@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testSUPGShapeFunc.c 860 2007-06-07 05:47:20Z LukeHodkinson $
+** $Id: testSUPGShapeFunc.c 886 2007-06-27 00:17:29Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -254,7 +254,7 @@ int main( int argc, char* argv[] ) {
 	
 	/* Create the finite element field variable*/
 	feVariable    = FeVariable_New( "VelocityField", feMesh, NULL, dofs, NULL, NULL, NULL, context->dim, False, 
-		StgFEM_Native_ImportExportType, StgFEM_Native_ImportExportType, context->fieldVariable_Register );
+		StgFEM_Native_ImportExportType, StgFEM_Native_ImportExportType, False, False, context->fieldVariable_Register );
 
 	/* Swarm stuff */
 	if ( context->dim == 3 ) 
