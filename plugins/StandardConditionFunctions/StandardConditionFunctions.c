@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StandardConditionFunctions.c 881 2007-06-21 02:09:32Z DavidLee $
+** $Id: StandardConditionFunctions.c 884 2007-06-27 00:13:52Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -841,7 +841,7 @@ void StgFEM_StandardConditionFunctions_ConstantVelocity( Node_LocalIndex node_lI
 		result[ K_AXIS ] = velocity[ K_AXIS ];
 }
 
-/* error function for use in 3D spec ridge top BC */
+/* error function for use in 3D spec ridge top BC - not currently in use */
 double errorFunction(double z, int n) {
 	double		pi	= 3.1415926535;
 	double 		a;
@@ -889,8 +889,6 @@ void StgFEM_StandardConditionFunctions_SpecRidge3D( Node_LocalIndex node_lI, Var
 	xOffset1 = Dictionary_GetDouble_WithDefault( dictionary, "SpecRidge3DXOffset1", 0.0 );
 	xOffset2 = Dictionary_GetDouble_WithDefault( dictionary, "SpecRidge3DXOffset2", 0.0 );
 	yOffset = Dictionary_GetDouble_WithDefault( dictionary, "SpecRidge3DZOffset", 0.0 );
-
-	printf("\n\ninto SpecRidge3D BC.\n\n");
 
 	if( coord[0] < xOffset1 )
 		*result = leftVal;
