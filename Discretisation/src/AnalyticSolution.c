@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AnalyticSolution.c 860 2007-06-07 05:47:20Z LukeHodkinson $
+** $Id: AnalyticSolution.c 887 2007-06-27 00:20:35Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -475,7 +475,7 @@ FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVari
 	tmpName = Stg_Object_AppendSuffix( feVariable, "Analytic" );
 	analyticFeVariable = FeVariable_New( tmpName, feVariable->feMesh, feVariable->geometryMesh, dofLayout,
 		NULL, NULL, NULL, feVariable->dim, feVariable->isCheckpointedAndReloaded, 
-		feVariable->importFormatType, feVariable->exportFormatType, 
+		feVariable->importFormatType, feVariable->exportFormatType, False, False,
 		feVariable->fieldVariable_Register );
 
 	/* Add new analyticFeVariable to list */

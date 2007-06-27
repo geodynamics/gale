@@ -154,6 +154,8 @@ ShapeFeVariable* _ShapeFeVariable_New(
 			isCheckpointedAndReloaded, /* Checkpointing boolean */
 			StgFEM_Native_ImportExportType,	/* import format type */
 			StgFEM_Native_ImportExportType,	/* export format type */
+			False,	/* isReference */
+			False,  /* loadReferenceEachTimestep */
 			communicator,	/* communicator */
 			fV_Register	/* fv_Register */
 			);

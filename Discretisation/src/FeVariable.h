@@ -122,9 +122,15 @@
 		FeVariable*                                       templateFeVariable; \
 		/** A type recording what import/export system for loading and saving should be used */ \
 		char*                                             importFormatType; \
-		char*                                             exportFormatType;
+		char*                                             exportFormatType; \
+		/** Records whether this FeVariable is a reference solution - and should be loaded from a file, regardless
+		 * of checkpointing status */ \
+		Bool                                              isReferenceSolution; \
+		/* if self->isReferenceSolution is true, this param determines if it's loaded once at the start, or every
+		 * timestep. */ \
+		Bool                                              loadReferenceEachTimestep; 
 
-		
+
 	/* Brings together and manages the life cycle of all the components required by the
 	Finite Element Method about a variable to be solved for - see FeVariable.h */
 	struct FeVariable { __FeVariable };
@@ -147,6 +153,8 @@
 		Bool                                            isCheckpointedAndReloaded,
 		const char* const                               importFormatType,
 		const char* const                               exportFormatType,
+		Bool                                            referenceSoulution,
+		Bool                                            loadReferenceEachTimestep,
 		FieldVariable_Register*                         fV_Register );
 
 	/** Create a new FeVariable and initialises it. Mesh, bcs and eqNum table is based off a template one.
@@ -176,6 +184,8 @@
 		Bool                                            isCheckpointedAndReloaded,
 		const char* const                               importFormatType,
 		const char* const                               exportFormatType,
+		Bool                                            referenceSoulution,
+		Bool                                            loadReferenceEachTimestep,
 		MPI_Comm                                        communicator,
 		FieldVariable_Register*                         fV_Register );
 	
@@ -214,6 +224,8 @@
 		Bool                                            isCheckpointedAndReloaded,
 		const char* const                               importFormatType,
 		const char* const                               exportFormatType,
+		Bool                                            referenceSoulution,
+		Bool                                            loadReferenceEachTimestep,
 		MPI_Comm                                        communicator,
 		FieldVariable_Register*                         fV_Register );
 	
@@ -228,7 +240,9 @@
 		void*                                           linkedDofInfo,
 		void*                                           templateFeVariable,
 		const char* const                               importFormatType,
-		const char* const                               exportFormatType );
+		const char* const                               exportFormatType,
+		Bool                                            referenceSoulution,
+		Bool                                            loadReferenceEachTimestep );
 	
 	/** Stg_Class_Delete a FeVariable construst */
 	void _FeVariable_Delete( void* variable );
