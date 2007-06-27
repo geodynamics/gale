@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testElementIntegral.c 466 2007-05-22 04:27:01Z LukeHodkinson $
+** $Id: testElementIntegral.c 476 2007-06-27 00:32:30Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -176,7 +176,7 @@ void PICellerator_testElementIntegral( DiscretisationContext* context ) {
 	/* Create FeVariable */
 	feVariable = FeVariable_New_Full( "feVariable", mesh, NULL, NULL, NULL, NULL, NULL, NULL, 
 			1, context->dim, False, StgFEM_Native_ImportExportType, StgFEM_Native_ImportExportType,
-			MPI_COMM_WORLD, context->fieldVariable_Register );
+			False, False, MPI_COMM_WORLD, context->fieldVariable_Register );
 
 	funcName = Dictionary_GetString( context->dictionary, "FunctionName" );
 	if ( strcasecmp( funcName, "ShapeFunction" ) == 0 ) {
