@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: BuoyancyForceTerm.c 456 2007-04-27 06:21:01Z LukeHodkinson $
+** $Id: BuoyancyForceTerm.c 475 2007-06-27 00:31:44Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -348,7 +348,7 @@ void _BuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVect
 	double                           gravity;
 	double                           detJac             = 0.0;
 	double                           factor;
-	double                           Ni[8];
+	double                           Ni[27];
 	double                           force;
 	double*                          xi;
 	Material*                        material;
