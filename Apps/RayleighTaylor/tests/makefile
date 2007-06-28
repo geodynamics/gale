@@ -38,7 +38,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 467 2007-05-24 08:30:12Z JulianGiordani $
+## $Id: makefile 488 2007-06-28 06:15:39Z PatrickSunter $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -53,14 +53,14 @@ subdirs = #AnalyticColumn AnalyticBlock
 modName = $(shell basename `pwd | sed s/tests//g`)
 
 checks = \
-	testAnalyticBlock.0of1.sh \
+	testRayTay3D.0of1.sh \
+	testRayTaySuperimposedBall2D.0of1.sh \
+	testRayTaySuperimposedBall2D-invert.0of1.sh
+	# testAnalyticBlock.0of1.sh \
 	testAnalyticBlock.0of2.sh \
 	testAnalyticColumn.0of1.sh \
 	testAnalyticColumn.0of2.sh \
 	testAnalyticColumn3D.0of1.sh \
-	testRayTay3D.0of1.sh \
-	testRayTaySuperimposedBall2D.0of1.sh \
-	testRayTaySuperimposedBall2D-invert.0of1.sh
 
 ifeq (${MACHINE},i686)
 	# i686 archs have weaker floating point calculations
