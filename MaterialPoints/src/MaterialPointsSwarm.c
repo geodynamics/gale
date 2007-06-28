@@ -297,8 +297,29 @@ void _MaterialPointsSwarm_Construct( void* swarm, Stg_ComponentFactory* cf, void
 
 void _MaterialPointsSwarm_Build( void* swarm, void* data ) {
 	MaterialPointsSwarm*	self = (MaterialPointsSwarm*) swarm;
+	int			commHandler_I;
+	Bool                    movementCommHandlerFound = False;
+	Stream*                 errorStream = Journal_Register( Error_Type, self->type );
 
 	_Swarm_Build( self, data );
+
+	/* Since this swarm is being set up to advect a PICellerator material, it should make sure
+	 * at least one ParticleMovementHandler-type ParticleCommHandler has been added to the base
+	 * Swarm. */
+	for( commHandler_I=0; commHandler_I < self->commHandlerList->count; commHandler_I++ ){
+		ParticleCommHandler *pComm = NULL;
+
+		pComm = (ParticleCommHandler*)(Stg_ObjectList_At( self->commHandlerList, commHandler_I ));
+		if( pComm->type == ParticleMovementHandler_Type ) {
+			movementCommHandlerFound = True;
+			break;
+		}
+	}
+
+	Journal_Firewall( ( self->commHandlerList >= 1) && (movementCommHandlerFound == True),
+		errorStream, "Error: for MaterialPointsSwarm Swarms, at least one ParticleMovementHandler"
+			" commHandler must be registered. Please rectify this in your XML / code.\n" );
+
 	Stg_Component_Build( self->particleCoordVariable, data, False );
 	Stg_Component_Build( self->materialIndexVariable, data, False );
 
