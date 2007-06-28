@@ -36,7 +36,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: testFeEquationNumber-LM.0of2.sh 535 2006-04-11 13:07:34Z PatrickSunter $
+## $Id: testFeEquationNumber.0of4.sh 890 2007-06-28 06:53:27Z LukeHodkinson $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -46,4 +46,4 @@ until test -r ${TEST_SCRIPT} ; do
 done
 . ${TEST_SCRIPT}
 
-runAndHandleSystemTestStdLocations "testFeEquationNumber-LM " "$0" "$@"
+runAndHandleSystemTestStdLocations "testFeEquationNumber" "$0" "$@"

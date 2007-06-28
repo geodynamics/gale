@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testElementType.c 860 2007-06-07 05:47:20Z LukeHodkinson $
+** $Id: testElementType.c 890 2007-06-28 06:53:27Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -118,7 +118,9 @@ int main( int argc, char* argv[] ) {
 	StGermain_Init( &argc, &argv );
 	StgFEM_Discretisation_Init( &argc, &argv );
 	MPI_Barrier( CommWorld ); /* Ensures copyright info always come first in output */
-	
+
+	Journal_Enable_NamedStream( Info_Type, CartesianGenerator_Type, False );
+	Journal_Enable_NamedStream( Info_Type, FeMesh_Type, False );
 	stream = Journal_Register (Info_Type, "myStream");
 
 	if( argc >= 2 ) {
