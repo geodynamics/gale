@@ -53,14 +53,18 @@
 			<param name="IntegrationPointsSwarm">picIntegrationPoints</param>
 			<param name="MaterialPointsSwarm">materialSwarm</param>
 		</struct>
+		<struct name="pMovementHandler"> 
+			<param name="Type">ParticleMovementHandler</param>
+		</struct>
 		<struct name="materialSwarm">
 			<param name="Type">MaterialPointsSwarm</param>
 			<param name="CellLayout">elementCellLayout</param>
 			<param name="ParticleLayout">picIntegrationPointsParticleLayout</param>
 			<param name="FeMesh">linearMesh</param>
+			<list name="ParticleCommHandlers">
+				<param>pMovementHandler</param>
+			</list>			
 		</struct>
-
-		
 		<struct name="backgroundMaterial">
 			<param name="Type">Material</param>
 			<param name="Shape">everywhereShape</param>
