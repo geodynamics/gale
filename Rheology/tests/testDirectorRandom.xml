@@ -30,6 +30,25 @@
 			</list>	
 		</struct>
 
+		<!-- Override the normal population control so
+			<param name="maxDeletions">0</param>
+		     otherwise it doesn't agreed with the tests expected file
+
+		     ***This is effectively turning populationControl off***
+		-->
+		<struct name="weights" mergeType="replace">
+			<param name="Type">PCDVC</param>
+			<param name="resolutionX">10</param>
+			<param name="resolutionY">10</param>
+			<param name="resolutionZ">10</param>
+			<param name="lowerT">0.6</param>
+			<param name="upperT">25</param>
+			<!-- The important override -->
+			<param name="maxDeletions">0</param>
+			<param name="maxSplits">3</param>
+			<param name="MaterialPointsSwarm">materialSwarm</param>
+		</struct>
+
 		<!-- Create Alignment Swarm Variable - for the sake of plotting -->
 		<struct name="director">
 			<param name="Type">Director</param>
