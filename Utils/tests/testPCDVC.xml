@@ -17,7 +17,7 @@
 			<param name="upperT">25</param>
 			<param name="maxDeletions">3</param>
 			<param name="maxSplits">3</param>
-			<param name="MaterialPointsSwarm">picIntegrationPoints</param>
+			<param name="MaterialPointsSwarm">materialPoints</param>
 		</struct>
 	</struct>
 
