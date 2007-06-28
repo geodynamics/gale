@@ -29,13 +29,20 @@
 		<struct name="weights">
 			<param name="Type">ConstantWeights</param>
 		</struct>	
+		<struct name="pMovementHandler"> 
+			<param name="Type">ParticleMovementHandler</param>
+		</struct>		
 		<struct name="materialPointsSwarm">
 			<param name="Type">MaterialPointsSwarm</param>
 			<param name="CellLayout">elementCellLayout</param>
 			<param name="ParticleLayout">particleLayout</param>
-			<param name="FiniteElement_Mesh">linearMesh</param>
+			<param name="FeMesh">linearMesh</param>
 			<param name="WeightsCalculator">weights</param>
 			<param name="TimeIntegrator">timeIntegrator</param>
+			<list name="ParticleCommHandlers">
+				<param>pMovementHandler</param>
+			</list>
+
 		</struct>
 		<struct name="materialPointsAdvector">
 			<param name="Type">SwarmAdvector</param>
