@@ -43,7 +43,7 @@
 			<param name="Type">IntegrationPointsSwarm</param>
 			<param name="CellLayout">elementCellLayout</param>
 			<param name="ParticleLayout">localLayout</param>
-			<param name="FiniteElement_Mesh">linearMesh</param>
+			<param name="FeMesh">linearMesh</param>
 			<param name="WeightsCalculator">weights</param>
 			<param name="TimeIntegrator">timeIntegrator</param>
 			<param name="IntegrationPointMapper">mapper</param>
@@ -57,7 +57,7 @@
 			<param name="Type">MaterialPointsSwarm</param>
 			<param name="CellLayout">elementCellLayout</param>
 			<param name="ParticleLayout">picIntegrationPointsParticleLayout</param>
-			<param name="FiniteElement_Mesh">linearMesh</param>
+			<param name="FeMesh">linearMesh</param>
 		</struct>
 
 		
