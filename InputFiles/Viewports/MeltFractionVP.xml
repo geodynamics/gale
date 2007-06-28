@@ -24,6 +24,10 @@
 			<param name="Type">lucFieldVariableBorder</param>
 			<param name="FieldVariable">MeltFractionField</param>
 		</struct>
+		<struct name="meltFractionTitle">
+			<param name="Type">lucTitle</param>
+			<param name="string">MeltFractionField</param>
+		</struct>
 		<struct name="meltFractionColourBar">
 			<param name="Type">lucColourBar</param>
 			<param name="ColourMap">meltFractionColourMap</param>
@@ -35,6 +39,7 @@
 			<list name="DrawingObject">
 				<param>meltFractionMap</param>
 				<param>border</param>
+				<param>meltFractionTitle</param>
 				<param>meltFractionColourBar</param>
 			</list>
 		</struct>

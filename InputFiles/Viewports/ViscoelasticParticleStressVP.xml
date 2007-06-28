@@ -53,6 +53,10 @@
 			<param name="Type">lucColourBar</param>
 			<param name="ColourMap">stressColourMap</param>
 		</struct>
+		<struct name="pStress0Title">
+			<param name="Type">lucTitle</param>
+			<param name="string">Particle Stress 0th</param>
+		</struct>
 		<!-- Viewport -->
 		<struct name="ParticleStress0VP">
 			<param name="Type">lucViewport</param>
@@ -60,8 +64,13 @@
 			<list name="DrawingObject">
 				<param>particleDotsStress0</param>
 				<param>border</param>
+				<param>pStress0Title</param>
 				<param>stressColourBar</param>
 			</list>
+		</struct>
+		<struct name="pStress1Title">
+			<param name="Type">lucTitle</param>
+			<param name="string">Particle Stress 1st</param>
 		</struct>
 		<struct name="ParticleStress1VP">
 			<param name="Type">lucViewport</param>
@@ -69,8 +78,13 @@
 			<list name="DrawingObject">
 				<param>particleDotsStress1</param>
 				<param>border</param>
+				<param>pStress1Title</param>
 				<param>stressColourBar</param>
 			</list>
+		</struct>
+		<struct name="pStress2Title">
+			<param name="Type">lucTitle</param>
+			<param name="string">Particle Stress 2nd</param>
 		</struct>
 		<struct name="ParticleStress2VP">
 			<param name="Type">lucViewport</param>
@@ -78,6 +92,7 @@
 			<list name="DrawingObject">
 				<param>particleDotsStress2</param>
 				<param>border</param>
+				<param>pStress2Title</param>
 				<param>stressColourBar</param>
 			</list>
 		</struct>

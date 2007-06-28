@@ -12,7 +12,7 @@
 	</struct>
                 <struct name="strainrateTitle" mergeType="replace">
                         <param name="Type">lucTitle</param>
-                        <param name="FieldVariable">recoveredStrainRateInvariantField</param>
+                        <param name="string">recoveredStrainRate InvariantField via SPR</param>
                 </struct>
 
 	<struct name="recoveredStrainRateInvMap">
@@ -30,8 +30,8 @@
 		<param name="Type">lucViewport</param>
 		<param name="Camera">camera</param>
 		<list name="DrawingObject">
-			<param>strainrateTitle</param>
 			<param>recoveredStrainRateInvMap</param>
+			<param>strainrateTitle</param>
 			<param>border</param>
 			<param>recstrainRateInvColourBar</param>
 		</list>

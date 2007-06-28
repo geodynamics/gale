@@ -39,7 +39,7 @@
 		
 		<struct name="fptitle">
 			<param name="Type">lucTitle</param>
-			<param name="String">FaultPlanesViewport</param>
+			<param name="string">FaultPlanesViewport</param>
 		</struct>
 
 		<!-- Viewport -->

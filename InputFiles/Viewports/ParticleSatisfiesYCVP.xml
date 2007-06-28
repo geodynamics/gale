@@ -44,7 +44,7 @@
 		
 		<struct name="hstitle">
 			<param name="Type">lucTitle</param>
-			<param name="String">ParticleSatisfiesYCViewport</param>
+			<param name="string">ParticleSatisfiesYCViewport</param>
 		</struct>
 
 		<!-- Viewport -->

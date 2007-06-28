@@ -37,8 +37,8 @@
 			<param name="Type">lucViewport</param>
 			<param name="Camera">camera</param>
 			<list name="DrawingObject">
-				<param>strainRateInvTitle</param>
 				<param>strainRateInvMap</param>
+				<param>strainRateInvTitle</param>
 				<param>border</param>
 				<param>strainRateInvColourBar</param>
 			</list>

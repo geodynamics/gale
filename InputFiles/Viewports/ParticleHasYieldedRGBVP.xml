@@ -32,7 +32,7 @@
 		
 		<struct name="hytitle">
 			<param name="Type">lucTitle</param>
-			<param name="String">ParticleHasYieldedViewport</param>
+			<param name="string">ParticleHasYieldedViewport</param>
 		</struct>
 
 		<!-- Viewport -->

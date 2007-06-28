@@ -25,6 +25,10 @@
 			<param name="Type">lucFieldVariableBorder</param>
 			<param name="FieldVariable">RatioViscosityField</param>
 		</struct>
+		<struct name="ratioTitle">
+			<param name="Type">lucTitle</param>
+			<param name="string">Viscosity Ratio</param>
+		</struct>
 		<struct name="ratioViscosityColourBar">
 			<param name="Type">lucColourBar</param>
 			<param name="ColourMap">ratioViscosityColourMap</param>
@@ -35,6 +39,7 @@
 			<param name="Camera">camera</param>
 			<list name="DrawingObject">
 				<param>ratioViscosityMap</param>
+				<param>ratioTitle</param>
 				<param>ratioBorder</param>
 				<param>ratioViscosityColourBar</param>
 			</list>

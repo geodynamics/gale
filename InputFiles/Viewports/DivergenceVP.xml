@@ -25,6 +25,10 @@
 			<param name="Type">lucFieldVariableBorder</param>
 			<param name="FieldVariable">DivergenceField</param>
 		</struct>
+		<struct name="divergenceTitle">
+			<param name="Type">lucTitle</param>
+			<param name="string">DivergenceField</param>
+		</struct>
 		<struct name="divergenceColourBar">
 			<param name="Type">lucColourBar</param>
 			<param name="ColourMap">divergenceColourMap</param>
@@ -35,6 +39,7 @@
 			<param name="Camera">camera</param>
 			<list name="DrawingObject">
 				<param>divergenceMap</param>
+				<param>divergenceTitle</param>
 				<param>border</param>
 				<param>divergenceColourBar</param>
 			</list>

@@ -17,7 +17,7 @@
 		<!-- Drawing Objects -->
                 <struct name="viscDissTitle" mergeType="replace">
                         <param name="Type">lucTitle</param>
-                        <param name="FieldVariable">ViscousDissipationField</param>
+                        <param name="string">ViscousDissipationField</param>
                 </struct>
 		<struct name="viscousDissipationInvMap">
 			<param name="Type">lucScalarField</param>
@@ -37,9 +37,8 @@
 			<param name="Type">lucViewport</param>
 			<param name="Camera">camera</param>
 			<list name="DrawingObject">
-				
-				<param>viscDissTitle</param>
 				<param>viscousDissipationInvMap</param>
+				<param>viscDissTitle</param>
 				<param>border</param>
 				<param>viscousDissipationInvColourBar</param>
 			</list>

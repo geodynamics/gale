@@ -26,7 +26,7 @@
 		</struct>
 		<struct name="border" mergeType="replace">
 			<param name="Type">lucFieldVariableBorder</param>
-			<param name="FieldVariable">ViscosityField</param>
+			<param name="string">ViscosityField</param>
 		</struct>
 		<struct name="viscosityColourBar">
 			<param name="Type">lucColourBar</param>

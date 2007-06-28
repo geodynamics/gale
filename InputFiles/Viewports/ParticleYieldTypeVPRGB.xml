@@ -33,7 +33,7 @@
 		
 		<struct name="yttitle">
 			<param name="Type">lucTitle</param>
-			<param name="String">ParticleYieldTypeViewport</param>
+			<param name="string">ParticleYieldTypeViewport</param>
 		</struct>
 
 		<!-- Viewport -->

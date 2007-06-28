@@ -26,12 +26,17 @@
 			<param name="Type">lucFieldVariableBorder</param>
 			<param name="FieldVariable">VelocityField</param>
 		</struct>
+		<struct name="pVisTitle">
+			<param name="Type">lucTitle</param>
+			<param name="string">Particle Viscosity</param>
+		</struct>
 		<!-- Viewport -->
 		<struct name="ParticleViscosityVP">
 			<param name="Type">lucViewport</param>
 			<param name="Camera">camera</param>
 			<list name="DrawingObject">
 				<param>particleDots</param>
+				<param>pVisTitle</param>
 				<param>border</param>
 			</list>
 		</struct>

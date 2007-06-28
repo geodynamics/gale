@@ -32,7 +32,7 @@
 		</struct>
 		<struct name="hbmtitle">
 			<param name="Type">lucTitle</param>
-			<param name="String">ParticleHasBeenInWeakZoneViewport</param>
+			<param name="string">ParticleHasBeenInWeakZoneViewport</param>
 		</struct>
 		<!-- Viewport -->
 		<struct name="ParticleHasBeenInWeakZoneVP">

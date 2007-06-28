@@ -27,7 +27,7 @@
 		</struct>
 		<struct name="hymtitle">
 			<param name="Type">lucTitle</param>
-			<param name="String">ParticleHasYieldedViewport</param>
+			<param name="string">ParticleHasYieldedViewport</param>
 		</struct>
 		<!-- Viewport -->
 		<struct name="ParticleHasYieldedVP">

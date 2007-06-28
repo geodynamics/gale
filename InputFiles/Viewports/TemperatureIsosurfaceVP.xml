@@ -41,6 +41,10 @@
 			<param name="ColourMap">temperatureColourMap</param>
 			<param name="resolution">128</param>
 		</struct>		
+		<struct name="tempIsoTitle">
+			<param name="Type">lucTitle</param>
+			<param name="string">TemperatureIsoSurface</param>
+		</struct>
 		<!-- Put these althogether in a viewport -->
 		<struct name="TemperatureIsosurfaceVP">
 			<param name="Type">lucViewport</param>
@@ -48,6 +52,7 @@
 			<list name="DrawingObject">
 				<param>temperatureMap</param>
 				<param>temperatureIsosurface</param>
+				<param>tempIsoTitle</param>
 				<param>border</param>
 				<param>temperatureColourBar</param>
 			</list>

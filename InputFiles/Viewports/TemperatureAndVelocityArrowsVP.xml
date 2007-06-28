@@ -17,7 +17,7 @@
 		<!-- Drawing Objects -->
                 <struct name="tempandVelTitle" mergeType="replace">
                         <param name="Type">lucTitle</param>
-                        <param name="FieldVariable">TemperatureField</param>
+                        <param name="string">TemperatureField and Velocity Arrows</param>
                 </struct>
 
 		<struct name="temperatureMap">
