@@ -28,11 +28,18 @@
 		<struct name="backgroundLayout">
 			<param name="Type">BackgroundParticleLayout</param>
 		</struct>
+		<struct name="gaussMSwarmMovementHandler"> 
+			<param name="Type">ParticleMovementHandler</param>
+		</struct>
 		<struct name="gaussMaterialSwarm">
 			<param name="Type">MaterialPointsSwarm</param>
 			<param name="CellLayout">cellLayout</param>
 			<param name="ParticleLayout">backgroundLayout</param>
 			<param name="FeMesh">elementMesh</param>
+			<list name="ParticleCommHandlers">
+				<param>gaussMSwarmMovementHandler</param>
+			</list>
+
 		</struct>
 		<struct name="timeIntegrator" mergeType="replace">
 			<param name="Type">TimeIntegrator</param>

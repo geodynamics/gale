@@ -69,7 +69,7 @@
 	<struct name="components" mergeType="merge">
 		<struct name="velocityLinkedDofs">
 			<param name="Type">LinkedDofInfo</param>
-			<param name="Mesh">mesh-linear</param>
+			<param name="Mesh">linearMesh</param>
 			<param name="DofLayout">velocityDofLayout</param>
 
 			<list name="linkSpecifications">

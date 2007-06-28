@@ -10,7 +10,7 @@
 		<struct name="yieldRheology">
 			<param name="Type">Byerlee</param>
 			<param name="StrainRateField">StrainRateField</param>
-			<param name="FeMesh">mesh-linear</param>
+			<param name="FeMesh">linearMesh</param>
 			<param name="cohesion">2</param>
 			<param name="depthCoefficient">0.533333333333333</param>
 		</struct>	

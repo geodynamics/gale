@@ -158,7 +158,7 @@ void* _NonNewtonianShearSolution_DefaultNew( Name name ) {
 			_AnalyticSolution_Copy,
 			_NonNewtonianShearSolution_DefaultNew,
 			_NonNewtonianShearSolution_Construct,
-			_AnalyticSolution_Build,
+			_NonNewtonianShearSolution_Build,
 			_AnalyticSolution_Initialise,
 			_AnalyticSolution_Execute,
 			_AnalyticSolution_Destroy,

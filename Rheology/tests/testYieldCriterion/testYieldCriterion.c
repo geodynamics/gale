@@ -108,7 +108,7 @@ void _Underworld_testYieldCriterion_Construct( void* component, Stg_ComponentFac
 					Underworld_testYieldCriterion_Type );
 
 	/* get pointer to the mesh */
-	self->mesh = Stg_ComponentFactory_ConstructByName( cf, "mesh-linear", FeMesh, True, data ); 
+	self->mesh = Stg_ComponentFactory_ConstructByName( cf, "linearMesh", FeMesh, True, data ); 
 	
 	/* Get a pointer the yield rheology that we are trying to test */
 	yieldRheology = (YieldRheology*) LiveComponentRegister_Get( context->CF->LCRegister, "yieldRheology" );
