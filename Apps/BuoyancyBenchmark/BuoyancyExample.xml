@@ -49,7 +49,7 @@
 		</struct>	
 		<struct name="compressible">
 			<param name="Type">Compressible</param>
-			<param name="GeometryMesh">mesh-linear</param>
+			<param name="GeometryMesh">linearMesh</param>
 			<param name="StiffnessMatrix">c_matrix</param>
 			<param name="Swarm">picIntegrationPoints</param>	
 			<param name="oneOnLambda">10.0</param>

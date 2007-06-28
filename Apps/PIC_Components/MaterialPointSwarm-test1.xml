@@ -7,7 +7,7 @@
 	<struct name="components" mergeType="merge">
 		<struct name="elementCellLayout">
 			<param name="Type">ElementCellLayout</param>
-			<param name="Mesh">mesh-linear</param>
+			<param name="Mesh">linearMesh</param>
 		</struct>
 		<struct name="discreteVoronoi">
 			<param name="Type">CellularAutomataVoronoi</param>
@@ -17,7 +17,7 @@
 		<struct name="weights">
 			<param name="Type">VolumeWeights</param>
 			<param name="Shape">ball</param>
-			<param name="Mesh">mesh-linear</param>
+			<param name="Mesh">linearMesh</param>
 <!--
 			<param name="Type">DiscreteVoronoiWeights</param>
 			<param name="DiscreteVoronoi">discreteVoronoi</param>
@@ -30,7 +30,7 @@
 			<param name="Type">IntegrationPointsSwarm</param>
 			<param name="CellLayout">elementCellLayout</param>
 			<param name="ParticleLayout">localLayout</param>
-			<param name="FeMesh">mesh-linear</param>
+			<param name="FeMesh">linearMesh</param>
 			<param name="WeightsCalculator">weights</param>
 			<param name="TimeIntegrator">timeIntegrator</param>
 			<param name="IntegrationPointMapper">mapper</param>
@@ -50,7 +50,7 @@
 			<param name="Type">MaterialPointsSwarm</param>
 			<param name="CellLayout">elementCellLayout</param>
 			<param name="ParticleLayout">picIntegrationPointsParticleLayout</param>
-			<param name="FeMesh">mesh-linear</param>
+			<param name="FeMesh">linearMesh</param>
 
 			<!-- These guys may or may not be created -->
 			<param name="SwarmAdvector">materialSwarmAdvector</param>
@@ -68,7 +68,7 @@
 			<param name="Type">IntegrationPointsSwarm</param>
 			<param name="CellLayout">cellLayout</param>
 			<param name="ParticleLayout">particleLayout</param>
-			<param name="FeMesh">mesh-linear</param>
+			<param name="FeMesh">linearMesh</param>
 			<param name="TimeIntegrator">timeIntegrator</param>
 			<param name="IntegrationPointMapper">backgroundMapper</param>
 		</struct>
@@ -84,7 +84,7 @@
 			<param name="Type">MaterialPointsSwarm</param>
 			<param name="CellLayout">cellLayout</param>
 			<param name="ParticleLayout">backgroundLayout</param>
-			<param name="FeMesh">mesh-linear</param>
+			<param name="FeMesh">linearMesh</param>
 			<param name="Material">lightMaterial</param>
 		</struct>
 

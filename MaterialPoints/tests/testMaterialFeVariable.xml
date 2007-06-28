@@ -5,14 +5,13 @@
 	
 	<include>StgFEM/LinearMesh.xml</include>
 	<include>StgFEM/GaussSwarm.xml</include>
-	<include>StgFEM/ElementLayout.xml</include>
 	<include>StgFEM/VelocityField.xml</include>
 	<include>StgFEM/TimeIntegrator.xml</include>
 
 	<struct name="components" mergeType="merge">
 		<struct name="elementCellLayout">
 			<param name="Type">ElementCellLayout</param>
-			<param name="Mesh">mesh-linear</param>
+			<param name="Mesh">linearMesh</param>
 		</struct>
 		<struct name="everywhereShape">
 			<param name="Type">Everywhere</param>
@@ -44,7 +43,7 @@
 			<param name="Type">IntegrationPointsSwarm</param>
 			<param name="CellLayout">elementCellLayout</param>
 			<param name="ParticleLayout">localLayout</param>
-			<param name="FiniteElement_Mesh">mesh-linear</param>
+			<param name="FiniteElement_Mesh">linearMesh</param>
 			<param name="WeightsCalculator">weights</param>
 			<param name="TimeIntegrator">timeIntegrator</param>
 			<param name="IntegrationPointMapper">mapper</param>
@@ -58,7 +57,7 @@
 			<param name="Type">MaterialPointsSwarm</param>
 			<param name="CellLayout">elementCellLayout</param>
 			<param name="ParticleLayout">picIntegrationPointsParticleLayout</param>
-			<param name="FiniteElement_Mesh">mesh-linear</param>
+			<param name="FiniteElement_Mesh">linearMesh</param>
 		</struct>
 
 		
@@ -75,7 +74,7 @@
 			<param name="Swarm">picIntegrationPoints</param>
 			<param name="Material">material</param>
 			<param name="Context">context</param>
-			<param name="Mesh">mesh-linear</param>
+			<param name="Mesh">linearMesh</param>
 		</struct>		
 	</struct>
 

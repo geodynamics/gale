@@ -33,7 +33,7 @@
 			<param name="Type">MaterialPointsSwarm</param>
 			<param name="CellLayout">elementCellLayout</param>
 			<param name="ParticleLayout">particleLayout</param>
-			<param name="FiniteElement_Mesh">mesh-linear</param>
+			<param name="FiniteElement_Mesh">linearMesh</param>
 			<param name="WeightsCalculator">weights</param>
 			<param name="TimeIntegrator">timeIntegrator</param>
 		</struct>
