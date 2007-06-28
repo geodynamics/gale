@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testPeriodicBCs.c 456 2007-04-27 06:21:01Z LukeHodkinson $
+** $Id: testPeriodicBCs.c 478 2007-06-28 02:40:38Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -73,17 +73,36 @@ void UpdateParticlePositionsToLeft(
 		Processor_Index rank,
 		Processor_Index procToWatch );
 
+FeMesh* configureFeMesh( double minCrd[3], double maxCrd[3], unsigned int sizes[3], unsigned nDims ) {
+	CartesianGenerator*	gen;
+	FeMesh*			feMesh;
+	unsigned		maxDecomp[3] = {0, 1, 1};
+
+	sizes[0] = sizes[1] = 6;
+	sizes[2] = 1;
+	minCrd[0] = minCrd[1] = minCrd[2] = 0.0;
+	maxCrd[0] = maxCrd[1] = maxCrd[2] = 1.2;
+
+	gen = CartesianGenerator_New( "" );
+	CartesianGenerator_SetDimSize( gen, nDims );
+	CartesianGenerator_SetTopologyParams( gen, sizes, 0, NULL, maxDecomp );
+	CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
+	CartesianGenerator_SetShadowDepth( gen, 0 );
+
+	feMesh = FeMesh_New( "" );
+	Mesh_SetGenerator( feMesh, gen );
+	FeMesh_SetElementFamily( feMesh, "linear" );
+
+	return feMesh;
+}
+
+
 int main( int argc, char* argv[] ) {
 	MPI_Comm			CommWorld;
 	int				rank;
 	int				numProcessors;
 	int				procToWatch;
 	Dictionary*			dictionary;
-	Topology*			nTopology;
-	ElementLayout*			eLayout;
-	NodeLayout*			nLayout;
-	MeshDecomp*			decomp;
-	MeshLayout*			layout;
 	ExtensionManager_Register*	extensionMgr_Register;
 	Mesh*				mesh;
 	ElementCellLayout*		elementCellLayout;
@@ -91,11 +110,15 @@ int main( int argc, char* argv[] ) {
 	Swarm*				swarm;
 	Stream*				stream;
 	Index				timeStep;
-	BlockGeometry*			blockGeom;
 	EntryPoint_Register*		epRegister;
 	PeriodicBoundariesManager*	perBCsManager;
 	Index                           decompDims;
 	char*                           directory;	
+	unsigned                        numElements[3];
+	double                          minCoords[3];
+	double                          maxCoords[3];
+	unsigned int                    dim = 2;
+
 	/* Initialise MPI, get world info */
 	MPI_Init( &argc, &argv );
 	MPI_Comm_dup( MPI_COMM_WORLD, &CommWorld );
@@ -148,19 +171,17 @@ int main( int argc, char* argv[] ) {
 	dictionary = Dictionary_New();
 	Dictionary_Add( dictionary, "rank", Dictionary_Entry_Value_FromUnsignedInt( rank ) );
 	Dictionary_Add( dictionary, "numProcessors", Dictionary_Entry_Value_FromUnsignedInt( numProcessors ) );
-	Dictionary_Add( dictionary, "meshSizeI", Dictionary_Entry_Value_FromUnsignedInt( 13 ) );
-	Dictionary_Add( dictionary, "meshSizeJ", Dictionary_Entry_Value_FromUnsignedInt( 13 ) );
-	Dictionary_Add( dictionary, "meshSizeK", Dictionary_Entry_Value_FromUnsignedInt( 2 ) );
-	Dictionary_Add( dictionary, "allowUnbalancing", Dictionary_Entry_Value_FromBool( True ) );
-	Dictionary_Add( dictionary, "minX", Dictionary_Entry_Value_FromDouble( 0.0f ) );
-	Dictionary_Add( dictionary, "minY", Dictionary_Entry_Value_FromDouble( 0.0f ) );
-	Dictionary_Add( dictionary, "minZ", Dictionary_Entry_Value_FromDouble( 0.0f ) );
-	Dictionary_Add( dictionary, "maxX", Dictionary_Entry_Value_FromDouble( 1.0f ) );
-	Dictionary_Add( dictionary, "maxY", Dictionary_Entry_Value_FromDouble( 1.0f ) );
-	Dictionary_Add( dictionary, "maxZ", Dictionary_Entry_Value_FromDouble( 1.0f ) );
+	numElements[0] = 12;
+	numElements[1] = 12;
+	numElements[2] = 1;
+	minCoords[0] = 0.0f;
+	minCoords[1] = 0.0f;
+	minCoords[2] = 0.0f;
+	maxCoords[0] = 1.0f;
+	maxCoords[1] = 1.0f;
+	maxCoords[2] = 1.0f;
 	Dictionary_Add( dictionary, "particlesPerCell", Dictionary_Entry_Value_FromUnsignedInt( 1 ) );
 	Dictionary_Add( dictionary, "seed", Dictionary_Entry_Value_FromUnsignedInt( 13 ) );
-	Dictionary_Add( dictionary, "shadowDepth", Dictionary_Entry_Value_FromUnsignedInt( 1 ) );
 	/*  TODO: a 2nd test with the periodic shadowing enabled. Its handy to keep the orig one */
 	/* 	without it though. */
 	/* Dictionary_Add( dictionary, "isPeriodicI", Dictionary_Entry_Value_FromBool( True ) ); */
@@ -168,15 +189,10 @@ int main( int argc, char* argv[] ) {
 	decompDims = 1;
 
 	/* Run the mesher */
-	nTopology = (Topology*)IJK6Topology_New( "IJK6Topology", dictionary );
-	eLayout = (ElementLayout*)ParallelPipedHexaEL_New( "PPHexaEL", 3, dictionary );
-	nLayout = (NodeLayout*)CornerNL_New( "CornerNL", dictionary, eLayout, nTopology );
-	decomp = (MeshDecomp*)HexaMD_New_All( "HexaMD", dictionary, MPI_COMM_WORLD, eLayout, nLayout, decompDims );
-	layout = MeshLayout_New( "Meshlayout", eLayout, nLayout, decomp );
-	
+	mesh = (Mesh*)configureFeMesh( minCoords, maxCoords, numElements, dim );
+
 	/* Init mesh */
 	extensionMgr_Register = ExtensionManager_Register_New();
-	mesh = Mesh_New( "Mesh", layout, sizeof(Node), sizeof(Element), extensionMgr_Register, dictionary );
 	
 	/* Configure the element-cell-layout */
 	elementCellLayout = ElementCellLayout_New( "elementCellLayout", mesh );
@@ -188,31 +204,29 @@ int main( int argc, char* argv[] ) {
 	swarm = Swarm_New( "testSwarm", elementCellLayout, randomParticleLayout, 3, sizeof(Particle),
 		extensionMgr_Register, NULL, CommWorld );
 	
-	blockGeom = (BlockGeometry*)eLayout->geometry;
-
 	epRegister = EntryPoint_Register_New();
 	
 	/* Configure the perBCs manager */
-	perBCsManager = PeriodicBoundariesManager_New( "perBCsManager", blockGeom, swarm,
+	perBCsManager = PeriodicBoundariesManager_New( "perBCsManager", mesh, swarm,
 		dictionary );
 	
 	/* +++ BUILD PHASE +++ */
 	
 	/* Build the mesh */
-	Build( mesh, 0, False );
+	Stg_Component_Build( mesh, 0, False );
 	/* Build the swarm */
-	Build( swarm, 0, False );
+	Stg_Component_Build( swarm, 0, False );
 
-	Build( perBCsManager, 0, False );
+	Stg_Component_Build( perBCsManager, 0, False );
 	PeriodicBoundariesManager_AddPeriodicBoundary( perBCsManager, I_AXIS );
 	/* +++ INITIALISE PHASE +++ */
 
-	Initialise( mesh, 0, False );
-	Initialise( swarm, 0, False );
-	Initialise( perBCsManager, 0, False );
+	Stg_Component_Initialise( mesh, 0, False );
+	Stg_Component_Initialise( swarm, 0, False );
+	Stg_Component_Initialise( perBCsManager, 0, False );
 	
 	if( rank == procToWatch ) {
-		Print( swarm, stream );
+		Stg_Class_Print( swarm, stream );
 	}	
 
 	/* +++ RUN PHASE +++ */
@@ -243,11 +257,6 @@ int main( int argc, char* argv[] ) {
 	Stg_Class_Delete( elementCellLayout );
 	Stg_Class_Delete( mesh );
 	Stg_Class_Delete( extensionMgr_Register );
-	Stg_Class_Delete( layout );
-	Stg_Class_Delete( decomp );
-	Stg_Class_Delete( nLayout );
-	Stg_Class_Delete( eLayout );
-	Stg_Class_Delete( nTopology );
 	Stg_Class_Delete( dictionary );
 	
         PICellerator_MaterialPoints_Finalise();
