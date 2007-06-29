@@ -175,6 +175,7 @@ int main(int argc, char *argv[])
 		var[i] =   Variable_NewScalar(  varName[i], 
 						Variable_DataType_Double, 
 						&nDomains, 
+						NULL,
 						(void**)&array[i], 
 						0 ); 
 		Variable_Register_Add(variable_Register, var[i]);

@@ -83,7 +83,7 @@ int main( int argc, char *argv[] ) {
 
 		/* Create variables */
 		for (i = 0; i < 6; i++) {
-			var[i] = Variable_NewScalar( varName[i], Variable_DataType_Double, &arraySize, (void**)&dummyPtr, 0 );
+			var[i] = Variable_NewScalar( varName[i], Variable_DataType_Double, &arraySize, NULL, (void**)&dummyPtr, 0 );
 			Variable_Register_Add(variableRegister, var[i]);
 		}
 

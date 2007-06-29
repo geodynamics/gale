@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Variable.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
+** $Id: Variable.c 4149 2007-06-29 06:59:13Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -65,6 +65,7 @@ Variable* Variable_New(
 		Name*						dataNames,
 		SizeT*						structSizePtr,
 		Index*						arraySizePtr,
+		Variable_ArraySizeFunc*				arraySizeFunc,
 		void**						arrayPtrPtr,
 		Variable_Register*				vr )
 {
@@ -91,6 +92,7 @@ Variable* Variable_New(
 		dataNames, 
 		structSizePtr, 
 		arraySizePtr,
+		arraySizeFunc,
 		arrayPtrPtr, 
 		vr );
 	
@@ -123,6 +125,7 @@ Variable* Variable_DefaultNew( Name name )
 		NULL, 
 		NULL,
 		NULL, 
+		NULL,
 		NULL );
 	
 	return self;
@@ -132,6 +135,7 @@ Variable* Variable_NewScalar(
 		Name						name,
 		Variable_DataType				dataType,
 		Index*						arraySizePtr,
+		Variable_ArraySizeFunc*				arraySizeFunc,
 		void**						arrayPtrPtr,
 		Variable_Register*				vr )
 {
@@ -163,6 +167,7 @@ Variable* Variable_NewScalar(
 		0, /* no component names */
 		0, /* means work out from dataType at build phase */
 		arraySizePtr,
+		arraySizeFunc,
 		arrayPtrPtr, 
 		vr );
 	
@@ -174,6 +179,7 @@ Variable* Variable_NewVector(
 		Variable_DataType				dataType,
 		Index						dataTypeCount,
 		Index*						arraySizePtr,
+		Variable_ArraySizeFunc*				arraySizeFunc,
 		void**						arrayPtrPtr,
 		Variable_Register*				vr,
 		... 						/* vector component names */ )
@@ -218,6 +224,7 @@ Variable* Variable_NewVector(
 		dataNames,
 		0, /* means work out from dataType at build phase */
 		arraySizePtr,
+		arraySizeFunc,
 		arrayPtrPtr, 
 		vr );
 
@@ -231,6 +238,7 @@ Variable* Variable_NewVector2(
 		Variable_DataType				dataType,
 		Index						dataTypeCount,
 		Index*						arraySizePtr,
+		Variable_ArraySizeFunc*				arraySizeFunc,
 		void**						arrayPtrPtr,
 		Variable_Register*				vr,
 		char**						dataNames )
@@ -264,6 +272,7 @@ Variable* Variable_NewVector2(
 		dataNames,
 		0, /* means work out from dataType at build phase */
 		arraySizePtr,
+		arraySizeFunc,
 		arrayPtrPtr, 
 		vr );
 
@@ -281,6 +290,7 @@ void Variable_Init(
 		Name*						dataNames,
 		SizeT*						structSizePtr,
 		Index*						arraySizePtr,
+		Variable_ArraySizeFunc*				arraySizeFunc,
 		void**						arrayPtrPtr,
 		Bool						allocateSelf,
 		Variable_Register*				vr )
@@ -311,6 +321,7 @@ void Variable_Init(
 		dataNames, 
 		structSizePtr,
 		arraySizePtr,
+		arraySizeFunc,
 		arrayPtrPtr, 
 		allocateSelf,
 		vr );
@@ -338,6 +349,7 @@ Variable* _Variable_New(
 		Name*						dataNames,
 		SizeT*						structSizePtr,
 		Index*						arraySizePtr,
+		Variable_ArraySizeFunc*				arraySizeFunc,
 		void**						arrayPtrPtr,
 		Variable_Register*				vr )
 {
@@ -365,6 +377,7 @@ Variable* _Variable_New(
 			dataNames, 
 			structSizePtr, 
 			arraySizePtr,
+			arraySizeFunc,
 			arrayPtrPtr, 
 			False,
 			vr );
@@ -382,10 +395,13 @@ void _Variable_Init(
 		Name*						dataNames,
 		SizeT*						structSizePtr,
 		Index*						arraySizePtr,
+		Variable_ArraySizeFunc*				arraySizeFunc,
 		void**						arrayPtrPtr,
 		Bool                                            allocateSelf,
 		Variable_Register*				vr )
 {
+	Stream*      errorStream = Journal_Register( Error_Type, self->type );
+
 	/* General and Virtual info should already be set */
 	
 	/* Variable info */
@@ -394,8 +410,14 @@ void _Variable_Init(
 	self->offsetCount = dataCount;
 	self->structSizePtr = structSizePtr;
 	self->arraySizePtr = arraySizePtr;
+	self->arraySizeFunc = arraySizeFunc;
 	self->arrayPtrPtr = arrayPtrPtr;
 	self->parent = NULL;
+
+	/* Checks */
+	Journal_Firewall( (self->arraySizePtr || self->arraySizeFunc) ,
+		errorStream, "Error: in %s(), for Variable %s - either arraySizePtr or arraySizeFunc "
+			"passed in must be non-NULL.\n", __func__, self->name );
 
 	/* Use of this class has increased... can't assume the info arrays are on persistant memory... copy by default. They will
 	   be deleted. */
@@ -459,6 +481,7 @@ void _Variable_Init(
 						0,
 						self->structSizePtr,
 						self->arraySizePtr,
+						self->arraySizeFunc,
 						self->arrayPtrPtr,
 						vr );
 					self->components[component_I]->parent = self;
@@ -503,6 +526,7 @@ void _Variable_Init(
 						0,
 						self->structSizePtr,
 						self->arraySizePtr,
+						self->arraySizeFunc,
 						self->arrayPtrPtr,
 						vr );
 					self->components[vector_I]->parent = self;
@@ -589,8 +613,9 @@ void _Variable_Print( void* variable, Stream* stream ) {
 	Journal_Printf( stream, "\tarrayPtr (ptr): %p\n", self->arrayPtr );
 	Journal_Printf( stream, "\tarrayPtrPtr (ptr): %p\n", self->arrayPtrPtr );
 
-	Journal_Printf( stream, "\tarraySize: %lu\n", self->arraySize );
+	Journal_Printf( stream, "\tarraySize: %lu\n", _Variable_GetNewArraySize( self ) );
 	Journal_Printf( stream, "\tarraySizePtr (ptr): %p\n", self->arraySizePtr );
+	Journal_Printf( stream, "\tarraySizeFunc (ptr): %p\n", self->arraySizeFunc );
 
 	Journal_Printf( stream, "\tallocateSelf = %s\n", self->allocateSelf ? "True" : "False" );
 }
@@ -607,7 +632,8 @@ void* _Variable_Copy( void* variable, void* dest, Bool deep, Name nameExt, PtrMa
 	/* virtual methods */
 	newVariable->offsetCount = self->offsetCount;
 	newVariable->structSize = self->structSize;
-	newVariable->arraySize = self->arraySize;
+	newVariable->arraySizePtr = self->arraySizePtr;
+	newVariable->arraySizeFunc = self->arraySizeFunc;
 	
 	newVariable->allocateSelf = self->allocateSelf; /* This may change depending on whether arrayPtr is found in map */
 
@@ -657,7 +683,20 @@ void* _Variable_Copy( void* variable, void* dest, Bool deep, Name nameExt, PtrMa
 			}
 		}
 		else {
-			newVariable->arraySizePtr = NULL;
+			newVariable->arraySizeFunc = NULL;
+		}
+		if ( self->arraySizeFunc != NULL ) {
+			if( (newVariable->arraySizeFunc = PtrMap_Find( map, self->arraySizeFunc )) == NULL ) {
+				newVariable->arraySizeFunc = Memory_Alloc_Array(
+					Variable_ArraySizeFunc,
+					1,
+					"Variable->arraySizeFunc" );
+				memcpy( newVariable->arraySizeFunc, self->arraySizeFunc, sizeof(Index) );
+				PtrMap_Append( map, self->arraySizeFunc, newVariable->arraySizeFunc );
+			}
+		}
+		else {
+			newVariable->arraySizeFunc = NULL;
 		}
 		
 		if( (newVariable->dataSizes = PtrMap_Find( map, self->dataSizes )) == NULL && self->dataSizes != NULL ) {
@@ -668,7 +707,7 @@ void* _Variable_Copy( void* variable, void* dest, Bool deep, Name nameExt, PtrMa
 
 		if( (newVariable->arrayPtrPtr = PtrMap_Find( map, self->arrayPtrPtr )) == NULL && self->arrayPtrPtr != NULL ) {	
 			if( (newVariable->arrayPtr = PtrMap_Find( map, self->arrayPtr )) == NULL && self->arrayPtr != NULL ) {
-				Index memoryToAllocSize = self->arraySize * self->structSize;
+				Index memoryToAllocSize = _Variable_GetNewArraySize( self ) * self->structSize;
 				newVariable->arrayPtr = Memory_Alloc_Bytes( 
 					memoryToAllocSize,
 					Variable_Type,
@@ -682,7 +721,7 @@ void* _Variable_Copy( void* variable, void* dest, Bool deep, Name nameExt, PtrMa
 		}
 		else {
 			newVariable->arrayPtr = *newVariable->arrayPtrPtr;
-			memcpy( newVariable->arrayPtr, self->arrayPtr, self->arraySize * self->structSize );
+			memcpy( newVariable->arrayPtr, self->arrayPtr, _Variable_GetNewArraySize(self) * self->structSize );
 		}
 		
 		if( (newVariable->components = PtrMap_Find( map, self->components )) == NULL && self->components != NULL ) {
@@ -745,17 +784,21 @@ void _Variable_Build( void* variable, void* data ) {
 	Index 		component_I;
 	Index 		subVariable_I;
 
-/*
-	if( self->parent )
-		Build( self->parent, NULL, False );
-*/
+	if( self->parent ) {
+		/* We need to build the parent first, as it may initialise data structures needed 
+	 	 * by this Variable. BUT, the parent will call Build() on all it's sub-Variables
+	 	 * including this one, so we need to avoid an infinite loop. */
+		self->isBuilt = True;
+		Stg_Component_Build( self->parent, NULL, False );
+		self->isBuilt = False;
+	}
 	
 	/* Obtain the actual array size, and array pointer */
 	Journal_Firewall( 
-		self->arraySizePtr ? True : False, 
+		( self->arraySizeFunc || self->arraySizePtr )? True : False, 
 		Journal_Register( Error_Type, Variable_Type ), 
-		"arraySizePtr is null\n" );
-	self->arraySize = *self->arraySizePtr;
+		"arraySizePtr && arraySizeFunc is null\n" );
+	self->arraySize = _Variable_GetNewArraySize( self );
 
 
 	/* Work out the actual data sizes from the data types */
@@ -827,7 +870,7 @@ void _Variable_Build( void* variable, void* data ) {
 	}
 	
 	if (self->allocateSelf) {
-		Index memoryToAllocSize = self->arraySize * self->structSize;
+		Index memoryToAllocSize = _Variable_GetNewArraySize( self ) * self->structSize;
 		Index subVariable_I;
 
 		Journal_Firewall( self->offsetCount == 1, 
@@ -864,7 +907,11 @@ void _Variable_Build( void* variable, void* data ) {
 	 * "velocity-x" etc are automatically build also. */	
 	for ( subVariable_I = 0; subVariable_I < self->subVariablesCount; subVariable_I++ ) {
 		if ( self->components[subVariable_I] ) {
+			/*Components now call Build on the parent, so if the parent is calling first,
+			 * need to avoid infinite recursion. */
+			self->isBuilt = True;
 			Stg_Component_Build( self->components[subVariable_I], data, False );
+			self->isBuilt = False;
 		}
 	}
 }
@@ -972,6 +1019,8 @@ void _Variable_Construct( void* variable, Stg_ComponentFactory* cf, void* data )
 			names, 
 			0, 
 			count, 
+			NULL,	/* Note: don't support arraySize being calculated from a Func Ptr through
+			 Construct() Yet - PatrickSunter, 29 Jun 2007 */ 
 			(void**)&self->arrayPtr,
 			True,
 			variableRegister );
@@ -984,6 +1033,32 @@ void _Variable_Construct( void* variable, Stg_ComponentFactory* cf, void* data )
 void _Variable_Destroy( void* variable, void* data )
 {
 	
+}
+
+Index _Variable_GetNewArraySize( Variable* self ) {
+	Index arraySize = 0;
+
+	/* By default, we will try the simple ptr approach. */
+	if ( NULL != self->arraySizePtr ) {
+		arraySize = (*self->arraySizePtr);
+	}
+	else {
+		/* If that was NULL, we expect the arraySizeFunc to be set */
+
+		/* Because of the way sub-variables are constructed, they will use their parent's
+		 * arraySizePtr function (eg in the case of "vx", we want it to use the parent
+		 * Velocity MeshVariable's function to calculate the
+		 * size of the mesh.
+		 */ 
+		if ( NULL != self->parent ) {
+			arraySize = (*self->arraySizeFunc)( self->parent );
+		}
+		else {
+			arraySize = (*self->arraySizeFunc)( self );
+		}
+	}
+
+	return arraySize;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------------
@@ -1022,7 +1097,7 @@ void Variable_Update( void* variable ) {
 
 	/* array may have resized, assign local properties again */
 	self->arrayPtr = *self->arrayPtrPtr;
-	self->arraySize = *self->arraySizePtr;
+	self->arraySize = _Variable_GetNewArraySize( self );
 	
 	if( !( self->offsetCount == 1 && !self->structSizePtr ) ) {
 		/* For non-scalar or non-vector variables, the targets may have been extended. */

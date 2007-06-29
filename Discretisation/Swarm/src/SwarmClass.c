@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SwarmClass.c 4140 2007-06-12 06:11:08Z RaquibulHassan $
+** $Id: SwarmClass.c 4149 2007-06-29 06:59:13Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -669,14 +669,14 @@ void _Swarm_Construct( void* swarm, Stg_ComponentFactory* cf, void* data ) {
 		Stg_Component **components = NULL;
 
 		components = (Stg_Component**)Stg_ComponentFactory_ConstructByList( 
-		cf, 
-		self->name, 
-		"ParticleCommHandlers", 
-		Stg_ComponentFactory_Unlimited, 
-		ParticleCommHandler, 
-		False, 
-		&count, 
-		data );
+			cf, 
+			self->name, 
+			"ParticleCommHandlers", 
+			Stg_ComponentFactory_Unlimited, 
+			ParticleCommHandler, 
+			False, 
+			&count, 
+			data );
 
 		if( count == 0 ){
  			Journal_Printf( self->debug, "Warning: Swarm has 0 Communication handlers..!\n" );
@@ -1372,6 +1372,7 @@ SwarmVariable* Swarm_NewScalarVariable(
 		0, /* no component names */
 		&self->particleExtensionMgr->finalSize,
 		&self->particleLocalCount,
+		NULL,
 		(void**)&self->particles,
 		variable_Register );
 
@@ -1434,6 +1435,7 @@ SwarmVariable* Swarm_NewVectorVariable(
 		dataNames,
 		&self->particleExtensionMgr->finalSize,
 		&self->particleLocalCount,
+		NULL,
 		(void**)&self->particles,
 		variable_Register );
 

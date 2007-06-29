@@ -98,4 +98,6 @@
 
 	void MeshVariable_Destruct( MeshVariable* self );
 
+	Index _MeshVariable_GetMeshArraySize( void* meshVariable );
+
 #endif /* __Discretisaton_Mesh_MeshVariable_h__ */

@@ -96,6 +96,7 @@ MockContext* MockContext_New( Index scalarCount, Index vectorCount, Index stuffC
 		"Scalar",
 		Variable_DataType_Float,
 		&(self->scalarCount),
+		NULL,
 		(void**)&(self->scalars),
 		self->vr );
 
@@ -104,6 +105,7 @@ MockContext* MockContext_New( Index scalarCount, Index vectorCount, Index stuffC
 		Variable_DataType_Double,
 		VECTOR_DATA_COUNT,
 		&(self->vectorCount),
+		NULL,
 		(void**)&(self->vectors),
 		self->vr,
 		"x",
@@ -128,6 +130,7 @@ MockContext* MockContext_New( Index scalarCount, Index vectorCount, Index stuffC
 			dataNames,
 			&(self->complexStuffSize),
 			&(self->stuffCount),
+			NULL,
 			(void**)&(self->stuff),
 			self->vr );
 	}

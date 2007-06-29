@@ -91,6 +91,7 @@ int main( int argc, char *argv[] ) {
 			"Scalar",
 			Variable_DataType_Float,
 			&length,
+			NULL,
 			(void**)&array,
 			reg );
 
@@ -99,6 +100,7 @@ int main( int argc, char *argv[] ) {
 			Variable_DataType_Float,
 			3,
 			&length,
+			NULL,
 			(void**)&structArray,
 			reg,
 			"a",

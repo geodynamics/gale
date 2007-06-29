@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testDofLayout.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
+** $Id: testDofLayout.c 4149 2007-06-29 06:59:13Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -84,7 +84,7 @@ int main( int argc, char *argv[] ) {
 		for (var_I = 0; var_I < 6; var_I++) {
 			varArrays[var_I] = Memory_Alloc_Array_Unnamed( double, arraySize );
 			var[var_I] = Variable_NewScalar( varName[var_I], Variable_DataType_Double, &arraySize, 
-				(void**)&(varArrays[var_I]), variableRegister );
+				NULL, (void**)&(varArrays[var_I]), variableRegister );
 			Stg_Component_Build( var[var_I], 0, False );	
 			Stg_Component_Initialise( var[var_I], 0, False );	
 		}

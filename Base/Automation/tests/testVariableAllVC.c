@@ -97,6 +97,7 @@ int main(int argc, char *argv[])
 		"test",
 		Variable_DataType_Double,
 		&length,
+		NULL,
 		(void*)&data,
 		variable_Register );
 		

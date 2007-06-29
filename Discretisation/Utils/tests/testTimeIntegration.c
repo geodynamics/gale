@@ -31,7 +31,7 @@
 **	Tests all requirements of the FieldVariable interface, such as max & min values, interpolation etc,
 **	plus any FE-specific additions made at the field Variable level.
 **
-** $Id: testTimeIntegration.c 3995 2007-02-07 02:20:14Z PatrickSunter $
+** $Id: testTimeIntegration.c 4149 2007-06-29 06:59:13Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -212,8 +212,8 @@ int main( int argc, char* argv[] ) {
 	/* Create Stuff */
 	order           = Dictionary_GetUnsignedInt_WithDefault( dictionary, "order", 1 );
 	simultaneous    = Dictionary_GetBool_WithDefault( dictionary, "simultaneous", False );
-	variableList[0] = Variable_NewVector( "testVariable",  Variable_DataType_Double, 2, &size0, (void**)&array, NULL );
-	variableList[1] = Variable_NewVector( "testVariable2", Variable_DataType_Double, 2, &size1, (void**)&array2, NULL );
+	variableList[0] = Variable_NewVector( "testVariable",  Variable_DataType_Double, 2, &size0, NULL, (void**)&array, NULL );
+	variableList[1] = Variable_NewVector( "testVariable2", Variable_DataType_Double, 2, &size1, NULL, (void**)&array2, NULL );
 	timeIntegrator  = TimeIntegrator_New( "testTimeIntegrator", order, simultaneous, NULL, NULL );
 	timeIntegrateeList[0] = TimeIntegratee_New( "testTimeIntegratee0", timeIntegrator, variableList[0],
 		0, NULL, True );

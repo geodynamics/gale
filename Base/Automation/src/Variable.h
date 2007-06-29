@@ -42,7 +42,7 @@
 **
 **	Note that Variables can be applied to any piece of contiguous memory.
 **
-** $Id: Variable.h 4123 2007-05-23 12:36:17Z PatrickSunter $
+** $Id: Variable.h 4149 2007-06-29 06:59:13Z PatrickSunter $
 **
 **/
 
@@ -63,6 +63,8 @@
 		Variable_DataType_Size /* Marker for derivatives to enum */
 	} Variable_DataType;
 
+	typedef Index (Variable_ArraySizeFunc) ( void* self );
+
 	/* See Variable */
 	#define __Variable \
 		/* General info */ 					\
@@ -77,7 +79,8 @@
 		Index*				dataTypeCounts;		/**< A list of the number of data. */ \
 		SizeT*				structSizePtr; 		/**< A pointer to the size of the structure. */ \
 		void**				arrayPtrPtr; 		/**< A pointer to a pointer to the 1D array data. */ \
-		Index*				arraySizePtr; 		/**< A pointer to the size/count of the 1D array data. */ \
+		Index*				arraySizePtr; 		/**< A ptr to the size/count of the 1D array data. Note that if this is NULL, the arraySizeFunc will be used */ \
+		Variable_ArraySizeFunc*		arraySizeFunc; 		/**< A func ptr to the size/count of the 1D array data. */ \
 									\
 		SizeT*				dataSizes; 		/**< The size in bytes of each field in this variable. */ \
 		SizeT				structSize; 		/**< The size of the structure. */ \
@@ -113,6 +116,7 @@
 		Name*						dataNames,		\
 		SizeT*						structSizePtr,		\
 		Index*						arraySizePtr,		\
+		Variable_ArraySizeFunc*				arraySizeFunc,		\
 		void**						arrayPtrPtr,		\
 		Variable_Register*				vr
 
@@ -120,7 +124,7 @@
 		STG_CLASS_PASSARGS, _defaultConstructor, _construct, 		\
 		_build, _initialise, _execute, _destroy, name, initFlag,	\
 		dataCount, dataOffsets, dataTypes, dataTypeCounts,		\
-		dataNames, structSizePtr, arraySizePtr,				\
+		dataNames, structSizePtr, arraySizePtr, arraySizeFunc,				\
 		arrayPtrPtr, vr
 	
 	/** Creates a new Variable. A Variable holds the run-time information of a complex data type created by the programmer.
@@ -149,6 +153,7 @@
 		Name*						dataNames,
 		SizeT*						structSizePtr,
 		Index*						arraySizePtr,
+		Variable_ArraySizeFunc*				arraySizeFunc,
 		void**						arrayPtrPtr,
 		Variable_Register*				vr );
 	
@@ -166,6 +171,7 @@
 		Name						name,
 		Variable_DataType				dataType,
 		Index*						arraySizePtr,
+		Variable_ArraySizeFunc*				arraySizeFunc,
 		void**						arrayPtrPtr,
 		Variable_Register*				vr );
 	
@@ -182,6 +188,7 @@
 		Variable_DataType				dataType,
 		Index						dataTypeCount,
 		Index*						arraySizePtr,
+		Variable_ArraySizeFunc*			        arraySizeFunc,
 		void**						arrayPtrPtr,
 		Variable_Register*				vr,
 		... 						/* vector component names */ );
@@ -191,6 +198,7 @@
 		Variable_DataType				dataType,
 		Index						dataTypeCount,
 		Index*						arraySizePtr,
+		Variable_ArraySizeFunc*				arraySizeFunc,
 		void**						arrayPtrPtr,
 		Variable_Register*				vr,
 		char**						dataNames );
@@ -199,15 +207,15 @@
 	Variable* _Variable_New(
 		SizeT						_sizeOfSelf, 
 		Type						type,
-		Stg_Class_DeleteFunction*				_delete,
-		Stg_Class_PrintFunction*				_print, 
+		Stg_Class_DeleteFunction*			_delete,
+		Stg_Class_PrintFunction*			_print, 
 		Stg_Class_CopyFunction*				_copy, 
 		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
 		Stg_Component_ConstructFunction*		_construct,
 		Stg_Component_BuildFunction*			_build,
-		Stg_Component_InitialiseFunction*			_initialise,
+		Stg_Component_InitialiseFunction*		_initialise,
 		Stg_Component_ExecuteFunction*			_execute,
-		Stg_Component_DestroyFunction*		_destroy,
+		Stg_Component_DestroyFunction*			_destroy,
 		Name						name,
 		Bool						initFlag,
 		Index						dataCount,
@@ -217,6 +225,7 @@
 		Name*						dataNames,
 		SizeT*						structSizePtr,
 		Index*						arraySizePtr,
+		Variable_ArraySizeFunc*				arraySizeFunc,
 		void**						arrayPtrPtr,
 		Variable_Register*				vr );
 	
@@ -232,6 +241,7 @@
 		Name*						dataNames,
 		SizeT*						structSizePtr,
 		Index*						arraySizePtr,
+		Variable_ArraySizeFunc*				arraySizeFunc,
 		void**						arrayPtrPtr,
 		Bool						allocateSelf,
 		Variable_Register*				vr );
@@ -246,8 +256,9 @@
 		Name*						dataNames,
 		SizeT*						structSizePtr,
 		Index*						arraySizePtr,
+		Variable_ArraySizeFunc*				arraySizeFunc,
 		void**						arrayPtrPtr,
-		Bool                        allocateSelf,
+		Bool						allocateSelf,
 		Variable_Register*				vr );
 	
 	
@@ -1177,6 +1188,8 @@
 		#define Variable_SetValueFromInbuilt _Variable_SetValuefromInBuilt
 	#endif
 	
+	/** Finds the new size of the array - replaces the limited ptr way of doing this. */
+	Index _Variable_GetNewArraySize( Variable* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Public Member functions: for any Variable

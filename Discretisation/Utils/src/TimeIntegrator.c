@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: TimeIntegrator.c 3851 2006-10-12 08:57:22Z SteveQuenette $
+** $Id: TimeIntegrator.c 4149 2007-06-29 06:59:13Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -651,6 +651,7 @@ Variable* Variable_NewFromOld( Variable* oldVariable, Name name, Bool copyValues
 			NULL,
 			0,
 			oldVariable->arraySizePtr,
+			oldVariable->arraySizeFunc,
 			NULL,
 			NULL );
 

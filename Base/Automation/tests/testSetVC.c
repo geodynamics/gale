@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testSetVC.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
+** $Id: testSetVC.c 4149 2007-06-29 06:59:13Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -105,11 +105,11 @@ int main(int argc, char *argv[])
 	/* Create variables */
 	for (i = 0; i < 6; i++) {
 		array[i] = Memory_Alloc_Array( double, arraySize, "array[]" );
-		var[i] = Variable_NewScalar( varName[i], Variable_DataType_Double, &arraySize, (void**)&array[i], 0 ); 
+		var[i] = Variable_NewScalar( varName[i], Variable_DataType_Double, &arraySize, NULL, (void**)&array[i], 0 ); 
 		Variable_Register_Add(variable_Register, var[i]);
 	}
 	array[6] = Memory_Alloc_Array( double , arraySize*5, "array[6]" );
-	var[6] = Variable_NewVector( varName[6], Variable_DataType_Double, 5, &arraySize, (void**)&array[6], 0,
+	var[6] = Variable_NewVector( varName[6], Variable_DataType_Double, 5, &arraySize, NULL, (void**)&array[6], 0,
 		"a", "b", "c", "d", "e" );
 	Variable_Register_Add(variable_Register, var[6]);
 	Variable_Register_BuildAll(variable_Register);

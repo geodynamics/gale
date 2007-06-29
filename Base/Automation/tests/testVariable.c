@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testVariable.c 4120 2007-05-23 10:43:41Z PatrickSunter $
+** $Id: testVariable.c 4149 2007-06-29 06:59:13Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -102,9 +102,9 @@ int main( int argc, char *argv[] ) {
 
 		/* Construction phase --------------------------------------------------------------------------------------------*/
 		vr = Variable_Register_New();
-		Variable_NewScalar( "temperature", Variable_DataType_Double, &aSize[0], (void**)&temperature, vr );
-		Variable_NewVector( "velocity", Variable_DataType_Double, 3, &aSize[1], (void**)&velocity, vr, "vx", "vy", "vz" );
-		Variable_New( "particle", 3, pOffsets, pDataTypes, pDtCounts, pNames, &pSize, &aSize[2], (void**)&particle, vr );
+		Variable_NewScalar( "temperature", Variable_DataType_Double, &aSize[0], NULL, (void**)&temperature, vr );
+		Variable_NewVector( "velocity", Variable_DataType_Double, 3, &aSize[1], NULL, (void**)&velocity, vr, "vx", "vy", "vz" );
+		Variable_New( "particle", 3, pOffsets, pDataTypes, pDtCounts, pNames, &pSize, &aSize[2], NULL, (void**)&particle, vr );
 		
 		Journal_Printf( stream, "Variable construction is working fine.\n" );
 

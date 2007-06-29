@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testVariableValueCompare.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
+** $Id: testVariableValueCompare.c 4149 2007-06-29 06:59:13Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -89,6 +89,7 @@ int main( int argc, char *argv[] ) {
 				Variable_DataType_Double, 
 				componentCount,
 				&arrayCount,
+				NULL,
 				(void**)&data,
 				vr,
 				"orig1",
@@ -100,6 +101,7 @@ int main( int argc, char *argv[] ) {
 				Variable_DataType_Double, 
 				componentCount,
 				&arrayCount,
+				NULL,
 				(void**)&data2,
 				vr,
 				"compare1",

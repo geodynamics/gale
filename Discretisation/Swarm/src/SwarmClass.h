@@ -40,7 +40,7 @@
 **	to appropriate processor immediately.)
 **	Communication is more efficient when shadow depth is equal to at least 1
 **
-** $Id: SwarmClass.h 4139 2007-06-12 02:39:52Z LukeHodkinson $
+** $Id: SwarmClass.h 4149 2007-06-29 06:59:13Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -104,7 +104,7 @@
 		double                          extraParticlesFactor; \
 		/*shaodw info*/								\
 		/** The indices of each shadow particle... */ \
-		Bool							shadowTablesBuilt; \
+		Bool                            shadowTablesBuilt; \
 		Cell_ParticlesList              shadowCellParticleTbl; \
 		/** The count of how many shadow particles are in each cell */ \
 		Cell_ParticlesIndexList         shadowCellParticleCountTbl; \
@@ -118,7 +118,7 @@
 		ExtensionManager*               particleExtensionMgr; \
 		/** Particle Communication handler */ \
 		\
-		Stg_ObjectList					*commHandlerList; \
+		Stg_ObjectList                  *commHandlerList; \
 		int				nSwarmVars; \
 		SwarmVariable			**swarmVars; \
 		\
@@ -291,7 +291,9 @@
 		...                         /* vector component names */ );
 
 	void Swarm_Realloc( void* swarm ) ;
+
 	void Swarm_CheckCoordsAreFinite( void* swarm ) ;
+
 	void Swarm_AssignIndexWithinShape( void* swarm, void* _shape, Variable* variableToAssign, Index indexToAssign ) ;
 
 	/* --- Private Functions --- */
@@ -319,7 +321,10 @@
 	/** simple function that determines logic for creating a swarm checkpoint filename */
 	void Swarm_GetCheckpointFilenameForGivenTimestep( Swarm* self, AbstractContext* context, char* swarmSaveFileName );
 
+	/** Function that adds a Communication Handler to a swarm. Expected to be run through C, since in
+	 * constructing via XML you should have just passed in a list at the Construct phase. */
 	Bool Swarm_AddCommHandler( Swarm *self, void *commHandler );
+
 	void Swarm_AddVariable( Swarm* self, SwarmVariable* swarmVar );
 
 #endif /* __Discretisation_Swarm_SwarmClass_h__ */

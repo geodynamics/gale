@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testCompositeVC-dictionary.c 4144 2007-06-13 04:33:59Z LukeHodkinson $
+** $Id: testCompositeVC-dictionary.c 4149 2007-06-29 06:59:13Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -157,11 +157,11 @@ int main(int argc, char *argv[])
 	/* Create variables */
 	for (i = 0; i < 6; i++) {
 		array[i] = Memory_Alloc_Array( double, 3*3*3, "array[i]" );
-		var[i] = Variable_NewScalar( varName[i], Variable_DataType_Double, &nDomains, (void**)&array[i], 0 ); 
+		var[i] = Variable_NewScalar( varName[i], Variable_DataType_Double, &nDomains, NULL, (void**)&array[i], 0 ); 
 		Variable_Register_Add(variable_Register, var[i]);
 	}
 	array[6] = Memory_Alloc_Array( double, 3*3*3*5, "array[6]" );
-	var[6] = Variable_NewVector( varName[6], Variable_DataType_Double, 5, &nDomains, (void**)&array[6], 0 );
+	var[6] = Variable_NewVector( varName[6], Variable_DataType_Double, 5, &nDomains, NULL, (void**)&array[6], 0 );
 	Variable_Register_Add(variable_Register, var[6]);
 	Variable_Register_BuildAll(variable_Register);
 	

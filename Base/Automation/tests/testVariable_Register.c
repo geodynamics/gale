@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testVariable_Register.c 3462 2006-02-19 06:53:24Z WalterLandry $
+** $Id: testVariable_Register.c 4149 2007-06-29 06:59:13Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -77,7 +77,7 @@ int main( int argc, char *argv[] ) {
 		Index			i;
 
 		for (i = 0; i < 10; i++) {
-			var[i] = Variable_NewVector( name[i], Variable_DataType_Double, 4, &arraySize, (void**)&array, 0 );
+			var[i] = Variable_NewVector( name[i], Variable_DataType_Double, 4, &arraySize, NULL, (void**)&array, 0 );
 		}
 
 		reg = Variable_Register_New();

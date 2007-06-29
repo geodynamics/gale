@@ -67,6 +67,7 @@ MeshVariable* MeshVariable_New( Name name ) {
 				  NULL, 
 				  NULL, 
 				  NULL, 
+				  NULL,
 				  NULL, 
 				  NULL, 
 				  NULL, 
@@ -204,7 +205,8 @@ void _MeshVariable_Construct( void* meshVariable, Stg_ComponentFactory* cf, void
 			dataTypeCounts, 
 			names, 
 			0, 
-			&self->meshArraySize, 
+			NULL,
+			_MeshVariable_GetMeshArraySize,
 			(void**)&self->arrayPtr,
 			True, 
 			variableRegister );
@@ -212,92 +214,6 @@ void _MeshVariable_Construct( void* meshVariable, Stg_ComponentFactory* cf, void
 	/* Clean Up */
 	if (names)
 		Memory_Free(names);
-
-#if 0
-	MeshVariable*		self = (MeshVariable*)meshVariable;
-	Variable_DataType	dataType;
-	unsigned		dataRank;
-	Dictionary*		dict;
-	char*			dataTypeName;
-	char*			rankName;
-	unsigned		nDataNames;
-	char**			names;
-	Stream*			error;
-	Mesh*			mesh;
-
-	assert( self );
-	assert( cf );
-
-	/* Register streams. */
-	error = Journal_Register( Error_Type, self->type );
-
-	/* Shortcuts. */
-	dict = Dictionary_GetDictionary( cf->componentDict, self->name );
-
-	/* Construct the mesh. */
-	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "mesh", Mesh, True );
-	MeshVariable_SetMesh( self, mesh );
-
-	/* Get the topological element we're intereseted in. */
-	self->topoDim = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "topologicalDim", 0 );
-
-	/* Get Type of Variable */
-	dataTypeName = Stg_ComponentFactory_GetString( cf, self->name, "DataType", "" );
-	if( !strcasecmp( dataTypeName, "Double" ) )
-		dataType = Variable_DataType_Double;
-	else if( !strcasecmp( dataTypeName, "Float" ) )
-		dataType = Variable_DataType_Float;
-	else if( !strcasecmp( dataTypeName, "Int" ) )
-		dataType = Variable_DataType_Int;
-	else if( !strcasecmp( dataTypeName, "Char" ) )
-		dataType = Variable_DataType_Char;
-	else if( !strcasecmp( dataTypeName, "Short" ) )
-		dataType = Variable_DataType_Short;
-	else {
-		Journal_Firewall( False, error, "Variable '%s' cannot understand data type '%s'\n", 
-				  self->name, dataTypeName );
-	}
-
-	/* Get Rank of Variable - i.e. Scalar or Vector */
-	rankName = Stg_ComponentFactory_GetString( cf, self->name, "Rank", "" );
-	if( !strcasecmp( rankName, "Scalar" ) ){
-		dataRank = 1;
-	}
-	else if( !strcasecmp( rankName, "Vector" ) ) {
-		Dictionary_Entry_Value* list;
-
-		/* Get Names from list */
-		if( (list = Dictionary_Get( dict, "names" ) )) {
-			unsigned	n_i;
-
-			nDataNames = Dictionary_Entry_Value_GetCount( list );
-			dataNames = Memory_Alloc_Array_Unnamed( char*, nDataNames );
-
-			for ( n_i = 0 ; n_i < nDataNames; n_i++ ) {
-				Dictionary_Entry_Value*	tmp;
-
-				tmp = Dictionary_Entry_Value_GetElement( list, n_i );
-				dataNames[n_i] = Dictionary_Entry_Value_AsString( tmp );
-			}
-		}
-
-		dataRank = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "VectorComponentCount", 
-								  nNames );
-		Journal_Firewall( nNames >= dataRank, error, 
-				  "Variable '%s' has too few names in list for %d vector components.\n", 
-				  self->name, dataRank );
-	}
-	else {
-		Journal_Firewall( False, error, "Variable '%s' cannot understand rank '%s'\n", 
-				  self->name, rankName );
-	}
-
-	/* Set the data type. */
-	Variable_SetDataType( self, dataType, dataRank, dataNames );
-
-	/* Free name array. */
-	FreeArray( dataNames );
-#endif
 }
 
 void _MeshVariable_Build( void* meshVariable, void* data ) {
@@ -305,9 +221,10 @@ void _MeshVariable_Build( void* meshVariable, void* data ) {
 
 	assert( self );
 
+	/* We need to make sure the Mesh is built first, since this Variable and it's sub-components are going
+	 *  to ask for the Mesh Size etc. */	
 	Stg_Component_Build( self->mesh, data, False );
 
-	self->meshArraySize = Mesh_GetDomainSize( self->mesh, self->topoDim );
 	_Variable_Build( self, data );
 }
 
@@ -345,3 +262,10 @@ void MeshVariable_SetMesh( void* meshVariable, void* _mesh ) {
 
 void MeshVariable_Destruct( MeshVariable* self ) {
 }
+
+Index _MeshVariable_GetMeshArraySize( void* meshVariable ) {
+	MeshVariable*	self = (MeshVariable*)meshVariable;
+
+	return Mesh_GetDomainSize( self->mesh, self->topoDim );
+}
+
