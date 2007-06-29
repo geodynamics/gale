@@ -17,12 +17,12 @@ checks = testArrheniusBackground2D.0of1.sh \
 	testNonNewtonianShearN4.0of1.sh \
 	testSpinUp.0of1.sh \
 	testVonMisesYieldCriterion.0of1.sh \
-	#testLateralViscosityAnalytic2dVisc102.0of1.sh \
+	testLateralViscosityAnalytic2dVisc102.0of1.sh \
 	testLateralViscosityAnalytic2dVisc106.0of1.sh \
-	 testColumnViscosity.0of1.sh \
-	 testColumnViscosity.0of2.sh
+	#testColumnViscosity.0of1.sh \
+	testColumnViscosity.0of2.sh
 #$(wildcard *.sh)
 
-subdirs := testConstitutiveMatrix testStiffnessMatrixAssembly testDirector testDirectorRandomness testDirectorPerMaterial testYieldCriterion NonNewtonianShearSolution #LateralViscosityAnalytic
+subdirs := testConstitutiveMatrix testStiffnessMatrixAssembly testDirector testDirectorRandomness testDirectorPerMaterial testYieldCriterion NonNewtonianShearSolution LateralViscosityAnalytic
 
 include ${PROJ_ROOT}/Makefile.vmake
