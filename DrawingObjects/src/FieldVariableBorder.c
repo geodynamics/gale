@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: FieldVariableBorder.c 628 2006-10-12 08:23:07Z SteveQuenette $
+** $Id: FieldVariableBorder.c 702 2007-06-29 00:43:14Z PatrickSunter $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -213,6 +213,10 @@ void _lucFieldVariableBorder_BuildDisplayList( void* drawingObject, void* _conte
 	Coord                    min;
 	Coord                    max;
 
+	/* THis needs to be first so all processors call it - collective comms */
+	/* Grab values from field variable */
+	FieldVariable_GetMinAndMaxGlobalCoords( field, min, max );
+
 	if ( context->rank != MASTER )
 		return;
 
@@ -227,8 +231,6 @@ void _lucFieldVariableBorder_BuildDisplayList( void* drawingObject, void* _conte
 	lucColour_SetOpenGLColour( &self->colour );
 	glLineWidth( self->lineWidth );
 
-	/* Grab values from field variable */
-	FieldVariable_GetMinAndMaxGlobalCoords( field, min, max );
 	
 	if (dim == 2) 
 		glRectd( min[ I_AXIS ], min[ J_AXIS ], max[ I_AXIS ], max[ J_AXIS ] );
