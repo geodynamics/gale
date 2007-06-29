@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: ColourMap.c 639 2006-11-15 05:29:51Z CecileDuboz $
+** $Id: ColourMap.c 703 2007-06-29 06:28:56Z CatherineMeriaux $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -347,10 +347,9 @@ void lucColourMap_GetColourFromValue_ExplicitOpacity( void* colourMap, double va
 
 void lucColourMap_SetMinMax( void* colourMap, double min, double max ) {
 	lucColourMap* self        = colourMap;
-	double        tolerance;
+	double        tolerance   = 1e-10;
 
 	/* Shift max and min if they are too close */
-	tolerance = 0.00005 * (fabs(max)+1);
 	if (fabs(min - max) < tolerance) {	
 		max += 0.5 * tolerance;
 		min -= 0.5 * tolerance;

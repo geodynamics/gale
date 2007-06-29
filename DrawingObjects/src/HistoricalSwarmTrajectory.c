@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: HistoricalSwarmTrajectory.c 628 2006-10-12 08:23:07Z SteveQuenette $
+** $Id: HistoricalSwarmTrajectory.c 703 2007-06-29 06:28:56Z CatherineMeriaux $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -220,9 +220,10 @@ void _lucHistoricalSwarmTrajectory_Setup( void* drawingObject, void* _context ) 
 	}
 	self->timeAtStep[ currentTimestep ] = context->currentTime;
 
-	/* Calibrate Colour Map */
-	lucColourMap_SetMinMax( colourMap, self->timeAtStep[ self->startTimestepIndex ], self->timeAtStep[ currentTimestep ] );
-
+ 	/* Calibrate Colour Map */
+	if ( colourMap )
+		lucColourMap_SetMinMax( colourMap, self->timeAtStep[ self->startTimestepIndex ], self->timeAtStep[ currentTimestep ] );
+		
 	/* Store Current position for each time step */
 	for ( lParticle_I = 0 ; lParticle_I < swarm->particleLocalCount ; lParticle_I++ ) {
 		particle    = (GlobalParticle*)Swarm_ParticleAt( swarm, lParticle_I );
@@ -259,6 +260,8 @@ void _lucHistoricalSwarmTrajectory_BuildDisplayList( void* drawingObject, void* 
 
 	lucColour_SetOpenGLColour( &self->colour );
 	glLineWidth( self->lineWidth );
+	
+	glDisable(GL_LIGHTING);
 
 	/* Loop over all particles and draw lines according to where each one has been */
 	for ( lParticle_I = 0 ; lParticle_I < swarm->particleLocalCount ; lParticle_I++ ) {
@@ -266,7 +269,8 @@ void _lucHistoricalSwarmTrajectory_BuildDisplayList( void* drawingObject, void* 
 		particleExt = ExtensionManager_Get( swarm->particleExtensionMgr, particle, self->particleExtHandle );
 
 		glBegin( GL_LINE_STRIP );
-		for ( timestep = self->startTimestepIndex ; timestep != currentTimestep ; ) {
+		timestep = self->startTimestepIndex ;
+		while (True) {
 			coord = particleExt->historyCoordList[ timestep ];
 
 			/* Set the colour from the colour map - if we've passed it in */
@@ -278,6 +282,10 @@ void _lucHistoricalSwarmTrajectory_BuildDisplayList( void* drawingObject, void* 
 				glVertex3f( (float)coord[0], (float)coord[1], offset );
 			else 
 				glVertex3dv( coord );
+				
+			/* Stop the loop when we have arrived a the current timestep */
+			if ( timestep == currentTimestep )
+				break;
 			
 			/* Adjust current timestep counter so that the list of stored coordinates loops over itself */
 			timestep++;
@@ -285,4 +293,5 @@ void _lucHistoricalSwarmTrajectory_BuildDisplayList( void* drawingObject, void* 
 		}
 		glEnd();
 	}
+	glEnable(GL_LIGHTING);
 }
