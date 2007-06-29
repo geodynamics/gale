@@ -11,7 +11,7 @@
 			<param name="Type">lucRenderingEngineGL</param>
 		</struct>
 		<struct name="imageOutput">
-			<param name="Type">lucOutputPPM</param>
+			<param name="Type">lucOutputPNG</param>
 		</struct>
 		<struct name="window">
 			<param name="Type">lucDefaultWindow</param>
