@@ -59,7 +59,6 @@ void FeVariable_ReadNodalValuesFromFile_SpecRidge2D( void* _feVariable, const ch
 	Dof_Index          dofAtEachNodeCount;
 	FILE*              inputFile;
 	double             variableVal;
-	double             variableVal2;
 	char               lineString[1000];
 	const unsigned int MAX_LINE_LENGTH = 1000;
 	Processor_Index    proc_I=0;
@@ -74,7 +73,6 @@ void FeVariable_ReadNodalValuesFromFile_SpecRidge2D( void* _feVariable, const ch
 	unsigned	rank, nProcs;
 	double		min[3], max[3];
 	unsigned	nDims;
-	int i = 0; /* dave - 19.06.07 */
 
 	Journal_DPrintf( debugStream, "In %s(): for FeVariable \"%s\"\n", __func__, feVariable->name );
 	Stream_Indent( debugStream );
@@ -151,7 +149,7 @@ void FeVariable_ReadNodalValuesFromFile_SpecRidge2D( void* _feVariable, const ch
 			if ( feVariable->fieldComponentCount == 3 ) {
 				fscanf( inputFile, "%lg", Mesh_GetVertex( mesh, lNode_I ) + 2 );
 			}
-			
+		
 			Journal_DPrintfL( debugStream, 3, "read coord (%.3f, %.3f, %.3f)\n", 
 					  Mesh_GetVertex( mesh, lNode_I )[0],
 					  Mesh_GetVertex( mesh, lNode_I )[1],
@@ -159,13 +157,15 @@ void FeVariable_ReadNodalValuesFromFile_SpecRidge2D( void* _feVariable, const ch
 			
 			for ( dof_I = 0; dof_I < dofAtEachNodeCount; dof_I++ ) {
 				fscanf( inputFile, " %lg ", &variableVal );
-				
+
 				DofLayout_SetValueDouble( feVariable->dofLayout, lNode_I, dof_I, variableVal );
 				Journal_DPrintfL( debugStream, 3, "read dof %u: %g\n", dof_I, variableVal ); 
 				/* TODO: Hack for now - ABAQUS only uses initial coords, so assume this is displacement and add */
 				/*Mesh_GetVertex( mesh, lNode_I )[dof_I] += variableVal;*/
 				/*Journal_DPrintfL( debugStream, 3, "TODO: using HACK assumption of disp.:- updating nodeCoord[%u] to %.3f\n",
 						  dof_I, Mesh_GetVertex( mesh, lNode_I )[dof_I] );*/
+				/*printf("value %d: %f  ", dof_I, variableVal);*/
+
 			}
 
 			for ( dim_I = 0; dim_I < 3; dim_I++ ) {
