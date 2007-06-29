@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AdvectionDiffusionSLE.c 860 2007-06-07 05:47:20Z LukeHodkinson $
+** $Id: AdvectionDiffusionSLE.c 893 2007-06-29 06:59:28Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -393,6 +393,7 @@ void _AdvectionDiffusionSLE_Build( void* sle, void* data ) {
 			"phiDot", 
 			Variable_DataType_Double, 
 			nodeDomainCountPtr, 
+			NULL,
 			(void**)&self->phiDotArray, 
 			variable_Register );
 

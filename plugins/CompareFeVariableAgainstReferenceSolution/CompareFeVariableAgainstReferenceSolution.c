@@ -279,12 +279,14 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 			tmpName,
 			Variable_DataType_Double,
 			&feVarToTest->feMesh->topo->remotes[MT_VERTEX]->nDomains, 
+			NULL,
 			(void**)NULL,
 			variable_Register );
 		roundedDataVariable = Variable_NewScalar(
 			tmpName2,
 			Variable_DataType_Double,
 			&feVarToTest->feMesh->topo->remotes[MT_VERTEX]->nDomains, 
+			NULL,
 			(void**)NULL,
 			variable_Register );
 	}
@@ -312,6 +314,7 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 				Variable_DataType_Double,
 				componentsCount,
 				&feVarToTest->feMesh->topo->remotes[MT_VERTEX]->nDomains, 
+				NULL,
 				(void**)NULL,
 				variable_Register,
 				referenceVariableName[0],
@@ -328,6 +331,7 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 				Variable_DataType_Double,
 				componentsCount,
 				&feVarToTest->feMesh->topo->remotes[MT_VERTEX]->nDomains, 
+				NULL,
 				(void**)NULL,
 				variable_Register,
 				roundedVariableName[0],

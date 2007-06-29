@@ -84,10 +84,10 @@ FeEquationNumber* buildEqNum() {
    arrayPtrs[1] = Memory_Alloc_Array_Unnamed( double, arraySize );
    vars[0] = Variable_New( "one", 1, &dataOffs, &dataType, (unsigned*)&nDataTypes, 
 			   &dataNames, &structSize, (unsigned*)&arraySize, 
-			   arrayPtrs, varReg );
+			   NULL, arrayPtrs, varReg );
    vars[1] = Variable_New( "two", 1, &dataOffs, &dataType, (unsigned*)&nDataTypes, 
 			   &dataNames, &structSize, (unsigned*)&arraySize, 
-			   arrayPtrs + 1, varReg );
+			   NULL, arrayPtrs + 1, varReg );
 
    dofs = DofLayout_New( "", varReg, 0, feMesh );
    dofs->nBaseVariables = 2;
@@ -154,10 +154,10 @@ FeEquationNumber* buildEqNumBCs() {
    arrayPtrs[1] = Memory_Alloc_Array_Unnamed( double, arraySize );
    vars[0] = Variable_New( "one", 1, &dataOffs, &dataType, (unsigned*)&nDataTypes, 
 			   &dataNames, &structSize, (unsigned*)&arraySize, 
-			   arrayPtrs, varReg );
+			   NULL, arrayPtrs, varReg );
    vars[1] = Variable_New( "two", 1, &dataOffs, &dataType, (unsigned*)&nDataTypes, 
 			   &dataNames, &structSize, (unsigned*)&arraySize, 
-			   arrayPtrs + 1, varReg );
+			   NULL, arrayPtrs + 1, varReg );
 
    dofs = DofLayout_New( "", varReg, 0, feMesh );
    dofs->nBaseVariables = 2;

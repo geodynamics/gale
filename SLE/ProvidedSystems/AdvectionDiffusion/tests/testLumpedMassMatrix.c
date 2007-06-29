@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testLumpedMassMatrix.c 886 2007-06-27 00:17:29Z DavidLee $
+** $Id: testLumpedMassMatrix.c 893 2007-06-29 06:59:28Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -207,6 +207,7 @@ int main( int argc, char* argv[] ) {
 		"phi", 
 		Variable_DataType_Double, 
 		&nDomainVerts, 
+		NULL,
 		(void**)&nodes, 
 		variableRegister );
 
