@@ -90,6 +90,7 @@ void _DensityField_Init(
 			tmpName,
 			Variable_DataType_Double, 
 			&self->feMesh->topo->remotes[MT_VERTEX]->nDomains, 
+			NULL,
 			(void**)&self->data, 
 			variable_Register );
 	Memory_Free( tmpName );

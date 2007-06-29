@@ -176,6 +176,7 @@ void _ViscosityField_Build( void* viscosityField, void* data ) {
 			tmpName,
 			Variable_DataType_Double, 
 			&self->feMesh->topo->remotes[MT_VERTEX]->nDomains, 
+			NULL,
 			(void**)&self->data, 
 			self->variable_Register );
 	Memory_Free( tmpName );
