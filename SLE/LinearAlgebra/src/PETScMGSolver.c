@@ -384,7 +384,11 @@ void PETScMGSolver_UpdateOps( PETScMGSolver* self ) {
 		assert( Stg_CheckType( rOps[l_i], PETScMatrix ) );
 
 		PETScMGSolver_SetProlongation( self, l_i, pOps[l_i] );
-		ec = PCMGSetInterpolate( pc, l_i, pOps[l_i]->petscMat );
+		#if( (PETSC_VERSION_MAJOR==2) && (PETSC_VERSION_MINOR==3) && (PETSC_VERSION_SUBMINOR==3) )
+			ec = PCMGSetInterpolation( pc, l_i, pOps[l_i]->petscMat );
+		#else
+			ec = PCMGSetInterpolate( pc, l_i, pOps[l_i]->petscMat );
+		#endif
 		CheckPETScError( ec );
 
 		PETScMGSolver_SetRestriction( self, l_i, rOps[l_i] );
