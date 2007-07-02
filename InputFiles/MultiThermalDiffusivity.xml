@@ -216,12 +216,17 @@ appropriate parameters and their values if you use this xml from production runs
 			<param name="Type">lucFieldVariableBorder</param>
 			<param name="FieldVariable">VelocityField</param>
 		</struct>
+		<struct name="particleTypeTitle" mergeType="replace">
+			<param name="Type">lucTitle</param>
+			<param name="string">Particle Types</param>
+		</struct>
 		<!-- Viewport -->
 		<struct name="ParticleVP">
 			<param name="Type">lucViewport</param>
 			<param name="Camera">camera</param>
 			<list name="DrawingObject">
 				<param>particleDots</param>
+				<param>particleTypeTitle</param>
 				<param>border</param>
 			</list>
 		</struct>
