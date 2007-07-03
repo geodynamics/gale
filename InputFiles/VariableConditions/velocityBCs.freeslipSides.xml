@@ -22,6 +22,11 @@
 						<param name="type">double</param>
 						<param name="value"> 0 </param>
 					</struct>
+					<struct>
+						<param name="name">vz</param>
+						<param name="type">double</param>
+						<param name="value"> 0 </param>
+					</struct>
 				</list>
 			</struct>
 			<struct>
@@ -79,6 +84,11 @@
 					</struct>
 					<struct>
 						<param name="name">vy</param>
+						<param name="type">double</param>
+						<param name="value"> 0 </param>
+					</struct>
+					<struct>
+						<param name="name">vz</param>
 						<param name="type">double</param>
 						<param name="value"> 0 </param>
 					</struct>
