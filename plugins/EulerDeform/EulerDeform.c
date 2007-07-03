@@ -282,6 +282,7 @@ Variable* EulerDeform_RegisterLocalNodeCoordsAsVariables( EulerDeform_System* sy
 		Variable_DataType_Double, 
 		Mesh_GetDimSize( self ), 
 		&self->topo->locals[MT_VERTEX]->locals->size, 
+		NULL,
 		(void**)&sys->verts, 
 		variable_Register, 
 		variableNameX,
@@ -305,7 +306,6 @@ Variable* EulerDeform_RegisterLocalNodeCoordsAsVariables( EulerDeform_System* sy
 
 
 void EulerDeform_IntegrationSetup( void* _timeIntegrator, void* context ) {
-	TimeIntegrator*		timeIntegrator = (TimeIntegrator*)_timeIntegrator;
 	EulerDeform_Context*	edCtx = (EulerDeform_Context*)context;
 	unsigned		sys_i, sys_j;
 
