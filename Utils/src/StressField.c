@@ -217,6 +217,7 @@ void _StressField_Build( void* stressField, void* data ) {
 			Variable_DataType_Double, 
 			self->fieldComponentCount,
 			&self->feMesh->topo->remotes[MT_VERTEX]->nDomains, 
+			NULL,
 			(void**)&self->data, 
 			self->variable_Register,
 			variableName[0],
