@@ -345,11 +345,24 @@ TestBegin( BCs ) {
 }
 TestEnd
 
+TestBegin( Linked ) {
+   FeEquationNumber* eqNum;
 
-#define nTests 3
+   eqNum = buildEqNumBCs();
+   TestTrue( eqNum );
+   /* TODO */
+
+  done:
+   FreeObject( eqNum );
+}
+TestEnd
+
+
+#define nTests 4
 TestSuite_Test tests[nTests] = {{"local destination array", testLocalDest}, 
 				{"shadow destination array", testShadowDest}, 
-				{"destination array with BCs", testShadowDest}};
+				{"destination array with BCs", testShadowDest}, 
+				{"linked dofs", testLinked}};
 
 
 #include "StGermain/Base/Foundation/TestEnd.h"
