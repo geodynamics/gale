@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AnalyticSolution.c 893 2007-06-29 06:59:28Z PatrickSunter $
+** $Id: AnalyticSolution.c 902 2007-07-04 03:51:43Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -432,6 +432,7 @@ FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVari
 				Variable_DataType_Double, 
 				componentsCount,
 				&sync->nDomains, 
+				NULL, 
 				(void**)NULL, 
 				variable_Register,
 				variableName[0],
