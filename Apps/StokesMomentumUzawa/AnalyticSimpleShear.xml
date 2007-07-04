@@ -76,6 +76,13 @@
 
 	<!-- Periodic boundary conditions -->
 	<struct name="components" mergeType="merge">
+		<struct name="linearMeshGenerator" mergeType="merge">
+			<list name="maxDecompositions">
+				<param> 0 </param>
+				<param> 1 </param>
+			</list>
+		</struct>
+
 		<struct name="velocityLinkedDofs">
 			<param name="Type">LinkedDofInfo</param>
 			<param name="Mesh">linearMesh</param>
