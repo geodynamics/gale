@@ -36,7 +36,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: testStiffnessMatrix-nonZeroCalculation-linkedDofs.0of1.sh 535 2006-04-11 13:07:34Z PatrickSunter $
+## $Id: testStiffnessMatrix.0of2.sh 900 2007-07-04 03:20:52Z LukeHodkinson $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -46,4 +46,4 @@ until test -r ${TEST_SCRIPT} ; do
 done
 . ${TEST_SCRIPT}
 
-runAndHandleSystemTestStdLocations "testStiffnessMatrix-nonZeroCalculation-linkedDofs " "$0" "$@"
+runAndHandleSystemTestStdLocations "testStiffnessMatrix " "$0" "$@"
