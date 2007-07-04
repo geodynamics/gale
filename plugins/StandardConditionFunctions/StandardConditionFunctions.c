@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StandardConditionFunctions.c 884 2007-06-27 00:13:52Z DavidLee $
+** $Id: StandardConditionFunctions.c 906 2007-07-04 06:24:40Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -108,6 +108,12 @@ void _StgFEM_StandardConditionFunctions_Construct( void* component, Stg_Componen
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpecRidge3D, "SpecRidge3D");
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpectralBCX, "SpectralBCX");
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpectralBCY, "SpectralBCY");
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ConstantVelocity, "ConstantVelocity");
@@ -842,7 +848,7 @@ void StgFEM_StandardConditionFunctions_ConstantVelocity( Node_LocalIndex node_lI
 }
 
 /* error function for use in 3D spec ridge top BC - not currently in use */
-double errorFunction(double z, int n) {
+double errorFunction( double z, int n ) {
 	double		pi	= 3.1415926535;
 	double 		a;
 	double 		erf 	= 0.0;
@@ -852,12 +858,11 @@ double errorFunction(double z, int n) {
 	a = 2.0/sqrt( pi );
 
 	for( i=0 ; i<n ; i++ ) {
-		
 		denom = 1;
-		for( j=1 ; j<=2*i+1 ; j+=2 ) denom *= j; 
+		for( j=1 ; j<=2*i+1 ; j+=2 ) 
+			denom *= j; 
 		
 		erf += pow( 2, i )*pow( z, 2*i+1 )/denom;
-
 	}
 
 	return erf *= a*exp( -1.0*z*z );
@@ -881,7 +886,7 @@ void StgFEM_StandardConditionFunctions_SpecRidge3D( Node_LocalIndex node_lI, Var
 
 
 	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
-	feMesh       = feVariable->feMesh;
+	feMesh     = feVariable->feMesh;
 	coord      = Mesh_GetVertex( feMesh, node_lI );
 
 	leftVal = Dictionary_GetDouble_WithDefault( dictionary, "SpecRidge3DLeftSide", 0.0 );
@@ -896,4 +901,48 @@ void StgFEM_StandardConditionFunctions_SpecRidge3D( Node_LocalIndex node_lI, Var
 		*result = leftVal;
 	else
 		*result = rightVal;
+}
+
+/* get the BC's from the analytic solution as stored on the relevant FeVariable */
+void StgFEM_StandardConditionFunctions_SpectralBCX( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	FiniteElementContext *	context            = (FiniteElementContext*)_context;
+	FeVariable*             analyticFeVarX     = NULL;
+	FeVariable*             numericFeVar       = NULL;
+	FeMesh*			feMesh             = NULL;
+	Dictionary*             dictionary         = context->dictionary;
+	double*                 result             = (double*) _result;
+        double*                 coord;
+	double*			dummy;
+
+	analyticFeVarX = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "SpectralVelocityXField" );
+	numericFeVar   = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
+	feMesh         = numericFeVar->feMesh;
+	coord          = Mesh_GetVertex( feMesh, node_lI );
+
+	FeVariable_GetValueAtNode( analyticFeVarX, node_lI, result );
+	/* *result = FeVariable_GetScalarAtNode( analyticFeVarX, node_lI );*/
+	/*FieldVariable_InterpolateValueAt( analyticFeVar, coord, result );*/
+
+	/*FeVariable_SetValueAtNode( numericFeVar, node_lI, result );*/
+}
+
+void StgFEM_StandardConditionFunctions_SpectralBCY( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	FiniteElementContext *	context            = (FiniteElementContext*)_context;
+	FeVariable*             analyticFeVarY     = NULL;
+	FeVariable*             numericFeVar       = NULL;
+	FeMesh*			feMesh             = NULL;
+	Dictionary*             dictionary         = context->dictionary;
+	double*                 result             = (double*) _result;
+        double*                 coord;
+	double*			dummy;
+
+	analyticFeVarY = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "SpectralVelocityYField" );
+	numericFeVar   = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
+	feMesh         = numericFeVar->feMesh;
+	coord          = Mesh_GetVertex( feMesh, node_lI );
+
+	FeVariable_GetValueAtNode( analyticFeVarY, node_lI, result );
+	/* *result = FeVariable_GetScalarAtNode( analyticFeVarY, node_lI ); */
+
+	/*FeVariable_SetValueAtNode( numericFeVar, node_lI, result );*/
 }
