@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testSUPGShapeFunc.c 886 2007-06-27 00:17:29Z DavidLee $
+** $Id: testSUPGShapeFunc.c 901 2007-07-04 03:31:27Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -239,6 +239,7 @@ int main( int argc, char* argv[] ) {
 		Variable_DataType_Double, 
 		3, 
 		&nDomainVerts, 
+		NULL, 
 		(void**)&nodes, 
 		variableRegister, 
 		"vx", 
