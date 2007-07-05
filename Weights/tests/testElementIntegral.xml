@@ -15,7 +15,7 @@
 		<struct name="localLayout">
 			<param name="Type">MappedParticleLayout</param>
 		</struct>
-		<struct name="swarm">
+		<struct name="integrationSwarm">
 			<param name="Type">IntegrationPointsSwarm</param>
 			<param name="CellLayout">elementCellLayout</param>
 			<param name="ParticleLayout">localLayout</param>
@@ -28,18 +28,24 @@
 		</struct>
 		<struct name="mapper">
 			<param name="Type">CoincidentMapper</param>
-			<param name="IntegrationPointsSwarm">swarm</param>
-			<param name="MaterialPointsSwarm">picIntegrationPoints</param>
+			<param name="IntegrationPointsSwarm">integrationSwarm</param>
+			<param name="MaterialPointsSwarm">materialSwarm</param>
 		</struct>
 		<struct name="particleLayout">
 			<param name="Type">RandomParticleLayout</param>
 			<param name="cellParticleCount">particleCount</param>
 		</struct>
-		<struct name="picIntegrationPoints">
+		<struct name="pMovementHandler"> 
+			<param name="Type">ParticleMovementHandler</param>
+		</struct>
+		<struct name="materialSwarm">
 			<param name="Type">MaterialPointsSwarm</param>
 			<param name="CellLayout">elementCellLayout</param>
 			<param name="ParticleLayout">particleLayout</param>
 			<param name="FeMesh">linearMesh</param>
+			<list name="ParticleCommHandlers">
+				<param>pMovementHandler</param>
+			</list>
 		</struct>
 							  
 	</struct>
