@@ -13,7 +13,7 @@
 		
 		<struct name="hassatisfiedColourMap">
 			<param name="Type">lucColourMap</param>
-			<param name="colours">Yellow White Blue</param>
+			<param name="colours">Yellow Blue White</param>
 			<param name="dynamicRange">True</param>
 		</struct>
 		<struct name="hassatisfiedColourBar">
