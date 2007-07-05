@@ -22,11 +22,14 @@
 						<param name="type">double</param>
 						<param name="value"> 0 </param>
 					</struct>
+					<!--
+					This is turned off for 2-D
 					<struct>
 						<param name="name">vz</param>
 						<param name="type">double</param>
 						<param name="value"> 0 </param>
 					</struct>
+					-->
 				</list>
 			</struct>
 			<struct>
@@ -87,11 +90,14 @@
 						<param name="type">double</param>
 						<param name="value"> 0 </param>
 					</struct>
+					<!--
+					This is turned off for 2-D
 					<struct>
 						<param name="name">vz</param>
 						<param name="type">double</param>
 						<param name="value"> 0 </param>
 					</struct>
+					-->
 				</list>
 			</struct>
 		</list>
