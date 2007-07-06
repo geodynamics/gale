@@ -18,6 +18,30 @@
 
 
 <list name="Params">
+	<struct>
+		<param name="Name">resolution</param>
+		<param name="Type">Int</param>
+		<param name="Default">10</param>
+		<param name="Description">A default resolution in every direction for the voronio mesh. If used you don't have to specify the resolution in every dimension.</param>
+	</struct>
+	<struct>
+		<param name="Name">resolutionX</param>
+		<param name="Type">Int</param>
+		<param name="Default">10</param>
+		<param name="Description">A default resolution in X-axis for the voronio mesh.</param>
+	</struct>
+	<struct>
+		<param name="Name">resolutionY</param>
+		<param name="Type">Int</param>
+		<param name="Default">10</param>
+		<param name="Description">A default resolution in Y-axis for the voronio mesh.</param>
+	</struct>
+	<struct>
+		<param name="Name">resolutionZ</param>
+		<param name="Type">Int</param>
+		<param name="Default">10</param>
+		<param name="Description">A default resolution in Z-axis for the voronio mesh.</param>
+	</struct>
 
 </list>
 
