@@ -18,6 +18,8 @@
 	<include>PICellerator/MaterialPointSwarm.xml        </include>
 	<include>Underworld/StokesFlowUzawaCompressible.xml </include>
 
+	<param name="timeIntegratorOrder"> 1 </param>
+
 	<struct name="components" mergeType="merge">
 		<struct name="buoyancyForceTerm">
 			<param name="Type">BuoyancyForceTerm</param>
@@ -29,6 +31,17 @@
 	</struct>
 
 	<!-- Replacement for MovingMesh -->
+	<struct name="components" mergeType="merge">
+		<struct name="velocityRemesher">
+			<param name="Type">RegularRemesherCmpt</param>
+			<param name="mesh">velocityMesh</param>
+			<list name="remeshDims">
+				<param>0</param>
+				<param>1</param>
+				<param>2</param>
+			</list>
+		</struct>
+	</struct>
 	<struct name="EulerDeform">
 		<list name="systems">
 			<struct>
@@ -36,8 +49,15 @@
 				<param name="velocityField"> VelocityField </param>
 			</struct>
 			<struct>
-				<param name="mesh"> linearMesh </param>
+				<param name="mesh"> velocityMesh </param>
+				<param name="remesher">velocityRemesher</param>
 				<param name="velocityField"> VelocityField </param>
+				<list name="fields">
+					<struct>
+						<param name="field">VelocityField</param>
+						<param name="variable">velocity</param>
+					</struct>
+				</list>
 			</struct>
 		</list>
 	</struct>
