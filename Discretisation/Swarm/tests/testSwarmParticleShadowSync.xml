@@ -57,9 +57,9 @@
 			<param name="Type">Swarm</param>
 			<param name="CellLayout">elementCellLayout</param>
 			<param name="ParticleLayout">particleLayout</param>
-			<list name="ParticleCommHandlers">
+			<!--<list name="ParticleCommHandlers">
 				<param>pShadowSync</param>
-			</list>			
+			</list>-->			
 		</struct>
 	</struct>
  
@@ -103,6 +103,6 @@
 	<param name="maxZ">1.0</param>
 	<param name="elementResI">12</param>
 	<param name="elementResJ">12</param>
-	<param name="elementResK">1</param>
+	<param name="elementResK">12</param>
 
 </StGermainData>

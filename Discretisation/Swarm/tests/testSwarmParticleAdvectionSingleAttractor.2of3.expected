@@ -1,4 +1,4 @@
-StGermain Framework revision 4125. Copyright (C) 2003-2005 VPAC.
+StGermain Framework revision 4149. Copyright (C) 2003-2005 VPAC.
 Cartesian generator: 'cartesianGenerator'
 	Target mesh: 'mesh-linear'
 	Global element size: 12x12x1
@@ -18,6 +18,7 @@ Cartesian generator: 'cartesianGenerator'
 		... element types are 'Mesh_HexType',
 		... mesh algorithm type is 'Mesh_RegularAlgorithms',
 		... done.
+Watching rank: 2
 Run until 5 timeSteps have been run
 TimeStep = 1, Start time = 0 + 2 prev timeStep dt
 Calculated attractor point is at (0.333333,0.333333,0.333333):

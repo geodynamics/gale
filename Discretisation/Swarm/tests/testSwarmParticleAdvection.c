@@ -35,7 +35,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: testSwarmParticleAdvection.c 4142 2007-06-13 01:26:58Z LukeHodkinson $
+** $Id: testSwarmParticleAdvection.c 4150 2007-07-09 06:09:02Z RaquibulHassan $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -144,7 +144,7 @@ int main( int argc, char* argv[] ) {
 	else {
 		procToWatch = 0;
 	}
-/*	if( rank == procToWatch ) printf( "Watching rank: %i\n", rank );*/
+	if( rank == procToWatch ) printf( "Watching rank: %i\n", rank );
 
 	/* For plugins to read */
 	Dictionary_Add( dictionary, "procToWatch", Dictionary_Entry_Value_FromUnsignedInt( procToWatch ) );

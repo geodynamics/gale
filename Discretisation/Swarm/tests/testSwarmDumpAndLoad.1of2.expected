@@ -1,4 +1,4 @@
-StGermain Framework revision 4125. Copyright (C) 2003-2005 VPAC.
+StGermain Framework revision 4149. Copyright (C) 2003-2005 VPAC.
 Cartesian generator: ''
 	Target mesh: ''
 	Global element size: 32x32x32
@@ -23,22 +23,8 @@ Cartesian generator: ''
 Calculated attractor point is at (0.333333,0.333333,0.333333):
 
 Starting timestep 1:
-...proc 0 finished particle communication:
-	- Particle comm totals via shadow cells (1 nbr procs): sent 0, recvd 1536
-	- time taken = 0.01 (secs)
-...proc 1 finished particle communication:
-	- Particle comm totals via shadow cells (1 nbr procs): sent 1536, recvd 0
-	- time taken = 0.01 (secs)
-...Max Communication time by any proc was 0.01 (secs)
 
 Starting timestep 2:
-...proc 0 finished particle communication:
-	- Particle comm totals via shadow cells (1 nbr procs): sent 0, recvd 2312
-	- time taken = 0.02 (secs)
-...proc 1 finished particle communication:
-	- Particle comm totals via shadow cells (1 nbr procs): sent 2312, recvd 0
-	- time taken = 0.03 (secs)
-...Max Communication time by any proc was 0.03 (secs)
 
 Comparing the 9565 local Particles between old and new swarms:
 	Passed: swarms are identical.
