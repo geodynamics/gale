@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ParticleFeVariable.c 474 2007-06-27 00:30:24Z DavidLee $
+** $Id: ParticleFeVariable.c 492 2007-07-09 23:41:51Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -117,6 +117,8 @@ ParticleFeVariable* _ParticleFeVariable_New(
 			True, /* isCheckpointedAndReloaded */
 			NULL,	/* import format type */
 			NULL,	/* export format type */
+			NULL,	/* custom input path */
+			NULL,	/* custom output path */
 			False,  /* use a reference solution from file */
 			False,  /* load the reference solution at each time step */
 			0,	/* communicator */
@@ -206,7 +208,7 @@ void _ParticleFeVariable_Construct( void* materialFeVariable, Stg_ComponentFacto
 	/* Construct Parent */
 	_FieldVariable_Construct( self, cf, data );
 	_FeVariable_Init( (FeVariable*)self, mesh, NULL, NULL, NULL, NULL, NULL, NULL,
-		StgFEM_Native_ImportExportType, StgFEM_Native_ImportExportType, False, False );
+		StgFEM_Native_ImportExportType, StgFEM_Native_ImportExportType, NULL, NULL, False, False );
 	_ParticleFeVariable_Init( self, swarm, context );
 }
 
