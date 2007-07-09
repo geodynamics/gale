@@ -123,6 +123,8 @@
 		/** A type recording what import/export system for loading and saving should be used */ \
 		char*                                             importFormatType; \
 		char*                                             exportFormatType; \
+		char*                                             customInputPath; \
+		char*                                             customOutputPath; \
 		/** Records whether this FeVariable is a reference solution - and should be loaded from a file, regardless
 		 * of checkpointing status */ \
 		Bool                                              isReferenceSolution; \
@@ -153,6 +155,8 @@
 		Bool                                            isCheckpointedAndReloaded,
 		const char* const                               importFormatType,
 		const char* const                               exportFormatType,
+		const char* const                               customInputPath,
+		const char* const                               customOutputPath,
 		Bool                                            referenceSoulution,
 		Bool                                            loadReferenceEachTimestep,
 		FieldVariable_Register*                         fV_Register );
@@ -167,6 +171,10 @@
 		void*                                          	ics,
 		const char* const                               importFormatType,
 		const char* const                               exportFormatType,
+		const char* const                               customInputPath,
+		const char* const                               customOutputPath,
+		Bool                                            isReferenceSolution,
+		Bool                                            loadReferenceEachTimestep,
 		FieldVariable_Register*                         fV_Register );
 	
 	/** Create a new FeVariable and initialises it. User chooses whether to pass a template or not. */
@@ -184,6 +192,8 @@
 		Bool                                            isCheckpointedAndReloaded,
 		const char* const                               importFormatType,
 		const char* const                               exportFormatType,
+		const char* const                               customInputPath,
+		const char* const                               customOutputPath,
 		Bool                                            referenceSoulution,
 		Bool                                            loadReferenceEachTimestep,
 		MPI_Comm                                        communicator,
@@ -224,6 +234,8 @@
 		Bool                                            isCheckpointedAndReloaded,
 		const char* const                               importFormatType,
 		const char* const                               exportFormatType,
+		const char* const                               customInputPath,
+		const char* const                               customOutputPath,
 		Bool                                            referenceSoulution,
 		Bool                                            loadReferenceEachTimestep,
 		MPI_Comm                                        communicator,
@@ -241,6 +253,8 @@
 		void*                                           templateFeVariable,
 		const char* const                               importFormatType,
 		const char* const                               exportFormatType,
+		const char* const                               customInputPath,
+		const char* const                               customOutputPath,
 		Bool                                            referenceSoulution,
 		Bool                                            loadReferenceEachTimestep );
 	

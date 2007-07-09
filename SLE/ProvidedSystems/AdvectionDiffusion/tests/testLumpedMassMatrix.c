@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testLumpedMassMatrix.c 893 2007-06-29 06:59:28Z PatrickSunter $
+** $Id: testLumpedMassMatrix.c 907 2007-07-09 23:41:37Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -220,7 +220,8 @@ int main( int argc, char* argv[] ) {
 	/* Create the finite element field variable*/
 	fV_Register = FieldVariable_Register_New();
 	feVariable = FeVariable_New( "phi", feMesh, NULL, dofs, wallVC, NULL, NULL, context->dim,
-		False, StgFEM_Native_ImportExportType, StgFEM_Native_ImportExportType, False, False, fV_Register );
+		False, StgFEM_Native_ImportExportType, StgFEM_Native_ImportExportType, NULL, NULL,
+		False, False, fV_Register );
 	
 	/* Create Stream */
 	outputStream = Journal_Register( InfoStream_Type, CURR_MODULE_NAME );

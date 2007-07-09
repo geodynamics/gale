@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testStiffnessMatrix-nonZeroCalculation-linkedDofs.c 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: testStiffnessMatrix-nonZeroCalculation-linkedDofs.c 907 2007-07-09 23:41:37Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -321,6 +321,6 @@ int main( int argc, char* argv[] ) {
 	/* Close off MPI */
 	MPI_Finalize();
 	
-	return 0; /* success */
 #endif
+	return 0; /* success */
 }

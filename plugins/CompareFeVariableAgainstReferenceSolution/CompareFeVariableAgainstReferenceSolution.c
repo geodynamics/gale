@@ -159,7 +159,7 @@ void _CompareFeVariableAgainstReferenceSolution_Construct( void* compareFeVariab
 		StgFEM_Native_ImportExportType ) );
 	self->exportFormatType = StG_Strdup( Dictionary_GetString_WithDefault( dictionary, "exportFormatType",
 		StgFEM_Native_ImportExportType ) );
-	self->referenceFeVariableSuffix = StG_Strdup( Dictionary_GetString_WithDefault( dictionary, "referenceFeVariabeSuffix", 
+	self->referenceFeVariableSuffix = StG_Strdup( Dictionary_GetString_WithDefault( dictionary, "referenceFeVariableSuffix", 
 		"Reference" ) );
 		
 
@@ -253,9 +253,7 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 /* 				 feVar type, or file reader or something */
 	unsigned int             numSigFigsInReferenceFeVar = 15;
 	
-	char*                    refName;
-
-	char*                    prefix;
+	char*                    refName = NULL;
 
 	double                   result;
 	
@@ -386,12 +384,14 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 	Stg_Component_Build( roundedDofLayout, NULL, False );
 	Stg_Component_Initialise( roundedDofLayout, NULL, False );
 
-	/* Instantiate FeVariable, pre-reading reference */
 	if ( strlen( self->referenceFeVariableSuffix ) > 0 ) {
 		refName = Stg_Object_AppendSuffix( feVarToTest, self->referenceFeVariableSuffix );
 	}
 	else {
-		refName = feVarToTest->name;
+		/* refName = Stg_Object_AppendSuffix( feVarToTest, "Reference" ); */
+		/* We actually need the referenceFeVar initially to be called the same as feVarToTest,
+		 * so it reads the correct values - PatrickSunter, 9 Jun 2007 */ 
+		refName = StG_Strdup( feVarToTest->name );
 	}
 
 	referenceFeVar = FeVariable_New_FromTemplate( 
@@ -401,6 +401,11 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 			NULL, 
 			self->importFormatType,
 			self->exportFormatType,
+			self->referencePath,
+			NULL,
+			True,  /* isReference = True */
+			False, /* Don't set the "test every timestep var", since we re-create this guy each
+				  timestep anyway*/
 			feVarToTest->fieldVariable_Register );
 
 	tmpName = Stg_Object_AppendSuffix( feVarToTest, "Rounded" );
@@ -411,20 +416,25 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 			NULL, 
 			feVarToTest->importFormatType,
 			self->exportFormatType,
+			NULL,
+			NULL,
+			False,
+			False,
 			feVarToTest->fieldVariable_Register );
+
 	Memory_Free( tmpName );
 
-	Stg_Component_Build( referenceFeVar, NULL, False );
-	/*Stg_Component_Initialise( referenceFeVar, NULL, False );*/
+	Stg_Component_Build( referenceFeVar, self->context, False );
+	Stg_Component_Build( roundedFeVar, self->context, False );
+	/* Running the "Initialise" below will read in the reference solution */
 	Stg_Component_Initialise( referenceFeVar, self->context, False );
-	Stg_Component_Build( roundedFeVar, NULL, False );
-	Stg_Component_Initialise( roundedFeVar, self->context, False );
+	/* Note we _don't_ pass in the context to the roundedFeVar to disable checkpoint-restart,
+	 * since no file exists */
+	Stg_Component_Initialise( roundedFeVar, NULL, False );
 
-	Stg_asprintf( &prefix, "%s/", self->referencePath );
-	FeVariable_ReadFromFile( referenceFeVar, prefix, self->context->timeStep );
-	Memory_Free( prefix );
-	/* Ok, now we need to make sure the referenceFeVar has an appropriate suffix, so it doesn't clash with an
-	 * existing one */
+	/* Note this is a bit inelegant, but kind of necessary unless we rewrite the FeVariable
+	 * checkpointing-reading code again to be more general - see my comment above when
+	 * refName is allocated */
 	if ( 0 == strcmp( feVarToTest->name, referenceFeVar->name ) ) {
 		Memory_Free( referenceFeVar->name );
 		referenceFeVar->name = Stg_Object_AppendSuffix( feVarToTest, "Reference" );
@@ -477,7 +487,8 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 			"\t(Integrated total error was %g)\n",
 			result );
 	}	
-		
+
+	/* TODO: The lines below were commented out. Why? This is actually a bad memory leak! PatrickSunter, 9 Jul 2007 */
 	/*
 	Stg_Class_Delete( referenceDataVariable );
 	Stg_Class_Delete( referenceDofLayout );
@@ -488,6 +499,8 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 	Stg_Class_Delete( errorField );
 	Stg_Class_Delete( errorMagnitudeField );
 	*/
+
+	Memory_Free( refName );
 }
 	
 void _CompareFeVariableAgainstReferenceSolution_Delete( void* compareFeVariable ) {

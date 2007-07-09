@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeVariable.c 887 2007-06-27 00:20:35Z DavidLee $
+** $Id: FeVariable.c 907 2007-07-09 23:41:37Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -98,7 +98,9 @@ void* FeVariable_DefaultNew( Name name )
 		NULL,
 		0,
 		0,
-		True,
+		False,
+		NULL,
+		NULL,
 		NULL,
 		NULL,
 		False,
@@ -120,6 +122,8 @@ FeVariable* FeVariable_New(
 		Bool                                            isCheckpointedAndReloaded,
 		const char* const                               importFormatType,
 		const char* const                               exportFormatType,
+		const char* const                               customInputPath,
+		const char* const                               customOutputPath,
 		Bool                                            isReferenceSolution,
 		Bool                                            loadReferenceEachTimestep,
 		FieldVariable_Register*                         fV_Register )		
@@ -138,6 +142,8 @@ FeVariable* FeVariable_New(
 	    	isCheckpointedAndReloaded,
 		importFormatType,
 		exportFormatType,
+		customInputPath,
+		customOutputPath,
 		isReferenceSolution,
 		loadReferenceEachTimestep,
 		((FeMesh*)feMesh)->topo->remotes[MT_VERTEX]->comm->mpiComm, 
@@ -152,6 +158,10 @@ FeVariable* FeVariable_New_FromTemplate(
 		void*                                          	ics,
 		const char* const                               importFormatType,
 		const char* const                               exportFormatType,
+		const char* const                               customInputPath,
+		const char* const                               customOutputPath,
+		Bool                                            isReferenceSolution,
+		Bool                                            loadReferenceEachTimestep,
 		FieldVariable_Register*                         fV_Register )
 {
 	FeVariable*	templateFeVariable = _templateFeVariable;
@@ -171,6 +181,8 @@ FeVariable* FeVariable_New_FromTemplate(
 		templateFeVariable->isCheckpointedAndReloaded,
 		importFormatType,
 		exportFormatType,
+		customInputPath,
+		customOutputPath,
 		templateFeVariable->isReferenceSolution,
 		templateFeVariable->loadReferenceEachTimestep,
 		templateFeVariable->communicator,
@@ -195,6 +207,8 @@ FeVariable* FeVariable_New_Full(
 		Bool                                            isCheckpointedAndReloaded,
 		const char* const                               importFormatType,
 		const char* const                               exportFormatType,
+		const char* const                               customInputPath,
+		const char* const                               customOutputPath,
 		Bool                                            isReferenceSolution,
 		Bool                                            loadReferenceEachTimestep,
 		MPI_Comm                                        communicator,
@@ -234,6 +248,8 @@ FeVariable* FeVariable_New_Full(
 		isCheckpointedAndReloaded,
 		importFormatType,
 		exportFormatType,
+		customInputPath,
+		customOutputPath,
 		isReferenceSolution,
 		loadReferenceEachTimestep,
 		communicator,
@@ -275,6 +291,8 @@ FeVariable* _FeVariable_New(
 		Bool                                            isCheckpointedAndReloaded,
 		const char* const                               importFormatType,
 		const char* const                               exportFormatType,
+		const char* const                               customInputPath,
+		const char* const                               customOutputPath,
 		Bool                                            isReferenceSolution,
 		Bool                                            loadReferenceEachTimestep,
 		MPI_Comm                                        communicator,
@@ -321,7 +339,8 @@ FeVariable* _FeVariable_New(
 	/* FeVariable info */
 	if( initFlag ){
 		_FeVariable_Init( self, feMesh, geometryMesh, dofLayout, bcs, ics, linkedDofInfo,
-			templateFeVariable, importFormatType, exportFormatType, isReferenceSolution, loadReferenceEachTimestep  );
+			templateFeVariable, importFormatType, exportFormatType,
+			customInputPath, customOutputPath, isReferenceSolution, loadReferenceEachTimestep  );
 	}
 	
 	return self;
@@ -339,6 +358,8 @@ void _FeVariable_Init(
 		void*                                           templateFeVariable,
 		const char* const                               importFormatType,
 		const char* const                               exportFormatType,
+		const char* const                               customInputPath,
+		const char* const                               customOutputPath,
 		Bool                                            isReferenceSolution,
 		Bool                                            loadReferenceEachTimestep )
 {
@@ -378,8 +399,16 @@ void _FeVariable_Init(
 	 * exist properly at that point. -- PatrickSunter, 27 July 2007 */
 	self->importFormatType = StG_Strdup( importFormatType );
 	self->exportFormatType = StG_Strdup( exportFormatType );
-
 	
+	self->customInputPath = NULL;
+	if ( NULL != customInputPath ) {
+		self->customInputPath = StG_Strdup( customInputPath ) ;
+	}	
+	self->customOutputPath = NULL;
+	if ( NULL != customOutputPath ) {
+		self->customOutputPath = StG_Strdup( customOutputPath );
+	}
+
 	self->isReferenceSolution = isReferenceSolution;
 	self->loadReferenceEachTimestep = loadReferenceEachTimestep;
 	Journal_Firewall( (self->loadReferenceEachTimestep != True), errorStream,
@@ -397,6 +426,12 @@ void _FeVariable_Delete( void* variable ) {
 	}
 	Memory_Free( self->importFormatType );
 	Memory_Free( self->exportFormatType );
+	if ( self->customInputPath ) {
+		Memory_Free( self->customInputPath );
+	}
+	if ( self->customOutputPath ) {
+		Memory_Free( self->customOutputPath );
+	}
 	/* feMesh bc and doflayout are purposely not deleted */
 
 	/* Stg_Class_Delete parent*/
@@ -588,6 +623,8 @@ void _FeVariable_Construct( void* variable, Stg_ComponentFactory* cf, void* data
 	LinkedDofInfo*      linkedDofInfo = NULL;
 	char*               importFormatType = NULL;
 	char*               exportFormatType = NULL;
+	char*               customInputPath = NULL;
+	char*               customOutputPath = NULL;
 	Bool                isReferenceSolution = False;
 	Bool                loadReferenceEachTimestep = False;
 
@@ -596,10 +633,25 @@ void _FeVariable_Construct( void* variable, Stg_ComponentFactory* cf, void* data
 	feMesh        = Stg_ComponentFactory_ConstructByKey( cf, self->name, "FEMesh",        FeMesh, True, data );
 	geometryMesh  = Stg_ComponentFactory_ConstructByKey( cf, self->name, "GeometryMesh",  FeMesh, False, data );
 	dofLayout     = Stg_ComponentFactory_ConstructByKey( cf, self->name, DofLayout_Type,  DofLayout,          True, data );
-	importFormatType =  Stg_ComponentFactory_GetString( cf, self->name, "importFormatType",
-		StgFEM_Native_ImportExportType );
-	exportFormatType =  Stg_ComponentFactory_GetString( cf, self->name, "exportFormatType",
-		StgFEM_Native_ImportExportType );
+	importFormatType =  StG_Strdup( Stg_ComponentFactory_GetString( cf, self->name, "importFormatType",
+		StgFEM_Native_ImportExportType ) );
+	exportFormatType =  StG_Strdup( Stg_ComponentFactory_GetString( cf, self->name, "exportFormatType",
+		StgFEM_Native_ImportExportType ) );
+	customInputPath =  StG_Strdup( Stg_ComponentFactory_GetString( cf, self->name, "customInputPath",
+		"" ) );
+	customOutputPath =  StG_Strdup( Stg_ComponentFactory_GetString( cf, self->name, "customOutputPath",
+		"" ) );
+
+	/* The following lines are because we want customInportPath to be a NULL string if it's empty, rather than ""
+	 *  - PatrickSunter, 5 July 2007 */
+	if ( 0 == strcmp( "", customInputPath ) ) {
+		Memory_Free( customInputPath );
+		customInputPath = NULL;
+	}
+	if ( 0 == strcmp( "", customOutputPath ) ) {
+		Memory_Free( customOutputPath );
+		customOutputPath = NULL;
+	}
 
 	ic            = Stg_ComponentFactory_ConstructByKey( cf, self->name, "IC",            VariableCondition,  False, data );
 	bc            = Stg_ComponentFactory_ConstructByKey( cf, self->name, "BC",            VariableCondition,  False, data );
@@ -612,12 +664,15 @@ void _FeVariable_Construct( void* variable, Stg_ComponentFactory* cf, void* data
 	self->removeBCs = Stg_ComponentFactory_GetBool( cf, self->name, "removeBCs", True );
 
 	_FeVariable_Init( self, feMesh, geometryMesh, dofLayout, bc, ic, linkedDofInfo, NULL,
-		importFormatType, exportFormatType, isReferenceSolution, loadReferenceEachTimestep );
+		importFormatType, exportFormatType, customInputPath, customOutputPath,
+		isReferenceSolution, loadReferenceEachTimestep );
 }
 
 void _FeVariable_Initialise( void* variable, void* data ) {
 	FeVariable*              self = (FeVariable*)variable;
 	DiscretisationContext*   context = (DiscretisationContext*)data;
+	char*                    inputPathString = NULL;
+	Stream*                  errorStr = Journal_Register( Error_Type, self->type );
 	
 	Journal_DPrintf( self->debug, "In %s- for %s:\n", __func__, self->name );
 	Stream_IndentBranch( StgFEM_Debug );
@@ -632,14 +687,34 @@ void _FeVariable_Initialise( void* variable, void* data ) {
 	
 	FeEquationNumber_Initialise( self->eqNum );
 
+	if ( context ) {
+		/* Get the input path string once here - single point of control */
+		inputPathString = Context_GetCheckPointInputPrefixString( context );
+		if ( self->customInputPath != NULL ) {
+			/* over-ride the general StGermain input path with the particular one for this Variable */
+			Memory_Free( inputPathString );
+			/* TODO: not really sure how we should handle context->checkPointPrefixString here - I can see reasons why you
+			 * wouldn't want to add it if using a custom one. Ignore it for now - PatrickSunter, 5 July 2007 */
+			inputPathString = StG_Strdup( self->customInputPath );
+			/* do this check here rather than leave it up to the import parsers */
+			if ( inputPathString [ strlen( inputPathString ) ] != "/" ) {
+				char* oldString = NULL;
+
+				oldString = inputPathString;
+				inputPathString = Memory_Alloc_Array( char*, strlen( inputPathString )+2,
+					"inputPathString" );
+				sprintf( inputPathString, "%s/", oldString ); 
+				Memory_Free( oldString ); 
+			}
+		}
+	}
 	
 	/* If the reference solution option is enabled, just load this up regardless of checkpointing options below */
 	if ( self->isReferenceSolution ) {
-		char*                  inputPathString = NULL;
-
+		Journal_Firewall( 0, errorStr, "Error- in %s(), for feVariable \"%s\": You specified this "
+			"FeVariable is a referenceSolution, but no Context has been passed in as the data "
+			"argument, so can't determine timestep to load.\n" );
 		Journal_DPrintf( self->debug, "Reference FeVariable -> loading nodal values from file.\n" );
-		inputPathString = Context_GetCheckPointInputPrefixString( context );
-		/* TODO: User may want to over-ride to a custom path - allow this as a Class parameter  */
 		FeVariable_ReadFromFile( self, inputPathString, context->restartTimestep );
 		Memory_Free( inputPathString );
 		Stream_UnIndentBranch( StgFEM_Debug );
@@ -657,12 +732,8 @@ void _FeVariable_Initialise( void* variable, void* data ) {
 			VariableCondition_Apply( self->ics, data );
 		}
 		else {
-			char*                  inputPathString = NULL;
-
 			Journal_DPrintf( self->debug, "restart from checkpoint mode -> loading checkpointed "
 				"nodal values as initial conditions, ignoring ics specified via XML/constructor\n" );
-
-			inputPathString = Context_GetCheckPointInputPrefixString( context );
 
 			FeVariable_ReadFromFile( self, inputPathString, context->restartTimestep );
 			/* TODO: maybe we want a mechanism in future to over-ride the checkpointed ICs in certain regions too

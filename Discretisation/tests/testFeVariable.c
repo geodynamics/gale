@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testFeVariable.c 896 2007-07-03 04:46:51Z LukeHodkinson $
+** $Id: testFeVariable.c 907 2007-07-09 23:41:37Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -115,7 +115,7 @@ FeVariable* buildFeVar() {
    fieldReg = FieldVariable_Register_New();
    feVar = FeVariable_New( "velocity", feMesh, NULL, dofs, bcs, NULL, NULL, 2, True, 
 			   StgFEM_Native_ImportExportType, StgFEM_Native_ImportExportType, 
-			   False, False, fieldReg );
+			   NULL, NULL, False, False, fieldReg );
 
    for( n_i = 0; n_i < Mesh_GetLocalSize( feMesh, 0 ); n_i++ ) {
       /*const double pi=acos(-1.0);*/

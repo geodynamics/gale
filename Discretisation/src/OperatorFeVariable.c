@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: OperatorFeVariable.c 887 2007-06-27 00:20:35Z DavidLee $
+** $Id: OperatorFeVariable.c 907 2007-07-09 23:41:37Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -251,6 +251,10 @@ OperatorFeVariable* _OperatorFeVariable_New(
 			/* TODO: hack as always StgFEM_Native for now - PatrickSunter - 7 July 2006 */
 			StgFEM_Native_ImportExportType,
 			StgFEM_Native_ImportExportType,
+			NULL,
+			/* TODO: as above, potentially might want to save to non-standard paths... fix
+			 * later though.- PatrickSunter - 9 July 2007 */
+			NULL,
 			False, /* Not a reference variable, so this line and following False */
 			False, 
 			communicator,
@@ -368,8 +372,11 @@ void _OperatorFeVariable_Construct( void* feVariable, Stg_ComponentFactory* cf, 
 
 	_FeVariable_Init( (FeVariable*) self, feVariableList[0]->feMesh, feVariableList[0]->geometryMesh,
 		feVariableList[0]->dofLayout, NULL, NULL, NULL, NULL,
-/* 		 TODO: hack as always StgFEM native for now - PatrickSunter 7/7/2006 */
-		StgFEM_Native_ImportExportType, StgFEM_Native_ImportExportType, False, False );
+		/* TODO: hack as always StgFEM native for now - PatrickSunter 7/7/2006 */
+		StgFEM_Native_ImportExportType, StgFEM_Native_ImportExportType,
+		/* TODO: hack as always the default path - PatrickSunter 9/7/2007 */
+		NULL, NULL,
+		False, False );
 	_OperatorFeVariable_Init( self, operatorName, feVariableCount, feVariableList );
 
 	Memory_Free( feVariableList );

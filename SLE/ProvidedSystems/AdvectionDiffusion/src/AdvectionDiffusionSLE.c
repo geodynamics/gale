@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AdvectionDiffusionSLE.c 893 2007-06-29 06:59:28Z PatrickSunter $
+** $Id: AdvectionDiffusionSLE.c 907 2007-07-09 23:41:37Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -409,6 +409,9 @@ void _AdvectionDiffusionSLE_Build( void* sle, void* data ) {
 			NULL,
 			self->phiField->importFormatType,
 			self->phiField->exportFormatType,
+			self->phiField->customInputPath,
+			self->phiField->customOutputPath,
+			False, False,
 			fieldVariable_Register );
 
 		/* Construct Solution Vectors */
