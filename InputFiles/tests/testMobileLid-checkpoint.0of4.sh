@@ -30,7 +30,7 @@ if test -r "${partTestname}.xml"; then
 	
 	# Do checkpointing test
 	printf "Doing actual test: restarting from timestep 2, checking if result by timestep 4 == previously generated one\n"
-	runAndHandleSystemTestStdLocations "Underworld ./${partTestname}.xml --interactive=False --dumpEvery=1 --maxTimeSteps=2 --restartTimestep=2 --checkpointEvery=1 --elementResI=24 --elementResJ=24 --elementResK=3 --plugins[]=StgFEM_CompareFeVariableAgainstReferenceSolution --StgFEM_CompareFeVariableAgainstReferenceSolution.referencePath=./output/${partTestname}${procToWatch}of${nproc}GeneratedTestResult --StgFEM_CompareFeVariableAgainstReferenceSolution.timeStepToCompare=4 --StgFEM_CompareFeVariableAgainstReferenceSolution.referenceFeVariabeSuffix=" "$0" "$@"
+	runAndHandleSystemTestStdLocations "Underworld ./${partTestname}.xml --interactive=False --dumpEvery=1 --maxTimeSteps=2 --restartTimestep=2 --checkpointEvery=1 --elementResI=24 --elementResJ=24 --elementResK=3 --plugins[]=StgFEM_CompareFeVariableAgainstReferenceSolution --StgFEM_CompareFeVariableAgainstReferenceSolution.referencePath=./output/${partTestname}${procToWatch}of${nproc}GeneratedTestResult --StgFEM_CompareFeVariableAgainstReferenceSolution.timeStepToCompare=4 --StgFEM_CompareFeVariableAgainstReferenceSolution.referenceFeVariableSuffix=" "$0" "$@"
 
 else echo "${partTestname}.xml doesn't exist, so can't test it"
 fi

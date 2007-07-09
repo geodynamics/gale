@@ -6,7 +6,7 @@
 	<include> Underworld/BaseApps/ExtensionBaseApp.xml </include>
 	
 	<list name="plugins" mergeType="merge">
-		<param>Underworld_MovingMesh</param>
+		<param>Underworld_EulerDeform</param>
 		
 		<!-- Output Plugins -->
 		<param>StgFEM_FrequentOutput</param>	

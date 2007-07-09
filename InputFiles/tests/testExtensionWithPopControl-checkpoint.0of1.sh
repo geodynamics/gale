@@ -33,7 +33,7 @@ if test -r "${partTestname}.xml"; then
 	cp -rf ./output/"${partTestname}${procToWatch}of${nproc}GeneratedTestResult/"*"$SaveCheckpointStep".dat ./output/ 	
 	# Do checkpointing test
 	printf "Doing actual test: restarting from timestep $SaveCheckpointStep, checking if result by timestep $MaxTimeStepsDefault == previously generated one\n"
-	runAndHandleSystemTestStdLocations "Underworld ./${partTestname}.xml --interactive=False  --maxTimeSteps=$StepsLeft --restartTimestep=$SaveCheckpointStep --plugins[]=StgFEM_CompareFeVariableAgainstReferenceSolution --StgFEM_CompareFeVariableAgainstReferenceSolution.referencePath=./output/${partTestname}${procToWatch}of${nproc}GeneratedTestResult --StgFEM_CompareFeVariableAgainstReferenceSolution.timeStepToCompare=$MaxTimeStepsDefault --StgFEM_CompareFeVariableAgainstReferenceSolution.referenceFeVariabeSuffix=" "$0" "$@"
+	runAndHandleSystemTestStdLocations "Underworld ./${partTestname}.xml --interactive=False  --maxTimeSteps=$StepsLeft --restartTimestep=$SaveCheckpointStep --plugins[]=StgFEM_CompareFeVariableAgainstReferenceSolution --StgFEM_CompareFeVariableAgainstReferenceSolution.referencePath=./output/${partTestname}${procToWatch}of${nproc}GeneratedTestResult --StgFEM_CompareFeVariableAgainstReferenceSolution.timeStepToCompare=$MaxTimeStepsDefault --StgFEM_CompareFeVariableAgainstReferenceSolution.referenceFeVariableSuffix=" "$0" "$@"
 
 else echo "${partTestname}.xml doesn't exist, so can't test it"
 fi
