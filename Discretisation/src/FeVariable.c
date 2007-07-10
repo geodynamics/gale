@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeVariable.c 908 2007-07-10 07:00:02Z JulianGiordani $
+** $Id: FeVariable.c 909 2007-07-10 07:27:09Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -672,7 +672,6 @@ void _FeVariable_Initialise( void* variable, void* data ) {
 	FeVariable*              self = (FeVariable*)variable;
 	DiscretisationContext*   context = (DiscretisationContext*)data;
 	char*                    inputPathString = NULL;
-	Stream*                  errorStr = Journal_Register( Error_Type, self->type );
 	
 	Journal_DPrintf( self->debug, "In %s- for %s:\n", __func__, self->name );
 	Stream_IndentBranch( StgFEM_Debug );
