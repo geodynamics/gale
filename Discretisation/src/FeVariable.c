@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeVariable.c 907 2007-07-09 23:41:37Z PatrickSunter $
+** $Id: FeVariable.c 908 2007-07-10 07:00:02Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -183,8 +183,8 @@ FeVariable* FeVariable_New_FromTemplate(
 		exportFormatType,
 		customInputPath,
 		customOutputPath,
-		templateFeVariable->isReferenceSolution,
-		templateFeVariable->loadReferenceEachTimestep,
+		isReferenceSolution,
+		loadReferenceEachTimestep,
 		templateFeVariable->communicator,
 		fV_Register );
 
@@ -709,11 +709,9 @@ void _FeVariable_Initialise( void* variable, void* data ) {
 		}
 	}
 	
-	/* If the reference solution option is enabled, just load this up regardless of checkpointing options below */
-	if ( self->isReferenceSolution ) {
-		Journal_Firewall( 0, errorStr, "Error- in %s(), for feVariable \"%s\": You specified this "
-			"FeVariable is a referenceSolution, but no Context has been passed in as the data "
-			"argument, so can't determine timestep to load.\n" );
+	/* If the reference solution option is enabled, just load this up regardless of checkpointing options below.
+	 * Want to allow option of disabling this feature, if you're manually setting up a FeVariable without a context etc. */
+	if ( context && self->isReferenceSolution ) {
 		Journal_DPrintf( self->debug, "Reference FeVariable -> loading nodal values from file.\n" );
 		FeVariable_ReadFromFile( self, inputPathString, context->restartTimestep );
 		Memory_Free( inputPathString );

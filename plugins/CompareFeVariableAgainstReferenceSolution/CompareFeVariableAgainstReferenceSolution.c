@@ -115,7 +115,12 @@ void _CompareFeVariableAgainstReferenceSolution_Construct( void* compareFeVariab
 	Journal_Printf(
 		Journal_MyStream( Info_Type, self ),
 		"%s: Using reference path %s\n", self->name, referencePath );
-	self->referencePath = StG_Strdup( referencePath );
+	if ( referencePath[ strlen(referencePath) ] == "/" ) {
+		self->referencePath = StG_Strdup( referencePath );
+	} 
+	else {	
+		Stg_asprintf( &self->referencePath, "%s/", referencePath );
+	}
 	
 	integrationSwarmName = Dictionary_GetString_WithDefault( dictionary, "integrationSwarm", "gaussSwarm" );
 	Journal_Printf(
@@ -426,11 +431,12 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 
 	Stg_Component_Build( referenceFeVar, self->context, False );
 	Stg_Component_Build( roundedFeVar, self->context, False );
-	/* Running the "Initialise" below will read in the reference solution */
-	Stg_Component_Initialise( referenceFeVar, self->context, False );
-	/* Note we _don't_ pass in the context to the roundedFeVar to disable checkpoint-restart,
-	 * since no file exists */
+	/* Note we _don't_ pass in the context to the vars below to disable checkpoint-restart,
+	 * since we want manual control over loading these 2 */
+	Stg_Component_Initialise( referenceFeVar, NULL, False );
 	Stg_Component_Initialise( roundedFeVar, NULL, False );
+
+	FeVariable_ReadFromFile( referenceFeVar, self->referencePath, self->context->timeStep );
 
 	/* Note this is a bit inelegant, but kind of necessary unless we rewrite the FeVariable
 	 * checkpointing-reading code again to be more general - see my comment above when
