@@ -86,7 +86,7 @@
 			<param name="Type">Byerlee</param>
 			<param name="StrainRateField">StrainRateField</param>
 			<param name="BlockGeometry">geometry</param>
-			<param name="FiniteElement_Mesh">linearMesh</param>
+			<param name="FeMesh">linearMesh</param>
 			<param name="cohesion">0.04</param>
 			<param name="depthCoefficient">0.25</param>
 		</struct>
@@ -131,9 +131,9 @@
 	<param name="journal-enable-branch.debug.lucDebug">f</param>
 
 	<!-- general simulation parameters -->
-	<param name="maxTimeSteps"> 30 </param>
+	<param name="maxTimeSteps"> 100 </param>
 	<param name="dumpEvery"> 1 </param>
-	<param name="outputPath"> ./output </param>
+	<param name="outputPath"> ./output/BigSlabNoTranslation </param>
 	<param name="gravity"> 1.0 </param>
         <param name="checkpointEvery"> 10 </param>
 
@@ -145,9 +145,9 @@
 	<!-- general decomposition parameters -->
 	<param name="dim"> 3 </param>
 	<!-- mesh parameters -->
-	<param name="elementResI"> 32 </param>
-	<param name="elementResJ"> 16 </param>
-	<param name="elementResK"> 32 </param>
+	<param name="elementResI"> 128 </param>
+	<param name="elementResJ"> 64 </param>
+	<param name="elementResK"> 64 </param>
 
 	<param name="shadowDepth"> 1 </param>
 	<param name="minX"> 0.0 </param>
