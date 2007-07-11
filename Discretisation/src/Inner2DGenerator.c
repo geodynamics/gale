@@ -206,13 +206,28 @@ void Inner2DGenerator_BuildTopology( Inner2DGenerator* self, FeMesh* mesh ) {
 	/* Need to redefine the nodes, nDims + 1 per parent element. */
 	elDecomp = (Decomp*)Sync_GetDecomp( elSync );
 	nodeDecomp = Decomp_New();
-	nLocals = Decomp_GetNumLocals( elDecomp ) * 3;
-	locals = MemArray( int, nLocals, Inner2DGenerator_Type );
-	for( l_i = 0; l_i < Decomp_GetNumLocals( elDecomp ); l_i++ ) {
-		global = Decomp_LocalToGlobal( elDecomp, l_i );
-		locals[l_i * 3 + 0] = global * 3;
-		locals[l_i * 3 + 1] = global * 3 + 1;
-		locals[l_i * 3 + 2] = global * 3 + 2;
+
+	/* generalise for 3D elements, dave - 27.06.07 */
+	if( nDims == 2 ) {
+		nLocals = Decomp_GetNumLocals( elDecomp ) * 3;
+		locals = MemArray( int, nLocals, Inner2DGenerator_Type );
+		for( l_i = 0; l_i < Decomp_GetNumLocals( elDecomp ); l_i++ ) {
+			global = Decomp_LocalToGlobal( elDecomp, l_i );
+			locals[l_i * 3 + 0] = global * 3;
+			locals[l_i * 3 + 1] = global * 3 + 1;
+			locals[l_i * 3 + 2] = global * 3 + 2;
+		}
+	}
+	else if( nDims == 3 ) {
+		nLocals = Decomp_GetNumLocals( elDecomp ) * 4;
+		locals = MemArray( int, nLocals, Inner2DGenerator_Type );
+		for( l_i = 0; l_i < Decomp_GetNumLocals( elDecomp ); l_i++ ) {
+			global = Decomp_LocalToGlobal( elDecomp, l_i );
+			locals[l_i * 4 + 0] = global * 4;
+			locals[l_i * 4 + 1] = global * 4 + 1;
+			locals[l_i * 4 + 2] = global * 4 + 2;
+			locals[l_i * 4 + 3] = global * 4 + 3;
+		}
 	}
 	Decomp_SetLocals( nodeDecomp, nLocals, locals );
 	MemFree( locals );
@@ -220,13 +235,28 @@ void Inner2DGenerator_BuildTopology( Inner2DGenerator* self, FeMesh* mesh ) {
 	nodeSync = Sync_New();
 	Sync_SetComm( nodeSync, Sync_GetComm( elSync ) );
 	Sync_SetDecomp( nodeSync, nodeDecomp );
-	nRemotes = Sync_GetNumRemotes( elSync ) * 3;
-	remotes = MemArray( int, nRemotes, Inner2DGenerator_Type );
-	for( r_i = 0; r_i < Sync_GetNumRemotes( elSync ); r_i++ ) {
-		global = Sync_RemoteToGlobal( elSync, r_i );
-		remotes[r_i * 3 + 0] = global * 3;
-		remotes[r_i * 3 + 1] = global * 3 + 1;
-		remotes[r_i * 3 + 2] = global * 3 + 2;
+
+	/* generalise for 3D elements, dave - 27.06.07 */
+	if( nDims == 2 ) {
+		nRemotes = Sync_GetNumRemotes( elSync ) * 3;
+		remotes = MemArray( int, nRemotes, Inner2DGenerator_Type );
+		for( r_i = 0; r_i < Sync_GetNumRemotes( elSync ); r_i++ ) {
+			global = Sync_RemoteToGlobal( elSync, r_i );
+			remotes[r_i * 3 + 0] = global * 3;
+			remotes[r_i * 3 + 1] = global * 3 + 1;
+			remotes[r_i * 3 + 2] = global * 3 + 2;
+		}
+	}
+	else if( nDims == 3 ) {
+		nRemotes = Sync_GetNumRemotes( elSync ) * 4;
+		remotes = MemArray( int, nRemotes, Inner2DGenerator_Type );
+		for( r_i = 0; r_i < Sync_GetNumRemotes( elSync ); r_i++ ) {
+			global = Sync_RemoteToGlobal( elSync, r_i );
+			remotes[r_i * 4 + 0] = global * 4;
+			remotes[r_i * 4 + 1] = global * 4 + 1;
+			remotes[r_i * 4 + 2] = global * 4 + 2;
+			remotes[r_i * 4 + 3] = global * 4 + 3;
+		}
 	}
 	Sync_SetRemotes( nodeSync, nRemotes, remotes );
 	MemFree( remotes );
@@ -238,13 +268,27 @@ void Inner2DGenerator_BuildTopology( Inner2DGenerator* self, FeMesh* mesh ) {
 
 	/* Build the incidence. */
 	nDomainEls = Mesh_GetDomainSize( elMesh, nDims );
-	nIncEls = 3;
-	incEls = MemArray( unsigned, 3, Inner2DGenerator_Type );
-	for( e_i = 0; e_i < nDomainEls; e_i++ ) {
-		incEls[0] = e_i * 3;
-		incEls[1] = e_i * 3 + 1;
-		incEls[2] = e_i * 3 + 2;
-		MeshTopology_SetIncidence( topo, nDims, e_i, 0, nIncEls, (int*)incEls );
+	/* generalise for 3D elements, dave - 27.06.07 */
+	if( nDims == 2 ) {
+		nIncEls = 3;
+		incEls = MemArray( unsigned, 3, Inner2DGenerator_Type );
+		for( e_i = 0; e_i < nDomainEls; e_i++ ) {
+			incEls[0] = e_i * 3;
+			incEls[1] = e_i * 3 + 1;
+			incEls[2] = e_i * 3 + 2;
+			MeshTopology_SetIncidence( topo, nDims, e_i, 0, nIncEls, (int*)incEls );
+		}
+	}
+	else if( nDims == 3 ) {
+		nIncEls = 4;
+		incEls = MemArray( unsigned, 4, Inner2DGenerator_Type );
+		for( e_i = 0; e_i < nDomainEls; e_i++ ) {
+			incEls[0] = e_i * 4;
+			incEls[1] = e_i * 4 + 1;
+			incEls[2] = e_i * 4 + 2;
+			incEls[3] = e_i * 4 + 3;
+			MeshTopology_SetIncidence( topo, nDims, e_i, 0, nIncEls, (int*)incEls );
+		}
 	}
 	FreeArray( incEls );
 
@@ -268,21 +312,54 @@ void Inner2DGenerator_BuildGeometry( Inner2DGenerator* self, FeMesh* mesh ) {
 	elMesh = self->elMesh;
 	nDims = Mesh_GetDimSize( elMesh );
 	nDomainEls = Mesh_GetDomainSize( elMesh, nDims );
-	mesh->verts = AllocArray2D( double, nDomainEls * 3, nDims );
-	for( e_i = 0; e_i < nDomainEls; e_i++ ) {
-		unsigned elInd = e_i * 3;
 
-		FeMesh_CoordLocalToGlobal( elMesh, e_i, localCrds[0], globalCrd );
-		vert = Mesh_GetVertex( mesh, elInd );
-		memcpy( vert, globalCrd, nDims * sizeof(double) );
+	if( nDims == 2 ) {
+		mesh->verts = AllocArray2D( double, nDomainEls * 3, nDims );
+		for( e_i = 0; e_i < nDomainEls; e_i++ ) {
+			unsigned elInd = e_i * 3;
 
-		FeMesh_CoordLocalToGlobal( elMesh, e_i, localCrds[1], globalCrd );
-		vert = Mesh_GetVertex( mesh, elInd + 1 );
-		memcpy( vert, globalCrd, nDims * sizeof(double) );
+			FeMesh_CoordLocalToGlobal( elMesh, e_i, localCrds[0], globalCrd );
+			vert = Mesh_GetVertex( mesh, elInd );
+			memcpy( vert, globalCrd, nDims * sizeof(double) );
 
-		FeMesh_CoordLocalToGlobal( elMesh, e_i, localCrds[2], globalCrd );
-		vert = Mesh_GetVertex( mesh, elInd + 2 );
-		memcpy( vert, globalCrd, nDims * sizeof(double) );
+			FeMesh_CoordLocalToGlobal( elMesh, e_i, localCrds[1], globalCrd );
+			vert = Mesh_GetVertex( mesh, elInd + 1 );
+			memcpy( vert, globalCrd, nDims * sizeof(double) );
+
+			FeMesh_CoordLocalToGlobal( elMesh, e_i, localCrds[2], globalCrd );
+			vert = Mesh_GetVertex( mesh, elInd + 2 );
+			memcpy( vert, globalCrd, nDims * sizeof(double) );
+		}
+	}
+
+	/* for 3D case - dave, 27.06.07 */
+	else if( nDims == 3 ) {
+		double localCrds3D[4][3] = { {-0.5, -0.5, -0.5},
+		                             {0.25, 0.25, 0.25},
+		                             {0.5, -0.25, -0.5},
+		                             {-0.25, 0.5, 0.5} };
+		double globalCrd3D[3];
+
+		mesh->verts = AllocArray2D( double, nDomainEls * 4, nDims );
+		for( e_i = 0; e_i < nDomainEls; e_i++ ) {
+			unsigned elInd = e_i * 4;
+
+			FeMesh_CoordLocalToGlobal( elMesh, e_i, localCrds3D[0], globalCrd3D );
+			vert = Mesh_GetVertex( mesh, elInd );
+			memcpy( vert, globalCrd3D, nDims * sizeof(double) );
+
+			FeMesh_CoordLocalToGlobal( elMesh, e_i, localCrds3D[1], globalCrd3D );
+			vert = Mesh_GetVertex( mesh, elInd + 1 );
+			memcpy( vert, globalCrd3D, nDims * sizeof(double) );
+
+			FeMesh_CoordLocalToGlobal( elMesh, e_i, localCrds3D[2], globalCrd3D );
+			vert = Mesh_GetVertex( mesh, elInd + 2 );
+			memcpy( vert, globalCrd3D, nDims * sizeof(double) );
+
+			FeMesh_CoordLocalToGlobal( elMesh, e_i, localCrds3D[3], globalCrd3D );
+			vert = Mesh_GetVertex( mesh, elInd + 3 );
+			memcpy( vert, globalCrd3D, nDims * sizeof(double) );
+		}
 	}
 }
 
