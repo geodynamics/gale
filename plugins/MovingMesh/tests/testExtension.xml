@@ -16,6 +16,13 @@
 	<include>StgFEM/TimeIntegrator.xml             </include>
 	<include>PICellerator/MaterialPointSwarm.xml   </include>
 	
+	<struct name="components" mergeType="merge">
+		<struct name="weights" mergeType="replace">
+			<param name="Type">DVCWeights</param>
+			<param name="resolution">10</param>
+		</struct>
+	</struct>
+
 	<param name="dt">0.1</param>
 	<param name="timeIntegratorOrder">1</param>
 
