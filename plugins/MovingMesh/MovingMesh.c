@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: MovingMesh.c 466 2007-04-27 06:24:33Z LukeHodkinson $
+** $Id: MovingMesh.c 529 2007-07-11 08:01:49Z JulianGiordani $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -138,7 +138,8 @@ void Underworld_MovingMesh_Remesh( TimeIntegrator* timeIntegrator, MeshExtender*
 	Index                 element_dI;
 	#endif
 
-	comm = CommTopology_GetComm( Mesh_GetCommTopology( mesh, MT_VERTEX ) );
+	/*comm = CommTopology_GetComm( Mesh_GetCommTopology( mesh, MT_VERTEX ) );*/
+	comm = Comm_GetMPIComm( Mesh_GetCommTopology( mesh, MT_VERTEX ) );
 	MPI_Comm_rank( comm, (int*)&rank );
 
 	Journal_Printf( info, "%d: starting remeshing of mesh \"%s\":\n", rank, mesh->name );
@@ -419,7 +420,6 @@ void Underworld_MovingMesh_CalculateMinOrMaxCoordsOnSidewall(
 	double                     velVector[3];
 	/* Somewhat arbitrary tolerance to check that extension of the mesh is not irregular in the current axis */
 	double                     tolerance;
-	double                     differenceBetweenCurrAndPrev = 0;
 	double                     dt = AbstractContext_Dt( self->context );
 	Bool                       atLeastOneLocalSideNodeProcessed = False;
 	MPI_Comm		   comm;
@@ -467,6 +467,7 @@ void Underworld_MovingMesh_CalculateMinOrMaxCoordsOnSidewall(
 				if ( ( True == atLeastOneLocalSideNodeProcessed ) &&
 					Stg_Class_IsInstance( mesh->layout->elementLayout, ParallelPipedHexaEL_Type ) )
 				{
+					double                     differenceBetweenCurrAndPrev = 0;
 					Stream*    errorStream = Journal_Register( Error_Type, self->type );
 					differenceBetweenCurrAndPrev = fabs( newWallCoordsInRemeshAxis[ sideWallNode_I ]
 						- lastCalculatedNewWallCoordInRemeshAxis );
@@ -520,7 +521,8 @@ void Underworld_MovingMesh_CalculateMinOrMaxCoordsOnSidewall(
 		mpiOperation = MPI_MAX;
 	}	
 
-	comm = CommTopology_GetComm( Mesh_GetCommTopology( mesh, MT_VERTEX ) );
+	/*comm = CommTopology_GetComm( Mesh_GetCommTopology( mesh, MT_VERTEX ) );*/
+	comm = Comm_GetMPIComm( Mesh_GetCommTopology( mesh, MT_VERTEX ) );
 	MPI_Allreduce( newWallCoordsInRemeshAxis, newWallCoordsInRemeshAxisGlobal, sideWallNodeCount,
 		       MPI_DOUBLE, mpiOperation, comm );
 
