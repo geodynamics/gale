@@ -10,7 +10,7 @@
 	<struct name="components" mergeType="merge">
 		<struct name="elementCellLayout"> 
 			<param name="Type">ElementCellLayout</param>
-			<param name="Mesh">mesh-linear</param>
+			<param name="Mesh">linearMesh</param>
 		</struct>
 		<struct name="swarm">
 			<param name="Type">Swarm</param>
@@ -28,12 +28,40 @@
 			<param name="TemperatureField">TemperatureField</param>
 		</struct>
 
+		<!--
 		<struct name="linearMesh-generator" mergeType="merge">
 			<param name="maxDecomposedDims"> 1 </param>
 			<list name="maxDecompositions">
 				<param> 0 </param>
 				<param> 1 </param>
 				<param> 1 </param>
+			</list>
+		</struct>
+		-->
+		<struct name="cartesianGenerator">
+			<param name="Type"> CartesianGenerator </param>
+			<param name="mesh"> constantMesh </param>
+			<param name="dims"> dim </param>
+			<list name="size">
+				<param> elementResI </param>
+				<param> elementResJ </param>
+				<param> elementResK </param>
+			</list>
+			<param name="maxDecomposedDims"> 1 </param>
+			<list name="maxDecompositions">
+				<param> 0 </param>
+				<param> 1 </param>
+				<param> 1 </param>
+			</list>
+			<list name="minCoord">
+				<param> minX </param>
+				<param> minY </param>
+				<param> minZ </param>
+			</list>
+			<list name="maxCoord">
+				<param> maxX </param>
+				<param> maxY </param>
+				<param> maxZ </param>
 			</list>
 		</struct>
 	</struct>
