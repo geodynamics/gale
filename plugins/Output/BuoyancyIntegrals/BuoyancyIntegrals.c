@@ -212,7 +212,7 @@ void Underworld_BuoyancyIntegrals_Setup( void *_context )
 	StgFEM_FrequentOutput_PrintString( context, "z_b" );
 	StgFEM_FrequentOutput_PrintString( context, "int_w_bar_dt" );
 	StgFEM_FrequentOutput_PrintString( context, "temp_b" );
-	
+	StgFEM_FrequentOutput_PrintString( context, "temp_max" );
 }
 
 
@@ -389,6 +389,7 @@ void Underworld_BuoyancyIntegrals_Output( UnderworldContext *context )
 	Underworld_BuoyancyIntegrals_CTX *ctx;
 	double B, w_bar, y_b, int_w_bar_dt;
 	double temp_b; /* the temperature at (x_b,y_b,z_b) */
+	double temp_max;
 	
 	perform_integrals( context, &B, &w_bar, &y_b, &int_w_bar_dt );
 	eval_temperature( context, y_b, &temp_b );
@@ -405,4 +406,9 @@ void Underworld_BuoyancyIntegrals_Output( UnderworldContext *context )
 	StgFEM_FrequentOutput_PrintValue( context, ctx->z_b );
 	StgFEM_FrequentOutput_PrintValue( context, int_w_bar_dt );
 	StgFEM_FrequentOutput_PrintValue( context, temp_b );
+
+	temp_max = _FeVariable_GetMaxGlobalFieldMagnitude( ctx->temperatureField );
+        StgFEM_FrequentOutput_PrintValue( context, temp_max );
+
+
 }
