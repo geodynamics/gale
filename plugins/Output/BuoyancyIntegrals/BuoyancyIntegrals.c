@@ -64,6 +64,7 @@ typedef struct {
 	double beta;
 	double gravity;
 	int dim;
+	double y_b_initial;
 	FieldVariable *temperatureField;
 	double x_b, z_b;
 } Underworld_BuoyancyIntegrals_CTX;
@@ -147,7 +148,12 @@ void Underworld_BuoyancyIntegrals_Setup( void *_context )
 		printf("******************** ERROR GRAVITY IS UNINITIALISED ******************************** \n");
 	}
 	
-	ctx->int_w_bar_dt = 0.0;
+	ctx->y_b_initial = Stg_ComponentFactory_GetRootDictDouble( context->CF, "y_b_initial", -1 );
+	if( (int)ctx->y_b_initial == -1 ) {
+		printf("********************* ERROR Y_B_INITIAL IS NOT SET *********************** \n");
+	}
+
+	ctx->int_w_bar_dt = ctx->y_b_initial;
 	
 	
 	shape = (Stg_Shape*)Stg_ComponentFactory_ConstructByName( context->CF, "cylinder", Stg_Shape, True, 0 /* dummy */ );
