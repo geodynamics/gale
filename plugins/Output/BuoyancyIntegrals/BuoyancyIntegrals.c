@@ -188,13 +188,14 @@ void Underworld_BuoyancyIntegrals_Setup( void *_context )
 	/* Add names to the integrals in the frequent output */
 	StgFEM_FrequentOutput_PrintString( context, "B" );
 	StgFEM_FrequentOutput_PrintString( context, "w_bar" );
-	StgFEM_FrequentOutput_PrintString( context, "x_b" );
+	StgFEM_FrequentOutput_PrintString( context, "y_b" );
 	StgFEM_FrequentOutput_PrintString( context, "int_w_bar_dt" );
+	StgFEM_FrequentOutput_PrintString( context, "temp_b" );
 
 }
 
 
-void perform_integrals( UnderworldContext *context, double *B, double *w_bar, double *x_b, double *int_w_bar_dt )
+void perform_integrals( UnderworldContext *context, double *B, double *w_bar, double *y_b, double *int_w_bar_dt )
 {
 	Underworld_BuoyancyIntegrals_CTX *ctx;
 	IntegrationPoint *ip;
@@ -223,7 +224,7 @@ void perform_integrals( UnderworldContext *context, double *B, double *w_bar, do
 			Underworld_BuoyancyIntegrals_Type );
 
 	/* initialise values to compute */
-	*B = *w_bar = *x_b = -1.0;
+	*B = *w_bar = *y_b = -1.0;
 	*int_w_bar_dt = ctx->int_w_bar_dt;
 
 
@@ -234,7 +235,7 @@ void perform_integrals( UnderworldContext *context, double *B, double *w_bar, do
 	/* test 2 - get gravity */
 	*w_bar = ctx->gravity;
 	/* test 3 get dt */
-	*x_b = context->dt;
+	*y_b = context->dt;
 #endif	
 
 	/* evaluate some integrals */
@@ -326,7 +327,7 @@ void perform_integrals( UnderworldContext *context, double *B, double *w_bar, do
 
 	*B     = ctx->gravity * ctx->beta * g_sum_T;
 	*w_bar = (ctx->gravity * ctx->beta/ *B) * g_sum_vT;
-	*x_b   = (ctx->gravity * ctx->beta/ *B) * g_sum_yT;
+	*y_b   = (ctx->gravity * ctx->beta/ *B) * g_sum_yT;
 
 	dt = context->dt;
 	*int_w_bar_dt = *int_w_bar_dt + (*w_bar) * dt;
@@ -338,14 +339,52 @@ void perform_integrals( UnderworldContext *context, double *B, double *w_bar, do
 
 
 
+void eval_temperature( UnderworldContext *context, double y_b, double *temp_b )
+{
+        Underworld_BuoyancyIntegrals_CTX *ctx;
+        IntegrationPoint *ip;
+        double *xi;
+        double weight;
+        Particle_InCellIndex p, ngp;
+        Cell_Index cell_I;
+        double velocity[3], global_coord[3];
+        Element_LocalIndex e;
+	double x_b, z_b;
+	Stg_Shape *shape;
+
+	*temp_b = 66.99;
+	return;
+
+        ctx = (Underworld_BuoyancyIntegrals_CTX*)LiveComponentRegister_Get(
+                        context->CF->LCRegister,
+                        Underworld_BuoyancyIntegrals_Type );
+
+	/* Get x_b, and z_b from xml */
+	/* "cylinder" z_b = CentreZ (0.5), x_b = CentreX (1.0) */
+	
+	shape = (Stg_Shape*)Stg_ComponentFactory_ConstructByName( context->CF, "cylinder", Stg_Shape, False, 0 /* dummy */ );
+
+	global_coord[0] = x_b;
+	global_coord[1] = y_b;
+	global_coord[2] = z_b;
+
+
+
+
+}
+
+
 void Underworld_BuoyancyIntegrals_Output( UnderworldContext *context ) 
 {
-	double B, w_bar, x_b, int_w_bar_dt;
+	double B, w_bar, y_b, int_w_bar_dt;
+	double temp_b; /* the temperature at (x_b,y_b,z_b) */
 
-	perform_integrals( context, &B, &w_bar, &x_b, &int_w_bar_dt );
+	perform_integrals( context, &B, &w_bar, &y_b, &int_w_bar_dt );
+	eval_temperature( context, y_b, &temp_b );
 
 	StgFEM_FrequentOutput_PrintValue( context, B );
 	StgFEM_FrequentOutput_PrintValue( context, w_bar );
-	StgFEM_FrequentOutput_PrintValue( context, x_b );
+	StgFEM_FrequentOutput_PrintValue( context, y_b );
 	StgFEM_FrequentOutput_PrintValue( context, int_w_bar_dt );
+	StgFEM_FrequentOutput_PrintValue( context, temp_b );
 }
