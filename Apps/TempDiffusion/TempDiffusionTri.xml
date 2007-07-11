@@ -388,7 +388,7 @@
 		</struct>
 	
 		<struct name="mesh-linear">
-			<param name="Type">FiniteElement_Mesh</param>
+			<param name="Type">FeMesh</param>
 			<param name="MeshLayout">meshLayout</param>
 			<param name="ElementSize">8</param>
 			<param name="NodeSize">0</param>
