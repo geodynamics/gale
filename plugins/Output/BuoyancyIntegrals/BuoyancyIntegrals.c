@@ -231,7 +231,7 @@ void perform_integrals( UnderworldContext *context, double *B, double *w_bar, do
 	Dimension_Index dim;
 	double det_jac, dt;
 	double **GNx;
-	double g_sum_vol, _sum_vol, sum_vol;
+	double _sum_vol, sum_vol;
 	
 	
 	ctx = (Underworld_BuoyancyIntegrals_CTX*)LiveComponentRegister_Get(
@@ -357,14 +357,7 @@ void perform_integrals( UnderworldContext *context, double *B, double *w_bar, do
 void eval_temperature( UnderworldContext *context, double y_b, double *temp_b )
 {
 	Underworld_BuoyancyIntegrals_CTX *ctx;
-	IntegrationPoint *ip;
-	double *xi;
-	double weight;
-	Particle_InCellIndex p, ngp;
-	Cell_Index cell_I;
-	double velocity[3], global_coord[3];
-	Element_LocalIndex e;
-	double x_b, z_b;
+	double global_coord[3];
 	InterpolationResult result;
 	
 	*temp_b = 66.99;
