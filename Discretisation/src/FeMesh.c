@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeMesh.c 872 2007-06-15 03:36:50Z DavidLee $
+** $Id: FeMesh.c 912 2007-07-11 06:50:57Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -179,7 +179,9 @@ void _FeMesh_Build( void* feMesh, void* data ) {
 		unsigned	nDims;
 
 		nDims = Mesh_GetDimSize( self );
-		if( nDims == 2 )
+		if( nDims == 3 )
+			elType = (ElementType*)TrilinearInnerElType_New( "" );
+		else if( nDims == 2 )
 			elType = (ElementType*)BilinearInnerElType_New( "" );
 		else
 			abort();
