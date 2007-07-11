@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: ScalarField.c 628 2006-10-12 08:23:07Z SteveQuenette $
+** $Id: ScalarField.c 710 2007-07-11 05:39:26Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -226,7 +226,7 @@ void _lucScalarField_BuildDisplayList( void* drawingObject, void* _context ) {
 
 	
 	if (context->dim == 2) {
-		lucScalarFieldCrossSection_DrawCrossSection( self, min[ K_AXIS ], K_AXIS );
+		lucScalarFieldCrossSection_DrawCrossSection( self, 0.0, K_AXIS );
 	}
 	else {
 		if ( self->cullFace ) 
