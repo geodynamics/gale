@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeVariable.c 909 2007-07-10 07:27:09Z JulianGiordani $
+** $Id: FeVariable.c 911 2007-07-11 05:43:54Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -884,10 +884,15 @@ double FeVariable_GetScalarAtNode( void* feVariable, Node_LocalIndex lNode_I ) {
 	Dof_Index	nodeLocalDof_I = 0;
 	double      value[ MAX_FIELD_COMPONENTS ];
 	
-	if ( self->dofLayout )
+	/*
+	if( self->type != OperatorFeVariable_Type && self->dofLayout )
 		dofCountThisNode = self->dofLayout->dofCounts[lNode_I];
-	else 
-		dofCountThisNode = self->fieldComponentCount;
+	else {
+	*/
+	dofCountThisNode = self->fieldComponentCount;
+	/*
+	}
+	*/
 
 	FeVariable_GetValueAtNode( self, lNode_I, value );
 
