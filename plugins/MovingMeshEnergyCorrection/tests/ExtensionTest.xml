@@ -3,7 +3,6 @@
 
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 
-	<include>StgFEM/ElementLayout.xml          </include>
 	<include>StgFEM/LinearMesh.xml             </include>
 	<include>StgFEM/GaussSwarm.xml             </include>
 	<include>StgFEM/VelocityField.xml          </include>

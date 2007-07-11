@@ -12,7 +12,6 @@
 	-->
 
 	<include>StgFEM/LinearMesh.xml</include>
-	<include>StgFEM/ElementLayout.xml</include>
 	<include>StgFEM/VelocityField.xml</include>
 	<include>StgFEM/GaussSwarm.xml</include>
 	
