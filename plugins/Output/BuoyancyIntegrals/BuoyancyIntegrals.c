@@ -155,11 +155,14 @@ void Underworld_BuoyancyIntegrals_Setup( void *_context )
 
 	ctx->int_w_bar_dt = ctx->y_b_initial;
 	
-	
+	if (ctx->dim ==3){
 	shape = (Stg_Shape*)Stg_ComponentFactory_ConstructByName( context->CF, "cylinder", Stg_Shape, True, 0 /* dummy */ );
 	ctx->x_b = shape->centre[0];
 	ctx->z_b = shape->centre[2];
-	
+	} else if (ctx->dim==2){
+	shape = (Stg_Shape*)Stg_ComponentFactory_ConstructByName( context->CF, "disk", Stg_Shape, True, 0 /* dummy */ );
+	ctx->x_b = shape->centre[0];
+	}
 	
 	ctx->temperatureField = FieldVariable_Register_GetByName( fV_Register, "TemperatureField" );
 	
@@ -209,7 +212,9 @@ void Underworld_BuoyancyIntegrals_Setup( void *_context )
 	StgFEM_FrequentOutput_PrintString( context, "w_bar" );
 	StgFEM_FrequentOutput_PrintString( context, "x_b" );
 	StgFEM_FrequentOutput_PrintString( context, "y_b" );
+	if (ctx->dim==3){
 	StgFEM_FrequentOutput_PrintString( context, "z_b" );
+	}
 	StgFEM_FrequentOutput_PrintString( context, "int_w_bar_dt" );
 	StgFEM_FrequentOutput_PrintString( context, "temp_b" );
 	StgFEM_FrequentOutput_PrintString( context, "temp_max" );
@@ -374,11 +379,16 @@ void eval_temperature( UnderworldContext *context, double y_b, double *temp_b )
 	
 	/* Get x_b, and z_b from xml */
 	/* "cylinder" z_b = CentreZ (0.5), x_b = CentreX (1.0) */
-	
+	if (ctx->dim==3){
 	global_coord[0] = ctx->x_b;
 	global_coord[1] = y_b;
 	global_coord[2] = ctx->z_b;
-	
+	}
+    if (ctx->dim==2){
+	global_coord[0] = ctx->x_b;
+	global_coord[1] = y_b;
+	}
+
 	result = FieldVariable_InterpolateValueAt( ctx->temperatureField, global_coord, temp_b );
 	
 }
@@ -403,7 +413,9 @@ void Underworld_BuoyancyIntegrals_Output( UnderworldContext *context )
 	StgFEM_FrequentOutput_PrintValue( context, w_bar );
 	StgFEM_FrequentOutput_PrintValue( context, ctx->x_b );
 	StgFEM_FrequentOutput_PrintValue( context, y_b );
+	if (ctx->dim==3){
 	StgFEM_FrequentOutput_PrintValue( context, ctx->z_b );
+	}
 	StgFEM_FrequentOutput_PrintValue( context, int_w_bar_dt );
 	StgFEM_FrequentOutput_PrintValue( context, temp_b );
 
