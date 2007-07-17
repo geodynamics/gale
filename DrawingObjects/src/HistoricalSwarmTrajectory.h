@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: HistoricalSwarmTrajectory.h 628 2006-10-12 08:23:07Z SteveQuenette $
+** $Id: HistoricalSwarmTrajectory.h 713 2007-07-17 05:43:47Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -50,7 +50,7 @@
 	/** Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 	extern const Type lucHistoricalSwarmTrajectory_Type;
 
-	#define HISTORY_STEPS 50
+	#define HISTORY_STEPS 5000
 
 	typedef struct {
 		Coord  historyCoordList[ HISTORY_STEPS ];
