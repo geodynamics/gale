@@ -30,7 +30,7 @@
 	<struct>
 		<param name="Essential">True</param>
 		<param name="Name">GeometryMesh</param>
-		<param name="Type">FiniteElement_Mesh</param>
+		<param name="Type">FeMesh</param>
 		<param name="Description">This is a mesh to give the geometry of the elements. It is used for Jacobian Determinant.</param>
 	</struct>
 

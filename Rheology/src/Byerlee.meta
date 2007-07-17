@@ -37,8 +37,8 @@
 	</struct>
 	<struct>
 		<param name="Essential">True</param>
-		<param name="Name">FiniteElement_Mesh</param>
-		<param name="Type">FiniteElement_Mesh</param>
+		<param name="Name">FeMesh</param>
+		<param name="Type">FeMesh</param>
 		<param name="Description">The mesh given so that this component can find the global coordinate of the particle.</param>
 	</struct>
 </list>
@@ -48,7 +48,7 @@
 		<param name="Type">Byerlee</param>
 		<param name="cohesion">0.04</param>
 		<param name="depthCoefficient">0.25</param>
-		<param name="FiniteElement_Mesh">mesh-linear</param>
+		<param name="FeMesh">mesh-linear</param>
 		<param name="BlockGeometry">geometry</param>
 	</struct>
 </param>
