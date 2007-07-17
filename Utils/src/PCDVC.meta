@@ -133,7 +133,7 @@
 	<param name="Type">IntegrationPointsSwarm</param>
 	<param name="CellLayout">elementCellLayout</param>
 	<param name="ParticleLayout">localLayout</param>
-	<param name="FiniteElement_Mesh">mesh-linear</param>
+	<param name="FeMesh">mesh-linear</param>
 	<param name="WeightsCalculator">weights</param>
 	<param name="TimeIntegrator">timeIntegrator</param>
 	<param name="IntegrationPointMapper">mapper</param>

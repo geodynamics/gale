@@ -26,8 +26,8 @@ and can be population controlled for load balancing purposes.
 <list name="Dependencies">
 	<struct>
 		<param name="Essential">True</param>
-		<param name="Name">FiniteElement_Mesh</param>
-		<param name="Type">FiniteElement_Mesh</param>
+		<param name="Name">FeMesh</param>
+		<param name="Type">FeMesh</param>
 		<param name="Description">The mesh this swarm exists in.</param>
 	</struct>
 	<struct>

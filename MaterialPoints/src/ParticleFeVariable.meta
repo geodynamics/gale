@@ -44,7 +44,7 @@
 	<struct>
 		<param name="Essential">True</param>
 		<param name="Name">Mesh</param>
-		<param name="Type">FiniteElement_Mesh</param>
+		<param name="Type">FeMesh</param>
 		<param name="Description">...</param>
 	</struct>
 

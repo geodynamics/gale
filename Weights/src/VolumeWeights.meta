@@ -33,7 +33,7 @@
 	<struct>
 		<param name="Essential">True</param>
 		<param name="Name">Mesh</param>
-		<param name="Type">FiniteElement_Mesh</param>
+		<param name="Type">FeMesh</param>
 		<param name="Description">...</param>
 	</struct>
 <!-- PLEASE, check the above struct information is accurate, in line number 121 of the c file and then remove this comment afterwards -->

@@ -30,8 +30,8 @@ it with the physical material swarm(s) of which can actually be advected.</param
 <list name="Dependencies">
 	<struct>
 		<param name="Essential">True</param>
-		<param name="Name">FiniteElement_Mesh</param>
-		<param name="Type">FiniteElement_Mesh</param>
+		<param name="Name">FeMesh</param>
+		<param name="Type">FeMesh</param>
 		<param name="Description">The mesh this swarm exists in.</param>
 	</struct>
 	<struct>
