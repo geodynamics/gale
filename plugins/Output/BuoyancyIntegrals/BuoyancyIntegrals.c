@@ -342,11 +342,11 @@ void perform_integrals( UnderworldContext *context, double *B, double *w_bar, do
 	
 	
 	/* all reduce */
-	MPI_Allreduce ( &_sum_T, &g_sum_T, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
-	MPI_Allreduce ( &_sum_vT, &g_sum_vT, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
-	MPI_Allreduce ( &_sum_yT, &g_sum_yT, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
+	MPI_Allreduce ( &_sum_T, &g_sum_T, 1, MPI_DOUBLE, MPI_SUM, context->communicator );
+	MPI_Allreduce ( &_sum_vT, &g_sum_vT, 1, MPI_DOUBLE, MPI_SUM, context->communicator );
+	MPI_Allreduce ( &_sum_yT, &g_sum_yT, 1, MPI_DOUBLE, MPI_SUM, context->communicator );
 	/*
-	MPI_Allreduce ( &_sum_vol, &g_sum_vol, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
+	MPI_Allreduce ( &_sum_vol, &g_sum_vol, 1, MPI_DOUBLE, MPI_SUM, context->communicator );
 	printf("l_sum_vol = %f \n", _sum_vol );
 	printf("g_sum_vol = %f \n", g_sum_vol );
 	*/
@@ -370,8 +370,9 @@ void eval_temperature( UnderworldContext *context, double y_b, double *temp_b )
 	Underworld_BuoyancyIntegrals_CTX *ctx;
 	double global_coord[3];
 	InterpolationResult result;
-	
-	*temp_b = 66.99;
+	double T;
+
+	T = -66.99;
 	
 	ctx = (Underworld_BuoyancyIntegrals_CTX*)LiveComponentRegister_Get(
 			context->CF->LCRegister,
@@ -380,17 +381,18 @@ void eval_temperature( UnderworldContext *context, double y_b, double *temp_b )
 	/* Get x_b, and z_b from xml */
 	/* "cylinder" z_b = CentreZ (0.5), x_b = CentreX (1.0) */
 	if (ctx->dim==3){
-	global_coord[0] = ctx->x_b;
-	global_coord[1] = y_b;
-	global_coord[2] = ctx->z_b;
+		global_coord[0] = ctx->x_b;
+		global_coord[1] = y_b;
+		global_coord[2] = ctx->z_b;
 	}
-    if (ctx->dim==2){
-	global_coord[0] = ctx->x_b;
-	global_coord[1] = y_b;
+    	if (ctx->dim==2){
+		global_coord[0] = ctx->x_b;
+		global_coord[1] = y_b;
 	}
 
-	result = FieldVariable_InterpolateValueAt( ctx->temperatureField, global_coord, temp_b );
-	
+	result = FieldVariable_InterpolateValueAt( ctx->temperatureField, global_coord, &T );
+	MPI_Allreduce ( &T, temp_b, 1, MPI_DOUBLE, MPI_MAX, context->communicator );
+
 }
 
 
