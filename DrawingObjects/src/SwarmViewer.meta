@@ -10,55 +10,13 @@
 <param name="Project Web">http://mcc.monash.edu.au/gLucifer</param>
 <param name="Copyright">Copyright (c) 2005, Monash Cluster Computing</param>
 <param name="License">http://www.opensource.org/licenses/bsd-license.php</param>
-<param name="Parent">lucOpenGLDrawingObject</param>
+<param name="Parent">lucSwarmViewerBase</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
 <param name="Description">Plots particles in a swarm as small dots.</param>
 
 <!--Now the interesting stuff-->
 <list name="Params">
-	<struct>
-		<param name="Name">ColourVariable</param>
-		<param name="Type">String</param>
-		<param name="Default">""</param>
-		<param name="Description">...</param>
-	</struct>
-	<struct>
-		<param name="Name">OpacityVariable</param>
-		<param name="Type">String</param>
-		<param name="Default">""</param>
-		<param name="Description">...</param>
-	</struct>
-	<struct>
-		<param name="Name">MaskVariable</param>
-		<param name="Type">String</param>
-		<param name="Default">""</param>
-		<param name="Description">...</param>
-	</struct>
-	<struct>
-		<param name="Name">drawParticleNumber</param>
-		<param name="Type">Bool</param>
-		<param name="Default">False</param>
-		<param name="Description">If set to True, draws the particle number next to the particle</param>
-	</struct>
-	<struct>
-		<param name="Name">sameParticleColour</param>
-		<param name="Type">Bool</param>
-		<param name="Default">False</param>
-		<param name="Description">If set to True and drawParticleNumber is True as well, then display the partivcle number in ths same colour than the particle itself</param>
-	</struct>
-	<struct>
-		<param name="Name">subSetEvery</param>
-		<param name="Type">Int</param>
-		<param name="Default">1</param>
-		<param name="Description">Display one particle every "subSetVery"</param>
-	</struct>
-	<struct>
-		<param name="Name">colour</param>
-		<param name="Type">String</param>
-		<param name="Default">"black"</param>
-		<param name="Description">The colour of the particles. (If a lucColourMap and a colour variable is given - then this colour will not be used)</param>
-	</struct>
 	<struct>
 		<param name="Name">pointSize</param>
 		<param name="Type">Double</param>
@@ -69,36 +27,7 @@
 </list>
 
 <list name="Dependencies">
-	<struct>
-		<param name="Essential">True</param>
-		<param name="Name">Swarm</param>
-		<param name="Type">Swarm</param>
-		<param name="Description">The swarm containing the particles to be plotted.</param>
-	</struct>
-	<struct>
-		<param name="Essential">False</param>
-		<param name="Name">ColourVariable</param>
-		<param name="Type">SwarmVariable</param>
-		<param name="Description">You may colour each of the dots with a colour derived from the value of from another SwarmVariable if you specify it here. A colour map must be specified as well. This will override the 'colour' given as a parameter. </param>
-	</struct>
-	<struct>
-		<param name="Essential">No</param>
-		<param name="Name">ColourMap</param>
-		<param name="Type">lucColourMap</param>
-		<param name="Description">This is the colour map to get the coresponding colour from the value of the ColourVariable at any particle. If no ColourVariable is specified then this colour map is not used.</param>
-	</struct>
-	<struct>
-		<param name="Essential">False</param>
-		<param name="Name">OpacityVariable</param>
-		<param name="Type">SwarmVariable</param>
-		<param name="Description">Sets the opacity of the dot according to a SwarmVariable.</param>
-	</struct>	
-	<struct>
-		<param name="Essential">False</param>
-		<param name="Name">MaskVariable</param>
-		<param name="Type">SwarmVariable</param>
-		<param name="Description"></param>
-	</struct>	
+		
 </list>
 <!-- Add an exmaple XML if possible -->
 <param name="Example">gLucifer/DrawingObjects/tests/testSwarmViewer</param>
