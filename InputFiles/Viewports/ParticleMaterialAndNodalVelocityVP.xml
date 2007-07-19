@@ -40,11 +40,17 @@
 			<param name="dynamicRange">True</param>
 			<!--<param name="maximum">0.8</param>-->
 		</struct>
+
+		<!--
+		This component doesn't work. Julian Giordani 19 Jul 2007.
 		<struct name="linearMeshView" mergeType="replace">
 			<param name="Type">lucMeshViewer</param>
 			<param name="Mesh">linearMesh</param>
 			<param name="localColour">black</param>
 		</struct>	
+
+				<param>linearMeshView</param>
+		-->
 		<!-- Viewport -->
 		<struct name="ParticleMaterialAndNodalVelocityVP">
 			<param name="Type">lucViewport</param>
@@ -53,7 +59,6 @@
 				<param>particleMaterialAndNodalVelocityTitle</param>
 				<param>velocityArrows</param>
 				<param>particleMaterialDots</param>
-				<param>linearMeshView</param>
 			</list>
 		</struct>
 	</struct>
