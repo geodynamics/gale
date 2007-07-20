@@ -49,19 +49,9 @@ Bool StgFEM_SLE_LinearAlgebra_Init( int* argc, char** argv[] ) {
 	Stream_Flush( Journal_Register( InfoStream_Type, "Context" ) );
 	Stream_SetPrintingRank( Journal_Register( InfoStream_Type, "Context" ), tmp );
 
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), 
-				   MultigridSolver_Type, "0", 
-				   (Stg_Component_DefaultConstructorFunction*)MultigridSolver_New );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), 
-				   SROpGenerator_Type, "0", 
-				   (Stg_Component_DefaultConstructorFunction*)SROpGenerator_New );
-
 	RegisterParent( Vector_Type, Stg_Component_Type );
 	RegisterParent( Matrix_Type, Stg_Component_Type );
 	RegisterParent( MatrixSolver_Type, Stg_Component_Type );
-	RegisterParent( MultigridSolver_Type, MatrixSolver_Type );
-	RegisterParent( MGOpGenerator_Type, Stg_Component_Type );
-	RegisterParent( SROpGenerator_Type, MGOpGenerator_Type );
 
 #ifdef HAVE_PETSC
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), 
@@ -70,13 +60,10 @@ Bool StgFEM_SLE_LinearAlgebra_Init( int* argc, char** argv[] ) {
 				   PETScMatrix_Type, "0", (Stg_Component_DefaultConstructorFunction*)PETScMatrix_New );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), 
 				   PETScMatrixSolver_Type, "0", (Stg_Component_DefaultConstructorFunction*)PETScMatrixSolver_New );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), 
-				   PETScMGSolver_Type, "0", (Stg_Component_DefaultConstructorFunction*)PETScMGSolver_New );
 
 	RegisterParent( PETScVector_Type, Vector_Type );
 	RegisterParent( PETScMatrix_Type, Matrix_Type );
 	RegisterParent( PETScMatrixSolver_Type, MatrixSolver_Type );
-	RegisterParent( PETScMGSolver_Type, PETScMatrixSolver_Type );
 
 	{
 		PetscErrorCode	ec;

@@ -46,7 +46,7 @@
 ** Comments:
 **	None so far.
 **
-** $Id: LinearAlgebra.h 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: LinearAlgebra.h 919 2007-07-20 01:53:52Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -57,9 +57,6 @@
 	#include "Vector.h"
 	#include "Matrix.h"
 	#include "MatrixSolver.h"
-	#include "MultigridSolver.h"
-	#include "MGOpGenerator.h"
-	#include "SROpGenerator.h"
 
 #ifdef HAVE_PETSC
 	#include <petsc.h>
@@ -71,7 +68,6 @@
 	#include "PETScVector.h"
 	#include "PETScMatrix.h"
 	#include "PETScMatrixSolver.h"
-	#include "PETScMGSolver.h"
 #endif
 
 	#include "Init.h"

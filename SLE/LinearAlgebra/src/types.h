@@ -43,7 +43,7 @@
 **
 ** Comments:
 **
-** $Id: types.h 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: types.h 919 2007-07-20 01:53:52Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -54,14 +54,10 @@
 	typedef struct Vector			Vector;
 	typedef struct Matrix			Matrix;
 	typedef struct MatrixSolver		MatrixSolver;
-	typedef struct MultigridSolver		MultigridSolver;
-	typedef struct MGOpGenerator		MGOpGenerator;
-	typedef struct SROpGenerator		SROpGenerator;
 #ifdef HAVE_PETSC
 	typedef struct PETScVector		PETScVector;
 	typedef struct PETScMatrix		PETScMatrix;
 	typedef struct PETScMatrixSolver	PETScMatrixSolver;
-	typedef struct PETScMGSolver		PETScMGSolver;
 #endif
 
 	typedef enum {
