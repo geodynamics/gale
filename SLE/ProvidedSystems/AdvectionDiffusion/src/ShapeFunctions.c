@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ShapeFunctions.c 876 2007-06-15 06:48:50Z JulianGiordani $
+** $Id: ShapeFunctions.c 920 2007-07-20 06:19:34Z RobertTurnbull $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -58,7 +58,8 @@
  * Returns memory to new shape functions - which then must be free'd */
 double** AdvDiffResidualForceTerm_BuildSUPGShapeFunctions( AdvDiffResidualForceTerm* self, AdvectionDiffusionSLE* sle, Swarm* swarm, Element_LocalIndex lElement_I, Dimension_Index dim ) {
 	FeVariable*                velocityField    = self->velocityField;
-	FeMesh*				feMesh             = velocityField->feMesh;
+	FeVariable*                phiField         = sle->phiField;
+	FeMesh*                    mesh;
 	double**                   elShapeFunc; 
 	double**                   GNx;
 	double*                    xi;
@@ -73,12 +74,18 @@ double** AdvDiffResidualForceTerm_BuildSUPGShapeFunctions( AdvDiffResidualForceT
 	Particle_InCellIndex       cParticle_I;
 	Particle_InCellIndex       particleCount;
 	Cell_Index                 cell_I;
-	ElementType*               elementType = FeMesh_GetElementType( feMesh, lElement_I );
-	Node_Index                 nodeCount = elementType->nodeCount;
+	ElementType*               elementType;
+	Node_Index                 nodeCount;
 	Node_Index                 node_I;
 	IntegrationPoint*          particle;
 	Variable*                  diffusivityVariable = self->diffusivityVariable;
 	Particle_Index             lParticle_I;
+
+	/* Get mesh information 
+	 * NB These shape functions will be used for integrating over the phi field - so we have to use the phi field's mesh */
+	mesh = phiField->feMesh;
+	elementType =  FeMesh_GetElementType( mesh, lElement_I );
+	nodeCount = elementType->nodeCount;
 
 	/* Find Number of Particles in Element */
 	cell_I = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
@@ -103,7 +110,7 @@ double** AdvDiffResidualForceTerm_BuildSUPGShapeFunctions( AdvDiffResidualForceT
 	}
 
 	/* Calculate Upwind Diffusivity For Element - See Section 3.3 */
-	upwindDiffusivity = AdvDiffResidualForceTerm_UpwindDiffusivity( self, lElement_I, averageDiffusivity, dim );
+	upwindDiffusivity = AdvDiffResidualForceTerm_UpwindDiffusivity( self, mesh, lElement_I, averageDiffusivity, dim );
 	
 	/* Loop over particles in element */
 	for ( cParticle_I = 0 ; cParticle_I < particleCount ; cParticle_I++ ) {
@@ -123,11 +130,26 @@ double** AdvDiffResidualForceTerm_BuildSUPGShapeFunctions( AdvDiffResidualForceT
 		/* Get Shape Functions Derivatives */
 		ElementType_ShapeFunctionsGlobalDerivs( 
 			elementType,
-			feMesh, lElement_I,
+			mesh, lElement_I,
 			xi, dim, &detJac, GNx );
 
-		/* Calculate Velocity on Particle */
-		FeVariable_InterpolateWithinElement( velocityField, lElement_I, xi, velocity );
+		/* Calculate Velocity on Integration Point */
+		/* FeVariable_InterpolateFromMeshLocalCoord( velocityField, mesh, lElement_I, xi, velocity ); TODO - add this function*/
+		if ( mesh == velocityField->feMesh ) {
+			/* If the phi field's mesh and the velocity field's mesh are identical - then we can assume we are in the same
+			 * element and have the same local coordinate for this integration point */
+			FeVariable_InterpolateWithinElement( velocityField, lElement_I, xi, velocity );	
+		}
+		else {
+			Coord globalCoord;
+
+			/* Since the phi field's mesh and the velocity field - we have to get the velocity the hard way */
+			FeMesh_CoordLocalToGlobal( mesh,
+						lElement_I, 
+						xi, 
+						globalCoord );
+			FieldVariable_InterpolateValueAt( velocityField, globalCoord, velocity );
+		}
 
 		/* Add upwinding perturbation - See Eq. 3.2.24 */
 		velocityMagnitude = StGermain_VectorMagnitude( velocity, dim );

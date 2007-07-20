@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AdvectionDiffusionSLE.c 907 2007-07-09 23:41:37Z PatrickSunter $
+** $Id: AdvectionDiffusionSLE.c 920 2007-07-20 06:19:34Z RobertTurnbull $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -438,6 +438,10 @@ void _AdvectionDiffusionSLE_Build( void* sle, void* data ) {
 
 			/* Store pointer to force term */
 			self->advDiffResidualForceTerm = (AdvDiffResidualForceTerm*) forceTerm;
+                       
+			/* HACK */
+			Stg_Component_Build( self->advDiffResidualForceTerm->velocityField, data, False );
+
 		}
 	}
 	/* Ensure that there is at least one force term with proper residual type */

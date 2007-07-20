@@ -61,7 +61,6 @@
 		\
 		/* AdvDiffResidualForceTerm info */ \
 		FeVariable*                                         velocityField;                  \
-		FeVariable*                                         phiField;                  \
 		double                                              defaultDiffusivity;             \
 		Variable*                                           diffusivityVariable;            \
 		AdvDiffResidualForceTerm_UpwindParamFuncType        upwindParamType;

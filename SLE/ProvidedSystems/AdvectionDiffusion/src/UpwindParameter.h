@@ -41,7 +41,7 @@
 #ifndef __StgFEM_AdvectionDiffusion_UpwindParameter_h__
 #define __StgFEM_AdvectionDiffusion_UpwindParameter_h__
 
-	double AdvDiffResidualForceTerm_UpwindDiffusivity( AdvDiffResidualForceTerm* self, Element_LocalIndex lElement_I, double diffusivity, Dimension_Index dim );
+	double AdvDiffResidualForceTerm_UpwindDiffusivity( AdvDiffResidualForceTerm* self, FeMesh* mesh, Element_LocalIndex lElement_I, double diffusivity, Dimension_Index dim );
 
 	double AdvDiffResidualForceTerm_UpwindXiExact( void* residual, double pecletNumber ) ;
 	double AdvDiffResidualForceTerm_UpwindXiDoublyAsymptoticAssumption( void* residual, double pecletNumber ) ;

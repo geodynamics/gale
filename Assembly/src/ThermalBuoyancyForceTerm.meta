@@ -3,7 +3,6 @@
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 
 <param name="Name">ThermalBuoyancyForceTerm</param>
-<param name="Author">...</param>
 <param name="Organisation">VPAC</param>
 <param name="Project">StgFEM</param>
 <param name="Location">./StgFEM/Assembly/src/</param>
@@ -11,8 +10,6 @@
 <param name="Copyright">Copyright (C) 2004-2005 VPAC.</param>
 <param name="License">https://csd.vpac.org/twiki/bin/view/Stgermain/SoftwareLicense</param>
 <param name="Parent">ForceTerm</param>
-<param name="Reference">...</param>
-<param name="Summary">...</param>
 <param name="Description">...</param>
 
 <!--Now the interesting stuff-->

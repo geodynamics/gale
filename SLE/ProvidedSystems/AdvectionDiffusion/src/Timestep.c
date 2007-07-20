@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Timestep.c 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: Timestep.c 920 2007-07-20 06:19:34Z RobertTurnbull $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 #include "mpi.h"
@@ -49,6 +49,7 @@
 #include "AdvectionDiffusionSLE.h"
 #include "Residual.h"
 #include <math.h>
+#include <assert.h>
 #include <string.h>
 
 
@@ -82,14 +83,12 @@ double AdvectionDiffusionSLE_CalculateDt( void* advectionDiffusionSLE, FiniteEle
 
 double AdvectionDiffusionSLE_DiffusiveTimestep( void* advectionDiffusionSLE ) {
 	AdvectionDiffusionSLE*    self              = (AdvectionDiffusionSLE*) advectionDiffusionSLE;
-	AdvDiffResidualForceTerm* residualForceTerm = self->advDiffResidualForceTerm;
-	FeVariable*               velocityField     = residualForceTerm->velocityField;
 	double                    minSeparation;
 	double                    minSeparationEachDim[3];
 
 	Journal_DPrintf( self->debug, "In func: %s\n", __func__ );
-
-	FeVariable_GetMinimumSeparation( velocityField, &minSeparation, minSeparationEachDim );
+	
+	FeVariable_GetMinimumSeparation( self->phiField, &minSeparation, minSeparationEachDim );
 
 	return self->courantFactor * minSeparation * minSeparation / self->maxDiffusivity;
 }
@@ -99,7 +98,7 @@ double AdvectionDiffusionSLE_AdvectiveTimestep( void* advectionDiffusionSLE ) {
 	AdvectionDiffusionSLE*    self              = (AdvectionDiffusionSLE*) advectionDiffusionSLE;
 	AdvDiffResidualForceTerm* residualForceTerm = self->advDiffResidualForceTerm;
 	FeVariable*               velocityField     = residualForceTerm->velocityField;
-	Node_LocalIndex           nodeLocalCount    = Mesh_GetLocalSize( velocityField->feMesh, MT_VERTEX );
+	Node_LocalIndex           nodeLocalCount    = FeMesh_GetNodeLocalSize( self->phiField->feMesh );
 	Node_LocalIndex           node_I;
 	Dimension_Index           dim               = self->dim;
 	Dimension_Index           dim_I;
@@ -107,15 +106,19 @@ double AdvectionDiffusionSLE_AdvectiveTimestep( void* advectionDiffusionSLE ) {
 	XYZ                       velocity;
 	double                    minSeparation;
 	double                    minSeparationEachDim[3];
+	double*                   meshCoord;
 	
 	Journal_DPrintf( self->debug, "In func: %s\n", __func__ );
 
-	FeVariable_GetMinimumSeparation( velocityField, &minSeparation, minSeparationEachDim );
+	FeVariable_GetMinimumSeparation( self->phiField, &minSeparation, minSeparationEachDim );
 
 	for( node_I = 0 ; node_I < nodeLocalCount ; node_I++ ){
-		FeVariable_GetValueAtNode( velocityField, node_I, velocity );
-
+		meshCoord = Mesh_GetVertex( self->phiField->feMesh, node_I );
+		FieldVariable_InterpolateValueAt( velocityField, meshCoord, velocity );
+		
 		for ( dim_I = 0 ; dim_I < dim ; dim_I++ ) {
+			if( velocity[ dim_I ] == 0.0 ) 
+				continue;
 			timestep = MIN( timestep, fabs( minSeparationEachDim[ dim_I ]/velocity[ dim_I ] ) );
 		}
 	}

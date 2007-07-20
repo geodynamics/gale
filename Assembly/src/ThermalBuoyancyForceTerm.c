@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ThermalBuoyancyForceTerm.c 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: ThermalBuoyancyForceTerm.c 920 2007-07-20 06:19:34Z RobertTurnbull $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -213,7 +213,8 @@ void _ThermalBuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* fo
 	Dimension_Index         dim                = forceVector->dim;
 	IntegrationPoint*       particle;
 	FeVariable*             temperatureField;
-	FeMesh*			mesh;
+	FeMesh*                 mesh;
+	FeMesh*                 temperatureMesh;
 	double*                 xi;
 	Particle_InCellIndex    cParticle_I;
 	Particle_InCellIndex    cellParticleCount;
@@ -228,14 +229,18 @@ void _ThermalBuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* fo
 	double                  force;
 	double                  rayleighNumber;
 	double                  temperature;
+	double                  tmpGlobalCoord[3];
 
 	/* Get context extension */
 	rayleighNumber   = self->rayleighNumber;
 	temperatureField = self->temperatureField;
-	mesh             = temperatureField->feMesh;
+	temperatureMesh  = temperatureField->feMesh;
+
+	/* Since we are integrating over the velocity mesh - we want the velocity mesh here and not the temperature mesh */
+	mesh             = forceVector->feVariable->feMesh;
 	
 	/* Set the element type */
-	elementType      = FeMesh_GetElementType( temperatureField->feMesh, lElement_I );
+	elementType      = FeMesh_GetElementType( mesh, lElement_I ); 
 	elementNodeCount = elementType->nodeCount;
 
 	/* assumes constant number of dofs per element */
@@ -253,7 +258,14 @@ void _ThermalBuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* fo
 		ElementType_EvaluateShapeFunctionsAt( elementType, xi, Ni );
 
 		/* Field Get Temperature from Field Variable */
-		FeVariable_InterpolateWithinElement( temperatureField, lElement_I, xi, &temperature );
+		if ( temperatureMesh == mesh ) {
+			/* If meshes are identical - then we can use a shortcut for working out the temperature */
+			FeVariable_InterpolateWithinElement( temperatureField, lElement_I, xi, &temperature );
+		}
+		else {
+			FeMesh_CoordLocalToGlobal( mesh, lElement_I, xi, tmpGlobalCoord );
+			FieldVariable_InterpolateValueAt( temperatureField, tmpGlobalCoord, &temperature );
+		}
 
 		force = rayleighNumber * temperature;
 

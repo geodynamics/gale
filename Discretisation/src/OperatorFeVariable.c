@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: OperatorFeVariable.c 907 2007-07-09 23:41:37Z PatrickSunter $
+** $Id: OperatorFeVariable.c 920 2007-07-20 06:19:34Z RobertTurnbull $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -46,6 +46,7 @@
 #include "types.h"
 #include "FeVariable.h"
 #include "OperatorFeVariable.h"
+#include "FeMesh.h"
 
 #include <assert.h>
 
@@ -557,15 +558,33 @@ void OperatorFeVariable_UnaryInterpolationFunc( void* feVariable, Element_Domain
 	Operator_CarryOutUnaryOperation( self->_operator, fieldValue0, value );
 }
 
-void OperatorFeVariable_BinaryInterpolationFunc( void* feVariable, Element_DomainIndex dElement_I, Coord coord, double* value ) {
+void OperatorFeVariable_BinaryInterpolationFunc( void* feVariable, Element_DomainIndex dElement_I, Coord localCoord, double* value ) {
 	OperatorFeVariable* self            = (OperatorFeVariable*) feVariable;
 	FeVariable*         field0          = self->feVariableList[0];
 	FeVariable*         field1          = self->feVariableList[1];
+	FeMesh*             mesh            = self->feMesh;
 	double              fieldValue0[ MAX_FIELD_COMPONENTS ]; 
 	double              fieldValue1[ MAX_FIELD_COMPONENTS ]; 
+	Coord               globalCoord;
 	
-	field0->_interpolateWithinElement( field0, dElement_I, coord, fieldValue0 );
-	field1->_interpolateWithinElement( field1, dElement_I, coord, fieldValue1 );
+	/* Get value for field0 */
+	if ( field0->feMesh == mesh )
+		field0->_interpolateWithinElement( field0, dElement_I, localCoord, fieldValue0 );
+	else {
+		/* Get Global Coordinates */
+		FeMesh_CoordLocalToGlobal( mesh, dElement_I, localCoord, globalCoord );
+		field0->_interpolateValueAt( field0, globalCoord, fieldValue0 );
+	}
+
+	/* Get value for field1 */
+	if ( field1->feMesh == mesh )
+		field1->_interpolateWithinElement( field1, dElement_I, localCoord, fieldValue1 );
+	else {
+		/* Get Global Coordinates */
+		FeMesh_CoordLocalToGlobal( mesh, dElement_I, localCoord, globalCoord );
+		field1->_interpolateValueAt( field1, globalCoord, fieldValue1 );
+	}
+	
 	Operator_CarryOutBinaryOperation( self->_operator, fieldValue0, fieldValue1, value );
 }
 

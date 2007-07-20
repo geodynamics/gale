@@ -35,11 +35,12 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: UpwindParameter.c 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: UpwindParameter.c 920 2007-07-20 06:19:34Z RobertTurnbull $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #include <math.h>
+#include <assert.h>
 
 #include "mpi.h"
 #include <StGermain/StGermain.h>
@@ -56,9 +57,8 @@
 
 /** AdvectionDiffusion_UpwindDiffusivity - See Brooks, Hughes 1982 Section 3.3 
  * All equations refer to this paper if not otherwise indicated */
-double AdvDiffResidualForceTerm_UpwindDiffusivity( AdvDiffResidualForceTerm* self, Element_LocalIndex lElement_I, double diffusivity, Dimension_Index dim ){
+double AdvDiffResidualForceTerm_UpwindDiffusivity( AdvDiffResidualForceTerm* self, FeMesh* mesh, Element_LocalIndex lElement_I, double diffusivity, Dimension_Index dim ){
 	FeVariable*                velocityField   = self->velocityField;
-	FeMesh*				feMesh            = velocityField->feMesh;
 	Coord                      xiElementCentre = {0.0,0.0,0.0};
 	double                     xiUpwind;
 	double                     velocityCentre[3];
@@ -69,21 +69,28 @@ double AdvDiffResidualForceTerm_UpwindDiffusivity( AdvDiffResidualForceTerm* sel
 	double*                    leastCoord;
 	double*                    greatestCoord;
 	Node_LocalIndex            nodeIndex_LeastValues, nodeIndex_GreatestValues;
-	unsigned			nInc, *inc;
-	
+	unsigned                   nInc, *inc;
+
 	/* Change Diffusivity if it is too small */
 	if ( diffusivity < MIN_DIFFUSIVITY ) 
 		diffusivity = MIN_DIFFUSIVITY;
 
 	/* Calculate Velocity At Middle of Element - See Eq. 3.3.6 */
-	FeVariable_InterpolateWithinElement( velocityField, lElement_I, xiElementCentre, velocityCentre );
+	if( mesh == velocityField->feMesh ) {
+		FeVariable_InterpolateWithinElement( velocityField, lElement_I, xiElementCentre, velocityCentre );
+	} 
+	else {
+		Coord globalCoord;
+		FeMesh_CoordLocalToGlobal( mesh, lElement_I, xiElementCentre, globalCoord );
+		FieldVariable_InterpolateValueAt( velocityField, globalCoord, velocityCentre );
+	}
 
 	/* Calculate Length Scales - See Fig 3.4 - ASSUMES BOX MESH TODO - fix */
-	FeMesh_GetElementNodes( feMesh, lElement_I, &nInc, &inc );
+	FeMesh_GetElementNodes( mesh, lElement_I, &nInc, &inc );
 	nodeIndex_LeastValues = inc[0];
 	nodeIndex_GreatestValues = (dim == 2) ? inc[3] : inc[7];
-	leastCoord    = Mesh_GetVertex( feMesh, nodeIndex_LeastValues );
-	greatestCoord = Mesh_GetVertex( feMesh, nodeIndex_GreatestValues );
+	leastCoord    = Mesh_GetVertex( mesh, nodeIndex_LeastValues );
+	greatestCoord = Mesh_GetVertex( mesh, nodeIndex_GreatestValues );
 
 	upwindDiffusivity = 0.0;
 	for ( dim_I = 0 ; dim_I < dim ; dim_I++ ) {
