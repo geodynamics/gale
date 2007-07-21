@@ -14,7 +14,9 @@
 		<struct name="hassatisfiedColourMap">
 			<param name="Type">lucColourMap</param>
 			<param name="colours">Yellow Blue White</param>
-			<param name="dynamicRange">True</param>
+			<param name="dynamicRange">False</param>
+			<param name="minimum">0</param>
+			<param name="maximum">2</param>
 		</struct>
 		<struct name="hassatisfiedColourBar">
 			<param name="Type">lucColourBar</param>
