@@ -116,6 +116,18 @@
 			<param name="Context">context</param>
 			<param name="Mesh">linearMesh</param>
 		</struct>		
+		<struct name="uzawa" mergeType="replace">
+                       <param name="Type">Stokes_SLE_UzawaSolver</param>
+                       <param name="Preconditioner">preconditioner</param>
+                       <param name="tolerance">1.0e-5</param>
+                       <param name="maxIterations">5000</param>
+			<!-- must be in slab models as DaveStegman has tuned this simulation.
+			but this is dangerous and we must calculate a better param selection
+			for uzawa to reasonably converge 
+			JulianGiordani 24Jul07
+			-->
+                       <param name="useAbsoluteTolerance"> true </param>
+               </struct>
 	</struct>
 
 	<include>Underworld/Viewports/SlabViewports.xml</include>
@@ -131,9 +143,9 @@
 	<param name="journal-enable-branch.debug.lucDebug">f</param>
 
 	<!-- general simulation parameters -->
-	<param name="maxTimeSteps"> 100 </param>
+	<param name="maxTimeSteps"> -1 </param>
 	<param name="dumpEvery"> 1 </param>
-	<param name="outputPath"> ./output/BigSlabNoTranslation </param>
+	<param name="outputPath"> ./output/ </param>
 	<param name="gravity"> 1.0 </param>
         <param name="checkpointEvery"> 10 </param>
 
