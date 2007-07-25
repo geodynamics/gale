@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StandardConditionFunctions.c 906 2007-07-04 06:24:40Z DavidLee $
+** $Id: StandardConditionFunctions.c 922 2007-07-25 03:01:19Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -114,6 +114,18 @@ void _StgFEM_StandardConditionFunctions_Construct( void* component, Stg_Componen
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpectralBCY, "SpectralBCY");
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpectralBCZ, "SpectralBCZ");
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpectralPressureBCX, "SpectralPressureBCX");
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpectralPressureBCY, "SpectralPressureBCY");
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ErrorFunc, "ErrorFunc");
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ConstantVelocity, "ConstantVelocity");
@@ -316,7 +328,6 @@ void StgFEM_StandardConditionFunctions_PartialLid_TopLayer( Node_LocalIndex node
 		(*velResult) = 0;
 	}
 }
-
 
 void StgFEM_StandardConditionFunctions_LinearInterpolationLid( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* result ) {
 	DiscretisationContext*	context = (DiscretisationContext*)_context;
@@ -847,26 +858,6 @@ void StgFEM_StandardConditionFunctions_ConstantVelocity( Node_LocalIndex node_lI
 		result[ K_AXIS ] = velocity[ K_AXIS ];
 }
 
-/* error function for use in 3D spec ridge top BC - not currently in use */
-double errorFunction( double z, int n ) {
-	double		pi	= 3.1415926535;
-	double 		a;
-	double 		erf 	= 0.0;
-	int		denom;
-	int		i, j;
-
-	a = 2.0/sqrt( pi );
-
-	for( i=0 ; i<n ; i++ ) {
-		denom = 1;
-		for( j=1 ; j<=2*i+1 ; j+=2 ) 
-			denom *= j; 
-		
-		erf += pow( 2, i )*pow( z, 2*i+1 )/denom;
-	}
-
-	return erf *= a*exp( -1.0*z*z );
-}
 
 /* 3D spec ridge top BC (for milestone 1 of magma project) 
  * to be applied to the top x-z plane of the domain */
@@ -909,17 +900,19 @@ void StgFEM_StandardConditionFunctions_SpectralBCX( Node_LocalIndex node_lI, Var
 	FeVariable*             analyticFeVarX     = NULL;
 	FeVariable*             numericFeVar       = NULL;
 	FeMesh*			feMesh             = NULL;
-	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
         double*                 coord;
-	double*			dummy;
+	Node_LocalIndex		analyticNodeI;
 
 	analyticFeVarX = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "SpectralVelocityXField" );
 	numericFeVar   = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
 	feMesh         = numericFeVar->feMesh;
 	coord          = Mesh_GetVertex( feMesh, node_lI );
 
-	FeVariable_GetValueAtNode( analyticFeVarX, node_lI, result );
+	/*FeVariable_GetValueAtNode( analyticFeVarX, node_lI, result );*/
+	analyticNodeI  = Mesh_NearestVertex( analyticFeVarX->feMesh, coord );
+	FeVariable_GetValueAtNode( analyticFeVarX, analyticNodeI, result );
+
 	/* *result = FeVariable_GetScalarAtNode( analyticFeVarX, node_lI );*/
 	/*FieldVariable_InterpolateValueAt( analyticFeVar, coord, result );*/
 
@@ -931,13 +924,71 @@ void StgFEM_StandardConditionFunctions_SpectralBCY( Node_LocalIndex node_lI, Var
 	FeVariable*             analyticFeVarY     = NULL;
 	FeVariable*             numericFeVar       = NULL;
 	FeMesh*			feMesh             = NULL;
-	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
         double*                 coord;
-	double*			dummy;
+	Node_LocalIndex		analyticNodeI;
 
 	analyticFeVarY = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "SpectralVelocityYField" );
 	numericFeVar   = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
+	feMesh         = numericFeVar->feMesh;
+	coord          = Mesh_GetVertex( feMesh, node_lI );
+
+	/*FeVariable_GetValueAtNode( analyticFeVarY, node_lI, result );*/
+	analyticNodeI  = Mesh_NearestVertex( analyticFeVarY->feMesh, coord );
+	FeVariable_GetValueAtNode( analyticFeVarY, analyticNodeI, result );
+	
+	/* *result = FeVariable_GetScalarAtNode( analyticFeVarY, node_lI ); */
+	/*FeVariable_SetValueAtNode( numericFeVar, node_lI, result );*/
+}
+
+void StgFEM_StandardConditionFunctions_SpectralBCZ( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	FiniteElementContext *	context            = (FiniteElementContext*)_context;
+	FeVariable*             analyticFeVarZ     = NULL;
+	FeVariable*             numericFeVar       = NULL;
+	FeMesh*			feMesh             = NULL;
+	double*                 result             = (double*) _result;
+        double*                 coord;
+
+	analyticFeVarZ = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "SpectralVelocityZField" );
+	numericFeVar   = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
+	feMesh         = numericFeVar->feMesh;
+	coord          = Mesh_GetVertex( feMesh, node_lI );
+
+	FeVariable_GetValueAtNode( analyticFeVarZ, node_lI, result );
+	/* *result = FeVariable_GetScalarAtNode( analyticFeVarZ, node_lI ); */
+
+	/*FeVariable_SetValueAtNode( numericFeVar, node_lI, result );*/
+}
+
+void StgFEM_StandardConditionFunctions_SpectralPressureBCX( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	FiniteElementContext *	context            = (FiniteElementContext*)_context;
+	FeVariable*             analyticFeVarX     = NULL;
+	FeVariable*             numericFeVar       = NULL;
+	FeMesh*			feMesh             = NULL;
+	double*                 result             = (double*) _result;
+        double*                 coord;
+
+	analyticFeVarX = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "SpectralPressureField" );
+	numericFeVar   = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "PressureField" );
+	feMesh         = numericFeVar->feMesh;
+	coord          = Mesh_GetVertex( feMesh, node_lI );
+
+	FeVariable_GetValueAtNode( analyticFeVarX, node_lI, result );
+	/* *result = FeVariable_GetScalarAtNode( analyticFeVarX, node_lI ); */
+
+	/*FeVariable_SetValueAtNode( numericFeVar, node_lI, result );*/
+}
+
+void StgFEM_StandardConditionFunctions_SpectralPressureBCY( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	FiniteElementContext *	context            = (FiniteElementContext*)_context;
+	FeVariable*             analyticFeVarY     = NULL;
+	FeVariable*             numericFeVar       = NULL;
+	FeMesh*			feMesh             = NULL;
+	double*                 result             = (double*) _result;
+        double*                 coord;
+
+	analyticFeVarY = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "SpectralPressureField" );
+	numericFeVar   = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "PressureField" );
 	feMesh         = numericFeVar->feMesh;
 	coord          = Mesh_GetVertex( feMesh, node_lI );
 
@@ -946,3 +997,57 @@ void StgFEM_StandardConditionFunctions_SpectralBCY( Node_LocalIndex node_lI, Var
 
 	/*FeVariable_SetValueAtNode( numericFeVar, node_lI, result );*/
 }
+
+/* error function for use in 3D spec ridge top BC */
+double errorFunction( double z, int n ) {
+	double		pi	= 3.1415926535;
+	double 		a;
+	double 		erf 	= 0.0;
+	int		denom;
+	int		i, j;
+
+	a = 2.0/sqrt( pi );
+
+	for( i=0 ; i<n ; i++ ) {
+		denom = 1;
+		for( j=1 ; j<=2*i+1 ; j+=2 ) 
+			denom *= j; 
+		
+		erf += pow( 2, i )*pow( z, 2*i+1 )/denom;
+	}
+
+	return erf *= a*exp( -1.0*z*z );
+}
+
+
+
+void StgFEM_StandardConditionFunctions_ErrorFunc( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	FiniteElementContext *	context            = (FiniteElementContext*)_context;
+	FeVariable*             feVariable         = NULL;
+	FeMesh*			feMesh             = NULL;
+	Dictionary*             dictionary         = context->dictionary;
+	double*                 result             = (double*) _result;
+        double*                 coord;
+	double			dilate;
+	double			width; 
+
+	feVariable  = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
+	feMesh      = feVariable->feMesh;
+	coord       = Mesh_GetVertex( feMesh, node_lI );
+
+	dilate      = Dictionary_GetDouble_WithDefault( dictionary, "ErrorFuncDilate", 0.0 );
+	width       = Dictionary_GetDouble_WithDefault( dictionary, "ErrorFuncWidth", 0.0 );
+
+	if( coord[0] < -1.0*width ) {
+		*result = -1.0;
+	}
+	else if( coord[0] > width ) {
+		*result = 1.0;
+	}
+	else {
+		*result     = errorFunction( coord[0]/dilate, 5 );	
+	}
+
+}
+
+
