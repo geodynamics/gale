@@ -32,7 +32,7 @@
 **
 ** Comments:
 **
-** $Id: types.h 4131 2007-05-31 01:41:51Z LukeHodkinson $
+** $Id: types.h 4155 2007-07-26 02:27:42Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -84,6 +84,7 @@
 	typedef struct MeshParticleLayout		MeshParticleLayout;
 	typedef struct GaussParticleLayout		GaussParticleLayout;
 	typedef struct TriGaussParticleLayout		TriGaussParticleLayout;
+	typedef struct GaussBorderParticleLayout	GaussBorderParticleLayout;
 	typedef struct GlobalParticleLayout		GlobalParticleLayout;
 	typedef struct SpaceFillerParticleLayout        SpaceFillerParticleLayout;
 	typedef struct WithinShapeParticleLayout        WithinShapeParticleLayout;

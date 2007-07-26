@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Init.c 4119 2007-05-22 07:35:46Z RaquibulHassan $
+** $Id: Init.c 4155 2007-07-26 02:27:42Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -58,6 +58,7 @@ Bool DiscretisationSwarm_Init( int* argc, char** argv[] ) {
 	
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), GaussParticleLayout_Type, "0", _GaussParticleLayout_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), TriGaussParticleLayout_Type, "0", _TriGaussParticleLayout_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), GaussBorderParticleLayout_Type, "0", _GaussBorderParticleLayout_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), RandomParticleLayout_Type, "0", _RandomParticleLayout_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), MeshParticleLayout_Type, "0", _MeshParticleLayout_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), SpaceFillerParticleLayout_Type, "0", _SpaceFillerParticleLayout_DefaultNew );
@@ -99,6 +100,7 @@ Bool DiscretisationSwarm_Init( int* argc, char** argv[] ) {
 	RegisterParent( RandomParticleLayout_Type,   PerCellParticleLayout_Type );
 	RegisterParent( MeshParticleLayout_Type,   PerCellParticleLayout_Type );
 	RegisterParent( TriGaussParticleLayout_Type,   PerCellParticleLayout_Type );
+	RegisterParent( GaussBorderParticleLayout_Type,   GaussParticleLayout_Type );
 	
 	
 	RegisterParent( SwarmVariable_Register_Type, NamedObject_Register_Type );
