@@ -108,6 +108,7 @@
 		DofLayout*                                        dofLayout; \
 		/** Boundary conditions applied to this variable - Compulsory, so the eq num table can be worked out*/ \
 		VariableCondition*                                bcs; \
+		DynamicVC*					dynamicBCs; /* Temporary hack */	\
 		Bool						removeBCs;	\
 		/** Boundary conditions applied to this variable - Optional, may be NULL */ \
 		VariableCondition*                                ics; \
@@ -299,6 +300,7 @@
 	
 	/** Apply BCs for this variable */
 	void FeVariable_ApplyBCs( void* variable, void* data );
+	Bool FeVariable_IsBC( void* variable, int node, int dof );
 	
 	/** Interpolate the value of the FE variable at a particular coord **/
 	InterpolationResult _FeVariable_InterpolateValueAt( void* variable, double* coord, double* value );
