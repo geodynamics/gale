@@ -51,7 +51,7 @@
 **	for storing and managing the matrices and vectors that make up a system, but uses
 **	the SLE_Solver class to actually implement a solution mechanism for the given eqn.
 **
-** $Id: SystemLinearEquations.h 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: SystemLinearEquations.h 925 2007-07-26 02:34:49Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -112,6 +112,10 @@
 		Iteration_Index                                     nonLinearIteration_I;      \
 		Bool                                                killNonConvergent;         \
 		Iteration_Index                                     nonLinearMinIterations;    \
+		/* BEGIN LUKE'S FRICTIONAL BCS BIT */					       \
+		char*						    nlEPName;	       	       \
+		EntryPoint*					    nlEP;		       \
+		/* END LUKE'S FRICTIONAL BCS BIT */					       \
 		/* Multi-grid data. */ \
 		Bool                                                mgEnabled;                 \
 		Bool                                                mgUpdate; \
@@ -260,6 +264,7 @@
 
 	/* Non-linear stuff */
 	void SystemLinearEquations_NonLinearExecute( void* sle, void* data ) ;
+	void SystemLinearEquations_AddNonLinearEP( void* sle, const char* name, EntryPoint_2VoidPtr_Cast func );
 	void SystemLinearEquations_SetToNonLinear( void* sle ) ;
 	void SystemLinearEquations_CheckIfNonLinear( void* sle ) ;
 	

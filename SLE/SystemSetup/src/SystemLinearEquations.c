@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SystemLinearEquations.c 860 2007-06-07 05:47:20Z LukeHodkinson $
+** $Id: SystemLinearEquations.c 925 2007-07-26 02:34:49Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -180,7 +180,11 @@ void _SystemLinearEquations_Init(
 	self->nonLinearTolerance        = nonLinearTolerance;
 	self->nonLinearMaxIterations    = nonLinearMaxIterations;
 	self->killNonConvergent         = killNonConvergent;
-	self->nonLinearMinIterations    = nonLinearMinIterations;	
+	self->nonLinearMinIterations    = nonLinearMinIterations;
+	/* BEGIN LUKE'S FRICTIONAL BCS BIT */
+	Stg_asprintf( &self->nlEPName, "%s-nlEP", self->name );
+	self->nlEP = EntryPoint_New( self->nlEPName, EntryPoint_2VoidPtr_CastType );
+	/* END LUKE'S FRICTIONAL BCS BIT */
 	
 	/* Initialise MG stuff. */
 	self->mgEnabled = False;
@@ -249,6 +253,9 @@ void _SystemLinearEquations_Delete( void* sle ) {
 	Journal_DPrintf( self->debug, "In %s\n", __func__ );
 	Stream_IndentBranch( StgFEM_Debug );
 	
+	/* BEGIN LUKE'S FRICTIONAL BCS BIT */
+	Memory_Free( self->nlEPName );
+	/* END LUKE'S FRICTIONAL BCS BIT */
 	Memory_Free( self->executeEPName );
 	
 	Stg_Class_Delete( self->extensionManager );
@@ -671,6 +678,21 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 	Vector_SetLocalSize( previousVector, Vector_GetLocalSize( currentVector ) );
 	
 	for ( self->nonLinearIteration_I = 1 ; self->nonLinearIteration_I < maxIterations ; self->nonLinearIteration_I++ ) {
+		/*
+		** BEGIN LUKE'S FRICTIONAL BCS BIT
+		**
+		** Adding an interface for allowing other components to add some form of non-linearity to the system.
+		** This is with a focus on frictional BCs, where we want to examine the stress field and modify
+		** traction BCs to enforce friction rules. - Luke 18/07/2007
+		*/
+
+		_EntryPoint_Run_2VoidPtr( self->nlEP, sle, _context );
+
+		/*
+		** END LUKE'S FRICTIONAL BCS BIT
+		*/
+
+
 		Vector_CopyEntries( currentVector, previousVector );
 	
 		Journal_Printf(self->info,"Non linear solver - iteration %d\n", self->nonLinearIteration_I);
@@ -713,15 +735,23 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 			abort();
 		}
 	}
-			
+
 	Stream_UnIndentBranch( StgFEM_Debug );
 
 	FreeObject( previousVector );
 }
 
+void SystemLinearEquations_AddNonLinearEP( void* sle, const char* name, EntryPoint_2VoidPtr_Cast func ) {
+	SystemLinearEquations* self = (SystemLinearEquations*)sle;
+
+	SystemLinearEquations_SetToNonLinear( self );
+	EntryPoint_Append( self->nlEP, (char*)name, func, self->type );
+}
+
 void SystemLinearEquations_SetToNonLinear( void* sle ) {
 	SystemLinearEquations*	self            = (SystemLinearEquations*) sle;
 
+	assert( self );
 	if ( self->isNonLinear )
 		return;
 

@@ -222,8 +222,8 @@ void Assembler_IntegrateMatrixElement( void* assembler, unsigned element ) {
 		ElementType_EvaluateShapeFunctionsAt( elType, self->particle->xi, self->shapeFuncs );
 		ElementType_ShapeFunctionsGlobalDerivs( elType, mesh, element, self->particle->xi, nDims, 
 							&self->detJac, self->globalDerivs );
-		if( self->partCB )
-			self->partCB( self->obj, self );
+		if( self->partCB && !self->partCB( self->obj, self ) )
+			continue;
 
 		Assembler_LoopMatrixElement( self, element );
 	}
@@ -241,7 +241,6 @@ void Assembler_LoopMatrixElement( void* assembler, unsigned element ) {
 	unsigned		nColElNodes, *colElNodes;
 	int			rowEq, colEq;
 	unsigned		rowInd, colInd;
-	unsigned		varInd;
 	unsigned		n_i, n_j, dof_i, dof_j;
 
 	assert( self && Stg_CheckType( self, Assembler ) );
@@ -279,8 +278,7 @@ void Assembler_LoopMatrixElement( void* assembler, unsigned element ) {
 			self->rowNodeInd = rowElNodes[n_i];
 			self->rowDofInd = dof_i;
 			self->rowEq = rowEq;
-			varInd = rowDofs->varIndices[rowElNodes[n_i]][dof_i];
-			if( rowVar->bcs && VariableCondition_IsCondition( rowVar->bcs, rowElNodes[n_i], varInd ) ) {
+			if( rowVar->bcs && FeVariable_IsBC( rowVar, rowElNodes[n_i], dof_i ) ) {
 				if( !self->rowRCB || !self->rowRCB( self->obj, self ) )
 					continue;
 			}
@@ -301,8 +299,7 @@ void Assembler_LoopMatrixElement( void* assembler, unsigned element ) {
 					self->colNodeInd = colElNodes[n_j];
 					self->colDofInd = dof_j;
 					self->colEq = colEq;
-					varInd = colDofs->varIndices[colElNodes[n_j]][dof_j];
-					if( colVar->bcs && VariableCondition_IsCondition( colVar->bcs, colElNodes[n_j], varInd ) ) {
+					if( colVar->bcs && FeVariable_IsBC( colVar, colElNodes[n_j], dof_j ) ) {
 						if( self->colRCB )
 							self->colRCB( self->obj, self );
 					}
@@ -324,7 +321,6 @@ void Assembler_LoopMatrixDiagonal( void* assembler ) {
 	unsigned		nRowDofs;
 	unsigned		nRowNodes;
 	int			rowEq;
-	unsigned		varInd;
 	unsigned		n_i, dof_i;
 
 	assert( self && Stg_CheckType( self, Assembler ) );
@@ -352,8 +348,7 @@ void Assembler_LoopMatrixDiagonal( void* assembler ) {
 			self->colNodeInd = n_i;
 			self->colDofInd = dof_i;
 			self->colEq = rowEq;
-			varInd = rowDofs->varIndices[n_i][dof_i];
-			if( rowVar->bcs && VariableCondition_IsCondition( rowVar->bcs, n_i, varInd ) ) {
+			if( rowVar->bcs && FeVariable_IsBC( rowVar, n_i, dof_i ) ) {
 				if( self->rowRCB )
 					self->rowRCB( self->obj, self );
 			}
