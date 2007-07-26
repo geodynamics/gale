@@ -45,8 +45,8 @@
 			<param name="Type">StiffnessMatrix</param>
 			<param name="RowVariable">VelocityField</param>
 			<param name="ColumnVariable">PressureField</param>	
-			<param name="RHS">cont_force</param>
-			<!--param name="transposeRHS">cont_force</param-->
+			<param name="RHS">mom_force</param>
+			<param name="transposeRHS">cont_force</param>
 			<param name="allowZeroElementContributions">False</param>
 		</struct>
 		<struct name="gradientStiffnessMatrixTerm">
