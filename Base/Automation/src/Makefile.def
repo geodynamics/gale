@@ -44,6 +44,7 @@ def_srcs = \
 	CompositeVC.c \
 	SetVC.c \
 	VariableAllVC.c \
+	DynamicVC.c \
 	Stg_Component.c \
 	Stg_ComponentMeta.c \
 	Stg_ComponentRegister.c \
@@ -70,6 +71,7 @@ def_hdrs = \
 	CompositeVC.h \
 	SetVC.h \
 	VariableAllVC.h \
+	DynamicVC.h \
 	types.h \
 	shortcuts.h \
 	offsets.h \

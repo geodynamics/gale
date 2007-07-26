@@ -35,7 +35,7 @@
 ** Comments:
 **	None so far.
 **
-** $Id: Container.h 4097 2007-05-16 00:57:11Z LukeHodkinson $
+** $Id: Container.h 4153 2007-07-26 02:25:22Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -45,6 +45,9 @@
 	#include "units.h"
 	#include "types.h"
 	#include "IArray.h"
+	#include "Iter.h"
+	#include "ISetIter.h"
+	#include "IMapIter.h"
 	#include "ISet.h"
 	#include "IMap.h"
 	#include "BTreeNode.h"

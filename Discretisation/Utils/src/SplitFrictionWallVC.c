@@ -88,6 +88,7 @@ SplitFrictionWallVC*	SplitFrictionWallVC_DefaultNew( Name name )
 		_SplitFrictionWallVC_GetValueIndex, 
 		_SplitFrictionWallVC_GetValueCount, 
 		_SplitFrictionWallVC_GetValue,
+		_VariableCondition_Apply, 
 		NULL,
 		NULL, 
 		NULL, 
@@ -126,6 +127,7 @@ SplitFrictionWallVC*	SplitFrictionWallVC_New(
 		_SplitFrictionWallVC_GetValueIndex, 
 		_SplitFrictionWallVC_GetValueCount, 
 		_SplitFrictionWallVC_GetValue,
+		_VariableCondition_Apply, 
 		_dictionaryEntryName,
 		variable_Register, 
 		conFunc_Register, 
@@ -167,6 +169,7 @@ void SplitFrictionWallVC_Init(
 	self->_getValueIndex = _SplitFrictionWallVC_GetValueIndex;
 	self->_getValueCount = _SplitFrictionWallVC_GetValueCount;
 	self->_getValue = _SplitFrictionWallVC_GetValue;
+	self->_apply = _VariableCondition_Apply;
 	
 	_Stg_Class_Init( (Stg_Class*)self );
 	_Stg_Object_Init( (Stg_Object*)self, name, NON_GLOBAL );
@@ -201,6 +204,7 @@ SplitFrictionWallVC* _SplitFrictionWallVC_New(
 	VariableCondition_GetValueIndexFunc*		_getValueIndex,
 	VariableCondition_GetValueCountFunc*		_getValueCount,
 	VariableCondition_GetValueFunc*			_getValue,
+	VariableCondition_ApplyFunc*			_apply, 
 	Name						_dictionaryEntryName, 
 	Variable_Register*				variable_Register, 
 	ConditionFunction_Register*			conFunc_Register, 
@@ -234,6 +238,7 @@ SplitFrictionWallVC* _SplitFrictionWallVC_New(
 		_getValueIndex, 
 		_getValueCount, 
 		_getValue, 
+		_apply, 
 		variable_Register, 
 		conFunc_Register,
 		dictionary );

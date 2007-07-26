@@ -33,7 +33,7 @@
 **
 ** Comments:
 **
-** $Id: VariableCondition.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: VariableCondition.h 4153 2007-07-26 02:25:22Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -52,6 +52,7 @@
 	typedef VariableCondition_ValueIndex	(VariableCondition_GetValueIndexFunc)		( void* variableCondition, Index index, VariableCondition_VariableIndex condVar_I );
 	typedef VariableCondition_ValueIndex	(VariableCondition_GetValueCountFunc)		( void* variableCondition );
 	typedef VariableCondition_Value		(VariableCondition_GetValueFunc)		( void* variableCondition, VariableCondition_ValueIndex valIndex );
+	typedef void (VariableCondition_ApplyFunc)( void *vc, void* ctx );
 	
 	
 	typedef struct {
@@ -99,6 +100,7 @@
 		VariableCondition_GetValueIndexFunc*		_getValueIndex; \
 		VariableCondition_GetValueCountFunc*		_getValueCount; \
 		VariableCondition_GetValueFunc*			_getValue; \
+		VariableCondition_ApplyFunc*			_apply; \
 		\
 		/* Stg_Class info */ \
 		/** Register of Variables that may be operated on. */ \
@@ -158,6 +160,7 @@
 						VariableCondition_GetValueIndexFunc*		_getValueIndex,
 						VariableCondition_GetValueCountFunc*		_getValueCount,
 						VariableCondition_GetValueFunc*			_getValue,
+						VariableCondition_ApplyFunc*			_apply, 
 						Variable_Register*				variable_Register,
 						ConditionFunction_Register*			conFunc_Register,
 						Dictionary*					dictionary );
@@ -195,6 +198,7 @@
 	** Virtual functions
 	*/
 	
+	void _VariableCondition_Apply( void* variableCondition, void* context );
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Build functions

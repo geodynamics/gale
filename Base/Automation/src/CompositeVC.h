@@ -31,7 +31,7 @@
 **
 ** <b>Comments:</b>
 **
-** $Id: CompositeVC.h 3851 2006-10-12 08:57:22Z SteveQuenette $
+** $Id: CompositeVC.h 4153 2007-07-26 02:25:22Z LukeHodkinson $
 **
 **/
 
@@ -111,6 +111,7 @@
 						VariableCondition_GetValueIndexFunc*		_getValueIndex,
 						VariableCondition_GetValueCountFunc*		_getValueCount,
 						VariableCondition_GetValueFunc*			_getValue,
+						VariableCondition_ApplyFunc*			_apply, 
 						Variable_Register*				variable_Register,
 						ConditionFunction_Register*			conFunc_Register,
 						Dictionary*					dictionary,

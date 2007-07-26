@@ -30,7 +30,7 @@
 **
 ** Comments:
 **
-** $Id: SetVC.h 3462 2006-02-19 06:53:24Z WalterLandry $
+** $Id: SetVC.h 4153 2007-07-26 02:25:22Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -113,6 +113,7 @@
 						VariableCondition_GetValueIndexFunc*		_getValueIndex,
 						VariableCondition_GetValueCountFunc*		_getValueCount,
 						VariableCondition_GetValueFunc*			_getValue,
+						VariableCondition_ApplyFunc*			_apply, 
 						Name						_dictionaryEntryName, 
 						Variable_Register*				variable_Register, 
 						ConditionFunction_Register*			conFunc_Register,

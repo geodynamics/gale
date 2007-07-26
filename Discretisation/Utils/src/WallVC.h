@@ -32,7 +32,7 @@
 **
 ** Comments:
 **
-** $Id: WallVC.h 4025 2007-03-13 11:22:43Z PatrickSunter $
+** $Id: WallVC.h 4153 2007-07-26 02:25:22Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -119,6 +119,7 @@
 						VariableCondition_GetValueIndexFunc*		_getValueIndex,
 						VariableCondition_GetValueCountFunc*		_getValueCount,
 						VariableCondition_GetValueFunc*			_getValue,
+						VariableCondition_ApplyFunc*			_apply, 
 						Name						_dictionaryEntryName, 
 						Variable_Register*				variable_Register, 
 						ConditionFunction_Register*			conFunc_Register, 

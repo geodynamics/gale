@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: CompositeVC.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: CompositeVC.c 4153 2007-07-26 02:25:22Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -95,6 +95,7 @@ CompositeVC* CompositeVC_New(
 		_CompositeVC_GetValueIndex, 
 		_CompositeVC_GetValueCount, 
 		_CompositeVC_GetValue, 
+		_VariableCondition_Apply, 
 		variable_Register, 
 		conFunc_Register, 
 		dictionary, 
@@ -126,6 +127,7 @@ CompositeVC* CompositeVC_DefaultNew( Name name )
 		_CompositeVC_GetValueIndex, 
 		_CompositeVC_GetValueCount, 
 		_CompositeVC_GetValue, 
+		_VariableCondition_Apply, 
 		NULL/*variable_Register*/, 
 		NULL/*conFunc_Register*/,
 		NULL,
@@ -161,6 +163,7 @@ void CompositeVC_Init(
 	self->_getValueIndex = _CompositeVC_GetValueIndex;
 	self->_getValueCount = _CompositeVC_GetValueCount;
 	self->_getValue = _CompositeVC_GetValue;
+	self->_apply = _VariableCondition_Apply;
 	
 	_Stg_Class_Init( (Stg_Class*)self );
 	_Stg_Object_Init( (Stg_Object*)self, name, NON_GLOBAL );
@@ -195,6 +198,7 @@ CompositeVC* _CompositeVC_New(
 		VariableCondition_GetValueIndexFunc*		_getValueIndex,
 		VariableCondition_GetValueCountFunc*		_getValueCount,
 		VariableCondition_GetValueFunc*			_getValue,
+		VariableCondition_ApplyFunc*			_apply, 
 		Variable_Register*				variable_Register,
 		ConditionFunction_Register*			conFunc_Register,
 		Dictionary*					dictionary,
@@ -227,6 +231,7 @@ CompositeVC* _CompositeVC_New(
 		_getValueIndex, 
 		_getValueCount, 
 		_getValue, 
+		_apply, 
 		variable_Register, 
 		conFunc_Register,
 		dictionary );

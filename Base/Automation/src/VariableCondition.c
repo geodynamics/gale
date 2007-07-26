@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: VariableCondition.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
+** $Id: VariableCondition.c 4153 2007-07-26 02:25:22Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -76,6 +76,7 @@ VariableCondition* _VariableCondition_New(
 			VariableCondition_GetValueIndexFunc*		_getValueIndex,
 			VariableCondition_GetValueCountFunc*		_getValueCount,
 			VariableCondition_GetValueFunc*			_getValue,
+			VariableCondition_ApplyFunc*			_apply, 
 			Variable_Register*				variable_Register,
 			ConditionFunction_Register*			conFunc_Register,
 			Dictionary*					dictionary )
@@ -85,7 +86,7 @@ VariableCondition* _VariableCondition_New(
 	/* Allocate memory/General info */
 	assert(_sizeOfSelf >= sizeof(VariableCondition));
 	self = (VariableCondition*)_Stg_Component_New( _sizeOfSelf, type, _delete, _print, _copy,  _defaultConstructor, 
-												_construct, _build, _initialise, _execute, _destroy, name, NON_GLOBAL );
+						       _construct, _build, _initialise, _execute, _destroy, name, NON_GLOBAL );
 	
 	/* Virtual info */
 	self->_buildSelf = _buildSelf;
@@ -97,6 +98,7 @@ VariableCondition* _VariableCondition_New(
 	self->_getValueIndex = _getValueIndex;
 	self->_getValueCount = _getValueCount;
 	self->_getValue = _getValue;
+	self->_apply = _apply;
 	
 	/* Stg_Class info */
 	if( initFlag ){
@@ -338,9 +340,7 @@ void* _VariableCondition_Copy( void* variableCondition, void* dest, Bool deep, N
 ** Build functions
 */
 
-void _VariableCondition_Construct( void* variableCondition, Stg_ComponentFactory* cf, void* data )
-{
-	
+void _VariableCondition_Construct( void* variableCondition, Stg_ComponentFactory* cf, void* data ) {
 }
 
 void _VariableCondition_Build( void* variableCondition, void* data ) {
@@ -430,16 +430,23 @@ void _VariableCondition_Destroy( void* variableCondition, void* data )
 {
 	
 }
-/*--------------------------------------------------------------------------------------------------------------------------
-** Functions
-*/
 
-void VariableCondition_Apply( void* variableCondition, void* context ) {
+void _VariableCondition_Apply( void* variableCondition, void* context ) {
 	VariableCondition*	self = (VariableCondition*)variableCondition;
 	Index			i;
 	
 	for (i = 0; i < self->indexCount; i++)
 		VariableCondition_ApplyToIndex(variableCondition, self->indexTbl[i], context);
+}
+
+
+/*--------------------------------------------------------------------------------------------------------------------------
+** Functions
+*/
+
+void VariableCondition_Apply( void* variableCondition, void* context ) {
+	assert( variableCondition );
+	((VariableCondition*)variableCondition)->_apply( variableCondition, context );
 }
 
 

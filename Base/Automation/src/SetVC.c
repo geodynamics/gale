@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SetVC.c 3881 2006-10-26 03:14:19Z KathleenHumble $
+** $Id: SetVC.c 4153 2007-07-26 02:25:22Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -95,6 +95,7 @@ SetVC*	SetVC_New(
 		_SetVC_GetValueIndex, 
 		_SetVC_GetValueCount, 
 		_SetVC_GetValue,
+		_VariableCondition_Apply, 
 		_dictionaryEntryName,
 		variable_Register, 
 		conFunc_Register,
@@ -126,6 +127,7 @@ SetVC* SetVC_DefaultNew( Name name )
 		_SetVC_GetValueIndex, 
 		_SetVC_GetValueCount, 
 		_SetVC_GetValue,
+		_VariableCondition_Apply, 
 		NULL,
 		NULL/*variable_Register*/, 
 		NULL/*conFunc_Register*/,
@@ -161,6 +163,7 @@ void SetVC_Init(
 	self->_getValueIndex = _SetVC_GetValueIndex;
 	self->_getValueCount = _SetVC_GetValueCount;
 	self->_getValue = _SetVC_GetValue;
+	self->_apply = _VariableCondition_Apply;
 	
 	_Stg_Class_Init( (Stg_Class*)self );
 	_Stg_Object_Init( (Stg_Object*)self, name, NON_GLOBAL );
@@ -196,6 +199,7 @@ SetVC* _SetVC_New(
 		VariableCondition_GetValueIndexFunc*		_getValueIndex,
 		VariableCondition_GetValueCountFunc*		_getValueCount,
 		VariableCondition_GetValueFunc*			_getValue,
+		VariableCondition_ApplyFunc*			_apply, 
 		Name						_dictionaryEntryName, 
 		Variable_Register*				variable_Register, 
 		ConditionFunction_Register*			conFunc_Register,
@@ -228,6 +232,7 @@ SetVC* _SetVC_New(
 		_getValueIndex, 
 		_getValueCount, 
 		_getValue,
+		_apply, 
 		variable_Register, 
 		conFunc_Register,
 		dictionary );

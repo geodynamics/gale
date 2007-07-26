@@ -94,6 +94,7 @@ InnerWallVC*	InnerWallVC_DefaultNew( Name name )
 		_InnerWallVC_GetValueIndex, 
 		_InnerWallVC_GetValueCount, 
 		_InnerWallVC_GetValue,
+		_VariableCondition_Apply, 
 		NULL,
 		NULL, 
 		NULL, 
@@ -132,6 +133,7 @@ InnerWallVC*	InnerWallVC_New(
 		_InnerWallVC_GetValueIndex, 
 		_InnerWallVC_GetValueCount, 
 		_InnerWallVC_GetValue,
+		_VariableCondition_Apply, 
 		_dictionaryEntryName,
 		variable_Register, 
 		conFunc_Register, 
@@ -173,6 +175,7 @@ void InnerWallVC_Init(
 	self->_getValueIndex = _InnerWallVC_GetValueIndex;
 	self->_getValueCount = _InnerWallVC_GetValueCount;
 	self->_getValue = _InnerWallVC_GetValue;
+	self->_apply = _VariableCondition_Apply;
 	
 	_Stg_Class_Init( (Stg_Class*)self );
 	_Stg_Object_Init( (Stg_Object*)self, name, NON_GLOBAL );
@@ -207,6 +210,7 @@ InnerWallVC* _InnerWallVC_New(
 	VariableCondition_GetValueIndexFunc*		_getValueIndex,
 	VariableCondition_GetValueCountFunc*		_getValueCount,
 	VariableCondition_GetValueFunc*			_getValue,
+	VariableCondition_ApplyFunc*			_apply, 
 	Name						_dictionaryEntryName, 
 	Variable_Register*				variable_Register, 
 	ConditionFunction_Register*			conFunc_Register, 
@@ -240,6 +244,7 @@ InnerWallVC* _InnerWallVC_New(
 		_getValueIndex, 
 		_getValueCount, 
 		_getValue, 
+		_apply, 
 		variable_Register, 
 		conFunc_Register,
 		dictionary );

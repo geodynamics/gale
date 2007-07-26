@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Init.c 3881 2006-10-26 03:14:19Z KathleenHumble $
+** $Id: Init.c 4153 2007-07-26 02:25:22Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -47,6 +47,7 @@
 #include "VariableCondition.h"
 #include "SetVC.h"
 #include "CompositeVC.h"
+#include "DynamicVC.h"
 #include "ConditionFunction.h"
 #include "VariableAllVC.h"
 #include "HierarchyTable.h"
@@ -90,6 +91,8 @@ Bool BaseAutomation_Init( int* argc, char** argv[] )
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), CompositeVC_Type, "0", (Stg_Component_DefaultConstructorFunction*)CompositeVC_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), SetVC_Type, "0", (Stg_Component_DefaultConstructorFunction*)SetVC_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), VariableAllVC_Type, "0", (Stg_Component_DefaultConstructorFunction*)VariableAllVC_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), DynamicVC_Type, "0", 
+				   (Stg_Component_DefaultConstructorFunction*)DynamicVC_DefaultNew );
 
 	/** Register Parents for All Classes */
 	RegisterParent( Stg_ComponentFactory_Type,           Stg_Class_Type );
@@ -97,6 +100,7 @@ Bool BaseAutomation_Init( int* argc, char** argv[] )
 	RegisterParent( Stg_Component_Type,                  Stg_Object_Type );
 	RegisterParent( VariableCondition_Type,          Stg_Component_Type );
 	RegisterParent( CompositeVC_Type,                VariableCondition_Type );
+	RegisterParent( DynamicVC_Type,                VariableCondition_Type );
 	RegisterParent( ConditionFunction_Type,          Stg_Class_Type );
 	RegisterParent( ConditionFunction_Register_Type, Stg_Class_Type );
 	RegisterParent( HierarchyTable_Type,             HashTable_Type );

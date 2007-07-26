@@ -97,6 +97,7 @@ CornerVC*	CornerVC_DefaultNew( Name name )
 		_CornerVC_GetValueIndex, 
 		_CornerVC_GetValueCount, 
 		_CornerVC_GetValue,
+		_VariableCondition_Apply, 
 		NULL,
 		NULL, 
 		NULL, 
@@ -135,6 +136,7 @@ CornerVC*	CornerVC_New(
 		_CornerVC_GetValueIndex, 
 		_CornerVC_GetValueCount, 
 		_CornerVC_GetValue,
+		_VariableCondition_Apply, 
 		_dictionaryEntryName,
 		variable_Register, 
 		conFunc_Register, 
@@ -176,6 +178,7 @@ void CornerVC_Init(
 	self->_getValueIndex =       _CornerVC_GetValueIndex;
 	self->_getValueCount =       _CornerVC_GetValueCount;
 	self->_getValue =            _CornerVC_GetValue;
+	self->_apply = _VariableCondition_Apply;
 	
    _Stg_Class_Init( (Stg_Class*)self );
    _Stg_Object_Init( (Stg_Object*)self, name, NON_GLOBAL );
@@ -210,6 +213,7 @@ CornerVC* _CornerVC_New(
    VariableCondition_GetValueIndexFunc*        _getValueIndex,
    VariableCondition_GetValueCountFunc*        _getValueCount,
    VariableCondition_GetValueFunc*             _getValue,
+   VariableCondition_ApplyFunc*			_apply, 
    Name                                        _dictionaryEntryName, 
    Variable_Register*                          variable_Register, 
    ConditionFunction_Register*                 conFunc_Register, 
@@ -243,6 +247,7 @@ CornerVC* _CornerVC_New(
       _getValueIndex, 
       _getValueCount, 
       _getValue, 
+      _apply, 
       variable_Register, 
       conFunc_Register,
       dictionary );

@@ -32,7 +32,7 @@
 **
 ** Comments:
 **
-** $Id: ShapeVC.h 3851 2006-10-12 08:57:22Z SteveQuenette $
+** $Id: ShapeVC.h 4153 2007-07-26 02:25:22Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -104,6 +104,7 @@
 		VariableCondition_GetValueIndexFunc*        _getValueIndex,
 		VariableCondition_GetValueCountFunc*        _getValueCount,
 		VariableCondition_GetValueFunc*             _getValue,
+		VariableCondition_ApplyFunc*			_apply, 
 		Name                                        name );
 	
 	void _ShapeVC_Init(

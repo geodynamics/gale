@@ -35,7 +35,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: types.h 4129 2007-05-31 01:26:41Z LukeHodkinson $
+** $Id: types.h 4153 2007-07-26 02:25:22Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -62,6 +62,7 @@ typedef struct Comm Comm;
 	typedef struct _VariableCondition		VariableCondition;
 	typedef struct _SetVC				SetVC;
 	typedef struct _CompositeVC			CompositeVC;
+	typedef struct DynamicVC			DynamicVC;
 	typedef struct _VariableCondition_Register	VariableCondition_Register;
 	typedef struct _ConditionFunction		ConditionFunction;
 	typedef struct _ConditionFunction_Register	ConditionFunction_Register;

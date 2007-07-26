@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ShapeVC.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: ShapeVC.c 4153 2007-07-26 02:25:22Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -93,6 +93,7 @@ ShapeVC* _ShapeVC_New(
 		VariableCondition_GetValueIndexFunc*        _getValueIndex,
 		VariableCondition_GetValueCountFunc*        _getValueCount,
 		VariableCondition_GetValueFunc*             _getValue,
+		VariableCondition_ApplyFunc*			_apply, 
 		Name                                        name  )
 {
 	ShapeVC*	self;
@@ -122,6 +123,7 @@ ShapeVC* _ShapeVC_New(
 		_getValueIndex, 
 		_getValueCount, 
 		_getValue, 
+		_apply, 
 		NULL, 
 		NULL,
 		NULL );
@@ -307,6 +309,7 @@ void* _ShapeVC_DefaultNew( Name name ) {
 		_ShapeVC_GetValueIndex, 
 		_ShapeVC_GetValueCount, 
 		_ShapeVC_GetValue,
+		_VariableCondition_Apply, 
 		name );
 }
 

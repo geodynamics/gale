@@ -34,7 +34,7 @@
 ** <b>Comments:</b>
 **	None.
 **
-** $Id: Automation.h 4098 2007-05-16 01:00:35Z LukeHodkinson $
+** $Id: Automation.h 4153 2007-07-26 02:25:22Z LukeHodkinson $
 **
 **/
 
@@ -61,6 +61,7 @@
 	#include "CompositeVC.h"
 	#include "SetVC.h"
 	#include "VariableAllVC.h"
+	#include "DynamicVC.h"
 	#include "HierarchyTable.h"
 	#include "CallGraph.h"
 	#include "Init.h"

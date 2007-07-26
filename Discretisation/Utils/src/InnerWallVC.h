@@ -119,6 +119,7 @@
 						VariableCondition_GetValueIndexFunc*		_getValueIndex,
 						VariableCondition_GetValueCountFunc*		_getValueCount,
 						VariableCondition_GetValueFunc*			_getValue,
+						VariableCondition_ApplyFunc*			_apply, 
 						Name						_dictionaryEntryName, 
 						Variable_Register*				variable_Register, 
 						ConditionFunction_Register*			conFunc_Register, 

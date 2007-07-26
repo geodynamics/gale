@@ -98,6 +98,7 @@ VariableAllVC*	VariableAllVC_New(
 		_VariableAllVC_GetValueIndex, 
 		_VariableAllVC_GetValueCount, 
 		_VariableAllVC_GetValue,
+		_VariableCondition_Apply, 
 		_dictionaryEntryName,
 		variable_Register, 
 		conFunc_Register, 
@@ -130,6 +131,7 @@ VariableAllVC*	VariableAllVC_DefaultNew( Name name )
 		_VariableAllVC_GetValueIndex, 
 		_VariableAllVC_GetValueCount, 
 		_VariableAllVC_GetValue,
+		_VariableCondition_Apply, 
 		NULL,
 		NULL/*variable_Register*/, 
 		NULL/*conFunc_Register*/, 
@@ -167,6 +169,7 @@ void VariableAllVC_Init(
 	self->_getValueIndex = _VariableAllVC_GetValueIndex;
 	self->_getValueCount = _VariableAllVC_GetValueCount;
 	self->_getValue = _VariableAllVC_GetValue;
+	self->_apply = _VariableCondition_Apply;
 	
 	_Stg_Class_Init( (Stg_Class*)self );
 	_Stg_Object_Init( (Stg_Object*)self, name, NON_GLOBAL );
@@ -201,6 +204,7 @@ VariableAllVC* _VariableAllVC_New(
 		VariableCondition_GetValueIndexFunc*		_getValueIndex,
 		VariableCondition_GetValueCountFunc*		_getValueCount,
 		VariableCondition_GetValueFunc*			_getValue,
+		VariableCondition_ApplyFunc*			_apply, 
 		Name									_dictionaryEntryName, 
 		Variable_Register*				variable_Register, 
 		ConditionFunction_Register*			conFunc_Register,
@@ -234,6 +238,7 @@ VariableAllVC* _VariableAllVC_New(
 		_getValueIndex, 
 		_getValueCount, 
 		_getValue,
+		_apply, 
 		variable_Register, 
 		conFunc_Register,
 		dictionary );

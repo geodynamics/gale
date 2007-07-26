@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: WallVC.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
+** $Id: WallVC.c 4153 2007-07-26 02:25:22Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -94,6 +94,7 @@ WallVC*	WallVC_DefaultNew( Name name )
 		_WallVC_GetValueIndex, 
 		_WallVC_GetValueCount, 
 		_WallVC_GetValue,
+		_VariableCondition_Apply, 
 		NULL,
 		NULL, 
 		NULL, 
@@ -132,6 +133,7 @@ WallVC*	WallVC_New(
 		_WallVC_GetValueIndex, 
 		_WallVC_GetValueCount, 
 		_WallVC_GetValue,
+		_VariableCondition_Apply, 
 		_dictionaryEntryName,
 		variable_Register, 
 		conFunc_Register, 
@@ -173,6 +175,7 @@ void WallVC_Init(
 	self->_getValueIndex = _WallVC_GetValueIndex;
 	self->_getValueCount = _WallVC_GetValueCount;
 	self->_getValue = _WallVC_GetValue;
+	self->_apply = _VariableCondition_Apply;
 	
 	_Stg_Class_Init( (Stg_Class*)self );
 	_Stg_Object_Init( (Stg_Object*)self, name, NON_GLOBAL );
@@ -207,6 +210,7 @@ WallVC* _WallVC_New(
 	VariableCondition_GetValueIndexFunc*		_getValueIndex,
 	VariableCondition_GetValueCountFunc*		_getValueCount,
 	VariableCondition_GetValueFunc*			_getValue,
+	VariableCondition_ApplyFunc*			_apply, 
 	Name						_dictionaryEntryName, 
 	Variable_Register*				variable_Register, 
 	ConditionFunction_Register*			conFunc_Register, 
@@ -240,6 +244,7 @@ WallVC* _WallVC_New(
 		_getValueIndex, 
 		_getValueCount, 
 		_getValue, 
+		_apply, 
 		variable_Register, 
 		conFunc_Register,
 		dictionary );
