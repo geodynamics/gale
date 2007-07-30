@@ -11,7 +11,7 @@ modName := $(shell basename `pwd` )
 XMLS_TARGET_DIR = ${EXAMPLES_DIR}
 XMLS := ${wildcard *.xml}
 
-subdirs := src ScienceBenchmarkTests
+subdirs := src 
 
 # obtain defaults for required variables according to system and project location, and then run the build.
 include ${PROJ_ROOT}/Makefile.vmake
