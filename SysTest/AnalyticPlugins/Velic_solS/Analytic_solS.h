@@ -9,7 +9,7 @@
 		double _eta;
 	} Velic_solS;
 
-	Index ExperimentalUnderworld_Velic_solS_Register( PluginsManager* pluginsManager );
+	Index Underworld_Velic_solS_Register( PluginsManager* pluginsManager );
 	void* _Velic_solS_DefaultNew( Name name );
 	void _Velic_solS_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data );
 	void _Velic_solS_Init( Velic_solS* self, double eta, int _n );

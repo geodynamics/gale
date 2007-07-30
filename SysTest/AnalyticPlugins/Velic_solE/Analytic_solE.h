@@ -17,7 +17,7 @@
 		int n;
 	} Velic_solE;
 
-	Index ExperimentalUnderworld_Velic_solE_Register( PluginsManager* pluginsManager );
+	Index Underworld_Velic_solE_Register( PluginsManager* pluginsManager );
 	void* _Velic_solE_DefaultNew( Name name );
 	void _Velic_solE_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data );
 	void _Velic_solE_Init( Velic_solE* self, double sigma, double etaA, double etaB, double zc, double km, double n );

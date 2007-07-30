@@ -49,7 +49,7 @@
 #include<StgFEM/StgFEM.h>
 #include "Analytic_solB.h"
 
-const Type Velic_solB_Type = "ExperimentalUnderworld_Velic_solB";
+const Type Velic_solB_Type = "Underworld_Velic_solB";
 
 void Velic_solB_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* pressure ) {
 	Velic_solB* self = (Velic_solB*) analyticSolution;
@@ -175,6 +175,6 @@ void* _Velic_solB_DefaultNew( Name name ) {
 			name );
 }
 
-Index ExperimentalUnderworld_Velic_solB_Register( PluginsManager* pluginsManager ) {
+Index Underworld_Velic_solB_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( pluginsManager, Velic_solB_Type, "0", _Velic_solB_DefaultNew );
 }

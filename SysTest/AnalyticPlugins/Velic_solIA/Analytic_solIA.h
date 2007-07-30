@@ -15,7 +15,7 @@
 		double x0;
 	} Velic_solIA;
 
-	Index ExperimentalUnderworld_Velic_solIA_Register( PluginsManager* pluginsManager );
+	Index Underworld_Velic_solIA_Register( PluginsManager* pluginsManager );
 	void* _Velic_solIA_DefaultNew( Name name );
 	void _Velic_solIA_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data );
 	void _Velic_solIA_Init( Velic_solIA* self, double sigma, double B, double dx, double x0 );

@@ -48,7 +48,7 @@
 
 #include "Analytic_solCx.h"
 
-const Type ExperimentalUnderworld_Velic_solCx_Type = "ExperimentalUnderworld_Velic_solCx";
+const Type Underworld_Velic_solCx_Type = "Underworld_Velic_solCx";
 
 void Velic_solCx_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* pressure ) {
 	Velic_solCx* self = (Velic_solCx*) analyticSolution;
@@ -156,7 +156,7 @@ void _Velic_solCx_Construct( void* analyticSolution, Stg_ComponentFactory* cf, v
 void* _Velic_solCx_DefaultNew( Name name ) {
 	return _AnalyticSolution_New(
 			sizeof(Velic_solCx),
-			ExperimentalUnderworld_Velic_solCx_Type,
+			Underworld_Velic_solCx_Type,
 			_AnalyticSolution_Delete,
 			_AnalyticSolution_Print,
 			_AnalyticSolution_Copy,
@@ -169,6 +169,6 @@ void* _Velic_solCx_DefaultNew( Name name ) {
 			name );
 }
 
-Index ExperimentalUnderworld_Velic_solCx_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, ExperimentalUnderworld_Velic_solCx_Type, "0", _Velic_solCx_DefaultNew );
+Index Underworld_Velic_solCx_Register( PluginsManager* pluginsManager ) {
+	return PluginsManager_Submit( pluginsManager, Underworld_Velic_solCx_Type, "0", _Velic_solCx_DefaultNew );
 }

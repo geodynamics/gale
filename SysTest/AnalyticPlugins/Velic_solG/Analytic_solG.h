@@ -17,7 +17,7 @@
 	       	double zc;
 	} Velic_solG;
 
-	Index ExperimentalUnderworld_Velic_solG_Register( PluginsManager* pluginsManager );
+	Index Underworld_Velic_solG_Register( PluginsManager* pluginsManager );
 	void* _Velic_solG_DefaultNew( Name name );
 	void _Velic_solG_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data );
 	void _Velic_solG_Init( Velic_solG* self, double sigma, double etaA, double etaB, double dx, double x0, double zc );

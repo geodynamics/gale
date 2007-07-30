@@ -11,7 +11,7 @@
 		double B;
 	} Velic_solKx;
 
-	Index ExperimentalUnderworld_Velic_solKx_Register( PluginsManager* pluginsManager );
+	Index Underworld_Velic_solKx_Register( PluginsManager* pluginsManager );
 	void* _Velic_solKx_DefaultNew( Name name );
 	void _Velic_solKx_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data );
 	void _Velic_solKx_Init( Velic_solKx* self, double sigma, double _m, double B, int n );

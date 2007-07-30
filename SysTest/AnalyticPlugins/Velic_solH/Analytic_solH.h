@@ -15,7 +15,7 @@
 	       	double dy;
 	} Velic_solH;
 
-	Index ExperimentalUnderworld_Velic_solH_Register( PluginsManager* pluginsManager );
+	Index Underworld_Velic_solH_Register( PluginsManager* pluginsManager );
 	void* _Velic_solH_DefaultNew( Name name );
 	void _Velic_solH_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data );
 	void _Velic_solH_Init( Velic_solH* self, double sigma, double eta, double dx, double dy );

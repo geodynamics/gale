@@ -15,7 +15,7 @@
 		double x0;  
 	} Velic_solCA;
 
-	Index ExperimentalUnderworld_Velic_solCA_Register( PluginsManager* pluginsManager );
+	Index Underworld_Velic_solCA_Register( PluginsManager* pluginsManager );
 	void* _Velic_solCA_DefaultNew( Name name );
 	void _Velic_solCA_Init( Velic_solCA* self, double sigma, double eta, double dx, double x0 ); 
 	void _Velic_solCA_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data );

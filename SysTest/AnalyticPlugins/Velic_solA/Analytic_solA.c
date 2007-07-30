@@ -160,6 +160,6 @@ void* _Velic_solA_DefaultNew( Name name ) {
 			name );
 }
 
-Index ExperimentalUnderworld_Velic_solA_Register( PluginsManager* pluginsManager ) {
+Index Underworld_Velic_solA_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( pluginsManager, Velic_solA_Type, "0", _Velic_solA_DefaultNew );
 }

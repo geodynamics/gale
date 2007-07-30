@@ -43,7 +43,7 @@
 
 #include "Analytic_solH.h"
 
-const Type Velic_solH_Type = "ExperimentalUnderworld_Velic_solH";
+const Type Velic_solH_Type = "Underworld_Velic_solH";
 
 void Velic_solH_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* pressure ) {
 	Velic_solH* self = (Velic_solH*) analyticSolution;
@@ -147,6 +147,6 @@ void* _Velic_solH_DefaultNew( Name name ) {
 			name );
 }
 
-Index ExperimentalUnderworld_Velic_solH_Register( PluginsManager* pluginsManager ) {
+Index Underworld_Velic_solH_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( pluginsManager, Velic_solH_Type, "0", _Velic_solH_DefaultNew );
 }
