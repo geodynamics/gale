@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ShapeVC.c 4153 2007-07-26 02:25:22Z LukeHodkinson $
+** $Id: MeshShapeVC.c 4160 2007-07-30 06:17:06Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -35,28 +35,28 @@
 #include <Discretisation/Mesh/Mesh.h>
 
 #include "types.h"
-#include "ShapeVC.h"
+#include "MeshShapeVC.h"
 
 #include <assert.h>
 #include <string.h>
 
-const Type ShapeVC_Type = "ShapeVC";
-const Name defaultShapeVCName = "defaultShapeVCName";
+const Type MeshShapeVC_Type = "MeshShapeVC";
+const Name defaultMeshShapeVCName = "defaultMeshShapeVCName";
 
 /*-----------------------------------------------------------------------------------------------------------------
 ** Constructor
 */
-VariableCondition* ShapeVC_Factory(
+VariableCondition* MeshShapeVC_Factory(
 		Variable_Register*                          variable_Register, 
 		ConditionFunction_Register*                 conFunc_Register, 
 		Dictionary*                                 dictionary,
 		void*                                       data )
 {
 	return (VariableCondition*) 
-		ShapeVC_New( defaultShapeVCName, NULL, variable_Register, conFunc_Register, dictionary, (Mesh*)data );
+		MeshShapeVC_New( defaultMeshShapeVCName, NULL, variable_Register, conFunc_Register, dictionary, (Mesh*)data );
 }
 
-ShapeVC* ShapeVC_New(
+MeshShapeVC* MeshShapeVC_New(
 		Name                                        name,
 		Name                                        _dictionaryEntryName, 
 		Variable_Register*                          variable_Register, 
@@ -64,15 +64,15 @@ ShapeVC* ShapeVC_New(
 		Dictionary*	                                dictionary,
 		void*                                       _mesh )
 {
-	ShapeVC* self = (ShapeVC*) _ShapeVC_DefaultNew( name );
+	MeshShapeVC* self = (MeshShapeVC*) _MeshShapeVC_DefaultNew( name );
 
 	_VariableCondition_Init( self, variable_Register, conFunc_Register, dictionary );
-	_ShapeVC_Init( self, _dictionaryEntryName, _mesh );
+	_MeshShapeVC_Init( self, _dictionaryEntryName, _mesh );
 
 	return self;
 }
 
-ShapeVC* _ShapeVC_New( 
+MeshShapeVC* _MeshShapeVC_New( 
 		SizeT                                       _sizeOfSelf, 
 		Type                                        type,
 		Stg_Class_DeleteFunction*                   _delete,
@@ -96,11 +96,11 @@ ShapeVC* _ShapeVC_New(
 		VariableCondition_ApplyFunc*			_apply, 
 		Name                                        name  )
 {
-	ShapeVC*	self;
+	MeshShapeVC*	self;
 	
 	/* Allocate memory/General info */
-	assert(_sizeOfSelf >= sizeof(ShapeVC));
-	self = (ShapeVC*)_VariableCondition_New(
+	assert(_sizeOfSelf >= sizeof(MeshShapeVC));
+	self = (MeshShapeVC*)_VariableCondition_New(
 		_sizeOfSelf, 
 		type, 
 		_delete, 
@@ -134,12 +134,12 @@ ShapeVC* _ShapeVC_New(
 }
 
 
-void _ShapeVC_Init(
+void _MeshShapeVC_Init(
 		void*                                       variableCondition, 
 		Name                                        _dictionaryEntryName, 
 		void*                                       _mesh )
 {
-	ShapeVC*			self = (ShapeVC*) variableCondition;
+	MeshShapeVC*			self = (MeshShapeVC*) variableCondition;
 
 	self->isConstructed        = True;
 	self->_dictionaryEntryName = _dictionaryEntryName;
@@ -156,8 +156,8 @@ void _ShapeVC_Init(
 */
 
 
-void _ShapeVC_Delete(void* variableCondition) {
-	ShapeVC*	self = (ShapeVC*)variableCondition;
+void _MeshShapeVC_Delete(void* variableCondition) {
+	MeshShapeVC*	self = (MeshShapeVC*)variableCondition;
 	
 	if ( self->_entryTbl ) 
 		Memory_Free(self->_entryTbl);
@@ -170,13 +170,13 @@ void _ShapeVC_Delete(void* variableCondition) {
 }
 
 
-void _ShapeVC_Print(void* variableCondition, Stream* stream) {
-	ShapeVC*                self = (ShapeVC*)variableCondition;
-	ShapeVC_Entry_Index     entry_I;
+void _MeshShapeVC_Print(void* variableCondition, Stream* stream) {
+	MeshShapeVC*                self = (MeshShapeVC*)variableCondition;
+	MeshShapeVC_Entry_Index     entry_I;
 	Index                   array_I;
 	
 	/* General info */
-	Journal_Printf( stream, "ShapeVC (ptr): %p\n", self);
+	Journal_Printf( stream, "MeshShapeVC (ptr): %p\n", self);
 	
 	/* Virtual info */
 	
@@ -248,9 +248,9 @@ void _ShapeVC_Print(void* variableCondition, Stream* stream) {
 }
 
 
-void* _ShapeVC_Copy( void* variableCondition, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
-	ShapeVC*        self           = (ShapeVC*)variableCondition;
-	ShapeVC*        newShapeVC;
+void* _MeshShapeVC_Copy( void* variableCondition, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
+	MeshShapeVC*        self           = (MeshShapeVC*)variableCondition;
+	MeshShapeVC*        newMeshShapeVC;
 	PtrMap*         map            = ptrMap;
 	Bool            ownMap         = False;
 	
@@ -259,79 +259,79 @@ void* _ShapeVC_Copy( void* variableCondition, void* dest, Bool deep, Name nameEx
 		ownMap = True;
 	}
 	
-	newShapeVC = (ShapeVC*)_VariableCondition_Copy( self, dest, deep, nameExt, map );
+	newMeshShapeVC = (MeshShapeVC*)_VariableCondition_Copy( self, dest, deep, nameExt, map );
 	
-	newShapeVC->_dictionaryEntryName = self->_dictionaryEntryName;
-	newShapeVC->_shape = self->_shape;
-	newShapeVC->_entryCount = self->_entryCount;
+	newMeshShapeVC->_dictionaryEntryName = self->_dictionaryEntryName;
+	newMeshShapeVC->_shape = self->_shape;
+	newMeshShapeVC->_entryCount = self->_entryCount;
 	
 	if( deep ) {
-		newShapeVC->_mesh = (Mesh*)Stg_Class_Copy( self->_mesh, NULL, deep, nameExt, map );
+		newMeshShapeVC->_mesh = (Mesh*)Stg_Class_Copy( self->_mesh, NULL, deep, nameExt, map );
 		
-		if( (newShapeVC->_entryTbl = PtrMap_Find( map, self->_entryTbl )) == NULL && self->_entryTbl ) {
-			newShapeVC->_entryTbl = Memory_Alloc_Array( ShapeVC_Entry, newShapeVC->_entryCount, "ShapeVC->_entryTbl");
-			memcpy( newShapeVC->_entryTbl, self->_entryTbl, sizeof(ShapeVC_Entry) * newShapeVC->_entryCount );
-			PtrMap_Append( map, newShapeVC->_entryTbl, self->_entryTbl );
+		if( (newMeshShapeVC->_entryTbl = PtrMap_Find( map, self->_entryTbl )) == NULL && self->_entryTbl ) {
+			newMeshShapeVC->_entryTbl = Memory_Alloc_Array( MeshShapeVC_Entry, newMeshShapeVC->_entryCount, "MeshShapeVC->_entryTbl");
+			memcpy( newMeshShapeVC->_entryTbl, self->_entryTbl, sizeof(MeshShapeVC_Entry) * newMeshShapeVC->_entryCount );
+			PtrMap_Append( map, newMeshShapeVC->_entryTbl, self->_entryTbl );
 		}
 	}
 	else {
-		newShapeVC->_mesh = self->_mesh;
-		newShapeVC->_entryTbl = self->_entryTbl;
+		newMeshShapeVC->_mesh = self->_mesh;
+		newMeshShapeVC->_entryTbl = self->_entryTbl;
 	}
 	
 	if( ownMap ) {
 		Stg_Class_Delete( map );
 	}
 	
-	return (void*)newShapeVC;
+	return (void*)newMeshShapeVC;
 }
 	
 /****************** Stg_Component Virtual Functions ******************/
-void* _ShapeVC_DefaultNew( Name name ) {
-	return (void*) _ShapeVC_New(
-		sizeof(ShapeVC), 
-		ShapeVC_Type, 
-		_ShapeVC_Delete, 
-		_ShapeVC_Print, 
-		_ShapeVC_Copy,
-		_ShapeVC_DefaultNew,
-		_ShapeVC_Construct,	
-		_ShapeVC_Build,
+void* _MeshShapeVC_DefaultNew( Name name ) {
+	return (void*) _MeshShapeVC_New(
+		sizeof(MeshShapeVC), 
+		MeshShapeVC_Type, 
+		_MeshShapeVC_Delete, 
+		_MeshShapeVC_Print, 
+		_MeshShapeVC_Copy,
+		_MeshShapeVC_DefaultNew,
+		_MeshShapeVC_Construct,	
+		_MeshShapeVC_Build,
 		_VariableCondition_Initialise,
 		_VariableCondition_Execute,
 		_VariableCondition_Destroy,
-		_ShapeVC_BuildSelf, 
-		_ShapeVC_PrintConcise,
-		_ShapeVC_ReadDictionary,
-		_ShapeVC_GetSet, 
-		_ShapeVC_GetVariableCount, 
-		_ShapeVC_GetVariableIndex, 
-		_ShapeVC_GetValueIndex, 
-		_ShapeVC_GetValueCount, 
-		_ShapeVC_GetValue,
+		_MeshShapeVC_BuildSelf, 
+		_MeshShapeVC_PrintConcise,
+		_MeshShapeVC_ReadDictionary,
+		_MeshShapeVC_GetSet, 
+		_MeshShapeVC_GetVariableCount, 
+		_MeshShapeVC_GetVariableIndex, 
+		_MeshShapeVC_GetValueIndex, 
+		_MeshShapeVC_GetValueCount, 
+		_MeshShapeVC_GetValue,
 		_VariableCondition_Apply, 
 		name );
 }
 
-void _ShapeVC_Construct( void* variableCondition, Stg_ComponentFactory* cf, void* data ) {
+void _MeshShapeVC_Construct( void* variableCondition, Stg_ComponentFactory* cf, void* data ) {
 }
 
-void _ShapeVC_Build(  void* variableCondition, void* data ) {
-	ShapeVC*			self = (ShapeVC*)variableCondition;
+void _MeshShapeVC_Build(  void* variableCondition, void* data ) {
+	MeshShapeVC*			self = (MeshShapeVC*)variableCondition;
 
-	_ShapeVC_BuildSelf( self, data );
+	_MeshShapeVC_BuildSelf( self, data );
 	_VariableCondition_Build( self, data );
 }
 	
 /****************** VariableCondition Virtual Functions ******************/
-void _ShapeVC_BuildSelf(  void* variableCondition, void* data /* for build phase */ ) {
-	ShapeVC*         self    = (ShapeVC*)variableCondition;
+void _MeshShapeVC_BuildSelf(  void* variableCondition, void* data /* for build phase */ ) {
+	MeshShapeVC*         self    = (MeshShapeVC*)variableCondition;
 	AbstractContext* context = (AbstractContext*) data;
 
 	assert( context && Stg_Class_IsInstance( context, AbstractContext_Type ) );
 	assert( self->shapeName );
 	Journal_Firewall( strlen( self->shapeName ) > 0, Journal_MyStream( Error_Type, self ),
-			"You need to fill out the 'Shape' dictionary entry for this ShapeVC.\n" );
+			"You need to fill out the 'Shape' dictionary entry for this MeshShapeVC.\n" );
 	assert( self->_mesh );
 
 	self->_shape =  Stg_ComponentFactory_ConstructByName(  context->CF,  self->shapeName, Stg_Shape,  True, 0 /* dummy */  ) ;
@@ -340,18 +340,18 @@ void _ShapeVC_BuildSelf(  void* variableCondition, void* data /* for build phase
 	Stg_Component_Build( self->_shape, data, False );
 }
 
-void _ShapeVC_PrintConcise( void* variableCondition, Stream* stream ) {
-	ShapeVC* self = (ShapeVC*) variableCondition;
+void _MeshShapeVC_PrintConcise( void* variableCondition, Stream* stream ) {
+	MeshShapeVC* self = (MeshShapeVC*) variableCondition;
 	
 	Journal_Printf( stream, "\ttype: %s, Shape: %s '%s'", self->type, self->_shape->type, self->_shape->name );
 }
 
-void _ShapeVC_ReadDictionary( void* variableCondition, void* dictionary ) {
-	ShapeVC*                  self = (ShapeVC*)variableCondition;
+void _MeshShapeVC_ReadDictionary( void* variableCondition, void* dictionary ) {
+	MeshShapeVC*                  self = (MeshShapeVC*)variableCondition;
 	Dictionary_Entry_Value*   vcDictVal;
 	Dictionary_Entry_Value    _vcDictVal;
 	Dictionary_Entry_Value*   varsVal;
-	ShapeVC_Entry_Index	      entry_I;
+	MeshShapeVC_Entry_Index	      entry_I;
 	
 	/* Find dictionary entry */
 	if (self->_dictionaryEntryName)
@@ -368,7 +368,7 @@ void _ShapeVC_ReadDictionary( void* variableCondition, void* dictionary ) {
 
 		/* Obtain the variable entries */
 		self->_entryCount = Dictionary_Entry_Value_GetCount(Dictionary_Entry_Value_GetMember(vcDictVal, "variables"));
-		self->_entryTbl = Memory_Alloc_Array( ShapeVC_Entry, self->_entryCount, "ShapeVC->_entryTbl" );
+		self->_entryTbl = Memory_Alloc_Array( MeshShapeVC_Entry, self->_entryCount, "MeshShapeVC->_entryTbl" );
 		varsVal = Dictionary_Entry_Value_GetMember(vcDictVal, "variables");
 		
 		for (entry_I = 0; entry_I < self->_entryCount; entry_I++) {
@@ -393,7 +393,7 @@ void _ShapeVC_ReadDictionary( void* variableCondition, void* dictionary ) {
 					Stream*	errorStr = Journal_Register( Error_Type, self->type );
 
 					Journal_Printf( errorStr, "Error- in %s: While parsing "
-						"definition of shapeVC \"%s\" (applies to shape \"%s\"), the cond. func. applied to "
+						"definition of MeshShapeVC \"%s\" (applies to shape \"%s\"), the cond. func. applied to "
 						"variable \"%s\" - \"%s\" - wasn't found in the c.f. register.\n",
 						__func__, self->_dictionaryEntryName, self->shapeName,
 						self->_entryTbl[entry_I].varName, funcName );
@@ -412,7 +412,7 @@ void _ShapeVC_ReadDictionary( void* variableCondition, void* dictionary ) {
 				self->_entryTbl[entry_I].value.type = VC_ValueType_DoubleArray;
 				self->_entryTbl[entry_I].value.as.typeArray.size = Dictionary_Entry_Value_GetCount(valueEntry);
 				self->_entryTbl[entry_I].value.as.typeArray.array = Memory_Alloc_Array( double,
-					self->_entryTbl[entry_I].value.as.typeArray.size, "ShapeVC->_entryTbl[].value.as.typeArray.array" );
+					self->_entryTbl[entry_I].value.as.typeArray.size, "MeshShapeVC->_entryTbl[].value.as.typeArray.array" );
 					
 				for (i = 0; i < self->_entryTbl[entry_I].value.as.typeArray.size; i++)
 				{
@@ -460,8 +460,8 @@ void _ShapeVC_ReadDictionary( void* variableCondition, void* dictionary ) {
 	}
 }
 
-IndexSet* _ShapeVC_GetSet(void* variableCondition) {
-	ShapeVC*	self = (ShapeVC*)variableCondition;
+IndexSet* _MeshShapeVC_GetSet(void* variableCondition) {
+	MeshShapeVC*	self = (MeshShapeVC*)variableCondition;
 	Mesh*		mesh = self->_mesh;
 	IndexSet*	set;
 	unsigned	v_i;
@@ -478,14 +478,14 @@ IndexSet* _ShapeVC_GetSet(void* variableCondition) {
 	return set;
 }
 
-VariableCondition_VariableIndex _ShapeVC_GetVariableCount(void* variableCondition, Index globalIndex) {
-	ShapeVC*	self = (ShapeVC*)variableCondition;
+VariableCondition_VariableIndex _MeshShapeVC_GetVariableCount(void* variableCondition, Index globalIndex) {
+	MeshShapeVC*	self = (MeshShapeVC*)variableCondition;
 
 	return self->_entryCount;
 }
 
-Variable_Index _ShapeVC_GetVariableIndex(void* variableCondition, Index globalIndex, VariableCondition_VariableIndex varIndex) {
-	ShapeVC*        self          = (ShapeVC*)variableCondition;
+Variable_Index _MeshShapeVC_GetVariableIndex(void* variableCondition, Index globalIndex, VariableCondition_VariableIndex varIndex) {
+	MeshShapeVC*        self          = (MeshShapeVC*)variableCondition;
 	Variable_Index  searchedIndex = 0;
 	Stream*         errorStr      = Journal_Register( Error_Type, self->type );
 	Name            varName;
@@ -504,7 +504,7 @@ Variable_Index _ShapeVC_GetVariableIndex(void* variableCondition, Index globalIn
 }
 
 
-VariableCondition_ValueIndex _ShapeVC_GetValueIndex(
+VariableCondition_ValueIndex _MeshShapeVC_GetValueIndex(
 		void*                                       variableCondition, 
 		Index                                       globalIndex, 
 		VariableCondition_VariableIndex             varIndex )
@@ -513,15 +513,15 @@ VariableCondition_ValueIndex _ShapeVC_GetValueIndex(
 }
 
 
-VariableCondition_ValueIndex _ShapeVC_GetValueCount(void* variableCondition) {
-	ShapeVC*	self = (ShapeVC*)variableCondition;
+VariableCondition_ValueIndex _MeshShapeVC_GetValueCount(void* variableCondition) {
+	MeshShapeVC*	self = (MeshShapeVC*)variableCondition;
 	
 	return self->_entryCount;
 }
 
 
-VariableCondition_Value _ShapeVC_GetValue(void* variableCondition, VariableCondition_ValueIndex valIndex) {
-	ShapeVC*	self = (ShapeVC*)variableCondition;
+VariableCondition_Value _MeshShapeVC_GetValue(void* variableCondition, VariableCondition_ValueIndex valIndex) {
+	MeshShapeVC*	self = (MeshShapeVC*)variableCondition;
 
 	return self->_entryTbl[valIndex].value;
 }

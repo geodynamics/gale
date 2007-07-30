@@ -35,7 +35,7 @@
 ** Comments:
 **	None so far.
 **
-** $Id: Utils.h 4137 2007-06-07 05:46:46Z LukeHodkinson $
+** $Id: Utils.h 4160 2007-07-30 06:17:06Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -50,7 +50,7 @@
 	#include "WallVC.h"
 	#include "CornerVC.h"
 	#include "InnerWallVC.h"
-	#include "ShapeVC.h"
+	#include "MeshShapeVC.h"
 	#include "FrictionVC.h"
 	#include "SplitFrictionWallVC.h"
 	#include "DofLayout.h"

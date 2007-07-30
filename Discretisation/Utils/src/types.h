@@ -35,7 +35,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: types.h 4137 2007-06-07 05:46:46Z LukeHodkinson $
+** $Id: types.h 4160 2007-07-30 06:17:06Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -52,7 +52,7 @@ typedef struct RegularRemesherCmpt RegularRemesherCmpt;
 	typedef struct _WallVC				WallVC;
 	typedef struct _InnerWallVC			InnerWallVC;
 	typedef struct _CornerVC			CornerVC;
-	typedef struct ShapeVC				ShapeVC;
+	typedef struct MeshShapeVC				MeshShapeVC;
 	typedef struct _FrictionVC			FrictionVC;
 	typedef struct SplitFrictionWallVC		SplitFrictionWallVC;
 	typedef struct _DofLayout			DofLayout;
@@ -146,7 +146,7 @@ typedef struct RegularRemesherCmpt RegularRemesherCmpt;
 
 	typedef struct _WallVC_Entry			WallVC_Entry;
 	typedef Index					WallVC_Entry_Index;
-	typedef Index					ShapeVC_Entry_Index;
+	typedef Index					MeshShapeVC_Entry_Index;
 
 	typedef struct _CornerVC_Entry			CornerVC_Entry;
 	typedef Index					CornerVC_Entry_Index;

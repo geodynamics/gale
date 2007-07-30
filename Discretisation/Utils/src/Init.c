@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Init.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
+** $Id: Init.c 4160 2007-07-30 06:17:06Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -47,7 +47,7 @@ Bool DiscretisationUtils_Init( int* argc, char** argv[] ) {
 	VariableCondition_Register_Add( variableCondition_Register, WallVC_Type, WallVC_Factory );
 	VariableCondition_Register_Add( variableCondition_Register, CornerVC_Type, CornerVC_Factory );
 	VariableCondition_Register_Add( variableCondition_Register, InnerWallVC_Type, InnerWallVC_Factory );
-	VariableCondition_Register_Add( variableCondition_Register, ShapeVC_Type, ShapeVC_Factory );
+	VariableCondition_Register_Add( variableCondition_Register, MeshShapeVC_Type, MeshShapeVC_Factory );
 	VariableCondition_Register_Add( variableCondition_Register, FrictionVC_Type, FrictionVC_Factory );
 	VariableCondition_Register_Add( variableCondition_Register, SplitFrictionWallVC_Type, SplitFrictionWallVC_Factory );
 	
@@ -67,8 +67,8 @@ Bool DiscretisationUtils_Init( int* argc, char** argv[] ) {
 				   "0", (void* (*)(Name))CornerVC_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), InnerWallVC_Type, 
 				   "0", (void* (*)(Name))InnerWallVC_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), ShapeVC_Type, 
-				   "0", (void*  (*)(Name))_ShapeVC_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), MeshShapeVC_Type, 
+				   "0", (void*  (*)(Name))_MeshShapeVC_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), FrictionVC_Type, 
 				   "0", (void* (*)(Name))FrictionVC_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), SplitFrictionWallVC_Type, 
@@ -100,7 +100,7 @@ Bool DiscretisationUtils_Init( int* argc, char** argv[] ) {
 	RegisterParent( WallVC_Type,                   VariableCondition_Type );
 	RegisterParent( CornerVC_Type,		       VariableCondition_Type );
 	RegisterParent( InnerWallVC_Type,	       VariableCondition_Type );
-	RegisterParent( ShapeVC_Type,                  VariableCondition_Type );
+	RegisterParent( MeshShapeVC_Type,                  VariableCondition_Type );
 	RegisterParent( FrictionVC_Type,               VariableCondition_Type );
 	RegisterParent( SplitFrictionWallVC_Type,      VariableCondition_Type );
 	RegisterParent( DofLayout_Type,                Stg_Component_Type );
