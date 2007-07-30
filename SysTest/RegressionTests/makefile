@@ -67,6 +67,6 @@ endif
 	#testExtensionDP.0of1.sh \
 	#testExtensionDP-checkpoint.0of1.sh \
 	#testExtensionFMM3D-checkpoint.0of1.sh \
-#subdirs := 
 
+subdirs := 
 include ${PROJ_ROOT}/Makefile.vmake

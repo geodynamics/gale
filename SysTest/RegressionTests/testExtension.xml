@@ -6,8 +6,6 @@
 	<include> Underworld/BaseApps/ExtensionBaseApp.xml </include>
 	
 	<list name="plugins" mergeType="merge">
-		<param>Underworld_MovingMesh</param>
-		
 		<!-- Output Plugins -->
 		<param>StgFEM_FrequentOutput</param>	
 		<param>Underworld_Vrms</param>	
@@ -75,6 +73,12 @@
 				<param>barViscosity</param>
 				<param>vonMises</param>
 			</list>
+		</struct>
+		<!--
+		-->
+		<struct name="weights" mergeType="replace">
+			<param name="Type">DVCWeights</param>
+			<param name="resolution">20</param>
 		</struct>
 	</struct>
 

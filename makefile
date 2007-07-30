@@ -2,7 +2,7 @@
 override PROJ_ROOT=.
 include ${PROJ_ROOT}/Makefile.system
 
-subdirs = Rheology Utils libUnderworld src plugins InputFiles
+subdirs = Rheology Utils libUnderworld src plugins InputFiles SysTest
 
 ifeq (true,$(shell if test -x $(DOXYGEN); then echo true; fi ))
 	subdirs += doc
