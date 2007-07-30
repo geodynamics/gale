@@ -3,7 +3,9 @@ SHELL := /bin/bash
 PROJ_ROOT := $(shell until test -r ./Makefile.system ; do cd .. ; done ; echo `pwd`)
 include ${PROJ_ROOT}/Makefile.system
 
+checks = testVelicSolA.0of1.sh
+
 # Subdirectories
-subdirs := $(shell find * -type d -follow -prune ! -name .svn )
+subdirs := ScienceBenchmarkTests
 
 include ${PROJ_ROOT}/Makefile.vmake
