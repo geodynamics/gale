@@ -35,7 +35,7 @@
 ** Comments:
 **	None so far.
 **
-** $Id: Extensibility.h 3462 2006-02-19 06:53:24Z WalterLandry $
+** $Id: Extensibility.h 4163 2007-08-02 08:32:40Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -52,8 +52,11 @@
 	#include "EntryPoint.h"
 	#include "EntryPoint_Register.h"
 	#include "Codelet.h"
-	#include "PluginLoader.h"
+	#include "Module.h"
+	#include "Plugin.h"
+	#include "ModulesManager.h"
 	#include "PluginsManager.h"
+	#include "ToolboxesManager.h"
 	#include "Init.h"
 	#include "Finalise.h"
 

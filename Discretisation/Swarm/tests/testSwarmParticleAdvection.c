@@ -35,7 +35,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: testSwarmParticleAdvection.c 4150 2007-07-09 06:09:02Z RaquibulHassan $
+** $Id: testSwarmParticleAdvection.c 4163 2007-08-02 08:32:40Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -118,7 +118,7 @@ int main( int argc, char* argv[] ) {
 	XML_IO_Handler_AddDirectory( "StGermain", directory  );
 	Memory_Free(directory);
 	/* Add the plugin path to the global plugin list */
-	PluginsManager_AddDirectory( "StGermain", LIB_DIR );
+	ModulesManager_AddDirectory( "StGermain", LIB_DIR );
 
 	stream = Journal_Register (Info_Type, "myStream");
 
@@ -166,7 +166,7 @@ int main( int argc, char* argv[] ) {
 	cf = context->CF = Stg_ComponentFactory_New( dictionary, componentDict, context->register_Register );
 
 	LiveComponentRegister_Add( cf->LCRegister, (Stg_Component*) context );
-	PluginsManager_Load( context->plugins, context, dictionary );
+	ModulesManager_Load( context->plugins, context, dictionary );
 
 	extensionMgr_Register = ExtensionManager_Register_New();
 	swarmVariable_Register = SwarmVariable_Register_New( NULL );
@@ -175,7 +175,7 @@ int main( int argc, char* argv[] ) {
 
 	Stg_ComponentFactory_CreateComponents( cf );
 	Stg_ComponentFactory_ConstructComponents( cf, 0 /* dummy */ );
-	PluginsManager_ConstructPlugins( context->plugins, context->CF, 0 /* dummy */ );
+	ModulesManager_ConstructModules( context->plugins, context->CF, 0 /* dummy */ );
 
 	KeyCall( context, context->constructExtensionsK, EntryPoint_VoidPtr_CallCast* )( KeyHandle(context,context->constructExtensionsK), context );
 

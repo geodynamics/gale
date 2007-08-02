@@ -127,13 +127,6 @@ int main( int argc, char* argv[] )
 	Stg_Component_Execute( context, 0 /* dummy */, False );
 
 	/* Destruct phase ---------------------------------------------------------------------------------------------------*/
-
-	/* Finalise any application plugins. */
-	applicationsFinalise_EP = Context_GetEntryPoint( context, EP_APPLICATIONS_FINALISE );
-	/* If there exists an applications Finalise Entry Point, get in there and run hooks! */
-	if(applicationsFinalise_EP != NULL)
-		((EntryPoint_VoidPtr_CallCast*) applicationsFinalise_EP->run)( applicationsFinalise_EP, NULL);
-
 	/* If the context got replaced, replacedContext != NULL & needs to be deleted. */
 	Stg_Component_Destroy( context, 0 /* dummy */, False );
 	if(replacedContext != NULL)
@@ -147,8 +140,8 @@ int main( int argc, char* argv[] )
 	#endif
 
 	infoStream = Journal_Register(Info_Type, "StGermainFinalise");
-	Journal_Printf( infoStream, "Finalised: StGermain Framework.\n");
 	StGermain_Finalise();
+	Journal_Printf( infoStream, "Finalised: StGermain Framework.\n");
 		
 	/* Close off MPI */
 	MPI_Finalize();

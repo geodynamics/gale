@@ -35,7 +35,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: types.h 3462 2006-02-19 06:53:24Z WalterLandry $
+** $Id: types.h 4163 2007-08-02 08:32:40Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -54,8 +54,12 @@
 	typedef struct ExtensionManager_Register	ExtensionManager_Register;
 	typedef struct EntryPoint_Register		EntryPoint_Register;
 	typedef struct Codelet				Codelet;
-	typedef struct PluginLoader			PluginLoader;
+	typedef struct Module				Module;
+	typedef struct Plugin				Plugin;
+	typedef struct Toolbox				Toolbox;
+	typedef struct ModulesManager			ModulesManager;
 	typedef struct PluginsManager			PluginsManager;
+	typedef struct ToolboxesManager			ToolboxesManager;
 
 	/* Extension types ... for readability */
 	typedef Stg_ObjectList			ExtensionList;

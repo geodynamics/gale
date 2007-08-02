@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Init.c 3462 2006-02-19 06:53:24Z WalterLandry $
+** $Id: Init.c 4163 2007-08-02 08:32:40Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -44,13 +44,21 @@
 #include "ExtensionManager_Register.h"
 #include "Hook.h"
 #include "ClassHook.h"
-#include "PluginLoader.h"
+#include "Module.h"
+#include "Plugin.h"
+#include "Toolbox.h"
+#include "ModulesManager.h"
 #include "PluginsManager.h"
+#include "ToolboxesManager.h"
 #include "SimpleExtensionInfo.h"
 #include "Init.h"
 #include "Finalise.h"
 
 #include <stdio.h>
+
+
+
+ToolboxesManager* stgToolboxesManager = 0;
 
 Bool BaseExtensibility_Init( int* argc, char** argv[] ) {
 	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
@@ -68,8 +76,14 @@ Bool BaseExtensibility_Init( int* argc, char** argv[] ) {
 	RegisterParent( SimpleExtensionInfo_Type,       ExtensionInfo_Type );
 	RegisterParent( ClassPtrExtensionInfo_Type,     ExtensionInfo_Type );
 
-	RegisterParent( PluginLoader_Type,                    Stg_Object_Type );
-	RegisterParent( PluginsManager_Type,            Stg_Class_Type );
+	RegisterParent( Module_Type,                    Stg_Object_Type );
+	RegisterParent( Plugin_Type,                    Module_Type );
+	RegisterParent( Toolbox_Type,                   Toolbox_Type );
+	RegisterParent( ModulesManager_Type,            Stg_Class_Type );
+	RegisterParent( PluginsManager_Type,            ModulesManager_Type );
+	RegisterParent( ToolboxesManager_Type,          ModulesManager_Type );
 	
+	stgToolboxesManager = ToolboxesManager_New( argc, argv );
+		
 	return True;
 }

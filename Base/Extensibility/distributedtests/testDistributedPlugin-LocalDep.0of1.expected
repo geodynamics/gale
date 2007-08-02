@@ -21,7 +21,7 @@ Stg_Class (ptr): 0x8067ea4
 	_copy (func ptr): (nil)
 Search Path:
 	(path) /home/alan/Codes/ChapelStreet/plugins-rework/build/lib
-Loaded plugins:
+Loaded modules:
 	LocalPlugin2
 	LocalPlugin1
 		(version) 19

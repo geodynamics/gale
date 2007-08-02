@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AbstractContext.c 4147 2007-06-25 05:50:03Z PatrickSunter $
+** $Id: AbstractContext.c 4163 2007-08-02 08:32:40Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -74,7 +74,6 @@ Type AbstractContext_EP_SaveClass =		"Context_SaveClass";
 
 /* Dictionary entry names */
 const Type AbstractContext_Dict_Components =	"components";
-const Type AbstractContext_Dict_Applications =	"application_plugins";
 
 
 /* Class stuff ********************************************************************************************************************/
@@ -167,7 +166,7 @@ void _AbstractContext_Init(
 		Journal_Enable_NamedStream( DebugStream_Type, "DictionaryWarning", False );
 	}
 	
-	/* Set up the registers and plugin manager */
+	/* Set up the registers and managers */
 	self->CF = 0; /* gets built later */
 	self->objectList = Stg_ObjectList_New();
 	self->condFunc_Register = ConditionFunction_Register_New();
@@ -177,8 +176,7 @@ void _AbstractContext_Init(
 	ExtensionManager_Register_Add( self->extensionMgr_Register, self->extensionMgr );
 	self->pointer_Register = Stg_ObjectList_New();
 	self->register_Register = Stg_ObjectList_New();
-
-	self->plugins = PluginsManager_New( self->dictionary );
+	self->plugins = PluginsManager_New();
 	
 	/* Main input parameters */
 	self->frequentOutputEvery = Dictionary_Entry_Value_AsUnsignedInt( 
@@ -424,7 +422,7 @@ void _AbstractContext_Delete( void* abstractContext ) {
 	Stg_Class_Delete( self->plugins );
 	
 	/* Stg_Class_Delete parent */
-	_Stg_Class_Delete( self );
+	_Stg_Component_Delete( self );
 }
 
 void _AbstractContext_Print( void* abstractContext, Stream* stream ) {
@@ -550,15 +548,16 @@ void _AbstractContext_Construct( void* context, Stg_ComponentFactory* cf, void* 
 	isConstructed = self->isConstructed;
 	self->isConstructed = True;
 
-	/* Construct all the components. There should be quite few in there right now, however, the context will do a plugins
-		load, which will add more and their dependencies. */
+	/* Construct all the components. There should be quite few in there right now, however, the context will do a toolbox
+		and plugin load, which will add more and their dependencies. The toolboxes will be forced to construct within 
+		here*/
 	KeyCall( self, self->constructK, EntryPoint_2VoidPtr_CallCast* )( KeyHandle(self,self->constructK), self, ptrToSelf );
 	self = *ptrToSelf;
 
 	/* Construct the list of plugins. This wont reconstruct the components already constructed in the last step. By seperating
 		the plugins contstruction out of the component construction EP gives an opportunity to do a wrap up before
-		plugins start */
-	PluginsManager_ConstructPlugins( self->plugins, self->CF, ptrToSelf );
+		plugins start. The toolboxes will already be constructed by this stage. */
+	ModulesManager_ConstructModules( self->plugins, self->CF, ptrToSelf );
 
 	/* Extensions are the last thing we want to do */
 	KeyCall( self, self->constructExtensionsK, EntryPoint_VoidPtr_CallCast* )( KeyHandle(self,self->constructExtensionsK), self );
@@ -781,9 +780,9 @@ void AbstractContext_InitialiseAllLiveComponents( void* context ) {
 
 void _AbstractContext_Construct_Hook( void* context, void* ptrToContext ) {
 	AbstractContext*		self = (AbstractContext*)context;
-	AbstractContext**		ptrToSelf = (AbstractContext**)ptrToContext;
+	AbstractContext**		ptrToSelf;
 	Dictionary*			componentDict;
-	Dictionary_Entry_Value*		apps;
+	int				index; /* needs to be signed */
 	
 	Journal_Printf( self->debug, "In: %s\n", __func__ );
 	
@@ -800,55 +799,33 @@ void _AbstractContext_Construct_Hook( void* context, void* ptrToContext ) {
 	}
 	LiveComponentRegister_Add( self->CF->LCRegister, (Stg_Component*)self );
 	
-	/* Obtain the applications  info from the global dictionary. Boot them up. */
-	if( (apps = Dictionary_Get( self->dictionary, AbstractContext_Dict_Applications )) != NULL ) {
-		int index; /* needs to be signed */
+	/* Boot up the toolboxes desired by this context (dictionary) */
+	ModulesManager_Load( stgToolboxesManager, context, self->dictionary );
+	/* SPECIAL BIT!
+	   Now that the toolboxes are loaded, now "contruct" each toolbox, ensuring that we "RE-construct" the context in the 
+	   reverse order of the toolboxes. Ensuring that only the first (i.e. largest context) toolbox builds a new context.
+	   NOTE: This mechanism completely sucks! The way Contexts are replaced is crap but works for now. It shows that
+	   Context's should be implemented as extensions! */
+	ptrToSelf = (AbstractContext**)ptrToContext;
+	for( index = stgToolboxesManager->modules->count - 1; index >= 0; index-- ) {
+		Module* module = (Module*)Stg_ObjectList_At( stgToolboxesManager->modules, index );
 		
-		/* Go through the list of entries, and attempt to load each plugin. NOTE: this will call the "Init" of the
-		   application module. */
-		for( index = 0; index < Dictionary_Entry_Value_GetCount( apps ); index++ ) {
-			Dictionary_Entry_Value* application;
-			
-			application = Dictionary_Entry_Value_GetElement( apps, index );
-
-			Journal_Firewall(
-				PluginsManager_LoadPlugin( self->plugins, application->as.typeString, self ),
-				Journal_Register( Error_Type, AbstractContext_Type ),
-				"Error: Application Plugin %s not found. Ensure it is"
-					" a valid plugin, and has been built.\n",
-					application->as.typeString );
-		}
+		/* Contruct toolbox */
+		Journal_Firewall(
+			ModulesManager_ConstructModule( stgToolboxesManager, module->name, self->CF, ptrToSelf ),
+			Journal_Register( Error_Type, AbstractContext_Type ),
+			"Error: Toolbox %s could not be constructed."
+				" Ensure it has a valid construction function.\n",
+				module->name );
 		
-		/* Now that the plugins are loaded (i.e. ALL application environments enabled), now RE-construct the context in the
-		   reverse order. Ensuring that only the first (i.e. largest context) plugin builds a new context.
- 		   NOTE: This mechanism completely sucks! The way Contexts are replaced is crap but works for now. It shows that
-		   Context's should be implemented as extensions! */
-		for( index = Dictionary_Entry_Value_GetCount( apps ) - 1; index >= 0; index-- ) {
-			Dictionary_Entry_Value* application;
-			
-			application = Dictionary_Entry_Value_GetElement( apps, index );
-
-			Journal_Firewall(
-				PluginsManager_ConstructPlugin( self->plugins, application->as.typeString, self->CF, ptrToSelf ),
-				Journal_Register( Error_Type, AbstractContext_Type ),
-				"Error: Application Plugin %s could not be constructed."
-					" Ensure it has a valid construction function.\n",
-				      	application->as.typeString );
-			
-			if( self !=  (AbstractContext*)self->CF->LCRegister->componentList->data[0] ) {
-				((AbstractContext*)self->CF->LCRegister->componentList->data[0])->plugins = self->plugins;
-				self = (AbstractContext*)self->CF->LCRegister->componentList->data[0];
-				Journal_Firewall( 
-					(Bool)ptrToSelf, 
-					Journal_Register( Error_Type, AbstractContext_Type ), 
-					"Pointer to the context is needed, but set to NULL.\n" );
-				*ptrToSelf = self;
-			}
+		/* Swap self to the new one*/
+		if( self !=  *ptrToSelf ) {
+			self = *ptrToSelf;
 		}
 	}
-	
-	/* Load the plugins ?? */
-	PluginsManager_Load( self->plugins, context, self->dictionary );
+		
+	/* Load the plugins desired by this context (dictionary) */
+	ModulesManager_Load( self->plugins, context, self->dictionary );
 
 	Stg_ComponentFactory_CreateComponents( self->CF );
 	Stg_ComponentFactory_ConstructComponents( self->CF, ptrToSelf );

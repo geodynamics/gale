@@ -47,7 +47,7 @@ int main( int argc, char* argv[] ) {
 	Stream* stream;
 
 	Stg_ObjectList* directories;
-	PluginLoader* plugin;
+	Plugin* plugin;
 
 	/* Initialise MPI, get world info */
 	MPI_Init( &argc, &argv );
@@ -67,11 +67,11 @@ int main( int argc, char* argv[] ) {
 	directories = Stg_ObjectList_New();
 	Stg_ObjectList_PointerAppend( directories, StG_Strdup(LIB_DIR), "default dir", 0, 0, 0 );
 	
-	plugin = PluginLoader_NewLocal( "LocalPlugin", directories );
+	plugin = Plugin_New( "LocalPlugin", directories );
 
 	Journal_Firewall( plugin != NULL, stream, "Failed!\n" );
 
-	Journal_Printf( stream, "PluginLoader_GetName(): %s\n", PluginLoader_GetName( plugin ) );
+	Journal_Printf( stream, "PluginLoader_GetName(): %s\n", Module_GetName( plugin ) );
 	Stg_Class_Print( plugin, stream );
 
 	Stg_Class_Delete( plugin );

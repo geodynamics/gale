@@ -82,11 +82,11 @@ int main( int argc, char* argv[] ) {
 
 	cf = Stg_ComponentFactory_New( dictionary, Dictionary_GetDictionary( dictionary, "components" ), Stg_ObjectList_New() );
 	LiveComponentRegister_Add( cf->LCRegister, (Stg_Component*)context );
-	PluginsManager_Load( context->plugins, context, dictionary );
+	ModulesManager_Load( context->plugins, context, dictionary );
 
 	Stg_ComponentFactory_CreateComponents( cf );
 	Stg_ComponentFactory_ConstructComponents( cf, 0 /* dummy */ );
-	PluginsManager_ConstructPlugins( context->plugins, cf, 0 /* dummy */ );
+	ModulesManager_ConstructModules( context->plugins, cf, 0 /* dummy */ );
 
 	((EntryPoint_VoidPtr_CallCast*) context->ep->run)( context->ep, context );
 

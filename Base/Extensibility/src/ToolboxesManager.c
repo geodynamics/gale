@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: PluginsManager.c 4163 2007-08-02 08:32:40Z SteveQuenette $
+** $Id: ToolboxesManager.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -37,29 +37,31 @@
 #include "types.h"
 #include "shortcuts.h"
 #include "Module.h"
-#include "Plugin.h"
+#include "Toolbox.h"
 #include "ModulesManager.h"
-#include "PluginsManager.h"
+#include "ToolboxesManager.h"
 
 
 /* Textual name of this class */
-const Type PluginsManager_Type = "PluginsManager";
+const Type ToolboxesManager_Type = "ToolboxesManager";
 
 
-PluginsManager* PluginsManager_New( void ) {
-	return _PluginsManager_New( 
-		sizeof(PluginsManager), 
-		PluginsManager_Type, 
-		_PluginsManager_Delete, 
-		_PluginsManager_Print, 
+ToolboxesManager* ToolboxesManager_New( int* argc, char*** argv ) {
+	return _ToolboxesManager_New( 
+		sizeof(ToolboxesManager), 
+		ToolboxesManager_Type, 
+		_ToolboxesManager_Delete, 
+		_ToolboxesManager_Print, 
 		NULL, 
-		_PluginsManager_GetPluginsList,
-		_PluginsManager_LoadPlugin,
-		_PluginsManager_UnloadPlugin,
-		Plugin_Factory );
+		_ToolboxesManager_GetToolboxesList,
+		_ToolboxesManager_LoadToolbox,
+		_ToolboxesManager_UnloadToolbox,
+		Toolbox_Factory,
+		argc,
+		argv );
 }
 
-PluginsManager* _PluginsManager_New(
+ToolboxesManager* _ToolboxesManager_New(
 		SizeT                                   _sizeOfSelf,
 		Type                                    type,
 		Stg_Class_DeleteFunction*               _delete,
@@ -68,13 +70,15 @@ PluginsManager* _PluginsManager_New(
 		ModulesManager_GetModulesListFunction*  _getModulesList,
 		ModulesManager_LoadModuleFunction*	_loadModule,
 		ModulesManager_UnloadModuleFunction*	_unloadModule,
-		ModulesManager_ModuleFactoryFunction*   _moduleFactory )
+		ModulesManager_ModuleFactoryFunction*   _moduleFactory,
+		int*					argc,
+		char***					argv )
 {
-	PluginsManager* self;
+	ToolboxesManager* self;
 	
 	/* Allocate memory */
-	assert( _sizeOfSelf >= sizeof(PluginsManager) );
-	self = (PluginsManager*)_ModulesManager_New( 
+	assert( _sizeOfSelf >= sizeof(ToolboxesManager) );
+	self = (ToolboxesManager*)_ModulesManager_New( 
 		_sizeOfSelf, 
 		type, 
 		_delete, 
@@ -89,54 +93,60 @@ PluginsManager* _PluginsManager_New(
 	
 	/* Virtual info */
 	
-	_PluginsManager_Init( self );
+	_ToolboxesManager_Init( self, argc, argv );
 	
 	return self;
 }
 
-void _PluginsManager_Init( void* pluginsManager ) {
+void _ToolboxesManager_Init( void* toolboxesManager, int* argc, char*** argv ) {
+	ToolboxesManager*         self = (ToolboxesManager*)toolboxesManager;
+	
+	self->argc = argc;
+	self->argv = argv;
 }
 
 
-void _PluginsManager_Delete( void* pluginsManager ) {
-	PluginsManager*         self = (PluginsManager*)pluginsManager;
+void _ToolboxesManager_Delete( void* toolboxesManager ) {
+	ToolboxesManager*         self = (ToolboxesManager*)toolboxesManager;
 
 	/* Delete parent */
 	_ModulesManager_Delete( self );
 }
 
-void _PluginsManager_Print( void* pluginsManager, Stream* stream ) {
-	PluginsManager* self = (PluginsManager*)pluginsManager;
+void _ToolboxesManager_Print( void* toolboxesManager, Stream* stream ) {
+	ToolboxesManager* self = (ToolboxesManager*)toolboxesManager;
 	
 	/* General info */
-	Journal_Printf( (void*) stream, "Plugins (ptr): %p\n", self );
+	Journal_Printf( (void*) stream, "Toolboxes (ptr): %p\n", self );
 	
 	/* Print parent */
 	_ModulesManager_Print( self, stream );
 }
 
 
-Dictionary_Entry_Value* _PluginsManager_GetPluginsList( void* pluginsManager, void* _dictionary ) {
-	/*PluginsManager*			self = (PluginsManager*)pluginsManager;*/
+Dictionary_Entry_Value* _ToolboxesManager_GetToolboxesList( void* toolboxesManager, void* _dictionary ) {
+	/*ToolboxesManager*		self = (ToolboxesManager*)toolboxesManager;*/
 	Dictionary*			dictionary = (Dictionary*)_dictionary;
 	Dictionary_Entry_Value*		pluginsList = NULL;
 	
-	pluginsList = Dictionary_Get( dictionary, "plugins" );
+	pluginsList = Dictionary_Get( dictionary, "import" );
 
 	return pluginsList;
 }
 
-
-Bool _PluginsManager_LoadPlugin( void* pluginsManager, Module* plugin ) {
-	PluginsManager* self = (PluginsManager*)pluginsManager;
+Bool _ToolboxesManager_LoadToolbox( void* toolboxesManager, Module* toolbox ) {
+	ToolboxesManager* self = (ToolboxesManager*)toolboxesManager;
 	
-	((Plugin*)plugin)->Register( self );
+	((Toolbox*)toolbox)->Initialise( self, self->argc, self->argv );
+	((Toolbox*)toolbox)->Register( self );
     
 	return True;
 }
 
-Bool _PluginsManager_UnloadPlugin( void* pluginsManager, Module* plugin ) {
-	/*PluginsManager* self = (PluginsManager*)pluginsManager;*/
+Bool _ToolboxesManager_UnloadToolbox( void* toolboxesManager, Module* toolbox ) {
+	ToolboxesManager* self = (ToolboxesManager*)toolboxesManager;
 	
+	((Toolbox*)toolbox)->Finalise( self );
+    
 	return True;
 }

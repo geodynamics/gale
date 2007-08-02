@@ -79,8 +79,8 @@ MockContext* MockContext_New( Dictionary* dictionary ) {
 		"context",
 		NON_GLOBAL );
 
-	self->plugins = PluginsManager_New( dictionary );
-	PluginsManager_AddDirectory( "StGermain", LIB_DIR );
+	self->plugins = PluginsManager_New();
+	ModulesManager_AddDirectory( "StGermain", LIB_DIR );
 	self->ep = EntryPoint_New( "TestEP", EntryPoint_VoidPtr_CastType );
 	self->em = ExtensionManager_New_OfExistingObject( "Context", self );
 

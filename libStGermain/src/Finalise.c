@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Finalise.c 4014 2007-02-23 02:15:16Z KathleenHumble $
+** $Id: Finalise.c 4163 2007-08-02 08:32:40Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -39,9 +39,9 @@
 Bool StGermain_Finalise( void ) {
 	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 	
-	/*Delete the global objects : xmlSearchPaths and pluginDirectories */
-	Stg_ObjectList_DeleteAllObjects( pluginDirectories );
-	Stg_Class_Delete( pluginDirectories );
+	/*Delete the global objects : xmlSearchPaths and moduleDirectories */
+	Stg_ObjectList_DeleteAllObjects( moduleDirectories );
+	Stg_Class_Delete( moduleDirectories );
 	
 	Stg_ObjectList_DeleteAllObjects(xmlSearchPaths);
 	Stg_Class_Delete( xmlSearchPaths );

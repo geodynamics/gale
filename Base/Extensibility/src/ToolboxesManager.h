@@ -27,44 +27,46 @@
 */
 /** \file
 **  Role:
-**	Handles the loading of "Plugin" modules, which can extend the functionality or data structures of 
+**	Handles the loading of "Toolbox" modules, which can extend the functionality or data structures of 
 **	a main StGermain program.
 **
 ** Assumptions:
 **
 ** Comments:
 **
-** $Id: PluginsManager.h 4163 2007-08-02 08:32:40Z SteveQuenette $
+** $Id: ToolboxesManager.h 4014 2007-02-23 02:15:16Z KathleenHumble $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Extensibility_PluginsManager_h__
-#define __Base_Extensibility_PluginsManager_h__
+#ifndef __Base_Extensibility_ToolboxesManager_h__
+#define __Base_Extensibility_ToolboxesManager_h__
 	
 
 	/* Textual name of this class */
-	extern const Type PluginsManager_Type;
+	extern const Type ToolboxesManager_Type;
 
 	
-	/* Plugins info */
-	#define __PluginsManager \
+	/* Toolboxes info */
+	#define __ToolboxesManager \
 		/* General info */ \
 		__ModulesManager \
 		\
 		/* Virtual info */ \
 		\
-		/* Plugins info */
+		/* Toolboxes info */ \
+		int*       argc; \
+		char***    argv; 
 		
-	struct PluginsManager { __PluginsManager };
+	struct ToolboxesManager { __ToolboxesManager };
 	
     /** Define a global list of plugin directories*/
      extern Stg_ObjectList*  pluginDirectories;	
 
-	/* Create a new Plugins */
-	PluginsManager* PluginsManager_New( void );
+	/* Create a new Toolboxes */
+	ToolboxesManager* ToolboxesManager_New( int* argc, char*** argv );
 	
 	/* Creation implementation / Virtual constructor */
-	PluginsManager* _PluginsManager_New( 
+	ToolboxesManager* _ToolboxesManager_New( 
 		SizeT                                   _sizeOfSelf,
 		Type                                    type,
 		Stg_Class_DeleteFunction*               _delete,
@@ -73,26 +75,28 @@
 		ModulesManager_GetModulesListFunction*  _getModulesList,
 		ModulesManager_LoadModuleFunction*	_loadModule,
 		ModulesManager_UnloadModuleFunction*	_unloadModule,
-		ModulesManager_ModuleFactoryFunction*   _moduleFactory );
-	
+		ModulesManager_ModuleFactoryFunction*   _moduleFactory,
+		int*					argc,
+		char***					argv );
+
 	/* Initialisation implementation */
-	void _PluginsManager_Init( void* pluginsManager );
+	void _ToolboxesManager_Init( void* toolboxesManager, int* argc, char*** argv );
 	
 	/* Stg_Class_Delete implementation */
-	void _PluginsManager_Delete( void* pluginsManager );
+	void _ToolboxesManager_Delete( void* toolboxesManager );
 	
 	/* Print implementation */
-	void _PluginsManager_Print( void* pluginsManager, Stream* stream );
+	void _ToolboxesManager_Print( void* toolboxesManager, Stream* stream );
 	
 	/** Get the plugins list from the dictionary */
-	Dictionary_Entry_Value* _PluginsManager_GetPluginsList( void* pluginsManager, void* dictionary );
-
-	/** Exactly what to do to load the plugin */
-	Bool _PluginsManager_LoadPlugin( void* pluginsManager, Module* plugin );
+	Dictionary_Entry_Value* _ToolboxesManager_GetToolboxesList(  void* toolboxesManager, void* dictionary );
 	
-	/** Exactly what to do to unload the plugin */
-	Bool _PluginsManager_UnloadPlugin( void* pluginsManager, Module* plugin );
+	/** Exactly what to do to load the toolbox */
+	Bool _ToolboxesManager_LoadToolbox( void* toolboxesManager, Module* toolbox );
 
-	#define PluginsManager_Submit ModulesManager_Submit
-	
-#endif /* __Base_Extensibility_PluginsManager_h__ */
+	/** Exactly what to do to unload the toolbox */
+	Bool _ToolboxesManager_UnloadToolbox( void* toolboxesManager, Module* toolbox );
+
+	#define ToolboxesManager_Submit ModulesManager_Submit
+
+#endif /* __Base_Extensibility_ToolboxesManager_h__ */

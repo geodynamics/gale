@@ -35,13 +35,16 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: Init.h 3462 2006-02-19 06:53:24Z WalterLandry $
+** $Id: Init.h 4163 2007-08-02 08:32:40Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #ifndef __Base_BaseExtensibility_Init_h__
 #define __Base_BaseExtensibility_Init_h__
-	
+
+	/** The toolboxes singleton... this is the manager of loading and unloading toolboxes */
+	extern ToolboxesManager* stgToolboxesManager;
+
 	Bool BaseExtensibility_Init( int* argc, char** argv[] );
 	
 #endif /* __Base_BaseExtensibility_Init_h__ */

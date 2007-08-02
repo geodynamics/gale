@@ -24,34 +24,64 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Init.c 4163 2007-08-02 08:32:40Z SteveQuenette $
+*/
+/** \file
+**  Role:
+**
+** Assumptions:
+**
+** Comments:
+**
+** $Id: Plugin.h 3192 2005-08-25 01:45:42Z AlanLo $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#include <mpi.h>
-#include "Base/Base.h"
-#include "Discretisation/Discretisation.h"
-
-#include "Init.h"
-
-#include <stdio.h>
-
-Bool StGermain_Init( int* argc, char** argv[] ) {
-	char* directory;
-	Base_Init( argc, argv );
+#ifndef __Base_Extensibility_Plugin_h__
+#define __Base_Extensibility_Plugin_h__
 	
-	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
-	
-	Discretisation_Init( argc, argv );
+	/** The prototype for the Register function in a plugin */
+	typedef Index (Plugin_RegisterFunction) ( void* pluginsManager );
 
-	/* Add the StGermain path to the global xml path dictionary */
-	directory = Memory_Alloc_Array( char, 200, "xmlDirectory" ) ;
-	sprintf(directory, "%s%s", LIB_DIR, "/StGermain" );
-	XML_IO_Handler_AddDirectory( "StGermain", directory  );
-	Memory_Free(directory);
-	/* Add the plugin path to the global plugin list */
-	ModulesManager_AddDirectory( "StGermain", LIB_DIR );
+	/* Textual name of this class */
+	extern const Type Plugin_Type;
 
+	/* Plugins info */
+	#define __Plugin \
+		/* General info */ \
+		__Module \
+		\
+		/* Virtual info */ \
+		\
+		/* Plugin info */ \
+		Plugin_RegisterFunction*    Register;
+		
+	struct Plugin { __Plugin };
+
+
+	/* Create a new Plugin */
+	Plugin* Plugin_New( Name name, Stg_ObjectList* directories );
+	Module* Plugin_Factory( Name name, Stg_ObjectList* directories );
 	
-	return True;
-}
+	/* Creation implementation / Virtual constructor */
+	Plugin* _Plugin_New( 
+		SizeT                        _sizeOfSelf,
+		Type                         type,
+		Stg_Class_DeleteFunction*    _delete,
+		Stg_Class_PrintFunction*     _print,
+		Stg_Class_CopyFunction*      _copy, 
+		Name                         name,
+		Stg_ObjectList*              directories );
+	
+	/* Initialisation implementation */
+	void _Plugin_Init( Plugin* self );
+	
+	/* Delete implementation */
+	void _Plugin_Delete( void* plugin );
+	
+	/* Print implementation */
+	void _Plugin_Print( void* plugin, Stream* stream );
+
+	/** Get the function pointer the to the plugin's register function */
+	Plugin_RegisterFunction* Plugin_GetRegisterFunc( void* plugin );
+	
+#endif /* __Base_Extensibility_Plugin_h__ */

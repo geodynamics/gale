@@ -35,7 +35,7 @@
 **	This is a class, of which subclasses can be defined, which can override default methods.
 **	Currently built with only MeshPIC_Context in mind (for Snac).
 **
-** $Id: AbstractContext.h 4147 2007-06-25 05:50:03Z PatrickSunter $
+** $Id: AbstractContext.h 4163 2007-08-02 08:32:40Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -151,7 +151,7 @@
 		Register_Register*			register_Register; \
 		Stg_ComponentFactory*			CF; \
 		PluginsManager*				plugins;
-		
+
 	struct AbstractContext { __AbstractContext };
 	
 	/* Class stuff ************************************************************************************************************/

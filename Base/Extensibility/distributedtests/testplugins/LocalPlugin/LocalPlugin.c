@@ -71,6 +71,6 @@ void* _LocalPlugin_DefaultNew( Name name ) {
 /* Plugins require a _Register() function for the plugin to be loaded. */
 
 Index LocalPlugin_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, LocalPlugin_Type, "0", _LocalPlugin_DefaultNew );
+	return ModulesManager_Submit( pluginsManager, LocalPlugin_Type, "0", _LocalPlugin_DefaultNew );
 }
 

@@ -42,8 +42,12 @@ def_srcs = \
 	EntryPoint.c \
 	EntryPoint_Register.c \
 	Codelet.c \
-	PluginLoader.c \
+	Module.c \
+	Plugin.c \
+	Toolbox.c \
+	ModulesManager.c \
 	PluginsManager.c \
+	ToolboxesManager.c \
 	Init.c \
 	Finalise.c
 
@@ -60,8 +64,12 @@ def_hdrs = \
 	EntryPoint.h \
 	EntryPoint_Register.h \
 	Codelet.h \
-	PluginLoader.h \
+	Module.h \
+	Plugin.h \
+	Toolbox.h \
+	ModulesManager.h \
 	PluginsManager.h \
+	ToolboxesManager.h \
 	Init.h \
 	Finalise.h \
 	Extensibility.h
