@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Init.c 427 2007-02-23 02:37:11Z KathleenHumble $
+** $Id: Init.c 503 2007-08-02 08:41:48Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -78,7 +78,7 @@ Bool PICellerator_Init( int* argc, char** argv[] ) {
 	Memory_Free(directory);
 	
 	/* Add the plugin path to the global plugin list */
-	PluginsManager_AddDirectory( "PICellerator", LIB_DIR );
+	ModulesManager_AddDirectory( "PICellerator", LIB_DIR );
 
 	return True;
 }

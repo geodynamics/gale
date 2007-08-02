@@ -53,14 +53,7 @@ includes = ${PROJECT}/${modName}
 SRCS = $(wildcard *.c)
 HDRS = $(wildcard *.h)
 
-EXTERNAL_LIBS = -lPICellerator ${EXPORT_DYNAMIC_LFLAGS}
-
-EXTERNAL_INCLUDES = -DMODULE_EXT=\"${MODULE_EXT}\"
-
-packages = STGFEM STGERMAIN PETSC MPI XML MATH DL HYPRE
-
-ifdef HAVE_PYTHON
-        packages += PYTHON
-endif
+packages = STGFEM STGERMAIN PETSC MPI XML
+EXTERNAL_LIBS = -lPICellerator
 
 include ${PROJ_ROOT}/Makefile.vmake

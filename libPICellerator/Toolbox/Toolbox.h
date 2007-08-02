@@ -48,17 +48,19 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __PICellerator_Application_h__
-#define __PICellerator_Application_h__
+#ifndef __PICellerator_Toolbox_h__
+#define __PICellerator_Toolbox_h__
 
-extern const Type PICellerator_Application_Type;
+extern const Type PICellerator_Toolbox_Type;
 
 typedef struct {
 	__Codelet
-} PICellerator_Application;
+} PICellerator_Toolbox;
 
-Index PICellerator_Application_Register( PluginsManager* pluginsManager );
+void PICellerator_Toolbox_Initialise();
 
-void PICellerator_Application_Finalise();
+Index PICellerator_Toolbox_Register( PluginsManager* pluginsManager );
+
+void PICellerator_Toolbox_Finalise();
 
 #endif	

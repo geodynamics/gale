@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testPeriodicBCs.c 478 2007-06-28 02:40:38Z PatrickSunter $
+** $Id: testPeriodicBCs.c 503 2007-08-02 08:41:48Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -140,7 +140,7 @@ int main( int argc, char* argv[] ) {
 	Memory_Free(directory);
 						
 	/* Add the plugin path to the global plugin list */
-	PluginsManager_AddDirectory( "PICellerator", LIB_DIR );
+	ModulesManager_AddDirectory( "PICellerator", LIB_DIR );
 
 	stream = Journal_Register (Info_Type, "myStream");
 
