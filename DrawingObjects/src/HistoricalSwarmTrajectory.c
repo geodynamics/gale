@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: HistoricalSwarmTrajectory.c 717 2007-07-20 06:09:06Z LukeHodkinson $
+** $Id: HistoricalSwarmTrajectory.c 727 2007-08-02 01:20:49Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -256,7 +256,7 @@ void _lucHistoricalSwarmTrajectory_BuildDisplayList( void* drawingObject, void* 
 	Particle_Index                 lParticle_I;
 	StandardParticle*              particle;
 	lucHistoricalSwarmTrajectory_ParticleExt* particleExt;
-	float                          offset              = 0.001;
+	float                          offset              = -1.0;
 	double*                        coord;
 	Dimension_Index                dim                 = context->dim;
 
@@ -282,7 +282,7 @@ void _lucHistoricalSwarmTrajectory_BuildDisplayList( void* drawingObject, void* 
 
 			if (dim == 2)
 				glVertex3f( (float)coord[0], (float)coord[1], offset );
-			else 
+			else
 				glVertex3dv( coord );
 				
 			/* Stop the loop when we have arrived a the current timestep */
