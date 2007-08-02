@@ -6,13 +6,13 @@
 	
 	<!-- Gauss Swarm Stuff -->
 	<struct name="components" mergeType="merge">
-		<struct name="cellLayout">
+		<struct name="cellLayout" mergeType="replace">
 			<param name="Type">SingleCellLayout</param>
 		</struct>
-		<struct name="particleLayout">
+		<struct name="particleLayout" mergeType="replace">
 			<param name="Type">GaussParticleLayout</param>
 		</struct>
-		<struct name="gaussSwarm">
+		<struct name="gaussSwarm" mergeType="replace">
 			<param name="Type">IntegrationPointsSwarm</param>
 			<param name="CellLayout">cellLayout</param>
 			<param name="ParticleLayout">particleLayout</param>

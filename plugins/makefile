@@ -5,6 +5,6 @@ include ${PROJ_ROOT}/Makefile.system
 
 # Subdirectories
 #subdirs := $(shell find * -type d -follow -prune ! -name .svn )
-subdirs = Application MaterialThermalDiffusivity VariableConditions EulerDeform ExtractPetscObjects IncompressibleExtensionBC Output MovingMesh
+subdirs = MaterialThermalDiffusivity VariableConditions EulerDeform ExtractPetscObjects IncompressibleExtensionBC Output MovingMesh
 
 include ${PROJ_ROOT}/Makefile.vmake

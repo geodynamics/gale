@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">Underworld_Toolbox</param>
+
+<list name="dependenices">
+	<struct>
+		<param name="plugin">PICellerator_Toolbox</param>
+		<param name="version">0</param>
+	</struct>
+</list>
+
+</StGermainData>

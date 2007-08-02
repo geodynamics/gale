@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: Init.c 437 2007-02-23 02:11:51Z KathleenHumble $
+** $Id: Init.c 563 2007-08-02 08:46:41Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -109,10 +109,10 @@ Bool Underworld_Init( int* argc, char** argv[] ) {
 
 	/* Add the plugin path to the global plugin list */
 	#ifdef GLUCIFER_LIBDIR
-		PluginsManager_AddDirectory( "gLucifer", GLUCIFER_LIBDIR );
+		ModulesManager_AddDirectory( "gLucifer", GLUCIFER_LIBDIR );
 	#endif
 	
-	PluginsManager_AddDirectory( "Underworld", LIB_DIR );
+	ModulesManager_AddDirectory( "Underworld", LIB_DIR );
 
 	return True;
 }

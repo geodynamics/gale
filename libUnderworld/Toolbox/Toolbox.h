@@ -48,17 +48,19 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Underworld_Application_h__
-#define __Underworld_Application_h__
+#ifndef __Underworld_Toolbox_h__
+#define __Underworld_Toolbox_h__
 
-extern const Type Underworld_Application_Type;
+extern const Type Underworld_Toolbox_Type;
 
 typedef struct {
 	__Codelet
-} Underworld_Application;
+} Underworld_Toolbox;
 
-Index Underworld_Application_Register( PluginsManager* pluginsManager );
+void Underworld_Toolbox_Initialise();
 
-void Underworld_Application_Finalise();
+Index Underworld_Toolbox_Register( PluginsManager* pluginsManager );
+
+void Underworld_Toolbox_Finalise();
 
 #endif	

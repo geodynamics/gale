@@ -7,29 +7,29 @@
 	<!-- Stokes Flow Stuff -->
 	<struct name="components" mergeType="merge">
 		<!-- Solution Vectors -->
-		<struct name="solutionVelocity">
+		<struct name="solutionVelocity" mergeType="replace">
 			<param name="Type">SolutionVector</param>
 			<param name="FeVariable">VelocityField</param>
 		</struct>
-		<struct name="solutionPressure">
+		<struct name="solutionPressure" mergeType="replace">
 			<param name="Type">SolutionVector</param>
 			<param name="FeVariable">PressureField</param>
 		</struct>
 
 		<!-- Force Vectors -->
-		<struct name="mom_force">
+		<struct name="mom_force" mergeType="replace">
 			<param name="Type">ForceVector</param>
 			<param name="FeVariable">VelocityField</param>
 			<param name="ExtraInfo">context</param>
 		</struct>
-		<struct name="cont_force">
+		<struct name="cont_force" mergeType="replace">
 			<param name="Type">ForceVector</param>
 			<param name="FeVariable">PressureField</param>
 			<param name="ExtraInfo">context</param>
 		</struct>
 		
 		<!-- Matricies -->
-		<struct name="k_matrix">
+		<struct name="k_matrix" mergeType="replace">
 			<param name="Type">StiffnessMatrix</param>
 			<param name="RowVariable">VelocityField</param>
 			<param name="ColumnVariable">VelocityField</param>	
@@ -41,7 +41,7 @@
 			<param name="Swarm">gaussSwarm</param>
 			<param name="StiffnessMatrix">k_matrix</param>
 		</struct>
-		<struct name="g_matrix">
+		<struct name="g_matrix" mergeType="replace">
 			<param name="Type">StiffnessMatrix</param>
 			<param name="RowVariable">VelocityField</param>
 			<param name="ColumnVariable">PressureField</param>	
@@ -49,27 +49,27 @@
 			<param name="transposeRHS">cont_force</param>
 			<param name="allowZeroElementContributions">False</param>
 		</struct>
-		<struct name="gradientStiffnessMatrixTerm">
+		<struct name="gradientStiffnessMatrixTerm" mergeType="replace">
 			<param name="Type">GradientStiffnessMatrixTerm</param>
 			<param name="Swarm">gaussSwarm</param>
 			<param name="StiffnessMatrix">g_matrix</param>
 		</struct>
 
 		<!-- Solver Stuff -->
-		<struct name="preconditioner">
+		<struct name="preconditioner" mergeType="replace">
 			<param name="Type">StiffnessMatrix</param>
 			<param name="RowVariable">PressureField</param>
 			<param name="ColumnVariable">PressureField</param>	
 			<param name="RHS">cont_force</param>
 			<param name="allowZeroElementContributions">True</param>
 		</struct>		
-		<struct name="preconditionerTerm">
+		<struct name="preconditionerTerm" mergeType="replace">
 			<param name="Type">UzawaPreconditionerTerm</param>
 			<param name="Swarm">gaussSwarm</param>
 			<param name="StiffnessMatrix">preconditioner</param>
 		</struct>
 
-		<struct name="uzawa">
+		<struct name="uzawa" mergeType="replace">
 			<param name="Type">Stokes_SLE_UzawaSolver</param>
 			<param name="velocitySolver">matrixSolver</param>
 			<param name="Preconditioner">preconditioner</param>
@@ -77,7 +77,7 @@
 			<param name="maxIterations">5000</param>
 		</struct>
 			
-		<struct name="stokesEqn">
+		<struct name="stokesEqn" mergeType="replace">
 			<param name="Type">Stokes_SLE</param>
 			<param name="SLE_Solver">uzawa</param>
 			<param name="Context">context</param>
