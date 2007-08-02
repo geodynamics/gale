@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: Init.c 663 2007-02-23 01:54:59Z KathleenHumble $
+** $Id: Init.c 728 2007-08-02 08:54:00Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -79,7 +79,7 @@ Bool glucifer_Init() {
 	Memory_Free(directory);
 
 	/* Add the plugin path to the global plugin list */
-	PluginsManager_AddDirectory( "gLucifer", LIB_DIR );
+	ModulesManager_AddDirectory( "gLucifer", LIB_DIR );
 
 	return True;
 }
