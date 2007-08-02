@@ -35,30 +35,46 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-*/
-/** \file
-** Role:
-**	Defines any header info, such as new structures, needed by this plugin
-**
-** Assumptions:
-**
-** Comments:
-**
-** $Id $
+** $Id: Init.c 934 2007-08-02 08:37:40Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __StgFEM_Application_h__
-#define __StgFEM_Application_h__
+#include <mpi.h>
+#include <StGermain/StGermain.h>
+#include "StgFEM/Discretisation/Discretisation.h"
+#include "StgFEM/SLE/SLE.h"
+#include "StgFEM/Assembly/Assembly.h"
+#include "Init.h"
 
-extern const Type StgFEM_Application_Type;
+#include <stdio.h>
 
-typedef struct {
-	__Codelet
-} StgFEM_Application;
+/** Initialises the Linear Algebra package, then any init for this package
+such as streams etc */
+Bool StgFEM_Init( int* argc, char** argv[] ) {
+	int tmp;
+	char* directory;
 
-Index StgFEM_Application_Register( PluginsManager* pluginsManager );
+	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
+	tmp = Stream_GetPrintingRank( Journal_Register( InfoStream_Type, "Context" ) );
+	Stream_SetPrintingRank( Journal_Register( InfoStream_Type, "Context" ), 0 );
+	Journal_Printf( /* DO NOT CHANGE OR REMOVE */
+		Journal_Register( InfoStream_Type, "Context" ), 
+		"StGermain Finite Element Framework revision %s. Copyright (C) 2003-2005 VPAC.\n", VERSION );
+	Stream_Flush( Journal_Register( InfoStream_Type, "Context" ) );
+	Stream_SetPrintingRank( Journal_Register( InfoStream_Type, "Context" ), tmp );
+	
+	StgFEM_Discretisation_Init( argc, argv );
+	StgFEM_SLE_Init( argc, argv );
+	StgFEM_Assembly_Init( argc, argv );
 
-void StgFEM_Application_Finalise();
+	/* Add the StgFEM path to the global xml path dictionary */
+	directory = Memory_Alloc_Array( char, 200, "xmlDirectory" ) ;
+	sprintf(directory, "%s%s", LIB_DIR, "/StGermain" );
+	XML_IO_Handler_AddDirectory("StgFEM", directory );
+	Memory_Free(directory);
+	
+	/* Add the plugin path to the global plugin list */
+	ModulesManager_AddDirectory( "StgFEM", LIB_DIR );
 
-#endif	
+	return True;
+}

@@ -35,21 +35,20 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 828 2007-05-07 10:09:40Z JulianGiordani $
+## $Id: makefile 934 2007-08-02 08:37:40Z SteveQuenette $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# obtain defaults for required variables according to system and project location, and then run the build.
+SHELL := $(shell which bash)
+PROJ_ROOT:= $(shell until test -r ./Makefile.system ; do cd .. ; done ; echo `pwd`)
+include ${PROJ_ROOT}/Makefile.system
 
 subdirs = \
 	Output \
 	StandardConditionFunctions \
 	Document \
 	CompareFeVariableAgainstReferenceSolution \
-	Application \
 	FeVariableImportExporters
 
-# obtain defaults for required variables according to system and project location, and then run the build.
-SHELL := $(shell which bash)
-PROJ_ROOT:= $(shell until test -r ./Makefile.system ; do cd .. ; done ; echo `pwd`)
-
-include ${PROJ_ROOT}/Makefile.system
 include ${PROJ_ROOT}/Makefile.vmake
