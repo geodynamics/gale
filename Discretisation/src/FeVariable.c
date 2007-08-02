@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeVariable.c 924 2007-07-26 02:32:12Z LukeHodkinson $
+** $Id: FeVariable.c 933 2007-08-02 06:21:38Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -2077,6 +2077,7 @@ void FeVariable_ReadNodalValuesFromFile_StgFEM_Native( void* feVariable, const c
 	MPI_Comm	comm = Comm_GetMPIComm( Mesh_GetCommTopology( self->feMesh, MT_VERTEX ) );
 	unsigned		rank;
 	unsigned		nProcs;
+	int nDims;
 
 	MPI_Comm_rank( comm, (int*)&rank );
 	MPI_Comm_size( comm, (int*)&nProcs );
@@ -2112,17 +2113,24 @@ void FeVariable_ReadNodalValuesFromFile_StgFEM_Native( void* feVariable, const c
 
 	/* Need to re-set the geometry here, in case we're loading from a checkpoint that had compression/squashing BCs,
 		and hence ended up with a smaller mesh than the original */
-
+	nDims = Mesh_GetDimSize( self->feMesh );
 	while ( !feof(inputFile) ) {
 		fscanf( inputFile, "%u ", &gNode_I );
 		if( FeMesh_NodeGlobalToDomain( self->feMesh, gNode_I, &lNode_I ) && 
 		    lNode_I < FeMesh_GetNodeLocalSize( self->feMesh ) )
 		{
+			double crds[3];
+			double *vert;
+
 			/* Note: until we have proper mesh geometry, topology etc checkpointing, we re-load the 
 			node co-ords from the feVariable file - and also update the geometry */
-			fscanf( inputFile, "%lg %lg %lg ", Mesh_GetVertex( self->feMesh, lNode_I ), 
-				Mesh_GetVertex( self->feMesh, lNode_I ) + 1, 
-				Mesh_GetVertex( self->feMesh, lNode_I ) + 2 );
+			fscanf( inputFile, "%lg %lg %lg ", crds, crds + 1, crds + 2 );
+			vert = Mesh_GetVertex( self->feMesh, lNode_I );
+			vert[0] = crds[0];
+			if( nDims >= 2 )
+				vert[1] = crds[1];
+			if( nDims >=3 )
+				vert[2] = crds[2];
 			
 			for ( dof_I = 0; dof_I < dofAtEachNodeCount; dof_I++ ) {
 				fscanf( inputFile, "%lg ", &variableVal );
