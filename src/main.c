@@ -38,93 +38,61 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: main.c 466 2007-04-27 06:24:33Z LukeHodkinson $
+** $Id: main.c 566 2007-08-05 09:49:28Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
 #ifdef HAVE_PYTHON
-#include <Python.h>
+	#include <Python.h>
 #endif
-#ifdef HAVE_SDL
-#include <SDL/SDL.h>
-#endif
-
 #include <mpi.h>
 #include <StGermain/StGermain.h>
-#include <StgFEM/StgFEM.h>
-#include <PICellerator/PICellerator.h>
-
-#include "Underworld/Underworld.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+
+const Type Underworld_Type = "Underworld";
 
 int main( int argc, char* argv[] ) {
-	MPI_Comm           CommWorld;
-	int                rank;
-	int                numProcessors;
-	Dictionary*        dictionary;
-	XML_IO_Handler*    ioHandler;
-	UnderworldContext* context         = NULL;
-	
-	char* errMessage = "Component dictionary must have unique names\n";
+	/* StGermain standard bits & pieces */
+	MPI_Comm			CommWorld;
+	int				rank;
+	int				numProcessors;
+	Dictionary*			dictionary;
+	XML_IO_Handler*			ioHandler;
+	Stream*                         stream;
 
 	/* Initialise PETSc, get world info */
 	MPI_Init( &argc, &argv );
 	MPI_Comm_dup( MPI_COMM_WORLD, &CommWorld );
 	MPI_Comm_size( CommWorld, &numProcessors );
 	MPI_Comm_rank( CommWorld, &rank );
-	
 	StGermain_Init( &argc, &argv );
-	StgFEM_Init( &argc, &argv );
-	PICellerator_Init( &argc, &argv );
-	Underworld_Init( &argc, &argv );
+	stream = Journal_Register( Info_Type, Underworld_Type );
 	#ifdef HAVE_PYTHON
-	Py_Initialize();
-	#endif
-
+		Py_Initialize();
+	#endif	
 	MPI_Barrier( CommWorld ); /* Ensures copyright info always come first in output */
 	
-	/* Create the application's dictionary */
+	/* Create the application's dictionary & read input */
 	dictionary = Dictionary_New();
-
-	/* Read input */
 	ioHandler = XML_IO_Handler_New();
 	IO_Handler_ReadAllFromCommandLine( ioHandler, argc, argv, dictionary );
 	Journal_ReadFromDictionary( dictionary );
-
-	/* Construction phase -----------------------------------------------------------------------------------------------*/
-	context = UnderworldContext_New( "context", 0, 0, CommWorld, dictionary );
-	Stg_Component_Construct( context, 0 /* dummy */, &context, True );
+	stgImportToolbox( dictionary, "Underworld" );
 	
-	/* Building phase ---------------------------------------------------------------------------------------------------*/
-	Stg_Component_Build( context, 0 /* dummy */, False );
+	stgMainLoop( dictionary, CommWorld );
 	
-	/* Initialisaton phase ----------------------------------------------------------------------------------------------*/
-	Stg_Component_Initialise( context, 0 /* dummy */, False );
-	
-	/* Run (Solve) phase ------------------------------------------------------------------------------------------------*/
-	AbstractContext_Dump( context );
-	Stg_Component_Execute( context, 0 /* dummy */, False );
-	
-	/* Destruct phase ---------------------------------------------------------------------------------------------------*/
-	Stg_Component_Destroy( context, 0 /* dummy */, False );
-	Stg_Class_Delete( context );
 	Stg_Class_Delete( dictionary );
-
-	/*if( rank == procToWatch ) Memory_Print(); */
 	
+	/* Close off everything */
 	#ifdef HAVE_PYTHON
-	Py_Finalize();
+		Py_Finalize();
 	#endif
-	PICellerator_Finalise();
-	StgFEM_Finalise();
 	StGermain_Finalise();
-		
-	/* Close off MPI */
+	Journal_Printf( stream, "Finalised: StGermain Framework.\n");
 	MPI_Finalize();
 	
 	return 0; /* success */

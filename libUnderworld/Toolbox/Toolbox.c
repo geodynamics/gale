@@ -105,8 +105,6 @@ void* _Underworld_Toolbox_DefaultNew( Name name ) {
 }
 
 void Underworld_Toolbox_Initialise( PluginsManager* pluginsManager, int* argc, char*** argv ) {
-	Journal_Printf( Journal_Register( Info_Type, Underworld_Toolbox_Type ), "Initialising: Underworld Toolbox.\n" );
-
 	Underworld_Init( argc, argv );
 }
 
