@@ -36,7 +36,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: testStressTensor.0of1.sh 656 2006-10-18 06:45:50Z SteveQuenette $
+## $Id: testStressTensor.0of1.sh 935 2007-08-05 09:48:38Z SteveQuenette $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -49,4 +49,4 @@ done
 setUpdateModeFromArg $1
 
 testname="`basename $0 .sh`"
-runAndHandleSystemTestStdLocations "StgFEM testStressTensor.xml --StiffnessMatrixCompareFilename=./expected/${testname}.matrix --patchtests=${UPDATE_MODE}" "$0" "$@"
+runAndHandleSystemTestStdLocations "StGermain testStressTensor.xml --StiffnessMatrixCompareFilename=./expected/${testname}.matrix --patchtests=${UPDATE_MODE}" "$0" "$@"

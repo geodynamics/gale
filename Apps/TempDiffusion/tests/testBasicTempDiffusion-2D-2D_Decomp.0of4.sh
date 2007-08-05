@@ -36,7 +36,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: testBasicTempDiffusion-2D-2D_Decomp.0of4.sh 656 2006-10-18 06:45:50Z SteveQuenette $
+## $Id: testBasicTempDiffusion-2D-2D_Decomp.0of4.sh 935 2007-08-05 09:48:38Z SteveQuenette $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -46,4 +46,4 @@ until test -r ${TEST_SCRIPT} ; do
 done
 . ${TEST_SCRIPT}
 
-runAndHandleSystemTestStdLocations "StgFEM ../TempDiffusion.xml ../analyticTemperature.xml --numPartitionedDims=2" "$0" "$@"
+runAndHandleSystemTestStdLocations "StGermain ../TempDiffusion.xml ../analyticTemperature.xml --numPartitionedDims=2" "$0" "$@"

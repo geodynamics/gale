@@ -28,7 +28,7 @@
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-def_sub = Discretisation SLE Assembly libStgFEM src plugins Apps
+def_sub = Discretisation SLE Assembly libStgFEM plugins Apps
 
 ifeq (true,$(shell if test -x $(DOXYGEN); then echo true; fi ))
 	def_sub += doc

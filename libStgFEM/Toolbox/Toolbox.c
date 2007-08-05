@@ -43,7 +43,7 @@
 #include <mpi.h>
 #include <StGermain/StGermain.h>
 #include <StgFEM/StgFEM.h>
-#include "Application.h"
+#include "Toolbox.h"
 
 
 const Type StgFEM_Toolbox_Type = "StgFEM_Toolbox";
@@ -104,8 +104,6 @@ void* _StgFEM_Toolbox_DefaultNew( Name name ) {
 }
 
 void StgFEM_Toolbox_Initialise( PluginsManager* pluginsManager, int* argc, char*** argv ) {
-	Journal_Printf( Journal_Register( Info_Type, StgFEM_Toolbox_Type ), "Initialising: StGermain FEM Toolbox.\n" );
-
 	StgFEM_Init( argc, argv );
 }
 
