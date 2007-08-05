@@ -49,4 +49,4 @@ until test -r ${TEST_SCRIPT} ; do
 done
 . ${TEST_SCRIPT}
 
-runAndHandleSystemTestStdLocations "PICellerator testPCDVC.xml --FunctionName=CircleInterface --mean-tolerance=0.001 --standardDeviation-tolerance=0.001 --mean-expectedValue=0.162 --standardDeviation-expectedValue=0.063" "$0" "$@"
+runAndHandleSystemTestStdLocations "StGermain testPCDVC.xml --FunctionName=CircleInterface --mean-tolerance=0.001 --standardDeviation-tolerance=0.001 --mean-expectedValue=0.162 --standardDeviation-expectedValue=0.063" "$0" "$@"

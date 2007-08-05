@@ -38,7 +38,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 277 2006-04-11 11:28:01Z PatrickSunter $
+## $Id: makefile 504 2007-08-05 09:48:58Z SteveQuenette $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -46,7 +46,7 @@
 override PROJ_ROOT=.
 include ${PROJ_ROOT}/Makefile.system
 
-subdirs = Voronoi PopulationControl Weights MaterialPoints Utils libPICellerator src plugins Apps
+subdirs = Voronoi PopulationControl Weights MaterialPoints Utils libPICellerator plugins Apps
 
 ifeq (true,$(shell if test -x $(DOXYGEN); then echo true; fi ))
         subdirs += doc

@@ -39,7 +39,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: testMaterialFeVariable.0of1.sh 279 2006-04-11 12:36:05Z PatrickSunter $
+## $Id: testMaterialFeVariable.0of1.sh 504 2007-08-05 09:48:58Z SteveQuenette $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -49,4 +49,4 @@ until test -r ${TEST_SCRIPT} ; do
 done
 . ${TEST_SCRIPT}
 
-runAndHandleSystemTestStdLocations "PICellerator testMaterialFeVariable.xml" "$0" "$@"
+runAndHandleSystemTestStdLocations "StGermain testMaterialFeVariable.xml" "$0" "$@"

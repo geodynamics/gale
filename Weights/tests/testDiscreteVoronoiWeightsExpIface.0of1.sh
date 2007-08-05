@@ -39,7 +39,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: testDiscreteVoronoiWeightsExpIface.0of1.sh 406 2007-01-15 03:03:20Z KathleenHumble $
+## $Id: testDiscreteVoronoiWeightsExpIface.0of1.sh 504 2007-08-05 09:48:58Z SteveQuenette $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -49,4 +49,4 @@ until test -r ${TEST_SCRIPT} ; do
 done
 . ${TEST_SCRIPT}
 
-runAndHandleSystemTestStdLocations "PICellerator testDiscreteVoronoiWeights.xml --FunctionName=ExponentialInterface --mean-tolerance=0.000001 --standardDeviation-tolerance=0.000001 --mean-expectedValue=0.074954 --standardDeviation-expectedValue=0.059645" "$0" "$@"
+runAndHandleSystemTestStdLocations "StGermain testDiscreteVoronoiWeights.xml --FunctionName=ExponentialInterface --mean-tolerance=0.000001 --standardDeviation-tolerance=0.000001 --mean-expectedValue=0.074954 --standardDeviation-expectedValue=0.059645" "$0" "$@"

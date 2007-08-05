@@ -103,8 +103,6 @@ void* _PICellerator_Toolbox_DefaultNew( Name name ) {
 }
 
 void PICellerator_Toolbox_Initialise( PluginsManager* pluginsManager, int* argc, char*** argv ) {
-	Journal_Printf( Journal_Register( Info_Type, PICellerator_Toolbox_Type ), "Initialising: PICellerator Toolbox.\n" );
-
 	PICellerator_Init( argc, argv );
 }
 

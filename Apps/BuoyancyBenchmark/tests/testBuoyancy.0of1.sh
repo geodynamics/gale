@@ -39,7 +39,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: testBuoyancy.0of1.sh 306 2006-05-17 08:22:48Z VincentLemiale $
+## $Id: testBuoyancy.0of1.sh 504 2007-08-05 09:48:58Z SteveQuenette $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -49,4 +49,4 @@ until test -r ${TEST_SCRIPT} ; do
 done
 . ${TEST_SCRIPT}
 
-runAndHandleSystemTestStdLocations "PICellerator ./testBuoyancy.xml" "$0" "$@"
+runAndHandleSystemTestStdLocations "StGermain ./testBuoyancy.xml" "$0" "$@"

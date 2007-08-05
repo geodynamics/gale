@@ -39,7 +39,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: testLidDrivenPIC-Analytic-2D.0of1.sh 287 2006-04-24 07:32:07Z RobertTurnbull $
+## $Id: testLidDrivenPIC-Analytic-2D.0of1.sh 504 2007-08-05 09:48:58Z SteveQuenette $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -49,4 +49,4 @@ until test -r ${TEST_SCRIPT} ; do
 done
 . ${TEST_SCRIPT}
 
-runAndHandleSystemTestStdLocations "PICellerator ../LidDrivenPIC.xml ../lidDrivenAnalytic.xml --AnalyticVelocityWavenumber=1 --maxTimeSteps=10" "$0" "$@"
+runAndHandleSystemTestStdLocations "StGermain ../LidDrivenPIC.xml ../lidDrivenAnalytic.xml --AnalyticVelocityWavenumber=1 --maxTimeSteps=10" "$0" "$@"

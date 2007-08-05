@@ -3,6 +3,10 @@
 
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 	
+	<list name="import" mergeType="merge">
+		<param>PICellerator</param>
+	</list>
+
 	<include>StgFEM/LinearMesh.xml</include>
 	<include>StgFEM/GaussSwarm.xml</include>
 	<include>StgFEM/VelocityField.xml</include>

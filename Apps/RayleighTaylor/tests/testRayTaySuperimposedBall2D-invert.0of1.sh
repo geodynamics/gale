@@ -49,4 +49,4 @@ until test -r ${TEST_SCRIPT} ; do
 done
 . ${TEST_SCRIPT}
 
-runAndHandleSystemTestStdLocations "PICellerator ./testRayTaySuperimposedBall-invert.xml" "$0" "$@"
+runAndHandleSystemTestStdLocations "StGermain ./testRayTaySuperimposedBall-invert.xml" "$0" "$@"
