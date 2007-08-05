@@ -35,21 +35,18 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: StGermain.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: StGermain.h 4164 2007-08-05 09:48:11Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #ifndef __StGermain_StGermain_h__
 #define __StGermain_StGermain_h__
 
-	#define EP_APPLICATIONS_FINALISE "StGermain_EP_ApplicationsFinalise"
-/* TODO: ensure safe to remove (i.e. evertthing compiles). Shoud just append the context's contruct */
-/*	#define EP_APPLICATIONS_POST_COMPONENTS_CONSTRUCT "StGermain_EP_ApplicationsPostComponentsConstruct" */
-
 	#include "Base/Base.h"
 	#include "Discretisation/Discretisation.h"
 	
 	#include "Init.h"
+	#include "main.h"
 	#include "Finalise.h"
 
 #endif /* __StGermain_StGermain_h__ */

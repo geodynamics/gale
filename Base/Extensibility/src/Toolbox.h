@@ -74,6 +74,7 @@
 		Stg_Class_PrintFunction*     _print,
 		Stg_Class_CopyFunction*      _copy, 
 		Name                         name,
+		Module_MangleNameFunction    MangleName,
 		Stg_ObjectList*              directories );
 	
 	/* Initialisation implementation */
@@ -84,6 +85,9 @@
 	
 	/* Print implementation */
 	void _Toolbox_Print( void* toolbox, Stream* stream );
+
+	/* MangleName implementation */
+	char* _Toolbox_MangleName( char* name );
 
 	/** Get the function pointer the to the toolbox's register function */
 	Toolbox_RegisterFunction* Toolbox_GetRegisterFunc( void* toolbox );

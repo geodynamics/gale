@@ -40,57 +40,64 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifdef HAVE_PYTHON
-	#include <Python.h>
-#endif
 #include <mpi.h>
-#include <StGermain/StGermain.h>
+#include "Base/Base.h"
+#include "Discretisation/Discretisation.h"
+
+#include "main.h"
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
-const Type StGermain_Type = "StGermain";
 
-int main( int argc, char* argv[] ) {
-	/* StGermain standard bits & pieces */
-	MPI_Comm			CommWorld;
-	int				rank;
-	int				numProcessors;
-	Dictionary*			dictionary;
-	XML_IO_Handler*			ioHandler;
-	Stream*                         stream;
+void stgMainLoop( Dictionary* dictionary, MPI_Comm CommWorld ) {
+	AbstractContext*		context = NULL;
+	
+	/* Construction phase -----------------------------------------------------------------------------------------------*/
+	context = _AbstractContext_New( 
+			sizeof(AbstractContext),
+	       	        AbstractContext_Type,
+	                _AbstractContext_Delete,
+	                _AbstractContext_Print,
+	                NULL,
+	                NULL,
+	                _AbstractContext_Construct,
+	                _AbstractContext_Build,
+	                _AbstractContext_Initialise,
+	                _AbstractContext_Execute,
+	                _AbstractContext_Destroy,
+	                "context",
+	                True,
+	                NULL,
+	                0,
+	                10,
+	                CommWorld,
+	                dictionary );
 
-	/* Initialise PETSc, get world info */
-	MPI_Init( &argc, &argv );
-	MPI_Comm_dup( MPI_COMM_WORLD, &CommWorld );
-	MPI_Comm_size( CommWorld, &numProcessors );
-	MPI_Comm_rank( CommWorld, &rank );
-	StGermain_Init( &argc, &argv );
-	stream = Journal_Register( Info_Type, StGermain_Type );
-	#ifdef HAVE_PYTHON
-		Py_Initialize();
-	#endif	
-	MPI_Barrier( CommWorld ); /* Ensures copyright info always come first in output */
+	/* Construction phase -----------------------------------------------------------------------------------------------*/
+	Stg_Component_Construct( context, 0 /* dummy */, &context, True );
 	
+	/* Building phase ---------------------------------------------------------------------------------------------------*/
+	Stg_Component_Build( context, 0 /* dummy */, False );
 	
-	/* Create the application's dictionary & read input */
-	dictionary = Dictionary_New();
-	ioHandler = XML_IO_Handler_New();
-	IO_Handler_ReadAllFromCommandLine( ioHandler, argc, argv, dictionary );
-	Journal_ReadFromDictionary( dictionary );
+	/* Initialisaton phase ----------------------------------------------------------------------------------------------*/
+	Stg_Component_Initialise( context, 0 /* dummy */, False );
 	
-	stgMainLoop( dictionary, CommWorld );
+	/* Run (Solve) phase ------------------------------------------------------------------------------------------------*/
+	AbstractContext_Dump( context );
+	Stg_Component_Execute( context, 0 /* dummy */, False );
+
+	/* Destruct phase ---------------------------------------------------------------------------------------------------*/
+	Stg_Component_Destroy( context, 0 /* dummy */, False );
+	Stg_Class_Delete( context );
+}
+
+void stgImportToolbox( Dictionary* dictionary, char* toolboxName ) {
+	Dictionary_Entry_Value* dev = Dictionary_Get( dictionary, "import" );
 	
-	Stg_Class_Delete( dictionary );
+	if( !dev ) {
+		dev = Dictionary_Entry_Value_NewList();
+		Dictionary_Add( dictionary, "import", dev );
+	}
 	
-	/* Close off everything */
-	#ifdef HAVE_PYTHON
-		Py_Finalize();
-	#endif
-	StGermain_Finalise();
-	Journal_Printf( stream, "Finalised: StGermain Framework.\n");
-	MPI_Finalize();
-	
-	return 0; /* success */
+	Dictionary_Entry_Value_AddElement( dev, Dictionary_Entry_Value_FromString( toolboxName ) );
 }

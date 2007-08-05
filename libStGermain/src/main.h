@@ -29,63 +29,22 @@
 **  Role:
 **
 ** Assumptions:
+**	Non as yet.
 **
 ** Comments:
+**	None as yet.
 **
-** $Id: Plugin.h 3192 2005-08-25 01:45:42Z AlanLo $
+** $Id: Init.h 3462 2006-02-19 06:53:24Z WalterLandry $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Extensibility_Plugin_h__
-#define __Base_Extensibility_Plugin_h__
-	
-	/** The prototype for the Register function in a plugin */
-	typedef Index (Plugin_RegisterFunction) ( void* pluginsManager );
+#ifndef __StGermain_main_h__
+#define __StGermain_main_h__
 
-	/* Textual name of this class */
-	extern const Type Plugin_Type;
+	/** The StGermain main loop - the context life cycle */
+	void stgMainLoop( Dictionary* dictionary, MPI_Comm CommWorld );
 
-	/* Plugins info */
-	#define __Plugin \
-		/* General info */ \
-		__Module \
-		\
-		/* Virtual info */ \
-		\
-		/* Plugin info */ \
-		Plugin_RegisterFunction*    Register;
-		
-	struct Plugin { __Plugin };
-
-
-	/* Create a new Plugin */
-	Plugin* Plugin_New( Name name, Stg_ObjectList* directories );
-	Module* Plugin_Factory( Name name, Stg_ObjectList* directories );
+	/** Add a toolbox to the "import" list in the dictionary */
+	void stgImportToolbox( Dictionary* dictionary, char* toolboxName );
 	
-	/* Creation implementation / Virtual constructor */
-	Plugin* _Plugin_New( 
-		SizeT                        _sizeOfSelf,
-		Type                         type,
-		Stg_Class_DeleteFunction*    _delete,
-		Stg_Class_PrintFunction*     _print,
-		Stg_Class_CopyFunction*      _copy, 
-		Name                         name,
-		Module_MangleNameFunction    MangleName,
-		Stg_ObjectList*              directories );
-	
-	/* Initialisation implementation */
-	void _Plugin_Init( Plugin* self );
-	
-	/* Delete implementation */
-	void _Plugin_Delete( void* plugin );
-	
-	/* Print implementation */
-	void _Plugin_Print( void* plugin, Stream* stream );
-
-	/* MangleName implementation */
-	char* _Plugin_MangleName( char* name );
-
-	/** Get the function pointer the to the plugin's register function */
-	Plugin_RegisterFunction* Plugin_GetRegisterFunc( void* plugin );
-	
-#endif /* __Base_Extensibility_Plugin_h__ */
+#endif /* __StGermain_main_h__ */

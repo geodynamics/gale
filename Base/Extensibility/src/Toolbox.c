@@ -47,13 +47,17 @@
 #include "Module.h"
 #include "Toolbox.h"
 
+#include <string.h>
 
 const Type Toolbox_Type = "Toolbox";
 
-static const char* PLUGIN_REGISTER_SUFFIX = "_Register";
-static const char* PLUGIN_INITIALISE_SUFFIX = "_Initialise";
-static const char* PLUGIN_FINALISE_SUFFIX = "_Finalise";
-
+static const char* TOOLBOX_REGISTER_SUFFIX = "_Register";
+static const char* TOOLBOX_INITIALISE_SUFFIX = "_Initialise";
+static const char* TOOLBOX_FINALISE_SUFFIX = "_Finalise";
+static const char* TOOLBOX_MODULE_SUFFIX = "_Toolbox";
+#ifdef MEMORY_STATS
+	static const char* TOOLBOX_MANGLEDNAME = "mangledName";
+#endif
 
 Toolbox* Toolbox_New( Name name, Stg_ObjectList* directories ) {
 	return _Toolbox_New( 
@@ -63,6 +67,7 @@ Toolbox* Toolbox_New( Name name, Stg_ObjectList* directories ) {
 		_Toolbox_Print, 
 		NULL,
 		name,
+		_Toolbox_MangleName,
 		directories );
 }
 
@@ -77,13 +82,14 @@ Toolbox* _Toolbox_New(
 		Stg_Class_PrintFunction*     _print,
 		Stg_Class_CopyFunction*      _copy, 
 		Name                         name,
+		Module_MangleNameFunction    MangleName,
 		Stg_ObjectList*              directories )
 {
 	Toolbox* self;
 
 	assert( _sizeOfSelf >= sizeof(Toolbox) );
 
-	self = (Toolbox*)_Module_New( _sizeOfSelf, type, _delete, _print, _copy, name, directories );
+	self = (Toolbox*)_Module_New( _sizeOfSelf, type, _delete, _print, _copy, name, MangleName, directories );
 	
 	_Toolbox_Init( self );
 
@@ -94,9 +100,9 @@ void _Toolbox_Init( Toolbox* self ) {
 	Stream* stream = Journal_Register( Info_Type, self->type );
 
 	if( self->dllPtr != NULL ) {
-		self->Register = (Toolbox_RegisterFunction*)Module_LoadSymbol( self, PLUGIN_REGISTER_SUFFIX );
-		self->Initialise = (Toolbox_InitialiseFunction*)Module_LoadSymbol( self, PLUGIN_INITIALISE_SUFFIX );
-		self->Finalise = (Toolbox_FinaliseFunction*)Module_LoadSymbol( self, PLUGIN_FINALISE_SUFFIX );
+		self->Register = (Toolbox_RegisterFunction*)Module_LoadSymbol( self, TOOLBOX_REGISTER_SUFFIX );
+		self->Initialise = (Toolbox_InitialiseFunction*)Module_LoadSymbol( self, TOOLBOX_INITIALISE_SUFFIX );
+		self->Finalise = (Toolbox_FinaliseFunction*)Module_LoadSymbol( self, TOOLBOX_FINALISE_SUFFIX );
 	}
 	/* If the register function is not found, then unload the module... it's not a toolbox. */
 	if( self->Register == NULL || self->Initialise == NULL || self->Finalise == NULL ) {
@@ -123,6 +129,13 @@ void _Toolbox_Print( void* toolbox, Stream* stream ) {
 	
 	Stream_UnIndent( stream );
 }
+
+char* _Toolbox_MangleName( char* name ) {
+	char* mangledName = Memory_Alloc_Array( char, strlen( name ) + strlen( TOOLBOX_MODULE_SUFFIX ) + 1, TOOLBOX_MANGLEDNAME );
+	sprintf( mangledName, "%s%s", name, TOOLBOX_MODULE_SUFFIX );
+	return mangledName;
+}
+
 
 Toolbox_RegisterFunction* Toolbox_GetRegisterFunc( void* toolbox ) {
 	Toolbox* self = (Toolbox*)toolbox;

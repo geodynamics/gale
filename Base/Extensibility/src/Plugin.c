@@ -47,10 +47,15 @@
 #include "Module.h"
 #include "Plugin.h"
 
+#include <string.h>
+
 
 const Type Plugin_Type = "Plugin";
 
 static const char* PLUGIN_REGISTER_SUFFIX = "_Register";
+#ifdef MEMORY_STATS
+	static const char* PLUGIN_MANGLEDNAME = "mangledName";
+#endif
 
 
 Plugin* Plugin_New( Name name, Stg_ObjectList* directories ) {
@@ -61,6 +66,7 @@ Plugin* Plugin_New( Name name, Stg_ObjectList* directories ) {
 		_Plugin_Print, 
 		NULL,
 		name,
+		_Plugin_MangleName,
 		directories );
 }
 
@@ -75,13 +81,14 @@ Plugin* _Plugin_New(
 		Stg_Class_PrintFunction*     _print,
 		Stg_Class_CopyFunction*      _copy, 
 		Name                         name,
+		Module_MangleNameFunction    MangleName,
 		Stg_ObjectList*              directories )
 {
 	Plugin* self;
 
 	assert( _sizeOfSelf >= sizeof(Plugin) );
 
-	self = (Plugin*)_Module_New( _sizeOfSelf, type, _delete, _print, _copy, name, directories );
+	self = (Plugin*)_Module_New( _sizeOfSelf, type, _delete, _print, _copy, name, MangleName, directories );
 	
 	_Plugin_Init( self );
 
@@ -120,6 +127,13 @@ void _Plugin_Print( void* plugin, Stream* stream ) {
 	
 	Stream_UnIndent( stream );
 }
+
+char* _Plugin_MangleName( char* name ) {
+	char* mangledName = Memory_Alloc_Array( char, strlen( name ) + 1, PLUGIN_MANGLEDNAME );
+	sprintf( mangledName, "%s", name );
+	return mangledName;
+}
+
 
 Plugin_RegisterFunction* Plugin_GetRegisterFunc( void* plugin ) {
 	Plugin* self = (Plugin*)plugin;

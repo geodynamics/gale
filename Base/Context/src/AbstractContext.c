@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AbstractContext.c 4163 2007-08-02 08:32:40Z SteveQuenette $
+** $Id: AbstractContext.c 4164 2007-08-05 09:48:11Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -809,19 +809,22 @@ void _AbstractContext_Construct_Hook( void* context, void* ptrToContext ) {
 	ptrToSelf = (AbstractContext**)ptrToContext;
 	for( index = stgToolboxesManager->modules->count - 1; index >= 0; index-- ) {
 		Module* module = (Module*)Stg_ObjectList_At( stgToolboxesManager->modules, index );
+		char*   mangledName = Module_MangledName( module );
 		
 		/* Contruct toolbox */
 		Journal_Firewall(
-			ModulesManager_ConstructModule( stgToolboxesManager, module->name, self->CF, ptrToSelf ),
+			ModulesManager_ConstructModule( stgToolboxesManager, mangledName, self->CF, ptrToSelf ),
 			Journal_Register( Error_Type, AbstractContext_Type ),
-			"Error: Toolbox %s could not be constructed."
+			"Error: Toolbox %s (mangled name: %s) could not be constructed."
 				" Ensure it has a valid construction function.\n",
-				module->name );
+				module->name, mangledName );
 		
 		/* Swap self to the new one*/
 		if( self !=  *ptrToSelf ) {
 			self = *ptrToSelf;
 		}
+		
+		Memory_Free( mangledName );
 	}
 		
 	/* Load the plugins desired by this context (dictionary) */

@@ -39,22 +39,29 @@
 #ifndef __Base_Extensibility_Module_h__
 #define __Base_Extensibility_Module_h__
 	
-	typedef const char* (Module_GetMetadataFunction) ( void );
-	typedef const char* (Module_GetNameFunction) ( void );
-	typedef const char* (Module_GetVersionFunction) ( void );
+	/* The prototype for the virtual functions in a module */
+	typedef char*       (Module_MangleNameFunction)         ( char* name );
 
-	/* Textual name of this class */
-	extern const Type Module_Type;
-
+	/* Meta data stuff */
+	typedef const char* (Module_GetMetadataFunction)        ( void );
+	typedef const char* (Module_GetNameFunction)            ( void );
+	typedef const char* (Module_GetVersionFunction)         ( void );
 	extern const char* PLUGIN_DEPENDENCY_NAME_KEY;
 	extern const char* PLUGIN_DEPENDENCY_VERSION_KEY;
 	extern const char* PLUGIN_DEPENDENCY_URL_KEY;
 	
+	/** Textual name of this class */
+	extern const Type Module_Type;
+
 	/* Modules info */
 	#define __Module \
 		/* General info */ \
 		__Stg_Object \
 		\
+		/* Virtual info */ \
+		Module_MangleNameFunction*  MangleName; \
+		\
+		/* Module info */ \
 		DLL_Handle                  dllPtr; \
 		Module_GetMetadataFunction* GetMetadata; \
 		Module_GetNameFunction*     GetName; \
@@ -72,12 +79,13 @@
 		Stg_Class_PrintFunction*     _print,
 		Stg_Class_CopyFunction*      _copy, 
 		Name                         name,
+		Module_MangleNameFunction    MangleName,
 		Stg_ObjectList*              directories );
 	
 	/* Initialisation implementation */
 	void _Module_Init(
 		Module*                      self,
-		Name                         name,
+		Module_MangleNameFunction    MangleName,
 		Stg_ObjectList*              directories );
 	
 	
@@ -92,6 +100,9 @@
 	const char* Module_GetName( void* module );
 
 	const char* Module_GetVersion( void* module );
+
+	/** Return the mangled (symbol and file) name. Note: result needs to be freed */
+	char* Module_MangledName( void* module );
 
 	/* Obtain the recorded dependancy information of the module */
 	Dictionary_Entry_Value* Module_GetDependencies( void* module );
