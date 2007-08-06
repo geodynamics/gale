@@ -97,7 +97,7 @@
 	<!-- Viewport stuff -->
 	<include>Underworld/Viewports/TemperatureAndVelocityArrowsVP.xml</include>
 	<include>Underworld/Viewports/VelocityMagnitudeVP.xml</include>
-	<include>window.xml</include>
+	<include>glucifer/window.xml</include>
 	<struct name="components" mergeType="merge">
 		<struct name="alignmentColourMap">
 			<param name="Type">lucColourMap</param>

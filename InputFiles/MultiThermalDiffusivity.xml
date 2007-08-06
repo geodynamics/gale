@@ -192,7 +192,7 @@ appropriate parameters and their values if you use this xml from production runs
 	<!-- Viewport stuff -->
 	<include>Underworld/Viewports/TemperatureAndVelocityArrowsVP.xml</include>
 	<include>Underworld/Viewports/VelocityMagnitudeVP.xml</include>
-	<include>window.xml</include>
+	<include>glucifer/window.xml</include>
 	<struct name="components" mergeType="merge">
 		<struct name="camera" mergeType="replace">
 			<param name="Type">lucCamera</param>

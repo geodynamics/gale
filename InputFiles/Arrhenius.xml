@@ -74,7 +74,7 @@
 	<!-- Viewport stuff -->
 	<include>Underworld/Viewports/TemperatureAndVelocityArrowsVP.xml</include>
 	<include>Underworld/Viewports/StrainRateInvariantVP.xml</include>
-	<include>window.xml</include>
+	<include>glucifer/window.xml</include>
 	<struct name="components" mergeType="merge">
 		<struct name="window" mergeType="merge">
 			<param name="Viewport">TemperatureAndVelocityArrowsVP StrainRateInvariantVP</param>
