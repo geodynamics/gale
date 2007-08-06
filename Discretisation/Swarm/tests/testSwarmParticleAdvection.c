@@ -35,7 +35,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: testSwarmParticleAdvection.c 4163 2007-08-02 08:32:40Z SteveQuenette $
+** $Id: testSwarmParticleAdvection.c 4165 2007-08-06 00:47:34Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -137,6 +137,8 @@ int main( int argc, char* argv[] ) {
 	Journal_Enable_TypedStream( DebugStream_Type, False );
 	Stream_EnableBranch( Swarm_Debug, True );
 	Stream_SetLevelBranch( Swarm_Debug, 3 );
+	Stream_Enable( Journal_Register( Info_Type, ParticleMovementHandler_Type ), False );
+	Stream_Enable( Journal_Register( Info_Type, CartesianGenerator_Type ), False );
 
 	if( argc >= 2 ) {
 		procToWatch = atoi( argv[1] );
@@ -144,7 +146,7 @@ int main( int argc, char* argv[] ) {
 	else {
 		procToWatch = 0;
 	}
-	if( rank == procToWatch ) printf( "Watching rank: %i\n", rank );
+	/*if( rank == procToWatch ) printf( "Watching rank: %i\n", rank );*/
 
 	/* For plugins to read */
 	Dictionary_Add( dictionary, "procToWatch", Dictionary_Entry_Value_FromUnsignedInt( procToWatch ) );

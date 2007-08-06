@@ -34,7 +34,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: testSwarmDumpAndLoad.c 4142 2007-06-13 01:26:58Z LukeHodkinson $
+** $Id: testSwarmDumpAndLoad.c 4165 2007-08-06 00:47:34Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -152,8 +152,8 @@ int main( int argc, char* argv[] ) {
 
 	/* *** Journal stuff *** */
 	Journal_Enable_TypedStream( DebugStream_Type, False );
-	Stream_EnableBranch( Swarm_Debug, True );
-	Stream_SetLevelBranch( Swarm_Debug, 3 );
+	Stream_EnableBranch( Swarm_Debug, False );
+	/*Stream_SetLevelBranch( Swarm_Debug, 3 );*/
 
 	/* Turn off the particle comm info to guarantee stdout order */
 	Stream_Enable( Journal_Register( Info_Type, ParticleCommHandler_Type ), False );
@@ -191,6 +191,7 @@ int main( int argc, char* argv[] ) {
     
 	movementHandler = ParticleMovementHandler_New( "movementHandler", True );
 	Swarm_AddCommHandler( swarm, movementHandler );
+	Stream_Enable( Journal_Register( Info_Type, ParticleMovementHandler_Type ), False );
 	
 	/* +++ BUILD PHASE +++ */
 	
