@@ -5,7 +5,7 @@ PROJ_ROOT := $(shell until test -r ./Makefile.system ; do cd .. ; done ; echo `p
 include ${PROJ_ROOT}/Makefile.system
 
 # Subdirectories
-subdirs := Base Windowing RenderingEngines OutputFormats InputFormats DrawingObjects WindowInteractions libglucifer src plugins
+subdirs := Base Windowing RenderingEngines OutputFormats InputFormats DrawingObjects WindowInteractions libglucifer src plugins ModelComponents
 
 
 ifeq (true,$(shell if test -x $(DOXYGEN); then echo true; fi ))
