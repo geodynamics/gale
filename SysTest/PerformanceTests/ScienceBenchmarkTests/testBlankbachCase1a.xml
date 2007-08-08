@@ -72,12 +72,22 @@
 
 	<!-- Visualisation stuff -->
 	<include>Underworld/Viewports/TemperatureAndVelocityArrowsVP.xml</include>
-	<include>../../../InputFiles/window.xml</include>
+	<include>glucifer/window.xml</include>
+	<include>testTracers.xml</include>
 	<struct name="components" mergeType="merge">
+		<struct name="passiveTracerViewport" mergeType="replace">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">camera</param>
+			<list name="DrawingObject">
+				<param>tempandVelTitle</param>
+				<param>temperatureMap</param>
+				<param>border</param>
+				<param>passiveTracerPoints</param>
+				<param>temperatureColourBar</param>
+			</list>	
+		</struct>
 		<struct name="window" mergeType="merge">
-			<list name="Viewport">
-				<param>TemperatureAndVelocityArrowsVP</param>
-			</list>
+			<param name="Viewport" mergeType="replace">TemperatureAndVelocityArrowsVP passiveTracerViewport </param>
 		</struct>
 	</struct>
 </StGermainData>

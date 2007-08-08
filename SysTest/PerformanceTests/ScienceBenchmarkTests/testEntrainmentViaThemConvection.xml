@@ -15,8 +15,23 @@
 			
 	</list>
 	
+	<include>testTracers.xml</include>
 	<struct name="components" mergeType="merge">
-		
+		<struct name="passiveTracerViewport" mergeType="replace">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">camera</param>
+			<list name="DrawingObject">
+				<param>densityTitle</param>
+				<param>passiveTracerPoints</param>
+				<param>particleDots</param>
+			</list>	
+		</struct>
+		<struct name="window" mergeType="merge">
+			<list name="Viewport">
+				<param>TemperatureAndVelocityArrowsVP</param>
+				<param>passiveTracerViewport</param>
+			</list>
+		</struct>
 	</struct>
 
 	<!-- Simulation control -->
