@@ -55,7 +55,9 @@ BelowPlane* BelowPlane_New(
 		double                                beta,
 		double                                gamma,
 		double                                offset,
-		XYZ                                   width )
+		XYZ                                   width,
+		XYZ                                   minValue,
+		XYZ                                   maxValue )
 {
 	BelowPlane* self = (BelowPlane*) _BelowPlane_DefaultNew( name );
 
@@ -67,7 +69,9 @@ BelowPlane* BelowPlane_New(
 		beta,
 		gamma,
 		offset,
-		width ) ;
+		width,
+		minValue,
+		maxValue );
 	return self;
 }
 
@@ -115,12 +119,14 @@ BelowPlane* _BelowPlane_New(
 	return self;
 }
 
-void _BelowPlane_Init( void* belowPlane, double offset, XYZ width ) {
+void _BelowPlane_Init( void* belowPlane, double offset, XYZ width, XYZ minValue, XYZ maxValue ) {
 	BelowPlane* self = (BelowPlane*)belowPlane;
 
 	self->offset = offset;
 
 	memcpy( self->width, width, sizeof(XYZ) );
+	memcpy( self->minValue, maxValue, sizeof(XYZ) );
+	memcpy( self->maxValue, maxValue, sizeof(XYZ) );
 }
 
 
@@ -132,12 +138,14 @@ void BelowPlane_InitAll(
 		double                                beta,
 		double                                gamma,
 		double                                offest,
-		XYZ                                   width )
+		XYZ                                   width,
+		XYZ                                   minValue,
+		XYZ                                   maxValue)
 {
 	BelowPlane* self = (BelowPlane*)belowPlane;
 
 	Stg_Shape_InitAll( self, dim, centre, alpha, beta, gamma );
-	_BelowPlane_Init( self, offest, width );
+	_BelowPlane_Init( self, offest, width, minValue, maxValue );
 }
 	
 
@@ -215,7 +223,7 @@ void _BelowPlane_Construct( void* belowPlane, Stg_ComponentFactory* cf, void* da
 	width[ J_AXIS ] = maxValue[ J_AXIS ] - minValue[ J_AXIS ] ;
 	width[ K_AXIS ] = maxValue[ K_AXIS ] - minValue[ K_AXIS ] ;
 
-	_BelowPlane_Init( self, offset, width );
+	_BelowPlane_Init( self, offset, width, minValue, maxValue );
 }
 
 void _BelowPlane_Build( void* belowPlane, void* data ) {

@@ -49,8 +49,7 @@
 		/* Virtual Info */\
 		\
 		double                  amplitude;  \
-		double                  period; \
-		double                  radPeriod; \
+		double                  quasiPeriod; \
 		double                  phase;
 
 	struct BelowCosinePlane { __BelowCosinePlane };
@@ -85,6 +84,8 @@
 		double                                gamma,
 		double                                offset,
 		XYZ                                   width,
+		XYZ                                   minValue,
+		XYZ                                   maxValue,
 		double                                amplitude,
 		double                                period,
 		double                                phase );

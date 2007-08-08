@@ -49,7 +49,9 @@
 		/* Virtual Info */\
 		\
 		double                  offset; \
-		XYZ                     width; /* The dimesions of a cubiod mesh, for calc volume */
+		XYZ                     width; /* The dimesions of a cubiod mesh, for calc volume */ \
+		XYZ                     minValue; \
+		XYZ                     maxValue; \
 
 	struct BelowPlane { __BelowPlane };
 	
@@ -73,7 +75,7 @@
 		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
 		Name                                  name );
 	
-	void _BelowPlane_Init( void* belowPlane, double offset, XYZ width ) ;
+	void _BelowPlane_Init( void* belowPlane, double offset, XYZ width, XYZ minValue, XYZ maxValue ) ;
 	void BelowPlane_InitAll( 
 		void*                                 belowPlane, 
 		Dimension_Index                       dim, 
@@ -82,7 +84,9 @@
 		double                                beta,
 		double                                gamma,
 		double                                offset,
-		XYZ                                   width );
+		XYZ                                   width,
+		XYZ                                   minValue,
+		XYZ                                   maxValue );
 
 	/* Stg_Class_Delete BelowPlane implementation */
 	void _BelowPlane_Delete( void* belowPlane );
