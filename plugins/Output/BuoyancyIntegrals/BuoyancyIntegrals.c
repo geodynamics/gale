@@ -174,12 +174,12 @@ void Underworld_BuoyancyIntegrals_Setup( void *_context )
 	ctx->int_w_bar_dt = ctx->y_b_initial;
 	
 	if (ctx->dim ==3){
-	shape = (Stg_Shape*)Stg_ComponentFactory_ConstructByName( context->CF, "cylinder", Stg_Shape, True, 0 /* dummy */ );
-	ctx->x_b = shape->centre[0];
-	ctx->z_b = shape->centre[2];
+		shape = (Stg_Shape*)Stg_ComponentFactory_ConstructByName( context->CF, "cylinder", Stg_Shape, True, 0 /* dummy */ );
+		ctx->x_b = shape->centre[0];
+		ctx->z_b = shape->centre[2];
 	} else if (ctx->dim==2){
-	shape = (Stg_Shape*)Stg_ComponentFactory_ConstructByName( context->CF, "disk", Stg_Shape, True, 0 /* dummy */ );
-	ctx->x_b = shape->centre[0];
+		shape = (Stg_Shape*)Stg_ComponentFactory_ConstructByName( context->CF, "disk", Stg_Shape, True, 0 /* dummy */ );
+		ctx->x_b = shape->centre[0];
 	}
 	
 	ctx->temperatureField = FieldVariable_Register_GetByName( fV_Register, "TemperatureField" );
@@ -236,6 +236,29 @@ void Underworld_BuoyancyIntegrals_Setup( void *_context )
 	StgFEM_FrequentOutput_PrintString( context, "int_w_bar_dt" );
 	StgFEM_FrequentOutput_PrintString( context, "temp_b" );
 	StgFEM_FrequentOutput_PrintString( context, "temp_max" );
+	
+	
+	/* Set the initial coordinates for the cob swarm */
+	if( ctx->cob_swarm != NULL ) {
+		Swarm *swarm;
+		int point_count;
+		GlobalParticle *particle;
+		
+		/* Force swarm to allocate points so that I can set initial values */
+		Stg_Component_Build( ctx->cob_swarm, NULL, False );
+		Stg_Component_Initialise( ctx->cob_swarm, NULL, False );
+		
+		swarm = (Swarm*)ctx->cob_swarm;
+		/* Set initial coords based on existing data from input xml */
+		particle = (GlobalParticle*)Swarm_ParticleAt( swarm, 0 );
+		particle->coord[0] = ctx->x_b;
+		particle->coord[1] = ctx->y_b_initial;
+		particle->coord[2] = ctx->z_b;
+	}
+	
+	
+	
+	
 }
 
 
@@ -421,6 +444,7 @@ void assign_coords_to_swarm( double x_b, double y_b, double z_b, MaterialPointsS
 	GlobalParticle *particle;
 	Particle_Index lParticle_I;
 	Stream *errorStream = Journal_Register( Error_Type, "Underworld_BuoyancyIntegrals: assign_coords_to_swarm" );
+	int rank;
 	
 	
 	/* Cast to get parent */
@@ -429,6 +453,10 @@ void assign_coords_to_swarm( double x_b, double y_b, double z_b, MaterialPointsS
 	
 	/* check cob swarm only has one point */
 	point_count = swarm->particleLocalCount;
+	/*
+	MPI_Comm_rank( MPI_COMM_WORLD, &rank );
+	printf("rank[%d]: np (cob) = %d \n", rank, point_count );
+	*/
 	Journal_Firewall(
 			point_count == 1,
 			errorStream,
