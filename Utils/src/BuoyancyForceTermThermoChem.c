@@ -317,7 +317,7 @@ void _BuoyancyForceTermThermoChem_AssembleElement( void* forceTerm, ForceVector*
 	double                           RaC;
 	double                           detJac             = 0.0;
 	double                           factor;
-	double                           Ni[8];
+	double                           Ni[27];
 	double                           force;
 	double*                          xi;
 	Material*                        material;
