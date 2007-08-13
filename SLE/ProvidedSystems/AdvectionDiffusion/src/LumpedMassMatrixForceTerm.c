@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: LumpedMassMatrixForceTerm.c 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: LumpedMassMatrixForceTerm.c 937 2007-08-13 00:53:46Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -218,7 +218,7 @@ void _LumpedMassMatrixForceTerm_AssembleElement_General( void* forceTerm, ForceV
 	Node_Index                 nodeColumn_I;
 	double                     factor;
 	double                     detJac;
-	double                     shapeFunc[8];
+	double                     shapeFunc[27];
 	unsigned			elementNodeCount;
 
 	elementNodeCount = FeMesh_GetElementNodeSize( feMesh, lElement_I );
