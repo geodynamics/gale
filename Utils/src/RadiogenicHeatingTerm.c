@@ -169,18 +169,18 @@ void _RadiogenicHeatingTerm_Build( void* forceTerm, void* data ) {
 		materialExt = ExtensionManager_GetFunc( material->extensionMgr, material, self->materialExtHandle );
 
 		/* Get List of Heating Elements from material's dictionary */
-        list = Dictionary_Get( material->dictionary, "heatingElements" );
-    	heatingElementCount = Dictionary_Entry_Value_GetCount( list );
-        materialExt->heatingElementList = Memory_Alloc_Array( HeatingElement, heatingElementCount, "Heating Element" );
-    	memset( materialExt->heatingElementList, 0, heatingElementCount * sizeof(HeatingElement) );
-    	materialExt->heatingElementCount = heatingElementCount;
+        	list = Dictionary_Get( material->dictionary, "heatingElements" );
+    		heatingElementCount = Dictionary_Entry_Value_GetCount( list );
+        	materialExt->heatingElementList = Memory_Alloc_Array( HeatingElement, heatingElementCount, "Heating Element" );
+    		memset( materialExt->heatingElementList, 0, heatingElementCount * sizeof(HeatingElement) );
+    		materialExt->heatingElementCount = heatingElementCount;
     	
-    	for ( heatingElement_I = 0 ; heatingElement_I < heatingElementCount ; heatingElement_I++) { 
+    		for ( heatingElement_I = 0 ; heatingElement_I < heatingElementCount ; heatingElement_I++) { 
 			heatingElement = &materialExt->heatingElementList[ heatingElement_I ];
-    		entry = Dictionary_Entry_Value_GetElement( list, heatingElement_I );
+    			entry = Dictionary_Entry_Value_GetElement( list, heatingElement_I );
 	    	
-	    	heatingElement->Q = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( entry, "Q"));
-	    	heatingElement->lambda = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( entry, "lambda"));
+	    		heatingElement->Q = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( entry, "Q"));
+	    		heatingElement->lambda = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( entry, "lambda"));
 	   }
 	}
 }
@@ -215,7 +215,7 @@ void _RadiogenicHeatingTerm_AssembleElement( void* forceTerm, ForceVector* force
 	ElementType*                         elementType;
 	double                               detJac             = 0.0;
 	double                               factor;
-	double                               Ni[8];
+	double                               Ni[27];
 	double                               radiogenicHeating;
 	double*                              xi;
 	Material*                            material;
@@ -243,9 +243,9 @@ void _RadiogenicHeatingTerm_AssembleElement( void* forceTerm, ForceVector* force
 
 		/* Calculate Radiogenic Heating */
 		radiogenicHeating = 0.0;
-        for ( heatingElement_I = 0 ; heatingElement_I < heatingElementCount ; heatingElement_I++ ) {
+        	for ( heatingElement_I = 0 ; heatingElement_I < heatingElementCount ; heatingElement_I++ ) {
 			heatingElement = &materialExt->heatingElementList[ heatingElement_I ];
-            radiogenicHeating += heatingElement->Q * exp(-heatingElement->lambda * (time));
+	        	radiogenicHeating += heatingElement->Q * exp(-heatingElement->lambda * (time));
 		}
 
 		/* Get Values to det integration */
