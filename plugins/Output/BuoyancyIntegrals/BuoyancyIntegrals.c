@@ -67,6 +67,7 @@ typedef struct {
 	double y_b_initial;
 	FieldVariable *temperatureField;
 	double x_b, z_b;
+	MaterialPointsSwarm *cob_swarm; /* center of buouyancy swarm */
 } Underworld_BuoyancyIntegrals_CTX;
 
 
@@ -109,13 +110,30 @@ void _Underworld_BuoyancyIntegrals_CTX_Delete( void *component )
 
 void _Underworld_BuoyancyIntegrals_Construct( void *component, Stg_ComponentFactory *cf, void *data ) 
 {
-	UnderworldContext* context;
+	UnderworldContext *context;
+	Underworld_BuoyancyIntegrals_CTX *ctx;
+	MaterialPointsSwarm *cob_swarm; /* center of buouyancy swarm */
+	
+	
 	
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
 	
 	/* Add functions to entry points */
 	ContextEP_Append( context, AbstractContext_EP_ConstructExtensions, Underworld_BuoyancyIntegrals_Setup );
 	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, Underworld_BuoyancyIntegrals_Output );
+	
+	
+	ctx = (Underworld_BuoyancyIntegrals_CTX*)LiveComponentRegister_Get(
+			context->CF->LCRegister,
+			Underworld_BuoyancyIntegrals_Type );
+	
+	/* Look for a swarm to which we will assign the calculated center of buoyancy to */
+	ctx->cob_swarm = NULL;
+	cob_swarm = Stg_ComponentFactory_ConstructByName( cf, "center_buoyancy_swarm", MaterialPointsSwarm, False, data );
+	if( cob_swarm != NULL ) {
+		ctx->cob_swarm = cob_swarm;
+	}
+	
 }
 
 void Underworld_BuoyancyIntegrals_Setup( void *_context )
@@ -396,6 +414,44 @@ void eval_temperature( UnderworldContext *context, double y_b, double *temp_b )
 }
 
 
+void assign_coords_to_swarm( double x_b, double y_b, double z_b, MaterialPointsSwarm *cob_swarm )
+{
+	Swarm *swarm;
+	int point_count;
+	GlobalParticle *particle;
+	Particle_Index lParticle_I;
+	Stream *errorStream = Journal_Register( Error_Type, "Underworld_BuoyancyIntegrals: assign_coords_to_swarm" );
+	
+	
+	/* Cast to get parent */
+	swarm = (Swarm*)cob_swarm;
+	
+	
+	/* check cob swarm only has one point */
+	point_count = swarm->particleLocalCount;
+	Journal_Firewall(
+			point_count == 1,
+			errorStream,
+			"Error in %s:\n"
+			"Swarm with name %s is be used to plot center of buoyancy.\n"
+			"This swarm contains more then 1 point. This is unexpected!!", __func__, swarm->name );
+	
+	
+	
+	
+	/* get point to the first particle */
+	lParticle_I = 0;
+	particle = (GlobalParticle*)Swarm_ParticleAt( swarm, lParticle_I );
+	
+	/* Set the coorindates */
+	/*printf("*********** ASSIGNING COORDS TO COB ****************** \n");*/
+	particle->coord[0] = x_b;
+	particle->coord[1] = y_b;
+	particle->coord[2] = z_b;
+	
+}
+
+
 void Underworld_BuoyancyIntegrals_Output( UnderworldContext *context ) 
 {
 	Underworld_BuoyancyIntegrals_CTX *ctx;
@@ -416,13 +472,20 @@ void Underworld_BuoyancyIntegrals_Output( UnderworldContext *context )
 	StgFEM_FrequentOutput_PrintValue( context, ctx->x_b );
 	StgFEM_FrequentOutput_PrintValue( context, y_b );
 	if (ctx->dim==3){
-	StgFEM_FrequentOutput_PrintValue( context, ctx->z_b );
+		StgFEM_FrequentOutput_PrintValue( context, ctx->z_b );
 	}
 	StgFEM_FrequentOutput_PrintValue( context, int_w_bar_dt );
 	StgFEM_FrequentOutput_PrintValue( context, temp_b );
-
+	
 	temp_max = _FeVariable_GetMaxGlobalFieldMagnitude( ctx->temperatureField );
-        StgFEM_FrequentOutput_PrintValue( context, temp_max );
-
-
+	StgFEM_FrequentOutput_PrintValue( context, temp_max );
+	
+	
+	/* assign coords of center of buoyancy to swarm (if it exists) */
+	if( ctx->cob_swarm != NULL ) {
+		assign_coords_to_swarm( ctx->x_b, y_b, ctx->z_b, ctx->cob_swarm );
+	}
+	
+	
+	
 }
