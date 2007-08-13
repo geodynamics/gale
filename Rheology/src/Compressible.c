@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: Compressible.c 466 2007-04-27 06:24:33Z LukeHodkinson $
+** $Id: Compressible.c 570 2007-08-13 01:16:48Z DavidLee $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 #include <mpi.h>
@@ -198,7 +198,7 @@ void _Compressible_AssembleElement(
 	ElementType*              elementType;
 	Dof_Index                 dofCount;
 	FeMesh*       		  mesh                = variable1->feMesh;
-	double                    Ni[8];
+	double                    Ni[27];
 	double*                   xi;
 	double                    factor;
 	FeMesh*  		  geometryMesh        = self->geometryMesh;
