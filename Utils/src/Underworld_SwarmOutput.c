@@ -180,13 +180,26 @@ void _Underworld_SwarmOutput_Construct( void* uwSwarmOutput, Stg_ComponentFactor
 	Dictionary_Entry_Value* list;
 	unsigned int            listCount, feVar_I;
 	char*                   varName;
-
+	Stream                 *errorStream = Journal_Register( Error_Type, "_Underworld_SwarmOutput_Construct" );
+	
 	context      =  Stg_ComponentFactory_ConstructByName(  cf,  "context", PICelleratorContext,  True, data ) ;
 	materialSwarm = (MaterialPointsSwarm*)Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm", MaterialPointsSwarm, True, data );
 	/* Get all Swarms specified in input file, under swarms */
 	list = Dictionary_Get( dictionary, "FeVariables" );
+	
+	Journal_Firewall(
+			list != NULL,
+			errorStream,
+			"Error in %s:\n"
+			"You must specify a list of fevariables to interpolate onto the swarm in your xml. Example:\n"
+			"<list name=\"FeVariables\">\n"
+				"\t<param>PressureField</param>\n"
+			"</list>", __func__ );
+	
+	
+	
 	listCount = Dictionary_Entry_Value_GetCount( list );
-
+	
 	/* Allocate the memory to store pointers to them */
 	self->feVariableList = Memory_Alloc_Array( FeVariable*, listCount, "List FeVariables" );
 
