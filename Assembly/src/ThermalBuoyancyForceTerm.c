@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ThermalBuoyancyForceTerm.c 920 2007-07-20 06:19:34Z RobertTurnbull $
+** $Id: ThermalBuoyancyForceTerm.c 936 2007-08-13 00:47:42Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -225,7 +225,8 @@ void _ThermalBuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* fo
 	Cell_Index              cell_I;
 	double                  detJac;
 	double                  factor;
-	double                  Ni[8];
+	/*double                  Ni[8];*/
+	double                  Ni[27];
 	double                  force;
 	double                  rayleighNumber;
 	double                  temperature;
