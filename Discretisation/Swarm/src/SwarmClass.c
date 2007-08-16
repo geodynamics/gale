@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SwarmClass.c 4149 2007-06-29 06:59:13Z PatrickSunter $
+** $Id: SwarmClass.c 4173 2007-08-16 03:36:33Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -85,7 +85,8 @@ Swarm* Swarm_New(
 		SizeT                                 particleSize,
 		ExtensionManager_Register*            extensionMgr_Register,
 		Variable_Register*                    variable_Register,
-		MPI_Comm                              comm ) 
+		MPI_Comm                              comm,
+		void*				      ics ) 
 {
 	return _Swarm_New( 
 			sizeof(Swarm),
@@ -109,7 +110,8 @@ Swarm* Swarm_New(
 			DEFAULT_EXTRA_PARTICLES_FACTOR,
 			extensionMgr_Register, 
 			variable_Register,
-			comm );
+			comm, 
+			ics );
 }
 
 Swarm* _Swarm_New(
@@ -134,7 +136,8 @@ Swarm* _Swarm_New(
 		double                                extraParticlesFactor,
 		ExtensionManager_Register*            extensionMgr_Register,
 		Variable_Register*                    variable_Register,
-		MPI_Comm                              comm )
+		MPI_Comm                              comm,
+		void*				      ics )
 {
 	Swarm* self;
 	
@@ -170,7 +173,8 @@ Swarm* _Swarm_New(
 				extraParticlesFactor,
 				extensionMgr_Register,
 				variable_Register,
-				comm );
+				comm, 
+				ics );
 	
 	return self;
 }
@@ -184,7 +188,8 @@ void _Swarm_Init(
 		double                                extraParticlesFactor,
 		ExtensionManager_Register*            extensionMgr_Register,
 		Variable_Register*                    variable_Register,
-		MPI_Comm                              comm )
+		MPI_Comm                              comm,
+		void*				      ics )
 {
 	StandardParticle   particle;
 	Stream*            errorStream = Journal_Register( Error_Type, self->type );
@@ -253,6 +258,9 @@ void _Swarm_Init(
 
 	self->swarmReg_I = Swarm_Register_Add( Swarm_Register_GetSwarm_Register(), self );
 
+	if ( ics ) {
+		self->ics = Stg_CheckType( ics, VariableCondition );
+	}
 }
 
 
@@ -407,6 +415,13 @@ void _Swarm_Print( void* swarm, Stream* stream ) {
 	Journal_Printf( swarmStream, "\tparticlesArraySize: %d\n", self->particlesArraySize );
 	Journal_Printf( swarmStream, "\tparticlesArrayDelta: %d\n", self->particlesArrayDelta );
 	Journal_Printf( swarmStream, "\textraParticlesFactor: %.3g\n", self->extraParticlesFactor );
+
+	if ( self->ics ) {
+		Stg_Class_Print( self->ics, stream );
+	}
+	else {
+		Journal_Printf( stream, "\tics: (null)... not provided (may be Operator type)\n" );
+	}
 }
 
 
@@ -579,6 +594,8 @@ void* _Swarm_Copy( void* swarm, void* dest, Bool deep, Name nameExt, PtrMap* ptr
 				}
 			}		
 		}
+
+		newSwarm->ics = self->ics ? (VariableCondition*)Stg_Class_Copy( self->ics, NULL, deep, nameExt, map ) : NULL;
 	}
 	else {
 		newSwarm->cellLayout = self->cellLayout;
@@ -597,6 +614,8 @@ void* _Swarm_Copy( void* swarm, void* dest, Bool deep, Name nameExt, PtrMap* ptr
 
 		newSwarm->particleExtensionMgr = self->particleExtensionMgr;
 		newSwarm->commHandlerList = self->commHandlerList;
+
+		newSwarm->ics = self->ics;
 	}
 	
 	if( ownMap ) {
@@ -629,7 +648,8 @@ void* _Swarm_DefaultNew( Name name ) {
 			0,                          /* extraParticlesFactor */
 			NULL,                       /* extensionMgr_Register */
 			NULL,                       /* variable_Register */
-			MPI_COMM_WORLD );
+			MPI_COMM_WORLD,
+		        NULL );			    /* ics */
 }
 
 void _Swarm_Construct( void* swarm, Stg_ComponentFactory* cf, void* data ) {
@@ -642,7 +662,8 @@ void _Swarm_Construct( void* swarm, Stg_ComponentFactory* cf, void* data ) {
 	Dimension_Index         dim;
 	Type                    particleType;
 	Variable_Register*      variable_Register        = NULL;
-	AbstractContext*        context = NULL;
+	AbstractContext*        context 		 = NULL;
+	VariableCondition* 	ic            		 = NULL;
 
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
 
@@ -689,6 +710,9 @@ void _Swarm_Construct( void* swarm, Stg_ComponentFactory* cf, void* data ) {
 		}
 	}
 
+	/* construct the variable condition IC */
+	ic = Stg_ComponentFactory_ConstructByKey( cf, self->name, "IC", VariableCondition, False, data );
+	
 	_Swarm_Init( 
 			self,
 			cellLayout,
@@ -698,7 +722,8 @@ void _Swarm_Construct( void* swarm, Stg_ComponentFactory* cf, void* data ) {
 			extraParticlesFactor,
 			extensionManagerRegister,
 			variable_Register,
-			context->communicator );
+			context->communicator,
+			ic );
 }
 
 
@@ -742,25 +767,41 @@ void _Swarm_Build( void* swarm, void* data ) {
 	Journal_DPrintf( self->debug, "setting up the particle owningCell SwarmVariable:\n" );
 	Stg_Component_Build( self->owningCellVariable, data, False );
 	Journal_DPrintf( self->debug, "...done.\n" );
+	
+	/* these three functions were in initialise function before... 10.08.07*/
+	_Swarm_InitialiseCells( self, data );
+	_Swarm_InitialiseParticles( self, data );
+	Stg_Component_Initialise( self->owningCellVariable, data, False );
+	/**/
+
 	Stream_UnIndentBranch( Swarm_Debug );
 	Journal_DPrintf( self->debug, "...done in %s().\n", __func__ );
+
+	if( self->ics && !(context && (True == context->loadFromCheckPoint) ) ) {
+		Stg_Component_Build( self->ics, data, False );
+	}
 }
 
 			
 void _Swarm_Initialise( void* swarm, void* data ) {
 	Swarm* self = (Swarm*)swarm;
+	AbstractContext* context = (AbstractContext*)data; 
 	
 	Journal_DPrintf( self->debug, "In %s(): for swarm \"%s\" (of type %s)\n", __func__, self->name, self->type ); 
 	Stream_IndentBranch( Swarm_Debug );
 	
-	_Swarm_InitialiseCells( self, data );
-	_Swarm_InitialiseParticles( self, data );
-
-	Stg_Component_Initialise( self->owningCellVariable, data, False );
 	self->stillDoingInitialisation = False;
 
 	Stream_UnIndentBranch( Swarm_Debug );
 	Journal_DPrintf( self->debug, "...done in %s().\n", __func__ );
+
+	if( self->ics || ( context && (True == context->loadFromCheckPoint) ) ) {
+		Journal_DPrintf( self->debug, "applying the ICs for this swarm.\n" );
+		Stream_Indent( self->debug );
+		Stg_Component_Initialise( self->ics, data, False );
+		/* call the initial conditions plugin here */
+		VariableCondition_Apply( self->ics, data );
+	}
 }
 
 
@@ -1529,7 +1570,7 @@ void Swarm_CheckCoordsAreFinite( void* swarm ) {
 void Swarm_AssignIndexWithinShape( void* swarm, void* _shape, Variable* variableToAssign, Index indexToAssign ) {
 	Swarm*            self              = Stg_CheckType( swarm, Swarm );
 	Stg_Shape*        shape             = Stg_CheckType( _shape, Stg_Shape );
-	GlobalParticle* particle;
+	GlobalParticle*   particle;
 	Particle_Index    lParticle_I;
 
 	Journal_Firewall( 

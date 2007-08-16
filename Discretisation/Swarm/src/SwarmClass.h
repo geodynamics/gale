@@ -40,7 +40,7 @@
 **	to appropriate processor immediately.)
 **	Communication is more efficient when shadow depth is equal to at least 1
 **
-** $Id: SwarmClass.h 4149 2007-06-29 06:59:13Z PatrickSunter $
+** $Id: SwarmClass.h 4173 2007-08-16 03:36:33Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -122,6 +122,7 @@
 		int				nSwarmVars; \
 		SwarmVariable			**swarmVars; \
 		\
+		VariableCondition*		ics; \
 		Index                           swarmReg_I; /**< Own index inside the Swarm_Register */
 
 	struct Swarm { __Swarm };
@@ -138,7 +139,9 @@
 		SizeT                                 particleSize,
 		ExtensionManager_Register*            extensionMgr_Register,
 		Variable_Register*                    variable_Register,
-		MPI_Comm                              comm ) ;
+		MPI_Comm                              comm,
+	        /* modified the constructor function to take in initial conditions */	
+	        void*				      ics ) ;
 	
 	/* Creation implementation / Virtual constructor */
 	Swarm* _Swarm_New(
@@ -163,7 +166,9 @@
 		double                                extraParticlesFactor,
 		ExtensionManager_Register*            extensionMgr_Register,
 		Variable_Register*                    variable_Register,
-		MPI_Comm                              comm );
+		MPI_Comm                              comm, 
+	        /* modified the constructor function to take in initial conditions */	
+		void*				      ics );
 
 	void _Swarm_Init( 
 		Swarm*                                self, 
@@ -174,7 +179,9 @@
 		double                                extraParticlesFactor,
 		ExtensionManager_Register*            extensionMgr_Register,
 		Variable_Register*                    variable_Register,
-		MPI_Comm                              comm );
+		MPI_Comm                              comm,
+	        /* modified the init function to take in initial conditions */	
+		void*				      ics );
 	
 	/* For use when Particle is not yet a complete type */
 	#define Swarm_ParticleInElementAt( self, dElement_I, cParticle_I ) \
