@@ -207,7 +207,6 @@ void Inner2DGenerator_BuildTopology( Inner2DGenerator* self, FeMesh* mesh ) {
 	elDecomp = (Decomp*)Sync_GetDecomp( elSync );
 	nodeDecomp = Decomp_New();
 
-	/* generalise for 3D elements, dave - 27.06.07 */
 	if( nDims == 2 ) {
 		nLocals = Decomp_GetNumLocals( elDecomp ) * 3;
 		locals = MemArray( int, nLocals, Inner2DGenerator_Type );
@@ -236,7 +235,6 @@ void Inner2DGenerator_BuildTopology( Inner2DGenerator* self, FeMesh* mesh ) {
 	Sync_SetComm( nodeSync, Sync_GetComm( elSync ) );
 	Sync_SetDecomp( nodeSync, nodeDecomp );
 
-	/* generalise for 3D elements, dave - 27.06.07 */
 	if( nDims == 2 ) {
 		nRemotes = Sync_GetNumRemotes( elSync ) * 3;
 		remotes = MemArray( int, nRemotes, Inner2DGenerator_Type );
@@ -268,7 +266,6 @@ void Inner2DGenerator_BuildTopology( Inner2DGenerator* self, FeMesh* mesh ) {
 
 	/* Build the incidence. */
 	nDomainEls = Mesh_GetDomainSize( elMesh, nDims );
-	/* generalise for 3D elements, dave - 27.06.07 */
 	if( nDims == 2 ) {
 		nIncEls = 3;
 		incEls = MemArray( unsigned, 3, Inner2DGenerator_Type );
@@ -332,7 +329,6 @@ void Inner2DGenerator_BuildGeometry( Inner2DGenerator* self, FeMesh* mesh ) {
 		}
 	}
 
-	/* for 3D case - dave, 27.06.07 */
 	else if( nDims == 3 ) {
 		double localCrds3D[4][3] = { {-0.5, -0.5, -0.5},
 		                             {0.25, 0.25, 0.25},
