@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeVariable.c 942 2007-08-16 04:08:18Z DavidLee $
+** $Id: FeVariable.c 943 2007-08-16 04:09:26Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -2074,7 +2074,6 @@ void FeVariable_ReadNodalValuesFromFile_StgFEM_Native( void* feVariable, const c
 	char               lineString[MAX_LINE_LENGTH_DEFINE];
 	const unsigned int MAX_LINE_LENGTH = MAX_LINE_LENGTH_DEFINE;
 	Processor_Index    proc_I=0;
-	Dimension_Index    dim_I=0;
 	MPI_Comm	comm = Comm_GetMPIComm( Mesh_GetCommTopology( self->feMesh, MT_VERTEX ) );
 	unsigned		rank;
 	unsigned		nProcs;
