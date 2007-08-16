@@ -250,12 +250,6 @@ void _TrilinearInnerElType_SF_allNodes( void* elementType, const double localCoo
 	evaluatedValues[1] = fac*(  16.0*xi - 64.0*eta + 60.0*zeta + 6.0 );
 	evaluatedValues[2] = fac*(            36.0*eta - 36.0*zeta       );
 	evaluatedValues[3] = fac*( -12.0*xi + 48.0*eta - 36.0*zeta       );
-/*
-	evaluatedValues[0] = 0.813648*xi + 0.745407*eta - 0.834646*zeta - 0.724409;
-	evaluatedValues[1] = 1.023622*xi - 0.094488*eta - 0.598425*zeta - 0.330709;
-	evaluatedValues[2] = 0.367454*xi + 0.530184*eta - 1.086614*zeta + 0.188976;
-	evaluatedValues[3] = 0.233596*xi + 0.265617*eta + 0.237795*zeta + 0.262992;
-*/
 }
 
 
@@ -286,37 +280,6 @@ void _TrilinearInnerElType_SF_allLocalDerivs_allNodes( void* elementType, const 
 	evaluatedDerivatives[2][1] = fac*(  60.0 );
 	evaluatedDerivatives[2][2] =       - 4.0  ;
 	evaluatedDerivatives[2][3] =       - 4.0  ;
-	
-	/* derivatives wrt xi */
-	/*evaluatedDerivatives[0][0] = - 0.125*( 1.0-eta )*( 1.0-zeta );
-	evaluatedDerivatives[0][2] = - 0.125*( 1.0+eta )*( 1.0-zeta );
-	evaluatedDerivatives[0][3] =   0.125*( 1.0+eta )*( 1.0-zeta );
-	evaluatedDerivatives[0][1] =   0.125*( 1.0-eta )*( 1.0-zeta );
-	evaluatedDerivatives[0][4] = - 0.125*( 1.0-eta )*( 1.0+zeta );
-	evaluatedDerivatives[0][6] = - 0.125*( 1.0+eta )*( 1.0+zeta );
-	evaluatedDerivatives[0][7] =   0.125*( 1.0+eta )*( 1.0+zeta );
-	evaluatedDerivatives[0][5] =   0.125*( 1.0-eta )*( 1.0+zeta );
-	*/
-	/* derivatives wrt eta */	
-	/*evaluatedDerivatives[1][0] = - 0.125*( 1.0-xi )*( 1.0-zeta );
-	evaluatedDerivatives[1][2] =   0.125*( 1.0-xi )*( 1.0-zeta );
-	evaluatedDerivatives[1][3] =   0.125*( 1.0+xi )*( 1.0-zeta );
-	evaluatedDerivatives[1][1] = - 0.125*( 1.0+xi )*( 1.0-zeta );
-	evaluatedDerivatives[1][4] = - 0.125*( 1.0-xi )*( 1.0+zeta );
-	evaluatedDerivatives[1][6] =   0.125*( 1.0-xi )*( 1.0+zeta );
-	evaluatedDerivatives[1][7] =   0.125*( 1.0+xi )*( 1.0+zeta );
-	evaluatedDerivatives[1][5] = - 0.125*( 1.0+xi )*( 1.0+zeta );
-	*/
-	/* derivatives wrt zeta */		
-	/*evaluatedDerivatives[2][0] = -0.125*( 1.0-xi )*( 1.0-eta );
-	evaluatedDerivatives[2][2] = -0.125*( 1.0-xi )*( 1.0+eta );
-	evaluatedDerivatives[2][3] = -0.125*( 1.0+xi )*( 1.0+eta );
-	evaluatedDerivatives[2][1] = -0.125*( 1.0+xi )*( 1.0-eta );
-	evaluatedDerivatives[2][4] =  0.125*( 1.0-xi )*( 1.0-eta );
-	evaluatedDerivatives[2][6] =  0.125*( 1.0-xi )*( 1.0+eta );
-	evaluatedDerivatives[2][7] =  0.125*( 1.0+xi )*( 1.0+eta );
-	evaluatedDerivatives[2][5] =  0.125*( 1.0+xi )*( 1.0-eta );
-	*/
 }
 
 /* get rid of this function and just use the superclass (elementType) version, as for BilinearInner class?? */
