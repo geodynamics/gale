@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testSUPGShapeFunc.c 907 2007-07-09 23:41:37Z PatrickSunter $
+** $Id: testSUPGShapeFunc.c 938 2007-08-16 03:42:14Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -275,7 +275,8 @@ int main( int argc, char* argv[] ) {
 			sizeof(IntegrationPoint), 
 			context->extensionMgr_Register, 
 			context->variable_Register, 
-			context->communicator );
+			context->communicator,
+		        NULL	);
 
 	residual = ForceVector_New( 
 			"residual",

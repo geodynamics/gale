@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testLumpedMassMatrix.c 907 2007-07-09 23:41:37Z PatrickSunter $
+** $Id: testLumpedMassMatrix.c 938 2007-08-16 03:42:14Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -233,7 +233,7 @@ int main( int argc, char* argv[] ) {
 	singleCellLayout    = (CellLayout*)SingleCellLayout_New( "SingleCellLayout", dimExists, NULL, NULL );
 	gaussParticleLayout = (ParticleLayout*)GaussParticleLayout_New( "GaussParticleLayout", dim, particlesPerDim );
 	swarm = Swarm_New( "gaussSwarm", singleCellLayout, gaussParticleLayout, dim,
-		sizeof(IntegrationPoint), context->extensionMgr_Register, context->variable_Register, MPI_COMM_WORLD );
+		sizeof(IntegrationPoint), context->extensionMgr_Register, context->variable_Register, MPI_COMM_WORLD, NULL );
 	
 	/* Lumping of Mass Matrix */
 	massMatrix = ForceVector_New( "MassMatrix", feVariable, dim, context->entryPoint_Register, MPI_COMM_WORLD );
