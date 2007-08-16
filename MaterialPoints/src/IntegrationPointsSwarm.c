@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: IntegrationPointsSwarm.c 456 2007-04-27 06:21:01Z LukeHodkinson $
+** $Id: IntegrationPointsSwarm.c 506 2007-08-16 03:47:04Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -203,7 +203,8 @@ IntegrationPointsSwarm* _IntegrationPointsSwarm_New(
 		extraParticlesFactor,
 		extensionMgr_Register,
 		swarmVariable_Register,
-		comm );
+		comm,
+	        NULL	);
 
 	if (initFlag) {
 		_IntegrationPointsSwarm_Init( 

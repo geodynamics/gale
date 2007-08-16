@@ -91,7 +91,8 @@ MaterialPointsSwarm* MaterialPointsSwarm_New(
 						extraParticlesFactor,
 		 				extensionMgr_Register,
 		  				swarmVariable_Register, 
-						comm);
+						comm,
+						NULL );
 		_MaterialPointsSwarm_Init(	self, 
 									mesh, 
 									removalRoutine, 
@@ -154,7 +155,8 @@ MaterialPointsSwarm* _MaterialPointsSwarm_New(
 			extraParticlesFactor,
 			extensionMgr_Register,
 			swarmVariable_Register,
-			comm );
+			comm,
+		        NULL	);
 
 	return self;
 }

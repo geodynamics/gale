@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Material.c 456 2007-04-27 06:21:01Z LukeHodkinson $
+** $Id: Material.c 506 2007-08-16 03:47:04Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -241,7 +241,7 @@ void Material_Layout( void* material, MaterialPointsSwarm* swarm ) {
 
 double Material_Volume( void* material, IntegrationPointsSwarm* swarm, Coord centroid ) {
 	Material*            self               = (Material*)material;
-	FeMesh*  feMesh             = swarm->mesh;
+	FeMesh*  	     feMesh             = swarm->mesh;
 	ElementType*         elementType;
 	IntegrationPoint*    particle;
 	Coord                globalCoord;
@@ -312,7 +312,7 @@ void Material_IntegrateField(
 		double*                 result ) 
 {
 	Material*            self               = (Material*)material;
-	FeMesh*  feMesh             = swarm->mesh;
+	FeMesh*  	     feMesh             = swarm->mesh;
 	ElementType*         elementType;
 	IntegrationPoint*    particle;
 	Cell_Index           lCell_I;

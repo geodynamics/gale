@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testPeriodicBCs.c 503 2007-08-02 08:41:48Z SteveQuenette $
+** $Id: testPeriodicBCs.c 506 2007-08-16 03:47:04Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -202,7 +202,7 @@ int main( int argc, char* argv[] ) {
 	
 	/* Configure the swarm */
 	swarm = Swarm_New( "testSwarm", elementCellLayout, randomParticleLayout, 3, sizeof(Particle),
-		extensionMgr_Register, NULL, CommWorld );
+		extensionMgr_Register, NULL, CommWorld, NULL );
 	
 	epRegister = EntryPoint_Register_New();
 	
