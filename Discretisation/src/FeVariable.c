@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeVariable.c 933 2007-08-02 06:21:38Z LukeHodkinson $
+** $Id: FeVariable.c 942 2007-08-16 04:08:18Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -1903,7 +1903,8 @@ double FeVariable_IntegratePlane( void* feVariable, Axis planeAxis, double plane
 			sizeof(IntegrationPoint), 
 			extensionMgr_Register, 
 			NULL,
-			self->communicator );
+			self->communicator,
+		        NULL	);
 	Stg_Component_Build( swarm, NULL, False );
 
 	/* Change Positions of the particles */
