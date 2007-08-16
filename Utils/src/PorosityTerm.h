@@ -12,13 +12,6 @@
 		double          phi;                   /* value of porosity coefficient */
 	} PorosityExt;
 
-	/*} PorosityElement;
-
-	typedef struct {
-		PorosityElement* porosityElementList;
-		Index            porosityElementCount;
-	} PorosityTerm_ParticleExt;*/
-
 	/** PorosityTerm class contents - this is defined as a macro so that sub-classes of this class can use this macro at the start of the definition of their struct */
 	#define __PorosityTerm \
 		/* Macro defining parent goes here - This means you can cast this class as its parent */ \
@@ -28,10 +21,10 @@
 		\
 		/* PorosityTerm info */ \
 		AbstractContext*		context;   \
-		/*ExtensionManager_Register*    particles_Register;*/   \
 		ExtensionInfo_Index             particleExtHandle;   \
 		double                    	referencePorosity;   \
 		double                    	gravity;   \
+		double*                    	gHat;   \
 		MaterialPointsSwarm*		materialSwarm;   \
 
 	struct PorosityTerm { __PorosityTerm };
@@ -42,7 +35,6 @@
 		Swarm*                                              integrationSwarm,
 		AbstractContext*                                    context,
 		Materials_Register*                                 materials_Register );
-		/*ExtensionManager_Register*                          particle_Register );*/
 
 	PorosityTerm* _PorosityTerm_New( 
 		SizeT                                               sizeOfSelf,  
@@ -65,7 +57,6 @@
 		Swarm*                                              integrationSwarm,
 		AbstractContext*                                    context,
 		Materials_Register*                                 materials_Register );
-		/*ExtensionManager_Register*                          particle_Register );*/
 
 	void _PorosityTerm_Delete( void* buoyancyForceTerm );
 	void _PorosityTerm_Print( void* buoyancyForceTerm, Stream* stream );
