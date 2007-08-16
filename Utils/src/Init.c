@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: Init.c 436 2007-02-19 05:15:47Z JulianGiordani $
+** $Id: Init.c 580 2007-08-16 03:48:53Z DavidLee $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -69,6 +69,8 @@ Bool Underworld_Utils_Init( int* argc, char** argv[] ) {
 	Stg_ComponentRegister_Add( componentRegister, StressField_Type ,              "0", _StressField_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, ViscosityField_Type ,           "0", _ViscosityField_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, DensityField_Type ,           "0", _DensityField_DefaultNew );
+
+	Stg_ComponentRegister_Add( componentRegister, PorosityTerm_Type ,           "0", _PorosityTerm_DefaultNew );
        	
 
 	RegisterParent( UnderworldContext_Type,             PICelleratorContext_Type );
@@ -79,6 +81,7 @@ Bool Underworld_Utils_Init( int* argc, char** argv[] ) {
 	RegisterParent( ViscosityField_Type,                ParticleFeVariable_Type );
 	RegisterParent( DensityField_Type,                  ParticleFeVariable_Type );
         
+	RegisterParent( PorosityTerm_Type,                  BuoyancyForceTerm_Type );
 
 	return True;
 }
