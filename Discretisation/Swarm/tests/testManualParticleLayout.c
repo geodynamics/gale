@@ -33,7 +33,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: testManualParticleLayout.c 4142 2007-06-13 01:26:58Z LukeHodkinson $
+** $Id: testManualParticleLayout.c 4175 2007-08-16 03:39:26Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -171,7 +171,7 @@ int main( int argc, char* argv[] ) {
 	
 	/* Configure the swarm */
 	swarm = Swarm_New(  "testSwarm", elementCellLayout, particleLayout, dim, sizeof(Particle),
-		extensionMgr_Register, NULL, CommWorld );
+		extensionMgr_Register, NULL, CommWorld, NULL );
 	
 	/* Build the swarm */
 	Stg_Component_Build( swarm, 0, False );

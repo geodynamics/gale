@@ -34,7 +34,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: testSwarmDumpAndLoad.c 4165 2007-08-06 00:47:34Z LukeHodkinson $
+** $Id: testSwarmDumpAndLoad.c 4175 2007-08-16 03:39:26Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -187,7 +187,7 @@ int main( int argc, char* argv[] ) {
 	
 	/* Configure the swarm */
 	swarm = Swarm_New( "testSwarm", elementCellLayout, randomParticleLayout, 3, sizeof(Particle),
-		extensionMgr_Register, NULL, CommWorld );
+		extensionMgr_Register, NULL, CommWorld, NULL );
     
 	movementHandler = ParticleMovementHandler_New( "movementHandler", True );
 	Swarm_AddCommHandler( swarm, movementHandler );
@@ -260,7 +260,7 @@ int main( int argc, char* argv[] ) {
 	sprintf( filename, "%s/%s.%05d.dat", context->outputPath, swarm->name, context->timeStep ); 
 	fileParticleLayout = FileParticleLayout_New( "fileParticleLayout", filename );
 	newSwarm = Swarm_New( "testSwarm2", elementCellLayout, fileParticleLayout, 3, sizeof(Particle),
-		extensionMgr_Register, NULL, CommWorld );
+		extensionMgr_Register, NULL, CommWorld, NULL );
 	Stg_Component_Build( newSwarm, 0, False );
 	Stg_Component_Initialise( newSwarm, 0, False );
 

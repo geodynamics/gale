@@ -33,7 +33,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: testGaussLayoutSingleCell.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
+** $Id: testGaussLayoutSingleCell.c 4175 2007-08-16 03:39:26Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -137,7 +137,7 @@ int main( int argc, char* argv[] ) {
 	/* Configure the swarm */
 	extensionMgr_Register = ExtensionManager_Register_New();
 	swarm = Swarm_New( "testGaussSwarmSingleCell", singleCellLayout, gaussParticleLayout, dim,
-		sizeof(Particle), extensionMgr_Register, NULL, CommWorld );
+		sizeof(Particle), extensionMgr_Register, NULL, CommWorld, NULL );
 	
 	/* Build the swarm */
 	Stg_Component_Build( swarm, 0, False );
