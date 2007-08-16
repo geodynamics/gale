@@ -225,12 +225,6 @@ void _BilinearInnerElType_SF_allNodes( void* elementType, const double localCoor
 	xi  = localCoord[0];
 	eta = localCoord[1];
 
-	/*	
-	evaluatedValues[0] = 0.25*( 1.0-xi )*( 1.0-eta );
-	evaluatedValues[1] = 0.25*( 1.0+xi )*( 1.0-eta );
-	evaluatedValues[3] = 0.25*( 1.0+xi )*( 1.0+eta );
-	evaluatedValues[2] = 0.25*( 1.0-xi )*( 1.0+eta );
-	*/
 	evaluatedValues[0] = - xi - 0.5*eta + 0.25;
 	evaluatedValues[1] = xi - 0.5*eta + 0.25;
 	evaluatedValues[2] = eta + 0.5;
@@ -245,17 +239,6 @@ void _BilinearInnerElType_SF_allLocalDerivs_allNodes( void* elementType, const d
 	xi  = localCoord[0];
 	eta = localCoord[1];
 
-	/*	
-	evaluatedDerivatives[0][0] = - 0.25*( 1.0 - eta );
-	evaluatedDerivatives[0][1] =   0.25*( 1.0 - eta );
-	evaluatedDerivatives[0][3] =   0.25*( 1.0 + eta );
-	evaluatedDerivatives[0][2] = - 0.25*( 1.0 + eta );
-	
-	evaluatedDerivatives[1][0] = - 0.25*( 1.0 - xi );
-	evaluatedDerivatives[1][1] = - 0.25*( 1.0 + xi );
-	evaluatedDerivatives[1][3] =   0.25*( 1.0 + xi );
-	evaluatedDerivatives[1][2] =   0.25*( 1.0 - xi );
-	*/
 	evaluatedDerivatives[0][0] = - 1.0;
 	evaluatedDerivatives[0][1] = 1.0;
 	evaluatedDerivatives[0][2] = 0.0;
