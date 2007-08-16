@@ -35,7 +35,7 @@
 ** Comments:
 **	None so far.
 **
-** $Id: Swarm.h 4155 2007-07-26 02:27:42Z LukeHodkinson $
+** $Id: Swarm.h 4171 2007-08-16 03:33:59Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -79,6 +79,7 @@
 	#include "OperatorSwarmVariable.h"
 	#include "SwarmOutput.h"
 	#include "SwarmDump.h"
+	#include "SwarmShapeVC.h"
 	#include "Init.h"
 	#include "Finalise.h"
 
