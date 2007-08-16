@@ -32,7 +32,7 @@
 **
 ** Comments:
 **
-** $Id: types.h 4155 2007-07-26 02:27:42Z LukeHodkinson $
+** $Id: types.h 4172 2007-08-16 03:34:16Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -73,6 +73,8 @@
 
 	typedef Particle*				Particle_List;
 	
+	typedef Index					SwarmShapeVC_Entry_Index;
+
 	/* Discretisation_Swarm types/classes */
 	typedef struct CellLayout			CellLayout;
 	typedef struct SingleCellLayout			SingleCellLayout;
@@ -103,6 +105,7 @@
 	typedef struct SwarmVariable			SwarmVariable;
 	typedef struct OperatorSwarmVariable		OperatorSwarmVariable;
 	typedef struct SwarmOutput			SwarmOutput;
+	typedef struct SwarmShapeVC			SwarmShapeVC;
 
 	typedef struct BaseParticle                     BaseParticle;
 	typedef struct StandardParticle			StandardParticle;
