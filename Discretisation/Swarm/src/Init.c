@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Init.c 4155 2007-07-26 02:27:42Z LukeHodkinson $
+** $Id: Init.c 4174 2007-08-16 03:37:44Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -40,6 +40,7 @@
 #include "ParticleCommHandler.h"
 #include "ParticleMovementHandler.h"
 #include "ParticleShadowSync.h"
+/*#include "SwarmShapeVC.h"*/
 
 
 Stream* Swarm_VerboseConfig = NULL;
@@ -56,6 +57,8 @@ Bool DiscretisationSwarm_Init( int* argc, char** argv[] ) {
 	
 	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 	
+	VariableCondition_Register_Add( variableCondition_Register, SwarmShapeVC_Type, SwarmShapeVC_Factory );
+
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), GaussParticleLayout_Type, "0", _GaussParticleLayout_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), TriGaussParticleLayout_Type, "0", _TriGaussParticleLayout_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), GaussBorderParticleLayout_Type, "0", _GaussBorderParticleLayout_DefaultNew );
@@ -78,6 +81,7 @@ Bool DiscretisationSwarm_Init( int* argc, char** argv[] ) {
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), SwarmDump_Type, "0", _SwarmDump_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), ParticleShadowSync_Type, "0", ParticleShadowSync_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), ParticleMovementHandler_Type, "0", ParticleMovementHandler_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), SwarmShapeVC_Type, "0", _SwarmShapeVC_DefaultNew );
 
 	RegisterParent( CellLayout_Type, Stg_Component_Type );
 	RegisterParent( ElementCellLayout_Type, CellLayout_Type );
@@ -114,6 +118,7 @@ Bool DiscretisationSwarm_Init( int* argc, char** argv[] ) {
 	RegisterParent( ParticleShadowSync_Type, ParticleCommHandler_Type);
 	RegisterParent( Swarm_Type, Stg_Component_Type );
 	RegisterParent( Swarm_Register_Type, Stg_Class_Type );
+	RegisterParent( SwarmShapeVC_Type,           VariableCondition_Type );
 
 	/* Create the singletons */
 	stgSwarm_Register = Swarm_Register_New(); 
