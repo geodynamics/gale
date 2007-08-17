@@ -9,4 +9,4 @@ done
 setUpdateModeFromArg ${1}
 
 testname="`basename $0 .sh`"
-runAndHandleSystemTestStdLocations "Underworld testVelicSolA.xml" "$0" "$@"
+runAndHandleSystemTestStdLocations "Underworld testVelicSolA-DualMesh.xml" "$0" "$@"
