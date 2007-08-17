@@ -3,39 +3,36 @@
 <!-- A StGermain input file -->
 <!-- DTD to validate against -->
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
-	
-	<!-- Linear Mesh Stuff -->
-	<struct name="components" mergeType="merge">
-		<struct name="Temp_cornerNodeTopology">
-			<param name="Type">IJK6Topology</param>
-			<param name="sizeI">Temp_elementResI</param>
-			<param name="sizeJ">Temp_elementResJ</param>
-			<param name="sizeK">Temp_elementResK</param>
-			<param name="sizeShift">1</param>
-		</struct>	
-		<struct name="Temp_cornerNodeLayout">
-			<param name="Type">CornerNL</param>
-			<param name="ElementLayout">Temp_elementLayout</param>
-			<param name="Topology">Temp_cornerNodeTopology</param>
-		</struct>
-		<struct name="Temp_decomp-linear">
-			<param name="Type">HexaMD</param>
-			<param name="ElementLayout">Temp_elementLayout</param>
-			<param name="NodeLayout">Temp_cornerNodeLayout</param>
-			<param name="numPartitionedDims">numPartitionedDims</param>
-		</struct>
-		<struct name="Temp_meshLayout-linear">
-			<param name="Type">MeshLayout</param>
-			<param name="ElementLayout">Temp_elementLayout</param>
-			<param name="NodeLayout">Temp_cornerNodeLayout</param>
-			<param name="MeshDecomp">Temp_decomp-linear</param>
-		</struct>		
-		<struct name="Temp_mesh-linear">
-			<param name="Type">FeMesh</param>
-			<param name="MeshLayout">Temp_meshLayout-linear</param>
-			<param name="ElementSize">8</param>
-			<param name="NodeSize">0</param>
-		</struct>
-	</struct>
+
+<param name="temperatureMesh"> temperatureMesh </param>
+
+  <struct name="components" mergeType="merge">
+    <struct name="temperatureMesh">
+      <param name="Type">FeMesh</param>
+      <param name="elementType">linear</param>
+    </struct>
+
+    <struct name="temperatureLinearMeshGenerator">
+      <param name="Type">CartesianGenerator</param>
+      <param name="mesh">temperatureMesh</param>
+      <param name="dims">dim</param>
+      <param name="shadowDepth">shadowDepth</param>
+      <list name="size">
+	<param>Temp_elementResI</param>
+	<param>Temp_elementResJ</param>
+	<param>Temp_elementResK</param>
+      </list>
+      <list name="minCoord">
+	<param>minX</param>
+	<param>minY</param>
+	<param>minZ</param>
+      </list>
+      <list name="maxCoord">
+	<param>maxX</param>
+	<param>maxY</param>
+	<param>maxZ</param>
+      </list>
+    </struct>
+  </struct>
 
 </StGermainData>
