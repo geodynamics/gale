@@ -1,0 +1,55 @@
+<!-- Rayleigh-Taylor lucifer viewports -->
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+        <struct name="components" mergeType="merge">
+		<!-- Camera And Colour Maps -->
+		<struct name="camerasm">
+			<param name="Type">lucCamera</param>
+			<param name="CentreFieldVariable">VelocityField</param>
+			<param name="coordZ">1.4762</param>
+		</struct>
+		<struct name="smColourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours">Blue</param>
+			<param name="dynamicRange">true</param>
+		</struct>
+		<!--struct name="smColourBar">
+			<param name="Type">lucColourBar</param>
+			<param name="ColourMap">smColourMap</param>
+		</struct-->
+		<!-- Drawing Objects -->
+		<struct name="smparticleDots">
+			<param name="Type">lucSwarmVectors</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="MaskVariable">materialSwarm-DrawMe</param>
+			<param name="maskValue">1</param>
+			<param name="maskType">EqualTo</param>
+			<param name="ColourMap">smColourMap</param>
+			<param name="DirectionVariable">materialSwarm-StressMax</param>
+			<param name="arrowHeadSize">0.07</param>
+			<param name="LengthVariable">materialSwarm-ARLength</param>
+		</struct>		
+		<struct name="smborder">
+			<param name="Type">lucFieldVariableBorder</param>
+			<param name="FieldVariable">VelocityField</param>
+			<param name="lineWidth">2</param>
+		</struct>
+		<struct name="smtitle">
+			<param name="Type">lucTitle</param>
+			<param name="string">ParticleStressMaxViewport</param>
+		</struct>
+		<!-- Viewport -->
+		<struct name="ARStressMaxVP">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">camerasm</param>
+			<list name="DrawingObject">
+				<param>smtitle</param>
+				<param>smborder</param>
+				<param>smparticleDots</param>
+				<!--param>smColourBar</param-->
+			</list>
+		</struct>
+	</struct>
+
+</StGermainData>
