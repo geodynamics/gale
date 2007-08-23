@@ -68,7 +68,7 @@
 				</list>
 			</struct>	
 			<struct>
-				<param name="type"> ShapeVC </param>
+				<param name="type"> MeshShapeVC </param>
 				<param name="Shape"> middleNodesShape </param>
 				<list name="variables">
 					<struct>
