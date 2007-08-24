@@ -69,7 +69,7 @@ void stgMainLoop( Dictionary* dictionary, MPI_Comm CommWorld ) {
 	                True,
 	                NULL,
 	                0,
-	                10,
+	                0,
 	                CommWorld,
 	                dictionary );
 
