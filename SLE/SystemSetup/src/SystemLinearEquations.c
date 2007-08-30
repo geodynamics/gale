@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SystemLinearEquations.c 925 2007-07-26 02:34:49Z LukeHodkinson $
+** $Id: SystemLinearEquations.c 949 2007-08-30 07:44:29Z DavidMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -491,7 +491,7 @@ void SystemLinearEquations_ExecuteSolver( void* sle, void* _context ) {
 	wallTime = MPI_Wtime();		
 	Stg_Component_Execute( self->solver, self, True );
 	
-	Journal_Printf(self->info,"Linear solution time %g (secs)\n",MPI_Wtime() - wallTime);
+	Journal_Printf(self->info,"Linear solver (%s), solution time %g (secs)\n",self->executeEPName, MPI_Wtime() - wallTime);
 		
 }
 
