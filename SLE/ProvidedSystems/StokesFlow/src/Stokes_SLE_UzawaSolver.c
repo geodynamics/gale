@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Stokes_SLE_UzawaSolver.c 860 2007-06-07 05:47:20Z LukeHodkinson $
+** $Id: Stokes_SLE_UzawaSolver.c 948 2007-08-30 07:42:19Z DavidMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -375,7 +375,10 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	
 	double                  qGlobalProblemScale = sqrt( (double)Vector_GetGlobalSize( qTempVec ) );
 	double                  qReciprocalGlobalProblemScale = 1.0 / qGlobalProblemScale;
-	
+	int			init_info_stream_rank;	
+
+	init_info_stream_rank = Stream_GetPrintingRank( self->info );
+	Stream_SetPrintingRank( self->info, 0 ); 
 
 
 	/*	DEFINITIONS:
@@ -778,6 +781,8 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	}
 	#endif
 	Stream_UnIndentBranch( StgFEM_Debug );
+
+        Stream_SetPrintingRank( self->info, init_info_stream_rank );	
 }
 
 
