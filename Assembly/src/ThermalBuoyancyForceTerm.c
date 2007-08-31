@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ThermalBuoyancyForceTerm.c 936 2007-08-13 00:47:42Z DavidLee $
+** $Id: ThermalBuoyancyForceTerm.c 950 2007-08-31 02:09:59Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -259,14 +259,7 @@ void _ThermalBuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* fo
 		ElementType_EvaluateShapeFunctionsAt( elementType, xi, Ni );
 
 		/* Field Get Temperature from Field Variable */
-		if ( temperatureMesh == mesh ) {
-			/* If meshes are identical - then we can use a shortcut for working out the temperature */
-			FeVariable_InterpolateWithinElement( temperatureField, lElement_I, xi, &temperature );
-		}
-		else {
-			FeMesh_CoordLocalToGlobal( mesh, lElement_I, xi, tmpGlobalCoord );
-			FieldVariable_InterpolateValueAt( temperatureField, tmpGlobalCoord, &temperature );
-		}
+		FeVariable_InterpolateFromMeshLocalCoord( temperatureField, mesh, lElement_I, xi, &temperature );
 
 		force = rayleighNumber * temperature;
 

@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: UpwindParameter.c 920 2007-07-20 06:19:34Z RobertTurnbull $
+** $Id: UpwindParameter.c 950 2007-08-31 02:09:59Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -76,14 +76,7 @@ double AdvDiffResidualForceTerm_UpwindDiffusivity( AdvDiffResidualForceTerm* sel
 		diffusivity = MIN_DIFFUSIVITY;
 
 	/* Calculate Velocity At Middle of Element - See Eq. 3.3.6 */
-	if( mesh == velocityField->feMesh ) {
-		FeVariable_InterpolateWithinElement( velocityField, lElement_I, xiElementCentre, velocityCentre );
-	} 
-	else {
-		Coord globalCoord;
-		FeMesh_CoordLocalToGlobal( mesh, lElement_I, xiElementCentre, globalCoord );
-		FieldVariable_InterpolateValueAt( velocityField, globalCoord, velocityCentre );
-	}
+	FeVariable_InterpolateFromMeshLocalCoord( velocityField, mesh, lElement_I, xiElementCentre, velocityCentre );
 
 	/* Calculate Length Scales - See Fig 3.4 - ASSUMES BOX MESH TODO - fix */
 	FeMesh_GetElementNodes( mesh, lElement_I, &nInc, &inc );

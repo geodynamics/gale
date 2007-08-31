@@ -372,6 +372,9 @@
 	/** Perhaps should be moved into feVariable interface? */
 	void FeVariable_PrintDomainDiscreteValues( void* feVariable, Stream* stream );
 	void FeVariable_PrintCoordsAndValues( void* _feVariable, Stream* stream ) ;
+
+	/** Use this function when you want the value of the field but the local coordinates you are using may not be appropriate for the mesh of this FeVariable */
+	void FeVariable_InterpolateFromMeshLocalCoord( void* feVariable, FeMesh* mesh, Element_DomainIndex dElement_I, double* localCoord, double* value ) ;
 	
 	#define FeVariable_IntegrateElement( feVariable, swarm, dElement_I ) \
 		FeVariable_IntegrateElement_AxisIndependent( \

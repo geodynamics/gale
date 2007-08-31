@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Residual.c 920 2007-07-20 06:19:34Z RobertTurnbull $
+** $Id: Residual.c 950 2007-08-31 02:09:59Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -313,18 +313,7 @@ void _AdvDiffResidualForceTerm_AssembleElement( void* forceTerm, ForceVector* fo
 			xi, dim, &detJac, GNx );
 		
 		/* Calculate Velocity */
-		if ( phiField->feMesh == self->velocityField->feMesh ) {
-			/* If the phi field's mesh and the velocity field's mesh are identical - then we can assume we are in the same
-			 * element and have the same local coordinate for this integration point */
-			FeVariable_InterpolateWithinElement( self->velocityField, lElement_I, xi, velocity );	
-		}
-		else {
-			Coord globalCoord;
-
-			/* Since the phi field's mesha and the velocity field - we have to get the velocity the hard way */
-			FeMesh_CoordLocalToGlobal( phiField->feMesh, lElement_I, xi, globalCoord );
-			FieldVariable_InterpolateValueAt( self->velocityField, globalCoord, velocity );
-		}
+		FeVariable_InterpolateFromMeshLocalCoord( self->velocityField, phiField->feMesh, lElement_I, xi, velocity );
 
 		/* Calculate phi on particle */
 		_FeVariable_InterpolateNodeValuesToElLocalCoord( phiField, lElement_I, xi, &phi );

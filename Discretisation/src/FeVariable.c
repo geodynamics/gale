@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeVariable.c 943 2007-08-16 04:09:26Z DavidLee $
+** $Id: FeVariable.c 950 2007-08-31 02:09:59Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -1590,7 +1590,6 @@ void _FeVariable_InterpolateNodeValuesToElLocalCoord( void* feVariable, Element_
 	FreeArray( shapeFuncsEvaluatedAtCoord );
 }
 
-
 void _FeVariable_PrintLocalOrDomainValues( void* variable, Index localOrDomainCount, Stream* stream ) {
 	FeVariable* self = (FeVariable*)variable;
 	Node_Index 		node_I = 0;
@@ -1622,6 +1621,23 @@ void _FeVariable_PrintLocalOrDomainValues( void* variable, Index localOrDomainCo
 			Journal_Printf( stream, "\n", currEqNum );
 		}
 	}
+}
+
+void FeVariable_InterpolateFromMeshLocalCoord( void* feVariable, FeMesh* mesh, Element_DomainIndex dElement_I, double* localCoord, double* value ) {
+	FeVariable*          self               = (FeVariable*)         feVariable;
+
+	if ( mesh == self->feMesh ) {
+		/* If the meshes are identical - then we can just interpolate within the elements because the elements are the same */
+		FeVariable_InterpolateWithinElement( self, dElement_I, localCoord, value );
+	}
+	else {
+		Coord               globalCoord;
+
+		/* If the meshes are different - then we must find the global coordinates and interpolate to that */
+		FeMesh_CoordLocalToGlobal( mesh, dElement_I, localCoord, globalCoord );
+		FieldVariable_InterpolateValueAt( feVariable, globalCoord, value );
+	}
+	
 }
 
 /* TODO: can't assume all swarms have particles of type integrationPoint anymore.

@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: OperatorFeVariable.c 920 2007-07-20 06:19:34Z RobertTurnbull $
+** $Id: OperatorFeVariable.c 950 2007-08-31 02:09:59Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -567,23 +567,8 @@ void OperatorFeVariable_BinaryInterpolationFunc( void* feVariable, Element_Domai
 	double              fieldValue1[ MAX_FIELD_COMPONENTS ]; 
 	Coord               globalCoord;
 	
-	/* Get value for field0 */
-	if ( field0->feMesh == mesh )
-		field0->_interpolateWithinElement( field0, dElement_I, localCoord, fieldValue0 );
-	else {
-		/* Get Global Coordinates */
-		FeMesh_CoordLocalToGlobal( mesh, dElement_I, localCoord, globalCoord );
-		field0->_interpolateValueAt( field0, globalCoord, fieldValue0 );
-	}
-
-	/* Get value for field1 */
-	if ( field1->feMesh == mesh )
-		field1->_interpolateWithinElement( field1, dElement_I, localCoord, fieldValue1 );
-	else {
-		/* Get Global Coordinates */
-		FeMesh_CoordLocalToGlobal( mesh, dElement_I, localCoord, globalCoord );
-		field1->_interpolateValueAt( field1, globalCoord, fieldValue1 );
-	}
+	FeVariable_InterpolateFromMeshLocalCoord( field0, mesh, dElement_I, localCoord, fieldValue0 );
+	FeVariable_InterpolateFromMeshLocalCoord( field1, mesh, dElement_I, localCoord, fieldValue1 );
 	
 	Operator_CarryOutBinaryOperation( self->_operator, fieldValue0, fieldValue1, value );
 }

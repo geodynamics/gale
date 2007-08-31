@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ShapeFunctions.c 920 2007-07-20 06:19:34Z RobertTurnbull $
+** $Id: ShapeFunctions.c 950 2007-08-31 02:09:59Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -134,22 +134,7 @@ double** AdvDiffResidualForceTerm_BuildSUPGShapeFunctions( AdvDiffResidualForceT
 			xi, dim, &detJac, GNx );
 
 		/* Calculate Velocity on Integration Point */
-		/* FeVariable_InterpolateFromMeshLocalCoord( velocityField, mesh, lElement_I, xi, velocity ); TODO - add this function*/
-		if ( mesh == velocityField->feMesh ) {
-			/* If the phi field's mesh and the velocity field's mesh are identical - then we can assume we are in the same
-			 * element and have the same local coordinate for this integration point */
-			FeVariable_InterpolateWithinElement( velocityField, lElement_I, xi, velocity );	
-		}
-		else {
-			Coord globalCoord;
-
-			/* Since the phi field's mesh and the velocity field - we have to get the velocity the hard way */
-			FeMesh_CoordLocalToGlobal( mesh,
-						lElement_I, 
-						xi, 
-						globalCoord );
-			FieldVariable_InterpolateValueAt( velocityField, globalCoord, velocity );
-		}
+		FeVariable_InterpolateFromMeshLocalCoord( velocityField, mesh, lElement_I, xi, velocity );
 
 		/* Add upwinding perturbation - See Eq. 3.2.24 */
 		velocityMagnitude = StGermain_VectorMagnitude( velocity, dim );
