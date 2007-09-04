@@ -21,8 +21,12 @@
 		<struct name="hbparticleDots">
 			<param name="Type">lucSwarmViewer</param>
 			<param name="Swarm">materialSwarm</param>
-			<param name="ColourVariable">materialSwarm-HasBeenInWeakZone</param>
-			<param name="ColourMap">hasbeenwzColourMap</param>
+			<param name="MaskVariable">materialSwarm-HasBeenInWeakZone</param>
+			<param name="maskValue">1</param>
+			<param name="maskType">EqualTo</param>
+			<!--param name="ColourVariable">green</param>
+			<param name="ColourMap">hasbeenwzColourMap</param-->
+			<param name="colour">green</param>
 			<param name="pointSize">2.0</param>
 		</struct>		
 		<struct name="hbborder">
