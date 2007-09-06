@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: Utils.h 580 2007-08-16 03:48:53Z DavidLee $
+** $Id: Utils.h 588 2007-09-06 08:43:22Z DavidLee $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -56,6 +56,4 @@
 	#include "RadiogenicHeatingTerm.h"
 	#include "Init.h"
 	#include "Finalise.h"
-
-	#include "PorosityTerm.h"
 #endif 
