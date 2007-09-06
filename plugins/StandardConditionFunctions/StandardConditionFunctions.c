@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StandardConditionFunctions.c 922 2007-07-25 03:01:19Z DavidLee $
+** $Id: StandardConditionFunctions.c 953 2007-09-06 06:07:41Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -903,20 +903,25 @@ void StgFEM_StandardConditionFunctions_SpectralBCX( Node_LocalIndex node_lI, Var
 	double*                 result             = (double*) _result;
         double*                 coord;
 	Node_LocalIndex		analyticNodeI;
-
+	Element_DomainIndex	analyticElement_I;
+	double			analyticLocalElementCoord[3];
+	FeMesh*			analyticFeMesh;
+	
 	analyticFeVarX = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "SpectralVelocityXField" );
 	numericFeVar   = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
 	feMesh         = numericFeVar->feMesh;
 	coord          = Mesh_GetVertex( feMesh, node_lI );
 
-	/*FeVariable_GetValueAtNode( analyticFeVarX, node_lI, result );*/
-	analyticNodeI  = Mesh_NearestVertex( analyticFeVarX->feMesh, coord );
-	FeVariable_GetValueAtNode( analyticFeVarX, analyticNodeI, result );
+	analyticFeMesh = analyticFeVarX->feMesh;
+	if( Mesh_SearchElements( analyticFeMesh, coord, &analyticElement_I ) ) {
+		FeMesh_CoordGlobalToLocal( analyticFeMesh, analyticElement_I, coord, analyticLocalElementCoord );
+		FeVariable_InterpolateWithinElement( analyticFeVarX, analyticElement_I, analyticLocalElementCoord, result );
+	}
+	else {	/* numerical solution node outside analytic mesh - just find closest point & use that */
+		analyticNodeI  = Mesh_NearestVertex( analyticFeMesh, coord );
+		FeVariable_GetValueAtNode( analyticFeVarX, analyticNodeI, result );
+	}
 
-	/* *result = FeVariable_GetScalarAtNode( analyticFeVarX, node_lI );*/
-	/*FieldVariable_InterpolateValueAt( analyticFeVar, coord, result );*/
-
-	/*FeVariable_SetValueAtNode( numericFeVar, node_lI, result );*/
 }
 
 void StgFEM_StandardConditionFunctions_SpectralBCY( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
@@ -927,18 +932,24 @@ void StgFEM_StandardConditionFunctions_SpectralBCY( Node_LocalIndex node_lI, Var
 	double*                 result             = (double*) _result;
         double*                 coord;
 	Node_LocalIndex		analyticNodeI;
-
+	Element_DomainIndex	analyticElement_I;
+	double			analyticLocalElementCoord[3];
+	FeMesh*			analyticFeMesh;
+	
 	analyticFeVarY = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "SpectralVelocityYField" );
 	numericFeVar   = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
 	feMesh         = numericFeVar->feMesh;
 	coord          = Mesh_GetVertex( feMesh, node_lI );
 
-	/*FeVariable_GetValueAtNode( analyticFeVarY, node_lI, result );*/
-	analyticNodeI  = Mesh_NearestVertex( analyticFeVarY->feMesh, coord );
-	FeVariable_GetValueAtNode( analyticFeVarY, analyticNodeI, result );
-	
-	/* *result = FeVariable_GetScalarAtNode( analyticFeVarY, node_lI ); */
-	/*FeVariable_SetValueAtNode( numericFeVar, node_lI, result );*/
+	analyticFeMesh = analyticFeVarY->feMesh;
+	if( Mesh_SearchElements( analyticFeMesh, coord, &analyticElement_I ) ) {
+		FeMesh_CoordGlobalToLocal( analyticFeMesh, analyticElement_I, coord, analyticLocalElementCoord );
+		FeVariable_InterpolateWithinElement( analyticFeVarY, analyticElement_I, analyticLocalElementCoord, result );
+	}
+	else {
+		analyticNodeI  = Mesh_NearestVertex( analyticFeMesh, coord );
+		FeVariable_GetValueAtNode( analyticFeVarY, analyticNodeI, result );
+	}
 }
 
 void StgFEM_StandardConditionFunctions_SpectralBCZ( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
@@ -948,16 +959,25 @@ void StgFEM_StandardConditionFunctions_SpectralBCZ( Node_LocalIndex node_lI, Var
 	FeMesh*			feMesh             = NULL;
 	double*                 result             = (double*) _result;
         double*                 coord;
+	Node_LocalIndex		analyticNodeI;
+	Element_DomainIndex	analyticElement_I;
+	double			analyticLocalElementCoord[3];
+	FeMesh*			analyticFeMesh;
 
 	analyticFeVarZ = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "SpectralVelocityZField" );
 	numericFeVar   = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
 	feMesh         = numericFeVar->feMesh;
 	coord          = Mesh_GetVertex( feMesh, node_lI );
 
-	FeVariable_GetValueAtNode( analyticFeVarZ, node_lI, result );
-	/* *result = FeVariable_GetScalarAtNode( analyticFeVarZ, node_lI ); */
-
-	/*FeVariable_SetValueAtNode( numericFeVar, node_lI, result );*/
+	analyticFeMesh = analyticFeVarZ->feMesh;
+	if( Mesh_SearchElements( analyticFeMesh, coord, &analyticElement_I ) ) {
+		FeMesh_CoordGlobalToLocal( analyticFeMesh, analyticElement_I, coord, analyticLocalElementCoord );
+		FeVariable_InterpolateWithinElement( analyticFeVarZ, analyticElement_I, analyticLocalElementCoord, result );
+	}
+	else {
+		analyticNodeI  = Mesh_NearestVertex( analyticFeMesh, coord );
+		FeVariable_GetValueAtNode( analyticFeVarZ, analyticNodeI, result );
+	}
 }
 
 void StgFEM_StandardConditionFunctions_SpectralPressureBCX( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
@@ -974,9 +994,6 @@ void StgFEM_StandardConditionFunctions_SpectralPressureBCX( Node_LocalIndex node
 	coord          = Mesh_GetVertex( feMesh, node_lI );
 
 	FeVariable_GetValueAtNode( analyticFeVarX, node_lI, result );
-	/* *result = FeVariable_GetScalarAtNode( analyticFeVarX, node_lI ); */
-
-	/*FeVariable_SetValueAtNode( numericFeVar, node_lI, result );*/
 }
 
 void StgFEM_StandardConditionFunctions_SpectralPressureBCY( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
@@ -993,9 +1010,6 @@ void StgFEM_StandardConditionFunctions_SpectralPressureBCY( Node_LocalIndex node
 	coord          = Mesh_GetVertex( feMesh, node_lI );
 
 	FeVariable_GetValueAtNode( analyticFeVarY, node_lI, result );
-	/* *result = FeVariable_GetScalarAtNode( analyticFeVarY, node_lI ); */
-
-	/*FeVariable_SetValueAtNode( numericFeVar, node_lI, result );*/
 }
 
 /* error function for use in 3D spec ridge top BC */
