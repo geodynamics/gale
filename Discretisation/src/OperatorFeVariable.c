@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: OperatorFeVariable.c 950 2007-08-31 02:09:59Z JulianGiordani $
+** $Id: OperatorFeVariable.c 954 2007-09-07 04:55:13Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -595,9 +595,40 @@ void OperatorFeVariable_BinaryValueAtNodeFunc( void* feVariable, Node_DomainInde
 	FeVariable*         field1          = self->feVariableList[1];
 	double              fieldValue0[ MAX_FIELD_COMPONENTS ]; 
 	double              fieldValue1[ MAX_FIELD_COMPONENTS ]; 
-	
-	FeVariable_GetValueAtNode( field0, dNode_I, fieldValue0 );
-	FeVariable_GetValueAtNode( field1, dNode_I, fieldValue1 );
+
+	double*		    	coord;
+	Element_DomainIndex	field0Element;
+	Element_DomainIndex	field1Element;
+	Coord			field0LocalCoord;
+	Coord			field1LocalCoord;
+	Node_LocalIndex		field0NearestNode;
+	Node_LocalIndex		field1NearestNode;
+
+	if( field0->feMesh == self->feMesh && field1->feMesh == self->feMesh ) {
+		FeVariable_GetValueAtNode( field0, dNode_I, fieldValue0 );
+		FeVariable_GetValueAtNode( field1, dNode_I, fieldValue1 );
+	}
+	else {
+		coord = Mesh_GetVertex( self->feMesh, dNode_I ); /* hope this is ok for global indices?? */
+		
+		if( Mesh_SearchElements( field0->feMesh, coord, &field0Element ) ) {
+			FeMesh_CoordGlobalToLocal( field0->feMesh, field0Element, coord, field0LocalCoord );
+			FeVariable_InterpolateWithinElement( field0, field0Element, field0LocalCoord, fieldValue0 );
+		}
+		else {	/* numerical solution node outside analytic mesh - just find closest point & use that */
+			field0NearestNode = Mesh_NearestVertex( field0->feMesh, coord );
+			FeVariable_GetValueAtNode( field0, field0NearestNode, fieldValue0 );
+		}
+		
+		if( Mesh_SearchElements( field1->feMesh, coord, &field1Element ) ) {
+			FeMesh_CoordGlobalToLocal( field1->feMesh, field1Element, coord, field1LocalCoord );
+			FeVariable_InterpolateWithinElement( field1, field1Element, field1LocalCoord, fieldValue1 );
+		}
+		else {	/* numerical solution node outside analytic mesh - just find closest point & use that */
+			field1NearestNode = Mesh_NearestVertex( field1->feMesh, coord );
+			FeVariable_GetValueAtNode( field1, field1NearestNode, fieldValue1 );
+		}
+	}
 	Operator_CarryOutBinaryOperation( self->_operator, fieldValue0, fieldValue1, value );
 }
 
