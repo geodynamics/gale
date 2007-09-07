@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SwarmClass.c 4173 2007-08-16 03:36:33Z DavidLee $
+** $Id: SwarmClass.c 4179 2007-09-07 00:15:38Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -1215,7 +1215,9 @@ Particle_Index Swarm_FindClosestParticle( void* _swarm, Dimension_Index dim, dou
 	closestParticle_I = swarm->cellParticleTbl[ lCell_I ][ cParticle_I ];
 
 	/* Find neighbours to this cell - TODO This Assumes ElementCellLayout */
-	Mesh_GetIncidence( ((ElementCellLayout*)swarm->cellLayout)->mesh, dim, lCell_I, dim, 
+	/*Mesh_GetIncidence( ((ElementCellLayout*)swarm->cellLayout)->mesh, dim, lCell_I, dim, 
+			   &neighbourCount, &neighbourList );*/
+	Mesh_GetIncidence( ((ElementCellLayout*)swarm->cellLayout)->mesh, dim, lCell_I, MT_VERTEX, /* dave - 05.09.07 */
 			   &neighbourCount, &neighbourList );
 
 	/* Loop over neighbours */
@@ -1223,12 +1225,14 @@ Particle_Index Swarm_FindClosestParticle( void* _swarm, Dimension_Index dim, dou
 		lCell_I = neighbourList[ neighbour_I ];
 
 		/* TODO - Be more clever than checking every particle in this cell */
-		cParticle_I = Swarm_FindClosestParticleInCell( swarm, lCell_I, dim, coord, &distanceToParticle );
+		if( lCell_I < swarm->cellDomainCount ) { /* dave - 05.09.07 */
+			cParticle_I = Swarm_FindClosestParticleInCell( swarm, lCell_I, dim, coord, &distanceToParticle );
 
-		/* Check to see if closest particle in this cell is closest to this coord */
-		if (minDistance > distanceToParticle) {
-			minDistance = distanceToParticle;
-			closestParticle_I = swarm->cellParticleTbl[ lCell_I ][ cParticle_I ];
+			/* Check to see if closest particle in this cell is closest to this coord */
+			if (minDistance > distanceToParticle) {
+				minDistance = distanceToParticle;
+				closestParticle_I = swarm->cellParticleTbl[ lCell_I ][ cParticle_I ];
+			}
 		}
 	}
 
