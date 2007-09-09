@@ -1,0 +1,49 @@
+<!-- Rayleigh-Taylor lucifer viewports -->
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<struct name="components" mergeType="merge">
+			<!-- Camera And Colour Maps -->
+		<struct name="mcamera" mergeType="replace">
+			<param name="Type">lucCamera</param>
+			<param name="CentreFieldVariable">VelocityField</param>
+			<param name="coordZ">1.4762</param>
+			<param name="coordY">1.4762</param>
+		</struct>
+		<struct name="materialColourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours">White Green</param>
+			<param name="dynamicRange">True</param>
+		</struct>
+		<!-- Drawing Objects -->
+		<struct name="WZMaterialTitle" mergeType="replace">
+			<param name="Type">lucTitle</param>
+			<param name="string">Weak zone material dots</param>
+		</struct>
+		<struct name="particleMaterialDots">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">materialSwarm-MaterialIndex</param>
+			<param name="ColourMap">materialColourMap</param>
+			<param name="pointSize">2.0</param>
+		</struct>		
+		<struct name="mborder">
+			<param name="Type">lucFieldVariableBorder</param>
+			<param name="FieldVariable">VelocityField</param>
+			<param name="lineWidth">4</param>
+		</struct>
+
+		
+		<!-- Viewport -->
+		<struct name="WZMaterialVP">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">mcamera</param>
+			<list name="DrawingObject">
+				<param>WZMaterialTitle</param>
+				<param>particleMaterialDots</param>
+				<param>mborder</param>
+			</list>
+		</struct>
+	</struct>
+
+</StGermainData>
