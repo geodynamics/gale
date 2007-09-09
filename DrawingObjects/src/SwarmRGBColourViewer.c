@@ -267,7 +267,7 @@ void _lucSwarmRGBColourViewer_SetParticleColour( void* drawingObject, void* _con
 	double                   colourValueRed        = 0.0;
 	double                   colourValueGreen      = 0.0;
 	double                   colourValueBlue       = 0.0;
-
+	double					 opacity = 0.0;
 	/* Get red colour */
 	if ( self->colourRedVariable){
 		SwarmVariable_ValueAt( self->colourRedVariable, lParticle_I, &colourValueRed );
@@ -286,9 +286,14 @@ void _lucSwarmRGBColourViewer_SetParticleColour( void* drawingObject, void* _con
 		SwarmVariable_ValueAt( self->colourBlueVariable, lParticle_I, &colourValueBlue );
 		(self->colour).blue = colourValueBlue;
 	}
-
 	
-	lucColourMap_SetOpenGLColourFromRGB_ExplicitOpacity( (self->colour).red, (self->colour).green, (self->colour).blue, (float)(self->colour).opacity );
+	//added this in
+	/* Get Opacity Value */
+	if ( self->opacityVariable ){
+		SwarmVariable_ValueAt( self->opacityVariable, lParticle_I, &opacity );
+		(self->colour).opacity = (float)opacity;	
+	}
+	lucColourMap_SetOpenGLColourFromRGB_ExplicitOpacity( (self->colour).red, (self->colour).green, (self->colour).blue, (self->colour).opacity );
 }
 
 
