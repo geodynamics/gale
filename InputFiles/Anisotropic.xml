@@ -111,12 +111,17 @@
 			<param name="ColourMap">alignmentColourMap</param>
 			<param name="pointSize">2.0</param>
 		</struct>	
+		<struct name="alignmentTitle">
+			<param name="Type">lucTitle</param>
+			<param name="string">Particle Alignment</param>
+		</struct>
 		<struct name="AlignmentVP">
 			<param name="Type">lucViewport</param>
 			<param name="Camera">camera</param>
 			<list name="DrawingObject">
 				<param>alignmentDrawingObject</param>
 				<param>border</param>
+				<param>alignmentTitle</param>
 			</list>
 		</struct>		
 		<struct name="window" mergeType="merge">
