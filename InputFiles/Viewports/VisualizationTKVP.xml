@@ -47,7 +47,7 @@
 		</struct>
 
 		<!-- Viewports -->
-		<!--struct name="VisualizationTKStressMinVP">
+		<struct name="VisualizationTKStressMinVP">
 			<param name="Type">lucViewport</param>
 			<param name="Camera">cameravt</param>
 			<list name="DrawingObject">
@@ -56,7 +56,7 @@
 				<param>vtparticleVector2</param>
 				
 			</list>
-		</struct-->
+		</struct>
 	
 	<struct name="VisualizationTKStressMaxVP">
 			<param name="Type">lucViewport</param>
