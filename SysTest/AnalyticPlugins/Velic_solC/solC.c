@@ -135,32 +135,33 @@ void _Velic_solC(
 		
 		
 		
-		u5 = u5*cos(n*PI*x); /* pressure */
-		u6 = u6*cos(n*PI*x); /* xx stress */
+		u5 *= cos(k*x); /* pressure */
+		u6 *= cos(k*x); /* xx stress */    
 		sum5 +=u5;
 		sum6 +=u6;
-		
-		u1 *= cos(n*PI*x); /* z velocity */
+
+		u1 *= cos(k*x); /* z velocity */
 		sum1 += u1;
-		u2 *= sin(n*PI*x); /* x velocity */
+		u2 *= sin(k*x); /* x velocity */
 		sum2 += u2;
-		u3 *= 2*n*PI*cos(n*PI*x); /* zz stress */
+		u3 *= cos(k*x); /* zz stress */
 		sum3 += u3;
-		u4 *= 2*n*PI*sin(n*PI*x); /* zx stress */
+		u4 *= sin(k*x); /* zx stress */
 		sum4 += u4;
-		/* density */
+		    /* density */
 		sum7 += del_rho*cos(k*x);
-		
+
 	}/* n */
-	/* n=0 term*/
+	 /* n=0 term*/
 	sum7 += sigma*xc;
-	/* pressure 0th term integration constant is arbitrarily chosen so that this term is 0 at z=0.5 */
-	sum5 += sigma*xc*(0.5-z); /* now have total pressure */
-	sum3 += -sigma*xc*(0.5-z); /* now have total zz stress */
-	sum6 += -sigma*xc*(0.5-z); /* now have total xx stress */
+	 /* pressure 0th term integration constant is arbitrarily chosen so that this term is 0 at z=0.5 */
+	sum5 +=  sigma*xc*(0.5-z); /* now have total pressure */
+	sum3 += -sum5; /* now have total zz stress */
+	sum6 += -sum5; /* now have total xx stress */
 	mag=sqrt(sum1*sum1+sum2*sum2);
-	/*printf("%0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f\n",x,z,sum1,sum2,sum3,sum4,sum5,sum6,mag,sum7);*/
-	
+	printf("%0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f\n",x,z,sum1,sum2,sum3,sum4,sum5,sum6,mag,sum7);
+
+
 	/* Output */
 	if( vel != NULL ) {
 		vel[0] = sum2;
@@ -178,10 +179,6 @@ void _Velic_solC(
 		strain_rate[0] = (sum6+sum5)/(2.0*Z);
 		strain_rate[1] = (sum3+sum5)/(2.0*Z);
 		strain_rate[2] = sum4/(2.0*Z);
-	}
-	
-	if( sum5 - (-0.5*(sum6+sum3)) > 1e-4 ) {
-		assert(0);
 	}
 	
 	
