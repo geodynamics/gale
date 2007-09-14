@@ -159,7 +159,7 @@ void _Velic_solC(
 	sum3 += -sum5; /* now have total zz stress */
 	sum6 += -sum5; /* now have total xx stress */
 	mag=sqrt(sum1*sum1+sum2*sum2);
-	printf("%0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f\n",x,z,sum1,sum2,sum3,sum4,sum5,sum6,mag,sum7);
+	/*printf("%0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f\n",x,z,sum1,sum2,sum3,sum4,sum5,sum6,mag,sum7);*/
 
 
 	/* Output */

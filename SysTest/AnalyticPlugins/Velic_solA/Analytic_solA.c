@@ -77,14 +77,6 @@ void _Velic_solA_Init( Velic_solA* self, double sigma, double Z, double wavenumb
 	self->n     = n;	
 }
 
-void _Velic_solA_Build( void* analyticSolution, void* data ) {
-	Velic_solA*          self  = (Velic_solA*)analyticSolution;
-
-	AnalyticSolution_BuildAllAnalyticFields( self, data );
-
-	_AnalyticSolution_Build( self, data );
-}
-
 void _Velic_solA_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	Velic_solA* self = (Velic_solA*) analyticSolution;
 	FeVariable*              velocityField;
@@ -153,7 +145,7 @@ void* _Velic_solA_DefaultNew( Name name ) {
 			_AnalyticSolution_Copy,
 			_Velic_solA_DefaultNew,
 			_Velic_solA_Construct,
-			_Velic_solA_Build,
+			_AnalyticSolution_Build,
 			_AnalyticSolution_Initialise,
 			_AnalyticSolution_Execute,
 			_AnalyticSolution_Destroy,

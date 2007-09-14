@@ -75,6 +75,12 @@ void Velic_solCx_StrainRateFunction( void* analyticSolution, FeVariable* analyti
 	_Velic_solCx( coord, self->etaA, self->etaB, self->xc, self->n, NULL, NULL, NULL, strainRate );
 }
 
+void Velic_solCx_ViscosityFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* viscosity ) {
+	Velic_solCx* self = (Velic_solCx*) analyticSolution;
+	
+	*viscosity = ( coord[ I_AXIS ] < self->xc ) ? self->etaA : self->etaB;
+}
+
 void _Velic_solCx_Init( Velic_solCx* self, double etaA, double etaB, double xc, int n ) {
 	Bool                     correctInput = True;
 
@@ -95,14 +101,6 @@ void _Velic_solCx_Init( Velic_solCx* self, double etaA, double etaB, double xc, 
 			"Error: In func %s. The input parameters you supplied to the analytic Solution are incorrect.\nValid range of xc values is [0,1]. Currently it is %f\n", __func__, self->xc );
 }
 
-void _Velic_solCx_Build( void* analyticSolution, void* data ) {
-	Velic_solCx*          self  = (Velic_solCx*)analyticSolution;
-
-	AnalyticSolution_BuildAllAnalyticFields( self, data );
-
-	_AnalyticSolution_Build( self, data );
-}
-
 void _Velic_solCx_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	Velic_solCx* self = (Velic_solCx*) analyticSolution;
 	FeVariable*              velocityField;
@@ -110,6 +108,7 @@ void _Velic_solCx_Construct( void* analyticSolution, Stg_ComponentFactory* cf, v
 	FeVariable*              recoveredPressureField;
 	FeVariable*              stressField;
 	FeVariable*              strainRateField;
+	FeVariable*              viscosityField;
 	FeVariable*              recoverdStrainRateField;
 	FeVariable*              recoveredStressField;
 	double                   etaA,  etaB,  xc;
@@ -124,6 +123,10 @@ void _Velic_solCx_Construct( void* analyticSolution, Stg_ComponentFactory* cf, v
 
 	pressureField = Stg_ComponentFactory_ConstructByName( cf, "PressureField", FeVariable, True, data );
 	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, pressureField, Velic_solCx_PressureFunction );
+
+	viscosityField = Stg_ComponentFactory_ConstructByName( cf, "ViscosityField", FeVariable, False, data );
+	if ( viscosityField ) 
+		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, viscosityField, Velic_solCx_ViscosityFunction );
 
 	stressField = Stg_ComponentFactory_ConstructByName( cf, "StressField", FeVariable, False, data );
 	if ( stressField ) 
@@ -162,7 +165,7 @@ void* _Velic_solCx_DefaultNew( Name name ) {
 			_AnalyticSolution_Copy,
 			_Velic_solCx_DefaultNew,
 			_Velic_solCx_Construct,
-			_Velic_solCx_Build,
+			_AnalyticSolution_Build,
 			_AnalyticSolution_Initialise,
 			_AnalyticSolution_Execute,
 			_AnalyticSolution_Destroy,

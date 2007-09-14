@@ -97,39 +97,42 @@ void _Velic_solCA_Construct( void* analyticSolution, Stg_ComponentFactory* cf, v
 	FeVariable*              strainRateField;
 	FeVariable*              recoverdStrainRateField;
 	FeVariable*              recoveredStressField;
-	double                   sigma, eta, dx, x0;
+	double                   sigma, eta, dx, x0, startX, endX;
 
 	/* Construct Parent */
 	_AnalyticSolution_Construct( self, cf, data );
 
 	/* Create Analytic Fields */
 	velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data );
-	AnalyticSolution_CreateAnalyticVectorField( self, velocityField, Velic_solCA_VelocityFunction );
+	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, velocityField, Velic_solCA_VelocityFunction );
 
 	pressureField = Stg_ComponentFactory_ConstructByName( cf, "PressureField", FeVariable, True, data );
-	AnalyticSolution_CreateAnalyticField( self, pressureField, Velic_solCA_PressureFunction );
+	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, pressureField, Velic_solCA_PressureFunction );
 
 	stressField = Stg_ComponentFactory_ConstructByName( cf, "StressField", FeVariable, False, data );
 	if ( stressField )
-		AnalyticSolution_CreateAnalyticSymmetricTensorField( self, stressField, Velic_solCA_StressFunction );
+		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, stressField, Velic_solCA_StressFunction );
 
 	strainRateField = Stg_ComponentFactory_ConstructByName( cf, "StrainRateField", FeVariable, False, data );
 	if ( strainRateField  ) {
-		AnalyticSolution_CreateAnalyticSymmetricTensorField( self, strainRateField, Velic_solCA_StrainRateFunction );
+		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, strainRateField, Velic_solCA_StrainRateFunction );
 	}
 
 	recoverdStrainRateField = Stg_ComponentFactory_ConstructByName( cf, "recoveredStrainRate", FeVariable, False, data );
 	if ( recoverdStrainRateField )
-		AnalyticSolution_CreateAnalyticSymmetricTensorField( self, recoverdStrainRateField, Velic_solCA_StrainRateFunction );
+		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, recoverdStrainRateField, Velic_solCA_StrainRateFunction );
 
 	recoveredStressField = Stg_ComponentFactory_ConstructByName( cf, "recoveredStressField", FeVariable, False, data );
 	if ( recoveredStressField )
-		AnalyticSolution_CreateAnalyticSymmetricTensorField( self, recoveredStressField, Velic_solCA_StressFunction );
+		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, recoveredStressField, Velic_solCA_StressFunction );
 
 	sigma = Stg_ComponentFactory_GetRootDictDouble( cf, "solCA_sigma", 1.0 );
 	eta = Stg_ComponentFactory_GetRootDictDouble( cf, "solCA_eta", 1.0 );
-	dx = Stg_ComponentFactory_GetRootDictDouble( cf, "solCA_dx", 0.2 );
-	x0 = Stg_ComponentFactory_GetRootDictDouble( cf, "solCA_x0", 0.4 );
+	startX = Stg_ComponentFactory_GetRootDictDouble( cf, "solCA_startX", 0.4 );
+	endX   = Stg_ComponentFactory_GetRootDictDouble( cf, "solCA_endX", 0.8 );
+
+	dx = endX - startX;
+	x0 = 0.5 * (endX + startX);
 	
 	_Velic_solCA_Init( self, sigma, eta, dx, x0 );
 

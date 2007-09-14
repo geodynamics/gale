@@ -70,6 +70,12 @@ void Velic_solKz_StrainRateFunction( void* analyticSolution, FeVariable* analyti
 	_Velic_solKz( coord, self->sigma, self->km, self->n, self->B, NULL, NULL, NULL, strainRate );
 }
 
+void Velic_solKz_ViscosityFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* viscosity ) {
+	Velic_solKz* self = (Velic_solKz*) analyticSolution;
+	
+	*viscosity = exp( 2.0 * self->B * coord[ J_AXIS ] );
+}
+
 	
 void _Velic_solKz_Init( Velic_solKz* self, double sigma, double km, double B, int n ) {
 	// TODO	Bool                     correctInput = True;
@@ -88,8 +94,6 @@ void _Velic_solKz_Init( Velic_solKz* self, double sigma, double km, double B, in
 void _Velic_solKz_Build( void* analyticSolution, void* data ) {
 	Velic_solKz*          self  = (Velic_solKz*)analyticSolution;
 
-	AnalyticSolution_BuildAllAnalyticFields( self, data );
-	
 	_AnalyticSolution_Build( self, data );
 }
 
@@ -98,10 +102,11 @@ void _Velic_solKz_Construct( void* analyticSolution, Stg_ComponentFactory* cf, v
 	FeVariable*              velocityField;
 	FeVariable*              pressureField, *recoveredPressureField;
 	FeVariable*              stressField;
+	FeVariable*              viscosityField;
 	FeVariable*              strainRateField;
 	FeVariable*              recoverdStrainRateField;
 	FeVariable*              recoveredStressField;
-	double                   sigma, km, B;
+	double                   sigma, km, B, twiceB;
 	int                      n;
 
 	/* Construct Parent */
@@ -113,6 +118,10 @@ void _Velic_solKz_Construct( void* analyticSolution, Stg_ComponentFactory* cf, v
 
 	pressureField = Stg_ComponentFactory_ConstructByName( cf, "PressureField", FeVariable, True, data );
 	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, pressureField, Velic_solKz_PressureFunction );
+
+	viscosityField = Stg_ComponentFactory_ConstructByName( cf, "ViscosityField", FeVariable, False, data );
+	if ( viscosityField ) 
+		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, viscosityField, Velic_solKz_ViscosityFunction );
 
 	stressField = Stg_ComponentFactory_ConstructByName( cf, "StressField", FeVariable, False, data );
 	if ( stressField ) 
@@ -136,7 +145,8 @@ void _Velic_solKz_Construct( void* analyticSolution, Stg_ComponentFactory* cf, v
 
 	sigma = Stg_ComponentFactory_GetRootDictDouble( cf, "solKz_sigma", 1.0 );
 	km = Stg_ComponentFactory_GetRootDictDouble( cf, "solKz_km", M_PI );
-	B = Stg_ComponentFactory_GetRootDictDouble( cf, "solKz_B", 1.0 );
+	twiceB = Stg_ComponentFactory_GetRootDictDouble( cf, "solKz_twiceB", 2.0 );
+	B = Stg_ComponentFactory_GetRootDictDouble( cf, "solKz_B", 0.5 * twiceB );
 	n = Stg_ComponentFactory_GetRootDictInt( cf, "solKz_n", 1 );
 	
 	_Velic_solKz_Init( self, sigma, km, B, n );

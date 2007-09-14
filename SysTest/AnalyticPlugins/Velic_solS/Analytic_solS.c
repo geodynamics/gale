@@ -95,8 +95,6 @@ void _Velic_solS_Init( Velic_solS* self, double _eta, int _n ) {
 void _Velic_solS_Build( void* analyticSolution, void* data ) {
 	Velic_solS*          self  = (Velic_solS*)analyticSolution;
 	
-	AnalyticSolution_BuildAllAnalyticFields( self, data );
-	
 	_AnalyticSolution_Build( self, data );
 }
 
@@ -143,7 +141,7 @@ void _Velic_solS_Construct( void* analyticSolution, Stg_ComponentFactory* cf, vo
 		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, recoveredPressureField, Velic_solS_PressureFunction );
 	
 	_eta = Stg_ComponentFactory_GetRootDictDouble( cf, "solS_eta", 1.0 );
-	_n = Stg_ComponentFactory_GetRootDictInt( cf, "wavenumberX", 1 );
+	_n = Stg_ComponentFactory_GetRootDictInt( cf, "sinusoidalLidWavenumber", 1 );
 
         _Velic_solS_Init( self, _eta, _n );
 }

@@ -99,8 +99,6 @@ void _Velic_solB_Init( Velic_solB* self, double sigma, double Z, double km, int 
 void _Velic_solB_Build( void* analyticSolution, void* data ) {
 	Velic_solB*           self  = (Velic_solB*)analyticSolution;
 
-	AnalyticSolution_BuildAllAnalyticFields( self, data );
-
 	_AnalyticSolution_Build( self, data );
 }
 	

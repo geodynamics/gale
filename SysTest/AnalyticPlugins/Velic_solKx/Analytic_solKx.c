@@ -92,8 +92,6 @@ void _Velic_solKx_Init( Velic_solKx* self, double sigma, double _m, double B, in
 void _Velic_solKx_Build( void* analyticSolution, void* data ) {
 	Velic_solKx*          self  = (Velic_solKx*)analyticSolution;
 
-	AnalyticSolution_BuildAllAnalyticFields( self, data );
-	
 	_AnalyticSolution_Build( self, data );
 }
 

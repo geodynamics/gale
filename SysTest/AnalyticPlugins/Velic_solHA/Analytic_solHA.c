@@ -94,8 +94,6 @@ void _Velic_solHA_Init( Velic_solHA* self, double sigma, double eta, double dx, 
 void _Velic_solHA_Build( void* analyticSolution, void* data ) {
 	Velic_solHA*          self  = (Velic_solHA*)analyticSolution;
 	
-	AnalyticSolution_BuildAllAnalyticFields( self, data );
-	
 	_AnalyticSolution_Build( self, data );
 }
 
