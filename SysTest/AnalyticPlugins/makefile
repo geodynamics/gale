@@ -3,7 +3,7 @@ PROJ_ROOT := $(shell until test -r ./Makefile.system ; do cd .. ; done ; echo `p
 
 include ${PROJ_ROOT}/Makefile.system
 
-subdirs = VelicIC Velic_solA Velic_solB Velic_solCx Velic_solHA Velic_solKz # Velic_solS $(shell find * -type d -follow -prune ! -name .svn  ! -name Doc ! -name figs ! -name Velic_solHy)
+subdirs = VelicIC Velic_solA Velic_solB Velic_solC Velic_solCA Velic_solCx Velic_solHA Velic_solKz  Velic_solS # $(shell find * -type d -follow -prune ! -name .svn  ! -name Doc ! -name figs ! -name Velic_solHy)
 
 modName := $(shell basename `pwd` )
 mod = ${PROJECT}_${modName}
