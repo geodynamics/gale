@@ -361,7 +361,8 @@ void _BuoyancyForceTermThermoChem_AssembleElement( void* forceTerm, ForceVector*
 
 		/* Get parameters */
 		if ( temperatureField )
-			FeVariable_InterpolateWithinElement( temperatureField, lElement_I, xi, &temperature );
+			FeVariable_InterpolateFromMeshLocalCoord( temperatureField, mesh, lElement_I, xi, &temperature );
+
 		material = IntegrationPointsSwarm_GetMaterialOn( (IntegrationPointsSwarm*) swarm, particle );
 		materialExt = ExtensionManager_Get( material->extensionMgr, material, self->materialExtHandle );
 

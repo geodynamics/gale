@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: BuoyancyForceTerm.c 475 2007-06-27 00:31:44Z DavidLee $
+** $Id: BuoyancyForceTerm.c 508 2007-09-14 05:20:39Z RobertTurnbull $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -256,6 +256,14 @@ void _BuoyancyForceTerm_Build( void* forceTerm, void* data ) {
 	MaterialPointsSwarm**            materialSwarms;
 	Index                            materialSwarm_I;
 	Name                             name;
+	AbstractContext*                 context;
+	Stg_ComponentFactory*            cf;
+
+	/* Get Component Factory if we can */
+	if ( Stg_Class_IsInstance( data, AbstractContext_Type ) ) {
+		context = (AbstractContext*) data;
+		cf = context->CF;
+	}
 
 	_ForceTerm_Build( self, data );
 
@@ -271,8 +279,14 @@ void _BuoyancyForceTerm_Build( void* forceTerm, void* data ) {
 		material = Materials_Register_GetByIndex( materials_Register, material_I );
 		materialExt = ExtensionManager_GetFunc( material->extensionMgr, material, self->materialExtHandle );
 
-		materialExt->density = Dictionary_GetDouble_WithDefault( material->dictionary, "density", 0.0 );
-		materialExt->alpha   = Dictionary_GetDouble_WithDefault( material->dictionary, "alpha",   0.0 );
+		if ( cf ) {
+			materialExt->density = Stg_ComponentFactory_GetDouble( cf, material->name, "density", 0.0 );
+			materialExt->alpha   = Stg_ComponentFactory_GetDouble( cf, material->name, "alpha",   0.0 );
+		}
+		else {
+			materialExt->density = Dictionary_GetDouble_WithDefault( material->dictionary, "density", 0.0 );
+			materialExt->alpha   = Dictionary_GetDouble_WithDefault( material->dictionary, "alpha",   0.0 );
+		}
 	}
 	
 	/* Create Swarm Variables of each material swarm this ip swarm is mapped against */
@@ -394,8 +408,9 @@ void _BuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVect
 		ElementType_EvaluateShapeFunctionsAt( elementType, xi, Ni );
 
 		/* Get parameters */
-		if ( temperatureField )
-			FeVariable_InterpolateWithinElement( temperatureField, lElement_I, xi, &temperature );
+		if ( temperatureField ) 
+			FeVariable_InterpolateFromMeshLocalCoord( temperatureField, mesh, lElement_I, xi, &temperature );
+	
 		material = IntegrationPointsSwarm_GetMaterialOn( (IntegrationPointsSwarm*) swarm, particle );
 		materialExt = ExtensionManager_Get( material->extensionMgr, material, self->materialExtHandle );
 
