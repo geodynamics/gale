@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SimpleShearAnalytic.c 846 2007-05-25 06:39:04Z JulianGiordani $
+** $Id: SimpleShearAnalytic.c 956 2007-09-14 05:37:43Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -65,8 +65,6 @@ void SimpleShearAnalytic_PressureFunction( void* analyticSolution, FeVariable* a
 
 void _SimpleShearAnalytic_Build( void* analyticSolution, void* data ) {
 	SimpleShearAnalytic *self = (SimpleShearAnalytic*)analyticSolution;
-
-	AnalyticSolution_BuildAllAnalyticFields( self, data );
 
 	_AnalyticSolution_Build( self, data );
 }

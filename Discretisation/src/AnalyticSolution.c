@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AnalyticSolution.c 907 2007-07-09 23:41:37Z PatrickSunter $
+** $Id: AnalyticSolution.c 956 2007-09-14 05:37:43Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -185,9 +185,13 @@ void _AnalyticSolution_Construct( void* analyticSolution, Stg_ComponentFactory* 
 
 void _AnalyticSolution_Build( void* analyticSolution, void* data ) {
 	AnalyticSolution* self = (AnalyticSolution*) analyticSolution;
-	Index             analyticFeVariableCount = Stg_ObjectList_Count( self->analyticFeVariableList );
+	Index             analyticFeVariableCount;
 	Index             analyticFeVariable_I;
+
+	/* Build all the analytic fields registered to this AnalyticSolution */
+	AnalyticSolution_BuildAllAnalyticFields( self, data );
 	
+	analyticFeVariableCount = Stg_ObjectList_Count( self->analyticFeVariableList );
 	assert( analyticFeVariableCount == Stg_ObjectList_Count( self->analyticFeVariableFuncList ) );
 
 	for ( analyticFeVariable_I = 0 ; analyticFeVariable_I < analyticFeVariableCount ; analyticFeVariable_I++ ) {
@@ -357,8 +361,13 @@ void AnalyticSolution_BuildAllAnalyticFields( void* analyticSolution, void* data
 
 	for( feVar_I = 0 ; feVar_I < feVarCount ; feVar_I++ ) {
 		feVariable = (FeVariable*)Stg_ObjectList_At( self->feVariableList, feVar_I );
+		
+		/* Check to see whether this field has already been added */
+		
+
 		/* Build the FeVariable here ensuring the analytic "copy" of it has valid values */
 		Stg_Component_Build( feVariable, data, False ) ;
+		
 		if( feVariable->fieldComponentCount == 1 ) {
 			if( NULL == AnalyticSolution_CreateAnalyticField( self, feVariable ) ) {
 

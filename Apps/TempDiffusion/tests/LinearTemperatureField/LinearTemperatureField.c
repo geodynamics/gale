@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: LinearTemperatureField.c 846 2007-05-25 06:39:04Z JulianGiordani $
+** $Id: LinearTemperatureField.c 956 2007-09-14 05:37:43Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -67,8 +67,6 @@ void _LinearTemperatureField_Construct( void* analyticSolution, Stg_ComponentFac
 
 void _LinearTemperatureField_Build( void* analyticSolution, void* data ) {
 	LinearTemperatureField *self = (LinearTemperatureField*)analyticSolution;
-
-	AnalyticSolution_BuildAllAnalyticFields( self, data );
 
 	_AnalyticSolution_Build( self, data );
 }
