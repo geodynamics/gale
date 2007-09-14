@@ -99,27 +99,27 @@ void _Velic_solH_Construct( void* analyticSolution, Stg_ComponentFactory* cf, vo
 
 	/* Create Analytic Fields */
 	velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data );
-	AnalyticSolution_CreateAnalyticVectorField( self, velocityField, Velic_solH_VelocityFunction );
+	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, velocityField, Velic_solH_VelocityFunction );
 
 	pressureField = Stg_ComponentFactory_ConstructByName( cf, "PressureField", FeVariable, True, data );
-	AnalyticSolution_CreateAnalyticField( self, pressureField, Velic_solH_PressureFunction );
+	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, pressureField, Velic_solH_PressureFunction );
 
 	stressField = Stg_ComponentFactory_ConstructByName( cf, "StressField", FeVariable, False, data );
 	if ( stressField )
-		AnalyticSolution_CreateAnalyticSymmetricTensorField( self, stressField, Velic_solH_StressFunction );
+		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, stressField, Velic_solH_StressFunction );
 
 	strainRateField = Stg_ComponentFactory_ConstructByName( cf, "StrainRateField", FeVariable, False, data );
 	if ( strainRateField  ) {
-		AnalyticSolution_CreateAnalyticSymmetricTensorField( self, strainRateField, Velic_solH_StrainRateFunction );
+		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, strainRateField, Velic_solH_StrainRateFunction );
 	}
 
 	recoverdStrainRateField = Stg_ComponentFactory_ConstructByName( cf, "recoveredStrainRateField", FeVariable, False, data );
 	if ( recoverdStrainRateField )
-		AnalyticSolution_CreateAnalyticSymmetricTensorField( self, recoverdStrainRateField, Velic_solH_StrainRateFunction );
+		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, recoverdStrainRateField, Velic_solH_StrainRateFunction );
 
 	recoveredStressField = Stg_ComponentFactory_ConstructByName( cf, "recoveredStressField", FeVariable, False, data );
 	if ( recoveredStressField )
-		AnalyticSolution_CreateAnalyticSymmetricTensorField( self, recoveredStressField, Velic_solH_StressFunction );
+		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, recoveredStressField, Velic_solH_StressFunction );
 	
 
 	sigma = Stg_ComponentFactory_GetRootDictDouble( cf, "solH_sigma", 1.0 );

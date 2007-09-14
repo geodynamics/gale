@@ -142,7 +142,7 @@ Bool _checkInputParams( Velic_solCA* self ) {
 	return ( 
 			( self->sigma > 0.0 ) && ( self->eta > 0.0 ) &&
 			( self->dx >= 0.0 )    && ( self->x0 > 0 ) &&
-			( self->dx < 0.5 )    && ( self->x0 < 1.0 )
+			( self->dx < 1.0 )    && ( self->x0 < 1.0 )
 		);
 }
 
