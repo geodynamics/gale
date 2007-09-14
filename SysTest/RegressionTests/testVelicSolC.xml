@@ -90,7 +90,7 @@
 	<param name="seed"> 13 </param>
 
 	<!-- Boundary conditions -->
-	<include>Underworld/VariableConditions/velocityBCs.freeslipSides.xml</include>
+	<include>Underworld/VariableConditions/velocityBCs.freeslip.xml</include>
 
 	
 	<param name="CentroidMaterial">ball</param>

@@ -20,7 +20,7 @@
 	</list>
 	
 	<param name="VelocityField-Tolerance"> 5.0e-05 </param>
-	<param name="PressureField-Tolerance"> 5.0e-04 </param>
+	<param name="PressureField-Tolerance"> 1.0e-03 </param>
 
 	<struct name="components" mergeType="merge">
 		<struct name="backgroundViscosity">
@@ -91,7 +91,7 @@
 	<param name="seed"> 13 </param>
 
 	<!-- Boundary conditions -->
-	<include>Underworld/VariableConditions/velocityBCs.freeslipSides.xml</include>
+	<include>Underworld/VariableConditions/velocityBCs.freeslip.xml</include>
 
 	
 	<param name="CentroidMaterial">ball</param>
