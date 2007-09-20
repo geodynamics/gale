@@ -14,7 +14,9 @@
 		<param name="colours">Black Purple DarkRed Orange Yellow</param>
 		<!--<param name="colours">#111111 #220044 DarkSlateBlue Blue green yellow orange DarkRed red</param>
 		-->
-		<param name="dynamicRange">true</param>
+		<param name="dynamicRange">false</param>
+		<param name="maximum">0</param>
+		<param name="minimum">-25</param>
 	</struct>
 	<struct name="recoveredPressureMap">
 		<param name="Type">lucScalarField</param>
