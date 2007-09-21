@@ -29,7 +29,14 @@
 #include <PICellerator/PopulationControl/PopulationControl.h>
 #include <PICellerator/Weights/Weights.h>
 
-#include "MaterialPoints.h"
+#include "types.h"
+#include "IntegrationPointMapper.h"
+#include "OneToOneMapper.h"
+#include "GaussMapper.h"
+#include "IntegrationPointsSwarm.h"
+#include "BackgroundParticleLayout.h"
+#include "MaterialPoint.h"
+#include "MaterialPointsSwarm.h"
 
 #include <assert.h>
 #include <string.h>
