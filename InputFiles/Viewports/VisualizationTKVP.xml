@@ -14,7 +14,7 @@
 		<struct name="vtparticleVector1">
 			<param name="Type">lucSwarmVectors</param>
 			<param name="Swarm">materialSwarm</param>
-			<param name="MaskVariable">materialSwarm-DrawMe1</param>
+			<param name="MaskVariable">materialSwarm-VTDrawMe1</param>
 			<param name="maskValue">1</param>
 			<param name="maskType">EqualTo</param>
 			<param name="colour">Red</param>
@@ -25,7 +25,7 @@
 		<struct name="vtparticleVector2">
 			<param name="Type">lucSwarmVectors</param>
 			<param name="Swarm">materialSwarm</param>
-			<param name="MaskVariable">materialSwarm-DrawMe2</param>
+			<param name="MaskVariable">materialSwarm-VTDrawMe2</param>
 			<param name="maskValue">1</param>
 			<param name="maskType">EqualTo</param>
 			<param name="colour">Blue</param>
