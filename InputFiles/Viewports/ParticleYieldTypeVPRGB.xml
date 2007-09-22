@@ -28,7 +28,7 @@
 		<struct name="ytborderrgb">
 			<param name="Type">lucFieldVariableBorder</param>
 			<param name="FieldVariable">VelocityField</param>
-			<param name="lineWidth">4</param>			
+			<param name="lineWidth">2</param>			
 		</struct>
 		
 		<struct name="yttitle">
