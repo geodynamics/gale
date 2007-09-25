@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: BoundaryLayers.c 466 2007-04-27 06:24:33Z LukeHodkinson $
+** $Id: BoundaryLayers.c 605 2007-09-25 07:55:27Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -187,6 +187,7 @@ double Underworld_BoundaryLayers_InternalTemperature( UnderworldContext* context
 	Particle_Index      gaussPoint_I;
 	Particle_Index      gaussPointCount        = gaussSwarm->particleLocalCount;
 	ElementType*        elementType;
+	IArray*			incArray;
 
 	Mesh_GetGlobalCoordRange( mesh, minCrd, maxCrd );
 	bottomLayerHeight = minCrd[ J_AXIS ] + hotLayerThickness;  
@@ -200,9 +201,12 @@ double Underworld_BoundaryLayers_InternalTemperature( UnderworldContext* context
 	/************************************** Do Integration ************************************************/
 	
 	/* Loop over Elements */
+	incArray = IArray_New();
 	for ( lElement_I = 0 ; lElement_I < FeMesh_GetElementLocalSize( mesh ) ; lElement_I++ ) {
 		elementType         = FeMesh_GetElementType( mesh, lElement_I );
-		FeMesh_GetElementNodes( mesh, lElement_I, &elementNodeCount, &elementNodes );
+		FeMesh_GetElementNodes( mesh, lElement_I, incArray );
+		elementNodeCount = IArray_GetSize( incArray );
+		elementNodes = IArray_GetPtr( incArray );
 
 		nodeAtElementBottom = elementNodes[ 0 ] ;
 		nodeAtElementTop    = elementNodes[ 2 ] ;
@@ -274,6 +278,8 @@ double Underworld_BoundaryLayers_InternalTemperature( UnderworldContext* context
 			assert(0);
 		}
 	}
+
+	NewClass_Delete( incArray );
 		
 	/* Gather data from other processors */
 	MPI_Allreduce( &integral, &integralGlobal, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );

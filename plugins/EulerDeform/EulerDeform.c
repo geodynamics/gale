@@ -277,11 +277,12 @@ Variable* EulerDeform_RegisterLocalNodeCoordsAsVariables( EulerDeform_System* sy
 	sprintf( variableNameZ, "%sNodeCoordZ", self->name );
 	
 	/* Construct */
+	assert( Class_IsSuper( self->topo, IGraph ) );
 	variable = Variable_NewVector( 
 		variableName, 
 		Variable_DataType_Double, 
 		Mesh_GetDimSize( self ), 
-		&self->topo->locals[MT_VERTEX]->locals->size, 
+		&((IGraph*)self->topo)->locals[MT_VERTEX]->locals->size, 
 		NULL,
 		(void**)&sys->verts, 
 		variable_Register, 

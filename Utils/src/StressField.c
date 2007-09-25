@@ -211,12 +211,13 @@ void _StressField_Build( void* stressField, void* data ) {
 	}
 
 	/* Create Variable to store data */
+	assert( Class_IsSuper( self->feMesh->topo, IGraph ) );
 	tmpName = Stg_Object_AppendSuffix( self, "DataVariable" );
 	self->dataVariable = Variable_NewVector( 	
 			tmpName,
 			Variable_DataType_Double, 
 			self->fieldComponentCount,
-			&self->feMesh->topo->remotes[MT_VERTEX]->nDomains, 
+			&((IGraph*)self->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 
 			NULL,
 			(void**)&self->data, 
 			self->variable_Register,

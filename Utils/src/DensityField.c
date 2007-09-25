@@ -85,11 +85,12 @@ void _DensityField_Init(
 	self->buoyancyForceTerm = buoyancyForceTerm;
 
 	/* Create Dof Layout */
+	assert( Class_IsSuper( self->feMesh->topo, IGraph ) );
 	tmpName = Stg_Object_AppendSuffix( self, "DataVariable" );
 	self->dataVariable = Variable_NewScalar( 	
 			tmpName,
 			Variable_DataType_Double, 
-			&self->feMesh->topo->remotes[MT_VERTEX]->nDomains, 
+			&((IGraph*)self->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 
 			NULL,
 			(void**)&self->data, 
 			variable_Register );
