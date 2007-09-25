@@ -60,7 +60,7 @@ BelowCosinePlane* BelowCosinePlane_New(
 		XYZ                                   minValue,
 		XYZ                                   maxValue,
 		double                                amplitude,
-		double                                quasiPeriod,
+		double                                period,
 		double                                phase )
 {
 	BelowCosinePlane* self = (BelowCosinePlane*) _BelowCosinePlane_DefaultNew( name );
@@ -77,7 +77,7 @@ BelowCosinePlane* BelowCosinePlane_New(
 		minValue,
 		maxValue,
 		amplitude,
-		quasiPeriod,
+		period,
 		phase ) ;
 	return self;
 }
@@ -126,11 +126,11 @@ BelowCosinePlane* _BelowCosinePlane_New(
 	return self;
 }
 
-void _BelowCosinePlane_Init( void* belowPlane, double offset, XYZ width, double amplitude, double quasiPeriod, double phase ) {
+void _BelowCosinePlane_Init( void* belowPlane, double offset, XYZ width, double amplitude, double period, double phase ) {
 	BelowCosinePlane* self = (BelowCosinePlane*)belowPlane;
 
 	self->amplitude = amplitude;
-	self->quasiPeriod = quasiPeriod;
+	self->period = period;
 	self->phase = phase;
 }
 
@@ -147,13 +147,13 @@ void BelowCosinePlane_InitAll(
 		XYZ                                   minValue,
 		XYZ                                   maxValue,
 		double                                amplitude,
-		double                                quasiPeriod,
+		double                                period,
 		double                                phase )
 {
 	BelowCosinePlane* self = (BelowCosinePlane*)belowPlane;
 
 	BelowPlane_InitAll( self, dim, centre, alpha, beta, gamma, offset, width, minValue, maxValue );
-	_BelowCosinePlane_Init( self, offset, width, amplitude, quasiPeriod, phase );
+	_BelowCosinePlane_Init( self, offset, width, amplitude, period, phase );
 }
 	
 
@@ -185,7 +185,7 @@ void* _BelowCosinePlane_Copy( void* belowPlane, void* dest, Bool deep, Name name
 	newBelowCosinePlane = (BelowCosinePlane*)_BelowPlane_Copy( self, dest, deep, nameExt, ptrMap );
 
 	newBelowCosinePlane->amplitude = self->amplitude;
-	newBelowCosinePlane->quasiPeriod = self->quasiPeriod;
+	newBelowCosinePlane->period = self->period;
 	newBelowCosinePlane->phase = self->phase;
 	
 	return (void*)newBelowCosinePlane;
@@ -213,16 +213,16 @@ void* _BelowCosinePlane_DefaultNew( Name name ) {
 void _BelowCosinePlane_Construct( void* belowPlane, Stg_ComponentFactory* cf, void* data ) {
 	BelowCosinePlane*            self          = (BelowCosinePlane*) belowPlane;
 	double                       amplitude;
-	double                       quasiPeriod;
+	double                       period;
 	double                       phase;
 
 	_BelowPlane_Construct( self, cf, data );
 
 	amplitude = Stg_ComponentFactory_GetDouble( cf, self->name, "amplitude", 0.1 );
-	quasiPeriod = Stg_ComponentFactory_GetDouble( cf, self->name, "quasiPeriod", 1.0 );
+	period = Stg_ComponentFactory_GetDouble( cf, self->name, "period", 2*M_PI );
 	phase = Stg_ComponentFactory_GetDouble( cf, self->name, "phase", 0.0 );
 
-	_BelowCosinePlane_Init( self, self->offset, self->width, amplitude, quasiPeriod, phase );
+	_BelowCosinePlane_Init( self, self->offset, self->width, amplitude, period, phase );
 }
 
 void _BelowCosinePlane_Build( void* belowPlane, void* data ) {
@@ -265,7 +265,7 @@ Bool _BelowCosinePlane_IsCoordInside( void* belowPlane, Coord coord ) {
 
 	x = newCoord[ I_AXIS ];
 
-	y =  self->offset + self->amplitude * cos( (self->quasiPeriod * x) + self->phase );
+	y =  self->offset + self->amplitude * cos( (2*M_PI * x /self->period)  + self->phase );
 
 	if ( fabs( newCoord[ J_AXIS ] < y) ) {
 		return True;
@@ -276,14 +276,16 @@ Bool _BelowCosinePlane_IsCoordInside( void* belowPlane, Coord coord ) {
 double _BelowCosinePlane_CalculateVolume( void* belowPlane ) {
 	BelowCosinePlane* self = (BelowCosinePlane*)belowPlane;
 	double volume;
-	double c_0 = self->quasiPeriod;
+	double period = self->period;
 	double dx = self->width[ I_AXIS ];
 
 	/* using the identity sin(u)-sin(v) = 2 * cos( (u+v)/2 ) * sin( (u-v)/2 ) */
 
-	volume = self->offset*dx + ( 2 * self->amplitude/c_0 ) 
-				 * cos( c_0 * (self->maxValue[I_AXIS] - self->minValue[I_AXIS] + 2*self->phase) / 2 )
-				 * sin( c_0 * (self->maxValue[I_AXIS] - self->minValue[I_AXIS]) / 2 );
+	volume = self->offset*dx + 2 * self->amplitude * period / (2*M_PI) *
+				 (
+				 cos( (M_PI/period) * (self->maxValue[I_AXIS] - self->minValue[I_AXIS] ) + self->phase) *
+				 sin( (M_PI/period) * (self->maxValue[I_AXIS] - self->minValue[I_AXIS]) )
+				 );
 
 	if ( self->dim == 3 ) 
 		volume = self->width[ K_AXIS ] * volume;

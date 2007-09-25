@@ -49,7 +49,7 @@
 		/* Virtual Info */\
 		\
 		double                  amplitude;  \
-		double                  quasiPeriod; \
+		double                  period; \
 		double                  phase;
 
 	struct BelowCosinePlane { __BelowCosinePlane };
