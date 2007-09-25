@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: FeVariableSurface.c 694 2007-05-22 03:17:41Z LukeHodkinson $
+** $Id: FeVariableSurface.c 734 2007-09-25 07:55:50Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -231,6 +231,7 @@ void _lucFeVariableSurface_BuildDisplayList( void* drawingObject, void* _context
 	Node_LocalIndex                lNode_I;
 	double                         nodeValue;
 	double                         height;
+	IArray*				inc;
 
 	FeVariable_SyncShadowValues( feVariable );
 
@@ -249,8 +250,11 @@ void _lucFeVariableSurface_BuildDisplayList( void* drawingObject, void* _context
 	else
 		lucColour_SetOpenGLColour( &self->colour );
 
+	inc = IArray_New();
 	for ( lElement_I = 0 ; lElement_I < elementLocalCount ; lElement_I++ ) {
-		FeMesh_GetElementNodes( mesh, lElement_I, &elementNodeCount, &elementNodes );
+	  FeMesh_GetElementNodes( mesh, lElement_I, inc );
+		elementNodeCount = IArray_GetSize( inc );
+		elementNodes = IArray_GetPtr( inc );
 
 		glBegin( GL_POLYGON );
 		for ( eNode_I = 0 ; eNode_I < elementNodeCount ; eNode_I++ ) {
@@ -272,4 +276,6 @@ void _lucFeVariableSurface_BuildDisplayList( void* drawingObject, void* _context
 	}
 	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 	glEnable( GL_LIGHTING );	
+
+	NewClass_Delete( inc );
 }

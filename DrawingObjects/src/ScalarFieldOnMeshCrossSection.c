@@ -301,6 +301,7 @@ void lucScalarFieldOnMeshCrossSection_DrawCrossSection( void* drawingObject, dou
 	Node_Index           elNode_I;
 	Element_LocalIndex   element_lI;
 	unsigned	 nIncVerts, *incVerts;
+	IArray		*inc;
 
 	
 	glDisable(GL_LIGHTING);
@@ -375,9 +376,11 @@ void lucScalarFieldOnMeshCrossSection_DrawCrossSection( void* drawingObject, dou
 	 /* TODO: The elements could have nodes insides...... !!!*/
 	#define NORMAL_LUCSCALARFIELD_BEHAVIOUR
 	#ifdef NORMAL_LUCSCALARFIELD_BEHAVIOUR
+	inc = IArray_New();
 	for ( element_lI = 0; element_lI < Mesh_GetLocalSize( mesh, Mesh_GetDimSize( mesh ) ); element_lI++ ) {
-		Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), element_lI, MT_VERTEX, 
-				   &nIncVerts, &incVerts );
+		Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), element_lI, MT_VERTEX, inc );
+		nIncVerts = IArray_GetSize( inc );
+		incVerts = IArray_GetPtr( inc );
 
 		/* Normal general case, the element can have whatever number of nodes */
 		glBegin(GL_POLYGON);
@@ -408,8 +411,9 @@ void lucScalarFieldOnMeshCrossSection_DrawCrossSection( void* drawingObject, dou
 
 	/** testing the quad_strip way --- ASSUMES only 4 nodes per element */
 	/* checking that there is 4 nodes per element - If yes, the quad strips can be used */
-	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), element_lI, MT_VERTEX, 
-			   &nIncVerts, &incVerts );
+	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), element_lI, MT_VERTEX, inc );
+	nIncVerts = IArray_GetSize( inc );
+	incVerts = IArray_GetPtr( inc );
 	if( nIncVerts == 4 ){
 		glBegin(GL_QUAD_STRIP);
 			/* The nodes are for 10, 10 msh for instance instance 0,1,10,9 We want to display 0,9 
@@ -436,6 +440,8 @@ void lucScalarFieldOnMeshCrossSection_DrawCrossSection( void* drawingObject, dou
       	}
 	#endif
 	glEnable(GL_LIGHTING);
+
+	NewClass_Delete( inc );
 }
 
 

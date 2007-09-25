@@ -588,6 +588,7 @@ void lucMeshViewer_BuildEdges( lucMeshViewer* self ) {
 void lucMeshViewer_RenderEdges_WithInc( lucMeshViewer* self, vertexFuncType* vertexFunc ) {
 	unsigned	nEdges;
 	unsigned	nIncVerts, *incVerts;
+	IArray*		inc;
 	unsigned	e_i;
 
 	assert( self );
@@ -597,8 +598,11 @@ void lucMeshViewer_RenderEdges_WithInc( lucMeshViewer* self, vertexFuncType* ver
 	nEdges = Mesh_GetLocalSize( self->mesh, MT_EDGE );
 	glDisable(GL_LIGHTING);
 	glBegin( GL_LINES );
+	inc = IArray_New();
 	for( e_i = 0; e_i < nEdges; e_i++ ) {
-		Mesh_GetIncidence( self->mesh, MT_EDGE, e_i, MT_VERTEX, &nIncVerts, &incVerts );
+		Mesh_GetIncidence( self->mesh, MT_EDGE, e_i, MT_VERTEX, inc );
+		nIncVerts = IArray_GetSize( inc );
+		incVerts = IArray_GetPtr( inc );
 		assert( nIncVerts == 2 );
 
 		vertexFunc( Mesh_GetVertex( self->mesh, incVerts[0] ) );
@@ -606,6 +610,8 @@ void lucMeshViewer_RenderEdges_WithInc( lucMeshViewer* self, vertexFuncType* ver
 	}
 	glEnd();
 	glEnable(GL_LIGHTING);
+
+	NewClass_Delete( inc );
 }
 
 void lucMeshViewer_RenderEdges( lucMeshViewer* self, vertexFuncType* vertexFunc ) {
