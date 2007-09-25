@@ -186,6 +186,18 @@
 	<param name="maxTimeSteps"> 100 </param>    <!--The simulation ends after solving for the number of timesteps indicated here-->
 	<param name="outputPath"> ./output </param><!--The name of the directory where the results are stored-->
 	<param name="dumpEvery"> 1 </param>        <!--Frequency of the ouput-->	
+	<param name="checkpointEvery"> 0 </param>
+
+        <!--   choose what to checkpoint
+	<list name="FieldVariablesToCheckpoint">
+		<param>VelocityField</param>
+		<param>VelocityGradientsField</param>
+	</list>
+	-->
+
+        <!--  restart from a previous checkpoint 
+        <param name="restartTimestep"> 10 </param>
+         -->
 
 	<!--param name="gravity"> 1.00    </param-->
 

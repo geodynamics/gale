@@ -147,10 +147,16 @@
 	<param name="dumpEvery"> 1 </param>
 	<param name="outputPath"> ./output/ </param>
 	<param name="gravity"> 1.0 </param>
-        <param name="checkpointEvery"> 10 </param>
+        <param name="checkpointEvery"> 0 </param>
 
-        <!---  restart from a previous checkpoint -->
-        <!---
+        <!--   choose what to checkpoint
+	<list name="FieldVariablesToCheckpoint">
+		<param>VelocityField</param>
+		<param>VelocityGradientsField</param>
+	</list>
+	-->
+
+        <!--  restart from a previous checkpoint 
         <param name="restartTimestep"> 10 </param>
          -->
 

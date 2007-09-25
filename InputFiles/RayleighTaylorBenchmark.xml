@@ -35,7 +35,7 @@
 			<param name="Type">BelowCosinePlane</param>
 			<param name="offset">0.2</param>
 			<param name="amplitude">0.02</param>
-			<param name="quasiPeriod"> 3.43649 </param>
+			<param name="period"> 1.8284 </param>
 			<param name="phase"> 0.0 </param>
 		</struct>		
 		<struct name="lightLayerViscosity">
@@ -59,11 +59,22 @@
 	<param name="journal-level-branch.debug.Swarm"> 2 </param>
 
 	<!-- general simulation parameters -->
-	<param name="maxTimeSteps"> 630 </param>
+	<param name="maxTimeSteps"> 60 </param>
 	<param name="dumpEvery"> 1 </param>
-	<param name="checkpointEvery"> 0 </param>
 	<param name="outputPath"> ./output/ </param>
 	<param name="gravity"> 1.0 </param>
+	<param name="checkpointEvery"> 0 </param>
+
+        <!--   choose what to checkpoint
+	<list name="FieldVariablesToCheckpoint">
+		<param>VelocityField</param>
+		<param>VelocityGradientsField</param>
+	</list>
+	-->
+
+        <!--  restart from a previous checkpoint 
+        <param name="restartTimestep"> 10 </param>
+         -->
 
 	<!-- general decomposition parameters -->
 	<param name="dim"> 2 </param>

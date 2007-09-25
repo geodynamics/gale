@@ -65,6 +65,18 @@
 	<param name="maxTimeSteps"> 100000000 </param>
 	<param name="outputPath"> ./output/testIng </param>
 	<param name="dumpEvery"> 10 </param>	
+	<param name="checkpointEvery"> 0 </param>
+
+        <!--   choose what to checkpoint
+	<list name="FieldVariablesToCheckpoint">
+		<param>VelocityField</param>
+		<param>VelocityGradientsField</param>
+	</list>
+	-->
+
+        <!--  restart from a previous checkpoint 
+        <param name="restartTimestep"> 10 </param>
+         -->
 	
 	<param name="RaT"> 3.0e5 </param>	
 	<param name="RaC"> 4.5e5 </param>	

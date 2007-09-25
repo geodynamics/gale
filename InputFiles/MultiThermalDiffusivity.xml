@@ -137,6 +137,18 @@ appropriate parameters and their values if you use this xml from production runs
 	<param name="maxTimeSteps"> 300 </param>
 	<param name="outputPath"> ./output/MultiThermalDiffusivity </param>
 	<param name="dumpEvery"> 1 </param>	
+	<param name="checkpointEvery"> 0 </param>
+
+        <!--   choose what to checkpoint
+	<list name="FieldVariablesToCheckpoint">
+		<param>VelocityField</param>
+		<param>VelocityGradientsField</param>
+	</list>
+	-->
+
+        <!--  restart from a previous checkpoint 
+        <param name="restartTimestep"> 10 </param>
+         -->
 	
 	<param name="Ra"> 1e5 </param>	
 	
