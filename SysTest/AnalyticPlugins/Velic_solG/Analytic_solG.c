@@ -98,7 +98,7 @@ void _Velic_solG_Construct( void* analyticSolution, Stg_ComponentFactory* cf, vo
 	FeVariable*              strainRateField;
 	FeVariable*              recoverdStrainRateField;
 	FeVariable*              recoveredStressField;
-        double                   sigma, etaA, etaB, dx, x0, zc;
+        double                   sigma, etaA, etaB, dx, x0, zc, startX, endX;
 
 	/* Construct Parent */
 	_AnalyticSolution_Construct( self, cf, data );
@@ -130,9 +130,12 @@ void _Velic_solG_Construct( void* analyticSolution, Stg_ComponentFactory* cf, vo
 	sigma = Stg_ComponentFactory_GetRootDictDouble( cf, "solG_sigma", 1.0 );
 	etaA = Stg_ComponentFactory_GetRootDictDouble( cf, "solG_etaA", 10.0 );
 	etaB = Stg_ComponentFactory_GetRootDictDouble( cf, "solG_etaB", 1.0 );
-	dx = Stg_ComponentFactory_GetRootDictDouble( cf, "solG_dx", 0.4 );
-	x0 = Stg_ComponentFactory_GetRootDictDouble( cf, "solG_x0", 0.55 );
 	zc = Stg_ComponentFactory_GetRootDictDouble( cf, "solG_zc", 0.7 );
+	
+	startX = Stg_ComponentFactory_GetRootDictDouble( cf, "solG_startX", 0.4 );
+	endX = Stg_ComponentFactory_GetRootDictDouble( cf, "solG_endX", 0.55 );
+	dx = endX - startX;
+	x0 = 0.5 * (startX + endX);
 
         _Velic_solG_Init( self, sigma, etaA, etaB, dx, x0, zc );
 

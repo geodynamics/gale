@@ -10,82 +10,49 @@
 	<include>Underworld/BaseApps/RayleighTaylor.xml</include>
 	<include>Underworld/ViscosityField.xml</include>
 
-	<param name="solDA_sigma">5.0</param>
-	<param name="solDA_etaA">1.0</param>
-	<param name="solDA_etaB">2.0</param>
-	<param name="solDA_startX">0.4</param>
-	<param name="solDA_endX">0.8</param>
-	<param name="solDA_zc">0.5</param>
+	<param name="solI_sigma">5.0</param>
+	<param name="solI_xc">0.4</param>
+	<param name="solI_twiceB"> 1.0 </param>
 
 	<list name="plugins" mergeType="merge">
 		<!-- Output Plugins -->
-		<param>Underworld_Velic_solDA</param>
+		<param>Underworld_Velic_solI</param>
 	</list>
 	
 	<param name="VelocityField-Tolerance"> 5.0e-05 </param>
 	<param name="PressureField-Tolerance"> 1.0e-03 </param>
 
 	<struct name="components" mergeType="merge">
-		<struct name="viscosityA">
-			<param name="Type">MaterialViscosity</param>
-			<param name="eta0">solDA_etaA</param>
+		<struct name="Viscosity">
+			<param name="Type">DepthDependentViscosity</param>
+			<param name="eta0">1.0</param>
+			<param name="gamma">solI_twiceB</param>
+			<param name="referencePoint">0.0</param>
+			<param name="Mesh">linearMesh</param>
 		</struct>
-		<struct name="viscosityB">
-			<param name="Type">MaterialViscosity</param>
-			<param name="eta0">solDA_etaB</param>
-		</struct>
-
-		<!-- Bottom Background Layer -->
-		<struct name="bottomBackgroundLayerShape">
+		<!-- Background -->
+		<struct name="backgroundShape">
 			<param name="Type">Everywhere</param>
 		</struct>	
-		<struct name="bottomBackgroundLayer">
+		<struct name="background">
 			<param name="Type">RheologyMaterial</param>
-			<param name="Shape">bottomBackgroundLayerShape</param>
+			<param name="Shape">backgroundShape</param>
 			<param name="density">0.0</param>
-			<param name="Rheology">viscosityA</param>
+			<param name="Rheology">Viscosity</param>
 		</struct>
 
-		<!-- Top Background Layer -->
-		<struct name="topBackgroundLayerShape">
+		<!-- Heavy Column -->
+		<struct name="heavyColumnShape">
 			<param name="Type">Box</param>
-			<param name="startX"> minX </param> <param name="endX"> maxX </param>
-			<param name="startY"> solDA_zc </param> <param name="endY"> maxY </param>
+			<param name="startX"> minX </param> <param name="endX"> solI_xc </param>
+			<param name="startY"> minY </param> <param name="endY"> maxY </param>
 			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
-		</struct>	
-		<struct name="topBackgroundLayer">
-			<param name="Type">RheologyMaterial</param>
-			<param name="Shape">topBackgroundLayerShape</param>
-			<param name="density">0.0</param>
-			<param name="Rheology">viscosityB</param>
-		</struct>
-
-		<!-- Bottom Heavy Layer -->
-		<struct name="bottomHeavyLayerShape">
-			<param name="Type">Box</param>
-			<param name="startX"> solDA_startX </param> <param name="endX"> solDA_endX </param>
-			<param name="startY"> minY </param>         <param name="endY"> maxY </param>
-			<param name="startZ"> minZ </param>         <param name="endZ"> maxZ </param>
 		</struct>		
-		<struct name="bottomHeavyLayer">
+		<struct name="heavyColumn">
 			<param name="Type">RheologyMaterial</param>
-			<param name="Shape">bottomHeavyLayerShape</param>
-			<param name="density">solDA_sigma</param>
-			<param name="Rheology">viscosityA</param>
-		</struct>
-
-		<!-- Top Heavy Layer -->
-		<struct name="topHeavyLayerShape">
-			<param name="Type">Box</param>
-			<param name="startX"> solDA_startX </param> <param name="endX"> solDA_endX </param>
-			<param name="startY"> solDA_zc </param>     <param name="endY"> maxY </param>
-			<param name="startZ"> minZ </param>         <param name="endZ"> maxZ </param>
-		</struct>		
-		<struct name="topHeavyLayer">
-			<param name="Type">RheologyMaterial</param>
-			<param name="Shape">topHeavyLayerShape</param>
-			<param name="density">solDA_sigma</param>
-			<param name="Rheology">viscosityB</param>
+			<param name="Shape">heavyColumnShape</param>
+			<param name="density">solI_sigma</param>
+			<param name="Rheology">Viscosity</param>
 		</struct>
 	</struct>
 
@@ -132,6 +99,7 @@
 	<include>Underworld/VariableConditions/velocityBCs.freeslip.xml</include>
 
 	<!-- Visualisation stuff -->
+<!--
 	<include> Underworld/Viewports/ParticleDensityVP.xml</include>
 	<include> Underworld/Viewports/StrainRateInvariantVP.xml</include>
 	<include> Underworld/Viewports/VelocityMagnitudeVP.xml </include>
@@ -139,6 +107,7 @@
 	<include> Underworld/Viewports/AnalyticVelocityMagnitudeVP.xml </include>
 	<include> Underworld/Viewports/AnalyticPressureVP.xml </include>
 	<include> Underworld/Viewports/ViscosityVP.xml </include>
+	<param name="interactive"> true </param>
 	<include>glucifer/window.xml</include>
 	<struct name="components" mergeType="merge">
 		<struct name="window" mergeType="merge">
@@ -148,7 +117,6 @@
 			</list>
 		</struct>
 	</struct>
-<!--
 -->
 
 </StGermainData>	

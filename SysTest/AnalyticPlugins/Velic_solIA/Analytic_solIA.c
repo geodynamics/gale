@@ -92,7 +92,7 @@ void _Velic_solIA_Construct( void* analyticSolution, Stg_ComponentFactory* cf, v
 	FeVariable*              strainRateField;
 	FeVariable*              recoverdStrainRateField;
 	FeVariable*              recoveredStressField;
-	double                   sigma, B, dx, x0;
+	double                   sigma, B, dx, x0, startX, endX, twiceB;
 
 	/* Construct Parent */
 	_AnalyticSolution_Construct( self, cf, data );
@@ -122,9 +122,13 @@ void _Velic_solIA_Construct( void* analyticSolution, Stg_ComponentFactory* cf, v
 		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, recoveredStressField, Velic_solIA_StressFunction );
 	
 	sigma = Stg_ComponentFactory_GetRootDictDouble( cf, "solIA_sigma", 1.0 );
-	B = Stg_ComponentFactory_GetRootDictDouble( cf, "solIA_B", 1.0 );
-	dx = Stg_ComponentFactory_GetRootDictDouble( cf, "solIA_dx", 0.4 );
-	x0 = Stg_ComponentFactory_GetRootDictDouble( cf, "solIA_x0", 0.3 );
+	twiceB = Stg_ComponentFactory_GetRootDictDouble( cf, "solIA_twiceB", 2.0 );
+	B = Stg_ComponentFactory_GetRootDictDouble( cf, "solIA_B", 0.5 * twiceB );
+
+	startX = Stg_ComponentFactory_GetRootDictDouble( cf, "solIA_startX", 0.4 );
+	endX = Stg_ComponentFactory_GetRootDictDouble( cf, "solIA_endX", 0.3 );
+	dx = endX - startX;
+	x0 = 0.5*(startX + endX);
 
 	_Velic_solIA_Init( self, sigma, B, dx, x0 );
 }

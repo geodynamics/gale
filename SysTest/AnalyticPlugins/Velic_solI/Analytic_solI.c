@@ -91,7 +91,7 @@ void _Velic_solI_Construct( void* analyticSolution, Stg_ComponentFactory* cf, vo
 	FeVariable*              strainRateField;
 	FeVariable*              recoverdStrainRateField;
 	FeVariable*              recoveredStressField;
-	double                   sigma, B, xc;
+	double                   sigma, B, xc, twiceB;
 
 	/* Construct Parent */
 	_AnalyticSolution_Construct( self, cf, data );
@@ -121,7 +121,8 @@ void _Velic_solI_Construct( void* analyticSolution, Stg_ComponentFactory* cf, vo
 		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, recoveredStressField, Velic_solI_StressFunction );
 	
 	sigma = Stg_ComponentFactory_GetRootDictDouble( cf, "solI_sigma", 1.0 );
-	B = Stg_ComponentFactory_GetRootDictDouble( cf, "solI_B", 1.5 );
+	twiceB = Stg_ComponentFactory_GetRootDictDouble( cf, "solI_twiceB", 2.0 );
+	B = Stg_ComponentFactory_GetRootDictDouble( cf, "solI_B", 0.5 * twiceB );
 	xc = Stg_ComponentFactory_GetRootDictDouble( cf, "solI_xc", 0.3 );
 
 	_Velic_solI_Init( self, sigma, B, xc );
