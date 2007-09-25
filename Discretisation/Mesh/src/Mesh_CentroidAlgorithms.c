@@ -91,6 +91,7 @@ void _Mesh_CentroidAlgorithms_Init( Mesh_CentroidAlgorithms* self ) {
 	assert( self && Stg_CheckType( self, Mesh_CentroidAlgorithms ) );
 
 	self->elMesh = NULL;
+	self->incArray = IArray_New();
 }
 
 
@@ -100,6 +101,8 @@ void _Mesh_CentroidAlgorithms_Init( Mesh_CentroidAlgorithms* self ) {
 
 void _Mesh_CentroidAlgorithms_Delete( void* centroidAlgorithms ) {
 	Mesh_CentroidAlgorithms*	self = (Mesh_CentroidAlgorithms*)centroidAlgorithms;
+
+	NewClass_Delete( self->incArray );
 
 	/* Delete the parent. */
 	_Mesh_Algorithms_Delete( self );
@@ -156,7 +159,9 @@ unsigned Mesh_CentroidAlgorithms_NearestVertex( void* centroidAlgorithms, double
 
 		nDims = Mesh_GetDimSize( self->mesh );
 		Mesh_GetIncidence( self->elMesh, Mesh_GetDimSize( self->mesh ), elInd, MT_VERTEX, 
-				   &nInc, &inc );
+				   self->incArray );
+		nInc = IArray_GetSize( self->incArray );
+		inc = (unsigned*)IArray_GetPtr( self->incArray );
 		near = inc[0];
 		vert = Mesh_GetVertex( self->mesh, inc[0] );
 		nearDist = Vec_Sep( nDims, vert, point );

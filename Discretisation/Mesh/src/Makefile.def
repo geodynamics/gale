@@ -24,7 +24,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: Makefile.def 4100 2007-05-16 01:07:26Z LukeHodkinson $
+## $Id: Makefile.def 4184 2007-09-25 07:54:17Z LukeHodkinson $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -36,6 +36,7 @@ def_srcs =				\
 	Decomp.c			\
 	Sync.c				\
 	MeshTopology.c			\
+	IGraph.c			\
 	Mesh_ElementType.c		\
 	Mesh_HexType.c			\
 	Mesh_CentroidType.c		\
@@ -64,6 +65,8 @@ def_hdrs =				\
 	Sync.h				\
 	MeshTopology.def		\
 	MeshTopology.h			\
+	IGraph.def			\
+	IGraph.h			\
 	Mesh.h				\
 	Mesh_ElementType.h		\
 	Mesh_HexType.h			\

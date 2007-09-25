@@ -42,6 +42,7 @@
 #include "Decomp.h"
 #include "Sync.h"
 #include "MeshTopology.h"
+#include "IGraph.h"
 #include "Mesh_ElementType.h"
 #include "MeshClass.h"
 #include "Mesh_HexType.h"
@@ -106,6 +107,8 @@ void _Mesh_HexType_Init( Mesh_HexType* self ) {
 	self->tetInds[7][0] = 0; self->tetInds[7][1] = 2; self->tetInds[7][2] = 3; self->tetInds[7][3] = 6;
 	self->tetInds[8][0] = 3; self->tetInds[8][1] = 5; self->tetInds[8][2] = 6; self->tetInds[8][3] = 7;
 	self->tetInds[9][0] = 0; self->tetInds[9][1] = 3; self->tetInds[9][2] = 5; self->tetInds[9][3] = 6;
+
+	self->incArray = IArray_New();
 }
 
 
@@ -120,6 +123,7 @@ void _Mesh_HexType_Delete( void* elementType ) {
 	FreeArray( self->inc );
 	FreeArray( self->triInds );
 	FreeArray( self->tetInds );
+	NewClass_Delete( self->incArray );
 
 	/* Delete the parent. */
 	_Mesh_ElementType_Delete( self );
@@ -199,7 +203,8 @@ double Mesh_HexType_GetMinimumSeparation( void* hexType, unsigned elInd, double*
 	unsigned*	map;
 	double		curSep;
 	double*		dimSep;
-	unsigned	nInc, *inc;
+	unsigned	nInc;
+	const int	*inc;
 
 	assert( self );
 	assert( elInd < Mesh_GetDomainSize( self->mesh, Mesh_GetDimSize( self->mesh ) ) );
@@ -215,7 +220,9 @@ double Mesh_HexType_GetMinimumSeparation( void* hexType, unsigned elInd, double*
 
 	dimSep = AllocArray( double, Mesh_GetDimSize( mesh ) );
 
-	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), elInd, MT_VERTEX, &nInc, &inc );
+	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), elInd, MT_VERTEX, self->incArray );
+	nInc = IArray_GetSize( self->incArray );
+	inc = IArray_GetPtr( self->incArray );
 	map = self->vertMap;
 
 	curSep = Mesh_GetVertex( mesh, inc[map[1]] )[0] - Mesh_GetVertex( mesh, inc[map[0]] )[0];
@@ -319,9 +326,10 @@ Bool Mesh_HexType_ElementHasPoint3DGeneral( Mesh_HexType* self, unsigned elInd, 
 					    MeshTopology_Dim* dim, unsigned* ind )
 {
 	Mesh*		mesh;
-	unsigned	nInc, *inc;
+	unsigned	nInc;
 	double		bc[4];
 	unsigned	inside;
+	const int	*inc;
 
 	assert( self && Stg_CheckType( self, Mesh_HexType ) );
 	assert( Mesh_GetDimSize( self->mesh ) == 3 );
@@ -334,7 +342,9 @@ Bool Mesh_HexType_ElementHasPoint3DGeneral( Mesh_HexType* self, unsigned elInd, 
 	mesh = self->mesh;
 
 	/* Get element to vertex incidence. */
-	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), elInd, MT_VERTEX, &nInc, &inc );
+	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), elInd, MT_VERTEX, self->incArray );
+	nInc = IArray_GetSize( self->incArray );
+	inc = IArray_GetPtr( self->incArray );
 
 	/* Search for tetrahedra. */
 	if( self->mapSize ) {
@@ -349,7 +359,7 @@ Bool Mesh_HexType_ElementHasPoint3DGeneral( Mesh_HexType* self, unsigned elInd, 
 		}
 	}
 	else {
-		if( Simplex_Search3D( mesh->verts, inc, 10, self->tetInds, point, bc, &inside ) ) {
+		if( Simplex_Search3D( mesh->verts, (unsigned*)inc, 10, self->tetInds, point, bc, &inside ) ) {
 			*dim = MT_VOLUME;
 			*ind = elInd;
 			return True;
@@ -363,11 +373,12 @@ Bool Mesh_HexType_ElementHasPoint3DWithIncidence( Mesh_HexType* self, unsigned e
 						  MeshTopology_Dim* dim, unsigned* ind )
 {
 	Mesh*		mesh;
-	unsigned	nInc, *inc;
+	unsigned	nInc;
 	Bool		fnd;
 	double		bc[4];
-	MeshTopology*	topo;
+	IGraph*		topo;
 	unsigned	inside;
+	const int*	inc;
 
 	assert( self && Stg_CheckType( self, Mesh_HexType ) );
 	assert( Mesh_GetDimSize( self->mesh ) == 3 );
@@ -378,10 +389,12 @@ Bool Mesh_HexType_ElementHasPoint3DWithIncidence( Mesh_HexType* self, unsigned e
 
 	/* Shortcuts. */
 	mesh = self->mesh;
-	topo = mesh->topo;
+	topo = (IGraph*)mesh->topo;
 
 	/* Get element to vertex incidence. */
-	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), elInd, MT_VERTEX, &nInc, &inc );
+	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), elInd, MT_VERTEX, self->incArray );
+	nInc = IArray_GetSize( self->incArray );
+	inc = IArray_GetPtr( self->incArray );
 
 	/* Search for tetrahedra. */
 	if( self->mapSize ) {
@@ -392,7 +405,7 @@ Bool Mesh_HexType_ElementHasPoint3DWithIncidence( Mesh_HexType* self, unsigned e
 		fnd = Simplex_Search3D( mesh->verts, self->inc, 10, self->tetInds, point, bc, &inside );
 	}
 	else
-		fnd = Simplex_Search3D( mesh->verts, inc, 10, self->tetInds, point, bc, &inside );
+		fnd = Simplex_Search3D( mesh->verts, (unsigned*)inc, 10, self->tetInds, point, bc, &inside );
 	if( fnd ) {
 		unsigned*	inds = self->tetInds[inside];
 
@@ -860,10 +873,11 @@ Bool Mesh_HexType_ElementHasPoint2DGeneral( Mesh_HexType* self, unsigned elInd, 
 					    MeshTopology_Dim* dim, unsigned* ind )
 {
 	Mesh*		mesh;
-	unsigned	nInc, *inc;
+	unsigned	nInc;
 	Bool		fnd;
 	double		bc[3];
 	unsigned	inside;
+	const int*	inc;
 
 	assert( self && Stg_CheckType( self, Mesh_HexType ) );
 	assert( Mesh_GetDimSize( self->mesh ) == 2 );
@@ -876,7 +890,9 @@ Bool Mesh_HexType_ElementHasPoint2DGeneral( Mesh_HexType* self, unsigned elInd, 
 	mesh = self->mesh;
 
 	/* Get element to vertex incidence. */
-	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), elInd, MT_VERTEX, &nInc, &inc );
+	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), elInd, MT_VERTEX, self->incArray );
+	nInc = IArray_GetSize( self->incArray );
+	inc = IArray_GetPtr( self->incArray );
 
 	/* Search for triangle. */
 	if( self->mapSize ) {
@@ -887,7 +903,7 @@ Bool Mesh_HexType_ElementHasPoint2DGeneral( Mesh_HexType* self, unsigned elInd, 
 		fnd = Simplex_Search2D( mesh->verts, self->inc, 2, self->triInds, point, bc, &inside );
 	}
 	else
-		fnd = Simplex_Search2D( mesh->verts, inc, 2, self->triInds, point, bc, &inside );
+		fnd = Simplex_Search2D( mesh->verts, (unsigned*)inc, 2, self->triInds, point, bc, &inside );
 	if( fnd ) {
 		*dim = MT_FACE;
 		*ind = elInd;
@@ -901,11 +917,12 @@ Bool Mesh_HexType_ElementHasPoint2DWithIncidence( Mesh_HexType* self, unsigned e
 						  MeshTopology_Dim* dim, unsigned* ind )
 {
 	Mesh*		mesh;
-	unsigned	nInc, *inc;
+	unsigned	nInc;
 	Bool		fnd;
 	double		bc[3];
-	MeshTopology*	topo;
+	IGraph*		topo;
 	unsigned	inside;
+	const int*	inc;
 
 	assert( self && Stg_CheckType( self, Mesh_HexType ) );
 	assert( Mesh_GetDimSize( self->mesh ) == 2 );
@@ -916,10 +933,12 @@ Bool Mesh_HexType_ElementHasPoint2DWithIncidence( Mesh_HexType* self, unsigned e
 
 	/* Shortcuts. */
 	mesh = self->mesh;
-	topo = mesh->topo;
+	topo = (IGraph*)mesh->topo;
 
 	/* Get element to vertex incidence. */
-	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), elInd, MT_VERTEX, &nInc, &inc );
+	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), elInd, MT_VERTEX, self->incArray );
+	nInc = IArray_GetSize( self->incArray );
+	inc = IArray_GetPtr( self->incArray );
 
 	/* Search for triangle. */
 	if( self->mapSize ) {
@@ -930,7 +949,7 @@ Bool Mesh_HexType_ElementHasPoint2DWithIncidence( Mesh_HexType* self, unsigned e
 		fnd = Simplex_Search2D( mesh->verts, self->inc, 2, self->triInds, point, bc, &inside );
 	}
 	else
-		fnd = Simplex_Search2D( mesh->verts, inc, 2, self->triInds, point, bc, &inside );
+		fnd = Simplex_Search2D( mesh->verts, (unsigned*)inc, 2, self->triInds, point, bc, &inside );
 	if( fnd ) {
 		unsigned	*inds = self->triInds[inside];
 
@@ -996,7 +1015,8 @@ Bool Mesh_HexType_ElementHasPoint1DGeneral( Mesh_HexType* self, unsigned elInd, 
 					    MeshTopology_Dim* dim, unsigned* ind )
 {
 	Mesh*		mesh;
-	unsigned	nInc, *inc;
+	unsigned	nInc;
+	const int*	inc;
 
 	assert( self && Stg_CheckType( self, Mesh_HexType ) );
 	assert( Mesh_GetDimSize( self->mesh ) == 1 );
@@ -1006,7 +1026,9 @@ Bool Mesh_HexType_ElementHasPoint1DGeneral( Mesh_HexType* self, unsigned elInd, 
 	assert( ind );
 
 	mesh = self->mesh;
-	Mesh_GetIncidence( mesh, MT_EDGE, elInd, MT_VERTEX, &nInc, &inc );
+	Mesh_GetIncidence( mesh, MT_EDGE, elInd, MT_VERTEX, self->incArray );
+	nInc = IArray_GetSize( self->incArray );
+	inc = IArray_GetPtr( self->incArray );
 
 	if( point[0] > *Mesh_GetVertex( mesh, inc[self->vertMap[0]] ) && 
 	    point[0] < *Mesh_GetVertex( mesh, inc[self->vertMap[1]] ) )
@@ -1023,7 +1045,8 @@ Bool Mesh_HexType_ElementHasPoint1DWithIncidence( Mesh_HexType* self, unsigned e
 						  MeshTopology_Dim* dim, unsigned* ind )
 {
 	Mesh*		mesh;
-	unsigned	nInc, *inc;
+	unsigned	nInc;
+	const int*	inc;
 
 	assert( self && Stg_CheckType( self, Mesh_HexType ) );
 	assert( Mesh_GetDimSize( self->mesh ) == 1 );
@@ -1033,7 +1056,9 @@ Bool Mesh_HexType_ElementHasPoint1DWithIncidence( Mesh_HexType* self, unsigned e
 	assert( ind );
 
 	mesh = self->mesh;
-	Mesh_GetIncidence( mesh, MT_EDGE, elInd, MT_VERTEX, &nInc, &inc );
+	Mesh_GetIncidence( mesh, MT_EDGE, elInd, MT_VERTEX, self->incArray );
+	nInc = IArray_GetSize( self->incArray );
+	inc = IArray_GetPtr( self->incArray );
 	assert( nInc == 2 );
 
 	if( point[0] > *Mesh_GetVertex( mesh, inc[self->vertMap[0]] ) && 

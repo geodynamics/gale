@@ -35,7 +35,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: types.h 4100 2007-05-16 01:07:26Z LukeHodkinson $
+** $Id: types.h 4184 2007-09-25 07:54:17Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -46,6 +46,7 @@ typedef struct Grid Grid;
 typedef struct Decomp Decomp;
 typedef struct Sync Sync;
 typedef struct MeshTopology MeshTopology;
+typedef struct IGraph IGraph;
 
 typedef enum {
    MT_VERTEX, 

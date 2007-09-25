@@ -100,6 +100,7 @@ void _Mesh_Algorithms_Init( Mesh_Algorithms* self ) {
 	self->nearestVertex = NULL;
 	self->search = NULL;
 	self->mesh = NULL;
+	self->incArray = IArray_New();
 }
 
 
@@ -109,6 +110,8 @@ void _Mesh_Algorithms_Init( Mesh_Algorithms* self ) {
 
 void _Mesh_Algorithms_Delete( void* algorithms ) {
 	Mesh_Algorithms*	self = (Mesh_Algorithms*)algorithms;
+
+	NewClass_Delete( self->incArray );
 
 	/* Delete the parent. */
 	_Stg_Component_Delete( self );
@@ -225,7 +228,9 @@ Bool _Mesh_Algorithms_SearchElements( void* algorithms, double* point,
 			assert( Mesh_HasIncidence( mesh, dim, nDims ) );
 
 			nLocalEls = Mesh_GetLocalSize( mesh, nDims );
-			Mesh_GetIncidence( mesh, dim, ind, nDims, &nInc, &inc );
+			Mesh_GetIncidence( mesh, dim, ind, nDims, self->incArray );
+			nInc = IArray_GetSize( self->incArray );
+			inc = (unsigned*)IArray_GetPtr( self->incArray );
 			assert( nInc );
 			lowest = Mesh_DomainToGlobal( mesh, nDims, inc[0] );
 			for( inc_i = 1; inc_i < nInc; inc_i++ ) {
@@ -300,7 +305,9 @@ void _Mesh_Algorithms_GetLocalCoordRange( void* algorithms, double* min, double*
 	memcpy( min, Mesh_GetVertex( mesh, 0 ), nDims * sizeof(double) );
 	memcpy( max, Mesh_GetVertex( mesh, 0 ), nDims * sizeof(double) );
 	for( e_i = 0; e_i < nEls; e_i++ ) {
-		Mesh_GetIncidence( mesh, nDims, e_i, 0, &nVerts, &verts );
+		Mesh_GetIncidence( mesh, nDims, e_i, 0, self->incArray );
+		nVerts = IArray_GetSize( self->incArray );
+		verts = (unsigned*)IArray_GetPtr( self->incArray );
 		for( v_i = 0; v_i < nVerts; v_i++ ) {
 			vert = Mesh_GetVertex( mesh, verts[v_i] );
 			for( d_i = 0; d_i < nDims; d_i++ ) {
@@ -412,7 +419,9 @@ unsigned Mesh_Algorithms_NearestVertexWithNeighbours( void* algorithms, double* 
 	/* Loop until we've found closest local node. */
 	do {
 		/* Get neighbouring vertices. */
-		Mesh_GetIncidence( mesh, MT_VERTEX, curVert, MT_VERTEX, &nNbrs, &nbrs );
+		Mesh_GetIncidence( mesh, MT_VERTEX, curVert, MT_VERTEX, self->incArray );
+		nNbrs = IArray_GetSize( self->incArray );
+		nbrs = (unsigned*)IArray_GetPtr( self->incArray );
 
 		/* Assume we'll be done after this loop. */
 		done = True;
@@ -504,8 +513,9 @@ Bool Mesh_Algorithms_SearchWithFullIncidence( void* algorithms, double* point,
 	nearVert = Mesh_NearestVertex( mesh, point );
 
 	/* Get vertex/element incidence. */
-	Mesh_GetIncidence( mesh, MT_VERTEX, nearVert, nDims, 
-			   &nInc, &inc );
+	Mesh_GetIncidence( mesh, MT_VERTEX, nearVert, nDims, self->incArray );
+	nInc = IArray_GetSize( self->incArray );
+	inc = (unsigned*)IArray_GetPtr( self->incArray );
 
 	/* Search each of these incident elements in turn. */
 	for( inc_i = 0; inc_i < nInc; inc_i++ ) {
@@ -557,8 +567,9 @@ Bool Mesh_Algorithms_SearchWithMinIncidence( void* algorithms, double* point,
 	nearVert = Mesh_NearestVertex( mesh, point );
 
 	/* Get vertex/element incidence. */
-	Mesh_GetIncidence( mesh, MT_VERTEX, nearVert, nDims, 
-			   &nInc, &inc );
+	Mesh_GetIncidence( mesh, MT_VERTEX, nearVert, nDims, self->incArray );
+	nInc = IArray_GetSize( self->incArray );
+	inc = (unsigned*)IArray_GetPtr( self->incArray );
 
 	/* Search all of these elements and return the element with lowest global index. */
 	lowest = (unsigned)-1;

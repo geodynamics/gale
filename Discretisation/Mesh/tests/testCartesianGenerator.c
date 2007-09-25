@@ -123,7 +123,7 @@ TestEnd
 
 TestBegin( Inc ) {
    Mesh* mesh;
-   MeshTopology* topo;
+   IGraph* topo;
    const Sync *elSync, *vertSync;
    Grid *elGrid, *vertGrid;
    int nEls, nDims;
@@ -131,21 +131,25 @@ TestBegin( Inc ) {
    int nIncEls;
    const int* incEls;
    int elGlobal, incGlobal, vertGlobal;
+   IArray* inc;
    int e_i;
 
    mesh = buildMesh();
-   topo = mesh->topo;
+   inc = IArray_New();
+   topo = (IGraph*)mesh->topo;
    nDims = MeshTopology_GetNumDims( topo );
-   elSync = MeshTopology_GetDomain( topo, nDims );
+   elSync = IGraph_GetDomain( topo, nDims );
    elGrid = *Mesh_GetExtension( mesh, Grid**, "elementGrid" );
-   vertSync = MeshTopology_GetDomain( topo, 0 );
+   vertSync = IGraph_GetDomain( topo, 0 );
    vertGrid = *Mesh_GetExtension( mesh, Grid**, "vertexGrid" );
    nEls = Sync_GetNumDomains( elSync );
    elParam = MemArray( int, nDims, "testInc" );
    for( e_i = 0; e_i < nEls; e_i++ ) {
       elGlobal = Sync_DomainToGlobal( elSync, e_i );
       Grid_Lift( elGrid, elGlobal, elParam );
-      MeshTopology_GetIncidence( topo, nDims, e_i, 0, &nIncEls, &incEls );
+      MeshTopology_GetIncidence( topo, nDims, e_i, 0, inc );
+      nIncEls = IArray_GetSize( inc );
+      incEls = IArray_GetPtr( inc );
       if( nIncEls != 8 )
 	 break;
 

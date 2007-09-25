@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SwarmClass.c 4179 2007-09-07 00:15:38Z DavidLee $
+** $Id: SwarmClass.c 4184 2007-09-25 07:54:17Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -261,6 +261,8 @@ void _Swarm_Init(
 	if ( ics ) {
 		self->ics = Stg_CheckType( ics, VariableCondition );
 	}
+
+	self->incArray = IArray_New();
 }
 
 
@@ -321,6 +323,8 @@ void _Swarm_Delete( void* swarm ) {
 	if ( self->swarmVariable_Register ) {
 		Stg_Class_Delete( self->swarmVariable_Register );
 	}
+
+	NewClass_Delete( self->incArray );
 	
 	/* Stg_Class_Delete parent class */
 	_Stg_Component_Delete( self );
@@ -1218,7 +1222,9 @@ Particle_Index Swarm_FindClosestParticle( void* _swarm, Dimension_Index dim, dou
 	/*Mesh_GetIncidence( ((ElementCellLayout*)swarm->cellLayout)->mesh, dim, lCell_I, dim, 
 			   &neighbourCount, &neighbourList );*/
 	Mesh_GetIncidence( ((ElementCellLayout*)swarm->cellLayout)->mesh, dim, lCell_I, MT_VERTEX, /* dave - 05.09.07 */
-			   &neighbourCount, &neighbourList );
+			   ((ElementCellLayout*)swarm)->incArray );
+	neighbourCount = IArray_GetSize( ((ElementCellLayout*)swarm)->incArray );
+	neighbourList = IArray_GetPtr( ((ElementCellLayout*)swarm)->incArray );
 
 	/* Loop over neighbours */
 	for ( neighbour_I = 0 ; neighbour_I < neighbourCount ; neighbour_I++ ) {

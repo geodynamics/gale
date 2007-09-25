@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testRegularMeshUtils.c 4144 2007-06-13 04:33:59Z LukeHodkinson $
+** $Id: testRegularMeshUtils.c 4184 2007-09-25 07:54:17Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -120,15 +120,18 @@ int main(int argc, char *argv[])
 		unsigned             	refNode_eI = 0;
 		unsigned		node_Diagonal = 0;
 		unsigned		node_Diagonal_gI = 0;
+		IArray*			inc;
 		
 		/* only use this while setting up the test
 		   Print(mesh, stream);
 				
 		   Some tests involving RegularMeshUtils_GetDiagOppositeAcrossElementNodeIndex() */
+		inc = IArray_New();
 		
 		for (element_dI=0; element_dI < Mesh_GetDomainSize( mesh, nDims ); element_dI++) {
-			Mesh_GetIncidence( mesh, nDims, element_dI, MT_VERTEX, 
-					   &currElementNodesCount, &currElementNodes );
+			Mesh_GetIncidence( mesh, nDims, element_dI, MT_VERTEX, inc );
+			currElementNodesCount = IArray_GetSize( inc );
+			currElementNodes = IArray_GetPtr( inc );
 			
 			for (refNode_eI = 0; refNode_eI < currElementNodesCount; refNode_eI++ ) {
 				
@@ -141,6 +144,8 @@ int main(int argc, char *argv[])
 				
 			}
 		}
+
+		NewClass_Delete( inc );
 	}
 	
 	Stg_Class_Delete(mesh);

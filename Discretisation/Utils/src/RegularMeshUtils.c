@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: RegularMeshUtils.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: RegularMeshUtils.c 4184 2007-09-25 07:54:17Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -836,6 +836,7 @@ Node_DomainIndex RegularMeshUtils_GetDiagOppositeAcrossElementNodeIndex( void* _
 	Node_DomainIndex   oppositeNode_dI = 0;
 	Node_Index         oppositeNode_eI = 0;
 	Stream*            errorStrm = Journal_Register( Error_Type, "RegularMeshUtils" );
+	IArray*		   inc;
 
 	Journal_Firewall( Mesh_GetElementType( mesh, refElement_dI )->type == Mesh_HexType_Type, errorStrm, 
 			  "Error (%s:%s:%d):\n\tIncorrect element type (%s); require %s.\n", 
@@ -848,8 +849,11 @@ Node_DomainIndex RegularMeshUtils_GetDiagOppositeAcrossElementNodeIndex( void* _
 		"required type \"%s\".\n", __func__, mesh->layout->nodeLayout->type, CornerNL_Type );
 #endif
 
+	inc = IArray_New();
 	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), refElement_dI, MT_VERTEX, 
-			   &currElementNodeCount, &currElementNodes );
+			   inc );
+	currElementNodeCount = IArray_GetSize( inc );
+	currElementNodes = IArray_GetPtr( inc );
 
 	/* Find index of reference node within reference element */
 	for( refNode_eI = 0; refNode_eI < currElementNodeCount; refNode_eI++ ) {
@@ -870,5 +874,6 @@ Node_DomainIndex RegularMeshUtils_GetDiagOppositeAcrossElementNodeIndex( void* _
 	}
 
 	oppositeNode_dI = currElementNodes[oppositeNode_eI];
+	NewClass_Delete( inc );
 	return oppositeNode_dI;
 }

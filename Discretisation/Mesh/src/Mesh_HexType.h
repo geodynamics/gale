@@ -59,7 +59,8 @@
 		unsigned*				inc;			\
 		Mesh_ElementType_ElementHasPointFunc*	elementHasPoint;	\
 		unsigned**				triInds;		\
-		unsigned**				tetInds;
+		unsigned**				tetInds;		\
+		IArray*					incArray;
 
 	struct Mesh_HexType { __Mesh_HexType };
 

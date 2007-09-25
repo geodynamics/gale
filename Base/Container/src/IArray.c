@@ -87,6 +87,16 @@ void IArray_Resize( void* _self, int size ) {
    self->ptr = Class_Rearray( self, self->ptr, int, self->maxSize );
 }
 
+void IArray_SoftResize( void* _self, int size ) {
+   IArray* self = (IArray*)_self;
+
+   assert( self && self->delta );
+   if( size > self->maxSize )
+     IArray_Resize( self, size );
+   else
+     self->size = size;
+}
+
 void IArray_Set( void* _self, int nItms, const int* itms ) {
    IArray* self = (IArray*)_self;
 

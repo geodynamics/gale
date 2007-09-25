@@ -37,7 +37,7 @@
 **	Created with Snac in mind.
 **	"Mesh*"  in the constuctor can be set to 0, but must then be set manually before the ensemble is created.
 **
-** $Id: ElementCellLayout.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: ElementCellLayout.h 4184 2007-09-25 07:54:17Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -57,7 +57,8 @@
 		\
 		/* ElementCellLayout info */ \
 		Mesh*					mesh; \
-		ShadowInfo				cellShadowInfo;
+		ShadowInfo				cellShadowInfo; \
+		IArray*					incArray;
 
 	struct ElementCellLayout { __ElementCellLayout };
 	

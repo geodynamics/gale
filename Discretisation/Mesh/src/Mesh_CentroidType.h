@@ -54,7 +54,8 @@
 		/* Virtual info */			\
 							\
 		/* Mesh_CentroidType info */		\
-		Mesh*			elMesh;
+		Mesh*			elMesh;		\
+		IArray*			incArray;
 
 	struct Mesh_CentroidType { __Mesh_CentroidType };
 

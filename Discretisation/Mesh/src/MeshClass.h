@@ -34,7 +34,7 @@
 **
 ** Comments:
 **
-** $Id: MeshClass.h 4137 2007-06-07 05:46:46Z LukeHodkinson $
+** $Id: MeshClass.h 4184 2007-09-25 07:54:17Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -142,7 +142,7 @@
 	unsigned Mesh_GetIncidenceSize( void* mesh, MeshTopology_Dim fromDim, unsigned fromInd, 
 					MeshTopology_Dim toDim );
 	void Mesh_GetIncidence( void* mesh, MeshTopology_Dim fromDim, unsigned fromInd, MeshTopology_Dim toDim, 
-				unsigned* nInc, unsigned** inc );
+				IArray* inc );
 
 	unsigned Mesh_NearestVertex( void* mesh, double* point );
 	Bool Mesh_Search( void* mesh, double* point, 

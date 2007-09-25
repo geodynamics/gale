@@ -40,7 +40,7 @@
 **	to appropriate processor immediately.)
 **	Communication is more efficient when shadow depth is equal to at least 1
 **
-** $Id: SwarmClass.h 4173 2007-08-16 03:36:33Z DavidLee $
+** $Id: SwarmClass.h 4184 2007-09-25 07:54:17Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -123,7 +123,9 @@
 		SwarmVariable			**swarmVars; \
 		\
 		VariableCondition*		ics; \
-		Index                           swarmReg_I; /**< Own index inside the Swarm_Register */
+		Index                           swarmReg_I; /**< Own index inside the Swarm_Register */ \
+						\
+		IArray*				incArray;
 
 	struct Swarm { __Swarm };
 	

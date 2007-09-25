@@ -62,6 +62,7 @@ TestBegin( NearVert ) {
    double maxCrd[3];
    int nRanks;
    int nInc, *inc;
+   IArray* incArray;
    double* vert;
    int e_i, inc_i;
 
@@ -79,9 +80,12 @@ TestBegin( NearVert ) {
    mesh = Mesh_New( "" );
    Mesh_SetGenerator( mesh, gen );
    Stg_Component_Build( mesh, NULL, False );
+   incArray = IArray_New();
 
    for( e_i = 0; e_i < Mesh_GetDomainSize( mesh, nDims ); e_i++ ) {
-      Mesh_GetIncidence( mesh, nDims, e_i, MT_VERTEX, &nInc, &inc );
+      Mesh_GetIncidence( mesh, nDims, e_i, MT_VERTEX, incArray );
+      nInc = IArray_GetSize( incArray );
+      inc = IArray_GetPtr( incArray );
       for( inc_i = 0; inc_i < nInc; inc_i++ ) {
 	 vert = Mesh_GetVertex( mesh, inc[inc_i] );
 	 if( !Mesh_NearestVertex( mesh, vert ) == inc[inc_i] ) break;
@@ -98,7 +102,9 @@ TestBegin( NearVert ) {
    Stg_Component_Build( mesh, NULL, True );
 
    for( e_i = 0; e_i < Mesh_GetDomainSize( mesh, nDims ); e_i++ ) {
-      Mesh_GetIncidence( mesh, nDims, e_i, MT_VERTEX, &nInc, &inc );
+      Mesh_GetIncidence( mesh, nDims, e_i, MT_VERTEX, incArray );
+      nInc = IArray_GetSize( incArray );
+      inc = IArray_GetPtr( incArray );
       for( inc_i = 0; inc_i < nInc; inc_i++ ) {
 	 vert = Mesh_GetVertex( mesh, inc[inc_i] );
 	 if( !Mesh_NearestVertex( mesh, vert ) == inc[inc_i] ) break;
@@ -115,13 +121,17 @@ TestBegin( NearVert ) {
    Stg_Component_Build( mesh, NULL, True );
 
    for( e_i = 0; e_i < Mesh_GetDomainSize( mesh, nDims ); e_i++ ) {
-      Mesh_GetIncidence( mesh, nDims, e_i, MT_VERTEX, &nInc, &inc );
+      Mesh_GetIncidence( mesh, nDims, e_i, MT_VERTEX, incArray );
+      nInc = IArray_GetSize( incArray );
+      inc = IArray_GetPtr( incArray );
       for( inc_i = 0; inc_i < nInc; inc_i++ ) {
 	 vert = Mesh_GetVertex( mesh, inc[inc_i] );
 	 if( !Mesh_NearestVertex( mesh, vert ) == inc[inc_i] ) break;
       }
    }
    TestTrue( e_i == Mesh_GetDomainSize( mesh, nDims ) );
+
+   NewClass_Delete( incArray );
 
 done:
    FreeObject( gen );
@@ -143,6 +153,7 @@ TestBegin( Search ) {
    unsigned elDim, elInd;
    int nEdgeInc, *edgeInc;
    int nFaceInc, *faceInc;
+   IArray *incArray, *edgeIncArray, *faceIncArray;
    int e_i, inc_i, inc_j, d_i;
 
    insist( MPI_Comm_size( MPI_COMM_WORLD, &nRanks ), == MPI_SUCCESS );
@@ -161,8 +172,14 @@ TestBegin( Search ) {
    Mesh_SetGenerator( mesh, gen );
    Stg_Component_Build( mesh, NULL, False );
 
+   incArray = IArray_New();
+   edgeIncArray = IArray_New();
+   faceIncArray = IArray_New();
+
    for( e_i = 0; e_i < Mesh_GetDomainSize( mesh, nDims ); e_i++ ) {
-      Mesh_GetIncidence( mesh, nDims, e_i, MT_VERTEX, &nInc, &inc );
+      Mesh_GetIncidence( mesh, nDims, e_i, MT_VERTEX, incArray );
+      nInc = IArray_GetSize( incArray );
+      inc = IArray_GetPtr( incArray );
       for( inc_i = 0; inc_i < nInc; inc_i++ ) {
 	 vert = Mesh_GetVertex( mesh, inc[inc_i] );
 	 if( !Mesh_Search( mesh, vert, &elDim, &elInd ) ) break;
@@ -170,7 +187,9 @@ TestBegin( Search ) {
 	 if( elInd != inc[inc_i] ) break;
       }
 
-      Mesh_GetIncidence( mesh, nDims, e_i, MT_VERTEX, &nInc, &inc );
+      Mesh_GetIncidence( mesh, nDims, e_i, MT_VERTEX, incArray );
+      nInc = IArray_GetSize( incArray );
+      inc = IArray_GetPtr( incArray );
       for( d_i = 0; d_i < nDims; d_i++ )
 	 point[d_i] = 0.0;
       for( inc_i = 0; inc_i < nInc; inc_i++ ) {
@@ -195,7 +214,9 @@ TestBegin( Search ) {
    Stg_Component_Build( mesh, NULL, True );
 
    for( e_i = 0; e_i < Mesh_GetDomainSize( mesh, nDims ); e_i++ ) {
-      Mesh_GetIncidence( mesh, nDims, e_i, MT_VERTEX, &nInc, &inc );
+      Mesh_GetIncidence( mesh, nDims, e_i, MT_VERTEX, incArray );
+      nInc = IArray_GetSize( incArray );
+      inc = IArray_GetPtr( incArray );
       for( inc_i = 0; inc_i < nInc; inc_i++ ) {
 	 vert = Mesh_GetVertex( mesh, inc[inc_i] );
 	 if( !Mesh_Search( mesh, vert, &elDim, &elInd ) ) break;
@@ -203,9 +224,13 @@ TestBegin( Search ) {
 	 if( elInd != inc[inc_i] ) break;
       }
 
-      Mesh_GetIncidence( mesh, nDims, e_i, MT_EDGE, &nInc, &inc );
+      Mesh_GetIncidence( mesh, nDims, e_i, MT_EDGE, incArray );
+      nInc = IArray_GetSize( incArray );
+      inc = IArray_GetPtr( incArray );
       for( inc_i = 0; inc_i < nInc; inc_i++ ) {
-	 Mesh_GetIncidence( mesh, MT_EDGE, inc[inc_i], MT_VERTEX, &nEdgeInc, &edgeInc );
+	 Mesh_GetIncidence( mesh, MT_EDGE, inc[inc_i], MT_VERTEX, edgeIncArray );
+	 nEdgeInc = IArray_GetSize( edgeIncArray );
+	 edgeInc = IArray_GetPtr( edgeIncArray );
 	 for( d_i = 0; d_i < nDims; d_i++ )
 	    point[d_i] = 0.0;
 	 for( inc_j = 0; inc_j < nEdgeInc; inc_j++ ) {
@@ -219,7 +244,9 @@ TestBegin( Search ) {
 	 if( elInd != inc[inc_i] ) break;
       }
 
-      Mesh_GetIncidence( mesh, nDims, e_i, MT_VERTEX, &nInc, &inc );
+      Mesh_GetIncidence( mesh, nDims, e_i, MT_VERTEX, incArray );
+      nInc = IArray_GetSize( incArray );
+      inc = IArray_GetPtr( incArray );
       for( d_i = 0; d_i < nDims; d_i++ )
 	 point[d_i] = 0.0;
       for( inc_i = 0; inc_i < nInc; inc_i++ ) {
@@ -244,7 +271,9 @@ TestBegin( Search ) {
    Stg_Component_Build( mesh, NULL, True );
 
    for( e_i = 0; e_i < Mesh_GetDomainSize( mesh, nDims ); e_i++ ) {
-      Mesh_GetIncidence( mesh, nDims, e_i, MT_VERTEX, &nInc, &inc );
+      Mesh_GetIncidence( mesh, nDims, e_i, MT_VERTEX, incArray );
+      nInc = IArray_GetSize( incArray );
+      inc = IArray_GetPtr( incArray );
       for( inc_i = 0; inc_i < nInc; inc_i++ ) {
 	 vert = Mesh_GetVertex( mesh, inc[inc_i] );
 	 if( !Mesh_Search( mesh, vert, &elDim, &elInd ) ) break;
@@ -252,9 +281,13 @@ TestBegin( Search ) {
 	 if( elInd != inc[inc_i] ) break;
       }
 
-      Mesh_GetIncidence( mesh, nDims, e_i, MT_EDGE, &nInc, &inc );
+      Mesh_GetIncidence( mesh, nDims, e_i, MT_EDGE, incArray );
+      nInc = IArray_GetSize( incArray );
+      inc = IArray_GetPtr( incArray );
       for( inc_i = 0; inc_i < nInc; inc_i++ ) {
-	 Mesh_GetIncidence( mesh, MT_EDGE, inc[inc_i], MT_VERTEX, &nEdgeInc, &edgeInc );
+	 Mesh_GetIncidence( mesh, MT_EDGE, inc[inc_i], MT_VERTEX, edgeIncArray );
+	 nEdgeInc = IArray_GetSize( edgeIncArray );
+	 edgeInc = IArray_GetPtr( edgeIncArray );
 	 for( d_i = 0; d_i < nDims; d_i++ )
 	    point[d_i] = 0.0;
 	 for( inc_j = 0; inc_j < nEdgeInc; inc_j++ ) {
@@ -268,9 +301,13 @@ TestBegin( Search ) {
 	 if( elInd != inc[inc_i] ) break;
       }
 
-      Mesh_GetIncidence( mesh, nDims, e_i, MT_FACE, &nInc, &inc );
+      Mesh_GetIncidence( mesh, nDims, e_i, MT_FACE, incArray );
+      nInc = IArray_GetSize( incArray );
+      inc = IArray_GetPtr( incArray );
       for( inc_i = 0; inc_i < nInc; inc_i++ ) {
-	 Mesh_GetIncidence( mesh, MT_FACE, inc[inc_i], MT_VERTEX, &nFaceInc, &faceInc );
+	 Mesh_GetIncidence( mesh, MT_FACE, inc[inc_i], MT_VERTEX, faceIncArray );
+	 nFaceInc = IArray_GetSize( faceIncArray );
+	 faceInc = IArray_GetPtr( faceIncArray );
 	 for( d_i = 0; d_i < nDims; d_i++ )
 	    point[d_i] = 0.0;
 	 for( inc_j = 0; inc_j < nFaceInc; inc_j++ ) {
@@ -284,7 +321,9 @@ TestBegin( Search ) {
 	 if( elInd != inc[inc_i] ) break;
       }
 
-      Mesh_GetIncidence( mesh, nDims, e_i, MT_VERTEX, &nInc, &inc );
+      Mesh_GetIncidence( mesh, nDims, e_i, MT_VERTEX, incArray );
+      nInc = IArray_GetSize( incArray );
+      inc = IArray_GetPtr( incArray );
       for( d_i = 0; d_i < nDims; d_i++ )
 	 point[d_i] = 0.0;
       for( inc_i = 0; inc_i < nInc; inc_i++ ) {
@@ -298,6 +337,10 @@ TestBegin( Search ) {
       if( elInd != e_i ) break;
    }
    TestTrue( e_i == Mesh_GetDomainSize( mesh, nDims ) );
+
+   NewClass_Delete( incArray );
+   NewClass_Delete( edgeIncArray );
+   NewClass_Delete( faceIncArray );
 
 done:
    FreeObject( gen );

@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ElementCellLayout.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
+** $Id: ElementCellLayout.c 4184 2007-09-25 07:54:17Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -192,11 +192,14 @@ void _ElementCellLayout_Init( ElementCellLayout* self, void* mesh ) {
 	/* ElementCellInfo info */
 	self->mesh = (Mesh*)mesh;
 	self->isConstructed = True;
+	self->incArray = IArray_New();
 }
 
 
 void _ElementCellLayout_Delete( void* elementCellLayout ) {
 	ElementCellLayout* self = (ElementCellLayout*)elementCellLayout;
+
+	NewClass_Delete( self->incArray );
 	
 	/* Stg_Class_Delete parent class */
 	_CellLayout_Delete( self );
@@ -298,12 +301,10 @@ Cell_Index _ElementCellLayout_CellShadowCount( void* elementCellLayout ) {
 
 Cell_PointIndex _ElementCellLayout_PointCount( void* elementCellLayout, Cell_Index cellIndex ) {
 	ElementCellLayout* self = (ElementCellLayout*)elementCellLayout;
-	unsigned		nInc;
-	unsigned*		inc;
 
 	Mesh_GetIncidence( self->mesh, Mesh_GetDimSize( self->mesh ), cellIndex, MT_VERTEX, 
-			   &nInc, &inc );
-	return nInc;
+			   self->incArray );
+	return IArray_GetSize( self->incArray );
 }
 
 void _ElementCellLayout_InitialisePoints( void* elementCellLayout, Cell_Index cellIndex, Cell_PointIndex pointCount, 
@@ -311,14 +312,16 @@ void _ElementCellLayout_InitialisePoints( void* elementCellLayout, Cell_Index ce
 {
 	ElementCellLayout* self = (ElementCellLayout*)elementCellLayout;
 	Cell_PointIndex point_I;
+	unsigned	nInc;
+	unsigned*	inc;
+
+	Mesh_GetIncidence( self->mesh, Mesh_GetDimSize( self->mesh ), cellIndex, MT_VERTEX, 
+			   self->incArray );
+	nInc = IArray_GetSize( self->incArray );
+	inc = (unsigned*)IArray_GetPtr( self->incArray );
 	
 	/* point to the mesh's node's coordinates */
 	for( point_I = 0; point_I < pointCount; point_I++ ) {
-		unsigned	nInc;
-		unsigned*	inc;
-
-	   	Mesh_GetIncidence( self->mesh, Mesh_GetDimSize( self->mesh ), cellIndex, MT_VERTEX, 
-				   &nInc, &inc );
 		points[point_I] = &self->mesh->verts[inc[point_I]];
 	}
 }

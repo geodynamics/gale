@@ -61,10 +61,10 @@ TestBegin( Construct ) {
 TestEnd
 
 TestBegin( SetDims ) {
-   MeshTopology* topo;
+   IGraph *topo;
    int d_i, d_j;
 
-   topo = MeshTopology_New();
+   topo = IGraph_New();
    TestNoAssert( MeshTopology_SetNumDims( topo, 3 ) );
    TestTrue( MeshTopology_GetNumDims( topo ) == 3 && topo->nTDims == 4 );
    TestTrue( topo->locals && topo->remotes );
@@ -90,12 +90,12 @@ TestBegin( SetDims ) {
 TestEnd
 
 TestBegin( SetComm ) {
-   MeshTopology* topo;
+   IGraph* topo;
    Comm* comm;
    int d_i;
 
    comm = Comm_New();
-   topo = MeshTopology_New();
+   topo = IGraph_New();
    MeshTopology_SetNumDims( topo, 3 );
 
    TestNoAssert( MeshTopology_SetComm( topo, comm ) );

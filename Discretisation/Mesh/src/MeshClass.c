@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: MeshClass.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
+** $Id: MeshClass.c 4184 2007-09-25 07:54:17Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -80,7 +80,7 @@ Mesh* _Mesh_New( MESH_DEFARGS ) {
 }
 
 void _Mesh_Init( Mesh* self ) {
-	self->topo = MeshTopology_New( "" );
+	self->topo = IGraph_New( "" );
 	self->verts = NULL;
 
 	self->vars = List_New();
@@ -263,7 +263,7 @@ unsigned Mesh_GetGlobalSize( void* mesh, MeshTopology_Dim dim ) {
 	assert( self );
 	assert( self->topo );
 
-	return Decomp_GetNumGlobals( Sync_GetDecomp( MeshTopology_GetDomain( self->topo, dim ) ) );
+	return Decomp_GetNumGlobals( Sync_GetDecomp( IGraph_GetDomain( self->topo, dim ) ) );
 }
 
 unsigned Mesh_GetLocalSize( void* mesh, MeshTopology_Dim dim ) {
@@ -272,7 +272,7 @@ unsigned Mesh_GetLocalSize( void* mesh, MeshTopology_Dim dim ) {
 	assert( self );
 	assert( self->topo );
 
-	return Decomp_GetNumLocals( Sync_GetDecomp( MeshTopology_GetDomain( self->topo, dim ) ) );
+	return Decomp_GetNumLocals( Sync_GetDecomp( IGraph_GetDomain( self->topo, dim ) ) );
 }
 
 unsigned Mesh_GetRemoteSize( void* mesh, MeshTopology_Dim dim ) {
@@ -281,7 +281,7 @@ unsigned Mesh_GetRemoteSize( void* mesh, MeshTopology_Dim dim ) {
 	assert( self );
 	assert( self->topo );
 
-	return Sync_GetNumRemotes( MeshTopology_GetDomain( self->topo, dim ) );
+	return Sync_GetNumRemotes( IGraph_GetDomain( self->topo, dim ) );
 }
 
 unsigned Mesh_GetDomainSize( void* mesh, MeshTopology_Dim dim ) {
@@ -290,7 +290,7 @@ unsigned Mesh_GetDomainSize( void* mesh, MeshTopology_Dim dim ) {
 	assert( self );
 	assert( self->topo );
 
-	return Sync_GetNumDomains( MeshTopology_GetDomain( self->topo, dim ) );
+	return Sync_GetNumDomains( IGraph_GetDomain( self->topo, dim ) );
 }
 
 unsigned Mesh_GetSharedSize( void* mesh, MeshTopology_Dim dim ) {
@@ -299,7 +299,7 @@ unsigned Mesh_GetSharedSize( void* mesh, MeshTopology_Dim dim ) {
 	assert( self );
 	assert( self->topo );
 
-	return Sync_GetNumShared( MeshTopology_GetDomain( self->topo, dim ) );
+	return Sync_GetNumShared( IGraph_GetDomain( self->topo, dim ) );
 }
 
 MeshTopology* Mesh_GetTopology( void* mesh ) {
@@ -315,7 +315,7 @@ Sync* Mesh_GetSync( void* mesh, MeshTopology_Dim dim ) {
 
 	assert( self );
 
-	return (Sync*)MeshTopology_GetDomain( self->topo, dim );
+	return (Sync*)IGraph_GetDomain( self->topo, dim );
 }
 
 Bool Mesh_GlobalToDomain( void* mesh, MeshTopology_Dim dim, unsigned global, unsigned* domain ) {
@@ -324,7 +324,7 @@ Bool Mesh_GlobalToDomain( void* mesh, MeshTopology_Dim dim, unsigned global, uns
 	assert( self );
 	assert( self->topo );
 
-	return Sync_TryGlobalToDomain( MeshTopology_GetDomain( self->topo, dim ), global, domain );
+	return Sync_TryGlobalToDomain( IGraph_GetDomain( self->topo, dim ), global, domain );
 }
 
 unsigned Mesh_DomainToGlobal( void* mesh, MeshTopology_Dim dim, unsigned domain ) {
@@ -333,7 +333,7 @@ unsigned Mesh_DomainToGlobal( void* mesh, MeshTopology_Dim dim, unsigned domain 
 	assert( self );
 	assert( self->topo );
 
-	return Sync_DomainToGlobal( MeshTopology_GetDomain( self->topo, dim ), domain );
+	return Sync_DomainToGlobal( IGraph_GetDomain( self->topo, dim ), domain );
 }
 
 Bool Mesh_LocalToShared( void* mesh, MeshTopology_Dim dim, unsigned domain, unsigned* shared ) {
@@ -342,7 +342,7 @@ Bool Mesh_LocalToShared( void* mesh, MeshTopology_Dim dim, unsigned domain, unsi
 	assert( self );
 	assert( self->topo );
 
-	return Sync_TryLocalToShared( MeshTopology_GetDomain( self->topo, dim ), domain, shared );
+	return Sync_TryLocalToShared( IGraph_GetDomain( self->topo, dim ), domain, shared );
 }
 
 unsigned Mesh_SharedToLocal( void* mesh, MeshTopology_Dim dim, unsigned shared ) {
@@ -351,7 +351,7 @@ unsigned Mesh_SharedToLocal( void* mesh, MeshTopology_Dim dim, unsigned shared )
 	assert( self );
 	assert( self->topo );
 
-	return Sync_SharedToLocal( MeshTopology_GetDomain( self->topo, dim ), shared );
+	return Sync_SharedToLocal( IGraph_GetDomain( self->topo, dim ), shared );
 }
 
 unsigned Mesh_GetOwner( void* mesh, MeshTopology_Dim dim, unsigned remote ) {
@@ -359,7 +359,7 @@ unsigned Mesh_GetOwner( void* mesh, MeshTopology_Dim dim, unsigned remote ) {
 
 	assert( self );
 
-	return Sync_GetOwner( MeshTopology_GetDomain( self->topo, dim ), remote );
+	return Sync_GetOwner( IGraph_GetDomain( self->topo, dim ), remote );
 }
 
 void Mesh_GetSharers( void* mesh, MeshTopology_Dim dim, unsigned shared, 
@@ -370,7 +370,7 @@ void Mesh_GetSharers( void* mesh, MeshTopology_Dim dim, unsigned shared,
 	assert( self );
 	assert( self->topo );
 
-	Sync_GetSharers( MeshTopology_GetDomain( self->topo, dim ), shared, nSharers, sharers );
+	Sync_GetSharers( IGraph_GetDomain( self->topo, dim ), shared, nSharers, sharers );
 }
 
 Bool Mesh_HasIncidence( void* mesh, MeshTopology_Dim fromDim, MeshTopology_Dim toDim ) {
@@ -379,7 +379,7 @@ Bool Mesh_HasIncidence( void* mesh, MeshTopology_Dim fromDim, MeshTopology_Dim t
 	assert( self );
 	assert( self->topo );
 
-	return MeshTopology_HasIncidence( self->topo, fromDim, toDim );
+	return IGraph_HasIncidence( self->topo, fromDim, toDim );
 }
 
 unsigned Mesh_GetIncidenceSize( void* mesh, MeshTopology_Dim fromDim, unsigned fromInd, 
@@ -389,18 +389,18 @@ unsigned Mesh_GetIncidenceSize( void* mesh, MeshTopology_Dim fromDim, unsigned f
 
 	assert( self );
 
-	return MeshTopology_GetIncidenceSize( self->topo, fromDim, fromInd, toDim );
+	return IGraph_GetIncidenceSize( self->topo, fromDim, fromInd, toDim );
 }
 
 void Mesh_GetIncidence( void* mesh, MeshTopology_Dim fromDim, unsigned fromInd, MeshTopology_Dim toDim, 
-			unsigned* nInc, unsigned** inc )
+			IArray* inc )
 {
 	Mesh*	self = (Mesh*)mesh;
 
 	assert( self );
 	assert( self->topo );
 
-	MeshTopology_GetIncidence( self->topo, fromDim, fromInd, toDim, nInc, (const int**)inc );
+	MeshTopology_GetIncidence( self->topo, fromDim, fromInd, toDim, inc );
 }
 
 unsigned Mesh_NearestVertex( void* mesh, double* point ) {

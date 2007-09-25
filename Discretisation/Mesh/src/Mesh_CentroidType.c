@@ -86,6 +86,7 @@ void _Mesh_CentroidType_Init( Mesh_CentroidType* self ) {
 	assert( self && Stg_CheckType( self, Mesh_CentroidType ) );
 
 	self->elMesh = NULL;
+	self->incArray = IArray_New();
 }
 
 
@@ -95,6 +96,8 @@ void _Mesh_CentroidType_Init( Mesh_CentroidType* self ) {
 
 void _Mesh_CentroidType_Delete( void* centroidType ) {
 	Mesh_CentroidType*	self = (Mesh_CentroidType*)centroidType;
+
+	NewClass_Delete( self->incArray );
 
 	/* Delete the parent. */
 	_Mesh_ElementType_Delete( self );
@@ -140,12 +143,14 @@ double Mesh_CentroidType_GetMinimumSeparation( void* centroidType, unsigned elIn
 
 void Mesh_CentroidType_GetCentroid( void* centroidType, unsigned element, double* centroid ) {
 	Mesh_CentroidType*	self = (Mesh_CentroidType*)centroidType;
-	unsigned		nInc, *inc;
+	const int*		inc;
 
 	assert( self && Stg_CheckType( self, Mesh_CentroidType ) );
 
-	Mesh_GetIncidence( self->mesh, Mesh_GetDimSize( self->mesh ), element, MT_VERTEX, &nInc, &inc );
-	assert( nInc == 1 );
+	Mesh_GetIncidence( self->mesh, Mesh_GetDimSize( self->mesh ), element, MT_VERTEX, 
+			   self->incArray );
+	assert( IArray_GetSize( self->incArray ) == 1 );
+	inc = IArray_GetPtr( self->incArray );
 	memcpy( centroid, Mesh_GetVertex( self->mesh, inc[0] ), Mesh_GetDimSize( self->mesh ) * sizeof(unsigned) );
 }
 

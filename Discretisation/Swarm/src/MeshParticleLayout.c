@@ -248,12 +248,16 @@ void _MeshParticleLayout_InitialiseParticlesOfCell( void* meshParticleLayout, vo
 	Particle_InCellIndex	particlesThisCell = swarm->cellParticleCountTbl[cell_I];
 	Particle_InCellIndex	cParticle_I = 0;
 	GlobalParticle*	        particle = NULL;
+	IArray*			inc;
 	unsigned		d_i, n_i;
 
 	assert( nDims == 2 || nDims == 3 );
 
+	inc = IArray_New();
 	Mesh_GetIncidence( self->mesh, nDims, cell_I, MT_VERTEX, 
-			   &nNodes, &incNodes );
+			   inc );
+	nNodes = IArray_GetSize( inc );
+	incNodes = IArray_GetPtr( inc );
 
 	for ( cParticle_I = 0; cParticle_I < particlesThisCell; cParticle_I++ ) {	
 		particle = (GlobalParticle*)Swarm_ParticleInCellAt( swarm, cell_I, cParticle_I );
@@ -288,4 +292,6 @@ void _MeshParticleLayout_InitialiseParticlesOfCell( void* meshParticleLayout, vo
 			}
 		}
 	}
+
+	NewClass_Delete( inc );
 }

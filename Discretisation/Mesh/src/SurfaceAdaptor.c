@@ -46,6 +46,7 @@
 #include "Decomp.h"
 #include "Sync.h"
 #include "MeshTopology.h"
+#include "IGraph.h"
 #include "MeshClass.h"
 #include "MeshGenerator.h"
 #include "MeshAdaptor.h"
@@ -233,7 +234,7 @@ void SurfaceAdaptor_Generate( void* adaptor, void* _mesh ) {
 	inds = AllocArray( unsigned, Mesh_GetDimSize( mesh ) );
 
 	/* Loop over domain nodes. */
-	sync = MeshTopology_GetDomain( mesh->topo, MT_VERTEX );
+	sync = IGraph_GetDomain( mesh->topo, MT_VERTEX );
 	for( n_i = 0; n_i < Sync_GetNumDomains( sync ); n_i++ ) {
 		unsigned	gNode;
 		double		height;

@@ -46,6 +46,7 @@
 #include "Decomp.h"
 #include "Sync.h"
 #include "MeshTopology.h"
+#include "IGraph.h"
 #include "MeshClass.h"
 #include "MeshGenerator.h"
 #include "MeshAdaptor.h"
@@ -192,7 +193,7 @@ void CompressionAdaptor_Generate( void* adaptor, void* _mesh ) {
 	min = mesh->verts[gNode][1];
 
 	/* Loop over domain nodes. */
-	sync = MeshTopology_GetDomain( mesh->topo, MT_VERTEX );
+	sync = IGraph_GetDomain( mesh->topo, MT_VERTEX );
 	for( n_i = 0; n_i < Sync_GetNumDomains( sync ); n_i++ ) {
 		gNode = Sync_DomainToGlobal( sync, n_i );
 		Grid_Lift( grid, gNode, inds );

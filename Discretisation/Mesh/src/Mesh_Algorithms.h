@@ -76,7 +76,8 @@
 		/* Mesh_Algorithms info */							\
 		Mesh_Algorithms_NearestVertexFunc*	nearestVertex;				\
 		Mesh_Algorithms_SearchFunc*		search;					\
-		Mesh*					mesh;
+		Mesh*					mesh;					\
+		IArray*					incArray;
 
 	struct Mesh_Algorithms { __Mesh_Algorithms };
 

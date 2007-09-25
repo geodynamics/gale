@@ -97,7 +97,9 @@ void _Mesh_ElementType_Print( void* elementType, Stream* stream ) {
 void _Mesh_ElementType_GetCentroid( void* elementType, unsigned element, double* centroid ) {
 	Mesh_ElementType*	self = (Mesh_ElementType*)elementType;
 	Mesh*			mesh;
-	unsigned		nIncVerts, *incVerts;
+	IArray*			inc;
+	unsigned		nIncVerts;
+	const int		*incVerts;
 	unsigned		nDims;
 	double			denom;
 	unsigned		d_i, v_i;
@@ -106,7 +108,10 @@ void _Mesh_ElementType_GetCentroid( void* elementType, unsigned element, double*
 
 	mesh = self->mesh;
 	nDims = Mesh_GetDimSize( mesh );
-	Mesh_GetIncidence( mesh, nDims, element, MT_VERTEX, &nIncVerts, &incVerts );
+	inc = IArray_New();
+	Mesh_GetIncidence( mesh, nDims, element, MT_VERTEX, inc );
+	nIncVerts = (unsigned)IArray_GetSize( inc );
+	incVerts = IArray_GetPtr( inc );
 
 	assert( nIncVerts );
 	denom = 1.0 / (double)nIncVerts;
@@ -117,6 +122,8 @@ void _Mesh_ElementType_GetCentroid( void* elementType, unsigned element, double*
 			centroid[d_i] += Mesh_GetVertex( mesh, incVerts[v_i] )[d_i];
 		centroid[d_i] *= denom;
 	}
+
+	NewClass_Delete( inc );
 }
 
 

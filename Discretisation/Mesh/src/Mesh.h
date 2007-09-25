@@ -35,7 +35,7 @@
 ** Comments:
 **	None so far.
 **
-** $Id: Mesh.h 4100 2007-05-16 01:07:26Z LukeHodkinson $
+** $Id: Mesh.h 4184 2007-09-25 07:54:17Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -49,6 +49,7 @@
 #include "Decomp.h"
 #include "Sync.h"
 #include "MeshTopology.h"
+#include "IGraph.h"
 /*
 	#include "Decomposer.h"
 	#include "DecompTransfer.h"

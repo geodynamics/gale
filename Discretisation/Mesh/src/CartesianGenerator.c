@@ -45,6 +45,7 @@
 #include "Decomp.h"
 #include "Sync.h"
 #include "MeshTopology.h"
+#include "IGraph.h"
 #include "Mesh_ElementType.h"
 #include "Mesh_HexType.h"
 #include "MeshClass.h"
@@ -356,7 +357,7 @@ void CartesianGenerator_Generate( void* meshGenerator, void* _mesh ) {
 		/* Fill topological values. */
 		MeshTopology_SetComm( mesh->topo, self->comm );
 		MeshTopology_SetNumDims( mesh->topo, self->elGrid->nDims );
-		CartesianGenerator_GenTopo( self, mesh->topo );
+		CartesianGenerator_GenTopo( self, (IGraph*)mesh->topo );
 
 		/* Fill geometric values. */
 		CartesianGenerator_GenGeom( self, mesh );
@@ -441,7 +442,7 @@ void _CartesianGenerator_SetTopologyParams( void* meshGenerator, unsigned* sizes
 	CartesianGenerator_BuildDecomp( self );
 }
 
-void _CartesianGenerator_GenElements( void* meshGenerator, MeshTopology* topo, Grid*** grids ) {
+void _CartesianGenerator_GenElements( void* meshGenerator, IGraph* topo, Grid*** grids ) {
 	CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
 	Stream*			stream = Journal_Register( Info_Type, self->type );
 	Grid*			grid;
@@ -475,7 +476,7 @@ void _CartesianGenerator_GenElements( void* meshGenerator, MeshTopology* topo, G
 		els[e_i] = Grid_Project( self->elGrid, dimInds );
 	}
 
-	MeshTopology_SetLocalElements( topo, grid->nDims, nEls, els );
+	IGraph_SetLocalElements( topo, grid->nDims, nEls, els );
 	FreeArray( els );
 	FreeArray( dimInds );
 	FreeObject( grid );
@@ -485,7 +486,7 @@ void _CartesianGenerator_GenElements( void* meshGenerator, MeshTopology* topo, G
 	Stream_UnIndent( stream );
 }
 
-void _CartesianGenerator_GenVertices( void* meshGenerator, MeshTopology* topo, Grid*** grids ) {
+void _CartesianGenerator_GenVertices( void* meshGenerator, IGraph* topo, Grid*** grids ) {
 	CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
 	Stream*			stream = Journal_Register( Info_Type, self->type );
 	unsigned		rank;
@@ -556,7 +557,7 @@ void _CartesianGenerator_GenVertices( void* meshGenerator, MeshTopology* topo, G
 	MeshTopology_SetLocalElements( topo, 0, nLocals, locals );
 	MeshTopology_SetRemoteElements( topo, 0, nRemotes, remotes );
 */
-	MeshTopology_SetElements( topo, 0, nLocals, locals );
+	IGraph_SetElements( topo, 0, nLocals, locals );
 	FreeArray( locals );
 /*
 	FreeArray( remotes );
@@ -570,7 +571,7 @@ void _CartesianGenerator_GenVertices( void* meshGenerator, MeshTopology* topo, G
 	Stream_UnIndent( stream );
 }
 
-void _CartesianGenerator_GenEdges( void* meshGenerator, MeshTopology* topo, Grid*** grids ) {
+void _CartesianGenerator_GenEdges( void* meshGenerator, IGraph* topo, Grid*** grids ) {
 	CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
 	Stream*			stream = Journal_Register( Info_Type, self->type );
 
@@ -592,7 +593,7 @@ void _CartesianGenerator_GenEdges( void* meshGenerator, MeshTopology* topo, Grid
 	Stream_UnIndent( stream );
 }
 
-void _CartesianGenerator_GenFaces( void* meshGenerator, MeshTopology* topo, Grid*** grids ) {
+void _CartesianGenerator_GenFaces( void* meshGenerator, IGraph* topo, Grid*** grids ) {
 	CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
 	Stream*			stream = Journal_Register( Info_Type, self->type );
 	Grid*			globalGrid;
@@ -683,7 +684,7 @@ void _CartesianGenerator_GenFaces( void* meshGenerator, MeshTopology* topo, Grid
 		els[nEls[0] + nEls[1] + e_i] = nGlobalEls[0] + nGlobalEls[1] + Grid_Project( globalGrid, dimInds );
 	}
 
-	MeshTopology_SetElements( topo, MT_FACE, nEls[0] + nEls[1] + nEls[2], els );
+	IGraph_SetElements( topo, MT_FACE, nEls[0] + nEls[1] + nEls[2], els );
 
 	FreeArray( dimInds );
 	FreeArray( els );
@@ -695,7 +696,7 @@ void _CartesianGenerator_GenFaces( void* meshGenerator, MeshTopology* topo, Grid
 	Stream_UnIndent( stream );
 }
 
-void _CartesianGenerator_GenElementVertexInc( void* meshGenerator, MeshTopology* topo, Grid*** grids ) {
+void _CartesianGenerator_GenElementVertexInc( void* meshGenerator, IGraph* topo, Grid*** grids ) {
 	CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
 	Stream*			stream = Journal_Register( Info_Type, self->type );
 	int			nDomainEls;
@@ -714,7 +715,7 @@ void _CartesianGenerator_GenElementVertexInc( void* meshGenerator, MeshTopology*
 
 	vertsPerEl = (topo->nDims == 1) ? 2 : (topo->nDims == 2) ? 4 : 8;
 
-	sync = MeshTopology_GetDomain( topo, topo->nDims );
+	sync = IGraph_GetDomain( topo, topo->nDims );
 	nDomainEls = Sync_GetNumDomains( sync );
 	incEls = Memory_Alloc_Array_Unnamed( unsigned, vertsPerEl );
 	dimInds = Memory_Alloc_Array_Unnamed( unsigned, topo->nDims );
@@ -758,9 +759,9 @@ void _CartesianGenerator_GenElementVertexInc( void* meshGenerator, MeshTopology*
 			}
 		}
 
-		CartesianGenerator_MapToDomain( self, (Sync*)MeshTopology_GetDomain( topo, 0 ), 
+		CartesianGenerator_MapToDomain( self, (Sync*)IGraph_GetDomain( topo, 0 ), 
 						vertsPerEl, incEls );
-		MeshTopology_SetIncidence( topo, topo->nDims, e_i, MT_VERTEX, vertsPerEl, incEls );
+		IGraph_SetIncidence( topo, topo->nDims, e_i, MT_VERTEX, vertsPerEl, incEls );
 	}
 
 	FreeArray( incEls );
@@ -771,7 +772,7 @@ void _CartesianGenerator_GenElementVertexInc( void* meshGenerator, MeshTopology*
 	Stream_UnIndent( stream );
 }
 
-void _CartesianGenerator_GenVolumeEdgeInc( void* meshGenerator, MeshTopology* topo, Grid*** grids ) {
+void _CartesianGenerator_GenVolumeEdgeInc( void* meshGenerator, IGraph* topo, Grid*** grids ) {
 	CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
 	Stream*			stream = Journal_Register( Info_Type, self->type );
 	unsigned		nIncEls;
@@ -835,9 +836,9 @@ void _CartesianGenerator_GenVolumeEdgeInc( void* meshGenerator, MeshTopology* to
 		dimInds[0]--;
 		dimInds[1]--;
 
-		CartesianGenerator_MapToDomain( self, (Sync*)MeshTopology_GetDomain( topo, 1 ), 
+		CartesianGenerator_MapToDomain( self, (Sync*)IGraph_GetDomain( topo, 1 ), 
 						nIncEls, incEls );
-		MeshTopology_SetIncidence( topo, topo->nDims, e_i, 1, nIncEls, incEls );
+		IGraph_SetIncidence( topo, topo->nDims, e_i, 1, nIncEls, incEls );
 	}
 
 	FreeArray( incEls );
@@ -848,7 +849,7 @@ void _CartesianGenerator_GenVolumeEdgeInc( void* meshGenerator, MeshTopology* to
 	Stream_UnIndent( stream );
 }
 
-void _CartesianGenerator_GenVolumeFaceInc( void* meshGenerator, MeshTopology* topo, Grid*** grids ) {
+void _CartesianGenerator_GenVolumeFaceInc( void* meshGenerator, IGraph* topo, Grid*** grids ) {
 	CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
 	Stream*			stream = Journal_Register( Info_Type, self->type );
 	unsigned		nIncEls;
@@ -890,9 +891,9 @@ void _CartesianGenerator_GenVolumeFaceInc( void* meshGenerator, MeshTopology* to
 		incEls[5] = Grid_Project( grids[2][2], dimInds ) + grids[2][0]->nPoints + grids[2][1]->nPoints;
 		dimInds[0]--;
 
-		CartesianGenerator_MapToDomain( self, (Sync*)MeshTopology_GetDomain( topo, 2 ), 
+		CartesianGenerator_MapToDomain( self, (Sync*)IGraph_GetDomain( topo, 2 ), 
 						nIncEls, incEls );
-		MeshTopology_SetIncidence( topo, topo->nDims, e_i, 2, nIncEls, incEls );
+		IGraph_SetIncidence( topo, topo->nDims, e_i, 2, nIncEls, incEls );
 	}
 
 	FreeArray( incEls );
@@ -903,7 +904,7 @@ void _CartesianGenerator_GenVolumeFaceInc( void* meshGenerator, MeshTopology* to
 	Stream_UnIndent( stream );
 }
 
-void _CartesianGenerator_GenFaceVertexInc( void* meshGenerator, MeshTopology* topo, Grid*** grids ) {
+void _CartesianGenerator_GenFaceVertexInc( void* meshGenerator, IGraph* topo, Grid*** grids ) {
 	CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
 	Stream*			stream = Journal_Register( Info_Type, self->type );
 	unsigned		nIncEls;
@@ -983,9 +984,9 @@ void _CartesianGenerator_GenFaceVertexInc( void* meshGenerator, MeshTopology* to
 			dimInds[2]--;
 		}
 
-		CartesianGenerator_MapToDomain( self, (Sync*)MeshTopology_GetDomain( topo, 0 ), 
+		CartesianGenerator_MapToDomain( self, (Sync*)IGraph_GetDomain( topo, 0 ), 
 						nIncEls, incEls );
-		MeshTopology_SetIncidence( topo, 2, e_i, 0, nIncEls, incEls );
+		IGraph_SetIncidence( topo, 2, e_i, 0, nIncEls, incEls );
 	}
 
 	FreeArray( incEls );
@@ -996,7 +997,7 @@ void _CartesianGenerator_GenFaceVertexInc( void* meshGenerator, MeshTopology* to
 	Stream_UnIndent( stream );
 }
 
-void _CartesianGenerator_GenFaceEdgeInc( void* meshGenerator, MeshTopology* topo, Grid*** grids ) {
+void _CartesianGenerator_GenFaceEdgeInc( void* meshGenerator, IGraph* topo, Grid*** grids ) {
 	CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
 	Stream*			stream = Journal_Register( Info_Type, self->type );
 	unsigned		nIncEls;
@@ -1070,9 +1071,9 @@ void _CartesianGenerator_GenFaceEdgeInc( void* meshGenerator, MeshTopology* topo
 			dimInds[1]--;
 		}
 
-		CartesianGenerator_MapToDomain( self, (Sync*)MeshTopology_GetDomain( topo, 1 ), 
+		CartesianGenerator_MapToDomain( self, (Sync*)IGraph_GetDomain( topo, 1 ), 
 						nIncEls, incEls );
-		MeshTopology_SetIncidence( topo, 2, e_i, 1, nIncEls, incEls );
+		IGraph_SetIncidence( topo, 2, e_i, 1, nIncEls, incEls );
 	}
 
 	FreeArray( incEls );
@@ -1083,7 +1084,7 @@ void _CartesianGenerator_GenFaceEdgeInc( void* meshGenerator, MeshTopology* topo
 	Stream_UnIndent( stream );
 }
 
-void _CartesianGenerator_GenEdgeVertexInc( void* meshGenerator, MeshTopology* topo, Grid*** grids ) {
+void _CartesianGenerator_GenEdgeVertexInc( void* meshGenerator, IGraph* topo, Grid*** grids ) {
 	CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
 	Stream*			stream = Journal_Register( Info_Type, self->type );
 	unsigned		nIncEls;
@@ -1099,7 +1100,7 @@ void _CartesianGenerator_GenEdgeVertexInc( void* meshGenerator, MeshTopology* to
 	Journal_Printf( stream, "Generating edge-vertex incidence...\n" );
 	Stream_Indent( stream );
 
-	sync = MeshTopology_GetDomain( topo, 1 );
+	sync = IGraph_GetDomain( topo, 1 );
 	incEls = MemArray( unsigned, 2, CartesianGenerator_Type );
 	dimInds = MemArray( unsigned, topo->nDims, CartesianGenerator_Type );
 	for( e_i = 0; e_i < Sync_GetNumDomains( sync ); e_i++ ) {
@@ -1140,9 +1141,9 @@ void _CartesianGenerator_GenEdgeVertexInc( void* meshGenerator, MeshTopology* to
 			dimInds[2]--;
 		}
 
-		CartesianGenerator_MapToDomain( self, (Sync*)MeshTopology_GetDomain( topo, 0 ), 
+		CartesianGenerator_MapToDomain( self, (Sync*)IGraph_GetDomain( topo, 0 ), 
 						nIncEls, incEls );
-		MeshTopology_SetIncidence( topo, MT_EDGE, e_i, MT_VERTEX, nIncEls, incEls );
+		IGraph_SetIncidence( topo, MT_EDGE, e_i, MT_VERTEX, nIncEls, incEls );
 	}
 
 	FreeArray( incEls );
@@ -1422,7 +1423,7 @@ void CartesianGenerator_RecurseDecomps( CartesianGenerator* self,
 	}
 }
 
-void CartesianGenerator_GenTopo( CartesianGenerator* self, MeshTopology* topo ) {
+void CartesianGenerator_GenTopo( CartesianGenerator* self, IGraph* topo ) {
 	Grid***		grids;
 	Comm*		comm;
 	unsigned	d_i, d_j;
@@ -1534,15 +1535,15 @@ void CartesianGenerator_GenTopo( CartesianGenerator* self, MeshTopology* topo ) 
 	comm = MeshTopology_GetComm( topo );
 	if( self->shadowDepth && Comm_GetNumNeighbours( comm ) > 0 ) {
 		/* Build enough incidence to set shadow depth. */
-		MeshTopology_InvertIncidence( topo, MT_VERTEX, topo->nDims );
-		MeshTopology_ExpandIncidence( topo, topo->nDims );
+		IGraph_InvertIncidence( topo, MT_VERTEX, topo->nDims );
+		IGraph_ExpandIncidence( topo, topo->nDims );
 
 		/* Set the shadow depth. */
 		MeshTopology_SetShadowDepth( topo, self->shadowDepth );
 
 		/* Kill up relations and neighbours. */
-		MeshTopology_RemoveIncidence( topo, topo->nDims, topo->nDims );
-		MeshTopology_RemoveIncidence( topo, 0, topo->nDims );
+		IGraph_RemoveIncidence( topo, topo->nDims, topo->nDims );
+		IGraph_RemoveIncidence( topo, 0, topo->nDims );
 	}
 
 	/* Complete all required relations. */
@@ -1551,7 +1552,7 @@ void CartesianGenerator_GenTopo( CartesianGenerator* self, MeshTopology* topo ) 
 			if( !self->enabledInc[d_i][d_j] )
 				continue;
 
-			MeshTopology_InvertIncidence( topo, d_i, d_j );
+			IGraph_InvertIncidence( topo, d_i, d_j );
 		}
 	}
 	for( d_i = 0; d_i <= self->nDims; d_i++ ) {
@@ -1559,7 +1560,7 @@ void CartesianGenerator_GenTopo( CartesianGenerator* self, MeshTopology* topo ) 
 			if( d_i == 0 )
 				CartesianGenerator_CompleteVertexNeighbours( self, topo, grids );
 			else {
-				MeshTopology_ExpandIncidence( topo, d_i );
+				IGraph_ExpandIncidence( topo, d_i );
 			}
 		}
 	}
@@ -1578,7 +1579,7 @@ void CartesianGenerator_GenTopo( CartesianGenerator* self, MeshTopology* topo ) 
 	FreeArray( grids );
 }
 
-void CartesianGenerator_GenEdges2D( CartesianGenerator* self, MeshTopology* topo, Grid*** grids ) {
+void CartesianGenerator_GenEdges2D( CartesianGenerator* self, IGraph* topo, Grid*** grids ) {
 	Grid*		globalGrid;
 	unsigned	nGlobalEls;
 	Grid*		grid;
@@ -1641,7 +1642,7 @@ void CartesianGenerator_GenEdges2D( CartesianGenerator* self, MeshTopology* topo
 		els[nEls[0] + e_i] = nGlobalEls + Grid_Project( globalGrid, dimInds );
 	}
 
-	MeshTopology_SetElements( topo, MT_EDGE, nEls[0] + nEls[1], els );
+	IGraph_SetElements( topo, MT_EDGE, nEls[0] + nEls[1], els );
 
 	FreeArray( dimInds );
 	FreeArray( els );
@@ -1649,7 +1650,7 @@ void CartesianGenerator_GenEdges2D( CartesianGenerator* self, MeshTopology* topo
 	FreeObject( globalGrid );
 }
 
-void CartesianGenerator_GenEdges3D( CartesianGenerator* self, MeshTopology* topo, Grid*** grids ) {
+void CartesianGenerator_GenEdges3D( CartesianGenerator* self, IGraph* topo, Grid*** grids ) {
 	Grid*		globalGrid;
 	unsigned	nGlobalEls[2];
 	Grid*		grid;
@@ -1747,7 +1748,7 @@ void CartesianGenerator_GenEdges3D( CartesianGenerator* self, MeshTopology* topo
 		els[nEls[0] + nEls[1] + e_i] = nGlobalEls[0] + nGlobalEls[1] + Grid_Project( globalGrid, dimInds );
 	}
 
-	MeshTopology_SetElements( topo, MT_EDGE, nEls[0] + nEls[1] + nEls[2], els );
+	IGraph_SetElements( topo, MT_EDGE, nEls[0] + nEls[1] + nEls[2], els );
 
 	FreeArray( dimInds );
 	FreeArray( els );
@@ -1755,7 +1756,7 @@ void CartesianGenerator_GenEdges3D( CartesianGenerator* self, MeshTopology* topo
 	FreeObject( globalGrid );
 }
 
-void CartesianGenerator_GenBndVerts( CartesianGenerator* self, MeshTopology* topo, Grid*** grids ) {
+void CartesianGenerator_GenBndVerts( CartesianGenerator* self, IGraph* topo, Grid*** grids ) {
 	IArray bndElsObj, *bndEls = &bndElsObj;
 	int nDims, nVerts, nBndEls;
 	const int* ptr;
@@ -1771,7 +1772,7 @@ void CartesianGenerator_GenBndVerts( CartesianGenerator* self, MeshTopology* top
 	nDims = MeshTopology_GetNumDims( topo );
 	inds = Class_Array( self, int, nDims );
 	IArray_Construct( bndEls );
-	sync = MeshTopology_GetDomain( topo, 0 );
+	sync = IGraph_GetDomain( topo, 0 );
 	nVerts = Sync_GetNumDomains( sync );
 	for( v_i = 0; v_i < nVerts; v_i++ ) {
 		global = Sync_DomainToGlobal( sync, v_i );
@@ -1786,11 +1787,11 @@ void CartesianGenerator_GenBndVerts( CartesianGenerator* self, MeshTopology* top
 	Class_Free( self, inds );
 
 	IArray_GetArray( bndEls, &nBndEls, &ptr );
-	MeshTopology_SetBoundaryElements( topo, 0, nBndEls, ptr );
+	IGraph_SetBoundaryElements( topo, 0, nBndEls, ptr );
 	IArray_Destruct( bndEls );
 }
 
-void CartesianGenerator_CompleteVertexNeighbours( CartesianGenerator* self, MeshTopology* topo, Grid*** grids ) {
+void CartesianGenerator_CompleteVertexNeighbours( CartesianGenerator* self, IGraph* topo, Grid*** grids ) {
 	Stream*		stream = Journal_Register( Info_Type, self->type );
 	Sync*		sync;
 	unsigned	nDims;
@@ -1808,7 +1809,7 @@ void CartesianGenerator_CompleteVertexNeighbours( CartesianGenerator* self, Mesh
 	Stream_Indent( stream );
 
 	nDims = topo->nDims;
-	sync = MeshTopology_GetDomain( topo, MT_VERTEX );
+	sync = IGraph_GetDomain( topo, MT_VERTEX );
 	nVerts = Sync_GetNumDomains( sync );
 	inds = AllocArray( unsigned, nDims );
 	nNbrs = AllocArray( unsigned, nVerts );
@@ -1882,7 +1883,7 @@ void CartesianGenerator_CompleteVertexNeighbours( CartesianGenerator* self, Mesh
 			}
 		}
 
-		MeshTopology_SetIncidence( topo, MT_VERTEX, v_i, MT_VERTEX, nNbrs[v_i], nbrs[v_i] );
+		IGraph_SetIncidence( topo, MT_VERTEX, v_i, MT_VERTEX, nNbrs[v_i], nbrs[v_i] );
 	}
 
 	FreeArray( nNbrs );
@@ -1932,7 +1933,7 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh ) {
 		steps[d_i] = self->crdMax[d_i] - self->crdMin[d_i];
 
 	/* Allocate for coordinates. */
-	sync = (Sync*)MeshTopology_GetDomain( mesh->topo, 0 );
+	sync = (Sync*)IGraph_GetDomain( (IGraph*)mesh->topo, 0 );
 	mesh->verts = AllocNamedArray2D( double, Sync_GetNumDomains( sync ), 
 					 mesh->topo->nDims, 
 					 "Mesh::verts" );
