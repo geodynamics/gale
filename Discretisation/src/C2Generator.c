@@ -179,11 +179,11 @@ void C2Generator_GenElementVertexInc( void* meshGenerator, MeshTopology* topo, G
 	vertsPerEl = (topo->nDims == 1) ? 3 : (topo->nDims == 2) ? 9 : 27;
 
 	nDims = topo->nDims;
-	nDomainEls = Sync_GetNumDomains( MeshTopology_GetDomain( topo, nDims ) );
+	nDomainEls = Sync_GetNumDomains( IGraph_GetDomain( topo, nDims ) );
 	incEls = Memory_Alloc_Array_Unnamed( unsigned, vertsPerEl );
 	dimInds = Memory_Alloc_Array_Unnamed( unsigned, topo->nDims );
 	for( e_i = 0; e_i < nDomainEls; e_i++ ) {
-		unsigned	gInd = Sync_DomainToGlobal( MeshTopology_GetDomain( topo, nDims ), e_i );
+		unsigned	gInd = Sync_DomainToGlobal( IGraph_GetDomain( topo, nDims ), e_i );
 		unsigned	curNode = 0;
 
 		Grid_Lift( grids[topo->nDims][0], gInd, dimInds );
@@ -262,9 +262,9 @@ void C2Generator_GenElementVertexInc( void* meshGenerator, MeshTopology* topo, G
 				dimInds[2] -= 2;
 			}
 		}
-		CartesianGenerator_MapToDomain( (CartesianGenerator*)self, MeshTopology_GetDomain( topo, 0), 
+		CartesianGenerator_MapToDomain( (CartesianGenerator*)self, IGraph_GetDomain( topo, 0), 
 						vertsPerEl, incEls );
-		MeshTopology_SetIncidence( topo, topo->nDims, e_i, MT_VERTEX, vertsPerEl, incEls );
+		IGraph_SetIncidence( topo, topo->nDims, e_i, MT_VERTEX, vertsPerEl, incEls );
 	}
 
 	FreeArray( incEls );

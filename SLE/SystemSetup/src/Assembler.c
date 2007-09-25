@@ -96,6 +96,9 @@ void _Assembler_Init( Assembler* self ) {
 	self->colNodeInd = 0;
 	self->colDofInd = 0;
 	self->colEq = 0;
+
+	self->rowInc = IArray_New();
+	self->colInc = IArray_New();
 }
 
 
@@ -110,6 +113,8 @@ void _Assembler_Delete( void* assembler ) {
 
 	FreeArray( self->shapeFuncs );
 	FreeArray( self->globalDerivs );
+	NewClass_Delete( self->rowInc );
+	NewClass_Delete( self->colInc );
 
 	/* Delete the parent. */
 	_Stg_Class_Delete( self );
@@ -256,7 +261,9 @@ void Assembler_LoopMatrixElement( void* assembler, unsigned element ) {
 	rowDofs = rowVar->dofLayout;			assert( rowDofs );
 	colDofs = colVar->dofLayout;			assert( colDofs );
 	nDims = Mesh_GetDimSize( rowMesh );		assert( nDims );
-	Mesh_GetIncidence( rowMesh, nDims, element, MT_VERTEX, &nRowElNodes, &rowElNodes );
+	Mesh_GetIncidence( rowMesh, nDims, element, MT_VERTEX, self->rowInc );
+	nRowElNodes = IArray_GetSize( self->rowInc );
+	rowElNodes = IArray_GetPtr( self->rowInc );
 	assert( FeMesh_GetElementLocalSize( rowMesh ) == FeMesh_GetElementLocalSize( colMesh ) );
 	assert( nDims == Mesh_GetDimSize( colMesh ) );
 	assert( rowEqNum->locationMatrix );
@@ -286,7 +293,9 @@ void Assembler_LoopMatrixElement( void* assembler, unsigned element ) {
 				continue;
 
 			Mesh_GetIncidence( colMesh, Mesh_GetDimSize( colMesh ), element, MT_VERTEX, 
-					   &nColElNodes, &colElNodes );
+					   self->colInc );
+			nColElNodes = IArray_GetSize( self->colInc );
+			colElNodes = IArray_GetPtr( self->colInc );
 			colInd = 0;
 			for( n_j = 0; n_j < nColElNodes; n_j++ ) {
 				assert( colEqNum->locationMatrix[element][n_j] );
@@ -381,7 +390,9 @@ void Assembler_LoopVectorElement( void* assembler, unsigned element ) {
 	rowMesh = rowVar->feMesh;
 	rowDofs = rowVar->dofLayout;			assert( rowDofs );
 	nDims = Mesh_GetDimSize( rowMesh );		assert( nDims );
-	Mesh_GetIncidence( rowMesh, nDims, element, MT_VERTEX, &nRowElNodes, &rowElNodes );
+	Mesh_GetIncidence( rowMesh, nDims, element, MT_VERTEX, self->rowInc );
+	nRowElNodes = IArray_GetSize( self->rowInc );
+	rowElNodes = IArray_GetPtr( self->rowInc );
 	assert( rowEqNum->locationMatrix );
 	assert( rowEqNum->locationMatrix[element] );
 	assert( rowDofs->dofCounts );

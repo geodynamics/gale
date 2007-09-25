@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeEquationNumber.c 860 2007-06-07 05:47:20Z LukeHodkinson $
+** $Id: FeEquationNumber.c 960 2007-09-25 07:54:49Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -1807,9 +1807,12 @@ void FeEquationNumber_BuildLocationMatrix( void* feEquationNumber ) {
 	unsigned*		elNodes;
 	int**			dstArray;
 	int***			locMat;
+	IArray*			inc;
 	unsigned		e_i, n_i, dof_i;
 
 	assert( self );
+
+	inc = IArray_New();
 
 	/* Don't build if already done. */
 	if( self->locationMatrixBuilt ) {
@@ -1829,7 +1832,9 @@ void FeEquationNumber_BuildLocationMatrix( void* feEquationNumber ) {
 	/* Allocate for the location matrix. */
 	locMat = AllocArray( int**, nDomainEls );
 	for( e_i = 0; e_i < nDomainEls; e_i++ ) {
-		FeMesh_GetElementNodes( feMesh, e_i, &nElNodes, &elNodes );
+		FeMesh_GetElementNodes( feMesh, e_i, inc );
+		nElNodes = IArray_GetSize( inc );
+		elNodes = IArray_GetPtr( inc );
 		locMat[e_i] = AllocArray( int*, nElNodes );
 		for( n_i = 0; n_i < nElNodes; n_i++ )
 			locMat[e_i][n_i] = AllocArray( int, nNodalDofs[elNodes[n_i]] );
@@ -1837,12 +1842,16 @@ void FeEquationNumber_BuildLocationMatrix( void* feEquationNumber ) {
 
 	/* Build location matrix. */
 	for( e_i = 0; e_i < nDomainEls; e_i++ ) {
-		FeMesh_GetElementNodes( feMesh, e_i, &nElNodes, &elNodes );
+		FeMesh_GetElementNodes( feMesh, e_i, inc );
+		nElNodes = IArray_GetSize( inc );
+		elNodes = IArray_GetPtr( inc );
 		for( n_i = 0; n_i < nElNodes; n_i++ ) {
 			for( dof_i = 0; dof_i < nNodalDofs[elNodes[n_i]]; dof_i++ )
 				locMat[e_i][n_i][dof_i] = dstArray[elNodes[n_i]][dof_i];
 		}
 	}
+
+	NewClass_Delete( inc );
 
 	/* Store result. */
 	self->locationMatrix = locMat;
@@ -1909,8 +1918,12 @@ Dof_EquationNumber** FeEquationNumber_BuildOneElementLocationMatrix( void* feEqu
 	Dof_EquationNumber** localLocationMatrix = NULL;
 	FeMesh* feMesh = self->feMesh;
 	Dof_Index numDofsThisNode = 0;
+	IArray* inc;
 
-	FeMesh_GetElementNodes( feMesh, lElement_I, &numNodesThisElement, &elInc );
+	inc = IArray_New();
+	FeMesh_GetElementNodes( feMesh, lElement_I, inc );
+	numNodesThisElement = IArray_GetSize( inc );
+	elInc = IArray_GetPtr( inc );
 
 	/* HACK: Make sure global element location matrix is built. */
 	if( !self->locationMatrixBuilt )
@@ -1958,6 +1971,8 @@ Dof_EquationNumber** FeEquationNumber_BuildOneElementLocationMatrix( void* feEqu
 		}
 	}
 #endif
+
+	NewClass_Delete( inc );
 
 	return localLocationMatrix;
 }
@@ -2018,8 +2033,12 @@ void FeEquationNumber_PrintLocationMatrix( void* feFeEquationNumber, Stream* str
 			Node_LocalIndex numNodesAtElement;
 			Node_LocalIndex elLocalNode_I;
 			unsigned*	incNodes;
+			IArray*		inc;
 
-			FeMesh_GetElementNodes( self->feMesh, lEl_I, &numNodesAtElement, &incNodes );
+			inc = IArray_New();
+			FeMesh_GetElementNodes( self->feMesh, lEl_I, inc );
+			numNodesAtElement = IArray_GetSize( inc );
+			incNodes = IArray_GetPtr( inc );
 
 			Journal_Printf( stream, "\tLM[(g/l el)%2d/%2d][(enodes)0-%d]", gEl_I, lEl_I, numNodesAtElement);	
 			/* print the nodes and dofs */
@@ -2042,6 +2061,8 @@ void FeEquationNumber_PrintLocationMatrix( void* feFeEquationNumber, Stream* str
 			}	
 
 			Journal_Printf( stream, "\n" );
+
+			NewClass_Delete( inc );
 		}
 
 	}
@@ -2273,9 +2294,12 @@ void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
 	unsigned*		tuples;
 	LinkedDofInfo*		links;
 	unsigned		highest;
+	IArray*		inc;
 	unsigned		e_i, n_i, dof_i, s_i;
 
 	assert( self );
+
+	inc = IArray_New();
 
 	stream = Journal_Register( Info_Type, self->type );
 	Journal_Printf( stream, "FeEquationNumber: '%s'\n", self->name );
@@ -2319,7 +2343,9 @@ void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
 	nLocMatDofs = NULL;
 	locMat = AllocArray( int**, nDomainEls );
 	for( e_i = 0; e_i < nDomainEls; e_i++ ) {
-		FeMesh_GetElementNodes( feMesh, e_i, &nElNodes, &elNodes );
+		FeMesh_GetElementNodes( feMesh, e_i, inc );
+		nElNodes = IArray_GetSize( inc );
+		elNodes = IArray_GetPtr( inc );
 		nLocMatDofs = ReallocArray( nLocMatDofs, int, nElNodes );
 		for( n_i = 0; n_i < nElNodes; n_i++ )
 			nLocMatDofs[n_i] = nNodalDofs[elNodes[n_i]];
@@ -2424,7 +2450,9 @@ void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
 
 	/* Build location matrix. */
 	for( e_i = 0; e_i < nDomainEls; e_i++ ) {
-		FeMesh_GetElementNodes( feMesh, e_i, &nElNodes, &elNodes );
+		FeMesh_GetElementNodes( feMesh, e_i, inc );
+		nElNodes = IArray_GetSize( inc );
+		elNodes = IArray_GetPtr( inc );
 		for( n_i = 0; n_i < nElNodes; n_i++ ) {
 			for( dof_i = 0; dof_i < nNodalDofs[elNodes[n_i]]; dof_i++ )
 				locMat[e_i][n_i][dof_i] = dstArray[elNodes[n_i]][dof_i];
@@ -2459,6 +2487,8 @@ void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
 	Stream_UnIndent( stream );
 	Journal_Printf( stream, "... Completed in %g seconds.\n", endTime - startTime );
 	Stream_UnIndent( stream );
+
+	NewClass_Delete( inc );
 }
 
 #if 0

@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ForceVector.c 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: ForceVector.c 960 2007-09-25 07:54:49Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -192,6 +192,7 @@ void _ForceVector_Init(
 	self->forceTermList = Stg_ObjectList_New();
 
 	self->bcAsm = Assembler_New();
+	self->inc = IArray_New();
 }
 
 
@@ -203,6 +204,8 @@ void _ForceVector_Delete( void* forceVector ) {
 
 	/* Don't delete entry point: E.P register will delete it automatically */
 	Stg_Class_Delete( self->forceTermList );
+
+	NewClass_Delete( self->inc );
 
 	/* Stg_Class_Delete parent*/
 	_SolutionVector_Delete( self );
@@ -380,8 +383,12 @@ void ForceVector_PrintElementForceVector(
 	Node_LocalIndex		node_I;
 	Dof_Index		dof_I;
 	Index			vec_I;
+	IArray*			incArray;
 
-	FeMesh_GetElementNodes( feMesh, element_lI, &nInc, &inc );
+	incArray = IArray_New();
+	FeMesh_GetElementNodes( feMesh, element_lI, incArray );
+	nInc = IArray_GetSize( incArray );
+	inc = IArray_GetPtr( incArray );
 	dofsPerNode = dofLayout->dofCounts[inc[0]];
 	nodesThisEl = nInc;
 
@@ -395,6 +402,8 @@ void ForceVector_PrintElementForceVector(
 					 elForceVecToAdd[vec_I] ); 
 		}			
 	}
+
+	NewClass_Delete( incArray );
 }
 
 
@@ -428,7 +437,9 @@ void ForceVector_GlobalAssembly_General( void* forceVector ) {
 		for( element_lI = 0; element_lI < elementLocalCount; element_lI++ ) {  
 			unsigned	nInc, *inc;
 		
-			FeMesh_GetElementNodes( feVar->feMesh, element_lI, &nInc, &inc );
+			FeMesh_GetElementNodes( feVar->feMesh, element_lI, self->inc );
+			nInc = IArray_GetSize( self->inc );
+			inc = IArray_GetPtr( self->inc );
 			nodeCountCurrElement = nInc;
 			/* Get the local node ids */
 			nodeIdsInCurrElement = inc;

@@ -141,7 +141,9 @@ void RegularTrilinear_ConvertGlobalCoordToElLocal( void* elementType, void* mesh
 
 	assert( self && Stg_CheckType( self, RegularTrilinear ) );
 
-	Mesh_GetIncidence( mesh, MT_VOLUME, element, MT_VERTEX, &nInc, &inc );
+	Mesh_GetIncidence( mesh, MT_VOLUME, element, MT_VERTEX, self->inc );
+	nInc = IArray_GetSize( self->inc );
+	inc = IArray_GetSize( self->inc );
 
 	vert[0] = Mesh_GetVertex( mesh, inc[0] );
 	vert[1] = Mesh_GetVertex( mesh, inc[7] );

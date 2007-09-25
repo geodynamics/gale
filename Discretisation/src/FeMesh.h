@@ -34,7 +34,7 @@
 **
 ** Comments:
 **
-** $Id: FeMesh.h 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: FeMesh.h 960 2007-09-25 07:54:49Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -55,7 +55,8 @@
 							\
 		/* FeMesh info */			\
 		char*			feElFamily;	\
-		ElementType*		feElType;
+		ElementType*		feElType;	\
+		IArray*	inc;
 
 	struct FeMesh { __FeMesh };
 
@@ -105,8 +106,8 @@
 
 	unsigned FeMesh_GetElementNodeSize( void* feMesh, unsigned element );
 	unsigned FeMesh_GetNodeElementSize( void* feMesh, unsigned node );
-	void FeMesh_GetElementNodes( void* feMesh, unsigned element, unsigned* nNodes, unsigned** nodes );
-	void FeMesh_GetNodeElements( void* feMesh, unsigned node, unsigned* nElements, unsigned** elements );
+	void FeMesh_GetElementNodes( void* feMesh, unsigned element, IArray* inc );
+	void FeMesh_GetNodeElements( void* feMesh, unsigned node, IArray* inc );
 
 	unsigned FeMesh_ElementDomainToGlobal( void* feMesh, unsigned domain );
 	Bool FeMesh_ElementGlobalToDomain( void* feMesh, unsigned global, unsigned* domain );

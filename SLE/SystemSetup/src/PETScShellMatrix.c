@@ -286,8 +286,13 @@ void PETScShellMatrix_UpdateAssembly( void* matrix ) {
 	colDofs = colVar->dofLayout;							assert( colDofs );
 
 	assert( FeMesh_GetElementLocalSize( rowMesh ) );
+	/*
+	** Taken out while adding in AMR, need to fix this.
+	**
 	FeMesh_GetElementNodes( rowMesh, 0, &nRowNodes, &rowNodes );
 	FeMesh_GetElementNodes( colMesh, 0, &nColNodes, &colNodes );
+	*/
+	abort();
 
 	nRowDofs = 0;
 	for( n_i = 0; n_i < nRowNodes; n_i++ )

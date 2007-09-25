@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testSolutionVector.c 907 2007-07-09 23:41:37Z PatrickSunter $
+** $Id: testSolutionVector.c 960 2007-09-25 07:54:49Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -169,6 +169,7 @@ TestBegin( All ) {
    SolutionVector* sol;
    int lSize;
    double* array;
+   IArray* incArray;
    int e_i, v_i, d_i, a_i;
 
    feVar = buildFeVar();
@@ -188,9 +189,11 @@ TestBegin( All ) {
    mesh = feVar->feMesh;
    nDims = Mesh_GetDimSize( mesh );
    nEls = Mesh_GetDomainSize( mesh, nDims );
+   incArray = IArray_New();
    for( e_i = 0; e_i < nEls; e_i++ ) {
-      Mesh_GetIncidence( mesh, nDims, e_i, 0, 
-			 (unsigned*)&nVerts, (unsigned**)&verts );
+      Mesh_GetIncidence( mesh, nDims, e_i, 0, incArray );
+      nVerts = IArray_GetSize( incArray );
+      verts = IArray_GetPtr( incArray );
       for( v_i = 0; v_i < nVerts; v_i++ ) {
 	 vert = Mesh_GetVertex( mesh, verts[v_i] );
 	 ret = FieldVariable_InterpolateValueAt( feVar, vert, val );
@@ -207,6 +210,8 @@ TestBegin( All ) {
 	 break;
    }
    TestTrue( e_i == nEls );
+
+   NewClass_Delete( incArray );
 
   done:
    FreeObject( feVar );

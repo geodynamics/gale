@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: UpwindParameter.c 950 2007-08-31 02:09:59Z JulianGiordani $
+** $Id: UpwindParameter.c 960 2007-09-25 07:54:49Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -70,6 +70,7 @@ double AdvDiffResidualForceTerm_UpwindDiffusivity( AdvDiffResidualForceTerm* sel
 	double*                    greatestCoord;
 	Node_LocalIndex            nodeIndex_LeastValues, nodeIndex_GreatestValues;
 	unsigned                   nInc, *inc;
+	IArray*			   incArray;
 
 	/* Change Diffusivity if it is too small */
 	if ( diffusivity < MIN_DIFFUSIVITY ) 
@@ -79,7 +80,10 @@ double AdvDiffResidualForceTerm_UpwindDiffusivity( AdvDiffResidualForceTerm* sel
 	FeVariable_InterpolateFromMeshLocalCoord( velocityField, mesh, lElement_I, xiElementCentre, velocityCentre );
 
 	/* Calculate Length Scales - See Fig 3.4 - ASSUMES BOX MESH TODO - fix */
-	FeMesh_GetElementNodes( mesh, lElement_I, &nInc, &inc );
+	incArray = IArray_New();
+	FeMesh_GetElementNodes( mesh, lElement_I, incArray );
+	nInc = IArray_GetSize( incArray );
+	inc = IArray_GetPtr( incArray );
 	nodeIndex_LeastValues = inc[0];
 	nodeIndex_GreatestValues = (dim == 2) ? inc[3] : inc[7];
 	leastCoord    = Mesh_GetVertex( mesh, nodeIndex_LeastValues );
@@ -99,6 +103,8 @@ double AdvDiffResidualForceTerm_UpwindDiffusivity( AdvDiffResidualForceTerm* sel
 		upwindDiffusivity += xiUpwind * velocityCentre[ dim_I ] * lengthScale;
 	}
 	upwindDiffusivity /= sqrt(15.0);         /* See Eq. 3.3.11 */
+
+	NewClass_Delete( incArray );
 
 	return upwindDiffusivity;
 }

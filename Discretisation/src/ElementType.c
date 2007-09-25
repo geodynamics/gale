@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ElementType.c 859 2007-06-05 06:55:16Z DavidLee $
+** $Id: ElementType.c 960 2007-09-25 07:54:49Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -110,12 +110,15 @@ void _ElementType_Init(
 	self->isConstructed = True;
 	self->nodeCount = nodeCount;
 	self->debug = Stream_RegisterChild( StgFEM_Discretisation_Debug, ElementType_Type );
+	self->inc = IArray_New();
 }
 
 
 void _ElementType_Delete( void* elementType ) {
 	ElementType* self = (ElementType*)elementType;
 	Journal_DPrintf( self->debug, "In %s\n", __func__ );
+
+	NewClass_Delete( self->inc );
 
 	/* Stg_Class_Delete parent*/
 	_Stg_Component_Delete( self );
@@ -225,7 +228,9 @@ void _ElementType_ConvertGlobalCoordToElLocal(
 	evaluatedShapeFuncs = Memory_Alloc_Array( double, nodeCount, "evaluatedShapeFuncs" );
 	GNi = Memory_Alloc_2DArray( double, dim, nodeCount, "localShapeFuncDerivitives" );
 
-	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), element, MT_VERTEX, &nInc, &inc );
+	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), element, MT_VERTEX, self->inc );
+	nInc = IArray_GetSize( self->inc );
+	inc = IArray_GetPtr( self->inc );
 
 	/* Initial guess for element local coordinate is in the centre of the element - ( 0.0, 0.0, 0.0 ) */
 	memset( elLocalCoord, 0, sizeof( Coord ) );
@@ -333,7 +338,9 @@ void ElementType_ShapeFunctionsGlobalDerivs(
 
 	nodesPerEl = self->nodeCount;
 
-	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), elId, MT_VERTEX, &nInc, &inc );
+	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), elId, MT_VERTEX, self->inc );
+	nInc = IArray_GetSize( self->inc );
+	inc = IArray_GetPtr( self->inc );
 	
 	/*
 	If constant shape function gets passed in here, getLocalDeriv will
@@ -464,7 +471,9 @@ void ElementType_Jacobian_AxisIndependent(
 	Node_Index   node_I;
 	unsigned	nInc, *inc;
 
-	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), elId, MT_VERTEX, &nInc, &inc );
+	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), elId, MT_VERTEX, self->inc );
+	nInc = IArray_GetSize( self->inc );
+	inc = IArray_GetPtr( self->inc );
 	
 	/* If GNi isn't passed in - then evaluate them for you */
 	if (_GNi == NULL) {

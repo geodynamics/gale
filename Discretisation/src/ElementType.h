@@ -47,7 +47,7 @@
 **	Is there a better name for this class? IE at least FeElementType.
 **	Perhaps FE_ElementDiscretisation?
 **
-** $Id: ElementType.h 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: ElementType.h 960 2007-09-25 07:54:49Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -84,7 +84,8 @@
 		\
 		/* ElementType info */ \
 		Index								nodeCount; \
-		Stream*								debug;
+		Stream*								debug;	\
+		IArray* inc;
 
 	struct ElementType { __ElementType };
 

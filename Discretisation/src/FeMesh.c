@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeMesh.c 912 2007-07-11 06:50:57Z DavidLee $
+** $Id: FeMesh.c 960 2007-09-25 07:54:49Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -87,6 +87,7 @@ void _FeMesh_Init( FeMesh* self ) {
 
 	self->feElType = NULL;
 	self->feElFamily = NULL;
+	self->inc = IArray_New();
 }
 
 
@@ -98,6 +99,7 @@ void _FeMesh_Delete( void* feMesh ) {
 	FeMesh*	self = (FeMesh*)feMesh;
 
 	FeMesh_Destruct( self );
+	NewClass_Delete( self->inc );
 
 	/* Delete the parent. */
 	_Mesh_Delete( self );
@@ -291,12 +293,12 @@ unsigned FeMesh_GetNodeElementSize( void* feMesh, unsigned node ) {
 	return Mesh_GetIncidenceSize( feMesh, MT_VERTEX, node, Mesh_GetDimSize( feMesh ) );
 }
 
-void FeMesh_GetElementNodes( void* feMesh, unsigned element, unsigned* nNodes, unsigned** nodes ) {
-	Mesh_GetIncidence( feMesh, Mesh_GetDimSize( feMesh ), element, MT_VERTEX, nNodes, nodes );
+void FeMesh_GetElementNodes( void* feMesh, unsigned element, IArray* inc ) {
+	Mesh_GetIncidence( feMesh, Mesh_GetDimSize( feMesh ), element, MT_VERTEX, inc );
 }
 
-void FeMesh_GetNodeElements( void* feMesh, unsigned node, unsigned* nElements, unsigned** elements ) {
-	Mesh_GetIncidence( feMesh, MT_VERTEX, node, Mesh_GetDimSize( feMesh ), nElements, elements );
+void FeMesh_GetNodeElements( void* feMesh, unsigned node, IArray* inc ) {
+	Mesh_GetIncidence( feMesh, MT_VERTEX, node, Mesh_GetDimSize( feMesh ), inc );
 }
 
 unsigned FeMesh_ElementDomainToGlobal( void* feMesh, unsigned domain ) {
@@ -345,7 +347,9 @@ void FeMesh_CoordLocalToGlobal( void* feMesh, unsigned element, double* local, d
 
 	nDims = Mesh_GetDimSize( self );
 	elType = FeMesh_GetElementType( self, element );
-	FeMesh_GetElementNodes( self, element, &nElNodes, &elNodes );
+	FeMesh_GetElementNodes( self, element, self->inc );
+	nElNodes = IArray_GetSize( self->inc );
+	elNodes = IArray_GetPtr( self->inc );
 	basis = AllocArray( double, nElNodes );
 	ElementType_EvaluateShapeFunctionsAt( elType, local, basis );
 

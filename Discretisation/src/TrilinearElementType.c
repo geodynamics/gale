@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: TrilinearElementType.c 832 2007-05-16 01:11:18Z LukeHodkinson $
+** $Id: TrilinearElementType.c 960 2007-09-25 07:54:49Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -311,7 +311,9 @@ void _TrilinearElementType_ConvertGlobalCoordToElLocal(
 	unsigned		nInc, *inc;
 	unsigned		bc_i;
 
-	Mesh_GetIncidence( mesh, MT_VOLUME, element, MT_VERTEX, &nInc, &inc );
+	Mesh_GetIncidence( mesh, MT_VOLUME, element, MT_VERTEX, self->inc );
+	nInc = IArray_GetSize( self->inc );
+	inc = IArray_GetPtr( self->inc );
 	assert( nInc == 8 );
 
 	insist( Simplex_Search3D( mesh->verts, inc, 10, self->tetInds, (double*)globalCoord, bc, &inside ), == True );

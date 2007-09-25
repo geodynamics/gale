@@ -197,8 +197,8 @@ void C0Generator_BuildTopology( C0Generator* self, FeMesh* mesh ) {
 	topo = Mesh_GetTopology( mesh );
 	MeshTopology_SetComm( topo, MeshTopology_GetComm( elTopo ) );
 	MeshTopology_SetNumDims( topo, nDims );
-	MeshTopology_SetDomain( topo, nDims, elSync );
-	MeshTopology_SetDomain( topo, MT_VERTEX, elSync );
+	IGraph_SetDomain( topo, nDims, elSync );
+	IGraph_SetDomain( topo, MT_VERTEX, elSync );
 	topo->shadDepth = elTopo->shadDepth;
 
 	nDomainEls = Mesh_GetDomainSize( elMesh, nDims );
@@ -207,12 +207,12 @@ void C0Generator_BuildTopology( C0Generator* self, FeMesh* mesh ) {
 	for( e_i = 0; e_i < nDomainEls; e_i++ ) {
 		nIncEls[e_i] = 1;
 		incEls[e_i][0] = e_i;
-		MeshTopology_SetIncidence( topo, nDims, e_i, MT_VERTEX, nIncEls[e_i], incEls[e_i] );
+		IGraph_SetIncidence( topo, nDims, e_i, MT_VERTEX, nIncEls[e_i], incEls[e_i] );
 	}
 	FreeArray( nIncEls );
 	FreeArray( incEls );
 
-	MeshTopology_InvertIncidence( topo, MT_VERTEX, nDims );
+	IGraph_InvertIncidence( topo, MT_VERTEX, nDims );
 }
 
 void C0Generator_BuildGeometry( C0Generator* self, FeMesh* mesh ) {

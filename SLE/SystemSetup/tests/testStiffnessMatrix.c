@@ -166,6 +166,7 @@ TestBegin( All ) {
    double val[3];
    InterpolationResult ret;
    StiffnessMatrix* mat;
+   IArray* incArray;
    int e_i, v_i, d_i;
 
    feVar = buildFeVar();
@@ -176,9 +177,11 @@ TestBegin( All ) {
    mesh = feVar->feMesh;
    nDims = Mesh_GetDimSize( mesh );
    nEls = Mesh_GetDomainSize( mesh, nDims );
+   incArray = IArray_New();
    for( e_i = 0; e_i < nEls; e_i++ ) {
-      Mesh_GetIncidence( mesh, nDims, e_i, 0, 
-			 (unsigned*)&nVerts, (unsigned**)&verts );
+      Mesh_GetIncidence( mesh, nDims, e_i, 0, incArray );
+      nVerts = IArray_GetSize( incArray );
+      verts = IArray_GetPtr( incArray );
       for( v_i = 0; v_i < nVerts; v_i++ ) {
 	 vert = Mesh_GetVertex( mesh, verts[v_i] );
 	 ret = FieldVariable_InterpolateValueAt( feVar, vert, val );
@@ -195,6 +198,8 @@ TestBegin( All ) {
 	 break;
    }
    TestTrue( e_i == nEls );
+
+   NewClass_Delete( incArray );
 
   done:
    FreeObject( feVar );

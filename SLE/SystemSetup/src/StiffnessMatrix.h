@@ -49,7 +49,7 @@
 **	very customisable. They both default to empty, in case we have a matrix
 **	that doesn't need element-based information to be assembled.
 **
-** $Id: StiffnessMatrix.h 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: StiffnessMatrix.h 960 2007-09-25 07:54:49Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -107,7 +107,10 @@
 		double**					elStiffMat;			\
 		double*						bcVals;				\
 		unsigned					nRowDofs;			\
-		unsigned					nColDofs;
+		unsigned					nColDofs;			\
+									\
+		IArray* rowInc;	\
+		IArray* colInc;
 		
 	struct StiffnessMatrix { __StiffnessMatrix };
 	

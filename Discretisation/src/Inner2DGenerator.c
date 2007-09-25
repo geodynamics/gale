@@ -201,7 +201,7 @@ void Inner2DGenerator_BuildTopology( Inner2DGenerator* self, FeMesh* mesh ) {
 	topo = Mesh_GetTopology( mesh );
 	MeshTopology_SetComm( topo, MeshTopology_GetComm( elTopo ) );
 	MeshTopology_SetNumDims( topo, nDims );
-	MeshTopology_SetDomain( topo, nDims, elSync );
+	IGraph_SetDomain( topo, nDims, elSync );
 
 	/* Need to redefine the nodes, nDims + 1 per parent element. */
 	elDecomp = (Decomp*)Sync_GetDecomp( elSync );
@@ -259,7 +259,7 @@ void Inner2DGenerator_BuildTopology( Inner2DGenerator* self, FeMesh* mesh ) {
 	Sync_SetRemotes( nodeSync, nRemotes, remotes );
 	MemFree( remotes );
 
-	MeshTopology_SetDomain( topo, 0, nodeSync );
+	IGraph_SetDomain( topo, 0, nodeSync );
 
 	/* Same shadow depth. */
 	topo->shadDepth = elTopo->shadDepth;
@@ -273,7 +273,7 @@ void Inner2DGenerator_BuildTopology( Inner2DGenerator* self, FeMesh* mesh ) {
 			incEls[0] = e_i * 3;
 			incEls[1] = e_i * 3 + 1;
 			incEls[2] = e_i * 3 + 2;
-			MeshTopology_SetIncidence( topo, nDims, e_i, 0, nIncEls, (int*)incEls );
+			IGraph_SetIncidence( topo, nDims, e_i, 0, nIncEls, (int*)incEls );
 		}
 	}
 	else if( nDims == 3 ) {
@@ -284,12 +284,12 @@ void Inner2DGenerator_BuildTopology( Inner2DGenerator* self, FeMesh* mesh ) {
 			incEls[1] = e_i * 4 + 1;
 			incEls[2] = e_i * 4 + 2;
 			incEls[3] = e_i * 4 + 3;
-			MeshTopology_SetIncidence( topo, nDims, e_i, 0, nIncEls, (int*)incEls );
+			IGraph_SetIncidence( topo, nDims, e_i, 0, nIncEls, (int*)incEls );
 		}
 	}
 	FreeArray( incEls );
 
-	MeshTopology_InvertIncidence( topo, MT_VERTEX, nDims );
+	IGraph_InvertIncidence( topo, MT_VERTEX, nDims );
 }
 
 void Inner2DGenerator_BuildGeometry( Inner2DGenerator* self, FeMesh* mesh ) {

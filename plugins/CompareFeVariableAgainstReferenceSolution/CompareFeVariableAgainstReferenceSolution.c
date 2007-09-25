@@ -275,20 +275,21 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 
 	/* Create a DataVariable for the Reference. This serves as the memory object is is linked to */
 	/* Likewise, for the rounded-off version of the "live" FeVar we are testing */
+	assert( Class_IsSuper( feVarToTest->feMesh->topo, IGraph ) );
 	tmpName = Stg_Object_AppendSuffix( feVarToTest, "Reference-DataVariable" );
 	tmpName2 = Stg_Object_AppendSuffix( feVarToTest, "Rounded-DataVariable" );
 	if ( scalar == 1 ) {
 		referenceDataVariable = Variable_NewScalar(
 			tmpName,
 			Variable_DataType_Double,
-			&feVarToTest->feMesh->topo->remotes[MT_VERTEX]->nDomains, 
+			&((IGraph*)feVarToTest->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 
 			NULL,
 			(void**)NULL,
 			variable_Register );
 		roundedDataVariable = Variable_NewScalar(
 			tmpName2,
 			Variable_DataType_Double,
-			&feVarToTest->feMesh->topo->remotes[MT_VERTEX]->nDomains, 
+			&((IGraph*)feVarToTest->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 
 			NULL,
 			(void**)NULL,
 			variable_Register );
@@ -316,7 +317,7 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 				tmpName,
 				Variable_DataType_Double,
 				componentsCount,
-				&feVarToTest->feMesh->topo->remotes[MT_VERTEX]->nDomains, 
+				&((IGraph*)feVarToTest->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 
 				NULL,
 				(void**)NULL,
 				variable_Register,
@@ -333,7 +334,7 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 				tmpName2,
 				Variable_DataType_Double,
 				componentsCount,
-				&feVarToTest->feMesh->topo->remotes[MT_VERTEX]->nDomains, 
+				&((IGraph*)feVarToTest->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 
 				NULL,
 				(void**)NULL,
 				variable_Register,

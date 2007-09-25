@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testFeVariable.c 907 2007-07-09 23:41:37Z PatrickSunter $
+** $Id: testFeVariable.c 960 2007-09-25 07:54:49Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -159,6 +159,7 @@ TestBegin( Interp ) {
    double* vert;
    double val[3];
    InterpolationResult ret;
+   IArray* inc;
    int e_i, v_i, d_i;
 
    feVar = buildFeVar();
@@ -168,9 +169,12 @@ TestBegin( Interp ) {
    mesh = feVar->feMesh;
    nDims = Mesh_GetDimSize( mesh );
    nEls = Mesh_GetDomainSize( mesh, nDims );
+   inc = IArray_New();
    for( e_i = 0; e_i < nEls; e_i++ ) {
-      Mesh_GetIncidence( mesh, nDims, e_i, 0, 
-			 (unsigned*)&nVerts, (unsigned**)&verts );
+      Mesh_GetIncidence( mesh, nDims, e_i, 0, inc );
+      nVerts = IArray_GetSize( inc );
+      verts = IArray_GetPtr( inc );
+
       for( v_i = 0; v_i < nVerts; v_i++ ) {
 	 vert = Mesh_GetVertex( mesh, verts[v_i] );
 	 ret = FieldVariable_InterpolateValueAt( feVar, vert, val );
@@ -187,6 +191,8 @@ TestBegin( Interp ) {
 	 break;
    }
    TestTrue( e_i == nEls );
+
+   NewClass_Delete( inc );
 
   done:
    FreeObject( feVar );
@@ -202,6 +208,7 @@ TestBegin( Save ) {
    double val[3];
    InterpolationResult ret;
    double zero[3] = {0.0, 0.0, 0.0};
+   IArray* inc;
    int e_i, v_i, d_i;
 
    feVar = buildFeVar();
@@ -217,9 +224,11 @@ TestBegin( Save ) {
    mesh = feVar->feMesh;
    nDims = Mesh_GetDimSize( mesh );
    nEls = Mesh_GetDomainSize( mesh, nDims );
+   inc = IArray_New();
    for( e_i = 0; e_i < nEls; e_i++ ) {
-      Mesh_GetIncidence( mesh, nDims, e_i, 0, 
-			 (unsigned*)&nVerts, (unsigned**)&verts );
+      Mesh_GetIncidence( mesh, nDims, e_i, 0, inc );
+      nVerts = IArray_GetSize( inc );
+      verts = IArray_GetPtr( inc );
       for( v_i = 0; v_i < nVerts; v_i++ ) {
 	 vert = Mesh_GetVertex( mesh, verts[v_i] );
 	 ret = FieldVariable_InterpolateValueAt( feVar, vert, val );
@@ -236,6 +245,8 @@ TestBegin( Save ) {
 	 break;
    }
    TestTrue( e_i == nEls );
+
+   NewClass_Delete( inc );
 
   done:
    FreeObject( feVar );

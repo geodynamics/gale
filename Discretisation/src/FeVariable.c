@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeVariable.c 950 2007-08-31 02:09:59Z JulianGiordani $
+** $Id: FeVariable.c 960 2007-09-25 07:54:49Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -128,6 +128,7 @@ FeVariable* FeVariable_New(
 		Bool                                            loadReferenceEachTimestep,
 		FieldVariable_Register*                         fV_Register )		
 {
+	assert( Class_IsSuper( ((FeMesh*)feMesh)->topo, IGraph ) );
 	return FeVariable_New_Full(
 		name,
 		feMesh,
@@ -146,7 +147,7 @@ FeVariable* FeVariable_New(
 		customOutputPath,
 		isReferenceSolution,
 		loadReferenceEachTimestep,
-		((FeMesh*)feMesh)->topo->remotes[MT_VERTEX]->comm->mpiComm, 
+		((IGraph*)((FeMesh*)feMesh)->topo)->remotes[MT_VERTEX]->comm->mpiComm, 
 		fV_Register );
 }
 
@@ -413,6 +414,8 @@ void _FeVariable_Init(
 	self->loadReferenceEachTimestep = loadReferenceEachTimestep;
 	Journal_Firewall( (self->loadReferenceEachTimestep != True), errorStream,
 		 "The loadReferenceEachTimestep feature isn't implemented yet, sorry.\n" );
+
+	self->inc = IArray_New();
 }
 
 
@@ -433,6 +436,8 @@ void _FeVariable_Delete( void* variable ) {
 		Memory_Free( self->customOutputPath );
 	}
 	/* feMesh bc and doflayout are purposely not deleted */
+
+	NewClass_Delete( self->inc );
 
 	/* Stg_Class_Delete parent*/
 	_Stg_Component_Delete( self );
@@ -1243,7 +1248,9 @@ void FeVariable_InterpolateDerivatives_WithGNx( void* _feVariable, Element_Local
 	/* Initialise */
 	memset( value, 0, sizeof( double ) * dofCount * dim );
 
-	FeMesh_GetElementNodes( self->feMesh, lElement_I, &nInc, &inc );
+	FeMesh_GetElementNodes( self->feMesh, lElement_I, self->inc );
+	nInc = IArray_GetSize( self->inc );
+	inc = IArray_GetPtr( self->inc );
 
 	for ( dof_I = 0 ; dof_I < dofCount ; dof_I++ ) {
 		/* Interpolate derivative from nodes */
@@ -1563,7 +1570,9 @@ void _FeVariable_InterpolateNodeValuesToElLocalCoord( void* feVariable, Element_
 	double			dofValueAtCurrNode=0;
 	unsigned		nInc, *inc;
 
-	FeMesh_GetElementNodes( self->feMesh, element_lI, &nInc, &inc );
+	FeMesh_GetElementNodes( self->feMesh, element_lI, self->inc );
+	nInc = IArray_GetSize( self->inc );
+	inc = IArray_GetPtr( self->inc );
 
 	/* Gets number of degrees of freedom - assuming it is the same throughout the mesh */
 	dofCountThisNode = self->dofLayout->dofCounts[lNode_I];

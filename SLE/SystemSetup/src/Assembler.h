@@ -80,7 +80,10 @@
 		unsigned		colElNodeInd;	\
 		unsigned		colNodeInd;	\
 		unsigned		colDofInd;	\
-		unsigned		colEq;
+		unsigned		colEq;		\
+							\
+		IArray*			rowInc;		\
+		IArray*			colInc;
 
 	struct Assembler { __Assembler };
 

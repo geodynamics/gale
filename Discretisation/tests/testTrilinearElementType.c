@@ -87,6 +87,7 @@ TestBegin( Shape ) {
    const int *verts;
    double* vert;
    double lCrd[3], basis[8];
+   IArray* inc;
    int e_i, v_i, v_j;
 
    mesh = buildMesh();
@@ -94,9 +95,11 @@ TestBegin( Shape ) {
 
    nDims = Mesh_GetDimSize( mesh );
    nEls = Mesh_GetDomainSize( mesh, nDims );
+   inc = IArray_New();
    for( e_i = 0; e_i < nEls; e_i++ ) {
-      Mesh_GetIncidence( mesh, nDims, e_i, 0, 
-			 (unsigned*)&nVerts, (unsigned**)&verts );
+      Mesh_GetIncidence( mesh, nDims, e_i, 0, inc );
+      nVerts = IArray_GetSize( inc );
+      verts = IArray_GetPtr( inc );
       for( v_i = 0; v_i < nVerts; v_i++ ) {
 	 vert = Mesh_GetVertex( mesh, verts[v_i] );
 	 FeMesh_CoordGlobalToLocal( mesh, e_i, vert, lCrd );
@@ -115,6 +118,8 @@ TestBegin( Shape ) {
 	 break;
    }
    TestTrue( e_i == nEls );
+
+   NewClass_Delete( inc );
 
   done:
    FreeObject( mesh );

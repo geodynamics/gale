@@ -45,7 +45,7 @@
 **
 ** Comments:
 **
-** $Id: ForceVector.h 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: ForceVector.h 960 2007-09-25 07:54:49Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -71,7 +71,8 @@
 		Name                                      _assembleForceVectorEPName; \
 		Stg_ObjectList*                           forceTermList;                             \
 		Stg_Component*                            applicationDepExtraInfo; /**< Default is NULL: passed to elForceVec during assembly */\
-		Assembler*				bcAsm;
+		Assembler*				bcAsm;	\
+		IArray*					inc
 	
 	struct ForceVector { __ForceVector };
 	

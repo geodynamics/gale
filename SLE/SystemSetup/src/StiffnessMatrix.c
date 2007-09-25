@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StiffnessMatrix.c 925 2007-07-26 02:34:49Z LukeHodkinson $
+** $Id: StiffnessMatrix.c 960 2007-09-25 07:54:49Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -272,6 +272,9 @@ void _StiffnessMatrix_Init(
 	self->nRowDofs = 0;
 	self->nColDofs = 0;
 	self->transRHS = NULL;
+
+	self->rowInc = IArray_New();
+	self->colInc = IArray_New();
 }
 
 
@@ -288,6 +291,9 @@ void _StiffnessMatrix_Delete( void* stiffnessMatrix ) {
 	FreeObject( self->transBCAsm );
 	FreeObject( self->diagBCsAsm );
 	/* Don't delete entry points: E.P. register will delete them automatically */
+
+	NewClass_Delete( self->rowInc );
+	NewClass_Delete( self->colInc );
 
 	/* Stg_Class_Delete parent*/
 	_Stg_Component_Delete( self );
@@ -679,7 +685,9 @@ void _StiffnessMatrix_CalcAndUpdateNonZeroEntriesAtRowNode(
 	Journal_DPrintfL( self->debug, 3, "In %s - for row local node %d\n", __func__, rowNode_lI );
 	Stream_Indent( self->debug );
 
-	FeMesh_GetNodeElements( rFeMesh, rowNode_lI, &nNodeInc, &nodeInc );
+	FeMesh_GetNodeElements( rFeMesh, rowNode_lI, self->rowInc );
+	nNodeInc = IArray_GetSize( self->rowInc );
+	nodeInc = IArray_GetPtr( self->rowInc );
 	for ( rowNodeElement_I = 0; rowNodeElement_I < nNodeInc; rowNodeElement_I++ ) {
 		unsigned	nElInc;
 
@@ -783,7 +791,9 @@ void _StiffnessMatrix_CalculatedListOfUniqueRelatedColNodes(
 	Node_Index		uniqueRelatedColNode_I = 0;
 	unsigned		nNodeInc, *nodeInc;
 
-	FeMesh_GetNodeElements( rFeMesh, rowNode_lI, &nNodeInc, &nodeInc );
+	FeMesh_GetNodeElements( rFeMesh, rowNode_lI, self->rowInc );
+	nNodeInc = IArray_GetSize( self->rowInc );
+	nodeInc = IArray_GetPtr( self->rowInc );
 	Journal_DPrintfL( self->debug, 3, "Searching the %d elements this node belongs to for unique related col nodes:\n",
 			  nNodeInc );
 	
@@ -798,7 +808,9 @@ void _StiffnessMatrix_CalculatedListOfUniqueRelatedColNodes(
 		Journal_DPrintfL( self->debug, 3, "domain element %d\n", element_dI );
 		
 		Stream_Indent( self->debug );
-		FeMesh_GetElementNodes( cFeMesh, element_dI, &nElInc, &elInc );
+		FeMesh_GetElementNodes( cFeMesh, element_dI, self->colInc );
+		nElInc = IArray_GetSize( self->colInc );
+		elInc = IArray_GetPtr( self->colInc );
 		Journal_DPrintfL( self->debug, 3, "Searching the %d column var nodes in this el:\n", nElInc );
 		for ( colElLocalNode_I =0; colElLocalNode_I < nElInc; colElLocalNode_I++ ) {
 			colNode_dI = elInc[colElLocalNode_I];
@@ -947,7 +959,9 @@ void StiffnessMatrix_GlobalAssembly_General( void* stiffnessMatrix, Bool bcRemov
 
 			/* Get the local node ids */
 			FeMesh_GetElementNodes( feVars[feVar_I]->feMesh, element_lI, 
-						&nodeCountThisEl, &nodeIdsThisEl );
+						self->rowInc );
+			nodeCountThisEl = IArray_GetSize( self->rowInc );
+			nodeIdsThisEl = IArray_GetPtr( self->rowInc );
 
 			/* Set value of elementLM: will automatically use large one if built */
 			elementLM[feVar_I] = FeEquationNumber_BuildOneElementLocationMatrix( feEqNum, element_lI );
@@ -1016,7 +1030,9 @@ void StiffnessMatrix_GlobalAssembly_General( void* stiffnessMatrix, Bool bcRemov
 				unsigned	nNodeInc, *nodeInc;
 
 				FeMesh_GetElementNodes( feVars[feVar_I]->feMesh, element_lI, 
-							&nNodeInc, &nodeInc );
+							self->rowInc );
+				nNodeInc = IArray_GetSize( self->rowInc );
+				nodeInc = IArray_GetPtr( self->rowInc );
 				_StiffnessMatrix_UpdateBC_CorrectionTables(
 					self,
 					feVars[feVar_I]->eqNum, 
@@ -1269,8 +1285,12 @@ void StiffnessMatrix_NewAssemble( void* stiffnessMatrix, Bool removeBCs, void* _
 
 	/* Begin assembling each element. */
 	for( e_i = 0; e_i < nRowEls; e_i++ ) {
-		FeMesh_GetElementNodes( rowMesh, e_i, &nRowNodes, &rowNodes );
-		FeMesh_GetElementNodes( colMesh, e_i, &nColNodes, &colNodes );
+		FeMesh_GetElementNodes( rowMesh, e_i, self->rowInc );
+		nRowNodes = IArray_GetSize( self->rowInc );
+		rowNodes = IArray_GetPtr( self->rowInc );
+		FeMesh_GetElementNodes( colMesh, e_i, self->colInc );
+		nColNodes = IArray_GetSize( self->colInc );
+		colNodes = IArray_GetPtr( self->colInc );
 
 		/* Do we need more space to assemble this element? */
 		nRowDofs = 0;
@@ -1387,8 +1407,12 @@ void StiffnessMatrix_ShellAssembly( void* stiffnessMatrix, Bool removeBCs, void*
 	maxDofs = 0;
 
 	for( e_i = 0; e_i < nRowEls; e_i++ ) {
-		FeMesh_GetElementNodes( rowMesh, e_i, &nRowNodes, &rowNodes );
-		FeMesh_GetElementNodes( colMesh, e_i, &nColNodes, &colNodes );
+		FeMesh_GetElementNodes( rowMesh, e_i, self->rowInc );
+		nRowNodes = IArray_GetSize( self->rowInc );
+		rowNodes = IArray_GetPtr( self->rowInc );
+		FeMesh_GetElementNodes( colMesh, e_i, self->colInc );
+		nColNodes = IArray_GetSize( self->colInc );
+		colNodes = IArray_GetPtr( self->colInc );
 
 		/* If none of the column equations on this element have BCs then skip it. */
 		for( n_i = 0; n_i < nRowNodes; n_i++ ) {
@@ -1585,8 +1609,12 @@ void _StiffnessMatrix_CorrectForceVectorWithOneElementsBoundaryConditions(
 		colEqNum = self->columnVariable->eqNum;
 		rowDofs = rowEqNum->dofLayout;
 		colDofs = colEqNum->dofLayout;
-		Mesh_GetIncidence( rowMesh, Mesh_GetDimSize( rowMesh ), elementInd, MT_VERTEX, &nRowElNodes, &rowElNodes );
-		Mesh_GetIncidence( colMesh, Mesh_GetDimSize( colMesh ), elementInd, MT_VERTEX, &nColElNodes, &colElNodes );
+		Mesh_GetIncidence( rowMesh, Mesh_GetDimSize( rowMesh ), elementInd, MT_VERTEX, self->rowInc );
+		nRowElNodes = IArray_GetSize( self->rowInc );
+		rowElNodes = IArray_GetPtr( self->rowInc );
+		Mesh_GetIncidence( colMesh, Mesh_GetDimSize( colMesh ), elementInd, MT_VERTEX, self->colInc );
+		nColElNodes = IArray_GetSize( self->colInc );
+		colElNodes = IArray_GetPtr( self->colInc );
 		nRowDofs = rowDofs->dofCounts[0];
 		nColDofs = colDofs->dofCounts[0];
 
@@ -1627,8 +1655,12 @@ void _StiffnessMatrix_CorrectForceVectorWithOneElementsBoundaryConditions(
 		colEqNum = self->columnVariable->eqNum;
 		rowDofs = rowEqNum->dofLayout;
 		colDofs = colEqNum->dofLayout;
-		Mesh_GetIncidence( rowMesh, Mesh_GetDimSize( rowMesh ), elementInd, MT_VERTEX, &nRowElNodes, &rowElNodes );
-		Mesh_GetIncidence( colMesh, Mesh_GetDimSize( colMesh ), elementInd, MT_VERTEX, &nColElNodes, &colElNodes );
+		Mesh_GetIncidence( rowMesh, Mesh_GetDimSize( rowMesh ), elementInd, MT_VERTEX, self->rowInc );
+		nRowElNodes = IArray_GetSize( self->rowInc );
+		rowElNodes = IArray_GetPtr( self->rowInc );
+		Mesh_GetIncidence( colMesh, Mesh_GetDimSize( colMesh ), elementInd, MT_VERTEX, self->colInc );
+		nColElNodes = IArray_GetSize( self->colInc );
+		colElNodes = IArray_GetPtr( self->colInc );
 		nRowDofs = rowDofs->dofCounts[0];
 		nColDofs = colDofs->dofCounts[0];
 
@@ -1732,8 +1764,12 @@ void _StiffnessMatrix_PrintElementStiffnessMatrix(
 	unsigned		nRowElInc, *rowElInc;
 	unsigned		nColElInc, *colElInc;
 
-	FeMesh_GetElementNodes( rFeMesh, element_lI, &nRowElInc, &rowElInc );
-	FeMesh_GetElementNodes( cFeMesh, element_lI, &nColElInc, &colElInc );
+	FeMesh_GetElementNodes( rFeMesh, element_lI, self->rowInc );
+	nRowElInc = IArray_GetSize( self->rowInc );
+	rowElInc = IArray_GetPtr( self->rowInc );
+	FeMesh_GetElementNodes( cFeMesh, element_lI, self->colInc );
+	nColElInc = IArray_GetSize( self->colInc );
+	colElInc = IArray_GetPtr( self->colInc );
 
 	rowDofsPerNode = self->rowVariable->dofLayout->dofCounts[rowElInc[0]];
 	colDofsPerNode = self->columnVariable->dofLayout->dofCounts[colElInc[0]];
@@ -1840,6 +1876,7 @@ void StiffnessMatrix_RefreshMatrix( StiffnessMatrix* self ) {
 }
 
 
+#if 0
 void StiffnessMatrix_CalcNonZeros( void* stiffnessMatrix ) {
 	StiffnessMatrix*	self = (StiffnessMatrix*)stiffnessMatrix;
 	Stream*			stream;
@@ -1995,6 +2032,8 @@ void StiffnessMatrix_TrackUniqueEqs( StiffnessMatrix* self, unsigned rowEq, unsi
 	nNonZeros[rowEq]++;
 	nonZeros[rowEq][nNonZeros[rowEq] - 1] = colEq;
 }
+#endif
+
 
 Bool StiffnessMatrix_ZeroBCsAsm_RowR( void* stiffMat, Assembler* assm ) {
 	memset( ((StiffnessMatrix*)stiffMat)->elStiffMat[assm->rowInd], 0, 

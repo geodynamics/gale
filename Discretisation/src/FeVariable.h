@@ -131,7 +131,9 @@
 		Bool                                              isReferenceSolution; \
 		/* if self->isReferenceSolution is true, this param determines if it's loaded once at the start, or every
 		 * timestep. */ \
-		Bool                                              loadReferenceEachTimestep; 
+		Bool                                              loadReferenceEachTimestep; \
+									\
+		IArray* inc;
 
 
 	/* Brings together and manages the life cycle of all the components required by the
