@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: MaterialFeVariable.c 489 2007-06-29 06:59:36Z PatrickSunter $
+** $Id: MaterialFeVariable.c 513 2007-09-25 07:55:04Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -201,10 +201,11 @@ void _MaterialFeVariable_Build( void* materialFeVariable, void* data ) {
 		variable_Register = swarm->swarmVariable_Register->variable_Register;
 
 	tmpName = Stg_Object_AppendSuffix( self, "DataVariable" );
+	assert( Class_IsSuper( self->feMesh->topo, IGraph ) );
 	self->dataVariable = Variable_NewScalar( 
 			tmpName,
 			Variable_DataType_Double, 
-			&self->feMesh->topo->remotes[MT_VERTEX]->nDomains, 
+			&((IGraph*)self->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 
 			NULL,
 			(void**)&self->data, 
 			variable_Register );
@@ -212,7 +213,8 @@ void _MaterialFeVariable_Build( void* materialFeVariable, void* data ) {
 	self->fieldComponentCount = 1;
 	
 	tmpName = Stg_Object_AppendSuffix( self, "DofLayout" );
-	self->dofLayout = DofLayout_New( tmpName, variable_Register, self->feMesh->topo->remotes[MT_VERTEX]->nDomains, NULL );
+	self->dofLayout = DofLayout_New( tmpName, variable_Register, 
+					 ((IGraph*)self->feMesh->topo)->remotes[MT_VERTEX]->nDomains, NULL );
 	DofLayout_AddAllFromVariableArray( self->dofLayout, 1, &self->dataVariable );
 	Memory_Free( tmpName );
 	self->eqNum->dofLayout = self->dofLayout;
