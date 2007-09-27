@@ -17,7 +17,7 @@
 	<param name="journal-level.info.Stg_ComponentFactory">0</param>
 	<param name="journal.info.Stg_ComponentFactory">False</param>
 
-	<include>testParticleCoords.xml</include>
+	<!--include>testParticleCoords.xml</include-->
 
 	<struct name="components" mergeType="merge">
 		<struct name="particleLayout">
@@ -27,7 +27,7 @@
 		</struct>
 	</struct>
 	<param name="dim">2</param>
-	<param name="maxTimeSteps">500</param> 
+	<param name="maxTimeSteps">200</param> 
 	<param name="dumpEvery">10</param> 
 	<param name="minX">0.0</param> 
 	<param name="minY">0.0</param> 
@@ -39,7 +39,6 @@
 	<param name="elementResJ">10</param>
 	<param name="elementResK">10</param>
 
-<!--	
 	<list name="plugins" mergeType="merge">
 		<param>lucPlugin</param>
 	</list>
@@ -77,18 +76,80 @@
 			<param name="arrowHeadSize">0.1</param>
 			<param name="length">10</param>
 		</struct>	
-		<struct name="meshView">
+		<struct name="elementCellLayout"> 
+			<param name="Type">ElementCellLayout</param>
+			<param name="Mesh">linearMesh</param>
+		</struct>
+
+		<struct name="pMovementHandler"> 
+			<param name="Type">ParticleMovementHandler</param>
+		</struct>
+		
+		<struct name="pShadowSync"> 
+			<param name="Type">ParticleShadowSync</param>
+		</struct>
+		
+		<struct name="swarm">
+			<param name="Type">Swarm</param>
+			<param name="CellLayout">elementCellLayout</param>
+			<param name="ParticleLayout">particleLayout</param>
+			<list name="ParticleCommHandlers">
+				<param>pMovementHandler</param>
+				<param>pShadowSync</param>
+			</list>			
+		</struct>
+		<struct name="linearMesh">
+			<param name="Type">Mesh</param>
+			<param name="ElementSize">8</param>
+			<param name="NodeSize">0</param>
+		</struct>
+		<struct name="linearMeshGenerator" mergeType="merge">
+			<param name="Type">CartesianGenerator</param>
+			<param name="mesh">linearMesh</param>
+			<param name="dims">dim</param>
+			<list name="enabledDims">
+				<param>0</param>
+				<param>1</param>
+				<param>2</param>
+			</list>
+			<list name="enabledIncidence" mergeType="merge">
+				<param>0</param><param>0</param>
+				<param>0</param><param>1</param>
+				<param>0</param><param>2</param>
+				<param>1</param><param>0</param>
+				<param>1</param><param>2</param>
+				<param>2</param><param>0</param>
+				<param>2</param><param>1</param>
+			</list>
+			<list name="size">
+				<param>elementResI</param>
+				<param>elementResJ</param>
+				<param>elementResK</param>
+			</list>
+			<list name="minCoord">
+				<param> minX </param>
+				<param> minY </param>
+				<param> minZ </param>
+			</list>
+			<list name="maxCoord">
+				<param> maxX </param>
+				<param> maxY </param>
+				<param> maxZ </param>
+			</list>
+		</struct>
+		<struct name="linearMeshView">
 			<param name="Type">lucMeshViewer</param>
-			<param name="Mesh">mesh-linear</param>
+			<param name="Mesh">linearMesh</param>
 			<param name="colour">blue</param>	
-		</struct>	
+		</struct>
+
 		<struct name="particlesViewport">
 			<param name="Type">lucViewport</param>
 			<param name="Camera">camera</param>
 			<list name="DrawingObject">
 				<param>particles</param>
 				<param>particleDirs</param>
-				<param>meshView</param>
+				<param>linearMeshView</param>
 			</list>
 		</struct>
 		<struct name="renderingEngine">
@@ -114,7 +175,6 @@
 		</struct>	
 	</struct>
 	
-	<param name="interactive">true</param>
--->	
+	<param name="interactive"> true </param>
 
 </StGermainData>
