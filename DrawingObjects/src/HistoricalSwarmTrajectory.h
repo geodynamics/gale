@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: HistoricalSwarmTrajectory.h 717 2007-07-20 06:09:06Z LukeHodkinson $
+** $Id: HistoricalSwarmTrajectory.h 735 2007-09-27 07:11:00Z BelindaMay $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -50,10 +50,8 @@
 	/** Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 	extern const Type lucHistoricalSwarmTrajectory_Type;
 
-	#define HISTORY_STEPS 500
-
 	typedef struct {
-		Coord  historyCoordList[ HISTORY_STEPS ];
+		Coord*  historyCoordList;		
 	} lucHistoricalSwarmTrajectory_ParticleExt;
 		
 	/** Class contents - this is defined as a macro so that sub-classes of this class can use this macro at the start of the definition of their struct */
@@ -69,8 +67,11 @@
 		lucColour                                          colour;                 \
 		/* Other Stuff */ \
 		float                                              lineWidth;              \
-		double                                             timeAtStep[ HISTORY_STEPS ]; \
-		Index                                              startTimestepIndex;
+		double*                                            timeAtStep; 		   \
+		Index                                              startTimestepIndex;     \
+		unsigned int					   historySteps;	   \
+		double	 					   historyTime;            \
+		unsigned int					   useHistoryTime;	   
 
 	struct lucHistoricalSwarmTrajectory { __lucHistoricalSwarmTrajectory };
 	
