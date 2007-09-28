@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeVariable.c 961 2007-09-28 01:29:33Z DavidLee $
+** $Id: FeVariable.c 962 2007-09-28 03:18:41Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -386,14 +386,18 @@ void _FeVariable_Init(
 
 	if ( templateFeVariable )
 		self->templateFeVariable = Stg_CheckType( templateFeVariable, FeVariable );
-	if ( self->templateFeVariable ) {
-		self->eqNum = self->templateFeVariable->eqNum;
+	if( !self->isReferenceSolution ) {
+		if ( self->templateFeVariable ) {
+			self->eqNum = self->templateFeVariable->eqNum;
+		}
+		else {
+			self->eqNum = FeEquationNumber_New( defaultFeVariableFeEquationNumberName, self->feMesh,
+				self->dofLayout, self->bcs, linkedDofInfo );
+			self->eqNum->removeBCs = self->removeBCs;
+		}
 	}
-	else {
-		self->eqNum = FeEquationNumber_New( defaultFeVariableFeEquationNumberName, self->feMesh,
-			self->dofLayout, self->bcs, linkedDofInfo );
-		self->eqNum->removeBCs = self->removeBCs;
-	}
+	else
+		self->eqNum = NULL;
 
 	/* NOte: at Construct time, we'll just take the _name_ of the filter the user wants to use. Since the actual
 	 * filters may be loaded in plugins which get loaded AFTER this construct currently, we'll only check they
@@ -524,12 +528,16 @@ void* _FeVariable_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, P
 				deep, nameExt, map );
 		}
 
-		if ( self->templateFeVariable ) {
-			newFeVariable->eqNum = self->eqNum;
+		if( !self->isReferenceSolution ) {
+			if ( self->templateFeVariable ) {
+				newFeVariable->eqNum = self->eqNum;
+			}
+			else {
+				newFeVariable->eqNum = (FeEquationNumber*)Stg_Class_Copy( self->eqNum, NULL, deep, nameExt, map );
+			}
 		}
-		else {
-			newFeVariable->eqNum = (FeEquationNumber*)Stg_Class_Copy( self->eqNum, NULL, deep, nameExt, map );
-		}
+		else
+			newFeVariable->eqNum = NULL;
 	}
 	else {
 		newFeVariable->debug = self->debug;
@@ -690,8 +698,10 @@ void _FeVariable_Initialise( void* variable, void* data ) {
 	if ( self->linkedDofInfo ) {
 		Stg_Component_Initialise( self->linkedDofInfo, data, False );
 	}
-	
-	FeEquationNumber_Initialise( self->eqNum );
+
+	if( !self->isReferenceSolution ) {	
+		FeEquationNumber_Initialise( self->eqNum );
+	}
 
 	if ( context ) {
 		/* Get the input path string once here - single point of control */
