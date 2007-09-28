@@ -7,26 +7,27 @@
 	<list name="plugins" mergeType="merge">
 		<!-- Output Plugins -->
 		<param>StgFEM_FrequentOutput</param>	
+		<param>Underworld_Nusselt</param>	
 		<param>Underworld_Vrms</param>	
 		<param>StgFEM_CPUTime</param>	
-		<param>Underworld_Velic_solA</param>
+		<param>Underworld_Velic_solB</param>
 	</list>
 	
 	<!-- Test tolerances -->
-	<param name="VelocityField-Tolerance"> 6.7e-06 </param>
-	<param name="PressureField-Tolerance"> 6.0e-05 </param>
-	
+	<param name="VelocityField-Tolerance"> 2.7e-06 </param>
+	<param name="PressureField-Tolerance"> 2.5e-05 </param>
+
 	<!-- Velic_SolB parameters -->
-	<param name="solA_sigma"> 1.0 </param>
-	<param name="solA_Z"> 1.0 </param>
+	<param name="solB_sigma"> 1.0 </param>
+	<param name="solB_Z"> 1.0 </param>
 	<!-- IC parameter -->
-	<param name="wavenumberY"> 1 </param>
+	<param name="wavenumberY"> 2 </param>
 	<param name="wavenumberX"> 1 </param>
 	
 	<struct name="components" mergeType="merge">
 		<struct name="Viscosity">
 			<param name="Type">MaterialViscosity</param>
-			<param name="eta0">solA_Z</param>
+			<param name="eta0">solB_Z</param>
 		</struct>
 		<struct name="Shape">
 			<param name="Type">Everywhere</param>
@@ -34,14 +35,14 @@
 		<struct name="Fluid">
 			<param name="Type">RheologyMaterial</param>
 			<param name="Shape">Shape</param>
-			<param name="density">solA_sigma</param>
+			<param name="density">solB_sigma</param>
 			<param name="Rheology">Viscosity</param>
 		</struct>
 	</struct>
 
 	<!-- Simulation control -->
 	<param name="maxTimeSteps"> 1 </param>
-	<param name="outputPath"> ./output </param>
+	<param name="outputPath"> ./output/ </param>
 	<param name="dumpEvery"> 1 </param>	
 	<param name="checkpointEvery"> 0 </param>	
 	
@@ -81,20 +82,18 @@
 					<struct>
 						<param name="name">temperature</param>
 						<param name="type">func</param>
-						<param name="value">VelicTemperatureIC</param>
+						<param name="value">VelicTemperatureIC_SolB</param>
 					</struct>
 				</list>
 			</struct>
 		</list>
 	</struct>
-
 	<!-- Integration Scheme configuration -->
 	<param name="gaussParticlesX"> 2 </param>
 	<param name="gaussParticlesY"> 2 </param>
 	<param name="gaussParticlesZ"> 2 </param>
 
-	<!-- Visualisation stuff -->
-	<!--
+	<!-- Visualisation stuff 
 	<include> Underworld/Viewports/VelocityMagnitudeVP.xml </include>
 	<include> Underworld/Viewports/PressureVP.xml </include>
 	<include> Underworld/Viewports/AnalyticVelocityMagnitudeVP.xml </include>

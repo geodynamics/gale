@@ -3,38 +3,66 @@
 
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 
-	<include> Underworld/BaseApps/ThermalConvection.xml </include>
+	<include> Underworld/BaseApps/RayleighTaylor.xml </include>
+	
 	<list name="plugins" mergeType="merge">
 		<!-- Output Plugins -->
 		<param>StgFEM_FrequentOutput</param>	
 		<param>Underworld_Vrms</param>	
 		<param>StgFEM_CPUTime</param>	
-		<param>Underworld_Velic_solA</param>
+		<param>Underworld_Velic_solHA</param>
 	</list>
-	
-	<!-- Test tolerances -->
-	<param name="VelocityField-Tolerance"> 6.7e-06 </param>
-	<param name="PressureField-Tolerance"> 6.0e-05 </param>
-	
-	<!-- Velic_SolB parameters -->
-	<param name="solA_sigma"> 1.0 </param>
-	<param name="solA_Z"> 1.0 </param>
-	<!-- IC parameter -->
-	<param name="wavenumberY"> 1 </param>
-	<param name="wavenumberX"> 1 </param>
-	
+
+	<!-- Test tolerances. THIS IS A LOW RESOLUTION TEST -->
+	<param name="VelocityField-Tolerance"> 4.0e-04 </param>
+	<param name="PressureField-Tolerance"> 6.0e-02 </param>
+
+	<param name="solHA_sigma">1.0</param>
+	<param name="solHA_eta">1.0</param>
+	<!-- Define the width and column of the box -->
+	<param name="solHA_dx">0.5</param>
+	<param name="solHA_dy">0.5</param>
+	<param name="solHA_x0">0.5</param>
+	<param name="solHA_y0">0.5</param>
+
 	<struct name="components" mergeType="merge">
 		<struct name="Viscosity">
 			<param name="Type">MaterialViscosity</param>
-			<param name="eta0">solA_Z</param>
+			<param name="eta0">solHA_eta</param>
 		</struct>
-		<struct name="Shape">
+		<struct name="backgroundShape">
 			<param name="Type">Everywhere</param>
 		</struct>	
-		<struct name="Fluid">
+		<struct name="background">
+			<param name="Type">RheologyMaterial</param>
+			<param name="Shape">backgroundShape</param>
+			<param name="density">0.0</param>
+			<param name="Rheology">Viscosity</param>
+		</struct>
+		<struct name="Shape">
+			<param name="Type">PolygonShape</param>
+			<param name="perpendicularAxis">y</param>
+			<param name="startY">-99.0</param>
+			<param name="endY">99.0</param>
+			<!--
+			Define the 3D column
+			-->
+			<list name="verticies">
+				<asciidata>
+					<columnDefinition name = "x" type="double"/>
+					<columnDefinition name = "y" type="double"/>
+					<columnDefinition name = "z" type="double"/>
+					0.25  0.0 0.25
+					0.25  0.0 0.75
+					0.75  0.0 0.75 
+					0.75  0.0 0.25 
+				</asciidata>
+			</list>
+		</struct>	
+		<struct name="column">
 			<param name="Type">RheologyMaterial</param>
 			<param name="Shape">Shape</param>
-			<param name="density">solA_sigma</param>
+			<param name="density">1</param>
 			<param name="Rheology">Viscosity</param>
 		</struct>
 	</struct>
@@ -43,24 +71,21 @@
 	<param name="maxTimeSteps"> 1 </param>
 	<param name="outputPath"> ./output </param>
 	<param name="dumpEvery"> 1 </param>	
-	<param name="checkpointEvery"> 0 </param>	
 	
-	<param name="Ra"> 1 </param>	
+	<param name="gravity"> 1 </param>	
 	
 	<!-- Journal Control -->
 	<param name="journal.info.Context-verbose">True</param>
 	<param name="journal-level.info.Stg_ComponentFactory">2</param>
+	<param name="journal.debug">f</param>
 	<param name="journal-enable-branch.debug.StG_FEM">f</param>
 	<param name="journal-level-branch.debug.StG_FEM"> 2 </param>	
-	<param name="journal.debug.Plugins">true</param>
-	<param name="journal.debug">true</param>
-
 	
 	<!-- Geometry & Mesh setup -->
-	<param name="dim"> 2 </param>
-	<param name="elementResI"> 64 </param>
-	<param name="elementResJ"> 64 </param>
-	<param name="elementResK"> 1 </param>
+	<param name="dim"> 3 </param>
+	<param name="elementResI"> 5 </param>
+	<param name="elementResJ"> 5 </param>
+	<param name="elementResK"> 5 </param>
 	<param name="shadowDepth"> 1 </param>
 	<param name="minX"> 0.0 </param>
 	<param name="minY"> 0.0 </param>
@@ -72,40 +97,24 @@
 
 	<!-- Set up BCs and ICs -->
 	<include> Underworld/VariableConditions/velocityBCs.freeslip.xml </include>
-	<struct name="temperatureICs" mergeType="replace">
-		<param name="type">CompositeVC</param>
-		<list name="vcList">
-			<struct>
-				<param name="type"> AllNodesVC </param>
-				<list name="variables">
-					<struct>
-						<param name="name">temperature</param>
-						<param name="type">func</param>
-						<param name="value">VelicTemperatureIC</param>
-					</struct>
-				</list>
-			</struct>
-		</list>
-	</struct>
-
 	<!-- Integration Scheme configuration -->
 	<param name="gaussParticlesX"> 2 </param>
 	<param name="gaussParticlesY"> 2 </param>
 	<param name="gaussParticlesZ"> 2 </param>
+	<param name="particlesPerCell"> 20 </param>
 
-	<!-- Visualisation stuff -->
-	<!--
+	<!-- Visualisation stuff
 	<include> Underworld/Viewports/VelocityMagnitudeVP.xml </include>
 	<include> Underworld/Viewports/PressureVP.xml </include>
-	<include> Underworld/Viewports/AnalyticVelocityMagnitudeVP.xml </include>
 	<include> Underworld/Viewports/AnalyticPressureVP.xml </include>
+	<include> Underworld/Viewports/AnalyticVelocityMagnitudeVP.xml </include>
 
 	<include>../../InputFiles/window.xml</include>
 	<struct name="components" mergeType="merge">
 		<struct name="window" mergeType="merge">
 			<list name="Viewport">
-				<param> AnalyticVelocityMagnitudeVP VelocityMagnitudeVP VelocityErrorMagnitudeVP </param>
-			        <param> AnalyticPressureVP PressureVP PressureErrorVP </param>
+				<param>  AnalyticVelocityMagnitudeVP VelocityMagnitudeVP VelocityErrorMagnitudeVP </param>
+			        <param>  AnalyticPressureVP PressureVP PressureErrorVP </param>
 			</list>
 		</struct>
 	</struct>

@@ -6,8 +6,6 @@
 	<include> Underworld/BaseApps/ThermalConvection.xml </include>
 	
 	<list name="plugins" mergeType="merge">
-		<param>ExperimentalUnderworld_Init</param>	
-
 		<!-- Output Plugins -->
 		<param>StgFEM_FrequentOutput</param>	
 		<param>Underworld_Nusselt</param>	
