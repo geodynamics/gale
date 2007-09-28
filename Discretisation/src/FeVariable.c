@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeVariable.c 960 2007-09-25 07:54:49Z LukeHodkinson $
+** $Id: FeVariable.c 961 2007-09-28 01:29:33Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -610,26 +610,28 @@ void _FeVariable_Build( void* variable, void* data ) {
 		/* Extract component count. */
 		self->fieldComponentCount = self->dofLayout->_totalVarCount;
 		
-		/* build the e.q. number array */
-		FeEquationNumber_Build( self->eqNum );
-		
+		/* build the e.q. number array - only do so for numeric fe variables, dave 28.09.07*/
+		if( !self->isReferenceSolution ) {
+			FeEquationNumber_Build( self->eqNum );
+		}
+
 		Stream_UnIndentBranch( StgFEM_Debug );
 	}
 }
 
 void _FeVariable_Construct( void* variable, Stg_ComponentFactory* cf, void* data ) 
 {
-	FeVariable*         self          = (FeVariable*)variable;
-	FeMesh*			feMesh        = NULL;
-	FeMesh*			geometryMesh  = NULL;
-	DofLayout*          dofLayout     = NULL;
-	VariableCondition*  bc            = NULL;
-	VariableCondition*  ic            = NULL;
-	LinkedDofInfo*      linkedDofInfo = NULL;
-	char*               importFormatType = NULL;
-	char*               exportFormatType = NULL;
-	char*               customInputPath = NULL;
-	char*               customOutputPath = NULL;
+	FeVariable*         self          	= (FeVariable*)variable;
+	FeMesh*		    feMesh        	= NULL;
+	FeMesh*		    geometryMesh  	= NULL;
+	DofLayout*          dofLayout     	= NULL;
+	VariableCondition*  bc            	= NULL;
+	VariableCondition*  ic            	= NULL;
+	LinkedDofInfo*      linkedDofInfo 	= NULL;
+	char*               importFormatType 	= NULL;
+	char*               exportFormatType 	= NULL;
+	char*               customInputPath 	= NULL;
+	char*               customOutputPath 	= NULL;
 	Bool                isReferenceSolution = False;
 	Bool                loadReferenceEachTimestep = False;
 
@@ -1280,7 +1282,7 @@ void FeVariable_GetMinimumSeparation( void* feVariable, double* minSeparationPtr
 void _FeVariable_SyncShadowValues( void* feVariable ) {
 	FeVariable*		self = (FeVariable*)feVariable;
 	DofLayout*		dofLayout;
-	Sync*		vertSync;
+	Sync*			vertSync;
 	unsigned		var_i;
 
 	assert( self );
