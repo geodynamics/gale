@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: HistoricalSwarmTrajectory.h 735 2007-09-27 07:11:00Z BelindaMay $
+** $Id: HistoricalSwarmTrajectory.h 736 2007-10-02 04:19:40Z BelindaMay $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -71,7 +71,8 @@
 		Index                                              startTimestepIndex;     \
 		unsigned int					   historySteps;	   \
 		double	 					   historyTime;            \
-		unsigned int					   useHistoryTime;	   
+		Bool					   	   useHistoryTime;	   \
+		int						   prevParticleLocalCount;   
 
 	struct lucHistoricalSwarmTrajectory { __lucHistoricalSwarmTrajectory };
 	
