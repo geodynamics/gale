@@ -35,7 +35,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: types.h 4107 2007-05-17 03:59:32Z LukeHodkinson $
+** $Id: types.h 4188 2007-10-02 03:54:33Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -43,13 +43,26 @@
 #define __Base_Container_types_h__
 
 typedef struct Iter Iter;
+typedef struct AbsArray AbsArray;
 typedef struct IArray IArray;
+typedef struct STree STree;
+typedef struct STreeMap STreeMap;
 typedef struct ISet ISet;
 typedef struct ISetItem ISetItem;
 typedef struct ISetIter ISetIter;
 typedef struct IMap IMap;
 typedef struct IMapItem IMapItem;
 typedef struct IMapIter IMapIter;
+
+typedef struct STreeNode STreeNode;
+struct STreeNode {
+      void* data;
+      STreeNode* left;
+      STreeNode* right;
+};
+
+typedef int (STree_CompareCB)( const void* left, const void* right );
+typedef void (STree_DeleteCB)( void* itm );
 
 struct ISetItem {
   int key;

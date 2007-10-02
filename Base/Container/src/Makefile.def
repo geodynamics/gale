@@ -24,7 +24,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: Makefile.def 4097 2007-05-16 00:57:11Z LukeHodkinson $
+## $Id: Makefile.def 4188 2007-10-02 03:54:33Z LukeHodkinson $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -33,7 +33,10 @@ def_inc = StGermain/Base/Container
 
 def_srcs = \
 	Iter.c \
+	AbsArray.c \
 	IArray.c \
+	STree.c \
+	STreeMap.c \
 	ISet.c \
 	ISetIter.c \
 	IMap.c \
@@ -65,8 +68,14 @@ def_hdrs = \
 	types.h \
 	Iter.def \
 	Iter.h \
+	AbsArray.def \
+	AbsArray.h \
 	IArray.def \
 	IArray.h \
+	STree.def \
+	STree.h \
+	STreeMap.def \
+	STreeMap.h \
 	ISet.def \
 	ISet.h \
 	ISetIter.def \

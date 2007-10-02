@@ -1,0 +1,99 @@
+#include INHERIT( StGermain/Base/Foundation/NewClass )
+#include "StGermain/Base/Foundation/ClassClear.h"
+
+#define PARENTDIR StGermain/Base/Foundation
+#define PARENT NewClass
+#define CLASSDIR StGermain/Base/Container
+#define CLASSNAME STree
+#include "StGermain/Base/Foundation/ClassSetup.h"
+
+
+MEMBER( STree_CompareCB*, cmp )
+MEMBER( STree_DeleteCB*, del )
+MEMBER( int, itmSize )
+MEMBER( STreeNode*, root )
+MEMBER( int, nNodes )
+MEMBER( int, maxNodes )
+MEMBER( float, alpha )
+MEMBER( float, invAlpha )
+MEMBER( int, curDepth )
+MEMBER( int, curSize )
+MEMBER( int, flip )
+
+
+VOIDOVERRIDE( Init, void, 
+	      (void* self), 
+	      (self) ) 
+
+VOIDOVERRIDE( Destruct, void, 
+	      (void* self), 
+	      (self) )
+
+VOIDOVERRIDE( Copy, void, 
+	      (void* self, const void* op), 
+	      (self, op) )
+
+
+METHOD( SetCallbacks, void,
+	(void* self, STree_CompareCB* cmp, STree_DeleteCB* del),
+	(self, cmp, del) )
+
+METHOD( SetIntCallbacks, void,
+	(void* self),
+	(self) )
+
+METHOD( SetItemSize, void,
+	(void* self, int itmSize),
+	(self, itmSize) )
+
+METHOD( SetAlpha, void,
+	(void* self, float alpha),
+	(self, itmSize) )
+
+METHOD( Insert, void,
+	(void* self, const void* itm),
+	(self, itm) )
+
+METHOD( Remove, void,
+	(void* self, const void* itm),
+	(self, itm) )
+
+METHOD( SoftResize, void, 
+	(void* self, int size), 
+	(self, size) )
+
+METHOD( Clear, void, 
+	(void* self), 
+	(self) )
+
+METHOD( GetSize, int, 
+	(const void* self), 
+	(self) )
+
+METHOD( GetRoot, const STreeNode*, 
+	(const void* self), 
+	(self) )
+
+METHOD( Has, Bool,
+	(const void* self, const void* itm), 
+	(self, itm) )
+
+METHOD( Size, int,
+	(const STreeNode* node),
+	(node) )
+
+METHOD( Rebalance, STreeNode*,
+	(void* self, STreeNode* root, int nNodes),
+	(self, root, nNodes) )
+
+METHOD( Flatten, void,
+	(STreeNode* pseudo),
+	(pseudo) )
+
+METHOD( Grow, void,
+	(STreeNode* pseudo, int nNodes),
+	(pseudo, nNodes) )
+
+METHOD( Compression, void,
+	(STreeNode* pseudo, int nSpineNodes),
+	(pseudo, nSpineNodes) )
