@@ -39,6 +39,10 @@ METHOD( SoftResize, void,
 	(void* self, int size), 
 	(self, size) )
 
+METHOD( SetProxy, void,
+	(void* self, int size, int* ptr),
+	(self, size, ptr) )
+
 METHOD( Set, void, 
 	(void* self, int nItms, const int* itms), 
 	(self, nItms, itms) )
@@ -55,6 +59,10 @@ METHOD( Append, void,
 	(void* self, int itm), 
 	(self, itm) )
 
+METHOD( Push, void,
+	(void* self, int itm),
+	(self, itm) )
+
 METHOD( Clear, void, 
 	(void* self), 
 	(self) )
@@ -63,7 +71,7 @@ METHOD( GetSize, int,
 	(const void* self), 
 	(self) )
 
-METHOD( GetPtr, const int*, 
+METHOD( GetPtr, int*, 
 	(const void* self), 
 	(self) )
 

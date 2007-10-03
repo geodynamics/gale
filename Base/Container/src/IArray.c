@@ -41,6 +41,7 @@
 
 
 int IArray_Cmp( const void* l, const void* r );
+void IArray_ZeroAll( IArray* self );
 
 
 void _IArray_Init( void* _self ) {
@@ -51,6 +52,7 @@ void _IArray_Init( void* _self ) {
    self->maxSize = 0;
    self->size = 0;
    self->ptr = NULL;
+   self->own = True;
 }
 
 void _IArray_Destruct( void* self ) {
@@ -81,6 +83,8 @@ void IArray_Resize( void* _self, int size ) {
    IArray* self = (IArray*)_self;
 
    assert( self && self->delta );
+   if( !self->own )
+      IArray_ZeroAll( self );
    self->maxSize = size / self->delta + ((size % self->delta) ? 1 : 0);
    self->maxSize *= self->delta;
    self->size = size;
@@ -91,10 +95,23 @@ void IArray_SoftResize( void* _self, int size ) {
    IArray* self = (IArray*)_self;
 
    assert( self && self->delta );
-   if( size > self->maxSize )
+   if( !self->own || size > self->maxSize )
      IArray_Resize( self, size );
    else
      self->size = size;
+}
+
+void IArray_SetProxy( void* _self, int size, int* ptr ) {
+   IArray* self = Class_Cast( _self, IArray );
+
+   if( self->own ) {
+      if( self->ptr )
+	 free( self->ptr );
+      self->own = False;
+   }
+   self->maxSize = size;
+   self->size = size;
+   self->ptr = ptr;
 }
 
 void IArray_Set( void* _self, int nItms, const int* itms ) {
@@ -159,6 +176,16 @@ void IArray_Append( void* _self, int itm ) {
    self->ptr[self->size - 1] = itm;
 }
 
+void IArray_Push( void* _self, int itm ) {
+   IArray* self = Class_Cast( _self, IArray );
+
+   if( self->size == self->maxSize )
+      IArray_Resize( self, self->size + 1 );
+   else
+      self->size++;
+   self->ptr[self->size - 1] = itm;
+}
+
 void IArray_Clear( void* self ) {
    IArray_Resize( self, 0 );
 }
@@ -168,7 +195,7 @@ int IArray_GetSize( const void* self ) {
    return ((IArray*)self)->size;
 }
 
-const int* IArray_GetPtr( const void* self ) {
+int* IArray_GetPtr( const void* self ) {
    assert( self );
    return ((IArray*)self)->ptr;
 }
@@ -183,4 +210,11 @@ void IArray_GetArray( const void* self, int* size, const int** ptr ) {
 int IArray_Cmp( const void* l, const void* r ) {
    assert( *(int*)l != *(int*)r );
    return (*(int*)l > *(int*)r) ? 1 : -1;
+}
+
+void IArray_ZeroAll( IArray* self ) {
+   self->maxSize = 0;
+   self->size = 0;
+   self->ptr = NULL;
+   self->own = True;
 }

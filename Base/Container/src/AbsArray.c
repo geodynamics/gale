@@ -84,7 +84,7 @@ void AbsArray_SetDelta( void* _self, int delta ) {
 void AbsArray_Resize( void* _self, int size ) {
    AbsArray* self = Class_Cast( _self, AbsArray );
 
-   assert( self->delta && self->itmSize );
+   assert( self->delta );
    self->maxSize = size / self->delta + ((size % self->delta) ? 1 : 0);
    self->maxSize *= self->delta;
    self->size = size;
@@ -107,14 +107,14 @@ void AbsArray_Offset( void* _self, int delta ) {
    if ( delta > 0 ) {
       if (( self->size + delta ) >= self->maxSize ) {
 	 self->maxSize += self->delta;
-	 self->ptr = realloc( self->ptr, self->maxSize * self->itmSize );
+	 self->ptr = Class_Rearray( self, self->ptr, stgByte, self->maxSize * self->itmSize );
       }
       self->size += delta;
    }
    else if( delta < 0 ) {
       assert( self->size >= -delta );
       if( self->size == self->maxSize - 2 * self->delta )
-	 self->ptr = realloc( self->ptr, (self->maxSize - self->delta ) * self->itmSize );
+	 self->ptr = Class_Rearray( self, self->ptr, stgByte, (self->maxSize - self->delta ) * self->itmSize );
    }
 }
 
