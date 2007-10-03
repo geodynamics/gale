@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: HistoricalSwarmTrajectory.h 736 2007-10-02 04:19:40Z BelindaMay $
+** $Id: HistoricalSwarmTrajectory.h 737 2007-10-03 05:13:13Z BelindaMay $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -71,9 +71,8 @@
 		Index                                              startTimestepIndex;     \
 		unsigned int					   historySteps;	   \
 		double	 					   historyTime;            \
-		Bool					   	   useHistoryTime;	   \
-		int						   prevParticleLocalCount;   
-
+		Bool					   	   useHistoryTime;	   
+		
 	struct lucHistoricalSwarmTrajectory { __lucHistoricalSwarmTrajectory };
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */

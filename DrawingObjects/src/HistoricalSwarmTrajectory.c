@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: HistoricalSwarmTrajectory.c 736 2007-10-02 04:19:40Z BelindaMay $
+** $Id: HistoricalSwarmTrajectory.c 737 2007-10-03 05:13:13Z BelindaMay $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -115,6 +115,8 @@ void _lucHistoricalSwarmTrajectory_Init(
 		unsigned int 						     historySteps,
 		double							     historyTime )
 {
+	unsigned int 		arraySize = 500;
+
 	self->swarm               = swarm;
 	self->colourMap           = colourMap;
 	self->lineWidth           = lineWidth;
@@ -123,14 +125,14 @@ void _lucHistoricalSwarmTrajectory_Init(
 
 	self->useHistoryTime = True;
 
-	if ( historyTime == 0 && historyTime != 0 )
+	if ( historyTime == 0 && historySteps != 0 ) {
 		self->useHistoryTime = False;
-
-	self->prevParticleLocalCount = -1;
+		arraySize = historySteps;
+	}
 
 	self->particleExtHandle = 
-		ExtensionManager_Add( swarm->particleExtensionMgr, self->type, sizeof(lucHistoricalSwarmTrajectory_ParticleExt) );
-
+		ExtensionManager_Add( swarm->particleExtensionMgr, self->type, sizeof(lucHistoricalSwarmTrajectory_ParticleExt) + arraySize*sizeof(Coord) );
+	
 	lucColour_FromString( &self->colour, colourName );
 
 	self->startTimestepIndex = 0;
@@ -229,13 +231,6 @@ void _lucHistoricalSwarmTrajectory_Destroy( void* drawingObject, void* data ) {
 	GlobalParticle*                particle;
 
 	Memory_Free( self->timeAtStep );
-
-	for ( lParticle_I = 0 ; lParticle_I < swarm->particleLocalCount ; lParticle_I++ ) {
-		particle    = (GlobalParticle*)Swarm_ParticleAt( swarm, lParticle_I );
-		particleExt = ExtensionManager_Get( swarm->particleExtensionMgr, particle, self->particleExtHandle );
-
-		Memory_Free( particleExt->historyCoordList );
-	}
 }
 
 void _lucHistoricalSwarmTrajectory_Setup( void* drawingObject, void* _context ) {
@@ -259,9 +254,9 @@ void _lucHistoricalSwarmTrajectory_Setup( void* drawingObject, void* _context ) 
 		}
 		arraySize = historySteps;
 	}
-	else {
+	else 
 		arraySize = currentTimestep + 1;
-	}
+	
 	self->timeAtStep =  Memory_Realloc_Array( self->timeAtStep, double, arraySize );
 
 	self->timeAtStep[ currentTimestep ] = context->currentTime;	
@@ -270,25 +265,17 @@ void _lucHistoricalSwarmTrajectory_Setup( void* drawingObject, void* _context ) 
 	if ( colourMap )
 		lucColourMap_SetMinMax( colourMap, self->timeAtStep[ self->startTimestepIndex ], self->timeAtStep[ currentTimestep ] );
 
-	if ( self->prevParticleLocalCount == -1 )
-		self->prevParticleLocalCount = swarm->particleLocalCount;
-
 	/* Store Current position for each time step */
 	for ( lParticle_I = 0 ; lParticle_I < swarm->particleLocalCount ; lParticle_I++ ) {
 
 		particle    = (GlobalParticle*)Swarm_ParticleAt( swarm, lParticle_I );
 		particleExt = ExtensionManager_Get( swarm->particleExtensionMgr, particle, self->particleExtHandle );
 
-		if (self->prevParticleLocalCount != swarm->particleLocalCount ) {
-			particleExt->historyCoordList = NULL;
-		}	
-		particleExt->historyCoordList = Memory_Realloc_Array( particleExt->historyCoordList, Coord, arraySize );
+		particleExt->historyCoordList = particleExt + sizeof( lucHistoricalSwarmTrajectory_ParticleExt );
 
 		memcpy( particleExt->historyCoordList[ currentTimestep ], particle->coord, sizeof(Coord) );
 	}
 	
-	self->prevParticleLocalCount = swarm->particleLocalCount;
-
 	/* Call parent's 'Setup' function */
 	_lucOpenGLDrawingObject_Setup( self, _context );
 }
@@ -334,7 +321,7 @@ void _lucHistoricalSwarmTrajectory_BuildDisplayList( void* drawingObject, void* 
 		glBegin( GL_LINE_STRIP );
 		timestep = self->startTimestepIndex ;
 		while (True) {
-			if ( historyTime == 0 || (currentTime - self->timeAtStep[ timestep ]) <= historyTime ) {
+			if ( self->useHistoryTime && (currentTime - self->timeAtStep[ timestep ]) <= historyTime || historyTime == 0) {
 				coord = particleExt->historyCoordList[ timestep ];
 
 				/* Set the colour from the colour map - if we've passed it in */
