@@ -37,38 +37,6 @@ VOIDVIRTUALMETHOD( SetNumDims, void,
 	       	   (void* self, int nDims), 
 	       	   (self, nDims) )
 
-ABSTRACTMETHOD( MakeVertex, int, 
-		(void* self), 
-		(self) )
-
-VOIDABSTRACTMETHOD( KillVertex, void, 
-		    (void* self, int cell), 
-		    (self, cell) )
-
-ABSTRACTMETHOD( Lift, int, 
-	        (void* self, int dim, int nSubCells, int* subCells), 
-	        (self, dim, nSubCells, subCells) )
-
-VOIDABSTRACTMETHOD( Unlift, void, 
-		    (void* self, int dim, int cell), 
-		    (self, dim, cell) )
-
-VOIDABSTRACTMETHOD( Join, void, 
-		    (void* self, int dim, int leftCell, int rightCell), 
-		    (self, dim, leftCell, rightCell) )
-
-VOIDABSTRACTMETHOD( Unjoin, void, 
-		    (void* self, int dim, int cell), 
-		    (self, dim, cell) )
-
-VOIDABSTRACTMETHOD( Split, void, 
-		    (void* self, int dim, int exCell, int newCell, int subCell, int repCell), 
-		    (self, dim, exCell, newCell, subCell, repCell) )
-
-VOIDABSTRACTMETHOD( Unsplit, void, 
-		    (void* self, int dim), 
-		    (self, dim) )
-
 VOIDVIRTUALMETHOD( SetShadowDepth, void, 
 		   (void* self, int depth), 
 		   (self, depth) )
