@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: HistoricalSwarmTrajectory.c 737 2007-10-03 05:13:13Z BelindaMay $
+** $Id: HistoricalSwarmTrajectory.c 738 2007-10-04 04:57:51Z BelindaMay $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -115,23 +115,16 @@ void _lucHistoricalSwarmTrajectory_Init(
 		unsigned int 						     historySteps,
 		double							     historyTime )
 {
-	unsigned int 		arraySize = 500;
-
 	self->swarm               = swarm;
 	self->colourMap           = colourMap;
 	self->lineWidth           = lineWidth;
 	self->historySteps	  = historySteps;
 	self->historyTime	  = historyTime;
 
-	self->useHistoryTime = True;
-
-	if ( historyTime == 0 && historySteps != 0 ) {
-		self->useHistoryTime = False;
-		arraySize = historySteps;
-	}
-
-	self->particleExtHandle = 
-		ExtensionManager_Add( swarm->particleExtensionMgr, self->type, sizeof(lucHistoricalSwarmTrajectory_ParticleExt) + arraySize*sizeof(Coord) );
+	self->particleExtHandle = ExtensionManager_Add( 	
+					swarm->particleExtensionMgr, 
+					self->type, 
+					sizeof( lucHistoricalSwarmTrajectory_ParticleExt ) + ( historySteps+1 )*sizeof( Coord ) );
 	
 	lucColour_FromString( &self->colour, colourName );
 
@@ -196,8 +189,8 @@ void _lucHistoricalSwarmTrajectory_Construct( void* drawingObject, Stg_Component
 	swarm         =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm",     Swarm,        True,  data );
 	colourMap     =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "ColourMap", lucColourMap, False, data );
 
-	historySteps  =  Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "historySteps", 0 );
-	historyTime   =  Stg_ComponentFactory_GetDouble( cf, self->name, "historyTime", 0 );
+	historySteps  =  Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "historySteps", DEFAULT_STEPS );
+	historyTime   =  Stg_ComponentFactory_GetDouble     ( cf, self->name, "historyTime",  0 );
 
 	Journal_Firewall(
 			swarm->particleLayout->coordSystem == GlobalCoordSystem,
@@ -225,11 +218,7 @@ void _lucHistoricalSwarmTrajectory_Execute( void* drawingObject, void* data ) {}
 
 void _lucHistoricalSwarmTrajectory_Destroy( void* drawingObject, void* data ) {
 	lucHistoricalSwarmTrajectory*  self            = (lucHistoricalSwarmTrajectory*)drawingObject;
-	Swarm*                         swarm           = self->swarm;
-	lucHistoricalSwarmTrajectory_ParticleExt* particleExt;
-	Particle_Index                 lParticle_I;
-	GlobalParticle*                particle;
-
+	
 	Memory_Free( self->timeAtStep );
 }
 
@@ -243,21 +232,14 @@ void _lucHistoricalSwarmTrajectory_Setup( void* drawingObject, void* _context ) 
 	int                            currentTimestep = context->timeStep;
 	lucHistoricalSwarmTrajectory_ParticleExt* particleExt;
 	unsigned int		       historySteps    = self->historySteps;
-	unsigned int		       arraySize;
-
-	if ( !self->useHistoryTime ) {
-		/* Adjust current timestep counter so that the list of stored coordinates loops over itself */
-		if ( currentTimestep >= historySteps ) {
-			self->startTimestepIndex++;
-			self->startTimestepIndex %= historySteps;	
-			currentTimestep %= historySteps;		
-		}
-		arraySize = historySteps;
-	}
-	else 
-		arraySize = currentTimestep + 1;
 	
-	self->timeAtStep =  Memory_Realloc_Array( self->timeAtStep, double, arraySize );
+	if ( currentTimestep >= historySteps ) {
+		self->startTimestepIndex++;
+		self->startTimestepIndex %= historySteps;	
+		currentTimestep %= historySteps;		
+	}
+	
+	self->timeAtStep =  Memory_Realloc_Array( self->timeAtStep, double, historySteps );
 
 	self->timeAtStep[ currentTimestep ] = context->currentTime;	
 
@@ -296,7 +278,7 @@ void _lucHistoricalSwarmTrajectory_BuildDisplayList( void* drawingObject, void* 
 	unsigned int		       historySteps    = self->historySteps;
 	double			       historyTime     = self->historyTime;		
 	int                            timestep;
-	int                            currentTimestep = context->timeStep; 
+	int                            currentTimestep = context->timeStep % historySteps; 
 	Particle_Index                 lParticle_I;
 	StandardParticle*              particle;
 	lucHistoricalSwarmTrajectory_ParticleExt* particleExt;
@@ -305,9 +287,6 @@ void _lucHistoricalSwarmTrajectory_BuildDisplayList( void* drawingObject, void* 
 	Dimension_Index                dim             = context->dim;
 	double 			       currentTime     = context->currentTime;	
 
-	if ( !self->useHistoryTime )
-		currentTimestep %= historySteps;
-	
 	lucColour_SetOpenGLColour( &self->colour );
 	glLineWidth( self->lineWidth );
 	
@@ -321,7 +300,7 @@ void _lucHistoricalSwarmTrajectory_BuildDisplayList( void* drawingObject, void* 
 		glBegin( GL_LINE_STRIP );
 		timestep = self->startTimestepIndex ;
 		while (True) {
-			if ( self->useHistoryTime && (currentTime - self->timeAtStep[ timestep ]) <= historyTime || historyTime == 0) {
+			if ( (currentTime - self->timeAtStep[ timestep ]) <= historyTime || historyTime == 0 ) {
 				coord = particleExt->historyCoordList[ timestep ];
 
 				/* Set the colour from the colour map - if we've passed it in */
@@ -340,11 +319,11 @@ void _lucHistoricalSwarmTrajectory_BuildDisplayList( void* drawingObject, void* 
 
 			/* Adjust current timestep counter so that the list of stored coordinates loops over itself */
 			timestep++;
-			if ( !self->useHistoryTime )
-				timestep %= historySteps;
+			timestep %= historySteps;
 		}
 		glEnd();
 	}
 		
 	glEnable(GL_LIGHTING);
+
 }
