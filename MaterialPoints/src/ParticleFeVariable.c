@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ParticleFeVariable.c 492 2007-07-09 23:41:51Z PatrickSunter $
+** $Id: ParticleFeVariable.c 515 2007-10-04 06:50:24Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -284,7 +284,7 @@ void ParticleFeVariable_AssembleElement( void* _forceTerm, ForceVector* forceVec
 	ForceTerm*                 forceTerm         = (ForceTerm*) _forceTerm;
 	ParticleFeVariable*        self              = Stg_CheckType( forceVector->feVariable, ParticleFeVariable );
 	IntegrationPointsSwarm*    swarm             = (IntegrationPointsSwarm*)forceTerm->integrationSwarm;
-	FeMesh*        mesh              = self->feMesh;
+	FeMesh*        		   mesh              = self->feMesh;
 	Element_NodeIndex          elementNodeCount  = FeMesh_GetElementNodeSize( mesh, lElement_I );
 	ElementType*               elementType       = FeMesh_GetElementType( mesh, lElement_I );
 	Cell_Index                 cell_I            = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
@@ -320,7 +320,7 @@ void ParticleFeVariable_AssembleElementShapeFunc( void* _forceTerm, ForceVector*
 	ForceTerm*                 forceTerm         = (ForceTerm*) _forceTerm;
 	ParticleFeVariable*        self              = Stg_CheckType( forceVector->feVariable, ParticleFeVariable );
 	Swarm*                     swarm             = forceTerm->integrationSwarm;
-	FeMesh*        mesh              = self->feMesh;
+	FeMesh*        		   mesh              = self->feMesh;
 	Element_NodeIndex          elementNodeCount  = FeMesh_GetElementNodeSize( mesh, lElement_I );
 	ElementType*               elementType       = FeMesh_GetElementType( mesh, lElement_I );
 	Cell_Index                 cell_I            = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );

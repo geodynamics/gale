@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Init.c 376 2006-10-18 06:58:41Z SteveQuenette $
+** $Id: Init.c 515 2007-10-04 06:50:24Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -74,9 +74,12 @@ Bool PICellerator_MaterialPoints_Init( int* argc, char** argv[] ) {
 	
 	Stg_ComponentRegister_Add( componentsRegister, SwarmAdvector_Type,            "0", _SwarmAdvector_DefaultNew );
 	Stg_ComponentRegister_Add( componentsRegister, SwarmAdvectorD_Type,            "0", _SwarmAdvectorD_DefaultNew );
-		Stg_ComponentRegister_Add( componentsRegister, SwarmAdvectorW_Type,            "0", _SwarmAdvectorW_DefaultNew );
+	Stg_ComponentRegister_Add( componentsRegister, SwarmAdvectorW_Type,            "0", _SwarmAdvectorW_DefaultNew );
 
 	Stg_ComponentRegister_Add( componentsRegister, PeriodicBoundariesManager_Type,"0", _PeriodicBoundariesManager_DefaultNew );
+	
+	/* dave, 18.09.07 */
+	Stg_ComponentRegister_Add( componentsRegister, SwarmVariableField_Type,"0", _SwarmVariableField_DefaultNew );
 
 	/* Doing this in alphabetical order to match ls output */
 	RegisterParent( BackgroundParticleLayout_Type,  ParticleLayout_Type );
@@ -97,6 +100,10 @@ Bool PICellerator_MaterialPoints_Init( int* argc, char** argv[] ) {
 	RegisterParent( SwarmAdvector_Type,             TimeIntegratee_Type );
 	RegisterParent( SwarmAdvectorD_Type,            SwarmAdvector_Type );
 	RegisterParent( SwarmAdvectorW_Type,            SwarmAdvector_Type );
+	
+	/* dave, 18.09.07 */
+	RegisterParent( SwarmVariableField_Type,        ParticleFeVariable_Type );
+
 
 	return True;
 }

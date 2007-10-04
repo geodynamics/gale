@@ -51,7 +51,7 @@
 	#include "MaterialFeVariable.h"
 	#include "SwarmAdvector.h"
 	#include "SwarmAdvectorD.h"
-    #include "SwarmAdvectorW.h"
+	#include "SwarmAdvectorW.h"
 
 	#include "PeriodicBoundariesManager.h"
 
@@ -66,6 +66,9 @@
 
 	#include "MaterialPointsSwarm.h"
 	#include "IntegrationPointsSwarm.h"
+
+	/* dave 21.09.07 */
+	#include "SwarmVariableField.h"
 
 	#include "Context.h"
 	#include "Init.h"

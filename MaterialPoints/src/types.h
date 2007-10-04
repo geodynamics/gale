@@ -49,7 +49,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: types.h 349 2006-07-05 11:02:57Z WendySharples $
+** $Id: types.h 515 2007-10-04 06:50:24Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -76,10 +76,13 @@
 	typedef struct MaterialPoint                MaterialPoint;
 	typedef struct MaterialPointRef             MaterialPointRef;
 	typedef struct SwarmAdvector                SwarmAdvector;
-typedef struct SwarmAdvectorD                SwarmAdvectorD;
-typedef struct SwarmAdvectorW                SwarmAdvectorW;
+	typedef struct SwarmAdvectorD                SwarmAdvectorD;
+	typedef struct SwarmAdvectorW                SwarmAdvectorW;
 
 	typedef struct PeriodicBoundariesManager    PeriodicBoundariesManager;
+
+	/* dave, 18.09.07 */
+	typedef struct SwarmVariableField	SwarmVariableField;
 
 	/* Types, for readability */
 	typedef Index                             Material_Index;
