@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: BuoyancyForceTerm.c 508 2007-09-14 05:20:39Z RobertTurnbull $
+** $Id: BuoyancyForceTerm.c 514 2007-10-04 02:55:34Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -416,17 +416,17 @@ void _BuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVect
 
 		/* Calculate Force */
 		gravity = BuoyancyForceTerm_CalcGravity( self, (Swarm*)swarm, lElement_I, particle );
-		force = - materialExt->density * gravity * (1.0 - materialExt->alpha * temperature);
+		force = materialExt->density * gravity * (1.0 - materialExt->alpha * temperature);
 		factor = detJac * particle->weight * adjustFactor * force;
 
-		/* Apply force in verticle direction */
+		/* Apply force in the correct direction */
 		for( eNode_I = 0 ; eNode_I < elementNodeCount; eNode_I++ ) {
 			if( gHat ) {
 				for( d_i = 0; d_i < dim; d_i++ )
 					elForceVec[ eNode_I * nodeDofCount + d_i ] += gHat[d_i] * factor * Ni[ eNode_I ] ;
 			}
 			else {
-				elForceVec[ eNode_I * nodeDofCount + J_AXIS ] += factor * Ni[ eNode_I ] ;
+				elForceVec[ eNode_I * nodeDofCount + J_AXIS ] += -1.0 * factor * Ni[ eNode_I ] ;
 			}
 		}
 	}
