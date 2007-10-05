@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: Isosurface.c 694 2007-05-22 03:17:41Z LukeHodkinson $
+** $Id: Isosurface.c 739 2007-10-05 01:23:19Z BelindaMay $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -1079,7 +1079,7 @@ void lucIsosurface_WallElement( lucIsosurface* self, Vertex** points, char order
 	if (points[RIGHT_BOTTOM]->value > value) cubeType += 2;
 	if (points[LEFT_TOP]->value     > value) cubeType += 4;
 	if (points[RIGHT_TOP]->value    > value) cubeType += 8;
-				
+
 	/* Create Points */
 	lucIsosurface_CreateIntermediatePoints( self, points, axis );
 	
@@ -1205,9 +1205,9 @@ void lucIsosurface_MarchingRectangles( lucIsosurface* self, Vertex** points, cha
 		case 11:
 			/*  @#  */
 			/*  ##  */
-			lucIsosurface_AddWallTriangle(self, LEFT , LEFT_BOTTOM, TOP, points, order);
-			lucIsosurface_AddWallTriangle(self, TOP , LEFT_BOTTOM, RIGHT_TOP, points, order);
-			lucIsosurface_AddWallTriangle(self, RIGHT_TOP , LEFT_BOTTOM, RIGHT_BOTTOM, points, order);
+			lucIsosurface_AddWallTriangle(self, TOP , LEFT_BOTTOM, LEFT, points, order);
+			lucIsosurface_AddWallTriangle(self, RIGHT_TOP , LEFT_BOTTOM, TOP, points, order);
+			lucIsosurface_AddWallTriangle(self, RIGHT_BOTTOM , LEFT_BOTTOM, RIGHT_TOP, points, order);
 			break;
 		case 12:
 			/*  ##  */
@@ -1218,9 +1218,9 @@ void lucIsosurface_MarchingRectangles( lucIsosurface* self, Vertex** points, cha
 		case 13:
 			/*  ##  */
 			/*  #@  */
-			lucIsosurface_AddWallTriangle(self, RIGHT , RIGHT_TOP, BOTTOM, points, order);
-			lucIsosurface_AddWallTriangle(self, BOTTOM , RIGHT_TOP, LEFT_BOTTOM, points, order);
-			lucIsosurface_AddWallTriangle(self, LEFT_BOTTOM , RIGHT_TOP, LEFT_TOP, points, order);
+			lucIsosurface_AddWallTriangle(self, BOTTOM , RIGHT_TOP, RIGHT, points, order);
+			lucIsosurface_AddWallTriangle(self, LEFT_BOTTOM , RIGHT_TOP, BOTTOM, points, order);
+			lucIsosurface_AddWallTriangle(self, LEFT_TOP , RIGHT_TOP, LEFT_BOTTOM, points, order);
 			break;
 		case 14:
 			/*  ##  */
