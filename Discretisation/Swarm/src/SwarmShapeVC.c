@@ -342,10 +342,10 @@ void _SwarmShapeVC_Build(  void* variableCondition, void* data ) {
 	
 	assert( context && Stg_Class_IsInstance( context, AbstractContext_Type ) );
 
-	self->_swarm =  Stg_ComponentFactory_ConstructByKey(  context->CF, self->name, "Swarm", Swarm,  True, 0  ) ; /* 08.08.07 */
+	self->_swarm = Stg_ComponentFactory_ConstructByKey(  context->CF, self->name, "Swarm", Swarm,  True, 0  ) ; 
 	assert( self->_swarm );
 	
-	self->_shape =  Stg_ComponentFactory_ConstructByKey(  context->CF, self->name, "Shape", Stg_Shape,  True, 0 /* dummy */  ) ;
+	self->_shape = Stg_ComponentFactory_ConstructByKey(  context->CF, self->name, "Shape", Stg_Shape,  True, 0 /* dummy */  ) ;
 	assert( self->_shape );
 
 	_VariableCondition_Build( self, data );
@@ -403,7 +403,6 @@ void _SwarmShapeVC_ReadDictionary( void* variableCondition, void* dict /**/ ) {
 		Dictionary_Entry_Value_InitFromStruct(vcDictVal, dictionary);
 	}
 
-	/* i think this vcDictVal is nonsense?? */	
 	if (vcDictVal) {
 		/* Get Name of Shape from dictionary - Grab pointer to shape later on */
 		self->shapeName = StG_Strdup( 

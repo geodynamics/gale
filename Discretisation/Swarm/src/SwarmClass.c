@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SwarmClass.c 4184 2007-09-25 07:54:17Z LukeHodkinson $
+** $Id: SwarmClass.c 4191 2007-10-05 06:23:59Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -1219,12 +1219,9 @@ Particle_Index Swarm_FindClosestParticle( void* _swarm, Dimension_Index dim, dou
 	closestParticle_I = swarm->cellParticleTbl[ lCell_I ][ cParticle_I ];
 
 	/* Find neighbours to this cell - TODO This Assumes ElementCellLayout */
-	/*Mesh_GetIncidence( ((ElementCellLayout*)swarm->cellLayout)->mesh, dim, lCell_I, dim, 
-			   &neighbourCount, &neighbourList );*/
-	Mesh_GetIncidence( ((ElementCellLayout*)swarm->cellLayout)->mesh, dim, lCell_I, MT_VERTEX, /* dave - 05.09.07 */
-			   ((ElementCellLayout*)swarm)->incArray );
-	neighbourCount = IArray_GetSize( ((ElementCellLayout*)swarm)->incArray );
-	neighbourList = IArray_GetPtr( ((ElementCellLayout*)swarm)->incArray );
+	Mesh_GetIncidence( ((ElementCellLayout*)swarm->cellLayout)->mesh, dim, lCell_I, MT_VERTEX, swarm->incArray );
+	neighbourCount = IArray_GetSize( swarm->incArray );
+	neighbourList = IArray_GetPtr( swarm->incArray );
 
 	/* Loop over neighbours */
 	for ( neighbour_I = 0 ; neighbour_I < neighbourCount ; neighbour_I++ ) {
