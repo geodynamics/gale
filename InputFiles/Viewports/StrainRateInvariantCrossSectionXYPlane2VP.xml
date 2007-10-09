@@ -26,7 +26,7 @@
 			<!--param name="Type">lucScalarField</param-->
 			<param name="Type">lucScalarFieldCrossSection</param>
 			<param name="FieldVariable">StrainRateInvariantField</param>
-			<param name="crossSection">z=1.25</param>
+			<param name="crossSection">z=0.75</param>
 			<param name="minCropX">1.0</param>
 			<param name="minCropY">0.9</param>
 			<!--param name="minCropZ">0.4</param-->
