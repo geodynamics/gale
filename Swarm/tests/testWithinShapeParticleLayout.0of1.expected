@@ -1,0 +1,109 @@
+StGermain Framework revision 4125. Copyright (C) 2003-2005 VPAC.
+Cartesian generator: ''
+	Target mesh: ''
+	Global element size: 5x3x2
+	Local offset of rank 0: 0x0x0
+	Local range of rank 0: 5x3x2
+	Generating vertices...
+		... done.
+	Generating elements...
+		... done.
+	Generating element-vertex incidence...
+		... done.
+	Generating vertex neighbours...
+		... done.
+	Generating geometry...
+		... done.
+	Generating element types...
+		... element types are 'Mesh_HexType',
+		... mesh algorithm type is 'Mesh_RegularAlgorithms',
+		... done.
+WithinShapeParticleLayout (ptr): 0x807f588:
+	SpaceFillerParticleLayout (ptr): 0x807f588:
+		GlobalParticleLayout (ptr): 0x807f588
+		ParticleLayout (ptr): 0x807f588
+		Stg_Class (ptr): 0x807f588
+			sizeOfSelf: 156
+			_deleteSelf: Yes
+			type: WithinShapeParticleLayout
+			_delete (func ptr): 0x4003ffb7
+			_print (func ptr): 0x4003ffe0
+			_copy (func ptr): 0x4004005a
+			_setInitialCounts (func ptr): 0x4002e1fe
+			_initialiseParticles (func ptr): 0x40040290
+			coordSystem: GlobalCoordSystem
+			weightsInitialisedAtStartup : False
+			_initialiseParticle (func ptr): 0x40037f5b
+			totalInitialParticles: 10
+			averageInitialParticlesPerCell: 0.333333
+		self->dim = 3
+	Stg_Component (ptr): 0x807f268
+	Stg_Object (ptr): 0x807f268
+		Stg_Class (ptr): 0x807f268
+			sizeOfSelf: 228
+			_deleteSelf: Yes
+			type: Sphere
+			_delete (func ptr): 0x400cecc5
+			_print (func ptr): 0x400cecee
+			_copy (func ptr): 0x400ced1e
+		name: testSphere
+		nameAllocationType: NON_GLOBAL
+		_defaultConstructor (func ptr): 0x400ced7b
+		_construct (func ptr): 0x400cee20
+		_build (func ptr): 0x400cee91
+		_initialise (func ptr): 0x400ceec1
+		_execute (func ptr): 0x400ceef1
+		_destroy (func ptr): 0x400cef21
+		isConstructed: True
+		isBuilt: False
+		isInitialised: False
+		hasExecuted: False
+		isDestroyed: False
+		constructor function name: testSphere-Construct
+		build function name: testSphere-Build
+		initialise function name: testSphere-Initialise
+		execute function name: testSphere-Execute
+		destroy function name: testSphere-Destroy
+	Stg_Shape (ptr): (0x807f268)
+	self->_isCoordInside = (ptr)0x400cef51
+Printing coords of all local particles, cell-by-cell:
+	Local Cell   0:
+	Local Cell   1:
+	Local Cell   2:
+	Local Cell   3:
+	Local Cell   4:
+	Local Cell   5:
+	Local Cell   6:
+	Local Cell   7:
+		part. InCell   0 (local index      0): (    0.5,     0.5,     0.5)
+		part. InCell   1 (local index      1): (0.49976, 0.50269, 0.49487)
+		part. InCell   2 (local index      3): (0.52942, 0.49963, 0.48059)
+		part. InCell   3 (local index      4): (0.50827, 0.48257, 0.46768)
+		part. InCell   4 (local index      7): (0.47269, 0.49191, 0.48593)
+		part. InCell   5 (local index      8): (0.46072, 0.52487, 0.49155)
+	Local Cell   8:
+	Local Cell   9:
+	Local Cell  10:
+	Local Cell  11:
+	Local Cell  12:
+	Local Cell  13:
+	Local Cell  14:
+	Local Cell  15:
+	Local Cell  16:
+	Local Cell  17:
+	Local Cell  18:
+	Local Cell  19:
+	Local Cell  20:
+	Local Cell  21:
+	Local Cell  22:
+		part. InCell   0 (local index      2): (0.47058, 0.49744, 0.52234)
+		part. InCell   1 (local index      5): (0.49191, 0.48135, 0.53531)
+		part. InCell   2 (local index      6): (0.53909, 0.52707, 0.51328)
+		part. InCell   3 (local index      9): (0.52713, 0.48972, 0.51108)
+	Local Cell  23:
+	Local Cell  24:
+	Local Cell  25:
+	Local Cell  26:
+	Local Cell  27:
+	Local Cell  28:
+	Local Cell  29:

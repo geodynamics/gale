@@ -1,0 +1,51 @@
+#include INHERIT( StGermain/Base/Foundation/NewClass )
+#include "StGermain/Base/Foundation/ClassClear.h"
+
+#define PARENTDIR StGermain/Base/Foundation
+#define PARENT NewClass
+#define CLASSDIR StgDomain/Mesh
+#define CLASSNAME Decomp
+#include "StGermain/Base/Foundation/ClassSetup.h"
+
+VOIDOVERRIDE( Init, void, (void* self), (self) )
+VOIDOVERRIDE( Destruct, void, (void* self), (self) )
+VOIDOVERRIDE( Copy, void, (void* self, const void* op), (self, op) )
+OVERRIDE( CalcMem, SizeT, (const void* self, PtrMap* ptrs), (self, ptrs) )
+
+METHOD( SetMPIComm, void, (void* self, MPI_Comm mpiComm), 
+	(self, mpiComm) )
+METHOD( SetLocals, void, (void* self, int nLocals, const int* locals), 
+	(self, nLocals, locals) )
+METHOD( AddLocals, void, (void* self, int nLocals, const int* locals), 
+	(self, nLocals, locals) )
+METHOD( RemoveLocals, void, (void* self, int nLocals, const int* locals, IMap* map), 
+	(self, nLocals, locals, map) )
+METHOD( Clear, void, (void* self), (self) )
+METHOD( ClearLocals, void, (void* self), (self) )
+
+METHOD( GetMPIComm, MPI_Comm, (const void* self), (self) )
+METHOD( GetNumGlobals, int, (const void* self), (self) )
+METHOD( GetNumLocals, int, (const void* self), (self) )
+METHOD( GetLocals, void, (const void* self, int* nLocals, const int** locals), 
+	(self, nLocals, locals) )
+
+METHOD( LocalToGlobal, int, (const void* self, int local), (self, local) )
+METHOD( GlobalToLocal, int, (const void* self, int global), (self, global) )
+METHOD( TryGlobalToLocal, Bool, (const void* self, int global, int* local), 
+	(self, global, local) )
+
+METHOD( FindOwners, void, 
+	(const void* self, int nGlobals, const int* globals, 
+	 int* ranks), 
+	(self, nGlobals, globals, ranks) )
+
+MEMBER( MPI_Comm, mpiComm )
+MEMBER( int, nGlobals )
+MEMBER( IArray*, locals )
+MEMBER( IArray, localsObj )
+MEMBER( IMap*, inv )
+MEMBER( IMap, invObj )
+MEMBER( int, rngBegin )
+MEMBER( int, rngEnd )
+MEMBER( IMap*, owners )
+MEMBER( IMap, ownersObj )

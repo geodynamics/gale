@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+  <param name="particlesPerCell">1</param>
+  <param name="seed">13</param>
+  <param name="shadowDepth">1</param>
+  <param name="outputPath">./output</param>
+  <param name="outputEvery">1</param>
+  <param name="dumpEvery">10</param>
+  <param name="checkpointEvery">0</param>
+  <param name="experimentName">experiment</param>
+</StGermainData>

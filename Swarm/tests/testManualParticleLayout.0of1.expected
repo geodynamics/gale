@@ -1,0 +1,50 @@
+StGermain Framework revision 4125. Copyright (C) 2003-2005 VPAC.
+Cartesian generator: ''
+	Target mesh: ''
+	Global element size: 4x2x1
+	Local offset of rank 0: 0x0x0
+	Local range of rank 0: 4x2x1
+	Generating vertices...
+		... done.
+	Generating elements...
+		... done.
+	Generating element-vertex incidence...
+		... done.
+	Generating vertex neighbours...
+		... done.
+	Generating geometry...
+		... done.
+	Generating element types...
+		... element types are 'Mesh_HexType',
+		... mesh algorithm type is 'Mesh_RegularAlgorithms',
+		... done.
+ManualParticleLayout (ptr): 0x807dc68:
+	GlobalParticleLayout (ptr): 0x807dc68
+	ParticleLayout (ptr): 0x807dc68
+	Stg_Class (ptr): 0x807dc68
+		sizeOfSelf: 140
+		_deleteSelf: Yes
+		type: ManualParticleLayout
+		_delete (func ptr): 0x4002fc4c
+		_print (func ptr): 0x4002fc75
+		_copy (func ptr): 0x4002fcd7
+		_setInitialCounts (func ptr): 0x4002e1fe
+		_initialiseParticles (func ptr): 0x4002e586
+		coordSystem: GlobalCoordSystem
+		weightsInitialisedAtStartup : False
+		_initialiseParticle (func ptr): 0x4002fe48
+		totalInitialParticles: 4
+		averageInitialParticlesPerCell: 0.5
+Printing coords of all local particles, cell-by-cell:
+	Local Cell   0:
+	Local Cell   1:
+		part. InCell   0 (local index      0): (    0.4,     0.3,     0.2)
+	Local Cell   2:
+	Local Cell   3:
+		part. InCell   0 (local index      2): (    0.8,     0.1,     0.3)
+		part. InCell   1 (local index      3): (    0.9,     0.4,     0.1)
+	Local Cell   4:
+	Local Cell   5:
+	Local Cell   6:
+		part. InCell   0 (local index      1): (    0.7,     0.6,     0.5)
+	Local Cell   7:
