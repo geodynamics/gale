@@ -38,11 +38,12 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: MultiRheologyMaterial.c 446 2007-03-04 09:55:46Z PatrickSunter $
+** $Id: MultiRheologyMaterial.c 610 2007-10-11 08:09:29Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include <StgFEM/StgFEM.h>
 #include <PICellerator/PICellerator.h>
 

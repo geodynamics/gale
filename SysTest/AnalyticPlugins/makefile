@@ -13,7 +13,7 @@ includes = ${PROJECT}/${modName}
 SRCS = $(wildcard *.c)
 HDRS = $(wildcard *.h)
 
-packages = PICELLERATOR STGFEM STGERMAIN PETSC MPI XML PYTHON
+packages = PICELLERATOR STGFEM STGDOMAIN STGERMAIN PETSC MPI XML PYTHON
 
 # obtain defaults for required variables according to system and project location, and then run the build.
 include ${PROJ_ROOT}/Makefile.vmake

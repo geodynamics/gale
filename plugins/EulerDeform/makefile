@@ -12,6 +12,6 @@ includes = ${PROJECT}/${modName}
 SRCS = $(wildcard *.c)
 HDRS = $(wildcard *.h)
 
-packages = PICELLERATOR STGFEM STGERMAIN PETSC MPI XML
+packages = PICELLERATOR STGFEM STGDOMAIN STGERMAIN PETSC MPI XML
 
 include ${PROJ_ROOT}/Makefile.vmake

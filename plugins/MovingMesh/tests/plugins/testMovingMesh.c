@@ -1,6 +1,7 @@
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include <StgFEM/StgFEM.h>
 #include <PICellerator/PICellerator.h>
 #include <Underworld/Underworld.h>
@@ -16,7 +17,7 @@ double dt( void* class, PICelleratorContext* context ) {
 }
 
 void MovingMeshTestVelBCs_IncreasingWithY( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
-	DiscretisationContext*	context            = (DiscretisationContext*)_context;
+	DomainContext*	context            = (DomainContext*)_context;
 	FeVariable*             feVariable         = NULL;
 	FeMesh*     		mesh               = NULL;
 	double*                 result             = (double*) _result;
@@ -35,7 +36,7 @@ void MovingMeshTestVelBCs_IncreasingWithY( Node_LocalIndex node_lI, Variable_Ind
 
 
 void MovingMeshTestVelBCs_ToCentreY( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
-	DiscretisationContext*	context            = (DiscretisationContext*)_context;
+	DomainContext*	context            = (DomainContext*)_context;
 	FeVariable*             feVariable         = NULL;
 	FeMesh* 		mesh               = NULL;
 	double*                 result             = (double*) _result;
@@ -173,10 +174,10 @@ typedef struct {
 } testMovingMesh;
 
 void _testMovingMesh_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
-	DiscretisationContext* context;
+	DomainContext* context;
 	Stream*                stream               = Journal_Register( Info_Type, CURR_MODULE_NAME );
 
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", DiscretisationContext, True, data ); 
+	context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data ); 
 
 	ContextEP_Append( context, AbstractContext_EP_ConstructExtensions, construct );
 	ContextEP_Append( context, AbstractContext_EP_Initialise, storeOriginalPos );

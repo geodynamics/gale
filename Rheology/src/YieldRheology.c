@@ -38,13 +38,14 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: YieldRheology.c 358 2006-10-18 06:17:30Z SteveQuenette $
+** $Id: YieldRheology.c 610 2007-10-11 08:09:29Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include <StgFEM/StgFEM.h>
 #include <PICellerator/PICellerator.h>
 

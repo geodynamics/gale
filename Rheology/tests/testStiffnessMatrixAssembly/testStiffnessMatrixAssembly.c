@@ -38,13 +38,14 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: testStiffnessMatrixAssembly.c 430 2007-02-07 00:10:36Z PatrickSunter $
+** $Id: testStiffnessMatrixAssembly.c 610 2007-10-11 08:09:29Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include <StgFEM/StgFEM.h>
 #include <PICellerator/PICellerator.h>
 

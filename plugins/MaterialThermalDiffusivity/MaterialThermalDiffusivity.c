@@ -38,12 +38,13 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: MaterialThermalDiffusivity.c 490 2007-06-15 06:56:48Z JulianGiordani $
+** $Id: MaterialThermalDiffusivity.c 610 2007-10-11 08:09:29Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include <StgFEM/StgFEM.h>
 #include <PICellerator/PICellerator.h>
 #include <Underworld/Underworld.h>

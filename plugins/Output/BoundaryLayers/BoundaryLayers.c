@@ -38,12 +38,13 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: BoundaryLayers.c 605 2007-09-25 07:55:27Z LukeHodkinson $
+** $Id: BoundaryLayers.c 610 2007-10-11 08:09:29Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include <StgFEM/StgFEM.h>
 #include <PICellerator/PICellerator.h>
 #include <Underworld/Underworld.h>

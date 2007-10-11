@@ -38,13 +38,14 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: Init.c 588 2007-09-06 08:43:22Z DavidLee $
+** $Id: Init.c 610 2007-10-11 08:09:29Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include <StgFEM/StgFEM.h>
 
 #include <PICellerator/PICellerator.h>

@@ -38,13 +38,14 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: Context.c 437 2007-02-23 02:11:51Z KathleenHumble $
+** $Id: Context.c 610 2007-10-11 08:09:29Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include <StgFEM/StgFEM.h>
 #include <PICellerator/PICellerator.h>
 #include <Underworld/Rheology/Rheology.h>

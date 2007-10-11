@@ -22,6 +22,7 @@ setValue  PROJECT 'Underworld'
 . ./VMake/Config/xml-config.sh
 
 . ./VMake/Config/StGermain-config.sh
+. ./VMake/Config/StgDomain-config.sh
 . ./VMake/Config/StgFEM-config.sh
 . ./VMake/Config/PICellerator-config.sh
 . ./VMake/Config/gLucifer-config.sh

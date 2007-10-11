@@ -19,6 +19,6 @@ mod = ${PROJECT}_${modName}
 includes = ${PROJECT}/${modName}
 
 # External Libraries and Headers
-packages = UNDERWORLD PICELLERATOR STGFEM STGERMAIN PETSC MPI XML PYTHON
+packages = UNDERWORLD PICELLERATOR STGFEM STGDOMAIN STGERMAIN PETSC MPI XML PYTHON
 
 include ${PROJ_ROOT}/Makefile.vmake

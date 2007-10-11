@@ -38,13 +38,14 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: LateralViscosityAnalytic.c 478 2007-05-25 06:44:20Z JulianGiordani $
+** $Id: LateralViscosityAnalytic.c 610 2007-10-11 08:09:29Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include <StgFEM/StgFEM.h>
 #include <PICellerator/PICellerator.h>
 #include <Underworld/Rheology/Rheology.h>
@@ -69,7 +70,7 @@ typedef struct {
  *  All equations refer to this paper */
 
 void LateralViscosityAnalytic_TemperatureIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
-	DiscretisationContext*  context            = (DiscretisationContext*)_context;
+	DomainContext*  context            = (DomainContext*)_context;
 	FeVariable*             temperatureField   = (FeVariable*) FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
 	FeMesh* 		mesh               = temperatureField->feMesh;
 	double*                 result             = (double*) _result;

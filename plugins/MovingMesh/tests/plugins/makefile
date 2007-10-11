@@ -4,7 +4,7 @@ PROJ_ROOT := $(shell until test -r ./Makefile.system ; do cd .. ; done ; echo `p
 include ${PROJ_ROOT}/Makefile.system
 
 # External Libraries and Headers
-packages = PICELLERATOR STGFEM STGERMAIN MPI XML 
+packages = PICELLERATOR STGFEM STGDOMAIN STGERMAIN MPI XML 
 
 # Note don't put the .c extension. just the base name of the plugin
 plugins := $(wildcard *.c)

@@ -38,11 +38,12 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: Compressible.c 570 2007-08-13 01:16:48Z DavidLee $
+** $Id: Compressible.c 610 2007-10-11 08:09:29Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include <StgFEM/StgFEM.h>
 #include <PICellerator/PICellerator.h>
 

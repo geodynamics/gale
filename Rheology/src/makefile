@@ -8,7 +8,7 @@ SRCS := $(wildcard *.c)
 HDRS := $(wildcard *.h)
 
 # External Libraries and Headers
-packages = PICELLERATOR STGFEM STGERMAIN PETSC MPI XML PYTHON
+packages = PICELLERATOR STGFEM STGDOMAIN STGERMAIN PETSC MPI XML PYTHON
 
 # Work out name to call library
 lib = ${PROJECT}$(shell basename `pwd | sed s/src//g`)

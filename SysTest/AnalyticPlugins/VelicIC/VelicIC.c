@@ -35,12 +35,13 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: VelicIC.c 564 2007-08-03 07:01:45Z RobertTurnbull $
+** $Id: VelicIC.c 610 2007-10-11 08:09:29Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include <StgFEM/StgFEM.h>
 #include <assert.h>
 #include "VelicIC.h"
@@ -51,7 +52,7 @@ const Type Underworld_VelicIC_Type = "Underworld_VelicIC";
 
 /* Works with SolA */
 void Underworld_VelicIC_Sinusoidal( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
-	DiscretisationContext*  context            = (DiscretisationContext*)_context;
+	DomainContext*  context            = (DomainContext*)_context;
 	FeVariable*             temperatureField   = (FeVariable*) FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
 	FeMesh*			feMesh             = temperatureField->feMesh;
 	Dictionary*             dictionary         = context->dictionary;
@@ -94,7 +95,7 @@ void Underworld_VelicIC_Sinusoidal( Node_LocalIndex node_lI, Variable_Index var_
 
 /* Works with SolB */
 void Underworld_VelicIC_Hyperbolic( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
-	DiscretisationContext*  context            = (DiscretisationContext*)_context;
+	DomainContext*  context            = (DomainContext*)_context;
 	FeVariable*             temperatureField   = (FeVariable*) FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
 	FeMesh*			feMesh             = temperatureField->feMesh;
 	Dictionary*             dictionary         = context->dictionary;

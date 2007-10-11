@@ -45,7 +45,8 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
-#include<StGermain/StGermain.h>
+#include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include<StgFEM/StgFEM.h>
 #include "Analytic_solB.h"
 

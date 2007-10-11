@@ -38,12 +38,13 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: MovingMeshEnergyCorrection.c 466 2007-04-27 06:24:33Z LukeHodkinson $
+** $Id: MovingMeshEnergyCorrection.c 610 2007-10-11 08:09:29Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include <StgFEM/StgFEM.h>
 #include <PICellerator/PICellerator.h>
 #include <Underworld/Underworld.h>

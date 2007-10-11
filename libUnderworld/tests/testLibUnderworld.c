@@ -41,6 +41,7 @@
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include <StgFEM/StgFEM.h>
 #include <PICellerator/PICellerator.h>
 #include "Underworld/Underworld.h"
@@ -143,6 +144,7 @@ int main( int argc, char* argv[] ) {
 	Underworld_Finalise();
 	PICellerator_Finalise(); 
 	StgFEM_Finalise();
+	StgDomain_Finalise();
 	StGermain_Finalise();
 	
 	/* Close off MPI */

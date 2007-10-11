@@ -20,6 +20,6 @@ includes = ${PROJECT}/${modName}
 
 # External libraries and Headers
 EXTERNAL_INCLUDES = -I${INC_DIR}/${PROJECT}
-packages = PICELLERATOR STGFEM STGERMAIN PETSC MPI XML PYTHON
+packages = PICELLERATOR STGFEM STGDOMAIN STGERMAIN PETSC MPI XML PYTHON
 
 include ${PROJ_ROOT}/Makefile.vmake
