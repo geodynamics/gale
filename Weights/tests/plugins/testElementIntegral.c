@@ -38,12 +38,13 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testElementIntegral.c 492 2007-07-09 23:41:51Z PatrickSunter $
+** $Id: testElementIntegral.c 518 2007-10-11 08:07:50Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include <StgFEM/StgFEM.h>
 #include <PICellerator/Voronoi/Voronoi.h>
 #include <PICellerator/Weights/Weights.h>
@@ -104,7 +105,7 @@ void CircleInterface( void* feVariable, Element_DomainIndex dElement_I, Coord xi
 }
 
 
-void testElementIntegral_CompareAgainstReferenceSolution(DiscretisationContext* context, Stream* stream, double mean, double standardDeviation) {
+void testElementIntegral_CompareAgainstReferenceSolution(DomainContext* context, Stream* stream, double mean, double standardDeviation) {
 	double meanTolerance, stdDevTolerance;
 	double expectedMean, expectedStdDev;
 	double differenceMean, differenceStdDev;	
@@ -145,7 +146,7 @@ void testElementIntegral_CompareAgainstReferenceSolution(DiscretisationContext* 
 }
 
 
-void PICellerator_testElementIntegral( DiscretisationContext* context ) {
+void PICellerator_testElementIntegral( DomainContext* context ) {
 	Swarm*              integrationSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, 
 										  "integrationSwarm" );
 	Swarm*              materialSwarm    = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, 
@@ -254,8 +255,8 @@ void PICellerator_testElementIntegral( DiscretisationContext* context ) {
 	
 	
 void _testElementIntegral_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
-	DiscretisationContext* context;
-	context = (DiscretisationContext*)Stg_ComponentFactory_ConstructByName( cf, "context", DiscretisationContext, True, data ); 
+	DomainContext* context;
+	context = (DomainContext*)Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data ); 
 
 	ContextEP_ReplaceAll( context, AbstractContext_EP_Execute, PICellerator_testElementIntegral );
 }

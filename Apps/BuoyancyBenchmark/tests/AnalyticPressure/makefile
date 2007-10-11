@@ -62,7 +62,9 @@ mod = ${PROJECT}_${modName}
 includes = ${PROJECT}/${modName}
 
 # External Libraries and Headers
-packages = STGFEM STGERMAIN PETSC MPI XML 
+EXTERNAL_INCLUDES = 
+EXTERNAL_LIBS = 
+packages = STGFEM PETSC STGDOMAIN STGERMAIN MPI XML MATH DL
 
 ifdef HAVE_PYTHON
 	packages += PYTHON

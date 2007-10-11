@@ -38,12 +38,13 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testPeriodicBCs.c 506 2007-08-16 03:47:04Z DavidLee $
+** $Id: testPeriodicBCs.c 518 2007-10-11 08:07:50Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include <StgFEM/StgFEM.h>
 
 #include <PICellerator/Voronoi/Voronoi.h>
@@ -126,6 +127,7 @@ int main( int argc, char* argv[] ) {
 	MPI_Comm_rank( CommWorld, &rank );
 	
 	StGermain_Init( &argc, &argv );
+	StgDomain_Init( &argc, &argv );
 	StgFEM_Init( &argc, &argv );
         PICellerator_Voronoi_Init( &argc, &argv );
         PICellerator_PopulationControl_Init( &argc, &argv );

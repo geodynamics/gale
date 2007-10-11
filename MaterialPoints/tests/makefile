@@ -38,7 +38,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 427 2007-02-23 02:37:11Z KathleenHumble $
+## $Id: makefile 518 2007-10-11 08:07:50Z SteveQuenette $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -48,10 +48,9 @@ PROJ_ROOT := $(shell until test -r ./Makefile.system ; do cd .. ; done ; echo `p
 include ${PROJ_ROOT}/Makefile.system
 
 # External Libraries and Headers
-EXTERNAL_INCLUDES = -I${INC_DIR}/${PROJECT} ${STGFEM_INCLUDES} ${STGERMAIN_INCLUDES} ${MPI_INCLUDES} ${XML_CFLAGS} -DLIB_DIR=\"${LIB_DIR}\"
-EXTERNAL_LIBS = ${RPATH_LFLAGS} -L${LIB_DIR} -l${PROJECT}MaterialPoints -l${PROJECT}Weights -l${PROJECT}Voronoi -l${PROJECT}PopulationControl ${STGFEM_LIBS} ${STGERMAIN_LIBS} ${MPI_LIBS} ${XML_LIBS}
-
-packages += STGFEM STGERMAIN PETSC MPI
+EXTERNAL_INCLUDES = -I${INC_DIR}/${PROJECT} -DLIB_DIR=\"${LIB_DIR}\"
+EXTERNAL_LIBS = ${RPATH_LFLAGS} -L${LIB_DIR} -l${PROJECT}MaterialPoints -l${PROJECT}Weights -l${PROJECT}Voronoi -l${PROJECT}PopulationControl
+packages = STGFEM PETSC STGDOMAIN STGERMAIN MPI XML MATH DL
 
 # Subdirectories
 subdirs := plugins

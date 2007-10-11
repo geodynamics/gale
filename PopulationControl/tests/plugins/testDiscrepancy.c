@@ -38,12 +38,13 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testDiscrepancy.c 376 2006-10-18 06:58:41Z SteveQuenette $
+** $Id: testDiscrepancy.c 518 2007-10-11 08:07:50Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include <StgFEM/StgFEM.h>
 #include <PICellerator/Voronoi/Voronoi.h>
 #include <PICellerator/PopulationControl/PopulationControl.h>
@@ -138,7 +139,7 @@ double Swarm_AverageDiscrepancy( void* swarm ) {
 }
 
 
-void testDiscrepancy_Function( DiscretisationContext* context ) {
+void testDiscrepancy_Function( DomainContext* context ) {
 	Stream*           stream = Journal_Register( Info_Type, CURR_MODULE_NAME );
 	double            discrepancy;
 	double            maxDiscrepancy;
@@ -198,8 +199,8 @@ typedef struct {
 } testDiscrepancy;
 
 void _testDiscrepancy_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
-	DiscretisationContext* context;
-	context = (DiscretisationContext*)Stg_ComponentFactory_ConstructByName( cf, "context", DiscretisationContext, True, data ); 
+	DomainContext* context;
+	context = (DomainContext*)Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data ); 
 	ContextEP_Append( context, AbstractContext_EP_Initialise, testDiscrepancy_Function );
 }
 

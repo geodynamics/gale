@@ -38,7 +38,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 422 2007-02-12 04:15:13Z KathleenHumble $
+## $Id: makefile 518 2007-10-11 08:07:50Z SteveQuenette $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -48,7 +48,9 @@ PROJ_ROOT := $(shell until test -r ./Makefile.system ; do cd .. ; done ; echo `p
 include ${PROJ_ROOT}/Makefile.system
 
 # External Libraries and Headers
-packages = STGFEM STGERMAIN MPI XML 
+EXTERNAL_INCLUDES = 
+EXTERNAL_LIBS = 
+packages = STGFEM PETSC STGDOMAIN STGERMAIN MPI XML MATH DL
 
 # Note don't put the .c extension. just the base name of the plugin
 plugins := $(wildcard *.c)

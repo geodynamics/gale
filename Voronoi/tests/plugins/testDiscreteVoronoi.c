@@ -38,12 +38,13 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testDiscreteVoronoi.c 376 2006-10-18 06:58:41Z SteveQuenette $
+** $Id: testDiscreteVoronoi.c 518 2007-10-11 08:07:50Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include <StgFEM/StgFEM.h>
 #include <PICellerator/Voronoi/Voronoi.h>
 
@@ -53,7 +54,7 @@
 
 const Type TestDiscreteVoronoi_Type = "TestDiscreteVoronoi";
 
-void PICellerator_testDiscreteVoronoi( DiscretisationContext* context ) {
+void PICellerator_testDiscreteVoronoi( DomainContext* context ) {
 	Swarm*              swarm;
 	DiscreteVoronoi*    discreteVoronoi;
 	Bool                particlesCorrectlyAssociated = True;
@@ -121,8 +122,8 @@ void PICellerator_testDiscreteVoronoi( DiscretisationContext* context ) {
 	
 
 void _testDiscreteVoronoi_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
-	DiscretisationContext* context;
-	context = (DiscretisationContext*)Stg_ComponentFactory_ConstructByName( cf, "context", DiscretisationContext, True, data );
+	DomainContext* context;
+	context = (DomainContext*)Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
 	ContextEP_ReplaceAll( context, AbstractContext_EP_Execute, PICellerator_testDiscreteVoronoi );
 }
 

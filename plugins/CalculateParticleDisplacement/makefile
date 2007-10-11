@@ -1,3 +1,4 @@
+
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ##
 ## Copyright (C), 2003-2006, Victorian Partnership for Advanced Computing (VPAC) Ltd, 110 Victoria Street,
@@ -62,13 +63,9 @@ mod = ${PROJECT}_${modName}
 includes = ${PROJECT}/${modName}
 
 # External Libraries and Headers
-EXTERNAL_INCLUDES = ${STGFEM_INCLUDES} ${STGERMAIN_INCLUDES} ${PETSC_INCLUDES} ${MPI_INCLUDES} ${XML_CFLAGS} 
-EXTERNAL_LIBS = \
-	${STGFEM_RPATH} ${STGFEM_LIBS} \
-	${STGFEM_RPATH} ${STGERMAIN_LIBS} \
-	${PETSC_RPATH} ${PETSC_LIBS} \
-	${MPI_RPATH} ${MPI_LIBS} \
-	${XML_LIBS} 
+EXTERNAL_INCLUDES = 
+EXTERNAL_LIBS = 
+packages = STGFEM PETSC STGDOMAIN STGERMAIN MPI XML MATH DL
 
 ifdef HAVE_PYTHON
 	packages += PYTHON

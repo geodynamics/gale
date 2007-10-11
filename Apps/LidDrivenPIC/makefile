@@ -38,7 +38,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 422 2007-02-12 04:15:13Z KathleenHumble $
+## $Id: makefile 518 2007-10-11 08:07:50Z SteveQuenette $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -60,13 +60,10 @@ XMLS_TARGET_DIR = ${EXAMPLES_DIR}/${modName}
 XMLS = $(wildcard *.xml)
 
 PROJ_LIBS = lib${PROJECT}Update.so lib${PROJECT}Materials.so
-EXTERNAL_INCLUDES = ${STGFEM_INCLUDES} ${STGERMAIN_INCLUDES} ${PETSC_INCLUDES} ${MPI_INCLUDES} ${XML_CFLAGS} 
-EXTERNAL_LIBS = \
-	${STGFEM_RPATH} ${STGFEM_LIBS} \
-	${STGFEM_RPATH} ${STGERMAIN_LIBS} \
-	${PETSC_RPATH} ${PETSC_LIBS} \
-	${MPI_RPATH} ${MPI_LIBS} \
-	${XML_LIBS}
+EXTERNAL_INCLUDES = 
+EXTERNAL_LIBS = 
+packages = STGFEM PETSC STGDOMAIN STGERMAIN MPI XML MATH DL
+
 
 ifdef HAVE_PYTHON
 	packages += PYTHON

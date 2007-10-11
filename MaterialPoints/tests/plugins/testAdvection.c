@@ -38,12 +38,13 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testAdvection.c 456 2007-04-27 06:21:01Z LukeHodkinson $
+** $Id: testAdvection.c 518 2007-10-11 08:07:50Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include <StgFEM/StgFEM.h>
 #include <PICellerator/Voronoi/Voronoi.h>
 #include <PICellerator/PopulationControl/PopulationControl.h>
@@ -148,10 +149,10 @@ void check( PICelleratorContext* context ) {
 
 
 void _testAdvection_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
-	DiscretisationContext* context;
+	DomainContext* context;
 	Stream*           stream               = Journal_Register( Info_Type, CURR_MODULE_NAME );
 
-	context = (DiscretisationContext*)Stg_ComponentFactory_ConstructByName( cf, "context", DiscretisationContext, True, data ); 
+	context = (DomainContext*)Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data ); 
 
 	ContextEP_Append( context, AbstractContext_EP_ConstructExtensions, construct );
 	ContextEP_Append( context, AbstractContext_EP_Initialise, storeOriginalPos );

@@ -38,12 +38,13 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testParticleCoords.c 376 2006-10-18 06:58:41Z SteveQuenette $
+** $Id: testParticleCoords.c 518 2007-10-11 08:07:50Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include <StgFEM/StgFEM.h>
 #include <PICellerator/Voronoi/Voronoi.h>
 #include <PICellerator/PopulationControl/PopulationControl.h>
@@ -54,7 +55,7 @@
 
 const Type TestParticleCoords_Type = "TestParticleCoords";
 
-void PICellerator_testParticleCoords( DiscretisationContext* context ) {
+void PICellerator_testParticleCoords( DomainContext* context ) {
 	Swarm*     swarm;
 	Stream*             stream  = Journal_Register( Info_Type, CURR_MODULE_NAME );
 	Name                filename;
@@ -75,8 +76,8 @@ void PICellerator_testParticleCoords( DiscretisationContext* context ) {
 }
 	
 void _testParticleCoords_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
-	DiscretisationContext* context;
-	context = (DiscretisationContext*)Stg_ComponentFactory_ConstructByName( cf, "context", DiscretisationContext, True, data ); 
+	DomainContext* context;
+	context = (DomainContext*)Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data ); 
 	
 	ContextEP_Append( context, AbstractContext_EP_Dump, PICellerator_testParticleCoords );
 }

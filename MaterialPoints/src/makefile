@@ -38,7 +38,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 427 2007-02-23 02:37:11Z KathleenHumble $
+## $Id: makefile 518 2007-10-11 08:07:50Z SteveQuenette $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -52,8 +52,9 @@ SRCS := $(wildcard *.c)
 HDRS := $(wildcard *.h)
 
 # External Libraries and Headers
-EXTERNAL_INCLUDES = ${STGFEM_INCLUDES} ${STGERMAIN_INCLUDES} ${MPI_INCLUDES} ${XML_CFLAGS} -DLIB_DIR=\"${LIB_DIR}\"
-EXTERNAL_LIBS = ${STGERMAIN_FEM_LIBS} ${STGERMAIN_LIBS} ${MPI_LIBS} ${XML_LIBS}
+EXTERNAL_INCLUDES = 
+EXTERNAL_LIBS = 
+packages = STGFEM PETSC STGDOMAIN STGERMAIN MPI XML MATH DL
 
 # Work out name to call library
 lib = ${PROJECT}$(shell basename `pwd | sed s/src//g`)

@@ -38,7 +38,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 427 2007-02-23 02:37:11Z KathleenHumble $
+## $Id: makefile 518 2007-10-11 08:07:50Z SteveQuenette $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -62,10 +62,8 @@ HDRS = Init.h \
 	PICellerator.h \
 
 PROJ_OBJLISTS = PICelleratorVoronoi PICelleratorPopulationControl PICelleratorWeights PICelleratorMaterialPoints PICelleratorUtils
-EXTERNAL_LIBS = -L${LIB_DIR} 
-
 EXTERNAL_INCLUDES = -I${INC_DIR}/${PROJECT} -DLIB_DIR=\"${LIB_DIR}\" 
-
-packages = STGFEM STGERMAIN MPI XML MATH
+EXTERNAL_LIBS = -L${LIB_DIR} 
+packages = STGFEM PETSC STGDOMAIN STGERMAIN MPI XML MATH DL
 
 include ${PROJ_ROOT}/Makefile.vmake

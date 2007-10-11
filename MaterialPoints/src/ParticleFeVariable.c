@@ -38,13 +38,14 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ParticleFeVariable.c 515 2007-10-04 06:50:24Z DavidLee $
+** $Id: ParticleFeVariable.c 518 2007-10-11 08:07:50Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include <StgFEM/StgFEM.h>
 #include <PICellerator/Voronoi/Voronoi.h>
 #include <PICellerator/PopulationControl/PopulationControl.h>
@@ -233,7 +234,7 @@ void _ParticleFeVariable_Build( void* materialFeVariable, void* data ) {
 
 void _ParticleFeVariable_Initialise( void* materialFeVariable, void* data ) {
 	ParticleFeVariable*      self = (ParticleFeVariable*) materialFeVariable;
-	DiscretisationContext*   context = (DiscretisationContext*)data;
+	DomainContext*   context = (DomainContext*)data;
 
 	/* Do a Variable_Update() first as well as last, since if we are loading from checkpoint we need
 	to make sure the variable exists to put ICs onto */

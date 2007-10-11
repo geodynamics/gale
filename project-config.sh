@@ -16,7 +16,7 @@
 ## Role:
 ##	Obtain the project configuration.
 ##
-## $Id: project-config.sh 376 2006-10-18 06:58:41Z SteveQuenette $
+## $Id: project-config.sh 518 2007-10-11 08:07:50Z SteveQuenette $
 ##
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -38,6 +38,7 @@ setValue PROJECT 'PICellerator'
 
 # Do configurations
 . ./VMake/Config/StGermain-config.sh
+. ./VMake/Config/StgDomain-config.sh
 . ./VMake/Config/StgFEM-config.sh
 
 . ./VMake/Config/compiler-config.sh

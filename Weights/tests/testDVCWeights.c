@@ -33,6 +33,7 @@
 #include <mpi.h>
 
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include <StgFEM/StgFEM.h>
 #include <PICellerator/Voronoi/Voronoi.h>
 #include <PICellerator/PopulationControl/PopulationControl.h>
@@ -56,6 +57,7 @@ int main( int argc, char* argv[] ) {
 	MPI_Comm_rank( CommWorld, &rank );
 	
 	StGermain_Init( &argc, &argv );
+	StgDomain_Init( &argc, &argv );
 	StgFEM_Init( &argc, &argv );
     PICellerator_Voronoi_Init( &argc, &argv );
     PICellerator_PopulationControl_Init( &argc, &argv );
@@ -404,11 +406,13 @@ int main( int argc, char* argv[] ) {
 
 	}
 		
-	
-	DiscretisationGeometry_Finalise();
-	
-	Base_Finalise();
-	
+	PICellerator_Weights_Finalise();	
+	PICellerator_PopulationControl_Finalise();
+	PICellerator_Voronoi_Finalise();
+	StgFEM_Finalise();
+	StgDomain_Finalise();
+	StGermain_Finalise();
+
 	/* Close off MPI */
 	MPI_Finalize();
 	

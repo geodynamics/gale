@@ -38,12 +38,13 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: CalculateParticleDisplacement.c 376 2006-10-18 06:58:41Z SteveQuenette $
+** $Id: CalculateParticleDisplacement.c 518 2007-10-11 08:07:50Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include <StgFEM/StgFEM.h>
 #include <PICellerator/PICellerator.h>
 
@@ -56,12 +57,12 @@ const Type PICellerator_CalculateParticleDisplacement_Type = "PICellerator_Calcu
 
 void _PICellerator_CalculateParticleDisplacement_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
 	CalculateParticleDisplacementPlugin*  self = (CalculateParticleDisplacementPlugin*)component;
-	DiscretisationContext*                context;
+	DomainContext*                context;
 	MaterialPointsSwarm*                  materialPointsSwarm;
 	StandardParticle                      particle;
 	ParticleDisplacementInfo*             particleExt;
 	
-	context = (DiscretisationContext*)Stg_ComponentFactory_ConstructByName( cf, "context", DiscretisationContext, True, data );
+	context = (DomainContext*)Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
 
 	ContextEP_Append( context, AbstractContext_EP_Initialise, _PICellerator_CalculateParticleDisplacement_StoreOriginalPos );
 	ContextEP_Append( context, AbstractContext_EP_Step, _PICellerator_CalculateParticleDisplacement_UpdateDisplacement );

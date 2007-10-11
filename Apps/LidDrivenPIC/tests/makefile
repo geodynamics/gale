@@ -38,7 +38,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 409 2007-01-17 13:01:26Z SteveQuenette $
+## $Id: makefile 518 2007-10-11 08:07:50Z SteveQuenette $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -56,6 +56,8 @@ EXTERNAL_INCLUDES = -I${INC_DIR}/${PROJECT}
 XMLS_TARGET_DIR = ${EXAMPLES_DIR}/${modName}/tests
 XMLS = $(wildcard *.xml)
 
-packages = STGERMAIN PETSC MPI XML MATH DL HYPRE
+EXTERNAL_INCLUDES = 
+EXTERNAL_LIBS = 
+packages = STGFEM PETSC STGDOMAIN STGERMAIN MPI XML MATH DL
 
 include ${PROJ_ROOT}/Makefile.vmake
