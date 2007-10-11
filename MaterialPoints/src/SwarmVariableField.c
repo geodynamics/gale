@@ -55,6 +55,7 @@
 #include "SwarmVariableField.h"
 #include "IntegrationPointsSwarm.h"
 #include "MaterialPointsSwarm.h"
+#include "IntegrationPointMapper.h"
 
 #include <assert.h>
 #include <string.h>
@@ -178,7 +179,7 @@ void _SwarmVariableField_Construct( void* swarmVariableField, Stg_ComponentFacto
 
 	self->materialSwarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, "MaterialSwarm", MaterialPointsSwarm, True, data );
 
-	integrationSwarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, "IntegrationSwarm", IntegrationPointsSwarm, True, NULL );
+	integrationSwarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm", IntegrationPointsSwarm, True, NULL );
 	assert( integrationSwarm );
 
 	/* dunno if this is the right way about getting the context... */
@@ -221,7 +222,6 @@ void _SwarmVariableField_Build( void* swarmVariableField, void* data ) {
 	Memory_Free( tmpName );
 	
 	self->eqNum->dofLayout = self->dofLayout;
-
 
 	_ParticleFeVariable_Build( self, data );
 	/* TODO: build self->swarmVar */
@@ -272,17 +272,27 @@ void _SwarmVariableField_ValueAtParticle( void* swarmVariableField,
 	Particle_InCellIndex	cParticle_I;
 	Particle_Index		lParticle_I;
 
-	matParticle = OneToOneMapper_GetMaterialPoint( swarm->mapper, particle, self->materialSwarm );
-	cell_I		= CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
+	//matParticle 	= OneToOneMapper_GetMaterialPoint( swarm->mapper, particle, self->materialSwarm );
+	//cell_I 		= CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
 
 	/* is the cell index required here local or global?? dave, 04.10.07 */
-	cParticle_I = Swarm_FindClosestParticleInCell( self->materialSwarm, 
-						       cell_I, 
-						       Mesh_GetDimSize( self->dofLayout->mesh ), 
-						       matParticle->coord, 
-						       &distance );
+	//cParticle_I = Swarm_FindClosestParticleInCell( self->materialSwarm, 
+	//					       cell_I, 
+	//					       Mesh_GetDimSize( self->dofLayout->mesh ), 
+	//					       matParticle->coord, 
+	//					       &distance );
 
-	lParticle_I = self->materialSwarm->cellParticleTbl[cell_I][cParticle_I];
+	//lParticle_I = self->materialSwarm->cellParticleTbl[cell_I][cParticle_I];
+
+	cell_I = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
+	cParticle_I = Swarm_FindClosestParticleInCell( swarm,
+		       				       cell_I,
+						       Mesh_GetDimSize( self->dofLayout->mesh ),
+						       particle->xi,
+						       &distance );
+	lParticle_I = IntegrationPointMapper_GetMaterialIndexAt( swarm->mapper, swarm->cellParticleTbl[cell_I][lParticle_I] );
+	
+	
 	// TODO SwarmVariable_ValueAt( self->swarmVariable, lParticle_I )
 	// TODO return / copy value
 	SwarmVariable_ValueAt( self->swarmVar, lParticle_I, value ); /* does the copy inside this func. dave, 18.09.07 */
