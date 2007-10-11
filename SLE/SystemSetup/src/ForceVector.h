@@ -45,7 +45,7 @@
 **
 ** Comments:
 **
-** $Id: ForceVector.h 960 2007-09-25 07:54:49Z LukeHodkinson $
+** $Id: ForceVector.h 963 2007-10-11 00:36:16Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -64,15 +64,15 @@
 		/* Virtual info */ \
 		\
 		/* StiffnessMatrix info */ \
-		Index                                     localSize; \
-		Dimension_Index                           dim; \
-		EntryPoint_Register*                      entryPoint_Register; \
-		FeEntryPoint*                             assembleForceVector; \
-		Name                                      _assembleForceVectorEPName; \
-		Stg_ObjectList*                           forceTermList;                             \
-		Stg_Component*                            applicationDepExtraInfo; /**< Default is NULL: passed to elForceVec during assembly */\
-		Assembler*				bcAsm;	\
-		IArray*					inc
+		Index				localSize;  \
+		Dimension_Index			dim;  \
+		EntryPoint_Register*		entryPoint_Register;  \
+		FeEntryPoint*			assembleForceVector;  \
+		Name				_assembleForceVectorEPName;  \
+		Stg_ObjectList*			forceTermList;  \
+		Stg_Component*			applicationDepExtraInfo; /**< Default is NULL: passed to elForceVec during assembly */\
+		Assembler*			bcAsm;  \
+		IArray*				inc;  \
 	
 	struct ForceVector { __ForceVector };
 	
