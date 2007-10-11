@@ -39,13 +39,14 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: EigenvectorsCrossSection.c 665 2007-02-27 07:10:48Z JulianGiordani $
+** $Id: EigenvectorsCrossSection.c 740 2007-10-11 08:05:31Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 
 #include <glucifer/Base/Base.h>
 #include <glucifer/RenderingEngines/RenderingEngines.h>
@@ -292,7 +293,7 @@ void _lucEigenvectorsCrossSection_CleanUp( void* drawingObject, void* _context )
 
 void _lucEigenvectorsCrossSection_BuildDisplayList( void* drawingObject, void* _context ) {
 	lucEigenvectorsCrossSection*       self            = (lucEigenvectorsCrossSection*)drawingObject;
-	DiscretisationContext*            context         = (DiscretisationContext*) _context;
+	DomainContext*            context         = (DomainContext*) _context;
 
 	_lucEigenvectorsCrossSection_DrawCrossSection( self, context->dim, self->crossSectionValue, self->crossSectionAxis );
 }

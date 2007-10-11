@@ -10,7 +10,7 @@ HDRS := $(wildcard *.h)
 EXTERNAL_INCLUDES = ${GL_INCLUDES}
 
 # External Libraries and Headers
-packages = STGERMAIN MPI XML
+packages = STGDOMAIN STGERMAIN MPI XML
 
 # Work out name to call library
 lib = $(shell basename `pwd | sed s/src//g`)

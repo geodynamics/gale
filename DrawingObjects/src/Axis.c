@@ -46,6 +46,7 @@
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 
 #include <glucifer/Base/Base.h>
 #include <glucifer/RenderingEngines/RenderingEngines.h>
@@ -249,7 +250,7 @@ void _lucAxis_Setup( void* drawingObject, void* _context ) {
 void _lucAxis_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* viewportInfo, void* _context ) {
 	lucAxis*      self            = (lucAxis*)drawingObject;
         lucViewport* viewport = viewportInfo->viewport;
-	DiscretisationContext*   context = (DiscretisationContext*) _context;
+	DomainContext*   context = (DomainContext*) _context;
 	Dimension_Index          dim     = context->dim;
 
         double rodLength = 0.0;

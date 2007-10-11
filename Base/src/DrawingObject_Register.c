@@ -39,13 +39,14 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: DrawingObject_Register.c 658 2007-02-05 00:58:07Z CecileDuboz $
+** $Id: DrawingObject_Register.c 740 2007-10-11 08:05:31Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 
 #include "types.h"
 #include "ViewportInfo.h"

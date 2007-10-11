@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: DummyOpenGL.c 510 2006-02-17 04:33:32Z RobertTurnbull $
+** $Id: DummyOpenGL.c 740 2007-10-11 08:05:31Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -48,6 +48,7 @@
 #include "stdio.h"
 
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 
 const Type DummyOpenGL_Type = "DummyOpenGL";
 

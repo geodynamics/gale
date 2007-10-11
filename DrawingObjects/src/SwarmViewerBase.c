@@ -46,6 +46,7 @@
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #ifdef GLUCIFER_USE_PICELLERATOR
 #include <StgFEM/StgFEM.h>
 #include <PICellerator/PICellerator.h>
@@ -366,7 +367,7 @@ void _lucSwarmViewerBase_BuildDisplayList( void* drawingObject, void* _context )
 				continue;
 			}
 
-			if( ((DiscretisationContext*)_context)->dim == 3 ) {
+			if( ((DomainContext*)_context)->dim == 3 ) {
 				if( coord[2] < minPosition[K_AXIS] || coord[2] > maxPosition[K_AXIS] )
 					continue;
 			}
@@ -387,7 +388,7 @@ void lucSwarmViewBase_DrawParticleNumbers( void* drawingObject, void* _context )
 
 void _lucSwarmViewerBase_PlotParticleNumber( void* drawingObject, void* _context, Particle_Index lParticle_I, lucColour colour ) {
 	lucSwarmViewerBase*      self                = (lucSwarmViewerBase*)drawingObject;
-	DiscretisationContext*   context             = (DiscretisationContext*) _context;
+	DomainContext*   context             = (DomainContext*) _context;
 	GlobalParticle*          particle            = (GlobalParticle*)Swarm_ParticleAt( self->swarm, lParticle_I );
 	double*                  coord               = particle->coord;
         Name particle_number;

@@ -45,7 +45,7 @@ ifdef HAVE_GL
 	packages += GL
 endif
 
-packages += STGERMAIN DL HYPRE PETSC MPI MATH XML 
+packages += STGDOMAIN STGERMAIN DL HYPRE PETSC MPI MATH XML 
 
 
 include ${PROJ_ROOT}/Makefile.vmake

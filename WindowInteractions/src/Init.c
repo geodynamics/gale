@@ -39,12 +39,13 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: Init.c 657 2007-02-05 00:56:08Z CecileDuboz $
+** $Id: Init.c 740 2007-10-11 08:05:31Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include <glucifer/Base/Base.h>
 
 #include "WindowInteractions.h"

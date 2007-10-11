@@ -39,13 +39,14 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: lucPlugin.c 695 2007-05-22 04:28:39Z LukeHodkinson $
+** $Id: lucPlugin.c 740 2007-10-11 08:05:31Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include <glucifer/glucifer.h>
 
 
@@ -54,7 +55,7 @@ const Type LucPlugin_Type = "LucPlugin";
 
 /** Special run function which replaces the abstract context's normal one */
 void lucPlugin_VisualOnlyRun( Context* _context ) {
-	DiscretisationContext*  context = (DiscretisationContext*)_context;
+	DomainContext*  context = (DomainContext*)_context;
 	double                  dt = 0;
 	double                  dtLoadedFromFile = 0;
 	Index                   fieldVar_I;

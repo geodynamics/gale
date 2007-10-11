@@ -7,7 +7,7 @@ include ${PROJ_ROOT}/Makefile.system
 SRCS := $(wildcard *.c)
 HDRS := $(wildcard *.h)
 
-packages = PICELLERATOR STGFEM STGERMAIN PETSC MPI XML GL
+packages = PICELLERATOR STGFEM STGDOMAIN STGERMAIN PETSC MPI XML GL
 
 # Work out name to call library
 lib = luc$(shell basename `pwd | sed s/src//g`)

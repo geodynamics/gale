@@ -49,6 +49,7 @@
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include <glucifer/Base/Base.h>
 #include <glucifer/Windowing/Windowing.h>
 #include <glucifer/RenderingEngines/RenderingEngines.h>

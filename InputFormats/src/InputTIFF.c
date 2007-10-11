@@ -47,6 +47,7 @@
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 
 #include <glucifer/Base/Base.h>
 

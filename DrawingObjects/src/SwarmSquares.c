@@ -39,13 +39,14 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: SwarmSquares.c 696 2007-06-01 01:17:56Z StuartClark $
+** $Id: SwarmSquares.c 740 2007-10-11 08:05:31Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 
 #include <glucifer/Base/Base.h>
 #include <glucifer/RenderingEngines/RenderingEngines.h>
@@ -283,7 +284,7 @@ void _lucSwarmSquares_BuildDisplayList( void* drawingObject, void* _context ) {
 
 void _lucSwarmSquares_PlotParticle( void* drawingObject, void* _context, Particle_Index lParticle_I ) {
 	lucSwarmSquares*         self                = (lucSwarmSquares*)drawingObject;
-	DiscretisationContext*   context             = (DiscretisationContext*) _context;
+	DomainContext*   context             = (DomainContext*) _context;
 	GlobalParticle*          particle            = (GlobalParticle*)Swarm_ParticleAt( self->swarm, lParticle_I );
 	SwarmVariable*           lengthVariable      = self->lengthVariable;
 	double*                  coord               = particle->coord;

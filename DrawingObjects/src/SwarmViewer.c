@@ -39,13 +39,14 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: SwarmViewer.c 667 2007-03-01 06:43:11Z RobertTurnbull $
+** $Id: SwarmViewer.c 740 2007-10-11 08:05:31Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #ifdef GLUCIFER_USE_PICELLERATOR
 #include <StgFEM/StgFEM.h>
 #include <PICellerator/PICellerator.h>
@@ -241,7 +242,7 @@ void _lucSwarmViewer_BuildDisplayList( void* drawingObject, void* _context ) {
 
 void _lucSwarmViewer_PlotParticle( void* drawingObject, void* _context, Particle_Index lParticle_I ) {
 	lucSwarmViewer*          self                = (lucSwarmViewer*)drawingObject;
-	DiscretisationContext*   context             = (DiscretisationContext*) _context;
+	DomainContext*   context             = (DomainContext*) _context;
 	GlobalParticle*          particle            = (GlobalParticle*)Swarm_ParticleAt( self->swarm, lParticle_I );
 	double*                  coord               = particle->coord;
 	float                    offset              = 0.001;

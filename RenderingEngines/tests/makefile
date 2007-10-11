@@ -10,7 +10,7 @@ EXTERNAL_LIBS = ${RPATH_LFLAGS} -L${LIB_DIR} -llucBase -llucRenderingEngines -lD
 
 subdirs = DummyOpenGL
 
-packages = STGERMAIN GL PETSC MPI XML 
+packages = STGDOMAIN STGERMAIN GL PETSC MPI XML 
 
 tests = lib${PROJECT}_RenderingEngines
 SRCS = $(wildcard *.c)

@@ -39,13 +39,14 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: SwarmVectors.c 667 2007-03-01 06:43:11Z RobertTurnbull $
+** $Id: SwarmVectors.c 740 2007-10-11 08:05:31Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 
 #include <glucifer/Base/Base.h>
 #include <glucifer/RenderingEngines/RenderingEngines.h>
@@ -263,7 +264,7 @@ void _lucSwarmVectors_BuildDisplayList( void* drawingObject, void* _context ) {
 
 void _lucSwarmVectors_PlotParticle( void* drawingObject, void* _context, Particle_Index lParticle_I ) {
 	lucSwarmVectors*         self                = (lucSwarmVectors*)drawingObject;
-	DiscretisationContext*   context             = (DiscretisationContext*) _context;
+	DomainContext*   context             = (DomainContext*) _context;
 	GlobalParticle*          particle            = (GlobalParticle*)Swarm_ParticleAt( self->swarm, lParticle_I );
 	SwarmVariable*           lengthVariable      = self->lengthVariable;
 	SwarmVariable*           thicknessVariable   = self->thicknessVariable;

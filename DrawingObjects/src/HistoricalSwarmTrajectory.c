@@ -39,13 +39,14 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: HistoricalSwarmTrajectory.c 738 2007-10-04 04:57:51Z BelindaMay $
+** $Id: HistoricalSwarmTrajectory.c 740 2007-10-11 08:05:31Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 
 #include <glucifer/Base/Base.h>
 #include <glucifer/RenderingEngines/RenderingEngines.h>
@@ -272,7 +273,7 @@ void _lucHistoricalSwarmTrajectory_CleanUp( void* drawingObject, void* context )
 
 void _lucHistoricalSwarmTrajectory_BuildDisplayList( void* drawingObject, void* _context ) {
 	lucHistoricalSwarmTrajectory*  self            = (lucHistoricalSwarmTrajectory*)drawingObject;
-	DiscretisationContext*         context         = (DiscretisationContext*)       _context;
+	DomainContext*         context         = (DomainContext*)       _context;
 	Swarm*                         swarm           = self->swarm;
 	lucColourMap*                  colourMap       = self->colourMap;
 	unsigned int		       historySteps    = self->historySteps;

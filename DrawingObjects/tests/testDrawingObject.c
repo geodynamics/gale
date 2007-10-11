@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: testDrawingObject.c 628 2006-10-12 08:23:07Z SteveQuenette $
+** $Id: testDrawingObject.c 740 2007-10-11 08:05:31Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -51,6 +51,7 @@
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include <glucifer/Base/Base.h>
 #include <glucifer/Windowing/Windowing.h>
 #include <glucifer/RenderingEngines/RenderingEngines.h>
@@ -69,7 +70,7 @@ int main( int argc, char* argv[] ) {
 	int                    numProcessors;
 	Dictionary*            dictionary;
 	XML_IO_Handler*        ioHandler;
-	DiscretisationContext* context         = NULL;
+	DomainContext* context         = NULL;
 	Stream*                dummyOpenGLStream;
 	char                   filename[20];
 	
@@ -80,6 +81,7 @@ int main( int argc, char* argv[] ) {
 	MPI_Comm_rank( CommWorld, &rank );
 	
 	StGermain_Init( &argc, &argv );
+	StgDomain_Init( &argc, &argv );
 	lucBase_Init();
 	/* Add lucWindow as default window for this test */
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), lucDefaultWindow_Type, "0", _lucWindow_DefaultNew );
@@ -104,7 +106,7 @@ int main( int argc, char* argv[] ) {
 
 
 	/* Construction phase -----------------------------------------------------------------------------------------------*/
-	context = DiscretisationContext_New( "context", 0, 0, CommWorld, dictionary );
+	context = DomainContext_New( "context", 0, 0, CommWorld, dictionary );
 	Stg_Component_Construct( context, 0 /* dummy */, &context, True );
 	if( rank == 0 ) 
 		Context_PrintConcise( context, context->verbose );
@@ -138,6 +140,7 @@ int main( int argc, char* argv[] ) {
 	lucRenderingEngines_Finalise();
 	lucWindowing_Finalise();
 	lucBase_Finalise();
+	StgDomain_Finalise();
 	StGermain_Finalise();
 		
 	/* Close off MPI */

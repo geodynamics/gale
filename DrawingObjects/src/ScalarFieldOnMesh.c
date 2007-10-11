@@ -46,6 +46,7 @@
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 
 #include <glucifer/Base/Base.h>
 #include <glucifer/RenderingEngines/RenderingEngines.h>
@@ -209,7 +210,7 @@ void _lucScalarFieldOnMesh_CleanUp( void* drawingObject, void* _context ) {
 
 void _lucScalarFieldOnMesh_BuildDisplayList( void* drawingObject, void* _context ) {
 	lucScalarFieldOnMesh*     self          = (lucScalarFieldOnMesh*)drawingObject;
-	DiscretisationContext*   context       = (DiscretisationContext*) _context;
+	DomainContext*   context       = (DomainContext*) _context;
 	FieldVariable*           fieldVariable = self->fieldVariable;
 	Coord                    min;
 	Coord                    max;

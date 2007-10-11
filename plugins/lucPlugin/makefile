@@ -10,8 +10,7 @@ HDRS := $(wildcard *.h)
 # External Libraries and Headers
 EXTERNAL_INCLUDES = -I${INC_DIR}
 EXTERNAL_LIBS = -L${LIB_DIR} -lglucifer ${GLUCIFER_RPATH} 
-
-packages = PICELLERATOR STGFEM STGERMAIN
+packages = PICELLERATOR STGFEM STGDOMAIN STGERMAIN
 
 ifdef HAVE_OSMESA
 	packages += OSMESA

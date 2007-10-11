@@ -39,13 +39,14 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: VectorArrowCrossSection.c 694 2007-05-22 03:17:41Z LukeHodkinson $
+** $Id: VectorArrowCrossSection.c 740 2007-10-11 08:05:31Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include <StgFEM/StgFEM.h>
 
 #include <glucifer/Base/Base.h>
@@ -254,7 +255,7 @@ void _lucVectorArrowCrossSection_CleanUp( void* drawingObject, void* _context ) 
 
 void _lucVectorArrowCrossSection_BuildDisplayList( void* drawingObject, void* _context ) {
 	lucVectorArrowCrossSection*       self            = (lucVectorArrowCrossSection*)drawingObject;
-	DiscretisationContext*            context         = (DiscretisationContext*) _context;
+	DomainContext*            context         = (DomainContext*) _context;
 
 	_lucVectorArrowCrossSection_DrawCrossSection( self, context->dim, self->crossSectionValue, self->crossSectionAxis );
 }

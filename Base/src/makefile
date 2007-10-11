@@ -7,7 +7,7 @@ include ${PROJ_ROOT}/Makefile.system
 SRCS := $(wildcard *.c)
 HDRS := $(wildcard *.h)
 
-packages = STGERMAIN
+packages = STGDOMAIN STGERMAIN
 
 ifdef HAVE_OSMESA
 	packages += OSMESA

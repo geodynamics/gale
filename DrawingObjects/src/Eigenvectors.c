@@ -39,13 +39,14 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: Eigenvectors.c 628 2006-10-12 08:23:07Z SteveQuenette $
+** $Id: Eigenvectors.c 740 2007-10-11 08:05:31Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 
 #include <glucifer/Base/Base.h>
 #include <glucifer/RenderingEngines/RenderingEngines.h>
@@ -189,7 +190,7 @@ void _lucEigenvectors_CleanUp( void* drawingObject, void* _context ) {
 	
 void _lucEigenvectors_BuildDisplayList( void* drawingObject, void* _context ) {
 	lucEigenvectors*       self            = (lucEigenvectors*)drawingObject;
-	DiscretisationContext* context         = (DiscretisationContext*) _context;
+	DomainContext* context         = (DomainContext*) _context;
 	Dimension_Index        dim             = context->dim;
 
 	if ( dim == 2 ) {

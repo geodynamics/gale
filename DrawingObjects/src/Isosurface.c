@@ -39,13 +39,14 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: Isosurface.c 739 2007-10-05 01:23:19Z BelindaMay $
+** $Id: Isosurface.c 740 2007-10-11 08:05:31Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include <StgFEM/StgFEM.h>
 
 #include <glucifer/Base/Base.h>
@@ -241,7 +242,7 @@ void _lucIsosurface_Destroy( void* drawingObject, void* data ) {}
 
 void _lucIsosurface_Setup( void* drawingObject, void* _context ) {
 	lucIsosurface*           self            = (lucIsosurface*)drawingObject;
-	DiscretisationContext*   context         = (DiscretisationContext*) _context;
+	DomainContext*   context         = (DomainContext*) _context;
 	FieldVariable*           isosurfaceField = self->isosurfaceField;
 	int                      i, j, k;
 	int                      nx, ny, nz;

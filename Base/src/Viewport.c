@@ -39,12 +39,13 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: Viewport.c 658 2007-02-05 00:58:07Z CecileDuboz $
+** $Id: Viewport.c 740 2007-10-11 08:05:31Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 
 #include "types.h"
 #include "ColourMap.h"

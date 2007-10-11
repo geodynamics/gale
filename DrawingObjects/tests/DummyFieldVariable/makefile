@@ -19,6 +19,6 @@ mod = ${modName}
 includes = ${PROJECT}/${modName}
 
 # External Libraries and Headers
-packages = STGERMAIN MPI XML PYTHON
+packages = STGDOMAIN STGERMAIN MPI XML PYTHON
 
 include ${PROJ_ROOT}/Makefile.vmake

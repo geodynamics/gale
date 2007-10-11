@@ -62,6 +62,6 @@ endif
 
 endif
 
-packages = STGERMAIN MPI XML MATH DL HYPRE
+packages = STGDOMAIN STGERMAIN MPI XML MATH DL HYPRE
 
 include ${PROJ_ROOT}/Makefile.vmake

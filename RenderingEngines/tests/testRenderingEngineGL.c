@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: testRenderingEngineGL.c 632 2006-10-18 07:54:57Z AlanLo $
+** $Id: testRenderingEngineGL.c 740 2007-10-11 08:05:31Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -50,6 +50,7 @@
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include <glucifer/Base/Base.h>
 #include <glucifer/RenderingEngines/RenderingEngines.h>
 
@@ -64,7 +65,7 @@ int main( int argc, char* argv[] ) {
 	int                    numProcessors;
 	Dictionary*            dictionary;
 	XML_IO_Handler*        ioHandler;
-	DiscretisationContext* context         = NULL;
+	DomainContext* context         = NULL;
 	Stream*                dummyOpenGLStream;
 	
 	/* Initialise PETSc, get world info */
@@ -74,6 +75,7 @@ int main( int argc, char* argv[] ) {
 	MPI_Comm_rank( CommWorld, &rank );
 	
 	StGermain_Init( &argc, &argv );
+	StgDomain_Init( &argc, &argv );
 	lucBase_Init();
 	lucRenderingEngines_Init();
 	#ifdef HAVE_PYTHON
@@ -91,7 +93,7 @@ int main( int argc, char* argv[] ) {
 	Journal_ReadFromDictionary( dictionary );
 
 	/* Construction phase -----------------------------------------------------------------------------------------------*/
-	context = DiscretisationContext_New( "context", 0, 0, CommWorld, dictionary );
+	context = DomainContext_New( "context", 0, 0, CommWorld, dictionary );
 
 	#if 0
 	componentDict = Dictionary_GetDictionary( dictionary, "components" );
@@ -136,6 +138,7 @@ int main( int argc, char* argv[] ) {
 
 	lucRenderingEngines_Finalise();
 	lucBase_Finalise();
+	StgDomain_Finalise();
 	StGermain_Finalise();
 		
 	/* Close off MPI */

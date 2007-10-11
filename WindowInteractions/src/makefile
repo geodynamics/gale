@@ -7,7 +7,7 @@ include ${PROJ_ROOT}/Makefile.system
 SRCS := $(wildcard *.c) $(wildcard *.cxx)
 HDRS := $(wildcard *.h)
 
-packages = PICELLERATOR STGFEM STGERMAIN PETSC MPI XML GL
+packages = PICELLERATOR STGFEM STGDOMAIN STGERMAIN PETSC MPI XML GL
 
 ifdef HAVE_VTK
 	packages += VTK

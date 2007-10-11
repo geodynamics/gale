@@ -10,7 +10,7 @@ EXTERNAL_LIBS = ${RPATH_LFLAGS} -L${LIB_DIR} -llucBase -llucWindowing -llucRende
 
 subdirs = DummyFieldVariable DummySwarmVariable 
 
-packages = PICELLERATOR STGFEM STGERMAIN 
+packages = PICELLERATOR STGFEM STGDOMAIN STGERMAIN 
 
 ifdef HAVE_OSMESA
 	packages += OSMESA

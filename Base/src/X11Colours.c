@@ -39,11 +39,12 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: X11Colours.c 616 2006-08-31 07:08:25Z KathleenHumble $
+** $Id: X11Colours.c 740 2007-10-11 08:05:31Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 
 #include "types.h"
 #include "ColourMap.h"

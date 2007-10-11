@@ -39,12 +39,13 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: lucTestInputFormat.c 628 2006-10-12 08:23:07Z SteveQuenette $
+** $Id: lucTestInputFormat.c 740 2007-10-11 08:05:31Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include <glucifer/Base/Base.h>
 
 #include <math.h>
@@ -53,7 +54,7 @@
 
 const Type TestInputFormat_Type = "TestInputFormat";
 
-void glucifer_lucTestInputFormat( DiscretisationContext* context ) {
+void glucifer_lucTestInputFormat( DomainContext* context ) {
 	Pixel_Index     width;
 	Pixel_Index     height;
 	char*           imageName;   
@@ -79,8 +80,8 @@ void glucifer_lucTestInputFormat( DiscretisationContext* context ) {
 }
 
 void _lucTestInputFormat_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
-	DiscretisationContext* context;
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", DiscretisationContext, True, data ); 
+	DomainContext* context;
+	context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data ); 
 	ContextEP_ReplaceAll( context, AbstractContext_EP_Initialise, glucifer_lucTestInputFormat );
 }
 

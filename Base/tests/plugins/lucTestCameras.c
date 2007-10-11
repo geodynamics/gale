@@ -39,11 +39,12 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: lucTestCameras.c 691 2007-05-16 01:14:04Z LukeHodkinson $
+** $Id: lucTestCameras.c 740 2007-10-11 08:05:31Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 
 #include <glucifer/Base/Base.h>
 

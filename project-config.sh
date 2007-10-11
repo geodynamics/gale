@@ -16,7 +16,7 @@
 ## Role:
 ##	Obtain the project configuration.
 ##
-## $Id: project-config.sh 631 2006-10-18 06:20:15Z SteveQuenette $
+## $Id: project-config.sh 740 2007-10-11 08:05:31Z SteveQuenette $
 ##
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -43,6 +43,7 @@ setValue  PROJECT 'glucifer'
 . ./VMake/Config/xml-config.sh
 
 . ./VMake/Config/StGermain-config.sh
+. ./VMake/Config/StgDomain-config.sh
 . ./VMake/Config/StgFEM-config.sh
 
 . ./VMake/Config/vtk-config.sh

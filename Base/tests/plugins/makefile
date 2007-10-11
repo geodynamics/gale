@@ -7,7 +7,7 @@ include ${PROJ_ROOT}/Makefile.system
 #EXTERNAL_INCLUDES = ${STGERMAIN_INCLUDES} ${MPI_INCLUDES} ${XML_CFLAGS} 
 #EXTERNAL_LIBS = ${STGERMAIN_LIBS} ${MPI_LIBS} ${XML_LIBS} 
 
-packages = STGERMAIN MPI XML GL
+packages = STGDOMAIN STGERMAIN MPI XML GL
 
 # Note don't put the .c extension. just the base name of the plugin
 plugins := $(wildcard *.c)

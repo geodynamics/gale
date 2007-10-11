@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: main.c 628 2006-10-12 08:23:07Z SteveQuenette $
+** $Id: main.c 740 2007-10-11 08:05:31Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -51,6 +51,7 @@
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include <glucifer/glucifer.h>
 
 #include <stdio.h>
@@ -64,7 +65,7 @@ int main( int argc, char* argv[] ) {
 	int                    numProcessors;
 	Dictionary*            dictionary;
 	XML_IO_Handler*        ioHandler;
-	DiscretisationContext* context         = NULL;
+	DomainContext* context         = NULL;
 	
 	/* Initialise PETSc, get world info */
 	MPI_Init( &argc, &argv );
@@ -73,6 +74,7 @@ int main( int argc, char* argv[] ) {
 	MPI_Comm_rank( CommWorld, &rank );
 	
 	StGermain_Init( &argc, &argv );
+	StgDomain_Init( &argc, &argv );
 	glucifer_Init();
 	#ifdef HAVE_PYTHON
 	Py_Initialize();
@@ -89,7 +91,7 @@ int main( int argc, char* argv[] ) {
 	Journal_ReadFromDictionary( dictionary );
 
 	/* Construction phase -----------------------------------------------------------------------------------------------*/
-	context = DiscretisationContext_New( "context", 0, 0, CommWorld, dictionary );
+	context = DomainContext_New( "context", 0, 0, CommWorld, dictionary );
 	Stg_Component_Construct( context, 0 /* dummy */, &context, True	);
 
 	if( rank == 0 ) 
@@ -118,6 +120,7 @@ int main( int argc, char* argv[] ) {
 	#endif
 
 	lucBase_Finalise();
+	StgDomain_Finalise();
 	StGermain_Finalise();
 		
 	/* Close off MPI */

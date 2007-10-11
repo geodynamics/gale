@@ -39,12 +39,13 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: ColourMap.c 703 2007-06-29 06:28:56Z CatherineMeriaux $
+** $Id: ColourMap.c 740 2007-10-11 08:05:31Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include "types.h"
 #include "ColourMap.h"
 #include "X11Colours.h"
