@@ -29,9 +29,7 @@
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # obtain defaults for required variables according to system and project location, and then run the build.
-ifndef PROJ_ROOT
-	PROJ_ROOT=..
-endif
+override PROJ_ROOT=.
 include ${PROJ_ROOT}/Makefile.system
 
 subdirs = Geometry Shape Mesh Utils Swarm libStgDomain

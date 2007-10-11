@@ -49,7 +49,7 @@ Bool StgDomain_Init( int* argc, char** argv[] ) {
 	Stream_SetPrintingRank( Journal_Register( InfoStream_Type, "Context" ), 0 );
 	Journal_Printf( /* DO NOT CHANGE OR REMOVE */
 		Journal_Register( InfoStream_Type, "Context" ), 
-		"StGermain Discretisation Library revision %s. Copyright (C) 2003-2005 VPAC.\n", VERSION );
+		"StGermain Domain Library revision %s. Copyright (C) 2003-2007 VPAC.\n", VERSION );
 	Stream_Flush( Journal_Register( InfoStream_Type, "Context" ) );
 	Stream_SetPrintingRank( Journal_Register( InfoStream_Type, "Context" ), tmp );
 	
