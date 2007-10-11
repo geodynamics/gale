@@ -24,7 +24,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 4081 2007-04-27 06:20:07Z LukeHodkinson $
+## $Id: makefile 4192 2007-10-11 07:56:26Z SteveQuenette $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -44,7 +44,7 @@ SRCS = ${def_srcs}
 
 PROJ_LIBS = ${def_libs}
 EXTERNAL_INCLUDES = -I${INC_DIR}/StGermain
-EXTERNAL_LIBS = -lStGermainBase -lStGermainBaseFoundation
+EXTERNAL_LIBS = -lStGermain
 
 ifeq (Darwin-mpich,${SYSTEM}-${MPI_IMPLEMENTATION})
 	PROJ_CFLAGS += -flat_namespace

@@ -24,28 +24,32 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Finalise.c 4192 2007-10-11 07:56:26Z SteveQuenette $
+*/
+/** \file
+**  Role:
+**	External header file to libBase.
+**
+** Assumptions:
+**	None so far.
+**
+** Comments:
+**	None so far.
+**
+** $Id: StGermain.h 4192 2007-10-11 07:56:26Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#include <mpi.h>
-#include "Base/Base.h"
-
-#include "Finalise.h"
-
-#include <stdio.h>
-
-Bool StGermain_Finalise( void ) {
-	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
+#ifndef __StGermain_StGermain_h__
+#define __StGermain_StGermain_h__
 	
-	/*Delete the global objects : xmlSearchPaths and moduleDirectories */
-	Stg_ObjectList_DeleteAllObjects( moduleDirectories );
-	Stg_Class_Delete( moduleDirectories );
+	#include "Base/Foundation/Foundation.h"
+	#include "Base/IO/IO.h"
+	#include "Base/Container/Container.h"
+	#include "Base/Automation/Automation.h"
+	#include "Base/Extensibility/Extensibility.h"
+	#include "Base/Context/Context.h"
+	#include "Init.h"
+	#include "main.h"
+	#include "Finalise.h"
 	
-	Stg_ObjectList_DeleteAllObjects(xmlSearchPaths);
-	Stg_Class_Delete( xmlSearchPaths );
-
-	Base_Finalise();
-	
-	return True;
-}
+#endif /* __StGermain_StGermain_h__ */

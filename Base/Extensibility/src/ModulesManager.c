@@ -131,7 +131,6 @@ void _ModulesManager_Delete( void* modulesManager ) {
 	Stg_Class_Delete( self->codelets );
 	ModulesManager_Unload( self ); 
 	Stg_Class_Delete( self->modules );
-
 	
 	/* Delete parent */
 	_Stg_Class_Delete( self );
@@ -362,7 +361,6 @@ Bool ModulesManager_UnloadModule( void* modulesManager, Name moduleName ) {
 			return True;
 		}
 	}
-	
 	return False;
 }
 

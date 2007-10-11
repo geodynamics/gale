@@ -24,7 +24,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 3462 2006-02-19 06:53:24Z WalterLandry $
+## $Id: makefile 4192 2007-10-11 07:56:26Z SteveQuenette $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -41,7 +41,7 @@ SRCS = ${def_srcs}
 PYTHON_PACKAGE = ${def_pyb_package}
 
 PROJ_LIBS = ${def_libs}
-EXTERNAL_LIBS = -lStGermainBase
+EXTERNAL_LIBS = -lStGermain
 EXTERNAL_INCLUDES = -I${INC_DIR}/StGermain
 
 packages = MPI XML MATH

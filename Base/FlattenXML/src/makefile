@@ -22,7 +22,7 @@ SRCS = ${def_srcs}
 PROJ_LIBS = ${def_libs}
 
 EXTERNAL_INCLUDES = -I${INC_DIR}/StGermain
-EXTERNAL_LIBS = -L${LIB_DIR} -lStGermainBase ${RPATH_FLAGS}
+EXTERNAL_LIBS = -L${LIB_DIR} -lStGermain ${RPATH_FLAGS}
 
 packages = MPI XML MATH DL 
 

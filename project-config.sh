@@ -24,7 +24,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: project-config.sh 3959 2007-01-11 02:17:08Z KathleenHumble $
+## $Id: project-config.sh 4192 2007-10-11 07:56:26Z SteveQuenette $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -48,13 +48,8 @@ export STGERMAIN_VERSION=${VERSION}
 . ./VMake/Config/compiler-config.sh
 . ./VMake/Config/math-config.sh
 . ./VMake/Config/xml-config.sh
-. ./VMake/Config/PETSc-config.sh
 . ./VMake/Config/mpi-config.sh
 . ./VMake/Config/blaslapack-config.sh
 . ./VMake/Config/python-config.sh --optional
-. ./VMake/Config/OpenGl-config.sh
-. ./VMake/Config/sdl-config.sh
-. ./VMake/Config/hdf5-config.sh
-. ./VMake/Config/neon-config.sh
 
 dumpPkgConfigFile ${BLD_DIR}/lib/pkgconfig

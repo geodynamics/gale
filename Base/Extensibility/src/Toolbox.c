@@ -115,6 +115,11 @@ void _Toolbox_Delete( void* toolbox ) {
 	Toolbox* self = (Toolbox*)toolbox;
 
 	/* Delete parent */
+/* This is a hack. It would seem that PETSc gives MPI/MPICH something along the lines of a pointer to a symbol in the PETSc library,
+   when StgFEM's toolbox is loaded (which links to PETSc and init and finalises it), a seg fault occours on MPI's finalise because 
+   the PETSc symbols are gone. The following line will cause dlclose not to be called, but is ok otherwise for the the toolboxes
+   deletion */
+self->dllPtr = 0;
 	_Module_Delete( self );
 }
 	

@@ -24,14 +24,14 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: bindings.c 4120 2007-05-23 10:43:41Z PatrickSunter $
+** $Id: bindings.c 4192 2007-10-11 07:56:26Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #include <Python.h>
 
 #include <mpi.h>
-#include "StGermain/Base/Base.h"
+#include "StGermain/StGermain.h"
 #include "bindings.h"
 #include "misc.h"
 

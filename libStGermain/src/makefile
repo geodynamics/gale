@@ -24,7 +24,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 4014 2007-02-23 02:15:16Z KathleenHumble $
+## $Id: makefile 4192 2007-10-11 07:56:26Z SteveQuenette $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -36,17 +36,24 @@ include ${PROJ_ROOT}/Makefile.system
 
 include Makefile.def
 
-lib = ${def_lib}
+lib = StGermain_
 libstatic = yes
 #libdynamic = yes
-includes = ${def_inc}
+includes = StGermain
 
-SRCS = ${def_srcs}
+SRCS = \
+	Init.c \
+	main.c \
+	Finalise.c
 
-HDRS = ${def_hdrs}
+HDRS = \
+	Init.h \
+	main.h \
+	Finalise.h \
+	StGermain.h
 
-PROJ_LIBS = ${def_libs}
-PROJ_OBJLISTS = ${def_objlists}
+PROJ_LIBS = 
+PROJ_OBJLISTS = 
 EXTERNAL_INCLUDES = -I${INC_DIR}/StGermain  -DLIB_DIR=\"${LIB_DIR}\"
 
 packages = MPI XML MATH

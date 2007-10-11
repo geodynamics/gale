@@ -18,7 +18,7 @@ bin = ${PROJECT}
 SRCS = $(wildcard *.c)
 
 # Necessary to load all my modules in one shebang!
-EXTERNAL_LIBS =  -lStGermain -lStGermainDiscretisation -lStGermainBase ${EXPORT_DYNAMIC_LFLAGS}
+EXTERNAL_LIBS = -lStGermain  ${EXPORT_DYNAMIC_LFLAGS}
 
 EXTERNAL_INCLUDES = -DMODULE_EXT=\"${MODULE_EXT}\"
 

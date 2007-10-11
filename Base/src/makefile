@@ -24,7 +24,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 3462 2006-02-19 06:53:24Z WalterLandry $
+## $Id: makefile 4192 2007-10-11 07:56:26Z SteveQuenette $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -34,22 +34,32 @@ ifndef PROJ_ROOT
 endif
 include ${PROJ_ROOT}/Makefile.system
 
-include Makefile.def
-
-lib = ${def_lib}
+lib = StGermain
 libstatic = yes
 libdynamic= yes
-includes = ${def_inc}
+includes = StGermain
 
-SRCS = ${def_srcs}
+SRCS = \
+	Init.c \
+	Finalise.c \
+	main.c
 
-HDRS = ${def_hdrs}
+HDRS = \
+	Init.h \
+	Finalise.h \
+	StGermain.h \
+	main.h
 
-PROJ_LIBS = ${def_libs}
-PROJ_OBJLISTS = ${def_objlists}
-EXTERNAL_INCLUDES = -I${INC_DIR}/StGermain ${MPI_INCLUDES}
+PROJ_LIBS = 
+PROJ_OBJLISTS = \
+	StGermainBaseContext \
+	StGermainBaseExtensibility \
+	StGermainBaseAutomation \
+	StGermainBaseContainer \
+	StGermainBaseIO \
+	StGermainBaseFoundation
+EXTERNAL_INCLUDES = -I${INC_DIR}/StGermain  -DLIB_DIR=\"${LIB_DIR}\"
 
 packages = MPI XML MATH DL
-#packages = XML MATH DL
 
 include ${PROJ_ROOT}/Makefile.vmake

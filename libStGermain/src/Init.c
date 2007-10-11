@@ -24,13 +24,12 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Init.c 4163 2007-08-02 08:32:40Z SteveQuenette $
+** $Id: Init.c 4192 2007-10-11 07:56:26Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #include <mpi.h>
 #include "Base/Base.h"
-#include "Discretisation/Discretisation.h"
 
 #include "Init.h"
 
@@ -42,8 +41,6 @@ Bool StGermain_Init( int* argc, char** argv[] ) {
 	
 	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 	
-	Discretisation_Init( argc, argv );
-
 	/* Add the StGermain path to the global xml path dictionary */
 	directory = Memory_Alloc_Array( char, 200, "xmlDirectory" ) ;
 	sprintf(directory, "%s%s", LIB_DIR, "/StGermain" );

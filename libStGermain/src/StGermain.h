@@ -35,7 +35,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: StGermain.h 4164 2007-08-05 09:48:11Z SteveQuenette $
+** $Id: StGermain.h 4192 2007-10-11 07:56:26Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -43,7 +43,6 @@
 #define __StGermain_StGermain_h__
 
 	#include "Base/Base.h"
-	#include "Discretisation/Discretisation.h"
 	
 	#include "Init.h"
 	#include "main.h"

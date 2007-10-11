@@ -35,13 +35,13 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: Init.h 3462 2006-02-19 06:53:24Z WalterLandry $
+** $Id: Init.h 4192 2007-10-11 07:56:26Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Init_h__
-#define __Base_Init_h__
-	
-	Bool Base_Init( int* argc, char** argv[] );
-	
-#endif /* __Base_Init_h__ */
+#ifndef __StGermain_Init_h__
+#define __StGermain_Init_h__
+
+	Bool StGermain_Init( int* argc, char** argv[] );
+
+#endif /* __StGermain_Init_h__ */
