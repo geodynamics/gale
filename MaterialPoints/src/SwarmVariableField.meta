@@ -10,10 +10,10 @@
 <param name="Project Web">https://csd.vpac.org/twiki/bin/view/PICellerator/WebHome</param>
 <param name="Copyright">Copyright (C) 2005 VPAC and Monash Cluster Computing.</param>
 <param name="License">https://csd.vpac.org/twiki/bin/view/Stgermain/SoftwareLicense http://www.opensource.org/licenses/bsd-license.php</param>
-<param name="Parent">SwarmVariable</param>
+<param name="Parent">ParticleFeVariable</param>
 <param name="Reference">...</param>
-<param name="Summary">...</param>
-<param name="Description">Creates a swarm variable from a value stored on each material. This means that the degrees of freedom for the SwarmVariable aren't extra data on the particles in the swarm but stored only once per material.</param>
+<param name="Summary">Provides an interface for interpolating values stored on the swarm using swarm variables onto the mesh.</param>
+<param name="Description">Takes the value for a given swarm variable (the textual name of which is provided through the XML) at each particle and assigns a dof layout for the mesh (specified through the XML). The parent class then uses this swarm variable value by polymorphically calling the respective value at particle function to interpolate the swarm variable values onto the mesh nodes using the shape functions. These are then stored on the mesh using the dof layout created here.</param>
 
 <list name="Params">
 </list>
