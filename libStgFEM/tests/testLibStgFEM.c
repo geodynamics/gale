@@ -35,12 +35,13 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testLibStgFEM.c 750 2007-02-23 04:25:13Z KathleenHumble $
+** $Id: testLibStgFEM.c 964 2007-10-11 08:03:06Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include <StgFEM/StgFEM.h>
 
 #include <stdio.h>
@@ -60,7 +61,7 @@ int main( int argc, char* argv[] ) {
 	MPI_Comm_rank( CommWorld, &rank );
 	/* Read input */
 
-	if( !StGermain_Init( &argc, &argv ) ) {
+	if( !StGermain_Init( &argc, &argv ) || !StgDomain_Init( &argc, &argv ) ) {
 		fprintf( stderr, "Error initialising StGermain, exiting.\n" );
 		exit( EXIT_FAILURE );
 	}

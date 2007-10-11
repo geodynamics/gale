@@ -35,11 +35,12 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: HomogeneousNaturalBCs.c 956 2007-09-14 05:37:43Z JulianGiordani $
+** $Id: HomogeneousNaturalBCs.c 964 2007-10-11 08:03:06Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include <StgFEM/StgFEM.h>
 
 const Type HomogeneousNaturalBCs_Type = "HomogeneousNaturalBCs";
@@ -52,7 +53,7 @@ typedef struct {
 
 
 void HomogeneousNaturalBCs_Velocity_SkewToMesh( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
-	DiscretisationContext*	context = (DiscretisationContext*)_context;
+	DomainContext*	context = (DomainContext*)_context;
 	HomogeneousNaturalBCs*  self    = Stg_ComponentFactory_ConstructByName( 
 		context->CF, 
 		HomogeneousNaturalBCs_Type, 
@@ -76,7 +77,7 @@ void HomogeneousNaturalBCs_TemperatureFunction( void* analyticSolution, FeVariab
 }
 	
 void HomogeneousNaturalBCs_TemperatureBC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
-	DiscretisationContext*	context    = (DiscretisationContext*)_context;
+	DomainContext*	context    = (DomainContext*)_context;
 	HomogeneousNaturalBCs*  self       = Stg_ComponentFactory_ConstructByName( 
 		context->CF, 
 		HomogeneousNaturalBCs_Type, 

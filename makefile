@@ -35,7 +35,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 535 2006-04-11 13:07:34Z PatrickSunter $
+## $Id: makefile 964 2007-10-11 08:03:06Z SteveQuenette $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -43,7 +43,10 @@
 override PROJ_ROOT=.
 include ${PROJ_ROOT}/Makefile.system
 
-include Makefile.def
-subdirs = ${def_sub}
+subdirs = Discretisation SLE Assembly libStgFEM plugins Apps
+
+ifeq (true,$(shell if test -x $(DOXYGEN); then echo true; fi ))
+	subdirs += doc
+endif
 
 include ${PROJ_ROOT}/Makefile.vmake

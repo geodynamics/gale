@@ -35,7 +35,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 535 2006-04-11 13:07:34Z PatrickSunter $
+## $Id: makefile 964 2007-10-11 08:03:06Z SteveQuenette $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -54,6 +54,6 @@ subdirs = LinearTemperatureField
 PROJ_LIBS =
 EXTERNAL_INCLUDES = -I${INC_DIR}/${PROJECT} 
 
-packages = STGERMAIN PETSC MPI XML MATH DL HYPRE
+packages = STGDOMAIN STGERMAIN PETSC MPI XML MATH DL HYPRE
 
 include ${PROJ_ROOT}/Makefile.vmake

@@ -35,12 +35,13 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StandardConditionFunctions.c 953 2007-09-06 06:07:41Z DavidLee $
+** $Id: StandardConditionFunctions.c 964 2007-10-11 08:03:06Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include <StgFEM/StgFEM.h>
 #include <assert.h>
 #include "StandardConditionFunctions.h"
@@ -151,7 +152,7 @@ Index StgFEM_StandardConditionFunctions_Register( PluginsManager* pluginsManager
 }
 
 void StgFEM_StandardConditionFunctions_SolidBodyRotation( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
-	DiscretisationContext*	context            = (DiscretisationContext*)_context;
+	DomainContext*	context            = (DomainContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
 	FeVariable*             feVariable         = NULL;
 	FeMesh*			mesh               = NULL;
@@ -182,7 +183,7 @@ void StgFEM_StandardConditionFunctions_SolidBodyRotation( Node_LocalIndex node_l
 
 
 void StgFEM_StandardConditionFunctions_PartialRotationX( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
-	DiscretisationContext*	context            = (DiscretisationContext*)_context;
+	DomainContext*	context            = (DomainContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
 	FeVariable*             feVariable         = NULL;
 	FeMesh*			mesh               = NULL;
@@ -220,7 +221,7 @@ void StgFEM_StandardConditionFunctions_PartialRotationX( Node_LocalIndex node_lI
 }
 
 void StgFEM_StandardConditionFunctions_PartialRotationY( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
-	DiscretisationContext*	context            = (DiscretisationContext*)_context;
+	DomainContext*	context            = (DomainContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
 	FeVariable*             feVariable         = NULL;
 	FeMesh*			mesh               = NULL;
@@ -259,7 +260,7 @@ void StgFEM_StandardConditionFunctions_PartialRotationY( Node_LocalIndex node_lI
 
 
 void StgFEM_StandardConditionFunctions_SimpleShear( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
-	DiscretisationContext*	context            = (DiscretisationContext*)_context;
+	DomainContext*	context            = (DomainContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
 	FeVariable*             feVariable         = NULL;
 	FeMesh*			mesh               = NULL;
@@ -282,7 +283,7 @@ void StgFEM_StandardConditionFunctions_SimpleShear( Node_LocalIndex node_lI, Var
 }
 
 void StgFEM_StandardConditionFunctions_Extension( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
-	DiscretisationContext*	context            = (DiscretisationContext*)_context;
+	DomainContext*	context            = (DomainContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
 	FeVariable*             feVariable         = NULL;
 	FeMesh*			mesh               = NULL;
@@ -306,7 +307,7 @@ void StgFEM_StandardConditionFunctions_Extension( Node_LocalIndex node_lI, Varia
 
 
 void StgFEM_StandardConditionFunctions_PartialLid_TopLayer( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* result ) {
-	DiscretisationContext*	context = (DiscretisationContext*)_context;
+	DomainContext*	context = (DomainContext*)_context;
 	FeVariable*             velVar = NULL;
 	FeMesh*			mesh = NULL;
 	double*			velResult = (double*)result;
@@ -330,7 +331,7 @@ void StgFEM_StandardConditionFunctions_PartialLid_TopLayer( Node_LocalIndex node
 }
 
 void StgFEM_StandardConditionFunctions_LinearInterpolationLid( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* result ) {
-	DiscretisationContext*	context = (DiscretisationContext*)_context;
+	DomainContext*	context = (DomainContext*)_context;
 	FeVariable*             velVar = NULL;
 	FeMesh*			mesh = NULL;
 	double*			velResult = (double*)result;
@@ -353,7 +354,7 @@ void StgFEM_StandardConditionFunctions_LinearInterpolationLid( Node_LocalIndex n
 
 
 void StgFEM_StandardConditionFunctions_Lid_RampWithCentralMax( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* result ) {
-	DiscretisationContext*	context = (DiscretisationContext*)_context;
+	DomainContext*	context = (DomainContext*)_context;
 	FeVariable*             velVar = NULL;
 	FeMesh*			mesh = NULL;
 	double*			velResult = (double*)result;
@@ -377,7 +378,7 @@ void StgFEM_StandardConditionFunctions_Lid_RampWithCentralMax( Node_LocalIndex n
 
 
 void StgFEM_StandardConditionFunctions_SinusoidalLid( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* result ) {
-	DiscretisationContext*	context = (DiscretisationContext*)_context;
+	DomainContext*	context = (DomainContext*)_context;
 	FeVariable*             velVar = NULL;
 	FeMesh*			mesh = NULL;
 	double*			velResult = (double*)result;
@@ -399,7 +400,7 @@ void StgFEM_StandardConditionFunctions_SinusoidalLid( Node_LocalIndex node_lI, V
 
 
 void StgFEM_StandardConditionFunctions_CornerOnly( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* result ) {
-	DiscretisationContext*	context = (DiscretisationContext*)_context;
+	DomainContext*	context = (DomainContext*)_context;
 	FeVariable*             velVar = NULL;
 	FeMesh*			feMesh = NULL;
 	double*			velResult = (double*)result;
@@ -433,7 +434,7 @@ double StGermain_CosineHillValue( double* centre, double* position, double heigh
 }
 
 void StgFEM_StandardConditionFunctions_TemperatureCosineHill( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
-	DiscretisationContext*	context            = (DiscretisationContext*)_context;
+	DomainContext*	context            = (DomainContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
 	FeVariable*             feVariable         = NULL;
 	FeMesh*			feMesh               = NULL;
@@ -471,7 +472,7 @@ void StgFEM_StandardConditionFunctions_TemperatureCosineHill( Node_LocalIndex no
 
 
 void StgFEM_StandardConditionFunctions_LinearWithSinusoidalPerturbation( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
-	DiscretisationContext*	context = (DiscretisationContext*)_context;
+	DomainContext*	context = (DomainContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
 	FeVariable*             feVariable = NULL;
 	FeMesh*			feMesh = NULL;
@@ -516,7 +517,7 @@ void StgFEM_StandardConditionFunctions_LinearWithSinusoidalPerturbation( Node_Lo
 }
 
 void StgFEM_StandardConditionFunctions_Trigonometry( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
-	DiscretisationContext*	context            = (DiscretisationContext*)_context;
+	DomainContext*	context            = (DomainContext*)_context;
 	FeVariable*             feVariable         = NULL;
 	FeMesh*			feMesh               = NULL;
 	double*                 result             = (double*) _result;
@@ -539,7 +540,7 @@ void StgFEM_StandardConditionFunctions_Trigonometry( Node_LocalIndex node_lI, Va
 
 #define SMALL 1.0e-5
 void Stg_FEM_VelicTemperatureIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
-	DiscretisationContext*  context            = (DiscretisationContext*)_context;
+	DomainContext*  context            = (DomainContext*)_context;
 	FeVariable*             temperatureField   = (FeVariable*) FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
 	FeMesh*			feMesh               = temperatureField->feMesh;
 	Dictionary*             dictionary         = context->dictionary;
@@ -582,7 +583,7 @@ void Stg_FEM_VelicTemperatureIC( Node_LocalIndex node_lI, Variable_Index var_I, 
 
 /* IC from Mirko Velic. This is the IC temperature for his solB, from his Analytic Suite. Added 22-May-2006 */
 void Stg_FEM_VelicTemperatureIC_SolB( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
-	DiscretisationContext*  context            = (DiscretisationContext*)_context;
+	DomainContext*  context            = (DomainContext*)_context;
 	FeVariable*             temperatureField   = (FeVariable*) FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
 	FeMesh*			feMesh               = temperatureField->feMesh;
 	Dictionary*             dictionary         = context->dictionary;
@@ -625,7 +626,7 @@ void Stg_FEM_VelicTemperatureIC_SolB( Node_LocalIndex node_lI, Variable_Index va
 /* Initial Condition derived from Boundary Layer theory -
    taken from P. E. van Keken, S. D. King, U. R. Schmeling, U. R. Christensen, D. Neumeister, and M.-P. Doin. A comparison of methods for the modeling of thermochemical convection. Journal of Geophysical Research, 102(B10):22477-22496, october 1997. */
 void StgFEM_StandardConditionFunctions_AnalyticalTemperatureIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
-	DiscretisationContext*	context            = (DiscretisationContext*)_context;
+	DomainContext*	context            = (DomainContext*)_context;
 	FeVariable*             feVariable         = NULL;
 	FeMesh*			feMesh               = NULL;
 	Dictionary*             dictionary         = context->dictionary;
@@ -681,7 +682,7 @@ void StgFEM_StandardConditionFunctions_AnalyticalTemperatureIC( Node_LocalIndex 
 
 void StgFEM_StandardConditionFunctions_EdgeDriveConvectionIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
 {        
-	DiscretisationContext*  context = (DiscretisationContext*)_context;        
+	DomainContext*  context = (DomainContext*)_context;        
 	Dictionary*             dictionary         = context->dictionary;        
 	FeVariable*             feVariable = NULL;        
 	FeMesh*			mesh = NULL;        
@@ -838,7 +839,7 @@ void StgFEM_StandardConditionFunctions_ConvectionBenchmark( Node_LocalIndex node
 }
 
 void StgFEM_StandardConditionFunctions_ConstantVelocity( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
-	DiscretisationContext*	context            = (DiscretisationContext*)_context;
+	DomainContext*	context            = (DomainContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
 	FeVariable*             feVariable         = NULL;
 	FeMesh*			mesh               = NULL;

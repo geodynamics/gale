@@ -33,7 +33,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <mpi.h>
-#include "StGermain/StGermain.h"
+#include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include "StgFEM/Discretisation/Discretisation.h"
 
 #include "StGermain/Base/Foundation/TestBegin.h"
@@ -69,6 +70,7 @@ FeMesh* buildMesh() {
 
 void testSetup( int* argc, char** argv[] ) {
    StGermain_Init( argc, argv );
+   StgDomain_Init( argc, argv );
    StgFEM_Discretisation_Init( argc, argv );
    Stream_Enable( Journal_GetTypedStream( Debug_Type ), False );
    Stream_Enable( Journal_GetTypedStream( Info_Type ), False );
@@ -78,6 +80,7 @@ void testSetup( int* argc, char** argv[] ) {
 
 void testTeardown() {
    StgFEM_Discretisation_Finalise();
+   StgDomain_Finalise();
    StGermain_Finalise();
 }
 

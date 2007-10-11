@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testFeVariable.c 960 2007-09-25 07:54:49Z LukeHodkinson $
+** $Id: testFeVariable.c 964 2007-10-11 08:03:06Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -33,7 +33,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <mpi.h>
-#include "StGermain/StGermain.h"
+#include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include "StgFEM/Discretisation/Discretisation.h"
 
 #include "StGermain/Base/Foundation/TestBegin.h"
@@ -139,6 +140,7 @@ FeVariable* buildFeVar() {
 
 void testSetup( int* argc, char** argv[] ) {
    StGermain_Init( argc, argv );
+   StgDomain_Init( argc, argv );
    StgFEM_Discretisation_Init( argc, argv );
    Stream_Enable( Journal_GetTypedStream( Debug_Type ), False );
    Stream_Enable( Journal_GetTypedStream( Info_Type ), False );
@@ -148,6 +150,7 @@ void testSetup( int* argc, char** argv[] ) {
 
 void testTeardown() {
    StgFEM_Discretisation_Finalise();
+   StgDomain_Finalise();
    StGermain_Finalise();
 }
 

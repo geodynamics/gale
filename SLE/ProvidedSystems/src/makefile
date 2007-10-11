@@ -35,7 +35,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 656 2006-10-18 06:45:50Z SteveQuenette $
+## $Id: makefile 964 2007-10-11 08:03:06Z SteveQuenette $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -58,6 +58,6 @@ EXTERNAL_LIBS = -L${LIB_DIR}
 
 EXTERNAL_INCLUDES = -I${INC_DIR}/${PROJECT} 
 
-packages = STGERMAIN MPI XML MATH
+packages = STGDOMAIN STGERMAIN MPI XML MATH
 
 include ${PROJ_ROOT}/Makefile.vmake

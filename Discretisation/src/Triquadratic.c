@@ -35,7 +35,8 @@
 #include <assert.h>
 #include <mpi.h>
 
-#include "StGermain/StGermain.h"
+#include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include "Discretisation.h"
 
 #include "Triquadratic.h"

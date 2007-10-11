@@ -1,138 +1,137 @@
-StGermain Framework. Copyright (C) 2003-2005 VPAC.
-StGermain Discretisation Library. Copyright (C) 2003-2005 VPAC.
-StGermain FEM Discretisation Framework. Copyright (C) 2003-2005 VPAC.
+StGermain Framework revision 4190. Copyright (C) 2003-2005 VPAC.
+StGermain FEM Discretisation Framework revision 962. Copyright (C) 2003-2005 VPAC.
 Watching rank: 0
-ElementType_Register (ptr): 0x8064000
-Stg_Class (ptr): 0x8064000
-	sizeOfSelf: 44
+ElementType_Register (ptr): 0x806b0d8
+Stg_Class (ptr): 0x806b0d8
+	sizeOfSelf: 120
 	_deleteSelf: Yes
 	type: ElementType_Register
-	_delete (func ptr): 0x804b9f5
-	_print (func ptr): 0x804ba8b
+	_delete (func ptr): 0x40031e71
+	_print (func ptr): 0x40031f05
 	_copy (func ptr): (nil)
 	count: 9
 	_size: 16
 	_delta: 8
-	elementType (ptr): 0x8066598
+	elementType (ptr): 0x806e9f8
 	elementType[0-9]:
-elementType[0]: ConstantElementType (ptr): 0x8064bf0
-ElementType (ptr): 0x8064bf0
-Stg_Class (ptr): 0x8064bf0
-	sizeOfSelf: 48
+elementType[0]: ConstantElementType (ptr): 0x806b5e0
+ElementType (ptr): 0x806b5e0
+Stg_Class (ptr): 0x806b5e0
+	sizeOfSelf: 124
 	_deleteSelf: Yes
 	type: ConstantElementType
-	_delete (func ptr): 0x804be50
-	_print (func ptr): 0x804be79
+	_delete (func ptr): 0x8048cc0
+	_print (func ptr): 0x8048d40
 	_copy (func ptr): (nil)
-	_build (func ptr): 0x804becb
-	_evaluateShapeFunctionsAt (func ptr): 0x804bed0
-	_evaluateShapeFunctionLocalDerivsAt (func ptr): 0x804beeb
+	_build (func ptr): 0x8048d50
+	_evaluateShapeFunctionsAt (func ptr): 0x8048c60
+	_evaluateShapeFunctionLocalDerivsAt (func ptr): 0x8048e50
 	nodeCount: 1
-elementType[1]: BilinearElementType (ptr): 0x8066360
-ElementType (ptr): 0x8066360
-Stg_Class (ptr): 0x8066360
-	sizeOfSelf: 96
+elementType[1]: BilinearElementType (ptr): 0x806bce0
+ElementType (ptr): 0x806bce0
+Stg_Class (ptr): 0x806bce0
+	sizeOfSelf: 176
 	_deleteSelf: Yes
 	type: BilinearElementType
-	_delete (func ptr): 0x804c128
-	_print (func ptr): 0x804c151
+	_delete (func ptr): 0x4002c461
+	_print (func ptr): 0x4002c4a7
 	_copy (func ptr): (nil)
-	_build (func ptr): 0x804c2f7
-	_evaluateShapeFunctionsAt (func ptr): 0x804c2fc
-	_evaluateShapeFunctionLocalDerivsAt (func ptr): 0x804c3b7
+	_build (func ptr): 0x4002c661
+	_evaluateShapeFunctionsAt (func ptr): 0x4002c666
+	_evaluateShapeFunctionLocalDerivsAt (func ptr): 0x4002c701
 	nodeCount: 4
 self->minElLocalCoord: (-1.00000,-1.00000,)
 self->maxElLocalCoord: (1.00000,1.00000,)
 self->elLocalLength: (2.00000,2.00000,)
-elementType[2]: TrilinearElementType (ptr): 0x80663c8
-ElementType (ptr): 0x80663c8
-Stg_Class (ptr): 0x80663c8
-	sizeOfSelf: 120
+elementType[2]: TrilinearElementType (ptr): 0x806c268
+ElementType (ptr): 0x806c268
+Stg_Class (ptr): 0x806c268
+	sizeOfSelf: 200
 	_deleteSelf: Yes
 	type: TrilinearElementType
-	_delete (func ptr): 0x804c7b0
-	_print (func ptr): 0x804c7d9
+	_delete (func ptr): 0x40042c40
+	_print (func ptr): 0x40042c86
 	_copy (func ptr): (nil)
-	_build (func ptr): 0x804c82b
-	_evaluateShapeFunctionsAt (func ptr): 0x804c830
-	_evaluateShapeFunctionLocalDerivsAt (func ptr): 0x804c9ee
+	_build (func ptr): 0x40042cec
+	_evaluateShapeFunctionsAt (func ptr): 0x40042cf1
+	_evaluateShapeFunctionLocalDerivsAt (func ptr): 0x40042e4f
 	nodeCount: 8
-elementType[3]: ConstantElementType (ptr): 0x8066448
-ElementType (ptr): 0x8066448
-Stg_Class (ptr): 0x8066448
-	sizeOfSelf: 48
+elementType[3]: ConstantElementType (ptr): 0x806c8c8
+ElementType (ptr): 0x806c8c8
+Stg_Class (ptr): 0x806c8c8
+	sizeOfSelf: 124
 	_deleteSelf: Yes
 	type: TestElementType0
-	_delete (func ptr): 0x804be50
-	_print (func ptr): 0x804be79
+	_delete (func ptr): 0x8048cc0
+	_print (func ptr): 0x8048d40
 	_copy (func ptr): (nil)
-	_build (func ptr): 0x804becb
-	_evaluateShapeFunctionsAt (func ptr): 0x804bed0
-	_evaluateShapeFunctionLocalDerivsAt (func ptr): 0x804beeb
+	_build (func ptr): 0x8048d50
+	_evaluateShapeFunctionsAt (func ptr): 0x8048c60
+	_evaluateShapeFunctionLocalDerivsAt (func ptr): 0x8048e50
 	nodeCount: 1
-elementType[4]: ConstantElementType (ptr): 0x8066480
-ElementType (ptr): 0x8066480
-Stg_Class (ptr): 0x8066480
-	sizeOfSelf: 48
+elementType[4]: ConstantElementType (ptr): 0x806ce50
+ElementType (ptr): 0x806ce50
+Stg_Class (ptr): 0x806ce50
+	sizeOfSelf: 124
 	_deleteSelf: Yes
 	type: TestElementType1
-	_delete (func ptr): 0x804be50
-	_print (func ptr): 0x804be79
+	_delete (func ptr): 0x8048cc0
+	_print (func ptr): 0x8048d40
 	_copy (func ptr): (nil)
-	_build (func ptr): 0x804becb
-	_evaluateShapeFunctionsAt (func ptr): 0x804bed0
-	_evaluateShapeFunctionLocalDerivsAt (func ptr): 0x804beeb
+	_build (func ptr): 0x8048d50
+	_evaluateShapeFunctionsAt (func ptr): 0x8048c60
+	_evaluateShapeFunctionLocalDerivsAt (func ptr): 0x8048e50
 	nodeCount: 1
-elementType[5]: ConstantElementType (ptr): 0x80664b8
-ElementType (ptr): 0x80664b8
-Stg_Class (ptr): 0x80664b8
-	sizeOfSelf: 48
+elementType[5]: ConstantElementType (ptr): 0x806d3d8
+ElementType (ptr): 0x806d3d8
+Stg_Class (ptr): 0x806d3d8
+	sizeOfSelf: 124
 	_deleteSelf: Yes
 	type: TestElementType2
-	_delete (func ptr): 0x804be50
-	_print (func ptr): 0x804be79
+	_delete (func ptr): 0x8048cc0
+	_print (func ptr): 0x8048d40
 	_copy (func ptr): (nil)
-	_build (func ptr): 0x804becb
-	_evaluateShapeFunctionsAt (func ptr): 0x804bed0
-	_evaluateShapeFunctionLocalDerivsAt (func ptr): 0x804beeb
+	_build (func ptr): 0x8048d50
+	_evaluateShapeFunctionsAt (func ptr): 0x8048c60
+	_evaluateShapeFunctionLocalDerivsAt (func ptr): 0x8048e50
 	nodeCount: 1
-elementType[6]: ConstantElementType (ptr): 0x80664f0
-ElementType (ptr): 0x80664f0
-Stg_Class (ptr): 0x80664f0
-	sizeOfSelf: 48
+elementType[6]: ConstantElementType (ptr): 0x806d960
+ElementType (ptr): 0x806d960
+Stg_Class (ptr): 0x806d960
+	sizeOfSelf: 124
 	_deleteSelf: Yes
 	type: TestElementType3
-	_delete (func ptr): 0x804be50
-	_print (func ptr): 0x804be79
+	_delete (func ptr): 0x8048cc0
+	_print (func ptr): 0x8048d40
 	_copy (func ptr): (nil)
-	_build (func ptr): 0x804becb
-	_evaluateShapeFunctionsAt (func ptr): 0x804bed0
-	_evaluateShapeFunctionLocalDerivsAt (func ptr): 0x804beeb
+	_build (func ptr): 0x8048d50
+	_evaluateShapeFunctionsAt (func ptr): 0x8048c60
+	_evaluateShapeFunctionLocalDerivsAt (func ptr): 0x8048e50
 	nodeCount: 1
-elementType[7]: ConstantElementType (ptr): 0x8066528
-ElementType (ptr): 0x8066528
-Stg_Class (ptr): 0x8066528
-	sizeOfSelf: 48
+elementType[7]: ConstantElementType (ptr): 0x806dee8
+ElementType (ptr): 0x806dee8
+Stg_Class (ptr): 0x806dee8
+	sizeOfSelf: 124
 	_deleteSelf: Yes
 	type: TestElementType4
-	_delete (func ptr): 0x804be50
-	_print (func ptr): 0x804be79
+	_delete (func ptr): 0x8048cc0
+	_print (func ptr): 0x8048d40
 	_copy (func ptr): (nil)
-	_build (func ptr): 0x804becb
-	_evaluateShapeFunctionsAt (func ptr): 0x804bed0
-	_evaluateShapeFunctionLocalDerivsAt (func ptr): 0x804beeb
+	_build (func ptr): 0x8048d50
+	_evaluateShapeFunctionsAt (func ptr): 0x8048c60
+	_evaluateShapeFunctionLocalDerivsAt (func ptr): 0x8048e50
 	nodeCount: 1
-elementType[8]: ConstantElementType (ptr): 0x8066560
-ElementType (ptr): 0x8066560
-Stg_Class (ptr): 0x8066560
-	sizeOfSelf: 48
+elementType[8]: ConstantElementType (ptr): 0x806e470
+ElementType (ptr): 0x806e470
+Stg_Class (ptr): 0x806e470
+	sizeOfSelf: 124
 	_deleteSelf: Yes
 	type: TestElementType5
-	_delete (func ptr): 0x804be50
-	_print (func ptr): 0x804be79
+	_delete (func ptr): 0x8048cc0
+	_print (func ptr): 0x8048d40
 	_copy (func ptr): (nil)
-	_build (func ptr): 0x804becb
-	_evaluateShapeFunctionsAt (func ptr): 0x804bed0
-	_evaluateShapeFunctionLocalDerivsAt (func ptr): 0x804beeb
+	_build (func ptr): 0x8048d50
+	_evaluateShapeFunctionsAt (func ptr): 0x8048c60
+	_evaluateShapeFunctionLocalDerivsAt (func ptr): 0x8048e50
 	nodeCount: 1
 	]

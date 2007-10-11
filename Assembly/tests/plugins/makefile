@@ -35,7 +35,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 822 2007-04-27 06:20:35Z LukeHodkinson $
+## $Id: makefile 964 2007-10-11 08:03:06Z SteveQuenette $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #Finds the Absolute path to the Project Root directory
@@ -44,7 +44,7 @@ PROJ_ROOT := $(shell until test -r ./Makefile.system ; do cd .. ; done ; echo `p
 include ${PROJ_ROOT}/Makefile.system
 
 # External Libraries and Headers
-packages = STGERMAIN MPI XML 
+packages = STGDOMAIN STGERMAIN MPI XML 
 
 ifeq (true,$(shell if test -r $(PETSC_INCDIR)/petsc.h; then echo true; fi ))
 	USER_CFLAGS += -DHAVE_PETSC

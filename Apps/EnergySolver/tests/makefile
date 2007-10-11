@@ -35,7 +35,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 715 2007-01-17 13:00:01Z SteveQuenette $
+## $Id: makefile 964 2007-10-11 08:03:06Z SteveQuenette $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 SHELL := $(shell which bash)
@@ -54,5 +54,5 @@ subdirs = HomogeneousNaturalBCs AdvDiffSteadyState1D
 XMLS_TARGET_DIR = ${EXAMPLES_DIR}/${modName}/tests
 XMLS = $(wildcard *.xml)
 
-packages = STGERMAIN PETSC MPI XML MATH DL 
+packages = STGDOMAIN STGERMAIN PETSC MPI XML MATH DL 
 include ${PROJ_ROOT}/Makefile.vmake

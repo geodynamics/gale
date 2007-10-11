@@ -53,7 +53,7 @@ SRCS = $(wildcard *.c)
 EXTERNAL_INCLUDES = -I${INC_DIR}/${PROJECT}
 EXTERNAL_LIBS= -L${LIB_DIR} -l${PROJECT}_SLE_LinearAlgebra -l${PROJECT}_Discretisation
 
-packages = STGERMAIN MPI XML MATH DL HYPRE
+packages = STGDOMAIN STGERMAIN MPI XML MATH DL HYPRE
 
 ifeq (true,$(shell if test -r $(PETSC_INCDIR)/petsc.h; then echo true; fi ))
 	USER_CFLAGS += -DHAVE_PETSC

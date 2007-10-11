@@ -16,7 +16,7 @@
 ## Role:
 ##	Obtain the project configuration.
 ##
-## $Id: project-config.sh 656 2006-10-18 06:45:50Z SteveQuenette $
+## $Id: project-config.sh 964 2007-10-11 08:03:06Z SteveQuenette $
 ##
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -40,6 +40,7 @@ setValue PROJECT 'StgFEM'
 # Note: StGermain needs to be before MPI and PETSc, due to the
 # "compatibility" stuff. -- PatrickSunter
 . ./VMake/Config/StGermain-config.sh
+. ./VMake/Config/StgDomain-config.sh
 
 . ./VMake/Config/compiler-config.sh
 . ./VMake/Config/math-config.sh

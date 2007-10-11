@@ -1,7 +1,6 @@
-StGermain Framework revision 3885. Copyright (C) 2003-2005 VPAC.
-StGermain Discretisation Library revision 3885. Copyright (C) 2003-2005 VPAC.
-StGermain FEM Discretisation Framework revision 662. Copyright (C) 2003-2005 VPAC.
-StGermain PETSc-LinearAlgebra Interface revision 662. Copyright (C) 2003-2005 VPAC.
+StGermain Framework revision 4190. Copyright (C) 2003-2005 VPAC.
+StGermain FEM Discretisation Framework revision 962. Copyright (C) 2003-2005 VPAC.
+StGermain PETSc-LinearAlgebra Interface revision 962. Copyright (C) 2003-2005 VPAC.
 Running with no timestep braking, using  dt that increases 50% each step:
 Run until 10 timeSteps have been run
 TimeStep = 1, Start time = 0 + 0 prev timeStep dt

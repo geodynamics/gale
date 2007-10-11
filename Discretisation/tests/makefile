@@ -35,7 +35,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 818 2007-04-24 04:44:27Z PatrickSunter $
+## $Id: makefile 964 2007-10-11 08:03:06Z SteveQuenette $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -53,6 +53,6 @@ SRCS = $(wildcard *.c)
 EXTERNAL_INCLUDES = -I${INC_DIR}/${PROJECT} 
 EXTERNAL_LIBS= -L${LIB_DIR} -l${PROJECT}_${NAME} ${RPATH_LFLAGS}
 
-packages = STGERMAIN PETSC MPI XML MATH DL HYPRE
+packages = STGDOMAIN STGERMAIN PETSC MPI XML MATH DL HYPRE
 
 include ${PROJ_ROOT}/Makefile.vmake

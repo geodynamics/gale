@@ -6,4 +6,11 @@
 <!-- Note: suffixing the name by "_Toolbox" is important here! -->
 <param name="Name">StgFEM_Toolbox</param>
 
+<list name="dependenices">
+	<struct>
+		<param name="plugin">StgDomain</param>
+		<param name="version">0</param>
+	</struct>
+</list>
+
 </StGermainData>

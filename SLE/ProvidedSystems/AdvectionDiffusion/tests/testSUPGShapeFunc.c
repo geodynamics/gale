@@ -35,12 +35,13 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testSUPGShapeFunc.c 938 2007-08-16 03:42:14Z DavidLee $
+** $Id: testSUPGShapeFunc.c 964 2007-10-11 08:03:06Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include "StgFEM/Discretisation/Discretisation.h"
 #include "StgFEM/SLE/LinearAlgebra/LinearAlgebra.h"
 #include "StgFEM/SLE/SystemSetup/SystemSetup.h"
@@ -154,7 +155,7 @@ int main( int argc, char* argv[] ) {
 	ExtensionManager_Register* extensionMgr_Register;
 	FeVariable*                feVariable;
 	Variable_Register*         variableRegister;
-	DiscretisationContext*     context;
+	DomainContext*     context;
 	Node_DomainIndex           node_I;
 	Stream*	                   stream;
 	/* Swarm Stuff */
@@ -176,6 +177,7 @@ int main( int argc, char* argv[] ) {
 	MPI_Comm_rank( CommWorld, &rank );
 	
 	StGermain_Init( &argc, &argv );
+	StgDomain_Init( &argc, &argv );
 	StgFEM_Discretisation_Init( &argc, &argv );
 	StgFEM_SLE_SystemSetup_Init( &argc, &argv );
 	StgFEM_SLE_ProvidedSystems_AdvectionDiffusion_Init( &argc, &argv );
@@ -200,11 +202,11 @@ int main( int argc, char* argv[] ) {
 	Dictionary_Add( dictionary, "gaussParticlesY", Dictionary_Entry_Value_FromUnsignedInt( 2 ) );
 	
 	/* Create Context */
-	context = _DiscretisationContext_New( 
-			sizeof(DiscretisationContext), 
-			DiscretisationContext_Type, 
-			_DiscretisationContext_Delete, 
-			_DiscretisationContext_Print,
+	context = _DomainContext_New( 
+			sizeof(DomainContext), 
+			DomainContext_Type, 
+			_DomainContext_Delete, 
+			_DomainContext_Print,
 			NULL,
 			NULL,
 			NULL,
@@ -212,7 +214,7 @@ int main( int argc, char* argv[] ) {
 			NULL,
 			NULL,
 			NULL,
-			"discretisationContext",
+			"domainContext",
 			True,
 			NULL,
 			0,0,
@@ -386,6 +388,7 @@ int main( int argc, char* argv[] ) {
 	
 	StgFEM_SLE_SystemSetup_Finalise();
 	StgFEM_Discretisation_Finalise();
+	StgDomain_Finalise();
 	StGermain_Finalise();
 	
 	/* Close off MPI */

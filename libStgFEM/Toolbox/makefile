@@ -55,7 +55,7 @@ HDRS = $(wildcard *.h)
 
 # ALso need to link against SLE library because
 # we call StgFEM init from here...
-packages = STGERMAIN PETSC MPI XML
+packages = STGDOMAIN STGERMAIN PETSC MPI XML
 EXTERNAL_LIBS = -lStgFEM -lStgFEM_SLE_LinearAlgebra
 
 include ${PROJ_ROOT}/Makefile.vmake

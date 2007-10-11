@@ -35,12 +35,13 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Context.c 860 2007-06-07 05:47:20Z LukeHodkinson $
+** $Id: Context.c 964 2007-10-11 08:03:06Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include "StgFEM/Discretisation/Discretisation.h"
 #include "StgFEM/SLE/LinearAlgebra/LinearAlgebra.h"
 #include "units.h"
@@ -138,7 +139,7 @@ FiniteElementContext* _FiniteElementContext_New(
 	FiniteElementContext* self;
 	
 	/* Allocate memory */
-	self = (FiniteElementContext*)_DiscretisationContext_New( 
+	self = (FiniteElementContext*)_DomainContext_New( 
 		sizeOfSelf, 
 		type, 
 		_delete, 
@@ -267,7 +268,7 @@ void _FiniteElementContext_Delete( void* context ) {
 	Stream_UnIndentBranch( StgFEM_Debug );
 
 	/* Stg_Class_Delete parent */
-	_DiscretisationContext_Delete( self );
+	_DomainContext_Delete( self );
 }
 
 
@@ -278,7 +279,7 @@ void _FiniteElementContext_Print( void* context, Stream* stream ) {
 	Journal_Printf( (void*) stream, "FiniteElementContext (ptr): %p\n", self );
 	
 	/* Print parent */
-	_DiscretisationContext_Print( self, stream );
+	_DomainContext_Print( self, stream );
 
 	Journal_Printf( (void*) stream, "\tslEquations (ptr): %p\n", self->slEquations );
 	Stg_Class_Print( self->slEquations, stream );
@@ -321,7 +322,7 @@ void _FiniteElementContext_Construct( void* context, Stg_ComponentFactory* cf, v
 
 /* I don't think this is needed any more...
 	_AbstractContext_Init( (AbstractContext*)self, 0, 0, MPI_COMM_WORLD );
-	_DiscretisationContext_Init( (DiscretisationContext*)self );*/
+	_DomainContext_Init( (DomainContext*)self );*/
 	_FiniteElementContext_Init( self );
 	
 	componentIndex = Stg_ObjectList_GetIndex( cf->LCRegister->componentList, self->name );

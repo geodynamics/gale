@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testSolutionVector.c 960 2007-09-25 07:54:49Z LukeHodkinson $
+** $Id: testSolutionVector.c 964 2007-10-11 08:03:06Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -33,7 +33,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <mpi.h>
-#include "StGermain/StGermain.h"
+#include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include "StgFEM/Discretisation/Discretisation.h"
 #include "StgFEM/SLE/LinearAlgebra/LinearAlgebra.h"
 #include "StgFEM/SLE/SystemSetup/SystemSetup.h"
@@ -142,6 +143,7 @@ FeVariable* buildFeVar() {
 
 void testSetup( int* argc, char** argv[] ) {
    StGermain_Init( argc, argv );
+   StgDomain_Init( argc, argv );
    StgFEM_Discretisation_Init( argc, argv );
    StgFEM_SLE_LinearAlgebra_Init( argc, argv );
    StgFEM_SLE_SystemSetup_Init( argc, argv );
@@ -155,6 +157,7 @@ void testTeardown() {
    StgFEM_SLE_SystemSetup_Finalise();
    StgFEM_SLE_LinearAlgebra_Finalise();
    StgFEM_Discretisation_Finalise();
+   StgDomain_Finalise();
    StGermain_Finalise();
 }
 

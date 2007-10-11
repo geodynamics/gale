@@ -47,7 +47,7 @@
 ** Comments:
 **	There's an issue inside FE_Context_Build() see inside the code.
 **
-** $Id: Context.h 656 2006-10-18 06:45:50Z SteveQuenette $
+** $Id: Context.h 964 2007-10-11 08:03:06Z SteveQuenette $
 *
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -61,7 +61,7 @@
 	
 	#define __FiniteElementContext \
 		/* General info */ \
-		__DiscretisationContext \
+		__DomainContext \
 		\
 		/* Virtual info */ \
 		\

@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeMesh.c 960 2007-09-25 07:54:49Z LukeHodkinson $
+** $Id: FeMesh.c 964 2007-10-11 08:03:06Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -34,7 +34,8 @@
 #include <assert.h>
 #include <mpi.h>
 
-#include "StGermain/StGermain.h"
+#include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include "Discretisation.h"
 
 

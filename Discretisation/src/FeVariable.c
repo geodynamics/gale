@@ -35,12 +35,13 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeVariable.c 962 2007-09-28 03:18:41Z DavidLee $
+** $Id: FeVariable.c 964 2007-10-11 08:03:06Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include "units.h"
 #include "types.h"
 #include "ElementType.h"
@@ -560,7 +561,7 @@ void* _FeVariable_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, P
 
 void _FeVariable_Build( void* variable, void* data ) {
 	FeVariable* self = (FeVariable*)variable;
-	DiscretisationContext*   context = (DiscretisationContext*)data;
+	DomainContext*   context = (DomainContext*)data;
 	
 	if ( False == self->isBuilt ) {
 		self->isBuilt = True;
@@ -685,7 +686,7 @@ void _FeVariable_Construct( void* variable, Stg_ComponentFactory* cf, void* data
 
 void _FeVariable_Initialise( void* variable, void* data ) {
 	FeVariable*              self = (FeVariable*)variable;
-	DiscretisationContext*   context = (DiscretisationContext*)data;
+	DomainContext*   context = (DomainContext*)data;
 	char*                    inputPathString = NULL;
 	
 	Journal_DPrintf( self->debug, "In %s- for %s:\n", __func__, self->name );

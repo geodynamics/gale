@@ -53,7 +53,7 @@ includes = ${PROJECT}/${modName}
 SRCS = $(wildcard *.c)
 HDRS = $(wildcard *.h)
 
-packages = STGERMAIN PETSC MPI XML
+packages = STGDOMAIN STGERMAIN PETSC MPI XML
 EXTERNAL_LIBS = -lStgFEM
 
 include ${PROJ_ROOT}/Makefile.vmake

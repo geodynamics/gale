@@ -35,12 +35,13 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testElementType.c 890 2007-06-28 06:53:27Z LukeHodkinson $
+** $Id: testElementType.c 964 2007-10-11 08:03:06Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include "StgFEM/Discretisation/Discretisation.h"
 
 #include <stdio.h>
@@ -95,7 +96,7 @@ int main( int argc, char* argv[] ) {
 	Dictionary*			dictionary;
 	ExtensionManager_Register*		extensionMgr_Register;
 	FeMesh*		feMesh;
-	DiscretisationContext* context;
+	DomainContext* context;
 	Index				test_I;
 	Stream*				stream;
 	Coord               globalCoord;
@@ -116,6 +117,7 @@ int main( int argc, char* argv[] ) {
 	MPI_Comm_rank( CommWorld, &rank );
 	
 	StGermain_Init( &argc, &argv );
+	StgDomain_Init( &argc, &argv );
 	StgFEM_Discretisation_Init( &argc, &argv );
 	MPI_Barrier( CommWorld ); /* Ensures copyright info always come first in output */
 
@@ -138,11 +140,11 @@ int main( int argc, char* argv[] ) {
 	Dictionary_ReadAllParamFromCommandLine( dictionary, argc, argv );
 	
 	/* Create Context */
-	context = _DiscretisationContext_New( 
-			sizeof(DiscretisationContext), 
-			DiscretisationContext_Type, 
-			_DiscretisationContext_Delete, 
-			_DiscretisationContext_Print,
+	context = _DomainContext_New( 
+			sizeof(DomainContext), 
+			DomainContext_Type, 
+			_DomainContext_Delete, 
+			_DomainContext_Print,
 			NULL,
 			NULL,
 			NULL,
@@ -150,7 +152,7 @@ int main( int argc, char* argv[] ) {
 			NULL,
 			NULL,
 			NULL,
-			"discretisationContext",
+			"domainContext",
 			True,
 			NULL,
 			0,0,
@@ -197,6 +199,7 @@ int main( int argc, char* argv[] ) {
 	Stg_Class_Delete( dictionary );
 	
 	StgFEM_Discretisation_Finalise();
+	StgDomain_Finalise();
 	StGermain_Finalise();
 	
 	/* Close off MPI */

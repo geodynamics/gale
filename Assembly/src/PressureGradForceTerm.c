@@ -44,6 +44,7 @@
 #include <string.h>
 #include <mpi.h>
 #include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 #include <StgFEM/Discretisation/Discretisation.h>
 #include <StgFEM/SLE/SLE.h>
 
