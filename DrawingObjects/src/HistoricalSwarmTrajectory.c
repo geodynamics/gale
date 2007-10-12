@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: HistoricalSwarmTrajectory.c 740 2007-10-11 08:05:31Z SteveQuenette $
+** $Id: HistoricalSwarmTrajectory.c 741 2007-10-12 06:54:18Z BelindaMay $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -125,7 +125,7 @@ void _lucHistoricalSwarmTrajectory_Init(
 	self->particleExtHandle = ExtensionManager_Add( 	
 					swarm->particleExtensionMgr, 
 					self->type, 
-					sizeof( lucHistoricalSwarmTrajectory_ParticleExt ) + ( historySteps+1 )*sizeof( Coord ) );
+					sizeof( lucHistoricalSwarmTrajectory_ParticleExt ) + ( historySteps+3 )*sizeof( Coord ) );
 	
 	lucColour_FromString( &self->colour, colourName );
 
