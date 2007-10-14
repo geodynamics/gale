@@ -262,12 +262,10 @@ void _SwarmVariableField_Destroy( void* swarmVariableField, void* data ) {
 void _SwarmVariableField_ValueAtParticle( void* swarmVariableField, 
 					  IntegrationPointsSwarm* swarm, 
 					  Element_LocalIndex lElement_I, 
-					  /*Particle_Index lParticle_I, */
 					  IntegrationPoint* particle,
 					  double* value ) 
 {
 	SwarmVariableField*	self            = (SwarmVariableField*)swarmVariableField;
-	//MaterialPoint*		matParticle;
 	GlobalParticle*		matParticle;
 	double			distance;
 	Cell_Index		cell_I;
