@@ -185,6 +185,7 @@ void _SwarmVariableField_Construct( void* swarmVariableField, Stg_ComponentFacto
 
 	/* dunno if this is the right way about getting the context... */
 	context = (FiniteElementContext*) Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data );
+	//context = Stg_ComponentFactory_ConstructByKey( cf, "context", FiniteElementContext, True, data );
 	assert( context );
 
 	_SwarmVariableField_Init( self, swarmVar, variable_Register );
@@ -273,41 +274,24 @@ void _SwarmVariableField_ValueAtParticle( void* swarmVariableField,
 	Particle_InCellIndex	cParticle_I;
 	Particle_Index		lParticle_I;
 
-	//matParticle 	= OneToOneMapper_GetMaterialPoint( swarm->mapper, particle, self->materialSwarm );
-	//cell_I 		= CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
-
-	/* is the cell index required here local or global?? dave, 04.10.07 */
-	//cParticle_I = Swarm_FindClosestParticleInCell( self->materialSwarm, 
-	//					       cell_I, 
-	//					       Mesh_GetDimSize( self->dofLayout->mesh ), 
-	//					       matParticle->coord, 
-	//					       &distance );
-
-	//lParticle_I = self->materialSwarm->cellParticleTbl[cell_I][cParticle_I];
-
 	cell_I = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
 	cParticle_I = Swarm_FindClosestParticleInCell( swarm,
 		       				       cell_I,
 						       Mesh_GetDimSize( self->dofLayout->mesh ),
 						       particle->xi,
 						       &distance );
-	lParticle_I = IntegrationPointMapper_GetMaterialIndexAt( swarm->mapper, swarm->cellParticleTbl[cell_I][lParticle_I] );
+	// this function doesn't seem to be doing its joob properly!
+	//lParticle_I = IntegrationPointMapper_GetMaterialIndexAt( swarm->mapper, swarm->cellParticleTbl[cell_I][cParticle_I] );
+	
+	/* assume that the material and intergation points swarms map 1:1 */
+	lParticle_I = swarm->cellParticleTbl[cell_I][cParticle_I];
 	
 	
-	// TODO SwarmVariable_ValueAt( self->swarmVariable, lParticle_I )
-	// TODO return / copy value
 	SwarmVariable_ValueAt( self->swarmVar, lParticle_I, value ); /* does the copy inside this func. dave, 18.09.07 */
 }
 
 /* use the FeVariable_GetValueAtNode func. dave, 03.10.07 */
 void _SwarmVariableField_GetValueAtNode( void* swarmVariableField, Node_DomainIndex dNode_I, double* value ) {
-/*
-	SwarmVariableField*	self            = (SwarmVariableField*)swarmVariableField;
-	double*			localVecValues;
-
-	Vector_GetArray( self->assemblyVector->vector, &localVecValues );
-	*value	= localVecValues[ dNode_I * self->fieldComponentCount ];
-*/
 	FeVariable_GetValueAtNode( swarmVariableField, dNode_I, value );
 }
 
