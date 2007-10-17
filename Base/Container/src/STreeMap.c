@@ -69,8 +69,12 @@ void STreeMap_Insert( void* _self, const void* key, const void* val ) {
    stgByte* tmp;
 
    tmp = (stgByte*)malloc( self->keySize + self->valSize );
+   assert( key );
    memcpy( tmp, key, self->keySize );
-   memcpy( tmp + self->keySize, val, self->valSize );
+   if( val )
+      memcpy( tmp + self->keySize, val, self->valSize );
+   else
+      memset( tmp + self->keySize, 0, self->valSize );
    STree_Insert( self, tmp );
    if( tmp )
      free( tmp );
