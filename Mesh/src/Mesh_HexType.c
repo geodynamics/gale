@@ -149,8 +149,11 @@ void Mesh_HexType_Update( void* hexType ) {
 
 	nDims = Mesh_GetDimSize( self->mesh );
 	for( d_i = 0; d_i < nDims; d_i++ ) {
-		if( !Mesh_GetGlobalSize( self->mesh, d_i ) || !Mesh_HasIncidence( self->mesh, nDims, d_i ) )
+		if( Class_IsSuper( self->mesh->topo, IGraph ) && 
+		    (!Mesh_GetGlobalSize( self->mesh, d_i ) || !Mesh_HasIncidence( self->mesh, nDims, d_i )) )
+		{
 			break;
+		}
 	}
 
 	if( Mesh_GetDimSize( self->mesh ) == 3 ) {

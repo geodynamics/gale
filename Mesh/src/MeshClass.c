@@ -272,7 +272,10 @@ unsigned Mesh_GetLocalSize( void* mesh, MeshTopology_Dim dim ) {
 	assert( self );
 	assert( self->topo );
 
-	return Decomp_GetNumLocals( Sync_GetDecomp( IGraph_GetDomain( self->topo, dim ) ) );
+	if( Class_IsSuper( self->topo, IGraph ) )
+		return Decomp_GetNumLocals( Sync_GetDecomp( IGraph_GetDomain( self->topo, dim ) ) );
+	else
+		return MeshTopology_GetNumCells( self->topo, dim );
 }
 
 unsigned Mesh_GetRemoteSize( void* mesh, MeshTopology_Dim dim ) {
@@ -290,7 +293,10 @@ unsigned Mesh_GetDomainSize( void* mesh, MeshTopology_Dim dim ) {
 	assert( self );
 	assert( self->topo );
 
-	return Sync_GetNumDomains( IGraph_GetDomain( self->topo, dim ) );
+	if( Class_IsSuper( self->topo, IGraph ) )
+		return Sync_GetNumDomains( IGraph_GetDomain( self->topo, dim ) );
+	else
+		return MeshTopology_GetNumCells( self->topo, dim );
 }
 
 unsigned Mesh_GetSharedSize( void* mesh, MeshTopology_Dim dim ) {
@@ -551,12 +557,14 @@ void Mesh_DeformationUpdate( void* mesh ) {
 
 	assert( self );
 
-	self->minSep = Mesh_Algorithms_GetMinimumSeparation( self->algorithms, self->minAxialSep );
-	Mesh_Algorithms_GetLocalCoordRange( self->algorithms, self->minLocalCrd, self->maxLocalCrd );
-	Mesh_Algorithms_GetDomainCoordRange( self->algorithms, self->minDomainCrd, self->maxDomainCrd );
-	Mesh_Algorithms_GetGlobalCoordRange( self->algorithms, self->minGlobalCrd, self->maxGlobalCrd );
+	if( Mesh_GetDomainSize( self, 0 ) ) {
+		self->minSep = Mesh_Algorithms_GetMinimumSeparation( self->algorithms, self->minAxialSep );
+		Mesh_Algorithms_GetLocalCoordRange( self->algorithms, self->minLocalCrd, self->maxLocalCrd );
+		Mesh_Algorithms_GetDomainCoordRange( self->algorithms, self->minDomainCrd, self->maxDomainCrd );
+		Mesh_Algorithms_GetGlobalCoordRange( self->algorithms, self->minGlobalCrd, self->maxGlobalCrd );
 
-	Mesh_Algorithms_Update( self->algorithms );
+		Mesh_Algorithms_Update( self->algorithms );
+	}
 }
 
 void Mesh_Sync( void* mesh ) {

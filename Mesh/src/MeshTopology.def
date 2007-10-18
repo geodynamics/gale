@@ -49,6 +49,10 @@ METHOD( GetComm, const Comm*,
 	(const void* self), 
 	(self) )
 
+ABSTRACTMETHOD( GetNumCells, int,
+		(const void* self, int dim),
+		(self, dim) )
+
 VOIDABSTRACTMETHOD( GetIncidence, void, 
 		    (void* self, int fromDim, int fromEl, int toDim, IArray* inc), 
 		    (self, fromDim, fromEl, toDim, inc) )

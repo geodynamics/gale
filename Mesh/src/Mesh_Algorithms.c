@@ -163,15 +163,21 @@ void _Mesh_Algorithms_Update( void* algorithms ) {
 	if( !self->mesh )
 		return;
 
-	if( Mesh_HasIncidence( self->mesh, MT_VERTEX, MT_VERTEX ) )
+	if( !Class_IsSuper( self->mesh->topo, IGraph ) || 
+	    Mesh_HasIncidence( self->mesh, MT_VERTEX, MT_VERTEX ) )
+	{
 		self->nearestVertex = Mesh_Algorithms_NearestVertexWithNeighbours;
+	}
 	else
 		self->nearestVertex = Mesh_Algorithms_NearestVertexGeneral;
 
 	nDims = Mesh_GetDimSize( self->mesh );
 	for( d_i = 0; d_i < nDims; d_i++ ) {
-		if( !Mesh_GetGlobalSize( self->mesh, d_i ) || !Mesh_HasIncidence( self->mesh, nDims, d_i ) )
+	   if( Class_IsSuper( self->mesh->topo, IGraph ) &&
+	       (!Mesh_GetGlobalSize( self->mesh, d_i ) || !Mesh_HasIncidence( self->mesh, nDims, d_i )) )
+	   {
 			break;
+	   }
 	}
 	if( d_i == nDims )
 		self->search = Mesh_Algorithms_SearchWithFullIncidence;
