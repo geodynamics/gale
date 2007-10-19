@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: BilinearElementType.c 964 2007-10-11 08:03:06Z SteveQuenette $
+** $Id: BilinearElementType.c 965 2007-10-19 00:32:44Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -75,7 +75,7 @@ void* BilinearElementType_DefaultNew( Name name ) {
 			False,
 			_BilinearElementType_SF_allNodes,
 			_BilinearElementType_SF_allLocalDerivs_allNodes,
-			_BilinearElementType_ConvertGlobalCoordToElLocal,
+			_ElementType_ConvertGlobalCoordToElLocal,
 			_BilinearElementType_NodeCount );
 }
 
@@ -255,6 +255,7 @@ void _BilinearElementType_SF_allLocalDerivs_allNodes( void* elementType, const d
 }
 
 
+#if 0
 /*
 ** Calculates the barycenter of a triangle with respect to some point.
 */
@@ -289,3 +290,4 @@ void _BilinearElementType_ConvertGlobalCoordToElLocal(
 		elLocalCoord[1] += bc[bc_i] * lCrds[self->triInds[inside][bc_i]][1];
 	}
 }
+#endif

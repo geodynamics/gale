@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: TrilinearElementType.c 964 2007-10-11 08:03:06Z SteveQuenette $
+** $Id: TrilinearElementType.c 965 2007-10-19 00:32:44Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -60,7 +60,7 @@ void* TrilinearElementType_DefaultNew( Name name ) {
 		_TrilinearElementType_Print, NULL, TrilinearElementType_DefaultNew, _TrilinearElementType_Construct,
 		_TrilinearElementType_Build, _TrilinearElementType_Initialise, _TrilinearElementType_Execute, _TrilinearElementType_Destroy,
 		name, False, _TrilinearElementType_SF_allNodes, 
-		_TrilinearElementType_SF_allLocalDerivs_allNodes, _TrilinearElementType_ConvertGlobalCoordToElLocal,
+		_TrilinearElementType_SF_allLocalDerivs_allNodes, _ElementType_ConvertGlobalCoordToElLocal,
 		_TrilinearElementType_NodeCount );
 }
 
@@ -69,7 +69,7 @@ TrilinearElementType* TrilinearElementType_New( Name name ) {
 		_TrilinearElementType_Print, NULL, TrilinearElementType_DefaultNew, _TrilinearElementType_Construct,
 		_TrilinearElementType_Build, _TrilinearElementType_Initialise, _TrilinearElementType_Execute, _TrilinearElementType_Destroy,
 		name, True, _TrilinearElementType_SF_allNodes, 
-		_TrilinearElementType_SF_allLocalDerivs_allNodes, _TrilinearElementType_ConvertGlobalCoordToElLocal,
+		_TrilinearElementType_SF_allLocalDerivs_allNodes, _ElementType_ConvertGlobalCoordToElLocal,
 		_TrilinearElementType_NodeCount );
 }
 
@@ -294,6 +294,7 @@ void _TrilinearElementType_SF_allLocalDerivs_allNodes( void* elementType, const 
 }
 
 
+#if 0
 void _TrilinearElementType_ConvertGlobalCoordToElLocal(
 		void*		elementType,
 		void*		_mesh, 
@@ -328,3 +329,4 @@ void _TrilinearElementType_ConvertGlobalCoordToElLocal(
 		elLocalCoord[2] += bc[bc_i] * lCrds[self->tetInds[inside][bc_i]][2];
 	}
 }
+#endif

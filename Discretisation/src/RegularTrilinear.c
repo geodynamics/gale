@@ -63,7 +63,7 @@ RegularTrilinear* RegularTrilinear_New( Name name ) {
 				      True, 
 				      _TrilinearElementType_SF_allNodes, 
 				      _TrilinearElementType_SF_allLocalDerivs_allNodes, 
-				      RegularTrilinear_ConvertGlobalCoordToElLocal, 
+				      _ElementType_ConvertGlobalCoordToElLocal, 
 				      8 );
 }
 
@@ -132,6 +132,7 @@ void _RegularTrilinear_Destroy( void* elementType, void* data ) {
 ** Public Functions
 */
 
+#if 0
 void RegularTrilinear_ConvertGlobalCoordToElLocal( void* elementType, void* mesh, unsigned element, 
 						   const double* globalCoord, double* localCoord )
 {
@@ -159,6 +160,7 @@ void RegularTrilinear_ConvertGlobalCoordToElLocal( void* elementType, void* mesh
 	assert( Num_InRange( localCoord[1], -1.0, 1.0 ) );
 	assert( Num_InRange( localCoord[2], -1.0, 1.0 ) );
 }
+#endif
 
 
 /*----------------------------------------------------------------------------------------------------------------------------------

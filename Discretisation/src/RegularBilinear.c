@@ -63,7 +63,7 @@ RegularBilinear* RegularBilinear_New( Name name ) {
 				     True, 
 				     _BilinearElementType_SF_allNodes, 
 				     _BilinearElementType_SF_allLocalDerivs_allNodes, 
-				     RegularBilinear_ConvertGlobalCoordToElLocal, 
+				     _ElementType_ConvertGlobalCoordToElLocal, 
 				     4 );
 }
 
@@ -132,6 +132,7 @@ void _RegularBilinear_Destroy( void* elementType, void* data ) {
 ** Public Functions
 */
 
+#if 0
 void RegularBilinear_ConvertGlobalCoordToElLocal( void* elementType, void* mesh, unsigned element, 
 						  const double* globalCoord, double* localCoord )
 {
@@ -156,6 +157,7 @@ void RegularBilinear_ConvertGlobalCoordToElLocal( void* elementType, void* mesh,
 	assert( localCoord[0] >= -1.0 && localCoord[0] <= 1.0 );
 	assert( localCoord[1] >= -1.0 && localCoord[1] <= 1.0 );
 }
+#endif
 
 
 /*----------------------------------------------------------------------------------------------------------------------------------
