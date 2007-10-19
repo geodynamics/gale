@@ -127,17 +127,14 @@ void _Velic_solH(
 				u6 = 0.0;
 			}
 			u4 = (n==0 && m==0) ? del_rho*(z-0.5) :  -( z*Ap+(z-1.0)*Bp )*del_rho/( E*E ) + 2.0*D*del_rho/(L1*E) ;
-			
 			pp = -u4-2.0*Z*(kn*u3+km*u2);
 			
 			txx = (-pp +2.0*Z*kn*u3)*cos(n*M_PI*x)*cos(m*M_PI*y);
 			tyy = (-pp +2.0*Z*km*u2)*cos(n*M_PI*x)*cos(m*M_PI*y);
 			tyx = -Z*(km*u3+kn*u2)*sin(n*M_PI*x)*sin(m*M_PI*y);
 			
-			pp *= cos(n*M_PI*x)*cos(m*M_PI*y);
 			//printf("u2 = %0.7g n=%d m=%d --> L2 = %0.7g  --> L1 = %0.7g\n",u2,n,m,L2,L1);
 			u1 *= cos(n*M_PI*x)*cos(m*M_PI*y); 
-			
 			sum1 += u1;
 			u2 *= cos(n*M_PI*x)*sin(m*M_PI*y);
 			sum2 += u2;
@@ -150,6 +147,7 @@ void _Velic_solH(
 			u6 *= sin(n*M_PI*x)*cos(m*M_PI*y);
 			sum6 += u6;
 			
+			pp *= cos(n*M_PI*x)*cos(m*M_PI*y);
 			sum7 += pp; /* total pressure */
 			sum8 += txx;
 			sum9 += tyy;
@@ -159,12 +157,11 @@ void _Velic_solH(
 			
 			sum11 += rho;
 			
-			
 		}/* n */
 	}/* m */
 	mag=sqrt(sum1*sum1+sum2*sum2+sum3*sum3);
 	
-	printf("%0.7g %0.7g %0.7g %0.7g %0.7g %0.7g %0.7g %0.7g %0.7g %0.7g %0.7g %0.7g %0.7g %0.7g\n",x,y,sum1,sum2,sum3,sum4,sum5,sum6,sum7,sum8,sum9,sum10,mag,sum11);
+	//printf("%0.7g %0.7g %0.7g %0.7g %0.7g %0.7g %0.7g %0.7g %0.7g %0.7g %0.7g %0.7g %0.7g %0.7g\n",x,y,sum1,sum2,sum3,sum4,sum5,sum6,sum7,sum8,sum9,sum10,mag,sum11);
 	/************************************************************************************
 	Run this by doing
 	_Velic_solH > out
@@ -217,10 +214,7 @@ void _Velic_solH(
 		strain_rate[5] = (sum5)/(2.0*Z);
 	}
 	/* Value checks, could be cleaned up if needed. Julian Giordani 9-Oct-2006*/
-        if( fabs( sum7 - ( -(1/3)*(sum8+sum9+sum4) ) ) > 1e-5 ) {
-                assert(0);
-        }
-	
+	assert ( fabs( 3.0 * sum7 + sum8+sum9+sum4 ) <= 1e-5 );	
 	
 	
 }
