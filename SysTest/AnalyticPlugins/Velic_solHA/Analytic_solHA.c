@@ -108,6 +108,7 @@ void _Velic_solHA_Construct( void* analyticSolution, Stg_ComponentFactory* cf, v
 	FeVariable*              recoverdStrainRateField;
 	FeVariable*              recoveredStressField;
 	double                   sigma, eta, dx, dy, x0, y0;
+	double                   startX, endX, startY, endY;
 
 	/* Construct Parent */
 	_AnalyticSolution_Construct( self, cf, data );
@@ -141,10 +142,17 @@ void _Velic_solHA_Construct( void* analyticSolution, Stg_ComponentFactory* cf, v
 
 	sigma = Stg_ComponentFactory_GetRootDictDouble( cf, "solHA_sigma", 1.0 );
 	eta = Stg_ComponentFactory_GetRootDictDouble( cf, "solHA_eta", 1.0 );
-	dx = Stg_ComponentFactory_GetRootDictDouble( cf, "solHA_dx", 0.4 );
-	dy = Stg_ComponentFactory_GetRootDictDouble( cf, "solHA_dy", 0.35 );
-	x0 = Stg_ComponentFactory_GetRootDictDouble( cf, "solHA_x0", 0.3 );
-	y0 = Stg_ComponentFactory_GetRootDictDouble( cf, "solHA_y0", 0.6 );
+
+	startX = Stg_ComponentFactory_GetRootDictDouble( cf, "solHA_startX", 0.1 );
+	endX   = Stg_ComponentFactory_GetRootDictDouble( cf, "solHA_endX", 0.7 );
+
+	startY = Stg_ComponentFactory_GetRootDictDouble( cf, "solHA_startY", 0.2 );
+	endY   = Stg_ComponentFactory_GetRootDictDouble( cf, "solHA_endY", 0.6 );
+
+	dx = 0.5 * (startX + endX);
+	dy = 0.5 * (startY + endY);
+	x0 = endX - startX;
+	y0 = endY - startY;
 
 	_Velic_solHA_Init( self, sigma, eta, dx, dy, x0, y0 );
 

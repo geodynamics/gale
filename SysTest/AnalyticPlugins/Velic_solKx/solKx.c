@@ -9,7 +9,7 @@ void _Velic_solKx(
 		double _m, int _n, 
 		double _B,
 		double vel[], double* presssure, 
-		double total_stress[], double strain_rate[] );
+		double total_stress[], double strain_rate[], double* viscosity );
 
 
 int main( int argc, char **argv )
@@ -30,7 +30,7 @@ int main( int argc, char **argv )
 					1.0,
 					(double)1, 1,
 					log(100.0)/2.0,
-					vel, &pressure, total_stress, strain_rate );
+					vel, &pressure, total_stress, strain_rate, NULL );
 			printf("%0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f \n",
 					pos[0],pos[1],
 					vel[0],vel[1], pressure, 
@@ -53,7 +53,7 @@ void _Velic_solKx(
 		double _m, int _n, /* wavelength in z, wavenumber in x */
 		double _B, /* viscosity parameter */
 		double vel[], double* presssure, 
-		double total_stress[], double strain_rate[] )
+		double total_stress[], double strain_rate[], double* viscosity )
 {
 	double Z;
 	double u1,u2,u3,u4,u5,u6;
@@ -82,7 +82,7 @@ void _Velic_solKx(
 	/*************************************************************************/
 	/*************************************************************************/
 	/* rho = -sin(km*z)*cos(kn*x) */ 
-	/* viscosity  Z= exp(2*B*z)  */
+	Z = exp( 2.0 * B * x );
 	B = _B; /* viscosity parameter must be non-zero*/
 	km = _m*M_PI; /* solution valid for km not zero -- should get trivial solution if km=0 */
 	n = _n; /* solution valid for n not zero */
@@ -519,6 +519,9 @@ void _Velic_solKx(
 	//printf("%0.7f %0.7f %0.7f %0.7f %0.7f %0.7f\n",x,z,u1,u2,mag,SS);
 	/*printf("%0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f\n",x,z,sum1,sum2,sum3,sum4,sum5,sum6,mag,sum7,SS);*/
 	
+	if ( viscosity != NULL ) {
+		*viscosity = Z;
+	}
 	
 	/* Output */
 	if( vel != NULL ) {
@@ -535,7 +538,6 @@ void _Velic_solKx(
 	}
 	if( strain_rate != NULL ) {
 		/* sigma = tau - p, tau = sigma + p, tau[] = 2*eta*strain_rate[] */
-		Z = exp( 2.0 * B * x );
 		strain_rate[0] = (sum6+sum5)/(2.0*Z);
 		strain_rate[1] = (sum3+sum5)/(2.0*Z);
 		strain_rate[2] = (sum4)/(2.0*Z);

@@ -51,29 +51,35 @@
 
 const Type Velic_solKx_Type = "Underworld_Velic_solKx";
 
+void Velic_solKx_ViscosityFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* viscosity ) {
+	Velic_solKx* self = (Velic_solKx*) analyticSolution;
+	
+	_Velic_solKx( coord, self->sigma, self->_m, self->n, self->B, NULL, NULL, NULL, NULL, viscosity );
+}
+
 void Velic_solKx_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* pressure ) {
 	Velic_solKx* self = (Velic_solKx*) analyticSolution;
 	
-	_Velic_solKx( coord, self->sigma, self->_m, self->n, self->B, NULL, pressure, NULL, NULL );
+	_Velic_solKx( coord, self->sigma, self->_m, self->n, self->B, NULL, pressure, NULL, NULL, NULL );
 }
 
 void Velic_solKx_VelocityFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* velocity ) {
 	Velic_solKx* self = (Velic_solKx*) analyticSolution;
 	
-	_Velic_solKx( coord, self->sigma, self->_m, self->n, self->B, velocity, NULL, NULL, NULL );
+	_Velic_solKx( coord, self->sigma, self->_m, self->n, self->B, velocity, NULL, NULL, NULL, NULL );
 }
 
 void Velic_solKx_StressFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* stress ) {
 	Velic_solKx* self = (Velic_solKx*) analyticSolution;
 	
-	_Velic_solKx( coord, self->sigma, self->_m, self->n, self->B, NULL, NULL, stress, NULL );
+	_Velic_solKx( coord, self->sigma, self->_m, self->n, self->B, NULL, NULL, stress, NULL, NULL );
 }
 
 
 void Velic_solKx_StrainRateFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* strainRate ) {
 	Velic_solKx* self = (Velic_solKx*) analyticSolution;
 	
-	_Velic_solKx( coord, self->sigma, self->_m, self->n, self->B, NULL, NULL, NULL, strainRate );
+	_Velic_solKx( coord, self->sigma, self->_m, self->n, self->B, NULL, NULL, NULL, strainRate, NULL );
 }
 	
 void _Velic_solKx_Init( Velic_solKx* self, double sigma, double _m, double B, int n ) {
@@ -103,9 +109,10 @@ void _Velic_solKx_Construct( void* analyticSolution, Stg_ComponentFactory* cf, v
 	FeVariable*              stressField;
 	FeVariable*              strainRateField;
 	FeVariable*              recoverdStrainRateField;
+	FeVariable*              viscosityField;
 	FeVariable*              recoveredStressField;
 	FeVariable*              recoveredPressureField;
-	double                   sigma, _m, B;
+	double                   sigma, _m, B, twiceB;
 	int                      n;
 
 	/* Construct Parent */
@@ -117,6 +124,10 @@ void _Velic_solKx_Construct( void* analyticSolution, Stg_ComponentFactory* cf, v
 
 	pressureField = Stg_ComponentFactory_ConstructByName( cf, "PressureField", FeVariable, True, data );
 	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, pressureField, Velic_solKx_PressureFunction );
+
+	viscosityField = Stg_ComponentFactory_ConstructByName( cf, "ViscosityField", FeVariable, False, data );
+	if ( viscosityField ) 
+		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, viscosityField, Velic_solKx_ViscosityFunction );
 
 	stressField = Stg_ComponentFactory_ConstructByName( cf, "StressField", FeVariable, False, data );
 	if ( stressField ) 
@@ -142,7 +153,8 @@ void _Velic_solKx_Construct( void* analyticSolution, Stg_ComponentFactory* cf, v
 	sigma = Stg_ComponentFactory_GetRootDictDouble( cf, "solKx_sigma", 1.0 );
 	_m = Stg_ComponentFactory_GetRootDictDouble( cf, "wavenumberY", 1 );
 	n = Stg_ComponentFactory_GetRootDictInt( cf, "wavenumberX", 1 );
-	B = Stg_ComponentFactory_GetRootDictDouble( cf, "solKx_B", 1.0 );//( log(100.0)/2.0 ) );
+	twiceB = Stg_ComponentFactory_GetRootDictDouble( cf, "solKx_twiceB", 2.0 );
+	B = Stg_ComponentFactory_GetRootDictDouble( cf, "solKx_B", 0.5 * twiceB );
 
 	_Velic_solKx_Init( self, sigma, _m, B, n );
 

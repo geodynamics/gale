@@ -32,7 +32,7 @@ int main( int argc, char **argv )
 					100.0, 1.0,
 					0.8, (double)M_PI, 1,
 					vel, &pressure, total_stress, strain_rate );
-			printf("pressure is fucked !! \n");
+//			printf("pressure is fucked !! \n");
 			printf("%0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f \n",
 					pos[0],pos[1],
 					vel[0],vel[1], pressure, 
@@ -778,8 +778,8 @@ void _Velic_solE(
 	pp = (double)-(u3 + 2.0*n*M_PI*Z*u2)*cos(n*M_PI*x); /* pressure */
 	
 	txx = (double)(u3 + 4*Z*n*M_PI*u2)*cos(n*M_PI*x); /* xx stress */
-	printf( "() = %g\n", (u3 + 2.0*n*M_PI*Z*u2) );
-	printf( "cos = %g\n", cos(n*M_PI*x) );
+	//printf( "() = %g\n", (u3 + 2.0*n*M_PI*Z*u2) );
+	//printf( "cos = %g\n", cos(n*M_PI*x) );
 	//printf( "pp = %g\n", pp );
 	sum5 += pp;
 	sum6 += txx;
@@ -799,7 +799,7 @@ void _Velic_solE(
 	mag=sqrt(sum1*sum1+sum2*sum2);
 	/****************************************************/
 	/****************************************************/
-	/*printf("%0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f\n",x,z,sum1,sum2,sum3,sum4,sum5,sum6,mag,sum7);*/
+//	printf("%0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f\n",x,z,sum1,sum2,sum3,sum4,sum5,sum6,mag,sum7);
 	
 	
 	/* Output */
@@ -808,7 +808,7 @@ void _Velic_solE(
 		vel[1] = sum1;
 	}
 	if( presssure != NULL ) {
-		printf( "pressure = %g\n", *presssure );
+		//printf( "pressure = %g\n", *presssure );
 		(*presssure) = sum5;
 	}
 	if( total_stress != NULL ) {
