@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testElementType.c 964 2007-10-11 08:03:06Z SteveQuenette $
+** $Id: testElementType.c 966 2007-10-21 22:53:00Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -178,12 +178,12 @@ int main( int argc, char* argv[] ) {
 							  globalCoord, elLocalCoordGeneral );
 
 		if ( context->dim == 2 ) {
-			_BilinearElementType_ConvertGlobalCoordToElLocal( elementType, feMesh, elementCoordIn, 
-									  globalCoord, elLocalCoord );
+			_ElementType_ConvertGlobalCoordToElLocal( elementType, feMesh, elementCoordIn, 
+								  globalCoord, elLocalCoord );
 		}
 		else {
-			_TrilinearElementType_ConvertGlobalCoordToElLocal( elementType, feMesh, elementCoordIn, 
-									   globalCoord, elLocalCoord );
+			_ElementType_ConvertGlobalCoordToElLocal( elementType, feMesh, elementCoordIn, 
+								  globalCoord, elLocalCoord );
 		}
 
 		StGermain_VectorSubtraction( errorVector, elLocalCoordGeneral, elLocalCoord, context->dim );

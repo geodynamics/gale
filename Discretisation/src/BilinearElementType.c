@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: BilinearElementType.c 965 2007-10-19 00:32:44Z LukeHodkinson $
+** $Id: BilinearElementType.c 966 2007-10-21 22:53:00Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -83,7 +83,7 @@ BilinearElementType* BilinearElementType_New( Name name ) {
 	return _BilinearElementType_New( sizeof(BilinearElementType), BilinearElementType_Type, _BilinearElementType_Delete,
 		_BilinearElementType_Print, NULL, BilinearElementType_DefaultNew, _BilinearElementType_Construct, _BilinearElementType_Build,
 		_BilinearElementType_Initialise, _BilinearElementType_Execute, _BilinearElementType_Destroy, name, True, _BilinearElementType_SF_allNodes, 
-		_BilinearElementType_SF_allLocalDerivs_allNodes, _BilinearElementType_ConvertGlobalCoordToElLocal,
+		_BilinearElementType_SF_allLocalDerivs_allNodes, _ElementType_ConvertGlobalCoordToElLocal,
 		_BilinearElementType_NodeCount );
 }
 
