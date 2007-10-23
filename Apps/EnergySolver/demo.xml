@@ -5,18 +5,8 @@
  	
 	<include>EnergySolver2D.xml</include>
 	<include>tests/cosineHillRotate.xml</include>
-	<include>TemperatureSurfaceVP.xml</include>
-	<include>TemperatureAndVelocityArrowsVP.xml</include>
-	<include>window.xml</include>
+	<include>Visualisation.xml</include>
 
-	<struct name="components" mergeType="merge">
-		<struct name="window" mergeType="merge">
-			<list name="Viewport">
-				<param>TemperatureSurfaceVP</param>
-				<param>TemperatureAndVelocityArrowsVP</param>
-			</list>
-		</struct>
-	</struct>
 	<param name="outputPath">./output</param>
 	
 

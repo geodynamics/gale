@@ -9,6 +9,6 @@
 		<param>StgFEM_HomogeneousNaturalBCs</param>
 	</list>
 
-	<param name="TemperatureField-Tolerance">0.0005</param>
+	<param name="TemperatureField-Tolerance">0.025</param>
 
 </StGermainData>
