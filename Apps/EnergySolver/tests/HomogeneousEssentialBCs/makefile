@@ -1,4 +1,3 @@
-#!/bin/sh
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ##
 ## Copyright (C), 2003-2006, Victorian Partnership for Advanced Computing (VPAC) Ltd, 110 Victoria Street,
@@ -36,14 +35,25 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: testEnergySolver-homogeneousNatural-DualMesh.0of1.sh 968 2007-10-23 07:53:39Z JulianGiordani $
+## $Id: makefile 964 2007-10-11 08:03:06Z SteveQuenette $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-TEST_SCRIPT=./VMake/executableTester.sh
-until test -r ${TEST_SCRIPT} ; do
-        TEST_SCRIPT=../${TEST_SCRIPT}
-done
-. ${TEST_SCRIPT}
+SHELL := $(shell which bash)
+PROJ_ROOT := $(shell until test -r ./Makefile.system ; do cd .. ; done ; echo `pwd`)
 
-runAndHandleSystemTestStdLocations "StGermain ../EnergySolver2D.xml ./homogeneousNaturalBCs.xml DualMesh.xml" "$0" "$@"
+include ${PROJ_ROOT}/Makefile.system
+
+modName := $(shell basename `pwd` )
+modName := $(shell echo ${modName} | cut -c 1 | tr '[:lower:]' '[:upper:]' )$(shell echo ${modName} | cut -c 2- ) 
+
+mod = ${PROJECT}_${modName}
+includes = ${PROJECT}/${modName}
+
+SRCS = $(wildcard *.c)
+HDRS = $(wildcard *.h)
+
+packages = STGDOMAIN STGERMAIN PETSC MPI XML
+EXTERNAL_LIBS = -lStgFEM
+
+include ${PROJ_ROOT}/Makefile.vmake

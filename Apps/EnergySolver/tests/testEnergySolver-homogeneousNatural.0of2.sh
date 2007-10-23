@@ -36,7 +36,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: testEnergySolver-homogeneousNatural.0of2.sh 935 2007-08-05 09:48:38Z SteveQuenette $
+## $Id: testEnergySolver-homogeneousNatural.0of2.sh 968 2007-10-23 07:53:39Z JulianGiordani $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -46,4 +46,4 @@ until test -r ${TEST_SCRIPT} ; do
 done
 . ${TEST_SCRIPT}
 
-runAndHandleSystemTestStdLocations "StGermain ../EnergySolver2D.xml ./homogeneousNaturalBCs.xml analyticHomogeneousNaturalBCs.xml" "$0" "$@"
+runAndHandleSystemTestStdLocations "StGermain ../EnergySolver2D.xml ./homogeneousNaturalBCs.xml" "$0" "$@"

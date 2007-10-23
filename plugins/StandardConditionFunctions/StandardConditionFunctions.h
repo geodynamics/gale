@@ -71,7 +71,6 @@ void StgFEM_StandardConditionFunctions_Lid_RampWithCentralMax( Node_LocalIndex n
 
 void StgFEM_StandardConditionFunctions_SinusoidalLid( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* result ) ;
 void StgFEM_StandardConditionFunctions_CornerOnly( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* result ) ;
-void StgFEM_StandardConditionFunctions_TemperatureCosineHill( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
 void StgFEM_StandardConditionFunctions_LinearWithSinusoidalPerturbation( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
 void StgFEM_StandardConditionFunctions_Trigonometry( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
 void Stg_FEM_VelicTemperatureIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;

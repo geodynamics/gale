@@ -36,7 +36,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: testEnergySolver-homogeneousNatural-DualMesh.0of1.sh 968 2007-10-23 07:53:39Z JulianGiordani $
+## $Id: testEnergySolver-CosineHillRotateBC-DualMesh.0of1.sh 968 2007-10-23 07:53:39Z JulianGiordani $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -46,4 +46,4 @@ until test -r ${TEST_SCRIPT} ; do
 done
 . ${TEST_SCRIPT}
 
-runAndHandleSystemTestStdLocations "StGermain ../EnergySolver2D.xml ./homogeneousNaturalBCs.xml DualMesh.xml" "$0" "$@"
+runAndHandleSystemTestStdLocations "StGermain ../EnergySolver2D.xml ./CosineHillRotateBC.xml DualMesh.xml" "$0" "$@"

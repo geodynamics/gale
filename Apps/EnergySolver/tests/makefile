@@ -35,7 +35,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 964 2007-10-11 08:03:06Z SteveQuenette $
+## $Id: makefile 968 2007-10-23 07:53:39Z JulianGiordani $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 SHELL := $(shell which bash)
@@ -49,7 +49,7 @@ checks = $(wildcard *.sh)
 
 EXTERNAL_INCLUDES = -I${INC_DIR}/${PROJECT} 
 
-subdirs = HomogeneousNaturalBCs AdvDiffSteadyState1D
+subdirs = HomogeneousNaturalBCs HomogeneousEssentialBCs CosineHillRotate AdvDiffSteadyState1D
 
 XMLS_TARGET_DIR = ${EXAMPLES_DIR}/${modName}/tests
 XMLS = $(wildcard *.xml)

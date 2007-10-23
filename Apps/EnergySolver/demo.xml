@@ -4,10 +4,13 @@
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
  	
 	<include>EnergySolver2D.xml</include>
-	<include>tests/cosineHillRotate.xml</include>
+	<include>tests/CosineHillRotateBC.xml</include>
 	<include>Visualisation.xml</include>
 
 	<param name="outputPath">./output</param>
+	<param name="elementResI">32</param>
+	<param name="elementResJ">32</param>
+	<param name="elementResK">1</param>
 	
 
 </StGermainData>

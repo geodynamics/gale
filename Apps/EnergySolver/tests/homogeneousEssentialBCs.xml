@@ -4,6 +4,11 @@
 <!-- DTD to validate against -->
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 	<!-- See Brooks, Hughes 1982 - Section 3.4.2 -->
+	<list name="plugins" mergeType="merge">
+		<param>StgFEM_HomogeneousEssentialBCs</param>
+	</list>
+
+	<param name="TemperatureField-Tolerance">0.025</param>
 
 	<!-- Geometry & Mesh setup -->
 	<param name="dim"> 2 </param>

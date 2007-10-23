@@ -4,11 +4,28 @@
 <!-- DTD to validate against -->
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 	<!-- See Brooks, Hughes 1982 - Section 3.4.2 -->
+	<list name="plugins" mergeType="merge">
+		<param>StgFEM_CosineHillRotate</param>
+	</list>
+
+	<param name="TemperatureField-Tolerance">0.035</param>
+	
+
+	<struct name="components" mergeType="merge">
+		<struct name="initialConditionShape">
+			<param name="Type">Box</param>
+			<param name="startX"> -0.01 </param> <param name="endX"> 0.01 </param>
+			<param name="startY"> -1e9 </param> <param name="endY"> 0.01 </param>
+			<param name="startZ"> -1e9 </param> <param name="endZ"> 1e9 </param>
+		</struct>
+	</struct>
+
+	<!-- See Brooks, Hughes 1982 - Section 3.4.2 -->
 	<!-- Geometry & Mesh setup -->
 	<param name="dim"> 2 </param>
 	<param name="shadowDepth"> 1 </param>
-	<param name="elementResI"> 30 </param>
-	<param name="elementResJ"> 30 </param>
+	<param name="elementResI"> 10 </param>
+	<param name="elementResJ"> 10 </param>
 	<param name="meshSizeK"> 1 </param>
 	<param name="minX"> -0.5 </param>
 	<param name="minY"> -0.5 </param>
@@ -17,6 +34,8 @@
 	<param name="maxY"> 0.5 </param>
 	<param name="maxZ"> 0.5 </param>
 	<param name="allowUnbalancing"> True </param>
+
+	<param name="maxTimeSteps"> 100 </param>
 
 	<param name="defaultDiffusivity"> 1.0e-6 </param>
 
@@ -47,36 +66,16 @@
 		<param name="type">CompositeVC</param>
 		<list name="vcList">
 			<struct>
-				<param name="type">SetVC</param>
+				<param name="type"> MeshShapeVC </param>
+				<param name="Shape"> initialConditionShape </param>
 				<list name="variables">
 					<struct>
 						<param name="name">temperature</param>
 						<param name="type">func</param>
-						<param name="value">Temperature_CosineHill</param>
+						<param name="value"> Temperature_CosineHill</param>
 					</struct>
 				</list>
-				<!-- Number of nodes on mesh ( 30 x 30 mesh ) -->
-				<param name="indexCount">961</param>
-				<!-- Nodes this Variable Condition will apply to -->
-				<list name="indices">
-					<param>15</param>
-					<param>46</param>
-					<param>77</param>
-					<param>108</param>
-					<param>139</param>
-					<param>170</param>
-					<param>201</param>
-					<param>232</param>
-					<param>263</param>
-					<param>294</param>
-					<param>325</param>
-					<param>356</param>
-					<param>387</param>
-					<param>418</param>
-					<param>449</param>
-					<param>480</param>
-				</list>
-			</struct>				
+			</struct>
 			<struct>
 				<param name="type"> WallVC </param>
 				<param name="wall"> right </param>

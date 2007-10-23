@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StandardConditionFunctions.c 964 2007-10-11 08:03:06Z SteveQuenette $
+** $Id: StandardConditionFunctions.c 968 2007-10-23 07:53:39Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -83,8 +83,6 @@ void _StgFEM_StandardConditionFunctions_Construct( void* component, Stg_Componen
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_CornerOnly, "Velocity_Lid_CornerOnly" );
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_TemperatureCosineHill, "Temperature_CosineHill" );
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 	
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ConvectionBenchmark, "Temperature_ConvectionBenchmark" );
@@ -423,53 +421,6 @@ void StgFEM_StandardConditionFunctions_CornerOnly( Node_LocalIndex node_lI, Vari
 		(*velResult) = 0;
 	}
 }
-
-double StGermain_CosineHillValue( double* centre, double* position, double height, double diameterAtBase, Dimension_Index dim ) {
-	double distanceFromCentre = StGermain_DistanceBetweenPoints( centre, position, dim );
-	
-	if (distanceFromCentre < diameterAtBase * 0.5 ) 
-		return height * (0.5 + 0.5 * cos( 2.0 * M_PI/diameterAtBase * distanceFromCentre ) );
-	else
-		return 0.0;
-}
-
-void StgFEM_StandardConditionFunctions_TemperatureCosineHill( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
-	DomainContext*	context            = (DomainContext*)_context;
-	Dictionary*             dictionary         = context->dictionary;
-	FeVariable*             feVariable         = NULL;
-	FeMesh*			feMesh               = NULL;
-	double*                 result             = (double*) _result;
-	Coord                   centre;
-	Coord                   rotationCentre;
-	double                  omega;
-	double                  hillHeight;
-	double                  hillDiameter;
-	
-	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
-	feMesh       = feVariable->feMesh;
-
-	/* Read values from dictionary */
-	hillHeight       = Dictionary_GetDouble_WithDefault( dictionary, "CosineHillHeight"  , 1.0 );
-	hillDiameter     = Dictionary_GetDouble_WithDefault( dictionary, "CosineHillDiameter", 1.0 );
-	centre[ I_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "CosineHillCentreX" , 0.0 );
-	centre[ J_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "CosineHillCentreY" , 0.0 );
-	centre[ K_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "CosineHillCentreZ" , 0.0 );
-
-	if ( Dictionary_GetBool( dictionary, "RotateCosineHill" ) ) {
-		/* Assume solid body rotation */
-		rotationCentre[ I_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "SolidBodyRotationCentreX", 0.0 );
-		rotationCentre[ J_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "SolidBodyRotationCentreY", 0.0 );
-		rotationCentre[ K_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "SolidBodyRotationCentreZ", 0.0 );
-		omega                    = Dictionary_GetDouble_WithDefault( dictionary, "SolidBodyRotationOmega",   1.0 );
-
-		StGermain_VectorSubtraction( centre, rotationCentre, centre, context->dim );
-		StGermain_RotateCoordinateAxis( centre, centre, K_AXIS, omega * context->currentTime );
-		StGermain_VectorAddition( centre, centre, rotationCentre, context->dim );
-	}
-
-	*result = StGermain_CosineHillValue( centre, Mesh_GetVertex( feMesh, node_lI ), hillHeight, hillDiameter, context->dim );
-}
-
 
 void StgFEM_StandardConditionFunctions_LinearWithSinusoidalPerturbation( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
 	DomainContext*	context = (DomainContext*)_context;
