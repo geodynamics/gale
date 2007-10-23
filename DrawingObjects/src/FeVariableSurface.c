@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: FeVariableSurface.c 740 2007-10-11 08:05:31Z SteveQuenette $
+** $Id: FeVariableSurface.c 742 2007-10-23 05:30:32Z RobertTurnbull $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -229,10 +229,11 @@ void _lucFeVariableSurface_BuildDisplayList( void* drawingObject, void* _context
 	Element_LocalIndex             elementLocalCount  = FeMesh_GetElementLocalSize( mesh );
 	Element_NodeIndex              eNode_I;
 	Element_NodeIndex              elementNodeCount, *elementNodes;
+	Element_NodeIndex              nodeMapper[]       = { 0, 1, 3, 2 };
 	Node_LocalIndex                lNode_I;
 	double                         nodeValue;
 	double                         height;
-	IArray*				inc;
+	IArray*                        inc;
 
 	FeVariable_SyncShadowValues( feVariable );
 
@@ -253,13 +254,16 @@ void _lucFeVariableSurface_BuildDisplayList( void* drawingObject, void* _context
 
 	inc = IArray_New();
 	for ( lElement_I = 0 ; lElement_I < elementLocalCount ; lElement_I++ ) {
-	  FeMesh_GetElementNodes( mesh, lElement_I, inc );
+		FeMesh_GetElementNodes( mesh, lElement_I, inc );
 		elementNodeCount = IArray_GetSize( inc );
 		elementNodes = IArray_GetPtr( inc );
 
 		glBegin( GL_POLYGON );
 		for ( eNode_I = 0 ; eNode_I < elementNodeCount ; eNode_I++ ) {
-			lNode_I = elementNodes[ eNode_I ];
+			/* Get the index of the node - we use the 'nodeMapper' array so that 
+			 * we are going around the nodes in an anti-clockwise direction */
+			lNode_I = elementNodes[ nodeMapper[ eNode_I ] ];
+
 			/* Get Value at node */
 			nodeValue = FeVariable_GetScalarAtNode( feVariable, lNode_I );
 
