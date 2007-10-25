@@ -272,6 +272,7 @@ void perform_integrals( UnderworldContext *context, double *B, double *w_bar, do
 	Particle_InCellIndex p, ngp;
 	Cell_Index cell_I;
 	double velocity[3], global_coord[3];
+	FeMesh* mesh;
 	Element_LocalIndex e;
 	
 	double i_T, i_v, i_y, i_vT; /* interpolated quantity */
@@ -326,18 +327,20 @@ void perform_integrals( UnderworldContext *context, double *B, double *w_bar, do
 	elementType = FeMesh_GetElementType( context->velocityField->feMesh, 0 );
 	elementNodeCount = elementType->nodeCount;
 	GNx = Memory_Alloc_2DArray( double, dim, elementNodeCount, "Global Shape Function Derivatives for mayhem" );
+
+	mesh = context->temperatureField->feMesh;
 	
 	
 	_sum_T = _sum_vT = _sum_yT = 0.0;
 	_sum_vol = 0.0;
 	
 	ngp = context->gaussSwarm->particleLocalCount;
-	n_elements = FeMesh_GetElementLocalSize( context->velocityField->feMesh );
+	n_elements = FeMesh_GetElementLocalSize( mesh );
 	//	printf("n_elements = %d \n", n_elements );
 	
 	for( e=0; e<n_elements; e++ ) {
 		cell_I = CellLayout_MapElementIdToCellId( context->gaussSwarm->cellLayout, e );
-		elementType = FeMesh_GetElementType( context->velocityField->feMesh, e );
+		elementType = FeMesh_GetElementType( mesh, e );
 		
 		sum_T  = 0.0;
 		sum_vT = 0.0;
@@ -353,16 +356,16 @@ void perform_integrals( UnderworldContext *context, double *B, double *w_bar, do
 			
 			ElementType_ShapeFunctionsGlobalDerivs(
 					elementType,
-					context->velocityField->feMesh, e,
+					mesh, e,
 					xi, dim, &det_jac, GNx );
 			
-			_FeVariable_InterpolateNodeValuesToElLocalCoord( context->temperatureField, e, xi, &i_T );
+			FeVariable_InterpolateFromMeshLocalCoord( context->temperatureField, mesh, e, xi, &i_T );
+			FeVariable_InterpolateFromMeshLocalCoord( context->velocityField,    mesh, e, xi, velocity );
 			
-			_FeVariable_InterpolateNodeValuesToElLocalCoord( context->velocityField, e, xi, velocity );
 			i_v = velocity[1];
 			i_vT = i_v * i_T;
 			
-			FeMesh_CoordLocalToGlobal( context->velocityField->feMesh, e, xi, global_coord );
+			FeMesh_CoordLocalToGlobal( mesh, e, xi, global_coord );
 			i_y = global_coord[1];
 			
 			//printf("%f %f %f %f J=%f \n", i_T, i_v, i_vT, i_y, det_jac );
