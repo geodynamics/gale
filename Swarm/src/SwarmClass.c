@@ -799,7 +799,7 @@ void _Swarm_Initialise( void* swarm, void* data ) {
 	Stream_UnIndentBranch( Swarm_Debug );
 	Journal_DPrintf( self->debug, "...done in %s().\n", __func__ );
 
-	if( self->ics || ( context && (True == context->loadFromCheckPoint) ) ) {
+	if( self->ics && ( context && (True == context->loadFromCheckPoint) ) ) {
 		Journal_DPrintf( self->debug, "applying the ICs for this swarm.\n" );
 		Stream_Indent( self->debug );
 		Stg_Component_Initialise( self->ics, data, False );
