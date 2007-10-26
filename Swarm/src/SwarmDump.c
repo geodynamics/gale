@@ -250,21 +250,21 @@ void _SwarmDump_Execute( void* swarmDump, void* data ) {
 
 		if ( self->newFileEachTime ) {
 			if ( strlen(context->checkPointPrefixString) > 0 ) {
-				Stg_asprintf( &filename, "%s/%s.%s.%05d.dat", context->outputPath,
+				Stg_asprintf( &filename, "%s/%s.%s.%05d.dat", context->checkpointPath,
 					context->checkPointPrefixString, swarm->name, context->timeStep );
 			}
 			else {
-				Stg_asprintf( &filename, "%s/%s.%05d.dat", context->outputPath,
+				Stg_asprintf( &filename, "%s/%s.%05d.dat", context->checkpointPath,
 					swarm->name, context->timeStep );
 			}
 		}	
 		else { 
 			if ( strlen(context->checkPointPrefixString) > 0 ) {
-				Stg_asprintf( &filename, "%s/%s.%s.dat", context->outputPath,
+				Stg_asprintf( &filename, "%s/%s.%s.dat", context->checkpointPath,
 					context->checkPointPrefixString, swarm->name );
 			}
 			else {
-				Stg_asprintf( &filename, "%s/%s.dat", context->outputPath, swarm->name );
+				Stg_asprintf( &filename, "%s/%s.dat", context->checkpointPath, swarm->name );
 			}
 		}	
 
