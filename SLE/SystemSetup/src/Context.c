@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Context.c 964 2007-10-11 08:03:06Z SteveQuenette $
+** $Id: Context.c 969 2007-10-26 05:32:20Z BelindaMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -464,17 +464,17 @@ void _FiniteElementContext_SaveFeVariables( void* context ) {
 	Dictionary*               dictionary = self->dictionary;
 	Dictionary_Entry_Value*   feVarsList = NULL;
 
-	outputStrLen = strlen(self->outputPath) + 1 + 1;
+	outputStrLen = strlen(self->checkpointPath) + 1 + 1;
 	if ( strlen(self->checkPointPrefixString) > 0 ) {
 		outputStrLen += strlen(self->checkPointPrefixString) + 1;
 	}
 	outputPathString = Memory_Alloc_Array( char, outputStrLen, "outputPathString" );
 
 	if ( strlen(self->checkPointPrefixString) > 0 ) {
-		sprintf( outputPathString, "%s/%s.", self->outputPath, self->checkPointPrefixString );
+		sprintf( outputPathString, "%s/%s.", self->checkpointPath, self->checkPointPrefixString );
 	}
 	else {
-		sprintf( outputPathString, "%s/", self->outputPath );
+		sprintf( outputPathString, "%s/", self->checkpointPath );
 	}
 
 	/* Save the variables that have had their "isCheckpointedAndReloaded" flag enabled - 
