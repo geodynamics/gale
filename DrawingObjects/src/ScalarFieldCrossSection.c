@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: ScalarFieldCrossSection.c 740 2007-10-11 08:05:31Z SteveQuenette $
+** $Id: ScalarFieldCrossSection.c 743 2007-10-26 00:50:14Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -356,6 +356,8 @@ void lucScalarFieldCrossSection_DrawCrossSection( void* drawingObject, double cr
 				pos[ aAxis ] = max[ aAxis ];
 				interpolationCoord[ aAxis ] = max[ aAxis ] - FUDGE_FACTOR/aLength;
 			}
+			else
+				interpolationCoord[ aAxis ] = pos[ aAxis ];
 			
 			lucScalarFieldCrossSection_PlotColouredVertex( self, interpolationCoord, pos );
 		}
