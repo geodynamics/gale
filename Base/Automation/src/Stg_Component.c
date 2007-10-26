@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Stg_Component.c 3851 2006-10-12 08:57:22Z SteveQuenette $
+** $Id: Stg_Component.c 4194 2007-10-26 05:31:19Z BelindaMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -277,7 +277,7 @@ void Stg_Component_Build( void* component, void* data, Bool force ) {
 
 void Stg_Component_Initialise( void* component, void* data, Bool force ) {
 	Stg_Component* self = (Stg_Component*)component;
-	
+
 	if( force || !self->isInitialised ) {
 		/*Stg_TimeMonitor* tm;
 		Stg_MemMonitor*  mm;

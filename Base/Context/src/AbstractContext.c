@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AbstractContext.c 4164 2007-08-05 09:48:11Z SteveQuenette $
+** $Id: AbstractContext.c 4194 2007-10-26 05:31:19Z BelindaMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -189,6 +189,8 @@ void _AbstractContext_Init(
 		Dictionary_GetDefault( self->dictionary, "experimentName", Dictionary_Entry_Value_FromString( "experiment" ) ) ) );
 	self->outputPath = StG_Strdup( Dictionary_Entry_Value_AsString( 
 		Dictionary_GetDefault( self->dictionary, "outputPath", Dictionary_Entry_Value_FromString( "./" ) ) ) );
+	self->checkpointPath = StG_Strdup( Dictionary_Entry_Value_AsString( 
+		Dictionary_GetDefault( self->dictionary, "checkpointPath", Dictionary_Entry_Value_FromString( self->outputPath ) ) ) );
 
 	if ( self->rank == 0 ) {
 		if ( ! Stg_DirectoryExists( self->outputPath ) ) {
@@ -206,6 +208,22 @@ void _AbstractContext_Init(
 			Journal_Firewall( ret, self->info, "Unable to create non-existing outputPath to '%s'\n", self->outputPath );
 			/* else */
 			Journal_Printf( self->info, "outputPath '%s' successfully created!\n", self->outputPath );
+		}
+		if ( ! Stg_DirectoryExists( self->checkpointPath ) ) {
+			Bool ret;
+
+			if ( Stg_FileExists( self->checkpointPath ) ) {
+				Journal_Firewall( 
+					0, 
+					self->info, 
+					"checkpointPath '%s' is a file an not a directory! Exiting...\n", self->checkpointPath );
+			}
+			
+			Journal_Printf( self->info, "checkpointPath '%s' does not exist, attempting to create...\n", self->checkpointPath );
+			ret = Stg_CreateDirectory( self->checkpointPath );
+			Journal_Firewall( ret, self->info, "Unable to create non-existing checkpointPath to '%s'\n", self->checkpointPath );
+			/* else */
+			Journal_Printf( self->info, "checkpointPath '%s' successfully created!\n", self->checkpointPath );
 		}
 	}
 
@@ -417,6 +435,7 @@ void _AbstractContext_Delete( void* abstractContext ) {
 
 	Memory_Free( self->experimentName );
 	Memory_Free( self->outputPath );
+	Memory_Free( self->checkpointPath );
 	
 	Stg_Class_Delete( self->extensionMgr_Register );
 	Stg_Class_Delete( self->plugins );
@@ -447,12 +466,21 @@ void _AbstractContext_Print( void* abstractContext, Stream* stream ) {
 	Journal_Printf( (void*) stream, "\toutputEvery: %u\n", self->frequentOutputEvery );
 	Journal_Printf( (void*) stream, "\tdumpEvery: %u\n", self->dumpEvery );
 	Journal_Printf( (void*) stream, "\tcheckpointEvery: %u\n", self->checkpointEvery );
+
 	if( self->outputPath ) {
 		Journal_Printf( (void*) stream, "\toutputPath: %s\n", self->outputPath );
 	}
 	else {
 		Journal_Printf( (void*) stream, "\toutputPath: (null)\n" );
 	}
+
+	if( self->checkpointPath ) {
+		Journal_Printf( (void*) stream, "\tcheckpointPath: %s\n", self->checkpointPath );
+	}
+	else {
+		Journal_Printf( (void*) stream, "\tcheckpointPath: (null)\n" );
+	}
+
 	Journal_Printf( stream, "\tloadFromCheckPoint: %u\n", self->loadFromCheckPoint );
 	Journal_Printf( stream, "\trestartTimestep: %u\n", self->restartTimestep );
 	Journal_Printf( stream, "\tcheckPointPrefixString: %s\n", self->checkPointPrefixString );
@@ -1009,17 +1037,17 @@ char* AbstractContext_GetTimeInfoFileNameForGivenTimeStep( void* context, Index 
 	char*                  timeInfoFileName = NULL;
 	Index                  timeInfoStrLen = 0;
 
-	timeInfoStrLen = strlen(self->outputPath) + 1 + 8 + 1 + 5 + 1 + 3 + 1;
+	timeInfoStrLen = strlen(self->checkpointPath) + 1 + 8 + 1 + 5 + 1 + 3 + 1;
 	if ( strlen(self->checkPointPrefixString) > 0 ) {
 		timeInfoStrLen += strlen(self->checkPointPrefixString) + 1;
 	}
 	timeInfoFileName = Memory_Alloc_Array( char, timeInfoStrLen, "timeInfoFileName" );
 
 	if ( strlen(self->checkPointPrefixString) > 0 ) {
-		sprintf( timeInfoFileName, "%s/%s.", self->outputPath, self->checkPointPrefixString );
+		sprintf( timeInfoFileName, "%s/%s.", self->checkpointPath, self->checkPointPrefixString );
 	}
 	else {
-		sprintf( timeInfoFileName, "%s/", self->outputPath );
+		sprintf( timeInfoFileName, "%s/", self->checkpointPath );
 	}
 	sprintf( timeInfoFileName, "%stimeInfo.%.5u.dat", timeInfoFileName, timeStep );
 
@@ -1032,17 +1060,17 @@ char* Context_GetCheckPointInputPrefixString( void* context ) {
 	Index                  inputStrLen = 0;
 	char*                  inputPathString = NULL;
 
-	inputStrLen = strlen(self->outputPath) + 1 + 1;
+	inputStrLen = strlen(self->checkpointPath) + 1 + 1;
 	if ( strlen(self->checkPointPrefixString) > 0 ) {
 		inputStrLen += strlen(self->checkPointPrefixString) + 1;
 	}
 	inputPathString = Memory_Alloc_Array( char, inputStrLen, "inputPathString" );
 
 	if ( strlen(self->checkPointPrefixString) > 0 ) {
-		sprintf( inputPathString, "%s/%s.", self->outputPath, self->checkPointPrefixString );
+		sprintf( inputPathString, "%s/%s.", self->checkpointPath, self->checkPointPrefixString );
 	}
 	else {
-		sprintf( inputPathString, "%s/", self->outputPath );
+		sprintf( inputPathString, "%s/", self->checkpointPath );
 	}
 
 	return inputPathString;
