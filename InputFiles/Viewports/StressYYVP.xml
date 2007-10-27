@@ -30,6 +30,10 @@
 			<param name="Type">lucColourBar</param>
 			<param name="ColourMap">stressYYColourMap</param>
 		</struct>
+		<struct name="YYtitle">
+			<param name="Type">lucTitle</param>
+			<param name="string">Stress in Y</param>
+		</struct>
 		<!-- Put these althogether in a viewport -->
 		<struct name="StressYYVP">
 			<param name="Type">lucViewport</param>
@@ -37,6 +41,7 @@
 			<list name="DrawingObject">
 				<param>stressYYMap</param>
 				<param>borderYY</param>
+				<param>YYtitle</param>
 				<param>stressYYColourBar</param>
 			</list>
 		</struct>
