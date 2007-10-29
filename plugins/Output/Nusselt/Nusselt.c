@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: Nusselt.c 610 2007-10-11 08:09:29Z SteveQuenette $
+** $Id: Nusselt.c 619 2007-10-29 11:43:40Z RobertTurnbull $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -132,7 +132,6 @@ void Underworld_Nusselt_Setup( UnderworldContext* context ) {
 			"VerticalAdvectiveHeatFluxField",
 			self->temperatureTotalDerivField, 
 			"TakeSecondComponent" );
-	self->temperatureVertDerivField->feMesh = ((FeVariable*)velocityField)->feMesh;
 
 	/* Add the variables to register so we can checkpoint & examine if necessary */
 	FieldVariable_Register_Add( fV_Register, self->advectiveHeatFluxField );
