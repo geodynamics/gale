@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: ConstitutiveMatrix.h 354 2006-10-12 08:19:27Z SteveQuenette $
+** $Id: ConstitutiveMatrix.h 618 2007-10-29 07:53:04Z RobertTurnbull $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -160,5 +160,8 @@
 
 	#define ConstitutiveMatrix_SetToNonLinear( constitutiveMatrix ) \
 		StiffnessMatrix_SetToNonLinear( constitutiveMatrix->stiffnessMatrix )
+
+	#define ConstitutiveMatrix_GetMesh( constitutiveMatrix ) \
+		( (constitutiveMatrix)->stiffnessMatrix->rowVariable->feMesh )
 
 #endif /* __Underworld_Rheology_ConstitutiveMatrix_h__ */

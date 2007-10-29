@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: FrankKamenetskii.c 610 2007-10-11 08:09:29Z SteveQuenette $
+** $Id: FrankKamenetskii.c 618 2007-10-29 07:53:04Z RobertTurnbull $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 #include <mpi.h>
@@ -151,12 +151,12 @@ void _FrankKamenetskii_ModifyConstitutiveMatrix(
 		MaterialPoint*                                     materialPoint,
 		Coord                                              xi )
 {
-	FrankKamenetskii*	              self              = (FrankKamenetskii*) rheology;
+	FrankKamenetskii*                 self              = (FrankKamenetskii*) rheology;
 	double                            temperature;
 	double                            viscosity;
 
 	/* Calculate Parameters */
-	FeVariable_InterpolateWithinElement( self->temperatureField, lElement_I, xi, &temperature );
+	FeVariable_InterpolateFromMeshLocalCoord( self->temperatureField, ConstitutiveMatrix_GetMesh( constitutiveMatrix ), lElement_I, xi, &temperature );
 
 	/* Calculate New Viscosity */
 	viscosity = self->eta0 * exp( - self->theta * temperature );

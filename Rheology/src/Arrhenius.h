@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: Arrhenius.h 466 2007-04-27 06:24:33Z LukeHodkinson $
+** $Id: Arrhenius.h 618 2007-10-29 07:53:04Z RobertTurnbull $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -56,7 +56,6 @@
 		/* Virtual functions go here */ \
 		/* Other Info */\
 		FeVariable*                                         temperatureField;        \
-		FeMesh*						    feMesh;		     \
 		double                                              eta0;                    \
 		double                                              activationEnergy;        \
 		double                                              activationVolume;        \

@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: Arrhenius.c 610 2007-10-11 08:09:29Z SteveQuenette $
+** $Id: Arrhenius.c 618 2007-10-29 07:53:04Z RobertTurnbull $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 #include <mpi.h>
@@ -97,7 +97,6 @@ Arrhenius* _Arrhenius_New(
 void _Arrhenius_Init( Arrhenius* self, FeVariable* temperatureField, double eta0, double activationEnergy, double activationVolume, double referenceTemp ) 
 {
 	self->temperatureField = temperatureField;
-	self->feMesh	       = temperatureField->feMesh;
 	self->eta0             = eta0;
 	self->activationEnergy = activationEnergy;
 	self->activationVolume = activationVolume;
@@ -163,6 +162,7 @@ void _Arrhenius_ModifyConstitutiveMatrix(
 	double                            height;
 	Coord				  min, max;	
 	Coord                             coord;
+	FeMesh*                           mesh              = ConstitutiveMatrix_GetMesh( constitutiveMatrix );
 
 	eta0             = self->eta0;
 	activationEnergy = self->activationEnergy;
@@ -170,10 +170,10 @@ void _Arrhenius_ModifyConstitutiveMatrix(
 	referenceTemp    = self->referenceTemp;
 
 	/* Extract geometric extents. */
-	Mesh_GetGlobalCoordRange( self->feMesh, min, max );
+	Mesh_GetGlobalCoordRange( mesh, min, max );
 
 	/* Calculate Parameters */
-	FeVariable_InterpolateWithinElement( temperatureField, lElement_I, xi, &temperature );
+	FeVariable_InterpolateFromMeshLocalCoord( temperatureField, mesh, lElement_I, xi, &temperature );
 	
 	/* If activationVolume is 0 there is no need to calculate the depth of the particle see viscosity line below. */
 	if( activationVolume > (0.0 + 1e-12 )  ) {
@@ -182,7 +182,7 @@ void _Arrhenius_ModifyConstitutiveMatrix(
 
 		/* This rheology assumes particle is an integration points thats can be mapped to a particle
 		 * that has no meaningful coord. Best to re-calc the global from local */
-		FeMesh_CoordLocalToGlobal( swarm->mesh, lElement_I, xi, coord );
+		FeMesh_CoordLocalToGlobal( mesh, lElement_I, xi, coord );
 		depth = height - coord[ J_AXIS ];
 		/* Calculate New Viscosity */
 		viscosity = eta0 * exp(( activationEnergy + activationVolume * depth)/ (temperature + referenceTemp));
