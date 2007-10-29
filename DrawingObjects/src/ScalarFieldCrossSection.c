@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: ScalarFieldCrossSection.c 743 2007-10-26 00:50:14Z LukeHodkinson $
+** $Id: ScalarFieldCrossSection.c 746 2007-10-29 04:26:41Z RobertTurnbull $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -292,7 +292,7 @@ void lucScalarFieldCrossSection_DrawCrossSection( void* drawingObject, double cr
 	Dimension_Index dim_I;
 
 	/* Ensure the field is synchronised. */
-	FeVariable_SyncShadowValues( self->fieldVariable );
+	lucOpenGLDrawingObject_SyncShadowValues( self, self->fieldVariable );
 	
 	glDisable(GL_LIGHTING);
 	

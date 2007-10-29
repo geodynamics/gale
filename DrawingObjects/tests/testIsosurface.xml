@@ -5,6 +5,10 @@
 
 	<include>testDrawingObject.xml</include>
 
+	<!-- Add in FeVariable -->
+	<list name="import" mergeType='merge'>
+		<param>StgFEM</param>
+	</list>
 	<list name="plugins">
 		<param>DummyFieldVariable</param>
 	</list>

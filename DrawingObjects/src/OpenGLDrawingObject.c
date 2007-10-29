@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: OpenGLDrawingObject.c 740 2007-10-11 08:05:31Z SteveQuenette $
+** $Id: OpenGLDrawingObject.c 746 2007-10-29 04:26:41Z RobertTurnbull $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -47,6 +47,7 @@
 #include <mpi.h>
 #include <StGermain/StGermain.h>
 #include <StgDomain/StgDomain.h>
+#include <StgFEM/StgFEM.h>
 
 #include <glucifer/Base/Base.h>
 #include <glucifer/RenderingEngines/RenderingEngines.h>
@@ -201,4 +202,10 @@ void lucOpenGLDrawingObject_BuildDisplayList( void* drawingObject, void* context
 	lucOpenGLDrawingObject*           self            = (lucOpenGLDrawingObject*)drawingObject;
 
 	self->_buildDisplayList( self, context );
+}
+
+/* HACK - a function to check whether a field is an FeVariable or not before it does an FeVariable_SyncShadowValues */
+void lucOpenGLDrawingObject_SyncShadowValues( void* drawingObject, void* field ) {
+	if ( field && Stg_Class_IsInstance( field, FeVariable_Type ) )
+		FeVariable_SyncShadowValues( field );
 }

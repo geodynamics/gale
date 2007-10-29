@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: Isosurface.c 740 2007-10-11 08:05:31Z SteveQuenette $
+** $Id: Isosurface.c 746 2007-10-29 04:26:41Z RobertTurnbull $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -253,7 +253,7 @@ void _lucIsosurface_Setup( void* drawingObject, void* _context ) {
 	Coord                    max;
 	Dimension_Index          dim             = context->dim;
 
-	FeVariable_SyncShadowValues( self->isosurfaceField );
+	lucOpenGLDrawingObject_SyncShadowValues( self, self->isosurfaceField );
 
 	/* Initialise Variables */
 	self->triangleCount = 0;
@@ -344,11 +344,9 @@ void _lucIsosurface_Draw( void* drawingObject, lucWindow* window, lucViewportInf
 	XYZ                      fudgeFactor   = { 0.0, 0.0, 0.0 };
 	Index                    dof_I;
 
-	FeVariable_SyncShadowValues( self->isosurfaceField );
-	if( colourField )
-		FeVariable_SyncShadowValues( colourField );
-	if( self->maskField )
-		FeVariable_SyncShadowValues( self->maskField );
+	lucOpenGLDrawingObject_SyncShadowValues( self, self->isosurfaceField );
+	lucOpenGLDrawingObject_SyncShadowValues( self, colourField );
+	lucOpenGLDrawingObject_SyncShadowValues( self, self->maskField );
 
 	/* Calibrate Colour Map using Colour Variable */
 	if ( colourMap && colourField ) {
@@ -385,11 +383,9 @@ void _lucIsosurface_BuildDisplayList( void* drawingObject, void* _context ) {
 	XYZ                      fudgeFactor   = { 0.0, 0.0, 0.0 };
 	Index                    dof_I;
 
-	FeVariable_SyncShadowValues( self->isosurfaceField );
-	if( colourField )
-		FeVariable_SyncShadowValues( colourField );
-	if( maskField )
-		FeVariable_SyncShadowValues( maskField );
+	lucOpenGLDrawingObject_SyncShadowValues( self, self->isosurfaceField );
+	lucOpenGLDrawingObject_SyncShadowValues( self, colourField );
+	lucOpenGLDrawingObject_SyncShadowValues( self, maskField );
 
 	/* Give option to draw surface as wireframe */
 	if (self->wireframe) 

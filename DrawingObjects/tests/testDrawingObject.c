@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: testDrawingObject.c 740 2007-10-11 08:05:31Z SteveQuenette $
+** $Id: testDrawingObject.c 746 2007-10-29 04:26:41Z RobertTurnbull $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -81,7 +81,6 @@ int main( int argc, char* argv[] ) {
 	MPI_Comm_rank( CommWorld, &rank );
 	
 	StGermain_Init( &argc, &argv );
-	StgDomain_Init( &argc, &argv );
 	lucBase_Init();
 	/* Add lucWindow as default window for this test */
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), lucDefaultWindow_Type, "0", _lucWindow_DefaultNew );
@@ -140,7 +139,6 @@ int main( int argc, char* argv[] ) {
 	lucRenderingEngines_Finalise();
 	lucWindowing_Finalise();
 	lucBase_Finalise();
-	StgDomain_Finalise();
 	StGermain_Finalise();
 		
 	/* Close off MPI */

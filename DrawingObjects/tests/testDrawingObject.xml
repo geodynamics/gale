@@ -2,6 +2,10 @@
 <!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
 
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<list name="import">
+		<param>StgDomain</param>
+	</list>
  	
 	<struct name="components" mergeType="merge">
 		<struct name="renderingEngine">

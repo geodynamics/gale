@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: VectorArrowCrossSection.c 740 2007-10-11 08:05:31Z SteveQuenette $
+** $Id: VectorArrowCrossSection.c 746 2007-10-29 04:26:41Z RobertTurnbull $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -277,7 +277,7 @@ void _lucVectorArrowCrossSection_DrawCrossSection( void* drawingObject, Dimensio
 	Journal_DPrintf( self->debugStream, "In %s():\n", __func__ );
 	Stream_Indent( self->debugStream );
 
-	FeVariable_SyncShadowValues( vectorVariable );
+	lucOpenGLDrawingObject_SyncShadowValues( self, vectorVariable );
 
 	if ( True == self->dynamicRange ) {
 		scaleValue = 1 / FieldVariable_GetMaxGlobalFieldMagnitude( vectorVariable );

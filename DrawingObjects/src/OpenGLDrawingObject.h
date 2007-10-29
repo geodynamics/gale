@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: OpenGLDrawingObject.h 628 2006-10-12 08:23:07Z SteveQuenette $
+** $Id: OpenGLDrawingObject.h 746 2007-10-29 04:26:41Z RobertTurnbull $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -98,5 +98,8 @@
 	void _lucOpenGLDrawingObject_CleanUp( void* drawingObject, void* _context ) ;
 
 	void lucOpenGLDrawingObject_BuildDisplayList( void* drawingObject, void* context ) ;
+
+	/* HACK - a function to check whether a field is an FeVariable or not before it does an FeVariable_SyncShadowValues */
+	void lucOpenGLDrawingObject_SyncShadowValues( void* drawingObject, void* field );
 
 #endif
