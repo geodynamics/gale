@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: SwarmSquares.c 740 2007-10-11 08:05:31Z SteveQuenette $
+** $Id: SwarmSquares.c 748 2007-10-29 05:12:58Z RobertTurnbull $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -275,6 +275,7 @@ void _lucSwarmSquares_BuildDisplayList( void* drawingObject, void* _context ) {
 		This isn't so great either ... it's hard to overlay darker colours on 
 		light with this choice of blending.
 	 */
+	glEnable(GL_BLEND);
 	
 	
 	_lucSwarmViewerBase_BuildDisplayList( self, _context );
@@ -298,7 +299,6 @@ void _lucSwarmSquares_PlotParticle( void* drawingObject, void* _context, Particl
 	if ( lengthVariable )
 		SwarmVariable_ValueAt( lengthVariable, lParticle_I, &length );
 
-	glEnable(GL_BLEND);
 	
 	/*  The fat square has a pizza box shape ... i.e. edges and two faces 
 		which have opposite normals */

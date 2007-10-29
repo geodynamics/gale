@@ -37,6 +37,7 @@ glLightfv( 16384, 4612, ptr );
 glEnable( 16384 );
 glGenLists( 1 );
 glNewList( 0, 4864 );
+	glEnable( 3042 );
 	glColor4f( 0, 1, 0, 1 );
 	glDisable( 2896 );
 	glBegin( 1 );
