@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: main.c 740 2007-10-11 08:05:31Z SteveQuenette $
+** $Id: main.c 750 2007-10-29 10:32:39Z RobertTurnbull $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -74,7 +74,6 @@ int main( int argc, char* argv[] ) {
 	MPI_Comm_rank( CommWorld, &rank );
 	
 	StGermain_Init( &argc, &argv );
-	StgDomain_Init( &argc, &argv );
 	glucifer_Init();
 	#ifdef HAVE_PYTHON
 	Py_Initialize();
@@ -120,7 +119,6 @@ int main( int argc, char* argv[] ) {
 	#endif
 
 	lucBase_Finalise();
-	StgDomain_Finalise();
 	StGermain_Finalise();
 		
 	/* Close off MPI */
