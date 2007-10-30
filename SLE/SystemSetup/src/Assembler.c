@@ -265,6 +265,10 @@ void Assembler_LoopMatrixElement( void* assembler, unsigned element ) {
 	Mesh_GetIncidence( rowMesh, nDims, element, MT_VERTEX, self->rowInc );
 	nRowElNodes = IArray_GetSize( self->rowInc );
 	rowElNodes = IArray_GetPtr( self->rowInc );
+	Mesh_GetIncidence( colMesh, Mesh_GetDimSize( colMesh ), element, MT_VERTEX, 
+			   self->colInc );
+	nColElNodes = IArray_GetSize( self->colInc );
+	colElNodes = IArray_GetPtr( self->colInc );
 	assert( FeMesh_GetElementLocalSize( rowMesh ) == FeMesh_GetElementLocalSize( colMesh ) );
 	assert( nDims == Mesh_GetDimSize( colMesh ) );
 	assert( rowEqNum->locationMatrix );
@@ -293,10 +297,6 @@ void Assembler_LoopMatrixElement( void* assembler, unsigned element ) {
 			else if( self->rowUCB && !self->rowUCB( self->obj, self ) )
 				continue;
 
-			Mesh_GetIncidence( colMesh, Mesh_GetDimSize( colMesh ), element, MT_VERTEX, 
-					   self->colInc );
-			nColElNodes = IArray_GetSize( self->colInc );
-			colElNodes = IArray_GetPtr( self->colInc );
 			colInd = 0;
 			for( n_j = 0; n_j < nColElNodes; n_j++ ) {
 				assert( colEqNum->locationMatrix[element][n_j] );
