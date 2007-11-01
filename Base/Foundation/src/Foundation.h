@@ -34,7 +34,7 @@
 ** <b>Comments:</b>
 **	None
 **
-** $Id: Foundation.h 4129 2007-05-31 01:26:41Z LukeHodkinson $
+** $Id: Foundation.h 4196 2007-11-01 06:20:53Z DavidMay $
 **
 **/
 
@@ -64,5 +64,6 @@
 	#include "TestSuite.h"
 	#include "Init.h"
 	#include "Finalise.h"
+	#include "Log.h"
 
 #endif /* __Base_Foundation_h__ */

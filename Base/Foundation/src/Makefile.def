@@ -24,7 +24,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: Makefile.def 4129 2007-05-31 01:26:41Z LukeHodkinson $
+## $Id: Makefile.def 4196 2007-11-01 06:20:53Z DavidMay $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -51,7 +51,8 @@ def_srcs = \
 	Numerics.c \
 	TestSuite.c \
 	Init.c \
-	Finalise.c
+	Finalise.c \
+	Log.c
 
 def_hdrs = \
 	types.h \
@@ -97,6 +98,7 @@ def_hdrs = \
 	TestEnd.h \
 	Init.h \
 	Finalise.h \
-	Foundation.h
+	Foundation.h \
+	Log.h
 
 def_objlists =
