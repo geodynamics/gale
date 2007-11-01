@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AbstractContext.c 4194 2007-10-26 05:31:19Z BelindaMay $
+** $Id: AbstractContext.c 4197 2007-11-01 06:23:48Z DavidMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -937,6 +937,9 @@ void _AbstractContext_Execute_Hook( Context* context ) {
 		if (self->maxTimeSteps && (self->timeStepSinceJobRestart >= self->maxTimeSteps)) break;
 		if (self->finalTimeStep && (self->timeStep >= self->finalTimeStep)) break;
 		if (self->stopTime && (self->currentTime >= self->stopTime)) break; 
+
+		stg_log_printf( "========================= Done step %d =========================\n\n", self->timeStep );
+		
 		self->timeStep++;
 		self->timeStepSinceJobRestart++;
 	}

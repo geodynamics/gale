@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: EntryPoint.c 3614 2006-06-01 08:58:48Z SteveQuenette $
+** $Id: EntryPoint.c 4197 2007-11-01 06:23:48Z DavidMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -312,16 +312,25 @@ void _EntryPoint_Run( void* entryPoint ) {
 	#endif
 }
 
+
+
+
+
 void _EntryPoint_Run_VoidPtr( void* entryPoint, void* data0 ) {
 	EntryPoint* self = (EntryPoint*)entryPoint;
 	Hook_Index hookIndex;
+	double wallTime;
 	
 	#ifdef USE_PROFILE
 		Stg_CallGraph_Push( stgCallGraph, _EntryPoint_Run_VoidPtr, self->name );
 	#endif
 	
 	for( hookIndex = 0; hookIndex < self->hooks->count; hookIndex++ ) {
+		wallTime = MPI_Wtime();
+
 		((EntryPoint_VoidPtr_Cast*)((Hook*)self->hooks->data[hookIndex])->funcPtr)( data0 );
+		
+		stg_profile_EntryPoint( self->name, self->hooks->data[hookIndex]->name, MPI_Wtime() - wallTime );
 	}
 	
 	#ifdef USE_PROFILE
@@ -332,13 +341,19 @@ void _EntryPoint_Run_VoidPtr( void* entryPoint, void* data0 ) {
 void _EntryPoint_Run_2VoidPtr( void* entryPoint, void* data0, void* data1 ) {
 	EntryPoint* self = (EntryPoint*)entryPoint;
 	Hook_Index hookIndex;
+        double wallTime;
 	
 	#ifdef USE_PROFILE
 		Stg_CallGraph_Push( stgCallGraph, _EntryPoint_Run_2VoidPtr, self->name );
 	#endif
+
 	
 	for( hookIndex = 0; hookIndex < self->hooks->count; hookIndex++ ) {
+		wallTime = MPI_Wtime();
+		
 		((EntryPoint_2VoidPtr_Cast*)((Hook*)self->hooks->data[hookIndex])->funcPtr)( data0, data1 );
+	
+		stg_profile_EntryPoint( self->name, self->hooks->data[hookIndex]->name, MPI_Wtime() - wallTime );
 	}
 	
 	#ifdef USE_PROFILE
@@ -349,13 +364,18 @@ void _EntryPoint_Run_2VoidPtr( void* entryPoint, void* data0, void* data1 ) {
 void _EntryPoint_Run_3VoidPtr( void* entryPoint, void* data0, void* data1, void* data2 ) {
 	EntryPoint* self      = (EntryPoint*)entryPoint;
 	Hook_Index  hookIndex;
+	double wallTime; 
 	
 	#ifdef USE_PROFILE
 		Stg_CallGraph_Push( stgCallGraph, _EntryPoint_Run_3VoidPtr, self->name );
 	#endif
 	
 	for( hookIndex = 0 ; hookIndex < self->hooks->count; hookIndex++ ) {
+		wallTime = MPI_Wtime();
+
 		((EntryPoint_3VoidPtr_Cast*)((Hook*)self->hooks->data[hookIndex])->funcPtr)( data0, data1, data2 );
+		
+		stg_profile_EntryPoint( self->name, self->hooks->data[hookIndex]->name, MPI_Wtime() - wallTime );
 	}
 	
 	#ifdef USE_PROFILE
