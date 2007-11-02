@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: DruckerPrager.c 610 2007-10-11 08:09:29Z SteveQuenette $
+** $Id: DruckerPrager.c 620 2007-11-02 12:56:56Z VincentLemiale $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -308,6 +308,7 @@ double _DruckerPrager_GetYieldCriterion(
 		
 	effectiveFrictionCoefficient = frictionCoefficient * (1.0 - strainWeakeningRatio) +
 			frictionCoefficientAfterSoftening * strainWeakeningRatio;
+	
 		
 	phi = atan(effectiveFrictionCoefficient);
 	sinphi = sin(phi);
@@ -315,7 +316,14 @@ double _DruckerPrager_GetYieldCriterion(
 		
 	dpFrictionCoefficient = 6.0 * sinphi * oneOverDenominator;
 	dpCohesion = 6.0 * effectiveCohesion * cos(phi) * oneOverDenominator;
-		
+
+	/* plane strain */
+	/*
+	phi = atan(effectiveFrictionCoefficient);
+	dpCohesion = effectiveCohesion * cos(phi);
+	dpFrictionCoefficient = sin(phi);
+	*/
+	
 	frictionalStrength = dpFrictionCoefficient * pressure + dpCohesion ;
 				
 	particleExt->tensileFailure = (frictionalStrength <= 0.0);
