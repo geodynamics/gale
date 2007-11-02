@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StandardConditionFunctions.c 971 2007-10-30 05:24:15Z DavidLee $
+** $Id: StandardConditionFunctions.c 973 2007-11-02 05:51:45Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -84,6 +84,8 @@ void _StgFEM_StandardConditionFunctions_Construct( void* component, Stg_Componen
 
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_CornerOnly, "Velocity_Lid_CornerOnly" );
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_TemperatureCosineHill, "Temperature_CosineHill" );
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 	
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ConvectionBenchmark, "Temperature_ConvectionBenchmark" );
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
@@ -128,6 +130,12 @@ void _StgFEM_StandardConditionFunctions_Construct( void* component, Stg_Componen
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ConstantVelocity, "ConstantVelocity");
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_GaussianDistribution, "GaussianDistribution");
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_HalfContainer, "HalfContainer");
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 }
 
@@ -421,6 +429,53 @@ void StgFEM_StandardConditionFunctions_CornerOnly( Node_LocalIndex node_lI, Vari
 		(*velResult) = 0;
 	}
 }
+
+double StGermain_CosineHillValue( double* centre, double* position, double height, double diameterAtBase, Dimension_Index dim ) {
+	double distanceFromCentre = StGermain_DistanceBetweenPoints( centre, position, dim );
+	
+	if (distanceFromCentre < diameterAtBase * 0.5 ) 
+		return height * (0.5 + 0.5 * cos( 2.0 * M_PI/diameterAtBase * distanceFromCentre ) );
+	else
+		return 0.0;
+}
+
+void StgFEM_StandardConditionFunctions_TemperatureCosineHill( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	DomainContext*	context            = (DomainContext*)_context;
+	Dictionary*             dictionary         = context->dictionary;
+	FeVariable*             feVariable         = NULL;
+	FeMesh*			feMesh               = NULL;
+	double*                 result             = (double*) _result;
+	Coord                   centre;
+	Coord                   rotationCentre;
+	double                  omega;
+	double                  hillHeight;
+	double                  hillDiameter;
+	
+	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
+	feMesh       = feVariable->feMesh;
+
+	/* Read values from dictionary */
+	hillHeight       = Dictionary_GetDouble_WithDefault( dictionary, "CosineHillHeight"  , 1.0 );
+	hillDiameter     = Dictionary_GetDouble_WithDefault( dictionary, "CosineHillDiameter", 1.0 );
+	centre[ I_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "CosineHillCentreX" , 0.0 );
+	centre[ J_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "CosineHillCentreY" , 0.0 );
+	centre[ K_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "CosineHillCentreZ" , 0.0 );
+
+	if ( Dictionary_GetBool( dictionary, "RotateCosineHill" ) ) {
+		/* Assume solid body rotation */
+		rotationCentre[ I_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "SolidBodyRotationCentreX", 0.0 );
+		rotationCentre[ J_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "SolidBodyRotationCentreY", 0.0 );
+		rotationCentre[ K_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "SolidBodyRotationCentreZ", 0.0 );
+		omega                    = Dictionary_GetDouble_WithDefault( dictionary, "SolidBodyRotationOmega",   1.0 );
+
+		StGermain_VectorSubtraction( centre, rotationCentre, centre, context->dim );
+		StGermain_RotateCoordinateAxis( centre, centre, K_AXIS, omega * context->currentTime );
+		StGermain_VectorAddition( centre, centre, rotationCentre, context->dim );
+	}
+
+	*result = StGermain_CosineHillValue( centre, Mesh_GetVertex( feMesh, node_lI ), hillHeight, hillDiameter, context->dim );
+}
+
 
 void StgFEM_StandardConditionFunctions_LinearWithSinusoidalPerturbation( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
 	DomainContext*	context = (DomainContext*)_context;
@@ -873,10 +928,8 @@ void StgFEM_StandardConditionFunctions_SpectralBCX( Node_LocalIndex node_lI, Var
 	//	analyticNodeI  = Mesh_NearestVertex( analyticFeMesh, coord );
 	//	FeVariable_GetValueAtNode( analyticFeVarX, analyticNodeI, result );
 	//}
-
-	/* same mesh used for spectral and numeric velocities - just get the value at the node */
+	
 	FeVariable_GetValueAtNode( analyticFeVarX, node_lI, result );
-
 }
 
 void StgFEM_StandardConditionFunctions_SpectralBCY( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
@@ -905,8 +958,7 @@ void StgFEM_StandardConditionFunctions_SpectralBCY( Node_LocalIndex node_lI, Var
 	//	analyticNodeI  = Mesh_NearestVertex( analyticFeMesh, coord );
 	//	FeVariable_GetValueAtNode( analyticFeVarY, analyticNodeI, result );
 	//}
-
-	/* same mesh used for spectral and numeric velocities - just get the value at the node */
+	
 	FeVariable_GetValueAtNode( analyticFeVarY, node_lI, result );
 }
 
@@ -936,8 +988,7 @@ void StgFEM_StandardConditionFunctions_SpectralBCZ( Node_LocalIndex node_lI, Var
 	//	analyticNodeI  = Mesh_NearestVertex( analyticFeMesh, coord );
 	//	FeVariable_GetValueAtNode( analyticFeVarZ, analyticNodeI, result );
 	//}
-
-	/* same mesh used for spectral and numeric velocities - just get the value at the node */
+	
 	FeVariable_GetValueAtNode( analyticFeVarZ, node_lI, result );
 }
 
@@ -1022,7 +1073,57 @@ void StgFEM_StandardConditionFunctions_ErrorFunc( Node_LocalIndex node_lI, Varia
 	else {
 		*result     = errorFunction( coord[0]/dilate, 5 );	
 	}
-
 }
+
+void StgFEM_StandardConditionFunctions_GaussianDistribution( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	FiniteElementContext *	context            = (FiniteElementContext*)_context;
+	FeVariable*             feVariable         = NULL;
+	Dictionary*             dictionary         = context->dictionary;
+	double*                 result             = (double*) _result;
+	Name			variableName;
+	double*			coord;
+	unsigned		nDims              = context->dim;
+	unsigned		dim_I;
+	double			orig[3];
+	double			sigma              = Dictionary_GetDouble_WithDefault( dictionary, "sigma", 1.0 );
+	double			gaussianScale      = Dictionary_GetDouble_WithDefault( dictionary, "GaussianScale", 1.0 );
+	double			distsq             = 0.0;
+
+	variableName = Dictionary_GetString_WithDefault( dictionary, "FieldVariable", "" );
+	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, variableName );
+	coord = Mesh_GetVertex( feVariable->feMesh, node_lI );
+
+	orig[0] = Dictionary_GetDouble_WithDefault( dictionary, "x0", 0.0 );
+	orig[1] = Dictionary_GetDouble_WithDefault( dictionary, "y0", 0.0 );
+	orig[2] = Dictionary_GetDouble_WithDefault( dictionary, "z0", 0.0 );
+
+	for( dim_I = 0; dim_I < nDims; dim_I++ )
+		distsq += ( coord[dim_I] - orig[dim_I] ) * ( coord[dim_I] - orig[dim_I] );
+
+	*result = gaussianScale * exp( -distsq / ( 2.0 * sigma * sigma ) );
+}
+
+void StgFEM_StandardConditionFunctions_HalfContainer( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	FiniteElementContext *	context            = (FiniteElementContext*)_context;
+	FeVariable*             feVariable         = NULL;
+	Dictionary*             dictionary         = context->dictionary;
+	double*                 result             = (double*) _result;
+	Name			variableName;
+	double*			coord;
+	unsigned		nDims              = context->dim;
+	unsigned		dim_I;
+	double			halfPoint          = Dictionary_GetDouble_WithDefault( dictionary, "halfPoint", 0.0 );
+	double			distsq             = 0.0;
+
+	variableName = Dictionary_GetString_WithDefault( dictionary, "FieldVariable", "" );
+	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, variableName );
+	coord = Mesh_GetVertex( feVariable->feMesh, node_lI );
+
+	if( coord[1] < halfPoint )
+		*result = 1;
+	else
+		*result = 0;	
+}
+
 
 
