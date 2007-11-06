@@ -24,10 +24,15 @@
 			<param name="backgroundColour">white</param>
 			<param name="xFontName">-adobe-helvetica-bold-r-normal--14-140-75-75-p-82-iso8859-1</param>
 		</struct>
+		<!-- If you want to add the movie functionality please add
+		 	 glucifer/BuildMovie.xml to your setup. The default behaviour is	
+			 to not make movies due to the difficulty in specifying a standard
+			 approach to building them 
+		
 		<struct name="movie">
 			<param name="Type">lucEncoderLibfame</param>
 			<param name="Window">window</param>
-		</struct>	
+		</struct>	-->
 	</struct>
 	
 	<!-- this parameter will be used as the default by all lucWindow objects -->
