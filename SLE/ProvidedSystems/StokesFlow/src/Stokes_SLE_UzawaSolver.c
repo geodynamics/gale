@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Stokes_SLE_UzawaSolver.c 964 2007-10-11 08:03:06Z SteveQuenette $
+** $Id: Stokes_SLE_UzawaSolver.c 977 2007-11-07 06:05:18Z DavidMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -330,6 +330,8 @@ void _Stokes_SLE_UzawaSolver_SolverSetup( void* solver, void* stokesSLE ) {
 }
 
 
+#define FetchPetscVector( vector ) ( (Vec)( ((PETScVector*)(vector))->petscVec ) )
+
 void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	Stokes_SLE_UzawaSolver* self            = (Stokes_SLE_UzawaSolver*)solver;	
 	Stokes_SLE*             sle             = (Stokes_SLE*)stokesSLE;
@@ -377,6 +379,8 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	double                  qGlobalProblemScale = sqrt( (double)Vector_GetGlobalSize( qTempVec ) );
 	double                  qReciprocalGlobalProblemScale = 1.0 / qGlobalProblemScale;
 	int			init_info_stream_rank;	
+	PetscScalar    		sum;
+	PetscInt		N;
 
 	init_info_stream_rank = Stream_GetPrintingRank( self->info );
 	Stream_SetPrintingRank( self->info, 0 ); 
@@ -653,6 +657,14 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 			Vector_Scale( qTempVec, -1.0 );
 			Matrix_MultiplyAdd( M_Mat, sVec, qTempVec, qTempVec );
 			Vector_Scale( qTempVec, -1.0 );
+		}
+
+		/* Remove the constant null space */
+		VecGetSize( FetchPetscVector(qTempVec), &N );
+		if( N > 0 ) {
+			VecSum( FetchPetscVector(qTempVec), &sum );
+			sum  = sum/( -1.0*N );
+			VecShift( FetchPetscVector(qTempVec), sum );
 		}
 
 		sdotGTrans_v = Vector_DotProduct( sVec, qTempVec );
