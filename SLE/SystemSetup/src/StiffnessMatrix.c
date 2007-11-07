@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StiffnessMatrix.c 972 2007-11-02 04:18:28Z DavidMay $
+** $Id: StiffnessMatrix.c 975 2007-11-07 00:27:32Z DavidMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -1302,7 +1302,7 @@ void _get_bc_values( FeVariable *colVar, int npe, int ndof, int el_nodes[], doub
 			/* query node index to see if it is has a dirichlet boundary condition */
 			if( FeVariable_IsBC( colVar, n_i, d) == True ) {       
                 		bc = DofLayout_GetValueDouble( colVar->dofLayout, n_i,  d );
-                        	bc_vals[ LEOrder(n,d,ndof) ] = bc;
+				bc_vals[ LEOrder(n,d,ndof) ] = bc;
 			}
 			/* end bc query */
                 }
@@ -1689,40 +1689,22 @@ void _StiffMatAss_vector_corrections(  struct StiffMatAss_Log *log, void *stiffn
                 n_rows = n_cols = 0;
                 has_row_bc = has_col_bc = 0;
 
-                if( same_variables == 1 ) {
-                        for( n_i=0; n_i<nColDofs; n_i++ ) {
-                                eq_num = colEqNum->locationMatrix[e_i][0][n_i];
-                                if( colEqNum->locationMatrix[e_i][0][n_i] < 0 ) {
-                                        col_index_to_keep[ n_cols ] = n_i;
-                                        row_index_to_keep[ n_rows ] = n_i;
-                                        n_cols++;
-                                        n_rows++;
-                                        has_col_bc = 1;
-                                        has_row_bc = 1;
-                                }
-                        }
-                }
-                else {
-                       for( n_i=0; n_i<nColDofs; n_i++ ) {
-                                eq_num = colEqNum->locationMatrix[e_i][0][n_i];
-                                if( colEqNum->locationMatrix[e_i][0][n_i] < 0 ) {
-                                        col_index_to_keep[ n_cols ] = n_i;
-                                        n_cols++;
-                                        has_col_bc = 1;
-                                }
-                        }
-
-                        for( n_i=0; n_i<nRowDofs; n_i++ ) {
-                                if( rowEqNum->locationMatrix[e_i][0][n_i] >= 0 ) {
-                                        row_index_to_keep[ n_rows ] = n_i;
-                                        n_rows++;
-                                        has_row_bc = 1;
-                                }
-                        }
-                }
-
-
-
+                       
+		for( n_i=0; n_i<nColDofs; n_i++ ) {
+			eq_num = colEqNum->locationMatrix[e_i][0][n_i];
+			if( colEqNum->locationMatrix[e_i][0][n_i] < 0 ) {
+				col_index_to_keep[ n_cols ] = n_i;
+				n_cols++;
+				has_col_bc = 1;
+			}
+		}
+		for( n_i=0; n_i<nRowDofs; n_i++ ) {
+			if( rowEqNum->locationMatrix[e_i][0][n_i] >= 0 ) {
+				row_index_to_keep[ n_rows ] = n_i;
+				n_rows++;
+				has_row_bc = 1;
+			}
+		}
 
 
                 /* Assemble the element. */
@@ -1732,11 +1714,7 @@ void _StiffMatAss_vector_corrections(  struct StiffMatAss_Log *log, void *stiffn
 		StiffMatAssLog_AccumulateTime_ElementAssembly( log );
 
 		if( (has_col_bc==1) ) {
-			int II;
                 //        memset( rhs, 0, maxRCDofs * sizeof(double) );
-			for( II=0; II<maxRCDofs; II++ ) {
-				bcVals[II] = rhs[II] = 0.0;
-			}
 
                         _get_bc_values( colVar, nColNodes, c_dof, colNodes, bcVals );
                         _make_dirichlet_corrections_to_rhs(
@@ -1898,40 +1876,24 @@ void _StiffMatAss_vector_corrections_from_transpose( struct StiffMatAss_Log *log
                 n_rows = n_cols = 0;
                 has_row_bc = has_col_bc = 0;
 
-                if( same_variables == 1 ) {
-                        for( n_i=0; n_i<nColDofs; n_i++ ) {
-                                eq_num = colEqNum->locationMatrix[e_i][0][n_i];
-                                if( colEqNum->locationMatrix[e_i][0][n_i] < 0 ) {
-                                        col_index_to_keep[ n_cols ] = n_i;
-                                        row_index_to_keep[ n_rows ] = n_i;
-                                        n_cols++;
-                                        n_rows++;
-                                        has_col_bc = 1;
-                                        has_row_bc = 1;
-                                }
+		/* cause this is the transpose function, we make corrections on the bc's if there are applied to the row variable */
+                for( n_i=0; n_i<nColDofs; n_i++ ) {
+			eq_num = colEqNum->locationMatrix[e_i][0][n_i];
+                        if( colEqNum->locationMatrix[e_i][0][n_i] >= 0 ) {
+				col_index_to_keep[ n_cols ] = n_i;
+                                n_cols++;
+                                has_col_bc = 1;
                         }
                 }
-                else {
-			/* cause this is the transpose function, we make corrections on the bc's if there are applied to the row variable */
-
-                       for( n_i=0; n_i<nColDofs; n_i++ ) {
-                                eq_num = colEqNum->locationMatrix[e_i][0][n_i];
-                                if( colEqNum->locationMatrix[e_i][0][n_i] >= 0 ) {
-                                        col_index_to_keep[ n_cols ] = n_i;
-                                        n_cols++;
-                                        has_col_bc = 1;
-                                }
-                        }
         
-                        for( n_i=0; n_i<nRowDofs; n_i++ ) {
-                                if( rowEqNum->locationMatrix[e_i][0][n_i] < 0 ) {
-                                        row_index_to_keep[ n_rows ] = n_i;
-                                        n_rows++;
-                                        has_row_bc = 1;
-                                }
-                        }
-
+                for( n_i=0; n_i<nRowDofs; n_i++ ) {
+                       if( rowEqNum->locationMatrix[e_i][0][n_i] < 0 ) {
+				row_index_to_keep[ n_rows ] = n_i;
+                                n_rows++;
+                                has_row_bc = 1;
+                       }
                 }
+
 
 
 
@@ -1954,8 +1916,6 @@ void _StiffMatAss_vector_corrections_from_transpose( struct StiffMatAss_Log *log
 		StiffMatAssLog_UpdateElementsAssembled( log );
 
                 if( (has_row_bc==1) ) {
-	                int II;
-	
         	//	memset( rhs, 0, maxRCDofs * sizeof(double) );
 		/*
 			for( II=0; II<maxRCDofs; II++ ) {
@@ -1969,11 +1929,6 @@ void _StiffMatAss_vector_corrections_from_transpose( struct StiffMatAss_Log *log
                                 n_rows, row_index_to_keep,
 				elStiffMat, -1, bcVals, rhs );
 
-/*
-			printf("h = { ");
-			for( II=0; II<nColDofs; II++ ) printf("%f(%d) ", rhs[II], colEqNum->locationMatrix[e_i][0][II] );
-			printf("}\n");
-*/		
 
 			Vector_AddEntries( transVector, nColDofs, (unsigned*)colEqNum->locationMatrix[e_i][0], rhs );
 			StiffMatAssLog_UpdateElementsAssembledForBC_Corrections( log );
