@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testElementIntegral.c 518 2007-10-11 08:07:50Z SteveQuenette $
+** $Id: testElementIntegral.c 522 2007-11-08 03:08:50Z BelindaMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -150,7 +150,7 @@ void PICellerator_testElementIntegral( DomainContext* context ) {
 	Swarm*              integrationSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, 
 										  "integrationSwarm" );
 	Swarm*              materialSwarm    = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, 
-										  "materialSwarm" );
+										  "materialPoints" );
 	FeMesh* mesh             = (FeMesh*) LiveComponentRegister_Get( context->CF->LCRegister, "linearMesh" );
 	WeightsCalculator*  weights          = (WeightsCalculator*) LiveComponentRegister_Get( context->CF->LCRegister, "weights" );
 	FeVariable*         feVariable;

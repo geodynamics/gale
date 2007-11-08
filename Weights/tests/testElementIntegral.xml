@@ -29,7 +29,7 @@
 		<struct name="mapper">
 			<param name="Type">CoincidentMapper</param>
 			<param name="IntegrationPointsSwarm">integrationSwarm</param>
-			<param name="MaterialPointsSwarm">materialSwarm</param>
+			<param name="MaterialPointsSwarm">materialPoints</param>
 		</struct>
 		<struct name="particleLayout">
 			<param name="Type">RandomParticleLayout</param>
@@ -38,7 +38,7 @@
 		<struct name="pMovementHandler"> 
 			<param name="Type">ParticleMovementHandler</param>
 		</struct>
-		<struct name="materialSwarm">
+		<struct name="materialPoints">
 			<param name="Type">MaterialPointsSwarm</param>
 			<param name="CellLayout">elementCellLayout</param>
 			<param name="ParticleLayout">particleLayout</param>
