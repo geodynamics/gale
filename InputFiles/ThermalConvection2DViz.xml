@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+
+	<!-- Visualisation odd and ends for 2D convection runs -->
+	
+	
+	<include>Underworld/Viewports/TemperatureAndVelocityArrowsVP.xml</include>
+	<include>glucifer/window.xml</include>
+	<struct name="components" mergeType="merge">
+		<struct name="window" mergeType="merge">
+			<param name="Viewport">TemperatureAndVelocityArrowsVP</param>
+		</struct>
+	</struct>
+ 
+</StGermainData>
