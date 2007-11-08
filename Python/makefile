@@ -43,3 +43,4 @@ ifdef HAVE_PYTHON
 endif
 
 include ${PROJ_ROOT}/Makefile.vmake
+
