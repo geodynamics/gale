@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StandardConditionFunctions.c 973 2007-11-02 05:51:45Z DavidLee $
+** $Id: StandardConditionFunctions.c 978 2007-11-08 12:23:51Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -136,6 +136,9 @@ void _StgFEM_StandardConditionFunctions_Construct( void* component, Stg_Componen
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_HalfContainer, "HalfContainer");
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ConstantValue, "ConstantValue");
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 }
 
@@ -1125,5 +1128,13 @@ void StgFEM_StandardConditionFunctions_HalfContainer( Node_LocalIndex node_lI, V
 		*result = 0;	
 }
 
+void StgFEM_StandardConditionFunctions_ConstantValue( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	FiniteElementContext *	context            = (FiniteElementContext*)_context;
+	Dictionary*             dictionary         = context->dictionary;
+	double*                 result             = (double*) _result;
+	unsigned		dim_I;
+	double			value          = Dictionary_GetDouble_WithDefault( dictionary, "constantValue", 1.0 );
 
+	*result = value;
+}
 
