@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testDiscrepancy.c 518 2007-10-11 08:07:50Z SteveQuenette $
+** $Id: testDiscrepancy.c 523 2007-11-08 03:10:04Z BelindaMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -69,15 +69,17 @@ double Swarm_ParticleDiscrepancy( void* swarm, Cell_LocalIndex lCell_I, Particle
 	GlobalParticle*      particle          = (GlobalParticle*)Swarm_ParticleInCellAt( self, lCell_I, cParticle_I );
 	double*              coord             = particle->coord;
 	GlobalParticle*      smallerCellParticle;
-	double*              startCellCoord    = (double*) self->cellPointTbl[lCell_I][0];
-	double*              endCellCoord      = (double*) self->cellPointTbl[lCell_I][ dim == 2 ? 2 : 6 ];
+	Coord 		     min;
+	Coord 		     max;
+
+	Swarm_GetCellMinMaxCoords (self, lCell_I, min, max);
 
 	/* Calculate volume of Gx */
 	volumeGx = 
-		(coord[ I_AXIS ] - startCellCoord[ I_AXIS ])/( endCellCoord[ I_AXIS ] - startCellCoord[ I_AXIS ]) *
-		(coord[ J_AXIS ] - startCellCoord[ J_AXIS ])/( endCellCoord[ J_AXIS ] - startCellCoord[ J_AXIS ]) ;
+		(coord[ I_AXIS ] - min[ I_AXIS ])/( max[ I_AXIS ] - min[ I_AXIS ]) *
+		(coord[ J_AXIS ] - min[ J_AXIS ])/( max[ J_AXIS ] - min[ J_AXIS ]) ;	
 	if ( dim == 3 )
-		volumeGx *= (coord[ K_AXIS ] - startCellCoord[ K_AXIS ])/( endCellCoord[ K_AXIS ] - startCellCoord[ K_AXIS ]) ;
+		volumeGx *= (coord[ K_AXIS ] - min[ K_AXIS ])/( max[ K_AXIS ] - min[ K_AXIS ]) ;
 	
 	for ( smallerCellParticle_I = 0 ; smallerCellParticle_I < cellParticleCount ; smallerCellParticle_I++ ) {
 		smallerCellParticle = (GlobalParticle*)Swarm_ParticleInCellAt( self, lCell_I, smallerCellParticle_I );
