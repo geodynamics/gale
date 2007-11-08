@@ -1,11 +1,33 @@
 StGermain Framework revision 4046. Copyright (C) 2003-2005 VPAC.
-StGermain Discretisation Library revision 4046. Copyright (C) 2003-2005 VPAC.
+StGermain Domain Library revision 4046. Copyright (C) 2003-2007 VPAC.
 StGermain Finite Element Framework revision 793. Copyright (C) 2003-2005 VPAC.
 StGermain FEM Discretisation Framework revision 793. Copyright (C) 2003-2005 VPAC.
 StGermain SLE Library revision 793. Copyright (C) 2003-2005 VPAC.
 StGermain PETSc-LinearAlgebra Interface revision 793. Copyright (C) 2003-2005 VPAC.
 StGermain FEM Assembly Library revision 793. Copyright (C) 2003-2005 VPAC.
 Watching rank: 0
+Cartesian generator: ''
+	Target mesh: ''
+	Global element size: 6x6
+	Local offset of rank 0: 0x0
+	Local range of rank 0: 6x6
+	Generating vertices...
+		... done.
+	Generating elements...
+		... done.
+	Generating element-vertex incidence...
+		... done.
+	Generating vertex neighbours...
+		... done.
+	Generating geometry...
+		... done.
+	Generating element types...
+		... element types are 'Mesh_HexType',
+		... mesh algorithm type is 'Mesh_RegularAlgorithms',
+		... done.
+	Assigning FeMesh element types...
+		... FE element types are 'BilinearElementType',
+		... done.
 Swarm (ptr): 0x64b8f0
 Stg_Component (ptr): 0x64b8f0
 Stg_Object (ptr): 0x64b8f0
