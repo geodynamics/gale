@@ -24,9 +24,9 @@
 			<param name="FieldVariable">ViscosityField</param>
 			<param name="ColourMap">viscosityColourMap</param>
 		</struct>
-		<struct name="border" mergeType="replace">
+		<struct name="viscborder" mergeType="replace">
 			<param name="Type">lucFieldVariableBorder</param>
-			<param name="string">ViscosityField</param>
+			<param name="FieldVariable">ViscosityField </param>
 		</struct>
 		<struct name="viscosityColourBar">
 			<param name="Type">lucColourBar</param>
@@ -39,7 +39,7 @@
 			<list name="DrawingObject">
 				<param>viscosityTitle</param>
 				<param>viscosityMap</param>
-				<param>border</param>
+				<param>viscborder</param>
 				<param>viscosityColourBar</param>
 			</list>
 		</struct>
