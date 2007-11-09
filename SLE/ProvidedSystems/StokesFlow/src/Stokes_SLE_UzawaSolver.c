@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Stokes_SLE_UzawaSolver.c 977 2007-11-07 06:05:18Z DavidMay $
+** $Id: Stokes_SLE_UzawaSolver.c 980 2007-11-09 11:20:33Z DavidMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -659,14 +659,15 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 			Vector_Scale( qTempVec, -1.0 );
 		}
 
-		/* Remove the constant null space */
-		VecGetSize( FetchPetscVector(qTempVec), &N );
-		if( N > 0 ) {
-			VecSum( FetchPetscVector(qTempVec), &sum );
-			sum  = sum/( -1.0*N );
-			VecShift( FetchPetscVector(qTempVec), sum );
+		/* Remove the constant null space, but only if NOT compressible */
+		if( !M_Mat ) {
+			VecGetSize( FetchPetscVector(qTempVec), &N );
+			if( N > 0 ) {
+				VecSum( FetchPetscVector(qTempVec), &sum );
+				sum  = sum/( -1.0*N );
+				VecShift( FetchPetscVector(qTempVec), sum );
+			}
 		}
-
 		sdotGTrans_v = Vector_DotProduct( sVec, qTempVec );
 		
 		alpha = zdotr_current/sdotGTrans_v;
