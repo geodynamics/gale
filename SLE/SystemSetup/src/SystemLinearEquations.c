@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SystemLinearEquations.c 964 2007-10-11 08:03:06Z SteveQuenette $
+** $Id: SystemLinearEquations.c 979 2007-11-09 01:39:25Z DavidMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -492,7 +492,7 @@ void SystemLinearEquations_ExecuteSolver( void* sle, void* _context ) {
 	wallTime = MPI_Wtime();		
 	Stg_Component_Execute( self->solver, self, True );
 	
-	Journal_Printf(self->info,"Linear solver (%s), solution time %g (secs)\n",self->executeEPName, MPI_Wtime() - wallTime);
+	Journal_Printf(self->info,"Linear solver (%s), solution time %6.6e (secs)\n",self->executeEPName, MPI_Wtime() - wallTime);
 		
 }
 
@@ -715,7 +715,7 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 		/* Check if residual is below tolerance */
 		converged = (residual < tolerance);
 		
-		Journal_Printf(self->info,"Non linear solver - Residual %.8e; Tolerance %.4e%s%s - %g (secs)\n\n", residual, tolerance, 
+		Journal_Printf(self->info,"Non linear solver - Residual %.8e; Tolerance %.4e%s%s - %6.6e (secs)\n\n", residual, tolerance, 
 			(converged) ? " - Converged" : " - Not converged",
 			(self->nonLinearIteration_I < maxIterations) ? "" : " - Reached iteration limit",
 			MPI_Wtime() - wallTime );
