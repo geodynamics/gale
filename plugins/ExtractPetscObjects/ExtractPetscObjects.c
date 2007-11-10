@@ -170,7 +170,7 @@ void Underworld_ExtractPetscObjects_Dump( void* _context )
 	if( stokesSLE->kStiffMat != NULL ) {
 		sprintf( kName, "k--%s-%d-%s", probName,step, machine_name );
 		sprintf( mat_name, "%s/%s", context->outputPath, kName );
-		printf("  Writing kMatrix to \t\t\t\t%s \n",mat_name );
+		printf("  Writing kMatrix:                    %s \n",mat_name );
 		
 		
 		A = GetPetscMatrix( stokesSLE->kStiffMat->matrix );
@@ -184,7 +184,7 @@ void Underworld_ExtractPetscObjects_Dump( void* _context )
 	if( stokesSLE->gStiffMat != NULL ) {
 		sprintf( GradName, "g--%s-%d-%s", probName,step, machine_name );
 		sprintf( mat_name, "%s/%s", context->outputPath, GradName );
-		printf("  Writing Grad to \t\t\t\t%s \n",mat_name );
+		printf("  Writing Grad:                       %s \n",mat_name );
 		
 		A = GetPetscMatrix( stokesSLE->gStiffMat->matrix );
 		PetscViewerBinaryOpen( comm, mat_name, FILE_MODE_WRITE, &mat_view_file );
@@ -196,7 +196,7 @@ void Underworld_ExtractPetscObjects_Dump( void* _context )
 	if( stokesSLE->dStiffMat != NULL ) {
 		sprintf( DivName, "div--%s-%d-%s", probName, step, machine_name );
 		sprintf( mat_name, "%s/%s", context->outputPath, DivName );
-		printf("  Writing Div to \t\t\t\t\t%s \n",mat_name );
+		printf("  Writing Div:                        %s \n",mat_name );
 		
 		A = GetPetscMatrix( stokesSLE->dStiffMat->matrix );
 		PetscViewerBinaryOpen( comm, mat_name, FILE_MODE_WRITE, &mat_view_file );
@@ -208,7 +208,7 @@ void Underworld_ExtractPetscObjects_Dump( void* _context )
 	if( stokesSLE->cStiffMat != NULL ) {
 		sprintf( CName, "c--%s-%d-%s", probName, step, machine_name );
 		sprintf( mat_name, "%s/%s", context->outputPath, CName );
-		printf("  Writing C to \t\t\t\t\t%s \n",mat_name );
+		printf("  Writing C:                          %s \n",mat_name );
 		
 		A = GetPetscMatrix( stokesSLE->cStiffMat->matrix );
 		PetscViewerBinaryOpen( comm, mat_name, FILE_MODE_WRITE, &mat_view_file );
@@ -221,7 +221,7 @@ void Underworld_ExtractPetscObjects_Dump( void* _context )
 	if( stokesSLE->fForceVec != NULL ) {
 		sprintf( FName, "F--%s-%d-%s", probName, step, machine_name );
 		sprintf( vec_name, "%s/%s", context->outputPath, FName );
-		printf("  Writing F to \t\t\t\t\t%s \n", vec_name );
+		printf("  Writing F:                          %s \n", vec_name );
 		
 		b = GetPetscVector( stokesSLE->fForceVec->vector );
 		PetscViewerBinaryOpen( comm, vec_name, FILE_MODE_WRITE, &vec_view_file );
@@ -233,7 +233,7 @@ void Underworld_ExtractPetscObjects_Dump( void* _context )
 	if( stokesSLE->hForceVec != NULL ) {
 		sprintf( HName, "H--%s-%d-%s", probName, step, machine_name );
 		sprintf( vec_name, "%s/%s", context->outputPath, HName );
-		printf("  Writing H to \t\t\t\t\t%s \n", vec_name );
+		printf("  Writing H:                          %s \n", vec_name );
 		
 		b = GetPetscVector( stokesSLE->hForceVec->vector );
 		PetscViewerBinaryOpen( comm, vec_name, FILE_MODE_WRITE, &vec_view_file );
@@ -247,7 +247,7 @@ void Underworld_ExtractPetscObjects_Dump( void* _context )
 	if( uzawa_present == True ) {
 		sprintf( SpcName, "Spc--%s-%d-%s", probName, step, machine_name );
 		sprintf( mat_name, "%s/%s", context->outputPath, SpcName );
-		printf("  Writing Schur pc operator (UW_Q22) to \t%s \n",mat_name );
+		printf("  Writing Schur pc operator (UW_Q22): %s \n",mat_name );
 	
 		uzawaSolver = (Stokes_SLE_UzawaSolver*)stokesSLE->solver;
 		A = GetPetscMatrix( uzawaSolver->preconditioner->matrix );
@@ -261,6 +261,7 @@ void Underworld_ExtractPetscObjects_Dump( void* _context )
 	if( rank == 0 ) {
 		
 		sprintf( fileName, "%s/%s-%d.info", context->outputPath, probName, context->timeStep );
+		printf("  Info file:                          %s \n", fileName );			
 		
 		if (( info = fopen (fileName, "w")) == NULL)  {
 			(void) fprintf(stderr, "Error: couldn't open file %s for writing. Exiting.\n", fileName);
