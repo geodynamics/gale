@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StandardConditionFunctions.c 978 2007-11-08 12:23:51Z DavidLee $
+** $Id: StandardConditionFunctions.c 981 2007-11-12 00:42:19Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -139,6 +139,9 @@ void _StgFEM_StandardConditionFunctions_Construct( void* component, Stg_Componen
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ConstantValue, "ConstantValue");
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_DiagonalLine, "DiagonalLine");
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 }
 
@@ -1133,8 +1136,28 @@ void StgFEM_StandardConditionFunctions_ConstantValue( Node_LocalIndex node_lI, V
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
 	unsigned		dim_I;
-	double			value          = Dictionary_GetDouble_WithDefault( dictionary, "constantValue", 1.0 );
+	double			value              = Dictionary_GetDouble_WithDefault( dictionary, "constantValue", 1.0 );
 
 	*result = value;
+}
+
+void StgFEM_StandardConditionFunctions_DiagonalLine( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	FiniteElementContext *	context            = (FiniteElementContext*)_context;
+	Dictionary*             dictionary         = context->dictionary;
+	double*                 result             = (double*) _result;
+	unsigned		dim_I;
+	double			width              = Dictionary_GetDouble_WithDefault( dictionary, "lineWidth", 1.0 );
+	double*			coord;
+	Name			variableName;
+	FeVariable*             feVariable         = NULL;
+
+	variableName = Dictionary_GetString_WithDefault( dictionary, "FieldVariable", "" );
+	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, variableName );
+	coord = Mesh_GetVertex( feVariable->feMesh, node_lI );
+
+	if( fabs( coord[0] - coord[1] ) < width )
+		*result = 1.0;
+	else
+		*result = 0.0;
 }
 
