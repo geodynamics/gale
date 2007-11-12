@@ -168,7 +168,7 @@ void Underworld_ExtractPetscObjects_Dump( void* _context )
 	
 	/* Write K to file */
 	if( stokesSLE->kStiffMat != NULL ) {
-		sprintf( kName, "k--%s-%d-%s", probName,step, machine_name );
+		sprintf( kName, "k--%s-step%d-%s", probName,step, machine_name );
 		sprintf( mat_name, "%s/%s", context->outputPath, kName );
 		printf("  Writing kMatrix:                    %s \n",mat_name );
 		
@@ -182,7 +182,7 @@ void Underworld_ExtractPetscObjects_Dump( void* _context )
 	}
 	/* Write G to file */
 	if( stokesSLE->gStiffMat != NULL ) {
-		sprintf( GradName, "g--%s-%d-%s", probName,step, machine_name );
+		sprintf( GradName, "g--%s-step%d-%s", probName,step, machine_name );
 		sprintf( mat_name, "%s/%s", context->outputPath, GradName );
 		printf("  Writing Grad:                       %s \n",mat_name );
 		
@@ -194,7 +194,7 @@ void Underworld_ExtractPetscObjects_Dump( void* _context )
 	
 	/* Write Div to file */	
 	if( stokesSLE->dStiffMat != NULL ) {
-		sprintf( DivName, "div--%s-%d-%s", probName, step, machine_name );
+		sprintf( DivName, "div--%s-step%d-%s", probName, step, machine_name );
 		sprintf( mat_name, "%s/%s", context->outputPath, DivName );
 		printf("  Writing Div:                        %s \n",mat_name );
 		
@@ -206,7 +206,7 @@ void Underworld_ExtractPetscObjects_Dump( void* _context )
 	
 	/* Write C to file */
 	if( stokesSLE->cStiffMat != NULL ) {
-		sprintf( CName, "c--%s-%d-%s", probName, step, machine_name );
+		sprintf( CName, "c--%s-step%d-%s", probName, step, machine_name );
 		sprintf( mat_name, "%s/%s", context->outputPath, CName );
 		printf("  Writing C:                          %s \n",mat_name );
 		
@@ -219,7 +219,7 @@ void Underworld_ExtractPetscObjects_Dump( void* _context )
 	
 	/* Momentum rhs */
 	if( stokesSLE->fForceVec != NULL ) {
-		sprintf( FName, "F--%s-%d-%s", probName, step, machine_name );
+		sprintf( FName, "F--%s-step%d-%s", probName, step, machine_name );
 		sprintf( vec_name, "%s/%s", context->outputPath, FName );
 		printf("  Writing F:                          %s \n", vec_name );
 		
@@ -231,7 +231,7 @@ void Underworld_ExtractPetscObjects_Dump( void* _context )
 	
 	/* Continuity rhs */
 	if( stokesSLE->hForceVec != NULL ) {
-		sprintf( HName, "H--%s-%d-%s", probName, step, machine_name );
+		sprintf( HName, "H--%s-step%d-%s", probName, step, machine_name );
 		sprintf( vec_name, "%s/%s", context->outputPath, HName );
 		printf("  Writing H:                          %s \n", vec_name );
 		
@@ -245,7 +245,7 @@ void Underworld_ExtractPetscObjects_Dump( void* _context )
 	uzawa_present = False;
 	uzawa_present = Stg_Class_IsInstance( stokesSLE->solver, Stokes_SLE_UzawaSolver_Type );
 	if( uzawa_present == True ) {
-		sprintf( SpcName, "Spc--%s-%d-%s", probName, step, machine_name );
+		sprintf( SpcName, "Spc--%s-step%d-%s", probName, step, machine_name );
 		sprintf( mat_name, "%s/%s", context->outputPath, SpcName );
 		printf("  Writing Schur pc operator (UW_Q22): %s \n",mat_name );
 	
@@ -260,7 +260,7 @@ void Underworld_ExtractPetscObjects_Dump( void* _context )
 	
 	if( rank == 0 ) {
 		
-		sprintf( fileName, "%s/%s-%d.info", context->outputPath, probName, context->timeStep );
+		sprintf( fileName, "%s/%s-step%d.info", context->outputPath, probName, context->timeStep );
 		printf("  Info file:                          %s \n", fileName );			
 		
 		if (( info = fopen (fileName, "w")) == NULL)  {
