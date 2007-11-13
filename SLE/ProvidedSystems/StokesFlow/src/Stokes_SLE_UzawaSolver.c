@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Stokes_SLE_UzawaSolver.c 980 2007-11-09 11:20:33Z DavidMay $
+** $Id: Stokes_SLE_UzawaSolver.c 982 2007-11-13 23:34:55Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -774,12 +774,12 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	 Note - correction for dof in Vrms ??
 	*/
 	
-	Journal_PrintfL( self->info, 1, "Summary: Max velocity component = %.8e; Velocity magnitude = %.8e\n",
+	Journal_PrintfL( self->info, 1, "Summary: Max velocity component = %.8e; RMS Velocity magnitude = %.8e\n",
 		Vector_LInfNorm( uVec ),
 		Vector_L2Norm( uVec ) / sqrt( (double)Vector_GetGlobalSize( uVec ) )  );
 		
 	
-	Journal_PrintfL( self->info, 1, "Summary: Max pressure value     = %.8e; Pressure magnitude = %.8e\n",
+	Journal_PrintfL( self->info, 1, "Summary: Max pressure value     = %.8e; RMS Pressure magnitude = %.8e\n",
 		Vector_LInfNorm( qVec ),
 		Vector_L2Norm( qVec ) / sqrt( (double)Vector_GetGlobalSize( qVec ) ) );
 		
