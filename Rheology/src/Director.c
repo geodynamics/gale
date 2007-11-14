@@ -39,7 +39,7 @@
 *+		Julian Giordani
 *+		Kathleen Humble
 *+
-** $Id: Director.c 610 2007-10-11 08:09:29Z SteveQuenette $
+** $Id: Director.c 629 2007-11-14 05:47:33Z BelindaMay $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -443,8 +443,8 @@ Bool _Director_TimeDerivative( void* director, Index lParticle_I, double* timeDe
 			__func__, array_I, coord[0], coord[1], coord[2], 
 			velGrad[0], velGrad[1], ( self->materialPointsSwarm->dim == 3 ? velGrad[2] : 0.0 ),
 			InterpolationResultToStringMap[result]  );
-		#endif	
 		return False;	
+		#endif	
 	}
 
 	if ( materialPointsSwarm->dim == 2 ) {
