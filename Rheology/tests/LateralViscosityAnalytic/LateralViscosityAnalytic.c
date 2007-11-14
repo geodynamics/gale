@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: LateralViscosityAnalytic.c 610 2007-10-11 08:09:29Z SteveQuenette $
+** $Id: LateralViscosityAnalytic.c 628 2007-11-14 03:59:03Z RobertTurnbull $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -428,8 +428,6 @@ void _LateralViscosityAnalytic_Construct( void* analyticSolution, Stg_ComponentF
 
 void _LateralViscosityAnalytic_Build( void* analyticSolution, void* data ) {
 	LateralViscosityAnalytic*         self = (LateralViscosityAnalytic*)analyticSolution;
-
-	AnalyticSolution_BuildAllAnalyticFields( self, data );
 
 	_AnalyticSolution_Build( self, data );
 }

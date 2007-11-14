@@ -5,16 +5,21 @@
 
 	<include> testStiffnessMatrixAssembly.xml </include>
 	<include> StgFEM/TemperatureField.xml </include>
+	<include> StgFEM/TemperatureLinearMesh.xml </include>
 	<include> Underworld/VariableConditions/temperatureICs.sinusoid.xml </include>
 	
-	<param name="StiffnessMatrixCompareFilename">./expected/testFrankKamenetskiiBackground2D.0of1.matrix</param>
+	<param name="Temp_elementResI"> 20 </param>
+	<param name="Temp_elementResJ"> 20 </param>
+	<param name="Temp_elementResK"> 1 </param>
+
+	<param name="StiffnessMatrixCompareFilename">./expected/testArrheniusBackground2D-DualMesh.0of1.matrix</param>
 
 	<struct name="components" mergeType="merge">
 		<struct name="rheology">
-			<param name="Type">FrankKamenetskii</param>
+			<param name="Type">Arrhenius</param>
 			<param name="TemperatureField">TemperatureField</param>
-			<param name="eta0">1.0e6</param>
-			<param name="theta">13.815510558</param>
+			<param name="eta0">1.0e-6</param>
+			<param name="activationEnergy">27.63102112</param>
 		</struct>	
 		<struct name="shape">
 			<param name="Type">Everywhere</param>

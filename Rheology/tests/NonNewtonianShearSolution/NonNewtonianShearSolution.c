@@ -143,8 +143,6 @@ void _NonNewtonianShearSolution_Construct( void* analyticSolution, Stg_Component
 void _NonNewtonianShearSolution_Build( void* analyticSolution, void* data ) {
 	NonNewtonianShearSolution* self = (NonNewtonianShearSolution*)analyticSolution;
 
-	AnalyticSolution_BuildAllAnalyticFields( self, data );
-
 	_AnalyticSolution_Build( self, data );
 }
 
