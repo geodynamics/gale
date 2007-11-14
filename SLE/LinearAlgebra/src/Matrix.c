@@ -64,6 +64,7 @@ Matrix* _Matrix_New( MATRIX_DEFARGS ) {
 	self->diagonalAddEntriesFunc = diagonalAddEntriesFunc;
 	self->diagonalInsertEntriesFunc = diagonalInsertEntriesFunc;
 	self->zeroFunc = zeroFunc;
+	self->dumpFunc = dumpFunc;
 	self->loadFunc = loadFunc;
 	self->assemblyBeginFunc = assemblyBeginFunc;
 	self->assemblyEndFunc = assemblyEndFunc;
@@ -183,7 +184,7 @@ void _Matrix_AssemblyBegin( void* matrix ) {
 ** Public Functions
 */
 
-void Matrix_Dump( void* matrix, const char* filename ) {
+void _Matrix_Dump( void* matrix, const char* filename ) {
 	Matrix*		self = (Matrix*)matrix;
 	FILE*		fp;
 	unsigned	nRows, nEntries, *entries;

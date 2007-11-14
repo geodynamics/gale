@@ -71,6 +71,7 @@ PETScShellMatrix* PETScShellMatrix_New( Name name ) {
 				      PETScMatrix_DiagonalAddEntries, 
 				      PETScMatrix_DiagonalInsertEntries, 
 				      PETScMatrix_Zero, 
+				      PETScMatrix_Dump, 
 				      PETScMatrix_Load, 
 				      PETScMatrix_AssemblyBegin, 
 				      PETScMatrix_AssemblyEnd, 

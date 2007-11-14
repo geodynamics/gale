@@ -70,6 +70,7 @@ PETScMatrix* PETScMatrix_New( Name name ) {
 				 PETScMatrix_DiagonalAddEntries, 
 				 PETScMatrix_DiagonalInsertEntries, 
 				 PETScMatrix_Zero, 
+				 PETScMatrix_Dump, 
 				 PETScMatrix_Load, 
 				 PETScMatrix_AssemblyBegin, 
 				 PETScMatrix_AssemblyEnd, 
@@ -293,6 +294,23 @@ void PETScMatrix_Zero( void* matrix ) {
 	CheckPETScError( ec );
 
 	self->hasChanged = True;
+}
+
+void PETScMatrix_Dump( void* matrix, const char* filename ) {
+	PETScMatrix*       self = (PETScMatrix*)matrix;
+	PetscErrorCode     ec;
+	PetscViewer        viewer;
+
+	ec = PetscViewerBinaryOpen( PETSC_COMM_SELF, filename, FILE_MODE_WRITE, &viewer );
+	CheckPETScError( ec );
+
+	if( self->petscMat != PETSC_NULL ) {
+		ec = MatView( (Mat) self->petscMat, viewer ); 
+		CheckPETScError( ec );
+	}
+
+	ec = PetscViewerDestroy( viewer );
+	CheckPETScError( ec );
 }
 
 void PETScMatrix_Load( void* matrix, char* filename ) {

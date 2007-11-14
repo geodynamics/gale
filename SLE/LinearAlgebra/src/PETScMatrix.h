@@ -101,6 +101,7 @@
 	void PETScMatrix_DiagonalAddEntries( void* matrix, void* vector );
 	void PETScMatrix_DiagonalInsertEntries( void* matrix, void* vector );
 	void PETScMatrix_Zero( void* matrix );
+	void PETScMatrix_Dump( void* matrix, const char* filename );
 	void PETScMatrix_Load( void* matrix, char* filename );
 	void PETScMatrix_AssemblyBegin( void* matrix );
 	void PETScMatrix_AssemblyEnd( void* matrix );

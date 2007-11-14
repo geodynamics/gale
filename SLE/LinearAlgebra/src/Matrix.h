@@ -34,7 +34,7 @@
 **
 ** Comments:
 **
-** $Id: Matrix.h 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: Matrix.h 983 2007-11-14 04:04:09Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -57,6 +57,7 @@
 	typedef void (Matrix_DiagonalAddEntriesFunc)( void* matrix, void* vector );
 	typedef void (Matrix_DiagonalInsertEntriesFunc)( void* matrix, void* vector );
 	typedef void (Matrix_ZeroFunc)( void* matrix );
+	typedef void (Matrix_DumpFunc)( void* matrix, const char* filename );
 	typedef void (Matrix_LoadFunc)( void* matrix, char* filename );
 	typedef void (Matrix_AssemblyBeginFunc)( void* matrix );
 	typedef void (Matrix_AssemblyEndFunc)( void* matrix );
@@ -97,6 +98,7 @@
 		Matrix_DiagonalAddEntriesFunc*		diagonalAddEntriesFunc;		\
 		Matrix_DiagonalInsertEntriesFunc*	diagonalInsertEntriesFunc;	\
 		Matrix_ZeroFunc*			zeroFunc;			\
+		Matrix_DumpFunc*			dumpFunc;			\
 		Matrix_LoadFunc*			loadFunc;			\
 		Matrix_AssemblyBeginFunc*		assemblyBeginFunc;		\
 		Matrix_AssemblyEndFunc*			assemblyEndFunc;		\
@@ -142,6 +144,7 @@
 		Matrix_DiagonalAddEntriesFunc*		diagonalAddEntriesFunc,		\
 		Matrix_DiagonalInsertEntriesFunc*	diagonalInsertEntriesFunc, 	\
 		Matrix_ZeroFunc*			zeroFunc,			\
+		Matrix_DumpFunc*			dumpFunc,			\
 		Matrix_LoadFunc*			loadFunc,			\
 		Matrix_AssemblyBeginFunc*		assemblyBeginFunc,		\
 		Matrix_AssemblyEndFunc*			assemblyEndFunc,		\
@@ -176,6 +179,7 @@
 		diagonalAddEntriesFunc,		\
 		diagonalInsertEntriesFunc,	\
 		zeroFunc,			\
+		dumpFunc,			\
 		loadFunc,			\
 		assemblyBeginFunc,		\
 		assemblyEndFunc,		\
@@ -241,6 +245,9 @@
 
 	#define Matrix_Zero( self )										\
 		VirtualCall( self, zeroFunc, self )
+
+	#define Matrix_Dump( self, filename )									\
+		VirtualCall( self, dumpFunc, self, filename )
 
 	#define Matrix_Load( self, filename )									\
 		VirtualCall( self, loadFunc, self, filename )
@@ -309,7 +316,7 @@
 	** Public functions
 	*/
 
-	void Matrix_Dump( void* matrix, const char* filename );
+	void _Matrix_Dump( void* matrix, const char* filename );
 	void Matrix_InvalidateSolvers( void* matrix );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
