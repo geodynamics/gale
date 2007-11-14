@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Stokes_SLE_UzawaSolver.c 982 2007-11-13 23:34:55Z DavidLee $
+** $Id: Stokes_SLE_UzawaSolver.c 984 2007-11-14 10:15:16Z DavidMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -332,6 +332,20 @@ void _Stokes_SLE_UzawaSolver_SolverSetup( void* solver, void* stokesSLE ) {
 
 #define FetchPetscVector( vector ) ( (Vec)( ((PETScVector*)(vector))->petscVec ) )
 
+void _remove_constant_null_space( Vector *vector )
+{
+        PetscInt N;
+	PetscScalar sum;
+	Vec v = FetchPetscVector(vector);
+                
+	VecGetSize( v, &N );
+	if( N > 0 ) {
+		VecSum( v, &sum );
+		sum  = sum/( -1.0*N );
+		VecShift( v, sum );
+	}
+}
+
 void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	Stokes_SLE_UzawaSolver* self            = (Stokes_SLE_UzawaSolver*)solver;	
 	Stokes_SLE*             sle             = (Stokes_SLE*)stokesSLE;
@@ -379,8 +393,9 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	double                  qGlobalProblemScale = sqrt( (double)Vector_GetGlobalSize( qTempVec ) );
 	double                  qReciprocalGlobalProblemScale = 1.0 / qGlobalProblemScale;
 	int			init_info_stream_rank;	
-	PetscScalar    		sum;
-	PetscInt		N;
+	PetscScalar p_sum;
+
+
 
 	init_info_stream_rank = Stream_GetPrintingRank( self->info );
 	Stream_SetPrintingRank( self->info, 0 ); 
@@ -598,6 +613,13 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 			MatrixSolver_Solve( pcSolver, rVec, qTempVec );
 		else
 			Vector_CopyEntries( rVec, qTempVec );
+
+		/* Remove the constant null space, but only if NOT compressible */
+		if( !M_Mat ) {
+			_remove_constant_null_space( qTempVec );
+		}
+
+
 				
 		/* STEP 4.2: Calculate s_I, the pressure search direction
 				z_{I-1} . r_{I-1}  
@@ -659,15 +681,6 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 			Vector_Scale( qTempVec, -1.0 );
 		}
 
-		/* Remove the constant null space, but only if NOT compressible */
-		if( !M_Mat ) {
-			VecGetSize( FetchPetscVector(qTempVec), &N );
-			if( N > 0 ) {
-				VecSum( FetchPetscVector(qTempVec), &sum );
-				sum  = sum/( -1.0*N );
-				VecShift( FetchPetscVector(qTempVec), sum );
-			}
-		}
 		sdotGTrans_v = Vector_DotProduct( sVec, qTempVec );
 		
 		alpha = zdotr_current/sdotGTrans_v;
@@ -691,6 +704,7 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 		Vector_AddScaled( qVec, alpha, sVec );
 		Vector_AddScaled( uVec, -alpha, vStarVec );
 		Vector_AddScaled( rVec, -alpha, qTempVec );
+
 		
 		/* STEP 4.6: store the value of z_{I-1} . r_{I-1} for the next iteration
 		 LM & DAM
@@ -778,12 +792,14 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 		Vector_LInfNorm( uVec ),
 		Vector_L2Norm( uVec ) / sqrt( (double)Vector_GetGlobalSize( uVec ) )  );
 		
-	
 	Journal_PrintfL( self->info, 1, "Summary: Max pressure value     = %.8e; RMS Pressure magnitude = %.8e\n",
 		Vector_LInfNorm( qVec ),
 		Vector_L2Norm( qVec ) / sqrt( (double)Vector_GetGlobalSize( qVec ) ) );
 		
 	}	
+		
+	VecSum( FetchPetscVector(qVec), &p_sum );
+	Journal_PrintfL( self->info, 1, "Summary: \\int_{\\Omega} p dV     = %.8e \n", p_sum );
 
 
 	#if DEBUG
