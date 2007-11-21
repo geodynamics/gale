@@ -38,7 +38,7 @@
 			<param name="VelocityField">VelocityField</param>
 			<param name="defaultDiffusivity">defaultDiffusivity</param>
 			<!-- UpwindXiFunction can be 'Exact', 'DoublyAsymptoticAssumption' or 'CriticalAssumption' -->
-			<param name="UpwindXiFunction">Exact</param> 
+			<param name="UpwindXiFunction">DoublyAsymptoticAssumption</param> 
 		</struct>
 	</struct>
 

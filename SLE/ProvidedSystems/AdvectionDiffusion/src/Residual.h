@@ -58,7 +58,12 @@
 		/* Virtual info */ \
 		AdvDiffResidualForceTerm_UpwindParamFunction*       _upwindParam;                   \
 		AdvDiffResidualForceTerm_GetDiffusivityFromIntPoint* _getDiffusivityFromIntPoint;  \
-		\
+                double*                                             phiGrad; \
+                double** GNx; \
+                double* Ni; \
+                double* SUPGNi; \
+                IArray *incarray; \
+                \
 		/* AdvDiffResidualForceTerm info */ \
 		FeVariable*                                         velocityField;                  \
 		double                                              defaultDiffusivity;             \
@@ -66,6 +71,9 @@
 		AdvDiffResidualForceTerm_UpwindParamFuncType        upwindParamType;
 
 	struct AdvDiffResidualForceTerm { __AdvDiffResidualForceTerm };	
+
+        void __AdvDiffResidualForceTerm_UpdateLocalMemory( AdvectionDiffusionSLE* sle );
+        void __AdvDiffResidualForceTerm_FreeLocalMemory( AdvectionDiffusionSLE* sle );
 
 	AdvDiffResidualForceTerm* AdvDiffResidualForceTerm_New( 
 		Name                                                name,

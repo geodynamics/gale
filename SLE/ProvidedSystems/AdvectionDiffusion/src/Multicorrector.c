@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Multicorrector.c 964 2007-10-11 08:03:06Z SteveQuenette $
+** $Id: Multicorrector.c 985 2007-11-21 00:20:24Z MirkoVelic $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -209,6 +209,9 @@ void _AdvDiffMulticorrector_Execute( void* solver, void* data ) {
 }
 
 void _AdvDiffMulticorrector_Destroy( void* solver, void* data ) {
+        AdvectionDiffusionSLE* sle    = Stg_CheckType( data, AdvectionDiffusionSLE );
+
+        __AdvDiffResidualForceTerm_FreeLocalMemory( sle );
 	_SLE_Solver_Destroy( solver, data );
 }
 
@@ -216,9 +219,10 @@ void _AdvDiffMulticorrector_SolverSetup( void* solver, void* data ) {
 	AdvDiffMulticorrector* self   = Stg_CheckType( solver, AdvDiffMulticorrector );
 	AdvectionDiffusionSLE* sle    = Stg_CheckType( data, AdvectionDiffusionSLE );
 	
+	__AdvDiffResidualForceTerm_UpdateLocalMemory( sle );
+
 	if ( self->matrixSolver && Stg_Class_IsInstance( sle->massMatrix, StiffnessMatrix_Type ) ) {
 		StiffnessMatrix* massMatrix = Stg_CheckType( sle->massMatrix, StiffnessMatrix );
-
 		MatrixSolver_SetMatrix( self->matrixSolver, massMatrix->matrix );
 	}
 }

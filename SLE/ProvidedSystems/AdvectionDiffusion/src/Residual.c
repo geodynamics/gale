@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Residual.c 964 2007-10-11 08:03:06Z SteveQuenette $
+** $Id: Residual.c 985 2007-11-21 00:20:24Z MirkoVelic $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -50,7 +50,6 @@
 #include "types.h"
 #include "AdvectionDiffusionSLE.h"
 #include "Residual.h"
-#include "ShapeFunctions.h"
 #include "UpwindParameter.h"
 
 #include <assert.h>
@@ -58,6 +57,55 @@
 
 /* Textual name of this class */
 const Type AdvDiffResidualForceTerm_Type = "AdvDiffResidualForceTerm";
+
+/*******************************************************************************
+  The following function scans all the elements of the mesh associated with
+  the residual forceterm phi to find the element with the most nodes.
+  Once the maximum number of nodes is found we then may allocate memory for
+  GNx etc that now live on the AdvDiffResidualForceTerm struct. This way we 
+  do not reallocate memory for these arrays for every element.
+ *******************************************************************************/
+void __AdvDiffResidualForceTerm_UpdateLocalMemory( AdvectionDiffusionSLE* sle ){
+       FeVariable* phiField = sle->phiField;
+       FeMesh* phiMesh = phiField->feMesh;
+       Dimension_Index  dim = phiField->dim;
+       Element_LocalIndex e, n_elements;
+       Node_Index max_elementNodeCount;
+
+       n_elements = FeMesh_GetElementLocalSize(phiMesh);//returns number of elements in a mesh
+
+       /* Scan all elements in Mesh to get max node count */
+       max_elementNodeCount = 0;
+       for(e=0;e<n_elements;e++){
+	 ElementType *elementType = FeMesh_GetElementType( phiMesh, e );
+	 Node_Index elementNodeCount = elementType->nodeCount;
+	 if( elementNodeCount > max_elementNodeCount){
+	   max_elementNodeCount = elementNodeCount;
+	 }
+	 
+       }
+       
+       sle->advDiffResidualForceTerm->GNx = Memory_Alloc_2DArray(double, dim, max_elementNodeCount, "(SUPG): Global Shape Function Derivatives");
+       sle->advDiffResidualForceTerm->phiGrad = Memory_Alloc_Array(double, dim, "(SUPG): Gradient of the Advected Scalar");
+       sle->advDiffResidualForceTerm->Ni = Memory_Alloc_Array(double, max_elementNodeCount, "(SUPG): Gradient of the Advected Scalar");
+
+       sle->advDiffResidualForceTerm->SUPGNi = Memory_Alloc_Array(double, max_elementNodeCount, "(SUPG): Upwinded Shape Function");
+       
+       sle->advDiffResidualForceTerm->incarray=IArray_New();
+  
+
+}
+
+void __AdvDiffResidualForceTerm_FreeLocalMemory( AdvectionDiffusionSLE* sle ){
+
+  Memory_Free(sle->advDiffResidualForceTerm->GNx);
+  Memory_Free(sle->advDiffResidualForceTerm->phiGrad);
+  Memory_Free(sle->advDiffResidualForceTerm->Ni);
+  Memory_Free(sle->advDiffResidualForceTerm->SUPGNi);
+  
+  NewClass_Delete(sle->advDiffResidualForceTerm->incarray);
+
+}
 
 AdvDiffResidualForceTerm* AdvDiffResidualForceTerm_New( 
 		Name                                                name,
@@ -136,6 +184,7 @@ void _AdvDiffResidualForceTerm_Init(
 	self->velocityField       = velocityField;
 	self->diffusivityVariable = diffusivityVariable;
 	self->defaultDiffusivity  = defaultDiffusivity;
+	self->upwindParamType    = upwindFuncType;
 }
 
 void AdvDiffResidualForceTerm_InitAll( 
@@ -275,11 +324,7 @@ void _AdvDiffResidualForceTerm_AssembleElement( void* forceTerm, ForceVector* fo
 	Dimension_Index            dim                = forceVector->dim;
 	double                     velocity[3];
 	double                     phi, phiDot;
-	double*                    phiGrad;
 	double                     detJac;
-	double**                   GNx;
-	double**                   elementUpwindShapeFunc;
-	double*                    upwindShapeFunc;
 	double*                    xi;
 	double                     totalDerivative, diffusionTerm;
 	double                     diffusivity         = self->defaultDiffusivity;
@@ -289,10 +334,19 @@ void _AdvDiffResidualForceTerm_AssembleElement( void* forceTerm, ForceVector* fo
 	Node_Index                 node_I;
 	double                     factor;
 
-	GNx     = Memory_Alloc_2DArray( double, dim, elementNodeCount, "Global Shape Function Derivatives" );
-	phiGrad = Memory_Alloc_Array( double, dim, "Gradient of Phi" );
-
-	elementUpwindShapeFunc = AdvDiffResidualForceTerm_BuildSUPGShapeFunctions( self, sle, swarm, lElement_I, dim );
+	double**                   GNx;
+	double*                    phiGrad;
+	double*                    Ni;
+	double*                    SUPGNi;
+	double                     supgfactor;
+	double                     udotu, perturbation;
+	double                     upwindDiffusivity;
+	GNx     = self->GNx;
+	phiGrad = self->phiGrad;
+	Ni = self->Ni;
+	SUPGNi = self->SUPGNi;
+	
+	upwindDiffusivity  = AdvDiffResidualForceTerm_UpwindDiffusivity( self, sle, swarm, phiField->feMesh, lElement_I, dim );
 
 	/* Determine number of particles in element */
 	cell_I = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
@@ -304,8 +358,8 @@ void _AdvDiffResidualForceTerm_AssembleElement( void* forceTerm, ForceVector* fo
 		particle        = (IntegrationPoint*) Swarm_ParticleAt( swarm, lParticle_I );
 		xi              = particle->xi;
 		
-		/* Evalutate Shape Functions */
-		upwindShapeFunc = elementUpwindShapeFunc[ cParticle_I ];
+		/* Evaluate Shape Functions */
+		ElementType_EvaluateShapeFunctionsAt(elementType, xi, Ni);
 
 		/* Calculate Global Shape Function Derivatives */
 		ElementType_ShapeFunctionsGlobalDerivs( 
@@ -316,6 +370,28 @@ void _AdvDiffResidualForceTerm_AssembleElement( void* forceTerm, ForceVector* fo
 		/* Calculate Velocity */
 		FeVariable_InterpolateFromMeshLocalCoord( self->velocityField, phiField->feMesh, lElement_I, xi, velocity );
 
+		/* Build the SUPG shape functions */
+		udotu = velocity[I_AXIS]*velocity[I_AXIS] + velocity[J_AXIS]*velocity[J_AXIS];
+		if(dim == 3) udotu += velocity[ K_AXIS ] * velocity[ K_AXIS ];
+
+		supgfactor = upwindDiffusivity / udotu;
+		for ( node_I = 0 ; node_I < elementNodeCount ; node_I++ ) {
+			/* In the case of per diffusion - just build regular shape functions */
+			if ( fabs(upwindDiffusivity) < SUPG_MIN_DIFFUSIVITY ) {
+				SUPGNi[node_I] = Ni[node_I];
+				continue;
+			}
+			
+			perturbation = velocity[ I_AXIS ] * GNx[ I_AXIS ][ node_I ] + velocity[ J_AXIS ] * GNx[ J_AXIS ][ node_I ];
+			if (dim == 3)
+					perturbation = perturbation + velocity[ K_AXIS ] * GNx[ K_AXIS ][ node_I ];
+			
+			/* p = \frac{\bar \kappa \hat u_j w_j }{ ||u|| } -  Eq. 3.2.25 */
+			perturbation = supgfactor * perturbation;
+			
+			SUPGNi[node_I] = Ni[node_I] + perturbation;
+		}  
+		
 		/* Calculate phi on particle */
 		_FeVariable_InterpolateNodeValuesToElLocalCoord( phiField, lElement_I, xi, &phi );
 
@@ -344,13 +420,10 @@ void _AdvDiffResidualForceTerm_AssembleElement( void* forceTerm, ForceVector* fo
 			if (dim == 3)
 				diffusionTerm += diffusivity * GNx[2][ node_I ] * phiGrad[2] ;
 			
-			elementResidual[ node_I ] -= factor * ( upwindShapeFunc[ node_I ] * totalDerivative + diffusionTerm );
+			elementResidual[ node_I ] -=  factor * ( SUPGNi[ node_I ] * totalDerivative + diffusionTerm );
 		}
 	}
 	
-	Memory_Free( elementUpwindShapeFunc );
-	Memory_Free( phiGrad );
-	Memory_Free( GNx );
 }
 
 

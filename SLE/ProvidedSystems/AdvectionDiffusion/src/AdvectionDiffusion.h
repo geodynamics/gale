@@ -45,7 +45,6 @@
 #include "AdvectionDiffusionSLE.h"
 #include "Multicorrector.h"
 #include "Residual.h"
-#include "ShapeFunctions.h"
 #include "Timestep.h"
 #include "UpwindParameter.h"
 #include "LumpedMassMatrixForceTerm.h"
