@@ -31,6 +31,88 @@
 			<param name="startY"> 0.4 </param>   <param name="endY"> 0.8 </param>
 			<param name="startZ"> minZ </param>  <param name="endZ"> maxZ </param>
 		</struct>		
+		
+		<!-- Stripes in the crust with 
+				the same physical properties -->
+		
+		<struct name="markerShape1">
+			<param name="Type">Box</param>
+			<param name="startX"> minX </param> <param name="endX"> maxX </param>
+			<param name="startY"> 0.4  </param> <param name="endY"> 0.8  </param>
+			<param name="startZ"> 0.0  </param> <param name="endZ"> 0.05 </param>
+		</struct>
+		
+		<struct name="markerShape2">
+			<param name="Type">Box</param>
+			<param name="startX"> minX </param> <param name="endX"> maxX </param>
+			<param name="startY"> 0.4  </param> <param name="endY"> 0.8  </param>
+			<param name="startZ"> 0.5  </param> <param name="endZ"> 0.55 </param>
+		</struct>
+		
+		<struct name="markerShape3">
+			<param name="Type">Box</param>
+			<param name="startX"> minX </param> <param name="endX"> maxX </param>
+			<param name="startY"> 0.4  </param> <param name="endY"> 0.8  </param>
+			<param name="startZ"> 1.0  </param> <param name="endZ"> 1.05 </param>
+		</struct>
+		
+		<struct name="markerShape4">
+			<param name="Type">Box</param>
+			<param name="startX"> minX </param> <param name="endX"> maxX </param>
+			<param name="startY"> 0.4  </param> <param name="endY"> 0.8  </param>
+			<param name="startZ"> 1.5  </param> <param name="endZ"> 1.55 </param>
+		</struct>
+		
+		<struct name="markerShape5">
+			<param name="Type">Box</param>
+			<param name="startX"> minX </param> <param name="endX"> maxX </param>
+			<param name="startY"> 0.4  </param> <param name="endY"> 0.8  </param>
+			<param name="startZ"> 1.95 </param> <param name="endZ"> 2.00 </param>
+		</struct>
+		
+		<struct name="markerShape">
+				<param name="Type">Union</param>
+				<list name="shapes">
+					<param>markerShape1</param>
+					<param>markerShape2</param>
+					<param>markerShape3</param>
+					<param>markerShape4</param>
+					<param>markerShape5</param>
+				</list>
+		</struct>
+		
+		<struct name="markerLayerShape1">
+			<param name="Type">Box</param>
+			<param name="startX"> minX </param> <param name="endX"> maxX </param>
+			<param name="startY"> 0.4  </param> <param name="endY"> 0.5  </param>
+			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
+		</struct>
+	
+		<struct name="markerLayerShape2">
+			<param name="Type">Box</param>
+			<param name="startX"> minX </param> <param name="endX"> maxX </param>
+			<param name="startY"> 0.6  </param> <param name="endY"> 0.7  </param>
+			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
+		</struct>
+		
+		<struct name="markerLayerShapesUnion">
+			<param name="Type">Union</param>
+				<list name="shapes">
+					<param>markerLayerShape1</param>
+					<param>markerLayerShape2</param>	
+				</list>
+		</struct>
+		
+		<struct name="markerLayerShape">
+				<param name="Type">Intersection</param>
+				<list name="shapes">
+					<param>markerShape</param>
+					<param>markerLayerShapesUnion</param>
+				</list>
+		</struct>
+		
+		<!-- "Weak" zones in the crust (seeds for initial faults) -->
+		
 		<struct name="weakZoneShape1">
 			<param name="Type">Box</param>
 			<param name="startX"> 0.775 </param> <param name="endX"> 0.825 </param>
@@ -42,7 +124,7 @@
 			<param name="startX"> 1.175 </param> <param name="endX"> 1.225 </param>
 			<param name="startY"> 0.4 </param>   <param name="endY"> 0.45 </param>
 			<param name="startZ"> 1.33333 </param>  <param name="endZ"> maxZ </param>
-		</struct>		
+		</struct>			
 		<struct name="weakZoneShape">
 			<param name="Type">Union</param>
 			<list name="shapes">
@@ -56,13 +138,15 @@
 				<param>crustShape</param>
 				<param>!weakZoneShape</param>
 			</list>
-		</struct>		
+		</struct>	
+			
 		<struct name="mantleShape">
 			<param name="Type">Box</param>
 			<param name="startX"> minX </param> <param name="endX"> maxX </param>
 			<param name="startY"> 0.0 </param>   <param name="endY"> 0.4 </param>
 			<param name="startZ"> minZ </param>  <param name="endZ"> maxZ </param>
-		</struct>		
+		</struct>
+				
 		<struct name="mantleShape2">
 			<param name="Type">Union</param>
 			<list name="shapes">
@@ -71,36 +155,85 @@
 			</list>
 		</struct>
 		
+		
+		
+		
 		<!-- Material Stuff -->
 		<struct name="backgroundViscosity">
 			<param name="Type">MaterialViscosity</param>
 			<param name="eta0">1.0e-1</param>
 		</struct>	
-		<struct name="compresibility">
+		<struct name="compressibility">
 			<param name="Type">Compressible</param>
 			<param name="GeometryMesh">elementMesh</param>
 			<param name="StiffnessMatrix">c_matrix</param>
 			<param name="Swarm">picIntegrationPoints</param>
 			<param name="oneOnLambda">10.0</param>
 		</struct>
+		
+		
+		
+		<!--Materials themselves -->
+		
 		<struct name="background">
 			<param name="Type">RheologyMaterial</param>
 			<param name="Shape">backgroundShape</param>
-			<!--param name="density">0.0</param-->
-			<param name="Compressible">compresibility</param>
+			<param name="density">0.0</param>
+			<param name="Compressible">compressibility</param>
 			<param name="Rheology">backgroundViscosity</param>
 		</struct>
+		
 		<struct name="incompressible">
 			<param name="Type">RheologyMaterial</param>
 			<param name="Shape">incompressibleShape</param>
-			<!--param name="density">0.0</param-->
+			<param name="density">0.0</param>
 			<param name="Rheology">backgroundViscosity</param>
 		</struct>	
+		
+		<struct name="crust">
+			<param name="Type">RheologyMaterial</param>
+			<param name="Shape">crustShape2</param>
+	        <param name="density">CrustDefaultDensity</param>
+			<list name="Rheology">
+				<param>crustViscosity</param>
+				<param>yielding</param>
+			</list>
+		</struct>
+		
+		<struct name="markedCrust">
+			<param name="Type">RheologyMaterial</param>
+			<param name="Shape">markerShape</param>
+	        <param name="density"> CrustDefaultDensity</param>
+			<list name="Rheology">
+				<param>crustViscosity</param>
+				<param>yielding</param>
+			</list>
+		</struct>
+		
+		<struct name="markedCrust2">
+			<param name="Type">RheologyMaterial</param>
+			<param name="Shape">markerLayerShape</param>
+	        <param name="density"> CrustDefaultDensity</param>
+			<list name="Rheology">
+				<param>crustViscosity</param>
+				<param>yielding</param>
+			</list>
+		</struct>
+		
+	
+		<struct name="mantle"> 
+			<param name="Type">RheologyMaterial</param>
+			<param name="Shape">mantleShape2</param>
+			<param name="density">1.1</param>
+			<!-- Rheology Stuff -->
+			<param name="Rheology">mantleViscosity</param>
+		</struct>
+		
 		
 		<!-- Crust Rheology -->
 		<struct name="crustViscosity">
 			<param name="Type">MaterialViscosity</param>
-			<param name="eta0">10.000</param>
+			<param name="eta0">CrustDefaultViscosity</param>
 		</struct>	
 		<struct name="strainWeakening">
 			<param name="Type">StrainWeakening</param>
@@ -137,27 +270,14 @@
 			<param name="minimumYieldStress">0.00001</param>
 			<param name="ignoreOldOrientation">false</param>
 		</struct>
-		<struct name="crust">
-			<param name="Type">RheologyMaterial</param>
-			<param name="Shape">crustShape2</param>
-	        <!--param name="density">1.0</param-->
-			<list name="Rheology">
-				<param>crustViscosity</param>
-				<param>yielding</param>
-			</list>
-		</struct>
+		
+		<!-- Mantle rheology -->
 		
 		<struct name="mantleViscosity">
 			<param name="Type">MaterialViscosity</param>
 			<param name="eta0">1.000</param>
 		</struct>	
-		<struct name="mantle"> 
-			<param name="Type">RheologyMaterial</param>
-			<param name="Shape">mantleShape2</param>
-			<!--	<param name="density">1.1</param>-->
-			<!-- Rheology Stuff -->
-			<param name="Rheology">mantleViscosity</param>
-		</struct>
+		
 
 		<!-- Mantle Field Stuff -->
 		<struct name="MantleField">
@@ -185,7 +305,7 @@
 	<param name="dumpEvery"> 1 </param>	
 	<param name="checkpointEvery"> 0 </param>
 
-        <!--   choose what to checkpoint
+    <!--   choose what to checkpoint
 	<list name="FieldVariablesToCheckpoint">
 		<param>VelocityField</param>
 		<param>VelocityGradientsField</param>
@@ -228,18 +348,39 @@
 	<param name="maxZ"> 2.0 </param>
 	<param name="allowUnbalancing"> True </param>
 
-	<param name="particlesPerCell"> 25 </param>
-	<param name="cellParticleCount"> 25 </param>
+	<param name="particlesPerCell"> 16 </param>
+	<param name="cellParticleCount"> 16 </param>
 	<param name="seed"> 13 </param>
+		
+	<!-- Global material parameters picked up by various materials -->
+	
+	<param name="CrustDefaultViscosity"> 10.0 </param>
+	<param name="CrustDefaultDensity">    1.0 </param>
+	
+		
+		
+		
+		
 		
 	<!-- Set up BCs and ICs -->
 	<include> Underworld/VariableConditions/velocityBCs.extension.xml </include>
 
-	<!-- Integration Scheme configuration -->
 
 	<!--param name="Gravity">10.0</param-->
 
-	<!-- Visualisation stuff -->
-	<include>Underworld/Viewports/Extension3DVP.xml</include>
+	<!-- Visualisation -->
+	
+	<!-- Option 1 
+		 Cross sections of strain rate (transparent at low strain-rate)  
+		
+	<include>Underworld/Viewports/Extension3DSectionsVP.xml</include> -->
+	
+	
+	<!-- Option 2
+		Light up stripes of embedded material layering / slicing -->
+		
+	<include>Underworld/Viewports/Extension3DMaterialSectionsVP.xml</include>
+		
+	
 
 </StGermainData>

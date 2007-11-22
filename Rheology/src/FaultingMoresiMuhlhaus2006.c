@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: FaultingMoresiMuhlhaus2006.c 610 2007-10-11 08:09:29Z SteveQuenette $
+** $Id: FaultingMoresiMuhlhaus2006.c 630 2007-11-22 06:35:49Z LouisMoresi $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -466,6 +466,7 @@ double _FaultingMoresiMuhlhaus2006_GetYieldIndicator(
 		 * we can calculate whether the material has failed at the current stress from the principle stresses 
 		 * (without having to compute the orientation) if it does fail, 
 		 * we can then calculate the orientation for the orthotropy model and history */
+		
 		theta = 0.5 * atan( 1.0/ _FaultingMoresiMuhlhaus2006_EffectiveFrictionCoefficient( self, materialPoint ) );
 		
 		stressMin = eigenvectorList[0].eigenvalue;
@@ -759,7 +760,6 @@ void _FaultingMoresiMuhlhaus2006_StoreCurrentParameters(
 	
 	FeVariable_InterpolateWithinElement( self->pressureField, lElement_I, xi, &self->currentPressure );	
 	FeVariable_InterpolateWithinElement( self->velocityGradientsField, lElement_I, xi, self->currentVelocityGradient );
-	
 	TensorArray_GetSymmetricPart( self->currentVelocityGradient, dim, strainRate );
 	ConstitutiveMatrix_CalculateStress( constitutiveMatrix, strainRate, self->currentStress );
 	
@@ -769,11 +769,12 @@ void _FaultingMoresiMuhlhaus2006_StoreCurrentParameters(
 }
 
 void _FaultingMoresiMuhlhaus2006_UpdateDrawParameters( void* rheology ) {
-	FaultingMoresiMuhlhaus2006*       self               = (FaultingMoresiMuhlhaus2006*) rheology;
+	
+	FaultingMoresiMuhlhaus2006*      self               = (FaultingMoresiMuhlhaus2006*) rheology;
 	Particle_Index                   lParticle_I;
 	Particle_Index                   particleLocalCount;
 	StrainWeakening*                 strainWeakening    = self->strainWeakening;
-	StandardParticle*                materialPoint;
+	GlobalParticle*	  				 materialPoint;
 	double                           slipRate;
 	
 	double 							 ratio;
@@ -801,6 +802,8 @@ void _FaultingMoresiMuhlhaus2006_UpdateDrawParameters( void* rheology ) {
 	double                           oneOverGlobalMaxSlipRate;
 	double                           oneOverGlobalMaxStrainIncrement;
 	double                           postFailureWeakeningIncrement;
+	
+	
 	
 	/* This parameter is only needed for the alternative commented out set of parameters */ 
 	/* double                           globalMaxStrainWeakeningRatio    = 0.0; */
@@ -876,7 +879,6 @@ void _FaultingMoresiMuhlhaus2006_UpdateDrawParameters( void* rheology ) {
 	fprintf(stderr,"globalMaxStrainIncrement  = %g\n",globalMaxStrainIncrement);
 	fprintf(stderr,"globalMinStrainIncrement  = %g\n",globalMinStrainIncrement);
 	fprintf(stderr,"averagedGlobalMaxStrainIncrement = %g\n",averagedGlobalMaxStrainIncrement);
-	
 	fprintf(stderr,"globalMeanSlipRate = %g\n",globalMeanSlipRate); 
 	fprintf(stderr,"averagedGlobalMaxSlipRate = %g\n",averagedGlobalMaxSlipRate);
 	
@@ -889,7 +891,7 @@ void _FaultingMoresiMuhlhaus2006_UpdateDrawParameters( void* rheology ) {
 	oneOverGlobalMaxStrainIncrement = 1.0 / averagedGlobalMaxStrainIncrement;
 	
 	for ( lParticle_I = 0 ; lParticle_I < particleLocalCount ; lParticle_I++ ) { 
-		materialPoint = Swarm_ParticleAt( strainWeakening->swarm, lParticle_I );
+		materialPoint = (GlobalParticle*) Swarm_ParticleAt( strainWeakening->swarm, lParticle_I );
 
 		if ( Variable_GetValueChar( self->hasYieldedVariable->variable, lParticle_I ) == False ||
 				StrainWeakening_GetPostFailureWeakening( strainWeakening, materialPoint ) < 0.0 ) 
@@ -927,11 +929,11 @@ void _FaultingMoresiMuhlhaus2006_UpdateDrawParameters( void* rheology ) {
 				}
 				else {  /* Growing  */
 					brightness = slipRate * oneOverGlobalMaxSlipRate;
-					opacity = 0.25 * (ratio < 1.0 ? ratio : 1.0);
+					opacity = (ratio < 1.0 ? ratio : 1.0);
 					
 				}
 				
-					
+		/* x = materialPoint->coord[I_AXIS]; */			
 					
 		/*
 		length     = 0.005 + 0.005 * strainWeakeningRatio;
@@ -942,10 +944,15 @@ void _FaultingMoresiMuhlhaus2006_UpdateDrawParameters( void* rheology ) {
 		opacity    = 0.1 + 0.05 * pow(brightness,3.0); 
 		*/
 
+
+
+
 		Variable_SetValueFloat( self->brightness->variable, lParticle_I, brightness );
 		Variable_SetValueFloat( self->opacity->variable,    lParticle_I, opacity );
 		Variable_SetValueFloat( self->length->variable,     lParticle_I, (float) length );
 		Variable_SetValueFloat( self->thickness->variable,  lParticle_I,  0.5 + 10.0 * (float)length );
+	
+		
 	
 	/* This parameter is only needed for the alternative commented out set of parameters */ 
 	/*	if (strainWeakeningRatio>globalMaxStrainWeakeningRatio)
