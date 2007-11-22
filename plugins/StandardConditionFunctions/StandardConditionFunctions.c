@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StandardConditionFunctions.c 981 2007-11-12 00:42:19Z DavidLee $
+** $Id: StandardConditionFunctions.c 986 2007-11-22 22:35:24Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -886,7 +886,9 @@ void StgFEM_StandardConditionFunctions_SpecRidge3D( Node_LocalIndex node_lI, Var
 	double			rightVal;
 	double			xOffset1;
 	double			xOffset2;
-	double			yOffset;
+	double			yOffset1, yOffset2;
+	double			xBegin, xEnd;
+	double			zBegin, zEnd;
 
 
 	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
@@ -897,11 +899,21 @@ void StgFEM_StandardConditionFunctions_SpecRidge3D( Node_LocalIndex node_lI, Var
 	rightVal = Dictionary_GetDouble_WithDefault( dictionary, "SpecRidge3DRightSide", 0.0 );
 	xOffset1 = Dictionary_GetDouble_WithDefault( dictionary, "SpecRidge3DXOffset1", 0.0 );
 	xOffset2 = Dictionary_GetDouble_WithDefault( dictionary, "SpecRidge3DXOffset2", 0.0 );
-	yOffset = Dictionary_GetDouble_WithDefault( dictionary, "SpecRidge3DZOffset", 0.0 );
+	yOffset1 = Dictionary_GetDouble_WithDefault( dictionary, "SpecRidge3DZOffset1", 0.0 );
+	yOffset2 = Dictionary_GetDouble_WithDefault( dictionary, "SpecRidge3DZOffset2", 0.0 );
+	xBegin = Dictionary_GetDouble_WithDefault( dictionary, "SpecRidge3DXBegin", 0.0 );
+	xEnd = Dictionary_GetDouble_WithDefault( dictionary, "SpecRidge3DXEnd", 0.0 );
+	zBegin = Dictionary_GetDouble_WithDefault( dictionary, "SpecRidge3DZBegin", 0.0 );
+	zEnd = Dictionary_GetDouble_WithDefault( dictionary, "SpecRidge3DZEnd", 0.0 );
 
-	if( coord[0] < xOffset1 )
+	if( coord[0] < xBegin || coord[0] > xEnd ||
+	    coord[2] < zBegin || coord[2] > zEnd )
+	{
+		*result = 0.0;
+	}
+	else if( coord[0] < xOffset1 )
 		*result = leftVal;
-	else if( coord[0] < xOffset2 && coord[2] > yOffset )
+	else if( coord[0] < xOffset2 && coord[2] > yOffset1 && coord[2] < yOffset2 )
 		*result = leftVal;
 	else
 		*result = rightVal;
