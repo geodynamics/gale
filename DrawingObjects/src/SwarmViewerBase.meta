@@ -128,6 +128,7 @@
 		<param name="Description">Optional. This is the name of the swarm variable which will set the opacity of each particle</param>
 	</struct>
 	<struct>
+		<param name="Essential">False</param>
 		<param name="Name">MaskVariable</param>
 		<param name="Type">String</param>
 		<param name="Default">""</param>

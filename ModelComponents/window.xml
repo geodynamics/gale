@@ -22,6 +22,7 @@
 			<param name="height">400</param>
 			<param name="width">800</param>
 			<param name="backgroundColour">white</param>
+			<param name="interactive"> False </param>
 			<param name="xFontName">-adobe-helvetica-bold-r-normal--14-140-75-75-p-82-iso8859-1</param>
 		</struct>
 		<!-- If you want to add the movie functionality please add

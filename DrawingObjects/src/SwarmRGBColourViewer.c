@@ -194,9 +194,9 @@ void _lucSwarmRGBColourViewer_Construct( void* drawingObject, Stg_ComponentFacto
 void _lucSwarmRGBColourViewer_Build( void* drawingObject, void* data ) {}
 
 void _lucSwarmRGBColourViewer_Initialise( void* drawingObject, void* data ) {
-	lucSwarmRGBColourViewer*          self                   = (lucSwarmRGBColourViewer*)drawingObject;
-	SwarmVariable_Register*  swarmVariable_Register = self->swarm->swarmVariable_Register;
-	Stream*                  errorStr               = Journal_Register( Error_Type, self->type );
+	lucSwarmRGBColourViewer*	self                   = (lucSwarmRGBColourViewer*)drawingObject;
+	SwarmVariable_Register*  	swarmVariable_Register = self->swarm->swarmVariable_Register;
+	Stream*                  	errorStr               = Journal_Register( Error_Type, self->type );
 
 	_lucSwarmViewer_Initialise( self, data );
 

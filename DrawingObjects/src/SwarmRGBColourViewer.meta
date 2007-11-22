@@ -13,14 +13,26 @@
 <param name="Parent">lucOpenGLDrawingObject</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">...</param>
+<param name="Description"> This is equivalent to the lucSwarmViewer but one can apply a different variable to each of the R, G and B channels individually. If the channel is not attached to a swarm variable then it assumes the value 0.0. The colour variable is not used ? </param>
 
 <!--Now the interesting stuff-->
 
 
 <list name="Params">
 	<struct>
-		<param name="Name">ColourVariable</param>
+		<param name="Name">ColourRedVariable</param>
+		<param name="Type">String</param>
+		<param name="Default">""</param>
+		<param name="Description">...</param>
+	</struct>
+	<struct>
+		<param name="Name">ColourGreenVariable</param>
+		<param name="Type">String</param>
+		<param name="Default">""</param>
+		<param name="Description">...</param>
+	</struct>
+	<struct>
+		<param name="Name">ColourBlueVariable</param>
 		<param name="Type">String</param>
 		<param name="Default">""</param>
 		<param name="Description">...</param>
