@@ -11,7 +11,8 @@ SRCS = \
 	testCartesianGenerator.c \
 	testDecomp.c \
 	testMesh.c \
-	testMeshTopology.c
+	testMeshTopology.c \
+	testSpatialTree.c
 
 
 checks = \

@@ -59,6 +59,7 @@ SRCS = 				\
 	MeshAdaptor.c			\
 	SurfaceAdaptor.c		\
 	CompressionAdaptor.c		\
+	SpatialTree.c			\
 	MeshVariable.c			\
 	Init.c				\
 	Finalise.c
@@ -89,6 +90,8 @@ HDRS = 				\
 	MeshAdaptor.h			\
 	SurfaceAdaptor.h		\
 	CompressionAdaptor.h		\
+	SpatialTree.def			\
+	SpatialTree.h			\
 	MeshVariable.h			\
 	Init.h				\
 	Finalise.h

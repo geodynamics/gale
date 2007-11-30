@@ -47,6 +47,7 @@ typedef struct Decomp Decomp;
 typedef struct Sync Sync;
 typedef struct MeshTopology MeshTopology;
 typedef struct IGraph IGraph;
+typedef struct SpatialTree SpatialTree;
 
 typedef enum {
    MT_VERTEX, 

@@ -77,6 +77,8 @@
 		Mesh_Algorithms_NearestVertexFunc*	nearestVertex;				\
 		Mesh_Algorithms_SearchFunc*		search;					\
 		Mesh*					mesh;					\
+		SpatialTree*				tree;					\
+		int					rank;					\
 		IArray*					incArray;
 
 	struct Mesh_Algorithms { __Mesh_Algorithms };
@@ -182,6 +184,8 @@
 						     MeshTopology_Dim* dim, unsigned* ind );
 	Bool Mesh_Algorithms_SearchGeneral( void* algorithms, double* point, 
 					    MeshTopology_Dim* dim, unsigned* ind );
+
+	Bool Mesh_Algorithms_SearchWithTree( void* self, double* pnt, unsigned* el );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Private Member functions

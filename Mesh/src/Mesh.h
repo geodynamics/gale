@@ -68,6 +68,7 @@
 #include "SurfaceAdaptor.h"
 #include "CompressionAdaptor.h"
 #include "MeshVariable.h"
+#include "SpatialTree.h"
 
 #include "Init.h"
 #include "Finalise.h"

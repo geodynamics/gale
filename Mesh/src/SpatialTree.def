@@ -1,0 +1,48 @@
+#include INHERIT( StGermain/Base/Foundation/NewClass )
+#include "StGermain/Base/Foundation/ClassClear.h"
+
+#define PARENTDIR StGermain/Base/Foundation
+#define PARENT NewClass
+#define CLASSDIR StgDomain/Mesh
+#define CLASSNAME SpatialTree
+#include "StGermain/Base/Foundation/ClassSetup.h"
+
+
+MEMBER( Mesh*, mesh )
+MEMBER( int, nDims )
+MEMBER( double*, min )
+MEMBER( double*, max )
+MEMBER( int, nChld )
+MEMBER( void*, root )
+MEMBER( int, tol )
+MEMBER( int, nNodes )
+
+
+VOIDOVERRIDE( Init, void, 
+	      (void* self), 
+	      (self) ) 
+
+VOIDOVERRIDE( Destruct, void, 
+	      (void* self), 
+	      (self) )
+
+VOIDOVERRIDE( Copy, void, 
+	      (void* self, const void* op), 
+	      (self, op) )
+
+
+METHOD( SetMesh, void,
+	(void* self, void* mesh),
+	(self, mesh) )
+
+METHOD( Rebuild, void,
+	(void* self),
+	(self) )
+
+METHOD( Search, Bool,
+	(void* self, const double* pnt, int* nEls, int** els),
+	(self, pnt, nEls, els) )
+
+METHOD( Clear, void, 
+	(void* self), 
+	(self) )

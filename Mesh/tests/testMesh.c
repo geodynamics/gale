@@ -140,6 +140,7 @@ done:
 TestEnd
 
 TestBegin( Search ) {
+#if 0
    CartesianGenerator* gen;
    Mesh* mesh;
    int nDims;
@@ -345,6 +346,7 @@ TestBegin( Search ) {
 done:
    FreeObject( gen );
    FreeObject( mesh );
+#endif
 }
 TestEnd
 
