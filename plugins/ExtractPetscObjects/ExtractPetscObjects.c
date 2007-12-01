@@ -137,6 +137,7 @@ void Underworld_ExtractPetscObjects_Dump( void* _context )
 	int step;
 	Stokes_SLE_UzawaSolver *uzawaSolver;
 	Bool uzawa_present;
+	int ex_step, default_step;
 	
 	/* Init names */
 	strcpy( kName,    "NULL" );
@@ -147,10 +148,21 @@ void Underworld_ExtractPetscObjects_Dump( void* _context )
 	strcpy( HName,    "NULL" );
 	
 	
-	
+	step = context->timeStep;
+
+	/* Get time step to perform extraction */
+	default_step =  -6699;
+	ex_step = Dictionary_Entry_Value_AsInt(
+			Dictionary_GetDefault( context->dictionary, "ExtractMatricesAtStep", Dictionary_Entry_Value_FromInt(default_step) )
+						);
+	if( ex_step != default_step ) { /* Then we want to dump a specific step */
+		if( ex_step != step ) { /* If current step does not match required step */
+			return;
+		}
+	}	
+
 	
 	/* Write the matrices and vectors to disk */
-	step = context->timeStep;
 	comm = context->communicator;
 	
 	// get filename from problem description
