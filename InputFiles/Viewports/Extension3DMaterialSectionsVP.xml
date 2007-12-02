@@ -58,6 +58,17 @@
 		<param name="dynamicRange">True</param>		
 	</struct>	
 	
+	
+	
+	<struct name="faultingColourMapFaultsOnly">
+		<param name="Type">lucColourMap</param>
+		<param name="colours"> white:0.0 white:0.5 yellow:0.5 </param>
+		<param name="minimum">0.0</param>
+		<param name="maximum">1.0</param>
+		<param name="logScale">False</param>
+		<param name="dynamicRange">False</param>		
+	</struct>
+	
 	<struct name="faultingColourMap1">
 		<param name="Type">lucColourMap</param>
 		<param name="colours">#666666 #666666 #FFDDDD </param>
@@ -102,7 +113,7 @@
 		<!--param name="OpacityVariable">materialSwarm-FaultingMoresiMuhlhaus2006Opacity</param-->
 		<param name="ColourVariable">materialSwarm-FaultingMoresiMuhlhaus2006Brightness</param>
 		<param name="ColourMap">brightnessColourMap</param>
-		<param name="maskValue">0.75</param>
+		<param name="maskValue">1.0</param>
 		<param name="maskType">GreaterThan</param>
 		<param name="MaskVariable">materialSwarm-FaultingMoresiMuhlhaus2006Opacity</param>
 		<param name="NormalVariable">materialSwarm-Director</param>
@@ -140,17 +151,19 @@
 			<param name="maskType">EqualTo</param>
 			<param name="maskValue">1.0</param>		
 	</struct>	
+	-->	
 	
 	<struct name="material2">
 			<param name="Type">lucSwarmRGBColourViewer</param>
 			<param name="Swarm">materialSwarm</param>
-			<param name="colour">yellow</param>
-			<param name="pointSize">5.0</param>
+			<param name="ColourVariable">materialSwarm-SlipRate</param>
+			<param name="ColourMap">faultingColourMapFaultsOnly</param>
+			<param name="pointSize">1.0</param>
 			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
 			<param name="maskType">EqualTo</param>
 			<param name="maskValue">2.0</param>		
 	</struct>
-	-->	
+	
 	
 	<struct name="material3">
 			<param name="Type">lucSwarmViewer</param>
@@ -206,9 +219,10 @@
 		<param name="compositeEachObject">true</param>
 		<list name="DrawingObject">
 			<param>mantleSurfaceWithStrainRateInv</param>
-			<param>faultSquares</param>
+			<!--param> faultSquares </param-->
 			<param>border</param>
 			<!--param>strainRateInvSection1</param-->
+			<!--param>material2</param-->
 			<param>material3</param>
 			<param>material4</param>
 			<!--param>topographySurface</param-->
