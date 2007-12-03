@@ -157,9 +157,11 @@ void _Mesh_Algorithms_SetMesh( void* algorithms, void* mesh ) {
 
 void _Mesh_Algorithms_Update( void* algorithms ) {
 	Mesh_Algorithms*	self = (Mesh_Algorithms*)algorithms;
+	int nDims, d_i;
 
 	assert( self );
 
+#if 0
 	if( !self->mesh ) {
 	   if( self->tree )
 	      SpatialTree_Clear( self->tree );
@@ -171,6 +173,7 @@ void _Mesh_Algorithms_Update( void* algorithms ) {
 	SpatialTree_SetMesh( self->tree, self->mesh );
 	SpatialTree_Rebuild( self->tree );
 	self->search = Mesh_Algorithms_SearchWithTree;
+#endif
 
 	if( !Class_IsSuper( self->mesh->topo, IGraph ) || 
 	    Mesh_HasIncidence( self->mesh, MT_VERTEX, MT_VERTEX ) )
@@ -180,7 +183,6 @@ void _Mesh_Algorithms_Update( void* algorithms ) {
 	else
 		self->nearestVertex = Mesh_Algorithms_NearestVertexGeneral;
 
-#if 0
 	nDims = Mesh_GetDimSize( self->mesh );
 	for( d_i = 0; d_i < nDims; d_i++ ) {
 	   if( Class_IsSuper( self->mesh->topo, IGraph ) &&
@@ -195,7 +197,6 @@ void _Mesh_Algorithms_Update( void* algorithms ) {
 		self->search = Mesh_Algorithms_SearchWithMinIncidence;
 	else
 		self->search = Mesh_Algorithms_SearchGeneral;
-#endif
 }
 
 unsigned _Mesh_Algorithms_NearestVertex( void* algorithms, double* point ) {
@@ -662,18 +663,20 @@ Bool Mesh_Algorithms_SearchGeneral( void* algorithms, double* point,
 	return False;
 }
 
-Bool Mesh_Algorithms_SearchWithTree( void* _self, double* pnt, unsigned* el ) {
+Bool Mesh_Algorithms_SearchWithTree( void* _self, double* pnt, unsigned* dim, unsigned* el ) {
    Mesh_Algorithms* self = (Mesh_Algorithms*)_self;
    int nEls, *els;
    int curDim, curRank, curEl;
    int nLocals, owner;
    int ii;
 
+   *dim = Mesh_GetDimSize( self->mesh );
    curRank = self->rank;
-   nLocals = Mesh_GetLocalSize( self->mesh, Mesh_GetDimSize( self->mesh ) );
+   nLocals = Mesh_GetLocalSize( self->mesh, *dim );
    if( !SpatialTree_Search( self->tree, pnt, &nEls, &els ) )
       return False;
 
+   *el = nLocals;
    for( ii = 0; ii < nEls; ii++ ) {
       if( Mesh_ElementHasPoint( self->mesh, els[ii], pnt, &curDim, &curEl ) ) {
 	 if( curEl >= nLocals ) {

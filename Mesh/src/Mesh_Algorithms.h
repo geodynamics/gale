@@ -185,7 +185,7 @@
 	Bool Mesh_Algorithms_SearchGeneral( void* algorithms, double* point, 
 					    MeshTopology_Dim* dim, unsigned* ind );
 
-	Bool Mesh_Algorithms_SearchWithTree( void* self, double* pnt, unsigned* el );
+Bool Mesh_Algorithms_SearchWithTree( void* self, double* pnt, unsigned* dim, unsigned* el );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Private Member functions

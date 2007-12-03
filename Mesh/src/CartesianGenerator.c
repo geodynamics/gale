@@ -128,7 +128,7 @@ void _CartesianGenerator_Init( CartesianGenerator* self ) {
 	Stream_SetPrintingRank( stream, 0 );
 
 	self->comm = NULL;
-	self->regular = True;
+	self->regular = False;
 	self->maxDecompDims = 0;
 	self->minDecomp = NULL;
 	self->maxDecomp = NULL;
