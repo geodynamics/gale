@@ -11,7 +11,11 @@
 		<param>StgFEM_FrequentOutput</param>	
 		<param>Underworld_Vrms</param>	
 		<param>StgFEM_CPUTime</param>
+		<param> Underworld_ExtractPetscObjects </param> 
 	</list>
+
+  <param name="ProbDescription"> Extension-Matrices-64x32x64 </param>
+  <param name="ExtractMatricesAtStep" > 10 </param>
 
 	<!-- Rheology Components -->
 	<struct name="components" mergeType="merge">
@@ -81,14 +85,14 @@
 				</list>
 		</struct>
 		
-		<struct name="markerLayerShape1">
+		<struct name="markerLayerSubShape1">
 			<param name="Type">Box</param>
 			<param name="startX"> minX </param> <param name="endX"> maxX </param>
 			<param name="startY"> 0.4  </param> <param name="endY"> 0.5  </param>
 			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
 		</struct>
 	
-		<struct name="markerLayerShape2">
+		<struct name="markerLayerSubShape2">
 			<param name="Type">Box</param>
 			<param name="startX"> minX </param> <param name="endX"> maxX </param>
 			<param name="startY"> 0.6  </param> <param name="endY"> 0.7  </param>
@@ -98,16 +102,24 @@
 		<struct name="markerLayerShapesUnion">
 			<param name="Type">Union</param>
 				<list name="shapes">
-					<param>markerLayerShape1</param>
-					<param>markerLayerShape2</param>	
+					<param>markerLayerSubShape1</param>
+					<param>markerLayerSubShape2</param>	
 				</list>
 		</struct>
 		
-		<struct name="markerLayerShape">
+		<struct name="markerLayerShape2">
 				<param name="Type">Intersection</param>
 				<list name="shapes">
 					<param>markerShape</param>
 					<param>markerLayerShapesUnion</param>
+				</list>
+		</struct>
+		
+		<struct name="markerLayerShape1">
+				<param name="Type">Intersection</param>
+				<list name="shapes">
+					<param>markerShape</param>
+					<param>!markerLayerShape2</param>
 				</list>
 		</struct>
 		
@@ -202,7 +214,7 @@
 		
 		<struct name="markedCrust">
 			<param name="Type">RheologyMaterial</param>
-			<param name="Shape">markerShape</param>
+			<param name="Shape">markerLayerShape1</param>
 	        <param name="density"> CrustDefaultDensity</param>
 			<list name="Rheology">
 				<param>crustViscosity</param>
@@ -212,7 +224,7 @@
 		
 		<struct name="markedCrust2">
 			<param name="Type">RheologyMaterial</param>
-			<param name="Shape">markerLayerShape</param>
+			<param name="Shape">markerLayerShape2</param>
 	        <param name="density"> CrustDefaultDensity</param>
 			<list name="Rheology">
 				<param>crustViscosity</param>
@@ -296,7 +308,29 @@
 			<param name="Context">context</param>
 			<param name="Mesh">linearMesh</param>
 		</struct>	
+		
+		<!-- Marker Layer 1 Field  -->
+		<!--struct name="MarkerLayer1Field">
+			<param name="Type">MaterialFeVariable</param>
+			<param name="Swarm">picIntegrationPoints</param>
+			<param name="Material">markedCrust</param>
+			<param name="Context">context</param>
+			<param name="Mesh">linearMesh</param>
+		</struct-->	
+
+		<!-- Marker Layer 2 Field  -->
+		<!--struct name="MarkerLayer2Field">
+			<param name="Type">MaterialFeVariable</param>
+			<param name="Swarm">picIntegrationPoints</param>
+			<param name="Material">markedCrust2</param>
+			<param name="Context">context</param>
+			<param name="Mesh">linearMesh</param>
+		</struct-->	
+		
+		
 	</struct>
+	
+		
 
 
 	<!-- Simulation control -->

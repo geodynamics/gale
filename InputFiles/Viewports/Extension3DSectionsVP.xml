@@ -159,9 +159,7 @@
 	</struct>	
 	
 
-	
 
-	
 		<struct name="strainRateInvSectionColourMap">
 			<param name="Type">lucColourMap</param>
 			<param name="colours">Black:0.0 Yellow Red</param>

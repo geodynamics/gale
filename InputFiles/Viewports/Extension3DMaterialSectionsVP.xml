@@ -11,12 +11,12 @@
 	<!-- Camera View -->
 	<struct name="perspectiveViewCamera">
 	        <param name="Type">lucCamera</param>
-	        <param name="coordX">-1.2747</param>
-	        <param name="coordY">2.2715</param>
-	        <param name="coordZ">2.8552</param>
-	        <param name="focalPointX">0.89117</param>
-	        <param name="focalPointY">0.22</param>
-	        <param name="focalPointZ">0.81161</param>
+	        <param name="coordX">-0.73655</param>
+	        <param name="coordY">2.7411</param>
+	        <param name="coordZ">2.8878</param>
+	        <param name="focalPointX">1.1301</param>
+	        <param name="focalPointY">0.13</param>
+	        <param name="focalPointZ">1.1073</param>
 	        <param name="upDirectionX">0</param>
 	        <param name="upDirectionY">1</param>
 	        <param name="upDirectionZ">0</param>
@@ -58,22 +58,20 @@
 		<param name="dynamicRange">True</param>		
 	</struct>	
 	
-	
-	
 	<struct name="faultingColourMapFaultsOnly">
 		<param name="Type">lucColourMap</param>
-		<param name="colours"> white:0.0 white:0.5 yellow:0.5 </param>
+		<param name="colours"> grey:0.0 white:0.5 yellow:0.5 </param>
 		<param name="minimum">0.0</param>
-		<param name="maximum">1.0</param>
+		<param name="maximum">3.0</param>
 		<param name="logScale">False</param>
 		<param name="dynamicRange">False</param>		
 	</struct>
 	
 	<struct name="faultingColourMap1">
 		<param name="Type">lucColourMap</param>
-		<param name="colours">#666666 #666666 #FFDDDD </param>
+		<param name="colours">#883322 #883322 #888822 #FFDDDD </param>
 		<param name="minimum">0.0</param>
-		<param name="maximum">1.0</param>
+		<param name="maximum">3.0</param>
 		<param name="logScale">False</param>
 		<param name="dynamicRange">False</param>		
 	</struct>	
@@ -81,15 +79,32 @@
 	
 	<struct name="faultingColourMap2">
 		<param name="Type">lucColourMap</param>
-		<param name="colours"> #BB9900 #BB9900 #DDFFDD</param>
+		<param name="colours"> #BB9900 #BB9900 #BBBB00 #FFFFDD</param>
 		<param name="minimum">0.0</param>
-		<param name="maximum">1.0</param>
+		<param name="maximum">3.0</param>
 		<param name="logScale">False</param>
 		<param name="dynamicRange">False</param>		
 	</struct>	
 	
+	<struct name="strainRateInvSectionColourMap">
+		<param name="Type">lucColourMap</param>
+		<param name="colours">Grey:0.0 Yellow:0.2 Red</param>
+		<param name="dynamicRange">False</param>
+		<param name="minimum">0.0</param>
+		<param name="maximum">5.0</param>
+	</struct>
 		
 	<!-- Drawing Objects -->
+	
+	<struct name="strainRateInvSection1">
+		<param name="Type">lucScalarFieldCrossSection</param>
+		<param name="FieldVariable">StrainRateInvariantField</param>
+		<param name="crossSection">y=0.66</param>
+		<param name="ColourMap">strainRateInvSectionColourMap</param>
+	</struct>
+
+
+	
 	<struct name="mantleSurfaceWithStrainRateInv">
 		<param name="Type">lucIsosurface</param>
 		<param name="IsosurfaceField">MantleField</param>
@@ -98,6 +113,25 @@
 		<param name="isovalue">0.5</param>
 		<param name="drawWalls">true</param>
 	</struct>			
+	
+	<!--struct name="brittleLayerSurfaceWithStrainRateInv">
+		<param name="Type">lucIsosurface</param>
+		<param name="IsosurfaceField">MarkerLayer1Field</param>
+		<param name="ColourMap">faultingColourMap1</param>
+		<param name="ColourField">StrainRateInvariantField</param>
+		<param name="isovalue">0.5</param>
+		<param name="drawWalls">true</param>7
+	</struct-->			
+	
+	<!--struct name="brittleLayer2SurfaceWithStrainRateInv">
+		<param name="Type">lucIsosurface</param>
+		<param name="IsosurfaceField">MarkerLayer2Field</param>
+		<param name="ColourMap">faultingColourMap2</param>
+		<param name="ColourField">StrainRateInvariantField</param>
+		<param name="isovalue">0.5</param>
+		<param name="drawWalls">true</param>
+	</struct-->			
+	
 	<struct name="topographySurface">
 		<param name="Type">lucIsosurface</param>
 		<param name="IsosurfaceField">CompressibleField</param>
@@ -151,7 +185,7 @@
 			<param name="maskType">EqualTo</param>
 			<param name="maskValue">1.0</param>		
 	</struct>	
-	-->	
+	
 	
 	<struct name="material2">
 			<param name="Type">lucSwarmRGBColourViewer</param>
@@ -163,7 +197,7 @@
 			<param name="maskType">EqualTo</param>
 			<param name="maskValue">2.0</param>		
 	</struct>
-	
+	-->
 	
 	<struct name="material3">
 			<param name="Type">lucSwarmViewer</param>
@@ -187,26 +221,12 @@
 			<param name="maskValue">4.0</param>		
 	</struct>	
 	
-
-		<struct name="strainRateInvSectionColourMap">
-			<param name="Type">lucColourMap</param>
-			<param name="colours">Black:0.0 Yellow Red</param>
-			<param name="dynamicRange">False</param>
-			<param name="minimum">0.0</param>
-			<param name="maximum">5.0</param>
-		</struct>
-	
-		<struct name="strainRateInvSection1">
-				<param name="Type">lucScalarFieldCrossSection</param>
-				<param name="FieldVariable">StrainRateInvariantField</param>
-				<param name="crossSection">z=0.00</param>
-				<param name="ColourMap">strainRateInvSectionColourMap</param>
-		</struct>
-			
+		
 		<struct name="border" mergeType="replace">
 			<param name="Type">lucFieldVariableBorder</param>
 			<param name="FieldVariable">StrainRateInvariantField</param>
 		</struct>
+		
 		<struct name="strainRateInvColourBarYZ">
 			<param name="Type">lucColourBar</param>
 			<param name="ColourMap">strainRateInvSectionColourMap</param>
@@ -219,9 +239,8 @@
 		<param name="compositeEachObject">true</param>
 		<list name="DrawingObject">
 			<param>mantleSurfaceWithStrainRateInv</param>
-			<!--param> faultSquares </param-->
 			<param>border</param>
-			<!--param>strainRateInvSection1</param-->
+			<param>strainRateInvSection1</param>
 			<!--param>material2</param-->
 			<param>material3</param>
 			<param>material4</param>
