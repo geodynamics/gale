@@ -69,7 +69,7 @@
 
 	struct DVCWeights { __DVCWeights };
 	
-#define INC 50
+#define INC 150
 	
 struct cell{
   int p;/*particle index number*/
@@ -149,6 +149,9 @@ struct particle2d{
 	double _DVCWeights_DistanceSquared(
 				double x0, double y0, double z0, 
 				double x1, double y1, double z1);
+        double _DVCWeights_DistanceTest(double x0, double y0, double z0, 
+                                        double x1, double y1, double z1,
+                                        double x2, double y2, double z2);	
 	void   _DVCWeights_ConstructGrid(
 				struct cell **cell_list, 
 				int n, int m, int l,
@@ -187,6 +190,9 @@ struct particle2d{
 				int p_i);
 	void   _DVCWeights_ResetGrid2D(struct cell2d **cells, int n );
 	double _DVCWeights_DistanceSquared2D(double x0, double y0, double x1, double y1);
+	double _DVCWeights_DistanceTest2D(double x0, double y0,
+					  double x1, double y1,
+					  double x2, double y2);
 	void   _DVCWeights_ConstructGrid2D(
 				struct cell2d **cell_list, 
 				int m, int l,

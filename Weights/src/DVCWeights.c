@@ -289,7 +289,7 @@ void _DVCWeights_GetCentroids2D( struct cell2d *cells,struct particle2d *pList,
 void _DVCWeights_ClaimCells(struct chain **bbchain,struct cell **ccells,struct particle **pList,int p_i){
   int i,count;
   int cell_num0;
-  double x0,y0,x1,y1,x2,y2,z0,z1,z2,dist1,dist2;
+  double x0,y0,x1,y1,x2,y2,z0,z1,z2,dist1;
   struct chain *bchain = &(*bbchain)[p_i];
   struct cell *cells = *ccells;
   int *temp;
@@ -330,9 +330,8 @@ void _DVCWeights_ClaimCells(struct chain **bbchain,struct cell **ccells,struct p
 	y0 = cells[cell_num0].y;
 	z0 = cells[cell_num0].z;
 	
-	dist1 = _DVCWeights_DistanceSquared(x0,y0,z0,x1,y1,z1);
-	dist2 = _DVCWeights_DistanceSquared(x0,y0,z0,x2,y2,z2);
-	if(dist1 > dist2){
+	dist1 = _DVCWeights_DistanceTest(x0,y0,z0,x1,y1,z1,x2,y2,z2);
+	if(dist1 > 0.0){
 	  bchain->new_claimed_cells[count] = cell_num0;
 	  bchain->numclaimed++;
 	  count++;
@@ -348,7 +347,7 @@ void _DVCWeights_ClaimCells(struct chain **bbchain,struct cell **ccells,struct p
 void _DVCWeights_ClaimCells2D(struct chain **bbchain,struct cell2d **ccells,struct particle2d **pList,int p_i){
   int i,count;
   int cell_num0;
-  double x0,y0,x1,y1,x2,y2,dist1,dist2;
+  double x0,y0,x1,y1,x2,y2,dist1;
   struct chain *bchain = &(*bbchain)[p_i];
   struct cell2d *cells = *ccells;
   int *temp;
@@ -386,9 +385,8 @@ void _DVCWeights_ClaimCells2D(struct chain **bbchain,struct cell2d **ccells,stru
 	x0 = cells[cell_num0].x;
 	y0 = cells[cell_num0].y;
 	
-	dist1 = _DVCWeights_DistanceSquared2D(x0,y0,x1,y1);
-	dist2 = _DVCWeights_DistanceSquared2D(x0,y0,x2,y2);
-	if(dist1 > dist2){
+	dist1 = _DVCWeights_DistanceTest2D(x0,y0,x1,y1,x2,y2);
+	if(dist1 > 0.0){
 	  bchain->new_claimed_cells[count] = cell_num0;
 	  bchain->numclaimed++;
 	  count++;
@@ -624,26 +622,19 @@ void _DVCWeights_ConstructGrid2D(struct cell2d **cell_list, int m, int l,
 
 /** Calculate the sqaure of the distance between two points */
 double _DVCWeights_DistanceSquared(double x0, double y0, double z0, double x1, double y1, double z1){
-	double  position0[3], position1[3], vectorDistance[3];
-	double  dist;
-	Vec_SetScalar3D( position0, x0, y0, z0 );	
-	Vec_SetScalar3D( position1, x1, y1, z1 );
-	StGermain_VectorSubtraction( vectorDistance, position0, position1, 3 ) ;
-	dist = StGermain_VectorDotProduct(vectorDistance, vectorDistance, 3);
-	return dist;
+	return (x1-x0)*(x1-x0)+(y1-y0)*(y1-y0)+(z1-z0)*(z1-z0);
 }
 
 /** Calculate the sqaure of the distance between two points in 2D*/
 double _DVCWeights_DistanceSquared2D(double x0, double y0,double x1, double y1){
-	double  position0[2], position1[2], vectorDistance[2];
-	double dist;
-	Vec_SetScalar2D( position0, x0, y0);	
-	Vec_SetScalar2D( position1, x1, y1);
-	StGermain_VectorSubtraction( vectorDistance, position0, position1, 2 ) ;
-	dist = StGermain_VectorDotProduct(vectorDistance, vectorDistance, 2);
-	return dist;
+	return (x1-x0)*(x1-x0)+(y1-y0)*(y1-y0);
 }
-
+double _DVCWeights_DistanceTest2D(double x0, double y0, double x1, double y1,double x2, double y2){
+        return (x1+x2-x0-x0)*(x1-x2) + (y1+y2-y0-y0)*(y1-y2);
+}
+double _DVCWeights_DistanceTest(double x0, double y0, double z0, double x1, double y1, double z1, double x2, double y2, double z2){
+        return (x1+x2-x0-x0)*(x1-x2) + (y1+y2-y0-y0)*(y1-y2) + (z1+z2-z0-z0)*(z1-z2);
+}
 /** Allocate the internal structs for the bchain (boundary chain) and the plist (particle list) */
 void _DVCWeights_InitialiseStructs( struct chain **bchain, struct particle **pList, int nump){
 
