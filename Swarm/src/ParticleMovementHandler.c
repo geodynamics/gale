@@ -307,6 +307,7 @@ void ParticleMovementHandler_FindParticlesThatHaveMovedOutsideMyDomain( Particle
 	Stream_IndentBranch( Swarm_Debug );
 
 	self->particlesOutsideDomainTotalCount = 0;
+	self->currParticleLeavingMyDomainIndex = 0;
 	particlesOutsideDomainSize = self->swarm->particlesArrayDelta;
 
 
