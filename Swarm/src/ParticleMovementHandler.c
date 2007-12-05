@@ -133,7 +133,7 @@ void _ParticleMovementHandler_Init(
 		)
 {
 	_ParticleCommHandler_Init( (ParticleCommHandler*)self );
-	self->defensive = True;
+	self->defensive = False;
 	self->useGlobalFallbackCommStrategy = useGlobalFallbackCommStrategy;
 	self->particlesOutsideDomainIndices = NULL;
 	ParticleMovementHandler_ZeroGlobalCommStrategyCounters( self );	
