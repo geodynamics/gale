@@ -932,6 +932,7 @@ void _Swarm_InitialiseParticles( void* swarm, void* data ) {
 void Swarm_UpdateAllParticleOwners( void* swarm ) {
 	Swarm*			self = (Swarm*)swarm;
 	Particle_Index		lParticle_I;
+	Progress*		prog;
 
 	/* TODO: need to reconsideer - gauss particle layout should be allowed, but not swarms that have no local
 	 * co-ordinates */
@@ -939,12 +940,21 @@ void Swarm_UpdateAllParticleOwners( void* swarm ) {
 		/* Assumption: Local coord layouts don't go through advection so no need to update */
 		return;
 	}
+
+	prog = Progress_New();
+	Progress_SetTitle( prog, "Updating particle owners" );
+	Progress_SetPrefix( prog, "\t" );
+	Progress_SetRange( prog, 0, self->particleLocalCount );
+	Progress_Update( prog );
 	
 	Journal_DPrintfL( self->debug, 1, "In %s() for Swarm \"%s\"\n", __func__, self->name );
 	Stream_IndentBranch( Swarm_Debug );	
 	for ( lParticle_I=0; lParticle_I < self->particleLocalCount; lParticle_I++ ) {
 		Swarm_UpdateParticleOwner( self, lParticle_I );
+		Progress_Increment( prog );
 	}
+
+	Stg_Class_Delete( prog );
 
 	/* UpdateAllParticleOwners is called during initialisation,to set up initial
 	 * ownership relationships, and if that's the case we don't want to invoke

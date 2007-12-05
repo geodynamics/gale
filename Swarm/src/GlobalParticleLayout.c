@@ -248,6 +248,7 @@ void _GlobalParticleLayout_InitialiseParticles( void* particleLayout, void* _swa
 	Particle_Index		newParticle_I=0;
 	Cell_Index		cell_I;
 	Particle_Index          globalParticlesInitialisedCount=0;
+	Progress*		prog;
 	Stream*                 errorStream = Journal_Register( Error_Type, self->type );
 
 	Journal_DPrintf( self->debug, "In %s(): for ParticleLayout \"%s\" (of type %s):\n",
@@ -258,6 +259,14 @@ void _GlobalParticleLayout_InitialiseParticles( void* particleLayout, void* _swa
 		"generating a particle, and checking if it's in this processor's domain. If so, "
 		"adding it to the appropriate local cell.\n", self->totalInitialParticles );
 	Stream_IndentBranch( Swarm_Debug );
+
+	/* Use a progress meter. */
+	prog = Progress_New();
+	Progress_SetStream( prog, self->debug );
+	Progress_SetTitle( prog, "Generating global particles" );
+	Progress_SetPrefix( prog, "\t" );
+	Progress_SetRange( prog, 0, self->totalInitialParticles );
+	Progress_Update( prog );
 
 	while( newParticle_I < self->totalInitialParticles ) {
 		
@@ -291,7 +300,12 @@ void _GlobalParticleLayout_InitialiseParticles( void* particleLayout, void* _swa
 		}		
 				
 		newParticle_I++;
+
+		Progress_Increment( prog );
 	}
+
+	/* Delete progress meter. */
+	Stg_Class_Delete( prog );
 
 	Stream_UnIndentBranch( Swarm_Debug );
 
