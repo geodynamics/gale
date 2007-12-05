@@ -27,25 +27,25 @@
 */
 /** \file
 **  Role:
-**	Initialises StGermain
+**	External header file to libBase.
 **
 ** Assumptions:
-**	Non as yet.
+**	None so far.
 **
 ** Comments:
-**	None as yet.
+**	None so far.
 **
-** $Id: StGermain.h 4192 2007-10-11 07:56:26Z SteveQuenette $
+** $Id: StGermain.h 4200 2007-12-05 04:11:33Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #ifndef __StGermain_StGermain_h__
 #define __StGermain_StGermain_h__
-
-	#include "Base/Base.h"
 	
+	#include "Base/Base.h"
+	#include "Utils/Utils.h"
 	#include "Init.h"
 	#include "main.h"
 	#include "Finalise.h"
-
+	
 #endif /* __StGermain_StGermain_h__ */

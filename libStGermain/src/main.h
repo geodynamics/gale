@@ -24,42 +24,27 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Finalise.c 4200 2007-12-05 04:11:33Z LukeHodkinson $
+*/
+/** \file
+**  Role:
+**
+** Assumptions:
+**	Non as yet.
+**
+** Comments:
+**	None as yet.
+**
+** $Id: Init.h 3462 2006-02-19 06:53:24Z WalterLandry $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#include <stdarg.h>
-#include <mpi.h>
-#include "Base/Foundation/Foundation.h"
-#include "Base/IO/IO.h"
-#include "Base/Container/Container.h"
-#include "Base/Automation/Automation.h"
-#include "Base/Extensibility/Extensibility.h"
-#include "Base/Context/Context.h"
+#ifndef __StGermain_main_h__
+#define __StGermain_main_h__
 
-#include "Finalise.h"
+	/** The StGermain main loop - the context life cycle */
+	void stgMainLoop( Dictionary* dictionary, MPI_Comm CommWorld );
 
-#include <stdio.h>
-
-Bool StGermainBase_Finalise( void ) {
-	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
+	/** Add a toolbox to the "import" list in the dictionary */
+	void stgImportToolbox( Dictionary* dictionary, char* toolboxName );
 	
-	/* Delete the global objects : xmlSearchPaths and moduleDirectories */
-	Stg_ObjectList_DeleteAllObjects( moduleDirectories );
-	Stg_Class_Delete( moduleDirectories );
-	
-	Stg_ObjectList_DeleteAllObjects(xmlSearchPaths);
-	Stg_Class_Delete( xmlSearchPaths );
-
-	/* Finalise all the bits and pieces */
-	BaseContext_Finalise();
-//#if 0
-	BaseExtensibility_Finalise();
-//#endif
-	BaseAutomation_Finalise();
-	BaseContainer_Finalise();
-	BaseIO_Finalise();
-	BaseFoundation_Finalise();
-
-	return True;
-}
+#endif /* __StGermain_main_h__ */

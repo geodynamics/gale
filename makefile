@@ -24,7 +24,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 4192 2007-10-11 07:56:26Z SteveQuenette $
+## $Id: makefile 4200 2007-12-05 04:11:33Z LukeHodkinson $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -32,7 +32,7 @@
 override PROJ_ROOT = .
 include ${PROJ_ROOT}/Makefile.system
 
-subdirs = Regresstor compatibility Base src
+subdirs = Regresstor compatibility Base Utils libStGermain src
 ifeq (true,$(shell if test -x $(DOXYGEN); then echo true; fi ))
 	subdirs += doc
 endif

@@ -24,12 +24,18 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Init.c 4192 2007-10-11 07:56:26Z SteveQuenette $
+** $Id: Init.c 4200 2007-12-05 04:11:33Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+#include <stdarg.h>
 #include <mpi.h>
-#include "Base/Base.h"
+#include "Base/Foundation/Foundation.h"
+#include "Base/IO/IO.h"
+#include "Base/Container/Container.h"
+#include "Base/Automation/Automation.h"
+#include "Base/Extensibility/Extensibility.h"
+#include "Base/Context/Context.h"
 
 #include "Init.h"
 
@@ -37,18 +43,36 @@
 
 Bool StGermain_Init( int* argc, char** argv[] ) {
 	char* directory;
-	Base_Init( argc, argv );
+	int tmp;
 	
+	/* Initialise enough bits and pieces to get IO going */
+	BaseFoundation_Init( argc, argv );
+	BaseIO_Init( argc, argv );
+
+	/* Write out the copyright message */
 	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
+	tmp = Stream_GetPrintingRank( Journal_Register( InfoStream_Type, "Context" ) );
+	Stream_SetPrintingRank( Journal_Register( InfoStream_Type, "Context" ), 0 );
+	Journal_Printf( /* DO NOT CHANGE OR REMOVE */
+		Journal_Register( InfoStream_Type, "Context" ), 
+		"StGermain Framework revision %s. Copyright (C) 2003-2005 VPAC.\n", VERSION );
+	Stream_Flush( Journal_Register( InfoStream_Type, "Context" ) );
+	Stream_SetPrintingRank( Journal_Register( InfoStream_Type, "Context" ), tmp );
+	
+	/* Initialise the remaining bits and pieces */
+	BaseContainer_Init( argc, argv );
+	BaseAutomation_Init( argc, argv );
+	BaseExtensibility_Init( argc, argv );
+	BaseContext_Init( argc, argv );
 	
 	/* Add the StGermain path to the global xml path dictionary */
 	directory = Memory_Alloc_Array( char, 200, "xmlDirectory" ) ;
-	sprintf(directory, "%s%s", LIB_DIR, "/StGermain" );
+	sprintf( directory, "%s%s", LIB_DIR, "/StGermain" );
 	XML_IO_Handler_AddDirectory( "StGermain", directory  );
-	Memory_Free(directory);
+	Memory_Free( directory );
+	
 	/* Add the plugin path to the global plugin list */
 	ModulesManager_AddDirectory( "StGermain", LIB_DIR );
-
 	
 	return True;
 }

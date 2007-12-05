@@ -24,7 +24,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 4192 2007-10-11 07:56:26Z SteveQuenette $
+## $Id: makefile 4200 2007-12-05 04:11:33Z LukeHodkinson $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -34,32 +34,34 @@ ifndef PROJ_ROOT
 endif
 include ${PROJ_ROOT}/Makefile.system
 
-include Makefile.def
-
-lib = StGermain_
+lib = StGermain
 libstatic = yes
-#libdynamic = yes
+libdynamic= yes
 includes = StGermain
 
 SRCS = \
 	Init.c \
-	main.c \
-	Finalise.c
+	Finalise.c \
+	main.c
 
 HDRS = \
 	Init.h \
-	main.h \
 	Finalise.h \
-	StGermain.h
+	StGermain.h \
+	main.h
 
 PROJ_LIBS = 
-PROJ_OBJLISTS = 
+PROJ_OBJLISTS = \
+	StGermainBaseContext \
+	StGermainBaseExtensibility \
+	StGermainBaseAutomation \
+	StGermainBaseContainer \
+	StGermainBaseIO \
+	StGermainBaseFoundation \
+	StGermainUtils
+
 EXTERNAL_INCLUDES = -I${INC_DIR}/StGermain  -DLIB_DIR=\"${LIB_DIR}\"
 
-packages = MPI XML MATH
-
-ifdef HAVE_PYTHON
-        packages += PYTHON
-endif
+packages = MPI XML MATH DL
 
 include ${PROJ_ROOT}/Makefile.vmake

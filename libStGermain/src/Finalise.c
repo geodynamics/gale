@@ -24,12 +24,18 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Finalise.c 4192 2007-10-11 07:56:26Z SteveQuenette $
+** $Id: Finalise.c 4200 2007-12-05 04:11:33Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+#include <stdarg.h>
 #include <mpi.h>
-#include "Base/Base.h"
+#include "Base/Foundation/Foundation.h"
+#include "Base/IO/IO.h"
+#include "Base/Container/Container.h"
+#include "Base/Automation/Automation.h"
+#include "Base/Extensibility/Extensibility.h"
+#include "Base/Context/Context.h"
 
 #include "Finalise.h"
 
@@ -38,14 +44,22 @@
 Bool StGermain_Finalise( void ) {
 	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 	
-	/*Delete the global objects : xmlSearchPaths and moduleDirectories */
+	/* Delete the global objects : xmlSearchPaths and moduleDirectories */
 	Stg_ObjectList_DeleteAllObjects( moduleDirectories );
 	Stg_Class_Delete( moduleDirectories );
 	
 	Stg_ObjectList_DeleteAllObjects(xmlSearchPaths);
 	Stg_Class_Delete( xmlSearchPaths );
 
-	Base_Finalise();
-	
+	/* Finalise all the bits and pieces */
+	BaseContext_Finalise();
+//#if 0
+	BaseExtensibility_Finalise();
+//#endif
+	BaseAutomation_Finalise();
+	BaseContainer_Finalise();
+	BaseIO_Finalise();
+	BaseFoundation_Finalise();
+
 	return True;
 }

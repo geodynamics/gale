@@ -27,12 +27,12 @@
 ** Role:
 **	Tests EntryPoint in the most basic sence... creation on default values, run with hooks added, and delete.
 **
-** $Id: testLibBase.c 4192 2007-10-11 07:56:26Z SteveQuenette $
+** $Id: testLibBase.c 4200 2007-12-05 04:11:33Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #include <mpi.h>
-#include "StGermain/StGermain.h"
+#include "StGermain/Base/Base.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -50,7 +50,7 @@ int main( int argc, char* argv[] ) {
 	MPI_Comm_rank( CommWorld, &rank );
 	/* Read input */
 
-	if( !StGermain_Init( &argc, &argv ) ) {
+	if( !StGermainBase_Init( &argc, &argv ) ) {
 		fprintf( stderr, "Error initialising StGermain, exiting.\n" );
 		exit( EXIT_FAILURE );
 	}
@@ -64,7 +64,7 @@ int main( int argc, char* argv[] ) {
 	}
 	if( rank == procToWatch ) printf( "Watching rank: %i\n", rank );
 	
-	StGermain_Finalise();
+	StGermainBase_Finalise();
 	
 	/* Close off MPI */
 	MPI_Finalize();

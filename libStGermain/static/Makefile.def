@@ -24,7 +24,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: Makefile.def 3462 2006-02-19 06:53:24Z WalterLandry $
+## $Id: Makefile.def 4200 2007-12-05 04:11:33Z LukeHodkinson $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -37,4 +37,4 @@ def_srcs = \
 def_hdrs = \
 
 def_libs =
-def_objlists = StGermain_ StGermainDiscretisation StGermainBase
+def_objlists = StGermain_ StGermainDiscretisation StGermainBase StGermainUtils

@@ -27,15 +27,15 @@
 */
 /** \file
 **  Role:
-**	Initialises StGermain
+**	Performs all initialisation at the base level
 **
 ** Assumptions:
-**	Non as yet.
+**	None as yet.
 **
 ** Comments:
 **	None as yet.
 **
-** $Id: Init.h 3462 2006-02-19 06:53:24Z WalterLandry $
+** $Id: Init.h 4200 2007-12-05 04:11:33Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 

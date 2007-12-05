@@ -35,21 +35,21 @@
 ** Comments:
 **	None so far.
 **
-** $Id: StGermain.h 4192 2007-10-11 07:56:26Z SteveQuenette $
+** $Id: Base.h 4200 2007-12-05 04:11:33Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __StGermain_StGermain_h__
-#define __StGermain_StGermain_h__
+#ifndef __StGermain_Base_h__
+#define __StGermain_Base_h__
 	
-	#include "Base/Foundation/Foundation.h"
-	#include "Base/IO/IO.h"
-	#include "Base/Container/Container.h"
-	#include "Base/Automation/Automation.h"
-	#include "Base/Extensibility/Extensibility.h"
-	#include "Base/Context/Context.h"
+	#include "Foundation/Foundation.h"
+	#include "IO/IO.h"
+	#include "Container/Container.h"
+	#include "Automation/Automation.h"
+	#include "Extensibility/Extensibility.h"
+	#include "Context/Context.h"
 	#include "Init.h"
 	#include "main.h"
 	#include "Finalise.h"
 	
-#endif /* __StGermain_StGermain_h__ */
+#endif /* __StGermain_Base_h__ */

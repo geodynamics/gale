@@ -58,7 +58,6 @@ void _NewClass_Destruct( void* _self ) {
 	       "Class type:    %s\n"
 	       "Memory leaked: %ld\n", 
 	       self->type, self->curAllocd );
-      abort();
    }
 #endif
 }

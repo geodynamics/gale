@@ -38,7 +38,7 @@
 
 #include <mpi.h>
 
-#include "StGermain/StGermain.h"
+#include "StGermain/Base/Base.h"
 
 #define OUTPUT_FILE_FLAG "-output_file="
 #define DEFAULT_OUTPUT_FILE "./output.xml"
@@ -54,7 +54,7 @@ int main( int argc, char* argv[] )
 	int ii;
 
 	MPI_Init( &argc, &argv );
-	if( !StGermain_Init( &argc, &argv ) ) {
+	if( !StGermainBase_Init( &argc, &argv ) ) {
 		fprintf( stderr, "Error initialising StGermain, exiting.\n" );
 		exit( EXIT_FAILURE );
 	}
@@ -67,7 +67,7 @@ int main( int argc, char* argv[] )
 				Journal_Printf( msgs, "Invalid outputfile name: %s\n", outputFilename );
 				Journal_Printf( msgs, "Exiting...\n" );
 				Stg_Class_Delete( dictionary );
-				StGermain_Finalise();
+				StGermainBase_Finalise();
 				return 1;
 			}
 			argv[ii] = " "; /* remove it from the arg list */
@@ -85,7 +85,7 @@ int main( int argc, char* argv[] )
 	Stg_Class_Delete( dictionary );
 	Stg_Class_Delete( ioHandler );
 
-	StGermain_Finalise();
+	StGermainBase_Finalise();
 	MPI_Finalize();
 
 	return 0; /* success */

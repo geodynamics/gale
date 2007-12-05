@@ -35,13 +35,13 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: Finalise.h 4192 2007-10-11 07:56:26Z SteveQuenette $
+** $Id: Finalise.h 4200 2007-12-05 04:11:33Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __StGermain_Finalise_h__
-#define __StGermain_Finalise_h__
+#ifndef __StGermain_Base_Finalise_h__
+#define __StGermain_Base_Finalise_h__
 
-	Bool StGermain_Finalise();
+	Bool StGermainBase_Finalise();
 
-#endif /* __StGermain_Finalise_h__ */
+#endif /* __StGermain_Base_Finalise_h__ */
