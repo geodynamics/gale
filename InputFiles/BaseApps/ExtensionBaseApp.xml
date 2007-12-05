@@ -65,7 +65,7 @@
 	<!-- Make the mesh non-regular. -->
 	<struct name="components" mergeType="merge">
 		<struct name="linearMeshGenerator" mergeType="merge">
-			<param name="regular"> False </param>
+			<param name="regular"> True </param>
 		</struct>
 	</struct>
 
