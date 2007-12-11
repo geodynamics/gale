@@ -34,7 +34,7 @@
 #include "types.h"
 #include "BTreeNode.h"
 #include "BTree.h"
-#include "MemoryPool.h"
+#include "ChunkArray.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -114,7 +114,7 @@ void _BTree_Init( BTree* self )
 	assert(self);
 	self->root = NIL;
 
-	self->pool = MemoryPool_New( BTreeNode, POOL_SIZE, POOL_DELTA );
+	self->pool = ChunkArray_New( BTreeNode, POOL_SIZE );
 }
 
 void BTree_Init( BTree *self )
@@ -319,7 +319,7 @@ int BTree_InsertNode ( BTree *tree, void *newNodeData, SizeT sizeOfData ){
 					tree->dataDeleteFunction( newNode->data );
 				
 				if( tree->pool ){
-					MemoryPool_DeleteObject( tree->pool, newNode );
+					ChunkArray_DeleteObjectID( tree->pool, newNode->id );
 				}
 				else{
 					free ( newNode );
@@ -581,7 +581,7 @@ void BTree_DeleteNode( BTree *tree, BTreeNode *z ) {
 	}
 
 	if( tree->pool ){
-		MemoryPool_DeleteObject( tree->pool, y );
+		ChunkArray_DeleteObjectID( tree->pool, y->id );
 	}
 	else{
 		free ( y );
@@ -631,7 +631,7 @@ void* BTree_GetData( BTreeNode *node )
 	}
 }
 
-void _BTree_DeleteFunc_Helper( BTreeNode *node, BTree_dataDeleteFunction *nodeDataDeleteFunc, MemoryPool *pool )
+void _BTree_DeleteFunc_Helper( BTreeNode *node, BTree_dataDeleteFunction *nodeDataDeleteFunc, ChunkArray *pool )
 {
 	BTreeNode *left = NULL;
 	BTreeNode *right = NULL;
@@ -659,7 +659,7 @@ void _BTree_DeleteFunc_Helper( BTreeNode *node, BTree_dataDeleteFunction *nodeDa
 		}
 
 		if( pool ){
-			MemoryPool_DeleteObject( pool, node );
+			ChunkArray_DeleteObjectID( pool, node->id );
 		}
 		else{
 			free( node );

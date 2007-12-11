@@ -72,7 +72,7 @@
 		/* Virtual info */ \
 		\
 		/* BTree info */ \
-		MemoryPool					*pool; \
+		ChunkArray					*pool; \
 		BTreeNode					*root; \
 		BTree_compareFunction*		compareFunction; \
 		BTree_dataCopyFunction*		dataCopyFunction; \
@@ -106,7 +106,7 @@
 	void BTree_Init( BTree* self );
 
 	/** Stg_Class_Delete Interface */
-	void _BTree_DeleteFunc_Helper( BTreeNode *, BTree_dataDeleteFunction *, MemoryPool *pool );
+	void _BTree_DeleteFunc_Helper( BTreeNode *, BTree_dataDeleteFunction *, ChunkArray *pool );
 	void _BTree_DeleteFunc( void *self );
 
 	/** Print Interface */

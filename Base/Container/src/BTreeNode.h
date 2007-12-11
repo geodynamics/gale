@@ -54,6 +54,7 @@
 		Color				color; \
 		void 				*data; \
 		SizeT				sizeOfData; \
+		unsigned int			id; \
 		struct BTreeNode	*left; \
 		struct BTreeNode	*right; \
 		struct BTreeNode	*parent; 
@@ -66,7 +67,7 @@
 
 
 	/** Constructor interface. */
-	BTreeNode *BTreeNode_New ( MemoryPool *pool );
+	BTreeNode *BTreeNode_New ( ChunkArray *pool );
 	
 	/** Init interface. */
 	void _BTreeNode_Init( BTreeNode *self );

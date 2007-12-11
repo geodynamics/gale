@@ -35,7 +35,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: types.h 4188 2007-10-02 03:54:33Z LukeHodkinson $
+** $Id: types.h 4202 2007-12-11 08:27:52Z RaquibulHassan $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -105,6 +105,8 @@ struct IMapItem {
 	typedef struct BTreeNode			BTreeNode;
 	typedef struct BTree				BTree;
 	typedef struct BTreeIterator			BTreeIterator;
+	typedef struct Chunk				Chunk;
+	typedef struct ChunkArray			ChunkArray;
 
 	typedef struct MapTuple				MapTuple;
 

@@ -32,8 +32,8 @@
 #include <Base/IO/IO.h>
 
 #include "types.h"
+#include "ChunkArray.h"
 #include "BTreeNode.h"
-#include "MemoryPool.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -44,20 +44,26 @@ const Type BTreeNode_Type = "BTreeNode";
 
 BTreeNode terminal = { BTREE_NODE_BLACK, NULL, 0, NIL, NIL, NULL };
 
-BTreeNode* BTreeNode_New( MemoryPool *pool )
+BTreeNode* BTreeNode_New( ChunkArray *pool )
 {
 	BTreeNode* self;
 	
 	/* Allocate memory */
 
 	if( pool ){
+		unsigned int objID = -1;
 		assert( sizeof( BTreeNode ) == pool->elementSize );
-		self = ( BTreeNode* ) MemoryPool_NewObject( BTreeNode, pool );
+		objID = ChunkArray_NewObjectID( BTreeNode, pool );
+		
+		self = ( BTreeNode* ) ChunkArray_ObjectAt(pool, objID);
+		memset ( self, 0, sizeof ( BTreeNode ) );
+		
+		self->id = objID;
 	}
 	else{
 		self = ( BTreeNode* ) malloc ( sizeof( BTreeNode ) );
+		memset ( self, 0, sizeof ( BTreeNode ) );
 	}
-	memset ( self, 0, sizeof ( BTreeNode ) );
 
 	assert ( self );
 	/* General info */

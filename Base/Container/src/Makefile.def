@@ -24,7 +24,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: Makefile.def 4188 2007-10-02 03:54:33Z LukeHodkinson $
+## $Id: Makefile.def 4202 2007-12-11 08:27:52Z RaquibulHassan $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -60,6 +60,7 @@ def_srcs = \
 	Heap.c \
 	MaxHeap.c \
 	MemoryPool.c \
+	ChunkArray.c \
 	Init.c \
 	Finalise.c
 
@@ -103,6 +104,7 @@ def_hdrs = \
 	Heap.h \
 	MaxHeap.h \
 	MemoryPool.h \
+	ChunkArray.h \
 	Init.h \
 	Finalise.h \
 	Container.h

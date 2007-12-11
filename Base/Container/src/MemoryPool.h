@@ -47,11 +47,11 @@
 	/** Textual name for List class. */
 	extern const Type MemoryPool_Type;
 	
-	typedef struct Chunk_t{
+	typedef struct MemChunk_t{
 		char *memory;
 		unsigned int maxFree;
 		unsigned int numFree;
-	}Chunk;
+	}MemChunk;
 
 	typedef void ( MemoryPool_ResizeCallbackFunc ) ( void * );
 	
@@ -67,9 +67,9 @@
 		int		numInitialElements; \
 		int		numElements; \
 		int		numElementsFree; \
-		int		numChunks; \
+		int		numMemChunks; \
 		int		delta; \
-		Chunk	*chunks; \
+		MemChunk	*chunks; \
 		char	**pool; \
 		MemoryPool_ResizeCallbackFunc *callbackFunc; \
 		void	*callbackFuncArg;
