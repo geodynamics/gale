@@ -42,7 +42,7 @@
 
 const Type BTreeNode_Type = "BTreeNode";
 
-BTreeNode terminal = { BTREE_NODE_BLACK, NULL, 0, NIL, NIL, NULL };
+BTreeNode terminal = { BTREE_NODE_BLACK, NULL, 0, NULL, NULL, NULL };
 
 BTreeNode* BTreeNode_New( ChunkArray *pool )
 {
