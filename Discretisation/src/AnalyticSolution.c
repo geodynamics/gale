@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AnalyticSolution.c 964 2007-10-11 08:03:06Z SteveQuenette $
+** $Id: AnalyticSolution.c 989 2007-12-18 13:57:56Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -130,7 +130,7 @@ void _AnalyticSolution_Init( AnalyticSolution* self, Swarm* integrationSwarm, Li
 
 	/* Add functions to entry points */
 	EP_AppendClassHook( Context_GetEntryPoint( context, AbstractContext_EP_UpdateClass ), 
-			_AnalyticSolution_Initialise, self );
+			Stg_Component_Initialise, self );
 	EP_AppendClassHook( Context_GetEntryPoint( context, AbstractContext_EP_DumpClass ), 
 			AnalyticSolution_TestAll, self );
 
