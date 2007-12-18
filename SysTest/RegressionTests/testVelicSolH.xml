@@ -15,13 +15,27 @@
 	<param name="solH_yc">0.6</param>
 
 	<list name="plugins" mergeType="merge">
+		<param>StgFEM_FileAnalyticSolution</param>
 <!--
 		<param>Underworld_Velic_solH</param>
 -->
 	</list>
 	
+	<param name="referencePath">expected/VelicSolH/</param>
+	<list name="FileAnalyticSolution" mergeType="merge">
+		<param>VelocityField</param>
+	</list>
+	
 	<param name="VelocityField-Tolerance"> 5.0e-05 </param>
 	<param name="PressureField-Tolerance"> 5.0e-04 </param>
+
+	<param name="checkpointEvery"> 1 </param>
+
+        <!-- choose what to checkpoint
+	<list name="FieldVariablesToCheckpoint">
+		<param>VelocityField-Analytic</param>
+	</list>
+	-->
 
 	<struct name="components" mergeType="merge">
 		<struct name="backgroundViscosity">
