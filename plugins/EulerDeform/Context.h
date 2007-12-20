@@ -43,6 +43,12 @@
 		Bool		wrapBottom;
 		Bool		wrapLeft;
 
+		Bool		staticTop;
+		Bool		staticBottom;
+		Bool		staticLeft;
+		Bool		staticRight;
+		Bool		staticFront;
+		Bool		staticBack;
 		Bool		staticSides;
 		double**	sideCoords;
 	};
