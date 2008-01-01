@@ -46,7 +46,7 @@
 ** Comments:
 **	None so far.
 **
-** $Id: LinearAlgebra.h 919 2007-07-20 01:53:52Z LukeHodkinson $
+** $Id: LinearAlgebra.h 990 2008-01-01 23:34:24Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -57,6 +57,7 @@
 	#include "Vector.h"
 	#include "Matrix.h"
 	#include "MatrixSolver.h"
+	#include "NonlinearSolver.h"
 
 #ifdef HAVE_PETSC
 	#include <petsc.h>
@@ -64,10 +65,12 @@
 	#include <petscmat.h>
 	#include <petscksp.h>
 	#include <petscmg.h>
+	#include <petscsnes.h>
 	#include "PETScErrorChecking.h"
 	#include "PETScVector.h"
 	#include "PETScMatrix.h"
 	#include "PETScMatrixSolver.h"
+	#include "PETScNonlinearSolver.h"
 #endif
 
 	#include "Init.h"

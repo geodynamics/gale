@@ -35,7 +35,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 964 2007-10-11 08:03:06Z SteveQuenette $
+## $Id: makefile 990 2008-01-01 23:34:24Z DavidLee $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -49,16 +49,16 @@ includes = ${PROJECT}/SLE/LinearAlgebra
 libstatic = yes
 libdynamic = yes
 
-SRCS = Vector.c Matrix.c MatrixSolver.c \
+SRCS = Vector.c Matrix.c MatrixSolver.c NonlinearSolver.c \
 	Init.c Finalise.c
-HDRS = Vector.h Matrix.h MatrixSolver.h \
+HDRS = Vector.h Matrix.h MatrixSolver.h NonlinearSolver.h \
 	Init.h Finalise.h LinearAlgebra.h types.h
 
 packages = STGDOMAIN STGERMAIN MPI XML MATH
 
 ifeq (true,$(shell if test -r $(PETSC_INCDIR)/petsc.h; then echo true; fi ))
-	SRCS += PETScVector.c PETScMatrix.c PETScMatrixSolver.c
-	HDRS += PETScVector.h PETScMatrix.h PETScMatrixSolver.h PETScErrorChecking.h
+	SRCS += PETScVector.c PETScMatrix.c PETScMatrixSolver.c PETScNonlinearSolver.c
+	HDRS += PETScVector.h PETScMatrix.h PETScMatrixSolver.h PETScNonlinearSolver.h PETScErrorChecking.h
 	USER_CFLAGS += -DHAVE_PETSC
 	packages += PETSC
 endif
