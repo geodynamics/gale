@@ -51,7 +51,7 @@
 **	for storing and managing the matrices and vectors that make up a system, but uses
 **	the SLE_Solver class to actually implement a solution mechanism for the given eqn.
 **
-** $Id: SystemLinearEquations.h 925 2007-07-26 02:34:49Z LukeHodkinson $
+** $Id: SystemLinearEquations.h 991 2008-01-02 00:47:23Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -67,7 +67,10 @@
 	typedef void (SystemLinearEquations_VectorSetupFunction) ( void* sle, void* data );
 	typedef void (SystemLinearEquations_UpdateSolutionOntoNodesFunc) ( void* sle, void* data );
 	typedef void (SystemLinearEquations_MG_SelectStiffMatsFunc) ( void* _sle, unsigned* nSMs, StiffnessMatrix*** sms );
-	
+
+	/* for solving non linear systems using Newton's method */
+	typedef void (SystemLinearEquations_BuildFFunc) ( void* sle, Vector f, Vector x, void* context );
+	typedef void (SystemLinearEquations_BuildJFunc) ( void* sle, Matrix J );	
 	
 	/*
 	** SystemLinearEquations class contents.
@@ -121,6 +124,12 @@
 		Bool                                                mgUpdate; \
 		unsigned                                            nMGHandles;                \
 		unsigned*                                           mgHandles; /* one per MG'd 'StiffnessMatrix' */ \
+		/* for solving non linear systems using Newton's method */\
+		Name						    nonLinearSolutionType;     \
+		SystemLinearEquations_BuildFFunc*		    _buildF;		       \
+		SystemLinearEquations_BuildJFunc*		    _buildJ;		       \
+		void*						    buildFContext;             \
+		void*						    buildJContext;             \
 		
 		
 		
@@ -263,6 +272,8 @@
 	void SystemLinearEquations_ZeroAllVectors( void* sle, void* data ) ;
 
 	/* Non-linear stuff */
+	/* matrix free finite difference newton's method non linear solve */
+	void SystemLinearEquations_NewtonMFFDExecute( void* sle, void* data );
 	void SystemLinearEquations_NonLinearExecute( void* sle, void* data ) ;
 	void SystemLinearEquations_AddNonLinearEP( void* sle, const char* name, EntryPoint_2VoidPtr_Cast func );
 	void SystemLinearEquations_SetToNonLinear( void* sle ) ;

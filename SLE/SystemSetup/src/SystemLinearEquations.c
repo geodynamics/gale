@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SystemLinearEquations.c 979 2007-11-09 01:39:25Z DavidMay $
+** $Id: SystemLinearEquations.c 991 2008-01-02 00:47:23Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -141,6 +141,7 @@ void _SystemLinearEquations_Init(
 		Iteration_Index                                    nonLinearMaxIterations,
 		Bool                                               killNonConvergent,
 		Iteration_Index                                    nonLinearMinIterations,
+		Name						   nonLinearSolutionType,
 		EntryPoint_Register*                               entryPoint_Register,
 		MPI_Comm                                           comm ) 
 {
@@ -182,6 +183,7 @@ void _SystemLinearEquations_Init(
 	self->nonLinearMaxIterations    = nonLinearMaxIterations;
 	self->killNonConvergent         = killNonConvergent;
 	self->nonLinearMinIterations    = nonLinearMinIterations;
+
 	/* BEGIN LUKE'S FRICTIONAL BCS BIT */
 	Stg_asprintf( &self->nlEPName, "%s-nlEP", self->name );
 	self->nlEP = EntryPoint_New( self->nlEPName, EntryPoint_2VoidPtr_CastType );
@@ -243,6 +245,7 @@ void SystemLinearEquations_InitAll(
 			nonLinearMaxIterations,
 			killNonConvergent, 
 			1,/* TODO : hack for setting the minimum number of iterations to 1- same hack as above */
+			"",
 			entryPoint_Register,
 			comm );
 }
@@ -369,6 +372,7 @@ void _SystemLinearEquations_Construct( void* sle, Stg_ComponentFactory* cf, void
 	Bool                    killNonConvergent;
 	Bool                    makeConvergenceFile;
 	Iteration_Index         nonLinearMinIterations;                     
+	Name			nonLinearSolutionType;
 	
 	solver = Stg_ComponentFactory_ConstructByKey( cf, self->name, SLE_Solver_Type, SLE_Solver, False, data ) ;
 
@@ -380,6 +384,7 @@ void _SystemLinearEquations_Construct( void* sle, Stg_ComponentFactory* cf, void
 	nonLinearMaxIterations    = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "nonLinearMaxIterations", 500 );
 	killNonConvergent         = Stg_ComponentFactory_GetBool(   cf, self->name, "killNonConvergent",      True );
 	nonLinearMinIterations    = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "nonLinearMinIterations", 1 );
+	nonLinearSolutionType	  = Stg_ComponentFactory_GetString( cf, self->name, "nonLinearSolutionType", "" );
 	
 	entryPointRegister = Stg_ObjectList_Get( cf->registerRegister, "EntryPoint_Register" );
 	assert( entryPointRegister );
@@ -396,6 +401,7 @@ void _SystemLinearEquations_Construct( void* sle, Stg_ComponentFactory* cf, void
 			nonLinearMaxIterations,
 			killNonConvergent, 
 			nonLinearMinIterations,
+			nonLinearSolutionType,
 			entryPointRegister,
 			MPI_COMM_WORLD );
 }
@@ -648,6 +654,16 @@ void SystemLinearEquations_ZeroAllVectors( void* sle, void* _context ) {
 	}
 }
 
+void SystemLinearEquations_NewtonMFFDExecute( void* sle, void* _context ) {
+	SystemLinearEquations*	self            = (SystemLinearEquations*) sle;
+	Vector*			F		= PETScVector_New( "F" );
+	Vector*			delta_x		= PETScVector_New( "delta x" );
+
+	/* calls to non linear solver routines here */
+
+	FreeObject( F );
+	FreeObject( delta_x );
+}
 
 void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 	SystemLinearEquations*	self            = (SystemLinearEquations*) sle;
