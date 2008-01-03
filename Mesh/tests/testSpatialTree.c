@@ -87,7 +87,6 @@ TestBegin( All ) {
 
    pnt[0] = pnt[1] = pnt[2] = 0.0;
    TestTrue( SpatialTree_Search( tree, pnt, &nEls, &els ) );
-   printf( "%d\n", nEls );
 
   done:
    NewClass_Delete( tree );
