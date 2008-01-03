@@ -671,7 +671,7 @@ Bool Mesh_Algorithms_SearchWithTree( void* _self, double* pnt, unsigned* dim, un
    int ii;
 
    *dim = Mesh_GetDimSize( self->mesh );
-   curRank = self->rank;
+   MPI_Comm_size( MPI_COMM_WORLD, &curRank );
    nLocals = Mesh_GetLocalSize( self->mesh, *dim );
    if( !SpatialTree_Search( self->tree, pnt, &nEls, &els ) )
       return False;
@@ -681,12 +681,14 @@ Bool Mesh_Algorithms_SearchWithTree( void* _self, double* pnt, unsigned* dim, un
       if( Mesh_ElementHasPoint( self->mesh, els[ii], pnt, &curDim, &curEl ) ) {
 	 if( curEl >= nLocals ) {
 	    owner = Mesh_GetOwner( self->mesh, curDim, curEl - nLocals );
-	    if( owner < curRank ) {
+	    owner = Comm_RankLocalToGlobal( self->mesh->topo->comm, owner );
+	    if( owner <= curRank ) {
 	       curRank = owner;
 	       *el = curEl;
 	    }
 	 }
-	 else if( curRank == self->rank && curEl < *el ) {
+	 else if( self->rank <= curRank && curEl < *el ) {
+	    curRank = self->rank;
 	    *el = curEl;
 	 }
       }
