@@ -34,7 +34,7 @@
 **
 ** Comments:
 **
-** $Id: FeMesh.h 960 2007-09-25 07:54:49Z LukeHodkinson $
+** $Id: FeMesh.h 992 2008-01-03 04:46:19Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -56,6 +56,7 @@
 		/* FeMesh info */			\
 		char*			feElFamily;	\
 		ElementType*		feElType;	\
+		Bool		elementMesh;		\
 		IArray*	inc;
 
 	struct FeMesh { __FeMesh };

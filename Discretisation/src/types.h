@@ -44,7 +44,7 @@
 **
 ** Comments:
 **
-** $Id: types.h 914 2007-07-11 07:01:09Z DavidLee $
+** $Id: types.h 992 2008-01-03 04:46:19Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -52,6 +52,8 @@
 #define __StgFEM_Discretisation_types_h__
 	
 	/* FE types/classes */
+	typedef struct FeMesh_Algorithms FeMesh_Algorithms;
+	typedef struct FeMesh_ElementType FeMesh_ElementType;
 	typedef struct ElementType               ElementType;
 	typedef struct ElementType_Register      ElementType_Register;
 	typedef struct ConstantElementType       ConstantElementType;
@@ -64,7 +66,6 @@
 	typedef struct LinearTriangleElementType LinearTriangleElementType;
 	typedef struct FiniteElement_Element     FiniteElement_Element;
 	typedef struct FeMesh			FeMesh;
-	typedef struct FeMesh_ElementType	FeMesh_ElementType;
 	typedef struct C0Generator		C0Generator;
 	typedef struct C2Generator		C2Generator;
 	typedef struct P1Generator		P1Generator;

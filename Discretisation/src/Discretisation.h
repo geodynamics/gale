@@ -46,7 +46,7 @@
 ** Comments:
 **	None so far.
 **
-** $Id: Discretisation.h 915 2007-07-11 07:03:22Z DavidLee $
+** $Id: Discretisation.h 992 2008-01-03 04:46:19Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -56,6 +56,8 @@
 	#include "units.h"
 	#include "types.h"
 
+	#include "FeMesh_Algorithms.h"
+	#include "FeMesh_ElementType.h"
 	#include "ElementType.h"
 	#include "ElementType_Register.h"
 	#include "ConstantElementType.h"

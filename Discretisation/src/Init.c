@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Init.c 964 2007-10-11 08:03:06Z SteveQuenette $
+** $Id: Init.c 992 2008-01-03 04:46:19Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -88,6 +88,8 @@ Bool StgFEM_Discretisation_Init( int* argc, char** argv[] ) {
 				   Inner2DGenerator_New );
 
 	/** Register Parents for type checking */
+	RegisterParent( FeMesh_Algorithms_Type, Mesh_Algorithms_Type );
+	RegisterParent( FeMesh_ElementType_Type, Mesh_HexType_Type );
 	RegisterParent( ElementType_Type,                  Stg_Component_Type );
 	RegisterParent( BilinearElementType_Type,          ElementType_Type );
 	RegisterParent( TrilinearElementType_Type,         ElementType_Type );

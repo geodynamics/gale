@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeMesh.c 964 2007-10-11 08:03:06Z SteveQuenette $
+** $Id: FeMesh.c 992 2008-01-03 04:46:19Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -128,6 +128,8 @@ void _FeMesh_Construct( void* feMesh, Stg_ComponentFactory* cf, void* data ) {
 
 	family = Stg_ComponentFactory_GetString( cf, self->name, "elementType", "linear" );
 	FeMesh_SetElementFamily( self, family );
+
+	self->elementMesh = Stg_ComponentFactory_GetBool( cf, self->name, "isElementMesh", False );
 }
 
 void _FeMesh_Build( void* feMesh, void* data ) {
@@ -200,6 +202,22 @@ void _FeMesh_Build( void* feMesh, void* data ) {
 	FeMesh_SetElementType( self, elType );
 	if( self->feElType )
 		Stg_Component_Build( self->feElType, data, False );
+
+	/*
+	** Reset the element type to FeMesh_ElementType.
+	**/
+
+	if( self->elementMesh ) {
+		Stg_Class_Delete( self->algorithms );
+		self->algorithms = FeMesh_Algorithms_New( "" );
+		Mesh_Algorithms_SetMesh( self->algorithms, self );
+		Mesh_Algorithms_Update( self->algorithms );
+
+		Stg_Class_Delete( self->elTypes[0] );
+		self->elTypes[0] = FeMesh_ElementType_New();
+		Mesh_ElementType_SetMesh( self->elTypes[0], self );
+		Mesh_ElementType_Update( self->elTypes[0] );
+	}
 
 	Journal_Printf( stream, "... FE element types are '%s',\n", elType->type );
 	Journal_Printf( stream, "... done.\n" );
