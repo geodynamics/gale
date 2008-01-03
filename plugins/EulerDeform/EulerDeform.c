@@ -283,46 +283,36 @@ IndexSet* EulerDeform_CreateStaticSet(EulerDeform_System* sys)
     if(ijk[0]==0) {
       if(sys->staticLeft)
         add=True;
-      else
-        continue;
     }
 
     if(ijk[0]==grid->sizes[0]-1) {
       if(sys->staticRight)
         add=True;
-      else
-        continue;
     }
 
     if(ijk[1]==0) {
       if(sys->staticBottom)
         add=True;
-      else
-        continue;
     }
 
     if(ijk[1]==grid->sizes[1]-1) {
       if(sys->staticTop)
         add=True;
     /* If wrapping the top, that does not imply fixing the corner, but
-       it does not preclude it either. */
+       it does not preclude it either.
       else if(!sys->wrapTop)
-        continue;
+      continue;*/
     }
 
     if(sys->mesh->topo->nDims == 3) {
        if(ijk[2]==0) {
           if(sys->staticBack)
             add=True;
-          else
-            continue;
        }
         
        if(ijk[2]==grid->sizes[2]-1) {
           if(sys->staticFront)
             add=True;
-          else
-        continue;
        }
     }
     if( add )
@@ -467,6 +457,7 @@ Bool EulerDeform_TimeDeriv( void* crdAdvector, Index arrayInd, double* timeDeriv
 
 
 void EulerDeform_Remesh( TimeIntegratee* crdAdvector, EulerDeform_Context* edCtx ) {
+	Mesh_Algorithms	*tmpAlgs, *oldAlgs;
 	unsigned	sys_i;
 
 	assert( edCtx );
@@ -510,6 +501,17 @@ void EulerDeform_Remesh( TimeIntegratee* crdAdvector, EulerDeform_Context* edCtx
 			FreeArray( sys->sideCoords );
 		}
 
+		/* If we have regular mesh algorithms specified, set the algorithms temporarily to
+		   an irregular method. */
+		if( !strcmp( sys->mesh->algorithms->type, "Mesh_RegularAlgorithms" ) && sys->remesher ) {
+			tmpAlgs = Mesh_Algorithms_New( "" );
+			oldAlgs = sys->mesh->algorithms;
+			sys->mesh->algorithms = NULL;
+			Mesh_SetAlgorithms( sys->mesh, tmpAlgs );
+		}
+		else
+			tmpAlgs = NULL;
+
 		/* Every system should synchronise the mesh coordinates. */
 		Mesh_Sync( sys->mesh );
 		Mesh_DeformationUpdate( sys->mesh );
@@ -544,6 +546,11 @@ void EulerDeform_Remesh( TimeIntegratee* crdAdvector, EulerDeform_Context* edCtx
 		/* Swap back coordinates and free memory. */
 		sys->mesh->verts = newCrds;
 		FreeArray( oldCrds );
+
+		/* Swap back old algorithms. */
+		if( tmpAlgs ) {
+			Mesh_SetAlgorithms( sys->mesh, oldAlgs );
+		}
 
 		/* Re-sync with new coordinates. */
 		Mesh_Sync( sys->mesh );
