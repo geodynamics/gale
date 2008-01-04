@@ -152,6 +152,21 @@
 
 	#define NonlinearSolver_SetComm( self, comm )			\
 		VirtualCall( self, setCommFunc, self, comm )
+
+	#define NonlinearSolver_SetFunction( self, f, func, context )	\
+		VirtualCall( self, setFunctionFunc, self, f, func, context )
+
+	#define NonlinearSolver_GetJacobian( self, J, pc, context )	\
+		VirtualCall( self, getJacobianFunc, self, j, pc, context )
+
+	#define NonlinearSolver_Solve( self, b, x )			\
+		VirtualCall( self, solveFunc, self, b, x )
+
+	#define NonlinearSolver_SetSolution( self, x )			\
+		VirtualCall( self, setSolutionFunc, self, x )
+
+	#define NonlinearSolver_SetRhs( self, rhs )			\
+		VirtualCall( self, setRhsFunc, self, rhs )
 	/*
 	#define NonlinearSolver_SetMaxIterations( self, nIterations )	\
 		VirtualCall( self, setMaxIterationsFunc, self, nIterations )
@@ -182,8 +197,8 @@
 	*/
 
 	MPI_Comm NonlinearSolver_GetComm( void* nls );
-	Matrix* NonlinearSolver_GetJacobian( void* nls );
-	Vector* NonlinearSolver_GetResidual( void* nls );
+	//Matrix* NonlinearSolver_GetJacobian( void* nls );
+	//Vector* NonlinearSolver_GetResidual( void* nls );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Private Member functions

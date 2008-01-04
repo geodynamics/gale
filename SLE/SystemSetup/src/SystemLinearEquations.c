@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SystemLinearEquations.c 991 2008-01-02 00:47:23Z DavidLee $
+** $Id: SystemLinearEquations.c 993 2008-01-04 02:50:16Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -658,8 +658,10 @@ void SystemLinearEquations_NewtonMFFDExecute( void* sle, void* _context ) {
 	SystemLinearEquations*	self            = (SystemLinearEquations*) sle;
 	Vector*			F		= PETScVector_New( "F" );
 	Vector*			delta_x		= PETScVector_New( "delta x" );
+	NonlinearSolver*	nls		= PETScNonlinearSolver_New( "PETScSNES" );
 
 	/* calls to non linear solver routines here */
+	NonlinearSolver_SetFunction( nls, F, self->_buildF, _context );
 
 	FreeObject( F );
 	FreeObject( delta_x );
