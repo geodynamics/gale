@@ -63,7 +63,7 @@ PETScNonlinearSolver* PETScNonlinearSolver_New( Name name ) {
 				       name, 
 				       NON_GLOBAL, 
 				       PETScNonlinearSolver_SetComm, 
-				       PETScNonlinearSolver_Create,
+				       //PETScNonlinearSolver_Create,
 			               PETScNonlinearSolver_Destroy,
 			               PETScNonlinearSolver_SetFunction,
 			               PETScNonlinearSolver_GetJacobian,

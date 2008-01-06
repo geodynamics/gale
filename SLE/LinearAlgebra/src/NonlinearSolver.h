@@ -48,7 +48,6 @@
 
 	/** Virtual function types */
 	typedef void (NonlinearSolver_SetCommFunc)( void* nls, MPI_Comm comm );
-	typedef void (NonlinearSolver_CreateFunc)( void* nls );
 	typedef void (NonlinearSolver_DestroyFunc)( void* nls );	
 	typedef void (NonlinearSolver_SetFunctionFunc)( void* nls, void* f, NonlinearSolver_Func* func, void* context );
 	typedef void (NonlinearSolver_GetJacobianFunc)( void* nls, void* J, void* pc, /*no Jacobian func for now*/  void** context );
@@ -68,7 +67,6 @@
 												\
 		/* Virtual info */								\
 		NonlinearSolver_SetCommFunc*			setCommFunc;			\
-		NonlinearSolver_CreateFunc*			createFunc;			\
 		NonlinearSolver_DestroyFunc*			destroyFunc;			\
 		NonlinearSolver_SetFunctionFunc*		setFunctionFunc;		\
 		NonlinearSolver_GetJacobianFunc*		getJacobianFunc;		\
@@ -104,7 +102,6 @@
 	#define NONLINEARSOLVER_DEFARGS								\
 		STG_COMPONENT_DEFARGS,								\
 		NonlinearSolver_SetCommFunc*			setCommFunc,			\
-		NonlinearSolver_CreateFunc*			createFunc,			\
 		NonlinearSolver_DestroyFunc*			destroyFunc,			\
 		NonlinearSolver_SetFunctionFunc*		setFunctionFunc,		\
 		NonlinearSolver_GetJacobianFunc*		getJacobianFunc,		\
@@ -120,7 +117,6 @@
 	#define NONLINEARSOLVER_PASSARGS	\
 		STG_COMPONENT_PASSARGS,		\
 		setCommFunc, 			\
-		createFunc,			\
 		destroyFunc,			\
 		setFunctionFunc,		\
 		getJacobianFunc,		\

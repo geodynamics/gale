@@ -57,7 +57,6 @@ NonlinearSolver* _NonlinearSolver_New( NONLINEARSOLVER_DEFARGS ) {
 
 	/* Virtual info */
 	self->setCommFunc = setCommFunc;
-	self->createFunc = createFunc;
 	self->destroyFunc = destroyFunc;
 	self->setFunctionFunc = setFunctionFunc;
 	self->getJacobianFunc = getJacobianFunc;
