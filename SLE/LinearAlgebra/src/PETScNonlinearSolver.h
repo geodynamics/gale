@@ -97,7 +97,6 @@
 	** Public functions
 	*/
 
-	void PETScNonlinearSolver_Create( void* nls );
 	void PETScNonlinearSolver_Destroy( void* nls );
 	void PETScNonlinearSolver_SetFunction( void* nls, void* f, void* func, void* context );
 	void PETScNonlinearSolver_GetJacobian( void* nls, void* J, void* pc, /*no function to build J for now*/ void** context );

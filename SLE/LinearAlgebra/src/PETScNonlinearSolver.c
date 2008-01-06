@@ -172,18 +172,15 @@ void PETScNonlinearSolver_SetComm( void* nls, MPI_Comm comm ) {
 
 	_NonlinearSolver_SetComm( self, comm );
 
+	if( self->snes != PETSC_NULL )
+		SNESDestroy( self->snes );
+	ec = SNESCreate( self->comm, &self->snes );
+	CheckPETScError( ec );
+
 	if( self->ksp != PETSC_NULL )
 		KSPDestroy( self->ksp );
 	ec = KSPCreate( self->comm, &self->ksp );
 	CheckPETScError( ec );
-}
-
-void PETScNonlinearSolver_Create( void* nls ) {
-	PETScNonlinearSolver*	self = (PETScNonlinearSolver*)nls;
-
-	assert( self && Stg_CheckType( self, PETScNonlinearSolver ) );
-
-	self = PETScNonlinearSolver_New( "" );
 }
 
 void PETScNonlinearSolver_Destroy( void* nls ) {
