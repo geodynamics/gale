@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StandardConditionFunctions.c 986 2007-11-22 22:35:24Z LukeHodkinson $
+** $Id: StandardConditionFunctions.c 997 2008-01-08 05:18:13Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -77,6 +77,12 @@ void _StgFEM_StandardConditionFunctions_Construct( void* component, Stg_Componen
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_Lid_RampWithCentralMax, "Velocity_Lid_RampWithCentralMax" );
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_LinearVelocityLeftWall, "LinearVelocityLeftWall" );
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_LinearVelocityRightWall, "LinearVelocityRightWall" );
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SinusoidalLid, "Velocity_SinusoidalLid" );
@@ -386,6 +392,43 @@ void StgFEM_StandardConditionFunctions_Lid_RampWithCentralMax( Node_LocalIndex n
 	else {
 		(*velResult) = 1 - 2 * ( xPosRelativeToTopLeft - (boxLength/2) );
 	}
+}
+void StgFEM_StandardConditionFunctions_LinearVelocityLeftWall( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* result ) {
+	DomainContext*	context = (DomainContext*)_context;
+	FeVariable*             velVar = NULL;
+	FeMesh*			mesh = NULL;
+	double*			velResult = (double*)result;
+	Dictionary*             dictionary         = context->dictionary;
+	double			min[3], max[3];
+	double			gradient, maxvel;
+	velVar = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
+	mesh = velVar->feMesh;
+
+	maxvel = Dictionary_GetDouble_WithDefault( dictionary, "MaximumVelocity_Left", 0.0 );
+	Mesh_GetGlobalCoordRange( mesh, min, max );
+	gradient = maxvel/(min[1] - max[1]);
+	
+	(*velResult)   = gradient*Mesh_GetVertex( mesh, node_lI )[J_AXIS];
+	 //printf("Left velResult is %g\n",(*velResult));
+	 
+}
+void StgFEM_StandardConditionFunctions_LinearVelocityRightWall( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* result ) {
+	DomainContext*	context = (DomainContext*)_context;
+	FeVariable*             velVar = NULL;
+	FeMesh*			mesh = NULL;
+	double*			velResult = (double*)result;
+	Dictionary*             dictionary         = context->dictionary;
+	double			min[3], max[3];
+	double			gradient, maxvel;
+	velVar = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
+	mesh = velVar->feMesh;
+
+	maxvel = Dictionary_GetDouble_WithDefault( dictionary, "MaximumVelocity_Right", 0.0 );
+	Mesh_GetGlobalCoordRange( mesh, min, max );
+	gradient = maxvel/(max[1] - min[1]);
+	 
+	(*velResult)   = maxvel - gradient*Mesh_GetVertex( mesh, node_lI )[J_AXIS];
+	//printf("Right velResult is %g\n",(*velResult));
 }
 
 
