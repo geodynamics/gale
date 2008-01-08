@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Stokes_SLE_UzawaSolver.c 984 2007-11-14 10:15:16Z DavidMay $
+** $Id: Stokes_SLE_UzawaSolver.c 998 2008-01-08 23:33:39Z DavidMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -331,8 +331,71 @@ void _Stokes_SLE_UzawaSolver_SolverSetup( void* solver, void* stokesSLE ) {
 
 
 #define FetchPetscVector( vector ) ( (Vec)( ((PETScVector*)(vector))->petscVec ) )
+#define FetchPetscMatrix( matrix ) ( (Mat)( ((PETScMatrix*)(matrix))->petscMat ) )
+#define FetchPetscKSP( solver ) ( (KSP)( ((PETScMatrixSolver*)(solver))->ksp ) )
 
-void _remove_constant_null_space( Vector *vector )
+Bool _check_if_constant_nullsp_present( 
+	Stokes_SLE_UzawaSolver* self, 
+	Matrix *_K, Matrix *_G, Matrix *_M, Vector *_p, Vector *_t1, Vector *_ustar, MatrixSolver *_ksp )
+{
+    Vec l,r;
+    PetscInt N;
+    PetscScalar sum;
+    PetscReal nrm;
+    Bool nullsp_present;
+
+    Mat K,G,M;
+    Vec p,t1,ustar;
+    KSP ksp;
+
+    /* Get Petsc objects */
+    K = FetchPetscMatrix( _K );
+    G = FetchPetscMatrix( _G );
+    M = PETSC_NULL;
+    if( _M != NULL ) {
+	M = FetchPetscMatrix( _M );
+    }
+
+    p = FetchPetscVector( _p );
+    t1 = FetchPetscVector( _t1 );
+    ustar = FetchPetscVector( _ustar );
+
+    ksp = FetchPetscKSP( _ksp );
+
+    VecDuplicate(p,&r);
+    VecDuplicate(p,&l);
+    VecGetSize(p,&N);
+    sum  = 1.0/N;
+    VecSet(l,sum);
+
+    /* [S] {l} = {r} */
+    MatMult( G,l, t1 );
+    KSPSolve( ksp, t1, ustar );
+    MatMultTranspose( G, ustar, r );     
+    if ( M ) {
+	VecScale( r, -1.0 );
+	MatMultAdd( M,l, r, r );
+	VecScale( r, -1.0 );
+    }
+
+    VecNorm(r,NORM_2,&nrm);
+    if (nrm < 1.e-7) {
+	Journal_PrintfL( self->debug, 2, "Constant null space detected, " ); 
+	nullsp_present = True;
+    }
+    else {
+	Journal_PrintfL( self->debug, 2, "Constant null space not present, " );
+	nullsp_present = False;
+    }
+    Journal_PrintfL( self->debug, 2, "|| [S]{1} || = %G\n", nrm );
+
+    VecDestroy(r);
+    VecDestroy(l);
+
+    return nullsp_present;
+}
+
+void _remove_constant_nullsp( Vector *vector )
 {
         PetscInt N;
 	PetscScalar sum;
@@ -394,7 +457,7 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	double                  qReciprocalGlobalProblemScale = 1.0 / qGlobalProblemScale;
 	int			init_info_stream_rank;	
 	PetscScalar p_sum;
-
+	Bool nullsp_present;
 
 
 	init_info_stream_rank = Stream_GetPrintingRank( self->info );
@@ -592,6 +655,8 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	}	
 	Vector_AddScaled( rVec, -1.0, hVec );
 			
+	/* Check for existence of constant null space */
+	nullsp_present = _check_if_constant_nullsp_present( self, K_Mat,G_Mat,M_Mat, qVec, fTempVec, vStarVec, velSolver );
 			
 	/* STEP 4: Preconditioned conjugate gradient iteration loop */	
 		
@@ -615,8 +680,8 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 			Vector_CopyEntries( rVec, qTempVec );
 
 		/* Remove the constant null space, but only if NOT compressible */
-		if( !M_Mat ) {
-			_remove_constant_null_space( qTempVec );
+		if( nullsp_present == True ) {
+			_remove_constant_nullsp( qTempVec );
 		}
 
 
