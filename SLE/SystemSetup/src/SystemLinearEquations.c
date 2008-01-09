@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SystemLinearEquations.c 993 2008-01-04 02:50:16Z DavidLee $
+** $Id: SystemLinearEquations.c 999 2008-01-09 04:13:42Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -57,6 +57,7 @@ const Type SystemLinearEquations_Type = "SystemLinearEquations";
 SystemLinearEquations* SystemLinearEquations_New(
 		Name                                               name,
 		SLE_Solver*                                        solver,
+		NonlinearSolver*				   nlSolver,
 		FiniteElementContext*                              context,
 		Bool                                               isNonLinear,
 		double                                             nonLinearTolerance,
@@ -70,6 +71,7 @@ SystemLinearEquations* SystemLinearEquations_New(
 	SystemLinearEquations_InitAll( 
 			self, 
 			solver,
+			nlSolver,
 			context,
 			isNonLinear,
 			nonLinearTolerance, 
@@ -134,6 +136,7 @@ SystemLinearEquations* _SystemLinearEquations_New(
 void _SystemLinearEquations_Init( 
 		void*                                              sle, 
 		SLE_Solver*                                        solver, 
+		NonlinearSolver*				   nlSolver,
 		FiniteElementContext*                              context, 
 		Bool                                               makeConvergenceFile,  
 		Bool                                               isNonLinear,
@@ -171,6 +174,7 @@ void _SystemLinearEquations_Init(
 	
 	self->comm = comm;
 	self->solver = solver;
+	self->nlSolver = nlSolver;
 	self->stiffnessMatrices = Stg_ObjectList_New();
 	self->forceVectors = Stg_ObjectList_New();
 	self->solutionVectors = Stg_ObjectList_New();
@@ -183,6 +187,7 @@ void _SystemLinearEquations_Init(
 	self->nonLinearMaxIterations    = nonLinearMaxIterations;
 	self->killNonConvergent         = killNonConvergent;
 	self->nonLinearMinIterations    = nonLinearMinIterations;
+	self->nonLinearSolutionType	= nonLinearSolutionType;
 
 	/* BEGIN LUKE'S FRICTIONAL BCS BIT */
 	Stg_asprintf( &self->nlEPName, "%s-nlEP", self->name );
@@ -225,7 +230,8 @@ void _SystemLinearEquations_Init(
 
 void SystemLinearEquations_InitAll( 
 		void*                                              sle, 
-		SLE_Solver*                                        solver, 
+		SLE_Solver*                                        solver,
+		NonlinearSolver*				   nlSolver,
 		FiniteElementContext*                              context, 
 		Bool                                               isNonLinear,
 		double                                             nonLinearTolerance,
@@ -238,6 +244,7 @@ void SystemLinearEquations_InitAll(
 	_SystemLinearEquations_Init( 
 			sle, 
 			solver,
+			nlSolver,
 			context,
 			False, /* TODO: A hack put in place for setting the convergence stream to 'off' if the SLE class is created from within the code, not via an xml */
 			isNonLinear,
@@ -373,6 +380,7 @@ void _SystemLinearEquations_Construct( void* sle, Stg_ComponentFactory* cf, void
 	Bool                    makeConvergenceFile;
 	Iteration_Index         nonLinearMinIterations;                     
 	Name			nonLinearSolutionType;
+	NonlinearSolver*	nlSolver		= NULL;
 	
 	solver = Stg_ComponentFactory_ConstructByKey( cf, self->name, SLE_Solver_Type, SLE_Solver, False, data ) ;
 
@@ -390,10 +398,13 @@ void _SystemLinearEquations_Construct( void* sle, Stg_ComponentFactory* cf, void
 	assert( entryPointRegister );
 
 	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, False, data );
+								/* should this be a PETSc nls?? */
+	nlSolver = Stg_ComponentFactory_ConstructByKey( cf, self->name, NonlinearSolver_Type, NonlinearSolver, False, data );
 
 	_SystemLinearEquations_Init( 
 			self,
 			solver,
+			nlSolver,
 			context,
 			makeConvergenceFile,
 			isNonLinear,
@@ -434,6 +445,7 @@ void _SystemLinearEquations_Build( void* sle, void* _context ) {
 	
 	/* lastly, the solver */
 	Stg_Component_Build( self->solver, self, False );
+	Stg_Component_Build( self->nlSolver, self, False );
 
 	Stream_UnIndentBranch( StgFEM_Debug );
 }
@@ -472,6 +484,7 @@ void _SystemLinearEquations_Initialise( void* sle, void* _context ) {
 
 	/* lastly, the solver */
 	Stg_Component_Initialise( self->solver, self, False );
+	Stg_Component_Initialise( self->nlSolver, self, False );
 	Stream_UnIndentBranch( StgFEM_Debug );
 }
 
@@ -656,15 +669,21 @@ void SystemLinearEquations_ZeroAllVectors( void* sle, void* _context ) {
 
 void SystemLinearEquations_NewtonMFFDExecute( void* sle, void* _context ) {
 	SystemLinearEquations*	self            = (SystemLinearEquations*) sle;
-	Vector*			F		= PETScVector_New( "F" );
-	Vector*			delta_x		= PETScVector_New( "delta x" );
-	NonlinearSolver*	nls		= PETScNonlinearSolver_New( "PETScSNES" );
+	Vector*			F;
+	NonlinearSolver*	nlSolver	= self->nlSolver; //need to build this guy...
 
-	/* calls to non linear solver routines here */
-	NonlinearSolver_SetFunction( nls, F, self->_buildF, _context );
 
-	FreeObject( F );
-	FreeObject( delta_x );
+	Vector_Duplicate( SystemLinearEquations_GetSolutionVectorAt( self, 0 )->vector, &F );
+
+	/* creates the nonlinear solver */
+	NonlinearSolver_SetComm( nlSolver, MPI_COMM_WORLD );
+	NonlinearSolver_SetFunction( nlSolver, F, self->_buildF, _context );
+
+	// set J (jacobian)
+	
+	// set F (residual vector)
+	
+	// call non linear solver func (SNES wrapper)
 }
 
 void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
@@ -778,6 +797,9 @@ void SystemLinearEquations_SetToNonLinear( void* sle ) {
 
 	self->linearExecute = self->_execute;
 	self->_execute = SystemLinearEquations_NonLinearExecute;
+
+	if( !strcmp( self->nonLinearSolutionType, "MatrixFreeNewton" ) )
+		self->_execute = SystemLinearEquations_NewtonMFFDExecute;
 }
 
 void SystemLinearEquations_CheckIfNonLinear( void* sle ) {

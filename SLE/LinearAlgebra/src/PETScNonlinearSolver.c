@@ -63,7 +63,6 @@ PETScNonlinearSolver* PETScNonlinearSolver_New( Name name ) {
 				       name, 
 				       NON_GLOBAL, 
 				       PETScNonlinearSolver_SetComm, 
-				       //PETScNonlinearSolver_Create,
 			               PETScNonlinearSolver_Destroy,
 			               PETScNonlinearSolver_SetFunction,
 			               PETScNonlinearSolver_GetJacobian,
@@ -100,13 +99,6 @@ void _PETScNonlinearSolver_Init( PETScNonlinearSolver* self ) {
 
 	self->snes = PETSC_NULL;
 	self->ksp = PETSC_NULL;
-	PETScNonlinearSolver_SetComm( self, MPI_COMM_WORLD );
-
-	ec = SNESCreate( self->comm, &self->snes );
-
-	/* i assume this is ok?? */
-	ec = KSPSetOperators( self->ksp, J->petscMat, J->petscMat, DIFFERENT_NONZERO_PATTERN );
-	CheckPETScError( ec );
 }
 
 

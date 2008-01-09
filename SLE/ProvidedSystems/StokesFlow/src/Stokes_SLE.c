@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Stokes_SLE.c 964 2007-10-11 08:03:06Z SteveQuenette $
+** $Id: Stokes_SLE.c 999 2008-01-09 04:13:42Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -214,6 +214,7 @@ void Stokes_SLE_InitAll(
 	SystemLinearEquations_InitAll( 
 			self, 
 			solver,
+			NULL, /* not sure if a non linear solver is required for the stokes SLE */
 			context,
 			isNonLinear,
 			nonLinearTolerance, 
