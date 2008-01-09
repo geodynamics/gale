@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Stokes_SLE_UzawaSolver.c 998 2008-01-08 23:33:39Z DavidMay $
+** $Id: Stokes_SLE_UzawaSolver.c 1000 2008-01-09 22:29:56Z DavidMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -336,16 +336,17 @@ void _Stokes_SLE_UzawaSolver_SolverSetup( void* solver, void* stokesSLE ) {
 
 Bool _check_if_constant_nullsp_present( 
 	Stokes_SLE_UzawaSolver* self, 
-	Matrix *_K, Matrix *_G, Matrix *_M, Vector *_p, Vector *_t1, Vector *_ustar, MatrixSolver *_ksp )
+	Matrix *_K, Matrix *_G, Matrix *_M, 
+	Vector *_t1, Vector *_ustar,  Vector *_q1, Vector *_q2,
+	MatrixSolver *_ksp )
 {
-    Vec l,r;
     PetscInt N;
     PetscScalar sum;
     PetscReal nrm;
     Bool nullsp_present;
 
     Mat K,G,M;
-    Vec p,t1,ustar;
+    Vec t1,ustar,r,l;
     KSP ksp;
 
     /* Get Petsc objects */
@@ -356,15 +357,14 @@ Bool _check_if_constant_nullsp_present(
 	M = FetchPetscMatrix( _M );
     }
 
-    p = FetchPetscVector( _p );
     t1 = FetchPetscVector( _t1 );
     ustar = FetchPetscVector( _ustar );
+    r = FetchPetscVector(_q1);    
+    l = FetchPetscVector(_q2);
 
     ksp = FetchPetscKSP( _ksp );
 
-    VecDuplicate(p,&r);
-    VecDuplicate(p,&l);
-    VecGetSize(p,&N);
+    VecGetSize(l,&N);
     sum  = 1.0/N;
     VecSet(l,sum);
 
@@ -389,8 +389,6 @@ Bool _check_if_constant_nullsp_present(
     }
     Journal_PrintfL( self->debug, 2, "|| [S]{1} || = %G\n", nrm );
 
-    VecDestroy(r);
-    VecDestroy(l);
 
     return nullsp_present;
 }
@@ -656,7 +654,7 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	Vector_AddScaled( rVec, -1.0, hVec );
 			
 	/* Check for existence of constant null space */
-	nullsp_present = _check_if_constant_nullsp_present( self, K_Mat,G_Mat,M_Mat, qVec, fTempVec, vStarVec, velSolver );
+	nullsp_present = _check_if_constant_nullsp_present( self, K_Mat,G_Mat,M_Mat, fTempVec,vStarVec,qTempVec,sVec, velSolver );
 			
 	/* STEP 4: Preconditioned conjugate gradient iteration loop */	
 		
