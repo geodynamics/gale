@@ -147,7 +147,8 @@ void Mesh_RegularAlgorithms_SetMesh( void* algorithms, void* mesh ) {
 void Mesh_RegularAlgorithms_Update( void* algorithms ) {
 	Mesh_RegularAlgorithms*	self = (Mesh_RegularAlgorithms*)algorithms;
 	unsigned		nDims;
-	double			minSep;
+	Grid*			vGrid;
+	int			ii;
 
 	assert( self && Stg_CheckType( self, Mesh_RegularAlgorithms ) );
 	assert( self->mesh );
@@ -156,11 +157,14 @@ void Mesh_RegularAlgorithms_Update( void* algorithms ) {
 	_Mesh_Algorithms_Update( self );
 
 	nDims = Mesh_GetDimSize( self->mesh );
-	self->sep = AllocArray( double, nDims );
 	self->minCrd = AllocArray( double, nDims );
 	self->maxCrd = AllocArray( double, nDims );
-	Mesh_GetMinimumSeparation( self->mesh, &minSep, self->sep );
 	Mesh_GetGlobalCoordRange( self->mesh, self->minCrd, self->maxCrd );
+
+	self->sep = AllocArray( double, nDims );
+	vGrid = *Mesh_GetExtension( self->mesh, Grid**, "vertexGrid" );
+	for( ii = 0; ii < nDims; ii++ )
+		self->sep[ii] = (self->maxCrd[ii] - self->minCrd[ii]) / (vGrid->sizes[ii] - 1);
 }
 
 Bool _Mesh_RegularAlgorithms_Search( void* algorithms, void* _mesh, double* point, 
