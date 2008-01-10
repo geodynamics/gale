@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SystemLinearEquations.c 999 2008-01-09 04:13:42Z DavidLee $
+** $Id: SystemLinearEquations.c 1001 2008-01-10 06:05:02Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -445,7 +445,8 @@ void _SystemLinearEquations_Build( void* sle, void* _context ) {
 	
 	/* lastly, the solver */
 	Stg_Component_Build( self->solver, self, False );
-	Stg_Component_Build( self->nlSolver, self, False );
+	if( self->nlSolver )
+		Stg_Component_Build( self->nlSolver, self, False );
 
 	Stream_UnIndentBranch( StgFEM_Debug );
 }
@@ -484,7 +485,8 @@ void _SystemLinearEquations_Initialise( void* sle, void* _context ) {
 
 	/* lastly, the solver */
 	Stg_Component_Initialise( self->solver, self, False );
-	Stg_Component_Initialise( self->nlSolver, self, False );
+	if( self->nlSolver )
+		Stg_Component_Initialise( self->nlSolver, self, False );
 	Stream_UnIndentBranch( StgFEM_Debug );
 }
 
