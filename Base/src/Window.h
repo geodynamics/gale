@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: Window.h 658 2007-02-05 00:58:07Z CecileDuboz $
+** $Id: Window.h 754 2008-01-11 05:41:53Z RobertTurnbull $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -148,4 +148,5 @@
 	void lucWindow_BeginEventLoop( void* window ) ;
 	void lucWindow_QuitEventLoop( void* window ) ;
 	void lucWindow_ToggleApplicationQuit( void* window ) ;
+	void lucWindow_Resize( void* window, Pixel_Index newWidth, Pixel_Index newHeight ) ;
 #endif

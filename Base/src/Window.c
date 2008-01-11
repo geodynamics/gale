@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: Window.c 740 2007-10-11 08:05:31Z SteveQuenette $
+** $Id: Window.c 754 2008-01-11 05:41:53Z RobertTurnbull $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -883,6 +883,29 @@ void lucWindow_ToggleApplicationQuit( void* window ) {
 
 	lucWindow_QuitEventLoop( self );
 	self->toggleApplicationQuit = True;
+}
+
+void lucWindow_Resize( void* window, Pixel_Index newWidth, Pixel_Index newHeight ) {
+	lucWindow*       self      = (lucWindow*) window;
+	Viewport_Index   viewport_I;
+	Viewport_Index   viewportCount = self->viewportCount;
+	lucViewportInfo* viewportInfo;
+	double           xScale = (double) newWidth  / (double) self->width;
+	double           yScale = (double) newHeight / (double) self->height;
+
+	for ( viewport_I = 0 ; viewport_I < viewportCount ; viewport_I++ ) {
+		viewportInfo = &self->viewportInfoList[ viewport_I ];
+		
+		viewportInfo->startx = (Pixel_Index) ( xScale * (double) viewportInfo->startx + 0.5 );
+		viewportInfo->width  = (Pixel_Index) ( xScale * (double) viewportInfo->width  + 0.5 );
+		viewportInfo->starty = (Pixel_Index) ( yScale * (double) viewportInfo->starty + 0.5 );
+		viewportInfo->height = (Pixel_Index) ( yScale * (double) viewportInfo->height + 0.5 );
+		viewportInfo->needsToDraw = True;
+	}
+	
+	self->width = newWidth;
+	self->height = newHeight;
+
 }
 
 #endif /* HAVE_GL */

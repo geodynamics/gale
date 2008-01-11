@@ -524,8 +524,7 @@ static pascal OSStatus lucCarbonWindow_EventHandler(EventHandlerCallRef nextHand
 
 			       self->offsetX = (Pixel_Index) rect.left;
 			       self->offsetY = (Pixel_Index) rect.top; 
-			       self->width   = (Pixel_Index) (rect.right - rect.left);
-			       self->height  = (Pixel_Index) (rect.bottom - rect.top); 
+			       lucWindow_Resize( self, (Pixel_Index) (rect.right - rect.left), (Pixel_Index) (rect.bottom - rect.top) );
 			       
 			       if (self->windowIsVisible && self->graphicsContext)
 				      lucCarbonWindow_Draw(self); 
