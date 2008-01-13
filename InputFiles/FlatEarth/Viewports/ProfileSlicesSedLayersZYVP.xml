@@ -1,0 +1,476 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<list name="plugins" mergeType="merge">
+		<param>lucPlugin</param>
+	</list>
+
+	<struct name="components" mergeType="merge">
+					
+		<struct name="PSSLZYFrontViewCamera">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">1</param>
+			<param name="coordY">0.5</param>
+	   		<param name="coordZ">-2</param>
+	 		<param name="focalPointX">1</param>
+			<param name="focalPointY">0.5</param>
+			<param name="focalPointZ">1</param>
+	 		<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+	 		<param name="stereoType">Mono</param>
+	 		<param name="eyeSeparation">0.2</param>
+	 		<param name="focalLength">0</param>
+	 	</struct>
+
+		<struct name="PSSLZYSideViewCamera">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">4</param>
+			<param name="coordY">0.5</param>
+			<param name="coordZ">1</param>
+			<param name="focalPointX">1</param>
+	 		<param name="focalPointY">0.5</param>
+			<param name="focalPointZ">1</param>
+			<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+			<param name="stereoType">Mono</param>
+			<param name="eyeSeparation">0.2</param>
+			<param name="focalLength">0</param>
+		</struct>
+	
+		<struct name="PSSLZYSideViewProfile1Camera">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">2</param>
+			<param name="coordY">0.5</param>
+	   		<param name="coordZ">1</param>
+	 		<param name="focalPointX">0</param>
+			<param name="focalPointY">0.5</param>
+			<param name="focalPointZ">1.0</param>
+	 		<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+	 		<param name="stereoType">Mono</param>
+	 		<param name="eyeSeparation">0.2</param>
+	 		<param name="focalLength">0</param>
+	 	</struct>
+
+		<struct name="PSSLZYSideViewProfile2Camera">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">2.5</param>
+			<param name="coordY">0.5</param>
+			<param name="coordZ">1</param>
+	 		<param name="focalPointX">0.5</param>
+			<param name="focalPointY">0.5</param>
+			<param name="focalPointZ">1</param>
+	 		<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+	 		<param name="stereoType">Mono</param>
+	 		<param name="eyeSeparation">0.2</param>
+	 		<param name="focalLength">0</param>
+	 	</struct>
+
+		<struct name="PSSLZYSideViewProfile3Camera">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">3</param>
+			<param name="coordY">0.5</param>
+	   		<param name="coordZ">1</param>
+	 		<param name="focalPointX">1</param>
+			<param name="focalPointY">0.5</param>
+			<param name="focalPointZ">1</param>
+	 		<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+	 		<param name="stereoType">Mono</param>
+	 		<param name="eyeSeparation">0.2</param>
+	 		<param name="focalLength">0</param>
+	 	</struct>
+
+		<struct name="PSSLZYSideViewProfile4Camera">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">3.5</param>
+			<param name="coordY">0.5</param>
+	   		<param name="coordZ">1</param>
+	 		<param name="focalPointX">1.5</param>
+			<param name="focalPointY">0.5</param>
+			<param name="focalPointZ">1</param>
+	 		<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+	 		<param name="stereoType">Mono</param>
+	 		<param name="eyeSeparation">0.2</param>
+	 		<param name="focalLength">0</param>
+	 	</struct>
+
+		<struct name="PSSLZYSideViewProfile5Camera">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">4</param>
+			<param name="coordY">0.5</param>
+			<param name="coordZ">1</param>
+	 		<param name="focalPointX">2</param>
+			<param name="focalPointY">0.5</param>
+			<param name="focalPointZ">1</param>
+	 		<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+	 		<param name="stereoType">Mono</param>
+	 		<param name="eyeSeparation">0.2</param>
+	 		<param name="focalLength">0</param>
+	 	</struct>
+
+		<struct name="PSSLZYmaterialColourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours"> #00FFFF #6600FF #00BB00 #9933FF #DDDD66 #9933FF #DDDD66 #9933FF #DDDD66 #9933FF #DDDD66 </param>
+			<param name="dynamicRange">True</param>
+		</struct>
+	
+		<struct name="PSSLZYCrustSlice1">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">materialSwarm-MaterialIndex</param>
+			<param name="ColourMap">PSSLZYmaterialColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">GreaterThan</param>
+			<param name="maskValue">1.0</param>
+			<param name="pointSize">2.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">0.05</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+		<struct name="PSSLZYCrustSlice2">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">materialSwarm-MaterialIndex</param>
+			<param name="ColourMap">PSSLZYmaterialColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">GreaterThan</param>
+			<param name="maskValue">1.0</param>
+			<param name="pointSize">2.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">0.5</param>
+			<param name="maxPositionX">0.55</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+		<struct name="PSSLZYCrustSlice3">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">materialSwarm-MaterialIndex</param>
+			<param name="ColourMap">PSSLZYmaterialColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">GreaterThan</param>
+			<param name="maskValue">1.0</param>
+			<param name="pointSize">2.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">1.0</param>
+			<param name="maxPositionX">1.05</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+		<struct name="PSSLZYCrustSlice4">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">materialSwarm-MaterialIndex</param>
+			<param name="ColourMap">PSSLZYmaterialColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">GreaterThan</param>
+			<param name="maskValue">1.0</param>
+			<param name="pointSize">2.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">1.50</param>
+			<param name="maxPositionX">1.55</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+	
+		<struct name="PSSLZYCrustSlice5">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">materialSwarm-MaterialIndex</param>
+			<param name="ColourMap">PSSLZYmaterialColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">GreaterThan</param>
+			<param name="maskValue">1.0</param>
+			<param name="pointSize">2.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">1.95</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+	
+		<struct name="PSSLZYborder">
+			<param name="Type">lucFieldVariableBorder</param>
+			<param name="FieldVariable">VelocityField</param>
+		</struct>
+
+		<struct name="PSSLZYx0Title">
+			<param name="Type">lucTitle</param>
+			<param name="string"> x = 0.00 </param>
+		</struct>
+	
+		<struct name="PSSLZYx05Title">
+			<param name="Type">lucTitle</param>
+			<param name="string">x = 0.50 </param>
+		</struct>
+	
+		<struct name="PSSLZYx1Title">
+			<param name="Type">lucTitle</param>
+			<param name="string">x = 1.00 </param>
+		</struct>
+	
+		<struct name="PSSLZYx15Title">
+			<param name="Type">lucTitle</param>
+			<param name="string">x = 1.50 </param>
+		</struct>
+	
+		<struct name="PSSLZYx2Title">
+			<param name="Type">lucTitle</param>
+			<param name="string">x = 2.00</param>
+		</struct>
+
+		<struct name="PSSLZYAxis">
+			<param name="Type">lucAxis</param>
+			<param name="originX"> -0.05</param>
+			<param name="originY"> -0.05</param>
+			<param name="originZ"> -0.05</param>
+		</struct>	
+	
+
+		<struct name="PSSLZYProfile1PerspViewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">PSSLZYSideViewCamera</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>PSSLZYborder</param>
+				-->
+				<param>PSSLZYx0Title</param>
+				<param>PSSLZYCrustSlice1</param>
+			</list>
+	 	</struct>
+
+		<struct name="PSSLZYProfile2PerspViewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">PSSLZYSideViewCamera</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>PSSLZYborder</param>
+				-->
+				<param>PSSLZYx05Title</param>
+				<param>PSSLZYCrustSlice2</param>
+			</list>
+	 	</struct>
+
+		<struct name="PSSLZYProfile3PerspViewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">PSSLZYSideViewCamera</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>PSSLZYborder</param>
+				-->
+				<param>PSSLZYx1Title</param>
+				<param>PSSLZYCrustSlice3</param>
+			</list>
+	 	</struct>
+
+		
+		<struct name="PSSLZYProfile4PerspViewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">PSSLZYSideViewCamera</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>PSSLZYborder</param>
+				-->
+				<param>PSSLZYx15Title</param>
+				<param>PSSLZYCrustSlice4</param>
+			</list>
+	 	</struct>
+
+		<struct name="PSSLZYProfile5PerspViewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">PSSLZYSideViewCamera</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>PSSLZYborder</param>
+				-->
+				<param>PSSLZYx2Title</param>
+				<param>PSSLZYCrustSlice5</param>
+			</list>
+	 	</struct>
+		
+		<struct name="PSSLZYProfile1Viewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">PSSLZYSideViewProfile1Camera</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>PSSLZYborder</param>
+				-->
+				<param>PSSLZYx0Title</param>
+				<param>PSSLZYCrustSlice1</param>
+			</list>
+	 	</struct>
+
+		<struct name="PSSLZYProfile2Viewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">PSSLZYSideViewProfile2Camera</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<paramPSSLZY>border</param>
+				-->
+				<param>PSSLZYx05Title</param>
+				<param>PSSLZYCrustSlice2</param>
+			</list>
+	 	</struct>
+
+		<struct name="PSSLZYProfile3Viewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">PSSLZYSideViewProfile3Camera</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>PSSLZYborder</param>
+				-->
+				<param>PSSLZYx1Title</param>
+				<param>PSSLZYCrustSlice3</param>
+			</list>
+	 	</struct>
+
+		<struct name="PSSLZYProfile4Viewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">PSSLZYSideViewProfile4Camera</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>PSSLZYborder</param>
+				-->
+				<param>PSSLZYx15Title</param>
+				<param>PSSLZYCrustSlice4</param>
+			</list>
+	 	</struct>
+
+		<struct name="PSSLZYProfile5Viewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">PSSLZYSideViewProfile5Camera</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>PSSLZYborder</param>
+				-->
+				<param>PSSLZYx2Title</param>
+				<param>PSSLZYCrustSlice5</param>
+			</list>
+	 	</struct>
+			
+		<struct name="PSSLZYFrontViewport">
+	       		<param name="Type">lucViewport</param>
+			<param name="Camera">PSSLZYFrontViewCamera</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<param>PSSLZYborder</param>
+				<param>PSSLZYCrustSlice1</param>
+				<param>PSSLZYCrustSlice2</param>
+				<param>PSSLZYCrustSlice3</param>
+				<param>PSSLZYCrustSlice4</param>
+				<param>PSSLZYCrustSlice5</param>
+				<param>PSSLZYAxis</param>
+			</list>
+		</struct>
+	
+		<struct name="PSSLZYrenderingEngine">
+			<param name="Type">lucRenderingEngineGL</param>
+		</struct>
+	
+		<struct name="PSSLZYpngOutput">
+			<param name="Type">lucOutputPNG</param>
+		</struct>
+			
+		<struct name="PSSLZYProfilePerspWindow">
+			<param name="Type">lucDefaultWindow</param>
+			<param name="RenderingEngine">PSSLZYrenderingEngine</param>
+			<param name="OutputFormat">PSSLZYpngOutput</param>
+			<param name="height">1008</param>
+			<param name="width">304</param>
+			<param name="interactive">f</param>
+			<param name="backgroundColour">White</param>
+			<list name="Viewport">
+				<param>PSSLZYProfile1PerspViewport</param> 
+				<param>PSSLZYProfile2PerspViewport</param>
+				<param>PSSLZYProfile3PerspViewport</param>
+				<param>PSSLZYProfile4PerspViewport</param>
+				<param>PSSLZYProfile5PerspViewport</param>
+			</list>
+		</struct>
+
+
+		<struct name="PSSLZYProfileWindow">
+			<param name="Type">lucDefaultWindow</param>
+			<param name="RenderingEngine">PSSLZYrenderingEngine</param>
+			<param name="OutputFormat">PSSLZYpngOutput</param>
+			<param name="height">1008</param>
+			<param name="width">304</param>
+			<param name="interactive">f</param>
+			<param name="backgroundColour">White</param>
+			<list name="Viewport">
+				<param>PSSLZYProfile1Viewport</param> 
+				<param>PSSLZYProfile2Viewport</param>
+				<param>PSSLZYProfile3Viewport</param>
+				<param>PSSLZYProfile4Viewport</param>
+				<param>PSSLZYProfile5Viewport</param>
+			</list>
+		</struct>
+
+		<struct name="PSSLZYFrontWindow">
+	                <param name="Type">lucDefaultWindow</param>
+	                <param name="RenderingEngine">PSSLZYrenderingEngine</param>
+			<param name="OutputFormat">PSSLZYpngOutput</param>
+			<param name="height">592</param>
+			<param name="width">1008</param>
+			<param name="interactive">f</param>
+			<param name="backgroundColour">White</param>
+			<list name="Viewport">
+	      			<param>PSSLZYFrontViewport</param>
+			</list>
+		</struct>
+			
+		<struct name="PSSLZYProfileWindowMovie">
+			<param name="Type">lucEncoderLibfame</param>
+			<param name="Window">PSSLZYProfileWindow</param>
+		</struct>
+		<struct name="PSSLZYProfilePerspWindowMovie">
+			<param name="Type">lucEncoderLibfame</param>
+			<param name="Window">PSSLZYProfilePerspWindow</param>
+		</struct>
+ 
+		<struct name="PSSLZYFrontWindowMovie">
+			<param name="Type">lucEncoderLibfame</param>
+			<param name="Window">PSSLZYFrontWindow</param>
+		</struct>
+ 
+	</struct>
+
+</StGermainData>
