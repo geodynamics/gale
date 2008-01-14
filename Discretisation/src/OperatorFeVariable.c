@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: OperatorFeVariable.c 964 2007-10-11 08:03:06Z SteveQuenette $
+** $Id: OperatorFeVariable.c 1003 2008-01-14 01:10:25Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -607,7 +607,8 @@ void OperatorFeVariable_BinaryValueAtNodeFunc( void* feVariable, Node_DomainInde
 		FeVariable_GetValueAtNode( field0, dNode_I, fieldValue0 );
 		FeVariable_GetValueAtNode( field1, dNode_I, fieldValue1 );
 	}
-	else {
+	/* field variables are using different meshes, so interpolate the values of each based on the global coord */
+	else {  
 		coord = Mesh_GetVertex( self->feMesh, dNode_I );
 		assert( Mesh_SearchElements( field0->feMesh, coord, &field0Element ) );
 		FeMesh_CoordGlobalToLocal( field0->feMesh, field0Element, coord, field0LocalCoord );
