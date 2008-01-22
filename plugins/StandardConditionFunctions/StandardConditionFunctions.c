@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StandardConditionFunctions.c 997 2008-01-08 05:18:13Z LukeHodkinson $
+** $Id: StandardConditionFunctions.c 1004 2008-01-22 00:44:16Z RebeccaFarrington $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -65,6 +65,8 @@ void _StgFEM_StandardConditionFunctions_Construct( void* component, Stg_Componen
 	
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SimpleShear, "Velocity_SimpleShear" );
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+        condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SimpleShearInverted, "Velocity_SimpleShearInverted" );
+        ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_Extension, "Velocity_Extension" );
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 
@@ -100,6 +102,9 @@ void _StgFEM_StandardConditionFunctions_Construct( void* component, Stg_Componen
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_EdgeDriveConvectionIC, "EdgeDriveConvectionIC" );
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+
+        condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ThermalEdgeDriveConvectionIC, "ThermalEdgeDriveConvectionIC" );
+        ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 	
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_AnalyticalTemperatureIC, "AnalyticalTemperatureIC" );
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
@@ -299,6 +304,33 @@ void StgFEM_StandardConditionFunctions_SimpleShear( Node_LocalIndex node_lI, Var
 
 	*result = factor * (coord[ J_AXIS ] - centre);
 }
+
+void StgFEM_StandardConditionFunctions_SimpleShearInverted( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+        DomainContext*  context            = (DomainContext*)_context;
+        Dictionary*             dictionary         = context->dictionary;
+        FeVariable*             feVariable         = NULL;
+        FeMesh*                 mesh               = NULL;
+        double*                 result             = (double*) _result;
+        double*                 coord;
+        double                  centre;
+        double                  factor;
+        double                  yAxisInvert;
+
+        feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
+        mesh       = feVariable->feMesh;
+
+        /* Find Centre of Solid Body Rotation */
+        centre = Dictionary_GetDouble_WithDefault( dictionary, "SimpleShearCentreY", 0.0 );
+        factor = Dictionary_GetDouble_WithDefault( dictionary, "SimpleShearFactor", 1.0 );
+
+        /* Find coordinate of node */
+        coord = Mesh_GetVertex( mesh, node_lI );
+
+        yAxisInvert = coord[ J_AXIS ] * -1.0 - 1.0;
+
+        *result = factor * ( 1.0 - coord[ J_AXIS ] ) ;
+}
+
 
 void StgFEM_StandardConditionFunctions_Extension( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
 	DomainContext*	context            = (DomainContext*)_context;
@@ -755,6 +787,49 @@ void StgFEM_StandardConditionFunctions_EdgeDriveConvectionIC( Node_LocalIndex no
 	/* eqn 1 from S.D.King & D.L. Anderson, "Edge-drive convection", EPSL 160 (1998) 289-296 */        
 	
 	*result = 1.0 + perturbationAmplitude * sin( M_PI * coord[ J_AXIS ] ) * cos( 0.5 * M_PI * ( coord[ I_AXIS ] + thermalAnomalyOffset ) );
+}
+
+void StgFEM_StandardConditionFunctions_ThermalEdgeDriveConvectionIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result )
+{
+        DomainContext*  context = (DomainContext*)_context;
+        Dictionary*             dictionary         = context->dictionary;
+        FeVariable*             feVariable = NULL;
+        FeMesh*                 mesh = NULL;
+        double*                 result = (double*) _result;
+        double*                 coord;
+        int                     dim;
+        double                  contStartX, contEndX;
+        double                  contStartY, contEndY;
+        double                  contStartZ, contEndZ;
+        double                  minY, maxY, interiorTemp;
+
+        feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
+        mesh       = feVariable->feMesh;
+        coord = Mesh_GetVertex( mesh, node_lI );
+        
+	dim = Dictionary_GetInt_WithDefault( dictionary, "dim", 0.0 );
+        contStartX = Dictionary_GetDouble_WithDefault( dictionary, "contStartX", 0.0 );
+        contEndX = Dictionary_GetDouble_WithDefault( dictionary, "contEndX", 0.0 );
+        contStartY = Dictionary_GetDouble_WithDefault( dictionary, "contStartY", 0.0 );
+        contEndY = Dictionary_GetDouble_WithDefault( dictionary, "contEndY", 0.0 );
+        minY = Dictionary_GetDouble_WithDefault( dictionary, "minY", 0.0 );
+        maxY = Dictionary_GetDouble_WithDefault( dictionary, "maxY", 0.0 );
+	interiorTemp = Dictionary_GetDouble_WithDefault( dictionary, "interiorTemp", 1.0 );
+        if ( dim == 3 ) {
+                contStartZ = Dictionary_GetDouble_WithDefault( dictionary, "contStartZ", 0.0 );
+                contEndZ = Dictionary_GetDouble_WithDefault( dictionary, "contEndZ", 0.0 );
+        }
+
+        if(( coord[I_AXIS] >= contStartX && coord[ I_AXIS ] <= contEndX ) && ( coord[J_AXIS] >= contStartY && coord[ J_AXIS ] <= contEndY )) {
+                if ( dim == 3 ) {
+                        if ( coord[K_AXIS] >= contStartZ && coord[ K_AXIS ] <= contEndZ )
+                                        *result = 0.0;
+                        else
+                                        *result = interiorTemp;
+                }
+        }
+        else
+                        *result = interiorTemp;
 }
 
 void StgFEM_StandardConditionFunctions_SinusoidalExtension( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
