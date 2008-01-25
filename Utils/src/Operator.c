@@ -438,18 +438,6 @@ void Operator_TensorInvariant( void* operator, double* operand0, double* result 
 	*result = TensorArray_2ndInvariant( operand0, self->dim );
 }
 
-void Operator_RaiseToPower( void* operator, double* operand0, double* operand1, double* result ) {
-	Operator*     self = (Operator*) operator;
-	Index         val_I;
-
-	Operator_FirewallUnary( self );
-
-	for( val_I = 0; val_I < self->operandDofs ; val_I++ ) {	
-		result[val_I] = pow( operand0[val_I], *operand1 );
-	}
-
-}
-
 void Operator_ScalarByVectorMultiplication( void* operator, double* operand0, double* operand1, double* result ) {
 	Operator*     self = (Operator*) operator;
 	Index         val_I;
@@ -575,11 +563,6 @@ Operator* Operator_NewFromName(
 		resultDofs = 1;
 		numberOfOperands = 1;
 		_carryOut = Operator_Divergence;
-	}
-	else if ( ! strcasecmp( name, "RaiseToPower" ) ){
-		resultDofs = dim;
-		numberOfOperands = 2;
-		_carryOut = Operator_RaiseToPower;
 	}
 	else if ( ! strcasecmp( name, "ScalarByVectorMultiplication" ) ){
 		resultDofs = dim;
