@@ -107,6 +107,8 @@ typedef void (Operator_CarryOutBinaryOperationFunction) ( void* operatorObject, 
 	void Operator_VerticalVorticity( void* operatorObject, double* velocityGradient, double* result ) ;
 	void Operator_Divergence( void* operatorObject, double* velocityGradient, double* result ) ;
 	void Operator_TensorInnerProduct( void* operatorObject, double* operand0, double* operand1, double* result );
+	void Operator_RaiseToPower( void* operatorObject, double* operand0, double* operand1, double* result );
+	void Operator_ScalarByVectorMultiplication( void* operatorObject, double* operand0, double* operand1, double* result );
 
 	Operator* Operator_NewFromName( 
 		Name                                       name, 		
