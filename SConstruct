@@ -1,5 +1,8 @@
 import os, glob
 
+# Check SCons version.
+EnsureSConsVersion(0, 97)
+
 #
 # Setup our option database.
 #
