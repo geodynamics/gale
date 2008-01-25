@@ -22,10 +22,20 @@ def appendPaths(env, key):
 def setupPETScDirs(env):
     if 'petscDir' not in env._dict:
         return
-    petscArch = 'linux-gnu-c-debug' # TODO: Read from petscconf
+
+    # Read the PETSc architecture.
+    petscconf = os.path.join(env['petscDir'], 'bmake', 'petscconf')
+    if not os.path.exists(petscconf):
+        print "Can't find 'petscconf'."
+        env.Exit()
+    f = file(petscconf, 'r')
+    arch = f.readline().split('=')[1][:-1]
+    f.close()
+
+    # Setup dirs.
     env.AppendUnique(CPPPATH=[env['petscDir'] + '/include'])
-    env.AppendUnique(CPPPATH=[env['petscDir'] + '/bmake/' + petscArch])
-    env.AppendUnique(LIBPATH=[env['petscDir'] + '/lib/' + petscArch])
+    env.AppendUnique(CPPPATH=[env['petscDir'] + '/bmake/' + arch])
+    env.AppendUnique(LIBPATH=[env['petscDir'] + '/lib/' + arch])
 
 #
 # Custom configuration checks.
