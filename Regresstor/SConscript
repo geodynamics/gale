@@ -1,0 +1,9 @@
+import os
+Import('env')
+
+# Execute subdirectory SConscripts.
+objs = SConscript('libRegresstor/SConscript', exports='env')
+if env['csoap']:
+    objs += SConscript('ClientPrograms/SConscript', exports='env')
+
+Return('objs')

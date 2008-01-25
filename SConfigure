@@ -1,0 +1,149 @@
+import os, sys
+Import('env opts')
+
+#
+# Helper functions.
+#
+
+def appendPaths(env, key):
+    if key + 'Dir' in env._dict:
+        tmp = key + 'Dir'
+        env.AppendUnique(CPPPATH=[env[tmp] + '/include'])
+        env.AppendUnique(LIBPATH=[env[tmp] + '/lib'])
+        return
+
+    if key + 'IncDir' in env._dict:
+        tmp = key + 'IncDir'
+        env.AppendUnique(CPPPATH=[env[tmp]])
+    if key + 'LibDir' in env._dict:
+        tmp = key + 'LibDir'
+        env.AppendUnique(LIBPATH=[env[tmp]])
+
+def setupPETScDirs(env):
+    if 'petscDir' not in env._dict:
+        return
+    petscArch = 'linux-gnu-c-debug' # TODO: Read from petscconf
+    env.AppendUnique(CPPPATH=[env['petscDir'] + '/include'])
+    env.AppendUnique(CPPPATH=[env['petscDir'] + '/bmake/' + petscArch])
+    env.AppendUnique(LIBPATH=[env['petscDir'] + '/lib/' + petscArch])
+
+#
+# Custom configuration checks.
+#
+
+def CheckMPICH(ctx):
+    src = """
+#include<mpi.h>
+int main(int argc, char** argv) {
+MPI_Init(&argc, &argv);
+MPI_Finalize();
+return 0;
+}
+"""
+    env = ctx.env
+    ctx.Message('Checking for MPICH... ')
+
+    env.Replace(LIBS=['mpich'])
+    res = ctx.TryLink(src, '.c')
+    if res:
+        ctx.Result(res)
+        return res
+
+    env.Replace(LIBS=['mpich', 'pmpich'])
+    res = ctx.TryLink(src, '.c')
+    if res:
+        ctx.Result(res)
+        return res
+
+    env.Replace(LIBS=['mpich', 'rt'])
+    res = ctx.TryLink(src, '.c')
+    if res:
+        ctx.Result(res)
+        return res
+
+    env.Replace(LIBS=['mpich', 'pmpich', 'rt'])
+    res = ctx.TryLink(src, '.c')
+
+    ctx.Result(res)
+    return res
+
+#
+# Configuration script.
+#
+
+# Do configuration.
+if not env.GetOption('clean'):
+    cfg = Configure(env,
+                    custom_tests={'CheckMPICH':
+                                      CheckMPICH})
+
+    # Check for the C math library.
+    if not cfg.CheckLib('m'):
+        print "Couldn't find the C standard math libaray."
+        env.Exit()
+
+    # Check for MPI.
+    appendPaths(env, 'mpi')
+    if not cfg.CheckMPICH():
+        print "\nCouldn't find MPICH in a location the compiler knew"
+        print "about. Please specify your MPICH installation on the"
+        print "commandline using any of the following:"
+        print "  mpiDir=<path to MPICH base directory>"
+        print "  mpiIncDir=<path to MPICH header directory>"
+        print "  mpiLibDir=<path to MPICH library directory>\n"
+        env.Exit()
+    opts.Save('config.cache', env)
+
+    # Check for PETSc.
+    setupPETScDirs(env)
+    if not cfg.CheckLibWithHeader('petsc', 'petsc.h', 'C') or \
+            not cfg.CheckLibWithHeader('petscvec', 'petscvec.h', 'C') or \
+            not cfg.CheckLibWithHeader('petscmat', 'petscmat.h', 'C') or \
+            not cfg.CheckLibWithHeader('petscksp', 'petscksp.h', 'C'):
+        print "\nCouldn't find PETSc in a location the compiler knew"
+        print "about. Please specify your PETSc installation on the"
+        print "commandline using any of the following:"
+        print "  petscDir=<path to PETSc base directory>"
+        print "  petscIncDir=<path to PETSc header directory>"
+        print "  petscLibDir=<path to PETSc library directory>\n"
+        env.Exit()
+    opts.Save('config.cache', env)
+
+    # Check for libXML2.
+    appendPaths(env, 'libxml2')
+    if not cfg.CheckLibWithHeader('xml2', 'libxml2/libxml/xmlIO.h', 'C'):
+        print "\nCouldn't find libXML2 in a location the compiler knew"
+        print "about. Please specify your libXML2 installation on the"
+        print "commandline using any of the following:"
+        print "  libxml2Dir=<path to libXML2 base directory>"
+        print "  libxml2IncDir=<path to libXML2 header directory>"
+        print "  libxml2LibDir=<path to libXML2 library directory>\n"
+        env.Exit()
+    opts.Save('config.cache', env)
+
+    # Extract revision number.
+    svnPath = os.path.join('.svn', 'entries')
+    if not os.path.exists(svnPath):
+        print "\nYou appear to be building the code from something"
+        print "that wasn't checked out of a repository. Bummer."
+        env.Exit()
+    f = file(svnPath, 'r')
+    f.readline()
+    f.readline()
+    f.readline()
+    ver = '\\"' + str(int(f.readline())) + '\\"'
+    env.Append(CPPDEFINES=[('VERSION', ver)])
+    f.close()
+
+    # Add module extension to build commands.
+    ext = '\\"' + env['SHLIBSUFFIX'][1:] + '\\"'
+    env.Append(CPPDEFINES=[('MODULE_EXT', ext)])
+
+    # Add the library directory.
+    libDir = '\\"' + os.path.join(Dir('.').abspath, 'build', 'lib') + '\\"'
+    env.Append(CPPDEFINES=[('LIB_DIR', libDir)])
+
+    # Setup the dynamic library search paths.
+    env.Append(RPATH=[os.path.join(Dir('.').abspath, 'build', 'lib')])
+
+    env = cfg.Finish()

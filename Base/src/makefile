@@ -24,7 +24,7 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 4200 2007-12-05 04:11:33Z LukeHodkinson $
+## $Id: makefile 4205 2008-01-25 05:04:49Z LukeHodkinson $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -41,8 +41,7 @@ includes = StGermain/Base
 
 SRCS = \
 	Init.c \
-	Finalise.c \
-	main.c
+	Finalise.c
 
 HDRS = \
 	Init.h \

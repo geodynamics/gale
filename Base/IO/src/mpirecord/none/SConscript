@@ -1,0 +1,6 @@
+import os, glob
+Import('env')
+
+# Copy headers to our build directory.
+env.Install('#build/include/StGermain/Base/IO/mpirecord',
+            'mpimessaging.h')

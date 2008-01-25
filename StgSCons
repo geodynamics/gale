@@ -1,0 +1,135 @@
+import os, glob
+Import('env')
+
+#
+# Helper functions.
+#
+
+def buildHdrPath(env, hdr):
+    hdr = File(hdr)
+    dirs = hdr.path.split(os.path.sep)
+    del dirs[-2]
+    dirs.insert(1, 'StGermain')
+    dirs.insert(1, 'include')
+    return os.path.sep.join(dirs)
+
+def buildModName(env):
+    ext = Dir('.').srcnode().path.replace(os.path.sep, '')
+    return env.proj + ext
+
+def buildLibDir(env):
+    return '#build/lib/' + buildModName(env)
+
+def copyFile(env, name, dstPath):
+    # If we're cleaning, forget about it.
+    if env.GetOption(['clean']):
+        return
+    src = File(name).srcnode().abspath
+    dstFile = File('#' + dstPath)
+    dst = dstFile.abspath
+    dstDir = os.path.dirname(dst)
+    if not os.path.exists(dstDir):
+        Execute(Mkdir(dstDir))
+    if not dstFile.current():
+        Execute(Copy(dst, src))
+    return dstFile
+
+def copyHdrs(env):
+    nodes = []
+    ptrn = os.path.join(Dir('.').srcnode().abspath, '*.h')
+    hdrs = [os.path.basename(h) for h in glob.iglob(ptrn)]
+    for h in hdrs:
+        dstDir = '#' + os.path.dirname(buildHdrPath(env, h))
+        nodes.append(env.Install(dstDir, h))
+    return nodes
+
+def copyDefs(env):
+    nodes = []
+    ptrn = os.path.join(Dir('.').srcnode().abspath, '*.def')
+    defs = [os.path.basename(d) for d in glob.iglob(ptrn)]
+    for d in defs:
+        if d == 'Makefile.def':
+            continue
+        hdrPath = buildHdrPath(env, d)
+        dstDir = '#' + os.path.dirname(hdrPath)
+        nodes.append(env.Install(dstDir, d))
+        # We need to copy straight away because of bogus deps.
+        copyFile(env, d, hdrPath)
+    return nodes
+
+def buildCSrcs(env, **kw):
+    nodes = []
+
+    # Collect standard C files.
+    ptrn = os.path.join(Dir('.').srcnode().abspath, '*.c')
+    srcs = [os.path.basename(s) for s in glob.iglob(ptrn)]
+
+    # Now add meta files.
+    ptrn = os.path.join(Dir('.').srcnode().abspath, '*.meta')
+    metas = [os.path.basename(s) for s in glob.iglob(ptrn)]
+    srcs.append(env.Meta(metas))
+
+    # Go for it.
+    modName = ('CURR_MODULE_NAME', '\\"' + env.curModule + '\\"')
+    curDefs = env['CPPDEFINES'] if 'CPPDEFINES' in env._dict else []
+    for s in srcs:
+        nodes.append(env.SharedObject(s, CPPDEFINES=curDefs +
+                                      [modName]))
+    return nodes
+
+def buildTests(env, objs=[], libs=[]):
+    ptrn = os.path.join(Dir('.').srcnode().abspath, 'test*.c')
+    srcs = [os.path.basename(s) for s in glob.iglob(ptrn)]
+    ptrn = os.path.join(Dir('.').srcnode().abspath, '*Suite.c')
+    srcs += [os.path.basename(s) for s in glob.iglob(ptrn)]
+    modName = ('CURR_MODULE_NAME', '\\"' + env.curModule + '\\"')
+    curDefs = env['CPPDEFINES'] if 'CPPDEFINES' in env._dict else []
+    curLibs = env['LIBS'] if 'LIBS' in env._dict else []
+    for s in srcs:
+        env.Program('#build/tests/' + os.path.splitext(s)[0], [s, objs],
+                    LIBS=curLibs + [libs],
+                    CPPDEFINES=curDefs + [modName])
+
+# Add any helper functions we want to use in child SConscripts.
+env['helpers'] = {}
+env['helpers']['buildHdrPath'] = buildHdrPath
+env['helpers']['buildModName'] = buildModName
+env['helpers']['buildLibDir'] = buildLibDir
+env['helpers']['copyFile'] = copyFile
+env['helpers']['copyHdrs'] = copyHdrs
+env['helpers']['copyDefs'] = copyDefs
+env['helpers']['buildCSrcs'] = buildCSrcs
+env['helpers']['buildTests'] = buildTests
+
+#
+# Custom builders.
+#
+
+# Builder for generating meta files (courtesy of Walter Landry).
+def create_meta(target, source, env):
+    output_file = file(str(target[0]),'wb')
+    output_file.write("#define XML_METADATA \"")
+    xml_file = file(str(source[0]))
+    xml_lines = xml_file.readlines()
+    for l in xml_lines:
+        output_file.write(l.replace('\"','\\\"')[:-1])
+    output_file.write("\"\n#define COMPONENT_NAME ")
+    for l in xml_lines:
+        start=l.find('<param name="Name">')
+        if start!=-1:
+            end=l.find('<',start+19)
+            if end==-1:
+                raise RunTimeError('Malformed XML file.  The file '
+                                   + str(source[0])
+                                   + ' does not close off <param name="Name"> on the same line.')
+            output_file.write(l[start+19:end])
+            output_file.write("\n")
+            break
+    template_file=file("meta-template.c")
+    output_file.write(template_file.read())
+
+def gen_meta_suffix(env, sources):
+    return "-meta.c"
+
+env['BUILDERS']['Meta']=Builder(action=create_meta,src_suffix="meta",
+                                suffix=gen_meta_suffix,single_source=True)

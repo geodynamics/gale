@@ -1,0 +1,7 @@
+import os
+Import('env')
+
+# Build the program.
+curLibs = env['LIBS'] if 'LIBS' in env._dict else []
+env.Program('#build/bin/StGermain', 'main.c',
+            LIBS=curLibs + ['StGermain'])

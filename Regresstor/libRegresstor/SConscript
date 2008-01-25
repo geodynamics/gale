@@ -1,0 +1,7 @@
+import os
+Import('env')
+
+# Execute subdirectory SConscripts.
+objs = SConscript('src/SConscript', exports='env')
+
+Return('objs')

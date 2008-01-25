@@ -1,0 +1,12 @@
+import os
+Import('env')
+
+# Build local test objects.
+objs = env.Object(Split("""
+BTreeWrappers.c
+JournalWrappers.c
+PtrMapWrappers.c
+"""))
+
+# Build test binaries.
+env['helpers']['buildTests'](env, objs, ['StGermainBaseFoundation'])

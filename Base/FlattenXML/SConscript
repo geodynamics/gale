@@ -1,0 +1,11 @@
+import os
+Import('env')
+
+# Setup current module.
+env.curModule = env['helpers']['buildModName'](env)
+
+# Execute subdirectory SConscripts.
+SConscript('src/SConscript', exports='env')
+
+# Build tests.
+SConscript('test/SConscript', exports='env')

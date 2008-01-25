@@ -43,7 +43,7 @@
 **	TODO: If MACRO_AS_FUNC and DEBUG is enabled, then the functions also check that the if we don't own the data we'll check to
 **	ensure it hasn't been de-allocated.
 **
-** $Id: Array.h 3462 2006-02-19 06:53:24Z WalterLandry $
+** $Id: Array.h.disabled 4205 2008-01-25 05:04:49Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 

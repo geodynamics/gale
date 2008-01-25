@@ -35,7 +35,7 @@
 **	Does not assumes ownership of the factories registered (i.e. it will not free the memory associated to them ).
 **	Do we eventually want to keep a registry of instantiated components?
 **
-** $Id: ComponentRepository.h 3462 2006-02-19 06:53:24Z WalterLandry $
+** $Id: ComponentRepository.h.disabled 4205 2008-01-25 05:04:49Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
