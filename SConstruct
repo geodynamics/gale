@@ -1,6 +1,7 @@
 import os, glob
 
-# Check SCons version.
+# Check versions of some things.
+EnsurePythonVersion(2, 5)
 EnsureSConsVersion(0, 97)
 
 #
