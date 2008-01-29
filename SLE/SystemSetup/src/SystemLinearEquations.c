@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SystemLinearEquations.c 1001 2008-01-10 06:05:02Z DavidLee $
+** $Id: SystemLinearEquations.c 1006 2008-01-29 06:09:44Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -669,6 +669,11 @@ void SystemLinearEquations_ZeroAllVectors( void* sle, void* _context ) {
 	}
 }
 
+void SystemLinearEquations_SolitaryWavesExecute( void* sle, void* _context ) {
+	SystemLinearEquations*	self            = (SystemLinearEquations*) sle;
+
+}
+
 void SystemLinearEquations_NewtonMFFDExecute( void* sle, void* _context ) {
 	SystemLinearEquations*	self            = (SystemLinearEquations*) sle;
 	Vector*			F;
@@ -802,6 +807,9 @@ void SystemLinearEquations_SetToNonLinear( void* sle ) {
 
 	if( !strcmp( self->nonLinearSolutionType, "MatrixFreeNewton" ) )
 		self->_execute = SystemLinearEquations_NewtonMFFDExecute;
+
+	if( !strcmp( self->nonLinearSolutionType, "SolitaryWaves" ) )
+		self->_execute = SystemLinearEquations_SolitaryWavesExecute;
 }
 
 void SystemLinearEquations_CheckIfNonLinear( void* sle ) {

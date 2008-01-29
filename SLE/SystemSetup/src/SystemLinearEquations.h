@@ -51,7 +51,7 @@
 **	for storing and managing the matrices and vectors that make up a system, but uses
 **	the SLE_Solver class to actually implement a solution mechanism for the given eqn.
 **
-** $Id: SystemLinearEquations.h 1005 2008-01-29 05:42:51Z DavidLee $
+** $Id: SystemLinearEquations.h 1006 2008-01-29 06:09:44Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -277,6 +277,8 @@
 	/* Non-linear stuff */
 	/* matrix free finite difference newton's method non linear solve */
 	void SystemLinearEquations_NewtonMFFDExecute( void* sle, void* data );
+	/* solitary waves model with hand rolled J */
+	void SystemLinearEquations_SolitaryWavesExecute( void* sle, void* data );
 	void SystemLinearEquations_NonLinearExecute( void* sle, void* data ) ;
 	void SystemLinearEquations_AddNonLinearEP( void* sle, const char* name, EntryPoint_2VoidPtr_Cast func );
 	void SystemLinearEquations_SetToNonLinear( void* sle ) ;
