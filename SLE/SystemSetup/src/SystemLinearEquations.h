@@ -51,7 +51,7 @@
 **	for storing and managing the matrices and vectors that make up a system, but uses
 **	the SLE_Solver class to actually implement a solution mechanism for the given eqn.
 **
-** $Id: SystemLinearEquations.h 999 2008-01-09 04:13:42Z DavidLee $
+** $Id: SystemLinearEquations.h 1005 2008-01-29 05:42:51Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -70,7 +70,7 @@
 
 	/* for solving non linear systems using Newton's method */
 	typedef void (SystemLinearEquations_BuildFFunc) ( void* sle, NonlinearSolver* nls, Vector* f, Vector* x, void* context );
-	typedef void (SystemLinearEquations_BuildJFunc) ( void* sle, Matrix J );	
+	typedef void (SystemLinearEquations_BuildJFunc) ( void* sle, Matrix J, void* context );	
 	
 	/*
 	** SystemLinearEquations class contents.
