@@ -1,0 +1,318 @@
+import os, sys
+Import('env opts')
+
+#
+# Helper functions.
+#
+
+def getPETScArch(baseDir):
+    petscconf = os.path.join(baseDir, 'bmake', 'petscconf')
+    if not os.path.exists(petscconf):
+        return None
+    f = file(petscconf, 'r')
+    arch = f.readline().split('=')[1][:-1]
+    f.close()
+    return arch
+
+def setupPETScHdrPath(env, baseDir):
+    arch = getPETScArch(baseDir)
+    if arch:
+        return os.path.join(baseDir, 'bmake', arch)
+    else:
+        return None
+
+def setupPETScLibPath(env, baseDir):
+    arch = getPETScArch(baseDir)
+    if arch:
+        return os.path.join(baseDir, 'lib', arch)
+    else:
+        return None
+
+def pushPaths(env, cppPaths=[], libPaths=[]):
+    state = ['', '']
+    state[0] = env['CPPPATH'] if 'CPPPATH' in env._dict else None
+    state[1] = env['LIBPATH'] if 'LIBPATH' in env._dict else None
+    for p in cppPaths:
+        env.AppendUnique(CPPPATH=[p])
+    for p in libPaths:
+        env.AppendUnique(LIBPATH=[p])
+    return state
+
+def popPaths(env, state):
+    env.Replace(CPPPATH=state[0])
+    env.Replace(LIBPATH=state[1])
+
+def appendExts(baseDir, exts):
+    paths = []
+    for e in exts:
+        if isinstance(e, str):
+            paths.append(os.path.join(baseDir, e))
+        else:
+            paths.append(e(env, baseDir))
+    return paths
+
+def packageSearch(cfg, name, check,
+                  places=[],
+                  hdrExts=['include'], libExts=['lib'],
+                  useSplit=True, useRPATH=False):
+    env = cfg.env
+
+    # If user specified paths, use that specifically.
+    key = name.lower() + 'Dir'
+    if key in env._dict:
+        cppPaths = appendExts(env[key], hdrExts)
+        libPaths = appendExts(env[key], libExts)
+        state = pushPaths(env, cppPaths, libPaths)
+        if check(cfg):
+            if useRPATH:
+                env.Append(RPATH=libPaths)
+            return
+        popPaths(env, state)
+        print "\nInvalid %s path: %s\n" % (name, env[key])
+        env.Exit()
+
+    if useSplit:
+        key = name.lower() + 'IncDir'
+        cppPaths = [env[key]] if key in env._dict else []
+        key = name.lower() + 'LibDir'
+        libPaths = [env[key]] if key in env._dict else []
+        if len(cppPaths) + len(libPaths) > 0:
+            state = pushPaths(env, cppPaths, libPaths)
+            if check(cfg):
+                if useRPATH:
+                    env.Append(RPATH=libPaths)
+                return
+            popPaths(env, state)
+            print ''
+            if len(cppPaths):
+                print "Invalid %s header path: %s" % (name, cppPaths[0])
+            if len(libPaths):
+                print "Invalid %s library path: %s" % (name, libPaths[0])
+            print ''
+            env.Exit()
+
+    # Otherwise check if it is in a default location.
+    if check(cfg):
+        return
+    print "\nCouldn't find %s in a location the compiler knew" % name
+    print "about, looking in a few standard places...\n"
+
+    # Lastly, search any common installations.
+    for p in places:
+        if isinstance(p, str):
+            # 'p' is a base directory.
+            cppPaths = appendExts(p, hdrExts)
+            libPaths = appendExts(p, libExts)
+            state = pushPaths(env, cppPaths, libPaths)
+        else:
+            # 'p' must be a tuple with include and library paths.
+            cppPaths = [p[0]] if p[0] is not None else []
+            libPaths = [p[1]] if p[1] is not None else []
+            state = pushPaths(env, cppPaths, libPaths)
+        if check(cfg):
+            if useRPATH:
+                env.Append(RPATH=libPaths)
+            print ''
+            if len(cppPaths):
+                print 'Using include path: %s' % cppPaths[0]
+            if len(libPaths):
+                print 'Using library path: %s' % libPaths[0]
+            print ''
+            return
+        popPaths(env, state)
+
+    # If we end up here we couldn't find the package.
+    key = name.lower()
+    print "Please specify your %s installation on the" % name
+    print "commandline using any of the following:"
+    print "  %sDir=<path to %s base directory>" % (key, name)
+    if useSplit:
+        print "  %sIncDir=<path to %s header directory>" % (key, name)
+        print "  %sLibDir=<path to %s library directory>\n" % (key, name)
+    env.Exit()
+
+#
+# Custom configuration checks.
+#
+
+def CheckMPICH(ctx):
+    src = """
+#include<mpi.h>
+int main(int argc, char** argv) {
+MPI_Init(&argc, &argv);
+MPI_Finalize();
+return 0;
+}
+"""
+    env = ctx.env
+    ctx.Message('Checking for MPICH... ')
+
+    env.Replace(LIBS=['mpich'])
+    res = ctx.TryLink(src, '.c')
+    if res:
+        ctx.Result(res)
+        return res
+
+    env.Replace(LIBS=['mpich', 'pmpich'])
+    res = ctx.TryLink(src, '.c')
+    if res:
+        ctx.Result(res)
+        return res
+
+    env.Replace(LIBS=['mpich', 'rt'])
+    res = ctx.TryLink(src, '.c')
+    if res:
+        ctx.Result(res)
+        return res
+
+    env.Replace(LIBS=['mpich', 'pmpich', 'rt'])
+    res = ctx.TryLink(src, '.c')
+
+    ctx.Result(res)
+    return res
+
+def CheckFortranSymbol(ctx):
+    fSrc = """
+      Program Conftest
+      external method
+      integer i
+      call method(i)
+      stop
+      end
+"""
+    cSrc = """
+#include <stdio.h>
+void method(int *i){printf("-DFORTRAN_NORMAL");}
+void method_(int *i){printf("-DFORTRAN_SINGLE_TRAILINGBAR");}
+void method__(int *i){printf("-DFORTRAN_DOUBLE_TRAILINGBAR");}
+void METHOD(int *i){printf("-DFORTRAN_UPPERCASE");}
+"""
+    env = ctx.env
+    ctx.Message('Checking for fortran symbol type... ')
+
+    res = ctx.TryCompile(cSrc, '.c')
+    if not res:
+        ctx.Result(res)
+        return res
+    cObj = ctx.lastTarget
+
+    oldLINK = env['LINK'] if 'LINK' in env._dict else None
+    oldLINKFLAGS = env['LINKFLAGS'] if 'LINKFLAGS' in env._dict else None
+    oldLIBS = env['LIBS'] if 'LIBS' in env._dict else None
+    env['LINK'] = env['_FORTRAND']
+    env['LINKFLAGS'] = str(cObj)
+    env['LIBS'] = []
+    res = ctx.TryRun(fSrc, '.F')
+    env['LINK'] = oldLINK
+    env['LINKFLAGS'] = oldLINKFLAGS
+    env['LIBS'] = oldLIBS
+    if not res[0]:
+        ctx.Result(res[0])
+        return res[0]
+
+    env.Append(CPPFLAGS=[res[1]])
+    ctx.Result(res[0])
+    return res[0]
+
+#
+# Configuration script.
+#
+
+# Setup some check functions for package searching.
+def checkMPICH(cfg):
+    return cfg.CheckMPICH()
+
+def checkLibXML2(cfg):
+    return cfg.CheckLibWithHeader('xml2', 'libxml/xmlIO.h', 'C')
+
+def checkStGermain(cfg):
+    return cfg.CheckLibWithHeader('StGermain', 'StGermain/StGermain.h',
+                                  'C')
+
+# Do configuration.
+if not env.GetOption('clean'):
+    cfg = Configure(env,
+                    custom_tests={'CheckMPICH':
+                                      CheckMPICH,
+                                  'CheckFortranSymbol':
+                                      CheckFortranSymbol})
+
+    #
+    # Check for the C math library.
+    #
+
+    if not cfg.CheckLib('m'):
+        print "Couldn't find the C standard math libaray."
+        env.Exit()
+
+    #
+    # Check for MPI.
+    #
+
+    packageSearch(cfg, 'MPICH', checkMPICH,
+                  ['/usr/local/mpich'])
+    opts.Save('config.cache', env)
+
+    #
+    # Check for libXML2.
+    #
+
+    packageSearch(cfg, 'libXML2', checkLibXML2,
+                  [('/usr/include/libxml2', None)])
+    opts.Save('config.cache', env)
+
+    #
+    # Check for StGermain.
+    #
+
+    packageSearch(cfg, 'StGermain', checkStGermain,
+                  [os.path.abspath('../StGermain/build')],
+                  useRPATH=True)
+    opts.Save('config.cache', env)
+
+    #
+    # Check Fortran symbol type.
+    #
+
+    if not cfg.CheckFortranSymbol():
+        print 'Fortran symbol check failed.'
+        env.Exit()
+
+    #
+    # Extract revision number.
+    #
+
+    svnPath = os.path.join('.svn', 'entries')
+    if not os.path.exists(svnPath):
+        print "\nYou appear to be building the code from something"
+        print "that wasn't checked out of a repository. Bummer."
+        env.Exit()
+    f = file(svnPath, 'r')
+    f.readline()
+    f.readline()
+    f.readline()
+    ver = '\\"' + str(int(f.readline())) + '\\"'
+    env.Append(CPPDEFINES=[('VERSION', ver)])
+    f.close()
+
+    #
+    # Add module extension to build commands.
+    #
+
+    ext = '\\"' + env['SHLIBSUFFIX'][1:] + '\\"'
+    env.Append(CPPDEFINES=[('MODULE_EXT', ext)])
+
+    #
+    # Add the library directory.
+    #
+
+    libDir = '\\"' + os.path.join(Dir('.').abspath, 'build', 'lib') + '\\"'
+    env.Append(CPPDEFINES=[('LIB_DIR', libDir)])
+
+    #
+    # Setup the dynamic library search paths.
+    #
+
+    env.Append(RPATH=[os.path.join(Dir('.').abspath, 'build', 'lib')])
+
+    env = cfg.Finish()

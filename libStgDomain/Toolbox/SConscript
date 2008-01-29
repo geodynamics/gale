@@ -1,0 +1,14 @@
+import os
+Import('env')
+
+# Build our source files.
+objs = env['helpers']['buildCSrcs'](env)
+
+# Build plugin module.
+curLIBPREFIXES = env['LIBPREFIXES'] if 'LIBPREFIXES' in env._dict else []
+if not isinstance(curLIBPREFIXES, list):
+    curLIBPREFIXES = [curLIBPREFIXES]
+mod = env.LoadableModule('#build/lib/StgDomain_Toolboxmodule', objs,
+                         SHLIBPREFIX='',
+                         LIBPREFIXES=curLIBPREFIXES + [''])
+env.Install(os.path.join(env['prefix'], 'lib'), mod)

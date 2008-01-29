@@ -1,0 +1,5 @@
+import os
+Import('env')
+
+# Build test binaries.
+env['helpers']['buildTests'](env, libs=['StgDomainGeometry'])
