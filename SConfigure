@@ -19,23 +19,125 @@ def appendPaths(env, key):
         tmp = key + 'LibDir'
         env.AppendUnique(LIBPATH=[env[tmp]])
 
-def setupPETScDirs(env):
-    if 'petscDir' not in env._dict:
-        return
-
-    # Read the PETSc architecture.
-    petscconf = os.path.join(env['petscDir'], 'bmake', 'petscconf')
+def getPETScArch(baseDir):
+    petscconf = os.path.join(baseDir, 'bmake', 'petscconf')
     if not os.path.exists(petscconf):
-        print "Can't find 'petscconf'."
-        env.Exit()
+        return None
     f = file(petscconf, 'r')
     arch = f.readline().split('=')[1][:-1]
     f.close()
+    return arch
 
-    # Setup dirs.
-    env.AppendUnique(CPPPATH=[env['petscDir'] + '/include'])
-    env.AppendUnique(CPPPATH=[env['petscDir'] + '/bmake/' + arch])
-    env.AppendUnique(LIBPATH=[env['petscDir'] + '/lib/' + arch])
+def setupPETScHdrPath(env, baseDir):
+    arch = getPETScArch(baseDir)
+    if arch:
+        return os.path.join(baseDir, 'bmake', arch)
+    else:
+        return None
+
+def setupPETScLibPath(env, baseDir):
+    arch = getPETScArch(baseDir)
+    if arch:
+        return os.path.join(baseDir, 'lib', arch)
+    else:
+        return None
+
+def pushPaths(env, cppPaths=[], libPaths=[]):
+    state = ['', '']
+    state[0] = env['CPPPATH'] if 'CPPPATH' in env._dict else None
+    state[1] = env['LIBPATH'] if 'LIBPATH' in env._dict else None
+    for p in cppPaths:
+        env.AppendUnique(CPPPATH=[p])
+    for p in libPaths:
+        env.AppendUnique(LIBPATH=[p])
+    return state
+
+def popPaths(env, state):
+    env.Replace(CPPPATH=state[0])
+    env.Replace(LIBPATH=state[1])
+
+def appendExts(baseDir, exts):
+    paths = []
+    for e in exts:
+        if isinstance(e, str):
+            paths.append(os.path.join(baseDir, e))
+        else:
+            paths.append(e(env, baseDir))
+    return paths
+
+def packageSearch(cfg, name, check,
+                  places=[],
+                  hdrExts=['include'], libExts=['lib'],
+                  useSplit=True):
+    env = cfg.env
+
+    # If user specified paths, use that specifically.
+    key = name.lower() + 'Dir'
+    if key in env._dict:
+        cppPaths = appendExts(env[key], hdrExts)
+        libPaths = appendExts(env[key], libExts)
+        state = pushPaths(env, cppPaths, libPaths)
+        if check(cfg):
+            return
+        popPaths(env, state)
+        print "\nInvalid %s path: %s\n" % (name, env[key])
+        env.Exit()
+
+    if useSplit:
+        key = name.lower() + 'IncDir'
+        cppPaths = [env[key]] if key in env._dict else []
+        key = name.lower() + 'LibDir'
+        libPaths = [env[key]] if key in env._dict else []
+        if len(cppPaths) + len(libPaths) > 0:
+            state = pushPaths(env, cppPaths, libPaths)
+            if check(cfg):
+                return
+            popPaths(env, state)
+            print ''
+            if len(cppPaths):
+                print "Invalid %s header path: %s" % (name, cppPaths[0])
+            if len(libPaths):
+                print "Invalid %s library path: %s" % (name, libPaths[0])
+            print ''
+            env.Exit()
+
+    # Otherwise check if it is in a default location.
+    if check(cfg):
+        return
+    print "\nCouldn't find %s in a location the compiler knew" % name
+    print "about, looking in a few standard places...\n"
+
+    # Lastly, search any common installations.
+    for p in places:
+        if isinstance(p, str):
+            # 'p' is a base directory.
+            cppPaths = appendExts(p, hdrExts)
+            libPaths = appendExts(p, libExts)
+            state = pushPaths(env, cppPaths, libPaths)
+        else:
+            # 'p' must be a tuple with include and library paths.
+            cppPaths = [p[0]] if p[0] is not None else []
+            libPaths = [p[1]] if p[1] is not None else []
+            state = pushPaths(env, cppPaths, libPaths)
+        if check(cfg):
+            print ''
+            if len(cppPaths):
+                print 'Using include path: %s' % cppPaths[0]
+            if len(libPaths):
+                print 'Using library path: %s' % libPaths[0]
+            print ''
+            return
+        popPaths(env, state)
+
+    # If we end up here we couldn't find the package.
+    key = name.lower()
+    print "Please specify your %s installation on the" % name
+    print "commandline using any of the following:"
+    print "  %sDir=<path to %s base directory>" % (key, name)
+    if useSplit:
+        print "  %sIncDir=<path to %s header directory>" % (key, name)
+        print "  %sLibDir=<path to %s library directory>\n" % (key, name)
+    env.Exit()
 
 #
 # Custom configuration checks.
@@ -81,57 +183,68 @@ return 0;
 # Configuration script.
 #
 
+# Setup some check functions for package searching.
+def checkMPICH(cfg):
+    return cfg.CheckMPICH()
+
+def checkPETSc(cfg):
+    if not cfg.CheckLibWithHeader('petsc', 'petsc.h', 'C'):
+        return False
+    if not cfg.CheckLibWithHeader('petscvec', 'petscvec.h', 'C'):
+        return False
+    if not cfg.CheckLibWithHeader('petscmat', 'petscmat.h', 'C'):
+        return False
+    if not cfg.CheckLibWithHeader('petscksp', 'petscksp.h', 'C'):
+        return False
+    return True
+
+def checkLibXML2(cfg):
+    return cfg.CheckLibWithHeader('xml2', 'libxml/xmlIO.h', 'C')
+
 # Do configuration.
 if not env.GetOption('clean'):
     cfg = Configure(env,
                     custom_tests={'CheckMPICH':
                                       CheckMPICH})
 
+    #
     # Check for the C math library.
+    #
+
     if not cfg.CheckLib('m'):
         print "Couldn't find the C standard math libaray."
         env.Exit()
 
+    #
     # Check for MPI.
-    appendPaths(env, 'mpi')
-    if not cfg.CheckMPICH():
-        print "\nCouldn't find MPICH in a location the compiler knew"
-        print "about. Please specify your MPICH installation on the"
-        print "commandline using any of the following:"
-        print "  mpiDir=<path to MPICH base directory>"
-        print "  mpiIncDir=<path to MPICH header directory>"
-        print "  mpiLibDir=<path to MPICH library directory>\n"
-        env.Exit()
+    #
+
+    packageSearch(cfg, 'MPICH', checkMPICH,
+                  ['/usr/local/mpich'])
     opts.Save('config.cache', env)
 
+    #
     # Check for PETSc.
-    setupPETScDirs(env)
-    if not cfg.CheckLibWithHeader('petsc', 'petsc.h', 'C') or \
-            not cfg.CheckLibWithHeader('petscvec', 'petscvec.h', 'C') or \
-            not cfg.CheckLibWithHeader('petscmat', 'petscmat.h', 'C') or \
-            not cfg.CheckLibWithHeader('petscksp', 'petscksp.h', 'C'):
-        print "\nCouldn't find PETSc in a location the compiler knew"
-        print "about. Please specify your PETSc installation on the"
-        print "commandline using any of the following:"
-        print "  petscDir=<path to PETSc base directory>"
-        print "  petscIncDir=<path to PETSc header directory>"
-        print "  petscLibDir=<path to PETSc library directory>\n"
-        env.Exit()
+    #
+
+    packageSearch(cfg, 'PETSc', checkPETSc,
+                  ['/usr/local/petsc'],
+                  ['include', setupPETScHdrPath], [setupPETScLibPath],
+                  False)
     opts.Save('config.cache', env)
 
+    #
     # Check for libXML2.
-    appendPaths(env, 'libxml2')
-    if not cfg.CheckLibWithHeader('xml2', 'libxml2/libxml/xmlIO.h', 'C'):
-        print "\nCouldn't find libXML2 in a location the compiler knew"
-        print "about. Please specify your libXML2 installation on the"
-        print "commandline using any of the following:"
-        print "  libxml2Dir=<path to libXML2 base directory>"
-        print "  libxml2IncDir=<path to libXML2 header directory>"
-        print "  libxml2LibDir=<path to libXML2 library directory>\n"
-        env.Exit()
+    #
+
+    packageSearch(cfg, 'libXML2', checkLibXML2,
+                  [('/usr/include/libxml2', None)])
     opts.Save('config.cache', env)
 
+    #
     # Extract revision number.
+    #
+
     svnPath = os.path.join('.svn', 'entries')
     if not os.path.exists(svnPath):
         print "\nYou appear to be building the code from something"
@@ -145,15 +258,24 @@ if not env.GetOption('clean'):
     env.Append(CPPDEFINES=[('VERSION', ver)])
     f.close()
 
+    #
     # Add module extension to build commands.
+    #
+
     ext = '\\"' + env['SHLIBSUFFIX'][1:] + '\\"'
     env.Append(CPPDEFINES=[('MODULE_EXT', ext)])
 
+    #
     # Add the library directory.
+    #
+
     libDir = '\\"' + os.path.join(Dir('.').abspath, 'build', 'lib') + '\\"'
     env.Append(CPPDEFINES=[('LIB_DIR', libDir)])
 
+    #
     # Setup the dynamic library search paths.
+    #
+
     env.Append(RPATH=[os.path.join(Dir('.').abspath, 'build', 'lib')])
 
     env = cfg.Finish()

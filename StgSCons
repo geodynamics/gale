@@ -9,7 +9,7 @@ def buildHdrPath(env, hdr):
     hdr = File(hdr)
     dirs = hdr.path.split(os.path.sep)
     del dirs[-2]
-    dirs.insert(1, 'StGermain')
+    dirs.insert(1, env.proj)
     dirs.insert(1, 'include')
     return os.path.sep.join(dirs)
 
