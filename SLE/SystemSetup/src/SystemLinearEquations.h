@@ -51,7 +51,7 @@
 **	for storing and managing the matrices and vectors that make up a system, but uses
 **	the SLE_Solver class to actually implement a solution mechanism for the given eqn.
 **
-** $Id: SystemLinearEquations.h 1006 2008-01-29 06:09:44Z DavidLee $
+** $Id: SystemLinearEquations.h 1013 2008-01-30 07:54:12Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -69,8 +69,8 @@
 	typedef void (SystemLinearEquations_MG_SelectStiffMatsFunc) ( void* _sle, unsigned* nSMs, StiffnessMatrix*** sms );
 
 	/* for solving non linear systems using Newton's method */
-	typedef void (SystemLinearEquations_BuildFFunc) ( void* sle, NonlinearSolver* nls, Vector* f, Vector* x, void* context );
-	typedef void (SystemLinearEquations_BuildJFunc) ( void* sle, Matrix J, void* context );	
+	typedef void (SystemLinearEquations_BuildFFunc) ( NonlinearSolver* nls, Vector* x, Vector* f, void* context );
+	typedef void (SystemLinearEquations_BuildJFunc) ( NonlinearSolver* nls, Vector* x, Matrix** A, Matrix** B, void* matStruct, void* context );	
 	
 	/*
 	** SystemLinearEquations class contents.
@@ -86,18 +86,18 @@
 		SystemLinearEquations_MatrixSetupFunction*          _matrixSetup;              \
 		SystemLinearEquations_VectorSetupFunction*          _vectorSetup;              \
 		SystemLinearEquations_UpdateSolutionOntoNodesFunc*  _updateSolutionOntoNodes;  \
-		SystemLinearEquations_MG_SelectStiffMatsFunc*       _mgSelectStiffMats;         \
+		SystemLinearEquations_MG_SelectStiffMatsFunc*       _mgSelectStiffMats;        \
 		\
 		/* SystemLinearEquations info */ \
 		Stream*                                             debug;                     \
-		Stream*                                             info;                     \
-		Stream*                                             convergenceStream;        \
-		Bool                                                makeConvergenceFile;      \
+		Stream*                                             info;                      \
+		Stream*                                             convergenceStream;         \
+		Bool                                                makeConvergenceFile;       \
 		MPI_Comm                                            comm;                      \
 		StiffnessMatrixList*                                stiffnessMatrices;         \
 		ForceVectorList*                                    forceVectors;              \
 		SolutionVectorList*                                 solutionVectors;           \
-		SLE_Solver*	                                    	solver;                    \
+		SLE_Solver*	                                    solver;                    \
 		FiniteElementContext*                               context;                   \
 		Name                                                executeEPName;             \
 		EntryPoint*                                         executeEP;                 \
@@ -131,6 +131,9 @@
 		void*						    buildFContext;             \
 		void*						    buildJContext;             \
 		NonlinearSolver*				    nlSolver;		       \
+		Vector*						    F;			       \
+		Vector*						    delta_x;		       \
+		Matrix*						    J;			       \
 		
 		
 		
@@ -278,7 +281,7 @@
 	/* matrix free finite difference newton's method non linear solve */
 	void SystemLinearEquations_NewtonMFFDExecute( void* sle, void* data );
 	/* solitary waves model with hand rolled J */
-	void SystemLinearEquations_SolitaryWavesExecute( void* sle, void* data );
+	void SystemLinearEquations_NewtonExecute( void* sle, void* data );
 	void SystemLinearEquations_NonLinearExecute( void* sle, void* data ) ;
 	void SystemLinearEquations_AddNonLinearEP( void* sle, const char* name, EntryPoint_2VoidPtr_Cast func );
 	void SystemLinearEquations_SetToNonLinear( void* sle ) ;

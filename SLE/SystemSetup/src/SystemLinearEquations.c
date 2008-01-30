@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SystemLinearEquations.c 1006 2008-01-29 06:09:44Z DavidLee $
+** $Id: SystemLinearEquations.c 1013 2008-01-30 07:54:12Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -415,6 +415,10 @@ void _SystemLinearEquations_Construct( void* sle, Stg_ComponentFactory* cf, void
 			nonLinearSolutionType,
 			entryPointRegister,
 			MPI_COMM_WORLD );
+
+	self->delta_x   = PETScVector_New( "delta x" );
+	self->F		= PETScVector_New( "residual" );
+	self->J		= PETScMatrix_New( "Jacobian" ); 
 }
 
 /* Build */
@@ -669,8 +673,23 @@ void SystemLinearEquations_ZeroAllVectors( void* sle, void* _context ) {
 	}
 }
 
-void SystemLinearEquations_SolitaryWavesExecute( void* sle, void* _context ) {
+void SystemLinearEquations_NewtonExecute( void* sle, void* _context ) {
 	SystemLinearEquations*	self            = (SystemLinearEquations*) sle;
+	//NonlinearSolver*	nlSolver	= self->nlSolver; //need to build this guy...
+	PETScVector*		F;
+	SNES			snes;
+
+	Vector_Duplicate( SystemLinearEquations_GetSolutionVectorAt( self, 0 )->vector, &F );
+	
+	SNESCreate( MPI_COMM_WORLD, &snes );
+	SNESSetJacobian( snes, ((PETScMatrix*)self->J)->petscMat, ((PETScMatrix*)self->J)->petscMat, self->_buildJ, self->buildJContext );
+	SNESSetFunction( snes, ((PETScVector*)self->F)->petscVec, self->_buildF, self->buildFContext );
+	
+	SNESSetFromOptions( snes );
+
+	SNESSolve( snes, PETSC_NULL, ((PETScVector*)self->delta_x)->petscVec );
+
+	SNESDestroy( snes );
 
 }
 
@@ -678,7 +697,6 @@ void SystemLinearEquations_NewtonMFFDExecute( void* sle, void* _context ) {
 	SystemLinearEquations*	self            = (SystemLinearEquations*) sle;
 	Vector*			F;
 	NonlinearSolver*	nlSolver	= self->nlSolver; //need to build this guy...
-
 
 	Vector_Duplicate( SystemLinearEquations_GetSolutionVectorAt( self, 0 )->vector, &F );
 
@@ -808,8 +826,8 @@ void SystemLinearEquations_SetToNonLinear( void* sle ) {
 	if( !strcmp( self->nonLinearSolutionType, "MatrixFreeNewton" ) )
 		self->_execute = SystemLinearEquations_NewtonMFFDExecute;
 
-	if( !strcmp( self->nonLinearSolutionType, "SolitaryWaves" ) )
-		self->_execute = SystemLinearEquations_SolitaryWavesExecute;
+	if( !strcmp( self->nonLinearSolutionType, "Newton" ) )
+		self->_execute = SystemLinearEquations_NewtonExecute;
 }
 
 void SystemLinearEquations_CheckIfNonLinear( void* sle ) {
