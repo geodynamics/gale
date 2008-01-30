@@ -54,7 +54,8 @@ def appendExts(baseDir, exts):
 def packageSearch(cfg, name, check,
                   places=[],
                   hdrExts=['include'], libExts=['lib'],
-                  useSplit=True, useRPATH=False):
+                  useSplit=True, useRPATH=False,
+                  fatal=True):
     env = cfg.env
 
     # If user specified paths, use that specifically.
@@ -66,10 +67,13 @@ def packageSearch(cfg, name, check,
         if check(cfg):
             if useRPATH:
                 env.Append(RPATH=libPaths)
-            return
+            return 1
         popPaths(env, state)
         print "\nInvalid %s path: %s\n" % (name, env[key])
-        env.Exit()
+        if fatal:
+            env.Exit()
+        else:
+            return 0
 
     if useSplit:
         key = name.lower() + 'IncDir'
@@ -81,7 +85,7 @@ def packageSearch(cfg, name, check,
             if check(cfg):
                 if useRPATH:
                     env.Append(RPATH=libPaths)
-                return
+                return 1
             popPaths(env, state)
             print ''
             if len(cppPaths):
@@ -89,11 +93,14 @@ def packageSearch(cfg, name, check,
             if len(libPaths):
                 print "Invalid %s library path: %s" % (name, libPaths[0])
             print ''
-            env.Exit()
+            if fatal:
+                env.Exit()
+            else:
+                return 0
 
     # Otherwise check if it is in a default location.
     if check(cfg):
-        return
+        return 1
     print "\nCouldn't find %s in a location the compiler knew" % name
     print "about, looking in a few standard places...\n"
 
@@ -118,18 +125,21 @@ def packageSearch(cfg, name, check,
             if len(libPaths):
                 print 'Using library path: %s' % libPaths[0]
             print ''
-            return
+            return 1
         popPaths(env, state)
 
     # If we end up here we couldn't find the package.
-    key = name.lower()
-    print "Please specify your %s installation on the" % name
-    print "commandline using any of the following:"
-    print "  %sDir=<path to %s base directory>" % (key, name)
-    if useSplit:
-        print "  %sIncDir=<path to %s header directory>" % (key, name)
-        print "  %sLibDir=<path to %s library directory>\n" % (key, name)
-    env.Exit()
+    if fatal:
+        key = name.lower()
+        print "Please specify your %s installation on the" % name
+        print "commandline using any of the following:"
+        print "  %sDir=<path to %s base directory>" % (key, name)
+        if useSplit:
+            print "  %sIncDir=<path to %s header directory>" % (key, name)
+            print "  %sLibDir=<path to %s library directory>\n" % (key, name)
+        env.Exit()
+    else:
+        return 0
 
 #
 # Custom configuration checks.
@@ -182,10 +192,10 @@ def CheckFortranSymbol(ctx):
 """
     cSrc = """
 #include <stdio.h>
-void method(int *i){printf("-DFORTRAN_NORMAL");}
-void method_(int *i){printf("-DFORTRAN_SINGLE_TRAILINGBAR");}
-void method__(int *i){printf("-DFORTRAN_DOUBLE_TRAILINGBAR");}
-void METHOD(int *i){printf("-DFORTRAN_UPPERCASE");}
+void method(int *i){printf("FORTRAN_NORMAL");}
+void method_(int *i){printf("FORTRAN_SINGLE_TRAILINGBAR");}
+void method__(int *i){printf("FORTRAN_DOUBLE_TRAILINGBAR");}
+void METHOD(int *i){printf("FORTRAN_UPPERCASE");}
 """
     env = ctx.env
     ctx.Message('Checking for fortran symbol type... ')
@@ -210,7 +220,7 @@ void METHOD(int *i){printf("-DFORTRAN_UPPERCASE");}
         ctx.Result(res[0])
         return res[0]
 
-    env.Append(CPPFLAGS=[res[1]])
+    env.Append(CPPDEFINES=[res[1]])
     ctx.Result(res[0])
     return res[0]
 
@@ -228,6 +238,12 @@ def checkLibXML2(cfg):
 def checkStGermain(cfg):
     return cfg.CheckLibWithHeader('StGermain', 'StGermain/StGermain.h',
                                   'C')
+
+def checkLapack(cfg):
+    return cfg.CheckLib('lapack')
+
+def checkMKL(cfg):
+    return cfg.CheckLib('mkl')
 
 # Do configuration.
 if not env.GetOption('clean'):
@@ -259,6 +275,14 @@ if not env.GetOption('clean'):
 
     packageSearch(cfg, 'libXML2', checkLibXML2,
                   [('/usr/include/libxml2', None)])
+    opts.Save('config.cache', env)
+
+    #
+    # Check for an implementation of lapack
+    #
+
+    if not packageSearch(cfg, 'lapack', checkLapack, fatal=False):
+        packageSearch(cfg, 'MKL', checkMKL)
     opts.Save('config.cache', env)
 
     #
