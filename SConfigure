@@ -52,7 +52,7 @@ def CheckPackage(ctx, name, check, state_gen, lib_gen):
         old = push_paths(state[0], state[1])
         for libs in lib_gen():
             libs = [libs] if isinstance(libs, str) else libs
-            res = check(ctx, libs)
+            res = check(ctx, libs, state[1])
             if res:
                 env['PACKAGES'][name] = (state, libs)
                 ctx.Result(res)
@@ -76,7 +76,7 @@ def CheckPackage(ctx, name, check, state_gen, lib_gen):
         old = push_paths(state[0], state[1])
         for libs in lib_gen():
             libs = [libs] if isinstance(libs, str) else libs
-            res = check(ctx, libs)
+            res = check(ctx, libs, state[1])
             if res:
                 env['PACKAGES'][name] = (state, libs)
                 ctx.Result(res)
@@ -90,7 +90,7 @@ def CheckPackage(ctx, name, check, state_gen, lib_gen):
         old = push_paths(state[0], state[1])
         for libs in lib_gen():
             libs = [libs] if isinstance(libs, str) else libs
-            res = check(ctx, libs)
+            res = check(ctx, libs, state[1])
             if res:
                 env['PACKAGES'][name] = (state, libs)
                 ctx.Result(res)
@@ -132,7 +132,7 @@ def mpich_lib_gen():
     yield ['pmpich', 'rt']
     yield ['mpich', 'pmpich', 'rt']
 
-def check_mpich(ctx, libs):
+def check_mpich(ctx, libs, libpath=None):
     src = """
 #include<mpi.h>
 int main(int argc, char** argv) {
@@ -141,10 +141,12 @@ MPI_Finalize();
 return (MPI_VERSION == 2) ? 0 : 1;
 }
 """
-    old = env['LIBS']
+    old = env['LIBS'], env['RPATH']
     env.Replace(LIBS=libs)
+    env.Replace(RPATH=libpath)
     res = ctx.TryRun(src, '.c')[0]
-    env.Replace(LIBS=old)
+    env.Replace(LIBS=old[0])
+    env.Replace(RPATH=old[1])
     if not res:
         return res
 
@@ -176,7 +178,7 @@ def libxml2_state_gen(type):
 def libxml2_lib_gen():
     yield ['libxml2']
 
-def check_libxml2(ctx, libs):
+def check_libxml2(ctx, libs, libpath=None):
     src = """
 #include<libxml/xmlIO.h>
 int main(int argc, char** argv) {

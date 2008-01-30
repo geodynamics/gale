@@ -35,6 +35,7 @@ env['CPPPATH'] = env['CPPPATH'] if 'CPPPATH' in env._dict else []
 env['LIBPATH'] = env['LIBPATH'] if 'LIBPATH' in env._dict else []
 env['CPPDEFINES'] = env['CPPDEFINES'] if 'CPPDEFINES' in env._dict else []
 env['LIBS'] = env['LIBS'] if 'LIBS' in env._dict else []
+env['RPATH'] = env['RPATH'] if 'RPATH' in env._dict else []
 
 # Add any variables that get used throughout the whole build.
 env.proj = 'StGermain'
