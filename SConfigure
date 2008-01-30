@@ -5,43 +5,6 @@ Import('env opts')
 # Helper functions.
 #
 
-def appendPaths(env, key):
-    if key + 'Dir' in env._dict:
-        tmp = key + 'Dir'
-        env.AppendUnique(CPPPATH=[env[tmp] + '/include'])
-        env.AppendUnique(LIBPATH=[env[tmp] + '/lib'])
-        return
-
-    if key + 'IncDir' in env._dict:
-        tmp = key + 'IncDir'
-        env.AppendUnique(CPPPATH=[env[tmp]])
-    if key + 'LibDir' in env._dict:
-        tmp = key + 'LibDir'
-        env.AppendUnique(LIBPATH=[env[tmp]])
-
-def getPETScArch(baseDir):
-    petscconf = os.path.join(baseDir, 'bmake', 'petscconf')
-    if not os.path.exists(petscconf):
-        return None
-    f = file(petscconf, 'r')
-    arch = f.readline().split('=')[1][:-1]
-    f.close()
-    return arch
-
-def setupPETScHdrPath(env, baseDir):
-    arch = getPETScArch(baseDir)
-    if arch:
-        return os.path.join(baseDir, 'bmake', arch)
-    else:
-        return None
-
-def setupPETScLibPath(env, baseDir):
-    arch = getPETScArch(baseDir)
-    if arch:
-        return os.path.join(baseDir, 'lib', arch)
-    else:
-        return None
-
 def pushPaths(env, cppPaths=[], libPaths=[]):
     state = ['', '']
     state[0] = env['CPPPATH'] if 'CPPPATH' in env._dict else None
@@ -68,7 +31,7 @@ def appendExts(baseDir, exts):
 def packageSearch(cfg, name, check,
                   places=[],
                   hdrExts=['include'], libExts=['lib'],
-                  useSplit=True):
+                  useSplit=True, useRPATH=False):
     env = cfg.env
 
     # If user specified paths, use that specifically.
@@ -78,6 +41,8 @@ def packageSearch(cfg, name, check,
         libPaths = appendExts(env[key], libExts)
         state = pushPaths(env, cppPaths, libPaths)
         if check(cfg):
+            if useRPATH:
+                env.Append(RPATH=libPaths)
             return
         popPaths(env, state)
         print "\nInvalid %s path: %s\n" % (name, env[key])
@@ -91,6 +56,8 @@ def packageSearch(cfg, name, check,
         if len(cppPaths) + len(libPaths) > 0:
             state = pushPaths(env, cppPaths, libPaths)
             if check(cfg):
+                if useRPATH:
+                    env.Append(RPATH=libPaths)
                 return
             popPaths(env, state)
             print ''
@@ -120,6 +87,8 @@ def packageSearch(cfg, name, check,
             libPaths = [p[1]] if p[1] is not None else []
             state = pushPaths(env, cppPaths, libPaths)
         if check(cfg):
+            if useRPATH:
+                env.Append(RPATH=libPaths)
             print ''
             if len(cppPaths):
                 print 'Using include path: %s' % cppPaths[0]
@@ -187,17 +156,6 @@ return 0;
 def checkMPICH(cfg):
     return cfg.CheckMPICH()
 
-def checkPETSc(cfg):
-    if not cfg.CheckLibWithHeader('petsc', 'petsc.h', 'C'):
-        return False
-    if not cfg.CheckLibWithHeader('petscvec', 'petscvec.h', 'C'):
-        return False
-    if not cfg.CheckLibWithHeader('petscmat', 'petscmat.h', 'C'):
-        return False
-    if not cfg.CheckLibWithHeader('petscksp', 'petscksp.h', 'C'):
-        return False
-    return True
-
 def checkLibXML2(cfg):
     return cfg.CheckLibWithHeader('xml2', 'libxml/xmlIO.h', 'C')
 
@@ -221,16 +179,6 @@ if not env.GetOption('clean'):
 
     packageSearch(cfg, 'MPICH', checkMPICH,
                   ['/usr/local/mpich'])
-    opts.Save('config.cache', env)
-
-    #
-    # Check for PETSc.
-    #
-
-    packageSearch(cfg, 'PETSc', checkPETSc,
-                  ['/usr/local/petsc'],
-                  ['include', setupPETScHdrPath], [setupPETScLibPath],
-                  False)
     opts.Save('config.cache', env)
 
     #
