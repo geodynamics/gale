@@ -14,7 +14,7 @@
 			<param name="Type">lucOutputPNG</param>
 		</struct>
 		<struct name="window">
-			<param name="Type">lucDefaultWindow</param>
+			<param name="Type">lucWindow</param>
 			<param name="RenderingEngine">renderingEngine</param>
 			<list name="OutputFormat">
 				<param>imageOutput</param>
@@ -24,10 +24,6 @@
 			<param name="interactive">t</param>
 			<param name="backgroundColour">white</param>
 		</struct>
-		<struct name="movie">
-			<param name="Type">lucEncoderLibfame</param>
-			<param name="Window">window</param>
-		</struct>	
 	</struct>
 
 </StGermainData>
