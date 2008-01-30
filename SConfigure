@@ -352,7 +352,8 @@ def petsc_state_gen(type):
                    os.path.join(dir, 'lib', arch))
 
 def petsc_lib_gen():
-    yield ['petsc', 'petscvec', 'petscmat', 'petscksp']
+    yield ['petsc', 'petscvec', 'petscmat', 'petscksp',
+           'petscsnes', 'petscdm']
 
 def check_petsc(ctx, libs, libpath=None):
     src = """
