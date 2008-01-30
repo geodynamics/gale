@@ -13,6 +13,25 @@ env.test_nodes = []
 # Helper functions.
 #
 
+def insert_objs(objs, hpath):
+    nodes = env.obj_nodes
+    if '.' not in nodes:
+        nodes['.'] = []
+    nodes['.'].append(objs)
+    for h in hpath.split(os.path.sep):
+        if h not in nodes:
+            nodes[h] = {}
+        nodes = nodes[h]
+        if '.' not in nodes:
+            nodes['.'] = []
+        nodes['.'].append(objs)
+
+def find_objs(hpath):
+    nodes = env.obj_nodes
+    for h in hpath.split(os.path.sep):
+        nodes = nodes[h]
+    return nodes['.']
+
 def copy_file(dst, src):
     if env.GetOption(['clean']):
         return
@@ -36,35 +55,32 @@ def build_defines(files, dst):
 def build_headers(files, dst, force_copy=False):
     copy_includes(files, dst, env.hdr_nodes, force_copy)
 
-def build_objects(files, name):
+def build_objects(files, hpath, store=True):
     files = files if isinstance(files, list) else [files]
-    nodes = env.obj_nodes
-    if name not in nodes:
-        nodes[name] = []
+    nodes = []
+    name = env.proj + ''.join(hpath.split(os.path.sep))
     mod = [('CURR_MODULE_NAME', env['ESCAPE']('"' + name + '"'))]
     for s in files:
         src = os.path.join('build', s)
         cur_node = env.SharedObject(src,
                                    CPPDEFINES=env['CPPDEFINES'] + mod)
-        nodes[name].append(cur_node)
+        nodes.append(cur_node)
+    if store:
+        insert_objs(nodes, hpath)
+    return nodes
 
-def build_metadata(files, name):
+def build_metadata(files, hpath):
     files = files if isinstance(files, list) else [files]
-    nodes = env.meta_nodes
-    obj_nodes = env.obj_nodes
-    if name not in nodes:
-        nodes[name] = []
-    if name not in obj_nodes:
-        obj_nodes[name] = []
+    nodes = []
     for m in files:
         src = env.Meta(os.path.join('build', m))
         cur_node = env.SharedObject(src)
-        nodes[name].append(cur_node)
-        obj_nodes[name].append(cur_node)
+        nodes.append(cur_node)
+    insert_objs(nodes, hpath)
+    return nodes
 
 def build_library(objs, name, force_name=False):
     objs = objs if isinstance(objs, list) else [objs]
-    nodes = env.lib_nodes
     dst = os.path.join('build', 'lib', name)
     if force_name:
         cur_node = env.LoadableModule(
@@ -73,10 +89,11 @@ def build_library(objs, name, force_name=False):
             LIBPREFIXES=[env['LIBPREFIXES']] + [''])
     else:
         cur_node = env.LoadableModule(dst, objs)
-    nodes.append(cur_node)
+    env.lib_nodes.append(cur_node)
 
-def build_tests(files, name, sup_objs=[], libs=[]):
+def build_tests(files, name, sup_objs=[], libs=env.lib_nodes):
     files = files if isinstance(files, list) else [files]
+    sup_objs = [sup_objs] if isinstance(sup_objs, str) else sup_objs
     nodes = env.test_nodes
     mod = [('CURR_MODULE_NAME', env['ESCAPE']('"' + name + '"'))]
     l = libs if isinstance(libs, list) else [libs]
@@ -89,7 +106,8 @@ def build_tests(files, name, sup_objs=[], libs=[]):
                                LIBS=env['LIBS'] + l)
         nodes.append(cur_node)
 
-def build_directory(dir, extra_objs=[], test_libs=[], build_lib=True):
+def build_directory(dir, extra_objs=[], test_libs=env.lib_nodes,
+                    build_lib=True):
     test_libs = [test_libs] if isinstance(test_libs, str) else test_libs
     extra_objs = [extra_objs] if isinstance(extra_objs, str) else extra_objs
     srcDir = os.path.join(dir, 'src')
@@ -99,17 +117,18 @@ def build_directory(dir, extra_objs=[], test_libs=[], build_lib=True):
 
     build_defines(glob.glob(os.path.join(srcDir, '*.def')), hdrDir)
     build_headers(glob.glob(os.path.join(srcDir, '*.h')), hdrDir)
-    build_metadata(glob.glob(os.path.join(srcDir, '*.meta')), mod)
-    build_objects(glob.glob(os.path.join(srcDir, '*.c')), mod)
+    build_metadata(glob.glob(os.path.join(srcDir, '*.meta')), dir)
+    build_objects(glob.glob(os.path.join(srcDir, '*.c')), dir)
     if build_lib:
-        build_library(env.obj_nodes[mod] + extra_objs, mod)
+        objs = find_objs(dir)
+        build_library(objs + extra_objs, mod)
     if os.path.exists(tstDir):
         tst_files = glob.glob(os.path.join(tstDir, 'test*.c'))
         sup_gen = glob.iglob(os.path.join(tstDir, '*.c'))
         sup_files = [f for f in sup_gen if f not in tst_files]
-        build_objects(sup_files, mod + '_test_objects')
+        sup = build_objects(sup_files, dir, False)
         build_tests(tst_files, mod,
-                    sup_objs=env.obj_nodes[mod + '_test_objects'],
+                    sup_objs=sup,
                     libs=test_libs + [mod])
 
 env.build_defines = build_defines

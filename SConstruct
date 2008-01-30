@@ -31,6 +31,8 @@ opts.AddOptions(
 #
 
 env = Environment(CC='cc', ENV=os.environ, options=opts)
+env['CPPPATH'] = env['CPPPATH'] if 'CPPPATH' in env._dict else []
+env['LIBPATH'] = env['LIBPATH'] if 'LIBPATH' in env._dict else []
 env['CPPDEFINES'] = env['CPPDEFINES'] if 'CPPDEFINES' in env._dict else []
 env['LIBS'] = env['LIBS'] if 'LIBS' in env._dict else []
 
@@ -78,48 +80,19 @@ else:
                       'StGermain/Base/IO/mpirecord')
 
 env.build_directory('Base/Foundation')
-env.build_directory('Base/IO',
-                    test_libs='StGermainBaseFoundation')
-env.build_directory('Base/Container',
-                    test_libs=['StGermainBaseFoundation',
-                               'StGermainBaseIO'])
-env.build_directory('Base/Automation',
-                    test_libs=['StGermainBaseFoundation',
-                               'StGermainBaseIO',
-                               'StGermainBaseContainer'])
-env.build_directory('Base/Extensibility',
-                    test_libs=['StGermainBaseFoundation',
-                               'StGermainBaseIO',
-                               'StGermainBaseContainer',
-                               'StGermainBaseAutomation'])
-env.build_directory('Base/Context',
-                    test_libs=['StGermainBaseFoundation',
-                               'StGermainBaseIO',
-                               'StGermainBaseContainer',
-                               'StGermainBaseAutomation',
-                               'StGermainBaseExtensibility'])
-env.build_directory('Base',
-                    extra_objs=env.obj_nodes['StGermainBaseFoundation'] + \
-                        env.obj_nodes['StGermainBaseIO'] + \
-                        env.obj_nodes['StGermainBaseContainer'] + \
-                        env.obj_nodes['StGermainBaseAutomation'] + \
-                        env.obj_nodes['StGermainBaseExtensibility'] + \
-                        env.obj_nodes['StGermainBaseContext'])
+env.build_directory('Base/IO')
+env.build_directory('Base/Container')
+env.build_directory('Base/Automation')
+env.build_directory('Base/Extensibility')
+env.build_directory('Base/Context')
+env.build_directory('Base')
 env.build_directory('Utils', test_libs='StGermainBase')
 
 env.build_headers(glob.glob('libStGermain/src/*.h'), 'StGermain')
 env.build_objects(glob.glob('libStGermain/src/*.c'), 'libStGermain')
 env.build_metadata(glob.glob('libStGermain/src/*.meta'), 'libStGermain')
 
-allNodes = env.obj_nodes['StGermainBaseFoundation'] + \
-    env.obj_nodes['StGermainBaseIO'] + \
-    env.obj_nodes['StGermainBaseContainer'] + \
-    env.obj_nodes['StGermainBaseAutomation'] + \
-    env.obj_nodes['StGermainBaseExtensibility'] + \
-    env.obj_nodes['StGermainBaseContext'] + \
-    env.obj_nodes['StGermainUtils'] + \
-    env.obj_nodes['libStGermain']
-env.build_library(allNodes, 'StGermain')
+env.build_library(env.obj_nodes['.'], 'StGermain')
 
 env.build_tests(glob.glob('libStGermain/tests/test*.c'), 'StGermain',
                 libs='StGermain')
