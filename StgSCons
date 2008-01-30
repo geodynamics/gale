@@ -1,0 +1,173 @@
+import os, glob
+Import('env')
+
+# Setup a few global variables.
+env.def_nodes = []
+env.hdr_nodes = []
+env.meta_nodes = {}
+env.obj_nodes = {}
+env.lib_nodes = []
+env.test_nodes = []
+
+#
+# Helper functions.
+#
+
+def insert_objs(objs, hpath):
+    nodes = env.obj_nodes
+    if '.' not in nodes:
+        nodes['.'] = []
+    nodes['.'].append(objs)
+    for h in hpath.split(os.path.sep):
+        if h not in nodes:
+            nodes[h] = {}
+        nodes = nodes[h]
+        if '.' not in nodes:
+            nodes['.'] = []
+        nodes['.'].append(objs)
+
+def find_objs(hpath):
+    nodes = env.obj_nodes
+    for h in hpath.split(os.path.sep):
+        nodes = nodes[h]
+    return nodes['.']
+
+def copy_file(dst, src):
+    if env.GetOption(['clean']):
+        return
+    dstDir = os.path.dirname(dst)
+    if not os.path.exists(dstDir):
+        Execute(Mkdir(dstDir))
+    Execute(Copy(dst, src))
+
+def copy_includes(files, dst, inc_nodes, force=False):
+    files = files if isinstance(files, list) else [files]
+    dst = os.path.join('build', 'include', dst)
+    for i in files:
+        cur_node = env.Install(dst, os.path.join('build', i))
+        inc_nodes.append(cur_node)
+        if force and not File(cur_node[0].path).current():
+            copy_file(cur_node[0].path, i)
+
+def build_defines(files, dst):
+    copy_includes(files, dst, env.def_nodes, True)
+
+def build_headers(files, dst, force_copy=False):
+    copy_includes(files, dst, env.hdr_nodes, force_copy)
+
+def build_objects(files, hpath, store=True):
+    files = files if isinstance(files, list) else [files]
+    nodes = []
+    name = env.proj + ''.join(hpath.split(os.path.sep))
+    mod = [('CURR_MODULE_NAME', env['ESCAPE']('"' + name + '"'))]
+    for s in files:
+        src = os.path.join('build', s)
+        cur_node = env.SharedObject(src,
+                                   CPPDEFINES=env['CPPDEFINES'] + mod)
+        nodes.append(cur_node)
+    if store:
+        insert_objs(nodes, hpath)
+    return nodes
+
+def build_metadata(files, hpath):
+    files = files if isinstance(files, list) else [files]
+    nodes = []
+    for m in files:
+        src = env.Meta(os.path.join('build', m))
+        cur_node = env.SharedObject(src)
+        nodes.append(cur_node)
+    insert_objs(nodes, hpath)
+    return nodes
+
+def build_library(objs, name, force_name=False):
+    objs = objs if isinstance(objs, list) else [objs]
+    dst = os.path.join('build', 'lib', name)
+    if force_name:
+        cur_node = env.LoadableModule(
+            dst, objs,
+            SHLIBPREFIX='',
+            LIBPREFIXES=[env['LIBPREFIXES']] + [''])
+    else:
+        cur_node = env.LoadableModule(dst, objs)
+    env.lib_nodes.append(cur_node)
+
+def build_tests(files, name, sup_objs=[], libs=env.lib_nodes):
+    files = files if isinstance(files, list) else [files]
+    sup_objs = [sup_objs] if isinstance(sup_objs, str) else sup_objs
+    nodes = env.test_nodes
+    mod = [('CURR_MODULE_NAME', env['ESCAPE']('"' + name + '"'))]
+    l = libs if isinstance(libs, list) else [libs]
+    for s in files:
+        src = os.path.join('build', s)
+        dst = os.path.join('build', 'tests',
+                           os.path.splitext(os.path.basename(s))[0])
+        cur_node = env.Program(dst, [src] + sup_objs,
+                               CPPDEFINES=env['CPPDEFINES'] + mod,
+                               LIBS=env['LIBS'] + l)
+        nodes.append(cur_node)
+
+def build_directory(dir, extra_objs=[], test_libs=env.lib_nodes,
+                    build_lib=True):
+    test_libs = [test_libs] if isinstance(test_libs, str) else test_libs
+    extra_objs = [extra_objs] if isinstance(extra_objs, str) else extra_objs
+    srcDir = os.path.join(dir, 'src')
+    tstDir = os.path.join(dir, 'tests')
+    hdrDir = os.path.join(env.proj, dir)
+    mod = ''.join(hdrDir.split(os.path.sep))
+
+    build_defines(glob.glob(os.path.join(srcDir, '*.def')), hdrDir)
+    build_headers(glob.glob(os.path.join(srcDir, '*.h')), hdrDir)
+    build_metadata(glob.glob(os.path.join(srcDir, '*.meta')), dir)
+    build_objects(glob.glob(os.path.join(srcDir, '*.c')), dir)
+    if build_lib:
+        objs = find_objs(dir)
+        build_library(objs + extra_objs, mod)
+    if os.path.exists(tstDir):
+        tst_files = glob.glob(os.path.join(tstDir, 'test*.c'))
+        sup_gen = glob.iglob(os.path.join(tstDir, '*.c'))
+        sup_files = [f for f in sup_gen if f not in tst_files]
+        sup = build_objects(sup_files, dir, False)
+        build_tests(tst_files, mod,
+                    sup_objs=sup,
+                    libs=test_libs + [mod])
+
+env.build_defines = build_defines
+env.build_headers = build_headers
+env.build_objects = build_objects
+env.build_metadata = build_metadata
+env.build_library = build_library
+env.build_tests = build_tests
+env.build_directory = build_directory
+
+#
+# Custom builders.
+#
+
+# Builder for generating meta files (courtesy of Walter Landry).
+def create_meta(target, source, env):
+    output_file = file(str(target[0]),'wb')
+    output_file.write("#define XML_METADATA \"")
+    xml_file = file(str(source[0]))
+    xml_lines = xml_file.readlines()
+    for l in xml_lines:
+        output_file.write(l.replace('\"','\\\"')[:-1])
+    output_file.write("\"\n#define COMPONENT_NAME ")
+    for l in xml_lines:
+        start=l.find('<param name="Name">')
+        if start!=-1:
+            end=l.find('<',start+19)
+            if end==-1:
+                raise RunTimeError('Malformed XML file.  The file '
+                                   + str(source[0])
+                                   + ' does not close off <param name="Name"> on the same line.')
+            output_file.write(l[start+19:end])
+            output_file.write("\n")
+            break
+    template_file=file("meta-template.c")
+    output_file.write(template_file.read())
+
+def gen_meta_suffix(env, sources):
+    return "-meta.c"
+
+env['BUILDERS']['Meta']=Builder(action=create_meta,src_suffix="meta",
+                                suffix=gen_meta_suffix,single_source=True)
