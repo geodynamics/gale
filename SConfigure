@@ -8,7 +8,7 @@ Import('env opts')
 def push_paths(cpp=[], lib=[]):
     cpp = [cpp] if isinstance(cpp, str) else cpp
     lib = [lib] if isinstance(lib, str) else lib
-    old = [env['CPPPATH'], env['LIBPATH']]
+    old = [list(env['CPPPATH']), list(env['LIBPATH'])]
     env.AppendUnique(CPPPATH=cpp)
     env.AppendUnique(LIBPATH=lib)
     return old
@@ -141,7 +141,7 @@ MPI_Finalize();
 return (MPI_VERSION == 2) ? 0 : 1;
 }
 """
-    old = env['LIBS'], env['RPATH']
+    old = list(env['LIBS']), list(env['RPATH'])
     env.Append(LIBS=libs)
     env.Append(RPATH=libpath)
     res = ctx.TryRun(src, '.c')[0]
@@ -185,7 +185,7 @@ int main(int argc, char** argv) {
 return 0;
 }
 """
-    old = env['LIBS']
+    old = list(env['LIBS'])
     env.Replace(LIBS=libs)
     res = ctx.TryLink(src, '.c')
     env.Replace(LIBS=old)
@@ -227,7 +227,7 @@ StGermain_Finalise();
 return 0;
 }
 """
-    old = env['LIBS']
+    old = list(env['LIBS'])
     env.Replace(LIBS=libs)
     res = ctx.TryLink(src, '.c')
     env.Replace(LIBS=old)
@@ -268,7 +268,7 @@ int main(int argc, char** argv) {
 return 0;
 }
 """
-    old = env['LIBS']
+    old = list(env['LIBS'])
     env.Append(LIBS=libs)
     res = ctx.TryLink(src, '.c')
     env.Replace(LIBS=old)
@@ -303,7 +303,7 @@ int main(int argc, char** argv) {
 return 0;
 }
 """
-    old = env['LIBS']
+    old = list(env['LIBS'])
     env.Replace(LIBS=libs)
     res = ctx.TryLink(src, '.c')
     env.Replace(LIBS=old)
@@ -370,7 +370,7 @@ printf("wrong version, need at least 2.3.2");
 return 0;
 }
 """
-    old = env['LIBS'], env['RPATH']
+    old = list(env['LIBS']), list(env['RPATH'])
     env.Append(LIBS=libs)
     env.Append(RPATH=libpath)
     res = ctx.TryRun(src, '.c')
