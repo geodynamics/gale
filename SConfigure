@@ -5,181 +5,101 @@ Import('env opts')
 # Helper functions.
 #
 
-def getPETScArch(baseDir):
-    petscconf = os.path.join(baseDir, 'bmake', 'petscconf')
-    if not os.path.exists(petscconf):
-        return None
-    f = file(petscconf, 'r')
-    arch = f.readline().split('=')[1][:-1]
-    f.close()
-    return arch
+def push_paths(cpp=[], lib=[]):
+    cpp = [cpp] if isinstance(cpp, str) else cpp
+    lib = [lib] if isinstance(lib, str) else lib
+    old = [env['CPPPATH'], env['LIBPATH']]
+    env.AppendUnique(CPPPATH=cpp)
+    env.AppendUnique(LIBPATH=lib)
+    return old
 
-def setupPETScHdrPath(env, baseDir):
-    arch = getPETScArch(baseDir)
-    if arch:
-        return os.path.join(baseDir, 'bmake', arch)
-    else:
-        return None
-
-def setupPETScLibPath(env, baseDir):
-    arch = getPETScArch(baseDir)
-    if arch:
-        return os.path.join(baseDir, 'lib', arch)
-    else:
-        return None
-
-def pushPaths(env, cppPaths=[], libPaths=[]):
-    state = ['', '']
-    state[0] = env['CPPPATH'] if 'CPPPATH' in env._dict else None
-    state[1] = env['LIBPATH'] if 'LIBPATH' in env._dict else None
-    for p in cppPaths:
-        env.AppendUnique(CPPPATH=[p])
-    for p in libPaths:
-        env.AppendUnique(LIBPATH=[p])
-    return state
-
-def popPaths(env, state):
-    env.Replace(CPPPATH=state[0])
-    env.Replace(LIBPATH=state[1])
-
-def appendExts(baseDir, exts):
-    paths = []
-    for e in exts:
-        if isinstance(e, str):
-            paths.append(os.path.join(baseDir, e))
-        else:
-            paths.append(e(env, baseDir))
-    return paths
-
-def packageSearch(cfg, name, check,
-                  places=[],
-                  hdrExts=['include'], libExts=['lib'],
-                  useSplit=True, useRPATH=False,
-                  fatal=True):
-    env = cfg.env
-
-    # If user specified paths, use that specifically.
-    key = name.lower() + 'Dir'
-    if key in env._dict:
-        cppPaths = appendExts(env[key], hdrExts)
-        libPaths = appendExts(env[key], libExts)
-        state = pushPaths(env, cppPaths, libPaths)
-        if check(cfg):
-            if useRPATH:
-                env.Append(RPATH=libPaths)
-            return 1
-        popPaths(env, state)
-        print "\nInvalid %s path: %s\n" % (name, env[key])
-        if fatal:
-            env.Exit()
-        else:
-            return 0
-
-    if useSplit:
-        key = name.lower() + 'IncDir'
-        cppPaths = [env[key]] if key in env._dict else []
-        key = name.lower() + 'LibDir'
-        libPaths = [env[key]] if key in env._dict else []
-        if len(cppPaths) + len(libPaths) > 0:
-            state = pushPaths(env, cppPaths, libPaths)
-            if check(cfg):
-                if useRPATH:
-                    env.Append(RPATH=libPaths)
-                return 1
-            popPaths(env, state)
-            print ''
-            if len(cppPaths):
-                print "Invalid %s header path: %s" % (name, cppPaths[0])
-            if len(libPaths):
-                print "Invalid %s library path: %s" % (name, libPaths[0])
-            print ''
-            if fatal:
-                env.Exit()
-            else:
-                return 0
-
-    # Otherwise check if it is in a default location.
-    if check(cfg):
-        return 1
-    print "\nCouldn't find %s in a location the compiler knew" % name
-    print "about, looking in a few standard places...\n"
-
-    # Lastly, search any common installations.
-    for p in places:
-        if isinstance(p, str):
-            # 'p' is a base directory.
-            cppPaths = appendExts(p, hdrExts)
-            libPaths = appendExts(p, libExts)
-            state = pushPaths(env, cppPaths, libPaths)
-        else:
-            # 'p' must be a tuple with include and library paths.
-            cppPaths = [p[0]] if p[0] is not None else []
-            libPaths = [p[1]] if p[1] is not None else []
-            state = pushPaths(env, cppPaths, libPaths)
-        if check(cfg):
-            if useRPATH:
-                env.Append(RPATH=libPaths)
-            print ''
-            if len(cppPaths):
-                print 'Using include path: %s' % cppPaths[0]
-            if len(libPaths):
-                print 'Using library path: %s' % libPaths[0]
-            print ''
-            return 1
-        popPaths(env, state)
-
-    # If we end up here we couldn't find the package.
-    if fatal:
-        key = name.lower()
-        print "Please specify your %s installation on the" % name
-        print "commandline using any of the following:"
-        print "  %sDir=<path to %s base directory>" % (key, name)
-        if useSplit:
-            print "  %sIncDir=<path to %s header directory>" % (key, name)
-            print "  %sLibDir=<path to %s library directory>\n" % (key, name)
-        env.Exit()
-    else:
-        return 0
+def pop_paths(old):
+    env.Replace(CPPPATH=old[0])
+    env.Replace(LIBPATH=old[1])
 
 #
 # Custom configuration checks.
 #
 
-def CheckMPICH(ctx):
-    src = """
-#include<mpi.h>
-int main(int argc, char** argv) {
-MPI_Init(&argc, &argv);
-MPI_Finalize();
-return 0;
-}
-"""
-    env = ctx.env
-    ctx.Message('Checking for MPICH... ')
+def print_result(ctx, state, libs):
+    if state[0]:
+        if isinstance(state[0], list):
+            for d in state[0]:
+                ctx.Display('      %s\n' % d)
+        else:
+            ctx.Display('      %s\n' % state[0])
+    if state[1]:
+        if isinstance(state[1], list):
+            for d in state[1]:
+                ctx.Display('      %s\n' % d)
+        else:
+            ctx.Display('      %s\n' % state[1])
+    ctx.Display('   using library names:\n')
+    if libs:
+        if isinstance(libs, list):
+            ctx.Display('      %s' % libs[0])
+            for l in libs[1:]:
+                ctx.Display(', %s' % l)
+            ctx.Display('\n')
+        else:
+            ctx.Display('      %s\n' % libs)
 
-    env.Replace(LIBS=['mpich'])
-    res = ctx.TryLink(src, '.c')
-    if res:
+def CheckPackage(ctx, name, check, state_gen, lib_gen):
+    ctx.Message('Checking for package %s ... ' % name)
+
+    # If options given, use that. If fails then fatal.
+    for state in state_gen('options'):
+        old = push_paths(state[0], state[1])
+        for libs in lib_gen():
+            libs = [libs] if isinstance(libs, str) else libs
+            res = check(ctx, libs)
+            if res:
+                env['PACKAGES'][name] = (state, libs)
+                ctx.Result(res)
+                return res
+        pop_paths(old)
         ctx.Result(res)
+        ctx.Display('  invalid options\n')
         return res
 
-    env.Replace(LIBS=['mpich', 'pmpich'])
-    res = ctx.TryLink(src, '.c')
-    if res:
-        ctx.Result(res)
-        return res
+    # Try and link to package with no state modification.
+    for libs in lib_gen():
+        libs = [libs] if isinstance(libs, str) else libs
+        res = check(ctx, libs)
+        if res:
+            env['PACKAGES'][name] = (None, libs)
+            ctx.Result(res)
+            return res
 
-    env.Replace(LIBS=['mpich', 'rt'])
-    res = ctx.TryLink(src, '.c')
-    if res:
-        ctx.Result(res)
-        return res
+    # Try and extract package location from shell environment.
+    for state in state_gen('environment'):
+        old = push_paths(state[0], state[1])
+        for libs in lib_gen():
+            libs = [libs] if isinstance(libs, str) else libs
+            res = check(ctx, libs)
+            if res:
+                env['PACKAGES'][name] = (state, libs)
+                ctx.Result(res)
+                ctx.Display('   found using environment variables:\n')
+                print_result(ctx, state, libs)
+                return res
+        pop_paths(old)
 
-    env.Replace(LIBS=['mpich', 'pmpich', 'rt'])
-    res = ctx.TryLink(src, '.c')
+    # Cycle through default locations.
+    for state in state_gen('default'):
+        old = push_paths(state[0], state[1])
+        for libs in lib_gen():
+            libs = [libs] if isinstance(libs, str) else libs
+            res = check(ctx, libs)
+            if res:
+                env['PACKAGES'][name] = (state, libs)
+                ctx.Result(res)
+                ctx.Display('   found in default location:\n')
+                print_result(ctx, state, libs)
+                return res
+        pop_paths(old)
 
     ctx.Result(res)
-    return res
 
 def CheckFortranSymbol(ctx):
     fSrc = """
@@ -197,7 +117,6 @@ void method_(int *i){printf("FORTRAN_SINGLE_TRAILINGBAR");}
 void method__(int *i){printf("FORTRAN_DOUBLE_TRAILINGBAR");}
 void METHOD(int *i){printf("FORTRAN_UPPERCASE");}
 """
-    env = ctx.env
     ctx.Message('Checking for fortran symbol type... ')
 
     res = ctx.TryCompile(cSrc, '.c')
@@ -225,33 +144,187 @@ void METHOD(int *i){printf("FORTRAN_UPPERCASE");}
     return res[0]
 
 #
-# Configuration script.
+# Package configuration generators.
 #
 
-# Setup some check functions for package searching.
-def checkMPICH(cfg):
-    return cfg.CheckMPICH()
+## MPICH ##
 
-def checkLibXML2(cfg):
-    return cfg.CheckLibWithHeader('xml2', 'libxml/xmlIO.h', 'C')
+def mpich_state_gen(type):
+    if type == 'options':
+        if 'mpichDir' in env._dict:
+            yield (os.path.join(env['mpichDir'], 'include'),
+                   os.path.join(env['mpichDir'], 'lib'))
+        elif 'mpichLibDir' in env._dict or 'mpichIncDir' in env._dict:
+            inc = env['mpichIncDir'] if 'mpichIncDir' in env._dict else None
+            lib = env['mpichLibDir'] if 'mpichLibDir' in env._dict else None
+            yield (inc, lib)
+    elif type == 'environment':
+        if 'MPI_DIR' in env['ENV']:
+            yield (os.path.join(env['ENV']['MPI_DIR'], 'include'),
+                   os.path.join(env['ENV']['MPI_DIR'], 'lib'))
+    elif type == 'default':
+        yield ('/usr/include/mpich', '/usr/lib')
+        yield ('/usr/local/mpich/include', '/usr/local/mpich/lib')
 
-def checkStGermain(cfg):
-    return cfg.CheckLibWithHeader('StGermain', 'StGermain/StGermain.h',
-                                  'C')
+def mpich_lib_gen():
+    yield ['mpich']
+    yield ['pmpich']
+    yield ['mpich', 'pmpich']
+    yield ['mpich', 'rt']
+    yield ['pmpich', 'rt']
+    yield ['mpich', 'pmpich', 'rt']
 
-def checkLapack(cfg):
-    return cfg.CheckLib('lapack')
+def check_mpich(ctx, libs):
+    src = """
+#include<mpi.h>
+int main(int argc, char** argv) {
+MPI_Init(&argc, &argv);
+MPI_Finalize();
+return (MPI_VERSION == 2) ? 0 : 1;
+}
+"""
+    old = env['LIBS']
+    env.Replace(LIBS=libs)
+    res = ctx.TryRun(src, '.c')[0]
+    env.Replace(LIBS=old)
+    if not res:
+        return res
 
-def checkMKL(cfg):
-    return cfg.CheckLib('mkl')
+    env.AppendUnique(LIBS=libs)
+    return res
 
+## libXML2 ##
+
+def libxml2_state_gen(type):
+    if type == 'options':
+        if 'libxml2Dir' in env._dict:
+            yield (os.path.join(env['libxml2Dir'], 'include'),
+                   os.path.join(env['libxml2Dir'], 'lib'))
+        elif 'libxml2LibDir' in env._dict or 'libxml2IncDir' in env._dict:
+            inc = env['libxml2IncDir'] \
+                if 'libxml2IncDir' in env._dict else None
+            lib = env['libxml2LibDir'] \
+                if 'libxml2LibDir' in env._dict else None
+            yield (inc, lib)
+    elif type == 'environment':
+        if 'LIBXML2_DIR' in env['ENV']:
+            yield (os.path.join(env['ENV']['LIBXML2_DIR'], 'include'),
+                   os.path.join(env['ENV']['LIBXML2_DIR'], 'lib'))
+    elif type == 'default':
+        yield ('/usr/include/libxml2', None)
+        yield ('/usr/include/libxml2', '/usr/lib')
+        yield ('/usr/local/libxml2/include', '/usr/local/libxml2/lib')
+
+def libxml2_lib_gen():
+    yield ['libxml2']
+
+def check_libxml2(ctx, libs):
+    src = """
+#include<libxml/xmlIO.h>
+int main(int argc, char** argv) {
+return 0;
+}
+"""
+    old = env['LIBS']
+    env.Replace(LIBS=libs)
+    res = ctx.TryLink(src, '.c')
+    env.Replace(LIBS=old)
+    if not res:
+        return res
+
+    env.AppendUnique(LIBS=libs)
+    return res
+
+## StGermain ##
+
+def stgermain_state_gen(type):
+    if type == 'options':
+        if 'stgermainDir' in env._dict:
+            yield (os.path.join(env['stgermainDir'], 'include'),
+                   os.path.join(env['stgermainDir'], 'lib'))
+        elif 'stgermainLibDir' in env._dict or 'stgermainIncDir' in env._dict:
+            inc = env['stgermainIncDir'] \
+                if 'stgermainIncDir' in env._dict else None
+            lib = env['stgermainLibDir'] \
+                if 'stgermainLibDir' in env._dict else None
+            yield (inc, lib)
+    elif type == 'environment':
+        if 'STGERMAIN_DIR' in env['ENV']:
+            yield (os.path.join(env['ENV']['STGERMAIN_DIR'], 'include'),
+                   os.path.join(env['ENV']['STGERMAIN_DIR'], 'lib'))
+    elif type == 'default':
+        yield ('../StGermain/build/include', '../StGermain/build/lib')
+
+def stgermain_lib_gen():
+    yield ['StGermain']
+
+def check_stgermain(ctx, libs):
+    src = """
+#include<StGermain/StGermain.h>
+int main(int argc, char** argv) {
+StGermain_Init(&argc, &argv);
+StGermain_Finalise();
+return 0;
+}
+"""
+    old = env['LIBS']
+    env.Replace(LIBS=libs)
+    res = ctx.TryLink(src, '.c')
+    env.Replace(LIBS=old)
+    if not res:
+        return res
+
+    env.AppendUnique(LIBS=libs)
+    return res
+
+## lapack ##
+
+def lapack_state_gen(type):
+    if type == 'options':
+        if 'lapackDir' in env._dict:
+            yield (None, os.path.join(env['lapackDir'], 'lib'))
+        elif 'lapackLibDir' in env._dict:
+            yield (None, env['lapackLibDir'])
+    elif type == 'environment':
+        if 'LAPACK_DIR' in env['ENV']:
+            yield (None, os.path.join(env['ENV']['LAPACK_DIR'], 'lib'))
+        if 'LAPACK_LIB_DIR' in env['ENV']:
+            yield (None, env['ENV']['LAPACK_LIB_DIR'])
+    elif type == 'default':
+        yield (None, '/usr/lib')
+
+def lapack_lib_gen():
+    yield ['lapack']
+
+def check_lapack(ctx, libs):
+    src = """
+int main(int argc, char** argv) {
+return 0;
+}
+"""
+    old = env['LIBS']
+    env.Replace(LIBS=libs)
+    res = ctx.TryLink(src, '.c')
+    env.Replace(LIBS=old)
+    if not res:
+        return res
+
+    env.AppendUnique(LIBS=libs)
+    return res
+
+#
 # Do configuration.
+#
+
 if not env.GetOption('clean'):
     cfg = Configure(env,
-                    custom_tests={'CheckMPICH':
-                                      CheckMPICH,
-                                  'CheckFortranSymbol':
-                                      CheckFortranSymbol})
+                    custom_tests={'CheckFortranSymbol':
+                                      CheckFortranSymbol,
+                                  'CheckPackage':
+                                      CheckPackage})
+
+    # Add a member to 'env' for storing package results.
+    env['PACKAGES'] = {}
 
     #
     # Check for the C math library.
@@ -262,36 +335,39 @@ if not env.GetOption('clean'):
         env.Exit()
 
     #
-    # Check for MPI.
+    #
     #
 
-    packageSearch(cfg, 'MPICH', checkMPICH,
-                  ['/usr/local/mpich'])
+    if not cfg.CheckPackage('MPICH', check_mpich,
+                            mpich_state_gen, mpich_lib_gen):
+        env.Exit()
     opts.Save('config.cache', env)
 
     #
     # Check for libXML2.
     #
 
-    packageSearch(cfg, 'libXML2', checkLibXML2,
-                  [('/usr/include/libxml2', None)])
+    if not cfg.CheckPackage('libXML2', check_libxml2,
+                            libxml2_state_gen, libxml2_lib_gen):
+        env.Exit()
     opts.Save('config.cache', env)
 
     #
     # Check for an implementation of lapack
     #
 
-    if not packageSearch(cfg, 'lapack', checkLapack, fatal=False):
-        packageSearch(cfg, 'MKL', checkMKL)
+    if not cfg.CheckPackage('lapack', check_lapack,
+                            lapack_state_gen, lapack_lib_gen):
+        env.Exit()
     opts.Save('config.cache', env)
 
     #
     # Check for StGermain.
     #
 
-    packageSearch(cfg, 'StGermain', checkStGermain,
-                  [os.path.abspath('../StGermain/build')],
-                  useRPATH=True)
+    if not cfg.CheckPackage('StGermain', check_stgermain,
+                            stgermain_state_gen, stgermain_lib_gen):
+        env.Exit()
     opts.Save('config.cache', env)
 
     #
@@ -315,7 +391,7 @@ if not env.GetOption('clean'):
     f.readline()
     f.readline()
     f.readline()
-    ver = '\\"' + str(int(f.readline())) + '\\"'
+    ver = env['ESCAPE']('"' + str(int(f.readline())) + '"')
     env.Append(CPPDEFINES=[('VERSION', ver)])
     f.close()
 
@@ -323,14 +399,15 @@ if not env.GetOption('clean'):
     # Add module extension to build commands.
     #
 
-    ext = '\\"' + env['SHLIBSUFFIX'][1:] + '\\"'
+    ext = env['ESCAPE']('"' + env['SHLIBSUFFIX'][1:] + '"')
     env.Append(CPPDEFINES=[('MODULE_EXT', ext)])
 
     #
     # Add the library directory.
     #
 
-    libDir = '\\"' + os.path.join(Dir('.').abspath, 'build', 'lib') + '\\"'
+    libDir = os.path.join(Dir('.').abspath, 'build', 'lib')
+    libDir = env['ESCAPE']('"' + libDir + '"')
     env.Append(CPPDEFINES=[('LIB_DIR', libDir)])
 
     #
