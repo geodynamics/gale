@@ -6,8 +6,10 @@ Import('env opts')
 #
 
 def push_paths(cpp=[], lib=[]):
-    cpp = [cpp] if isinstance(cpp, str) else cpp
-    lib = [lib] if isinstance(lib, str) else lib
+    cpp = [cpp] if not isinstance(cpp, list) else cpp
+    cpp = [p for p in cpp if p is not None]
+    lib = [lib] if not isinstance(lib, list) else lib
+    lib = [p for p in lib if p is not None]
     old = [list(env['CPPPATH']), list(env['LIBPATH'])]
     env.AppendUnique(CPPPATH=cpp)
     env.AppendUnique(LIBPATH=lib)
@@ -50,7 +52,7 @@ def CheckPackage(ctx, name, check, state_gen, lib_gen):
     # If options given, use that. If fails then fatal.
     for state in state_gen('options'):
         old = push_paths(state[0], state[1])
-        for libs in lib_gen():
+        for libs in lib_gen(state):
             libs = [libs] if isinstance(libs, str) else libs
             res = check(ctx, libs, state[1])
             if res:
@@ -74,7 +76,7 @@ def CheckPackage(ctx, name, check, state_gen, lib_gen):
     # Try and extract package location from shell environment.
     for state in state_gen('environment'):
         old = push_paths(state[0], state[1])
-        for libs in lib_gen():
+        for libs in lib_gen(state):
             libs = [libs] if isinstance(libs, str) else libs
             res = check(ctx, libs, state[1])
             if res:
@@ -88,7 +90,7 @@ def CheckPackage(ctx, name, check, state_gen, lib_gen):
     # Cycle through default locations.
     for state in state_gen('default'):
         old = push_paths(state[0], state[1])
-        for libs in lib_gen():
+        for libs in lib_gen(state):
             libs = [libs] if isinstance(libs, str) else libs
             res = check(ctx, libs, state[1])
             if res:
@@ -124,7 +126,7 @@ def mpich_state_gen(type):
         yield ('/usr/include/mpich', '/usr/lib')
         yield ('/usr/local/mpich/include', '/usr/local/mpich/lib')
 
-def mpich_lib_gen():
+def mpich_lib_gen(state=None):
     yield ['mpich']
     yield ['pmpich']
     yield ['mpich', 'pmpich']
@@ -175,7 +177,7 @@ def libxml2_state_gen(type):
         yield ('/usr/include/libxml2', '/usr/lib')
         yield ('/usr/local/libxml2/include', '/usr/local/libxml2/lib')
 
-def libxml2_lib_gen():
+def libxml2_lib_gen(state=None):
     yield ['libxml2']
 
 def check_libxml2(ctx, libs, libpath=None):
@@ -215,7 +217,7 @@ def stgermain_state_gen(type):
     elif type == 'default':
         yield ('../StGermain/build/include', '../StGermain/build/lib')
 
-def stgermain_lib_gen():
+def stgermain_lib_gen(state=None):
     yield ['StGermain']
 
 def check_stgermain(ctx, libs, libpath=None):
@@ -257,7 +259,7 @@ def stgdomain_state_gen(type):
     elif type == 'default':
         yield ('../StgDomain/build/include', '../StgDomain/build/lib')
 
-def stgdomain_lib_gen():
+def stgdomain_lib_gen(state=None):
     yield ['StgDomain']
 
 def check_stgdomain(ctx, libs, libpath=None):
@@ -294,7 +296,7 @@ def lapack_state_gen(type):
     elif type == 'default':
         yield (None, '/usr/lib')
 
-def lapack_lib_gen():
+def lapack_lib_gen(state=None):
     yield ['lapack']
 
 def check_lapack(ctx, libs, libpath=None):
@@ -315,14 +317,28 @@ return 0;
 
 ## PETSc ##
 
-def petsc_arch(baseDir):
-    petscconf = os.path.join(baseDir, 'bmake', 'petscconf')
+def petsc_arch(base_dir):
+    petscconf = os.path.join(base_dir, 'bmake', 'petscconf')
     if not os.path.exists(petscconf):
         return None
     f = file(petscconf, 'r')
     arch = f.readline().split('=')[1][:-1]
     f.close()
     return arch
+
+def petsc_x11_libs(base_dir, arch):
+    petscconf = os.path.join(base_dir, 'bmake', arch, 'petscconf')
+    if not os.path.exists(petscconf):
+        return None
+    f = file(petscconf, 'r')
+    libs = []
+    for l in f.readlines():
+        if l[:7] == 'X11_LIB':
+            libs = l.split('=')[1].strip().split(' ')
+            libs = [lib[2:] for lib in libs]
+            break
+    f.close()
+    return libs
 
 def petsc_state_gen(type):
     if type == 'options':
@@ -331,7 +347,9 @@ def petsc_state_gen(type):
             if arch:
                 yield ([os.path.join(env['petscDir'], 'include'),
                         os.path.join(env['petscDir'], 'bmake', arch)],
-                       os.path.join(env['petscDir'], 'lib', arch))
+                       os.path.join(env['petscDir'], 'lib', arch),
+                       env['petscDir'],
+                       arch)
     elif type == 'environment':
         if 'PETSC_DIR' in env['ENV']:
             dir = env['ENV']['PETSC_DIR']
@@ -342,18 +360,26 @@ def petsc_state_gen(type):
             if arch:
                 yield ([os.path.join(dir, 'include'),
                         os.path.join(dir, 'bmake', arch)],
-                       os.path.join(dir, 'lib', arch))
+                       os.path.join(dir, 'lib', arch),
+                       dir,
+                       arch)
     elif type == 'default':
         dir = '/usr/local/petsc'
         arch = petsc_arch(dir)
         if arch:
             yield ([os.path.join(dir, 'include'),
                     os.path.join(dir, 'bmake', arch)],
-                   os.path.join(dir, 'lib', arch))
+                   os.path.join(dir, 'lib', arch),
+                   dir,
+                   arch)
 
-def petsc_lib_gen():
+def petsc_lib_gen(state=None):
+    if state:
+        libs = petsc_x11_libs(state[2], state[3])
+    else:
+        libs = []
     yield ['petsc', 'petscvec', 'petscmat', 'petscksp',
-           'petscsnes', 'petscdm']
+           'petscsnes', 'petscdm'] + libs
 
 def check_petsc(ctx, libs, libpath=None):
     src = """
