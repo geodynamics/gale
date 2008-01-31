@@ -95,10 +95,12 @@ void _PETScNonlinearSolver_Init( PETScNonlinearSolver* self ) {
 	PetscErrorCode		ec;
 	
 	assert( self && Stg_CheckType( self, PETScNonlinearSolver ) );
-	assert( J && Stg_CheckType( J, PETScMatrix ) );
 
+	self->J	= PETSC_NULL;
 	self->snes = PETSC_NULL;
 	self->ksp = PETSC_NULL;
+
+	PETScNonlinearSolver_SetComm( self, MPI_COMM_WORLD );
 }
 
 

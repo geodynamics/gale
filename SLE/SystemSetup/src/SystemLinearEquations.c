@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SystemLinearEquations.c 1013 2008-01-30 07:54:12Z DavidLee $
+** $Id: SystemLinearEquations.c 1016 2008-01-31 07:58:26Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -181,13 +181,14 @@ void _SystemLinearEquations_Init(
 	self->bcRemoveQuery = True;
 
 	/* Init NonLinear Stuff */
-	if ( isNonLinear ) 
+	if ( isNonLinear ) {
+		self->nonLinearSolutionType	= nonLinearSolutionType;
 		SystemLinearEquations_SetToNonLinear( self );
+	}
 	self->nonLinearTolerance        = nonLinearTolerance;
 	self->nonLinearMaxIterations    = nonLinearMaxIterations;
 	self->killNonConvergent         = killNonConvergent;
 	self->nonLinearMinIterations    = nonLinearMinIterations;
-	self->nonLinearSolutionType	= nonLinearSolutionType;
 
 	/* BEGIN LUKE'S FRICTIONAL BCS BIT */
 	Stg_asprintf( &self->nlEPName, "%s-nlEP", self->name );
@@ -399,7 +400,9 @@ void _SystemLinearEquations_Construct( void* sle, Stg_ComponentFactory* cf, void
 
 	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, False, data );
 								/* should this be a PETSc nls?? */
-	nlSolver = Stg_ComponentFactory_ConstructByKey( cf, self->name, NonlinearSolver_Type, NonlinearSolver, False, data );
+	//nlSolver = Stg_ComponentFactory_ConstructByKey( cf, self->name, NonlinearSolver_Type, NonlinearSolver, False, data );
+	if( isNonLinear )
+		nlSolver = PETScNonlinearSolver_New( "nonLinearSolver" );
 
 	_SystemLinearEquations_Init( 
 			self,
@@ -419,6 +422,7 @@ void _SystemLinearEquations_Construct( void* sle, Stg_ComponentFactory* cf, void
 	self->delta_x   = PETScVector_New( "delta x" );
 	self->F		= PETScVector_New( "residual" );
 	self->J		= PETScMatrix_New( "Jacobian" ); 
+	PETScMatrix_SetComm( self->J, MPI_COMM_WORLD );
 }
 
 /* Build */
