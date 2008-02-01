@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StandardConditionFunctions.c 1004 2008-01-22 00:44:16Z RebeccaFarrington $
+** $Id: StandardConditionFunctions.c 1017 2008-02-01 00:36:32Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -140,7 +140,13 @@ void _StgFEM_StandardConditionFunctions_Construct( void* component, Stg_Componen
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ErrorFunc, "ErrorFunc");
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ConstantVelocity, "ConstantVelocity");
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ConstantValueX, "ConstantValueX");
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ConstantValueY, "ConstantValueY");
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ConstantValueZ, "ConstantValueZ");
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_GaussianDistribution, "GaussianDistribution");
@@ -968,25 +974,28 @@ void StgFEM_StandardConditionFunctions_ConvectionBenchmark( Node_LocalIndex node
 	*result = ( 1 - y ) + ( cos( M_PI * x ) * sin( M_PI * y ) ) / 100 ;
 }
 
-void StgFEM_StandardConditionFunctions_ConstantVelocity( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
-	DomainContext*	context            = (DomainContext*)_context;
+void StgFEM_StandardConditionFunctions_ConstantValueX( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	DomainContext*		context            = (DomainContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
-	FeVariable*             feVariable         = NULL;
-	FeMesh*			mesh               = NULL;
 	double*                 result             = (double*) _result;
-	double                  velocity[3];
 	
-	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
-	mesh       = feVariable->feMesh;
+	*result = Dictionary_GetDouble_WithDefault( dictionary, "ConstantValueX", 0.0 );
+}
 
-	velocity[ I_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "ConstantVelocity_Vx", 0.0 );
-	velocity[ J_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "ConstantVelocity_Vy", 1.0 );
-	velocity[ K_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "ConstantVelocity_Vz", 0.0 );
+void StgFEM_StandardConditionFunctions_ConstantValueY( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	DomainContext*		context            = (DomainContext*)_context;
+	Dictionary*             dictionary         = context->dictionary;
+	double*                 result             = (double*) _result;
+	
+	*result = Dictionary_GetDouble_WithDefault( dictionary, "ConstantValueY", 0.0 );
+}
 
-	result[ I_AXIS ] = velocity[ I_AXIS ];
-	result[ J_AXIS ] = velocity[ J_AXIS ];
-	if( feVariable->dim == 3 )
-		result[ K_AXIS ] = velocity[ K_AXIS ];
+void StgFEM_StandardConditionFunctions_ConstantValueZ( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	DomainContext*		context            = (DomainContext*)_context;
+	Dictionary*             dictionary         = context->dictionary;
+	double*                 result             = (double*) _result;
+	
+	*result = Dictionary_GetDouble_WithDefault( dictionary, "ConstantValueZ", 0.0 );
 }
 
 
@@ -1246,10 +1255,7 @@ void StgFEM_StandardConditionFunctions_HalfContainer( Node_LocalIndex node_lI, V
 	double*                 result             = (double*) _result;
 	Name			variableName;
 	double*			coord;
-	unsigned		nDims              = context->dim;
-	unsigned		dim_I;
 	double			halfPoint          = Dictionary_GetDouble_WithDefault( dictionary, "halfPoint", 0.0 );
-	double			distsq             = 0.0;
 
 	variableName = Dictionary_GetString_WithDefault( dictionary, "FieldVariable", "" );
 	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, variableName );

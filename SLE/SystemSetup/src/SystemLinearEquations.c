@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SystemLinearEquations.c 1016 2008-01-31 07:58:26Z DavidLee $
+** $Id: SystemLinearEquations.c 1017 2008-02-01 00:36:32Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -422,7 +422,8 @@ void _SystemLinearEquations_Construct( void* sle, Stg_ComponentFactory* cf, void
 	self->delta_x   = PETScVector_New( "delta x" );
 	self->F		= PETScVector_New( "residual" );
 	self->J		= PETScMatrix_New( "Jacobian" ); 
-	PETScMatrix_SetComm( self->J, MPI_COMM_WORLD );
+	//PETScMatrix_SetComm( self->J, MPI_COMM_WORLD );
+	PETScMatrix_SetComm( self->J, self->comm );
 }
 
 /* Build */
@@ -451,8 +452,9 @@ void _SystemLinearEquations_Build( void* sle, void* _context ) {
 		Stg_Component_Build( self->solutionVectors->data[index], _context, False );
 	}
 	
-	/* lastly, the solver */
-	Stg_Component_Build( self->solver, self, False );
+	/* lastly, the solver - if required */
+	if( self->solver )
+		Stg_Component_Build( self->solver, self, False );
 	if( self->nlSolver )
 		Stg_Component_Build( self->nlSolver, self, False );
 
@@ -491,8 +493,9 @@ void _SystemLinearEquations_Initialise( void* sle, void* _context ) {
 	/* Setup Location Matrix */
 	SystemLinearEquations_LM_Setup( self, _context );
 
-	/* lastly, the solver */
-	Stg_Component_Initialise( self->solver, self, False );
+	/* lastly, the solver, if required */
+	if( self->solver )
+		Stg_Component_Initialise( self->solver, self, False );
 	if( self->nlSolver )
 		Stg_Component_Initialise( self->nlSolver, self, False );
 	Stream_UnIndentBranch( StgFEM_Debug );
@@ -518,8 +521,9 @@ void SystemLinearEquations_ExecuteSolver( void* sle, void* _context ) {
 	
 	Journal_Printf(self->info,"Linear solver (%s) \n",self->executeEPName);
 		
-	wallTime = MPI_Wtime();		
-	Stg_Component_Execute( self->solver, self, True );
+	wallTime = MPI_Wtime();
+	if( self->solver )	
+		Stg_Component_Execute( self->solver, self, True );
 	
 	Journal_Printf(self->info,"Linear solver (%s), solution time %6.6e (secs)\n",self->executeEPName, MPI_Wtime() - wallTime);
 		
