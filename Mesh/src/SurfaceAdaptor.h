@@ -108,7 +108,7 @@
 	void _SurfaceAdaptor_Execute( void* adaptor, void* data );
 	void _SurfaceAdaptor_Destroy( void* adaptor, void* data );
 
-	void SurfaceAdaptor_Generate( void* adaptor, void* _mesh );
+	void SurfaceAdaptor_Generate( void* adaptor, void* _mesh, void* data );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Public functions

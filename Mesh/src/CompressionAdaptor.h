@@ -82,7 +82,7 @@
 	void _CompressionAdaptor_Execute( void* adaptor, void* data );
 	void _CompressionAdaptor_Destroy( void* adaptor, void* data );
 
-	void CompressionAdaptor_Generate( void* adaptor, void* _mesh );
+	void CompressionAdaptor_Generate( void* adaptor, void* _mesh, void* data );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Public functions

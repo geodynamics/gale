@@ -186,8 +186,13 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
 	unsigned*		size;
 	unsigned		shadowDepth;
 	Stream*			stream;
+	Stream*			errorStream = Journal_Register( Error_Type, self->type );
 	unsigned		d_i;
-
+	unsigned 		restartTimestep;
+	char 			meshSaveFileName[256];
+	char			checkpointPath[256];
+	char			checkpointPrefix[256];
+	
 	assert( self && Stg_CheckType( self, CartesianGenerator ) );
 	assert( cf );
 
@@ -255,7 +260,7 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
 		assert( Dictionary_Entry_Value_GetCount( maxList ) >= self->nDims );
 		crdMin = Memory_Alloc_Array_Unnamed( double, self->nDims );
 		crdMax = Memory_Alloc_Array_Unnamed( double, self->nDims );
-		for( d_i = 0; d_i < self->nDims; d_i++ ) {
+		for( d_i = 0; d_i < self->nDims; d_i++ ) {	
 			tmp = Dictionary_Entry_Value_GetElement( minList, d_i );
 			rootKey = Dictionary_Entry_Value_AsString( tmp );
 
@@ -271,6 +276,40 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
 			crdMax[d_i] = Dictionary_Entry_Value_AsDouble( tmp );
 		}
 
+		restartTimestep = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "restartTimestep", 1 );	
+		if( restartTimestep ) {
+			strcpy( checkpointPath, Stg_ComponentFactory_GetRootDictString( cf, "checkpointPath", "" ) );
+			strcpy( checkpointPrefix, Stg_ComponentFactory_GetRootDictString( cf, "checkPointPrefixString", "" ) );
+			
+			if ( strlen(checkpointPrefix) > 0 ) {
+				sprintf( meshSaveFileName, "%s/%s.Mesh.%05d.dat", checkpointPath,
+					checkpointPrefix, restartTimestep );
+			}
+			else {
+				sprintf( meshSaveFileName, "%s/Mesh.%05d.dat", checkpointPath,
+					restartTimestep );
+			}			
+			
+			FILE* meshFile = fopen( meshSaveFileName, "rb" );	
+			/*Journal_Firewall( 
+				meshFile != 0, 
+				errorStream, 
+				"Error in %s - Couldn't find checkpoint mesh file with filename \"%s\" - aborting.\n", 
+				__func__,  
+				meshSaveFileName );*/
+
+			if( meshFile == 0 ) {
+				Journal_Printf( errorStream, 
+					"Warning - Couldn't find checkpoint mesh file with filename \"%s\".\n", 
+					meshSaveFileName );
+			}
+			else {
+				fread( crdMin, sizeof( double ), self->nDims, meshFile );
+				fread( crdMax, sizeof( double ), self->nDims, meshFile );
+				fclose( meshFile );
+			}
+		}
+	
 		/* Initial setup. */
 		CartesianGenerator_SetGeometryParams( self, crdMin, crdMax );
 
@@ -322,13 +361,13 @@ void CartesianGenerator_SetDimSize( void* meshGenerator, unsigned nDims ) {
 	memset( self->maxDecomp, 0, nDims * sizeof(unsigned) );
 }
 
-void CartesianGenerator_Generate( void* meshGenerator, void* _mesh ) {
+void CartesianGenerator_Generate( void* meshGenerator, void* _mesh, void* data ) {
 	CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
 	Stream*			stream = Journal_Register( Info_Type, self->type );
 	Mesh*			mesh = (Mesh*)_mesh;
 	Grid**			grid;
 	unsigned		*localRange, *localOrigin;
-
+	
 	/* Sanity check. */
 	assert( self );
 	assert( !self->elGrid || mesh );
@@ -360,7 +399,7 @@ void CartesianGenerator_Generate( void* meshGenerator, void* _mesh ) {
 		CartesianGenerator_GenTopo( self, (IGraph*)mesh->topo );
 
 		/* Fill geometric values. */
-		CartesianGenerator_GenGeom( self, mesh );
+		CartesianGenerator_GenGeom( self, mesh, data );
 
 		/* Fill element types. */
 		CartesianGenerator_GenElementTypes( self, mesh );
@@ -1909,13 +1948,19 @@ void CartesianGenerator_MapToDomain( CartesianGenerator* self, Sync* sync,
 		incEls[inc_i] = Sync_GlobalToDomain( sync, incEls[inc_i] );
 }
 
-void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh ) {
-	Stream*		stream = Journal_Register( Info_Type, self->type );
-	Sync*		sync;
-	Grid*		grid;
-	unsigned*	inds;
-	double*		steps;
-	unsigned	n_i, d_i;
+void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* data ) {
+	Stream*			stream = Journal_Register( Info_Type, self->type );
+	Sync*			sync;
+	Grid*			grid;
+	unsigned*		inds;
+	double*			steps;
+	unsigned		n_i, d_i;
+	AbstractContext* 	context = (AbstractContext*)data;
+	char 			meshSaveFileName[256];
+	double*         	vert;
+	unsigned        	gNode;
+	Stream*			errorStream = Journal_Register( Error_Type, self->type );
+	int			myRank;
 
 	assert( self );
 	assert( mesh );
@@ -1938,19 +1983,62 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh ) {
 					 mesh->topo->nDims, 
 					 "Mesh::verts" );
 
-	/* Loop over domain nodes. */
-	for( n_i = 0; n_i < Sync_GetNumDomains( sync ); n_i++ ) {
-		double*		vert;
-		unsigned	gNode;
+	/* If loading from checkpoint, read mesh vertices from file */
+	if( context->restartTimestep && context->timeStep == context->restartTimestep ) {
+		Journal_Printf( stream, "Loading mesh values from file.\n");
 
-		gNode = Sync_DomainToGlobal( sync, n_i );
-		Grid_Lift( grid, gNode, inds );
-		vert = Mesh_GetVertex( mesh, n_i );
+		MPI_Comm_rank( MPI_COMM_WORLD, &myRank);
+		
+		if ( strlen( context->checkPointPrefixString ) > 0 ) {
+			sprintf( meshSaveFileName, "%s/%s.Mesh.%05d.dat", context->checkpointPath,
+				context->checkPointPrefixString, context->restartTimestep );
+		}
+		else {
+			sprintf( meshSaveFileName, "%s/Mesh.%05d.dat", context->checkpointPath,
+				context->restartTimestep );
+		}
 
-		/* Calculate coordinate. */
-		for( d_i = 0; d_i < mesh->topo->nDims; d_i++ ) {
-			vert[d_i] = self->crdMin[d_i] + 
-				((double)inds[d_i] / (double)(grid->sizes[d_i] - 1)) * steps[d_i];
+		FILE* meshFile = fopen( meshSaveFileName, "rb" );	//rb
+		/*Journal_Firewall( 
+			meshFile != 0, 
+			errorStream, 
+			"Error in %s - Couldn't find checkpoint mesh file with filename \"%s\" - aborting.\n", 
+			__func__,  
+			meshSaveFileName );*/
+
+		if( meshFile == 0 ) {
+			Journal_Printf( errorStream, 
+				"Warning - Couldn't find checkpoint mesh file with filename \"%s\".\n", 
+				meshSaveFileName );
+		}
+		else {
+			fseek( meshFile, (Sync_GetNumDomains( sync ) * myRank + 2) * mesh->topo->nDims * sizeof( double ), SEEK_CUR );
+
+			for( n_i = 0; n_i < Sync_GetNumDomains( sync ); n_i++ ) {
+				gNode = Sync_DomainToGlobal( sync, n_i );
+				Grid_Lift( grid, gNode, inds );
+				vert = Mesh_GetVertex( mesh, n_i );
+
+				for( d_i = 0; d_i < mesh->topo->nDims; d_i++ ) {	
+					fread( &vert[d_i], sizeof( double ), 1, meshFile );
+				}
+			}
+		}
+		fclose( meshFile );
+	}
+	else {
+		/* Loop over domain nodes. */
+		for( n_i = 0; n_i < Sync_GetNumDomains( sync ); n_i++ ) {
+			
+			gNode = Sync_DomainToGlobal( sync, n_i );
+			Grid_Lift( grid, gNode, inds );
+			vert = Mesh_GetVertex( mesh, n_i );
+
+			/* Calculate coordinate. */
+			for( d_i = 0; d_i < mesh->topo->nDims; d_i++ ) {
+				vert[d_i] = self->crdMin[d_i] + 
+					((double)inds[d_i] / (double)(grid->sizes[d_i] - 1)) * steps[d_i];
+			}
 		}
 	}
 

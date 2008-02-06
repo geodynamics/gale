@@ -160,7 +160,7 @@ void _CompressionAdaptor_Destroy( void* adaptor, void* data ) {
 ** Public Functions
 */
 
-void CompressionAdaptor_Generate( void* adaptor, void* _mesh ) {
+void CompressionAdaptor_Generate( void* adaptor, void* _mesh, void* data ) {
 	CompressionAdaptor*		self = (CompressionAdaptor*)adaptor;
 	Mesh*				mesh = (Mesh*)_mesh;
 	const Sync*			sync;
@@ -172,7 +172,7 @@ void CompressionAdaptor_Generate( void* adaptor, void* _mesh ) {
 	unsigned			d_i, n_i;
 
 	/* Build base mesh, which is assumed to be cartesian. */
-	MeshGenerator_Generate( self->generator, mesh );
+	MeshGenerator_Generate( self->generator, mesh, data );
 
 	/* If we're not 2D or 3D, forget about it. */
 	if( mesh->topo->nDims != 2 && mesh->topo->nDims != 3 )

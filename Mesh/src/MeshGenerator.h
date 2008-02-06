@@ -46,7 +46,7 @@
 
 	/** Virtual function types */
 	typedef void (MeshGenerator_SetDimSizeFunc)( void* meshGenerator, unsigned nDims );
-	typedef void (MeshGenerator_GenerateFunc)( void* meshGenerator, void* _mesh );
+	typedef void (MeshGenerator_GenerateFunc)( void* meshGenerator, void* _mesh, void* data );
 
 	/** MeshGenerator class contents */
 	#define __MeshGenerator					\
@@ -109,8 +109,8 @@
 	#define MeshGenerator_SetDimSize( self, nDims )			\
 		VirtualCall( self, setDimSizeFunc, self, nDims )
 
-	#define MeshGenerator_Generate( self, mesh )			\
-		VirtualCall( self, generateFunc, self, mesh )
+	#define MeshGenerator_Generate( self, mesh, data )			\
+		VirtualCall( self, generateFunc, self, mesh, data )
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Public functions

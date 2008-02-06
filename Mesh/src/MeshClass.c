@@ -145,14 +145,29 @@ void _Mesh_Construct( void* mesh, Stg_ComponentFactory* cf, void* data ) {
 }
 
 void _Mesh_Build( void* mesh, void* data ) {
-	Mesh*		self = (Mesh*)mesh;
-	unsigned	nDims;
-	unsigned	d_i;
+	Mesh*			self = (Mesh*)mesh;
+	unsigned		nDims;
+	unsigned		d_i;
+	AbstractContext*	context = (AbstractContext*)data;
+	char 			meshSaveFileName[256];
+	double*			temp;
+	//Stream*			errorStream = Journal_Register( Error_Type, self->type );
+	int 			i, j;
 
 	assert( self );
+	assert( context );
+
+	/*printf ("Start of _Mesh_Build function\n");
+	for( i=0; i<64; i++ ) {		
+		//fread( self->verts[i], 32 * sizeof( double ), 1, meshFile );
+		for( j=0; j<32; j++) {
+			//self->verts[i][j] = 0.0;					
+			printf ("%lf  \t", self->verts[i][j] );
+		}
+	}*/
 
 	if( self->generator )
-		MeshGenerator_Generate( self->generator, self );
+		MeshGenerator_Generate( self->generator, self, context );
 
 	nDims = Mesh_GetDimSize( self );
 	if( !nDims )
@@ -189,6 +204,7 @@ void _Mesh_Build( void* mesh, void* data ) {
 	self->maxDomainCrd = Memory_Alloc_Array( double, nDims, "Mesh::maxLocalCrd" );
 	self->minGlobalCrd = Memory_Alloc_Array( double, nDims, "Mesh::minGlobalCrd" );
 	self->maxGlobalCrd = Memory_Alloc_Array( double, nDims, "Mesh::maxGlobalCrd" );
+
 	Mesh_DeformationUpdate( self );
 }
 

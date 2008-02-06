@@ -197,7 +197,7 @@ void _SurfaceAdaptor_Destroy( void* adaptor, void* data ) {
 ** Public Functions
 */
 
-void SurfaceAdaptor_Generate( void* adaptor, void* _mesh ) {
+void SurfaceAdaptor_Generate( void* adaptor, void* _mesh, void* data ) {
 	SurfaceAdaptor*			self = (SurfaceAdaptor*)adaptor;
 	Mesh*				mesh = (Mesh*)_mesh;
 	const Sync*			sync;
@@ -207,7 +207,7 @@ void SurfaceAdaptor_Generate( void* adaptor, void* _mesh ) {
 	unsigned			n_i;
 
 	/* Build base mesh, which is assumed to be cartesian. */
-	MeshGenerator_Generate( self->generator, mesh );
+	MeshGenerator_Generate( self->generator, mesh, data );
 
 	/* If we're not 2D or 3D, forget about it. */
 	if( mesh->topo->nDims != 2 && mesh->topo->nDims != 3 )

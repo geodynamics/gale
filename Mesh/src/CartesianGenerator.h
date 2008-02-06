@@ -149,7 +149,7 @@
 	void _CartesianGenerator_Destroy( void* meshGenerator, void* data );
 
 	void CartesianGenerator_SetDimSize( void* meshGenerator, unsigned nDims );
-	void CartesianGenerator_Generate( void* meshGenerator, void* mesh );
+	void CartesianGenerator_Generate( void* meshGenerator, void* mesh, void* data );
 	void _CartesianGenerator_SetTopologyParams( void* meshGenerator, unsigned* sizes, 
 						    unsigned maxDecompDims, unsigned* minDecomp, unsigned* maxDecomp );
 	void _CartesianGenerator_GenElements( void* meshGenerator, IGraph* topo, Grid*** grids );
@@ -212,7 +212,7 @@
 	void CartesianGenerator_CompleteVertexNeighbours( CartesianGenerator* self, IGraph* topo, Grid*** grids );
 	void CartesianGenerator_MapToDomain( CartesianGenerator* self, Sync* sync, 
 					     unsigned nIncEls, unsigned* incEls );
-	void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh );
+	void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* data );
 	void CartesianGenerator_Destruct( CartesianGenerator* self );
 	void CartesianGenerator_DestructTopology( CartesianGenerator* self );
 	void CartesianGenerator_DestructGeometry( CartesianGenerator* self );
