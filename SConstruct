@@ -89,3 +89,21 @@ env.build_library(env.obj_nodes['Toolbox']['.'],
 
 env.build_tests(glob.glob('libStgFEM/tests/test*.c'),
                 'StgFEM', libs='StgFEM')
+
+env.build_plugin('plugins/CompareFeVariableAgainstReferenceSolution',
+                 'CompareFeVariableAgainstReferenceSolution')
+env.build_plugin('plugins/Document', 'Document')
+env.build_plugin('plugins/FeVariableImportExporters/FeVariable_ImportExport_ABAQUS',
+                 'FeVariableImportExporters/FeVariable_ImportExport_ABAQUS')
+env.build_plugin('plugins/FeVariableImportExporters/FeVariable_ImportExport_SpecRidge2D',
+                 'FeVariableImportExporters/FeVariable_ImportExport_SpecRidge2D')
+env.build_plugin('plugins/FileAnalyticSolution', 'FileAnalyticSolution')
+env.build_plugin('plugins/Output/CPUTime', 'Output/CPUTime')
+env.build_plugin('plugins/Output/FrequentOutput', 'Output/FrequentOutput')
+env.build_plugin('plugins/Output/PeakMemory', 'Output/PeakMemory')
+env.build_plugin('plugins/Output/PrintFeVariableDiscreteValues',
+                 'Output/PrintFeVariableDiscreteValues')
+env.build_plugin('plugins/Output/PrintFeVariableDiscreteValues_2dBox',
+                 'Output/PrintFeVariableDiscreteValues_2dBox')
+env.build_plugin('plugins/StandardConditionFunctions',
+                 'StandardConditionFunctions')
