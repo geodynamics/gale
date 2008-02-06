@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Context.c 969 2007-10-26 05:32:20Z BelindaMay $
+** $Id: Context.c 1020 2008-02-06 22:46:09Z BelindaMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -247,6 +247,11 @@ void _FiniteElementContext_Init( FiniteElementContext* self ) {
 		Context_GetEntryPoint( self, AbstractContext_EP_Save ),
 		"saveSwarms",
 		_FiniteElementContext_SaveSwarms,
+		FiniteElementContext_Type );
+	EntryPoint_Append(
+		Context_GetEntryPoint( self, AbstractContext_EP_Save ),
+		"saveMesh",
+		_FiniteElementContext_SaveMesh,
 		FiniteElementContext_Type );
 
 }
@@ -461,8 +466,6 @@ void _FiniteElementContext_SaveFeVariables( void* context ) {
 	FeVariable*               feVar = NULL;
 	char*                     outputPathString = NULL;
 	Index                     outputStrLen = 0;
-	Dictionary*               dictionary = self->dictionary;
-	Dictionary_Entry_Value*   feVarsList = NULL;
 
 	outputStrLen = strlen(self->checkpointPath) + 1 + 1;
 	if ( strlen(self->checkPointPrefixString) > 0 ) {
@@ -498,7 +501,71 @@ void _FiniteElementContext_SaveFeVariables( void* context ) {
 
 
 void _FiniteElementContext_SaveSwarms( void* context ) {
-	
+
 	Swarm_Register_SaveAllRegisteredSwarms( 
 		Swarm_Register_GetSwarm_Register(), context );
+
 }
+
+
+void _FiniteElementContext_SaveMesh( void* context ) {
+	FiniteElementContext*   self = (FiniteElementContext*) context;
+	FieldVariable*          fieldVar = NULL;
+	FeVariable*     	feVar = NULL;
+	Mesh* 			mesh;
+	unsigned 		nDims;
+	Stream*         	stream = Journal_Register( MPIStream_Type, "Context" );
+	Stream*         	info = Journal_Register( Info_Type, "Context" );
+	char			meshSaveFileName[256];
+	unsigned		n_i, d_i;
+	Sync*			sync;
+	int myRank, size, i;
+
+	Journal_Printf( info, "In %s(): about to save the mesh to disk:\n", __func__ );
+
+	MPI_Comm_rank( MPI_COMM_WORLD, &myRank);
+	MPI_Comm_size( MPI_COMM_WORLD, &size );	
+
+	if ( strlen(self->checkPointPrefixString) > 0 ) {
+		sprintf( meshSaveFileName, "%s/%s.%s.%05d.dat", self->checkpointPath,
+			self->checkPointPrefixString, "Mesh", self->timeStep );
+	}
+	else {
+		sprintf( meshSaveFileName, "%s/%s.%05d.dat", self->checkpointPath,
+			"Mesh", self->timeStep );
+	}
+
+	fieldVar = FieldVariable_Register_GetByIndex( self->fieldVariable_Register, 0 );
+
+	if ( Stg_Class_IsInstance( fieldVar, FeVariable_Type ) ) {
+		feVar = (FeVariable*)fieldVar;
+		mesh = (Mesh*)feVar->feMesh;
+	
+		nDims = Mesh_GetDimSize( mesh );
+
+		Stream_RedirectFile( stream, meshSaveFileName );	
+		_MPIStream_Write( stream, mesh->minGlobalCrd, nDims * sizeof( double ), 1 );
+		_MPIStream_Write( stream, mesh->maxGlobalCrd, nDims * sizeof( double ), 1 );
+
+		sync = (Sync*)IGraph_GetDomain( (IGraph*)mesh->topo, 0 );
+
+		for( i=0; i<size; i++ ) {
+			if( myRank == i ) {
+				for( n_i = 0; n_i < Sync_GetNumDomains( sync ); n_i++ ) {
+					double*		vert;
+
+					vert = Mesh_GetVertex( mesh, n_i );
+
+					for( d_i = 0; d_i < mesh->topo->nDims; d_i++ ) {
+						_MPIStream_Write( stream, &vert[d_i], sizeof( double ), 1 );
+					}
+				}
+			}
+			MPI_Barrier( MPI_COMM_WORLD );
+		}			
+		Stream_CloseFile( stream );
+	}
+	
+	Journal_Printf( info, "%s: saving of mesh completed.\n", __func__ );
+}
+

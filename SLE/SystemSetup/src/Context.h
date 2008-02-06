@@ -47,7 +47,7 @@
 ** Comments:
 **	There's an issue inside FE_Context_Build() see inside the code.
 **
-** $Id: Context.h 964 2007-10-11 08:03:06Z SteveQuenette $
+** $Id: Context.h 1020 2008-02-06 22:46:09Z BelindaMay $
 *
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -184,5 +184,7 @@
 	/** Saves all Swarms known about by the context to file (necessary to put this here since 
 	gauss integration swarms may need to be saved and reloaded) */
 	void _FiniteElementContext_SaveSwarms( void* context );
+
+	void _FiniteElementContext_SaveMesh( void* context );
 
 #endif /* __StgFEM_SLE_SystemSetup_Context_h__ */
