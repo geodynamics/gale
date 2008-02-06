@@ -237,7 +237,8 @@ if not env.GetOption('clean'):
     # Extract revision number.
     #
 
-    svnPath = os.path.join('.svn', 'entries')
+    svnPath = Dir('.').srcnode().abspath
+    svnPath = os.path.join(svnPath, '.svn', 'entries')
     if not os.path.exists(svnPath):
         print "\nYou appear to be building the code from something"
         print "that wasn't checked out of a repository. Bummer."
