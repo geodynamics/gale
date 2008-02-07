@@ -30,7 +30,7 @@ env.build_metadata(env.glob('libStgFEM/Toolbox/*.meta'), 'Toolbol')
 env.build_library(env.get_hnodes(env.SharedObject), 'StgFEM')
 
 env.build_library(env.get_hnodes(env.SharedObject, 'Toolbox'),
-                  'StgFEM_Toolboxmodule',
+                  'StgFEM_Toolboxmodule', ['StgFEM']
                   True)
 
 env.build_tests(env.glob('libStgFEM/tests/test*.c'),
