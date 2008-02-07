@@ -23,7 +23,7 @@ env.build_metadata(env.glob('libUnderworld/Toolbox/*.meta'), 'Toolbol')
 env.build_library(env.get_hnodes(env.SharedObject), 'Underworld')
 
 env.build_library(env.get_hnodes(env.SharedObject, 'Toolbox'),
-                  'Underworld_Toolboxmodule',
+                  'Underworld_Toolboxmodule', ['Underworld'],
                   True)
 
 env.build_tests(env.glob('libUnderworld/tests/test*.c'),
