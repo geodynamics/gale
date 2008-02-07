@@ -1984,7 +1984,7 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
 					 "Mesh::verts" );
 
 	/* If loading from checkpoint, read mesh vertices from file */
-	if( context->restartTimestep && context->timeStep == context->restartTimestep ) {
+	if( context && context->restartTimestep && context->timeStep == context->restartTimestep ) {
 		Journal_Printf( stream, "Loading mesh values from file.\n");
 
 		MPI_Comm_rank( MPI_COMM_WORLD, &myRank);
