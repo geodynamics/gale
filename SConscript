@@ -26,7 +26,7 @@ env.build_metadata(env.glob('libPICellerator/Toolbox/*.meta'), 'Toolbol')
 env.build_library(env.get_hnodes(env.SharedObject), 'PICellerator')
 
 env.build_library(env.get_hnodes(env.SharedObject, 'Toolbox'),
-                  'PICellerator_Toolboxmodule',
+                  'PICellerator_Toolboxmodule', ['PICellerator']
                   True)
 
 env.build_tests(env.glob('libPICellerator/tests/test*.c'),
