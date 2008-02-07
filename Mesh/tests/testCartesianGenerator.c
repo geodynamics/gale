@@ -60,7 +60,7 @@ Mesh* buildMesh() {
    CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
 
    mesh = Mesh_New( "" );
-   CartesianGenerator_Generate( gen, mesh );
+   CartesianGenerator_Generate( gen, mesh, NULL );
    FreeObject( gen );
 
    return mesh;
@@ -113,7 +113,7 @@ TestBegin( Gen ) {
    CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
 
    mesh = Mesh_New( "" );
-   TestNoAssert( CartesianGenerator_Generate( gen, mesh ) );
+   TestNoAssert( CartesianGenerator_Generate( gen, mesh, NULL ) );
 
   done:
    FreeObject( gen );

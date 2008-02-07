@@ -62,7 +62,7 @@ Mesh* buildMesh() {
    CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
 
    mesh = Mesh_New( "" );
-   CartesianGenerator_Generate( gen, mesh );
+   CartesianGenerator_Generate( gen, mesh, NULL );
    FreeObject( gen );
    Stg_Component_Build( mesh, NULL, False );
    Stg_Component_Initialise( mesh, NULL, False );
