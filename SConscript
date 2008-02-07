@@ -26,7 +26,7 @@ env.build_metadata(env.glob('libStgDomain/Toolbox/*.meta'), 'Toolbox')
 env.build_library(env.get_hnodes(env.SharedObject), 'StgDomain')
 
 env.build_library(env.get_hnodes(env.SharedObject, 'Toolbox'),
-                  'StgDomain_Toolboxmodule',
+                  'StgDomain_Toolboxmodule', ['StgDomain']
                   True)
 
 env.build_tests(env.glob('libStgDomain/tests/test*.c'),
