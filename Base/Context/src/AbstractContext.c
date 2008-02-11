@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AbstractContext.c 4197 2007-11-01 06:23:48Z DavidMay $
+** $Id: AbstractContext.c 4218 2008-02-11 10:29:46Z DavidMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -869,26 +869,26 @@ void _AbstractContext_Execute_Hook( Context* context ) {
 	double             dtLoadedFromFile = 0;
 	
 	if (self->maxTimeSteps) {
-		Journal_Printf( self->info, "Run until %u timeSteps have been run\n", self->maxTimeSteps );
+		Journal_RPrintf( self->info, "Run until %u timeSteps have been run\n", self->maxTimeSteps );
 	}
 	if (self->finalTimeStep ) {
 		if (self->maxTimeSteps ) {
-			Journal_Printf( self->info, "or " );
+			Journal_RPrintf( self->info, "or " );
 		}	
 		else {
-			Journal_Printf( self->info, "Run " );
+			Journal_RPrintf( self->info, "Run " );
 		}
 		Journal_Printf( self->info, "until absolute time step %u reached\n", self->stopTime );
 	}
 	
 	if (self->stopTime) {
 		if (self->maxTimeSteps || self->finalTimeStep ) {
-			Journal_Printf( self->info, "or " );
+			Journal_RPrintf( self->info, "or " );
 		}	
 		else {
-			Journal_Printf( self->info, "Run " );
+			Journal_RPrintf( self->info, "Run " );
 		}
-		Journal_Printf( self->info, "until simulation time passes %g.\n", self->stopTime );
+		Journal_RPrintf( self->info, "until simulation time passes %g.\n", self->stopTime );
 	}
 	
 	self->timeStepSinceJobRestart = 1;
@@ -954,11 +954,11 @@ void _AbstractContext_Step( Context* context, double dt ) {
 	 * have just synchronised while calculating timestep anyway. */
 	MPI_Barrier( self->communicator );
 	Journal_DPrintf( self->debug, "In: %s\n", __func__ );
-	Journal_Printf( self->info, "TimeStep = %d, Start time = %.6g + %.6g prev timeStep dt\n",
+	Journal_RPrintf( self->info, "TimeStep = %d, Start time = %.6g + %.6g prev timeStep dt\n\n",
 		self->timeStep, self->currentTime, dt );
 
 	if (self->loadFromCheckPoint) {
-		Journal_Printf( self->info, "TimeStep since job restart = %d\n", self->timeStepSinceJobRestart );
+		Journal_RPrintf( self->info, "TimeStep since job restart = %d\n", self->timeStepSinceJobRestart );
 	}
 
 	#ifdef DEBUG
