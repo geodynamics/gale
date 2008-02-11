@@ -1156,9 +1156,10 @@ void _PCDVC_Calculate( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ){
          are being created and destroyed while maintaining some population that it has converged on */
       if(lCell_I == 0){
 
+/*
 	   Journal_Printf( stream, "\nOn Proc %d: In func %s(): for swarm \"%s\" Population is %d\n", swarm->myRank, __func__, swarm->name, swarm->particleLocalCount );
 	   Journal_Printf( stream, "On Proc %d: In func %s(): for swarm \"%s\" Population is %d\n\n", matSwarm->myRank,__func__, matSwarm->name, matSwarm->particleLocalCount );
-
+*/
       }
       if(dim == 3){
 	    _PCDVC_Calculate3D( pcdvc, _swarm, lCell_I);

@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: WeightsCalculator.c 518 2007-10-11 08:07:50Z SteveQuenette $
+** $Id: WeightsCalculator.c 531 2008-02-11 10:32:00Z DavidMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -208,12 +208,12 @@ void WeightsCalculator_CalculateAll( void* weightsCalculator, void* _swarm ) {
 	Stream*              stream = Journal_Register( Info_Type, self->type );
 	Processor_Index      formerStreamPrintingRank = 0;
 
-	Journal_Printf( stream, "In func %s(): for swarm \"%s\"\n", __func__, swarm->name );
+	Journal_RPrintf( stream, "In func %s(): for swarm \"%s\"\n", __func__, swarm->name );
 	Stream_Indent( stream );
 	formerStreamPrintingRank = Stream_GetPrintingRank( stream );
 	Stream_SetPrintingRank( stream, 0 );
 	MPI_Reduce( &cellLocalCount, &cellGlobalCount, 1, MPI_UNSIGNED, MPI_SUM, 0, swarm->comm );
-	Journal_Printf( stream, "Calculating weights for the particles in the %u global cells\n",
+	Journal_RPrintf( stream, "Calculating weights for the particles in the %u global cells\n",
 		cellGlobalCount );
 	Stream_Indent( stream );
 
@@ -252,7 +252,7 @@ void WeightsCalculator_CalculateAll( void* weightsCalculator, void* _swarm ) {
 	MPI_Barrier( swarm->comm );
 	Stream_SetPrintingRank( stream, formerStreamPrintingRank );
 	Stream_UnIndent( stream );
-	Journal_Printf( stream, "%s(): finished update of weights for swarm \"%s\"\n"
+	Journal_RPrintf( stream, "%s(): finished update of weights for swarm \"%s\"\n"
 		/*"\ttook %g secs\n"*/, __func__, swarm->name );
 }
 
