@@ -683,13 +683,13 @@ void _ParticleCommHandler_PrintCommunicationVolumeStats( ParticleCommHandler* se
 		MPI_Barrier( self->swarm->comm );
 
 		if ( self->swarm->myRank == proc_I ) {			
-			Journal_Printf( stream, "...proc %d finished particle communication:\n", self->swarm->myRank );
+			Journal_PrintfL( stream, 2, "...proc %d finished particle communication:\n", self->swarm->myRank );
 			Stream_Indent( stream );
-			Journal_Printf( stream, "- Particle comm totals via shadow cells (%d nbr procs):"
+			Journal_PrintfL( stream, 2, "- Particle comm totals via shadow cells (%d nbr procs):"
 				" sent %d, recvd %d\n",
 				nbrCount, self->shadowParticlesLeavingMeTotalCount,
 				totalParticlesRecvdViaShadowFromNbrs );
-			Journal_Printf( stream, "- time taken = %.2f (secs)\n", myProcTime );
+			Journal_PrintfL( stream, 2, "- time taken = %.2f (secs)\n", myProcTime );
 			Stream_UnIndent( stream );
 		}
 	}
@@ -704,7 +704,7 @@ void _ParticleCommHandler_PrintCommunicationVolumeStats( ParticleCommHandler* se
 			}
 		}
 		// TODO: print some stats on max particles sent/recvd and total sent/recvd
-		Journal_Printf( stream, "...Max Communication time by any proc was %.2f (secs)\n", maxProcTime );
+		Journal_PrintfL( stream, 2, "...Max Communication time by any proc was %.2f (secs)\n", maxProcTime );
 	}
 	Memory_Free( procTimes );
 }
