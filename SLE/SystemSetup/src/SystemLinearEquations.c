@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SystemLinearEquations.c 1017 2008-02-01 00:36:32Z DavidLee $
+** $Id: SystemLinearEquations.c 1025 2008-02-11 10:31:15Z DavidMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -516,16 +516,19 @@ void _SystemLinearEquations_Execute( void* sle, void* _context ) {
 
 void SystemLinearEquations_ExecuteSolver( void* sle, void* _context ) {
 	SystemLinearEquations*	self = (SystemLinearEquations*)sle;
-	double wallTime;
+	double wallTime, tmin,tmax;
 	/* Actually run the solver to get the new values into the SolutionVectors */
 	
-	Journal_Printf(self->info,"Linear solver (%s) \n",self->executeEPName);
+	Journal_RPrintf(self->info,"Linear solver (%s) \n",self->executeEPName);
 		
 	wallTime = MPI_Wtime();
 	if( self->solver )	
 		Stg_Component_Execute( self->solver, self, True );
-	
-	Journal_Printf(self->info,"Linear solver (%s), solution time %6.6e (secs)\n",self->executeEPName, MPI_Wtime() - wallTime);
+
+	wallTime = MPI_Wtime()-wallTime;
+	MPI_Reduce( &wallTime, &tmin, 1, MPI_DOUBLE, MPI_MIN, 0, self->comm ); 	
+	MPI_Reduce( &wallTime, &tmax, 1, MPI_DOUBLE, MPI_MAX, 0, self->comm );	
+	Journal_RPrintf(self->info,"Linear solver (%s), solution time %6.6e [min] / %6.6e [max] (secs)\n",self->executeEPName, tmin,tmax);
 		
 }
 

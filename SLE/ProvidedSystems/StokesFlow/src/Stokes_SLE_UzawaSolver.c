@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Stokes_SLE_UzawaSolver.c 1023 2008-02-11 06:41:30Z DavidMay $
+** $Id: Stokes_SLE_UzawaSolver.c 1025 2008-02-11 10:31:15Z DavidMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -387,14 +387,14 @@ Bool _check_if_constant_nullsp_present(
 
     VecNorm(r,NORM_2,&nrm);
     if (nrm < 1.e-7) {
-	Journal_PrintfL( self->debug, 2, "Constant null space detected, " ); 
+	Journal_RPrintfL( self->debug, 2, "Constant null space detected, " ); 
 	nullsp_present = True;
     }
     else {
-	Journal_PrintfL( self->debug, 2, "Constant null space not present, " );
+	Journal_RPrintfL( self->debug, 2, "Constant null space not present, " );
 	nullsp_present = False;
     }
-    Journal_PrintfL( self->debug, 2, "|| [S]{1} || = %G\n", nrm );
+    Journal_RPrintfL( self->debug, 2, "|| [S]{1} || = %G\n", nrm );
 
 
     return nullsp_present;
@@ -512,12 +512,12 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	
 					
  	Journal_DPrintf( self->debug, "In %s:\n", __func__ );
-	Journal_PrintfL( self->debug, 2, "Conjugate Gradient Uzawa solver with:\n");
+	Journal_RPrintfL( self->debug, 2, "Conjugate Gradient Uzawa solver with:\n");
 	
 	Stream_IndentBranch( StgFEM_Debug );
 	
-	Journal_PrintfL( self->debug, 2, "Compressibility %s\n", (sle->cStiffMat)? "on" : "off");
-	Journal_PrintfL( self->debug, 2, "Preconditioning %s\n", (pcSolver)? "on" : "off" );   
+	Journal_RPrintfL( self->debug, 2, "Compressibility %s\n", (sle->cStiffMat)? "on" : "off");
+	Journal_RPrintfL( self->debug, 2, "Preconditioning %s\n", (pcSolver)? "on" : "off" );   
 	
 	
 	
