@@ -231,7 +231,7 @@ void _TimeIntegrator_Initialise( void* timeIntegrator, void* data ) {
 
 void _TimeIntegrator_Execute( void* timeIntegrator, void* data ) {
 	TimeIntegrator*	self = (TimeIntegrator*)timeIntegrator;
-	double wallTime;
+	double wallTime,tmin,tmax;
 
 
 	Journal_DPrintf( self->debug, "In %s for %s '%s'\n", __func__, self->type, self->name );
@@ -262,9 +262,13 @@ void _TimeIntegrator_Execute( void* timeIntegrator, void* data ) {
 
 	/* Call real function */
 	
-	Journal_Printf( self->info, "Time Integration\n" );
+	Journal_RPrintf( self->info, "Time Integration\n" );
 	self->_execute( self, data );
-	Journal_Printf(self->info,"Time Integration - %.6g (secs)\n", MPI_Wtime()-wallTime);
+
+	wallTime = MPI_Wtime()-wallTime;
+        MPI_Reduce( &wallTime, &tmin, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD );
+        MPI_Reduce( &wallTime, &tmax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD );
+	Journal_RPrintf(self->info,"Time Integration - %.6g [min] / %.6g [max] (secs)\n", tmin, tmax);
 	
 }
 
@@ -276,12 +280,16 @@ void _TimeIntegrator_Destroy( void* timeIntegrator, void* data ) {
 
 void TimeIntegrator_UpdateClass( void* timeIntegrator, void* data ) {
 	TimeIntegrator*        self            = (TimeIntegrator*) timeIntegrator;
-	double wallTime;
+	double wallTime,tmin,tmax;
 	
 	wallTime = MPI_Wtime();
-	Journal_Printf(self->info,"Time Integration\n");
+	Journal_RPrintf(self->info,"Time Integration\n");
 	self->_execute( self, data );
-	Journal_Printf(self->info,"Time Integration - %.4g (secs)\n", MPI_Wtime()-wallTime);	
+
+	wallTime = MPI_Wtime()-wallTime;
+        MPI_Reduce( &wallTime, &tmin, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD );
+        MPI_Reduce( &wallTime, &tmax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD );
+	Journal_RPrintf(self->info,"Time Integration - %.4g [min] / %.4g [max] (secs)\n", tmin,tmax);	
 }
 
 /* +++ Private Functions +++ */
@@ -292,7 +300,7 @@ void _TimeIntegrator_ExecuteEuler( void* timeIntegrator, void* data ) {
 	Index                  integrateeCount = TimeIntegrator_GetCount( self );
 	double                 dt              = AbstractContext_Dt( context );
 	TimeIntegratee*        integratee;
-	double wallTime;
+	double wallTime,tmin,tmax;
 	
 	Journal_DPrintf( self->debug, "In %s for %s '%s'\n", __func__, self->type, self->name );
 
@@ -305,7 +313,11 @@ void _TimeIntegrator_ExecuteEuler( void* timeIntegrator, void* data ) {
 	
 		wallTime = MPI_Wtime();
 		TimeIntegratee_FirstOrder( integratee, integratee->variable, dt );
-		Journal_Printf(self->info,"\t1st order: %35s - %9.4f (secs)\n", integratee->name, MPI_Wtime()-wallTime);
+
+        	wallTime = MPI_Wtime()-wallTime;
+        	MPI_Reduce( &wallTime, &tmin, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD );
+        	MPI_Reduce( &wallTime, &tmax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD );
+		Journal_RPrintf(self->info,"\t1st order: %35s - %9.4f [min] / %9.4f [max] (secs)\n", integratee->name, tmin,tmax);
 	}
 	TimeIntegrator_Finalise( self );
 }
@@ -317,7 +329,7 @@ void _TimeIntegrator_ExecuteRK2( void* timeIntegrator, void* data ) {
 	Index                  integrateeCount = TimeIntegrator_GetCount( self );
 	double                 dt              = AbstractContext_Dt( context );
 	TimeIntegratee*        integratee;
-	double wallTime;
+	double wallTime,tmin,tmax;
 
 	Journal_DPrintf( self->debug, "In %s for %s '%s'\n", __func__, self->type, self->name );
 
@@ -332,7 +344,11 @@ void _TimeIntegrator_ExecuteRK2( void* timeIntegrator, void* data ) {
 		
 		wallTime = MPI_Wtime();
 		TimeIntegratee_SecondOrder( integratee, integratee->variable, dt );
-		Journal_Printf(self->info,"\t2nd order: %35s - %9.4f (secs)\n", integratee->name, MPI_Wtime()-wallTime);
+
+        	wallTime = MPI_Wtime()-wallTime;
+        	MPI_Reduce( &wallTime, &tmin, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD );
+        	MPI_Reduce( &wallTime, &tmax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD );
+		Journal_RPrintf(self->info,"\t2nd order: %35s - %9.4f [min] / %9.4f [max] (secs)\n", integratee->name, tmin, tmax);
 		
 	}
 	
@@ -348,7 +364,7 @@ void _TimeIntegrator_ExecuteRK4( void* timeIntegrator, void* data ) {
 	Index                  integrateeCount = TimeIntegrator_GetCount( self );
 	double                 dt              = AbstractContext_Dt( context );
 	TimeIntegratee*        integratee;
-	double wallTime;
+	double wallTime,tmin,tmax;
 
 	Journal_DPrintf( self->debug, "In %s for %s '%s'\n", __func__, self->type, self->name );
 
@@ -359,7 +375,11 @@ void _TimeIntegrator_ExecuteRK4( void* timeIntegrator, void* data ) {
 		TimeIntegrator_SetTime( self, context->currentTime );
 		wallTime = MPI_Wtime();
 		TimeIntegratee_FourthOrder( integratee, integratee->variable, dt );
-		Journal_Printf(self->info,"\t4th order: %35s - %9.4f (secs)\n", integratee->name, MPI_Wtime()-wallTime);
+       	
+		wallTime = MPI_Wtime()-wallTime;
+        	MPI_Reduce( &wallTime, &tmin, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD );
+        	MPI_Reduce( &wallTime, &tmax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD );
+		Journal_RPrintf(self->info,"\t4th order: %35s - %9.4f [min] / %9.4f [max] (secs)\n", integratee->name, tmin, tmax);
 	}
 	TimeIntegrator_Finalise( self );
 }
@@ -391,7 +411,7 @@ void _TimeIntegrator_ExecuteRK2Simultaneous( void* timeIntegrator, void* data ) 
 	TimeIntegrator_Setup( self );
 	for ( integratee_I = 0 ; integratee_I < integrateeCount ; integratee_I++ ) {
 		integratee = TimeIntegrator_GetByIndex( self, integratee_I );
-		Journal_Printf(self->info,"\t2nd order (simultaneous): %s\n", integratee->name);
+		Journal_RPrintf(self->info,"\t2nd order (simultaneous): %s\n", integratee->name);
 		
 		/* Store Original */
 		originalVariableList[ integratee_I ] = Variable_NewFromOld( integratee->variable, "Original", True );
@@ -440,7 +460,7 @@ void _TimeIntegrator_ExecuteRK4Simultaneous( void* timeIntegrator, void* data ) 
 	TimeIntegrator_Setup( self );
 	for ( integratee_I = 0 ; integratee_I < integrateeCount ; integratee_I++ ) {
 		integratee = TimeIntegrator_GetByIndex( self, integratee_I );
-		Journal_Printf(self->info,"\t2nd order (simultaneous): %s\n", integratee->name);
+		Journal_RPrintf(self->info,"\t2nd order (simultaneous): %s\n", integratee->name);
 
 		/* Store Original Position Variable */
 		originalVariableList[ integratee_I ]  = Variable_NewFromOld( integratee->variable, "Original", True );
@@ -515,7 +535,7 @@ void TimeIntegrator_Setup( void* timeIntegrator ) {
 	TimeIntegrator*        self            = (TimeIntegrator*)timeIntegrator;
 	EntryPoint*            entryPoint      = self->setupEP;
 	Hook_Index             hookIndex;
-	double wallTime;
+	double wallTime,tmin,tmax;
 	
 	/* Shouldn't this be using a call to a run function of the entry point class ? */ 
 	for( hookIndex = 0; hookIndex < entryPoint->hooks->count; hookIndex++ ) {
@@ -523,9 +543,11 @@ void TimeIntegrator_Setup( void* timeIntegrator ) {
 		
 		((EntryPoint_2VoidPtr_Cast*)((Hook*)entryPoint->hooks->data[hookIndex])->funcPtr)(
 			self, Stg_ObjectList_At( self->setupData, hookIndex ) );
-			
-		Journal_Printf(self->info,"\t       EP: %35s - %9.4f (secs)\n",(entryPoint->hooks->data[hookIndex])->name,
-			MPI_Wtime()-wallTime);	
+	
+       		wallTime = MPI_Wtime()-wallTime;
+        	MPI_Reduce( &wallTime, &tmin, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD );
+        	MPI_Reduce( &wallTime, &tmax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD );
+		Journal_RPrintf(self->info,"\t       EP: %35s - %9.4f [min] / %9.4f [max] (secs)\n",(entryPoint->hooks->data[hookIndex])->name,tmin,tmax);	
 	}		
 }
 
@@ -548,16 +570,18 @@ void TimeIntegrator_Finalise( void* timeIntegrator ) {
 	TimeIntegrator*        self            = (TimeIntegrator*)timeIntegrator;
 	EntryPoint*            entryPoint      = self->finishEP;
 	Hook_Index             hookIndex;
-	double 				  wallTime;
+	double 			wallTime,tmin,tmax;
 	
 	for( hookIndex = 0; hookIndex < entryPoint->hooks->count; hookIndex++ ) {
 		wallTime = MPI_Wtime();
 		
 		((EntryPoint_2VoidPtr_Cast*)((Hook*)entryPoint->hooks->data[hookIndex])->funcPtr)(
 			self, Stg_ObjectList_At( self->finishData, hookIndex ) );
-		
-		Journal_Printf(self->info,"\t       EP: %35s - %9.4f (secs)\n",(entryPoint->hooks->data[hookIndex])->name,
-				MPI_Wtime()-wallTime);	
+
+        	wallTime = MPI_Wtime()-wallTime;
+        	MPI_Reduce( &wallTime, &tmin, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD );
+        	MPI_Reduce( &wallTime, &tmax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD );
+		Journal_RPrintf(self->info,"\t       EP: %35s - %9.4f (secs)\n",(entryPoint->hooks->data[hookIndex])->name,tmin,tmax);	
 
 
 	}
