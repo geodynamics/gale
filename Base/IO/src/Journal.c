@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Journal.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: Journal.c 4216 2008-02-11 10:22:07Z DavidMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -638,3 +638,56 @@ Bool Journal_Dump( void* _stream, void* data )
 
 	return Stream_Dump( stream, data );
 }
+
+
+/* Only rank 0 will print to stream */
+int Journal_RPrintf ( void* _stream, char* fmt, ... )
+{
+	Stream* stream = (Stream*)_stream;
+	int result, init_stream_rank;
+        va_list ap;
+
+        init_stream_rank = Stream_GetPrintingRank( stream );
+	Stream_SetPrintingRank( stream, 0 );
+
+        va_start( ap, fmt );
+
+        if ( !stJournal->enable || !Stream_IsEnable( stream ) )
+        {
+                return 0;
+        }
+
+        result = Stream_Printf( stream, fmt, ap );
+
+        va_end(ap);
+
+	Stream_SetPrintingRank( stream, init_stream_rank );
+        return result;
+}
+
+/* Only rank 0 will print to stream */
+int Journal_RPrintfL ( void* _stream, JournalLevel level, char* fmt, ... )
+{
+        Stream* stream = (Stream*)_stream;
+        int result, init_stream_rank;
+        va_list ap;
+
+        init_stream_rank = Stream_GetPrintingRank( stream );
+        Stream_SetPrintingRank( stream, 0 );
+
+        va_start( ap, fmt );
+
+        if ( !stJournal->enable || !Stream_IsEnable( stream ) || !Stream_IsPrintableLevel( stream, level ) )
+        {
+                return 0;
+        }
+
+        result = Stream_Printf( stream, fmt, ap );
+
+        va_end(ap);
+
+        Stream_SetPrintingRank( stream, init_stream_rank );
+        return result;
+}
+
+
