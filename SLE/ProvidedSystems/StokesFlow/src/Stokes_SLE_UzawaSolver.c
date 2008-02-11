@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Stokes_SLE_UzawaSolver.c 1026 2008-02-11 23:44:41Z DavidMay $
+** $Id: Stokes_SLE_UzawaSolver.c 1027 2008-02-11 23:51:54Z DavidMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -827,12 +827,10 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	if (Stream_IsEnable( self->info ) ) {
 	
 	/* This information should be in an info stream */
-//	Journal_PrintfL( self->info, 1, "Summary: Uzawa_its = %04d; Uzawa Residual  = %.8e\n", iteration_I, relResidual );  
 	Journal_PrintfL( self->info, 1, "Summary:\n");
 	Journal_PrintfL( self->info, 1, "  Uzawa its. = %04d , Uzawa residual = %12.13e\n", iteration_I, relResidual );
 	Matrix_TransposeMultiply( G_Mat, uVec, rVec );	
 	divU = Vector_L2Norm( rVec ) / Vector_L2Norm( uVec );  
-//	Journal_PrintfL( self->info, 1, "Summary: || Div ( u ) || / || u ||         = %.8e\n", divU);
 	Journal_PrintfL( self->info, 1, "  |G^T u|/|u|               = %.8e\n", divU);
 	
 	/* Residual for the momentum equation 
@@ -844,7 +842,6 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	Vector_ScaleAdd( fTempVec, -1.0, fVec );
 	
 	momentumEquationResidual = Vector_L2Norm( fTempVec ) / Vector_L2Norm( fVec ); 
-//	Journal_PrintfL( self->info, 1, "Summary: || F - Ku - Gp || / || F ||       = %.8e\n", momentumEquationResidual );
 	Journal_PrintfL( self->info, 1, "  |f - K u - G p|/|f|       = %.8e\n", momentumEquationResidual );
 	Journal_Firewall( isGoodNumber( momentumEquationResidual ), errorStream, 
 			"Bad residual for the momentum equation (|| F - Ku - Gp || / || F || = %g):\n"
@@ -868,25 +865,10 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	Vector_PointwiseMultiply( vStarVec, fVec, fTempVec );	
 	weightedVelocityScale = Vector_L2Norm( fTempVec );
 		
-//	Journal_PrintfL( self->info, 1, "Summary: || F - Ku - Gp ||_w / || F ||_w   = %.8e\n", 
-//		weightedResidual / weightedVelocityScale );
 	Journal_PrintfL( self->info, 1, "  |f - K u - G p|_w/|f|_w   = %.8e\n", weightedResidual / weightedVelocityScale );	
 		
 	/* Report back on the solution - velocity and pressure 
 	 Note - correction for dof in Vrms ??
-	*/
-	/*
-	Journal_PrintfL( self->info, 1, "Summary: Max velocity component = %.8e; RMS Velocity magnitude = %.8e\n",
-		Vector_LInfNorm( uVec ),
-		Vector_L2Norm( uVec ) / sqrt( (double)Vector_GetGlobalSize( uVec ) )  );
-		
-	Journal_PrintfL( self->info, 1, "Summary: Max pressure value     = %.8e; RMS Pressure magnitude = %.8e\n",
-		Vector_LInfNorm( qVec ),
-		Vector_L2Norm( qVec ) / sqrt( (double)Vector_GetGlobalSize( qVec ) ) );
-			
-		
-	VecSum( FetchPetscVector(qVec), &p_sum );
-	Journal_PrintfL( self->info, 1, "Summary: \\int_{\\Omega} p dV     = %.8e \n", p_sum );
 	*/
 
         Journal_PrintfL( self->info, 1, "  |u|_{\\infty} = %.8e , u_rms = %.8e\n", 
