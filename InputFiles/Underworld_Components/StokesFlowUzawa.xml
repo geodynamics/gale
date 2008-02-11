@@ -74,6 +74,7 @@
 			<param name="velocitySolver">matrixSolver</param>
 			<param name="Preconditioner">preconditioner</param>
 			<param name="tolerance">1.0e-5</param>
+			<param name="monitor">false</param>
 			<param name="maxIterations">5000</param>
 		</struct>
 			
