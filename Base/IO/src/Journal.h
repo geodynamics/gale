@@ -45,7 +45,7 @@
 **
 **	http://csd.vpac.org/twiki/bin/view/Stgermain/Journal 
 **
-** $Id: Journal.h 3573 2006-05-15 07:51:14Z AlanLo $
+** $Id: Journal.h 4217 2008-02-11 10:22:40Z DavidMay $
 **
 **/
 
@@ -245,5 +245,8 @@
 
 	/** Performs a dump depending on the implemenation of the given stream. */
 	Bool Journal_Dump( void* stream, void* data );
+
+	int Journal_RPrintf ( void* _stream, char* fmt, ... );
+	int Journal_RPrintfL ( void* _stream, JournalLevel level, char* fmt, ... );
 	
 #endif /* __Base_IO_Journal_h__ */
