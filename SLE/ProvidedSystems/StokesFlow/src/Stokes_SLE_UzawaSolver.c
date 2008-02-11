@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Stokes_SLE_UzawaSolver.c 1000 2008-01-09 22:29:56Z DavidMay $
+** $Id: Stokes_SLE_UzawaSolver.c 1023 2008-02-11 06:41:30Z DavidMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -85,11 +85,12 @@ Stokes_SLE_UzawaSolver* Stokes_SLE_UzawaSolver_New(
 		StiffnessMatrix*                            preconditioner,
 		Iteration_Index                             maxUzawaIterations,
 		double                                      tolerance,
-		Bool                                        useAbsoluteTolerance )
+		Bool                                        useAbsoluteTolerance,
+                Bool                                        monitor )
 {		
 	Stokes_SLE_UzawaSolver* self = _Stokes_SLE_UzawaSolver_DefaultNew( name );
 
-	Stokes_SLE_UzawaSolver_InitAll( self, useStatSolve, statReps, preconditioner, maxUzawaIterations, tolerance, useAbsoluteTolerance );
+	Stokes_SLE_UzawaSolver_InitAll( self, useStatSolve, statReps, preconditioner, maxUzawaIterations, tolerance, useAbsoluteTolerance, monitor );
 
 	return self;
 }
@@ -144,13 +145,15 @@ void _Stokes_SLE_UzawaSolver_Init(
 		StiffnessMatrix*             preconditioner, 
 		Iteration_Index              maxUzawaIterations,
 		double                       tolerance,
-		Bool                         useAbsoluteTolerance )
+		Bool                         useAbsoluteTolerance,
+                Bool                         monitor )
 {
 	self->isConstructed        = True;
 	self->tolerance            = tolerance;
 	self->maxUzawaIterations   = maxUzawaIterations;
 	self->preconditioner       = preconditioner;
 	self->useAbsoluteTolerance = useAbsoluteTolerance;
+        self->monitor              = monitor;
 }
 
 void Stokes_SLE_UzawaSolver_InitAll( 
@@ -160,12 +163,13 @@ void Stokes_SLE_UzawaSolver_InitAll(
 		StiffnessMatrix*             preconditioner, 
 		Iteration_Index              maxUzawaIterations,
 		double                       tolerance,
-		Bool                         useAbsoluteTolerance )
+		Bool                         useAbsoluteTolerance,
+                Bool                         monitor )
 {
 	Stokes_SLE_UzawaSolver* self = (Stokes_SLE_UzawaSolver*)solver;
 
 	SLE_Solver_InitAll( self, useStatSolve, statReps );
-	_Stokes_SLE_UzawaSolver_Init( self, preconditioner, maxUzawaIterations, tolerance, useAbsoluteTolerance );
+	_Stokes_SLE_UzawaSolver_Init( self, preconditioner, maxUzawaIterations, tolerance, useAbsoluteTolerance, monitor );
 }
 
 void _Stokes_SLE_UzawaSolver_Delete( void* solver ) {
@@ -215,7 +219,8 @@ void* _Stokes_SLE_UzawaSolver_Copy( void* stokesSleUzawaSolver, void* dest, Bool
 	newStokesSleUzawaSolver->tolerance           = self->tolerance;
 	newStokesSleUzawaSolver->maxUzawaIterations  = self->maxUzawaIterations;
 	newStokesSleUzawaSolver->useAbsoluteTolerance  = self->useAbsoluteTolerance;
-	
+	newStokesSleUzawaSolver->monitor               = self->monitor;	
+
 	return (void*) newStokesSleUzawaSolver;
 }
 
@@ -263,16 +268,18 @@ void _Stokes_SLE_UzawaSolver_Construct( void* solver, Stg_ComponentFactory* cf, 
 	Iteration_Index         maxUzawaIterations;
 	StiffnessMatrix*        preconditioner;
 	Bool                    useAbsoluteTolerance;
+	Bool                    monitor;
 
 	_SLE_Solver_Construct( self, cf, data );
 
 	tolerance            = Stg_ComponentFactory_GetDouble( cf, self->name, "tolerance", 1.0e-5 );
 	maxUzawaIterations   = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "maxIterations", 1000 );
 	useAbsoluteTolerance = Stg_ComponentFactory_GetBool( cf, self->name, "useAbsoluteTolerance", False );
+	monitor              = Stg_ComponentFactory_GetBool( cf, self->name, "monitor", False );
 
 	preconditioner = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Preconditioner", StiffnessMatrix, False, data );
 
-	_Stokes_SLE_UzawaSolver_Init( self, preconditioner, maxUzawaIterations, tolerance, useAbsoluteTolerance );
+	_Stokes_SLE_UzawaSolver_Init( self, preconditioner, maxUzawaIterations, tolerance, useAbsoluteTolerance, monitor );
 
 	self->velSolver = Stg_ComponentFactory_ConstructByKey( cf, self->name, "velocitySolver", MatrixSolver, 
 							       False, data );
@@ -456,7 +463,8 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	int			init_info_stream_rank;	
 	PetscScalar p_sum;
 	Bool nullsp_present;
-
+	Bool uzawa_summary;
+	double time,t0;
 
 	init_info_stream_rank = Stream_GetPrintingRank( self->info );
 	Stream_SetPrintingRank( self->info, 0 ); 
@@ -625,7 +633,8 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	Matrix_MultiplyAdd( G_Mat, qVec, fTempVec, fTempVec );
 	Vector_Scale( fTempVec, -1.0 );
 	MatrixSolver_Solve( velSolver, fTempVec, uVec ); 
-	
+
+
 	/* Handling for NON-SYMMETRIC: relegated to sin bin (see comment above) 
 	 if ( D_Mat ) {
     	MatrixMultiply( D_Mat, uVec, rVec );
@@ -659,8 +668,15 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	/* STEP 4: Preconditioned conjugate gradient iteration loop */	
 		
 	Journal_DPrintfL( self->debug, 1, "Beginning main Uzawa conjugate gradient loop:\n" );	
+
 	
 	iteration_I = 0;
+
+        /* outer_it, residual, time */
+        uzawa_summary = self->monitor;
+	time = 0.0;
+	t0 = MPI_Wtime();
+
 	do{	
 		Journal_DPrintfL( self->debug, 2, "Beginning solve '%u'.\n", iteration_I );
 		Stream_IndentBranch( StgFEM_Debug );
@@ -794,6 +810,11 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 				__func__, iteration_I, absResidual, relResidual );
 
 /* 		 TODO: test for small change in 10 iterations and if so restart? */
+
+		time = MPI_Wtime()-t0;
+		if (uzawa_summary) {
+                	Journal_PrintfL( self->info, 1, "  %1.4d uzawa residual norm %12.13e, cpu time %5.5e\n", iteration_I+1,*chosenResidual,time );
+        	}
 			
 	iteration_I++;  
 	}  while (*chosenResidual > self->tolerance );  

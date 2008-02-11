@@ -54,7 +54,7 @@
 **	TODO: Need to handle Non-symmetric problems where Divergence isn't just G transpose. This will require a 
 **	fn pointer or entry point to MatMult certain things based on D.
 **
-** $Id: Stokes_SLE_UzawaSolver.h 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: Stokes_SLE_UzawaSolver.h 1023 2008-02-11 06:41:30Z DavidMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -85,7 +85,8 @@
 		/* parameters */ \
 		Iteration_Index     maxUzawaIterations;	/** Max number of iterations the solver can run for */ \
 		double              tolerance;	/** Tolerance that residual must be within to finish */ \
-		Bool                useAbsoluteTolerance;
+		Bool                useAbsoluteTolerance; \
+		Bool		    monitor;
 
 	/** Solves a Stokes SLE using the Uzawa-Preconditioned Conjugate Gradient method - see Stokes_SLE_UzawaSolver.h */
 	struct Stokes_SLE_UzawaSolver { __Stokes_SLE_UzawaSolver };
@@ -102,7 +103,8 @@
 		StiffnessMatrix*                            preconditioner,
 		Iteration_Index                             maxUzawaIterations,
 		double                                      tolerance,
-		Bool                                        useAbsoluteTolerance );
+		Bool                                        useAbsoluteTolerance,
+		Bool                                        monitor );
 		
 	/** Creation implementation / Virtual constructor */
 	Stokes_SLE_UzawaSolver* _Stokes_SLE_UzawaSolver_New( 
@@ -128,7 +130,8 @@
 		StiffnessMatrix*             preconditioner, 
 		Iteration_Index              maxUzawaIterations,
 		double                       tolerance,
-		Bool                         useAbsoluteTolerance );
+		Bool                         useAbsoluteTolerance, 
+                Bool                         monitor );
 		
 	void Stokes_SLE_UzawaSolver_InitAll( 
 		void*                        solver,
@@ -137,7 +140,8 @@
 		StiffnessMatrix*             preconditioner, 
 		Iteration_Index              maxUzawaIterations,
 		double                       tolerance,
-		Bool                         useAbsoluteTolerance );
+		Bool                         useAbsoluteTolerance,
+		Bool                         monitor );
 		
 	/** Class_Delete() implementation */
 	void _Stokes_SLE_UzawaSolver_Delete( void* solver );
