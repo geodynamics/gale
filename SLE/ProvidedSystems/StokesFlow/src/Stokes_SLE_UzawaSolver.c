@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Stokes_SLE_UzawaSolver.c 1027 2008-02-11 23:51:54Z DavidMay $
+** $Id: Stokes_SLE_UzawaSolver.c 1030 2008-02-12 08:35:46Z DavidMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -387,14 +387,14 @@ Bool _check_if_constant_nullsp_present(
 
     VecNorm(r,NORM_2,&nrm);
     if (nrm < 1.e-7) {
-	Journal_RPrintfL( self->debug, 2, "Constant null space detected, " ); 
+	Journal_PrintfL( self->info, 1, "Constant null space detected, " ); 
 	nullsp_present = True;
     }
     else {
-	Journal_RPrintfL( self->debug, 2, "Constant null space not present, " );
+	Journal_PrintfL( self->info, 1, "Constant null space not present, " );
 	nullsp_present = False;
     }
-    Journal_RPrintfL( self->debug, 2, "|| [S]{1} || = %G\n", nrm );
+    Journal_PrintfL( self->info, 1, "|| [S]{1} || = %G\n", nrm );
 
 
     return nullsp_present;
