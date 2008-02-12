@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SystemLinearEquations.c 1025 2008-02-11 10:31:15Z DavidMay $
+** $Id: SystemLinearEquations.c 1029 2008-02-12 05:59:08Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -834,11 +834,13 @@ void SystemLinearEquations_SetToNonLinear( void* sle ) {
 	self->linearExecute = self->_execute;
 	self->_execute = SystemLinearEquations_NonLinearExecute;
 
-	if( !strcmp( self->nonLinearSolutionType, "MatrixFreeNewton" ) )
-		self->_execute = SystemLinearEquations_NewtonMFFDExecute;
+	if( self->nonLinearSolutionType ) {
+		if( !strcmp( self->nonLinearSolutionType, "MatrixFreeNewton" ) )
+			self->_execute = SystemLinearEquations_NewtonMFFDExecute;
 
-	if( !strcmp( self->nonLinearSolutionType, "Newton" ) )
-		self->_execute = SystemLinearEquations_NewtonExecute;
+		if( !strcmp( self->nonLinearSolutionType, "Newton" ) )
+			self->_execute = SystemLinearEquations_NewtonExecute;
+	}
 }
 
 void SystemLinearEquations_CheckIfNonLinear( void* sle ) {
