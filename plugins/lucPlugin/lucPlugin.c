@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: lucPlugin.c 740 2007-10-11 08:05:31Z SteveQuenette $
+** $Id: lucPlugin.c 756 2008-02-12 00:28:41Z DavidMay $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -188,7 +188,6 @@ void _lucPlugin_Construct( void* component, Stg_ComponentFactory* cf, void* data
 
 	AbstractContext* context;
 
-	printf("In _lucPlugin_Construct\n" );
 
 	context = (AbstractContext*)Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
 	//glucifer_Init();
