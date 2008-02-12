@@ -112,7 +112,7 @@ void Underworld_Toolbox_Initialise( PluginsManager* pluginsManager, int* argc, c
 void Underworld_Toolbox_Finalise( PluginsManager* pluginsManager ) {
 	Underworld_Finalise();
 	
-	Journal_Printf( Journal_Register( Info_Type, Underworld_Toolbox_Type ), "Finalised: Underworld Toolbox.\n" );
+	Journal_RPrintf( Journal_Register( Info_Type, Underworld_Toolbox_Type ), "Finalised: Underworld Toolbox.\n" );
 }
 
 Index Underworld_Toolbox_Register( PluginsManager* pluginsManager ) {

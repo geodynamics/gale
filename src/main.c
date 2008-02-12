@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: main.c 610 2007-10-11 08:09:29Z SteveQuenette $
+** $Id: main.c 645 2008-02-12 01:18:41Z DavidMay $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -93,7 +93,7 @@ int main( int argc, char* argv[] ) {
 		Py_Finalize();
 	#endif
 	StGermain_Finalise();
-	Journal_Printf( stream, "Finalised: StGermain Framework.\n");
+	Journal_RPrintf( stream, "Finalised: StGermain Framework.\n");
 	MPI_Finalize();
 	
 	return 0; /* success */
