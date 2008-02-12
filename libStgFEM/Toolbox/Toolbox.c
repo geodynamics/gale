@@ -111,7 +111,7 @@ void StgFEM_Toolbox_Initialise( PluginsManager* pluginsManager, int* argc, char*
 void StgFEM_Toolbox_Finalise( PluginsManager* pluginsManager ) {
 	StgFEM_Finalise();
 	
-	Journal_Printf( Journal_Register( Info_Type, StgFEM_Toolbox_Type ), "Finalised: StGermain FEM Toolbox.\n" );
+	Journal_RPrintf( Journal_Register( Info_Type, StgFEM_Toolbox_Type ), "Finalised: StGermain FEM Toolbox.\n" );
 }
 
 Index StgFEM_Toolbox_Register( PluginsManager* pluginsManager ) {

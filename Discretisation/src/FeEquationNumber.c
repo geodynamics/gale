@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeEquationNumber.c 964 2007-10-11 08:03:06Z SteveQuenette $
+** $Id: FeEquationNumber.c 1028 2008-02-12 01:18:59Z DavidMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -2273,7 +2273,7 @@ void FeEquationNumber_Create_CritPointInfo_MPI_Datatype( void ) {
 
 void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
 	Stream*			stream;
-	double			startTime, endTime;
+	double			startTime, endTime, time, tmin, tmax;
 	FeMesh*			feMesh;
 	Sync*			sync;
 	Comm*			comm;
@@ -2303,14 +2303,14 @@ void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
 	inc = IArray_New();
 
 	stream = Journal_Register( Info_Type, self->type );
-	Journal_Printf( stream, "FeEquationNumber: '%s'\n", self->name );
+	Journal_RPrintf( stream, "FeEquationNumber: '%s'\n", self->name );
 	Stream_Indent( stream );
-	Journal_Printf( stream, "Generating equation numbers...\n" );
+	Journal_RPrintf( stream, "Generating equation numbers...\n" );
 	Stream_Indent( stream );
 	if( self->removeBCs )
-		Journal_Printf( stream, "BCs set to be removed.\n" );
+		Journal_RPrintf( stream, "BCs set to be removed.\n" );
 	else
-		Journal_Printf( stream, "BCs will not be removed.\n" );
+		Journal_RPrintf( stream, "BCs will not be removed.\n" );
 
 	startTime = MPI_Wtime();
 
@@ -2481,12 +2481,15 @@ void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
 
 	endTime = MPI_Wtime();
 
-	Journal_Printf( stream, "Assigned %d global equation numbers.\n", self->globalSumUnconstrainedDofs );
-	Journal_Printf( stream, "Assigned %d local equation numbers.\n", self->lastOwnedEqNum - self->firstOwnedEqNum + 1 );
-	Journal_Printf( stream, "Local equation numbers in the range %d to %d.\n", 
-			self->firstOwnedEqNum, self->lastOwnedEqNum + 1 );
+	Journal_RPrintf( stream, "Assigned %d global equation numbers.\n", self->globalSumUnconstrainedDofs );
+	Journal_Printf( stream, "[%u] Assigned %d local equation numbers, within range %d to %d.\n", 
+		rank, self->lastOwnedEqNum - self->firstOwnedEqNum + 1, self->firstOwnedEqNum, self->lastOwnedEqNum + 1 );
 	Stream_UnIndent( stream );
-	Journal_Printf( stream, "... Completed in %g seconds.\n", endTime - startTime );
+
+	time = endTime - startTime;
+        MPI_Reduce( &time, &tmin, 1, MPI_DOUBLE, MPI_MIN, 0, mpiComm );
+        MPI_Reduce( &time, &tmax, 1, MPI_DOUBLE, MPI_MAX, 0, mpiComm );
+	Journal_RPrintf( stream, "... Completed in %g [min] / %g [max] seconds.\n", tmin, tmax );
 	Stream_UnIndent( stream );
 
 	NewClass_Delete( inc );
