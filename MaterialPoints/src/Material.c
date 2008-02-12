@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Material.c 518 2007-10-11 08:07:50Z SteveQuenette $
+** $Id: Material.c 532 2008-02-12 01:17:48Z DavidMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -229,7 +229,7 @@ void Material_Layout( void* material, MaterialPointsSwarm* swarm ) {
 	Particle_Index        particleLocalCount = swarm->particleLocalCount;
 	Stream*               stream             = Journal_MyStream( Info_Type, self );
 
-	Journal_Printf( stream, "Laying out material '%s' within %s '%s':\n", self->name, shape->type, shape->name );
+	Journal_RPrintf( stream, "Laying out material '%s' within %s '%s':\n", self->name, shape->type, shape->name );
 	
 	for ( lParticle_I = 0 ; lParticle_I < particleLocalCount ; lParticle_I++ ) {
 		particle = (MaterialPoint*)Swarm_ParticleAt( swarm, lParticle_I );

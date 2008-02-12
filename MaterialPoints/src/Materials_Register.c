@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Materials_Register.c 518 2007-10-11 08:07:50Z SteveQuenette $
+** $Id: Materials_Register.c 532 2008-02-12 01:17:48Z DavidMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -154,19 +154,21 @@ void Materials_Register_AssignParticleProperties(
 	Particle_Index      particleGlobalCount = 0;
 	Stream*             stream = Journal_Register( Info_Type, self->type );
 	double              setupStartTime = 0;
-	double              setupTime = 0;
+	double              setupTime = 0, tmin, tmax;
 	Processor_Index     formerStreamPrintingRank;
 	unsigned int        numberOfCompletionPrintIncrements=10;
 	double              completionRatioIncrement= 1 / (double)numberOfCompletionPrintIncrements;
 	double              nextCompletionRatioToPrint=0;
 	Particle_Index      nextCompletedParticleCountToPrint=0;
 	Particle_Index      nextPlusOneCompletedParticleCountToPrint=0;
+	char                *title;
+
+        formerStreamPrintingRank = Stream_GetPrintingRank( stream );
+        Stream_SetPrintingRank( stream, 0 );
 
 	Journal_Printf( stream, "In func %s(): for swarm \"%s\"\n", __func__, swarm->name );
 	Stream_Indent( stream );
 	setupStartTime = MPI_Wtime();
-	formerStreamPrintingRank = Stream_GetPrintingRank( stream );
-	Stream_SetPrintingRank( stream, 0 );
 	MPI_Reduce( &particleLocalCount, &particleGlobalCount, 1, MPI_UNSIGNED, MPI_SUM, 0, swarm->comm );
 	Journal_Printf( stream, "Assigning initial particle properties to the %u global particles\n",
 		particleGlobalCount );
@@ -215,15 +217,19 @@ void Materials_Register_AssignParticleProperties(
 			nextCompletedParticleCountToPrint = ceil(particleLocalCount * nextCompletionRatioToPrint - 0.001);
 		}
 	}
+
 	Stream_UnIndent( stream );
 	/* Need this barrier so the time is accurate */
 	MPI_Barrier( swarm->comm );
 	setupTime = MPI_Wtime() - setupStartTime;
 
 	Stream_UnIndent( stream );
-	Stream_SetPrintingRank( stream, formerStreamPrintingRank );
+
+	MPI_Reduce( &setupTime, &tmin, 1, MPI_DOUBLE, MPI_MIN, 0, swarm->comm );
+	MPI_Reduce( &setupTime, &tmax, 1, MPI_DOUBLE, MPI_MAX, 0, swarm->comm );
 	Journal_Printf( stream, "%s(): finished setup of material properties for swarm \"%s\"\n"
-		"\ttook %g secs\n", __func__, swarm->name, setupTime );
+		"\ttook %g [min] / %g [max] secs\n", __func__, swarm->name, tmin, tmax );
+	Stream_SetPrintingRank( stream, formerStreamPrintingRank );
 }
 
 
