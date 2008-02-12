@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Stg_Component.c 4194 2007-10-26 05:31:19Z BelindaMay $
+** $Id: Stg_Component.c 4219 2008-02-12 01:18:35Z DavidMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -199,7 +199,7 @@ void Stg_Component_Construct( void* component, Stg_ComponentFactory* cf, void* d
 		
 		Stream* stream = Journal_Register( Info_Type, "Stg_ComponentFactory" );
 
-		Journal_Printf( stream, "Constructing %s..\n", self->name );
+		Journal_RPrintf( stream, "Constructing %s..\n", self->name );
 		Stream_Indent( stream );
 		
 		/*buf = Stg_Object_AppendSuffix( self, "Construct" );

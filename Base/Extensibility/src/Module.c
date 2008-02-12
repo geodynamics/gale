@@ -140,10 +140,10 @@ void _Module_Init(
 		
 	self->dllPtr = dlopen( fileName, RTLD_LAZY | RTLD_GLOBAL );
 	if( self->dllPtr ) {
-		Journal_Printf( stream, "%s \"%s\" found using %s\n", self->type, self->name, fileName );
+		Journal_RPrintf( stream, "%s \"%s\" found using %s\n", self->type, self->name, fileName );
 	}
 	else {
-		Journal_Printf( stream, "%s \"%s\" failed: %s\n", self->type, self->name, dlerror() );
+		Journal_RPrintf( stream, "%s \"%s\" failed: %s\n", self->type, self->name, dlerror() );
 		
 		for ( dir_i = 0; dir_i < directories->count; ++dir_i ) {
 			length = strlen(Stg_ObjectList_ObjectAt( directories, dir_i )) + 1 + strlen(fileName) + 1;
@@ -154,11 +154,11 @@ void _Module_Init(
 			PathJoin( fullPathName, 2, Stg_ObjectList_ObjectAt( directories, dir_i ), fileName );
 			self->dllPtr = dlopen( fullPathName, RTLD_LAZY | RTLD_GLOBAL );
 			if( self->dllPtr ) {
-				Journal_Printf( stream, "%s \"%s\" found using %s\n", self->type, self->name, fileName );
+				Journal_RPrintf( stream, "%s \"%s\" found using %s\n", self->type, self->name, fileName );
 				break;
 			}
 			else {
-				Journal_Printf( stream, "%s \"%s\" failed: %s\n", self->type, self->name, dlerror() );
+				Journal_RPrintf( stream, "%s \"%s\" failed: %s\n", self->type, self->name, dlerror() );
 			}
 		}
 		/* If it failed alltogether, print a error message. */
@@ -210,7 +210,7 @@ void _Module_Print( void* module, Stream* stream ) {
 	Index i;
 	const char* version;
 
-	Journal_Printf( stream, "Module: %s\n", self->name );
+	Journal_RPrintf( stream, "Module: %s\n", self->name );
 	Stream_Indent( stream );
 	
 	version = Module_GetVersion( self );
@@ -234,7 +234,7 @@ void _Module_Print( void* module, Stream* stream ) {
 		depVersion = Dictionary_GetString_WithDefault( dep, (char*)PLUGIN_DEPENDENCY_VERSION_KEY, "Unknown" );
 		depUrl = Dictionary_GetString_WithDefault( dep, (char*)PLUGIN_DEPENDENCY_URL_KEY, "None" );
 	
-		Journal_Printf( stream, "Depends on: %s, version=%s, url=%s\n", depName, depVersion, depUrl );
+		Journal_RPrintf( stream, "Depends on: %s, version=%s, url=%s\n", depName, depVersion, depUrl );
 	}
 	
 	/* Print parent */
