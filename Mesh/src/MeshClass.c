@@ -155,7 +155,6 @@ void _Mesh_Build( void* mesh, void* data ) {
 	int 			i, j;
 
 	assert( self );
-	assert( context );
 
 	/*printf ("Start of _Mesh_Build function\n");
 	for( i=0; i<64; i++ ) {		
