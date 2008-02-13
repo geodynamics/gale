@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SystemLinearEquations.c 1029 2008-02-12 05:59:08Z DavidLee $
+** $Id: SystemLinearEquations.c 1031 2008-02-13 06:11:38Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -179,6 +179,7 @@ void _SystemLinearEquations_Init(
 	self->forceVectors = Stg_ObjectList_New();
 	self->solutionVectors = Stg_ObjectList_New();
 	self->bcRemoveQuery = True;
+	self->context = context;
 
 	/* Init NonLinear Stuff */
 	if ( isNonLinear ) {
@@ -224,7 +225,6 @@ void _SystemLinearEquations_Init(
 	self->entryPoint_Register = entryPoint_Register;
 
 	/* Add SLE to Context */
-	self->context = context;
 	if ( context )
 		FiniteElementContext_AddSLE( context, self );
 }
@@ -422,7 +422,6 @@ void _SystemLinearEquations_Construct( void* sle, Stg_ComponentFactory* cf, void
 	self->delta_x   = PETScVector_New( "delta x" );
 	self->F		= PETScVector_New( "residual" );
 	self->J		= PETScMatrix_New( "Jacobian" ); 
-	//PETScMatrix_SetComm( self->J, MPI_COMM_WORLD );
 	PETScMatrix_SetComm( self->J, self->comm );
 }
 
@@ -516,19 +515,16 @@ void _SystemLinearEquations_Execute( void* sle, void* _context ) {
 
 void SystemLinearEquations_ExecuteSolver( void* sle, void* _context ) {
 	SystemLinearEquations*	self = (SystemLinearEquations*)sle;
-	double wallTime, tmin,tmax;
+	double wallTime;
 	/* Actually run the solver to get the new values into the SolutionVectors */
 	
-	Journal_RPrintf(self->info,"Linear solver (%s) \n",self->executeEPName);
+	Journal_Printf(self->info,"Linear solver (%s) \n",self->executeEPName);
 		
 	wallTime = MPI_Wtime();
 	if( self->solver )	
 		Stg_Component_Execute( self->solver, self, True );
-
-	wallTime = MPI_Wtime()-wallTime;
-	MPI_Reduce( &wallTime, &tmin, 1, MPI_DOUBLE, MPI_MIN, 0, self->comm ); 	
-	MPI_Reduce( &wallTime, &tmax, 1, MPI_DOUBLE, MPI_MAX, 0, self->comm );	
-	Journal_RPrintf(self->info,"Linear solver (%s), solution time %6.6e [min] / %6.6e [max] (secs)\n",self->executeEPName, tmin,tmax);
+	
+	Journal_Printf(self->info,"Linear solver (%s), solution time %6.6e (secs)\n",self->executeEPName, MPI_Wtime() - wallTime);
 		
 }
 
@@ -684,9 +680,39 @@ void SystemLinearEquations_ZeroAllVectors( void* sle, void* _context ) {
 	}
 }
 
+/* need to do this before the SLE specific function to set up the 
+pre conditioners is called (beginning of solve) */
+void SystemLinearEquations_NewtonInitialise( void* _context, void* data ) {
+	FiniteElementContext*	context		= (FiniteElementContext*)_context;
+	SystemLinearEquations*	sle             = (SystemLinearEquations*)context->slEquations->data[0];
+	PETScVector*		F;
+	SNES			snes;
+	SNES			oldSnes		= ((PETScNonlinearSolver*)sle->nlSolver)->snes;
+
+	//if( ((PETScNonlinearSolver*)sle->nlSolver)->snes )
+	//	SNESDestroy( ((PETScNonlinearSolver*)sle->nlSolver)->snes );
+	//VecDestroy( ((PETScVector*)self->F)->petscVec );
+	if( oldSnes )
+		SNESDestroy( oldSnes );
+
+	SNESCreate( sle->comm, &snes );
+	//VecCreate( self->comm, &F );
+
+	((PETScNonlinearSolver*)sle->nlSolver)->snes = snes;
+	//Vector_Duplicate( SystemLinearEquations_GetSolutionVectorAt( sle, 0 )->vector, &F );
+	sle->_setFFunc( &sle->F, context );
+
+	SNESSetJacobian( snes, ((PETScMatrix*)sle->J)->petscMat, ((PETScMatrix*)sle->J)->petscMat, 
+				sle->_buildJ, sle->buildJContext );
+	SNESSetFunction( snes, ((PETScVector*)sle->F)->petscVec, sle->_buildF, sle->buildFContext );
+}
+
+/* do this after the pre conditoiners have been set up in the problem specific SLE */
 void SystemLinearEquations_NewtonExecute( void* sle, void* _context ) {
 	SystemLinearEquations*	self            = (SystemLinearEquations*) sle;
+	SNES			snes		= ((PETScNonlinearSolver*)self->nlSolver)->snes;
 	//NonlinearSolver*	nlSolver	= self->nlSolver; //need to build this guy...
+	/*
 	PETScVector*		F;
 	SNES			snes;
 
@@ -697,11 +723,23 @@ void SystemLinearEquations_NewtonExecute( void* sle, void* _context ) {
 	SNESSetFunction( snes, ((PETScVector*)self->F)->petscVec, self->_buildF, self->buildFContext );
 	
 	SNESSetFromOptions( snes );
-
+	
 	SNESSolve( snes, PETSC_NULL, ((PETScVector*)self->delta_x)->petscVec );
 
 	SNESDestroy( snes );
+	*/
 
+	SNESSetFromOptions( snes );
+	SNESSolve( snes, PETSC_NULL, ((PETScVector*)self->delta_x)->petscVec );
+}
+
+/* do this at end of solve step */
+void SystemLinearEquations_NewtonDestroy( void* _context, void* data ) {
+	FiniteElementContext*	context		= (FiniteElementContext*)_context;
+	SystemLinearEquations*	sle             = (SystemLinearEquations*)context->slEquations->data[0];
+	SNES			snes		= ((PETScNonlinearSolver*)sle->nlSolver)->snes;
+
+	SNESDestroy( snes );	
 }
 
 void SystemLinearEquations_NewtonMFFDExecute( void* sle, void* _context ) {
@@ -823,7 +861,10 @@ void SystemLinearEquations_AddNonLinearEP( void* sle, const char* name, EntryPoi
 }
 
 void SystemLinearEquations_SetToNonLinear( void* sle ) {
-	SystemLinearEquations*	self            = (SystemLinearEquations*) sle;
+	SystemLinearEquations*	self            	= (SystemLinearEquations*) sle;
+	Hook*			nonLinearInitHook	= NULL;
+	Hook*			nonLinearDestroyHook	= NULL;
+	FiniteElementContext*	context			= NULL;
 
 	assert( self );
 	if ( self->isNonLinear )
@@ -838,8 +879,19 @@ void SystemLinearEquations_SetToNonLinear( void* sle ) {
 		if( !strcmp( self->nonLinearSolutionType, "MatrixFreeNewton" ) )
 			self->_execute = SystemLinearEquations_NewtonMFFDExecute;
 
-		if( !strcmp( self->nonLinearSolutionType, "Newton" ) )
+		if( !strcmp( self->nonLinearSolutionType, "Newton" ) ) {
+			context = self->context;
+
+			nonLinearInitHook = Hook_New( "NewtonInitialise", 
+						SystemLinearEquations_NewtonInitialise, self->name );
+			_EntryPoint_PrependHook_AlwaysFirst( Context_GetEntryPoint( context, AbstractContext_EP_Solve ), 
+								nonLinearInitHook );
+			nonLinearDestroyHook = Hook_New( "NewtonDestroy",
+						SystemLinearEquations_NewtonDestroy, self->name );
+			_EntryPoint_AppendHook_AlwaysLast( Context_GetEntryPoint( context, AbstractContext_EP_Solve ), 
+						nonLinearDestroyHook );
 			self->_execute = SystemLinearEquations_NewtonExecute;
+		}
 	}
 }
 
