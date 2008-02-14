@@ -2006,10 +2006,22 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
 			__func__,  
 			meshSaveFileName );*/
 
-		if( meshFile == 0 ) {
+		if( !meshFile ) {
 			Journal_Printf( errorStream, 
 				"Warning - Couldn't find checkpoint mesh file with filename \"%s\".\n", 
 				meshSaveFileName );
+
+			for( n_i = 0; n_i < Sync_GetNumDomains( sync ); n_i++ ) {
+				gNode = Sync_DomainToGlobal( sync, n_i );
+				Grid_Lift( grid, gNode, inds );
+				vert = Mesh_GetVertex( mesh, n_i );
+
+				/* Calculate coordinate. */
+				for( d_i = 0; d_i < mesh->topo->nDims; d_i++ ) {
+					vert[d_i] = self->crdMin[d_i] + 
+						((double)inds[d_i] / (double)(grid->sizes[d_i] - 1)) * steps[d_i];
+				}
+			}
 		}
 		else {
 			fseek( meshFile, (Sync_GetNumDomains( sync ) * myRank + 2) * mesh->topo->nDims * sizeof( double ), SEEK_CUR );
@@ -2023,8 +2035,8 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
 					fread( &vert[d_i], sizeof( double ), 1, meshFile );
 				}
 			}
+			fclose( meshFile );
 		}
-		fclose( meshFile );
 	}
 	else {
 		/* Loop over domain nodes. */
