@@ -2,7 +2,7 @@
 <!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 
-<param name="Name">Mesh_Algorithms</param>
+<param name="Name">FeMesh_Algorithms</param>
 <param name="Organisation">VPAC</param>
 <param name="Project">StGermain</param>
 <param name="Location">./StGermain/Discretisation/Utils/src/</param>
