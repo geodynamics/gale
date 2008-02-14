@@ -47,6 +47,6 @@ env.build_tests(env.glob('libStGermain/tests/test*.c'), 'StGermain',
                 libs='StGermain')
 
 env.Program('#build/bin/FlattenXML', 'Base/FlattenXML/src/main.c',
-            LIBS=env['LIBS'] + ['StGermainBase'])
+            LIBS=['StGermainBase'] + env.get('LIBS', []))
 env.Program('#build/bin/StGermain', 'src/main.c',
-            LIBS=env['LIBS'] + ['StGermain'])
+            LIBS=['StGermain'] + env.get('LIBS', []))
