@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SystemLinearEquations.c 1031 2008-02-13 06:11:38Z DavidLee $
+** $Id: SystemLinearEquations.c 1034 2008-02-15 02:58:14Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -692,7 +692,7 @@ void SystemLinearEquations_NewtonInitialise( void* _context, void* data ) {
 	//if( ((PETScNonlinearSolver*)sle->nlSolver)->snes )
 	//	SNESDestroy( ((PETScNonlinearSolver*)sle->nlSolver)->snes );
 	//VecDestroy( ((PETScVector*)self->F)->petscVec );
-	if( oldSnes )
+	if( oldSnes && context->timeStep == 1 )
 		SNESDestroy( oldSnes );
 
 	SNESCreate( sle->comm, &snes );
