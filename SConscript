@@ -28,6 +28,6 @@ env.build_library(env.get_hnodes(env.SharedObject), 'glucifer')
 env.build_tests(env.glob('libglucifer/tests/test*.c'),
                 'glucifer', libs='glucifer')
 
-env.build_plugin('plugins/lucPlugin', 'lucPlugin')
+env.build_plugin('plugins/lucPlugin', 'lucPlugin', prefix=False)
 
 env.build_xmls(env.glob('ModelComponents/*.xml'), 'StGermain/gLucifer')
