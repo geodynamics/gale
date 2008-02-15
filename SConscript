@@ -45,7 +45,7 @@ env.build_plugin('plugins/FeVariableImportExporters/FeVariable_ImportExport_Spec
                  'FeVariableImportExporters/FeVariable_ImportExport_SpecRidge2D')
 env.build_plugin('plugins/FileAnalyticSolution', 'FileAnalyticSolution')
 env.build_plugin('plugins/Output/CPUTime', 'Output/CPUTime')
-env.build_plugin('plugins/Output/FrequentOutput', 'Output/FrequentOutput')
+env.build_plugin('plugins/Output/FrequentOutput', 'FrequentOutput')
 env.build_plugin('plugins/Output/PeakMemory', 'Output/PeakMemory')
 env.build_plugin('plugins/Output/PrintFeVariableDiscreteValues',
                  'Output/PrintFeVariableDiscreteValues')
