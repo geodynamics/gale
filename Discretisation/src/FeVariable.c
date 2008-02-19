@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeVariable.c 1035 2008-02-19 01:17:10Z JulianGiordani $
+** $Id: FeVariable.c 1038 2008-02-19 04:45:04Z RobertTurnbull $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -969,19 +969,20 @@ void FeVariable_GetValueAtNodeGlobal( void* feVariable, Node_GlobalIndex gNode_I
 	FeVariable*        self         = (FeVariable*) feVariable;
 	FeMesh*            mesh         = self->feMesh;
 	Element_LocalIndex lNode_I;
-	int                rootRank     = 0;
+	int                rootRankL     = 0;
+	int                rootRankG     = 0;
 	MPI_Comm           comm         = self->communicator;
 
 	/* Find Local Index */
 	if ( Mesh_GlobalToDomain( mesh, MT_VERTEX, gNode_I, &lNode_I ) ) {
 		/* If node is on local processor, then get value of field */
 		FeVariable_GetValueAtNode( self, lNode_I, value );
-		MPI_Comm_rank( comm, (int*)&rootRank );
+		MPI_Comm_rank( comm, (int*)&rootRankL );
 	}
 	
 	/* Send to other processors */
-	MPI_Allreduce( &rootRank, &rootRank, 1, MPI_INT, MPI_MAX, comm );
-	MPI_Bcast( value, self->fieldComponentCount, MPI_DOUBLE, rootRank, comm );
+	MPI_Allreduce( &rootRankL, &rootRankG, 1, MPI_INT, MPI_MAX, comm );
+	MPI_Bcast( value, self->fieldComponentCount, MPI_DOUBLE, rootRankG, comm );
 }
 
 void FeVariable_ZeroField( void* feVariable ) {
