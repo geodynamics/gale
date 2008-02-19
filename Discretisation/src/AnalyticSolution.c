@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AnalyticSolution.c 989 2007-12-18 13:57:56Z JulianGiordani $
+** $Id: AnalyticSolution.c 1036 2008-02-19 01:19:30Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -129,8 +129,8 @@ void _AnalyticSolution_Init( AnalyticSolution* self, Swarm* integrationSwarm, Li
 	self->streamList                 = Stg_ObjectList_New();
 
 	/* Add functions to entry points */
-	EP_AppendClassHook( Context_GetEntryPoint( context, AbstractContext_EP_UpdateClass ), 
-			Stg_Component_Initialise, self );
+	EntryPoint_AppendClassHook( Context_GetEntryPoint( context, AbstractContext_EP_UpdateClass ), 
+			self->type, AnalyticSolution_Update, self->type, self );
 	EP_AppendClassHook( Context_GetEntryPoint( context, AbstractContext_EP_DumpClass ), 
 			AnalyticSolution_TestAll, self );
 
@@ -219,6 +219,13 @@ void _AnalyticSolution_Initialise( void* analyticSolution, void* data ) {
 
 		AnalyticSolution_PutAnalyticSolutionOntoNodes( self, analyticFeVariable_I );
 	}
+}
+
+/* This function is called when the 'Update' phase happens */
+void AnalyticSolution_Update( void* analyticSolution ) {
+	AnalyticSolution*                            self = (AnalyticSolution*) analyticSolution;
+
+	self->_initialise( self, NULL );
 }
 
 void _AnalyticSolution_Execute( void* analyticSolution, void* data ) {
@@ -322,6 +329,7 @@ void AnalyticSolution_Test( void* analyticSolution, Index analyticFeVariable_I )
 
 	Journal_Printf( stream, "Timestep %u: Total integrated value of '%s' is %s a tolerance %.5g.\n", 
 				self->context->timeStep, errorMagnitudeField->name, result <= tolerance ? "within" : "outside", tolerance );
+	Stream_Flush( stream );
 
 	Journal_Printf( infoStream, "Timestep %u: Total integrated value of '%s' is %g\n", 
 			self->context->timeStep, errorMagnitudeField->name, result );

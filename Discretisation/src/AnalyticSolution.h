@@ -130,6 +130,9 @@
 	/* Initialisation implementation */
 	void _AnalyticSolution_Initialise( void* analyticSolution, void* data );
 	
+	/* This function is called when the 'Update' phase happens */
+	void AnalyticSolution_Update( void* analyticSolution ) ;
+
 	/* Execution implementation */
 	void _AnalyticSolution_Execute( void* analyticSolution, void* data );
 	
