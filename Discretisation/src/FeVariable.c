@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeVariable.c 964 2007-10-11 08:03:06Z SteveQuenette $
+** $Id: FeVariable.c 1035 2008-02-19 01:17:10Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -962,6 +962,26 @@ void _FeVariable_GetValueAtNode( void* feVariable, Node_DomainIndex dNode_I, dou
 		currVariable = DofLayout_GetVariable( self->dofLayout, dNode_I, nodeLocalDof_I );
 		value[ nodeLocalDof_I ] = Variable_GetValueDouble( currVariable, dNode_I );
 	}
+}
+
+/** Finds the value of the field at the node and broadcasts it to the rest of the processors */
+void FeVariable_GetValueAtNodeGlobal( void* feVariable, Node_GlobalIndex gNode_I, double* value ) {
+	FeVariable*        self         = (FeVariable*) feVariable;
+	FeMesh*            mesh         = self->feMesh;
+	Element_LocalIndex lNode_I;
+	int                rootRank     = 0;
+	MPI_Comm           comm         = self->communicator;
+
+	/* Find Local Index */
+	if ( Mesh_GlobalToDomain( mesh, MT_VERTEX, gNode_I, &lNode_I ) ) {
+		/* If node is on local processor, then get value of field */
+		FeVariable_GetValueAtNode( self, lNode_I, value );
+		MPI_Comm_rank( comm, (int*)&rootRank );
+	}
+	
+	/* Send to other processors */
+	MPI_Allreduce( &rootRank, &rootRank, 1, MPI_INT, MPI_MAX, comm );
+	MPI_Bcast( value, self->fieldComponentCount, MPI_DOUBLE, rootRank, comm );
 }
 
 void FeVariable_ZeroField( void* feVariable ) {

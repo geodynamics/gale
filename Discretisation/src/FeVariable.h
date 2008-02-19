@@ -325,6 +325,9 @@
 
 	/* --- Public Functions --- */
 
+	/** Finds the value of the field at the node and broadcasts it to the rest of the processors */
+	void FeVariable_GetValueAtNodeGlobal( void* feVariable, Node_GlobalIndex gNode_I, double* value ) ;
+
 	/** Zeros the value of the field at every nodal position */
 	void FeVariable_ZeroField( void* feVariable ) ;
 
