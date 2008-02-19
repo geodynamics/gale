@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<!-- A StGermain input file -->
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<struct name="components" mergeType="merge">
+	<struct name="linearMeshGenerator" mergeType="merge">
+	<param name="maxDecomposedDims"> 1 </param>
+	<list name="maxDecompositions">
+		<param> 1 </param>
+		<param> 1 </param>
+		<param> 0 </param>
+	</list>
+	</struct>
+</struct>
+
+</StGermainData>

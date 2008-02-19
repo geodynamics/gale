@@ -26,4 +26,6 @@
 		</struct>
 	</struct>
 
+	<include>StgFEM/BreadSliceDecomposition.x.xml</include>
+
 </StGermainData>
