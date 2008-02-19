@@ -4,6 +4,9 @@ SHELL := /bin/bash
 PROJ_ROOT := $(shell until test -r ./Makefile.system ; do cd .. ; done ; echo `pwd`)
 include ${PROJ_ROOT}/Makefile.system
 
+# Subdirectories
+subdirs := tests
+
 # Source Code and Header files
 SRCS := $(wildcard *.c)
 HDRS := $(wildcard *.h)

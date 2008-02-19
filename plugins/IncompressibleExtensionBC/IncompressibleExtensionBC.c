@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: IncompressibleExtensionBC.c 610 2007-10-11 08:09:29Z SteveQuenette $
+** $Id: IncompressibleExtensionBC.c 650 2008-02-19 01:27:56Z RobertTurnbull $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -49,27 +49,10 @@
 #include <StgFEM/StgFEM.h>
 #include <PICellerator/PICellerator.h>
 #include <Underworld/Underworld.h>
+#include "IncompressibleExtensionBC.h"
 
 /* Each component type needs a unique identifier (as a string for us to read and as an integer for realtime comparisions) */
 const Type Underworld_IncompressibleExtensionBC_Type = "Underworld_IncompressibleExtensionBC_Type";
-
-
-void CalculateVelocities( UnderworldContext* context, double* V_c, double* V_d )  {
-	FeVariable*         velocityField  = context->velocityField;
-	FeMesh* mesh           = velocityField->feMesh;
-	double              V_a, V_b;
-	double              h_1, h_2;
-	double              x;
-	IJK                 leftWall_global_IJK;
-	IJK                 rightWall_global_IJK;
-	Node_GlobalIndex    leftWall_globalIndex;
-	Node_GlobalIndex    rightWall_globalIndex;
-	Node_LocalIndex     leftWall_localIndex;
-	Node_LocalIndex     rightWall_localIndex;
-	XYZ                 velocity;
-	XYZ                 min, max;
-	double              width;
-	Grid*		    vertGrid;
 
 	/*
 	                 ^ V_c
@@ -90,67 +73,116 @@ void CalculateVelocities( UnderworldContext* context, double* V_c, double* V_d )
 
 	*/
 
-	x = Dictionary_GetDouble_WithDefault( context->dictionary, "constantHeight", 0.0 );
-
-	vertGrid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
-						  ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
-
-	/* Grab V_a and V_b (i.e. velocities at left and right walls) */
-	leftWall_global_IJK[ I_AXIS ] = 0;
-	leftWall_global_IJK[ J_AXIS ] = 0;
-	leftWall_global_IJK[ K_AXIS ] = 0;
-
-	rightWall_global_IJK[ I_AXIS ] = vertGrid->sizes[ I_AXIS ] - 1;
-	rightWall_global_IJK[ J_AXIS ] = 0;
-	rightWall_global_IJK[ K_AXIS ] = 0;
+double GetLeftWallVelocity( FeVariable* velocityField ) {
+	FeMesh*             mesh = velocityField->feMesh;
+	IJK                 globalIJK = {0,0,0};
+	Node_GlobalIndex    global_I;
+	XYZ                 velocity;
+	Grid*		    vertGrid;
 	
+	vertGrid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+
 	/* Grab global indicies for these nodes */
-	leftWall_globalIndex = Grid_Project( vertGrid, leftWall_global_IJK );
-	rightWall_globalIndex = Grid_Project( vertGrid, rightWall_global_IJK );
+	global_I = Grid_Project( vertGrid, globalIJK );
 	
-	/* Grab local indicies for these nodes */
-	insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, leftWall_globalIndex, &leftWall_localIndex ), == True );
-	insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, rightWall_globalIndex, &rightWall_localIndex ), == True );
+	/* Grab velocities on these walls */
+	FeVariable_GetValueAtNodeGlobal( velocityField, global_I, velocity );
 
-	/* Check if the left wall is on processor */
-	if ( leftWall_localIndex < FeMesh_GetNodeLocalSize( mesh ) ) {
-		FeVariable_GetValueAtNode( velocityField, leftWall_localIndex, velocity );
-		V_b = velocity[ I_AXIS ];
-	}
-	/* Check if the right wall is on processor */
-	if ( rightWall_localIndex < FeMesh_GetNodeLocalSize( mesh ) ) {
-		FeVariable_GetValueAtNode( velocityField, rightWall_localIndex, velocity );
-		V_a = velocity[ I_AXIS ];
-	}
+	/* Get components in horizontal direction */
+	return velocity[ I_AXIS ]; 
+}
+double GetRightWallVelocity( FeVariable* velocityField ) {
+	FeMesh*             mesh = velocityField->feMesh;
+	IJK                 globalIJK = {0,0,0};
+	Node_GlobalIndex    global_I;
+	XYZ                 velocity;
+	Grid*		    vertGrid;
+	
+	vertGrid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
 
-	/* Send these values across processors  - TODO */
+	globalIJK[ I_AXIS ] = vertGrid->sizes[ I_AXIS ] - 1;
+
+	/* Grab global indicies for these nodes */
+	global_I = Grid_Project( vertGrid, globalIJK );
+	
+	/* Grab velocities on these walls */
+	FeVariable_GetValueAtNodeGlobal( velocityField, global_I, velocity );
+	
+	/* Get components in horizontal direction */
+	return velocity[ I_AXIS ]; 
+}
+
+double GetTopWallVelocity( FeVariable* velocityField, double y ) {
+	double              V_b = GetLeftWallVelocity( velocityField );
+	double              V_a = GetRightWallVelocity( velocityField );
+	double              V_c;
+	double              h_1;
+	XYZ                 min, max;
+	double              width;
 	
 	/* Calculate Width and Height */
 	FieldVariable_GetMinAndMaxGlobalCoords( velocityField, min, max );
 	width  = (max[ I_AXIS ] - min[ I_AXIS ]);
-	h_1 = max[ J_AXIS ] - x;
-	h_2 = x - min[ J_AXIS ];
+	h_1 = max[ J_AXIS ] - y;
 
 	/* Calculate velocity at the top and at the bottom of the nodes */
-	*V_c = - h_1/width * ( V_a - V_b );
-	*V_d =   h_2/width * ( V_a - V_b );
+	V_c = - h_1/width * ( V_a - V_b );
 
+	return V_c;
+}
+
+double GetBottomWallVelocity( FeVariable* velocityField, double y ) {
+	double              V_b = GetLeftWallVelocity( velocityField );
+	double              V_a = GetRightWallVelocity( velocityField );
+	double              V_d;
+	double              h_2;
+	XYZ                 min, max;
+	double              width;
+	
+	/* Calculate Width and Height */
+	FieldVariable_GetMinAndMaxGlobalCoords( velocityField, min, max );
+	width  = (max[ I_AXIS ] - min[ I_AXIS ]);
+	h_2 = y - min[ J_AXIS ];
+	
+	/* Calculate velocity at the top and at the bottom of the nodes */
+	V_d =   h_2/width * ( V_a - V_b );
+	
+	return V_d;
+}
+
+void GetVelocity( FeVariable* velocityField, double y, Coord coord, double* velocity ) {
+	double              V_a = GetRightWallVelocity( velocityField );
+	double              V_b = GetLeftWallVelocity( velocityField );
+	double              V_c = GetTopWallVelocity( velocityField, y );
+	double              V_d = GetBottomWallVelocity( velocityField, y );
+	XYZ                 min, max;
+	double              width;
+	double              height;
+
+	FieldVariable_GetMinAndMaxGlobalCoords( velocityField, min, max );
+	width  = (max[ I_AXIS ] - min[ I_AXIS ]);
+	height  = (max[ J_AXIS ] - min[ J_AXIS ]);
+
+	velocity[ I_AXIS ] = ( coord[ I_AXIS ] - min[ I_AXIS ] ) / width  * ( V_a - V_b ) + V_b;
+	velocity[ J_AXIS ] = ( coord[ J_AXIS ] - min[ J_AXIS ] ) / height * ( V_c - V_d ) + V_d;
+	if ( velocityField->dim )
+		velocity[ K_AXIS ] = 0.0;
 }
 
 void IncompressibleExtensionBC_TopCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
 	UnderworldContext* context = (UnderworldContext*) _context;
-	double* result = (double*) _result;
-	double tmp;
+	double*            result  = (double*) _result;
+	double             y       = Dictionary_GetDouble_WithDefault( context->dictionary, "constantHeight", 0.0 );
 
-	CalculateVelocities( context, result, &tmp );
+	*result = GetTopWallVelocity( context->velocityField, y );
 }
 
 void IncompressibleExtensionBC_BottomCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
 	UnderworldContext* context = (UnderworldContext*) _context;
-	double* result = (double*) _result;
-	double tmp;
+	double*            result  = (double*) _result;
+	double             y       = Dictionary_GetDouble_WithDefault( context->dictionary, "constantHeight", 0.0 );
 
-	CalculateVelocities( context, &tmp, (double*) result );
+	*result = GetBottomWallVelocity( context->velocityField, y );
 }
 
 void _Underworld_IncompressibleExtensionBC_Construct( void* self, Stg_ComponentFactory* cf, void* data ) {
@@ -161,6 +193,7 @@ void _Underworld_IncompressibleExtensionBC_Construct( void* self, Stg_ComponentF
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 	condFunc = ConditionFunction_New( IncompressibleExtensionBC_BottomCondition, "IncompressibleExtensionBC_BottomCondition" );
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+
 }
 
 
