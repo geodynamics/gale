@@ -1,7 +1,7 @@
 import os
 
 # Check versions of some things.
-EnsurePythonVersion(2, 5)
+EnsurePythonVersion(2, 2)
 EnsureSConsVersion(0, 97)
 
 #

@@ -29,9 +29,19 @@ void METHOD(int *i){printf("FORTRAN_UPPERCASE");}
         return res
     cObj = ctx.lastTarget
 
-    oldLINK = env['LINK'] if 'LINK' in env._dict else None
-    oldLINKFLAGS = env['LINKFLAGS'] if 'LINKFLAGS' in env._dict else None
-    oldLIBS = env['LIBS'] if 'LIBS' in env._dict else None
+    if 'LINK' in env._dict:
+        oldLINK = env['LINK']
+    else:
+        oldLINK = None
+
+    if 'LINKFLAGS' in env._dict:
+        oldLINKFLAGS = env['LINKFLAGS']
+    else:
+        oldLINKFLAGS = None
+    if 'LIBS' in env._dict:
+        oldLIBS = env['LIBS']
+    else:
+        oldLIBS = None
     oldFW = env._dict.get('FRAMEWORKS', '')
     env['LINK'] = env['_FORTRAND']
     env['LINKFLAGS'] = str(cObj)
@@ -284,8 +294,10 @@ if not 'help' in COMMAND_LINE_TARGETS:
     if env._dict.get('force32bit', None):
         bits = 32
     else:
-        bits = 64 if \
-            platform.architecture()[0].find('64') != -1 else 32
+        if platform.architecture()[0].find('64') != -1:
+            bits = 64
+        else:
+            bits = 32
     print '%dbit ...' % bits
 
     # Need to modify building shared libraries when on Mac OS X.

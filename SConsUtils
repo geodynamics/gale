@@ -44,7 +44,10 @@ def push_state(env, state, append=False):
     old = {}
     copy = dict(state)
     for k, v in copy.iteritems():
-        copy[k] = v if isinstance(v, list) else [v]
+        if isinstance(v, list):
+            copy[k] = v 
+        else:
+            copy[k] = [v]
         old[k] = env.get(k, None)
     if append:
         env.AppendUnique(**copy)
@@ -209,8 +212,10 @@ return 0;
         if env._dict.get('force32bit', None):
             self.bits = 32
         else:
-            self.bits = 64 if \
-                platform.architecture()[0].find('64') != -1 else 32
+             if platform.architecture()[0].find('64') != -1:
+                 self.bits = 64
+             else:
+                 self.bits = 32
 
         # Provide a list (or a single) of strings to override the
         # generated search base directories.
@@ -385,13 +390,25 @@ return 0;
             # Grab all the options we have.
             base_dir = self.opts.get('base_dir', '')
             ohdr_dir = self.opts.get('hdr_dir', '')
-            ohdr_dir = [ohdr_dir] if ohdr_dir else []
+            if ohdr_dir:
+                ohdr_dir = [ohdr_dir]
+            else:
+                ohdr_dir = []
             olib_dir = self.opts.get('lib_dir', '')
-            olib_dir = [olib_dir] if olib_dir else []
+            if olib_dir:
+                olib_dir = [olib_dir]
+            else:
+                olib_dir=[]
             libs = self.opts.get('libs', '')
-            libs = [libs] if libs else []
+            if libs:
+                libs = [libs] 
+            else:
+                libs=[]
             fw = self.opts.get('fw', '')
-            fw = [fw] if fw else []
+            if fw:
+                fw = [fw]
+            else:
+                fw=[]
 
             # If certain specific options were given then use only
             # options to locate the package.
@@ -411,7 +428,10 @@ return 0;
             else:
                 sub_dir = self.sub_dirs
 
-            base_dir = [base_dir] if base_dir else self.base_dirs
+            if base_dir:
+                base_dir = [base_dir]
+            else:
+                base_dir = self.base_dirs
             if not libs:
                 libs = self.libs
             if not fw:
