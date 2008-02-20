@@ -21,7 +21,7 @@
 	<param name="timeIntegratorOrder"> 1 </param>
 
 	<!-- Must allow particles to leave domain. -->
-	<include>PICellerator/AllowOutflow.xml</param>
+	<include>PICellerator/AllowOutflow.xml</include>
 
 	<!-- Replacement for MovingMesh -->
 	<struct name="components" mergeType="merge">
