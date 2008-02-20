@@ -1,0 +1,733 @@
+import os, glob as pyglob, platform, pickle
+from SCons.Script.SConscript import SConsEnvironment
+Import('env')
+
+#
+# Setup some basic path utilities.
+#
+
+# Globbing for hierarchical SCons scripts.
+def glob(env, ptrn):
+    if not os.path.isabs(ptrn):
+        old = os.getcwd()
+        os.chdir(Dir('.').srcnode().abspath)
+        res = pyglob.glob(ptrn)
+        os.chdir(old)
+    else:
+        res = pyglob.glob(ptrn)
+    return res
+
+# Normalise an SCons path to the project root.
+def norm_path(env, path):
+    cur_dir = env.Dir('.').srcnode().path
+    if path[0] != '#':
+        path = os.path.join(cur_dir, path)
+    else:
+        path = path[1:]
+    return path
+
+# Copy a file immediately.
+def copy_file(env, dst, src):
+    dst = env.norm_path(dst)
+    old = os.getcwd()
+    os.chdir(env.GetLaunchDir())
+    if not File(os.path.abspath(dst)).current():
+        src = env.norm_path(src)
+        dst_dir = os.path.dirname(dst)
+        if not os.path.exists(dst_dir):
+            Execute(Mkdir(dst_dir))
+        Execute(Copy(dst, src))
+        os.chdir(old)
+
+# Temporarily replace some paths.
+def push_state(env, state, append=False):
+    old = {}
+    copy = dict(state)
+    for k, v in copy.iteritems():
+        copy[k] = v if isinstance(v, list) else [v]
+        old[k] = env.get(k, None)
+    if append:
+        env.AppendUnique(**copy)
+    else:
+        env.PrependUnique(**copy)
+    return old
+
+# Replace old paths.
+def pop_state(env, state):
+    env.Replace(**state)
+
+# Add to the SCons main class.
+SConsEnvironment.glob = glob
+SConsEnvironment.norm_path = norm_path
+SConsEnvironment.copy_file = copy_file
+SConsEnvironment.push_state = push_state
+SConsEnvironment.pop_state = pop_state
+
+#
+# Setup some utilities for dumping configurations.
+#
+
+# Dump a set of environment variables.
+def dump_cfg(env, filename, vars):
+    d = {}
+    for a in vars:
+        if a in env._dict:
+            d[a] = env[a]
+    f = file(filename, 'w')
+    pickle.dump(d, f)
+    f.close()
+
+# Load a configuration dump.
+def load_cfg(env, filename):
+    if not os.path.exists(filename):
+        print "\nError: project hasn't been configured!\n"
+        print '************************************************'
+        print "* Run 'scons config' to configure the project. *"
+        print '************************************************\n'
+        env.Exit()
+    f = file(filename, 'r')
+    d = pickle.load(f)
+    f.close()
+    for k, v in d.iteritems():
+        env[k] = v
+
+SConsEnvironment.dump_cfg = dump_cfg
+SConsEnvironment.load_cfg = load_cfg
+
+#
+# Setup the hierarchical build stuff.
+#
+
+def hbuild(env, builder, hpath, store=True, *args, **kw):
+    nodes = builder(*args, **kw)
+    if store:
+        if builder not in env.hnodes:
+            env.hnodes[builder] = {}
+        place = env.hnodes[builder]
+        if '.' not in place:
+            place['.'] = []
+        place['.'].append(nodes)
+        for h in hpath.split(os.path.sep):
+            if h not in place:
+                place[h] = {}
+            place = place[h]
+            if '.' not in place:
+                place['.'] = []
+            place['.'].append(nodes)
+    return nodes
+
+def get_hnodes(env, builder, hpath=None):
+    place = env.hnodes[builder]
+    if hpath:
+        for h in hpath.split(os.path.sep):
+            place = place[h]
+    return place['.']
+
+def hclear(env):
+    env.hnodes = {}
+
+SConsEnvironment.hbuild = hbuild
+SConsEnvironment.get_hnodes = get_hnodes
+SConsEnvironment.hclear = hclear
+
+#
+# Setup some utilities for handling package configuration.
+#
+
+class PackageState(object):
+    def __init__(self, pkg, base_dir, hdr_dirs, lib_dirs,
+                 libs, frameworks):
+        self.pkg = pkg
+        self.base_dir = base_dir
+        self.hdr_dirs = hdr_dirs
+        self.lib_dirs = lib_dirs
+        self.libs = libs
+        self.frameworks = frameworks
+        self.state = {}
+        self.old = None
+
+    def enable(self, env):
+        if self.old != None:
+            print 'Error'
+            env.Exit()
+        self.old = env.push_state(self.state)
+
+    def disable(self, env):
+        env.pop_state(self.old)
+        self.old = None
+
+    def build_state(self):
+        self.state = {}
+        if not self.frameworks:
+            if self.hdr_dirs:
+                self.state['CPPPATH'] = self.hdr_dirs
+            if self.lib_dirs:
+                self.state['LIBPATH'] = self.lib_dirs
+                if self.pkg.use_rpath:
+                    self.state['RPATH'] = self.lib_dirs
+            if self.libs:
+                self.state['LIBS'] = self.libs
+        else:
+            self.state['FRAMEWORKS'] = self.frameworks
+
+    def text(self, prefix=''):
+        txt = ''
+        if self.base_dir:
+            txt += prefix + 'Base path: %s\n' % self.base_dir
+        if self.hdr_dirs:
+            txt += prefix + 'Header paths: %s\n' % str(self.hdr_dirs)
+        if self.lib_dirs:
+            txt += prefix + 'Lib paths: %s\n' % str(self.lib_dirs)
+        if self.libs:
+            txt += prefix + 'Libs: %s\n'% str(self.libs)
+        if self.frameworks:
+            txt += prefix + 'Frameworks: %s\n' % str(self.frameworks)
+        return txt
+
+    def __str__(self):
+        return self.text()
+        
+
+class Package(object):
+    check_src = """
+#include<stdlib.h>
+#include<stdio.h>
+%s
+int main(int argc, char** argv) {
+%s
+%s
+return 0;
+}
+"""
+
+    def __init__(self, name, env):
+        self.name = name
+        self.env = env
+
+        # Setup some system specific information.
+        self.system = platform.system()
+        if env._dict.get('force32bit', None):
+            self.bits = 32
+        else:
+            self.bits = 64 if \
+                platform.architecture()[0].find('64') != -1 else 32
+
+        # Provide a list (or a single) of strings to override the
+        # generated search base directories.
+        self.base_dirs = []
+
+        # Specify a list of directories that are common
+        # sub-directories for installations of this package.
+        self.pkg_dirs = []
+
+        # Setup header and library subdirectories; can be a list of (or
+        # just a single) tuple(s) containing the header/library sub-
+        # directory or a tuple containing simultaneous header/library
+        # subdirectories.
+        self.sub_dirs = []
+
+        # Some libraries pack headers under their own subdirectory
+        # (i.e. libXML2). Same for library directories.
+        self.hdr_sub_dirs = []
+        self.lib_sub_dirs = []
+
+        # Place any headers that should be checked for here.
+        self.hdrs = []
+
+        # Setup default library names.
+        self.libs = [] # can be a list or a list of tuples
+
+        # Add any frameworks that may exist representing this package here.
+        self.frameworks = []
+        self.framework_hdr_prefix = ''
+
+        # Set this flag if RPATH's are needed for this package.
+        self.use_rpath = False
+
+        # Set to force presence of shared libs.
+        self.require_shared = False
+
+        # Use this member to specify a callback function for
+        # customising search states.
+        self.check_state = None
+
+        # Set these to perform version checks.
+        self.major_macro = None
+        self.minor_macro = None
+        self.major_ver = None
+        self.minor_ver = None
+
+        # Insert any library function calls to perform here.
+        self.func_src = ''
+
+        # Prepare default options.
+        self.cmd_opts = None
+        self.env_opts = None
+        self.opt_entries = None
+        self.build_options()
+
+        # Setup some default locations we shouldn't try and override.
+        if self.system in ['Darwin', 'Linux']:
+            self.def_hdr_dirs = ['/usr/include', '/usr/include/']
+            self.def_lib_dirs = ['/usr/lib', '/usr/lib/',
+                                 '/usr/lib64', '/usr/lib64/']
+
+        else:
+            self.def_hdr_dirs = []
+            self.def_lib_dirs = []
+
+    def build_options(self):
+        # Build the command line options.
+        if not self.cmd_opts:
+            low = self.name.lower()
+            self.cmd_opts = {'base_dir': low + 'Dir',
+                             'hdr_dir': low + 'IncDir',
+                             'lib_dir': low + 'LibDir',
+                             'libs': low + 'Libs',
+                             'framework': low + 'Framework'}
+
+        # Build environment options.
+        if not self.env_opts:
+            upp = self.name.upper()
+            self.env_opts = {'base_dir': upp + '_DIR',
+                             'hdr_dir': upp + '_INC_DIR',
+                             'lib_dir': upp + '_LIB_DIR',
+                             'libs': upp + '_LIBS',
+                             'framework': upp + '_FRAMEWORK'}
+
+        # Setup option entries.
+        self.opt_entries = [
+            PathOption(self.cmd_opts['base_dir'],
+                       '%s installation path' % self.name,
+                       None, PathOption.PathIsDir),
+            PathOption(self.cmd_opts['hdr_dir'],
+                       '%s header installation path' % self.name,
+                       None, PathOption.PathIsDir),
+            PathOption(self.cmd_opts['lib_dir'],
+                       '%s library installation path' % self.name,
+                       None, PathOption.PathIsDir),
+            (self.cmd_opts['libs'],
+             '%s libraries' % self.name,
+             None, None),
+            (self.cmd_opts['framework'],
+             '%s framework' % self.name,
+             None, None)
+            ]
+
+    def add_options(self, opts):
+        opts.AddOptions(*self.opt_entries)
+
+    def build_search_dirs(self):
+        if not self.base_dirs:
+            # Setup some default search directories based on the
+            # kind of platform we're on.
+            if self.system in ['Darwin', 'Linux']:
+                # Setup the base directories.
+                self.base_dirs = []
+                if self.system == 'Darwin':
+                    # Darwin specific
+                    self.base_dirs += ['/sw']
+
+                # Common to both Darwin and Linux
+                self.base_dirs += ['/usr', '/usr/local']
+                for d in self.pkg_dirs:
+                    ptrn = os.path.join('/usr/local', d)
+                    self.base_dirs += pyglob.glob(ptrn)
+                    ptrn = os.path.join(env['ENV']['HOME'], d)
+                    self.base_dirs += pyglob.glob(ptrn)
+
+            elif self.system == 'Windows':
+                pass # TODO
+
+            # Strip out any directories that don't exist or aren't
+            # directories.
+            self.base_dirs = [d for d in self.base_dirs \
+                                  if os.path.exists(d) and \
+                                  os.path.isdir(d)]
+
+        if not self.sub_dirs:
+            # Now append any usual subdirectories to our list.
+            if self.system in ['Darwin', 'Linux']:
+                # Figure out the order of library extension directories.
+                exts = []
+                if self.bits == 64:
+                    exts += ['lib64']
+                exts += ['lib']
+
+                # If we have library sub-directories, add them in.
+                if self.lib_sub_dirs:
+                    lib_dirs = []
+                    for d in self.lib_sub_dirs:
+                        lib_dirs += [os.path.join(e, d) for e in exts]
+                else:
+                    lib_dirs = exts
+
+                # If we have header sub-directories, add them in.
+                if self.hdr_sub_dirs:
+                    hdr_dirs = []
+                    for d in self.hdr_sub_dirs:
+                        hdr_dirs += [os.path.join('include', d)]
+                else:
+                    hdr_dirs = ['include']
+
+                # Compile our sub-directory tuples.
+                self.sub_dirs = []
+                for h in hdr_dirs:
+                    for l in lib_dirs:
+                        self.sub_dirs += [(h, l)]
+
+            elif self.system == 'Windows':
+                pass # TODO
+
+    def build_states(self):
+        # If we have options of any kind, use those exclusively.
+        if len(self.opts):
+            # Grab all the options we have.
+            base_dir = self.opts.get('base_dir', '')
+            ohdr_dir = self.opts.get('hdr_dir', '')
+            ohdr_dir = [ohdr_dir] if ohdr_dir else []
+            olib_dir = self.opts.get('lib_dir', '')
+            olib_dir = [olib_dir] if olib_dir else []
+            libs = self.opts.get('libs', '')
+            libs = [libs] if libs else []
+            fw = self.opts.get('fw', '')
+            fw = [fw] if fw else []
+
+            # If certain specific options were given then use only
+            # options to locate the package.
+            if (ohdr_dir and olib_dir and libs) or fw:
+                state = PackageState(self, base_dir, ohdr_dir, olib_dir,
+                                     libs, fw)
+                if self.check_state:
+                    self.check_state(state)
+                self.states = [state]
+                return
+
+            # Figure out what to alias.
+            if ohdr_dir and olib_dir:
+                # Place a dummy value in here so the loop below iterates
+                # once.
+                sub_dir = [('', '')]
+            else:
+                sub_dir = self.sub_dirs
+
+            base_dir = [base_dir] if base_dir else self.base_dirs
+            if not libs:
+                libs = self.libs
+            if not fw:
+                fw = self.frameworks
+
+        else:
+            # Alias to use defaults.
+            base_dir = self.base_dirs
+            libs = self.libs
+            sub_dir = self.sub_dirs
+            fw = self.frameworks
+
+            # Clear out other values.
+            ohdr_dir = None
+            olib_dir = None
+
+        self.states = []
+        if not (ohdr_dir or olib_dir) and not self.opts.get('base_dir', ''):
+            # Before formulating other states, insert a blank state to
+            # check if the package has been made available.
+            for l in libs:
+                state = PackageState(self, '', [], [], l, None)
+                self.states += [state]
+
+        # Begin forming states from default search locations.
+        for base in base_dir:
+            for sub in sub_dir:
+                # Were we given header directories?
+                if ohdr_dir:
+                    hdr_dir = ohdr_dir
+                else:
+                    # Combine header dirs.
+                    if isinstance(sub[0], tuple):
+                        hdr_dir = [os.path.join(base, s) for s in sub[0]]
+                    else:
+                        hdr_dir = [os.path.join(base, sub[0])]
+
+                    # Don't include it if it's a default location.
+                    hdr_dir = [h for h in hdr_dir \
+                                   if h not in self.def_hdr_dirs]
+
+                # Were we given library directories?
+                if olib_dir:
+                    lib_dir = olib_dir
+                else:
+                    # Combine library dirs.
+                    if isinstance(sub[0], tuple):
+                        lib_dir = [os.path.join(base, s) for s in sub[1]]
+                    else:
+                        lib_dir = [os.path.join(base, sub[1])]
+
+                    # Don't include it if it's a default location.
+                    lib_dir = [h for h in lib_dir \
+                                   if h not in self.def_lib_dirs]
+
+                # If we have nothing, skip.
+                if not (base or hdr_dir or lib_dir):
+                    continue
+
+                # Permute with libraries.
+                for l in libs:
+                    if isinstance(l, tuple):
+                        l = list(l)
+
+                    # Create our package state.
+                    state = PackageState(self, base, hdr_dir, lib_dir,
+                                         l, None)
+
+                    # If we have a callback, use it.
+                    if self.check_state:
+                        if not self.check_state(state):
+                            continue
+
+					# If any of the directories don't exist, skip.
+                    okay = True
+                    for h in hdr_dir:
+                        if not os.path.exists(h):
+                            okay = False
+                            break
+                    for l in lib_dir:
+                        if not os.path.exists(l):
+                            okay = False
+                            break
+                    if not okay:
+                        continue
+
+                    # Store in state array.
+                    self.states += [state]
+
+        # Add a state for any alternate frameworks (if they were given).
+        if fw:
+            self.states += [PackageState(self, '', [], [], [], fw)]
+
+    def next_state(self, ctx):
+        # Set everything up.
+        self.build_options()
+        self.process_opts(ctx.env)
+        self.build_search_dirs()
+        self.build_states()
+
+        # Begin trialing states.
+        for s in self.states:
+            s.build_state()
+            yield s
+
+    def check(self, ctx, state):
+        hdr_src = self.string_hdrs(state)
+        ver_src = self.string_ver()
+        src = self.check_src % (hdr_src, ver_src, self.func_src)
+
+        state.enable(ctx.env)
+        res = ctx.TryRun(src, '.c')
+        state.disable(ctx.env)
+        if not res[0]:
+            return res
+
+        if self.require_shared:
+            res = self.check_shared(ctx, state)
+        return res
+
+    def check_shared(self, ctx, state):
+        lib_src = """
+#include<stdlib.h>
+%s
+void _dummy_func(int argc, char** argv) {
+%s
+}
+"""
+        main_src="""
+void _dummy_func(int argc, char** argv);
+int main(int argc, char** argv) {
+_dummy_func(argc, argv);
+return 0;
+}
+"""
+
+        # Must have a function to call from the library.
+        if not self.func_src:
+            print '\n'
+            print '   Error: need a function from the library to call in order'
+            print '      to check for shared libraries.\n'
+            env.Exit()
+
+        # Create the shared object.
+        hdr_src = self.string_hdrs(state)
+        state.enable(ctx.env)
+        res = ctx.TryBuild(env.SharedObject,
+                           lib_src % (hdr_src, self.func_src),
+                           '*.c')
+        state.disable(ctx.env)
+        if not res:
+            return (res, '')
+
+        # Create the shared library.
+        lib_obj = ctx.lastTarget
+        old = env.push_state({'LIBS': [lib_obj]})
+        res = ctx.TryBuild(env.SharedLibrary, '', '*.c')
+        env.pop_state(old)
+        if not res:
+            return (res, '')
+        lib = ctx.lastTarget
+
+        # Build the program and try to run, but make sure the symbols are
+        # passed to the linker out of order.
+        state.enable(env)
+        old = env.push_state({'LIBS': [lib],
+                              'RPATH': [os.getcwd()]},
+                             append=True)
+        res = ctx.TryRun(main_src, '*.c')
+        env.pop_state(old)
+        state.disable(env)
+        if not res[0]:
+            res = (res[0], 'no shared libraries available')
+
+        return res
+
+    def string_hdrs(self, state):
+        txt = ''
+        if self.hdrs:
+            for h in self.hdrs:
+		if state.frameworks and self.framework_hdr_prefix:
+		    h = os.path.join(self.framework_hdr_prefix, h)
+                txt += '#include<%s>\n' % h
+        return txt
+
+    def string_ver(self):
+        if self.major_macro and self.major_ver:
+            txt = '(%s >= %d)' % (self.major_macro, self.major_ver)
+            if self.minor_macro and self.minor_ver:
+                txt = '(%s ? 0 : (%s == %d && %s >= %d)' % \
+                    (txt, self.major_macro, self.major_ver,
+                     self.minor_macro, self.minor_ver)
+            txt += ' ? 0 : 1'
+            if self.minor_macro and self.minor_ver:
+                txt += ')'
+            txt = 'if( %s )' % txt
+            txt = '%s {\n  printf("invalid version (v%s' % (txt, '%d')
+            if self.minor_macro:
+                txt = '%s.\%s), requires ' % (txt, '%d')
+            else:
+                txt = '%s)' % txt
+            txt = '%s, requires v%d' % (txt, self.major_ver)
+            if self.minor_ver is not None:
+                txt = '%s.%d' % (txt, self.minor_ver)
+            txt = '%s", %s' % (txt, self.major_macro)
+            if self.minor_macro:
+                txt = '%s, %s' % (txt, self.minor_macro)
+            txt = '%s);\n}\n' % (txt)
+        else:
+            txt = ''
+        return txt
+
+    def process_opts(self, env):
+        """Processes all options specified in self.cmd_opts and 
+self.env_opts."""
+
+        # Clear any existing options.
+        self.opts = {}
+
+        # Fill in values from command line options first.
+        for k, v in self.cmd_opts.iteritems():
+            val = env.get(v, None)
+            if val:
+                self.opts[k] = val
+
+        # If command line options were given, don't check environment
+        # options (we don't want to mix and match just yet).
+        if len(self.opts):
+            return
+
+        # Now process environment options.
+        for k, v in self.env_opts.iteritems():
+            val = env['ENV'].get(v, None)
+            if val:
+                self.opts[k] = val
+
+    def print_opts_help(self):
+        print '   Was unable to locate a working version of package:'
+        print '      %s\n' % self.name
+        print "   Please check 'config.log' for the cause of the failure.\n"
+
+        if len(self.opts):
+            print '   The following options were used:'
+            for k, v in self.opts.iteritems():
+                if self.cmd_opts[k] in env._dict:
+                    print '      %s: ' % self.cmd_opts[k],
+                    print '%s' % env[self.cmd_opts[k]]
+                else:
+                    print '      %s: ' % self.env_opts[k],
+                    print '%s' % env['ENV'][self.env_opts[k]]
+            print ''
+            return
+
+        if len(self.cmd_opts):
+            print '   You could try specifying any of the following command'
+            print '   line options:'
+            for c in self.cmd_opts.itervalues():
+                print '      %s' % c
+            print ''
+        if len(self.env_opts):
+            if len(self.cmd_opts):
+                print '   Or you',
+            else:
+                print '   You',
+            print ' could try setting any of the following environment'
+            print '   variables (if your platform supports doing so):'
+            for e in self.env_opts.itervalues():
+                print '      %s' % e
+            print ''
+        if len(self.cmd_opts) or len(self.env_opts):
+            print "   Please run 'scons help' to see more details on using"
+            print '   these options.\n'
+
+def CheckPackage(ctx, pkg):
+    env = ctx.env
+    ctx.Message('Checking for package %s ... ' % pkg.name)
+    res = 0
+    first = True
+    for state in pkg.next_state(ctx):
+        # Log some information.
+        ctx.Log('**********************************\n')
+        ctx.Log('*       Package state            *\n')
+        ctx.Log('**********************************\n')
+        ctx.Log(str(state))
+        ctx.Log('**********************************\n')
+
+        # Perform the check.
+        res = pkg.check(ctx, state)
+
+        # Did it pass?
+        if res[0] and res[1] == '':
+            ctx.Log('**********************************\n')
+            ctx.Log('*             Result             *\n')
+            ctx.Log('**********************************\n')
+            ctx.Log('Passed\n')
+            ctx.Log('**********************************\n')
+            ctx.Result(1)
+            ctx.Display(state.text(prefix='   '))
+            ctx.Display('\n')
+            env['PACKAGES'][pkg.name] = state
+            state.enable(env)
+            return 1
+
+        # No.
+        ctx.Log('**********************************\n')
+        ctx.Log('*             Result             *\n')
+        ctx.Log('**********************************\n')
+        if res[1]:
+            ctx.Log('Failed: ' + res[1] + '\n')
+        else:
+            ctx.Log('Failed\n')
+        ctx.Log('**********************************\n')
+    ctx.Result(0)
+    return 0
+
+# Need to store these guys on the environment.
+env.Package = Package
+env.PackageState = PackageState
+env.CheckPackage = CheckPackage

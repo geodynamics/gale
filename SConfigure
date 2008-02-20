@@ -1,0 +1,425 @@
+import os, sys, platform
+Import('env')
+
+#
+# Custom configuration checks.
+#
+
+def CheckFortranSymbol(ctx):
+    fSrc = """
+      Program Conftest
+      external method
+      integer i
+      call method(i)
+      stop
+      end
+"""
+    cSrc = """
+#include <stdio.h>
+void method(int *i){printf("FORTRAN_NORMAL");}
+void method_(int *i){printf("FORTRAN_SINGLE_TRAILINGBAR");}
+void method__(int *i){printf("FORTRAN_DOUBLE_TRAILINGBAR");}
+void METHOD(int *i){printf("FORTRAN_UPPERCASE");}
+"""
+    ctx.Message('Checking for fortran symbol type... ')
+
+    res = ctx.TryCompile(cSrc, '.c')
+    if not res:
+        ctx.Result(res)
+        return res
+    cObj = ctx.lastTarget
+
+    oldLINK = env['LINK'] if 'LINK' in env._dict else None
+    oldLINKFLAGS = env['LINKFLAGS'] if 'LINKFLAGS' in env._dict else None
+    oldLIBS = env['LIBS'] if 'LIBS' in env._dict else None
+    oldFW = env._dict.get('FRAMEWORKS', '')
+    env['LINK'] = env['_FORTRAND']
+    env['LINKFLAGS'] = str(cObj)
+    env['LIBS'] = []
+    env['FRAMEWORKS'] = []
+    res = ctx.TryRun(fSrc, '.F')
+    env['LINK'] = oldLINK
+    env['LINKFLAGS'] = oldLINKFLAGS
+    env['LIBS'] = oldLIBS
+    env['FRAMEWORKS'] = oldFW
+    if not res[0]:
+        ctx.Result(res[0])
+        return res[0]
+
+    env.Append(CPPDEFINES=[res[1]])
+    ctx.Result(res[0])
+    return res[0]
+
+def CheckPetscMpich(ctx):
+    src="""
+#include<mpi.h>
+#include<petsc.h>
+int main(int argc, char** argv) {
+MPI_Init(&argc, &argv);
+PetscInitialize(&argc, &argv, NULL, NULL);
+PetscFinalize();
+MPI_Finalize();
+}
+"""
+    ctx.Message('Checking that PETSc and MPI are compatible ...')
+    res = ctx.TryRun(src, '.c')
+    ctx.Result(res[0])
+    return res[0]
+
+#
+# Some functions for processing certain search paths.
+#
+
+def petsc_get_arch(base_dir):
+    petscconf = os.path.join(base_dir, 'bmake',
+                             'petscconf')
+    if not os.path.exists(petscconf):
+        return None
+    f = file(petscconf, 'r')
+    arch = f.readline().split('=')[1][:-1]
+    f.close()
+    return arch
+
+def petsc_get_opt(base_dir, arch, opt):
+    petscconf = os.path.join(base_dir, 'bmake', 
+                             arch, 'petscconf')
+    if not os.path.exists(petscconf):
+        return None
+    f = file(petscconf, 'r')
+    res = ''
+    for l in f.readlines():
+        if l[:len(opt)] == opt:
+            res = l.split('=')[1].strip()
+            break
+    f.close()
+    return res
+
+def petsc_get_libs(base_dir, arch, prefix):
+    petscconf = os.path.join(base_dir, 'bmake', 
+                             arch, 'petscconf')
+    if not os.path.exists(petscconf):
+        return None
+    f = file(petscconf, 'r')
+    libs = []
+    lib_dirs = []
+    prefix = prefix + '_LIB'
+    for l in f.readlines():
+        if l[:len(prefix)] == prefix:
+            itms = l.split('=')[1].strip().split(' ')
+            length = len(env['LIBLINKPREFIX'])
+            libs = [itm[length:] for itm in itms \
+                        if itm[:length] == env['LIBLINKPREFIX']]
+            length = len(env['LIBDIRPREFIX'])
+            lib_dirs = [itm[length:] for itm in itms \
+                            if itm[:length] == env['LIBDIRPREFIX']]
+            break
+    f.close()
+    return (lib_dirs, libs)
+
+def petsc_check_state(state):
+    arch = petsc_get_arch(state.base_dir)
+    if not arch:
+        return False
+
+    x11_libs = petsc_get_libs(state.base_dir, arch, 'X11')
+    if x11_libs is None:
+        return False
+
+    hdr_dir = os.path.join(state.base_dir, 'bmake', arch)
+    if hdr_dir not in state.hdr_dirs:
+        state.hdr_dirs.append(hdr_dir)
+
+    lib_dir = os.path.join(state.base_dir, 'lib')
+    if lib_dir in state.lib_dirs:
+        state.lib_dirs.remove(lib_dir)
+    lib_dir = os.path.join(lib_dir, arch)
+    if lib_dir not in state.lib_dirs:
+        state.lib_dirs.append(lib_dir)
+
+    for l in x11_libs[0]:
+        if l not in state.lib_dirs:
+            state.lib_dirs.append(l)
+    for l in x11_libs[1]:
+        if l not in state.libs:
+            state.libs.append(l)
+
+    state.arch = arch
+
+    return True
+
+#
+# Create all the packages we need so their options will already be in the
+# option database.
+#
+
+opts = Options('config.cache')
+env['PACKAGES'] = {}
+
+mpich = env.Package('MPICH', env)
+mpich.pkg_dirs = ['mpich*', 'MPICH*']
+mpich.hdr_sub_dirs = ['', 'mpi']
+mpich.lib_sub_dirs = ['', 'shared']
+mpich.hdrs = ['mpi.h']
+mpich.libs = ['mpich',
+              ('mpich', 'pmpich'),
+              ('mpich', 'rt'),
+              ('mpich', 'pmpich', 'rt'),
+              'mpi']
+mpich.require_shared = True
+mpich.use_rpath = True
+mpich.major_macro = 'MPI_VERSION'
+mpich.minor_macro = 'MPI_SUBVERSION'
+mpich.major_ver = 1
+mpich.minor_ver = 2
+mpich.func_src = 'MPI_Init(&argc, &argv);\nMPI_Finalize();'
+mpich.add_options(opts)
+
+petsc = env.Package('PETSc', env)
+petsc.pkg_dirs = ['petsc*', 'PETSc*', 'PETSC*']
+petsc.hdrs = ['petsc.h',
+              'petscvec.h', 'petscmat.h',
+              'petscksp.h', 'petscsnes.h']
+petsc.libs = [('petsc', 'petscdm',
+               'petscvec', 'petscmat',
+               'petscksp', 'petscsnes')]
+petsc.require_shared = True
+petsc.use_rpath = True
+petsc.check_state = petsc_check_state
+petsc.major_macro = 'PETSC_VERSION_MAJOR'
+petsc.minor_macro = 'PETSC_VERSION_MINOR'
+petsc.major_ver = 2
+petsc.minor_ver = 3
+petsc.func_src = """PetscInitialize(&argc, &argv, NULL, NULL);
+PetscFinalize();"""
+petsc.add_options(opts)
+
+libxml = env.Package('libXML2', env)
+libxml.pkg_dirs = ['libxml2', 'libXML2']
+libxml.hdr_sub_dirs = ['libxml2']
+libxml.hdrs = ['libxml/xmlIO.h']
+libxml.libs = ['libxml2']
+libxml.add_options(opts)
+
+lapack = env.Package('blaslapack', env)
+lapack.libs = [('blas', 'lapack'),
+               'lapack',
+               'mkl']
+lapack.frameworks = ['Accelerate']
+lapack.add_options(opts)
+
+ogl = env.Package('OpenGL', env)
+ogl.hdr_sub_dirs = ['GL']
+ogl.hdrs = ['gl.h', 'glu.h']
+ogl.libs = [('GL', 'GLU')]
+ogl.frameworks = ['OpenGL']
+ogl.framework_hdr_prefix = 'OpenGL'
+ogl.add_options(opts)
+
+mesa = env.Package('OSMesa', env)
+mesa.libs = ['OSMesa']
+mesa.add_options(opts)
+
+sdl = env.Package('SDL', env)
+sdl.hdrs = ['SDL/SDL.h']
+sdl.libs = ['SDL']
+sdl.frameworks = ['SDL', 'Cocoa']
+sdl.add_options(opts)
+
+png = env.Package('libPNG', env)
+png.hdrs = ['png.h']
+png.libs = ['png']
+png.add_options(opts)
+
+jpeg = env.Package('libJPEG', env)
+jpeg.hdrs = ['jpeglib.h']
+jpeg.libs = ['jpeg']
+jpeg.add_options(opts)
+
+tiff = env.Package('libTIFF', env)
+tiff.hdrs = ['tiff.h']
+tiff.libs = ['tiff']
+tiff.add_options(opts)
+
+fame = env.Package('libFAME', env)
+fame.hdrs = ['fame.h']
+fame.libs = ['fame']
+fame.add_options(opts)
+
+avc = env.Package('libavcodec', env)
+avc.hdrs = ['ffmpeg/avcodec.h']
+avc.libs = ['avcodec']
+avc.add_options(opts)
+
+hdf = env.Package('HDF5', env)
+hdf.hdrs = ['hdf5.h']
+hdf.libs = ['hdf5']
+avc.add_options(opts)
+
+# Add other options.
+opts.AddOptions(
+    BoolOption('debug', 'Enable debugging version', 1),
+    BoolOption('useMpiRecord', 'Don''t know what this does...', 0),
+    PathOption('prefix', 'Installation path',
+               '/usr/local', PathOption.PathIsDirCreate),
+    BoolOption('force32bit', 'Force the use of 32-bit libraries', 0),
+    PackageOption('csoap', 'Enable use of the package CSoap', 'no')
+    )
+
+opts.Update(env)
+opts.Save('config.cache', env)
+
+#
+# Okay, now actually perform the configuration.
+#
+
+if not 'help' in COMMAND_LINE_TARGETS:
+    cfg = Configure(env,
+                    custom_tests={'CheckPackage': env.CheckPackage,
+                                  'CheckFortranSymbol': CheckFortranSymbol,
+                                  'CheckPetscMpich': CheckPetscMpich})
+
+    # Print out a message about what architecture we're
+    # planning on using.
+    print 'Configuring for %s' % platform.system(),
+    if env._dict.get('force32bit', None):
+        bits = 32
+    else:
+        bits = 64 if \
+            platform.architecture()[0].find('64') != -1 else 32
+    print '%dbit ...' % bits
+
+    # Need to modify building shared libraries when on Mac OS X.
+    if platform.system() == 'Darwin':
+        env.AppendUnique(SHLINKFLAGS=['-flat_namespace',
+                                      '-single_module',
+                                      '-undefined', 'suppress'])
+
+        # And fix RPATHs.
+        import SCons.Util
+        env['LINKFLAGS'] = SCons.Util.CLVar('')
+        env['RPATHPREFIX'] = ''
+        env['RPATHSUFFIX'] = ''
+        env['_RPATH'] = ''
+
+    # Check for the C math library.
+    if not cfg.CheckLib('m'):
+        print "Couldn't find the C standard math libaray."
+        env.Exit()
+
+    # Check for MPICH.
+    if not cfg.CheckPackage(mpich):
+        mpich.print_opts_help()
+        env.Exit()
+
+    # Check for an implementation of PETSc
+    if not cfg.CheckPackage(petsc):
+        petsc.print_opts_help()
+        env.Exit()
+    env.Append(CPPDEFINES=['HAVE_PETSC'])
+
+    # Make sure both PETSc and MPICH are compatible.
+    if not cfg.CheckPetscMpich():
+        print '   Selected versions of MPI and PETSc are incompatible,'
+        print '   please choose another combination.\n'
+        env.Exit()
+
+    # Check for libXML2.
+    if not cfg.CheckPackage(libxml):
+        libxml.print_opts_help()
+        env.Exit()
+
+    # Check for an implementation of lapack and blas.
+    if not cfg.CheckPackage(lapack):
+        lapack.print_opts_help()
+        env.Exit()
+
+    # Setup OpenGL.
+    if not cfg.CheckPackage(ogl):
+        ogl.print_opts_help()
+        env.Exit()
+    env.Append(CPPDEFINES=['HAVE_GL'])
+
+    # Setup Mesa.
+    if not cfg.CheckPackage(mesa):
+        print "   Couldn't find OSMesa - off screen rendering disabled\n"
+    else:
+        env.Append(CPPDEFINES=['HAVE_MESA'])
+
+    # Setup SDL.
+    if cfg.CheckPackage(sdl):
+        env.Append(CPPDEFINES=['HAVE_SDL'])
+
+    # Setup various image formats.
+    if cfg.CheckPackage(png):
+        env.Append(CPPDEFINES=['HAVE_PNG'])
+
+    if cfg.CheckPackage(jpeg):
+        env.Append(CPPDEFINES=['HAVE_JPEG'])
+
+    if cfg.CheckPackage(tiff):
+        env.Append(CPPDEFINES=['HAVE_TIFF'])
+
+    # Setup libFAME.
+    if cfg.CheckPackage(fame):
+        env.Append(CPPDEFINES=['HAVE_FAME'])
+
+    # Setup libavcodec.
+    if cfg.CheckPackage(avc):
+        env.Append(CPPDEFINES=['HAVE_AVCODEC'])
+
+    # Setup HDF5.
+    if cfg.CheckPackage(hdf):
+        env.Append(CPPDEFINES=['HAVE_HDF5'])
+
+    # Check Fortran symbol type.
+    if not cfg.CheckFortranSymbol():
+        print '   Failed to compile and run a simple fortran program,'
+        print "   please check 'config.log' for the cause of the error."
+        env.Exit()
+
+    # Extract revision number.
+    svnPath = Dir('.').srcnode().abspath
+    svnPath = os.path.join(svnPath, '.svn', 'entries')
+    if not os.path.exists(svnPath):
+        print "\nYou appear to be building the code from something"
+        print "that wasn't checked out of a repository. Bummer."
+        env.Exit()
+    f = file(svnPath, 'r')
+    f.readline()
+    f.readline()
+    f.readline()
+    ver = env['ESCAPE']('"' + str(int(f.readline())) + '"')
+    env.Append(CPPDEFINES=[('VERSION', ver)])
+    f.close()
+
+    # Add module extension to build commands.
+    ext = env['ESCAPE']('"' + env['SHLIBSUFFIX'][1:] + '"')
+    env.Append(CPPDEFINES=[('MODULE_EXT', ext)])
+
+    # Add the library directory.
+    libDir = os.path.join(Dir('.').abspath, 'build', 'lib')
+    libDir = env['ESCAPE']('"' + libDir + '"')
+    env.Append(CPPDEFINES=[('LIB_DIR', libDir)])
+
+    # Setup the dynamic library search paths.
+    env.Append(RPATH=[os.path.join(Dir('.').abspath, 'build', 'lib')])
+
+    # Finish the configuration.
+    env = cfg.Finish()
+
+opts.Update(env)
+opts.Save('config.cache', env)
+
+if 'config' in COMMAND_LINE_TARGETS:
+    print "\nWriting out 'config.state' ... ",
+    env.dump_cfg('config.state',
+                 opts.keys() + ['CPPPATH', 'CPPDEFINES',
+                                'LIBPATH', 'LIBS', 'RPATH',
+                                'FRAMEWORKS'])
+    print 'done\n'
+    print '*************************************'
+    print "* Run 'scons' to build the project. *"
+    print '*************************************\n'
+
+if 'help' in COMMAND_LINE_TARGETS:
+    print opts.GenerateHelpText(env)
