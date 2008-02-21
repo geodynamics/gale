@@ -582,7 +582,8 @@ void EulerDeform_InterpVar( FieldVariable* field, Variable* var, Mesh* mesh, dou
 		/* Interpolate the value. */
 		res = FieldVariable_InterpolateValueAt( field, newCrds[n_i], newVals + n_i * field->fieldComponentCount );
 		if( res == OTHER_PROC || res == OUTSIDE_GLOBAL ) {
-			assert( 0 );
+			FeVariable_GetValueAtNode( (FeVariable*)field, n_i, 
+						   newVals + n_i * field->fieldComponentCount );
 		}
 	}
 
