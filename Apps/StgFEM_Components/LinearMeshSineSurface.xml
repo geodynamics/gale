@@ -8,9 +8,15 @@
 
 		<struct name="linearMesh-sineUpperSurface">
 			<param name="Type"> SurfaceAdaptor </param>
-			<param name="sourceMesh"> linearMesh </param>
+			<param name="mesh"> linearMesh </param>
+			<param name="sourceGenerator"> linearMeshGenerator </param>
 			<param name="surfaceType"> sine </param>
-			<param name="amplitude"> 20 </param>
+			<param name="amplitude"> 1 </param>
+			<param name="frequency"> 3.14159 </param>
+		</struct>
+
+		<struct name="linearMeshGenerator" mergeType="merge">
+			<param name="mesh"></param>
 		</struct>
 
 	</struct>
