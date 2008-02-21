@@ -20,6 +20,16 @@
 
 	<param name="timeIntegratorOrder"> 1 </param>
 
+	<struct name="components" mergeType="merge">
+		<struct name="buoyancyForceTerm">
+			<param name="Type">BuoyancyForceTerm</param>
+			<param name="ForceVector">mom_force</param>
+			<param name="TemperatureField">TemperatureField</param>
+			<param name="Swarm">picIntegrationPoints</param>
+			<param name="gravity">gravity</param>
+		</struct>
+	</struct>
+
 	<!-- Must allow particles to leave domain. -->
 	<include>PICellerator/AllowOutflow.xml</include>
 
@@ -51,11 +61,20 @@
 		</list>
 	</struct>
 
-	<!-- Make the mesh regular. -->
 	<struct name="components" mergeType="merge">
+
+		<!-- Make the mesh regular. -->
 		<struct name="linearMeshGenerator" mergeType="merge">
 			<param name="regular"> False </param>
 		</struct>
+
+		<!-- Initialise with particles per-cell. -->
+		<struct name="materialSwarmParticleLayout" mergeType="merge">
+			<param name="Type" mergeType="replace">MeshParticleLayout</param>
+			<param name="mesh"> linearMesh </param>
+			<param name="cellParticleCount"> particlesPerCell </param>
+		</struct>
+
 	</struct>
 
 </StGermainData>
