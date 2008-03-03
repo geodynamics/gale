@@ -1,15 +1,8 @@
 Import('env')
 
-# Need to copy the environment for use here.
 env = env.Copy()
-
-# Add some extra stuff.
-env.proj = 'StgFEM'
-env.Append(CPPPATH=['#build/include/' + env.proj])
-
-#
-# Target specification section.
-#
+env.project_name = 'StgFEM' # Need a project name.
+env.clear_all() # ... so that our structures are ready.
 
 env.build_directory('Discretisation')
 env.build_directory('SLE/LinearAlgebra')
