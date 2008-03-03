@@ -1,15 +1,8 @@
 Import('env')
 
-# Need to copy the environment for use here.
 env = env.Copy()
-
-# Add some extra stuff.
-env.proj = 'Underworld'
-env.Append(CPPPATH=['#build/include/' + env.proj])
-
-#
-# Target specification section.
-#
+env.project_name = 'Underworld' # Need a project name.
+env.clear_all() # ... so that our structures are ready.
 
 env.build_directory('Rheology')
 env.build_directory('Utils')
