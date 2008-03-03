@@ -1,0 +1,81 @@
+import os
+from SCons.Script.SConscript import SConsEnvironment
+
+#
+# Setup the Package system.
+#
+
+def Package(env, pkg_module, options=None):
+    # Setup the SCons environment to hold packages if not already
+    # done.
+    if not hasattr(env, 'packages'):
+        env.packages = {}
+        env.package_list = []
+
+    # If we already have this package we can return now.
+    if pkg_module in env.packages:
+        return
+
+    # Add an instance of this package.
+    env.packages[pkg_module] = pkg_module(env, options)
+    env.package_list += [env.packages[pkg_module]]
+
+def CheckPackages(ctx, pkg_list):
+    for pkg in pkg_list:
+        pkg.configure(ctx)
+
+def setup_packages(env, options=None):
+    for pkg in env.package_list:
+        pkg.setup_dependencies()
+    if options:
+        options.Update(env)
+        options.Save('config.cache', env)
+
+def save_config(env, filename, vars):
+    d = {}
+    for a in vars:
+        if a in env._dict:
+            d[a] = env[a]
+    f = file(filename, 'w')
+    import pickle
+    pickle.dump(d, f)
+    f.close()
+
+def load_config(env, filename):
+    if not os.path.exists(filename):
+        print "\nError: project hasn't been configured!\n"
+        print '************************************************'
+        print "* Run 'scons config' to configure the project. *"
+        print '************************************************\n'
+        env.Exit()
+    f = file(filename, 'r')
+    import pickle
+    d = pickle.load(f)
+    f.close()
+    for k, v in d.iteritems():
+        env[k] = v
+
+def configure_packages(env, options=None, output='config.cfg'):
+    sconf = Configure(env, custom_tests={'CheckPackages': CheckPackages})
+
+    # Set the configure object to all packages.
+    for pkg in env.package_list:
+        pkg.sconf = sconf
+
+    # Call the packages checker.
+    sconf.CheckPackages(env.package_list)
+
+    # Dump results to our output file.
+    vars = ['CFLAGS', 'CCFLAGS',
+            'CPPPATH', 'CPPDEFINES',
+            'LIBPATH', 'LIBS', 'RPATH',
+            'FRAMEWORKS']
+    if options:
+        vars += options.keys()
+    env.save_config(output, vars)
+
+SConsEnvironment.Package = Package
+SConsEnvironment.setup_packages = setup_packages
+SConsEnvironment.configure_packages = configure_packages
+SConsEnvironment.save_config = save_config
+SConsEnvironment.load_config = load_config
