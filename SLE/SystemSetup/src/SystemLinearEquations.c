@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SystemLinearEquations.c 1034 2008-02-15 02:58:14Z DavidLee $
+** $Id: SystemLinearEquations.c 1043 2008-03-03 04:41:39Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -419,7 +419,7 @@ void _SystemLinearEquations_Construct( void* sle, Stg_ComponentFactory* cf, void
 			entryPointRegister,
 			MPI_COMM_WORLD );
 
-	self->delta_x   = PETScVector_New( "delta x" );
+	self->X   	= PETScVector_New( "delta x" );
 	self->F		= PETScVector_New( "residual" );
 	self->J		= PETScMatrix_New( "Jacobian" ); 
 	PETScMatrix_SetComm( self->J, self->comm );
@@ -689,8 +689,6 @@ void SystemLinearEquations_NewtonInitialise( void* _context, void* data ) {
 	SNES			snes;
 	SNES			oldSnes		= ((PETScNonlinearSolver*)sle->nlSolver)->snes;
 
-	//if( ((PETScNonlinearSolver*)sle->nlSolver)->snes )
-	//	SNESDestroy( ((PETScNonlinearSolver*)sle->nlSolver)->snes );
 	//VecDestroy( ((PETScVector*)self->F)->petscVec );
 	if( oldSnes && context->timeStep == 1 )
 		SNESDestroy( oldSnes );
@@ -711,34 +709,19 @@ void SystemLinearEquations_NewtonInitialise( void* _context, void* data ) {
 void SystemLinearEquations_NewtonExecute( void* sle, void* _context ) {
 	SystemLinearEquations*	self            = (SystemLinearEquations*) sle;
 	SNES			snes		= ((PETScNonlinearSolver*)self->nlSolver)->snes;
-	//NonlinearSolver*	nlSolver	= self->nlSolver; //need to build this guy...
-	/*
-	PETScVector*		F;
-	SNES			snes;
-
-	Vector_Duplicate( SystemLinearEquations_GetSolutionVectorAt( self, 0 )->vector, &F );
-	
-	SNESCreate( MPI_COMM_WORLD, &snes );
-	SNESSetJacobian( snes, ((PETScMatrix*)self->J)->petscMat, ((PETScMatrix*)self->J)->petscMat, self->_buildJ, self->buildJContext );
-	SNESSetFunction( snes, ((PETScVector*)self->F)->petscVec, self->_buildF, self->buildFContext );
-	
-	SNESSetFromOptions( snes );
-	
-	SNESSolve( snes, PETSC_NULL, ((PETScVector*)self->delta_x)->petscVec );
-
-	SNESDestroy( snes );
-	*/
 
 	SNESSetFromOptions( snes );
-	SNESSolve( snes, PETSC_NULL, ((PETScVector*)self->delta_x)->petscVec );
+	SNESSolve( snes, PETSC_NULL, ((PETScVector*)self->X)->petscVec );
 }
 
 /* do this at end of solve step */
-void SystemLinearEquations_NewtonDestroy( void* _context, void* data ) {
+void SystemLinearEquations_NewtonFinalise( void* _context, void* data ) {
 	FiniteElementContext*	context		= (FiniteElementContext*)_context;
 	SystemLinearEquations*	sle             = (SystemLinearEquations*)context->slEquations->data[0];
 	SNES			snes		= ((PETScNonlinearSolver*)sle->nlSolver)->snes;
 
+	sle->_updateXToNodes( &sle->X, context );
+	
 	SNESDestroy( snes );	
 }
 
@@ -863,7 +846,7 @@ void SystemLinearEquations_AddNonLinearEP( void* sle, const char* name, EntryPoi
 void SystemLinearEquations_SetToNonLinear( void* sle ) {
 	SystemLinearEquations*	self            	= (SystemLinearEquations*) sle;
 	Hook*			nonLinearInitHook	= NULL;
-	Hook*			nonLinearDestroyHook	= NULL;
+	Hook*			nonLinearFinaliseHook	= NULL;
 	FiniteElementContext*	context			= NULL;
 
 	assert( self );
@@ -886,10 +869,10 @@ void SystemLinearEquations_SetToNonLinear( void* sle ) {
 						SystemLinearEquations_NewtonInitialise, self->name );
 			_EntryPoint_PrependHook_AlwaysFirst( Context_GetEntryPoint( context, AbstractContext_EP_Solve ), 
 								nonLinearInitHook );
-			nonLinearDestroyHook = Hook_New( "NewtonDestroy",
-						SystemLinearEquations_NewtonDestroy, self->name );
+			nonLinearFinaliseHook = Hook_New( "NewtonFinalise",
+						SystemLinearEquations_NewtonFinalise, self->name );
 			_EntryPoint_AppendHook_AlwaysLast( Context_GetEntryPoint( context, AbstractContext_EP_Solve ), 
-						nonLinearDestroyHook );
+						nonLinearFinaliseHook );
 			self->_execute = SystemLinearEquations_NewtonExecute;
 		}
 	}

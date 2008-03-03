@@ -51,7 +51,7 @@
 **	for storing and managing the matrices and vectors that make up a system, but uses
 **	the SLE_Solver class to actually implement a solution mechanism for the given eqn.
 **
-** $Id: SystemLinearEquations.h 1031 2008-02-13 06:11:38Z DavidLee $
+** $Id: SystemLinearEquations.h 1043 2008-03-03 04:41:39Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -134,9 +134,10 @@
 		void*						    buildJContext;             \
 		NonlinearSolver*				    nlSolver;		       \
 		Vector*						    F;			       \
-		Vector*						    delta_x;		       \
+		Vector*						    X;		       	       \
 		Matrix*						    J;			       \
 		SystemLinearEquations_SetFFunc*		    	    _setFFunc;		       \
+		SystemLinearEquations_SetFFunc*		    	    _updateXToNodes;	       \
 		
 		
 	/** Abstract class to manage the set up, building, initialisation etc of a System of
@@ -285,7 +286,7 @@
 	/* solitary waves model with hand rolled J */
 	void SystemLinearEquations_NewtonInitialise( void* sle, void* data );
 	void SystemLinearEquations_NewtonExecute( void* sle, void* data );
-	void SystemLinearEquations_NewtonDestroy( void* sle, void* data );
+	void SystemLinearEquations_NewtonFinalise( void* sle, void* data );
 	void SystemLinearEquations_NonLinearExecute( void* sle, void* data ) ;
 	void SystemLinearEquations_AddNonLinearEP( void* sle, const char* name, EntryPoint_2VoidPtr_Cast func );
 	void SystemLinearEquations_SetToNonLinear( void* sle ) ;
