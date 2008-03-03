@@ -1,4 +1,4 @@
-import os
+import os, platform
 import SConfig
 import SCons.Script
 
@@ -51,5 +51,9 @@ class stgUnderworld(SConfig.Package):
         # Setup debugging.
         if self.env['debug']:
             self.env.MergeFlags('-g')
+
+        # Setup 64 bit builds.
+        if platform.architecture()[0].find('64') != -1:
+            self.env.MergeFlags('-m64')
 
         return [1, '', '']
