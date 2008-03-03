@@ -9,6 +9,10 @@ class Package(object):
 
         # Setup some system specific information.
         self.system = platform.system()
+        if platform.architecture()[0].find('64') != -1:
+            self.bits = 64
+        else:
+            self.bits = 32
 
         # Is this package essential?
         self.required          = required
@@ -81,6 +85,8 @@ class Package(object):
         if self.system in ['Darwin', 'Linux']:
             self.base_dirs = ['/usr', '/usr/local']
             self.sub_dirs = [[['include'], ['lib']]]
+            if self.bits == 64:
+                self.sub_dirs = [[['include'], ['lib64']]] + self.sub_dirs
 
         # Set Darwin specific defaults.
         if self.system == 'Darwin':
