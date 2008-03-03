@@ -1,15 +1,8 @@
 Import('env')
 
-# Need to copy the environment for use here.
 env = env.Copy()
-
-# Add some extra stuff.
-env.proj = 'StGermain'
-env.Append(CPPPATH=['#build/include/' + env.proj])
-
-#
-# Target specification.
-#
+env.project_name = 'StGermain' # Need a project name.
+env.clear_all() # ... so that our structures are ready.
 
 # TODO: Build sources if csoap present.
 env.build_headers(env.glob('Regresstor/libRegresstor/src/*.h'),
@@ -21,12 +14,8 @@ env.build_headers(['Base/Foundation/src/ClassSetup.h',
                   'StGermain/Base/Foundation', force_copy=True)
 
 # We have this funny 'mpirecord' business to handle now.
-if env['useMpiRecord']:
-    # TODO
-    pass
-else:
-    env.build_headers('Base/IO/src/mpirecord/none/mpimessaging.h',
-                      'StGermain/Base/IO/mpirecord')
+env.build_headers('Base/IO/src/mpirecord/none/mpimessaging.h',
+                  'StGermain/Base/IO/mpirecord')
 
 env.build_directory('Base/Foundation')
 env.build_directory('Base/IO')
