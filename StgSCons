@@ -1,128 +1,230 @@
-import os
-Import('env')
+import os, glob as pyglob, platform, pickle
+from SCons.Script.SConscript import SConsEnvironment
 
-# Setup a few global variables.
-env.def_nodes = []
-env.hdr_nodes = []
-env.meta_nodes = {}
-env.obj_nodes = {}
-env.lib_nodes = []
-env.test_nodes = []
+#
+# Setup some basic path utilities.
+#
+
+# Globbing for hierarchical SCons scripts.
+def glob(env, ptrn):
+    if not os.path.isabs(ptrn):
+        old = os.getcwd()
+        os.chdir(Dir('.').srcnode().abspath)
+        res = pyglob.glob(ptrn)
+        os.chdir(old)
+    else:
+        res = pyglob.glob(ptrn)
+    return res
+
+# Normalise an SCons path to the project root.
+def norm_path(env, path):
+    cur_dir = env.Dir('.').srcnode().path
+    if path[0] != '#':
+        path = os.path.join(cur_dir, path)
+    else:
+        path = path[1:]
+    return path
+
+# Copy a file immediately.
+def copy_file(env, dst, src):
+    dst = env.norm_path(dst)
+    old = os.getcwd()
+    os.chdir(env.GetLaunchDir())
+    if not File(os.path.abspath(dst)).current():
+        src = env.norm_path(src)
+        dst_dir = os.path.dirname(dst)
+        if not os.path.exists(dst_dir):
+            Execute(Mkdir(dst_dir))
+        Execute(Copy(dst, src))
+        os.chdir(old)
+
+# Add to the SCons main class.
+SConsEnvironment.glob = glob
+SConsEnvironment.norm_path = norm_path
+SConsEnvironment.copy_file = copy_file
+
+#
+# Setup the hierarchical build stuff.
+#
+
+def hbuild(env, builder, hpath, store=True, *args, **kw):
+    if kw['target'] == 'build/StGermain/Base/Automation/src/CompositeVC-meta':
+        import pdb
+        pdb.set_trace()
+    nodes = builder(*args, **kw)
+    if store:
+        if builder not in env.hnodes:
+            env.hnodes[builder] = {}
+        place = env.hnodes[builder]
+        if '.' not in place:
+            place['.'] = []
+        place['.'].append(nodes)
+        for h in hpath.split(os.path.sep):
+            if h not in place:
+                place[h] = {}
+            place = place[h]
+            if '.' not in place:
+                place['.'] = []
+            place['.'].append(nodes)
+    return nodes
+
+def get_hnodes(env, builder, hpath=None):
+    place = env.hnodes[builder]
+    if hpath:
+        for h in hpath.split(os.path.sep):
+            place = place[h]
+    return place['.']
+
+def hclear(env):
+    env.hnodes = {}
+
+SConsEnvironment.hbuild = hbuild
+SConsEnvironment.get_hnodes = get_hnodes
+SConsEnvironment.hclear = hclear
 
 #
 # Helper functions.
 #
 
-def copy_includes(files, dst, inc_nodes, force=False):
+def copy_includes(env, files, dst, inc_nodes, force=False):
     files = files if isinstance(files, list) else [files]
-    dst = os.path.join('#build', 'include', dst)
+    dst = os.path.join(env['buildPath'], dst)
     for i in files:
         node = env.Install(dst, i)
         inc_nodes.append(node)
-        dst_path = os.path.join(dst, os.path.basename(i))
         if force:
+            dst_path = os.path.join(dst, os.path.basename(i))
             env.copy_file(dst_path, i)
 
 #
 # Builder helpers.
 #
 
-def build_defines(files, dst):
-    copy_includes(files, dst, env.def_nodes, True)
+def get_target_name(env, src, suffix='.c'):
+    return os.path.join(env['buildPath'], env.project_name, src[:-len(suffix)])
 
-def build_headers(files, dst, force_copy=False):
-    copy_includes(files, dst, env.hdr_nodes, force_copy)
+def build_defines(env, files, dst):
+    copy_includes(env, files, os.path.join('include', dst), 
+                  env.def_nodes, True)
 
-def build_objects(files, hpath, store=True):
+def build_headers(env, files, dst, force_copy=False):
+    copy_includes(env, files, os.path.join('include', dst),
+                  env.hdr_nodes, force_copy)
+
+def build_xmls(env, files, dst, force_copy=False):
+    copy_includes(env, files, os.path.join('lib', dst),
+                  env.hdr_nodes, force_copy)
+
+def build_objects(env, files, hpath, store=True):
     files = files if isinstance(files, list) else [files]
     nodes = []
-    name = env.proj + ''.join(hpath.split(os.path.sep))
+    name = env.project_name + ''.join(hpath.split(os.path.sep))
     mod = [('CURR_MODULE_NAME', env['ESCAPE']('"' + name + '"'))]
     for src in files:
+        tgt = get_target_name(env, src)
         cur_node = env.hbuild(env.SharedObject, hpath, store,
-                              src, CPPDEFINES=env['CPPDEFINES'] + mod)
+                              target=tgt, source=src,
+                              CPPDEFINES=env['CPPDEFINES'] + mod)
         nodes.append(cur_node)
     return nodes
 
-def build_metadata(files, hpath):
+def build_metadata(env, files, hpath):
     files = files if isinstance(files, list) else [files]
     nodes = []
     for m in files:
-        src = env.Meta(m)
-        cur_node = env.SharedObject(src)
+        tgt = get_target_name(env, m, '.meta')
+        src = env.Meta(target=tgt, source=m)
+        tgt = get_target_name(env, src[0].path)
+        cur_node = env.hbuild(env.SharedObject, hpath,
+                              target=tgt, source=src)
         nodes.append(cur_node)
-    insert_objs(nodes, hpath)
     return nodes
 
-def build_library(objs, name, force_name=False):
+def build_library(env, objs, name, libs=[], force_name=False):
     objs = objs if isinstance(objs, list) else [objs]
-    dst = os.path.join('#build', 'lib', name)
+    dst = os.path.join(env['buildPath'], 'lib', name)
     if force_name:
-        cur_node = env.LoadableModule(
+        cur_node = env.library_builder(
             dst, objs,
             SHLIBPREFIX='',
-            LIBPREFIXES=[env['LIBPREFIXES']] + [''])
+            LIBPREFIXES=[env['LIBPREFIXES']] + [''],
+	    LIBS=libs + env.get('LIBS', []))
     else:
-        cur_node = env.LoadableModule(dst, objs)
-    env.lib_nodes.append(cur_node)
+        cur_node = env.library_builder(dst, objs, LIBS=libs + env.get('LIBS', []))
+    env.lib_nodes.insert(0, cur_node)
 
-def build_tests(files, name, sup_objs=[], libs=env.lib_nodes):
+def build_tests(env, files, name, sup_objs=[], libs=None):
+    if not libs:
+        libs = env.lib_nodes
     files = files if isinstance(files, list) else [files]
     sup_objs = [sup_objs] if isinstance(sup_objs, str) else sup_objs
     nodes = env.test_nodes
     mod = [('CURR_MODULE_NAME', env['ESCAPE']('"' + name + '"'))]
     l = libs if isinstance(libs, list) else [libs]
     for src in files:
-        dst = os.path.join('#build', 'tests',
+        dst = os.path.join(env['buildPath'], 'tests',
                            os.path.splitext(os.path.basename(src))[0])
         cur_node = env.Program(dst, [src] + sup_objs,
                                CPPDEFINES=env['CPPDEFINES'] + mod,
-                               LIBS=env['LIBS'] + l)
+                               LIBS=l + env.get('LIBS', []))
         nodes.append(cur_node)
 
-def build_directory(dir, extra_objs=[], test_libs=env.lib_nodes,
-                    build_lib=True):
+def build_directory(env, dir, extra_objs=[],
+                    test_libs=None, build_lib=True):
+    if not test_libs:
+        test_libs = env.lib_nodes
     test_libs = [test_libs] if isinstance(test_libs, str) else test_libs
     extra_objs = [extra_objs] if isinstance(extra_objs, str) else extra_objs
     srcDir = os.path.join(dir, 'src')
     tstDir = os.path.join(dir, 'tests')
-    hdrDir = os.path.join(env.proj, dir)
+    hdrDir = os.path.join(env.project_name, dir)
     mod = ''.join(hdrDir.split(os.path.sep))
 
-    build_defines(env.glob(os.path.join(srcDir, '*.def')), hdrDir)
-    build_headers(env.glob(os.path.join(srcDir, '*.h')), hdrDir)
-    build_metadata(env.glob(os.path.join(srcDir, '*.meta')), dir)
-    build_objects(env.glob(os.path.join(srcDir, '*.c')), dir)
+    env.build_defines(env.glob(os.path.join(srcDir, '*.def')), hdrDir)
+    env.build_headers(env.glob(os.path.join(srcDir, '*.h')), hdrDir)
+    env.build_metadata(env.glob(os.path.join(srcDir, '*.meta')), dir)
+    env.build_objects(env.glob(os.path.join(srcDir, '*.c')), dir)
     if build_lib:
-        objs = find_objs(dir)
-        build_library(objs + extra_objs, mod)
+        objs = env.get_hnodes(env.SharedObject, dir)
+        env.build_library(objs + extra_objs, mod)
     if os.path.exists(tstDir):
         tst_files = env.glob(os.path.join(tstDir, 'test*.c'))
         sup_gen = env.glob(os.path.join(tstDir, '*.c'))
         sup_files = [f for f in sup_gen if f not in tst_files]
-        sup = build_objects(sup_files, dir, False)
-        build_tests(tst_files, mod,
-                    sup_objs=sup,
-                    libs=test_libs + [mod])
+        sup = env.build_objects(sup_files, dir, False)
+        env.build_tests(tst_files, mod,
+                        sup_objs=sup,
+                        libs=test_libs + [mod])
 
-def build_plugin(dir, hpath):
-    name = [env.proj] + hpath.split(os.path.sep)
-    name = '_'.join(name)
-    hdr_dir = os.path.join(env.proj, hpath.split(os.path.sep)[-1])
+def build_plugin(env, dir, hpath, prefix=True):
+    name = hpath.split(os.path.sep)
+    if prefix:
+        name = [env.project_name] + name
+    name = '_'.join(name) + 'module'
+    hdr_dir = os.path.join(env.project_name, hpath.split(os.path.sep)[-1])
 
-    build_headers(env.glob(os.path.join(dir, '*.h')), hdr_dir)
-    objs = build_objects(env.glob(os.path.join(dir, '*.c')),
+    env.build_headers(env.glob(os.path.join(dir, '*.h')), hdr_dir)
+    objs = env.build_objects(env.glob(os.path.join(dir, '*.c')),
                          hpath, False)
-    build_library(objs, name, True)
+    env.build_library(objs, name, [env.project_name], True)
 
-env.build_defines = build_defines
-env.build_headers = build_headers
-env.build_objects = build_objects
-env.build_metadata = build_metadata
-env.build_library = build_library
-env.build_tests = build_tests
-env.build_directory = build_directory
-env.build_plugin = build_plugin
+def clear_all(env):
+    env.hclear()
+    env.def_nodes = []
+    env.hdr_nodes = []
+    env.lib_nodes = []
+    env.test_nodes = []
+
+SConsEnvironment.build_defines = build_defines
+SConsEnvironment.build_headers = build_headers
+SConsEnvironment.build_xmls = build_xmls
+SConsEnvironment.build_objects = build_objects
+SConsEnvironment.build_metadata = build_metadata
+SConsEnvironment.build_library = build_library
+SConsEnvironment.build_tests = build_tests
+SConsEnvironment.build_directory = build_directory
+SConsEnvironment.build_plugin = build_plugin
+SConsEnvironment.clear_all = clear_all
 
 #
 # Custom builders.
@@ -154,5 +256,6 @@ def create_meta(target, source, env):
 def gen_meta_suffix(env, sources):
     return "-meta.c"
 
+Import('env')
 env['BUILDERS']['Meta']=Builder(action=create_meta,src_suffix="meta",
                                 suffix=gen_meta_suffix,single_source=True)
