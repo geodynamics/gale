@@ -86,8 +86,14 @@ SConsEnvironment.hclear = hclear
 # Helper functions.
 #
 
+def to_list(var):
+    if isinstance(var, list):
+        return var
+    else:
+        return [var]
+
 def copy_includes(env, files, dst, inc_nodes, force=False):
-    files = files if isinstance(files, list) else [files]
+    files = to_list(files)
     dst = os.path.join(env['buildPath'], dst)
     for i in files:
         node = env.Install(dst, i)
@@ -116,7 +122,7 @@ def build_xmls(env, files, dst, force_copy=False):
                   env.hdr_nodes, force_copy)
 
 def build_objects(env, files, hpath, store=True):
-    files = files if isinstance(files, list) else [files]
+    files = to_list(files)
     nodes = []
     name = env.project_name + ''.join(hpath.split(os.path.sep))
     mod = [('CURR_MODULE_NAME', env['ESCAPE']('"' + name + '"'))]
@@ -129,7 +135,7 @@ def build_objects(env, files, hpath, store=True):
     return nodes
 
 def build_metadata(env, files, hpath):
-    files = files if isinstance(files, list) else [files]
+    files = to_list(files)
     nodes = []
     for m in files:
         tgt = get_target_name(env, m, '.meta')
@@ -141,7 +147,7 @@ def build_metadata(env, files, hpath):
     return nodes
 
 def build_library(env, objs, name, libs=[], force_name=False):
-    objs = objs if isinstance(objs, list) else [objs]
+    objs = to_list(objs)
     dst = os.path.join(env['buildPath'], 'lib', name)
     if force_name:
         cur_node = env.library_builder(
@@ -156,11 +162,11 @@ def build_library(env, objs, name, libs=[], force_name=False):
 def build_tests(env, files, name, sup_objs=[], libs=None):
     if not libs:
         libs = env.lib_nodes
-    files = files if isinstance(files, list) else [files]
-    sup_objs = [sup_objs] if isinstance(sup_objs, str) else sup_objs
+    files = to_list(files)
+    sup_objs = to_list(sup_objs)
     nodes = env.test_nodes
     mod = [('CURR_MODULE_NAME', env['ESCAPE']('"' + name + '"'))]
-    l = libs if isinstance(libs, list) else [libs]
+    l = to_list(libs)
     for src in files:
         dst = os.path.join(env['buildPath'], 'tests',
                            os.path.splitext(os.path.basename(src))[0])
@@ -173,8 +179,8 @@ def build_directory(env, dir, extra_objs=[],
                     test_libs=None, build_lib=True):
     if not test_libs:
         test_libs = env.lib_nodes
-    test_libs = [test_libs] if isinstance(test_libs, str) else test_libs
-    extra_objs = [extra_objs] if isinstance(extra_objs, str) else extra_objs
+    test_libs = to_list(test_libs)
+    extra_objs = to_list(extra_objs)
     srcDir = os.path.join(dir, 'src')
     tstDir = os.path.join(dir, 'tests')
     hdrDir = os.path.join(env.project_name, dir)
