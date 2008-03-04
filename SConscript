@@ -1,3 +1,4 @@
+import os
 Import('env')
 
 env = env.Copy()
@@ -35,7 +36,10 @@ env.build_library(env.get_hnodes(env.SharedObject), 'StGermain')
 env.build_tests(env.glob('libStGermain/tests/test*.c'), 'StGermain',
                 libs='StGermain')
 
-env.Program('#build/bin/FlattenXML', 'Base/FlattenXML/src/main.c',
-            LIBS=['StGermainBase'] + env.get('LIBS', []))
-env.Program('#build/bin/StGermain', 'src/main.c',
-            LIBS=['StGermain'] + env.get('LIBS', []))
+src = os.path.join('Base', 'FlattenXML', 'src', 'main.c')
+dst = os.path.join(env['buildPath'], 'bin', 'FlattenXML')
+env.Program(dst, src, LIBS=['StGermainBase'] + env.get('LIBS', []))
+
+src = os.path.join('src', 'main.c')
+dst = os.path.join(env['buildPath'], 'bin', 'StGermain')
+env.Program(dst, src, LIBS=['StGermain'] + env.get('LIBS', []))
