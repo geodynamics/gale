@@ -5,7 +5,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.getcwd(), 'config')))
 SConscript('config/SConfig/SConscript')
 
 # Create our base construction environment.
-env = Environment()
+env = Environment(ENV=os.environ)
 
 # Configuring or building? Or helping?
 if 'config' in COMMAND_LINE_TARGETS or 'help' in COMMAND_LINE_TARGETS:
