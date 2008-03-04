@@ -1,71 +1,47 @@
-import os
+import os, sys
 
-# Check versions of some things.
-EnsurePythonVersion(2, 2)
-EnsureSConsVersion(0, 97)
+# Source the configuration scripts.
+sys.path.insert(0, os.path.abspath(os.path.join(os.getcwd(), 'config')))
+SConscript('config/SConfig/SConscript')
 
-#
-# Create our substitution environment.
-#
+# Create our base construction environment.
+env = Environment()
 
-env = Environment(ENV=os.environ)
+# Configuring or building? Or helping?
+if 'config' in COMMAND_LINE_TARGETS or 'help' in COMMAND_LINE_TARGETS:
+    import packages
+    opts = Options('config.cache') # Create our options database.
 
-# Include our SCons utils (hopefully they'll add stuff to do 
-# these things we need).
-SConscript('SConsUtils', exports='env')
+    # Setup all the packages we want configured.
+    env.Package(packages.stgUnderworld, opts)
+    env.setup_packages(opts)
 
-# Are we configuring or building?
-if ('config' in COMMAND_LINE_TARGETS or 'help' in COMMAND_LINE_TARGETS) \
-        and not env.GetOption('clean'):
-    SConscript('SConfigure', exports='env')
-    env.Alias('config', '.')
-    env.Alias('help', '.')
+    if 'help' in COMMAND_LINE_TARGETS:
+        env.Alias('help', '.')
+        print opts.GenerateHelpText(env)
+
+    else:
+        env.configure_packages(opts)
 
 else:
-    # Setup all our StGermain specific utilities.
-    SConscript('StgSCons', exports='env')
+    # Prepare our construction environment.
+    env.load_config('config.cfg') # Load configuration.
+    SConscript('StgSCons', exports='env') # Setup our StG specific utils.
+    if env['staticLibraries']: # Static libs or shared?
+        env.library_builder = env.StaticLibrary
+    else:
+        env.library_builder = env.SharedLibrary
 
-    # Load the configuration.
-    env.load_cfg('config.state')
+    SConscript('StGermain/SConscript', exports='env')
+    env.Prepend(LIBS='StGermain')
 
-    # Add any variables that get used throughout the whole build.
-    if env['debug']:
-        env.Append(CCFLAGS='-g')
-    env.Prepend(CPPPATH=['#build/include'])
-    env.Prepend(LIBPATH=['#build/lib'])
+    SConscript('StgDomain/SConscript', exports='env')
+    env.Prepend(LIBS='StgDomain')
 
-    # Setup any additional build targets.
-    env.Alias('install', env['prefix'])
+    SConscript('StgFEM/SConscript', exports='env')
+    env.Prepend(LIBS='StgFEM')
 
-    #
-    # Call target SConscripts.
-    #
+    SConscript('PICellerator/SConscript', exports='env')
+    env.Prepend(LIBS='PICellerator')
 
-    env.BuildDir('build', '.', duplicate=0)
-
-    env.clear_all()
-    SConscript('build/StGermain/SConscript', exports='env')
-    env.Prepend(LIBS=['StGermain'])
-
-    env.clear_all()
-    SConscript('build/StgDomain/SConscript', exports='env')
-    env.Prepend(LIBS=['StgDomain'])
-
-    env.clear_all()
-    SConscript('build/StgFEM/SConscript', exports='env')
-    env.Prepend(LIBS=['StgFEM'])
-
-    env.clear_all()
-    SConscript('build/PICellerator/SConscript', exports='env')
-    env.Prepend(LIBS=['PICellerator'])
-
-    env.clear_all()
-    SConscript('build/Underworld/SConscript', exports='env')
-    env.Prepend(LIBS=['Underworld'])
-
-#    env.clear_all()
-#    SConscript('build/Experimental/SConscript', exports='env')
-#    env.Prepend(LIBS=['ExperimentalUnderworld'])
-
-    env.clear_all()
-    SConscript('build/gLucifer/SConscript', exports='env')
+    SConscript('Underworld/SConscript', exports='env')
