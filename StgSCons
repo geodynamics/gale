@@ -48,9 +48,6 @@ SConsEnvironment.copy_file = copy_file
 #
 
 def hbuild(env, builder, hpath, store=True, *args, **kw):
-    if kw['target'] == 'build/StGermain/Base/Automation/src/CompositeVC-meta':
-        import pdb
-        pdb.set_trace()
     nodes = builder(*args, **kw)
     if store:
         if builder not in env.hnodes:
@@ -140,7 +137,7 @@ def build_metadata(env, files, hpath):
     for m in files:
         tgt = get_target_name(env, m, '.meta')
         src = env.Meta(target=tgt, source=m)
-        tgt = get_target_name(env, src[0].path)
+        tgt = src[0].path[:-2]
         cur_node = env.hbuild(env.SharedObject, hpath,
                               target=tgt, source=src)
         nodes.append(cur_node)
@@ -168,10 +165,12 @@ def build_tests(env, files, name, sup_objs=[], libs=None):
     mod = [('CURR_MODULE_NAME', env['ESCAPE']('"' + name + '"'))]
     l = to_list(libs)
     for src in files:
+        tgt = get_target_name(env, src)
+        obj_node = env.SharedObject(tgt, src,
+                                    CPPDEFINES=env.get('CPPDEFINES') + mod)
         dst = os.path.join(env['buildPath'], 'tests',
                            os.path.splitext(os.path.basename(src))[0])
-        cur_node = env.Program(dst, [src] + sup_objs,
-                               CPPDEFINES=env['CPPDEFINES'] + mod,
+        cur_node = env.Program(dst, obj_node + sup_objs,
                                LIBS=l + env.get('LIBS', []))
         nodes.append(cur_node)
 
