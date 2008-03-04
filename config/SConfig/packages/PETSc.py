@@ -8,7 +8,7 @@ class PETSc(SConfig.Package):
         self.setup_options()
         self.dependencies = [SConfig.packages.MPI]
         self.base_patterns = ['petsc*', 'PETSC*', 'PETSc*']
-        self.sub_dirs += [[[os.path.join('include', 'petsc')], ['lib']]]
+        self.header_sub_dir = 'petsc'
         self.headers = ['petsc.h',
                         'petscvec.h', 'petscmat.h',
                         'petscksp.h', 'petscsnes.h']
