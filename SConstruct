@@ -31,6 +31,7 @@ else:
         env.library_builder = env.StaticLibrary
     else:
         env.library_builder = env.SharedLibrary
+    env.Default(env['buildPath']) # Needed for different build paths.
 
     SConscript('StGermain/SConscript', exports='env')
     env.Prepend(LIBS='StGermain')

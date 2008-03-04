@@ -165,10 +165,12 @@ def build_tests(env, files, name, sup_objs=[], libs=None):
     mod = [('CURR_MODULE_NAME', env['ESCAPE']('"' + name + '"'))]
     l = to_list(libs)
     for src in files:
+        tgt = get_target_name(env, src)
+        obj_node = env.SharedObject(tgt, src,
+                                    CPPDEFINES=env.get('CPPDEFINES') + mod)
         dst = os.path.join(env['buildPath'], 'tests',
                            os.path.splitext(os.path.basename(src))[0])
-        cur_node = env.Program(dst, [src] + sup_objs,
-                               CPPDEFINES=env['CPPDEFINES'] + mod,
+        cur_node = env.Program(dst, obj_node + sup_objs,
                                LIBS=l + env.get('LIBS', []))
         nodes.append(cur_node)
 
