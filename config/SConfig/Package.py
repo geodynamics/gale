@@ -28,6 +28,7 @@ class Package(object):
         self.base_dirs         = [] #['']
         self.base_patterns     = [] #['']
         self.sub_dirs          = [] #[[[''], ['']]]
+        self.header_sub_dir    = ''
 
         # Header options.
         self.headers            = [] #['']
@@ -85,7 +86,12 @@ class Package(object):
         if self.system in ['Darwin', 'Linux']:
             self.base_dirs = ['/usr', '/usr/local']
             self.sub_dirs = [[['include'], ['lib']]]
+            if self.header_sub_dir:
+                self.sub_dirs += [[[os.path.join('include', self.header_sub_dir)], ['lib']]]
             if self.bits == 64:
+                if self.header_sub_dir:
+                    self.sub_dirs = [[[os.path.join('include', self.header_sub_dir)],
+                                      ['lib64']]] + self.sub_dirs
                 self.sub_dirs = [[['include'], ['lib64']]] + self.sub_dirs
 
         # Set Darwin specific defaults.
