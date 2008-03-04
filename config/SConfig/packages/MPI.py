@@ -7,7 +7,7 @@ class MPI(SConfig.Package):
         self.setup_search_defaults()
         self.setup_options()
         self.base_patterns = ['mpich*', 'MPICH*']
-        self.sub_dirs += [[[os.path.join('include', 'mpi')], ['lib']]]
+        self.header_sub_dir = 'mpi'
         self.headers = ['mpi.h']
         self.libraries = [['mpich'],
                           ['mpich', 'pmpich'],
