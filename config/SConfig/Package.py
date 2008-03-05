@@ -32,17 +32,17 @@ class Package(object):
 
         # Header options.
         self.headers            = [] #['']
-        self.dependency_headers = [] # ['']
+        self.dependency_headers = [] #['']
 
         # Library options.
         self.libraries         = [] #[['']]
         self.require_shared    = False
-        self.use_rpath         = False
-        self.symbols           = [([], '')] # [([''], '')]
+        self.use_rpath         = True
+        self.symbols           = [([], '')] #[([''], '')]
         self.symbol_setup      = ''
         self.symbol_teardown   = ''
-        self.symbol_prototypes = [] # ['']
-        self.symbol_calls      = [] # ['']
+        self.symbol_prototypes = [] #['']
+        self.symbol_calls      = [] #['']
 
         # Framework options.
         self.frameworks        = [] #[['']]
