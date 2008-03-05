@@ -8,8 +8,8 @@ class BlasLapack(SConfig.Package):
         self.setup_options()
         self.libraries = [['blas', 'lapack'],
                           ['cblas', 'clapack'],
-                          ['mkl']]
-        self.frameworks = ['Accelerate']
+                          ['mkl', 'mkl_lapack']]
+        self.frameworks = [['Accelerate']]
         self.symbols = [(['dgeev'], 'FORTRAN_NORMAL'),
                         (['dgeev_'], 'FORTRAN_SINGLE_TRAILINGBAR'),
                         (['dgeev__'], 'FORTRAN_DOUBLE_TRAILINGBAR'),
