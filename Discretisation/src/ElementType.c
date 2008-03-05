@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ElementType.c 964 2007-10-11 08:03:06Z SteveQuenette $
+** $Id: ElementType.c 1058 2008-03-05 04:46:12Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -234,7 +234,7 @@ void _ElementType_ConvertGlobalCoordToElLocal(
 	inc = IArray_GetPtr( self->inc );
 
 	/* Initial guess for element local coordinate is in the centre of the element - ( 0.0, 0.0, 0.0 ) */
-	memset( elLocalCoord, 0, sizeof( Coord ) );
+	memset( elLocalCoord, 0, dim*sizeof(double) );
 
 	/* Do Newton-Raphson Iteration */
 	for ( iteration_I = 0 ; iteration_I < maxIterations ; iteration_I++ ) {
