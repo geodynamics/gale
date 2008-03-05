@@ -6,7 +6,10 @@ class BlasLapack(SConfig.Package):
         SConfig.Package.__init__(self, env, options)
         self.setup_search_defaults()
         self.setup_options()
-        self.libraries = [['blas', 'lapack']]
+        self.libraries = [['blas', 'lapack'],
+                          ['cblas', 'clapack'],
+                          ['mkl']]
+        self.frameworks = ['Accelerate']
         self.symbols = [(['dgeev'], 'FORTRAN_NORMAL'),
                         (['dgeev_'], 'FORTRAN_SINGLE_TRAILINGBAR'),
                         (['dgeev__'], 'FORTRAN_DOUBLE_TRAILINGBAR'),

@@ -4,11 +4,11 @@ import SConfig
 class PETSc(SConfig.Package):
     def __init__(self, env, options):
         SConfig.Package.__init__(self, env, options)
+        self.header_sub_dir = 'petsc'
         self.setup_search_defaults()
         self.setup_options()
         self.dependencies = [SConfig.packages.MPI]
         self.base_patterns = ['petsc*', 'PETSC*', 'PETSc*']
-        self.header_sub_dir = 'petsc'
         self.headers = ['petsc.h',
                         'petscvec.h', 'petscmat.h',
                         'petscksp.h', 'petscsnes.h']
