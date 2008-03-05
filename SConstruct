@@ -5,7 +5,11 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.getcwd(), 'config')))
 SConscript('config/SConfig/SConscript')
 
 # Create our base construction environment.
-env = Environment(ENV=os.environ)
+if platform.platform().find('ia64') != -1:
+    # Hack needed for APAC, damn it all!
+    env = Environment(ENV=os.environ, tools=['gcc', 'gnulink'])
+else:
+    env = Environment(ENV=os.environ)
 
 # Configuring or building? Or helping?
 if 'config' in COMMAND_LINE_TARGETS or 'help' in COMMAND_LINE_TARGETS:

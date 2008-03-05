@@ -27,6 +27,8 @@ def norm_path(env, path):
 
 # Copy a file immediately.
 def copy_file(env, dst, src):
+    if env.GetOption('clean'):
+        return
     dst = env.norm_path(dst)
     old = os.getcwd()
     os.chdir(env.GetLaunchDir())
