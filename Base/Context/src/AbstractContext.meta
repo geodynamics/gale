@@ -12,8 +12,27 @@
 <param name="License">The Gnu Lesser General Public License http://www.gnu.org/licenses/lgpl.html</param>
 <param name="Parent">Stg_Component</param>
 <param name="Reference">...</param>
-<param name="Summary">...</param>
-<param name="Description">...</param>
+<param name="Summary">AbstractContext is standardised interface for StGermain to manage plugins.</param>
+<param name="Description"><p>From a software architecture point of view, plugins are a flexible way of adding runtime-configurable extensions to a core application.  AbstractContext is standardised interface for StGermain to manage plugins.  
+It is a crucial, low-level component of the framework because it establishes and maintains interconnections between other Codes and their high-level features.</p>
+
+<p>AbstractContext contains Entrypoints, sites where it expects plugins will be added.  These plugins insert algorithms or alter the control flow.  An entrypoint is a dynamically changeable array of function pointers, which get executed sequentially.  Entrypoints can be coarse-grained (“the mesh”, “the solve phase”) or fine-grained (“each particle”, “updating the stress of each particle”).</p>
+
+<p>AbstractContext is the first component to start.  Other components can be inserted after the live component register is attached.   This is accomplished by inserting hooks at the activation site of each point of control flow of AbstractContext.  Hooks are function pointers and reside in an array at the entrypoint.  You can dynamically rearrange the array to set the order in which the functions run.</p>
+
+<p>AbstractContext goes through a setup phase before proceeding to its run phase.  During setup, it goes through build and then initialise function calls.    Each step contains entry point, and a hook is positioned there to attach each function call.  Following the setup phase, AbstractContext enters the Run phase.  It encapsulates timing, stepping through iterations to solve the equation, and collating and saving output. </p>
+
+<p>Checkpoints are places where states of variables are saved.
+When using checkpoints, identify which variables to checkpoint and specify the frequency (the number of timesteps between checkpoint event).
+You may want to restart from last checkpoint to:
+modify parameters at a moment and run from there rather than re-calculating the all timesteps
+save the state before a scheduled interruption, or for when time-sharing processor/memory resources where a modelling job may take weeks in total to run
+save current state if you think it may be a useful point to rollback to, or to resume from after an unscheduled interruption
+skip the setup process for frequently performed tasks to save time.
+</p>
+
+<p>For more information on checkpointing, see the wiki.</p>
+</param>
 
 <!--Now the interesting stuff-->
 
@@ -26,6 +45,6 @@
 
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">n/a</param>
 
 </StGermainData>

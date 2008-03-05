@@ -12,8 +12,16 @@
 <param name="License">The Gnu Lesser General Public License http://www.gnu.org/licenses/lgpl.html</param>
 <param name="Parent">Stg_Component</param>
 <param name="Reference">...</param>
-<param name="Summary">...</param>
-<param name="Description">...</param>
+<param name="Summary">Associates a textual label with a piece of data in memory, which can then be referred to via the Variable Register.</param>
+<param name="Description"><p>Variable makes an association between a defined, textual name and a chunk of data in memory.  This data could take the form of a basic type (such as an int or double), or an element of an array, or an entire array or struct.  Variable may also index a regular series of non-contiguous locations in memory.  This capability to define arbitrary data within a datastructure makes it very powerful.</p>
+
+<p>For example, a Variable can refer to a series of ints in an array with an offset of 1 and a stride of 3.  This terminology will be familiar to those who are accustomed with  MPI.
+Once a Variable is defined, it is stored in the Variable Register.  Like other Registers of StGermain, it can be accessed by any other Component.</p>
+
+<p>The benefit of using Variable is that it provides access to data without the need for the original source code or linking to the header file.  Practically everything you need to use the data is supplied by Variable: the memory location, a name for the data, its type and its size.</p>
+
+
+</param>
 
 <!--Now the interesting stuff-->
 
@@ -42,6 +50,48 @@
 
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">
+
+<p>Examples:
+
+XML version / MDF (Model Description File):
+Unlike the C usage, MDF automatically handles memory allocation.
+</p>
+<p>
+<struct name="velocity">
+  <param name="Type">Variable</param>
+  <param name="Rank">Vector</param>
+  <param name="Dependency">decomp-linear</param>
+  <param name="DataType">Double</param>
+  <param name="Count">decomp-linear-nodeDomainCount</param>
+  <param name="VectorComponentCount">dim</param>
+  <list name="names">
+    <param>vx</param>
+    <param>vy</param>
+    <param>vz</param>
+  </list>
+</struct>
+</p>
+<p>
+This XML example contains an important pair of parameters, Dependency and Count.  Because the number and size of variables are not known presently, it is made a dependency of another Component, and they will be resolved dynamically.  These values are often stored as numbers in the XML, as this example shows: 
+<param name="Count">32</param>
+</p>
+
+<p>C version:
+Using Variable in C is different to the XML implementation because you need to do own memory handling.
+This example is based on the sourcecode in ~/code/StGermain/Base/Automation/tests/testVariable.c </p>
+<p>
+/* Construct phase */
+double* velocity;
+Variable_NewVector("velocity", Variable_DataType_Double, 3, &aSize[1], (void**)&velocity, vr, "vx", "vy", "vz");
+
+/* Build phase*/
+velocity = malloc(...);
+component_Build(v);
+
+A general form of the C version:
+Variable_NewVector(name, type, length, array size, data array, variable register, [optional: list of names of array items]);
+</p>
+</param>
 
 </StGermainData>
