@@ -338,7 +338,7 @@ class Package(object):
 
         for fw in frameworks:
             # If we have some frameworks, try them alone first.
-            if not have_loc:
+            if not have_loc and fw:
                 yield ['', [], [], list(fw)]
 
             # Traverse the list of base directories, using them only if they exist.
