@@ -50,9 +50,12 @@ SConsEnvironment.copy_file = copy_file
 def hbuild(env, builder, hpath, store=True, *args, **kw):
     nodes = builder(*args, **kw)
     if store:
-        if builder not in env.hnodes:
-            env.hnodes[builder] = {}
-        place = env.hnodes[builder]
+        if builder not in env.hbuilders:
+            env.hbuilders.append(builder)
+        ind = env.hbuilders.index(builder)
+        if ind not in env.hnodes:
+            env.hnodes[ind] = {}
+        place = env.hnodes[ind]
         if '.' not in place:
             place['.'] = []
         place['.'].append(nodes)
@@ -66,7 +69,8 @@ def hbuild(env, builder, hpath, store=True, *args, **kw):
     return nodes
 
 def get_hnodes(env, builder, hpath=None):
-    place = env.hnodes[builder]
+    ind = env.hbuilders.index(builder)
+    place = env.hnodes[ind]
     if hpath:
         for h in hpath.split(os.path.sep):
             place = place[h]
@@ -74,6 +78,7 @@ def get_hnodes(env, builder, hpath=None):
 
 def hclear(env):
     env.hnodes = {}
+    env.hbuilders = []
 
 SConsEnvironment.hbuild = hbuild
 SConsEnvironment.get_hnodes = get_hnodes
