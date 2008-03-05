@@ -70,17 +70,6 @@ class Package(object):
         self.env = env
         self.opts = options
 
-    def __str__(self):
-        str =  'Package name:  %s\n' % self.name
-        str += 'Found:         %s\n' % self.result[0]
-        str += 'Base path:     %s\n' % self.base_dir
-        str += 'Header paths:  %s\n' % self.hdr_dirs
-        str += 'Library paths: %s\n' % self.lib_dirs
-        str += 'Libraries:     %s\n' % self.libs
-        str += 'Have shared:   %s\n' % self.have_shared
-        str += 'Frameworks:    %s\n' % self.fworks
-        return str
-
     def setup_search_defaults(self):
         # Set common defaults of Darwin and Linux.
         if self.system in ['Darwin', 'Linux']:
@@ -91,8 +80,11 @@ class Package(object):
             if self.bits == 64:
                 if self.header_sub_dir:
                     self.sub_dirs = [[[os.path.join('include', self.header_sub_dir)],
-                                      ['lib64']]] + self.sub_dirs
-                self.sub_dirs = [[['include'], ['lib64']]] + self.sub_dirs
+                                      ['lib64']],
+                                     [[os.path.join('include', self.header_sub_dir)],
+                                      [os.path.join('lib', '64')]]] + self.sub_dirs
+                self.sub_dirs = [[['include'], ['lib64']],
+                                 [['include'], [os.path.join('lib', '64')]]] + self.sub_dirs
 
         # Set Darwin specific defaults.
         if self.system == 'Darwin':
@@ -121,104 +113,6 @@ class Package(object):
             (self.option_name + 'Framework',
              '%s framework' % self.name,
              None, None))
-
-    def run_source(self, source):
-        """At this point we know all our construction environment has been set up,
-        so we should be able to build and run the application."""
-        result = self.run_scons_cmd(self.ctx.TryRun, source, '.c')
-        msg = self.get_run_error_message(result[1])
-        return [result[0][0], result[0][1], msg]
-
-    def check_symbols(self):
-        """We have our paths and libraries setup, now we need to see if we can find
-        one of the set of required symbols in the libraries."""
-        for syms in self.symbols:
-            result = self.run_source(self.get_check_symbols_source(syms[0]))
-            if result[0]:
-                if syms[1]:
-                    self.cpp_defines += [syms[1]] # Add the CPP defines.
-                break
-        return result
-
-    def check_shared(self, location, libs):
-        """Confirm that there are shared versions of this package's libraries available."""
-        # TODO
-        return [1, '', '']
-
-    def check_libs(self, location, libs):
-        """Check if the currently selected location is a valid installation of the
-        required package. At this stage we know that the paths given in the location
-        actually exist and we need to confirm that the libraries in 'libs' exist."""
-        # Validate the libraries.
-        result = self.validate_libraries(location, libs)
-        if not result[0]:
-            return result
-
-        # Construct the library state.
-        lib_state = self.build_lib_state(location, libs)
-        old = self.push_state(lib_state)
-
-        # Check that we can link against the libraries by trying to link against
-        # a particular set of symbols.
-        result = self.check_symbols()
-        if not result[0]:
-            if not result[2]:
-                result[2] = 'Failed to link against library(s).'
-            self.pop_state(old)
-            return result
-
-        # Check if we have shared libraries.
-        if self.require_shared:
-            result = self.check_shared(location, libs)
-            if not result[0] and not result[2]:
-                result[2] = 'No shared library(s) available.'
-
-        # Roll-back on our state.
-        self.pop_state(old)
-        return result
-
-    def check_headers(self, location):
-        """Determine if the required headers are available with the current construction
-        environment settings."""
-        src = self.get_header_source()
-        result = self.run_scons_cmd(self.ctx.TryCompile, src, '.c')
-        msg = self.get_headers_error_message(result[1])
-        if not msg:
-            msg = 'Failed to locate headers.'
-        return [result[0], '', msg]
-
-    def check_location(self, location):
-        """Check if the currently selected location is a valid installation of the
-        required package. At this stage we know that the paths given in the location
-        actually exist."""
-        # Validate the headers, first.
-        result = self.validate_location(location)
-        if not result[0]:
-            return result
-
-        # Construct our path state.
-        path_state = self.build_header_state(location)
-        old = self.push_state(path_state)
-
-        # Check for the headers.
-        result = self.check_headers(location)
-        if not result[0]:
-            self.pop_state(old)
-            return result
-
-        # Scan each set of libraries in turn.
-        libs = []
-        for libs in self.libraries:
-            result = self.check_libs(location, libs)
-            if result[0]:
-                break
-
-        # Store last known configuration.
-        self.store_result(result, location, libs)
-
-        # Roll-back on state.
-        self.pop_state(old)
-        return result
 
     def get_headers_error_message(self, console):
         return ''
@@ -259,6 +153,20 @@ class Package(object):
 
         return result
 
+    def setup_dependencies(self):
+        # If the package doesn't yet exist, create it.
+        for pkg_module in self.dependencies:
+            if pkg_module not in self.env.packages:
+                self.env.Package(pkg_module, self.opts)
+
+    def process_dependencies(self):
+        """Ensure all dependencies have been configured before this package."""
+        for pkg_module in self.dependencies:
+            # Configure the dependency now.
+            pkg = self.env.packages[pkg_module]
+            pkg.sconf = self.sconf
+            pkg.configure(self.ctx)
+
     def find_package(self):
         # Search for package locations.
         self.ctx.Message('Checking for package %s ... ' % self.name)
@@ -281,19 +189,103 @@ class Package(object):
 
         return result
 
-    def setup_dependencies(self):
-        # If the package doesn't yet exist, create it.
-        for pkg_module in self.dependencies:
-            if pkg_module not in self.env.packages:
-                self.env.Package(pkg_module, self.opts)
+    def check_location(self, location):
+        """Check if the currently selected location is a valid installation of the
+        required package. At this stage we know that the paths given in the location
+        actually exist."""
+        # Validate the headers, first.
+        result = self.validate_location(location)
+        if not result[0]:
+            return result
 
-    def process_dependencies(self):
-        """Ensure all dependencies have been configured before this package."""
-        for pkg_module in self.dependencies:
-            # Configure the dependency now.
-            pkg = self.env.packages[pkg_module]
-            pkg.sconf = self.sconf
-            pkg.configure(self.ctx)
+        # Construct our path state.
+        path_state = self.build_header_state(location)
+        old = self.push_state(path_state)
+
+        # Check for the headers.
+        result = self.check_headers(location)
+        if not result[0]:
+            self.pop_state(old)
+            return result
+
+        # Scan each set of libraries in turn.
+        libs = []
+        for libs in self.libraries:
+            result = self.check_libs(location, libs)
+            if result[0]:
+                break
+
+        # Store last known configuration.
+        self.store_result(result, location, libs)
+
+        # Roll-back on state.
+        self.pop_state(old)
+        return result
+
+    def check_headers(self, location):
+        """Determine if the required headers are available with the current construction
+        environment settings."""
+        src = self.get_header_source()
+        result = self.run_scons_cmd(self.ctx.TryCompile, src, '.c')
+        msg = self.get_headers_error_message(result[1])
+        if not msg:
+            msg = 'Failed to locate headers.'
+        return [result[0], '', msg]
+
+    def check_libs(self, location, libs):
+        """Check if the currently selected location is a valid installation of the
+        required package. At this stage we know that the paths given in the location
+        actually exist and we need to confirm that the libraries in 'libs' exist."""
+        # Validate the libraries.
+        result = self.validate_libraries(location, libs)
+        if not result[0]:
+            return result
+
+        # Construct the library state.
+        lib_state = self.build_lib_state(location, libs)
+        old = self.push_state(lib_state)
+
+        # Check that we can link against the libraries by trying to link against
+        # a particular set of symbols.
+        result = self.check_symbols()
+        if not result[0]:
+            if not result[2]:
+                result[2] = 'Failed to link against library(s).'
+            self.pop_state(old)
+            return result
+
+        # Check if we have shared libraries.
+        if self.require_shared:
+            result = self.check_shared(location, libs)
+            if not result[0] and not result[2]:
+                result[2] = 'No shared library(s) available.'
+
+        # Roll-back on our state.
+        self.pop_state(old)
+        return result
+
+    def check_symbols(self):
+        """We have our paths and libraries setup, now we need to see if we can find
+        one of the set of required symbols in the libraries."""
+        for syms in self.symbols:
+            result = self.run_source(self.get_check_symbols_source(syms[0]))
+            if result[0]:
+                if syms[1]:
+                    self.cpp_defines += [syms[1]] # Add the CPP defines.
+                break
+        return result
+
+    def check_shared(self, location, libs):
+        """Confirm that there are shared versions of this package's libraries available."""
+        # TODO
+        return [1, '', '']
+
+    def run_source(self, source):
+        """At this point we know all our construction environment has been set up,
+        so we should be able to build and run the application."""
+        result = self.run_scons_cmd(self.ctx.TryRun, source, '.c')
+        msg = self.get_run_error_message(result[1])
+        return [result[0][0], result[0][1], msg]
 
     def validate_location(self, location):
         """Confirm that the location is okay, possibly modifying it in place if
@@ -505,5 +497,13 @@ class Package(object):
         old_log.write(log)
         return (res, log)
 
-    def dump(self, env, file):
-        pass
+    def __str__(self):
+        str =  'Package name:  %s\n' % self.name
+        str += 'Found:         %s\n' % self.result[0]
+        str += 'Base path:     %s\n' % self.base_dir
+        str += 'Header paths:  %s\n' % self.hdr_dirs
+        str += 'Library paths: %s\n' % self.lib_dirs
+        str += 'Libraries:     %s\n' % self.libs
+        str += 'Have shared:   %s\n' % self.have_shared
+        str += 'Frameworks:    %s\n' % self.fworks
+        return str
