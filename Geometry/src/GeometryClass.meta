@@ -12,8 +12,8 @@
 <param name="License">The Gnu Lesser General Public License http://www.gnu.org/licenses/lgpl.html</param>
 <param name="Parent">Stg_Component</param>
 <param name="Reference">...</param>
-<param name="Summary">...</param>
-<param name="Description">...</param>
+<param name="Summary">Sets the position of points on a mesh.</param>
+<param name="Description">Geometry sets the spatial location of every component in a mesh.  It does this by operating on the geometry in terms of points, not higher-order elements such as faces.  More complex shapes can be built-up later from these atomic points.  Geometry defines position of each point during construction of a mesh. It uses (x, y, z) coordinates and works on a regular or irregular mesh.</param>
 
 <!--Now the interesting stuff-->
 

@@ -12,8 +12,19 @@
 <param name="License">The Gnu Lesser General Public License http://www.gnu.org/licenses/lgpl.html</param>
 <param name="Parent">Geometry</param>
 <param name="Reference">...</param>
-<param name="Summary">...</param>
-<param name="Description">...</param>
+<param name="Summary">Defines points inside a block of a regular mesh.</param>
+<param name="Description">BlockGeometry assigns points in a regular arrangement over a defined area of a mesh.  It assumes you are using a regular, Cartesian block in two or three dimensions.
+
+To use BlockGeometry, pass it the coordinates of opposing corners of the block, and also the number of mesh points to include for each dimension.
+
+In the nomenclature of BlockGeometry, the number of points along each axis is known as its size.  In this context, size  should not be confused with the difference between max values and min coordinates.  For example, a block where the size is 4 high (sizeJ=4) would feature four nodes along the Y axis.
+Use the component interface to set the values of sizeI, sizeJ and sizeK.
+
+Conversely, BlockGeometry searches in the Root Directory for (minX, minY, minZ) and (maxX ,maxY, maxZ), so set those values in the Root Directory.
+For a two-dimensional mesh, minX and minY coordinates refer to the bottom-left corner, while maxX and maxY refer to the top-right corner.  Meanwhile, Z coordinates are set to 0 and ignored for a 2D BlockGeometry mesh.
+
+The spaces between points along an axis of a BlockGeometry mesh are always equal.  For example, the vertical distance between points = maxY–minY/sizeJ-1.
+</param>
 
 <!--Now the interesting stuff-->
 
@@ -56,6 +67,27 @@
 
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">
+<struct name="components" mergeType="merge">
+  <struct name="geometry">
+    <param name="Type">BlockGeometry</param>
+    <param name="sizeI"> elementResI </param>
+    <param name="sizeJ"> elementResJ </param>
+    <param name="sizeK"> elementResK </param>
+    <param name="sizeShift">+1</param>
+  </struct>
+  <struct name="elementTopology">
+    <param name="Type">IJK26Topology</param>
+    <param name="sizeI"> elementResI </param>
+    <param name="sizeJ"> elementResJ </param>
+    <param name="sizeK"> elementResK </param>
+  </struct>
+  <struct name="elementLayout">
+    <param name="Type">ParallelPipedHexaEL</param>
+    <param name="Topology">elementTopology</param>
+    <param name="Geometry">geometry</param>
+  </struct>
+</struct>
+</param>
 
 </StGermainData>

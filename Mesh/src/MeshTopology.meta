@@ -12,8 +12,9 @@
 <param name="License">https://csd.vpac.org/twiki/bin/view/Stgermain/SoftwareLicense</param>
 <param name="Parent">Stg_Component</param>
 <param name="Reference">...</param>
-<param name="Summary">...</param>
-<param name="Description">...</param>
+<param name="Summary">Stores topological information about a mesh and useful for Shadowing.</param>
+<param name="Description"><p>MeshTopology stores topological information about a mesh but manages no geometric information.</p><p>MeshTopology is used when Shadowing.  Shadowing is a process by which some data pertaining to a section of the mesh gets duplicated and assigned to a processor managing adjacent decomposition regions.  Shadowing is managed automatically by MeshTopology and can be performed to a specified depth.</p><p>No assumptions are made about how the data is stored.  MeshTopology merely stores and indexes data as requested, per algorithmic demands.</p>
+</param>
 
 <!--Now the interesting stuff-->
 

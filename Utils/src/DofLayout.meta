@@ -12,8 +12,13 @@
 <param name="License">The Gnu Lesser General Public License http://www.gnu.org/licenses/lgpl.html</param>
 <param name="Parent">Stg_Component</param>
 <param name="Reference">...</param>
-<param name="Summary">...</param>
-<param name="Description">...</param>
+<param name="Summary">Maps between the spatial domain of a mesh and variables.</param>
+<param name="Description"><p>DofLayout (Degrees of Freedom Layout) prescribes how particular chunks of data are attached to specified parts a mesh.  A mesh describes a divided domain, and you need to know where values lie in the domain when solving for a variable over the domain.</p>
+
+<p>DofLayout maps between the spacial domain and one or more Variables.  Briefly, a Variable is a block of memory which is indexed so it can be associated with part of a mesh.  This can be a vertex, face or some other topological feature.   See the StGermain component, Variable, for more information.</p>
+
+<p>DofLayout refers to scalar variables only, not vectors, though a wrapper can be applied later to convert vectors.</p>
+</param>
 
 <!--Now the interesting stuff-->
 

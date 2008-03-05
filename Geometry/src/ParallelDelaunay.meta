@@ -12,8 +12,18 @@
 <param name="License">https://csd.vpac.org/twiki/bin/view/Stgermain/SoftwareLicense</param>
 <param name="Parent">Delaunay</param>
 <param name="Reference">...</param>
-<param name="Summary">...</param>
-<param name="Description">...</param>
+<param name="Summary">The Constrained Delaunay Algorithm performs Delaunay triangulation on a set of 2D points.  It also generates a dual graph (Voronoi diagram) and a Convex Hull.<br> Multi-processor version, good for large data sets or where speed is critical.</param>
+<param name="Description"><p>Delaunay works on a set of 2D points.  It uses the Constrained Delaunay Algorithm to generate a  network between these points.</p>
+<p> Once that step is complete it generates a dual graph, a Voronoi Diagram, based on the Delaunay Triangulation.</p>
+
+<p>Delaunay can also generate a Convex Hull based on the set of points.</p>
+
+<p>This is a multi-processor implementation of Delaunay, useful on multi-processor system for large data sets, speed-critical applications or where memory resources are limited.</p>
+
+<p>Parallel processing of Delaunay is done by dividing the 2D set into equally-sized regions along the x-axis, then assigning each area to a different processor.  The parallel approach is quicker and more efficient than the single-processor version because the memory required by the recursive, divide-and-conquer Delaunay Algorithm increases nonlinearly as the number of data-points scales-up.  The algorithm is no longer constrained by the memory resources of a single processor because each processor manages only a discrete, longitudinal slice of the graph.</p>
+
+<p>Dividing the set introduces boundary-cases where triangles overlap regions handled by two adjacent processors.  These triangles are detected then mirrored on both processors.  This repeated data imposes a minimal overhead and is superimposed when recombining the slices to form the final output diagram.</p>
+</param>
 
 <!--Now the interesting stuff-->
 

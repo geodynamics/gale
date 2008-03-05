@@ -12,7 +12,7 @@
 <param name="License">The Gnu Lesser General Public License http://www.gnu.org/licenses/lgpl.html</param>
 <param name="Parent">Stg_Component</param>
 <param name="Reference">...</param>
-<param name="Summary">...</param>
+<param name="Summary"><p>DecompTransfer specifies a sub-problem and helps to improve the efficiency of decomposition.</p></param>
 <param name="Description">...</param>
 
 </StGermainData>

@@ -12,7 +12,7 @@
 <param name="License">The Gnu Lesser General Public License http://www.gnu.org/licenses/lgpl.html</param>
 <param name="Parent">Stg_Component</param>
 <param name="Reference">...</param>
-<param name="Summary">...</param>
+<param name="Summary">A general class which integrates each element in a Variable through time.</param>
 <param name="Description">A general class which integrates each element in a Variable through time. It does this through a TimeDerivative method which it calls for each element in the Variable. This happens every time the TimeIntegrator that this object is attached to executes (This should happen on the AbstractContext_EP_Step EntryPoint.</param>
 
 <list name="Params">

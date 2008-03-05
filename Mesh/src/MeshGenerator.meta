@@ -13,6 +13,7 @@
 <param name="Parent"></param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">...</param>
+<param name="Description">MeshGenerator is an internal mechanism for building a mesh of up to three dimensions.  Later, the Mesh component may hold  holds information.
+MeshGenerator takes a list of meshes as its targets.  It is an abstract class and gets inherited by other classes such as CartesianGenerator.</param>
 
 </StGermainData>

@@ -12,8 +12,11 @@
 <param name="License">The Gnu Lesser General Public License http://www.gnu.org/licenses/lgpl.html</param>
 <param name="Parent">Geometry</param>
 <param name="Reference">...</param>
-<param name="Summary">...</param>
-<param name="Description">...</param>
+<param name="Summary">Imports mesh coordinates from a file and applies them to a mesh.</param>
+<param name="Description"><p>IrregGeometry reads in a set of arbitrary points from a file and applies them to the geometry of a mesh.  This makes it ideal for importing mesh data produced by another tool, such as a third-party application.  As the name of this Code implies, the geometry of this mesh can be irregular.</p>
+
+<p>IrregGeometry retrieves ListName from the Root Directory.  This lets it locate an XML file containing listing of (x, y, z) points in a simple format, typically inside an <asciidata> element.</p>
+</param>
 
 <!--Now the interesting stuff-->
 

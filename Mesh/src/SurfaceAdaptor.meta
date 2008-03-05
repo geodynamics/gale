@@ -12,7 +12,15 @@
 <param name="License">The Gnu Lesser General Public License http://www.gnu.org/licenses/lgpl.html</param>
 <param name="Parent"></param>
 <param name="Reference">...</param>
-<param name="Summary">...</param>
-<param name="Description">...</param>
+<param name="Summary">A type of MeshAdaptor that lets you modify the top surface of a mesh without altering the underlying layers.</param>
+<param name="Description"><p>SurfaceAdaptor is a type of MeshAdaptor.  It allows you to selectively change the top surface of a mesh without altering the underlying layers. </p>
+
+<p>SurfaceAdaptor is an example of a MeshAdaptor.  It allows you to modify the top surface without changing the underlying layers.  Presently, it's the only MeshAdaptor, but it makes for a useful case study and other MeshAdaptors can be constructed in future.</p>
+
+<p> <br>Questions: Is SurfaceAdaptor useful when dealing with conditions with highly stratified materials?  
+Where forces acting on material being modelled only affect the surface and don't penetrate the bulk of the material?
+Useful as a quick approximation because you're interested only in examining the surface?
+TODO: Does it stricktly deal with the top layer only, or can you set the depth to which the SurfaceAdaptor goes?  This has implications for mesh deformation, level of detail, size of “cells” etc.
+</param>
 
 </StGermainData>

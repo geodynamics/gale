@@ -12,7 +12,7 @@
 <param name="License">https://csd.vpac.org/twiki/bin/view/Stgermain/SoftwareLicense</param>
 <param name="Parent">GlobalParticleLayout</param>
 <param name="Reference">...</param>
-<param name="Summary">...</param>
+<param name="Summary">A particle layout that sequentially combines many particle layouts.<br>When one particle layout finishes initialising all its particles then the next one begins.</param>
 <param name="Description">This is a particle layout that simply combines many particle layouts together into one. When one particle layout finishes initialises all its particles, then the next one begins.</param>
 
 <list name="Params">

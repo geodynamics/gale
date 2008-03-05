@@ -12,8 +12,10 @@
 <param name="License">https://csd.vpac.org/twiki/bin/view/Stgermain/SoftwareLicense</param>
 <param name="Parent"></param>
 <param name="Reference">...</param>
-<param name="Summary">...</param>
-<param name="Description">...</param>
+<param name="Summary">An abstract class that helps to transform a mesh into a regular, well-formed format.</param>
+<param name="Description">Remesher assists with rearranging a mesh into a more regular, ordered format.  Giving a mesh a simplified form results in it being easier to deal with.
+For example, Remesher is useful when a mesh has been advected to such an extent that it is no longer well-formed.  A malformed mesh is slower to process and not as representative as a well-formed mesh.
+Remesher is an abstract interface to classes, and therefore does not perform any remeshing.  Other classes may be instructed to do the remeshing using a variety of remesheing methods.</param>
 
 <!--Now the interesting stuff-->
 
