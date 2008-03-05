@@ -30,7 +30,7 @@ def copy_file(env, dst, src):
     dst = env.norm_path(dst)
     old = os.getcwd()
     os.chdir(env.GetLaunchDir())
-    if not File(os.path.abspath(dst)).current():
+    if not File(os.path.abspath(dst)).is_up_to_date():
         src = env.norm_path(src)
         dst_dir = os.path.dirname(dst)
         if not os.path.exists(dst_dir):
