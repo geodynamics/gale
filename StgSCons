@@ -255,8 +255,32 @@ def create_meta(target, source, env):
             output_file.write(l[start+19:end])
             output_file.write("\n")
             break
-    template_file=file("meta-template.c")
-    output_file.write(template_file.read())
+    output_file.write('''
+#define Stg_Component_Stringify( str ) #str
+
+/* Note: Two macros are used to resolve the the extra macro level */
+#define Stg_Component_Metadata_Create( name ) Stg_Component_Metadata_Create_Macro( name )
+#define Stg_Component_Metadata_Create_Macro( name ) \
+	const char* name ##_Meta = XML_METADATA; \
+	const char* name ##_Name = #name; \
+	const char* name ##_Version = VERSION; \
+	const char* name ##_Type_GetMetadata() { /* hack...won't be needed when hierarchy rollout is done */\
+		return name ##_Meta; \
+	} \
+	const char* name ##_GetMetadata() { \
+		return name ##_Meta; \
+	} \
+	const char* name ##_GetName() { \
+		return name ##_Name; \
+	} \
+	const char* name ##_GetVersion() { \
+		return name ##_Version; \
+	}
+
+#if defined(COMPONENT_NAME) && defined(VERSION) && defined(XML_METADATA)
+	Stg_Component_Metadata_Create( COMPONENT_NAME )
+#endif
+''')
 
 def gen_meta_suffix(env, sources):
     return "-meta.c"
