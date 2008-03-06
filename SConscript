@@ -2,6 +2,9 @@ import os
 Import('env')
 
 env = env.Copy()
+env.AppendUnique(CPPPATH=[os.path.join(env['buildPath'], # Add StGermain include path.
+                                       'include',
+                                       'StGermain')])
 env.project_name = 'StGermain' # Need a project name.
 env.clear_all() # ... so that our structures are ready.
 
