@@ -397,7 +397,7 @@ int main(int argc, char* argv[]) {
                 if os.path.exists(dir) and os.path.isdir(dir):
                     for hdr, lib in self.combine_sub_dirs(dir):
                         yield [dir, list(hdr), list(lib), list(fw)]
-                        for sub in self.combine_header_sub_dir(hdr):
+                        for sub in self.combine_header_sub_dir(dir, hdr):
                             yield [dir, list(sub), list(lib), list(fw)]
 
     def combine_sub_dirs(self, base_dir):
@@ -430,10 +430,15 @@ int main(int argc, char* argv[]) {
 
             yield (hdr_dirs, lib_dirs)
 
-    def combine_header_sub_dir(self, hdr_dirs):
+    def combine_header_sub_dir(self, base_dir, hdr_dirs):
         if not self.header_sub_dir or not hdr_dirs:
             return
-        yield [os.path.join(h, self.header_sub_dir) for h in hdr_dirs if h]
+        cand = [os.path.join(h, self.header_sub_dir) for h in hdr_dirs if h]
+        for d in cand:
+            path = os.path.join(base_dir, d)
+            if not (os.path.exists(path) and os.path.isdir(path)):
+                return
+        yield cand
 
     def join_sub_dir(self, base_dir, sub_dir):
         if os.path.isabs(sub_dir):
