@@ -50,10 +50,6 @@ def load_config(env, filename):
 def configure_packages(env, options=None, output='config.cfg'):
     sconf = Configure(env, custom_tests={'CheckPackages': CheckPackages})
 
-    # Update the options dictionary.
-    if options:
-        options.Update(env)
-
     # Call the packages checker.
     sconf.CheckPackages(env.package_list)
 
