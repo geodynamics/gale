@@ -191,7 +191,7 @@ class Package(object):
         """Do any initial option processing, including importing any values from
         the environment and validating that all options are consistent."""
         cmd_opts = False
-        for opt in self.opts.keys():
+        for opt in self.command_options:
             if opt in self.opts.args:
                 cmd_opts = True
                 break
