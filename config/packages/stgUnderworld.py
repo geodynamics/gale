@@ -12,6 +12,10 @@ class stgUnderworld(SConfig.Package):
         self.require(SConfig.packages.SVNRevision)
         self.require(SConfig.packages.BlasLapack)
         self.require(SConfig.packages.PETSc)
+        if self.env['with_glucifer']:
+            self.require(SConfig.packages.OpenGL)
+            mesa = self.require(SConfig.packages.OSMesa)
+            mesa.required = False
 
     def setup_options(self):
         SConfig.Package.setup_options(self)
@@ -21,6 +25,7 @@ class stgUnderworld(SConfig.Package):
                                         'Enable debugging', 1),
                 SCons.Script.BoolOption('staticLibraries',
                                         'Build static libraries only', 0),
+                SCons.Script.BoolOption('with_glucifer', 'Enable the gLucifer module', 1),
                 ('buildPath', 'Temporary build path', 'build'))
 
     def setup_environment(self):

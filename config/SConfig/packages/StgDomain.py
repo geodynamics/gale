@@ -4,12 +4,9 @@ import SConfig
 class StgDomain(SConfig.Package):
     def __init__(self, env, options):
         SConfig.Package.__init__(self, env, options)
-        self.setup_search_defaults()
-        self.setup_options()
-        self.dependencies = [SConfig.packages.StGermain]
+        self.require(SConfig.packages.StGermain)
         self.base_patterns = ['StgDomain*']
-        self.headers = [os.path.join('StgDomain', 'StgDomain.h')]
-        self.dependency_headers = [os.path.join('StGermain', 'StGermain.h')]
+        self.headers = [[os.path.join('StgDomain', 'StgDomain.h')]]
         self.libraries = [['StgDomain']]
         self.symbols = [(['StgDomain_Init', 'StgDomain_Finalise'], '')]
         self.symbol_setup = '''MPI_Init(&argc, &argv);

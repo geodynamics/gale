@@ -18,6 +18,13 @@ class Package(object):
         else:
             self.bits = 32
 
+        # Setup the options immediately, that way we can access them
+        # in sub-classes.
+        self.opts = options
+        self.setup_options()
+        if self.opts:
+            self.opts.Update(env)
+
         # Is this package essential?
         self.required          = required
 
@@ -32,8 +39,7 @@ class Package(object):
         self.header_sub_dir    = ''
 
         # Header options.
-        self.headers            = [] #['']
-        self.dependency_headers = [] #['']
+        self.headers            = [[]] #[['']]
 
         # Library options.
         self.libraries         = [] #[['']]
@@ -56,10 +62,11 @@ class Package(object):
 
         # Once configured, these values will be set.
         self.configured = False
-        self.result = (0, '', '')
+        self.result = [0, '', '']
         self.cpp_defines = []
         self.base_dir = ''
         self.hdr_dirs = []
+        self.hdrs = []
         self.lib_dirs = []
         self.libs = []
         self.have_shared = None
@@ -68,11 +75,9 @@ class Package(object):
 
         # Private stuff.
         self.env = env
-        self.opts = options
         self.deps = []
 
         self.setup_search_defaults()
-        self.setup_options()
 
     def setup_search_defaults(self):
         # Set common defaults of Darwin and Linux.
@@ -259,11 +264,18 @@ class Package(object):
     def check_headers(self, location):
         """Determine if the required headers are available with the current construction
         environment settings."""
-        src = self.get_header_source()
-        result = self.run_scons_cmd(self.ctx.TryCompile, src, '.c')
-        msg = self.get_headers_error_message(result[1])
-        if not msg:
-            msg = 'Failed to locate headers.'
+        for hdrs in self.headers:
+            src = self.get_header_source(hdrs)
+            result = self.run_scons_cmd(self.ctx.TryCompile, src, '.c')
+            if result[0]:
+                self.hdrs = list(hdrs)
+                break
+        if not result[0]:
+            msg = self.get_headers_error_message(result[1])
+            if not msg:
+                msg = 'Failed to locate headers.'
+        else:
+            msg = ''
         return [result[0], '', msg]
 
     def check_libs(self, location, libs):
@@ -515,9 +527,22 @@ int main(int argc, char* argv[]) {
     def pop_state(self, old):
         self.env.Replace(**old)
 
-    def get_header_source(self):
+    def get_all_headers(self, headers):
+        if not self.result[0]:
+            return
+        headers += [h for h in self.hdrs if h not in headers]
+        for d in self.deps:
+            d.get_all_headers(headers)
+
+    def get_header_source(self, headers=None):
         src = '#include<stdlib.h>\n#include<stdio.h>\n#include<string.h>\n'
-        for h in self.dependency_headers + self.headers:
+        if headers is None:
+            hdrs = list(self.hdrs)
+        else:
+            hdrs = list(headers)
+        for d in self.deps:
+            d.get_all_headers(hdrs)
+        for h in hdrs:
             src += '#include<' + h + '>\n'
         return src
 

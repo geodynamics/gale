@@ -6,7 +6,7 @@ class MPI(SConfig.Package):
         SConfig.Package.__init__(self, env, options)
         self.base_patterns = ['mpich*', 'MPICH*']
         self.header_sub_dir = 'mpi'
-        self.headers = ['mpi.h']
+        self.headers = [['mpi.h']]
         self.libraries = [['mpich'],
                           ['mpich', 'pmpich'],
                           ['mpich', 'rt'],

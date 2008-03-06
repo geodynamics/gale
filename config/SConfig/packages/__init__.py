@@ -9,3 +9,12 @@ from StgDomain import StgDomain
 from StgFEM import StgFEM
 from PICellerator import PICellerator
 from dl import dl
+from OpenGL import OpenGL
+from OSMesa import OSMesa
+from SDL import SDL
+from libPNG import libPNG
+from libJPEG import libJPEG
+from libTIFF import libTIFF
+from libFAME import libFAME
+from libavcodec import libavcodec
+from HDF5 import HDF5

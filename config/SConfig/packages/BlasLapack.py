@@ -4,8 +4,7 @@ import SConfig
 class BlasLapack(SConfig.Package):
     def __init__(self, env, options):
         SConfig.Package.__init__(self, env, options)
-        self.setup_search_defaults()
-        self.setup_options()
+        self.cmath = self.require(SConfig.packages.cmath)
         self.libraries = [['blas', 'lapack'],
                           ['cblas', 'clapack'],
                           ['mkl', 'mkl_lapack']]
