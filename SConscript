@@ -2,6 +2,9 @@ import os
 Import('env')
 
 env = env.Copy()
+env.AppendUnique(CPPPATH=[os.path.join(env['buildPath'], # Add gLucifer include path.
+                                       'include',
+                                       'glucifer')])
 env.project_name = 'glucifer' # Need a project name.
 env.clear_all() # ... so that our structures are ready.
 
