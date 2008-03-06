@@ -1,3 +1,4 @@
+import os
 Import('env')
 
 env = env.Copy()
