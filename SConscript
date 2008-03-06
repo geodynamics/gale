@@ -30,7 +30,7 @@ env.build_plugin('plugins/MaterialThermalDiffusivity',
                  'MaterialThermalDiffusivity')
 env.build_plugin('plugins/VariableConditions/ShapeTemperatureIC',
                  'VariableConditions/ShapeTemperatureIC')
-# TODO: Output plugins.
+env.build_plugin('plugins/Output/Vrms', 'Vrms')
 
 env.build_xmls(env.glob('InputFiles/src/*.xml'), 'StGermain/Underworld')
 env.build_xmls(env.glob('InputFiles/src/BaseApps/*.xml'),
