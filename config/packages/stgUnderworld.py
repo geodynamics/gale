@@ -50,11 +50,6 @@ class stgUnderworld(SConfig.Package):
         # Setup the include paths.
         inc_path = os.path.join(self.env['buildPath'], 'include')
         self.env.AppendUnique(CPPPATH=[inc_path])
-        self.env.AppendUnique(CPPPATH=[os.path.join(inc_path, 'StGermain')])
-        self.env.AppendUnique(CPPPATH=[os.path.join(inc_path, 'StgDomain')])
-        self.env.AppendUnique(CPPPATH=[os.path.join(inc_path, 'StgFEM')])
-        self.env.AppendUnique(CPPPATH=[os.path.join(inc_path, 'PICellerator')])
-        self.env.AppendUnique(CPPPATH=[os.path.join(inc_path, 'Underworld')])
 
         # Setup debugging.
         if self.env['debug']:
