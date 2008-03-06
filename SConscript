@@ -1,15 +1,9 @@
+import os
 Import('env')
 
-# Need to copy the environment for use here.
 env = env.Copy()
-
-# Add some extra stuff.
-env.proj = 'glucifer'
-env.Append(CPPPATH=['#build/include/' + env.proj])
-
-#
-# Target specification section.
-#
+env.project_name = 'glucifer' # Need a project name.
+env.clear_all() # ... so that our structures are ready.
 
 env.build_directory('Base')
 env.build_directory('Windowing')
