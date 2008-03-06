@@ -4,13 +4,10 @@ import SConfig
 class StgFEM(SConfig.Package):
     def __init__(self, env, options):
         SConfig.Package.__init__(self, env, options)
-        self.setup_search_defaults()
-        self.setup_options()
-        self.dependencies = [SConfig.packages.StGermain]
+        self.require(SConfig.packages.StGermain)
+        self.require(SConfig.packages.StgDomain)
         self.base_patterns = ['StgFEM*']
-        self.headers = [os.path.join('StgFEM', 'StgFEM.h')]
-        self.dependency_headers = [os.path.join('StGermain', 'StGermain.h'),
-                                   os.path.join('StgDomain', 'StgDomain.h')]
+        self.headers = [[os.path.join('StgFEM', 'StgFEM.h')]]
         self.libraries = [['StgFEM']]
         self.symbols = [(['StgFEM_Init', 'StgFEM_Finalise'], '')]
         self.symbol_setup = '''MPI_Init(&argc, &argv);

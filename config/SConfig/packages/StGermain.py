@@ -4,13 +4,11 @@ import SConfig
 class StGermain(SConfig.Package):
     def __init__(self, env, options):
         SConfig.Package.__init__(self, env, options)
-        self.setup_search_defaults()
-        self.setup_options()
-        self.dependencies = [SConfig.packages.cmath,
-                             SConfig.packages.libXML2,
-                             SConfig.packages.MPI]
+        self.require(SConfig.packages.cmath)
+        self.require(SConfig.packages.libXML2)
+        self.require(SConfig.packages.MPI)
         self.base_patterns = ['StGermain*']
-        self.headers = [os.path.join('StGermain', 'StGermain.h')]
+        self.headers = [[os.path.join('StGermain', 'StGermain.h')]]
         self.libraries = [['StGermain']]
         self.symbols = [(['StGermain_Init', 'StGermain_Finalise'], '')]
         self.symbol_setup = 'MPI_Init(&argc, &argv);'
