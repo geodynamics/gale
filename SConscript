@@ -1,6 +1,9 @@
 Import('env')
 
 env = env.Copy()
+env.AppendUnique(CPPPATH=[os.path.join(env['buildPath'], # Add Underworld include path.
+                                       'include',
+                                       'Underworld')])
 env.project_name = 'Underworld' # Need a project name.
 env.clear_all() # ... so that our structures are ready.
 
