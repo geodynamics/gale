@@ -1,6 +1,9 @@
 Import('env')
 
 env = env.Copy()
+env.AppendUnique(CPPPATH=[os.path.join(env['buildPath'], # Add PICellerator include path.
+                                       'include',
+                                       'PICellerator')])
 env.project_name = 'PICellerator' # Need a project name.
 env.clear_all() # ... so that our structures are ready.
 
