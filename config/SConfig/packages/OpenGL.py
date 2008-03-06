@@ -9,4 +9,4 @@ class OpenGL(SConfig.Package):
                         ['OpenGL/gl.h', 'OpenGL/glu.h']] # For framework.
         self.libraries = [['GL', 'GLU']]
         self.frameworks = [['OpenGL']]
-        self.have_define = 'HAVE_OPENGL'
+        self.have_define = 'HAVE_GL'
