@@ -12,24 +12,16 @@ def Package(env, pkg_module, options=None):
         env.packages = {}
         env.package_list = []
 
-    # If we already have this package we can return now.
-    if pkg_module in env.packages:
-        return
+    if not pkg_module in env.packages:
+        # Add an instance of this package.
+        env.packages[pkg_module] = pkg_module(env, options)
+        env.package_list += [env.packages[pkg_module]]
 
-    # Add an instance of this package.
-    env.packages[pkg_module] = pkg_module(env, options)
-    env.package_list += [env.packages[pkg_module]]
+    return env.packages[pkg_module]
 
 def CheckPackages(ctx, pkg_list):
     for pkg in pkg_list:
         pkg.configure(ctx)
-
-def setup_packages(env, options=None):
-    for pkg in env.package_list:
-        pkg.setup_dependencies()
-    if options:
-        options.Update(env)
-        options.Save('config.cache', env)
 
 def save_config(env, filename, vars):
     d = {}
@@ -58,9 +50,9 @@ def load_config(env, filename):
 def configure_packages(env, options=None, output='config.cfg'):
     sconf = Configure(env, custom_tests={'CheckPackages': CheckPackages})
 
-    # Set the configure object to all packages.
-    for pkg in env.package_list:
-        pkg.sconf = sconf
+    # Update the options dictionary.
+    if options:
+        options.Update(env)
 
     # Call the packages checker.
     sconf.CheckPackages(env.package_list)
@@ -75,7 +67,6 @@ def configure_packages(env, options=None, output='config.cfg'):
     env.save_config(output, vars)
 
 SConsEnvironment.Package = Package
-SConsEnvironment.setup_packages = setup_packages
 SConsEnvironment.configure_packages = configure_packages
 SConsEnvironment.save_config = save_config
 SConsEnvironment.load_config = load_config

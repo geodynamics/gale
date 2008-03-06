@@ -6,12 +6,15 @@ class stgUnderworld(SConfig.Package):
     def __init__(self, env, options):
         SConfig.Package.__init__(self, env, options)
         self.checks = [self.setup_environment]
-        self.dependencies = [SConfig.packages.cmath,
-                             SConfig.packages.libXML2,
-                             SConfig.packages.MPI,
-                             SConfig.packages.SVNRevision,
-                             SConfig.packages.BlasLapack,
-                             SConfig.packages.PETSc]
+        self.require(SConfig.packages.cmath)
+        self.require(SConfig.packages.libXML2)
+        self.require(SConfig.packages.MPI)
+        self.require(SConfig.packages.SVNRevision)
+        self.require(SConfig.packages.BlasLapack)
+        self.require(SConfig.packages.PETSc)
+
+    def setup_options(self):
+        SConfig.Package.setup_options(self)
         if self.opts:
             self.opts.AddOptions(
                 SCons.Script.BoolOption('debug',
