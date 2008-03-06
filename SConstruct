@@ -57,5 +57,5 @@ else:
     SConscript('PICellerator/SConscript', exports='env')
     env.Prepend(LIBS='PICellerator')
     SConscript('Underworld/SConscript', exports='env')
-    if env['with_gLucifer']:
+    if env['with_glucifer']:
         SConscript('gLucifer/SConscript', exports='env')
