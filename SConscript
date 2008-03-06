@@ -1,6 +1,9 @@
 Import('env')
 
 env = env.Copy()
+env.AppendUnique(CPPPATH=[os.path.join(env['buildPath'], # Add StgFEM include path.
+                                       'include',
+                                       'StgFEM')])
 env.project_name = 'StgFEM' # Need a project name.
 env.clear_all() # ... so that our structures are ready.
 
