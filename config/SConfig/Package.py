@@ -8,6 +8,7 @@ class Package(object):
         self.name = self.__module__.split('.')[-1]
         self.option_name = self.name.lower()
         self.environ_name = self.name.upper()
+        self.command_options = {}
         self.environ_options = {}
 
         # Setup some system specific information.
@@ -93,6 +94,16 @@ class Package(object):
     def setup_options(self):
         if not self.opts:
             return
+        self.command_options = [self.option_name + 'Dir',
+                                self.option_name + 'IncDir',
+                                self.option_name + 'LibDir',
+                                self.option_name + 'Lib',
+                                self.option_name + 'Framework']
+        self.environ_options = {self.option_name + 'Dir': self.environ_name + '_DIR',
+                                self.option_name + 'IncDir': self.environ_name + '_INC_DIR',
+                                self.option_name + 'LibDir': self.environ_name + '_LIB_DIR',
+                                self.option_name + 'Lib': self.environ_name + '_LIB',
+                                self.option_name + 'Framework': self.environ_name + '_FRAMEWORK'}
         self.opts.AddOptions(
             SCons.Script.PathOption(self.option_name + 'Dir',
                                     '%s installation path' % self.name,
@@ -109,11 +120,6 @@ class Package(object):
             (self.option_name + 'Framework',
              '%s framework' % self.name,
              None, None))
-        self.environ_options = {self.option_name + 'Dir': self.environ_name + '_DIR',
-                                self.option_name + 'IncDir': self.environ_name + '_INC_DIR',
-                                self.option_name + 'LibDir': self.environ_name + '_LIB_DIR',
-                                self.option_name + 'Lib': self.environ_name + '_LIB',
-                                self.option_name + 'Framework': self.environ_name + '_FRAMEWORK'}
 
     def get_headers_error_message(self, console):
         return ''
@@ -151,6 +157,15 @@ class Package(object):
 
         # Required?
         if self.required and not result[0]:
+            self.ctx.Display('\nThe required package ' + self.name + ' could not be found.\n')
+            self.ctx.Display('The printouts above should provide some information on what went wrong,\n')
+            self.ctx.Display('To see further details, please read the \'config.log\' file.\n')
+            if len(self.command_options):
+                self.ctx.Display('You can directly specify search parameters for this package via\n')
+                self.ctx.Display('the following command line options:\n\n')
+                for opt in self.command_options:
+                    self.ctx.Display('  ' + opt + '\n')
+                self.ctx.Display('\nRun \'scons help\' for more details on these options.\n\n')
             self.env.Exit()
 
         # If we succeeded, store the resulting environment.
