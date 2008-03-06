@@ -14,11 +14,10 @@ else:
 # Configuring or building? Or helping?
 if 'config' in COMMAND_LINE_TARGETS or 'help' in COMMAND_LINE_TARGETS:
     import packages
-    opts = Options('config.cache') # Create our options database.
+    opts = Options() # Create our options database.
 
     # Setup all the packages we want configured.
     env.Package(packages.stgUnderworld, opts)
-    env.setup_packages(opts)
 
     # Displaying help?
     if 'help' in COMMAND_LINE_TARGETS:
