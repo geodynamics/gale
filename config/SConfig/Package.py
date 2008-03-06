@@ -1,11 +1,15 @@
 import os, platform, glob
 import SCons.Script
+import SConfig
 
 class Package(object):
     def __init__(self, env, options=None, required=True):
         # Construct this package's name.
         self.name = self.__module__.split('.')[-1]
         self.option_name = self.name.lower()
+        self.environ_name = self.name.upper()
+        self.command_options = {}
+        self.environ_options = {}
 
         # Setup some system specific information.
         self.system = platform.system()
@@ -16,9 +20,6 @@ class Package(object):
 
         # Is this package essential?
         self.required          = required
-
-        # Dependency list.
-        self.dependencies      = [] #[<module>]
 
         # Language options.
         self.language          = 'C' # 'C' | 'CXX' | 'F77'
@@ -31,18 +32,17 @@ class Package(object):
         self.header_sub_dir    = ''
 
         # Header options.
-        self.headers            = [] #['']
-        self.dependency_headers = [] # ['']
+        self.headers            = [[]] #[['']]
 
         # Library options.
         self.libraries         = [] #[['']]
         self.require_shared    = False
-        self.use_rpath         = False
-        self.symbols           = [([], '')] # [([''], '')]
+        self.use_rpath         = True
+        self.symbols           = [([], '')] #[([''], '')]
         self.symbol_setup      = ''
         self.symbol_teardown   = ''
-        self.symbol_prototypes = [] # ['']
-        self.symbol_calls      = [] # ['']
+        self.symbol_prototypes = [] #['']
+        self.symbol_calls      = [] #['']
 
         # Framework options.
         self.frameworks        = [] #[['']]
@@ -55,10 +55,11 @@ class Package(object):
 
         # Once configured, these values will be set.
         self.configured = False
-        self.result = (0, '', '')
+        self.result = [0, '', '']
         self.cpp_defines = []
         self.base_dir = ''
         self.hdr_dirs = []
+        self.hdrs = []
         self.lib_dirs = []
         self.libs = []
         self.have_shared = None
@@ -66,23 +67,19 @@ class Package(object):
         self.state = {}
 
         # Private stuff.
-        self.sconf = None
         self.env = env
         self.opts = options
+        self.deps = []
+
+        self.setup_search_defaults()
+        self.setup_options()
 
     def setup_search_defaults(self):
         # Set common defaults of Darwin and Linux.
         if self.system in ['Darwin', 'Linux']:
             self.base_dirs = ['/usr', '/usr/local']
             self.sub_dirs = [[['include'], ['lib']]]
-            if self.header_sub_dir:
-                self.sub_dirs += [[[os.path.join('include', self.header_sub_dir)], ['lib']]]
             if self.bits == 64:
-                if self.header_sub_dir:
-                    self.sub_dirs = [[[os.path.join('include', self.header_sub_dir)],
-                                      ['lib64']],
-                                     [[os.path.join('include', self.header_sub_dir)],
-                                      [os.path.join('lib', '64')]]] + self.sub_dirs
                 self.sub_dirs = [[['include'], ['lib64']],
                                  [['include'], [os.path.join('lib', '64')]]] + self.sub_dirs
 
@@ -97,6 +94,16 @@ class Package(object):
     def setup_options(self):
         if not self.opts:
             return
+        self.command_options = [self.option_name + 'Dir',
+                                self.option_name + 'IncDir',
+                                self.option_name + 'LibDir',
+                                self.option_name + 'Lib',
+                                self.option_name + 'Framework']
+        self.environ_options = {self.option_name + 'Dir': self.environ_name + '_DIR',
+                                self.option_name + 'IncDir': self.environ_name + '_INC_DIR',
+                                self.option_name + 'LibDir': self.environ_name + '_LIB_DIR',
+                                self.option_name + 'Lib': self.environ_name + '_LIB',
+                                self.option_name + 'Framework': self.environ_name + '_FRAMEWORK'}
         self.opts.AddOptions(
             SCons.Script.PathOption(self.option_name + 'Dir',
                                     '%s installation path' % self.name,
@@ -131,8 +138,16 @@ class Package(object):
         self.ctx = configure_context
         self.configured = True
 
+        # If we have shared libraries enabled, we must ensure the dynamic loader
+        # package is included.
+        if self.require_shared:
+            self.pkg_dl = self.require(SConfig.packages.dl)
+
         # Process dependencies first.
         self.process_dependencies()
+
+        # Process options.
+        self.process_options()
 
         # Perfrom actual configuration.
         for check in self.checks:
@@ -142,6 +157,15 @@ class Package(object):
 
         # Required?
         if self.required and not result[0]:
+            self.ctx.Display('\nThe required package ' + self.name + ' could not be found.\n')
+            self.ctx.Display('The printouts above should provide some information on what went wrong,\n')
+            self.ctx.Display('To see further details, please read the \'config.log\' file.\n')
+            if len(self.command_options):
+                self.ctx.Display('You can directly specify search parameters for this package via\n')
+                self.ctx.Display('the following command line options:\n\n')
+                for opt in self.command_options:
+                    self.ctx.Display('  ' + opt + '\n')
+                self.ctx.Display('\nRun \'scons help\' for more details on these options.\n\n')
             self.env.Exit()
 
         # If we succeeded, store the resulting environment.
@@ -153,19 +177,29 @@ class Package(object):
 
         return result
 
-    def setup_dependencies(self):
-        # If the package doesn't yet exist, create it.
-        for pkg_module in self.dependencies:
-            if pkg_module not in self.env.packages:
-                self.env.Package(pkg_module, self.opts)
+    def require(self, package_module):
+        pkg = self.env.Package(package_module, self.opts)
+        self.deps += [pkg]
+        return pkg
 
     def process_dependencies(self):
         """Ensure all dependencies have been configured before this package."""
-        for pkg_module in self.dependencies:
-            # Configure the dependency now.
-            pkg = self.env.packages[pkg_module]
-            pkg.sconf = self.sconf
+        for pkg in self.deps:
             pkg.configure(self.ctx)
+
+    def process_options(self):
+        """Do any initial option processing, including importing any values from
+        the environment and validating that all options are consistent."""
+        cmd_opts = False
+        for opt in self.command_options:
+            if opt in self.opts.args:
+                cmd_opts = True
+                break
+        if cmd_opts:
+            return
+        for cmd, env in self.environ_options.iteritems():
+            if cmd not in self.opts.args and env in self.env['ENV']:
+                self.env[cmd] = self.env['ENV'][env]
 
     def find_package(self):
         # Search for package locations.
@@ -225,11 +259,18 @@ class Package(object):
     def check_headers(self, location):
         """Determine if the required headers are available with the current construction
         environment settings."""
-        src = self.get_header_source()
-        result = self.run_scons_cmd(self.ctx.TryCompile, src, '.c')
-        msg = self.get_headers_error_message(result[1])
-        if not msg:
-            msg = 'Failed to locate headers.'
+        for hdrs in self.headers:
+            src = self.get_header_source(hdrs)
+            result = self.run_scons_cmd(self.ctx.TryCompile, src, '.c')
+            if result[0]:
+                self.hdrs = list(hdrs)
+                break
+        if not result[0]:
+            msg = self.get_headers_error_message(result[1])
+            if not msg:
+                msg = 'Failed to locate headers.'
+        else:
+            msg = ''
         return [result[0], '', msg]
 
     def check_libs(self, location, libs):
@@ -277,8 +318,25 @@ class Package(object):
 
     def check_shared(self, location, libs):
         """Confirm that there are shared versions of this package's libraries available."""
-        # TODO
-        return [1, '', '']
+        if not self.pkg_dl.result[0]:
+            return [0, '', 'No dynamic loader found (libdl).']
+
+        # Build a binary to try and dynamically open the library.
+        result = [1, '', '']
+        for l in libs:
+            src = self.get_header_source()
+            src += '#include<dlfcn.h>\n'
+            src += """
+int main(int argc, char* argv[]) {
+  void* lib;
+  lib = dlopen("%s", RTLD_LAZY);
+  return lib ? 0 : 1;
+}
+""" % self.env.subst('${SHLIBPREFIX}' + l + '${SHLIBSUFFIX}')
+            result = self.run_source(src)
+            if not result[0]:
+                break
+        return result
 
     def run_source(self, source):
         """At this point we know all our construction environment has been set up,
@@ -346,6 +404,8 @@ class Package(object):
                 if os.path.exists(dir) and os.path.isdir(dir):
                     for hdr, lib in self.combine_sub_dirs(dir):
                         yield [dir, list(hdr), list(lib), list(fw)]
+                        for sub in self.combine_header_sub_dir(dir, hdr):
+                            yield [dir, list(sub), list(lib), list(fw)]
 
     def combine_sub_dirs(self, base_dir):
         """Take a base directory and combine it with the set of header and library
@@ -376,6 +436,16 @@ class Package(object):
                 continue
 
             yield (hdr_dirs, lib_dirs)
+
+    def combine_header_sub_dir(self, base_dir, hdr_dirs):
+        if not self.header_sub_dir or not hdr_dirs:
+            return
+        cand = [os.path.join(h, self.header_sub_dir) for h in hdr_dirs if h]
+        for d in cand:
+            path = os.path.join(base_dir, d)
+            if not (os.path.exists(path) and os.path.isdir(path)):
+                return
+        yield cand
 
     def join_sub_dir(self, base_dir, sub_dir):
         if os.path.isabs(sub_dir):
@@ -452,9 +522,22 @@ class Package(object):
     def pop_state(self, old):
         self.env.Replace(**old)
 
-    def get_header_source(self):
+    def get_all_headers(self, headers):
+        if not self.result[0]:
+            return
+        headers += [h for h in self.hdrs if h not in headers]
+        for d in self.deps:
+            d.get_all_headers(headers)
+
+    def get_header_source(self, headers=None):
         src = '#include<stdlib.h>\n#include<stdio.h>\n#include<string.h>\n'
-        for h in self.dependency_headers + self.headers:
+        if headers is None:
+            hdrs = list(self.hdrs)
+        else:
+            hdrs = list(headers)
+        for d in self.deps:
+            d.get_all_headers(hdrs)
+        for h in hdrs:
             src += '#include<' + h + '>\n'
         return src
 
