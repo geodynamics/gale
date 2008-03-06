@@ -1,6 +1,9 @@
 Import('env')
 
 env = env.Copy()
+env.AppendUnique(CPPPATH=[os.path.join(env['buildPath'], # Add StgDomain include path.
+                                       'include',
+                                       'StgDomain')])
 env.project_name = 'StgDomain' # Need a project name.
 env.clear_all() # ... so that our structures are ready.
 
