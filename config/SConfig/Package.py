@@ -97,7 +97,8 @@ class Package(object):
     def setup_options(self):
         if not self.opts:
             return
-        self.command_options = [self.option_name + 'Dir',
+        self.command_options = ['with_' + self.option_name,
+                                self.option_name + 'Dir',
                                 self.option_name + 'IncDir',
                                 self.option_name + 'LibDir',
                                 self.option_name + 'Lib',
@@ -108,6 +109,7 @@ class Package(object):
                                 self.option_name + 'Lib': self.environ_name + '_LIB',
                                 self.option_name + 'Framework': self.environ_name + '_FRAMEWORK'}
         self.opts.AddOptions(
+            SCons.Script.BoolOption('with_' + self.option_name, 'Turn on/off %s' % self.name, 1),
             SCons.Script.PathOption(self.option_name + 'Dir',
                                     '%s installation path' % self.name,
                                     None, SCons.Script.PathOption.PathIsDir),
@@ -133,8 +135,8 @@ class Package(object):
     def configure(self, configure_context):
         """Perform the configuration of this package. Override this method to perform
         custom configuration checks."""
-        # If we've already configured this package, just return.
-        if self.configured:
+        # If we've already configured this package, or it is deselected, just return.
+        if self.configured or not (self.required or self.env['with_' + self.option_name]):
             return
 
         # Setup our configure context and environment.
