@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StandardConditionFunctions.c 1017 2008-02-01 00:36:32Z DavidLee $
+** $Id: StandardConditionFunctions.c 1061 2008-03-07 00:17:09Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -979,7 +979,7 @@ void StgFEM_StandardConditionFunctions_ConstantValueX( Node_LocalIndex node_lI, 
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
 	
-	*result = Dictionary_GetDouble_WithDefault( dictionary, "ConstantValueX", 0.0 );
+	result[0] = Dictionary_GetDouble_WithDefault( dictionary, "ConstantValueX", 0.0 );
 }
 
 void StgFEM_StandardConditionFunctions_ConstantValueY( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
@@ -987,7 +987,7 @@ void StgFEM_StandardConditionFunctions_ConstantValueY( Node_LocalIndex node_lI, 
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
 	
-	*result = Dictionary_GetDouble_WithDefault( dictionary, "ConstantValueY", 0.0 );
+	result[1] = Dictionary_GetDouble_WithDefault( dictionary, "ConstantValueY", 0.0 );
 }
 
 void StgFEM_StandardConditionFunctions_ConstantValueZ( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
@@ -995,7 +995,7 @@ void StgFEM_StandardConditionFunctions_ConstantValueZ( Node_LocalIndex node_lI, 
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
 	
-	*result = Dictionary_GetDouble_WithDefault( dictionary, "ConstantValueZ", 0.0 );
+	result[2] = Dictionary_GetDouble_WithDefault( dictionary, "ConstantValueZ", 0.0 );
 }
 
 
@@ -1051,14 +1051,14 @@ void StgFEM_StandardConditionFunctions_SpectralBCX( Node_LocalIndex node_lI, Var
 	FiniteElementContext *	context            = (FiniteElementContext*)_context;
 	FeVariable*             analyticFeVarX     = NULL;
 	FeVariable*             numericFeVar       = NULL;
-	FeMesh*			feMesh             = NULL;
 	double*                 result             = (double*) _result;
+	/*FeMesh*			feMesh             = NULL;
         double*                 coord;
 	Node_LocalIndex		analyticNodeI;
 	Element_DomainIndex	analyticElement_I;
 	double			analyticLocalElementCoord[3];
 	FeMesh*			analyticFeMesh;
-	
+	*/
 	analyticFeVarX = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "SpectralVelocityXField" );
 	numericFeVar   = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
 	//feMesh         = numericFeVar->feMesh;
@@ -1081,14 +1081,14 @@ void StgFEM_StandardConditionFunctions_SpectralBCY( Node_LocalIndex node_lI, Var
 	FiniteElementContext *	context            = (FiniteElementContext*)_context;
 	FeVariable*             analyticFeVarY     = NULL;
 	FeVariable*             numericFeVar       = NULL;
-	FeMesh*			feMesh             = NULL;
 	double*                 result             = (double*) _result;
+	/*FeMesh*			feMesh             = NULL;
         double*                 coord;
 	Node_LocalIndex		analyticNodeI;
 	Element_DomainIndex	analyticElement_I;
 	double			analyticLocalElementCoord[3];
 	FeMesh*			analyticFeMesh;
-	
+	*/
 	analyticFeVarY = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "SpectralVelocityYField" );
 	numericFeVar   = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
 	//feMesh         = numericFeVar->feMesh;
@@ -1111,14 +1111,15 @@ void StgFEM_StandardConditionFunctions_SpectralBCZ( Node_LocalIndex node_lI, Var
 	FiniteElementContext *	context            = (FiniteElementContext*)_context;
 	FeVariable*             analyticFeVarZ     = NULL;
 	FeVariable*             numericFeVar       = NULL;
-	FeMesh*			feMesh             = NULL;
 	double*                 result             = (double*) _result;
+	/*
+	FeMesh*			feMesh             = NULL;
         double*                 coord;
 	Node_LocalIndex		analyticNodeI;
 	Element_DomainIndex	analyticElement_I;
 	double			analyticLocalElementCoord[3];
 	FeMesh*			analyticFeMesh;
-
+	*/
 	analyticFeVarZ = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "SpectralVelocityZField" );
 	numericFeVar   = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
 	//feMesh         = numericFeVar->feMesh;
@@ -1271,7 +1272,6 @@ void StgFEM_StandardConditionFunctions_ConstantValue( Node_LocalIndex node_lI, V
 	FiniteElementContext *	context            = (FiniteElementContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
-	unsigned		dim_I;
 	double			value              = Dictionary_GetDouble_WithDefault( dictionary, "constantValue", 1.0 );
 
 	*result = value;
@@ -1281,7 +1281,6 @@ void StgFEM_StandardConditionFunctions_DiagonalLine( Node_LocalIndex node_lI, Va
 	FiniteElementContext *	context            = (FiniteElementContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
-	unsigned		dim_I;
 	double			width              = Dictionary_GetDouble_WithDefault( dictionary, "lineWidth", 1.0 );
 	double*			coord;
 	Name			variableName;
