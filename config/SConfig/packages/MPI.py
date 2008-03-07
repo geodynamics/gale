@@ -4,6 +4,7 @@ import SConfig
 class MPI(SConfig.Package):
     def __init__(self, env, options):
         SConfig.Package.__init__(self, env, options)
+        self.dependency(SConfig.packages.CompilerFlags)
         self.base_patterns = ['mpich*', 'MPICH*']
         self.header_sub_dir = 'mpi'
         self.headers = [['mpi.h']]
