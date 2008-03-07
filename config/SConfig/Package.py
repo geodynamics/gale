@@ -337,7 +337,6 @@ class Package(object):
         result = [1, '', '']
         for l in libs:
             src = self.get_header_source()
-            src += '#include<dlfcn.h>\n'
             src += """
 int main(int argc, char* argv[]) {
   void* lib;
