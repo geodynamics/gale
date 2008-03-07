@@ -31,6 +31,7 @@ class stgUnderworld(SConfig.Package):
                                         'Enable debugging', 1),
                 SCons.Script.BoolOption('staticLibraries',
                                         'Build static libraries only', 0),
+                SCons.Script.BoolOption('with_32bit', 'Generate 32bit code', 0),
                 SCons.Script.BoolOption('with_glucifer', 'Enable the gLucifer module', 1),
                 ('buildPath', 'Temporary build path', 'build'))
 
@@ -61,8 +62,8 @@ class stgUnderworld(SConfig.Package):
         if self.env['debug']:
             self.env.MergeFlags('-g')
 
-        # Setup 64 bit builds.
-        #if platform.architecture()[0].find('64') != -1:
-        #    self.env.MergeFlags('-m64')
+        # Setup 64 and 32 bit builds.
+        if self.env['with_32bit']:
+            self.env.MergeFlags('-m32')
 
         return [1, '', '']
