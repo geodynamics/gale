@@ -6,6 +6,9 @@
 	<include>testYieldCriterion.xml</include>
 
 	<struct name="components" mergeType="merge">
+		<struct name="uzawa" mergeType="merge">
+			<param name="tolerance" mergeType="replace">1.0e-4</param>
+		</struct>
 		<struct name="yieldRheology">
 			<!-- These parameters mean that the whole of the box should yield at time = 0.75 -->
 			<param name="Type">VonMises</param>

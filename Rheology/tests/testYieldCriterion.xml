@@ -98,13 +98,14 @@
 	<include> ./velocityBCs.incompressible.xml </include>
  
 	<!--
-	<include>./Viewports/StrainRateInvariantVP.xml</include>
-	<include>./Viewports/VelocityMagnitudeVP.xml</include>
-	<include>./Viewports/PressureVP.xml</include>
-	<include>./window.xml</include>
+	<include>Underworld/Viewports/StrainRateInvariantVP.xml</include>
+	<include>Underworld/Viewports/VelocityMagnitudeVP.xml</include>
+	<include>Underworld/Viewports/PressureVP.xml</include>
+	<include>glucifer/window.xml</include>
 	 <struct name="components" mergeType="merge">
  		<struct name="window" mergeType="merge">
 			<param name="Viewport">StrainRateInvariantVP VelocityMagnitudeVP PressureVP</param>
+			<param name="interactive" mergeType="replace">T</param>
 		</struct>
 	</struct>
 	-->
