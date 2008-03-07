@@ -33,8 +33,11 @@ def copy_file(env, dst, src):
     old = os.getcwd()
     os.chdir(env.GetLaunchDir())
     f = File(os.path.abspath(dst))
-    f.binfo = f.gen_binfo() # Hack to make work with later versions.
-    if not f.is_up_to_date():
+    if hasattr(f, 'changed'): # Hack to make work with later versions.
+        check = f.is_up_to_date
+    else:
+        check = f.current
+    if not check():
         src = env.norm_path(src)
         dst_dir = os.path.dirname(dst)
         if not os.path.exists(dst_dir):
