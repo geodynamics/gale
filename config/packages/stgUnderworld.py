@@ -4,32 +4,24 @@ import SCons.Script
 
 class stgUnderworld(SConfig.Package):
     def __init__(self, env, options):
-        SConfig.Package.__init__(self, env, options)
+        SConfig.Package.__init__(self, env, options, True)
         self.checks = [self.setup_environment]
-        self.require(SConfig.packages.cmath)
-        self.require(SConfig.packages.libXML2)
-        self.require(SConfig.packages.MPI)
-        self.require(SConfig.packages.SVNRevision)
-        self.require(SConfig.packages.BlasLapack)
-        self.require(SConfig.packages.PETSc)
+        self.dependency(SConfig.packages.cmath)
+        self.dependency(SConfig.packages.libXML2)
+        self.dependency(SConfig.packages.MPI)
+        self.dependency(SConfig.packages.SVNRevision)
+        self.dependency(SConfig.packages.BlasLapack)
+        self.dependency(SConfig.packages.PETSc)
         if self.env['with_glucifer']:
-            self.require(SConfig.packages.OpenGL)
-            mesa = self.require(SConfig.packages.OSMesa)
-            mesa.required = False
-            x11 = self.require(SConfig.packages.X11)
-            x11.required = False
-            sdl = self.require(SConfig.packages.SDL)
-            sdl.required = False
-            avc = self.require(SConfig.packages.libavcodec)
-            avc.required = False
-            fame = self.require(SConfig.packages.libFAME)
-            fame.required = False
-            png = self.require(SConfig.packages.libPNG)
-            png.required = False
-            jpg = self.require(SConfig.packages.libJPEG)
-            jpg.required = False
-            tiff = self.require(SConfig.packages.libTIFF)
-            tiff.required = False
+            self.dependency(SConfig.packages.OpenGL)
+            self.dependency(SConfig.packages.OSMesa, False)
+            self.dependency(SConfig.packages.X11, False)
+            self.dependency(SConfig.packages.SDL, False)
+            self.dependency(SConfig.packages.libavcodec, False)
+            self.dependency(SConfig.packages.libFAME, False)
+            self.dependency(SConfig.packages.libPNG, False)
+            self.dependency(SConfig.packages.libJPEG, False)
+            self.dependency(SConfig.packages.libTIFF, False)
 
     def setup_options(self):
         SConfig.Package.setup_options(self)

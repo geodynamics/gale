@@ -3,7 +3,7 @@ import SCons.Script
 import SConfig
 
 class Package(object):
-    def __init__(self, env, options=None, required=True):
+    def __init__(self, env, options=None, required=False):
         # Construct this package's name.
         self.name = self.__module__.split('.')[-1]
         self.option_name = self.name.lower()
@@ -24,9 +24,6 @@ class Package(object):
         self.setup_options()
         if self.opts:
             self.opts.Update(env)
-
-        # Is this package essential?
-        self.required          = required
 
         # Language options.
         self.language          = 'C' # 'C' | 'CXX' | 'F77'
@@ -76,6 +73,7 @@ class Package(object):
         # Private stuff.
         self.env = env
         self.deps = []
+        self.required = required
 
         self.setup_search_defaults()
 
@@ -146,22 +144,29 @@ class Package(object):
         # If we have shared libraries enabled, we must ensure the dynamic loader
         # package is included.
         if self.require_shared:
-            self.pkg_dl = self.require(SConfig.packages.dl)
+            self.pkg_dl = self.dependency(SConfig.packages.dl)
 
         # Process dependencies first.
-        self.process_dependencies()
+        result = self.process_dependencies()
+        if not result[0]:
+            self.ctx.Display('  ' + result[2])
+            self.result = result
+            return result
 
         # Process options.
         self.process_options()
 
         # Perfrom actual configuration.
+        self.ctx.Message('Checking for package %s ... ' % self.name)
+        self.ctx.Display('\n')
         for check in self.checks:
             result = check()
-            if not result[0]:
+            self.result = result
+            if not self.result[0]:
                 break
 
         # Required?
-        if self.required and not result[0]:
+        if self.required and not self.result[0]:
             self.ctx.Display('\nThe required package ' + self.name + ' could not be found.\n')
             self.ctx.Display('The printouts above should provide some information on what went wrong,\n')
             self.ctx.Display('To see further details, please read the \'config.log\' file.\n')
@@ -174,23 +179,32 @@ class Package(object):
             self.env.Exit()
 
         # If we succeeded, store the resulting environment.
-        if result[0]:
+        if self.result[0]:
             if self.have_define:
                 self.cpp_defines += [self.have_define]
             self.build_state()
             self.push_state(self.state)
 
-        return result
+        # Display results.
+        if not self.result[0] and self.result[2]:
+            self.ctx.Display('   ' + self.result[2])
+        self.ctx.Display('   ')
+        self.ctx.Result(self.result[0])
 
-    def require(self, package_module):
+        return self.result
+
+    def dependency(self, package_module, required=True):
         pkg = self.env.Package(package_module, self.opts)
-        self.deps += [pkg]
+        self.deps += [(pkg, required)]
         return pkg
 
     def process_dependencies(self):
         """Ensure all dependencies have been configured before this package."""
-        for pkg in self.deps:
+        for pkg, req in self.deps:
             pkg.configure(self.ctx)
+            if req and not pkg.result[0]:
+                return [0, '', 'Missing dependency: ' + pkg.name]
+        return [1, '', '']
 
     def process_options(self):
         """Do any initial option processing, including importing any values from
@@ -208,24 +222,16 @@ class Package(object):
 
     def find_package(self):
         # Search for package locations.
-        self.ctx.Message('Checking for package %s ... ' % self.name)
-        self.ctx.Display('\n   Searching locations:\n')
+        self.ctx.Display('   Searching locations:\n')
         for loc in self.generate_locations():
             result = self.check_location(loc)
             self.ctx.Display('      %s\n' % str(loc))
-
-            # If we succeeded, back out here.
-            if result[0]:
+            if result[0]: # If we succeeded, back out here.
                 break
-
-            # Display an error message.
-            if result[2]:
+            if result[2]: # Display an error message.
                 self.ctx.Display('         %s\n' % result[2])
 
-        # Display results.
-        self.ctx.Display('   ')
-        self.ctx.Result(result[0])
-
+        result = [result[0], '', '']
         return result
 
     def check_location(self, location):
@@ -531,7 +537,7 @@ int main(int argc, char* argv[]) {
         if not self.result[0]:
             return
         headers += [h for h in self.hdrs if h not in headers]
-        for d in self.deps:
+        for d, r in self.deps:
             d.get_all_headers(headers)
 
     def get_header_source(self, headers=None):
@@ -540,7 +546,7 @@ int main(int argc, char* argv[]) {
             hdrs = list(self.hdrs)
         else:
             hdrs = list(headers)
-        for d in self.deps:
+        for d, r in self.deps:
             d.get_all_headers(hdrs)
         for h in hdrs:
             src += '#include<' + h + '>\n'

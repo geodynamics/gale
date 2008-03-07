@@ -1,6 +1,7 @@
 from libXML2 import libXML2
 from MPI import MPI
 from PETSc import PETSc
+from PETScExt import PETScExt
 from cmath import cmath
 from SVNRevision import SVNRevision
 from BlasLapack import BlasLapack

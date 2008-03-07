@@ -4,7 +4,7 @@ import SConfig
 class StgDomain(SConfig.Package):
     def __init__(self, env, options):
         SConfig.Package.__init__(self, env, options)
-        self.require(SConfig.packages.StGermain)
+        self.dependency(SConfig.packages.StGermain)
         self.base_patterns = ['StgDomain*']
         self.headers = [[os.path.join('StgDomain', 'StgDomain.h')]]
         self.libraries = [['StgDomain']]

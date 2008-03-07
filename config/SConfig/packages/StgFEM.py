@@ -4,8 +4,8 @@ import SConfig
 class StgFEM(SConfig.Package):
     def __init__(self, env, options):
         SConfig.Package.__init__(self, env, options)
-        self.require(SConfig.packages.StGermain)
-        self.require(SConfig.packages.StgDomain)
+        self.dependency(SConfig.packages.StGermain)
+        self.dependency(SConfig.packages.StgDomain)
         self.base_patterns = ['StgFEM*']
         self.headers = [[os.path.join('StgFEM', 'StgFEM.h')]]
         self.libraries = [['StgFEM']]

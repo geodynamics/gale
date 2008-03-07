@@ -4,9 +4,9 @@ import SConfig
 class PICellerator(SConfig.Package):
     def __init__(self, env, options):
         SConfig.Package.__init__(self, env, options)
-        self.require(SConfig.packages.StGermain)
-        self.require(SConfig.packages.StgDomain)
-        self.require(SConfig.packages.StgFEM)
+        self.dependency(SConfig.packages.StGermain)
+        self.dependency(SConfig.packages.StgDomain)
+        self.dependency(SConfig.packages.StgFEM)
         self.base_patterns = ['PICellerator*']
         self.headers = [[os.path.join('PICellerator', 'PICellerator.h')]]
         self.libraries = [['PICellerator']]

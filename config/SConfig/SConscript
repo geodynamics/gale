@@ -47,8 +47,23 @@ def load_config(env, filename):
     for k, v in d.iteritems():
         env[k] = v
 
+def force_required(pkg):
+    for d in pkg.deps:
+        d.required = True
+        force_required(d)
+
 def configure_packages(env, options=None, output='config.cfg'):
     sconf = Configure(env, custom_tests={'CheckPackages': CheckPackages})
+
+    # Update dependencies and requirements.
+    pkgs_rem = list(env.package_list)
+    while len(pkgs_rem):
+        pkg = pkgs_rem.pop()
+        if pkg.required:
+            for d, r in pkg.deps:
+                if r and not d.required:
+                    d.required = True
+                    pkgs_rem += [d]
 
     # Call the packages checker.
     sconf.CheckPackages(env.package_list)

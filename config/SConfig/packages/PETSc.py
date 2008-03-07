@@ -4,7 +4,7 @@ import SConfig
 class PETSc(SConfig.Package):
     def __init__(self, env, options):
         SConfig.Package.__init__(self, env, options)
-        self.require(SConfig.packages.MPI)
+        self.dependency(SConfig.packages.MPI)
         self.base_patterns = ['petsc*', 'PETSC*', 'PETSc*']
         self.header_sub_dir = 'petsc'
         self.headers = [['petsc.h',
