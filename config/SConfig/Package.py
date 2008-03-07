@@ -141,11 +141,6 @@ class Package(object):
         self.ctx = configure_context
         self.configured = True
 
-        # If we have shared libraries enabled, we must ensure the dynamic loader
-        # package is included.
-        if self.require_shared:
-            self.pkg_dl = self.dependency(SConfig.packages.dl)
-
         # Process dependencies first.
         result = self.process_dependencies()
         if not result[0]:
@@ -194,8 +189,12 @@ class Package(object):
         return self.result
 
     def dependency(self, package_module, required=True):
+        if self.configured:
+            print 'Error: Cannot add a dependency during configuration.'
+            self.env.Exit()
         pkg = self.env.Package(package_module, self.opts)
-        self.deps += [(pkg, required)]
+        if pkg not in [d[0] for d in self.deps]:
+            self.deps += [(pkg, required)]
         return pkg
 
     def process_dependencies(self):

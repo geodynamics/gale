@@ -55,6 +55,11 @@ def force_required(pkg):
 def configure_packages(env, options=None, output='config.cfg'):
     sconf = Configure(env, custom_tests={'CheckPackages': CheckPackages})
 
+    # Add dependencies needed for shared libraries.
+    for pkg in env.package_list:
+        if pkg.require_shared:
+            pkg.pkg_dl = pkg.dependency(SConfig.packages.dl)
+
     # Update dependencies and requirements.
     pkgs_rem = list(env.package_list)
     while len(pkgs_rem):

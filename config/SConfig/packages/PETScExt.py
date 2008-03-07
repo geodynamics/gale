@@ -12,7 +12,7 @@ class PETScExt(SConfig.Package):
                          'petscext_ksp.h', 'petscext_snes.h']]
         self.libraries = [['petscext_snes', 'petscext_ksp', 'petscext_pc',
                            'petscext_mat', 'petscext_vec',
-                           'petscext_utils', 'petscext',]]
+                           'petscext_utils']]
         self.require_shared = True
         self.use_rpath = True
         self.have_define = 'HAVE_PETSCEXT'
