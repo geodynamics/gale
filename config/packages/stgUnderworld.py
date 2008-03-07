@@ -16,6 +16,20 @@ class stgUnderworld(SConfig.Package):
             self.require(SConfig.packages.OpenGL)
             mesa = self.require(SConfig.packages.OSMesa)
             mesa.required = False
+            x11 = self.require(SConfig.packages.X11)
+            x11.required = False
+            sdl = self.require(SConfig.packages.SDL)
+            sdl.required = False
+            avc = self.require(SConfig.packages.libavcodec)
+            avc.required = False
+            fame = self.require(SConfig.packages.libFAME)
+            fame.required = False
+            png = self.require(SConfig.packages.libPNG)
+            png.required = False
+            jpg = self.require(SConfig.packages.libJPEG)
+            jpg.required = False
+            tiff = self.require(SConfig.packages.libTIFF)
+            tiff.required = False
 
     def setup_options(self):
         SConfig.Package.setup_options(self)
