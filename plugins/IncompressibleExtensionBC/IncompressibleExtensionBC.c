@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: IncompressibleExtensionBC.c 650 2008-02-19 01:27:56Z RobertTurnbull $
+** $Id: IncompressibleExtensionBC.c 675 2008-03-07 06:32:38Z JulianGiordani $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -158,6 +158,8 @@ void GetVelocity( FeVariable* velocityField, double y, Coord coord, double* velo
 	XYZ                 min, max;
 	double              width;
 	double              height;
+	
+	printf(" %g %g \n", coord[0], coord[1] );
 
 	FieldVariable_GetMinAndMaxGlobalCoords( velocityField, min, max );
 	width  = (max[ I_AXIS ] - min[ I_AXIS ]);
@@ -165,7 +167,7 @@ void GetVelocity( FeVariable* velocityField, double y, Coord coord, double* velo
 
 	velocity[ I_AXIS ] = ( coord[ I_AXIS ] - min[ I_AXIS ] ) / width  * ( V_a - V_b ) + V_b;
 	velocity[ J_AXIS ] = ( coord[ J_AXIS ] - min[ J_AXIS ] ) / height * ( V_c - V_d ) + V_d;
-	if ( velocityField->dim )
+	if ( velocityField->dim == 3 )
 		velocity[ K_AXIS ] = 0.0;
 }
 
