@@ -13,7 +13,9 @@ class Package(object):
 
         # Setup some system specific information.
         self.system = platform.system()
-        if platform.architecture()[0].find('64') != -1:
+        if platform.platform().find('x86_64') != -1 or \
+                platform.platform().find('ppc64') != -1 or \
+                platform.architecture()[0].find('64') != -1:
             self.bits = 64
         else:
             self.bits = 32
