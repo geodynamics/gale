@@ -17,11 +17,13 @@ class CompilerFlags(SConfig.Package):
 
     def check_architecture(self):
         if (platform.platform().find('x86_64') != -1 or \
-                platform.platorm().find('ppc64') != -1 or \
+                platform.platform().find('ppc64') != -1 or \
                 platform.architecture()[0].find('64') != -1) and \
                 not self.env['with_32bit']:
             self.bits = 64
-            #self.env.MergeFlags('-m64') Fails on apac.
+            self.env.MergeFlags('-m64')
+            if self.env.subst('$CC') == self.env.subst('$LINK'):
+                self.env.AppendUnique(LINKFLAGS='-m64')
         else:
             self.bits = 32
             self.env.MergeFlags('-m32')
