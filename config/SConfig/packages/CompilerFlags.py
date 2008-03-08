@@ -17,7 +17,7 @@ class CompilerFlags(SConfig.Package):
 
     def check_architecture(self):
         if (platform.platform().find('x86_64') != -1 or \
-                platform.architecture()[0].find('ppc64') != -1 or \
+                platform.platorm().find('ppc64') != -1 or \
                 platform.architecture()[0].find('64') != -1) and \
                 not self.env['with_32bit']:
             self.bits = 64
