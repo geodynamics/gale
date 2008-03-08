@@ -36,10 +36,11 @@ def save_config(env, filename, vars):
 
 def load_config(env, filename):
     if not os.path.exists(filename):
-        print "\nError: project hasn't been configured!\n"
-        print '************************************************'
-        print "* Run 'scons config' to configure the project. *"
-        print '************************************************\n'
+        print "\nError: project hasn't been configured!"
+        print '*******************************************************'
+        print "* Run 'scons config' to configure the project.        *"
+        print "* Run 'scons help' to see what options are available. *"
+        print '*******************************************************'
         env.Exit()
     f = file(filename, 'r')
     import pickle
