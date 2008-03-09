@@ -521,11 +521,13 @@ int main(int argc, char* argv[]) {
         old = {}
         copy = dict(state)
         for k, v in copy.iteritems():
+            if not v:
+                continue
             if not isinstance(v, list):
                 copy[k] = [v]
             else:
                 copy[k] = v
-            old[k] = self.env.get(k, None)
+            old[k] = self.env.get(k, [])
         if append:
             self.env.AppendUnique(**copy)
         else:
@@ -591,7 +593,7 @@ int main(int argc, char* argv[]) {
         log_file.close()
         os.remove('sconfig.log')
         old_log.write(log)
-        return (res, log)
+        return [res, log]
 
     def __str__(self):
         str =  'Package name:  %s\n' % self.name
