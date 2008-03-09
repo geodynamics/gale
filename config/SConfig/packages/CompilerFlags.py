@@ -39,10 +39,14 @@ class CompilerFlags(SConfig.Package):
     def check_bit_flags(self):
         if self.try_flag('-m32')[0]:
             self.flag_32bit = '-m32'
+        elif self.try_flag('-q32')[0]:
+            self.flag_32bit = '-q32'
         else:
             self.flag_32bit = ''
         if self.try_flag('-m64')[0]:
             self.flag_64bit = '-m64'
+        elif self.try_flag('-q64')[0]:
+            self.flag_64bit = '-q64'
         else:
             self.flag_64bit = ''
         return [1, '', '']
@@ -52,4 +56,7 @@ class CompilerFlags(SConfig.Package):
         old = self.push_state(state)
         result = self.run_scons_cmd(self.ctx.TryCompile, '', '.c')
         self.pop_state(old)
-        return result
+        if result[0] and (result[1].find('not recognized') != -1 or
+                          result[1].find('not recognised') != -1):
+            result[0] = 0
+        return [result[0], result[1], '']
