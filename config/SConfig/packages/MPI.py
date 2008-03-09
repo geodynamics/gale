@@ -21,5 +21,5 @@ class MPI(SConfig.Package):
             shared_dir = os.path.join(lib_dir, 'shared')
             path = os.path.join(location[0], shared_dir)
             if os.path.exists(path):
-                location[2] += [shared_dir]
+                location[2] = [shared_dir] + location[2]
         return [1, '', '']
