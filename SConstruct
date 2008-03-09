@@ -10,6 +10,8 @@ if platform.platform().find('ia64') != -1:
     env = Environment(ENV=os.environ, tools=['gcc', 'gnulink'])
 else:
     env = Environment(ENV=os.environ)
+if 'CC' in env['ENV']:
+    env['CC'] = env['ENV']['CC']
 
 # Configuring or building? Or helping?
 if 'config' in COMMAND_LINE_TARGETS or 'help' in COMMAND_LINE_TARGETS:
