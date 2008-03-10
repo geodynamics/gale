@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeEquationNumber.c 1062 2008-03-10 06:12:01Z LukeHodkinson $
+** $Id: FeEquationNumber.c 1064 2008-03-10 06:56:00Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -2701,6 +2701,23 @@ Assumptions:
 - We can define a logical i,j,k ordering to uniquely identify nodes.
 
 */
+
+PetscErrorCode _VecScatterBeginEnd( VecScatter vscat, Vec FROM, Vec TO, InsertMode addv,ScatterMode mode )
+{
+#if( (PETSC_VERSION_MAJOR==2) && (PETSC_VERSION_MINOR==3) && (PETSC_VERSION_SUBMINOR==2) )
+	// 2.3.2 ordering of args
+	VecScatterBegin( FROM, TO, addv, mode, vscat );
+	VecScatterEnd( FROM, TO, addv, mode, vscat );
+#endif
+	
+#if( (PETSC_VERSION_MAJOR==2) && (PETSC_VERSION_MINOR==3) && (PETSC_VERSION_SUBMINOR>=3) )
+	// 2.3.3
+	VecScatterBegin( vscat, FROM, TO, addv, mode );
+	VecScatterEnd( vscat, FROM, TO, addv, mode );
+#endif
+	
+	PetscFunctionReturn(0);
+}
 
 int GenerateEquationNumbering(
 		int NX, int NY,
