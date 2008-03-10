@@ -49,7 +49,8 @@
 		</list>
 		<param name="referencePath">./expected/testThermoChemBenchmark.0of1</param>
 		<param name="VelocityField-tolerance">0.000005</param>
-		<param name="VelocityField-tolerance">0.005</param>
+		<param name="PressureField-tolerance">0.005</param>
+		<param name="PressureField-useRelativeErrorMeasure">True</param>
 
 		<param name="timeStepToCompare">5</param>
 	</struct>
