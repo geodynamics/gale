@@ -14,7 +14,7 @@
 	</list>
 
 	<!-- Test tolerances. THIS IS A LOW RESOLUTION TEST -->
-	<param name="VelocityField-Tolerance"> 4.0e-04 </param>
+	<param name="VelocityField-Tolerance"> 4.0e-03 </param>
 	<param name="PressureField-Tolerance"> 6.0e-02 </param>
 
 	<param name="solHA_sigma">1.0</param>
@@ -109,7 +109,7 @@
 	<include> Underworld/Viewports/AnalyticPressureVP.xml </include>
 	<include> Underworld/Viewports/AnalyticVelocityMagnitudeVP.xml </include>
 
-	<include>../../InputFiles/window.xml</include>
+	<include>glucifer/window.xml</include>
 	<struct name="components" mergeType="merge">
 		<struct name="window" mergeType="merge">
 			<list name="Viewport">

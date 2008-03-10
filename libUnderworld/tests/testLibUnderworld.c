@@ -69,6 +69,10 @@ int main( int argc, char* argv[] ) {
 		fprintf( stderr, "Error initialising StGermain, exiting.\n" );
 		exit( EXIT_FAILURE );
 	}
+	if (!StgDomain_Init( &argc, &argv ) ) {
+		fprintf( stderr, "Error initialising StgDomain, exiting.\n" );
+		exit( EXIT_FAILURE );
+	}
 	if (!StgFEM_Init( &argc, &argv ) ) {
 		fprintf( stderr, "Error initialising StgFEM, exiting.\n" );
 		exit( EXIT_FAILURE );
@@ -98,7 +102,20 @@ int main( int argc, char* argv[] ) {
 		else {
 			printf("StGermain XML library Path not found.\n"); 
 		}
-/* For build in the same build directory */
+		/* For build in the same build directory */
+		if (strcmp((char*)LIB_DIR, (char*)testDirectory)) {
+			printf("StgDomain XML library Path found.\n");
+		}
+		/* For build in separate directories */
+		else{
+			testDirectory = Stg_ObjectList_Get( xmlSearchPaths,"StgDomain" );
+			if (testDirectory != NULL) {
+				printf("StgDomain XML library Path found.\n");
+			}
+			else {
+				printf("StgDomain XML library Path not found.\n"); 
+			}
+		}
 		if (strcmp((char*)LIB_DIR, (char*)testDirectory)) {
 			printf("StgFEM XML library Path found.\n");
 		}
