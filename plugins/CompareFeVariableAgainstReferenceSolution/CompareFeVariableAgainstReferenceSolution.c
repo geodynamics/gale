@@ -51,7 +51,7 @@
 const Type CompareFeVariableAgainstReferenceSolution_Type = "StgFEM_CompareFeVariableAgainstReferenceSolution";
 
 void CompareFeVariableAgainstReferenceSolution_TestAll( void* compareFeVariable, void* data );
-void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVariable, FeVariable* feVarToTest, double tolerance );
+void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVariable, FeVariable* feVarToTest, double tolerance, Bool relativeErrorMeasure );
 void _CompareFeVariableAgainstReferenceSolution_Delete( void* compareFeVariable );
 
 typedef struct {
@@ -64,6 +64,7 @@ typedef struct {
 	
 	Stg_ObjectList*          variables;
 	Stg_ObjectList*          tolerances;
+	Stg_ObjectList*          relativeErrorMeasure;
 
 	Index                    timeStepToCompare;
 
@@ -90,6 +91,7 @@ void _CompareFeVariableAgainstReferenceSolution_Construct( void* compareFeVariab
 	FeVariable*              feVarToTest;
 	Index                    var_I;
 	double                   tolerance;
+	Bool                     relativeErrorMeasure;
 
 	char*                    tmpName;
 
@@ -116,7 +118,7 @@ void _CompareFeVariableAgainstReferenceSolution_Construct( void* compareFeVariab
 	Journal_Printf(
 		Journal_MyStream( Info_Type, self ),
 		"%s: Using reference path %s\n", self->name, referencePath );
-	if ( referencePath[ strlen(referencePath) ] == "/" ) {
+	if ( referencePath[ strlen(referencePath) ] == (int)"/" ) {
 		self->referencePath = StG_Strdup( referencePath );
 	} 
 	else {	
@@ -129,8 +131,9 @@ void _CompareFeVariableAgainstReferenceSolution_Construct( void* compareFeVariab
 		"%s: Using integration swarm %s\n", self->name, integrationSwarmName );
 	self->integrationSwarm = Stg_ComponentFactory_ConstructByName( cf, integrationSwarmName, Swarm, True, data ); 
 
-	self->variables = Stg_ObjectList_New();
-	self->tolerances = Stg_ObjectList_New();
+	self->variables            = Stg_ObjectList_New();
+	self->tolerances           = Stg_ObjectList_New();
+	self->relativeErrorMeasure = Stg_ObjectList_New();
 
 	varList = Dictionary_Get( dictionary, "variables" );
 	Journal_Firewall(
@@ -147,9 +150,13 @@ void _CompareFeVariableAgainstReferenceSolution_Construct( void* compareFeVariab
 
 		tmpName = Stg_Object_AppendSuffix( feVarToTest, "tolerance" );
 		tolerance = Dictionary_GetDouble_WithDefault( dictionary, tmpName, 0.005 );
+
+		tmpName = Stg_Object_AppendSuffix( feVarToTest, "useRelativeErrorMeasure" );
+		relativeErrorMeasure = Dictionary_GetBool_WithDefault( dictionary, tmpName, False );
 		
 		Stg_ObjectList_Append( self->variables, feVarToTest );
 		Stg_ObjectList_Append( self->tolerances, Stg_PrimitiveObject_New_Double( tolerance, varName ) );
+		Stg_ObjectList_Append( self->relativeErrorMeasure, Stg_PrimitiveObject_New_Int( (relativeErrorMeasure)?1:0, varName ) );
 	}
 
 	/* Default is zero which means every time step */
@@ -207,6 +214,7 @@ void CompareFeVariableAgainstReferenceSolution_TestAll( void* compareFeVariable,
 
 	FeVariable*     feVarToTest;
 	double          tolerance;
+	int             relativeErrorMeasure;
 
 	Index           var_I;
 
@@ -223,12 +231,13 @@ void CompareFeVariableAgainstReferenceSolution_TestAll( void* compareFeVariable,
 	for ( var_I = 0; var_I < self->variables->count; ++var_I ) {
 		feVarToTest = (FeVariable*)Stg_ObjectList_At( self->variables, var_I );
 		tolerance = ((Stg_PrimitiveObject*)Stg_ObjectList_At( self->tolerances, var_I ))->value.asDouble;
-		CompareFeVariableAgainstReferenceSolution_TestVariable( self, feVarToTest, tolerance );
+		relativeErrorMeasure = ((Stg_PrimitiveObject*)Stg_ObjectList_At( self->relativeErrorMeasure, var_I ))->value.asInt;
+		CompareFeVariableAgainstReferenceSolution_TestVariable( self, feVarToTest, tolerance, relativeErrorMeasure );
 	}
 }
 
 
-void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVariable, FeVariable* feVarToTest, double tolerance ) {
+void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVariable, FeVariable* feVarToTest, double tolerance, Bool relativeErrorMeasure ) {
 	CompareFeVariableAgainstReferenceSolution* self = (CompareFeVariableAgainstReferenceSolution*) compareFeVariable;
 	
 	Variable_Register*       variable_Register;
@@ -247,9 +256,11 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 	double*                  nodalValues = NULL;
 
 	FeVariable*              referenceFeVar;
+	OperatorFeVariable*      refMagnitudeField;
 	FeVariable*              roundedFeVar;
 	OperatorFeVariable*      errorField;
-	OperatorFeVariable*      errorMagnitudeField;
+	OperatorFeVariable*      errorMagnitudeField, *relativeErrorMagnitudeField;
+	OperatorFeVariable*      feVarOutput;
 
 	char*                    tmpName;
 	char*                    tmpName2;
@@ -447,6 +458,9 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 		Memory_Free( referenceFeVar->name );
 		referenceFeVar->name = Stg_Object_AppendSuffix( feVarToTest, "Reference" );
 	}
+	tmpName = Stg_Object_AppendSuffix( feVarToTest, "MagnitudeField" );
+	refMagnitudeField = OperatorFeVariable_NewUnary( tmpName, referenceFeVar, "Magnitude" );
+	Memory_Free( tmpName );
 
 	/* now we need to round off the feVar we are testing, and copy the result to the roundedFeVar */
 	for( dNode_I = 0; dNode_I < Mesh_GetDomainSize( feVarToTest->feMesh, MT_VERTEX ); dNode_I++ ) {
@@ -473,27 +487,50 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 	errorMagnitudeField = OperatorFeVariable_NewUnary( tmpName, errorField, "Magnitude" );
 	Memory_Free( tmpName );
 
+	tmpName = Stg_Object_AppendSuffix( feVarToTest, "RelativeErrorMagnitudeField" );
+	relativeErrorMagnitudeField = OperatorFeVariable_NewBinary(
+			tmpName, errorMagnitudeField, refMagnitudeField, "ScalarDivision" );
+	Memory_Free( tmpName );
+
 	/* Build and Initialise the newly-created OperatorFeVariables - else we can't use them */
 	Stg_Component_Build( errorField, self->context, False );
 	Stg_Component_Build( errorMagnitudeField, self->context, False );
+	Stg_Component_Build( refMagnitudeField, self->context, False );
+	Stg_Component_Build( relativeErrorMagnitudeField, self->context, False );
 	Stg_Component_Initialise( errorField, self->context, False );
 	Stg_Component_Initialise( errorMagnitudeField, self->context, False );
+	Stg_Component_Initialise( refMagnitudeField, self->context, False );
+	Stg_Component_Initialise( relativeErrorMagnitudeField, self->context, False );
 
-        result = FeVariable_Integrate( errorMagnitudeField, self->integrationSwarm );
+	/* If the relativeErrorMeasure flag was used, then change the calculations and output to be relative */
+	if( relativeErrorMeasure ) 
+		feVarOutput = relativeErrorMagnitudeField;
+	else
+		feVarOutput = errorMagnitudeField;
+
+        result = FeVariable_Integrate( feVarOutput, self->integrationSwarm );
 
 	Journal_Printf( 
 		Journal_MyStream( Info_Type, self ), 
 		"Timestep %u: Total integrated value of '%s' is %s a tolerance %.5g.\n",
 		self->context->timeStep, 
-		errorMagnitudeField->name, 
+		feVarOutput->name, 
 		result <= tolerance ? "within" : "outside", 
 		tolerance );
 
 	if ( ( result > tolerance ) || (True == self->alwaysOutputErrors) ) {
-		Journal_Printf( 
-			Journal_MyStream( Info_Type, self ), 
-			"\t(Integrated total error was %g)\n",
-			result );
+		if( relativeErrorMeasure ) {
+			Journal_Printf( 
+				Journal_MyStream( Info_Type, self ), 
+				"\t(Integrated total relative error was %g)\n",
+				result );
+		}
+		else {
+			Journal_Printf( 
+				Journal_MyStream( Info_Type, self ), 
+				"\t(Integrated total absolute error was %g)\n",
+				result );
+		}
 	}	
 
 	/* TODO: The lines below were commented out. Why? This is actually a bad memory leak! PatrickSunter, 9 Jul 2007 */
@@ -506,6 +543,7 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 	Stg_Class_Delete( roundedFeVar );
 	Stg_Class_Delete( errorField );
 	Stg_Class_Delete( errorMagnitudeField );
+	Stg_Class_Delete( relativeErrorMagnitudeField );
 	*/
 
 	Memory_Free( refName );
