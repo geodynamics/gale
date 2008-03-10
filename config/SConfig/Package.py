@@ -258,7 +258,7 @@ class Package(object):
 
         # Scan each set of libraries in turn.
         libs = []
-        for libs in self.libraries:
+        for libs in self.generate_libraries(location):
             result = self.check_libs(location, libs)
             if result[0]:
                 break
@@ -419,6 +419,10 @@ int main(int argc, char* argv[]) {
                         yield [dir, list(hdr), list(lib), list(fw)]
                         for sub in self.combine_header_sub_dir(dir, hdr):
                             yield [dir, list(sub), list(lib), list(fw)]
+
+    def generate_libraries(self, location):
+        for libs in self.libraries:
+            yield libs
 
     def combine_sub_dirs(self, base_dir):
         """Take a base directory and combine it with the set of header and library
