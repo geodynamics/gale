@@ -9,6 +9,7 @@ class BlasLapack(SConfig.Package):
                           ['cblas', 'clapack'],
                           ['mkl', 'mkl_lapack']]
         self.frameworks = [['Accelerate']]
+        self.use_rpath = True
         self.symbols = [(['dgeev'], 'FORTRAN_NORMAL'),
                         (['dgeev_'], 'FORTRAN_SINGLE_TRAILINGBAR'),
                         (['dgeev__'], 'FORTRAN_DOUBLE_TRAILINGBAR'),
@@ -49,3 +50,26 @@ free(rightEigenVec);
 '''
         self.symbol_prototypes = ['void %s(char*,char*,int*,double*,int*,double*,double*,double*,int*,double*,int*,double*,int*,int*);']
         self.symbol_calls = ['%s(&jobVecLeft, &jobVecRight, &dim, arrayA, &dim, outputReal, outputImag, leftEigenVec, &leadDimVL, rightEigenVec, &leadDimVR, workSpace, &dimWorkSpace, &INFO );']
+
+    # Thanks to there not being a C version of Blas/Lapack on edda, we need
+    # to be able to search for that installation specifically.
+    def generate_locations(self):
+        lib_dir = ['/usr/local/IBM_compilers/xlf/9.1/lib64',
+                   '/opt/ibmcmp/lib64']
+        use_dir = True
+        for d in lib_dir:
+            if not os.path.exists(d):
+                use_dir = False
+                break
+        for loc in SConfig.Package.generate_locations(self):
+            yield loc
+            if use_dir:
+                yield [loc[0], loc[1], loc[2] + lib_dir, loc[3]]
+
+    def generate_libraries(self, location):
+        lib_dir = '/usr/local/IBM_compilers/xlf/9.1/lib64'
+        if lib_dir in location[2]:
+            yield ['blas', 'lapack', 'xlf90', 'xlfmath', 'xl']
+        else:
+            for libs in SConfig.Package.generate_libraries(self, location):
+                yield libs
