@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeEquationNumber.c 1064 2008-03-10 06:56:00Z LukeHodkinson $
+** $Id: FeEquationNumber.c 1065 2008-03-10 06:59:37Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -2611,7 +2611,7 @@ void FeEquationNumber_BuildWithDave( FeEquationNumber* self ) {
                               dstArray[0], &nEqNums );
 
    /* Allocate for location matrix. */
-   nDims = Mesh_GetNumDims( self->feMesh );
+   nDims = Mesh_GetDimSize( self->feMesh );
    locMat = AllocArray( int**, Mesh_GetDomainSize( self->feMesh, nDims ) );
    for( ii = 0; ii < Mesh_GetDomainSize( self->feMesh, nDims ); ii++ )
       locMat[ii] = AllocArray2D( int, FeMesh_GetElementNodeSize( self->feMesh, 0 ), nDofs );
