@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeEquationNumber.c 1068 2008-03-11 03:08:25Z LukeHodkinson $
+** $Id: FeEquationNumber.c 1069 2008-03-11 03:31:00Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -2632,7 +2632,7 @@ void FeEquationNumber_BuildWithDave( FeEquationNumber* self ) {
 	 for( jj = 0; jj < nLocals; jj++ ) {
 	    Grid_Lift( vGrid, locals[jj], inds );
 	    if( inds[ii] == vGrid->sizes[ii] - 1 )
-	       periodicInds[ii][nPeriodicInds[jj]++] = locals[jj];
+	       periodicInds[ii][nPeriodicInds[ii]++] = locals[jj];
 	 }
       }
    }
