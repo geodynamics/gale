@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeEquationNumber.c 1066 2008-03-11 01:06:29Z LukeHodkinson $
+** $Id: FeEquationNumber.c 1068 2008-03-11 03:08:25Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -2579,6 +2579,10 @@ void FeEquationNumber_BuildWithDave( FeEquationNumber* self ) {
    int nRanks, rank;
    Sync *sync;
    Bool isCond;
+   int nPeriodicInds[3];
+   int *periodicInds[3];
+   int inds[3];
+   Bool usePeriodic;
    int ii, jj, kk;
 
    /* Setup an array containing global indices of all locally owned nodes. */
@@ -2591,30 +2595,62 @@ void FeEquationNumber_BuildWithDave( FeEquationNumber* self ) {
    nDofs = self->dofLayout->dofCounts[0];
    dstArray = AllocArray2D( int, Mesh_GetDomainSize( self->feMesh, 0 ), nDofs );
 
+   /* Get the vertex grid extension and any periodicity. */
+   nDims = Mesh_GetDimSize( self->feMesh );
+   vGrid = *Mesh_GetExtension( self->feMesh, Grid**, "vertexGrid" );
+   periodic = Mesh_GetExtension( self->feMesh, int*, "periodic" );
+
    /* Fill destination array with initial values, setting dirichlet BCs as we go. */
    for( ii = 0; ii < nLocals; ii++ ) {
+      Grid_Lift( vGrid, locals[ii], inds );
+      usePeriodic = False;
+      for( jj = 0; jj < nDims; jj++ ) {
+	 if( periodic[jj] && (inds[jj] == 0 || inds[jj] == vGrid->sizes[jj] - 1) ) {
+	    usePeriodic = True;
+	    break;
+	 }
+      }
       for( jj = 0; jj < nDofs; jj++ ) {
          varInd = self->dofLayout->varIndices[ii][jj];
-	 isCond = VariableCondition_IsCondition( self->bcs, ii, varInd );
-         if( !self->bcs || !isCond || !self->removeBCs )
+	 if( self->bcs )
+	    isCond = VariableCondition_IsCondition( self->bcs, ii, varInd );
+	 else
+	    isCond = False;
+         if( usePeriodic || !isCond || !self->removeBCs )
             dstArray[ii][jj] = 0;
          else
             dstArray[ii][jj] = -1;
       }
    }
 
-   /* Get the vertex grid extension and any periodicity. */
-   vGrid = *Mesh_GetExtension( self->feMesh, Grid**, "vertexGrid" );
-   periodic = Mesh_GetExtension( self->feMesh, int*, "periodic" );
+   /* Generate opposing indices for periodicity. */
+   for( ii = 0; ii < nDims; ii++ ) {
+      nPeriodicInds[ii] = 0;
+      periodicInds[ii] = NULL;
+      if( periodic[ii] ) {
+	 periodicInds[ii] = AllocArray( int, nLocals );
+	 for( jj = 0; jj < nLocals; jj++ ) {
+	    Grid_Lift( vGrid, locals[jj], inds );
+	    if( inds[ii] == vGrid->sizes[ii] - 1 )
+	       periodicInds[ii][nPeriodicInds[jj]++] = locals[jj];
+	 }
+      }
+   }
 
    /* Call Dave's equation number generation routine. */
    GenerateEquationNumbering( vGrid->sizes[0], vGrid->sizes[1],
                               nLocals, locals,
                               nDofs, Mesh_GetGlobalSize( self->feMesh, 0 ),
                               periodic[0], periodic[1],
-                              0, 0, /* TODO: what are these? */
-                              NULL, NULL, /* TODO: and these? */
+                              nPeriodicInds[0], nPeriodicInds[1],
+			      periodicInds[0], periodicInds[1],
                               dstArray[0], &nEqNums );
+
+   /* Free periodic arrays. */
+   for( ii = 0; ii < nDims; ii++ ) {
+      if( periodicInds[ii] )
+	 FreeArray( periodicInds[ii] );
+   }
 
    /* Find the first and last owned equation numbers. */
    self->firstOwnedEqNum = -1;
@@ -2635,7 +2671,6 @@ void FeEquationNumber_BuildWithDave( FeEquationNumber* self ) {
                    nDofs * sizeof(int) );
 
    /* Allocate for location matrix. */
-   nDims = Mesh_GetDimSize( self->feMesh );
    locMat = AllocArray( int**, Mesh_GetDomainSize( self->feMesh, nDims ) );
    for( ii = 0; ii < Mesh_GetDomainSize( self->feMesh, nDims ); ii++ )
       locMat[ii] = AllocArray2D( int, FeMesh_GetElementNodeSize( self->feMesh, 0 ), nDofs );
