@@ -67,7 +67,7 @@
 **	Just in case it causes problems with the lowestLocalEqNum 
 **	calculations.
 **
-** $Id: FeEquationNumber.h 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: FeEquationNumber.h 1066 2008-03-11 01:06:29Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -282,5 +282,6 @@
 	void _FeEquationNumber_BuildDestinationArray( FeEquationNumber* self );
 
 	void FeEquationNumber_BuildWithTopology( FeEquationNumber* self );
+	void FeEquationNumber_BuildWithDave( FeEquationNumber* self );
 
 #endif /* __StgFEM_Discretisation_EquationNumber_h__ */

@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeEquationNumber.c 1065 2008-03-10 06:59:37Z LukeHodkinson $
+** $Id: FeEquationNumber.c 1066 2008-03-11 01:06:29Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -502,12 +502,16 @@ void _FeEquationNumber_Build( void* feEquationNumber ) {
    Journal_DPrintf( self->debug, "In %s:\n",  __func__ );
    Stream_IndentBranch( StgFEM_Debug );
 
-#if 0
    /* If we have new mesh topology information, do this differently. */
+/*
    if( self->feMesh->topo->domains && self->feMesh->topo->domains[MT_VERTEX] ) {
-#endif
+*/
+   if( Mesh_HasExtension( self->feMesh, "vertexGrid" ) )
+      FeEquationNumber_BuildWithDave( self );
+   else
       FeEquationNumber_BuildWithTopology( self );
-#if 0
+
+/*
    }
    else {
       _FeEquationNumber_BuildRemappedNodeInfoTable( self );
@@ -515,7 +519,7 @@ void _FeEquationNumber_Build( void* feEquationNumber ) {
       _FeEquationNumber_CalculateGlobalUnconstrainedDofTotal( self );
       _FeEquationNumber_CalculateEqNumsDecomposition( self );
    }
-#endif
+*/
 
    if ( Stream_IsPrintableLevel( self->debug, 3 ) ) {
       FeEquationNumber_PrintDestinationArray( self, self->debug );
@@ -2574,6 +2578,7 @@ void FeEquationNumber_BuildWithDave( FeEquationNumber* self ) {
    MPI_Comm mpiComm;
    int nRanks, rank;
    Sync *sync;
+   Bool isCond;
    int ii, jj, kk;
 
    /* Setup an array containing global indices of all locally owned nodes. */
@@ -2590,7 +2595,8 @@ void FeEquationNumber_BuildWithDave( FeEquationNumber* self ) {
    for( ii = 0; ii < nLocals; ii++ ) {
       for( jj = 0; jj < nDofs; jj++ ) {
          varInd = self->dofLayout->varIndices[ii][jj];
-         if( !self->bcs || !VariableCondition_IsCondition( self->bcs, ii, varInd ) || !self->removeBCs )
+	 isCond = VariableCondition_IsCondition( self->bcs, ii, varInd );
+         if( !self->bcs || !isCond || !self->removeBCs )
             dstArray[ii][jj] = 0;
          else
             dstArray[ii][jj] = -1;
@@ -2610,28 +2616,10 @@ void FeEquationNumber_BuildWithDave( FeEquationNumber* self ) {
                               NULL, NULL, /* TODO: and these? */
                               dstArray[0], &nEqNums );
 
-   /* Allocate for location matrix. */
-   nDims = Mesh_GetDimSize( self->feMesh );
-   locMat = AllocArray( int**, Mesh_GetDomainSize( self->feMesh, nDims ) );
-   for( ii = 0; ii < Mesh_GetDomainSize( self->feMesh, nDims ); ii++ )
-      locMat[ii] = AllocArray2D( int, FeMesh_GetElementNodeSize( self->feMesh, 0 ), nDofs );
-
-   /* Fill in location matrix. */
-   inc = IArray_New();
-   FeMesh_GetElementNodes( self->feMesh, 0, inc );
-   elNodes = IArray_GetPtr( inc );
-   for( ii = 0; ii < Mesh_GetDomainSize( self->feMesh, nDims ); ii++ ) {
-      for( jj = 0; jj < FeMesh_GetElementNodeSize( self->feMesh, 0 ); jj++ ) {
-         for( kk = 0; kk < nDofs; kk++ )
-            locMat[ii][jj][kk] = dstArray[elNodes[jj]][kk];
-      }
-   }
-   NewClass_Delete( inc );
-
    /* Find the first and last owned equation numbers. */
    self->firstOwnedEqNum = -1;
    self->lastOwnedEqNum = 0;
-   for( ii = 0; ii < nEqNums; ii++ ) {
+   for( ii = 0; ii < nLocals * nDofs; ii++ ) {
       if( dstArray[0][ii] == -1 )
          continue;
       if( self->firstOwnedEqNum == -1 || dstArray[0][ii] < self->firstOwnedEqNum )
@@ -2646,12 +2634,30 @@ void FeEquationNumber_BuildWithDave( FeEquationNumber* self ) {
                    dstArray[0] + nLocals * nDofs, nDofs * sizeof(int),
                    nDofs * sizeof(int) );
 
+   /* Allocate for location matrix. */
+   nDims = Mesh_GetDimSize( self->feMesh );
+   locMat = AllocArray( int**, Mesh_GetDomainSize( self->feMesh, nDims ) );
+   for( ii = 0; ii < Mesh_GetDomainSize( self->feMesh, nDims ); ii++ )
+      locMat[ii] = AllocArray2D( int, FeMesh_GetElementNodeSize( self->feMesh, 0 ), nDofs );
+
+   /* Fill in location matrix. */
+   inc = IArray_New();
+   for( ii = 0; ii < Mesh_GetDomainSize( self->feMesh, nDims ); ii++ ) {
+      FeMesh_GetElementNodes( self->feMesh, ii, inc );
+      elNodes = IArray_GetPtr( inc );
+      for( jj = 0; jj < FeMesh_GetElementNodeSize( self->feMesh, 0 ); jj++ ) {
+         for( kk = 0; kk < nDofs; kk++ )
+            locMat[ii][jj][kk] = dstArray[elNodes[jj]][kk];
+      }
+   }
+   NewClass_Delete( inc );
+
    /* Fill in our other weird values. */
    self->destinationArray = dstArray;
    self->locationMatrix = locMat;
    self->locationMatrixBuilt = True;
    self->remappingActivated = False;
-   self->localEqNumsOwnedCount = nEqNums;
+   self->localEqNumsOwnedCount = self->lastOwnedEqNum - self->firstOwnedEqNum + 1;
    self->_lowestLocalEqNum = self->firstOwnedEqNum;
 
    /* Bcast global sum from highest rank. */
@@ -2752,6 +2758,7 @@ int GenerateEquationNumbering(
 	PetscInt spanx,spany,total;
 	PetscInt loc;
 	PetscReal max;
+	PetscInt n_inserts;
 	
 	
 	ierr = MPI_Comm_rank(PETSC_COMM_WORLD,&rank);CHKERRQ(ierr);
@@ -2849,16 +2856,20 @@ int GenerateEquationNumbering(
 	
 	/* Load existing eqnums in */
 	for( i=0; i<nlocal; i++ ) {
+		n_inserts = 0;
 		for( d=0; d<dof; d++ ) {
+/*
 			idx[d] = -(g_node_id[i]*dof + d);
 			val[d] = 0.0;
+*/
 			if( eqnums[ i*dof + d ] < 0.0 ) {
-				idx[d] = g_node_id[i]*dof + d;
-				val[d] = eqnums[ i*dof + d ];
+				idx[n_inserts] = g_node_id[i]*dof + d;
+				val[n_inserts] = eqnums[ i*dof + d ];
+				n_inserts++;
 			}
 		}
 		/* only insert dirichlet bc's */
-		VecSetValues( global_eqnum, dof, idx, val, INSERT_VALUES );
+		VecSetValues( global_eqnum, n_inserts, idx, val, INSERT_VALUES );
 	}
 	VecAssemblyBegin(global_eqnum);
 	VecAssemblyEnd(global_eqnum);
