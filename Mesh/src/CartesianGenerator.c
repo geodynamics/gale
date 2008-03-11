@@ -129,6 +129,7 @@ void _CartesianGenerator_Init( CartesianGenerator* self ) {
 
 	self->comm = NULL;
 	self->regular = True;
+	memset( self->periodic, 0, 3 * sizeof(Bool) );
 	self->maxDecompDims = 0;
 	self->minDecomp = NULL;
 	self->maxDecomp = NULL;
@@ -325,6 +326,14 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
 	/* Read regular flag. */
 	self->regular = Stg_ComponentFactory_GetBool( cf, self->name, "regular", True );
 
+	/* Read periodic flags. */
+	self->periodic[0] = Stg_ComponentFactory_GetBool( cf, self->name,
+							  "periodic_x", False );
+	self->periodic[1] = Stg_ComponentFactory_GetBool( cf, self->name,
+							  "periodic_y", False );
+	self->periodic[2] = Stg_ComponentFactory_GetBool( cf, self->name,
+							  "periodic_z", False );
+
 	/* Read a general dictionary flag for which processor to watch. */
 	stream = Journal_Register( Info_Type, self->type );
 	Stream_SetPrintingRank( stream, Dictionary_GetUnsignedInt_WithDefault( cf->rootDict, "rankToWatch", 0 ) );
@@ -367,6 +376,7 @@ void CartesianGenerator_Generate( void* meshGenerator, void* _mesh, void* data )
 	Mesh*			mesh = (Mesh*)_mesh;
 	Grid**			grid;
 	unsigned		*localRange, *localOrigin;
+	Bool			*periodic;
 	
 	/* Sanity check. */
 	assert( self );
@@ -432,6 +442,12 @@ void CartesianGenerator_Generate( void* meshGenerator, void* _mesh, void* data )
 	localRange = (unsigned*)ExtensionManager_Get( mesh->info, mesh, 
 						      ExtensionManager_GetHandle( mesh->info, "localRange" ) );
 	memcpy( localRange, self->range, Mesh_GetDimSize( mesh ) * sizeof(unsigned) );
+
+	ExtensionManager_AddArray( mesh->info, "periodic", sizeof(Bool), 3 );
+	periodic = (int*)ExtensionManager_Get(
+		mesh->info, mesh, ExtensionManager_GetHandle( mesh->info, "periodic" )
+		);
+	memcpy( periodic, self->periodic, 3 * sizeof(Bool) );
 
 	Stream_UnIndent( stream );
 }

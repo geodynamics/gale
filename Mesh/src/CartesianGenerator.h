@@ -81,6 +81,7 @@
 		/* CartesianGenerator info */							\
 		Comm*		comm;								\
 		Bool		regular;							\
+		Bool		periodic[3];							\
 		unsigned	maxDecompDims;							\
 		unsigned*	minDecomp;							\
 		unsigned*	maxDecomp;							\
