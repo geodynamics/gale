@@ -1,5 +1,6 @@
 import os, glob as pyglob, platform, pickle
 from SCons.Script.SConscript import SConsEnvironment
+import SCons.Sig
 
 #
 # Setup some basic path utilities.
@@ -32,13 +33,10 @@ def copy_file(env, dst, src):
     dst = env.norm_path(dst)
     old = os.getcwd()
     os.chdir(env.GetLaunchDir())
-    f = File(os.path.abspath(dst))
-    if hasattr(f, 'changed'): # Hack to make work with later versions.
-        check = f.is_up_to_date
-    else:
-        check = f.current
-    if not check():
-        src = env.norm_path(src)
+    src = env.norm_path(src)
+    src_sig = SCons.Sig.MD5.signature(File(os.path.abspath(src)))
+    dst_sig = SCons.Sig.MD5.signature(File(os.path.abspath(dst)))
+    if not os.path.exists(os.path.abspath(dst)) or src_sig != dst_sig:
         dst_dir = os.path.dirname(dst)
         if not os.path.exists(dst_dir):
             Execute(Mkdir(dst_dir))
