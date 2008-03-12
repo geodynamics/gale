@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StiffnessMatrix.c 976 2007-11-07 03:32:45Z DavidMay $
+** $Id: StiffnessMatrix.c 1071 2008-03-12 02:23:49Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -94,7 +94,7 @@ void* StiffnessMatrix_DefaultNew( Name name )
 		_StiffnessMatrix_Destroy,
 		name,
 		False,
-		_StiffnessMatrix_CalculateNonZeroEntries, 
+		StiffnessMatrix_CalcNonZeros,
 		NULL, 
 		NULL, 
 		NULL, 
@@ -133,7 +133,7 @@ StiffnessMatrix* StiffnessMatrix_New(
 		_StiffnessMatrix_Destroy,
 		name, 
 		True,
-		_StiffnessMatrix_CalculateNonZeroEntries,
+		StiffnessMatrix_CalcNonZeros,
 		rowVariable, 
 		columnVariable, 
 		rhs,
@@ -530,7 +530,7 @@ void _StiffnessMatrix_Build( void* stiffnessMatrix, void* data ) {
 	assert( self->colLocalSize );
 	
 	/* update the number of non zero entries from the finite element variables */
-	StiffnessMatrix_CalculateNonZeroEntries( self );
+	StiffnessMatrix_CalcNonZeros( self );
 	
 	Journal_DPrintf( self->debug, "row(%s) localSize = %d : col(%s) localSize = %d \n", self->rowVariable->name,
 			 self->rowLocalSize, self->columnVariable->name, self->colLocalSize );
@@ -627,21 +627,27 @@ void _StiffnessMatrix_CalculateNonZeroEntries( void* stiffnessMatrix ) {
 	}
 
 	for( rowNode_lI = 0; rowNode_lI < FeMesh_GetNodeLocalSize( rFeMesh ); rowNode_lI++ ) {
+/*
 		activeEqsAtCurrRowNodeCount = FeEquationNumber_CalculateActiveEqCountAtNode( rowEqNum, rowNode_lI,
 											     &lowestActiveEqNumAtCurrRowNode );
 
 		if ( activeEqsAtCurrRowNodeCount > 0 ) {
-			currMatrixRow = lowestActiveEqNumAtCurrRowNode - rowEqNum->firstOwnedEqNum;
+			currMatrixRow = *(int*)STreeMap_Map( rowEqNum->ownedMap,
+							     &lowestActiveEqNumAtCurrRowNode );
 			
 			if ( currMatrixRow >= rowEqNum->localEqNumsOwnedCount ) {
 				Journal_DPrintfL( self->debug, 1, "row node %d - eq nums not owned by this proc -> continue\n",
 						  rowNode_lI );
 				continue;
 			}
+*/
 			
-			_StiffnessMatrix_CalcAndUpdateNonZeroEntriesAtRowNode( self, rowNode_lI, currMatrixRow,
-									       activeEqsAtCurrRowNodeCount );
+			_StiffnessMatrix_CalcAndUpdateNonZeroEntriesAtRowNode( self, rowNode_lI,
+									       0 /*currMatrixRow*/,
+									       0 /*activeEqsAtCurrRowNodeCount*/ );
+/*
 		}
+*/
 	}
 
 #ifdef DEBUG
@@ -721,9 +727,7 @@ void _StiffnessMatrix_CalcAndUpdateNonZeroEntriesAtRowNode(
 				Journal_DPrintfL( self->debug, 3, "is a BC.\n" );
 			}
 			else {
-				if ( (currColEqNum >= colEqNum->firstOwnedEqNum ) && 
-				     (currColEqNum <= colEqNum->lastOwnedEqNum ) )
-				{
+				if( STreeMap_HasKey( colEqNum->ownedMap, &currColEqNum ) ) {
 					Journal_DPrintfL( self->debug, 3, "is diagonal (eq %d)\n", currColEqNum );
 					countTableToAdjust = self->diagonalNonZeroIndices;
 				}
@@ -734,8 +738,10 @@ void _StiffnessMatrix_CalcAndUpdateNonZeroEntriesAtRowNode(
 
 				for ( currNodeDof_I = 0; currNodeDof_I < self->rowVariable->dofLayout->dofCounts[rowNode_lI]; currNodeDof_I++) {
 					if ( -1 != rowEqNum->destinationArray[rowNode_lI][currNodeDof_I] ) {
-						currDofMatrixRow = rowEqNum->destinationArray[rowNode_lI][currNodeDof_I] -
-							rowEqNum->firstOwnedEqNum;
+						currDofMatrixRow = *(int*)STreeMap_Map(
+							rowEqNum->ownedMap,
+							rowEqNum->destinationArray[rowNode_lI] + currNodeDof_I );
+
 						/* Because of periodic BCs, the eq num may be lower than the normal
 						 * lowest held on this processor, so we need to check this */
 						if ( currDofMatrixRow >= self->rowLocalSize ) {	
@@ -1106,7 +1112,10 @@ void StiffnessMatrix_GlobalAssembly_General( void* stiffnessMatrix, Bool bcRemov
 
 			/* Loop over elementLM rows */
 			for( row_i = 0; row_i < nRows; row_i++ ) {
-				unsigned	rowEqInd = elementLM[ROW_VAR][0][row_i] - rowEqNum->firstOwnedEqNum;
+				unsigned	rowEqInd;
+
+				rowEqInd = *(int*)STreeMap_Map( rowEqNum->ownedMap,
+								elementLM[ROW_VAR][0] + row_i );
 
 				/* If row is bc */
 				if( IndexSet_IsMember( rowEqNum->bcEqNums, rowEqInd ) ) {
@@ -1115,7 +1124,10 @@ void StiffnessMatrix_GlobalAssembly_General( void* stiffnessMatrix, Bool bcRemov
 
 					/* Loop over elementLM cols */
 					for( col_i = 0; col_i < nCols; col_i++ ) {
-						unsigned	colEqInd = elementLM[COL_VAR][0][col_i] - colEqNum->firstOwnedEqNum;
+						unsigned	colEqInd;
+
+						colEqInd = *(int*)STreeMap_Map( colEqNum->ownedMap,
+										elementLM[COL_VAR][0] + col_i );
 
 						/* If col is bc */
 						if( IndexSet_IsMember( colEqNum->bcEqNums, colEqInd ) ) {
@@ -1202,8 +1214,10 @@ void StiffnessMatrix_GlobalAssembly_General( void* stiffnessMatrix, Bool bcRemov
 
 			for( dof_i = 0; dof_i < nDofs; dof_i++ ) {
 				unsigned	eqInd = colEqNum->destinationArray[node_i][dof_i];
+				int localEq;
 
-				if( IndexSet_IsMember( colEqNum->bcEqNums, eqInd - colEqNum->firstOwnedEqNum ) ) {
+				localEq = *(int*)STreeMap_Map( colEqNum->ownedMap, &eqInd );
+				if( IndexSet_IsMember( colEqNum->bcEqNums, localEq ) ) {
 					double	bcVal = DofLayout_GetValueDouble( dofLayout, node_i, dof_i );
 					double	one = 1.0;
 
@@ -2348,7 +2362,10 @@ void _StiffnessMatrix_UpdateBC_CorrectionTables(
 			   we'll need to determine if the VariableCondition has a value specified for this 
 			   node/dof. - Luke */
 			if( elementLM[node_elLocalI][dof_nodeLocalI] != (unsigned)-1 ) {
-				unsigned	lEqNum = elementLM[node_elLocalI][dof_nodeLocalI] - eqNum->_lowestLocalEqNum;
+				unsigned	lEqNum;
+
+				lEqNum = *(int*)STreeMap_Map( eqNum->ownedMap,
+							      elementLM[node_elLocalI] + dof_nodeLocalI );
 
 				if( eqNum->bcEqNums && IndexSet_IsMember( eqNum->bcEqNums, lEqNum ) ) {
 					isBC = True;
@@ -2689,10 +2706,9 @@ void StiffnessMatrix_RefreshMatrix( StiffnessMatrix* self ) {
 }
 
 
-#if 0
 void StiffnessMatrix_CalcNonZeros( void* stiffnessMatrix ) {
 	StiffnessMatrix*	self = (StiffnessMatrix*)stiffnessMatrix;
-	Stream*			stream;
+	Stream			*stream;
 	FeVariable		*rowVar, *colVar;
 	FeMesh			*rowMesh, *colMesh;
 	FeEquationNumber	*rowEqNum, *colEqNum;
@@ -2733,8 +2749,12 @@ void StiffnessMatrix_CalcNonZeros( void* stiffnessMatrix ) {
 	memset( nMaxNonZeros, 0, nRowEqs * sizeof(unsigned) );
 
 	for( e_i = 0; e_i < FeMesh_GetElementDomainSize( rowMesh ); e_i++ ) {
-		FeMesh_GetElementNodes( rowMesh, e_i, &nRowNodes, &rowNodes );
-		FeMesh_GetElementNodes( colMesh, e_i, &nColNodes, &colNodes );
+		FeMesh_GetElementNodes( rowMesh, e_i, self->rowInc );
+		FeMesh_GetElementNodes( colMesh, e_i, self->colInc );
+		nRowNodes = IArray_GetSize( self->rowInc );
+		rowNodes = IArray_GetPtr( self->rowInc );
+		nColNodes = IArray_GetSize( self->colInc );
+		colNodes = IArray_GetPtr( self->colInc );
 
 		for( n_i = 0; n_i < nRowNodes; n_i++ ) {
 			if( rowNodes[n_i] >= FeMesh_GetNodeLocalSize( rowMesh ) )
@@ -2747,11 +2767,15 @@ void StiffnessMatrix_CalcNonZeros( void* stiffnessMatrix ) {
 
 				for( n_j = 0; n_j < nColNodes; n_j++ ) {
 					for( dof_j = 0; dof_j < colDofs->dofCounts[colNodes[n_j]]; dof_j++ ) {
+						int localEq;
+
 						colEq = colEqNum->locationMatrix[e_i][n_j][dof_j];
 						if( colEq == (unsigned)-1 )
 							continue;
 
-						nMaxNonZeros[rowEq - rowEqNum->firstOwnedEqNum]++;
+						localEq = *(int*)STreeMap_Map( rowEqNum->ownedMap,
+									       &rowEq );
+						nMaxNonZeros[localEq]++;
 					}
 				}
 			}
@@ -2771,8 +2795,12 @@ void StiffnessMatrix_CalcNonZeros( void* stiffnessMatrix ) {
 	nonZeros = AllocArray2D( unsigned, nRowEqs, maxNZ );
 
 	for( e_i = 0; e_i < FeMesh_GetElementDomainSize( rowMesh ); e_i++ ) {
-		FeMesh_GetElementNodes( rowMesh, e_i, &nRowNodes, &rowNodes );
-		FeMesh_GetElementNodes( colMesh, e_i, &nColNodes, &colNodes );
+		FeMesh_GetElementNodes( rowMesh, e_i, self->rowInc );
+		FeMesh_GetElementNodes( colMesh, e_i, self->colInc );
+		nRowNodes = IArray_GetSize( self->rowInc );
+		rowNodes = IArray_GetPtr( self->rowInc );
+		nColNodes = IArray_GetSize( self->colInc );
+		colNodes = IArray_GetPtr( self->colInc );
 
 		for( n_i = 0; n_i < nRowNodes; n_i++ ) {
 			if( rowNodes[n_i] >= FeMesh_GetNodeLocalSize( rowMesh ) )
@@ -2785,11 +2813,15 @@ void StiffnessMatrix_CalcNonZeros( void* stiffnessMatrix ) {
 
 				for( n_j = 0; n_j < nColNodes; n_j++ ) {
 					for( dof_j = 0; dof_j < colDofs->dofCounts[colNodes[n_j]]; dof_j++ ) {
+						int localEq;
+
 						colEq = colEqNum->locationMatrix[e_i][n_j][dof_j];
 						if( colEq == (unsigned)-1 )
 							continue;
 
-						StiffnessMatrix_TrackUniqueEqs( self, rowEq - rowEqNum->firstOwnedEqNum, colEq, 
+						localEq = *(int*)STreeMap_Map( rowEqNum->ownedMap,
+									       &rowEq );
+						StiffnessMatrix_TrackUniqueEqs( self, localEq, colEq, 
 										nNonZeros, nonZeros );
 					}
 				}
@@ -2816,6 +2848,7 @@ void StiffnessMatrix_CalcNonZeros( void* stiffnessMatrix ) {
 
 	FreeArray( nNonZeros );
 	FreeArray( nonZeros );
+	
 
 	self->diagonalNonZeroIndices = nDiagNZs;
 	self->offDiagonalNonZeroIndices = nOffDiagNZs;
@@ -2845,7 +2878,6 @@ void StiffnessMatrix_TrackUniqueEqs( StiffnessMatrix* self, unsigned rowEq, unsi
 	nNonZeros[rowEq]++;
 	nonZeros[rowEq][nNonZeros[rowEq] - 1] = colEq;
 }
-#endif
 
 
 Bool StiffnessMatrix_ZeroBCsAsm_RowR( void* stiffMat, Assembler* assm ) {

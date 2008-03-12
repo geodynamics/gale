@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SolutionVector.c 964 2007-10-11 08:03:06Z SteveQuenette $
+** $Id: SolutionVector.c 1071 2008-03-12 02:23:49Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -398,14 +398,14 @@ void SolutionVector_UpdateSolutionOntoNodes( void* solutionVector ) {
 			if( currEqNum != -1 ) {
 				Journal_DPrintfL( self->debug, 3, "is unconstrained, eqNum %d:", currEqNum );
 
-				if ( (currEqNum >= eqNum->firstOwnedEqNum ) && (currEqNum <= eqNum->lastOwnedEqNum ) ) {
-					indexIntoLocalSolnVecValues = currEqNum - eqNum->firstOwnedEqNum;
+				if( STreeMap_HasKey( eqNum->ownedMap, &currEqNum ) ) {
+					indexIntoLocalSolnVecValues = *(int*)STreeMap_Map( eqNum->ownedMap, &currEqNum );
 					Journal_DPrintfL( self->debug, 3, "local -> just copying value %f\n",
 						localSolnVecValues[indexIntoLocalSolnVecValues] );
 					DofLayout_SetValueDouble( feVar->dofLayout, lNode_I, nodeLocalDof_I,
 						localSolnVecValues[indexIntoLocalSolnVecValues] );
-				}		
-				else {		
+				}
+				else {
 					RequestInfo*	requestInfo;
 					
 					Journal_DPrintfL( self->debug, 3, "nonlocal -> add to req list " );
@@ -648,7 +648,8 @@ void _SolutionVector_ShareValuesNotStoredLocally(
 			Journal_DPrintfL( self->debug, 3, "list to proc %d is: ", proc_I );
 			for ( req_I=0; req_I < reqFromMeCounts[proc_I]; req_I++ ) {
 				/* look up and fill in correct value in array */
-				indexIntoLocalSolnVecValues = reqFromMe[proc_I][req_I] - eqNum->firstOwnedEqNum;
+				indexIntoLocalSolnVecValues = *(int*)STreeMap_Map( eqNum->ownedMap,
+										   reqFromMe[proc_I] + req_I );
 				reqValuesFromMe[proc_I][req_I] = localSolnVecValues[indexIntoLocalSolnVecValues];
 				Journal_DPrintfL( self->debug, 3, "%d=%f, ", reqFromMe[proc_I][req_I],
 					reqValuesFromMe[proc_I][req_I] );
