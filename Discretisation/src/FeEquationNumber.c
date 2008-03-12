@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeEquationNumber.c 1072 2008-03-12 03:30:59Z LukeHodkinson $
+** $Id: FeEquationNumber.c 1073 2008-03-12 03:59:59Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -2951,21 +2951,17 @@ int GenerateEquationNumbering(
 	/* check */
 	spanx = NX;
 	spany = NY;
-/*
 	spanz = NZ;
-*/
 	if( periodic_x==PETSC_TRUE ) {
 		spanx--;
 	}
 	if( periodic_y==PETSC_TRUE ) {
 		spany--;
 	}
-/*
 	if( periodic_z==PETSC_TRUE ) {
 		spanz--;
 	}
-*/
-	total = spanx*spany/**spanz*/;
+	total = spanx*spany*spanz;
 	if( total!=global_eqnum_count ) {
 		SETERRQ(PETSC_ERR_SUP, "Something stinks. Computed global size for nodes does not match expected" );
 	}
@@ -3101,15 +3097,10 @@ int GenerateEquationNumbering(
 			PetscInt I,J,K,gid,from_gid;
 			
 			gid = periodic_x_gnode_id[i];
-			J = gid/NX;
-			I = gid - J*NX;
-			from_gid = (I-(NX-1)) + J*NX;
-/*
 			K = gid/(NX*NY);
 			J = (gid - K*(NX*NY))/NX;
 			I = gid - K*(NX*NY) - J*NX;
 			from_gid = (I-(NX-1)) + J*NX + K*(NX*NY);
-*/
 			
 			for( d=0; d<dof; d++ ) {
 				to[c] = gid * dof + d;
@@ -3160,15 +3151,10 @@ int GenerateEquationNumbering(
 			PetscInt I,J,K,gid,from_gid;
 			
 			gid = periodic_y_gnode_id[i];
-			J = gid/NX;
-			I = gid - J*NX;
-			from_gid = I + (J - (NY - 1))*NX;
-/*
 			K = gid/(NX*NY);
 			J = (gid - K*(NX*NY))/NX;
 			I = gid - K*(NX*NY) - J*NX;
 			from_gid = I + (J - (NY - 1))*NX + K*(NX*NY);
-*/
 			
 			for( d=0; d<dof; d++ ) {
 				to[c] = gid * dof + d;
@@ -3202,7 +3188,6 @@ int GenerateEquationNumbering(
 		PetscFree( to );
 	}
 
-/*
 	if( periodic_z==PETSC_TRUE ) {
 		VecScatter vscat_p;
 		IS is_from;
@@ -3255,7 +3240,6 @@ int GenerateEquationNumbering(
 		PetscFree( from );
 		PetscFree( to );
 	}
-*/
 
 	
 	/*
