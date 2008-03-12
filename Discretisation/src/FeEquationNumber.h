@@ -67,7 +67,7 @@
 **	Just in case it causes problems with the lowestLocalEqNum 
 **	calculations.
 **
-** $Id: FeEquationNumber.h 1066 2008-03-11 01:06:29Z LukeHodkinson $
+** $Id: FeEquationNumber.h 1070 2008-03-12 02:23:21Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -118,6 +118,7 @@
 		unsigned int				_eqNumsPerProcDivisor; \
 		unsigned int				_eqNumsRemainder; \
 		Dof_EquationNumber			_remNotAddedChangeover; \
+		STreeMap*				ownedMap; \
 		Dof_EquationNumber			firstOwnedEqNum; \
 		Dof_EquationNumber			lastOwnedEqNum; \
 		Dof_EquationNumber			localEqNumsOwnedCount; \
@@ -282,6 +283,7 @@
 	void _FeEquationNumber_BuildDestinationArray( FeEquationNumber* self );
 
 	void FeEquationNumber_BuildWithTopology( FeEquationNumber* self );
+	void FeEquationNumber_BuildRegular( FeEquationNumber* self );
 	void FeEquationNumber_BuildWithDave( FeEquationNumber* self );
 
 #endif /* __StgFEM_Discretisation_EquationNumber_h__ */

@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeEquationNumber.c 1069 2008-03-11 03:31:00Z LukeHodkinson $
+** $Id: FeEquationNumber.c 1070 2008-03-12 02:23:21Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -58,6 +58,10 @@
 #include <mpi.h>
 #include <petsc.h>
 #include <petscvec.h>
+
+int stgCmpInt( const void *l, const void *r ) {
+   return *(int*)l - *(int*)r;
+}
 
 /*###### Typedefs and Structs ######*/
 
@@ -138,6 +142,15 @@ Node_RemappedGlobalIndex _FeEquationNumber_RemapNode(
    Mesh* mesh, 
    Index newDimOrder[3],
    Node_GlobalIndex gNode_I );
+
+int GenerateEquationNumbering(
+		int NX, int NY, int NZ,
+		int nlocal, int g_node_id[],
+		int dof, int nglobal,
+		PetscTruth periodic_x, PetscTruth periodic_y, PetscTruth periodic_z,
+		int npx, int npy, int npz,
+		int periodic_x_gnode_id[], int periodic_y_gnode_id[], int periodic_z_gnode_id[],
+		int eqnums[], int *neqnums );
 
 /** Tests if the critical point from another processor is held by ours.
     Is complicated by the possibility of remapping. */
@@ -282,6 +295,9 @@ void _FeEquationNumber_Init(
    self->warning = Stream_RegisterChild( StgFEM_Warning, FeEquationNumber_Type );
    self->removeBCs = True;
    self->bcEqNums = NULL;
+   self->ownedMap = STreeMap_New();
+   STreeMap_SetItemSize( self->ownedMap, sizeof(int), sizeof(int) );
+   STree_SetIntCallbacks( self->ownedMap );
 }
 
 void _FeEquationNumber_Construct( void* feEquationNumber, Stg_ComponentFactory *cf, void* data ){
@@ -318,6 +334,8 @@ void _FeEquationNumber_Delete( void* feEquationNumber ) {
    if( self->bcEqNums ) {
       Stg_Class_Delete( self->bcEqNums );
    }
+
+   NewClass_Delete( self->ownedMap );
 	
    /* Stg_Class_Delete parent */
    _Stg_Class_Delete( self );
@@ -2303,6 +2321,7 @@ void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
    unsigned		highest;
    IArray*		inc;
    unsigned             e_i, n_i, dof_i, s_i;
+   int			ii;
 
    assert( self );
 
@@ -2476,6 +2495,13 @@ void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
    self->lastOwnedEqNum = subTotal - 1;
    self->_lowestLocalEqNum = self->firstOwnedEqNum;
 
+   /* Setup owned mapping. */
+   STree_Clear( self->ownedMap );
+   for( ii = self->firstOwnedEqNum; ii <= self->lastOwnedEqNum; ii++ ) {
+      int val = ii - self->firstOwnedEqNum;
+      STreeMap_Insert( self->ownedMap, &ii, &val );
+   }
+
    /* Bcast global sum from highest rank. */
    if( rank == nProcs - 1 )
       self->globalSumUnconstrainedDofs = self->lastOwnedEqNum + 1;
@@ -2583,7 +2609,14 @@ void FeEquationNumber_BuildWithDave( FeEquationNumber* self ) {
    int *periodicInds[3];
    int inds[3];
    Bool usePeriodic;
+   int *tmpArray, nLocalEqNums;
+   int lastOwnedEqNum;
    int ii, jj, kk;
+
+   comm = Mesh_GetCommTopology( self->feMesh, 0 );
+   mpiComm = Comm_GetMPIComm( comm );
+   MPI_Comm_size( mpiComm, &nRanks );
+   MPI_Comm_rank( mpiComm, &rank );
 
    /* Setup an array containing global indices of all locally owned nodes. */
    nLocals = Mesh_GetLocalSize( self->feMesh, 0 );
@@ -2638,13 +2671,24 @@ void FeEquationNumber_BuildWithDave( FeEquationNumber* self ) {
    }
 
    /* Call Dave's equation number generation routine. */
-   GenerateEquationNumbering( vGrid->sizes[0], vGrid->sizes[1],
-                              nLocals, locals,
-                              nDofs, Mesh_GetGlobalSize( self->feMesh, 0 ),
-                              periodic[0], periodic[1],
-                              nPeriodicInds[0], nPeriodicInds[1],
-			      periodicInds[0], periodicInds[1],
-                              dstArray[0], &nEqNums );
+   if( nDims == 2 ) {
+      GenerateEquationNumbering( vGrid->sizes[0], vGrid->sizes[1], 1,
+				 nLocals, locals,
+				 nDofs, Mesh_GetGlobalSize( self->feMesh, 0 ),
+				 periodic[0], periodic[1], False,
+				 nPeriodicInds[0], nPeriodicInds[1], 0,
+				 periodicInds[0], periodicInds[1], NULL,
+				 dstArray[0], &nEqNums );
+   }
+   else {
+      GenerateEquationNumbering( vGrid->sizes[0], vGrid->sizes[1], vGrid->sizes[2],
+				 nLocals, locals,
+				 nDofs, Mesh_GetGlobalSize( self->feMesh, 0 ),
+				 periodic[0], periodic[1], periodic[2],
+				 nPeriodicInds[0], nPeriodicInds[1], nPeriodicInds[2],
+				 periodicInds[0], periodicInds[1], periodicInds[2],
+				 dstArray[0], &nEqNums );
+   }
 
    /* Free periodic arrays. */
    for( ii = 0; ii < nDims; ii++ ) {
@@ -2652,16 +2696,36 @@ void FeEquationNumber_BuildWithDave( FeEquationNumber* self ) {
 	 FreeArray( periodicInds[ii] );
    }
 
-   /* Find the first and last owned equation numbers. */
-   self->firstOwnedEqNum = -1;
-   self->lastOwnedEqNum = 0;
-   for( ii = 0; ii < nLocals * nDofs; ii++ ) {
-      if( dstArray[0][ii] == -1 )
-         continue;
-      if( self->firstOwnedEqNum == -1 || dstArray[0][ii] < self->firstOwnedEqNum )
-         self->firstOwnedEqNum = dstArray[0][ii];
-      if( dstArray[0][ii] > self->lastOwnedEqNum )
-         self->lastOwnedEqNum = dstArray[0][ii];
+   /* Setup owned mapping. */
+   tmpArray = AllocArray( int, nLocals * nDofs );
+   memcpy( tmpArray, dstArray[0], nLocals * nDofs * sizeof(int) );
+   qsort( tmpArray, nLocals * nDofs, sizeof(int), stgCmpInt );
+   STree_Clear( self->ownedMap );
+   for( nLocalEqNums = 0, ii = 0; ii < nLocals * nDofs; ii++ ) {
+      if( tmpArray[ii] != -1 ) {
+	 if( !nLocalEqNums )
+	    self->_lowestLocalEqNum = tmpArray[ii];
+	 STreeMap_Insert( self->ownedMap, tmpArray + ii, &nLocalEqNums );
+	 printf( "%d: %d\n", rank, tmpArray[ii] );
+	 nLocalEqNums++;
+      }
+   }
+   lastOwnedEqNum = -1; /* Don't need this anymore. */
+   FreeArray( tmpArray );
+
+   /* Setup owned mapping part 2. */
+   for( ii = 0; ii < nLocals; ii++ ) {
+      Grid_Lift( vGrid, locals[ii], inds );
+      for( jj = 0; jj < nDims; jj++ ) {
+	 if( periodic[jj] && inds[jj] == vGrid->sizes[jj] - 1 )
+	    break;
+      }
+      if( jj == nDims ) continue;
+      for( jj = 0; jj < nDofs; jj++ ) {
+	 if( dstArray[ii][jj] == -1 ) continue;
+	 STree_Remove( self->ownedMap, dstArray[ii] + jj );
+	 nLocalEqNums--;
+      }
    }
 
    /* Transfer remote equation numbers. */
@@ -2692,23 +2756,21 @@ void FeEquationNumber_BuildWithDave( FeEquationNumber* self ) {
    self->locationMatrix = locMat;
    self->locationMatrixBuilt = True;
    self->remappingActivated = False;
-   self->localEqNumsOwnedCount = self->lastOwnedEqNum - self->firstOwnedEqNum + 1;
-   self->_lowestLocalEqNum = self->firstOwnedEqNum;
+   self->localEqNumsOwnedCount = nLocalEqNums;
 
    /* Bcast global sum from highest rank. */
-   comm = Mesh_GetCommTopology( self->feMesh, 0 );
-   mpiComm = Comm_GetMPIComm( comm );
-   MPI_Comm_size( mpiComm, &nRanks );
-   MPI_Comm_rank( mpiComm, &rank );
-   if( rank == nRanks - 1 )
-      self->globalSumUnconstrainedDofs = self->lastOwnedEqNum + 1;
-   MPI_Bcast( &self->globalSumUnconstrainedDofs, 1, MPI_UNSIGNED, nRanks - 1, mpiComm );
+   self->globalSumUnconstrainedDofs = nEqNums;
 
    /* Construct lowest global equation number list. */
    self->_lowestGlobalEqNums = AllocArray( int, nRanks );
-   MPI_Allgather( &self->firstOwnedEqNum, 1, MPI_UNSIGNED, 
+   MPI_Allgather( &self->_lowestLocalEqNum, 1, MPI_UNSIGNED, 
                   self->_lowestGlobalEqNums, 1, MPI_UNSIGNED,
                   mpiComm );
+
+   FreeArray( locals );
+
+   printf( "%d: localEqNumsOwned = %d\n", rank, self->localEqNumsOwnedCount );
+   printf( "%d: globalSumUnconstrainedDofs = %d\n", rank, self->globalSumUnconstrainedDofs );
 }
 
 
@@ -2761,12 +2823,12 @@ PetscErrorCode _VecScatterBeginEnd( VecScatter vscat, Vec FROM, Vec TO, InsertMo
 }
 
 int GenerateEquationNumbering(
-		int NX, int NY,
+		int NX, int NY, int NZ,
 		int nlocal, int g_node_id[],
 		int dof, int nglobal,
-		PetscTruth periodic_x, PetscTruth periodic_y,
-		int npx, int npy,
-		int periodic_x_gnode_id[], int periodic_y_gnode_id[],
+		PetscTruth periodic_x, PetscTruth periodic_y, PetscTruth periodic_z,
+		int npx, int npy, int npz,
+		int periodic_x_gnode_id[], int periodic_y_gnode_id[], int periodic_z_gnode_id[],
 		int eqnums[], int *neqnums )
 {
 	PetscErrorCode ierr;
@@ -2790,7 +2852,7 @@ int GenerateEquationNumbering(
 	Vec seq_offset_list;
 	PetscInt offset, inc;
 	
-	PetscInt spanx,spany,total;
+	PetscInt spanx,spany,spanz,total;
 	PetscInt loc;
 	PetscReal max;
 	PetscInt n_inserts;
@@ -2829,6 +2891,11 @@ int GenerateEquationNumbering(
 	if (periodic_y_gnode_id!=NULL) {
 		for( i=0; i<npy; i++ ) {
 			VecSetValue( g_ownership, periodic_y_gnode_id[i], periodic_mask, INSERT_VALUES );
+		}
+	}
+	if (periodic_z_gnode_id!=NULL) {
+		for( i=0; i<npz; i++ ) {
+			VecSetValue( g_ownership, periodic_z_gnode_id[i], periodic_mask, INSERT_VALUES );
 		}
 	}
 	VecAssemblyBegin(g_ownership);
@@ -2871,13 +2938,21 @@ int GenerateEquationNumbering(
 	/* check */
 	spanx = NX;
 	spany = NY;
+/*
+	spanz = NZ;
+*/
 	if( periodic_x==PETSC_TRUE ) {
 		spanx--;
 	}
 	if( periodic_y==PETSC_TRUE ) {
 		spany--;
 	}
-	total = spanx*spany;
+/*
+	if( periodic_z==PETSC_TRUE ) {
+		spanz--;
+	}
+*/
+	total = spanx*spany/**spanz*/;
 	if( total!=global_eqnum_count ) {
 		SETERRQ(PETSC_ERR_SUP, "Something stinks. Computed global size for nodes does not match expected" );
 	}
@@ -3010,12 +3085,18 @@ int GenerateEquationNumbering(
 		
 		c = 0;
 		for( i=0; i<npx; i++ ) {
-			PetscInt I,J,gid,from_gid;
+			PetscInt I,J,K,gid,from_gid;
 			
 			gid = periodic_x_gnode_id[i];
 			J = gid/NX;
 			I = gid - J*NX;
-			from_gid = (I-(NX-1)) + J * NX;
+			from_gid = (I-(NX-1)) + J*NX;
+/*
+			K = gid/(NX*NY);
+			J = (gid - K*(NX*NY))/NX;
+			I = gid - K*(NX*NY) - J*NX;
+			from_gid = (I-(NX-1)) + J*NX + K*(NX*NY);
+*/
 			
 			for( d=0; d<dof; d++ ) {
 				to[c] = gid * dof + d;
@@ -3063,12 +3144,18 @@ int GenerateEquationNumbering(
 		
 		c = 0;
 		for( i=0; i<npy; i++ ) {
-			PetscInt I,J,gid,from_gid;
+			PetscInt I,J,K,gid,from_gid;
 			
 			gid = periodic_y_gnode_id[i];
 			J = gid/NX;
 			I = gid - J*NX;
-			from_gid = I + (J-(NY-1)) * NX;
+			from_gid = I + (J - (NY - 1))*NX;
+/*
+			K = gid/(NX*NY);
+			J = (gid - K*(NX*NY))/NX;
+			I = gid - K*(NX*NY) - J*NX;
+			from_gid = I + (J - (NY - 1))*NX + K*(NX*NY);
+*/
 			
 			for( d=0; d<dof; d++ ) {
 				to[c] = gid * dof + d;
@@ -3101,6 +3188,62 @@ int GenerateEquationNumbering(
 		PetscFree( from );
 		PetscFree( to );
 	}
+
+/*
+	if( periodic_z==PETSC_TRUE ) {
+		VecScatter vscat_p;
+		IS is_from;
+		PetscInt *from, *to;
+		Vec mapped;
+		PetscScalar *_mapped;
+		PetscInt c;
+		
+		PetscMalloc( sizeof(PetscInt)*npz*dof, &from );
+		PetscMalloc( sizeof(PetscInt)*npz*dof, &to );
+		
+		c = 0;
+		for( i=0; i<npz; i++ ) {
+			PetscInt I,J,K,gid,from_gid;
+			
+			gid = periodic_z_gnode_id[i];
+			K = gid/(NX*NY);
+			J = (gid - K*(NX*NY))/NX;
+			I = gid - K*(NX*NY) - J*NX;
+			from_gid = I + (J - (NY - 1))*NX + (K - (NZ-1))*(NX*NY);
+			
+			for( d=0; d<dof; d++ ) {
+				to[c] = gid * dof + d;
+				from[c] = from_gid * dof + d;
+				c++;
+			}
+		}
+		
+		
+		VecCreate( PETSC_COMM_SELF, &mapped );
+		VecSetSizes( mapped, PETSC_DECIDE, npz*dof );
+		VecSetFromOptions( mapped );
+		
+		ISCreateGeneralWithArray( PETSC_COMM_SELF, npz*dof, from, &is_from );
+		VecScatterCreate( global_eqnum, is_from, mapped, PETSC_NULL, &vscat_p );
+		
+		_VecScatterBeginEnd( vscat_p, global_eqnum, mapped, INSERT_VALUES, SCATTER_FORWARD );
+		if( npz>0 ) {
+			VecGetArray( mapped, &_mapped );
+			VecSetValues( global_eqnum, npz*dof, to, _mapped,  INSERT_VALUES );
+			VecRestoreArray( mapped, &_mapped );
+		}
+		
+		VecAssemblyBegin(global_eqnum);
+		VecAssemblyEnd(global_eqnum);
+		
+		VecScatterDestroy( vscat_p );
+		ISDestroy( is_from );
+		VecDestroy( mapped );
+		PetscFree( from );
+		PetscFree( to );
+	}
+*/
+
 	
 	/*
 	PetscPrintf(PETSC_COMM_WORLD, "global_eqnum following periodic \n");
