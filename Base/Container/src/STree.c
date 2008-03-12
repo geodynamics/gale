@@ -311,9 +311,8 @@ void STreeNode_Insert( STreeNode *self, STreeNode *node, STree *tree, STreeNode 
 
    assert( tree->cmp );
    res = tree->cmp( node->data, self->data );
-   assert( res );
    tree->curDepth++;
-   child = (res < 0) ? &self->left : &self->right;
+   child = (res < 0 || !res) ? &self->left : &self->right;
    if ( *child )
       STreeNode_Insert( *child, node, tree, child );
    else {
