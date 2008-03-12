@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeEquationNumber.c 1070 2008-03-12 02:23:21Z LukeHodkinson $
+** $Id: FeEquationNumber.c 1072 2008-03-12 03:30:59Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -2610,7 +2610,8 @@ void FeEquationNumber_BuildWithDave( FeEquationNumber* self ) {
    int inds[3];
    Bool usePeriodic;
    int *tmpArray, nLocalEqNums;
-   int lastOwnedEqNum;
+   int lastOwnedEqNum, ind;
+   STree *doneSet;
    int ii, jj, kk;
 
    comm = Mesh_GetCommTopology( self->feMesh, 0 );
@@ -2696,37 +2697,49 @@ void FeEquationNumber_BuildWithDave( FeEquationNumber* self ) {
 	 FreeArray( periodicInds[ii] );
    }
 
+   /* Setup owned mapping part 1. */
+   STree_Clear( self->ownedMap );
+   for( ii = 0; ii < nLocals; ii++ ) {
+      Grid_Lift( vGrid, locals[ii], inds );
+      for( jj = 0; jj < nDims; jj++ ) {
+	 if( periodic[jj] && inds[jj] == vGrid->sizes[jj] - 1 ) {
+            inds[jj] = 0;
+            ind = Grid_Project( vGrid, inds );
+            if( !FeMesh_NodeGlobalToDomain( self->feMesh, ind, &ind ) )
+               break;
+         }
+      }
+      if( jj < nDims ) continue;
+      for( jj = 0; jj < nDofs; jj++ ) {
+	 if( dstArray[ii][jj] == -1 || STreeMap_HasKey( self->ownedMap, dstArray[ii] + jj ) )
+            continue;
+	 STreeMap_Insert( self->ownedMap, dstArray[ii] + jj, &ii );
+      }
+   }
+
    /* Setup owned mapping. */
    tmpArray = AllocArray( int, nLocals * nDofs );
    memcpy( tmpArray, dstArray[0], nLocals * nDofs * sizeof(int) );
    qsort( tmpArray, nLocals * nDofs, sizeof(int), stgCmpInt );
-   STree_Clear( self->ownedMap );
+   doneSet = STree_New();
+   STree_SetItemSize( doneSet, sizeof(int) );
+   STree_SetIntCallbacks( doneSet );
    for( nLocalEqNums = 0, ii = 0; ii < nLocals * nDofs; ii++ ) {
-      if( tmpArray[ii] != -1 ) {
+      if( tmpArray[ii] != -1 &&
+          STreeMap_HasKey( self->ownedMap, tmpArray + ii ) &&
+          !STree_Has( doneSet, tmpArray + ii ) )
+      {
 	 if( !nLocalEqNums )
 	    self->_lowestLocalEqNum = tmpArray[ii];
-	 STreeMap_Insert( self->ownedMap, tmpArray + ii, &nLocalEqNums );
-	 printf( "%d: %d\n", rank, tmpArray[ii] );
+	 *(int*)STreeMap_Map( self->ownedMap, tmpArray + ii ) = nLocalEqNums;
+         STree_Insert( doneSet, tmpArray + ii );
+	 printf( "%d: %d = %d\n", rank, tmpArray[ii], nLocalEqNums );
 	 nLocalEqNums++;
       }
    }
    lastOwnedEqNum = -1; /* Don't need this anymore. */
    FreeArray( tmpArray );
-
-   /* Setup owned mapping part 2. */
-   for( ii = 0; ii < nLocals; ii++ ) {
-      Grid_Lift( vGrid, locals[ii], inds );
-      for( jj = 0; jj < nDims; jj++ ) {
-	 if( periodic[jj] && inds[jj] == vGrid->sizes[jj] - 1 )
-	    break;
-      }
-      if( jj == nDims ) continue;
-      for( jj = 0; jj < nDofs; jj++ ) {
-	 if( dstArray[ii][jj] == -1 ) continue;
-	 STree_Remove( self->ownedMap, dstArray[ii] + jj );
-	 nLocalEqNums--;
-      }
-   }
+   NewClass_Delete( doneSet );
 
    /* Transfer remote equation numbers. */
    sync = Mesh_GetSync( self->feMesh, 0 );

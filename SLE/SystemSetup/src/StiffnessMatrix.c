@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StiffnessMatrix.c 1071 2008-03-12 02:23:49Z LukeHodkinson $
+** $Id: StiffnessMatrix.c 1072 2008-03-12 03:30:59Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -2762,7 +2762,7 @@ void StiffnessMatrix_CalcNonZeros( void* stiffnessMatrix ) {
 
 			for( dof_i = 0; dof_i < rowDofs->dofCounts[rowNodes[n_i]]; dof_i++ ) {
 				rowEq = rowEqNum->locationMatrix[e_i][n_i][dof_i];
-				if( rowEq == (unsigned)-1 )
+				if( rowEq == (unsigned)-1 || !STreeMap_HasKey( rowEqNum->ownedMap, &rowEq ) )
 					continue;
 
 				for( n_j = 0; n_j < nColNodes; n_j++ ) {
@@ -2808,7 +2808,7 @@ void StiffnessMatrix_CalcNonZeros( void* stiffnessMatrix ) {
 
 			for( dof_i = 0; dof_i < rowDofs->dofCounts[rowNodes[n_i]]; dof_i++ ) {
 				rowEq = rowEqNum->locationMatrix[e_i][n_i][dof_i];
-				if( rowEq == (unsigned)-1 )
+				if( rowEq == (unsigned)-1 || !STreeMap_HasKey( rowEqNum->ownedMap, &rowEq ) )
 					continue;
 
 				for( n_j = 0; n_j < nColNodes; n_j++ ) {
