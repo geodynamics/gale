@@ -22,3 +22,4 @@ includes = ${PROJECT}/${modName}
 packages = PICELLERATOR STGFEM STGDOMAIN STGERMAIN PETSC MPI XML PYTHON
 
 include ${PROJ_ROOT}/Makefile.vmake
+
