@@ -84,6 +84,11 @@ def configure_packages(env, options=None, output='config.cfg'):
         vars += options.keys()
     env.save_config(output, vars)
 
+    # Print out build message.
+    print '\n*****************************************'
+    print "* Now run 'scons' to build the project. *"
+    print '*****************************************\n'
+
 SConsEnvironment.Package = Package
 SConsEnvironment.configure_packages = configure_packages
 SConsEnvironment.save_config = save_config
