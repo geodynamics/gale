@@ -57,6 +57,7 @@ class CompilerFlags(SConfig.Package):
         result = self.run_scons_cmd(self.ctx.TryCompile, '', '.c')
         self.pop_state(old)
         if result[0] and (result[1].find('not recognized') != -1 or
-                          result[1].find('not recognised') != -1):
+                          result[1].find('not recognised') != -1 or
+                          result[1].find('unknown option') != -1):
             result[0] = 0
         return [result[0], result[1], '']
