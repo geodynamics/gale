@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeEquationNumber.c 1073 2008-03-12 03:59:59Z LukeHodkinson $
+** $Id: FeEquationNumber.c 1077 2008-03-13 07:10:51Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -3207,7 +3207,7 @@ int GenerateEquationNumbering(
 			K = gid/(NX*NY);
 			J = (gid - K*(NX*NY))/NX;
 			I = gid - K*(NX*NY) - J*NX;
-			from_gid = I + (J - (NY - 1))*NX + (K - (NZ-1))*(NX*NY);
+			from_gid = I + J*NX + (K - (NZ-1))*(NX*NY);
 			
 			for( d=0; d<dof; d++ ) {
 				to[c] = gid * dof + d;
