@@ -254,9 +254,15 @@ void _lucCarbonWindow_ExecuteInteractive( void* carbonWindow, void* data ) {
 		}
 
 		/* Broadcast information about loop */
-		MPI_Bcast( &self->quitEventLoop,     1, MPI_INT, MASTER, context->communicator );
-		MPI_Bcast( &self->interactive,       1, MPI_INT, MASTER, context->communicator );
-		MPI_Bcast( &self->windowIsVisible,   1, MPI_INT, MASTER, context->communicator );
+		MPI_Bcast( &self->quitEventLoop,        1, MPI_INT, MASTER, context->communicator );
+		MPI_Bcast( &self->interactive,          1, MPI_INT, MASTER, context->communicator );
+		MPI_Bcast( &self->windowIsVisible,      1, MPI_INT, MASTER, context->communicator );
+		MPI_Bcast( &self->hackNonInteractive,   1, MPI_INT, MASTER, context->communicator );
+
+		if (self->hackNonInteractive) {
+			lucCarbonWindow_Draw(self);
+			break;
+		}
 
 		if (self->windowIsVisible) {
 			lucCarbonWindow_Draw(self);
@@ -385,18 +391,23 @@ void lucCarbonWindow_CreateInteractiveWindow( void* carbonWindow, void* data ) {
 	thandler = NewEventLoopTimerUPP((void (*)(EventLoopTimerRef, void *)) lucCarbonWindow_IdleFunc );
 	InstallEventLoopTimer(GetMainEventLoop(), 0, 0, thandler, 0, &timer);
 
-	GetCurrentProcess(&psn);
-	/* this is a secret undocumented Mac function that allows code that isn't part of a bundle to be a foreground operation */
-	CPSEnableForegroundOperation( &psn ); 
-	SetFrontProcess( &psn );
+	/* This hack with the 'if' condition is to make the CarbonWindowing code not crash if it starts with an interactive window then starts to use a non-interactive window - if it was originally interactive it must continue to use the same windowing code, but we will just arrange so that it doesn't show up for the user */
+	if ( ! self->hackNonInteractive ) {
+		GetCurrentProcess(&psn);
+		/* this is a secret undocumented Mac function that allows code that isn't part of a bundle to be a foreground operation */
+		CPSEnableForegroundOperation( &psn ); 
+		SetFrontProcess( &psn );
 
-	/* Window operations - Not all of these are nessesary */
-	DrawGrowIcon(window);
-	ShowWindow(window);
-	SetUserFocusWindow( window );
-	BringToFront( window );
-	ActivateWindow( window, true );
-	SelectWindow(window);
+		/* Window operations - Not all of these are nessesary */
+		DrawGrowIcon(window);
+		ShowWindow(window);
+		SetUserFocusWindow( window );
+		BringToFront( window );
+		ActivateWindow( window, true );
+		SelectWindow(window);
+
+		lucWindow_InteractionHelpMessage( self, Journal_MyStream( Info_Type, self ) );
+	}
 
 	/* Create the OpenGL context and bind it to the window.  */
 	format = aglChoosePixelFormat(NULL, 0, attributes);
@@ -411,9 +422,6 @@ void lucCarbonWindow_CreateInteractiveWindow( void* carbonWindow, void* data ) {
 	self->timerHandler = thandler;
 	self->handler = handler;
 	self->window = window;
-	
-	lucWindow_InteractionHelpMessage( self, Journal_MyStream( Info_Type, self ) );
-
 }
 
 /* Steps taken from http://gemma.apple.com/documentation/GraphicsImaging/Conceptual/OpenGL-MacProgGuide/OpenGLProg_MacOSX.pdf */
@@ -470,11 +478,15 @@ void lucCarbonWindow_DestroyWindow( void* carbonWindow, void* data ) {
 	lucCarbonWindow*        self      = (lucCarbonWindow*) carbonWindow; 
 
 	if ( self->windowIsInteractive ) {
-		aglDestroyContext( self->graphicsContext );
 		RemoveEventLoopTimer( self->timer );
 		DisposeEventLoopTimerUPP( self->timerHandler ); 
 		DisposeEventHandlerUPP( self->handler ); 
 		DisposeWindow( self->window );
+
+		aglSetDrawable( self->graphicsContext, 0 );
+		aglSetCurrentContext( 0 );
+		aglDestroyContext( self->graphicsContext );
+		self->graphicsContext = NULL;
 	}
 	else {
 		CGLContextObj contextObj = (CGLContextObj) self->graphicsContext;
@@ -551,6 +563,12 @@ static pascal OSStatus lucCarbonWindow_EventHandler(EventHandlerCallRef nextHand
 			lucCarbonWindow_GetPixelIndicies( self, &point, &xPos, &yPos );
 
 			lucWindow_KeyboardEvent( self, key, xPos, yPos );
+			/* HACK */
+			if ( key == 'i' ) {
+				self->interactive = true;
+				self->hackNonInteractive = true;
+				self->quitEventLoop = true;
+			}
 		}
 	}
 	else if ( eventClass == kEventClassMouse ) { 

@@ -66,6 +66,7 @@
 		int                                                fontSize;                 \
 		/* Stuff for interactive windows */ \
 		Bool                                               windowIsInteractive;      \
+		Bool                                               hackNonInteractive;       \
 		void*                                              handler;                  \
 		void*                                              timerHandler;             \
 		void*                                              timer;                    \
