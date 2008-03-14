@@ -13,6 +13,17 @@ else:
 if 'CC' in env['ENV']:
     env['CC'] = env['ENV']['CC']
 
+# Need to modify building shared libraries when on Mac OS X.
+if platform.system() == 'Darwin':
+    env.AppendUnique(SHLINKFLAGS=['-flat_namespace',
+                                  '-single_module',
+                                  '-undefined', 'suppress'])
+    import SCons.Util # And fix RPATHs.
+    env['LINKFLAGS'] = SCons.Util.CLVar('')
+    env['RPATHPREFIX'] = ''
+    env['RPATHSUFFIX'] = ''
+    env['_RPATH'] = ''
+
 # Configuring or building? Or helping?
 if 'config' in COMMAND_LINE_TARGETS or 'help' in COMMAND_LINE_TARGETS:
     import packages
@@ -39,15 +50,6 @@ else:
     else:
         env.library_builder = env.SharedLibrary
     env.Default(env['buildPath']) # Needed for different build paths.
-    if platform.system() == 'Darwin': # Need to modify building shared libraries when on Mac OS X.
-        env.AppendUnique(SHLINKFLAGS=['-flat_namespace',
-                                      '-single_module',
-                                      '-undefined', 'suppress'])
-        import SCons.Util # And fix RPATHs.
-        env['LINKFLAGS'] = SCons.Util.CLVar('')
-        env['RPATHPREFIX'] = ''
-        env['RPATHSUFFIX'] = ''
-        env['_RPATH'] = ''
 
     # Specify targets.
     SConscript('StGermain/SConscript', exports='env')
