@@ -57,6 +57,11 @@ def force_required(pkg):
 def configure_packages(env, options=None, output='config.cfg'):
     sconf = Configure(env, custom_tests={'CheckPackages': CheckPackages})
 
+    # Get rid of the temporary directory to make sure we're building
+    # from scratch.
+    if os.path.exists('.sconsign.dblite'):
+        os.remove('.sconsign.dblite')
+
     # Add dependencies needed for shared libraries.
     for pkg in env.package_list:
         if pkg.require_shared:
