@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: X11Window.c 740 2007-10-11 08:05:31Z SteveQuenette $
+** $Id: X11Window.c 762 2008-03-14 05:25:56Z RobertTurnbull $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
  
@@ -262,7 +262,7 @@ Bool lucX11Window_EventLoop( void* window, AbstractContext* context) {
 				XNextEvent(dpy, &event);
 				switch (event.type) {
 					case ConfigureNotify:
-						//Reshape( windowingContextExt, event.xconfigure.width, event.xconfigure.height);
+						lucWindow_Resize( self, event.xconfigure.width, event.xconfigure.height);
 						/* fall through... */
 					case Expose:
 						lucWindow_SetViewportNeedsToDrawFlag( self, True );
