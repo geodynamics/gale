@@ -354,7 +354,7 @@ void GaussParticleLayout_GetAbscissaAndWeights1D( double* weight, double* abscis
 			abscissa[1]  = - sqrt( 245.0 - 14.0 * sqrt( 70.0 ) )/21.0;
 			abscissa[2]  = 0.0;
 			abscissa[3]  = - abscissa[1];
-			abscissa[4]  = - abscissa[2];
+			abscissa[4]  = - abscissa[0];
 
 			weight[0] = ( 322.0 - 13.0 * sqrt( 70.0 ) )/900.0;
 			weight[1] = ( 322.0 + 13.0 * sqrt( 70.0 ) )/900.0;
