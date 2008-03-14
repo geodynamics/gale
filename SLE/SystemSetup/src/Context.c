@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Context.c 1020 2008-02-06 22:46:09Z BelindaMay $
+** $Id: Context.c 1078 2008-03-14 03:02:17Z BelindaMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -55,6 +55,8 @@
 #include <string.h>
 #include "SystemLinearEquations.h"
 #include "SolutionVector.h"
+
+#define FINISHED_WRITING_TAG 9
 
 /* Textual name of this class */
 const Type FiniteElementContext_Type = "FiniteElementContext";
@@ -514,25 +516,26 @@ void _FiniteElementContext_SaveMesh( void* context ) {
 	FeVariable*     	feVar = NULL;
 	Mesh* 			mesh;
 	unsigned 		nDims;
-	Stream*         	stream = Journal_Register( MPIStream_Type, "Context" );
 	Stream*         	info = Journal_Register( Info_Type, "Context" );
 	char			meshSaveFileName[256];
 	unsigned		n_i, d_i;
 	Sync*			sync;
-	int myRank, size, i;
+	int 			myRank, nProcs, i;
+	FILE*			outputFile;
+	int                	confirmation = 0;
+	MPI_Status         	status;
 
 	Journal_Printf( info, "In %s(): about to save the mesh to disk:\n", __func__ );
 
 	MPI_Comm_rank( MPI_COMM_WORLD, &myRank);
-	MPI_Comm_size( MPI_COMM_WORLD, &size );	
+	MPI_Comm_size( MPI_COMM_WORLD, &nProcs );	
 
 	if ( strlen(self->checkPointPrefixString) > 0 ) {
-		sprintf( meshSaveFileName, "%s/%s.%s.%05d.dat", self->checkpointPath,
-			self->checkPointPrefixString, "Mesh", self->timeStep );
+		sprintf( meshSaveFileName, "%s/%s.Mesh.%05d.dat", self->checkpointPath,
+			self->checkPointPrefixString, self->timeStep );
 	}
 	else {
-		sprintf( meshSaveFileName, "%s/%s.%05d.dat", self->checkpointPath,
-			"Mesh", self->timeStep );
+		sprintf( meshSaveFileName, "%s/Mesh.%05d.dat", self->checkpointPath, self->timeStep );
 	}
 
 	fieldVar = FieldVariable_Register_GetByIndex( self->fieldVariable_Register, 0 );
@@ -543,27 +546,46 @@ void _FiniteElementContext_SaveMesh( void* context ) {
 	
 		nDims = Mesh_GetDimSize( mesh );
 
-		Stream_RedirectFile( stream, meshSaveFileName );	
-		_MPIStream_Write( stream, mesh->minGlobalCrd, nDims * sizeof( double ), 1 );
-		_MPIStream_Write( stream, mesh->maxGlobalCrd, nDims * sizeof( double ), 1 );
+		/* wait for go-ahead from process ranked lower than me, to avoid competition writing to file */
+		if ( myRank != 0 ) {
+			MPI_Recv( &confirmation, 1, MPI_INT, myRank - 1, FINISHED_WRITING_TAG, MPI_COMM_WORLD, &status );
+		}
+
+		if ( myRank == 0 ) {
+			outputFile = fopen( meshSaveFileName, "w" );
+		
+			fprintf( outputFile, "Min: " );
+			for( i=0; i<nDims; i++ ) {
+				fprintf( outputFile, "%.15g ", mesh->minGlobalCrd[i] );
+			}
+			fprintf( outputFile, "\nMax: " );
+			for( i=0; i<nDims; i++ ) {
+				fprintf( outputFile, "%.15g ", mesh->maxGlobalCrd[i] );
+			}
+			fprintf( outputFile, "\n" );
+		}
+		else {
+			outputFile = fopen( meshSaveFileName, "a" );
+		}
 
 		sync = (Sync*)IGraph_GetDomain( (IGraph*)mesh->topo, 0 );
 
-		for( i=0; i<size; i++ ) {
-			if( myRank == i ) {
-				for( n_i = 0; n_i < Sync_GetNumDomains( sync ); n_i++ ) {
-					double*		vert;
+		for( n_i = 0; n_i < Sync_GetNumDomains( sync ); n_i++ ) {
+			double*		vert;
 
-					vert = Mesh_GetVertex( mesh, n_i );
+			vert = Mesh_GetVertex( mesh, n_i );
 
-					for( d_i = 0; d_i < mesh->topo->nDims; d_i++ ) {
-						_MPIStream_Write( stream, &vert[d_i], sizeof( double ), 1 );
-					}
-				}
+			for( d_i = 0; d_i < mesh->topo->nDims; d_i++ ) {
+				fprintf( outputFile, "%.15g ", vert[d_i] );
 			}
-			MPI_Barrier( MPI_COMM_WORLD );
-		}			
-		Stream_CloseFile( stream );
+			fprintf( outputFile, "\n" );
+		}
+		fprintf( outputFile, "\n" );
+		fclose( outputFile );
+		
+		if ( myRank != nProcs - 1 ) {
+			MPI_Ssend( &confirmation, 1, MPI_INT, myRank + 1, FINISHED_WRITING_TAG, MPI_COMM_WORLD );
+		}
 	}
 	
 	Journal_Printf( info, "%s: saving of mesh completed.\n", __func__ );
