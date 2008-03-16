@@ -46,12 +46,26 @@
 	extern const Type FileParticleLayout_Type;
 	
 	/* FileParticleLayout information */
+#ifdef HAVE_HDF5
+	#define __FileParticleLayout \
+		__GlobalParticleLayout \
+		\
+		Name                                             filename;    \
+		FILE*                                            file;        \
+		Stream*                                          errorStream; \
+		hid_t fileData; \
+		hid_t fileSpace; \
+		hid_t memSpace; \
+		hsize_t start[2]; \
+		hsize_t count[2];
+#else
 	#define __FileParticleLayout \
 		__GlobalParticleLayout \
 		\
 		Name                                             filename;    \
 		FILE*                                            file;        \
 		Stream*                                          errorStream;
+#endif
 
 	struct FileParticleLayout { __FileParticleLayout };
 	

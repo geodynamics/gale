@@ -45,6 +45,10 @@
 #include <assert.h>
 #include <string.h>
 
+#ifdef HAVE_HDF5
+#include <hdf5.h>
+#endif
+
 const Type SwarmDump_Type = "SwarmDump";
 
 
@@ -277,11 +281,14 @@ void _SwarmDump_Execute( void* swarmDump, void* data ) {
 			MPI_Barrier( swarm->comm );
 		}
 
+#ifdef HAVE_HDF5
+		SwarmDump_DumpToHDF5( self, swarm, filename );
+#else
 		Stream_RedirectFile( stream, filename );
-
 		MPIStream_WriteAllProcessors( stream, swarm->particles, particleSize, (SizeT) particleLocalCount, swarm->comm );
-
 		Stream_CloseFile( stream );
+#endif
+
 		Memory_Free( filename );
 	}
 	Stream_UnIndent( info );
@@ -297,3 +304,48 @@ void SwarmDump_Execute( void* swarmDump, void* context ) {
 
 	self->_execute( self, context );
 }
+
+#ifdef HAVE_HDF5
+void SwarmDump_DumpToHDF5( SwarmDump* self, Swarm* swarm, const char* filename ) {
+   hid_t file, fileSpace, fileData;
+   hid_t props;
+   hsize_t size[2];
+   int intSize[2];
+
+   /* Open the HDF5 output file. */
+   file = H5Fcreate( filename, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT );
+   assert( file );
+
+   /* Dump the size so we don't have to do any divisions later on. */
+   size[0] = (hsize_t)2;
+   fileSpace = H5Screate_simple( 1, size, NULL );
+   fileData = H5Dcreate( file, "/size", H5T_NATIVE_INT, fileSpace, H5P_DEFAULT );
+   intSize[0] = swarm->particleLocalCount;
+   intSize[1] = swarm->particleExtensionMgr->finalSize;
+   H5Dwrite( fileData, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, intSize );
+   H5Dclose( fileData );
+   H5Sclose( fileSpace );
+
+   /* Set our data chunk size so we can compress each chunk individually. */
+   size[0] = (swarm->particleLocalCount > 10000) ? 10000 : swarm->particleLocalCount;
+   size[1] = (hsize_t)swarm->particleExtensionMgr->finalSize;
+   props = H5Pcreate( H5P_DATASET_CREATE );
+   H5Pset_chunk( props, 2, size );
+   H5Pset_deflate( props, 6 ); /* Turn on compression. */
+
+   /* Create our output space and data objects. */
+   size[0] = swarm->particleLocalCount;
+   fileSpace = H5Screate_simple( 2, size, NULL );
+   fileData = H5Dcreate( file, "/data", H5T_NATIVE_CHAR, fileSpace, props );
+   H5Sselect_all( fileSpace ); /* Set the file to recieve everything. */
+
+   /* Dump all data. */
+   H5Dwrite( fileData, H5T_NATIVE_CHAR, H5S_ALL, H5S_ALL, H5P_DEFAULT, swarm->particles );
+
+   /* Close off all our handles. */
+   H5Dclose( fileData );
+   H5Sclose( fileSpace );
+   H5Pclose( props );
+   H5Fclose( file );
+}
+#endif

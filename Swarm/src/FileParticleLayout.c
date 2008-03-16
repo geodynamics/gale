@@ -28,6 +28,10 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+#ifdef HAVE_HDF5
+#include <hdf5.h>
+#endif
+
 #include <mpi.h>
 #include <StGermain/StGermain.h>
 
@@ -213,6 +217,8 @@ void _FileParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm ) 
 	MPI_Offset                 bytesCount;
 	SizeT                      particleSize = swarm->particleExtensionMgr->finalSize;
 	div_t                      division;
+	hid_t file, fileData;
+	int size[2];
 
 	Journal_DPrintf( self->debug, "In %s(): for ParticleLayout \"%s\", of type %s\n",
 		__func__, self->name, self->type );
@@ -221,6 +227,20 @@ void _FileParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm ) 
 	Journal_DPrintf( self->debug, "Finding number of bytes in checkpoint file \"%s\":\n",
 		self->filename );
 
+#ifdef HAVE_HDF5
+	/* Read in data size. */
+	file = H5Fopen( filename, H5F_ACC_RDONLY, H5P_DEFAULT );
+	fileData = H5Dopen( file, "/size" );
+	H5Dread( fileData, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, size );
+	H5Dclose( fileData );
+	H5Fclose( file );
+
+	/* Make sure paricle sizes are the same. */
+	assert( size[1] == swarm->particleExtensionMgr->finalSize );
+
+	/* Store number of particles. */
+	self->totalInitialParticles = size[0];
+#else
 	openResult = MPI_File_open( swarm->comm, filename, MPI_MODE_RDONLY, MPI_INFO_NULL, &mpiFile );
 
 	Journal_Firewall( 
@@ -257,6 +277,7 @@ void _FileParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm ) 
 		bytesCount, 
 		(unsigned int)particleSize, 
 		division.rem ); 
+#endif
 
 	Journal_DPrintf( self->debug, "calling parent func to set cell counts:\n", bytesCount );
 	_GlobalParticleLayout_SetInitialCounts( self, swarm );
@@ -268,7 +289,34 @@ void _FileParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm ) 
 
 void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm ) {
 	FileParticleLayout*        self             = (FileParticleLayout*)particleLayout;
-	
+	Swarm *swarm = (Swarm*)_swarm;
+#ifdef HAVE_HDF5
+	hid_t file;
+	hsize_t size[2];
+
+	/* Open the file and data set. */
+	file = H5Fopen( self->filename, H5F_ACC_RDONLY, H5P_DEFAULT );
+	self->fileData = H5Dopen( file, "/data" );
+	self->fileSpace = H5Dget_space( self->fileData );
+
+	/* Need a memory space for extracting to. */
+	size[0] = 1;
+	size[1] = swarm->particleExtensionMgr->finalSize;
+	self->memSpace = H5Screate_simple( 1, size + 1, NULL );
+	H5Sselect_all( self->memSpace );
+
+	/* Prepare a hyperslab for extracting file data one particle at a time. */
+	self->start[0] = 0; self->start[1] = 0;
+	self->count[0] = 1; self->count[1] = size[1];
+	H5Sselect_hyperslab( self->fileSpace, H5S_SELECT_SET, self->start, NULL, self->count, NULL );
+
+	_GlobalParticleLayout_InitialiseParticles( self, _swarm );
+
+	H5Sclose( self->memSpace );
+	H5Sclose( self->fileSpace );
+	H5Dclose( self->fileData );
+	H5Fclose( file );
+#else
 	self->file = fopen( self->filename, "rb" );
 	Journal_Firewall( 
 		self->file != NULL, 
@@ -283,6 +331,7 @@ void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm
 	
 	fclose( self->file );
 	self->file = NULL;
+#endif
 }	
 	
 void _FileParticleLayout_InitialiseParticle( 
@@ -296,6 +345,15 @@ void _FileParticleLayout_InitialiseParticle(
 	SizeT                      particleSize     = swarm->particleExtensionMgr->finalSize;
 	int                        result;
 
+#ifdef HAVE_HDF5
+	/* Update the hyperslab. */
+	self->start[0] = newParticle_I;
+	H5Sselect_hyperslab( self->fileSpace, H5S_SELECT_SET, self->start, NULL, self->count, NULL );
+
+	/* Read particle data. */
+	H5Dread( self->fileData, H5T_NATIVE_CHAR, self->memSpace,
+		 self->fileSpace, H5P_DEFAULT, particle );
+#else
 	result = fread( particle, particleSize, 1, self->file );
 
 	Journal_Firewall( 
@@ -307,6 +365,7 @@ void _FileParticleLayout_InitialiseParticle(
 		self->type, 
 		self->name, 
 		newParticle_I );
+#endif
 }
 		
 

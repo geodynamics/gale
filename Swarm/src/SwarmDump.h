@@ -101,5 +101,8 @@
 
 	/** Virtual Function Wrappers */
 	void SwarmDump_Execute( void* swarmDump, void* context ) ;
+#ifdef HAVE_HDF5
+	void SwarmDump_DumpToHDF5( SwarmDump* self, Swarm* swarm, const char* filename );
+#endif
 
 #endif /* __Domain_Swarm_SwarmDump_h__ */

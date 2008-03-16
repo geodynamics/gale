@@ -41,7 +41,11 @@
 
 #ifndef __Domain_Swarm_h__
 #define __Domain_Swarm_h__
-	
+
+#ifdef HAVE_HDF5
+#include <hdf5.h>
+#endif
+
 	#include "types.h"
 	#include "shortcuts.h"
 
