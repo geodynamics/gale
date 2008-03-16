@@ -217,8 +217,10 @@ void _FileParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm ) 
 	MPI_Offset                 bytesCount;
 	SizeT                      particleSize = swarm->particleExtensionMgr->finalSize;
 	div_t                      division;
+#ifdef HAVE_HDF5
 	hid_t file, fileData;
 	int size[2];
+#endif
 
 	Journal_DPrintf( self->debug, "In %s(): for ParticleLayout \"%s\", of type %s\n",
 		__func__, self->name, self->type );
