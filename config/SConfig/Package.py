@@ -244,7 +244,8 @@ class Package(object):
         # Validate the headers, first.
         result = self.validate_location(location)
         if not result[0]:
-            return result
+            #return result
+            pass
 
         # Construct our path state.
         path_state = self.build_header_state(location)

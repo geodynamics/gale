@@ -12,7 +12,7 @@ class stgUnderworld(SConfig.Package):
         self.dependency(SConfig.packages.SVNRevision)
         self.dependency(SConfig.packages.BlasLapack)
         self.dependency(SConfig.packages.PETSc)
-        self.dependency(SConfig.packages.HDF5, False)
+        self.dependency(SConfig.packages.HDF5, False).require_shared = True
         if self.env['with_glucifer']:
             self.dependency(SConfig.packages.OpenGL)
             self.dependency(SConfig.packages.OSMesa, False)

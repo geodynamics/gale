@@ -28,7 +28,7 @@ class PETSc(SConfig.Package):
         # Get the architecture.
         arch = self.get_petsc_arch(location[0])
         if not arch:
-            return (0, '', 'Could not read architecture from petscconf.')
+            return [0, '', 'Could not read architecture from petscconf.']
         self.arch = arch
 
         # Add the bmake/arch include directory.
