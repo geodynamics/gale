@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: ShapeTemperatureIC.c 610 2007-10-11 08:09:29Z SteveQuenette $
+** $Id: ShapeTemperatureIC.c 682 2008-03-17 03:01:22Z JulianGiordani $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -50,6 +50,7 @@
 #include <PICellerator/PICellerator.h>
 #include <Underworld/Underworld.h>
 
+#include <string.h>
 #include <assert.h>
 
 const Type Underworld_ShapeTemperatureIC_Type = "Underworld_ShapeTemperatureIC";
@@ -81,6 +82,50 @@ void Underworld_ShapeTemperatureICFunction( Node_LocalIndex node_lI, Variable_In
 		*result = 0.0;
 }
 
+void Underworld_GaussianIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	UnderworldContext*      context            = (UnderworldContext*)_context;
+	Dictionary*             dictionary         = context->dictionary;
+	FeMesh*			mesh               = NULL;
+	double*                 result             = (double*) _result;
+	Stg_Shape*              shape;
+	Name                    shapeName;
+	double*                 coord;
+	double                  disVec[3];
+	double                  amplitude, width;
+	double                  rSq;
+	
+	mesh       = context->temperatureField->feMesh;
+
+	amplitude = Dictionary_GetDouble_WithDefault( dictionary, "GaussianIC-Amplitude", 1.0 );
+	width = Dictionary_GetDouble_WithDefault( dictionary, "GaussianIC-Width", 1e-2 );
+
+	shapeName = Dictionary_GetString( dictionary, "temperatureICShape" );
+	shape = (Stg_Shape*) LiveComponentRegister_Get( context->CF->LCRegister, shapeName );
+	assert( shape );
+	Journal_Firewall( !strcmp(shape->type, "Sphere") || !strcmp(shape->type, "Cylinder"),
+			Journal_Register( Error_Type, Underworld_ShapeTemperatureIC_Type ),
+			"Error in %s: You're applying the GaussianIC to a shape of type %s, which can't be done."
+			" It can only work on Sphere\' or \'Cylinder\' shapes\n", __func__,  shape->type );
+	/* Find coordinate of node */
+	coord = Mesh_GetVertex( mesh, node_lI );
+
+	if( !strcmp(shape->type, "Sphere") ) {
+		_Sphere_DistanceFromCenterAxis( shape, coord, disVec );
+
+		rSq = disVec[0]*disVec[0]+disVec[1]*disVec[1];
+		*result = amplitude * exp( -1 * rSq / (2 * width) );
+	} 
+	else if(  !strcmp(shape->type, "Cylinder") )  {
+		_Cylinder_DistanceFromCenterAxis( shape, coord, disVec );
+
+		rSq = disVec[0]*disVec[0]+disVec[1]*disVec[1];
+		if( shape->dim == 3 ) rSq += disVec[2]*disVec[2];
+
+		*result = amplitude * exp( -1 * rSq / (2 * width) );
+	}
+
+}
+
 void _Underworld_ShapeTemperatureIC_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
 	ConditionFunction*      condFunc;
 	UnderworldContext*      context;
@@ -88,6 +133,7 @@ void _Underworld_ShapeTemperatureIC_Construct( void* component, Stg_ComponentFac
 	context = (UnderworldContext*)Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
 	
 	condFunc = ConditionFunction_New( Underworld_ShapeTemperatureICFunction, "ShapeTemperatureIC" );
+	condFunc = ConditionFunction_New( Underworld_GaussianIC, "GaussianIC" );
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 }
 
