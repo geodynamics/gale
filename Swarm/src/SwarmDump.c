@@ -308,44 +308,71 @@ void SwarmDump_Execute( void* swarmDump, void* context ) {
 #ifdef HAVE_HDF5
 void SwarmDump_DumpToHDF5( SwarmDump* self, Swarm* swarm, const char* filename ) {
    hid_t file, fileSpace, fileData;
+   hid_t memSpace;
    hid_t props;
    hsize_t size[2];
    int intSize[2];
+   int rank, nRanks, offset;
+   hsize_t start[2], count[2];
+
+   /* Create parallel file property list. */
+   props = H5Pcreate( H5P_FILE_ACCESS );
+   H5Pset_fapl_mpio( props, MPI_COMM_WORLD, MPI_INFO_NULL );
 
    /* Open the HDF5 output file. */
-   file = H5Fcreate( filename, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT );
+   file = H5Fcreate( filename, H5F_ACC_TRUNC, H5P_DEFAULT, props );
    assert( file );
+   H5Pclose( props );
 
    /* Dump the size so we don't have to do any divisions later on. */
    size[0] = (hsize_t)2;
    fileSpace = H5Screate_simple( 1, size, NULL );
-   fileData = H5Dcreate( file, "/size", H5T_NATIVE_INT, fileSpace, H5P_DEFAULT );
-   intSize[0] = swarm->particleLocalCount;
+   fileData = H5Dcreate( file, "/size", H5T_NATIVE_INT, fileSpace,
+                         H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+   MPI_Allreduce( &swarm->particleLocalCount, intSize, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD );
    intSize[1] = swarm->particleExtensionMgr->finalSize;
-   H5Dwrite( fileData, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, intSize );
+   props = H5Pcreate( H5P_DATASET_XFER );
+   H5Pset_dxpl_mpio( props, H5FD_MPIO_COLLECTIVE );
+   H5Dwrite( fileData, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, props, intSize );
+   H5Pclose( props );
    H5Dclose( fileData );
    H5Sclose( fileSpace );
 
-   /* Set our data chunk size so we can compress each chunk individually. */
-   size[0] = (swarm->particleLocalCount > 10000) ? 10000 : swarm->particleLocalCount;
-   size[1] = (hsize_t)swarm->particleExtensionMgr->finalSize;
-   props = H5Pcreate( H5P_DATASET_CREATE );
-   H5Pset_chunk( props, 2, size );
-   H5Pset_deflate( props, 6 ); /* Turn on compression. */
-
    /* Create our output space and data objects. */
-   size[0] = swarm->particleLocalCount;
+   size[0] = intSize[0];
+   size[1] = intSize[1];
    fileSpace = H5Screate_simple( 2, size, NULL );
-   fileData = H5Dcreate( file, "/data", H5T_NATIVE_CHAR, fileSpace, props );
-   H5Sselect_all( fileSpace ); /* Set the file to recieve everything. */
+   fileData = H5Dcreate( file, "/data", H5T_NATIVE_CHAR, fileSpace,
+                         H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
 
-   /* Dump all data. */
-   H5Dwrite( fileData, H5T_NATIVE_CHAR, H5S_ALL, H5S_ALL, H5P_DEFAULT, swarm->particles );
+   /* Calculate our file offset. */
+   MPI_Comm_rank( MPI_COMM_WORLD, &rank );
+   MPI_Comm_size( MPI_COMM_WORLD, &nRanks );
+   offset = 0;
+   if( rank > 0 ) {
+      MPI_Status status;
+      MPI_Recv( &offset, 1, MPI_INT, rank - 1, 455, MPI_COMM_WORLD, &status );
+   }
+   start[0] = offset;                    start[1] = 0;
+   count[0] = swarm->particleLocalCount; count[1] = intSize[1];
+   offset += swarm->particleLocalCount;
+   if( rank < nRanks - 1 )
+      MPI_Send( &offset, 1, MPI_INT, rank + 1, 455, MPI_COMM_WORLD );
+
+   /* Create our memory space. */
+   memSpace = H5Screate_simple( 2, count, NULL );
+
+   /* Dump our local data. */
+   H5Sselect_hyperslab( fileSpace, H5S_SELECT_SET, start, NULL, count, NULL );
+   H5Sselect_all( memSpace );
+   props = H5Pcreate( H5P_DATASET_XFER );
+   H5Pset_dxpl_mpio( props, H5FD_MPIO_INDEPENDENT );
+   H5Dwrite( fileData, H5T_NATIVE_CHAR, memSpace, fileSpace, props, swarm->particles );
+   H5Pclose( props );
 
    /* Close off all our handles. */
    H5Dclose( fileData );
    H5Sclose( fileSpace );
-   H5Pclose( props );
    H5Fclose( file );
 }
 #endif
