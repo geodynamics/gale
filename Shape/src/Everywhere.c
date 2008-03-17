@@ -78,6 +78,7 @@ Everywhere* _Everywhere_New(
 		Stg_Component_DestroyFunction*        _destroy,		
 		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
 		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
+		Stg_Shape_DistanceFromCenterAxisFunction*     _distanceFromCenterAxis,
 		Name                                  name )
 {
 	Everywhere* self;
@@ -98,12 +99,14 @@ Everywhere* _Everywhere_New(
 			_destroy,		
 			_isCoordInside,
 			_calculateVolume,
+			_distanceFromCenterAxis,
 			name );
 	
 	/* General info */
 
 	/* Virtual Info */
 	self->_isCoordInside = _isCoordInside;
+	self->_distanceFromCenterAxis = _distanceFromCenterAxis;
 	
 	return self;
 }
@@ -169,6 +172,7 @@ void* _Everywhere_DefaultNew( Name name ) {
 			_Everywhere_Destroy,
 			_Everywhere_IsCoordInside,
 			_Everywhere_CalculateVolume,
+			_Everywhere_DistanceFromCenterAxis,
 			name );
 }
 
@@ -212,6 +216,12 @@ Bool _Everywhere_IsCoordInside( void* everywhere, Coord coord ) {
 double _Everywhere_CalculateVolume( void* everywhere ) {
 	return 1.0;
 }	
+void _Everywhere_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec ){
+	Stg_Shape* self = (Stg_Shape*)shape;
+	Journal_Firewall( False, Journal_Register( Error_Type, self->type ),
+	"Error in function %s: This functions hasn't been implemented.", 
+	"Please inform uderworld-dev@vpac.org you've received this error.\n", __func__ );
+}
 
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Private Functions

@@ -86,6 +86,7 @@ ConvexHull* _ConvexHull_New(
 		Stg_Component_DestroyFunction*        _destroy,		
 		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
 		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
+		Stg_Shape_DistanceFromCenterAxisFunction*     _distanceFromCenterAxis,
 		Name                                  name )
 {
 	ConvexHull* self;
@@ -106,6 +107,7 @@ ConvexHull* _ConvexHull_New(
 			_destroy,		
 			_isCoordInside,
 			_calculateVolume,
+			_distanceFromCenterAxis,
 			name );
 	
 	/* General info */
@@ -253,6 +255,7 @@ void* _ConvexHull_DefaultNew( Name name ) {
 			_ConvexHull_Destroy,
 			_ConvexHull_IsCoordInside,
 			_ConvexHull_CalculateVolume,
+			_ConvecHull_DistanceFromCenterAxis,
 			name );
 }
 
@@ -353,6 +356,12 @@ Bool _ConvexHull_IsCoordInside( void* convexHull, Coord point ) {
 double _ConvexHull_CalculateVolume( void* convexHull ) {
 	assert( 0 );
 	return 0.0;
+}
+void _ConvecHull_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec ) {
+	Stg_Shape* self = (Stg_Shape*)shape;
+	Journal_Firewall( False, Journal_Register( Error_Type, self->type ),
+	"Error in function %s: This functions hasn't been implemented.", 
+	"Please inform uderworld-dev@vpac.org you've received this error.\n", __func__ );
 }
 
 

@@ -84,6 +84,7 @@ Sphere* _Sphere_New(
 		Stg_Component_DestroyFunction*        _destroy,		
 		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
 		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
+		Stg_Shape_DistanceFromCenterAxisFunction*     _distanceFromCenterAxis,
 		Name                                  name )
 {
 	Sphere* self;
@@ -104,12 +105,15 @@ Sphere* _Sphere_New(
 			_destroy,		
 			_isCoordInside ,
 			_calculateVolume,
+			_distanceFromCenterAxis,
 			name );
 	
 	/* General info */
 
 	/* Virtual Info */
 	self->_isCoordInside = _isCoordInside;
+	self->_calculateVolume = _calculateVolume;
+	self->_distanceFromCenterAxis = _distanceFromCenterAxis;
 	
 	return self;
 }
@@ -184,6 +188,7 @@ void* _Sphere_DefaultNew( Name name ) {
 			_Sphere_Destroy,
 			_Sphere_IsCoordInside,
 			_Sphere_CalculateVolume,
+			_Sphere_DistanceFromCenterAxis,
 			name );
 }
 
@@ -250,6 +255,20 @@ Bool _Sphere_IsCoordInside( void* sphere, Coord coord ) {
 	return (insideOutsideValue <= self->radiusSquared);
 	
 }
+
+void _Sphere_DistanceFromCenterAxis( void* sphere, Coord coord, double* disVec ) {
+	Sphere*         self              = (Sphere*)sphere;
+	Coord           newCoord;
+
+	/* Transform coordinate into canonical reference frame */
+	Stg_Shape_TransformCoord( self, coord, newCoord );
+
+	disVec[0] = newCoord[ I_AXIS ];
+	disVec[1] = newCoord[ J_AXIS ];
+	if( self->dim == 3 )
+		disVec[2] = newCoord[ K_AXIS ];
+}
+	
 
 double _Sphere_CalculateVolume( void* sphere ) {
 	Sphere* self = sphere;

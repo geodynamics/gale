@@ -83,6 +83,7 @@
 		Stg_Component_DestroyFunction*        _destroy,		
 		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
 		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
+		Stg_Shape_DistanceFromCenterAxisFunction*     _distanceFromCenterAxis,
 		Name                                  name );
 	
 	void _Superellipsoid_Init( void* superellipsoid, double epsilon1, double epsilon2, XYZ radius ) ;
@@ -115,6 +116,7 @@
 	
 	Bool _Superellipsoid_IsCoordInside( void* superellipsoid, Coord coord ) ;
 	double _Superellipsoid_CalculateVolume( void* superellipsoid );
+	void _Superellipsoid_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec );
 
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Public member functions

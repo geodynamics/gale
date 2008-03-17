@@ -84,6 +84,7 @@
 		Stg_Component_DestroyFunction*        _destroy,		
 		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
 		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
+		Stg_Shape_DistanceFromCenterAxisFunction*   _distanceFromCenterAxis,
 		Name                                  name );
 	
 	void _Cylinder_Init( Cylinder* self, double radius, XYZ start, XYZ end, Axis perpendicularAxis ) ;
@@ -116,6 +117,7 @@
 	void _Cylinder_Destroy( void* cylinder, void* data ) ;
 	
 	Bool _Cylinder_IsCoordInside( void* cylinder, Coord coord ) ;
+	void _Cylinder_DistanceFromCenterAxis( void* cylinder, Coord coord, double* disVec );
 	double _Cylinder_CalculateVolume( void* cylinder );
 
 	/*---------------------------------------------------------------------------------------------------------------------

@@ -80,6 +80,7 @@
 		Stg_Component_DestroyFunction*        _destroy,		
 		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
 		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
+		Stg_Shape_DistanceFromCenterAxisFunction*     _distanceFromCenterAxis,
 		Name                                  name );
 	
 	void _Sphere_Init( void* sphere, double radius ) ;
@@ -109,6 +110,7 @@
 	void _Sphere_Destroy( void* sphere, void* data ) ;
 	
 	Bool _Sphere_IsCoordInside( void* sphere, Coord coord ) ;
+	void _Sphere_DistanceFromCenterAxis( void* sphere, Coord coord, double* disVec );
 	double _Sphere_CalculateVolume( void* sphere );
 
 	/*---------------------------------------------------------------------------------------------------------------------

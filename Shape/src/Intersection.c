@@ -88,6 +88,7 @@ Intersection* _Intersection_New(
 		Stg_Component_DestroyFunction*        _destroy,		
 		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
 		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
+		Stg_Shape_DistanceFromCenterAxisFunction*   _distanceFromCenterAxis,
 		Name                                  name )
 {
 	Intersection* self;
@@ -108,12 +109,14 @@ Intersection* _Intersection_New(
 			_destroy,		
 			_isCoordInside ,
 			_calculateVolume,
+			_distanceFromCenterAxis,
 			name );
 	
 	/* General info */
 
 	/* Virtual Info */
 	self->_isCoordInside = _isCoordInside;
+	self->_distanceFromCenterAxis = _distanceFromCenterAxis;
 	
 	return self;
 }
@@ -207,6 +210,7 @@ void* _Intersection_DefaultNew( Name name ) {
 			_Intersection_Destroy,
 			_Intersection_IsCoordInside,
 			_Intersection_CalculateVolume,
+			_Intersection_DistanceFromCenterAxis,
 			name );
 }
 
@@ -317,6 +321,12 @@ Bool _Intersection_IsCoordInside( void* intersection, Coord coord ) {
 double _Intersection_CalculateVolume( void* intersection ) {
 	assert( 0 /* not impossible as long as you have other shapes with volum */ );
 	return 0.0;
+}
+void _Intersection_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec ){
+	Stg_Shape* self = (Stg_Shape*)shape;
+	Journal_Firewall( False, Journal_Register( Error_Type, self->type ),
+	"Error in function %s: This functions hasn't been implemented.", 
+	"Please inform uderworld-dev@vpac.org you've received this error.\n", __func__ );
 }
 	
 

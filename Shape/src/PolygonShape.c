@@ -91,6 +91,7 @@ PolygonShape* _PolygonShape_New(
 		Stg_Component_DestroyFunction*        _destroy,		
 		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
 		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
+		Stg_Shape_DistanceFromCenterAxisFunction*     _distanceFromCenterAxis,
 		Name                                  name )
 {
 	PolygonShape* self;
@@ -111,12 +112,14 @@ PolygonShape* _PolygonShape_New(
 			_destroy,		
 			_isCoordInside ,
 			_calculateVolume,
+			_distanceFromCenterAxis,
 			name );
 	
 	/* General info */
 
 	/* Virtual Info */
 	self->_isCoordInside = _isCoordInside;
+	self->_distanceFromCenterAxis = _distanceFromCenterAxis;
 	
 	return self;
 }
@@ -209,6 +212,7 @@ void* _PolygonShape_DefaultNew( Name name ) {
 			_PolygonShape_Destroy,
 			_PolygonShape_IsCoordInside,
 			_PolygonShape_CalculateVolume,
+			_PolygonShape_DistanceFromCenterAxis,
 			name );
 }
 
@@ -378,4 +382,11 @@ Bool _PolygonShape_IsCoordInside( void* polygon, Coord testCoord ) {
 double _PolygonShape_CalculateVolume( void* polygon ) {
 	assert( 0 );
 	return 0.0;
+}
+
+void _PolygonShape_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec ){
+	Stg_Shape* self = (Stg_Shape*)shape;
+	Journal_Firewall( False, Journal_Register( Error_Type, self->type ),
+	"Error in function %s: This functions hasn't been implemented.", 
+	"Please inform uderworld-dev@vpac.org you've received this error.\n", __func__ );
 }

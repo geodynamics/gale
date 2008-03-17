@@ -83,6 +83,7 @@
 		Stg_Component_DestroyFunction*        _destroy,		
 		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
 		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
+		Stg_Shape_DistanceFromCenterAxisFunction*     _distanceFromCenterAxis,
 		Name                                  name );
 	
 	void _Union_Init( void* combination, Stg_Shape** shapeList, Index shapeCount, Bool* isComplement ) ;
@@ -116,6 +117,7 @@
 	
 	Bool _Union_IsCoordInside( void* combination, Coord coord ) ;
 	double _Union_CalculateVolume( void* combination );
+	void _Union_DistanceFromCenterAxis( void* sphere, Coord coord, double* disVec );
 
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Public member functions

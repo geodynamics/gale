@@ -61,6 +61,7 @@ Stg_Shape* _Stg_Shape_New(
 		Stg_Component_DestroyFunction*              _destroy,
 		Stg_Shape_IsCoordInsideFunction*            _isCoordInside,
 		Stg_Shape_CalculateVolumeFunction*          _calculateVolume,
+		Stg_Shape_DistanceFromCenterAxisFunction*   _distanceFromCenterAxis,
 		Name                                        name )
 {
 	Stg_Shape* self;
@@ -87,6 +88,7 @@ Stg_Shape* _Stg_Shape_New(
 	/* Virtual Info */
 	self->_isCoordInside = _isCoordInside;
 	self->_calculateVolume = _calculateVolume;
+	self->_distanceFromCenterAxis = _distanceFromCenterAxis,
 
 	self->invert = False;
 	
@@ -238,6 +240,11 @@ double Stg_Shape_CalculateVolume( void* shape ) {
 	}
 }
 
+void Stg_Shape_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec ) {
+	Stg_Shape* self = (Stg_Shape*)shape;
+
+	self->_distanceFromCenterAxis( self, coord, disVec );
+}
 
 /*--------------------------------------------------------------------------------------------------------------------------
 ** Public Functions

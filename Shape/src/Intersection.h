@@ -83,6 +83,7 @@
 		Stg_Component_DestroyFunction*        _destroy,		
 		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
 		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
+		Stg_Shape_DistanceFromCenterAxisFunction*   _distanceFromCenterAxis,
 		Name                                  name );
 	
 	void _Intersection_Init( void* intersection, Stg_Shape** shapeList, Index shapeCount, Bool* isComplement ) ;
@@ -116,7 +117,7 @@
 	
 	Bool _Intersection_IsCoordInside( void* intersection, Coord coord ) ;
 	double _Intersection_CalculateVolume( void* intersection );
-
+	void _Intersection_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec );
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Public member functions
 	*/

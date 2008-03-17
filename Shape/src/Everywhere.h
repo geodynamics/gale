@@ -73,6 +73,7 @@
 		Stg_Component_DestroyFunction*        _destroy,		
 		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
 		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
+		Stg_Shape_DistanceFromCenterAxisFunction*     _distanceFromCenterAxis,
 		Name                                  name );
 	
 	void _Everywhere_Init( void* everywhere ) ;
@@ -102,6 +103,7 @@
 	
 	Bool _Everywhere_IsCoordInside( void* everywhere, Coord coord ) ;
 	double _Everywhere_CalculateVolume( void* everywhere );
+	void _Everywhere_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec );
 
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Public member functions

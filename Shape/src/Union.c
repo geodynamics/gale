@@ -88,6 +88,7 @@ Union* _Union_New(
 		Stg_Component_DestroyFunction*        _destroy,		
 		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
 		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
+		Stg_Shape_DistanceFromCenterAxisFunction*     _distanceFromCenterAxis,
 		Name                                  name )
 {
 	Union* self;
@@ -108,6 +109,7 @@ Union* _Union_New(
 			_destroy,		
 			_isCoordInside ,
 			_calculateVolume,
+			_distanceFromCenterAxis,
 			name );
 	
 	/* General info */
@@ -207,6 +209,7 @@ void* _Union_DefaultNew( Name name ) {
 			_Union_Destroy,
 			_Union_IsCoordInside,
 			_Union_CalculateVolume,
+			_Union_DistanceFromCenterAxis,
 			name );
 }
 
@@ -318,5 +321,12 @@ Bool _Union_IsCoordInside( void* combination, Coord coord ) {
 double _Union_CalculateVolume( void* combination ) {
 	assert ( 0 );
 	return 0.0;
+}
+
+void _Union_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec ) {
+	Stg_Shape* self = (Stg_Shape*)shape;
+	Journal_Firewall( False, Journal_Register( Error_Type, self->type ),
+	"Error in function %s: This functions hasn't been implemented.", 
+	"Please inform uderworld-dev@vpac.org you've received this error.\n", __func__ );
 }
 	

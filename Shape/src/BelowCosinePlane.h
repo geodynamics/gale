@@ -72,6 +72,7 @@
 		Stg_Component_DestroyFunction*        _destroy,		
 		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
 		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
+		Stg_Shape_DistanceFromCenterAxisFunction*   _distanceFromCenterAxis,
 		Name                                  name );
 	
 	void _BelowCosinePlane_Init( void* belowPlane, double offset, XYZ width, double amplitude, double period, double phase ) ;
@@ -109,6 +110,8 @@
 	Bool _BelowCosinePlane_IsCoordInside( void* belowPlane, Coord coord ) ;
 
 	double _BelowCosinePlane_CalculateVolume( void* belowPlane );
+	void _BelowCosinePlane_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec );
+
 
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Public member functions

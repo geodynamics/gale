@@ -82,6 +82,7 @@
 		Stg_Component_DestroyFunction*        _destroy,		
 		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
 		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
+		Stg_Shape_DistanceFromCenterAxisFunction*     _distanceFromCenterAxis,
 		Name                                  name );
 	
 	void _ConvexHull_Init( void* convexHull, Coord_List vertexList, Index vertexCount);
@@ -113,6 +114,7 @@
 	
 	Bool _ConvexHull_IsCoordInside( void* convexHull, Coord coord ) ;
 	double _ConvexHull_CalculateVolume( void* convexHull );
+	void _ConvecHull_DistanceFromCenterAxis( void* self, Coord coord, double* disVec );
 
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Public member functions

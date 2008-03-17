@@ -41,6 +41,8 @@
 
 	typedef Bool (Stg_Shape_IsCoordInsideFunction) ( void* shape, Coord coord );
 
+	typedef void (Stg_Shape_DistanceFromCenterAxisFunction) ( void* shape, Coord coord, double* disVec );
+
 	typedef double (Stg_Shape_CalculateVolumeFunction) ( void* shape );
 
 
@@ -54,6 +56,7 @@
 		/* Virtual Info */                                         \
 		Stg_Shape_IsCoordInsideFunction*      _isCoordInside;      \
 		Stg_Shape_CalculateVolumeFunction*    _calculateVolume;    \
+		Stg_Shape_DistanceFromCenterAxisFunction* _distanceFromCenterAxis; \
 		/* Other info */                                           \
 		Dimension_Index                       dim;                 \
 		XYZ                                   centre;              \
@@ -80,6 +83,7 @@
 		Stg_Component_DestroyFunction*              _destroy,
 		Stg_Shape_IsCoordInsideFunction*            _isCoordInside,
 		Stg_Shape_CalculateVolumeFunction*          _calculateVolume,
+		Stg_Shape_DistanceFromCenterAxisFunction*   _distanceFromCenterAxis,
 		Name                                        name );
 	
 	void _Stg_Shape_Init( void* shape, Dimension_Index dim, Coord centre, Bool invert, double alpha, double beta, double gamma ) ;
@@ -107,6 +111,7 @@
 	Bool Stg_Shape_IsCoordInside( void* shape, Coord coord ) ;
 
 	double Stg_Shape_CalculateVolume( void* shape );
+	void Stg_Shape_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec );
 	
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Public member functions

@@ -70,6 +70,7 @@
 		Stg_Component_DestroyFunction*        _destroy,		
 		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
 		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
+		Stg_Shape_DistanceFromCenterAxisFunction*     _distanceFromCenterAxis,
 		Name                                  name );
 	
 	void _Box_Init( void* box, XYZ width ) ;
@@ -102,6 +103,7 @@
 
 	double _Box_CalculateVolume( void* box );
 
+	void _Box_DistanceFromCenterAxis( void* box, Coord coord, double* disVec );
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Public member functions
 	*/

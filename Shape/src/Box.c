@@ -83,6 +83,7 @@ Box* _Box_New(
 		Stg_Component_DestroyFunction*        _destroy,		
 		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
 		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
+		Stg_Shape_DistanceFromCenterAxisFunction*     _distanceFromCenterAxis,
 		Name                                  name )
 {
 	Box* self;
@@ -103,25 +104,28 @@ Box* _Box_New(
 			_destroy,		
 			_isCoordInside,
 			_calculateVolume,
+			_distanceFromCenterAxis,
 			name );
 	
 	/* General info */
 
 	/* Virtual Info */
 	self->_isCoordInside = _isCoordInside;
+	self->_calculateVolume = _calculateVolume;
+	self->_distanceFromCenterAxis = _distanceFromCenterAxis;
 	
 	return self;
 }
 
-void _Box_Init( void* box, XYZ width ) {
-	Box* self = (Box*)box;
+void _Box_Init( void* shape, XYZ width ) {
+	Box* self = (Box*)shape;
 	
 	memcpy( self->width, width, sizeof(XYZ));
 }
 
 
 void Box_InitAll( 
-		void*                                 box, 
+		void*                                 shape, 
 		Dimension_Index                       dim, 
 		Coord                                 centre,
 		double                                alpha,
@@ -129,7 +133,7 @@ void Box_InitAll(
 		double                                gamma,
 		XYZ                                   width) 
 {
-	Box* self = (Box*)box;
+	Box* self = (Box*)shape;
 
 	Stg_Shape_InitAll( self, dim, centre, alpha, beta, gamma );
 	_Box_Init( self, width );
@@ -140,16 +144,16 @@ void Box_InitAll(
 ** Virtual functions
 */
 
-void _Box_Delete( void* box ) {
-	Box* self = (Box*)box;
+void _Box_Delete( void* shape ) {
+	Box* self = (Box*)shape;
 	
 	/* Delete parent */
 	_Stg_Shape_Delete( self );
 }
 
 
-void _Box_Print( void* box, Stream* stream ) {
-	Box* self = (Box*)box;
+void _Box_Print( void* shape, Stream* stream ) {
+	Box* self = (Box*)shape;
 	
 	/* Print parent */
 	_Stg_Shape_Print( self, stream );
@@ -157,8 +161,8 @@ void _Box_Print( void* box, Stream* stream ) {
 
 
 
-void* _Box_Copy( void* box, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
-	Box*	self = (Box*)box;
+void* _Box_Copy( void* shape, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+	Box*	self = (Box*)shape;
 	Box*	newBox;
 	
 	newBox = (Box*)_Stg_Shape_Copy( self, dest, deep, nameExt, ptrMap );
@@ -183,12 +187,13 @@ void* _Box_DefaultNew( Name name ) {
 			_Box_Destroy,
 			_Box_IsCoordInside,
 			_Box_CalculateVolume,
+			_Box_DistanceFromCenterAxis,
 			name );
 }
 
 
-void _Box_Construct( void* box, Stg_ComponentFactory* cf, void* data ) {
-	Box*	             self          = (Box*) box;
+void _Box_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) {
+	Box*	             self          = (Box*) shape;
 	Dictionary*          dictionary    = Dictionary_GetDictionary( cf->componentDict, self->name );
 	XYZ                  width;
 	double               start, end;
@@ -227,23 +232,23 @@ void _Box_Construct( void* box, Stg_ComponentFactory* cf, void* data ) {
 	_Box_Init( self, width );
 }
 
-void _Box_Build( void* box, void* data ) {
-	Box*	self = (Box*)box;
+void _Box_Build( void* shape, void* data ) {
+	Box*	self = (Box*)shape;
 
 	_Stg_Shape_Build( self, data );
 }
-void _Box_Initialise( void* box, void* data ) {
-	Box*	self = (Box*)box;
+void _Box_Initialise( void* shape, void* data ) {
+	Box*	self = (Box*)shape;
 	
 	_Stg_Shape_Initialise( self, data );
 }
-void _Box_Execute( void* box, void* data ) {
-	Box*	self = (Box*)box;
+void _Box_Execute( void* shape, void* data ) {
+	Box*	self = (Box*)shape;
 	
 	_Stg_Shape_Execute( self, data );
 }
-void _Box_Destroy( void* box, void* data ) {
-	Box*	self = (Box*)box;
+void _Box_Destroy( void* shape, void* data ) {
+	Box*	self = (Box*)shape;
 	
 	_Stg_Shape_Destroy( self, data );
 }
@@ -256,8 +261,8 @@ void _Box_Destroy( void* box, void* data ) {
 ** Private Member functions
 */
 
-Bool _Box_IsCoordInside( void* box, Coord coord ) {
-	Box*            self       = (Box*)box;
+Bool _Box_IsCoordInside( void* shape, Coord coord ) {
+	Box*            self       = (Box*)shape;
 	Coord           newCoord;
 	Dimension_Index dim_I;
 
@@ -271,8 +276,8 @@ Bool _Box_IsCoordInside( void* box, Coord coord ) {
 	return True;
 }
 
-double _Box_CalculateVolume( void* box ) {
-	Box* self = (Box*)box;
+double _Box_CalculateVolume( void* shape ) {
+	Box* self = (Box*)shape;
 	Dimension_Index dim_I;
 	double result;
 	result = 1.0;
@@ -280,5 +285,13 @@ double _Box_CalculateVolume( void* box ) {
 		result *= self->width[dim_I];
 	}
 	return result;
+}
+
+void _Box_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec ) {
+	/* To be implemented */
+	Stg_Shape* self = (Stg_Shape*)shape;
+	Journal_Firewall( False, Journal_Register( Error_Type, self->type ),
+	"Error in function %s: This functions hasn't been implemented.", 
+	"Please inform uderworld-dev@vpac.org you've received this error.\n", __func__ );
 }
 

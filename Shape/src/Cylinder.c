@@ -89,6 +89,7 @@ Cylinder* _Cylinder_New(
 		Stg_Component_DestroyFunction*        _destroy,		
 		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
 		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
+		Stg_Shape_DistanceFromCenterAxisFunction*   _distanceFromCenterAxis,
 		Name                                  name )
 {
 	Cylinder* self;
@@ -109,6 +110,7 @@ Cylinder* _Cylinder_New(
 			_destroy,		
 			_isCoordInside,
 			_calculateVolume,
+			_distanceFromCenterAxis,
 			name );
 	
 	/* General info */
@@ -196,6 +198,7 @@ void* _Cylinder_DefaultNew( Name name ) {
 			_Cylinder_Destroy,
 			_Cylinder_IsCoordInside,
 			_Cylinder_CalculateVolume,
+			_Cylinder_DistanceFromCenterAxis,
 			name );
 }
 
@@ -298,6 +301,25 @@ Bool _Cylinder_IsCoordInside( void* cylinder, Coord coord ) {
 
 	return True;
 }
+
+void _Cylinder_DistanceFromCenterAxis( void* cylinder, Coord coord, double* disVec ) {
+	Cylinder*       self       = (Cylinder*)cylinder;
+	Coord           newCoord;
+
+	/* Transform coordinate into canonical reference frame */
+	Stg_Shape_TransformCoord( self, coord, newCoord );
+	
+	newCoord[ self->perpendicularAxis ] = 0.0;
+
+	/* Check if coord is within radius */
+	disVec[0] = newCoord[ I_AXIS ];
+	disVec[1] = newCoord[ J_AXIS ];
+	if(self->dim == 3)
+		disVec[2] = newCoord[ K_AXIS ];
+
+	return;
+}
+
 
 double _Cylinder_CalculateVolume( void* cylinder ) {
 	assert( 0 /* unsure how this cylinder is setup...but shouldn't be hard to implement -- Alan */ );

@@ -88,6 +88,7 @@ Superellipsoid* _Superellipsoid_New(
 		Stg_Component_DestroyFunction*        _destroy,		
 		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
 		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
+		Stg_Shape_DistanceFromCenterAxisFunction*     _distanceFromCenterAxis,
 		Name                                  name )
 {
 	Superellipsoid* self;
@@ -108,12 +109,14 @@ Superellipsoid* _Superellipsoid_New(
 			_destroy,		
 			_isCoordInside,
 			_calculateVolume,
+			_distanceFromCenterAxis,
 			name );
 	
 	/* General info */
 
 	/* Virtual Info */
 	self->_isCoordInside = _isCoordInside;
+	self->_distanceFromCenterAxis = _distanceFromCenterAxis;
 	
 	return self;
 }
@@ -196,6 +199,7 @@ void* _Superellipsoid_DefaultNew( Name name ) {
 			_Superellipsoid_Destroy,
 			_Superellipsoid_IsCoordInside,
 			_Superellipsoid_CalculateVolume,
+			_Superellipsoid_DistanceFromCenterAxis,
 			name );
 }
 
@@ -277,4 +281,10 @@ double _Superellipsoid_CalculateVolume( void* superellipsoid ) {
 	assert( 0  );
 	return 0.0;
 }
-	
+
+void _Superellipsoid_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec ){
+	Stg_Shape* self = (Stg_Shape*)shape;
+	Journal_Firewall( False, Journal_Register( Error_Type, self->type ),
+	"Error in function %s: This functions hasn't been implemented.", 
+	"Please inform uderworld-dev@vpac.org you've received this error.\n", __func__ );
+}	

@@ -87,6 +87,7 @@
 		Stg_Component_DestroyFunction*        _destroy,		
 		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
 		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
+		Stg_Shape_DistanceFromCenterAxisFunction*     _distanceFromCenterAxis,
 		Name                                  name );
 	
 	void _PolygonShape_Init( void* polygon, Coord_List vertexList, Index vertexCount, XYZ start, XYZ end, Axis perpendicular ) ;
@@ -122,6 +123,7 @@
 	
 	Bool _PolygonShape_IsCoordInside( void* polygon, Coord coord ) ;
 	double _PolygonShape_CalculateVolume( void* polygon );
+	void _PolygonShape_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec );
 
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Public member functions

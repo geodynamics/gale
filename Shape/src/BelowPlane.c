@@ -89,6 +89,7 @@ BelowPlane* _BelowPlane_New(
 		Stg_Component_DestroyFunction*        _destroy,		
 		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
 		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
+		Stg_Shape_DistanceFromCenterAxisFunction*     _distanceFromCenterAxis,
 		Name                                  name )
 {
 	BelowPlane* self;
@@ -109,13 +110,14 @@ BelowPlane* _BelowPlane_New(
 			_destroy,		
 			_isCoordInside,
 			_calculateVolume,
+			_distanceFromCenterAxis,
 			name );
 	
 	/* General info */
 
 	/* Virtual Info */
 	self->_isCoordInside = _isCoordInside;
-	
+	self->_distanceFromCenterAxis = _distanceFromCenterAxis;
 	return self;
 }
 
@@ -196,6 +198,7 @@ void* _BelowPlane_DefaultNew( Name name ) {
 			_BelowPlane_Destroy,
 			_BelowPlane_IsCoordInside,
 			_BelowPlane_CalculateVolume,
+			_BelowPlane_DistanceFromCenterAxis,
 			name );
 }
 
@@ -280,5 +283,12 @@ double _BelowPlane_CalculateVolume( void* belowPlane ) {
 	}
 
 	return volume;
+}
+
+void _BelowPlane_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec ){
+	Stg_Shape* self = (Stg_Shape*)shape;
+	Journal_Firewall( False, Journal_Register( Error_Type, self->type ),
+	"Error in function %s: This functions hasn't been implemented.", 
+	"Please inform uderworld-dev@vpac.org you've received this error.\n", __func__ );
 }
 

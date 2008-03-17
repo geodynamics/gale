@@ -81,6 +81,7 @@
 		Stg_Component_DestroyFunction*        _destroy,		
 		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
 		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
+		Stg_Shape_DistanceFromCenterAxis*     _distanceFromCenterAxis,
 		Name                                  name );
 	
 	void _PythonShape_Init( void* pythonShape, char* conditionFunction ) ;
@@ -111,6 +112,7 @@
 	
 	Bool _PythonShape_IsCoordInside( void* pythonShape, Coord coord ) ;
 	double _PythonShape_CalculateVolume( void* pythonShape );
+	void _PythonShape_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec );
 
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Public member functions
