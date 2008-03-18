@@ -1978,12 +1978,12 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
 	unsigned*		inds;
 	double*			steps;
 	unsigned		n_i, d_i;
-	AbstractContext* 	context = (AbstractContext*)data;
-	char 			meshSaveFileName[256];
 	double*         	vert;
 	unsigned        	gNode;
+	AbstractContext* 	context = (AbstractContext*)data;
+	char 			meshSaveFileName[256];
 	Stream*			errorStream = Journal_Register( Error_Type, self->type );
-	int			myRank, nProcs, i;
+	int			myRank, nProcs, i, prevProcs;
 	double 			temp;
 	int 			offset = 0;
 	MPI_Status         	status;
@@ -2009,12 +2009,12 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
 					 mesh->topo->nDims, 
 					 "Mesh::verts" );
 
-	/* If loading from checkpoint, read mesh vertices from file */
 	if( context && context->restartTimestep && context->timeStep == context->restartTimestep ) {
+		/* Loading from checkpoint */
 		Journal_Printf( stream, "Loading mesh values from file.\n");
 
-		MPI_Comm_rank( MPI_COMM_WORLD, &myRank );
-		MPI_Comm_size( MPI_COMM_WORLD, &nProcs );
+		MPI_Comm_rank( self->mpiComm, &myRank );
+		MPI_Comm_size( self->mpiComm, &nProcs );
 		
 		if ( strlen( context->checkPointPrefixString ) > 0 ) {
 			sprintf( meshSaveFileName, "%s/%s.Mesh.%05d.dat", context->checkpointPath,
@@ -2026,11 +2026,10 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
 		}
 
 		if( myRank != 0 ) {
-			MPI_Recv( &offset, 1, MPI_INT, myRank - 1, OFFSET_TAG, MPI_COMM_WORLD, &status );
+			MPI_Recv( &offset, 1, MPI_INT, myRank - 1, OFFSET_TAG, self->mpiComm, &status );
 		}
 
-		FILE* meshFile = fopen( meshSaveFileName, "r" );	/*********************/
-		fseek( meshFile, offset, SEEK_SET );
+		FILE* meshFile = fopen( meshSaveFileName, "r" );	
 		/*Journal_Firewall( 
 			meshFile != 0, 
 			errorStream, 
@@ -2043,64 +2042,52 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
 			Journal_Printf( errorStream, 
 				"Warning - Couldn't find checkpoint mesh file with filename \"%s\".\n", 
 				meshSaveFileName );
-
-			for( n_i = 0; n_i < Sync_GetNumDomains( sync ); n_i++ ) {
-				gNode = Sync_DomainToGlobal( sync, n_i );
-				Grid_Lift( grid, gNode, inds );
-				vert = Mesh_GetVertex( mesh, n_i );
-
-				/* Calculate coordinate. */
-				for( d_i = 0; d_i < mesh->topo->nDims; d_i++ ) {
-					vert[d_i] = self->crdMin[d_i] + 
-						((double)inds[d_i] / (double)(grid->sizes[d_i] - 1)) * steps[d_i];
-				}
-			}
-				}
+			
+			CartesianGenerator_CalcGeom( self, mesh, sync, grid, inds, steps );
+		}
 		else {	
+			fseek( meshFile, offset, SEEK_SET );
 			/* Read from file */				
 			if( myRank == 0 ) {
 				fscanf( meshFile, "Min: " );
 				for( i=0; i<self->nDims; i++ ) {
 					fscanf( meshFile, "%lg ", &temp );
 				}
-				fscanf( meshFile, "\nMax: " );
+				fscanf( meshFile, "Max: " );
 				for( i=0; i<self->nDims; i++ ) {
 					fscanf( meshFile, "%lg ", &temp );
 				}
+				fscanf( meshFile, "nProcs: %d", &prevProcs );
 			}
-			
-			for( n_i = 0; n_i < Sync_GetNumDomains( sync ); n_i++ ) {
-				gNode = Sync_DomainToGlobal( sync, n_i );
-				Grid_Lift( grid, gNode, inds );
-				vert = Mesh_GetVertex( mesh, n_i );
 
-				for( d_i = 0; d_i < mesh->topo->nDims; d_i++ ) {	
-					fscanf( meshFile, "%lg ", &vert[d_i] );
+			if( prevProcs == nProcs ) {
+
+				/* Reload mesh vertices from file */	
+				for( n_i = 0; n_i < Sync_GetNumDomains( sync ); n_i++ ) {
+					gNode = Sync_DomainToGlobal( sync, n_i );
+					Grid_Lift( grid, gNode, inds );
+					vert = Mesh_GetVertex( mesh, n_i );
+
+					for( d_i = 0; d_i < mesh->topo->nDims; d_i++ ) {	
+						fscanf( meshFile, "%lg ", &vert[d_i] );
+					}
+					fscanf( meshFile, "\n" );
 				}
-				fscanf( meshFile, "\n" );
+				offset = ftell( meshFile );
+				fclose( meshFile );
 			}
-			offset = ftell( meshFile );
-			fclose( meshFile );
+			else {
+				/* Calculate mesh vertices */
+				CartesianGenerator_CalcGeom( self, mesh, sync, grid, inds, steps );
+			}
 		}
 
 		if ( myRank != nProcs - 1 ) {
-			MPI_Ssend( &offset, 1, MPI_INT, myRank + 1, OFFSET_TAG, MPI_COMM_WORLD );
+			MPI_Ssend( &offset, 1, MPI_INT, myRank + 1, OFFSET_TAG, self->mpiComm );
 		}
 	}
 	else {
-		/* Loop over domain nodes. */
-		for( n_i = 0; n_i < Sync_GetNumDomains( sync ); n_i++ ) {
-			
-			gNode = Sync_DomainToGlobal( sync, n_i );
-			Grid_Lift( grid, gNode, inds );
-			vert = Mesh_GetVertex( mesh, n_i );
-
-			/* Calculate coordinate. */
-			for( d_i = 0; d_i < mesh->topo->nDims; d_i++ ) {
-				vert[d_i] = self->crdMin[d_i] + 
-					((double)inds[d_i] / (double)(grid->sizes[d_i] - 1)) * steps[d_i];
-			}
-		}
+		CartesianGenerator_CalcGeom( self, mesh, sync, grid, inds, steps );
 	}
 
 	/* Free resources. */
@@ -2110,6 +2097,25 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
 	MPI_Barrier( self->mpiComm );
 	Journal_Printf( stream, "... done.\n" );
 	Stream_UnIndent( stream );
+}
+
+void CartesianGenerator_CalcGeom( CartesianGenerator* self, Mesh* mesh, Sync* sync, Grid* grid, unsigned* inds, double* steps ) {	
+	unsigned		n_i, d_i;
+	double*         	vert;
+	unsigned        	gNode;
+
+	/* Loop over domain nodes. */
+	for( n_i = 0; n_i < Sync_GetNumDomains( sync ); n_i++ ) {
+		gNode = Sync_DomainToGlobal( sync, n_i );
+		Grid_Lift( grid, gNode, inds );
+		vert = Mesh_GetVertex( mesh, n_i );
+
+		/* Calculate coordinate. */
+		for( d_i = 0; d_i < mesh->topo->nDims; d_i++ ) {
+			vert[d_i] = self->crdMin[d_i] + 
+				((double)inds[d_i] / (double)(grid->sizes[d_i] - 1)) * steps[d_i];
+		}
+	}
 }
 
 void CartesianGenerator_Destruct( CartesianGenerator* self ) {
