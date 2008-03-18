@@ -336,21 +336,19 @@ class Package(object):
         if not self.pkg_dl.result[0]:
             return [0, '', 'No dynamic loader found (libdl).']
 
-        # Build a binary to try and dynamically open the library.
+        # Build a binary to try and dynamically open the libraries in order.
         result = [1, '', '']
-        for l in libs:
-            src = self.get_header_source()
-            src += """
+        src = self.get_header_source()
+        src += """
 int main(int argc, char* argv[]) {
-  void* lib;
-  lib = dlopen("%s", RTLD_LAZY);
-  return lib ? 0 : 1;
-}
-""" % self.env.subst('${SHLIBPREFIX}' + l + '${SHLIBSUFFIX}')
-            result = self.run_source(src)
-            if not result[0]:
-                break
-        return result
+  void* lib[%d];
+""" % len(libs)
+        for l in libs:
+            src += """  lib[%d] = dlopen("%s", RTLD_LAZY);
+  if( !lib ) return 1;
+""" % (libs.index(l), self.env.subst('${SHLIBPREFIX}' + l + '${SHLIBSUFFIX}'))
+        src += '  return 0;\n}\n'
+        return self.run_source(src)
 
     def run_source(self, source):
         """At this point we know all our construction environment has been set up,
