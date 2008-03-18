@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Context.c 1078 2008-03-14 03:02:17Z BelindaMay $
+** $Id: Context.c 1079 2008-03-18 05:11:00Z BelindaMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -527,8 +527,8 @@ void _FiniteElementContext_SaveMesh( void* context ) {
 
 	Journal_Printf( info, "In %s(): about to save the mesh to disk:\n", __func__ );
 
-	MPI_Comm_rank( MPI_COMM_WORLD, &myRank);
-	MPI_Comm_size( MPI_COMM_WORLD, &nProcs );	
+	MPI_Comm_rank( self->communicator, &myRank);
+	MPI_Comm_size( self->communicator, &nProcs );	
 
 	if ( strlen(self->checkPointPrefixString) > 0 ) {
 		sprintf( meshSaveFileName, "%s/%s.Mesh.%05d.dat", self->checkpointPath,
@@ -548,7 +548,7 @@ void _FiniteElementContext_SaveMesh( void* context ) {
 
 		/* wait for go-ahead from process ranked lower than me, to avoid competition writing to file */
 		if ( myRank != 0 ) {
-			MPI_Recv( &confirmation, 1, MPI_INT, myRank - 1, FINISHED_WRITING_TAG, MPI_COMM_WORLD, &status );
+			MPI_Recv( &confirmation, 1, MPI_INT, myRank - 1, FINISHED_WRITING_TAG, self->communicator, &status );
 		}
 
 		if ( myRank == 0 ) {
@@ -562,7 +562,7 @@ void _FiniteElementContext_SaveMesh( void* context ) {
 			for( i=0; i<nDims; i++ ) {
 				fprintf( outputFile, "%.15g ", mesh->maxGlobalCrd[i] );
 			}
-			fprintf( outputFile, "\n" );
+			fprintf( outputFile, "\nnProcs: %d\n", nProcs );
 		}
 		else {
 			outputFile = fopen( meshSaveFileName, "a" );
@@ -584,7 +584,7 @@ void _FiniteElementContext_SaveMesh( void* context ) {
 		fclose( outputFile );
 		
 		if ( myRank != nProcs - 1 ) {
-			MPI_Ssend( &confirmation, 1, MPI_INT, myRank + 1, FINISHED_WRITING_TAG, MPI_COMM_WORLD );
+			MPI_Ssend( &confirmation, 1, MPI_INT, myRank + 1, FINISHED_WRITING_TAG, self->communicator );
 		}
 	}
 	
