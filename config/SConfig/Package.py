@@ -311,7 +311,7 @@ class Package(object):
             return result
 
         # Check if we have shared libraries.
-        if self.require_shared:
+        if self.require_shared and libs:
             result = self.check_shared(location, libs)
             if not result[0] and not result[2]:
                 result[2] = 'No shared library(s) available.'
@@ -344,9 +344,9 @@ int main(int argc, char* argv[]) {
   void* lib[%d];
 """ % len(libs)
         for l in libs:
-            src += """  lib[%d] = dlopen("%s", RTLD_LAZY);
-  if( !lib ) return 1;
-""" % (libs.index(l), self.env.subst('${SHLIBPREFIX}' + l + '${SHLIBSUFFIX}'))
+            src += """  lib[%d] = dlopen("%s", RTLD_NOW);
+  if( !lib[%d] ) return 1;
+""" % (libs.index(l), self.env.subst('${SHLIBPREFIX}' + l + '${SHLIBSUFFIX}'), libs.index(l))
         src += '  return 0;\n}\n'
         return self.run_source(src)
 
@@ -420,6 +420,8 @@ int main(int argc, char* argv[]) {
                             yield [dir, list(sub), list(lib), list(fw)]
 
     def generate_libraries(self, location):
+        if location[3]:
+            yield []
         for libs in self.libraries:
             yield libs
 
