@@ -17,6 +17,8 @@ class MPI(SConfig.Package):
         self.shared_libraries = ['mpich', 'pmpich']
         self.require_shared = True
         self.use_rpath = True
+        self.symbols = [(['MPI_Init', 'MPI_Finalize'], '')]
+        self.symbol_calls = ['%s(&argc, &argv);', '%s();']
 
     def validate_location(self, location):
         for lib_dir in location[2]:
