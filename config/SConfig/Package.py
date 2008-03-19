@@ -6,7 +6,7 @@ class Package(object):
     def __init__(self, env, options=None, required=False):
         # Construct this package's name.
         self.name = self.__module__.split('.')[-1]
-        self.option_name = self.name.lower()
+        self.command_name = self.name.lower()
         self.environ_name = self.name.upper()
         self.command_options = {}
         self.environ_options = {}
@@ -42,6 +42,7 @@ class Package(object):
 
         # Library options.
         self.libraries         = [] #[['']]
+        self.shared_libraries  = []
         self.require_shared    = False
         self.use_rpath         = True
         self.symbols           = [([], '')] #[([''], '')]
@@ -99,32 +100,32 @@ class Package(object):
     def setup_options(self):
         if not self.opts:
             return
-        self.command_options = ['with_' + self.option_name,
-                                self.option_name + 'Dir',
-                                self.option_name + 'IncDir',
-                                self.option_name + 'LibDir',
-                                self.option_name + 'Lib',
-                                self.option_name + 'Framework']
-        self.environ_options = {self.option_name + 'Dir': self.environ_name + '_DIR',
-                                self.option_name + 'IncDir': self.environ_name + '_INC_DIR',
-                                self.option_name + 'LibDir': self.environ_name + '_LIB_DIR',
-                                self.option_name + 'Lib': self.environ_name + '_LIB',
-                                self.option_name + 'Framework': self.environ_name + '_FRAMEWORK'}
+        self.command_options = ['with_' + self.command_name,
+                                self.command_name + 'Dir',
+                                self.command_name + 'IncDir',
+                                self.command_name + 'LibDir',
+                                self.command_name + 'Lib',
+                                self.command_name + 'Framework']
+        self.environ_options = {self.command_name + 'Dir': self.environ_name + '_DIR',
+                                self.command_name + 'IncDir': self.environ_name + '_INC_DIR',
+                                self.command_name + 'LibDir': self.environ_name + '_LIB_DIR',
+                                self.command_name + 'Lib': self.environ_name + '_LIB',
+                                self.command_name + 'Framework': self.environ_name + '_FRAMEWORK'}
         self.opts.AddOptions(
-            SCons.Script.BoolOption('with_' + self.option_name, 'Turn on/off %s' % self.name, 1),
-            SCons.Script.PathOption(self.option_name + 'Dir',
+            SCons.Script.BoolOption('with_' + self.command_name, 'Turn on/off %s' % self.name, 1),
+            SCons.Script.PathOption(self.command_name + 'Dir',
                                     '%s installation path' % self.name,
                                     None, SCons.Script.PathOption.PathIsDir),
-            SCons.Script.PathOption(self.option_name + 'IncDir',
+            SCons.Script.PathOption(self.command_name + 'IncDir',
                                     '%s header installation path' % self.name,
                                     None, SCons.Script.PathOption.PathIsDir),
-            SCons.Script.PathOption(self.option_name + 'LibDir',
+            SCons.Script.PathOption(self.command_name + 'LibDir',
                                     '%s library installation path' % self.name,
                                     None, SCons.Script.PathOption.PathIsDir),
-            (self.option_name + 'Lib',
+            (self.command_name + 'Lib',
              '%s libraries' % self.name,
              None, None),
-            (self.option_name + 'Framework',
+            (self.command_name + 'Framework',
              '%s framework' % self.name,
              None, None))
 
@@ -138,7 +139,7 @@ class Package(object):
         """Perform the configuration of this package. Override this method to perform
         custom configuration checks."""
         # If we've already configured this package, or it is deselected, just return.
-        if self.configured or not (self.required or self.env['with_' + self.option_name]):
+        if self.configured or not (self.required or self.env['with_' + self.command_name]):
             return
 
         # Setup our configure context and environment.
@@ -344,11 +345,30 @@ int main(int argc, char* argv[]) {
   void* lib[%d];
 """ % len(libs)
         for l in libs:
-            src += """  lib[%d] = dlopen("%s", RTLD_NOW);
-  if( !lib[%d] ) return 1;
-""" % (libs.index(l), self.env.subst('${SHLIBPREFIX}' + l + '${SHLIBSUFFIX}'), libs.index(l))
+            if self.shared_libraries and l not in self.shared_libraries:
+                continue
+            offs = ''
+            for p in self.generate_library_paths(location, l):
+                offs += '  '
+                if len(offs) > 2:
+                    src += '{\n%s'
+                src += '%slib[%d] = dlopen("%s", RTLD_NOW);\n' % (offs, libs.index(l), p)
+                src += '%sif( !lib[%d] ) ' % (offs, libs.index(l))
+            src += 'return 1;\n'
+            while len(offs) > 2:
+                src += offs + '}'
+                offs = offs[:-2]
         src += '  return 0;\n}\n'
         return self.run_source(src)
+
+    def generate_library_paths(self, location, library):
+        lib_name = self.env.subst('${SHLIBPREFIX}' + library + '${SHLIBSUFFIX}')
+        if location[2]:
+            for d in location[2]:
+                path = os.path.join(location[0], d, lib_name)
+                yield os.path.abspath(path)
+        else:
+            yield lib_name
 
     def run_source(self, source):
         """At this point we know all our construction environment has been set up,
@@ -372,15 +392,15 @@ int main(int argc, char* argv[]) {
         ['base_dir', ['header_dirs'], ['lib_dirs'], ['frameworks']]."""
         # If we've been given options directly specifying the location of this
         # package we need to use those in place of searching for locations.
-        base_dir = self.env.get(self.option_name + 'Dir', '')
-        inc_dir = self.env.get(self.option_name + 'IncDir', '')
-        lib_dir = self.env.get(self.option_name + 'LibDir', '')
-        fwork = self.env.get(self.option_name + 'Framework', '')
+        base_dir = self.env.get(self.command_name + 'Dir', '')
+        inc_dir = self.env.get(self.command_name + 'IncDir', '')
+        lib_dir = self.env.get(self.command_name + 'LibDir', '')
+        fwork = self.env.get(self.command_name + 'Framework', '')
         if inc_dir or lib_dir:
             if not (inc_dir and lib_dir):
                 print '   Error: must specify both of'
-                print '      ' + self.option_name + 'IncDir'
-                print '      ' + self.option_name + 'LibDir'
+                print '      ' + self.command_name + 'IncDir'
+                print '      ' + self.command_name + 'LibDir'
                 env.Exit()
             yield ['', [inc_dir], [lib_dir], [fwork]]
             return

@@ -12,7 +12,9 @@ class MPI(SConfig.Package):
                           ['mpich', 'pmpich'],
                           ['mpich', 'rt'],
                           ['mpich', 'pmpich', 'rt'],
-                          ['mpi']]
+                          ['mpi'],
+                          ['lam', 'mpi']]
+        self.shared_libraries = ['mpich', 'pmpich']
         self.require_shared = True
         self.use_rpath = True
 
