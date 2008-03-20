@@ -20,12 +20,12 @@ env.build_directory('Assembly')
 
 env.build_headers(env.glob('libStgFEM/src/*.h'), 'StgFEM')
 env.build_objects(env.glob('libStgFEM/src/*.c'), 'libStgFEM')
-env.build_objects(env.glob('libStgFEM/Toolbox/*.c'), 'Toolbox')
 env.build_metadata(env.glob('libStgFEM/src/*.meta'), 'libStgFEM')
-env.build_metadata(env.glob('libStgFEM/Toolbox/*.meta'), 'Toolbol')
 
 env.build_library(env.get_hnodes(env.SharedObject), 'StgFEM')
 
+env.build_objects(env.glob('libStgFEM/Toolbox/*.c'), 'Toolbox')
+env.build_metadata(env.glob('libStgFEM/Toolbox/*.meta'), 'Toolbox')
 env.build_library(env.get_hnodes(env.SharedObject, 'Toolbox'),
                   'StgFEM_Toolboxmodule', ['StgFEM'],
                   True)
