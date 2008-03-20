@@ -73,7 +73,8 @@ class Package(SConfig.Node):
             (self.command_name + '_framework',
              '%s framework' % self.name,
              None, None))
-        self.option_map = {self.command_name + '_dir': self.environ_name + '_DIR'}
+        self.option_map = {'with_' + self.command_name: None,
+                           self.command_name + '_dir': self.environ_name + '_DIR'}
 
     def setup_search_defaults(self):
         """Setup the usual search paths for packages depending on the kind of system
@@ -95,10 +96,12 @@ class Package(SConfig.Node):
 
         # Combine these guys to build default system paths. We need these to ensure specific
         # include paths are used before generic ones.
-        for base_dir in self.base_dirs:
+        for base_dir in ['/usr', '/sw']:
             for hdr_dirs, lib_dirs in self.combine_sub_dirs(base_dir):
-                self.system_header_dirs += [os.path.join(base_dir, h) for h in hdr_dirs]
-                self.system_library_dirs += [os.path.join(base_dir, h) for l in lib_dirs]
+                hdr_dirs = [os.path.join(base_dir, h) for h in hdr_dirs]
+                self.system_header_dirs += [h for h in hdr_dirs if h not in self.system_header_dirs]
+                lib_dirs = [os.path.join(base_dir, l) for l in lib_dirs]
+                self.system_library_dirs += [l for l in lib_dirs if l not in self.system_library_dirs]
 
     def get_check_headers_fail_reason(self, fail_logs):
         return ''
@@ -124,6 +127,8 @@ class Package(SConfig.Node):
             self.ctx.Display('    %s\n' % str(loc))
             result = self.check_location(loc)
             if result:
+                if self.have_define:
+                    self.cpp_defines += [self.have_define]
                 self.base_dir = loc[0]
                 self.hdr_dirs = loc[1]
                 self.lib_dirs = loc[2]
@@ -396,26 +401,31 @@ int main(int argc, char* argv[]) {
             self.env.PrependUnique(LIBS=libs)
         return old_state
 
-    def enable(self, scons_env):
-        SConfig.Node.enable(self, scons_env)
+    def enable(self, scons_env, old_state=None):
+        SConfig.Node.enable(self, scons_env, old_state)
         if self.cpp_defines:
+            self.backup_variable(scons_env, 'CPPDEFINES', old_state)
             scons_env.AppendUnique(CPPDEFINES=self.cpp_defines)
 
         if self.hdr_dirs:
+            self.backup_variable(scons_env, 'CPPPATH', old_state)
             for d in self.hdr_dirs:
                 abs_dir = [self.join_sub_dir(self.base_dir, d)]
-                if d in self.system_header_dirs:
+                if abs_dir in self.system_header_dirs:
                     scons_env.AppendUnique(CPPPATH=abs_dir)
                 else:
                     scons_env.PrependUnique(CPPPATH=abs_dir)
 
         if self.fworks:
+            self.backup_variable(scons_env, 'FRAMEWORKS', old_state)
             scons_env.PrependUnique(FRAMEWORKS=self.fworks)
 
         if self.lib_dirs:
+            self.backup_variable(scons_env, 'LIBPATH', old_state)
+            self.backup_variable(scons_env, 'RPATH', old_state)
             for d in self.lib_dirs:
                 abs_dir = self.join_sub_dir(self.base_dir, d)
-                if d in self.system_library_dirs:
+                if abs_dir in self.system_library_dirs:
                     scons_env.AppendUnique(LIBPATH=[abs_dir])
                     scons_env.AppendUnique(RPATH=[os.path.abspath(abs_dir)])
                 else:
@@ -423,7 +433,8 @@ int main(int argc, char* argv[]) {
                     scons_env.PrependUnique(RPATH=[os.path.abspath(abs_dir)])
 
         if self.libs:
-            scons_env['LIBS'] = self.libs
+            self.backup_variable(scons_env, 'LIBS', old_state)
+            scons_env.PrependUnique(LIBS=self.libs)
 
     def get_all_headers(self, headers):
         if not self.result:

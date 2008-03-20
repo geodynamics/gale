@@ -16,7 +16,8 @@ def Package(env, pkg_module, options, required=False):
         env.package_list += [env.packages[pkg_module]]
     return env.packages[pkg_module]
 
-def CheckPackage(ctx, pkg):
+def CheckPackages(ctx, pkg_list):
+    for pkg in pkg_list:
         pkg.configure(ctx)
 
 def configure_packages(env, options=None, output='config.cfg'):
@@ -40,12 +41,14 @@ def configure_packages(env, options=None, output='config.cfg'):
                     pkgs_rem += [d]
 
     # Call the packages checker.
-    for pkg in env.package_list:
-        sconf = Configure(pkg.env, custom_tests={'CheckPackage': CheckPackage})
-        sconf.CheckPackage(pkg)
-        sconf.Finish()
+    sconf = Configure(pkg.env, custom_tests={'CheckPackages': CheckPackages})
+    sconf.CheckPackages(env.package_list)
+    sconf.Finish()
 
     # Dump results to our output file.
+    for pkg in env.package_list: # Put the results on this environment.
+        if pkg.result:
+            pkg.enable(env)
     vars = ['CFLAGS', 'CCFLAGS',
             'CPPPATH', 'CPPDEFINES',
             'LIBPATH', 'LIBS', 'RPATH',

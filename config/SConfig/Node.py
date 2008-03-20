@@ -18,7 +18,7 @@ class Node(object):
         self.result = False
 
         # Private stuff.
-        self.env = scons_env.Copy()
+        self.env = scons_env
         self.opts = scons_opts
         self.required = required
         self.deps = []
@@ -58,7 +58,7 @@ class Node(object):
         self.configured = True
 
         # Setup basic stuff.
-        self.process_dependencies()
+        old_state = self.process_dependencies()
         self.ctx.Message('Configuring package %s ... ' % self.name)
         self.ctx.Display('\n')
         result = True
@@ -75,6 +75,7 @@ class Node(object):
                     break
 
         # Handle results.
+        self.restore_state(self.env, old_state)
         self.result = result
         self.ctx.Display('  ')
         self.ctx.Result(result)
@@ -92,9 +93,31 @@ class Node(object):
                 self.ctx.Display('\nRun \'scons help\' for more details on these options.\n\n')
             self.env.Exit()
 
-    def enable(self, scons_env):
-        """Modify the SCons environment to have this package enabled."""
-        pass
+    def enable(self, scons_env, old_state=None):
+        """Modify the SCons environment to have this package enabled. Begin by inserting
+        all options on this node into the environment."""
+        for pkg, req in self.deps: # Enable dependencies first.
+            if pkg.result:
+                pkg.enable(scons_env, old_state)
+        for opt in self.option_map.iterkeys(): # Now add options.
+            if opt in self.env._dict:
+                scons_env[opt] = self.env[opt]
+
+    def backup_variable(self, scons_env, var_name, old_state):
+        if old_state is None:
+            return
+        if var_name not in old_state:
+            if var_name in scons_env._dict:
+                old_state[var_name] = scons_env[var_name]
+            else:
+                old_state[var_name] = None
+
+    def restore_state(self, scons_env, old_state):
+        for var_name, state in old_state.iteritems():
+            if state is None:
+                del scons_env[var_name]
+            else:
+                scons_env[var_name] = state
 
     def process_options(self):
         """Do any initial option processing, including importing any values from
@@ -112,10 +135,12 @@ class Node(object):
 
     def process_dependencies(self):
         """Ensure all dependencies have been configured before this package."""
+        old_state = {}
         for pkg, req in self.deps:
             pkg.configure(self.ctx)
             if pkg.result:
-                pkg.enable(self.env)
+                pkg.enable(self.env, old_state)
+        return old_state
 
     def compile_source(self, source):
         """At this point we know all our construction environment has been set up,
@@ -130,21 +155,14 @@ class Node(object):
         return [result[0][0], result[0][1], result[1]]
 
     def run_scons_cmd(self, cmd, *args, **kw):
-        # Capture the log.
         old_log = self.ctx.sconf.logstream
-        self.ctx.sconf.logstream = open('sconfig.log', 'w')
-
-        # Execute the command.
-        res = cmd(*args, **kw)
-
-        # Make sure the file is closed.
+        self.ctx.sconf.logstream = open('sconfig.log', 'w') # Capture the log.
+        res = cmd(*args, **kw) # Execute the command.
         try:
-            self.ctx.sconf.logstream.close()
+            self.ctx.sconf.logstream.close() # Make sure the file is closed.
         finally:
             pass
-
-        # Replace the old log.
-        self.ctx.sconf.logstream = old_log
+        self.ctx.sconf.logstream = old_log # Replace the old log.
 
         # Return results.
         log_file = open('sconfig.log', 'r')
