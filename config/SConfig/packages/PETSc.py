@@ -62,6 +62,6 @@ class PETSc(SConfig.Package):
 
     def get_check_headers_fail_reason(self, fail_logs):
         for log in fail_logs:
-            if log.find('MPI') != -1:
+            if log.find('MPI_') != -1:
                 return 'Selected MPI implementation incompatible.'
         return ''

@@ -410,11 +410,11 @@ int main(int argc, char* argv[]) {
         if self.hdr_dirs:
             self.backup_variable(scons_env, 'CPPPATH', old_state)
             for d in self.hdr_dirs:
-                abs_dir = [self.join_sub_dir(self.base_dir, d)]
+                abs_dir = self.join_sub_dir(self.base_dir, d)
                 if abs_dir in self.system_header_dirs:
-                    scons_env.AppendUnique(CPPPATH=abs_dir)
+                    scons_env.AppendUnique(CPPPATH=[abs_dir])
                 else:
-                    scons_env.PrependUnique(CPPPATH=abs_dir)
+                    scons_env.PrependUnique(CPPPATH=[abs_dir])
 
         if self.fworks:
             self.backup_variable(scons_env, 'FRAMEWORKS', old_state)
