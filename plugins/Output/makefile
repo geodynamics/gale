@@ -35,11 +35,11 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 535 2006-04-11 13:07:34Z PatrickSunter $
+## $Id: makefile 1080 2008-03-20 02:21:32Z JohnMansour $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-subdirs = PrintFeVariableDiscreteValues PrintFeVariableDiscreteValues_2dBox FrequentOutput CPUTime PeakMemory
+subdirs = PrintFeVariableDiscreteValues PrintFeVariableDiscreteValues_2dBox FrequentOutput CPUTime PeakMemory FeVariableList
 
 # obtain defaults for required variables according to system and project location, and then run the build.
 SHELL := $(shell which bash)
