@@ -3,16 +3,16 @@ import SConfig
 import SCons.Script
 
 class stgUnderworld(SConfig.Package):
-    def __init__(self, env, options):
-        SConfig.Package.__init__(self, env, options, True)
+    def __init__(self, scons_env, scons_opts, required=False):
+        SConfig.Package.__init__(self, scons_env, scons_opts, required)
         self.checks = [self.setup_environment]
         self.dependency(SConfig.packages.cmath)
         self.dependency(SConfig.packages.libXML2)
         self.dependency(SConfig.packages.MPI)
-        self.dependency(SConfig.packages.SVNRevision)
+        self.svnrevision = self.dependency(SConfig.packages.SVNRevision)
         self.dependency(SConfig.packages.BlasLapack)
         self.dependency(SConfig.packages.PETSc)
-        self.dependency(SConfig.packages.HDF5, False).require_shared = True
+        self.dependency(SConfig.packages.HDF5, False)
         if self.env['with_glucifer']:
             self.dependency(SConfig.packages.OpenGL)
             self.dependency(SConfig.packages.OSMesa, False)
@@ -30,10 +30,13 @@ class stgUnderworld(SConfig.Package):
             self.opts.AddOptions(
                 SCons.Script.BoolOption('debug',
                                         'Enable debugging', 1),
-                SCons.Script.BoolOption('staticLibraries',
-                                        'Build static libraries only', 0),
+                SCons.Script.BoolOption('static_libraries',
+                                        'Build static libraries', 0),
+                SCons.Script.BoolOption('shared_libraries',
+                                        'Build shared libraries', 1),
                 SCons.Script.BoolOption('with_glucifer', 'Enable the gLucifer module', 1),
-                ('buildPath', 'Temporary build path', 'build'))
+                ('buildPath', 'Temporary build path', 'build')
+                )
 
     def setup_environment(self):
         # Setup the build path.
@@ -62,4 +65,8 @@ class stgUnderworld(SConfig.Package):
         if self.env['debug']:
             self.env.MergeFlags('-g')
 
-        return [1, '', '']
+        # Setup the revision number.
+        ver = self.env['ESCAPE']('"' + str(self.svnrevision.revision) + '"')
+        self.env.Append(CPPDEFINES=[('VERSION', ver)])
+
+        return True

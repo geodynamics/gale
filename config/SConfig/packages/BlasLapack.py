@@ -2,14 +2,13 @@ import os
 import SConfig
 
 class BlasLapack(SConfig.Package):
-    def __init__(self, env, options):
-        SConfig.Package.__init__(self, env, options)
+    def __init__(self, scons_env, scons_opts, required=False):
+        SConfig.Package.__init__(self, scons_env, scons_opts, required)
         self.cmath = self.dependency(SConfig.packages.cmath)
         self.libraries = [['blas', 'lapack'],
                           ['cblas', 'clapack'],
                           ['mkl', 'mkl_lapack']]
         self.frameworks = [['Accelerate']]
-        self.use_rpath = True
         self.symbols = [(['dgeev'], 'FORTRAN_NORMAL'),
                         (['dgeev_'], 'FORTRAN_SINGLE_TRAILINGBAR'),
                         (['dgeev__'], 'FORTRAN_DOUBLE_TRAILINGBAR'),

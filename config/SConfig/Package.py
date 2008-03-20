@@ -2,349 +2,244 @@ import os, platform, glob
 import SCons.Script
 import SConfig
 
-class Package(object):
-    def __init__(self, env, options=None, required=False):
-        # Construct this package's name.
-        self.name = self.__module__.split('.')[-1]
-        self.command_name = self.name.lower()
-        self.environ_name = self.name.upper()
-        self.command_options = {}
-        self.environ_options = {}
+class Package(SConfig.Node):
+    def __init__(self, scons_env, scons_opts, required=False):
+        SConfig.Node.__init__(self, scons_env, scons_opts, required)
 
-        # Setup some system specific information.
-        self.system = platform.system()
-        if platform.platform().find('x86_64') != -1 or \
-               platform.platform().find('ppc64') != -1 or \
-               platform.architecture()[0].find('64') != -1:
-            self.bits = 64
-        else:
-            self.bits = 32
-
-        # Setup the options immediately, that way we can access them
-        # in sub-classes.
-        self.opts = options
-        self.setup_options()
-        if self.opts:
-            self.opts.Update(env)
-
-        # Language options.
-        self.language          = 'C' # 'C' | 'CXX' | 'F77'
-        self.have_define       = ''
+        # This will be set in the preprocessor.
+        self.have_define         = 'HAVE_' + self.environ_name
 
         # Search options.
-        self.base_dirs         = [] #['']
-        self.base_patterns     = [] #['']
-        self.sub_dirs          = [] #[[[''], ['']]]
-        self.header_sub_dir    = ''
+        self.base_dirs           = [] #['']
+        self.base_patterns       = [] #['']
+        self.sub_dirs            = [] #[[[''], ['']]]
+        self.header_sub_dir      = ''
+        self.system_header_dirs  = []
+        self.system_library_dirs = []
 
-        # Header options.
-        self.headers            = [[]] #[['']]
+        # Which headers do we require?
+        self.headers             = [[]] #[['']]
 
         # Library options.
-        self.libraries         = [] #[['']]
-        self.shared_libraries  = []
-        self.require_shared    = False
-        self.use_rpath         = True
-        self.symbols           = [([], '')] #[([''], '')]
-        self.symbol_setup      = ''
-        self.symbol_teardown   = ''
-        self.symbol_prototypes = [] #['']
-        self.symbol_calls      = [] #['']
+        self.libraries           = [] #[['']]
+        self.shared_libraries    = [] # Only libraries listed here will be considered
+                                      # when checking for shared libraries.
+        self.require_shared      = False
+        self.symbols             = [([], '')] #[([''], '')]
+        self.symbol_setup        = ''
+        self.symbol_teardown     = ''
+        self.symbol_prototypes   = [] #['']
+        self.symbol_calls        = [] #['']
 
         # Framework options.
-        self.frameworks        = [] #[['']]
+        self.frameworks          = [] #[['']]
 
-        # Version checking options.
-        self.version           = [] #[['', 0]]
-
-        # A list of checks to perform for this package.
-        self.checks            = [self.find_package]
-
-        # Once configured, these values will be set.
-        self.configured = False
-        self.result = [0, '', '']
-        self.cpp_defines = []
+        # Will be set after configuration.
         self.base_dir = ''
         self.hdr_dirs = []
-        self.hdrs = []
         self.lib_dirs = []
+        self.hdrs = []
         self.libs = []
         self.have_shared = None
         self.fworks = []
-        self.state = {}
+        self.cpp_defines = []
 
         # Private stuff.
-        self.env = env
-        self.deps = []
-        self.required = required
+        self.platform = self.dependency(SConfig.Platform, True) # Need this so we can get
+                                                                # access to information about
+                                                                # the platform we're running on.
+        self.checks = [self.find_package] # The basic package location check.
 
+        # Set everything up.
         self.setup_search_defaults()
 
+    def setup_options(self):
+        SConfig.Node.setup_options(self)
+        self.opts.AddOptions(
+            SCons.Script.BoolOption('with_' + self.command_name,
+                                    'Turn on/off package %s' % self.name, 1),
+            SCons.Script.PathOption(self.command_name + '_dir',
+                                    '%s installation path' % self.name,
+                                    None, SCons.Script.PathOption.PathIsDir),
+            SCons.Script.PathOption(self.command_name + '_inc_dir',
+                                    '%s header installation path' % self.name,
+                                    None, SCons.Script.PathOption.PathIsDir),
+            SCons.Script.PathOption(self.command_name + '_lib_dir',
+                                    '%s library installation path' % self.name,
+                                    None, SCons.Script.PathOption.PathIsDir),
+            (self.command_name + '_lib',
+             '%s libraries' % self.name,
+             None, None),
+            (self.command_name + '_framework',
+             '%s framework' % self.name,
+             None, None))
+        self.option_map = {self.command_name + '_dir': self.environ_name + '_DIR'}
+
     def setup_search_defaults(self):
-        # Set common defaults of Darwin and Linux.
-        if self.system in ['Darwin', 'Linux']:
+        """Setup the usual search paths for packages depending on the kind of system
+        we're on."""
+        if self.platform.system in ['Darwin', '*ix']:
             self.base_dirs = ['/usr', '/usr/local']
             self.sub_dirs = [[['include'], ['lib']]]
-            if self.bits == 64:
+            if self.platform.bits == 64:
                 self.sub_dirs = [[['include'], ['lib64']],
                                  [['include'], [os.path.join('lib', '64')]]] + self.sub_dirs
 
         # Set Darwin specific defaults.
-        if self.system == 'Darwin':
+        if self.platform.system == 'Darwin':
             self.base_dirs += ['/sw']
 
         # Set Window specific defaults.
-        if self.system == 'Windows':
+        if self.platform.system == 'Windows':
             pass # TODO
 
-    def setup_options(self):
-        if not self.opts:
-            return
-        self.command_options = ['with_' + self.command_name,
-                                self.command_name + 'Dir',
-                                self.command_name + 'IncDir',
-                                self.command_name + 'LibDir',
-                                self.command_name + 'Lib',
-                                self.command_name + 'Framework']
-        self.environ_options = {self.command_name + 'Dir': self.environ_name + '_DIR',
-                                self.command_name + 'IncDir': self.environ_name + '_INC_DIR',
-                                self.command_name + 'LibDir': self.environ_name + '_LIB_DIR',
-                                self.command_name + 'Lib': self.environ_name + '_LIB',
-                                self.command_name + 'Framework': self.environ_name + '_FRAMEWORK'}
-        self.opts.AddOptions(
-            SCons.Script.BoolOption('with_' + self.command_name, 'Turn on/off %s' % self.name, 1),
-            SCons.Script.PathOption(self.command_name + 'Dir',
-                                    '%s installation path' % self.name,
-                                    None, SCons.Script.PathOption.PathIsDir),
-            SCons.Script.PathOption(self.command_name + 'IncDir',
-                                    '%s header installation path' % self.name,
-                                    None, SCons.Script.PathOption.PathIsDir),
-            SCons.Script.PathOption(self.command_name + 'LibDir',
-                                    '%s library installation path' % self.name,
-                                    None, SCons.Script.PathOption.PathIsDir),
-            (self.command_name + 'Lib',
-             '%s libraries' % self.name,
-             None, None),
-            (self.command_name + 'Framework',
-             '%s framework' % self.name,
-             None, None))
+        # Combine these guys to build default system paths. We need these to ensure specific
+        # include paths are used before generic ones.
+        for base_dir in self.base_dirs:
+            for hdr_dirs, lib_dirs in self.combine_sub_dirs(base_dir):
+                self.system_header_dirs += [os.path.join(base_dir, h) for h in hdr_dirs]
+                self.system_library_dirs += [os.path.join(base_dir, h) for l in lib_dirs]
 
-    def get_headers_error_message(self, console):
+    def get_check_headers_fail_reason(self, fail_logs):
         return ''
 
-    def get_run_error_message(self, console):
+    def get_check_symbols_fail_reason(self, fail_logs):
         return ''
 
-    def configure(self, configure_context):
-        """Perform the configuration of this package. Override this method to perform
-        custom configuration checks."""
-        # If we've already configured this package, or it is deselected, just return.
-        if self.configured or not (self.required or self.env['with_' + self.command_name]):
+    def configure(self, scons_ctx):
+        if not self.required and not self.env['with_' + self.command_name]:
             return
+        SConfig.Node.configure(self, scons_ctx)
 
-        # Setup our configure context and environment.
-        self.ctx = configure_context
-        self.configured = True
-
-        # Process dependencies first.
-        result = self.process_dependencies()
-        if not result[0]:
-            self.ctx.Display('  ' + result[2])
-            self.result = result
-            return result
-
-        # Process options.
-        self.process_options()
-
-        # Perfrom actual configuration.
-        self.ctx.Message('Checking for package %s ... ' % self.name)
-        self.ctx.Display('\n')
-        for check in self.checks:
-            result = check()
-            self.result = result
-            if not self.result[0]:
-                break
-
-        # Required?
-        if self.required and not self.result[0]:
-            self.ctx.Display('\nThe required package ' + self.name + ' could not be found.\n')
-            self.ctx.Display('The printouts above should provide some information on what went wrong,\n')
-            self.ctx.Display('To see further details, please read the \'config.log\' file.\n')
-            if len(self.command_options):
-                self.ctx.Display('You can directly specify search parameters for this package via\n')
-                self.ctx.Display('the following command line options:\n\n')
-                for opt in self.command_options:
-                    self.ctx.Display('  ' + opt + '\n')
-                self.ctx.Display('\nRun \'scons help\' for more details on these options.\n\n')
-            self.env.Exit()
-
-        # If we succeeded, store the resulting environment.
-        if self.result[0]:
-            if self.have_define:
-                self.cpp_defines += [self.have_define]
-            self.build_state()
-            self.push_state(self.state)
-
-        # Display results.
-        if not self.result[0] and self.result[2]:
-            self.ctx.Display('   ' + self.result[2])
-        self.ctx.Display('   ')
-        self.ctx.Result(self.result[0])
-
-        return self.result
-
-    def dependency(self, package_module, required=True):
-        if self.configured:
-            print 'Error: Cannot add a dependency during configuration.'
-            self.env.Exit()
-        pkg = self.env.Package(package_module, self.opts)
-        if pkg not in [d[0] for d in self.deps]:
-            self.deps += [(pkg, required)]
-        return pkg
-
-    def process_dependencies(self):
-        """Ensure all dependencies have been configured before this package."""
-        for pkg, req in self.deps:
-            pkg.configure(self.ctx)
-            if req and not pkg.result[0]:
-                return [0, '', 'Missing dependency: ' + pkg.name]
-        return [1, '', '']
-
-    def process_options(self):
-        """Do any initial option processing, including importing any values from
-        the environment and validating that all options are consistent."""
-        cmd_opts = False
-        for opt in self.command_options:
-            if opt in self.opts.args:
-                cmd_opts = True
-                break
-        if cmd_opts:
-            return
-        for cmd, env in self.environ_options.iteritems():
-            if cmd not in self.opts.args and env in self.env['ENV']:
-                self.env[cmd] = self.env['ENV'][env]
+    def setup(self):
+        SConfig.Node.setup(self)
+        if self.require_shared:
+            self.dependency(SConfig.packages.dl)
 
     def find_package(self):
-        # Search for package locations.
-        self.ctx.Display('   Searching locations:\n')
+        """Basic check routine for locating the package."""
+        result = True
+        self.ctx.Display('  Searching locations:\n')
         for loc in self.generate_locations():
+            self.ctx.Display('    %s\n' % str(loc))
             result = self.check_location(loc)
-            self.ctx.Display('      %s\n' % str(loc))
-            if result[0]: # If we succeeded, back out here.
+            if result:
+                self.base_dir = loc[0]
+                self.hdr_dirs = loc[1]
+                self.lib_dirs = loc[2]
+                self.fworks = loc[3]
                 break
-            if result[2]: # Display an error message.
-                self.ctx.Display('         %s\n' % result[2])
-
-        result = [result[0], '', '']
         return result
 
     def check_location(self, location):
         """Check if the currently selected location is a valid installation of the
         required package. At this stage we know that the paths given in the location
         actually exist."""
-        # Validate the headers, first.
-        result = self.validate_location(location)
-        if not result[0]:
-            #return result
-            pass
-
-        # Construct our path state.
-        path_state = self.build_header_state(location)
-        old = self.push_state(path_state)
+        old_state = self.enable_location_state(location)
 
         # Check for the headers.
-        result = self.check_headers(location)
-        if not result[0]:
-            self.pop_state(old)
-            return result
+        if not self.check_headers(location):
+            self.pop_state(old_state)
+            return False
 
         # Scan each set of libraries in turn.
-        libs = []
-        for libs in self.generate_libraries(location):
-            result = self.check_libs(location, libs)
-            if result[0]:
-                break
+        if not self.check_libraries(location):
+            self.pop_state(old_state)
+            return False
 
-        # Store last known configuration.
-        self.store_result(result, location, libs)
-
-        # Roll-back on state.
-        self.pop_state(old)
-        return result
+        self.pop_state(old_state)
+        return True
 
     def check_headers(self, location):
         """Determine if the required headers are available with the current construction
         environment settings."""
+        fail_logs = []
         for hdrs in self.headers:
             src = self.get_header_source(hdrs)
-            result = self.run_scons_cmd(self.ctx.TryCompile, src, '.c')
+            result = self.compile_source(src)
             if result[0]:
                 self.hdrs = list(hdrs)
                 break
+            fail_logs += [result[1]]
         if not result[0]:
-            msg = self.get_headers_error_message(result[1])
+            msg = self.get_check_headers_fail_reason(fail_logs)
             if not msg:
-                msg = 'Failed to locate headers.'
-        else:
-            msg = ''
-        return [result[0], '', msg]
+                msg = 'Headers not found.'
+            self.ctx.Display('      ' + msg + '\n')
+        return result[0]
 
-    def check_libs(self, location, libs):
+    def check_libraries(self, location):
         """Check if the currently selected location is a valid installation of the
         required package. At this stage we know that the paths given in the location
         actually exist and we need to confirm that the libraries in 'libs' exist."""
-        # Validate the libraries.
-        result = self.validate_libraries(location, libs)
-        if not result[0]:
-            return result
+        fail_reasons = []
+        no_shared = False
+        for libs in self.generate_libraries(location):
+            old_state = self.enable_library_state(location, libs)
 
-        # Construct the library state.
-        lib_state = self.build_lib_state(location, libs)
-        old = self.push_state(lib_state)
+            # Check that we can link against the libraries by trying to link against
+            # a particular set of symbols.
+            result = self.check_symbols(location, libs)
+            if not result[0]:
+                fail_reasons += [result[1]]
+                self.pop_state(old_state)
+                continue
 
-        # Check that we can link against the libraries by trying to link against
-        # a particular set of symbols.
-        result = self.check_symbols()
-        if not result[0]:
-            if not result[2]:
-                result[2] = 'Failed to link against library(s).'
-            self.pop_state(old)
-            return result
+            # Check if we have shared libraries.
+            if not self.require_shared or not libs:
+                self.libs = list(libs)
+                self.pop_state(old_state)
+                return True
+            elif self.check_shared(location, libs):
+                self.libs = list(libs)
+                self.pop_state(old_state)
+                return True
+            else:
+                no_shared = True
 
-        # Check if we have shared libraries.
-        if self.require_shared and libs:
-            result = self.check_shared(location, libs)
-            if not result[0] and not result[2]:
-                result[2] = 'No shared library(s) available.'
+        # Figure out what to report.
+        if no_shared:
+            reason = 'No shared libraries.'
+        else:
+            reason = ''
+            for reason in fail_reasons:
+                if reason:
+                    break
+            if not reason:
+                reason = 'Libraries not found.'
+        self.ctx.Display('      ' + reason + '\n')
 
-        # Roll-back on our state.
-        self.pop_state(old)
-        return result
+        self.pop_state(old_state)
+        return False
 
-    def check_symbols(self):
+    def check_symbols(self, location, libraries):
         """We have our paths and libraries setup, now we need to see if we can find
         one of the set of required symbols in the libraries."""
+        fail_logs = []
         for syms in self.symbols:
             result = self.run_source(self.get_check_symbols_source(syms[0]))
             if result[0]:
                 if syms[1]:
                     self.cpp_defines += [syms[1]] # Add the CPP defines.
                 break
-        return result
+            fail_logs += [result[2]]
+        if not result[0]:
+            reason = self.get_check_symbols_fail_reason(fail_logs)
+        else:
+            reason = ''
+        return [result[0], reason]
 
-    def check_shared(self, location, libs):
-        """Confirm that there are shared versions of this package's libraries available."""
-        if not self.pkg_dl.result[0]:
-            return [0, '', 'No dynamic loader found (libdl).']
-
+    def check_shared(self, location, libraries):
+        """Confirm that there are shared versions of this package's libraries available.
+        At this point we know we can link against the libraries."""
         # Build a binary to try and dynamically open the libraries in order.
         result = [1, '', '']
         src = self.get_header_source()
         src += """
 int main(int argc, char* argv[]) {
   void* lib[%d];
-""" % len(libs)
-        for l in libs:
+""" % len(libraries)
+        for l in libraries:
             if self.shared_libraries and l not in self.shared_libraries:
                 continue
             offs = ''
@@ -352,14 +247,16 @@ int main(int argc, char* argv[]) {
                 offs += '  '
                 if len(offs) > 2:
                     src += '{\n%s'
-                src += '%slib[%d] = dlopen("%s", RTLD_NOW);\n' % (offs, libs.index(l), p)
-                src += '%sif( !lib[%d] ) ' % (offs, libs.index(l))
+                src += '%slib[%d] = dlopen("%s", RTLD_NOW);\n' % (offs, libraries.index(l), p)
+                src += '%sif( !lib[%d] ) ' % (offs, libraries.index(l))
             src += 'return 1;\n'
             while len(offs) > 2:
                 src += offs + '}'
                 offs = offs[:-2]
         src += '  return 0;\n}\n'
-        return self.run_source(src)
+        if not self.run_source(src)[0]:
+            return False
+        return True
 
     def generate_library_paths(self, location, library):
         lib_name = self.env.subst('${SHLIBPREFIX}' + library + '${SHLIBSUFFIX}')
@@ -370,37 +267,20 @@ int main(int argc, char* argv[]) {
         else:
             yield lib_name
 
-    def run_source(self, source):
-        """At this point we know all our construction environment has been set up,
-        so we should be able to build and run the application."""
-        result = self.run_scons_cmd(self.ctx.TryRun, source, '.c')
-        msg = self.get_run_error_message(result[1])
-        return [result[0][0], result[0][1], msg]
-
-    def validate_location(self, location):
-        """Confirm that the location is okay, possibly modifying it in place if
-        there are additional locations to search."""
-        return [1, '', '']
-
-    def validate_libraries(self, location, libs):
-        """Confirm that the specified libraries are okay, possibly modifying in
-        place the list of libraries."""
-        return [1, '', '']
-
     def generate_locations(self):
         """Generate a set of potential package locations. Locations are of the form
         ['base_dir', ['header_dirs'], ['lib_dirs'], ['frameworks']]."""
         # If we've been given options directly specifying the location of this
         # package we need to use those in place of searching for locations.
-        base_dir = self.env.get(self.command_name + 'Dir', '')
-        inc_dir = self.env.get(self.command_name + 'IncDir', '')
-        lib_dir = self.env.get(self.command_name + 'LibDir', '')
-        fwork = self.env.get(self.command_name + 'Framework', '')
+        base_dir = self.env.get(self.command_name + '_dir', '')
+        inc_dir = self.env.get(self.command_name + '_inc_dir', '')
+        lib_dir = self.env.get(self.command_name + '_lib_dir', '')
+        fwork = self.env.get(self.command_name + '_framework', '')
         if inc_dir or lib_dir:
             if not (inc_dir and lib_dir):
                 print '   Error: must specify both of'
-                print '      ' + self.command_name + 'IncDir'
-                print '      ' + self.command_name + 'LibDir'
+                print '      ' + self.command_name + '_inc_dir'
+                print '      ' + self.command_name + '_lib_dir'
                 env.Exit()
             yield ['', [inc_dir], [lib_dir], [fwork]]
             return
@@ -438,12 +318,6 @@ int main(int argc, char* argv[]) {
                         yield [dir, list(hdr), list(lib), list(fw)]
                         for sub in self.combine_header_sub_dir(dir, hdr):
                             yield [dir, list(sub), list(lib), list(fw)]
-
-    def generate_libraries(self, location):
-        if location[3]:
-            yield []
-        for libs in self.libraries:
-            yield libs
 
     def combine_sub_dirs(self, base_dir):
         """Take a base directory and combine it with the set of header and library
@@ -490,93 +364,85 @@ int main(int argc, char* argv[]) {
             return sub_dir
         return os.path.join(base_dir, sub_dir)
 
-    def build_header_state(self, location):
-        """Build a construction state for including headers."""
-        state = {}
-        if location[1]:
-            state['CPPPATH'] = [self.join_sub_dir(location[0], l) for l in location[1]]
-        if location[3]:
-            state['FRAMEWORKS'] = location[3]
-        return state
+    def generate_libraries(self, location):
+        if location[3]: # Try any frameworks by themselves first.
+            yield []
+        for libs in self.libraries:
+            yield libs
 
-    def build_lib_state(self, location, libs):
+    def enable_location_state(self, location):
+        """Modify our environment to include search paths for the current location."""
+        old_state = {}
+        if location[1]:
+            old_state['CPPPATH'] = self.env.get('CPPPATH', [])
+            self.env.PrependUnique(CPPPATH=[self.join_sub_dir(location[0], l) for l in location[1]])
+        if location[2]:
+            old_state['LIBPATH'] = self.env.get('LIBPATH', [])
+            old_state['RPATH'] = self.env.get('RPATH', [])
+            lib_paths = [self.join_sub_dir(location[0], l) for l in location[2]]
+            self.env.PrependUnique(LIBPATH=lib_paths)
+            self.env.PrependUnique(RPATH=[os.path.abspath(p) for p in lib_paths])
+        if location[3]:
+            old_state['FRAMEWORKS'] = self.env.get('FRAMEWORKS', [])
+            self.env.PrependUnique(FRAMEWORKS=location[3])
+        return old_state
+
+    def enable_library_state(self, location, libs):
         """Take the current location and libraries and convert them into an SCons
         construction environment state dictionary."""
-        state = {}
-        if location[2]:
-            state['LIBPATH'] = [self.join_sub_dir(location[0], l) for l in location[2]]
-            if self.use_rpath:
-                state['RPATH'] = [os.path.abspath(p) for p in state['LIBPATH']]
-        if location[3]:
-            state['FRAMEWORKS'] = location[3]
+        old_state = {}
         if libs:
-            state['LIBS'] = libs
-        return state
+            old_state['LIBS'] = self.env.get('LIBS', [])
+            self.env.PrependUnique(LIBS=libs)
+        return old_state
 
-    def build_state(self):
-        self.state = {}
+    def enable(self, scons_env):
+        SConfig.Node.enable(self, scons_env)
         if self.cpp_defines:
-            self.state['CPPDEFINES'] = self.cpp_defines
+            scons_env.AppendUnique(CPPDEFINES=self.cpp_defines)
+
         if self.hdr_dirs:
-            self.state['CPPPATH'] = [self.join_sub_dir(self.base_dir, d) \
-                                         for d in self.hdr_dirs]
+            for d in self.hdr_dirs:
+                abs_dir = [self.join_sub_dir(self.base_dir, d)]
+                if d in self.system_header_dirs:
+                    scons_env.AppendUnique(CPPPATH=abs_dir)
+                else:
+                    scons_env.PrependUnique(CPPPATH=abs_dir)
+
         if self.fworks:
-            self.state['FRAMEWORKS'] = self.fworks
+            scons_env.PrependUnique(FRAMEWORKS=self.fworks)
+
         if self.lib_dirs:
-            self.state['LIBPATH'] = [self.join_sub_dir(self.base_dir, d) \
-                                         for d in self.lib_dirs]
-            if self.use_rpath:
-                self.state['RPATH'] = [os.path.abspath(p) for p in self.state['LIBPATH']]
+            for d in self.lib_dirs:
+                abs_dir = self.join_sub_dir(self.base_dir, d)
+                if d in self.system_library_dirs:
+                    scons_env.AppendUnique(LIBPATH=[abs_dir])
+                    scons_env.AppendUnique(RPATH=[os.path.abspath(abs_dir)])
+                else:
+                    scons_env.PrependUnique(LIBPATH=[abs_dir])
+                    scons_env.PrependUnique(RPATH=[os.path.abspath(abs_dir)])
+
         if self.libs:
-            self.state['LIBS'] = self.libs
-
-    def store_result(self, result, location, libs):
-        self.result = result
-        self.base_dir = location[0]
-        self.hdr_dirs = location[1]
-        self.lib_dirs = location[2]
-        self.libs = libs
-        if self.require_shared:
-            self.have_shared = True
-        else:
-            self.have_shared = None
-        self.fworks = location[3]
-
-    def push_state(self, state, append=False):
-        old = {}
-        copy = dict(state)
-        for k, v in copy.iteritems():
-            if not v:
-                continue
-            if not isinstance(v, list):
-                copy[k] = [v]
-            else:
-                copy[k] = v
-            old[k] = self.env.get(k, [])
-        if append:
-            self.env.AppendUnique(**copy)
-        else:
-            self.env.PrependUnique(**copy)
-        return old
-
-    def pop_state(self, old):
-        self.env.Replace(**old)
+            scons_env['LIBS'] = self.libs
 
     def get_all_headers(self, headers):
-        if not self.result[0]:
+        if not self.result:
             return
-        headers += [h for h in self.hdrs if h not in headers]
         for d, r in self.deps:
-            d.get_all_headers(headers)
+            if hasattr(d, 'get_all_headers'):
+                d.get_all_headers(headers)
+        headers += [h for h in self.hdrs if h not in headers]
 
     def get_header_source(self, headers=None):
         src = '#include<stdlib.h>\n#include<stdio.h>\n#include<string.h>\n'
-        if headers is None:
-            hdrs = list(self.hdrs)
-        else:
-            hdrs = list(headers)
+        hdrs = []
         for d, r in self.deps:
-            d.get_all_headers(hdrs)
+            if hasattr(d, 'get_all_headers'):
+                d.get_all_headers(hdrs)
+        if headers is None:
+            hdrs += list(self.hdrs)
+        else:
+            hdrs += list(headers)
         for h in hdrs:
             src += '#include<' + h + '>\n'
         return src
@@ -594,39 +460,3 @@ int main(int argc, char* argv[]) {
             src += self.symbol_teardown + '\n'
         src += 'return 0;\n}\n'
         return src
-
-    def run_scons_cmd(self, cmd, *args, **kw):
-        # Capture the log.
-        old_log = self.ctx.sconf.logstream
-        self.ctx.sconf.logstream = open('sconfig.log', 'w')
-
-        # Execute the command.
-        res = cmd(*args, **kw)
-
-        # Make sure the file is closed.
-        try:
-            self.ctx.sconf.logstream.close()
-        finally:
-            pass
-
-        # Replace the old log.
-        self.ctx.sconf.logstream = old_log
-
-        # Return results.
-        log_file = open('sconfig.log', 'r')
-        log = log_file.read()
-        log_file.close()
-        os.remove('sconfig.log')
-        old_log.write(log)
-        return [res, log]
-
-    def __str__(self):
-        str =  'Package name:  %s\n' % self.name
-        str += 'Found:         %s\n' % self.result[0]
-        str += 'Base path:     %s\n' % self.base_dir
-        str += 'Header paths:  %s\n' % self.hdr_dirs
-        str += 'Library paths: %s\n' % self.lib_dirs
-        str += 'Libraries:     %s\n' % self.libs
-        str += 'Have shared:   %s\n' % self.have_shared
-        str += 'Frameworks:    %s\n' % self.fworks
-        return str

@@ -6,23 +6,57 @@ from SCons.Script.SConscript import SConsEnvironment
 # Setup the Package system.
 #
 
-def Package(env, pkg_module, options=None):
-    # Setup the SCons environment to hold packages if not already
-    # done.
+def Package(env, pkg_module, options, required=False):
+    """Create a new package to be configured."""
     if not hasattr(env, 'packages'):
         env.packages = {}
         env.package_list = []
-
     if not pkg_module in env.packages:
-        # Add an instance of this package.
-        env.packages[pkg_module] = pkg_module(env, options)
+        env.packages[pkg_module] = pkg_module(env, options, required)
         env.package_list += [env.packages[pkg_module]]
-
     return env.packages[pkg_module]
 
-def CheckPackages(ctx, pkg_list):
-    for pkg in pkg_list:
+def CheckPackage(ctx, pkg):
         pkg.configure(ctx)
+
+def configure_packages(env, options=None, output='config.cfg'):
+    # Get rid of the temporary directory to make sure we're building
+    # from scratch.
+    if os.path.exists('.sconsign.dblite'):
+        os.remove('.sconsign.dblite')
+
+    # Finish setting everything up.
+    for pkg in env.package_list:
+        pkg.setup()
+
+    # Update dependencies and requirements.
+    pkgs_rem = list(env.package_list)
+    while len(pkgs_rem):
+        pkg = pkgs_rem.pop()
+        if pkg.required:
+            for d, r in pkg.deps:
+                if r and not d.required:
+                    d.required = True
+                    pkgs_rem += [d]
+
+    # Call the packages checker.
+    for pkg in env.package_list:
+        sconf = Configure(pkg.env, custom_tests={'CheckPackage': CheckPackage})
+        sconf.CheckPackage(pkg)
+        sconf.Finish()
+
+    # Dump results to our output file.
+    vars = ['CFLAGS', 'CCFLAGS',
+            'CPPPATH', 'CPPDEFINES',
+            'LIBPATH', 'LIBS', 'RPATH',
+            'FRAMEWORKS']
+    vars += options.keys()
+    env.save_config(output, vars)
+
+    # Print out build message.
+    print '\n*****************************************'
+    print "* Now run 'scons' to build the project. *"
+    print '*****************************************\n'
 
 def save_config(env, filename, vars):
     d = {}
@@ -48,51 +82,6 @@ def load_config(env, filename):
     f.close()
     for k, v in d.iteritems():
         env[k] = v
-
-def force_required(pkg):
-    for d in pkg.deps:
-        d.required = True
-        force_required(d)
-
-def configure_packages(env, options=None, output='config.cfg'):
-    sconf = Configure(env, custom_tests={'CheckPackages': CheckPackages})
-
-    # Get rid of the temporary directory to make sure we're building
-    # from scratch.
-    if os.path.exists('.sconsign.dblite'):
-        os.remove('.sconsign.dblite')
-
-    # Add dependencies needed for shared libraries.
-    for pkg in env.package_list:
-        if pkg.require_shared:
-            pkg.pkg_dl = pkg.dependency(SConfig.packages.dl)
-
-    # Update dependencies and requirements.
-    pkgs_rem = list(env.package_list)
-    while len(pkgs_rem):
-        pkg = pkgs_rem.pop()
-        if pkg.required:
-            for d, r in pkg.deps:
-                if r and not d.required:
-                    d.required = True
-                    pkgs_rem += [d]
-
-    # Call the packages checker.
-    sconf.CheckPackages(env.package_list)
-
-    # Dump results to our output file.
-    vars = ['CFLAGS', 'CCFLAGS',
-            'CPPPATH', 'CPPDEFINES',
-            'LIBPATH', 'LIBS', 'RPATH',
-            'FRAMEWORKS']
-    if options:
-        vars += options.keys()
-    env.save_config(output, vars)
-
-    # Print out build message.
-    print '\n*****************************************'
-    print "* Now run 'scons' to build the project. *"
-    print '*****************************************\n'
 
 SConsEnvironment.Package = Package
 SConsEnvironment.configure_packages = configure_packages

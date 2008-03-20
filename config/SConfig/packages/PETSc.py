@@ -2,8 +2,8 @@ import os
 import SConfig
 
 class PETSc(SConfig.Package):
-    def __init__(self, env, options):
-        SConfig.Package.__init__(self, env, options)
+    def __init__(self, scons_env, scons_opts, required=False):
+        SConfig.Package.__init__(self, scons_env, scons_opts, required)
         self.dependency(SConfig.packages.MPI)
         self.base_patterns = ['petsc*', 'PETSC*', 'PETSc*']
         self.header_sub_dir = 'petsc'
@@ -14,45 +14,41 @@ class PETSc(SConfig.Package):
                            'petscmat', 'petscvec',
                            'petscdm', 'petsc',]]
         self.require_shared = True
-        self.use_rpath = True
-        self.have_define = 'HAVE_PETSC'
+        self.symbols = [(['PetscInitialize', 'PetscFinalize'], '')]
+        self.symbol_calls = ['%s(&argc, &argv, NULL, NULL);', '%s();']
 
-        # Other stuff.
+        # Will be set after configuration.
         self.arch = ''
 
-    def validate_location(self, location):
-        # Must have a base directory.
-        if not location[0]:
-            return (1, '', '')
+    def generate_locations(self):
+        for loc in SConfig.Package.generate_locations(self):
+            if not loc[0]:
+                yield loc
+                continue
 
-        # Get the architecture.
-        arch = self.get_petsc_arch(location[0])
-        if not arch:
-            return [0, '', 'Could not read architecture from petscconf.']
-        self.arch = arch
+            arch = self.get_petsc_arch(loc[0])
+            if not arch:
+                yield loc
+                continue
+            self.arch = arch
 
-        # Add the bmake/arch include directory.
-        hdr_dir = os.path.join('bmake', arch)
-        if not os.path.exists(os.path.join(location[0], hdr_dir)):
-            return [0, '', 'No bmake/<arch> directory.']
-        if hdr_dir not in location[1]:
-            location[1] += [hdr_dir]
+            # Add the bmake/arch include directory.
+            hdr_dir = os.path.join('bmake', arch)
+            if not os.path.exists(os.path.join(loc[0], hdr_dir)):
+                continue
+            if hdr_dir not in loc[1]:
+                loc[1] += [hdr_dir]
 
-        # Add the lib/arch library directory.
-        if 'lib' in location[2]:
-            location[2].remove('lib')
-        lib_dir = os.path.join('lib', arch)
-        if not os.path.exists(os.path.join(location[0], lib_dir)):
-            return [0, '', 'No lib/<arch> directory.']
-        if lib_dir not in location[2]:
-            location[2] += [lib_dir]
+            # Add the lib/arch library directory.
+            if 'lib' in loc[2]:
+                loc[2].remove('lib')
+            lib_dir = os.path.join('lib', arch)
+            if not os.path.exists(os.path.join(loc[0], lib_dir)):
+                continue
+            if lib_dir not in loc[2]:
+                loc[2] += [lib_dir]
 
-        return [1, '', '']
-
-    def get_headers_error_message(self, console):
-        if console.find('MPI_') != -1:
-            return 'Incompatible implementation of MPI.'
-        return ''
+            yield loc
 
     def get_petsc_arch(self, base_dir):
         petscconf = os.path.join(base_dir, 'bmake',
@@ -63,3 +59,9 @@ class PETSc(SConfig.Package):
         arch = f.readline().split('=')[1][:-1]
         f.close()
         return arch
+
+    def get_check_headers_fail_reason(self, fail_logs):
+        for log in fail_logs:
+            if log.find('MPI') != -1:
+                return 'Selected MPI implementation incompatible.'
+        return ''

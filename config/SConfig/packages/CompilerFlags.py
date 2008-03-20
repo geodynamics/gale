@@ -2,20 +2,18 @@ import os, platform
 import SCons.Script
 import SConfig
 
-class CompilerFlags(SConfig.Package):
-    def __init__(self, env, options):
-        SConfig.Package.__init__(self, env, options)
+class CompilerFlags(SConfig.Node):
+    def __init__(self, scons_env, scons_opts, required=False):
+        SConfig.Node.__init__(self, scons_env, scons_opts, required)
         self.checks = [self.check_bit_flags,
                        self.check_architecture]
 
     def setup_options(self):
-        SConfig.Package.setup_options(self)
-        if not self.opts:
-            return
-        self.command_options += ['with_32bit']
+        SConfig.Node.setup_options(self)
         self.opts.AddOptions(
             SCons.Script.BoolOption('with_32bit', 'Generate 32bit code', 0),
-            SCons.Script.BoolOption('with_64bit', 'Generate 64bit code', 0))
+            SCons.Script.BoolOption('with_64bit', 'Generate 64bit code', 0)
+            )
 
     def check_architecture(self):
         if (platform.platform().find('x86_64') != -1 or \
@@ -34,7 +32,7 @@ class CompilerFlags(SConfig.Package):
                 self.env.MergeFlags(self.flag_32bit)
                 if self.env.subst('$CC') == self.env.subst('$LINK'):
                     self.env.AppendUnique(LINKFLAGS=[self.flag_32bit])
-        return [1, '', '']
+        return True
 
     def check_bit_flags(self):
         if self.try_flag('-m32')[0]:
@@ -49,7 +47,7 @@ class CompilerFlags(SConfig.Package):
             self.flag_64bit = '-q64'
         else:
             self.flag_64bit = ''
-        return [1, '', '']
+        return True
 
     def try_flag(self, flag):
         state = self.env.ParseFlags(flag)
