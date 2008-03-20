@@ -45,11 +45,14 @@ else:
     # Prepare our construction environment.
     env.load_config('config.cfg') # Load configuration.
     SConscript('StgSCons', exports='env') # Setup our StG specific utils.
-    if env['staticLibraries']: # Static libs or shared?
-        env.library_builder = env.StaticLibrary
-    else:
-        env.library_builder = env.SharedLibrary
     env.Default(env['buildPath']) # Needed for different build paths.
+
+    # Prepare library builders.
+    env.library_builders = []
+    if env['static_libraries']:
+        env.library_builders += [env.StaticLibrary]
+    if env['shared_libraries']:
+        env.library_builders += [env.SharedLibrary]
 
     # Specify targets.
     SConscript('StGermain/SConscript', exports='env')

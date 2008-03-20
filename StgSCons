@@ -146,7 +146,7 @@ def build_metadata(env, files, hpath):
     for m in files:
         tgt = get_target_name(env, m, '.meta')
         src = env.Meta(target=tgt, source=m)
-        tgt = src[0].path[:-2]
+        tgt = '#' + src[0].path[:-2]
         cur_node = env.hbuild(env.SharedObject, hpath,
                               target=tgt, source=src)
         nodes.append(cur_node)
@@ -155,14 +155,15 @@ def build_metadata(env, files, hpath):
 def build_library(env, objs, name, libs=[], force_name=False):
     objs = to_list(objs)
     dst = os.path.join(env['buildPath'], 'lib', name)
-    if force_name:
-        cur_node = env.library_builder(
-            dst, objs,
-            SHLIBPREFIX='',
-            LIBPREFIXES=[env['LIBPREFIXES']] + [''],
-	    LIBS=libs + env.get('LIBS', []))
-    else:
-        cur_node = env.library_builder(dst, objs, LIBS=libs + env.get('LIBS', []))
+    for b in env.library_builders:
+        if force_name:
+            cur_node = b(
+                dst, objs,
+                SHLIBPREFIX='',
+                LIBPREFIXES=[env['LIBPREFIXES']] + [''],
+                LIBS=libs + env.get('LIBS', []))
+        else:
+            cur_node = b(dst, objs, LIBS=libs + env.get('LIBS', []))
     env.lib_nodes.insert(0, cur_node)
 
 def build_tests(env, files, name, sup_objs=[], libs=None):
