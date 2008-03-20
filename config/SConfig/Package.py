@@ -246,13 +246,13 @@ int main(int argc, char* argv[]) {
             for p in self.generate_library_paths(location, l):
                 offs += '  '
                 if len(offs) > 2:
-                    src += '{\n%s'
+                    src += '{\n'
                 src += '%slib[%d] = dlopen("%s", RTLD_NOW);\n' % (offs, libraries.index(l), p)
                 src += '%sif( !lib[%d] ) ' % (offs, libraries.index(l))
             src += 'return 1;\n'
             while len(offs) > 2:
-                src += offs + '}'
                 offs = offs[:-2]
+                src += offs + '}\n'
         src += '  return 0;\n}\n'
         if not self.run_source(src)[0]:
             return False
