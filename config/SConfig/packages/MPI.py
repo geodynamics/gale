@@ -14,7 +14,7 @@ class MPI(SConfig.Package):
                           ['mpich', 'pmpich', 'rt'],
                           ['mpi'],
                           ['lam', 'mpi']]
-        self.shared_libraries = ['mpich', 'pmpich']
+        self.shared_libraries = ['mpich', 'pmpich', 'mpi', 'lam']
         self.require_shared = True
         self.symbols = [(['MPI_Init', 'MPI_Finalize'], '')]
         self.symbol_calls = ['%s(&argc, &argv);', '%s();']
