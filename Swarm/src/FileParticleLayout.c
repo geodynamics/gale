@@ -232,7 +232,11 @@ void _FileParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm ) 
 #ifdef HAVE_HDF5
 	/* Read in data size. */
 	file = H5Fopen( filename, H5F_ACC_RDONLY, H5P_DEFAULT );
+#if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+	fileData = H5Dopen( file, "/size" );
+#else
 	fileData = H5Dopen( file, "/size", H5P_DEFAULT );
+#endif
 	H5Dread( fileData, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, size );
 	H5Dclose( fileData );
 	H5Fclose( file );
@@ -298,7 +302,11 @@ void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm
 
 	/* Open the file and data set. */
 	file = H5Fopen( self->filename, H5F_ACC_RDONLY, H5P_DEFAULT );
+#if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+	self->fileData = H5Dopen( file, "/data" );
+#else
 	self->fileData = H5Dopen( file, "/data", H5P_DEFAULT );
+#endif
 	self->fileSpace = H5Dget_space( self->fileData );
 
 	/* Need a memory space for extracting to. */

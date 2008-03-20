@@ -327,8 +327,12 @@ void SwarmDump_DumpToHDF5( SwarmDump* self, Swarm* swarm, const char* filename )
    /* Dump the size so we don't have to do any divisions later on. */
    size[0] = (hsize_t)2;
    fileSpace = H5Screate_simple( 1, size, NULL );
+#if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+   fileData = H5Dcreate( file, "/size", H5T_NATIVE_INT, fileSpace, H5P_DEFAULT );
+#else
    fileData = H5Dcreate( file, "/size", H5T_NATIVE_INT, fileSpace,
                          H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+#endif
    MPI_Allreduce( &swarm->particleLocalCount, intSize, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD );
    intSize[1] = swarm->particleExtensionMgr->finalSize;
    props = H5Pcreate( H5P_DATASET_XFER );
@@ -342,8 +346,12 @@ void SwarmDump_DumpToHDF5( SwarmDump* self, Swarm* swarm, const char* filename )
    size[0] = intSize[0];
    size[1] = intSize[1];
    fileSpace = H5Screate_simple( 2, size, NULL );
+#if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+   fileData = H5Dcreate( file, "/data", H5T_NATIVE_CHAR, fileSpace, H5P_DEFAULT );
+#else
    fileData = H5Dcreate( file, "/data", H5T_NATIVE_CHAR, fileSpace,
                          H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+#endif
 
    /* Calculate our file offset. */
    MPI_Comm_rank( MPI_COMM_WORLD, &rank );
