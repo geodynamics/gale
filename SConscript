@@ -16,12 +16,12 @@ env.build_directory('Utils')
 
 env.build_headers(env.glob('libPICellerator/src/*.h'), 'PICellerator')
 env.build_objects(env.glob('libPICellerator/src/*.c'), 'libPICellerator')
-env.build_objects(env.glob('libPICellerator/Toolbox/*.c'), 'Toolbox')
 env.build_metadata(env.glob('libPICellerator/src/*.meta'), 'libPICellerator')
-env.build_metadata(env.glob('libPICellerator/Toolbox/*.meta'), 'Toolbol')
 
 env.build_library(env.get_hnodes(env.SharedObject), 'PICellerator')
 
+env.build_objects(env.glob('libPICellerator/Toolbox/*.c'), 'Toolbox')
+env.build_metadata(env.glob('libPICellerator/Toolbox/*.meta'), 'Toolbox')
 env.build_library(env.get_hnodes(env.SharedObject, 'Toolbox'),
                   'PICellerator_Toolboxmodule', ['PICellerator'],
                   True)
