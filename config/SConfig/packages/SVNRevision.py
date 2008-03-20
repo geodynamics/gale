@@ -16,9 +16,14 @@ class SVNRevision(SConfig.Node):
         if not os.path.exists(svn_path):
             return [0, '', 'Could not find .svn directory']
         f = file(svn_path, 'r')
-        f.readline()
-        f.readline()
-        f.readline()
-        self.revision = int(f.readline())
+	all_lines = f.readlines()
         f.close()
+
+	for l in all_lines:
+            ind = l.rfind('revision=')
+            if ind != -1:
+                self.revision = int(l[ind + 10:l.rfind('"')])
+                return True
+
+        self.revision = int(f[3])
         return True
