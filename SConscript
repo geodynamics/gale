@@ -13,12 +13,12 @@ env.build_directory('Utils')
 
 env.build_headers(env.glob('libUnderworld/src/*.h'), 'Underworld')
 env.build_objects(env.glob('libUnderworld/src/*.c'), 'libUnderworld')
-env.build_objects(env.glob('libUnderworld/Toolbox/*.c'), 'Toolbox')
 env.build_metadata(env.glob('libUnderworld/src/*.meta'), 'libUnderworld')
-env.build_metadata(env.glob('libUnderworld/Toolbox/*.meta'), 'Toolbol')
 
 env.build_library(env.get_hnodes(env.SharedObject), 'Underworld')
 
+env.build_objects(env.glob('libUnderworld/Toolbox/*.c'), 'Toolbox')
+env.build_metadata(env.glob('libUnderworld/Toolbox/*.meta'), 'Toolbox')
 env.build_library(env.get_hnodes(env.SharedObject, 'Toolbox'),
                   'Underworld_Toolboxmodule', ['Underworld'],
                   True)
