@@ -25,5 +25,5 @@ class SVNRevision(SConfig.Node):
                 self.revision = int(l[ind + 10:l.rfind('"')])
                 return True
 
-        self.revision = int(f[3])
+        self.revision = int(all_lines[3])
         return True
