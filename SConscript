@@ -27,4 +27,4 @@ env.build_tests(env.glob('libglucifer/tests/test*.c'),
 
 env.build_plugin('plugins/lucPlugin', 'lucPlugin', prefix=False)
 
-env.build_xmls(env.glob('ModelComponents/*.xml'), 'StGermain/gLucifer')
+env.build_xmls(env.glob('ModelComponents/*.xml'), 'StGermain/glucifer')
