@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeEquationNumber.c 1077 2008-03-13 07:10:51Z LukeHodkinson $
+** $Id: FeEquationNumber.c 1082 2008-03-24 05:21:02Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -2733,7 +2733,6 @@ void FeEquationNumber_BuildWithDave( FeEquationNumber* self ) {
 	    self->_lowestLocalEqNum = tmpArray[ii];
 	 *(int*)STreeMap_Map( self->ownedMap, tmpArray + ii ) = nLocalEqNums;
          STree_Insert( doneSet, tmpArray + ii );
-	 printf( "%d: %d = %d\n", rank, tmpArray[ii], nLocalEqNums );
 	 nLocalEqNums++;
       }
    }

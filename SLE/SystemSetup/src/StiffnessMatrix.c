@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StiffnessMatrix.c 1072 2008-03-12 03:30:59Z LukeHodkinson $
+** $Id: StiffnessMatrix.c 1082 2008-03-24 05:21:02Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -2707,176 +2707,97 @@ void StiffnessMatrix_RefreshMatrix( StiffnessMatrix* self ) {
 
 
 void StiffnessMatrix_CalcNonZeros( void* stiffnessMatrix ) {
-	StiffnessMatrix*	self = (StiffnessMatrix*)stiffnessMatrix;
-	Stream			*stream;
-	FeVariable		*rowVar, *colVar;
-	FeMesh			*rowMesh, *colMesh;
-	FeEquationNumber	*rowEqNum, *colEqNum;
-	DofLayout		*rowDofs, *colDofs;
-	unsigned		nRowEqs, nColEqs;
-	unsigned		nRowNodes, *rowNodes;
-	unsigned		nColNodes, *colNodes;
-	unsigned		*nMaxNonZeros, maxNZ;
-	unsigned		*nNonZeros, **nonZeros;
-	unsigned		*nDiagNZs, *nOffDiagNZs;
-	unsigned		rowEq, colEq;
-	unsigned		netNonZeros;
-	unsigned		e_i, nz_i, eq_i;
-	unsigned		n_i, dof_i;
-	unsigned		n_j, dof_j;
+   StiffnessMatrix* self = (StiffnessMatrix*)stiffnessMatrix;
+   Stream *stream;
+   FeVariable *rowVar, *colVar;
+   FeMesh *rowMesh, *colMesh;
+   FeEquationNumber *rowEqNum, *colEqNum;
+   DofLayout *rowDofs, *colDofs;
+   int nRowEqs, nColEqs;
+   int nRowNodes, *rowNodes;
+   int nColNodes, *colNodes;
+   int nNodeEls, *nodeEls;
+   int *nDiagNonZeros, *nOffDiagNonZeros;
+   int rowEq, colEq, localRowEq;
+   int netNonZeros;
+   STree *candColEqs;
+   int e_i, nz_i, eq_i;
+   int n_i, dof_i;
+   int n_j, dof_j;
 
-	assert( self && Stg_CheckType( self, StiffnessMatrix ) );
-	assert( self->rowVariable );
+   assert( self && Stg_CheckType( self, StiffnessMatrix ) );
+   assert( self->rowVariable );
 
-	stream = Journal_Register( Info_Type, self->type );
-	Journal_Printf( stream, "Stiffness matrix: '%s'\n", self->name );
-	Stream_Indent( stream );
-	Journal_Printf( stream, "Calculating number of nonzero entries...\n" );
-	Stream_Indent( stream );
+   stream = Journal_Register( Info_Type, self->type );
+   Journal_Printf( stream, "Stiffness matrix: '%s'\n", self->name );
+   Stream_Indent( stream );
+   Journal_Printf( stream, "Calculating number of nonzero entries...\n" );
+   Stream_Indent( stream );
 
-	rowVar = self->rowVariable;
-	colVar = self->columnVariable ? self->columnVariable : rowVar;
-	rowMesh = rowVar->feMesh;
-	colMesh = colVar->feMesh;
-	rowEqNum = rowVar->eqNum;
-	colEqNum = colVar->eqNum;
-	nRowEqs = rowEqNum->localEqNumsOwnedCount;
-	nColEqs = colEqNum->localEqNumsOwnedCount;
-	rowDofs = rowVar->dofLayout;
-	colDofs = colVar->dofLayout;
+   rowVar = self->rowVariable;
+   colVar = self->columnVariable ? self->columnVariable : rowVar;
+   rowMesh = rowVar->feMesh;
+   colMesh = colVar->feMesh;
+   rowEqNum = rowVar->eqNum;
+   colEqNum = colVar->eqNum;
+   nRowEqs = rowEqNum->localEqNumsOwnedCount;
+   nColEqs = colEqNum->localEqNumsOwnedCount;
+   rowDofs = rowVar->dofLayout;
+   colDofs = colVar->dofLayout;
 
-	nMaxNonZeros = AllocArray( unsigned, nRowEqs );
-	memset( nMaxNonZeros, 0, nRowEqs * sizeof(unsigned) );
+   candColEqs = STree_New();
+   STree_SetIntCallbacks( candColEqs );
+   STree_SetItemSize( candColEqs, sizeof(int) );
+   nDiagNonZeros = AllocArray( int, nRowEqs );
+   nOffDiagNonZeros = AllocArray( int, nRowEqs );
+   memset( nDiagNonZeros, 0, nRowEqs * sizeof(int) );
+   memset( nOffDiagNonZeros, 0, nRowEqs * sizeof(int) );
+   netNonZeros = 0;
 
-	for( e_i = 0; e_i < FeMesh_GetElementDomainSize( rowMesh ); e_i++ ) {
-		FeMesh_GetElementNodes( rowMesh, e_i, self->rowInc );
-		FeMesh_GetElementNodes( colMesh, e_i, self->colInc );
-		nRowNodes = IArray_GetSize( self->rowInc );
-		rowNodes = IArray_GetPtr( self->rowInc );
-		nColNodes = IArray_GetSize( self->colInc );
-		colNodes = IArray_GetPtr( self->colInc );
+   for( n_i = 0; n_i < FeMesh_GetNodeLocalSize( rowMesh ); n_i++ ) {
+      for( dof_i = 0; dof_i < rowDofs->dofCounts[n_i]; dof_i++ ) {
+	 rowEq = rowEqNum->destinationArray[n_i][dof_i];
+	 if( rowEq == -1 ) continue;
+	 localRowEq = *(int*)STreeMap_Map( rowEqNum->ownedMap, &rowEq );
+	 FeMesh_GetNodeElements( rowMesh, n_i, self->rowInc );
+	 nNodeEls = IArray_GetSize( self->rowInc );
+	 nodeEls = IArray_GetPtr( self->rowInc );
+	 STree_Clear( candColEqs );
+	 for( e_i = 0; e_i < nNodeEls; e_i++ ) {
+	    /* ASSUME: Row and column meshes have one-to-one element overlap. */
+	    FeMesh_GetElementNodes( colMesh, nodeEls[e_i], self->colInc );
+	    nColNodes = IArray_GetSize( self->colInc );
+	    colNodes = IArray_GetPtr( self->colInc );
+	    for( n_j = 0; n_j < nColNodes; n_j++ ) {
+	       for( dof_j = 0; dof_j < colDofs->dofCounts[colNodes[n_j]]; dof_j++ ) {
+		  colEq = colEqNum->destinationArray[colNodes[n_j]][dof_j];
+		  if( colEq == -1 ) continue;
+		  if( !STree_Has( candColEqs, &colEq  ) ) {
+		     STree_Insert( candColEqs, &colEq );
+		     if( STreeMap_HasKey( rowEqNum->ownedMap, &colEq ) )
+			nDiagNonZeros[localRowEq]++;
+		     else
+			nOffDiagNonZeros[localRowEq]++;
+		     netNonZeros++;
+		  }
+	       }
+	    }
+	 }
+      }
+   }
 
-		for( n_i = 0; n_i < nRowNodes; n_i++ ) {
-			if( rowNodes[n_i] >= FeMesh_GetNodeLocalSize( rowMesh ) )
-				continue;
+   self->diagonalNonZeroIndices = nDiagNonZeros;
+   self->offDiagonalNonZeroIndices = nOffDiagNonZeros;
 
-			for( dof_i = 0; dof_i < rowDofs->dofCounts[rowNodes[n_i]]; dof_i++ ) {
-				rowEq = rowEqNum->locationMatrix[e_i][n_i][dof_i];
-				if( rowEq == (unsigned)-1 || !STreeMap_HasKey( rowEqNum->ownedMap, &rowEq ) )
-					continue;
-
-				for( n_j = 0; n_j < nColNodes; n_j++ ) {
-					for( dof_j = 0; dof_j < colDofs->dofCounts[colNodes[n_j]]; dof_j++ ) {
-						int localEq;
-
-						colEq = colEqNum->locationMatrix[e_i][n_j][dof_j];
-						if( colEq == (unsigned)-1 )
-							continue;
-
-						localEq = *(int*)STreeMap_Map( rowEqNum->ownedMap,
-									       &rowEq );
-						nMaxNonZeros[localEq]++;
-					}
-				}
-			}
-		}
-	}
-
-	maxNZ = 0;
-	for( eq_i = 0; eq_i < nRowEqs; eq_i++ ) {
-		if( nMaxNonZeros[eq_i] > maxNZ )
-			maxNZ = nMaxNonZeros[eq_i];
-	}
-
-	FreeArray( nMaxNonZeros );
-
-	nNonZeros = AllocArray( unsigned, nRowEqs );
-	memset( nNonZeros, 0, nRowEqs * sizeof(unsigned) );
-	nonZeros = AllocArray2D( unsigned, nRowEqs, maxNZ );
-
-	for( e_i = 0; e_i < FeMesh_GetElementDomainSize( rowMesh ); e_i++ ) {
-		FeMesh_GetElementNodes( rowMesh, e_i, self->rowInc );
-		FeMesh_GetElementNodes( colMesh, e_i, self->colInc );
-		nRowNodes = IArray_GetSize( self->rowInc );
-		rowNodes = IArray_GetPtr( self->rowInc );
-		nColNodes = IArray_GetSize( self->colInc );
-		colNodes = IArray_GetPtr( self->colInc );
-
-		for( n_i = 0; n_i < nRowNodes; n_i++ ) {
-			if( rowNodes[n_i] >= FeMesh_GetNodeLocalSize( rowMesh ) )
-				continue;
-
-			for( dof_i = 0; dof_i < rowDofs->dofCounts[rowNodes[n_i]]; dof_i++ ) {
-				rowEq = rowEqNum->locationMatrix[e_i][n_i][dof_i];
-				if( rowEq == (unsigned)-1 || !STreeMap_HasKey( rowEqNum->ownedMap, &rowEq ) )
-					continue;
-
-				for( n_j = 0; n_j < nColNodes; n_j++ ) {
-					for( dof_j = 0; dof_j < colDofs->dofCounts[colNodes[n_j]]; dof_j++ ) {
-						int localEq;
-
-						colEq = colEqNum->locationMatrix[e_i][n_j][dof_j];
-						if( colEq == (unsigned)-1 )
-							continue;
-
-						localEq = *(int*)STreeMap_Map( rowEqNum->ownedMap,
-									       &rowEq );
-						StiffnessMatrix_TrackUniqueEqs( self, localEq, colEq, 
-										nNonZeros, nonZeros );
-					}
-				}
-			}
-		}
-	}
-
-	nDiagNZs = AllocArray( unsigned, nRowEqs );
-	memset( nDiagNZs, 0, nRowEqs * sizeof(unsigned) );
-	nOffDiagNZs = AllocArray( unsigned, nRowEqs );
-	memset( nOffDiagNZs, 0, nRowEqs * sizeof(unsigned) );
-
-	netNonZeros = 0;
-	for( eq_i = 0; eq_i < nRowEqs; eq_i++ ) {
-		netNonZeros += nNonZeros[eq_i];
-
-		for( nz_i = 0; nz_i < nNonZeros[eq_i]; nz_i++ ) {
-			if( nonZeros[eq_i][nz_i] < nRowEqs )
-				nDiagNZs[eq_i]++;
-			else
-				nOffDiagNZs[eq_i]++;
-		}
-	}
-
-	FreeArray( nNonZeros );
-	FreeArray( nonZeros );
-	
-
-	self->diagonalNonZeroIndices = nDiagNZs;
-	self->offDiagonalNonZeroIndices = nOffDiagNZs;
-
-	Journal_Printf( stream, "Found %d nonzero entries.\n", netNonZeros );
-	Journal_Printf( stream, "Done.\n" );
-	Stream_UnIndent( stream );
-	Stream_UnIndent( stream );
-}
-
-
-void StiffnessMatrix_TrackUniqueEqs( StiffnessMatrix* self, unsigned rowEq, unsigned colEq, 
-				     unsigned* nNonZeros, unsigned** nonZeros )
-{
-	unsigned	nz_i;
-
-	assert( self );
-	assert( nNonZeros && nonZeros );
-
-	for( nz_i = 0; nz_i < nNonZeros[rowEq]; nz_i++ ) {
-		if( nonZeros[rowEq][nz_i] == colEq )
-			break;
-	}
-	if( nz_i < nNonZeros[rowEq] )
-		return;
-
-	nNonZeros[rowEq]++;
-	nonZeros[rowEq][nNonZeros[rowEq] - 1] = colEq;
+   {
+      int tmp;
+      MPI_Allreduce( &netNonZeros, &tmp, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD );
+      netNonZeros = tmp;
+   }
+   Journal_Printf( stream, "Found %d nonzero entries.\n", netNonZeros );
+   Journal_Printf( stream, "Done.\n" );
+   Stream_UnIndent( stream );
+   Stream_UnIndent( stream );
 }
 
 
