@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StiffnessMatrix.c 1082 2008-03-24 05:21:02Z LukeHodkinson $
+** $Id: StiffnessMatrix.c 1083 2008-03-24 22:19:52Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -2774,7 +2774,7 @@ void StiffnessMatrix_CalcNonZeros( void* stiffnessMatrix ) {
 		  if( colEq == -1 ) continue;
 		  if( !STree_Has( candColEqs, &colEq  ) ) {
 		     STree_Insert( candColEqs, &colEq );
-		     if( STreeMap_HasKey( rowEqNum->ownedMap, &colEq ) )
+		     if( STreeMap_HasKey( colEqNum->ownedMap, &colEq ) )
 			nDiagNonZeros[localRowEq]++;
 		     else
 			nOffDiagNonZeros[localRowEq]++;
