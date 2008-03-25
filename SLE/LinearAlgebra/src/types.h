@@ -43,7 +43,7 @@
 **
 ** Comments:
 **
-** $Id: types.h 990 2008-01-01 23:34:24Z DavidLee $
+** $Id: types.h 1084 2008-03-25 00:04:14Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -76,6 +76,7 @@
 	typedef enum {
 		PETScMatrixSolver_KSPType_Richardson, 
 		PETScMatrixSolver_KSPType_GMRes, 
+		PETScMatrixSolver_KSPType_FGMRes, 
 		PETScMatrixSolver_KSPType_CG, 
 		PETScMatrixSolver_KSPType_PreOnly
 	} PETScMatrixSolver_KSPType;

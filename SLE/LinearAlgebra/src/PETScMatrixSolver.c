@@ -356,6 +356,10 @@ void PETScMatrixSolver_SetKSPType( void* matrixSolver, PETScMatrixSolver_KSPType
 		ec = KSPSetType( self->ksp, KSPGMRES );
 		CheckPETScError( ec );
 		break;
+	case PETScMatrixSolver_KSPType_FGMRes:
+		ec = KSPSetType( self->ksp, KSPFGMRES );
+		CheckPETScError( ec );
+		break;
 	case PETScMatrixSolver_KSPType_CG:
 		ec = KSPSetType( self->ksp, KSPCG );
 		CheckPETScError( ec );
