@@ -35,14 +35,16 @@
 ** Comments:
 **	None so far.
 **
-** $Id: StGermain.h 4245 2008-03-27 10:47:42Z LukeHodkinson $
+** $Id: StGermain.h 4246 2008-03-27 22:46:39Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #ifndef __StGermain_StGermain_h__
 #define __StGermain_StGermain_h__
 
+#ifdef HAVE_SCONS
         #include "pcu/pcu.h"
+#endif
 	#include "Base/Base.h"
 	#include "Utils/Utils.h"
 	#include "Init.h"
