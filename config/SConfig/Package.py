@@ -381,9 +381,6 @@ int main(int argc, char* argv[]) {
         if location[1]:
             old_state['CPPPATH'] = self.env.get('CPPPATH', [])
             self.env.PrependUnique(CPPPATH=[self.join_sub_dir(location[0], l) for l in location[1]])
-            for fw in location[3]: # Sort of a hack for Mac OS X.
-                path = '/System/Library/Frameworks/' + fw + '.framework/Headers'
-                self.env.PrependUnique(CPPPATH=[path])
         if location[2]:
             old_state['LIBPATH'] = self.env.get('LIBPATH', [])
             old_state['RPATH'] = self.env.get('RPATH', [])
@@ -393,6 +390,11 @@ int main(int argc, char* argv[]) {
         if location[3]:
             old_state['FRAMEWORKS'] = self.env.get('FRAMEWORKS', [])
             self.env.PrependUnique(FRAMEWORKS=location[3])
+            if 'CPPPATH' not in old_state:
+                old_state['CPPPATH'] = self.env.get('CPPPATH', [])
+            for fw in location[3]: # Sort of a hack for Mac OS X.
+                path = '/System/Library/Frameworks/' + fw + '.framework/Headers'
+                self.env.PrependUnique(CPPPATH=[path])
         return old_state
 
     def enable_library_state(self, location, libs):
@@ -421,7 +423,11 @@ int main(int argc, char* argv[]) {
 
         if self.fworks:
             self.backup_variable(scons_env, 'FRAMEWORKS', old_state)
+            self.backup_variable(scons_env, 'CPPPATH', old_state)
             scons_env.PrependUnique(FRAMEWORKS=self.fworks)
+            for fw in self.fworks: # Sort of a hack for Mac OS X.
+                path = '/System/Library/Frameworks/' + fw + '.framework/Headers'
+                self.env.PrependUnique(CPPPATH=[path])
 
         if self.lib_dirs:
             self.backup_variable(scons_env, 'LIBPATH', old_state)
