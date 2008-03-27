@@ -47,6 +47,11 @@ else:
     SConscript('StgSCons', exports='env') # Setup our StG specific utils.
     env.Default(env['buildPath']) # Needed for different build paths.
 
+    # Another Mac OS X hack.
+    if platform.system() == 'Darwin':
+	env['_abspath'] = lambda x: File(x).abspath
+        env.Append(SHLINKFLAGS=['-install_name', '${_abspath(TARGET)}'])
+
     # Prepare library builders.
     env.library_builders = []
     if env['static_libraries']:
