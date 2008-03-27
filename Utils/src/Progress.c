@@ -146,7 +146,7 @@ void Progress_Restart( void* _self ) {
 void Progress_Update( void* _self ) {
    Progress* self = (Progress*)_self;
 
-   if( self->rank != 0 )
+   if( self->rank != 0 || !self->strm )
       return;
 
    if( self->printTitle && self->title ) {
@@ -171,7 +171,7 @@ void Progress_PrintStatus( void* _self ) {
    Progress* self = (Progress*)_self;
    int ii;
 
-   if( self->rank != 0 )
+   if( self->rank != 0 || !self->strm )
       return;
 
    assert( self->width >= 8 );

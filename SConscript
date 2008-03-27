@@ -21,6 +21,7 @@ env.build_headers(['Base/Foundation/src/ClassSetup.h',
 env.build_headers('Base/IO/src/mpirecord/none/mpimessaging.h',
                   'StGermain/Base/IO/mpirecord')
 
+env.build_directory('pcu')
 env.build_directory('Base/Foundation')
 env.build_directory('Base/IO')
 env.build_directory('Base/Container')
@@ -41,8 +42,10 @@ env.build_tests(env.glob('libStGermain/tests/test*.c'), 'StGermain',
 
 src = os.path.join('Base', 'FlattenXML', 'src', 'main.c')
 dst = os.path.join(env['buildPath'], 'bin', 'FlattenXML')
-env.Program(dst, src, LIBS=['StGermainBase'] + env.get('LIBS', []))
+env.Program(dst, src, LIBS=['StGermain'] + env.get('LIBS', []))
 
 src = os.path.join('src', 'main.c')
 dst = os.path.join(env['buildPath'], 'bin', 'StGermain')
 env.Program(dst, src, LIBS=['StGermain'] + env.get('LIBS', []))
+
+env.build_suite_runner()

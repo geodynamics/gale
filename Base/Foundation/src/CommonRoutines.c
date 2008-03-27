@@ -112,6 +112,7 @@ char* StG_Strdup( const char* const str ) {
 	int length;
 	char* result;
 
+        if( !str ) return NULL;
 	length = strlen( str ) + 1;
 	result = Memory_Alloc_Array_Unnamed( char, length );
 
