@@ -381,6 +381,9 @@ int main(int argc, char* argv[]) {
         if location[1]:
             old_state['CPPPATH'] = self.env.get('CPPPATH', [])
             self.env.PrependUnique(CPPPATH=[self.join_sub_dir(location[0], l) for l in location[1]])
+            for fw in location[3]: # Sort of a hack for Mac OS X.
+                path = '/System/Library/Frameworks/' + fw + '.framework/Headers'
+                self.env.PrependUnique(CPPPATH=[path])
         if location[2]:
             old_state['LIBPATH'] = self.env.get('LIBPATH', [])
             old_state['RPATH'] = self.env.get('RPATH', [])
