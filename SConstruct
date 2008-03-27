@@ -46,6 +46,7 @@ else:
     env.load_config('config.cfg') # Load configuration.
     SConscript('StgSCons', exports='env') # Setup our StG specific utils.
     env.Default(env['buildPath']) # Needed for different build paths.
+    env.Append(CPPDEFINES=['HAVE_SCONS'])
 
     # Another Mac OS X hack.
     if platform.system() == 'Darwin':
