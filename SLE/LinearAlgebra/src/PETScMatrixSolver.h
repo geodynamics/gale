@@ -54,7 +54,8 @@
 		/* Virtual info */		\
 						\
 		/* PETScMatrixSolver info */	\
-		KSP		ksp;
+		KSP		ksp;		\
+		Bool            optionsReady;
 
 	struct PETScMatrixSolver { __PETScMatrixSolver };
 

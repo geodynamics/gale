@@ -175,6 +175,11 @@ void PETScMatrixSolver_SetMatrix( void* matrixSolver, void* _matrix ) {
 
 	ec = KSPSetOperators( self->ksp, matrix->petscMat, matrix->petscMat, DIFFERENT_NONZERO_PATTERN );
 	CheckPETScError( ec );
+	if( !self->optionsReady ) {
+		ec = KSPSetFromOptions( self->ksp );
+		CheckPETScError( ec );
+		self->optionsReady = True;
+	}
 }
 
 void PETScMatrixSolver_SetMaxIterations( void* matrixSolver, unsigned nIterations ) {
@@ -239,9 +244,6 @@ void PETScMatrixSolver_Setup( void* matrixSolver, void* rhs, void* solution ) {
 	assert( self && Stg_CheckType( self, PETScMatrixSolver ) );
 
 	_MatrixSolver_Setup( self, rhs, solution );
-
-	ec = KSPSetFromOptions( self->ksp );
-	CheckPETScError( ec );
 }
 
 MatrixSolver_Status PETScMatrixSolver_GetSolveStatus( void* matrixSolver ) {
