@@ -274,6 +274,10 @@ int main( int argc, char* argv[] ) {
 """ % (hdrs, suites)
     src_filename = os.path.join(env["buildPath"], env.project_name, 
                                 "test" + env.project_name + ".c")
+    import pdb
+    pdb.set_trace()
+    if not os.path.exists(os.path.dirname(File(src_filename).path)):
+        os.makedirs(os.path.dirname(File(src_filename).path))
     f = open(File(src_filename).path, "w")
     f.write(src)
     f.close()
