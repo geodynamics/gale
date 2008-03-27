@@ -16,6 +16,16 @@ def glob(env, ptrn):
         res = pyglob.glob(ptrn)
     return res
 
+def path_exists(env, path):
+    if not os.path.isabs(path):
+        old = os.getcwd()
+        os.chdir(Dir('.').srcnode().abspath)
+        res = os.path.exists(path)
+        os.chdir(old)
+    else:
+        res = os.path.exists(path)
+    return res
+
 # Normalise an SCons path to the project root.
 def norm_path(env, path):
     cur_dir = env.Dir('.').srcnode().path
@@ -44,6 +54,7 @@ def copy_file(env, dst, src):
 
 # Add to the SCons main class.
 SConsEnvironment.glob = glob
+SConsEnvironment.path_exists = path_exists
 SConsEnvironment.norm_path = norm_path
 SConsEnvironment.copy_file = copy_file
 
@@ -101,12 +112,15 @@ def to_list(var):
 def copy_includes(env, files, dst, inc_nodes, force=False):
     files = to_list(files)
     dst = os.path.join(env['buildPath'], dst)
+    nodes = []
     for i in files:
         node = env.Install(dst, i)
+        nodes.append(node)
         inc_nodes.append(node)
         if force:
             dst_path = os.path.join(dst, os.path.basename(i))
             env.copy_file(dst_path, i)
+    return nodes
 
 #
 # Builder helpers.
@@ -116,12 +130,12 @@ def get_target_name(env, src, suffix='.c'):
     return os.path.join(env['buildPath'], env.project_name, src[:-len(suffix)])
 
 def build_defines(env, files, dst):
-    copy_includes(env, files, os.path.join('include', dst), 
+    copy_includes(env, files, os.path.join('include', dst),
                   env.def_nodes, True)
 
 def build_headers(env, files, dst, force_copy=False):
-    copy_includes(env, files, os.path.join('include', dst),
-                  env.hdr_nodes, force_copy)
+    return copy_includes(env, files, os.path.join('include', dst),
+                         env.hdr_nodes, force_copy)
 
 def build_xmls(env, files, dst, force_copy=False):
     copy_includes(env, files, os.path.join('lib', dst),
@@ -184,12 +198,14 @@ def build_tests(env, files, name, sup_objs=[], libs=None):
                                LIBS=l + env.get('LIBS', []))
         nodes.append(cur_node)
 
-def build_directory(env, dir, extra_objs=[],
-                    test_libs=None, build_lib=True):
-    if not test_libs:
-        test_libs = env.lib_nodes
-    test_libs = to_list(test_libs)
-    extra_objs = to_list(extra_objs)
+def build_suites(env, sources):
+    sources = to_list(sources)
+    for src in sources:
+        tgt = get_target_name(env, src)
+        obj_node = env.SharedObject(tgt, src)
+        env.suite_nodes += obj_node
+
+def build_directory(env, dir, build_lib=False):
     srcDir = os.path.join(dir, 'src')
     tstDir = os.path.join(dir, 'tests')
     hdrDir = os.path.join(env.project_name, dir)
@@ -201,15 +217,18 @@ def build_directory(env, dir, extra_objs=[],
     env.build_objects(env.glob(os.path.join(srcDir, '*.c')), dir)
     if build_lib:
         objs = env.get_hnodes(env.SharedObject, dir)
-        env.build_library(objs + extra_objs, mod)
-    if os.path.exists(tstDir):
+        env.build_library(objs, mod)
+    if env.path_exists(tstDir):
         tst_files = env.glob(os.path.join(tstDir, 'test*.c'))
+        suites = env.glob(os.path.join(tstDir, '*Suite.c'))
         sup_gen = env.glob(os.path.join(tstDir, '*.c'))
-        sup_files = [f for f in sup_gen if f not in tst_files]
+        sup_files = [f for f in sup_gen if f not in tst_files + suites]
         sup = env.build_objects(sup_files, dir, False)
         env.build_tests(tst_files, mod,
                         sup_objs=sup,
-                        libs=test_libs + [mod])
+                        libs=[env.project_name])
+        if suites:
+            env.build_suites(suites)
 
 def build_plugin(env, dir, hpath, prefix=True):
     name = hpath.split(os.path.sep)
@@ -223,12 +242,53 @@ def build_plugin(env, dir, hpath, prefix=True):
                          hpath, False)
     env.build_library(objs, name, [env.project_name], True)
 
+def build_suite_runner(env):
+    hdrs = ""
+    suites = ""
+    for node in env.suite_nodes:
+        name = node.path[node.path.rfind(os.path.sep) + 1:node.path.rfind('.')]
+        suites += "pcu_runner_addSuite( %s );\n" % name
+        name = node.path[node.path.find(os.path.sep) + 1:node.path.rfind('.')]
+        hdrs += "#include \"%s.h\"" % name
+    src = """#include <stdlib.h>
+#include <mpi.h>
+#include "StGermain/pcu/pcu.h"
+%s
+
+int main( int argc, char* argv[] ) {
+   pcu_listener_t* lsnr;
+
+   MPI_Init( &argc, &argv );
+   StGermain_Init( &argc, &argv );
+   pcu_runner_init( argc, argv );
+
+   %s
+   lsnr = pcu_textoutput_create();
+   pcu_runner_run( lsnr );
+   pcu_runner_finalise();
+   pcu_textoutput_destroy( lsnr );
+   StGermain_Finalise();
+   MPI_Finalize();
+   return EXIT_SUCCESS;
+}
+""" % (hdrs, suites)
+    src_filename = os.path.join(env["buildPath"], env.project_name, 
+                                "test" + env.project_name + ".c")
+    f = open(File(src_filename).path, "w")
+    f.write(src)
+    f.close()
+    bin_filename = os.path.join(env["buildPath"], "bin", "test" + env.project_name)
+    env.Program(bin_filename, [File(src_filename)] + env.suite_nodes,
+                CPPPATH=["#."] + env.get("CPPPATH", []),
+                LIBS=[env.project_name] + env.get("LIBS", []))
+
 def clear_all(env):
     env.hclear()
     env.def_nodes = []
     env.hdr_nodes = []
     env.lib_nodes = []
     env.test_nodes = []
+    env.suite_nodes = []
 
 SConsEnvironment.build_defines = build_defines
 SConsEnvironment.build_headers = build_headers
@@ -237,8 +297,10 @@ SConsEnvironment.build_objects = build_objects
 SConsEnvironment.build_metadata = build_metadata
 SConsEnvironment.build_library = build_library
 SConsEnvironment.build_tests = build_tests
+SConsEnvironment.build_suites = build_suites
 SConsEnvironment.build_directory = build_directory
 SConsEnvironment.build_plugin = build_plugin
+SConsEnvironment.build_suite_runner = build_suite_runner
 SConsEnvironment.clear_all = clear_all
 
 #
