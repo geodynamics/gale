@@ -55,6 +55,8 @@ int pcu_source_getPackLen( pcu_source_t* src ) {
       len += strlen( src->msg ) + 1;
 
    len += sizeof(int);
+
+   return len;
 }
 
 void pcu_source_pack( pcu_source_t* src, void* buf ) {
