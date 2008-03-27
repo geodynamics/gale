@@ -45,7 +45,7 @@ env.build_plugin('plugins/Output/CPUTime', 'CPUTime')
 env.build_plugin('plugins/Output/FrequentOutput', 'FrequentOutput')
 env.build_plugin('plugins/Output/PeakMemory', 'Output/PeakMemory')
 env.build_plugin('plugins/Output/PrintFeVariableDiscreteValues',
-                 'Output/PrintFeVariableDiscreteValues')
+                 'PrintFeVariableDiscreteValues')
 env.build_plugin('plugins/Output/PrintFeVariableDiscreteValues_2dBox',
                  'Output/PrintFeVariableDiscreteValues_2dBox')
 env.build_plugin('plugins/StandardConditionFunctions',
