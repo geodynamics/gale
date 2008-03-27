@@ -148,6 +148,12 @@ class Node(object):
         result = self.run_scons_cmd(self.ctx.TryCompile, source, '.c')
         return [result[0], result[1]]
 
+    def link_source(self, source):
+        """At this point we know all our construction environment has been set up,
+        so we should be able to build and run the application."""
+        result = self.run_scons_cmd(self.ctx.TryLink, source, '.c')
+        return [result[0], result[1]]
+
     def run_source(self, source):
         """At this point we know all our construction environment has been set up,
         so we should be able to build and run the application."""

@@ -222,12 +222,12 @@ class Package(SConfig.Node):
         one of the set of required symbols in the libraries."""
         fail_logs = []
         for syms in self.symbols:
-            result = self.run_source(self.get_check_symbols_source(syms[0]))
+            result = self.link_source(self.get_check_symbols_source(syms[0]))
             if result[0]:
                 if syms[1]:
                     self.cpp_defines += [syms[1]] # Add the CPP defines.
                 break
-            fail_logs += [result[2]]
+            fail_logs += [result[1]]
         if not result[0]:
             reason = self.get_check_symbols_fail_reason(fail_logs)
         else:
