@@ -9,7 +9,7 @@
 	<include>AnalyticVelocityMagnitudeVP.xml</include>
 	<include>PressureAndVelocityArrowsVP.xml</include>
 	<include>AnalyticPressureVP.xml</include>
-	<include>window.xml</include>
+	<include>gLucifer/window.xml</include>
 	<struct name="components" mergeType="merge">
 		<struct name="window" mergeType="merge">
 			<list name="Viewport">
