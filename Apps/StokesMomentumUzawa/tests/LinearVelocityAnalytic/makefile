@@ -35,41 +35,25 @@
 ##  License along with this library; if not, write to the Free Software
 ##  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ##
-## $Id: makefile 1088 2008-03-28 03:48:58Z RobertTurnbull $
+## $Id: makefile 964 2007-10-11 08:03:06Z SteveQuenette $
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# obtain defaults for required variables according to system and project location, and then run the build.
 SHELL := $(shell which bash)
 PROJ_ROOT := $(shell until test -r ./Makefile.system ; do cd .. ; done ; echo `pwd`)
 
 include ${PROJ_ROOT}/Makefile.system
 
-subdirs = LidDrivenIsoviscousAnalytic SimpleShearAnalytic LinearVelocityAnalytic
-tests = ${PROJECT}-StokesMomentumUzawaTest
+modName := $(shell basename `pwd` )
+modName := $(shell echo ${modName} | cut -c 1 | tr '[:lower:]' '[:upper:]' )$(shell echo ${modName} | cut -c 2- ) 
 
-checks = \
-	testStokesMomentum-UzawaSolver-2D.0of1.sh \
-	testStokesMomentum-UzawaSolver-2D.0of2.sh \
-	testStokesMomentum-UzawaSolver-3D.0of1.sh \
-	testStokesMomentum-UzawaSolver-3D.0of2.sh \
-	testStokesMomentum-UzawaSolver-3D.0of3.sh \
-	testStokesMomentum-UzawaSolver-SimpleShear2D.0of1.sh \
-	testStokesMomentum-UzawaSolver-SimpleShear2D.0of2.sh \
-	testStokesMomentum-UzawaSolver-SimpleShear2D.0of3.sh \
-	testStokesMomentum-UzawaSolver-SimpleShear3D.0of1.sh \
-	testStokesMomentum-UzawaSolver-SimpleShear3D.0of2.sh
+mod = ${PROJECT}_${modName}
+includes = ${PROJECT}/${modName}
 
-ifeq (${PETSC_VERSION_RELEASE}, 0)
-	checks += \
-		testStokesMomentum-UzawaSolver-2D-MG.0of1.sh \
-		testStokesMomentum-UzawaSolver-2D-MG.0of2.sh
-endif
+SRCS = $(wildcard *.c)
+HDRS = $(wildcard *.h)
 
-
-PROJ_LIBS =
-EXTERNAL_INCLUDES = -I${INC_DIR}/${PROJECT} 
-
-packages = STGDOMAIN STGERMAIN PETSC MPI XML MATH DL HYPRE
+packages = STGDOMAIN STGERMAIN PETSC MPI XML
+EXTERNAL_LIBS = -lStgFEM
 
 include ${PROJ_ROOT}/Makefile.vmake

@@ -7,11 +7,14 @@
 	<include>LidDrivenConvection.xml</include>
 
 	<list name="plugins" mergeType="merge">
-		<param>StgFEM_SimpleShearAnalytic</param>
+		<param>StgFEM_LinearVelocityAnalytic</param>
 	</list>
 
 	<param name="VelocityField-Tolerance">1e-6</param>
 	<param name="PressureField-Tolerance">1e-5</param>
+	
+	<!-- Periodic boundary conditions -->
+	<include>StgFEM/PeriodicX.xml</include>
 
 	<!-- Velocity BCs -->
 	<struct name="velocityBCs" mergeType="replace">
@@ -23,8 +26,8 @@
 				<list name="variables">
 					<struct>
 						<param name="name">vx</param>
-						<param name="type">func</param>
-						<param name="value"> Velocity_SimpleShear </param>
+						<param name="type">double</param>
+						<param name="value"> -0.5 </param>
 					</struct>
 					<struct>
 						<param name="name">vy</param>
@@ -61,8 +64,8 @@
 				<list name="variables">
 					<struct>
 						<param name="name">vx</param>
-						<param name="type">func</param>
-						<param name="value"> Velocity_SimpleShear </param>
+						<param name="type">double</param>
+						<param name="value"> 0.5 </param>
 					</struct>
 					<struct>
 						<param name="name">vy</param>
@@ -74,34 +77,5 @@
 		</list>
 	</struct>
 
-	<!-- Periodic boundary conditions -->
-	<struct name="components" mergeType="merge">
-		<struct name="linearMeshGenerator" mergeType="merge">
-			<list name="maxDecompositions">
-				<param> 0 </param>
-				<param> 1 </param>
-			</list>
-		</struct>
 
-		<struct name="velocityLinkedDofs">
-			<param name="Type">LinkedDofInfo</param>
-			<param name="Mesh">linearMesh</param>
-			<param name="DofLayout">velocityDofLayout</param>
-
-			<list name="linkSpecifications">
-				<struct>
-					<param name="wallPair">left-right</param>
-					<param name="dof">0</param>
-				</struct>
-				<struct>
-					<param name="wallPair">left-right</param>
-					<param name="dof">1</param>
-				</struct>
-				<struct>
-					<param name="wallPair">left-right</param>
-					<param name="dof">2</param>
-				</struct>
-			</list>	
-		</struct>
-	</struct>
 </StGermainData>
