@@ -6,12 +6,13 @@
 
 	<!-- Periodic boundary conditions manager for particles -->
 	<struct name="components" mergeType="merge">
-		<struct name="periodicBCsManager">
+		<struct name="periodicBCsManager" mergeType="merge">
 			<param name="Type">PeriodicBoundariesManager</param>
 			<param name="Geometry">geometry</param>
-			<param name="Swarm">picIntegrationPoints</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="mesh">linearMesh</param>
 			<param name="TimeIntegrator">timeIntegrator</param>
-			<list name="PeriodicBoundaries">
+			<list name="PeriodicBoundaries" mergeType="merge">
 				<param>K_AXIS</param>
 			</list>	
 		</struct>

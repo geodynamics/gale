@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: PeriodicBoundariesManager.c 518 2007-10-11 08:07:50Z SteveQuenette $
+** $Id: PeriodicBoundariesManager.c 556 2008-03-28 06:41:03Z RobertTurnbull $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -275,32 +275,47 @@ void _PeriodicBoundariesManager_Build( void* periodicBCsManager, void* data ) {
 	self->size = 4;
 	self->boundaries = Memory_Alloc_Array( PeriodicBoundary, self->size, "PeriodicBoundariesManager->boundaries" );
 
-	periodicBCsList = Dictionary_Get( self->dictionary, "PeriodicBoundaries" );
-	
-	/* Dictionary entry is optional - users may prefer to enter in code */
-	if ( periodicBCsList ) {
-		Index                   numPeriodicBCs = 0;
-		Index                   periodicBC_I = 0;
-		Dictionary_Entry_Value* periodicBC = NULL;
-		char*                   perBCAxis = NULL;
+	if ( self->dictionary ) {
+		periodicBCsList = Dictionary_Get( self->dictionary, "PeriodicBoundaries" );
 		
-		numPeriodicBCs = Dictionary_Entry_Value_GetCount( periodicBCsList );
+		/* Dictionary entry is optional - users may prefer to enter in code */
+		if ( periodicBCsList ) {
+			Index                   numPeriodicBCs = 0;
+			Index                   periodicBC_I = 0;
+			Dictionary_Entry_Value* periodicBC = NULL;
+			char*                   perBCAxis = NULL;
+			
+			numPeriodicBCs = Dictionary_Entry_Value_GetCount( periodicBCsList );
 
-		for ( periodicBC_I = 0; periodicBC_I < numPeriodicBCs; periodicBC_I++ ) {
-			periodicBC = Dictionary_Entry_Value_GetElement( periodicBCsList, periodicBC_I );
-			perBCAxis = Dictionary_Entry_Value_AsString( periodicBC );
+			for ( periodicBC_I = 0; periodicBC_I < numPeriodicBCs; periodicBC_I++ ) {
+				periodicBC = Dictionary_Entry_Value_GetElement( periodicBCsList, periodicBC_I );
+				perBCAxis = Dictionary_Entry_Value_AsString( periodicBC );
 
-			if ( 0 == strcmp( perBCAxis, "I_AXIS" ) ) {
-				PeriodicBoundariesManager_AddPeriodicBoundary( self, I_AXIS );
-			}
-			else if ( 0 == strcmp( perBCAxis, "J_AXIS" ) ) {
-				PeriodicBoundariesManager_AddPeriodicBoundary( self, J_AXIS );
-			}
-			else if ( 0 == strcmp( perBCAxis, "K_AXIS" ) ) {
-				PeriodicBoundariesManager_AddPeriodicBoundary( self, K_AXIS );
+				if ( 0 == strcmp( perBCAxis, "I_AXIS" ) ) {
+					PeriodicBoundariesManager_AddPeriodicBoundary( self, I_AXIS );
+				}
+				else if ( 0 == strcmp( perBCAxis, "J_AXIS" ) ) {
+					PeriodicBoundariesManager_AddPeriodicBoundary( self, J_AXIS );
+				}
+				else if ( 0 == strcmp( perBCAxis, "K_AXIS" ) ) {
+					PeriodicBoundariesManager_AddPeriodicBoundary( self, K_AXIS );
+				}
 			}
 		}
 	}
+	/* Test if mesh is periodic */
+	else if ( Stg_Class_IsInstance( self->mesh->generator, CartesianGenerator_Type ) ) {
+		CartesianGenerator* cartesianGenerator = (CartesianGenerator*) self->mesh->generator;
+		Dimension_Index dim_I;
+
+		for ( dim_I = 0 ; dim_I < self->swarm->dim ; dim_I++ ) {
+			/* Add boundaries straight from mesh generator */
+			if ( cartesianGenerator->periodic[ dim_I ] ) 
+				PeriodicBoundariesManager_AddPeriodicBoundary( self, dim_I );
+		}		
+	}
+
+
 
 }
 
@@ -350,7 +365,7 @@ void PeriodicBoundariesManager_UpdateParticle( void* periodicBCsManager, Particl
 
 	particle = (GlobalParticle*)Swarm_ParticleAt( self->swarm, lParticle_I );
 
-	Journal_DPrintfL( self->debug, 2, "Checking particle %d at (%.2f,%.2f,%2f)\n", lParticle_I,
+	Journal_DPrintfL( self->debug, 2, "Checking particle %d at (%.4g,%.4g,%.4g)\n", lParticle_I,
 		particle->coord[0], particle->coord[1], particle->coord[2] );
 
 	for ( perBoundary_I = 0; perBoundary_I < self->count; perBoundary_I++ ) {
@@ -363,20 +378,20 @@ void PeriodicBoundariesManager_UpdateParticle( void* periodicBCsManager, Particl
 			
 		Stream_Indent( self->debug );
 		if ( particle->coord[boundaryAxis] < perBoundary->minWall ) {
-			Journal_DPrintfL( self->debug, 3, "coord is < min wall %.2f:\n", perBoundary->minWall );
+			Journal_DPrintfL( self->debug, 3, "coord is < min wall %.4f:\n", perBoundary->minWall );
 			difference = perBoundary->minWall - particle->coord[boundaryAxis];
 			particle->coord[boundaryAxis] = perBoundary->maxWall - difference;
 			perBoundary->particlesUpdatedMinEndCount++;
-			Journal_DPrintfL( self->debug, 3, "moving to (%.2f,%.2f,%.2f).\n",
+			Journal_DPrintfL( self->debug, 3, "moving to (%.4f,%.4f,%.4f).\n",
 				particle->coord[I_AXIS], particle->coord[J_AXIS],
 				particle->coord[K_AXIS] );
 		}
 		else if ( particle->coord[perBoundary->axis] > perBoundary->maxWall ) {
-			Journal_DPrintfL( self->debug, 3, "coord is > max wall %.2f:\n", perBoundary->maxWall );
+			Journal_DPrintfL( self->debug, 3, "coord is > max wall %.4f:\n", perBoundary->maxWall );
 			difference = particle->coord[boundaryAxis] - perBoundary->maxWall; 
 			particle->coord[boundaryAxis] = perBoundary->minWall + difference;
 			perBoundary->particlesUpdatedMaxEndCount++;
-			Journal_DPrintfL( self->debug, 3, "moving to (%.2f,%.2f,%.2f).\n",
+			Journal_DPrintfL( self->debug, 3, "moving to (%.4f,%.4f,%.4f).\n",
 				particle->coord[I_AXIS], particle->coord[J_AXIS],
 				particle->coord[K_AXIS] );
 		}

@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SwarmAdvector.c 518 2007-10-11 08:07:50Z SteveQuenette $
+** $Id: SwarmAdvector.c 556 2008-03-28 06:41:03Z RobertTurnbull $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -150,7 +150,18 @@ void _SwarmAdvector_Init(
 	self->swarm = swarm;
 	self->swarm->swarmAdvector = self;	/* Attach ourselves to the swarm */
 	self->variable = swarm->particleCoordVariable->variable;
+
+	/* Test if mesh is periodic and a periodic boundaries manager hasn't been given */
+	if ( !periodicBCsManager && Stg_Class_IsInstance( swarm->mesh->generator, CartesianGenerator_Type ) ) {
+		CartesianGenerator* cartesianGenerator = (CartesianGenerator*) swarm->mesh->generator;
+		if ( cartesianGenerator->periodic[ I_AXIS ] || cartesianGenerator->periodic[ I_AXIS ] || cartesianGenerator->periodic[ I_AXIS ] ) {
+			/* Create a periodicBCsManager if there isn't one already */
+			periodicBCsManager = PeriodicBoundariesManager_New( "periodicBCsManager", (Mesh*)swarm->mesh, (Swarm*)swarm, NULL );
+		}
+	}	
 	self->periodicBCsManager = periodicBCsManager;
+	
+
 
 	TimeIntegrator_AppendSetupEP( self->timeIntegrator,  
 			"SwarmAdvector_AdvectionSetup", SwarmAdvector_AdvectionSetup,  self->name, self );
@@ -238,11 +249,17 @@ void _SwarmAdvector_Build( void* swarmAdvector, void* data ) {
 	SwarmAdvector*	self = (SwarmAdvector*) swarmAdvector;
 
 	_TimeIntegratee_Build( self, data );
+
+	if ( self->periodicBCsManager )
+		Stg_Component_Build( self->periodicBCsManager, data, False );
 }
 void _SwarmAdvector_Initialise( void* swarmAdvector, void* data ) {
 	SwarmAdvector*	self = (SwarmAdvector*) swarmAdvector;
 	
 	_TimeIntegratee_Initialise( self, data );
+	
+	if ( self->periodicBCsManager )
+		Stg_Component_Initialise( self->periodicBCsManager, data, False );
 }
 void _SwarmAdvector_Execute( void* swarmAdvector, void* data ) {
 	SwarmAdvector*	self = (SwarmAdvector*)swarmAdvector;
