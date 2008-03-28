@@ -3,6 +3,10 @@
 
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 
+	<list name="import">
+		<param> Underworld </param>
+	</list>
+
 	<include> Underworld/BaseApps/ThermalConvectionPIC.xml </include>
 	
 	<list name="plugins" mergeType="merge">

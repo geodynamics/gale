@@ -3,6 +3,10 @@
 		the modelling of thermochemical convection', JGR, 1997  -->
 		
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+        <list name="import">
+                <param> Underworld </param>
+        </list>
  
  	<include>Underworld/BaseApps/ThermoChem.xml</include>
 

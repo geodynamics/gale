@@ -3,6 +3,10 @@
 <!-- DTD to validate against -->
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 
+        <list name="import">
+                <param> Underworld </param>
+        </list>
+
 	<include>Underworld/BaseApps/RayleighTaylor.xml</include>
 
 	<list name="plugins" mergeType="merge">
