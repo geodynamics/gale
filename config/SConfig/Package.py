@@ -22,6 +22,7 @@ class Package(SConfig.Node):
 
         # Library options.
         self.libraries           = [] #[['']]
+        self.extra_libraries     = [] #['']
         self.shared_libraries    = [] # Only libraries listed here will be considered
                                       # when checking for shared libraries.
         self.require_shared      = False
@@ -247,6 +248,8 @@ int main(int argc, char* argv[]) {
         for l in libraries:
             if self.shared_libraries and l not in self.shared_libraries:
                 continue
+            if l in self.extra_libraries:
+                continue
             offs = ''
             for p in self.generate_library_paths(location, l):
                 offs += '  '
@@ -371,9 +374,9 @@ int main(int argc, char* argv[]) {
 
     def generate_libraries(self, location):
         if location[3]: # Try any frameworks by themselves first.
-            yield []
+            yield self.extra_libraries
         for libs in self.libraries:
-            yield libs
+            yield libs + self.extra_libraries
 
     def enable_location_state(self, location):
         """Modify our environment to include search paths for the current location."""

@@ -274,9 +274,9 @@ int main( int argc, char* argv[] ) {
 """ % (hdrs, suites)
     src_filename = os.path.join(env["buildPath"], env.project_name, 
                                 "test" + env.project_name + ".c")
-    if not os.path.exists(os.path.dirname(File(src_filename).path)):
-        os.makedirs(os.path.dirname(File(src_filename).path))
-    f = open(File(src_filename).path, "w")
+    if not os.path.exists(os.path.dirname(File(src_filename).abspath)):
+        os.makedirs(os.path.dirname(File(src_filename).abspath))
+    f = open(File(src_filename).abspath, "w")
     f.write(src)
     f.close()
     bin_filename = os.path.join(env["buildPath"], "bin", "test" + env.project_name)

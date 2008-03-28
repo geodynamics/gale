@@ -1,4 +1,4 @@
-import os
+import os, sys
 import SConfig
 from SCons.Script.SConscript import SConsEnvironment
 
@@ -6,14 +6,20 @@ from SCons.Script.SConscript import SConsEnvironment
 # Setup the Package system.
 #
 
-def Package(env, pkg_module, options, required=False):
+def Package(env, pkg_module, options, required=False, **kw):
     """Create a new package to be configured."""
     if not hasattr(env, 'packages'):
         env.packages = {}
         env.package_list = []
     if not pkg_module in env.packages:
-        env.packages[pkg_module] = pkg_module(env, options, required)
-        env.package_list += [env.packages[pkg_module]]
+        pkg = pkg_module(env, options, required)
+        for attr, val in kw.iteritems():
+            if not hasattr(pkg, attr):
+                print 'Package does not have attribute!'
+                sys.exit()
+            setattr(pkg, attr, val)
+        env.packages[pkg_module] = pkg
+        env.package_list += [pkg]
     return env.packages[pkg_module]
 
 def CheckPackages(ctx, pkg_list):

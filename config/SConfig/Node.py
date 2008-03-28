@@ -31,14 +31,14 @@ class Node(object):
         """Setup all the options for this package."""
         pass
 
-    def dependency(self, package_module, required=True):
+    def dependency(self, package_module, required=True, **kw):
         """Add another package as a dependency of this package. If required is False, the
         dependent package is not required, and thus will not cause this package to fail if
         it cannot be found."""
         if self.configured:
             print 'Error: Cannot add a dependency during configuration.'
             self.env.Exit()
-        pkg = self.env.Package(package_module, self.opts)
+        pkg = self.env.Package(package_module, self.opts, **kw)
         if pkg not in [d[0] for d in self.deps]:
             self.deps += [(pkg, required)]
         return pkg
