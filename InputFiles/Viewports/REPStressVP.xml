@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<struct name="components" mergeType="merge">
+	<struct name="sigmaInvColourMap">
+		<param name="Type">lucColourMap</param>
+		<param name="colours">Purple Blue Green Yellow Orange Red</param>
+		<param name="dynamicRange">true</param>
+	</struct>
+	<!-- SigmaVP setup -->
+	<struct name="sigmaInvMap">
+		<param name="Type">lucScalarField</param>
+		<param name="FieldVariable">recoveredSigmaInvariantField</param>
+		<param name="ColourMap">sigmaInvColourMap</param>
+	</struct>
+	<struct name="sigmaInvTitle" mergeType="replace">
+		<param name="Type">lucTitle</param>
+		<param name="string">Recovered Sigma Invariant (via REP)</param>
+	</struct>
+
+	<struct name="sigmaInvColourBar">
+		<param name="Type">lucColourBar</param>
+		<param name="ColourMap">sigmaInvColourMap</param>
+	</struct>
+
+	<struct name="SigmaInvariantVP">
+		<param name="Type">lucViewport</param>
+		<param name="Camera">camera</param>
+		<list name="DrawingObject">
+			<param>sigmaInvMap</param>
+			<param>border</param>
+			<param>sigmaInvTitle</param>
+			<param>sigmaInvColourBar</param>
+		</list>
+	</struct>
+
+	<struct name="recoveredPressureInvColourMap">
+		<param name="Type">lucColourMap</param>
+		<param name="colours">Black Purple DarkRed Orange Yellow</param>
+		<param name="dynamicRange">true</param>
+	</struct>
+	<struct name="recoveredPressureMap">
+		<param name="Type">lucScalarField</param>
+		<param name="FieldVariable">recoveredPressureField</param>
+		<param name="ColourMap">recoveredPressureInvColourMap</param>
+	</struct>
+	<struct name="recoveredPressureTitle" mergeType="replace">
+		<param name="Type">lucTitle</param>
+		<param name="string">Recovered Pressure (via REP)</param>
+	</struct>
+
+	<struct name="recoveredPressureColourBar">
+		<param name="Type">lucColourBar</param>
+		<param name="ColourMap">recoveredPressureInvColourMap</param>
+	</struct>
+
+	<struct name="recoveredPressureVP">
+		<param name="Type">lucViewport</param>
+		<param name="Camera">camera</param>
+		<list name="DrawingObject">
+			<param>recoveredPressureMap</param>
+			<param>border</param>
+			<param>recoveredPressureTitle</param>
+			<param>recoveredPressureColourBar</param>
+		</list>
+	</struct>
+	<!-- TauVP setup -->
+	<struct name="tauInvColourMap">
+		<param name="Type">lucColourMap</param>
+		<param name="colours">Purple Blue Green Yellow Orange Red</param>
+		<param name="dynamicRange">true</param>
+	</struct>
+	<struct name="tauInvMap">
+		<param name="Type">lucScalarField</param>
+		<param name="FieldVariable">recoveredTauInvariantField</param>
+		<param name="ColourMap">tauInvColourMap</param>
+	</struct>
+	<struct name="tauInvTitle" mergeType="replace">
+		<param name="Type">lucTitle</param>
+		<param name="string">Recovered Tau Invariant (via REP)</param>
+	</struct>
+
+	<struct name="tauInvColourBar">
+		<param name="Type">lucColourBar</param>
+		<param name="ColourMap">tauInvColourMap</param>
+	</struct>
+
+	<struct name="TauInvariantVP">
+		<param name="Type">lucViewport</param>
+		<param name="Camera">camera</param>
+		<list name="DrawingObject">
+			<param>tauInvMap</param>
+			<param>border</param>
+			<param>tauInvTitle</param>
+			<param>tauInvColourBar</param>
+		</list>
+	</struct>
+</struct>
+
+</StGermainData>
