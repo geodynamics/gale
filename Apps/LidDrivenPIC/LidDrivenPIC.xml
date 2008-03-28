@@ -43,15 +43,16 @@
 	<param name="journal.info.Context-verbose"> t </param>
 	<param name="journal-level.info.Stg_ComponentFactory"> 2 </param>
 	<param name="journal.debug">f</param>
-	<param name="journal-enable-branch.debug.StgFEM">f</param>
+	<param name="journal-enable-branch.debug.StgFEM">t</param>
 	<param name="journal-level-branch.debug.StgFEM"> 1 </param>
+	<param name="journal-level.debug.PeriodicBoundariesManager"> 3 </param>
 
 	<!-- Geometry & mesh setup -->
 	<param name="dim"> 2 </param>
 	<!-- Remember in StGermain these currently refer to _node_ counts rather than elements... -->
-	<param name="elementResI"> 7 </param>
-	<param name="elementResJ"> 7 </param>
-	<param name="elementResK"> 1 </param>
+	<param name="elementResI"> 20 </param>
+	<param name="elementResJ"> 20 </param>
+	<param name="elementResK"> 7 </param>
 	<param name="shadowDepth"> 1 </param>
 	<param name="minX"> 0.0 </param>
 	<param name="minY"> 0.0 </param>
