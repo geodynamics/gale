@@ -10,17 +10,17 @@
 			<param name="CentreFieldVariable">VelocityField</param>
 			<param name="coordZ">1.4762</param>
 		</struct>
-		<struct name="pressureColourMap">
+		<struct name="pressureColourMap" mergeType="replace">
 			<param name="Type">lucColourMap</param>
 			<param name="colours">Black Grey White Orange Red</param>
 			<param name="dynamicRange">true</param>
 		</struct>
 		<!-- Drawing Objects -->
-		<struct name="pressureColourBar">
+		<struct name="pressureColourBar" mergeType="replace">
 			<param name="Type">lucColourBar</param>
 			<param name="ColourMap">pressureColourMap</param>
 		</struct>			
-		<struct name="pressureMap">
+		<struct name="pressureMap" mergeType="replace">
 			<param name="Type">lucScalarField</param>
 			<param name="FieldVariable">PressureField</param>
 			<param name="ColourMap">pressureColourMap</param>
@@ -38,7 +38,7 @@
 			<param name="colour">black</param>
 			<param name="pointSize">2.0</param>
 		</struct>		
-		<struct name="border">
+		<struct name="border" mergeType="replace">
 			<param name="Type">lucFieldVariableBorder</param>
 			<param name="FieldVariable">VelocityField</param>
 		</struct>
@@ -47,9 +47,11 @@
 			<param name="Type">lucViewport</param>
 			<param name="Camera">camera</param>
 			<list name="DrawingObject">
+<!--
 				<param>pressureMap</param>
-				<param>velocityArrows</param>
+-->
 				<param>particleDots</param>
+				<param>velocityArrows</param>
 				<param>border</param>
 				<param>pressureColourBar</param>
 			</list>
