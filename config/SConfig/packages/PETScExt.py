@@ -19,6 +19,10 @@ class PETScExt(SConfig.Package):
 
     def generate_locations(self):
         for loc in SConfig.Package.generate_locations(self):
+            if not loc[0]:
+                yield loc
+                continue
+
             # Just use whatever architecture PETSc uses.
             arch = self.pkg_petsc.arch
             self.arch = arch
