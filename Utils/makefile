@@ -4,6 +4,6 @@ ifndef PROJ_ROOT
 endif
 include ${PROJ_ROOT}/Makefile.system
 
-subdirs = src tests
+subdirs = src
 
 include ${PROJ_ROOT}/Makefile.vmake
