@@ -219,6 +219,30 @@ void Operator_SymmetricTensor_GetNegAverageTrace( void* operator, double* operan
 	*result = -1.0 * (*result) / self->dim ;
 }
 
+void Operator_SymmetricTensor_MakeDeviatoric( void* operator, double* operand0, double* result ) {
+	Operator* self = (Operator*) operator;
+	double meanStress;
+	
+	Operator_FirewallUnary( self );
+	Operator_FirewallResultDofs( self, self->operandDofs );
+	
+	SymmetricTensor_GetTrace( operand0, self->dim, &meanStress );
+	meanStress = meanStress / self->dim ;
+
+	if( self->dim == 2 ) {
+		result[0] = operand0[0] - meanStress;
+		result[1] = operand0[1] - meanStress;
+		result[2] = operand0[2];
+	} else {
+		result[0] = operand0[0] - meanStress;
+		result[1] = operand0[1] - meanStress;
+		result[2] = operand0[2] - meanStress;
+		result[3] = operand0[3];
+		result[4] = operand0[4];
+		result[5] = operand0[5];
+	}
+}
+
 void Operator_Tensor_GetNegAverageTrace( void* operator, double* operand0, double* result ) {
 	Operator* self = (Operator*) operator;
 	
@@ -331,7 +355,7 @@ void Operator_Subtraction( void* operator, double* operand0, double* operand1, d
 			abort();				
 	}
 }
-	
+
 void Operator_ScalarMultiplication( void* operator, double* operand0, double* operand1, double* result ) {
 	Operator* self = (Operator*) operator;
 	
@@ -493,6 +517,11 @@ Operator* Operator_NewFromName(
 		resultDofs = 1;
 		numberOfOperands = 1;
 		_carryOut = Operator_Tensor_GetNegAverageTrace;
+	}
+	else if ( ! strcasecmp( name, "SymmetricTensor_MakeDeviatoric" ) ){ 
+		resultDofs = operandDofs;
+		numberOfOperands = 1;
+		_carryOut = Operator_SymmetricTensor_MakeDeviatoric;
 	}
 	else if ( ! strcasecmp( name, "TakeFirstComponent" ) ) {
 		resultDofs = 1;
