@@ -44,10 +44,12 @@
 	</struct>
 	<struct name="EulerDeform">
 		<list name="systems">
+<!--
 			<struct>
 				<param name="mesh"> constantMesh </param>
 				<param name="velocityField"> VelocityField </param>
 			</struct>
+-->
 			<struct>
 				<param name="mesh"> velocityMesh </param>
 				<param name="remesher">velocityRemesher</param>
