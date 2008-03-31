@@ -66,6 +66,9 @@
 #include <assert.h>
 
 
+extern void dump_discretisation( Mesh *mesh, Swarm *swarm, const char *filename );
+
+
 const Type Swarm_Type = "Swarm";
 const Name defaultSwarmParticleCommHandlerName = "defaultSwarmPHandlerName";
 
@@ -978,7 +981,16 @@ void Swarm_UpdateAllParticleOwners( void* swarm ) {
 		}
 	}
 
-	Stream_UnIndentBranch( Swarm_Debug );	
+	Stream_UnIndentBranch( Swarm_Debug );
+
+	/* DEBUG */
+	if( !strcmp( self->cellLayout->type, "ElementCellLayout" ) ) {
+	   static int iter = 0;
+	   char filename[12];
+
+	   sprintf( filename, "disc-%d.h5", iter++ );
+	   dump_discretisation( ((ElementCellLayout*)self->cellLayout)->mesh, self, filename );
+	}
 }
 
 
