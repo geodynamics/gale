@@ -51,7 +51,7 @@
 **	for storing and managing the matrices and vectors that make up a system, but uses
 **	the SLE_Solver class to actually implement a solution mechanism for the given eqn.
 **
-** $Id: SystemLinearEquations.h 1043 2008-03-03 04:41:39Z DavidLee $
+** $Id: SystemLinearEquations.h 1090 2008-03-31 02:42:22Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -133,6 +133,7 @@
 		void*						    buildFContext;             \
 		void*						    buildJContext;             \
 		NonlinearSolver*				    nlSolver;		       \
+		Bool						    linearSolveInitGuess;      \
 		Vector*						    F;			       \
 		Vector*						    X;		       	       \
 		Matrix*						    J;			       \

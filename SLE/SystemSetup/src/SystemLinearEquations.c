@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SystemLinearEquations.c 1043 2008-03-03 04:41:39Z DavidLee $
+** $Id: SystemLinearEquations.c 1090 2008-03-31 02:42:22Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -399,11 +399,12 @@ void _SystemLinearEquations_Construct( void* sle, Stg_ComponentFactory* cf, void
 	assert( entryPointRegister );
 
 	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, False, data );
-								/* should this be a PETSc nls?? */
-	//nlSolver = Stg_ComponentFactory_ConstructByKey( cf, self->name, NonlinearSolver_Type, NonlinearSolver, False, data );
-	if( isNonLinear )
-		nlSolver = PETScNonlinearSolver_New( "nonLinearSolver" );
 
+	if( isNonLinear ) {
+		nlSolver = PETScNonlinearSolver_New( "nonLinearSolver" );
+		self->linearSolveInitGuess = Stg_ComponentFactory_GetBool( cf, self->name, "linearSolveInitialGuess", False );
+	}
+	
 	_SystemLinearEquations_Init( 
 			self,
 			solver,
@@ -419,9 +420,9 @@ void _SystemLinearEquations_Construct( void* sle, Stg_ComponentFactory* cf, void
 			entryPointRegister,
 			MPI_COMM_WORLD );
 
-	self->X   	= PETScVector_New( "delta x" );
-	self->F		= PETScVector_New( "residual" );
-	self->J		= PETScMatrix_New( "Jacobian" ); 
+	self->X  = PETScVector_New( "delta x" );
+	self->F	 = PETScVector_New( "residual" );
+	self->J	 = PETScMatrix_New( "Jacobian" ); 
 	PETScMatrix_SetComm( self->J, self->comm );
 }
 
@@ -688,12 +689,19 @@ void SystemLinearEquations_NewtonInitialise( void* _context, void* data ) {
 	PETScVector*		F;
 	SNES			snes;
 	SNES			oldSnes		= ((PETScNonlinearSolver*)sle->nlSolver)->snes;
+	KSP			ksp;
+	PC			pc;
 
 	//VecDestroy( ((PETScVector*)self->F)->petscVec );
-	if( oldSnes && context->timeStep == 1 )
+	/* don't assume that a snes is being used for initial guess, check for this!!! */
+	if( oldSnes && context->timeStep == 1 && !sle->linearSolveInitGuess )
 		SNESDestroy( oldSnes );
 
 	SNESCreate( sle->comm, &snes );
+	SNESGetKSP( snes, &ksp );
+	KSPGetPC( ksp, &pc );
+	PCSetOperators( pc, ((PETScMatrix*)sle->J)->petscMat, ((PETScMatrix*)sle->J)->petscMat, SAME_NONZERO_PATTERN );
+	PCSetType( pc, "block" );
 	//VecCreate( self->comm, &F );
 
 	((PETScNonlinearSolver*)sle->nlSolver)->snes = snes;
@@ -710,6 +718,8 @@ void SystemLinearEquations_NewtonExecute( void* sle, void* _context ) {
 	SystemLinearEquations*	self            = (SystemLinearEquations*) sle;
 	SNES			snes		= ((PETScNonlinearSolver*)self->nlSolver)->snes;
 
+	/* make this prefix generic - ie: get from XML */
+	SNESSetOptionsPrefix( snes, "sw_" );
 	SNESSetFromOptions( snes );
 	SNESSolve( snes, PETSC_NULL, ((PETScVector*)self->X)->petscVec );
 }
