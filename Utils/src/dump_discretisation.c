@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
+#ifdef HAVE_HDF5
 #include <hdf5.h>
+#endif
 #include <StGermain/StGermain.h>
 #include <StgDomain/StgDomain.h>
 
