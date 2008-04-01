@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: ShapeTemperatureIC.c 682 2008-03-17 03:01:22Z JulianGiordani $
+** $Id: ShapeTemperatureIC.c 691 2008-04-01 23:30:31Z BelindaMay $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -133,6 +133,7 @@ void _Underworld_ShapeTemperatureIC_Construct( void* component, Stg_ComponentFac
 	context = (UnderworldContext*)Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
 	
 	condFunc = ConditionFunction_New( Underworld_ShapeTemperatureICFunction, "ShapeTemperatureIC" );
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 	condFunc = ConditionFunction_New( Underworld_GaussianIC, "GaussianIC" );
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 }
