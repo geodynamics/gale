@@ -249,6 +249,8 @@ def build_suite_runner(env):
         name = node.path[node.path.rfind(os.path.sep) + 1:node.path.rfind('.')]
         suites += "pcu_runner_addSuite( %s );\n" % name
         name = node.path[len(env['buildPath']):node.path.rfind('.')]
+        if name[0] == os.path.sep:
+            name = name[1:]
         hdrs += "#include \"%s.h\"" % name
     src = """#include <stdlib.h>
 #include <mpi.h>
