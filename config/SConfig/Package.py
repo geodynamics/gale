@@ -122,7 +122,7 @@ class Package(SConfig.Node):
 
     def find_package(self):
         """Basic check routine for locating the package."""
-        result = True
+        result = False
         self.ctx.Display('  Searching locations:\n')
         for loc in self.generate_locations():
             self.ctx.Display('    %s\n' % str(loc))
