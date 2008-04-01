@@ -67,7 +67,7 @@
 **	Just in case it causes problems with the lowestLocalEqNum 
 **	calculations.
 **
-** $Id: FeEquationNumber.h 1070 2008-03-12 02:23:21Z LukeHodkinson $
+** $Id: FeEquationNumber.h 1093 2008-04-01 04:47:08Z RobertTurnbull $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -253,6 +253,7 @@
 	
 	/** Prints only the destination array */
 	void FeEquationNumber_PrintDestinationArray( void* feEquationNumber, Stream* stream );
+	void FeEquationNumber_PrintDestinationArrayBox( void* feFeEquationNumber, Stream* stream ) ;
 
 	/** Prints only the location matrix */
 	void FeEquationNumber_PrintLocationMatrix( void* feEquationNumber, Stream* stream );

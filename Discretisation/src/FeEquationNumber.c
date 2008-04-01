@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeEquationNumber.c 1082 2008-03-24 05:21:02Z LukeHodkinson $
+** $Id: FeEquationNumber.c 1093 2008-04-01 04:47:08Z RobertTurnbull $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -2033,6 +2033,58 @@ void FeEquationNumber_PrintDestinationArray( void* feFeEquationNumber, Stream* s
    }		
 }
 
+void FeEquationNumber_PrintDestinationArrayBox( void* feFeEquationNumber, Stream* stream ) {
+	FeEquationNumber*   self = (FeEquationNumber*) feFeEquationNumber;
+	FeMesh*             feMesh = self->feMesh;
+	MPI_Comm            comm = Comm_GetMPIComm( Mesh_GetCommTopology( feMesh, MT_VERTEX ) );
+	unsigned            rank;
+	Grid*               vGrid;
+	int                 ijk[3];
+	Element_LocalIndex  lNode_I;
+	Node_GlobalIndex    gNode_I;
+	Node_Index          sizeI, sizeJ, sizeK;
+	Dof_Index           nDofs;
+	Dof_Index           dof_I;
+
+	MPI_Comm_rank( comm, (int*)&rank );
+	Journal_Printf( stream, "%d: *** Printing destination array ***\n", rank );
+	
+	vGrid = *Mesh_GetExtension( feMesh, Grid**, "vertexGrid" );
+	nDofs = self->dofLayout->dofCounts[0];
+	sizeI = vGrid->sizes[ I_AXIS ];
+	sizeJ = vGrid->sizes[ J_AXIS ];
+	sizeK = vGrid->sizes[ K_AXIS ] ? vGrid->sizes[ K_AXIS ] : 1;
+
+	for ( ijk[2] = 0 ; ijk[2] < sizeK ; ijk[2]++ ) {
+		if ( sizeK != 1 )
+			Journal_Printf( stream, "\nk = %d\n", ijk[2] );
+		for ( ijk[1] = sizeJ - 1 ; ijk[1] >= 0 ; ijk[1]-- ) {
+			Journal_Printf( stream, "%2d - ", ijk[1] );
+			for ( ijk[0] = 0 ; ijk[0] < sizeI ; ijk[0]++ ) {
+				gNode_I = Grid_Project( vGrid, ijk );
+				Journal_Printf( stream, "{ " );
+				if ( Mesh_GlobalToDomain( feMesh, MT_VERTEX, gNode_I, &lNode_I ) ) {
+					for ( dof_I = 0 ; dof_I < nDofs ; dof_I++ )
+						Journal_Printf( stream, "%3d ", self->destinationArray[lNode_I][dof_I] );
+				}
+				else {
+					for ( dof_I = 0 ; dof_I < nDofs ; dof_I++ )
+						Journal_Printf( stream, " XX " );
+				}
+				Journal_Printf( stream, "}" );
+			}
+			Journal_Printf( stream, "\n" );
+		}
+		/* Bottom row */
+		Journal_Printf( stream, "    " );
+		for ( ijk[0] = 0 ; ijk[0] < sizeI ; ijk[0]++ ) {
+			Journal_Printf( stream, "    %3d    ", ijk[0] );
+			if ( nDofs == 3 )
+				Journal_Printf( stream, "    " );
+		}
+		Journal_Printf( stream, "\n" );
+	}	
+}
 
 void FeEquationNumber_PrintLocationMatrix( void* feFeEquationNumber, Stream* stream ) {
    FeEquationNumber* self = (FeEquationNumber*) feFeEquationNumber;
