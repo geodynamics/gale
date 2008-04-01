@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: LinearVelocityAnalytic.c 1088 2008-03-28 03:48:58Z RobertTurnbull $
+** $Id: LinearVelocityAnalytic.c 1094 2008-04-01 08:18:54Z RobertTurnbull $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -49,6 +49,8 @@ const Type LinearVelocityAnalytic_Type = "LinearVelocityAnalytic";
 typedef struct { 
 	__AnalyticSolution
 	FeVariable* velocityField;
+	double nodeVelocity[8][3];
+	int    cornerNodeCount;
 } LinearVelocityAnalytic;
 
 Index Grid_ProjectIJK( Grid* grid, Index i, Index j, Index k ) {
@@ -73,28 +75,53 @@ Index Grid_ProjectIJK_MinMax( Grid* grid, Bool iIsMax, Bool jIsMax, Bool kIsMax 
 	return Grid_Project( grid, ijk );
 }
 
+void LinearVelocityAnalytic_GetCornerNodeVelocities(void* analyticSolution) {
+	LinearVelocityAnalytic *self = (LinearVelocityAnalytic*)analyticSolution;
+	Grid*                   vertGrid;
+	Node_GlobalIndex        nodeMapper[8];
+	FeVariable*             velocityField = self->velocityField;
+	FeMesh*                 mesh = velocityField->feMesh;
+	Dimension_Index         dim = velocityField->dim;
+	Node_Index              globalNode_I;
+	Node_Index              ii;
+	
+	vertGrid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+
+	/* Find global indicies of nodes */
+	self->cornerNodeCount = 4;
+	nodeMapper[0] = Grid_ProjectIJK_MinMax( vertGrid, 0, 0, 0 );
+	nodeMapper[1] = Grid_ProjectIJK_MinMax( vertGrid, 1, 0, 0 );
+	nodeMapper[2] = Grid_ProjectIJK_MinMax( vertGrid, 1, 1, 0 );
+	nodeMapper[3] = Grid_ProjectIJK_MinMax( vertGrid, 0, 1, 0 );
+	if ( dim == 3 ) {
+		self->cornerNodeCount = 8;
+		nodeMapper[4] = Grid_ProjectIJK_MinMax( vertGrid, 0, 0, 1 );
+		nodeMapper[5] = Grid_ProjectIJK_MinMax( vertGrid, 1, 0, 1 );
+		nodeMapper[6] = Grid_ProjectIJK_MinMax( vertGrid, 1, 1, 1 );
+		nodeMapper[7] = Grid_ProjectIJK_MinMax( vertGrid, 0, 1, 1 );
+	}
+
+	/* Loop over corner nodes */
+	for ( ii = 0 ; ii < self->cornerNodeCount ; ii++ ) {
+		globalNode_I = nodeMapper[ ii ];
+		FeVariable_GetValueAtNodeGlobal( velocityField, globalNode_I, self->nodeVelocity[ii] );
+	}
+}
 
 /* Do a normal linear interpolation as if the box were a FEM element */
 void LinearVelocityAnalytic_VelocityFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* velocity ) {
 	LinearVelocityAnalytic *self = (LinearVelocityAnalytic*)analyticSolution;
 	FeVariable*             velocityField = self->velocityField;
 	FeMesh*                 mesh = velocityField->feMesh;
-	Dimension_Index         dim_I;
 	Dimension_Index         dim = velocityField->dim;
-	Grid*                   vertGrid;
-	Node_GlobalIndex        nodeMapper[8];
+	Dimension_Index         dim_I;
 	XYZ                     xi;
 	XYZ                     min;
 	XYZ                     max;
 	double                  Ni[8];
-	Node_Index              cornerNodeCount;
 	Node_Index              ii;
-	Node_Index              globalNode_I;
-	double                  nodeVelocity[3];
 	ElementType*            elementType;
 
-	vertGrid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
-	
 	/* Transform the coordinate into a master coordinate system */
 	_FeVariable_GetMinAndMaxGlobalCoords( velocityField, min, max );
 	for ( dim_I = 0 ; dim_I < dim ; dim_I++ ) {
@@ -102,46 +129,43 @@ void LinearVelocityAnalytic_VelocityFunction( void* analyticSolution, FeVariable
 	}	
 
 	/* Get Shape Functions */
-	elementType = FeMesh_GetElementType( velocityField->feMesh, 0 );
+	elementType = FeMesh_GetElementType( mesh, 0 );
 	ElementType_EvaluateShapeFunctionsAt( elementType, xi, Ni );
-
-	/* Find global indicies of nodes */
-	cornerNodeCount = 4;
-	nodeMapper[0] = Grid_ProjectIJK_MinMax( vertGrid, 0, 0, 0 );
-	nodeMapper[1] = Grid_ProjectIJK_MinMax( vertGrid, 1, 0, 0 );
-	nodeMapper[2] = Grid_ProjectIJK_MinMax( vertGrid, 1, 1, 0 );
-	nodeMapper[3] = Grid_ProjectIJK_MinMax( vertGrid, 0, 1, 0 );
-	if ( dim == 3 ) {
-		cornerNodeCount = 8;
-		nodeMapper[4] = Grid_ProjectIJK_MinMax( vertGrid, 0, 0, 1 );
-		nodeMapper[5] = Grid_ProjectIJK_MinMax( vertGrid, 1, 0, 1 );
-		nodeMapper[6] = Grid_ProjectIJK_MinMax( vertGrid, 1, 1, 1 );
-		nodeMapper[7] = Grid_ProjectIJK_MinMax( vertGrid, 0, 1, 1 );
-	}
 
 	/* Do interpolation */
 	/* Loop over corner nodes */
 	memset( velocity, 0, dim*sizeof(double) );
-	for ( ii = 0 ; ii < cornerNodeCount ; ii++ ) {
-		globalNode_I = nodeMapper[ ii ];
-		FeVariable_GetValueAtNodeGlobal( velocityField, globalNode_I, nodeVelocity );
-		/* LOOKS LIKE THERE'S A BUG IN THE BOUNDARY CONDITIONS CODE 
-		printf("nodeVelocity = %g %g - is bc = %d, %d\n", nodeVelocity[0], nodeVelocity[1], 
-			FeVariable_IsBC( velocityField, globalNode_I, 0 ), FeVariable_IsBC( velocityField, globalNode_I, 1 ) );
-		*/
+	for ( ii = 0 ; ii < self->cornerNodeCount ; ii++ ) {
 		for ( dim_I = 0 ; dim_I < dim ; dim_I++ ) {
-			velocity[ dim_I ] += Ni[ ii ] * nodeVelocity[ dim_I ];
+			velocity[ dim_I ] += Ni[ ii ] * self->nodeVelocity[ii][ dim_I ];
 		}
 	}
+}
+void SimpleShearAnalytic_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* pressure ) {
+	*pressure = 0.0;
 }
 
 void _LinearVelocityAnalytic_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	LinearVelocityAnalytic *self = (LinearVelocityAnalytic*)analyticSolution;
+	FeVariable*       pressureField;
 
 	_AnalyticSolution_Construct( self, cf, data );
 
 	self->velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data ); 
 	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, self->velocityField, LinearVelocityAnalytic_VelocityFunction );
+	
+	pressureField = Stg_ComponentFactory_ConstructByName( cf, "PressureField", FeVariable, True, data ); 
+	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, pressureField, SimpleShearAnalytic_PressureFunction );
+	
+}
+
+void _LinearVelocityAnalytic_Initialise( void* analyticSolution, void* data ) {
+	LinearVelocityAnalytic *self = (LinearVelocityAnalytic*)analyticSolution;
+	
+	Stg_Component_Initialise( self->velocityField, data,  False );
+	LinearVelocityAnalytic_GetCornerNodeVelocities( self );
+
+	_AnalyticSolution_Initialise( self, data );
 }
 
 void* _LinearVelocityAnalytic_DefaultNew( Name name ) {
@@ -154,7 +178,7 @@ void* _LinearVelocityAnalytic_DefaultNew( Name name ) {
 			_LinearVelocityAnalytic_DefaultNew,
 			_LinearVelocityAnalytic_Construct,
 			_AnalyticSolution_Build,
-			_AnalyticSolution_Initialise,
+			_LinearVelocityAnalytic_Initialise,
 			_AnalyticSolution_Execute,
 			_AnalyticSolution_Destroy,
 			name );
