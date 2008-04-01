@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SystemLinearEquations.c 1090 2008-03-31 02:42:22Z DavidLee $
+** $Id: SystemLinearEquations.c 1092 2008-04-01 03:34:46Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -730,7 +730,7 @@ void SystemLinearEquations_NewtonFinalise( void* _context, void* data ) {
 	SystemLinearEquations*	sle             = (SystemLinearEquations*)context->slEquations->data[0];
 	SNES			snes		= ((PETScNonlinearSolver*)sle->nlSolver)->snes;
 
-	sle->_updateXToNodes( &sle->X, context );
+	sle->_updateOldFields( &sle->X, context );
 	
 	SNESDestroy( snes );	
 }
