@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: IncompressibleExtensionBC.h 650 2008-02-19 01:27:56Z RobertTurnbull $
+** $Id: IncompressibleExtensionBC.h 694 2008-04-03 01:06:30Z LouisMoresi $
 ** 
 ** Comments:
 **
@@ -48,12 +48,15 @@
 #ifndef __Underworld_IncompressibleExtensionBC_h__
 #define __Underworld_IncompressibleExtensionBC_h__
 
-	double GetLeftWallVelocity( FeVariable* velocityField ) ;
-	double GetRightWallVelocity( FeVariable* velocityField ) ;
-	double GetTopWallVelocity( FeVariable* velocityField, double y ) ;
-	double GetBottomWallVelocity( FeVariable* velocityField, double y ) ;
-	void GetVelocity( FeVariable* velocityField, double y, Coord coord, double* velocity ) ;
+//	double GetLeftWallVelocity( FeVariable* velocityField ) ;
+//	double GetRightWallVelocity( FeVariable* velocityField ) ;
+	double GetTopWallVelocity( FeVariable* velocityField, void* _context, double y ) ;
+	double GetBottomWallVelocity( FeVariable* velocityField, void* _context, double y ) ;
+//	void GetVelocity( FeVariable* velocityField, double y, Coord coord, void* _context, double* velocity ) ;
+	
 	void IncompressibleExtensionBC_TopCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
+	void IncompressibleExtensionBC_LeftCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
+	void IncompressibleExtensionBC_RightCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
 	void IncompressibleExtensionBC_BottomCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
 
 	Index Underworld_IncompressibleExtensionBC_Register( PluginsManager* pluginsManager );
