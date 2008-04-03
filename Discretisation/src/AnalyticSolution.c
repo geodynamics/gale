@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AnalyticSolution.c 1036 2008-02-19 01:19:30Z JulianGiordani $
+** $Id: AnalyticSolution.c 1095 2008-04-03 06:29:29Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -54,6 +54,8 @@
 #include <string.h>
 
 const Type AnalyticSolution_Type = "AnalyticSolution";
+/* Singleton for analytical solution */
+AnalyticSolution* mySingleton = NULL;
 
 void* _AnalyticSolution_DefaultNew( Name name ) {
 	return _AnalyticSolution_New(
@@ -70,7 +72,6 @@ void* _AnalyticSolution_DefaultNew( Name name ) {
 		_AnalyticSolution_Destroy,
 		name );
 }
-
 
 AnalyticSolution* _AnalyticSolution_New( 
 		SizeT                                       _sizeOfSelf,
@@ -106,6 +107,8 @@ AnalyticSolution* _AnalyticSolution_New(
 			name,
 			NON_GLOBAL );
 
+	/* Assign singleton ptr */
+	mySingleton = self;
 	return self;
 }
 
@@ -196,7 +199,6 @@ void _AnalyticSolution_Build( void* analyticSolution, void* data ) {
 	assert( analyticFeVariableCount == Stg_ObjectList_Count( self->analyticFeVariableFuncList ) );
 
 	for ( analyticFeVariable_I = 0 ; analyticFeVariable_I < analyticFeVariableCount ; analyticFeVariable_I++ ) {
-		//Stg_Component_Build( Stg_ObjectList_At( self->feVariableList, analyticFeVariable_I ), data, False ) ;
 		Stg_Component_Build( Stg_ObjectList_At( self->analyticFeVariableList, analyticFeVariable_I ), data, False ) ;
 		Stg_Component_Build( Stg_ObjectList_At( self->errorMagnitudeFieldList, analyticFeVariable_I ), data, False ) ;
 		Stg_Component_Build( Stg_ObjectList_At( self->relativeErrorMagnitudeFieldList, analyticFeVariable_I ), data, False ) ;
@@ -236,7 +238,7 @@ void _AnalyticSolution_Destroy( void* analyticSolution, void* data ) {
 
 void AnalyticSolution_PutAnalyticSolutionOntoNodes( void* analyticSolution, Index analyticFeVariable_I ) {
 	AnalyticSolution*                            self = (AnalyticSolution*) analyticSolution;
-	AnalyticSolution_FeVariableSolutionFunction* solutionFunction;
+	AnalyticSolution_SolutionFunction*           solutionFunction;
 	FeVariable*                                  analyticFeVariable;
 	double*                                      coord;
 	Dof_Index                                    dofAtEachNodeCount;
@@ -253,12 +255,11 @@ void AnalyticSolution_PutAnalyticSolutionOntoNodes( void* analyticSolution, Inde
 	analyticFeVariable = 
 		Stg_CheckType( Stg_ObjectList_At( self->analyticFeVariableList, analyticFeVariable_I ), FeVariable );
 	mesh = analyticFeVariable->feMesh;
-	solutionFunction   = (AnalyticSolution_FeVariableSolutionFunction*) 
+	solutionFunction   = (AnalyticSolution_SolutionFunction*) 
 		Stg_ObjectList_ObjectAt( self->analyticFeVariableFuncList, analyticFeVariable_I );
 	feVariable = AnalyticSolution_GetFeVariableFromAnalyticFeVariable( self, analyticFeVariable );
 
 	/* Get number of degrees of freedom at each node (assuming they are the same) */
-	//dofAtEachNodeCount = analyticFeVariable->dofLayout->dofCounts[0];
 	dofAtEachNodeCount = analyticFeVariable->fieldComponentCount;
 	value = Memory_Alloc_Array( double, dofAtEachNodeCount, "value" );
 
@@ -349,7 +350,7 @@ void AnalyticSolution_TestAll( void* analyticSolution, void* data ) {
 	}
 }
 
-void AnalyticSolution_RegisterFeVariableWithAnalyticFunction( void* analyticSolution, FeVariable* feVariable, AnalyticSolution_FeVariableSolutionFunction* solutionFunction) {
+void AnalyticSolution_RegisterFeVariableWithAnalyticFunction( void* analyticSolution, FeVariable* feVariable, AnalyticSolution_SolutionFunction* solutionFunction) {
 	AnalyticSolution* self    = (AnalyticSolution*) analyticSolution;
 	char*             tmpName = Stg_Object_AppendSuffix( feVariable, "Analytic" );
 
@@ -399,7 +400,6 @@ void AnalyticSolution_BuildAllAnalyticFields( void* analyticSolution, void* data
 }
 
 FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVariable* feVariable ) {
-//FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVariable* feVariable, AnalyticSolution_FeVariableSolutionFunction* solutionFunction ) {
 	AnalyticSolution*                            self = (AnalyticSolution*) analyticSolution;
 	Name                                         tmpName;
 	FeVariable*                                  analyticFeVariable;
@@ -429,7 +429,7 @@ FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVari
 		dataVariable = Variable_NewScalar( 	
 			tmpName,
 			Variable_DataType_Double, 
-			&sync->nDomains, 
+			(unsigned*)&sync->nDomains, 
 			NULL,
 			(void**)NULL, 
 			variable_Register );
@@ -449,7 +449,7 @@ FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVari
 				tmpName,
 				Variable_DataType_Double, 
 				componentsCount,
-				&sync->nDomains, 
+				(unsigned*)&sync->nDomains, 
 				NULL, 
 				(void**)NULL, 
 				variable_Register,
@@ -500,14 +500,8 @@ FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVari
 		feVariable->fieldVariable_Register );
 
 	/* Add new analyticFeVariable to list */
-	/* Add new FeVariable to list */
-	//Stg_ObjectList_Append( self->feVariableList,         feVariable );
 	Stg_ObjectList_Append( self->analyticFeVariableList, analyticFeVariable );
 
-	/* Add function to list 
-	Stg_ObjectList_GlobalPointerAppend( self->analyticFeVariableFuncList, solutionFunction, tmpName );
-	Memory_Free( tmpName );
-	*/
 	/* Create Magnitude Field */
 	tmpName = Stg_Object_AppendSuffix( analyticFeVariable, "Magnitude" );
 	analyticMagField = OperatorFeVariable_NewUnary( tmpName, analyticFeVariable, "Magnitude" );
@@ -560,24 +554,21 @@ FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVari
 	return analyticFeVariable;
 }
 
-FeVariable* AnalyticSolution_CreateAnalyticVectorField( void* analyticSolution, FeVariable* vectorField, AnalyticSolution_FeVariableSolutionFunction* solutionFunction ) {
+FeVariable* AnalyticSolution_CreateAnalyticVectorField( void* analyticSolution, FeVariable* vectorField, AnalyticSolution_SolutionFunction* solutionFunction ) {
 	AnalyticSolution*                            self = (AnalyticSolution*) analyticSolution;
 	FeVariable*                                  analyticVectorField;
 
-	//analyticVectorField = AnalyticSolution_CreateAnalyticField( self, vectorField, solutionFunction );
 	analyticVectorField = AnalyticSolution_CreateAnalyticField( self, vectorField );
 
 	return analyticVectorField;
 }
 
-//FeVariable* AnalyticSolution_CreateAnalyticSymmetricTensorField( void* analyticSolution, FeVariable* vectorField, AnalyticSolution_FeVariableSolutionFunction* solutionFunction ) {
 FeVariable* AnalyticSolution_CreateAnalyticSymmetricTensorField( void* analyticSolution, FeVariable* vectorField ) {
 	AnalyticSolution*                            self = (AnalyticSolution*) analyticSolution;
 	FeVariable*                                  analyticVectorField;
 	OperatorFeVariable*                          analyticVectorInvField;
 	Name                                         tmpName;
 
-	//analyticVectorField = AnalyticSolution_CreateAnalyticField( self, vectorField, solutionFunction );
 	analyticVectorField = AnalyticSolution_CreateAnalyticField( self, vectorField );
 
 	/* Create Invariant Field */
@@ -613,4 +604,11 @@ InterpolationResult AnalyticSolution_InterpolateValueFromNormalFeVariable( void*
 	normalFeVariable = AnalyticSolution_GetFeVariableFromAnalyticFeVariable( self, analyticFeVariable );
 
 	return FieldVariable_InterpolateValueAt( normalFeVariable, coord, value );
+}
+
+AnalyticSolution* AnalyticSolution_GetAnalyticSolution() {
+	Journal_Firewall( mySingleton != NULL , Journal_Register( Error_Type, "AnalyticSolution" ),
+			"Error in function %s: The Singleton Ptr is NULL, meaning the AnalyticSolution has not been created yet\n",
+			__func__ );
+	return mySingleton;
 }

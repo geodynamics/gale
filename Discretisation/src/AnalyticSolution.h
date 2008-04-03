@@ -50,11 +50,7 @@
 #ifndef __StgFEM_Discretisation_AnalyticSolution_h__
 #define __StgFEM_Discretisation_AnalyticSolution_h__
 	
-	typedef void (AnalyticSolution_FeVariableSolutionFunction) (void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* value );
-	typedef void (AnalyticSolution_GetVelocity) (void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* value );
-	typedef void (AnalyticSolution_GetPressure) (void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* value );
-	typedef void (AnalyticSolution_GetTotalStress) (void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* value );
-	typedef void (AnalyticSolution_GetStrainRate) (void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* value );
+	typedef void (AnalyticSolution_SolutionFunction) (void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* value );
 
 	/** Textual name of this class */
 	extern const Type AnalyticSolution_Type;
@@ -75,10 +71,10 @@
 		Swarm*                 integrationSwarm;           \
 		LiveComponentRegister* LC_Register;                \
 		AbstractContext*       context;                    \
-		AnalyticSolution_GetVelocity* _getAnalyticVelocity; \
-		AnalyticSolution_GetPressure* _getAnalyticPressure; \
-		AnalyticSolution_GetTotalStress* _getAnalyticTotalStress; \
-		AnalyticSolution_GetStrainRate* _getAnalyticStrainRate; \
+		AnalyticSolution_SolutionFunction* _getAnalyticVelocity; \
+		AnalyticSolution_SolutionFunction* _getAnalyticPressure; \
+		AnalyticSolution_SolutionFunction* _getAnalyticTotalStress; \
+		AnalyticSolution_SolutionFunction* _getAnalyticStrainRate; \
 		
 	/** Brings together and manages the life-cycle of a a mesh and all the 
 	info relevant to it for the Finite Element Method. See Mesh.h for more. */
@@ -145,14 +141,15 @@
 	
 	void AnalyticSolution_PutAnalyticSolutionOntoNodes( void* analyticSolution, Index analyticFeVariable_I ) ;
 
-	void AnalyticSolution_RegisterFeVariableWithAnalyticFunction( void* analyticSolution, FeVariable* feVariable, AnalyticSolution_FeVariableSolutionFunction* solutionFunction );
+	void AnalyticSolution_RegisterFeVariableWithAnalyticFunction( void* analyticSolution, FeVariable* feVariable, AnalyticSolution_SolutionFunction* solutionFunction );
 	void AnalyticSolution_BuildAllAnalyticFields( void* analyticSolution, void* data );
 
 	FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVariable* feVariable ) ;
-	FeVariable* AnalyticSolution_CreateAnalyticVectorField( void* analyticSolution, FeVariable* vectorField, AnalyticSolution_FeVariableSolutionFunction* solutionFunction ) ;
+	FeVariable* AnalyticSolution_CreateAnalyticVectorField( void* analyticSolution, FeVariable* vectorField, AnalyticSolution_SolutionFunction* solutionFunction ) ;
 	FeVariable* AnalyticSolution_CreateAnalyticSymmetricTensorField( void* analyticSolution, FeVariable* vectorField ) ;
 
 	FeVariable* AnalyticSolution_GetFeVariableFromAnalyticFeVariable( void* analyticSolution, FeVariable* analyticFeVariable ) ;
 	InterpolationResult AnalyticSolution_InterpolateValueFromNormalFeVariable( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* value ) ;
+	AnalyticSolution* AnalyticSolution_GetAnalyticSolution();
 	
 #endif /* __StgFEM_Discretisation_AnalyticSolution_h__ */
