@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: IncompressibleExtensionBC.c 675 2008-03-07 06:32:38Z JulianGiordani $
+** $Id: IncompressibleExtensionBC.c 693 2008-04-03 01:03:45Z LouisMoresi $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -73,48 +73,11 @@ const Type Underworld_IncompressibleExtensionBC_Type = "Underworld_Incompressibl
 
 	*/
 
-double GetLeftWallVelocity( FeVariable* velocityField ) {
-	FeMesh*             mesh = velocityField->feMesh;
-	IJK                 globalIJK = {0,0,0};
-	Node_GlobalIndex    global_I;
-	XYZ                 velocity;
-	Grid*		    vertGrid;
-	
-	vertGrid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
 
-	/* Grab global indicies for these nodes */
-	global_I = Grid_Project( vertGrid, globalIJK );
-	
-	/* Grab velocities on these walls */
-	FeVariable_GetValueAtNodeGlobal( velocityField, global_I, velocity );
-
-	/* Get components in horizontal direction */
-	return velocity[ I_AXIS ]; 
-}
-double GetRightWallVelocity( FeVariable* velocityField ) {
-	FeMesh*             mesh = velocityField->feMesh;
-	IJK                 globalIJK = {0,0,0};
-	Node_GlobalIndex    global_I;
-	XYZ                 velocity;
-	Grid*		    vertGrid;
-	
-	vertGrid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
-
-	globalIJK[ I_AXIS ] = vertGrid->sizes[ I_AXIS ] - 1;
-
-	/* Grab global indicies for these nodes */
-	global_I = Grid_Project( vertGrid, globalIJK );
-	
-	/* Grab velocities on these walls */
-	FeVariable_GetValueAtNodeGlobal( velocityField, global_I, velocity );
-	
-	/* Get components in horizontal direction */
-	return velocity[ I_AXIS ]; 
-}
-
-double GetTopWallVelocity( FeVariable* velocityField, double y ) {
-	double              V_b = GetLeftWallVelocity( velocityField );
-	double              V_a = GetRightWallVelocity( velocityField );
+double GetTopWallVelocity( FeVariable* velocityField, void* _context, double y ) {
+	UnderworldContext*  context = (UnderworldContext*) _context;
+	double              V_b = Dictionary_GetDouble_WithDefault( context->dictionary,  "leftWallVelocity", 0.0 );
+	double              V_a = Dictionary_GetDouble_WithDefault( context->dictionary, "rightWallVelocity", 0.0 );
 	double              V_c;
 	double              h_1;
 	XYZ                 min, max;
@@ -131,9 +94,10 @@ double GetTopWallVelocity( FeVariable* velocityField, double y ) {
 	return V_c;
 }
 
-double GetBottomWallVelocity( FeVariable* velocityField, double y ) {
-	double              V_b = GetLeftWallVelocity( velocityField );
-	double              V_a = GetRightWallVelocity( velocityField );
+double GetBottomWallVelocity( FeVariable* velocityField, void* _context, double y ) {
+	UnderworldContext* context = (UnderworldContext*) _context;
+	double              V_b = Dictionary_GetDouble_WithDefault( context->dictionary,  "leftWallVelocity", 0.0 );
+	double              V_a = Dictionary_GetDouble_WithDefault( context->dictionary, "rightWallVelocity", 0.0 );
 	double              V_d;
 	double              h_2;
 	XYZ                 min, max;
@@ -146,37 +110,34 @@ double GetBottomWallVelocity( FeVariable* velocityField, double y ) {
 	
 	/* Calculate velocity at the top and at the bottom of the nodes */
 	V_d =   h_2/width * ( V_a - V_b );
-	
+		
 	return V_d;
 }
 
-void GetVelocity( FeVariable* velocityField, double y, Coord coord, double* velocity ) {
-	double              V_a = GetRightWallVelocity( velocityField );
-	double              V_b = GetLeftWallVelocity( velocityField );
-	double              V_c = GetTopWallVelocity( velocityField, y );
-	double              V_d = GetBottomWallVelocity( velocityField, y );
-	XYZ                 min, max;
-	double              width;
-	double              height;
-	
-	printf(" %g %g \n", coord[0], coord[1] );
 
-	FieldVariable_GetMinAndMaxGlobalCoords( velocityField, min, max );
-	width  = (max[ I_AXIS ] - min[ I_AXIS ]);
-	height  = (max[ J_AXIS ] - min[ J_AXIS ]);
-
-	velocity[ I_AXIS ] = ( coord[ I_AXIS ] - min[ I_AXIS ] ) / width  * ( V_a - V_b ) + V_b;
-	velocity[ J_AXIS ] = ( coord[ J_AXIS ] - min[ J_AXIS ] ) / height * ( V_c - V_d ) + V_d;
-	if ( velocityField->dim == 3 )
-		velocity[ K_AXIS ] = 0.0;
-}
 
 void IncompressibleExtensionBC_TopCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
 	UnderworldContext* context = (UnderworldContext*) _context;
 	double*            result  = (double*) _result;
 	double             y       = Dictionary_GetDouble_WithDefault( context->dictionary, "constantHeight", 0.0 );
 
-	*result = GetTopWallVelocity( context->velocityField, y );
+	*result = GetTopWallVelocity( context->velocityField, context, y );
+}
+
+void IncompressibleExtensionBC_LeftCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	UnderworldContext* context = (UnderworldContext*) _context;
+	double*            result  = (double*) _result;
+	double             V_l     = Dictionary_GetDouble_WithDefault( context->dictionary, "leftWallVelocity", 0.0 );
+
+	*result = V_l;
+}
+
+void IncompressibleExtensionBC_RightCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	UnderworldContext* context = (UnderworldContext*) _context;
+	double*            result  = (double*) _result;
+	double             V_r       = Dictionary_GetDouble_WithDefault( context->dictionary, "rightWallVelocity", 0.0 );
+
+	*result = V_r ;
 }
 
 void IncompressibleExtensionBC_BottomCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
@@ -184,7 +145,7 @@ void IncompressibleExtensionBC_BottomCondition( Node_LocalIndex node_lI, Variabl
 	double*            result  = (double*) _result;
 	double             y       = Dictionary_GetDouble_WithDefault( context->dictionary, "constantHeight", 0.0 );
 
-	*result = GetBottomWallVelocity( context->velocityField, y );
+	*result = GetBottomWallVelocity( context->velocityField, context, y );
 }
 
 void _Underworld_IncompressibleExtensionBC_Construct( void* self, Stg_ComponentFactory* cf, void* data ) {
@@ -193,7 +154,14 @@ void _Underworld_IncompressibleExtensionBC_Construct( void* self, Stg_ComponentF
 
 	condFunc = ConditionFunction_New( IncompressibleExtensionBC_TopCondition, "IncompressibleExtensionBC_TopCondition" );
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	
 	condFunc = ConditionFunction_New( IncompressibleExtensionBC_BottomCondition, "IncompressibleExtensionBC_BottomCondition" );
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	
+	condFunc = ConditionFunction_New( IncompressibleExtensionBC_LeftCondition, "IncompressibleExtensionBC_LeftCondition" );
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	
+	condFunc = ConditionFunction_New( IncompressibleExtensionBC_RightCondition, "IncompressibleExtensionBC_RightCondition" );
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 
 }
