@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: DruckerPrager.c 620 2007-11-02 12:56:56Z VincentLemiale $
+** $Id: DruckerPrager.c 696 2008-04-03 01:17:37Z LouisMoresi $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -318,11 +318,11 @@ double _DruckerPrager_GetYieldCriterion(
 	dpCohesion = 6.0 * effectiveCohesion * cos(phi) * oneOverDenominator;
 
 	/* plane strain */
-	/*
+	
 	phi = atan(effectiveFrictionCoefficient);
 	dpCohesion = effectiveCohesion * cos(phi);
 	dpFrictionCoefficient = sin(phi);
-	*/
+	
 	
 	frictionalStrength = dpFrictionCoefficient * pressure + dpCohesion ;
 				
