@@ -17,10 +17,10 @@
 
 <p>SurfaceAdaptor is an example of a MeshAdaptor.  It allows you to modify the top surface without changing the underlying layers.  Presently, it's the only MeshAdaptor, but it makes for a useful case study and other MeshAdaptors can be constructed in future.</p>
 
-<p> <br>Questions: Is SurfaceAdaptor useful when dealing with conditions with highly stratified materials?  
+<p> <br/>Questions: Is SurfaceAdaptor useful when dealing with conditions with highly stratified materials?  
 Where forces acting on material being modelled only affect the surface and don't penetrate the bulk of the material?
 Useful as a quick approximation because you're interested only in examining the surface?
-TODO: Does it stricktly deal with the top layer only, or can you set the depth to which the SurfaceAdaptor goes?  This has implications for mesh deformation, level of detail, size of “cells” etc.
+TODO: Does it stricktly deal with the top layer only, or can you set the depth to which the SurfaceAdaptor goes?  This has implications for mesh deformation, level of detail, size of “cells” etc.</p>
 </param>
 
 </StGermainData>

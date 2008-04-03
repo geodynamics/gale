@@ -12,7 +12,7 @@
 <param name="License">https://csd.vpac.org/twiki/bin/view/Stgermain/SoftwareLicense</param>
 <param name="Parent">Stg_Component</param>
 <param name="Reference">...</param>
-<param name="Summary">The Constrained Delaunay Algorithm performs Delaunay triangulation on a set of 2D points.  It also generates a dual graph (Voronoi diagram) and a Convex Hull.<br>Single-processor version - good for small data sets or where speed is not critical.</param>
+<param name="Summary">The Constrained Delaunay Algorithm performs Delaunay triangulation on a set of 2D points.  It also generates a dual graph (Voronoi diagram) and a Convex Hull.<br/>Single-processor version - good for small data sets or where speed is not critical.</param>
 <param name="Description"><p>Delaunay works on a set of 2D points.  It uses the Constrained Delaunay Algorithm to generate a  network between these points.</p><p>Once that step is complete it generates a dual graph, a Voronoi Diagram, based on the Delaunay Triangulation.</p><p>Delaunay can also generate a Convex Hull based on the set of points.</p><p>This is a single-processor implementation of Delaunay.  Use ParallelDelaunay on a multi-processor system for large data sets, speed-critical applications or where memory resources are limited.</p>
 </param>
 

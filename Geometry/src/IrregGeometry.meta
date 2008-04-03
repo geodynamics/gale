@@ -5,8 +5,8 @@
 <param name="Name">IrregGeometry</param>
 <param name="Author">...</param>
 <param name="Organisation">VPAC</param>
-<param name="Project">StGermain</param>
-<param name="Location">./StGermain/Discretisation/Geometry/src/</param>
+<param name="Project">StDomain</param>
+<param name="Location">./StGermain/Geometry/src/</param>
 <param name="Project Web">https://csd.vpac.org/twiki/bin/view/Stgermain/WebHome</param>
 <param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
 <param name="License">The Gnu Lesser General Public License http://www.gnu.org/licenses/lgpl.html</param>
@@ -15,7 +15,7 @@
 <param name="Summary">Imports mesh coordinates from a file and applies them to a mesh.</param>
 <param name="Description"><p>IrregGeometry reads in a set of arbitrary points from a file and applies them to the geometry of a mesh.  This makes it ideal for importing mesh data produced by another tool, such as a third-party application.  As the name of this Code implies, the geometry of this mesh can be irregular.</p>
 
-<p>IrregGeometry retrieves ListName from the Root Directory.  This lets it locate an XML file containing listing of (x, y, z) points in a simple format, typically inside an <asciidata> element.</p>
+<p>IrregGeometry retrieves ListName from the Root Directory.  This lets it locate an XML file containing listing of (x, y, z) points in a simple format, typically inside an &lt;asciidata&gt; element.</p>
 </param>
 
 <!--Now the interesting stuff-->

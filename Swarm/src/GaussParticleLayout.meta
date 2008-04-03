@@ -12,8 +12,8 @@
 <param name="License">The Gnu Lesser General Public License http://www.gnu.org/licenses/lgpl.html</param>
 <param name="Parent">PerCellParticleLayout</param>
 <param name="Reference">...</param>
-<param name="Summary">...</a></param>
-<param name="Description">Lays out particles on points optimised for integrating over a cell. This layout also sets the particle weights as well. See <a HREF=”http://mathworld.wolfram.com/Legendre-GaussQuadrature.html”>http://mathworld.wolfram.com/Legendre-GaussQuadrature.html</a><l</param>
+<param name="Summary">...</param>
+<param name="Description">Lays out particles on points optimised for integrating over a cell. This layout also sets the particle weights as well. See <a HREF="http://mathworld.wolfram.com/Legendre-GaussQuadrature.html">here</a></param>
 
 <!--Now the interesting stuff-->
 <list name="Params">

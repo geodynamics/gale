@@ -5,14 +5,14 @@
 <param name="Name">ParallelDelaunay</param>
 <param name="Author">...</param>
 <param name="Organisation">VPAC</param>
-<param name="Project">StGermain</param>
-<param name="Location">./StGermain/Discretisation/Geometry/src/</param>
+<param name="Project">StgDomain</param>
+<param name="Location">./StgDomain/Geometry/src/</param>
 <param name="Project Web">https://csd.vpac.org/twiki/bin/view/Stgermain/WebHome</param>
 <param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
 <param name="License">https://csd.vpac.org/twiki/bin/view/Stgermain/SoftwareLicense</param>
 <param name="Parent">Delaunay</param>
 <param name="Reference">...</param>
-<param name="Summary">The Constrained Delaunay Algorithm performs Delaunay triangulation on a set of 2D points.  It also generates a dual graph (Voronoi diagram) and a Convex Hull.<br> Multi-processor version, good for large data sets or where speed is critical.</param>
+<param name="Summary">The Constrained Delaunay Algorithm performs Delaunay triangulation on a set of 2D points.  It also generates a dual graph (Voronoi diagram) and a Convex Hull.<br/> Multi-processor version, good for large data sets or where speed is critical.</param>
 <param name="Description"><p>Delaunay works on a set of 2D points.  It uses the Constrained Delaunay Algorithm to generate a  network between these points.</p>
 <p> Once that step is complete it generates a dual graph, a Voronoi Diagram, based on the Delaunay Triangulation.</p>
 

@@ -12,7 +12,7 @@
 <param name="License">The Gnu Lesser General Public License http://www.gnu.org/licenses/lgpl.html</param>
 <param name="Parent">Stg_Component</param>
 <param name="Reference">...</param>
-<param name="Summary">Finds and identifies neighbours of a processor.<br>Can lead to  more elegant and efficient design.</param>
+<param name="Summary">Finds and identifies neighbours of a processor.<br/>Can lead to  more elegant and efficient design.</param>
 <param name="Description"><p>CommTopology is a tool that helps to find and identify the neighbours of a processor.  It is useful for hugely parallel operations, such as those distributed over thousands of processors.</p><p>Typically, a processor only needs to communicate with adjacent processors.  A global (one-to-all) operation is an example of a poorly designed operation because it calls for unnecessary communication beyond the scope of the processor's neighbourhood.  In this situation, redesigning the operation and using CommTopology would be a more elegant design and lead to improved efficiency.</p></param>
 
 </StGermainData>
