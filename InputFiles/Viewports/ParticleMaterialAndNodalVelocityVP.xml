@@ -43,7 +43,7 @@
 			<param name="Swarm">materialSwarm</param>
 			<param name="ColourVariable">materialSwarm-MaterialIndex</param>
 			<param name="ColourMap">materialColourMap</param>
-			<param name="pointSize">2.0</param>
+			<param name="pointSize">1.0</param>
 		</struct>		
 		<struct name="velocityArrows" mergeType="replace">
 			<param name="Type">lucVectorArrows</param>
