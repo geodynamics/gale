@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Context.c 1079 2008-03-18 05:11:00Z BelindaMay $
+** $Id: Context.c 1097 2008-04-04 05:41:18Z BelindaMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -250,12 +250,14 @@ void _FiniteElementContext_Init( FiniteElementContext* self ) {
 		"saveSwarms",
 		_FiniteElementContext_SaveSwarms,
 		FiniteElementContext_Type );
-	EntryPoint_Append(
-		Context_GetEntryPoint( self, AbstractContext_EP_Save ),
-		"saveMesh",
-		_FiniteElementContext_SaveMesh,
-		FiniteElementContext_Type );
 
+	if( Dictionary_GetBool_WithDefault( self->dictionary, "checkpointMesh", True ) ) {
+		EntryPoint_Append(
+			Context_GetEntryPoint( self, AbstractContext_EP_Save ),
+			"saveMesh",
+			_FiniteElementContext_SaveMesh,
+			FiniteElementContext_Type );
+	}
 }
 
 
