@@ -14,16 +14,16 @@
 	</list>
 
 	<!-- Test tolerances. THIS IS A LOW RESOLUTION TEST -->
-	<param name="VelocityField-Tolerance"> 4.0e-03 </param>
+	<param name="VelocityField-Tolerance"> 4.0e-04 </param>
 	<param name="PressureField-Tolerance"> 6.0e-02 </param>
 
 	<param name="solHA_sigma">1.0</param>
 	<param name="solHA_eta">1.0</param>
 	<!-- Define the width and column of the box -->
-	<param name="solHA_dx">0.5</param>
-	<param name="solHA_dy">0.5</param>
-	<param name="solHA_x0">0.5</param>
-	<param name="solHA_y0">0.5</param>
+	<param name="solHA_startX">0.25</param>
+	<param name="solHA_endX">0.75</param>
+	<param name="solHA_startY">0.25</param>
+	<param name="solHA_endY">0.75</param>
 
 	<struct name="components" mergeType="merge">
 		<struct name="Viscosity">
@@ -116,6 +116,7 @@
 				<param>  AnalyticVelocityMagnitudeVP VelocityMagnitudeVP VelocityErrorMagnitudeVP </param>
 			        <param>  AnalyticPressureVP PressureVP PressureErrorVP </param>
 			</list>
+			<param name="interactive" mergeType="replace">True</param>
 		</struct>
 	</struct>
 	-->
