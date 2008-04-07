@@ -2,29 +2,50 @@ import os
 Import('env')
 
 env = env.Copy()
-env.AppendUnique(CPPPATH=[os.path.join(env['buildPath'], # Add StgDomain include path.
-                                       'include',
-                                       'StgDomain')])
-env.project_name = 'StgDomain' # Need a project name.
-env.clear_all() # ... so that our structures are ready.
+env.AppendUnique(CPPPATH=[env.get_build_path('include/StgDomain')])
 
-env.build_directory('Geometry')
-env.build_directory('Shape')
-env.build_directory('Mesh')
-env.build_directory('Utils')
-env.build_directory('Swarm')
+# Collect our inputs from the directory structure.
+bases = ['Geometry', 'Shape', 'Mesh', 'Utils', 'Swarm']
+src_objs = []
+suite_hdrs = []
+suite_objs = []
+for base in bases:
+    env.build_files(env.glob(base + '/src/*.def'), 'include/StgDomain/' + base)
+    env.build_headers(env.glob(base + '/src/*.h'), 'include/StgDomain/' + base)
+    src_objs += env.build_sources(env.glob(base + '/src/*.c'), 'StgDomain/' + base)
+    src_objs += env.build_metas(env.glob(base + '/src/*.meta'), 'StgDomain/' + base)
+    suite_hdrs += env.glob(base + '/tests/*Suite.h')
+    suite_objs += env.build_sources(env.glob(base + '/tests/*Suite.c'), 'StgDomain/' + base)
 
-env.build_headers(env.glob('libStgDomain/src/*.h'), 'StgDomain')
-env.build_objects(env.glob('libStgDomain/src/*.c'), 'libStgDomain')
-env.build_metadata(env.glob('libStgDomain/src/*.meta'), 'libStgDomain')
+env.build_headers(env.glob('libStgDomain/src/*.h'), 'include/StgDomain')
+src_objs += env.build_sources(env.glob('libStgDomain/src/*.c'), 'StgDomain/libStgDomain')
+src_objs += env.build_sources(env.glob('libStgDomain/src/*.meta'), 'StgDomain/libStgDomain')
 
-env.build_library(env.get_hnodes(env.SharedObject), 'StgDomain')
+# Build library.
+if env['static_libraries']:
+    env.Library(env.get_build_path('lib/StgDomain'), src_objs)
+if env['shared_libraries']:
+    env.SharedLibrary(env.get_build_path('lib/StgDomain'), src_objs)
 
-env.build_objects(env.glob('libStgDomain/Toolbox/*.c'), 'Toolbox')
-env.build_metadata(env.glob('libStgDomain/Toolbox/*.meta'), 'Toolbox')
-env.build_library(env.get_hnodes(env.SharedObject, 'Toolbox'),
-                  'StgDomain_Toolboxmodule', ['StgDomain'],
-                  True)
+# Build toolbox.
+if env['shared_libraries']:
+    objs = env.build_sources(env.glob('libStgDomain/Toolbox/*.c'),
+                             'StgDomain/libStgDomain/Toolbox')
+    objs += env.build_metas(env.glob('libStgDomain/Toolbox/*.meta'),
+                            'StgDomain/libStgDomain/Toolbox')
+    env.SharedLibrary(env.get_target_name('lib/StgDomain_Toolboxmodule'), objs,
+                      SHLIBPREFIX='',
+                      LIBPREFIXES=[env['LIBPREFIXES']] + [''],
+                      LIBS=['StgDomain'] + env.get('LIBS', []))
 
-env.build_tests(env.glob('libStgDomain/tests/test*.c'),
-                'StgDomain', libs='StgDomain')
+# Build unit test runner.
+env['PCURUNNERINIT'] = ''
+env['PCURUNNERSETUP'] = """StGermain_Init( &argc, &argv );
+   StgDomain_Init( &argc, &argv );"""
+env['PCURUNNERTEARDOWN'] = """StgDomain_Finalise();
+   StGermain_Finalise();"""
+runner_src = env.PCUSuiteRunner(env.get_build_path('StgDomain/testStgDomain.c'), suite_hdrs)
+runner_obj = env.SharedObject(runner_src)
+env.Program(env.get_build_path('bin/testStgDomain'),
+            runner_obj + suite_objs,
+            LIBS=['StgDomain', 'pcu'] + env.get('LIBS', []))

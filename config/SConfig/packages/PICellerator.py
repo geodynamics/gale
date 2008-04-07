@@ -2,11 +2,9 @@ import os
 import SConfig
 
 class PICellerator(SConfig.Package):
-    def __init__(self, env, options):
-        SConfig.Package.__init__(self, env, options)
-        self.require(SConfig.packages.StGermain)
-        self.require(SConfig.packages.StgDomain)
-        self.require(SConfig.packages.StgFEM)
+    def __init__(self, scons_env, scons_opts, required=False):
+        SConfig.Package.__init__(self, scons_env, scons_opts, required)
+        self.dependency(SConfig.packages.StgFEM)
         self.base_patterns = ['PICellerator*']
         self.headers = [[os.path.join('PICellerator', 'PICellerator.h')]]
         self.libraries = [['PICellerator']]
@@ -20,9 +18,3 @@ StgDomain_Finalise();
 StGermain_Finalise();
 MPI_Finalize();'''
         self.symbol_calls = ['%s(&argc, &argv);', '%s();']
-        self.require_shared = True
-        self.use_rpath = True
-
-    def get_run_error_message(self, console):
-        if len(console):
-            return 'Incompatible libraries, check \'config.log\'.'

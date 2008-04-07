@@ -2,22 +2,22 @@ ifndef WHICH
 	WHICH=/usr/bin/which
 endif
 ifndef UNAME
-	UNAME=/usr/bin/uname
+	UNAME=/bin/uname
 endif
 ifndef UNAME_M
-	UNAME_M=/usr/bin/uname -m
+	UNAME_M=/bin/uname -m
 endif
 ifndef UNAME_R
-	UNAME_R=/usr/bin/uname -r
+	UNAME_R=/bin/uname -r
 endif
 ifndef MACHINE
 	MACHINE=i686
 endif
 ifndef KERNEL_RELEASE
-	KERNEL_RELEASE=2.6.22-gentoo-r5
+	KERNEL_RELEASE=2.6.22-14-generic
 endif
 ifndef UNAME_S
-	UNAME_S=/usr/bin/uname -s
+	UNAME_S=/bin/uname -s
 endif
 ifndef SYSTEM
 	SYSTEM=Linux
@@ -221,7 +221,7 @@ ifndef DL_INCLUDES
 	DL_INCLUDES=-I/usr/include
 endif
 ifndef NOPYTHON
-	NOPYTHON=
+	NOPYTHON=1
 endif
 ifndef DOXYGEN
 	DOXYGEN=/usr/bin/doxygen
@@ -275,7 +275,7 @@ ifndef REGRESSTOR_URL
 	REGRESSTOR_URL=http://localhost/~alan/cgi-bin/RegresstorServices/Regresstor.cgi
 endif
 ifndef STGERMAIN_DIR
-	STGERMAIN_DIR=/home/steve/Projects/ComputationalMechanics/ClubStGermain/v0.3-domainRework200709/build
+	STGERMAIN_DIR=/home/luke/VPAC/stgUnderworld/build
 endif
 ifndef OPTIONS
 	OPTIONS=
@@ -284,19 +284,19 @@ ifndef USE_RUN_LONG_TESTS
 	USE_RUN_LONG_TESTS=
 endif
 ifndef PROJ_ROOT
-	PROJ_ROOT=/home/steve/Projects/ComputationalMechanics/ClubStGermain/v0.3-domainRework200709/StgDomain
+	PROJ_ROOT=/home/luke/VPAC/stgUnderworld/StgDomain
 endif
 ifndef BLD_DIR
-	BLD_DIR=/home/steve/Projects/ComputationalMechanics/ClubStGermain/v0.3-domainRework200709/build
+	BLD_DIR=/home/luke/VPAC/stgUnderworld/build
 endif
 ifndef PREFIX_DIR
 	PREFIX_DIR=
 endif
 ifndef EXPORT_DIR
-	EXPORT_DIR=/home/steve/Projects/ComputationalMechanics/ClubStGermain/v0.3-domainRework200709/build
+	EXPORT_DIR=/home/luke/VPAC/stgUnderworld/build
 endif
 ifndef TMP_DIR
-	TMP_DIR=/home/steve/Projects/ComputationalMechanics/ClubStGermain/v0.3-domainRework200709/build/tmp
+	TMP_DIR=/home/luke/VPAC/stgUnderworld/build/tmp
 endif
 ifndef BIN_DIR
 	BIN_DIR=${EXPORT_DIR}/bin
@@ -308,7 +308,7 @@ ifndef INC_DIR
 	INC_DIR=${EXPORT_DIR}/include
 endif
 ifndef TST_DIR
-	TST_DIR=/home/steve/Projects/ComputationalMechanics/ClubStGermain/v0.3-domainRework200709/build/tests
+	TST_DIR=/home/luke/VPAC/stgUnderworld/build/tests
 endif
 ifndef PYB_DIR
 	PYB_DIR=${EXPORT_DIR}/Python
@@ -327,7 +327,7 @@ ifndef MAKEFILE_FIND_SUBDIRS
 	MAKEFILE_FIND_SUBDIRS=$(shell ${FIND_SUBDIRS})
 endif
 ifndef GET_MODNAME
-	GET_MODNAME=basename /home/steve/Projects/ComputationalMechanics/ClubStGermain/v0.3-domainRework200709/StGermain
+	GET_MODNAME=basename /home/luke/VPAC/stgUnderworld/StGermain
 endif
 ifndef MAKEFILE_GET_MODNAME
 	MAKEFILE_GET_MODNAME=$(shell ${GET_MODNAME})
@@ -336,7 +336,7 @@ ifndef MAKEFILE_CHECK_DEPENDENCIES
 	MAKEFILE_CHECK_DEPENDENCIES=$(foreach DEP,${DEPENDS},$(shell cd ${LIB_DIR} && if test -z `find . -name ${PROJECT}${DEP}*` ; then echo Compiling dependency: ${DEP} 1>&2 && cd ${PROJ_ROOT}/src && if test ! -z `find . -type d -name ${DEP}` ; then cd `find . -type d -name ${DEP}` && make 1>&2 ; else echo Cannot find dependency: ${DEP} 1>&2 ; fi ; fi ) )
 endif
 ifndef STGERMAIN_DIR
-	STGERMAIN_DIR=/home/steve/Projects/ComputationalMechanics/ClubStGermain/v0.3-domainRework200709/build
+	STGERMAIN_DIR=/home/luke/VPAC/stgUnderworld/build
 endif
 ifndef STGERMAIN_INCDIR
 	STGERMAIN_INCDIR=${STGERMAIN_DIR}/include
@@ -393,40 +393,40 @@ ifndef XML_INCLUDES
 	XML_INCLUDES=-I/usr/include/libxml2
 endif
 ifndef XML_LIBS
-	XML_LIBS=-L/usr/lib -lxml2 -lz -lm
+	XML_LIBS=-L/usr/lib -lxml2
 endif
 ifndef MPI_DIR
-	MPI_DIR=/usr/local/mpich-1.2.6-gcc34-shmem
+	MPI_DIR=/usr/local/mpich2-1.0.6
 endif
 ifndef MPI_BINDIR
-	MPI_BINDIR=/usr/local/mpich-1.2.6-gcc34-shmem/bin
+	MPI_BINDIR=/usr/local/mpich2-1.0.6/bin
 endif
 ifndef MPI_LIBDIR
-	MPI_LIBDIR=/usr/local/mpich-1.2.6-gcc34-shmem/lib
+	MPI_LIBDIR=/usr/local/mpich2-1.0.6/lib
 endif
 ifndef MPI_INCDIR
-	MPI_INCDIR=/usr/local/mpich-1.2.6-gcc34-shmem/include
+	MPI_INCDIR=/usr/local/mpich2-1.0.6/include
 endif
 ifndef MPI_INCLUDES
-	MPI_INCLUDES=-I/usr/local/mpich-1.2.6-gcc34-shmem/include
+	MPI_INCLUDES=-I/usr/local/mpich2-1.0.6/include
 endif
 ifndef MPI_IMPLEMENTATION
-	MPI_IMPLEMENTATION=mpich
+	MPI_IMPLEMENTATION=mpich2
 endif
 ifndef MPI_LIBFILES
-	MPI_LIBFILES=-lmpich -lpmpich   
+	MPI_LIBFILES=-lmpich      -lrt   
 endif
 ifndef MPI_RPATH
-	MPI_RPATH=-Xlinker -rpath -Xlinker /usr/local/mpich-1.2.6-gcc34-shmem/lib
+	MPI_RPATH=-Xlinker -rpath -Xlinker /usr/local/mpich2-1.0.6/lib
 endif
 ifndef MPI_LIBS
-	MPI_LIBS=-L/usr/local/mpich-1.2.6-gcc34-shmem/lib -lmpich -lpmpich   
+	MPI_LIBS=-L/usr/local/mpich2-1.0.6/lib -lmpich      -lrt   
 endif
 ifndef MPI_RUN_COMMAND
 	MPI_RUN_COMMAND=mpirun
 endif
 ifndef MPI_RUN
-	MPI_RUN=/usr/local/mpich-1.2.6-gcc34-shmem/bin/mpirun
+	MPI_RUN=/usr/local/mpich2-1.0.6/bin/mpirun
 endif
 ifndef MPI_NPROC
 	MPI_NPROC=-np
@@ -439,55 +439,12 @@ ifndef BLASLAPACK_LIBDIR
 	BLASLAPACK_LIBDIR=/usr/lib
 endif
 ifndef LAPACK_BLAS_LIBS
-	LAPACK_BLAS_LIBS=-L/usr/lib -llapack -lblas -lg2c
-endif
-ifndef PYTHON_DIR
-	PYTHON_DIR=/usr/
-endif
-ifndef PYTHON_VERSION
-	PYTHON_VERSION=2.4
-endif
-ifndef PYTHON_INCDIR
-	PYTHON_INCDIR=/usr//include/python2.4
-endif
-ifndef PYTHON_INCLUDES
-	PYTHON_INCLUDES=-I/usr//include/python2.4 -DHAVE_PYTHON
-endif
-ifndef PYTHON_BINDIR
-	PYTHON_BINDIR=/usr//bin
-endif
-ifndef PYTHON
-	PYTHON=/usr//bin/python
-endif
-ifndef PYTHON_LIB
-	PYTHON_LIB=python2.4
-endif
-ifndef PYTHON_LIBDIR
-	PYTHON_LIBDIR=/usr//lib
-endif
-ifndef PYTHON_MODDIR
-	PYTHON_MODDIR=/usr//lib/python2.4
-endif
-PYTHON_HAVE_SO_LIB=1
-ifndef PYTHON_COMPILEALL
-	PYTHON_COMPILEALL=/usr//bin/python /usr//lib/python2.4/compileall.py
-endif
-ifndef PYTHON_EXTERNAL_LIBS
-	PYTHON_EXTERNAL_LIBS=-lpthread -ldl -lutil
-endif
-ifndef PYTHON_LIBS
-	PYTHON_LIBS=-L/usr//lib -lpython2.4 -lpthread -ldl -lutil
-endif
-ifndef PYTHON_STATIC_LIB
-	PYTHON_STATIC_LIB=/usr//lib/config/libpython2.4.a
-endif
-ifndef HAVE_PYTHON
-	HAVE_PYTHON=1
+	LAPACK_BLAS_LIBS=-L/usr/lib -llapack -lblas
 endif
 ifndef APPS_XML_DIR
-	APPS_XML_DIR=/home/steve/Projects/ComputationalMechanics/ClubStGermain/v0.3-domainRework200709/build/lib/STGDOMAIN
+	APPS_XML_DIR=/home/luke/VPAC/stgUnderworld/build/lib/STGDOMAIN
 endif
-	EXPORT_INCLUDE_DIR=/home/steve/Projects/ComputationalMechanics/ClubStGermain/v0.3-domainRework200709/build/lib/StGermain/StgDomain
+	EXPORT_INCLUDE_DIR=/home/luke/VPAC/stgUnderworld/build/lib/StGermain/StgDomain
 	EXAMPLES_DIR=${EXPORT_DIR}/share/StgDomain
-	STG_INCLUDE_PATH=/home/steve/Projects/ComputationalMechanics/ClubStGermain/v0.3-domainRework200709/build/lib/StGermain
-	EXPORT_INCLUDE_DIR=/home/steve/Projects/ComputationalMechanics/ClubStGermain/v0.3-domainRework200709/build/lib/StGermain/StgDomain
+	STG_INCLUDE_PATH=/home/luke/VPAC/stgUnderworld/build/lib/StGermain
+	EXPORT_INCLUDE_DIR=/home/luke/VPAC/stgUnderworld/build/lib/StGermain/StgDomain
