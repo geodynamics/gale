@@ -1,66 +1,67 @@
-import os, sys, platform
+import sys, os
 
-# Source the configuration scripts.
 sys.path.insert(0, os.path.abspath(os.path.join(os.getcwd(), 'config')))
+import SConfig
 SConscript('config/SConfig/SConscript')
 
-# Create our base construction environment.
-if platform.platform().find('ia64') != -1:
-    # Hack needed for APAC, damn it all!
-    env = Environment(ENV=os.environ, tools=['gcc', 'gnulink'])
-else:
-    env = Environment(ENV=os.environ)
-if 'CC' in env['ENV']:
-    env['CC'] = env['ENV']['CC']
+#
+# CUSTOMISE THE ENVIRONMENT HERE.
+#
 
-# Need to modify building shared libraries when on Mac OS X.
-if platform.system() == 'Darwin':
-    env.AppendUnique(SHLINKFLAGS=['-flat_namespace',
-                                  '-single_module',
-                                  '-undefined', 'suppress'])
-    import SCons.Util # And fix RPATHs.
-    env['LINKFLAGS'] = SCons.Util.CLVar('')
-    env['RPATHPREFIX'] = ''
-    env['RPATHSUFFIX'] = ''
-    env['_RPATH'] = ''
+env = Environment(ENV=os.environ)
+env['_abspath'] = lambda x: File(x).abspath # Needed by Darwin.
 
-# Configuring or building? Or helping?
+# Determine whether we are configuring, helping or building.
 if 'config' in COMMAND_LINE_TARGETS or 'help' in COMMAND_LINE_TARGETS:
-    import packages
-    opts = Options() # Create our options database.
 
-    # Setup all the packages we want configured.
-    env.Package(packages.stgUnderworld, opts, True)
+    #
+    # INSERT CONFIGURATION HERE.
+    #
 
-    # Displaying help?
-    if 'help' in COMMAND_LINE_TARGETS:
-        env.Alias('help', '.')
-        print opts.GenerateHelpText(env)
+    proj = env.Package(SConfig.Project)
+    proj.opts.AddOptions(
+        BoolOption('with_glucifer', 'Use gLucifer visualisation', 1)
+        )
+    proj.dependency(SConfig.packages.cmath)
+    proj.dependency(SConfig.packages.libXML2)
+    proj.dependency(SConfig.packages.MPI)
+    proj.dependency(SConfig.packages.SVNRevision)
+    proj.dependency(SConfig.packages.BlasLapack)
+    proj.dependency(SConfig.packages.HDF5, False)
+    petsc = proj.dependency(SConfig.packages.PETSc)
+    petsc.have_define = 'HAVE_PETSC'
+    if env['with_glucifer']:
+        proj.dependency(SConfig.packages.OpenGL)
+        proj.dependency(SConfig.packages.OSMesa, False)
+        proj.dependency(SConfig.packages.X11, False)
+        proj.dependency(SConfig.packages.SDL, False)
+        proj.dependency(SConfig.packages.libavcodec, False)
+        proj.dependency(SConfig.packages.libFAME, False)
+        proj.dependency(SConfig.packages.libPNG, False)
+        proj.dependency(SConfig.packages.libJPEG, False)
+        proj.dependency(SConfig.packages.libTIFF, False)
+    env.configure_packages()
 
-    # Or configuring?
-    else:
-        env.configure_packages(opts)
+    # Need to define the extension for shared libraries as well
+    # as the library directory.
+    ext = env['ESCAPE']('"' + env['SHLIBSUFFIX'][1:] + '"')
+    lib_dir = env['ESCAPE']('"' + os.path.abspath(env['build_dir']) + '/lib' + '"')
+    env.AppendUnique(CPPDEFINES=[('MODULE_EXT', ext), ('LIB_DIR', lib_dir)])
+
+    # Save results.
+    env.save_config()
 
 else:
-    # Prepare our construction environment.
-    env.load_config('config.cfg') # Load configuration.
-    SConscript('StgSCons', exports='env') # Setup our StG specific utils.
-    env.Default(env['buildPath']) # Needed for different build paths.
-    env.Append(CPPDEFINES=['HAVE_SCONS'])
+    # Load configuration.
+    env.load_config()
+    SConscript('StGermain/pcu/script/scons.py', exports='env')
+    SConscript('StGermain/script/scons.py', exports='env')
+    env.Append(CPPDEFINES=['HAVE_SCONS']) # Needed for old VMake.
 
-    # Another Mac OS X hack.
-    if platform.system() == 'Darwin':
-	env['_abspath'] = lambda x: File(x).abspath
-        env.Append(SHLINKFLAGS=['-install_name', '${_abspath(TARGET)}'])
+    #
+    # INSERT TARGETS HERE.
+    #
 
-    # Prepare library builders.
-    env.library_builders = []
-    if env['static_libraries']:
-        env.library_builders += [env.StaticLibrary]
-    if env['shared_libraries']:
-        env.library_builders += [env.SharedLibrary]
-
-    # Specify targets.
     SConscript('StGermain/SConscript', exports='env')
     env.Prepend(LIBS='StGermain')
     SConscript('StgDomain/SConscript', exports='env')

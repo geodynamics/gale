@@ -21,3 +21,4 @@ from libFAME import libFAME
 from libavcodec import libavcodec
 from HDF5 import HDF5
 from X11 import X11
+from pcu import pcu

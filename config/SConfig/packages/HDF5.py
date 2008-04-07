@@ -9,6 +9,7 @@ class HDF5(SConfig.Package):
         self.libraries = [["hdf5"]]
 
     def setup(self):
+        SConfig.Package.setup(self)
         if self.require_parallel:
             self.dependency(SConfig.packages.MPI)
             self.symbols = [(["H5Pset_dxpl_mpio", "H5Pset_fapl_mpio"], "")]

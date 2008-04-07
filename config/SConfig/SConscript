@@ -1,4 +1,5 @@
-import os, sys
+import os, sys, platform, pickle, shutil
+import glob as pyglob
 import SConfig
 from SCons.Script.SConscript import SConsEnvironment
 
@@ -6,13 +7,15 @@ from SCons.Script.SConscript import SConsEnvironment
 # Setup the Package system.
 #
 
-def Package(env, pkg_module, options, required=False, **kw):
+def Package(env, pkg_module, required=True, **kw):
     """Create a new package to be configured."""
+    if not hasattr(env, 'package_options'):
+        env.package_options = Options()
     if not hasattr(env, 'packages'):
         env.packages = {}
         env.package_list = []
     if not pkg_module in env.packages:
-        pkg = pkg_module(env, options, required)
+        pkg = pkg_module(env, env.package_options, required)
         for attr, val in kw.iteritems():
             if not hasattr(pkg, attr):
                 print 'Package does not have attribute!'
@@ -26,15 +29,25 @@ def CheckPackages(ctx, pkg_list):
     for pkg in pkg_list:
         pkg.configure(ctx)
 
-def configure_packages(env, options=None, output='config.cfg'):
+def configure_packages(env):
+    # If we have 'help' given as a target, use that to generate help.
+    if 'help' in COMMAND_LINE_TARGETS:
+        env.Alias('help', '.')
+        print env.package_options.GenerateHelpText(env)
+        return
+
     # Get rid of the temporary directory to make sure we're building
     # from scratch.
     if os.path.exists('.sconsign.dblite'):
         os.remove('.sconsign.dblite')
 
     # Finish setting everything up.
-    for pkg in env.package_list:
-        pkg.setup()
+    pkgs_rem = list(env.package_list)
+    while len(pkgs_rem):
+        pkg = pkgs_rem.pop()
+        modified = pkg.setup()
+        if isinstance(modified, list):
+            pkgs_rem += [m for m in modified if m not in pkgs_rem]
 
     # Update dependencies and requirements.
     pkgs_rem = list(env.package_list)
@@ -51,25 +64,27 @@ def configure_packages(env, options=None, output='config.cfg'):
     sconf.CheckPackages(env.package_list)
     sconf.Finish()
 
-    # Dump results to our output file.
-    for pkg in env.package_list: # Put the results on this environment.
-        if pkg.result:
-            pkg.enable(env)
-    vars = ['CFLAGS', 'CCFLAGS',
-            'CPPPATH', 'CPPDEFINES',
-            'LIBPATH', 'LIBS', 'RPATH',
-            'FRAMEWORKS']
-    vars += options.keys()
-    env.save_config(output, vars)
-
     # Print out build message.
     print '\n*****************************************'
     print "* Now run 'scons' to build the project. *"
     print '*****************************************\n'
 
-def save_config(env, filename, vars):
+def save_config(env, filename='config.cfg'):
+    # Put the results on this environment.
+    for pkg in env.package_list: 
+        if pkg.result:
+            pkg.enable(env)
+
+    # Update config variables.
+    env.AppendUnique(CONFIGVARS=['CC', 'CFLAGS', 'CCFLAGS',
+                                 'CPPPATH', 'CPPDEFINES',
+                                 'LIBPATH', 'LIBS', 'RPATH',
+                                 'FRAMEWORKS'])
+    env.AppendUnique(CONFIGVARS=env.package_options.keys())
+
+    # Dump to file.
     d = {}
-    for a in vars:
+    for a in env['CONFIGVARS']:
         if a in env._dict:
             d[a] = env[a]
     f = file(filename, 'w')
@@ -77,7 +92,7 @@ def save_config(env, filename, vars):
     pickle.dump(d, f)
     f.close()
 
-def load_config(env, filename):
+def load_config(env, filename='config.cfg'):
     if not os.path.exists(filename):
         print "\nError: project hasn't been configured!"
         print '*******************************************************'
@@ -91,8 +106,81 @@ def load_config(env, filename):
     f.close()
     for k, v in d.iteritems():
         env[k] = v
+    for script in env.get('CONFIGSCRIPTS', []):
+        env.SConscript(script, 'env')
+    if 'build_dir' in env._dict:
+        env.Default(env['build_dir'])
 
 SConsEnvironment.Package = Package
 SConsEnvironment.configure_packages = configure_packages
 SConsEnvironment.save_config = save_config
 SConsEnvironment.load_config = load_config
+
+#
+# Useful utilities.
+#
+
+def copy_file(env, dst, src):
+    dst = File(dst).abspath
+    if os.path.exists(dst):
+        return
+    dst_dir = os.path.dirname(dst)
+    if not os.path.exists(dst_dir):
+        os.makedirs(dst_dir)
+    shutil.copy(src, dst)
+
+def get_build_path(env, prefix):
+    if os.path.isabs(env['build_dir']):
+        bld_dir = env['build_dir']
+    else:
+        bld_dir = '#' + env['build_dir']
+    if prefix:
+        return os.path.join(bld_dir, prefix)
+    else:
+        return bld_dir
+
+def get_target_name(env, source, extension=''):
+    """Return the destination name for a source file with suffix 'suffix'. This
+    is useful for building files into the correct build path. Returns the full
+    path to the built source without extension."""
+    if extension:
+        src = source[:-len(extension)]
+    else:
+        src = source
+    return env.get_build_path(src)
+
+def glob(env, pattern):
+    if not os.path.isabs(pattern):
+        old = os.getcwd()
+        os.chdir(Dir('.').srcnode().abspath)
+        res = pyglob.glob(pattern)
+        os.chdir(old)
+    else:
+        res = pyglob.glob(pattern)
+    return res
+
+def path_exists(env, path):
+    if not os.path.isabs(path):
+        old = os.getcwd()
+        os.chdir(Dir('.').srcnode().abspath)
+        res = os.path.exists(path)
+        os.chdir(old)
+    else:
+        res = os.path.exists(path)
+    return res
+
+def strip_dir(env, path, subdir):
+    offs = path.find(os.path.sep + subdir + os.path.sep)
+    if offs != -1:
+        return path[:offs] + path[offs + len(subdir) + 1:]
+    offs = path.find(os.path.sep + subdir)
+    if offs != -1:
+        return path[:-(len(subdir) + 1)]
+    return path
+
+SConsEnvironment.strip_dir = strip_dir
+SConsEnvironment.copy_file = copy_file
+SConsEnvironment.get_build_path = get_build_path
+SConsEnvironment.get_target_name = get_target_name
+SConsEnvironment.glob = glob
+SConsEnvironment.path_exists = path_exists

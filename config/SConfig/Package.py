@@ -7,7 +7,7 @@ class Package(SConfig.Node):
         SConfig.Node.__init__(self, scons_env, scons_opts, required)
 
         # This will be set in the preprocessor.
-        self.have_define         = 'HAVE_' + self.environ_name
+        self.have_define         = ''
 
         # Search options.
         self.base_dirs           = [] #['']

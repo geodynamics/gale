@@ -38,7 +38,7 @@ class Node(object):
         if self.configured:
             print 'Error: Cannot add a dependency during configuration.'
             self.env.Exit()
-        pkg = self.env.Package(package_module, self.opts, **kw)
+        pkg = self.env.Package(package_module, required, **kw)
         if pkg not in [d[0] for d in self.deps]:
             self.deps += [(pkg, required)]
         return pkg

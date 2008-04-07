@@ -27,3 +27,9 @@ class SVNRevision(SConfig.Node):
 
         self.revision = int(all_lines[3])
         return True
+
+    def enable(self, scons_env, old_state=None):
+        SConfig.Node.enable(self, scons_env, old_state)
+        self.backup_variable(scons_env, 'CPPDEFINES', old_state)
+        ver = scons_env['ESCAPE']('"' + str(self.revision) + '"')
+        scons_env.AppendUnique(CPPDEFINES=[(self.define_name, ver)])

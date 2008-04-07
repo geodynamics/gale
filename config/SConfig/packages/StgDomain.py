@@ -2,9 +2,11 @@ import os
 import SConfig
 
 class StgDomain(SConfig.Package):
-    def __init__(self, env, options):
-        SConfig.Package.__init__(self, env, options)
+    def __init__(self, scons_env, scons_opts, required=False):
+        SConfig.Package.__init__(self, scons_env, scons_opts, required)
         self.dependency(SConfig.packages.StGermain)
+        self.dependency(SConfig.packages.BlasLapack)
+        self.dependency(SConfig.packages.HDF5, False)
         self.base_patterns = ['StgDomain*']
         self.headers = [[os.path.join('StgDomain', 'StgDomain.h')]]
         self.libraries = [['StgDomain']]
@@ -16,9 +18,3 @@ StGermain_Init(&argc, &argv);
 MPI_Finalize();
 '''
         self.symbol_calls = ['%s(&argc, &argv);', '%s();']
-        self.require_shared = True
-        self.use_rpath = True
-
-    def get_run_error_message(self, console):
-        if len(console):
-            return 'Incompatible libraries, check \'config.log\'.'

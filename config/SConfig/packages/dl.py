@@ -7,3 +7,6 @@ class dl(SConfig.Package):
         self.dependency(SConfig.packages.CompilerFlags)
         self.headers = [['dlfcn.h']]
         self.libraries = [['dl']]
+
+    def setup(self):
+        SConfig.Node.setup(self)
