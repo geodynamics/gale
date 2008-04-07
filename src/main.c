@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: main.c 645 2008-02-12 01:18:41Z DavidMay $
+** $Id: main.c 701 2008-04-07 02:12:42Z JulianGiordani $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -82,8 +82,20 @@ int main( int argc, char* argv[] ) {
 	ioHandler = XML_IO_Handler_New();
 	IO_Handler_ReadAllFromCommandLine( ioHandler, argc, argv, dictionary );
 	Journal_ReadFromDictionary( dictionary );
+
+	/* Error check for input parameters in the dictionary */
+	if( dictionary->count == 0 ) {
+		printf("********************************************\n"
+		       "Error in function %s\n"
+		       "%d input parameters have been defined.\n"
+		       "check what you are passing to the executable\n"
+		       "********************************************\n",
+			 __func__, dictionary->count );
+		abort();
+	}
+
 	stgImportToolbox( dictionary, "Underworld" );
-	
+	 
 	stgMainLoop( dictionary, CommWorld );
 	
 	Stg_Class_Delete( dictionary );
