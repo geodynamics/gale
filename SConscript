@@ -2,50 +2,67 @@ import os
 Import('env')
 
 env = env.Copy()
-env.AppendUnique(CPPPATH=[os.path.join(env['buildPath'], # Add StGermain include path.
-                                       'include',
-                                       'StGermain')])
-env.project_name = 'StGermain' # Need a project name.
-env.clear_all() # ... so that our structures are ready.
+env.AppendUnique(CPPPATH=[env.get_build_path('include/StGermain')])
 
-# TODO: Build sources if csoap present.
-env.build_headers(env.glob('Regresstor/libRegresstor/src/*.h'),
-                  'StGermain/Regresstor/libRegresstor')
+# Forced copy.
+env.copy_file(env.get_build_path('include/StGermain/Base/IO/mpirecord/mpimessaging.h'),
+              'Base/IO/src/mpirecord/none/mpimessaging.h')
+env.build_files(['Base/Foundation/src/ClassSetup.h', 'Base/Foundation/src/ClassEmpty.h'],
+                'include/StGermain/Base/Foundation')
 
-# Some special cases we need to copy first.
-env.build_headers(['Base/Foundation/src/ClassSetup.h',
-                   'Base/Foundation/src/ClassEmpty.h'],
-                  'StGermain/Base/Foundation', force_copy=True)
+bases = ['Base/Foundation',
+         'Base/IO',
+         'Base/Container',
+         'Base/Automation',
+         'Base/Extensibility',
+         'Base/Context',
+         'Base',
+         'Utils']
+src_objs = []
+suite_hdrs = []
+suite_objs = []
+for base in bases:
+    env.build_files(env.glob(base + '/src/*.def'), 'include/StGermain/' + base)
+    env.build_headers(env.glob(base + '/src/*.h'), 'include/StGermain/' + base)
+    src_objs += env.build_sources(env.glob(base + '/src/*.c'), 'StGermain/' + base)
+    src_objs += env.build_metas(env.glob(base + '/src/*.meta'), 'StGermain/' + base)
+    suite_hdrs += env.glob(base + '/tests/*Suite.h')
+    suite_objs += env.build_sources(env.glob(base + '/tests/*Suite.c'), 'StGermain/' + base)
 
-# We have this funny 'mpirecord' business to handle now.
-env.build_headers('Base/IO/src/mpirecord/none/mpimessaging.h',
-                  'StGermain/Base/IO/mpirecord')
+env.build_headers(env.glob('libStGermain/src/*.h'), 'include/StGermain')
+src_objs += env.build_sources(env.glob('libStGermain/src/*.c'), 'StGermain/libStGermain')
+src_objs += env.build_sources(env.glob('libStGermain/src/*.meta'), 'StGermain/libStGermain')
 
-env.build_directory('pcu')
-env.build_directory('Base/Foundation')
-env.build_directory('Base/IO')
-env.build_directory('Base/Container')
-env.build_directory('Base/Automation')
-env.build_directory('Base/Extensibility')
-env.build_directory('Base/Context')
-env.build_directory('Base')
-env.build_directory('Utils')
+# Build library.
+if env['static_libraries']:
+    env.Library(env.get_build_path('lib/StGermain'), src_objs)
+if env['shared_libraries']:
+    env.SharedLibrary(env.get_build_path('lib/StGermain'), src_objs)
 
-env.build_headers(env.glob('libStGermain/src/*.h'), 'StGermain')
-env.build_objects(env.glob('libStGermain/src/*.c'), 'libStGermain')
-env.build_metadata(env.glob('libStGermain/src/*.meta'), 'libStGermain')
+# FlattenXML program.
+src = 'Base/FlattenXML/src/main.c'
+obj = env.SharedObject(env.get_build_path('StGermain/' + src[:-2]), src)
+env.Program(env.get_build_path('bin/FlattenXML'), obj,
+            LIBS=['StGermain'] + env.get('LIBS', []))
 
-env.build_library(env.get_hnodes(env.SharedObject), 'StGermain')
+# StGermain program.
+src = 'src/main.c'
+obj = env.SharedObject(env.get_build_path('StGermain/' + src[:-2]), src)
+env.Program(env.get_build_path('bin/StGermain'), obj,
+            LIBS=['StGermain'] + env.get('LIBS', []))
 
-env.build_tests(env.glob('libStGermain/tests/test*.c'), 'StGermain',
-                libs='StGermain')
+# Build pcu.
+SConscript('pcu/SConscript', exports='env')
 
-src = os.path.join('Base', 'FlattenXML', 'src', 'main.c')
-dst = os.path.join(env['buildPath'], 'bin', 'FlattenXML')
-env.Program(dst, src, LIBS=['StGermain'] + env.get('LIBS', []))
+# Build unit test runner.
+env['PCURUNNERINIT'] = ''
+env['PCURUNNERSETUP'] = 'StGermain_Init( &argc, &argv );'
+env['PCURUNNERTEARDOWN'] = 'StGermain_Finalise();'
+runner_src = env.PCUSuiteRunner(env.get_build_path('StGermain/testStGermain.c'), suite_hdrs)
+runner_obj = env.SharedObject(runner_src)
+env.Program(env.get_build_path('bin/testStGermain'),
+            runner_obj + suite_objs,
+            LIBS=['StGermain', 'pcu'] + env.get('LIBS', []))
 
-src = os.path.join('src', 'main.c')
-dst = os.path.join(env['buildPath'], 'bin', 'StGermain')
-env.Program(dst, src, LIBS=['StGermain'] + env.get('LIBS', []))
-
-env.build_suite_runner()
+# Copy scripts to correct destinations.
+env.Install(env.get_build_path('script/StGermain'), 'script/scons.py')

@@ -7,7 +7,7 @@ void pcu_runner_run( pcu_listener_t* lsnr );
 void _pcu_runner_addSuite( const char* name,
 			   void (initfunc)( pcu_suite_t* ) );
 
-#define pcu_runner_addSuite( suite )            \
-   _pcu_runner_addSuite( #suite, suite )
+#define pcu_runner_addSuite( suite, initfunc )  \
+   _pcu_runner_addSuite( #suite, initfunc )
 
 #endif
