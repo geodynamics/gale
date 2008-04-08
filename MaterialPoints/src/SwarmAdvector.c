@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SwarmAdvector.c 556 2008-03-28 06:41:03Z RobertTurnbull $
+** $Id: SwarmAdvector.c 559 2008-04-08 05:54:05Z RobertTurnbull $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -154,7 +154,7 @@ void _SwarmAdvector_Init(
 	/* Test if mesh is periodic and a periodic boundaries manager hasn't been given */
 	if ( !periodicBCsManager && Stg_Class_IsInstance( swarm->mesh->generator, CartesianGenerator_Type ) ) {
 		CartesianGenerator* cartesianGenerator = (CartesianGenerator*) swarm->mesh->generator;
-		if ( cartesianGenerator->periodic[ I_AXIS ] || cartesianGenerator->periodic[ I_AXIS ] || cartesianGenerator->periodic[ I_AXIS ] ) {
+		if ( cartesianGenerator->periodic[ I_AXIS ] || cartesianGenerator->periodic[ J_AXIS ] || cartesianGenerator->periodic[ K_AXIS ] ) {
 			/* Create a periodicBCsManager if there isn't one already */
 			periodicBCsManager = PeriodicBoundariesManager_New( "periodicBCsManager", (Mesh*)swarm->mesh, (Swarm*)swarm, NULL );
 		}

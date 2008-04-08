@@ -7,7 +7,7 @@
 	<include>gLucifer/window.xml</include>
 	<struct name="components" mergeType="merge">
 		<struct name="window" mergeType="merge">
-			<param name="Viewport">SolutionViewport</param>
+			<param name="Viewport">ParticlesAndVelocityMagVP</param>
 		</struct>
 	</struct>
 

@@ -10,6 +10,7 @@
 	</list>
 	
 	<param name="VelocityField-Tolerance">1e-6</param>
+	<param name="PressureField-Tolerance">1e-5</param>
 	<param name="dim">3</param>
 	<param name="elementResI">10</param>
 	<param name="elementResJ">10</param>
