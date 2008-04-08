@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeEquationNumber.c 1093 2008-04-01 04:47:08Z RobertTurnbull $
+** $Id: FeEquationNumber.c 1100 2008-04-08 08:06:17Z RobertTurnbull $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -2692,7 +2692,11 @@ void FeEquationNumber_BuildWithDave( FeEquationNumber* self ) {
       usePeriodic = False;
       for( jj = 0; jj < nDims; jj++ ) {
 	 if( periodic[jj] && (inds[jj] == 0 || inds[jj] == vGrid->sizes[jj] - 1) ) {
-	    usePeriodic = True;
+//		TEMPORARY HACK by ROB - APRIL 8, 2008
+//		Commenting out this line so that periodic BCs don't stomp on boundary conditions already set
+//		There's better way to do this but I'm leaving this for Luke to sort out.
+//		Just need this to work for extension problem with shear boundary conditions for Louis
+//	    usePeriodic = True;
 	    break;
 	 }
       }
