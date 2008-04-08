@@ -9,7 +9,7 @@
 			<param name="CentreFieldVariable">VelocityMagnitudeField</param>
 			<param name="coordZ">1.5</param>
 		</struct>
-		<struct name="velocityMagnitudeColourMap">
+		<struct name="velocityMagnitudeColourMap" mergeType="replace">
 			<param name="Type">lucColourMap</param>
 			<param name="colours">Purple Blue Green Yellow Orange Red Black</param>
 			<param name="dynamicRange">true</param>
@@ -42,12 +42,12 @@
 			<param name="Type">lucFieldVariableBorder</param>
 			<param name="FieldVariable">VelocityMagnitudeField</param>
 		</struct>
-		<struct name="velocityMagnitudeColourBar">
+		<struct name="velocityMagnitudeColourBar" mergeType="replace">
 			<param name="Type">lucColourBar</param>
 			<param name="ColourMap">velocityMagnitudeColourMap</param>
 		</struct>
 		<!-- Put these althogether in a viewport -->
-		<struct name="VelocityMagnitudeVP">
+		<struct name="VelocityMagnitudeVP" mergeType="replace">
 			<param name="Type">lucViewport</param>
 			<param name="Camera">camera</param>
 			<list name="DrawingObject">
