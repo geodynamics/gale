@@ -432,12 +432,23 @@ void EulerDeform_IntegrationSetup( void* _timeIntegrator, void* context ) {
 
 Bool EulerDeform_TimeDeriv( void* crdAdvector, Index arrayInd, double* timeDeriv ) {
 	TimeIntegratee*	self = (TimeIntegratee*)crdAdvector;
-	FieldVariable*	velocityField = (FieldVariable*)self->data[0];
+	FeVariable*	velocityField = (FeVariable*)self->data[0];
 	double**	crds = *(double***)self->data[1];
 	InterpolationResult  result;
 
-	result = FieldVariable_InterpolateValueAt( velocityField, crds[arrayInd], timeDeriv );
+	FeVariable_GetValueAtNode( velocityField, arrayInd, timeDeriv );
 
+	/* Check if periodic */
+	if ( Stg_Class_IsInstance( velocityField->feMesh->generator, CartesianGenerator_Type ) ) {
+		CartesianGenerator* cartesianGenerator = (CartesianGenerator*) velocityField->feMesh->generator;
+		if ( cartesianGenerator->periodic[ I_AXIS ] )
+			timeDeriv[I_AXIS] = 0.0;
+		if ( cartesianGenerator->periodic[ J_AXIS ] )
+			timeDeriv[J_AXIS] = 0.0;
+		if ( cartesianGenerator->periodic[ K_AXIS ] )
+			timeDeriv[K_AXIS] = 0.0;
+	}
+		
 	if ( result == OTHER_PROC || result == OUTSIDE_GLOBAL || isinf(timeDeriv[0]) || isinf(timeDeriv[1]) || 
 	     ( velocityField->dim == 3 && isinf(timeDeriv[2]) ) ) 
 	{
