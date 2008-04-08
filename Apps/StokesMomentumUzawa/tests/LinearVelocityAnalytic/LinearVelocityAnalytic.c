@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: LinearVelocityAnalytic.c 1094 2008-04-01 08:18:54Z RobertTurnbull $
+** $Id: LinearVelocityAnalytic.c 1099 2008-04-08 05:51:09Z RobertTurnbull $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -91,14 +91,14 @@ void LinearVelocityAnalytic_GetCornerNodeVelocities(void* analyticSolution) {
 	self->cornerNodeCount = 4;
 	nodeMapper[0] = Grid_ProjectIJK_MinMax( vertGrid, 0, 0, 0 );
 	nodeMapper[1] = Grid_ProjectIJK_MinMax( vertGrid, 1, 0, 0 );
-	nodeMapper[2] = Grid_ProjectIJK_MinMax( vertGrid, 1, 1, 0 );
-	nodeMapper[3] = Grid_ProjectIJK_MinMax( vertGrid, 0, 1, 0 );
+	nodeMapper[2] = Grid_ProjectIJK_MinMax( vertGrid, 0, 1, 0 );
+	nodeMapper[3] = Grid_ProjectIJK_MinMax( vertGrid, 1, 1, 0 );
 	if ( dim == 3 ) {
 		self->cornerNodeCount = 8;
 		nodeMapper[4] = Grid_ProjectIJK_MinMax( vertGrid, 0, 0, 1 );
 		nodeMapper[5] = Grid_ProjectIJK_MinMax( vertGrid, 1, 0, 1 );
-		nodeMapper[6] = Grid_ProjectIJK_MinMax( vertGrid, 1, 1, 1 );
-		nodeMapper[7] = Grid_ProjectIJK_MinMax( vertGrid, 0, 1, 1 );
+		nodeMapper[6] = Grid_ProjectIJK_MinMax( vertGrid, 0, 1, 1 );
+		nodeMapper[7] = Grid_ProjectIJK_MinMax( vertGrid, 1, 1, 1 );
 	}
 
 	/* Loop over corner nodes */
@@ -141,7 +141,7 @@ void LinearVelocityAnalytic_VelocityFunction( void* analyticSolution, FeVariable
 		}
 	}
 }
-void SimpleShearAnalytic_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* pressure ) {
+void LinearVelocityAnalytic_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* pressure ) {
 	*pressure = 0.0;
 }
 
@@ -155,7 +155,7 @@ void _LinearVelocityAnalytic_Construct( void* analyticSolution, Stg_ComponentFac
 	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, self->velocityField, LinearVelocityAnalytic_VelocityFunction );
 	
 	pressureField = Stg_ComponentFactory_ConstructByName( cf, "PressureField", FeVariable, True, data ); 
-	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, pressureField, SimpleShearAnalytic_PressureFunction );
+	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, pressureField, LinearVelocityAnalytic_PressureFunction );
 	
 }
 
