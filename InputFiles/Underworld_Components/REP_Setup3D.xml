@@ -47,6 +47,7 @@
 		<param name="RawField">StrainRateField</param>
 		<param name="RecoverPressure">True</param>
 		<param name="PressureField">PressureField</param>
+		<param name="CalibratePressure">0</param>
 	</struct>
 		
 	<!-- Operator FeVariables based on recovedSigmaField -->
