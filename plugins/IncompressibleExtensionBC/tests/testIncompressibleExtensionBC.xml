@@ -7,11 +7,18 @@
 	
 	<list name="plugins" mergeType="merge">
 		<param>Underworld_IncompressibleExtensionBC</param>
-		<param>Underworld_IncompressibleExtensionAnalytic</param>
+		<param>StgFEM_LinearVelocityAnalytic</param>
 		<param>Underworld_EulerDeform</param>
 	</list>
 
+	<!-- Extension Parameters -->
+	<param name="leftWallVelocity"> -0.5 </param>
+	<param name="rightWallVelocity"> 0.5 </param>
+	<param name="backWallVelocity"> 0.0 </param>
+	<param name="frontWallVelocity"> 0.0 </param>
 	<param name="constantHeight"> 0.5 </param>
+
+	<!-- Analytic Solution Tolerances -->
 	<param name="VelocityField-Tolerance"> 5.0e-05 </param>
 	<param name="StrainRateInvariantField-Tolerance"> 0.06 </param>
 
@@ -57,19 +64,19 @@
 	<!-- Journal Control -->
 	<param name="journal.info.Context-verbose">True</param>
 	<param name="journal-level.info.Stg_ComponentFactory">2</param>
-	<param name="journal.debug">t</param>
+	<param name="journal.debug">f</param>
 	<param name="journal-enable-branch.debug.StgFEM">t</param>
-	<param name="journal-level-branch.debug.StgFEM"> 2 </param>	
+	<param name="journal-level-branch.debug.StgFEM"> 3 </param>	
 	
 	<!-- Geometry & Mesh setup -->
 	<param name="dim"> 2 </param>
-	<param name="elementResI"> 10 </param>
-	<param name="elementResJ"> 10 </param>
-	<param name="elementResK"> 5 </param>
+	<param name="elementResI"> 9 </param>
+	<param name="elementResJ"> 9 </param>
+	<param name="elementResK"> 9 </param>
 	<param name="shadowDepth"> 1 </param>
 	<param name="minX"> 0.0 </param>
 	<param name="minY"> 0.0 </param>
-	<param name="minZ"> 0.5 </param>
+	<param name="minZ"> 0.0 </param>
 	<param name="maxX"> 1.0 </param>
 	<param name="maxY"> 1.0 </param>
 	<param name="maxZ"> 1.0 </param>
@@ -89,8 +96,8 @@
 				<list name="variables">
 					<struct>
 						<param name="name">vx</param>
-						<param name="type">double</param>
-						<param name="value"> -0.5 </param>
+						<param name="type">func</param>
+						<param name="value"> IncompressibleExtensionBC_LeftCondition </param>
 					</struct>
 				</list>
 			</struct>
@@ -100,8 +107,8 @@
 				<list name="variables">
 					<struct>
 						<param name="name">vx</param>
-						<param name="type">double</param>
-						<param name="value"> 0.5 </param>
+						<param name="type">func</param>
+						<param name="value"> IncompressibleExtensionBC_RightCondition </param>
 					</struct>
 				</list>
 			</struct>
@@ -111,8 +118,8 @@
 				<list name="variables">
 					<struct>
 						<param name="name">vz</param>
-						<param name="type">double</param>
-						<param name="value"> 0 </param>
+						<param name="type">func</param>
+						<param name="value"> IncompressibleExtensionBC_FrontCondition </param>
 					</struct>
 				</list>
 			</struct>
@@ -122,8 +129,8 @@
 				<list name="variables">
 					<struct>
 						<param name="name">vz</param>
-						<param name="type">double</param>
-						<param name="value"> 0 </param>
+						<param name="type">func</param>
+						<param name="value"> IncompressibleExtensionBC_BackCondition </param>
 					</struct>
 				</list>
 			</struct>
@@ -152,20 +159,4 @@
 		</list>
 	</struct>
 
-	<!-- Integration Scheme configuration -->
-
-	<!-- Visualisation stuff -->
-<!--
-	<include> Underworld/Viewports/VelocityMagnitudeVP.xml </include>
-	<include> Underworld/Viewports/AnalyticVelocityMagnitudeVP.xml </include>
-	<include> Underworld/Viewports/StrainRateInvariantVP.xml</include>
-
-	<include>glucifer/window.xml</include>
-	<struct name="components" mergeType="merge">
-		<struct name="window" mergeType="merge">
-			<param name="Viewport">VelocityMagnitudeVP AnalyticVelocityMagnitudeVP</param>
-		</struct>
-	</struct>
--->
- 
 </StGermainData>

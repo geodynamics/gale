@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: IncompressibleExtensionBC.c 693 2008-04-03 01:03:45Z LouisMoresi $
+** $Id: IncompressibleExtensionBC.c 704 2008-04-08 08:06:11Z RobertTurnbull $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -55,97 +55,146 @@
 const Type Underworld_IncompressibleExtensionBC_Type = "Underworld_IncompressibleExtensionBC_Type";
 
 	/*
-	                 ^ V_c
-	 ________________|_____________________ 
-	|     ^                                | --
-	|     |                                |   |
-	|     h_1                              |    }
-	|     |                                |    }
-	|     v                                |   |
-	|--------------------------------------| --
-	|         ^                            |
-	|         |                            |
-	|-> V_b   |                            |->V_a
-	|         |                            |
-	|         |                            |
-	|         |      ^V_d                  |
-	|________________|_____________________|
+
+	                       ^ V_e
+	                      /
+	         ____________/__________________________
+	        /                                      /|
+	       /                                      / |
+	      /                                      /  |
+	     /                  ^ V_c               /   |
+	    /                   |                  /    |
+	   /          ^ V_f                       /     |
+	  /          /                           /      |
+	 /__________/___________________________/       |
+	|     ^                                |        |
+	|     |                                |        |
+	|     h_1                              |  ->V_a |
+	|     |                                |        |
+	|     v                                |        |
+	|--------------------------------------|       /
+	|         ^                            |      /
+	|         |                            |     /
+	|-> V_b   |                            |    /
+	|         |h_2                         |   / 
+	|         |                            |  /
+	|         |      ^V_d                  | /
+	|________________|_____________________|/
 
 	*/
 
+double GetLeftWallVelocity( UnderworldContext* context ) {
+	return Dictionary_GetDouble_WithDefault( context->dictionary,  "leftWallVelocity", 0.0 );
+}
+double GetRightWallVelocity( UnderworldContext* context ) {
+	return Dictionary_GetDouble_WithDefault( context->dictionary,  "rightWallVelocity", 0.0 );
+}
+double GetBackWallVelocity( UnderworldContext* context ) {
+	if ( context->dim == 2 )
+		return 0.0;
+	
+	return Dictionary_GetDouble_WithDefault( context->dictionary,  "backWallVelocity", 0.0 );
+}
+double GetFrontWallVelocity( UnderworldContext* context ) {
+	if ( context->dim == 2 )
+		return 0.0;
+	
+	return Dictionary_GetDouble_WithDefault( context->dictionary,  "frontWallVelocity", 0.0 );
+}
+double GetReferenceHeight( UnderworldContext* context ) {
+	return Dictionary_GetDouble_WithDefault( context->dictionary,  "constantHeight", 0.0 );
+}
 
-double GetTopWallVelocity( FeVariable* velocityField, void* _context, double y ) {
-	UnderworldContext*  context = (UnderworldContext*) _context;
-	double              V_b = Dictionary_GetDouble_WithDefault( context->dictionary,  "leftWallVelocity", 0.0 );
-	double              V_a = Dictionary_GetDouble_WithDefault( context->dictionary, "rightWallVelocity", 0.0 );
+double GetTopWallVelocity( UnderworldContext* context ) {
+	FeVariable*         velocityField = context->velocityField;
+	double              y   = GetReferenceHeight( context );
+	double              V_a = GetRightWallVelocity( context );
+	double              V_b = GetLeftWallVelocity( context );
+	double              V_e = GetBackWallVelocity( context );
+	double              V_f = GetFrontWallVelocity( context );
 	double              V_c;
 	double              h_1;
 	XYZ                 min, max;
 	double              width;
+	double              depth;
 	
 	/* Calculate Width and Height */
 	FieldVariable_GetMinAndMaxGlobalCoords( velocityField, min, max );
 	width  = (max[ I_AXIS ] - min[ I_AXIS ]);
+	depth  = context->dim == 3 ? (max[ K_AXIS ] - min[ K_AXIS ]) : 1.0; /* if only 3D depth cancels in division */
+
 	h_1 = max[ J_AXIS ] - y;
 
 	/* Calculate velocity at the top and at the bottom of the nodes */
-	V_c = - h_1/width * ( V_a - V_b );
-
+	V_c = - h_1 * ( (V_a - V_b) * depth + (V_f - V_e) * width )/(width*depth);
+	
 	return V_c;
 }
 
-double GetBottomWallVelocity( FeVariable* velocityField, void* _context, double y ) {
-	UnderworldContext* context = (UnderworldContext*) _context;
-	double              V_b = Dictionary_GetDouble_WithDefault( context->dictionary,  "leftWallVelocity", 0.0 );
-	double              V_a = Dictionary_GetDouble_WithDefault( context->dictionary, "rightWallVelocity", 0.0 );
+double GetBottomWallVelocity( UnderworldContext* context ) {
+	FeVariable*         velocityField = context->velocityField;
+	double              y   = GetReferenceHeight( context );
+	double              V_a = GetRightWallVelocity( context );
+	double              V_b = GetLeftWallVelocity( context );
+	double              V_e = GetBackWallVelocity( context );
+	double              V_f = GetFrontWallVelocity( context );
 	double              V_d;
 	double              h_2;
 	XYZ                 min, max;
 	double              width;
+	double              depth;
 	
 	/* Calculate Width and Height */
 	FieldVariable_GetMinAndMaxGlobalCoords( velocityField, min, max );
 	width  = (max[ I_AXIS ] - min[ I_AXIS ]);
+	depth  = context->dim == 3 ? (max[ K_AXIS ] - min[ K_AXIS ]) : 1.0; /* if only 3D depth cancels in division */
+
 	h_2 = y - min[ J_AXIS ];
 	
 	/* Calculate velocity at the top and at the bottom of the nodes */
-	V_d =   h_2/width * ( V_a - V_b );
-		
+	V_d =   h_2 * ( (V_a - V_b) * depth + (V_f - V_e) * width )/(width*depth);
+
 	return V_d;
-}
-
-
-
-void IncompressibleExtensionBC_TopCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
-	UnderworldContext* context = (UnderworldContext*) _context;
-	double*            result  = (double*) _result;
-	double             y       = Dictionary_GetDouble_WithDefault( context->dictionary, "constantHeight", 0.0 );
-
-	*result = GetTopWallVelocity( context->velocityField, context, y );
-}
-
-void IncompressibleExtensionBC_LeftCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
-	UnderworldContext* context = (UnderworldContext*) _context;
-	double*            result  = (double*) _result;
-	double             V_l     = Dictionary_GetDouble_WithDefault( context->dictionary, "leftWallVelocity", 0.0 );
-
-	*result = V_l;
 }
 
 void IncompressibleExtensionBC_RightCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
 	UnderworldContext* context = (UnderworldContext*) _context;
 	double*            result  = (double*) _result;
-	double             V_r       = Dictionary_GetDouble_WithDefault( context->dictionary, "rightWallVelocity", 0.0 );
 
-	*result = V_r ;
+	*result = GetRightWallVelocity( context );
+}
+
+void IncompressibleExtensionBC_LeftCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	UnderworldContext* context = (UnderworldContext*) _context;
+	double*            result  = (double*) _result;
+
+	*result = GetLeftWallVelocity( context );
+}
+void IncompressibleExtensionBC_BackCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	UnderworldContext* context = (UnderworldContext*) _context;
+	double*            result  = (double*) _result;
+
+	*result = GetBackWallVelocity( context );
+}
+void IncompressibleExtensionBC_FrontCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	UnderworldContext* context = (UnderworldContext*) _context;
+	double*            result  = (double*) _result;
+
+	*result = GetFrontWallVelocity( context );
+}
+
+void IncompressibleExtensionBC_TopCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	UnderworldContext* context = (UnderworldContext*) _context;
+	double*            result  = (double*) _result;
+
+	*result = GetTopWallVelocity( context );
 }
 
 void IncompressibleExtensionBC_BottomCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
 	UnderworldContext* context = (UnderworldContext*) _context;
 	double*            result  = (double*) _result;
-	double             y       = Dictionary_GetDouble_WithDefault( context->dictionary, "constantHeight", 0.0 );
 
-	*result = GetBottomWallVelocity( context->velocityField, context, y );
+	*result = GetBottomWallVelocity( context );
 }
 
 void _Underworld_IncompressibleExtensionBC_Construct( void* self, Stg_ComponentFactory* cf, void* data ) {
@@ -154,14 +203,15 @@ void _Underworld_IncompressibleExtensionBC_Construct( void* self, Stg_ComponentF
 
 	condFunc = ConditionFunction_New( IncompressibleExtensionBC_TopCondition, "IncompressibleExtensionBC_TopCondition" );
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
-	
 	condFunc = ConditionFunction_New( IncompressibleExtensionBC_BottomCondition, "IncompressibleExtensionBC_BottomCondition" );
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
-	
 	condFunc = ConditionFunction_New( IncompressibleExtensionBC_LeftCondition, "IncompressibleExtensionBC_LeftCondition" );
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
-	
 	condFunc = ConditionFunction_New( IncompressibleExtensionBC_RightCondition, "IncompressibleExtensionBC_RightCondition" );
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	condFunc = ConditionFunction_New( IncompressibleExtensionBC_FrontCondition, "IncompressibleExtensionBC_FrontCondition" );
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	condFunc = ConditionFunction_New( IncompressibleExtensionBC_BackCondition, "IncompressibleExtensionBC_BackCondition" );
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 
 }

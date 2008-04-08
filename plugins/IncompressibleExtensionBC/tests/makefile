@@ -5,7 +5,7 @@ PROJ_ROOT := $(shell until test -r ./Makefile.system ; do cd .. ; done ; echo `p
 include ${PROJ_ROOT}/Makefile.system
 
 # Subdirectories
-subdirs := IncompressibleExtensionAnalytic
+subdirs := 
 
 checks = testIncompressibleExtensionBC.0of1.sh \
 	testIncompressibleExtensionBC3D.0of1.sh
