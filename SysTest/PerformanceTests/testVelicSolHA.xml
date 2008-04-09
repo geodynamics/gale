@@ -108,6 +108,7 @@
 	<include> Underworld/Viewports/PressureVP.xml </include>
 	<include> Underworld/Viewports/AnalyticPressureVP.xml </include>
 	<include> Underworld/Viewports/AnalyticVelocityMagnitudeVP.xml </include>
+	<include> Underworld/Viewports/ParticleDensityVP.xml </include>
 
 	<include>glucifer/window.xml</include>
 	<struct name="components" mergeType="merge">

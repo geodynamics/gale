@@ -106,7 +106,7 @@
 	<include> Underworld/Viewports/AnalyticVelocityMagnitudeVP.xml </include>
 	<include> Underworld/Viewports/AnalyticPressureVP.xml </include>
 
-	<include>../window.xml</include>
+	<include>glucifer/window.xml</include>
 	<struct name="components" mergeType="merge">
 		<struct name="window" mergeType="merge">
 			<list name="Viewport">

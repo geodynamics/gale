@@ -232,7 +232,7 @@
 	-->
 	<!-- Visualisation stuff -->
 	<!--The end of the file is for vizualisation purpose-->
-<!--	<include>./window.xml</include>
+<!--	<include>glucifer/window.xml</include>
 	<struct name="components" mergeType="merge">
 		<struct name="camera" mergeType="replace">
 			<param name="Type">lucCamera</param>
