@@ -222,6 +222,7 @@ void _PCDVC_Construct( void* pcdvc, Stg_ComponentFactory* cf, void *data ) {
 	Bool Inflow;
 	double CentPosRatio;
 	int ParticlesPerCell;
+	double Thresh;
 
 	_DVCWeights_Construct( self, cf, data );
 	materialPointsSwarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, "MaterialPointsSwarm", MaterialPointsSwarm, True, data );
@@ -1463,7 +1464,7 @@ void _PCDVC_Calculate2D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
 	/**************************************/
 	/**************************************/
 	nump_orig=nump;
-//	if(1){
+//	if(0){
 	if(nump_orig < (int)(0.8*ParticlesPerCell) && Inflow){
 	      FILE *fp,*fp2;
 	      char title[30],title2[30];
