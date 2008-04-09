@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StandardConditionFunctions.c 1061 2008-03-07 00:17:09Z JulianGiordani $
+** $Id: StandardConditionFunctions.c 1101 2008-04-09 04:38:04Z MirkoVelic $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -159,6 +159,9 @@ void _StgFEM_StandardConditionFunctions_Construct( void* component, Stg_Componen
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_DiagonalLine, "DiagonalLine");
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_InflowBottom, "InflowBottom");
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 }
 
@@ -1296,3 +1299,21 @@ void StgFEM_StandardConditionFunctions_DiagonalLine( Node_LocalIndex node_lI, Va
 		*result = 0.0;
 }
 
+void StgFEM_StandardConditionFunctions_InflowBottom( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	DomainContext*	context            = (DomainContext*)_context;
+	FeVariable* feVariable;
+	Dictionary*             dictionary         = context->dictionary;
+	FeMesh*			mesh               = NULL;
+	double*                 result             = (double*) _result;
+	double sideLength, wallLength, sideV;
+	double min[3], max[3];
+	
+	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
+	mesh       = feVariable->feMesh;
+	Mesh_GetGlobalCoordRange( mesh, min, max );
+	sideLength = max[1] - min[1];
+	wallLength = max[0] - min[0];
+	sideV = Dictionary_GetDouble_WithDefault( dictionary, "InflowSideVelocity", 1.0 );
+
+	*result = 2.0 * sideV * sideLength / wallLength;
+}

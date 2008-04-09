@@ -104,4 +104,6 @@ void StgFEM_StandardConditionFunctions_HalfContainer( Node_LocalIndex node_lI, V
 void StgFEM_StandardConditionFunctions_ConstantValue( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result );
 void StgFEM_StandardConditionFunctions_DiagonalLine( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result );
 
+void StgFEM_StandardConditionFunctions_InflowBottom( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result );
+
 #endif	
