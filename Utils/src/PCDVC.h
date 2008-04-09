@@ -80,7 +80,7 @@
               //  int upT; 
               //  int lowT;
 
-#define __PCDVC __DVCWeights MaterialPointsSwarm* materialPointsSwarm; double upperT; double lowerT; Bool splitInInterfaceCells; int maxDeletions; int maxSplits;
+#define __PCDVC __DVCWeights MaterialPointsSwarm* materialPointsSwarm; double upperT; double lowerT; Bool splitInInterfaceCells; int maxDeletions; int maxSplits; Bool Inflow; double CentPosRatio; int ParticlesPerCell, double Threshold;
 
 struct PCDVC { __PCDVC };
 
@@ -108,7 +108,7 @@ struct deleteParticle{
 		WeightsCalculator_CalculateFunction*  _calculate,
 		Name                                  name );
 
-	void _PCDVC_Init( void* pcdvc, MaterialPointsSwarm* mps, double upT, double lowT, int maxDeletions, int maxSplits, Bool splitInInterfaceCells, int *res ) ;
+	void _PCDVC_Init( void* pcdvc, MaterialPointsSwarm* mps, double upT, double lowT, int maxDeletions, int maxSplits, Bool splitInInterfaceCells, int *res, Bool Inflow, double CentPosRatio, int ParticlesPerCell, double Threshold ) ;
 	void PCDVC_InitAll( void* pcdvc, Dimension_Index dim ) ;
 
 
