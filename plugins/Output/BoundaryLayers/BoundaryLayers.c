@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: BoundaryLayers.c 610 2007-10-11 08:09:29Z SteveQuenette $
+** $Id: BoundaryLayers.c 708 2008-04-09 07:00:44Z JulianGiordani $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -62,6 +62,7 @@ const Type Underworld_BoundaryLayers_Type = "Underworld_BoundaryLayers";
 void _Underworld_BoundaryLayers_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext* context;
 
+	printf("AKJFHQEIUH)@$UFKAJSDHRF\nKJASHRFOPUEH\nsaljkdh9\n9)#@$\n213\n\n");
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
 
 	/* Add functions to entry points */
@@ -71,8 +72,13 @@ void _Underworld_BoundaryLayers_Construct( void* component, Stg_ComponentFactory
 }
 
 void* _Underworld_BoundaryLayers_DefaultNew( Name name ) {
-	return Codelet_New(
+	printf("2  AKJFHQEIUH)@$UFKAJSDHRF\nKJASHRFOPUEH\nsaljkdh9\n9)#@$\n213\n\n");
+	return _Codelet_New(
+		sizeof(Underworld_BoundaryLayers),
 		Underworld_BoundaryLayers_Type,
+		_Codelet_Delete,
+		_Codelet_Print,
+		_Codelet_Copy,
 		_Underworld_BoundaryLayers_DefaultNew,
 		_Underworld_BoundaryLayers_Construct,
 		_Codelet_Build,
@@ -178,7 +184,7 @@ double Underworld_BoundaryLayers_InternalTemperature( UnderworldContext* context
 	Element_LocalIndex  lElement_I;
 	Node_LocalIndex    	nodeAtElementBottom;
 	Node_LocalIndex    	nodeAtElementTop;
-	Node_Index    	    elementNodeCount, *elementNodes;
+	int                 elementNodeCount, *elementNodes;
 	double              elementBottomHeight;
 	double              elementTopHeight;
 	double              detJac;
