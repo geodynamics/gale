@@ -15,7 +15,7 @@ def Package(env, pkg_module, required=True, **kw):
         env.packages = {}
         env.package_list = []
     if not pkg_module in env.packages:
-        pkg = pkg_module(env, env.package_options, required)
+        pkg = pkg_module(env, env.package_options, required, **kw)
         for attr, val in kw.iteritems():
             if not hasattr(pkg, attr):
                 print 'Package does not have attribute!'

@@ -3,11 +3,11 @@ import SCons.Script
 import SConfig
 
 class Package(SConfig.Node):
-    def __init__(self, scons_env, scons_opts, required=False):
+    def __init__(self, scons_env, scons_opts, required=False, **kw):
         SConfig.Node.__init__(self, scons_env, scons_opts, required)
 
         # This will be set in the preprocessor.
-        self.have_define         = ''
+        self.have_define         = kw.get('have_define', '')
 
         # Search options.
         self.base_dirs           = [] #['']
@@ -418,11 +418,13 @@ int main(int argc, char* argv[]) {
         if self.hdr_dirs:
             self.backup_variable(scons_env, 'CPPPATH', old_state)
             for d in self.hdr_dirs:
-                abs_dir = self.join_sub_dir(self.base_dir, d)
-                if abs_dir in self.system_header_dirs:
-                    scons_env.AppendUnique(CPPPATH=[abs_dir])
+                full_dir = self.join_sub_dir(self.base_dir, d)
+                if full_dir in self.system_header_dirs:
+                    if not os.path.isabs(full_dir): full_dir = '#' + full_dir
+                    scons_env.AppendUnique(CPPPATH=[full_dir])
                 else:
-                    scons_env.PrependUnique(CPPPATH=[abs_dir])
+                    if not os.path.isabs(full_dir): full_dir = '#' + full_dir
+                    scons_env.PrependUnique(CPPPATH=[full_dir])
 
         if self.fworks:
             self.backup_variable(scons_env, 'FRAMEWORKS', old_state)
@@ -436,13 +438,16 @@ int main(int argc, char* argv[]) {
             self.backup_variable(scons_env, 'LIBPATH', old_state)
             self.backup_variable(scons_env, 'RPATH', old_state)
             for d in self.lib_dirs:
-                abs_dir = self.join_sub_dir(self.base_dir, d)
-                if abs_dir in self.system_library_dirs:
-                    scons_env.AppendUnique(LIBPATH=[abs_dir])
-                    scons_env.AppendUnique(RPATH=[os.path.abspath(abs_dir)])
+                full_dir = self.join_sub_dir(self.base_dir, d)
+                abs_dir = os.path.abspath(full_dir)
+                if full_dir in self.system_library_dirs:
+                    if not os.path.isabs(full_dir): full_dir = '#' + full_dir
+                    scons_env.AppendUnique(LIBPATH=[full_dir])
+                    scons_env.AppendUnique(RPATH=[abs_dir])
                 else:
-                    scons_env.PrependUnique(LIBPATH=[abs_dir])
-                    scons_env.PrependUnique(RPATH=[os.path.abspath(abs_dir)])
+                    if not os.path.isabs(full_dir): full_dir = '#' + full_dir
+                    scons_env.PrependUnique(LIBPATH=[full_dir])
+                    scons_env.PrependUnique(RPATH=[abs_dir])
 
         if self.libs:
             self.backup_variable(scons_env, 'LIBS', old_state)
