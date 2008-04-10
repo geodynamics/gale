@@ -5,9 +5,11 @@
 #include "StGermain/Utils/Utils.h"
 #include "ProgressSuite.h"
 
-struct ProgressSuiteData {
+
+typedef struct {
       Progress* prog;
-};
+} ProgressSuiteData;
+
 
 void ProgressSuite_TestSetStream( ProgressSuiteData* data ) {
    Progress_SetStream( data->prog, NULL );
@@ -58,6 +60,14 @@ void ProgressSuite_TestCalcStatus( ProgressSuiteData* data ) {
    }
 }
 
+void ProgressSuite_Setup( ProgressSuiteData* data ) {
+   data->prog = Progress_New();
+}
+
+void ProgressSuite_Teardown( ProgressSuiteData* data ) {
+   Stg_Class_Delete( data->prog );
+}
+
 void ProgressSuite( pcu_suite_t* suite ) {
    pcu_suite_setData( suite, ProgressSuiteData );
    pcu_suite_setFixtures( suite, ProgressSuite_Setup, ProgressSuite_Teardown );
@@ -65,12 +75,4 @@ void ProgressSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, ProgressSuite_TestSetTitle );
    pcu_suite_addTest( suite, ProgressSuite_TestSetPrefix );
    pcu_suite_addTest( suite, ProgressSuite_TestSetRange );
-}
-
-void ProgressSuite_Setup( ProgressSuiteData* data ) {
-   data->prog = Progress_New();
-}
-
-void ProgressSuite_Teardown( ProgressSuiteData* data ) {
-   Stg_Class_Delete( data->prog );
 }
