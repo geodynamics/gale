@@ -13,7 +13,7 @@ class Package(SConfig.Node):
         self.base_dirs           = [] #['']
         self.base_patterns       = [] #['']
         self.sub_dirs            = [] #[[[''], ['']]]
-        self.header_sub_dir      = ''
+        self.header_sub_dir      = [] #['']
         self.system_header_dirs  = []
         self.system_library_dirs = []
 
@@ -123,8 +123,11 @@ class Package(SConfig.Node):
     def find_package(self):
         """Basic check routine for locating the package."""
         result = False
-        self.ctx.Display('  Searching locations:\n')
+        any_locs = False
         for loc in self.generate_locations():
+            if not any_locs:
+                any_locs = True
+                self.ctx.Display('  Searching locations:\n')
             self.ctx.Display('    %s\n' % str(loc))
             result = self.check_location(loc)
             if result:
@@ -135,6 +138,8 @@ class Package(SConfig.Node):
                 self.lib_dirs = loc[2]
                 self.fworks = loc[3]
                 break
+        if not any_locs:
+            self.ctx.Display('  No valid locations found\n')
         return result
 
     def check_location(self, location):
@@ -360,12 +365,13 @@ int main(int argc, char* argv[]) {
     def combine_header_sub_dir(self, base_dir, hdr_dirs):
         if not self.header_sub_dir or not hdr_dirs:
             return
-        cand = [os.path.join(h, self.header_sub_dir) for h in hdr_dirs if h]
-        for d in cand:
-            path = os.path.join(base_dir, d)
-            if not (os.path.exists(path) and os.path.isdir(path)):
-                return
-        yield cand
+        for sub_dir in self.header_sub_dir:
+            cand = [os.path.join(h, sub_dir) for h in hdr_dirs if h]
+            for d in cand:
+                path = os.path.join(base_dir, d)
+                if not (os.path.exists(path) and os.path.isdir(path)):
+                    return
+            yield cand
 
     def join_sub_dir(self, base_dir, sub_dir):
         if os.path.isabs(sub_dir):
@@ -452,6 +458,11 @@ int main(int argc, char* argv[]) {
         if self.libs:
             self.backup_variable(scons_env, 'LIBS', old_state)
             scons_env.PrependUnique(LIBS=self.libs)
+
+    def display_configuration(self):
+        SConfig.Node.display_configuration(self)
+        if self.have_define:
+            self.ctx.Display('  Exporting: %s\n' % self.have_define)
 
     def get_all_headers(self, headers):
         if not self.result:

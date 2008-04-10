@@ -6,7 +6,7 @@ class PETSc(SConfig.Package):
         SConfig.Package.__init__(self, scons_env, scons_opts, required, **kw)
         self.dependency(SConfig.packages.MPI)
         self.base_patterns = ['petsc*', 'PETSC*', 'PETSc*']
-        self.header_sub_dir = 'petsc'
+        self.header_sub_dir = ['petsc']
         self.headers = [['petsc.h',
                          'petscvec.h', 'petscmat.h',
                          'petscksp.h', 'petscsnes.h']]

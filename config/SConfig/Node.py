@@ -74,6 +74,10 @@ class Node(object):
                 if not result:
                     break
 
+        # If everything succeeded, display configuration results.
+        if result:
+            self.display_configuration()
+
         # Handle results.
         self.restore_state(self.env, old_state)
         self.result = result
@@ -177,6 +181,10 @@ class Node(object):
         os.remove('sconfig.log')
         old_log.write(log)
         return [res, log]
+
+    def display_configuration(self):
+        """Print out a brief summary of what options we found/used."""
+        pass
 
     def push_state(self, state, append=False):
         old = {}

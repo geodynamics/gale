@@ -6,7 +6,7 @@ class PETScExt(SConfig.Package):
         SConfig.Package.__init__(self, scons_env, scons_opts, required)
         self.pkg_petsc = self.dependency(SConfig.packages.PETSc)
         self.base_patterns = ['petscext*', 'PETSCEXT*', 'PETScExt*']
-        self.header_sub_dir = 'petsc'
+        self.header_sub_dir = ['petsc']
         self.headers = [['petscext.h',
                          'petscext_vec.h', 'petscext_mat.h',
                          'petscext_ksp.h', 'petscext_snes.h']]
