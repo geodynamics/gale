@@ -434,10 +434,10 @@ Bool EulerDeform_TimeDeriv( void* crdAdvector, Index arrayInd, double* timeDeriv
 	TimeIntegratee*	self = (TimeIntegratee*)crdAdvector;
 	FeVariable*	velocityField = (FeVariable*)self->data[0];
 	double**	crds = *(double***)self->data[1];
-	InterpolationResult  result;
+	InterpolationResult  result = LOCAL;
 
 	/* check if the node information is on the local proc */
-	if (arrayInd < Mesh_GetDomainSize(velocityField->feMesh,MT_VERTEX) )
+	if (arrayInd >= Mesh_GetDomainSize(velocityField->feMesh,MT_VERTEX) )
 		result = OTHER_PROC;
 
 	FeVariable_GetValueAtNode( velocityField, arrayInd, timeDeriv );
