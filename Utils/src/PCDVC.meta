@@ -54,48 +54,53 @@
 		<param name="Name">resolution</param>
 		<param name="Type">UnsignedInt</param>
 		<param name="Default">10</param>
-		<param name="Description">Discrete voronio resolution in all dimensions, or you can specified individually using resolutionX/Y/Z</param>
+		<param name="Description">Discrete Voronoi resolution in all dimensions, or you can specified individually using resolutionX/Y/Z</param>
 	</struct>
 	<struct>
 		<param name="Name">resolutionX</param>
 		<param name="Type">UnsignedInt</param>
 		<param name="Default">defaultResolution</param>
-		<param name="Description">Discrete voronio resolution in X axis</param>
+		<param name="Description">Discrete Voronoi resolution in X axis</param>
 	</struct>
 	<struct>
 		<param name="Name">resolutionY</param>
 		<param name="Type">UnsignedInt</param>
 		<param name="Default">defaultResolution</param>
-		<param name="Description">Discrete voronio resolution in Y axis</param>
+		<param name="Description">Discrete Voronoi resolution in Y axis</param>
 	</struct>
 	<struct>
 		<param name="Name">resolutionZ</param>
 		<param name="Type">UnsignedInt</param>
 		<param name="Default">defaultResolution</param>
-		<param name="Description">Discrete voronio resolution in Z axis</param>
+		<param name="Description">Discrete Voronoi resolution in Z axis</param>
 	</struct>
-
-</list>
-
-<list name="Dependencies">
 	<struct>
-		<param name="Essential">True</param>
-		<param name="Name">MaterialPointsSwarm</param>
-		<param name="Type">MaterialPointsSwarm</param>
-		<param name="Description">Material points swarm to perform population control on</param>
+		<param name="Name">Inflow</param>
+		<param name="Type">UnsignedInt</param>
+		<param name="Default">False</param>
+		<param name="Description">Switches the Inflow flag on</param>
 	</struct>
-
-<!-- PLEASE, check the above struct information is accurate, in line number 218 of the c file and then remove this comment afterwards -->
-
-
+	<struct>
+		<param name="Name">Threshold</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.8</param>
+		<param name="Description">Population threshold trigger for cells in an inflow problem</param>
+	</struct>	
+	<struct>
+		<param name="Name">CentPosRatio</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.01</param>
+		<param name="Description">Centroid position trigger as a ratio of distance of data to centroid position over FEm cell width</param>
+	</struct>
 </list>
-<!-- Add an exmaple XML if possible -->
-<param name="Example">Underworld/InputFiles/PIC_Components/MaterialPointsSwarm.xml</param>
+
+<!-- Example XML -->
+<param name="Example">PICellerator/MaterialPointSwarm.xml</param>
 
 
 <!-- Example Usage -->
 <!-- Use this struct -->
-<struct name="weights">
+<struct name="weights" mergeType="replace">
    <param name="Type">PCDVC</param>
    <param name="resolution">10</param>
    <param name="lowerT">0.6</param>
@@ -107,7 +112,7 @@
 </struct>
 
 <!-- or one can use this struct instead -->
-<struct name="weights">
+<struct name="weights" mergeType="replace">
    <param name="Type">PCDVC</param>
    <param name="resolutionX">10</param>
    <param name="resolutionY">10</param>
@@ -123,8 +128,19 @@
 <!-- upperT and lowerT represent upper and lower volume percentage thresholds
      for population control criteria -->
 
+<!-- For Inflow type problems add the following -->
+<struct name="weights" mergeType="merge">
+  <!-- switches the Inflow flag on -->
+   <param name="Inflow">True</param>
+ <!-- Threshold for cell population in an inflow problem: If a cell has less than 80% of its assigned particles then we re-populate -->
+   <param name="Threshold">0.8</param>
+ <!-- Threshold for cell population in an inflow problem:
+      If a cell's centroid is more than sqrt(0.01) of the width of an FEM cell away from the particle position then we re-populate -->
+   <param name="CentPosRatio">0.01</param>
+</struct>
+
 <!-- Then do this -->
-<!-- The file InputFiles/PIC_Components/MaterialPointSwarm.xml
+<!-- The file PICellerator/MaterialPointSwarm.xml
      should alreay have this in it -->
 <struct name="localLayout">
 	<param name="Type">MappedParticleLayout</param>
@@ -147,4 +163,4 @@
    <param name="MaterialPointsSwarm">materialSwarm</param>
 </struct>
 
-<!-- See MaterialPointsSwarm.xml in Underworld/InputFiles/PIC_Components for an example -->
+<!-- See MaterialPointsSwarm.xml in PICellerator/Apps/PIC_Components for an example -->
