@@ -1297,7 +1297,6 @@ void _PCDVC_Calculate2D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
 	      if(dist > CentPosRatio*FEMCEllspan){flag = 1;}
 	      
 	}
-	if(flag && lCell_I < 33){ printf("cell = %d CentPosRatio =  %lf\n",lCell_I,CentPosRatio);}
 	if(Inflow && (  ((1.0*nump_orig)/ParticlesPerCell < Thresh) || flag  ) ){
 	      int oneOda = (int)(1.0/da + 0.5);
 	      double dist;
