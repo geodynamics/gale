@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StandardConditionFunctions.c 1101 2008-04-09 04:38:04Z MirkoVelic $
+** $Id: StandardConditionFunctions.c 1105 2008-04-14 04:56:24Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -1236,6 +1236,7 @@ void StgFEM_StandardConditionFunctions_GaussianDistribution( Node_LocalIndex nod
 	double			orig[3];
 	double			sigma              = Dictionary_GetDouble_WithDefault( dictionary, "sigma", 1.0 );
 	double			gaussianScale      = Dictionary_GetDouble_WithDefault( dictionary, "GaussianScale", 1.0 );
+	double			background         = Dictionary_GetDouble_WithDefault( dictionary, "backgroundValue", 1.0 );
 	double			distsq             = 0.0;
 
 	variableName = Dictionary_GetString_WithDefault( dictionary, "FieldVariable", "" );
@@ -1249,7 +1250,7 @@ void StgFEM_StandardConditionFunctions_GaussianDistribution( Node_LocalIndex nod
 	for( dim_I = 0; dim_I < nDims; dim_I++ )
 		distsq += ( coord[dim_I] - orig[dim_I] ) * ( coord[dim_I] - orig[dim_I] );
 
-	*result = gaussianScale * exp( -distsq / ( 2.0 * sigma * sigma ) );
+	*result = gaussianScale * exp( -distsq / ( 2.0 * sigma * sigma ) ) + background;
 }
 
 void StgFEM_StandardConditionFunctions_HalfContainer( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
