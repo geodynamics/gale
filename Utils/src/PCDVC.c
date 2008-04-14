@@ -30,8 +30,8 @@
 *%
 ** Author:
 **              Mirko Velic - Mirko.Velic@sci.monash.edu.au
-**              Patrick Sunter - patrick@vpac.org
 **              Julian Giordani - julian.giordani@sci.monash.edu.au
+**              Patrick Sunter - patrick@vpac.org
 **          
 **  Assumptions:
 **  	 I am assuming that the xi's (local coords) on the IntegrationPoint particles
@@ -49,18 +49,47 @@
 **         We do not allow particle deletion in interface cells (cells that have more than one type of material
 **         in them). Splitting is optional. This may be inadequate. We may need to do some handling of the neighbours
 **         to interface cells as well, in order to preserve particle density about an interface.
+
+       How to use this:
+	   You may place the following in a top-level xml file to change the parameters:
+	   This assumes a lower level xml file is not using a weights calculator other than PCDVC.
+	   
+		<struct name="weights" mergeType="replace">
+                   <param name="Type">PCDVC</param>
+                   <param name="resolutionX">10</param>
+                   <param name="resolutionY">10</param>
+                   <param name="resolutionZ">10</param>
+                   <param name="lowerT">0.25</param>  <!-- lower % threshold volume for deletion of particles. i.e if a particle volume < 0.25% of total then delete it -->
+                   <param name="upperT">15</param>    <!-- upper % threshold volume for deletion of particles. i.e if a particle volume > 15% of total then split it -->
+                   <param name="maxDeletions">5</param>
+                   <param name="maxSplits">10</param>
+                   <param name="MaterialPointsSwarm">materialSwarm</param>
+                </struct>
+		<struct name="weights" mergeType="merge">
+			<param name="Inflow">True</param>  <!-- switches the Inflow flag on -->
+			<param name="Threshold">0.8</param> <!-- Threshold for cell population in an inflow problem: If a cell has less than 80% of its assigned particles then we re-populate -->
+			<param name="CentPosRatio">0.01</param> <!-- Threshold for cell population in an inflow problem: If a cell's centroid is more than sqrt(0.01) of the width of an FEM cell away from the particle position then we re-populate -->
+		</struct>
+		
+	    Note that you can use the Inflow flags for non-inflow problems. Might be OK for paranoid people or weird situations.
+	    There is a slight performance hit having the Inflow flag enabled.
+	    
+	    This code is a bit messy and needs some tidying up and more comments. But for now, the inflow stuff seems to work OK.
+	    Tested in 3D with as few as 15 particles per cell for 50 time-steps with an Inflow problem.
+	    Tested in 2D with as few as 10 particles per cell for 150 time-steps with an Inflow problem.
+
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
 /****************************************************************************************************************
 
-  The algorithm here-in uses the DVCWeights module to compute a discrete voronoi diagram per FEM cell given a set of local
+  The algorithm here uses the DVCWeights module to compute a discrete voronoi diagram per FEM cell given a set of local
   particle positions, in 3D and 2D. The volumes of the Voronoi regions are used as integration weights for
   the integration point swarm and the integration points are the centroids of the same volumes.
 
-  The volumes are also used as criteria for splitting and deleting particles.
-  At the moment we are only deleting or adding *one* particle per cell per time-step: This
-  will be changed shortlyas it may be inadequate.
+  The volumes are also used as criteria for splitting and deleting particles. i.e. lowerT and upperT as percentages.
+
+  The Threshold and CentPosRatio parameters are only used when Inflow is turned on.
 
   For a description of the Voronoi algorithm, see the article by Velic et.al.
      "A Fast Robust Algorithm for computing Discrete Voronoi Diagrams in N-dimensions"
@@ -242,9 +271,12 @@ void _PCDVC_Construct( void* pcdvc, Stg_ComponentFactory* cf, void *data ) {
 	Inflow =  Stg_ComponentFactory_GetBool( cf, self->name, "Inflow", False);
 	Thresh = Stg_ComponentFactory_GetDouble( cf, self->name, "Threshold", 0.8 );
 	//CentPosRatio is ratio of allowable distance of a centroid from generating particle to distance across a FEM cell.
-	CentPosRatio =  Stg_ComponentFactory_GetDouble( cf, self->name, "CentPosRatio", 0.2 );
+	// I think the centroid distance idea is not ideal in the end...can create some weirdness...even thought the code "works"
+	// after a while one can get wiggly lines in the cells...the centriods are close to the particles but its all
+	// centred in the FEM cell.
+	CentPosRatio =  Stg_ComponentFactory_GetDouble( cf, self->name, "CentPosRatio", 0.01 );
 	// just getting the initial PPC for now...maybe could make this a separate parameter yet if needed.
-	ParticlesPerCell = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "particlesPerCell", 25 );
+	ParticlesPerCell = cf->getRootDictUnsignedInt( cf, "particlesPerCell", 25);
 	if(upT < lowT){
 	      lowT = 0.6;
 	      upT = 25;
@@ -659,6 +691,38 @@ int compare_indexOnCPU(const void * _particleA, const void * _particleB){
 	    return -1;
 
 }
+int compare_ints(const void * _A, const void * _B){
+      int *A = (int *) _A;
+      int *B = (int *) _B;
+      if(*A > *B) return 1; else return -1;
+}
+#if 0
+void buildPVCList(int **particleVornoiCellList, struct particle2d *pList, struct cell2d *cells, int *VCsize, double da, int nump, int XY, int dim){
+      int oneOda = (int)(1.0/da + 0.5);
+      int i,j;
+      int *count = (int)malloc(nump*sizeof(int));
+      
+      for(i=0;i<nump;i++){ 
+	    count[i] = (int)( pList[i].w*oneOda +0.5 ); // add the 0.5 so we don't lose anything from rounding down accidentally
+	    VCsize[i] = count[i];
+	    //countSum += count[i];//for debugging
+	    //wSum += pList[i].w;//for debugging
+	    particleVoronoiCellList[i] = (int *)malloc( ( 1 + count[i] ) * sizeof(int));
+      }
+      for(i=0;i<XY;i++){// traverse the grid
+	    /** for total volume of a cell i.e. how many cells a particle owns .. this is actually calculated
+		internally in the Centroids function and could be also accessed by dividing the weight of a particle by 'da'. **/
+	    //if(VCsize[cells[i].p] != 0){// in case a particle is unresolved
+	    if( count[cells[i].p] > 0 ){// it's possible for the total count to be a little off...this can cause a negative index
+		  particleVoronoiCellList[ cells[i].p ][ count[cells[i].p]-1 ] = i;
+		  count[cells[i].p] = count[cells[i].p] - 1;//decrement the count to insert i value into correct slot.
+		  //countSum++;
+	    }
+	    //}
+      }
+      free(count);
+}
+#endif
 /* Calculate the integration weights for each particle by contructing
    a voronoi diagram in an element in 3D*/
 void _PCDVC_Calculate3D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
@@ -725,7 +789,7 @@ void _PCDVC_Calculate3D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
 
 	nump_orig = nump = cParticleCount = intSwarm->cellParticleCountTbl[lCell_I];
 
-	/* need a struct for the deletList because we must sort it bu indexOnCPU and delete in reverse order
+	/* need a struct for the deletList because we must sort it by indexOnCPU and delete in reverse order
            so we don't have the potential problem of  deleting a particle from the list that points to the last particle on the swarm */
 	deleteList = (struct deleteParticle*)malloc(nump*sizeof(struct deleteParticle));/* I don't think I am going to let you delete more than half the particles in a given cell */
 	splitList  = (Particle_Index*)malloc(nump*sizeof(Particle_Index));
@@ -786,46 +850,76 @@ void _PCDVC_Calculate3D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
 	/*      Start 3D Inflow Control     */
 	/************************************/
 	/************************************/
-	//if(Inflow){
-	/* This bit is broken right now */
-	if(0){
-	      int **particleVoronoiCellList = (int **)malloc(nump * sizeof(int *));// [i][] is ith particle's list of cells in grid it owns
-	      int *count=(int *)malloc(sizeof(int)*nump); // count of how many cells each particle owns in the Voronoi diagram.
+
+	int *VCsize;
+	int **particleVoronoiCellList;
+	int *count; // count of how many cells each particle owns in the Voronoi diagram.
+	int flag =0;
+	double FEMCEllspan = BBXMAX - BBXMIN;
+	double dist;
+	if(Inflow){
+	      for(i=0;i<nump_orig;i++){
+		    dist = (pList[i].cx - pList[i].x)*(pList[i].cx - pList[i].x) + (pList[i].cy - pList[i].y)*(pList[i].cy - pList[i].y) + (pList[i].cz - pList[i].z)*(pList[i].cz - pList[i].z);
+	      }
+	      if(dist > CentPosRatio*FEMCEllspan){flag = 1;}
+	      
+	}
+	if(Inflow && (  ((1.0*nump_orig)/ParticlesPerCell < Thresh) || flag  ) ){
 	      int oneOda = (int)(1.0/da + 0.5);
 	      double dist;
 	      int numberofnewpoints, *VCsize=(int *)malloc(sizeof(int)*nump);
 	      int newpindex;
-	      double FEMCEllspan = BBXMAX - BBXMIN;
 	      int j;
-
+	      int delNum;
+	      VCsize=(int *)malloc(sizeof(int)*nump_orig);
+	      count=(int *)malloc(sizeof(int)*nump_orig);
 	      splitCount = 0;
-	      
-	      for(i=0;i<nump;i++){ 
+	      particleVoronoiCellList = (int **)malloc(nump_orig * sizeof(int *));// [i][j] is jth cell owned by particle i
+	      for(i=0;i<nump_orig;i++){ 
 		    count[i] = (int)( pList[i].w*oneOda +0.5 ); // add the 0.5 so we don't lose anything from rounding down accidentally
 		    VCsize[i] = count[i];
-		    //if(count[i] != 0){// in case a particle is unresolved
 		    particleVoronoiCellList[i] = (int *)malloc( ( 1 + count[i] ) * sizeof(int));
-		    // making arrays '1' too big in case count[i] = 0
-		    //}
 	      }
 	      for(i=0;i<numx*numy*numz;i++){// traverse the grid
 		    //count[ cells[i].p ]++;
                     /** for total volume of a cell i.e. how many cells a particle owns .. this is actually calculated
-			internally in the Centroids function and could be also accessed by dividing the weight of a particle by 'da'.
-			Recalculating it here so I don't have to mess around with the function or risk getting the size wrong
-			using floating point division. Will revisit later and maybe improve this. **/
-		    if(count[cells[i].p] != 0){// in case a particle is unresolved
+			internally in the Centroids function and could be also accessed by dividing the weight of a particle by 'da'. **/
+		    if( count[cells[i].p] > 0 ){// it's possible for the total count to be a little off...this can cause a negative index
 			  particleVoronoiCellList[ cells[i].p ][ count[cells[i].p]-1 ] = i;
-			  count[cells[i].p] = count[cells[i].p] - 1;
+			  count[cells[i].p] = count[cells[i].p] - 1;//decrement the count to insert i value into correct slot.
+			  //countSum++;
 		    }
 	      }
 	      // we now have a list of cells from the grid belonging to each particle that make up each Voronoi cell in the Voronoi diagram
 	      // next lets compare how far our centroids are from the particle positions.
 	      // this is my criteria for a voronoi cell having a weird shape...too stretched out for example.
-	      // this is exactly what happens in inflow situations.
-	      //FEMCEllspan = BBXMAX - BBXMIN;
-	      //CentPosRatio = 0.2; // this is the fraction of the FEMCEllspan distance we are going to let centroids be from the particle
-	      // and not take action	       
+	      // this is exactly what happens in inflow situations.  
+	      // Add a random number of new particles...
+	      // But Need to add them where they are needed. 
+	      for(i=0;i<ParticlesPerCell;i++){
+		    j  =  (int) ( numx*numy * (rand() / (RAND_MAX + 1.0)));
+		    xi[0] = cells[ j ].x;
+		    xi[1] = cells[ j ].y;
+		    xi[2] = cells[ j ].z;
+		    splitIntParticleByIndexWithinCell( intSwarm, matSwarm, lCell_I, cells[j].p, xi );
+		    nump++; splitCount++;
+	      }
+	      for(i=0;i<nump_orig;i++){
+		    free(particleVoronoiCellList[i]);
+	      }
+	      free(particleVoronoiCellList);
+	      free(VCsize); free(count);
+	      //if(splitCount) printf("\n\e[32mnump is now %d splitCount = %d\n",nump,splitCount);
+	      delNum = nump - ParticlesPerCell;
+	      if(delNum > 5){
+		    for(i=0;i<delNum;i++){
+			  j =  (int) (nump * (rand() / (RAND_MAX + 1.0)));
+			  deleteIntParticleByIndexWithinCell( intSwarm,  matSwarm, lCell_I, j );
+			  nump--;
+			  splitCount--;
+		    }
+	      }
+#if 0
 	      for(i=0;i<nump;i++){
 		    if(0 != VCsize[i]){
 			  dist = (pList[i].cx - pList[i].x)*(pList[i].cx - pList[i].x) + (pList[i].cy - pList[i].y)*(pList[i].cy - pList[i].y) + (pList[i].cz - pList[i].z)*(pList[i].cz - pList[i].z);
@@ -850,6 +944,7 @@ void _PCDVC_Calculate3D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
 			  }//if
 		    }//if
 	      }//for i=0:nump
+#endif
 	      if(splitCount){// then redo Voronoi diagram.
 		    for(k=0;k<nump_orig;k++){
 			  free(bchain[k].new_claimed_cells);
@@ -881,14 +976,37 @@ void _PCDVC_Calculate3D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
 		    _DVCWeights_GetCentroids( cells, pList,numz,numy,numx,nump,da);
 
 	      }
-	      free(count);
-	      for(i=0;i<nump_orig;i++){
-		    free(particleVoronoiCellList[i]);
-	      }
-	      free(particleVoronoiCellList);
-	      free(VCsize);
 	      nump_orig = nump;
-	}// if Inflow
+	}// if Inflow && ...
+	if(Inflow){
+	      int oneOda = (int)(1.0/da + 0.5);
+	      int sumc = 0;
+	      int j;
+              //recreate the lists.
+	      particleVoronoiCellList = (int **)malloc(nump * sizeof(int *));// [i][j] is jth cell owned by particle i
+	      //VCsize = (int*)realloc(VCsize,nump_orig);
+	      //count = (int*)realloc(count,nump_orig);
+	      VCsize=(int *)malloc(sizeof(int)*nump);
+	      count=(int *)malloc(sizeof(int)*nump); 
+	
+	      for(i=0;i<nump;i++){ 
+		    count[i] = (int)( pList[i].w*oneOda +0.5 ); // add the 0.5 so we don't lose anything from rounding down accidentally
+		    VCsize[i] = count[i];
+		    particleVoronoiCellList[i] = (int *)malloc( ( 1 + count[i] ) * sizeof(int));
+	      }
+	      for(i=0;i<numx*numy*numz;i++){// traverse the grid
+		    //count[ cells[i].p ]++;
+                    /** for total volume of a cell i.e. how many cells a particle owns .. this is actually calculated
+			internally in the Centroids function and could be also accessed by dividing the weight of a particle by 'da'. **/
+		    //if(VCsize[cells[i].p] != 0){// in case a particle is unresolved
+		    if( count[cells[i].p] > 0 ){// it's possible for the total count to be a little off...this can cause a negative index
+			  particleVoronoiCellList[ cells[i].p ][ count[cells[i].p]-1 ] = i;
+			  count[cells[i].p] = count[cells[i].p] - 1;//decrement the count to insert i value into correct slot.
+			  //countSum++;
+		    }
+		    //}
+	      }
+	}//if Inflow
 	/**************************************/
 	/**************************************/
 	/*        End 3D Inflow Control       */
@@ -942,34 +1060,42 @@ void _PCDVC_Calculate3D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
 //	if(pList[maxI].w > upT*8/100.0){
 	Count = maxSplits > splitCount ? splitCount : maxSplits;
 	for(i=0;i<Count;i++){
+	      int j;
 	      maxI = splitList[i];
-	      /* now get local coords from centroid of the cell that particleToSplit lives in */
-	      xi[0] = pList[maxI].cx;
-	      xi[1] = pList[maxI].cy;
-	      xi[2] = pList[maxI].cz;
-
+	      if(!Inflow){
+		    /* now get local coords from centroid of the cell that particleToSplit lives in */
+		    xi[0] = pList[maxI].cx;
+		    xi[1] = pList[maxI].cy;
+		    xi[2] = pList[maxI].cz;
+	      }
+	      else{
+                    /* lets do something different now..because am getting lines formed on inflow probs */
+		    j =  (int) (VCsize[maxI] * (rand() / (RAND_MAX + 1.0)));
+		    xi[0] = cells[ particleVoronoiCellList[maxI][j] ].x;
+		    xi[1] = cells[ particleVoronoiCellList[maxI][j] ].y;
+		    xi[2] = cells[ particleVoronoiCellList[maxI][j] ].z;
+	      }
 	      split_flag = 1;
 	      nump++;
-
 	      splitIntParticleByIndexWithinCell( intSwarm, matSwarm, lCell_I, maxI, xi );
-
 	}
 
-//	if( (pList[minI].w < lowT*8/100.0) ){
+	if(Inflow){
+	      for(i=0;i<nump_orig;i++){
+		    free(particleVoronoiCellList[i]);
+	      }
+	      free(particleVoronoiCellList);
+	      free(VCsize);
+	      free(count);
+	}
 	Count = maxDeletions > deleteCount ? deleteCount : maxDeletions;
 	for(i=0;i<Count;i++){
-
 	      minI = deleteList[i].indexOnCPU;
-
 	      deleteIntParticleByIndexOnCPU( intSwarm,  matSwarm, minI );
-
 	      delete_flag = 1;
 	      nump--;
+	}
 
-	} /* if(pList[minI].w < lowT*8/100.0) */
-	
-	//printf("pList[maxI].w = %lf particle num = %d : %d\n", pList[maxI].w, pList[maxI].index,maxI);
-	//printf("pList[minI].w = %lf particle num = %d : %d\n", pList[minI].w, pList[minI].index,minI);
 	if(delete_flag || split_flag ){/* then we need to redo the Voronoi diagram */
 	      for(k=0;k<nump_orig;k++){
 		    free(bchain[k].new_claimed_cells);
@@ -1007,91 +1133,6 @@ void _PCDVC_Calculate3D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
 	      _DVCWeights_GetCentroids( cells, pList,numz,numy,numx,nump,da);
 
 	}/* if delete_flag */
-	/**************************************/
-	/**************************************/
-	/*       Begin 3D Shotgun Method      */
-	/**************************************/
-	/**************************************/
-	nump_orig=nump;
-//	if(1){
-	if(nump_orig < (int)(0.8*ParticlesPerCell) && Inflow){
-//	      FILE *fp,*fp2;
-//	      char title[30],title2[30];
-	      IntegrationPoint* tparticle;
-	      MaterialPoint*    matParticle;
-	      int newpindex;
-/*	      sprintf(title,"cell-%03d.plot",lCell_I);
-	      sprintf(title2,"local-%03d.plot",lCell_I);
-	      fp=fopen(title,"w");
-	      fp2=fopen(title2,"w");
-*/      
-	      //for(i=0;i<(numx*numy)/4;i++){
-	      for(i=0;i<2*ParticlesPerCell/3;i++){    
-		    nump++;
-		    newpindex = rand()%(numx*numy*numz);
-		    //newpindex = i;
-		    xi[0] = 2.0*rand()/(RAND_MAX+1.0)-1.0;
-		    xi[1] = 2.0*rand()/(RAND_MAX+1.0)-1.0;
-		    xi[2] = 2.0*rand()/(RAND_MAX+1.0)-1.0;
-		    splitIntParticleByIndexWithinCell( intSwarm, matSwarm, lCell_I, 0, xi );
-		    //if(lCell_I == 0){
-			  //fprintf(fp2,"%lf %lf\n",xi[0],xi[1]);
-		    
-		    //}
-		    splitCount++;
-	      }
-	      
-/*	      for(i=0;i<nump;i++){
-		    
-		    matParticle = (MaterialPoint*) Swarm_ParticleInCellAt( matSwarm, lCell_I, i );
-		    tparticle = (IntegrationPoint*) Swarm_ParticleInCellAt( intSwarm, lCell_I, i );
-		    //pList[i].x = particle[i]->xi[0];
-		    //pList[i].y = particle[i]->xi[1];
-		    //pList[i].z = particle[i]->xi[2];
-		    //pList[i].index = i; // to track which particle numbers we have after sorting this list
-		    fprintf(fp,"%lf %lf\n",matParticle->coord[0],matParticle->coord[1]);
-		    fprintf(fp2,"%lf %lf\n",tparticle->xi[0],tparticle->xi[1]);
-		    //free(tparticle);
-	      }
-*/
-	      if(splitCount){// then redo Voronoi diagram.
-		    for(k=0;k<nump_orig;k++){
-			  free(bchain[k].new_claimed_cells);
-			  free(bchain[k].new_bound_cells);
-		    }
-		    free(particle);
-		    free(bchain);
-		    free(pList);
-		    if(nump < 3){
-			  Journal_Firewall( 0 , Journal_Register(Error_Type, "PCDVC"), "Something went horribly -wrong- in shotgun part of %s: Problem has an under resolved cell (Cell Id = %d), check or tune your population control parameters\n", __func__, lCell_I );
-		    }
-		    particle = (IntegrationPoint**)malloc((nump)*sizeof(IntegrationPoint*));
-		    // init the data structures
-		    _DVCWeights_InitialiseStructs( &bchain, &pList, nump);
-		    // re-initialize the particle positions to be the local coordinates of the material swarm particles
-		    for(i=0;i<nump;i++){
-		    
-			  particle[i] = (IntegrationPoint*) Swarm_ParticleInCellAt( intSwarm, lCell_I, i );
-			  pList[i].x = particle[i]->xi[0];
-			  pList[i].y = particle[i]->xi[1];
-			  pList[i].z = particle[i]->xi[2];
-		    
-		    }
-		    _DVCWeights_ResetGrid(&cells,numz*numy*numx);
-		    _DVCWeights_CreateVoronoi( &bchain, &pList, &cells, dx, dy, dz, nump, numx, numy, numz, BBXMIN, BBXMAX, BBYMIN, BBYMAX, BBZMIN, BBZMAX);
-		    _DVCWeights_GetCentroids( cells, pList,numz,numy,numx,nump,da);
-		    nump_orig=nump;
-
-	      }
-	      //fclose(fp);
-	      //fclose(fp2);
-	}//if
-	/**************************************/
-	/**************************************/
-	/*        End 3D Shotgun Method       */
-	/**************************************/
-	/**************************************/
-
 	/******************************************/
 	/******************************************/
 	/*        End 3D Population Control       */
@@ -1165,6 +1206,9 @@ void _PCDVC_Calculate2D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
 	double Thresh = self->Threshold;
 	int ParticlesPerCell = self->ParticlesPerCell;
 	double CentPosRatio = self->CentPosRatio;
+	time_t tm;
+	
+
 //	SizeT                 intparticleSize     = intSwarm->particleExtensionMgr->finalSize;
 //	SizeT                 matparticleSize     = matSwarm->particleExtensionMgr->finalSize;
 
@@ -1204,6 +1248,8 @@ void _PCDVC_Calculate2D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
                  a pointer inside that function */
 	      visited++;
 	      _DVCWeights_ConstructGrid2D(&cells,numy,numx,BBXMIN,BBYMIN,BBXMAX,BBYMAX);
+//	      time(&tm);
+//	      srand( (long) tm);
 	}
 	
 	
@@ -1230,10 +1276,6 @@ void _PCDVC_Calculate2D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
 	/************************************/
 	/*    Start 2D Population Control   */
 	/************************************/
-	/************************************/
-	/* todo: put print statements into Journal statements */
-	/*********************************/
-
 	/** want to do something special for inflow problems **/
 	/** we need to be a lot more aggressive with adding particles in this case **/
 	/************************************/
@@ -1241,71 +1283,82 @@ void _PCDVC_Calculate2D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
 	/*      Start 2D Inflow Control     */
 	/************************************/
 	/************************************/
-	/* This bit is broken right now */
-	if(0){
-	//if(Inflow){
-	      int **particleVoronoiCellList = (int **)malloc(nump * sizeof(int *));// [i][] is ith particle's list of cells in grid it owns
-	      int *count=(int *)malloc(sizeof(int)*nump); // count of how many cells each particle owns in the Voronoi diagram.
+//	if(0){
+	int *VCsize;
+	int **particleVoronoiCellList;
+	int *count; // count of how many cells each particle owns in the Voronoi diagram.
+	int flag =0;
+	double FEMCEllspan = BBXMAX - BBXMIN;
+	double dist;
+	if(Inflow){
+	      for(i=0;i<nump_orig;i++){
+		    dist = (pList[i].x-pList[i].cx)*(pList[i].x-pList[i].cx)+(pList[i].y-pList[i].cy)*(pList[i].y-pList[i].cy);;
+	      }
+	      if(dist > CentPosRatio*FEMCEllspan){flag = 1;}
+	      
+	}
+	if(flag && lCell_I < 33){ printf("cell = %d CentPosRatio =  %lf\n",lCell_I,CentPosRatio);}
+	if(Inflow && (  ((1.0*nump_orig)/ParticlesPerCell < Thresh) || flag  ) ){
 	      int oneOda = (int)(1.0/da + 0.5);
 	      double dist;
-	      int numberofnewpoints, *VCsize=(int *)malloc(sizeof(int)*nump);
+	      int numberofnewpoints;
 	      int newpindex;
-	      double FEMCEllspan = BBXMAX - BBXMIN;
-	      int j;
-
+	      int j,countSum;
+	      double wSum;
+	      int *temparray;
+	      int delNum;
+	      VCsize=(int *)malloc(sizeof(int)*nump_orig);
+	      count=(int *)malloc(sizeof(int)*nump_orig);
+	      //wSum = 0.0;
+	      //countSum = 0;
 	      splitCount = 0;
-	      
-	      for(i=0;i<nump;i++){ 
+	      particleVoronoiCellList = (int **)malloc(nump_orig * sizeof(int *));// [i][j] is jth cell owned by particle i
+	      for(i=0;i<nump_orig;i++){ 
 		    count[i] = (int)( pList[i].w*oneOda +0.5 ); // add the 0.5 so we don't lose anything from rounding down accidentally
 		    VCsize[i] = count[i];
-		    //if(count[i] != 0){// in case a particle is unresolved
 		    particleVoronoiCellList[i] = (int *)malloc( ( 1 + count[i] ) * sizeof(int));
-		    // making arrays '1' too big in case count[i] = 0
-		    //}
 	      }
 	      for(i=0;i<numx*numy;i++){// traverse the grid
 		    //count[ cells[i].p ]++;
                     /** for total volume of a cell i.e. how many cells a particle owns .. this is actually calculated
-			internally in the Centroids function and could be also accessed by dividing the weight of a particle by 'da'.
-			Recalculating it here so I don't have to mess around with the function or risk getting the size wrong
-			using floating point division. Will revisit later and maybe improve this. **/
-		    if(count[cells[i].p] != 0){// in case a particle is unresolved
+			internally in the Centroids function and could be also accessed by dividing the weight of a particle by 'da'. **/
+		    if( count[cells[i].p] > 0 ){// it's possible for the total count to be a little off...this can cause a negative index
 			  particleVoronoiCellList[ cells[i].p ][ count[cells[i].p]-1 ] = i;
-			  count[cells[i].p] = count[cells[i].p] - 1;
+			  count[cells[i].p] = count[cells[i].p] - 1;//decrement the count to insert i value into correct slot.
+			  //countSum++;
 		    }
 	      }
+	      //printf("countSum = %d\n",countSum);
 	      // we now have a list of cells from the grid belonging to each particle that make up each Voronoi cell in the Voronoi diagram
 	      // next lets compare how far our centroids are from the particle positions.
 	      // this is my criteria for a voronoi cell having a weird shape...too stretched out for example.
 	      // this is exactly what happens in inflow situations.
-	      //FEMCEllspan = BBXMAX - BBXMIN;
-	      //CentPosRatio = 0.2; // this is the fraction of the FEMCEllspan distance we are going to let centroids be from the particle
-	      // and not take action	       
+	      // Add a random number of new particles...
+	      // But Need to add them where they are needed.
+	      for(i=0;i<ParticlesPerCell;i++){
+		    j  =  (int) ( numx*numy * (rand() / (RAND_MAX + 1.0)));
+		    xi[0] = cells[ j ].x;
+		    xi[1] = cells[ j ].y;
+		    splitIntParticleByIndexWithinCell( intSwarm, matSwarm, lCell_I, cells[j].p, xi );
+		    nump++; splitCount++;
+	      }
 	      for(i=0;i<nump_orig;i++){
-		    if(0 != VCsize[i]){
-			  dist = (pList[i].cx - pList[i].x)*(pList[i].cx - pList[i].x) + (pList[i].cy - pList[i].y)*(pList[i].cy - pList[i].y);
-			  if(dist > CentPosRatio*FEMCEllspan){
-				// Then populate this Voronoi cell with more particles.
-				// A working number might be based on the initial population per FEM cell, i.e. restore the density.
-				// which I can't be bothered trying to figure out how to extract right this minute.
-				// So, for now, I will just go with say..30? or could pass in via xml?
-				numberofnewpoints = 10*ParticlesPerCell*pList[i].w/4; //4 is total volume of a local element.
-				numberofnewpoints =  20;
-				printf("numbernewpts = %d ParticlesPerCell = %d pList[i].w %lf\n",numberofnewpoints,ParticlesPerCell,pList[i].w);
-				for(j=0;j<numberofnewpoints;j++){
-				      newpindex = rand()%VCsize[i];
-				      // we going to split particle[i] numberofnewpoints times and each time give the new particle the coordinates
-				      // of the cell we are planting it in.
-				      // it should not matter if we put newly created particles on top of each other accidentally.
-				      xi[0] = cells[ particleVoronoiCellList[i][newpindex] ].x;
-				      xi[1] = cells[ particleVoronoiCellList[i][newpindex] ].y;
-				      nump++;
-				      splitIntParticleByIndexWithinCell( intSwarm, matSwarm, lCell_I, i, xi );
-				      splitCount++;
-				}
-			  }//if
-		    }//if
-	      }//for i=0:nump
+		    free(particleVoronoiCellList[i]);
+	      }
+	      free(particleVoronoiCellList);
+	      free(VCsize); free(count);
+	      //if(splitCount) printf("\n\e[32mnump is now %d splitCount = %d\n",nump,splitCount);
+	      delNum = nump - ParticlesPerCell;
+	      if(delNum > 5){
+		    for(i=0;i<delNum;i++){
+			  j =  (int) (nump * (rand() / (RAND_MAX + 1.0)));
+			  deleteIntParticleByIndexWithinCell( intSwarm,  matSwarm, lCell_I, j );
+			  nump--;
+			  splitCount--;
+		    }
+	      }
+	      //if(splitCount) printf("\e[34mnump is now %d splitCount = %d\n",nump,splitCount);;printf("\e[0;37m");
+	      //printf("\n\n");
 	      if(splitCount){// then redo Voronoi diagram.
 		    for(k=0;k<nump_orig;k++){
 			  free(bchain[k].new_claimed_cells);
@@ -1314,42 +1367,68 @@ void _PCDVC_Calculate2D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
 		    free(particle);
 		    free(bchain);
 		    free(pList);
+		    //printf("\e[33mnump is now %d splitCount = %d\n",nump,splitCount);printf("\e[0;37m");
 		    if(nump < 3){
 			  Journal_Firewall( 0 , Journal_Register(Error_Type, "PCDVC"), "Something went horribly wrong in %s: Problem has an under resolved cell (Cell Id = %d), check or tune your population control parameters\n", __func__, lCell_I );
 		    }
 		    // init the data structures
-		    _DVCWeights_InitialiseStructs2D( &bchain, &pList, nump);
-		    	      
-		    particle = (IntegrationPoint**)malloc( (nump)*sizeof(IntegrationPoint*));
-	
+		    _DVCWeights_InitialiseStructs2D( &bchain, &pList, nump);		    	      
+		    particle = (IntegrationPoint**)malloc( (nump)*sizeof(IntegrationPoint*));	
 		    // re-initialize the particle positions to be the local coordinates of the material swarm particles
 		    // could do better here..instead of completely destroying these lists I could append to them I suppose.
-		    for(i=0;i<nump;i++){
-		    
+		    for(i=0;i<nump;i++){		    
 			  particle[i] = (IntegrationPoint*) Swarm_ParticleInCellAt( intSwarm, lCell_I, i );
 			  pList[i].x = particle[i]->xi[0];
-			  pList[i].y = particle[i]->xi[1];
-		    
+			  pList[i].y = particle[i]->xi[1];		    
 		    }
 		    _DVCWeights_ResetGrid2D(&cells,numy*numx);
 		    _DVCWeights_CreateVoronoi2D( &bchain, &pList, &cells, dx, dy, nump, numx, numy, BBXMIN, BBXMAX, BBYMIN, BBYMAX);
 		    _DVCWeights_GetCentroids2D( cells, pList,numy,numx,nump,da);
-
 	      }
-	      free(count);
-	      for(i=0;i<nump_orig;i++){
-		    free(particleVoronoiCellList[i]);
-	      }
-	      free(particleVoronoiCellList);
-	      free(VCsize);
 	      nump_orig = nump;
-	}// if Inflow
+	}// if Inflow && ...
+	if(Inflow){
+	      int oneOda = (int)(1.0/da + 0.5);
+	      int sumc = 0;
+	      int j;
+              //recreate the lists.
+	      particleVoronoiCellList = (int **)malloc(nump * sizeof(int *));// [i][j] is jth cell owned by particle i
+	      //VCsize = (int*)realloc(VCsize,nump_orig);
+	      //count = (int*)realloc(count,nump_orig);
+	      VCsize=(int *)malloc(sizeof(int)*nump);
+	      count=(int *)malloc(sizeof(int)*nump); 
+	
+	      for(i=0;i<nump;i++){ 
+		    count[i] = (int)( pList[i].w*oneOda +0.5 ); // add the 0.5 so we don't lose anything from rounding down accidentally
+		    VCsize[i] = count[i];
+		    particleVoronoiCellList[i] = (int *)malloc( ( 1 + count[i] ) * sizeof(int));
+	      }
+	      for(i=0;i<numx*numy;i++){// traverse the grid
+		    //count[ cells[i].p ]++;
+                    /** for total volume of a cell i.e. how many cells a particle owns .. this is actually calculated
+			internally in the Centroids function and could be also accessed by dividing the weight of a particle by 'da'. **/
+		    //if(VCsize[cells[i].p] != 0){// in case a particle is unresolved
+		    if( count[cells[i].p] > 0 ){// it's possible for the total count to be a little off...this can cause a negative index
+			  particleVoronoiCellList[ cells[i].p ][ count[cells[i].p]-1 ] = i;
+			  count[cells[i].p] = count[cells[i].p] - 1;//decrement the count to insert i value into correct slot.
+			  //countSum++;
+		    }
+		    //}
+	      }
+	      /*
+	      for(i=0;i<nump;i++){
+		    for(j=0;j<VCsize[i];j++){
+			  sumc +=  1;
+		    }
+	      }
+	      */
+	      //printf("sumc = %d cell = %d\n",sumc,lCell_I);
+	}//if Inflow
 	/************************************/
 	/************************************/
 	/*        End 2D Inflow Control     */
 	/************************************/
 	/************************************/
-
 	split_flag = 0;
 	delete_flag = 0;
 	splitCount = 0;
@@ -1394,33 +1473,43 @@ void _PCDVC_Calculate2D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
 
 	/* we now have our lists of particles to delete and split */
 	Count = maxSplits > splitCount ? splitCount : maxSplits;
+	/* lets do something different now..because am getting lines formed on inflow probs */
+	//if(Inflow){ Count = 0;} //turn off ordinary splitting if inflow is on for moment      
 	for(i=0;i<Count;i++){
+	      int j;
 	      maxI = splitList[i];
-	      /* now get local coords from centroid of the cell that particleToSplit lives in */
-	      xi[0] = pList[maxI].cx;
-	      xi[1] = pList[maxI].cy;
-	      //xi[2] = pList[maxI].cz;
-
+	      if(!Inflow){
+		    /* now get local coords from centroid of the cell that particleToSplit lives in */
+		    xi[0] = pList[maxI].cx;
+		    xi[1] = pList[maxI].cy;
+	      }
+	      else{
+                    /* lets do something different now..because am getting lines formed on inflow probs */
+		    j =  (int) (VCsize[maxI] * (rand() / (RAND_MAX + 1.0)));
+		    xi[0] = cells[ particleVoronoiCellList[maxI][j] ].x;
+		    xi[1] = cells[ particleVoronoiCellList[maxI][j] ].y;
+	      }     
 	      split_flag = 1;
 	      nump++;
-
 	      splitIntParticleByIndexWithinCell( intSwarm, matSwarm, lCell_I, maxI, xi );
-
 	}
+
+	if(Inflow){
+	      for(i=0;i<nump_orig;i++){
+		    free(particleVoronoiCellList[i]);
+	      }
+	      free(particleVoronoiCellList);
+	      free(VCsize);
+	      free(count);
+	}
+
 	Count = maxDeletions > deleteCount ? deleteCount : maxDeletions;
 	for(i=0;i<Count;i++){
-
 	      minI = deleteList[i].indexOnCPU;
-
 	      deleteIntParticleByIndexOnCPU( intSwarm,  matSwarm, minI );
-
-
 	      delete_flag = 1;
 	      nump--;
-
-	      
-	} /* if(pList[minI].w < lowT*8/100.0) */
-	
+	}
 	//printf("pList[maxI].w = %lf particle num = %d : %d\n", pList[maxI].w, pList[maxI].index,maxI);
 	//printf("pList[minI].w = %lf particle num = %d : %d\n", pList[minI].w, pList[minI].index,minI);
 	if(delete_flag || split_flag ){/* then we need to redo the Voronoi diagram */
@@ -1443,7 +1532,6 @@ void _PCDVC_Calculate2D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
 		    particle[i] = (IntegrationPoint*) Swarm_ParticleInCellAt( intSwarm, lCell_I, i );
 		    pList[i].x = particle[i]->xi[0];
 		    pList[i].y = particle[i]->xi[1];
-		    //pList[i].z = particle[i]->xi[2];
 		    //pList[i].index = i; // to track which particle numbers we have after sorting this list */
 		    
 	      }
@@ -1452,94 +1540,10 @@ void _PCDVC_Calculate2D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
 
 	      _DVCWeights_ResetGrid2D(&cells,numy*numx);
 	      //reset_grid(&cells,numz*numy*numx);/* adding this line fixed memory leak probs */
-	      //create_voronoi( &bchain, &pList, &cells, dx, dy, dz, nump, numx, numy, numz, BBXMIN, BBXMAX, BBYMIN, BBYMAX, BBZMIN, BBZMAX);
-	      //get_centroids( cells, pList,numz,numy,numx,nump,da);
 	      _DVCWeights_CreateVoronoi2D( &bchain, &pList, &cells, dx, dy, nump, numx, numy, BBXMIN, BBXMAX, BBYMIN, BBYMAX);
 	      _DVCWeights_GetCentroids2D( cells, pList,numy,numx,nump,da);
 
 	}/* if delete_flag */
-	/**************************************/
-	/**************************************/
-	/*       Begin 2D Shotgun Method      */
-	/**************************************/
-	/**************************************/
-	nump_orig=nump;
-//	if(0){
-	if(nump_orig < (int)(0.8*ParticlesPerCell) && Inflow){
-	      FILE *fp,*fp2;
-	      char title[30],title2[30];
-	      IntegrationPoint* tparticle;
-	      MaterialPoint*    matParticle;
-	      int newpindex;
-	      sprintf(title,"cell-%03d.plot",lCell_I);
-	      sprintf(title2,"local-%03d.plot",lCell_I);
-	      fp=fopen(title,"w");
-	      fp2=fopen(title2,"w");
-	      
-	      //for(i=0;i<(numx*numy)/4;i++){
-	      for(i=0;i<ParticlesPerCell/2;i++){    
-		    nump++;
-		    newpindex = rand()%(numx*numy);
-		    //newpindex = i;
-		    xi[0] = 2.0*rand()/(RAND_MAX+1.0)-1.0;
-		    xi[1] = 2.0*rand()/(RAND_MAX+1.0)-1.0;
-		    splitIntParticleByIndexWithinCell( intSwarm, matSwarm, lCell_I, 0, xi );
-		    //if(lCell_I == 0){
-			  //fprintf(fp2,"%lf %lf\n",xi[0],xi[1]);
-		    
-		    //}
-		    splitCount++;
-	      }
-	      
-	      for(i=0;i<nump;i++){
-		    
-		    matParticle = (MaterialPoint*) Swarm_ParticleInCellAt( matSwarm, lCell_I, i );
-		    tparticle = (IntegrationPoint*) Swarm_ParticleInCellAt( intSwarm, lCell_I, i );
-		    //pList[i].x = particle[i]->xi[0];
-		    //pList[i].y = particle[i]->xi[1];
-		    //pList[i].z = particle[i]->xi[2];
-		    //pList[i].index = i; // to track which particle numbers we have after sorting this list */
-		    fprintf(fp,"%lf %lf\n",matParticle->coord[0],matParticle->coord[1]);
-		    fprintf(fp2,"%lf %lf\n",tparticle->xi[0],tparticle->xi[1]);
-		    //free(tparticle);
-	      }
-	      if(splitCount){// then redo Voronoi diagram.
-		    for(k=0;k<nump_orig;k++){
-			  free(bchain[k].new_claimed_cells);
-			  free(bchain[k].new_bound_cells);
-		    }
-		    free(particle);
-		    free(bchain);
-		    free(pList);
-		    if(nump < 3){
-			  Journal_Firewall( 0 , Journal_Register(Error_Type, "PCDVC"), "Something went horribly -wrong- in shotgun part of %s: Problem has an under resolved cell (Cell Id = %d), check or tune your population control parameters\n", __func__, lCell_I );
-		    }
-		    particle = (IntegrationPoint**)malloc((nump)*sizeof(IntegrationPoint*));
-		    // init the data structures
-		    _DVCWeights_InitialiseStructs2D( &bchain, &pList, nump);
-		    // re-initialize the particle positions to be the local coordinates of the material swarm particles
-		    for(i=0;i<nump;i++){
-		    
-			  particle[i] = (IntegrationPoint*) Swarm_ParticleInCellAt( intSwarm, lCell_I, i );
-			  pList[i].x = particle[i]->xi[0];
-			  pList[i].y = particle[i]->xi[1];
-		    
-		    }
-		    _DVCWeights_ResetGrid2D(&cells,numy*numx);
-		    _DVCWeights_CreateVoronoi2D( &bchain, &pList, &cells, dx, dy, nump, numx, numy, BBXMIN, BBXMAX, BBYMIN, BBYMAX);
-		    _DVCWeights_GetCentroids2D( cells, pList,numy,numx,nump,da);
-		    
-		    nump_orig=nump;
-
-	      }
-	      fclose(fp);
-	      fclose(fp2);
-	}//if
-	/**************************************/
-	/**************************************/
-	/*        End 2D Shotgun Method       */
-	/**************************************/
-	/**************************************/
 	/**************************************/
 	/**************************************/
 	/*      End 2D Population Control     */
@@ -1565,7 +1569,14 @@ void _PCDVC_Calculate2D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
 	free(pList);
 	free(deleteList);
 	free(splitList);
-
+	/*
+	FILE *fp;
+	fp=fopen("nump.txt","a");
+	if(lCell_I< 33){
+	      fprintf(fp,"nump = %d cell = %d\n",nump,lCell_I);
+	}
+	fclose(fp);
+	*/
 }
 
 void _PCDVC_Calculate( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ){
