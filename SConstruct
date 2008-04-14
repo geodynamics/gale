@@ -36,9 +36,9 @@ if 'config' in COMMAND_LINE_TARGETS or 'help' in COMMAND_LINE_TARGETS:
         proj.dependency(SConfig.packages.SDL, False, have_define='HAVE_SDL')
         proj.dependency(SConfig.packages.libavcodec, False, have_define='HAVE_LIBAVCODEC')
         proj.dependency(SConfig.packages.libFAME, False, have_define='HAVE_LIBFAME')
-        proj.dependency(SConfig.packages.libPNG, False, have_define='HAVE_LIBPNG')
-        proj.dependency(SConfig.packages.libJPEG, False, have_define='HAVE_LIBJPEG')
-        proj.dependency(SConfig.packages.libTIFF, False, have_define='HAVE_LIBTIFF')
+        proj.dependency(SConfig.packages.libPNG, False, have_define='HAVE_PNG')
+        proj.dependency(SConfig.packages.libJPEG, False, have_define='HAVE_JPEG')
+        proj.dependency(SConfig.packages.libTIFF, False, have_define='HAVE_TIFF')
     env.configure_packages()
 
     # Need to define the extension for shared libraries as well
