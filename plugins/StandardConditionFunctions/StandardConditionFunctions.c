@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StandardConditionFunctions.c 1105 2008-04-14 04:56:24Z DavidLee $
+** $Id: StandardConditionFunctions.c 1106 2008-04-15 02:15:33Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -581,15 +581,17 @@ void StgFEM_StandardConditionFunctions_LinearWithSinusoidalPerturbation( Node_Lo
 	double                  verticalWaveNumber;
 	double                  scaleFactor;
 	double*                 coord;
-	Dimension_Index         dim_I=0;
-	Coord                   relScaledCoord;
-	double			min[3], max[3];
+	Coord                   relScaledCoord; 
+	double			min[3], max[3], topLayerCoord, bottomLayerCoord;
 	
 	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
 	feMesh       = feVariable->feMesh;
 
 	nDims = Mesh_GetDimSize( feMesh );
 	Mesh_GetGlobalCoordRange( feMesh, min, max );
+
+	topLayerCoord = Dictionary_GetDouble_WithDefault( dictionary, "SinusoidalTempIC_TopLayerCoord", max[J_AXIS] );
+	bottomLayerCoord = Dictionary_GetDouble_WithDefault( dictionary, "SinusoidalTempIC_BottomLayerCoord", min[J_AXIS] );
 
 	topLayerBC = Dictionary_GetDouble_WithDefault( dictionary, "SinusoidalTempIC_TopLayerBC", 0.0 );
 	bottomLayerBC = Dictionary_GetDouble_WithDefault( dictionary, "SinusoidalTempIC_BottomLayerBC", 1.0 );
@@ -601,15 +603,21 @@ void StgFEM_StandardConditionFunctions_LinearWithSinusoidalPerturbation( Node_Lo
 	verticalWaveNumber = Dictionary_GetDouble_WithDefault( dictionary, "SinusoidalTempIC_VerticalWaveNumber", 1.0 );
 
 	coord = Mesh_GetVertex( feMesh, node_lI );
-	/* make coord relative to box bottom left corner, then scale from 0 to 1 between box min & max */
-	for( dim_I = 0; dim_I < nDims; dim_I++ ) {
-		relScaledCoord[dim_I] = (coord[dim_I] - min[dim_I]) / (max[dim_I] - min[dim_I]);
+
+	/* if node is outside IC shape set to 0 temperature */
+	if( coord[J_AXIS] > topLayerCoord || coord[J_AXIS] < bottomLayerCoord ) {
+		*result = 0; return ;
 	}
+
+	/* make coord relative to box bottom left corner, then scale from 0 to 1 between box min & max */
+	relScaledCoord[I_AXIS] = (coord[0] - min[0]) / (max[0] - min[0]);
+	relScaledCoord[J_AXIS] = (coord[1] - bottomLayerCoord) / (topLayerCoord - bottomLayerCoord);
+
 
 	/* Note: ok to use the 1.0 below since we've already scaled the coord to somewhere between 0 to 1 */
 	*result = topLayerBC + scaleFactor * ( 1.0 - relScaledCoord[ J_AXIS ] )
 		+ perturbationAmplitude * ( cos( horizontalWaveNumber * M_PI * coord[ I_AXIS ] )
-					    * sin( verticalWaveNumber * M_PI * coord[ J_AXIS ] ) );
+					    * sin( verticalWaveNumber * M_PI * relScaledCoord[ J_AXIS ] ) );
 }
 
 void StgFEM_StandardConditionFunctions_Trigonometry( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
