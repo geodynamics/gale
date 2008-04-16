@@ -95,8 +95,8 @@ void _StgFEM_PeakMemory_Construct( void* componment, Stg_ComponentFactory* cf, v
 */
 	
 	/* Print Header to file */
-	StgFEM_FrequentOutput_PrintString( context, "Stg Memory" );
-	StgFEM_FrequentOutput_PrintString( context, "LA Memory" );
+	StgFEM_FrequentOutput_PrintString( context, "Stg_Memory" );
+	StgFEM_FrequentOutput_PrintString( context, "LA_Memory" );
 	
 	ContextEP_Append( context, AbstractContext_EP_FrequentOutput ,StgFEM_PeakMemory_PrintMemoryInfo );
 }

@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: CPUTime.c 964 2007-10-11 08:03:06Z SteveQuenette $
+** $Id: CPUTime.c 1107 2008-04-16 01:54:15Z BelindaMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -65,7 +65,7 @@ void _StgFEM_CPUTime_Construct( void* componment, Stg_ComponentFactory* cf, void
 	self->initialTime = MPI_Wtime();
 
 	/* Print Header to file */
-	StgFEM_FrequentOutput_PrintString( context, "CPU Time" );
+	StgFEM_FrequentOutput_PrintString( context, "CPU_Time" );
 	
 	ContextEP_Append( context, AbstractContext_EP_FrequentOutput ,StgFEM_CPUTime_PrintTimeInfo );
 }
