@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Context.c 1097 2008-04-04 05:41:18Z BelindaMay $
+** $Id: Context.c 1108 2008-04-17 01:52:41Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -60,7 +60,7 @@
 
 /* Textual name of this class */
 const Type FiniteElementContext_Type = "FiniteElementContext";
-const Name defaultFiniteElementContextETypeRegisterName = "defaultFiniteElementContextETypeRegisterName";
+const Name defaultFiniteElementContextETypeRegisterName = "finiteElementContext";
 const Name FiniteElementContext_EP_CalcDt = "FiniteElementContext_EP_CalcDt";
 
 
