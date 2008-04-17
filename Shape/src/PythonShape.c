@@ -89,7 +89,7 @@ PythonShape* _PythonShape_New(
 		Stg_Component_DestroyFunction*        _destroy,		
 		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
 		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
-		Stg_Shape_DistanceFromCenterAxis*     _distanceFromCenterAxis,
+		Stg_Shape_DistanceFromCenterAxisFunction*     _distanceFromCenterAxis,
 		Name                                  name )
 {
 	PythonShape* self;

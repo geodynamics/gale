@@ -81,7 +81,7 @@
 		Stg_Component_DestroyFunction*        _destroy,		
 		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
 		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
-		Stg_Shape_DistanceFromCenterAxis*     _distanceFromCenterAxis,
+		Stg_Shape_DistanceFromCenterAxisFunction*     _distanceFromCenterAxis,
 		Name                                  name );
 	
 	void _PythonShape_Init( void* pythonShape, char* conditionFunction ) ;
