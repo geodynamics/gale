@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Context.c 1108 2008-04-17 01:52:41Z SteveQuenette $
+** $Id: Context.c 1109 2008-04-17 04:52:30Z BelindaMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -471,17 +471,17 @@ void _FiniteElementContext_SaveFeVariables( void* context ) {
 	char*                     outputPathString = NULL;
 	Index                     outputStrLen = 0;
 
-	outputStrLen = strlen(self->checkpointPath) + 1 + 1;
+	outputStrLen = strlen(self->checkpointWritePath) + 1 + 1;
 	if ( strlen(self->checkPointPrefixString) > 0 ) {
 		outputStrLen += strlen(self->checkPointPrefixString) + 1;
 	}
 	outputPathString = Memory_Alloc_Array( char, outputStrLen, "outputPathString" );
 
 	if ( strlen(self->checkPointPrefixString) > 0 ) {
-		sprintf( outputPathString, "%s/%s.", self->checkpointPath, self->checkPointPrefixString );
+		sprintf( outputPathString, "%s/%s.", self->checkpointWritePath, self->checkPointPrefixString );
 	}
 	else {
-		sprintf( outputPathString, "%s/", self->checkpointPath );
+		sprintf( outputPathString, "%s/", self->checkpointWritePath );
 	}
 
 	/* Save the variables that have had their "isCheckpointedAndReloaded" flag enabled - 
@@ -533,11 +533,11 @@ void _FiniteElementContext_SaveMesh( void* context ) {
 	MPI_Comm_size( self->communicator, &nProcs );	
 
 	if ( strlen(self->checkPointPrefixString) > 0 ) {
-		sprintf( meshSaveFileName, "%s/%s.Mesh.%05d.dat", self->checkpointPath,
+		sprintf( meshSaveFileName, "%s/%s.Mesh.%05d.dat", self->checkpointWritePath,
 			self->checkPointPrefixString, self->timeStep );
 	}
 	else {
-		sprintf( meshSaveFileName, "%s/Mesh.%05d.dat", self->checkpointPath, self->timeStep );
+		sprintf( meshSaveFileName, "%s/Mesh.%05d.dat", self->checkpointWritePath, self->timeStep );
 	}
 
 	fieldVar = FieldVariable_Register_GetByIndex( self->fieldVariable_Register, 0 );
