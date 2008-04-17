@@ -1637,10 +1637,10 @@ void Swarm_ReplaceCurrentParticleLayoutWithFileParticleLayout( void* swarm, void
 	
 	Journal_DPrintf( self->debug, "overriding the particleLayout specified via XML/constructor\n"
 		"of \"%s\" (of type %s) with a FileParticleLayout to load\n"
-		"this swarm's checkpoint file from checkpointPath \"%s\",\n"
+		"this swarm's checkpoint file from checkpointReadPath \"%s\",\n"
 		"with prefix \"%s\" from timestep %u with total name:\n\"%s\"\n",
 		self->particleLayout->name, self->particleLayout->type,
-		context->checkpointPath,
+		context->checkpointReadPath,
 		context->checkPointPrefixString, context->restartTimestep,
 		swarmSaveFileName );
 
@@ -1658,11 +1658,11 @@ void Swarm_ReplaceCurrentParticleLayoutWithFileParticleLayout( void* swarm, void
 
 void Swarm_GetCheckpointFilenameForGivenTimestep( Swarm* self, AbstractContext* context, char* swarmSaveFileName ) {
 	if ( strlen(context->checkPointPrefixString) > 0 ) {
-		sprintf( swarmSaveFileName, "%s/%s.%s.%05d.dat", context->checkpointPath,
+		sprintf( swarmSaveFileName, "%s/%s.%s.%05d.dat", context->checkpointReadPath,
 			context->checkPointPrefixString, self->name, context->restartTimestep );
 	}
 	else {
-		sprintf( swarmSaveFileName, "%s/%s.%05d.dat", context->checkpointPath,
+		sprintf( swarmSaveFileName, "%s/%s.%05d.dat", context->checkpointReadPath,
 			self->name, context->restartTimestep );
 	}
 }
