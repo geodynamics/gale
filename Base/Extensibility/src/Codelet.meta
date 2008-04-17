@@ -14,7 +14,9 @@
 <param name="Reference">None</param>
 <param name="Summary">Codelets are components that are used to encapsulate the concerns of a plugin into one object.</param>
 <param name="Description">
-Codelets are essentially nothing more than Components that are used for encapsulating the concerns/features of a plugin into one object. The plugin registration process expects Codelet to be submitted for addition to the component factory. Codelets are assumed to be instantiated only one (i.e. are singletons) by the system.
+<p>Codelets are essentially nothing more than Components that are used for encapsulating the concerns/features of a plugin into one object. The plugin registration process expects Codelet to be submitted for addition to the component factory. Codelets are assumed to be instantiated only one (i.e. are singletons) by the system.</p>
+
+<p>A Codelet is an abstract class that is used in the C API and not directly in the XML model description files</p>
 </param>
 
 
