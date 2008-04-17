@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Object.c 3462 2006-02-19 06:53:24Z WalterLandry $
+** $Id: Object.c 4253 2008-04-17 01:50:25Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -47,6 +47,8 @@
 
 const Type Stg_Object_Type = "Stg_Object";
 
+Index _Stg_Object_Counter = 0;
+static const char _Stg_Object_Unnamed[] = "Unnamed";
 
 Stg_Object* _Stg_Object_New( 
 		SizeT				_sizeOfSelf, 
@@ -78,11 +80,16 @@ void _Stg_Object_Init( Stg_Object* self, Name name, AllocationType nameAllocatio
 	/* General and Virtual info should already be set */
 	
 	/* Stg_Object info */
-	assert( name );
-	if ( GLOBAL == nameAllocationType )
+	if( !name || strlen( name ) == 0 ) {
+		Stg_asprintf( &self->name, "%s-%u", _Stg_Object_Unnamed, _Stg_Object_Counter );
+		_Stg_Object_Counter += 1;
+	}
+	else if ( GLOBAL == nameAllocationType ) {
 		self->name = name;
-	else
+	}
+	else {
 		self->name = StG_Strdup( name );
+	}
 
 	self->nameAllocationType = nameAllocationType;	
 }
