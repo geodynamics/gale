@@ -62,7 +62,7 @@ const Type ModulesManager_Type = "ModulesManager";
 
 /* For when compiling a single a single executable (no loading of modules at runtime */
 /* This is mainly for platforms which does not support dynamic libs */
-void SingleRegister( void* context );
+void SingleRegister();
 
 
 const char* Codelet_GetMetadata();
@@ -178,7 +178,7 @@ Dictionary_Entry_Value* ModulesManager_GetModulesList( void* modulesManager, voi
 }
 
 
-void ModulesManager_Load( void* modulesManager, void* context, void* _dictionary ) {
+void ModulesManager_Load( void* modulesManager, void* _dictionary ) {
 	ModulesManager*			self = (ModulesManager*)modulesManager;
 	Dictionary*			dictionary = (Dictionary*)_dictionary;
 	unsigned int			entryCount;
@@ -193,7 +193,7 @@ void ModulesManager_Load( void* modulesManager, void* context, void* _dictionary
 	Index dir_I;
 	
 #ifdef SINGLE_EXE
-	SingleRegister( context );
+	SingleRegister();
 #else
 	if( dictionary ) {
 		Dictionary_Entry_Value* localLibDirList = Dictionary_Get( dictionary, "LD_LIBRARY_PATH" );
@@ -252,7 +252,7 @@ void ModulesManager_Load( void* modulesManager, void* context, void* _dictionary
 		Name		moduleName;
 		moduleName = Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( modulesVal, entry_I ) );
 
-		if ( ! ModulesManager_LoadModule( self, moduleName, context ) ) {
+		if ( ! ModulesManager_LoadModule( self, moduleName ) ) {
 			Journal_Firewall(
 				0,
 				Journal_Register( Info_Type, self->type ),
@@ -273,7 +273,7 @@ void ModulesManager_Load( void* modulesManager, void* context, void* _dictionary
 #endif /* ifdef SINGLE_EXE */
 }
 
-Bool ModulesManager_LoadModule( void* modulesManager, Name moduleName, void* _context ) {
+Bool ModulesManager_LoadModule( void* modulesManager, Name moduleName ) {
 	ModulesManager*	self = (ModulesManager*)modulesManager;
 	Module* theModule;
 
@@ -333,7 +333,7 @@ Bool ModulesManager_LoadModule( void* modulesManager, Name moduleName, void* _co
 			version = (depVersion == NULL) ? NULL : Dictionary_Entry_Value_AsString( depVersion );
 			url = (depUrl == NULL) ? NULL : Dictionary_Entry_Value_AsString( depUrl );
 
-			if ( ! ModulesManager_LoadModule( self, name, _context ) ) {
+			if ( ! ModulesManager_LoadModule( self, name ) ) {
 				Journal_Printf( stream, "Dependency %s failed to load\n", name );
 				Stg_Class_Delete( theModule );
 				return False;

@@ -6,9 +6,7 @@
 **	Stevan M. Quenette, Senior Software Engineer, VPAC. (steve@vpac.org)
 **	Patrick D. Sunter, Software Engineer, VPAC. (pds@vpac.org)
 **	Luke J. Hodkinson, Computational Engineer, VPAC. (lhodkins@vpac.org)
-**	Siew-Ching Tan, Software Engineer, VPAC. (siew@vpac.org)
 **	Alan H. Lo, Computational Engineer, VPAC. (alan@vpac.org)
-**	Raquibul Hassan, Computational Engineer, VPAC. (raq@vpac.org)
 **
 **  This library is free software; you can redistribute it and/or
 **  modify it under the terms of the GNU Lesser General Public
@@ -23,49 +21,12 @@
 **  You should have received a copy of the GNU Lesser General Public
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-**
-*/
-/** \file
-** <b>Role:</b>
-**	External header file to this library.
-**
-** <b>Assumptions:</b>
-**	None.
-**
-** <b>Comments:</b>
-**	None.
-**
-** $Id: IO.h 4259 2008-04-17 12:26:22Z SteveQuenette $
-**
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_IO_h__
-#define __Base_IO_h__
+#ifndef __Base_IO_CmdLineArgs_h__
+#define __Base_IO_CmdLineArgs_h__
 	
-	#include "types.h"
-	#include "shortcuts.h"
-	#include "Dictionary.h"
-	#include "Dictionary_Entry.h"
-	#include "Dictionary_Entry_Value.h"
-	#include "IO_Handler.h"
-	#include "XML_IO_Handler.h"
-	#include "Init.h"
-	#include "Journal.h"
-	#include "JournalFile.h"
-	#include "CFile.h"
-	#include "MPIFile.h"
-	#include "Stream.h"
-	#include "CStream.h"
-	#include "MPIStream.h"
-	#include "StreamFormatter.h"
-	#include "LineFormatter.h"
-	#include "IndentFormatter.h"
-	#include "RankFormatter.h"
-	#include "PathUtils.h"
-	#include "CmdLineArgs.h"
-	#include "Finalise.h"
+	void stgRemoveCmdLineArg( int* argc, char** argv[], int index );
+	char* stgParseHelpCmdLineArg( int* argc, char** argv[] );
 
-	#include "StGermain/Base/IO/mpirecord/mpimessaging.h"
-
-#endif /* __Base_IO_h__ */
-
+#endif /* __Base_IO_CmdLineArgs_h__ */

@@ -24,48 +24,57 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-*/
-/** \file
-** <b>Role:</b>
-**	External header file to this library.
-**
-** <b>Assumptions:</b>
-**	None.
-**
-** <b>Comments:</b>
-**	None.
-**
-** $Id: IO.h 4259 2008-04-17 12:26:22Z SteveQuenette $
+** $Id: Dictionary.c 4096 2007-05-16 00:54:10Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_IO_h__
-#define __Base_IO_h__
-	
-	#include "types.h"
-	#include "shortcuts.h"
-	#include "Dictionary.h"
-	#include "Dictionary_Entry.h"
-	#include "Dictionary_Entry_Value.h"
-	#include "IO_Handler.h"
-	#include "XML_IO_Handler.h"
-	#include "Init.h"
-	#include "Journal.h"
-	#include "JournalFile.h"
-	#include "CFile.h"
-	#include "MPIFile.h"
-	#include "Stream.h"
-	#include "CStream.h"
-	#include "MPIStream.h"
-	#include "StreamFormatter.h"
-	#include "LineFormatter.h"
-	#include "IndentFormatter.h"
-	#include "RankFormatter.h"
-	#include "PathUtils.h"
-	#include "CmdLineArgs.h"
-	#include "Finalise.h"
+#include <string.h>
 
-	#include "StGermain/Base/IO/mpirecord/mpimessaging.h"
+#include "Base/Foundation/Foundation.h"
 
-#endif /* __Base_IO_h__ */
+
+void stgRemoveCmdLineArg( int* argc, char** argv[], int index ) {
+	if( index > 0 && index < *argc ) {
+		Index i;
+		void* tmpPtr = (*argv)[index];
+
+		for( i = index; i < *argc - 1; i++ ) {
+			(*argv)[i] = (*argv)[i+1];
+		}
+
+		(*argv)[*argc-1] = tmpPtr;
+		*argc -= 1;
+	}
+}
+
+
+char* stgParseHelpCmdLineArg( int* argc, char** argv[] ) {
+	Index                   arg_I;
+
+	/* Loop over all the arguments from command line and reads all arguments of form "--help topic" */
+	for( arg_I = 1 ; arg_I < *argc; arg_I++ ) {
+		char*                   valueString = 0;
+		char*                   argumentString = (*argv)[arg_I];
+		const char*             preceedingString = "--help";
+		unsigned int            preceedingStringLength = strlen( preceedingString );
+
+		/* Check is string has preceeding string is "--help" if not then continue in loop */
+		if( strncmp( preceedingString, argumentString , preceedingStringLength ) != 0 ) {
+			continue;
+		}
+		if( strlen( argumentString ) != strlen( preceedingString ) ) {
+			continue;
+		}
+		if( arg_I >= (*argc - 1) ) {
+			continue;
+		}
+
+		valueString = StG_Strdup( (*argv)[arg_I+1] );
+		stgRemoveCmdLineArg( argc, argv, arg_I ); /* first argument: --help */
+		stgRemoveCmdLineArg( argc, argv, arg_I ); /* second argument: topic */
+		return valueString;		
+	}
+
+	return 0;
+}
 

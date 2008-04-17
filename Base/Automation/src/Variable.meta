@@ -48,7 +48,6 @@
 		<param name="Description">The count of subcomponents inside this Variable that are also to become variables.</param>
 	</struct>
 	<struct>
-		<param 
 		<param name="Name">names</param>
 		<param name="Type">list</param>
 		<param name="Default">(empty)</param>
@@ -89,7 +88,7 @@ This example is based on the sourcecode in ~/code/StGermain/Base/Automation/test
 <p>
 /* Construct phase */
 double* velocity;
-Variable_NewVector("velocity", Variable_DataType_Double, 3, &aSize[1], (void**)&velocity, vr, "vx", "vy", "vz");
+Variable_NewVector("velocity", Variable_DataType_Double, 3, &amp;aSize[1], (void**)&amp;velocity, vr, "vx", "vy", "vz");
 
 /* Build phase*/
 velocity = malloc(...);

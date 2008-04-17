@@ -60,6 +60,7 @@ int main( int argc, char* argv[] ) {
 	Dictionary*			dictionary;
 	XML_IO_Handler*			ioHandler;
 	Stream*                         stream;
+	char*                           helpTopic;
 
 	/* Initialise PETSc, get world info */
 	MPI_Init( &argc, &argv );
@@ -80,7 +81,26 @@ int main( int argc, char* argv[] ) {
 	IO_Handler_ReadAllFromCommandLine( ioHandler, argc, argv, dictionary );
 	Journal_ReadFromDictionary( dictionary );
 	
-	stgMainLoop( dictionary, CommWorld );
+	/* if the command line arguments ask for help, then load the toolboxes and plugins (to include all symbols/components, and
+	   print the help for the selected component */
+	helpTopic = stgParseHelpCmdLineArg( &argc, &argv );
+	if( helpTopic ) {
+		PluginsManager* plugins = PluginsManager_New();
+		Stg_ComponentMeta* metaTest;
+
+		ModulesManager_Load( stgToolboxesManager, dictionary );
+		ModulesManager_Load( plugins, dictionary );
+
+		metaTest = Stg_Component_CreateMeta( NULL, helpTopic );
+		Stg_Class_Print( metaTest, stream );
+
+		Stg_Class_Delete( metaTest );
+		Stg_Class_Delete( plugins );
+		Memory_Free( helpTopic );
+	}
+	else {
+		stgMainLoop( dictionary, CommWorld );
+	}
 	
 	Stg_Class_Delete( dictionary );
 	

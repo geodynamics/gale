@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AbstractContext.c 4255 2008-04-17 04:49:17Z BelindaMay $
+** $Id: AbstractContext.c 4259 2008-04-17 12:26:22Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -844,7 +844,7 @@ void _AbstractContext_Construct_Hook( void* context, void* ptrToContext ) {
 	LiveComponentRegister_Add( self->CF->LCRegister, (Stg_Component*)self );
 	
 	/* Boot up the toolboxes desired by this context (dictionary) */
-	ModulesManager_Load( stgToolboxesManager, context, self->dictionary );
+	ModulesManager_Load( stgToolboxesManager, self->dictionary );
 	/* SPECIAL BIT!
 	   Now that the toolboxes are loaded, now "contruct" each toolbox, ensuring that we "RE-construct" the context in the 
 	   reverse order of the toolboxes. Ensuring that only the first (i.e. largest context) toolbox builds a new context.
@@ -872,7 +872,7 @@ void _AbstractContext_Construct_Hook( void* context, void* ptrToContext ) {
 	}
 		
 	/* Load the plugins desired by this context (dictionary) */
-	ModulesManager_Load( self->plugins, context, self->dictionary );
+	ModulesManager_Load( self->plugins, self->dictionary );
 
 	Stg_ComponentFactory_CreateComponents( self->CF );
 	Stg_ComponentFactory_ConstructComponents( self->CF, ptrToSelf );

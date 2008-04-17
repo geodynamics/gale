@@ -95,11 +95,11 @@
 	/** Get the modules list from the dictionary */
 	Dictionary_Entry_Value* ModulesManager_GetModulesList( void* modulesManager, void* dictionary );
 	
-	/** Load the specified modules from the dictionary attaching the codelets (components) onto a specified context */ 
-	void ModulesManager_Load( void* modulesManager, void* _context, void* dictionary );
+	/** Load the specified modules from the dictionary attaching the codelets (components) */ 
+	void ModulesManager_Load( void* modulesManager, void* dictionary );
 
-	/** Load a module attaching the codelet (compoent) onto a specified context */
-	Bool ModulesManager_LoadModule( void* modulesManager, Name moduleName, void* _context );
+	/** Load a module attaching the codelet (component) */
+	Bool ModulesManager_LoadModule( void* modulesManager, Name moduleName );
 
 	/** Unload a module */
 	Bool ModulesManager_UnloadModule( void* modulesManager, Name moduleName );
