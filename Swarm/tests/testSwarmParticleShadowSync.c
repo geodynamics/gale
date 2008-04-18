@@ -166,7 +166,7 @@ int main( int argc, char* argv[] ) {
 	cf = context->CF = Stg_ComponentFactory_New( dictionary, componentDict, context->register_Register );
 
 	LiveComponentRegister_Add( cf->LCRegister, (Stg_Component*) context );
-	ModulesManager_Load( context->plugins, context, dictionary );
+	ModulesManager_Load( context->plugins, dictionary );
 
 	extensionMgr_Register = ExtensionManager_Register_New();
 	swarmVariable_Register = SwarmVariable_Register_New( NULL );
