@@ -30,6 +30,8 @@
 			<param name="Type">lucVectorArrows</param>
 			<param name="VectorVariable">VelocityField</param>
 			<param name="Colour">black</param>
+			<param name="resolutionX">16</param>	
+			<param name="resolutionY">16</param>	
 			<param name="arrowHeadSize">0.15</param>	
 			<param name="lengthScale">0.15</param>	
 		</struct>

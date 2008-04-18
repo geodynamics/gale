@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: DruckerPrager.c 696 2008-04-03 01:17:37Z LouisMoresi $
+** $Id: DruckerPrager.c 715 2008-04-18 02:33:59Z LouisMoresi $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -119,12 +119,11 @@ void _DruckerPrager_Init(
 	DruckerPrager_Particle*   particleExt;
 	StandardParticle          materialPoint;
 	
-	self->particleExtHandle       = ExtensionManager_Add( materialPointsSwarm->particleExtensionMgr,
+	self->particleExtHandle = ExtensionManager_Add( materialPointsSwarm->particleExtensionMgr,
 		DruckerPrager_Type, sizeof(DruckerPrager_Particle) );
 		
 	/* Assign Pointers */
-	self->pressureField      = pressureField;
-
+	self->pressureField       = pressureField;
 	self->frictionCoefficient = frictionCoefficient;
 	
 	/* Strain softening of Friction - (linear weakening is assumed) */
@@ -195,15 +194,17 @@ void _DruckerPrager_Construct( void* druckerPrager, Stg_ComponentFactory* cf, vo
 	_VonMises_Construct( self, cf, data );
 	
 	/* TODO: KeyFallback soon to be deprecated/updated */
-	pressureField      = Stg_ComponentFactory_ConstructByNameWithKeyFallback(
-                        cf, self->name, "PressureField", "PressureField", FeVariable, True, data );
-	/*pressureField      = Stg_ComponentFactory_ConstructByKey( 
-			cf, self->name, "PressureField", FeVariable, True );*/
+	/* pressureField      = Stg_ComponentFactory_ConstructByNameWithKeyFallback(
+                        cf, self->name, "PressureField", "PressureField", FeVariable, True, data ); */
+	
+	pressureField      = (FeVariable *) 
+			Stg_ComponentFactory_ConstructByKey( cf, self->name, "PressureField", 		FeVariable, 		 True, data );
+			
 	materialPointsSwarm     = (MaterialPointsSwarm*)
 			Stg_ComponentFactory_ConstructByKey( cf, self->name, "MaterialPointsSwarm", MaterialPointsSwarm, True, data );
 
 	context = (FiniteElementContext*)
-	Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data ); 
+			Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data ); 
 		
 	_DruckerPrager_Init( self, 
 			pressureField,

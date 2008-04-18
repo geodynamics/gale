@@ -18,12 +18,12 @@
 			<param name="maskValue">1</param>
 			<param name="maskType">EqualTo</param>
 			<param name="colour">Green</param>
-			<param name="pointSize">2.0</param>
+			<param name="pointSize">1.0</param>
 		</struct>		
 		<struct name="hyborder">
 			<param name="Type">lucFieldVariableBorder</param>
 			<param name="FieldVariable">VelocityField</param>
-			<param name="lineWidth">4</param>
+			<param name="lineWidth">1</param>
 		</struct>
 		<struct name="hymtitle">
 			<param name="Type">lucTitle</param>
@@ -32,7 +32,7 @@
 		<!-- Viewport -->
 		<struct name="ParticleHasYieldedVP">
 			<param name="Type">lucViewport</param>
-			<param name="Camera">camerahasyielded</param>
+			<param name="Camera">camera</param>
 			<list name="DrawingObject">
 				<param>hymtitle</param>
 				<param>hyparticleDots</param>
