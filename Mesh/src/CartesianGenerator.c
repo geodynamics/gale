@@ -191,9 +191,10 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
 	Stream*			errorStream = Journal_Register( Error_Type, self->type );
 	unsigned		d_i, i;
 	unsigned 		restartTimestep;
-	char 			meshSaveFileName[256];
-	char			checkpointPath[256];
-	char			checkpointPrefix[256];
+	char* 			meshSaveFileName;
+	char*			checkpointPath;
+	char*			checkpointPrefix;
+	Index                   meshStrLen;
 	
 	assert( self && Stg_CheckType( self, CartesianGenerator ) );
 	assert( cf );
@@ -278,11 +279,17 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
 			crdMax[d_i] = Dictionary_Entry_Value_AsDouble( tmp );
 		}
 
-		restartTimestep = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "restartTimestep", 1 );	
+		restartTimestep = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "restartTimestep", 0 );	
 		if( restartTimestep ) {
-			strcpy( checkpointPath, Stg_ComponentFactory_GetRootDictString( cf, "checkpointReadPath", Stg_ComponentFactory_GetRootDictString( cf, "checkpointPath", Stg_ComponentFactory_GetRootDictString( cf, "outputPath", "" ) ) ) );
-			strcpy( checkpointPrefix, Stg_ComponentFactory_GetRootDictString( cf, "checkPointPrefixString", "" ) );
-			
+			checkpointPath = Stg_ComponentFactory_GetRootDictString( cf, "checkpointReadPath", "./" );
+			checkpointPrefix = Stg_ComponentFactory_GetRootDictString( cf, "checkPointPrefixString", "" );
+
+			meshStrLen = strlen(checkpointPath) + 2 + 5 + 5 + 4;
+			if ( strlen(checkpointPrefix) > 0 ) {
+				meshStrLen += strlen(checkpointPrefix) + 1;
+			}
+			meshSaveFileName = Memory_Alloc_Array( char, meshStrLen, "Construct_meshSaveFileName" );
+
 			if ( strlen(checkpointPrefix) > 0 ) {
 				sprintf( meshSaveFileName, "%s/%s.Mesh.%05d.dat", checkpointPath,
 					checkpointPrefix, restartTimestep );
@@ -316,6 +323,8 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
 				}
 				fclose( meshFile );
 			}
+
+			Memory_Free( meshSaveFileName );
 		}	
 	
 		/* Initial setup. */
@@ -1981,7 +1990,8 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
 	double*         	vert;
 	unsigned        	gNode;
 	AbstractContext* 	context = (AbstractContext*)data;
-	char 			meshSaveFileName[256];
+	char* 			meshSaveFileName;
+	Index			meshStrLen;
 	Stream*			errorStream = Journal_Register( Error_Type, self->type );
 	int			myRank, nProcs, i, prevProcs;
 	double 			temp;
@@ -2016,6 +2026,12 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
 		MPI_Comm_rank( self->mpiComm, &myRank );
 		MPI_Comm_size( self->mpiComm, &nProcs );
 		
+		meshStrLen = strlen(context->checkpointReadPath)  + 2 + 5 + 5 + 4;
+		if ( strlen(context->checkPointPrefixString) > 0 ) {
+			meshStrLen += strlen(context->checkPointPrefixString) + 1;
+		}
+		meshSaveFileName = Memory_Alloc_Array( char, meshStrLen, "GenGeom_meshSaveFileName" );
+
 		if ( strlen( context->checkPointPrefixString ) > 0 ) {
 			sprintf( meshSaveFileName, "%s/%s.Mesh.%05d.dat", context->checkpointReadPath,
 				context->checkPointPrefixString, context->restartTimestep, myRank );
@@ -2085,6 +2101,8 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
 		if ( myRank != nProcs - 1 ) {
 			MPI_Ssend( &offset, 1, MPI_INT, myRank + 1, OFFSET_TAG, self->mpiComm );
 		}
+
+		Memory_Free( meshSaveFileName );
 	}
 	else {
 		CartesianGenerator_CalcGeom( self, mesh, sync, grid, inds, steps );
