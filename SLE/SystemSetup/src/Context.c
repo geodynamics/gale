@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Context.c 1109 2008-04-17 04:52:30Z BelindaMay $
+** $Id: Context.c 1110 2008-04-18 02:04:27Z BelindaMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -519,7 +519,8 @@ void _FiniteElementContext_SaveMesh( void* context ) {
 	Mesh* 			mesh;
 	unsigned 		nDims;
 	Stream*         	info = Journal_Register( Info_Type, "Context" );
-	char			meshSaveFileName[256];
+	char*			meshSaveFileName;
+	Index			meshStrLen;
 	unsigned		n_i, d_i;
 	Sync*			sync;
 	int 			myRank, nProcs, i;
@@ -532,6 +533,12 @@ void _FiniteElementContext_SaveMesh( void* context ) {
 	MPI_Comm_rank( self->communicator, &myRank);
 	MPI_Comm_size( self->communicator, &nProcs );	
 
+	meshStrLen = strlen(self->checkpointReadPath) + 2 + 5 + 5 + 4;
+	if ( strlen(self->checkPointPrefixString) > 0 ) {
+		meshStrLen += strlen(self->checkPointPrefixString) + 1;
+	}
+	meshSaveFileName = Memory_Alloc_Array( char, meshStrLen, "SaveMesh-meshSaveFileName" );
+	
 	if ( strlen(self->checkPointPrefixString) > 0 ) {
 		sprintf( meshSaveFileName, "%s/%s.Mesh.%05d.dat", self->checkpointWritePath,
 			self->checkPointPrefixString, self->timeStep );
@@ -590,6 +597,7 @@ void _FiniteElementContext_SaveMesh( void* context ) {
 		}
 	}
 	
+	Memory_Free( meshSaveFileName );
 	Journal_Printf( info, "%s: saving of mesh completed.\n", __func__ );
 }
 
