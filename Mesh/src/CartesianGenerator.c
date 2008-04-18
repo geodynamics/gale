@@ -280,7 +280,7 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
 
 		restartTimestep = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "restartTimestep", 1 );	
 		if( restartTimestep ) {
-			strcpy( checkpointPath, Stg_ComponentFactory_GetRootDictString( cf, "checkpointPath", "" ) );
+			strcpy( checkpointPath, Stg_ComponentFactory_GetRootDictString( cf, "checkpointReadPath", Stg_ComponentFactory_GetRootDictString( cf, "checkpointPath", Stg_ComponentFactory_GetRootDictString( cf, "outputPath", "" ) ) ) );
 			strcpy( checkpointPrefix, Stg_ComponentFactory_GetRootDictString( cf, "checkPointPrefixString", "" ) );
 			
 			if ( strlen(checkpointPrefix) > 0 ) {
@@ -2017,11 +2017,11 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
 		MPI_Comm_size( self->mpiComm, &nProcs );
 		
 		if ( strlen( context->checkPointPrefixString ) > 0 ) {
-			sprintf( meshSaveFileName, "%s/%s.Mesh.%05d.dat", context->checkpointPath,
+			sprintf( meshSaveFileName, "%s/%s.Mesh.%05d.dat", context->checkpointReadPath,
 				context->checkPointPrefixString, context->restartTimestep, myRank );
 		}
 		else {
-			sprintf( meshSaveFileName, "%s/Mesh.%05d.dat", context->checkpointPath,
+			sprintf( meshSaveFileName, "%s/Mesh.%05d.dat", context->checkpointReadPath,
 				context->restartTimestep, myRank );
 		}
 
