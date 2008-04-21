@@ -9,6 +9,10 @@ HDRS := $(wildcard *.h)
 
 packages = STGDOMAIN STGERMAIN MPI XML TIFF JPEG PNG LIBFAME LIBAVCODEC
 
+ifdef HAVE_GL2PS
+	packages += GL2PS
+endif
+
 # Work out name to call library
 lib = luc$(shell basename `pwd | sed s/src//g`)
 libdynamic = yes

@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: OpenGlUtil.h 520 2006-03-15 05:36:31Z LouisMoresi $
+** $Id: OpenGlUtil.h 768 2008-04-21 03:20:07Z JohnMansour $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -47,7 +47,14 @@
 #ifndef __lucRenderingEngines_OpenGlUtil_h__
 #define __lucRenderingEngines_OpenGlUtil_h__
 
-#define lucPrintString( A )        glCallLists( strlen( A ), GL_UNSIGNED_BYTE, A )
+#ifdef HAVE_GL2PS
+/* call to gl2pText is required for text output using vector formats, 
+ * as no text is stored in the GL feedback buffer */  
+	#define lucPrintString( A )       gl2psText( A, "Times-Roman", 16); glCallLists( strlen( A ), GL_UNSIGNED_BYTE, A )
+#else
+	#define lucPrintString( A )       glCallLists( strlen( A ), GL_UNSIGNED_BYTE, A )
+#endif
+
 /* Big hack !! - Assumes that font width is 10 pixels - this is hardly ever true */
 #define lucStringWidth( A )     (strlen( A ) * 10) 
 

@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: types.h 510 2006-02-17 04:33:32Z RobertTurnbull $
+** $Id: types.h 768 2008-04-21 03:20:07Z JohnMansour $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -47,6 +47,7 @@
 #ifndef __lucOutputFormats_types_h__
 #define __lucOutputFormats_types_h__
 
+	typedef struct lucOutputVECTOR        lucOutputVECTOR;
 	typedef struct lucOutputPPM           lucOutputPPM;
 	typedef struct lucOutputPNG           lucOutputPNG;
 	typedef struct lucOutputJPEG          lucOutputJPEG;

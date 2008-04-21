@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: ColourBar.c 740 2007-10-11 08:05:31Z SteveQuenette $
+** $Id: ColourBar.c 768 2008-04-21 03:20:07Z JohnMansour $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -50,6 +50,10 @@
 
 #include <glucifer/Base/Base.h>
 #include <glucifer/RenderingEngines/RenderingEngines.h>
+
+#ifdef HAVE_GL2PS
+	#include <gl2ps.h>
+#endif
 
 #include "types.h"
 #include "ColourBar.h"

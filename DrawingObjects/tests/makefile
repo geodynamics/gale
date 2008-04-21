@@ -19,6 +19,10 @@ ifdef HAVE_GL
 	packages += GL
 endif
 
+ifdef HAVE_GL2PS
+	packages += GL2PS
+endif
+
 packages += PETSC MPI XML 
 
 tests = lib${PROJECT}_DrawingObjects

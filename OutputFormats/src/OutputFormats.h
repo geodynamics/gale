@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: OutputFormats.h 510 2006-02-17 04:33:32Z RobertTurnbull $
+** $Id: OutputFormats.h 768 2008-04-21 03:20:07Z JohnMansour $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -49,6 +49,7 @@
 
 
 #include "types.h"
+#include "OutputVECTOR.h"
 #include "OutputPPM.h"
 #include "OutputPNG.h"
 #include "OutputJPEG.h"

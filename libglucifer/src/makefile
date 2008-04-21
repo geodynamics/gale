@@ -73,6 +73,10 @@ ifdef HAVE_LIBAVCODEC
 	packages += LIBAVCODEC
 endif
 
+ifdef HAVE_GL2PS
+	packages += GL2PS
+endif
+
 ifdef HAVE_VTK
 	packages += VTK
 endif

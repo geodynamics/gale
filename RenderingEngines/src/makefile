@@ -13,6 +13,10 @@ ifdef HAVE_VTK
 	packages += VTK
 endif
 
+ifdef HAVE_GL2PS
+	packages += GL2PS
+endif
+
 # Work out name to call library
 lib = luc$(shell basename `pwd | sed s/src//g`)
 libdynamic = yes

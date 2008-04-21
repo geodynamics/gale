@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: Init.c 740 2007-10-11 08:05:31Z SteveQuenette $
+** $Id: Init.c 768 2008-04-21 03:20:07Z JohnMansour $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -57,10 +57,15 @@ Bool lucOutputFormats_Init() {
 	Stg_ComponentRegister* componentRegister = Stg_ComponentRegister_Get_ComponentRegister();
 
 	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
-	
+
 	Stg_ComponentRegister_Add( componentRegister, lucOutputPPM_Type,      "0", _lucOutputPPM_DefaultNew );
 	RegisterParent( lucOutputPPM_Type,         lucOutputFormat_Type );
-		
+
+	#ifdef HAVE_GL2PS
+	  Stg_ComponentRegister_Add( componentRegister, lucOutputVECTOR_Type,      "0", _lucOutputVECTOR_DefaultNew );
+	  RegisterParent( lucOutputVECTOR_Type,         lucOutputFormat_Type );
+	#endif
+
 	#ifdef HAVE_PNG
 	   Stg_ComponentRegister_Add( componentRegister, lucOutputPNG_Type,      "0", _lucOutputPNG_DefaultNew );
 	   RegisterParent( lucOutputPNG_Type,         lucOutputFormat_Type );

@@ -12,6 +12,10 @@ subdirs = DummyOpenGL
 
 packages = STGDOMAIN STGERMAIN GL PETSC MPI XML 
 
+ifdef HAVE_GL2PS
+	packages += GL2PS
+endif
+
 tests = lib${PROJECT}_RenderingEngines
 SRCS = $(wildcard *.c)
 checks = $(wildcard *.sh)

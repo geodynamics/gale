@@ -51,6 +51,10 @@
 #include <glucifer/Base/Base.h>
 #include <glucifer/RenderingEngines/RenderingEngines.h>
 
+#ifdef HAVE_GL2PS
+	#include <gl2ps.h>
+#endif
+
 #include "types.h"
 #include "OpenGLDrawingObject.h"
 #include "Axis.h"

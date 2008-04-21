@@ -39,6 +39,10 @@ ifdef HAVE_LIBAVCODEC
 	packages += LIBAVCODEC
 endif
 
+ifdef HAVE_GL2PS
+	packages += GL2PS
+endif
+
 packages += PETSC MPI XML
 
 include ${PROJ_ROOT}/Makefile.vmake

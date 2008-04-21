@@ -16,7 +16,7 @@
 ## Role:
 ##	Obtain the project configuration.
 ##
-## $Id: project-config.sh 740 2007-10-11 08:05:31Z SteveQuenette $
+## $Id: project-config.sh 768 2008-04-21 03:20:07Z JohnMansour $
 ##
 ##
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -54,4 +54,5 @@ setValue  PROJECT 'glucifer'
 . ./VMake/Config/OpenGl-config.sh
 . ./VMake/Config/X11-config.sh
 . ./VMake/Config/ImageFormats-config.sh
+. ./VMake/Config/gl2ps-config.sh
 

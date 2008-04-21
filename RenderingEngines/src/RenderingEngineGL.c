@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: RenderingEngineGL.c 740 2007-10-11 08:05:31Z SteveQuenette $
+** $Id: RenderingEngineGL.c 768 2008-04-21 03:20:07Z JohnMansour $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -58,6 +58,10 @@
 #include <gl.h>
 #include <glu.h>
 #include <string.h>
+
+#ifdef HAVE_GL2PS
+	#include <gl2ps.h>
+#endif
 
 #ifndef MASTER
 	#define MASTER 0
@@ -178,7 +182,8 @@ void _lucRenderingEngineGL_Render( void* renderingEngine, lucWindow* window, Abs
 	Viewport_Index        viewport_I;
 	Viewport_Index        viewportCount     = window->viewportCount;
 	lucViewportInfo*      viewportInfo;
-
+	GLint                 viewport_gl2ps[4], state;
+	
 	Journal_DPrintfL( lucDebug, 2, "In func: %s for %s '%s'\n", __func__, self->type, self->name );
 	Stream_Indent( lucDebug );
 
@@ -217,7 +222,17 @@ void _lucRenderingEngineGL_Render( void* renderingEngine, lucWindow* window, Abs
 			Stream_UnIndent( lucDebug );
 			continue;
 		}
-
+		
+		#ifdef HAVE_GL2PS
+			/* calls to gl2ps so that different viewports are created for vector image outputs */
+			glGetIntegerv(GL_VIEWPORT, viewport_gl2ps);
+			state = gl2psBeginViewport(viewport_gl2ps);
+			if(state == 5)
+				Journal_Printf( Journal_MyStream( Error_Type, self ), "\nError. Insufficient GL feedback buffer size. \ 
+										       \nConsider increasing the OutputVECTOR buffersize. \
+										      \nVector image will not be created correctly.\n\n" );
+		#endif
+		
 		lucRenderingEngineGL_Clear( self, window );
 
 		if (context->rank == MASTER)
@@ -247,6 +262,14 @@ void _lucRenderingEngineGL_Render( void* renderingEngine, lucWindow* window, Abs
 
 		Stream_UnIndent( lucDebug );
 		Journal_DPrintfL( lucDebug, 2, "Finised loop.\n" );
+
+		#ifdef HAVE_GL2PS		
+			state = gl2psEndViewport();
+			if(state == 5)
+				Journal_Printf( Journal_MyStream( Error_Type, self ), "\nError. Insufficient GL feedback buffer size. \ 
+										       \nConsider increasing the OutputVECTOR buffersize. \
+										      \nVector image will not be created correctly.\n\n" );
+		#endif		
 	}
 	
 	Stream_UnIndent( lucDebug );
