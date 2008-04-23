@@ -67,7 +67,7 @@
 **	Just in case it causes problems with the lowestLocalEqNum 
 **	calculations.
 **
-** $Id: FeEquationNumber.h 1093 2008-04-01 04:47:08Z RobertTurnbull $
+** $Id: FeEquationNumber.h 1112 2008-04-23 06:10:17Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -134,7 +134,7 @@
 		\
 		/** Some vars to deal with removing BCs from mats and vecs. */ \
 		Bool					removeBCs; \
-		IndexSet*			  	bcEqNums;
+		STree*  			  	bcEqNums;
 
 	struct FeEquationNumber { __FeEquationNumber };
 	

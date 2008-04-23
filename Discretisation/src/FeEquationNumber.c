@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeEquationNumber.c 1100 2008-04-08 08:06:17Z RobertTurnbull $
+** $Id: FeEquationNumber.c 1112 2008-04-23 06:10:17Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -294,7 +294,9 @@ void _FeEquationNumber_Init(
    self->debugLM = Stream_RegisterChild( self->debug, "LM" );
    self->warning = Stream_RegisterChild( StgFEM_Warning, FeEquationNumber_Type );
    self->removeBCs = True;
-   self->bcEqNums = NULL;
+   self->bcEqNums = STree_New();
+   STree_SetIntCallbacks( self->bcEqNums );
+   STree_SetItemSize( self->bcEqNums, sizeof(int) );
    self->ownedMap = STreeMap_New();
    STreeMap_SetItemSize( self->ownedMap, sizeof(int), sizeof(int) );
    STree_SetIntCallbacks( self->ownedMap );
@@ -332,7 +334,10 @@ void _FeEquationNumber_Delete( void* feEquationNumber ) {
    }
 
    if( self->bcEqNums ) {
-      Stg_Class_Delete( self->bcEqNums );
+      NewClass_Delete( self->bcEqNums );
+   }
+   if( self->ownedMap ) {
+      NewClass_Delete( self->ownedMap );
    }
 
    NewClass_Delete( self->ownedMap );
@@ -528,6 +533,26 @@ void _FeEquationNumber_Build( void* feEquationNumber ) {
       FeEquationNumber_BuildWithDave( self );
    else
       FeEquationNumber_BuildWithTopology( self );
+
+   /* If not removing BCs, construct a table of which equation numbers are actually BCs. */
+   if( !self->removeBCs ) {
+      FeMesh* mesh = self->feMesh;
+      DofLayout* dofLayout = self->dofLayout;
+      VariableCondition* bcs = self->bcs;
+      int nDofs, varInd;
+      int ii, jj;
+
+      for( ii = 0; ii < FeMesh_GetNodeLocalSize( mesh ); ii++ ) {
+         nDofs = dofLayout->dofCounts[ii];
+         for( jj = 0; jj < nDofs; jj++ ) {
+            varInd = dofLayout->varIndices[ii][jj];
+            if( bcs && VariableCondition_IsCondition( bcs, ii, varInd ) ) {
+               if( !STree_Has( self->bcEqNums, self->destinationArray[ii] + jj ) )
+                  STree_Insert( self->bcEqNums, self->destinationArray[ii] + jj );
+            }
+         }
+      }
+   }
 
 /*
    }
@@ -2692,11 +2717,7 @@ void FeEquationNumber_BuildWithDave( FeEquationNumber* self ) {
       usePeriodic = False;
       for( jj = 0; jj < nDims; jj++ ) {
 	 if( periodic[jj] && (inds[jj] == 0 || inds[jj] == vGrid->sizes[jj] - 1) ) {
-//		TEMPORARY HACK by ROB - APRIL 8, 2008
-//		Commenting out this line so that periodic BCs don't stomp on boundary conditions already set
-//		There's better way to do this but I'm leaving this for Luke to sort out.
-//		Just need this to work for extension problem with shear boundary conditions for Louis
-//	    usePeriodic = True;
+            usePeriodic = True;
 	    break;
 	 }
       }
@@ -2706,10 +2727,10 @@ void FeEquationNumber_BuildWithDave( FeEquationNumber* self ) {
 	    isCond = VariableCondition_IsCondition( self->bcs, ii, varInd );
 	 else
 	    isCond = False;
-         if( usePeriodic || !isCond || !self->removeBCs )
-            dstArray[ii][jj] = 0;
-         else
+         if( isCond && self->removeBCs )
             dstArray[ii][jj] = -1;
+         else
+            dstArray[ii][jj] = 0;
       }
    }
 
@@ -2721,8 +2742,13 @@ void FeEquationNumber_BuildWithDave( FeEquationNumber* self ) {
 	 periodicInds[ii] = AllocArray( int, nLocals );
 	 for( jj = 0; jj < nLocals; jj++ ) {
 	    Grid_Lift( vGrid, locals[jj], inds );
-	    if( inds[ii] == vGrid->sizes[ii] - 1 )
-	       periodicInds[ii][nPeriodicInds[ii]++] = locals[jj];
+	    if( inds[ii] != vGrid->sizes[ii] - 1 ) continue;
+/*
+            for( kk = 0; kk < nDofs; kk++ )
+               if( dstArray[jj][kk] == -1 ) break;
+            if( kk < nDofs ) continue;
+*/
+            periodicInds[ii][nPeriodicInds[ii]++] = locals[jj];
 	 }
       }
    }

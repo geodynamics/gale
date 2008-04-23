@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StiffnessMatrix.c 1083 2008-03-24 22:19:52Z LukeHodkinson $
+** $Id: StiffnessMatrix.c 1112 2008-04-23 06:10:17Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -63,6 +63,7 @@
 #include "Assembler.h"
 
 
+void __StiffnessMatrix_NewAssemble( void* stiffnessMatrix, Bool removeBCs, void* _sle, void* _context );
 void StiffnessMatrix_NewAssemble( void* stiffnessMatrix, Bool removeBCs, void* _sle, void* _context );
 Bool StiffnessMatrix_ZeroBCsAsm_RowR( void* stiffMat, Assembler* assm );
 Bool StiffnessMatrix_ZeroBCsAsm_ColR( void* stiffMat, Assembler* assm );
@@ -259,7 +260,7 @@ void _StiffnessMatrix_Init(
 
 	/* Set default function for Global Stiffness Matrix Assembly */
 	/*EP_ReplaceAll( self->assembleStiffnessMatrix, StiffnessMatrix_GlobalAssembly_General );*/
-	EP_ReplaceAll( self->assembleStiffnessMatrix, StiffnessMatrix_NewAssemble );
+	EP_ReplaceAll( self->assembleStiffnessMatrix, __StiffnessMatrix_NewAssemble );
 
 	/* We need some assembler contexts. */
 	self->zeroBCsAsm = Assembler_New();
@@ -1118,7 +1119,7 @@ void StiffnessMatrix_GlobalAssembly_General( void* stiffnessMatrix, Bool bcRemov
 								elementLM[ROW_VAR][0] + row_i );
 
 				/* If row is bc */
-				if( IndexSet_IsMember( rowEqNum->bcEqNums, rowEqInd ) ) {
+				if( STree_Has( rowEqNum->bcEqNums, &rowEqInd ) ) {
 					unsigned	nCols = *totalDofsThisElement[COL_VAR];
 					unsigned	col_i;
 
@@ -1130,7 +1131,7 @@ void StiffnessMatrix_GlobalAssembly_General( void* stiffnessMatrix, Bool bcRemov
 										elementLM[COL_VAR][0] + col_i );
 
 						/* If col is bc */
-						if( IndexSet_IsMember( colEqNum->bcEqNums, colEqInd ) ) {
+						if( STree_Has( colEqNum->bcEqNums, &colEqInd ) ) {
 							elStiffMatToAdd[0][row_i * nCols + col_i] = 0.0;
 						}
 						else {
@@ -1146,7 +1147,7 @@ void StiffnessMatrix_GlobalAssembly_General( void* stiffnessMatrix, Bool bcRemov
 						unsigned	colEqInd = elementLM[COL_VAR][0][col_i];
 
 						/* If col is bc */
-						if( IndexSet_IsMember( colEqNum->bcEqNums, colEqInd ) ) {
+						if( STree_Has( colEqNum->bcEqNums, &colEqInd ) ) {
 							elStiffMatToAdd[0][row_i * nCols + col_i] = 0.0;
 						}
 					}
@@ -1217,7 +1218,7 @@ void StiffnessMatrix_GlobalAssembly_General( void* stiffnessMatrix, Bool bcRemov
 				int localEq;
 
 				localEq = *(int*)STreeMap_Map( colEqNum->ownedMap, &eqInd );
-				if( IndexSet_IsMember( colEqNum->bcEqNums, localEq ) ) {
+				if( STree_Has( colEqNum->bcEqNums, &localEq ) ) {
 					double	bcVal = DofLayout_GetValueDouble( dofLayout, node_i, dof_i );
 					double	one = 1.0;
 
@@ -1737,6 +1738,12 @@ void _StiffMatAss_vector_corrections(  struct StiffMatAss_Log *log, void *stiffn
 		StiffMatAssLog_AccumulateTime_ElementAssembly( log ); /* update time */
 		StiffMatAssLog_UpdateElementsAssembled( log ); /* update counter */
 
+
+               /* If keeping BCs in, zero corresponding entries in the element stiffness matrix. */
+                if( !rowEqNum->removeBCs || !colEqNum->removeBCs )
+                        Assembler_LoopMatrixElement( self->zeroBCsAsm, e_i );
+
+
 		if( (has_col_bc==1) ) {
 			int I;
                         memset( rhs, 0, maxRCDofs * sizeof(double) );
@@ -1759,10 +1766,6 @@ void _StiffMatAss_vector_corrections(  struct StiffMatAss_Log *log, void *stiffn
 
                 }
 
-
-               /* If keeping BCs in, zero corresponding entries in the element stiffness matrix. */
-                if( !rowEqNum->removeBCs || !colEqNum->removeBCs )
-                        Assembler_LoopMatrixElement( self->zeroBCsAsm, e_i );
 
                 /* Add to stiffness matrix. */
 		/*
@@ -1956,6 +1959,12 @@ void _StiffMatAss_vector_corrections_from_transpose( struct StiffMatAss_Log *log
                 StiffMatAssLog_AccumulateTime_ElementAssembly( log );		
 		StiffMatAssLog_UpdateElementsAssembled( log );
 
+
+               /* If keeping BCs in, zero corresponding entries in the element stiffness matrix. */
+                if( !rowEqNum->removeBCs || !colEqNum->removeBCs )
+                        Assembler_LoopMatrixElement( self->zeroBCsAsm, e_i );
+
+
                 if( (has_row_bc==1) ) {
 			int I;
         		memset( rhs, 0, maxRCDofs * sizeof(double) );
@@ -1981,11 +1990,6 @@ void _StiffMatAss_vector_corrections_from_transpose( struct StiffMatAss_Log *log
 			StiffMatAssLog_UpdateElementsAssembledForBC_Corrections( log );
 			bc_cnt++;
                 }
-
-
-               /* If keeping BCs in, zero corresponding entries in the element stiffness matrix. */
-                if( !rowEqNum->removeBCs || !colEqNum->removeBCs )
-                        Assembler_LoopMatrixElement( self->zeroBCsAsm, e_i );
 
                 /* Add to stiffness matrix. */
 /*
@@ -2071,9 +2075,21 @@ void StiffnessMatrix_NewAssemble( void* stiffnessMatrix, Bool removeBCs, void* _
 
 
 
+#if 0
+void StiffnessMatrix_SetEqsToUnity( StiffnessMatrix* self, const STreeNode* node ) {
+   static const double one = 1.0;
+
+   if( !node ) return;
+   StiffnessMatrix_SetEqsToUnity( self, node->left );
+   Matrix_AddEntries( self->matrix, 1, (int*)node->data, 1, (int*)node->data, (double*)&one );
+   StiffnessMatrix_SetEqsToUnity( self, node->right );
+}
+#endif
+
 
 /* Callback version */
 void __StiffnessMatrix_NewAssemble( void* stiffnessMatrix, Bool removeBCs, void* _sle, void* _context ) {
+   static const double one = 1.0;
 	StiffnessMatrix*		self = (StiffnessMatrix*)stiffnessMatrix;
 	SystemLinearEquations*		sle = (SystemLinearEquations*)_sle;
 	FeVariable			*rowVar, *colVar;
@@ -2088,7 +2104,10 @@ void __StiffnessMatrix_NewAssemble( void* stiffnessMatrix, Bool removeBCs, void*
 	double*				bcVals;
 	Matrix*				matrix;
 	Vector				*vector, *transVector;
-	unsigned			e_i, n_i;
+        int nRowNodeDofs, nColNodeDofs;
+        int rowInd, colInd;
+        double bc;
+	unsigned			e_i, n_i, dof_i, n_j, dof_j;
 
 	assert( self && Stg_CheckType( self, StiffnessMatrix ) );
 
@@ -2145,18 +2164,77 @@ void __StiffnessMatrix_NewAssemble( void* stiffnessMatrix, Bool removeBCs, void*
 		/* Correct for BCs providing I'm not keeping them in. */
 		if( vector ) {
 			memset( bcVals, 0, nRowDofs * sizeof(double) );
-			Assembler_LoopMatrixElement( self->bcAsm, e_i );
+
+                        rowInd = 0;
+                        for( n_i = 0; n_i < nRowNodes; n_i++ ) {
+                           nRowNodeDofs = rowDofs->dofCounts[rowNodes[n_i]];
+                           for( dof_i = 0; dof_i < nRowNodeDofs; dof_i++ ) {
+                              colInd = 0;
+                              for( n_j = 0; n_j < nColNodes; n_j++ ) {
+                                 nColNodeDofs = colDofs->dofCounts[colNodes[n_j]];
+                                 for( dof_j = 0; dof_j < nColNodeDofs; dof_j++ ) {
+                                    if( FeVariable_IsBC( colVar, colNodes[n_j], dof_j ) ) {
+                                       bc = DofLayout_GetValueDouble( colDofs, colNodes[n_j], dof_j );
+                                       bcVals[rowInd] -= bc * elStiffMat[rowInd][colInd];
+                                    }
+                                    colInd++;
+                                 }
+                              }
+                              rowInd++;
+                           }
+                        }
+
 			Vector_AddEntries( vector, nRowDofs, (unsigned*)rowEqNum->locationMatrix[e_i][0], bcVals );
 		}
 		if( transVector ) {
 			memset( bcVals, 0, nColDofs * sizeof(double) );
-			Assembler_LoopMatrixElement( self->transBCAsm, e_i );
+
+                        colInd = 0;
+                        for( n_i = 0; n_i < nColNodes; n_i++ ) {
+                           nColNodeDofs = colDofs->dofCounts[colNodes[n_i]];
+                           for( dof_i = 0; dof_i < nColNodeDofs; dof_i++ ) {
+                              rowInd = 0;
+                              for( n_j = 0; n_j < nRowNodes; n_j++ ) {
+                                 nRowNodeDofs = rowDofs->dofCounts[rowNodes[n_j]];
+                                 for( dof_j = 0; dof_j < nRowNodeDofs; dof_j++ ) {
+                                    if( FeVariable_IsBC( rowVar, rowNodes[n_j], dof_j ) ) {
+                                       bc = DofLayout_GetValueDouble( rowDofs, rowNodes[n_j], dof_j );
+                                       bcVals[colInd] -= bc * elStiffMat[rowInd][colInd];
+                                    }
+                                    rowInd++;
+                                 }
+                              }
+                              colInd++;
+                           }
+                        }
+
 			Vector_AddEntries( transVector, nColDofs, (unsigned*)colEqNum->locationMatrix[e_i][0], bcVals );
 		}
 
 		/* If keeping BCs in, zero corresponding entries in the element stiffness matrix. */
-		if( !rowEqNum->removeBCs || !colEqNum->removeBCs )
-			Assembler_LoopMatrixElement( self->zeroBCsAsm, e_i );
+		if( !rowEqNum->removeBCs || !colEqNum->removeBCs ) {
+                   rowInd = 0;
+                   for( n_i = 0; n_i < nRowNodes; n_i++ ) {
+                      nRowNodeDofs = rowDofs->dofCounts[rowNodes[n_i]];
+                      for( dof_i = 0; dof_i < nRowNodeDofs; dof_i++ ) {
+                         if( FeVariable_IsBC( rowVar, rowNodes[n_i], dof_i ) ) {
+                            memset( elStiffMat[rowInd], 0, nColDofs * sizeof(double) );
+                         }
+                         else {
+                            colInd = 0;
+                            for( n_j = 0; n_j < nColNodes; n_j++ ) {
+                               nColNodeDofs = colDofs->dofCounts[colNodes[n_j]];
+                               for( dof_j = 0; dof_j < nColNodeDofs; dof_j++ ) {
+                                  if( FeVariable_IsBC( colVar, colNodes[n_j], dof_j ) )
+                                     elStiffMat[rowInd][colInd] = 0.0;
+                                  colInd++;
+                               }
+                            }
+                         }
+                         rowInd++;
+                      }
+                   }
+                }
 
 		/* Add to stiffness matrix. */
 		Matrix_AddEntries( matrix, 
@@ -2169,8 +2247,23 @@ void __StiffnessMatrix_NewAssemble( void* stiffnessMatrix, Bool removeBCs, void*
 	FreeArray( bcVals );
 
 	/* If keeping BCs in and rows and columnns use the same variable, put ones in all BC'd diagonals. */
-	if( !colEqNum->removeBCs && rowVar == colVar )
-		Assembler_LoopMatrixDiagonal( self->diagBCsAsm );
+	if( !colEqNum->removeBCs && rowVar == colVar ) {
+           for( n_i = 0; n_i < FeMesh_GetNodeLocalSize( colMesh ); n_i++ ) {
+              nColNodeDofs = colDofs->dofCounts[n_i];
+              for( dof_i = 0; dof_i < nColNodeDofs; dof_i++ ) {
+                 if( FeVariable_IsBC( colVar, n_i, dof_i ) ) {
+                    Matrix_AddEntries( self->matrix,
+                                       1, colEqNum->destinationArray[n_i] + dof_i,
+                                       1, colEqNum->destinationArray[n_i] + dof_i,
+                                       (double*)&one );
+                 }
+              }
+           }
+
+#if 0
+           StiffnessMatrix_SetEqsToUnity( self, rowEqNum, STree_GetRoot( rowEqNum->ownedMap ) );
+#endif
+        }
 
 	/* Reassemble the matrix and vectors. */
 	Matrix_AssemblyBegin( matrix );
@@ -2367,7 +2460,7 @@ void _StiffnessMatrix_UpdateBC_CorrectionTables(
 				lEqNum = *(int*)STreeMap_Map( eqNum->ownedMap,
 							      elementLM[node_elLocalI] + dof_nodeLocalI );
 
-				if( eqNum->bcEqNums && IndexSet_IsMember( eqNum->bcEqNums, lEqNum ) ) {
+				if( eqNum->bcEqNums && STree_Has( eqNum->bcEqNums, &lEqNum ) ) {
 					isBC = True;
 				}
 			}
