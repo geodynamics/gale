@@ -11,8 +11,8 @@
 		<param>StgFEM_LinearVelocityAnalytic</param>
 	</list>
 
-	<param name="VelocityField-Tolerance">1e-7</param>
-	<param name="PressureField-Tolerance">1e-6</param>
+	<param name="VelocityField-Tolerance">5e-6</param>
+	<param name="PressureField-Tolerance">5e-5</param>
 	<param name="StrainRateField-Tolerance">1e-6</param>
 	<param name="StrainRateInvariantField-Tolerance">1e-6</param>
 	
