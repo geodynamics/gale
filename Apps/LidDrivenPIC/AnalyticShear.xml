@@ -11,5 +11,7 @@
 	
 	<param name="VelocityField-Tolerance">1e-6</param>
 	<param name="PressureField-Tolerance">1e-5</param>
+	<param name="StrainRateField-Tolerance">1e-6</param>
+	<param name="StrainRateInvariantField-Tolerance">1e-6</param>
 
 </StGermainData>

@@ -14,5 +14,7 @@
 	<!-- I don't know why this should be less accurate than the 2D solution -->
 	<param name="VelocityField-Tolerance">1e-4</param>
 	<param name="PressureField-Tolerance">1e-2</param>
+	<param name="StrainRateField-Tolerance">1e-2</param>
+	<param name="StrainRateInvariantField-Tolerance">1e-2</param>
 
 </StGermainData>
