@@ -9,10 +9,9 @@
 <param name="Project Web">https://csd.vpac.org/twiki/bin/view/Stgfem/WebHome</param>
 <param name="Copyright">Copyright (C) 2004-2005 VPAC.</param>
 <param name="License">https://csd.vpac.org/twiki/bin/view/Stgermain/SoftwareLicense</param>
+<param name="Reference">Brooks, A. and T. Hughes, Streamline upwind Petrov-Galerkin formulations for convection dominated flows with paricular emphasis on the incompressible Navier-Stokes equation, Comput. Methods Apll. Mech. Eng., Vol 32, 1982, pp. 199-259</param>
 <param name="Parent">ForceTerm</param>
-<param name="Description">...</param>
-
-<!--Now the interesting stuff-->
+<param name="Description">The weighted residual vector for the SU/PG method.</param>
 
 
 <list name="Params">
@@ -20,13 +19,13 @@
 		<param name="Name">UpwindXiFunction</param>
 		<param name="Type">String</param>
 		<param name="Default">"Exact"</param>
-		<param name="Description">...</param>
+		<param name="Description">Determines the function to calculate the upwind parameter. Options are 'DoublyAsymptoticAssumption', 'CriticalAssumption' and 'Exact'. See Brooks and Hughes, Section 3.3.1, pp. 213-214</param>
 	</struct>
 	<struct>
 		<param name="Name">defaultDiffusivity</param>
 		<param name="Type">Double</param>
 		<param name="Default">1.0</param>
-		<param name="Description">...</param>
+		<param name="Description">If the diffusivity isn't specified per integration point, this is the diffusivity used everywhere.</param>
 	</struct>
 
 </list>
@@ -36,23 +35,28 @@
 		<param name="Essential">True</param>
 		<param name="Name">VelocityField</param>
 		<param name="Type">FeVariable</param>
-		<param name="Description">...</param>
+		<param name="Description">The Velocity Field doing the advection.</param>
 	</struct>
-
-<!-- PLEASE, check the above struct information is accurate, in line number 175 of the c file and then remove this comment afterwards -->
 
 	<struct>
 		<param name="Essential">No</param>
 		<param name="Name">DiffusivityVariable</param>
 		<param name="Type">Variable</param>
-		<param name="Description">...</param>
+		<param name="Description">If the diffusivity varies per integration point, this is the variable to map the integration point to the diffusivity.</param>
 	</struct>
-
-<!-- PLEASE, check the above struct information is accurate, in line number 176 of the c file and then remove this comment afterwards -->
-
 
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">
+	<struct name="defaultResidualForceTerm">
+		<param name="Type">AdvDiffResidualForceTerm</param>
+		<param name="Swarm">gaussSwarm</param>
+		<param name="ForceVector">residual</param>
+		<param name="ExtraInfo">EnergyEqn</param>
+		<param name="VelocityField">VelocityField</param>
+		<param name="defaultDiffusivity">defaultDiffusivity</param>
+		<param name="UpwindXiFunction">DoublyAsymptoticAssumption</param> 
+	</struct>
+</param>
 
 </StGermainData>
