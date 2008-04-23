@@ -10,18 +10,29 @@
 <param name="Project Web">http://mcc.monash.edu.au/Underworld</param>
 <param name="Copyright">Copyright (C) 2006 Monash Cluster Computing.</param>
 <param name="License">http://www.opensource.org/licenses/bsd-license.php</param>
-<param name="Parent">WeightsCalculator</param>
+<param name="Parent">ParticleFeVariable</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">Calculates PIC integration weights in 3D and 2D using a Voronoi diagram. The integration points are set to the centroid of a Voronoi cell and
- the weight is the volume of the cell.</param>
+<param name="Description">A continuous field that represents the density at every point.</param>
 
 
 <list name="Params">
-
 </list>
 
 <list name="Dependencies">
-
+	<struct>
+		<param name="Essential">True</param>
+		<param name="Name">BuoyancyForceTerm</param>
+		<param name="Type">BuoyancyForceTerm</param>
+		<param name="Description">The component required to get the density for each material.</param>
+	</struct>
 </list>
+<!-- Add an exmaple XML if possible -->
+<param name="Example">
+	<struct name="densityField">
+		<param name="Type">DensityField</param>
+		<param name="BuoyancyForceTerm">buoyancyForceTerm</param>
+	</struct>
+</param>
+
 </StGermainData>
