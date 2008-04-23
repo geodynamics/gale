@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: LinearVelocityAnalytic.c 1099 2008-04-08 05:51:09Z RobertTurnbull $
+** $Id: LinearVelocityAnalytic.c 1111 2008-04-23 04:12:36Z RobertTurnbull $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -49,7 +49,8 @@ const Type LinearVelocityAnalytic_Type = "LinearVelocityAnalytic";
 typedef struct { 
 	__AnalyticSolution
 	FeVariable* velocityField;
-	double nodeVelocity[8][3];
+	double  nodeVelocity[8][3];
+	double  nodeCoords[8][3];
 	int    cornerNodeCount;
 } LinearVelocityAnalytic;
 
@@ -105,8 +106,22 @@ void LinearVelocityAnalytic_GetCornerNodeVelocities(void* analyticSolution) {
 	for ( ii = 0 ; ii < self->cornerNodeCount ; ii++ ) {
 		globalNode_I = nodeMapper[ ii ];
 		FeVariable_GetValueAtNodeGlobal( velocityField, globalNode_I, self->nodeVelocity[ii] );
+		FeVariable_GetCoordAtNodeGlobal( velocityField, globalNode_I, self->nodeCoords[ii] );
 	}
 }
+
+void GetLocalCoords( LinearVelocityAnalytic* self, double* coord, double* xi ) {
+	FeVariable*             velocityField = self->velocityField;
+	XYZ                     min;
+	XYZ                     max;
+	Dimension_Index         dim = velocityField->dim;
+	Dimension_Index         dim_I;
+
+	_FeVariable_GetMinAndMaxGlobalCoords( velocityField, min, max );
+	for ( dim_I = 0 ; dim_I < dim ; dim_I++ ) {
+		xi[ dim_I ] = 2.0 * (coord[ dim_I ] - min[ dim_I ])/(max[dim_I] - min[dim_I]) - 1;
+	}	
+}	
 
 /* Do a normal linear interpolation as if the box were a FEM element */
 void LinearVelocityAnalytic_VelocityFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* velocity ) {
@@ -116,17 +131,12 @@ void LinearVelocityAnalytic_VelocityFunction( void* analyticSolution, FeVariable
 	Dimension_Index         dim = velocityField->dim;
 	Dimension_Index         dim_I;
 	XYZ                     xi;
-	XYZ                     min;
-	XYZ                     max;
 	double                  Ni[8];
 	Node_Index              ii;
 	ElementType*            elementType;
 
 	/* Transform the coordinate into a master coordinate system */
-	_FeVariable_GetMinAndMaxGlobalCoords( velocityField, min, max );
-	for ( dim_I = 0 ; dim_I < dim ; dim_I++ ) {
-		xi[ dim_I ] = 2.0 * (coord[ dim_I ] - min[ dim_I ])/(max[dim_I] - min[dim_I]) - 1;
-	}	
+	GetLocalCoords( self, coord, xi );
 
 	/* Get Shape Functions */
 	elementType = FeMesh_GetElementType( mesh, 0 );
@@ -145,9 +155,175 @@ void LinearVelocityAnalytic_PressureFunction( void* analyticSolution, FeVariable
 	*pressure = 0.0;
 }
 
+void LinearVelocityAnalytic_VelocityGradientsFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* velocityGradients ) {
+	LinearVelocityAnalytic *self = (LinearVelocityAnalytic*)analyticSolution;
+	FeVariable*             velocityField = self->velocityField;
+	FeMesh*                 mesh = velocityField->feMesh;
+	ElementType*            elementType;
+	XYZ                     xi;
+	double                  jac[3][3];
+	double                  cof[3][3];	/* cofactors */
+	double                  detJac;
+	Node_Index              node_I;
+	double**                GNi; 
+	double**                GNx; 
+	double*                 nodeCoord;
+	double                  nodeValue;
+	Dimension_Index         dim = velocityField->dim;
+	Dimension_Index         i, j, dx, dxi;
+	Dimension_Index         dim_I;
+	
+	/* Transform the coordinate into a master coordinate system */
+	GetLocalCoords( self, coord, xi );
+
+	GNi = Memory_Alloc_2DArray( double, dim, self->cornerNodeCount, "GNi" );
+	GNx = Memory_Alloc_2DArray( double, dim, self->cornerNodeCount, "GNx" );
+
+	/* Get Shape Functions */
+	elementType = FeMesh_GetElementType( mesh, 0 );
+	elementType->_evaluateShapeFunctionLocalDerivsAt( elementType, xi, GNi );
+
+	/* build the jacobian matrix */
+	/*
+	jac = 	\sum_i d/d\xi( N_i ) x_i 		\sum_i d/d\xi( N_i ) y_i
+			\sum_i d/d\eta( N_i ) x_i 		\sum_i d/d\eta( N_i ) y_i
+	*/
+	if( dim == 2 ) {
+		jac[0][0] = jac[0][1] = jac[1][0] = jac[1][1] = 0.0;
+		for(  node_I =0;  node_I < self->cornerNodeCount ;  node_I ++){	
+			nodeCoord = self->nodeCoords[ node_I ];
+			jac[0][0] = jac[0][0] + GNi[0][node_I] * nodeCoord[0];
+			jac[0][1] = jac[0][1] + GNi[0][node_I] * nodeCoord[1];
+			
+			jac[1][0] = jac[1][0] + GNi[1][node_I] * nodeCoord[0];
+			jac[1][1] = jac[1][1] + GNi[1][node_I] * nodeCoord[1];
+		}
+	}
+	
+	if( dim == 3 ) {
+		jac[0][0] = jac[0][1] = jac[0][2] = 0.0;
+		jac[1][0] = jac[1][1] = jac[1][2] = 0.0;
+		jac[2][0] = jac[2][1] = jac[2][2] = 0.0;
+		for(  node_I =0;  node_I < self->cornerNodeCount ;  node_I ++){	
+			nodeCoord = self->nodeCoords[ node_I ];
+			jac[0][0] = jac[0][0] + GNi[0][node_I] * nodeCoord[0];
+			jac[0][1] = jac[0][1] + GNi[0][node_I] * nodeCoord[1];
+			jac[0][2] = jac[0][2] + GNi[0][node_I] * nodeCoord[2];
+			
+			jac[1][0] = jac[1][0] + GNi[1][node_I] * nodeCoord[0];
+			jac[1][1] = jac[1][1] + GNi[1][node_I] * nodeCoord[1];
+			jac[1][2] = jac[1][2] + GNi[1][node_I] * nodeCoord[2];
+			
+			jac[2][0] = jac[2][0] + GNi[2][node_I] * nodeCoord[0];
+			jac[2][1] = jac[2][1] + GNi[2][node_I] * nodeCoord[1];
+			jac[2][2] = jac[2][2] + GNi[2][node_I] * nodeCoord[2];
+		}
+	}
+	
+	/* get determinant of the jacobian matrix */
+	if( dim == 2 ) {
+		detJac = jac[0][0]*jac[1][1] - jac[0][1]*jac[1][0]; 
+	}		
+	if( dim == 3 ) {
+		detJac = jac[0][0]*( jac[1][1]*jac[2][2] - jac[1][2]*jac[2][1] ) 
+				  - jac[0][1]*( jac[1][0]*jac[2][2] - jac[1][2]*jac[2][0] ) 
+				  + jac[0][2]*( jac[1][0]*jac[2][1] - jac[1][1]*jac[2][0] );
+	}
+	
+	/* invert the jacobian matrix A^-1 = adj(A)/det(A) */
+	if( dim == 2 ) {
+		double tmp = jac[0][0];
+		jac[0][0] = jac[1][1]/detJac;
+		jac[1][1] = tmp/detJac;
+		jac[0][1] = -jac[0][1]/detJac;
+		jac[1][0] = -jac[1][0]/detJac;		
+	}
+	if( dim == 3 ) {
+		/*
+		00 01 02
+		10 11 12
+		20 21 22		
+		*/		
+		cof[0][0] = jac[1][1]*jac[2][2] - jac[1][2]*jac[2][1];
+		cof[1][0] = -(jac[1][0]*jac[2][2] - jac[1][2]*jac[2][0]);
+		cof[2][0] = jac[1][0]*jac[2][1] - jac[1][1]*jac[2][0];
+		
+		cof[0][1] = -(jac[0][1]*jac[2][2] - jac[0][2]*jac[2][1]);
+		cof[1][1] = jac[0][0]*jac[2][2] - jac[0][2]*jac[2][0];
+		cof[2][1] = -(jac[0][0]*jac[2][1] - jac[0][1]*jac[2][0]);
+		
+		cof[0][2] = jac[0][1]*jac[1][2] - jac[0][2]*jac[1][1];
+		cof[1][2] = -(jac[0][0]*jac[1][2] - jac[0][2]*jac[1][0]);
+		cof[2][2] = jac[0][0]*jac[1][1] - jac[0][1]*jac[1][0];
+		
+		for( i=0; i<dim; i++ ) {
+			for( j=0; j<dim; j++ ) {
+				jac[i][j] = cof[i][j]/detJac;
+			}
+		}
+		
+		
+	}
+	
+	/* get global derivs Ni_x, Ni_y and Ni_z if dim == 3 */
+	for( dx=0; dx<dim; dx++ ) {
+		for(  node_I =0;  node_I < self->cornerNodeCount ;  node_I ++){	
+			double globalSF_DerivVal = 0.0;
+			for(dxi=0; dxi<dim; dxi++) {
+				globalSF_DerivVal = globalSF_DerivVal + GNi[dxi][node_I] * jac[dx][dxi];
+			}
+			
+			GNx[dx][node_I] = globalSF_DerivVal;
+		}
+	}
+	
+	/* Initialise velocity gradients */
+	memset( velocityGradients, 0, sizeof( double ) * dim * dim );
+	
+	for ( dim_I = 0 ; dim_I < dim ; dim_I++ ) {
+		/* Interpolate derivative from nodes */
+		for( node_I =0;  node_I < self->cornerNodeCount ;  node_I ++){	
+			nodeValue    = self->nodeVelocity[ node_I ][ dim_I ];
+			
+			velocityGradients[dim_I*dim + 0] += GNx[0][node_I] * nodeValue;
+			velocityGradients[dim_I*dim + 1] += GNx[1][node_I] * nodeValue;
+			if( dim == 3 ) 
+				velocityGradients[dim_I*dim + 2] += GNx[2][node_I] * nodeValue;	
+		}
+	}
+	Memory_Free( GNi );
+	Memory_Free( GNx );
+}
+
+void LinearVelocityAnalytic_StrainRateFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* strainRate ) {
+	LinearVelocityAnalytic *self = (LinearVelocityAnalytic*)analyticSolution;
+	Dimension_Index         dim = self->velocityField->dim;
+	TensorArray             velocityGradients;
+
+	/* Get Velocity Gradients */
+	LinearVelocityAnalytic_VelocityGradientsFunction( self, analyticFeVariable, coord, velocityGradients );
+	
+	/* Get Strain Rate */
+	TensorArray_GetSymmetricPart( velocityGradients, dim, strainRate );
+}
+
+void LinearVelocityAnalytic_StrainRateInvFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* strainRateInv ) {
+	LinearVelocityAnalytic *self = (LinearVelocityAnalytic*)analyticSolution;
+	Dimension_Index         dim = self->velocityField->dim;
+	SymmetricTensor         strainRate;
+
+	/* Get Strain Rate */
+	LinearVelocityAnalytic_StrainRateFunction( self, analyticFeVariable, coord, strainRate );
+	
+	/* Get Invariant */
+	*strainRateInv = SymmetricTensor_2ndInvariant( strainRate, dim );
+}
+
 void _LinearVelocityAnalytic_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	LinearVelocityAnalytic *self = (LinearVelocityAnalytic*)analyticSolution;
 	FeVariable*       pressureField;
+	FeVariable*       strainRateField;
+	FeVariable*       strainRateInvField;
 
 	_AnalyticSolution_Construct( self, cf, data );
 
@@ -157,6 +333,13 @@ void _LinearVelocityAnalytic_Construct( void* analyticSolution, Stg_ComponentFac
 	pressureField = Stg_ComponentFactory_ConstructByName( cf, "PressureField", FeVariable, True, data ); 
 	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, pressureField, LinearVelocityAnalytic_PressureFunction );
 	
+	strainRateField = Stg_ComponentFactory_ConstructByName( cf, "StrainRateField", FeVariable, False, data ); 
+	if ( strainRateField )
+		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, strainRateField, LinearVelocityAnalytic_StrainRateFunction );
+	
+	strainRateInvField = Stg_ComponentFactory_ConstructByName( cf, "StrainRateInvariantField", FeVariable, False, data ); 
+	if ( strainRateInvField )
+		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, strainRateInvField, LinearVelocityAnalytic_StrainRateInvFunction );
 }
 
 void _LinearVelocityAnalytic_Initialise( void* analyticSolution, void* data ) {

@@ -1,0 +1,2 @@
+Timestep 0: Total integrated value of 'StrainRateField-ErrorMagnitudeField' is outside a tolerance 1e-06.
+Timestep 1: Total integrated value of 'StrainRateField-ErrorMagnitudeField' is within a tolerance 1e-06.
