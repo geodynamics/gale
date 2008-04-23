@@ -11,27 +11,24 @@
 <param name="Copyright">Copyright (C) 2004-2005 VPAC.</param>
 <param name="License">https://csd.vpac.org/twiki/bin/view/Stgermain/SoftwareLicense</param>
 <param name="Parent">SystemLinearEquations</param>
-<param name="Reference">...</param>
+<param name="Reference">Brooks, A. and T. Hughes, Streamline upwind Petrov-Galerkin formulations for convection dominated flows with paricular emphasis on the incompressible Navier-Stokes equation, Comput. Methods Apll. Mech. Eng., Vol 32, 1982, pp. 199-259</param>
 <param name="Summary">...</param>
-<param name="Description">...</param>
+<param name="Description">An implementation of Brooks and Hughes' SU/PG advection-diffusion algorithm.</param>
 
 <!--Now the interesting stuff-->
-
-
 <list name="Params">
 	<struct>
 		<param name="Name">dim</param>
 		<param name="Type">UnsignedInt</param>
 		<param name="Default">0</param>
-		<param name="Description">...</param>
+		<param name="Description">How many dimensions we are working in (either 2 or 3). This parameter is taken form the root dictionary.</param>
 	</struct>
 	<struct>
 		<param name="Name">courantFactor</param>
 		<param name="Type">Double</param>
 		<param name="Default">0.5</param>
-		<param name="Description">...</param>
+		<param name="Description">A factor to determine the timestep. Between 0 and 1. See Brooks and Hughes, p. 227. Also: http://mathworld.wolfram.com/Courant-Friedrichs-LewyCondition.html</param>
 	</struct>
-
 </list>
 
 <list name="Dependencies">
@@ -39,32 +36,32 @@
 		<param name="Essential">True</param>
 		<param name="Name">PhiField</param>
 		<param name="Type">FeVariable</param>
-		<param name="Description">...</param>
+		<param name="Description">The field, refered to as $\phi$, to which the advection and diffusion is taking place.</param>
 	</struct>
-
-<!-- PLEASE, check the above struct information is accurate, in line number 349 of the c file and then remove this comment afterwards -->
-
 	<struct>
 		<param name="Essential">True</param>
 		<param name="Name">Residual</param>
 		<param name="Type">ForceVector</param>
-		<param name="Description">...</param>
+		<param name="Description">The weighted residual vector.</param>
 	</struct>
-
-<!-- PLEASE, check the above struct information is accurate, in line number 350 of the c file and then remove this comment afterwards -->
-
 	<struct>
 		<param name="Essential">True</param>
 		<param name="Name">MassMatrix</param>
 		<param name="Type">Stg_Component</param>
-		<param name="Description">...</param>
+		<param name="Description">The Lumped Mass Matrix. See Brooks and Hughes, p. 226</param>
 	</struct>
-
-<!-- PLEASE, check the above struct information is accurate, in line number 351 of the c file and then remove this comment afterwards -->
-
-
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">
+	<struct name="EnergyEqn">
+		<param name="Type">AdvectionDiffusionSLE</param>
+		<param name="SLE_Solver">predictorMulticorrector</param> 
+		<param name="Context">context</param>
+		<param name="PhiField">TemperatureField</param>
+		<param name="Residual">residual</param>
+		<param name="MassMatrix">massMatrix</param>
+		<param name="courantFactor">0.5</param>
+	</struct>
+</param>
 
 </StGermainData>

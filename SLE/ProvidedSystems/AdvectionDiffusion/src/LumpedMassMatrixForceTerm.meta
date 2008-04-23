@@ -11,21 +11,23 @@
 <param name="Copyright">Copyright (C) 2004-2005 VPAC.</param>
 <param name="License">https://csd.vpac.org/twiki/bin/view/Stgermain/SoftwareLicense</param>
 <param name="Parent">ForceTerm</param>
-<param name="Reference">...</param>
+<param name="Reference">Brooks, A. and T. Hughes, Streamline upwind Petrov-Galerkin formulations for convection dominated flows with paricular emphasis on the incompressible Navier-Stokes equation, Comput. Methods Apll. Mech. Eng., Vol 32, 1982, pp. 199-259</param>
 <param name="Summary">...</param>
-<param name="Description">...</param>
+<param name="Description">Builds the Lumped Mass Matrix (as a vector) necessary for the SU/PG method</param>
 
 <!--Now the interesting stuff-->
-
-
 <list name="Params">
-
 </list>
 
 <list name="Dependencies">
-
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">
+	<struct name="lumpedMassMatrixForceTerm">
+		<param name="Type">LumpedMassMatrixForceTerm</param>
+		<param name="Swarm">gaussSwarm</param>
+		<param name="ForceVector">massMatrix</param>
+	</struct>
+</param>
 
 </StGermainData>
