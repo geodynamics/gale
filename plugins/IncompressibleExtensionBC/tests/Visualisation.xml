@@ -7,6 +7,10 @@
 	<include> Underworld/Viewports/VelocityMagnitudeVP.xml </include>
 	<include> Underworld/Viewports/AnalyticVelocityMagnitudeVP.xml </include>
 	<include> Underworld/Viewports/StrainRateInvariantVP.xml</include>
+	<!--
+	<include> Underworld/Viewports/StrainRateXXVP.xml</include>
+	<include> Underworld/Viewports/StrainRateYYVP.xml</include>
+	-->
 
 	<include>glucifer/window.xml</include>
 	<struct name="components" mergeType="merge">

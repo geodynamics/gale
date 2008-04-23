@@ -19,8 +19,10 @@
 	<param name="constantHeight"> 0.5 </param>
 
 	<!-- Analytic Solution Tolerances -->
-	<param name="VelocityField-Tolerance"> 5.0e-05 </param>
-	<param name="StrainRateInvariantField-Tolerance"> 0.06 </param>
+	<param name="VelocityField-Tolerance"> 5.0e-06 </param>
+	<param name="PressureField-Tolerance"> 5.0e-06 </param>
+	<param name="StrainRateInvariantField-Tolerance"> 5.0e-06 </param>
+	<param name="StrainRateField-Tolerance"> 5.0e-06 </param>
 
 	<struct name="components" mergeType="merge">
 		<!-- Shape Stuff -->
