@@ -8,7 +8,7 @@
         </list>
 
 		<include> Underworld/BaseApps/ThermoChem.xml </include>
-		<include> Underworld/REP_Setup3D.xml </include>
+		<include> ExperimentalUnderworld/REP_Setup3D.xml </include>
 	
 	<list name="plugins" mergeType="merge">
 		<!-- Output Plugins -->
@@ -39,9 +39,9 @@
 		
 		<struct name="lightLayer">
 			<param name="Type">Box</param>
-			<param name="startX"> minX  </param> <param name="endX"> maxX </param>
-			<param name="startY"> 0.975 </param> <param name="endY"> maxY </param>  <!-- vertical -->
-			<param name="startZ"> minZ  </param> <param name="endZ"> maxZ </param>
+			<param name="startX"> 1.0  </param> <param name="endX"> 3.0 </param>
+			<param name="startY"> 0.95 </param> <param name="endY"> maxY </param>  <!-- vertical -->
+			<param name="startZ"> 1.0  </param> <param name="endZ"> 3.0 </param>
 		</struct>
 				
 		<struct name="material">
@@ -55,13 +55,13 @@
 			</list>
 		</struct>	
 	
-		<struct name="materialcont">
+		<struct name="weakmaterial">
                <param name="Type">RheologyMaterial</param>
                <param name="Shape">lightLayer</param>
                <param name="density"> 0.5 </param>
                <param name="alpha">   1.0 </param>
                <list name="Rheology">
-                 <param> temperatureDependence </param>
+                 <param> weakerTemperatureDependence </param>
                  <param> yielding </param>
                </list>
         </struct>	
@@ -94,18 +94,16 @@
 			<param name="frictionCoefficient">0.5</param>
 			<param name="frictionCoefficientAfterSoftening">0.5</param>
 			<param name="minimumYieldStress">1.0e3</param>
-		</struct>
-		
-		
-		
-	</struct>  <!-- End of components list -->
+		</struct>		
+	</struct> 
 	
 
 	<!-- Simulation control -->
-	<param name="maxTimeSteps"> 2 </param>
+	
+	<param name="maxTimeSteps"> 100 </param>
 	<param name="outputPath"> ./output </param>
-	<param name="dumpEvery"> 1 </param>	
-	<param name="checkpointEvery"> 0 </param>
+	<param name="dumpEvery"> 10 </param>	
+	<param name="checkpointEvery"> 100 </param>
 
     <!--   choose what to checkpoint -->
 
@@ -125,7 +123,7 @@
 	
 	<param name="gravity"> 1e6 </param>	
 	
-	<param name="courantFactor"> 0.75 </param>	
+	<param name="courantFactor"> 0.95 </param>	
 	
 	<!-- Integration Scheme configuration -->
 	<param name="particlesPerCell"> 10 </param>
@@ -182,8 +180,8 @@
 			<param name="height" mergeType="replace"> 1024 </param>
 			<param name="interactive" mergeType="replace"> f </param>
 			 <list name="Viewport" mergeType="replace">
-				<param> TemperatureIsosurfaceVP recoveredPressureVP </param>
-			 	<param> ParticleMaterialVP StrainRateInvariantVP </param>
+				<param> TemperatureIsosurfaceVP recoveredPressureParticleVP </param>
+			 	<param> ParticleMaterialVP TauInvariantParticleVP </param>
 			 </list>
 		</struct>
 		

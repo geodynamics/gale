@@ -11,12 +11,41 @@
 			<param name="dynamicRange">true</param>
 		</struct>
 		<!-- Drawing Objects -->
+		
+		<!--
+            Constructing temperatureIsosurface95..
+                    Looking for essential component 'TemperatureField': Found.
+                    Stg_Component 'temperatureIsosurface95' cannot find non-essential component with key 'ColourMap'.
+                    Stg_Component 'temperatureIsosurface95' cannot find non-essential component with key 'ColourField'.
+                    Stg_Component 'temperatureIsosurface95' cannot find non-essential component with key 'MaskField'.
+                    Getting parameter 'resolution': Using default value = 64
+                    Getting parameter 'resolutionX': Using default value = 64
+                    Getting parameter 'resolutionY': Using default value = 64
+                    Getting parameter 'resolutionZ': Using default value = 64
+                    Getting parameter 'maskValue': Using default value = 0
+                    Getting parameter 'maskTolerance': Using default value = 0.001
+                    Getting parameter 'maskType': Using default value = "GreaterThan"
+                    Getting parameter 'isovalue': Found - Value = "0.95"
+                    Getting parameter 'colour': Found - Value = "#FF0133"
+                    Getting parameter 'cullBackFace': Using default value = false
+                    Getting parameter 'cullFrontFace': Using default value = false
+                    Getting parameter 'wireframe': Using default value = false
+                    Getting parameter 'drawWalls': Found - Value = "false"
+       -->
 
-		<struct name="temperatureIsosurface">
+		<struct name="temperatureIsosurface95">
 			<param name="Type">lucIsosurface</param>
 			<param name="IsosurfaceField">TemperatureField</param>
-			<param name="ColourMap">temperatureIsoSurfaceColourMap</param>
-			<param name="isovalue">0.5</param>
+			<param name="colour"> #FF0133 </param>
+			<param name="isovalue">0.95</param>
+			<param name="drawWalls">false</param>			
+		</struct>
+		
+		<struct name="temperatureIsosurface50">
+			<param name="Type">lucIsosurface</param>
+			<param name="IsosurfaceField">TemperatureField</param>
+			<param name="colour"> #4444FF </param>
+			<param name="isovalue">0.4</param>
 			<param name="drawWalls">false</param>			
 		</struct>
 		
@@ -49,7 +78,8 @@
 			<param name="Camera">camera</param>
 			<list name="DrawingObject">
 				<param>temperatureIsoSurfaceMap</param>
-				<param>temperatureIsosurface</param>
+				<param>temperatureIsosurface50</param>
+				<param>temperatureIsosurface95</param>
 				<param>temperatureIsoSurfaceBorder</param>
 				<param>temperatureIsoSurfaceTitle</param>
 				<param>temperatureIsoSurfaceColourBar</param>

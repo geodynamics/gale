@@ -14,11 +14,34 @@
 			<param name="colours">Purple Blue Green Yellow Orange Red</param>
 			<param name="dynamicRange">True</param>
 		</struct>
+		<struct name="particleMaterialStrainRateColourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours"> DarkBlue LightBlue White</param>
+			<param name="dynamicRange">False</param>
+			<param name="minimum">0.0</param>
+			<param name="maximum">1</param>
+			
+		</struct>
 		<!-- Drawing Objects -->
 		<struct name="strainRateInvTitle" mergeType="replace">
 			<param name="Type">lucTitle</param>
 			<param name="string">Strain Rate Invariant</param>
 		</struct>
+		
+		<struct name="strainRateMaterialDots">
+	        <param name="Type">lucSwarmViewer</param>
+	        <param name="Swarm">materialSwarm</param>
+	        <param name="MaskVariable">materialSwarm-MaterialIndex</param>
+	        <param name="maskValue">1.0</param>
+	        <param name="maskTolerance">0.1</param>
+	        <param name="maskType">EqualTo</param> 
+	        <param name="ColourVariable">materialSwarm-StrainRateInvariant</param>
+	        <param name="ColourMap">particleMaterialStrainRateColourMap</param>
+	        <param name="pointSize">2.0</param>
+	 	</struct>		
+	 
+		
+		
 		<struct name="strainRateInvMap">
 			<param name="Type">lucScalarField</param>
 			<param name="FieldVariable">StrainRateInvariantField</param>
@@ -38,6 +61,7 @@
 			<param name="Camera">camera</param>
 			<list name="DrawingObject">
 				<param>strainRateInvMap</param>
+				<param>strainRateMaterialDots</param>
 				<param>strainRateInvTitle</param>
 				<param>border</param>
 				<param>strainRateInvColourBar</param>

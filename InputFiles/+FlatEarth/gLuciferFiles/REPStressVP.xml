@@ -9,6 +9,7 @@
 		<param name="colours">Purple Blue Green Yellow Orange Red</param>
 		<param name="dynamicRange">true</param>
 	</struct>
+	
 	<!-- SigmaVP setup -->
 	<struct name="sigmaInvMap">
 		<param name="Type">lucScalarField</param>
@@ -56,16 +57,84 @@
 		<param name="ColourMap">recoveredPressureInvColourMap</param>
 	</struct>
 
-	<struct name="recoveredPressureVP">
-		<param name="Type">lucViewport</param>
-		<param name="Camera">camera</param>
-		<list name="DrawingObject">
-			<param>recoveredPressureMap</param>
-			<param>border</param>
-			<param>recoveredPressureTitle</param>
-			<param>recoveredPressureColourBar</param>
-		</list>
+	
+	<struct name="materialSwarm-recoveredDeviatoricStress">
+		<param name="Type">FeSwarmVariable</param>
+		<param name="Swarm">materialSwarm</param>
+		<param name="FeVariable">recoveredTauInvariantField</param>
 	</struct>
+	
+	<struct name="materialSwarm-recoveredPressure">
+		<param name="Type">FeSwarmVariable</param>
+		<param name="Swarm">materialSwarm</param>
+		<param name="FeVariable">recoveredPressureField</param>
+	</struct>
+	
+	
+	
+	 <struct name="tauInvParticleDots0">
+	 	<param name="Type">lucSwarmViewer</param>
+	 	<param name="Swarm">materialSwarm</param>
+	 	<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+	 	<param name="maskValue">0.0</param>
+	 	<param name="maskTolerance">0.1</param>
+	 	<param name="maskType">EqualTo</param> 
+		<param name="positionRange">False</param>
+	 	<param name="maxPositionZ">2.0</param> 
+	 	<param name="maxPositionX">2.0</param> 
+	 	<param name="ColourVariable">materialSwarm-recoveredDeviatoricStress</param>
+	 	<param name="ColourMap">tauInvColourMap</param>
+	 	<param name="pointSize">2.0</param>
+	 </struct>
+	
+	 <struct name="tauInvParticleDots1">
+	 	<param name="Type">lucSwarmViewer</param>
+	 	<param name="Swarm">materialSwarm</param>
+	 	<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+	 	<param name="maskValue">1.0</param>
+	 	<param name="maskTolerance">0.1</param>
+	 	<param name="maskType">EqualTo</param> 
+		<param name="positionRange">False</param>
+	 	<param name="maxPositionZ">2.0</param> 
+	 	<param name="maxPositionX">2.0</param> 
+	 	<param name="ColourVariable">materialSwarm-recoveredDeviatoricStress</param>
+	 	<param name="ColourMap">tauInvColourMap</param>
+	 	<param name="pointSize">2.0</param>
+	 </struct>
+	
+	
+	 <struct name="pressureParticleDots0">
+	 	<param name="Type">lucSwarmViewer</param>
+	 	<param name="Swarm">materialSwarm</param>
+	 	<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+	 	<param name="maskValue">0.0</param>
+	 	<param name="maskTolerance">0.1</param>
+	 	<param name="maskType">EqualTo</param> 
+		<param name="positionRange">False</param>
+	 	<param name="maxPositionZ">2.0</param> 
+	 	<param name="maxPositionX">2.0</param> 
+	 	<param name="ColourVariable">materialSwarm-recoveredPressure</param>
+	 	<param name="ColourMap">recoveredPressureInvColourMap</param>
+	 	<param name="pointSize">2.0</param>
+	 </struct>
+	
+	 <struct name="pressureParticleDots1">
+	 	<param name="Type">lucSwarmViewer</param>
+	 	<param name="Swarm">materialSwarm</param>
+	 	<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+	 	<param name="maskValue">1.0</param>
+	 	<param name="maskTolerance">0.1</param>
+	 	<param name="maskType">EqualTo</param> 
+		<param name="positionRange">False</param>
+	 	<param name="maxPositionZ">2.0</param> 
+	 	<param name="maxPositionX">2.0</param> 
+	 	<param name="ColourVariable">materialSwarm-recoveredPressure</param>
+	 	<param name="ColourMap">recoveredPressureInvColourMap</param>
+	 	<param name="pointSize">2.0</param>
+	 </struct>
+	
+	
+	
 	<!-- TauVP setup -->
 	<struct name="tauInvColourMap">
 		<param name="Type">lucColourMap</param>
@@ -97,6 +166,44 @@
 			<param>tauInvColourBar</param>
 		</list>
 	</struct>
+	
+	<struct name="TauInvariantParticleVP">
+		<param name="Type">lucViewport</param>
+		<param name="Camera">camera</param>
+		<list name="DrawingObject">
+			<param>tauInvParticleDots0</param>
+			<param>tauInvParticleDots1</param>
+			<param>border</param>
+			<param>tauInvTitle</param>
+			<param>tauInvColourBar</param>
+		</list>
+	</struct>
+	
+
+	<struct name="recoveredPressureVP">
+		<param name="Type">lucViewport</param>
+		<param name="Camera">camera</param>
+		<list name="DrawingObject">
+			<param>recoveredPressureMap</param>
+			<param>border</param>
+			<param>recoveredPressureTitle</param>
+			<param>recoveredPressureColourBar</param>
+		</list>
+	</struct>
+	
+	<struct name="recoveredPressureParticleVP">
+		<param name="Type">lucViewport</param>
+		<param name="Camera">camera</param>
+		<list name="DrawingObject">
+			<param>pressureParticleDots0</param>
+			<param>pressureParticleDots1</param>
+			<param>border</param>
+			<param>recoveredPressureTitle</param>
+			<param>recoveredPressureColourBar</param>
+		</list>
+	</struct>
+	
+	
 </struct>
 
 </StGermainData>
