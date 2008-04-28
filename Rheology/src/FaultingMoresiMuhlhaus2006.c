@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: FaultingMoresiMuhlhaus2006.c 630 2007-11-22 06:35:49Z LouisMoresi $
+** $Id: FaultingMoresiMuhlhaus2006.c 721 2008-04-28 23:15:15Z JohnMansour $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -122,7 +122,8 @@ void _FaultingMoresiMuhlhaus2006_Init(
 		double                                             frictionCoefficient,
 		double                                             frictionCoefficientAfterSoftening,
 		double                                             minimumYieldStress,
-		Bool                                               ignoreOldOrientation )
+		Bool                                               ignoreOldOrientation,
+		Bool                                               updateOrientationAtMaxSoftness)
 {
 	FaultingMoresiMuhlhaus2006_Particle* particleExt;
 	StandardParticle                    materialPoint;
@@ -152,6 +153,9 @@ void _FaultingMoresiMuhlhaus2006_Init(
 	
 	/* Should orientation from previous timestep be tested ? */
 	self->ignoreOldOrientation = ignoreOldOrientation;
+	
+	/* Do we want to update the orientation when maximum softness is reached? */
+	self->updateOrientationAtMaxSoftness = updateOrientationAtMaxSoftness;
 
 	/* Update Drawing Parameters */
 	EP_PrependClassHook( Context_GetEntryPoint( context, AbstractContext_EP_DumpClass ),
@@ -209,6 +213,13 @@ void _FaultingMoresiMuhlhaus2006_Init(
 			"FaultingMoresiMuhlhaus2006TensileFailure",
 			(ArithPointer) &particleExt->tensileFailure - (ArithPointer) &materialPoint,
 			Variable_DataType_Char );
+	
+	self->fullySoftened = Swarm_NewScalarVariable(
+			materialPointsSwarm,
+			"FaultingMoresiMuhlhaus2006FullySoftened",
+			(ArithPointer) &particleExt->fullySoftened - (ArithPointer) &materialPoint,
+			Variable_DataType_Char );
+	
 }
 
 void* _FaultingMoresiMuhlhaus2006_DefaultNew( Name name ) {
@@ -271,7 +282,8 @@ void _FaultingMoresiMuhlhaus2006_Construct( void* rheology, Stg_ComponentFactory
 			Stg_ComponentFactory_GetDouble( cf, self->name, "frictionCoefficient", 0.0 ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "frictionCoefficientAfterSoftening", 0.0 ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "minimumYieldStress", 0.0 ),
-			Stg_ComponentFactory_GetBool(   cf, self->name, "ignoreOldOrientation", False )	);
+			Stg_ComponentFactory_GetBool(   cf, self->name, "ignoreOldOrientation", False ),
+			Stg_ComponentFactory_GetBool(   cf, self->name, "updateOrientationAtMaxSoftness", True ) );
 }
 
 void _FaultingMoresiMuhlhaus2006_Build( void* rheology, void* data ) {
@@ -287,7 +299,7 @@ void _FaultingMoresiMuhlhaus2006_Build( void* rheology, void* data ) {
 	Stg_Component_Build( self->length, data, False );
 	Stg_Component_Build( self->thickness, data, False );
 	Stg_Component_Build( self->tensileFailure, data, False );
-
+	Stg_Component_Build( self->fullySoftened, data, False );
 }
 
 void _FaultingMoresiMuhlhaus2006_Initialise( void* rheology, void* data ) {
@@ -322,11 +334,12 @@ void _FaultingMoresiMuhlhaus2006_Initialise( void* rheology, void* data ) {
 	Stg_Component_Initialise( self->length, data, False );
 	Stg_Component_Initialise( self->thickness, data, False );
 	Stg_Component_Initialise( self->tensileFailure, data, False );
+	Stg_Component_Initialise( self->fullySoftened, data, False );
 
 	/* We don't need to Initialise hasYieldedVariable because it's a parent variable and _YieldRheology_Initialise
 	 * has already been called */
 	particleLocalCount = self->hasYieldedVariable->variable->arraySize;
-
+	
 	/* If restarting from checkpoint, don't change the parameters on the particles */
 	if ( !(context && (True == context->loadFromCheckPoint) ) ) {
 		for ( lParticle_I = 0 ; lParticle_I < particleLocalCount ; lParticle_I++ ) { 
@@ -371,12 +384,12 @@ void _FaultingMoresiMuhlhaus2006_Initialise( void* rheology, void* data ) {
 			memcpy( normalDirector, normal, sizeof(Coord) );
 			memcpy( ptr, slip, sizeof(Coord) );
 			
-			Variable_SetValueDouble( self->slipRate->variable,     lParticle_I, 0.0 );
-
-			Variable_SetValueFloat( self->opacity->variable,      lParticle_I, 0.0 );
-			Variable_SetValueFloat( self->length->variable,       lParticle_I, 0.0 );
-			Variable_SetValueFloat( self->thickness->variable,    lParticle_I, 0.0 );
-			Variable_SetValueChar( self->tensileFailure->variable,lParticle_I, False );
+			Variable_SetValueDouble( self->slipRate->variable,      lParticle_I, 0.0   );
+			Variable_SetValueFloat(  self->opacity->variable,       lParticle_I, 0.0   );
+			Variable_SetValueFloat(  self->length->variable,        lParticle_I, 0.0   );
+			Variable_SetValueFloat(  self->thickness->variable,     lParticle_I, 0.0   );
+			Variable_SetValueChar(   self->tensileFailure->variable,lParticle_I, False );
+			Variable_SetValueChar(   self->fullySoftened->variable, lParticle_I, False );
 		}
 	}
 }
@@ -498,7 +511,7 @@ double _FaultingMoresiMuhlhaus2006_GetYieldCriterion(
 		
 	/* Calculate frictional strength */
 	effectiveFrictionCoefficient = _FaultingMoresiMuhlhaus2006_EffectiveFrictionCoefficient( self, materialPoint );
-	effectiveCohesion            = _FaultingMoresiMuhlhaus2006_EffectiveCohesion( self, materialPoint );
+	effectiveCohesion            = _FaultingMoresiMuhlhaus2006_EffectiveCohesion( self, materialPoint , particleExt);
 	sigma_nn                     = _FaultingMoresiMuhlhaus2006_Sigma_nn( self, materialPoint, constitutiveMatrix->dim );
 
 	frictionalStrength = effectiveFrictionCoefficient * sigma_nn + effectiveCohesion;
@@ -607,10 +620,10 @@ Bool _FaultingMoresiMuhlhaus2006_OldOrientationStillSoftening( void* rheology, M
 }
 
 double* _FaultingMoresiMuhlhaus2006_UpdateNormalDirection( void* rheology, MaterialPointsSwarm* materialPointsSwarm, void* materialPoint, Dimension_Index dim ) {
-	FaultingMoresiMuhlhaus2006*          self             = (FaultingMoresiMuhlhaus2006*) rheology;
+	FaultingMoresiMuhlhaus2006*          self                   = (FaultingMoresiMuhlhaus2006*) rheology;
 	FaultingMoresiMuhlhaus2006_Particle* particleExt;
-	double*                              velocityGradient = self->currentVelocityGradient;
-	Eigenvector*                         eigenvectorList  = self->currentEigenvectorList;
+	double*                              velocityGradient       = self->currentVelocityGradient;
+	Eigenvector*                         eigenvectorList        = self->currentEigenvectorList;
 	double                               strainRate_ns[2];
 	XYZ                                  normal[2];
 	XYZ                                  slip[2];
@@ -625,7 +638,7 @@ double* _FaultingMoresiMuhlhaus2006_UpdateNormalDirection( void* rheology, Mater
 	
 	/* This function is specific for pristine materials -- 
 	 * We don't need to calculate it for failure in old orientations */
-	if ( self->tryingOldOrientation )
+	 if ( self->tryingOldOrientation )
 		return normalDirector;
 	
 	if ((fabs(tanPhi = _FaultingMoresiMuhlhaus2006_EffectiveFrictionCoefficient( self, materialPoint )))<0.000001)
@@ -665,9 +678,10 @@ double* _FaultingMoresiMuhlhaus2006_UpdateNormalDirection( void* rheology, Mater
 	return normalDirector;
 }
 
-double _FaultingMoresiMuhlhaus2006_EffectiveCohesion( void* rheology, void* materialPoint ) {
-	FaultingMoresiMuhlhaus2006*    self                          = (FaultingMoresiMuhlhaus2006*) rheology;
-	double                         effectiveCohesion;
+double _FaultingMoresiMuhlhaus2006_EffectiveCohesion( void* rheology, void* materialPoint, void*  particleExtIn ) {
+	FaultingMoresiMuhlhaus2006*          self                          = (FaultingMoresiMuhlhaus2006*) rheology;
+	double                               effectiveCohesion;
+	FaultingMoresiMuhlhaus2006_Particle* particleExt                   = (FaultingMoresiMuhlhaus2006_Particle*) particleExtIn; 
 	
 	if ( self->tryingOldOrientation || self->ignoreOldOrientation ) {
 		/* If this is the old orientation or old orientations are ignored
@@ -676,6 +690,10 @@ double _FaultingMoresiMuhlhaus2006_EffectiveCohesion( void* rheology, void* mate
 	
 		effectiveCohesion =  self->cohesion * (1.0 - strainWeakeningRatio) + 
 				self->cohesionAfterSoftening * strainWeakeningRatio;
+				
+		/* Flag particle as fully softened if strainWeakeningRation > 0.99 */ 
+		
+		particleExt->fullySoftened = ( strainWeakeningRatio > 0.99 );
 	}
 	else {
 		/*	If old orientations are given priority and this is an unbroken direction 
@@ -742,6 +760,44 @@ double _FaultingMoresiMuhlhaus2006_Sigma_nn( void* rheology, void* materialPoint
 	return sigma_nn;
 }
 
+void _FaultingMoresiMuhlhaus2006_UpdateNormalAtMaxSoft( void* rheology, void* materialPoint, Dimension_Index dim, SymmetricTensor strainRate, void* particleExtIn ) {
+	XYZ                                  normal[2];
+	XYZ                                  slip[2];
+	double                               theta;
+	double*                              normalDirector;
+	double                               strainRate_ns[2];
+	int                                  favourablePlane;
+	Eigenvector                          eigenvectorListStrain[2];
+	FaultingMoresiMuhlhaus2006*          self               = (FaultingMoresiMuhlhaus2006*) rheology;
+	FaultingMoresiMuhlhaus2006_Particle* particleExt        = (FaultingMoresiMuhlhaus2006_Particle*) particleExtIn;	
+
+	normalDirector = Director_GetNormalPtr( self->director, materialPoint);
+
+	SymmetricTensor_CalcAllEigenvectors( strainRate, dim, eigenvectorListStrain );
+	theta = M_PI / 4.0;
+
+	if(dim = 2){
+		StGermain_RotateCoordinateAxis(   slip[0],   eigenvectorListStrain[0].vector, K_AXIS, -theta);
+		StGermain_RotateCoordinateAxis(   slip[1],   eigenvectorListStrain[0].vector, K_AXIS, +theta);
+		StGermain_RotateCoordinateAxis( normal[0],   eigenvectorListStrain[0].vector, K_AXIS, +theta);
+		StGermain_RotateCoordinateAxis( normal[1],   eigenvectorListStrain[0].vector, K_AXIS, -theta);		
+	}
+	else{
+		StGermain_RotateVector( slip[0],   eigenvectorListStrain[0].vector, eigenvectorListStrain[1].vector, - theta );
+		StGermain_RotateVector( slip[1],   eigenvectorListStrain[0].vector, eigenvectorListStrain[1].vector, + theta );
+		StGermain_RotateVector( normal[0], eigenvectorListStrain[0].vector, eigenvectorListStrain[1].vector, + theta );
+		StGermain_RotateVector( normal[1], eigenvectorListStrain[0].vector, eigenvectorListStrain[1].vector, - theta );
+	}
+	
+	/* Choose the plane which is oriented favorably for continued slip */
+	strainRate_ns[0] = fabs(TensorArray_MultiplyByVectors( self->currentVelocityGradient, slip[0], normal[0], dim ));
+	strainRate_ns[1] = fabs(TensorArray_MultiplyByVectors( self->currentVelocityGradient, slip[1], normal[1], dim ));
+
+	favourablePlane = strainRate_ns[0] > strainRate_ns[1] ? 0 : 1;
+	memcpy( particleExt->slip,   slip[favourablePlane], dim * sizeof(double) );
+	memcpy( normalDirector,    normal[favourablePlane], dim * sizeof(double) );
+}	
+
 void _FaultingMoresiMuhlhaus2006_StoreCurrentParameters( 
 		void*                                              rheology,
 		ConstitutiveMatrix*                                constitutiveMatrix, 
@@ -766,6 +822,13 @@ void _FaultingMoresiMuhlhaus2006_StoreCurrentParameters(
 	SymmetricTensor_CalcAllEigenvectors( self->currentStress, dim, self->currentEigenvectorList );
 
 	Director_SetDontUpdateParticleFlag( self->director, materialPoint, False );
+	
+	if( self->updateOrientationAtMaxSoftness ){
+		/* if particle is fully softened, and it is the first non-linear iteration of the current timestep,
+		   then update particle direction */		
+		if( particleExt->fullySoftened && (constitutiveMatrix->sleNonLinearIteration_I == 0) )	
+		  _FaultingMoresiMuhlhaus2006_UpdateNormalAtMaxSoft( rheology, materialPoint, dim, strainRate, particleExt ) ;
+	}
 }
 
 void _FaultingMoresiMuhlhaus2006_UpdateDrawParameters( void* rheology ) {
@@ -777,7 +840,7 @@ void _FaultingMoresiMuhlhaus2006_UpdateDrawParameters( void* rheology ) {
 	GlobalParticle*	  				 materialPoint;
 	double                           slipRate;
 	
-	double 							 ratio;
+	double                           ratio;
 	double                           length;
 	double                           brightness;
 	double                           opacity;

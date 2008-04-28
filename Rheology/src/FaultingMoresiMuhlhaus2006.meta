@@ -54,6 +54,12 @@
 		<param name="Default">False</param>
 		<param name="Description">Boolean to indicate if we want to take into account the oldOrientation</param>
 	</struct>
+	<struct>
+		<param name="Name">updateOrientationAtMaxSoftness</param>
+		<param name="Type">Bool</param>
+		<param name="Default">True</param>
+		<param name="Description">Boolean to indicate if we want to update the particle fault orientation when maximum softness is reached.  The new orientation is chosen to coincide with the direction of maximum shear strain rate.</param>
+	</struct>
 
 </list>
 

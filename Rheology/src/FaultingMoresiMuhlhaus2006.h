@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: FaultingMoresiMuhlhaus2006.h 354 2006-10-12 08:19:27Z SteveQuenette $
+** $Id: FaultingMoresiMuhlhaus2006.h 721 2008-04-28 23:15:15Z JohnMansour $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -57,6 +57,7 @@
 		float              length;
 		float              thickness;
 		Particle_Bool      tensileFailure;
+		Particle_Bool      fullySoftened;
 	}  FaultingMoresiMuhlhaus2006_Particle; 
 
 	
@@ -73,6 +74,7 @@
 		SwarmVariable*                                      length;                                \
 		SwarmVariable*                                      thickness;                             \
 		SwarmVariable*                                      tensileFailure;                        \
+		SwarmVariable*                                      fullySoftened;                        \
 		ExtensionInfo_Index                                 particleExtHandle;                     \
 		/* Param passed in */ \
 		MaterialPointsSwarm*                                materialPointsSwarm;                                 \
@@ -85,7 +87,8 @@
 		double                                              frictionCoefficient;                   \
 		double                                              frictionCoefficientAfterSoftening;     \
 		double                                              minimumYieldStress;                    \
-		Bool                                                ignoreOldOrientation;	           \
+		Bool                                                ignoreOldOrientation;	                \
+		Bool                                                updateOrientationAtMaxSoftness;        \
 		/* Stored values that are calculated once for each particle */ \
 		Eigenvector                                         currentEigenvectorList[3];             \
 		TensorArray                                         currentVelocityGradient;               \
@@ -94,8 +97,8 @@
 		double                                              tau_nn;                                \
 		double                                              storedSlipRateValue;                   \
 		/* Flags set to tell functions what's going on */ \
-		Bool                                                tryingOldOrientation;
-	
+		Bool                                                tryingOldOrientation;			\
+
 	struct FaultingMoresiMuhlhaus2006 { __FaultingMoresiMuhlhaus2006 };
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
@@ -161,10 +164,10 @@
 	Bool _FaultingMoresiMuhlhaus2006_OldOrientationStillSoftening( void* rheology, MaterialPointsSwarm* materialPointsSwarm, void* materialPoint, Dimension_Index dim ) ;
 	double* _FaultingMoresiMuhlhaus2006_UpdateNormalDirection( void* rheology, MaterialPointsSwarm* materialPointsSwarm, void* materialPoint, Dimension_Index dim ) ;
 
-	double _FaultingMoresiMuhlhaus2006_EffectiveCohesion( void* rheology, void* materialPoint ) ;
+	double _FaultingMoresiMuhlhaus2006_EffectiveCohesion( void* rheology, void* materialPoint, void* particleExt ) ;
 	double _FaultingMoresiMuhlhaus2006_EffectiveFrictionCoefficient( void* rheology, void* materialPoint ) ;
 	double _FaultingMoresiMuhlhaus2006_Sigma_nn( void* rheology, void* materialPoint, Dimension_Index dim ) ;
-
+	void  _FaultingMoresiMuhlhaus2006_UpdateNormalAtMaxSoft( void* rheology, void* materialPoint, Dimension_Index dim, SymmetricTensor strainRate, void* particleExtIn ) ;
 	void _FaultingMoresiMuhlhaus2006_StoreCurrentParameters( 
 		void*                                              rheology,
 		ConstitutiveMatrix*                                constitutiveMatrix, 
