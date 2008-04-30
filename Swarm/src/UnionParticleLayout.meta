@@ -27,5 +27,14 @@
 	</struct>
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">
+	<struct name="particleLayout">
+		<param name="Type">UnionParticleLayout</param>
+		<list name="ParticleLayoutList">
+			<param>ParticleLayout1</param>
+			<param>ParticleLayout2</param>
+			<param>ParticleLayout3</param>
+		</list>
+	</struct>
+</param>
 

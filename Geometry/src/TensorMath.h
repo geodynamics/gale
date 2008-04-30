@@ -123,7 +123,7 @@ int SymmetricTensor_TensorMap(Dimension_Index row_I, Dimension_Index col_I, Dime
 /** Alternate mapping index for 2D SymmetricTensor */ 
 #define MAP_2D_SYMM_TENSOR( ii, jj )  ( (ii) == (jj) ? (ii) : 2 )
 
-/** Alternate mapping index for 2D SymmetricTensor */ 
+/** Alternate mapping index for 3D SymmetricTensor */ 
 #define MAP_3D_SYMM_TENSOR( ii, jj )  ( (ii) == (jj) ? (ii) : ((ii) + (jj) + 2) )
 
 /** Alternate wrapper for indexing a SymmetricTensor */

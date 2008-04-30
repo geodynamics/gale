@@ -10,19 +10,21 @@
 <param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
 <param name="License">The Gnu Lesser General Public License http://www.gnu.org/licenses/lgpl.html</param>
 <param name="Parent">AbstractContext</param>
-<param name="Description">...</param>
+<param name="Description">Builds on the AbstractContext by adding a field variable register as well as recorded how many dimensions the problem is in.</param>
 
 <!--Now the interesting stuff-->
-
-
 <list name="Params">
-
+	<struct>
+		<param name="Name">dim</param>
+		<param name="Type">UnsignedInt</param>
+		<param name="Default">2</param>
+		<param name="Description">How many dimensions we are working in (either 2 or 3). This parameter is taken form the root dictionary.</param>
+	</struct>
 </list>
 
 <list name="Dependencies">
-
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">N/A</param>
 
 </StGermainData>

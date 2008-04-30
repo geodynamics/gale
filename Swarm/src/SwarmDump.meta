@@ -13,7 +13,7 @@
 <param name="Parent">Stg_Component</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">...</param>
+<param name="Description">Dumps all the information from the Swarm into a binary file. Occurs on the 'Dump' Entry Point specified by the 'dumpEvery' parameter in your imput file. This component will used HDF5 if it is installed.</param>
 
 <!--Now the interesting stuff-->
 
@@ -23,7 +23,7 @@
 		<param name="Name">newFileEachTime</param>
 		<param name="Type">Bool</param>
 		<param name="Default">True</param>
-		<param name="Description">...</param>
+		<param name="Description">The flag set whether you want the file to re-written over each output step or if you want a new file time.</param>
 	</struct>
 
 </list>
@@ -33,17 +33,23 @@
 		<param name="Essential">True</param>
 		<param name="Name">context</param>
 		<param name="Type">AbstractContext</param>
-		<param name="Description">...</param>
+		<param name="Description">The current context we are working in.</param>
 	</struct>
-
-<!-- PLEASE, check the above struct information is accurate, in line number 181 of the c file and then remove this comment afterwards -->
-
-
-<!-- PLEASE, check line number 182 for a dependency and add its information and then remove this comment afterwards -->
-
+	<struct>
+		<param name="Essential">True</param>
+		<param name="Name">Swarm</param>
+		<param name="Type">Swarm</param>
+		<param name="Description">A list of swarms that out want to output.</param>
+	</struct>	
 
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">
+	<struct name="swarmDump">
+		<param name="Type">SwarmDump</param>
+		<param name="Swarm">materialSwarm</param>
+		<param name="newFileEachTime">false</param>
+	</struct>
+</param>
 
 </StGermainData>
