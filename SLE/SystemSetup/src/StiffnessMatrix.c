@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StiffnessMatrix.c 1112 2008-04-23 06:10:17Z LukeHodkinson $
+** $Id: StiffnessMatrix.c 1116 2008-05-01 05:17:56Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -2851,6 +2851,7 @@ void StiffnessMatrix_CalcNonZeros( void* stiffnessMatrix ) {
       for( dof_i = 0; dof_i < rowDofs->dofCounts[n_i]; dof_i++ ) {
 	 rowEq = rowEqNum->destinationArray[n_i][dof_i];
 	 if( rowEq == -1 ) continue;
+         if( !STreeMap_HasKey( rowEqNum->ownedMap, &rowEq ) ) continue;
 	 localRowEq = *(int*)STreeMap_Map( rowEqNum->ownedMap, &rowEq );
 	 FeMesh_GetNodeElements( rowMesh, n_i, self->rowInc );
 	 nNodeEls = IArray_GetSize( self->rowInc );
