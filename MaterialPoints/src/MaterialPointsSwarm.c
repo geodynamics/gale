@@ -303,6 +303,7 @@ void _MaterialPointsSwarm_Build( void* swarm, void* data ) {
 	int			commHandler_I;
 	Bool                    movementCommHandlerFound = False;
 	Stream*                 errorStream = Journal_Register( Error_Type, self->type );
+	int var_I;
 
 	_Swarm_Build( self, data );
 
@@ -323,17 +324,20 @@ void _MaterialPointsSwarm_Build( void* swarm, void* data ) {
 		errorStream, "Error: for MaterialPointsSwarm Swarms, at least one ParticleMovementHandler"
 			" commHandler must be registered. Please rectify this in your XML / code.\n" );
 
-	Stg_Component_Build( self->particleCoordVariable, data, False );
-	Stg_Component_Build( self->materialIndexVariable, data, False );
+	for( var_I = 0 ; var_I < self->nSwarmVars ; var_I++ ) {
+		Stg_Component_Build( self->swarmVars[var_I], data , False );
+	}
 
 }
 void _MaterialPointsSwarm_Initialise( void* swarm, void* data ) {
 	MaterialPointsSwarm*	self = (MaterialPointsSwarm*) swarm;
 	AbstractContext* context = (AbstractContext*)data;
+	int var_I;
 	
 	_Swarm_Initialise( self, data );
-	Stg_Component_Initialise( self->particleCoordVariable, data, False );
-	Stg_Component_Initialise( self->materialIndexVariable, data, False );
+	for( var_I = 0 ; var_I < self->nSwarmVars ; var_I++ ) {
+		Stg_Component_Initialise( self->swarmVars[var_I], data , False );
+	}
 
 	/* if loading from checkpoint, particle materials etc have already been loaded in Swarm_Build() - 
 	 * thus nothing to do here */
