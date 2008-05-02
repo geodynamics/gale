@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeSwarmVariable.c 964 2007-10-11 08:03:06Z SteveQuenette $
+** $Id: FeSwarmVariable.c 1117 2008-05-02 02:50:02Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -46,6 +46,7 @@
 
 #include "types.h"
 #include "FeVariable.h"
+#include "FeMesh.h"
 #include "FeSwarmVariable.h"
 
 #include <assert.h>
@@ -171,10 +172,19 @@ void _FeSwarmVariable_Destroy( void* swarmVariable, void* data ) {}
 
 void _FeSwarmVariable_ValueAt( void* swarmVariable, Particle_Index lParticle_I, double* value ) {
 	FeSwarmVariable*  self            = (FeSwarmVariable*) swarmVariable;
+	FeMesh*           mesh            = self->feVariable->feMesh;
 	Swarm*            swarm           = self->swarm;
-	IntegrationPoint* particle        = (IntegrationPoint*) Swarm_ParticleAt( swarm, lParticle_I );
+	GlobalParticle*   particle        = (GlobalParticle*) Swarm_ParticleAt( swarm, lParticle_I );
+	double            xi[3];
 
-	FeVariable_InterpolateWithinElement( self->feVariable, particle->owningCell, particle->xi, value );
+	/* check if the swarm is using a GlobalCoordSystem, if not FAIL */
+	Journal_Firewall( (swarm->particleLayout->coordSystem == GlobalCoordSystem), 
+			Journal_Register( Error_Type, "FeSwarmVariable" ),
+			"Error in function %s: FeSwarmVariables require swarms with GlobalCoordSystems\n"
+		        "This FeSwarmVariable, %s, uses the swarm %s, which doesn't have a GlobalCoordSystem\n",
+			__func__, self->name, swarm->name );
+	FeMesh_CoordGlobalToLocal( mesh, particle->owningCell, particle->coord, xi );
+	FeVariable_InterpolateWithinElement( self->feVariable, particle->owningCell, xi, value );
 }
 
 
