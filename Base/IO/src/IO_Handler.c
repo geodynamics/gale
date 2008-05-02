@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: IO_Handler.c 3743 2006-08-03 03:14:38Z KentHumphries $
+** $Id: IO_Handler.c 4260 2008-05-02 04:20:37Z LeonSutedja $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -48,8 +48,6 @@
 const Type IO_Handler_Type = Type_Invalid;
 
 /* TODO: register with IO_Handler registry */
-
-
 
 IO_Handler* _IO_Handler_New( 
 		SizeT						_sizeOfSelf, 
@@ -84,11 +82,14 @@ IO_Handler* _IO_Handler_New(
 
 void _IO_Handler_Init( IO_Handler* self ) {
 	/* General and Virtual info should already be set */
-	
+
 	/* IO_Handler info */
 	self->currDictionary = NULL;
 	self->resource = NULL;
 	self->currPath = NULL;
+	self->schema = NULL;
+	self->validate = malloc( sizeof( int ) );
+	*(self->validate) = 0;
 }
 
 
@@ -98,7 +99,7 @@ void _IO_Handler_Delete( void* io_handler ) {
 	
 	if( self->currPath ) Memory_Free( self->currPath );
 	if( self->resource ) Memory_Free( self->resource );
-	
+
 	/* Stg_Class_Delete parent class */
 	_Stg_Class_Delete( self );
 }
@@ -424,9 +425,40 @@ Index IO_Handler_ReadAllFilesFromCommandLineForceSource( void* ioHandler, int ar
 	return filesRead;
 }
 
+void _get_XML(void* ioHandler, char* argv[], int argc) {
+	IO_Handler* self          = (IO_Handler*) ioHandler;
+	Index arg_I;
+	int schema=0;
+	char* name;
+	char* option;
+	
+	for ( arg_I = 1 ; arg_I < argc; arg_I++) {
+		name = argv[ arg_I ];
+		option = strrchr( name, '-' );
+		if ( schema == 1 ) { 
+			if ( self->schema==NULL ) {
+				self->schema = malloc( strlen( argv[ arg_I ] ) +1 );
+				strcpy( self->schema, argv[ arg_I ] );
+				schema=0;
+			}
+		}
+		if ( option != NULL ) {
+			if ( strcasecmp( option, "-schema" ) == 0 )
+				schema = 1;
+			if ( strcasecmp( option, "-dontXMLValidate" ) == 0 )
+				*(self->validate) = 0;
+			if ( strcasecmp( option, "-XMLValidate" ) == 0 )
+				*(self->validate) = 1;
+		}
+	}
+}
+
 
 Index IO_Handler_ReadAllFromCommandLine( void* ioHandler, int argc, char* argv[], Dictionary* dictionary ) {
 	Index       filesRead = 0;
+	Index arg_I;
+	IO_Handler* self;	
+	_get_XML( ioHandler, argv, argc );
 	filesRead = IO_Handler_ReadAllFilesFromCommandLine( ioHandler, argc, argv, dictionary );
 	Dictionary_ReadAllParamFromCommandLine( dictionary, argc, argv );
 

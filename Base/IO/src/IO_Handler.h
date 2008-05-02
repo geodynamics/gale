@@ -34,7 +34,7 @@
 ** Comments:
 **	When writing files, I should change the interface to add an option to update, rather than overwrite, files.
 **
-** $Id: IO_Handler.h 3743 2006-08-03 03:14:38Z KentHumphries $
+** $Id: IO_Handler.h 4260 2008-05-02 04:20:37Z LeonSutedja $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -69,7 +69,9 @@
 		/* IO_Handler info */ \
 		Dictionary*				currDictionary; \
 		char*					resource; \
-		char*					currPath;
+		char*					currPath; \
+		char*					schema; \
+		int*					validate;
 	struct _IO_Handler { __IO_Handler };
 	
 	/* No "IO_Handler_New" and "IO_Handler_Init" as this is an abstract class */
