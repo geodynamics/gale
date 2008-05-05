@@ -11,7 +11,7 @@
 <param name="Copyright">Copyright (C) 2004-2007 VPAC.</param>
 <param name="License">https://csd.vpac.org/twiki/bin/view/Stgermain/SoftwareLicense</param>
 <param name="Parent">ElementType</param>
-<param name="Reference">Hughes, Thomas J. R., "The Finite Element Method, Linear Static and Dynamic Finite Element Analysis" Dover Publications, Inc. Mineola New York (1987)</param>
+<param name="Reference">Hughes, Thomas J. R., "The Finite Element Method, Linear Static and Dynamic Finite Element Analysis" Dover Publications, Inc. Mineola New York (1987) pp. 126</param>
 <param name="Summary">Defines a set of quadratic shape functions for a 3D element.</param>
 <param name="Description">3D element with quadratic shape functions</param>
 
