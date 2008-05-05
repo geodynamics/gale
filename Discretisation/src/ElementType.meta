@@ -13,7 +13,8 @@
 <param name="Parent">Stg_Component</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">...</param>
+<param name="isAbstractClass">True</param>
+<param name="Description">Abstract parent class for the different element type implementations. Also provides generic element type functionality.</param>
 
 <!--Now the interesting stuff-->
 

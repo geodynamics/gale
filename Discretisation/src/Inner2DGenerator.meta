@@ -9,7 +9,7 @@
 <param name="Project Web">https://csd.vpac.org/twiki/bin/view/Stgfem/WebHome</param>
 <param name="Copyright">Copyright (C) 2004-2005 VPAC.</param>
 <param name="License">https://csd.vpac.org/twiki/bin/view/Stgermain/SoftwareLicense</param>
-<param name="Parent">ElementType</param>
+<param name="Parent">MeshGenerator</param>
 <param name="Description">...</param>
 
 <!--Now the interesting stuff-->

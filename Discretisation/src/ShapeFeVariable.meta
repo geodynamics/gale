@@ -13,7 +13,7 @@
 <param name="Parent">FeVariable</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">...</param>
+<param name="Description">Field variable to be defined over a particular sub domain defined by the Shape supplied.</param>
 
 <!--Now the interesting stuff-->
 
@@ -23,7 +23,7 @@
 		<param name="Name">Shape</param>
 		<param name="Type">String</param>
 		<param name="Default">""</param>
-		<param name="Description">...</param>
+		<param name="Description">Defines the geometric sub domain over which the FeVariable is to be applied.</param>
 	</struct>
 
 </list>
