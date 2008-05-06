@@ -35,14 +35,52 @@ elementFormDefault="qualified">
    <xs:attribute name="append" type="xs:string" use="optional"/>
  </xs:complexType>
 </xs:element>
+
 <xs:element name="include" type="xs:string"/>
 <xs:element name="searchPath" type="xs:string"/>
+
+<xs:element name="components">
+ <xs:complexType mixed="true">
+  <xs:sequence>
+   <xs:element ref="element" minOccurs="1" maxOccurs="unbounded"/>
+  </xs:sequence>
+   <xs:attribute name="mergeType" use="optional">
+     <xs:simpleType>
+       <xs:restriction base="xs:string">
+         <xs:enumeration value="merge"/>
+         <xs:enumeration value="replace"/>
+       </xs:restriction>
+     </xs:simpleType>
+   </xs:attribute>
+ </xs:complexType>
+</xs:element>
+
+<xs:element name="toolbox" type="xs:string"/>
+<xs:element name="import">
+ <xs:complexType mixed="true">
+  <xs:sequence>
+   <xs:element ref="toolbox" minOccurs="1" maxOccurs="1"/>
+  </xs:sequence>
+ </xs:complexType>
+</xs:element>
+
+<xs:element name="plugin" type="xs:string"/>
+<xs:element name="plugins">
+ <xs:complexType mixed="true">
+  <xs:sequence>
+   <xs:element ref="plugin" minOccurs="1" maxOccurs="unbounded"/>
+  </xs:sequence>
+ </xs:complexType>
+</xs:element>
   
 <xs:element name="StGermainData">
 <xs:complexType mixed="true">
   <xs:sequence>
-    <xs:element ref="searchPath" maxOccurs="unbounded" minOccurs="0"/>
     <xs:element ref="include" maxOccurs="unbounded" minOccurs="0"/>
+    <xs:element ref="import" maxOccurs="unbounded" minOccurs="0"/>
+    <xs:element ref="plugins" maxOccurs="unbounded" minOccurs="0"/>
+    <xs:element ref="components" maxOccurs="unbounded" minOccurs="0"/>
+    <xs:element ref="searchPath" maxOccurs="unbounded" minOccurs="0"/>
     <xs:element ref="element" maxOccurs="unbounded" minOccurs="0"/>
   </xs:sequence>
 </xs:complexType>

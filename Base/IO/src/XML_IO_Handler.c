@@ -81,6 +81,13 @@ static const xmlChar* REPLACE_TAG = (const xmlChar*) "replace";
 static const xmlChar* SEARCH_PATH_TAG = (const xmlChar*) "searchPath";
 static const xmlChar* ELEMENT_TAG = (const xmlChar*) "element";
 
+static const xmlChar* PLUGINS_TAG = (const xmlChar*) "plugins";
+static const xmlChar* PLUGIN_TAG = (const xmlChar*) "plugin";
+static const xmlChar* IMPORT_TAG = (const xmlChar*) "import";
+static const xmlChar* TOOLBOX_TAG = (const xmlChar*) "toolbox";
+static const xmlChar* COMPONENTS_TAG = (const xmlChar*) "components";
+
+
 /* Namespace and root node to validate against - please update on new releases */
 static const xmlChar* ROOT_NODE_NAME = (xmlChar*) "StGermainData";
 static const xmlChar* XML_VERSION = (xmlChar*) "1.0";
@@ -117,9 +124,19 @@ static void _XML_IO_Handler_ParseColumnDefinitions( XML_IO_Handler*, xmlNodePtr,
 static void _XML_IO_Handler_ParseAsciiValue( char* asciiValue, ColumnInfo* columnInfo, Dictionary_Entry_Value* toDictStruct );
 static char* _XML_IO_Handler_GetNextAsciiToken( XML_IO_Handler*, xmlNodePtr );
 static void _XML_IO_Handler_ParseStruct( XML_IO_Handler*, xmlNodePtr, Dictionary_Entry_Value*, 
-						Dictionary_MergeType, Dictionary_Entry_Source );
+					Dictionary_MergeType, Dictionary_Entry_Source );
 static void _XML_IO_Handler_ParseParameter( XML_IO_Handler*, xmlNodePtr, Dictionary_Entry_Value*, 
-						Dictionary_MergeType, Dictionary_Entry_Source source );
+					Dictionary_MergeType, Dictionary_Entry_Source );
+static void _XML_IO_Handler_ParsePlugins( XML_IO_Handler*, xmlNodePtr, Dictionary_Entry_Value*, 
+					Dictionary_MergeType, Dictionary_Entry_Source );
+static void _XML_IO_Handler_ParsePlugin( XML_IO_Handler*, xmlNodePtr, Dictionary_Entry_Value*, 
+					Dictionary_MergeType, Dictionary_Entry_Source );
+static void _XML_IO_Handler_ParseImport( XML_IO_Handler*, xmlNodePtr, Dictionary_Entry_Value*, 
+					Dictionary_MergeType, Dictionary_Entry_Source );
+static void _XML_IO_Handler_ParseToolbox( XML_IO_Handler*, xmlNodePtr, Dictionary_Entry_Value*, 
+					Dictionary_MergeType, Dictionary_Entry_Source );
+static void _XML_IO_Handler_ParseComponents( XML_IO_Handler*, xmlNodePtr, Dictionary_Entry_Value*, 
+					Dictionary_MergeType, Dictionary_Entry_Source );
 static Dictionary_Entry_Value_Type _XML_IO_Handler_GetDictValueType( XML_IO_Handler* self, char* type );
 static xmlChar* _XML_IO_Handler_StripLeadingTrailingWhiteSpace( XML_IO_Handler* self, const xmlChar* const );
 static Bool _XML_IO_Handler_IsOnlyWhiteSpace( char* );
@@ -932,6 +949,21 @@ static void _XML_IO_Handler_ParseNodes( XML_IO_Handler* self, xmlNodePtr cur, Di
 		if ( (0 == xmlStrcmp( cur->name, (const xmlChar *) ELEMENT_TAG ) ) && ( cur->ns == self->currNameSpace ) ) {
 			_XML_IO_Handler_ParseElement( self, cur, parent, mergeType, source );
 		}
+		else if ( (0 == xmlStrcmp( cur->name, (const xmlChar *) PLUGINS_TAG) ) && ( cur->ns == self->currNameSpace ) ) {
+			_XML_IO_Handler_ParsePlugins( self, cur, parent, mergeType, source );
+		} 
+		else if ( (0 == xmlStrcmp( cur->name, (const xmlChar *) PLUGIN_TAG) ) && ( cur->ns == self->currNameSpace ) ) {
+			_XML_IO_Handler_ParsePlugin( self, cur, parent, mergeType, source );
+		} 
+		else if ( (0 == xmlStrcmp( cur->name, (const xmlChar *) TOOLBOX_TAG) ) && ( cur->ns == self->currNameSpace ) ) {
+			_XML_IO_Handler_ParseToolbox( self, cur, parent, mergeType, source );
+		} 
+		else if ( (0 == xmlStrcmp( cur->name, (const xmlChar *) IMPORT_TAG) ) && ( cur->ns == self->currNameSpace ) ) {
+			_XML_IO_Handler_ParseImport( self, cur, parent, mergeType, source );
+		} 
+		else if ( (0 == xmlStrcmp( cur->name, (const xmlChar *) COMPONENTS_TAG) ) && ( cur->ns == self->currNameSpace ) ) {
+			_XML_IO_Handler_ParseComponents( self, cur, parent, mergeType, source );
+		} 
 		#ifdef XML_OLD_DTD
 		else if ( (0 == xmlStrcmp( cur->name, (const xmlChar *) PARAM_TAG ) ) && ( cur->ns == self->currNameSpace ) ) {
 			_XML_IO_Handler_ParseParameter( self, cur, parent, mergeType, source );
@@ -1071,6 +1103,45 @@ static void _XML_IO_Handler_ParseElement( XML_IO_Handler* self, xmlNodePtr cur, 
 	}
 }
 
+static void _XML_IO_Handler_ParseComponents( XML_IO_Handler* self, xmlNodePtr cur, Dictionary_Entry_Value* parent, 
+					Dictionary_MergeType defaultMergeType, Dictionary_Entry_Source source )
+{
+	xmlChar* name = (xmlChar*) "name";
+	xmlNewProp( cur, (xmlChar*) NAME_ATTR, (xmlChar*) name );
+	xmlSetProp( cur, (xmlChar*) NAME_ATTR, "components" );
+	_XML_IO_Handler_ParseStruct( self, cur, parent, defaultMergeType, source );
+}
+
+static void _XML_IO_Handler_ParsePlugins( XML_IO_Handler* self, xmlNodePtr cur, Dictionary_Entry_Value* parent, 
+					Dictionary_MergeType defaultMergeType, Dictionary_Entry_Source source )
+{
+	xmlChar* name = (xmlChar*) "name";
+	xmlNewProp( cur, (xmlChar*) NAME_ATTR, (xmlChar*) name );
+	xmlSetProp( cur, (xmlChar*) NAME_ATTR, "plugins" );
+	_XML_IO_Handler_ParseList( self, cur, parent, defaultMergeType, source );
+}
+
+static void _XML_IO_Handler_ParsePlugin( XML_IO_Handler* self, xmlNodePtr cur, Dictionary_Entry_Value* parent, 
+					Dictionary_MergeType defaultMergeType, Dictionary_Entry_Source source )
+{
+	_XML_IO_Handler_ParseParameter( self, cur, parent, defaultMergeType, source );
+}
+
+static void _XML_IO_Handler_ParseImport( XML_IO_Handler* self, xmlNodePtr cur, Dictionary_Entry_Value* parent, 
+					Dictionary_MergeType defaultMergeType, Dictionary_Entry_Source source )
+{
+	xmlChar* name = (xmlChar*) "name";
+	xmlNewProp( cur, (xmlChar*) NAME_ATTR, (xmlChar*) name );
+	xmlSetProp( cur, (xmlChar*) NAME_ATTR, "import" );
+	_XML_IO_Handler_ParseList( self, cur, parent, defaultMergeType, source );
+}
+
+static void _XML_IO_Handler_ParseToolbox( XML_IO_Handler* self, xmlNodePtr cur, Dictionary_Entry_Value* parent, 
+					Dictionary_MergeType defaultMergeType, Dictionary_Entry_Source source )
+{
+	_XML_IO_Handler_ParseParameter( self, cur, parent, defaultMergeType, source );
+}
+	
 /** parse list: given a node containing a list, parses the list into the ::Dictionary. (In future might want flags to
  * say whether each element constrained to be same type?) */
 static void _XML_IO_Handler_ParseList( XML_IO_Handler* self, xmlNodePtr cur, Dictionary_Entry_Value* parent, 
