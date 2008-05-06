@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StandardConditionFunctions.c 1106 2008-04-15 02:15:33Z JulianGiordani $
+** $Id: StandardConditionFunctions.c 1122 2008-05-06 01:08:00Z DavidMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -163,6 +163,10 @@ void _StgFEM_StandardConditionFunctions_Construct( void* component, Stg_Componen
 
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_InflowBottom, "InflowBottom");
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+
+        condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_GaussianTube, "GaussianTube");
+        ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+
 }
 
 void* _StgFEM_StandardConditionFunctions_DefaultNew( Name name ) {
@@ -1326,3 +1330,59 @@ void StgFEM_StandardConditionFunctions_InflowBottom( Node_LocalIndex node_lI, Va
 
 	*result = 2.0 * sideV * sideLength / wallLength;
 }
+
+void StgFEM_StandardConditionFunctions_GaussianTube( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
+{
+        DomainContext*  context = (DomainContext*)_context;
+        Dictionary*             dictionary         = context->dictionary;
+        FeVariable*             feVariable = NULL;
+        FeMesh*                 feMesh = NULL;
+        unsigned                nDims;
+        double*                 result = (double*) _result;
+        double                  a1,b1,c1, a2,b2,c2, x,y,z,r_y,r_yz;
+        double*                 coord;
+        double                  min[3], max[3];
+	double                  y_shift, z_shift;
+
+        feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
+        feMesh       = feVariable->feMesh;
+
+        nDims = Mesh_GetDimSize( feMesh );
+        Mesh_GetGlobalCoordRange( feMesh, min, max );
+
+ 	a1 = Dictionary_GetDouble_WithDefault( dictionary, "GaussianTube_a1", 1.0 ); /* Scales the magnitude of the perturbation. */
+	c1 = Dictionary_GetDouble_WithDefault( dictionary, "GaussianTube_c1", 0.1 ); /* Controls the smoothing length. Smaller values produce less smoothing. */
+
+        a2 = Dictionary_GetDouble_WithDefault( dictionary, "GaussianTube_a2", 0.05 ); /* Controls ampltude of oscillations */
+        b2 = Dictionary_GetDouble_WithDefault( dictionary, "GaussianTube_b2", 6.28318530718 ); /* Controls frequency of oscillations */
+	c2 = Dictionary_GetDouble_WithDefault( dictionary, "GaussianTube_c2", 1.570796326795 ); /* Shifts oscillations */
+
+	y_shift = Dictionary_GetDouble_WithDefault( dictionary, "GaussianTube_y_origin", 0.0 );
+	z_shift = Dictionary_GetDouble_WithDefault( dictionary, "GaussianTube_z_origin", 0.0 );
+
+        coord = Mesh_GetVertex( feMesh, node_lI );
+
+	x = coord[ I_AXIS ];
+	y = coord[ J_AXIS ];
+
+	y = y - y_shift;
+	if (nDims==2) {
+		b1 = a2 * sin( b2*x - c2 );
+		r_y = sqrt( (y-b1)*(y-b1) );
+		*result = a1 * exp( -(r_y * r_y) / (2.0*c1*c1) );
+	}
+	if (nDims==3) {
+		z = coord[ K_AXIS ];
+		z = z - z_shift;
+
+		b1 = a2 * sin( b2*x - c2 );
+		r_yz = sqrt( (y-b1)*(y-b1) + z*z );
+		*result = a1 * exp( -(r_yz * r_yz) / (2.0*c1*c1) );
+	}
+
+
+}
+
+
+
+
