@@ -136,7 +136,7 @@ void _Velic_solB_Construct( void* analyticSolution, Stg_ComponentFactory* cf, vo
 	if ( recoverdStrainRateField )
 		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, recoverdStrainRateField, Velic_solB_StrainRateFunction );
 
-	recoveredStressField = Stg_ComponentFactory_ConstructByName( cf, "recoveredStressField", FeVariable, False, data );
+	recoveredStressField = Stg_ComponentFactory_ConstructByName( cf, "recoveredSigmaField", FeVariable, False, data );
 	if ( recoveredStressField )
 		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, recoveredStressField, Velic_solB_StressFunction );
 
