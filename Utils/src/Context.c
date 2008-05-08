@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: Context.c 610 2007-10-11 08:09:29Z SteveQuenette $
+** $Id: Context.c 725 2008-05-08 05:15:45Z WendySharples $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -165,6 +165,7 @@ UnderworldContext* _UnderworldContext_New(
 
 void _UnderworldContext_Init( UnderworldContext* self ) {
 	self->isConstructed = True;
+	self->Vrms = 0.0;
 	EntryPoint_Append_AlwaysLast( Context_GetEntryPoint( self, AbstractContext_EP_Construct ),
 			   "Underworld App Assign Pointers",
 			   UnderworldContext_AssignPointers,

@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: Context.h 354 2006-10-12 08:19:27Z SteveQuenette $
+** $Id: Context.h 725 2008-05-08 05:15:45Z WendySharples $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -75,6 +75,7 @@
 		FeVariable*                    viscosityField;                \
 		FeVariable*                    stressField;                   \
 		FeVariable*                    stressInvField;                \
+		double						   Vrms;						  \
 		
 	struct UnderworldContext { __UnderworldContext };
 	
