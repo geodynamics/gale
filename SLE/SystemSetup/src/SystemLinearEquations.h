@@ -51,7 +51,7 @@
 **	for storing and managing the matrices and vectors that make up a system, but uses
 **	the SLE_Solver class to actually implement a solution mechanism for the given eqn.
 **
-** $Id: SystemLinearEquations.h 1092 2008-04-01 03:34:46Z DavidLee $
+** $Id: SystemLinearEquations.h 1123 2008-05-08 00:34:10Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -139,6 +139,7 @@
 		Matrix*						    J;			       \
 		SystemLinearEquations_SetFFunc*		    	    _setFFunc;		       \
 		SystemLinearEquations_SetFFunc*		    	    _updateOldFields;	       \
+		Name						    optionsPrefix;	       \
 		
 		
 	/** Abstract class to manage the set up, building, initialisation etc of a System of

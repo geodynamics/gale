@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SystemLinearEquations.c 1092 2008-04-01 03:34:46Z DavidLee $
+** $Id: SystemLinearEquations.c 1123 2008-05-08 00:34:10Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -145,11 +145,13 @@ void _SystemLinearEquations_Init(
 		Bool                                               killNonConvergent,
 		Iteration_Index                                    nonLinearMinIterations,
 		Name						   nonLinearSolutionType,
+		Name						   optionsPrefix,
 		EntryPoint_Register*                               entryPoint_Register,
 		MPI_Comm                                           comm ) 
 {
-	SystemLinearEquations* self = (SystemLinearEquations*)sle;
-	char* filename;
+	SystemLinearEquations*  self 		= (SystemLinearEquations*)sle;
+	char* 			filename;
+	char* 			optionsName;
 
 	self->isConstructed = True;
 	self->extensionManager = ExtensionManager_New_OfExistingObject( self->name, self );
@@ -189,7 +191,11 @@ void _SystemLinearEquations_Init(
 	self->nonLinearTolerance        = nonLinearTolerance;
 	self->nonLinearMaxIterations    = nonLinearMaxIterations;
 	self->killNonConvergent         = killNonConvergent;
-	self->nonLinearMinIterations    = nonLinearMinIterations;
+	self->nonLinearMinIterations    = nonLinearMinIterations;    
+									     /* _  /0 */
+	optionsName = Memory_Alloc_Array_Unnamed( char, strlen(optionsPrefix) + 1 + 1 );
+	sprintf( optionsName, "%s_", optionsPrefix );
+	self->optionsPrefix = optionsName;
 
 	/* BEGIN LUKE'S FRICTIONAL BCS BIT */
 	Stg_asprintf( &self->nlEPName, "%s-nlEP", self->name );
@@ -254,6 +260,7 @@ void SystemLinearEquations_InitAll(
 			killNonConvergent, 
 			1,/* TODO : hack for setting the minimum number of iterations to 1- same hack as above */
 			"",
+			"",
 			entryPoint_Register,
 			comm );
 }
@@ -279,6 +286,8 @@ void _SystemLinearEquations_Delete( void* sle ) {
 /* 	 delete parent */
 	_Stg_Component_Delete( self );
 	Stream_UnIndentBranch( StgFEM_Debug );
+
+	Memory_Free( self->optionsPrefix );
 }
 
 
@@ -382,6 +391,7 @@ void _SystemLinearEquations_Construct( void* sle, Stg_ComponentFactory* cf, void
 	Iteration_Index         nonLinearMinIterations;                     
 	Name			nonLinearSolutionType;
 	NonlinearSolver*	nlSolver		= NULL;
+	Name			optionsPrefix;
 	
 	solver = Stg_ComponentFactory_ConstructByKey( cf, self->name, SLE_Solver_Type, SLE_Solver, False, data ) ;
 
@@ -393,7 +403,8 @@ void _SystemLinearEquations_Construct( void* sle, Stg_ComponentFactory* cf, void
 	nonLinearMaxIterations    = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "nonLinearMaxIterations", 500 );
 	killNonConvergent         = Stg_ComponentFactory_GetBool(   cf, self->name, "killNonConvergent",      True );
 	nonLinearMinIterations    = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "nonLinearMinIterations", 1 );
-	nonLinearSolutionType	  = Stg_ComponentFactory_GetString( cf, self->name, "nonLinearSolutionType", "" );
+	nonLinearSolutionType	  = Stg_ComponentFactory_GetString( cf, self->name, "nonLinearSolutionType",  "" );
+	optionsPrefix		  = Stg_ComponentFactory_GetString( cf, self->name, "optionsPrefix",          "" );
 	
 	entryPointRegister = Stg_ObjectList_Get( cf->registerRegister, "EntryPoint_Register" );
 	assert( entryPointRegister );
@@ -417,6 +428,7 @@ void _SystemLinearEquations_Construct( void* sle, Stg_ComponentFactory* cf, void
 			killNonConvergent, 
 			nonLinearMinIterations,
 			nonLinearSolutionType,
+			optionsPrefix,
 			entryPointRegister,
 			MPI_COMM_WORLD );
 
@@ -718,8 +730,7 @@ void SystemLinearEquations_NewtonExecute( void* sle, void* _context ) {
 	SystemLinearEquations*	self            = (SystemLinearEquations*) sle;
 	SNES			snes		= ((PETScNonlinearSolver*)self->nlSolver)->snes;
 
-	/* make this prefix generic - ie: get from XML */
-	SNESSetOptionsPrefix( snes, "sw_" );
+	SNESSetOptionsPrefix( snes, self->optionsPrefix );
 	SNESSetFromOptions( snes );
 	SNESSolve( snes, PETSC_NULL, ((PETScVector*)self->X)->petscVec );
 }
