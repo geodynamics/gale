@@ -104,6 +104,9 @@
 	void PETScNonlinearSolver_SetSolution( void* nls, void* x );
 	void PETScNonlinearSolver_SetRhs( void* nls, void* rhs );
 
+	#define StgNonlinearSolverGetPetscSNES( nls ) ( (SNES)( ((PETScNonlinearSolver*)(nls))->snes ) )
+	#define StgNonlinearSolverGetPetscKSP( nls ) ( (KSP)( ((PETScNonlinearSolver*)(nls))->ksp ) )
+
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Private Member functions
 	*/

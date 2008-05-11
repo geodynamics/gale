@@ -120,6 +120,8 @@
 
 	void PETScVector_SetComm( void* vector, MPI_Comm comm );
 
+	#define StgVectorGetPetscVec( vector ) ( (Vec)( ((PETScVector*)(vector))->petscVec ) )
+
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Private Member functions
 	*/

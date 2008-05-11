@@ -110,6 +110,8 @@
 	void PETScMatrixSolver_EnableShifting( void* matrixSolver, Bool state );
 	void PETScMatrixSolver_SetNormType( void* matrixSolver, PETScMatrixSolver_NormType normType );
 
+	#define StgMatrixSolverGetPetscKSP( solver ) ( (KSP)( ((PETScMatrixSolver*)(solver))->ksp ) )
+
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Private Member functions
 	*/

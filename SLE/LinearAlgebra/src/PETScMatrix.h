@@ -140,6 +140,8 @@
 
 	void PETScMatrix_Draw( void* matrix );
 
+	#define StgMatrixGetPetscMat( matrix ) ( (Mat)( ((PETScMatrix*)(matrix))->petscMat ) )
+
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Private Member functions
 	*/
