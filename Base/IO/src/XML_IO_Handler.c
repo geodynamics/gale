@@ -111,6 +111,7 @@ static const unsigned int ASCII_LIST_STRING_BUFFER_SIZE = 1024;
 static xmlNodePtr _XML_IO_Handler_OpenCheckFile( XML_IO_Handler*, const char* );
 static xmlNodePtr _XML_IO_Handler_OpenCheckBuffer( XML_IO_Handler*, const char* );
 static void _XML_IO_Handler_OpenFile( XML_IO_Handler*, const char* );
+static void _XML_IO_Handler_ValidateFile( XML_IO_Handler*, const char* );
 static void _XML_IO_Handler_OpenBuffer( XML_IO_Handler*, const char* );
 static xmlNodePtr _XML_IO_Handler_Check( XML_IO_Handler* );
 static void _XML_IO_Handler_ParseNodes( XML_IO_Handler*, xmlNodePtr, Dictionary_Entry_Value*, 
@@ -348,8 +349,6 @@ void _XML_IO_Handler_Init( XML_IO_Handler* self ) {
 	self->searchPathsSize = 0;
 	self->searchPaths = NULL;
 	
-	
-
 }
 
 
@@ -609,6 +608,8 @@ MPI_Comm_rank( MPI_COMM_WORLD, &rank );
 		return False;
 	}
 	
+	_XML_IO_Handler_ValidateFile( self, filename );
+	
 	/* call parse nodes, starting on the first child */
 	_XML_IO_Handler_ParseNodes( self, cur, NULL, Dictionary_MergeType_Replace, NULL );
 	
@@ -738,10 +739,7 @@ static void _processNode(xmlTextReaderPtr reader) {
 	}
 }
 
-static void _XML_IO_Handler_OpenFile( XML_IO_Handler* self, const char* filename ) {
-	/* open an XML file and build an XML tree from it. */
-	/* TODO: validate against simple dtd? */
-	
+static void _XML_IO_Handler_ValidateFile( XML_IO_Handler* self, const char* filename ) {
 	xmlTextReaderPtr reader;
 	int ret, valid;
 
@@ -749,7 +747,7 @@ static void _XML_IO_Handler_OpenFile( XML_IO_Handler* self, const char* filename
 
 	if ( reader != NULL ) {
 
-		if ( self->validate )
+		if ( *(self->validate) == 1 )
 			valid = xmlTextReaderSchemaValidate( reader, (const char*) self->schema );
 
 		ret = xmlTextReaderRead( reader );
@@ -759,11 +757,13 @@ static void _XML_IO_Handler_OpenFile( XML_IO_Handler* self, const char* filename
 		}
 
 		if ( *(self->validate) == 1 ) {
+			/*
 			if ( self->schema == NULL )
 				Journal_Firewall( 
 					( self->schema != NULL ), 
 					Journal_Register( Error_Type, XML_IO_Handler_Type ), 
 					"Schema is not provided\n" );
+			*/
 			if ( xmlTextReaderIsValid( reader ) != 1 ) {
 				fprintf( stderr, "%s : failed to parse\n", filename );
 				Journal_Firewall( 
@@ -784,6 +784,11 @@ static void _XML_IO_Handler_OpenFile( XML_IO_Handler* self, const char* filename
 	} else {
 		fprintf( stderr, "unable to open %s\n", filename );
 	}
+}
+
+static void _XML_IO_Handler_OpenFile( XML_IO_Handler* self, const char* filename ) {
+	/* open an XML file and build an XML tree from it. */
+	/* TODO: validate against simple dtd? */
 	
 	self->currDoc = xmlParseFile( filename );
 	if ( self->currDoc == NULL ) {
@@ -793,6 +798,7 @@ static void _XML_IO_Handler_OpenFile( XML_IO_Handler* self, const char* filename
 		Memory_Free( self->resource );
 	}
 	self->resource = StG_Strdup( (char*)filename );
+
 }
 
 static void _XML_IO_Handler_OpenBuffer( XML_IO_Handler* self, const char* buffer ) {
@@ -1973,14 +1979,31 @@ static void _XML_IO_Handler_WriteDictionary( XML_IO_Handler* self, Dictionary* d
 	Journal_DPrintf( 
 		Journal_Register( Debug_Type, XML_IO_Handler_Type ),
 		"_XML_IO_Handler_WriteDictionary called.\n" );
-		
+	
+	// find the plugins tag, and write it first	
 	for (index=0; index < dict->count; index++) {
 		Dictionary_Entry* currEntryPtr = dict->entryPtr[index];
 	
-		_XML_IO_Handler_WriteNode( self, currEntryPtr->key, currEntryPtr->value, currEntryPtr->source, parent );
+		if ( strcmp(currEntryPtr->key, IMPORT_TAG) == 0 ) 
+			_XML_IO_Handler_WriteNode( self, currEntryPtr->key, currEntryPtr->value, currEntryPtr->source, parent );
+	}
+
+	// find the plugins tag, and write it first	
+	for (index=0; index < dict->count; index++) {
+		Dictionary_Entry* currEntryPtr = dict->entryPtr[index];
+	
+		if ( strcmp(currEntryPtr->key, PLUGINS_TAG) == 0 ) 
+			_XML_IO_Handler_WriteNode( self, currEntryPtr->key, currEntryPtr->value, currEntryPtr->source, parent );
+	}
+
+	// creates the rest of dictionary
+	for (index=0; index < dict->count; index++) {
+		Dictionary_Entry* currEntryPtr = dict->entryPtr[index];
+	
+		if ( ( strcmp(currEntryPtr->key, IMPORT_TAG) != 0 )  && ( strcmp(currEntryPtr->key, PLUGINS_TAG) != 0 ) )  
+			_XML_IO_Handler_WriteNode( self, currEntryPtr->key, currEntryPtr->value, currEntryPtr->source, parent );
 	}
 }
-
 
 /** write a single node to file, and its children. */
 static void _XML_IO_Handler_WriteNode( XML_IO_Handler* self, char* name, Dictionary_Entry_Value* value, 
@@ -2011,11 +2034,22 @@ static void _XML_IO_Handler_WriteList( XML_IO_Handler* self, char* name, Diction
 	Journal_DPrintf( Journal_Register( Debug_Type, XML_IO_Handler_Type ), "_XML_IO_Handler_WriteList called.\n" );
 
 	/* create and add list child node */
-	//newNode = xmlNewTextChild( parent, self->currNameSpace, LIST_ATTR, NULL );
-	newNode = xmlNewTextChild( parent, self->currNameSpace, ELEMENT_TAG, NULL );
-	xmlNewProp( newNode, (xmlChar*) TYPE_ATTR, (xmlChar*) type );
 	if ( NULL != name ) {
-		xmlNewProp( newNode, (xmlChar*) NAME_ATTR, (xmlChar*) name );
+		if ( strcmp(name, PLUGINS_TAG) == 0 ) {
+			newNode = xmlNewTextChild( parent, self->currNameSpace, PLUGINS_TAG, NULL );
+		}
+		else if ( strcmp(name, IMPORT_TAG) == 0 ) {
+			newNode = xmlNewTextChild( parent, self->currNameSpace, IMPORT_TAG, NULL );
+		}
+		else
+		{
+			//newNode = xmlNewTextChild( parent, self->currNameSpace, LIST_ATTR, NULL );
+			newNode = xmlNewTextChild( parent, self->currNameSpace, ELEMENT_TAG, NULL );
+			xmlNewProp( newNode, (xmlChar*) TYPE_ATTR, (xmlChar*) type );
+			if ( NULL != name ) {
+				xmlNewProp( newNode, (xmlChar*) NAME_ATTR, (xmlChar*) name );
+			}
+		}
 	}	
 	if ( NULL != source ) {
 		xmlNewProp( newNode, (xmlChar*) SOURCEFILE_ATTR, (xmlChar*) source );
@@ -2285,11 +2319,24 @@ static void _XML_IO_Handler_WriteStruct( XML_IO_Handler* self, char* name, Dicti
 		"_XML_IO_Handler_WriteStruct called.\n" );
 
 	/* create and add struct child node*/
-	//newNode = xmlNewTextChild( parent, self->currNameSpace, STRUCT_ATTR, NULL );
-	newNode = xmlNewTextChild( parent, self->currNameSpace, ELEMENT_TAG, NULL );
-	xmlNewProp( newNode, (xmlChar*) TYPE_ATTR, (xmlChar*) type );
 	if ( NULL != name ) {
-		xmlNewProp( newNode, (xmlChar*) NAME_ATTR, (xmlChar*) name );
+		if ( strcmp(name, COMPONENTS_TAG) == 0 ) {
+			newNode = xmlNewTextChild( parent, self->currNameSpace, COMPONENTS_TAG, NULL );
+		}
+		else
+		{
+			//newNode = xmlNewTextChild( parent, self->currNameSpace, STRUCT_ATTR, NULL );
+			newNode = xmlNewTextChild( parent, self->currNameSpace, ELEMENT_TAG, NULL );
+			xmlNewProp( newNode, (xmlChar*) TYPE_ATTR, (xmlChar*) type );
+			xmlNewProp( newNode, (xmlChar*) NAME_ATTR, (xmlChar*) name );
+		}
+	}
+	else
+	{
+		newNode = xmlNewTextChild( parent, self->currNameSpace, ELEMENT_TAG, NULL );
+		xmlNewProp( newNode, (xmlChar*) TYPE_ATTR, (xmlChar*) type );
+		if ( NULL != name ) 
+			xmlNewProp( newNode, (xmlChar*) NAME_ATTR, (xmlChar*) name );
 	}
 	if ( NULL != source ) {
 		xmlNewProp( newNode, (xmlChar*) SOURCEFILE_ATTR, (xmlChar*) source );
@@ -2312,9 +2359,17 @@ static void _XML_IO_Handler_WriteParameter( XML_IO_Handler* self, char* name, Di
 		"_XML_IO_Handler_WriteParameter called.\n");
 
 	/* add new child to parent, with correct value*/
-	//newNode = xmlNewTextChild( parent, self->currNameSpace, PARAM_ATTR, (xmlChar*) Dictionary_Entry_Value_AsString( value ) );
-	newNode = xmlNewTextChild( parent, self->currNameSpace, ELEMENT_TAG, (xmlChar*) Dictionary_Entry_Value_AsString( value ) );
-	xmlNewProp( newNode, (xmlChar*) TYPE_ATTR, (xmlChar*) type );
+	if ( strcmp((char *)parent->name, PLUGINS_TAG) == 0 ) {
+		newNode = xmlNewTextChild( parent, self->currNameSpace, PLUGIN_TAG, (xmlChar*) Dictionary_Entry_Value_AsString( value ) );
+	}
+	else if ( strcmp((char *)parent->name, IMPORT_TAG) == 0 ) {
+		newNode = xmlNewTextChild( parent, self->currNameSpace, TOOLBOX_TAG, (xmlChar*) Dictionary_Entry_Value_AsString( value ) );
+	}
+	else {
+		//newNode = xmlNewTextChild( parent, self->currNameSpace, PARAM_ATTR, (xmlChar*) Dictionary_Entry_Value_AsString( value ) );
+		newNode = xmlNewTextChild( parent, self->currNameSpace, ELEMENT_TAG, (xmlChar*) Dictionary_Entry_Value_AsString( value ) );
+		xmlNewProp( newNode, (xmlChar*) TYPE_ATTR, (xmlChar*) type );
+	}
 	if ( NULL != name ) {
 		xmlNewProp( newNode, (xmlChar*) NAME_ATTR, (xmlChar*) name );
 	}
