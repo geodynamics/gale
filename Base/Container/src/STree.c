@@ -319,7 +319,7 @@ void STreeNode_Insert( STreeNode *self, STreeNode *node, STree *tree, STreeNode 
    else {
       int height;
       *child = node;
-      height = ( int )( log2(( float )tree->nNodes + 1.0 ) /
+      height = ( int )( log2( (float)(tree->nNodes + 1) ) /
 			log2( tree->invAlpha ) );
       if ( tree->curDepth > height )
 	 tree->curSize = 1;
