@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SLE_Solver.c 964 2007-10-11 08:03:06Z SteveQuenette $
+** $Id: SLE_Solver.c 1125 2008-05-12 14:22:02Z DavidMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -84,6 +84,10 @@ SLE_Solver* _SLE_Solver_New(
 	self->_solverSetup = _solverSetup;
 	self->_solve = _solve;
 	self->_getResidual = _getResidual;
+
+	self->_formResidual = NULL;
+	self->_getRhs       = NULL;
+	self->_getSolution  = NULL;
 
 	return self;
 

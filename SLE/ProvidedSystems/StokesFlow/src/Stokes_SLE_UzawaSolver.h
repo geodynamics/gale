@@ -54,7 +54,7 @@
 **	TODO: Need to handle Non-symmetric problems where Divergence isn't just G transpose. This will require a 
 **	fn pointer or entry point to MatMult certain things based on D.
 **
-** $Id: Stokes_SLE_UzawaSolver.h 1023 2008-02-11 06:41:30Z DavidMay $
+** $Id: Stokes_SLE_UzawaSolver.h 1125 2008-05-12 14:22:02Z DavidMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -84,6 +84,7 @@
 		Vector*             vStarVec; \
 		/* parameters */ \
 		Iteration_Index     maxUzawaIterations;	/** Max number of iterations the solver can run for */ \
+		Iteration_Index     minUzawaIterations; \
 		double              tolerance;	/** Tolerance that residual must be within to finish */ \
 		Bool                useAbsoluteTolerance; \
 		Bool		    monitor;
@@ -102,6 +103,7 @@
 		int                                         statReps,
 		StiffnessMatrix*                            preconditioner,
 		Iteration_Index                             maxUzawaIterations,
+		Iteration_Index                             minUzawaIterations,
 		double                                      tolerance,
 		Bool                                        useAbsoluteTolerance,
 		Bool                                        monitor );
@@ -129,6 +131,7 @@
 		Stokes_SLE_UzawaSolver*      self,
 		StiffnessMatrix*             preconditioner, 
 		Iteration_Index              maxUzawaIterations,
+		Iteration_Index              minUzawaIterations,
 		double                       tolerance,
 		Bool                         useAbsoluteTolerance, 
                 Bool                         monitor );
@@ -139,6 +142,7 @@
 		int                          statReps, 
 		StiffnessMatrix*             preconditioner, 
 		Iteration_Index              maxUzawaIterations,
+		Iteration_Index              minUzawaIterations,
 		double                       tolerance,
 		Bool                         useAbsoluteTolerance,
 		Bool                         monitor );
@@ -188,5 +192,9 @@
 
 	/* Get residual implementation */
 	Vector* _Stokes_SLE_UzawaSolver_GetResidual( void* solver, Index fv_I );
+
+	void _Stokes_SLE_UzawaSolver_FormResidual( void *stokesSLE, void *solver, Vector *stg_r );
+	void _Stokes_SLE_UzawaSolver_GetRhs( void *stokesSLE, void *solver, Vector *stg_rhs );
+	void _Stokes_SLE_UzawaSolver_GetSolution( void *stokesSLE, void *solver, Vector **x );
 
 #endif	

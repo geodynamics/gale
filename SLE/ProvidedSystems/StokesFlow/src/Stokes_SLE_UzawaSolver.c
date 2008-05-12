@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Stokes_SLE_UzawaSolver.c 1030 2008-02-12 08:35:46Z DavidMay $
+** $Id: Stokes_SLE_UzawaSolver.c 1125 2008-05-12 14:22:02Z DavidMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -84,13 +84,14 @@ Stokes_SLE_UzawaSolver* Stokes_SLE_UzawaSolver_New(
 		int                                         statReps,
 		StiffnessMatrix*                            preconditioner,
 		Iteration_Index                             maxUzawaIterations,
+		Iteration_Index                             minUzawaIterations,
 		double                                      tolerance,
 		Bool                                        useAbsoluteTolerance,
                 Bool                                        monitor )
 {		
 	Stokes_SLE_UzawaSolver* self = _Stokes_SLE_UzawaSolver_DefaultNew( name );
 
-	Stokes_SLE_UzawaSolver_InitAll( self, useStatSolve, statReps, preconditioner, maxUzawaIterations, tolerance, useAbsoluteTolerance, monitor );
+	Stokes_SLE_UzawaSolver_InitAll( self, useStatSolve, statReps, preconditioner, maxUzawaIterations, minUzawaIterations, tolerance, useAbsoluteTolerance, monitor );
 
 	return self;
 }
@@ -134,6 +135,10 @@ Stokes_SLE_UzawaSolver* _Stokes_SLE_UzawaSolver_New(
 		_solve,
 		_getResidual, 
 		name );
+
+	self->_formResidual  = _Stokes_SLE_UzawaSolver_FormResidual;
+        self->_getRhs        = _Stokes_SLE_UzawaSolver_GetRhs;
+	self->_getSolution   = _Stokes_SLE_UzawaSolver_GetSolution;
 	
 	/* Virtual info */
 	return self;
@@ -144,6 +149,7 @@ void _Stokes_SLE_UzawaSolver_Init(
 		Stokes_SLE_UzawaSolver*      self,
 		StiffnessMatrix*             preconditioner, 
 		Iteration_Index              maxUzawaIterations,
+		Iteration_Index              minUzawaIterations,
 		double                       tolerance,
 		Bool                         useAbsoluteTolerance,
                 Bool                         monitor )
@@ -151,6 +157,7 @@ void _Stokes_SLE_UzawaSolver_Init(
 	self->isConstructed        = True;
 	self->tolerance            = tolerance;
 	self->maxUzawaIterations   = maxUzawaIterations;
+	self->minUzawaIterations   = minUzawaIterations;
 	self->preconditioner       = preconditioner;
 	self->useAbsoluteTolerance = useAbsoluteTolerance;
         self->monitor              = monitor;
@@ -162,6 +169,7 @@ void Stokes_SLE_UzawaSolver_InitAll(
 		int                          statReps, 
 		StiffnessMatrix*             preconditioner, 
 		Iteration_Index              maxUzawaIterations,
+		Iteration_Index              minUzawaIterations,
 		double                       tolerance,
 		Bool                         useAbsoluteTolerance,
                 Bool                         monitor )
@@ -169,7 +177,7 @@ void Stokes_SLE_UzawaSolver_InitAll(
 	Stokes_SLE_UzawaSolver* self = (Stokes_SLE_UzawaSolver*)solver;
 
 	SLE_Solver_InitAll( self, useStatSolve, statReps );
-	_Stokes_SLE_UzawaSolver_Init( self, preconditioner, maxUzawaIterations, tolerance, useAbsoluteTolerance, monitor );
+	_Stokes_SLE_UzawaSolver_Init( self, preconditioner, maxUzawaIterations, minUzawaIterations, tolerance, useAbsoluteTolerance, monitor );
 }
 
 void _Stokes_SLE_UzawaSolver_Delete( void* solver ) {
@@ -199,6 +207,7 @@ void _Stokes_SLE_UzawaSolver_Print( void* solver, Stream* stream ) {
 
 	Journal_PrintValue( stream, self->tolerance );
 	Journal_PrintValue( stream, self->maxUzawaIterations );
+	Journal_PrintValue( stream, self->minUzawaIterations );
 }
 
 
@@ -218,6 +227,7 @@ void* _Stokes_SLE_UzawaSolver_Copy( void* stokesSleUzawaSolver, void* dest, Bool
 	newStokesSleUzawaSolver->vStarVec            = self->vStarVec;
 	newStokesSleUzawaSolver->tolerance           = self->tolerance;
 	newStokesSleUzawaSolver->maxUzawaIterations  = self->maxUzawaIterations;
+	newStokesSleUzawaSolver->minUzawaIterations  = self->minUzawaIterations;
 	newStokesSleUzawaSolver->useAbsoluteTolerance  = self->useAbsoluteTolerance;
 	newStokesSleUzawaSolver->monitor               = self->monitor;	
 
@@ -259,13 +269,18 @@ void _Stokes_SLE_UzawaSolver_Build( void* solver, void* stokesSLE ) {
 	Vector_SetLocalSize( self->fTempVec, Vector_GetLocalSize( sle->fForceVec->vector ) );
 	Vector_Duplicate( sle->fForceVec->vector, (void**)&self->vStarVec );
 	Vector_SetLocalSize( self->vStarVec, Vector_GetLocalSize( sle->fForceVec->vector ) );
+	/* Need by the Picard nonlinear solver */
+//        Vector_Duplicate( sle->pTempVec->vector, (void**)&self->f_hat );
+//        Vector_SetLocalSize( self->vf_hat, Vector_GetLocalSize( sle->pTempVec->vector ) );
+
+
 	Stream_UnIndentBranch( StgFEM_Debug );
 }
 
 void _Stokes_SLE_UzawaSolver_Construct( void* solver, Stg_ComponentFactory* cf, void* data ) {
 	Stokes_SLE_UzawaSolver* self         = (Stokes_SLE_UzawaSolver*) solver;
 	double                  tolerance;
-	Iteration_Index         maxUzawaIterations;
+	Iteration_Index         maxUzawaIterations, minUzawaIterations;
 	StiffnessMatrix*        preconditioner;
 	Bool                    useAbsoluteTolerance;
 	Bool                    monitor;
@@ -274,12 +289,13 @@ void _Stokes_SLE_UzawaSolver_Construct( void* solver, Stg_ComponentFactory* cf, 
 
 	tolerance            = Stg_ComponentFactory_GetDouble( cf, self->name, "tolerance", 1.0e-5 );
 	maxUzawaIterations   = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "maxIterations", 1000 );
+	minUzawaIterations   = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "minIterations", 1 );
 	useAbsoluteTolerance = Stg_ComponentFactory_GetBool( cf, self->name, "useAbsoluteTolerance", False );
 	monitor              = Stg_ComponentFactory_GetBool( cf, self->name, "monitor", False );
 
 	preconditioner = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Preconditioner", StiffnessMatrix, False, data );
 
-	_Stokes_SLE_UzawaSolver_Init( self, preconditioner, maxUzawaIterations, tolerance, useAbsoluteTolerance, monitor );
+	_Stokes_SLE_UzawaSolver_Init( self, preconditioner, maxUzawaIterations, minUzawaIterations, tolerance, useAbsoluteTolerance, monitor );
 
 	self->velSolver = Stg_ComponentFactory_ConstructByKey( cf, self->name, "velocitySolver", MatrixSolver, 
 							       False, data );
@@ -337,9 +353,16 @@ void _Stokes_SLE_UzawaSolver_SolverSetup( void* solver, void* stokesSLE ) {
 }
 
 
+/*
 #define FetchPetscVector( vector ) ( (Vec)( ((PETScVector*)(vector))->petscVec ) )
 #define FetchPetscMatrix( matrix ) ( (Mat)( ((PETScMatrix*)(matrix))->petscMat ) )
 #define FetchPetscKSP( solver ) ( (KSP)( ((PETScMatrixSolver*)(solver))->ksp ) )
+*/
+
+#define FetchPetscVector StgVectorGetPetscVec
+#define FetchPetscMatrix StgMatrixGetPetscMat
+#define FetchPetscKSP    StgMatrixSolverGetPetscKSP
+
 
 Bool _check_if_constant_nullsp_present( 
 	Stokes_SLE_UzawaSolver* self, 
@@ -438,7 +461,8 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	MatrixSolver*           velSolver       = self->velSolver;	/*  Inner velocity solver */
 	MatrixSolver*           pcSolver        = self->pcSolver;   /*  Preconditioner  */
 
-	Iteration_Index         maxIterations   = self->maxUzawaIterations;	
+	Iteration_Index         maxIterations   = self->maxUzawaIterations;
+	Iteration_Index         minIterations   = self->minUzawaIterations;
 	Iteration_Index         iteration_I     = 0;
 	Iteration_Index         outputInterval  = 1;
 	
@@ -464,10 +488,14 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	PetscScalar p_sum;
 	Bool nullsp_present;
 	Bool uzawa_summary;
-	double time,t0;
+	double time,t0,rnorm0;
 
 	init_info_stream_rank = Stream_GetPrintingRank( self->info );
 	Stream_SetPrintingRank( self->info, 0 ); 
+
+
+//        Journal_PrintfL( self->info, 1, "  |u0| = %.8e \n", Vector_L2Norm(uVec)  );
+//        Journal_PrintfL( self->info, 1, "  |p0| = %.8e \n", Vector_L2Norm(qVec) );
 
 
 	/*	DEFINITIONS:
@@ -646,7 +674,8 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	*/
 	
 	Matrix_TransposeMultiply( G_Mat, uVec, rVec );
-	divU = Vector_L2Norm( rVec ) / Vector_L2Norm( uVec );  
+        rnorm0 = Vector_L2Norm( rVec );
+	divU = rnorm0 / Vector_L2Norm( uVec );  
 	
 	Journal_PrintfL( self->info, 2, "Initial l2Norm( Div u ) / l2Norm( u ) = %f \n", divU);
 	
@@ -676,6 +705,7 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
         uzawa_summary = self->monitor;
 	time = 0.0;
 	t0 = MPI_Wtime();
+//	Journal_PrintfL( self->info, 1, "  |r0| = %.8e \n", rnorm0 );
 
 	do{	
 		Journal_DPrintfL( self->debug, 2, "Beginning solve '%u'.\n", iteration_I );
@@ -817,7 +847,8 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
         	}
 			
 	iteration_I++;  
-	}  while (*chosenResidual > self->tolerance );  
+	}  while ( (*chosenResidual > self->tolerance) || (iteration_I<minIterations) );  
+//	}  while ( *chosenResidual > self->tolerance );
 
 	Journal_DPrintfL( self->debug, 1, "Pressure solution converged. Exiting uzawa \n ");
 	
@@ -874,7 +905,7 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
         Journal_PrintfL( self->info, 1, "  |u|_{\\infty} = %.8e , u_rms = %.8e\n", 
 		Vector_LInfNorm( uVec ),Vector_L2Norm( uVec ) / sqrt( (double)Vector_GetGlobalSize( uVec ) )  );
 	Journal_PrintfL( self->info, 1, "  |p|_{\\infty} = %.8e , p_rms = %.8e\n",
-                Vector_LInfNorm( qVec ), Vector_L2Norm( qVec ) / sqrt( (double)Vector_GetGlobalSize( qVec ) ) );
+               Vector_LInfNorm( qVec ), Vector_L2Norm( qVec ) / sqrt( (double)Vector_GetGlobalSize( qVec ) ) );
 
 	{	PetscInt lmin,lmax;
 		PetscReal min,max;
@@ -904,6 +935,127 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
         Stream_SetPrintingRank( self->info, init_info_stream_rank );	
 }
 
+void _Stokes_SLE_UzawaSolver_GetSolution( void *stokesSLE, void *solver, Vector **x )
+{
+	Stokes_SLE *sle = (Stokes_SLE*)stokesSLE;
+	Vector *p = sle->pSolnVec->vector;
+
+	(*x) = p;
+}
+
+
+#undef __FUNCT__
+#define __FUNCT__ "_Stokes_SLE_UzawaSolver_GetRhs"
+void _Stokes_SLE_UzawaSolver_GetRhs( void *stokesSLE, void *solver, Vector *stg_rhs )
+{
+        Stokes_SLE_UzawaSolver *self = (Stokes_SLE_UzawaSolver*)solver;
+	Stokes_SLE *sle = (Stokes_SLE*)stokesSLE;
+	/* stg linear algebra */
+	MatrixSolver *stg_A11_solver = self->velSolver;
+        Matrix *stg_A12 = sle->gStiffMat->matrix;
+        Vector *stg_b1  = sle->fForceVec->vector;
+        Vector *stg_b2  = sle->hForceVec->vector;
+        Vector *stg_u_star = self->vStarVec;
+	
+	/* petsc variables */
+	KSP ksp_A11;
+	Mat A12;
+	Vec u_star,rhs,b1,b2;
+
+	/* check operations will be valid */
+	if (sle->dStiffMat!=NULL) {   SETERRQ( PETSC_ERR_SUP, "A21 must be NULL" ); }
+	if (stg_A11_solver==NULL){    SETERRQ( PETSC_ERR_ARG_NULL, "vel_solver is NULL" ); }
+        if (stg_A12==NULL){           SETERRQ( PETSC_ERR_ARG_NULL, "A12 is NULL" ); }
+        if (stg_b1==NULL){       SETERRQ( PETSC_ERR_ARG_NULL, "b1 is NULL" ); }
+        if (stg_b2==NULL){       SETERRQ( PETSC_ERR_ARG_NULL, "b2 is NULL" ); }
+        if (stg_u_star==NULL){   SETERRQ( PETSC_ERR_ARG_NULL, "u* is NULL" ); }
+
+	/* Extract petsc objects */
+	ksp_A11 = FetchPetscKSP( stg_A11_solver );
+	b1 = FetchPetscVector( stg_b1 );
+	b2 = FetchPetscVector( stg_b2 );
+	rhs = FetchPetscVector( stg_rhs );
+	u_star = FetchPetscVector( stg_u_star );
+	A12 = FetchPetscMatrix( stg_A12 );
+
+	/* compute rhs = A12^T A11^{-1} b1 - b2 */
+	KSPSolve( ksp_A11, b1, u_star );         /* u* = A11^{-1} b1 */
+	MatMultTranspose( A12, u_star, rhs );    /* b2 = A12^T u* */
+	VecAXPY( rhs, -1.0, b2 );  /* rhs <- rhs - b2 */
+}
+
+
+/* Computes r = f_hat - S p */
+#undef __FUNCT__
+#define __FUNCT__ "_Stokes_SLE_UzawaSolver_FormResidual"
+void _Stokes_SLE_UzawaSolver_FormResidual( void *stokesSLE, void *solver, Vector *stg_r )
+{
+        Stokes_SLE_UzawaSolver *self = (Stokes_SLE_UzawaSolver*)solver;
+        Stokes_SLE *sle = (Stokes_SLE*)stokesSLE;
+ 	/* stg linear algebra objects */
+        Matrix *stg_A12 = sle->gStiffMat->matrix;
+        Matrix *stg_A22 = NULL;
+        Vector *stg_x2 = sle->pSolnVec->vector;
+        Vector *stg_f_star = self->fTempVec;
+        Vector *stg_u_star = self->vStarVec;
+	Vector *stg_q_star = self->pTempVec;
+        MatrixSolver *stg_A11_solver = self->velSolver;
+
+	/* petsc objects */
+	KSP ksp_A11;
+	Mat A12, A22;
+	Vec x2, u_star, f_star, q_star, r;
+	PetscInt r_N, x2_N;
+
+        /* check operations will be valid */
+	if (stg_A11_solver==NULL){   SETERRQ( PETSC_ERR_ARG_NULL, "vel_solver is NULL" ); }
+        if (sle->dStiffMat!=NULL) {  SETERRQ( PETSC_ERR_SUP, "A21 must be NULL" ); }
+        if (stg_A12==NULL){          SETERRQ( PETSC_ERR_ARG_NULL, "A12 is NULL" ); }
+        if (stg_x2==NULL){         SETERRQ( PETSC_ERR_ARG_NULL, "x2 is NULL" ); }
+        if (stg_u_star==NULL){     SETERRQ( PETSC_ERR_ARG_NULL, "u* is NULL" ); }
+        if (stg_f_star==NULL){     SETERRQ( PETSC_ERR_ARG_NULL, "f* is NULL" ); }
+	if (stg_q_star==NULL) {    SETERRQ( PETSC_ERR_ARG_NULL, "q* is NULL" ); }
+
+	A22 = PETSC_NULL;
+	if (sle->cStiffMat!=NULL) {
+		stg_A22 = sle->cStiffMat->matrix;
+		A22 = FetchPetscMatrix( stg_A22 );
+	}
+
+
+        /* Extract petsc objects */
+        ksp_A11 = FetchPetscKSP( stg_A11_solver );
+        x2      = FetchPetscVector( stg_x2 );
+        u_star  = FetchPetscVector( stg_u_star );
+	f_star  = FetchPetscVector( stg_f_star );
+	q_star  = FetchPetscVector( stg_q_star );
+        A12     = FetchPetscMatrix( stg_A12 );
+	r       = FetchPetscVector( stg_r );
+
+
+	/* Check sizes match */
+	VecGetSize( r, &r_N );
+	VecGetSize( x2, &x2_N );
+	if (r_N!=x2_N) {
+		SETERRQ2( PETSC_ERR_ARG_SIZ, "Solution vector for pressure (N=%D) is not compatible with residual vector (N=%D)", x2_N, r_N );
+	}	
+	
+
+	/* r = f_hat - (G^T K^{-1} G - M) p */
+	_Stokes_SLE_UzawaSolver_GetRhs( stokesSLE, solver, stg_r );  /* r <- f_hat */
+
+	/* correct for non zero A22 */
+	if (A22!=PETSC_NULL) {
+		MatMultAdd( A22, x2, r, r );  /* r <- r + A22 p */
+	}
+
+	/* make correction r <- r - G^T K^{-1} G */
+	MatMult( A12, x2, f_star );                 /* f* <- A12 x2 */
+	KSPSolve( ksp_A11, f_star, u_star );        /* u* <- A11^{-1} f* */
+	MatMultTranspose( A12, u_star, q_star );    /* q* <- A12 u* */
+	
+	VecAXPY( r, -1.0, q_star );  /* r <- r - q* */
+}
 
 Vector* _Stokes_SLE_UzawaSolver_GetResidual( void* solver, Index fv_I ) {
 	return NULL;

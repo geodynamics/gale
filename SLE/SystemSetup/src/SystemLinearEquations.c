@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SystemLinearEquations.c 1123 2008-05-08 00:34:10Z DavidLee $
+** $Id: SystemLinearEquations.c 1125 2008-05-12 14:22:02Z DavidMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -129,6 +129,8 @@ SystemLinearEquations* _SystemLinearEquations_New(
 	self->_vectorSetup = _vectorSetup;
 	self->_updateSolutionOntoNodes = _updateSolutionOntoNodes;
 	self->_mgSelectStiffMats = _mgSelectStiffMats;
+
+	self->_sleFormFunction = NULL;
 	
 	return self;
 }
@@ -184,6 +186,7 @@ void _SystemLinearEquations_Init(
 	self->context = context;
 
 	/* Init NonLinear Stuff */
+	self->nonLinearSolutionType = nonLinearSolutionType; /* This will never got propogated through to _Initialise->SetToNonLinear if we keep it in the loop */
 	if ( isNonLinear ) {
 		self->nonLinearSolutionType	= nonLinearSolutionType;
 		SystemLinearEquations_SetToNonLinear( self );
@@ -392,6 +395,9 @@ void _SystemLinearEquations_Construct( void* sle, Stg_ComponentFactory* cf, void
 	Name			nonLinearSolutionType;
 	NonlinearSolver*	nlSolver		= NULL;
 	Name			optionsPrefix;
+	double double_from_dict;
+	Bool   bool_from_dict;
+	int    int_from_dict;
 	
 	solver = Stg_ComponentFactory_ConstructByKey( cf, self->name, SLE_Solver_Type, SLE_Solver, False, data ) ;
 
@@ -403,8 +409,18 @@ void _SystemLinearEquations_Construct( void* sle, Stg_ComponentFactory* cf, void
 	nonLinearMaxIterations    = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "nonLinearMaxIterations", 500 );
 	killNonConvergent         = Stg_ComponentFactory_GetBool(   cf, self->name, "killNonConvergent",      True );
 	nonLinearMinIterations    = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "nonLinearMinIterations", 1 );
-	nonLinearSolutionType	  = Stg_ComponentFactory_GetString( cf, self->name, "nonLinearSolutionType",  "" );
+	nonLinearSolutionType	  = Stg_ComponentFactory_GetString( cf, self->name, "nonLinearSolutionType",  "default" );
 	optionsPrefix		  = Stg_ComponentFactory_GetString( cf, self->name, "optionsPrefix",          "" );
+
+
+	/* Read some value for Picard */
+	self->picard_form_function_type = Stg_ComponentFactory_GetString( cf, self->name, "picard_FormFunctionType", "PicardFormFunction_KSPResidual" );
+
+	self->alpha  = Stg_ComponentFactory_GetDouble( cf, self->name, "picard_alpha", 1.0 );
+	self->rtol   = Stg_ComponentFactory_GetDouble( cf, self->name, "picard_rtol", 1.0e-8 );
+	self->abstol = Stg_ComponentFactory_GetDouble( cf, self->name, "picard_atol", 1.0e-50 );        
+	self->xtol           = Stg_ComponentFactory_GetDouble( cf, self->name, "picard_xtol", 1.0e-8 );
+	self->picard_monitor = Stg_ComponentFactory_GetBool(   cf, self->name, "picard_ActivateMonitor", False );
 	
 	entryPointRegister = Stg_ObjectList_Get( cf->registerRegister, "EntryPoint_Register" );
 	assert( entryPointRegister );
@@ -814,6 +830,7 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 		Journal_Printf(self->info,"Non linear solver - iteration %d\n", self->nonLinearIteration_I);
 			
 		self->linearExecute( self, _context );
+//		PetscPrintf( PETSC_COMM_WORLD, "|Xn+1| = %12.12e \n", Vector_L2Norm(SystemLinearEquations_GetSolutionVectorAt(self,1)->vector) );
 
 		/* Calculate Residual */
 		Vector_AddScaled( previousVector, -1.0, currentVector );
@@ -857,12 +874,316 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 	FreeObject( previousVector );
 }
 
+
+/*
+Computes
+  F1 := A(x) x -b  = -r,
+  where r = b - A(x) x
+*/
+void SystemLinearEquations_SNESPicardFormalResidual( void *someSLE, Vector *stg_X, Vector *stg_F, void *_context )
+{
+	SystemLinearEquations *sle = (SystemLinearEquations*)someSLE;
+    	SLE_Solver            *solver = (SLE_Solver*)sle->solver;
+	Vec                   F;
+	Stream*                 errorStream     = Journal_Register( Error_Type, sle->type );
+
+	Journal_Printf( errorStream, "    **** SystemLinearEquations_SNESPicardFormalResidual: This option is un-tested and does not yet function correctly. \n");
+	Journal_Printf( errorStream, "    **** Use the default form function or specify --components.XXX.picard_FormFunctionType=PicardFormFunction_KSPResidual instead. \n");
+	Journal_Printf( errorStream, "    ****     [Dave May - 12 May, 2008] \n");
+	abort();
+
+	solver->_formResidual( (void*)sle,  (void*)solver, stg_F );
+	F = StgVectorGetPetscVec( stg_F );	
+//	VecScale( F, -1.0 );
+}
+
+/*
+Computes
+  F2 := x - A(x)^{-1} b
+*/
+#if 0
+void SystemLinearEquations_SNESPicardKSPResidual( void *someSLE, Vector *stg_X, Vector *stg_F, void *_context )
+{
+        SystemLinearEquations *sle = (SystemLinearEquations*)someSLE;
+        SLE_Solver            *solver = (SLE_Solver*)sle->solver;
+        Vec                   F,X,Xcopy;
+        PetscReal norm;
+
+        F = StgVectorGetPetscVec( stg_F );
+        X = StgVectorGetPetscVec( stg_X );
+
+        VecDuplicate( X, &Xcopy );
+        VecCopy( X, Xcopy );
+
+        VecCopy( X, F );                        /* F <- X */
+//      VecNorm( X, NORM_2, &norm );
+//      PetscPrintf(PETSC_COMM_WORLD,"  |X|_pre = %5.5e \n", norm );
+        sle->linearExecute( sle, _context );    /* X = A^{-1} b */
+        X = StgVectorGetPetscVec( stg_X );
+//      VecNorm( X, NORM_2, &norm );
+//      PetscPrintf(PETSC_COMM_WORLD,"  |X|_post = %5.5e \n", norm );
+
+        VecAXPY( F, -1.0, X );                  /* F <- X - F */
+//      VecNorm( F, NORM_2, &norm );
+//      PetscPrintf(PETSC_COMM_WORLD,"  |F|_post = %5.5e \n", norm );
+
+        VecCopy( Xcopy, X );
+        VecDestroy( Xcopy );
+}
+#endif
+
+/*
+stg_X must not get modified by this function !!
+*/
+void SystemLinearEquations_SNESPicardKSPResidual( void *someSLE, Vector *stg_X, Vector *stg_F, void *_context )
+{
+        SystemLinearEquations *sle = (SystemLinearEquations*)someSLE;
+        SLE_Solver            *solver = (SLE_Solver*)sle->solver;
+        Vector                *stg_Xstar;
+        Vec                   F,X,Xstar;
+	PetscReal norm,norms;
+
+	solver->_getSolution( sle, solver, &stg_Xstar );
+
+        F = StgVectorGetPetscVec( stg_F );
+	X = StgVectorGetPetscVec( stg_X );
+	Xstar = StgVectorGetPetscVec( stg_Xstar );
+	
+	/* Map most current solution into stg object, vec->mesh  */
+	VecCopy( X, Xstar );  /* X* <- X */
+	/* Map onto nodes */
+	SystemLinearEquations_UpdateSolutionOntoNodes( someSLE, _context );
+
+//	VecCopy( X, F );      /*  F <- X */
+
+	VecNorm( X, NORM_2, &norm );
+	VecNorm( Xstar, NORM_2, &norms );
+//	PetscPrintf(PETSC_COMM_WORLD,"  |X| = %12.12e : |x*| = %12.12e <pre>\n", norm, norms );
+
+	sle->linearExecute( sle, _context );    /* X* = A^{-1} b */
+	Xstar = StgVectorGetPetscVec( stg_Xstar );
+
+	VecNorm( X, NORM_2, &norm );
+	VecNorm( Xstar, NORM_2, &norms );
+//	PetscPrintf(PETSC_COMM_WORLD,"  |X| = %12.12e : |x*| = %12.12e <post> \n", norm, norms );
+
+	VecWAXPY( F, -1.0, Xstar, X ); /* F = -X* + X  */
+}
+
+void SLEComputeFunction( void *someSLE, Vector *stg_X, Vector *stg_F, void *_context )
+{
+        SystemLinearEquations *sle = (SystemLinearEquations*)someSLE;	
+
+	if (sle->_sleFormFunction!=NULL) {
+		sle->_sleFormFunction( sle, stg_X, stg_F, _context );
+	}
+	else {
+		SETERRQ( PETSC_ERR_SUP, "SLEComputeFunction in not valid" );
+	}
+}
+
+void SLE_SNESMonitor( void *sle, PetscInt iter, PetscReal fnorm )
+{
+  PetscPrintf( PETSC_COMM_WORLD, "  %.4D SLE_NS Function norm %12.12e    --------------------------------------------------------------------------------\n", iter, fnorm );
+}
+
+void SLE_SNESConverged(
+	PetscReal snes_abstol, PetscReal snes_rtol, PetscReal snes_ttol, PetscReal snes_xtol,
+	PetscInt it,PetscReal xnorm,PetscReal pnorm,PetscReal fnorm,SNESConvergedReason *reason )
+{
+  PetscErrorCode ierr;
+
+  *reason = SNES_CONVERGED_ITERATING;
+
+  if (!it) {
+    /* set parameter for default relative tolerance convergence test */
+    snes_ttol = fnorm*snes_rtol;
+  }
+  if (fnorm != fnorm) {
+//    ierr = PetscInfo(snes,"Failed to converged, function norm is NaN\n");CHKERRQ(ierr);
+    *reason = SNES_DIVERGED_FNORM_NAN;
+  } else if (fnorm < snes_abstol) {
+//    ierr = PetscInfo2(snes,"Converged due to function norm %G < %G\n",fnorm,snes_abstol);CHKERRQ(ierr);
+    *reason = SNES_CONVERGED_FNORM_ABS;
+  }
+//  } else if (snes->nfuncs >= snes->max_funcs) {
+//    ierr = PetscInfo2(snes,"Exceeded maximum number of function evaluations: %D > %D\n",snes->nfuncs,snes->max_funcs);CHKERRQ(ierr);
+//    *reason = SNES_DIVERGED_FUNCTION_COUNT;
+//  }
+
+  if (it && !*reason) {
+    if (fnorm <= snes_ttol) {
+//      ierr = PetscInfo2(snes,"Converged due to function norm %G < %G (relative tolerance)\n",fnorm,snes_ttol);CHKERRQ(ierr);
+      *reason = SNES_CONVERGED_FNORM_RELATIVE;
+    } else if (pnorm < snes_xtol*xnorm) {
+//      ierr = PetscInfo3(snes,"Converged due to small update length: %G < %G * %G\n",pnorm,snes_xtol,xnorm);CHKERRQ(ierr);
+      *reason = SNES_CONVERGED_PNORM_RELATIVE;
+    }
+  }
+}
+
+
+#if defined(PETSC_HAVE_ISINF) && defined(PETSC_HAVE_ISNAN)
+#define PetscIsInfOrNanScalar(a) (isinf(PetscAbsScalar(a)) || isnan(PetscAbsScalar(a)))
+#define PetscIsInfOrNanReal(a) (isinf(a) || isnan(a))
+#elif defined(PETSC_HAVE__FINITE) && defined(PETSC_HAVE__ISNAN)
+#if defined(PETSC_HAVE_FLOAT_H)
+#include "float.h"  /* windows defines _finite() in float.h */ 
+#endif
+#define PetscIsInfOrNanScalar(a) (!_finite(PetscAbsScalar(a)) || _isnan(PetscAbsScalar(a)))
+#define PetscIsInfOrNanReal(a) (!_finite(a) || _isnan(a))
+#else
+#define PetscIsInfOrNanScalar(a) ((a - a) != 0.0)
+#define PetscIsInfOrNanReal(a) ((a - a) != 0.0)
+#endif
+
+/*
+This will be replaced by SNESPicard in petsc 2.4.0.
+*/
+
+void SystemLinearEquations_PicardExecute( void *sle, void *_context )
+{
+  SystemLinearEquations *self = (SystemLinearEquations*)sle;
+  SLE_Solver            *solver = (SLE_Solver*)self->solver;
+
+  Vec            X, Y, F, Xstar,delta_X;
+  PetscReal      alpha = 1.0;
+  PetscReal      fnorm,norm_X,pnorm;
+  PetscInt       i;
+  PetscErrorCode ierr;
+  SNESConvergedReason snes_reason;
+ 
+  PetscReal snes_norm;
+  PetscInt snes_iter;
+
+  PetscReal snes_ttol, snes_rtol, snes_abstol, snes_xtol;
+  PetscInt  snes_maxits;
+
+  Vector *stg_X, *stg_F, *stg_Xstar;
+  PetscTruth monitor_flg;
+
+  /* setup temporary some vectors */
+  solver->_getSolution( self, solver, &stg_Xstar );
+  Xstar = StgVectorGetPetscVec( stg_Xstar );
+
+  Vector_Duplicate( stg_Xstar, (void**)&stg_X );
+  Vector_SetLocalSize( stg_X, Vector_GetLocalSize(stg_Xstar) );
+  X = StgVectorGetPetscVec( stg_X );
+
+  Vector_Duplicate( stg_X, (void**)&stg_F );
+  Vector_SetLocalSize( stg_F, Vector_GetLocalSize(stg_X) );
+  F = StgVectorGetPetscVec( stg_F );
+
+  VecDuplicate( F, &Y );
+  VecDuplicate( F, &delta_X );
+
+  /* Get some values from dictionary */
+  snes_maxits =  (PetscInt)self->nonLinearMaxIterations;
+  snes_ttol   = 0.0;
+  snes_rtol   = (PetscReal)self->rtol;
+  snes_abstol = (PetscReal)self->abstol;
+  snes_xtol   = (PetscReal)self->xtol;
+  monitor_flg = PETSC_FALSE;
+  if (self->picard_monitor==True) { monitor_flg = PETSC_TRUE; }
+  alpha       = (PetscReal)self->alpha;
+
+  snes_reason = SNES_CONVERGED_ITERATING;
+
+  /* Map X <- X* */
+  VecCopy( Xstar, X );  // Vector_CopyEntries( currentVector, previousVector );
+
+  /* Get an initial guess if |X| ~ 0, by solving the linear problem  */
+  VecNorm( X, NORM_2, &norm_X );
+  if (norm_X <1.0e-20) {
+    if (monitor_flg==PETSC_TRUE)
+      PetscPrintf( PETSC_COMM_WORLD, "SLE_Picard: Computing an initial guess for X from the linear problem\n");
+
+    self->linearExecute( sle, _context );    /* X* = A^{-1} b */
+    self->hasExecuted = True;
+
+    Xstar = StgVectorGetPetscVec( stg_Xstar );
+    
+    /* Map X <- X* */
+    VecCopy( Xstar, X ); 
+  }
+
+
+
+  snes_iter = 0;
+  snes_norm = 0;
+  SLEComputeFunction( sle, stg_X, stg_F, _context );
+  ierr = VecNorm(F, NORM_2, &fnorm);CHKERRQ(ierr); /* fnorm <- ||F||  */
+  if( PetscIsInfOrNanReal(fnorm) ) SETERRQ(PETSC_ERR_FP,"Infinite or not-a-number generated in norm");
+
+  snes_norm = fnorm;
+  if(monitor_flg==PETSC_TRUE)
+    SLE_SNESMonitor(sle,0,fnorm);
+
+  /* set parameter for default relative tolerance convergence test */
+  snes_ttol = fnorm*snes_rtol;
+  /* test convergence */
+  SLE_SNESConverged( snes_abstol,snes_rtol,snes_ttol,snes_xtol , 0,norm_X,0.0,fnorm,&snes_reason);
+  if (snes_reason) return;
+
+  for(i = 0; i < snes_maxits; i++) {
+    PetscTruth lsSuccess = PETSC_TRUE;
+    PetscReal  dummyNorm;
+
+    /* Update guess Y = X^n - F(X^n) */
+    ierr = VecWAXPY(Y, -1.0, F, X);CHKERRQ(ierr);
+
+    VecCopy( X, delta_X );  /* delta_X <- X */
+
+    /* X^{n+1} = (1 - \alpha) X^n + alpha Y */
+    ierr = VecAXPBY(X, alpha, 1 - alpha, Y);CHKERRQ(ierr);
+    VecNorm( X, NORM_2, &norm_X ); 
+/*    PetscPrintf( PETSC_COMM_WORLD, "  Xn+1 = %12.12e \n", norm_X ); */
+
+    VecAYPX( delta_X, -1.0, X );   /* delta_X <- Xn+1 - delta_X */
+    VecNorm( delta_X, NORM_2, &pnorm );
+
+    /* Compute F(X^{new}) */
+    SLEComputeFunction( sle, stg_X, stg_F, _context );
+    ierr = VecNorm(F, NORM_2, &fnorm);CHKERRQ(ierr);
+    if( PetscIsInfOrNanReal(fnorm) ) SETERRQ(PETSC_ERR_FP,"Infinite or not-a-number generated norm");
+
+    /* Monitor convergence */
+    snes_iter = i+1;
+    snes_norm = fnorm;
+    if (monitor_flg==PETSC_TRUE)
+      SLE_SNESMonitor(sle,snes_iter,snes_norm);
+
+    /* Test for convergence */
+    SLE_SNESConverged( snes_abstol,snes_rtol,snes_ttol,snes_xtol , snes_iter,norm_X,pnorm,fnorm,&snes_reason);
+    if (snes_reason) break;
+  }
+  if (i == snes_maxits) {
+//    ierr = PetscInfo1(snes, "Maximum number of iterations has been reached: %D\n", maxits);CHKERRQ(ierr);
+    if (!snes_reason) snes_reason = SNES_DIVERGED_MAX_IT;
+  }
+
+  /* If monitoring, report reason converged */
+  if (monitor_flg==PETSC_TRUE)
+    PetscPrintf( PETSC_COMM_WORLD, "Nonlinear solve converged due to %s \n", SNESConvergedReasons[snes_reason] );
+
+  FreeObject( stg_X );
+  FreeObject( stg_F );
+  VecDestroy( Y );
+  VecDestroy( delta_X );
+
+}
+
+
+///////////////
+
 void SystemLinearEquations_AddNonLinearEP( void* sle, const char* name, EntryPoint_2VoidPtr_Cast func ) {
 	SystemLinearEquations* self = (SystemLinearEquations*)sle;
 
 	SystemLinearEquations_SetToNonLinear( self );
 	EntryPoint_Append( self->nlEP, (char*)name, func, self->type );
 }
+
+
 
 void SystemLinearEquations_SetToNonLinear( void* sle ) {
 	SystemLinearEquations*	self            	= (SystemLinearEquations*) sle;
@@ -880,6 +1201,10 @@ void SystemLinearEquations_SetToNonLinear( void* sle ) {
 	self->_execute = SystemLinearEquations_NonLinearExecute;
 
 	if( self->nonLinearSolutionType ) {
+		if( !strcmp( self->nonLinearSolutionType, "default" ) ) {
+			self->_execute = SystemLinearEquations_NonLinearExecute;
+		}		
+
 		if( !strcmp( self->nonLinearSolutionType, "MatrixFreeNewton" ) )
 			self->_execute = SystemLinearEquations_NewtonMFFDExecute;
 
@@ -895,6 +1220,27 @@ void SystemLinearEquations_SetToNonLinear( void* sle ) {
 			_EntryPoint_AppendHook_AlwaysLast( Context_GetEntryPoint( context, AbstractContext_EP_Solve ), 
 						nonLinearFinaliseHook );
 			self->_execute = SystemLinearEquations_NewtonExecute;
+		}
+		
+		if (!strcmp( self->nonLinearSolutionType, "Picard") ) {
+			/* set function pointer for execute */
+			self->_execute = SystemLinearEquations_PicardExecute;
+
+			/* set form function */
+			if (!strcmp(self->picard_form_function_type,"PicardFormFunction_KSPResidual") ) {
+				self->_sleFormFunction = SystemLinearEquations_SNESPicardKSPResidual;
+			}
+			else if (!strcmp(self->picard_form_function_type,"PicardFormFunction_FormalResidual") ) {
+				self->_sleFormFunction = SystemLinearEquations_SNESPicardFormalResidual;
+			}
+			else {
+				 Stream *errorStream = Journal_Register( Error_Type, self->type );
+
+		                Journal_Printf( errorStream, "Unknown the Picard FormFunction type %s is unrecognised. .\n", self->picard_form_function_type );
+				Journal_Printf( errorStream, "Supported types include <PicardFormFunction_FormalResidual, PicardFormFunction_KSPResidual> \n" );
+                        	abort();
+
+			}
 		}
 	}
 }

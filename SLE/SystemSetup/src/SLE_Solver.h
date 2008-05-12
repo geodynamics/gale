@@ -46,7 +46,7 @@
 **	Note - as 1 September 2004 (rev 1994), the functioality for building Matrices etc
 **	that was in this class is back in the SLE_Solver class.
 **
-** $Id: SLE_Solver.h 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: SLE_Solver.h 1125 2008-05-12 14:22:02Z DavidMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 	
@@ -62,6 +62,10 @@
 	typedef void		(SLE_Solver_SolveFunction)		( void* sleSolver, void* sle );
 	typedef Vector*	(SLE_Solver_GetResidualFunc)		( void* sleSolver, Index fvIndex );
 
+        typedef void            (SLE_Solver_FormResidualFunc)        ( void *someSLE, void *someSolver, Vector* );
+        typedef void            (SLE_Solver_GetRhsFunc)              ( void *someSLE, void *someSovler, Vector* );
+        typedef void            (SLE_Solver_GetSolutionFunc)         ( void *someSLE, void *someSolver, Vector** );
+
 	/** SLE_Solver class contents */
 	#define __SLE_Solver \
 		__Stg_Component \
@@ -71,6 +75,9 @@
 		SLE_Solver_SolverSetupFunction*    _solverSetup;     \
 		SLE_Solver_SolveFunction*          _solve;           \
 		SLE_Solver_GetResidualFunc*        _getResidual;	  \
+                SLE_Solver_FormResidualFunc*       _formResidual;    \
+                SLE_Solver_GetRhsFunc*             _getRhs;          \
+                SLE_Solver_GetSolutionFunc*        _getSolution;     \
 		\
 		/* SLE_Solver info */ \
 		Stream*                            debug;            \
