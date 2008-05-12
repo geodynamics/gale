@@ -37,7 +37,7 @@
 		</list>
 	</struct>
 
-	<struct name="recoveredPressureInvColourMap">
+	<struct name="recoveredPressureColourMap">
 		<param name="Type">lucColourMap</param>
 		<param name="colours">Black Purple DarkRed Orange Yellow</param>
 		<param name="dynamicRange">true</param>
@@ -45,7 +45,7 @@
 	<struct name="recoveredPressureMap">
 		<param name="Type">lucScalarField</param>
 		<param name="FieldVariable">recoveredPressureField</param>
-		<param name="ColourMap">recoveredPressureInvColourMap</param>
+		<param name="ColourMap">recoveredPressureColourMap</param>
 	</struct>
 	<struct name="recoveredPressureTitle" mergeType="replace">
 		<param name="Type">lucTitle</param>
@@ -54,7 +54,7 @@
 
 	<struct name="recoveredPressureColourBar">
 		<param name="Type">lucColourBar</param>
-		<param name="ColourMap">recoveredPressureInvColourMap</param>
+		<param name="ColourMap">recoveredPressureColourMap</param>
 	</struct>
 
 	
