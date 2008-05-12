@@ -47,6 +47,7 @@
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 #include <libxml/xmlreader.h>
+#include <libxml/xmlversion.h>
 
 /* textual class name */
 const Type XML_IO_Handler_Type = "XML_IO_Handler";
@@ -746,7 +747,8 @@ static void _XML_IO_Handler_ValidateFile( XML_IO_Handler* self, const char* file
 	reader = xmlNewTextReaderFilename( filename );
 
 	if ( reader != NULL ) {
-/*
+	#ifdef LIBXML_VERSION 
+	#if LIBXML_VERSION == 20631
 		if ( *(self->validate) == 1 )
 			valid = xmlTextReaderSchemaValidate( reader, (const char*) self->schema );
 
@@ -757,14 +759,14 @@ static void _XML_IO_Handler_ValidateFile( XML_IO_Handler* self, const char* file
 		}
 
 		if ( *(self->validate) == 1 ) {
-	*/		/*
+			/*
 			if ( self->schema == NULL )
 				Journal_Firewall( 
 					( self->schema != NULL ), 
 					Journal_Register( Error_Type, XML_IO_Handler_Type ), 
 					"Schema is not provided\n" );
 			*/
-	/*		if ( xmlTextReaderIsValid( reader ) != 1 ) {
+			if ( xmlTextReaderIsValid( reader ) != 1 ) {
 				fprintf( stderr, "%s : failed to parse\n", filename );
 				Journal_Firewall( 
 					xmlTextReaderIsValid( reader ) == 1, 
@@ -780,7 +782,8 @@ static void _XML_IO_Handler_ValidateFile( XML_IO_Handler* self, const char* file
 		if (ret !=0) {
 			fprintf( stderr, "%s : failed to parse\n", filename );
 		}
-*/
+	#endif
+	#endif
 	} else {
 		fprintf( stderr, "unable to open %s\n", filename );
 	}
