@@ -6,9 +6,11 @@
 	<list name="plugins" mergeType="Replace">
 		<param>Underworld_EulerDeform</param>
 		<param>StgFEM_StandardConditionFunctions</param>
+		<param>Underworld_IncompressibleExtensionBC</param>
 	</list>
 
 	<!-- Component Stuff -->
+	
 	<include>StgFEM/ConstantMesh.xml                    </include>
 	<include>StgFEM/LinearMesh.xml                      </include>
 	<include>StgFEM/VelocityField.xml                   </include>
@@ -17,6 +19,8 @@
 	<include>StgFEM/TimeIntegrator.xml                  </include>
 	<include>PICellerator/MaterialPointSwarm.xml        </include>
 	<include>Underworld/StokesFlowUzawaPIC.xml </include>
+
+
 
 	<param name="timeIntegratorOrder"> 1 </param>
 
@@ -29,8 +33,11 @@
 			<param name="gravity">gravity</param>
 		</struct>
 	</struct>
+	
+	<param name="gravity"> 1.0 </param>
 
 	<!-- Replacement for MovingMesh -->
+	
 	<struct name="components" mergeType="merge">
 		<struct name="velocityRemesher">
 			<param name="Type">RegularRemesherCmpt</param>
@@ -42,6 +49,7 @@
 			</list>
 		</struct>
 	</struct>
+	
 	<struct name="EulerDeform">
 		<list name="systems">
 			<struct>
@@ -51,6 +59,9 @@
 			<struct>
 				<param name="mesh"> velocityMesh </param>
 				<param name="remesher">velocityRemesher</param>
+				
+				
+				
 				<param name="velocityField"> VelocityField </param>
 				<list name="fields">
 					<struct>
@@ -68,5 +79,118 @@
 			<param name="regular"> True </param>
 		</struct>
 	</struct>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	<!-- The velocity boundary conditions for this problem are entirely specific ...
+	 	 therefore we build them in here --> 
+	 
+	 <param name="leftWallVelocity"> -0.5 </param>
+	 <param name="rightWallVelocity"> 0.5 </param>
+	 <param name="backWallVelocity"> 0.0 </param>
+	 <param name="frontWallVelocity"> 0.0 </param>
+	 <param name="constantHeight"> 0.5 </param>
+	
+	
+	<!-- WARNING !!! FRONT / BACK VELOCITIES BREAK THIS SETUP SO WE NEED TO REMOVE THEM -->
+	
+		<struct name="velocityBCs">
+			<param name="type">CompositeVC</param>
+			<list name="vcList">
+
+				<struct>
+					<param name="type"> WallVC </param>
+					<param name="wall"> left </param>
+					<list name="variables">
+						<struct>
+							<param name="name">vx</param>
+							<param name="type">func</param>
+							<param name="value"> IncompressibleExtensionBC_LeftCondition </param>
+						</struct>
+					</list>
+				</struct>
+				<struct>
+					<param name="type"> WallVC </param>
+					<param name="wall"> right </param>
+					<list name="variables">
+						<struct>
+							<param name="name">vx</param>
+							<param name="type">func</param>
+							<param name="value"> IncompressibleExtensionBC_RightCondition </param>
+						</struct>
+					</list>
+				</struct>
+				<struct>
+					<param name="type"> WallVC </param>
+					<param name="wall"> front </param>
+					<list name="variables">
+						<struct>
+							<param name="name">vz</param>
+							<param name="type">func</param>
+							<param name="value"> IncompressibleExtensionBC_FrontCondition </param>
+						</struct>
+					</list>
+				</struct>
+				<struct>
+					<param name="type"> WallVC </param>
+					<param name="wall"> back </param>
+					<list name="variables">
+						<struct>
+							<param name="name">vz</param>
+							<param name="type">func</param>
+							<param name="value"> IncompressibleExtensionBC_BackCondition </param>
+						</struct>
+					</list>
+				</struct>
+				<struct>
+					<param name="type"> WallVC </param>
+					<param name="wall"> top </param>
+					<list name="variables">
+						<struct>
+							<param name="name">vy</param>
+							<param name="type">func</param>
+							<param name="value"> IncompressibleExtensionBC_TopCondition </param>
+						</struct>
+					</list>
+				</struct>
+				<struct>
+					<param name="type"> WallVC </param>
+					<param name="wall"> bottom </param>
+					<list name="variables">
+						<struct>
+							<param name="name">vy</param>
+							<param name="type">func</param>
+							<param name="value"> IncompressibleExtensionBC_BottomCondition </param>
+						</struct>
+					</list>
+				</struct>
+			</list>
+		</struct>
+
+	
+
+
+
 
 </StGermainData>
