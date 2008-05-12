@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: IncompressibleExtensionBC.h 704 2008-04-08 08:06:11Z RobertTurnbull $
+** $Id: IncompressibleExtensionBC.h 728 2008-05-12 02:29:30Z LouisMoresi $
 ** 
 ** Comments:
 **
@@ -50,7 +50,9 @@
 
 	void IncompressibleExtensionBC_TopCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
 	void IncompressibleExtensionBC_LeftCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
+	void IncompressibleExtensionBC_LeftShearCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
 	void IncompressibleExtensionBC_RightCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
+	void IncompressibleExtensionBC_RightShearCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
 	void IncompressibleExtensionBC_BottomCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
 
 	Index Underworld_IncompressibleExtensionBC_Register( PluginsManager* pluginsManager );

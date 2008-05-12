@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: IncompressibleExtensionBC.c 704 2008-04-08 08:06:11Z RobertTurnbull $
+** $Id: IncompressibleExtensionBC.c 728 2008-05-12 02:29:30Z LouisMoresi $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -85,10 +85,20 @@ const Type Underworld_IncompressibleExtensionBC_Type = "Underworld_Incompressibl
 
 double GetLeftWallVelocity( UnderworldContext* context ) {
 	return Dictionary_GetDouble_WithDefault( context->dictionary,  "leftWallVelocity", 0.0 );
-}
+}	
+
+double GetLeftWallShearVelocity( UnderworldContext* context ) {
+		return Dictionary_GetDouble_WithDefault( context->dictionary,  "leftWallShearVelocity", 0.0 );
+	}
+	
 double GetRightWallVelocity( UnderworldContext* context ) {
-	return Dictionary_GetDouble_WithDefault( context->dictionary,  "rightWallVelocity", 0.0 );
+		return Dictionary_GetDouble_WithDefault( context->dictionary,  "rightWallVelocity", 0.0 );
+	}	
+	
+double GetRightWallShearVelocity( UnderworldContext* context ) {
+			return Dictionary_GetDouble_WithDefault( context->dictionary,  "rightWallShearVelocity", 0.0 );
 }
+
 double GetBackWallVelocity( UnderworldContext* context ) {
 	if ( context->dim == 2 )
 		return 0.0;
@@ -164,12 +174,29 @@ void IncompressibleExtensionBC_RightCondition( Node_LocalIndex node_lI, Variable
 	*result = GetRightWallVelocity( context );
 }
 
+void IncompressibleExtensionBC_RightShearCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	UnderworldContext* context = (UnderworldContext*) _context;
+	double*            result  = (double*) _result;
+
+	*result = GetRightWallShearVelocity( context );
+}
+
+
 void IncompressibleExtensionBC_LeftCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
 	UnderworldContext* context = (UnderworldContext*) _context;
 	double*            result  = (double*) _result;
 
 	*result = GetLeftWallVelocity( context );
 }
+
+void IncompressibleExtensionBC_LeftShearCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	UnderworldContext* context = (UnderworldContext*) _context;
+	double*            result  = (double*) _result;
+
+	*result = GetLeftWallShearVelocity( context );
+}
+
+
 void IncompressibleExtensionBC_BackCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
 	UnderworldContext* context = (UnderworldContext*) _context;
 	double*            result  = (double*) _result;
@@ -207,7 +234,11 @@ void _Underworld_IncompressibleExtensionBC_Construct( void* self, Stg_ComponentF
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 	condFunc = ConditionFunction_New( IncompressibleExtensionBC_LeftCondition, "IncompressibleExtensionBC_LeftCondition" );
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	condFunc = ConditionFunction_New( IncompressibleExtensionBC_LeftShearCondition, "IncompressibleExtensionBC_LeftShearCondition" );
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 	condFunc = ConditionFunction_New( IncompressibleExtensionBC_RightCondition, "IncompressibleExtensionBC_RightCondition" );
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	condFunc = ConditionFunction_New( IncompressibleExtensionBC_RightShearCondition, "IncompressibleExtensionBC_RightShearCondition" );
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 	condFunc = ConditionFunction_New( IncompressibleExtensionBC_FrontCondition, "IncompressibleExtensionBC_FrontCondition" );
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
