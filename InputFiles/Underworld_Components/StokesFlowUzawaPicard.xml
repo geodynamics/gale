@@ -110,7 +110,6 @@
 			<param name="nonLinearMaxIterations"> 500     </param>
 			<param name="picard_alpha">           1.0     </param> <!-- For tough problems make this smaller -->
 			<param name="picard_rtol">            1.0e-8  </param>
-			<param name="picard_ttol">            1.0e-8  </param>
 			<param name="picard_atol">            1.0e-50 </param>
 			<param name="picard_xtol">            1.0e-8  </param>
 		</struct>
