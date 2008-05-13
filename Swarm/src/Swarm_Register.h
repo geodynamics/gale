@@ -83,6 +83,7 @@
 	*/
 
 	Index Swarm_Register_Add( Swarm_Register* self, void* swarm );
+	void Swarm_Register_RemoveIndex( Swarm_Register* self, unsigned int index );
 	
 	Swarm* Swarm_Register_Get( Swarm_Register* self, Name name );
 	Swarm* Swarm_Register_At( void* swarmRegister, Index index ) ;

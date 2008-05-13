@@ -150,6 +150,16 @@ Index Swarm_Register_Add( Swarm_Register* self, void* swarm )
 	assert( self );
 	return Stg_ObjectList_Append( self->swarmList, swarm );
 }
+
+void Swarm_Register_RemoveIndex( Swarm_Register* self, unsigned int index )
+{
+	assert( self );
+	/* The third argument controls if the Delete phase is run or not in this function
+	 * KEEP = Don't run delete
+	 * DELETE = Run delete
+	 */
+	_Stg_ObjectList_RemoveByIndex( self, index, KEEP );
+}
 	
 Swarm* Swarm_Register_Get( Swarm_Register* self, Name name )
 {

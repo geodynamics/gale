@@ -329,6 +329,8 @@ void _Swarm_Delete( void* swarm ) {
 	}
 
 	NewClass_Delete( self->incArray );
+
+	Swarm_Register_RemoveIndex( Swarm_Register_GetSwarm_Register(), self->swarmReg_I );
 	
 	/* Stg_Class_Delete parent class */
 	_Stg_Component_Delete( self );
