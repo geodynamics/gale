@@ -158,7 +158,7 @@ void Swarm_Register_RemoveIndex( Swarm_Register* self, unsigned int index )
 	 * KEEP = Don't run delete
 	 * DELETE = Run delete
 	 */
-	_Stg_ObjectList_RemoveByIndex( self, index, KEEP );
+	_Stg_ObjectList_RemoveByIndex( self->swarmList, index, KEEP );
 }
 	
 Swarm* Swarm_Register_Get( Swarm_Register* self, Name name )
