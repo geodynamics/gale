@@ -916,7 +916,7 @@ void _PCDVC_Calculate3D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
 			  j =  (int) (nump * (rand() / (RAND_MAX + 1.0)));
 			  deleteIntParticleByIndexWithinCell( intSwarm,  matSwarm, lCell_I, j );
 			  nump--;
-			  splitCount--;
+			  splitCount++;
 		    }
 	      }
 #if 0
@@ -1353,7 +1353,7 @@ void _PCDVC_Calculate2D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
 			  j =  (int) (nump * (rand() / (RAND_MAX + 1.0)));
 			  deleteIntParticleByIndexWithinCell( intSwarm,  matSwarm, lCell_I, j );
 			  nump--;
-			  splitCount--;
+			  splitCount++;
 		    }
 	      }
 	      //if(splitCount) printf("\e[34mnump is now %d splitCount = %d\n",nump,splitCount);;printf("\e[0;37m");
