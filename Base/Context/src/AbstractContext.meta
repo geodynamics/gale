@@ -58,7 +58,7 @@ skip the setup process for frequently performed tasks to save time.
 	<struct>
 		<param name="Name">experimentName</param>
 		<param name="Type">String</param>
-		<param name="Default">experiement</param>
+		<param name="Default">experiment</param>
 		<param name="Description">Not used by anything at present.</param>
 	</struct>
 	<struct>
@@ -68,10 +68,22 @@ skip the setup process for frequently performed tasks to save time.
 		<param name="Description">Specifies the relative path to output and dump into.</param>
 	</struct>
 	<struct>
-		<param name="Name">checkpoinPath</param>
+		<param name="Name">checkpointPath</param>
 		<param name="Type">String</param>
-		<param name="Default">0</param>
-		<param name="Description">Specifies the relative path to checkpoint into.</param>
+		<param name="Default">outputPath</param>
+		<param name="Description">Specifies the relative path to read and write checkpoint files to if checkpointReadPath or checkpointWritePath are not defined. </param>
+	</struct>
+	<struct>
+		<param name="Name">checkpointReadPath</param>
+		<param name="Type">String</param>
+		<param name="Default">checkpointPath</param>
+		<param name="Description">Specifies the relative path to read checkpoint files from when restarting.</param>
+	</struct>
+	<struct>
+		<param name="Name">checkpointWritePath</param>
+		<param name="Type">String</param>
+		<param name="Default">checkpointPath</param>
+		<param name="Description">Specifies the relative path to save checkpoint files to. </param>
 	</struct>
 	<struct>
 		<param name="Name">start</param>
@@ -123,8 +135,8 @@ skip the setup process for frequently performed tasks to save time.
 	</struct>
 	<struct>
 		<param name="Name">checkPointPrefixString</param>
-		<param name="Type">Double</param>
-		<param name="Default">0</param>
+		<param name="Type">String</param>
+		<param name="Default">""</param>
 		<param name="Description">Prefixes checkpoint filenames.</param>
 	</struct>
 </list>
