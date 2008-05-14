@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: PeriodicBoundariesManager.c 556 2008-03-28 06:41:03Z RobertTurnbull $
+** $Id: PeriodicBoundariesManager.c 569 2008-05-14 02:42:54Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -56,6 +56,8 @@
 
 #include <string.h>
 #include <assert.h>
+
+char IJKTopology_DimNumToDimLetter[3] = {'I', 'J', 'K'};
 
 /* Textual name of this class */
 const Type PeriodicBoundariesManager_Type = "PeriodicBoundariesManager";
