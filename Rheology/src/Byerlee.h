@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: Byerlee.h 466 2007-04-27 06:24:33Z LukeHodkinson $
+** $Id: Byerlee.h 733 2008-05-14 04:55:40Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -55,7 +55,6 @@
 		__VonMises \
 		/* Virtual functions go here */ \
 		/* Material Parameters */\
-		BlockGeometry*                      geometry;                                 \
 		FeMesh*                 	    mesh;                                     \
 		double                              depthCoefficient;
 	

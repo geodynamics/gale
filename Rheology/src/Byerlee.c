@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: Byerlee.c 610 2007-10-11 08:09:29Z SteveQuenette $
+** $Id: Byerlee.c 733 2008-05-14 04:55:40Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 #include <mpi.h>
@@ -106,8 +106,7 @@ Byerlee* _Byerlee_New(
 	return self;
 }
 
-void _Byerlee_Init( Byerlee* self, BlockGeometry* geometry, FeMesh* mesh, double depthCoefficient ) {
-	self->geometry = geometry;
+void _Byerlee_Init( Byerlee* self, FeMesh* mesh, double depthCoefficient ) {
 	self->mesh = mesh;
 	self->depthCoefficient = depthCoefficient;
 }
@@ -134,7 +133,6 @@ void* _Byerlee_DefaultNew( Name name ) {
 
 void _Byerlee_Construct( void* rheology, Stg_ComponentFactory* cf, void* data ){
 	Byerlee*            self           = (Byerlee*)rheology;
-	BlockGeometry*      geometry;
 	FeMesh*		    mesh;
 
 	/* Construct Parent */
@@ -153,7 +151,6 @@ void _Byerlee_Construct( void* rheology, Stg_ComponentFactory* cf, void* data ){
 
 	_Byerlee_Init( 
 			self, 
-			geometry,
 			mesh,
 			Stg_ComponentFactory_GetDouble( cf, self->name, "depthCoefficient", 0.0  ) );
 }
