@@ -175,7 +175,7 @@ void _SwarmVariableField_Construct( void* swarmVariableField, Stg_ComponentFacto
 	_ParticleFeVariable_Construct( self, cf, data );
 
 	// TODO: just get the textual name here - see gLucifer's SwarmPlotter DrawignObject 
-	self->swarmVarName = Stg_ComponentFactory_GetString( cf, self->name, "SwarmVariable", "" );
+	self->swarmVarName = Stg_ComponentFactory_GetString( cf, self->name, "swarmVariable", "" );
 	assert( swarmVar );
 
 	self->materialSwarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, "MaterialSwarm", MaterialPointsSwarm, True, data );
@@ -183,9 +183,8 @@ void _SwarmVariableField_Construct( void* swarmVariableField, Stg_ComponentFacto
 	integrationSwarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm", IntegrationPointsSwarm, True, NULL );
 	assert( integrationSwarm );
 
-	/* dunno if this is the right way about getting the context... */
-	context = (FiniteElementContext*) Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data );
-	//context = Stg_ComponentFactory_ConstructByKey( cf, "context", FiniteElementContext, True, data );
+	context = (FiniteElementContext*) Stg_ComponentFactory_ConstructByKey( cf, self->name, "context", FiniteElementContext, True, data );
+	
 	assert( context );
 
 	_SwarmVariableField_Init( self, swarmVar, variable_Register );
@@ -203,9 +202,6 @@ void _SwarmVariableField_Build( void* swarmVariableField, void* data ) {
 	tmpName = Stg_Object_AppendSuffix( self, "DataVariable" );
 	self->dataVariable = Variable_NewScalar( tmpName,
 		       				 Variable_DataType_Double,
-						 /* this guy is NULL, & i have no idea what an igraph is,
-						  * but this arument is a pointer to the array size - 03.10.07 */
-						 //&((IGraph*)self->feMesh->topo)->remotes[MT_VERTEX]->nDomains,
 						 &nDomainVerts,
 						 NULL,
 						 (void**)&self->data,
@@ -288,7 +284,6 @@ void _SwarmVariableField_ValueAtParticle( void* swarmVariableField,
 	SwarmVariable_ValueAt( self->swarmVar, lParticle_I, value ); /* does the copy inside this func. dave, 18.09.07 */
 }
 
-/* use the FeVariable_GetValueAtNode func. dave, 03.10.07 */
 void _SwarmVariableField_GetValueAtNode( void* swarmVariableField, Node_DomainIndex dNode_I, double* value ) {
 	FeVariable_GetValueAtNode( swarmVariableField, dNode_I, value );
 }

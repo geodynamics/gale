@@ -31,6 +31,6 @@ property which defines its mathematical behaviour.
 	</struct>
 
 </list>
-<param name="Example">...</param>
+<param name="Example">./PICellerator/Apps/RayleighTaylor/RayTay_Example.xml</param>
 
 </StGermainData>
