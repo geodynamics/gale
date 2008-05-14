@@ -35,16 +35,6 @@
 #include "units.h"
 #include "types.h"
 #include "Init.h"
-#include "Topology.h"
-#include "IJKTopology.h"
-#include "IJK6Topology.h"
-#include "IJK26Topology.h"
-#include "IrregTopology.h"
-#include "GeometryClass.h"
-#include "BlockGeometry.h"
-#include "RefinedRegionsGeometry.h"
-#include "ShellGeometry.h"
-#include "IrregGeometry.h"
 #include "Delaunay.h"
 #include "ParallelDelaunay.h"
 
@@ -54,29 +44,11 @@ Bool StgDomainGeometry_Init( int* argc, char** argv[] ) {
 	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 
 		
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), IJK6Topology_Type, "0", (Stg_Component_DefaultConstructorFunction*)IJK6Topology_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), IJK26Topology_Type, "0", (Stg_Component_DefaultConstructorFunction*)IJK26Topology_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), IrregTopology_Type, "0", (Stg_Component_DefaultConstructorFunction*)IrregTopology_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), BlockGeometry_Type, "0", (Stg_Component_DefaultConstructorFunction*)BlockGeometry_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), RefinedRegionsGeometry_Type, "0", RefinedRegionsGeometry_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), ShellGeometry_Type, "0", (Stg_Component_DefaultConstructorFunction*)ShellGeometry_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), IrregGeometry_Type, "0", (Stg_Component_DefaultConstructorFunction*)IrregGeometry_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), Delaunay_Type, "0", (Stg_Component_DefaultConstructorFunction*)Delaunay_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), ParallelDelaunay_Type, "0", (Stg_Component_DefaultConstructorFunction*)ParallelDelaunay_DefaultNew );
 
 	RegisterParent( Delaunay_Type,               Stg_Component_Type );
 	RegisterParent( ParallelDelaunay_Type,       Delaunay_Type );
-	RegisterParent( Geometry_Type,               Stg_Component_Type );
-	RegisterParent( BlockGeometry_Type,          Geometry_Type );
-	RegisterParent( RefinedRegionsGeometry_Type, Geometry_Type );
-	RegisterParent( IrregGeometry_Type,          Geometry_Type );
-	RegisterParent( ShellGeometry_Type,          Geometry_Type );
-	
-	RegisterParent( Topology_Type,      Stg_Component_Type );
-	RegisterParent( IJKTopology_Type,   Topology_Type );
-	RegisterParent( IrregTopology_Type, Topology_Type );
-	RegisterParent( IJK26Topology_Type, IJKTopology_Type );
-	RegisterParent( IJK6Topology_Type,  IJKTopology_Type );
 	
 	return True;
 }
