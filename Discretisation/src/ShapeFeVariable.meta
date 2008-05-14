@@ -30,18 +30,12 @@
 
 <list name="Dependencies">
 <!-- This component calls in another directory so the info above/below may not be complete-->
-	<struct>
-		<param name="Essential">True</param>
-		<param name="Name">FeVariable</param>
-		<param name="Type">FeVariable</param>
-		<param name="Description">...</param>
-	</struct>
 
 <!-- PLEASE, check the above struct information is accurate, in line number 358 of the c file and then remove this comment afterwards -->
 
 
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">n/a</param>
 
 </StGermainData>

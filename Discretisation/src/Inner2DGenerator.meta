@@ -10,7 +10,7 @@
 <param name="Copyright">Copyright (C) 2004-2005 VPAC.</param>
 <param name="License">https://csd.vpac.org/twiki/bin/view/Stgermain/SoftwareLicense</param>
 <param name="Parent">MeshGenerator</param>
-<param name="Description">...</param>
+<param name="Description">Generates a mesh with nodes situated at points internal to the element.</param>
 
 <!--Now the interesting stuff-->
 
@@ -20,9 +20,14 @@
 </list>
 
 <list name="Dependencies">
-
+	<struct>
+		<param name="Essential">true</param>
+		<param name="Name">elementMesh</param>
+		<param name="Type">Mesh</param>
+		<param name="Description">Eulerian mesh</param>
+	</struct>
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">n/a</param>
 
 </StGermainData>
