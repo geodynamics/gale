@@ -5,15 +5,15 @@
 <param name="Name">GlobalParticleLayout</param>
 <param name="Author">...</param>
 <param name="Organisation">VPAC</param>
-<param name="Project">StGermain</param>
-<param name="Location">./StGermain/Discretisation/Swarm/src/</param>
+<param name="Project">StgDomain</param>
+<param name="Location">./StgDomain/Swarm/src/</param>
 <param name="Project Web">https://csd.vpac.org/twiki/bin/view/Stgermain/WebHome</param>
 <param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
 <param name="License">The Gnu Lesser General Public License http://www.gnu.org/licenses/lgpl.html</param>
 <param name="Parent">ParticleLayout</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">...</param>
+<param name="Description">Another abstract class which define global coordinate layouts</param>
 
 <!--Now the interesting stuff-->
 
@@ -26,6 +26,6 @@
 
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">n/a</param>
 
 </StGermainData>
