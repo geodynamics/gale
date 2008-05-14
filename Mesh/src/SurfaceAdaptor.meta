@@ -3,24 +3,59 @@
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 
 <param name="Name">SurfaceAdaptor</param>
-<param name="Author">...</param>
 <param name="Organisation">VPAC</param>
-<param name="Project">StGermain</param>
-<param name="Location">./StGermain/Discretisation/Mesh/src/</param>
-<param name="Project Web">https://csd.vpac.org/twiki/bin/view/Stgermain/WebHome</param>
+<param name="Project">StgDomain</param>
+<param name="Location">./StgDomain/Mesh/src/</param>
+<param name="Project Web">http://mcc.monash.edu.au/Software/Underworld.</param>
 <param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
-<param name="License">The Gnu Lesser General Public License http://www.gnu.org/licenses/lgpl.html</param>
-<param name="Parent"></param>
-<param name="Reference">...</param>
+<param name="License">http://www.opensource.org/licenses/bsd-license.php</param>
+<param name="Parent">MeshAdaptor</param>
 <param name="Summary">A type of MeshAdaptor that lets you modify the top surface of a mesh without altering the underlying layers.</param>
 <param name="Description"><p>SurfaceAdaptor is a type of MeshAdaptor.  It allows you to selectively change the top surface of a mesh without altering the underlying layers. </p>
-
-<p>SurfaceAdaptor is an example of a MeshAdaptor.  It allows you to modify the top surface without changing the underlying layers.  Presently, it's the only MeshAdaptor, but it makes for a useful case study and other MeshAdaptors can be constructed in future.</p>
 
 <p> <br/>Questions: Is SurfaceAdaptor useful when dealing with conditions with highly stratified materials?  
 Where forces acting on material being modelled only affect the surface and don't penetrate the bulk of the material?
 Useful as a quick approximation because you're interested only in examining the surface?
-TODO: Does it stricktly deal with the top layer only, or can you set the depth to which the SurfaceAdaptor goes?  This has implications for mesh deformation, level of detail, size of “cells” etc.</p>
+TODO: Does it strictly deal with the top layer only, or can you set the depth to which the SurfaceAdaptor goes?  This has implications for mesh deformation, level of detail, size of “cells” etc.</p>
 </param>
+
+<list name="Params">
+	<struct>
+		<param name="Name">surfaceType</param>
+		<param name="Type">String</param>
+		<param name="Default">""</param>
+		<param name="Description">The type of surface to be used - can be "wedge", "sine" or "cosine"</param>
+	</struct>
+	<struct>
+		<param name="Name">offset</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.0</param>
+		<param name="Description">The length of the flat section before the slope of a wedge begins</param>
+	</struct>
+	<struct>
+		<param name="Name">gradient</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.5</param>
+		<param name="Description">The gradient of the slope of a wedge</param>
+	</struct>
+	<struct>
+		<param name="Name">amplitude</param>
+		<param name="Type">Double</param>
+		<param name="Default">1.0</param>
+		<param name="Description">The amplitude of a sine/cosine wave</param>
+	</struct>
+	<struct>
+		<param name="Name">frequency</param>
+		<param name="Type">Double</param>
+		<param name="Default">1.0</param>
+		<param name="Description">The frequency of a sine/cosine wave</param>
+	</struct>
+</list>
+
+<list name="Dependencies">
+</list>
+
+<!-- Add an exmaple XML if possible -->
+<param name="Example">n/a</param>
 
 </StGermainData>

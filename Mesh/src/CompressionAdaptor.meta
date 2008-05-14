@@ -5,14 +5,30 @@
 <param name="Name">CompressionAdaptor</param>
 <param name="Author">...</param>
 <param name="Organisation">VPAC</param>
-<param name="Project">StGermain</param>
-<param name="Location">./StGermain/Discretisation/Mesh/src/</param>
+<param name="Project">StgDomain</param>
+<param name="Location">./StgDomain/Mesh/src/</param>
 <param name="Project Web">https://csd.vpac.org/twiki/bin/view/Stgermain/WebHome</param>
 <param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
 <param name="License">The Gnu Lesser General Public License http://www.gnu.org/licenses/lgpl.html</param>
-<param name="Parent"></param>
+<param name="Parent">MeshAdaptor</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">...</param>
+<param name="Description">A type of MeshAdaptor that lets you compress the mesh.</param>
+
+<list name="Params">
+	<struct>
+		<param name="Name">compressionfactor</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.0</param>
+		<param name="Description">Controls the extent to which the mesh is compressed</param>
+	</struct>
+</list>
+
+<list name="Dependencies">
+</list>
+
+<!-- Add an exmaple XML if possible -->
+<param name="Example">n/a</param>
+
 
 </StGermainData>
