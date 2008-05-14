@@ -53,8 +53,6 @@ typedef struct RegularRemesherCmpt RegularRemesherCmpt;
 	typedef struct _InnerWallVC			InnerWallVC;
 	typedef struct _CornerVC			CornerVC;
 	typedef struct MeshShapeVC				MeshShapeVC;
-	typedef struct _FrictionVC			FrictionVC;
-	typedef struct SplitFrictionWallVC		SplitFrictionWallVC;
 	typedef struct _DofLayout			DofLayout;
 	typedef struct _EmbeddedSurface			EmbeddedSurface;
 	typedef struct Operator      		Operator;
@@ -76,35 +74,6 @@ typedef struct RegularRemesherCmpt RegularRemesherCmpt;
 	typedef unsigned int				Dof;
 	typedef Index                       Bit_Index;
 
-	/* FrictionVC types */
-	typedef enum
-	{
-		FrictionVC_Wall_Back,
-		FrictionVC_Wall_Left,
-		FrictionVC_Wall_Bottom,
-		FrictionVC_Wall_Right,
-		FrictionVC_Wall_Top,
-		FrictionVC_Wall_Front,
-		FrictionVC_Wall_Size
-	} FrictionVC_Wall;
-	
-	typedef struct _FrictionVC_Entry	FrictionVC_Entry;
-	typedef Index		       	        FrictionVC_Entry_Index;
-	/* SplitFrictionWallVC types */
-	typedef enum
-	{
-		SplitFrictionWallVC_Wall_Back,
-		SplitFrictionWallVC_Wall_Left,
-		SplitFrictionWallVC_Wall_Bottom,
-		SplitFrictionWallVC_Wall_Right,
-		SplitFrictionWallVC_Wall_Top,
-		SplitFrictionWallVC_Wall_Front,
-		SplitFrictionWallVC_Wall_Size
-	} SplitFrictionWallVC_Wall;
-	
-	typedef struct _SplitFrictionWallVC_Entry   SplitFrictionWallVC_Entry;
-	typedef Index			      SplitFrictionWallVC_Entry_Index;
-	
 	/* WallVC types */
 	typedef enum
 	{

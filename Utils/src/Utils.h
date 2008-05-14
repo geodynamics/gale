@@ -51,8 +51,6 @@
 	#include "CornerVC.h"
 	#include "InnerWallVC.h"
 	#include "MeshShapeVC.h"
-	#include "FrictionVC.h"
-	#include "SplitFrictionWallVC.h"
 	#include "DofLayout.h"
 	#include "Operator.h"
 	#include "FieldVariable_Register.h"

@@ -93,16 +93,6 @@
 	typedef Index				Coord_Index;
 	typedef long int 			QuadEdgeRef;
 
-	typedef struct Topology			Topology;
-	typedef struct IJKTopology		IJKTopology;
-	typedef struct IJK6Topology		IJK6Topology;
-	typedef struct IJK26Topology	IJK26Topology;
-	typedef struct IrregTopology	IrregTopology;
-	typedef struct Geometry			Geometry;
-	typedef struct BlockGeometry	BlockGeometry;
-	typedef struct RefinedRegionsGeometry	RefinedRegionsGeometry;
-	typedef struct ShellGeometry	ShellGeometry;
-	typedef struct IrregGeometry	IrregGeometry;
 	typedef struct QuadEdge			QuadEdge;
 	typedef struct QuadEdgePool		QuadEdgePool;
 	typedef struct VoronoiVertexPool		VoronoiVertexPool;
