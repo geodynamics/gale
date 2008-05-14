@@ -12,6 +12,7 @@
   <param name="Parent">CellLayout</param>
 
   <param name="Description">
+    Single particle cell denoted by a (right angled) triangular arrangment of nodes. 
   </param>
 
   <list name="Params">
@@ -20,6 +21,7 @@
       <param name="Type">Integer</param>
       <param name="Default">0</param>
       <param name="Description">
+        Dimensionality of the cell.
       </param>
     </struct>
 

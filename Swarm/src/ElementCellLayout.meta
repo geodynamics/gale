@@ -32,6 +32,7 @@
   </list>
 
   <param name="Example">
+    ./StgDomain/Swarm/tests/testParticleCoords.xml
   </param>
 
 </StGermainData>

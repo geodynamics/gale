@@ -10,7 +10,7 @@
 <param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
 <param name="License">The Gnu Lesser General Public License http://www.gnu.org/licenses/lgpl.html</param>
 <param name="Parent">CellLayout</param>
-<param name="Description">...</param>
+<param name="Description">Cell layout for a single particle arrangement, to be mapped to each of the elements.</param>
 
 <!--Now the interesting stuff-->
 
@@ -20,25 +20,25 @@
 		<param name="Name">dim</param>
 		<param name="Type">UnsignedInt</param>
 		<param name="Default">0</param>
-		<param name="Description">...</param>
+		<param name="Description">Dimensionality of the cell.</param>
 	</struct>
 	<struct>
 		<param name="Name">dimExistsI</param>
 		<param name="Type">Bool</param>
 		<param name="Default">True</param>
-		<param name="Description">...</param>
+		<param name="Description">If the cell is defined in the ith dimension, then add particles to the cell in this dimension</param>
 	</struct>
 	<struct>
 		<param name="Name">dimExistsJ</param>
 		<param name="Type">Bool</param>
 		<param name="Default">True</param>
-		<param name="Description">...</param>
+		<param name="Description">If the cell is defined in the jth dimension, then add particles to the cell in this dimension</param>
 	</struct>
 	<struct>
-		<param name="Name"></param>
-		<param name="Type">Bool( cf, self->name, "dimExistsK", </param>
-		<param name="Default"></param>
-		<param name="Description">...</param>
+		<param name="Name">dimExistsK</param>
+		<param name="Type">Bool</param>
+		<param name="Default">dim == 3</param>
+		<param name="Description">If the cell is defined in the kth dimension, then add particles to the cell in this dimension</param>
 	</struct>
 	<struct>
 		<param name="Name">minX</param>
@@ -83,6 +83,6 @@
 
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">./StgFEM/Apps/StgFEM_Components/GaussSwarm.xml</param>
 
 </StGermainData>
