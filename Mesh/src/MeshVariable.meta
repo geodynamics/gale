@@ -9,7 +9,38 @@
 <param name="Project Web">https://csd.vpac.org/twiki/bin/view/Stgermain/WebHome</param>
 <param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
 <param name="License">The Gnu Lesser General Public License http://www.gnu.org/licenses/lgpl.html</param>
-<param name="Parent">Stg_Component</param>
-<param name="Description">...</param>
+<param name="Parent">Variable</param>
+
+<param name="Description">
+  A kind of Variable component that implicitly extracts the number of items in
+  the variable from the number of elements in any topological dimension from
+  the mesh.
+</param>
+
+  <list name="Params">
+    <struct>
+      <param name="Name">topologicalDim</param>
+      <param name="Type">Integer</param>
+      <param name="Default">0</param>
+      <param name="Description">
+        The topological dimension to use as the number of items in the
+        variable.
+      </param>
+    </struct>
+  </list>
+
+  <list name="Dependencies">
+    <struct>
+      <param name="Essential">Yes</param>
+      <param name="Name">mesh</param>
+      <param name="Type">Mesh</param>
+      <param name="Description">
+        The mesh to take the number of items from.
+      </param>
+    </struct>
+  </list>
+
+  <param name="Example">
+  </param>
 
 </StGermainData>
