@@ -10,7 +10,7 @@
 <param name="Copyright">Copyright (C) 2004-2005 VPAC.</param>
 <param name="License">https://csd.vpac.org/twiki/bin/view/Stgermain/SoftwareLicense</param>
 <param name="Parent">ForceTerm</param>
-<param name="Description">...</param>
+<param name="Description">Temperature and Rayleigh number dependent force term for the Stokes equation.</param>
 
 <!--Now the interesting stuff-->
 
@@ -20,9 +20,8 @@
 		<param name="Name">Ra</param>
 		<param name="Type">Double</param>
 		<param name="Default">0.0</param>
-		<param name="Description">...</param>
+		<param name="Description">Rayleigh number - if small then heat transfer is conductive, if large then heat transfer is convective.</param>
 	</struct>
-
 </list>
 
 <list name="Dependencies">
@@ -30,14 +29,10 @@
 		<param name="Essential">True</param>
 		<param name="Name">TemperatureField</param>
 		<param name="Type">FeVariable</param>
-		<param name="Description">...</param>
+		<param name="Description">Temperature field</param>
 	</struct>
-
-<!-- PLEASE, check the above struct information is accurate, in line number 139 of the c file and then remove this comment afterwards -->
-
-
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">StgFEM/Apps/ThermalConvection/ThermalConvection.xml</param>
 
 </StGermainData>
