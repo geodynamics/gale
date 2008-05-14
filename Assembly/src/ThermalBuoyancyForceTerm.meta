@@ -33,6 +33,6 @@
 	</struct>
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">StgFEM/Apps/ThermalConvection/ThermalConvection.xml</param>
+<param name="Example">./StgFEM/Apps/ThermalConvection/ThermalConvection.xml</param>
 
 </StGermainData>
