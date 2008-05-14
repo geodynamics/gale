@@ -5,8 +5,8 @@
 <param name="Name">BelowCosinePlane</param>
 <param name="Author">...</param>
 <param name="Organisation">VPAC</param>
-<param name="Project">StGermain</param>
-<param name="Location">./StGermain/Discretisation/Shape/src/</param>
+<param name="Project">StgDomain</param>
+<param name="Location">./StgDomain/Shape/src/</param>
 <param name="Project Web">https://csd.vpac.org/twiki/bin/view/Stgermain/WebHome</param>
 <param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
 <param name="License">The Gnu Lesser General Public License http://www.gnu.org/licenses/lgpl.html</param>
@@ -21,12 +21,6 @@
 
 
 <list name="Params">
-	<struct>
-		<param name="Name">offset</param>
-		<param name="Type">Double</param>
-		<param name="Default">1.0</param>
-		<param name="Description">The offset in the dependent variable, $ a_0 $ in the equation. Traditionally this would be the y-axis.</param>
-	</struct>
 	<struct>
 		<param name="Name">amplitude</param>
 		<param name="Type">Double</param>

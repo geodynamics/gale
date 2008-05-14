@@ -75,7 +75,7 @@
 		Stg_Shape_DistanceFromCenterAxisFunction*   _distanceFromCenterAxis,
 		Name                                  name );
 	
-	void _BelowCosinePlane_Init( void* belowPlane, double offset, XYZ width, double amplitude, double period, double phase ) ;
+	void _BelowCosinePlane_Init( void* belowPlane, XYZ width, double amplitude, double period, double phase ) ;
 	void BelowCosinePlane_InitAll( 
 		void*                                 belowPlane, 
 		Dimension_Index                       dim, 

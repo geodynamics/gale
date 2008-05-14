@@ -129,7 +129,7 @@ BelowCosinePlane* _BelowCosinePlane_New(
 	return self;
 }
 
-void _BelowCosinePlane_Init( void* belowPlane, double offset, XYZ width, double amplitude, double period, double phase ) {
+void _BelowCosinePlane_Init( void* belowPlane, XYZ width, double amplitude, double period, double phase ) {
 	BelowCosinePlane* self = (BelowCosinePlane*)belowPlane;
 
 	self->amplitude = amplitude;
@@ -156,7 +156,7 @@ void BelowCosinePlane_InitAll(
 	BelowCosinePlane* self = (BelowCosinePlane*)belowPlane;
 
 	BelowPlane_InitAll( self, dim, centre, alpha, beta, gamma, offset, width, minValue, maxValue );
-	_BelowCosinePlane_Init( self, offset, width, amplitude, period, phase );
+	_BelowCosinePlane_Init( self, width, amplitude, period, phase );
 }
 	
 
@@ -226,7 +226,7 @@ void _BelowCosinePlane_Construct( void* belowPlane, Stg_ComponentFactory* cf, vo
 	period = Stg_ComponentFactory_GetDouble( cf, self->name, "period", 2*M_PI );
 	phase = Stg_ComponentFactory_GetDouble( cf, self->name, "phase", 0.0 );
 
-	_BelowCosinePlane_Init( self, self->offset, self->width, amplitude, period, phase );
+	_BelowCosinePlane_Init( self, self->width, amplitude, period, phase );
 }
 
 void _BelowCosinePlane_Build( void* belowPlane, void* data ) {
