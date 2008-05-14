@@ -5,14 +5,13 @@
 <param name="Name">UnionParticleLayout</param>
 <param name="Author">...</param>
 <param name="Organisation">VPAC</param>
-<param name="Project">StGermain</param>
-<param name="Location">./</param>
+<param name="Project">StgDomain</param>
+<param name="Location">./StgDomain/Swarm/src</param>
 <param name="Project Web">https://csd.vpac.org/twiki/bin/view/Stgermain/WebHome</param>
 <param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
 <param name="License">https://csd.vpac.org/twiki/bin/view/Stgermain/SoftwareLicense</param>
 <param name="Parent">GlobalParticleLayout</param>
 <param name="Reference">...</param>
-<param name="Summary">A particle layout that sequentially combines many particle layouts.<br/>When one particle layout finishes initialising all its particles then the next one begins.</param>
 <param name="Description">This is a particle layout that simply combines many particle layouts together into one. When one particle layout finishes initialises all its particles, then the next one begins.</param>
 
 <list name="Params">
@@ -24,6 +23,7 @@
 		<param name="Name">ParticleLayoutList</param>
 		<param name="Type">GlobalParticleLayout</param>
 		<param name="Description">This is a list of all the particle layouts that you want to combine into one.</param>
+		<param name="Fallback Key"></param>
 	</struct>
 </list>
 <!-- Add an exmaple XML if possible -->

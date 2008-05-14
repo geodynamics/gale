@@ -50,16 +50,6 @@ SRCS = \
 	Plane.c \
 	Edge.c \
 	RMatrix.c \
-	Topology.c \
-	IJKTopology.c \
-	IJK6Topology.c \
-	IJK26Topology.c \
-	IrregTopology.c \
-	GeometryClass.c \
-	BlockGeometry.c \
-	RefinedRegionsGeometry.c \
-	ShellGeometry.c \
-	IrregGeometry.c \
 	QuadEdge.c \
 	Delaunay.c \
 	ParallelDelaunay.c \
@@ -86,16 +76,6 @@ HDRS = \
 	Plane.h \
 	Edge.h \
 	RMatrix.h \
-	Topology.h \
-	IJKTopology.h \
-	IJK6Topology.h \
-	IJK26Topology.h \
-	IrregTopology.h \
-	GeometryClass.h \
-	ShellGeometry.h \
-	BlockGeometry.h \
-	RefinedRegionsGeometry.h \
-	IrregGeometry.h \
 	QuadEdge.h \
 	Delaunay.h \
 	ParallelDelaunay.h \

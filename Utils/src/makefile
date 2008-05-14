@@ -49,7 +49,6 @@ SRCS = \
 	FieldVariable.c \
 	FieldVariable_Register.c \
 	Finalise.c \
-	FrictionVC.c \
 	Init.c \
 	InnerWallVC.c \
 	LinearRegression.c \
@@ -63,7 +62,6 @@ SRCS = \
 	Remesher.c \
 	ShapeAdvector.c \
 	SobolGenerator.c \
-	SplitFrictionWallVC.c \
 	TimeIntegratee.c \
 	TimeIntegrator.c \
 	WallVC.c
@@ -82,7 +80,6 @@ HDRS = \
 	FieldVariable.h \
 	FieldVariable_Register.h \
 	Finalise.h \
-	FrictionVC.h \
 	Init.h \
 	InnerWallVC.h \
 	LinearRegression.h \
@@ -98,7 +95,6 @@ HDRS = \
 	Remesher.h \
 	ShapeAdvector.h \
 	SobolGenerator.h \
-	SplitFrictionWallVC.h \
 	TimeIntegratee.h \
 	TimeIntegrator.h \
 	Utils.h \
