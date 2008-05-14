@@ -13,10 +13,22 @@
 <param name="Parent">SystemLinearEquations</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">...</param>
+<param name="Description"> 
+	This SLE define the Stokes system of equations given by the 2x2 block matrix
+		[  K  G  ]{u} = {f}
+		[  D  C  ]{p} = {h} ........................................ (1)
 
-<!--Now the interesting stuff-->
-
+	The param names used to identify each matrix in (1) within the Stokes_SLE are
+	provided below.
+		K: StressTensorMatrix
+		G: GradientMatrix
+		D: DivergenceMatrix
+		C: CompressibilityMatrix
+		u: VelocityVector
+		p: PressureVector
+		f: ForceVector
+		h: ContinuityForceVector:
+</param>
 
 <list name="Params">
 
@@ -24,79 +36,55 @@
 
 <list name="Dependencies">
 	<struct>
-		<param name="Essential">True</param>
-		<param name="Name">StressTensorMatrix</param>
-		<param name="Type">StiffnessMatrix</param>
-		<param name="Description">...</param>
+		<param name="Name">      StressTensorMatrix </param>
+		<param name="Type">      StiffnessMatrix    </param>
+		<param name="Essential"> True               </param>
+		<param name="Description"> Matrix which is discrete counter part of a tensor gradient. </param>
 	</struct>
-
-<!-- PLEASE, check the above struct information is accurate, in line number 272 of the c file and then remove this comment afterwards -->
-
 	<struct>
-		<param name="Essential">True</param>
-		<param name="Name">GradientMatrix</param>
-		<param name="Type">StiffnessMatrix</param>
-		<param name="Description">...</param>
+		<param name="Name">      GradientMatrix  </param>
+		<param name="Type">      StiffnessMatrix </param>
+		<param name="Essential"> True            </param>
+		<param name="Description"> Matrix which is the discrete counter part of the gradient operator. </param>
 	</struct>
-
-<!-- PLEASE, check the above struct information is accurate, in line number 273 of the c file and then remove this comment afterwards -->
-
 	<struct>
-		<param name="Essential">No</param>
-		<param name="Name">DivergenceMatrix</param>
-		<param name="Type">StiffnessMatrix</param>
-		<param name="Description">...</param>
+		<param name="Name">      DivergenceMatrix </param>
+		<param name="Type">      StiffnessMatrix  </param>
+		<param name="Essential"> No               </param>
+		<param name="Description"> Matrix which is the discrete counter part of the divergence operator. </param>
 	</struct>
-
-<!-- PLEASE, check the above struct information is accurate, in line number 274 of the c file and then remove this comment afterwards -->
-
 	<struct>
-		<param name="Essential">No</param>
-		<param name="Name">CompressibilityMatrix</param>
-		<param name="Type">StiffnessMatrix</param>
-		<param name="Description">...</param>
+		<param name="Name">      CompressibilityMatrix </param>
+		<param name="Type">      StiffnessMatrix       </param>
+		<param name="Essential"> No                    </param>
+		<param name="Description"> Matrix which is the discrete counter part of "some" operator applied to p. The form of the operator is application dependent.  </param>
 	</struct>
-
-<!-- PLEASE, check the above struct information is accurate, in line number 275 of the c file and then remove this comment afterwards -->
-
 	<struct>
-		<param name="Essential">True</param>
-		<param name="Name">VelocityVector</param>
-		<param name="Type">SolutionVector</param>
-		<param name="Description">...</param>
+		<param name="Name">      VelocityVector </param>
+		<param name="Type">      SolutionVector </param>
+		<param name="Essential"> True           </param>
+		<param name="Description"> The discrete velocity vector. </param>
 	</struct>
-
-<!-- PLEASE, check the above struct information is accurate, in line number 277 of the c file and then remove this comment afterwards -->
-
 	<struct>
-		<param name="Essential">True</param>
-		<param name="Name">PressureVector</param>
-		<param name="Type">SolutionVector</param>
-		<param name="Description">...</param>
+		<param name="Name">      PressureVector </param>
+		<param name="Type">      SolutionVector </param>
+		<param name="Essential"> True           </param>
+		<param name="Description"> The discrete pressure vector. </param>
 	</struct>
-
-<!-- PLEASE, check the above struct information is accurate, in line number 278 of the c file and then remove this comment afterwards -->
-
 	<struct>
-		<param name="Essential">True</param>
-		<param name="Name">ForceVector</param>
-		<param name="Type">ForceVector</param>
-		<param name="Description">...</param>
+		<param name="Name">      ForceVector </param>
+		<param name="Type">      ForceVector <</param>
+		<param name="Essential"> True        </param>
+		<param name="Description"> The discrete forcing term for the momentum equation. </param>
 	</struct>
-
-<!-- PLEASE, check the above struct information is accurate, in line number 280 of the c file and then remove this comment afterwards -->
-
 	<struct>
-		<param name="Essential">True</param>
-		<param name="Name">ContinuityForceVector</param>
-		<param name="Type">ForceVector</param>
-		<param name="Description">...</param>
+		<param name="Name">      ContinuityForceVector </param>
+		<param name="Type">      ForceVector           </param>
+		<param name="Essential"> True                  </param>
+		<param name="Description"> The discrete forcing term for the continuity equation. </param>
 	</struct>
-
-<!-- PLEASE, check the above struct information is accurate, in line number 281 of the c file and then remove this comment afterwards -->
-
-
 </list>
+
 <!-- Add an exmaple XML if possible -->
 <param name="Example">...</param>
 
