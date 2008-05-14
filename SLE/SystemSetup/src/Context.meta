@@ -6,23 +6,36 @@
 <param name="Organisation">VPAC</param>
 <param name="Project">StgFEM</param>
 <param name="Location">./StgFEM/SLE/SystemSetup/src/</param>
-<param name="Project Web">https://csd.vpac.org/twiki/bin/view/Stgfem/WebHome</param>
+<param name="Project Web">http://mcc.monash.edu.au/Software/Underworld</param>
 <param name="Copyright">Copyright (C) 2004-2005 VPAC.</param>
-<param name="License">https://csd.vpac.org/twiki/bin/view/Stgermain/SoftwareLicense</param>
-<param name="Parent">DiscretisationContext</param>
-<param name="Description">...</param>
-
-<!--Now the interesting stuff-->
-
+<param name="License">http://www.opensource.org/licenses/bsd-license.php</param>
+<param name="Parent">DomainContext</param>
+<param name="Description">Builds on the DomainContext to allow a FEM problem to be constructed and solved</param>
 
 <list name="Params">
-
+	<struct>
+		<param name="Name">limitTimeStepIncreaseRate</param>
+		<param name="Type">Bool</param>
+		<param name="Default">False</param>
+		<param name="Description">Determines whether the increase in Dt should be limited</param>
+	</struct>
+	<struct>
+		<param name="Name">maxTimeStepIncreasePercentage</param>
+		<param name="Type">Double</param>
+		<param name="Default">10.0</param>
+		<param name="Description">Sets a limit on the percentage increase in Dt per timestep (requires limitTimeStepIncreaseRate to be True)</param>
+	</struct>
+	<struct>
+		<param name="Name">checkpointMesh</param>
+		<param name="Type">Bool</param>
+		<param name="Default">True</param>
+		<param name="Description">Defines whether mesh checkpointing files should be produced</param>
+	</struct>
 </list>
 
 <list name="Dependencies">
-
 </list>
-<!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+
+<param name="Example">n/a</param>
 
 </StGermainData>
