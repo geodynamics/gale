@@ -2,48 +2,55 @@
 <!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 
-<param name="Name">MeshParticleLayout</param>
-<param name="Author">...</param>
-<param name="Organisation">VPAC</param>
-<param name="Project">StGermain</param>
-<param name="Location">./StGermain/Discretisation/Swarm/src/</param>
-<param name="Project Web">https://csd.vpac.org/twiki/bin/view/Stgermain/WebHome</param>
-<param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
-<param name="License">The Gnu Lesser General Public License http://www.gnu.org/licenses/lgpl.html</param>
-<param name="Parent">PerCellParticleLayout</param>
-<param name="Reference">...</param>
-<param name="Summary">...</param>
-<param name="Description">Randomly distributes particles within cells.</param>
+  <param name="Name">MeshParticleLayout</param>
+  <param name="Author">...</param>
+  <param name="Organisation">VPAC</param>
+  <param name="Project">StGermain</param>
+  <param name="Location">./StGermain/Discretisation/Swarm/src/</param>
+  <param name="Project Web">https://csd.vpac.org/twiki/bin/view/Stgermain/WebHome</param>
+  <param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
+  <param name="License">The Gnu Lesser General Public License http://www.gnu.org/licenses/lgpl.html</param>
+  <param name="Parent">PerCellParticleLayout</param>
+  <param name="Reference">...</param>
+  <param name="Summary">...</param>
 
-<!--Now the interesting stuff-->
+  <param name="Description">
+    A utlility for filling a Swarm with particles based on the elements of a mesh.  Restricted
+    to meshes using quadrilateral and hexahedral topology, but useful for any geometry.
+  </param>
 
+  <list name="Params">
+    <struct>
+      <param name="Name">cellParticleCount</param>
+      <param name="Type">Integer</param>
+      <param name="Default">0</param>
+      <param name="Description">
+        The number of particles you want in each cell.
+      </param>
+    </struct>
+    <struct>
+      <param name="Name">seed</param>
+      <param name="Type">Integer</param>
+      <param name="Default">13</param>
+      <param name="Description">
+        The seed that you want to give the random number generator. The same seed
+        will always give the same particle positions.
+      </param>
+    </struct>
+  </list>
 
-<list name="Params">
-	<struct>
-		<param name="Name">cellParticleCount</param>
-		<param name="Type">UnsignedInt</param>
-		<param name="Default">0</param>
-		<param name="Description">The number of particles you want in each cell.</param>
-	</struct>
-	<struct>
-		<param name="Name">seed</param>
-		<param name="Type">UnsignedInt</param>
-		<param name="Default">13</param>
-		<param name="Description">The seed that you want to give the random number generator. The same seed will always give the same particle positions.</param>
-	</struct>
+  <list name="Dependencies">
+    <struct>
+      <param name="Essential">Yes</param>
+      <param name="Name">mesh</param>
+      <param name="Type">Mesh</param>
+      <param name="Description">
+        The mesh whose elements will be used as a particle template.
+      </param>
+    </struct>
+  </list>
 
-</list>
-
-<list name="Dependencies">
-
-</list>
-<!-- Add an exmaple XML if possible -->
-<param name="Example">
-	<struct name="particleLayoutExample1">
-		<param name="Type">RandomParticleLayout</param>
-		<param name="cellParticleLayout">20</param>
-		<param name="seed">2</param>
-	</struct>
-</param>
+  <param name="Example">
+  </param>
 
 </StGermainData>
