@@ -5,8 +5,8 @@
 <param name="Name">ManualParticleLayout</param>
 <param name="Author">...</param>
 <param name="Organisation">VPAC</param>
-<param name="Project">StGermain</param>
-<param name="Location">./StGermain/Discretisation/Swarm/src/</param>
+<param name="Project">StgDomain</param>
+<param name="Location">./StgDomain/Swarm/src/</param>
 <param name="Project Web">https://csd.vpac.org/twiki/bin/view/Stgermain/WebHome</param>
 <param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
 <param name="License">The Gnu Lesser General Public License http://www.gnu.org/licenses/lgpl.html</param>
@@ -22,8 +22,7 @@
 	<struct>
 		<param name="Name">manualParticlePositions</param>
 		<param name="Type">list</param>
-		<param name="ElementType">Double</param>
-		<param name="ElementHeaders">x, y, z</param>
+		<param name="ElementType">struct of doubles with name x, y, z</param>
 		<param name="Description">A list of particle positions.</param>
 	</struct>
 </list>
