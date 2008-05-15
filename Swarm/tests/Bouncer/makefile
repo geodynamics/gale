@@ -8,8 +8,8 @@ include ${PROJ_ROOT}/Makefile.system
 #subdirs := tests
 
 # Source Code and Header files
-SRCS := $(wildcard *.c)
-HDRS := $(wildcard *.h)
+#SRCS := $(wildcard *.c)
+#HDRS := $(wildcard *.h)
 
 # What to call the plugin
 modName := $(shell basename `pwd`)
