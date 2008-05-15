@@ -41,6 +41,9 @@
 #include "StGermain/Base/Foundation/ClassDef.h"
 
 
+#define INV_LOG2 1.442695041
+
+
 void STreeNode_Insert( STreeNode *self, STreeNode *node, STree *tree, STreeNode **par );
 void STreeNode_Destroy( STreeNode *self, STree *tree );
 int STree_IntCmp( const void* left, const void* right );
@@ -319,8 +322,8 @@ void STreeNode_Insert( STreeNode *self, STreeNode *node, STree *tree, STreeNode 
    else {
       int height;
       *child = node;
-      height = ( int )( log2( (float)(tree->nNodes + 1) ) /
-			log2( tree->invAlpha ) );
+      height = (int)((log( (float)(tree->nNodes + 1) ) * INV_LOG2) /
+                     (log( tree->invAlpha ) * INV_LOG2));
       if ( tree->curDepth > height )
 	 tree->curSize = 1;
    }
