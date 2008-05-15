@@ -139,7 +139,9 @@ class Package(SConfig.Node):
                 self.fworks = loc[3]
                 break
         if not any_locs:
-            self.ctx.Display('  No valid locations found\n')
+            import TerminalController
+            term = TerminalController.TerminalController()
+            self.ctx.Display(term.render('  ${RED}No valid locations found.${NORMAL}\n'))
         return result
 
     def check_location(self, location):
@@ -176,7 +178,9 @@ class Package(SConfig.Node):
             msg = self.get_check_headers_fail_reason(fail_logs)
             if not msg:
                 msg = 'Headers not found.'
-            self.ctx.Display('      ' + msg + '\n')
+            import TerminalController
+            term = TerminalController.TerminalController()
+            self.ctx.Display(term.render('      ${YELLOW}' + msg + '${NORMAL}\n'))
         return result[0]
 
     def check_libraries(self, location):
@@ -218,7 +222,9 @@ class Package(SConfig.Node):
                     break
             if not reason:
                 reason = 'Libraries not found.'
-        self.ctx.Display('      ' + reason + '\n')
+        import TerminalController
+        term = TerminalController.TerminalController()
+        self.ctx.Display(term.render('      ${YELLOW}' + reason + '${NORMAL}\n'))
 
         self.pop_state(old_state)
         return False
