@@ -42,7 +42,7 @@ if env['shared_libraries']:
     plgn_bases = ['EulerDeform', 'ExtractPetscObjects',
                   'IncompressibleExtensionBC', 'MaterialThermalDiffusivity',
                   'VariableConditions/ShapeTemperatureIC',
-                  'Output/Vrms']
+                  'Output/Vrms', 'Output/Nusselt']
     for base in plgn_bases:
         env.build_headers(env.glob('plugins/' + base + '/*.h'), 'include/Underworld/' + base.split('/')[-1])
         objs = env.build_sources(env.glob('plugins/' + base + '/*.c'), 'Underworld/' + base)

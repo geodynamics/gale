@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: MovingMesh.c 610 2007-10-11 08:09:29Z SteveQuenette $
+** $Id: MovingMesh.c 734 2008-05-15 23:15:29Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -148,7 +148,7 @@ void Underworld_MovingMesh_Remesh( TimeIntegrator* timeIntegrator, MeshExtender*
 	Journal_Printf( info, "Axis set to remesh on are : " );
 	for ( dim_I = 0; dim_I < velocityField->dim; dim_I++ ) {
 		if ( self->remeshAccordingToAxis[dim_I] == True ) {
-			Journal_Printf( info, "%c, ", IJKTopology_DimNumToDimLetter[dim_I] );
+                  /* Journal_Printf( info, "%c, ", IJKTopology_DimNumToDimLetter[dim_I] );*/
 			axisToRemeshOnTotal++;
 		}
 	}
@@ -263,7 +263,7 @@ void Underworld_MovingMesh_RemeshAccordingToSidewall_SingleAxis(
 
 	Stream* debug = Journal_Register( Debug_Type, Underworld_MovingMesh_Type );
 
-	Journal_DPrintf( debug, "In %s(): for remeshAxis %c\n", __func__, IJKTopology_DimNumToDimLetter[remeshAxis] );
+	/*Journal_DPrintf( debug, "In %s(): for remeshAxis %c\n", __func__, IJKTopology_DimNumToDimLetter[remeshAxis] );*/
 	Stream_Indent( debug );	
 
 	Mesh_GetGlobalCoordRange( mesh, minCrd, maxCrd );
@@ -302,8 +302,8 @@ void Underworld_MovingMesh_RemeshAccordingToSidewall_SingleAxis(
 	if ( ( fabs( minGlobalCoord - minCrd[ remeshAxis ] ) < tolerance ) &&
 		( fabs( maxGlobalCoord - maxCrd[ remeshAxis ] ) < tolerance ) )
 	{
-		Journal_DPrintfL( debug, 1, "Found no extension/compression in remeshAxis %c: thus not "
-			"updating node coords.\n", IJKTopology_DimNumToDimLetter[remeshAxis] );
+          /*Journal_DPrintfL( debug, 1, "Found no extension/compression in remeshAxis %c: thus not "
+            "updating node coords.\n", IJKTopology_DimNumToDimLetter[remeshAxis] );*/
 		Memory_Free( minGlobal );
 		Memory_Free( maxGlobal );
 		/*
@@ -326,8 +326,8 @@ void Underworld_MovingMesh_RemeshAccordingToSidewall_SingleAxis(
 	maxCrd[ remeshAxis ] = maxGlobalCoord;
 	*/
 
-	Journal_DPrintfL( debug, 2, "Looping over all nodes, updating coordinates in remeshAxis %c based on "
-		"stretch/compression on the relevant side walls.\n", IJKTopology_DimNumToDimLetter[remeshAxis] );
+	/*Journal_DPrintfL( debug, 2, "Looping over all nodes, updating coordinates in remeshAxis %c based on "
+          "stretch/compression on the relevant side walls.\n", IJKTopology_DimNumToDimLetter[remeshAxis] );*/
 	Stream_Indent( debug );	
 	sideWallNode_I = 0;
 	for ( aNode_I = 0 ; aNode_I < vertGrid->sizes[ otherAxisA ] ; aNode_I++ ) {
@@ -338,11 +338,11 @@ void Underworld_MovingMesh_RemeshAccordingToSidewall_SingleAxis(
 			newElementWidthInRemeshAxis = (maxGlobal[ sideWallNode_I ] - minGlobal[ sideWallNode_I ])
 				/ ( (double)vertGrid->sizes[ remeshAxis ] - 1.0 );
 
-			Journal_DPrintfL( debug, 3, "For slice with aNode_I=%u in otherAxisA=%c and bNode_I=%u in "
+			/*Journal_DPrintfL( debug, 3, "For slice with aNode_I=%u in otherAxisA=%c and bNode_I=%u in "
 				"otherAxisB=%c: calculated new element width in remesh axis= %.3f\n",
 				aNode_I, IJKTopology_DimNumToDimLetter[otherAxisA],
 				bNode_I, IJKTopology_DimNumToDimLetter[otherAxisB],
-				newElementWidthInRemeshAxis );
+				newElementWidthInRemeshAxis );*/
 			Stream_Indent( debug );	
 
 			for ( remeshAxisNode_I = 0 ; remeshAxisNode_I < vertGrid->sizes[ remeshAxis ] ; remeshAxisNode_I++ ) {
