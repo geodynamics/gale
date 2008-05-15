@@ -8,7 +8,14 @@ SConscript('config/SConfig/SConscript')
 # CUSTOMISE THE ENVIRONMENT HERE.
 #
 
-env = Environment(ENV=os.environ)
+import platform
+if platform.platform().find('ia64') != -1:
+    # Hack needed for APAC, damn it all!
+    env = Environment(ENV=os.environ, tools=['gcc', 'gnulink'])
+    import SCons.Tool
+    SCons.Tool.createStaticLibBuilder(env)
+else:
+    env = Environment(ENV=os.environ)
 env['_abspath'] = lambda x: File(x).abspath # Needed by Darwin.
 
 # Determine whether we are configuring, helping or building.
@@ -70,5 +77,6 @@ else:
     SConscript('PICellerator/SConscript', exports='env')
     env.Prepend(LIBS='PICellerator')
     SConscript('Underworld/SConscript', exports='env')
+    env.Prepend(LIBS='Underworld')
     if env['with_glucifer']:
         SConscript('gLucifer/SConscript', exports='env')
