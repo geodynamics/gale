@@ -3,7 +3,7 @@
 <!-- DTD to validate against -->
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 
-  <param name="Name">Stg_Component</param>
+<param name="Name">Stg_Component</param>
   <param name="Author">CSD Team</param>
   <param name="Organisation">VPAC</param>
   <param name="Project">StGermain</param>
