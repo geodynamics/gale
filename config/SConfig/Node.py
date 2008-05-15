@@ -54,13 +54,17 @@ class Node(object):
         if self.configured:
             return
         self.ctx = scons_ctx
-        self.process_options()
         self.configured = True
-
-        # Setup basic stuff.
         old_state = self.process_dependencies()
+
+        # Print opening message.
         self.ctx.Message('Configuring package %s ... ' % self.name)
         self.ctx.Display('\n')
+
+        # Now process options which will print out what options were found.
+        self.process_options()
+
+        # Setup basic stuff.
         result = True
         for pkg, req in self.deps: # Check we have all dependencies.
             if req and not pkg.result:
@@ -126,16 +130,29 @@ class Node(object):
     def process_options(self):
         """Do any initial option processing, including importing any values from
         the environment and validating that all options are consistent."""
+        # Search command line options.
         cmd_opts = False
         for opt in self.option_map.iterkeys():
             if opt in self.opts.args:
-                cmd_opts = True
+                if not cmd_opts:
+                    self.ctx.Display('  Found command line options:\n')
+                    cmd_opts = True
+                self.ctx.Display('    %s = %s\n' % (opt, self.opts.args[opt]))
                 break
+
+        # We don't want to mix command line and evironment options.
         if cmd_opts:
             return
+
+        # Now go for environment options.
+        env_opts = False
         for cmd, env in self.option_map.iteritems():
             if cmd not in self.opts.args and env in self.env['ENV']:
+                if not env_opts:
+                    self.ctx.Display('  Found environment options:\n')
+                    env_opts = True
                 self.env[cmd] = self.env['ENV'][env]
+                self.ctx.Display('    %s = %s\n' % (env, self.env[cmd]))
 
     def process_dependencies(self):
         """Ensure all dependencies have been configured before this package."""
