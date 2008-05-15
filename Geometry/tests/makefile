@@ -50,12 +50,6 @@ SRCS = \
 	testPlane.c \
 	testLine.c \
 	testRMatrix.c \
-	testBlockGeometry.c \
-	testRefinedRegionsGeometry.c \
-	testShellGeometry.c \
-	testIrregGeometry.c \
-	testIJK6Topology.c \
-	testIJK26Topology.c \
 	testDelaunay.c \
 	testParallelDelaunay.c \
 	testComplexVectorMath.c \
@@ -73,12 +67,6 @@ checks = \
 	testEdge.0of1.sh \
 	testPlane.0of1.sh \
 	testLine.0of1.sh \
-	testBlockGeometry.0of1.sh \
-	testRefinedRegionsGeometry.0of1.sh \
-	testShellGeometry.0of1.sh \
-	testIrregGeometry.0of1.sh \
-	testIJK6Topology.0of1.sh \
-	testIJK26Topology.0of1.sh \
 	testDelaunay.0of1.sh \
 	testParallelDelaunay.0of1.sh \
 	testParallelDelaunay.0of2.sh \
