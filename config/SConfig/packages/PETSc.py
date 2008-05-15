@@ -53,6 +53,12 @@ class PETSc(SConfig.Package):
             if extra_lib_dirs: loc[2] += extra_lib_dirs
             if extra_libs: self.extra_libraries += extra_libs
 
+            # There seems to be some extra library paths we'll need that get stored
+            # in SL_LINKER_LIBS.
+            extra_lib_dirs, extra_libs = self.get_sl_linker_libs(loc[0])
+            if extra_lib_dirs: loc[2] += extra_lib_dirs
+            if extra_libs: self.extra_libraries += extra_libs
+
             yield loc
 
     def get_arch(self, base_dir):
@@ -76,6 +82,28 @@ class PETSc(SConfig.Package):
         f.close()
         if 'PACKAGES_LIBS' not in line_dict: return ([], [])
         lib_string = line_dict['PACKAGES_LIBS']
+        lib_string = self.subst(lib_string, line_dict)
+
+        extra_lib_dirs = []
+        extra_libs = []
+        for string in lib_string.split(' '):
+            if string[:len(self.env['LIBLINKPREFIX'])] == self.env['LIBLINKPREFIX']:
+                extra_libs += [string[len(self.env['LIBLINKPREFIX']):]]
+            elif string[:len(self.env['LIBDIRPREFIX'])] == self.env['LIBDIRPREFIX']:
+                extra_lib_dirs += [string[len(self.env['LIBDIRPREFIX']):]]
+        return (extra_lib_dirs, extra_libs)
+
+    def get_sl_linker_libs(self, base_dir):
+        petscconf = os.path.join(base_dir, 'bmake', self.arch, 'petscconf')
+        if not os.path.exists(petscconf): return ([], [])
+        f = file(petscconf, 'r')
+        line_dict = {}
+        for line in f.readlines():
+            sides = line.split('=')
+            line_dict[sides[0].strip()] = sides[1].strip()
+        f.close()
+        if 'SL_LINKER_LIBS' not in line_dict: return ([], [])
+        lib_string = line_dict['SL_LINKER_LIBS']
         lib_string = self.subst(lib_string, line_dict)
 
         extra_lib_dirs = []
