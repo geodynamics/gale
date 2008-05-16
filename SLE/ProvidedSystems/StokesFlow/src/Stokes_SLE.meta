@@ -73,7 +73,7 @@
 	</struct>
 	<struct>
 		<param name="Name">      ForceVector </param>
-		<param name="Type">      ForceVector <</param>
+		<param name="Type">      ForceVector </param>
 		<param name="Essential"> True        </param>
 		<param name="Description"> The discrete forcing term for the momentum equation. </param>
 	</struct>

@@ -14,6 +14,7 @@
 <param name="Reference">...</param>
 <param name="Summary">...</param>
 <param name="Description">
+	<![CDATA[
 	Solves the pressure Schur complement equation
 		[ G^T K^{-1} G - C ]  p = G^T K^{-1} f - h ....................... (1)
 	via preconditioned Conjugate Gradient (PCG). The velocity u is incrementally updated
@@ -36,6 +37,7 @@
 	parameter called "velocitySolver". By default this solver uses a tolerance, delta_K given by
 	delta_K = 0.1 * tolerance. When using petsc to define linear solvers, this default can be
 	changed via the usual petsc KSP command line arguements. Eg -ksp_rtol 1.0e-8.
+	]]>
 </param>
 
 
@@ -82,7 +84,7 @@
 	<struct>
 		<param name="Name">      velocitySolver </param>
 		<param name="Type">      MatrixSolver   </param>
-		<param name="Essential"> No             </parm>
+		<param name="Essential"> No             </param>
 		<param name="Description"> The solver used to define the action y = K^{-1} x. </param>
 	</struct>
 </list>
