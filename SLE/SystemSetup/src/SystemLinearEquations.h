@@ -51,7 +51,7 @@
 **	for storing and managing the matrices and vectors that make up a system, but uses
 **	the SLE_Solver class to actually implement a solution mechanism for the given eqn.
 **
-** $Id: SystemLinearEquations.h 1125 2008-05-12 14:22:02Z DavidMay $
+** $Id: SystemLinearEquations.h 1133 2008-05-19 03:01:56Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -120,6 +120,8 @@
 		Bool                                                killNonConvergent;         \
 		Iteration_Index                                     nonLinearMinIterations;    \
 		/* BEGIN LUKE'S FRICTIONAL BCS BIT */					       \
+		char*						    nlSetupEPName;	       \
+		EntryPoint*					    nlSetupEP;		       \
 		char*						    nlEPName;	       	       \
 		EntryPoint*					    nlEP;		       \
 		/* END LUKE'S FRICTIONAL BCS BIT */					       \
@@ -298,7 +300,10 @@
 	void SystemLinearEquations_NewtonExecute( void* sle, void* data );
 	void SystemLinearEquations_NewtonFinalise( void* sle, void* data );
 	void SystemLinearEquations_NonLinearExecute( void* sle, void* data ) ;
-	void SystemLinearEquations_AddNonLinearEP( void* sle, const char* name, EntryPoint_2VoidPtr_Cast func );
+	void SystemLinearEquations_AddNonLinearSetupEP( void* sle, const char* name,
+                                                        EntryPoint_2VoidPtr_Cast func );
+	void SystemLinearEquations_AddNonLinearEP( void* sle, const char* name,
+                                                   EntryPoint_2VoidPtr_Cast func );
 	void SystemLinearEquations_SetToNonLinear( void* sle ) ;
 	void SystemLinearEquations_CheckIfNonLinear( void* sle ) ;
 	

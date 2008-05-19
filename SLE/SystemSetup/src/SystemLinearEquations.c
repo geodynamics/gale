@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SystemLinearEquations.c 1125 2008-05-12 14:22:02Z DavidMay $
+** $Id: SystemLinearEquations.c 1133 2008-05-19 03:01:56Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -201,6 +201,8 @@ void _SystemLinearEquations_Init(
 	self->optionsPrefix = optionsName;
 
 	/* BEGIN LUKE'S FRICTIONAL BCS BIT */
+	Stg_asprintf( &self->nlSetupEPName, "%s-nlSetupEP", self->name );
+	self->nlSetupEP = EntryPoint_New( self->nlSetupEPName, EntryPoint_2VoidPtr_CastType );
 	Stg_asprintf( &self->nlEPName, "%s-nlEP", self->name );
 	self->nlEP = EntryPoint_New( self->nlEPName, EntryPoint_2VoidPtr_CastType );
 	/* END LUKE'S FRICTIONAL BCS BIT */
@@ -276,6 +278,7 @@ void _SystemLinearEquations_Delete( void* sle ) {
 	Stream_IndentBranch( StgFEM_Debug );
 	
 	/* BEGIN LUKE'S FRICTIONAL BCS BIT */
+        Memory_Free( self->nlSetupEPName );
 	Memory_Free( self->nlEPName );
 	/* END LUKE'S FRICTIONAL BCS BIT */
 	Memory_Free( self->executeEPName );
@@ -800,6 +803,9 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 	/* First Solve */
 	self->nonLinearIteration_I = 0;
 	Journal_Printf(self->info,"\nNon linear solver - iteration %d\n", self->nonLinearIteration_I);
+
+        /* More of Luke's stuff. I need an entry point for a non-linear setup operation. */
+        _EntryPoint_Run_2VoidPtr( self->nlSetupEP, sle, _context );
 	
 	self->linearExecute( self, _context );
 	self->hasExecuted = True;
@@ -873,6 +879,14 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 
 	FreeObject( previousVector );
 }
+
+void SystemLinearEquations_AddNonLinearSetupEP( void* sle, const char* name, EntryPoint_2VoidPtr_Cast func ) {
+	SystemLinearEquations* self = (SystemLinearEquations*)sle;
+
+	SystemLinearEquations_SetToNonLinear( self );
+	EntryPoint_Append( self->nlSetupEP, (char*)name, func, self->type );
+}
+
 
 
 /*
