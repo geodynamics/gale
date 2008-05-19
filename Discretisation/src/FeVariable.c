@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeVariable.c 1038 2008-02-19 04:45:04Z RobertTurnbull $
+** $Id: FeVariable.c 1132 2008-05-19 03:01:17Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -420,6 +420,9 @@ void _FeVariable_Init(
 	Journal_Firewall( (self->loadReferenceEachTimestep != True), errorStream,
 		 "The loadReferenceEachTimestep feature isn't implemented yet, sorry.\n" );
 
+        self->dynamicBCs[0] = NULL;
+        self->dynamicBCs[1] = NULL;
+
 	self->inc = IArray_New();
 }
 
@@ -772,8 +775,12 @@ void _FeVariable_Initialise( void* variable, void* data ) {
 void FeVariable_ApplyBCs( void* variable, void* data ) {
 	FeVariable* self = (FeVariable*)variable;
 
-	if( self->dynamicBCs ) {
-		VariableCondition_Apply( self->dynamicBCs, data );
+        /* This is an unpleasant hack; we really need to reevaluate our BC code. */
+	if( self->dynamicBCs[0] ) {
+		VariableCondition_Apply( self->dynamicBCs[0], data );
+	}
+	if( self->dynamicBCs[1] ) {
+		VariableCondition_Apply( self->dynamicBCs[1], data );
 	}
 	if ( self->bcs ) {
 		Journal_DPrintf( self->debug, "In %s- for %s:\n", __func__, self->name );
@@ -786,9 +793,16 @@ Bool FeVariable_IsBC( void* variable, int node, int dof ) {
 	FeVariable* self = (FeVariable*)variable;
 
 	assert( self );
-	if( self->dynamicBCs && 
-	    self->dynamicBCs->var == DofLayout_GetVariable( self->dofLayout, node, dof ) && 
-	    IMap_Has( self->dynamicBCs->vcMap, node ) )
+	if( self->dynamicBCs[0] && 
+	    self->dynamicBCs[0]->var == DofLayout_GetVariable( self->dofLayout, node, dof ) && 
+	    IMap_Has( self->dynamicBCs[0]->vcMap, node ) )
+	{
+		return True;
+	}
+
+	if( self->dynamicBCs[1] && 
+	    self->dynamicBCs[1]->var == DofLayout_GetVariable( self->dofLayout, node, dof ) && 
+	    IMap_Has( self->dynamicBCs[1]->vcMap, node ) )
 	{
 		return True;
 	}

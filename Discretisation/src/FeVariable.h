@@ -108,7 +108,7 @@
 		DofLayout*                                        dofLayout; \
 		/** Boundary conditions applied to this variable - Compulsory, so the eq num table can be worked out*/ \
 		VariableCondition*                                bcs; \
-		DynamicVC*					dynamicBCs; /* Temporary hack */	\
+		DynamicVC*					dynamicBCs[2]; /* Temporary hack */	\
 		Bool						removeBCs;	\
 		/** Boundary conditions applied to this variable - Optional, may be NULL */ \
 		VariableCondition*                                ics; \
