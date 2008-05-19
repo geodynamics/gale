@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SystemLinearEquations.c 1133 2008-05-19 03:01:56Z LukeHodkinson $
+** $Id: SystemLinearEquations.c 1135 2008-05-19 13:35:36Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -720,28 +720,21 @@ void SystemLinearEquations_NewtonInitialise( void* _context, void* data ) {
 	PETScVector*		F;
 	SNES			snes;
 	SNES			oldSnes		= ((PETScNonlinearSolver*)sle->nlSolver)->snes;
-	KSP			ksp;
-	PC			pc;
 
-	//VecDestroy( ((PETScVector*)self->F)->petscVec );
 	/* don't assume that a snes is being used for initial guess, check for this!!! */
 	if( oldSnes && context->timeStep == 1 && !sle->linearSolveInitGuess )
 		SNESDestroy( oldSnes );
 
 	SNESCreate( sle->comm, &snes );
-	SNESGetKSP( snes, &ksp );
-	KSPGetPC( ksp, &pc );
-	PCSetOperators( pc, ((PETScMatrix*)sle->J)->petscMat, ((PETScMatrix*)sle->J)->petscMat, SAME_NONZERO_PATTERN );
-	PCSetType( pc, "block" );
-	//VecCreate( self->comm, &F );
 
 	((PETScNonlinearSolver*)sle->nlSolver)->snes = snes;
-	//Vector_Duplicate( SystemLinearEquations_GetSolutionVectorAt( sle, 0 )->vector, &F );
 	sle->_setFFunc( &sle->F, context );
 
-	SNESSetJacobian( snes, ((PETScMatrix*)sle->J)->petscMat, ((PETScMatrix*)sle->J)->petscMat, 
-				sle->_buildJ, sle->buildJContext );
+	SNESSetJacobian( snes, ((PETScMatrix*)sle->J)->petscMat, ((PETScMatrix*)sle->J)->petscMat, sle->_buildJ, sle->buildJContext );
 	SNESSetFunction( snes, ((PETScVector*)sle->F)->petscVec, sle->_buildF, sle->buildFContext );
+
+	/* configure the KSP */
+	sle->_configureNLSolverFunc( snes, context );
 }
 
 /* do this after the pre conditoiners have been set up in the problem specific SLE */
