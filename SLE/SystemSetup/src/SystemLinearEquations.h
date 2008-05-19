@@ -51,7 +51,7 @@
 **	for storing and managing the matrices and vectors that make up a system, but uses
 **	the SLE_Solver class to actually implement a solution mechanism for the given eqn.
 **
-** $Id: SystemLinearEquations.h 1133 2008-05-19 03:01:56Z LukeHodkinson $
+** $Id: SystemLinearEquations.h 1134 2008-05-19 12:54:33Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -72,6 +72,7 @@
 	typedef int (SystemLinearEquations_BuildFFunc) ( NonlinearSolver* nls, Vector* x, Vector* f, void* context );
 	typedef int (SystemLinearEquations_BuildJFunc) ( NonlinearSolver* nls, Vector* x, Matrix** A, Matrix** B, void* matStruct, void* context );	
 	typedef void (SystemLinearEquations_SetFFunc) ( Vector** F, void* context );
+	typedef void (SystemLinearEquations_ConfigureNonlinearSolver) ( void* nls, void* data );
 
 	typedef void (SLE_FormFunctionFunc)( void *someSLE, Vector *X, Vector *F, void *ctx );
 
@@ -141,7 +142,9 @@
 		Vector*						    F;			       \
 		Vector*						    X;		       	       \
 		Matrix*						    J;			       \
+		Matrix*						    P;			       \
 		SystemLinearEquations_SetFFunc*		    	    _setFFunc;		       \
+		SystemLinearEquations_ConfigureNonlinearSolver*	    _configureNLSolverFunc;    \
 		SystemLinearEquations_SetFFunc*		    	    _updateOldFields;	       \
 		Name						    optionsPrefix;	       \
 		/* parameter and methods relevant to PICARD */ \
