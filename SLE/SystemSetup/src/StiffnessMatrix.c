@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StiffnessMatrix.c 1116 2008-05-01 05:17:56Z LukeHodkinson $
+** $Id: StiffnessMatrix.c 1136 2008-05-20 05:06:21Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -2162,7 +2162,7 @@ void __StiffnessMatrix_NewAssemble( void* stiffnessMatrix, Bool removeBCs, void*
 		StiffnessMatrix_AssembleElement( self, e_i, sle, _context, elStiffMat );
 
 		/* Correct for BCs providing I'm not keeping them in. */
-		if( vector ) {
+		if( vector && rowEqNum->removeBCs ) {
 			memset( bcVals, 0, nRowDofs * sizeof(double) );
 
                         rowInd = 0;
@@ -2186,7 +2186,7 @@ void __StiffnessMatrix_NewAssemble( void* stiffnessMatrix, Bool removeBCs, void*
 
 			Vector_AddEntries( vector, nRowDofs, (unsigned*)rowEqNum->locationMatrix[e_i][0], bcVals );
 		}
-		if( transVector ) {
+		if( transVector && colEqNum->removeBCs ) {
 			memset( bcVals, 0, nColDofs * sizeof(double) );
 
                         colInd = 0;
@@ -2220,6 +2220,7 @@ void __StiffnessMatrix_NewAssemble( void* stiffnessMatrix, Bool removeBCs, void*
                          if( FeVariable_IsBC( rowVar, rowNodes[n_i], dof_i ) ) {
                             memset( elStiffMat[rowInd], 0, nColDofs * sizeof(double) );
                          }
+                         /*
                          else {
                             colInd = 0;
                             for( n_j = 0; n_j < nColNodes; n_j++ ) {
@@ -2231,6 +2232,7 @@ void __StiffnessMatrix_NewAssemble( void* stiffnessMatrix, Bool removeBCs, void*
                                }
                             }
                          }
+                         */
                          rowInd++;
                       }
                    }

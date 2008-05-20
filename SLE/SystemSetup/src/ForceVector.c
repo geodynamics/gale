@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ForceVector.c 964 2007-10-11 08:03:06Z SteveQuenette $
+** $Id: ForceVector.c 1136 2008-05-20 05:06:21Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -478,6 +478,31 @@ void ForceVector_GlobalAssembly_General( void* forceVector ) {
   #endif
 */
 
+                        /* When keeping BCs in we come across a bit of a problem in parallel. We're not
+                           allowed to add entries to the force vector here and then clobber it later with
+                           an insert in order to set the BC. So, what we'll do is just add zero here, that
+                           way later we can add the BC and it will be the same as inserting it.
+                           --- Luke, 20 May 2008 */
+                        if( !self->feVariable->eqNum->removeBCs ) {
+                           DofLayout* dofs;
+                           int nDofs, curInd;
+                           int ii, jj;
+
+                           dofs = self->feVariable->dofLayout; /* shortcut to the dof layout */
+                           curInd = 0; /* need a counter to track where we are in the element force vector */
+                           for( ii = 0; ii < nodeCountCurrElement; ii++ ) {
+                              nDofs = dofs->dofCounts[inc[ii]]; /* number of dofs on this node */
+                              for( jj = 0; jj < nDofs; jj++ ) {
+                                 if( !FeVariable_IsBC( self->feVariable, inc[ii], jj ) ) {
+                                    curInd++;
+                                    continue; /* only need to clear it if it's a bc */
+                                 }
+                                 elForceVecToAdd[curInd] = 0.0;
+                                 curInd++;
+                              }
+                           }
+                        }
+
 			/* Ok, assemble into global matrix */
 			Vector_AddEntries( self->vector, totalDofsThisElement, (Index*)(elementLM[0]), elForceVecToAdd );
 
@@ -543,6 +568,6 @@ Bool ForceVector_BCAsm_RowR( void* forceVec, Assembler* assm ) {
 	bc = DofLayout_GetValueDouble( assm->rowVar->dofLayout, 
 				       assm->rowNodeInd, 
 				       assm->rowDofInd );
-	Vector_InsertEntries( ((ForceVector*)forceVec)->vector, 1, &assm->rowEq, &bc );
+	Vector_AddEntries( ((ForceVector*)forceVec)->vector, 1, &assm->rowEq, &bc );
 	return True;
 }
