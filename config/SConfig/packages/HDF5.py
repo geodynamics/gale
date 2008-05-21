@@ -36,8 +36,12 @@ MPI_Finalize();
                         if line.find("Extra libraries") != -1:
                             dict = self.env.ParseFlags(line.split(":")[1])
                             extra_libs = dict.get('LIBS', [])
+                            extra_lib_dirs = dict.get('LIBPATH', [])
             old_libs = self.extra_libraries
             self.extra_libraries += extra_libs
+            for lib_dir in extra_lib_dirs:
+                if lib_dir not in loc[2]:
+                    loc[2] += [lib_dir]
             yield loc
             self.extra_libraries = old_libs
 
