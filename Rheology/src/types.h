@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: types.h 303 2006-08-10 04:16:34Z MirkoVelic $
+** $Id: types.h 736 2008-05-23 06:05:21Z RobertTurnbull $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -62,6 +62,8 @@
 	typedef struct FrankKamenetskii                 FrankKamenetskii;
 	typedef struct NonNewtonian                     NonNewtonian;
 	typedef struct DepthDependentViscosity          DepthDependentViscosity;
+	typedef struct LinearViscosity                  LinearViscosity;
+	typedef struct ViscosityFieldRheology           ViscosityFieldRheology;
 	
 	typedef struct YieldRheology                    YieldRheology;
 	typedef struct VonMises                         VonMises;

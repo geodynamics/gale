@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: Rheology.h 303 2006-08-10 04:16:34Z MirkoVelic $
+** $Id: Rheology.h 736 2008-05-23 06:05:21Z RobertTurnbull $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -60,10 +60,12 @@
 	#include "FrankKamenetskii.h"
 	#include "NonNewtonian.h"
 	#include "DepthDependentViscosity.h"
+	#include "LinearViscosity.h"
 	#include "Anisotropic.h"
         #include "OrthotropicAligned.h"
         #include "Orthotropic.h"
 	#include "VonMises.h"
+	#include "ViscosityFieldRheology.h"
 	#include "Byerlee.h"
 	#include "DruckerPrager.h"
 	#include "FaultingMoresiMuhlhaus2006.h"

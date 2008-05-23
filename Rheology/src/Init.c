@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: Init.c 610 2007-10-11 08:09:29Z SteveQuenette $
+** $Id: Init.c 736 2008-05-23 06:05:21Z RobertTurnbull $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -65,6 +65,7 @@ Bool Underworld_Rheology_Init( int* argc, char** argv[] ) {
 	Stg_ComponentRegister_Add( componentRegister, Arrhenius_Type,               "0", _Arrhenius_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, FrankKamenetskii_Type,        "0", _FrankKamenetskii_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, NonNewtonian_Type,            "0", _NonNewtonian_DefaultNew );
+	Stg_ComponentRegister_Add( componentRegister, LinearViscosity_Type,         "0", _LinearViscosity_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, DepthDependentViscosity_Type, "0", _DepthDependentViscosity_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, Anisotropic_Type,             "0", _Anisotropic_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, OrthotropicAligned_Type,      "0", _OrthotropicAligned_DefaultNew );
@@ -79,6 +80,8 @@ Bool Underworld_Rheology_Init( int* argc, char** argv[] ) {
 	Stg_ComponentRegister_Add( componentRegister, BuiterStrainWeakening_Type,   "0", _BuiterStrainWeakening_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, Director_Type,                "0", _Director_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, AlignmentSwarmVariable_Type,  "0", _AlignmentSwarmVariable_DefaultNew );
+	
+	Stg_ComponentRegister_Add( componentRegister, ViscosityFieldRheology_Type,  "0", _ViscosityFieldRheology_DefaultNew );
 
 	Stg_ComponentRegister_Add( componentRegister, StoreStress_Type,             "0", _StoreStress_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, StoreVisc_Type,               "0", _StoreVisc_DefaultNew );
@@ -91,6 +94,7 @@ Bool Underworld_Rheology_Init( int* argc, char** argv[] ) {
 	RegisterParent( MaterialViscosity_Type,       Rheology_Type );
 	RegisterParent( NonNewtonian_Type,            Rheology_Type );
 	RegisterParent( DepthDependentViscosity_Type, Rheology_Type );
+	RegisterParent( LinearViscosity_Type,         Rheology_Type );
 	RegisterParent( Anisotropic_Type,             Rheology_Type );
 	RegisterParent( OrthotropicAligned_Type,      Rheology_Type );
 	RegisterParent( Orthotropic_Type,             Rheology_Type );
@@ -98,6 +102,7 @@ Bool Underworld_Rheology_Init( int* argc, char** argv[] ) {
 	RegisterParent( StoreStress_Type,             Rheology_Type );
 	RegisterParent( StoreVisc_Type,               Rheology_Type );
 	
+	RegisterParent( ViscosityFieldRheology_Type,     Rheology_Type );
 	RegisterParent( YieldRheology_Type,              Rheology_Type );
 	RegisterParent( VonMises_Type,                   YieldRheology_Type );
 	RegisterParent( Byerlee_Type,                    VonMises_Type );
