@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: Contour.h 628 2006-10-12 08:23:07Z SteveQuenette $
+** $Id: Contour.h 769 2008-05-23 04:16:39Z RobertTurnbull $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -104,6 +104,12 @@
 	void _lucContour_CleanUp( void* drawingObject, void* _context ) ;
 
 	void _lucContour_BuildDisplayList( void* drawingObject, void* _context ) ;
+
+	void lucContour_DrawContourWalls( 
+		void*                                             drawingObject,
+		double                                            isovalue,
+		Coord                                             min,
+		Coord                                             max );
 
 	void lucContour_DrawContour( 
 		void*                                             drawingObject,

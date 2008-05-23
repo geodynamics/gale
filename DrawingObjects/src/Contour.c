@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: Contour.c 740 2007-10-11 08:05:31Z SteveQuenette $
+** $Id: Contour.c 769 2008-05-23 04:16:39Z RobertTurnbull $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -255,17 +255,18 @@ void _lucContour_BuildDisplayList( void* drawingObject, void* _context ) {
 		if ( colourMap )
 			lucColourMap_SetOpenGLColourFromValue( colourMap, isovalue );
 
-		lucContour_DrawContour( self, isovalue, 0.0, K_AXIS, min, max ); 
+		lucContour_DrawContourWalls( self, isovalue, min, max );
 	}
 	
 	/* Draw isovalues at interval */
 	if ( interval <= 0.0 ) 
 		return;
 
-	for ( isovalue = minIsovalue ; isovalue < maxIsovalue ; isovalue += interval ) {
+	for ( isovalue = minIsovalue + interval ; isovalue < maxIsovalue ; isovalue += interval ) {
 		if ( colourMap )
 			lucColourMap_SetOpenGLColourFromValue( colourMap, isovalue );
-		lucContour_DrawContour( self, isovalue, 0.0, K_AXIS, min, max ); 
+		
+		lucContour_DrawContourWalls( self, isovalue, min, max );
 	}
 }
 
@@ -274,6 +275,29 @@ void _lucContour_BuildDisplayList( void* drawingObject, void* _context ) {
 #define RIGHT  1
 #define BOTTOM 2
 #define TOP    3
+
+void lucContour_DrawContourWalls( 
+		void*                                             drawingObject,
+		double                                            isovalue,
+		Coord                                             min,
+		Coord                                             max )
+{
+	lucContour*            self            = (lucContour*)drawingObject;
+	Dimension_Index        dim             = self->fieldVariable->dim;
+
+	if ( dim == 2 ) {
+		lucContour_DrawContour( self, isovalue, 0.0, K_AXIS, min, max ); 
+	}
+	else {
+		lucContour_DrawContour( self, isovalue, min[ I_AXIS ], I_AXIS, min, max ); 
+		lucContour_DrawContour( self, isovalue, max[ I_AXIS ], I_AXIS, min, max ); 
+		lucContour_DrawContour( self, isovalue, min[ J_AXIS ], J_AXIS, min, max ); 
+		lucContour_DrawContour( self, isovalue, max[ J_AXIS ], J_AXIS, min, max ); 
+		lucContour_DrawContour( self, isovalue, min[ K_AXIS ], K_AXIS, min, max ); 
+		lucContour_DrawContour( self, isovalue, max[ K_AXIS ], K_AXIS, min, max ); 
+	}
+}
+	
 
 void lucContour_DrawContour( 
 		void*                                             drawingObject,
