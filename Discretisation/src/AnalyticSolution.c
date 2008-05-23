@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AnalyticSolution.c 1095 2008-04-03 06:29:29Z JulianGiordani $
+** $Id: AnalyticSolution.c 1137 2008-05-23 05:57:48Z RobertTurnbull $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -361,6 +361,19 @@ void AnalyticSolution_RegisterFeVariableWithAnalyticFunction( void* analyticSolu
 	Memory_Free( tmpName );	
 }
 
+
+FeVariable* AnalyticSolution_RegisterFeVariableFromCF( void* analyticSolution, char* fieldName, AnalyticSolution_SolutionFunction* solutionFunction, Stg_ComponentFactory* cf, Bool isEssential, void* data ) {
+	AnalyticSolution* self    = (AnalyticSolution*) analyticSolution;
+	FeVariable*       field;
+
+	field = Stg_ComponentFactory_ConstructByName( cf, fieldName, FeVariable, isEssential, data ); 
+	if ( field )
+		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, field, solutionFunction );
+
+	return field;
+}
+
+
 void AnalyticSolution_BuildAllAnalyticFields( void* analyticSolution, void* data ) {
 	AnalyticSolution* self       = (AnalyticSolution*) analyticSolution;
 	FeVariable*       feVariable = NULL;
@@ -612,3 +625,5 @@ AnalyticSolution* AnalyticSolution_GetAnalyticSolution() {
 			__func__ );
 	return mySingleton;
 }
+
+

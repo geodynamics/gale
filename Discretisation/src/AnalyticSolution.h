@@ -142,6 +142,7 @@
 	void AnalyticSolution_PutAnalyticSolutionOntoNodes( void* analyticSolution, Index analyticFeVariable_I ) ;
 
 	void AnalyticSolution_RegisterFeVariableWithAnalyticFunction( void* analyticSolution, FeVariable* feVariable, AnalyticSolution_SolutionFunction* solutionFunction );
+	FeVariable* AnalyticSolution_RegisterFeVariableFromCF( void* analyticSolution, char* fieldName, AnalyticSolution_SolutionFunction* solutionFunction, Stg_ComponentFactory* cf, Bool isEssential, void* data ) ;
 	void AnalyticSolution_BuildAllAnalyticFields( void* analyticSolution, void* data );
 
 	FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVariable* feVariable ) ;

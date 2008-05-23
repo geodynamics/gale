@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: OperatorFeVariable.c 1003 2008-01-14 01:10:25Z DavidLee $
+** $Id: OperatorFeVariable.c 1137 2008-05-23 05:57:48Z RobertTurnbull $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -550,13 +550,35 @@ InterpolationResult _OperatorFeVariable_InterpolateValueAt( void* variable, Coor
 
 
 
-void OperatorFeVariable_UnaryInterpolationFunc( void* feVariable, Element_DomainIndex dElement_I, Coord coord, double* value ) {
+void OperatorFeVariable_UnaryInterpolationFunc( void* feVariable, Element_DomainIndex dElement_I, Coord localCoord, double* value ) {
 	OperatorFeVariable* self            = (OperatorFeVariable*) feVariable;
 	FeVariable*         field0          = self->feVariableList[0];
 	double              fieldValue0[ MAX_FIELD_COMPONENTS ]; 
 
-	field0->_interpolateWithinElement( field0, dElement_I, coord, fieldValue0 );
+	field0->_interpolateWithinElement( field0, dElement_I, localCoord, fieldValue0 );
 	Operator_CarryOutUnaryOperation( self->_operator, fieldValue0, value );
+
+#ifdef DEBUG
+	if ( Stream_IsPrintableLevel( self->debug, 3 ) ) {
+		Dimension_Index dim_I;
+		Dof_Index       dof_I;
+		Journal_DPrintf( self->debug, "%s Unary Op: El %d, xi = ( ", self->name, dElement_I );
+		for ( dim_I = 0 ; dim_I < self->dim ; dim_I++ ) 
+			Journal_DPrintf( self->debug, "%g ", localCoord[ dim_I ] );
+
+		/* Field 0 */
+		Journal_DPrintf( self->debug, ") - %s = [ ", field0->name );
+		for ( dof_I = 0 ; dof_I < field0->fieldComponentCount ; dof_I++ ) 
+			Journal_DPrintf( self->debug, "%g ", fieldValue0[ dof_I ] );
+
+		/* Result */
+		Journal_DPrintf( self->debug, "] - Result = [ " );
+		for ( dof_I = 0 ; dof_I < self->fieldComponentCount ; dof_I++ ) 
+			Journal_DPrintf( self->debug, "%g ", value[ dof_I ] );
+		Journal_DPrintf( self->debug, "]\n" );
+	}
+#endif
+	
 }
 
 void OperatorFeVariable_BinaryInterpolationFunc( void* feVariable, Element_DomainIndex dElement_I, Coord localCoord, double* value ) {
@@ -571,13 +593,39 @@ void OperatorFeVariable_BinaryInterpolationFunc( void* feVariable, Element_Domai
 	FeVariable_InterpolateFromMeshLocalCoord( field1, mesh, dElement_I, localCoord, fieldValue1 );
 	
 	Operator_CarryOutBinaryOperation( self->_operator, fieldValue0, fieldValue1, value );
+
+#ifdef DEBUG
+	if ( Stream_IsPrintableLevel( self->debug, 3 ) ) {
+		Dimension_Index dim_I;
+		Dof_Index       dof_I;
+		Journal_DPrintf( self->debug, "%s Binary Op: El %d, xi = ( ", self->name, dElement_I );
+		for ( dim_I = 0 ; dim_I < self->dim ; dim_I++ ) 
+			Journal_DPrintf( self->debug, "%g ", localCoord[ dim_I ] );
+
+		/* Field 0 */
+		Journal_DPrintf( self->debug, ") - %s = [ ", field0->name );
+		for ( dof_I = 0 ; dof_I < field0->fieldComponentCount ; dof_I++ ) 
+			Journal_DPrintf( self->debug, "%g ", fieldValue0[ dof_I ] );
+
+		/* Field 1 */
+		Journal_DPrintf( self->debug, "] - %s = [ ", field1->name );
+		for ( dof_I = 0 ; dof_I < field1->fieldComponentCount ; dof_I++ ) 
+			Journal_DPrintf( self->debug, "%g ", fieldValue1[ dof_I ] );
+
+		/* Result */
+		Journal_DPrintf( self->debug, "] - Result = [ " );
+		for ( dof_I = 0 ; dof_I < self->fieldComponentCount ; dof_I++ ) 
+			Journal_DPrintf( self->debug, "%g ", value[ dof_I ] );
+		Journal_DPrintf( self->debug, "]\n" );
+	}
+#endif
 }
 
-void OperatorFeVariable_GradientInterpolationFunc( void* feVariable, Element_DomainIndex dElement_I, Coord coord, double* value ) {
+void OperatorFeVariable_GradientInterpolationFunc( void* feVariable, Element_DomainIndex dElement_I, Coord localCoord, double* value ) {
 	OperatorFeVariable* self            = (OperatorFeVariable*) feVariable;
 	FeVariable*         field0          = self->feVariableList[0];
 	
-	FeVariable_InterpolateDerivativesToElLocalCoord( field0, dElement_I, coord, value );
+	FeVariable_InterpolateDerivativesToElLocalCoord( field0, dElement_I, localCoord, value );
 }
 
 void OperatorFeVariable_UnaryValueAtNodeFunc( void* feVariable, Node_DomainIndex dNode_I, double* value ) {

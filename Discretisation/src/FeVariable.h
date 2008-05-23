@@ -325,8 +325,13 @@
 
 	/* --- Public Functions --- */
 
-	/** Finds the value of the field at the node and broadcasts it to the rest of the processors */
+	/** Finds the value of the field at the node and broadcasts it to the rest of the processors 
+	 *  It calls MPI_Allreduce - so this function must be called by all processors for it to work */
 	void FeVariable_GetValueAtNodeGlobal( void* feVariable, Node_GlobalIndex gNode_I, double* value ) ;
+
+	/** Finds the coordinate of the node and broadcasts it to the rest of the processors
+	 *  It calls MPI_Allreduce - so this function must be called by all processors for it to work */
+	void FeVariable_GetCoordAtNodeGlobal( void* feVariable, Node_GlobalIndex gNode_I, double* coord ) ;
 
 	/** Zeros the value of the field at every nodal position */
 	void FeVariable_ZeroField( void* feVariable ) ;

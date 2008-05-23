@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeVariable.c 1132 2008-05-19 03:01:17Z LukeHodkinson $
+** $Id: FeVariable.c 1137 2008-05-23 05:57:48Z RobertTurnbull $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -986,7 +986,7 @@ void FeVariable_GetValueAtNodeGlobal( void* feVariable, Node_GlobalIndex gNode_I
 	int                rootRankL     = 0;
 	int                rootRankG     = 0;
 	MPI_Comm           comm         = self->communicator;
-
+	
 	/* Find Local Index */
 	if ( Mesh_GlobalToDomain( mesh, MT_VERTEX, gNode_I, &lNode_I ) ) {
 		/* If node is on local processor, then get value of field */
@@ -998,6 +998,28 @@ void FeVariable_GetValueAtNodeGlobal( void* feVariable, Node_GlobalIndex gNode_I
 	MPI_Allreduce( &rootRankL, &rootRankG, 1, MPI_INT, MPI_MAX, comm );
 	MPI_Bcast( value, self->fieldComponentCount, MPI_DOUBLE, rootRankG, comm );
 }
+
+/** Finds the coordinate of the node and broadcasts it to the rest of the processors */
+void FeVariable_GetCoordAtNodeGlobal( void* feVariable, Node_GlobalIndex gNode_I, double* coord ) {
+	FeVariable*        self         = (FeVariable*) feVariable;
+	FeMesh*            mesh         = self->feMesh;
+	Element_LocalIndex lNode_I;
+	int                rootRankL     = 0;
+	int                rootRankG     = 0;
+	MPI_Comm           comm         = self->communicator;
+
+	/* Find Local Index */
+	if ( Mesh_GlobalToDomain( mesh, MT_VERTEX, gNode_I, &lNode_I ) ) {
+		/* If node is on local processor, then get value of field */
+		memcpy( coord, Mesh_GetVertex( mesh, lNode_I ), self->dim * sizeof(double) );
+		MPI_Comm_rank( comm, (int*)&rootRankL );
+	}
+	
+	/* Send to other processors */
+	MPI_Allreduce( &rootRankL, &rootRankG, 1, MPI_INT, MPI_MAX, comm );
+	MPI_Bcast( coord, self->dim, MPI_DOUBLE, rootRankG, comm );
+}
+
 
 void FeVariable_ZeroField( void* feVariable ) {
 	FeVariable* self = (FeVariable*) feVariable;
@@ -1739,6 +1761,8 @@ double FeVariable_IntegrateElement_AxisIndependent(
 		/* Interpolate Value of Field at Particle */
 		FeVariable_InterpolateWithinElement( feVariable, dElement_I, particle->xi, &value );
 
+		Journal_DPrintfL( self->debug, 3, "%s: Integrating element %d - particle %d - Value = %g\n", self->name, dElement_I, cParticle_I, value );
+
 		/* Calculate Determinant of Jacobian */
 		detJac = ElementType_JacobianDeterminant_AxisIndependent( 
 				elementType, mesh, dElement_I, particle->xi, dim, axis0, axis1, axis2 );
@@ -1762,9 +1786,11 @@ double FeVariable_Integrate( void* feVariable, void* _swarm ) {
 	integral = 0.0;
 
 	/* Loop over all local elements */
-	for ( lElement_I = 0 ; lElement_I < elementLocalCount ; lElement_I++ ) 
+	for ( lElement_I = 0 ; lElement_I < elementLocalCount ; lElement_I++ ) {
 		integral += FeVariable_IntegrateElement( self, swarm, lElement_I );
-	
+		Journal_DPrintfL( self->debug, 3, "%s: Integrating element %d - Accumulated Integral = %g\n", self->name, lElement_I, integral );
+	}
+		
 	/* Gather and sum integrals from other processors */
 	MPI_Allreduce( &integral, &integralGlobal, 1, MPI_DOUBLE, MPI_SUM, self->communicator );
 
