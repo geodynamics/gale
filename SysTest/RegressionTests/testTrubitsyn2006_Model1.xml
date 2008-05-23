@@ -4,6 +4,11 @@
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 
 	<include> Underworld/BaseApps/ThermalConvection.xml </include>
+	<!--
+	<include> Underworld/BaseApps/ThermalConvectionPIC.xml </include>
+	<include> Underworld/ViscosityField.xml </include>
+	-->
+
 	<list name="plugins" mergeType="merge">
 		<!-- Output Plugins -->
 		<param>StgFEM_FrequentOutput</param>	
@@ -16,6 +21,7 @@
 	<!-- Trubitsyn2006 parameters -->
 	<param name="Ra"> 10 </param>
 	<param name="T0"> 0.1 </param>
+	<param name="ViscosityType"> Model1 </param>
 
 	<!-- IC parameter -->
 	<param name="wavenumberY"> 1 </param>
@@ -26,8 +32,9 @@
 
 	<struct name="components" mergeType="merge">
 		<struct name="Viscosity">
-			<param name="Type">MaterialViscosity</param>
-			<param name="eta0">1.0</param>
+			<param name="Type">LinearViscosity</param>
+			<param name="C">1.0</param>
+			<param name="XY">100.0</param>
 		</struct>
 		<struct name="Shape">
 			<param name="Type">Everywhere</param>
@@ -35,7 +42,6 @@
 		<struct name="Fluid">
 			<param name="Type">RheologyMaterial</param>
 			<param name="Shape">Shape</param>
-			<param name="density">solA_sigma</param>
 			<param name="Rheology">Viscosity</param>
 		</struct>
 	</struct>
