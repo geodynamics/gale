@@ -66,3 +66,6 @@ env.Program(env.get_build_path('bin/testStGermain'),
 
 # Copy scripts to correct destinations.
 env.Install(env.get_build_path('script/StGermain'), 'script/scons.py')
+
+# Copy XML validation file to correct destination.
+env.Install(env.get_build_path('lib'), 'Base/IO/src/StGermain.xsd')
