@@ -749,8 +749,16 @@ static void _XML_IO_Handler_ValidateFile( XML_IO_Handler* self, const char* file
 	if ( reader != NULL ) {
 	#ifdef LIBXML_VERSION 
 	#if LIBXML_VERSION == 20631
-		if ( *(self->validate) == 1 )
-			valid = xmlTextReaderSchemaValidate( reader, (const char*) self->schema );
+
+		xmlNodePtr cur = NULL;
+		cur = xmlDocGetRootElement( self->currDoc );
+		xmlNsPtr* nsArray = xmlGetNsList( self->currDoc, cur );
+		int i;
+		for (i=0; nsArray[i] != NULL; i++ ) {
+			//if ( *(self->validate) == 1 )
+				//valid = xmlTextReaderSchemaValidate( reader, (const char*) nsArray[i]->href );
+		}
+
 
 		ret = xmlTextReaderRead( reader );
 		while ( ret == 1 ) {
@@ -2054,6 +2062,10 @@ static void _XML_IO_Handler_WriteList( XML_IO_Handler* self, char* name, Diction
 			}
 		}
 	}	
+    else {
+		newNode = xmlNewTextChild( parent, self->currNameSpace, ELEMENT_TAG, NULL );
+		xmlNewProp( newNode, (xmlChar*) TYPE_ATTR, (xmlChar*) type );
+    }
 	if ( NULL != source ) {
 		xmlNewProp( newNode, (xmlChar*) SOURCEFILE_ATTR, (xmlChar*) source );
 	}	
