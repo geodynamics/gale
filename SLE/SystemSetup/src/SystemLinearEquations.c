@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SystemLinearEquations.c 1135 2008-05-19 13:35:36Z DavidLee $
+** $Id: SystemLinearEquations.c 1138 2008-05-28 23:09:26Z LouisMoresi $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -991,7 +991,7 @@ void SLEComputeFunction( void *someSLE, Vector *stg_X, Vector *stg_F, void *_con
 
 void SLE_SNESMonitor( void *sle, PetscInt iter, PetscReal fnorm )
 {
-  PetscPrintf( PETSC_COMM_WORLD, "  %.4D SLE_NS Function norm %12.12e    --------------------------------------------------------------------------------\n", iter, fnorm );
+  PetscPrintf( PETSC_COMM_WORLD, "  %.4d SLE_NS Function norm %12.12e    --------------------------------------------------------------------------------\n", iter, fnorm );
 }
 
 void SLE_SNESConverged(
