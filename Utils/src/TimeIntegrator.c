@@ -614,7 +614,7 @@ void TimeIntegrator_InsertBeforeFinishEP(
 
 	if ( Stg_ObjectList_GetIndex( self->finishEP->hooks, hookToInsertBefore ) != (unsigned int)-1 ) {
 		EntryPoint_InsertBefore( self->finishEP, hookToInsertBefore, name, funcPtr, addedBy );
-		_Stg_ObjectList_InsertAtIndex( 
+		Stg_ObjectList_InsertAtIndex( 
 				self->finishData,
 				Stg_ObjectList_GetIndex( self->finishEP->hooks, name ),
 				data );
@@ -636,7 +636,7 @@ void TimeIntegrator_InsertAfterFinishEP(
 
 	if ( Stg_ObjectList_GetIndex( self->finishEP->hooks, hookToInsertAfter ) != (unsigned int)-1 ) {
 		EntryPoint_InsertAfter( self->finishEP, hookToInsertAfter, name, funcPtr, addedBy );
-		_Stg_ObjectList_InsertAtIndex(
+		Stg_ObjectList_InsertAtIndex(
 				self->finishData,
 				Stg_ObjectList_GetIndex( self->finishEP->hooks, name ),
 				data );
