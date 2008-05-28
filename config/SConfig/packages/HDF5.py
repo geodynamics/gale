@@ -27,6 +27,7 @@ MPI_Finalize();
 
     def generate_locations(self):
         for loc in SConfig.Package.generate_locations(self):
+            extra_lib_dirs=[]
             extra_libs = []
             for lib_dir in loc[2]:
                 set_file = os.path.join(loc[0], lib_dir, "libhdf5.settings")
