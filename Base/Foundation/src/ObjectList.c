@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ObjectList.c 4094 2007-05-16 00:50:44Z LukeHodkinson $
+** $Id: ObjectList.c 4274 2008-05-28 02:00:24Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -480,6 +480,20 @@ Index Stg_ObjectList_InsertAfter( void* objectList, Name reference, void* object
 	return self->_insertAfter( self, reference, objectPtr );
 }
 
+
+void Stg_ObjectList_InsertAtIndex( void* objects, Index index, void* objectPtr ) {
+	Stg_ObjectList* self = (Stg_ObjectList*) objects;
+
+	/* Runs error checking and then inserts */
+	assert( objectPtr );
+	assert( self->count <= self->_size );
+	if ( self->count == self->_size ) {
+		self->_allocMoreMemory( self );
+	}
+
+	self->_insertAtIndex( self, index, objectPtr );
+}
+
 Index Stg_ObjectList_ClassInsertAfter( void* objectList, Name reference, void* objectPtr, Name name ) {
 	Stg_ObjectList* self = (Stg_ObjectList*) objectList;
 	
@@ -799,6 +813,7 @@ void _Stg_ObjectList_AllocMoreMemory( void* namedObjectList ) {
 	self->data = Memory_Realloc_Array( self->data, Stg_ObjectPtr, self->_size );
 	assert( self->data );
 }
+
 
 
 void _Stg_ObjectList_InsertAtIndex( void* objects, Index index, void* objectPtr ) {

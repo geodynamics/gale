@@ -58,7 +58,7 @@
 **	of printing large lists more meaningful for user info, rather than debugging,
 **	purposes.
 **
-** $Id: ObjectList.h 3670 2006-07-07 03:42:25Z PatrickSunter $
+** $Id: ObjectList.h 4274 2008-05-28 02:00:24Z JulianGiordani $
 **
 **/
 
@@ -284,7 +284,9 @@
 	/** Insert global pointer before a specific entry */
 	Index Stg_ObjectList_GlobalPointerInsertBefore( void* objectList, Name reference, void* objectPtr, Name name );
 	
-	
+	/** Insert object at a specific Index */	
+	void Stg_ObjectList_InsertAtIndex( void* objects, Index index, void* objectPtr );
+
 	/** Insert object after a specific entry */ 
 	Index Stg_ObjectList_InsertAfter( void* objectList, Name reference, void* objectPtr );
 	
