@@ -207,6 +207,7 @@ Bool _SwarmAdvectorD_TimeDeriv( void* swarmAdvector, Index array_I, double* time
 	coord = Variable_GetPtrDouble( self->variable, array_I );
 
 	result = FieldVariable_InterpolateValueAt( velocityField, coord, timeDeriv );
+	if( velocityField->dim == 3 )
 	        timeDeriv[ K_AXIS ] = 0.0;
 
 
