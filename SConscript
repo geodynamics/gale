@@ -42,21 +42,31 @@ if env['shared_libraries']:
 
 # Build plugins.
 if env['shared_libraries']:
-    plgn_bases = ['CompareFeVariableAgainstReferenceSolution',
-                  'Document',
-                  'FeVariableImportExporters/FeVariable_ImportExport_ABAQUS',
-                  'FeVariableImportExporters/FeVariable_ImportExport_SpecRidge2D',
-                  'FileAnalyticSolution',
-                  'Output/CPUTime',
-                  'Output/FrequentOutput',
-                  'Output/PeakMemory',
-                  'Output/PrintFeVariableDiscreteValues',
-                  'Output/PrintFeVariableDiscreteValues_2dBox',
-                  'StandardConditionFunctions']
+    plgn_bases = ['plugins/CompareFeVariableAgainstReferenceSolution',
+                  'plugins/Document',
+                  'plugins/FeVariableImportExporters/FeVariable_ImportExport_ABAQUS',
+                  'plugins/FeVariableImportExporters/FeVariable_ImportExport_SpecRidge2D',
+                  'plugins/FileAnalyticSolution',
+                  'plugins/Output/CPUTime',
+                  'plugins/Output/FrequentOutput',
+                  'plugins/Output/PeakMemory',
+                  'plugins/Output/PrintFeVariableDiscreteValues',
+                  'plugins/Output/PrintFeVariableDiscreteValues_2dBox',
+                  'plugins/StandardConditionFunctions',
+                  ('Apps/StokesMomentumUzawa/tests/LinearVelocityAnalytic',
+                   'LinearVelocityAnalytic'),
+                  ('Apps/StokesMomentumUzawa/tests/LidDrivenIsoviscousAnalytic',
+                   'LidDrivenIsoviscousAnalytic'),
+                  ('Apps/StokesMomentumUzawa/tests/SimpleShearAnalytic',
+                   'SimpleShearAnalytic')]
     for base in plgn_bases:
+        if isinstance(base, tuple):
+            name = 'StgFEM_' + base[1] + 'module'
+            base = base[0]
+        else:
+            name = 'StgFEM_' + base.split('/')[-1] + 'module'
         env.build_headers(env.glob('plugins/' + base + '/*.h'), 'include/StgFEM/' + base.split('/')[-1])
         objs = env.build_sources(env.glob('plugins/' + base + '/*.c'), 'StgFEM/' + base)
-        name = 'StgFEM_' + base.split('/')[-1] + 'module'
         env.SharedLibrary(env.get_build_path('lib/' + name), objs,
                           SHLIBPREFIX='',
                           LIBPREFIXES=[env['LIBPREFIXES']] + [''],
