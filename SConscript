@@ -65,8 +65,8 @@ if env['shared_libraries']:
             base = base[0]
         else:
             name = 'StgFEM_' + base.split('/')[-1] + 'module'
-        env.build_headers(env.glob('plugins/' + base + '/*.h'), 'include/StgFEM/' + base.split('/')[-1])
-        objs = env.build_sources(env.glob('plugins/' + base + '/*.c'), 'StgFEM/' + base)
+        env.build_headers(env.glob(base + '/*.h'), 'include/StgFEM/' + base.split('/')[-1])
+        objs = env.build_sources(env.glob(base + '/*.c'), 'StgFEM/' + base)
         env.SharedLibrary(env.get_build_path('lib/' + name), objs,
                           SHLIBPREFIX='',
                           LIBPREFIXES=[env['LIBPREFIXES']] + [''],
