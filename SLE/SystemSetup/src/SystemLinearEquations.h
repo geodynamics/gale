@@ -51,7 +51,7 @@
 **	for storing and managing the matrices and vectors that make up a system, but uses
 **	the SLE_Solver class to actually implement a solution mechanism for the given eqn.
 **
-** $Id: SystemLinearEquations.h 1134 2008-05-19 12:54:33Z DavidLee $
+** $Id: SystemLinearEquations.h 1141 2008-06-02 03:13:02Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -125,6 +125,8 @@
 		EntryPoint*					    nlSetupEP;		       \
 		char*						    nlEPName;	       	       \
 		EntryPoint*					    nlEP;		       \
+		char*						    nlConvergedEPName;	       \
+		EntryPoint*					    nlConvergedEP;	       \
 		/* END LUKE'S FRICTIONAL BCS BIT */					       \
 		/* Multi-grid data. */ \
 		Bool                                                mgEnabled;                 \

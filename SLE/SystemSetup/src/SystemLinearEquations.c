@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SystemLinearEquations.c 1138 2008-05-28 23:09:26Z LouisMoresi $
+** $Id: SystemLinearEquations.c 1141 2008-06-02 03:13:02Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -205,6 +205,8 @@ void _SystemLinearEquations_Init(
 	self->nlSetupEP = EntryPoint_New( self->nlSetupEPName, EntryPoint_2VoidPtr_CastType );
 	Stg_asprintf( &self->nlEPName, "%s-nlEP", self->name );
 	self->nlEP = EntryPoint_New( self->nlEPName, EntryPoint_2VoidPtr_CastType );
+	Stg_asprintf( &self->nlConvergedEPName, "%s-nlConvergedEP", self->name );
+	self->nlConvergedEP = EntryPoint_New( self->nlConvergedEPName, EntryPoint_2VoidPtr_CastType );
 	/* END LUKE'S FRICTIONAL BCS BIT */
 	
 	/* Initialise MG stuff. */
@@ -280,6 +282,7 @@ void _SystemLinearEquations_Delete( void* sle ) {
 	/* BEGIN LUKE'S FRICTIONAL BCS BIT */
         Memory_Free( self->nlSetupEPName );
 	Memory_Free( self->nlEPName );
+        Memory_Free( self->nlConvergedEPName );
 	/* END LUKE'S FRICTIONAL BCS BIT */
 	Memory_Free( self->executeEPName );
 	
@@ -851,8 +854,18 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 			(self->nonLinearIteration_I < maxIterations) ? "" : " - Reached iteration limit",
 			MPI_Wtime() - wallTime );
 		
-		if ( (converged) && (self->nonLinearIteration_I>=minIterations) )
-			break;
+		if ( (converged) && (self->nonLinearIteration_I>=minIterations) ) {
+		   int result;
+
+		   /* Adding in another entry point so we can insert out own custom
+		      convergeance checks. For example, with frictional boundary
+		      conditions we need to ensure envery node was gone from the
+		      original searching state to a fixed slipping or sticking state. */
+		   _EntryPoint_Run_2VoidPtr( self->nlConvergedEP, _context, &converged );
+		   MPI_Allreduce( &converged, &result, 1, MPI_INT, MPI_LOR, MPI_COMM_WORLD );
+		   if( result )
+		      break;
+		}
 	}
 
 	/* Print Info */
@@ -878,6 +891,16 @@ void SystemLinearEquations_AddNonLinearSetupEP( void* sle, const char* name, Ent
 
 	SystemLinearEquations_SetToNonLinear( self );
 	EntryPoint_Append( self->nlSetupEP, (char*)name, func, self->type );
+}
+
+void SystemLinearEquations_AddNonLinearConvergedEP( void* sle,
+						    const char* name,
+						    EntryPoint_2VoidPtr_Cast func )
+{
+	SystemLinearEquations* self = (SystemLinearEquations*)sle;
+
+	SystemLinearEquations_SetToNonLinear( self );
+	EntryPoint_Append( self->nlConvergedEP, (char*)name, func, self->type );
 }
 
 
