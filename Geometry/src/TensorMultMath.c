@@ -594,16 +594,16 @@ void NonSquareMatrix_CumulativeMultiplicationByNonSquareMatrix( double **AMatrix
 			
   int row_I, col_I; /* location with resultMatrix  */
   int counter;      /* counter which facilitates the multiplication of AMatrix and BMatrix */
-	/** Error Checking Code */
-	Stream* error = Journal_Register( ErrorStream_Type, "TensorMultMath" );
-					 
+	/** Error Checking Code */				 
 	if (colDimA != rowDimB) {
+		Stream* error = Journal_Register( ErrorStream_Type, "TensorMultMath" );
 		Journal_Firewall( False, error,
 				"In func '%s'  row dimension B, %u != column dimension A, %u\n", 
 			__func__, rowDimB, colDimA );
 	}
 	if ((AMatrix == NULL) || (BMatrix == NULL) || (resultMatrix == NULL) ) {
-			Journal_Firewall( False, error,
+		Stream* error = Journal_Register( ErrorStream_Type, "TensorMultMath" );
+		Journal_Firewall( False, error,
 				"In func '%s', Input matrices: %s %s, or Output matrix: %s is NULL \n", 
 			__func__, AMatrix, BMatrix, resultMatrix);
 	}
@@ -637,13 +637,19 @@ to the passed in 'solution Vector'. It requires the column
 void NonSquareMatrix_CumulativeMatrixVectorMultiplication( double** AMatrix, int rowsInA, int colsInA,
 		                               double* BVec, int rowsInB, double* resultVector ) {
   int row_I, col_I; /* counters through matrix rows and columns respectively */
-	Stream* error = Journal_Register( ErrorStream_Type, "TensorMultMath" );
-	Journal_Firewall( ( colsInA == rowsInB ), error,
+	/** Error Checking Code */  
+  	if ( colsInA != rowsInB ) {
+		Stream* error = Journal_Register( ErrorStream_Type, "TensorMultMath" );
+		Journal_Firewall( False, error,
 			"In func '%s' column dimensions of A_Matrix = %d is not equal to the row dimensions of B_Vec = %d\n",
 			__func__, colsInA, rowsInB );
-	Journal_Firewall( (resultVector != NULL) || (AMatrix != NULL) || (BVec != NULL) , error,
+	}
+	if( (resultVector == NULL) || (AMatrix == NULL) || (BVec == NULL) ) {
+		Stream* error = Journal_Register( ErrorStream_Type, "TensorMultMath" );
+		Journal_Firewall( False , error,
 			"In func '%s', Input matrices: %p %p, or Output matrix: %p is NULL \n", 
 			__func__, AMatrix, BVec, resultVector);
+	}
 	/* calculate the result Vector */
 	for( row_I = 0 ; row_I < rowsInA ; row_I++ ) {
 		for( col_I = 0 ; col_I < colsInA ; col_I++ ) {
