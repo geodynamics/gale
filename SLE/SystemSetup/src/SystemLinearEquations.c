@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SystemLinearEquations.c 1141 2008-06-02 03:13:02Z LukeHodkinson $
+** $Id: SystemLinearEquations.c 1143 2008-06-03 04:18:54Z DavidMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -1017,6 +1017,54 @@ void SLE_SNESMonitor( void *sle, PetscInt iter, PetscReal fnorm )
   PetscPrintf( PETSC_COMM_WORLD, "  %.4d SLE_NS Function norm %12.12e    --------------------------------------------------------------------------------\n", iter, fnorm );
 }
 
+void SLE_SNESMonitor2( void *sle, PetscInt iter, PetscReal fnorm0, PetscReal fnorm, PetscReal dX, PetscReal X1 )
+{
+  if(iter==0) {
+    PetscPrintf( PETSC_COMM_WORLD, "  SLE_NS  it       |F|             |F|/|F0|         |X1-X0|       |X1-X0|/|X1| \n" );
+  }
+  PetscPrintf( PETSC_COMM_WORLD,   "  SLE_NS  %1.4d     %2.4e      %2.4e       %2.4e     %2.4e \n", iter, fnorm, fnorm/fnorm0, dX, dX/X1 );
+}
+
+void _monitor_progress( PetscReal initial, PetscReal target, PetscReal current, PetscReal *p )
+{
+  PetscReal p0;
+
+  p0 = log10(initial) - log10(target);
+  *p = 100.0 * ( 1.0 - (log10(current)-log10(target)) / p0 );
+}
+
+void SLE_SNESMonitorProgress( void *sle, 
+  PetscInt iter, 
+  PetscReal fnorm0, PetscReal fnorm, PetscReal dX, PetscReal X1, 
+  PetscReal fatol, PetscReal frtol, PetscReal xtol )
+{
+  PetscReal f_abs_s, f_abs_e, w1, v1, p1;
+  PetscReal f_rel_s, f_rel_e, w2, v2, p2;
+  PetscReal x_del_s, x_del_e, w3, v3, p3;
+
+  if(iter==0) {
+    PetscPrintf( PETSC_COMM_WORLD, "  SLE_NS  it       |F|                 |F|/|F0|             |X1-X0|/|X1| \n" );
+  }
+
+  f_abs_s = fnorm0;
+  f_abs_e = fatol;
+  v1 = fnorm;
+  _monitor_progress( f_abs_s, f_abs_e, v1, &p1 );
+
+  f_rel_s = fnorm0;
+  f_rel_e = fnorm0 * frtol;
+  v2 = fnorm;
+  _monitor_progress( f_rel_s, f_rel_e, v2, &p2 );
+
+  x_del_s = 1.0;
+  x_del_e = xtol;
+  v3 = dX/X1;
+  _monitor_progress( x_del_s, x_del_e, v3, &p3 );
+
+  PetscPrintf( PETSC_COMM_WORLD,   "  SLE_NS  %1.4d     %2.4e [%.0f%%]     %2.4e [%.0f%%]      %2.4e [%.0f%%] \n", iter, fnorm,p1, fnorm/fnorm0,p2,  dX/X1,p3 );
+}
+
+
 void SLE_SNESConverged(
 	PetscReal snes_abstol, PetscReal snes_rtol, PetscReal snes_ttol, PetscReal snes_xtol,
 	PetscInt it,PetscReal xnorm,PetscReal pnorm,PetscReal fnorm,SNESConvergedReason *reason )
@@ -1078,7 +1126,7 @@ void SystemLinearEquations_PicardExecute( void *sle, void *_context )
 
   Vec            X, Y, F, Xstar,delta_X;
   PetscReal      alpha = 1.0;
-  PetscReal      fnorm,norm_X,pnorm;
+  PetscReal      fnorm,norm_X,pnorm,fnorm0;
   PetscInt       i;
   PetscErrorCode ierr;
   SNESConvergedReason snes_reason;
@@ -1135,19 +1183,23 @@ void SystemLinearEquations_PicardExecute( void *sle, void *_context )
     
     /* Map X <- X* */
     VecCopy( Xstar, X ); 
+    VecNorm( X, NORM_2, &norm_X );
   }
-
 
 
   snes_iter = 0;
   snes_norm = 0;
   SLEComputeFunction( sle, stg_X, stg_F, _context );
   ierr = VecNorm(F, NORM_2, &fnorm);CHKERRQ(ierr); /* fnorm <- ||F||  */
+  fnorm0 = fnorm;
   if( PetscIsInfOrNanReal(fnorm) ) SETERRQ(PETSC_ERR_FP,"Infinite or not-a-number generated in norm");
 
   snes_norm = fnorm;
-  if(monitor_flg==PETSC_TRUE)
-    SLE_SNESMonitor(sle,0,fnorm);
+  if(monitor_flg==PETSC_TRUE) {
+  /*  SLE_SNESMonitor(sle,0,fnorm); */
+  /*  SLE_SNESMonitor2(sle,0,fnorm0,fnorm, norm_X, norm_X ); */
+    SLE_SNESMonitorProgress( sle, snes_iter,  fnorm0, fnorm, norm_X, norm_X, snes_abstol, snes_rtol, snes_xtol );
+  }
 
   /* set parameter for default relative tolerance convergence test */
   snes_ttol = fnorm*snes_rtol;
@@ -1180,8 +1232,11 @@ void SystemLinearEquations_PicardExecute( void *sle, void *_context )
     /* Monitor convergence */
     snes_iter = i+1;
     snes_norm = fnorm;
-    if (monitor_flg==PETSC_TRUE)
-      SLE_SNESMonitor(sle,snes_iter,snes_norm);
+    if (monitor_flg==PETSC_TRUE) {
+    /*  SLE_SNESMonitor(sle,snes_iter,snes_norm); */
+    /*  SLE_SNESMonitor2(sle,snes_iter,fnorm0,fnorm, pnorm, norm_X ); */
+      SLE_SNESMonitorProgress( sle, snes_iter,  fnorm0, fnorm, pnorm, norm_X, snes_abstol, snes_rtol, snes_xtol );
+    }
 
     /* Test for convergence */
     SLE_SNESConverged( snes_abstol,snes_rtol,snes_ttol,snes_xtol , snes_iter,norm_X,pnorm,fnorm,&snes_reason);
