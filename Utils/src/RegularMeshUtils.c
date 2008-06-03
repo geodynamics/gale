@@ -270,12 +270,11 @@ IndexSet* RegularMeshUtils_CreateGlobalInnerTopSet( void* _mesh ) {
 
 	for( n_i = 0; n_i < nNodes; n_i++ ) {
 		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
-                if( nDims == 2 ) ijk[2] = 0;
 		if( ijk[1] == grid->sizes[1] - 1 && 
-		    (ijk[0] != grid->sizes[0] - 1 || ijk[2] != grid->sizes[2] - 1 ) && 
-		    (ijk[0] != 0 || ijk[2] != grid->sizes[2] - 1 ) && 
-		    (ijk[0] != grid->sizes[0] - 1 || ijk[2] != 0 ) && 
-		    (ijk[0] != 0 || ijk[2] != 0 ) )
+		    (ijk[0] != grid->sizes[0] - 1 || (nDims == 3 && ijk[2] != grid->sizes[2] - 1)) && 
+		    (ijk[0] != 0 || (nDims == 3 && ijk[2] != grid->sizes[2] - 1)) && 
+		    (ijk[0] != grid->sizes[0] - 1 || (nDims == 3 && ijk[2] != 0)) && 
+		    (ijk[0] != 0 || (nDims == 3 && ijk[2] != 0)) )
 		{
 			IndexSet_Add( set, n_i );
 		}
@@ -305,12 +304,11 @@ IndexSet* RegularMeshUtils_CreateGlobalInnerBottomSet( void* _mesh ) {
 
 	for( n_i = 0; n_i < nNodes; n_i++ ) {
 		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
-                if( nDims == 2 ) ijk[2] = 0;
 		if( ijk[1] == 0 && 
-		    (ijk[0] != grid->sizes[0] - 1 || ijk[2] != grid->sizes[2] - 1 ) && 
-		    (ijk[0] != 0 || ijk[2] != grid->sizes[2] - 1 ) && 
-		    (ijk[0] != grid->sizes[0] - 1 || ijk[2] != 0 ) && 
-		    (ijk[0] != 0 || ijk[2] != 0 ) )
+		    (ijk[0] != grid->sizes[0] - 1 || (nDims == 3 && ijk[2] != grid->sizes[2] - 1)) && 
+		    (ijk[0] != 0 || (nDims == 3 && ijk[2] != grid->sizes[2] - 1)) && 
+		    (ijk[0] != grid->sizes[0] - 1 || (nDims == 3 && ijk[2] != 0)) && 
+		    (ijk[0] != 0 || (nDims == 3 && ijk[2] != 0)) )
 		{
 			IndexSet_Add( set, n_i );
 		}
@@ -340,12 +338,11 @@ IndexSet* RegularMeshUtils_CreateGlobalInnerLeftSet( void* _mesh ) {
 
 	for( n_i = 0; n_i < nNodes; n_i++ ) {
 		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
-                if( nDims == 2 ) ijk[2] = 0;
 		if( ijk[0] == 0 && 
-		    (ijk[1] != grid->sizes[1] - 1 || ijk[2] != grid->sizes[2] - 1 ) && 
-		    (ijk[1] != 0 || ijk[2] != grid->sizes[2] - 1 ) && 
-		    (ijk[1] != grid->sizes[1] - 1 || ijk[2] != 0 ) && 
-		    (ijk[1] != 0 || ijk[2] != 0 ) )
+		    (ijk[1] != grid->sizes[1] - 1 || (nDims == 3 && ijk[2] != grid->sizes[2] - 1)) && 
+		    (ijk[1] != 0 || (nDims == 3 && ijk[2] != grid->sizes[2] - 1)) && 
+		    (ijk[1] != grid->sizes[1] - 1 || (nDims == 3 && ijk[2] != 0)) && 
+		    (ijk[1] != 0 || (nDims == 3 && ijk[2] != 0)) )
 		{
 			IndexSet_Add( set, n_i );
 		}
@@ -375,12 +372,11 @@ IndexSet* RegularMeshUtils_CreateGlobalInnerRightSet( void* _mesh ) {
 
 	for( n_i = 0; n_i < nNodes; n_i++ ) {
 		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
-                if( nDims == 2 ) ijk[2] = 0;
 		if( ijk[0] == grid->sizes[0] - 1 && 
-		    (ijk[1] != grid->sizes[1] - 1 || ijk[2] != grid->sizes[2] - 1 ) && 
-		    (ijk[1] != 0 || ijk[2] != grid->sizes[2] - 1 ) && 
-		    (ijk[1] != grid->sizes[1] - 1 || ijk[2] != 0 ) && 
-		    (ijk[1] != 0 || ijk[2] != 0 ) )
+		    (ijk[1] != grid->sizes[1] - 1 || (nDims == 3 && ijk[2] != grid->sizes[2] - 1)) && 
+		    (ijk[1] != 0 || (nDims == 3 && ijk[2] != grid->sizes[2] - 1)) && 
+		    (ijk[1] != grid->sizes[1] - 1 || (nDims == 3 && ijk[2] != 0)) && 
+		    (ijk[1] != 0 || (nDims == 3 && ijk[2] != 0)) )
 		{
 			IndexSet_Add( set, n_i );
 		}
