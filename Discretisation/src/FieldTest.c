@@ -45,6 +45,7 @@
 #include "types.h"
 #include "FieldTest.h"
 #include "FeVariable.h"
+#include "ElementType.h"
 #include "FeMesh.h"
 
 #include <stdio.h>
@@ -413,7 +414,6 @@ void FieldTest_LoadReferenceSolitionFromFile( void* fieldTest ) {
 	double 			a1, b1, c1;
 	double 			a2, b2, c2;
 	double 			m0, m1, m2, m3, m4, m5, m6;
-	Bool			quadraticMesh		= ( !strcmp( feMesh->name, "quadraticMesh" ) ) ? True : False;
 	hid_t 			dataSet, memSpace, dataSpace;
 	hsize_t 		start[2], count[2], hSize;
 	int 			sizes[3];
@@ -511,15 +511,12 @@ void FieldTest_LoadReferenceSolitionFromFile( void* fieldTest ) {
 		vertex0[0] = posx[lineNum0];
 		vertex0[1] = posy[lineNum0];
 		if( nDims == 3 ) vertex0[2] = posz[lineNum0];
+		
 		/* for quadratic elements the resolution is twice the distance between the nodes */
-		if( quadraticMesh )
-			for( dim_I = 0; dim_I < nDims; dim_I++ )
-				coordPrime[dim_I] = ( coord[dim_I] - vertex0[dim_I] ) / resolution[dim_I] - 1.0;
-		else
-			for( dim_I = 0; dim_I < nDims; dim_I++ )
-				coordPrime[dim_I] = 2.0 * ( coord[dim_I] - vertex0[dim_I] ) / resolution[dim_I] - 1.0;
+		for( dim_I = 0; dim_I < nDims; dim_I++ )
+			coordPrime[dim_I] = ( coord[dim_I] - vertex0[dim_I] ) / resolution[dim_I] - 1.0;
 
-		/* assign the shape functions */
+		/* assign the shape functions & interpolate quadratically */
 		if( nDims == 2 ) {
 			xi = coordPrime[0]; eta = coordPrime[1];
 			a0 = xi - 1.0; b0 = eta - 1.0;
@@ -637,11 +634,11 @@ void FieldTest_GenerateErrorField( void* fieldTest, void* data ) {
 	localAnalyticSq = 0.0;
 	localErrorSq    = 0.0;
 	
-	if( numericFeVar && self->_analyticFeVarSoln ) {
+	if( numericFeVar && self->_analyticSolution ) {
 		for( lElement_I = 0; lElement_I < meshLocalSize; lElement_I++ ) {
 			elErrorSq = 0.0;
 			elNormSq  = 0.0;
-			FieldTest_ElementErrorAnalyticFromField( self, referenceFeVar, lElement_I, &elErrorSq, &elNormSq );
+			FieldTest_ElementErrorAnalyticFromField( self, lElement_I, &elErrorSq, &elNormSq );
 
 			localAnalyticSq += elNormSq;
 			localErrorSq    += elErrorSq;
@@ -655,7 +652,7 @@ void FieldTest_GenerateErrorField( void* fieldTest, void* data ) {
 		for( lElement_I = 0; lElement_I < meshLocalSize; lElement_I++ ) {
 			elErrorSq = 0.0;
 			elNormSq  = 0.0;
-			FieldTest_ElementErrorReferenceFromField( self, referenceFeVar, lElement_I, &elErrorSq, &elNormSq );
+			FieldTest_ElementErrorReferenceFromField( self, lElement_I, &elErrorSq, &elNormSq );
 
 			localAnalyticSq += elNormSq;
 			localErrorSq    += elErrorSq;
@@ -665,11 +662,11 @@ void FieldTest_GenerateErrorField( void* fieldTest, void* data ) {
 			FeVariable_SetValueAtNode( referenceMesh, lElement_I, &elError );
 		}
 	}
-	else if( numericSwarm && self->_analyticSwarmSoln ) {
+	else if( numericSwarm && self->_analyticSolution ) {
 		for( lElement_I = 0; lElement_I < meshLocalSize; lElement_I++ ) {
 			elErrorSq = 0.0;
 			elNormSq  = 0.0;
-			FieldTest_ElementErrorAnalyticFromSwarm( self, referenceFeVar, lElement_I, &elErrorSq, &elNormSq );
+			FieldTest_ElementErrorAnalyticFromSwarm( self, lElement_I, &elErrorSq, &elNormSq );
 
 			localAnalyticSq += elNormSq;
 			localErrorSq    += elErrorSq;
@@ -683,7 +680,7 @@ void FieldTest_GenerateErrorField( void* fieldTest, void* data ) {
 		for( lElement_I = 0; lElement_I < meshLocalSize; lElement_I++ ) {
 			elErrorSq = 0.0;
 			elNormSq  = 0.0;
-			FieldTest_ElementErrorReferenceFromSwarm( self, referenceFeVar, lElement_I, &elErrorSq, &elNormSq );
+			FieldTest_ElementErrorReferenceFromSwarm( self, lElement_I, &elErrorSq, &elNormSq );
 
 			localAnalyticSq += elNormSq;
 			localErrorSq    += elErrorSq;
@@ -702,25 +699,92 @@ void FieldTest_GenerateErrorField( void* fieldTest, void* data ) {
 	self->globalErrorNorm = sqrt( globalErrorSq / globalAnalyticSq );
 }
 
-void FieldTest_ElementErrorAnalyticFromField( void* fieldTest, FeVariable* referenceField, Element_LocalIndex lElement_I, double* elErrorSq, double* elNormSq ) {
+void FieldTest_ElementErrorReferenceFromField( void* fieldTest, Element_LocalIndex lElement_I, double* elErrorSq, double* elNormSq ) {
+	FieldTest* 		self 			= (FieldTest*) fieldTest;
+	FeVariable*		referenceField		= self->referenceFeVar;
+	FeVariable*		numericField		= self->numericFeVar;
+	FeMesh*			referenceMesh		= referenceField->feMesh;
+	Index			constantElNode		= lElement_I;
+	double*			coord			= Mesh_GetVertex( self->constantMesh, constantElNode );
+	unsigned		nDims			= Mesh_GetDimSize( referenceMesh );
+	Index			el_I;
+	ElementType*		elType;
+	Swarm*			intSwarm		= self->integrationSwarm;
+	Index			cell_I;
+	unsigned		cellParticleCount;
+	Index			cParticle_I;
+	IntegrationPoint*	intParticle;
+	double			globalCoord[3];
+	double			detJac;
+	double			reference, numeric; /* scalar fields only */
+
+	/* don't assume that the constant error field mesh & reference field mesh necessarily map 1:1 */
+	Mesh_SearchElements( referenceField, coord, &el_I );
+	elType = FeMesh_GetElementType( referenceMesh, el_I );
+
+	cell_I = CellLayout_MapElementIdToCellId( intSwarm, el_I );
+	cellParticleCount = intSwarm->cellParticleCountTbl[cell_I];
+
+	for( cParticle_I = 0; cParticle_I < cellParticleCount; cParticle_I++ ) {
+		intParticle = (IntegrationPoint*) Swarm_ParticleInCellAt( intSwarm, cell_I, cParticle_I );
+		FeMesh_CoordLocalToGlobal( referenceMesh, el_I, intParticle->xi, globalCoord );
+		FieldVariable_InterpolateValueAt( referenceField, globalCoord, &reference );
+		FieldVariable_InterpolateValueAt( numericField,   globalCoord, &numeric   );
+
+		detJac = ElementType_JacobianDeterminant( elType, referenceMesh, el_I, intParticle->xi, nDims );
+
+		*elErrorSq += ( numeric - reference ) * ( numeric - reference ) * intParticle->weight * detJac;
+		*elNormSq  += reference * reference * intParticle->weight * detJac;
+	}
+}
+
+void FieldTest_ElementErrorAnalyticFromField( void* fieldTest, Element_LocalIndex lElement_I, double* elErrorSq, double* elNormSq ) {
+	FieldTest* 		self 			= (FieldTest*) fieldTest;
+	FeVariable*		referenceField		= self->referenceFeVar;
+	FeVariable*		numericField		= self->numericFeVar;
+	FeMesh*			referenceMesh		= referenceField->feMesh;
+	Index			constantElNode		= lElement_I;
+	double*			coord			= Mesh_GetVertex( self->constantMesh, constantElNode );
+	unsigned		nDims			= Mesh_GetDimSize( referenceMesh );
+	Index			el_I;
+	ElementType*		elType;
+	Swarm*			intSwarm		= self->integrationSwarm;
+	Index			cell_I;
+	unsigned		cellParticleCount;
+	Index			cParticle_I;
+	IntegrationPoint*	intParticle;
+	double			globalCoord[3];
+	double			detJac;
+	double			analytic, numeric; /* scalar fields only */
+	FieldTest_AnalyticSolutionFunc*		analyticSolution = self->_analyticSolution;
+
+	/* don't assume that the constant error field mesh & reference field mesh necessarily map 1:1 */
+	Mesh_SearchElements( referenceField, coord, &el_I );
+	elType = FeMesh_GetElementType( referenceMesh, el_I );
+
+	cell_I = CellLayout_MapElementIdToCellId( intSwarm, el_I );
+	cellParticleCount = intSwarm->cellParticleCountTbl[cell_I];
+
+	for( cParticle_I = 0; cParticle_I < cellParticleCount; cParticle_I++ ) {
+		intParticle = (IntegrationPoint*) Swarm_ParticleInCellAt( intSwarm, cell_I, cParticle_I );
+		FeMesh_CoordLocalToGlobal( referenceMesh, el_I, intParticle->xi, globalCoord );
+		analyticSolution( self, globalCoord, &analytic );
+		FieldVariable_InterpolateValueAt( numericField, globalCoord, &numeric );
+
+		detJac = ElementType_JacobianDeterminant( elType, referenceMesh, el_I, intParticle->xi, nDims );
+
+		*elErrorSq += ( numeric - analytic ) * ( numeric - analytic ) * intParticle->weight * detJac;
+		*elNormSq  += analytic * analytic * intParticle->weight * detJac;
+	}
+}
+
+void FieldTest_ElementErrorAnalyticFromSwarm( void* fieldTest, Element_LocalIndex lElement_I, double* elErrorSq, double* elNormSq ) {
 	FieldTest* 		self 		= (FieldTest*) fieldTest;
 
 
 }
 
-void FieldTest_ElementErrorReferenceFromField( void* fieldTest, FeVariable* referenceField, Element_LocalIndex lElement_I, double* elErrorSq, double* elNormSq ) {
-	FieldTest* 		self 		= (FieldTest*) fieldTest;
-
-
-}
-
-void FieldTest_ElementErrorAnalyticFromSwarm( void* fieldTest, FeVariable* referenceField, Element_LocalIndex lElement_I, double* elErrorSq, double* elNormSq ) {
-	FieldTest* 		self 		= (FieldTest*) fieldTest;
-
-
-}
-
-void FieldTest_ElementErrorReferenceFromSwarm( void* fieldTest, FeVariable* referenceField, Element_LocalIndex lElement_I, double* elErrorSq, double* elNormSq ) {
+void FieldTest_ElementErrorReferenceFromSwarm( void* fieldTest, Element_LocalIndex lElement_I, double* elErrorSq, double* elNormSq ) {
 	FieldTest* 		self 		= (FieldTest*) fieldTest;
 
 

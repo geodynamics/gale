@@ -50,8 +50,7 @@
 #ifndef __StgFEM_Discretisation_FieldTest_h__
 #define __StgFEM_Discretisation_FieldTest_h__
 	
-	typedef void (FieldTest_AnalyticFeVarSolutionFunc) (void* fieldTest, FeVariable* analyticFeVar, double* coord, double* value );
-	typedef void (FieldTest_AnalyticSwarmSolutionFunc) (void* fieldTest, Swarm*      analyticSwarm, double* coord, double* value );
+	typedef void (FieldTest_AnalyticSolutionFunc) (void* fieldTest, double* coord, double* value );
 
 	/** Textual name of this class */
 	extern const Type FieldTest_Type;
@@ -78,8 +77,7 @@
 		Name					referenceSolnPath;	\
 		Swarm*                 			integrationSwarm;       \
 		DomainContext*				context;		\
-		FieldTest_AnalyticFeVarSolutionFunc* 	_analyticFeVarSoln; 	\
-		FieldTest_AnalyticSwarmSolutionFunc* 	_analyticSwarmSoln; 	\
+		FieldTest_AnalyticSolutionFunc* 	_analyticSolution; 	\
 		
 
 	/** Brings together and manages the life-cycle of a a mesh and all the 
@@ -150,9 +148,9 @@
 
 	void FieldTest_GenerateErrorField( void* fieldTest, void* data );
 
-	void FieldTest_ElementErrorAnalyticFromField( void* fieldTest, FeVariable* refField, Element_LocalIndex lElement_I, double* elErrorSq, double* elNormSq );
-	void FieldTest_ElementErrorReferenceFromField( void* fieldTest, FeVariable* refField, Element_LocalIndex lElement_I, double* elErrorSq, double* elNormSq );
-	void FieldTest_ElementErrorAnalyticFromSwarm( void* fieldTest, FeVariable* refField, Element_LocalIndex lElement_I, double* elErrorSq, double* elNormSq );
-	void FieldTest_ElementErrorReferenceFromSwarm( void* fieldTest, FeVariable* refField, Element_LocalIndex lElement_I, double* elErrorSq, double* elNormSq );
+	void FieldTest_ElementErrorAnalyticFromField( void* fieldTest, Element_LocalIndex lElement_I, double* elErrorSq, double* elNormSq );
+	void FieldTest_ElementErrorReferenceFromField( void* fieldTest, Element_LocalIndex lElement_I, double* elErrorSq, double* elNormSq );
+	void FieldTest_ElementErrorAnalyticFromSwarm( void* fieldTest, Element_LocalIndex lElement_I, double* elErrorSq, double* elNormSq );
+	void FieldTest_ElementErrorReferenceFromSwarm( void* fieldTest, Element_LocalIndex lElement_I, double* elErrorSq, double* elNormSq );
 
 #endif /* __StgFEM_Discretisation_FieldTest_h__ */
