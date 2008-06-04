@@ -57,6 +57,6 @@ env.Program(env.get_build_path('bin/testglucifer'),
 # Copy over XML files.
 xml_bases = ['']
 for base in xml_bases:
-    dst = env.get_build_path('lib/StGermain/glucifer/' + base)
+    dst = env.get_build_path('lib/StGermain/gLucifer/' + base)
     for file in env.glob('ModelComponents/' + base + '/*.xml'):
         env.Install(dst, file)
