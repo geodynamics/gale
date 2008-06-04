@@ -44,7 +44,7 @@
 **
 ** Comments:
 **
-** $Id: types.h 992 2008-01-03 04:46:19Z LukeHodkinson $
+** $Id: types.h 1144 2008-06-04 05:59:29Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -52,24 +52,24 @@
 #define __StgFEM_Discretisation_types_h__
 	
 	/* FE types/classes */
-	typedef struct FeMesh_Algorithms FeMesh_Algorithms;
-	typedef struct FeMesh_ElementType FeMesh_ElementType;
+	typedef struct FeMesh_Algorithms 	 FeMesh_Algorithms;
+	typedef struct FeMesh_ElementType 	 FeMesh_ElementType;
 	typedef struct ElementType               ElementType;
 	typedef struct ElementType_Register      ElementType_Register;
 	typedef struct ConstantElementType       ConstantElementType;
 	typedef struct BilinearElementType       BilinearElementType;
 	typedef struct TrilinearElementType      TrilinearElementType;
-	typedef struct RegularTrilinear			RegularTrilinear;
-	typedef struct RegularBilinear			RegularBilinear;
-	typedef struct Biquadratic		Biquadratic;
-	typedef struct P1			P1;
+	typedef struct RegularTrilinear		 RegularTrilinear;
+	typedef struct RegularBilinear		 RegularBilinear;
+	typedef struct Biquadratic		 Biquadratic;
+	typedef struct P1			 P1;
 	typedef struct LinearTriangleElementType LinearTriangleElementType;
 	typedef struct FiniteElement_Element     FiniteElement_Element;
-	typedef struct FeMesh			FeMesh;
-	typedef struct C0Generator		C0Generator;
-	typedef struct C2Generator		C2Generator;
-	typedef struct P1Generator		P1Generator;
-	typedef struct Inner2DGenerator		Inner2DGenerator;
+	typedef struct FeMesh			 FeMesh;
+	typedef struct C0Generator		 C0Generator;
+	typedef struct C2Generator		 C2Generator;
+	typedef struct P1Generator		 P1Generator;
+	typedef struct Inner2DGenerator		 Inner2DGenerator;
 	typedef struct LinkedDofInfo             LinkedDofInfo;
 	typedef struct FeEquationNumber          FeEquationNumber;
 	typedef struct FeVariable                FeVariable;
@@ -80,6 +80,7 @@
 	typedef struct Triquadratic              Triquadratic;
 	typedef struct BilinearInnerElType       BilinearInnerElType;
 	typedef struct TrilinearInnerElType      TrilinearInnerElType;
+	typedef struct FieldTest		 FieldTest;
 
 	/* types for lists etc ... for readability */
 	typedef FeVariable*				FeVariablePtr;
