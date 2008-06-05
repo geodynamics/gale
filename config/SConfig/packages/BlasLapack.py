@@ -68,7 +68,10 @@ free(rightEigenVec);
     def generate_libraries(self, location):
         lib_dir = '/usr/local/IBM_compilers/xlf/9.1/lib64'
         if lib_dir in location[2]:
+            old_libs = list(self.extra_libraries)
+            self.extra_libraries = ['xlf90', 'xlfmath', 'xl']
             yield ['blas', 'lapack', 'xlf90', 'xlfmath', 'xl']
+            self.extra_libraries = old_libs
         else:
             for libs in SConfig.Package.generate_libraries(self, location):
                 yield libs

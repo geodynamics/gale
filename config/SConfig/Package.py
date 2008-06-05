@@ -429,7 +429,9 @@ int main(int argc, char* argv[]) {
 
         if self.hdr_dirs:
             self.backup_variable(scons_env, 'CPPPATH', old_state)
-            for d in self.hdr_dirs:
+            rev_hdr_dirs = list(self.hdr_dirs)
+            rev_hdr_dirs.reverse()
+            for d in rev_hdr_dirs:
                 full_dir = self.join_sub_dir(self.base_dir, d)
                 if full_dir in self.system_header_dirs:
                     if not os.path.isabs(full_dir): full_dir = '#' + full_dir
@@ -449,7 +451,9 @@ int main(int argc, char* argv[]) {
         if self.lib_dirs:
             self.backup_variable(scons_env, 'LIBPATH', old_state)
             self.backup_variable(scons_env, 'RPATH', old_state)
-            for d in self.lib_dirs:
+            rev_lib_dirs = list(self.lib_dirs)
+            rev_lib_dirs.reverse()
+            for d in rev_lib_dirs:
                 full_dir = self.join_sub_dir(self.base_dir, d)
                 abs_dir = os.path.abspath(full_dir)
                 if full_dir in self.system_library_dirs:
