@@ -414,8 +414,10 @@ void FieldTest_LoadReferenceSolitionFromFile( void* fieldTest ) {
 	double 			a1, b1, c1;
 	double 			a2, b2, c2;
 	double 			m0, m1, m2, m3, m4, m5, m6;
+#ifdef HAVE_HDF5
 	hid_t 			dataSet, memSpace, dataSpace;
 	hsize_t 		start[2], count[2], hSize;
+#endif
 	int 			sizes[3];
 	double* 		data;
 	int 			dataPos = 0;
@@ -427,13 +429,9 @@ void FieldTest_LoadReferenceSolitionFromFile( void* fieldTest ) {
 													 	      /* .  h5  \0 */
 	filename = Memory_Alloc_Array_Unnamed( char, strlen(self->referenceSolnPath) + strlen(self->referenceSolnFileName) + 1 + 2 + 1 );
 	sprintf( filename, "%s%s.h5", self->referenceSolnPath, self->referenceSolnFileName );
+#ifdef HAVE_HDF5
 	inputFile = H5Fopen( filename, H5F_ACC_RDONLY, H5P_DEFAULT );
-
-#if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
-	dataSet = H5Dopen( inputFile, "/size" );
-#else
 	dataSet = H5Dopen( inputFile, "/size", H5P_DEFAULT );
-#endif
 	H5Dread( dataSet, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, sizes );
 	nx = sizes[0];
 	ny = sizes[1];
@@ -453,11 +451,7 @@ void FieldTest_LoadReferenceSolitionFromFile( void* fieldTest ) {
 	hSize = nDims + dofAtEachNodeCount;
 	memSpace = H5Screate_simple( 1, &hSize, NULL );
 	H5Sselect_all( memSpace );
-#if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
-	dataSet = H5Dopen( inputFile, "/data" );
-#else
 	dataSet = H5Dopen( inputFile, "/data", H5P_DEFAULT );
-#endif
 	dataSpace = H5Dget_space( dataSet );
 	start[0] = 0;
 	start[1] = 0;
@@ -480,7 +474,7 @@ void FieldTest_LoadReferenceSolitionFromFile( void* fieldTest ) {
 	H5Sclose( memSpace );
 	H5Sclose( dataSpace );
 	H5Dclose( dataSet );
-
+#endif
 	Memory_Free( data );
 
 	resolution[0] = posx[1]  - posx[0];
@@ -781,7 +775,7 @@ void FieldTest_ElementErrorAnalyticFromField( void* fieldTest, Element_LocalInde
 void FieldTest_ElementErrorAnalyticFromSwarm( void* fieldTest, Element_LocalIndex lElement_I, double* elErrorSq, double* elNormSq ) {
 	FieldTest* 		self 		= (FieldTest*) fieldTest;
 
-
+	
 }
 
 void FieldTest_ElementErrorReferenceFromSwarm( void* fieldTest, Element_LocalIndex lElement_I, double* elErrorSq, double* elNormSq ) {
@@ -789,7 +783,5 @@ void FieldTest_ElementErrorReferenceFromSwarm( void* fieldTest, Element_LocalInd
 
 
 }
-
-
 
 
