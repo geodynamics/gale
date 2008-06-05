@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StiffnessMatrix.c 1142 2008-06-03 03:00:17Z LukeHodkinson $
+** $Id: StiffnessMatrix.c 1146 2008-06-05 04:09:39Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -2169,15 +2169,17 @@ void __StiffnessMatrix_NewAssemble( void* stiffnessMatrix, Bool removeBCs, void*
                         for( n_i = 0; n_i < nRowNodes; n_i++ ) {
                            nRowNodeDofs = rowDofs->dofCounts[rowNodes[n_i]];
                            for( dof_i = 0; dof_i < nRowNodeDofs; dof_i++ ) {
-                              colInd = 0;
-                              for( n_j = 0; n_j < nColNodes; n_j++ ) {
-                                 nColNodeDofs = colDofs->dofCounts[colNodes[n_j]];
-                                 for( dof_j = 0; dof_j < nColNodeDofs; dof_j++ ) {
-                                    if( FeVariable_IsBC( colVar, colNodes[n_j], dof_j ) ) {
-                                       bc = DofLayout_GetValueDouble( colDofs, colNodes[n_j], dof_j );
-                                       bcVals[rowInd] -= bc * elStiffMat[rowInd][colInd];
+                              if( !FeVariable_IsBC( rowVar, rowNodes[n_i], dof_i ) ) {
+                                 colInd = 0;
+                                 for( n_j = 0; n_j < nColNodes; n_j++ ) {
+                                    nColNodeDofs = colDofs->dofCounts[colNodes[n_j]];
+                                    for( dof_j = 0; dof_j < nColNodeDofs; dof_j++ ) {
+                                       if( FeVariable_IsBC( colVar, colNodes[n_j], dof_j ) ) {
+                                          bc = DofLayout_GetValueDouble( colDofs, colNodes[n_j], dof_j );
+                                          bcVals[rowInd] -= bc * elStiffMat[rowInd][colInd];
+                                       }
+                                       colInd++;
                                     }
-                                    colInd++;
                                  }
                               }
                               rowInd++;
@@ -2193,15 +2195,17 @@ void __StiffnessMatrix_NewAssemble( void* stiffnessMatrix, Bool removeBCs, void*
                         for( n_i = 0; n_i < nColNodes; n_i++ ) {
                            nColNodeDofs = colDofs->dofCounts[colNodes[n_i]];
                            for( dof_i = 0; dof_i < nColNodeDofs; dof_i++ ) {
-                              rowInd = 0;
-                              for( n_j = 0; n_j < nRowNodes; n_j++ ) {
-                                 nRowNodeDofs = rowDofs->dofCounts[rowNodes[n_j]];
-                                 for( dof_j = 0; dof_j < nRowNodeDofs; dof_j++ ) {
-                                    if( FeVariable_IsBC( rowVar, rowNodes[n_j], dof_j ) ) {
-                                       bc = DofLayout_GetValueDouble( rowDofs, rowNodes[n_j], dof_j );
-                                       bcVals[colInd] -= bc * elStiffMat[rowInd][colInd];
+                              if( !FeVariable_IsBC( colVar, colNodes[n_i], dof_i ) ) {
+                                 rowInd = 0;
+                                 for( n_j = 0; n_j < nRowNodes; n_j++ ) {
+                                    nRowNodeDofs = rowDofs->dofCounts[rowNodes[n_j]];
+                                    for( dof_j = 0; dof_j < nRowNodeDofs; dof_j++ ) {
+                                       if( FeVariable_IsBC( rowVar, rowNodes[n_j], dof_j ) ) {
+                                          bc = DofLayout_GetValueDouble( rowDofs, rowNodes[n_j], dof_j );
+                                          bcVals[colInd] -= bc * elStiffMat[rowInd][colInd];
+                                       }
+                                       rowInd++;
                                     }
-                                    rowInd++;
                                  }
                               }
                               colInd++;
