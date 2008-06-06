@@ -390,7 +390,6 @@ void FieldTest_LoadReferenceSolitionFromFile( void* fieldTest ) {
 	FieldTest* 		self 			= (FieldTest*) fieldTest;
 	FeVariable*		feVariable		= self->referenceFeVar;
 	FeMesh*			feMesh			= self->referenceFeVar->feMesh;
-	hid_t			inputFile;
 	char*			filename;
 	unsigned		nx = 0, ny = 0, nz = 0, total;
 	unsigned		lineNum = 0;
@@ -415,6 +414,7 @@ void FieldTest_LoadReferenceSolitionFromFile( void* fieldTest ) {
 	double 			a2, b2, c2;
 	double 			m0, m1, m2, m3, m4, m5, m6;
 #ifdef HAVE_HDF5
+	hid_t			inputFile;
 	hid_t 			dataSet, memSpace, dataSpace;
 	hsize_t 		start[2], count[2], hSize;
 #endif
@@ -605,7 +605,9 @@ void FieldTest_LoadReferenceSolitionFromFile( void* fieldTest ) {
 	if( nDims == 3 ) Memory_Free( posz );
 	Memory_Free( variables );
 
+#ifdef HAVE_HDF5
 	H5Fclose( inputFile );
+#endif
 }
 
 void FieldTest_GenerateErrorField( void* fieldTest, void* data ) {
