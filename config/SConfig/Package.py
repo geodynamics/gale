@@ -435,7 +435,8 @@ class Package(SConfig.Node):
         for syms in self.symbols:
 
             # Try to link the source and get the results.
-            result = self.link_source(self.get_check_symbols_source(inst, syms[0]))
+            exe_src, lib_src = self.get_check_symbols_source(inst, syms[0])
+            result = self.library_source(lib_src)
             if result[0]:
 
                 # In addition to the results indicating success, we need to check
@@ -666,18 +667,43 @@ int main(int argc, char* argv[]) {
         return src
 
     def get_check_symbols_source(self, inst, symbols):
-        src = self.get_header_source(inst)
+        """Build the source code required to check that a set of symbols is
+        present in a package installation. We produce two sets of source code:
+        the first is the code to build a library with a 'main-like' function
+        call. The second is a 'runner' that calls the library's function. We
+        do this because we need to check that we can build a library out of
+        the symbols, which ensures any cross-dependencies are compatible."""
+
+        # Begin with header inclusions and symbol prototypes.
+        lib_src = self.get_header_source(inst)
         for sym, proto in zip(symbols, self.symbol_prototypes):
-            src += (proto % sym) + '\n'
-        src += 'int main(int argc, char* argv[]) {\n'
+            lib_src += (proto % sym) + '\n'
+
+        # Setup the main-like function call.
+        lib_src += 'int lib_main(int argc, char* argv[]) {\n'
+
+        # Setup any code required for the symbol check.
         if self.symbol_setup:
-            src += self.symbol_setup + '\n'
+            lib_src += self.symbol_setup + '\n'
+
+        # Unpack all the symbols.
         for sym, call in zip(symbols, self.symbol_calls):
-            src += (call % sym) + '\n'
+            lib_src += (call % sym) + '\n'
+
+        # Include any teardown code.
         if self.symbol_teardown:
-            src += self.symbol_teardown + '\n'
-        src += 'return 0;\n}\n'
-        return src
+            lib_src += self.symbol_teardown + '\n'
+        lib_src += 'return 0;\n}\n'
+
+        # Setupt the executable code.
+        exe_src = """int lib_main(int** argc, char** argv[]);
+int main(int argc, char* argv[]) {
+  return lib_main(argc, argv);
+}
+"""
+
+        # Return a tuple of executable code and library code.
+        return (exe_src, lib_src)
 
     def make_list(self, var):
         """Convert anything into a list. Handles things that are already lists,

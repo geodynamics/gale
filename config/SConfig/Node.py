@@ -200,6 +200,13 @@ class Node(object):
         result = self.run_scons_cmd(self.ctx.TryLink, source, '.c')
         return [result[0], result[1]]
 
+    def library_source(self, source):
+        """Build a library out of some source code."""
+
+        result = self.run_scons_cmd(self.ctx.TryBuild, self.env.SharedLibrary,
+                                    source, '.c')
+        return [result[0], result[1]]
+
     def run_source(self, source):
         """At this point we know all our construction environment has been set up,
         so we should be able to build and run the application."""
