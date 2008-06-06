@@ -5,6 +5,7 @@ from PETSc import PETSc
 from PETScExt import PETScExt
 from cmath import cmath
 from SVNRevision import SVNRevision
+from HGRevision import HGRevision
 from BlasLapack import BlasLapack
 from StGermain import StGermain
 from StgDomain import StgDomain
@@ -22,4 +23,5 @@ from libavcodec import libavcodec
 from HDF5 import HDF5
 from X11 import X11
 from pcu import pcu
-from szip import szip
+from cobj import cobj
+from ckit import ckit

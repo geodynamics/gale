@@ -5,9 +5,13 @@ class BlasLapack(SConfig.Package):
     def __init__(self, scons_env, scons_opts, required=False):
         SConfig.Package.__init__(self, scons_env, scons_opts, required)
         self.cmath = self.dependency(SConfig.packages.cmath)
-        self.libraries = [['blas', 'lapack'],
-                          ['cblas', 'clapack'],
-                          ['mkl', 'mkl_lapack']]
+        self.libraries = [['lapack', 'blas'],
+                          ['flapack', 'fblas'],
+                          ['flapack', 'fblas', 'gfortran'],
+                          ['clapack', 'cblas'],
+                          ['mkl_lapack', 'mkl']]
+        self.shared_libraries = ['lapack', 'blas']
+        self.extra_libraries = ['gfortran']
         self.frameworks = [['Accelerate']]
         self.symbols = [(['dgeev'], 'FORTRAN_NORMAL'),
                         (['dgeev_'], 'FORTRAN_SINGLE_TRAILINGBAR'),
@@ -52,7 +56,7 @@ free(rightEigenVec);
 
     # Thanks to there not being a C version of Blas/Lapack on edda, we need
     # to be able to search for that installation specifically.
-    def generate_locations(self):
+    def process_installations(self, inst):
         lib_dir = ['/usr/local/IBM_compilers/xlf/9.1/lib64',
                    '/opt/ibmcmp/lib64']
         use_dir = True
@@ -60,18 +64,16 @@ free(rightEigenVec);
             if not os.path.exists(d):
                 use_dir = False
                 break
-        for loc in SConfig.Package.generate_locations(self):
-            yield loc
-            if use_dir:
-                yield [loc[0], loc[1], loc[2] + lib_dir, loc[3]]
+        if use_dir:
+            inst.add_lib_dirs(lib_dir)
 
-    def generate_libraries(self, location):
+    def generate_libraries(self, inst):
         lib_dir = '/usr/local/IBM_compilers/xlf/9.1/lib64'
-        if lib_dir in location[2]:
-            old_libs = list(self.extra_libraries)
-            self.extra_libraries = ['xlf90', 'xlfmath', 'xl']
+        if lib_dir in inst.lib_dirs:
+            old_libs = list(inst.extra_libs)
+            inst.extra_libs += ['xlf90', 'xlfmath', 'xl']
             yield ['blas', 'lapack', 'xlf90', 'xlfmath', 'xl']
-            self.extra_libraries = old_libs
+            inst.extra_libs = old_libs
         else:
-            for libs in SConfig.Package.generate_libraries(self, location):
+            for libs in SConfig.Package.generate_libraries(self, inst):
                 yield libs

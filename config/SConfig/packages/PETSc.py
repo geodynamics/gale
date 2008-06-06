@@ -4,7 +4,8 @@ import SConfig
 class PETSc(SConfig.Package):
     def __init__(self, scons_env, scons_opts, required=False, **kw):
         SConfig.Package.__init__(self, scons_env, scons_opts, required, **kw)
-        self.dependency(SConfig.packages.MPI)
+        self.mpi = self.dependency(SConfig.packages.MPI)
+        self.blas_lapack = self.dependency(SConfig.packages.BlasLapack)
         self.base_patterns = ['petsc*', 'PETSC*', 'PETSc*']
         self.header_sub_dir = ['petsc']
         self.headers = [['petsc.h',
@@ -13,53 +14,40 @@ class PETSc(SConfig.Package):
         self.libraries = [['petscsnes', 'petscksp',
                            'petscmat', 'petscvec',
                            'petscdm', 'petsc',]]
-        self.require_shared = True
         self.symbols = [(['PetscInitialize', 'PetscFinalize'], '')]
         self.symbol_calls = ['%s(&argc, &argv, NULL, NULL);', '%s();']
 
-        # Will be set after configuration.
-        self.arch = ''
+    def process_installation(self, inst):
+        # Read the PETSc architecture.
+        inst.arch = self.get_arch(inst.base_dir)
+        if not inst.arch:
+            return False
 
-    def generate_locations(self):
-        for loc in SConfig.Package.generate_locations(self):
-            if not loc[0]:
-                yield loc
-                continue
+        # Add the bmake/arch include directory.
+        hdr_dir = os.path.join('bmake', inst.arch)
+        if not os.path.exists(os.path.join(inst.base_dir, hdr_dir)):
+            return False # Can't continue without bmake include directory.
+        inst.add_hdr_dirs(hdr_dir)
 
-            arch = self.get_arch(loc[0])
-            if not arch:
-                yield loc
-                continue
-            self.arch = arch
+        # Add the lib/arch library directory.
+        lib_dir = os.path.join('lib', inst.arch)
+        if not os.path.exists(os.path.join(inst.base_dir, lib_dir)):
+            return False # Must have correct library path.
+        inst.add_lib_dirs(lib_dir)
 
-            # Add the bmake/arch include directory.
-            hdr_dir = os.path.join('bmake', arch)
-            if not os.path.exists(os.path.join(loc[0], hdr_dir)):
-                continue
-            if hdr_dir not in loc[1]:
-                loc[1] += [hdr_dir]
+        # Parse extra libraries.
+        extra_lib_dirs, extra_libs = self.get_extra_libraries(inst)
+        inst.add_lib_dirs(extra_lib_dirs)
+        inst.add_extra_libs(extra_libs)
 
-            # Add the lib/arch library directory.
-            if 'lib' in loc[2]:
-                loc[2].remove('lib')
-            lib_dir = os.path.join('lib', arch)
-            if not os.path.exists(os.path.join(loc[0], lib_dir)):
-                continue
-            if lib_dir not in loc[2]:
-                loc[2] += [lib_dir]
+        # There seems to be some extra library paths we'll need that get stored
+        # in SL_LINKER_LIBS.
+#        extra_lib_dirs, extra_libs = self.get_sl_linker_libs(inst)
+#        inst.add_lib_dirs(extra_lib_dirs)
+#        inst.add_libs(extra_libs)
 
-            # Parse extra libraries.
-            extra_lib_dirs, extra_libs = self.get_extra_libraries(loc[0])
-            if extra_lib_dirs: loc[2] += extra_lib_dirs
-            if extra_libs: self.extra_libraries += extra_libs
-
-            # There seems to be some extra library paths we'll need that get stored
-            # in SL_LINKER_LIBS.
-            extra_lib_dirs, extra_libs = self.get_sl_linker_libs(loc[0])
-            if extra_lib_dirs: loc[2] += extra_lib_dirs
-            if extra_libs: self.extra_libraries += extra_libs
-
-            yield loc
+        # Everything's okay.
+        return True
 
     def get_arch(self, base_dir):
         petscconf = os.path.join(base_dir, 'bmake',
@@ -71,30 +59,79 @@ class PETSc(SConfig.Package):
         f.close()
         return arch
 
-    def get_extra_libraries(self, base_dir):
-        petscconf = os.path.join(base_dir, 'bmake', self.arch, 'petscconf')
-        if not os.path.exists(petscconf): return ([], [])
+    def get_extra_libraries(self, inst):
+        """Read 'petscconf' and extract any additional dependencies/extra
+        libraries we may need."""
+
+        # Make sure the file exists before trying anything.
+        petscconf = os.path.join(inst.base_dir, 'bmake', inst.arch, 'petscconf')
+        if not os.path.exists(petscconf):
+            return
+
+        # Read all the lines, which are of the form 'something = something else'.
         f = file(petscconf, 'r')
         line_dict = {}
         for line in f.readlines():
             sides = line.split('=')
             line_dict[sides[0].strip()] = sides[1].strip()
         f.close()
-        if 'PACKAGES_LIBS' not in line_dict: return ([], [])
-        lib_string = line_dict['PACKAGES_LIBS']
-        lib_string = self.subst(lib_string, line_dict)
 
-        extra_lib_dirs = []
-        extra_libs = []
-        for string in lib_string.split(' '):
-            if string[:len(self.env['LIBLINKPREFIX'])] == self.env['LIBLINKPREFIX']:
-                extra_libs += [string[len(self.env['LIBLINKPREFIX']):]]
-            elif string[:len(self.env['LIBDIRPREFIX'])] == self.env['LIBDIRPREFIX']:
-                extra_lib_dirs += [string[len(self.env['LIBDIRPREFIX']):]]
+        # Try and locate any possible dependent installations
+        # PETSc knows about.
+        name_map = {'MPI': self.mpi,
+                    'BLASLAPACK': self.blas_lapack}
+        for name_base, pkg in name_map.iteritems():
+            name = name_base + '_INCLUDE'
+            if name not in line_dict: continue
+            string = self.subst(line_dict[name], line_dict).strip()
+            for sub in string.split(' '):
+                if sub[:len(self.env['INCPREFIX'])] == self.env['INCPREFIX']:
+                    base_dir = os.path.normpath(sub[len(self.env['INCPREFIX']):])
+
+                    # Try the base directory on it's own; sometimes
+                    # the libraries will be placed there.
+                    pkg.add_candidate(SConfig.Installation(pkg, base_dir))
+
+                    # Try combining with sub-directories.
+                    base_dir = os.path.dirname(base_dir)
+                    for inst in pkg.combine_base_dir(base_dir):
+                        if pkg.process_installation(inst):
+                            pkg.add_candidate(inst)
+            name = name_base + '_LIB'
+            if name not in line_dict: continue
+            string = self.subst(line_dict[name], line_dict).strip()
+            for sub in string.split(' '):
+                if sub[:len(self.env['LIBDIRPREFIX'])] == self.env['LIBDIRPREFIX']:
+                    base_dir = os.path.normpath(sub[len(self.env['LIBDIRPREFIX']):])
+
+                    # Try the base directory on it's own; sometimes
+                    # the libraries will be placed there.
+                    pkg.add_candidate(SConfig.Installation(pkg, base_dir, [], ['']))
+
+                    # Try combining with sub-directories.
+                    base_dir = os.path.dirname(base_dir)
+                    for inst in pkg.combine_base_dir(base_dir):
+                        if pkg.process_installation(inst):
+                            pkg.add_candidate(inst)
+
+        # Hunt down all the libraries and library paths we may need.
+        names = ['PACKAGES_LIBS', 'SL_LINKER_LIBS']
+        for name in names:
+            if name not in line_dict: continue
+            lib_string = line_dict['PACKAGES_LIBS']
+            lib_string = self.subst(lib_string, line_dict)
+
+            extra_lib_dirs = []
+            extra_libs = []
+            for string in lib_string.split(' '):
+                if string[:len(self.env['LIBLINKPREFIX'])] == self.env['LIBLINKPREFIX']:
+                    extra_libs += [string[len(self.env['LIBLINKPREFIX']):]]
+                elif string[:len(self.env['LIBDIRPREFIX'])] == self.env['LIBDIRPREFIX']:
+                    extra_lib_dirs += [string[len(self.env['LIBDIRPREFIX']):]]
         return (extra_lib_dirs, extra_libs)
 
-    def get_sl_linker_libs(self, base_dir):
-        petscconf = os.path.join(base_dir, 'bmake', self.arch, 'petscconf')
+    def get_sl_linker_libs(self, inst):
+        petscconf = os.path.join(inst.base_dir, 'bmake', inst.arch, 'petscconf')
         if not os.path.exists(petscconf): return ([], [])
         f = file(petscconf, 'r')
         line_dict = {}

@@ -1,4 +1,5 @@
 import os
+import SConfig
 
 class Node(object):
     def __init__(self, scons_env, scons_opts, required=False):
@@ -9,6 +10,9 @@ class Node(object):
         self.command_name = self.name.lower()
         self.environ_name = self.name.upper()
         self.option_map = {} # Maps command-line options to their environment alternatives.
+        self.options_processed = False
+        self.options_result = '' # String to store the results of options processing for later
+                                 # display.
 
         # Override with a list of methods to run during configuration.
         self.checks = []
@@ -29,12 +33,14 @@ class Node(object):
 
     def setup_options(self):
         """Setup all the options for this package."""
+
         pass
 
     def dependency(self, package_module, required=True, **kw):
         """Add another package as a dependency of this package. If required is False, the
         dependent package is not required, and thus will not cause this package to fail if
         it cannot be found."""
+
         if self.configured:
             print 'Error: Cannot add a dependency during configuration.'
             self.env.Exit()
@@ -46,10 +52,15 @@ class Node(object):
     def setup(self):
         """Anything that needs to be finalised before continuing with the configuration needs
         to go here."""
-        pass
+
+        # Process options which will print out what options were found.
+        if not self.options_processed:
+            self.options_processed = True
+            self.process_options()
 
     def configure(self, scons_ctx):
         """Perform the configuration of this package."""
+
         # Will need to color some stuff here.
         import TerminalController
         term = TerminalController.TerminalController()
@@ -59,20 +70,22 @@ class Node(object):
             return
         self.ctx = scons_ctx
         self.configured = True
-        old_state = self.process_dependencies()
+        self.process_dependencies()
 
         # Print opening message.
         self.ctx.Message('Configuring package %s ... ' % self.name)
         self.ctx.Display('\n')
 
-        # Now process options which will print out what options were found.
-        self.process_options()
+        # Display the result of options processing.
+        self.ctx.Log(self.options_result)
+        print term.render('${GREEN}%s${NORMAL}\r' % self.options_result),
 
-        # Setup basic stuff.
+        # Check we have all dependencies.
         result = True
-        for pkg, req in self.deps: # Check we have all dependencies.
+        for pkg, req in self.deps:
             if req and not pkg.result:
-                self.ctx.Display(term.render('  ${RED}Missing dependency: ' + pkg.name + '${NORMAL}\n'))
+                self.ctx.Log('  Missing dependency: %s\n' % pkg.name)
+                print term.render('  ${RED}Missing dependency: %s${NORMAL}\n' % pkg.name),
                 result = False
 
         # Perform as many checks as we can without failing.
@@ -87,13 +100,13 @@ class Node(object):
             self.display_configuration()
 
         # Handle results.
-        self.restore_state(self.env, old_state)
         self.result = result
         self.ctx.Display('  ')
         if not self.result:
-            self.ctx.Display(term.render('${RED}'))
+            print term.render('${RED}'),
         self.ctx.Result(result)
-        self.ctx.Display(term.render('${NORMAL}'))
+        if not self.result:
+            print term.render('${NORMAL}\r'),
 
         # If this was a critical fail, try and help the user.
         if self.required and not result:
@@ -111,6 +124,7 @@ class Node(object):
     def enable(self, scons_env, old_state=None):
         """Modify the SCons environment to have this package enabled. Begin by inserting
         all options on this node into the environment."""
+
         for pkg, req in self.deps: # Enable dependencies first.
             if pkg.result:
                 pkg.enable(scons_env, old_state)
@@ -137,18 +151,15 @@ class Node(object):
     def process_options(self):
         """Do any initial option processing, including importing any values from
         the environment and validating that all options are consistent."""
-        # For coloring.
-        import TerminalController
-        term = TerminalController.TerminalController()
 
         # Search command line options.
         cmd_opts = False
         for opt in self.option_map.iterkeys():
             if opt in self.opts.args:
                 if not cmd_opts:
-                    self.ctx.Display(term.render('  ${GREEN}Found command line options:${NORMAL}\n'))
+                    self.options_result += '  Found command line options:\n'
                     cmd_opts = True
-                self.ctx.Display(term.render('    ${GREEN}%s = %s${NORMAL}\n' % (opt, self.opts.args[opt])))
+                self.options_result += '    %s = %s\n' % (opt, self.opts.args[opt])
                 break
 
         # We don't want to mix command line and evironment options.
@@ -160,35 +171,39 @@ class Node(object):
         for cmd, env in self.option_map.iteritems():
             if cmd not in self.opts.args and env in self.env['ENV']:
                 if not env_opts:
-                    self.ctx.Display(term.render('  ${GREEN}Found environment options:${NORMAL}\n'))
+                    self.options_result += '  Found environment options:\n'
                     env_opts = True
                 self.env[cmd] = self.env['ENV'][env]
-                self.ctx.Display(term.render('    ${GREEN}%s = %s${NORMAL}\n' % (env, self.env[cmd])))
+                self.options_result += '    %s = %s\n' % (env, self.env[cmd])
 
     def process_dependencies(self):
         """Ensure all dependencies have been configured before this package."""
-        old_state = {}
+
+#        old_state = {}
         for pkg, req in self.deps:
             pkg.configure(self.ctx)
-            if pkg.result:
-                pkg.enable(self.env, old_state)
-        return old_state
+#            if pkg.result:
+#                pkg.enable(self.env, old_state)
+#        return old_state
 
     def compile_source(self, source):
         """At this point we know all our construction environment has been set up,
         so we should be able to compile some source code."""
+
         result = self.run_scons_cmd(self.ctx.TryCompile, source, '.c')
         return [result[0], result[1]]
 
     def link_source(self, source):
         """At this point we know all our construction environment has been set up,
         so we should be able to build and run the application."""
+
         result = self.run_scons_cmd(self.ctx.TryLink, source, '.c')
         return [result[0], result[1]]
 
     def run_source(self, source):
         """At this point we know all our construction environment has been set up,
         so we should be able to build and run the application."""
+
         result = self.run_scons_cmd(self.ctx.TryRun, source, '.c')
         return [result[0][0], result[0][1], result[1]]
 

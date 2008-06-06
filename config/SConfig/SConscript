@@ -64,6 +64,15 @@ def configure_packages(env):
     sconf.CheckPackages(env.package_list)
     sconf.Finish()
 
+    # Print package results.
+    print '\n*****************************************'
+    print "*               Results                 *"
+    print '*****************************************\n'
+    for pkg in env.package_list:
+        if isinstance(pkg, SConfig.Package):
+            if pkg.selected:
+                print str(pkg.selected),
+
     # Print out build message.
     print '\n*****************************************'
     print "* Now run 'scons' to build the project. *"
@@ -111,10 +120,44 @@ def load_config(env, filename='config.cfg'):
     if 'build_dir' in env._dict:
         env.Default(env['build_dir'])
 
+def write_pkgconfig(env, filename, name, desc='', version=0):
+    """Write out a pkgconfig file."""
+
+    # Make sure the directory structure exists.
+    filename = File(filename).abspath
+    dirs = os.path.dirname(filename)
+    if not os.path.exists(dirs):
+        os.makedirs(dirs)
+
+    # Write the pkgconfig file.
+    f = open(filename, 'w')
+    build_path = env.get('build_dir', '')
+    if build_path:
+        f.write('prefix=%s\n' % build_path)
+        f.write('exec_prefix=%s\n' % os.path.join(build_path, 'bin'))
+        f.write('libdir=%s\n' % os.path.join(build_path, 'lib'))
+        f.write('includedir=%s\n' % os.path.join(build_path, 'include'))
+        f.write('\n')
+    f.write('Name: %s\n' % name)
+    f.write('Description: %s\n' % desc)
+    f.write('Version: %s\n' % version)
+    f.write('Requires:\n')
+
+    # Unfortunately SCons leaves hashes in paths after calling the
+    # subst command, so we'll need to expand these manually.
+    old_state = {'LIBPATH': env['LIBPATH'], 'CPPPATH': env['CPPPATH']}
+    env['LIBPATH'] = [Dir(p).abspath for p in env['LIBPATH']]
+    env['CPPPATH'] = [Dir(p).abspath for p in env['CPPPATH']]
+    f.write(env.subst('Libs: ${_LIBDIRFLAGS} ${_LIBFLAGS}') + '\n')
+    f.write(env.subst('Cflags: ${_CPPINCFLAGS}') + '\n')
+    env.Replace(**old_state)
+    f.close()
+
 SConsEnvironment.Package = Package
 SConsEnvironment.configure_packages = configure_packages
 SConsEnvironment.save_config = save_config
 SConsEnvironment.load_config = load_config
+SConsEnvironment.write_pkgconfig = write_pkgconfig
 
 #
 # Useful utilities.
