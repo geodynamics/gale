@@ -431,7 +431,11 @@ void FieldTest_LoadReferenceSolitionFromFile( void* fieldTest ) {
 	sprintf( filename, "%s%s.h5", self->referenceSolnPath, self->referenceSolnFileName );
 #ifdef HAVE_HDF5
 	inputFile = H5Fopen( filename, H5F_ACC_RDONLY, H5P_DEFAULT );
+#if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+	dataSet = H5Dopen( inputFile, "/size" );
+#else
 	dataSet = H5Dopen( inputFile, "/size", H5P_DEFAULT );
+#endif
 	H5Dread( dataSet, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, sizes );
 	nx = sizes[0];
 	ny = sizes[1];
@@ -451,7 +455,11 @@ void FieldTest_LoadReferenceSolitionFromFile( void* fieldTest ) {
 	hSize = nDims + dofAtEachNodeCount;
 	memSpace = H5Screate_simple( 1, &hSize, NULL );
 	H5Sselect_all( memSpace );
+#if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+	dataSet = H5Dopen( inputFile, "/data" );
+#else
 	dataSet = H5Dopen( inputFile, "/data", H5P_DEFAULT );
+#endif
 	dataSpace = H5Dget_space( dataSet );
 	start[0] = 0;
 	start[1] = 0;
