@@ -14,8 +14,11 @@ class PETSc(SConfig.Package):
         self.libraries = [['petscsnes', 'petscksp',
                            'petscmat', 'petscvec',
                            'petscdm', 'petsc',]]
-        self.symbols = [(['PetscInitialize', 'PetscFinalize'], '')]
-        self.symbol_calls = ['%s(&argc, &argv, NULL, NULL);', '%s();']
+        self.symbols = [(['PetscInitialize', 'MPI_Comm_dup', 'PetscFinalize'], '')]
+        self.symbol_setup = 'MPI_Comm comm_world;\n'
+        self.symbol_calls = ['%s(&argc, &argv, NULL, NULL);',
+                             '%s(PETSC_COMM_WORLD, &comm_world);',
+                             '%s();']
 
     def process_installation(self, inst):
         # Read the PETSc architecture.
