@@ -315,16 +315,19 @@ class Package(SConfig.Node):
         result = [False, '']
         hdr_list = self.make_list(self.headers)
         for inst.hdrs in hdr_list: # Check each selection of headers.
-            # See if we can locate the files themselves.
-            found = False
-            for hdr in inst.hdrs:
-                for hdr_dir in inst.hdr_dirs:
-                    path = os.path.join(inst.base_dir, hdr_dir, hdr)
-                    if os.path.exists(path):
-                        found = True
-                        break
-                if not found: break
-            if not found: continue
+
+            # If we don't have any frameworks for this search, see if
+            # we can locate the files themselves.
+            if not inst.fworks:
+                found = False
+                for hdr in inst.hdrs:
+                    for hdr_dir in inst.hdr_dirs:
+                        path = os.path.join(inst.base_dir, hdr_dir, hdr)
+                        if os.path.exists(path):
+                            found = True
+                            break
+                    if not found: break
+                if not found: continue
 
             # Try to compile the source.
             src = self.get_header_source(inst)
