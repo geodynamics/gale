@@ -13,13 +13,10 @@
 <param name="Parent">WeightsCalculator</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">...</param>
+<param name="Description">Calculates PIC integration weights based on cell volumes</param>
 
 <!--Now the interesting stuff-->
-
-
 <list name="Params">
-
 </list>
 
 <list name="Dependencies">
@@ -27,20 +24,18 @@
 		<param name="Essential">True</param>
 		<param name="Name">Shape</param>
 		<param name="Type">Stg_Shape</param>
-		<param name="Description">...</param>
+		<param name="Description">The overall shape</param>
 	</struct>
 
 	<struct>
 		<param name="Essential">True</param>
 		<param name="Name">Mesh</param>
 		<param name="Type">FeMesh</param>
-		<param name="Description">...</param>
+		<param name="Description">The mesh - assumed to be regular</param>
 	</struct>
-<!-- PLEASE, check the above struct information is accurate, in line number 121 of the c file and then remove this comment afterwards -->
-
-
 </list>
+
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">PICellerator/Apps/src/MaterialPointSwarm-test1.xml</param>
 
 </StGermainData>

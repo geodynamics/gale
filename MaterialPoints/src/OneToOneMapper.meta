@@ -16,8 +16,6 @@
 <param name="Description">An abstract mapper which will yield one-to-one mapping of integration points to material points.</param>
 
 <!--Now the interesting stuff-->
-
-
 <list name="Params">
 </list>
 
@@ -26,11 +24,11 @@
 		<param name="Essential">True</param>
 		<param name="Name">MaterialPointsSwarm</param>
 		<param name="Type">MaterialPointsSwarm</param>
-		<param name="Description">The material swarm to map to</param>
+		<param name="Description">The list of material points to be mapped.</param>
 	</struct>
-
 </list>
+
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">n/a</param>
 
 </StGermainData>

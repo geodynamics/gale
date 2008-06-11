@@ -19,21 +19,13 @@ this mapper allow you to map IntegrationPoints to a signle MaterialPoint. The Ma
 BackgroundParticleLayout.</param>
 
 <!--Now the interesting stuff-->
-
-
 <list name="Params">
-
 </list>
 
 <list name="Dependencies">
-        <struct>
-                <param name="Essential">True</param>
-		<param name="Name">MaterialPointsSwarm</param>
-		<param name="Type">MaterialPointsSwarm</param>
-		<param name="Description">The material points to be mapped.</param>
-	</struct>
 </list>
+
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">Underworld/GaussSwarm.xml</param>
 
 </StGermainData>

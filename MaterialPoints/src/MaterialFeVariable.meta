@@ -13,13 +13,10 @@
 <param name="Parent">ParticleFeVariable</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">...</param>
+<param name="Description">Extends on ParticleFeVariable by adding material properties (and an IntegrationPointsSwarm) </param>
 
 <!--Now the interesting stuff-->
-
-
 <list name="Params">
-
 </list>
 
 <list name="Dependencies">
@@ -27,14 +24,11 @@
 		<param name="Essential">True</param>
 		<param name="Name">Material</param>
 		<param name="Type">Material</param>
-		<param name="Description">...</param>
+		<param name="Description">The material properties to be applied </param>
 	</struct>
-
-<!-- PLEASE, check the above struct information is accurate, in line number 175 of the c file and then remove this comment afterwards -->
-
-
 </list>
+
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">./Underworld/InputFiles/ExtensionFMM3D.xml</param>
 
 </StGermainData>

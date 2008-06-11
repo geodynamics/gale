@@ -16,10 +16,7 @@
 <param name="Description">Maps many MaterialPointsSwarms to one IntegrationPointsSwarm</param>
 
 <!--Now the interesting stuff-->
-
-
 <list name="Params">
-
 </list>
 
 <list name="Dependencies">
@@ -30,7 +27,8 @@
 		<param name="Description">The list of material points to be mapped.</param>
 	</struct>
 </list>
+
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">n/a</param>
 
 </StGermainData>

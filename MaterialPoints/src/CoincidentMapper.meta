@@ -14,22 +14,15 @@
 <param name="Reference">...</param>
 <param name="Summary">...</param>
 <param name="Description">A one-to-one mapper that maps integration points to material points at the same coordinates. A simple global to local operation is performed. The weight of the integration point is dependant on the WeightCalculator of the IntegrationPointsSwarm.</param> 
+
 <!--Now the interesting stuff-->
-
-
 <list name="Params">
-
 </list>
 
 <list name="Dependencies">
-	<struct>
-		<param name="Essential">True</param>
-		<param name="Name">MaterialPointsSwarm</param>
-		<param name="Type">MaterialPointsSwarm</param>
-		<param name="Description">The material points to be mapped.</param>
-	</struct>
 </list>
+
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">Underworld/InputFiles/timingExamples/ExtensionNoVisuals_100x100x50.xml</param>
 
 </StGermainData>
