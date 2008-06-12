@@ -34,7 +34,7 @@ if env['shared_libraries']:
                             'Underworld/libUnderworld/Toolbox')
     env.SharedLibrary(env.get_target_name('lib/Underworld_Toolboxmodule'), objs,
                       SHLIBPREFIX='',
-                      LIBPREFIXES=[env['LIBPREFIXES']] + [''],
+                      LIBPREFIXES=env.make_list(env['LIBPREFIXES']) + [''],
                       LIBS=['Underworld'] + env.get('LIBS', []))
 
 # Build plugins.
@@ -49,7 +49,7 @@ if env['shared_libraries']:
         name = 'Underworld_' + base.split('/')[-1] + 'module'
         env.SharedLibrary(env.get_build_path('lib/' + name), objs,
                           SHLIBPREFIX='',
-                          LIBPREFIXES=[env['LIBPREFIXES']] + [''],
+                          LIBPREFIXES=env.make_list(env['LIBPREFIXES']) + [''],
                           LIBS=['Underworld'] + env.get('LIBS', []))
 
 # Build unit test runner.
