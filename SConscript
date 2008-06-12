@@ -37,7 +37,7 @@ if env['shared_libraries']:
         name = base.split('/')[-1] + 'module'
         env.SharedLibrary(env.get_build_path('lib/' + name), objs,
                           SHLIBPREFIX='',
-                          LIBPREFIXES=[env['LIBPREFIXES']] + [''],
+                          LIBPREFIXES=env.make_list(env['LIBPREFIXES']) + [''],
                           LIBS=['glucifer'] + env.get('LIBS', []))
 
 # Build unit test runner.
