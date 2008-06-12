@@ -61,23 +61,30 @@
 		__Stg_Component \
 		/* Virtual info */ \
 		/* FieldTest info */ \
-		FeVariable*				numericFeVar;		\
+		FeVariable**				numericFieldList;	\
+		FeVariable**				referenceFieldList;	\
+		FeVariable**				errorFieldList;		\
+		unsigned				fieldCount;		\
 		Swarm*					numericSwarm;		\
-		FeVariable*				referenceFeVar;		\
-		FeVariable*				errorFeVar;		\
-		Name					swarmVariableName;	\
+		Name*					swarmVarNameList;	\
+		unsigned				swarmVarCount;		\
 		FeMesh*					constantMesh;		\
 		FeMesh*					referenceMesh;		\
 		Bool					normalise;		\
-		double					globalAnalyticSq;	\
-		double					globalErrorSq;		\
-		double					globalError;		\
-		double					globalErrorNorm;	\
-		Name					referenceSolnFileName;	\
+		double**				gAnalyticSq;		\
+		double**				gErrorSq;		\
+		double**				gError;			\
+		double**				gErrorNorm;		\
+		Name*					referenceSolnFileList;	\
 		Name					referenceSolnPath;	\
 		Swarm*                 			integrationSwarm;       \
 		DomainContext*				context;		\
-		FieldTest_AnalyticSolutionFunc* 	_analyticSolution; 	\
+		Bool					referenceSolnFromFile;	\
+		/* must fill this array in the analytic solution plugin so */	\
+		/* that the correct analytic solution func is applied for the*/ \
+		/* correct feVariable */			 		\
+		Index*					analyticSolnForFeVarKey;\
+		FieldTest_AnalyticSolutionFunc**	_analyticSolutionList;	\
 		
 
 	/** Brings together and manages the life-cycle of a a mesh and all the 
@@ -140,17 +147,18 @@
 	void _FieldTest_Destroy( void* fieldTest, void* data );
 
 	/* --- Public Functions --- */
-	void FieldTest_BuildReferenceField( void* fieldTest, void* data );
+	void FieldTest_BuildReferenceField( FeMesh* feMesh, FeVariable* numericField, DomainContext* context, FeVariable** referenceField );
+	void FieldTest_BuildErrorField( FeMesh* feMesh, FeVariable* numericField, DomainContext* context, FeVariable** errorField );
 
-	void FieldTest_BuildErrorField( void* fieldTest, void* data );
+	void FieldTest_LoadReferenceSolutionFromFile( FeVariable* referenceField, Name referenceSolnName, Name referenceSolnPath, DomainContext* context );
 
-	void FieldTest_LoadReferenceSolutionFromFile( void* fieldTest );
+	void FieldTest_GenerateErrorFields( void* fieldTest, void* data );
 
-	void FieldTest_GenerateErrorField( void* fieldTest, void* data );
+	void FieldTest_ElementErrorAnalyticFromField( void* fieldTest, Index field_I, Index lElement_I, double* elErrorSq, double* elNormSq );
+	void FieldTest_ElementErrorReferenceFromField( void* fieldTest, Index field_I, Index lElement_I, double* elErrorSq, double* elNormSq );
+	void FieldTest_ElementErrorAnalyticFromSwarm( void* fieldTest, Index field_I, Index lElement_I, double* elErrorSq, double* elNormSq );
+	void FieldTest_ElementErrorReferenceFromSwarm( void* fieldTest, Index field_I, Index lElement_I, double* elErrorSq, double* elNormSq );
 
-	void FieldTest_ElementErrorAnalyticFromField( void* fieldTest, Element_LocalIndex lElement_I, double* elErrorSq, double* elNormSq );
-	void FieldTest_ElementErrorReferenceFromField( void* fieldTest, Element_LocalIndex lElement_I, double* elErrorSq, double* elNormSq );
-	void FieldTest_ElementErrorAnalyticFromSwarm( void* fieldTest, Element_LocalIndex lElement_I, double* elErrorSq, double* elNormSq );
-	void FieldTest_ElementErrorReferenceFromSwarm( void* fieldTest, Element_LocalIndex lElement_I, double* elErrorSq, double* elNormSq );
+	void FieldTest_AddAnalyticSolutionFuncToListAtIndex( void* fieldTest, Index func_I, FieldTest_AnalyticSolutionFunc* func, Index field_I );
 
 #endif /* __StgFEM_Discretisation_FieldTest_h__ */
