@@ -8,7 +8,7 @@
 	<!-- Analytic Solution parameters -->
 	<param name="Ra"> 10 </param>
 	<param name="V0"> 0.0337737  </param>
-	<param name="ViscosityType"> Exponential  </param>
+	<param name="ViscosityType"> Exponential2  </param>
 
 	<param name="VelocityField-Tolerance"> 1.0e-04 </param>
 	<param name="PressureField-Tolerance"> 5.0e-04 </param>
@@ -25,8 +25,8 @@
 		</struct>
 		<struct name="ExpViscosity">
 			<param name="Type">DepthDependentViscosity</param>
-			<param name="eta0">1.0</param>
-			<param name="gamma">-1.0</param>
+			<param name="eta0">1e6.0</param>
+			<param name="gamma">13.81551055796427</param>
 			<param name="variationAxis">Y</param>
 			<param name="referencePoint">1.0</param>
 			<param name="Mesh">linearMesh</param>

@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: DepthDependentAnalytic3D.c 737 2008-05-23 06:08:42Z RobertTurnbull $
+** $Id: DepthDependentAnalytic3D.c 739 2008-06-12 06:05:14Z RobertTurnbull $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -62,6 +62,7 @@ typedef struct {
 	AnalyticSolution_SolutionFunction* viscosity2ndDerivativeFunc;
 	FeVariable*                        velocityField;
 	FeVariable*                        pressureField;
+	FeVariable*                        temperatureField;
 	double                             Ra;
 	double                             V0;
 } DepthDependentAnalytic3D;
@@ -98,6 +99,25 @@ void DepthDependentAnalytic3D_Viscosity2ndDerivativeFunc_Exponential( void* anal
 	double y = coord[ J_AXIS ];
 	*d2_eta_dy2 = exp( 1.0 - y );
 }
+void DepthDependentAnalytic3D_ViscosityFunc_Exponential2( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* eta ) {
+	double y = coord[ J_AXIS ];
+	double viscosityContrast = 1e6;
+	double gamma = log(viscosityContrast);
+	*eta = viscosityContrast * exp( - gamma *( 1.0 - y ) );
+}
+void DepthDependentAnalytic3D_ViscosityDerivativeFunc_Exponential2( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* d_eta_dy ) {
+	double y = coord[ J_AXIS ];
+	double viscosityContrast = 1e6;
+	double gamma = log(viscosityContrast);
+	*d_eta_dy = viscosityContrast * gamma * exp( - gamma *( 1.0 - y ) );
+}
+void DepthDependentAnalytic3D_Viscosity2ndDerivativeFunc_Exponential2( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* d2_eta_dy2 ) {
+	double y = coord[ J_AXIS ];
+	double viscosityContrast = 1e6;
+	double gamma = log(viscosityContrast);
+	*d2_eta_dy2 = viscosityContrast * gamma * gamma * exp( - gamma *( 1.0 - y ) );
+}
+
 
 void _DepthDependentAnalytic3D_TemperatureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* temperature ) {
 	DepthDependentAnalytic3D* self            = (DepthDependentAnalytic3D*)analyticSolution;
@@ -124,8 +144,6 @@ void _DepthDependentAnalytic3D_TemperatureFunction( void* analyticSolution, FeVa
 
 	*temperature = 1 - y + perturbation;
 }
-
-
 
 void DepthDependentAnalytic3D_TemperatureIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
 	DomainContext*         context            = (DomainContext*)_context;
@@ -210,7 +228,7 @@ void _DepthDependentAnalytic3D_Construct( void* analyticSolution, Stg_ComponentF
 	/* Create Analytic Fields */
 	self->velocityField = AnalyticSolution_RegisterFeVariableFromCF( self, "VelocityField", _DepthDependentAnalytic3D_VelocityFunction, cf, True, data );
 	self->pressureField = AnalyticSolution_RegisterFeVariableFromCF( self, "PressureField", _DepthDependentAnalytic3D_PressureFunction, cf, True, data );
-	AnalyticSolution_RegisterFeVariableFromCF( self, "TemperatureField", _DepthDependentAnalytic3D_TemperatureFunction, cf, True, data );
+	self->temperatureField = AnalyticSolution_RegisterFeVariableFromCF( self, "TemperatureField", _DepthDependentAnalytic3D_TemperatureFunction, cf, True, data );
 	AnalyticSolution_RegisterFeVariableFromCF( self, "ViscosityField", _DepthDependentAnalytic3D_ViscosityFunction, cf, False, data );
 
 	/* Setup Viscosity Functions */
@@ -229,6 +247,11 @@ void _DepthDependentAnalytic3D_Construct( void* analyticSolution, Stg_ComponentF
 		self->viscosityFunc              = DepthDependentAnalytic3D_ViscosityFunc_Exponential;
 		self->viscosityDerivativeFunc    = DepthDependentAnalytic3D_ViscosityDerivativeFunc_Exponential;
 		self->viscosity2ndDerivativeFunc = DepthDependentAnalytic3D_Viscosity2ndDerivativeFunc_Exponential;
+	}
+	else if ( strcasecmp( viscosityType, "Exponential2" ) == 0 ) {
+		self->viscosityFunc              = DepthDependentAnalytic3D_ViscosityFunc_Exponential2;
+		self->viscosityDerivativeFunc    = DepthDependentAnalytic3D_ViscosityDerivativeFunc_Exponential2;
+		self->viscosity2ndDerivativeFunc = DepthDependentAnalytic3D_Viscosity2ndDerivativeFunc_Exponential2;
 	}
 
 	self->Ra = Stg_ComponentFactory_GetRootDictDouble( cf, "Ra", 0.0 );
