@@ -37,7 +37,7 @@ if env['shared_libraries']:
                             'StgFEM/libStgFEM/Toolbox')
     env.SharedLibrary(env.get_target_name('lib/StgFEM_Toolboxmodule'), objs,
                       SHLIBPREFIX='',
-                      LIBPREFIXES=[env['LIBPREFIXES']] + [''],
+                      LIBPREFIXES=env.make_list(env['LIBPREFIXES']) + [''],
                       LIBS=['StgFEM'] + env.get('LIBS', []))
 
 # Build plugins.
@@ -69,7 +69,7 @@ if env['shared_libraries']:
         objs = env.build_sources(env.glob(base + '/*.c'), 'StgFEM/' + base)
         env.SharedLibrary(env.get_build_path('lib/' + name), objs,
                           SHLIBPREFIX='',
-                          LIBPREFIXES=[env['LIBPREFIXES']] + [''],
+                          LIBPREFIXES=env.make_list(env['LIBPREFIXES']) + [''],
                           LIBS=['StgFEM'] + env.get('LIBS', []))
 
 # Build unit test runner.
