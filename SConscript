@@ -35,7 +35,7 @@ if env['shared_libraries']:
                             'PICellerator/libPICellerator/Toolbox')
     env.SharedLibrary(env.get_target_name('lib/PICellerator_Toolboxmodule'), objs,
                       SHLIBPREFIX='',
-                      LIBPREFIXES=[env['LIBPREFIXES']] + [''],
+                      LIBPREFIXES=env.make_list(env['LIBPREFIXES']) + [''],
                       LIBS=['PICellerator'] + env.get('LIBS', []))
 
 # Build plugins.
@@ -47,7 +47,7 @@ if env['shared_libraries']:
         name = 'PICellerator_' + base.split('/')[-1] + 'module'
         env.SharedLibrary(env.get_build_path('lib/' + name), objs,
                           SHLIBPREFIX='',
-                          LIBPREFIXES=[env['LIBPREFIXES']] + [''],
+                          LIBPREFIXES=env.make_list(env['LIBPREFIXES']) + [''],
                           LIBS=['PICellerator'] + env.get('LIBS', []))
 
 # Build unit test runner.
