@@ -35,7 +35,7 @@ if env['shared_libraries']:
                             'StgDomain/libStgDomain/Toolbox')
     env.SharedLibrary(env.get_target_name('lib/StgDomain_Toolboxmodule'), objs,
                       SHLIBPREFIX='',
-                      LIBPREFIXES=[env['LIBPREFIXES']] + [''],
+                      LIBPREFIXES=env.make_list(env['LIBPREFIXES']) + [''],
                       LIBS=['StgDomain'] + env.get('LIBS', []))
 
 # Build unit test runner.
