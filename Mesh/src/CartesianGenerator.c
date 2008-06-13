@@ -33,6 +33,10 @@
 #include <string.h>
 #include <assert.h>
 
+#ifdef HAVE_HDF5
+#include <hdf5.h>
+#endif
+
 #include <mpi.h>
 #include <StGermain/StGermain.h>
 
@@ -196,6 +200,12 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
 	char*			checkpointPrefix;
 	Index                   meshStrLen;
 	
+#ifdef HAVE_HDF5
+	hid_t file, fileData;
+	hid_t             props;
+	double      temp1[3], temp2[3];
+#endif
+	
 	assert( self && Stg_CheckType( self, CartesianGenerator ) );
 	assert( cf );
 
@@ -291,14 +301,48 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
 			meshSaveFileName = Memory_Alloc_Array( char, meshStrLen, "Construct_meshSaveFileName" );
 
 			if ( strlen(checkpointPrefix) > 0 ) {
-				sprintf( meshSaveFileName, "%s/%s.Mesh.%05d.dat", checkpointPath,
+				sprintf( meshSaveFileName, "%s/%s.Mesh.%05d", checkpointPath,
 					checkpointPrefix, restartTimestep );
 			}
 			else {
-				sprintf( meshSaveFileName, "%s/Mesh.%05d.dat", checkpointPath,
+				sprintf( meshSaveFileName, "%s/Mesh.%05d", checkpointPath,
 					restartTimestep );
 			}			
+	
+	#ifdef HAVE_HDF5	
+	      sprintf( meshSaveFileName, "%s.h5", meshSaveFileName );
+	      
+	      /* Read in minimum coord. */
+	      file = H5Fopen( meshSaveFileName, H5F_ACC_RDONLY, H5P_DEFAULT );
+	      
+	      if( file == 0 ) {
+				Journal_Printf( errorStream, 
+					"Warning - Couldn't find checkpoint mesh file with filename \"%s\".\n", 
+					meshSaveFileName );
+			}
 			
+      #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+	      fileData = H5Dopen( file, "/min" );
+      #else
+	      fileData = H5Dopen( file, "/min", H5P_DEFAULT );
+      #endif
+	      H5Dread( fileData, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, crdMin );
+	      H5Dclose( fileData );
+	      
+	      /* Read in maximum coord. */
+      #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+	      fileData = H5Dopen( file, "/max" );
+      #else
+	      fileData = H5Dopen( file, "/max", H5P_DEFAULT );
+      #endif
+	      H5Dread( fileData, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, crdMax );
+	      H5Dclose( fileData );
+	      
+	      H5Fclose( file );
+	      
+	#else	
+	      sprintf( meshSaveFileName, "%s.dat", meshSaveFileName );
+	        
 			FILE* meshFile = fopen( meshSaveFileName, "r" );	
 			/*Journal_Firewall( 
 				meshFile != 0, 
@@ -313,6 +357,7 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
 					meshSaveFileName );
 			}
 			else {
+			#if 0
 				fscanf( meshFile, "Min: " );
 				for( i=0; i<self->nDims; i++ ) {
 					fscanf( meshFile, "%lg ", &crdMin[i] );
@@ -321,12 +366,25 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
 				for( i=0; i<self->nDims; i++ ) {
 					fscanf( meshFile, "%lg ", &crdMax[i] );
 				}
+				#endif
+				
+				/* Read min and max coords from file */
+		      if(self->nDims==2)
+                  fscanf( meshFile, "Min: %.15g %.15g 0\n", &crdMin[0], &crdMin[1] );
+            else
+                  fscanf( meshFile, "Min: %.15g %.15g %.15g\n", &crdMin[0], &crdMin[1], &crdMin[2] );
+		      if(self->nDims==2)
+                  fscanf( meshFile, "Max: %.15g %.15g 0\n", &crdMax[0], &crdMax[1] );
+            else
+                  fscanf( meshFile, "Max: %.15g %.15g %.15g\n", &crdMax[0], &crdMax[1], &crdMax[2] );
+            
 				fclose( meshFile );
 			}
-
+   #endif
+				
 			Memory_Free( meshSaveFileName );
 		}	
-	
+		   
 		/* Initial setup. */
 		CartesianGenerator_SetGeometryParams( self, crdMin, crdMax );
 
@@ -1980,38 +2038,38 @@ void CartesianGenerator_MapToDomain( CartesianGenerator* self, Sync* sync,
 		incEls[inc_i] = Sync_GlobalToDomain( sync, incEls[inc_i] );
 }
 
+#define MAX_LINE_LENGTH 1024
 void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* data ) {
-	Stream*			stream = Journal_Register( Info_Type, self->type );
-	Sync*			sync;
-	Grid*			grid;
-	unsigned*		inds;
-	double*			steps;
-	unsigned		n_i, d_i;
-	double*         	vert;
-	unsigned        	gNode;
+	Stream*			   stream = Journal_Register( Info_Type, self->type );
+	Sync*			      sync;
 	AbstractContext* 	context = (AbstractContext*)data;
-	char* 			meshSaveFileName;
-	Index			meshStrLen;
-	Stream*			errorStream = Journal_Register( Error_Type, self->type );
-	int			myRank, nProcs, i, prevProcs;
-	double 			temp;
-	int 			offset = 0;
-	MPI_Status         	status;
+	char* 			   meshSaveFileName;
+	Index			      meshStrLen;
+	Stream*			   errorStream = Journal_Register( Error_Type, self->type );
+	int			      rank, nRanks;
+	
+#ifdef HAVE_HDF5
+	hid_t             file, fileSpace, fileData;
+	hsize_t           start[2], count[2], size[2];
+	hid_t             memSpace;
+	double            buf[4];
+   Node_LocalIndex   lNode_I = 0;
+	Node_GlobalIndex  gNode_I = 0;
+   int               totalVerts, ii;
+   hid_t             props;
+#else
+	int               proc_I;
+	Node_LocalIndex   lNode_I = 0;
+	Node_GlobalIndex  gNode_I = 0;
+	FILE*             inputFile;
+	char              lineString[MAX_LINE_LENGTH];
+#endif
 
 	assert( self );
 	assert( mesh );
 
 	Journal_Printf( stream, "Generating geometry...\n" );
 	Stream_Indent( stream );
-
-	/* Build grid and space for indices. */
-	grid = self->vertGrid;
-	inds = Memory_Alloc_Array_Unnamed( unsigned, mesh->topo->nDims );
-
-	/* Calculate steps. */
-	steps = Memory_Alloc_Array_Unnamed( double, mesh->topo->nDims );
-	for( d_i = 0; d_i < mesh->topo->nDims; d_i++ )
-		steps[d_i] = self->crdMax[d_i] - self->crdMin[d_i];
 
 	/* Allocate for coordinates. */
 	sync = (Sync*)IGraph_GetDomain( (IGraph*)mesh->topo, 0 );
@@ -2021,10 +2079,9 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
 
 	if( context && context->restartTimestep && context->timeStep == context->restartTimestep ) {
 		/* Loading from checkpoint */
-		Journal_Printf( stream, "Loading mesh values from file.\n");
 
-		MPI_Comm_rank( self->mpiComm, &myRank );
-		MPI_Comm_size( self->mpiComm, &nProcs );
+		MPI_Comm_rank( self->mpiComm, &rank );
+		MPI_Comm_size( self->mpiComm, &nRanks );
 		
 		meshStrLen = strlen(context->checkpointReadPath)  + 2 + 5 + 5 + 4;
 		if ( strlen(context->checkPointPrefixString) > 0 ) {
@@ -2033,84 +2090,192 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
 		meshSaveFileName = Memory_Alloc_Array( char, meshStrLen, "GenGeom_meshSaveFileName" );
 
 		if ( strlen( context->checkPointPrefixString ) > 0 ) {
-			sprintf( meshSaveFileName, "%s/%s.Mesh.%05d.dat", context->checkpointReadPath,
-				context->checkPointPrefixString, context->restartTimestep, myRank );
+			sprintf( meshSaveFileName, "%s/%s.Mesh.%05d", context->checkpointReadPath,
+				context->checkPointPrefixString, context->restartTimestep );
 		}
 		else {
-			sprintf( meshSaveFileName, "%s/Mesh.%05d.dat", context->checkpointReadPath,
-				context->restartTimestep, myRank );
+			sprintf( meshSaveFileName, "%s/Mesh.%05d", context->checkpointReadPath,
+				context->restartTimestep );
 		}
 
-		if( myRank != 0 ) {
-			MPI_Recv( &offset, 1, MPI_INT, myRank - 1, OFFSET_TAG, self->mpiComm, &status );
-		}
-
-		FILE* meshFile = fopen( meshSaveFileName, "r" );	
-		/*Journal_Firewall( 
-			meshFile != 0, 
-			errorStream, 
-			"Error in %s - Couldn't find checkpoint mesh file with filename \"%s\" - aborting.\n", 
-			__func__,  
-			meshSaveFileName );*/
-
-		/* If meshFile was not found, calculate mesh coordinates (so old checkpoint files can be used) */
-		if( !meshFile ) {
+#ifdef HAVE_HDF5
+      sprintf( meshSaveFileName, "%s.h5", meshSaveFileName );
+      
+      Journal_Printf( stream, "... loading from file %s.\n", meshSaveFileName );
+		
+      /* Open the file and data set. */
+	   file = H5Fopen( meshSaveFileName, H5F_ACC_RDONLY, H5P_DEFAULT );
+	   
+	   if( !file ) {
 			Journal_Printf( errorStream, 
 				"Warning - Couldn't find checkpoint mesh file with filename \"%s\".\n", 
 				meshSaveFileName );
 			
+			Grid*			      grid;
+			unsigned*		   inds;
+	      double*			   steps;
+	      unsigned          d_i;
+	
+			/* Build grid and space for indices. */
+	      grid = self->vertGrid;
+	      inds = Memory_Alloc_Array_Unnamed( unsigned, mesh->topo->nDims );
+
+	      /* Calculate steps. */
+	      steps = Memory_Alloc_Array_Unnamed( double, mesh->topo->nDims );
+	      for( d_i = 0; d_i < mesh->topo->nDims; d_i++ )
+		      steps[d_i] = self->crdMax[d_i] - self->crdMin[d_i];
+		
 			CartesianGenerator_CalcGeom( self, mesh, sync, grid, inds, steps );
+			
+			/* Free resources. */
+	      FreeArray( inds );
+	      FreeArray( steps );
 		}
-		else {	
-			fseek( meshFile, offset, SEEK_SET );
-			/* Read from file */				
-			if( myRank == 0 ) {
-				fscanf( meshFile, "Min: " );
-				for( i=0; i<self->nDims; i++ ) {
-					fscanf( meshFile, "%lg ", &temp );
-				}
-				fscanf( meshFile, "Max: " );
-				for( i=0; i<self->nDims; i++ ) {
-					fscanf( meshFile, "%lg ", &temp );
-				}
-				fscanf( meshFile, "nProcs: %d", &prevProcs );
-			}
+      	
+	   /* Prepare to read vertices from file */		
+      #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+	   fileData = H5Dopen( file, "/data" );
+      #else
+	   fileData = H5Dopen( file, "/data", H5P_DEFAULT );
+      #endif
+	   fileSpace = H5Dget_space( fileData );
+      
+      start[1] = 0;
+	   count[0] = 1;
+	   count[1] = mesh->topo->nDims + 1;
+      memSpace = H5Screate_simple( 2, count, NULL );
+      totalVerts = Mesh_GetGlobalSize( mesh, 0 );
+         
+	   for( ii=0; ii<totalVerts; ii++ ) {   
+	      start[0] = ii;
+               
+         H5Sselect_hyperslab( fileSpace, H5S_SELECT_SET, start, NULL, count, NULL );
+         H5Sselect_all( memSpace );
+         
+         H5Dread( fileData, H5T_NATIVE_DOUBLE, memSpace, fileSpace, H5P_DEFAULT, buf );
+         gNode_I = (int)buf[0];
+         
+         if( Mesh_GlobalToDomain( mesh, MT_VERTEX, gNode_I, &lNode_I ) && 
+		       lNode_I < Mesh_GetLocalSize( mesh, MT_VERTEX ) )
+		   {
+			   double *vert;
 
-			if( prevProcs == nProcs ) {
+			   vert = Mesh_GetVertex( mesh, lNode_I );
+			   vert[0] = buf[1];
+			   if( mesh->topo->nDims >= 2 )
+				   vert[1] = buf[2];
+			   if( mesh->topo->nDims >=3 )
+				   vert[2] = buf[3];
+		   }
+	   }
+	   	      
+	   /* Close handles */
+	   H5Sclose( memSpace );
+	   H5Sclose( fileSpace );
+	   H5Dclose( fileData );
+	   H5Fclose( file );
+	   
+#else
+      sprintf( meshSaveFileName, "%s.dat", meshSaveFileName );
+      
+      Journal_Printf( stream, "... loading from file %s.\n", meshSaveFileName );
+      
+      /* This loop used to stop 2 processors trying to open the file at the same time, which
+	   * seems to cause problems */
+	   for ( proc_I = 0; proc_I < nRanks; proc_I++ ) {
+		   MPI_Barrier( self->mpiComm );
+		   if ( proc_I == rank ) {
+			   /* Do the following since in parallel on some systems, the file
+			    * doesn't get re-opened at the start automatically. */
+			   inputFile = fopen( meshSaveFileName, "r" );
 
-				/* Reload mesh vertices from file */	
-				for( n_i = 0; n_i < Sync_GetNumDomains( sync ); n_i++ ) {
-					gNode = Sync_DomainToGlobal( sync, n_i );
-					Grid_Lift( grid, gNode, inds );
-					vert = Mesh_GetVertex( mesh, n_i );
+			   /*if ( !inputFile ) {
+				   Stream*    errorStr = Journal_Register( Error_Type, self->type );
+				   Journal_Firewall( 0, errorStr, "Error- in %s(): Couldn't find mesh checkpoint file with "
+					   "filename \"%s\" - aborting.\n", __func__, meshSaveFileName );
+					
+			   }*/
+			   
+			   /* If the file was not found, calculate mesh coordinates (so old checkpoint files can be used) */
+		      if( !inputFile ) {
+			      Journal_Printf( errorStream, 
+				      "Warning - Couldn't find mesh checkpoint file with filename \"%s\".\n", 
+				      meshSaveFileName );
+			
+			      Grid*			      grid;
+			      unsigned*		   inds;
+	            double*			   steps;
+	            unsigned          d_i;
+	      
+			      /* Build grid and space for indices. */
+	            grid = self->vertGrid;
+	            inds = Memory_Alloc_Array_Unnamed( unsigned, mesh->topo->nDims );
 
-					for( d_i = 0; d_i < mesh->topo->nDims; d_i++ ) {	
-						fscanf( meshFile, "%lg ", &vert[d_i] );
-					}
-					fscanf( meshFile, "\n" );
-				}
-				offset = ftell( meshFile );
-				fclose( meshFile );
-			}
-			else {
-				/* Calculate mesh vertices */
-				CartesianGenerator_CalcGeom( self, mesh, sync, grid, inds, steps );
-			}
-		}
+	            /* Calculate steps. */
+	            steps = Memory_Alloc_Array_Unnamed( double, mesh->topo->nDims );
+	            for( d_i = 0; d_i < mesh->topo->nDims; d_i++ )
+		            steps[d_i] = self->crdMax[d_i] - self->crdMin[d_i];
+		
+			      CartesianGenerator_CalcGeom( self, mesh, sync, grid, inds, steps );
+			      
+			      /* Free resources. */
+	            FreeArray( inds );
+	            FreeArray( steps );
+		      }
+		      
+			   rewind( inputFile );
+		   }
+	   }
+	   
+		fgets( lineString, MAX_LINE_LENGTH, inputFile );
+      fgets( lineString, MAX_LINE_LENGTH, inputFile );
+	
+      while ( !feof(inputFile) ) {
+		   fscanf( inputFile, "%u ", &gNode_I );
+		   if( Mesh_GlobalToDomain( mesh, MT_VERTEX, gNode_I, &lNode_I ) && 
+		       lNode_I < Mesh_GetLocalSize( mesh, MT_VERTEX ) )
+		   {
+			   double crds[3];
+			   double *vert;
 
-		if ( myRank != nProcs - 1 ) {
-			MPI_Ssend( &offset, 1, MPI_INT, myRank + 1, OFFSET_TAG, self->mpiComm );
-		}
-
+			   fscanf( inputFile, "%lg %lg %lg ", crds, crds + 1, crds + 2 );
+			   vert = Mesh_GetVertex( mesh, lNode_I );
+			   vert[0] = crds[0];
+			   if( self->nDims >= 2 )
+				   vert[1] = crds[1];
+			   if( self->nDims >=3 )
+				   vert[2] = crds[2];
+		   }
+		   else {
+			   fgets( lineString, MAX_LINE_LENGTH, inputFile );
+		   }
+		}   
+#endif
+      Mesh_Sync( mesh );
+      
 		Memory_Free( meshSaveFileName );
 	}
 	else {
-		CartesianGenerator_CalcGeom( self, mesh, sync, grid, inds, steps );
-	}
+	   Grid*			      grid;
+		unsigned*		   inds;
+	   double*			   steps;
+	   unsigned          d_i;
+	      
+	   /* Build grid and space for indices. */
+	   grid = self->vertGrid;
+	   inds = Memory_Alloc_Array_Unnamed( unsigned, mesh->topo->nDims );
 
-	/* Free resources. */
-	FreeArray( inds );
-	FreeArray( steps );
+	   /* Calculate steps. */
+	   steps = Memory_Alloc_Array_Unnamed( double, mesh->topo->nDims );
+	   for( d_i = 0; d_i < mesh->topo->nDims; d_i++ )
+		   steps[d_i] = self->crdMax[d_i] - self->crdMin[d_i];
+		
+		CartesianGenerator_CalcGeom( self, mesh, sync, grid, inds, steps );
+		
+		/* Free resources. */
+	   FreeArray( inds );
+	   FreeArray( steps );
+	}
 
 	MPI_Barrier( self->mpiComm );
 	Journal_Printf( stream, "... done.\n" );
