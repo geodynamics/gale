@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AbstractContext.c 4259 2008-04-17 12:26:22Z SteveQuenette $
+** $Id: AbstractContext.c 4275 2008-06-13 07:03:20Z BelindaMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -50,6 +50,10 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <time.h>
+
+#ifdef HAVE_HDF5
+#include <hdf5.h>
+#endif
 
 /* AbstractContext entry point names */
 Type AbstractContext_EP_Construct =		"Context_Construct";
@@ -993,7 +997,45 @@ void _AbstractContext_LoadTimeInfoFromCheckPoint( Context* self, Index timeStep,
 	FILE*                  timeInfoFile;		
 	Stream*                errorStr = Journal_Register( Error_Type, self->type );
 
+#ifdef HAVE_HDF5
+	hid_t             file, fileSpace, fileData;
+#endif
+
 	timeInfoFileName = AbstractContext_GetTimeInfoFileNameForGivenTimeStep( self, timeStep, self->checkpointReadPath ); 
+	
+#ifdef HAVE_HDF5
+   /* Open the file and data set. */
+	file = H5Fopen( timeInfoFileName, H5F_ACC_RDONLY, H5P_DEFAULT );
+	   	
+   /* Read currentTime from file */
+   #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+   fileData = H5Dopen( file, "/currentTime" );
+   #else
+   fileData = H5Dopen( file, "/currentTime", H5P_DEFAULT );
+   #endif
+   fileSpace = H5Dget_space( fileData );
+	   
+   H5Dread( fileData, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, &self->currentTime );
+	   
+   H5Sclose( fileSpace );
+   H5Dclose( fileData );
+   
+   /* Read Dt from file */
+   #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+   fileData = H5Dopen( file, "/Dt" );
+   #else
+   fileData = H5Dopen( file, "/Dt", H5P_DEFAULT );
+   #endif
+   fileSpace = H5Dget_space( fileData );
+	   
+   H5Dread( fileData, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, dtLoadedFromFile );
+	   
+   H5Sclose( fileSpace );
+   H5Dclose( fileData );
+   
+   H5Fclose( file );
+	   
+#else	
 	timeInfoFile = fopen( timeInfoFileName, "r" );
 	Journal_Firewall( NULL != timeInfoFile, errorStr, "Error- in %s(), Couldn't find checkpoint time info file with "
 		"filename \"%s\" - aborting.\n", __func__, timeInfoFileName );
@@ -1002,6 +1044,8 @@ void _AbstractContext_LoadTimeInfoFromCheckPoint( Context* self, Index timeStep,
 	fscanf( timeInfoFile, "%lg", &self->currentTime );
 	fscanf( timeInfoFile, "%lg", dtLoadedFromFile );
 	fclose( timeInfoFile );
+#endif
+	
 	Memory_Free( timeInfoFileName );
 }
 		
@@ -1011,11 +1055,61 @@ void _AbstractContext_SaveTimeInfo( Context* context ) {
 	char*                  timeInfoFileName = NULL;
 	FILE*                  timeInfoFile;	
 
+#ifdef HAVE_HDF5
+   hid_t             file, fileSpace, fileData, props;
+   hsize_t           count;
+   double            Dt;
+#endif 
+
 	/* Only the master process needs to write this file */
 	if ( 0 != self->rank ) return;
 
 	timeInfoFileName = AbstractContext_GetTimeInfoFileNameForGivenTimeStep( self, self->timeStep, self->checkpointWritePath ); 
 	
+#ifdef HAVE_HDF5
+   /* Create parallel file property list. */
+   props = H5Pcreate( H5P_FILE_ACCESS );
+   
+   /* Open the HDF5 output file. */
+   file = H5Fcreate( timeInfoFileName, H5F_ACC_TRUNC, H5P_DEFAULT, props );
+   assert( file );
+   H5Pclose( props );
+
+   /* Dump currentTime */
+   count = 1;
+   fileSpace = H5Screate_simple( 1, &count, NULL );         
+   #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+   fileData = H5Dcreate( file, "/currentTime", H5T_NATIVE_DOUBLE, fileSpace, H5P_DEFAULT );
+   #else
+   fileData = H5Dcreate( file, "/currentTime", H5T_NATIVE_DOUBLE, fileSpace,
+                               H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+   #endif
+         
+   props = H5Pcreate( H5P_DATASET_XFER );      
+   H5Dwrite( fileData, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, props, &(context->currentTime) );
+   H5Pclose( props );
+   H5Dclose( fileData );
+   H5Sclose( fileSpace );
+   
+   /* Dump Dt */
+   fileSpace = H5Screate_simple( 1, &count, NULL );         
+   #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+   fileData = H5Dcreate( file, "/Dt", H5T_NATIVE_DOUBLE, fileSpace, H5P_DEFAULT );
+   #else
+   fileData = H5Dcreate( file, "/Dt", H5T_NATIVE_DOUBLE, fileSpace,
+                               H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+   #endif
+         
+   props = H5Pcreate( H5P_DATASET_XFER );
+   Dt = AbstractContext_Dt( context );
+   H5Dwrite( fileData, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, props, &Dt );
+   H5Pclose( props );
+   H5Dclose( fileData );
+   H5Sclose( fileSpace );
+   
+   H5Fclose( file );
+   
+#else	
 	timeInfoFile = fopen( timeInfoFileName, "w" );
 
 	if ( False == timeInfoFile ) {
@@ -1029,6 +1123,8 @@ void _AbstractContext_SaveTimeInfo( Context* context ) {
 	fprintf( timeInfoFile, "%lg ", context->currentTime );
 	fprintf( timeInfoFile, "%lg\n", AbstractContext_Dt( context ) );
 	fclose( timeInfoFile );
+#endif
+	
 	Memory_Free( timeInfoFileName );
 }
 
@@ -1068,7 +1164,12 @@ char* AbstractContext_GetTimeInfoFileNameForGivenTimeStep( void* context, Index 
 	else {
 		sprintf( timeInfoFileName, "%s/", checkpointPath );
 	}
+	
+#ifdef HAVE_HDF5
+	sprintf( timeInfoFileName, "%stimeInfo.%.5u.h5", timeInfoFileName, timeStep );
+#else	
 	sprintf( timeInfoFileName, "%stimeInfo.%.5u.dat", timeInfoFileName, timeStep );
+#endif
 
 	return timeInfoFileName;
 }
