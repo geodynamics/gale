@@ -13,10 +13,9 @@
 <param name="Parent">SwarmOutput</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">...</param>
+<param name="Description">This component prints out the temperature and pressure values on a swarm</param>
 
 <!--Now the interesting stuff-->
-
 
 <list name="Params">
 
@@ -27,20 +26,15 @@
 		<param name="Essential">True</param>
 		<param name="Name">PressureField</param>
 		<param name="Type">FeVariable</param>
-		<param name="Description">...</param>
+		<param name="Description">The pressure field whose value will be evaluated at swarm points</param>
 	</struct>
-
-<!-- PLEASE, check the above struct information is accurate, in line number 186 of the c file and then remove this comment afterwards -->
 
 	<struct>
 		<param name="Essential">True</param>
 		<param name="Name">TemperatureField</param>
 		<param name="Type">FeVariable</param>
-		<param name="Description">...</param>
+		<param name="Description">The temperature field whose value will be evaluated at swarm points</param>
 	</struct>
-
-<!-- PLEASE, check the above struct information is accurate, in line number 187 of the c file and then remove this comment afterwards -->
-
 
 </list>
 <!-- Add an exmaple XML if possible -->

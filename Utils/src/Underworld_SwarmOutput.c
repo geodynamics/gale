@@ -254,7 +254,7 @@ void _Underworld_SwarmOutput_Execute( void* uwSwarmOutput, void* data ) {
 	int                nProcs;
 	MPI_Status         status;
 	const int          FINISHED_WRITING_TAG = 100;
-	int                confirmation = 0;
+	int                canExecute = 0;
 
 	
 	timeStep = context->timeStep;
@@ -275,8 +275,8 @@ void _Underworld_SwarmOutput_Execute( void* uwSwarmOutput, void* data ) {
 			       	strlen(outputPath) +1+ strlen(feVar->name) +1+ strlen(materialSwarm->name) +1+ 5 + 1+ 3 +1 );
 		sprintf( filename, "%s/%s.%s.%.5u.dat", outputPath, feVar->name, materialSwarm->name, timeStep );
 		/* wait for go-ahead from process ranked lower than me, to avoid competition writing to file */
-		if ( myRank != 0 ) {
-			MPI_Recv( &confirmation, 1, MPI_INT, myRank - 1, FINISHED_WRITING_TAG, comm, &status );
+		if ( myRank != 0  && canExecute == 0 ) {
+			MPI_Recv( &canExecute, 1, MPI_INT, myRank - 1, FINISHED_WRITING_TAG, comm, &status );
 		}	
 
 		/* if myRank is 0, create file, otherwise append to file */
@@ -291,9 +291,11 @@ void _Underworld_SwarmOutput_Execute( void* uwSwarmOutput, void* data ) {
 		fclose( outputFile );
 	}
 
+	/* confirms this processor is finshed */
+	canExecute = 1;
 	/* send go-ahead from process ranked lower than me, to avoid competition writing to file */
 	if ( myRank != nProcs - 1 ) {
-		MPI_Ssend( &confirmation, 1, MPI_INT, myRank + 1, FINISHED_WRITING_TAG, comm );
+		MPI_Ssend( &canExecute, 1, MPI_INT, myRank + 1, FINISHED_WRITING_TAG, comm );
 	}
 
 	Memory_Free( filename );
