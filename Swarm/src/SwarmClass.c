@@ -1659,6 +1659,16 @@ void Swarm_ReplaceCurrentParticleLayoutWithFileParticleLayout( void* swarm, void
 
 
 void Swarm_GetCheckpointFilenameForGivenTimestep( Swarm* self, AbstractContext* context, char* swarmSaveFileName ) {
+#ifdef HAVE_HDF5
+	if ( strlen(context->checkPointPrefixString) > 0 ) {
+		sprintf( swarmSaveFileName, "%s/%s.%s.%05d.h5", context->checkpointReadPath,
+			context->checkPointPrefixString, self->name, context->restartTimestep );
+	}
+	else {
+		sprintf( swarmSaveFileName, "%s/%s.%05d.h5", context->checkpointReadPath,
+			self->name, context->restartTimestep );
+	}
+#else
 	if ( strlen(context->checkPointPrefixString) > 0 ) {
 		sprintf( swarmSaveFileName, "%s/%s.%s.%05d.dat", context->checkpointReadPath,
 			context->checkPointPrefixString, self->name, context->restartTimestep );
@@ -1667,6 +1677,7 @@ void Swarm_GetCheckpointFilenameForGivenTimestep( Swarm* self, AbstractContext* 
 		sprintf( swarmSaveFileName, "%s/%s.%05d.dat", context->checkpointReadPath,
 			self->name, context->restartTimestep );
 	}
+#endif
 }
 
 Bool Swarm_AddCommHandler( Swarm *self, void *commHandler )

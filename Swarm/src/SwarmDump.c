@@ -254,21 +254,21 @@ void _SwarmDump_Execute( void* swarmDump, void* data ) {
 
 		if ( self->newFileEachTime ) {
 			if ( strlen(context->checkPointPrefixString) > 0 ) {
-				Stg_asprintf( &filename, "%s/%s.%s.%05d.dat", context->checkpointWritePath,
+				Stg_asprintf( &filename, "%s/%s.%s.%05d", context->checkpointWritePath,
 					context->checkPointPrefixString, swarm->name, context->timeStep );
 			}
 			else {
-				Stg_asprintf( &filename, "%s/%s.%05d.dat", context->checkpointWritePath,
+				Stg_asprintf( &filename, "%s/%s.%05d", context->checkpointWritePath,
 					swarm->name, context->timeStep );
 			}
 		}	
 		else { 
 			if ( strlen(context->checkPointPrefixString) > 0 ) {
-				Stg_asprintf( &filename, "%s/%s.%s.dat", context->checkpointWritePath,
+				Stg_asprintf( &filename, "%s/%s.%s", context->checkpointWritePath,
 					context->checkPointPrefixString, swarm->name );
 			}
 			else {
-				Stg_asprintf( &filename, "%s/%s.dat", context->checkpointWritePath, swarm->name );
+				Stg_asprintf( &filename, "%s/%s", context->checkpointWritePath, swarm->name );
 			}
 		}	
 
@@ -282,8 +282,10 @@ void _SwarmDump_Execute( void* swarmDump, void* data ) {
 		}
 
 #ifdef HAVE_HDF5
+      Stg_asprintf( &filename, "%s.h5", filename );
 		SwarmDump_DumpToHDF5( self, swarm, filename );
 #else
+      Stg_asprintf( &filename, "%s.dat", filename );
 		Stream_RedirectFile( stream, filename );
 		MPIStream_WriteAllProcessors( stream, swarm->particles, particleSize, (SizeT) particleLocalCount, swarm->comm );
 		Stream_CloseFile( stream );
