@@ -47,7 +47,7 @@
 ** Comments:
 **	There's an issue inside FE_Context_Build() see inside the code.
 **
-** $Id: Context.h 1020 2008-02-06 22:46:09Z BelindaMay $
+** $Id: Context.h 1154 2008-06-13 07:13:37Z BelindaMay $
 *
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -185,6 +185,12 @@
 	gauss integration swarms may need to be saved and reloaded) */
 	void _FiniteElementContext_SaveSwarms( void* context );
 
-	void _FiniteElementContext_SaveMesh( void* context );
+   void _FiniteElementContext_SaveMesh( void* context );
+   
+   #ifdef HAVE_HDF5
+	void _FiniteElementContext_DumpMeshHDF5( void* context, char* filename );
+   #else
+	void _FiniteElementContext_DumpMeshAscii( void* context, char* filename );
+   #endif
 
 #endif /* __StgFEM_SLE_SystemSetup_Context_h__ */

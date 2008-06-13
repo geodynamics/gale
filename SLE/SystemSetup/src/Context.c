@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Context.c 1110 2008-04-18 02:04:27Z BelindaMay $
+** $Id: Context.c 1154 2008-06-13 07:13:37Z BelindaMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -55,6 +55,10 @@
 #include <string.h>
 #include "SystemLinearEquations.h"
 #include "SolutionVector.h"
+
+#ifdef HAVE_HDF5
+#include <hdf5.h>
+#endif
 
 #define FINISHED_WRITING_TAG 9
 
@@ -513,26 +517,13 @@ void _FiniteElementContext_SaveSwarms( void* context ) {
 
 
 void _FiniteElementContext_SaveMesh( void* context ) {
-	FiniteElementContext*   self = (FiniteElementContext*) context;
-	FieldVariable*          fieldVar = NULL;
-	FeVariable*     	feVar = NULL;
-	Mesh* 			mesh;
-	unsigned 		nDims;
-	Stream*         	info = Journal_Register( Info_Type, "Context" );
+   FiniteElementContext*   self = (FiniteElementContext*) context;
 	char*			meshSaveFileName;
 	Index			meshStrLen;
-	unsigned		n_i, d_i;
-	Sync*			sync;
-	int 			myRank, nProcs, i;
-	FILE*			outputFile;
-	int                	confirmation = 0;
-	MPI_Status         	status;
-
+   Stream*         	info = Journal_Register( Info_Type, "Context" );
+   
 	Journal_Printf( info, "In %s(): about to save the mesh to disk:\n", __func__ );
-
-	MPI_Comm_rank( self->communicator, &myRank);
-	MPI_Comm_size( self->communicator, &nProcs );	
-
+	
 	meshStrLen = strlen(self->checkpointReadPath) + 2 + 5 + 5 + 4;
 	if ( strlen(self->checkPointPrefixString) > 0 ) {
 		meshStrLen += strlen(self->checkPointPrefixString) + 1;
@@ -540,64 +531,212 @@ void _FiniteElementContext_SaveMesh( void* context ) {
 	meshSaveFileName = Memory_Alloc_Array( char, meshStrLen, "SaveMesh-meshSaveFileName" );
 	
 	if ( strlen(self->checkPointPrefixString) > 0 ) {
-		sprintf( meshSaveFileName, "%s/%s.Mesh.%05d.dat", self->checkpointWritePath,
+		sprintf( meshSaveFileName, "%s/%s.Mesh.%05d", self->checkpointWritePath,
 			self->checkPointPrefixString, self->timeStep );
 	}
 	else {
-		sprintf( meshSaveFileName, "%s/Mesh.%05d.dat", self->checkpointWritePath, self->timeStep );
+		sprintf( meshSaveFileName, "%s/Mesh.%05d", self->checkpointWritePath, self->timeStep );
 	}
 
-	fieldVar = FieldVariable_Register_GetByIndex( self->fieldVariable_Register, 0 );
+#ifdef HAVE_HDF5
+   sprintf( meshSaveFileName, "%s.h5", meshSaveFileName );
+   _FiniteElementContext_DumpMeshHDF5( context, meshSaveFileName );
+#else
+   sprintf( meshSaveFileName, "%s.dat", meshSaveFileName );
+   _FiniteElementContext_DumpMeshAscii( context, meshSaveFileName );
+#endif
+
+	Memory_Free( meshSaveFileName );
+	Journal_Printf( info, "%s: saving of mesh completed.\n", __func__ );
+}
+
+#ifndef HAVE_HDF5
+void _FiniteElementContext_DumpMeshAscii( void* context, char* filename ) {
+   FiniteElementContext*   self = (FiniteElementContext*) context;
+   FieldVariable*    fieldVar = NULL;
+	FeVariable*       feVar = NULL;
+	Mesh* 			   mesh;
+	int 			      rank, nRanks;  
+	FILE*			      outputFile;
+	int               confirmation = 0;
+	MPI_Status        status;
+	Node_LocalIndex   lNode_I = 0;
+	Node_GlobalIndex  gNode_I = 0;
+	double*           coord;
+	unsigned          nDims;
+	
+	MPI_Comm_rank( self->communicator, &rank);
+	MPI_Comm_size( self->communicator, &nRanks );	
+
+   fieldVar = FieldVariable_Register_GetByIndex( self->fieldVariable_Register, 0 );
+	feVar = (FeVariable*)fieldVar;
+	mesh = (Mesh*)feVar->feMesh;
+	
+	nDims = Mesh_GetDimSize( mesh );	
+		
+	/* wait for go-ahead from process ranked lower than me, to avoid competition writing to file */
+	if ( rank != 0 ) {
+		MPI_Recv( &confirmation, 1, MPI_INT, rank - 1, FINISHED_WRITING_TAG, self->communicator, &status );
+	}	
+
+	if ( rank == 0 ) {
+		outputFile = fopen( filename, "w" );
+		assert( outputFile );
+		
+		/* Write min and max coords to file */
+		if( nDims == 2 )
+            fprintf( outputFile, "Min: %.15g %.15g 0\n", mesh->minGlobalCrd[0], mesh->minGlobalCrd[1] );
+      else
+            fprintf( outputFile, "Min: %.15g %.15g %.15g\n", mesh->minGlobalCrd[0], mesh->minGlobalCrd[1], mesh->minGlobalCrd[2] );
+		if( nDims == 2 )
+            fprintf( outputFile, "Max: %.15g %.15g 0\n", mesh->maxGlobalCrd[0], mesh->maxGlobalCrd[1] );
+      else
+            fprintf( outputFile, "Max: %.15g %.15g %.15g\n", mesh->maxGlobalCrd[0], mesh->maxGlobalCrd[1], mesh->maxGlobalCrd[2] );
+	}
+	else {
+		outputFile = fopen( filename, "a" );
+		assert( outputFile );
+	}	
+
+   for ( lNode_I = 0; lNode_I < FeMesh_GetNodeLocalSize( mesh ); lNode_I++ ) {
+	   gNode_I = FeMesh_NodeDomainToGlobal( mesh, lNode_I );
+	   fprintf( outputFile, "%u ", gNode_I );
+	   coord = Mesh_GetVertex( mesh, lNode_I );
+                   
+      if(self->dim==2)
+         fprintf( outputFile, "%.15g %.15g 0\n", coord[0], coord[1] );
+      else
+         fprintf( outputFile, "%.15g %.15g %.15g\n", coord[0], coord[1], coord[2] );
+	}
+	
+	fclose( outputFile );
+	
+	/* send go-ahead from process ranked lower than me, to avoid competition writing to file */
+	if ( rank != nRanks - 1 ) {
+		MPI_Ssend( &confirmation, 1, MPI_INT, rank + 1, FINISHED_WRITING_TAG, self->communicator );
+	}	
+}
+#endif
+
+#ifdef HAVE_HDF5
+void _FiniteElementContext_DumpMeshHDF5( void* context, char* filename ) {
+   FiniteElementContext*   self = (FiniteElementContext*) context;
+   int 			      rank, nRanks;
+   FieldVariable*    fieldVar = NULL;
+	FeVariable*       feVar = NULL;
+	Mesh* 			   mesh;
+	unsigned 		   nDims;
+	hid_t             file, fileSpace, fileData;
+   hid_t             memSpace;
+   hid_t             props;
+   hsize_t           start[2], count[2], size[2];
+   unsigned          nVerts, totalVerts;
+   Node_LocalIndex   lNode_I = 0;
+	Node_GlobalIndex  gNode_I = 0;
+	double*           coord;
+	double            buf[4];
+   
+   MPI_Comm_rank( self->communicator, &rank);
+	MPI_Comm_size( self->communicator, &nRanks );	
+
+   fieldVar = FieldVariable_Register_GetByIndex( self->fieldVariable_Register, 0 );
 
 	if ( Stg_Class_IsInstance( fieldVar, FeVariable_Type ) ) {
 		feVar = (FeVariable*)fieldVar;
 		mesh = (Mesh*)feVar->feMesh;
 	
 		nDims = Mesh_GetDimSize( mesh );
-
-		/* wait for go-ahead from process ranked lower than me, to avoid competition writing to file */
-		if ( myRank != 0 ) {
-			MPI_Recv( &confirmation, 1, MPI_INT, myRank - 1, FINISHED_WRITING_TAG, self->communicator, &status );
-		}
-
-		if ( myRank == 0 ) {
-			outputFile = fopen( meshSaveFileName, "w" );
+		nVerts = Mesh_GetDomainSize( mesh, 0 );
 		
-			fprintf( outputFile, "Min: " );
-			for( i=0; i<nDims; i++ ) {
-				fprintf( outputFile, "%.15g ", mesh->minGlobalCrd[i] );
-			}
-			fprintf( outputFile, "\nMax: " );
-			for( i=0; i<nDims; i++ ) {
-				fprintf( outputFile, "%.15g ", mesh->maxGlobalCrd[i] );
-			}
-			fprintf( outputFile, "\nnProcs: %d\n", nProcs );
-		}
-		else {
-			outputFile = fopen( meshSaveFileName, "a" );
-		}
+      /* Create parallel file property list. */
+      props = H5Pcreate( H5P_FILE_ACCESS );
+      H5Pset_fapl_mpio( props, MPI_COMM_WORLD, MPI_INFO_NULL );
 
-		sync = (Sync*)IGraph_GetDomain( (IGraph*)mesh->topo, 0 );
-
-		for( n_i = 0; n_i < Sync_GetNumDomains( sync ); n_i++ ) {
-			double*		vert;
-
-			vert = Mesh_GetVertex( mesh, n_i );
-
-			for( d_i = 0; d_i < mesh->topo->nDims; d_i++ ) {
-				fprintf( outputFile, "%.15g ", vert[d_i] );
-			}
-			fprintf( outputFile, "\n" );
-		}
-		fprintf( outputFile, "\n" );
-		fclose( outputFile );
-		
-		if ( myRank != nProcs - 1 ) {
-			MPI_Ssend( &confirmation, 1, MPI_INT, myRank + 1, FINISHED_WRITING_TAG, self->communicator );
-		}
-	}
+      /* Open the HDF5 output file. */
+      file = H5Fcreate( filename, H5F_ACC_TRUNC, H5P_DEFAULT, props );
+      assert( file );
+      H5Pclose( props );	
 	
-	Memory_Free( meshSaveFileName );
-	Journal_Printf( info, "%s: saving of mesh completed.\n", __func__ );
+      /* Dump the min and max coords, and number of processes. */
+      count[0] = (hsize_t)nDims;
+      fileSpace = H5Screate_simple( 1, count, NULL );         
+   #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+      fileData = H5Dcreate( file, "/min", H5T_NATIVE_DOUBLE, fileSpace, H5P_DEFAULT );
+   #else
+      fileData = H5Dcreate( file, "/min", H5T_NATIVE_DOUBLE, fileSpace,
+                               H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+   #endif
+         
+      props = H5Pcreate( H5P_DATASET_XFER );
+      H5Pset_dxpl_mpio( props, H5FD_MPIO_COLLECTIVE );
+         
+      H5Dwrite( fileData, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, props, mesh->minGlobalCrd );
+      H5Dclose( fileData );
+      H5Sclose( fileSpace );
+         
+      fileSpace = H5Screate_simple( 1, count, NULL );       
+   #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+      fileData = H5Dcreate( file, "/max", H5T_NATIVE_DOUBLE, fileSpace, H5P_DEFAULT );
+   #else
+      fileData = H5Dcreate( file, "/max", H5T_NATIVE_DOUBLE, fileSpace,
+                               H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+   #endif
+            
+      H5Dwrite( fileData, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, props, mesh->maxGlobalCrd );
+      H5Dclose( fileData );
+      H5Sclose( fileSpace );
+          
+      /* Write vertex coords to file */   
+      /* Create our output space and data objects. */
+      totalVerts = Mesh_GetGlobalSize( mesh, 0 );
+      size[0] = (hsize_t)totalVerts;
+      size[1] = (hsize_t)nDims + 1;
+      
+      fileSpace = H5Screate_simple( 2, size, NULL );
+   #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+      fileData = H5Dcreate( file, "/data", H5T_NATIVE_DOUBLE, fileSpace, H5P_DEFAULT );
+   #else
+      fileData = H5Dcreate( file, "/data", H5T_NATIVE_DOUBLE, fileSpace,
+                            H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+   #endif
+      
+      start[1] = 0;
+	   count[0] = 1;
+	   count[1] = nDims + 1;
+      memSpace = H5Screate_simple( 2, count, NULL );
+         
+      props = H5Pcreate( H5P_DATASET_XFER );
+      H5Pset_dxpl_mpio( props, H5FD_MPIO_INDEPENDENT );
+               
+      for ( lNode_I = 0; lNode_I < FeMesh_GetNodeLocalSize( mesh ); lNode_I++ ) {
+	      gNode_I = FeMesh_NodeDomainToGlobal( mesh, lNode_I );
+	      
+	      /* Create our memory space. */
+	      start[0] = gNode_I;
+         
+	      coord = Mesh_GetVertex( mesh, lNode_I );
+         buf[0] = (double)gNode_I;
+         buf[1] = coord[0];
+         if( nDims >= 2 )
+            buf[2] = coord[1];
+         if( nDims >= 3 )
+            buf[3] = coord[2];
+               
+         /* Dump our local data. */
+         H5Sselect_hyperslab( fileSpace, H5S_SELECT_SET, start, NULL, count, NULL );
+         H5Sselect_all( memSpace );
+         
+         H5Dwrite( fileData, H5T_NATIVE_DOUBLE, memSpace, fileSpace, props, buf );
+	   }
+	   
+		/* Close off all our handles. */
+		H5Sclose( memSpace );
+		H5Pclose( props );
+      H5Dclose( fileData );
+      H5Sclose( fileSpace );
+      H5Fclose( file );
+	}	
 }
+#endif
+
 
