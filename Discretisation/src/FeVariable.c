@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeVariable.c 1137 2008-05-23 05:57:48Z RobertTurnbull $
+** $Id: FeVariable.c 1153 2008-06-13 07:09:48Z BelindaMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -55,6 +55,10 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
+
+#ifdef HAVE_HDF5
+#include <hdf5.h>
+#endif
 
 const Type   FeVariable_Type = "FeVariable";
 const Name   defaultFeVariableFeEquationNumberName = "defaultFeVariableFeEqName";
@@ -2071,28 +2075,101 @@ void FeVariable_SaveToFile( void* feVariable, const char* prefixStr, unsigned in
 
 
 void FeVariable_SaveNodalValuesToFile_StgFEM_Native( void* feVariable, const char* prefixStr, unsigned int timeStep ) {
-	FeVariable*        self = (FeVariable*)feVariable;
-	char*              filename;
-	Node_LocalIndex    lNode_I = 0;
-	Node_GlobalIndex   gNode_I = 0;
-	double*            coord;
-	Dof_Index          dof_I;
-	Dof_Index          dofAtEachNodeCount;
-	FILE*              outputFile;
-	double             variableValues[MAX_FIELD_COMPONENTS];	
-	const int          FINISHED_WRITING_TAG = 100;
-	int                confirmation = 0;
-	MPI_Comm	comm = Comm_GetMPIComm( Mesh_GetCommTopology( self->feMesh, MT_VERTEX ) );
-	int                myRank;
-	int                nProcs;
-	MPI_Status         status;
+	FeVariable*       self = (FeVariable*)feVariable;
+	char*             filename;
+	Node_LocalIndex   lNode_I = 0;
+	Node_GlobalIndex  gNode_I = 0;
+	double*           coord;
+	Dof_Index         dof_I;
+	Dof_Index         dofAtEachNodeCount;
+	double            variableValues[MAX_FIELD_COMPONENTS];	
+	MPI_Comm	         comm = Comm_GetMPIComm( Mesh_GetCommTopology( self->feMesh, MT_VERTEX ) );
+	int               myRank;
+	int               nProcs;
+	MPI_Status        status;
+
+#ifdef HAVE_HDF5
+   hid_t             file, fileSpace, fileData, props;
+   hid_t             memSpace;
+   hsize_t           start[2], count[2], size[2];
+   double*           buf;              
+   int               totalNodes;
+#else
+   FILE*             outputFile;
+   const int         FINISHED_WRITING_TAG = 100;
+   int               confirmation = 0;   
+#endif 
 
 	MPI_Comm_size( comm, (int*)&nProcs );
 	MPI_Comm_rank( comm, (int*)&myRank );
 	
 	/*                                                prefix             self->name       . 00000 .  dat \0 */
 	filename = Memory_Alloc_Array_Unnamed( char, strlen(prefixStr) + strlen(self->name) + 1 + 5 + 1 + 3 + 1 );
-	sprintf( filename, "%s%s.%.5u.dat", prefixStr, self->name, timeStep );
+	
+	/* Note: assumes same number of dofs at each node */
+	dofAtEachNodeCount = self->fieldComponentCount;
+
+#ifdef HAVE_HDF5
+	sprintf( filename, "%s%s.%.5u.h5", prefixStr, self->name, timeStep );
+	
+	/* Create parallel file property list. */
+   props = H5Pcreate( H5P_FILE_ACCESS );
+   H5Pset_fapl_mpio( props, MPI_COMM_WORLD, MPI_INFO_NULL );
+
+   /* Open the HDF5 output file. */
+   file = H5Fcreate( filename, H5F_ACC_TRUNC, H5P_DEFAULT, props );
+   assert( file );
+   H5Pclose( props );
+   
+   totalNodes = Mesh_GetGlobalSize( self->feMesh, 0 );
+   
+   size[0] = totalNodes;
+   size[1] = dofAtEachNodeCount + 1;
+   fileSpace = H5Screate_simple( 2, size, NULL );         
+   #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+   fileData = H5Dcreate( file, "/data", H5T_NATIVE_DOUBLE, fileSpace, H5P_DEFAULT );
+   #else
+   fileData = H5Dcreate( file, "/data", H5T_NATIVE_DOUBLE, fileSpace,
+                               H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+   #endif
+
+   start[1] = 0;
+	count[0] = 1;
+	count[1] = dofAtEachNodeCount + 1;
+   memSpace = H5Screate_simple( 2, count, NULL );
+   
+   props = H5Pcreate( H5P_DATASET_XFER );
+   H5Pset_dxpl_mpio( props, H5FD_MPIO_INDEPENDENT );
+    
+   buf = Memory_Alloc_Array( double, dofAtEachNodeCount + 1, "fileBuffer" );
+   
+   for ( lNode_I = 0; lNode_I < FeMesh_GetNodeLocalSize( self->feMesh ); lNode_I++ ) {
+		gNode_I = FeMesh_NodeDomainToGlobal( self->feMesh, lNode_I );
+		
+		/* Create our memory space. */
+	   start[0] = gNode_I;        
+	   buf[0] = (double)gNode_I;
+	   
+      FeVariable_GetValueAtNode( self, lNode_I, variableValues );
+		for ( dof_I = 0; dof_I < dofAtEachNodeCount; dof_I++ ) {
+			buf[dof_I+1] = variableValues[dof_I];
+		}	
+		         
+      /* Dump our local data. */
+      H5Sselect_hyperslab( fileSpace, H5S_SELECT_SET, start, NULL, count, NULL );
+      H5Sselect_all( memSpace );
+         
+      H5Dwrite( fileData, H5T_NATIVE_DOUBLE, memSpace, fileSpace, props, buf );
+	}   
+   
+   H5Pclose( props );
+   H5Dclose( fileData );
+   H5Sclose( memSpace );
+   H5Sclose( fileSpace );
+   H5Fclose( file );
+      
+#else
+   sprintf( filename, "%s%s.%.5u.dat", prefixStr, self->name, timeStep );
 
 	/* wait for go-ahead from process ranked lower than me, to avoid competition writing to file */
 	if ( myRank != 0 ) {
@@ -2106,20 +2183,10 @@ void FeVariable_SaveNodalValuesToFile_StgFEM_Native( void* feVariable, const cha
 		outputFile = fopen( filename, "a" );
 	}	
 
-	/* Note: assumes same number of dofs at each node */
-	dofAtEachNodeCount = self->fieldComponentCount;
-
 	for ( lNode_I = 0; lNode_I < FeMesh_GetNodeLocalSize( self->feMesh ); lNode_I++ ) {
 		gNode_I = FeMesh_NodeDomainToGlobal( self->feMesh, lNode_I );
 		fprintf( outputFile, "%u ", gNode_I );
-		coord = Mesh_GetVertex( self->feMesh, lNode_I );
-                if(self->dim==2)
-                  fprintf( outputFile, "%.15g %.15g 0 ", coord[0],
-                           coord[1]);
-                else
-                  fprintf( outputFile, "%.15g %.15g %.15g ", coord[0],
-                           coord[1], coord[2] );
-                  
+		            
 		FeVariable_GetValueAtNode( self, lNode_I, variableValues );
 		for ( dof_I = 0; dof_I < dofAtEachNodeCount; dof_I++ ) {
 			fprintf( outputFile, "%.15g ", variableValues[dof_I] );
@@ -2133,6 +2200,7 @@ void FeVariable_SaveNodalValuesToFile_StgFEM_Native( void* feVariable, const cha
 	if ( myRank != nProcs - 1 ) {
 		MPI_Ssend( &confirmation, 1, MPI_INT, myRank + 1, FINISHED_WRITING_TAG, comm );
 	}	
+#endif
 	
 	Memory_Free( filename );
 }
@@ -2173,23 +2241,74 @@ void FeVariable_ReadNodalValuesFromFile_StgFEM_Native( void* feVariable, const c
 	char               lineString[MAX_LINE_LENGTH_DEFINE];
 	const unsigned int MAX_LINE_LENGTH = MAX_LINE_LENGTH_DEFINE;
 	Processor_Index    proc_I=0;
-	MPI_Comm	comm = Comm_GetMPIComm( Mesh_GetCommTopology( self->feMesh, MT_VERTEX ) );
-	unsigned		rank;
-	unsigned		nProcs;
-	int nDims;
+	MPI_Comm	          comm = Comm_GetMPIComm( Mesh_GetCommTopology( self->feMesh, MT_VERTEX ) );
+	unsigned		       rank;
+	unsigned		       nRanks;
+	int                nDims;
+	
+#ifdef HAVE_HDF5
+   hid_t             file, fileSpace, fileData;
+   int               totalNodes, ii;
+   hid_t             props;
+   hid_t             memSpace;
+   hsize_t           start[2], count[2], size[2];
+   double*           buf;             
+#endif   	
 
 	MPI_Comm_rank( comm, (int*)&rank );
-	MPI_Comm_size( comm, (int*)&nProcs );
+	MPI_Comm_size( comm, (int*)&nRanks );
 	
 	/*                                                prefix            self->name        . 00000 .  dat \0 */
 	filename = Memory_Alloc_Array_Unnamed( char, strlen(prefixStr) + strlen(self->name) + 1 + 5 + 1 + 3 + 1 );
+	dofAtEachNodeCount = self->fieldComponentCount;
+	
+#ifdef HAVE_HDF5	
+   sprintf( filename, "%s%s.%.5u.h5", prefixStr, self->name, timeStep );
+   
+   /* Open the file and data set. */
+	file = H5Fopen( filename, H5F_ACC_RDONLY, H5P_DEFAULT );
+	
+	/* Prepare to read vertices from file */		
+   #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+	fileData = H5Dopen( file, "/data" );
+   #else
+	fileData = H5Dopen( file, "/data", H5P_DEFAULT );
+   #endif
+	fileSpace = H5Dget_space( fileData );
+      
+   start[1] = 0;
+	count[0] = 1;
+	count[1] = dofAtEachNodeCount + 1;
+   memSpace = H5Screate_simple( 2, count, NULL );
+   totalNodes = Mesh_GetGlobalSize( self->feMesh, 0 );
+   buf = Memory_Alloc_Array( double, dofAtEachNodeCount + 1, "fileBuffer" );
+         
+   /* Read from HDF5 checkpint file */
+   for( ii=0; ii<totalNodes; ii++ ) {   
+	   start[0] = ii;
+               
+      H5Sselect_hyperslab( fileSpace, H5S_SELECT_SET, start, NULL, count, NULL );
+      H5Sselect_all( memSpace );
+         
+      H5Dread( fileData, H5T_NATIVE_DOUBLE, memSpace, fileSpace, H5P_DEFAULT, buf );
+      gNode_I = (int)buf[0];
+         
+      if( Mesh_GlobalToDomain( self->feMesh, MT_VERTEX, gNode_I, &lNode_I ) && 
+		   lNode_I < Mesh_GetLocalSize( self->feMesh, MT_VERTEX ) )
+		{
+		   for ( dof_I = 0; dof_I < dofAtEachNodeCount; dof_I++ ) {
+				variableVal = buf[dof_I+1];
+				DofLayout_SetValueDouble( self->dofLayout, lNode_I, dof_I, variableVal );
+			}  
+		}
+	}   
+   
+#else   
 	sprintf( filename, "%s%s.%.5u.dat", prefixStr, self->name, timeStep );
 
-	/* TODO May need/want to change to MPI file stuff */
-	
 	/* This loop used to stop 2 processors trying to open the file at the same time, which
 	  * seems to cause problems */
-	for ( proc_I = 0; proc_I < nProcs; proc_I++ ) {
+	for ( proc_I = 0; proc_I < nRanks; proc_I++ ) {
 		MPI_Barrier( comm );
 		if ( proc_I == rank ) {
 			/* Do the following since in parallel on some systems, the file
@@ -2208,8 +2327,6 @@ void FeVariable_ReadNodalValuesFromFile_StgFEM_Native( void* feVariable, const c
 		}
 	}
 
-	dofAtEachNodeCount = self->fieldComponentCount;
-
 	/* Need to re-set the geometry here, in case we're loading from a checkpoint that had compression/squashing BCs,
 		and hence ended up with a smaller mesh than the original */
 	nDims = Mesh_GetDimSize( self->feMesh );
@@ -2218,19 +2335,6 @@ void FeVariable_ReadNodalValuesFromFile_StgFEM_Native( void* feVariable, const c
 		if( FeMesh_NodeGlobalToDomain( self->feMesh, gNode_I, &lNode_I ) && 
 		    lNode_I < FeMesh_GetNodeLocalSize( self->feMesh ) )
 		{
-			double crds[3];
-			double *vert;
-
-			/* Note: until we have proper mesh geometry, topology etc checkpointing, we re-load the 
-			node co-ords from the feVariable file - and also update the geometry */
-			fscanf( inputFile, "%lg %lg %lg ", crds, crds + 1, crds + 2 );
-			vert = Mesh_GetVertex( self->feMesh, lNode_I );
-			vert[0] = crds[0];
-			if( nDims >= 2 )
-				vert[1] = crds[1];
-			if( nDims >=3 )
-				vert[2] = crds[2];
-			
 			for ( dof_I = 0; dof_I < dofAtEachNodeCount; dof_I++ ) {
 				fscanf( inputFile, "%lg ", &variableVal );
 				DofLayout_SetValueDouble( self->dofLayout, lNode_I, dof_I, variableVal );
@@ -2241,6 +2345,7 @@ void FeVariable_ReadNodalValuesFromFile_StgFEM_Native( void* feVariable, const c
 		}
 	}
 	fclose( inputFile );
+#endif	
 
 	Mesh_DeformationUpdate( self->feMesh );
 }
