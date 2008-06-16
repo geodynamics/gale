@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeVariable.c 1153 2008-06-13 07:09:48Z BelindaMay $
+** $Id: FeVariable.c 1155 2008-06-16 06:34:22Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -1951,7 +1951,7 @@ double FeVariable_IntegratePlane( void* feVariable, Axis planeAxis, double plane
 	Axis                       bAxis              = ( planeAxis == K_AXIS ? J_AXIS : K_AXIS );
 	double                     integral;
 	/* Swarm Stuff */
-	Swarm*                     swarm;
+	Swarm*                     tmpSwarm;
 	Bool                       dimExists[]        = { False, False, False };
 	ExtensionManager_Register* extensionMgr_Register;
 	SingleCellLayout*          singleCellLayout;
@@ -1998,8 +1998,8 @@ double FeVariable_IntegratePlane( void* feVariable, Axis planeAxis, double plane
 	singleCellLayout = SingleCellLayout_New( "cellLayout", dimExists, NULL, NULL );
 	particlesPerDim[ planeAxis ] = 1;
 	gaussParticleLayout = GaussParticleLayout_New( "particleLayout", self->dim - 1, particlesPerDim );
-	swarm = Swarm_New( 
-			"gaussSwarm",
+	tmpSwarm = Swarm_New( 
+			"tmpgaussSwarm",
 			singleCellLayout, 
 			gaussParticleLayout,
 			self->dim,
@@ -2008,12 +2008,12 @@ double FeVariable_IntegratePlane( void* feVariable, Axis planeAxis, double plane
 			NULL,
 			self->communicator,
 		        NULL	);
-	Stg_Component_Build( swarm, NULL, False );
+	Stg_Component_Build( tmpSwarm, NULL, False );
 
 	/* Change Positions of the particles */
-	Stg_Component_Initialise( swarm, NULL, False );
-	for ( lParticle_I = 0 ; lParticle_I < swarm->particleLocalCount ; lParticle_I++ ) {
-		particle = (IntegrationPoint*) Swarm_ParticleAt( swarm, lParticle_I );
+	Stg_Component_Initialise( tmpSwarm, NULL, False );
+	for ( lParticle_I = 0 ; lParticle_I < tmpSwarm->particleLocalCount ; lParticle_I++ ) {
+		particle = (IntegrationPoint*) Swarm_ParticleAt( tmpSwarm, lParticle_I );
 
 		storedXi_J_AXIS = particle->xi[ J_AXIS ];
 		particle->xi[ aAxis ]     = particle->xi[ I_AXIS ];
@@ -2021,11 +2021,11 @@ double FeVariable_IntegratePlane( void* feVariable, Axis planeAxis, double plane
 		particle->xi[ planeAxis ] = planeXiGlobal;
 	}
 	
-	integral = FeVariable_IntegrateLayer_AxisIndependent( self, swarm, planeAxis, planeLayerGlobal, 
+	integral = FeVariable_IntegrateLayer_AxisIndependent( self, tmpSwarm, planeAxis, planeLayerGlobal, 
 			self->dim - 1, aAxis, bAxis, planeAxis );
 
 	/* Delete */
-	Stg_Class_Delete( swarm );
+	Stg_Class_Delete( tmpSwarm );
 	Stg_Class_Delete( gaussParticleLayout );
 	Stg_Class_Delete( singleCellLayout );
 	Stg_Class_Delete( extensionMgr_Register );
@@ -2186,6 +2186,15 @@ void FeVariable_SaveNodalValuesToFile_StgFEM_Native( void* feVariable, const cha
 	for ( lNode_I = 0; lNode_I < FeMesh_GetNodeLocalSize( self->feMesh ); lNode_I++ ) {
 		gNode_I = FeMesh_NodeDomainToGlobal( self->feMesh, lNode_I );
 		fprintf( outputFile, "%u ", gNode_I );
+#if DEBUG
+		coord = Mesh_GetVertex( self->feMesh, lNode_I );
+                if(self->dim==2)
+                  fprintf( outputFile, "%.15g %.15g 0 ", coord[0],
+                           coord[1]);
+                else
+                  fprintf( outputFile, "%.15g %.15g %.15g ", coord[0],
+                           coord[1], coord[2] );
+#endif
 		            
 		FeVariable_GetValueAtNode( self, lNode_I, variableValues );
 		for ( dof_I = 0; dof_I < dofAtEachNodeCount; dof_I++ ) {

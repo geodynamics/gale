@@ -279,9 +279,9 @@
 	
 	/** Copy */
 	#define FeVariable_Copy( self ) \
-		(FeVariable*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
+		(FeVariable*)Stg_Class_Copy( self, NULL, Fale, NULL, NULL )
 	#define FeVariable_DeepCopy( self ) \
-		(FeVariable*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
+		(FeVariable*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	
 	void* _FeVariable_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
