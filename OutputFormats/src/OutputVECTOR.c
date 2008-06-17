@@ -58,6 +58,9 @@
 #include <assert.h>
 #include <string.h>
 
+#ifndef MASTER
+	#define MASTER 0
+#endif
 
 /* Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 const Type lucOutputVECTOR_Type = "lucOutputVECTOR";
@@ -101,9 +104,9 @@ lucOutputVECTOR* _lucOutputVECTOR_New(
 }
 
 void _lucOutputVECTOR_Init( lucOutputVECTOR* self, Stg_ComponentFactory* cf ){
-	Name		 formatName;
-	Index		 buffersize;
-
+	Name             formatName;
+	Index            buffersize;
+	
 	formatName = Stg_ComponentFactory_GetString( cf, self->name, "Format", "ps" );
 
 	if ( strcasecmp( formatName, "ps" ) == 0 ) {
@@ -182,6 +185,10 @@ void* _lucOutputVECTOR_DefaultNew( Name name ) {
 
 void _lucOutputVECTOR_Construct( void* outputFormat, Stg_ComponentFactory* cf, void* data ){
 	lucOutputVECTOR*  self = (lucOutputVECTOR*)outputFormat;
+	AbstractContext* context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ) ;
+	
+	if(context->rank == MASTER)
+		Journal_Firewall( context->nproc == 1, Journal_MyStream( Error_Type, self ), "\n \n     Vector outputting is not supported in parallel.\n     Please choose an alternate output format.\n\n");
 
 	_lucOutputVECTOR_Init( self, cf );
 	
