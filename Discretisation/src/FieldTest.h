@@ -69,7 +69,6 @@
 		Name*					swarmVarNameList;	\
 		unsigned				swarmVarCount;		\
 		FeMesh*					constantMesh;		\
-		FeMesh*					referenceMesh;		\
 		Bool					normalise;		\
 		double**				gAnalyticSq;		\
 		double**				gErrorSq;		\

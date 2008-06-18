@@ -172,7 +172,6 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 
 	self->integrationSwarm 	= Stg_ComponentFactory_ConstructByKey( cf, self->name, "IntegrationSwarm",    Swarm,      True,  data );
 	self->constantMesh	= Stg_ComponentFactory_ConstructByKey( cf, self->name, "ConstantElementMesh", FeMesh,     True,  data );
-	self->referenceMesh	= Stg_ComponentFactory_ConstructByKey( cf, self->name, "ReferenceMesh",       FeMesh,     True,  data );
 
 	//self->swarmVariableName 	= Stg_ComponentFactory_GetString( cf, self->name, "numericVariableName",       "" );
 	self->swarmVarCount = ( swarmVarList ) ? Dictionary_Entry_Value_GetCount( swarmVarList ) : 1;
@@ -200,11 +199,11 @@ void _FieldTest_Build( void* fieldTest, void* data ) {
 	Index			field_I;
 	//Index			swarm_I;
 
-	Stg_Component_Build( self->referenceMesh, data, False );
 	Stg_Component_Build( self->constantMesh,  data, False );
 
 	for( field_I = 0; field_I < self->fieldCount; field_I++ ) {
-		FieldTest_BuildReferenceField( self->referenceMesh, self->numericFieldList[field_I],
+		FieldTest_BuildReferenceField( self->numericFieldList[field_I]->feMesh, 
+					       self->numericFieldList[field_I],
 					       self->context, &self->referenceFieldList[field_I] );
 		FieldTest_BuildErrField( self->constantMesh, self->numericFieldList[field_I],
 					 self->context, &self->errorFieldList[field_I] );
@@ -615,9 +614,9 @@ void FieldTest_GenerateErrFields( void* fieldTest, void* data ) {
 	Index			field_I;
 	
 	for( field_I = 0; field_I < self->fieldCount; field_I++ ) {
-		lMeshSize 	= Mesh_GetLocalSize( self->referenceMesh, MT_VOLUME );
-		errorField 	= self->errorFieldList[field_I];
-		numDofs		= self->numericFieldList[field_I]->fieldComponentCount;
+		lMeshSize  = Mesh_GetLocalSize( self->numericFieldList[field_I]->feMesh, MT_VOLUME );
+		errorField = self->errorFieldList[field_I];
+		numDofs	   = self->numericFieldList[field_I]->fieldComponentCount;
 
 		assert( !strcmp( errorField->feMesh->name, "constantMesh" ) );
 
@@ -770,7 +769,7 @@ void FieldTest_ElementErrReferenceFromSwarm( void* fieldTest, Index var_I, Index
 }
 
 void FieldTest_AddAnalyticSolutionFuncToListAtIndex( void* fieldTest, Index func_I, FieldTest_AnalyticSolutionFunc* func, Index field_I ) {
-	FieldTest* 		self 		= (FieldTest*) fieldTest;
+	FieldTest* 	self 	= (FieldTest*) fieldTest;
 
 	self->_analyticSolutionList[func_I] = func;
 	self->analyticSolnForFeVarKey[field_I] = func_I;
