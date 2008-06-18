@@ -89,7 +89,7 @@
 		<param name="Essential">True</param>
 		<param name="Type">FiniteElementContext</param>
 		<param name="Fallback Key">Context</param>
-		<param name="Description">The context is essential because the FaultingMoresiMuhlhaus2006_UpdateDrawParameters function is prepended to an existing Entry Point. </param>
+		<param name="Description">The context is essential because the FaultingMoresiMuhlhaus2006_ UpdateDrawParameters function is prepended to an existing Entry Point. </param>
 	</struct>
 
 	<struct>
