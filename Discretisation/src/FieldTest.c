@@ -191,7 +191,7 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 	self->context			= Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
 
 	/* set up the entry point */
-	generateErrorFields = Hook_New( "Generate error fields hook", FieldTest_GenerateErrorFields, self->name );
+	generateErrorFields = Hook_New( "Generate error fields hook", FieldTest_GenerateErrFields, self->name );
 	_EntryPoint_AppendHook( Context_GetEntryPoint( self->context, AbstractContext_EP_Solve ), generateErrorFields );
 }
 
@@ -206,15 +206,15 @@ void _FieldTest_Build( void* fieldTest, void* data ) {
 	for( field_I = 0; field_I < self->fieldCount; field_I++ ) {
 		FieldTest_BuildReferenceField( self->referenceMesh, self->numericFieldList[field_I],
 					       self->context, &self->referenceFieldList[field_I] );
-		FieldTest_BuildErrorField( self->constantMesh, self->numericFieldList[field_I],
-					   self->context, &self->errorFieldList[field_I] );
+		FieldTest_BuildErrField( self->constantMesh, self->numericFieldList[field_I],
+					 self->context, &self->errorFieldList[field_I] );
 	}
 
 	/*for( swarm_I = 0; swarm_I < self->swarmCount; swarm_I++ ) {
 		FieldTest_BuildReferenceSwarm( self->referenceMesh, self->numericSwarmList[swarm_I], 
 					       self->context, &self->referenceSwarmList[swarm_I] );
-		FieldTest_BuildErrorSwarm( self->constantMesh, self->numericSwarmList[swarm_I], 
-					   self->context, &self->referenceSwarmList[swarm_I] );
+		FieldTest_BuildErrSwarm( self->constantMesh, self->numericSwarmList[swarm_I], 
+					 self->context, &self->referenceSwarmList[swarm_I] );
 	}*/
 
 	self->gAnalyticSq = Memory_Alloc_2DArray( double, self->fieldCount, 3, "global reference solution squared" );
@@ -316,7 +316,7 @@ void FieldTest_BuildReferenceField( FeMesh* referenceMesh, FeVariable* numericFi
 	LiveComponentRegister_Add( context->CF->LCRegister, (Stg_Component*) referenceField );
 }
 
-void FieldTest_BuildErrorField( FeMesh* constantMesh, FeVariable* numericField, DomainContext* context, FeVariable** errorField ) {
+void FieldTest_BuildErrField( FeMesh* constantMesh, FeVariable* numericField, DomainContext* context, FeVariable** errorField ) {
 	Variable_Register*	variable_Register	= context->variable_Register;
 	Sync*			sync			= Mesh_GetSync( constantMesh, MT_VERTEX );
 	Name			tmpName;
@@ -603,7 +603,7 @@ void FieldTest_LoadReferenceSolutionFromFile( FeVariable* feVariable, Name refer
 #endif
 }
 
-void FieldTest_GenerateErrorFields( void* fieldTest, void* data ) {
+void FieldTest_GenerateErrFields( void* fieldTest, void* data ) {
 	FieldTest* 		self 			= (FieldTest*) fieldTest;
 	FeVariable*		errorField;
 	Index			lMeshSize, lElement_I;
@@ -633,9 +633,9 @@ void FieldTest_GenerateErrorFields( void* fieldTest, void* data ) {
 			}
 
 			if( self->referenceSolnFromFile )
-				FieldTest_ElementErrorReferenceFromField( self, field_I, lElement_I, elErrorSq, elNormSq );
+				FieldTest_ElementErrReferenceFromField( self, field_I, lElement_I, elErrorSq, elNormSq );
 			else
-				FieldTest_ElementErrorAnalyticFromField( self, field_I, lElement_I, elErrorSq, elNormSq );
+				FieldTest_ElementErrAnalyticFromField( self, field_I, lElement_I, elErrorSq, elNormSq );
 
 			for( dof_I = 0; dof_I < numDofs; dof_I++ ) {
 				lAnalyticSq[dof_I] += elNormSq[dof_I];
@@ -659,7 +659,7 @@ void FieldTest_GenerateErrorFields( void* fieldTest, void* data ) {
 	}
 }
 
-void FieldTest_ElementErrorReferenceFromField( void* fieldTest, Index field_I, Index lElement_I, double* elErrorSq, double* elNormSq ) {
+void FieldTest_ElementErrReferenceFromField( void* fieldTest, Index field_I, Index lElement_I, double* elErrorSq, double* elNormSq ) {
 	FieldTest* 		self 			= (FieldTest*) fieldTest;
 	FeVariable*		referenceField		= self->referenceFieldList[field_I];
 	FeVariable*		numericField		= self->numericFieldList[field_I];
@@ -707,7 +707,7 @@ void FieldTest_ElementErrorReferenceFromField( void* fieldTest, Index field_I, I
 	}
 }
 
-void FieldTest_ElementErrorAnalyticFromField( void* fieldTest, Index field_I, Index lElement_I, double* elErrorSq, double* elNormSq ) {
+void FieldTest_ElementErrAnalyticFromField( void* fieldTest, Index field_I, Index lElement_I, double* elErrorSq, double* elNormSq ) {
 	FieldTest* 		self 			= (FieldTest*) fieldTest;
 	FeVariable*		referenceField		= self->referenceFieldList[field_I];
 	FeVariable*		numericField		= self->numericFieldList[field_I];
@@ -757,13 +757,13 @@ void FieldTest_ElementErrorAnalyticFromField( void* fieldTest, Index field_I, In
 	}
 }
 
-void FieldTest_ElementErrorAnalyticFromSwarm( void* fieldTest, Index var_I, Index lElement_I, double* elErrorSq, double* elNormSq ) {
+void FieldTest_ElementErrAnalyticFromSwarm( void* fieldTest, Index var_I, Index lElement_I, double* elErrorSq, double* elNormSq ) {
 	FieldTest* 		self 		= (FieldTest*) fieldTest;
 
 	
 }
 
-void FieldTest_ElementErrorReferenceFromSwarm( void* fieldTest, Index var_I, Index lElement_I, double* elErrorSq, double* elNormSq ) {
+void FieldTest_ElementErrReferenceFromSwarm( void* fieldTest, Index var_I, Index lElement_I, double* elErrorSq, double* elNormSq ) {
 	FieldTest* 		self 		= (FieldTest*) fieldTest;
 
 

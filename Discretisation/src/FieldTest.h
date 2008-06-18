@@ -148,16 +148,16 @@
 
 	/* --- Public Functions --- */
 	void FieldTest_BuildReferenceField( FeMesh* feMesh, FeVariable* numericField, DomainContext* context, FeVariable** referenceField );
-	void FieldTest_BuildErrorField( FeMesh* feMesh, FeVariable* numericField, DomainContext* context, FeVariable** errorField );
+	void FieldTest_BuildErrField( FeMesh* feMesh, FeVariable* numericField, DomainContext* context, FeVariable** errorField );
 
 	void FieldTest_LoadReferenceSolutionFromFile( FeVariable* referenceField, Name referenceSolnName, Name referenceSolnPath, DomainContext* context );
 
-	void FieldTest_GenerateErrorFields( void* fieldTest, void* data );
+	void FieldTest_GenerateErrFields( void* fieldTest, void* data );
 
-	void FieldTest_ElementErrorAnalyticFromField( void* fieldTest, Index field_I, Index lElement_I, double* elErrorSq, double* elNormSq );
-	void FieldTest_ElementErrorReferenceFromField( void* fieldTest, Index field_I, Index lElement_I, double* elErrorSq, double* elNormSq );
-	void FieldTest_ElementErrorAnalyticFromSwarm( void* fieldTest, Index field_I, Index lElement_I, double* elErrorSq, double* elNormSq );
-	void FieldTest_ElementErrorReferenceFromSwarm( void* fieldTest, Index field_I, Index lElement_I, double* elErrorSq, double* elNormSq );
+	void FieldTest_ElementErrAnalyticFromField( void* fieldTest, Index field_I, Index lElement_I, double* elErrorSq, double* elNormSq );
+	void FieldTest_ElementErrReferenceFromField( void* fieldTest, Index field_I, Index lElement_I, double* elErrorSq, double* elNormSq );
+	void FieldTest_ElementErrAnalyticFromSwarm( void* fieldTest, Index field_I, Index lElement_I, double* elErrorSq, double* elNormSq );
+	void FieldTest_ElementErrReferenceFromSwarm( void* fieldTest, Index field_I, Index lElement_I, double* elErrorSq, double* elNormSq );
 
 	void FieldTest_AddAnalyticSolutionFuncToListAtIndex( void* fieldTest, Index func_I, FieldTest_AnalyticSolutionFunc* func, Index field_I );
 
