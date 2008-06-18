@@ -24,14 +24,14 @@
 		<param name="Type">Bool</param>
 		<param name="Default">True</param>
 		<param name="Description">Normalise the error field against the analytic or reference solution.</param>
-	<struct>
+	</struct>
 		
 	<struct>
 		<param name="Name">numericVariableName</param>
 		<param name="Type">String</param>
 		<param name="Default">""</param>
 		<param name="Description">Textual name of the variable to be used in the case of a swarm based variable.</param>
-	<struct>
+	</struct>
 </list>
 
 <list name="Dependencies">
