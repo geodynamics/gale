@@ -195,7 +195,7 @@ void _Underworld_SwarmOutput_Construct( void* uwSwarmOutput, Stg_ComponentFactor
 			"You must specify a list of fevariables to interpolate onto the swarm in your xml. Example:\n"
 			"<list name=\"FeVariables\">\n"
 				"\t<param>PressureField</param>\n"
-			"</list>", __func__ );
+			"</list>\n", __func__ );
 	
 	
 	

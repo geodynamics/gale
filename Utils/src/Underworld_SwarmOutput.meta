@@ -27,10 +27,20 @@
 	</struct>
 	<struct>
 		<param name="Essential">True</param>
-		<param name="Name">MaterialPointsSwarm</param>
+		<param name="Name">Swarm</param>
 		<param name="Type">MaterialPointsSwarm</param>
 		<param name="Description">This is the materialPointsSwarm, which by default is called materialSwarm in the xml.</param>
 	</struct>
 </list>
-<param name="Example">...</param>
+<param name="Example">
+<![CDATA[
+	<struct name="testing">
+		<param name="Type">Underworld_SwarmOutput</param>
+		<param name="Swarm">materialSwarm</param>
+		<list name="FeVariables">
+			<param>PressureField</param>
+		</list>
+	</struct>
+]]>
+</param>
 </StGermainData>
