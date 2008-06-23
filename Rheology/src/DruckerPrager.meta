@@ -21,6 +21,12 @@
 
 <list name="Params">
 	<struct>
+		<param name="Name">minimumYieldStress</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.0</param>
+		<param name="Description">This sets an absolute minimum for the value for the calculated yield stress.</param>
+	</struct>
+	<struct>
 		<param name="Name">frictionCoefficient</param>
 		<param name="Type">Double</param>
 		<param name="Default">0.0</param>
@@ -36,21 +42,18 @@
 </list>
 
 <list name="Dependencies">
-
 	<struct>
 		<param name="Essential">True</param>
 		<param name="Type">FeVariable</param>
 		<param name="Fallback Key">PressureField</param>
 		<param name="Description">Essential component since the DruckerPrager criterion is pressure dependant</param>
 	</struct>
-
 	<struct>
 		<param name="Essential">True</param>
 		<param name="Type">IntegrationPointsSwarm</param>
 		<param name="Fallback Key">MaterialPoints</param>
 		<param name="Description">Defines the set of material points. It is needed because infos stored by each material point are added for viz purpose. </param>
 	</struct>
-
 	<struct>
 		<param name="Essential">True</param>
 		<param name="Type">FiniteElementContext</param>

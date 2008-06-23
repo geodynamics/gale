@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: VonMises.h 354 2006-10-12 08:19:27Z SteveQuenette $
+** $Id: VonMises.h 743 2008-06-23 01:49:43Z JulianGiordani $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -57,7 +57,6 @@
 		/* Material Parameters */\
 		FeVariable*                                         strainRateField;                      \
 		double                                              cohesion;                             \
-		double                                              minimumYieldStress;                   \
 		double                                              cohesionAfterSoftening;               \
 		Bool                                                strainRateSoftening;                  
 

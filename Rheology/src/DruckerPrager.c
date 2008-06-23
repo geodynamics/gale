@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: DruckerPrager.c 715 2008-04-18 02:33:59Z LouisMoresi $
+** $Id: DruckerPrager.c 743 2008-06-23 01:49:43Z JulianGiordani $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -113,6 +113,7 @@ void _DruckerPrager_Init(
 		FeVariable*                                        pressureField,
 		MaterialPointsSwarm*                               materialPointsSwarm,
 		FiniteElementContext*                              context,
+		double                                             minimumYieldStress,
 		double                                             frictionCoefficient,
 		double                                             frictionCoefficientAfterSoftening )
 {
@@ -125,6 +126,7 @@ void _DruckerPrager_Init(
 	/* Assign Pointers */
 	self->pressureField       = pressureField;
 	self->frictionCoefficient = frictionCoefficient;
+	self->minimumYieldStress  = minimumYieldStress;
 	
 	/* Strain softening of Friction - (linear weakening is assumed) */
 	/* needs a softening factor between +0 and 1 and a reference strain > 0 */
@@ -193,12 +195,8 @@ void _DruckerPrager_Construct( void* druckerPrager, Stg_ComponentFactory* cf, vo
 	/* Construct Parent */
 	_VonMises_Construct( self, cf, data );
 	
-	/* TODO: KeyFallback soon to be deprecated/updated */
-	/* pressureField      = Stg_ComponentFactory_ConstructByNameWithKeyFallback(
-                        cf, self->name, "PressureField", "PressureField", FeVariable, True, data ); */
-	
 	pressureField      = (FeVariable *) 
-			Stg_ComponentFactory_ConstructByKey( cf, self->name, "PressureField", 		FeVariable, 		 True, data );
+			Stg_ComponentFactory_ConstructByKey( cf, self->name, "PressureField", FeVariable, True, data );
 			
 	materialPointsSwarm     = (MaterialPointsSwarm*)
 			Stg_ComponentFactory_ConstructByKey( cf, self->name, "MaterialPointsSwarm", MaterialPointsSwarm, True, data );
@@ -210,6 +208,7 @@ void _DruckerPrager_Construct( void* druckerPrager, Stg_ComponentFactory* cf, vo
 			pressureField,
 			materialPointsSwarm, 
 			context,
+			Stg_ComponentFactory_GetDouble( cf, self->name, "minimumYieldStress", 0.0 ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "frictionCoefficient", 0.0 ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "frictionCoefficientAfterSoftening", 0.0 ) );
 }
@@ -289,7 +288,7 @@ double _DruckerPrager_GetYieldCriterion(
 	double                            pressure;
 	DruckerPrager_Particle*           particleExt;
 	
-	/* Get Parameters From Material Extension */
+	/* Get Parameters From Rheology */
 	cohesion                           = self->cohesion;
 	cohesionAfterSoftening             = self->cohesionAfterSoftening;
 	frictionCoefficient                = self->frictionCoefficient;

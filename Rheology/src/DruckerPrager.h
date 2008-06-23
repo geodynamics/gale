@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: DruckerPrager.h 354 2006-10-12 08:19:27Z SteveQuenette $
+** $Id: DruckerPrager.h 743 2008-06-23 01:49:43Z JulianGiordani $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -69,6 +69,7 @@
 		ExtensionInfo_Index                                 particleExtHandle;                     \
 		/* Param passed in */\
 		FeVariable*                                         pressureField;                         \
+		double                                              minimumYieldStress;                    \
 		double                                              frictionCoefficient;                   \
 		double                                              frictionCoefficientAfterSoftening;
 

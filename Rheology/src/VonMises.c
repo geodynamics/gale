@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: VonMises.c 610 2007-10-11 08:09:29Z SteveQuenette $
+** $Id: VonMises.c 743 2008-06-23 01:49:43Z JulianGiordani $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -112,7 +112,6 @@ void _VonMises_Init(
 		FeVariable* strainRateField, 
 		double      cohesion, 
 		double      cohesionAfterSoftening,
-		double      minimumYieldStress,
 		Bool        strainRateSoftening ) 
 {
 	self->strainRateField        = strainRateField;
@@ -121,7 +120,6 @@ void _VonMises_Init(
 	/* Strain softening of Cohesion - (linear weakening is assumed) */
 	/* needs a softening factor between +0 and 1 and a reference strain > 0 */
 	self->cohesionAfterSoftening = cohesionAfterSoftening;
-	self->minimumYieldStress     = minimumYieldStress;
 	self->strainRateSoftening    = strainRateSoftening;
 }
 
@@ -152,25 +150,14 @@ void _VonMises_Construct( void* rheology, Stg_ComponentFactory* cf, void* data )
 	/* Construct Parent */
 	_YieldRheology_Construct( self, cf, data );
 	
-	/* TODO: soon to be deprecated/updated */
-	strainRateField = Stg_ComponentFactory_ConstructByNameWithKeyFallback(
-        	cf, 
-		self->name, 
-		"StrainRateField", 
-		"StrainRateField", 
-		FeVariable, 
-		True,
-		data );
-	/*strainRateField = Stg_ComponentFactory_ConstructByKey(  */
-	/*		cf, self->name, "StrainRateField", FeVariable, True ); */
-	
+	strainRateField = Stg_ComponentFactory_ConstructByKey(  
+			cf, self->name, "StrainRateField", FeVariable, True, data );
 	
 	_VonMises_Init( 
 			self, 
 			strainRateField,
 			Stg_ComponentFactory_GetDouble( cf, self->name, "cohesion", 0.0 ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "cohesionAfterSoftening", 0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "minimumYieldStress", 0.0 ),
 			Stg_ComponentFactory_GetBool(   cf, self->name, "strainRateSoftening", False ) );
 }
 

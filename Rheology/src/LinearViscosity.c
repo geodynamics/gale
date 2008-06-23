@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: LinearViscosity.c 736 2008-05-23 06:05:21Z RobertTurnbull $
+** $Id: LinearViscosity.c 743 2008-06-23 01:49:43Z JulianGiordani $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 #include <mpi.h>
@@ -142,14 +142,14 @@ void _LinearViscosity_Construct( void* rheology, Stg_ComponentFactory* cf, void*
 	
 	_LinearViscosity_Init( 
 			self, 
-			Stg_ComponentFactory_GetDouble( cf, self->name, "C", 0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "X", 0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "Y", 0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "Z", 0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "XY", 0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "XZ", 0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "YZ", 0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "XYZ", 0.0 ) );
+			Stg_ComponentFactory_GetDouble( cf, self->name, "C", 1.0 ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, "X", 1.0 ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, "Y", 1.0 ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, "Z", 1.0 ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, "XY", 1.0 ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, "XZ", 1.0 ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, "YZ", 1.0 ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, "XYZ", 1.0 ) );
 }
 
 void _LinearViscosity_ModifyConstitutiveMatrix( 
