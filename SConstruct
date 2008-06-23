@@ -2,7 +2,6 @@ import sys, os
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.getcwd(), 'config')))
 import SConfig
-SConscript('config/SConfig/SConscript')
 
 #
 # CUSTOMISE THE ENVIRONMENT HERE.
@@ -16,7 +15,7 @@ if platform.platform().find('ia64') != -1:
     SCons.Tool.createStaticLibBuilder(env)
 else:
     env = Environment(ENV=os.environ)
-env['_abspath'] = lambda x: File(x).abspath # Needed by Darwin.
+SConscript('config/SConfig/SConscript', exports='env')
 
 # Determine whether we are configuring, helping or building.
 if 'config' in COMMAND_LINE_TARGETS or 'help' in COMMAND_LINE_TARGETS:
@@ -80,3 +79,7 @@ else:
     env.Prepend(LIBS='Underworld')
     if env['with_glucifer']:
         SConscript('gLucifer/SConscript', exports='env')
+
+    # Dump package config.
+    filename = env.get_build_path('lib/pkgconfig/stgermain.pc')
+    env.write_pkgconfig(filename, 'StGermain', 'The StGermain Framework')
