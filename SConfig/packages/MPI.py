@@ -9,13 +9,13 @@ class MPI(SConfig.Package):
         self.header_sub_dir = ['mpi']
         self.headers = [['mpi.h']]
         self.libraries = [['mpich'],
-                          ['mpich', 'pmpich'],
+                          ['pmpich', 'mpich'],
                           ['mpich', 'rt'],
-                          ['mpich', 'pmpich', 'rt'],
+                          ['pmpich', 'mpich', 'rt'],
                           ['mpich', 'pvfs2'],
-                          ['mpich', 'pmpich', 'pvfs2'],
+                          ['pmpich', 'mpich', 'pvfs2'],
                           ['mpich', 'rt', 'pvfs2'],
-                          ['mpich', 'pmpich', 'rt', 'pvfs2'],
+                          ['pmpich', 'mpich', 'rt', 'pvfs2'],
                           ['mpi'],
                           ['lam', 'mpi']]
         self.shared_libraries = ['mpich', 'pmpich', 'mpi', 'lam']
