@@ -88,6 +88,8 @@ class Installation:
             cpp_def = list(self.cpp_defines)
             if self.sym_def:
                 cpp_def += [self.sym_def]
+            if self.pkg.have_fwork_define and self.fwork:
+                cpp_def += [self.pkg.have_fwork_define]
             self.pkg.backup_variable(scons_env, 'CPPDEFINES', old_state)
             scons_env.AppendUnique(CPPDEFINES=cpp_def)
 
@@ -226,6 +228,8 @@ class Installation:
             cpp_def = list(self.cpp_defines)
             if self.sym_def:
                 cpp_def += [self.sym_def]
+            if self.pkg.have_fwork_define and self.fwork:
+                cpp_def += [self.pkg.have_fwork_define]
             txt += '  Exporting: %s\n' % (cpp_def)
 
         return txt

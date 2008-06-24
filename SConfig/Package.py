@@ -20,6 +20,7 @@ class Package(SConfig.Node):
 
         # This will be set in the preprocessor.
         self.have_define         = kw.get('have_define', '')
+        self.have_fwork_define   = 'HAVE_' + self.name.upper() + '_FRAMEWORK'
 
         # Search options.
         self.base_dirs           = [] #['']
