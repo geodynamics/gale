@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SystemLinearEquations.c 1143 2008-06-03 04:18:54Z DavidMay $
+** $Id: SystemLinearEquations.c 1160 2008-06-24 00:25:20Z LouisMoresi $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -416,7 +416,7 @@ void _SystemLinearEquations_Construct( void* sle, Stg_ComponentFactory* cf, void
 	killNonConvergent         = Stg_ComponentFactory_GetBool(   cf, self->name, "killNonConvergent",      True );
 	nonLinearMinIterations    = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "nonLinearMinIterations", 1 );
 	nonLinearSolutionType	  = Stg_ComponentFactory_GetString( cf, self->name, "nonLinearSolutionType",  "default" );
-	optionsPrefix		  = Stg_ComponentFactory_GetString( cf, self->name, "optionsPrefix",          "" );
+	optionsPrefix			  = Stg_ComponentFactory_GetString( cf, self->name, "optionsPrefix",          "" );
 
 
 	/* Read some value for Picard */
@@ -1020,7 +1020,7 @@ void SLE_SNESMonitor( void *sle, PetscInt iter, PetscReal fnorm )
 void SLE_SNESMonitor2( void *sle, PetscInt iter, PetscReal fnorm0, PetscReal fnorm, PetscReal dX, PetscReal X1 )
 {
   if(iter==0) {
-    PetscPrintf( PETSC_COMM_WORLD, "  SLE_NS  it       |F|             |F|/|F0|         |X1-X0|       |X1-X0|/|X1| \n" );
+    PetscPrintf( PETSC_COMM_WORLD, "  SLE_NS  it       |F|              |F|/|F0|          |X1-X0|        |X1-X0|/|X1| \n" );
   }
   PetscPrintf( PETSC_COMM_WORLD,   "  SLE_NS  %1.4d     %2.4e      %2.4e       %2.4e     %2.4e \n", iter, fnorm, fnorm/fnorm0, dX, dX/X1 );
 }
@@ -1061,7 +1061,7 @@ void SLE_SNESMonitorProgress( void *sle,
   v3 = dX/X1;
   _monitor_progress( x_del_s, x_del_e, v3, &p3 );
 
-  PetscPrintf( PETSC_COMM_WORLD,   "  SLE_NS  %1.4d     %2.4e [%.0f%%]     %2.4e [%.0f%%]      %2.4e [%.0f%%] \n", iter, fnorm,p1, fnorm/fnorm0,p2,  dX/X1,p3 );
+  PetscPrintf( PETSC_COMM_WORLD,   "  SLE_NS  %1.4d     %2.4e [%2.0f%%]     %2.4e [%2.0f%%]      %2.4e [%2.0f%%] \n", iter, fnorm,p1, fnorm/fnorm0,p2,  dX/X1,p3 );
 }
 
 
