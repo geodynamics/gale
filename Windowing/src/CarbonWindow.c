@@ -425,19 +425,33 @@ void lucCarbonWindow_CreateInteractiveWindow( void* carbonWindow, void* data ) {
 }
 
 /* Steps taken from http://gemma.apple.com/documentation/GraphicsImaging/Conceptual/OpenGL-MacProgGuide/OpenGLProg_MacOSX.pdf */
+
 void lucCarbonWindow_CreateBackgroundWindow( void* carbonWindow, void* data ) {
 	lucCarbonWindow*        self       = (lucCarbonWindow*) carbonWindow; 
-	long                    numPixelFormats;
+
+	GLint                   numPixelFormats;
 	CGLContextObj           contextObj;
 	lucAlphaPixel*          memBuffer;
 	CGLPixelFormatObj       pixelFormatObj;
 	CGLPBufferObj           pBuffer;
+	CGLError 				cglReturnValue;
+	
+	
 	/* Step 1:
 	 * Sets up an array of pixel format attributes 
 	 * - an offscreen drawable object and a color buffer with a size of 32 bytes. 
 	 * Note that the list must be terminated by NULL. */
-	CGLPixelFormatAttribute attribs[] = 	{
+	
+/*	CGLPixelFormatAttribute attribs[] = 	{
 		kCGLPFARemotePBuffer,
+		kCGLPFAOffScreen,
+		kCGLPFAColorSize, 32,
+		NULL
+	} ; */
+	
+	/* Note: the apple document referred to above was recently updated */
+	
+	CGLPixelFormatAttribute attribs[] = 	{
 		kCGLPFAOffScreen,
 		kCGLPFAColorSize, 32,
 		0
@@ -445,18 +459,36 @@ void lucCarbonWindow_CreateBackgroundWindow( void* carbonWindow, void* data ) {
 	
 
 	/* Step 2 - Creates a pixel format object that has the specified renderer and buffer attributes. */
-	CGLChoosePixelFormat (attribs, &pixelFormatObj, &numPixelFormats);
+	cglReturnValue = CGLChoosePixelFormat (attribs, &pixelFormatObj, &numPixelFormats);
+		
+	if(cglReturnValue != kCGLNoError) 
+		Journal_DPrintf( lucDebug,"Error setting up background window (Step 2): %s\n", CGLErrorString(cglReturnValue));
+		
+		
 
 	/* Step 3 - Creates a CGL context using the newly created pixel format object. */
-	CGLCreateContext (pixelFormatObj, NULL, &contextObj); /* Step 3 */
-	CGLDestroyPixelFormat (pixelFormatObj);
+	cglReturnValue = CGLCreateContext (pixelFormatObj, NULL, &contextObj); /* Step 3 */
+	if(cglReturnValue != kCGLNoError) 
+		Journal_DPrintf( lucDebug,"Error setting up background window (Step 3): %s\n", CGLErrorString(cglReturnValue));	
 
-	/* Step 4 - Sets the current context to the newly created offscreen CGL context. */
-	CGLSetCurrentContext (contextObj);
+	cglReturnValue = CGLDestroyPixelFormat (pixelFormatObj);
+	if(cglReturnValue != kCGLNoError) 
+		Journal_DPrintf( lucDebug,"Error setting up background window (Step 3): %s\n", CGLErrorString(cglReturnValue));	
+	
 
+	/* Step 4a - Sets the current context to the newly created offscreen CGL context. */
+	cglReturnValue = CGLSetCurrentContext (contextObj);
+	if(cglReturnValue != kCGLNoError) 
+		Journal_DPrintf( lucDebug,"Error setting up background window (Step 4a): %s\n", CGLErrorString(cglReturnValue));
+		
 	/* Step 4b - Create Pixel Buffer */
-	CGLCreatePBuffer( self->width, self->height, GL_TEXTURE_RECTANGLE_EXT, GL_RGBA, 0, &pBuffer );
-	CGLSetPBuffer( contextObj, pBuffer, 0, 0, 0 );
+	cglReturnValue = CGLCreatePBuffer( self->width, self->height, GL_TEXTURE_RECTANGLE_EXT, GL_RGBA, 0, &pBuffer );
+	if(cglReturnValue != kCGLNoError) 
+		Journal_DPrintf( lucDebug,"Error setting up background window (Step 4b): %s\n", CGLErrorString(cglReturnValue));
+	
+	cglReturnValue = CGLSetPBuffer( contextObj, pBuffer, 0, 0, 0 );
+	if(cglReturnValue != kCGLNoError) 
+		Journal_DPrintf( lucDebug,"Error setting up background window (Step 4b): %s\n", CGLErrorString(cglReturnValue));
 
 	/* Step 5 - Allocates memory for the offscreen drawable object. */
 	memBuffer = Memory_Alloc_Array( lucAlphaPixel, self->width * self->height, "Image Buffer" );
@@ -466,7 +498,10 @@ void lucCarbonWindow_CreateBackgroundWindow( void* carbonWindow, void* data ) {
 	 * You need to specify the width and height of the offscreen buffer (in pixels), 
 	 * the number of bytes per row, and a pointer to the block of memory you want to render the context into.
 	 * The number of bytes per row must be at least the width times the bytes per pixels. */
-	CGLSetOffScreen (contextObj, (GLsizei) self->width, (GLsizei) self->height, (GLsizei) self->width * sizeof(lucAlphaPixel), memBuffer);
+	
+	cglReturnValue = CGLSetOffScreen (contextObj, (GLsizei) self->width, (GLsizei) self->height, (GLsizei) self->width * sizeof(lucAlphaPixel), memBuffer);
+	if(cglReturnValue != kCGLNoError) 
+		Journal_DPrintf( lucDebug,"Error setting up background window (Step 6): %s", CGLErrorString(cglReturnValue));
 
 	/* Set pointer to graphics context on my object */
 	self->windowIsInteractive = False;
@@ -488,18 +523,25 @@ void lucCarbonWindow_DestroyWindow( void* carbonWindow, void* data ) {
 		aglDestroyContext( self->graphicsContext );
 		self->graphicsContext = NULL;
 	}
+	
 	else {
+				
 		CGLContextObj contextObj = (CGLContextObj) self->graphicsContext;
 		CGLPBufferObj pBuffer;
-		unsigned long face;
-		long level;
-		long screen;
-
-		CGLGetPBuffer( contextObj, &pBuffer, &face, &level, &screen ) ;
-		CGLDestroyPBuffer (pBuffer);
-		CGLSetCurrentContext (NULL);
-		CGLClearDrawable (contextObj);
-		CGLDestroyContext (contextObj);
+		CGLError cglReturnValue;
+		GLenum face;
+		GLint level;
+		GLint screen;
+	
+		cglReturnValue = CGLGetPBuffer( contextObj, &pBuffer, &face, &level, &screen ) ;		
+		if(cglReturnValue != kCGLNoError)
+			Journal_DPrintf( lucDebug,"Error cleaning up background window: %s", CGLErrorString(cglReturnValue));
+		
+		
+			CGLDestroyPBuffer (pBuffer);
+			CGLSetCurrentContext (NULL);
+			CGLClearDrawable (contextObj);
+			CGLDestroyContext (contextObj);		
 	}
 }
 
