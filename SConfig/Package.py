@@ -274,7 +274,7 @@ class Package(SConfig.Node):
                 path = os.path.join(base_dir, d)
                 if not (os.path.exists(path) and os.path.isdir(path)):
                     return
-            yield cand
+            yield cand + hdr_dirs
 
     def add_candidate(self, inst):
         """Add a unique candidate installation. Note that if candidate(s) were
