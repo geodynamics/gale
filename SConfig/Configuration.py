@@ -91,6 +91,16 @@ class Configuration:
                 return None
             deps += result
 
+    def value(self):
+        """Evaluates a 'value' figure for this configuration. The value
+        corresponds to how it should be weighted when considering which
+        configuration to use. Includes the values of it's children."""
+
+        val = len(self.deps)
+        for d in self.deps:
+            val += d.value()
+        return val
+
     def __str__(self, brief=True):
         """Convert to printable string."""
 

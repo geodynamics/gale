@@ -78,11 +78,16 @@ class Project(SConfig.Node):
                         self.ctx.Display('      %s\n' % useable.inst.base_dir)
             return False
 
-        # Decide which selection of dependencies to use. For the moment base
-        # it entirely on the number of packages in the set.
-        selected = []
+        # Decide which selection of dependencies to use. We use the 'value'
+        # method for each configuration.
+        max_val = 0
+        selected = None
         for d in deps:
-            if len(d) > len(selected):
+            cur_val = 0
+            for cfg in d:
+                cur_val += cfg.value()
+            if cur_val > max_val:
+                max_val = cur_val
                 selected = d
 
         # Set the 'selected' member of each package with configurations.
