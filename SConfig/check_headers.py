@@ -90,4 +90,4 @@ def check_headers(cfg):
     pkg.env.Replace(**old_state)
 
     # Return the results.
-    return result
+    return result[0]
