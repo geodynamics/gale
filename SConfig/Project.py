@@ -81,11 +81,12 @@ class Project(SConfig.Node):
         # Decide which selection of dependencies to use. We use the 'value'
         # method for each configuration.
         max_val = 0
-        selected = None
+        selected = deps[0]
         for d in deps:
             cur_val = 0
             for cfg in d:
-                cur_val += cfg.value()
+                if isinstance(cfg, Configuration):
+                    cur_val += cfg.value()
             if cur_val > max_val:
                 max_val = cur_val
                 selected = d
