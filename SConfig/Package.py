@@ -77,8 +77,10 @@ class Package(SConfig.Node):
         # platform we're running on.
         self.platform = self.dependency(SConfig.Platform, True) 
 
-        # We have one configuration check.
+        # We have one configuration check. We also have the option of adding
+        # candidate checks.
         self.checks = [self.check_candidates]
+        self.candidate_checks = [self.check_headers, self.check_libraries]
 
         # Setup search defaults for the platform we're on.
         self.setup_search_defaults()
@@ -316,8 +318,13 @@ class Package(SConfig.Node):
             print '  Trialing candidate %d of %d ...\r' % (cur, len(self.cand_cfgs)),
             cur = cur + 1
 
-            # Check for the headers and libraries.
-            if self.check_headers(cfg) and self.check_libraries(cfg):
+            # Run all the candidate checks.
+            okay = True
+            for cand_check in self.candidate_checks:
+                if not cand_check(cfg):
+                    okay = False
+                    break
+            if okay:
 
                 # If the checks passed, include the 'have_define' if there and add
                 # this installation to the list.

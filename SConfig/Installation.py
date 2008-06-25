@@ -210,6 +210,19 @@ class Installation:
                         found_libs += [path]
         return found_libs
 
+    def find_header(self, hdr):
+        """Using the search paths we know about, try and locate the files corresponding
+        to the header name(s) given."""
+
+        hdrs = self.pkg.env.make_list(hdr)
+        found_hdrs = []
+        for h in hdrs:
+            for hdr_dir in self.hdr_dirs:
+                path = os.path.join(self.base_dir, hdr_dir, h)
+                if os.path.exists(path):
+                    found_hdrs += [path]
+        return found_hdrs
+
     def __str__(self):
         """Convert to printable string."""
 

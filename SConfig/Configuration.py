@@ -18,6 +18,14 @@ class Configuration:
         self.has_static = None
         self.has_shared = None
 
+        # Preprocessor definitions.
+        self.cpp_defines = []
+
+        # This list provides a way of modifying the printed output of
+        # a configuration without needing to replace the print method.
+        self.outputs = [('Static libraries: %s', 'has_static'),
+                        ('Shared libraries: %s', 'has_shared')]
+
     def __eq__(self, cfg):
         if not (self.inst == cfg.inst):
             return False
@@ -46,6 +54,11 @@ class Configuration:
                          libs=self.libs,
                          has_shared=self.has_shared,
                          lib_exclude=lib_exclude)
+
+        # Throw in any preprocessor stuff.
+        if self.cpp_defines:
+            self.inst.pkg.backup_variable(scons_env, 'CPPDEFINES', old_state)
+            scons_env.AppendUnique(CPPDEFINES=self.cpp_defines)
 
     def enable_dependencies(self, scons_env, old_state={}, lib_exclude=[]):
         """Enables all available dependencies."""
@@ -84,11 +97,11 @@ class Configuration:
         # Get the installation's string first.
         txt = str(self.inst)
 
-        # Add information about libraries.
-        if self.has_static is not None:
-            txt += '  Static libraries: %s\n' % str(self.has_static)
-        if self.has_shared is not None:
-            txt += '  Shared libraries: %s\n' % str(self.has_shared)
+        # Print out our outputs.
+        for out in self.outputs:
+            line = out[0]
+            vals = tuple([getattr(self, v) for v in out[1:]])
+            txt += ('  ' + line + '\n') % vals
 
         # Now produce the dependency text.
         dep_txt = ''
