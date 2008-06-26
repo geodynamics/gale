@@ -79,23 +79,42 @@ Unlike the C usage, MDF automatically handles memory allocation.
 </struct>
 </p>
 <p>
-This example create an entry in the variable register of the name "velocity", which is a vector of 3 double components. Also, 3 more entries into the variable register will be made, targetting the 3 vector components of "velocity", named "vx", "vy", "vz".
+This example create an entry in the variable register of the name "velocity", 
+which is a vector of 3 double components. Also, 3 more entries into the variable
+ register will be made, targetting the 3 vector components of "velocity",
+ named "vx", "vy", "vz".
 </p>
 
 <p>C version:
-Using Variable in C is different to the XML implementation because you need to do own memory handling.
-This example is based on the sourcecode in ~/code/StGermain/Base/Automation/tests/testVariable.c </p>
+Using Variable in C is different to the XML implementation because you need to
+ do own memory handling.
+This example is based on the sourcecode in 
+~/code/StGermain/Base/Automation/tests/testVariable.c </p>
 <p>
 /* Construct phase */
 double* velocity;
-Variable_NewVector("velocity", Variable_DataType_Double, 3, &amp;aSize[1], (void**)&amp;velocity, vr, "vx", "vy", "vz");
+Variable_NewVector("velocity", 
+                   Variable_DataType_Double, 
+                   3, 
+                   &amp;aSize[1], 
+                   (void**)&amp;velocity, 
+                   vr, 
+                   "vx", 
+                   "vy", 
+                   "vz");
 
 /* Build phase*/
 velocity = malloc(...);
 component_Build(v);
 
 A general form of the C version:
-Variable_NewVector(name, type, length, array size, data array, variable register, [optional: list of names of array items]);
+Variable_NewVector(name, 
+                   type, 
+                   length, 
+                   array size, 
+                   data array, 
+                   variable register, 
+                   [optional: list of names of array items]);
 </p>
 </param>
 
