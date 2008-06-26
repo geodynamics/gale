@@ -2,6 +2,28 @@ import os, shutil
 import SConfig
 import check_headers
 
+def get_symbols_prototypes(cfg):
+    src = ''
+    for sym, proto in zip(cfg.inst.syms, cfg.inst.pkg.symbol_prototypes):
+        src += (proto % sym) + '\n'
+    return src
+
+def get_symbols_calls(cfg):
+    # Setup any code required for the symbol check.
+    src = ''
+    if cfg.inst.pkg.symbol_setup:
+        src += cfg.inst.pkg.symbol_setup + '\n'
+
+    # Unpack all the symbols.
+    for sym, call in zip(cfg.inst.syms, cfg.inst.pkg.symbol_calls):
+        src += (call % sym) + '\n'
+
+    # Include any teardown code.
+    if cfg.inst.pkg.symbol_teardown:
+        src += cfg.inst.pkg.symbol_teardown + '\n'
+
+    return src
+
 def get_symbols_source(cfg):
     """Build the source code required to check that a set of symbols is
     present in a package installation. We produce two sets of source code:
@@ -16,26 +38,13 @@ def get_symbols_source(cfg):
 
     # Begin with header inclusions and symbol prototypes.
     src = check_headers.get_header_source(cfg)
-    for sym, proto in zip(inst.syms, pkg.symbol_prototypes):
-        src += (proto % sym) + '\n'
+    src += get_symbols_prototypes(cfg)
 
     # Setup the main function call.
     src += 'int main(int argc, char* argv[]) {\n'
-
-    # Setup any code required for the symbol check.
-    if pkg.symbol_setup:
-        src += pkg.symbol_setup + '\n'
-
-    # Unpack all the symbols.
-    for sym, call in zip(inst.syms, pkg.symbol_calls):
-        src += (call % sym) + '\n'
-
-    # Include any teardown code.
-    if pkg.symbol_teardown:
-        src += pkg.symbol_teardown + '\n'
-
-    # Finish it off and return.
+    src += get_symbols_calls(cfg)
     src += 'return 0;\n}\n'
+
     return src
 
 def generate_library_paths(cfg, lib):
@@ -46,6 +55,58 @@ def generate_library_paths(cfg, lib):
             yield os.path.abspath(path)
     else:
         yield lib_name
+
+def new_check_shared_exist(cfg):
+    """Check for the existance of shared libraries for the given
+    configuration only. We want to do this by not caring whether
+    dependencies have shared libraries or not. The method we use is
+    to build a shared library and link directly against this packages
+    shared libraries."""
+
+    # Alias the instance and package.
+    inst = cfg.inst
+    pkg = inst.pkg
+
+    pkg.ctx.Log('  Checking for existence of shared libraries:\n')
+
+    # If we're configuring the dynamic linker, just return True.
+    if pkg.name == 'dl':
+        pkg.ctx.Log('    No need for the \'dl\' package.\n')
+        return True
+
+    # If we don't have any libraries to check, return True.
+    if not cfg.libs:
+        pkg.ctx.Log('    No libraries to check!\n')
+        return True
+
+    # If this package is shared, it should have a configuration of the
+    # 'dl' package as one of it's dependencies.
+    dl = None
+    for dep in cfg.deps:
+        if dep.inst.pkg.name == 'dl':
+            dl = dep
+            break
+    if not dl:
+        raise 'Error: No dynamic linker as a dependency!'
+
+    # Begin setting up the shared library source by getting the symbols
+    # function.
+    src = check_headers.get_header_source(cfg) + '\n'
+    src += get_symbols_prototypes(cfg) + '\n'
+    src += 'void lib_main( int argc, char* argv[] ) {\n'
+    src += get_symbols_calls(cfg)
+    src += '}\n'
+
+    # Try building a library, but make sure when we enable the system we
+    # don't use the regular '-l' library options, we need to actually
+    # specify the shared library names directly.
+    if pkg.name == 'PETScExt':
+        import pdb
+        pdb.set_trace()
+    old_state = {}
+    dep_cfg.enable(pkg.env, old_state, abs_path=True, shared=True)
+
+    return True
 
 def check_shared_exist(cfg):
     """Run a sanity check on shared libraries to see if they exist."""
@@ -138,14 +199,15 @@ def run_dependency_check(cfg, dep_cfg, dl, use_dep=False):
     # dependency.
     old_state = {}
     if use_dep:
-        cfg.enable(pkg.env, old_state)
+        cfg.enable(pkg.env, old_state, abs_path=True)
     else:
-        cfg.enable(pkg.env, old_state, lib_exclude=dep_pkg)
+        cfg.enable(pkg.env, old_state, abs_path=True, lib_exclude=dep_pkg)
 
     # Build the initialisation library and grab it's path.
     result = pkg.library_source(lib1_src)
     if not result[0]:
-        raise 'Broken'
+        pkg.ctx.Log('      No shared libraries.\n')
+        return False
     init_lib = pkg.ctx.sconf.lastTarget.abspath
 
     # Disable the main package for building the check library.
@@ -282,9 +344,10 @@ def check_shared_dependencies(cfg):
         # Run the test without the dependent package.
         result = run_dependency_check(cfg, dep_cfg, dl)
 
-        # If the link failed, we have a bug.
+        # If the link failed it means we have no shared libraries for this
+        # package.
         if not result[0]:
-            raise 'Error: This link should not have failed.\n'
+            return False
 
         # Check if we were able to open the initialisation library.
         if result[1].find('lib1 open failed') != -1:
@@ -516,8 +579,8 @@ def check_libraries(cfg):
 
     # Check for the existence of shared libraries if we were able to find shared
     # library-like files.
-    if not inst.fwork and cfg.has_shared:
-        cfg.has_shared = check_shared_exist(cfg)
+#    if not inst.fwork and cfg.has_shared:
+#        cfg.has_shared = new_check_shared_exist(cfg)
 
     # Also check if we know of a dependency for which the package was linked
     # against for each dependency listed.

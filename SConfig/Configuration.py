@@ -42,7 +42,8 @@ class Configuration:
         if cfg not in self.deps:
             self.deps += [cfg]
 
-    def enable(self, scons_env, old_state=None, lib_exclude=[]):
+    def enable(self, scons_env, old_state=None,
+               abs_path=False, shared=None, lib_exclude=[]):
         """Inserts this configuration's information into the provided SCons
         environment."""
 
@@ -53,6 +54,7 @@ class Configuration:
         self.inst.enable(scons_env, old_state,
                          libs=self.libs,
                          has_shared=self.has_shared,
+                         abs_path=abs_path,
                          lib_exclude=lib_exclude)
 
         # Throw in any preprocessor stuff.

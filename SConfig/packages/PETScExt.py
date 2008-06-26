@@ -4,15 +4,16 @@ import SConfig
 class PETScExt(SConfig.Package):
     def __init__(self, scons_env, scons_opts, required=False):
         SConfig.Package.__init__(self, scons_env, scons_opts, required)
+        self.mpi = self.dependency(SConfig.packages.MPI)
         self.petsc = self.dependency(SConfig.packages.PETSc)
         self.base_patterns = ['petscext*', 'PETSCEXT*', 'PETScExt*']
         self.header_sub_dir = ['petsc']
         self.headers = [['petscext.h',
                          'petscext_vec.h', 'petscext_mat.h',
                          'petscext_ksp.h', 'petscext_snes.h']]
-        self.libraries = [['petscext_snes', 'petscext_ksp', 'petscext_pc',
-                           'petscext_mat', 'petscext_vec',
-                           'petscext_utils']]
+        self.libraries = [['petscext_utils',
+                           'petscext_snes', 'petscext_ksp', 'petscext_pc',
+                           'petscext_mat', 'petscext_vec']]
 
     def process_installation(self, inst):
         # Have to get the architecture using this garbage...

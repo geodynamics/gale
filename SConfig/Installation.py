@@ -75,7 +75,9 @@ class Installation:
         def_list = self.pkg.env.make_list(defs)
         self.cpp_defines += [d for d in def_list if d not in self.cpp_defines + ['']]
 
-    def enable(self, scons_env, old_state=None, libs=[], has_shared=True, lib_exclude=[]):
+    def enable(self, scons_env, old_state=None,
+               libs=[], has_shared=True, abs_path=False,
+               lib_exclude=[]):
         """Inserts this installation's information into the provided SCons
         environment. Any environment values that are modified are backed
         up into 'old_state' providing there is not already a backup there."""
@@ -153,14 +155,16 @@ class Installation:
                     # If the path is relative, make sure SCons knows it needs
                     # to treat it as relative to the project root.
                     if not os.path.isabs(full_dir): full_dir = '#' + full_dir
-                    scons_env.AppendUnique(LIBPATH=[full_dir])
+                    if not abs_path:
+                        scons_env.AppendUnique(LIBPATH=[full_dir])
                     scons_env.AppendUnique(RPATH=[abs_dir])
                 else:
 
                     # If the path is relative, make sure SCons knows it needs
                     # to treat it as relative to the project root.
                     if not os.path.isabs(full_dir): full_dir = '#' + full_dir
-                    scons_env.PrependUnique(LIBPATH=[full_dir])
+                    if not abs_path:
+                        scons_env.PrependUnique(LIBPATH=[full_dir])
                     scons_env.PrependUnique(RPATH=[abs_dir])
 
         # Add libraries if there are any, unless this package is part of our
@@ -174,8 +178,13 @@ class Installation:
                 libs = self.find_library(libs)
                 scons_env.PrependUnique(STATICLIBS=libs)
             else:
-                self.pkg.backup_variable(scons_env, 'LIBS', old_state)
-                scons_env.PrependUnique(LIBS=libs)
+                if abs_path:
+                    self.pkg.backup_variable(scons_env, 'STATICLIBS', old_state)
+                    libs = self.find_library(libs, static=False, shared=True)
+                    scons_env.PrependUnique(STATICLIBS=libs)
+                else:
+                    self.pkg.backup_variable(scons_env, 'LIBS', old_state)
+                    scons_env.PrependUnique(LIBS=libs)
 
         # If we have a framework, add it now.
         if self.fwork:
