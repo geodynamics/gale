@@ -47,6 +47,7 @@
 #include "FeVariable.h"
 #include "ElementType.h"
 #include "FeMesh.h"
+#include "OperatorFeVariable.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -154,10 +155,12 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 
 	//self->numericField	= Stg_ComponentFactory_ConstructByKey( cf, self->name, "NumericVariable",     FeVariable, False, data );
 	//self->numericSwarm	= Stg_ComponentFactory_ConstructByKey( cf, self->name, "NumericSwarm",        Swarm,      False, data );
-	self->fieldCount = ( fieldList ) ? Dictionary_Entry_Value_GetCount( fieldList ) : 1;
-	self->numericFieldList   = Memory_Alloc_Array( FeVariable*, self->fieldCount, "numeric fields" );
-	self->referenceFieldList = Memory_Alloc_Array( FeVariable*, self->fieldCount, "reference fields" );
-	self->errorFieldList     = Memory_Alloc_Array( FeVariable*, self->fieldCount, "error fields" );
+	self->fieldCount = fieldList ? Dictionary_Entry_Value_GetCount( fieldList ) : 0;
+	self->numericFieldList   	= Memory_Alloc_Array( FeVariable*, self->fieldCount, "numeric fields" );
+	self->referenceFieldList 	= Memory_Alloc_Array( FeVariable*, self->fieldCount, "reference fields" );
+	self->errorFieldList     	= Memory_Alloc_Array( FeVariable*, self->fieldCount, "error fields" );
+	self->referenceMagFieldList	= Memory_Alloc_Array( OperatorFeVariable*, self->fieldCount, "reference field magnitudes" );
+	self->errorMagFieldList		= Memory_Alloc_Array( OperatorFeVariable*, self->fieldCount, "error field magnitudes" );
 	
 	for( feVariable_I = 0; feVariable_I < self->fieldCount; feVariable_I++ ) {
 		fieldName = ( fieldList ) ? 
@@ -170,11 +173,12 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 			self->numericFieldList[feVariable_I] = Stg_ComponentFactory_ConstructByName( cf, fieldName, FeVariable, True, data ); 
 	}
 
-	self->integrationSwarm 	= Stg_ComponentFactory_ConstructByKey( cf, self->name, "IntegrationSwarm",    Swarm,      True,  data );
-	self->constantMesh	= Stg_ComponentFactory_ConstructByKey( cf, self->name, "ConstantElementMesh", FeMesh,     True,  data );
+	self->integrationSwarm 	= Stg_ComponentFactory_ConstructByKey( cf, self->name, "IntegrationSwarm", Swarm,  True,  data );
+	self->constantMesh	= Stg_ComponentFactory_ConstructByKey( cf, self->name, "ConstantMesh",     FeMesh, True,  data );
+	self->elementMesh	= Stg_ComponentFactory_ConstructByKey( cf, self->name, "ElementMesh",      FeMesh, True, data );
 
 	//self->swarmVariableName 	= Stg_ComponentFactory_GetString( cf, self->name, "numericVariableName",       "" );
-	self->swarmVarCount = ( swarmVarList ) ? Dictionary_Entry_Value_GetCount( swarmVarList ) : 1;
+	self->swarmVarCount = swarmVarList ? Dictionary_Entry_Value_GetCount( swarmVarList ) : 0;
 	self->swarmVarNameList = Memory_Alloc_Array( Name, self->swarmVarCount, "numeric swarm variable names" );
 	
 	for( swarmVar_I = 0; swarmVar_I < self->swarmVarCount; swarmVar_I++ ) {
@@ -192,6 +196,8 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 	/* set up the entry point */
 	generateErrorFields = Hook_New( "Generate error fields hook", FieldTest_GenerateErrFields, self->name );
 	_EntryPoint_AppendHook( Context_GetEntryPoint( self->context, AbstractContext_EP_Solve ), generateErrorFields );
+
+	self->LCRegister = cf->LCRegister;
 }
 
 void _FieldTest_Build( void* fieldTest, void* data ) {
@@ -202,11 +208,14 @@ void _FieldTest_Build( void* fieldTest, void* data ) {
 	Stg_Component_Build( self->constantMesh,  data, False );
 
 	for( field_I = 0; field_I < self->fieldCount; field_I++ ) {
-		FieldTest_BuildReferenceField( self->numericFieldList[field_I]->feMesh, 
-					       self->numericFieldList[field_I],
-					       self->context, &self->referenceFieldList[field_I] );
-		FieldTest_BuildErrField( self->constantMesh, self->numericFieldList[field_I],
-					 self->context, &self->errorFieldList[field_I] );
+		FieldTest_BuildReferenceField( self, field_I );
+		FieldTest_BuildErrField( self, field_I );
+	
+		Stg_Component_Build( self->numericFieldList[field_I], data, False );
+		Stg_Component_Build( self->errorFieldList[field_I], data, False );
+
+		Stg_Component_Build( self->referenceFieldList[field_I], data, False );
+		Stg_Component_Build( self->errorFieldList[field_I], data, False );
 	}
 
 	/*for( swarm_I = 0; swarm_I < self->swarmCount; swarm_I++ ) {
@@ -221,24 +230,68 @@ void _FieldTest_Build( void* fieldTest, void* data ) {
 	self->gError	  = Memory_Alloc_2DArray( double, self->fieldCount, 3, "global L2 error" );
 	self->gErrorNorm  = Memory_Alloc_2DArray( double, self->fieldCount, 3, "global L2 error normalised" );
 
-	self->analyticSolnForFeVarKey = Memory_Alloc_Array( unsigned, self->fieldCount, "analytic solution index for ith feVariable" );
+	if( !self->referenceSolnFromFile ) {
+		self->analyticSolnForFeVarKey = Memory_Alloc_Array( unsigned, self->fieldCount, 
+								    "analytic solution index for ith feVariable" );
+		self->_analyticSolutionList = malloc( sizeof( FieldTest_AnalyticSolutionFunc* ) * self->fieldCount );
+		//self->_analyticSolutionList = Memory_Alloc_Array( sizeof(FieldTest_AnalyticSolutionFunc), self->fieldCount, 
+		//						  "analytic solution function list" );
+	}
 }
 
 void _FieldTest_Initialise( void* fieldTest, void* data ) {
 	FieldTest* 		self 		= (FieldTest*) fieldTest;
 	Index			field_I;
 
+
+	for( field_I = 0; field_I < self->fieldCount; field_I++ ) {
+		Stg_Component_Initialise( self->numericFieldList[field_I], data, False );
+		Stg_Component_Initialise( self->errorFieldList[field_I], data, False );
+		Stg_Component_Initialise( self->referenceFieldList[field_I], data, False );
+		if( self->referenceMagFieldList[field_I] )
+			Stg_Component_Initialise( self->referenceMagFieldList[field_I], data, False );
+		if( self->errorMagFieldList[field_I] )
+			Stg_Component_Initialise( self->errorMagFieldList[field_I], data, False );
+	}
+
 	/* load the reference solution from file if req'd */
 	if( self->referenceSolnFromFile ) {
 		for( field_I = 0; field_I < self->fieldCount; field_I++ ) {
 			FieldTest_LoadReferenceSolutionFromFile( self->referenceFieldList[field_I],
 				       				 self->referenceSolnFileList[field_I],
-								 self->referenceSolnPath,
-								 self->context );
+								 self->referenceSolnPath, self->context );
 		}
+	}
+	/* calculate the analytic solutions */
+	else {
+		for( field_I = 0; field_I < self->fieldCount; field_I++ )
+			FieldTest_CalculateAnalyticSolutionForField( self, field_I );
 	}
 }
 
+void FieldTest_CalculateAnalyticSolutionForField( void* fieldTest, Index field_I ) {
+	FieldTest* 			self 		= (FieldTest*) fieldTest;
+	FeVariable*			analyticField	= self->referenceFieldList[field_I];
+	FeMesh*				analyticMesh	= analyticField->feMesh;
+	FieldTest_AnalyticSolutionFunc*	analyticSolution;
+	Index				lNode_I;
+	Index				lMeshSize	= Mesh_GetLocalSize( analyticMesh, MT_VERTEX );
+	double*				coord;
+	double*				value;
+	
+	analyticSolution = self->_analyticSolutionList[self->analyticSolnForFeVarKey[field_I]];
+	value = Memory_Alloc_Array_Unnamed( double, analyticField->fieldComponentCount );
+	memset( value, 0, analyticField->fieldComponentCount * sizeof(double) );
+
+	for( lNode_I = 0; lNode_I < lMeshSize; lNode_I++ ) {
+		coord = Mesh_GetVertex( analyticMesh, lNode_I );
+		/* store the constants on the FieldTest components void** data */
+		analyticSolution( self, coord, value );
+		FeVariable_SetValueAtNode( analyticField, lNode_I, value );
+	}
+
+	Memory_Free( value );
+}
 void _FieldTest_Execute( void* fieldTest, void* data ) {
 	FieldTest* 		self 		= (FieldTest*) fieldTest;
 }
@@ -258,7 +311,11 @@ void _FieldTest_Destroy( void* fieldTest, void* data ) {
 	Memory_Free( self->analyticSolnForFeVarKey );
 }
 
-void FieldTest_BuildReferenceField( FeMesh* referenceMesh, FeVariable* numericField, DomainContext* context, FeVariable** referenceField ) {
+void FieldTest_BuildReferenceField( void* fieldTest, Index field_I ) {
+	FieldTest* 		self 			= (FieldTest*) fieldTest;
+	FeVariable*		numericField		= self->numericFieldList[field_I];
+	FeMesh*			referenceMesh		= numericField->feMesh;
+	DomainContext*		context			= self->context;
 	Variable_Register*	variable_Register	= context->variable_Register;
 	Sync*			sync			= Mesh_GetSync( referenceMesh, MT_VERTEX );
 	Name			tmpName;
@@ -270,24 +327,45 @@ void FieldTest_BuildReferenceField( FeMesh* referenceMesh, FeVariable* numericFi
 	Variable*		baseVariable		= NULL;
 	DofLayout*		referenceDofLayout	= NULL;
 
-	tmpName = Stg_Object_AppendSuffix( numericField, "-ReferenceVariable" );
+	unsigned		nDomainVerts		= Mesh_GetDomainSize( referenceMesh, MT_VERTEX );
+	static double*		arrayPtr;
+
+	tmpName = Stg_Object_AppendSuffix( numericField, "ReferenceVariable" );
 
 	if( componentsCount == 1 ) {
+		/*
 		baseVariable = Variable_NewScalar( tmpName, Variable_DataType_Double, (unsigned*)&sync->nDomains, NULL,
 						   (void**)NULL, variable_Register );
+		*/
+		arrayPtr = Memory_Alloc_Array_Unnamed( double, nDomainVerts );
+		baseVariable = Variable_NewScalar( tmpName, Variable_DataType_Double, &nDomainVerts, NULL, (void**)&arrayPtr, 
+						   variable_Register );
 	}
 	else {
 		for( var_I = 0; var_I < componentsCount; var_I++ )
 			Stg_asprintf( &varName[var_I], "%s-Component-%d", numericField->name, var_I );
 
+		/*
 		baseVariable = Variable_NewVector( tmpName, Variable_DataType_Double, componentsCount, 
 						   (unsigned*)&sync->nDomains, NULL, (void**)NULL, variable_Register, 
 						   varName[0], varName[1], varName[2], varName[3], varName[4], 
 						   varName[5], varName[6], varName[7], varName[8] );
+		*/
+		arrayPtr = Memory_Alloc_Array_Unnamed( double, nDomainVerts * componentsCount );
+		baseVariable = Variable_NewVector( tmpName, 
+						   Variable_DataType_Double, 
+						   componentsCount, 
+						   &nDomainVerts,
+						   NULL, 
+						   (void**)&arrayPtr, 
+						   variable_Register,
+						   varName[0], varName[1], varName[2], 
+						   varName[3], varName[4], varName[5], 
+						   varName[6], varName[7], varName[8] );
 	}
 	Memory_Free( tmpName );
 
-	tmpName = Stg_Object_AppendSuffix( numericField, "-ReferenceDofLayout" );
+	tmpName = Stg_Object_AppendSuffix( numericField, "ReferenceDofLayout" );
 
 	referenceDofLayout = DofLayout_New( tmpName, variable_Register, Mesh_GetDomainSize( referenceMesh, MT_VERTEX ), referenceMesh );
 	if( componentsCount == 1 )
@@ -302,20 +380,42 @@ void FieldTest_BuildReferenceField( FeMesh* referenceMesh, FeVariable* numericFi
 
 			Memory_Free( varName[var_I] );
 		}
+
+		//referenceDofLayout->baseVariables = Memory_Alloc_Array_Unnamed( Variable*, componentsCount );
+		//referenceDofLayout->baseVariables[0] = baseVariable;
 	}
+
+	Stg_Component_Build( referenceDofLayout, NULL, False );
+	Stg_Component_Initialise( referenceDofLayout, NULL, False );
+
 	Memory_Free( tmpName );
 
-	tmpName = Stg_Object_AppendSuffix( numericField, "-ReferenceFieldVariable" );
+	tmpName = Stg_Object_AppendSuffix( numericField, "Reference" );
 
-	*referenceField = FeVariable_New( tmpName, referenceMesh, referenceMesh, referenceDofLayout, NULL, NULL, NULL, 
-					  Mesh_GetDimSize( referenceMesh ), False, "StgFEM_Native", "StgFEM_Native",
-					  "", "", False, False, context->fieldVariable_Register );
+	self->referenceFieldList[field_I] = FeVariable_New( tmpName, referenceMesh, referenceMesh, referenceDofLayout, NULL, NULL, NULL, 
+							Mesh_GetDimSize( referenceMesh ), False, "StgFEM_Native", "StgFEM_Native",
+							"", "", False, False, context->fieldVariable_Register );
 
+	tmpName = Stg_Object_AppendSuffix( self->referenceFieldList[field_I], "Magnitude" );
+	self->referenceMagFieldList[field_I] = OperatorFeVariable_NewUnary( tmpName, self->referenceFieldList[field_I], "Magnitude" );
+	Memory_Free( tmpName );
+	Stg_Component_Build( self->referenceMagFieldList[field_I], context, False );
+	self->referenceMagFieldList[field_I]->_operator = Operator_NewFromName( self->referenceMagFieldList[field_I]->operatorName, 
+							self->referenceFieldList[field_I]->fieldComponentCount, context->dim );
+	self->referenceMagFieldList[field_I]->fieldComponentCount = self->referenceMagFieldList[field_I]->_operator->resultDofs;
+	_OperatorFeVariable_SetFunctions( self->referenceMagFieldList[field_I] );
+
+	LiveComponentRegister_Add( context->CF->LCRegister, (Stg_Component*) baseVariable );
 	LiveComponentRegister_Add( context->CF->LCRegister, (Stg_Component*) referenceDofLayout );
-	LiveComponentRegister_Add( context->CF->LCRegister, (Stg_Component*) referenceField );
+	LiveComponentRegister_Add( context->CF->LCRegister, (Stg_Component*) self->referenceFieldList[field_I] );
+	LiveComponentRegister_Add( context->CF->LCRegister, (Stg_Component*) self->referenceMagFieldList[field_I] );
 }
 
-void FieldTest_BuildErrField( FeMesh* constantMesh, FeVariable* numericField, DomainContext* context, FeVariable** errorField ) {
+void FieldTest_BuildErrField( void* fieldTest, Index field_I ) {
+	FieldTest* 		self 			= (FieldTest*) fieldTest;
+	FeMesh*			constantMesh		= self->constantMesh;
+	FeVariable*		numericField		= self->numericFieldList[field_I];
+	DomainContext*		context			= self->context;
 	Variable_Register*	variable_Register	= context->variable_Register;
 	Sync*			sync			= Mesh_GetSync( constantMesh, MT_VERTEX );
 	Name			tmpName;
@@ -326,25 +426,39 @@ void FieldTest_BuildErrField( FeMesh* constantMesh, FeVariable* numericField, Do
 	Variable*		variable;
 	Variable*		baseVariable		= NULL;
 	DofLayout*		errorDofLayout		= NULL;
+	unsigned		nDomainVerts		= Mesh_GetDomainSize( constantMesh, MT_VERTEX );
+	static void*		arrayPtr;
 
-	tmpName = Stg_Object_AppendSuffix( numericField, "-ErrorVariable" );
+	tmpName = Stg_Object_AppendSuffix( numericField, "ErrorVariable" );
 
 	if( componentsCount == 1 ) {
+		/*
 		baseVariable = Variable_NewScalar( tmpName, Variable_DataType_Double, (unsigned*)&sync->nDomains, NULL,
 						   (void**)NULL, variable_Register );
+		*/
+		arrayPtr = Memory_Alloc_Array_Unnamed( double, nDomainVerts );
+		baseVariable = Variable_NewScalar( tmpName, Variable_DataType_Double, &nDomainVerts, NULL, &arrayPtr, 
+						   variable_Register );
 	}
 	else {
 		for( var_I = 0; var_I < componentsCount; var_I++ )
 			Stg_asprintf( &varName[var_I], "%s-Component-%d", numericField->name, var_I );
 
+		/*
 		baseVariable = Variable_NewVector( tmpName, Variable_DataType_Double, componentsCount, (unsigned*)&sync->nDomains, 
 						   NULL, (void**)NULL, variable_Register,
+						   varName[0], varName[1], varName[2], varName[3], varName[4],
+						   varName[5], varName[6], varName[7], varName[8] );
+		*/
+		arrayPtr = Memory_Alloc_Array_Unnamed( double, nDomainVerts * componentsCount );
+		baseVariable = Variable_NewVector( tmpName, Variable_DataType_Double, componentsCount, &nDomainVerts, 
+						   NULL, (void**)&arrayPtr, variable_Register,
 						   varName[0], varName[1], varName[2], varName[3], varName[4],
 						   varName[5], varName[6], varName[7], varName[8] );
 	}
 	Memory_Free( tmpName );
 
-	tmpName = Stg_Object_AppendSuffix( numericField, "-ErrorDofLayout" );
+	tmpName = Stg_Object_AppendSuffix( numericField, "ErrorDofLayout" );
 
 	errorDofLayout = DofLayout_New( tmpName, variable_Register, Mesh_GetDomainSize( constantMesh, MT_VERTEX ), constantMesh );
 	if( componentsCount == 1 )
@@ -359,17 +473,25 @@ void FieldTest_BuildErrField( FeMesh* constantMesh, FeVariable* numericField, Do
 
 			Memory_Free( varName[var_I] );
 		}
+		
+		//errorDofLayout->baseVariables = Memory_Alloc_Array_Unnamed( Variable*, componentsCount );
+		//errorDofLayout->baseVariables[0] = baseVariable;
 	}
+	
+	Stg_Component_Build( errorDofLayout, NULL, False );
+	Stg_Component_Initialise( errorDofLayout, NULL, False );
+
 	Memory_Free( tmpName );
 
-	tmpName = Stg_Object_AppendSuffix( numericField, "-ReferenceFieldVariable" );
+	tmpName = Stg_Object_AppendSuffix( numericField, "Error" );
 
-	*errorField = FeVariable_New( tmpName, constantMesh, constantMesh, errorDofLayout, NULL, NULL, NULL, 
-				      Mesh_GetDimSize( constantMesh ), False, "StgFEM_Native", "StgFEM_Native",
-				      "", "", False, False, context->fieldVariable_Register );
+	self->errorFieldList[field_I] = FeVariable_New( tmpName, constantMesh, constantMesh, errorDofLayout, NULL, NULL, NULL, 
+							Mesh_GetDimSize( constantMesh ), False, "StgFEM_Native", "StgFEM_Native",
+							"", "", False, False, context->fieldVariable_Register );
 
+	LiveComponentRegister_Add( context->CF->LCRegister, (Stg_Component*) baseVariable );
 	LiveComponentRegister_Add( context->CF->LCRegister, (Stg_Component*) errorDofLayout );
-	LiveComponentRegister_Add( context->CF->LCRegister, (Stg_Component*) errorField );
+	LiveComponentRegister_Add( context->CF->LCRegister, (Stg_Component*) self->errorFieldList[field_I] );
 }
 
 void FieldTest_LoadReferenceSolutionFromFile( FeVariable* feVariable, Name referenceSolnName, Name referenceSolnPath, DomainContext* context ) {
@@ -602,8 +724,11 @@ void FieldTest_LoadReferenceSolutionFromFile( FeVariable* feVariable, Name refer
 #endif
 }
 
-void FieldTest_GenerateErrFields( void* fieldTest, void* data ) {
-	FieldTest* 		self 			= (FieldTest*) fieldTest;
+void FieldTest_GenerateErrFields( void* _context, void* data ) {
+	DomainContext*		context			= (DomainContext*)_context;
+	/* this a really dodgy way to get the self ptr, as will only work if the textual name is consistent with that in 
+	 * the XML - need to find a way to add an entry point which allows the self ptr to be passed as a void * */
+	FieldTest* 		self 			= LiveComponentRegister_Get( context->CF->LCRegister, "ReferenceFields" );
 	FeVariable*		errorField;
 	Index			lMeshSize, lElement_I;
 	double			elErrorSq[3], elNormSq[3], elError[3];
@@ -613,8 +738,14 @@ void FieldTest_GenerateErrFields( void* fieldTest, void* data ) {
 	Index			numDofs, dof_I;
 	Index			field_I;
 	
+	/*  */
 	for( field_I = 0; field_I < self->fieldCount; field_I++ ) {
-		lMeshSize  = Mesh_GetLocalSize( self->numericFieldList[field_I]->feMesh, MT_VOLUME );
+
+	}
+
+	for( field_I = 0; field_I < self->fieldCount; field_I++ ) {
+		/* should be using MT_VOLUME for the reference field mesh, but seems to have a bug */
+		lMeshSize  = Mesh_GetLocalSize( self->constantMesh, MT_VERTEX );
 		errorField = self->errorFieldList[field_I];
 		numDofs	   = self->numericFieldList[field_I]->fieldComponentCount;
 
@@ -681,10 +812,10 @@ void FieldTest_ElementErrReferenceFromField( void* fieldTest, Index field_I, Ind
 	Index			dof_I;
 
 	/* don't assume that the constant error field mesh & reference field mesh necessarily map 1:1 */
-	Mesh_SearchElements( referenceField, coord, &el_I );
+	Mesh_SearchElements( referenceMesh, coord, &el_I );
 	elType = FeMesh_GetElementType( referenceMesh, el_I );
 
-	cell_I = CellLayout_MapElementIdToCellId( intSwarm, el_I );
+	cell_I = CellLayout_MapElementIdToCellId( intSwarm->cellLayout, el_I );
 	cellParticleCount = intSwarm->cellParticleCountTbl[cell_I];
 
 	for( cParticle_I = 0; cParticle_I < cellParticleCount; cParticle_I++ ) {
@@ -710,10 +841,10 @@ void FieldTest_ElementErrAnalyticFromField( void* fieldTest, Index field_I, Inde
 	FieldTest* 		self 			= (FieldTest*) fieldTest;
 	FeVariable*		referenceField		= self->referenceFieldList[field_I];
 	FeVariable*		numericField		= self->numericFieldList[field_I];
-	FeMesh*			referenceMesh		= referenceField->feMesh;
+	FeMesh*			elementMesh		= self->elementMesh;
 	Index			constantElNode		= lElement_I;
 	double*			coord			= Mesh_GetVertex( self->constantMesh, constantElNode );
-	unsigned		nDims			= Mesh_GetDimSize( referenceMesh );
+	unsigned		nDims			= Mesh_GetDimSize( elementMesh );
 	Index			el_I;
 	ElementType*		elType;
 	Swarm*			intSwarm		= self->integrationSwarm;
@@ -731,10 +862,10 @@ void FieldTest_ElementErrAnalyticFromField( void* fieldTest, Index field_I, Inde
 	FieldTest_AnalyticSolutionFunc*	analyticSolution = self->_analyticSolutionList[self->analyticSolnForFeVarKey[field_I]];
 
 	/* don't assume that the constant error field mesh & reference field mesh necessarily map 1:1 */
-	Mesh_SearchElements( referenceField, coord, &el_I );
-	elType = FeMesh_GetElementType( referenceMesh, el_I );
+	Mesh_SearchElements( elementMesh, coord, &el_I );
+	elType = FeMesh_GetElementType( elementMesh, el_I );
 
-	cell_I = CellLayout_MapElementIdToCellId( intSwarm, el_I );
+	cell_I = CellLayout_MapElementIdToCellId( intSwarm->cellLayout, el_I );
 	cellParticleCount = intSwarm->cellParticleCountTbl[cell_I];
 
 	for( cParticle_I = 0; cParticle_I < cellParticleCount; cParticle_I++ ) {
@@ -742,11 +873,11 @@ void FieldTest_ElementErrAnalyticFromField( void* fieldTest, Index field_I, Inde
 		xi	  = cParticle->xi;
 		weight    = cParticle->weight;
 
-		FeMesh_CoordLocalToGlobal( referenceMesh, el_I, xi, globalCoord );
+		FeMesh_CoordLocalToGlobal( elementMesh, el_I, xi, globalCoord );
 		analyticSolution( self, globalCoord, analytic );
 		FieldVariable_InterpolateValueAt( numericField, globalCoord, numeric );
 
-		detJac = ElementType_JacobianDeterminant( elType, referenceMesh, el_I, xi, nDims );
+		detJac = ElementType_JacobianDeterminant( elType, elementMesh, el_I, xi, nDims );
 
 		for( dof_I = 0; dof_I < numDofs; dof_I++ ) {
 			elErrorSq[dof_I] += ( numeric[dof_I] - analytic[dof_I] ) * ( numeric[dof_I] - analytic[dof_I] ) 
@@ -774,5 +905,4 @@ void FieldTest_AddAnalyticSolutionFuncToListAtIndex( void* fieldTest, Index func
 	self->_analyticSolutionList[func_I] = func;
 	self->analyticSolnForFeVarKey[field_I] = func_I;
 }
-
 

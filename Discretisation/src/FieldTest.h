@@ -64,11 +64,14 @@
 		FeVariable**				numericFieldList;	\
 		FeVariable**				referenceFieldList;	\
 		FeVariable**				errorFieldList;		\
+		OperatorFeVariable**			referenceMagFieldList;	\
+		OperatorFeVariable**			errorMagFieldList;	\
 		unsigned				fieldCount;		\
 		Swarm*					numericSwarm;		\
 		Name*					swarmVarNameList;	\
 		unsigned				swarmVarCount;		\
 		FeMesh*					constantMesh;		\
+		FeMesh*					elementMesh;		\
 		Bool					normalise;		\
 		double**				gAnalyticSq;		\
 		double**				gErrorSq;		\
@@ -78,12 +81,16 @@
 		Name					referenceSolnPath;	\
 		Swarm*                 			integrationSwarm;       \
 		DomainContext*				context;		\
+		LiveComponentRegister*			LCRegister;		\
 		Bool					referenceSolnFromFile;	\
 		/* must fill this array in the analytic solution plugin so */	\
 		/* that the correct analytic solution func is applied for the*/ \
 		/* correct feVariable */			 		\
 		Index*					analyticSolnForFeVarKey;\
 		FieldTest_AnalyticSolutionFunc**	_analyticSolutionList;	\
+		/* store any constants required by the analytic solution */     \
+		/* plugin in this array (to be initialised in the plugin) */    \
+		void**					data;			\
 		
 
 	/** Brings together and manages the life-cycle of a a mesh and all the 
@@ -146,10 +153,11 @@
 	void _FieldTest_Destroy( void* fieldTest, void* data );
 
 	/* --- Public Functions --- */
-	void FieldTest_BuildReferenceField( FeMesh* feMesh, FeVariable* numericField, DomainContext* context, FeVariable** referenceField );
-	void FieldTest_BuildErrField( FeMesh* feMesh, FeVariable* numericField, DomainContext* context, FeVariable** errorField );
+	void FieldTest_BuildReferenceField( void* fieldTest, Index field_I );
+	void FieldTest_BuildErrField( void* fieldTest, Index field_I );
 
 	void FieldTest_LoadReferenceSolutionFromFile( FeVariable* referenceField, Name referenceSolnName, Name referenceSolnPath, DomainContext* context );
+	void FieldTest_CalculateAnalyticSolutionForField( void* fieldTest, Index field_I );
 
 	void FieldTest_GenerateErrFields( void* fieldTest, void* data );
 
@@ -159,5 +167,4 @@
 	void FieldTest_ElementErrReferenceFromSwarm( void* fieldTest, Index field_I, Index lElement_I, double* elErrorSq, double* elNormSq );
 
 	void FieldTest_AddAnalyticSolutionFuncToListAtIndex( void* fieldTest, Index func_I, FieldTest_AnalyticSolutionFunc* func, Index field_I );
-
 #endif /* __StgFEM_Discretisation_FieldTest_h__ */
