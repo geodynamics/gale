@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SystemLinearEquations.c 1160 2008-06-24 00:25:20Z LouisMoresi $
+** $Id: SystemLinearEquations.c 1161 2008-06-26 07:00:55Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -733,7 +733,7 @@ void SystemLinearEquations_NewtonInitialise( void* _context, void* data ) {
 	((PETScNonlinearSolver*)sle->nlSolver)->snes = snes;
 	sle->_setFFunc( &sle->F, context );
 
-	SNESSetJacobian( snes, ((PETScMatrix*)sle->J)->petscMat, ((PETScMatrix*)sle->J)->petscMat, sle->_buildJ, sle->buildJContext );
+	SNESSetJacobian( snes, ((PETScMatrix*)sle->J)->petscMat, ((PETScMatrix*)sle->P)->petscMat, sle->_buildJ, sle->buildJContext );
 	SNESSetFunction( snes, ((PETScVector*)sle->F)->petscVec, sle->_buildF, sle->buildFContext );
 
 	/* configure the KSP */
