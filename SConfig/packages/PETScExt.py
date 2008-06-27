@@ -18,9 +18,14 @@ class PETScExt(SConfig.Package):
     def process_installation(self, inst):
         # Have to get the architecture using this garbage...
         archs = os.listdir(os.path.join(inst.base_dir, 'lib'))
+        found_arch = False
         for arch in archs:
             if arch[0] != '.':
+                found_arch = True
                 inst.arch = arch
+                break
+        if not found_arch:
+            return False
 
         # Add the bmake/arch include directory.
         hdr_dir = os.path.join('bmake', inst.arch)
