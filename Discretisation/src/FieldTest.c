@@ -116,9 +116,11 @@ void _FieldTest_Delete( void* fieldTest ) {
 	Index		field_I;
 
 	for( field_I = 0; field_I < self->fieldCount; field_I++ ) {
-		if( self->numericFieldList[field_I]   ) Stg_Class_Delete( self->numericFieldList[field_I]   );
-		if( self->referenceFieldList[field_I] ) Stg_Class_Delete( self->referenceFieldList[field_I] );
-		if( self->errorFieldList[field_I]     ) Stg_Class_Delete( self->errorFieldList[field_I]     );
+		if( self->numericFieldList[field_I]      ) Stg_Class_Delete( self->numericFieldList[field_I]      );
+		if( self->referenceFieldList[field_I]    ) Stg_Class_Delete( self->referenceFieldList[field_I]    );
+		if( self->errorFieldList[field_I]        ) Stg_Class_Delete( self->errorFieldList[field_I]        );
+		if( self->referenceMagFieldList[field_I] ) Stg_Class_Delete( self->referenceMagFieldList[field_I] );
+		if( self->errorMagFieldList[field_I]     ) Stg_Class_Delete( self->errorMagFieldList[field_I]     );
 	}
 	if( self->numericSwarm     ) Stg_Class_Delete( self->numericSwarm     );
 	if( self->constantMesh     ) Stg_Class_Delete( self->constantMesh     );
@@ -470,9 +472,19 @@ void FieldTest_BuildErrField( void* fieldTest, Index field_I ) {
 							Mesh_GetDimSize( constantMesh ), False, "StgFEM_Native", "StgFEM_Native",
 							"", "", False, False, context->fieldVariable_Register );
 
+	tmpName = Stg_Object_AppendSuffix( self->errorFieldList[field_I], "Magnitude" );
+	self->errorMagFieldList[field_I] = OperatorFeVariable_NewUnary( tmpName, self->errorFieldList[field_I], "Magnitude" );
+	Memory_Free( tmpName );
+	Stg_Component_Build( self->errorMagFieldList[field_I], context, False );
+	self->errorMagFieldList[field_I]->_operator = Operator_NewFromName( self->errorMagFieldList[field_I]->operatorName, 
+							self->errorFieldList[field_I]->fieldComponentCount, context->dim );
+	self->errorMagFieldList[field_I]->fieldComponentCount = self->errorMagFieldList[field_I]->_operator->resultDofs;
+	_OperatorFeVariable_SetFunctions( self->errorMagFieldList[field_I] );
+
 	LiveComponentRegister_Add( context->CF->LCRegister, (Stg_Component*) baseVariable );
 	LiveComponentRegister_Add( context->CF->LCRegister, (Stg_Component*) errorDofLayout );
 	LiveComponentRegister_Add( context->CF->LCRegister, (Stg_Component*) self->errorFieldList[field_I] );
+	LiveComponentRegister_Add( context->CF->LCRegister, (Stg_Component*) self->errorMagFieldList[field_I] );
 }
 
 void FieldTest_LoadReferenceSolutionFromFile( FeVariable* feVariable, Name referenceSolnName, Name referenceSolnPath, DomainContext* context ) {
