@@ -51,9 +51,8 @@ const Type StgFEM_LidDrivenStokesAnalytic_Type = "StgFEM_LidDrivenStokesAnalytic
 
 typedef struct {
 	__Codelet
-	//__FieldTest
-	unsigned int wavenumber;
-	double A, B, C, D;
+	unsigned int n;
+	//double A, B, C, D;
 	FieldTest* fieldTest;
 } StgFEM_LidDrivenStokesAnalytic;
 
@@ -84,7 +83,8 @@ void StgFEM_LidDrivenStokesAnalytic_CalculateConstants( FieldTest *fieldTest ) {
 	dblArray[3] = - ( 2.0 * n * M_PI * e_2nPI - e_2nPI + 1.0 ) * e_nPI / E;
 }
 
-void StgFEM_LidDrivenStokesAnalytic_VelocityFunction( FieldTest* fieldTest, double* coord, double* velocity ) {
+void StgFEM_LidDrivenStokesAnalytic_VelocityFunction( void* data, double* coord, double* velocity ) {
+	FieldTest*	fieldTest = (FieldTest*) data;
 	double x,y;
 	double n;
 	double A, B, C, D;
@@ -111,7 +111,8 @@ void StgFEM_LidDrivenStokesAnalytic_VelocityFunction( FieldTest* fieldTest, doub
 }
 
 
-void StgFEM_LidDrivenStokesAnalytic_PressureFunction( FieldTest* fieldTest, double* coord, double* pressure ) {
+void StgFEM_LidDrivenStokesAnalytic_PressureFunction( void* data, double* coord, double* pressure ) {
+	FieldTest*	fieldTest = (FieldTest*) data;
 	double x,y;
 	double n;
 	double A, B, C, D;
@@ -144,7 +145,6 @@ void _StgFEM_LidDrivenStokesAnalytic_Construct( void* codelet, Stg_ComponentFact
 	self->fieldTest->data[0] = (unsigned int*) Memory_Alloc_Array_Unnamed( unsigned int, 1 );
 	self->fieldTest->data[1] = (double*) Memory_Alloc_Array_Unnamed( double, 4 );
 
-	//self->fieldTest->data[4][0] = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "sinusoidalLidWavenumber", 1 );
 	waveSpeed = Memory_Alloc_Array_Unnamed( unsigned int, 1 );
 	*waveSpeed = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "sinusoidalLidWavenumber", 1 );
 	self->fieldTest->data[0] = waveSpeed;
