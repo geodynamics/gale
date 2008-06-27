@@ -189,7 +189,7 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 	
 	//self->referenceSolnFileName 	= Stg_ComponentFactory_GetString( cf, self->name, "referenceSolutionFileName", "" );
 	self->referenceSolnPath		= Stg_ComponentFactory_GetString( cf, self->name, "referenceSolutionFilePath", "" );
-	self->normalise			= Stg_ComponentFactory_GetBool( cf, self->name, "normaliseByReferenceSoln", True );
+	self->normalise			= Stg_ComponentFactory_GetBool( cf, self->name, "normaliseByReferenceSolution", True );
 	self->referenceSolnFromFile	= Stg_ComponentFactory_GetBool( cf, self->name, "useReferenceSolutionFromFile", False );
 	self->context			= Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
 
@@ -309,6 +309,7 @@ void _FieldTest_Destroy( void* fieldTest, void* data ) {
 	Memory_Free( self->gErrorNorm  );
 
 	Memory_Free( self->analyticSolnForFeVarKey );
+	Memory_Free( self->data );
 }
 
 void FieldTest_BuildReferenceField( void* fieldTest, Index field_I ) {
@@ -333,24 +334,14 @@ void FieldTest_BuildReferenceField( void* fieldTest, Index field_I ) {
 	tmpName = Stg_Object_AppendSuffix( numericField, "ReferenceVariable" );
 
 	if( componentsCount == 1 ) {
-		/*
-		baseVariable = Variable_NewScalar( tmpName, Variable_DataType_Double, (unsigned*)&sync->nDomains, NULL,
-						   (void**)NULL, variable_Register );
-		*/
 		arrayPtr = Memory_Alloc_Array_Unnamed( double, nDomainVerts );
 		baseVariable = Variable_NewScalar( tmpName, Variable_DataType_Double, &nDomainVerts, NULL, (void**)&arrayPtr, 
 						   variable_Register );
 	}
 	else {
 		for( var_I = 0; var_I < componentsCount; var_I++ )
-			Stg_asprintf( &varName[var_I], "%s-Component-%d", numericField->name, var_I );
+			Stg_asprintf( &varName[var_I], "%s-Component-%d", tmpName, var_I );
 
-		/*
-		baseVariable = Variable_NewVector( tmpName, Variable_DataType_Double, componentsCount, 
-						   (unsigned*)&sync->nDomains, NULL, (void**)NULL, variable_Register, 
-						   varName[0], varName[1], varName[2], varName[3], varName[4], 
-						   varName[5], varName[6], varName[7], varName[8] );
-		*/
 		arrayPtr = Memory_Alloc_Array_Unnamed( double, nDomainVerts * componentsCount );
 		baseVariable = Variable_NewVector( tmpName, 
 						   Variable_DataType_Double, 
@@ -432,24 +423,14 @@ void FieldTest_BuildErrField( void* fieldTest, Index field_I ) {
 	tmpName = Stg_Object_AppendSuffix( numericField, "ErrorVariable" );
 
 	if( componentsCount == 1 ) {
-		/*
-		baseVariable = Variable_NewScalar( tmpName, Variable_DataType_Double, (unsigned*)&sync->nDomains, NULL,
-						   (void**)NULL, variable_Register );
-		*/
 		arrayPtr = Memory_Alloc_Array_Unnamed( double, nDomainVerts );
 		baseVariable = Variable_NewScalar( tmpName, Variable_DataType_Double, &nDomainVerts, NULL, &arrayPtr, 
 						   variable_Register );
 	}
 	else {
 		for( var_I = 0; var_I < componentsCount; var_I++ )
-			Stg_asprintf( &varName[var_I], "%s-Component-%d", numericField->name, var_I );
+			Stg_asprintf( &varName[var_I], "%s-Component-%d", tmpName, var_I );
 
-		/*
-		baseVariable = Variable_NewVector( tmpName, Variable_DataType_Double, componentsCount, (unsigned*)&sync->nDomains, 
-						   NULL, (void**)NULL, variable_Register,
-						   varName[0], varName[1], varName[2], varName[3], varName[4],
-						   varName[5], varName[6], varName[7], varName[8] );
-		*/
 		arrayPtr = Memory_Alloc_Array_Unnamed( double, nDomainVerts * componentsCount );
 		baseVariable = Variable_NewVector( tmpName, Variable_DataType_Double, componentsCount, &nDomainVerts, 
 						   NULL, (void**)&arrayPtr, variable_Register,
@@ -738,11 +719,6 @@ void FieldTest_GenerateErrFields( void* _context, void* data ) {
 	Index			numDofs, dof_I;
 	Index			field_I;
 	
-	/*  */
-	for( field_I = 0; field_I < self->fieldCount; field_I++ ) {
-
-	}
-
 	for( field_I = 0; field_I < self->fieldCount; field_I++ ) {
 		/* should be using MT_VOLUME for the reference field mesh, but seems to have a bug */
 		lMeshSize  = Mesh_GetLocalSize( self->constantMesh, MT_VERTEX );
@@ -770,8 +746,7 @@ void FieldTest_GenerateErrFields( void* _context, void* data ) {
 			for( dof_I = 0; dof_I < numDofs; dof_I++ ) {
 				lAnalyticSq[dof_I] += elNormSq[dof_I];
 				lErrorSq[dof_I]    += elErrorSq[dof_I];
-				elError[dof_I] = ( normalise ) ? sqrt( elErrorSq[dof_I] / elNormSq[dof_I] ) : 
-								 sqrt( elErrorSq[dof_I] );
+				elError[dof_I] = normalise ? sqrt( elErrorSq[dof_I] / elNormSq[dof_I] ) : sqrt( elErrorSq[dof_I] );
 			}
 
 			/* constant mesh, so node and element indices map 1:1 */
