@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SystemLinearEquations.c 1161 2008-06-26 07:00:55Z DavidLee $
+** $Id: SystemLinearEquations.c 1167 2008-06-30 09:43:05Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -205,6 +205,8 @@ void _SystemLinearEquations_Init(
 	self->nlSetupEP = EntryPoint_New( self->nlSetupEPName, EntryPoint_2VoidPtr_CastType );
 	Stg_asprintf( &self->nlEPName, "%s-nlEP", self->name );
 	self->nlEP = EntryPoint_New( self->nlEPName, EntryPoint_2VoidPtr_CastType );
+	Stg_asprintf( &self->nlEPName, "%s-postNlEP", self->name );
+	self->postNlEP = EntryPoint_New( self->postNlEPName, EntryPoint_2VoidPtr_CastType );
 	Stg_asprintf( &self->nlConvergedEPName, "%s-nlConvergedEP", self->name );
 	self->nlConvergedEP = EntryPoint_New( self->nlConvergedEPName, EntryPoint_2VoidPtr_CastType );
 	/* END LUKE'S FRICTIONAL BCS BIT */
@@ -282,6 +284,7 @@ void _SystemLinearEquations_Delete( void* sle ) {
 	/* BEGIN LUKE'S FRICTIONAL BCS BIT */
         Memory_Free( self->nlSetupEPName );
 	Memory_Free( self->nlEPName );
+	Memory_Free( self->postNlEPName );
         Memory_Free( self->nlConvergedEPName );
 	/* END LUKE'S FRICTIONAL BCS BIT */
 	Memory_Free( self->executeEPName );
@@ -853,6 +856,11 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 			(converged) ? " - Converged" : " - Not converged",
 			(self->nonLinearIteration_I < maxIterations) ? "" : " - Reached iteration limit",
 			MPI_Wtime() - wallTime );
+
+                /*
+                ** Include an entry point to do some kind of post-non-linear-iteration operation. */
+		_EntryPoint_Run_2VoidPtr( self->postNlEP, sle, _context );
+                
 		
 		if ( (converged) && (self->nonLinearIteration_I>=minIterations) ) {
 		   int result;
@@ -891,6 +899,12 @@ void SystemLinearEquations_AddNonLinearSetupEP( void* sle, const char* name, Ent
 
 	SystemLinearEquations_SetToNonLinear( self );
 	EntryPoint_Append( self->nlSetupEP, (char*)name, func, self->type );
+}
+
+void SystemLinearEquations_AddPostNonLinearEP( void* sle, const char* name, EntryPoint_2VoidPtr_Cast func ) {
+	SystemLinearEquations* self = (SystemLinearEquations*)sle;
+
+	EntryPoint_Append( self->postNlEP, (char*)name, func, self->type );
 }
 
 void SystemLinearEquations_AddNonLinearConvergedEP( void* sle,

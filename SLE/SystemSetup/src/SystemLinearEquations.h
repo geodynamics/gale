@@ -51,7 +51,7 @@
 **	for storing and managing the matrices and vectors that make up a system, but uses
 **	the SLE_Solver class to actually implement a solution mechanism for the given eqn.
 **
-** $Id: SystemLinearEquations.h 1141 2008-06-02 03:13:02Z LukeHodkinson $
+** $Id: SystemLinearEquations.h 1167 2008-06-30 09:43:05Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -125,6 +125,8 @@
 		EntryPoint*					    nlSetupEP;		       \
 		char*						    nlEPName;	       	       \
 		EntryPoint*					    nlEP;		       \
+		char*						    postNlEPName;	       \
+		EntryPoint*					    postNlEP;		       \
 		char*						    nlConvergedEPName;	       \
 		EntryPoint*					    nlConvergedEP;	       \
 		/* END LUKE'S FRICTIONAL BCS BIT */					       \
@@ -309,6 +311,8 @@
                                                         EntryPoint_2VoidPtr_Cast func );
 	void SystemLinearEquations_AddNonLinearEP( void* sle, const char* name,
                                                    EntryPoint_2VoidPtr_Cast func );
+	void SystemLinearEquations_AddPostNonLinearEP( void* sle, const char* name,
+                                                       EntryPoint_2VoidPtr_Cast func );
 	void SystemLinearEquations_SetToNonLinear( void* sle ) ;
 	void SystemLinearEquations_CheckIfNonLinear( void* sle ) ;
 	
