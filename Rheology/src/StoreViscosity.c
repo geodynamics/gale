@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: StoreViscosity.c 610 2007-10-11 08:09:29Z SteveQuenette $
+** $Id: StoreViscosity.c 747 2008-07-04 01:36:54Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 #include <mpi.h>
@@ -164,6 +164,12 @@ void _StoreVisc_ModifyConstitutiveMatrix(
 {
 	StoreVisc*	                      self              = (StoreVisc*) rheology;
 	StoreVisc_ParticleExt*            particleExt;
+
+	/*
+	** HAXOR: Throwing this flag in here to try and prevent REP from
+	** overwriting the previously calculated viscosity value. */
+	if ( !constitutiveMatrix->previousSolutionExists )
+	  return;
                           
 	/* Get Parameters From Material Extension */
 	particleExt          = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, materialPoint, self->particleExtHandle );
