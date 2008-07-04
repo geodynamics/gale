@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SystemLinearEquations.c 1167 2008-06-30 09:43:05Z LukeHodkinson $
+** $Id: SystemLinearEquations.c 1168 2008-07-04 01:34:48Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -809,6 +809,10 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 	self->linearExecute( self, _context );
 	self->hasExecuted = True;
 
+	/*
+	** Include an entry point to do some kind of post-non-linear-iteration operation. */
+	_EntryPoint_Run_2VoidPtr( self->postNlEP, sle, _context );
+
 	/* TODO - Give option which solution vector to test */
 	currentVector   = SystemLinearEquations_GetSolutionVectorAt( self, 0 )->vector; 
 	Vector_Duplicate( currentVector, (void**)&previousVector );
@@ -837,6 +841,10 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 		self->linearExecute( self, _context );
 //		PetscPrintf( PETSC_COMM_WORLD, "|Xn+1| = %12.12e \n", Vector_L2Norm(SystemLinearEquations_GetSolutionVectorAt(self,1)->vector) );
 
+                /*
+                ** Include an entry point to do some kind of post-non-linear-iteration operation. */
+		_EntryPoint_Run_2VoidPtr( self->postNlEP, sle, _context );
+
 		/* Calculate Residual */
 		Vector_AddScaled( previousVector, -1.0, currentVector );
 		residual = Vector_L2Norm( previousVector ) / Vector_L2Norm( currentVector );
@@ -856,10 +864,6 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 			(converged) ? " - Converged" : " - Not converged",
 			(self->nonLinearIteration_I < maxIterations) ? "" : " - Reached iteration limit",
 			MPI_Wtime() - wallTime );
-
-                /*
-                ** Include an entry point to do some kind of post-non-linear-iteration operation. */
-		_EntryPoint_Run_2VoidPtr( self->postNlEP, sle, _context );
                 
 		
 		if ( (converged) && (self->nonLinearIteration_I>=minIterations) ) {
