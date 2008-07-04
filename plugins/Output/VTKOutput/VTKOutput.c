@@ -93,10 +93,8 @@ void VTKOutput( void* _context ) {
         int myRank, nprocs;
         MPI_Comm comm;
 
-        comm=CommTopology_GetComm
-          ( Mesh_GetCommTopology(context->picIntegrationPoints->mesh,
-                                 MT_VERTEX));
-                                 
+        comm = Comm_GetMPIComm( Mesh_GetCommTopology( context->picIntegrationPoints->mesh, MT_VERTEX ) );
+
 	MPI_Comm_rank( comm, (int*)&myRank );
         MPI_Comm_size( comm, (int*)&nprocs );
 
