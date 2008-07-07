@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: Rheology.h 736 2008-05-23 06:05:21Z RobertTurnbull $
+** $Id: Rheology.h 750 2008-07-07 02:26:33Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -69,6 +69,7 @@
 	#include "Byerlee.h"
 	#include "DruckerPrager.h"
 	#include "FaultingMoresiMuhlhaus2006.h"
+	#include "MohrCoulomb.h"
 	#include "StrainWeakening.h"
 	#include "BuiterStrainWeakening.h"
 	#include "Director.h"

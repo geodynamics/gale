@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: VonMises.h 743 2008-06-23 01:49:43Z JulianGiordani $
+** $Id: VonMises.h 750 2008-07-07 02:26:33Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -58,7 +58,8 @@
 		FeVariable*                                         strainRateField;                      \
 		double                                              cohesion;                             \
 		double                                              cohesionAfterSoftening;               \
-		Bool                                                strainRateSoftening;                  
+		Bool                                                strainRateSoftening;                  \
+                double                                              maximumCorrectionFactor;
 
 	struct VonMises { __VonMises };
 	

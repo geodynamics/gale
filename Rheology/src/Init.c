@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: Init.c 736 2008-05-23 06:05:21Z RobertTurnbull $
+** $Id: Init.c 750 2008-07-07 02:26:33Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -75,6 +75,7 @@ Bool Underworld_Rheology_Init( int* argc, char** argv[] ) {
 	Stg_ComponentRegister_Add( componentRegister, Byerlee_Type,                 "0", _Byerlee_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, DruckerPrager_Type,           "0", _DruckerPrager_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, FaultingMoresiMuhlhaus2006_Type,             "0", _FaultingMoresiMuhlhaus2006_DefaultNew );
+	Stg_ComponentRegister_Add( componentRegister, MohrCoulomb_Type,             "0", _MohrCoulomb_DefaultNew );
 
 	Stg_ComponentRegister_Add( componentRegister, StrainWeakening_Type,         "0", _StrainWeakening_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, BuiterStrainWeakening_Type,   "0", _BuiterStrainWeakening_DefaultNew );
@@ -108,6 +109,7 @@ Bool Underworld_Rheology_Init( int* argc, char** argv[] ) {
 	RegisterParent( Byerlee_Type,                    VonMises_Type );
 	RegisterParent( DruckerPrager_Type,              VonMises_Type );
 	RegisterParent( FaultingMoresiMuhlhaus2006_Type, YieldRheology_Type );
+	RegisterParent( MohrCoulomb_Type,             YieldRheology_Type );
 	
 	RegisterParent( StrainWeakening_Type,         TimeIntegratee_Type );
 	RegisterParent( BuiterStrainWeakening_Type,   StrainWeakening_Type );

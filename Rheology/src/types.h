@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: types.h 736 2008-05-23 06:05:21Z RobertTurnbull $
+** $Id: types.h 750 2008-07-07 02:26:33Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -71,6 +71,7 @@
 	
 	typedef struct DruckerPrager                    DruckerPrager;
 	typedef struct FaultingMoresiMuhlhaus2006       FaultingMoresiMuhlhaus2006;
+	typedef struct MohrCoulomb MohrCoulomb;
 	
 	typedef struct StrainWeakening                  StrainWeakening;
 	typedef struct BuiterStrainWeakening		BuiterStrainWeakening;

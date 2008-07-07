@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: VonMises.c 743 2008-06-23 01:49:43Z JulianGiordani $
+** $Id: VonMises.c 750 2008-07-07 02:26:33Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -112,7 +112,8 @@ void _VonMises_Init(
 		FeVariable* strainRateField, 
 		double      cohesion, 
 		double      cohesionAfterSoftening,
-		Bool        strainRateSoftening ) 
+		Bool        strainRateSoftening,
+                double      maximumCorrectionFactor )
 {
 	self->strainRateField        = strainRateField;
 	self->cohesion               = cohesion;
@@ -121,6 +122,8 @@ void _VonMises_Init(
 	/* needs a softening factor between +0 and 1 and a reference strain > 0 */
 	self->cohesionAfterSoftening = cohesionAfterSoftening;
 	self->strainRateSoftening    = strainRateSoftening;
+
+        self->maximumCorrectionFactor = maximumCorrectionFactor;
 }
 
 void* _VonMises_DefaultNew( Name name ) {
@@ -158,7 +161,8 @@ void _VonMises_Construct( void* rheology, Stg_ComponentFactory* cf, void* data )
 			strainRateField,
 			Stg_ComponentFactory_GetDouble( cf, self->name, "cohesion", 0.0 ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "cohesionAfterSoftening", 0.0 ),
-			Stg_ComponentFactory_GetBool(   cf, self->name, "strainRateSoftening", False ) );
+			Stg_ComponentFactory_GetBool(   cf, self->name, "strainRateSoftening", False ),
+                        Stg_ComponentFactory_GetDouble( cf, self->name, "maximumCorrectionFactor", 1.0 ) );
 }
 
 double _VonMises_GetYieldCriterion( 
@@ -216,7 +220,7 @@ void _VonMises_HasYielded(
 {
 	VonMises*                 self             = (VonMises*) rheology;
 	double                    viscosity        = ConstitutiveMatrix_GetIsotropicViscosity( constitutiveMatrix );
-		
+
 	if ( self->strainRateSoftening ) {
 		/* TODO - Put this function in a plugin */
 		viscosity = 2.0 * yieldCriterion * yieldCriterion * viscosity / 
@@ -226,6 +230,8 @@ void _VonMises_HasYielded(
 	else {
 		double beta = 1.0 - yieldCriterion/yieldIndicator;
 		
+                if( beta > self->maximumCorrectionFactor )
+                        beta = self->maximumCorrectionFactor;
 		ConstitutiveMatrix_IsotropicCorrection( constitutiveMatrix, -viscosity * beta );
 	}
 }
