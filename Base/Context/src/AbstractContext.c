@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AbstractContext.c 4275 2008-06-13 07:03:20Z BelindaMay $
+** $Id: AbstractContext.c 4277 2008-07-08 00:40:33Z BelindaMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -1006,7 +1006,11 @@ void _AbstractContext_LoadTimeInfoFromCheckPoint( Context* self, Index timeStep,
 #ifdef HAVE_HDF5
    /* Open the file and data set. */
 	file = H5Fopen( timeInfoFileName, H5F_ACC_RDONLY, H5P_DEFAULT );
-	   	
+	Journal_Firewall( 
+		file >= 0, 
+		errorStr, "Error- in %s(), Couldn't find checkpoint time info file with "
+		"filename \"%s\" - aborting.\n", __func__, timeInfoFileName );
+		   	
    /* Read currentTime from file */
    #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
    fileData = H5Dopen( file, "/currentTime" );
@@ -1053,12 +1057,14 @@ void _AbstractContext_LoadTimeInfoFromCheckPoint( Context* self, Index timeStep,
 void _AbstractContext_SaveTimeInfo( Context* context ) {
 	AbstractContext*       self = context;	
 	char*                  timeInfoFileName = NULL;
-	FILE*                  timeInfoFile;	
-
+   Stream*                errorStr = Journal_Register( Error_Type, self->type );
+   
 #ifdef HAVE_HDF5
-   hid_t             file, fileSpace, fileData, props;
-   hsize_t           count;
-   double            Dt;
+   hid_t                  file, fileSpace, fileData, props;
+   hsize_t                count;
+   double                 Dt;
+#else
+   FILE*                  timeInfoFile;	
 #endif 
 
 	/* Only the master process needs to write this file */
@@ -1072,7 +1078,15 @@ void _AbstractContext_SaveTimeInfo( Context* context ) {
    
    /* Open the HDF5 output file. */
    file = H5Fcreate( timeInfoFileName, H5F_ACC_TRUNC, H5P_DEFAULT, props );
-   assert( file );
+   Journal_Firewall( 
+		file >= 0, 
+		errorStr,
+		"Error in %s for %s '%s' - Cannot create file %s.\n", 
+		__func__, 
+		self->type, 
+		self->name, 
+		timeInfoFileName );
+		
    H5Pclose( props );
 
    /* Dump currentTime */
@@ -1113,7 +1127,6 @@ void _AbstractContext_SaveTimeInfo( Context* context ) {
 	timeInfoFile = fopen( timeInfoFileName, "w" );
 
 	if ( False == timeInfoFile ) {
-		Stream*    errorStr = Journal_Register( Error_Type, self->type );
 		Journal_Printf( errorStr, "Error- in %s(), Couldn't create checkpoint time info file with "
 		"filename \"%s\" - aborting.\n", __func__, timeInfoFileName );
 		exit(EXIT_FAILURE);
