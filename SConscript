@@ -1,76 +1,64 @@
 import os
 Import('env')
 
+#
+# Prepare the construction environment by copying the one we
+# were given.
 env = env.Copy()
-env.AppendUnique(CPPPATH=[env.get_build_path('include/StgFEM')])
+env.project_name = 'StgFEM'
+env.AppendUnique(CPPPATH=[env.get_build_path('include/' + env.project_name)])
+env.src_objs = []
+env.suite_hdrs = []
+env.suite_objs = []
 
-bases = ['Discretisation', 'SLE/LinearAlgebra', 'SLE/SystemSetup',
-         'SLE/ProvidedSystems/AdvectionDiffusion', 'SLE/ProvidedSystems/Energy',
-         'SLE/ProvidedSystems/StokesFlow', 'SLE/ProvidedSystems',
-         'SLE', 'Assembly']
-src_objs = []
-suite_hdrs = []
-suite_objs = []
-for base in bases:
-    env.build_files(env.glob(base + '/src/*.def'), 'include/StgFEM/' + base)
-    env.build_headers(env.glob(base + '/src/*.h'), 'include/StgFEM/' + base)
-    src_objs += env.build_sources(env.glob(base + '/src/*.c'), 'StgFEM/' + base)
-    src_objs += env.build_metas(env.glob(base + '/src/*.meta'), 'StgFEM/' + base)
-    suite_hdrs += env.glob(base + '/tests/*Suite.h')
-    suite_objs += env.build_sources(env.glob(base + '/tests/*Suite.c'), 'StgFEM/' + base)
+#
+# Build standard stg directories.
+env.build_directory('Discretisation')
+env.build_directory('SLE/LinearAlgebra')
+env.build_directory('SLE/SystemSetup')
+env.build_directory('SLE/ProvidedSystems/AdvectionDiffusion')
+env.build_directory('SLE/ProvidedSystems/Energy')
+env.build_directory('SLE/ProvidedSystems/StokesFlow')
+env.build_directory('SLE/ProvidedSystems')
+env.build_directory('SLE')
+env.build_directory('Assembly')
+env.build_directory('libStgFEM')
 
-env.build_headers(env.glob('libStgFEM/src/*.h'), 'include/StgFEM')
-src_objs += env.build_sources(env.glob('libStgFEM/src/*.c'), 'StgFEM/libStgFEM')
-src_objs += env.build_sources(env.glob('libStgFEM/src/*.meta'), 'StgFEM/libStgFEM')
-
-# Build library.
+#
+# Build libraries.
 if env['static_libraries']:
-    env.Library(env.get_build_path('lib/StgFEM'), src_objs)
+    env.Library(env.get_build_path('lib/StgFEM'), env.src_objs)
 if env['shared_libraries']:
-    env.SharedLibrary(env.get_build_path('lib/StgFEM'), src_objs)
+    env.SharedLibrary(env.get_build_path('lib/StgFEM'), env.src_objs)
 
+#
 # Build toolbox.
 if env['shared_libraries']:
-    objs = env.build_sources(env.glob('libStgFEM/Toolbox/*.c'),
-                             'StgFEM/libStgFEM/Toolbox')
-    objs += env.build_metas(env.glob('libStgFEM/Toolbox/*.meta'),
-                            'StgFEM/libStgFEM/Toolbox')
+    objs = env.build_sources(env.glob('libStgFEM/Toolbox/*.c'), 'StgFEM/libStgFEM/Toolbox')
+    objs += env.build_metas(env.glob('libStgFEM/Toolbox/*.meta'), 'StgFEM/libStgFEM/Toolbox')
     env.SharedLibrary(env.get_target_name('lib/StgFEM_Toolboxmodule'), objs,
                       SHLIBPREFIX='',
                       LIBPREFIXES=env.make_list(env['LIBPREFIXES']) + [''],
                       LIBS=['StgFEM'] + env.get('LIBS', []))
 
-# Build plugins.
+#
+# Build plugins. Note that this must happen after the libraries
+# have been built.
 if env['shared_libraries']:
-    plgn_bases = ['plugins/CompareFeVariableAgainstReferenceSolution',
-                  'plugins/Document',
-                  'plugins/FeVariableImportExporters/FeVariable_ImportExport_ABAQUS',
-                  'plugins/FeVariableImportExporters/FeVariable_ImportExport_SpecRidge2D',
-                  'plugins/FileAnalyticSolution',
-                  'plugins/Output/CPUTime',
-                  'plugins/Output/FrequentOutput',
-                  'plugins/Output/PeakMemory',
-                  'plugins/Output/PrintFeVariableDiscreteValues',
-                  'plugins/Output/PrintFeVariableDiscreteValues_2dBox',
-                  'plugins/StandardConditionFunctions',
-                  ('Apps/StokesMomentumUzawa/tests/LinearVelocityAnalytic',
-                   'LinearVelocityAnalytic'),
-                  ('Apps/StokesMomentumUzawa/tests/LidDrivenIsoviscousAnalytic',
-                   'LidDrivenIsoviscousAnalytic'),
-                  ('Apps/StokesMomentumUzawa/tests/SimpleShearAnalytic',
-                   'SimpleShearAnalytic')]
-    for base in plgn_bases:
-        if isinstance(base, tuple):
-            name = 'StgFEM_' + base[1] + 'module'
-            base = base[0]
-        else:
-            name = 'StgFEM_' + base.split('/')[-1] + 'module'
-        env.build_headers(env.glob(base + '/*.h'), 'include/StgFEM/' + base.split('/')[-1])
-        objs = env.build_sources(env.glob(base + '/*.c'), 'StgFEM/' + base)
-        env.SharedLibrary(env.get_build_path('lib/' + name), objs,
-                          SHLIBPREFIX='',
-                          LIBPREFIXES=env.make_list(env['LIBPREFIXES']) + [''],
-                          LIBS=['StgFEM'] + env.get('LIBS', []))
+    env.build_plugin('plugins/CompareFeVariableAgainstReferenceSolution')
+    env.build_plugin('plugins/Document')
+    env.build_plugin('plugins/FeVariableImportExporters/FeVariable_ImportExport_ABAQUS')
+    env.build_plugin('plugins/FeVariableImportExporters/FeVariable_ImportExport_SpecRidge2D')
+    env.build_plugin('plugins/FileAnalyticSolution')
+    env.build_plugin('plugins/Output/CPUTime')
+    env.build_plugin('plugins/Output/FrequentOutput')
+    env.build_plugin('plugins/Output/PeakMemory')
+    env.build_plugin('plugins/Output/PrintFeVariableDiscreteValues')
+    env.build_plugin('plugins/Output/PrintFeVariableDiscreteValues_2dBox')
+    env.build_plugin('plugins/StandardConditionFunctions')
+    env.build_plugin('Apps/StokesMomentumUzawa/tests/LinearVelocityAnalytic')
+    env.build_plugin('Apps/StokesMomentumUzawa/tests/LidDrivenIsoviscousAnalytic')
+    env.build_plugin('Apps/StokesMomentumUzawa/tests/SimpleShearAnalytic')
 
 # Build unit test runner.
 env['PCURUNNERINIT'] = ''
@@ -80,10 +68,10 @@ env['PCURUNNERSETUP'] = """StGermain_Init( &argc, &argv );
 env['PCURUNNERTEARDOWN'] = """StgFEM_Finalise();
    StgDomain_Finalise();
    StGermain_Finalise();"""
-runner_src = env.PCUSuiteRunner(env.get_build_path('StgFEM/testStgFEM.c'), suite_hdrs)
+runner_src = env.PCUSuiteRunner(env.get_build_path('StgFEM/testStgFEM.c'), env.suite_hdrs)
 runner_obj = env.SharedObject(runner_src)
 env.Program(env.get_build_path('bin/testStgFEM'),
-            runner_obj + suite_objs,
+            runner_obj + env.suite_objs,
             LIBS=['StgFEM', 'pcu'] + env.get('LIBS', []))
 
 # Copy over XML files.
