@@ -30,10 +30,36 @@ def build_metas(env, metas, dst_dir):
         objs += env.SharedObject(tgt, src, CPPDEFINES=[mod_name] + env.get('CPPDEFINES', []))
     return objs
 
+def build_directory(env, dir, dst_dir=''):
+    if not dst_dir:
+        dst_dir = dir
+    inc_dir = 'include/' + env.project_name + '/' + dst_dir
+    obj_dir = env.project_name + '/' + dst_dir
+    env.build_files(env.glob(dir + '/src/*.def'), inc_dir)
+    env.build_headers(env.glob(dir + '/src/*.h'), inc_dir)
+    env.src_objs += env.build_sources(env.glob(dir + '/src/*.c'), obj_dir)
+    env.src_objs += env.build_metas(env.glob(dir + '/src/*.meta'), obj_dir)
+    env.suite_hdrs += env.glob(dir + '/tests/*Suite.h')
+    env.suite_objs += env.build_sources(env.glob(dir + '/tests/*Suite.c'), obj_dir)
+
+def build_plugin(env, dir, dst_dir=''):
+    if not dst_dir:
+        dst_dir = dir
+    name = dir.split('/')[-1]
+    mod_name = 'StgFEM_' + name + 'module'
+    env.build_headers(env.glob(dir + '/*.h'), 'include/StgFEM/' + name)
+    objs = env.build_sources(env.glob(dir + '/*.c'), 'StgFEM/' + dir)
+    env.SharedLibrary(env.get_build_path('lib/' + mod_name), objs,
+                      SHLIBPREFIX='',
+                      LIBPREFIXES=env.make_list(env['LIBPREFIXES']) + [''],
+                      LIBS=['StgFEM'] + env.get('LIBS', []))
+
 SConsEnvironment.build_files = build_files
 SConsEnvironment.build_headers = build_headers
 SConsEnvironment.build_sources = build_sources
 SConsEnvironment.build_metas = build_metas
+SConsEnvironment.build_directory = build_directory
+SConsEnvironment.build_plugin = build_plugin
 
 #
 # Custom builders.
@@ -92,3 +118,9 @@ def gen_meta_suffix(env, sources):
 Import('env')
 env['BUILDERS']['Meta']=Builder(action=create_meta,src_suffix="meta",
                                 suffix=gen_meta_suffix,single_source=True)
+
+#
+# Add object storage locations.
+env.src_objs = []
+env.suite_hdrs = []
+env.suite_objs = []
