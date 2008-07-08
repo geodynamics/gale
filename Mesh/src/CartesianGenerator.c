@@ -309,38 +309,40 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
 					restartTimestep );
 			}			
 	
-	#ifdef HAVE_HDF5	
+#ifdef HAVE_HDF5	
 	      sprintf( meshSaveFileName, "%s.h5", meshSaveFileName );
 	      
 	      /* Read in minimum coord. */
 	      file = H5Fopen( meshSaveFileName, H5F_ACC_RDONLY, H5P_DEFAULT );
 	      
-	      if( file == 0 ) {
+	      if( !file ) {
 				Journal_Printf( errorStream, 
 					"Warning - Couldn't find checkpoint mesh file with filename \"%s\".\n", 
 					meshSaveFileName );
 			}
+			else {
 			
-      #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
-	      fileData = H5Dopen( file, "/min" );
-      #else
-	      fileData = H5Dopen( file, "/min", H5P_DEFAULT );
-      #endif
-	      H5Dread( fileData, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, crdMin );
-	      H5Dclose( fileData );
+         #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+	         fileData = H5Dopen( file, "/min" );
+         #else
+	         fileData = H5Dopen( file, "/min", H5P_DEFAULT );
+         #endif
+	         H5Dread( fileData, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, crdMin );
+	         H5Dclose( fileData );
+	         
+	         /* Read in maximum coord. */
+         #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+	         fileData = H5Dopen( file, "/max" );
+         #else
+	         fileData = H5Dopen( file, "/max", H5P_DEFAULT );
+         #endif
+	         H5Dread( fileData, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, crdMax );
+	         H5Dclose( fileData );
+	         
+	         H5Fclose( file );
+	      }
 	      
-	      /* Read in maximum coord. */
-      #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
-	      fileData = H5Dopen( file, "/max" );
-      #else
-	      fileData = H5Dopen( file, "/max", H5P_DEFAULT );
-      #endif
-	      H5Dread( fileData, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, crdMax );
-	      H5Dclose( fileData );
-	      
-	      H5Fclose( file );
-	      
-	#else	
+#else	
 	      sprintf( meshSaveFileName, "%s.dat", meshSaveFileName );
 	        
 			FILE* meshFile = fopen( meshSaveFileName, "r" );	
@@ -357,16 +359,6 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
 					meshSaveFileName );
 			}
 			else {
-			#if 0
-				fscanf( meshFile, "Min: " );
-				for( i=0; i<self->nDims; i++ ) {
-					fscanf( meshFile, "%lg ", &crdMin[i] );
-				}
-				fscanf( meshFile, "\nMax: " );
-				for( i=0; i<self->nDims; i++ ) {
-					fscanf( meshFile, "%lg ", &crdMax[i] );
-				}
-				#endif
 				
 				/* Read min and max coords from file */
 		      if(self->nDims==2)
@@ -380,7 +372,7 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
             
 				fclose( meshFile );
 			}
-   #endif
+#endif
 				
 			Memory_Free( meshSaveFileName );
 		}	
@@ -2105,8 +2097,8 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
 		
       /* Open the file and data set. */
 	   file = H5Fopen( meshSaveFileName, H5F_ACC_RDONLY, H5P_DEFAULT );
-	   
-	   if( !file ) {
+		
+	   if( file < 0 ) {
 			Journal_Printf( errorStream, 
 				"Warning - Couldn't find checkpoint mesh file with filename \"%s\".\n", 
 				meshSaveFileName );
@@ -2131,49 +2123,51 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
 	      FreeArray( inds );
 	      FreeArray( steps );
 		}
+		else {
       	
-	   /* Prepare to read vertices from file */		
-      #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
-	   fileData = H5Dopen( file, "/data" );
-      #else
-	   fileData = H5Dopen( file, "/data", H5P_DEFAULT );
-      #endif
-	   fileSpace = H5Dget_space( fileData );
-      
-      start[1] = 0;
-	   count[0] = 1;
-	   count[1] = mesh->topo->nDims + 1;
-      memSpace = H5Screate_simple( 2, count, NULL );
-      totalVerts = Mesh_GetGlobalSize( mesh, 0 );
+	      /* Prepare to read vertices from file */		
+         #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+	      fileData = H5Dopen( file, "/data" );
+         #else
+	      fileData = H5Dopen( file, "/data", H5P_DEFAULT );
+         #endif
+	      fileSpace = H5Dget_space( fileData );
          
-	   for( ii=0; ii<totalVerts; ii++ ) {   
-	      start[0] = ii;
-               
-         H5Sselect_hyperslab( fileSpace, H5S_SELECT_SET, start, NULL, count, NULL );
-         H5Sselect_all( memSpace );
-         
-         H5Dread( fileData, H5T_NATIVE_DOUBLE, memSpace, fileSpace, H5P_DEFAULT, buf );
-         gNode_I = (int)buf[0];
-         
-         if( Mesh_GlobalToDomain( mesh, MT_VERTEX, gNode_I, &lNode_I ) && 
-		       lNode_I < Mesh_GetLocalSize( mesh, MT_VERTEX ) )
-		   {
-			   double *vert;
+         start[1] = 0;
+	      count[0] = 1;
+	      count[1] = mesh->topo->nDims + 1;
+         memSpace = H5Screate_simple( 2, count, NULL );
+         totalVerts = Mesh_GetGlobalSize( mesh, 0 );
+            
+	      for( ii=0; ii<totalVerts; ii++ ) {   
+	         start[0] = ii;
+                  
+            H5Sselect_hyperslab( fileSpace, H5S_SELECT_SET, start, NULL, count, NULL );
+            H5Sselect_all( memSpace );
+            
+            H5Dread( fileData, H5T_NATIVE_DOUBLE, memSpace, fileSpace, H5P_DEFAULT, buf );
+            gNode_I = (int)buf[0];
+            
+            if( Mesh_GlobalToDomain( mesh, MT_VERTEX, gNode_I, &lNode_I ) && 
+		          lNode_I < Mesh_GetLocalSize( mesh, MT_VERTEX ) )
+		      {
+			      double *vert;
 
-			   vert = Mesh_GetVertex( mesh, lNode_I );
-			   vert[0] = buf[1];
-			   if( mesh->topo->nDims >= 2 )
-				   vert[1] = buf[2];
-			   if( mesh->topo->nDims >=3 )
-				   vert[2] = buf[3];
-		   }
-	   }
+			      vert = Mesh_GetVertex( mesh, lNode_I );
+			      vert[0] = buf[1];
+			      if( mesh->topo->nDims >= 2 )
+				      vert[1] = buf[2];
+			      if( mesh->topo->nDims >=3 )
+				      vert[2] = buf[3];
+		      }
+	      }
 	   	      
-	   /* Close handles */
-	   H5Sclose( memSpace );
-	   H5Sclose( fileSpace );
-	   H5Dclose( fileData );
-	   H5Fclose( file );
+	      /* Close handles */
+	      H5Sclose( memSpace );
+	      H5Sclose( fileSpace );
+	      H5Dclose( fileData );
+	      H5Fclose( file );
+	   }
 	   
 #else
       sprintf( meshSaveFileName, "%s.dat", meshSaveFileName );
@@ -2221,6 +2215,8 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
 			      /* Free resources. */
 	            FreeArray( inds );
 	            FreeArray( steps );
+	            
+	            return;
 		      }
 		      
 			   rewind( inputFile );
