@@ -1,4 +1,4 @@
-/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ** Copyright (c) 2005, Monash Cluster Computing 
 ** All rights reserved.
 ** Redistribution and use in source and binary forms, with or without modification,
@@ -204,56 +204,52 @@ void _Orthotropic_ModifyConstitutiveMatrix(
 	C_h12 = self->C12;
 	C_h13 = self->C13;
 	C_h23 = self->C23;
-	C_h44 = self->C44;
-	C_h55 = self->C55;
-	C_h66 = self->C66;
 
-	if(dim==2) {
-	      C_h44 = 0.0;
-	      C_h55 = 0.0;
-	      C_h66 = 0.0;
-	      C_h13 = 0.0;
-	      C_h23 = 0.0;   
-	      n3 = 0.0;
-	      m3 = 0.0;
-	      q3 = 0.0;
-	      q1 = 0.0;
-	      q2 = 0.0;
-	}
 	/* the vectors n, m and q must form an orthonormal triad in 3D */
 	n1 = self->n[0];
 	n2 = self->n[1];
-	m1 = self->m[0];
-	m2 = self->m[1];
-	if(dim == 3){
-	      m3 = self->m[2];
-	      n3 = self->n[2];
-	      q1 = self->q[0];
-	      q2 = self->q[1];
-	      q3 = self->q[2];
-	}
-
 
 	for(i=0;i<dim*(dim+1)/2;i++){
 	      for(j=0;j<dim*(dim+1)/2;j++){
 		    C[i][j] = 0.0;
 	      }
 	}
-	  
-	C[0][0] = C_h11*n1*n1*n1*n1+C_h22*m1*m1*m1*m1+C_h33*q1*q1*q1*q1+4*C_h44*n1*n1*m1*m1+4*C_h55*n1*n1*q1*q1+4*C_h66*q1*q1*m1*m1+2*C_h12*n1*n1*m1*m1+2*C_h12*n1*n1*q1*q1+2*C_h23*q1*q1*m1*m1;
 	
-	C[1][1] = C_h11*n2*n2*n2*n2+C_h22*m2*m2*m2*m2+C_h33*q2*q2*q2*q2+4*C_h44*n2*n2*m2*m2+4*C_h55*n2*n2*q2*q2+4*C_h66*q2*q2*m2*m2+2*C_h12*n2*n2*m2*m2+2*C_h12*n2*n2*q2*q2+2*C_h23*q2*q2*m2*m2;
 
-	C[1][0]=C[0][1] = C_h11*n1*n1*n2*n2+C_h22*m1*m1*m2*m2+C_h33*q1*q1*q2*q2+4*C_h44*m1*n2*n1*m2+4*C_h55*q1*n2*n1*q2+4*C_h66*m1*q2*q1*m2+C_h12*(n1*n1*m2*m2+m1*m1*n2*n2)+C_h12*(n1*n1*q2*q2+q1*q1*n2*n2)+C_h23*(q1*q1*m2*m2+m1*m1*q2*q2);
+	if(2==dim) {/* vector m appears implicitly here. m=(-n2,n1) i.e. n dot m = 0 */
+	      C[0][0] = n1*n1*n1*n1*C_h11+2*n1*n1*n2*n2*C_h12-2*n1*n1*n1*n2*C_h12+n2*n2*n2*n2*C_h22-4*n2*n2*n2*n1*C_h23-2*n1*n1*n1*n2*C_h13+4*n1*n1*n2*n2*C_h33;
+	      C[0][1] = C[1][0] = n1*n1*n2*n2*C_h11+n2*n2*n2*n2*C_h12-2*n1*n2*n2*n2*C_h12+n1*n1*n1*n1*C_h12+n2*n2*n1*n1*C_h22-2*n1*n1*n1*n2*C_h23+2*n1*n1*n1*n2*C_h13+2*n2*n2*n2*n1*C_h23-4*n1*n1*n2*n2*C_h33;
+	      C[0][2] = C[2][0] = n1*n1*n1*n2*C_h11+n1*n2*n2*n2*C_h12-2*n1*n1*n2*n2*C_h12-n1*n1*n1*n2*C_h12-n1*n2*n2*n2*C_h22+3*n1*n1*n2*n2*C_h23+n1*n1*n1*n1*C_h13-n1*n1*C_h13*n2*n2-n2*n2*n2*n2*C_h23-2*n1*n1*n1*n2*C_h33+2*n1*n2*n2*n2*C_h33;
+	      C[1][1] = n2*n2*n2*n2*C_h11+2*n1*n1*n2*n2*C_h12+2*n1*n2*n2*n2*C_h12+n1*n1*n1*n1*C_h22+4*n1*n1*n1*n2*C_h23+2*n1*n2*n2*n2*C_h13+4*n1*n1*n2*n2*C_h33;
+	      C[1][2] = C[2][1] = n1*n2*n2*n2*C_h11+n1*n1*n1*n2*C_h12+2*n1*n1*n2*n2*C_h12-n1*n2*n2*n2*C_h12-n1*n1*n1*n2*C_h22-3*n1*n1*n2*n2*C_h23+n1*n1*C_h13*n2*n2-n2*n2*n2*n2*C_h13+n1*n1*n1*n1*C_h23+2*n1*n1*n1*n2*C_h33-2*n1*n2*n2*n2*C_h33;
+	      C[2][2] = n1*n1*n2*n2*C_h11-2*n1*n1*n2*n2*C_h12+n1*n1*n1*n2*C_h12-n1*n2*n2*n2*C_h12+n2*n2*n1*n1*C_h22-2*n1*n1*n1*n2*C_h23+2*n2*n2*n2*n1*C_h23+n1*n1*n1*n2*C_h13-n1*n2*n2*n2*C_h13+C_h33*n1*n1*n1*n1-2*n1*n1*n2*n2*C_h33+C_h33*n2*n2*n2*n2;
+	}
 
-	C[2][2] = C_h11*n3*n3*n3*n3+C_h22*m3*m3*m3*m3+C_h33*q3*q3*q3*q3+4*C_h44*n3*n3*m3*m3+4*C_h55*n3*n3*q3*q3+4*C_h66*q3*q3*m3*m3+2*C_h12*n3*n3*m3*m3+2*C_h12*n3*n3*q3*q3+2*C_h23*q3*q3*m3*m3;
 
-	C[2][0]=C[0][2] = C_h11*n1*n1*n3*n3+C_h22*m1*m1*m3*m3+C_h33*q1*q1*q3*q3+4*C_h44*n1*m1*n3*m3+4*C_h55*n1*q1*n3*q3+4*C_h66*q1*m1*q3*m3+C_h12*(n1*n1*m3*m3+m1*m1*n3*n3)+C_h12*(n1*n1*q3*q3+q1*q1*n3*n3)+C_h23*(q1*q1*m3*m3+m1*m1*q3*q3);
+	if(3==dim){
+	      m1 = self->m[0];
+	      m2 = self->m[1];
+	      m3 = self->m[2];
+	      n3 = self->n[2];
+	      q1 = self->q[0];
+	      q2 = self->q[1];
+	      q3 = self->q[2];
+	      C_h44 = self->C44;
+	      C_h55 = self->C55;
+	      C_h66 = self->C66;
 
-	C[2][1]=C[1][2] =  C_h11*n2*n2*n3*n3+C_h22*m2*m2*m3*m3+C_h33*q2*q2*q3*q3+4*C_h44*n2*m2*n3*m3+4*C_h55*n2*q2*n3*q3+4*C_h66*q2*m2*q3*m3+C_h12*(n2*n2*m3*m3+m2*m2*n3*n3)+C_h12*(n2*n2*q3*q3+q2*q2*n3*n3)+C_h23*(q2*q2*m3*m3+m2*m2*q3*q3);
+	      C[0][0] = C_h11*n1*n1*n1*n1+C_h22*m1*m1*m1*m1+C_h33*q1*q1*q1*q1+4*C_h44*n1*n1*m1*m1+4*C_h55*n1*n1*q1*q1+4*C_h66*q1*q1*m1*m1+2*C_h12*n1*n1*m1*m1+2*C_h12*n1*n1*q1*q1+2*C_h23*q1*q1*m1*m1;
+	
+	      C[1][1] = C_h11*n2*n2*n2*n2+C_h22*m2*m2*m2*m2+C_h33*q2*q2*q2*q2+4*C_h44*n2*n2*m2*m2+4*C_h55*n2*n2*q2*q2+4*C_h66*q2*q2*m2*m2+2*C_h12*n2*n2*m2*m2+2*C_h12*n2*n2*q2*q2+2*C_h23*q2*q2*m2*m2;
 
+	      C[1][0]=C[0][1] = C_h11*n1*n1*n2*n2+C_h22*m1*m1*m2*m2+C_h33*q1*q1*q2*q2+4*C_h44*m1*n2*n1*m2+4*C_h55*q1*n2*n1*q2+4*C_h66*m1*q2*q1*m2+C_h12*(n1*n1*m2*m2+m1*m1*n2*n2)+C_h12*(n1*n1*q2*q2+q1*q1*n2*n2)+C_h23*(q1*q1*m2*m2+m1*m1*q2*q2);
 
-	if(dim == 3){
+	      C[2][2] = C_h11*n3*n3*n3*n3+C_h22*m3*m3*m3*m3+C_h33*q3*q3*q3*q3+4*C_h44*n3*n3*m3*m3+4*C_h55*n3*n3*q3*q3+4*C_h66*q3*q3*m3*m3+2*C_h12*n3*n3*m3*m3+2*C_h12*n3*n3*q3*q3+2*C_h23*q3*q3*m3*m3;
+
+	      C[2][0]=C[0][2] = C_h11*n1*n1*n3*n3+C_h22*m1*m1*m3*m3+C_h33*q1*q1*q3*q3+4*C_h44*n1*m1*n3*m3+4*C_h55*n1*q1*n3*q3+4*C_h66*q1*m1*q3*m3+C_h12*(n1*n1*m3*m3+m1*m1*n3*n3)+C_h12*(n1*n1*q3*q3+q1*q1*n3*n3)+C_h23*(q1*q1*m3*m3+m1*m1*q3*q3);
+
+	      C[2][1]=C[1][2] =  C_h11*n2*n2*n3*n3+C_h22*m2*m2*m3*m3+C_h33*q2*q2*q3*q3+4*C_h44*n2*m2*n3*m3+4*C_h55*n2*q2*n3*q3+4*C_h66*q2*m2*q3*m3+C_h12*(n2*n2*m3*m3+m2*m2*n3*n3)+C_h12*(n2*n2*q3*q3+q2*q2*n3*n3)+C_h23*(q2*q2*m3*m3+m2*m2*q3*q3);
+
 	      C[5][0]=C[0][5] = C_h11*n1*n1*n3*n2+C_h22*m1*m1*m3*m2+C_h33*q1*q1*q3*q2+2*C_h44*m1*n1*(n2*m3+m2*n3)+2*C_h55*q1*n1*(n2*q3+q2*n3)+2*C_h66*m1*q1*(m2*q3+q2*m3)+C_h12*(n1*n1*m3*m2+m1*m1*n3*n2)+C_h12*(n1*n1*q3*q2+q1*q1*n3*n2)+C_h23*(q1*q1*m3*m2+m1*m1*q3*q2);
 
 	      C[4][0]=C[0][4] = C_h11*n1*n1*n1*n3+C_h22*m1*m1*m1*m3+C_h33*q1*q1*q1*q3+2*C_h44*n1*m1*(n3*m1+n1*m3)+2*C_h55*n1*q1*(n3*q1+n1*q3)+2*C_h66*q1*m1*(m1*q3+q1*m3)+C_h12*n1*m1*(n3*m1+n1*m3)+C_h12*n1*q1*(n3*q1+n1*q3)+C_h23*q1*m1*(m1*q3+q1*m3);
@@ -286,15 +282,16 @@ void _Orthotropic_ModifyConstitutiveMatrix(
 	}
 
  
-	   constitutiveMatrix->isDiagonal = False;	   
+	constitutiveMatrix->isDiagonal = False;	   
            /*	   printf("In %s OK\n\n",__func__); */
            /*	   flag = 1; */
            /*	} */
-/* 	for(i=0;i<dim*(dim+1)/2;i++){ */
-/* 	   for(j=0;j<dim*(dim+1)/2;j++){ */
-/* 	      printf("Matrix Data = %g [%d %d]\n",constitutiveMatrix->matrixData[i][j],i,j); */
-/* 	   } */
-/* 	} */
+	/*for(i=0;i<dim*(dim+1)/2;i++){ 
+	 	   for(j=0;j<dim*(dim+1)/2;j++){
+			printf("Matrix Data = %g [%d %d]\n",constitutiveMatrix->matrixData[i][j],i,j); 
+ 	   } 
+ 	}
+	exit(0);*/ 
 }
 
 #if 0
