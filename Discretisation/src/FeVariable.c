@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeVariable.c 1155 2008-06-16 06:34:22Z JulianGiordani $
+** $Id: FeVariable.c 1170 2008-07-10 04:03:07Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -426,6 +426,7 @@ void _FeVariable_Init(
 
         self->dynamicBCs[0] = NULL;
         self->dynamicBCs[1] = NULL;
+	self->dynamicBCs[2] = NULL;
 
 	self->inc = IArray_New();
 }
@@ -786,6 +787,9 @@ void FeVariable_ApplyBCs( void* variable, void* data ) {
 	if( self->dynamicBCs[1] ) {
 		VariableCondition_Apply( self->dynamicBCs[1], data );
 	}
+	if( self->dynamicBCs[2] ) {
+		VariableCondition_Apply( self->dynamicBCs[2], data );
+	}
 	if ( self->bcs ) {
 		Journal_DPrintf( self->debug, "In %s- for %s:\n", __func__, self->name );
 		Journal_DPrintf( self->debug, "applying the B.C.s for this Variable.\n" ); 
@@ -807,6 +811,13 @@ Bool FeVariable_IsBC( void* variable, int node, int dof ) {
 	if( self->dynamicBCs[1] && 
 	    self->dynamicBCs[1]->var == DofLayout_GetVariable( self->dofLayout, node, dof ) && 
 	    IMap_Has( self->dynamicBCs[1]->vcMap, node ) )
+	{
+		return True;
+	}
+
+	if( self->dynamicBCs[2] && 
+	    self->dynamicBCs[2]->var == DofLayout_GetVariable( self->dofLayout, node, dof ) && 
+	    IMap_Has( self->dynamicBCs[2]->vcMap, node ) )
 	{
 		return True;
 	}
