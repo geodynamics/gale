@@ -31,6 +31,7 @@
 </list>
 <!-- Add an exmaple XML if possible -->
 <param name="Example">
+<![CDATA[
 	<struct name="particleLayoutExample1">
 		<param name="Type">ManualParticleLayout</param>
 		<list name="manualParticlePositions">
@@ -65,5 +66,5 @@
 		</list>		
 	</struct>
 </param>
-
+]]>
 </StGermainData>
