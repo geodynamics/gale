@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<!-- Global material parameters picked up by various materials -->
+	
+	<param name="LcrustCohesion">10.0</param>
+	<param name="LcrustCohesionAfterSoftening">0.0001</param>
+	<param name="LcrustFrictionCoefficient">0.5</param>
+	<param name="LcrustFrictionCoefficientAfterSoftening">0.0</param>
+	<param name="LcrustMinimumYieldStress">0.00001</param>
+
+
+	<param name="LowerCrustDefaultViscosity"> 10.0 </param>
+	<param name="UpperMantleDefaultViscosity"> 1.000 </param>
+
+	<param name="LowerCrustDefaultDensity"> 1.0 </param>
+	<param name="UpperMantleDefaultDensity"> 1.0 </param>
+	<struct name="components" mergeType="merge">
+				
+		<!-- Crust Rheology -->
+		<struct name="LowerCrustViscosity" mergeType="replace">
+			<param name="Type">MaterialViscosity</param>
+			<param name="eta0">CrustDefaultViscosity</param>
+		</struct>	
+		<struct name="LowerCrustYielding" mergeType="replace">
+			<param name="Type">FaultingMoresiMuhlhaus2006</param>
+			<param name="PressureField">PressureField</param>
+			<param name="VelocityGradientsField">VelocityGradientsField</param>
+			<param name="MaterialPointsSwarm">materialSwarm</param>
+			<param name="Director">director</param>
+			<param name="Context">context</param>
+			<param name="StrainWeakening">strainWeakening</param>
+			<param name="cohesion">LcrustCohesion</param>
+			<param name="cohesionAfterSoftening">LcrustCohesionAfterSoftening</param><!--0.0001-->
+			<param name="frictionCoefficient">LcrustFrictionCoefficient</param><!--0.5-->
+			<param name="frictionCoefficientAfterSoftening">LcrustFrictionCoefficientAfterSoftening</param><!--0.0-->
+			<param name="minimumYieldStress">LcrustMinimumYieldStress</param>
+			<param name="ignoreOldOrientation">false</param>
+		</struct>
+		
+		<!-- Mantle rheology -->
+		<struct name="UpperMantleViscosity" mergeType="replace">
+			<param name="Type">MaterialViscosity</param>
+			<param name="eta0">UpperMantleDefaultViscosity</param>
+		</struct>	
+		
+<!-- this is the colour scheme for the VPs -->
+		<struct name="UpperMantleColourMap" mergeType="replace">
+			<param name="Type">lucColourMap</param>
+			<param name="colours"> #660033 #990066 #9966CC </param>
+			<param name="dynamicRange">False</param>
+			<param name="minimum">0</param>
+			<param name="maximum">2.5</param>
+		</struct>
+		<struct name="LowerCrustColourMap" mergeType="replace">
+			<param name="Type">lucColourMap</param>
+			<param name="colours"> #003300 #339900 #99FF00 </param>
+			<param name="dynamicRange">False</param>
+			<param name="minimum">0</param>
+			<param name="maximum">1</param>
+		</struct>
+	</struct>
+</StGermainData>
+

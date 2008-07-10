@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+
+	<!-- Simulation control -->
+	<param name="maxTimeSteps"> 10 </param>
+	<param name="outputPath"> ./output-basic-test </param>
+	<param name="dumpEvery"> 1 </param>	
+	<param name="checkpointEvery"> 0 </param>
+
+	<!--	
+	<struct name="components" mergeType="merge">
+		<struct name="recoveredSigmaField" mergeType="merge">
+			<param name="CalibratePressure" mergeType="replace">1</param>
+		</struct>
+	</struct>
+    -->
+
+
+
+	<!-- Non-linear stuff -->
+	<param name="nonLinearMaxIterations"> 20 </param>	
+	
+	<!-- Journal Control -->
+	<param name="journal.info.Context-verbose">True</param>
+	<param name="journal-level.info.Stg_ComponentFactory">2</param>
+	<param name="journal.debug">t</param>
+	<param name="journal-enable-branch.debug.StgFEM">t</param>
+	<param name="journal-enable-branch.debug.lucDebug">t</param>
+	<param name="journal-level-branch.debug.lucDebug">2</param>
+	<param name="journal-level-branch.debug.StgFEM"> 2 </param>	
+	
+	<!-- Geometry & Mesh setup -->
+	<param name="elementMesh"> linearMesh </param>
+	<param name="velocityMesh"> linearMesh </param>
+	<param name="pressureMesh"> constantMesh </param>
+	<param name="dim"> 3 </param>
+	<!-- Note : for proper resolution of the problem, it is strongly recommended you run
+	     this problem in parallel, with at least 100 * 50 * 100 elements. The values below are for
+	     small testing / demonstration only. -->
+	     <param name="elementResI"> 20</param>
+	     <param name="elementResJ"> 10 </param>
+	     <param name="elementResK"> 20 </param>
+	<param name="shadowDepth"> 1 </param>
+	<param name="minX"> 0.0 </param>
+	<param name="minY"> 0.0 </param>
+	<param name="minZ"> 0.0 </param>
+	<param name="maxX"> 2.0 </param>
+	<param name="maxY"> 1.0 </param>
+	<param name="maxZ"> 2.0 </param>
+	<param name="allowUnbalancing"> True </param>
+
+	<param name="particlesPerCell"> 16 </param>
+	<param name="cellParticleCount"> 16 </param>
+	<param name="seed"> 13 </param>
+
+		
+	<!-- Set up BCs and ICs -->
+	<!-- ><include> Underworld/VariableConditions/velocityBCs.extension.xml </include> <-->
+
+	<param name="Gravity">10.0</param>
+</StGermainData>
