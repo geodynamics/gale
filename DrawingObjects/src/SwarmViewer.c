@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: SwarmViewer.c 740 2007-10-11 08:05:31Z SteveQuenette $
+** $Id: SwarmViewer.c 774 2008-07-10 02:00:51Z LouisMoresi $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -119,9 +119,11 @@ lucSwarmViewer* _lucSwarmViewer_New(
 
 void _lucSwarmViewer_Init( 
 	lucSwarmViewer*                                              self,
-	float                                                        pointSize )
+	float                                                        pointSize, 
+	Bool													     pointSmoothing )
 {
 	self->pointSize           = pointSize;
+	self->pointSmoothing      = pointSmoothing;
 }
 
 void _lucSwarmViewer_Delete( void* drawingObject ) {
@@ -179,7 +181,9 @@ void _lucSwarmViewer_Construct( void* drawingObject, Stg_ComponentFactory* cf, v
 	
 	_lucSwarmViewer_Init( 
 		self, 
-		(float) Stg_ComponentFactory_GetDouble( cf, self->name, "pointSize", 1.0 ) );
+		(float) Stg_ComponentFactory_GetDouble( cf, self->name, "pointSize",      1.0 ),
+		(Bool ) Stg_ComponentFactory_GetBool(   cf, self->name, "pointSmoothing", 0 )
+	  );
 }
 
 void _lucSwarmViewer_Build( void* drawingObject, void* data ) {
@@ -229,14 +233,26 @@ void _lucSwarmViewer_BuildDisplayList( void* drawingObject, void* _context ) {
 	   the gl lighting system doesn't seem to deal with lighting such tiny objects well. Lighting
 	   of particles doesn't really help the user anyway, so I've disabled it for now.
 	   PatrickSunter - 8 Jun 2006 */
+			
 	glDisable(GL_LIGHTING);
-
+		
+	if(self->pointSmoothing) 
+		glEnable(GL_POINT_SMOOTH);
+	else 
+		glDisable(GL_POINT_SMOOTH);
+		
+	
 	glBegin( GL_POINTS );
 	_lucSwarmViewerBase_BuildDisplayList( self, _context );
 	glEnd( );
 
-	/* Put back lighting settings */
-	glEnable(GL_LIGHTING);
+	/* Put back lighting / smoothing settings to low-impact options */
+	
+	glEnable(GL_LIGHTING);	
+		
+	if(self->pointSmoothing) {
+		glDisable(GL_POINT_SMOOTH);
+	}
 }
 
 

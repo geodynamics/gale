@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: SwarmViewer.h 667 2007-03-01 06:43:11Z RobertTurnbull $
+** $Id: SwarmViewer.h 774 2008-07-10 02:00:51Z LouisMoresi $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -55,8 +55,9 @@
 		/* Macro defining parent goes here - This means you can cast this class as its parent */ \
 		__lucSwarmViewerBase \
 		/* Virtual functions go here */ \
-		/* Other info */\
-		float                                              pointSize;
+		/* Other info */ \
+		float                                              pointSize; \
+		Bool											   pointSmoothing;
 
 		/* Opacity Stuff */ 
 	
