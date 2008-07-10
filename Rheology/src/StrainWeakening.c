@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: StrainWeakening.c 610 2007-10-11 08:09:29Z SteveQuenette $
+** $Id: StrainWeakening.c 752 2008-07-10 02:11:16Z LouisMoresi $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -315,13 +315,13 @@ void _StrainWeakening_Initialise( void* strainWeakening, void* data ) {
 				if ( self->initialDamageWavenumber > 0.0 ) {				
 					coord = Variable_GetPtrDouble( positionVariable, lParticle_I );
 					postFailureWeakening *= 
-						pow(sin(M_PI * coord[ I_AXIS ] * self->initialDamageWavenumber),2.0);
+						pow(cos(M_PI * coord[ I_AXIS ] * self->initialDamageWavenumber),2.0);
 				}
 				
 				if ( self->initialDamageWavenumberJ > 0.0 ) {				
 					coord = Variable_GetPtrDouble( positionVariable, lParticle_I ); /* This could be done more efficiently */
 					postFailureWeakening *= 
-						pow(sin(M_PI * coord[ J_AXIS ] * self->initialDamageWavenumberJ),2.0);
+						pow(cos(M_PI * coord[ J_AXIS ] * self->initialDamageWavenumberJ),2.0);
 				}
 			}
 		
