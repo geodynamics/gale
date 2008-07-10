@@ -28,10 +28,11 @@
 </list>
 
 <list name="Dependencies">
+
 </list>
-<!-- Add an exmaple XML if possible -->
+
 <param name="Example">
-<![CDATA[
+
 	<struct name="particleLayoutExample1">
 		<param name="Type">ManualParticleLayout</param>
 		<list name="manualParticlePositions">
@@ -45,6 +46,7 @@
 			</asciidata>		
 		</list>		
 	</struct>
+<![CDATA[
 	<struct name="particleLayoutExample2">
 		<param name="Type">ManualParticleLayout</param>
 		<list name="manualParticlePositions">
@@ -65,6 +67,6 @@
 			</struct>			
 		</list>		
 	</struct>
-</param>
 ]]>
+</param>
 </StGermainData>
