@@ -34,8 +34,8 @@ env.build_directory('Utils')
 #
 # Need to handle libStGermain differently.
 env.build_headers(env.glob('libStGermain/src/*.h'), 'include/StGermain')
-env.build_sources(env.glob('libStGermain/src/*.c'), 'StGermain/libStGermain')
-env.build_metas(env.glob('libStGermain/src/*.meta'), 'StGermain/libStGermain')
+env.src_objs += env.build_sources(env.glob('libStGermain/src/*.c'), 'StGermain/libStGermain')
+env.src_objs += env.build_metas(env.glob('libStGermain/src/*.meta'), 'StGermain/libStGermain')
 
 #
 # Build libraries.
