@@ -30,7 +30,12 @@ env.build_directory('Base/Extensibility')
 env.build_directory('Base/Context')
 env.build_directory('Base')
 env.build_directory('Utils')
-env.build_directory('libStGermain')
+
+#
+# Need to handle libStGermain differently.
+env.build_headers(env.glob('libStGermain/src/*.h'), 'include/StGermain')
+env.build_sources(env.glob('libStGermain/src/*.c'), 'StGermain/libStGermain')
+env.build_metas(env.glob('libStGermain/src/*.meta'), 'StGermain/libStGermain')
 
 #
 # Build libraries.
