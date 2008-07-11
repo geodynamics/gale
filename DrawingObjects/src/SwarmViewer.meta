@@ -13,7 +13,7 @@
 <param name="Parent">lucSwarmViewerBase</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">Plots particles in a swarm as small dots.</param>
+<param name="Description">Plots particles in a particular swarm as individual dots.</param>
 
 <!--Now the interesting stuff-->
 <list name="Params">
@@ -22,6 +22,13 @@
 		<param name="Type">Double</param>
 		<param name="Default">1.0</param>
 		<param name="Description">The size of the points to be plotted.</param>
+	</struct>
+
+	<struct>
+		<param name="Name">pointSmoothing</param>
+		<param name="Type">Bool</param>
+		<param name="Default">0</param>
+		<param name="Description">Whether the points should be rendered with GL_POINT_SMOOTH switched on (t) or off (f). You should test the performance implications of switching this on if the number of particles in the swarm is large </param>
 	</struct>
 
 </list>
