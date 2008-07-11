@@ -26,8 +26,8 @@ env.build_directory('Assembly')
 #
 # Need to handle libStgFEM differently.
 env.build_headers(env.glob('libStgFEM/src/*.h'), 'include/StgFEM')
-env.build_sources(env.glob('libStgFEM/src/*.c'), 'StgFEM/libStgFEM')
-env.build_metas(env.glob('libStgFEM/src/*.meta'), 'StgFEM/libStgFEM')
+env.src_objs += env.build_sources(env.glob('libStgFEM/src/*.c'), 'StgFEM/libStgFEM')
+env.src_objs += env.build_metas(env.glob('libStgFEM/src/*.meta'), 'StgFEM/libStgFEM')
 
 #
 # Build libraries.
