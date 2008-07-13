@@ -56,6 +56,8 @@
 
 const Type FieldTest_Type = "FieldTest";
 
+FieldTest* fieldTestSingleton = NULL;
+
 void* _FieldTest_DefaultNew( Name name ) {
 	return _FieldTest_New(
 		sizeof(FieldTest),
@@ -106,8 +108,11 @@ FieldTest* _FieldTest_New(
 			name,
 			NON_GLOBAL );
 
+	self->normalise = False;
+	self->referenceSolnFromFile = False;
+
 	/* Assign singleton ptr */
-	//mySingleton = self;
+	fieldTestSingleton = self;
 	return self;
 }
 
@@ -145,8 +150,12 @@ void* _FieldTest_Copy( void* fieldTest, void* dest, Bool deep, Name nameExt, Ptr
 
 void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data ) {
 	FieldTest* 			self 			= (FieldTest*)fieldTest;
-	Dictionary*			dict			= Dictionary_GetDictionary( cf->componentDict, self->name );
-	Dictionary_Entry_Value*		fieldList		= Dictionary_Get( dict, "NumericFields" );
+	//Dictionary*			dict			= Dictionary_GetDictionary( cf->componentDict, self->name );
+	Dictionary*			dict			= cf->rootDict;
+	Dictionary_Entry_Value*		dictEntryVal		= Dictionary_Get( dict, "pluginData" );
+	Dictionary_Entry_Value*		pluginDict		= Dictionary_Entry_Value_AsDictionary( dictEntryVal );
+	//Dictionary_Entry_Value*		fieldList		= Dictionary_Get( dict, "NumericFields" );
+	Dictionary_Entry_Value*		fieldList;
 	Dictionary_Entry_Value*		swarmVarList		= Dictionary_Get( dict, "NumericSwarmVariableNames" );
 	FieldVariable_Register* 	fV_Register     	= Stg_ObjectList_Get( cf->registerRegister, "FieldVariable_Register" );
 	FieldVariable_Register* 	sW_Register     	= Stg_ObjectList_Get( cf->registerRegister, "SwarmVariable_Register" );
@@ -157,7 +166,10 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 
 	//self->numericField	= Stg_ComponentFactory_ConstructByKey( cf, self->name, "NumericVariable",     FeVariable, False, data );
 	//self->numericSwarm	= Stg_ComponentFactory_ConstructByKey( cf, self->name, "NumericSwarm",        Swarm,      False, data );
+	//self->fieldCount = fieldList ? Dictionary_Entry_Value_GetCount( fieldList ) : 0;
+	fieldList = Dictionary_Get( pluginDict, "NumericFields" );
 	self->fieldCount = fieldList ? Dictionary_Entry_Value_GetCount( fieldList ) : 0;
+
 	self->numericFieldList   	= Memory_Alloc_Array( FeVariable*, self->fieldCount, "numeric fields" );
 	self->referenceFieldList 	= Memory_Alloc_Array( FeVariable*, self->fieldCount, "reference fields" );
 	self->errorFieldList     	= Memory_Alloc_Array( FeVariable*, self->fieldCount, "error fields" );
@@ -167,7 +179,8 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 	for( feVariable_I = 0; feVariable_I < self->fieldCount; feVariable_I++ ) {
 		fieldName = ( fieldList ) ? 
 			    Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( fieldList, feVariable_I ) ) :
-			    Dictionary_GetString( dict, "FeVariable" );
+			    Dictionary_GetString( pluginDict, "FeVariable" );
+			    //Dictionary_GetString( dict, "FeVariable" );
 			
 		self->numericFieldList[feVariable_I] = (FeVariable*) FieldVariable_Register_GetByName( fV_Register, fieldName );
 
@@ -175,9 +188,9 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 			self->numericFieldList[feVariable_I] = Stg_ComponentFactory_ConstructByName( cf, fieldName, FeVariable, True, data ); 
 	}
 
-	self->integrationSwarm 	= Stg_ComponentFactory_ConstructByKey( cf, self->name, "IntegrationSwarm", Swarm,  True,  data );
-	self->constantMesh	= Stg_ComponentFactory_ConstructByKey( cf, self->name, "ConstantMesh",     FeMesh, True,  data );
-	self->elementMesh	= Stg_ComponentFactory_ConstructByKey( cf, self->name, "ElementMesh",      FeMesh, True, data );
+	self->integrationSwarm 	= LiveComponentRegister_Get( cf->LCRegister, Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "IntegrationSwarm" ) ) );
+	self->constantMesh     	= LiveComponentRegister_Get( cf->LCRegister, Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "ConstantMesh"     ) ) );
+	self->elementMesh      	= LiveComponentRegister_Get( cf->LCRegister, Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "ElementMesh"      ) ) );
 
 	//self->swarmVariableName 	= Stg_ComponentFactory_GetString( cf, self->name, "numericVariableName",       "" );
 	self->swarmVarCount = swarmVarList ? Dictionary_Entry_Value_GetCount( swarmVarList ) : 0;
@@ -186,14 +199,19 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 	for( swarmVar_I = 0; swarmVar_I < self->swarmVarCount; swarmVar_I++ ) {
 		self->swarmVarNameList[swarmVar_I] = ( swarmVarList ) ? 
 				Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( swarmVarList, swarmVar_I ) ) :
-				Dictionary_GetString( dict, "SwarmVariable" );
+				Dictionary_GetString( pluginDict, "SwarmVariable" );
+				//Dictionary_GetString( dict, "SwarmVariable" );
 	}	
 	
 	//self->referenceSolnFileName 	= Stg_ComponentFactory_GetString( cf, self->name, "referenceSolutionFileName", "" );
-	self->referenceSolnPath		= Stg_ComponentFactory_GetString( cf, self->name, "referenceSolutionFilePath", "" );
-	self->normalise			= Stg_ComponentFactory_GetBool( cf, self->name, "normaliseByReferenceSolution", True );
-	self->referenceSolnFromFile	= Stg_ComponentFactory_GetBool( cf, self->name, "useReferenceSolutionFromFile", False );
+	//self->referenceSolnPath		= Stg_ComponentFactory_GetString( cf, self->name, "referenceSolutionFilePath", "" );
+	//self->normalise			= Stg_ComponentFactory_GetBool( cf, self->name, "normaliseByReferenceSolution", True );
+	//self->referenceSolnFromFile	= Stg_ComponentFactory_GetBool( cf, self->name, "useReferenceSolutionFromFile", False );
+	self->referenceSolnPath		= Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "referenceSolutionFilePath" ) );
+	self->normalise			= Dictionary_Entry_Value_AsBool( Dictionary_Get( pluginDict, "normaliseByReferenceSolution" ) );
+	self->referenceSolnFromFile	= Dictionary_Entry_Value_AsBool( Dictionary_Get( pluginDict, "useReferenceSolutionFromFile" ) );
 	self->context			= Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
+
 
 	/* set up the entry point */
 	generateErrorFields = Hook_New( "Generate error fields hook", FieldTest_GenerateErrFields, self->name );
@@ -287,7 +305,6 @@ void FieldTest_CalculateAnalyticSolutionForField( void* fieldTest, Index field_I
 
 	for( lNode_I = 0; lNode_I < lMeshSize; lNode_I++ ) {
 		coord = Mesh_GetVertex( analyticMesh, lNode_I );
-		/* store the constants on the FieldTest components void** data */
 		analyticSolution( self, coord, value );
 		FeVariable_SetValueAtNode( analyticField, lNode_I, value );
 	}
@@ -721,7 +738,9 @@ void FieldTest_GenerateErrFields( void* _context, void* data ) {
 	DomainContext*		context			= (DomainContext*)_context;
 	/* this a really dodgy way to get the self ptr, as will only work if the textual name is consistent with that in 
 	 * the XML - need to find a way to add an entry point which allows the self ptr to be passed as a void * */
-	FieldTest* 		self 			= LiveComponentRegister_Get( context->CF->LCRegister, "ReferenceFields" );
+	//FieldTest* 		self 			= LiveComponentRegister_Get( context->CF->LCRegister, "NumericFields" );
+	/* this is also a dodgy way to get the self ptr, as its obtained from a global variable */
+	FieldTest*		self			= fieldTestSingleton;
 	FeVariable*		errorField;
 	Index			lMeshSize, lElement_I;
 	double			elErrorSq[3], elNormSq[3], elError[3];
