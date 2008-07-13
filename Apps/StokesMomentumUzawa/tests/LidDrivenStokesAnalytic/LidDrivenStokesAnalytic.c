@@ -50,25 +50,28 @@
 const Type StgFEM_LidDrivenStokesAnalytic_Type = "StgFEM_LidDrivenStokesAnalytic";
 
 typedef struct {
-	__Codelet
+	//__Codelet
+	__FieldTest;
 	unsigned int n;
-	//double A, B, C, D;
-	FieldTest* fieldTest;
+	double A, B, C, D;
+	//FieldTest* fieldTest;
 } StgFEM_LidDrivenStokesAnalytic;
 
 void StgFEM_LidDrivenStokesAnalytic_CalculateConstants( FieldTest *fieldTest ) {
+	StgFEM_LidDrivenStokesAnalytic* self = (StgFEM_LidDrivenStokesAnalytic*)fieldTest;
 	double                  E;
 	double                  e_nPI;
 	double                  e_2nPI;
 	double                  e_4nPI;
 	double                  n;
+	//unsigned int*		intArray;
+	//double*			dblArray;
 
-	unsigned int*		intArray;
-	double*			dblArray;
-
-	intArray = (unsigned int*)fieldTest->data[0];
-	dblArray = (double*)fieldTest->data[1];
-	n = (double) *intArray;
+	//intArray = (unsigned int*)fieldTest->data[0];
+	//dblArray = (double*)fieldTest->data[1];
+	//n = (double) *intArray;
+	
+	n = self->n;
 
 	e_nPI = exp( n * M_PI );
 	e_2nPI = e_nPI * e_nPI;
@@ -76,27 +79,39 @@ void StgFEM_LidDrivenStokesAnalytic_CalculateConstants( FieldTest *fieldTest ) {
 
 	E = (4.0 * n * n * M_PI * M_PI + 2.0 ) * e_2nPI - e_4nPI - 1.0;
 
-	dblArray[0] = ( e_2nPI - 1.0 )* e_nPI / E;
-	dblArray[1] = - dblArray[0];
+	//dblArray[0] = ( e_2nPI - 1.0 )* e_nPI / E;
+	//dblArray[1] = - dblArray[0];
 
-	dblArray[2] =   ( 2.0 * n * M_PI - e_2nPI + 1.0 ) * e_nPI / E;
-	dblArray[3] = - ( 2.0 * n * M_PI * e_2nPI - e_2nPI + 1.0 ) * e_nPI / E;
+	//dblArray[2] =   ( 2.0 * n * M_PI - e_2nPI + 1.0 ) * e_nPI / E;
+	//dblArray[3] = - ( 2.0 * n * M_PI * e_2nPI - e_2nPI + 1.0 ) * e_nPI / E;
+	self->A     = ( e_2nPI - 1.0 )* e_nPI / E;
+	//self->B     = - dblArray[0];
+	self->B     = self->A;
+
+	self->C     =   ( 2.0 * n * M_PI - e_2nPI + 1.0 ) * e_nPI / E;
+	self->D     = - ( 2.0 * n * M_PI * e_2nPI - e_2nPI + 1.0 ) * e_nPI / E;
 }
 
 void StgFEM_LidDrivenStokesAnalytic_VelocityFunction( void* data, double* coord, double* velocity ) {
-	FieldTest*	fieldTest = (FieldTest*) data;
+	//FieldTest*	fieldTest = (FieldTest*) data;
+	StgFEM_LidDrivenStokesAnalytic* self = (StgFEM_LidDrivenStokesAnalytic*)data;
 	double x,y;
 	double n;
 	double A, B, C, D;
-	unsigned int*	intArray = (unsigned int*)fieldTest->data[0];
-	double*		dblArray = (double*)fieldTest->data[1];
+	//unsigned int*	intArray = (unsigned int*)fieldTest->data[0];
+	//double*		dblArray = (double*)fieldTest->data[1];
 
 	/* Get local copy of constants */
-	n = (double) *intArray;
-	A = dblArray[0];
-	B = dblArray[1];
-	C = dblArray[2];
-	D = dblArray[3];
+	//self->n = (double) *intArray;
+	//self->A = dblArray[0];
+	//self->B = dblArray[1];
+	//self->C = dblArray[2];
+	//self->D = dblArray[3];
+	n = self->n;
+	A = self->A;
+	B = self->B;
+	C = self->C;
+	D = self->D;
 
 	/* get copy of coords */
 	x = coord[I_AXIS];
@@ -112,19 +127,25 @@ void StgFEM_LidDrivenStokesAnalytic_VelocityFunction( void* data, double* coord,
 
 
 void StgFEM_LidDrivenStokesAnalytic_PressureFunction( void* data, double* coord, double* pressure ) {
-	FieldTest*	fieldTest = (FieldTest*) data;
+	//FieldTest*	fieldTest = (FieldTest*) data;
+	StgFEM_LidDrivenStokesAnalytic* self = (StgFEM_LidDrivenStokesAnalytic*)data;
 	double x,y;
 	double n;
 	double A, B, C, D;
-	unsigned int*	intArray = (unsigned int*)fieldTest->data[0];
-	double*		dblArray = (double*)fieldTest->data[1];
+	//unsigned int*	intArray = (unsigned int*)fieldTest->data[0];
+	//double*		dblArray = (double*)fieldTest->data[1];
 
 	/* Get local copy of constants */
-	n = (double) *intArray;
-	A = dblArray[0];
-	B = dblArray[1];
-	C = dblArray[2];
-	D = dblArray[3];
+	//n = (double) *intArray;
+	//A = dblArray[0];
+	//B = dblArray[1];
+	//C = dblArray[2];
+	//D = dblArray[3];
+	n = self->n;
+	A = self->A;
+	B = self->B;
+	C = self->C;
+	D = self->D;
 
 	/* get copy of coords */
 	x = coord[I_AXIS];
@@ -138,33 +159,45 @@ void _StgFEM_LidDrivenStokesAnalytic_Construct( void* codelet, Stg_ComponentFact
 	
 	unsigned int* waveSpeed;
 
-	self->fieldTest = Stg_ComponentFactory_ConstructByName( cf, "ReferenceFields", FieldTest, True, data );
+	//self->fieldTest = Stg_ComponentFactory_ConstructByName( cf, "ReferenceFields", FieldTest, True, data );
+	_FieldTest_Construct( self, cf, data );
 
 	/* Set constants */
-	self->fieldTest->data = Memory_Alloc_Array_Unnamed( void*, 2 );
-	self->fieldTest->data[0] = (unsigned int*) Memory_Alloc_Array_Unnamed( unsigned int, 1 );
-	self->fieldTest->data[1] = (double*) Memory_Alloc_Array_Unnamed( double, 4 );
+	//self->fieldTest->data = Memory_Alloc_Array_Unnamed( void*, 2 );
+	//self->fieldTest->data[0] = (unsigned int*) Memory_Alloc_Array_Unnamed( unsigned int, 1 );
+	//self->fieldTest->data[1] = (double*) Memory_Alloc_Array_Unnamed( double, 4 );
 
-	waveSpeed = Memory_Alloc_Array_Unnamed( unsigned int, 1 );
+	//waveSpeed = Memory_Alloc_Array_Unnamed( unsigned int, 1 );
 	*waveSpeed = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "sinusoidalLidWavenumber", 1 );
-	self->fieldTest->data[0] = waveSpeed;
-	StgFEM_LidDrivenStokesAnalytic_CalculateConstants( self->fieldTest );
+	self->n = *waveSpeed;
+	//self->fieldTest->data[0] = waveSpeed;
+	//StgFEM_LidDrivenStokesAnalytic_CalculateConstants( self->fieldTest );
+	StgFEM_LidDrivenStokesAnalytic_CalculateConstants( self );
 }
 
 void _StgFEM_LidDrivenStokesAnalytic_Build( void* codelet, void* data ) {
 	StgFEM_LidDrivenStokesAnalytic *self = (StgFEM_LidDrivenStokesAnalytic*)codelet;
 
-	_Codelet_Build( self, data );
+	//_Codelet_Build( self, data );
 
 	/* build the field test component so that the analytic function array is initialised */
-	Stg_Component_Build( self->fieldTest, data, False );
+	//Stg_Component_Build( self->fieldTest, data, False );
+	_FieldTest_Build( self, data );
 
 	/* set the analytic solution functions for the feVariables - must be in the same order as the XML */
-	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self->fieldTest, 0, StgFEM_LidDrivenStokesAnalytic_VelocityFunction, 0 );
-	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self->fieldTest, 1, StgFEM_LidDrivenStokesAnalytic_PressureFunction, 1 );
+	//FieldTest_AddAnalyticSolutionFuncToListAtIndex( self->fieldTest, 0, StgFEM_LidDrivenStokesAnalytic_VelocityFunction, 0 );
+	//FieldTest_AddAnalyticSolutionFuncToListAtIndex( self->fieldTest, 1, StgFEM_LidDrivenStokesAnalytic_PressureFunction, 1 );
+	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 0, StgFEM_LidDrivenStokesAnalytic_VelocityFunction, 0 );
+	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 1, StgFEM_LidDrivenStokesAnalytic_PressureFunction, 1 );
 }
 
+void _StgFEM_LidDrivenStokesAnalytic_Initialise( void* codelet, void* data ) {
+	_FieldTest_Initialise( codelet, data );
+}
+
+
 void* _StgFEM_LidDrivenStokesAnalytic_DefaultNew( Name name ) {
+	/*
 	return Codelet_New(
 		StgFEM_LidDrivenStokesAnalytic_Type,
 		_StgFEM_LidDrivenStokesAnalytic_DefaultNew,
@@ -174,7 +207,8 @@ void* _StgFEM_LidDrivenStokesAnalytic_DefaultNew( Name name ) {
 		_Codelet_Execute,
 		_Codelet_Destroy,
 		name );
-	/*return (void*) _FieldTest_New( 
+		*/
+	return (void*) _FieldTest_New( 
 			sizeof(StgFEM_LidDrivenStokesAnalytic),
 			StgFEM_LidDrivenStokesAnalytic_Type,
 			_FieldTest_Delete,
@@ -186,7 +220,7 @@ void* _StgFEM_LidDrivenStokesAnalytic_DefaultNew( Name name ) {
 			_FieldTest_Initialise,
 			_FieldTest_Execute,
 			_FieldTest_Destroy,
-			name );*/
+			name );
 }
 
 Index StgFEM_LidDrivenStokesAnalytic_Register( PluginsManager* pluginsManager ) {
