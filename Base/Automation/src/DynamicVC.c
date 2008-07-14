@@ -403,6 +403,12 @@ void DynamicVC_SetMaxEntries( void* vc, int maxEntries ) {
 	IMap_SetMaxSize( self->vcMap, maxEntries );
 }
 
+int DynamicVC_GetMaxEntries( void* vc ) {
+   DynamicVC* self = (DynamicVC*)vc;
+
+   return IMap_GetMaxSize( self->vcMap );
+}
+
 void DynamicVC_SetValues( void* vc, int nVals, VariableCondition_Value* vals ) {
 	DynamicVC* self = (DynamicVC*)vc;
 

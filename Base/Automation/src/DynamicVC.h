@@ -169,6 +169,7 @@ void DynamicVC_Apply( void* vc, void* ctx );
 
 void DynamicVC_SetVariable( void* vc, Variable* var );
 void DynamicVC_SetMaxEntries( void* vc, int maxEntries );
+int DynamicVC_GetMaxEntries( void* vc );
 void DynamicVC_SetValues( void* vc, int nVals, VariableCondition_Value* vals );
 void DynamicVC_Insert( void* vc, int index, int valIndex );
 void DynamicVC_Remove( void* vc, int index );

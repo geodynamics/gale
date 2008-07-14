@@ -232,6 +232,11 @@ int IMap_GetSize( const void* self ) {
    return ((IMap*)self)->curSize;
 }
 
+int IMap_GetMaxSize( const void* self ) {
+   assert( self );
+   return ((IMap*)self)->maxSize;
+}
+
 int IMap_Map( const void* _self, int key ) {
    const IMap* self = (const IMap*)_self;
    IMapItem* itm;

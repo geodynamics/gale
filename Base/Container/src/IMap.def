@@ -18,6 +18,7 @@ METHOD( Remove, void, (void* self, int key), (self, key) )
 METHOD( Clear, void, (void* self), (self) )
 
 METHOD( GetSize, int, (const void* self), (self) )
+METHOD( GetMaxSize, int, (const void* self), (self) )
 METHOD( Map, int, (const void* self, int key), (self, key) )
 METHOD( TryMap, Bool, (const void* self, int key, int* val), (self, key, val) )
 METHOD( Has, Bool, (const void* self, int key), (self, key) )
