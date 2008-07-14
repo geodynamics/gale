@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Dictionary_Entry_Value.c 4075 2007-04-24 04:30:55Z PatrickSunter $
+** $Id: Dictionary_Entry_Value.c 4282 2008-07-14 06:01:20Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -902,6 +902,14 @@ Bool Dictionary_Entry_Value_AsBool( Dictionary_Entry_Value* self ) {
 		}
 	}
 	return False;
+}
+
+
+Bool Dictionary_Entry_Value_AsBool_with_Default( Dictionary_Entry_Value* self, Bool Default ) {
+  if(self==NULL)
+    return Default;
+  else
+    return Dictionary_Entry_Value_AsBool(self);
 }
 
 
