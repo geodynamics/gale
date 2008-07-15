@@ -52,11 +52,13 @@ env.Program(env.get_build_path('bin/FlattenXML'), obj,
             LIBS=['StGermain'] + env.get('LIBS', []))
 
 #
-# StGermain program.
-src = 'src/main.c'
-obj = env.SharedObject(env.get_build_path('StGermain/' + src[:-2]), src)
-env.Program(env.get_build_path('bin/StGermain'), obj,
-            LIBS=['StGermain'] + env.get('LIBS', []))
+# StGermain program. We can only build this guy here if we're using
+# shared libraries.
+if env['shared_libraries']:
+    src = 'src/main.c'
+    obj = env.SharedObject(env.get_build_path('StGermain/' + src[:-2]), src)
+    env.Program(env.get_build_path('bin/StGermain'), obj,
+                LIBS=['StGermain'] + env.get('LIBS', []))
 
 #
 # Build unit testing framework.

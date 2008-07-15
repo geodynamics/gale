@@ -30,7 +30,7 @@ def build_metas(env, metas, dst_dir):
         objs += env.SharedObject(tgt, src, CPPDEFINES=[mod_name] + env.get('CPPDEFINES', []))
     return objs
 
-def build_directory(env, dir, dst_dir=''):
+def build_directory(env, dir, dst_dir='', with_tests=True):
     if not dst_dir:
         dst_dir = dir
     inc_dir = 'include/' + env.project_name + '/' + dst_dir
@@ -46,13 +46,16 @@ def build_plugin(env, dir, dst_dir=''):
     if not dst_dir:
         dst_dir = dir
     name = dir.split('/')[-1]
-    mod_name = 'StgFEM_' + name + 'module'
-    env.build_headers(env.glob(dir + '/*.h'), 'include/StgFEM/' + name)
-    objs = env.build_sources(env.glob(dir + '/*.c'), 'StgFEM/' + dir)
-    env.SharedLibrary(env.get_build_path('lib/' + mod_name), objs,
-                      SHLIBPREFIX='',
-                      LIBPREFIXES=env.make_list(env['LIBPREFIXES']) + [''],
-                      LIBS=['StgFEM'] + env.get('LIBS', []))
+    mod_name = env.project_name + '_' + name + 'module'
+    env.build_headers(env.glob(dir + '/*.h'), 'include/' + env.project_name + '/' + name)
+    objs = env.build_sources(env.glob(dir + '/*.c'), env.project_name + '/' + dir)
+    if env['shared_libraries']:
+        env.SharedLibrary(env.get_build_path('lib/' + mod_name), objs,
+                          SHLIBPREFIX='',
+                          LIBPREFIXES=env.make_list(env['LIBPREFIXES']) + [''],
+                          LIBS=[env.project_name] + env.get('LIBS', []))
+    if env['static_libraries']:
+        env.src_objs += objs
 
 SConsEnvironment.build_files = build_files
 SConsEnvironment.build_headers = build_headers
