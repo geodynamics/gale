@@ -47,7 +47,7 @@
 **	Is there a better name for this class? IE at least FeElementType.
 **	Perhaps FE_ElementDiscretisation?
 **
-** $Id: ElementType.h 1177 2008-07-15 01:29:58Z DavidLee $
+** $Id: ElementType.h 1178 2008-07-15 04:12:09Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -74,8 +74,9 @@
 
 	typedef double	(ElementType_JacobianDeterminantSurfaceFunction)		( void* elementType,
 		void* 		mesh, 
+		unsigned	element_I,
 		const double	localCoord[],
-		unsigned*	nodes,
+		unsigned	face_I,
 		unsigned 	norm );
 	
 	/* ElementType information */
@@ -92,7 +93,8 @@
 		/* ElementType info */ \
 		Index								nodeCount; \
 		Stream*								debug;	\
-		IArray* 							inc;
+		IArray* 							inc; \
+		Index**								faceNodes;
 
 	struct ElementType { __ElementType };
 
@@ -216,15 +218,17 @@
 	double _ElementType_JacobianDeterminantSurface(
 		void*			elementType,
 		void*			mesh,
+		unsigned		element_I,
 		const double		localCoord[],
-		unsigned*		nodes,
+		unsigned		face_I,
 		unsigned		norm );
 
 	double ElementType_JacobianDeterminantSurface(
 		void*			elementType,
 		void*			mesh,
+		unsigned		element_I,
 		const double		localCoord[],
-		unsigned*		nodes,
+		unsigned		face_I,
 		unsigned		norm );
 
 	#define ElementType_Jacobian( elementType, mesh, elId, xi, dim, jacobian, GNi ) \
@@ -254,5 +258,8 @@
 		Coord_Index         A_axis, 
 		Coord_Index         B_axis, 
 		Coord_Index         C_axis );
+
+	void ElementType_GetFaceNodes( void* elementType, Mesh* mesh, 
+					unsigned element_I, unsigned face_I, unsigned nNodes, unsigned* nodes );
 
 #endif /* __StgFEM_Discretisation_ElementType_h__ */

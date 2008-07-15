@@ -43,7 +43,7 @@
 **
 ** Comments:
 **
-** $Id: TrilinearElementType.h 1177 2008-07-15 01:29:58Z DavidLee $
+** $Id: TrilinearElementType.h 1178 2008-07-15 04:12:09Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -135,8 +135,9 @@
 	double _TrilinearElementType_JacobianDeterminantSurface(
 		void*		elementType,
 		void*		mesh,
+		unsigned	element_I,
 		const double	localCoord[],
-		unsigned*	nodes,
+		unsigned	face_I,
 		unsigned	norm );
 
 #endif /* __StgFEM_Discretisation_TrilinearElementType_h__ */

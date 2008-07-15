@@ -44,7 +44,7 @@
 **
 ** Comments:
 **
-** $Id: BilinearElementType.h 1177 2008-07-15 01:29:58Z DavidLee $
+** $Id: BilinearElementType.h 1178 2008-07-15 04:12:09Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -66,7 +66,7 @@
 		double	maxElLocalCoord[2]; /** Top corner in elLocal mathematical space */ \
 		double	elLocalLength[2]; /** Length of element in elLocal space */ \
 		\
-		unsigned**		triInds;
+		unsigned**		triInds; \
 		
 	struct BilinearElementType { __BilinearElementType };
 	
@@ -135,8 +135,9 @@
 	double _BilinearElementType_JacobianDeterminantSurface(
 		void*		elementType,
 		void*		mesh,
+		unsigned	element_I,
 		const double	localCoord[],
-		unsigned*	nodes,
+		unsigned	face_I,
 		unsigned	norm );
 
 #endif /* __StgFEM_Discretisation_BilinearElementType_h__ */

@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ElementType.c 1177 2008-07-15 01:29:58Z DavidLee $
+** $Id: ElementType.c 1178 2008-07-15 04:12:09Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -45,6 +45,7 @@
 #include "units.h"
 #include "types.h"
 #include "shortcuts.h"
+#include "FeMesh.h"
 #include "ElementType.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -168,7 +169,9 @@ void ElementType_EvaluateShapeFunctionLocalDerivsAt( void* elementType, const do
 	self->_evaluateShapeFunctionLocalDerivsAt( self, localCoord, evaluatedDerivatives );
 }
 
-double _ElementType_JacobianDeterminantSurface( void* elementType, void* mesh, const double localCoord[], unsigned* nodes, unsigned norm ) {
+double _ElementType_JacobianDeterminantSurface( void* elementType, void* mesh, unsigned element_I, const double localCoord[], 
+						unsigned face_I, unsigned norm ) 
+{
 	ElementType* 	self        	= (ElementType*) elementType;
 	Stream*		error		= Journal_Register( ErrorStream_Type, ElementType_Type );
 
@@ -179,10 +182,11 @@ double _ElementType_JacobianDeterminantSurface( void* elementType, void* mesh, c
 	return -1;
 }
 
-double ElementType_JacobianDeterminantSurface( void* elementType, void* mesh, const double localCoord[], unsigned* nodes, unsigned norm ) {
+double ElementType_JacobianDeterminantSurface( void* elementType, void* mesh, unsigned element_I, 
+						const double localCoord[], unsigned face_I, unsigned norm ) {
 	ElementType* self = (ElementType*)elementType;
 
-	self->_jacobianDeterminantSurface( self, mesh, localCoord, nodes, norm );
+	self->_jacobianDeterminantSurface( self, mesh, element_I, localCoord, face_I, norm );
 }
 
 void ElementType_ConvertGlobalCoordToElLocal(
@@ -595,4 +599,20 @@ double ElementType_JacobianDeterminant_AxisIndependent(
 
 	return detJac;
 }
+
+void ElementType_GetFaceNodes( void* elementType, Mesh* mesh, unsigned element_I, unsigned face_I, 
+				unsigned nNodes, unsigned* nodes ) {
+	ElementType* 	self        = (ElementType*) elementType;
+	Index		node_i;
+	unsigned*	inc;
+
+	assert( mesh && Stg_CheckType( mesh, FeMesh ) );
+
+	FeMesh_GetElementNodes( mesh, element_I, self->inc );
+	inc = IArray_GetPtr( self->inc );
+
+	for( node_i = 0; node_i < nNodes; node_i++ )
+		nodes[node_i] = inc[self->faceNodes[face_I][node_i]];
+}
+
 

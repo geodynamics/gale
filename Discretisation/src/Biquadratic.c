@@ -118,12 +118,23 @@ void _Biquadratic_Build( void* elementType, void* data ) {
 }
 
 void _Biquadratic_Initialise( void* elementType, void* data ) {
+	Biquadratic*	self = (Biquadratic*)elementType;
+
+	self->faceNodes = Memory_Alloc_2DArray( double, 4, 2, "node indices for element faces" );
+
+	self->faceNodes[0][0] = 0; self->faceNodes[0][1] = 1; self->faceNodes[0][2] = 2;
+	self->faceNodes[1][0] = 6; self->faceNodes[1][1] = 7; self->faceNodes[1][2] = 8;
+	self->faceNodes[2][0] = 0; self->faceNodes[2][1] = 3; self->faceNodes[2][2] = 6;
+	self->faceNodes[3][0] = 2; self->faceNodes[3][1] = 5; self->faceNodes[3][2] = 8;
 }
 
 void _Biquadratic_Execute( void* elementType, void* data ) {
 }
 
 void _Biquadratic_Destroy( void* elementType, void* data ) {
+	Biquadratic*	self = (Biquadratic*)elementType;
+
+	Memory_Free( self->faceNodes );
 }
 
 
@@ -189,14 +200,17 @@ void Biquadratic_EvalLocalDerivs( void* elementType, const double* localCoord, d
 	derivs[1][4] = -2.0 * eta * a4;
 }
 
-double Biquadratic_JacobianDeterminantSurface( void* elementType, void* _mesh, const double* localCoord, 
-						unsigned* nodes, unsigned norm )
+double Biquadratic_JacobianDeterminantSurface( void* elementType, void* _mesh, unsigned element_I, const double* localCoord, 
+						unsigned face_I, unsigned norm )
 {
 	Biquadratic*	self		= (Biquadratic*) elementType;
 	Mesh*		mesh		= (Mesh*)_mesh;
 	unsigned	surfaceDim	= ( norm + 1 ) % 2;
 	double		x[3];
 	double		detJac;
+	unsigned	nodes[3];
+
+	ElementType_GetFaceNodes( elementType, mesh, element_I, face_I, 3, nodes );
 
 	x[0] = Mesh_GetVertex( mesh, nodes[0] )[surfaceDim];
 	x[1] = Mesh_GetVertex( mesh, nodes[1] )[surfaceDim];

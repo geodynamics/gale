@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: BilinearElementType.c 1177 2008-07-15 01:29:58Z DavidLee $
+** $Id: BilinearElementType.c 1178 2008-07-15 04:12:09Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -193,7 +193,14 @@ void _BilinearElementType_Construct( void* elementType, Stg_ComponentFactory *cf
 }
 	
 void _BilinearElementType_Initialise( void* elementType, void *data ){
-	
+	BilinearElementType*	self	= (BilinearElementType*) self;
+
+	self->faceNodes = Memory_Alloc_2DArray( unsigned, 4, 2, "node indices for element faces" );
+
+	self->faceNodes[0][0] = 0; self->faceNodes[0][1] = 1;
+	self->faceNodes[1][0] = 2; self->faceNodes[1][1] = 3;
+	self->faceNodes[2][0] = 0; self->faceNodes[2][1] = 2;
+	self->faceNodes[3][0] = 1; self->faceNodes[3][1] = 3;
 }
 	
 void _BilinearElementType_Execute( void* elementType, void *data ){
@@ -201,7 +208,9 @@ void _BilinearElementType_Execute( void* elementType, void *data ){
 }
 	
 void _BilinearElementType_Destroy( void* elementType, void *data ){
-	
+	BilinearElementType*	self	= (BilinearElementType*) self;
+
+	Memory_Free( self->faceNodes );	
 }
 
 void _BilinearElementType_Build( void* elementType, void *data ) {
@@ -297,8 +306,9 @@ void _BilinearElementType_ConvertGlobalCoordToElLocal(
 double _BilinearElementType_JacobianDeterminantSurface( 
 		void* elementType, 
 		void* _mesh, 
-		const double localCoord[], 
-		unsigned* nodes, 
+		unsigned element_I,
+		const double localCoord[],
+		unsigned face_I, 
 		unsigned norm ) 
 {
 	BilinearElementType*	self		= (BilinearElementType*) elementType;
@@ -306,6 +316,9 @@ double _BilinearElementType_JacobianDeterminantSurface(
 	unsigned		surfaceDim	= ( norm + 1 ) % 2;
 	double			x[2];
 	double			detJac;
+	Index			nodes[2];
+
+	ElementType_GetFaceNodes( self, mesh, element_I, face_I, 2, nodes );
 
 	x[0] = Mesh_GetVertex( mesh, nodes[0] )[surfaceDim];
 	x[1] = Mesh_GetVertex( mesh, nodes[1] )[surfaceDim];

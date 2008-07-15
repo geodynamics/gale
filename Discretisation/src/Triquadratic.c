@@ -118,12 +118,45 @@ void _Triquadratic_Build( void* elementType, void* data ) {
 }
 
 void _Triquadratic_Initialise( void* elementType, void* data ) {
+	Triquadratic*	self 		= (Triquadratic*)elementType;
+	unsigned**	faceNodes;
+
+	faceNodes = Memory_Alloc_2DArray( unsigned, 6, 9, "node indices for element faces" );
+
+	faceNodes[0][0] =  0; faceNodes[0][1] =  1; faceNodes[0][2] =  2;
+	faceNodes[0][3] =  9; faceNodes[0][4] = 10; faceNodes[0][5] = 11;
+	faceNodes[0][6] = 18; faceNodes[0][7] = 19; faceNodes[0][8] = 20;
+
+	faceNodes[1][0] =  6; faceNodes[1][1] =  7; faceNodes[1][2] =  8;
+	faceNodes[1][3] = 15; faceNodes[1][4] = 16; faceNodes[1][5] = 17;
+	faceNodes[1][6] = 24; faceNodes[1][7] = 25; faceNodes[1][8] = 26;
+
+	faceNodes[2][0] =  0; faceNodes[2][1] =  9; faceNodes[2][2] = 18;
+	faceNodes[2][3] =  3; faceNodes[2][4] = 12; faceNodes[2][5] = 21;
+	faceNodes[2][6] =  6; faceNodes[2][7] = 15; faceNodes[2][8] = 24;
+
+	faceNodes[3][0] =  2; faceNodes[3][1] = 11; faceNodes[3][2] = 20;
+	faceNodes[3][3] =  5; faceNodes[3][4] = 14; faceNodes[3][5] = 23;
+	faceNodes[3][6] =  8; faceNodes[3][7] = 17; faceNodes[3][8] = 26;
+
+	faceNodes[4][0] =  0; faceNodes[4][1] =  1; faceNodes[4][2] =  2;
+	faceNodes[4][3] =  3; faceNodes[4][4] =  4; faceNodes[4][5] =  5;
+	faceNodes[4][6] =  6; faceNodes[4][7] =  7; faceNodes[4][8] =  8;
+
+	faceNodes[5][0] = 18; faceNodes[5][1] = 19; faceNodes[5][2] = 20;
+	faceNodes[5][3] = 21; faceNodes[5][4] = 22; faceNodes[5][5] = 23;
+	faceNodes[5][6] = 24; faceNodes[5][7] = 25; faceNodes[5][8] = 26;
+
+	self->faceNodes = faceNodes;
 }
 
 void _Triquadratic_Execute( void* elementType, void* data ) {
 }
 
 void _Triquadratic_Destroy( void* elementType, void* data ) {
+	Triquadratic*	self 		= (Triquadratic*)elementType;
+
+	Memory_Free( self->faceNodes );
 }
 
 
@@ -350,8 +383,8 @@ void Triquadratic_EvalLocalDerivs( void* elementType, const double* localCoord, 
 	derivs[2][26] = c5 * m3 * a2 * b2;
 }
 
-double Triquadratic_JacobianDeterminantSurface( void* elementType, void* _mesh, const double localCoord[],
-	       					unsigned* nodes, unsigned norm ) 
+double Triquadratic_JacobianDeterminantSurface( void* elementType, void* _mesh, unsigned element_I, const double localCoord[],
+	       					unsigned face_I, unsigned norm ) 
 {
 	Triquadratic*		self		= (Triquadratic*) elementType;
 	Mesh*			mesh		= (Mesh*)_mesh;
@@ -363,6 +396,7 @@ double Triquadratic_JacobianDeterminantSurface( void* elementType, void* _mesh, 
 	Index			node_i;
 	double			s0, s1, s2, t0, t1, t2;
 	double			ds0, ds1, ds2, dt0, dt1, dt2;
+	unsigned		nodes[9];
 
 	surfaceDim[0] = ( norm + 1 ) % 3;
 	surfaceDim[1] = ( norm + 2 ) % 3;
@@ -375,6 +409,8 @@ double Triquadratic_JacobianDeterminantSurface( void* elementType, void* _mesh, 
 
 	ds0 = s - 0.5; ds1 = -2.0 * s; ds2 = s + 0.5;
 	dt0 = t - 0.5; dt1 = -2.0 * t; dt2 = t + 0.5;
+
+	ElementType_GetFaceNodes( self, mesh, element_I, face_I, 9, nodes );
 
 	for( node_i = 0; node_i < 9; node_i++ ) {
 		x[node_i] = Mesh_GetVertex( mesh, nodes[node_i] )[surfaceDim[0]];

@@ -53,7 +53,7 @@
 					\
 		/* Virtual info */	\
 					\
-		/* Biquadratic info */
+		/* Biquadratic info */  \
 
 	struct Biquadratic { __Biquadratic };
 
@@ -85,8 +85,8 @@
 
 	void Biquadratic_EvalBasis( void* elementType, const double* localCoord, double* derivs );
 	void Biquadratic_EvalLocalDerivs( void* elementType, const double* localCoord, double** derivs );
-	double Biquadratic_JacobianDeterminantSurface( void* elementType, void* mesh, const double* localCoord, 
-							unsigned* nodes, unsigned norm );
+	double Biquadratic_JacobianDeterminantSurface( void* elementType, void* mesh, unsigned element_I, 
+							const double* localCoord, unsigned face_I, unsigned norm );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Public functions

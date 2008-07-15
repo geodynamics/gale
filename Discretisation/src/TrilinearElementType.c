@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: TrilinearElementType.c 1177 2008-07-15 01:29:58Z DavidLee $
+** $Id: TrilinearElementType.c 1178 2008-07-15 04:12:09Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -175,7 +175,19 @@ void _TrilinearElementType_Construct( void* elementType, Stg_ComponentFactory *c
 }
 	
 void _TrilinearElementType_Initialise( void* elementType, void *data ){
-	
+	TrilinearElementType* 	self = (TrilinearElementType*)elementType;
+	unsigned**		faceNodes;
+
+	faceNodes = Memory_Alloc_2DArray( unsigned, 6, 4, "node indices for element faces" );
+
+	faceNodes[0][0] = 0; faceNodes[0][1] = 1; faceNodes[0][2] = 4; faceNodes[0][3] = 5;
+	faceNodes[1][0] = 2; faceNodes[1][1] = 3; faceNodes[1][2] = 6; faceNodes[1][3] = 7;
+	faceNodes[2][0] = 0; faceNodes[2][1] = 4; faceNodes[2][2] = 2; faceNodes[2][3] = 6;
+	faceNodes[3][0] = 1; faceNodes[3][1] = 5; faceNodes[3][2] = 3; faceNodes[3][3] = 7;
+	faceNodes[4][0] = 0; faceNodes[4][1] = 1; faceNodes[4][2] = 2; faceNodes[4][3] = 3;
+	faceNodes[5][0] = 4; faceNodes[5][1] = 5; faceNodes[5][2] = 6; faceNodes[5][3] = 7;
+
+	self->faceNodes = faceNodes;
 }
 	
 void _TrilinearElementType_Execute( void* elementType, void *data ){
@@ -183,7 +195,9 @@ void _TrilinearElementType_Execute( void* elementType, void *data ){
 }
 	
 void _TrilinearElementType_Destroy( void* elementType, void *data ){
-	
+	TrilinearElementType* 	self = (TrilinearElementType*)elementType;
+
+	Memory_Free( self->faceNodes );
 }
 
 void _TrilinearElementType_Build( void* elementType, void *data ) {
@@ -332,8 +346,8 @@ void _TrilinearElementType_ConvertGlobalCoordToElLocal(
 }
 #endif
 
-double _TrilinearElementType_JacobianDeterminantSurface( void* elementType, void* _mesh, const double localCoord[],
-	       						unsigned* nodes, unsigned norm ) 
+double _TrilinearElementType_JacobianDeterminantSurface( void* elementType, void* _mesh, unsigned element_I, const double localCoord[],
+	       						 unsigned face_I, unsigned norm ) 
 {
 	TrilinearElementType*	self		= (TrilinearElementType*) elementType;
 	Mesh*			mesh		= (Mesh*)_mesh;
@@ -342,12 +356,15 @@ double _TrilinearElementType_JacobianDeterminantSurface( void* elementType, void
 	double			s, t;
 	double			dxds, dxdt, dyds, dydt;
 	double			detJac;
+	unsigned		nodes[3];
 
 	surfaceDim[0] = ( norm + 1 ) % 3;
 	surfaceDim[1] = ( norm + 2 ) % 3;
 
 	s = localCoord[surfaceDim[0]];
 	t = localCoord[surfaceDim[1]];
+
+	ElementType_GetFaceNodes( self, mesh, element_I, face_I, 4, nodes );
 
 	x[0] = Mesh_GetVertex( mesh, nodes[0] )[surfaceDim[0]];
 	x[1] = Mesh_GetVertex( mesh, nodes[1] )[surfaceDim[0]];
