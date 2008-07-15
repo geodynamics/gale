@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ElementType.c 1178 2008-07-15 04:12:09Z DavidLee $
+** $Id: ElementType.c 1179 2008-07-15 05:28:11Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -186,7 +186,7 @@ double ElementType_JacobianDeterminantSurface( void* elementType, void* mesh, un
 						const double localCoord[], unsigned face_I, unsigned norm ) {
 	ElementType* self = (ElementType*)elementType;
 
-	self->_jacobianDeterminantSurface( self, mesh, element_I, localCoord, face_I, norm );
+	return self->_jacobianDeterminantSurface( self, mesh, element_I, localCoord, face_I, norm );
 }
 
 void ElementType_ConvertGlobalCoordToElLocal(

@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: BilinearElementType.c 1178 2008-07-15 04:12:09Z DavidLee $
+** $Id: BilinearElementType.c 1179 2008-07-15 05:28:11Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -53,6 +53,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
+#include <math.h>
 
 const Type BilinearElementType_Type = "BilinearElementType";
 
@@ -193,7 +194,7 @@ void _BilinearElementType_Construct( void* elementType, Stg_ComponentFactory *cf
 }
 	
 void _BilinearElementType_Initialise( void* elementType, void *data ){
-	BilinearElementType*	self	= (BilinearElementType*) self;
+	BilinearElementType*	self	= (BilinearElementType*) elementType;
 
 	self->faceNodes = Memory_Alloc_2DArray( unsigned, 4, 2, "node indices for element faces" );
 
@@ -323,7 +324,7 @@ double _BilinearElementType_JacobianDeterminantSurface(
 	x[0] = Mesh_GetVertex( mesh, nodes[0] )[surfaceDim];
 	x[1] = Mesh_GetVertex( mesh, nodes[1] )[surfaceDim];
 
-	detJac = 0.5 * x[1] - x[0];
+	detJac = 0.5 * ( x[1] - x[0] );
 
 	return fabs( detJac );
 }
