@@ -454,6 +454,7 @@ void lucCarbonWindow_CreateBackgroundWindow( void* carbonWindow, void* data ) {
 	CGLPixelFormatAttribute attribs[] = 	{
 		kCGLPFAOffScreen,
 		kCGLPFAColorSize, 32,
+		kCGLPFADepthSize, 16,
 		0
 	} ;
 	
