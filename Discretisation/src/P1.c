@@ -64,6 +64,7 @@ P1* P1_New( Name name ) {
 			P1_EvalBasis, 
 			P1_EvalLocalDerivs, 
 			NULL/*P1_CoordGlobalToLocal*/, 
+			_ElementType_JacobianDeterminantSurface,
 			3 );
 }
 

@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ElementType.c 1058 2008-03-05 04:46:12Z JulianGiordani $
+** $Id: ElementType.c 1177 2008-07-15 01:29:58Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -57,20 +57,21 @@ const Type ElementType_Type = "ElementType";
 ElementType* _ElementType_New( 
 		SizeT								_sizeOfSelf,
 		Type								type,
-		Stg_Class_DeleteFunction*						_delete,
-		Stg_Class_PrintFunction*						_print,
+		Stg_Class_DeleteFunction*					_delete,
+		Stg_Class_PrintFunction*					_print,
 		Stg_Class_CopyFunction*						_copy, 
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*			_construct,
-		Stg_Component_BuildFunction*		_build,
-		Stg_Component_InitialiseFunction*		_initialise,
-		Stg_Component_ExecuteFunction*		_execute,
-		Stg_Component_DestroyFunction*		_destroy,
-		Name							name,
-		Bool							initFlag,
+		Stg_Component_DefaultConstructorFunction*			_defaultConstructor,
+		Stg_Component_ConstructFunction*				_construct,
+		Stg_Component_BuildFunction*					_build,
+		Stg_Component_InitialiseFunction*				_initialise,
+		Stg_Component_ExecuteFunction*					_execute,
+		Stg_Component_DestroyFunction*					_destroy,
+		Name								name,
+		Bool								initFlag,
 		ElementType_EvaluateShapeFunctionsAtFunction*			_evaluateShapeFunctionsAt,
 		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt,
 		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,
+		ElementType_JacobianDeterminantSurfaceFunction*			_jacobianDeterminantSurface,
 		Index								nodeCount )
 {
 	ElementType*		self;
@@ -87,6 +88,7 @@ ElementType* _ElementType_New(
 	self->_evaluateShapeFunctionsAt = _evaluateShapeFunctionsAt;
 	self->_evaluateShapeFunctionLocalDerivsAt = _evaluateShapeFunctionLocalDerivsAt;
 	self->_convertGlobalCoordToElLocal = _convertGlobalCoordToElLocal;
+	self->_jacobianDeterminantSurface = _jacobianDeterminantSurface;
 	
 	/* ElementType info */
 	
@@ -166,6 +168,22 @@ void ElementType_EvaluateShapeFunctionLocalDerivsAt( void* elementType, const do
 	self->_evaluateShapeFunctionLocalDerivsAt( self, localCoord, evaluatedDerivatives );
 }
 
+double _ElementType_JacobianDeterminantSurface( void* elementType, void* mesh, const double localCoord[], unsigned* nodes, unsigned norm ) {
+	ElementType* 	self        	= (ElementType*) elementType;
+	Stream*		error		= Journal_Register( ErrorStream_Type, ElementType_Type );
+
+	Journal_Printf( error, "Error: the jacobian for this element type cannot be evaluated on the element surface" );
+	Journal_Printf( error, "(perhaps because the nodes are defined internally for the element).\n" );
+	assert( 0 );
+
+	return -1;
+}
+
+double ElementType_JacobianDeterminantSurface( void* elementType, void* mesh, const double localCoord[], unsigned* nodes, unsigned norm ) {
+	ElementType* self = (ElementType*)elementType;
+
+	self->_jacobianDeterminantSurface( self, mesh, localCoord, nodes, norm );
+}
 
 void ElementType_ConvertGlobalCoordToElLocal(
 		void*		elementType,

@@ -85,6 +85,8 @@
 
 	void Biquadratic_EvalBasis( void* elementType, const double* localCoord, double* derivs );
 	void Biquadratic_EvalLocalDerivs( void* elementType, const double* localCoord, double** derivs );
+	double Biquadratic_JacobianDeterminantSurface( void* elementType, void* mesh, const double* localCoord, 
+							unsigned* nodes, unsigned norm );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Public functions

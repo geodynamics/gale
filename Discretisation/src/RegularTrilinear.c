@@ -64,6 +64,7 @@ RegularTrilinear* RegularTrilinear_New( Name name ) {
 				      _TrilinearElementType_SF_allNodes, 
 				      _TrilinearElementType_SF_allLocalDerivs_allNodes, 
 				      _ElementType_ConvertGlobalCoordToElLocal, 
+				      _TrilinearElementType_JacobianDeterminantSurface,
 				      8 );
 }
 

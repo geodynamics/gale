@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: BilinearElementType.c 966 2007-10-21 22:53:00Z LukeHodkinson $
+** $Id: BilinearElementType.c 1177 2008-07-15 01:29:58Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -76,6 +76,7 @@ void* BilinearElementType_DefaultNew( Name name ) {
 			_BilinearElementType_SF_allNodes,
 			_BilinearElementType_SF_allLocalDerivs_allNodes,
 			_ElementType_ConvertGlobalCoordToElLocal,
+			_BilinearElementType_JacobianDeterminantSurface,
 			_BilinearElementType_NodeCount );
 }
 
@@ -83,7 +84,7 @@ BilinearElementType* BilinearElementType_New( Name name ) {
 	return _BilinearElementType_New( sizeof(BilinearElementType), BilinearElementType_Type, _BilinearElementType_Delete,
 		_BilinearElementType_Print, NULL, BilinearElementType_DefaultNew, _BilinearElementType_Construct, _BilinearElementType_Build,
 		_BilinearElementType_Initialise, _BilinearElementType_Execute, _BilinearElementType_Destroy, name, True, _BilinearElementType_SF_allNodes, 
-		_BilinearElementType_SF_allLocalDerivs_allNodes, _ElementType_ConvertGlobalCoordToElLocal,
+		_BilinearElementType_SF_allLocalDerivs_allNodes, _ElementType_ConvertGlobalCoordToElLocal, _BilinearElementType_JacobianDeterminantSurface,
 		_BilinearElementType_NodeCount );
 }
 
@@ -91,20 +92,21 @@ BilinearElementType* BilinearElementType_New( Name name ) {
 BilinearElementType* _BilinearElementType_New( 
 		SizeT								_sizeOfSelf,
 		Type								type,
-		Stg_Class_DeleteFunction*						_delete,
-		Stg_Class_PrintFunction*						_print,
+		Stg_Class_DeleteFunction*					_delete,
+		Stg_Class_PrintFunction*					_print,
 		Stg_Class_CopyFunction*						_copy, 
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*			_construct,
-		Stg_Component_BuildFunction*		_build,
-		Stg_Component_InitialiseFunction*		_initialise,
-		Stg_Component_ExecuteFunction*		_execute,
-		Stg_Component_DestroyFunction*		_destroy,
-		Name							name,
-		Bool							initFlag,
+		Stg_Component_DefaultConstructorFunction*			_defaultConstructor,
+		Stg_Component_ConstructFunction*				_construct,
+		Stg_Component_BuildFunction*					_build,
+		Stg_Component_InitialiseFunction*				_initialise,
+		Stg_Component_ExecuteFunction*					_execute,
+		Stg_Component_DestroyFunction*					_destroy,
+		Name								name,
+		Bool								initFlag,
 		ElementType_EvaluateShapeFunctionsAtFunction*			_evaluateShapeFunctionsAt,
 		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt,
 		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,
+		ElementType_JacobianDeterminantSurfaceFunction*			_jacobianDeterminantSurface,
 		Index								nodeCount )
 {
 	BilinearElementType*		self;
@@ -112,9 +114,9 @@ BilinearElementType* _BilinearElementType_New(
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(BilinearElementType) );
 	self = (BilinearElementType*)_ElementType_New( _sizeOfSelf, type, _delete, _print, _copy, _defaultConstructor,
-			_construct, _build, _initialise, _execute, _destroy, name, initFlag,
+		_construct, _build, _initialise, _execute, _destroy, name, initFlag,
 		_evaluateShapeFunctionsAt, _evaluateShapeFunctionLocalDerivsAt, _convertGlobalCoordToElLocal,
-		nodeCount );
+		_jacobianDeterminantSurface, nodeCount );
 	
 	/* General info */
 	
@@ -291,3 +293,25 @@ void _BilinearElementType_ConvertGlobalCoordToElLocal(
 	}
 }
 #endif
+
+double _BilinearElementType_JacobianDeterminantSurface( 
+		void* elementType, 
+		void* _mesh, 
+		const double localCoord[], 
+		unsigned* nodes, 
+		unsigned norm ) 
+{
+	BilinearElementType*	self		= (BilinearElementType*) elementType;
+	Mesh*			mesh		= (Mesh*)_mesh;
+	unsigned		surfaceDim	= ( norm + 1 ) % 2;
+	double			x[2];
+	double			detJac;
+
+	x[0] = Mesh_GetVertex( mesh, nodes[0] )[surfaceDim];
+	x[1] = Mesh_GetVertex( mesh, nodes[1] )[surfaceDim];
+
+	detJac = 0.5 * x[1] - x[0];
+
+	return fabs( detJac );
+}
+

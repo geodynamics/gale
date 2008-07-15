@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: TrilinearElementType.c 965 2007-10-19 00:32:44Z LukeHodkinson $
+** $Id: TrilinearElementType.c 1177 2008-07-15 01:29:58Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -61,7 +61,7 @@ void* TrilinearElementType_DefaultNew( Name name ) {
 		_TrilinearElementType_Build, _TrilinearElementType_Initialise, _TrilinearElementType_Execute, _TrilinearElementType_Destroy,
 		name, False, _TrilinearElementType_SF_allNodes, 
 		_TrilinearElementType_SF_allLocalDerivs_allNodes, _ElementType_ConvertGlobalCoordToElLocal,
-		_TrilinearElementType_NodeCount );
+		_TrilinearElementType_JacobianDeterminantSurface, _TrilinearElementType_NodeCount );
 }
 
 TrilinearElementType* TrilinearElementType_New( Name name ) {
@@ -70,27 +70,28 @@ TrilinearElementType* TrilinearElementType_New( Name name ) {
 		_TrilinearElementType_Build, _TrilinearElementType_Initialise, _TrilinearElementType_Execute, _TrilinearElementType_Destroy,
 		name, True, _TrilinearElementType_SF_allNodes, 
 		_TrilinearElementType_SF_allLocalDerivs_allNodes, _ElementType_ConvertGlobalCoordToElLocal,
-		_TrilinearElementType_NodeCount );
+		_TrilinearElementType_JacobianDeterminantSurface, _TrilinearElementType_NodeCount );
 }
 
 
 TrilinearElementType* _TrilinearElementType_New( 
 		SizeT								_sizeOfSelf,
 		Type								type,
-		Stg_Class_DeleteFunction*						_delete,
-		Stg_Class_PrintFunction*						_print,
+		Stg_Class_DeleteFunction*					_delete,
+		Stg_Class_PrintFunction*					_print,
 		Stg_Class_CopyFunction*						_copy, 
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*			_construct,
-		Stg_Component_BuildFunction*		_build,
-		Stg_Component_InitialiseFunction*		_initialise,
-		Stg_Component_ExecuteFunction*		_execute,
-		Stg_Component_DestroyFunction*		_destroy,
-		Name							name,
-		Bool							initFlag,
+		Stg_Component_DefaultConstructorFunction*			_defaultConstructor,
+		Stg_Component_ConstructFunction*				_construct,
+		Stg_Component_BuildFunction*					_build,
+		Stg_Component_InitialiseFunction*				_initialise,
+		Stg_Component_ExecuteFunction*					_execute,
+		Stg_Component_DestroyFunction*					_destroy,
+		Name								name,
+		Bool								initFlag,
 		ElementType_EvaluateShapeFunctionsAtFunction*			_evaluateShapeFunctionsAt,
 		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt,
 		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,
+		ElementType_JacobianDeterminantSurfaceFunction*			_jacobianDeterminantSurface,
 		Index								nodeCount )
 {
 	TrilinearElementType*		self;
@@ -99,7 +100,7 @@ TrilinearElementType* _TrilinearElementType_New(
 	assert( _sizeOfSelf >= sizeof(TrilinearElementType) );
 	self = (TrilinearElementType*)_ElementType_New( _sizeOfSelf, type, _delete, _print, _copy, _defaultConstructor,
 			_construct, _build, _initialise, _execute, _destroy, name, initFlag, _evaluateShapeFunctionsAt,
-		_evaluateShapeFunctionLocalDerivsAt, _convertGlobalCoordToElLocal, nodeCount );
+		_evaluateShapeFunctionLocalDerivsAt, _convertGlobalCoordToElLocal, _jacobianDeterminantSurface, nodeCount );
 	
 	/* General info */
 	
@@ -330,3 +331,41 @@ void _TrilinearElementType_ConvertGlobalCoordToElLocal(
 	}
 }
 #endif
+
+double _TrilinearElementType_JacobianDeterminantSurface( void* elementType, void* _mesh, const double localCoord[],
+	       						unsigned* nodes, unsigned norm ) 
+{
+	TrilinearElementType*	self		= (TrilinearElementType*) elementType;
+	Mesh*			mesh		= (Mesh*)_mesh;
+	unsigned		surfaceDim[2];
+	double			x[4], y[4];
+	double			s, t;
+	double			dxds, dxdt, dyds, dydt;
+	double			detJac;
+
+	surfaceDim[0] = ( norm + 1 ) % 3;
+	surfaceDim[1] = ( norm + 2 ) % 3;
+
+	s = localCoord[surfaceDim[0]];
+	t = localCoord[surfaceDim[1]];
+
+	x[0] = Mesh_GetVertex( mesh, nodes[0] )[surfaceDim[0]];
+	x[1] = Mesh_GetVertex( mesh, nodes[1] )[surfaceDim[0]];
+	x[2] = Mesh_GetVertex( mesh, nodes[2] )[surfaceDim[0]];
+	x[3] = Mesh_GetVertex( mesh, nodes[3] )[surfaceDim[0]];
+
+	y[0] = Mesh_GetVertex( mesh, nodes[0] )[surfaceDim[1]];
+	y[1] = Mesh_GetVertex( mesh, nodes[1] )[surfaceDim[1]];
+	y[2] = Mesh_GetVertex( mesh, nodes[2] )[surfaceDim[1]];
+	y[3] = Mesh_GetVertex( mesh, nodes[3] )[surfaceDim[1]];
+
+	dxds = 0.25 * ( -1.0 * ( 1.0 - t ) * x[0] - ( 1.0 + t ) * x[1] + ( 1.0 - t ) * x[2] + ( 1.0 + t ) * x[3] );
+	dxdt = 0.25 * ( -1.0 * ( 1.0 - s ) * x[0] - ( 1.0 + s ) * x[1] + ( 1.0 - s ) * x[2] + ( 1.0 + s ) * x[3] );
+	dyds = 0.25 * ( -1.0 * ( 1.0 - t ) * y[0] - ( 1.0 + t ) * y[1] + ( 1.0 - t ) * y[2] + ( 1.0 + t ) * y[3] );
+	dydt = 0.25 * ( -1.0 * ( 1.0 - s ) * y[0] - ( 1.0 + s ) * y[1] + ( 1.0 - s ) * y[2] + ( 1.0 + s ) * y[3] );
+	
+	detJac = dxds * dydt - dxdt * dyds;
+
+	return fabs( detJac );
+}
+

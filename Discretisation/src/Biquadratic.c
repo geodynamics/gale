@@ -64,6 +64,7 @@ Biquadratic* Biquadratic_New( Name name ) {
 				 Biquadratic_EvalBasis, 
 				 Biquadratic_EvalLocalDerivs, 
 				 _ElementType_ConvertGlobalCoordToElLocal, 
+				 Biquadratic_JacobianDeterminantSurface,
 				 9 );
 }
 
@@ -188,6 +189,24 @@ void Biquadratic_EvalLocalDerivs( void* elementType, const double* localCoord, d
 	derivs[1][4] = -2.0 * eta * a4;
 }
 
+double Biquadratic_JacobianDeterminantSurface( void* elementType, void* _mesh, const double* localCoord, 
+						unsigned* nodes, unsigned norm )
+{
+	Biquadratic*	self		= (Biquadratic*) elementType;
+	Mesh*		mesh		= (Mesh*)_mesh;
+	unsigned	surfaceDim	= ( norm + 1 ) % 2;
+	double		x[3];
+	double		detJac;
+
+	x[0] = Mesh_GetVertex( mesh, nodes[0] )[surfaceDim];
+	x[1] = Mesh_GetVertex( mesh, nodes[1] )[surfaceDim];
+	x[2] = Mesh_GetVertex( mesh, nodes[2] )[surfaceDim];
+
+	detJac = ( localCoord[surfaceDim] - 0.5 ) * x[0] - 2.0 * localCoord[surfaceDim] * x[1] + 
+		 ( localCoord[surfaceDim] + 0.5 ) * x[2];
+
+	return fabs( detJac );
+}
 
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Private Functions

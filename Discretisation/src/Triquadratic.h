@@ -85,6 +85,8 @@
 
 	void Triquadratic_EvalBasis( void* elementType, const double* localCoord, double* derivs );
 	void Triquadratic_EvalLocalDerivs( void* elementType, const double* localCoord, double** derivs );
+	double Triquadratic_JacobianDeterminantSurface( void* elementType, void * mesh, const double localCoord[],
+		       					unsigned* nodes, unsigned norm );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Public functions

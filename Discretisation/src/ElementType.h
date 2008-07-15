@@ -47,7 +47,7 @@
 **	Is there a better name for this class? IE at least FeElementType.
 **	Perhaps FE_ElementDiscretisation?
 **
-** $Id: ElementType.h 960 2007-09-25 07:54:49Z LukeHodkinson $
+** $Id: ElementType.h 1177 2008-07-15 01:29:58Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -71,6 +71,12 @@
 		double*		elLocalCoord );
 
 	typedef void	(ElementType_BuildFunction)					( void* elementType, void *arg );
+
+	typedef double	(ElementType_JacobianDeterminantSurfaceFunction)		( void* elementType,
+		void* 		mesh, 
+		const double	localCoord[],
+		unsigned*	nodes,
+		unsigned 	norm );
 	
 	/* ElementType information */
 	#define __ElementType  \
@@ -81,11 +87,12 @@
 		ElementType_EvaluateShapeFunctionsAtFunction*			_evaluateShapeFunctionsAt; \
 		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt; \
 		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal; \
+		ElementType_JacobianDeterminantSurfaceFunction*			_jacobianDeterminantSurface; \
 		\
 		/* ElementType info */ \
 		Index								nodeCount; \
 		Stream*								debug;	\
-		IArray* inc;
+		IArray* 							inc;
 
 	struct ElementType { __ElementType };
 
@@ -107,6 +114,7 @@
 		ElementType_EvaluateShapeFunctionsAtFunction*			_evaluateShapeFunctionsAt,		\
 		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt,	\
 		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,		\
+		ElementType_JacobianDeterminantSurfaceFunction*			_jacobianDeterminantSurface, 		\
 		Index								nodeCount
 
 	#define ELEMENTTYPE_PASSARGS											\
@@ -126,6 +134,7 @@
 		_evaluateShapeFunctionsAt,		\
 		_evaluateShapeFunctionLocalDerivsAt,	\
 		_convertGlobalCoordToElLocal,		\
+		_jacobianDeterminantSurface,		\
 		nodeCount
 	
 	
@@ -136,20 +145,21 @@
 	ElementType* _ElementType_New(
 		SizeT								_sizeOfSelf,
 		Type								type,
-		Stg_Class_DeleteFunction*						_delete,
-		Stg_Class_PrintFunction*						_print,
+		Stg_Class_DeleteFunction*					_delete,
+		Stg_Class_PrintFunction*					_print,
 		Stg_Class_CopyFunction*						_copy, 
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*			_construct,
-		Stg_Component_BuildFunction*		_build,
-		Stg_Component_InitialiseFunction*		_initialise,
-		Stg_Component_ExecuteFunction*		_execute,
-		Stg_Component_DestroyFunction*		_destroy,
-		Name							name,
-		Bool							initFlag,
+		Stg_Component_DefaultConstructorFunction*			_defaultConstructor,
+		Stg_Component_ConstructFunction*				_construct,
+		Stg_Component_BuildFunction*					_build,
+		Stg_Component_InitialiseFunction*				_initialise,
+		Stg_Component_ExecuteFunction*					_execute,
+		Stg_Component_DestroyFunction*					_destroy,
+		Name								name,
+		Bool								initFlag,
 		ElementType_EvaluateShapeFunctionsAtFunction*			_evaluateShapeFunctionsAt,
 		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt,
 		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,
+		ElementType_JacobianDeterminantSurfaceFunction*			_jacobianDeterminantSurface,
 		Index								nodeCount );
 	
 	/* Initialise implementation */
@@ -202,6 +212,20 @@
 		int			dim, 
 		double*			detJac, 
 		double**		GNx );
+
+	double _ElementType_JacobianDeterminantSurface(
+		void*			elementType,
+		void*			mesh,
+		const double		localCoord[],
+		unsigned*		nodes,
+		unsigned		norm );
+
+	double ElementType_JacobianDeterminantSurface(
+		void*			elementType,
+		void*			mesh,
+		const double		localCoord[],
+		unsigned*		nodes,
+		unsigned		norm );
 
 	#define ElementType_Jacobian( elementType, mesh, elId, xi, dim, jacobian, GNi ) \
 		ElementType_Jacobian_AxisIndependent( elementType, mesh, elId, xi, dim, jacobian, GNi, I_AXIS, J_AXIS, K_AXIS )

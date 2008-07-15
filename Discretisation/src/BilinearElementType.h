@@ -44,7 +44,7 @@
 **
 ** Comments:
 **
-** $Id: BilinearElementType.h 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: BilinearElementType.h 1177 2008-07-15 01:29:58Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -79,20 +79,21 @@
 	BilinearElementType* _BilinearElementType_New(
 		SizeT								_sizeOfSelf,
 		Type								type,
-		Stg_Class_DeleteFunction*						_delete,
-		Stg_Class_PrintFunction*						_print,
+		Stg_Class_DeleteFunction*					_delete,
+		Stg_Class_PrintFunction*					_print,
 		Stg_Class_CopyFunction*						_copy, 
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*			_construct,
-		Stg_Component_BuildFunction*		_build,
-		Stg_Component_InitialiseFunction*		_initialise,
-		Stg_Component_ExecuteFunction*		_execute,
-		Stg_Component_DestroyFunction*		_destroy,
-		Name							name,
-		Bool							initFlag,
+		Stg_Component_DefaultConstructorFunction*			_defaultConstructor,
+		Stg_Component_ConstructFunction*				_construct,
+		Stg_Component_BuildFunction*					_build,
+		Stg_Component_InitialiseFunction*				_initialise,
+		Stg_Component_ExecuteFunction*					_execute,
+		Stg_Component_DestroyFunction*					_destroy,
+		Name								name,
+		Bool								initFlag,
 		ElementType_EvaluateShapeFunctionsAtFunction*			_evaluateShapeFunctionsAt,
 		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt,
 		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,
+		ElementType_JacobianDeterminantSurfaceFunction*			_jacobianDeterminantSurface,
 		Index								nodeCount );
 	
 	/* Initialise implementation */
@@ -130,5 +131,12 @@
 		unsigned	element, 
 		const double*	globalCoord,
 		double*		elLocalCoord );
+
+	double _BilinearElementType_JacobianDeterminantSurface(
+		void*		elementType,
+		void*		mesh,
+		const double	localCoord[],
+		unsigned*	nodes,
+		unsigned	norm );
 
 #endif /* __StgFEM_Discretisation_BilinearElementType_h__ */

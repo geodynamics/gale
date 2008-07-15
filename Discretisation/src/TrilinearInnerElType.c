@@ -60,8 +60,8 @@ void* TrilinearInnerElType_DefaultNew( Name name ) {
 		_TrilinearInnerElType_Print, NULL, TrilinearInnerElType_DefaultNew, _TrilinearInnerElType_Construct,
 		_TrilinearInnerElType_Build, _TrilinearInnerElType_Initialise, _TrilinearInnerElType_Execute, _TrilinearInnerElType_Destroy,
 		name, False, _TrilinearInnerElType_SF_allNodes, 
-		_TrilinearInnerElType_SF_allLocalDerivs_allNodes, /*_TrilinearInnerElType_ConvertGlobalCoordToElLocal,*/
-		_ElementType_ConvertGlobalCoordToElLocal,
+		_TrilinearInnerElType_SF_allLocalDerivs_allNodes,
+		_ElementType_ConvertGlobalCoordToElLocal, _ElementType_JacobianDeterminantSurface,
 		_TrilinearInnerElType_NodeCount );
 }
 
@@ -70,8 +70,8 @@ TrilinearInnerElType* TrilinearInnerElType_New( Name name ) {
 		_TrilinearInnerElType_Print, NULL, TrilinearInnerElType_DefaultNew, _TrilinearInnerElType_Construct,
 		_TrilinearInnerElType_Build, _TrilinearInnerElType_Initialise, _TrilinearInnerElType_Execute, _TrilinearInnerElType_Destroy,
 		name, True, _TrilinearInnerElType_SF_allNodes, 
-		_TrilinearInnerElType_SF_allLocalDerivs_allNodes, /*_TrilinearInnerElType_ConvertGlobalCoordToElLocal,*/
-		_ElementType_ConvertGlobalCoordToElLocal,
+		_TrilinearInnerElType_SF_allLocalDerivs_allNodes,
+		_ElementType_ConvertGlobalCoordToElLocal, _ElementType_JacobianDeterminantSurface,
 		_TrilinearInnerElType_NodeCount );
 }
 
@@ -79,21 +79,21 @@ TrilinearInnerElType* TrilinearInnerElType_New( Name name ) {
 TrilinearInnerElType* _TrilinearInnerElType_New( 
 		SizeT								_sizeOfSelf,
 		Type								type,
-		Stg_Class_DeleteFunction*						_delete,
-		Stg_Class_PrintFunction*						_print,
+		Stg_Class_DeleteFunction*					_delete,
+		Stg_Class_PrintFunction*					_print,
 		Stg_Class_CopyFunction*						_copy, 
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*			_construct,
-		Stg_Component_BuildFunction*		_build,
-		Stg_Component_InitialiseFunction*		_initialise,
-		Stg_Component_ExecuteFunction*		_execute,
-		Stg_Component_DestroyFunction*		_destroy,
-		Name							name,
-		Bool							initFlag,
+		Stg_Component_DefaultConstructorFunction*			_defaultConstructor,
+		Stg_Component_ConstructFunction*				_construct,
+		Stg_Component_BuildFunction*					_build,
+		Stg_Component_InitialiseFunction*				_initialise,
+		Stg_Component_ExecuteFunction*					_execute,
+		Stg_Component_DestroyFunction*					_destroy,
+		Name								name,
+		Bool								initFlag,
 		ElementType_EvaluateShapeFunctionsAtFunction*			_evaluateShapeFunctionsAt,
 		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt,
-		/*ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,*/
 		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,
+		ElementType_JacobianDeterminantSurfaceFunction*			_jacobianDeterminantSurface,
 		Index								nodeCount )
 {
 	TrilinearInnerElType*		self;
@@ -102,7 +102,7 @@ TrilinearInnerElType* _TrilinearInnerElType_New(
 	assert( _sizeOfSelf >= sizeof(TrilinearInnerElType) );
 	self = (TrilinearInnerElType*)_ElementType_New( _sizeOfSelf, type, _delete, _print, _copy, _defaultConstructor,
 			_construct, _build, _initialise, _execute, _destroy, name, initFlag, _evaluateShapeFunctionsAt,
-		_evaluateShapeFunctionLocalDerivsAt, _convertGlobalCoordToElLocal, nodeCount );
+		_evaluateShapeFunctionLocalDerivsAt, _convertGlobalCoordToElLocal, _jacobianDeterminantSurface, nodeCount );
 	
 	/* General info */
 	

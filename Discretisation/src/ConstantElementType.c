@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ConstantElementType.c 964 2007-10-11 08:03:06Z SteveQuenette $
+** $Id: ConstantElementType.c 1177 2008-07-15 01:29:58Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -72,6 +72,7 @@ void* ConstantElementType_DefaultNew( Name name ) {
 			_ConstantElementType_SF_allNodes,
 			_ConstantElementType_SF_allLocalDerivs_allNodes,
 			_ConstantElementType_ConvertGlobalCoordToElLocal,
+			_ElementType_JacobianDeterminantSurface,
 			_ConstantElementType_NodeCount );
 }
 
@@ -93,6 +94,7 @@ ConstantElementType* ConstantElementType_New( Name name ) {
 			_ConstantElementType_SF_allNodes,
 			_ConstantElementType_SF_allLocalDerivs_allNodes,
 			_ConstantElementType_ConvertGlobalCoordToElLocal,
+			_ElementType_JacobianDeterminantSurface,
 			_ConstantElementType_NodeCount );
 }
 
@@ -100,20 +102,21 @@ ConstantElementType* ConstantElementType_New( Name name ) {
 ConstantElementType* _ConstantElementType_New( 
 		SizeT								_sizeOfSelf,
 		Type								type,
-		Stg_Class_DeleteFunction*						_delete,
-		Stg_Class_PrintFunction*						_print,
+		Stg_Class_DeleteFunction*					_delete,
+		Stg_Class_PrintFunction*					_print,
 		Stg_Class_CopyFunction*						_copy, 
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*			_construct,
-		Stg_Component_BuildFunction*		_build,
-		Stg_Component_InitialiseFunction*		_initialise,
-		Stg_Component_ExecuteFunction*		_execute,
-		Stg_Component_DestroyFunction*		_destroy,
-		Name							name,
-		Bool							initFlag,
+		Stg_Component_DefaultConstructorFunction*			_defaultConstructor,
+		Stg_Component_ConstructFunction*				_construct,
+		Stg_Component_BuildFunction*					_build,
+		Stg_Component_InitialiseFunction*				_initialise,
+		Stg_Component_ExecuteFunction*					_execute,
+		Stg_Component_DestroyFunction*					_destroy,
+		Name								name,
+		Bool								initFlag,
 		ElementType_EvaluateShapeFunctionsAtFunction*			_evaluateShapeFunctionsAt,
 		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt,
 		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,
+		ElementType_JacobianDeterminantSurfaceFunction*			_jacobianDeterminantSurface,
 		Index								nodeCount )
 {
 	ConstantElementType*		self;
@@ -121,9 +124,9 @@ ConstantElementType* _ConstantElementType_New(
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(ConstantElementType) );
 	self = (ConstantElementType*)_ElementType_New( _sizeOfSelf, type, _delete, _print, _copy,
-			_defaultConstructor, _construct, _build, _initialise, _execute, _destroy, name, initFlag,
+		_defaultConstructor, _construct, _build, _initialise, _execute, _destroy, name, initFlag,
 		_evaluateShapeFunctionsAt, _evaluateShapeFunctionLocalDerivsAt, _convertGlobalCoordToElLocal,
-		nodeCount );
+		_jacobianDeterminantSurface, nodeCount );
 	
 	/* General info */
 	
