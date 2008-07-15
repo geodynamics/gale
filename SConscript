@@ -1,45 +1,48 @@
 import os
 Import('env')
 
+#
+# Prepare the construction environment by copying the one we
+# were given.
 env = env.Copy()
-env.AppendUnique(CPPPATH=[env.get_build_path('include/glucifer')])
+env.project_name = 'glucifer'
+env.AppendUnique(CPPPATH=[env.get_build_path('include/' + env.project_name)])
+env.src_objs = []
+env.suite_hdrs = []
+env.suite_objs = []
 
-# Collect our inputs from the directory structure.
-bases = ['Base', 'Windowing', 'RenderingEngines', 'OutputFormats',
-         'InputFormats', 'DrawingObjects', 'WindowInteractions']
-src_objs = []
-suite_hdrs = []
-suite_objs = []
-for base in bases:
-    env.build_files(env.glob(base + '/src/*.def'), 'include/glucifer/' + base)
-    env.build_headers(env.glob(base + '/src/*.h'), 'include/glucifer/' + base)
-    src_objs += env.build_sources(env.glob(base + '/src/*.c'), 'glucifer/' + base)
-    src_objs += env.build_metas(env.glob(base + '/src/*.meta'), 'glucifer/' + base)
-    suite_hdrs += env.glob(base + '/tests/*Suite.h')
-    suite_objs += env.build_sources(env.glob(base + '/tests/*Suite.c'), 'glucifer/' + base)
+#
+# Build standard stg directories.
+env.build_directory('Base')
+env.build_directory('Windowing')
+env.build_directory('RenderingEngines')
+env.build_directory('OutputFormats')
+env.build_directory('InputFormats')
+env.build_directory('DrawingObjects')
+env.build_directory('WindowInteractions')
 
+#
+# Need to handle libglucifer differently.
 env.build_headers(env.glob('libglucifer/src/*.h'), 'include/glucifer')
-src_objs += env.build_sources(env.glob('libglucifer/src/*.c'), 'glucifer/libglucifer')
-src_objs += env.build_sources(env.glob('libglucifer/src/*.meta'), 'glucifer/libglucifer')
+env.src_objs += env.build_sources(env.glob('libglucifer/src/*.c'), 'glucifer/libglucifer')
+env.src_objs += env.build_metas(env.glob('libglucifer/src/*.meta'), 'glucifer/libglucifer')
 
-# Build library.
+#
+# Build shared library.
+if env['shared_libraries']:
+    env.SharedLibrary(env.get_build_path('lib/glucifer'), env.src_objs)
+
+#
+# Build plugins. Note that this must happen after the shared library
+# has been built.
+env.build_plugin('plugins/lucPlugin')
+
+#
+# Build static library.
 if env['static_libraries']:
-    env.Library(env.get_build_path('lib/glucifer'), src_objs)
-if env['shared_libraries']:
-    env.SharedLibrary(env.get_build_path('lib/glucifer'), src_objs)
+    env.Library(env.get_build_path('lib/glucifer'), env.src_objs)
 
-# Build plugins.
-if env['shared_libraries']:
-    plgn_bases = ['lucPlugin']
-    for base in plgn_bases:
-        env.build_headers(env.glob('plugins/' + base + '/*.h'), 'include/glucifer/' + base.split('/')[-1])
-        objs = env.build_sources(env.glob('plugins/' + base + '/*.c'), 'glucifer/' + base)
-        name = base.split('/')[-1] + 'module'
-        env.SharedLibrary(env.get_build_path('lib/' + name), objs,
-                          SHLIBPREFIX='',
-                          LIBPREFIXES=env.make_list(env['LIBPREFIXES']) + [''],
-                          LIBS=['glucifer'] + env.get('LIBS', []))
-
+#
 # Build unit test runner.
 env['PCURUNNERINIT'] = ''
 env['PCURUNNERSETUP'] = """StGermain_Init( &argc, &argv );
@@ -48,12 +51,13 @@ env['PCURUNNERSETUP'] = """StGermain_Init( &argc, &argv );
 env['PCURUNNERTEARDOWN'] = """StgFEM_Finalise();
    StgDomain_Finalise();
    StGermain_Finalise();"""
-runner_src = env.PCUSuiteRunner(env.get_build_path('glucifer/testglucifer.c'), suite_hdrs)
+runner_src = env.PCUSuiteRunner(env.get_build_path('glucifer/testglucifer.c'), env.suite_hdrs)
 runner_obj = env.SharedObject(runner_src)
 env.Program(env.get_build_path('bin/testglucifer'),
-            runner_obj + suite_objs,
+            runner_obj + env.suite_objs,
             LIBS=['glucifer', 'pcu'] + env.get('LIBS', []))
 
+#
 # Copy over XML files.
 xml_bases = ['']
 for base in xml_bases:
