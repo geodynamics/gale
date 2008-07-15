@@ -30,40 +30,44 @@ env.src_objs += env.build_sources(env.glob('libStgFEM/src/*.c'), 'StgFEM/libStgF
 env.src_objs += env.build_metas(env.glob('libStgFEM/src/*.meta'), 'StgFEM/libStgFEM')
 
 #
-# Build libraries.
-if env['static_libraries']:
-    env.Library(env.get_build_path('lib/StgFEM'), env.src_objs)
+# Build shared library.
 if env['shared_libraries']:
     env.SharedLibrary(env.get_build_path('lib/StgFEM'), env.src_objs)
 
 #
 # Build toolbox.
+objs = env.build_sources(env.glob('libStgFEM/Toolbox/*.c'), 'StgFEM/libStgFEM/Toolbox')
+objs += env.build_metas(env.glob('libStgFEM/Toolbox/*.meta'), 'StgFEM/libStgFEM/Toolbox')
 if env['shared_libraries']:
-    objs = env.build_sources(env.glob('libStgFEM/Toolbox/*.c'), 'StgFEM/libStgFEM/Toolbox')
-    objs += env.build_metas(env.glob('libStgFEM/Toolbox/*.meta'), 'StgFEM/libStgFEM/Toolbox')
     env.SharedLibrary(env.get_target_name('lib/StgFEM_Toolboxmodule'), objs,
                       SHLIBPREFIX='',
                       LIBPREFIXES=env.make_list(env['LIBPREFIXES']) + [''],
                       LIBS=['StgFEM'] + env.get('LIBS', []))
+if env['static_libraries']:
+    env.src_objs += objs
 
 #
-# Build plugins. Note that this must happen after the libraries
-# have been built.
-if env['shared_libraries']:
-    env.build_plugin('plugins/CompareFeVariableAgainstReferenceSolution')
-    env.build_plugin('plugins/Document')
-    env.build_plugin('plugins/FeVariableImportExporters/FeVariable_ImportExport_ABAQUS')
-    env.build_plugin('plugins/FeVariableImportExporters/FeVariable_ImportExport_SpecRidge2D')
-    env.build_plugin('plugins/FileAnalyticSolution')
-    env.build_plugin('plugins/Output/CPUTime')
-    env.build_plugin('plugins/Output/FrequentOutput')
-    env.build_plugin('plugins/Output/PeakMemory')
-    env.build_plugin('plugins/Output/PrintFeVariableDiscreteValues')
-    env.build_plugin('plugins/Output/PrintFeVariableDiscreteValues_2dBox')
-    env.build_plugin('plugins/StandardConditionFunctions')
-    env.build_plugin('Apps/StokesMomentumUzawa/tests/LinearVelocityAnalytic')
-    env.build_plugin('Apps/StokesMomentumUzawa/tests/LidDrivenIsoviscousAnalytic')
-    env.build_plugin('Apps/StokesMomentumUzawa/tests/SimpleShearAnalytic')
+# Build plugins. Note that this must happen after the shared library
+# has been built.
+env.build_plugin('plugins/CompareFeVariableAgainstReferenceSolution')
+env.build_plugin('plugins/Document')
+env.build_plugin('plugins/FeVariableImportExporters/FeVariable_ImportExport_ABAQUS')
+env.build_plugin('plugins/FeVariableImportExporters/FeVariable_ImportExport_SpecRidge2D')
+env.build_plugin('plugins/FileAnalyticSolution')
+env.build_plugin('plugins/Output/CPUTime')
+env.build_plugin('plugins/Output/FrequentOutput')
+env.build_plugin('plugins/Output/PeakMemory')
+env.build_plugin('plugins/Output/PrintFeVariableDiscreteValues')
+env.build_plugin('plugins/Output/PrintFeVariableDiscreteValues_2dBox')
+env.build_plugin('plugins/StandardConditionFunctions')
+env.build_plugin('Apps/StokesMomentumUzawa/tests/LinearVelocityAnalytic')
+env.build_plugin('Apps/StokesMomentumUzawa/tests/LidDrivenIsoviscousAnalytic')
+env.build_plugin('Apps/StokesMomentumUzawa/tests/SimpleShearAnalytic')
+
+#
+# Build static library.
+if env['static_libraries']:
+    env.Library(env.get_build_path('lib/StgFEM'), env.src_objs)
 
 # Build unit test runner.
 env['PCURUNNERINIT'] = ''
