@@ -118,19 +118,17 @@ FieldTest* _FieldTest_New(
 
 void _FieldTest_Delete( void* fieldTest ) {
 	FieldTest* 	self 	= (FieldTest*)fieldTest;
-	Index		field_I;
-
-	for( field_I = 0; field_I < self->fieldCount; field_I++ ) {
-		if( self->numericFieldList[field_I]      ) Stg_Class_Delete( self->numericFieldList[field_I]      );
-		if( self->referenceFieldList[field_I]    ) Stg_Class_Delete( self->referenceFieldList[field_I]    );
-		if( self->errorFieldList[field_I]        ) Stg_Class_Delete( self->errorFieldList[field_I]        );
-		if( self->referenceMagFieldList[field_I] ) Stg_Class_Delete( self->referenceMagFieldList[field_I] );
-		if( self->errorMagFieldList[field_I]     ) Stg_Class_Delete( self->errorMagFieldList[field_I]     );
-	}
-	if( self->numericSwarm     ) Stg_Class_Delete( self->numericSwarm     );
-	if( self->constantMesh     ) Stg_Class_Delete( self->constantMesh     );
+	
 	if( self->integrationSwarm ) Stg_Class_Delete( self->integrationSwarm );
 
+	Memory_Free( self->gAnalyticSq );
+	Memory_Free( self->gErrorSq    );
+	Memory_Free( self->gError      );
+	Memory_Free( self->gErrorNorm  );
+
+	Memory_Free( self->analyticSolnForFeVarKey );
+	Memory_Free( self->_analyticSolutionList );
+	
 	/* Stg_Class_Delete parent*/
 	_Stg_Component_Delete( self );
 }
@@ -150,11 +148,9 @@ void* _FieldTest_Copy( void* fieldTest, void* dest, Bool deep, Name nameExt, Ptr
 
 void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data ) {
 	FieldTest* 			self 			= (FieldTest*)fieldTest;
-	//Dictionary*			dict			= Dictionary_GetDictionary( cf->componentDict, self->name );
 	Dictionary*			dict			= cf->rootDict;
 	Dictionary_Entry_Value*		dictEntryVal		= Dictionary_Get( dict, "pluginData" );
 	Dictionary_Entry_Value*		pluginDict		= Dictionary_Entry_Value_AsDictionary( dictEntryVal );
-	//Dictionary_Entry_Value*		fieldList		= Dictionary_Get( dict, "NumericFields" );
 	Dictionary_Entry_Value*		fieldList;
 	Dictionary_Entry_Value*		swarmVarList		= Dictionary_Get( dict, "NumericSwarmVariableNames" );
 	FieldVariable_Register* 	fV_Register     	= Stg_ObjectList_Get( cf->registerRegister, "FieldVariable_Register" );
@@ -164,9 +160,6 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 	Name                    	fieldName;
 	Hook*				generateErrorFields;
 
-	//self->numericField	= Stg_ComponentFactory_ConstructByKey( cf, self->name, "NumericVariable",     FeVariable, False, data );
-	//self->numericSwarm	= Stg_ComponentFactory_ConstructByKey( cf, self->name, "NumericSwarm",        Swarm,      False, data );
-	//self->fieldCount = fieldList ? Dictionary_Entry_Value_GetCount( fieldList ) : 0;
 	fieldList = Dictionary_Get( pluginDict, "NumericFields" );
 	self->fieldCount = fieldList ? Dictionary_Entry_Value_GetCount( fieldList ) : 0;
 
@@ -180,7 +173,6 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 		fieldName = ( fieldList ) ? 
 			    Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( fieldList, feVariable_I ) ) :
 			    Dictionary_GetString( pluginDict, "FeVariable" );
-			    //Dictionary_GetString( dict, "FeVariable" );
 			
 		self->numericFieldList[feVariable_I] = (FeVariable*) FieldVariable_Register_GetByName( fV_Register, fieldName );
 
@@ -192,7 +184,6 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 	self->constantMesh     	= LiveComponentRegister_Get( cf->LCRegister, Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "ConstantMesh"     ) ) );
 	self->elementMesh      	= LiveComponentRegister_Get( cf->LCRegister, Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "ElementMesh"      ) ) );
 
-	//self->swarmVariableName 	= Stg_ComponentFactory_GetString( cf, self->name, "numericVariableName",       "" );
 	self->swarmVarCount = swarmVarList ? Dictionary_Entry_Value_GetCount( swarmVarList ) : 0;
 	self->swarmVarNameList = Memory_Alloc_Array( Name, self->swarmVarCount, "numeric swarm variable names" );
 	
@@ -200,18 +191,12 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 		self->swarmVarNameList[swarmVar_I] = ( swarmVarList ) ? 
 				Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( swarmVarList, swarmVar_I ) ) :
 				Dictionary_GetString( pluginDict, "SwarmVariable" );
-				//Dictionary_GetString( dict, "SwarmVariable" );
 	}	
 	
-	//self->referenceSolnFileName 	= Stg_ComponentFactory_GetString( cf, self->name, "referenceSolutionFileName", "" );
-	//self->referenceSolnPath		= Stg_ComponentFactory_GetString( cf, self->name, "referenceSolutionFilePath", "" );
-	//self->normalise			= Stg_ComponentFactory_GetBool( cf, self->name, "normaliseByReferenceSolution", True );
-	//self->referenceSolnFromFile	= Stg_ComponentFactory_GetBool( cf, self->name, "useReferenceSolutionFromFile", False );
 	self->referenceSolnPath		= Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "referenceSolutionFilePath" ) );
 	self->normalise			= Dictionary_Entry_Value_AsBool( Dictionary_Get( pluginDict, "normaliseByReferenceSolution" ) );
 	self->referenceSolnFromFile	= Dictionary_Entry_Value_AsBool( Dictionary_Get( pluginDict, "useReferenceSolutionFromFile" ) );
 	self->context			= Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
-
 
 	/* set up the entry point */
 	generateErrorFields = Hook_New( "Generate error fields hook", FieldTest_GenerateErrFields, self->name );
@@ -253,9 +238,8 @@ void _FieldTest_Build( void* fieldTest, void* data ) {
 	if( !self->referenceSolnFromFile ) {
 		self->analyticSolnForFeVarKey = Memory_Alloc_Array( unsigned, self->fieldCount, 
 								    "analytic solution index for ith feVariable" );
-		self->_analyticSolutionList = malloc( sizeof( FieldTest_AnalyticSolutionFunc* ) * self->fieldCount );
-		//self->_analyticSolutionList = Memory_Alloc_Array( sizeof(FieldTest_AnalyticSolutionFunc), self->fieldCount, 
-		//						  "analytic solution function list" );
+		//self->_analyticSolutionList = malloc( sizeof( FieldTest_AnalyticSolutionFunc* ) * self->fieldCount );
+		self->_analyticSolutionList = Memory_Alloc_Array_Unnamed( FieldTest_AnalyticSolutionFunc*, self->fieldCount );
 	}
 }
 
@@ -317,18 +301,6 @@ void _FieldTest_Execute( void* fieldTest, void* data ) {
 
 void _FieldTest_Destroy( void* fieldTest, void* data ) {
 	FieldTest* 		self 		= (FieldTest*) fieldTest;
-
-	Memory_Free( self->numericFieldList );
-	Memory_Free( self->referenceFieldList );
-	Memory_Free( self->errorFieldList );
-
-	Memory_Free( self->gAnalyticSq );
-	Memory_Free( self->gErrorSq    );
-	Memory_Free( self->gError      );
-	Memory_Free( self->gErrorNorm  );
-
-	Memory_Free( self->analyticSolnForFeVarKey );
-	Memory_Free( self->data );
 }
 
 void FieldTest_BuildReferenceField( void* fieldTest, Index field_I ) {

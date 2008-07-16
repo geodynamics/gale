@@ -88,9 +88,6 @@
 		/* correct feVariable */			 		\
 		Index*					analyticSolnForFeVarKey;\
 		FieldTest_AnalyticSolutionFunc**	_analyticSolutionList;	\
-		/* store any constants required by the analytic solution */     \
-		/* plugin in this array (to be initialised in the plugin) */    \
-		void**					data;			\
 		
 
 	/** Brings together and manages the life-cycle of a a mesh and all the 
