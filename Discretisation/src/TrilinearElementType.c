@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: TrilinearElementType.c 1178 2008-07-15 04:12:09Z DavidLee $
+** $Id: TrilinearElementType.c 1180 2008-07-16 01:34:25Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -356,7 +356,7 @@ double _TrilinearElementType_JacobianDeterminantSurface( void* elementType, void
 	double			s, t;
 	double			dxds, dxdt, dyds, dydt;
 	double			detJac;
-	unsigned		nodes[3];
+	unsigned		nodes[4];
 
 	surfaceDim[0] = ( norm + 1 ) % 3;
 	surfaceDim[1] = ( norm + 2 ) % 3;
@@ -376,10 +376,10 @@ double _TrilinearElementType_JacobianDeterminantSurface( void* elementType, void
 	y[2] = Mesh_GetVertex( mesh, nodes[2] )[surfaceDim[1]];
 	y[3] = Mesh_GetVertex( mesh, nodes[3] )[surfaceDim[1]];
 
-	dxds = 0.25 * ( -1.0 * ( 1.0 - t ) * x[0] - ( 1.0 + t ) * x[1] + ( 1.0 - t ) * x[2] + ( 1.0 + t ) * x[3] );
-	dxdt = 0.25 * ( -1.0 * ( 1.0 - s ) * x[0] - ( 1.0 + s ) * x[1] + ( 1.0 - s ) * x[2] + ( 1.0 + s ) * x[3] );
-	dyds = 0.25 * ( -1.0 * ( 1.0 - t ) * y[0] - ( 1.0 + t ) * y[1] + ( 1.0 - t ) * y[2] + ( 1.0 + t ) * y[3] );
-	dydt = 0.25 * ( -1.0 * ( 1.0 - s ) * y[0] - ( 1.0 + s ) * y[1] + ( 1.0 - s ) * y[2] + ( 1.0 + s ) * y[3] );
+	dxds = 0.25 * ( - ( 1.0 - t )*x[0] + ( 1.0 - t )*x[1] - ( 1.0 + t )*x[2] + ( 1.0 + t )*x[3] );
+	dyds = 0.25 * ( - ( 1.0 - t )*y[0] + ( 1.0 - t )*y[1] - ( 1.0 + t )*y[2] + ( 1.0 + t )*y[3] );
+	dxdt = 0.25 * ( - ( 1.0 - s )*x[0] - ( 1.0 + s )*x[1] + ( 1.0 - s )*x[2] + ( 1.0 + s )*x[3] );
+	dydt = 0.25 * ( - ( 1.0 - s )*y[0] - ( 1.0 + s )*y[1] + ( 1.0 - s )*y[2] + ( 1.0 + s )*y[3] );
 	
 	detJac = dxds * dydt - dxdt * dyds;
 
