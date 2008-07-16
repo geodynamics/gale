@@ -42,11 +42,12 @@ def build_directory(env, dir, dst_dir='', with_tests=True):
     env.suite_hdrs += env.glob(dir + '/tests/*Suite.h')
     env.suite_objs += env.build_sources(env.glob(dir + '/tests/*Suite.c'), obj_dir)
 
-def build_plugin(env, dir, dst_dir=''):
+def build_plugin(env, dir, dst_dir='', name=''):
     if not dst_dir:
         dst_dir = dir
-    name = dir.split('/')[-1]
-    mod_name = env.project_name + '_' + name + 'module'
+    if not name:
+        name = env.project_name + '_' + dir.split('/')[-1]
+    mod_name = name + 'module'
     env.build_headers(env.glob(dir + '/*.h'), 'include/' + env.project_name + '/' + name)
     objs = env.build_sources(env.glob(dir + '/*.c'), env.project_name + '/' + dir)
     if env['shared_libraries']:
