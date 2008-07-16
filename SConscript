@@ -35,7 +35,7 @@ if env['shared_libraries']:
 #
 # Build plugins. Note that this must happen after the shared library
 # has been built.
-env.build_plugin('plugins/lucPlugin')
+env.build_plugin('plugins/lucPlugin', name='lucPlugin')
 
 #
 # Build static library.
