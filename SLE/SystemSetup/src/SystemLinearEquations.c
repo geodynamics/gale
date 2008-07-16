@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SystemLinearEquations.c 1175 2008-07-14 05:59:04Z LukeHodkinson $
+** $Id: SystemLinearEquations.c 1182 2008-07-16 06:09:08Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -782,50 +782,6 @@ void SystemLinearEquations_NewtonMFFDExecute( void* sle, void* _context ) {
 	// call non linear solver func (SNES wrapper)
 }
 
-void update_nodal_pressure(void *_context)
-{
-  FeVariable *nodal_pressure, *pressure;
-  nodal_pressure = (FeVariable*)FieldVariable_Register_GetByName( ((FiniteElementContext *)_context)->fieldVariable_Register, "NodalPressureField" );
-  pressure = (FeVariable*)FieldVariable_Register_GetByName( ((FiniteElementContext *)_context)->fieldVariable_Register, "PressureField" );
-
-  if(nodal_pressure!=NULL)
-    {
-      Node_LocalIndex n_i;
-      unsigned	N, nDims;
-      IArray* incArray;
-
-      incArray = IArray_New();
-            
-      FeVariable_SyncShadowValues(pressure);
-      nDims = Mesh_GetDimSize( nodal_pressure->feMesh );
-
-        /* Average the pressure over neighboring cells to get the
-           pressure at the node. */
-      N = FeMesh_GetNodeLocalSize( nodal_pressure->feMesh);
-      for( n_i = 0; n_i < N; n_i++ ) {
-        unsigned nInc;
-        unsigned *inc;
-        unsigned nn;
-        double p,temp;
-        
-        Mesh_GetIncidence(nodal_pressure->feMesh, MT_VERTEX, n_i, nDims, incArray );
-        nInc = IArray_GetSize( incArray );
-        inc = IArray_GetPtr( incArray );
-        p=0;
-        for(nn=0; nn<nInc; ++nn)
-          {
-            FeVariable_GetValueAtNode(pressure,inc[nn],&temp);
-            p+=temp;
-          }
-        p/=nInc;
-        FeVariable_SetValueAtNode(nodal_pressure,n_i,&p);
-      }
-      FeVariable_SyncShadowValues(nodal_pressure); 
-
-      NewClass_Delete( incArray );
-    }
-}
-
 void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 	SystemLinearEquations*	self            = (SystemLinearEquations*) sle;
 	Vector*                 previousVector;
@@ -852,8 +808,6 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 	
 	self->linearExecute( self, _context );
 	self->hasExecuted = True;
-
-        update_nodal_pressure(_context);
 
 	/*
 	** Include an entry point to do some kind of post-non-linear-iteration operation. */
@@ -886,8 +840,6 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 			
 		self->linearExecute( self, _context );
 //		PetscPrintf( PETSC_COMM_WORLD, "|Xn+1| = %12.12e \n", Vector_L2Norm(SystemLinearEquations_GetSolutionVectorAt(self,1)->vector) );
-
-                update_nodal_pressure(_context);
 
                 /*
                 ** Include an entry point to do some kind of post-non-linear-iteration operation. */
