@@ -49,6 +49,9 @@ env.build_plugin('plugins/MaterialThermalDiffusivity')
 env.build_plugin('plugins/VariableConditions/ShapeTemperatureIC')
 env.build_plugin('plugins/Output/Vrms')
 env.build_plugin('plugins/Output/Nusselt')
+env.build_plugin('SysTest/AnalyticPlugins/VelicIC')
+env.build_plugin('SysTest/AnalyticPlugins/Velic_solA')
+env.build_plugin('SysTest/AnalyticPlugins/newVelicSolA')
 
 #
 # Build static library.
