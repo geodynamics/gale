@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testElementType_Register.c 964 2007-10-11 08:03:06Z SteveQuenette $
+** $Id: testElementType_Register.c 1183 2008-07-17 05:27:16Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -90,7 +90,7 @@ int main( int argc, char* argv[] ) {
 		_ConstantElementType_Construct, _ConstantElementType_Build, _ConstantElementType_Initialise,
 		_ConstantElementType_Execute, _ConstantElementType_Destroy, "TestElementType0Name", True,
 		_ConstantElementType_SF_allNodes, _ConstantElementType_SF_allLocalDerivs_allNodes,
-		_ConstantElementType_ConvertGlobalCoordToElLocal,
+		_ConstantElementType_ConvertGlobalCoordToElLocal, _ElementType_JacobianDeterminantSurface,
 		1 ) );
 	
 	ElementType_Register_Add( elementType_Register, _ElementType_New( sizeof(ConstantElementType), "TestElementType1",
@@ -98,7 +98,7 @@ int main( int argc, char* argv[] ) {
 		_ConstantElementType_Construct, _ConstantElementType_Build, _ConstantElementType_Initialise,
 		_ConstantElementType_Execute, _ConstantElementType_Destroy, "TestElementType1Name", True,
 		_ConstantElementType_SF_allNodes, _ConstantElementType_SF_allLocalDerivs_allNodes,
-		_ConstantElementType_ConvertGlobalCoordToElLocal,
+		_ConstantElementType_ConvertGlobalCoordToElLocal, _ElementType_JacobianDeterminantSurface,
 		1 ) );
 	
 	ElementType_Register_Add( elementType_Register, _ElementType_New( sizeof(ConstantElementType), "TestElementType2",
@@ -106,7 +106,7 @@ int main( int argc, char* argv[] ) {
 		_ConstantElementType_Construct, _ConstantElementType_Build, _ConstantElementType_Initialise,
 		_ConstantElementType_Execute, _ConstantElementType_Destroy, "TestElementType2Name", True,
 		_ConstantElementType_SF_allNodes, _ConstantElementType_SF_allLocalDerivs_allNodes,
-		_ConstantElementType_ConvertGlobalCoordToElLocal,
+		_ConstantElementType_ConvertGlobalCoordToElLocal, _ElementType_JacobianDeterminantSurface,
 		1 ) );
 	
 	ElementType_Register_Add( elementType_Register, _ElementType_New( sizeof(ConstantElementType), "TestElementType3",
@@ -114,7 +114,7 @@ int main( int argc, char* argv[] ) {
 		_ConstantElementType_Construct, _ConstantElementType_Build, _ConstantElementType_Initialise,
 		_ConstantElementType_Execute, _ConstantElementType_Destroy, "TestElementType3Name", True,
 		_ConstantElementType_SF_allNodes, _ConstantElementType_SF_allLocalDerivs_allNodes,
-		_ConstantElementType_ConvertGlobalCoordToElLocal,
+		_ConstantElementType_ConvertGlobalCoordToElLocal, _ElementType_JacobianDeterminantSurface,
 		1 ) );
 	
 	ElementType_Register_Add( elementType_Register, _ElementType_New( sizeof(ConstantElementType), "TestElementType4",
@@ -122,7 +122,7 @@ int main( int argc, char* argv[] ) {
 		_ConstantElementType_Construct, _ConstantElementType_Build, _ConstantElementType_Initialise,
 		_ConstantElementType_Execute, _ConstantElementType_Destroy, "TestElementType4Name", True,
 		_ConstantElementType_SF_allNodes, _ConstantElementType_SF_allLocalDerivs_allNodes,
-		_ConstantElementType_ConvertGlobalCoordToElLocal,
+		_ConstantElementType_ConvertGlobalCoordToElLocal, _ElementType_JacobianDeterminantSurface,
 		1 ) );
 	
 	ElementType_Register_Add( elementType_Register, _ElementType_New( sizeof(ConstantElementType), "TestElementType5",
@@ -130,7 +130,7 @@ int main( int argc, char* argv[] ) {
 		_ConstantElementType_Construct, _ConstantElementType_Build, _ConstantElementType_Initialise,
 		_ConstantElementType_Execute, _ConstantElementType_Destroy, "TestElementType5Name", True,
 		_ConstantElementType_SF_allNodes, _ConstantElementType_SF_allLocalDerivs_allNodes,
-		_ConstantElementType_ConvertGlobalCoordToElLocal,
+		_ConstantElementType_ConvertGlobalCoordToElLocal, _ElementType_JacobianDeterminantSurface,
 		1 ) );
 	
 	
