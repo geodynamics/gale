@@ -372,6 +372,8 @@
 	void FeVariable_InterpolateDerivativesToElLocalCoord( void* _feVariable, Element_LocalIndex lElement_I, double* elLocalCoord, double* value ) ;
 	
 	void FeVariable_InterpolateDerivatives_WithGNx( void* _feVariable, Element_LocalIndex lElement_I, double** GNx, double* value ) ;
+
+	void FeVariable_InterpolateValue_WithNi( void* _feVariable, Element_LocalIndex lElement_I, double* Ni, double* value ) ;
 	
 	void FeVariable_GetMinimumSeparation( void* feVariable, double* minSeparationPtr, double minSeparationEachDim[3] );
 

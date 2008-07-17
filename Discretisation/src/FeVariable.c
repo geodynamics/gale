@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeVariable.c 1170 2008-07-10 04:03:07Z DavidLee $
+** $Id: FeVariable.c 1186 2008-07-17 07:57:52Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -1352,6 +1352,37 @@ void FeVariable_InterpolateDerivatives_WithGNx( void* _feVariable, Element_Local
 	}
 }
 
+void FeVariable_InterpolateValue_WithNi( void* _feVariable, Element_LocalIndex lElement_I, double* Ni, double* value ) {
+	FeVariable*             self        = (FeVariable*) _feVariable;
+	Node_ElementLocalIndex  elLocalNode_I;
+	Node_LocalIndex         lNode_I;
+	Dof_Index               dof_I;
+	Dof_Index               dofCount;
+	Variable*               dofVariable;
+	double                  nodeValue;
+	unsigned		nInc, *inc;
+
+	/* Gets number of degrees of freedom - assuming it is the same throughout the mesh */
+	dofCount = self->dofLayout->dofCounts[0];
+
+	/* Initialise */
+	memset( value, 0, sizeof( double ) * dofCount );
+
+	FeMesh_GetElementNodes( self->feMesh, lElement_I, self->inc );
+	nInc = IArray_GetSize( self->inc );
+	inc = IArray_GetPtr( self->inc );
+
+	for ( dof_I = 0 ; dof_I < dofCount ; dof_I++ ) {
+		/* Interpolate derivative from nodes */
+		for ( elLocalNode_I = 0 ; elLocalNode_I < nInc ; elLocalNode_I++) {
+			lNode_I      = inc[ elLocalNode_I ];
+			dofVariable  = DofLayout_GetVariable( self->dofLayout, lNode_I, dof_I );
+			nodeValue    = Variable_GetValueDouble( dofVariable, lNode_I );
+
+			value[dof_I] += Ni[elLocalNode_I] * nodeValue;
+		}
+	}
+}
 
 void FeVariable_GetMinimumSeparation( void* feVariable, double* minSeparationPtr, double minSeparationEachDim[3] ) {
 	FeVariable*	self = (FeVariable*)feVariable;
