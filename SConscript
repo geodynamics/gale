@@ -63,6 +63,7 @@ env.build_plugin('plugins/StandardConditionFunctions')
 env.build_plugin('Apps/StokesMomentumUzawa/tests/LinearVelocityAnalytic')
 env.build_plugin('Apps/StokesMomentumUzawa/tests/LidDrivenIsoviscousAnalytic')
 env.build_plugin('Apps/StokesMomentumUzawa/tests/SimpleShearAnalytic')
+env.build_plugin('Apps/StokesMomentumUzawa/tests/LidDrivenStokesAnalytic')
 
 #
 # Build static library.
