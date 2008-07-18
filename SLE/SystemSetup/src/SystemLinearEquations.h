@@ -51,7 +51,7 @@
 **	for storing and managing the matrices and vectors that make up a system, but uses
 **	the SLE_Solver class to actually implement a solution mechanism for the given eqn.
 **
-** $Id: SystemLinearEquations.h 1167 2008-06-30 09:43:05Z LukeHodkinson $
+** $Id: SystemLinearEquations.h 1187 2008-07-18 04:44:58Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -120,6 +120,8 @@
 		Iteration_Index                                     nonLinearIteration_I;      \
 		Bool                                                killNonConvergent;         \
 		Iteration_Index                                     nonLinearMinIterations;    \
+		double			                            curResidual;               \
+		double                                              curSolveTime;              \
 		/* BEGIN LUKE'S FRICTIONAL BCS BIT */					       \
 		char*						    nlSetupEPName;	       \
 		EntryPoint*					    nlSetupEP;		       \

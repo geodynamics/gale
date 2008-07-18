@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SystemLinearEquations.c 1182 2008-07-16 06:09:08Z LukeHodkinson $
+** $Id: SystemLinearEquations.c 1187 2008-07-18 04:44:58Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -195,6 +195,8 @@ void _SystemLinearEquations_Init(
 	self->nonLinearMaxIterations    = nonLinearMaxIterations;
 	self->killNonConvergent         = killNonConvergent;
 	self->nonLinearMinIterations    = nonLinearMinIterations;    
+	self->curResidual               = 0.0;
+	self->curSolveTime              = 0.0;
 									     /* _  /0 */
 	optionsName = Memory_Alloc_Array_Unnamed( char, strlen(optionsPrefix) + 1 + 1 );
 	sprintf( optionsName, "%s_", optionsPrefix );
@@ -562,7 +564,8 @@ void SystemLinearEquations_ExecuteSolver( void* sle, void* _context ) {
 	if( self->solver )	
 		Stg_Component_Execute( self->solver, self, True );
 	
-	Journal_Printf(self->info,"Linear solver (%s), solution time %6.6e (secs)\n",self->executeEPName, MPI_Wtime() - wallTime);
+	self->curSolveTime = MPI_Wtime() - wallTime;
+	Journal_Printf(self->info,"Linear solver (%s), solution time %6.6e (secs)\n",self->executeEPName, self->curSolveTime);
 		
 }
 
@@ -841,13 +844,14 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 		self->linearExecute( self, _context );
 //		PetscPrintf( PETSC_COMM_WORLD, "|Xn+1| = %12.12e \n", Vector_L2Norm(SystemLinearEquations_GetSolutionVectorAt(self,1)->vector) );
 
-                /*
-                ** Include an entry point to do some kind of post-non-linear-iteration operation. */
-		_EntryPoint_Run_2VoidPtr( self->postNlEP, sle, _context );
-
 		/* Calculate Residual */
 		Vector_AddScaled( previousVector, -1.0, currentVector );
 		residual = Vector_L2Norm( previousVector ) / Vector_L2Norm( currentVector );
+		self->curResidual = residual;
+
+                /*
+                ** Include an entry point to do some kind of post-non-linear-iteration operation. */
+		_EntryPoint_Run_2VoidPtr( self->postNlEP, sle, _context );
 
 		Journal_Printf( self->info, "In func %s: Iteration %u of %u - Residual %.5g - Tolerance = %.5g\n", 
 				__func__, self->nonLinearIteration_I, maxIterations, residual, tolerance );
