@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StandardConditionFunctions.c 1122 2008-05-06 01:08:00Z DavidMay $
+** $Id: StandardConditionFunctions.c 1188 2008-07-18 06:55:12Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -150,6 +150,9 @@ void _StgFEM_StandardConditionFunctions_Construct( void* component, Stg_Componen
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_GaussianDistribution, "GaussianDistribution");
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_1DGaussianDistribution, "1DGaussianDistribution");
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_HalfContainer, "HalfContainer");
@@ -1261,6 +1264,34 @@ void StgFEM_StandardConditionFunctions_GaussianDistribution( Node_LocalIndex nod
 
 	for( dim_I = 0; dim_I < nDims; dim_I++ )
 		distsq += ( coord[dim_I] - orig[dim_I] ) * ( coord[dim_I] - orig[dim_I] );
+
+	*result = gaussianScale * exp( -distsq / ( 2.0 * sigma * sigma ) ) + background;
+}
+
+void StgFEM_StandardConditionFunctions_1DGaussianDistribution( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	FiniteElementContext *	context            = (FiniteElementContext*)_context;
+	FeVariable*             feVariable         = NULL;
+	Dictionary*             dictionary         = context->dictionary;
+	double*                 result             = (double*) _result;
+	Name			variableName;
+	double*			coord;
+	unsigned		nDims              = context->dim;
+	unsigned		dim_I;
+	double			orig[3];
+	double			sigma              = Dictionary_GetDouble_WithDefault( dictionary, "sigma", 1.0 );
+	double			gaussianScale      = Dictionary_GetDouble_WithDefault( dictionary, "GaussianScale", 1.0 );
+	double			background         = Dictionary_GetDouble_WithDefault( dictionary, "backgroundValue", 1.0 );
+	double			distsq             = 0.0;
+
+	variableName = Dictionary_GetString_WithDefault( dictionary, "FieldVariable", "" );
+	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, variableName );
+	coord = Mesh_GetVertex( feVariable->feMesh, node_lI );
+
+	orig[0] = Dictionary_GetDouble_WithDefault( dictionary, "x0", 0.0 );
+	orig[1] = Dictionary_GetDouble_WithDefault( dictionary, "y0", 0.0 );
+	orig[2] = Dictionary_GetDouble_WithDefault( dictionary, "z0", 0.0 );
+
+	distsq = ( coord[J_AXIS] - orig[J_AXIS] ) * ( coord[J_AXIS] - orig[J_AXIS] );
 
 	*result = gaussianScale * exp( -distsq / ( 2.0 * sigma * sigma ) ) + background;
 }
