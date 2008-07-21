@@ -1370,17 +1370,18 @@ void Swarm_PrintParticleCoords_ByCell( void* swarm, Stream* stream ) {
 
 void Swarm_GetCellMinMaxCoords( void* swarm, Cell_DomainIndex cell_I, Coord min, Coord max ) {
 	Swarm*              self     =  (Swarm*) swarm;
-	Dimension_Index		dim_I;
-	Cell_PointIndex		cPoint_I;
+	Dimension_Index		  dim_I;
+	int                 dim      = self->dim;
+	Cell_PointIndex		  cPoint_I;
 	double*             currCoord;
 
-	for ( dim_I = 0; dim_I < 3; dim_I++ ) {
+	for ( dim_I = 0; dim_I < dim; dim_I++ ) {
 		min[dim_I] = (*self->cellPointTbl[cell_I][0])[dim_I];
 		max[dim_I] = (*self->cellPointTbl[cell_I][0])[dim_I];
 	}
 
 	for ( cPoint_I = 1; cPoint_I < self->cellPointCountTbl[cell_I]; cPoint_I++ ) {
-		for ( dim_I = 0; dim_I < 3; dim_I++ ) {
+		for ( dim_I = 0; dim_I < dim; dim_I++ ) {
 			currCoord = (*self->cellPointTbl[cell_I][cPoint_I]);
 			if ( currCoord[dim_I] < min[dim_I] ) {
 				min[dim_I] = currCoord[dim_I];
