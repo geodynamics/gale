@@ -51,7 +51,7 @@
 		double                                radius;           \
 		XYZ                                   start;            \
 		XYZ                                   end;              \
-		Axis                                  perpendicularAxis;
+		Axis                                  alongAxis;
 
 	struct Cylinder { __Cylinder };
 	
