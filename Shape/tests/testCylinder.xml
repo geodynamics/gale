@@ -8,7 +8,7 @@
 		<struct name="shape">
 			<param name="Type">Cylinder</param>
 			<param name="radius">0.3</param> 
-			<param name="perpendicularAxis">j</param> 
+			<param name="alongAxis">j</param> 
 			<param name="startY">0.0</param> 
 			<param name="startX">0.0</param> 
 			<param name="endZ">0.0</param> 

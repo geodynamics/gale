@@ -62,10 +62,10 @@
 		<param name="Description">z-coord the cylinder ends at</param>
 	</struct>
 	<struct>
-		<param name="Name">perpendicularAxis</param>
+		<param name="Name">alongAxis</param>
 		<param name="Type">String</param>
 		<param name="Default">x</param>
-		<param name="Description">axis the cylinder is perpdenicular to</param>
+		<param name="Description">axis the cylinder is aligned with</param>
 	</struct>
 
 </list>

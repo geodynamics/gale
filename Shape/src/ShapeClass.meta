@@ -20,34 +20,28 @@
 
 <list name="Params">
 	<struct>
-		<param name="Name">dim</param>
-		<param name="Type">UnsignedInt</param>
-		<param name="Default">0</param>
-		<param name="Description">...</param>
-	</struct>
-	<struct>
 		<param name="Name">CentreX</param>
 		<param name="Type">Double</param>
 		<param name="Default">0.0</param>
-		<param name="Description">...</param>
+		<param name="Description">x coord the shape is centred on</param>
 	</struct>
 	<struct>
 		<param name="Name">CentreY</param>
 		<param name="Type">Double</param>
 		<param name="Default">0.0</param>
-		<param name="Description">...</param>
+		<param name="Description">y coord the shape is centred on</param>
 	</struct>
 	<struct>
 		<param name="Name">CentreZ</param>
 		<param name="Type">Double</param>
 		<param name="Default">0.0</param>
-		<param name="Description">...</param>
+		<param name="Description">z coord the shape is centred on</param>
 	</struct>
 	<struct>
 		<param name="Name">alpha</param>
 		<param name="Type">Double</param>
 		<param name="Default">0.0</param>
-		<param name="Description">...</param>
+		<param name="Description">Sets the rotatio</param>
 	</struct>
 	<struct>
 		<param name="Name">beta</param>

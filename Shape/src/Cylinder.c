@@ -57,7 +57,7 @@ Cylinder* Cylinder_New(
 		double                                radius, 
 		XYZ                                   start, 
 		XYZ                                   end, 
-		Axis                                  perpendicularAxis )
+		Axis                                  alongAxis )
 {
 	Cylinder* self = (Cylinder*) _Cylinder_DefaultNew( name );
 
@@ -71,7 +71,7 @@ Cylinder* Cylinder_New(
 		radius,
 		start,
 		end,
-		perpendicularAxis ) ;
+		alongAxis ) ;
 	return self;
 }
 
@@ -120,10 +120,10 @@ Cylinder* _Cylinder_New(
 	return self;
 }
 
-void _Cylinder_Init( Cylinder* self, double radius, XYZ start, XYZ end, Axis perpendicularAxis ) {
+void _Cylinder_Init( Cylinder* self, double radius, XYZ start, XYZ end, Axis alongAxis ) {
 	memcpy( self->start, start, sizeof(XYZ));
 	memcpy( self->end, end, sizeof(XYZ));
-	self->perpendicularAxis = perpendicularAxis;
+	self->alongAxis = alongAxis;
 	self->radius = radius;
 }
 
@@ -138,12 +138,12 @@ void Cylinder_InitAll(
 		double                                radius, 
 		XYZ                                   start, 
 		XYZ                                   end, 
-		Axis                                  perpendicularAxis )
+		Axis                                  alongAxis )
 {
 	Cylinder* self = (Cylinder*)cylinder;
 
 	Stg_Shape_InitAll( self, dim, centre, alpha, beta, gamma );
-	_Cylinder_Init( self, radius, start, end, perpendicularAxis );
+	_Cylinder_Init( self, radius, start, end, alongAxis );
 }
 	
 
@@ -178,7 +178,7 @@ void* _Cylinder_Copy( void* cylinder, void* dest, Bool deep, Name nameExt, PtrMa
 	memcpy( newCylinder->end, self->end, sizeof(XYZ));
 
 	newCylinder->radius = self->radius;
-	newCylinder->perpendicularAxis = self->perpendicularAxis;
+	newCylinder->alongAxis = self->alongAxis;
 	
 	return (void*)newCylinder;
 }
@@ -209,7 +209,7 @@ void _Cylinder_Construct( void* cylinder, Stg_ComponentFactory* cf, void* data )
 	XYZ                  start                    = { -BIG, -BIG, -BIG }; 
 	XYZ                  end                      = {  BIG,  BIG,  BIG };
 	double               radius                   = 0.0;
-	Axis                 perpendicularAxis        = I_AXIS;
+	Axis                 alongAxis        = I_AXIS;
 	char*                perpendicularAxisName    = NULL;
 
 	_Stg_Shape_Construct( self, cf, data );
@@ -223,20 +223,20 @@ void _Cylinder_Construct( void* cylinder, Stg_ComponentFactory* cf, void* data )
 	end[ J_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "endY", BIG );
 	end[ K_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "endZ", BIG );
 
-	perpendicularAxisName = Stg_ComponentFactory_GetString( cf, self->name, "perpendicularAxis", "x" );
+	perpendicularAxisName = Stg_ComponentFactory_GetString( cf, self->name, "alongAxis", "x" );
 	switch ( perpendicularAxisName[0] ) {
 		case 'x': case 'X': case 'i': case 'I': case '0':
-			perpendicularAxis = I_AXIS; break;
+			alongAxis = I_AXIS; break;
 		case 'y': case 'Y': case 'j': case 'J': case '1':
-			perpendicularAxis = J_AXIS; break;
+			alongAxis = J_AXIS; break;
 		case 'z': case 'Z': case 'k': case 'K': case '2':
-			perpendicularAxis = K_AXIS; break;
+			alongAxis = K_AXIS; break;
 		default:
 			Journal_Firewall( False, Journal_Register( Error_Type, self->type ),
-					"Cannot understand perpendicularAxis '%s'\n", perpendicularAxisName );
+					"Cannot understand alongAxis '%s'\n", perpendicularAxisName );
 	}
 	
-	_Cylinder_Init( self, radius, start, end, perpendicularAxis );
+	_Cylinder_Init( self, radius, start, end, alongAxis );
 }
 
 void _Cylinder_Build( void* cylinder, void* data ) {
@@ -284,7 +284,7 @@ Bool _Cylinder_IsCoordInside( void* cylinder, Coord coord ) {
 	/* Transform coordinate into canonical reference frame */
 	Stg_Shape_TransformCoord( self, coord, newCoord );
 	
-	newCoord[ self->perpendicularAxis ] = 0.0;
+	newCoord[ self->alongAxis ] = 0.0;
 
 	/* Check if coord is within radius */
 	x = newCoord[ I_AXIS ];
@@ -309,7 +309,7 @@ void _Cylinder_DistanceFromCenterAxis( void* cylinder, Coord coord, double* disV
 	/* Transform coordinate into canonical reference frame */
 	Stg_Shape_TransformCoord( self, coord, newCoord );
 	
-	newCoord[ self->perpendicularAxis ] = 0.0;
+	newCoord[ self->alongAxis ] = 0.0;
 
 	/* Check if coord is within radius */
 	disVec[0] = newCoord[ I_AXIS ];
