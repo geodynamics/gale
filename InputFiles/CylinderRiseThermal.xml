@@ -40,7 +40,7 @@
 			<param name="startX">0.0</param>
 			<param name="endX">2.0</param>
 			<param name="radius"> 0.10 </param>
-			<param name="perpendicularAxis"> X </param>
+			<param name="alongAxis"> X </param>
 		</struct>		
 		<!-- Material Definitions -->
 		<struct name="backgroundViscosity">
