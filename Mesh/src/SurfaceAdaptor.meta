@@ -6,7 +6,7 @@
 <param name="Organisation">VPAC</param>
 <param name="Project">StgDomain</param>
 <param name="Location">./StgDomain/Mesh/src/</param>
-<param name="Project Web">http://mcc.monash.edu.au/Software/Underworld.</param>
+<param name="Project Web">http://www.stgermainproject.org/StgDomain.html</param>
 <param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
 <param name="License">http://www.opensource.org/licenses/bsd-license.php</param>
 <param name="Parent">MeshAdaptor</param>
