@@ -7,7 +7,7 @@
 <param name="Organisation">VPAC</param>
 <param name="Project">StgFEM</param>
 <param name="Location">./StgFEM/SLE/ProvidedSystems/StokesFlow/src/</param>
-<param name="Project Web">https://csd.vpac.org/twiki/bin/view/Stgfem/WebHome</param>
+<param name="Project Web">http://www.stgermainproject.org/StgFEM.html</param>
 <param name="Copyright">Copyright (C) 2004-2005 VPAC.</param>
 <param name="License">https://csd.vpac.org/twiki/bin/view/Stgermain/SoftwareLicense</param>
 <param name="Parent">SLE_Solver</param>
