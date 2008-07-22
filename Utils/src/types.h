@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: types.h 436 2007-02-19 05:15:47Z JulianGiordani $
+** $Id: types.h 763 2008-07-22 04:20:07Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -51,6 +51,7 @@
 	typedef struct Underworld_SwarmOutput              Underworld_SwarmOutput;
 	typedef struct RadiogenicHeatingTerm         RadiogenicHeatingTerm;
 	typedef struct StressField                   StressField;
+	typedef struct NodalPressureField NodalPressureField;
 	typedef struct ViscosityField                ViscosityField;
 	typedef struct DensityField                  DensityField;
 

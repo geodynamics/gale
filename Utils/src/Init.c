@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: Init.c 610 2007-10-11 08:09:29Z SteveQuenette $
+** $Id: Init.c 763 2008-07-22 04:20:07Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -68,6 +68,7 @@ Bool Underworld_Utils_Init( int* argc, char** argv[] ) {
 	Stg_ComponentRegister_Add( componentRegister, Underworld_SwarmOutput_Type, "0", _Underworld_SwarmOutput_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, RadiogenicHeatingTerm_Type,     "0", _RadiogenicHeatingTerm_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, StressField_Type ,              "0", _StressField_DefaultNew );
+	Stg_ComponentRegister_Add( componentRegister, NodalPressureField_Type , "0", _NodalPressureField_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, ViscosityField_Type ,           "0", _ViscosityField_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, DensityField_Type ,           "0", _DensityField_DefaultNew );
 
@@ -77,6 +78,7 @@ Bool Underworld_Utils_Init( int* argc, char** argv[] ) {
 	RegisterParent( Underworld_SwarmOutput_Type,     SwarmOutput_Type );
 	RegisterParent( RadiogenicHeatingTerm_Type,         ForceTerm_Type );
 	RegisterParent( StressField_Type,                   ParticleFeVariable_Type );
+	RegisterParent( NodalPressureField_Type,                   ParticleFeVariable_Type );
 	RegisterParent( ViscosityField_Type,                ParticleFeVariable_Type );
 	RegisterParent( DensityField_Type,                  ParticleFeVariable_Type );
         
