@@ -7,7 +7,7 @@
 <param name="Organisation">VPAC and MCC</param>
 <param name="Project">PICellerator</param>
 <param name="Location">./PICellerator/Weights/src/</param>
-<param name="Project Web">https://csd.vpac.org/twiki/bin/view/PICellerator/WebHome</param>
+<param name="Project Web">http://www.stgermainproject.org/PICellerator.html</param>
 <param name="Copyright">Copyright (C) 2005 VPAC and Monash Cluster Computing.</param>
 <param name="License">https://csd.vpac.org/twiki/bin/view/Stgermain/SoftwareLicense http://www.opensource.org/licenses/bsd-license.php</param>
 <param name="Parent">Stg_Component</param>

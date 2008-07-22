@@ -5,7 +5,7 @@
 <param name="Name">MaterialSwarm</param>
 <param name="Organisation">VPAC & MCC</param>
 <param name="Project">PICellerator</param>
-<param name="Project Web">https://csd.vpac.org/twiki/bin/view/PICellerator/WebHome</param>
+<param name="Project Web">http://www.stgermainproject.org/PICellerator.html</param>
 <param name="Copyright">Copyright (C) 2005 VPAC & Monash Cluster Computing.</param>
 <param name="License">https://csd.vpac.org/twiki/bin/view/Stgermain/SoftwareLicensehttp://www.opensource.org/licenses/bsd-license.php</param>
 <param name="Parent">PopulationControlSwarm</param>
