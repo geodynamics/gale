@@ -8,7 +8,7 @@
 <param name="Organisation">VPAC</param>
 <param name="Project">StGermain</param>
 <param name="Location">./StGermain/Base/Extensibility/src/</param>
-<param name="Project Web">https://www.stgermainproject.org</param>
+<param name="Project Web">http://www.stgermainproject.org/</param>
 <param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
 <param name="License">The Gnu Lesser General Public License http://www.gnu.org/licenses/lgpl.html</param>
 <param name="Parent">Stg_Component</param>
