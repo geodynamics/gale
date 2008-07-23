@@ -48,7 +48,7 @@ def build_plugin(env, dir, dst_dir='', name=''):
     if not name:
         name = env.project_name + '_' + dir.split('/')[-1]
     mod_name = name + 'module'
-    env.build_headers(env.glob(dir + '/*.h'), 'include/' + env.project_name + '/' + name)
+    env.build_headers(env.glob(dir + '/*.h'), 'include/' + env.project_name + '/' + dir.split('/')[-1])
     objs = env.build_sources(env.glob(dir + '/*.c'), env.project_name + '/' + dir)
     if env['shared_libraries']:
         env.SharedLibrary(env.get_build_path('lib/' + mod_name), objs,
@@ -57,6 +57,47 @@ def build_plugin(env, dir, dst_dir='', name=''):
                           LIBS=[env.project_name] + env.get('LIBS', []))
     if env['static_libraries']:
         env.src_objs += objs
+        if not env['shared_libraries']:
+            if not env.get('STGMODULECODE', None):
+                env['STGMODULECODE'] = ''
+            if not env.get('STGMODULEPROTO', None):
+                env['STGMODULEPROTO'] = ''
+            env['STGMODULEPROTO'] += 'int ' + env.project_name + '_' + name + '_Register( void* );\n'
+            env['STGMODULECODE'] += '  ' + env.project_name + '_' + name + '_Register( mgr );\n'
+
+def build_toolbox(env, dir, dst_dir=''):
+    if not dst_dir:
+        dst_dir = env.project_name + '/' + dir
+    objs = env.build_sources(env.glob(dir + '/*.c'), dst_dir)
+    objs += env.build_metas(env.glob(dir + '/*.meta'), dst_dir)
+    if env['shared_libraries']:
+        env.SharedLibrary(env.get_target_name('lib/' + env.project_name + '_Toolboxmodule'), objs,
+                          SHLIBPREFIX='',
+                          LIBPREFIXES=env.make_list(env['LIBPREFIXES']) + [''],
+                          LIBS=[env.project_name] + env.get('LIBS', []))
+    if env['static_libraries']:
+        env.src_objs += objs
+        if not env['shared_libraries']:
+            if not env.get('STGMODULECODE', None):
+                env['STGMODULECODE'] = ''
+            if not env.get('STGMODULEPROTO', None):
+                env['STGMODULEPROTO'] = ''
+            env['STGMODULEPROTO'] += 'int ' + env.project_name + '_Toolbox_Register( void* );\n'
+            env['STGMODULEPROTO'] += 'void ' + env.project_name + '_Toolbox_Initialise( void*, int, char** );\n'
+            env['STGMODULECODE'] += '  ' + env.project_name + '_Toolbox_Register( mgr );\n'
+            env['STGMODULECODE'] += '  ' + env.project_name + '_Toolbox_Initialise( mgr, argc, argv );\n'
+
+def build_module_register(env, dst, module_proto, module_code):
+    src = str(module_proto)
+    src += '\nvoid SingleRegister( void* mgr, int argc, char** argv ) {\n'
+    src += module_code
+    src += '}\n'
+    if not os.path.exists(os.path.dirname(File(dst).abspath)):
+        os.makedirs(os.path.dirname(File(dst).abspath))
+    f = open(File(dst).abspath, "w")
+    f.write(src)
+    f.close()
+    return File(dst)
 
 SConsEnvironment.build_files = build_files
 SConsEnvironment.build_headers = build_headers
@@ -64,6 +105,8 @@ SConsEnvironment.build_sources = build_sources
 SConsEnvironment.build_metas = build_metas
 SConsEnvironment.build_directory = build_directory
 SConsEnvironment.build_plugin = build_plugin
+SConsEnvironment.build_toolbox = build_toolbox
+SConsEnvironment.build_module_register = build_module_register
 
 #
 # Custom builders.
