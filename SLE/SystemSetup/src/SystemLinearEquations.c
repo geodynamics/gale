@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SystemLinearEquations.c 1187 2008-07-18 04:44:58Z LukeHodkinson $
+** $Id: SystemLinearEquations.c 1190 2008-07-23 06:26:05Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -297,11 +297,11 @@ void _SystemLinearEquations_Delete( void* sle ) {
 	Stg_Class_Delete( self->forceVectors ); 
 	Stg_Class_Delete( self->solutionVectors ); 
 
-/* 	 delete parent */
+	Memory_Free( self->optionsPrefix );
+	/* 	 delete parent */
 	_Stg_Component_Delete( self );
 	Stream_UnIndentBranch( StgFEM_Debug );
 
-	Memory_Free( self->optionsPrefix );
 }
 
 
