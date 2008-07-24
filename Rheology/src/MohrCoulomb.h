@@ -74,6 +74,7 @@
 		double                                              currentPressure;                       \
 		double                                              strainRateSecondInvariant;                   \
 		FeVariable*                                         strainRateField;                      \
+		double                                              minVisc;
 
 	
 	struct MohrCoulomb { __MohrCoulomb };

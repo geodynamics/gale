@@ -180,6 +180,7 @@ void _MohrCoulomb_Construct( void* rheology, Stg_ComponentFactory* cf,
 			"PressureField", FeVariable, True, data );
 	velocityGradientsField = Stg_ComponentFactory_ConstructByKey( cf, self->name,
 			"VelocityGradientsField", FeVariable, True, data );
+	self->minVisc = Stg_ComponentFactory_GetDouble( cf, self->name, "minimumViscosity", 0.0 );
 	
 	_MohrCoulomb_Init( 
 			self,
@@ -348,8 +349,12 @@ void _MohrCoulomb_HasYielded(
   double                           viscosity = ConstitutiveMatrix_GetIsotropicViscosity( constitutiveMatrix );
 
   double beta=1.0-yieldCriterion/(yieldIndicator);
+  double corr = -viscosity * beta;
 
-  ConstitutiveMatrix_IsotropicCorrection( constitutiveMatrix, -viscosity * beta );
+  if( (viscosity + corr) < ((MohrCoulomb*)rheology)->minVisc )
+    corr = ((MohrCoulomb*)rheology)->minVisc - viscosity;
+
+  ConstitutiveMatrix_IsotropicCorrection( constitutiveMatrix, corr );
 }
 
 double _MohrCoulomb_EffectiveCohesion( void* rheology, void* materialPoint ) {
