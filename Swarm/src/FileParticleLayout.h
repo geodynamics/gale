@@ -51,11 +51,9 @@
 		__GlobalParticleLayout \
 		\
 		Name                                             filename;    \
-		FILE*                                            file;        \
 		Stream*                                          errorStream; \
-		hid_t fileData; \
-		hid_t fileSpace; \
-		hid_t memSpace; \
+		hid_t* fileData; \
+		hid_t* fileSpace; \
 		hsize_t start[2]; \
 		hsize_t count[2];
 #else

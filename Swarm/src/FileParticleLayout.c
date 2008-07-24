@@ -51,6 +51,9 @@
 #include "ShadowInfo.h"
 #include "CellLayout.h"
 #include "ElementCellLayout.h"
+#include "IntegrationPoint.h"
+#include "SwarmVariable.h"
+#include "SwarmVariable_Register.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -125,7 +128,6 @@ void _FileParticleLayout_Init( void* particleLayout, Name filename )
 	FileParticleLayout* self = (FileParticleLayout*) particleLayout;
 
 	self->filename = StG_Strdup( filename );
-	self->file        = NULL;
 	self->errorStream = Journal_MyStream( Error_Type, self );
 	_GlobalParticleLayout_Init( self, GlobalCoordSystem, False, 0, 0.0 );
 }
@@ -152,7 +154,6 @@ void _FileParticleLayout_Print( void* particleLayout, Stream* stream ) {
 	
 	/* FileParticleLayout */
 	Journal_Printf( stream, "filename: %s\n", self->filename );
-	Journal_Printf( stream, "file (ptr): %p\n", self->file );
 	
 	Stream_UnIndent( stream );
 }
@@ -209,46 +210,66 @@ void _FileParticleLayout_Destroy( void* particleLayout, void* data ) {
 }
 
 void _FileParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm ) {
-	FileParticleLayout*        self         = (FileParticleLayout*)particleLayout;
-	Swarm*                     swarm        = (Swarm*)_swarm;
-	Name                       filename     = self->filename;
-	MPI_File                   mpiFile;
-	int                        openResult;
-	MPI_Offset                 bytesCount;
-	SizeT                      particleSize = swarm->particleExtensionMgr->finalSize;
-	div_t                      division;
+	FileParticleLayout*  self         = (FileParticleLayout*)particleLayout;
+	Swarm*               swarm        = (Swarm*)_swarm;
+	Name                 filename     = self->filename;
+	
 #ifdef HAVE_HDF5
-	hid_t file, fileData;
-	int size[2];
+	hid_t                file, fileData, fileSpace;
+	hsize_t              size[2];
+	char                 dataSpaceName[1024];
+	SwarmVariable*       swarmVar;
+#else
+	MPI_File             mpiFile;
+	int                  openResult;
+	MPI_Offset           bytesCount;
+	SizeT                particleSize = swarm->particleExtensionMgr->finalSize;
+	div_t                division;
 #endif
 
 	Journal_DPrintf( self->debug, "In %s(): for ParticleLayout \"%s\", of type %s\n",
 		__func__, self->name, self->type );
 	Stream_IndentBranch( Swarm_Debug );	
 
-	Journal_DPrintf( self->debug, "Finding number of bytes in checkpoint file \"%s\":\n",
-		self->filename );
-
 #ifdef HAVE_HDF5
-	/* Read in data size. */
+   /* Open the swarm checkpointing file */
 	file = H5Fopen( filename, H5F_ACC_RDONLY, H5P_DEFAULT );
-#if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
-	fileData = H5Dopen( file, "/size" );
-#else
-	fileData = H5Dopen( file, "/size", H5P_DEFAULT );
-#endif
-	H5Dread( fileData, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, size );
-	H5Dclose( fileData );
-	H5Fclose( file );
+	Journal_Firewall( 
+		file >= 0, 
+		self->errorStream,
+		"Error in %s for %s '%s' - Cannot open file %s.\n", 
+		__func__, 
+		self->type, 
+		self->name, 
+		filename );
 
-	/* Make sure paricle sizes are the same. */
-	assert( size[1] == swarm->particleExtensionMgr->finalSize );
-
-	/* Store number of particles. */
-	self->totalInitialParticles = size[0];
+   /* Open a dataspace */
+   swarmVar = SwarmVariable_Register_GetByIndex( swarm->swarmVariable_Register, 0 );
+   sprintf( dataSpaceName, "/%s", swarmVar->name );
+      
+   #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+	fileData = H5Dopen( file, dataSpaceName );
+   #else
+	fileData = H5Dopen( file, dataSpaceName, H5P_DEFAULT );
+   #endif
+	fileSpace = H5Dget_space( fileData );
+	
+	/* Get the dimensions of the open dataspace */
+   H5Sget_simple_extent_dims( fileSpace, size, NULL ); 
+   
+   self->totalInitialParticles = size[0];
+   
+   /* Close the dataspace and file */
+   H5Sclose( fileSpace );
+	H5Dclose( fileData );	 
+	H5Fclose( file );	
+   
 #else
+   Journal_DPrintf( self->debug, "Finding number of bytes in checkpoint file \"%s\":\n",
+		self->filename );
+		
 	openResult = MPI_File_open( swarm->comm, filename, MPI_MODE_RDONLY, MPI_INFO_NULL, &mpiFile );
-
+   
 	Journal_Firewall( 
 		openResult == 0, 
 		self->errorStream,
@@ -266,7 +287,7 @@ void _FileParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm ) 
 	/* Divide by particle size to get number of particles */
 	division = div( bytesCount, particleSize );
 	self->totalInitialParticles = division.quot;
-
+	
 	Journal_DPrintf( self->debug, "given bytes total %u / particle size %u ->\n"
 		"\ttotalInitialParticles = %u.\n", bytesCount, (unsigned int)particleSize,
 		self->totalInitialParticles );
@@ -283,9 +304,10 @@ void _FileParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm ) 
 		bytesCount, 
 		(unsigned int)particleSize, 
 		division.rem ); 
+
+   Journal_DPrintf( self->debug, "calling parent func to set cell counts:\n", bytesCount );
 #endif
 
-	Journal_DPrintf( self->debug, "calling parent func to set cell counts:\n", bytesCount );
 	_GlobalParticleLayout_SetInitialCounts( self, swarm );
 
 	Stream_UnIndentBranch( Swarm_Debug );	
@@ -296,36 +318,59 @@ void _FileParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm ) 
 void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm ) {
 	FileParticleLayout*        self             = (FileParticleLayout*)particleLayout;
 	Swarm *swarm = (Swarm*)_swarm;
+	
 #ifdef HAVE_HDF5
-	hid_t file;
-	hsize_t size[2];
-
-	/* Open the file and data set. */
+	SwarmVariable*          swarmVar;
+   Index                   swarmVar_I, dof_I;
+   char                    dataSpaceName[1024];
+   hid_t                   file;
+     
+   /* Allocate space to store arrays of dataspaces */   
+   assert( swarm->swarmVariable_Register );  
+   self->fileData = Memory_Alloc_Array( hid_t, swarm->swarmVariable_Register->objects->count, "fileData" );
+   self->fileSpace = Memory_Alloc_Array( hid_t, swarm->swarmVariable_Register->objects->count, "fileSpace" );
+	 
+	/* Open the file */
 	file = H5Fopen( self->filename, H5F_ACC_RDONLY, H5P_DEFAULT );
-#if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
-	self->fileData = H5Dopen( file, "/data" );
-#else
-	self->fileData = H5Dopen( file, "/data", H5P_DEFAULT );
-#endif
-	self->fileSpace = H5Dget_space( self->fileData );
+	Journal_Firewall( 
+		file >= 0, 
+		self->errorStream,
+		"Error in %s for %s '%s' - Cannot open file %s.\n", 
+		__func__, 
+		self->type, 
+		self->name, 
+		self->filename );
 
-	/* Need a memory space for extracting to. */
-	size[0] = 1;
-	size[1] = swarm->particleExtensionMgr->finalSize;
-	self->memSpace = H5Screate_simple( 1, size + 1, NULL );
-	H5Sselect_all( self->memSpace );
-
-	/* Prepare a hyperslab for extracting file data one particle at a time. */
-	self->start[0] = 0; self->start[1] = 0;
-	self->count[0] = 1; self->count[1] = size[1];
-	H5Sselect_hyperslab( self->fileSpace, H5S_SELECT_SET, self->start, NULL, self->count, NULL );
-
+   /* Open a dataspace for each swarmVariable */
+   for( swarmVar_I = 0; swarmVar_I < swarm->swarmVariable_Register->objects->count; swarmVar_I++ ) {
+      swarmVar = SwarmVariable_Register_GetByIndex( swarm->swarmVariable_Register, swarmVar_I );
+      sprintf( dataSpaceName, "/%s", swarmVar->name );
+      
+      #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+	   self->fileData[swarmVar_I] = H5Dopen( file, dataSpaceName );
+      #else
+	   self->fileData[swarmVar_I] = H5Dopen( file, dataSpaceName, H5P_DEFAULT );
+      #endif
+	   self->fileSpace[swarmVar_I] = H5Dget_space( self->fileData[swarmVar_I] );
+   
+      Variable_Update( swarmVar->variable );
+   }
+       
+	self->start[1] = 0;
+	self->count[0] = 1; 
+	
 	_GlobalParticleLayout_InitialiseParticles( self, _swarm );
 
-	H5Sclose( self->memSpace );
-	H5Sclose( self->fileSpace );
-	H5Dclose( self->fileData );
-	H5Fclose( file );
+   /* Close dataspaces and the file */
+   for( swarmVar_I = 0; swarmVar_I < swarm->swarmVariable_Register->objects->count; swarmVar_I++ ) {
+	   H5Sclose( self->fileSpace[swarmVar_I] );
+	   H5Dclose( self->fileData[swarmVar_I] );
+	}
+	H5Fclose( file );	
+	
+	Memory_Free( self->fileData );
+	Memory_Free( self->fileSpace );
+	
 #else
 	self->file = fopen( self->filename, "rb" );
 	Journal_Firewall( 
@@ -340,7 +385,6 @@ void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm
 	_GlobalParticleLayout_InitialiseParticles( self, _swarm );
 	
 	fclose( self->file );
-	self->file = NULL;
 #endif
 }	
 	
@@ -350,19 +394,76 @@ void _FileParticleLayout_InitialiseParticle(
 		Particle_Index     newParticle_I,
 		void*              particle )
 {
-	FileParticleLayout*        self             = (FileParticleLayout*)particleLayout;
-	Swarm*                     swarm            = (Swarm*)_swarm;
-	SizeT                      particleSize     = swarm->particleExtensionMgr->finalSize;
+	FileParticleLayout*        self                 = (FileParticleLayout*)particleLayout;
+	Swarm*                     swarm                = (Swarm*)_swarm;
+	SizeT                      particleSize         = swarm->particleExtensionMgr->finalSize;
 	int                        result;
+	IntegrationPoint*          newParticle          = (IntegrationPoint*)particle;
 
 #ifdef HAVE_HDF5
-	/* Update the hyperslab. */
+   SwarmVariable*          swarmVar;
+   Index                   swarmVar_I;
+   hid_t                   memSpace; 
+    
 	self->start[0] = newParticle_I;
-	H5Sselect_hyperslab( self->fileSpace, H5S_SELECT_SET, self->start, NULL, self->count, NULL );
-
-	/* Read particle data. */
-	H5Dread( self->fileData, H5T_NATIVE_CHAR, self->memSpace,
-		 self->fileSpace, H5P_DEFAULT, particle );
+	
+	for( swarmVar_I = 0; swarmVar_I < swarm->nSwarmVars; swarmVar_I++ ) {
+      swarmVar = SwarmVariable_Register_GetByIndex( swarm->swarmVariable_Register, swarmVar_I );
+       
+      /* Update the hyperslab. */   
+      self->count[1] = swarmVar->dofCount;
+	   memSpace = H5Screate_simple( 2, self->count, NULL );
+	   H5Sselect_hyperslab( self->fileSpace[swarmVar_I], H5S_SELECT_SET, self->start, NULL, self->count, NULL );
+      H5Sselect_all( memSpace );
+      
+      /* Treat the data differently depending on its type */
+      if( swarmVar->variable->dataTypes[0] == Variable_DataType_Int ) {
+            int* particleInfo = Memory_Alloc_Array( int, swarmVar->dofCount, "particleCheckpointInfo" );
+            
+            /* Read particle data. */
+	         H5Dread( self->fileData[swarmVar_I], H5T_NATIVE_INT, memSpace, self->fileSpace[swarmVar_I], H5P_DEFAULT, particleInfo );
+	         
+	         Variable_SetValue( swarmVar->variable, swarm->particleLocalCount, particleInfo );
+	         
+	         Memory_Free( particleInfo );
+	    }
+	  
+	    else if( swarmVar->variable->dataTypes[0] == Variable_DataType_Char) {
+	         char* particleInfo = Memory_Alloc_Array( char, swarmVar->dofCount, "particleCheckpointInfo" );
+            
+            /* Read particle data. */
+	         H5Dread( self->fileData[swarmVar_I], H5T_NATIVE_CHAR, memSpace, self->fileSpace[swarmVar_I], H5P_DEFAULT, particleInfo );
+	         
+	         Variable_SetValue( swarmVar->variable, swarm->particleLocalCount, particleInfo );
+	        
+	         Memory_Free( particleInfo );
+	   }
+	           
+      else if( swarmVar->variable->dataTypes[0] == Variable_DataType_Float ) {
+            float* particleInfo = Memory_Alloc_Array( float, swarmVar->dofCount, "particleCheckpointInfo" );
+               
+            /* Read particle data. */
+	         H5Dread( self->fileData[swarmVar_I], H5T_NATIVE_FLOAT, memSpace, self->fileSpace[swarmVar_I], H5P_DEFAULT, particleInfo );
+	         
+	         Variable_SetValue( swarmVar->variable, swarm->particleLocalCount, particleInfo );
+	         
+	         Memory_Free( particleInfo );
+	   }
+	      
+      else {
+            double* particleInfo = Memory_Alloc_Array( double, swarmVar->dofCount, "particleCheckpointInfo" );
+            
+            /* Read particle data. */
+	         H5Dread( self->fileData[swarmVar_I], H5T_NATIVE_DOUBLE, memSpace, self->fileSpace[swarmVar_I], H5P_DEFAULT, particleInfo );
+	         
+	         Variable_SetValue( swarmVar->variable, swarm->particleLocalCount, particleInfo );
+	         
+	         Memory_Free( particleInfo );
+	   }   
+	   
+	   H5Sclose( memSpace );
+   } 
+      
 #else
 	result = fread( particle, particleSize, 1, self->file );
 
