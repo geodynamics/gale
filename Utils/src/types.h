@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: types.h 763 2008-07-22 04:20:07Z LukeHodkinson $
+** $Id: types.h 765 2008-07-24 05:40:02Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -52,6 +52,7 @@
 	typedef struct RadiogenicHeatingTerm         RadiogenicHeatingTerm;
 	typedef struct StressField                   StressField;
 	typedef struct NodalPressureField NodalPressureField;
+	typedef struct SmoothVelGradField SmoothVelGradField;
 	typedef struct ViscosityField                ViscosityField;
 	typedef struct DensityField                  DensityField;
 

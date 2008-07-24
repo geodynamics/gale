@@ -196,6 +196,7 @@ void _StressField_Build( void* stressField, void* data ) {
 	Node_DomainIndex  node_I;
 
 	Stg_Component_Build( self->feMesh, data, False );
+	Stg_Component_Build( self->strainRateField, data, False );
 
 	if ( dim == 2 ) {
 		variableName[0] = StG_Strdup( "tau_xx" );
@@ -214,7 +215,7 @@ void _StressField_Build( void* stressField, void* data ) {
 	/* Create Variable to store data */
 	assert( Class_IsSuper( self->feMesh->topo, IGraph ) );
 	tmpName = Stg_Object_AppendSuffix( self, "DataVariable" );
-	self->dataVariable = Variable_NewVector( 	
+	self->dataVariable = Variable_NewVector(
 			tmpName,
 			Variable_DataType_Double, 
 			self->fieldComponentCount,
@@ -250,14 +251,14 @@ void _StressField_Build( void* stressField, void* data ) {
 	Stg_Component_Build( self->dataVariable, data, False); Variable_Update( self->dataVariable );
 	for( variable_I = 0; variable_I < self->fieldComponentCount ; variable_I++ ) {
 		Stg_Component_Build( self->dataVariableList[ variable_I ], data, False); Variable_Update( self->dataVariableList[ variable_I ] );
-	}	
+	}
 
 	_ParticleFeVariable_Build( self, data );
 	/* Update again, just in case things were changed/reallocated when ICs loaded */
 	Variable_Update( self->dataVariable );
 	for( variable_I = 0; variable_I < self->fieldComponentCount ; variable_I++ ) {
 		Variable_Update( self->dataVariableList[ variable_I ] );
-	}	
+	}
 
 
 }
@@ -265,6 +266,8 @@ void _StressField_Build( void* stressField, void* data ) {
 void _StressField_Initialise( void* stressField, void* data ) {
 	StressField* self = (StressField*) stressField;
 	Variable_Index variable_I;
+
+	Stg_Component_Initialise( self->strainRateField, data, False );
 	
 	/* Initialise and Update all Variables that this component has created */
 	Stg_Component_Initialise( self->dataVariable, data, False); Variable_Update( self->dataVariable );

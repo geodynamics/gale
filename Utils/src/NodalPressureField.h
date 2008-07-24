@@ -1,67 +1,63 @@
-/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 **
 ** Monash Cluster Computing, Australia
 ** (C) 2003-2004 All Rights Reserved
 **
 ** Primary Authors:
-** Robert Turnbull, MCC
+** Luke Hodkinson
 **
-**~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+**~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Underworld_MaterialPoints_NodalPressureField_h__
-#define __Underworld_MaterialPoints_NodalPressureField_h__
-	
-	/** Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
-	extern const Type NodalPressureField_Type;
+#ifndef __Underworld_Utils_NodalPressureField_h__
+#define __Underworld_Utils_NodalPressureField_h__
 
-	/** NodalPressureField class contents - this is defined as a macro so that sub-classes of this class can use this macro at the start of the definition of their struct */
-	#define __NodalPressureField \
-		/* Macro defining parent goes here - This means you can cast this class as its parent */ \
-		__ParticleFeVariable \
-		\
-		/* Virtual functions go here */ \
-		\
-		/* Passed in parameters */ \
-		Variable_Register*				  variable_Register;	\
-                FeVariable*                                     pressureField;
-		
-	struct NodalPressureField { __NodalPressureField };
-	
-	/* --- Contstructors / Destructors --- */
-	NodalPressureField* _NodalPressureField_New(
- 		SizeT                                             _sizeOfSelf,
-		Type                                              type,
-		Stg_Class_DeleteFunction*                         _delete,
-		Stg_Class_PrintFunction*                          _print,
-		Stg_Class_CopyFunction*                           _copy, 
-		Stg_Component_DefaultConstructorFunction*         _defaultConstructor,
-		Stg_Component_ConstructFunction*                  _construct,
-		Stg_Component_BuildFunction*                      _build,
-		Stg_Component_InitialiseFunction*                 _initialise,
-		Stg_Component_ExecuteFunction*                    _execute,
-		Stg_Component_DestroyFunction*                    _destroy,
-		FieldVariable_InterpolateValueAtFunction*         _interpolateValueAt,
-		FieldVariable_GetValueFunction*	                  _getMinGlobalFeMagnitude,
-		FieldVariable_GetValueFunction*                   _getMaxGlobalFeMagnitude,
-		FieldVariable_GetCoordFunction*                   _getMinAndMaxLocalCoords,
-		FieldVariable_GetCoordFunction*                   _getMinAndMaxGlobalCoords,		
-		FeVariable_InterpolateWithinElementFunction*      _interpolateWithinElement,	
-		FeVariable_GetValueAtNodeFunction*                _getValueAtNode,
-		ParticleFeVariable_ValueAtParticleFunction*       _valueAtParticle,
-		Name                                              name );
-	
-	/** Print the contents of an NodalPressureField construct */
-	void* _NodalPressureField_DefaultNew( Name name );
-	void _NodalPressureField_Delete( void* variable );
-	void _NodalPressureField_Print( void* variable, Stream* stream );
-	void* _NodalPressureField_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+/*
+** Class definition.
+*/
 
-	void _NodalPressureField_Construct( void* variable, Stg_ComponentFactory* cf, void* data ) ;
-	void _NodalPressureField_Build( void* variable, void* data ) ;
-	void _NodalPressureField_Initialise( void* variable, void* data ) ;
-	void _NodalPressureField_Execute( void* variable, void* data ) ;
-	void _NodalPressureField_Destroy( void* variable, void* data ) ;
-	void _NodalPressureField_ValueAtParticle( void* stressField, IntegrationPointsSwarm* swarm, Element_LocalIndex lElement_I, void* particle, double* stress ) ;
-	
+extern const Type NodalPressureField_Type;
 
-#endif 
+#define __NodalPressureField			\
+   __ParticleFeVariable				\
+						\
+   /* Virtual functions. */			\
+						\
+   /* Members. */				\
+   Variable_Register* variable_Register;	\
+   FeVariable* pressureField;
+
+struct NodalPressureField { __NodalPressureField };
+
+#define NODALPRESSUREFIELD_ARGS			\
+   PARTICLEFEVARIABLE_ARGS
+
+#define NODALPRESSUREFIELD_PASSARGS		\
+   PARTICLEFEVARIABLE_PASSARGS
+
+/*
+** Constructors/Destructors.
+*/
+
+NodalPressureField* _NodalPressureField_New( NODALPRESSUREFIELD_ARGS );
+void _NodalPressureField_Init( NodalPressureField* self,
+			       Variable_Register* variable_Register );
+void* _NodalPressureField_DefaultNew( Name name );
+void _NodalPressureField_Delete( void* _self );
+
+/*
+** Methods.
+*/
+
+void _NodalPressureField_Print( void* _self, Stream* stream );
+void* _NodalPressureField_Copy( void* _self, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+
+void _NodalPressureField_Construct( void* _self, Stg_ComponentFactory* cf, void* data ) ;
+void _NodalPressureField_Build( void* _self, void* data ) ;
+void _NodalPressureField_Initialise( void* _self, void* data ) ;
+void _NodalPressureField_Execute( void* _self, void* data ) ;
+void _NodalPressureField_Destroy( void* _self, void* data ) ;
+void _NodalPressureField_ValueAtParticle( void* _self, IntegrationPointsSwarm* swarm,
+					  Element_LocalIndex lElement_I, void* particle,
+					  double* pressure ) ;
+
+#endif

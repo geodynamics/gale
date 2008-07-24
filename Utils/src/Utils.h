@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: Utils.h 763 2008-07-22 04:20:07Z LukeHodkinson $
+** $Id: Utils.h 765 2008-07-24 05:40:02Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -50,6 +50,7 @@
 	#include "Context.h"
 	#include "StressField.h"
 	#include "NodalPressureField.h"
+	#include "SmoothVelGradField.h"
 	#include "ViscosityField.h"
 	#include "DensityField.h"
 	#include "PressureTemperatureOutput.h"
