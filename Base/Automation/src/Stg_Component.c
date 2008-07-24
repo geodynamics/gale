@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Stg_Component.c 4219 2008-02-12 01:18:35Z DavidMay $
+** $Id: Stg_Component.c 4288 2008-07-24 05:32:42Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -295,8 +295,8 @@ void Stg_Component_Initialise( void* component, void* data, Bool force ) {
 			Stg_CallGraph_Push( stgCallGraph, self->_initialise, self->initialiseType );
 		#endif
 		
-		self->_initialise( self, data );
 		self->isInitialised = True;
+		self->_initialise( self, data );
 		
 		
 		#ifdef USE_PROFILE
