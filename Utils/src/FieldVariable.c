@@ -220,8 +220,11 @@ void _FieldVariable_Init(
 	self->communicator                = communicator;
 	self->fieldVariable_Register      = fV_Register;
 	self->isCheckpointedAndReloaded   = isCheckpointedAndReloaded;
-	if (self != NULL && fV_Register != NULL)	
-		FieldVariable_Register_Add( fV_Register, self );
+	if (self != NULL && fV_Register != NULL) {	
+	   /* Prevent the same field from being added more than once */
+	   if( NamedObject_Register_GetIndex( fV_Register, self->name ) == -1 )
+	      FieldVariable_Register_Add( fV_Register, self );
+	}	
 
 	self->extensionMgr = ExtensionManager_New_OfExistingObject( self->name, self );
 }
