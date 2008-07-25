@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeEquationNumber.c 1112 2008-04-23 06:10:17Z LukeHodkinson $
+** $Id: FeEquationNumber.c 1191 2008-07-25 03:06:19Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -1862,14 +1862,14 @@ void FeEquationNumber_BuildLocationMatrix( void* feEquationNumber ) {
 
    assert( self );
 
-   inc = IArray_New();
-
    /* Don't build if already done. */
    if( self->locationMatrixBuilt ) {
       Journal_DPrintf( self->debugLM, "In %s: LM already built, so just returning.\n",  __func__ );
       Stream_UnIndentBranch( StgFEM_Debug );
       return;
    }
+
+   inc = IArray_New();
 
    /* Shortcuts. */
    feMesh = self->feMesh;
