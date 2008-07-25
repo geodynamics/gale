@@ -111,7 +111,7 @@ MohrCoulomb* _MohrCoulomb_New(
 void _MohrCoulomb_Init(
 		MohrCoulomb*                        self,
 		FeVariable*                                        pressureField,
-		FeVariable*                                        velocityGradientsField,
+		FeVariable*                                        strainRateField,
 		MaterialPointsSwarm*                               materialPointsSwarm,
 		double                                             cohesion,
 		double                                             cohesionAfterSoftening,
@@ -121,7 +121,7 @@ void _MohrCoulomb_Init(
 {
 	self->materialPointsSwarm     = materialPointsSwarm;
 	self->pressureField           = pressureField;
-	self->velocityGradientsField  = velocityGradientsField;
+	self->strainRateField  = strainRateField;
 	
 	self->cohesion = cohesion;
 	self->frictionCoefficient = frictionCoefficient;
@@ -162,7 +162,7 @@ void _MohrCoulomb_Construct( void* rheology, Stg_ComponentFactory* cf,
 	MohrCoulomb*   self           = (MohrCoulomb*)rheology;
 	FeVariable*                   pressureField;
 	MaterialPointsSwarm*          materialPointsSwarm;
-	FeVariable*                   velocityGradientsField;
+	FeVariable*                   strainRateField;
 	
 	/* Construct Parent */
 	_YieldRheology_Construct( self, cf, data );
@@ -178,14 +178,14 @@ void _MohrCoulomb_Construct( void* rheology, Stg_ComponentFactory* cf,
 			"MaterialPointsSwarm", MaterialPointsSwarm, True, data );
 	pressureField          = Stg_ComponentFactory_ConstructByKey( cf, self->name,
 			"PressureField", FeVariable, True, data );
-	velocityGradientsField = Stg_ComponentFactory_ConstructByKey( cf, self->name,
-			"VelocityGradientsField", FeVariable, True, data );
+	strainRateField = Stg_ComponentFactory_ConstructByKey( cf, self->name,
+			"StrainRateField", FeVariable, True, data );
 	self->minVisc = Stg_ComponentFactory_GetDouble( cf, self->name, "minimumViscosity", 0.0 );
 	
 	_MohrCoulomb_Init( 
 			self,
 			pressureField,
-			velocityGradientsField,
+			strainRateField,
 			materialPointsSwarm, 
 			Stg_ComponentFactory_GetDouble( cf, self->name, "cohesion", 0.0 ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "cohesionAfterSoftening", 0.0 ),
@@ -390,7 +390,6 @@ void _MohrCoulomb_StoreCurrentParameters(
 		Coord                                              xi ) 
 {
 	MohrCoulomb*          self               = (MohrCoulomb*) rheology;
-	SymmetricTensor                      strainRate;
 	Dimension_Index                      dim                = constitutiveMatrix->dim;
         Eigenvector                          evectors[3];
         double e0, e1, e2;
@@ -398,21 +397,19 @@ void _MohrCoulomb_StoreCurrentParameters(
         int i;
 	
 	FeVariable_InterpolateWithinElement( self->pressureField, lElement_I, xi, &self->currentPressure );	
-	FeVariable_InterpolateWithinElement( self->velocityGradientsField, lElement_I, xi, self->currentVelocityGradient );
-	
-	TensorArray_GetSymmetricPart( self->currentVelocityGradient, dim, strainRate );
+	FeVariable_InterpolateWithinElement( self->strainRateField, lElement_I, xi, self->currentStrainRate );
 
-        SymmetricTensor_GetTrace(strainRate, dim, &trace);
+        SymmetricTensor_GetTrace(self->currentStrainRate, dim, &trace);
 
         /* Subtract the trace (which should be zero anyway).  We can
            use TensorMapST3D even for 2D, because it is the same for
            the xx and yy components */
         for(i=0;i<dim;++i)
-          strainRate[TensorMapST3D[i][i]]-=trace/dim;
+          self->currentStrainRate[TensorMapST3D[i][i]]-=trace/dim;
 
-	ConstitutiveMatrix_CalculateStress( constitutiveMatrix, strainRate, self->currentStress );
+	ConstitutiveMatrix_CalculateStress( constitutiveMatrix, self->currentStrainRate, self->currentStress );
 	
 	SymmetricTensor_CalcAllEigenvectors( self->currentStress, dim, self->currentEigenvectorList );
 
-        SymmetricTensor_CalcAllEigenvectors( strainRate, dim, evectors);
+        SymmetricTensor_CalcAllEigenvectors( self->currentStrainRate, dim, evectors);
 }

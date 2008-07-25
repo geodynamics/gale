@@ -59,7 +59,7 @@
 		/* Param passed in */ \
 		MaterialPointsSwarm*                                materialPointsSwarm;                                 \
 		FeVariable*                                         pressureField;                         \
-		FeVariable*                                         velocityGradientsField;                \
+		FeVariable*                                         strainRateField;\
 		/* Director component is used to update the normal */\
 		Director*                                           director;                              \
 		double                                              cohesion;                              \
@@ -69,11 +69,10 @@
 		double                                              minimumYieldStress;                    \
 		/* Stored values that are calculated once for each particle */ \
 		Eigenvector                                         currentEigenvectorList[3];             \
-		TensorArray                                         currentVelocityGradient;               \
+		SymmetricTensor                                     currentStrainRate; \
 		SymmetricTensor                                     currentStress;                         \
 		double                                              currentPressure;                       \
 		double                                              strainRateSecondInvariant;                   \
-		FeVariable*                                         strainRateField;                      \
 		double                                              minVisc;
 
 	
