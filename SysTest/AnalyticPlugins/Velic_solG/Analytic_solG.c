@@ -96,7 +96,7 @@ void _Velic_solG_Construct( void* analyticSolution, Stg_ComponentFactory* cf, vo
 	FeVariable*              pressureField;
 	FeVariable*              stressField;
 	FeVariable*              strainRateField;
-	FeVariable*              recoverdStrainRateField;
+	FeVariable*              recoveredStrainRateField;
 	FeVariable*              recoveredStressField;
         double                   sigma, etaA, etaB, dx, x0, zc, startX, endX;
 
@@ -119,9 +119,9 @@ void _Velic_solG_Construct( void* analyticSolution, Stg_ComponentFactory* cf, vo
 		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, strainRateField, Velic_solG_StrainRateFunction );
 	}
 
-	recoverdStrainRateField = Stg_ComponentFactory_ConstructByName( cf, "recoveredStrainRate", FeVariable, False, data );
-	if ( recoverdStrainRateField )
-		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, recoverdStrainRateField, Velic_solG_StrainRateFunction );
+	recoveredStrainRateField = Stg_ComponentFactory_ConstructByName( cf, "recoveredStrainRateField", FeVariable, False, data );
+	if ( recoveredStrainRateField )
+		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, recoveredStrainRateField, Velic_solG_StrainRateFunction );
 
 	recoveredStressField = Stg_ComponentFactory_ConstructByName( cf, "recoveredStressField", FeVariable, False, data );
 	if ( recoveredStressField )

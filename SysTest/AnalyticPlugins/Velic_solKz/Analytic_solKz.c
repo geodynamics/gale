@@ -104,7 +104,7 @@ void _Velic_solKz_Construct( void* analyticSolution, Stg_ComponentFactory* cf, v
 	FeVariable*              stressField;
 	FeVariable*              viscosityField;
 	FeVariable*              strainRateField;
-	FeVariable*              recoverdStrainRateField;
+	FeVariable*              recoveredStrainRateField;
 	FeVariable*              recoveredStressField;
 	double                   sigma, km, B, twiceB;
 	int                      n;
@@ -131,9 +131,9 @@ void _Velic_solKz_Construct( void* analyticSolution, Stg_ComponentFactory* cf, v
 	if ( strainRateField  )
 		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, strainRateField, Velic_solKz_StrainRateFunction );
 
-	recoverdStrainRateField = Stg_ComponentFactory_ConstructByName( cf, "recoveredStrainRateField", FeVariable, False, data );
-	if ( recoverdStrainRateField )
-		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, recoverdStrainRateField, Velic_solKz_StrainRateFunction );
+	recoveredStrainRateField = Stg_ComponentFactory_ConstructByName( cf, "recoveredStrainRateField", FeVariable, False, data );
+	if ( recoveredStrainRateField )
+		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, recoveredStrainRateField, Velic_solKz_StrainRateFunction );
 
 	recoveredStressField = Stg_ComponentFactory_ConstructByName( cf, "recoveredStressField", FeVariable, False, data );
 	if ( recoveredStressField )
