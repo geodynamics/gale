@@ -25,11 +25,11 @@
 		<param name="Default">10.0</param>
 		<param name="Description">Sets a limit on the percentage increase in Dt per timestep (requires limitTimeStepIncreaseRate to be True)</param>
 	</struct>
-	<struct>
-		<param name="Name">checkpointMesh</param>
+   <struct>
+		<param name="Name">saveCoordsWithFields</param>
 		<param name="Type">Bool</param>
-		<param name="Default">True</param>
-		<param name="Description">Defines whether mesh checkpointing files should be produced</param>
+		<param name="Default">False</param>
+		<param name="Description">Determines whether coordinates are output with field values in checkpoint files</param>
 	</struct>
 </list>
 

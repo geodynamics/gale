@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeVariable.c 1186 2008-07-17 07:57:52Z DavidLee $
+** $Id: FeVariable.c 1192 2008-07-28 01:11:17Z BelindaMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -738,7 +738,9 @@ void _FeVariable_Initialise( void* variable, void* data ) {
 	 * Want to allow option of disabling this feature, if you're manually setting up a FeVariable without a context etc. */
 	if ( context && self->isReferenceSolution ) {
 		Journal_DPrintf( self->debug, "Reference FeVariable -> loading nodal values from file.\n" );
+		
 		FeVariable_ReadFromFile( self, inputPathString, context->restartTimestep );
+		
 		Memory_Free( inputPathString );
 		Stream_UnIndentBranch( StgFEM_Debug );
 		return;
@@ -758,7 +760,7 @@ void _FeVariable_Initialise( void* variable, void* data ) {
 			Journal_DPrintf( self->debug, "restart from checkpoint mode -> loading checkpointed "
 				"nodal values as initial conditions, ignoring ics specified via XML/constructor\n" );
 
-			FeVariable_ReadFromFile( self, inputPathString, context->restartTimestep );
+         FeVariable_ReadFromFile( self, inputPathString, context->restartTimestep );
 			/* TODO: maybe we want a mechanism in future to over-ride the checkpointed ICs in certain regions too
 			so the user can introduce new phenomena into the model */
 
@@ -2100,7 +2102,7 @@ void* FeVariable_ImportExportInfo_Copy(
 }		
 
 
-void FeVariable_SaveToFile( void* feVariable, const char* prefixStr, unsigned int timeStep ) {
+void FeVariable_SaveToFile( void* feVariable, const char* prefixStr, unsigned int timeStep, Bool saveCoords ) {
 	FeVariable*                       self = (FeVariable*)feVariable;
 	FeVariable_ImportExportInfo*      importExportInfo;
 	/* put in an extra loop here that first checks if the feVariable should be
@@ -2110,13 +2112,13 @@ void FeVariable_SaveToFile( void* feVariable, const char* prefixStr, unsigned in
 		importExportInfo = Stg_ObjectList_Get( FeVariable_FileFormatImportExportList, 
 								self->exportFormatType );
 		assert( importExportInfo );
-		importExportInfo->saveNodalValuesToFile( feVariable, prefixStr, timeStep );
+		importExportInfo->saveNodalValuesToFile( feVariable, prefixStr, timeStep, saveCoords );
 	}
 		
 }
 
 
-void FeVariable_SaveNodalValuesToFile_StgFEM_Native( void* feVariable, const char* prefixStr, unsigned int timeStep ) {
+void FeVariable_SaveNodalValuesToFile_StgFEM_Native( void* feVariable, const char* prefixStr, unsigned int timeStep, Bool saveCoords ) {
 	FeVariable*       self = (FeVariable*)feVariable;
 	char*             filename;
 	Node_LocalIndex   lNode_I = 0;
@@ -2129,13 +2131,13 @@ void FeVariable_SaveNodalValuesToFile_StgFEM_Native( void* feVariable, const cha
 	int               myRank;
 	int               nProcs;
 	MPI_Status        status;
-
+   Stream*           errorStr = Journal_Register( Error_Type, self->type );
+   
 #ifdef HAVE_HDF5
    hid_t             file, fileSpace, fileData, props;
    hid_t             memSpace;
    hsize_t           start[2], count[2], size[2];
-   double*           buf;              
-   int               totalNodes;
+   double*           buf;      
 #else
    FILE*             outputFile;
    const int         FINISHED_WRITING_TAG = 100;
@@ -2150,8 +2152,9 @@ void FeVariable_SaveNodalValuesToFile_StgFEM_Native( void* feVariable, const cha
 	
 	/* Note: assumes same number of dofs at each node */
 	dofAtEachNodeCount = self->fieldComponentCount;
-
+	
 #ifdef HAVE_HDF5
+   /* Get filename */
 	sprintf( filename, "%s%s.%.5u.h5", prefixStr, self->name, timeStep );
 	
 	/* Create parallel file property list. */
@@ -2160,13 +2163,23 @@ void FeVariable_SaveNodalValuesToFile_StgFEM_Native( void* feVariable, const cha
 
    /* Open the HDF5 output file. */
    file = H5Fcreate( filename, H5F_ACC_TRUNC, H5P_DEFAULT, props );
-   assert( file );
+   Journal_Firewall( 
+		file >= 0, 
+	   errorStr,
+		"Error in %s for %s '%s' - Cannot create file %s.\n", 
+		__func__, 
+		self->type, 
+		self->name, 
+		filename );
+		
    H5Pclose( props );
-   
-   totalNodes = Mesh_GetGlobalSize( self->feMesh, 0 );
-   
-   size[0] = totalNodes;
+    
+   size[0] = Mesh_GetGlobalSize( self->feMesh, 0 );;
    size[1] = dofAtEachNodeCount + 1;
+   if( saveCoords )
+	   size[1] += self->dim;
+	
+	/* Create filespace */   
    fileSpace = H5Screate_simple( 2, size, NULL );         
    #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
    fileData = H5Dcreate( file, "/data", H5T_NATIVE_DOUBLE, fileSpace, H5P_DEFAULT );
@@ -2178,12 +2191,15 @@ void FeVariable_SaveNodalValuesToFile_StgFEM_Native( void* feVariable, const cha
    start[1] = 0;
 	count[0] = 1;
 	count[1] = dofAtEachNodeCount + 1;
+	if( saveCoords )
+	   count[1] += self->dim;
+	   
    memSpace = H5Screate_simple( 2, count, NULL );
    
    props = H5Pcreate( H5P_DATASET_XFER );
    H5Pset_dxpl_mpio( props, H5FD_MPIO_INDEPENDENT );
     
-   buf = Memory_Alloc_Array( double, dofAtEachNodeCount + 1, "fileBuffer" );
+   buf = Memory_Alloc_Array( double, count[1], "fileBuffer" );
    
    for ( lNode_I = 0; lNode_I < FeMesh_GetNodeLocalSize( self->feMesh ); lNode_I++ ) {
 		gNode_I = FeMesh_NodeDomainToGlobal( self->feMesh, lNode_I );
@@ -2192,18 +2208,32 @@ void FeVariable_SaveNodalValuesToFile_StgFEM_Native( void* feVariable, const cha
 	   start[0] = gNode_I;        
 	   buf[0] = (double)gNode_I;
 	   
+	   /* If required, add coords to array */
+	   if( saveCoords ) {
+	      coord = Mesh_GetVertex( self->feMesh, lNode_I );
+	      buf[1] = coord[0];
+	      buf[2] = coord[1];
+	      if( self->dim == 3 )
+	         buf[3] = coord[2]; 
+	   }
+	   
+	   /* Add field value at current node to array */
       FeVariable_GetValueAtNode( self, lNode_I, variableValues );
 		for ( dof_I = 0; dof_I < dofAtEachNodeCount; dof_I++ ) {
-			buf[dof_I+1] = variableValues[dof_I];
+		   if( saveCoords )
+			   buf[dof_I + self->dim + 1] = variableValues[dof_I];
+			else
+			   buf[dof_I + 1] = variableValues[dof_I];   
 		}	
 		         
-      /* Dump our local data. */
+      /* Write the array to file */
       H5Sselect_hyperslab( fileSpace, H5S_SELECT_SET, start, NULL, count, NULL );
       H5Sselect_all( memSpace );
          
       H5Dwrite( fileData, H5T_NATIVE_DOUBLE, memSpace, fileSpace, props, buf );
 	}   
    
+   /* Close all handles */
    H5Pclose( props );
    H5Dclose( fileData );
    H5Sclose( memSpace );
@@ -2211,33 +2241,45 @@ void FeVariable_SaveNodalValuesToFile_StgFEM_Native( void* feVariable, const cha
    H5Fclose( file );
       
 #else
+   /* Get filename */
    sprintf( filename, "%s%s.%.5u.dat", prefixStr, self->name, timeStep );
-
+	   
 	/* wait for go-ahead from process ranked lower than me, to avoid competition writing to file */
 	if ( myRank != 0 ) {
 		MPI_Recv( &confirmation, 1, MPI_INT, myRank - 1, FINISHED_WRITING_TAG, comm, &status );
 	}	
 
+   /* Open the file */
 	if ( myRank == 0 ) {
 		outputFile = fopen( filename, "w" );
 	}
 	else {
 		outputFile = fopen( filename, "a" );
 	}	
-
+	
+	Journal_Firewall( 
+		outputFile != NULL, 
+		errorStr,
+		"Error in %s for %s '%s' - Cannot create file %s.\n", 
+		__func__, 
+		self->type, 
+		self->name, 
+		filename );
+		
 	for ( lNode_I = 0; lNode_I < FeMesh_GetNodeLocalSize( self->feMesh ); lNode_I++ ) {
 		gNode_I = FeMesh_NodeDomainToGlobal( self->feMesh, lNode_I );
 		fprintf( outputFile, "%u ", gNode_I );
-#if DEBUG
-		coord = Mesh_GetVertex( self->feMesh, lNode_I );
-                if(self->dim==2)
-                  fprintf( outputFile, "%.15g %.15g 0 ", coord[0],
-                           coord[1]);
-                else
-                  fprintf( outputFile, "%.15g %.15g %.15g ", coord[0],
-                           coord[1], coord[2] );
-#endif
-		            
+		
+		/* If required, write the node coords to file */		
+      if( saveCoords ) {
+		   coord = Mesh_GetVertex( self->feMesh, lNode_I );
+         if(self->dim == 2)
+            fprintf( outputFile, "%.15g %.15g 0 ", coord[0], coord[1]);
+         else
+            fprintf( outputFile, "%.15g %.15g %.15g ", coord[0], coord[1], coord[2] );
+      }
+		
+		/* Add field value at current node to the file */            
 		FeVariable_GetValueAtNode( self, lNode_I, variableValues );
 		for ( dof_I = 0; dof_I < dofAtEachNodeCount; dof_I++ ) {
 			fprintf( outputFile, "%.15g ", variableValues[dof_I] );
@@ -2245,12 +2287,14 @@ void FeVariable_SaveNodalValuesToFile_StgFEM_Native( void* feVariable, const cha
 		fprintf( outputFile, "\n" );
 	}
 	
+	/* Close the file */
 	fclose( outputFile );
 	
 	/* send go-ahead from process ranked lower than me, to avoid competition writing to file */
 	if ( myRank != nProcs - 1 ) {
 		MPI_Ssend( &confirmation, 1, MPI_INT, myRank + 1, FINISHED_WRITING_TAG, comm );
 	}	
+
 #endif
 	
 	Memory_Free( filename );
@@ -2289,21 +2333,28 @@ void FeVariable_ReadNodalValuesFromFile_StgFEM_Native( void* feVariable, const c
 	Dof_Index          dofAtEachNodeCount;
 	FILE*              inputFile;
 	double             variableVal;
-	char               lineString[MAX_LINE_LENGTH_DEFINE];
-	const unsigned int MAX_LINE_LENGTH = MAX_LINE_LENGTH_DEFINE;
 	Processor_Index    proc_I=0;
 	MPI_Comm	          comm = Comm_GetMPIComm( Mesh_GetCommTopology( self->feMesh, MT_VERTEX ) );
 	unsigned		       rank;
 	unsigned		       nRanks;
 	int                nDims;
+	Bool               savedCoords = False;
+	Stream*            errorStr = Journal_Register( Error_Type, self->type );
 	
 #ifdef HAVE_HDF5
    hid_t             file, fileSpace, fileData;
    int               totalNodes, ii;
    hid_t             props;
    hid_t             memSpace;
-   hsize_t           start[2], count[2], size[2];
-   double*           buf;             
+   hsize_t           start[2], count[2], size[2], maxSize[2];
+   double*           buf; 
+#else
+   unsigned          uTemp;  
+   double            temp[3];  
+   int               count = 0;     
+   char               lineString[MAX_LINE_LENGTH_DEFINE];
+	const unsigned int MAX_LINE_LENGTH = MAX_LINE_LENGTH_DEFINE;
+   int               offset, n;    
 #endif   	
 
 	MPI_Comm_rank( comm, (int*)&rank );
@@ -2319,6 +2370,15 @@ void FeVariable_ReadNodalValuesFromFile_StgFEM_Native( void* feVariable, const c
    /* Open the file and data set. */
 	file = H5Fopen( filename, H5F_ACC_RDONLY, H5P_DEFAULT );
 	
+	Journal_Firewall( 
+		file >= 0, 
+		errorStr,
+		"Error in %s for %s '%s' - Cannot open file %s.\n", 
+		__func__, 
+		self->type, 
+		self->name, 
+		filename );
+		
 	/* Prepare to read vertices from file */		
    #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
 	fileData = H5Dopen( file, "/data" );
@@ -2326,13 +2386,22 @@ void FeVariable_ReadNodalValuesFromFile_StgFEM_Native( void* feVariable, const c
 	fileData = H5Dopen( file, "/data", H5P_DEFAULT );
    #endif
 	fileSpace = H5Dget_space( fileData );
-      
+   
+   /* Get size of dataspace to determine if coords are in file */
+   H5Sget_simple_extent_dims( fileSpace, size, maxSize ); 
+   
+   if( maxSize[1] > dofAtEachNodeCount + 1 ) 
+      savedCoords = True;
+       
    start[1] = 0;
 	count[0] = 1;
 	count[1] = dofAtEachNodeCount + 1;
+	if( savedCoords )  
+	   count[1] += self->dim;
+	   
    memSpace = H5Screate_simple( 2, count, NULL );
    totalNodes = Mesh_GetGlobalSize( self->feMesh, 0 );
-   buf = Memory_Alloc_Array( double, dofAtEachNodeCount + 1, "fileBuffer" );
+   buf = Memory_Alloc_Array( double, count[1], "fileBuffer" );
          
    /* Read from HDF5 checkpint file */
    for( ii=0; ii<totalNodes; ii++ ) {   
@@ -2348,11 +2417,15 @@ void FeVariable_ReadNodalValuesFromFile_StgFEM_Native( void* feVariable, const c
 		   lNode_I < Mesh_GetLocalSize( self->feMesh, MT_VERTEX ) )
 		{
 		   for ( dof_I = 0; dof_I < dofAtEachNodeCount; dof_I++ ) {
-				variableVal = buf[dof_I+1];
+		      if( savedCoords )
+		         variableVal = buf[dof_I + self->dim + 1];
+		      else
+				   variableVal = buf[dof_I + 1];
 				DofLayout_SetValueDouble( self->dofLayout, lNode_I, dof_I, variableVal );
 			}  
 		}
 	}   
+   Memory_Free( buf );
    
 #else   
 	sprintf( filename, "%s%s.%.5u.dat", prefixStr, self->name, timeStep );
@@ -2367,7 +2440,6 @@ void FeVariable_ReadNodalValuesFromFile_StgFEM_Native( void* feVariable, const c
 			inputFile = fopen( filename, "r" );
 
 			if ( False == inputFile ) {
-				Stream*    errorStr = Journal_Register( Error_Type, self->type );
 				Journal_Firewall( 0, errorStr, "Error- in %s(), for feVariable \"%s\": Couldn't find checkpoint file with "
 					"prefix \"%s\", timestep %d - thus full filename \"%s\" - aborting.\n", __func__, self->name,
 					prefixStr, timeStep, filename );
@@ -2377,12 +2449,33 @@ void FeVariable_ReadNodalValuesFromFile_StgFEM_Native( void* feVariable, const c
 	
 		}
 	}
-
+   
+   /* Need to determine whether checkpoint file contains coordinates */
+   fgets( lineString, MAX_LINE_LENGTH, inputFile );
+   
+   sscanf( lineString, "%u%n ", &uTemp, &offset );
+   while( sscanf( lineString + offset, "%lf%n ", &temp[0], &n ) )
+   {
+      offset += n;
+      count ++;
+      if( offset >= strlen( lineString ) - 2 )
+         break;
+   }   
+ 
+   if( count > dofAtEachNodeCount + 1 ) 
+      savedCoords = True;
+    
+   rewind( inputFile );
+      
 	/* Need to re-set the geometry here, in case we're loading from a checkpoint that had compression/squashing BCs,
 		and hence ended up with a smaller mesh than the original */
 	nDims = Mesh_GetDimSize( self->feMesh );
 	while ( !feof(inputFile) ) {
 		fscanf( inputFile, "%u ", &gNode_I );
+		
+		if( savedCoords ) 
+		   fscanf( inputFile, "%lg %lg %lg ", &temp[0], &temp[1], &temp[2] );
+		   
 		if( FeMesh_NodeGlobalToDomain( self->feMesh, gNode_I, &lNode_I ) && 
 		    lNode_I < FeMesh_GetNodeLocalSize( self->feMesh ) )
 		{

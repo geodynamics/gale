@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Context.c 1154 2008-06-13 07:13:37Z BelindaMay $
+** $Id: Context.c 1192 2008-07-28 01:11:17Z BelindaMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -255,13 +255,11 @@ void _FiniteElementContext_Init( FiniteElementContext* self ) {
 		_FiniteElementContext_SaveSwarms,
 		FiniteElementContext_Type );
 
-	if( Dictionary_GetBool_WithDefault( self->dictionary, "checkpointMesh", True ) ) {
-		EntryPoint_Append(
-			Context_GetEntryPoint( self, AbstractContext_EP_Save ),
-			"saveMesh",
-			_FiniteElementContext_SaveMesh,
-			FiniteElementContext_Type );
-	}
+	EntryPoint_Append(
+		Context_GetEntryPoint( self, AbstractContext_EP_Save ),
+		"saveMesh",
+		_FiniteElementContext_SaveMesh,
+		FiniteElementContext_Type );
 }
 
 
@@ -499,7 +497,8 @@ void _FiniteElementContext_SaveFeVariables( void* context ) {
 			feVar = (FeVariable*)fieldVar;
 
 			if ( feVar->isCheckpointedAndReloaded ) {
-				FeVariable_SaveToFile( feVar, outputPathString, self->timeStep );
+			   FeVariable_SaveToFile( feVar, outputPathString, self->timeStep, 
+			               Dictionary_GetBool_WithDefault( self->dictionary, "saveCoordsWithFields", False ) );           
 			}
 		}
 	}

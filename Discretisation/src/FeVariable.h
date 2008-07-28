@@ -61,7 +61,7 @@
 	
 	/* Function prototypes for import / export */
 	typedef void (FeVariable_ReadNodalValuesFromFile_Function) (void* feVariable, const char* prefixStr, unsigned int timeStep );
-	typedef void (FeVariable_SaveNodalValuesToFile_Function) (void* feVariable, const char* prefixStr, unsigned int timeStep );
+	typedef void (FeVariable_SaveNodalValuesToFile_Function) (void* feVariable, const char* prefixStr, unsigned int timeStep, Bool saveCoords );
 
 	/** Struct containing info of how to read from / export to a certain file format */
 	/* We expect several of these guys to be registered in the Discretisation Init phase, and possibly by later
@@ -359,8 +359,8 @@
 	void FeVariable_PrintLocalDiscreteValues_2dBox( void* variable, Stream* stream );
 
 	/** Saves the current mesh coordinates, and value of each dof in the feVariable, to file */
-	void FeVariable_SaveToFile( void* feVariable, const char* prefixStr, unsigned int timeStep );
-	void FeVariable_SaveNodalValuesToFile_StgFEM_Native( void* feVariable, const char* prefixStr, unsigned int timeStep );
+	void FeVariable_SaveToFile( void* feVariable, const char* prefixStr, unsigned int timeStep, Bool saveCoords );
+	void FeVariable_SaveNodalValuesToFile_StgFEM_Native( void* feVariable, const char* prefixStr, unsigned int timeStep, Bool saveCoords );
 
 	/** Reads in everything to initialise a built FeVariable from a file */
 	void FeVariable_ReadFromFile( void* feVariable, const char* prefixStr, unsigned int timeStep );
