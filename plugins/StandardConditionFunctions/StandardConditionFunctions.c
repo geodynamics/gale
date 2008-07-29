@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StandardConditionFunctions.c 1188 2008-07-18 06:55:12Z DavidLee $
+** $Id: StandardConditionFunctions.c 1193 2008-07-29 04:07:40Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -117,6 +117,9 @@ void _StgFEM_StandardConditionFunctions_Construct( void* component, Stg_Componen
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_StepFunction, "StepFunction");
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_MovingStepFunction, "MovingStepFunction");
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpecRidge3D, "SpecRidge3D");
@@ -959,6 +962,53 @@ void StgFEM_StandardConditionFunctions_StepFunction( Node_LocalIndex node_lI, Va
 /*           { */
 /*             *result=value; */
 /*           } */
+}
+
+void StgFEM_StandardConditionFunctions_MovingStepFunction( int nodeInd, int varInd, void* _ctx, void* _result ) {
+   FiniteElementContext* ctx = (FiniteElementContext*)_ctx;
+   FeVariable* velField;
+   FeMesh* mesh;
+   Dictionary* dict = ctx->dictionary;
+   double* result = (double*)_result;
+   double* coord, offset, left, right;
+   double min[3], max[3], pos;
+   int dim;
+   char* movingWall;
+
+   /*
+   ** Get the velocity field. */
+   velField = (FeVariable*)FieldVariable_Register_GetByName(
+      ctx->fieldVariable_Register, "VelocityField" );
+
+   /*
+   ** Get the mesh and the coordinate of the node. */
+   mesh = velField->feMesh;
+   coord = Mesh_GetVertex( mesh, nodeInd );
+
+   /*
+   ** Extract all the parameters we need from the dictionary. */
+   offset = Dictionary_GetDouble_WithDefault( dict, "MovingStepFunctionOffset", 0.0 );
+   dim = Dictionary_GetUnsignedInt_WithDefault( dict, "MovingStepFunctionDim", 0 );
+   left = Dictionary_GetDouble_WithDefault( dict, "MovingStepFunctionLeftSide", 0.0 );
+   right = Dictionary_GetDouble_WithDefault( dict, "MovingStepFunctionRightSide", 0.0 );
+   movingWall = Dictionary_GetString_WithDefault( dict, "MovingStepFunctionMovingWall", "lower" );
+
+   /*
+   ** Because we're dealing with a moving step function, we need to calculate
+   ** from where the offset should be applied. */
+   Mesh_GetGlobalCoordRange( mesh, min, max );
+   if( !strcmp( movingWall, "lower" ) )
+      offset += min[dim];
+   else
+      offset += max[dim];
+
+   /*
+   ** Apply the set of parameters to this node. */
+   pos = coord[dim];
+   if( pos < offset )
+      *result = left;
+   else
+      *result = right;
 }
 
 void StgFEM_StandardConditionFunctions_ConvectionBenchmark( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {

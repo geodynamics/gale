@@ -82,6 +82,7 @@ void StgFEM_StandardConditionFunctions_SinusoidalExtension( Node_LocalIndex node
 void StgFEM_StandardConditionFunctions_EdgeDriveConvectionIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result );
 void StgFEM_StandardConditionFunctions_ThermalEdgeDriveConvectionIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result );
 void StgFEM_StandardConditionFunctions_StepFunction( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
+void StgFEM_StandardConditionFunctions_MovingStepFunction( int nodeInd, int varInd, void* _ctx, void* _result );
 void StgFEM_StandardConditionFunctions_SpecRidge3D( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
 void StgFEM_StandardConditionFunctions_SpectralBCX( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
 void StgFEM_StandardConditionFunctions_SpectralBCY( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
