@@ -151,6 +151,9 @@ void _Underworld_EulerDeform_Construct( void* component, Stg_ComponentFactory* c
 			sys->staticSides = sys->staticTop || sys->staticBottom
                           || sys->staticRight || sys->staticLeft || sys->staticFront || sys->staticBack;
 
+			sys->contactRight = Dictionary_GetBool_WithDefault( sysDict, "contactRight", False );
+			sys->contactLeft = Dictionary_GetBool_WithDefault( sysDict, "contactLeft", False );
+
 			/* Read the list of variables to interpolate. */
 			varLst = Dictionary_Entry_Value_GetMember( Dictionary_Entry_Value_GetElement( sysLst, sys_i ), "fields" );
 			if( varLst ) {
@@ -176,6 +179,7 @@ void _Underworld_EulerDeform_Construct( void* component, Stg_ComponentFactory* c
 						FieldVariable, 
 						True, 
 						data ); 
+#if 0
 					varName = Dictionary_GetString( varDict, "variable" );
 					sys->vars[var_i] = Stg_ComponentFactory_ConstructByName( 
 						cf, 
@@ -183,6 +187,7 @@ void _Underworld_EulerDeform_Construct( void* component, Stg_ComponentFactory* c
 						Variable, 
 						True, 
 						data ); 
+#endif
 				}
 			}
 		}
@@ -516,6 +521,34 @@ void EulerDeform_Remesh( TimeIntegratee* crdAdvector, EulerDeform_Context* edCtx
 			FreeArray( sys->sideCoords );
 		}
 
+		/*
+		** If we have any contact sides, handle them now. */
+		if( sys->contactRight ) {
+		   int nDims;
+		   Grid* grid;
+		   int inds[3], flatInd;
+		   double height;
+		   int ii;
+
+		   nDims = Mesh_GetDimSize( sys->mesh );
+		   grid = *Mesh_GetExtension( sys->mesh, Grid**, "vertexGrid" );
+		   for( ii = 0; ii < nDims; ii++ )
+		      inds[ii] = grid->sizes[ii];
+		   inds[0]--;
+		   flatInd = Grid_Project( grid, inds );
+
+		   /* Get the height of the next left node. */
+		   height = Mesh_GetVertex( sys->mesh, flatInd )[1];
+
+		   /* Set for upper-right height. */
+		   inds[0]++;
+		   flatInd = Grid_Project( grid, inds );
+		   sys->mesh->verts[flatInd][1] = height;
+
+		   /* TODO: Should even out lower nodes here, but the regular
+		      remesher will take care of it for now. */
+		}
+
 		/* If we have regular mesh algorithms specified, set the algorithms temporarily to
 		   an irregular method. */
 		if( !strcmp( sys->mesh->algorithms->type, "Mesh_RegularAlgorithms" ) && sys->remesher ) {
@@ -556,7 +589,8 @@ void EulerDeform_Remesh( TimeIntegratee* crdAdvector, EulerDeform_Context* edCtx
 
 		/* Interpolate the variables. */
 		for( var_i = 0; var_i < sys->nFields; var_i++ )
-			EulerDeform_InterpVar( sys->fields[var_i], sys->vars[var_i], sys->mesh, newCrds );
+		   EulerDeform_InterpVar( sys->fields[var_i],
+					  NULL/*sys->vars[var_i]*/, sys->mesh, newCrds );
 
 		/* Swap back coordinates and free memory. */
 		sys->mesh->verts = newCrds;
@@ -580,10 +614,10 @@ void EulerDeform_InterpVar( FieldVariable* field, Variable* var, Mesh* mesh, dou
 	double*		newVals;
 	unsigned	curValInd = 0;
 	unsigned	nLocalNodes;
-	unsigned	n_i;
+	unsigned	n_i, c_i;
 
 	assert( field );
-	assert( var );
+	/*assert( var );*/
 	assert( newCrds );
 
 	/* Allocate for new values. */
@@ -603,6 +637,11 @@ void EulerDeform_InterpVar( FieldVariable* field, Variable* var, Mesh* mesh, dou
 	}
 
 	/* Transfer the new values back to the variable. */
+	for( n_i = 0; n_i < nLocalNodes; n_i++ ) {
+	   for( c_i = 0; c_i < field->fieldComponentCount; c_i++ )
+	      DofLayout_SetValueDouble( ((FeVariable*)field)->dofLayout, n_i, c_i, newVals[curValInd++] );
+	}
+#if 0
 	if( field->fieldComponentCount > 1 ) {
 		unsigned	c_i;
 
@@ -615,6 +654,7 @@ void EulerDeform_InterpVar( FieldVariable* field, Variable* var, Mesh* mesh, dou
 		for( n_i = 0; n_i < nLocalNodes; n_i++ )
 			Variable_SetValueDouble( var, n_i, newVals[curValInd++] );
 	}
+#endif
 
 	/* Free the values array. */
 	FreeArray( newVals );

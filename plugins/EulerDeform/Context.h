@@ -51,6 +51,9 @@
 		Bool		staticBack;
 		Bool		staticSides;
 		double**	sideCoords;
+
+		Bool contactRight;
+		Bool contactLeft;
 	};
 
 #endif
