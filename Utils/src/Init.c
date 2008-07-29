@@ -45,6 +45,7 @@ Bool StgDomainUtils_Init( int* argc, char** argv[] ) {
 	VariableCondition_Register_Add( variableCondition_Register, AllElementsVC_Type, AllElementsVC_Factory );
 	VariableCondition_Register_Add( variableCondition_Register, AllNodesVC_Type, AllNodesVC_Factory );
 	VariableCondition_Register_Add( variableCondition_Register, WallVC_Type, WallVC_Factory );
+	VariableCondition_Register_Add( variableCondition_Register, ContactVC_Type, ContactVC_Factory );
 	VariableCondition_Register_Add( variableCondition_Register, CornerVC_Type, CornerVC_Factory );
 	VariableCondition_Register_Add( variableCondition_Register, InnerWallVC_Type, InnerWallVC_Factory );
 	VariableCondition_Register_Add( variableCondition_Register, MeshShapeVC_Type, MeshShapeVC_Factory );
@@ -61,6 +62,8 @@ Bool StgDomainUtils_Init( int* argc, char** argv[] ) {
 				   "0", (void* (*)(Name))OperatorFieldVariable_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), WallVC_Type, 
 				   "0", (void* (*)(Name))WallVC_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), ContactVC_Type, 
+				   "0", (void* (*)(Name))ContactVC_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), CornerVC_Type, 
 				   "0", (void* (*)(Name))CornerVC_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), InnerWallVC_Type, 
@@ -92,6 +95,7 @@ Bool StgDomainUtils_Init( int* argc, char** argv[] ) {
 	RegisterParent( AllElementsVC_Type,            VariableCondition_Type );
 	RegisterParent( AllNodesVC_Type,               VariableCondition_Type );
 	RegisterParent( WallVC_Type,                   VariableCondition_Type );
+	RegisterParent( ContactVC_Type,                   WallVC_Type );
 	RegisterParent( CornerVC_Type,		       VariableCondition_Type );
 	RegisterParent( InnerWallVC_Type,	       VariableCondition_Type );
 	RegisterParent( MeshShapeVC_Type,                  VariableCondition_Type );

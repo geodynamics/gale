@@ -831,6 +831,95 @@ IndexSet* RegularMeshUtils_CreateLocalInGlobalBackSet( void* _mesh ) {
 	return set;
 }
 
+IndexSet* RegularMeshUtils_CreateContactBottomSet( void* _mesh, int depth ) {
+   Mesh* mesh = (Mesh*)_mesh;
+   Grid* grid;
+   int nNodes;
+   IndexSet* set;
+   int ijk[2], left, right, bottom, top;
+   int ii;
+
+   assert( mesh );
+   assert( Mesh_GetDimSize( mesh ) == 2 );
+   assert( depth > 0 );
+
+   grid = *Mesh_GetExtension( mesh, Grid**, "vertexGrid" );
+   nNodes = Mesh_GetDomainSize( mesh, 0 );
+   set = IndexSet_New( nNodes );
+
+   left = depth + 1;
+   right = grid->sizes[0] - (depth + 1) - 1;
+   bottom = 1;
+   top = depth;
+   for( ii = 0; ii < nNodes; ii++ ) {
+      Grid_Lift( grid, Mesh_DomainToGlobal( mesh, 0, ii ), ijk );
+      if( ijk[0] >= left && ijk[0] <= right && ijk[1] >= bottom && ijk[1] <= top )
+	 IndexSet_Add( set, ii );
+   }
+
+   return set;
+}
+
+IndexSet* RegularMeshUtils_CreateContactLeftSet( void* _mesh, int depth, Bool includeTop ) {
+   Mesh* mesh = (Mesh*)_mesh;
+   Grid* grid;
+   int nNodes;
+   IndexSet* set;
+   int ijk[2], left, right, bottom, top;
+   int ii;
+
+   assert( mesh );
+   assert( Mesh_GetDimSize( mesh ) == 2 );
+   assert( depth > 0 );
+
+   grid = *Mesh_GetExtension( mesh, Grid**, "vertexGrid" );
+   nNodes = Mesh_GetDomainSize( mesh, 0 );
+   set = IndexSet_New( nNodes );
+
+   left = 1;
+   right = depth;
+   bottom = depth + 1;
+   top = grid->sizes[1] - 2;
+   if( includeTop ) top++;
+   for( ii = 0; ii < nNodes; ii++ ) {
+      Grid_Lift( grid, Mesh_DomainToGlobal( mesh, 0, ii ), ijk );
+      if( ijk[0] >= left && ijk[0] <= right && ijk[1] >= bottom && ijk[1] <= top )
+	 IndexSet_Add( set, ii );
+   }
+
+   return set;
+}
+
+IndexSet* RegularMeshUtils_CreateContactRightSet( void* _mesh, int depth, Bool includeTop ) {
+   Mesh* mesh = (Mesh*)_mesh;
+   Grid* grid;
+   int nNodes;
+   IndexSet* set;
+   int ijk[2], left, right, bottom, top;
+   int ii;
+
+   assert( mesh );
+   assert( Mesh_GetDimSize( mesh ) == 2 );
+   assert( depth > 0 );
+
+   grid = *Mesh_GetExtension( mesh, Grid**, "vertexGrid" );
+   nNodes = Mesh_GetDomainSize( mesh, 0 );
+   set = IndexSet_New( nNodes );
+
+   left = grid->sizes[0] - depth - 1;
+   right = grid->sizes[0] - 2;
+   bottom = depth + 1;
+   top = grid->sizes[1] - 2;
+   if( includeTop ) top++;
+   for( ii = 0; ii < nNodes; ii++ ) {
+      Grid_Lift( grid, Mesh_DomainToGlobal( mesh, 0, ii ), ijk );
+      if( ijk[0] >= left && ijk[0] <= right && ijk[1] >= bottom && ijk[1] <= top )
+	 IndexSet_Add( set, ii );
+   }
+
+   return set;
+}
+
 Node_DomainIndex RegularMeshUtils_GetDiagOppositeAcrossElementNodeIndex( void* _mesh, 
 									 Element_DomainIndex refElement_dI, 
 									 Node_DomainIndex refNode_dI )

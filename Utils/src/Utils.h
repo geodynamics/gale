@@ -48,6 +48,7 @@
 	#include "AllElementsVC.h"
 	#include "AllNodesVC.h"
 	#include "WallVC.h"
+	#include "ContactVC.h"
 	#include "CornerVC.h"
 	#include "InnerWallVC.h"
 	#include "MeshShapeVC.h"

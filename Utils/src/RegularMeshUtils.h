@@ -137,6 +137,10 @@
 	/** Create a new set, based on node indices, of nodes on the back of the local regular mesh */
 	IndexSet* RegularMeshUtils_CreateLocalInGlobalBackSet( void* _mesh );
 
+IndexSet* RegularMeshUtils_CreateContactBottomSet( void* _mesh, int depth );
+IndexSet* RegularMeshUtils_CreateContactLeftSet( void* _mesh, int depth, Bool includeTop );
+IndexSet* RegularMeshUtils_CreateContactRightSet( void* _mesh, int depth, Bool includeTop );
+
 	Node_DomainIndex RegularMeshUtils_GetDiagOppositeAcrossElementNodeIndex( void* _mesh, 
 										 Element_DomainIndex refElement_dI, 
 										 Node_DomainIndex refNode_dI );

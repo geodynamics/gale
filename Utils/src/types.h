@@ -50,6 +50,7 @@ typedef struct RegularRemesherCmpt RegularRemesherCmpt;
 	typedef struct _AllElementsVC			AllElementsVC;
 	typedef struct _AllNodesVC			AllNodesVC;
 	typedef struct _WallVC				WallVC;
+	typedef struct _ContactVC ContactVC;
 	typedef struct _InnerWallVC			InnerWallVC;
 	typedef struct _CornerVC			CornerVC;
 	typedef struct MeshShapeVC				MeshShapeVC;
