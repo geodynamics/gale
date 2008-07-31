@@ -44,6 +44,7 @@ SRCS = \
 	AllElementsVC.c \
 	AllNodesVC.c \
 	CornerVC.c \
+	ContactVC.c \
 	DomainContext.c \
 	DofLayout.c \
 	FieldVariable.c \
@@ -75,6 +76,7 @@ HDRS = \
 	AllElementsVC.h \
 	AllNodesVC.h \
 	CornerVC.h \
+	ContactVC.h \
 	DomainContext.h \
 	DofLayout.h \
 	FieldVariable.h \
