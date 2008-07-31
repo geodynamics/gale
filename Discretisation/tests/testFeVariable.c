@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testFeVariable.c 964 2007-10-11 08:03:06Z SteveQuenette $
+** $Id: testFeVariable.c 1194 2008-07-31 05:53:08Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -218,7 +218,7 @@ TestBegin( Save ) {
    FeVariable_SyncShadowValues( feVar );
    TestTrue( feVar );
 
-   FeVariable_SaveToFile( feVar, "output/", 0 );
+   FeVariable_SaveToFile( feVar, "output/", 0, True );
    for( v_i = 0; v_i < Mesh_GetDomainSize( feVar->feMesh, 0 ); v_i++ )
       FeVariable_SetValueAtNode( feVar, v_i, zero );
    FeVariable_ReadFromFile( feVar, "output/", 0 );
