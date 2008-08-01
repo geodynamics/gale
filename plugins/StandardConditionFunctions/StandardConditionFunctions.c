@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StandardConditionFunctions.c 1193 2008-07-29 04:07:40Z LukeHodkinson $
+** $Id: StandardConditionFunctions.c 1195 2008-08-01 01:44:38Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -970,7 +970,7 @@ void StgFEM_StandardConditionFunctions_MovingStepFunction( int nodeInd, int varI
    FeMesh* mesh;
    Dictionary* dict = ctx->dictionary;
    double* result = (double*)_result;
-   double* coord, offset, left, right;
+   double* coord, offsetLower, offsetUpper, left, right;
    double min[3], max[3], pos;
    int dim;
    char* movingWall;
@@ -987,7 +987,8 @@ void StgFEM_StandardConditionFunctions_MovingStepFunction( int nodeInd, int varI
 
    /*
    ** Extract all the parameters we need from the dictionary. */
-   offset = Dictionary_GetDouble_WithDefault( dict, "MovingStepFunctionOffset", 0.0 );
+   offsetLower = Dictionary_GetDouble_WithDefault( dict, "MovingStepFunctionOffsetLower", 0.0 );
+   offsetUpper = Dictionary_GetDouble_WithDefault( dict, "MovingStepFunctionOffsetUpper", 0.0 );
    dim = Dictionary_GetUnsignedInt_WithDefault( dict, "MovingStepFunctionDim", 0 );
    left = Dictionary_GetDouble_WithDefault( dict, "MovingStepFunctionLeftSide", 0.0 );
    right = Dictionary_GetDouble_WithDefault( dict, "MovingStepFunctionRightSide", 0.0 );
@@ -997,18 +998,25 @@ void StgFEM_StandardConditionFunctions_MovingStepFunction( int nodeInd, int varI
    ** Because we're dealing with a moving step function, we need to calculate
    ** from where the offset should be applied. */
    Mesh_GetGlobalCoordRange( mesh, min, max );
-   if( !strcmp( movingWall, "lower" ) )
-      offset += min[dim];
-   else
-      offset += max[dim];
+   if( !strcmp( movingWall, "lower" ) ) {
+      offsetLower += min[dim];
+      offsetUpper += min[dim];
+   }
+   else {
+      offsetLower += max[dim];
+      offsetUpper += max[dim];
+   }
 
    /*
    ** Apply the set of parameters to this node. */
    pos = coord[dim];
-   if( pos < offset )
+   if( pos <= offsetLower )
       *result = left;
-   else
+   else if( pos >= offsetUpper )
       *result = right;
+   else {
+      *result = left + ((pos - offsetLower) / (offsetUpper - offsetLower)) * (right - left);
+   }
 }
 
 void StgFEM_StandardConditionFunctions_ConvectionBenchmark( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
