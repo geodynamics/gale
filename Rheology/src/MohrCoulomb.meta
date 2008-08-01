@@ -65,7 +65,7 @@
 	<struct>
 		<param name="Essential">True</param>
 		<param name="Type">FeVariable</param>
-		<param name="Fallback Key">VelocityGradientsFieldField</param>
+		<param name="Fallback Key">StrainRateFieldField</param>
 		<param name="Description">The resolved component of this tensor wrt the failure plane are mainly used to determine the most favourable oriented plane for failure to occur </param>
 	</struct>
 
