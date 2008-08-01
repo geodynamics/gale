@@ -45,25 +45,11 @@
       <param name="LinkedDofInfo">velocityLinkedDofs</param>
     </struct>
 
-    <!-- Smooth the velocity gradients. -->
-    <struct name="VelocityGradientsField">
-      <param name="Type">SmoothVelGradField</param>
-      <param name="Context">context</param>
-      <param name="Swarm">picIntegrationPoints</param>
-      <param name="Mesh">elementMesh</param>
-      <param name="VelocityField">VelocityField</param>
-    </struct>
-
     <!-- Standard Operators on velocity field -->
     <struct name="VelocityMagnitudeField">
       <param name="Type">OperatorFeVariable</param>
       <param name="Operator">Magnitude</param>
       <param name="FeVariable">VelocityField</param>
-    </struct>
-    <struct name="VelocityGradientsInvariantField">
-      <param name="Type">OperatorFeVariable</param>
-      <param name="Operator">TensorInvariant</param>
-      <param name="FeVariable">VelocityGradientsField</param>
     </struct>
 
     <struct name="VelocityXXField">
@@ -81,38 +67,6 @@
 	  <param name="Type">OperatorFeVariable</param>
 	  <param name="Operator">TakeThirdComponent</param>
 	  <param name="FeVariable">VelocityField</param>
-	</struct>
-	-->
-    <struct name="StrainRateField"> 
-      <param name="Type">OperatorFeVariable</param>
-      <param name="Operator">TensorSymmetricPart</param>
-      <param name="FeVariable">VelocityGradientsField</param>
-    </struct>
-    <struct name="VorticityField"> 
-      <param name="Type">OperatorFeVariable</param>
-      <param name="Operator">TensorAntisymmetricPart</param>
-      <param name="FeVariable">VelocityGradientsField</param>
-    </struct>
-    <struct name="StrainRateInvariantField"> 
-      <param name="Type">OperatorFeVariable</param>
-      <param name="Operator">SymmetricTensor_Invariant</param>
-      <param name="FeVariable">StrainRateField</param>
-    </struct>
-    <struct name="StrainRateXXField"> 
-      <param name="Type">OperatorFeVariable</param>
-      <param name="Operator">TakeFirstComponent</param>
-      <param name="FeVariable">StrainRateField</param>
-    </struct>
-    <struct name="StrainRateYYField"> 
-      <param name="Type">OperatorFeVariable</param>
-      <param name="Operator">TakeSecondComponent</param>
-      <param name="FeVariable">StrainRateField</param>
-    </struct>
-    <!--
-	<struct name="StrainRateZZField"> 
-	  <param name="Type">OperatorFeVariable</param>
-	  <param name="Operator">TakeThirdComponent</param>
-	  <param name="FeVariable">StrainRateField</param>
 	</struct>
 	-->
   </struct>
