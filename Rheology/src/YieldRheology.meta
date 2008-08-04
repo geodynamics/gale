@@ -25,12 +25,14 @@
 	<struct>
 		<param name="Essential">No</param>
 		<param name="Type">StrainWeakening</param>
+		<param name="Name">StrainWeakening</param>
 		<param name="Description">Define the weakening behaviour of material parameters</param>
 	</struct>
 
 	<struct>
 		<param name="Essential">No</param>
-		<param name="Type">IntegrationPointsSwarm</param>
+		<param name="Type">MaterialPointsSwarm</param>
+		<param name="Name">MaterialPointsSwarm</param>
 		<param name="Description">Define set of material points if it exists</param>
 	</struct>
 </list>

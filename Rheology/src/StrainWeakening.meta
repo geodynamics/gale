@@ -70,18 +70,9 @@
 		<param name="Default">0</param>
 		<param name="Description">This parameter is used to initialise the random function used to define the initial random strain</param>
 	</struct>
-
 </list>
 
 <list name="Dependencies">
-
-	<struct>
-		<param name="Essential">Yes</param>
-		<param name="Type">TimeIntegrator</param>
-		<param name="Description">This component is used to calculate postFailureWeakening variable (the actual accumulated strain)
-		by integration (the derivative being defined by postFailureWeakeningIncrement variable)</param>
-	</struct>
-								
 	<struct>
 		<param name="Essential">Yes</param>
 		<param name="Type">MaterialPointsSwarm</param>
@@ -91,6 +82,7 @@
 	<struct>
 		<param name="Essential">No</param>
 		<param name="Type">Stg_Shape</param>
+		<param name="Name">initialStrainShape</param>
 		<param name="Description">If defined, the initial random strain will be prescibed inside this shape only (the initial strain will be zero outside the shape).</param>
 	</struct>
 

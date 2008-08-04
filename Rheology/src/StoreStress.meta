@@ -29,8 +29,8 @@ tau_xx, tau_yy, tau_zz, tau_xy, tau_xz, tau_yz in 3D
 
 	<struct>
 		<param name="Essential">True</param>
-		<param name="Type">IntegrationPointsSwarm</param>
-		<param name="Fallback Key">IntegrationPointsSwarm</param>
+		<param name="Type">MaterialPointsSwarm</param>
+		<param name="Name">MaterialPointsSwarm</param>
 		<param name="Description">This is the swarm defining the material points</param>
 	</struct>
 
