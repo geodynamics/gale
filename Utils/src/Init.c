@@ -70,6 +70,8 @@ Bool StgDomainUtils_Init( int* argc, char** argv[] ) {
 				   "0", (void* (*)(Name))InnerWallVC_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), MeshShapeVC_Type, 
 				   "0", (void*  (*)(Name))_MeshShapeVC_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), MeshBoundaryShape_Type, 
+				   "0", (void*  (*)(Name))MeshBoundaryShape_New );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), 
 				   RegularRemesherCmpt_Type, 
 				   "0", (void* (*)(Name))_RegularRemesherCmpt_DefaultNew );
@@ -99,6 +101,7 @@ Bool StgDomainUtils_Init( int* argc, char** argv[] ) {
 	RegisterParent( CornerVC_Type,		       VariableCondition_Type );
 	RegisterParent( InnerWallVC_Type,	       VariableCondition_Type );
 	RegisterParent( MeshShapeVC_Type,                  VariableCondition_Type );
+	RegisterParent( MeshBoundaryShape_Type,        Stg_Shape_Type );
 	RegisterParent( DofLayout_Type,                Stg_Component_Type );
 	RegisterParent( RegularRemesherCmpt_Type,      Remesher_Type );
 /*

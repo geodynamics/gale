@@ -52,6 +52,7 @@
 	#include "CornerVC.h"
 	#include "InnerWallVC.h"
 	#include "MeshShapeVC.h"
+	#include "MeshBoundaryShape.h"
 	#include "DofLayout.h"
 	#include "Operator.h"
 	#include "FieldVariable_Register.h"

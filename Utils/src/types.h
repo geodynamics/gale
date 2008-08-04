@@ -54,6 +54,7 @@ typedef struct RegularRemesherCmpt RegularRemesherCmpt;
 	typedef struct _InnerWallVC			InnerWallVC;
 	typedef struct _CornerVC			CornerVC;
 	typedef struct MeshShapeVC				MeshShapeVC;
+	typedef struct MeshBoundaryShape MeshBoundaryShape;
 	typedef struct _DofLayout			DofLayout;
 	typedef struct _EmbeddedSurface			EmbeddedSurface;
 	typedef struct Operator      		Operator;
