@@ -35,10 +35,11 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StandardConditionFunctions.c 1195 2008-08-01 01:44:38Z LukeHodkinson $
+** $Id: StandardConditionFunctions.c 1196 2008-08-04 16:29:30Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+#include <string.h>
 #include <mpi.h>
 #include <StGermain/StGermain.h>
 #include <StgDomain/StgDomain.h>
@@ -971,9 +972,10 @@ void StgFEM_StandardConditionFunctions_MovingStepFunction( int nodeInd, int varI
    Dictionary* dict = ctx->dictionary;
    double* result = (double*)_result;
    double* coord, offsetLower, offsetUpper, left, right;
-   double min[3], max[3], pos;
-   int dim;
+   double *wallCrd, pos;
+   int dim, wallDepth, ijk[3];
    char* movingWall;
+   Grid* grid;
 
    /*
    ** Get the velocity field. */
@@ -993,18 +995,25 @@ void StgFEM_StandardConditionFunctions_MovingStepFunction( int nodeInd, int varI
    left = Dictionary_GetDouble_WithDefault( dict, "MovingStepFunctionLeftSide", 0.0 );
    right = Dictionary_GetDouble_WithDefault( dict, "MovingStepFunctionRightSide", 0.0 );
    movingWall = Dictionary_GetString_WithDefault( dict, "MovingStepFunctionMovingWall", "lower" );
+   wallDepth = Dictionary_GetInt_WithDefault( dict, "MovingStepFunctionWallDepth", 0 );
 
    /*
    ** Because we're dealing with a moving step function, we need to calculate
    ** from where the offset should be applied. */
-   Mesh_GetGlobalCoordRange( mesh, min, max );
+   grid = *(Grid**)Mesh_GetExtension( mesh, Grid**, "vertexGrid" );
+   assert( grid );
+   memset( ijk, 0, 3 * sizeof(int) );
    if( !strcmp( movingWall, "lower" ) ) {
-      offsetLower += min[dim];
-      offsetUpper += min[dim];
+      ijk[dim] = wallDepth;
+      wallCrd = Mesh_GetVertex( mesh, Grid_Project( grid, ijk ) );
+      offsetLower += wallCrd[dim];
+      offsetUpper += wallCrd[dim];
    }
    else {
-      offsetLower += max[dim];
-      offsetUpper += max[dim];
+      ijk[dim] = grid->sizes[dim] - wallDepth - 1;
+      wallCrd = Mesh_GetVertex( mesh, Grid_Project( grid, ijk ) );
+      offsetLower += wallCrd[dim];
+      offsetUpper += wallCrd[dim];
    }
 
    /*
