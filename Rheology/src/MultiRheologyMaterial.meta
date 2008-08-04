@@ -13,9 +13,9 @@
 <param name="Parent">RheologyMaterial</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">...</param>
+<param name="Description">This allows for multiple rheologies to be applied to a material. The resultant isotropic material will have a effective viscosity defined as $\frac{1}{n_{eff}} = \sum_{i=0}^n \frac{1}{n_{i}}$, where $n_i is the isotropic vicosities of the input rheologies. <br/><br/>
+The input rheologies must be defined in a rheology list, see example</param>
 
-<!--Now the interesting stuff-->
 
 
 <list name="Params">
@@ -23,28 +23,51 @@
 </list>
 
 <list name="Dependencies">
-<!-- This component calls in another directory so the info above/below may not be complete-->
-	<struct>
-		<param name="Essential">No</param>
-		<param name="Name">Compressible</param>
-		<param name="Type">Compressible</param>
-		<param name="Description">...</param>
-	</struct>
-
-<!-- PLEASE, check the above struct information is accurate, in line number 171 of the c file and then remove this comment afterwards -->
-
-	<struct>
-		<param name="Essential">True</param>
-		<param name="Name">rheologyName</param>
-		<param name="Type">Rheology</param>
-		<param name="Description">...</param>
-	</struct>
-
-<!-- PLEASE, check the above struct information is accurate, in line number 201 of the c file and then remove this comment afterwards -->
-
-
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">
+
+<![CDATA[
+		<struct name="temperatureDependence1">
+			<param name="Type">FrankKamenetskii</param>
+			<param name="TemperatureField">TemperatureField</param>
+			<param name="eta0">6.31e10</param>
+			<param name="theta">13.815510558</param>
+		</struct>
+		<struct name="temperatureDependence2">
+			<param name="Type">FrankKamenetskii</param>
+			<param name="TemperatureField">TemperatureField</param>
+			<param name="eta0">1.00e24</param>
+			<param name="theta">13.815510558</param>
+		</struct>		
+		<struct name="n1">
+			<param name="Type">NonNewtonian</param>
+			<param name="StrainRateInvariantField">StrainRateInvariantField</param>
+			<param name="stressExponent">1.8</param>
+		</struct>		
+		<struct name="n2">
+			<param name="Type">NonNewtonian</param>
+			<param name="StrainRateInvariantField">StrainRateInvariantField</param>
+			<param name="stressExponent">4.0</param>
+		</struct>			
+		<struct name="shape">
+			<param name="Type">Everywhere</param>
+		</struct>		
+		<struct name="material">
+			<param name="Type">MultiRheologyMaterial</param>
+			<param name="Shape">shape</param>
+			<list name="MultiRheologies">
+				<list>
+					<param>temperatureDependence1</param>
+					<param>n1</param>
+				</list>
+				<list>
+					<param>temperatureDependence2</param>
+					<param>n2</param>
+				</list>				
+			</list>
+		</struct>
+]]>
+</param>
 
 </StGermainData>

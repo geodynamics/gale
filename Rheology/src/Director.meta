@@ -83,3 +83,19 @@
 		<param name="Description">This is the swarm that you want to add the director to.</param>
 	</struct>	
 </list>
+
+<param name="Example">
+<![CDATA[
+	<struct name="director">
+		<param name="Type">Director</param>
+		<param name="TimeIntegrator">timeIntegrator</param>
+		<param name="VelocityGradientsField">VelocityGradientsField</param>
+		<param name="MaterialPointsSwarm">materialSwarm</param>
+		<param name="initialDirectionX">0.0</param>
+		<param name="initialDirectionY">1.0</param>
+		<param name="initialDirectionZ">0.0</param>
+		<param name="dontUpdate">True</param>
+	</struct>
+]]>
+</param>
+</StGermainData>
