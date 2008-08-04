@@ -53,172 +53,172 @@ const Name defaultContactVCName = "defaultContactVCName";
 */
 
 VariableCondition* ContactVC_Factory(
-	Variable_Register*				variable_Register, 
-	ConditionFunction_Register*			conFunc_Register, 
-	Dictionary*					dictionary,
-	void*						data )
+   Variable_Register*				variable_Register, 
+   ConditionFunction_Register*			conFunc_Register, 
+   Dictionary*					dictionary,
+   void*						data )
 {
-	return (VariableCondition*)ContactVC_New( defaultContactVCName, NULL, variable_Register, conFunc_Register, dictionary, (Mesh*)data );
+   return (VariableCondition*)ContactVC_New( defaultContactVCName, NULL, variable_Register, conFunc_Register, dictionary, (Mesh*)data );
 }
 
 
 ContactVC*	ContactVC_DefaultNew( Name name )
 {
-	return _ContactVC_New(
-		sizeof(ContactVC), 
-		ContactVC_Type, 
-		_ContactVC_Delete, 
-		_WallVC_Print, 
-		_WallVC_Copy,
-		(Stg_Component_DefaultConstructorFunction*)ContactVC_DefaultNew,
-		_ContactVC_Construct,	
-		_ContactVC_Build,
-		_VariableCondition_Initialise,
-		_VariableCondition_Execute,
-		_VariableCondition_Destroy,
-		name,
-		False,
-		_WallVC_BuildSelf, 
-		_WallVC_PrintConcise,
-		_ContactVC_ReadDictionary,
-		_ContactVC_GetSet, 
-		_WallVC_GetVariableCount, 
-		_WallVC_GetVariableIndex, 
-		_WallVC_GetValueIndex, 
-		_WallVC_GetValueCount, 
-		_WallVC_GetValue,
-		_VariableCondition_Apply, 
-		NULL,
-		NULL, 
-		NULL, 
-		NULL, 
-		NULL);
+   return _ContactVC_New(
+      sizeof(ContactVC), 
+      ContactVC_Type, 
+      _ContactVC_Delete, 
+      _WallVC_Print, 
+      _WallVC_Copy,
+      (Stg_Component_DefaultConstructorFunction*)ContactVC_DefaultNew,
+      _ContactVC_Construct,	
+      _ContactVC_Build,
+      _VariableCondition_Initialise,
+      _VariableCondition_Execute,
+      _VariableCondition_Destroy,
+      name,
+      False,
+      _WallVC_BuildSelf, 
+      _WallVC_PrintConcise,
+      _ContactVC_ReadDictionary,
+      _ContactVC_GetSet, 
+      _WallVC_GetVariableCount, 
+      _WallVC_GetVariableIndex, 
+      _WallVC_GetValueIndex, 
+      _WallVC_GetValueCount, 
+      _WallVC_GetValue,
+      _VariableCondition_Apply, 
+      NULL,
+      NULL, 
+      NULL, 
+      NULL, 
+      NULL);
 }
 
 ContactVC*	ContactVC_New(
-	Name						name,
-	Name						_dictionaryEntryName, 
-	Variable_Register*				variable_Register, 
-	ConditionFunction_Register*			conFunc_Register, 
-	Dictionary*					dictionary,
-	void*						_mesh )
+   Name						name,
+   Name						_dictionaryEntryName, 
+   Variable_Register*				variable_Register, 
+   ConditionFunction_Register*			conFunc_Register, 
+   Dictionary*					dictionary,
+   void*						_mesh )
 {
-	return _ContactVC_New(
-		sizeof(ContactVC), 
-		ContactVC_Type, 
-		_ContactVC_Delete, 
-		_WallVC_Print, 
-		_WallVC_Copy,
-		(Stg_Component_DefaultConstructorFunction*)ContactVC_DefaultNew,
-		_ContactVC_Construct,	
-		_ContactVC_Build,
-		_VariableCondition_Initialise,
-		_VariableCondition_Execute,
-		_VariableCondition_Destroy,
-		name,
-		True,
-		_WallVC_BuildSelf, 
-		_WallVC_PrintConcise,
-		_ContactVC_ReadDictionary,
-		_ContactVC_GetSet, 
-		_WallVC_GetVariableCount, 
-		_WallVC_GetVariableIndex, 
-		_WallVC_GetValueIndex, 
-		_WallVC_GetValueCount, 
-		_WallVC_GetValue,
-		_VariableCondition_Apply, 
-		_dictionaryEntryName,
-		variable_Register, 
-		conFunc_Register, 
-		dictionary, 
-		_mesh );
+   return _ContactVC_New(
+      sizeof(ContactVC), 
+      ContactVC_Type, 
+      _ContactVC_Delete, 
+      _WallVC_Print, 
+      _WallVC_Copy,
+      (Stg_Component_DefaultConstructorFunction*)ContactVC_DefaultNew,
+      _ContactVC_Construct,	
+      _ContactVC_Build,
+      _VariableCondition_Initialise,
+      _VariableCondition_Execute,
+      _VariableCondition_Destroy,
+      name,
+      True,
+      _WallVC_BuildSelf, 
+      _WallVC_PrintConcise,
+      _ContactVC_ReadDictionary,
+      _ContactVC_GetSet, 
+      _WallVC_GetVariableCount, 
+      _WallVC_GetVariableIndex, 
+      _WallVC_GetValueIndex, 
+      _WallVC_GetValueCount, 
+      _WallVC_GetValue,
+      _VariableCondition_Apply, 
+      _dictionaryEntryName,
+      variable_Register, 
+      conFunc_Register, 
+      dictionary, 
+      _mesh );
 }
 
 
 ContactVC* _ContactVC_New( 
-	SizeT						_sizeOfSelf, 
-	Type						type,
-	Stg_Class_DeleteFunction*				_delete,
-	Stg_Class_PrintFunction*				_print,
-	Stg_Class_CopyFunction*				_copy, 
-	Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-	Stg_Component_ConstructFunction*			_construct,
-	Stg_Component_BuildFunction*			_build,
-	Stg_Component_InitialiseFunction*			_initialise,
-	Stg_Component_ExecuteFunction*			_execute,
-	Stg_Component_DestroyFunction*			_destroy,
-	Name								name, 
-	Bool								initFlag,
-	VariableCondition_BuildSelfFunc*		_buildSelf, 
-	VariableCondition_PrintConciseFunc*		_printConcise,
-	VariableCondition_ReadDictionaryFunc*		_readDictionary,
-	VariableCondition_GetSetFunc*			_getSet,
-	VariableCondition_GetVariableCountFunc*		_getVariableCount,
-	VariableCondition_GetVariableIndexFunc*		_getVariableIndex,
-	VariableCondition_GetValueIndexFunc*		_getValueIndex,
-	VariableCondition_GetValueCountFunc*		_getValueCount,
-	VariableCondition_GetValueFunc*			_getValue,
-	VariableCondition_ApplyFunc*			_apply, 
-	Name						_dictionaryEntryName, 
-	Variable_Register*				variable_Register, 
-	ConditionFunction_Register*			conFunc_Register, 
-	Dictionary*					dictionary,
-	void*						_mesh)
+   SizeT						_sizeOfSelf, 
+   Type						type,
+   Stg_Class_DeleteFunction*				_delete,
+   Stg_Class_PrintFunction*				_print,
+   Stg_Class_CopyFunction*				_copy, 
+   Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
+   Stg_Component_ConstructFunction*			_construct,
+   Stg_Component_BuildFunction*			_build,
+   Stg_Component_InitialiseFunction*			_initialise,
+   Stg_Component_ExecuteFunction*			_execute,
+   Stg_Component_DestroyFunction*			_destroy,
+   Name								name, 
+   Bool								initFlag,
+   VariableCondition_BuildSelfFunc*		_buildSelf, 
+   VariableCondition_PrintConciseFunc*		_printConcise,
+   VariableCondition_ReadDictionaryFunc*		_readDictionary,
+   VariableCondition_GetSetFunc*			_getSet,
+   VariableCondition_GetVariableCountFunc*		_getVariableCount,
+   VariableCondition_GetVariableIndexFunc*		_getVariableIndex,
+   VariableCondition_GetValueIndexFunc*		_getValueIndex,
+   VariableCondition_GetValueCountFunc*		_getValueCount,
+   VariableCondition_GetValueFunc*			_getValue,
+   VariableCondition_ApplyFunc*			_apply, 
+   Name						_dictionaryEntryName, 
+   Variable_Register*				variable_Register, 
+   ConditionFunction_Register*			conFunc_Register, 
+   Dictionary*					dictionary,
+   void*						_mesh)
 {
-	ContactVC*	self;
+   ContactVC*	self;
 	
-	/* Allocate memory/General info */
-	assert(_sizeOfSelf >= sizeof(ContactVC));
-	self = (ContactVC*)_WallVC_New(
-		_sizeOfSelf, 
-		type, 
-		_delete, 
-		_print,
-		_copy,
-		_defaultConstructor,
-		_construct,	
-		_build,
-		_initialise,
-		_execute,
-		_destroy,
-		name,
-		initFlag,
-		_buildSelf, 
-		_printConcise,	
-		_readDictionary,
-		_getSet, 
-		_getVariableCount, 
-		_getVariableIndex, 
-		_getValueIndex, 
-		_getValueCount, 
-		_getValue, 
-		_apply, 
-		_dictionaryEntryName,
-		variable_Register, 
-		conFunc_Register,
-		dictionary,
-		_mesh );
+   /* Allocate memory/General info */
+   assert(_sizeOfSelf >= sizeof(ContactVC));
+   self = (ContactVC*)_WallVC_New(
+      _sizeOfSelf, 
+      type, 
+      _delete, 
+      _print,
+      _copy,
+      _defaultConstructor,
+      _construct,	
+      _build,
+      _initialise,
+      _execute,
+      _destroy,
+      name,
+      initFlag,
+      _buildSelf, 
+      _printConcise,	
+      _readDictionary,
+      _getSet, 
+      _getVariableCount, 
+      _getVariableIndex, 
+      _getValueIndex, 
+      _getValueCount, 
+      _getValue, 
+      _apply, 
+      _dictionaryEntryName,
+      variable_Register, 
+      conFunc_Register,
+      dictionary,
+      _mesh );
 	
-	/* Virtual info */
+   /* Virtual info */
 	
-	/* Stg_Class info */
-	if( initFlag ){
-		_ContactVC_Init( self, _dictionaryEntryName, _mesh );
-	}
+   /* Stg_Class info */
+   if( initFlag ){
+      _ContactVC_Init( self, _dictionaryEntryName, _mesh );
+   }
 	
-	return self;
+   return self;
 }
 
 
 void _ContactVC_Init(
-	void*						wallVC, 
-	Name						_dictionaryEntryName, 
-	void*						_mesh )
+   void*						wallVC, 
+   Name						_dictionaryEntryName, 
+   void*						_mesh )
 {
-	ContactVC*			self = (ContactVC*)wallVC;
+   ContactVC*			self = (ContactVC*)wallVC;
 
-	self->depth = 0;
-	self->includeTop = False;
+   self->depth = 0;
+   self->includeTop = False;
 }
 
 
@@ -227,46 +227,46 @@ void _ContactVC_Init(
 */
 
 void _ContactVC_ReadDictionary( void* variableCondition, void* dictionary ) {
-	ContactVC* self = (ContactVC*)variableCondition;
-	Dictionary_Entry_Value *vcDictVal, _vcDictVal, *entryVal;
+   ContactVC* self = (ContactVC*)variableCondition;
+   Dictionary_Entry_Value *vcDictVal, _vcDictVal, *entryVal;
 
-	_WallVC_ReadDictionary( variableCondition, dictionary );
+   _WallVC_ReadDictionary( variableCondition, dictionary );
 
-	/* Find dictionary entry */
-	if (self->_dictionaryEntryName)
-		vcDictVal = Dictionary_Get(dictionary, self->_dictionaryEntryName);
-	else
-	{
-		vcDictVal = &_vcDictVal;
-		Dictionary_Entry_Value_InitFromStruct(vcDictVal, dictionary);
-	}
+   /* Find dictionary entry */
+   if (self->_dictionaryEntryName)
+      vcDictVal = Dictionary_Get(dictionary, self->_dictionaryEntryName);
+   else
+   {
+      vcDictVal = &_vcDictVal;
+      Dictionary_Entry_Value_InitFromStruct(vcDictVal, dictionary);
+   }
 
-	if (vcDictVal) {
-	   self->depth = Dictionary_Entry_Value_AsInt(
-	      Dictionary_Entry_Value_GetMember( vcDictVal, "depth" ) );
-	   entryVal = Dictionary_Entry_Value_GetMember( vcDictVal, "includeTop" );
-	   if( entryVal )
-	      self->includeTop = Dictionary_Entry_Value_AsBool( entryVal );
-	}
-	else {
-	   self->depth = 0;
-	   self->includeTop = False;
-	}
+   if (vcDictVal) {
+      self->depth = Dictionary_Entry_Value_AsInt(
+         Dictionary_Entry_Value_GetMember( vcDictVal, "depth" ) );
+      entryVal = Dictionary_Entry_Value_GetMember( vcDictVal, "includeTop" );
+      if( entryVal )
+         self->includeTop = Dictionary_Entry_Value_AsBool( entryVal );
+   }
+   else {
+      self->depth = 0;
+      self->includeTop = False;
+   }
 }
 
 
 void _ContactVC_Delete(void* wallVC)
 {
-	ContactVC*	self = (ContactVC*)wallVC;
+   ContactVC*	self = (ContactVC*)wallVC;
 	
-	/* Stg_Class_Delete parent */
-	_WallVC_Delete(self);
+   /* Stg_Class_Delete parent */
+   _WallVC_Delete(self);
 }
 
 void _ContactVC_Build(  void* wallVC, void* data ) {
-	ContactVC*			self = (ContactVC*)wallVC;
+   ContactVC*			self = (ContactVC*)wallVC;
 	
-	_WallVC_Build( self, data );
+   _WallVC_Build( self, data );
 }
 	
 
@@ -285,100 +285,100 @@ void _ContactVC_Construct( void* wallVC, Stg_ComponentFactory* cf, void* data )
 }
 
 IndexSet* _ContactVC_GetSet(void* variableCondition) {
-	ContactVC*		self = (ContactVC*)variableCondition;
-	IndexSet*	set = NULL;
-	Stream*		warningStr = Journal_Register( Error_Type, self->type );
-	unsigned	nDims;
-	Grid*		vertGrid;
+   ContactVC*		self = (ContactVC*)variableCondition;
+   IndexSet*	set = NULL;
+   Stream*		warningStr = Journal_Register( Error_Type, self->type );
+   unsigned	nDims;
+   Grid*		vertGrid;
 
-	nDims = Mesh_GetDimSize( self->_mesh );
-	vertGrid = *(Grid**)ExtensionManager_Get( self->_mesh->info, self->_mesh, 
-						  ExtensionManager_GetHandle( self->_mesh->info, 
-									      "vertexGrid" ) );
+   nDims = Mesh_GetDimSize( self->_mesh );
+   vertGrid = *(Grid**)ExtensionManager_Get( self->_mesh->info, self->_mesh, 
+                                             ExtensionManager_GetHandle( self->_mesh->info, 
+                                                                         "vertexGrid" ) );
+
+   switch (self->_wall) {
+      case WallVC_Wall_Front:
+         if ( nDims < 3 || !vertGrid->sizes[2] ) {
+            Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
+                            "when mesh has no elements in the %s axis. Returning an empty set.\n", __func__,
+                            WallVC_WallEnumToStr[self->_wall], "K" );
+            set = IndexSet_New( Mesh_GetDomainSize( self->_mesh, MT_VERTEX ) );
+         }
+         else {
+            abort();
+            /*set = RegularMeshUtils_CreateContactFrontSet( self->_mesh );*/
+         }
+         break;
+			
+      case WallVC_Wall_Back:
+         if ( nDims < 3 || !vertGrid->sizes[2] ) {
+            Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
+                            "when mesh has no elements in the %s axis. Returning an empty set.\n", __func__,
+                            WallVC_WallEnumToStr[self->_wall], "K" );
+            set = IndexSet_New( Mesh_GetDomainSize( self->_mesh, MT_VERTEX ) );
+         }
+         else {
+            abort();
+            /*set = RegularMeshUtils_CreateContactBackSet( self->_mesh );*/
+         }	
+         break;
+			
+      case WallVC_Wall_Top:
+         if ( nDims < 2 || !vertGrid->sizes[1] ) {
+            Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
+                            "when mesh has no elements in the %s axis. Returning an empty set.\n", __func__,
+                            WallVC_WallEnumToStr[self->_wall], "J" );
+            set = IndexSet_New( Mesh_GetDomainSize( self->_mesh, MT_VERTEX ) );
+         }
+         else {
+            abort();
+            /*set = RegularMeshUtils_CreateContactTopSet(self->_mesh);*/
+         }	
+         break;
+			
+      case WallVC_Wall_Bottom:
+         if ( nDims < 2 || !vertGrid->sizes[1] ) {
+            Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
+                            "when mesh has no elements in the %s axis. Returning an empty set.\n", __func__,
+                            WallVC_WallEnumToStr[self->_wall], "J" );
+            set = IndexSet_New( Mesh_GetDomainSize( self->_mesh, MT_VERTEX ) );
+         }
+         else {
+            set = RegularMeshUtils_CreateContactBottomSet(self->_mesh, self->depth);
+         }	
+         break;
+			
+      case WallVC_Wall_Left:
+         if ( nDims < 1 ) {
+            Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
+                            "when mesh has no elements in the %s axis. Returning an empty set.\n", __func__,
+                            WallVC_WallEnumToStr[self->_wall], "I" );
+            set = IndexSet_New( Mesh_GetDomainSize( self->_mesh, MT_VERTEX ) );
+         }
+         else {
+            set = RegularMeshUtils_CreateContactLeftSet(self->_mesh, self->depth, self->includeTop);
+         }	
+         break;
+			
+      case WallVC_Wall_Right:
+         if( nDims < 1 ) {
+            Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
+                            "when mesh has no elements in the %s axis. Returning an empty set.\n", __func__,
+                            WallVC_WallEnumToStr[self->_wall], "I" );
+            set = IndexSet_New( Mesh_GetDomainSize( self->_mesh, MT_VERTEX ) );
+         }
+         else {
+            set = RegularMeshUtils_CreateContactRightSet(self->_mesh, self->depth, self->includeTop);
+         }
+         break;
+			
+      case WallVC_Wall_Size:
+      default:
+         assert(0);
+         break;
+   }
 	
-	switch (self->_wall) {
-	case WallVC_Wall_Front:
-		if ( nDims < 3 || !vertGrid->sizes[2] ) {
-			Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
-					"when mesh has no elements in the %s axis. Returning an empty set.\n", __func__,
-					WallVC_WallEnumToStr[self->_wall], "K" );
-			set = IndexSet_New( Mesh_GetDomainSize( self->_mesh, MT_VERTEX ) );
-		}
-		else {
-		   abort();
-		   /*set = RegularMeshUtils_CreateContactFrontSet( self->_mesh );*/
-		}
-		break;
-			
-	case WallVC_Wall_Back:
-		if ( nDims < 3 || !vertGrid->sizes[2] ) {
-			Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
-					"when mesh has no elements in the %s axis. Returning an empty set.\n", __func__,
-					WallVC_WallEnumToStr[self->_wall], "K" );
-			set = IndexSet_New( Mesh_GetDomainSize( self->_mesh, MT_VERTEX ) );
-		}
-		else {
-		   abort();
-		   /*set = RegularMeshUtils_CreateContactBackSet( self->_mesh );*/
-		}	
-		break;
-			
-	case WallVC_Wall_Top:
-		if ( nDims < 2 || !vertGrid->sizes[1] ) {
-			Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
-					"when mesh has no elements in the %s axis. Returning an empty set.\n", __func__,
-					WallVC_WallEnumToStr[self->_wall], "J" );
-			set = IndexSet_New( Mesh_GetDomainSize( self->_mesh, MT_VERTEX ) );
-		}
-		else {
-		   abort();
-		   /*set = RegularMeshUtils_CreateContactTopSet(self->_mesh);*/
-		}	
-		break;
-			
-	case WallVC_Wall_Bottom:
-		if ( nDims < 2 || !vertGrid->sizes[1] ) {
-			Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
-					"when mesh has no elements in the %s axis. Returning an empty set.\n", __func__,
-					WallVC_WallEnumToStr[self->_wall], "J" );
-			set = IndexSet_New( Mesh_GetDomainSize( self->_mesh, MT_VERTEX ) );
-		}
-		else {
-		   set = RegularMeshUtils_CreateContactBottomSet(self->_mesh, self->depth);
-		}	
-		break;
-			
-	case WallVC_Wall_Left:
-		if ( nDims < 1 ) {
-			Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
-					"when mesh has no elements in the %s axis. Returning an empty set.\n", __func__,
-					WallVC_WallEnumToStr[self->_wall], "I" );
-			set = IndexSet_New( Mesh_GetDomainSize( self->_mesh, MT_VERTEX ) );
-		}
-		else {
-		   set = RegularMeshUtils_CreateContactLeftSet(self->_mesh, self->depth, self->includeTop);
-		}	
-		break;
-			
-	case WallVC_Wall_Right:
-		if( nDims < 1 ) {
-			Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
-					"when mesh has no elements in the %s axis. Returning an empty set.\n", __func__,
-					WallVC_WallEnumToStr[self->_wall], "I" );
-			set = IndexSet_New( Mesh_GetDomainSize( self->_mesh, MT_VERTEX ) );
-		}
-		else {
-		   set = RegularMeshUtils_CreateContactRightSet(self->_mesh, self->depth, self->includeTop);
-		}
-		break;
-			
-	case WallVC_Wall_Size:
-	default:
-		assert(0);
-		break;
-	}
-	
-	return set;
+   return set;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------------
