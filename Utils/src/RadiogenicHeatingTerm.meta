@@ -13,7 +13,7 @@
 <param name="Parent">ForceTerm</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">This adds a radiogenic heating term on to the energy equation. To turn it on this force term must be defined <b> as well as</b> extending the definitions of materials, by adding a heating element list to a material definition. <br/>One or more heating elements can be defined in this list.</param>
+<param name="Description">This adds a radiogenic heating term on to the energy equation. To turn on this force term must be define it <b> as well as</b> extending the definitions of materials, by adding a heating element list to a material definition. <br/>One or more heating elements can be defined in this list.</param>
 
 <!--Now the interesting stuff-->
 
@@ -26,6 +26,25 @@
 
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">
+<![CDATA[
+	<struct name="internalHeatingTerm">
+		<param name="Type">RadiogenicHeatingTerm</param>
+		<param name="ForceVector">residual</param>
+		<param name="Swarm">gaussSwarm</param>
+	</struct>	
+	<struct name="material">
+		<param name="Type">RheologyMaterial</param>
+		<param name="Shape">shape</param>
+		<param name="Rheology">temperatureDependence</param>
+		<list name="heatingElements">
+			<struct>
+				<param name="Q">1.0</param>
+				<param name="lambda">1.65</param>                    
+			</struct>
+		</list>
+	</struct>
+]]>
+</param>
 
 </StGermainData>

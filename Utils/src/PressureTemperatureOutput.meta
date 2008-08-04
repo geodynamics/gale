@@ -38,6 +38,15 @@
 
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">
+<![CDATA[
+	<struct name="swarmOutput">
+		<param name="Type">PressureTemperatureOutput</param>
+		<param name="Swarm">swarm</param>
+		<param name="PressureField">PressureField</param>
+		<param name="TemperatureField">TemperatureField</param>
+	</struct>
+]]>
+</param>
 
 </StGermainData>
