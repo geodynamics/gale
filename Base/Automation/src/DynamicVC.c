@@ -399,7 +399,7 @@ void DynamicVC_SetMaxEntries( void* vc, int maxEntries ) {
 	DynamicVC* self = (DynamicVC*)vc;
 
 	assert( self );
-	IMap_Clear( self->vcMap );
+	/*IMap_Clear( self->vcMap );*/
 	IMap_SetMaxSize( self->vcMap, maxEntries );
 }
 
@@ -432,4 +432,11 @@ void DynamicVC_Remove( void* vc, int index ) {
 	assert( self );
 	if( IMap_Has( self->vcMap, index ) )
 		IMap_Remove( self->vcMap, index );
+}
+
+Bool DynamicVC_Has( void* _self, int index ) {
+	DynamicVC* self = (DynamicVC*)_self;
+
+	assert( self );
+        return IMap_Has( self->vcMap, index );
 }

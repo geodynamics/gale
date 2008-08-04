@@ -173,6 +173,7 @@ int DynamicVC_GetMaxEntries( void* vc );
 void DynamicVC_SetValues( void* vc, int nVals, VariableCondition_Value* vals );
 void DynamicVC_Insert( void* vc, int index, int valIndex );
 void DynamicVC_Remove( void* vc, int index );
+Bool DynamicVC_Has( void* _self, int index );
 
 
 #endif /* __Base_Automation_DynamicVC_h__ */
