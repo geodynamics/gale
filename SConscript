@@ -29,15 +29,7 @@ if env['shared_libraries']:
 
 #
 # Build toolbox.
-objs = env.build_sources(env.glob('libUnderworld/Toolbox/*.c'), 'Underworld/libUnderworld/Toolbox')
-objs += env.build_metas(env.glob('libUnderworld/Toolbox/*.meta'), 'Underworld/libUnderworld/Toolbox')
-if env['shared_libraries']:
-    env.SharedLibrary(env.get_target_name('lib/Underworld_Toolboxmodule'), objs,
-                      SHLIBPREFIX='',
-                      LIBPREFIXES=env.make_list(env['LIBPREFIXES']) + [''],
-                      LIBS=['Underworld'] + env.get('LIBS', []))
-if env['static_libraries']:
-    env.src_objs += objs
+env.build_toolbox('libUnderworld/Toolbox')
 
 #
 # Build plugins. Note that this must happen after the shared library
@@ -49,6 +41,7 @@ env.build_plugin('plugins/MaterialThermalDiffusivity')
 env.build_plugin('plugins/VariableConditions/ShapeTemperatureIC')
 env.build_plugin('plugins/Output/Vrms')
 env.build_plugin('plugins/Output/Nusselt')
+env.build_plugin('plugins/Output/VTKOutput')
 env.build_plugin('SysTest/AnalyticPlugins/VelicIC')
 env.build_plugin('SysTest/AnalyticPlugins/Velic_solA')
 env.build_plugin('SysTest/AnalyticPlugins/newVelicSolA')
@@ -58,6 +51,7 @@ env.build_plugin('SysTest/AnalyticPlugins/newVelicSolA')
 if env['static_libraries']:
     env.Library(env.get_build_path('lib/Underworld'), env.src_objs)
 
+#
 # Build unit test runner.
 env['PCURUNNERINIT'] = ''
 env['PCURUNNERSETUP'] = """StGermain_Init( &argc, &argv );
@@ -76,9 +70,15 @@ env.Program(env.get_build_path('bin/testUnderworld'),
             runner_obj + env.suite_objs,
             LIBS=['Underworld', 'pcu'] + env.get('LIBS', []))
 
+#
 # Copy over XML files.
 xml_bases = ['', 'BaseApps', 'VariableConditions', 'Viewports']
 for base in xml_bases:
     dst = env.get_build_path('lib/StGermain/Underworld/' + base)
     for file in env.glob('InputFiles/src/' + base + '/*.xml'):
         env.Install(dst, file)
+
+#
+# Return any module code we need to build into a static binary.
+module = (env.get('STGMODULEPROTO', ''), env.get('STGMODULECODE', ''))
+Return('module')
