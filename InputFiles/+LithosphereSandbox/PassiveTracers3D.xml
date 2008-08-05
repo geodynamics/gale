@@ -176,15 +176,16 @@
 		<struct name="passiveTracerBox_TopViewCamera">
 			<param name="Type">lucCamera</param>
 			<param name="coordX">0.00</param>
-			<param name="coordY">3.40</param>
-			<param name="coordZ">1.00</param>
+			<param name="coordY">25.0</param>
+			<param name="coordZ">0.01</param>
 			<param name="focalPointX">0</param>
-			<param name="focalPointY">0.6</param>
+			<param name="focalPointY">0.5</param>
 			<param name="focalPointZ">0</param>
 			<param name="upDirectionX">0</param>
 			<param name="upDirectionY">1</param>
 			<param name="upDirectionZ">0</param>
 			<param name="stereoType">Mono</param>
+			<param name="aperture">5</param>
 			<param name="eyeSeparation">0.2</param>
 			<param name="focalLength">0</param>
 		</struct>
@@ -207,7 +208,7 @@
 			<param name="OutputFormat">PNGOutput</param>
 			<param name="height">600</param>
 			<param name="width">700</param>
-			<param name="interactive">t</param>
+			<param name="interactive">f</param>
 			<param name="backgroundColour">White</param>
 			<list name="Viewport">
 				<param> passiveTracerBox_Viewport </param>

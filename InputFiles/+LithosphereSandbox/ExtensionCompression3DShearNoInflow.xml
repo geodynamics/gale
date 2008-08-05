@@ -49,13 +49,6 @@
 	
 	<!-- Visualisation -->
 
-	<!-- ><include>Viewports/ProfileSlicesXYVP.xml</include> -->
-	<!-- ><include>Viewports/ProfileSlicesZYVP.xml</include> -->
-	<!-- ><include>Viewports/MapViewSlicesVP.xml</include> -->
-	
-	<!--
-	<include>Viewports/BlockCutAwayVP.xml</include> -->
-
 
 	<include> Viewports/Cameras.xml </include> 
 	<!-- <include> Viewports/RecoveredPressureVP.xml </include> 

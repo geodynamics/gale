@@ -131,44 +131,6 @@
 			<param name="maxPositionZ">10</param>
 		</struct>
 
-
-
-		<struct name="strainRateLayers-HalfUpperCrustX">
-			<param name="Type">lucSwarmViewer</param>
-			<param name="Swarm">materialSwarm</param>
-			<param name="ColourVariable">layersParticleStrainRate</param>
-			<param name="ColourMap">strainRateLayers-UpperCrustColourMap</param>
-			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
-			<param name="maskType">EqualTo</param>
-			<param name="maskValue">4.0</param>
-			<param name="pointSize">1.0</param>
-			<param name="positionRange">True</param>
-			<param name="minPositionX">-10</param>
-			<param name="maxPositionX">0.0</param>
-			<param name="minPositionY">-10</param>
-			<param name="maxPositionY">10</param>
-			<param name="minPositionZ">-10</param>
-			<param name="maxPositionZ">10</param>
-		</struct>
-
-		<struct name="strainRateLayers-HalfUpperCrustZ">
-			<param name="Type">lucSwarmViewer</param>
-			<param name="Swarm">materialSwarm</param>
-			<param name="ColourVariable">layersParticleStrainRate</param>
-			<param name="ColourMap">strainRateLayers-UpperCrustColourMap</param>
-			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
-			<param name="maskType">EqualTo</param>
-			<param name="maskValue">4.0</param>
-			<param name="pointSize">1.0</param>
-			<param name="positionRange">True</param>
-			<param name="minPositionX">-10</param>
-			<param name="maxPositionX">10</param>
-			<param name="minPositionY">-10</param>
-			<param name="maxPositionY">10</param>
-			<param name="minPositionZ">-10</param>
-			<param name="maxPositionZ">0.0</param>
-		</struct>
-
 		<struct name="strainRateLayers-LowerCrust">
 			<param name="Type">lucSwarmViewer</param>
 			<param name="Swarm">materialSwarm</param>
@@ -187,42 +149,69 @@
 			<param name="maxPositionZ">10</param>
 		</struct>
 
-		<struct name="strainRateLayers-HalfLowerCrustX">
-			<param name="Type">lucSwarmViewer</param>
-			<param name="Swarm">materialSwarm</param>
-			<param name="ColourVariable">layersParticleStrainRate</param>
-			<param name="ColourMap">strainRateLayers-LowerCrustColourMap</param>
-			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
-			<param name="maskType">EqualTo</param>
-			<param name="maskValue">3.0</param>
-			<param name="pointSize">1.0</param>
-			<param name="positionRange">True</param>
-			<param name="minPositionX">-10</param>
-			<param name="maxPositionX">0.0</param>
-			<param name="minPositionY">-10</param>
-			<param name="maxPositionY">10</param>
-			<param name="minPositionZ">-10</param>
-			<param name="maxPositionZ">10</param>
-		</struct>
 
-		<struct name="strainRateLayers-HalfLowerCrustZ">
+		<!-- Tries to pick up all 3 crust materials with the loose tolerance
+		
+			
+		
+		  -->
+	
+		<struct name="strainRateLayers-CrustBlock1">
 			<param name="Type">lucSwarmViewer</param>
 			<param name="Swarm">materialSwarm</param>
 			<param name="ColourVariable">layersParticleStrainRate</param>
-			<param name="ColourMap">strainRateLayers-LowerCrustColourMap</param>
+			<param name="ColourMap">strainRateLayers-UpperCrustColourMap</param>
 			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
 			<param name="maskType">EqualTo</param>
-			<param name="maskValue">3.0</param>
+			<param name="maskTolerance">1.1</param>
+			<param name="maskValue">4.0</param>
 			<param name="pointSize">1.0</param>
 			<param name="positionRange">True</param>
 			<param name="minPositionX">-10</param>
 			<param name="maxPositionX">10</param>
 			<param name="minPositionY">-10</param>
 			<param name="maxPositionY">10</param>
-			<param name="minPositionZ">-10</param>
-			<param name="maxPositionZ">0.0</param>
+			<param name="minPositionZ"> 0.0</param>
+			<param name="maxPositionZ"> 0.2</param>
 		</struct>
 
+		<struct name="strainRateLayers-CrustBlock2">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">layersParticleStrainRate</param>
+			<param name="ColourMap">strainRateLayers-UpperCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskTolerance">1.1</param>
+			<param name="maskValue">4.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ"> -0.8</param>
+			<param name="maxPositionZ"> -0.6</param>
+		</struct>
+
+		<struct name="strainRateLayers-CrustBlock3">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">layersParticleStrainRate</param>
+			<param name="ColourMap">strainRateLayers-UpperCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskTolerance">1.1</param>
+			<param name="maskValue">4.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ"> 0.8 </param>
+			<param name="maxPositionZ"> 1.0 </param>
+		</struct>
 
 
 		<struct name="strainRateLayers-MantleBaseLayer">
@@ -391,8 +380,6 @@
 		       	<param name="minPositionZ">-10</param>
 		       	<param name="maxPositionZ">10</param>
 			</struct>	
-		
-
 
 			<struct name="strainRateLayers-LC-Slice4">
 	     	  	<param name="Type">lucSwarmViewer</param>
@@ -412,15 +399,35 @@
 		       	<param name="minPositionZ">-10</param>
 		       	<param name="maxPositionZ">10</param>
 			</struct>
-			
+
+
+<!-- Strain rate block/s -->
+
+		<struct name="strainRateLayers-PerspectiveViewCamera2">
+			<param name="Type">lucCamera</param>
+			<param name="coordX"> 0 </param>
+			<param name="coordY"> 2.7 </param>
+			<param name="coordZ">-2.4 </param>
+			<param name="focalPointX">0.0 </param>
+			<param name="focalPointY">0.2 </param>
+			<param name="focalPointZ">0.0 </param>
+			<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+			<param name="stereoType">Mono</param>
+			<param name="eyeSeparation">0.2</param>
+			<param name="focalLength">0</param>
+		</struct>
 		
+
+
 		<struct name="strainRateLayersPerspectiveVP1">
 			<param name="Type">lucViewport</param>
-			<param name="Camera">lithosphereSandboxPerspectiveViewCamera2</param>
+			<param name="Camera">strainRateLayers-PerspectiveViewCamera2</param>
 			<param name="compositeEachObject">true</param>
 			<list name="DrawingObject">
-				<param> strainRateLayers-UpperCrust1 </param>
-				<param> strainRateLayers-UpperCrust2 </param>
+				<param> strainRateLayers-UpperCrust1</param>
+				<param> strainRateLayers-UpperCrust2</param>
 				<param> strainRateLayers-LowerCrust </param>
 				<param> strainRateLayers-MantleBaseLayer </param>
 				<param> strainRateLayers-MantleUpperLayer </param>
@@ -429,6 +436,58 @@
 		 		<param> strainRateLayers-UpperCrustColourBar</param>
 			</list>
 		</struct>
+
+					
+		<struct name="strainRateLayersBlocksPerspectiveVP1">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">strainRateLayers-PerspectiveViewCamera2</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<param> strainRateLayers-CrustBlock1</param>
+				<param> strainRateLayers-CrustBlock2</param>
+				<param> strainRateLayers-CrustBlock3</param>
+				<param> strainRateLayers-MantleBaseLayer </param>
+				<param> strainRateLayers-MantleUpperLayer </param>
+				<!-- <param> passiveTracerDots </param> -->
+				<param> Boxborder </param>
+		 		<param> strainRateLayers-UpperCrustColourBar</param>
+			</list>
+		</struct>
+			
+
+		<struct name="strainRateLayersWindow">
+	        <param name="Type">lucDefaultWindow</param>
+	        <param name="RenderingEngine">RenderingEngine</param>
+			<param name="OutputFormat">PNGOutput</param>
+			<param name="height">592</param>
+			<param name="width">800</param>
+			<param name="interactive">f</param>
+			<param name="backgroundColour">White</param>
+			<list name="Viewport">
+				<param> strainRateLayersPerspectiveVP1   </param>
+			</list>
+		</struct>
+		
+		
+
+		<struct name="strainRateLayersBlocksWindow">
+	        <param name="Type">lucDefaultWindow</param>
+	        <param name="RenderingEngine">RenderingEngine</param>
+			<param name="OutputFormat">PNGOutput</param>
+			<param name="height">592</param>
+			<param name="width">800</param>
+			<param name="interactive">f</param>
+			<param name="backgroundColour">White</param>
+			<list name="Viewport">
+				<param> strainRateLayersBlocksPerspectiveVP1 </param>
+			</list>
+		</struct>
+
+
+
+
+
+<!-- Strain rate slices -->
 
 		<struct name="strainRateSlicesViewport">
 			<param name="Type">lucViewport</param>
@@ -465,29 +524,17 @@
 			<param name="compositeEachObject">true</param>
 			<list name="DrawingObject">
 				<param> strainRateLayers-LC-Slice4</param>
-			</list>
-			
+			</list>			
 			<!-- this is how to do lights per viewport -->
 			<!--
 			<list name="Lights">   
 				<param> ?? </param>
-			</list>	
-			
+			</list>				
 			-->
 		</struct>
-		
-		<struct name="strainRateLayersWindow">
-	        <param name="Type">lucDefaultWindow</param>
-	        <param name="RenderingEngine">RenderingEngine</param>
-			<param name="OutputFormat">PNGOutput</param>
-			<param name="height">592</param>
-			<param name="width">800</param>
-			<param name="interactive">f</param>
-			<param name="backgroundColour">White</param>
-			<list name="Viewport">
-				<param> strainRateLayersPerspectiveVP1   </param>
-			</list>
-		</struct>
+
+
+
 
 		<struct name="strainRateSlicesWindow">
 	        <param name="Type">lucDefaultWindow</param>
