@@ -67,9 +67,8 @@
 	RegularRemesherCmpt* RegularRemesherCmpt_New( Name name );
 
 	/* Creation implementation */
-	RegularRemesherCmpt* _RegularRemesherCmpt_New( CLASS_ARGS, 
-						       COMPONENT_ARGS, 
-						       REMESHER_ARGS );
+	RegularRemesherCmpt* _RegularRemesherCmpt_New( REMESHER_ARGS );
+
 	/* Initialise a RegularRemesherCmpt */
 	void RegularRemesherCmpt_Init( RegularRemesherCmpt* self );
 

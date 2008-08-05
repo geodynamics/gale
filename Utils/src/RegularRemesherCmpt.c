@@ -77,32 +77,14 @@ RegularRemesherCmpt* RegularRemesherCmpt_New( Name name ) {
 }
 
 
-RegularRemesherCmpt* _RegularRemesherCmpt_New( CLASS_ARGS, 
-					       COMPONENT_ARGS, 
-					       REMESHER_ARGS )
-{
+RegularRemesherCmpt* _RegularRemesherCmpt_New( REMESHER_ARGS ) {
 	RegularRemesherCmpt*	self;
 
 	/* Allocate memory. */
-	self = (RegularRemesherCmpt*)_Remesher_New( _sizeOfSelf,
-					    type,
-					    _delete,
-					    _print, 
-					    _copy, 
-					    _defaultConstructor, 
-					    _construct, 
-					    _build, 
-					    _initialise, 
-					    _execute, 
-					    _destroy, 
-					    name, 
-							 initFlag, 
-							 NULL );
+	self = (RegularRemesherCmpt*)_Remesher_New( REMESHER_PASSARGS );
 
 	/* RegularRemesherCmpt info */
-	if( initFlag ) {
-		_RegularRemesherCmpt_Init( self );
-	}
+        _RegularRemesherCmpt_Init( self );
 
 	return self;
 }
@@ -188,6 +170,8 @@ void _RegularRemesherCmpt_Construct( void* remesher, Stg_ComponentFactory* cf, v
 
 	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "mesh", Mesh, True, data );
 	NewRemesher_SetMesh( self->regRemesh, mesh );
+
+        self->regRemesh->contactDepth = Stg_ComponentFactory_GetInt( cf, self->name, "contactDepth", 0 );
 
 	dict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( cf->componentDict, self->name ) );
 	list = Dictionary_Get( dict, "remeshDims" );

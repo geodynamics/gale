@@ -847,8 +847,14 @@ IndexSet* RegularMeshUtils_CreateContactBottomSet( void* _mesh, int depth ) {
    nNodes = Mesh_GetDomainSize( mesh, 0 );
    set = IndexSet_New( nNodes );
 
+/*
    left = depth + 1;
    right = grid->sizes[0] - (depth + 1) - 1;
+   bottom = 1;
+   top = depth;
+*/
+   left = 0;
+   right = grid->sizes[0] - 1;
    bottom = 1;
    top = depth;
    for( ii = 0; ii < nNodes; ii++ ) {
@@ -876,9 +882,15 @@ IndexSet* RegularMeshUtils_CreateContactLeftSet( void* _mesh, int depth, Bool in
    nNodes = Mesh_GetDomainSize( mesh, 0 );
    set = IndexSet_New( nNodes );
 
+/*
    left = 1;
    right = depth;
    bottom = depth + 1;
+   top = grid->sizes[1] - 2;
+*/
+   left = 1;
+   right = depth;
+   bottom = 1;
    top = grid->sizes[1] - 2;
    if( includeTop ) top++;
    for( ii = 0; ii < nNodes; ii++ ) {
@@ -906,9 +918,15 @@ IndexSet* RegularMeshUtils_CreateContactRightSet( void* _mesh, int depth, Bool i
    nNodes = Mesh_GetDomainSize( mesh, 0 );
    set = IndexSet_New( nNodes );
 
+/*
    left = grid->sizes[0] - depth - 1;
    right = grid->sizes[0] - 2;
    bottom = depth + 1;
+   top = grid->sizes[1] - 2;
+*/
+   left = grid->sizes[0] - depth - 1;
+   right = grid->sizes[0] - 2;
+   bottom = 1;
    top = grid->sizes[1] - 2;
    if( includeTop ) top++;
    for( ii = 0; ii < nNodes; ii++ ) {

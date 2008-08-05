@@ -58,6 +58,7 @@ void _RegularRemesher_Init( void* _self ) {
    self->nWallVerts = NULL;
    self->wallVerts = NULL;
    self->wallCrds = NULL;
+   self->contactDepth = 0;
 }
 
 void _RegularRemesher_Copy( void* _self, const void* _op ) {
@@ -135,6 +136,47 @@ void _RegularRemesher_Remesh( void* _self ) {
       }
    }
 
+   /* If we have a contact depth set we'll need to manipulate the boundaries
+      a little. */
+   if( self->contactDepth ) {
+      int curInd;
+      int ii, d_j;
+
+      /* Reset static depths. */
+      curInd = 0;
+      for( ii = 0; ii < nVerts; ii++ ) {
+         Grid_Lift( vGrid, ii, inds );
+         if( inds[1] != self->contactDepth ) continue;
+         Mesh_GetVertex( mesh, ii )[1] = self->contactVerts[curInd++];
+      }
+
+      /* Also handle contact element boundaries. */
+      for( d_i = 0; d_i < nDims; d_i++ ) {
+         for( v_i = 0; v_i < nVerts; v_i++ ) {
+            ind = Sync_DomainToGlobal( meshSync, v_i );
+            Grid_Lift( vGrid, ind, (unsigned*)inds );
+            center = inds[d_i];
+            if( center == 0 || center == vGrid->sizes[d_i] - 1 ) {
+
+               /* If we're inside the contact depth range, we need to make
+                  sure the side coordinates are aligned. */
+               if( d_i == 0 ) d_j = 1;
+               else if( d_i == 1 ) d_j = 0;
+               else if( d_i == 2 ) d_j = 1;
+               if( inds[d_j] < self->contactDepth )
+                  inds[d_j] = self->contactDepth;
+               else if( inds[d_j] > vGrid->sizes[d_j] - self->contactDepth - 1 && 
+                        d_i == 1 )
+               {
+                  inds[d_j] = vGrid->sizes[d_j] - self->contactDepth - 1;
+               }
+               Mesh_GetVertex( mesh, v_i )[d_i] =
+                  Mesh_GetVertex( mesh, Grid_Project( vGrid, inds ) )[d_i];
+            }
+         }
+      }
+   }
+
    for( d_i = 0; d_i < nDims; d_i++ ) {
       if( !ISet_Has( self->remeshDims, d_i ) )
 	 continue;
@@ -167,9 +209,42 @@ void _RegularRemesher_Remesh( void* _self ) {
 	 else
 	    rightCrd = Mesh_GetVertex( mesh, ind)[d_i];
 
-	 mesh->verts[v_i][d_i] = leftCrd + 
-	    (double)center * (rightCrd - leftCrd) / 
-	    (double)(vGrid->sizes[d_i] - 1);
+         /* Account for contact depth. */
+         if( d_i == 1 ) {
+            if( center > self->contactDepth ) {
+
+               /* If we're past contact elements, adjust center to be
+                  properly smoothed. */
+               center -= self->contactDepth;
+               inds[1] = self->contactDepth;
+               leftCrd = Mesh_GetVertex( mesh, Grid_Project( vGrid, inds ) )[1];
+
+               /* Blend coordinate. */
+               mesh->verts[v_i][d_i] = leftCrd + 
+                  (double)center * (rightCrd - leftCrd) / 
+                  (double)(vGrid->sizes[d_i] - self->contactDepth - 1);
+
+            }
+            else if( center < self->contactDepth ) {
+
+               /* If we're inside the contact depth smooth within the
+                  contact range. */
+               inds[1] = self->contactDepth;
+               rightCrd = Mesh_GetVertex( mesh, Grid_Project( vGrid, inds ) )[1];
+               mesh->verts[v_i][d_i] = leftCrd + 
+                  (double)center * (rightCrd - leftCrd) / 
+                  (double)self->contactDepth;
+
+            }
+         }
+         else {
+
+               /* Blend coordinate. */
+               mesh->verts[v_i][d_i] = leftCrd + 
+                  (double)center * (rightCrd - leftCrd) / 
+                  (double)(vGrid->sizes[d_i] - 1);
+
+         }
       }
    }
 
@@ -290,8 +365,35 @@ void RegularRemesher_Build( void* _self ) {
       self->crds[d_i] = Class_Array( self, double, nRems );
    }
 
-   Class_Free( self, inds );
    NewClass_Delete( wallSet );
+
+   /* If we have some contact depth, copy the relevant vertices. */
+   if( self->contactDepth > 0 ) {
+      int curInd;
+      Grid* grid;
+      int ii;
+
+      /* Get the vertex grid from the mesh. */
+      grid = *Mesh_GetExtension( mesh, Grid**, "vertexGrid" );
+      assert( grid );
+
+      /* Allocate for all the contact vertices. */
+      nVerts = grid->sizes[0];
+      if( nDims == 3 ) nVerts *= grid->sizes[1];
+      self->contactVerts = MemArray( double, nVerts, "" );
+
+      /* Copy upper strip. */
+      nVerts = Mesh_GetLocalSize( mesh, 0 );
+      curInd = 0;
+      for( ii = 0; ii < nVerts; ii++ ) {
+         Grid_Lift( grid, ii, inds );
+         if( inds[1] != self->contactDepth ) continue;
+         self->contactVerts[curInd++] = Mesh_GetVertex( mesh, ii )[1];
+      }
+
+   }
+
+   Class_Free( self, inds );
 }
 
 void RegularRemesher_SetRemeshState( void* _self, int dim, Bool state ) {
