@@ -115,7 +115,10 @@ void _BuiterStrainWeakening_Init(
 		double                                             softeningStrain,
 		double                                             initialDamageFraction,
 		double                                             initialDamageWavenumber,
-		double                                             initialDamageWavenumberJ,
+		double                                             initialDamageWavenumberSinI,
+		double                                             initialDamageWavenumberCosI,
+		double                                             initialDamageWavenumberSinJ,
+		double                                             initialDamageWavenumberCosJ,
 		double                                             initialDamageFactor,
 		long int                                           randomSeed,
 		Stg_Shape*                                         initialStrainShape  )
@@ -125,7 +128,10 @@ void _BuiterStrainWeakening_Init(
 				softeningStrain, 
 				initialDamageFraction,
 				initialDamageWavenumber,
-				initialDamageWavenumberJ,
+				initialDamageWavenumberSinI,
+				initialDamageWavenumberCosI,
+				initialDamageWavenumberSinJ,
+				initialDamageWavenumberCosJ,
 				initialDamageFactor, randomSeed,
 				initialStrainShape );
 }

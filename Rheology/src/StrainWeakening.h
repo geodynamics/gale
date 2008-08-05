@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: StrainWeakening.h 483 2007-06-01 00:56:27Z StuartClark $
+** $Id: StrainWeakening.h 776 2008-08-05 02:39:26Z LouisMoresi $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -80,13 +80,16 @@
 		double                                 softeningStrain;                   \
 		double                                 initialDamageFraction;             \
 		double                                 initialDamageWavenumber;           \
-		double                                 initialDamageWavenumberJ;           \
+		double                                 initialDamageWavenumberSinI;           \
+		double                                 initialDamageWavenumberCosI;           \
+		double                                 initialDamageWavenumberSinJ;           \
+		double                                 initialDamageWavenumberCosJ;           \
 		double                                 initialDamageFactor;               \
 		Stg_Shape*                             initialStrainShape;                \
 		long int                               randomSeed;
 				
 	struct StrainWeakening { __StrainWeakening };
-
+ 
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
 	StrainWeakening* _StrainWeakening_New( 
 		SizeT                                              sizeOfSelf,
@@ -112,7 +115,10 @@
 		double                                             softeningStrain,
 		double                                             initialDamageFraction,
 		double                                             initialDamageWavenumber,
-		double                                             initialDamageWavenumberJ,
+		double                                             initialDamageWavenumberSinI,
+		double                                             initialDamageWavenumberCosI,
+		double                                             initialDamageWavenumberSinJ,
+		double                                             initialDamageWavenumberCosJ,
 		double                                             initialDamageFactor,
 		long int                                           randomSeed,
 		Stg_Shape*                                         initialStrainShape  );
