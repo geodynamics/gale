@@ -55,8 +55,9 @@
 	} SurfaceAdaptor_SurfaceType;
 
 	typedef struct {
-		double	offs;
-		double	grad;
+              double	offs;
+              double    endOffs;
+              double	grad;
 	} SurfaceAdaptor_WedgeInfo;
 
 	typedef struct {
@@ -78,7 +79,9 @@
 								\
 		/* SurfaceAdaptor info */			\
 		SurfaceAdaptor_SurfaceType	surfaceType;	\
-		SurfaceAdaptor_SurfaceInfo	info;
+		SurfaceAdaptor_SurfaceInfo	info;           \
+                int                             contactDepth;
+
 
 	struct SurfaceAdaptor { __SurfaceAdaptor };
 

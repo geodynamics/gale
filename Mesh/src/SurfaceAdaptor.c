@@ -141,11 +141,16 @@ void _SurfaceAdaptor_Construct( void* adaptor, Stg_ComponentFactory* cf, void* d
 	/* Rip out the components structure as a dictionary. */
 	dict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( cf->componentDict, self->name ) );
 
+        /* Check if we want to keep a certain depth at the bottom reserved for
+           contact elements. */
+        self->contactDepth = Stg_ComponentFactory_GetInt( cf, self->name, "contactDepth", 0 );
+
 	/* What kind of surface do we want? */
 	surfaceType = Stg_ComponentFactory_GetString( cf, self->name, "surfaceType", "" );
 	if( !strcmp( surfaceType, "wedge" ) ) {
 		self->surfaceType = SurfaceAdaptor_SurfaceType_Wedge;
-		self->info.wedge.offs = Stg_ComponentFactory_GetDouble( cf, self->name, "offset", 0.0 );
+		self->info.wedge.offs = Stg_ComponentFactory_GetDouble( cf, self->name, "beginOffset", 0.0 );
+		self->info.wedge.endOffs = Stg_ComponentFactory_GetDouble( cf, self->name, "endOffset", 1.0 );
 		self->info.wedge.grad = Stg_ComponentFactory_GetDouble( cf, self->name, "gradient", 0.5 );
 	}
 	else if( !strcmp( surfaceType, "sine" ) || !strcmp( surfaceType, "cosine" ) ) {
@@ -204,6 +209,7 @@ void SurfaceAdaptor_Generate( void* adaptor, void* _mesh, void* data ) {
 	SurfaceAdaptor_DeformFunc*	deformFunc;
 	Grid				*grid;
 	unsigned*			inds;
+        double                          deform;
 	unsigned			n_i;
 
 	/* Build base mesh, which is assumed to be cartesian. */
@@ -242,11 +248,16 @@ void SurfaceAdaptor_Generate( void* adaptor, void* _mesh, void* data ) {
 		gNode = Sync_DomainToGlobal( sync, n_i );
 		Grid_Lift( grid, gNode, inds );
 
+                /* If we're under the contact depth don't modify. */
+                if( self->contactDepth && inds[1] < (self->contactDepth + 1) )
+                   continue;
+
 		/* Calculate a height percentage. */
-		height = (double)inds[1] / (double)(grid->sizes[1] - 1);
+		height = (double)(inds[1] - self->contactDepth) / (double)(grid->sizes[1] - 1);
 
 		/* Deform this node. */
-		mesh->verts[n_i][1] += height * deformFunc( self, mesh, grid->sizes, n_i, inds );
+                deform = deformFunc( self, mesh, grid->sizes, n_i, inds );
+		mesh->verts[n_i][1] += height * deform;
 	}
 
 	/* Free resources. */
@@ -261,10 +272,14 @@ void SurfaceAdaptor_Generate( void* adaptor, void* _mesh, void* data ) {
 double SurfaceAdaptor_Wedge( SurfaceAdaptor* self, Mesh* mesh, 
 			     unsigned* globalSize, unsigned vertex, unsigned* vertexInds )
 {
-	if( mesh->verts[vertex][0] >= self->info.wedge.offs )
-		return (mesh->verts[vertex][0] - self->info.wedge.offs) * self->info.wedge.grad;
-	else
-		return 0.0;
+   if( mesh->verts[vertex][0] >= self->info.wedge.offs ) {
+      if( mesh->verts[vertex][0] >= self->info.wedge.endOffs )
+         return (self->info.wedge.endOffs - self->info.wedge.offs) * self->info.wedge.grad;
+      else
+         return (mesh->verts[vertex][0] - self->info.wedge.offs) * self->info.wedge.grad;
+   }
+   else 
+      return 0.0;
 }
 
 double SurfaceAdaptor_Sine( SurfaceAdaptor* self, Mesh* mesh, 
@@ -287,14 +302,14 @@ double SurfaceAdaptor_Sine( SurfaceAdaptor* self, Mesh* mesh,
 double SurfaceAdaptor_Cosine( SurfaceAdaptor* self, Mesh* mesh, 
 			      unsigned* globalSize, unsigned vertex, unsigned* vertexInds )
 {
-	double	dx, dy;
+	double	dx, dz;
 	double	rad;
 
 	dx = mesh->verts[vertex][0] - self->info.trig.origin[0];
 	rad = dx * dx;
 	if( mesh->topo->nDims == 3 ) {
-		dy = mesh->verts[vertex][1] - self->info.trig.origin[1];
-		rad += dy * dy;
+		dz = mesh->verts[vertex][2] - self->info.trig.origin[2];
+		rad += dz * dz;
 	}
 	rad = sqrt( rad );
 
