@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: FaultingMoresiMuhlhaus2006.c 781 2008-08-06 17:21:55Z LukeHodkinson $
+** $Id: FaultingMoresiMuhlhaus2006.c 783 2008-08-06 19:26:16Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -429,8 +429,10 @@ void _FaultingMoresiMuhlhaus2006_ModifyConstitutiveMatrix(
 
 	postFailureWeakening = StrainWeakening_GetPostFailureWeakening( self->strainWeakening, materialPoint );
 	
-	/* First part : treatment of the existing weakened directions */
-	if ( !self->ignoreOldOrientation && postFailureWeakening > 0.0 ) {
+	/* First part : treatment of the existing weakened directions.
+           Note: If we don't want to update orientations that means we want to use
+           the existing preset ones, so we'll always go in here. */
+	if( !self->updateOrientations || (!self->ignoreOldOrientation && postFailureWeakening > 0.0) ) {
 	
 		/* tryingOldOrientation is a flag used to know where we are. This is necessary because some parts are treated differently
 		 * if we are dealing with old orientation or with pristine material (see for example _FaultingMoresiMuhlhaus2006_GetYieldIndicator) */
@@ -554,12 +556,17 @@ void _FaultingMoresiMuhlhaus2006_HasYielded(
 	double*                              normal;
 	double                               viscosity        = ConstitutiveMatrix_GetIsotropicViscosity( constitutiveMatrix );
 	FaultingMoresiMuhlhaus2006_Particle* particleExt;
+        double corr;
 
 	normal = _FaultingMoresiMuhlhaus2006_UpdateNormalDirection( self, materialPointsSwarm, materialPoint, constitutiveMatrix->dim );
 	
 	beta = 1.0 - yieldCriterion / yieldIndicator;
-	
-	ConstitutiveMatrix_SetSecondViscosity( constitutiveMatrix, viscosity * beta, normal ); 
+        corr = -viscosity * beta;
+        if( (viscosity + corr) < self->minVisc )
+           corr = self->minVisc - viscosity;
+
+        /*ConstitutiveMatrix_IsotropicCorrection( constitutiveMatrix, corr );*/
+	ConstitutiveMatrix_SetSecondViscosity( constitutiveMatrix, viscosity * beta, normal );
 
 	particleExt = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, materialPoint, self->particleExtHandle );
 	particleExt->slipRate = self->storedSlipRateValue;
@@ -627,8 +634,10 @@ Bool _FaultingMoresiMuhlhaus2006_OldOrientationStillSoftening( void* rheology, M
 
 	/* We should only continue testing this plane if it is also in the 
 	 * softening orientation with respect to the strain-rate gradient rather than hardening */
+
+        /* The above is untrue if we are keeping the same director normals. */
 	
-	return (dVparalleldXperpendicular1 < dVparalleldXperpendicular);
+	return (dVparalleldXperpendicular1 < dVparalleldXperpendicular) ? True : !self->updateOrientations;
 }
 
 double* _FaultingMoresiMuhlhaus2006_UpdateNormalDirection( void* rheology, MaterialPointsSwarm* materialPointsSwarm, void* materialPoint, Dimension_Index dim ) {
@@ -645,52 +654,61 @@ double* _FaultingMoresiMuhlhaus2006_UpdateNormalDirection( void* rheology, Mater
 	double                               tanPhi;
 	
 	normalDirector = Director_GetNormalPtr( self->director, materialPoint);
-
-        /* If we don't want to ever change the normals attached to the director, then just
-           return the normal we have. */
-        if( !self->updateOrientations )
-           return normalDirector;
 	
 	particleExt = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, materialPoint, self->particleExtHandle );
 	
 	/* This function is specific for pristine materials -- 
 	 * We don't need to calculate it for failure in old orientations */
-	 if ( self->tryingOldOrientation )
-		return normalDirector;
+        if ( self->tryingOldOrientation )
+           return normalDirector;
 	
-	if ((fabs(tanPhi = _FaultingMoresiMuhlhaus2006_EffectiveFrictionCoefficient( self, materialPoint )))<0.000001)
-		theta = M_PI / 4.0;
-	else
-		theta = 0.5 * atan( 1.0/ tanPhi );
-	
-	if (dim == 2){ 
-		
-		/* Identify potential failure directions */
-		StGermain_RotateCoordinateAxis( slip[0],   eigenvectorList[0].vector, K_AXIS, +theta);
-		StGermain_RotateCoordinateAxis( slip[1],   eigenvectorList[0].vector, K_AXIS, -theta);				
-		StGermain_RotateCoordinateAxis( normal[0], eigenvectorList[0].vector, K_AXIS,  0.5*M_PI + theta);
-		StGermain_RotateCoordinateAxis( normal[1], eigenvectorList[0].vector, K_AXIS,  0.5*M_PI - theta);
-	}
-	else {
-			
-		/* Identify potential failure directions */
-		StGermain_RotateVector( slip[0],   eigenvectorList[0].vector, eigenvectorList[1].vector, + theta );
-		StGermain_RotateVector( slip[1],   eigenvectorList[0].vector, eigenvectorList[1].vector, - theta );
-		StGermain_RotateVector( normal[0], eigenvectorList[0].vector, eigenvectorList[1].vector,  0.5*M_PI + theta);
-		StGermain_RotateVector( normal[1], eigenvectorList[0].vector, eigenvectorList[1].vector,  0.5*M_PI - theta);
-	}
-				
-	/* Resolve shear strain-rate for the potential failure planes */
-	strainRate_ns[0] = fabs(TensorArray_MultiplyByVectors( velocityGradient, slip[0], normal[0], dim ));
-	strainRate_ns[1] = fabs(TensorArray_MultiplyByVectors( velocityGradient, slip[1], normal[1], dim ));
-				
-	/* Choose the plane which is oriented favorably for continued slip */
-	favourablePlane = strainRate_ns[0] > strainRate_ns[1] ? 0 : 1;
+        /* Only enter the following conditional if we're interested in
+           updating the director's normal directions. */
+        if( self->updateOrientations ) {
 
-	memcpy( normalDirector,      normal[favourablePlane], dim * sizeof(double) );
-	memcpy( particleExt->slip,   slip[favourablePlane],   dim * sizeof(double) );
-	
-	self->storedSlipRateValue = strainRate_ns[ favourablePlane ];
+           if ((fabs(tanPhi = _FaultingMoresiMuhlhaus2006_EffectiveFrictionCoefficient( self, materialPoint )))<0.000001)
+              theta = M_PI / 4.0;
+           else
+              theta = 0.5 * atan( 1.0/ tanPhi );
+
+           if (dim == 2){ 
+
+              /* Identify potential failure directions */
+              StGermain_RotateCoordinateAxis( slip[0],   eigenvectorList[0].vector, K_AXIS, +theta);
+              StGermain_RotateCoordinateAxis( slip[1],   eigenvectorList[0].vector, K_AXIS, -theta);
+              StGermain_RotateCoordinateAxis( normal[0], eigenvectorList[0].vector, K_AXIS,  0.5*M_PI + theta);
+              StGermain_RotateCoordinateAxis( normal[1], eigenvectorList[0].vector, K_AXIS,  0.5*M_PI - theta);
+           }
+           else {
+
+              /* Identify potential failure directions */
+              StGermain_RotateVector( slip[0],   eigenvectorList[0].vector, eigenvectorList[1].vector, + theta );
+              StGermain_RotateVector( slip[1],   eigenvectorList[0].vector, eigenvectorList[1].vector, - theta );
+              StGermain_RotateVector( normal[0], eigenvectorList[0].vector, eigenvectorList[1].vector,  0.5*M_PI + theta);
+              StGermain_RotateVector( normal[1], eigenvectorList[0].vector, eigenvectorList[1].vector,  0.5*M_PI - theta);
+           }
+
+           /* Resolve shear strain-rate for the potential failure planes */
+           strainRate_ns[0] = fabs(TensorArray_MultiplyByVectors( velocityGradient, slip[0], normal[0], dim ));
+           strainRate_ns[1] = fabs(TensorArray_MultiplyByVectors( velocityGradient, slip[1], normal[1], dim ));
+
+           /* Choose the plane which is oriented favorably for continued slip */
+           favourablePlane = strainRate_ns[0] > strainRate_ns[1] ? 0 : 1;
+
+           memcpy( normalDirector,      normal[favourablePlane], dim * sizeof(double) );
+           memcpy( particleExt->slip,   slip[favourablePlane],   dim * sizeof(double) );
+
+           self->storedSlipRateValue = strainRate_ns[ favourablePlane ];
+
+        }
+
+        /* If we're not interested in changing director normals, just use existing ones. */
+        else {
+
+           self->storedSlipRateValue = fabs(TensorArray_MultiplyByVectors(
+                                               velocityGradient, particleExt->slip, normalDirector, dim ));
+
+        }
 
 	return normalDirector;
 }
