@@ -180,7 +180,6 @@ void _MohrCoulomb_Construct( void* rheology, Stg_ComponentFactory* cf,
 			"PressureField", FeVariable, True, data );
 	strainRateField = Stg_ComponentFactory_ConstructByKey( cf, self->name,
 			"StrainRateField", FeVariable, True, data );
-	self->minVisc = Stg_ComponentFactory_GetDouble( cf, self->name, "minimumViscosity", 0.0 );
 	
 	_MohrCoulomb_Init( 
 			self,

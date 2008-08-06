@@ -72,8 +72,7 @@
 		SymmetricTensor                                     currentStrainRate; \
 		SymmetricTensor                                     currentStress;                         \
 		double                                              currentPressure;                       \
-		double                                              strainRateSecondInvariant;                   \
-		double                                              minVisc;
+		double                                              strainRateSecondInvariant;
 
 	
 	struct MohrCoulomb { __MohrCoulomb };

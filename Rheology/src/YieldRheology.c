@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: YieldRheology.c 610 2007-10-11 08:09:29Z SteveQuenette $
+** $Id: YieldRheology.c 779 2008-08-06 15:50:41Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -185,6 +185,8 @@ void _YieldRheology_Construct( void* rheology, Stg_ComponentFactory* cf, void* d
 		MaterialPointsSwarm,  
 		False,
 		data  ) ;
+
+	self->minVisc = Stg_ComponentFactory_GetDouble( cf, self->name, "minimumViscosity", 0.0 );
 
 	_YieldRheology_Init( self, strainWeakening, materialPoints );
 }

@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: YieldRheology.h 354 2006-10-12 08:19:27Z SteveQuenette $
+** $Id: YieldRheology.h 779 2008-08-06 15:50:41Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -86,7 +86,8 @@
 		/* Other info */ \
 		StrainWeakening*                                   strainWeakening;             \
 		ExtensionInfo_Index                                hasYieldedParticleExtHandle; \
-		SwarmVariable*                                     hasYieldedVariable;          
+		SwarmVariable*                                     hasYieldedVariable;          \
+		double                                             minVisc;
 
 	struct YieldRheology { __YieldRheology };
 

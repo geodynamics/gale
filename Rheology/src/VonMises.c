@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: VonMises.c 750 2008-07-07 02:26:33Z LukeHodkinson $
+** $Id: VonMises.c 779 2008-08-06 15:50:41Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -229,10 +229,11 @@ void _VonMises_HasYielded(
 	}	
 	else {
 		double beta = 1.0 - yieldCriterion/yieldIndicator;
-		
-                if( beta > self->maximumCorrectionFactor )
-                        beta = self->maximumCorrectionFactor;
-		ConstitutiveMatrix_IsotropicCorrection( constitutiveMatrix, -viscosity * beta );
+		double corr = -viscosity * beta;
+
+		if( (viscosity + corr) < self->minVisc )
+		   corr = self->minVisc - viscosity;
+		ConstitutiveMatrix_IsotropicCorrection( constitutiveMatrix, corr );
 	}
 }
 
