@@ -217,7 +217,7 @@ void VTKOutput_particles(IntegrationPointsSwarm*  picswarm,
         else
           {
             /* Loop over all of the rheologies for a particle. */
-                  
+             memset( normal, 0, 3 * sizeof(double) );
             for( rheology_I = 0; rheology_I < rheologyCount ; rheology_I++ ) { 
               rheology = (YieldRheology*)Rheology_Register_GetByIndex( rheology_register, rheology_I ); 
 
@@ -233,7 +233,7 @@ void VTKOutput_particles(IntegrationPointsSwarm*  picswarm,
                 }
 */
               /* Get viscosity */
-              if(!strcmp(rheology->name,"storeViscosity"))
+              if(!strcmp(rheology->type,"StoreVisc"))
                 {
                   StoreVisc* self = (StoreVisc*) rheology;
                   StoreVisc_ParticleExt* particleExt;
@@ -242,7 +242,7 @@ void VTKOutput_particles(IntegrationPointsSwarm*  picswarm,
                   viscosity=particleExt->effVisc;
                 }
               /* Get stress */
-              if(!strcmp(rheology->name,"storeStress"))
+              if(!strcmp(rheology->type,"StoreStress"))
                 {
                   StoreStress* self = (StoreStress*) rheology;
                   StoreStress_ParticleExt* particleExt;
@@ -261,9 +261,6 @@ void VTKOutput_particles(IntegrationPointsSwarm*  picswarm,
               if(!strcmp(rheology->type, "FaultingMoresiMuhlhaus2006")) {
                  Director* director = ((FaultingMoresiMuhlhaus2006*)rheology)->director;
                  Director_GetNormal( director, materialparticle, normal );
-              }
-              else {
-                 memset( normal, 0, 3 * sizeof(double) );
               }
             }
             switch(iteration)
