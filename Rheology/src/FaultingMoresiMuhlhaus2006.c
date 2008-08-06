@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: FaultingMoresiMuhlhaus2006.c 721 2008-04-28 23:15:15Z JohnMansour $
+** $Id: FaultingMoresiMuhlhaus2006.c 781 2008-08-06 17:21:55Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -269,6 +269,8 @@ void _FaultingMoresiMuhlhaus2006_Construct( void* rheology, Stg_ComponentFactory
 	velocityGradientsField = Stg_ComponentFactory_ConstructByKey( cf, self->name,
 			"VelocityGradientsField", FeVariable, True, data );
 	director               =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "Director", Director, True, data );
+
+        self->updateOrientations = Stg_ComponentFactory_GetBool( cf, self->name, "updateOrientations", True );
 	
 	_FaultingMoresiMuhlhaus2006_Init( 
 			self,
@@ -357,32 +359,42 @@ void _FaultingMoresiMuhlhaus2006_Initialise( void* rheology, void* data ) {
 				LM  */
 		
 		
-			if (1 || rand() < RAND_MAX*initialDamageFraction) {
-				normalLength2 = 0.0;
+                        if( initialDamageFraction > 0.0 ) {
+                           /*if (1 || rand() < RAND_MAX*initialDamageFraction) {*/
+                           normalLength2 = 0.0;
 				
-				for( dof_I=0; dof_I < dim ; dof_I++) {
-					normal[dof_I] = 1.0 - (2.0 * rand())/RAND_MAX; 
-					normalLength2 += normal[dof_I] * normal[dof_I];
-				}
-				
-				invNormalLength = 1.0/sqrt(normalLength2);
-				
-				for( dof_I=0; dof_I < dim ; dof_I++){
-					normal[dof_I] *= invNormalLength; 
-				}
-				
-				/*TODO : improve this initialisation (is it really needed ?)
-					Dear Dr TODO, If you mean "is the slip really needed" then
-					I think the answer is "no" .... LM 
-				*/
-				slip[0] = - normal[1];
-				slip[1] =   normal[0];
-				slip[2] =   0.0;
+                           for( dof_I=0; dof_I < dim ; dof_I++) {
+                              normal[dof_I] = 1.0 - (2.0 * (double)rand())/(double)RAND_MAX;
+                              normalLength2 += normal[dof_I] * normal[dof_I];
+                           }
 
+                           invNormalLength = 1.0/sqrt(normalLength2);
+
+                           for( dof_I=0; dof_I < dim ; dof_I++){
+                              normal[dof_I] *= invNormalLength; 
+                           }
+
+                           /*TODO : improve this initialisation (is it really needed ?)
+                             Dear Dr TODO, If you mean "is the slip really needed" then
+                             I think the answer is "no" .... LM 
+                           */
+                           slip[0] = - normal[1];
+                           slip[1] =   normal[0];
+                           slip[2] =   0.0;
+
+                           memcpy( normalDirector, normal, sizeof(Coord) );
+                           memcpy( ptr, slip, sizeof(Coord) );
 			}
-			
-			memcpy( normalDirector, normal, sizeof(Coord) );
-			memcpy( ptr, slip, sizeof(Coord) );
+                        else {
+
+                           /* If not using damage fraction, then just calculate the slip
+                              direction from the existing normal. */
+                           slip[0] = - normalDirector[1];
+                           slip[1] =   normalDirector[0];
+                           slip[2] =   0.0;
+                           memcpy( ptr, slip, sizeof(Coord) );
+
+                        }
 			
 			Variable_SetValueDouble( self->slipRate->variable,      lParticle_I, 0.0   );
 			Variable_SetValueFloat(  self->opacity->variable,       lParticle_I, 0.0   );
@@ -633,6 +645,11 @@ double* _FaultingMoresiMuhlhaus2006_UpdateNormalDirection( void* rheology, Mater
 	double                               tanPhi;
 	
 	normalDirector = Director_GetNormalPtr( self->director, materialPoint);
+
+        /* If we don't want to ever change the normals attached to the director, then just
+           return the normal we have. */
+        if( !self->updateOrientations )
+           return normalDirector;
 	
 	particleExt = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, materialPoint, self->particleExtHandle );
 	
@@ -773,6 +790,10 @@ void _FaultingMoresiMuhlhaus2006_UpdateNormalAtMaxSoft( void* rheology, void* ma
 
 	normalDirector = Director_GetNormalPtr( self->director, materialPoint);
 
+        /* If we don't want to update normals, leave as is. */
+        if( !self->updateOrientations )
+           return;
+
 	SymmetricTensor_CalcAllEigenvectors( strainRate, dim, eigenvectorListStrain );
 	theta = M_PI / 4.0;
 
@@ -780,7 +801,7 @@ void _FaultingMoresiMuhlhaus2006_UpdateNormalAtMaxSoft( void* rheology, void* ma
 		StGermain_RotateCoordinateAxis(   slip[0],   eigenvectorListStrain[0].vector, K_AXIS, -theta);
 		StGermain_RotateCoordinateAxis(   slip[1],   eigenvectorListStrain[0].vector, K_AXIS, +theta);
 		StGermain_RotateCoordinateAxis( normal[0],   eigenvectorListStrain[0].vector, K_AXIS, +theta);
-		StGermain_RotateCoordinateAxis( normal[1],   eigenvectorListStrain[0].vector, K_AXIS, -theta);		
+		StGermain_RotateCoordinateAxis( normal[1],   eigenvectorListStrain[0].vector, K_AXIS, -theta);
 	}
 	else{
 		StGermain_RotateVector( slip[0],   eigenvectorListStrain[0].vector, eigenvectorListStrain[1].vector, - theta );

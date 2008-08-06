@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: FaultingMoresiMuhlhaus2006.h 721 2008-04-28 23:15:15Z JohnMansour $
+** $Id: FaultingMoresiMuhlhaus2006.h 781 2008-08-06 17:21:55Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -89,6 +89,7 @@
 		double                                              minimumYieldStress;                    \
 		Bool                                                ignoreOldOrientation;	                \
 		Bool                                                updateOrientationAtMaxSoftness;        \
+                Bool                                                updateOrientations;                    \
 		/* Stored values that are calculated once for each particle */ \
 		Eigenvector                                         currentEigenvectorList[3];             \
 		TensorArray                                         currentVelocityGradient;               \
