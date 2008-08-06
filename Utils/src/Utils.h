@@ -62,7 +62,6 @@
 	#include "LinearRegression.h"
 	#include "SobolGenerator.h"
 	#include "NewRemesher.h"
-	#include "Remesher.h"
 	#include "RegularRemesher.h"
 	#include "RegularRemesherCmpt.h"
 /*

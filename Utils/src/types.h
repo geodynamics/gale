@@ -68,7 +68,6 @@ typedef struct RegularRemesherCmpt RegularRemesherCmpt;
 	typedef struct TimeIntegratee            TimeIntegratee;
 	typedef struct TimeIntegrator            TimeIntegrator;
 	typedef struct ShapeAdvector             ShapeAdvector;
-	typedef struct Remesher			Remesher;
 	typedef struct StripRemesher		StripRemesher;
 	typedef struct CellRemesher		CellRemesher;
 

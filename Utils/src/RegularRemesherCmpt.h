@@ -26,77 +26,77 @@
 **
 */
 /** \file
-**  Role:
-**
-** Assumptions:
-**
-** Invariants:
-**
-** Comments:
-**
-** $Id: RegularRemesherCmpt.h 2225 1970-01-02 13:48:23Z LukeHodkinson $
-**
-**~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+ **  Role:
+ **
+ ** Assumptions:
+ **
+ ** Invariants:
+ **
+ ** Comments:
+ **
+ ** $Id: RegularRemesherCmpt.h 2225 1970-01-02 13:48:23Z LukeHodkinson $
+ **
+ **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #ifndef __StGermain_Domain_Utils_RegularRemesherCmpt_h__
 #define __StGermain_Domain_Utils_RegularRemesherCmpt_h__
 
-	/* Textual name of this class. */
-	extern const Type RegularRemesherCmpt_Type;
+/* Textual name of this class. */
+extern const Type RegularRemesherCmpt_Type;
 
-	/* Virtual function types. */
+/* Virtual function types. */
 
-	/* Class contents. */
-	#define __RegularRemesherCmpt			\
-		/* General info */			\
-		__Remesher				\
-							\
-		/* Virtual info */			\
-							\
-		/* RegularRemesherCmpt info ... */	\
-		RegularRemesher*	regRemesh;
+/* Class contents. */
+#define __RegularRemesherCmpt			\
+   /* General info */				\
+   __Remesher					\
+						\
+   /* Virtual info */				\
+						\
+   /* RegularRemesherCmpt info ... */		\
+   RegularRemesher*	regRemesh;
 
-	struct RegularRemesherCmpt { __RegularRemesherCmpt };
-
-
-	/*-----------------------------------------------------------------------------------------------------------------------------
-	** Constructors
-	*/
-
-	/* Create a RegularRemesherCmpt */
-	RegularRemesherCmpt* RegularRemesherCmpt_New( Name name );
-
-	/* Creation implementation */
-	RegularRemesherCmpt* _RegularRemesherCmpt_New( REMESHER_ARGS );
-
-	/* Initialise a RegularRemesherCmpt */
-	void RegularRemesherCmpt_Init( RegularRemesherCmpt* self );
-
-	/* Initialisation implementation functions */
-	void _RegularRemesherCmpt_Init( RegularRemesherCmpt* self );
+struct RegularRemesherCmpt { __RegularRemesherCmpt };
 
 
-	/*-----------------------------------------------------------------------------------------------------------------------------
-	** Virtual functions
-	*/
+/*-----------------------------------------------------------------------------------------------------------------------------
+** Constructors
+*/
 
-	void _RegularRemesherCmpt_Delete( void* remesher );
-	void _RegularRemesherCmpt_Print( void* remesher, Stream* stream );
-	RegularRemesherCmpt* _RegularRemesherCmpt_DefaultNew( Name name );
-	void _RegularRemesherCmpt_Construct( void* remesher, Stg_ComponentFactory* cf, void* data );
-	void _RegularRemesherCmpt_Build( void* remesher, void* data );
-	void _RegularRemesherCmpt_Initialise( void* remesher, void* data );
-	void _RegularRemesherCmpt_Execute( void* remesher, void* data );
-	void _RegularRemesherCmpt_Destroy( void* remesher, void* data );
+/* Create a RegularRemesherCmpt */
+RegularRemesherCmpt* RegularRemesherCmpt_New( Name name );
 
+/* Creation implementation */
+RegularRemesherCmpt* _RegularRemesherCmpt_New( REMESHER_ARGS );
 
-	/*-----------------------------------------------------------------------------------------------------------------------------
-	** Public functions
-	*/
+/* Initialise a RegularRemesherCmpt */
+void RegularRemesherCmpt_Init( RegularRemesherCmpt* self );
+
+/* Initialisation implementation functions */
+void _RegularRemesherCmpt_Init( RegularRemesherCmpt* self );
 
 
-	/*-----------------------------------------------------------------------------------------------------------------------------
-	** Private Member functions
-	*/
+/*-----------------------------------------------------------------------------------------------------------------------------
+** Virtual functions
+*/
+
+void _RegularRemesherCmpt_Delete( void* remesher );
+void _RegularRemesherCmpt_Print( void* remesher, Stream* stream );
+RegularRemesherCmpt* _RegularRemesherCmpt_DefaultNew( Name name );
+void _RegularRemesherCmpt_Construct( void* remesher, Stg_ComponentFactory* cf, void* data );
+void _RegularRemesherCmpt_Build( void* remesher, void* data );
+void _RegularRemesherCmpt_Initialise( void* remesher, void* data );
+void _RegularRemesherCmpt_Execute( void* remesher, void* data );
+void _RegularRemesherCmpt_Destroy( void* remesher, void* data );
+
+
+/*-----------------------------------------------------------------------------------------------------------------------------
+** Public functions
+*/
+
+
+/*-----------------------------------------------------------------------------------------------------------------------------
+** Private Member functions
+*/
 
 #endif

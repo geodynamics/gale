@@ -69,6 +69,7 @@
 #include "CompressionAdaptor.h"
 #include "MeshVariable.h"
 #include "SpatialTree.h"
+#include "Remesher.h"
 
 #include "Init.h"
 #include "Finalise.h"

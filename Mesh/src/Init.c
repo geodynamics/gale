@@ -74,6 +74,8 @@ Bool StgDomainMesh_Init( int* argc, char** argv[] ) {
 				   CompressionAdaptor_Type, "0", (Stg_Component_DefaultConstructorFunction*)CompressionAdaptor_New );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), 
 				   MeshVariable_Type, "0", (Stg_Component_DefaultConstructorFunction*)MeshVariable_New );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), 
+				   Remesher_Type, "0", (Stg_Component_DefaultConstructorFunction*)_Remesher_DefaultNew );
 
 	RegisterParent( Mesh_ElementType_Type, Stg_Class_Type );
 	RegisterParent( Mesh_HexType_Type, Mesh_ElementType_Type );
@@ -90,6 +92,7 @@ Bool StgDomainMesh_Init( int* argc, char** argv[] ) {
 	RegisterParent( SurfaceAdaptor_Type, MeshAdaptor_Type );
 	RegisterParent( CompressionAdaptor_Type, MeshAdaptor_Type );
 	RegisterParent( MeshVariable_Type, Variable_Type );
+	RegisterParent( Remesher_Type, Stg_Component_Type );
 
 	return True;
 }

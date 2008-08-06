@@ -80,7 +80,7 @@
 		/* SurfaceAdaptor info */			\
 		SurfaceAdaptor_SurfaceType	surfaceType;	\
 		SurfaceAdaptor_SurfaceInfo	info;           \
-                int                             contactDepth;
+		int                             contactDepth;
 
 
 	struct SurfaceAdaptor { __SurfaceAdaptor };

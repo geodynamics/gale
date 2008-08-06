@@ -40,6 +40,7 @@ MEMBER( int***, wallVerts )
 MEMBER( double***, wallCrds )
 MEMBER( int, contactDepth )
 MEMBER( double*, contactVerts )
+MEMBER( double, contactSize )
 
 
 /*

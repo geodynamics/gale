@@ -151,8 +151,10 @@ void _Mesh_Build( void* mesh, void* data ) {
 
 	assert( self );
 
-	if( self->generator )
-		MeshGenerator_Generate( self->generator, self, data );
+	if( self->generator ) {
+	   Stg_Component_Build( self->generator, data, False );
+	   MeshGenerator_Generate( self->generator, self, data );
+	}
 
 	nDims = Mesh_GetDimSize( self );
 	if( !nDims )

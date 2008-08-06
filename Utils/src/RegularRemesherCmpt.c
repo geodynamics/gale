@@ -41,7 +41,6 @@
 #include <StgDomain/Mesh/Mesh.h>
 
 #include "types.h"
-#include "Remesher.h"
 #include "NewRemesher.h"
 #include "RegularRemesher.h"
 #include "RegularRemesherCmpt.h"
@@ -56,63 +55,63 @@ const Type RegularRemesherCmpt_Type = "RegularRemesherCmpt";
 */
 
 #define REMESHER_DEFARGS				\
-	sizeof(RegularRemesherCmpt),				\
-	RegularRemesherCmpt_Type,				\
-	_RegularRemesherCmpt_Delete,				\
-	_RegularRemesherCmpt_Print,				\
-	NULL,						\
-	(void*(*)(Name))_RegularRemesherCmpt_DefaultNew,	\
-	_RegularRemesherCmpt_Construct,			\
-	_RegularRemesherCmpt_Build,				\
-	_RegularRemesherCmpt_Initialise,			\
-	_RegularRemesherCmpt_Execute,				\
-	_RegularRemesherCmpt_Destroy,				\
-	name,						\
-		False, 				\
-		NULL
+   sizeof(RegularRemesherCmpt),				\
+      RegularRemesherCmpt_Type,				\
+      _RegularRemesherCmpt_Delete,			\
+      _RegularRemesherCmpt_Print,			\
+      NULL,						\
+      (void*(*)(Name))_RegularRemesherCmpt_DefaultNew,	\
+      _RegularRemesherCmpt_Construct,			\
+      _RegularRemesherCmpt_Build,			\
+      _RegularRemesherCmpt_Initialise,			\
+      _RegularRemesherCmpt_Execute,			\
+      _RegularRemesherCmpt_Destroy,			\
+      name,						\
+      False,						\
+      NULL
 
 
 RegularRemesherCmpt* RegularRemesherCmpt_New( Name name ) {
-	return _RegularRemesherCmpt_New( REMESHER_DEFARGS );
+   return _RegularRemesherCmpt_New( REMESHER_DEFARGS );
 }
 
 
 RegularRemesherCmpt* _RegularRemesherCmpt_New( REMESHER_ARGS ) {
-	RegularRemesherCmpt*	self;
+   RegularRemesherCmpt*	self;
 
-	/* Allocate memory. */
-	self = (RegularRemesherCmpt*)_Remesher_New( REMESHER_PASSARGS );
+   /* Allocate memory. */
+   self = (RegularRemesherCmpt*)_Remesher_New( REMESHER_PASSARGS );
 
-	/* RegularRemesherCmpt info */
-        _RegularRemesherCmpt_Init( self );
+   /* RegularRemesherCmpt info */
+   _RegularRemesherCmpt_Init( self );
 
-	return self;
+   return self;
 }
 
 
 void RegularRemesherCmpt_Init( RegularRemesherCmpt* self ) {
-	assert( 0 ); /* TODO */
+   assert( 0 ); /* TODO */
 #if 0
-	/* General info */
-	self->type = RegularRemesherCmpt_Type;
-	self->_sizeOfSelf = sizeof(RegularRemesherCmpt);
-	self->_deleteSelf = False;
+   /* General info */
+   self->type = RegularRemesherCmpt_Type;
+   self->_sizeOfSelf = sizeof(RegularRemesherCmpt);
+   self->_deleteSelf = False;
 	
-	/* Virtual info */
-	self->_delete = _RegularRemesherCmpt_Delete;
-	self->_print = _RegularRemesherCmpt_Print;
-	self->_copy = NULL;
-	_Stg_Class_Init( (Stg_Class*)self );
+   /* Virtual info */
+   self->_delete = _RegularRemesherCmpt_Delete;
+   self->_print = _RegularRemesherCmpt_Print;
+   self->_copy = NULL;
+   _Stg_Class_Init( (Stg_Class*)self );
 	
-	/* RegularRemesherCmpt info */
-	_RegularRemesherCmpt_Init( self );
+   /* RegularRemesherCmpt info */
+   _RegularRemesherCmpt_Init( self );
 #endif
 }
 
 
 void _RegularRemesherCmpt_Init( RegularRemesherCmpt* self ) {
-	/* RegularRemesherCmpt info */
-	self->regRemesh = RegularRemesher_New();
+   /* RegularRemesherCmpt info */
+   self->regRemesh = RegularRemesher_New();
 }
 
 
@@ -121,113 +120,114 @@ void _RegularRemesherCmpt_Init( RegularRemesherCmpt* self ) {
 */
 
 void _RegularRemesherCmpt_Delete( void* remesher ) {
-	RegularRemesherCmpt*	self = (RegularRemesherCmpt*)remesher;
+   RegularRemesherCmpt*	self = (RegularRemesherCmpt*)remesher;
 
-	/* Delete the class itself */
-	NewClass_Delete( self->regRemesh );
+   /* Delete the class itself */
+   NewClass_Delete( self->regRemesh );
 
-	/* Delete parent */
-	_Stg_Component_Delete( remesher );
+   /* Delete parent */
+   _Stg_Component_Delete( remesher );
 }
 
 
 void _RegularRemesherCmpt_Print( void* remesher, Stream* stream ) {
-	RegularRemesherCmpt*	self = (RegularRemesherCmpt*)remesher;
-	Stream*		myStream;
+   RegularRemesherCmpt*	self = (RegularRemesherCmpt*)remesher;
+   Stream*		myStream;
 	
-	/* Set the Journal for printing informations */
-	myStream = Journal_Register( InfoStream_Type, "RegularRemesherCmptStream" );
+   /* Set the Journal for printing informations */
+   myStream = Journal_Register( InfoStream_Type, "RegularRemesherCmptStream" );
 
-	/* Print parent */
-	_Stg_Component_Print( self, stream );
+   /* Print parent */
+   _Stg_Component_Print( self, stream );
 
-	/* General info */
-	Journal_Printf( myStream, "RegularRemesherCmpt (ptr): (%p)\n", self );
+   /* General info */
+   Journal_Printf( myStream, "RegularRemesherCmpt (ptr): (%p)\n", self );
 
-	/* Virtual info */
+   /* Virtual info */
 
-	/* RegularRemesherCmpt info */
+   /* RegularRemesherCmpt info */
 }
 
 
 RegularRemesherCmpt* _RegularRemesherCmpt_DefaultNew( Name name ) {
-	return _RegularRemesherCmpt_New( REMESHER_DEFARGS );
+   return _RegularRemesherCmpt_New( REMESHER_DEFARGS );
 }
 
 
 void _RegularRemesherCmpt_Construct( void* remesher, Stg_ComponentFactory* cf, void* data ) {
-	RegularRemesherCmpt* self = (RegularRemesherCmpt*)remesher;
-	Dictionary* dict;
-	Dictionary_Entry_Value* list;
-	Mesh* mesh;
-	int nItms, dim, wall;
-	int i_i;
+   RegularRemesherCmpt* self = (RegularRemesherCmpt*)remesher;
+   Dictionary* dict;
+   Dictionary_Entry_Value* list;
+   Mesh* mesh;
+   int nItms, dim, wall;
+   int i_i;
 
-	assert( self );
-	assert( cf );
+   assert( self );
+   assert( cf );
 
-	_RegularRemesherCmpt_Init( self );
+   _RegularRemesherCmpt_Init( self );
 
-	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "mesh", Mesh, True, data );
-	NewRemesher_SetMesh( self->regRemesh, mesh );
+   mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "mesh", Mesh, True, data );
+   NewRemesher_SetMesh( self->regRemesh, mesh );
 
-        self->regRemesh->contactDepth = Stg_ComponentFactory_GetInt( cf, self->name, "contactDepth", 0 );
+   self->regRemesh->contactDepth = Stg_ComponentFactory_GetInt( cf, self->name, "contactDepth", 0 );
+   self->regRemesh->contactSize = Stg_ComponentFactory_GetDouble( cf, self->name, "contactSize", 0.0 );
 
-	dict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( cf->componentDict, self->name ) );
-	list = Dictionary_Get( dict, "remeshDims" );
-	if( list ) {
-		nItms = Dictionary_Entry_Value_GetCount( list );
-		for( i_i = 0; i_i < nItms; i_i++ ) {
-			dim = Dictionary_Entry_Value_AsInt( 
-				Dictionary_Entry_Value_GetElement( list, i_i ) );
-			RegularRemesher_SetRemeshState( self->regRemesh, dim, True );
-		}
-	}
+   dict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( cf->componentDict, self->name ) );
+   list = Dictionary_Get( dict, "remeshDims" );
+   if( list ) {
+      nItms = Dictionary_Entry_Value_GetCount( list );
+      for( i_i = 0; i_i < nItms; i_i++ ) {
+	 dim = Dictionary_Entry_Value_AsInt( 
+	    Dictionary_Entry_Value_GetElement( list, i_i ) );
+	 RegularRemesher_SetRemeshState( self->regRemesh, dim, True );
+      }
+   }
 
-	list = Dictionary_Get( dict, "staticWalls" );
-	if( list ) {
-		nItms = Dictionary_Entry_Value_GetCount( list );
-		assert( nItms % 2 == 0 );
-		for( i_i = 0; i_i < nItms; i_i += 2 ) {
-			dim = Dictionary_Entry_Value_AsInt( 
-				Dictionary_Entry_Value_GetElement( list, i_i ) );
-			wall = Dictionary_Entry_Value_AsInt( 
-				Dictionary_Entry_Value_GetElement( list, i_i + 1 ) );
-			RegularRemesher_SetStaticWall( self->regRemesh, dim, wall, True );
-		}
-	}
+   list = Dictionary_Get( dict, "staticWalls" );
+   if( list ) {
+      nItms = Dictionary_Entry_Value_GetCount( list );
+      assert( nItms % 2 == 0 );
+      for( i_i = 0; i_i < nItms; i_i += 2 ) {
+	 dim = Dictionary_Entry_Value_AsInt( 
+	    Dictionary_Entry_Value_GetElement( list, i_i ) );
+	 wall = Dictionary_Entry_Value_AsInt( 
+	    Dictionary_Entry_Value_GetElement( list, i_i + 1 ) );
+	 RegularRemesher_SetStaticWall( self->regRemesh, dim, wall, True );
+      }
+   }
 }
 
 
 void _RegularRemesherCmpt_Build( void* remesher, void* data ) {
-	RegularRemesherCmpt*	self = (RegularRemesherCmpt*)remesher;
+   RegularRemesherCmpt*	self = (RegularRemesherCmpt*)remesher;
 
-	assert( self );
+   assert( self );
 
-	RegularRemesher_Build( self->regRemesh );
+   RegularRemesher_Build( self->regRemesh );
 }
 
 
 void _RegularRemesherCmpt_Initialise( void* remesher, void* data ) {
-	RegularRemesherCmpt*	self = (RegularRemesherCmpt*)remesher;
+   RegularRemesherCmpt*	self = (RegularRemesherCmpt*)remesher;
 
-	assert( self );
+   assert( self );
 }
 
 
 void _RegularRemesherCmpt_Execute( void* remesher, void* data ) {
-	RegularRemesherCmpt*	self = (RegularRemesherCmpt*)remesher;
+   RegularRemesherCmpt*	self = (RegularRemesherCmpt*)remesher;
 
-	assert( self );
+   assert( self );
 
-	RegularRemesher_Remesh( self->regRemesh );
+   RegularRemesher_Remesh( self->regRemesh );
 }
 
 
 void _RegularRemesherCmpt_Destroy( void* remesher, void* data ) {
-	RegularRemesherCmpt*	self = (RegularRemesherCmpt*)remesher;
+   RegularRemesherCmpt*	self = (RegularRemesherCmpt*)remesher;
 
-	assert( self );
+   assert( self );
 }
 
 

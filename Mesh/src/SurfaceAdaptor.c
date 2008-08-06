@@ -51,6 +51,7 @@
 #include "MeshGenerator.h"
 #include "MeshAdaptor.h"
 #include "SurfaceAdaptor.h"
+#include "Remesher.h"
 
 
 typedef double (SurfaceAdaptor_DeformFunc)( SurfaceAdaptor* self, Mesh* mesh, 
@@ -185,11 +186,15 @@ void _SurfaceAdaptor_Construct( void* adaptor, Stg_ComponentFactory* cf, void* d
 }
 
 void _SurfaceAdaptor_Build( void* adaptor, void* data ) {
-	_MeshAdaptor_Build( adaptor, data );
+   SurfaceAdaptor* self = (SurfaceAdaptor*)adaptor;
+
+   _MeshAdaptor_Build( adaptor, data );
 }
 
 void _SurfaceAdaptor_Initialise( void* adaptor, void* data ) {
-	_MeshAdaptor_Initialise( adaptor, data );
+   SurfaceAdaptor* self = (SurfaceAdaptor*)adaptor;
+
+   _MeshAdaptor_Initialise( adaptor, data );
 }
 
 void _SurfaceAdaptor_Execute( void* adaptor, void* data ) {
@@ -248,9 +253,9 @@ void SurfaceAdaptor_Generate( void* adaptor, void* _mesh, void* data ) {
 		gNode = Sync_DomainToGlobal( sync, n_i );
 		Grid_Lift( grid, gNode, inds );
 
-                /* If we're under the contact depth don't modify. */
-                if( self->contactDepth && inds[1] < (self->contactDepth + 1) )
-                   continue;
+		/* Check if we're inside the contact depth. */
+		if( inds[1] <= self->contactDepth )
+		   continue;
 
 		/* Calculate a height percentage. */
 		height = (double)(inds[1] - self->contactDepth) / (double)(grid->sizes[1] - 1);

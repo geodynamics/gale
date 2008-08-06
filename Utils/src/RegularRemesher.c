@@ -59,6 +59,7 @@ void _RegularRemesher_Init( void* _self ) {
    self->wallVerts = NULL;
    self->wallCrds = NULL;
    self->contactDepth = 0;
+   self->contactSize = 0.0;
 }
 
 void _RegularRemesher_Copy( void* _self, const void* _op ) {
@@ -388,7 +389,12 @@ void RegularRemesher_Build( void* _self ) {
       for( ii = 0; ii < nVerts; ii++ ) {
          Grid_Lift( grid, ii, inds );
          if( inds[1] != self->contactDepth ) continue;
-         self->contactVerts[curInd++] = Mesh_GetVertex( mesh, ii )[1];
+
+	 /* If we were given a contact size, insert that instead. */
+	 if( self->contactSize > 0.0 )
+	   self->contactVerts[curInd++] = self->contactSize;
+	 else
+	   self->contactVerts[curInd++] = Mesh_GetVertex( mesh, ii )[1];
       }
 
    }

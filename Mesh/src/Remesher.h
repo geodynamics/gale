@@ -87,7 +87,7 @@ void _Remesher_Destroy( void* remesher, void* data );
 ** Public functions */
 
 #define Remesher_Remesh( self)                  \
-  (self)->reshFunc( self )
+  (self)->remeshFunc( self )
 
 
 #endif

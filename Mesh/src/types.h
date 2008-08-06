@@ -137,6 +137,7 @@ typedef enum {
 	typedef struct SurfaceAdaptor			SurfaceAdaptor;
 	typedef struct CompressionAdaptor		CompressionAdaptor;
 	typedef struct MeshVariable			MeshVariable;
+	typedef struct Remesher Remesher;
 
 	/* Streams */
 	extern Stream*	Mesh_VerboseConfig;
