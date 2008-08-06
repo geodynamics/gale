@@ -170,7 +170,7 @@ void VTKOutput_particles(IntegrationPointsSwarm*  picswarm,
   
   /* We need many iterations, because the values are written
      separately from the coordinates. */
-  for(iteration=0; iteration<8; ++iteration)
+  for(iteration=0; iteration<9; ++iteration)
     {
       /* Loop over all of the particles */
       for ( lParticle_I = 0 ; lParticle_I < num_particles ;
@@ -180,6 +180,7 @@ void VTKOutput_particles(IntegrationPointsSwarm*  picswarm,
         SymmetricTensor stress;
         BuoyancyForceTerm_MaterialExt*   materialExt;
         Material *extension_info;
+        double normal[3];
         
         IntegrationPoint* integrationparticle = (IntegrationPoint*)Swarm_ParticleAt( picswarm, lParticle_I );
         
@@ -195,7 +196,7 @@ void VTKOutput_particles(IntegrationPointsSwarm*  picswarm,
           ( material->dictionary, "diffusivity", defaultDiffusivity );
         rheology_register=(Rheology_Register*)material->rheology_Register;
 
-        rheologyCount = Rheology_Register_GetCount( rheology_register ); 
+        rheologyCount = Rheology_Register_GetCount( rheology_register );
         
         coord = materialparticle->coord;
         yielding=0;
@@ -219,15 +220,20 @@ void VTKOutput_particles(IntegrationPointsSwarm*  picswarm,
                   
             for( rheology_I = 0; rheology_I < rheologyCount ; rheology_I++ ) { 
               rheology = (YieldRheology*)Rheology_Register_GetByIndex( rheology_register, rheology_I ); 
-                
+
               /* Get yielding information */
-              if(!strcmp(rheology->name,"yielding"))
+/*
+              if(!strcmp(rheology->type, "DruckerPrager") || 
+                 !strcmp(rheology->type, "VonMises") ||
+                 !strcmp(rheology->type, "FaultingMoresiMuhlhaus2006") ||
+                 !strcmp(rheology->type, "MohrCoulomb"))
                 {
                   yielding=StrainWeakening_CalcRatio(rheology->strainWeakening,
                                                      materialparticle);
                 }
+*/
               /* Get viscosity */
-              else if(!strcmp(rheology->name,"storeViscosity"))
+              if(!strcmp(rheology->name,"storeViscosity"))
                 {
                   StoreVisc* self = (StoreVisc*) rheology;
                   StoreVisc_ParticleExt* particleExt;
@@ -236,7 +242,7 @@ void VTKOutput_particles(IntegrationPointsSwarm*  picswarm,
                   viscosity=particleExt->effVisc;
                 }
               /* Get stress */
-              else if(!strcmp(rheology->name,"storeStress"))
+              if(!strcmp(rheology->name,"storeStress"))
                 {
                   StoreStress* self = (StoreStress*) rheology;
                   StoreStress_ParticleExt* particleExt;
@@ -252,6 +258,13 @@ void VTKOutput_particles(IntegrationPointsSwarm*  picswarm,
                       stress[5]=particleExt->stress[5];
                     }
                 }
+              if(!strcmp(rheology->type, "FaultingMoresiMuhlhaus2006")) {
+                 Director* director = ((FaultingMoresiMuhlhaus2006*)rheology)->director;
+                 Director_GetNormal( director, materialparticle, normal );
+              }
+              else {
+                 memset( normal, 0, 3 * sizeof(double) );
+              }
             }
             switch(iteration)
               {
@@ -288,6 +301,8 @@ void VTKOutput_particles(IntegrationPointsSwarm*  picswarm,
               case 7:
                 fprintf(fp,"%lf ",diffusivity);
                 break;
+                 case 8:
+                    fprintf(fp, "%lf %lf %lf ", normal[0], normal[1], normal[2]);
               }
           }
       }
@@ -341,6 +356,12 @@ void VTKOutput_particles(IntegrationPointsSwarm*  picswarm,
             fprintf(pfp,"        <PDataArray type=\"Float64\" Name=\"Thermal_Diffusivity\" format=\"ascii\"/>\n");
           break;
         case 7:
+          fprintf(fp,"\n        </DataArray>\n");
+          fprintf(fp,"        <DataArray type=\"Float64\" Name=\"Director_Normals\" format=\"ascii\" NumberOfComponents=\"3\">\n");
+          if(myRank==0)
+            fprintf(pfp,"        <PDataArray type=\"Float64\" Name=\"Director_Normals\" format=\"ascii\" NumberOfComponents=\"3\"/>\n");
+          break;
+        case 8:
           fprintf(fp,"\n        </DataArray>\n");
           fprintf(fp,"      </PointData>\n");
           fprintf(fp,"      <CellData>\n");
