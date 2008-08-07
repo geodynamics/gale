@@ -763,6 +763,9 @@ void FieldTest_GenerateErrFields( void* _context, void* data ) {
 			self->gAnalyticSq[field_I][dof_I] = gAnalyticSq[dof_I];
 			self->gErrorSq[field_I][dof_I]    = gErrorSq[dof_I];
 			self->gErrorNorm[field_I][dof_I]  = sqrt( gErrorSq[dof_I] / gAnalyticSq[dof_I] );
+
+			Journal_Printf( context->info, "%s - dof %d normalised global error: %.8e\n", 
+				     	self->numericFieldList[field_I]->name, dof_I, self->gErrorNorm[field_I][dof_I] );
 		}
 	}
 }
