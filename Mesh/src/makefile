@@ -61,6 +61,7 @@ SRCS = 				\
 	CompressionAdaptor.c		\
 	SpatialTree.c			\
 	MeshVariable.c			\
+	Remesher.c			\
 	Init.c				\
 	Finalise.c
 
@@ -93,6 +94,7 @@ HDRS = 				\
 	SpatialTree.def			\
 	SpatialTree.h			\
 	MeshVariable.h			\
+	Remesher.h			\
 	Init.h				\
 	Finalise.h
 

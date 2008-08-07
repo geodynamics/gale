@@ -54,13 +54,13 @@ SRCS = \
 	InnerWallVC.c \
 	LinearRegression.c \
 	MeshShapeVC.c \
+	MeshBoundaryShape.c \
 	NewRemesher.c \
 	Operator.c \
 	OperatorFieldVariable.c \
 	RegularMeshUtils.c \
 	RegularRemesher.c \
 	RegularRemesherCmpt.c \
-	Remesher.c \
 	ShapeAdvector.c \
 	SobolGenerator.c \
 	TimeIntegratee.c \
@@ -86,6 +86,7 @@ HDRS = \
 	InnerWallVC.h \
 	LinearRegression.h \
 	MeshShapeVC.h \
+	MeshBoundaryShape.h \
 	NewRemesher.def \
 	NewRemesher.h \
 	Operator.h \
@@ -94,7 +95,6 @@ HDRS = \
 	RegularRemesher.def \
 	RegularRemesher.h \
 	RegularRemesherCmpt.h \
-	Remesher.h \
 	ShapeAdvector.h \
 	SobolGenerator.h \
 	TimeIntegratee.h \
