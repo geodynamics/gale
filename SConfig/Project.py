@@ -13,11 +13,13 @@ class Project(SConfig.Node):
     def setup_options(self):
         self.opts.AddOptions(
             SCons.Script.BoolOption('with_debug',
-                                    'Generate debugging symbols', 1),
+                                    'Generate debugging symbols', 0),
             SCons.Script.BoolOption('static_libraries',
                                     'Build static libraries', 1),
             SCons.Script.BoolOption('shared_libraries',
                                     'Build shared libraries', 1),
+            SCons.Script.BoolOption('with_optimise',
+                                    'optimising with -03 flag', 1),
             ('build_dir', 'Temporary build directory', 'build')
             )
 
@@ -215,6 +217,7 @@ class Project(SConfig.Node):
         self.ctx.Display("  Shared libraries: %s\n" % str(bool(self.env['shared_libraries'])))
         self.ctx.Display("  Using build directory: %s\n" % self.env['build_dir'])
         self.ctx.Display("  Debugging symbols: %s\n" % str(bool(self.env['with_debug'])))
+        self.ctx.Display("  Optimisation symbols: %s\n" % str(bool(self.env['with_optimise'])))
         return True
 
     def enable(self, scons_env, old_state=None):
@@ -227,6 +230,12 @@ class Project(SConfig.Node):
             scons_env.MergeFlags(d)
         else:
             d = scons_env.ParseFlags('-DNDEBUG')
+            self.backup_variable(scons_env, d.keys(), old_state)
+            scons_env.MergeFlags(d)
+
+	# Setup the optimisation flags
+        if self.env['with_optimise']:
+            d = scons_env.ParseFlags('-O3')
             self.backup_variable(scons_env, d.keys(), old_state)
             scons_env.MergeFlags(d)
 
@@ -243,3 +252,7 @@ class Project(SConfig.Node):
         # Setup the RPATH.
         self.backup_variable(scons_env, 'RPATH', old_state)
         scons_env.PrependUnique(RPATH=[scons_env.Dir(lib_dir).abspath])
+
+	# TODO print compiler flags without quotes and commas so they can be copied clenly
+	self.ctx.Display( "Compiler flags: " )
+	print scons_env['CCFLAGS'][:]
