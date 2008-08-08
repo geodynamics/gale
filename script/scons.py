@@ -27,7 +27,12 @@ def build_metas(env, metas, dst_dir):
     for m in metas:
         src = env.Meta(env.get_build_path(dst_dir + '/' + os.path.basename(m)[:-5]), m)
         tgt = env.get_build_path(dst_dir + '/' + os.path.basename(src[0].path)[:-2])
-        objs += env.SharedObject(tgt, src, CPPDEFINES=[mod_name] + env.get('CPPDEFINES', []))
+        if 'tau_old_cc' in env._dict:
+            objs += env.SharedObject(tgt, src,
+                                     CC=env['tau_old_cc'],
+                                     CPPDEFINES=[mod_name] + env.get('CPPDEFINES', []))
+        else:
+            objs += env.SharedObject(tgt, src, CPPDEFINES=[mod_name] + env.get('CPPDEFINES', []))
     return objs
 
 def build_directory(env, dir, dst_dir='', with_tests=True):
