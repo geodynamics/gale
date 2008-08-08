@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Stokes_SLE_UzawaSolver.c 1125 2008-05-12 14:22:02Z DavidMay $
+** $Id: Stokes_SLE_UzawaSolver.c 1199 2008-08-08 04:03:32Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -256,6 +256,17 @@ void _Stokes_SLE_UzawaSolver_Build( void* solver, void* stokesSLE ) {
 	}
 	else 
 		self->pcSolver = NULL;
+
+	if( self->pTempVec != NULL )
+	  FreeObject( self->pTempVec );
+	if( self->rVec != NULL )
+	  FreeObject( self->rVec );
+	if( self->sVec != NULL )
+	  FreeObject( self->sVec );
+	if( self->fTempVec != NULL )
+	  FreeObject( self->fTempVec );
+	if( self->vStarVec != NULL )
+	  FreeObject( self->vStarVec );
 
  	Journal_DPrintfL( self->debug, 2, "Allocate the auxillary vectors pTemp, r, s, fTemp and vStar.\n" ); 
 	Vector_Duplicate( sle->pSolnVec->vector, (void**)&self->pTempVec );
@@ -692,7 +703,9 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	Vector_AddScaled( rVec, -1.0, hVec );
 			
 	/* Check for existence of constant null space */
+#if 0
 	nullsp_present = _check_if_constant_nullsp_present( self, K_Mat,G_Mat,M_Mat, fTempVec,vStarVec,qTempVec,sVec, velSolver );
+#endif
 			
 	/* STEP 4: Preconditioned conjugate gradient iteration loop */	
 		
@@ -724,9 +737,11 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 			Vector_CopyEntries( rVec, qTempVec );
 
 		/* Remove the constant null space, but only if NOT compressible */
+#if 0
 		if( nullsp_present == True ) {
 			_remove_constant_nullsp( qTempVec );
 		}
+#endif
 
 
 				
