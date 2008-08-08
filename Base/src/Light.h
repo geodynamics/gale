@@ -96,12 +96,12 @@
 	void lucLight_InitAll( 
 		void*                                              light,
 		Light_Index                                        index,
-		int                                              model,
-		int                                              material,
-		float                                            position[4],
-		float                                            lmodel_ambient[4],
-		float                                            spotCutOff,
-		float                                            spotDirection[3]
+		int                                                model,
+		int                                                material,
+		float                                              position[4],
+		float                                              lmodel_ambient[4],
+		float                                              spotCutOff,
+		float                                              spotDirection[3]
 	 );
 	
 	/** Virtual Functions */
@@ -111,15 +111,15 @@
 	#define lucLight_Copy( self ) \
 		(lucLight*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	void* _lucLight_DefaultNew( Name name ) ;
-void _lucLight_Construct( void* light, Stg_ComponentFactory* cf, void* data ) ;
+	void _lucLight_Construct( void* light, Stg_ComponentFactory* cf, void* data ) ;
 	void _lucLight_Build( void* light, void* data );
 	void _lucLight_Initialise( void* light, void* data );
 	void _lucLight_Execute( void* light, void* data );
 	void _lucLight_Destroy( void* light, void* data );
 
 	/** Public Functions */
-void lucLight_Position( void * light, int index, float posX, float posY, float posZ, float posW);
-void lucLight_Material( int material);
+	void lucLight_Position( void * light, int index, float posX, float posY, float posZ, float posW);
+	void lucLight_Material( int material);
 
 
 

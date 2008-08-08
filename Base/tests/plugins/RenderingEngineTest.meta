@@ -13,7 +13,7 @@
 <param name="Parent">lucRenderingEngine</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">...</param>
+<param name="Description">An implementation of the lucRenderingEngine class which outputs a consistent colour pattern designed to test Output Format implementations.</param>
 
 <!--Now the interesting stuff-->
 
@@ -26,5 +26,9 @@
 
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">
+		<struct name="renderingEngine">
+				<param name="Type">lucRenderingEngineTest</param>
+		</struct>
+</param>
 

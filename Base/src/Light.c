@@ -198,12 +198,12 @@ void* _lucLight_Copy( void* light, void* dest, Bool deep, Name nameExt, PtrMap* 
 
 	newLight->index    = self->index;
 	newLight->model    = self->model;
-	newLight->material =  self->material;	
+	newLight->material = self->material;	
 	
 
 	/*TODO*/
        	newLight->position[0] = self->position[0];
-	newLight->position[1] =self-> position[1];
+	newLight->position[1] = self-> position[1];
 	newLight->position[2] = self->position[2];
 	newLight->position[3] = self->position[3];
 	newLight->lmodel_ambient[0] = self->lmodel_ambient[0];
@@ -307,12 +307,12 @@ void lucLight_Pickle( void* light, Stream* stream ) {
 	Journal_Printf( stream, "<param name=\"posX\">%.5g</param>\n", self->position[ 0 ] );
 	Journal_Printf( stream, "<param name=\"posY\">%.5g</param>\n", self->position[ 1 ] );
 	Journal_Printf( stream, "<param name=\"posZ\">%.5g</param>\n", self->position[ 2 ] );	
-	Journal_Printf( stream, "<param name=\"posZ\">%.5g</param>\n", self->position[ 3 ] );
+	Journal_Printf( stream, "<param name=\"posW\">%.5g</param>\n", self->position[ 3 ] );
 
 	Journal_Printf( stream, "<param name=\"ambX\">%.5g</param>\n", self->lmodel_ambient[ 0 ] );
 	Journal_Printf( stream, "<param name=\"ambY\">%.5g</param>\n", self->lmodel_ambient[ 1 ]  );
 	Journal_Printf( stream, "<param name=\"ambZ\">%.5g</param>\n", self->lmodel_ambient[ 2 ]  );
-	Journal_Printf( stream, "<param name=\"ambZ\">%.5g</param>\n", self->lmodel_ambient[ 3 ]  );
+	Journal_Printf( stream, "<param name=\"ambW\">%.5g</param>\n", self->lmodel_ambient[ 3 ]  );
 
 	Journal_Printf( stream, "<param name=\"model\">%s</param>\n", 
 			self->model == GL_LIGHT_MODEL_LOCAL_VIEWER ? "Local" :

@@ -86,7 +86,7 @@
 	void* _lucInputFormat_Copy( void* inputFormat, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) ;
 
 	void* _lucInputFormat_DefaultNew( Name name ) ;
-void _lucInputFormat_Construct( void* inputFormat, Stg_ComponentFactory* cf, void* data ) ;
+	void _lucInputFormat_Construct( void* inputFormat, Stg_ComponentFactory* cf, void* data ) ;
 	void _lucInputFormat_Build( void* inputFormat, void* data );
 	void _lucInputFormat_Initialise( void* inputFormat, void* data );
 	void _lucInputFormat_Execute( void* inputFormat, void* data );
