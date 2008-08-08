@@ -13,7 +13,7 @@
 <param name="Parent">Stg_Component</param>
 <param name="Reference">N/A.</param>
 <param name="Summary">...</param>
-<param name="Description">An abstract class to setup an interface to read in images to be used in lucDrawingObjects.</param>
+<param name="Description">An abstract class to setup an interface to read in images to be used in lucDrawingObjects. Each concrete Input Format class should be added to the lucInputFormat_Register which works out which lucInputFormat to use when opening an image through its extension. e.g. Image.ppm will be opened by the lucInputPPM class.</param>
 
 <!--Now the interesting stuff-->
 

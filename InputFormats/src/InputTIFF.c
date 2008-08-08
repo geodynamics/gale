@@ -165,7 +165,8 @@ void _lucInputTIFF_Destroy( void* InputFormat, void* data ) {}
 
 lucPixel* _lucInputTIFF_Input( void* inputFormat, Name imageName, Pixel_Index *width, Pixel_Index* height ){
 
-	/*Using Sam Leffler's libtiff library */
+	/* Using Sam Leffler's libtiff library 
+	 * http://www.remotesensing.org/libtiff/ */
 	TIFFRGBAImage  img;
 	uint32*        raster;
 	size_t         npixels;
