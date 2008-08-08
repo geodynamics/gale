@@ -377,6 +377,8 @@ void FieldTest_BuildReferenceField( void* fieldTest, Index field_I ) {
 	self->referenceFieldList[field_I] = FeVariable_New( tmpName, referenceMesh, referenceMesh, referenceDofLayout, NULL, NULL, NULL, 
 							Mesh_GetDimSize( referenceMesh ), False, "StgFEM_Native", "StgFEM_Native",
 							"", "", False, False, context->fieldVariable_Register );
+	/* so that the eqnation numbers don't get built for this guy */
+	self->referenceFieldList[field_I]->buildEqNums = False;
 
 	tmpName = Stg_Object_AppendSuffix( self->referenceFieldList[field_I], "Magnitude" );
 	self->referenceMagFieldList[field_I] = OperatorFeVariable_NewUnary( tmpName, self->referenceFieldList[field_I], "Magnitude" );
@@ -460,6 +462,8 @@ void FieldTest_BuildErrField( void* fieldTest, Index field_I ) {
 	self->errorFieldList[field_I] = FeVariable_New( tmpName, constantMesh, constantMesh, errorDofLayout, NULL, NULL, NULL, 
 							Mesh_GetDimSize( constantMesh ), False, "StgFEM_Native", "StgFEM_Native",
 							"", "", False, False, context->fieldVariable_Register );
+	/* so that the eqnation numbers don't get built for this guy */
+	self->errorFieldList[field_I]->buildEqNums = False;
 
 	tmpName = Stg_Object_AppendSuffix( self->errorFieldList[field_I], "Magnitude" );
 	self->errorMagFieldList[field_I] = OperatorFeVariable_NewUnary( tmpName, self->errorFieldList[field_I], "Magnitude" );
