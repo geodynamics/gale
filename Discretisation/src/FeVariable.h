@@ -132,6 +132,7 @@
 		/* if self->isReferenceSolution is true, this param determines if it's loaded once at the start, or every
 		 * timestep. */ \
 		Bool                                              loadReferenceEachTimestep; \
+		Bool                                              buildEqNums; \
 									\
 		IArray* inc;
 

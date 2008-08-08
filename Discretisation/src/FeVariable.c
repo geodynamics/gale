@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeVariable.c 1192 2008-07-28 01:11:17Z BelindaMay $
+** $Id: FeVariable.c 1200 2008-08-08 06:35:14Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -428,6 +428,8 @@ void _FeVariable_Init(
         self->dynamicBCs[1] = NULL;
 	self->dynamicBCs[2] = NULL;
 
+	self->buildEqNums = True;
+
 	self->inc = IArray_New();
 }
 
@@ -627,8 +629,9 @@ void _FeVariable_Build( void* variable, void* data ) {
 		/* Extract component count. */
 		self->fieldComponentCount = self->dofLayout->_totalVarCount;
 		
-		/* build the e.q. number array - only do so for numeric fe variables, dave 28.09.07*/
-		if( !self->isReferenceSolution ) {
+		/* don't build the equation numbers for fields that aren't being solved for 
+		 * (ie: error and reference fields) */
+		if( !self->isReferenceSolution && self->buildEqNums ) {
 			FeEquationNumber_Build( self->eqNum );
 		}
 
