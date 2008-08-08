@@ -20,7 +20,10 @@ class Project(SConfig.Node):
                                     'Build shared libraries', 1),
             SCons.Script.BoolOption('with_optimise',
                                     'optimising with -03 flag', 1),
-            ('build_dir', 'Temporary build directory', 'build')
+            SCons.Script.BoolOption('with_tau',
+                                    'use tau instrumentation', 0),
+            ('tau_cc', 'tau compiler to use if tau is enabled', 'tau_cc.sh'),
+            ('build_dir', 'temporary build directory', 'build')
             )
 
     def check_libs(self):
@@ -218,10 +221,20 @@ class Project(SConfig.Node):
         self.ctx.Display("  Using build directory: %s\n" % self.env['build_dir'])
         self.ctx.Display("  Debugging symbols: %s\n" % str(bool(self.env['with_debug'])))
         self.ctx.Display("  Optimisation symbols: %s\n" % str(bool(self.env['with_optimise'])))
+        if self.env['with_tau']:
+            self.ctx.Display('  Instrumenting with tau compiler: %s\n' % self.env['tau_cc'])
         return True
 
     def enable(self, scons_env, old_state=None):
         SConfig.Node.enable(self, scons_env, old_state)
+
+        # Setup tau.
+        if self.env['with_tau']:
+            self.backup_variable(scons_env, 'tau_old_cc', old_state)
+            self.backup_variable(scons_env, 'CC', old_state)
+            scons_env['tau_old_cc'] = self.env['CC']
+            scons_env['CC'] = self.env['tau_cc']
+            scons_env.AppendUnique(CONFIGVARS=['tau_old_cc'])
 
         # Setup debugging flags.
         if self.env['with_debug']:
