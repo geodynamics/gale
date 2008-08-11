@@ -44,18 +44,19 @@ if env['static_libraries']:
 
 #
 # Build unit test runner.
-env['PCURUNNERINIT'] = ''
-env['PCURUNNERSETUP'] = """StGermain_Init( &argc, &argv );
+if not env.get('dir_target', ''):
+    env['PCURUNNERINIT'] = ''
+    env['PCURUNNERSETUP'] = """StGermain_Init( &argc, &argv );
    StgDomain_Init( &argc, &argv );
    StgFEM_Init( &argc, &argv );"""
-env['PCURUNNERTEARDOWN'] = """StgFEM_Finalise();
+    env['PCURUNNERTEARDOWN'] = """StgFEM_Finalise();
    StgDomain_Finalise();
    StGermain_Finalise();"""
-runner_src = env.PCUSuiteRunner(env.get_build_path('glucifer/testglucifer.c'), env.suite_hdrs)
-runner_obj = env.SharedObject(runner_src)
-env.Program(env.get_build_path('bin/testglucifer'),
-            runner_obj + env.suite_objs,
-            LIBS=['glucifer', 'pcu'] + env.get('LIBS', []))
+    runner_src = env.PCUSuiteRunner(env.get_build_path('glucifer/testglucifer.c'), env.suite_hdrs)
+    runner_obj = env.SharedObject(runner_src)
+    env.Program(env.get_build_path('bin/testglucifer'),
+                runner_obj + env.suite_objs,
+                LIBS=['glucifer', 'pcu'] + env.get('LIBS', []))
 
 #
 # Copy over XML files.
@@ -63,4 +64,10 @@ xml_bases = ['']
 for base in xml_bases:
     dst = env.get_build_path('lib/StGermain/glucifer/' + base)
     for file in env.glob('ModelComponents/' + base + '/*.xml'):
-        env.Install(dst, file)
+        if env.check_dir_target(file):
+            env.Install(dst, file)
+
+#
+# Return any module code we need to build into a static binary.
+module = (env.get('STGMODULEPROTO', ''), env.get('STGMODULECODE', ''))
+Return('module')
