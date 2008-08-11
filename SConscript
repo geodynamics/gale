@@ -36,15 +36,7 @@ if env['shared_libraries']:
 
 #
 # Build toolbox.
-objs = env.build_sources(env.glob('libStgFEM/Toolbox/*.c'), 'StgFEM/libStgFEM/Toolbox')
-objs += env.build_metas(env.glob('libStgFEM/Toolbox/*.meta'), 'StgFEM/libStgFEM/Toolbox')
-if env['shared_libraries']:
-    env.SharedLibrary(env.get_target_name('lib/StgFEM_Toolboxmodule'), objs,
-                      SHLIBPREFIX='',
-                      LIBPREFIXES=env.make_list(env['LIBPREFIXES']) + [''],
-                      LIBS=['StgFEM'] + env.get('LIBS', []))
-if env['static_libraries']:
-    env.src_objs += objs
+env.build_toolbox('libStgFEM/Toolbox')
 
 #
 # Build plugins. Note that this must happen after the shared library
@@ -70,23 +62,32 @@ env.build_plugin('Apps/StokesMomentumUzawa/tests/LidDrivenStokesAnalytic')
 if env['static_libraries']:
     env.Library(env.get_build_path('lib/StgFEM'), env.src_objs)
 
+#
 # Build unit test runner.
-env['PCURUNNERINIT'] = ''
-env['PCURUNNERSETUP'] = """StGermain_Init( &argc, &argv );
+if not env.get('dir_target', ''):
+    env['PCURUNNERINIT'] = ''
+    env['PCURUNNERSETUP'] = """StGermain_Init( &argc, &argv );
    StgDomain_Init( &argc, &argv );
    StgFEM_Init( &argc, &argv );"""
-env['PCURUNNERTEARDOWN'] = """StgFEM_Finalise();
+    env['PCURUNNERTEARDOWN'] = """StgFEM_Finalise();
    StgDomain_Finalise();
    StGermain_Finalise();"""
-runner_src = env.PCUSuiteRunner(env.get_build_path('StgFEM/testStgFEM.c'), env.suite_hdrs)
-runner_obj = env.SharedObject(runner_src)
-env.Program(env.get_build_path('bin/testStgFEM'),
-            runner_obj + env.suite_objs,
-            LIBS=['StgFEM', 'pcu'] + env.get('LIBS', []))
+    runner_src = env.PCUSuiteRunner(env.get_build_path('StgFEM/testStgFEM.c'), env.suite_hdrs)
+    runner_obj = env.SharedObject(runner_src)
+    env.Program(env.get_build_path('bin/testStgFEM'),
+                runner_obj + env.suite_objs,
+                LIBS=['StgFEM', 'pcu'] + env.get('LIBS', []))
 
+#
 # Copy over XML files.
 xml_bases = ['']
 for base in xml_bases:
     dst = env.get_build_path('lib/StGermain/StgFEM/' + base)
     for file in env.glob('Apps/StgFEM_Components/' + base + '/*.xml'):
-        env.Install(dst, file)
+        if env.check_dir_target(file):
+            env.Install(dst, file)
+
+#
+# Return any module code we need to build into a static binary.
+module = (env.get('STGMODULEPROTO', ''), env.get('STGMODULECODE', ''))
+Return('module')
