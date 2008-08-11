@@ -46,19 +46,22 @@ if env['shared_libraries']:
 
 #
 # FlattenXML program.
-src = 'Base/FlattenXML/src/main.c'
-obj = env.SharedObject(env.get_build_path('StGermain/' + src[:-2]), src)
-env.Program(env.get_build_path('bin/FlattenXML'), obj,
-            LIBS=['StGermain'] + env.get('LIBS', []))
+if env['shared_libraries']:
+    src = 'Base/FlattenXML/src/main.c'
+    if env.check_dir_target(src):
+        obj = env.SharedObject(env.get_build_path('StGermain/' + src[:-2]), src)
+        env.Program(env.get_build_path('bin/FlattenXML'), obj,
+                    LIBS=['StGermain'] + env.get('LIBS', []))
 
 #
 # StGermain program. We can only build this guy here if we're using
 # shared libraries.
 if env['shared_libraries']:
     src = 'src/main.c'
-    obj = env.SharedObject(env.get_build_path('StGermain/' + src[:-2]), src)
-    env.Program(env.get_build_path('bin/StGermain'), obj,
-                LIBS=['StGermain'] + env.get('LIBS', []))
+    if env.check_dir_target(src):
+        obj = env.SharedObject(env.get_build_path('StGermain/' + src[:-2]), src)
+        env.Program(env.get_build_path('bin/StGermain'), obj,
+                    LIBS=['StGermain'] + env.get('LIBS', []))
 
 #
 # Build unit testing framework.
@@ -66,20 +69,28 @@ SConscript('pcu/SConscript', exports='env')
 
 #
 # Build unit test runner.
-env['PCURUNNERINIT'] = ''
-env['PCURUNNERSETUP'] = 'StGermain_Init( &argc, &argv );'
-env['PCURUNNERTEARDOWN'] = 'StGermain_Finalise();'
-runner_src = env.PCUSuiteRunner(env.get_build_path('StGermain/testStGermain.c'),
-                                env.suite_hdrs)
-runner_obj = env.SharedObject(runner_src)
-env.Program(env.get_build_path('bin/testStGermain'),
-            runner_obj + env.suite_objs,
-            LIBS=['StGermain', 'pcu'] + env.get('LIBS', []))
+if not env.get('dir_target', ''):
+    env['PCURUNNERINIT'] = ''
+    env['PCURUNNERSETUP'] = 'StGermain_Init( &argc, &argv );'
+    env['PCURUNNERTEARDOWN'] = 'StGermain_Finalise();'
+    runner_src = env.PCUSuiteRunner(env.get_build_path('StGermain/testStGermain.c'),
+                                    env.suite_hdrs)
+    runner_obj = env.SharedObject(runner_src)
+    env.Program(env.get_build_path('bin/testStGermain'),
+                runner_obj + env.suite_objs,
+                LIBS=['StGermain', 'pcu'] + env.get('LIBS', []))
 
 #
 # Copy scripts to correct destinations.
-env.Install(env.get_build_path('script/StGermain'), 'script/scons.py')
+if env.check_dir_target('script/scons.py'):
+    env.Install(env.get_build_path('script/StGermain'), 'script/scons.py')
 
 #
 # Copy XML validation file to correct destination.
-env.Install(env.get_build_path('lib'), 'Base/IO/src/StGermain.xsd')
+if env.check_dir_target('Base/IO/src/StGermain.xsd'):
+    env.Install(env.get_build_path('lib'), 'Base/IO/src/StGermain.xsd')
+
+#
+# Return any module code we need to build into a static binary.
+module = (env.get('STGMODULEPROTO', ''), env.get('STGMODULECODE', ''))
+Return('module')
