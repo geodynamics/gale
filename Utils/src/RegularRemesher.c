@@ -158,18 +158,29 @@ void _RegularRemesher_Remesh( void* _self ) {
             Grid_Lift( vGrid, ind, (unsigned*)inds );
             center = inds[d_i];
             if( center == 0 || center == vGrid->sizes[d_i] - 1 ) {
+	       int depth;
 
                /* If we're inside the contact depth range, we need to make
                   sure the side coordinates are aligned. */
-               if( d_i == 0 ) d_j = 1;
-               else if( d_i == 1 ) d_j = 0;
-               else if( d_i == 2 ) d_j = 1;
-               if( inds[d_j] < self->contactDepth )
-                  inds[d_j] = self->contactDepth;
-               else if( inds[d_j] > vGrid->sizes[d_j] - self->contactDepth - 1 && 
+	       if( d_i == 0 ) {
+		  d_j = 1;
+		  depth = self->contactDepth;
+	       }
+               else if( d_i == 1 ) {
+		  d_j = 0;
+		  depth = 1;
+	       }
+               else if( d_i == 2 ) {
+		  d_j = 1;
+		  // TODO
+		  abort();
+	       }
+               if( inds[d_j] < depth )
+                  inds[d_j] = depth;
+               else if( inds[d_j] > vGrid->sizes[d_j] - depth - 1 && 
                         d_i == 1 )
                {
-                  inds[d_j] = vGrid->sizes[d_j] - self->contactDepth - 1;
+                  inds[d_j] = vGrid->sizes[d_j] - depth - 1;
                }
                Mesh_GetVertex( mesh, v_i )[d_i] =
                   Mesh_GetVertex( mesh, Grid_Project( vGrid, inds ) )[d_i];
