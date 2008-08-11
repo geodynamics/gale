@@ -53,22 +53,23 @@ if env['static_libraries']:
 
 #
 # Build unit test runner.
-env['PCURUNNERINIT'] = ''
-env['PCURUNNERSETUP'] = """StGermain_Init( &argc, &argv );
+if not env.get('dir_target', ''):
+    env['PCURUNNERINIT'] = ''
+    env['PCURUNNERSETUP'] = """StGermain_Init( &argc, &argv );
    StgDomain_Init( &argc, &argv );
    StgFEM_Init( &argc, &argv );
    PICellerator_Init( &argc, &argv );
    Underworld_Init( &argc, &argv );"""
-env['PCURUNNERTEARDOWN'] = """Underworld_Finalise();
+    env['PCURUNNERTEARDOWN'] = """Underworld_Finalise();
    PICellerator_Finalise();
    StgFEM_Finalise();
    StgDomain_Finalise();
    StGermain_Finalise();"""
-runner_src = env.PCUSuiteRunner(env.get_build_path('Underworld/testUnderworld.c'), env.suite_hdrs)
-runner_obj = env.SharedObject(runner_src)
-env.Program(env.get_build_path('bin/testUnderworld'),
-            runner_obj + env.suite_objs,
-            LIBS=['Underworld', 'pcu'] + env.get('LIBS', []))
+    runner_src = env.PCUSuiteRunner(env.get_build_path('Underworld/testUnderworld.c'), env.suite_hdrs)
+    runner_obj = env.SharedObject(runner_src)
+    env.Program(env.get_build_path('bin/testUnderworld'),
+                runner_obj + env.suite_objs,
+                LIBS=['Underworld', 'pcu'] + env.get('LIBS', []))
 
 #
 # Copy over XML files.
@@ -76,7 +77,8 @@ xml_bases = ['', 'BaseApps', 'VariableConditions', 'Viewports']
 for base in xml_bases:
     dst = env.get_build_path('lib/StGermain/Underworld/' + base)
     for file in env.glob('InputFiles/src/' + base + '/*.xml'):
-        env.Install(dst, file)
+        if env.check_dir_target(file):
+            env.Install(dst, file)
 
 #
 # Return any module code we need to build into a static binary.
