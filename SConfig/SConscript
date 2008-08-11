@@ -285,3 +285,5 @@ env['SHLINKCOM'] += ' $STATICLIBS $_INTLIBS' # Needed for static libs. Thanks SC
 # Scan command line targets to see if the user has specified any directories
 # they want singled out to be built alone.
 env['dir_target'] = ARGUMENTS.get('target', '')
+if len(env['dir_target']) and env['dir_target'][-1] == os.path.sep:
+    env['dir_target'] = env['dir_target'][:-1]
