@@ -5,18 +5,27 @@ from SCons.Script.SConscript import SConsEnvironment
 # Helpful build utilities.
 #
 
+def check_dir_target(env, src):
+    if os.path.commonprefix([env['dir_target'],
+                             os.path.join(env.project_name, src)]) == env['dir_target']:
+        return True
+    return False
+
 def build_files(env, files, dst_dir):
     for f in files:
+        if not env.check_dir_target(f): continue
         env.copy_file(env.get_build_path(dst_dir) + '/' + os.path.basename(f), f)
 
 def build_headers(env, headers, dst_dir):
     for hdr in headers:
+        if not env.check_dir_target(hdr): continue
         env.Install(env.get_build_path(dst_dir), hdr)
 
 def build_sources(env, sources, dst_dir):
     objs = []
     mod_name = ('CURR_MODULE_NAME', env['ESCAPE']('"' + ''.join(dst_dir.split('/')) + '"'))
     for src in sources:
+        if not env.check_dir_target(src): continue
         tgt = env.get_build_path(dst_dir + '/' + os.path.basename(src)[:-2])
         objs += env.SharedObject(tgt, src, CPPDEFINES=[mod_name] + env.get('CPPDEFINES', []))
     return objs
@@ -25,6 +34,7 @@ def build_metas(env, metas, dst_dir):
     objs = []
     mod_name = ('CURR_MODULE_NAME', env['ESCAPE']('"' + ''.join(dst_dir.split('/')) + '"'))
     for m in metas:
+        if not env.check_dir_target(m): continue
         src = env.Meta(env.get_build_path(dst_dir + '/' + os.path.basename(m)[:-5]), m)
         tgt = env.get_build_path(dst_dir + '/' + os.path.basename(src[0].path)[:-2])
         if 'tau_old_cc' in env._dict:
@@ -36,6 +46,7 @@ def build_metas(env, metas, dst_dir):
     return objs
 
 def build_directory(env, dir, dst_dir='', with_tests=True):
+    if not env.check_dir_target(dir): return
     if not dst_dir:
         dst_dir = dir
     inc_dir = 'include/' + env.project_name + '/' + dst_dir
@@ -48,6 +59,7 @@ def build_directory(env, dir, dst_dir='', with_tests=True):
     env.suite_objs += env.build_sources(env.glob(dir + '/tests/*Suite.c'), obj_dir)
 
 def build_plugin(env, dir, dst_dir='', name=''):
+    if not env.check_dir_target(dir): return
     if not dst_dir:
         dst_dir = dir
     if not name:
@@ -71,6 +83,7 @@ def build_plugin(env, dir, dst_dir='', name=''):
             env['STGMODULECODE'] += '  ' + env.project_name + '_' + name + '_Register( mgr );\n'
 
 def build_toolbox(env, dir, dst_dir=''):
+    if not env.check_dir_target(dir): return
     if not dst_dir:
         dst_dir = env.project_name + '/' + dir
     objs = env.build_sources(env.glob(dir + '/*.c'), dst_dir)
@@ -104,6 +117,7 @@ def build_module_register(env, dst, module_proto, module_code):
     f.close()
     return File(dst)
 
+SConsEnvironment.check_dir_target = check_dir_target
 SConsEnvironment.build_files = build_files
 SConsEnvironment.build_headers = build_headers
 SConsEnvironment.build_sources = build_sources
