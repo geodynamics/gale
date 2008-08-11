@@ -11,6 +11,9 @@
                        <param>0</param>
                        <param>1</param>
                        <param>2</param>
+                       <!-- if dim == 3 uncomment below 
+                       <param>3</param>
+                       -->
                </list>
                <list name="enabledIncidence" mergeType="merge">
                        <param>0</param><param>0</param>
@@ -20,6 +23,10 @@
                        <param>1</param><param>2</param>
                        <param>2</param><param>0</param>
                        <param>2</param><param>1</param>
+                       <!-- if dim == 3 uncomment below 
+                       <param>0</param><param>3</param>
+                       <param>3</param><param>0</param>
+                       -->
                </list>
        </struct>
 		<!-- Camera And Colour Maps -->
