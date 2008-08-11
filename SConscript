@@ -30,29 +30,28 @@ if env['shared_libraries']:
     env.SharedLibrary(env.get_build_path('lib/StgDomain'), env.src_objs)
 
 # Build toolbox.
-objs = env.build_sources(env.glob('libStgDomain/Toolbox/*.c'), 'StgDomain/libStgDomain/Toolbox')
-objs += env.build_metas(env.glob('libStgDomain/Toolbox/*.meta'), 'StgDomain/libStgDomain/Toolbox')
-if env['shared_libraries']:
-    env.SharedLibrary(env.get_target_name('lib/StgDomain_Toolboxmodule'), objs,
-                      SHLIBPREFIX='',
-                      LIBPREFIXES=env.make_list(env['LIBPREFIXES']) + [''],
-                      LIBS=['StgDomain'] + env.get('LIBS', []))
-if env['static_libraries']:
-    env.src_objs += objs
+env.build_toolbox('libStgDomain/Toolbox')
 
 #
 # Build static library.
 if env['static_libraries']:
     env.Library(env.get_build_path('lib/StgDomain'), env.src_objs)
 
+#
 # Build unit test runner.
-env['PCURUNNERINIT'] = ''
-env['PCURUNNERSETUP'] = """StGermain_Init( &argc, &argv );
+if not env.get('dir_target', ''):
+    env['PCURUNNERINIT'] = ''
+    env['PCURUNNERSETUP'] = """StGermain_Init( &argc, &argv );
    StgDomain_Init( &argc, &argv );"""
-env['PCURUNNERTEARDOWN'] = """StgDomain_Finalise();
+    env['PCURUNNERTEARDOWN'] = """StgDomain_Finalise();
    StGermain_Finalise();"""
-runner_src = env.PCUSuiteRunner(env.get_build_path('StgDomain/testStgDomain.c'), env.suite_hdrs)
-runner_obj = env.SharedObject(runner_src)
-env.Program(env.get_build_path('bin/testStgDomain'),
-            runner_obj + env.suite_objs,
-            LIBS=['StgDomain', 'pcu'] + env.get('LIBS', []))
+    runner_src = env.PCUSuiteRunner(env.get_build_path('StgDomain/testStgDomain.c'), env.suite_hdrs)
+    runner_obj = env.SharedObject(runner_src)
+    env.Program(env.get_build_path('bin/testStgDomain'),
+                runner_obj + env.suite_objs,
+                LIBS=['StgDomain', 'pcu'] + env.get('LIBS', []))
+
+#
+# Return any module code we need to build into a static binary.
+module = (env.get('STGMODULEPROTO', ''), env.get('STGMODULECODE', ''))
+Return('module')
