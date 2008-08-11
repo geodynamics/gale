@@ -32,15 +32,7 @@ if env['shared_libraries']:
 
 #
 # Build toolbox.
-objs = env.build_sources(env.glob('libPICellerator/Toolbox/*.c'), 'PICellerator/libPICellerator/Toolbox')
-objs += env.build_metas(env.glob('libPICellerator/Toolbox/*.meta'), 'PICellerator/libPICellerator/Toolbox')
-if env['shared_libraries']:
-    env.SharedLibrary(env.get_target_name('lib/PICellerator_Toolboxmodule'), objs,
-                      SHLIBPREFIX='',
-                      LIBPREFIXES=env.make_list(env['LIBPREFIXES']) + [''],
-                      LIBS=['PICellerator'] + env.get('LIBS', []))
-if env['static_libraries']:
-    env.src_objs += objs
+env.build_toolbox('libPICellerator/Toolbox')
 
 #
 # Build plugins. Note that this must happen after the shared library
@@ -53,25 +45,34 @@ env.build_plugin('plugins/MaterialCentroid')
 if env['static_libraries']:
     env.Library(env.get_build_path('lib/PICellerator'), env.src_objs)
 
+#
 # Build unit test runner.
-env['PCURUNNERINIT'] = ''
-env['PCURUNNERSETUP'] = """StGermain_Init( &argc, &argv );
+if not env.get('dir_target', ''):
+    env['PCURUNNERINIT'] = ''
+    env['PCURUNNERSETUP'] = """StGermain_Init( &argc, &argv );
    StgDomain_Init( &argc, &argv );
    StgFEM_Init( &argc, &argv );
    PICellerator_Init( &argc, &argv );"""
-env['PCURUNNERTEARDOWN'] = """PICellerator_Finalise();
+    env['PCURUNNERTEARDOWN'] = """PICellerator_Finalise();
    StgFEM_Finalise();
    StgDomain_Finalise();
    StGermain_Finalise();"""
-runner_src = env.PCUSuiteRunner(env.get_build_path('PICellerator/testPICellerator.c'), env.suite_hdrs)
-runner_obj = env.SharedObject(runner_src)
-env.Program(env.get_build_path('bin/testPICellerator'),
+    runner_src = env.PCUSuiteRunner(env.get_build_path('PICellerator/testPICellerator.c'), env.suite_hdrs)
+    runner_obj = env.SharedObject(runner_src)
+    env.Program(env.get_build_path('bin/testPICellerator'),
             runner_obj + env.suite_objs,
             LIBS=['PICellerator', 'pcu'] + env.get('LIBS', []))
 
+#
 # Copy over XML files.
 xml_bases = ['']
 for base in xml_bases:
     dst = env.get_build_path('lib/StGermain/PICellerator/' + base)
     for file in env.glob('Apps/src/' + base + '/*.xml'):
-        env.Install(dst, file)
+        if env.check_dir_target(file):
+            env.Install(dst, file)
+
+#
+# Return any module code we need to build into a static binary.
+module = (env.get('STGMODULEPROTO', ''), env.get('STGMODULECODE', ''))
+Return('module')
