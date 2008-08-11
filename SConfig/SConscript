@@ -280,3 +280,8 @@ env['_MYLIBS'] = '${_stripixes(LIBLINKPREFIX, MYLIBS, LIBLINKSUFFIX, LIBPREFIX, 
 env['_INTLIBS'] = '${_interleave(INTLIBS, __env__)}'
 env['LINKCOM'] += ' $STATICLIBS $_INTLIBS' # Needed for static libs. Thanks SCons. :(
 env['SHLINKCOM'] += ' $STATICLIBS $_INTLIBS' # Needed for static libs. Thanks SCons. :(
+
+#
+# Scan command line targets to see if the user has specified any directories
+# they want singled out to be built alone.
+env['dir_target'] = ARGUMENTS.get('target', '')
