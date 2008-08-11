@@ -13,7 +13,7 @@
 <param name="Parent">ParticleLayout</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">...</param>
+<param name="Description">This is an abstract class for defining an initial distribution of particles cell-by-cell. This class only provides simple data structure and function pointers which execute in the initialisation phase.</param>
 
 <!--Now the interesting stuff-->
 

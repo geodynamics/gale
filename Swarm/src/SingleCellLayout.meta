@@ -44,37 +44,37 @@
 		<param name="Name">minX</param>
 		<param name="Type">Double</param>
 		<param name="Default">-1.0</param>
-		<param name="Description">...</param>
+		<param name="Description">Defines the min X coordinate within a cell</param>
 	</struct>
 	<struct>
 		<param name="Name">minY</param>
 		<param name="Type">Double</param>
 		<param name="Default">-1.0</param>
-		<param name="Description">...</param>
+		<param name="Description">Defines the min Y coordinate within a cell</param>
 	</struct>
 	<struct>
 		<param name="Name">minZ</param>
 		<param name="Type">Double</param>
 		<param name="Default">-1.0</param>
-		<param name="Description">...</param>
+		<param name="Description">Defines the min Z coordinate within a cell</param>
 	</struct>
 	<struct>
 		<param name="Name">maxX</param>
 		<param name="Type">Double</param>
 		<param name="Default">1.0</param>
-		<param name="Description">...</param>
+		<param name="Description">Defines the max X coordinate within a cell</param>
 	</struct>
 	<struct>
 		<param name="Name">maxY</param>
 		<param name="Type">Double</param>
 		<param name="Default">1.0</param>
-		<param name="Description">...</param>
+		<param name="Description">Defines the max Y coordinate within a cell</param>
 	</struct>
 	<struct>
 		<param name="Name">maxZ</param>
 		<param name="Type">Double</param>
 		<param name="Default">1.0</param>
-		<param name="Description">...</param>
+		<param name="Description">Defines the max Z coordinate within a cell</param>
 	</struct>
 
 </list>

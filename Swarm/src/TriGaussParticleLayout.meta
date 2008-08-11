@@ -19,7 +19,18 @@
 
 
 <list name="Params">
-
+	<struct>
+		<param name="Name">dim</param>
+		<param name="Type">Int</param>
+		<param name="Default">3</param>
+		<param name="Description">Number of spatial dimensions for the simulation. This value is taken from the root dictionary and should never be specified otherwise.</param>
+	</struct>
+	<struct>
+		<param name="Name">particlesPerCell</param>
+		<param name="Type">Int</param>
+		<param name="Default">1</param>
+		<param name="Description">Number of particles to use in the cell. This value is taken from the root dictionary and should never be specified otherwise. </param>
+	</struct>
 </list>
 
 <list name="Dependencies">
