@@ -49,7 +49,7 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: types.h 515 2007-10-04 06:50:24Z DavidLee $
+** $Id: types.h 582 2008-08-12 03:15:11Z WendySharples $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -77,7 +77,6 @@
 	typedef struct MaterialPointRef             MaterialPointRef;
 	typedef struct SwarmAdvector                SwarmAdvector;
 	typedef struct SwarmAdvectorD                SwarmAdvectorD;
-	typedef struct SwarmAdvectorW                SwarmAdvectorW;
 
 	typedef struct PeriodicBoundariesManager    PeriodicBoundariesManager;
 

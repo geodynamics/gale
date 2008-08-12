@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Init.c 518 2007-10-11 08:07:50Z SteveQuenette $
+** $Id: Init.c 582 2008-08-12 03:15:11Z WendySharples $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -75,7 +75,6 @@ Bool PICellerator_MaterialPoints_Init( int* argc, char** argv[] ) {
 	
 	Stg_ComponentRegister_Add( componentsRegister, SwarmAdvector_Type,            "0", _SwarmAdvector_DefaultNew );
 	Stg_ComponentRegister_Add( componentsRegister, SwarmAdvectorD_Type,            "0", _SwarmAdvectorD_DefaultNew );
-	Stg_ComponentRegister_Add( componentsRegister, SwarmAdvectorW_Type,            "0", _SwarmAdvectorW_DefaultNew );
 
 	Stg_ComponentRegister_Add( componentsRegister, PeriodicBoundariesManager_Type,"0", _PeriodicBoundariesManager_DefaultNew );
 	
@@ -100,7 +99,6 @@ Bool PICellerator_MaterialPoints_Init( int* argc, char** argv[] ) {
 	RegisterParent( PeriodicBoundariesManager_Type, Stg_Component_Type );
 	RegisterParent( SwarmAdvector_Type,             TimeIntegratee_Type );
 	RegisterParent( SwarmAdvectorD_Type,            SwarmAdvector_Type );
-	RegisterParent( SwarmAdvectorW_Type,            SwarmAdvector_Type );
 	
 	/* dave, 18.09.07 */
 	RegisterParent( SwarmVariableField_Type,        ParticleFeVariable_Type );
