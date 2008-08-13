@@ -6,12 +6,9 @@ from SCons.Script.SConscript import SConsEnvironment
 #
 
 def check_dir_target(env, src):
-    try:
-        obj = File(src)
-    except:
-        obj = Dir(src)
+    src = env.project_name + '/' + src
     if os.path.commonprefix([env['dir_target'],
-                             obj.path]) == env['dir_target']:
+                             src]) == env['dir_target']:
         return True
     return False
 
