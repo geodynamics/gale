@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Context.c 1203 2008-08-13 03:58:09Z BelindaMay $
+** $Id: Context.c 1204 2008-08-13 08:34:21Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -583,12 +583,14 @@ void _FiniteElementContext_DumpMeshAscii( void* context, char* filename ) {
 		assert( outputFile );
 		
 		/* Write min and max coords to file */
-		if( nDims == 2 )
-            fprintf( outputFile, "Min: %.15g %.15g 0\n", mesh->minGlobalCrd[0], mesh->minGlobalCrd[1] );
-            fprintf( outputFile, "Max: %.15g %.15g 0\n", mesh->maxGlobalCrd[0], mesh->maxGlobalCrd[1] );
-      else
-            fprintf( outputFile, "Min: %.15g %.15g %.15g\n", mesh->minGlobalCrd[0], mesh->minGlobalCrd[1], mesh->minGlobalCrd[2] );
-            fprintf( outputFile, "Max: %.15g %.15g %.15g\n", mesh->maxGlobalCrd[0], mesh->maxGlobalCrd[1], mesh->maxGlobalCrd[2] );  
+		if( nDims == 2 ) {
+            		fprintf( outputFile, "Min: %.15g %.15g 0\n", mesh->minGlobalCrd[0], mesh->minGlobalCrd[1] );
+            		fprintf( outputFile, "Max: %.15g %.15g 0\n", mesh->maxGlobalCrd[0], mesh->maxGlobalCrd[1] );
+      		} 
+		else {
+            		fprintf( outputFile, "Min: %.15g %.15g %.15g\n", mesh->minGlobalCrd[0], mesh->minGlobalCrd[1], mesh->minGlobalCrd[2] );
+            		fprintf( outputFile, "Max: %.15g %.15g %.15g\n", mesh->maxGlobalCrd[0], mesh->maxGlobalCrd[1], mesh->maxGlobalCrd[2] );  
+		}
 	}
 	else {
 		outputFile = fopen( filename, "a" );
