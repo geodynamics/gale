@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AbstractContext.c 4277 2008-07-08 00:40:33Z BelindaMay $
+** $Id: AbstractContext.c 4296 2008-08-13 03:57:10Z BelindaMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -51,7 +51,7 @@
 #include <sys/stat.h>
 #include <time.h>
 
-#ifdef HAVE_HDF5
+#if defined(READ_HDF5) || defined(WRITE_HDF5)
 #include <hdf5.h>
 #endif
 
@@ -997,13 +997,15 @@ void _AbstractContext_LoadTimeInfoFromCheckPoint( Context* self, Index timeStep,
 	FILE*                  timeInfoFile;		
 	Stream*                errorStr = Journal_Register( Error_Type, self->type );
 
-#ifdef HAVE_HDF5
+#ifdef READ_HDF5
 	hid_t             file, fileSpace, fileData;
 #endif
 
 	timeInfoFileName = AbstractContext_GetTimeInfoFileNameForGivenTimeStep( self, timeStep, self->checkpointReadPath ); 
 	
-#ifdef HAVE_HDF5
+#ifdef READ_HDF5
+    sprintf( timeInfoFileName, "%s.h5", timeInfoFileName );
+    
    /* Open the file and data set. */
 	file = H5Fopen( timeInfoFileName, H5F_ACC_RDONLY, H5P_DEFAULT );
 	Journal_Firewall( 
@@ -1040,6 +1042,8 @@ void _AbstractContext_LoadTimeInfoFromCheckPoint( Context* self, Index timeStep,
    H5Fclose( file );
 	   
 #else	
+    sprintf( timeInfoFileName, "%s.dat", timeInfoFileName );
+    
 	timeInfoFile = fopen( timeInfoFileName, "r" );
 	Journal_Firewall( NULL != timeInfoFile, errorStr, "Error- in %s(), Couldn't find checkpoint time info file with "
 		"filename \"%s\" - aborting.\n", __func__, timeInfoFileName );
@@ -1059,7 +1063,7 @@ void _AbstractContext_SaveTimeInfo( Context* context ) {
 	char*                  timeInfoFileName = NULL;
    Stream*                errorStr = Journal_Register( Error_Type, self->type );
    
-#ifdef HAVE_HDF5
+#ifdef WRITE_HDF5
    hid_t                  file, fileSpace, fileData, props;
    hsize_t                count;
    double                 Dt;
@@ -1072,7 +1076,9 @@ void _AbstractContext_SaveTimeInfo( Context* context ) {
 
 	timeInfoFileName = AbstractContext_GetTimeInfoFileNameForGivenTimeStep( self, self->timeStep, self->checkpointWritePath ); 
 	
-#ifdef HAVE_HDF5
+#ifdef WRITE_HDF5
+    sprintf( timeInfoFileName, "%s.h5", timeInfoFileName );
+    
    /* Create parallel file property list. */
    props = H5Pcreate( H5P_FILE_ACCESS );
    
@@ -1124,6 +1130,8 @@ void _AbstractContext_SaveTimeInfo( Context* context ) {
    H5Fclose( file );
    
 #else	
+    sprintf( timeInfoFileName, "%s.dat", timeInfoFileName );
+    
 	timeInfoFile = fopen( timeInfoFileName, "w" );
 
 	if ( False == timeInfoFile ) {
@@ -1178,11 +1186,7 @@ char* AbstractContext_GetTimeInfoFileNameForGivenTimeStep( void* context, Index 
 		sprintf( timeInfoFileName, "%s/", checkpointPath );
 	}
 	
-#ifdef HAVE_HDF5
-	sprintf( timeInfoFileName, "%stimeInfo.%.5u.h5", timeInfoFileName, timeStep );
-#else	
-	sprintf( timeInfoFileName, "%stimeInfo.%.5u.dat", timeInfoFileName, timeStep );
-#endif
+    sprintf( timeInfoFileName, "%stimeInfo.%.5u", timeInfoFileName, timeStep );
 
 	return timeInfoFileName;
 }
