@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Context.c 1192 2008-07-28 01:11:17Z BelindaMay $
+** $Id: Context.c 1203 2008-08-13 03:58:09Z BelindaMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -56,7 +56,7 @@
 #include "SystemLinearEquations.h"
 #include "SolutionVector.h"
 
-#ifdef HAVE_HDF5
+#ifdef WRITE_HDF5
 #include <hdf5.h>
 #endif
 
@@ -537,7 +537,7 @@ void _FiniteElementContext_SaveMesh( void* context ) {
 		sprintf( meshSaveFileName, "%s/Mesh.%05d", self->checkpointWritePath, self->timeStep );
 	}
 
-#ifdef HAVE_HDF5
+#ifdef WRITE_HDF5
    sprintf( meshSaveFileName, "%s.h5", meshSaveFileName );
    _FiniteElementContext_DumpMeshHDF5( context, meshSaveFileName );
 #else
@@ -549,7 +549,7 @@ void _FiniteElementContext_SaveMesh( void* context ) {
 	Journal_Printf( info, "%s: saving of mesh completed.\n", __func__ );
 }
 
-#ifndef HAVE_HDF5
+#ifndef WRITE_HDF5
 void _FiniteElementContext_DumpMeshAscii( void* context, char* filename ) {
    FiniteElementContext*   self = (FiniteElementContext*) context;
    FieldVariable*    fieldVar = NULL;
@@ -585,12 +585,10 @@ void _FiniteElementContext_DumpMeshAscii( void* context, char* filename ) {
 		/* Write min and max coords to file */
 		if( nDims == 2 )
             fprintf( outputFile, "Min: %.15g %.15g 0\n", mesh->minGlobalCrd[0], mesh->minGlobalCrd[1] );
-      else
-            fprintf( outputFile, "Min: %.15g %.15g %.15g\n", mesh->minGlobalCrd[0], mesh->minGlobalCrd[1], mesh->minGlobalCrd[2] );
-		if( nDims == 2 )
             fprintf( outputFile, "Max: %.15g %.15g 0\n", mesh->maxGlobalCrd[0], mesh->maxGlobalCrd[1] );
       else
-            fprintf( outputFile, "Max: %.15g %.15g %.15g\n", mesh->maxGlobalCrd[0], mesh->maxGlobalCrd[1], mesh->maxGlobalCrd[2] );
+            fprintf( outputFile, "Min: %.15g %.15g %.15g\n", mesh->minGlobalCrd[0], mesh->minGlobalCrd[1], mesh->minGlobalCrd[2] );
+            fprintf( outputFile, "Max: %.15g %.15g %.15g\n", mesh->maxGlobalCrd[0], mesh->maxGlobalCrd[1], mesh->maxGlobalCrd[2] );  
 	}
 	else {
 		outputFile = fopen( filename, "a" );
@@ -617,7 +615,7 @@ void _FiniteElementContext_DumpMeshAscii( void* context, char* filename ) {
 }
 #endif
 
-#ifdef HAVE_HDF5
+#ifdef WRITE_HDF5
 void _FiniteElementContext_DumpMeshHDF5( void* context, char* filename ) {
    FiniteElementContext*   self = (FiniteElementContext*) context;
    int 			      rank, nRanks;

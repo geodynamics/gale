@@ -47,7 +47,7 @@
 ** Comments:
 **	There's an issue inside FE_Context_Build() see inside the code.
 **
-** $Id: Context.h 1154 2008-06-13 07:13:37Z BelindaMay $
+** $Id: Context.h 1203 2008-08-13 03:58:09Z BelindaMay $
 *
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -187,7 +187,7 @@
 
    void _FiniteElementContext_SaveMesh( void* context );
    
-   #ifdef HAVE_HDF5
+   #ifdef WRITE_HDF5
 	void _FiniteElementContext_DumpMeshHDF5( void* context, char* filename );
    #else
 	void _FiniteElementContext_DumpMeshAscii( void* context, char* filename );

@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeVariable.c 1200 2008-08-08 06:35:14Z DavidLee $
+** $Id: FeVariable.c 1203 2008-08-13 03:58:09Z BelindaMay $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -56,7 +56,7 @@
 #include <assert.h>
 #include <string.h>
 
-#ifdef HAVE_HDF5
+#if defined(READ_HDF5) || defined(WRITE_HDF5)
 #include <hdf5.h>
 #endif
 
@@ -2136,7 +2136,7 @@ void FeVariable_SaveNodalValuesToFile_StgFEM_Native( void* feVariable, const cha
 	MPI_Status        status;
    Stream*           errorStr = Journal_Register( Error_Type, self->type );
    
-#ifdef HAVE_HDF5
+#ifdef WRITE_HDF5
    hid_t             file, fileSpace, fileData, props;
    hid_t             memSpace;
    hsize_t           start[2], count[2], size[2];
@@ -2156,7 +2156,7 @@ void FeVariable_SaveNodalValuesToFile_StgFEM_Native( void* feVariable, const cha
 	/* Note: assumes same number of dofs at each node */
 	dofAtEachNodeCount = self->fieldComponentCount;
 	
-#ifdef HAVE_HDF5
+#ifdef WRITE_HDF5
    /* Get filename */
 	sprintf( filename, "%s%s.%.5u.h5", prefixStr, self->name, timeStep );
 	
@@ -2344,7 +2344,7 @@ void FeVariable_ReadNodalValuesFromFile_StgFEM_Native( void* feVariable, const c
 	Bool               savedCoords = False;
 	Stream*            errorStr = Journal_Register( Error_Type, self->type );
 	
-#ifdef HAVE_HDF5
+#ifdef READ_HDF5
    hid_t             file, fileSpace, fileData;
    int               totalNodes, ii;
    hid_t             props;
@@ -2367,7 +2367,7 @@ void FeVariable_ReadNodalValuesFromFile_StgFEM_Native( void* feVariable, const c
 	filename = Memory_Alloc_Array_Unnamed( char, strlen(prefixStr) + strlen(self->name) + 1 + 5 + 1 + 3 + 1 );
 	dofAtEachNodeCount = self->fieldComponentCount;
 	
-#ifdef HAVE_HDF5	
+#ifdef READ_HDF5	
    sprintf( filename, "%s%s.%.5u.h5", prefixStr, self->name, timeStep );
    
    /* Open the file and data set. */

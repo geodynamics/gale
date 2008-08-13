@@ -505,7 +505,7 @@ void FieldTest_LoadReferenceSolutionFromFile( FeVariable* feVariable, Name refer
 	double 			a1, b1, c1;
 	double 			a2, b2, c2;
 	double 			m0, m1, m2, m3, m4, m5, m6;
-#ifdef HAVE_HDF5
+#ifdef READ_HDF5
 	hid_t			inputFile;
 	hid_t 			dataSet, memSpace, dataSpace;
 	hsize_t 		start[2], count[2], hSize;
@@ -521,7 +521,7 @@ void FieldTest_LoadReferenceSolutionFromFile( FeVariable* feVariable, Name refer
 													  /* .  h5  \0 */
 	filename = Memory_Alloc_Array_Unnamed( char, strlen(referenceSolnPath) + strlen(referenceSolnName) + 1 + 2 + 1 );
 	sprintf( filename, "%s%s.h5", referenceSolnPath, referenceSolnName );
-#ifdef HAVE_HDF5
+#ifdef READ_HDF5
 	inputFile = H5Fopen( filename, H5F_ACC_RDONLY, H5P_DEFAULT );
 #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
 	dataSet = H5Dopen( inputFile, "/size" );
@@ -705,7 +705,7 @@ void FieldTest_LoadReferenceSolutionFromFile( FeVariable* feVariable, Name refer
 	if( nDims == 3 ) Memory_Free( posz );
 	Memory_Free( variables );
 
-#ifdef HAVE_HDF5
+#ifdef READ_HDF5
 	H5Fclose( inputFile );
 #endif
 }
