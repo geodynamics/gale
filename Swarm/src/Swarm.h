@@ -42,7 +42,7 @@
 #ifndef __Domain_Swarm_h__
 #define __Domain_Swarm_h__
 
-#ifdef HAVE_HDF5
+#if defined(READ_HDF5) || defined(WRITE_HDF5)
 #include <hdf5.h>
 #endif
 

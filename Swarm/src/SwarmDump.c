@@ -46,7 +46,7 @@
 #include <assert.h>
 #include <string.h>
 
-#ifdef HAVE_HDF5
+#ifdef WRITE_HDF5
 #include <hdf5.h>
 #endif
 
@@ -282,7 +282,7 @@ void _SwarmDump_Execute( void* swarmDump, void* data ) {
 			MPI_Barrier( swarm->comm );
 		}
 
-#ifdef HAVE_HDF5
+#ifdef WRITE_HDF5
       Stg_asprintf( &filename, "%s.h5", filename );
 		SwarmDump_DumpToHDF5( self, swarm, filename );
 #else
@@ -308,7 +308,7 @@ void SwarmDump_Execute( void* swarmDump, void* context ) {
 	self->_execute( self, context );
 }
 
-#ifdef HAVE_HDF5
+#ifdef WRITE_HDF5
 void SwarmDump_DumpToHDF5( SwarmDump* self, Swarm* swarm, const char* filename ) {
    hid_t                   file, fileSpace, fileData;
    hid_t                   memSpace;

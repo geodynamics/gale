@@ -28,7 +28,7 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifdef HAVE_HDF5
+#ifdef READ_HDF5
 #include <hdf5.h>
 #endif
 
@@ -1660,7 +1660,7 @@ void Swarm_ReplaceCurrentParticleLayoutWithFileParticleLayout( void* swarm, void
 
 
 void Swarm_GetCheckpointFilenameForGivenTimestep( Swarm* self, AbstractContext* context, char* swarmSaveFileName ) {
-#ifdef HAVE_HDF5
+#ifdef READ_HDF5
 	if ( strlen(context->checkPointPrefixString) > 0 ) {
 		sprintf( swarmSaveFileName, "%s/%s.%s.%05d.h5", context->checkpointReadPath,
 			context->checkPointPrefixString, self->name, context->restartTimestep );

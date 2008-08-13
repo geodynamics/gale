@@ -33,7 +33,7 @@
 #include <string.h>
 #include <assert.h>
 
-#ifdef HAVE_HDF5
+#ifdef READ_HDF5
 #include <hdf5.h>
 #endif
 
@@ -200,7 +200,7 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
 	char*			checkpointPrefix;
 	Index                   meshStrLen;
 	
-#ifdef HAVE_HDF5
+#ifdef READ_HDF5
 	hid_t file, fileData;
 	hid_t             props;
 	double      temp1[3], temp2[3];
@@ -309,7 +309,7 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
 					restartTimestep );
 			}			
 	
-#ifdef HAVE_HDF5	
+#ifdef READ_HDF5	
 	      sprintf( meshSaveFileName, "%s.h5", meshSaveFileName );
 	      
 	      /* Read in minimum coord. */
@@ -2040,7 +2040,7 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
 	Stream*			   errorStream = Journal_Register( Error_Type, self->type );
 	int			      rank, nRanks;
 	
-#ifdef HAVE_HDF5
+#ifdef READ_HDF5
 	hid_t             file, fileSpace, fileData;
 	hsize_t           start[2], count[2], size[2];
 	hid_t             memSpace;
@@ -2090,7 +2090,7 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
 				context->restartTimestep );
 		}
 
-#ifdef HAVE_HDF5
+#ifdef READ_HDF5
       sprintf( meshSaveFileName, "%s.h5", meshSaveFileName );
       
       Journal_Printf( stream, "... loading from file %s.\n", meshSaveFileName );

@@ -46,7 +46,7 @@
 	extern const Type FileParticleLayout_Type;
 	
 	/* FileParticleLayout information */
-#ifdef HAVE_HDF5
+#ifdef READ_HDF5
 	#define __FileParticleLayout \
 		__GlobalParticleLayout \
 		\

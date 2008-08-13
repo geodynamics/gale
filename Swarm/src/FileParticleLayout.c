@@ -28,7 +28,7 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifdef HAVE_HDF5
+#ifdef READ_HDF5
 #include <hdf5.h>
 #endif
 
@@ -214,7 +214,7 @@ void _FileParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm ) 
 	Swarm*               swarm        = (Swarm*)_swarm;
 	Name                 filename     = self->filename;
 	
-#ifdef HAVE_HDF5
+#ifdef READ_HDF5
 	hid_t                file, fileData, fileSpace;
 	hsize_t              size[2];
 	char                 dataSpaceName[1024];
@@ -231,7 +231,7 @@ void _FileParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm ) 
 		__func__, self->name, self->type );
 	Stream_IndentBranch( Swarm_Debug );	
 
-#ifdef HAVE_HDF5
+#ifdef READ_HDF5
    /* Open the swarm checkpointing file */
 	file = H5Fopen( filename, H5F_ACC_RDONLY, H5P_DEFAULT );
 	Journal_Firewall( 
@@ -319,7 +319,7 @@ void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm
 	FileParticleLayout*        self             = (FileParticleLayout*)particleLayout;
 	Swarm *swarm = (Swarm*)_swarm;
 	
-#ifdef HAVE_HDF5
+#ifdef READ_HDF5
 	SwarmVariable*          swarmVar;
    Index                   swarmVar_I, dof_I;
    char                    dataSpaceName[1024];
@@ -400,7 +400,7 @@ void _FileParticleLayout_InitialiseParticle(
 	int                        result;
 	IntegrationPoint*          newParticle          = (IntegrationPoint*)particle;
 
-#ifdef HAVE_HDF5
+#ifdef READ_HDF5
    SwarmVariable*          swarmVar;
    Index                   swarmVar_I;
    hid_t                   memSpace; 
