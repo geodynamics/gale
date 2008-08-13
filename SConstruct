@@ -26,14 +26,23 @@ if 'config' in COMMAND_LINE_TARGETS or 'help' in COMMAND_LINE_TARGETS:
 
     proj = env.Package(SConfig.Project)
     proj.opts.AddOptions(
-        BoolOption('with_glucifer', 'Use gLucifer visualisation', 1)
+        BoolOption('with_glucifer', 'Use gLucifer visualisation', 1),
+        BoolOption('read_hdf5', 'Read from HDF5 files when restarting from checkpoint', 1),
+        BoolOption('write_hdf5', 'Write checkpoint files as HDF5', 1)
         )
     proj.dependency(SConfig.packages.cmath)
     proj.dependency(SConfig.packages.libXML2)
     proj.dependency(SConfig.packages.MPI)
     proj.dependency(SConfig.packages.SVNRevision)
     proj.dependency(SConfig.packages.BlasLapack)
-    proj.dependency(SConfig.packages.HDF5, False, have_define='HAVE_HDF5')
+    
+    if env['read_hdf5'] and env['write_hdf5']:
+        proj.dependency(SConfig.packages.HDF5, False, have_define=['READ_HDF5','WRITE_HDF5'])
+    elif env['write_hdf5']:
+        proj.dependency(SConfig.packages.HDF5, False, have_define='WRITE_HDF5')
+    elif env['read_hdf5']:
+        proj.dependency(SConfig.packages.HDF5, False, have_define='READ_HDF5')
+       
     proj.dependency(SConfig.packages.PETSc, have_define='HAVE_PETSC')
     if env['with_glucifer']:
         proj.dependency(SConfig.packages.OpenGL, have_define='HAVE_GL')
