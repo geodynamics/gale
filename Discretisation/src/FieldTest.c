@@ -159,6 +159,7 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 	Index				swarmVar_I;
 	Name                    	fieldName;
 	Hook*				generateErrorFields;
+	Dictionary_Entry_Value*		expectedFileList;
 
 	fieldList = Dictionary_Get( pluginDict, "NumericFields" );
 	self->fieldCount = fieldList ? Dictionary_Entry_Value_GetCount( fieldList ) : 0;
@@ -197,6 +198,18 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 	self->normalise			= Dictionary_Entry_Value_AsBool( Dictionary_Get( pluginDict, "normaliseByReferenceSolution" ) );
 	self->referenceSolnFromFile	= Dictionary_Entry_Value_AsBool( Dictionary_Get( pluginDict, "useReferenceSolutionFromFile" ) );
 	self->context			= Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
+
+	expectedFileList = Dictionary_Get( pluginDict, "ExpectedFiles" );
+	self->expectedCount = (expectedFileList) ? Dictionary_Entry_Value_GetCount( expectedFileList ) : 0;
+	if( self->expectedCount ) {
+		self->expectedValuePath = Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "expectedValuePath" ) );
+
+		self->expectedFilename     = Memory_Alloc_Array_Unnamed( Name, self->expectedCount );
+		self->expectedValue        = Memory_Alloc_Array_Unnamed( double, self->expectedCount );
+		self->expectedTolerance    = Memory_Alloc_Array_Unnamed( double, self->expectedCount );
+		self->expectedFunc         = Memory_Alloc_Array_Unnamed( FieldTest_ExpectedResultFunc*, self->expectedCount );
+		self->expectedNumericField = Memory_Alloc_Array_Unnamed( FeVariable*, self->expectedCount );
+	}
 
 	/* set up the entry point */
 	generateErrorFields = Hook_New( "Generate error fields hook", FieldTest_GenerateErrFields, self->name );
@@ -246,7 +259,9 @@ void _FieldTest_Build( void* fieldTest, void* data ) {
 void _FieldTest_Initialise( void* fieldTest, void* data ) {
 	FieldTest* 		self 		= (FieldTest*) fieldTest;
 	Index			field_I;
-
+	Index			expected_I;
+	FILE*			expected_fp;
+	char*			expectedFilename;
 
 	for( field_I = 0; field_I < self->fieldCount; field_I++ ) {
 		Stg_Component_Initialise( self->numericFieldList[field_I], data, False );
@@ -270,6 +285,23 @@ void _FieldTest_Initialise( void* fieldTest, void* data ) {
 	else {
 		for( field_I = 0; field_I < self->fieldCount; field_I++ )
 			FieldTest_CalculateAnalyticSolutionForField( self, field_I );
+	}
+
+	if( self->expectedCount ) {
+		for( expected_I = 0; expected_I < self->expectedCount; expected_I++ ) {
+			expectedFilename = Memory_Alloc_Array_Unnamed( char, strlen(self->expectedValuePath) + 
+							strlen(self->expectedFilename[expected_I]) + 1 );
+			sprintf( expectedFilename, "%s%s", self->expectedValuePath, self->expectedFilename[expected_I] );
+
+			expected_fp = fopen( expectedFilename, "r" );
+
+			fscanf( expected_fp, "%lf %lf", &self->expectedValue[expected_I], 
+							&self->expectedTolerance[expected_I] );
+
+			fclose( expected_fp );
+
+			Memory_Free( expectedFilename );
+		}
 	}
 }
 
@@ -301,6 +333,28 @@ void _FieldTest_Execute( void* fieldTest, void* data ) {
 
 void _FieldTest_Destroy( void* fieldTest, void* data ) {
 	FieldTest* 		self 		= (FieldTest*) fieldTest;
+	
+	Memory_Free( self->numericFieldList );
+	Memory_Free( self->referenceFieldList );
+	Memory_Free( self->errorFieldList );
+	Memory_Free( self->referenceMagFieldList );
+	Memory_Free( self->errorMagFieldList );
+
+	Memory_Free( self->gAnalyticSq );
+	Memory_Free( self->gErrorSq );
+	Memory_Free( self->gError );
+	Memory_Free( self->gErrorNorm );
+	if( self->expectedCount ) {
+		Memory_Free( self->expectedFilename );
+		Memory_Free( self->expectedValue );
+		Memory_Free( self->expectedTolerance );
+		Memory_Free( self->expectedFunc );
+		Memory_Free( self->expectedNumericField );
+	}
+	if( !self->referenceSolnFromFile ) {
+		Memory_Free( self->analyticSolnForFeVarKey );
+		Memory_Free( self->_analyticSolutionList );
+	}
 }
 
 void FieldTest_BuildReferenceField( void* fieldTest, Index field_I ) {
@@ -513,6 +567,7 @@ void FieldTest_LoadReferenceSolutionFromFile( FeVariable* feVariable, Name refer
 	int 			sizes[3];
 	double* 		data;
 	int 			dataPos = 0;
+	double			nodeDummy;
 
 	Stg_Component_Initialise( feMesh,     context, False );
 	Stg_Component_Initialise( feVariable, context, False );
@@ -540,8 +595,8 @@ void FieldTest_LoadReferenceSolutionFromFile( FeVariable* feVariable, Name refer
 
 	posx = Memory_Alloc_Array_Unnamed( double, total );
 	posy = Memory_Alloc_Array_Unnamed( double, total );
-	if( nDims == 3 ) Memory_Alloc_Array_Unnamed( double, total );
-	Memory_Alloc_2DArray_Unnamed( double, total, dofAtEachNodeCount );
+	if( nDims == 3 ) posz = Memory_Alloc_Array_Unnamed( double, total );
+	variables = Memory_Alloc_2DArray_Unnamed( double, total, dofAtEachNodeCount );
 	data = Memory_Alloc_Array_Unnamed( double, nDims + dofAtEachNodeCount );
 
 	hSize = nDims + dofAtEachNodeCount;
@@ -563,6 +618,7 @@ void FieldTest_LoadReferenceSolutionFromFile( FeVariable* feVariable, Name refer
 		H5Sselect_hyperslab( dataSpace, H5S_SELECT_SET, start, NULL, count, NULL );
 		H5Dread( dataSet, H5T_NATIVE_DOUBLE, memSpace, dataSpace, H5P_DEFAULT, data );
 
+		nodeDummy = data[dataPos++];
 		posx[lineNum] = data[dataPos++];
 		posy[lineNum] = data[dataPos++];
 		if( nDims == 3 ) posz[lineNum] = data[dataPos++];
@@ -725,6 +781,10 @@ void FieldTest_GenerateErrFields( void* _context, void* data ) {
 	Bool			normalise		= self->normalise;
 	Index			numDofs, dof_I;
 	Index			field_I;
+	Index			expected_I;
+	FieldTest_ExpectedResultFunc* expectedFunc;
+	Bool			pass;
+	double			numericTestResult;
 	
 	for( field_I = 0; field_I < self->fieldCount; field_I++ ) {
 		/* should be using MT_VOLUME for the reference field mesh, but seems to have a bug */
@@ -770,6 +830,18 @@ void FieldTest_GenerateErrFields( void* _context, void* data ) {
 
 			Journal_Printf( context->info, "%s - dof %d normalised global error: %.8e\n", 
 				     	self->numericFieldList[field_I]->name, dof_I, self->gErrorNorm[field_I][dof_I] );
+		}
+	}
+
+	if( self->expectedCount ) {
+		for( expected_I = 0; expected_I < self->expectedCount; expected_I++ ) {
+			expectedFunc = self->expectedFunc[expected_I];
+			
+			pass = expectedFunc( self, self->expectedNumericField[expected_I], &numericTestResult );
+
+			Journal_Printf( context->info, "test %d - expected: %.8e, actual: %.8e, tolerance: %.8e, pass = %d\n",
+				     expected_I, self->expectedValue[expected_I], numericTestResult, 
+				     self->expectedTolerance[expected_I], pass );
 		}
 	}
 }
@@ -889,5 +961,12 @@ void FieldTest_AddAnalyticSolutionFuncToListAtIndex( void* fieldTest, Index func
 
 	self->_analyticSolutionList[func_I] = func;
 	self->analyticSolnForFeVarKey[field_I] = func_I;
+}
+
+void FieldTest_AddExpectedFuncAndFieldToListAtIndex( void* fieldTest, FieldTest_ExpectedResultFunc* func, FeVariable* feVariable, Index i ) {
+	FieldTest* 	self 	= (FieldTest*) fieldTest;
+
+	self->expectedFunc[i] = func;
+	self->expectedNumericField[i] = feVariable;
 }
 

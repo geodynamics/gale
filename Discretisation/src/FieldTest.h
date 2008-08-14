@@ -51,6 +51,7 @@
 #define __StgFEM_Discretisation_FieldTest_h__
 	
 	typedef void (FieldTest_AnalyticSolutionFunc) (void* fieldTest, double* coord, double* value );
+	typedef Bool (FieldTest_ExpectedResultFunc) (void* fieldTest, FeVariable* feVar, double* value);
 
 	/** Textual name of this class */
 	extern const Type FieldTest_Type;
@@ -88,6 +89,15 @@
 		/* correct feVariable */			 		\
 		Index*					analyticSolnForFeVarKey;\
 		FieldTest_AnalyticSolutionFunc**	_analyticSolutionList;	\
+		/* for the physics tests */ \
+		Name*					expectedFilename;	\
+		Name					expectedValuePath;	\
+		double*					expectedValue;		\
+		double*					expectedTolerance;	\
+		FieldTest_ExpectedResultFunc**		expectedFunc;		\
+		FeVariable**				expectedNumericField;	\
+		unsigned				expectedCount;		\
+		
 		
 
 	/** Brings together and manages the life-cycle of a a mesh and all the 
@@ -164,4 +174,5 @@
 	void FieldTest_ElementErrReferenceFromSwarm( void* fieldTest, Index field_I, Index lElement_I, double* elErrorSq, double* elNormSq );
 
 	void FieldTest_AddAnalyticSolutionFuncToListAtIndex( void* fieldTest, Index func_I, FieldTest_AnalyticSolutionFunc* func, Index field_I );
+	void FieldTest_AddExpectedFuncAndFieldToListAtIndex( void* fieldTest, FieldTest_ExpectedResultFunc* func, FeVariable* feVariable, Index i );
 #endif /* __StgFEM_Discretisation_FieldTest_h__ */
