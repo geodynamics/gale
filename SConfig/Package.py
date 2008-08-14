@@ -121,7 +121,7 @@ class Package(SConfig.Node):
         if self.platform.system in ['Darwin', '*ix']:
             self.base_dirs = ['/usr', '/usr/local']
             self.sub_dirs = [[['include'], ['lib']]]
-            if self.platform.bits == 64:
+            if self.platform.bits == 64 and self.env['with_lib64']:
                 self.sub_dirs = [[['include'], ['lib64']],
                                  [['include'], [os.path.join('lib', '64')]]] + self.sub_dirs
 

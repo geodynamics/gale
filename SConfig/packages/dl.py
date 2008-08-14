@@ -7,3 +7,5 @@ class dl(SConfig.Package):
         self.dependency(SConfig.packages.CompilerFlags)
         self.headers = [['dlfcn.h']]
         self.libraries = [['dl']]
+        self.symbols = [(['dlopen'], '')]
+        self.symbol_calls = ['%s("dummy", RTLD_LAZY);']

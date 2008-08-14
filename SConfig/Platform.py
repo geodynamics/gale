@@ -20,6 +20,7 @@ class Platform(SConfig.Node):
         self.opts.AddOptions(
             SCons.Script.BoolOption('with_32bit', 'Generate 32bit code', 0),
             SCons.Script.BoolOption('with_64bit', 'Generate 64bit code', 0),
+            SCons.Script.BoolOption('with_lib64', 'Search in lib64 directories', 1),
             )
 
     def check_system(self):
