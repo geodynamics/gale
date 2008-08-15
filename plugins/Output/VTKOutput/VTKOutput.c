@@ -585,7 +585,7 @@ void VTKOutput_fields(void *context, int myRank, int nprocs) {
 
       /* Write the coordinates for the pressure, and set the
          appropriate file pointer to output for this variable. */
-      if(!strcmp(feVar->name,"PressureField")){
+      if(!strcmp(feVar->name,"PressureField") && !strcmp(feVar->feMesh->name, "constantMesh")){
         VTKOutput_print_coords(pressure_fp, feVar->feMesh, elGrid, nDims,
                                p_lower, p_upper);
         fprintf(pressure_fp,"      <PointData Scalars=\"PressureField\">\n");
