@@ -12,6 +12,14 @@
 			<param name="Rank">Scalar</param>
 			<param name="DataType">Double</param>
 		</struct>
+		<struct name="pressureBCs">
+			<param name="Type">CompositeVC</param>
+			<param name="Data">pressureMesh</param>
+		</struct>
+		<struct name="pressureICs">
+			<param name="Type">CompositeVC</param>
+			<param name="Data">pressureMesh</param>
+		</struct>
 		<struct name="pressureDofLayout">
 			<param name="Type">DofLayout</param>
 			<param name="mesh">pressureMesh</param>
@@ -23,6 +31,8 @@
 			<param name="Type">FeVariable</param>
 			<param name="FEMesh">pressureMesh</param>
 			<param name="DofLayout">pressureDofLayout</param>
+			<param name="BC">pressureBCs</param>
+			<param name="IC">pressureICs</param>
 			<param name="LinkedDofInfo">pressureLinkedDofs</param>
 		</struct>
 	</struct>
