@@ -47,7 +47,7 @@
 ** Comments:
 **	There's an issue inside FE_Context_Build() see inside the code.
 **
-** $Id: Context.h 1203 2008-08-13 03:58:09Z BelindaMay $
+** $Id: Context.h 1207 2008-08-17 15:16:25Z LukeHodkinson $
 *
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -72,6 +72,7 @@
 		double                              prevTimestepDt;          \
 		Bool                                limitTimeStepIncreaseRate; \
 		double                              maxTimeStepIncreasePercentage; \
+                double                              maxTimeStepSize;\
 		EntryPoint*                         calcDtEP;                 \
 		
 	struct FiniteElementContext { __FiniteElementContext };

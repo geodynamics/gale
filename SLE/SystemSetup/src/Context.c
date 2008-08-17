@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Context.c 1204 2008-08-13 08:34:21Z DavidLee $
+** $Id: Context.c 1207 2008-08-17 15:16:25Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -198,6 +198,10 @@ void _FiniteElementContext_Init( FiniteElementContext* self ) {
 		"maxTimeStepIncreasePercentage", 10.0 );
 	Journal_Firewall( self->maxTimeStepIncreasePercentage >= 0, errorStream,
 		"Error - in %s(): maxTimeStepIncreasePercentage must be >= 0\n", __func__ );
+
+        self->maxTimeStepSize = Dictionary_GetDouble_WithDefault(
+           self->dictionary, "maxTimeStepSize", 0.0 );
+                                                                  
 	
 	/* set up s.l.e list */
 	self->slEquations = Stg_ObjectList_New();
@@ -460,6 +464,11 @@ double FiniteElementContext_CalcNewDt( void* context ) {
 			Stream_SetPrintingRank( self->info, prevContextPrintingRank );
 		}
 	}
+
+        if( self->maxTimeStepSize > 0.0 ) {
+           if( self->dt > self->maxTimeStepSize )
+              self->dt = self->maxTimeStepSize;
+        }
 	
 	return self->dt;
 }
