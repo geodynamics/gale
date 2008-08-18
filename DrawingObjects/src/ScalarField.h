@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: ScalarField.h 628 2006-10-12 08:23:07Z SteveQuenette $
+** $Id: ScalarField.h 786 2008-08-18 13:55:47Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -57,6 +57,7 @@
 		/* Virtual functions go here */ \
 		/* Other info */\
 		Bool                                               cullFace;               \
+                Bool useMesh;
 
 	struct lucScalarField { __lucScalarField };
 	
@@ -96,5 +97,7 @@
 	void _lucScalarField_CleanUp( void* drawingObject, void* _context ) ;
 
 	void _lucScalarField_BuildDisplayList( void* drawingObject, void* _context ) ;
+
+	void lucScalarField_DrawWithMesh( lucScalarField* self );
 
 #endif

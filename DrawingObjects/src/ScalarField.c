@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: ScalarField.c 740 2007-10-11 08:05:31Z SteveQuenette $
+** $Id: ScalarField.c 786 2008-08-18 13:55:47Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -47,6 +47,7 @@
 #include <mpi.h>
 #include <StGermain/StGermain.h>
 #include <StgDomain/StgDomain.h>
+#include <StgFEM/StgFEM.h>
 
 #include <glucifer/Base/Base.h>
 #include <glucifer/RenderingEngines/RenderingEngines.h>
@@ -173,6 +174,8 @@ void _lucScalarField_Construct( void* drawingObject, Stg_ComponentFactory* cf, v
 	_lucScalarField_Init( 
 			self, 
 			Stg_ComponentFactory_GetBool( cf, self->name, "cullFace", True ) );
+
+        self->useMesh = Stg_ComponentFactory_GetBool( cf, self->name, "useMesh", False );
 }
 
 void _lucScalarField_Build( void* drawingObject, void* data ) {
@@ -227,7 +230,10 @@ void _lucScalarField_BuildDisplayList( void* drawingObject, void* _context ) {
 
 	
 	if (context->dim == 2) {
-		lucScalarFieldCrossSection_DrawCrossSection( self, 0.0, K_AXIS );
+           if( self->useMesh )
+              lucScalarField_DrawWithMesh( self );
+           else
+              lucScalarFieldCrossSection_DrawCrossSection( self, 0.0, K_AXIS );
 	}
 	else {
 		if ( self->cullFace ) 
@@ -247,3 +253,70 @@ void _lucScalarField_BuildDisplayList( void* drawingObject, void* _context ) {
 	}
 }
 
+void lucScalarField_DrawWithMesh( lucScalarField* self ) {
+   FeVariable* var = (FeVariable*)self->fieldVariable;
+   FeMesh* mesh = var->feMesh;
+   lucColourMap* cmap = self->colourMap;
+   IArray* inc;
+   double value;
+   int* nodes, nElements, curNode;
+   int nodeMap[4] = {0, 1, 3, 2};
+   double xi[3], vertex[3];
+   int ii, jj, kk;
+
+   lucOpenGLDrawingObject_SyncShadowValues( self, self->fieldVariable );
+   glDisable( GL_LIGHTING );
+   glNormal3f( 0.0, 0.0, 1.0 );
+   glBegin( GL_QUADS );
+   nElements = FeMesh_GetElementLocalSize( mesh );
+   inc = IArray_New();
+   for( ii = 0; ii < nElements; ii++ ) {
+      for( jj = 0; jj < 10; jj++ ) {
+         for( kk = 0; kk < 10; kk++ ) {
+
+            xi[0] = -1.0 + ((double)kk / 10.0) * 2.0;
+            xi[1] = -1.0 + ((double)jj / 10.0) * 2.0;
+            FeVariable_InterpolateWithinElement( var, ii, xi, &value );
+            lucColourMap_SetOpenGLColourFromValue( cmap, value );
+            FeMesh_CoordLocalToGlobal( mesh, ii, xi, vertex );
+            glVertex2dv( vertex );
+
+            xi[0] = -1.0 + ((double)(kk + 1) / 10.0) * 2.0;
+            xi[1] = -1.0 + ((double)jj / 10.0) * 2.0;
+            FeVariable_InterpolateWithinElement( var, ii, xi, &value );
+            lucColourMap_SetOpenGLColourFromValue( cmap, value );
+            FeMesh_CoordLocalToGlobal( mesh, ii, xi, vertex );
+            glVertex2dv( vertex );
+
+            xi[0] = -1.0 + ((double)(kk + 1) / 10.0) * 2.0;
+            xi[1] = -1.0 + ((double)(jj + 1) / 10.0) * 2.0;
+            FeVariable_InterpolateWithinElement( var, ii, xi, &value );
+            lucColourMap_SetOpenGLColourFromValue( cmap, value );
+            FeMesh_CoordLocalToGlobal( mesh, ii, xi, vertex );
+            glVertex2dv( vertex );
+
+            xi[0] = -1.0 + ((double)kk / 10.0) * 2.0;
+            xi[1] = -1.0 + ((double)(jj + 1) / 10.0) * 2.0;
+            FeVariable_InterpolateWithinElement( var, ii, xi, &value );
+            lucColourMap_SetOpenGLColourFromValue( cmap, value );
+            FeMesh_CoordLocalToGlobal( mesh, ii, xi, vertex );
+            glVertex2dv( vertex );
+         }
+      }
+
+#if 0
+      FeMesh_GetElementNodes( mesh, ii, inc );
+      assert( IArray_GetSize( inc ) == 4 );
+      nodes = IArray_GetPtr( inc );
+      for( jj = 0; jj < 4; jj++ ) {
+         curNode = nodes[nodeMap[jj]];
+         FeVariable_GetValueAtNode( var, curNode, &value );
+         lucColourMap_SetOpenGLColourFromValue( cmap, value );
+         glVertex2dv( Mesh_GetVertex( mesh, curNode ) );
+      }
+#endif
+   }
+   NewClass_Delete( inc );
+   glEnd();
+   glEnable(GL_LIGHTING);
+}
