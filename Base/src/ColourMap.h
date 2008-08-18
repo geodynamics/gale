@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: ColourMap.h 639 2006-11-15 05:29:51Z CecileDuboz $
+** $Id: ColourMap.h 784 2008-08-18 13:54:31Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -65,6 +65,7 @@
 		double                                             maximum;      \
 		Bool                                               logScale;     \
 		Bool                                               dynamicRange; \
+                Bool discrete;
 
 	struct lucColourMap {__lucColourMap};
 

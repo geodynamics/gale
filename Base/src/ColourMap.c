@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: ColourMap.c 740 2007-10-11 08:05:31Z SteveQuenette $
+** $Id: ColourMap.c 784 2008-08-18 13:54:31Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -266,6 +266,8 @@ void _lucColourMap_Construct( void* colourMap, Stg_ComponentFactory* cf, void* d
 			Stg_ComponentFactory_GetDouble( cf, self->name, "maximum", 1.0 ),
 			Stg_ComponentFactory_GetBool( cf, self->name, "logScale", False ),
 			Stg_ComponentFactory_GetBool( cf, self->name, "dynamicRange", False ) );
+
+        self->discrete = Stg_ComponentFactory_GetBool( cf, self->name, "discrete", False );
 }
 
 void _lucColourMap_Build( void* colourMap, void* data ) { }
@@ -297,17 +299,27 @@ void lucColourMap_GetColourFromValue( void* colourMap, double value, lucColour* 
 		return;
 	}
 	
-	colourBelow_I = (Colour_Index) ( ( colourCount - 1 ) * scaledValue );
-	colourBelow   = lucColourMap_GetColourFromList( self, colourBelow_I );
-	colourAbove   = lucColourMap_GetColourFromList( self, colourBelow_I + 1 );
+        if( !self->discrete ) {
+           colourBelow_I = (Colour_Index) ( ( colourCount - 1 ) * scaledValue );
+           colourBelow   = lucColourMap_GetColourFromList( self, colourBelow_I );
+           colourAbove   = lucColourMap_GetColourFromList( self, colourBelow_I + 1 );
 	
-	remainder = (float)( colourCount - 1 ) * scaledValue - (float) colourBelow_I;
+           remainder = (float)( colourCount - 1 ) * scaledValue - (float) colourBelow_I;
 	
-	/* Do linear interpolation between colours */
-	colour->red     = ( colourAbove->red     - colourBelow->red     ) * remainder + colourBelow->red;
-	colour->green   = ( colourAbove->green   - colourBelow->green   ) * remainder + colourBelow->green;
-	colour->blue    = ( colourAbove->blue    - colourBelow->blue    ) * remainder + colourBelow->blue;
-	colour->opacity = ( colourAbove->opacity - colourBelow->opacity ) * remainder + colourBelow->opacity;
+           /* Do linear interpolation between colours */
+           colour->red     = ( colourAbove->red     - colourBelow->red     ) * remainder + colourBelow->red;
+           colour->green   = ( colourAbove->green   - colourBelow->green   ) * remainder + colourBelow->green;
+           colour->blue    = ( colourAbove->blue    - colourBelow->blue    ) * remainder + colourBelow->blue;
+           colour->opacity = ( colourAbove->opacity - colourBelow->opacity ) * remainder + colourBelow->opacity;
+        }
+        else {
+           colourBelow_I = (Colour_Index) ( (float)colourCount * scaledValue );
+           colourBelow = lucColourMap_GetColourFromList( self, colourBelow_I );
+           colour->red = colourBelow->red;
+           colour->green = colourBelow->green;
+           colour->blue = colourBelow->blue;
+           colour->opacity = colourBelow->opacity;
+        }
 }
 void lucColourMap_GetColourFromValue_ExplicitOpacity( void* colourMap, double value, lucColour* colour, float opacity ) {
 	lucColourMap* self        = colourMap;
