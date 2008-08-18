@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: ColourBar.c 768 2008-04-21 03:20:07Z JohnMansour $
+** $Id: ColourBar.c 785 2008-08-18 13:55:00Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -200,6 +200,7 @@ void _lucColourBar_Construct( void* drawingObject, Stg_ComponentFactory* cf, voi
 			(float) Stg_ComponentFactory_GetDouble( cf, self->name, "borderWidth", 1 ) ,
 			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "precision", 2 ) ,
 			Stg_ComponentFactory_GetBool(cf, self->name, "scientific", False ),
+
 			Stg_ComponentFactory_GetUnsignedInt(cf, self->name, "ticks", 0 ) ,
 			Stg_ComponentFactory_GetBool(cf, self->name, "printTickValue", False ),
 			(float) Stg_ComponentFactory_GetDouble(cf, self->name, "scaleValue", 1.0 ) 
@@ -223,23 +224,23 @@ value = scaleValue * value;
 
 	if(scientific){
 		if( precision == 1 ){
-			sprintf(string, "%.1E", value);
+			sprintf(string, "%.1e", value);
 			return;
 			}
 		if( precision == 2 ){
-			sprintf(string, "%.2E", value);
+			sprintf(string, "%.2e", value);
 			return;
 			}
 		if( precision == 3 ){
-			sprintf(string, "%.3E", value);
+			sprintf(string, "%.3e", value);
 			return;
 			}
 		if( precision == 4 ){
-			sprintf(string, "%.4E", value);
+			sprintf(string, "%.4e", value);
 			return;
 			}
 		if( precision == 5 ){
-			sprintf(string, "%.5E", value);
+			sprintf(string, "%.5e", value);
 			return;
 			}
 	}
@@ -307,7 +308,13 @@ void _lucColourBar_Draw( void* drawingObject, lucWindow* window, lucViewportInfo
 	
 	/* Draw Colour Bar */
 	for ( pixel_I = 0 ; pixel_I < length ; pixel_I++ ) {
-		value = colourMap->minimum + (double) pixel_I * (colourMap->maximum - colourMap->minimum) / (double) length;
+           if( colourMap->logScale ) {
+              value = log10(colourMap->minimum) +
+                 (double)pixel_I * (log10(colourMap->maximum) - log10(colourMap->minimum)) / (double)length;
+              value = pow( 10.0, value );
+           }
+           else
+              value = colourMap->minimum + (double) pixel_I * (colourMap->maximum - colourMap->minimum) / (double) length;
 
 		lucColourMap_SetOpenGLColourFromValue( colourMap, value );
 	
@@ -325,7 +332,7 @@ void _lucColourBar_Draw( void* drawingObject, lucWindow* window, lucViewportInfo
 	glEnd();
 
 	/* Write scale */
-	if ( fabs(colourMap->minimum) < 1.0e-5 )
+	if ( !self->scientific && fabs(colourMap->minimum) < 1.0e-5 )
 		sprintf( string, "0" );
 	else{
 		 _lucColourBar_WithPrecision(string, self->scientific, self->precision,  self->scaleValue, colourMap->minimum);
@@ -340,7 +347,7 @@ void _lucColourBar_Draw( void* drawingObject, lucWindow* window, lucViewportInfo
 	glRasterPos2iv( rasterPos );
 	lucPrintString( string );
 	
-	if ( fabs(colourMap->maximum) < 1.0e-5 )
+	if ( !self->scientific && fabs(colourMap->maximum) < 1.0e-5 )
 		sprintf( string, "0" );
 	else{
 		_lucColourBar_WithPrecision( string, self->scientific, self->precision, self->scaleValue, colourMap->maximum);
@@ -367,7 +374,13 @@ void _lucColourBar_Draw( void* drawingObject, lucWindow* window, lucViewportInfo
 
 		
 		/* Computse the tick value */
-		tickValue = colourMap->minimum + ( i*(colourMap->maximum - colourMap->minimum)/self->ticks );
+                if( colourMap->logScale ) {
+                   tickValue = log10(colourMap->minimum) + 
+                      ((double)i * (log10(colourMap->maximum) - log10(colourMap->minimum)) / (double)self->ticks);
+                   tickValue = pow( 10.0, tickValue );
+                }
+                else
+                   tickValue = colourMap->minimum + ( i*(colourMap->maximum - colourMap->minimum)/self->ticks );
 		
 		if(self->printTickValue)  {
 			_lucColourBar_WithPrecision( string, self->scientific, self->precision, self->scaleValue, tickValue);
