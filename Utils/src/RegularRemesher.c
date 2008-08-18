@@ -168,7 +168,7 @@ void _RegularRemesher_Remesh( void* _self ) {
 	       }
                else if( d_i == 1 ) {
 		  d_j = 0;
-		  depth = 1;
+		  depth = self->contactDepth;
 	       }
                else if( d_i == 2 ) {
 		  d_j = 1;
