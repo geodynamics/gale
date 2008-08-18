@@ -11,3 +11,4 @@ class X11(SConfig.Package):
         self.symbols = [(['XOpenDisplay'], '')]
         self.symbol_setup = 'void* display;'
         self.symbol_calls = ['display = %s(NULL);']
+        self.have_define = 'HAVE_X11'
