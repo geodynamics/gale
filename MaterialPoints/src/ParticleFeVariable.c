@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ParticleFeVariable.c 577 2008-07-24 05:34:16Z LukeHodkinson $
+** $Id: ParticleFeVariable.c 583 2008-08-19 08:03:13Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -56,6 +56,10 @@
 #include <assert.h>
 
 const Type ParticleFeVariable_Type = "ParticleFeVariable";
+
+char* ParticleFeVariable_names[10];
+int ParticleFeVariable_nNames = 0;
+int ParticleFeVariable_curName = 0;
 
 ParticleFeVariable* _ParticleFeVariable_New(
  		SizeT                                             _sizeOfSelf,
@@ -156,7 +160,9 @@ void _ParticleFeVariable_Init( ParticleFeVariable* self, IntegrationPointsSwarm*
 		ForceTerm_New( "massMatrixForceTerm", self->massMatrix, (Swarm*)swarm, (Stg_Component*) self );
 	ForceTerm_SetAssembleElementFunction( self->massMatrixForceTerm, ParticleFeVariable_AssembleElementShapeFunc );
 	
-	EP_AppendClassHook( Context_GetEntryPoint( context, AbstractContext_EP_UpdateClass ),	ParticleFeVariable_Update, self );
+	/*EP_AppendClassHook( Context_GetEntryPoint( context, AbstractContext_EP_UpdateClass ),	ParticleFeVariable_Update, self );*/
+	EP_AppendClassHook( Context_GetEntryPoint( context, "stokesEqn-execute" ), _ParticleFeVariable_Execute, self );
+	ParticleFeVariable_names[ParticleFeVariable_nNames++] = self->name;
 
 	self->useDeriv = False;
 	self->GNx = NULL;
@@ -219,10 +225,14 @@ void _ParticleFeVariable_Build( void* materialFeVariable, void* data ) {
 	ParticleFeVariable* self = (ParticleFeVariable*) materialFeVariable;
 	int dataSize;
 
+#if 0
 	if( self->useDeriv )
+#endif
 	   ForceTerm_SetAssembleElementFunction( self->assemblyTerm, ParticleFeVariable_AssembleElement_Deriv );
+#if 0
 	else
 	   ForceTerm_SetAssembleElementFunction( self->assemblyTerm, ParticleFeVariable_AssembleElement );
+#endif
 	
 	Stg_Component_Build( self->feMesh, data, False );
 	dataSize = FeMesh_GetNodeDomainSize( self->feMesh ) * self->fieldComponentCount;
@@ -265,10 +275,12 @@ void _ParticleFeVariable_Initialise( void* materialFeVariable, void* data ) {
 	}
 }
 
-void _ParticleFeVariable_Execute( void* materialFeVariable, void* data ) {
-	ParticleFeVariable* self = (ParticleFeVariable*) materialFeVariable;
+void _ParticleFeVariable_Execute( void* materialFeVariable, void* _ctx ) {
+   AbstractContext* ctx = (AbstractContext*)_ctx;
 
-	_FeVariable_Execute( self, data );
+   if( ParticleFeVariable_curName >= ParticleFeVariable_nNames )
+      ParticleFeVariable_curName = 0;
+   ParticleFeVariable_Update( LiveComponentRegister_Get( ctx->CF->LCRegister, ParticleFeVariable_names[ParticleFeVariable_curName++] ) );
 }
 
 void _ParticleFeVariable_Destroy( void* materialFeVariable, void* data ) {
@@ -280,6 +292,8 @@ void _ParticleFeVariable_Destroy( void* materialFeVariable, void* data ) {
 
 void ParticleFeVariable_Update( void* materialFeVariable ) {
 	ParticleFeVariable* self = (ParticleFeVariable*) materialFeVariable;
+
+	printf( "***\n*** Updating %s\n***\n", self->name );
 
 	/* Initialise Vectors */
 	Vector_Zero( self->assemblyVector->vector );
@@ -345,7 +359,6 @@ void ParticleFeVariable_AssembleElement_Deriv( void* _forceTerm, ForceVector* fo
 	Dof_Index                  dofCount          = self->fieldComponentCount;
 	Dof_Index                  dof_I;
 	int                        dim = Mesh_GetDimSize( mesh );
-	double                     shapeFunc[8];
 	double                     particleValue[9];
 	double                     detJac;
 	double**                   GNx;
@@ -357,7 +370,6 @@ void ParticleFeVariable_AssembleElement_Deriv( void* _forceTerm, ForceVector* fo
 		/* Find this particle in the element */
 		particle = (IntegrationPoint*) Swarm_ParticleInCellAt( swarm, cell_I, cParticle_I );
 
-		ElementType_EvaluateShapeFunctionsAt( elementType, particle->xi, shapeFunc );
 		ElementType_ShapeFunctionsGlobalDerivs( elementType, mesh, lElement_I,
 							particle->xi, dim, &detJac, self->GNx );
 
@@ -365,7 +377,7 @@ void ParticleFeVariable_AssembleElement_Deriv( void* _forceTerm, ForceVector* fo
 
 		for ( dof_I = 0 ; dof_I < dofCount ; dof_I++ ) {
 			for ( node_I = 0 ; node_I < elementNodeCount ; node_I++ ) {
-				elForceVector[ node_I * dofCount + dof_I ] += shapeFunc[ node_I ] * particleValue[ dof_I ];
+				elForceVector[ node_I * dofCount + dof_I ] += particle->weight * detJac * particleValue[ dof_I ];
 			}
 		}
 	}
@@ -382,26 +394,31 @@ void ParticleFeVariable_AssembleElementShapeFunc( void* _forceTerm, ForceVector*
 	Element_NodeIndex          elementNodeCount  = FeMesh_GetElementNodeSize( mesh, lElement_I );
 	ElementType*               elementType       = FeMesh_GetElementType( mesh, lElement_I );
 	Cell_Index                 cell_I            = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
+	int                        dim = Mesh_GetDimSize( mesh );
 	Particle_InCellIndex       cellParticleCount;
 	Particle_InCellIndex       cParticle_I;
 	IntegrationPoint*          particle;
+	double                     detJac;
 	Node_Index                 node_I;
 	Dof_Index                  dofCount          = self->fieldComponentCount;
 	Dof_Index                  dof_I;
-	double                     shapeFunc[8];
 
+	self->GNx = Memory_Alloc_2DArray( double, dim, elementNodeCount, "GNx" );
 	cellParticleCount = swarm->cellParticleCountTbl[ cell_I ];
 	
 	for( cParticle_I = 0 ; cParticle_I < cellParticleCount; cParticle_I++ ) {
 		/* Find this particle in the element */
 		particle = (IntegrationPoint*) Swarm_ParticleInCellAt( swarm, cell_I, cParticle_I );
 
-		ElementType_EvaluateShapeFunctionsAt( elementType, particle->xi, shapeFunc );
+		ElementType_ShapeFunctionsGlobalDerivs( elementType, mesh, lElement_I,
+							particle->xi, dim, &detJac, self->GNx );
 
 		for ( dof_I = 0 ; dof_I < dofCount ; dof_I++ ) {
 			for ( node_I = 0 ; node_I < elementNodeCount ; node_I++ ) {
-				elForceVector[ node_I * dofCount + dof_I ] += shapeFunc[ node_I ]; 
+			   elForceVector[ node_I * dofCount + dof_I ] += particle->weight * detJac;
 			}
 		}
 	}
+
+	Memory_Free( self->GNx );
 }
