@@ -33,7 +33,7 @@
 **
 ** Comments:
 **
-** $Id: VariableCondition.h 4153 2007-07-26 02:25:22Z LukeHodkinson $
+** $Id: VariableCondition.h 4297 2008-08-19 16:54:05Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -126,7 +126,8 @@
 		by VariableCondition::vcTbl). */ \
 		VariableCondition_Value*			valueTbl; \
 									\
-		UIntMap*		mapping;
+                UIntMap*		mapping;  \
+                Stg_ComponentFactory* cf;
 	
 	/** Abstract class for specifying (1 or more) conditions that apply to (1 or more) variables in an array - 
 	see VariableCondition.h for details */

@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: CompositeVC.c 4153 2007-07-26 02:25:22Z LukeHodkinson $
+** $Id: CompositeVC.c 4297 2008-08-19 16:54:05Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -95,7 +95,7 @@ CompositeVC* CompositeVC_New(
 		_CompositeVC_GetValueIndex, 
 		_CompositeVC_GetValueCount, 
 		_CompositeVC_GetValue, 
-		_VariableCondition_Apply, 
+		_CompositeVC_Apply, 
 		variable_Register, 
 		conFunc_Register, 
 		dictionary, 
@@ -127,7 +127,7 @@ CompositeVC* CompositeVC_DefaultNew( Name name )
 		_CompositeVC_GetValueIndex, 
 		_CompositeVC_GetValueCount, 
 		_CompositeVC_GetValue, 
-		_VariableCondition_Apply, 
+		_CompositeVC_Apply, 
 		NULL/*variable_Register*/, 
 		NULL/*conFunc_Register*/,
 		NULL,
@@ -255,6 +255,8 @@ void _CompositeVC_Init(
 	
 	self->isConstructed = True;
 	self->itemCount = 0;
+        self->nIndepItems = 0;
+        self->indepItems = NULL;
 	self->_size = 8;
 	self->_delta = 8;
 	self->itemTbl = Memory_Alloc_Array( VariableCondition*, self->_size, "CompositeCV->itemTbl" );
@@ -301,6 +303,36 @@ void _CompositeVC_ReadDictionary( void* compositeVC, void* dictionary ) {
 			}
 			
 		}
+		vcList = Dictionary_Get( dictionary, "independentVCList" );
+		if( vcList ) {
+			Index	count;
+			Index	entry_I;
+			
+			count = Dictionary_Entry_Value_GetCount(vcList);
+			for (entry_I = 0; entry_I < count; entry_I++)
+			{
+				Dictionary_Entry_Value*	vcEntry;
+				Type			type;
+				Dictionary*		dictionary;
+				VariableCondition*	vc;
+				
+				vcEntry = Dictionary_Entry_Value_GetElement(vcList, entry_I);
+				type = Dictionary_Entry_Value_AsString(Dictionary_Entry_Value_GetMember(vcEntry, "type"));
+				dictionary = Dictionary_Entry_Value_AsDictionary(vcEntry);
+				vc = VariableCondition_Register_CreateNew(variableCondition_Register, self->variable_Register, 
+					self->conFunc_Register, type, dictionary, self->data );
+                                vc->cf = self->cf;
+				vc->_readDictionary( vc, dictionary );
+
+                                self->nIndepItems++;
+                                self->indepItems = ReallocArray(
+                                   self->indepItems, VariableCondition*, self->nIndepItems );
+                                self->indepItems[self->nIndepItems - 1] = vc;
+
+				CompositeVC_Add(self, vc, True);
+			}
+			
+		}
 		self->hasReadDictionary = True;
 	}
 }
@@ -314,6 +346,10 @@ void _CompositeVC_Construct( void* compositeVC, Stg_ComponentFactory* cf, void* 
 	Name         vcName;
 	
 	self->dictionary = cf->rootDict;
+
+        /* Need to store this so we can get at components
+           later on when using the fucked up 'ReadDictionary' function. */
+        self->cf = cf;
 	
 	variableRegister = (void*)Stg_ObjectList_Get( cf->registerRegister, "Variable_Register" );
 	assert( variableRegister );
@@ -337,6 +373,7 @@ void _CompositeVC_Construct( void* compositeVC, Stg_ComponentFactory* cf, void* 
 void _CompositeVC_Delete(void* compositeVC)
 {
 	CompositeVC*	self = (CompositeVC*)compositeVC;
+        int ii;
 	
 	if (self->itemTbl)
 	{
@@ -354,6 +391,12 @@ void _CompositeVC_Delete(void* compositeVC)
 	if( self->attachedSets ) {
 		Memory_Free( self->attachedSets );
 	}
+
+        if( self->indepItems ) {
+           for( ii = 0; ii < self->nIndepItems; ii++ )
+              Stg_Class_Delete( self->indepItems[ii] );
+           FreeArray( self->indepItems );
+        }
 	
 	/* Stg_Class_Delete parent */
 	_VariableCondition_Delete(self);
@@ -469,6 +512,7 @@ void* _CompositeVC_Copy( void* compositeVC, void* dest, Bool deep, Name nameExt,
 void _CompositeVC_Build( void* compositeVC, void* data ) {
 	CompositeVC*	self = (CompositeVC*)compositeVC;
 	Index		index;
+        int ii;
 	
 	/* Read the dictionary... we have to do this early to get self->itemCount filled in. Hence we keep a flag to ensure we
 		dont read twice */
@@ -494,6 +538,9 @@ void _CompositeVC_Build( void* compositeVC, void* data ) {
 		Memory_Free( self->attachedSets );
 		self->attachedSets = 0;
 	}
+
+        for( ii = 0; ii < self->nIndepItems; ii++ )
+           Stg_Component_Build( self->indepItems[ii], data, False );
 }
 
 
@@ -711,3 +758,13 @@ CompositeVC_ItemIndex CompositeVC_Add(void* compositeVC, void* variableCondition
 /*--------------------------------------------------------------------------------------------------------------------------
 ** Functions
 */
+
+void _CompositeVC_Apply( void* _self, void* _ctx ) {
+   CompositeVC* self = (CompositeVC*)_self;
+   int ii;
+
+   _VariableCondition_Apply( self, _ctx );
+
+   for( ii = 0; ii < self->nIndepItems; ii++ )
+      VariableCondition_Apply( self->indepItems[ii], _ctx );
+}

@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: VariableCondition.c 4153 2007-07-26 02:25:22Z LukeHodkinson $
+** $Id: VariableCondition.c 4297 2008-08-19 16:54:05Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -341,6 +341,7 @@ void* _VariableCondition_Copy( void* variableCondition, void* dest, Bool deep, N
 */
 
 void _VariableCondition_Construct( void* variableCondition, Stg_ComponentFactory* cf, void* data ) {
+   VariableCondition* self = (VariableCondition*)variableCondition;
 }
 
 void _VariableCondition_Build( void* variableCondition, void* data ) {

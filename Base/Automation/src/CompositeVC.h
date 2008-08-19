@@ -31,7 +31,7 @@
 **
 ** <b>Comments:</b>
 **
-** $Id: CompositeVC.h 4153 2007-07-26 02:25:22Z LukeHodkinson $
+** $Id: CompositeVC.h 4297 2008-08-19 16:54:05Z LukeHodkinson $
 **
 **/
 
@@ -51,6 +51,8 @@
 		/* Stg_Class info */ \
 		CompositeVC_ItemIndex		itemCount; \
 		VariableCondition**		itemTbl; \
+                int nIndepItems;                         \
+                VariableCondition** indepItems;          \
 		Bool*				iOwnTbl; \
 		SizeT				_size; \
 		SizeT				_delta; \
@@ -184,6 +186,8 @@
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Functions
 	*/
+
+void _CompositeVC_Apply( void* _self, void* _ctx );
 
 	
 #endif /* __Base_Automation_CompositeVC_h__ */
