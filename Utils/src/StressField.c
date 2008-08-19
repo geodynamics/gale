@@ -163,6 +163,17 @@ void* _StressField_DefaultNew( Name name ) {
 		name );
 }
 
+void StressField_NonLinearUpdate( void* _sle, void* _ctx ) {
+   SystemLinearEquations* sle = (SystemLinearEquations*)_sle;
+   AbstractContext* ctx = (AbstractContext*)_ctx;
+   FieldVariable_Register* fieldVar_Register;
+   StressField* stressVar;
+
+   fieldVar_Register = Stg_ObjectList_Get( ctx->register_Register, "FieldVariable_Register" );
+   stressVar = (StressField*)FieldVariable_Register_GetByName( fieldVar_Register, "StressField" );
+   ParticleFeVariable_Update( stressVar );
+}
+
 void _StressField_Construct( void* stressField, Stg_ComponentFactory* cf, void* data ){
 	StressField*          self              = (StressField*) stressField;
 	FeVariable*           strainRateField;
@@ -170,6 +181,7 @@ void _StressField_Construct( void* stressField, Stg_ComponentFactory* cf, void* 
 	Variable_Register*    variable_Register;
 	Name                  stressVariableName;
 	Variable*             stressVariable;
+        SystemLinearEquations* sle;
 
 	/* Construct Parent */
 	_ParticleFeVariable_Construct( self, cf, data );
@@ -185,6 +197,13 @@ void _StressField_Construct( void* stressField, Stg_ComponentFactory* cf, void* 
 	stressVariable = Variable_Register_GetByName( variable_Register, stressVariableName );
 
 	_StressField_Init( self, strainRateField, constitutiveMatrix, stressVariable, variable_Register );
+
+        /*
+        ** If we're using this field for non-linear feedback, we'll need to update it in between
+        ** non-linear iterations. */
+        sle = Stg_ComponentFactory_ConstructByKey( cf, self->name, "SLE", SystemLinearEquations, False, data );
+        if( sle )
+           SystemLinearEquations_AddPostNonLinearEP( sle, StressField_Type, StressField_NonLinearUpdate );
 }
 
 void _StressField_Build( void* stressField, void* data ) {
