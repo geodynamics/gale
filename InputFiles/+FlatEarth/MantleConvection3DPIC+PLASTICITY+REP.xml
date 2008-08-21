@@ -8,7 +8,7 @@
         </list>
 
 		<include> Underworld/BaseApps/ThermoChem.xml </include>
-		<include> ExperimentalUnderworld/REP_Setup3D.xml </include>
+		<include> Experimental/REP_Setup3D.xml </include>
 	
 	<list name="plugins" mergeType="merge">
 		<!-- Output Plugins -->

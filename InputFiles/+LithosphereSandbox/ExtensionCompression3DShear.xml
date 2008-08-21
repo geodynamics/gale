@@ -11,8 +11,8 @@
 	 fixed before we can release this functionality
 -->		
 
-	<include> ExperimentalUnderworld/ExtensionIncompressibleShearInflow.xml </include>
-	<include> ExperimentalUnderworld/REP_Setup3D.xml </include>
+	<include> Experimental/ExtensionIncompressibleShearInflow.xml </include>
+	<include> Experimental/REP_Setup3D.xml </include>
 	
 	<list name="plugins" mergeType="merge">
 		<param>StgFEM_FrequentOutput</param>	

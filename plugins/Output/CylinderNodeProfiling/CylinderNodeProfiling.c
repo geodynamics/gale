@@ -49,9 +49,9 @@
 #include <PICellerator/PICellerator.h>
 #include <assert.h>
 
-const Type ExperimentalUnderworld_CylinderNodeProfiling = "ExperimentalUnderworld_CylinderNodeProfiling";
+const Type Experimental_CylinderNodeProfiling = "Experimental_CylinderNodeProfiling";
 
-void ExperimentalUnderworld_NodeTempProfile( PICelleratorContext* context ) {
+void Experimental_NodeTempProfile( PICelleratorContext* context ) {
 #if 0
 	static FeVariable*          temperatureFe;
 	FiniteElement_Mesh*         mesh;
@@ -127,26 +127,26 @@ void ExperimentalUnderworld_NodeTempProfile( PICelleratorContext* context ) {
 #endif
 }
 
-void _ExperimentalUnderworld_CylinderNodeProfiling_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _Experimental_CylinderNodeProfiling_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
 
 	AbstractContext* context;
 	FeVariable*  temperatureField  = Stg_ComponentFactory_ConstructByName( cf, "TemperatureField", FeVariable, True, data );
 	FeMesh* mesh     = temperatureField->feMesh;
 
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
-	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, ExperimentalUnderworld_NodeTempProfile );
+	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, Experimental_NodeTempProfile );
 }
 
 
-void* _ExperimentalUnderworld_CylinderNodeProfiling_DefaultNew( Name name ) {
+void* _Experimental_CylinderNodeProfiling_DefaultNew( Name name ) {
 	return _Codelet_New(
 			sizeof( Codelet ),
-			ExperimentalUnderworld_CylinderNodeProfiling,
+			Experimental_CylinderNodeProfiling,
 			_Codelet_Delete,
 			_Codelet_Print,
 			_Codelet_Copy,
-			_ExperimentalUnderworld_CylinderNodeProfiling_DefaultNew,
-			_ExperimentalUnderworld_CylinderNodeProfiling_Construct,
+			_Experimental_CylinderNodeProfiling_DefaultNew,
+			_Experimental_CylinderNodeProfiling_Construct,
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,
@@ -155,11 +155,11 @@ void* _ExperimentalUnderworld_CylinderNodeProfiling_DefaultNew( Name name ) {
 }
 
 
-Index ExperimentalUnderworld_CylinderNodeProfiling_Register( PluginsManager* pluginsManager ) {
+Index Experimental_CylinderNodeProfiling_Register( PluginsManager* pluginsManager ) {
 	Index result;
 
-	result = PluginsManager_Submit( pluginsManager, ExperimentalUnderworld_CylinderNodeProfiling, "0",
-		_ExperimentalUnderworld_CylinderNodeProfiling_DefaultNew );
+	result = PluginsManager_Submit( pluginsManager, Experimental_CylinderNodeProfiling, "0",
+		_Experimental_CylinderNodeProfiling_DefaultNew );
 
 	return result;
 }
