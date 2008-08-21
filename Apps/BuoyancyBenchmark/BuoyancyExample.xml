@@ -10,7 +10,7 @@
 	<list name="plugins" mergeType="Replace">
 		<!--param>Underworld_MovingMesh</param-->
 		<param>StgFEM_StandardConditionFunctions</param>	
-		<!--param>ExperimentalUnderworld_PressureCalibration</param-->	
+		<!--param>Experimental_PressureCalibration</param-->	
 	</list>
 
 	<!--param name="extensionReferenceHeight">maxY</param-->
