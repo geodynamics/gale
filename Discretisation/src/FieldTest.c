@@ -956,6 +956,11 @@ void FieldTest_ElementErrReferenceFromSwarm( void* fieldTest, Index var_I, Index
 
 }
 
+/* the first index 'func_I' denotes the index of the function in the analytic solution list to be applied to calculate
+ * the analytic field at index 'field_I' in the analytic field list.
+ *
+ * the analytic fields are in the same order as their numeric counterparts are read in from the XML
+ */
 void FieldTest_AddAnalyticSolutionFuncToListAtIndex( void* fieldTest, Index func_I, FieldTest_AnalyticSolutionFunc* func, Index field_I ) {
 	FieldTest* 	self 	= (FieldTest*) fieldTest;
 
