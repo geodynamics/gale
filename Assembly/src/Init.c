@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Init.c 964 2007-10-11 08:03:06Z SteveQuenette $
+** $Id: Init.c 1209 2008-08-25 01:16:22Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -71,6 +71,7 @@ Bool StgFEM_Assembly_Init( int* argc, char** argv[] ) {
 	
 	Stg_ComponentRegister_Add( componentRegister, ThermalBuoyancyForceTerm_Type, "0", _ThermalBuoyancyForceTerm_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, GradientStiffnessMatrixTerm_Type, "0", _GradientStiffnessMatrixTerm_DefaultNew );
+	Stg_ComponentRegister_Add( componentRegister, DivergenceMatrixTerm_Type, "0", _DivergenceMatrixTerm_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, LaplacianStiffnessMatrixTerm_Type, "0", _LaplacianStiffnessMatrixTerm_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, IsoviscousStressTensorTerm_Type, "0", _IsoviscousStressTensorTerm_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, PressureGradMatrixTerm_Type, "0", _PressureGradMatrixTerm_DefaultNew );
@@ -78,6 +79,7 @@ Bool StgFEM_Assembly_Init( int* argc, char** argv[] ) {
 
 	RegisterParent( ThermalBuoyancyForceTerm_Type,     ForceTerm_Type );
 	RegisterParent( GradientStiffnessMatrixTerm_Type,  StiffnessMatrixTerm_Type );
+	RegisterParent( DivergenceMatrixTerm_Type,  StiffnessMatrixTerm_Type );
 	RegisterParent( LaplacianStiffnessMatrixTerm_Type, StiffnessMatrixTerm_Type );
 	RegisterParent( IsoviscousStressTensorTerm_Type,   StiffnessMatrixTerm_Type );
 	RegisterParent( PressureGradMatrixTerm_Type,   StiffnessMatrixTerm_Type );

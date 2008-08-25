@@ -44,7 +44,7 @@
 **
 ** Comments:
 **
-** $Id: types.h 856 2007-06-05 00:15:05Z LukeHodkinson $
+** $Id: types.h 1209 2008-08-25 01:16:22Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -54,6 +54,7 @@
 	/* FE types/classes */
 	typedef struct ThermalBuoyancyForceTerm                ThermalBuoyancyForceTerm;
 	typedef struct GradientStiffnessMatrixTerm             GradientStiffnessMatrixTerm;
+	typedef struct DivergenceMatrixTerm             DivergenceMatrixTerm;
 	typedef struct LaplacianStiffnessMatrixTerm            LaplacianStiffnessMatrixTerm;
 	typedef struct IsoviscousStressTensorTerm              IsoviscousStressTensorTerm;
 	typedef struct PressureGradForceTerm			PressureGradForceTerm;
