@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AbstractContext.c 4296 2008-08-13 03:57:10Z BelindaMay $
+** $Id: AbstractContext.c 4299 2008-08-25 06:59:12Z JohnMansour $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -1156,7 +1156,12 @@ Bool AbstractContext_CheckPointExists( void* context, Index timeStep ) {
 	struct stat            statInfo;
 	int                    statResult;
 
-	timeInfoFileName = AbstractContext_GetTimeInfoFileNameForGivenTimeStep( self, self->timeStep, self->checkpointReadPath ); 
+	timeInfoFileName = AbstractContext_GetTimeInfoFileNameForGivenTimeStep( self, self->timeStep, self->checkpointReadPath );
+#ifdef READ_HDF5
+    sprintf( timeInfoFileName, "%s.h5", timeInfoFileName );
+#else	
+    sprintf( timeInfoFileName, "%s.dat", timeInfoFileName );
+#endif	
 	statResult = stat( timeInfoFileName, &statInfo );
 
 	if ( 0 == statResult ) {
