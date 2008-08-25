@@ -45,7 +45,7 @@
 **
 ** Comments:
 **
-** $Id: ForceVector.h 963 2007-10-11 00:36:16Z DavidLee $
+** $Id: ForceVector.h 1210 2008-08-25 01:17:12Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -73,6 +73,8 @@
 		Stg_Component*			applicationDepExtraInfo; /**< Default is NULL: passed to elForceVec during assembly */\
 		Assembler*			bcAsm;  \
 		IArray*				inc;  \
+                int nModifyCBs;                       \
+                Callback* modifyCBs;
 	
 	struct ForceVector { __ForceVector };
 	
@@ -140,5 +142,7 @@
 	void ForceVector_GlobalAssembly_General( void* forceVector ) ;
 	void ForceVector_AssembleElement( void* forceVector, Element_LocalIndex element_lI, double* elForceVecToAdd ) ;
 	void ForceVector_AddForceTerm( void* forceVector, ForceTerm* forceTerm ) ;
+
+void ForceVector_AddModifyCallback( ForceVector* self, void* callback, void* object );
 
 #endif /* __StgFEM_SLE_SystemSetup_ForceVector_h__ */

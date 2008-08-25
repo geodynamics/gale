@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: StiffnessMatrix.c 1146 2008-06-05 04:09:39Z LukeHodkinson $
+** $Id: StiffnessMatrix.c 1210 2008-08-25 01:17:12Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -277,6 +277,9 @@ void _StiffnessMatrix_Init(
 
 	self->rowInc = IArray_New();
 	self->colInc = IArray_New();
+
+        self->nModifyCBs = 0;
+        self->modifyCBs = NULL;
 }
 
 
@@ -845,6 +848,7 @@ void _StiffnessMatrix_CalculatedListOfUniqueRelatedColNodes(
 
 void StiffnessMatrix_Assemble( void* stiffnessMatrix, Bool bcRemoveQuery, void* _sle, void* _context ) {
 	StiffnessMatrix* self = (StiffnessMatrix*)stiffnessMatrix;
+        int ii;
 
 	StiffnessMatrix_RefreshMatrix( self );
 
@@ -858,6 +862,13 @@ void StiffnessMatrix_Assemble( void* stiffnessMatrix, Bool bcRemoveQuery, void* 
 		bcRemoveQuery,
 		_sle,
 		_context );
+
+        /* Run all the modify callbacks. */
+        for( ii = 0; ii < self->nModifyCBs; ii++ ) {
+           void* callback = self->modifyCBs[ii].callback;
+           void* object = self->modifyCBs[ii].object;
+           ((void(*)(void*))callback)( object );
+        }
 }
 
 
@@ -2940,4 +2951,11 @@ Bool StiffnessMatrix_DiagBCsAsm_RowR( void* stiffMat, Assembler* assm ) {
 			   1, &assm->rowEq, 
 			   (double*)&one );
 	return True;
+}
+
+void StiffnessMatrix_AddModifyCallback( StiffnessMatrix* self, void* callback, void* object ) {
+   self->nModifyCBs++;
+   self->modifyCBs = ReallocArray( self->modifyCBs, Callback, self->nModifyCBs );
+   self->modifyCBs[self->nModifyCBs - 1].callback = callback;
+   self->modifyCBs[self->nModifyCBs - 1].object = object;
 }

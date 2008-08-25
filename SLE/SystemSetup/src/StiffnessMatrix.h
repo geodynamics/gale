@@ -49,7 +49,7 @@
 **	very customisable. They both default to empty, in case we have a matrix
 **	that doesn't need element-based information to be assembled.
 **
-** $Id: StiffnessMatrix.h 960 2007-09-25 07:54:49Z LukeHodkinson $
+** $Id: StiffnessMatrix.h 1210 2008-08-25 01:17:12Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -110,7 +110,9 @@
 		unsigned					nColDofs;			\
 									\
 		IArray* rowInc;	\
-		IArray* colInc;
+		IArray* colInc; \
+                int nModifyCBs;\
+                Callback* modifyCBs;
 		
 	struct StiffnessMatrix { __StiffnessMatrix };
 	
@@ -291,5 +293,7 @@
 
 	void StiffnessMatrix_TrackUniqueEqs( StiffnessMatrix* self, unsigned rowEq, unsigned colEq, 
 					     unsigned* nNonZeros, unsigned** nonZeros );
+
+void StiffnessMatrix_AddModifyCallback( StiffnessMatrix* self, void* callback, void* object );
 	
 #endif /* __StgFEM_SLE_SystemSetup_StiffnessMatrix_h__ */

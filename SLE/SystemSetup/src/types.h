@@ -44,7 +44,7 @@
 **
 ** Comments:
 **
-** $Id: types.h 822 2007-04-27 06:20:35Z LukeHodkinson $
+** $Id: types.h 1210 2008-08-25 01:17:12Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -84,5 +84,10 @@
 	/* output streams: initialised in StgFEM_SLE_SystemSetup_Init() */
 	extern Stream* StgFEM_SLE_Debug;
 	extern Stream* StgFEM_SLE_SystemSetup_Debug;
+
+typedef struct {
+      void* callback;
+      void* object;
+} Callback;
 
 #endif /* __StgFEM_SLE_SystemSetup_types_h__ */

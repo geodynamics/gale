@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ForceVector.c 1136 2008-05-20 05:06:21Z LukeHodkinson $
+** $Id: ForceVector.c 1210 2008-08-25 01:17:12Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -194,6 +194,9 @@ void _ForceVector_Init(
 
 	self->bcAsm = Assembler_New();
 	self->inc = IArray_New();
+
+        self->nModifyCBs = 0;
+        self->modifyCBs = NULL;
 }
 
 
@@ -354,6 +357,7 @@ void _ForceVector_Destroy( void* forceVector, void* data ) {
 
 void ForceVector_Assemble( void* forceVector ) {
 	ForceVector* self = (ForceVector*)forceVector;
+        int ii;
 	
 	Journal_DPrintf( self->debug, "In %s - for vector \"%s\" - calling the \"%s\" E.P.\n", __func__, self->name,
 			 self->assembleForceVector->name );
@@ -367,6 +371,13 @@ void ForceVector_Assemble( void* forceVector ) {
 	((FeEntryPoint_AssembleForceVector_CallFunction*)EntryPoint_GetRun( self->assembleForceVector ))(
 		self->assembleForceVector,
 		self );
+
+        /* Run all the modify callbacks. */
+        for( ii = 0; ii < self->nModifyCBs; ii++ ) {
+           void* callback = self->modifyCBs[ii].callback;
+           void* object = self->modifyCBs[ii].object;
+           ((void(*)(void*))callback)( object );
+        }
 }
 
 
@@ -570,4 +581,11 @@ Bool ForceVector_BCAsm_RowR( void* forceVec, Assembler* assm ) {
 				       assm->rowDofInd );
 	Vector_AddEntries( ((ForceVector*)forceVec)->vector, 1, &assm->rowEq, &bc );
 	return True;
+}
+
+void ForceVector_AddModifyCallback( ForceVector* self, void* callback, void* object ) {
+   self->nModifyCBs++;
+   self->modifyCBs = ReallocArray( self->modifyCBs, Callback, self->nModifyCBs );
+   self->modifyCBs[self->nModifyCBs - 1].callback = callback;
+   self->modifyCBs[self->nModifyCBs - 1].object = object;
 }
