@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: CompositeVC.c 4297 2008-08-19 16:54:05Z LukeHodkinson $
+** $Id: CompositeVC.c 4298 2008-08-25 01:14:56Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -280,29 +280,6 @@ void _CompositeVC_ReadDictionary( void* compositeVC, void* dictionary ) {
 	if( dictionary && !self->hasReadDictionary ) {
 		Dictionary_Entry_Value*	vcList;
 		
-		vcList = Dictionary_Get( dictionary, "vcList" );
-		if( vcList ) {
-			Index	count;
-			Index	entry_I;
-			
-			count = Dictionary_Entry_Value_GetCount(vcList);
-			for (entry_I = 0; entry_I < count; entry_I++)
-			{
-				Dictionary_Entry_Value*	vcEntry;
-				Type			type;
-				Dictionary*		dictionary;
-				VariableCondition*	vc;
-				
-				vcEntry = Dictionary_Entry_Value_GetElement(vcList, entry_I);
-				type = Dictionary_Entry_Value_AsString(Dictionary_Entry_Value_GetMember(vcEntry, "type"));
-				dictionary = Dictionary_Entry_Value_AsDictionary(vcEntry);
-				vc = VariableCondition_Register_CreateNew(variableCondition_Register, self->variable_Register, 
-					self->conFunc_Register, type, dictionary, self->data );
-				vc->_readDictionary( vc, dictionary );
-				CompositeVC_Add(self, vc, True);
-			}
-			
-		}
 		vcList = Dictionary_Get( dictionary, "independentVCList" );
 		if( vcList ) {
 			Index	count;
@@ -329,6 +306,31 @@ void _CompositeVC_ReadDictionary( void* compositeVC, void* dictionary ) {
                                    self->indepItems, VariableCondition*, self->nIndepItems );
                                 self->indepItems[self->nIndepItems - 1] = vc;
 
+                                /* Don't add so we can modify the matrix later.
+				CompositeVC_Add(self, vc, True);
+                                */
+			}
+			
+		}
+		vcList = Dictionary_Get( dictionary, "vcList" );
+		if( vcList ) {
+			Index	count;
+			Index	entry_I;
+			
+			count = Dictionary_Entry_Value_GetCount(vcList);
+			for (entry_I = 0; entry_I < count; entry_I++)
+			{
+				Dictionary_Entry_Value*	vcEntry;
+				Type			type;
+				Dictionary*		dictionary;
+				VariableCondition*	vc;
+				
+				vcEntry = Dictionary_Entry_Value_GetElement(vcList, entry_I);
+				type = Dictionary_Entry_Value_AsString(Dictionary_Entry_Value_GetMember(vcEntry, "type"));
+				dictionary = Dictionary_Entry_Value_AsDictionary(vcEntry);
+				vc = VariableCondition_Register_CreateNew(variableCondition_Register, self->variable_Register, 
+					self->conFunc_Register, type, dictionary, self->data );
+				vc->_readDictionary( vc, dictionary );
 				CompositeVC_Add(self, vc, True);
 			}
 			
