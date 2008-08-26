@@ -296,6 +296,8 @@ void _MaterialPointsSwarm_Construct( void* swarm, Stg_ComponentFactory* cf, void
 			escapedRoutine,
 			material,
 			materials_Register );
+
+	self->geomodHack = Dictionary_GetBool_WithDefault( cf->rootDict, "geomodHacks", False );
 }
 
 void _MaterialPointsSwarm_Build( void* swarm, void* data ) {
@@ -405,9 +407,38 @@ void _MaterialPointsSwarm_UpdateHook( void* timeIntegrator, void* swarm ) {
 				materialPoint->coord[ I_AXIS ],
 				materialPoint->coord[ J_AXIS ],
 				materialPoint->coord[ K_AXIS ] );
+
+                        /* Super hack. For the geomod benchmarks we need to convert frictional
+                           materials into regular materials as they cross the frictional boundaries. */
+                        if( self->geomodHack ) {
+                           Material* material;
+                           FeMesh* mesh;
+                           Grid* grid;
+                           int inds[3];
+
+                           mesh = (FeMesh*)((ElementCellLayout*)self->cellLayout)->mesh;
+                           grid = *Mesh_GetExtension( mesh, Grid**, "elementGrid" );
+                           material = MaterialPointsSwarm_GetMaterialOn( self, materialPoint );
+                           if( !strcmp( material->name, "quartzFriction" ) ) {
+                              Grid_Lift( grid, cell, inds );
+                              if( inds[0] > 1 && inds[0] < grid->sizes[0] - 2 &&
+                                  inds[1] > 1 && inds[1] < grid->sizes[1] - 2 )
+                              {
+                                 materialPoint->materialIndex = Materials_Register_GetIndex( self->materials_Register, "quartz" );
+                              }
+                           }
+                           else if( !strcmp( material->name, "corundumFriction" ) ) {
+                              Grid_Lift( grid, cell, inds );
+                              if( inds[0] > 1 && inds[0] < grid->sizes[0] - 2 &&
+                                  inds[1] > 1 && inds[1] < grid->sizes[1] - 2 )
+                              {
+                                 materialPoint->materialIndex = Materials_Register_GetIndex( self->materials_Register, "corundum" );
+                              }
+                           }
+                        }
 		}
 	}
-	
+
 }
 
 void MaterialPointsSwarm_SetMaterialAt( void* swarm, Index point_I, Index materialIndex ) {
