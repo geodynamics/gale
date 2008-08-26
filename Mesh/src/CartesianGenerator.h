@@ -95,7 +95,9 @@
 		unsigned*	origin;								\
 		unsigned*	range;								\
 		unsigned*	vertOrigin;							\
-		unsigned*	vertRange;
+		unsigned*	vertRange;                              \
+                int             contactDepth[3][2];                     \
+                double          contactGeom[3];
 
 	struct CartesianGenerator { __CartesianGenerator };
 

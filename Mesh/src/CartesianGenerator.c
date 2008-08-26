@@ -265,6 +265,17 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
 	/* Initial setup. */
 	CartesianGenerator_SetTopologyParams( self, size, maxDecompDims, minDecomp, maxDecomp );
 
+        /* Contact stuff. */
+        self->contactDepth[0][0] = Stg_ComponentFactory_GetInt( cf, self->name, "contactDepth-left", 0 );
+        self->contactDepth[0][1] = Stg_ComponentFactory_GetInt( cf, self->name, "contactDepth-right", 0 );
+        self->contactDepth[1][0] = Stg_ComponentFactory_GetInt( cf, self->name, "contactDepth-bottom", 0 );
+        self->contactDepth[1][1] = Stg_ComponentFactory_GetInt( cf, self->name, "contactDepth-top", 0 );
+        self->contactDepth[2][0] = Stg_ComponentFactory_GetInt( cf, self->name, "contactDepth-back", 0 );
+        self->contactDepth[2][1] = Stg_ComponentFactory_GetInt( cf, self->name, "contactDepth-front", 0 );
+        self->contactGeom[0] = Stg_ComponentFactory_GetDouble( cf, self->name, "contactGeometry-x", 0.0 );
+        self->contactGeom[1] = Stg_ComponentFactory_GetDouble( cf, self->name, "contactGeometry-y", 0.0 );
+        self->contactGeom[2] = Stg_ComponentFactory_GetDouble( cf, self->name, "contactGeometry-z", 0.0 );
+
 	/* Read geometry. */
 	minList = Dictionary_Get( dict, "minCoord" );
 	maxList = Dictionary_Get( dict, "maxCoord" );
@@ -2291,8 +2302,29 @@ void CartesianGenerator_CalcGeom( CartesianGenerator* self, Mesh* mesh, Sync* sy
 
 		/* Calculate coordinate. */
 		for( d_i = 0; d_i < mesh->topo->nDims; d_i++ ) {
-			vert[d_i] = self->crdMin[d_i] + 
-				((double)inds[d_i] / (double)(grid->sizes[d_i] - 1)) * steps[d_i];
+                   if( inds[d_i] <= self->contactDepth[d_i][0] ) {
+                      mesh->verts[n_i][d_i] = self->crdMin[d_i];
+                      if( self->contactDepth[d_i][0] ) {
+                         mesh->verts[n_i][d_i] +=
+                            ((double)inds[d_i] / (double)self->contactDepth[d_i][0]) *
+                            self->contactGeom[d_i];
+                      }
+                   }
+                   else if( inds[d_i] >= grid->sizes[d_i] - self->contactDepth[d_i][1] - 1 ) {
+                      mesh->verts[n_i][d_i] = self->crdMax[d_i];
+                      if( self->contactDepth[d_i][1] ) {
+                         mesh->verts[n_i][d_i] -=
+                            ((double)(grid->sizes[d_i] - 1 - inds[d_i]) /
+                             (double)self->contactDepth[d_i][1]) *
+                            self->contactGeom[d_i];
+                      }
+                   }
+                   else {
+                      vert[d_i] = self->crdMin[d_i] + self->contactGeom[d_i] +
+                         ((double)(inds[d_i] - self->contactDepth[d_i][0]) / 
+                          (double)(grid->sizes[d_i] - (self->contactDepth[d_i][0] + self->contactDepth[d_i][1]) - 1)) *
+                         (steps[d_i] - 2.0 * self->contactGeom[d_i]);
+                   }
 		}
 	}
 }
