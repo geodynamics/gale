@@ -38,9 +38,7 @@ MEMBER( double**, crds )
 MEMBER( int**, nWallVerts )
 MEMBER( int***, wallVerts )
 MEMBER( double***, wallCrds )
-MEMBER( int, contactDepth )
 MEMBER( double*, contactVerts )
-MEMBER( double, contactSize )
 
 
 /*

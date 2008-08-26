@@ -58,8 +58,6 @@ void _RegularRemesher_Init( void* _self ) {
    self->nWallVerts = NULL;
    self->wallVerts = NULL;
    self->wallCrds = NULL;
-   self->contactDepth = 0;
-   self->contactSize = 0.0;
 }
 
 void _RegularRemesher_Copy( void* _self, const void* _op ) {
@@ -115,6 +113,7 @@ void _RegularRemesher_Remesh( void* _self ) {
    int nDims, nVerts;
    int center, ind, *inds;
    double leftCrd, rightCrd;
+   CartesianGenerator* gen;
    int d_i, v_i, w_i;
 
    assert( self->mesh );
@@ -139,10 +138,14 @@ void _RegularRemesher_Remesh( void* _self ) {
 
    /* If we have a contact depth set we'll need to manipulate the boundaries
       a little. */
-   if( self->contactDepth ) {
+   gen = self->mesh->generator;
+   if( strcmp( gen->type, CartesianGenerator_Type ) )
+      gen = NULL;
+   if( gen ) {
       int curInd;
       int ii, d_j;
 
+#if 0
       /* Reset static depths. */
       curInd = 0;
       for( ii = 0; ii < nVerts; ii++ ) {
@@ -150,6 +153,7 @@ void _RegularRemesher_Remesh( void* _self ) {
          if( inds[1] != self->contactDepth ) continue;
          Mesh_GetVertex( mesh, ii )[1] = self->contactVerts[curInd++];
       }
+#endif
 
       /* Also handle contact element boundaries. */
       for( d_i = 0; d_i < nDims; d_i++ ) {
@@ -164,24 +168,19 @@ void _RegularRemesher_Remesh( void* _self ) {
                   sure the side coordinates are aligned. */
 	       if( d_i == 0 ) {
 		  d_j = 1;
-		  depth = self->contactDepth;
 	       }
                else if( d_i == 1 ) {
 		  d_j = 0;
-		  depth = self->contactDepth;
 	       }
                else if( d_i == 2 ) {
 		  d_j = 1;
 		  // TODO
 		  abort();
 	       }
-               if( inds[d_j] < depth )
-                  inds[d_j] = depth;
-               else if( inds[d_j] > vGrid->sizes[d_j] - depth - 1 && 
-                        d_i == 1 )
-               {
-                  inds[d_j] = vGrid->sizes[d_j] - depth - 1;
-               }
+               if( inds[d_j] < gen->contactDepth[d_j][0] )
+                  inds[d_j] = gen->contactDepth[d_j][0];
+               else if( inds[d_j] > vGrid->sizes[d_j] - gen->contactDepth[d_j][1] - 1 )
+                  inds[d_j] = vGrid->sizes[d_j] - gen->contactDepth[d_j][1] - 1;
                Mesh_GetVertex( mesh, v_i )[d_i] =
                   Mesh_GetVertex( mesh, Grid_Project( vGrid, inds ) )[d_i];
             }
@@ -221,6 +220,42 @@ void _RegularRemesher_Remesh( void* _self ) {
 	 else
 	    rightCrd = Mesh_GetVertex( mesh, ind)[d_i];
 
+         /* Do interpolation. */
+         if( gen ) {
+            if( center <= gen->contactDepth[d_i][0] ) {
+               mesh->verts[v_i][d_i] = leftCrd;
+               if( gen->contactDepth[d_i][0] ) {
+                  mesh->verts[v_i][d_i] +=
+                     ((double)center / (double)gen->contactDepth[d_i][0]) *
+                     gen->contactGeom[d_i];
+               }
+            }
+            else if( center >= vGrid->sizes[d_i] - gen->contactDepth[d_i][1] - 1 ) {
+               mesh->verts[v_i][d_i] = rightCrd;
+               if( gen->contactDepth[d_i][1] ) {
+                  mesh->verts[v_i][d_i] -=
+                     ((double)(vGrid->sizes[d_i] - 1 - center) /
+                      (double)gen->contactDepth[d_i][1]) *
+                     gen->contactGeom[d_i];
+               }
+            }
+            else {
+               mesh->verts[v_i][d_i] = leftCrd + gen->contactGeom[d_i] +
+                  ((double)(center - gen->contactDepth[d_i][0]) / 
+                   (double)(vGrid->sizes[d_i] - (gen->contactDepth[d_i][0] + gen->contactDepth[d_i][1]) - 1)) *
+                  ((rightCrd - leftCrd) - 2.0 * gen->contactGeom[d_i]);
+            }
+         }
+         else {
+
+               /* Blend coordinate. */
+               mesh->verts[v_i][d_i] = leftCrd + 
+                  (double)center * (rightCrd - leftCrd) / 
+                  (double)(vGrid->sizes[d_i] - 1);
+
+         }
+
+#if 0
          /* Account for contact depth. */
          if( d_i == 1 ) {
             if( center > self->contactDepth ) {
@@ -257,6 +292,7 @@ void _RegularRemesher_Remesh( void* _self ) {
                   (double)(vGrid->sizes[d_i] - 1);
 
          }
+#endif
       }
    }
 
@@ -379,7 +415,8 @@ void RegularRemesher_Build( void* _self ) {
 
    NewClass_Delete( wallSet );
 
-   /* If we have some contact depth, copy the relevant vertices. */
+#if 0
+   /* If we have some contact depth, copy the relevant vertex offsets. */
    if( self->contactDepth > 0 ) {
       int curInd;
       Grid* grid;
@@ -409,6 +446,7 @@ void RegularRemesher_Build( void* _self ) {
       }
 
    }
+#endif
 
    Class_Free( self, inds );
 }

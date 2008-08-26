@@ -47,6 +47,7 @@ extern const Type MeshBoundaryShape_Type;
 #define __MeshBoundaryShape                     \
    __Stg_Shape                                  \
    Mesh* mesh;                                  \
+   CartesianGenerator* gen;                     \
    int depth;                                   \
    Bool walls[6];
 

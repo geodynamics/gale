@@ -60,8 +60,8 @@ MeshBoundaryShape* MeshBoundaryShape_New( Name name ) {
       _Stg_Shape_Copy,
       (void*(*)(Name))MeshBoundaryShape_New,
       _MeshBoundaryShape_Construct,
-      _Stg_Shape_Build,
-      _Stg_Shape_Initialise,
+      _MeshBoundaryShape_Build,
+      _MeshBoundaryShape_Initialise,
       _Stg_Shape_Execute,
       _Stg_Shape_Destroy,
       _MeshBoundaryShape_IsCoordInside,
@@ -105,9 +105,10 @@ void _MeshBoundaryShape_Construct( void* _self, Stg_ComponentFactory* cf, void* 
    int ii;
 
    _Stg_Shape_Construct( self, cf, data );
+   _MeshBoundaryShape_Init( self );
 
+   /* Need a mesh with a cartesian generator. */
    self->mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "mesh", Mesh, True, data );
-   self->depth = Stg_ComponentFactory_GetInt( cf, self->name, "depth", 1 );
 
    /* Read in the walls to have friction applied. */
    wallList = _Stg_ComponentFactory_GetDictionaryValue( cf, self->name, "walls", NULL );
@@ -161,6 +162,9 @@ void _MeshBoundaryShape_Build( void* _self, void* data ) {
 
    _Stg_Shape_Build( self, data );
    Stg_Component_Build( self->mesh, data, False );
+   if( !self->mesh->generator || strcmp( self->mesh->generator->type, CartesianGenerator_Type ) )
+      abort();
+   self->gen = (CartesianGenerator*)self->mesh->generator;
 }
 
 void _MeshBoundaryShape_Initialise( void* _self, void* data ) {
@@ -173,15 +177,26 @@ void _MeshBoundaryShape_Initialise( void* _self, void* data ) {
 Bool _MeshBoundaryShape_IsCoordInside( void* _self, Coord coord ) {
    MeshBoundaryShape* self = (MeshBoundaryShape*)_self;
    Coord newCoord;
+#if 0
    Grid* grid;
    int inds[3], element, nDims, wallInd;
+#endif
    int ii;
-
-   assert( self->depth > 0 );
 
    /* Transform coordinate into canonical reference frame */
    Stg_Shape_TransformCoord( self, coord, newCoord );
 
+   /* Easy, just check if the coord is in the boundary region. */
+   for( ii = 0; ii < Mesh_GetDimSize( self->mesh ); ii++ ) {
+      if( (self->walls[2 * ii] && coord[ii] < self->gen->crdMin[ii] + self->gen->contactGeom[ii]) ||
+          (self->walls[2 * ii + 1] && coord[ii] > self->gen->crdMax[ii] - self->gen->contactGeom[ii]) )
+      {
+         return True;
+      }
+   }
+   return False;
+
+#if 0
    /* Get the element grid from the mesh. */
    grid = *(Grid**)Mesh_GetExtension( self->mesh, Grid**, "elementGrid" );
    assert( grid );
@@ -203,11 +218,13 @@ Bool _MeshBoundaryShape_IsCoordInside( void* _self, Coord coord ) {
       if( (self->walls[wallInd] && inds[ii] < self->depth) ||
           (self->walls[wallInd + 1] && inds[ii] > (grid->sizes[ii] - self->depth - 1)) )
       {
+         if( coords[
          return True;
       }
    }
 
    return False;
+#endif
 }
 
 double _MeshBoundaryShape_CalculateVolume( void* _self ) {
