@@ -421,33 +421,25 @@ void _MaterialPointsSwarm_UpdateHook( void* timeIntegrator, void* swarm ) {
                            material = MaterialPointsSwarm_GetMaterialOn( self, materialPoint );
                            if( !strcmp( material->name, "quartzFriction" ) ) {
                               Grid_Lift( grid, cell, inds );
-                              if( inds[0] > 1 && inds[0] < grid->sizes[0] - 2 &&
-                                  inds[1] > 1 )
-                              {
+                              if( inds[0] < grid->sizes[0] - 2 && inds[1] > 1 ) {
                                  materialPoint->materialIndex = Materials_Register_GetIndex( self->materials_Register, "quartz" );
                               }
                            }
                            else if( !strcmp( material->name, "corundumFriction" ) ) {
                               Grid_Lift( grid, cell, inds );
-                              if( inds[0] > 1 && inds[0] < grid->sizes[0] - 2 &&
-                                  inds[1] > 1 )
-                              {
+                              if( inds[0] < grid->sizes[0] - 2 && inds[1] > 1 ) {
                                  materialPoint->materialIndex = Materials_Register_GetIndex( self->materials_Register, "corundum" );
                               }
                            }
                            if( !strcmp( material->name, "quartz" ) ) {
                               Grid_Lift( grid, cell, inds );
-                              if( inds[0] <= 1 || inds[0] >= grid->sizes[0] - 2 ||
-                                  inds[1] <= 1 )
-                              {
+                              if( inds[0] >= grid->sizes[0] - 2 || inds[1] <= 1 ) {
                                  materialPoint->materialIndex = Materials_Register_GetIndex( self->materials_Register, "quartzFriction" );
                               }
                            }
                            else if( !strcmp( material->name, "corundum" ) ) {
                               Grid_Lift( grid, cell, inds );
-                              if( inds[0] <= 1 || inds[0] >= grid->sizes[0] - 2 ||
-                                  inds[1] <= 1 )
-                              {
+                              if( inds[0] >= grid->sizes[0] - 2 || inds[1] <= 1 ) {
                                  materialPoint->materialIndex = Materials_Register_GetIndex( self->materials_Register, "corundumFriction" );
                               }
                            }
