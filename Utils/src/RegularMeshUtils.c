@@ -831,7 +831,7 @@ IndexSet* RegularMeshUtils_CreateLocalInGlobalBackSet( void* _mesh ) {
 	return set;
 }
 
-IndexSet* RegularMeshUtils_CreateContactBottomSet( void* _mesh, int depth ) {
+IndexSet* RegularMeshUtils_CreateContactTopSet( void* _mesh, int lowDepth, int uppDepth ) {
    Mesh* mesh = (Mesh*)_mesh;
    Grid* grid;
    int nNodes;
@@ -841,7 +841,6 @@ IndexSet* RegularMeshUtils_CreateContactBottomSet( void* _mesh, int depth ) {
 
    assert( mesh );
    assert( Mesh_GetDimSize( mesh ) == 2 );
-   assert( depth > 0 );
 
    grid = *Mesh_GetExtension( mesh, Grid**, "vertexGrid" );
    nNodes = Mesh_GetDomainSize( mesh, 0 );
@@ -853,10 +852,44 @@ IndexSet* RegularMeshUtils_CreateContactBottomSet( void* _mesh, int depth ) {
    bottom = 1;
    top = depth;
 */
-   left = 0;
-   right = grid->sizes[0] - 1;
+   left = lowDepth;
+   right = grid->sizes[0] - 1 - uppDepth;
+   bottom = grid->sizes[1] - 1;
+   top = grid->sizes[1] - 1;
+   for( ii = 0; ii < nNodes; ii++ ) {
+      Grid_Lift( grid, Mesh_DomainToGlobal( mesh, 0, ii ), ijk );
+      if( ijk[0] >= left && ijk[0] <= right && ijk[1] >= bottom && ijk[1] <= top )
+	 IndexSet_Add( set, ii );
+   }
+
+   return set;
+}
+
+IndexSet* RegularMeshUtils_CreateContactBottomSet( void* _mesh, int lowDepth, int uppDepth ) {
+   Mesh* mesh = (Mesh*)_mesh;
+   Grid* grid;
+   int nNodes;
+   IndexSet* set;
+   int ijk[2], left, right, bottom, top;
+   int ii;
+
+   assert( mesh );
+   assert( Mesh_GetDimSize( mesh ) == 2 );
+
+   grid = *Mesh_GetExtension( mesh, Grid**, "vertexGrid" );
+   nNodes = Mesh_GetDomainSize( mesh, 0 );
+   set = IndexSet_New( nNodes );
+
+/*
+   left = depth + 1;
+   right = grid->sizes[0] - (depth + 1) - 1;
    bottom = 1;
    top = depth;
+*/
+   left = lowDepth;
+   right = grid->sizes[0] - 1 - uppDepth;
+   bottom = 0;
+   top = 0;
    for( ii = 0; ii < nNodes; ii++ ) {
       Grid_Lift( grid, Mesh_DomainToGlobal( mesh, 0, ii ), ijk );
       if( ijk[0] >= left && ijk[0] <= right && ijk[1] >= bottom && ijk[1] <= top )
@@ -866,7 +899,7 @@ IndexSet* RegularMeshUtils_CreateContactBottomSet( void* _mesh, int depth ) {
    return set;
 }
 
-IndexSet* RegularMeshUtils_CreateContactLeftSet( void* _mesh, int depth, Bool includeTop ) {
+IndexSet* RegularMeshUtils_CreateContactLeftSet( void* _mesh, int lowDepth, int uppDepth ) {
    Mesh* mesh = (Mesh*)_mesh;
    Grid* grid;
    int nNodes;
@@ -876,7 +909,6 @@ IndexSet* RegularMeshUtils_CreateContactLeftSet( void* _mesh, int depth, Bool in
 
    assert( mesh );
    assert( Mesh_GetDimSize( mesh ) == 2 );
-   assert( depth > 0 );
 
    grid = *Mesh_GetExtension( mesh, Grid**, "vertexGrid" );
    nNodes = Mesh_GetDomainSize( mesh, 0 );
@@ -888,11 +920,10 @@ IndexSet* RegularMeshUtils_CreateContactLeftSet( void* _mesh, int depth, Bool in
    bottom = depth + 1;
    top = grid->sizes[1] - 2;
 */
-   left = 1;
-   right = depth;
-   bottom = 1;
-   top = grid->sizes[1] - 2;
-   if( includeTop ) top++;
+   left = 0;
+   right = 0;
+   bottom = lowDepth;
+   top = grid->sizes[1] - 1 - uppDepth;
    for( ii = 0; ii < nNodes; ii++ ) {
       Grid_Lift( grid, Mesh_DomainToGlobal( mesh, 0, ii ), ijk );
       if( ijk[0] >= left && ijk[0] <= right && ijk[1] >= bottom && ijk[1] <= top )
@@ -902,7 +933,7 @@ IndexSet* RegularMeshUtils_CreateContactLeftSet( void* _mesh, int depth, Bool in
    return set;
 }
 
-IndexSet* RegularMeshUtils_CreateContactRightSet( void* _mesh, int depth, Bool includeTop ) {
+IndexSet* RegularMeshUtils_CreateContactRightSet( void* _mesh, int lowDepth, int uppDepth ) {
    Mesh* mesh = (Mesh*)_mesh;
    Grid* grid;
    int nNodes;
@@ -912,7 +943,6 @@ IndexSet* RegularMeshUtils_CreateContactRightSet( void* _mesh, int depth, Bool i
 
    assert( mesh );
    assert( Mesh_GetDimSize( mesh ) == 2 );
-   assert( depth > 0 );
 
    grid = *Mesh_GetExtension( mesh, Grid**, "vertexGrid" );
    nNodes = Mesh_GetDomainSize( mesh, 0 );
@@ -924,11 +954,10 @@ IndexSet* RegularMeshUtils_CreateContactRightSet( void* _mesh, int depth, Bool i
    bottom = depth + 1;
    top = grid->sizes[1] - 2;
 */
-   left = grid->sizes[0] - depth - 1;
-   right = grid->sizes[0] - 2;
-   bottom = 1;
-   top = grid->sizes[1] - 2;
-   if( includeTop ) top++;
+   left = grid->sizes[0] - 1;
+   right = grid->sizes[0] - 1;
+   bottom = lowDepth;
+   top = grid->sizes[1] - uppDepth - 1;
    for( ii = 0; ii < nNodes; ii++ ) {
       Grid_Lift( grid, Mesh_DomainToGlobal( mesh, 0, ii ), ijk );
       if( ijk[0] >= left && ijk[0] <= right && ijk[1] >= bottom && ijk[1] <= top )

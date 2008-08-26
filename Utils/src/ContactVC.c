@@ -241,6 +241,7 @@ void _ContactVC_ReadDictionary( void* variableCondition, void* dictionary ) {
       Dictionary_Entry_Value_InitFromStruct(vcDictVal, dictionary);
    }
 
+#if 0
    if (vcDictVal) {
       self->depth = Dictionary_Entry_Value_AsInt(
          Dictionary_Entry_Value_GetMember( vcDictVal, "depth" ) );
@@ -252,6 +253,7 @@ void _ContactVC_ReadDictionary( void* variableCondition, void* dictionary ) {
       self->depth = 0;
       self->includeTop = False;
    }
+#endif
 }
 
 
@@ -290,8 +292,12 @@ IndexSet* _ContactVC_GetSet(void* variableCondition) {
    Stream*		warningStr = Journal_Register( Error_Type, self->type );
    unsigned	nDims;
    Grid*		vertGrid;
+   CartesianGenerator* gen;
 
    nDims = Mesh_GetDimSize( self->_mesh );
+   gen = self->_mesh->generator;
+   if( strcmp( gen->type, CartesianGenerator_Type ) )
+      abort();
    vertGrid = *(Grid**)ExtensionManager_Get( self->_mesh->info, self->_mesh, 
                                              ExtensionManager_GetHandle( self->_mesh->info, 
                                                                          "vertexGrid" ) );
@@ -331,8 +337,7 @@ IndexSet* _ContactVC_GetSet(void* variableCondition) {
             set = IndexSet_New( Mesh_GetDomainSize( self->_mesh, MT_VERTEX ) );
          }
          else {
-            abort();
-            /*set = RegularMeshUtils_CreateContactTopSet(self->_mesh);*/
+            set = RegularMeshUtils_CreateContactTopSet(self->_mesh, gen->contactDepth[0][0], gen->contactDepth[0][1]);
          }	
          break;
 			
@@ -344,7 +349,7 @@ IndexSet* _ContactVC_GetSet(void* variableCondition) {
             set = IndexSet_New( Mesh_GetDomainSize( self->_mesh, MT_VERTEX ) );
          }
          else {
-            set = RegularMeshUtils_CreateContactBottomSet(self->_mesh, self->depth);
+            set = RegularMeshUtils_CreateContactBottomSet(self->_mesh, gen->contactDepth[0][0], gen->contactDepth[0][1]);
          }	
          break;
 			
@@ -356,7 +361,7 @@ IndexSet* _ContactVC_GetSet(void* variableCondition) {
             set = IndexSet_New( Mesh_GetDomainSize( self->_mesh, MT_VERTEX ) );
          }
          else {
-            set = RegularMeshUtils_CreateContactLeftSet(self->_mesh, self->depth, self->includeTop);
+            set = RegularMeshUtils_CreateContactLeftSet(self->_mesh, gen->contactDepth[1][0], gen->contactDepth[1][1]);
          }	
          break;
 			
@@ -368,7 +373,7 @@ IndexSet* _ContactVC_GetSet(void* variableCondition) {
             set = IndexSet_New( Mesh_GetDomainSize( self->_mesh, MT_VERTEX ) );
          }
          else {
-            set = RegularMeshUtils_CreateContactRightSet(self->_mesh, self->depth, self->includeTop);
+            set = RegularMeshUtils_CreateContactRightSet(self->_mesh, gen->contactDepth[1][0], gen->contactDepth[1][1]);
          }
          break;
 			
