@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: X11Window.c 762 2008-03-14 05:25:56Z RobertTurnbull $
+** $Id: X11Window.c 787 2008-08-26 07:57:24Z JulianGiordani $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
  
@@ -56,7 +56,7 @@
 
 #include <assert.h>
 #ifdef __APPLE__
-#include <Power.h>
+#include <CoreServices/CoreServices.h>
 #endif
 
 #ifndef MASTER
