@@ -4,6 +4,11 @@
 <!-- DTD to validate against -->
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 
+	<list name="FieldVariablesToCheckpoint" mergeType="merge">
+		<param> VelocityField </param>
+		<param> PressureField </param>
+	</list>
+
 	<!-- Stokes Flow Stuff -->
 	<struct name="components" mergeType="merge">
 		<!-- Solution Vectors -->

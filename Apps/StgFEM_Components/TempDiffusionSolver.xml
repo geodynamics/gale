@@ -4,6 +4,13 @@
 <!-- DTD to validate against -->
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 
+	<list name="FieldVariablesToCheckpoint" mergeType="merge">
+		<param> TemperatureField </param>
+		<!-- phiDotField is never explicitly made in xml, 
+		but in the AdvectionDiffusionSLE.c, it's a necessary field for restarting. -->
+		<param> phiDotField </param>
+	</list>
+
 	<struct name="components" mergeType="merge">
 		<struct name="sVector">
 			<param name="Type">SolutionVector</param>
