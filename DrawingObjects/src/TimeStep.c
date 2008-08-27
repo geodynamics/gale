@@ -286,10 +286,10 @@ void _lucTimeStep_Draw( void* drawingObject, lucWindow* window, lucViewportInfo*
 		self->colour.blue,
 		self->colour.opacity );
 
-	glRasterPos2i( viewportInfo->width + 20 , viewportInfo->height - 13 );
+	glRasterPos2i( viewportInfo->width/2 , viewportInfo->height - 13 );
 	stringWidth = lucStringWidth( displayString );
 
-	/*lucMoveRaster( - stringWidth/2, -20 );*/
+	lucMoveRaster( - stringWidth/2, -20 );
 	lucPrintString(displayString);
 
 	/* Free the memory */
