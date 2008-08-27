@@ -31,6 +31,8 @@
 */
 
 MEMBER( int, nDims )
+MEMBER( int, contactDepth )
+MEMBER( double, contactSize )
 MEMBER( ISet*, remeshDims )
 MEMBER( ISet**, staticWalls )
 MEMBER( Sync**, syncs )
