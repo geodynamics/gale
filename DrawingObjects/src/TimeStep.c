@@ -232,7 +232,7 @@ void _lucTimeStep_Draw( void* drawingObject, lucWindow* window, lucViewportInfo*
 	int time = context->timeStep;
 	double currentTime = context->currentTime;
 	/* Allocating Memory */
-	char* displayString = Memory_Alloc_Array( char, 60, "displayString");
+	char* displayString = Memory_Alloc_Array( char, 100, "displayString");
 	char* timeStepString = Memory_Alloc_Array( char, 10, "timeStepString");
  	char* currentTimeString = Memory_Alloc_Array( char, 20, "currentTimeString");
 	
@@ -241,8 +241,9 @@ void _lucTimeStep_Draw( void* drawingObject, lucWindow* window, lucViewportInfo*
 	char* timeStepString = malloc(10*sizeof(char));
 	char* currentTimeString = malloc(10*sizeof(char));*/
 
+#if 0
 	sprintf(timeStepString, "%d", time );	
-	sprintf(currentTimeString, "%E", currentTime );
+	sprintf(currentTimeString, "%e", currentTime );
 	
 	if(self->frame){
 		sprintf(displayString, "%s", "Frame ");
@@ -258,6 +259,9 @@ void _lucTimeStep_Draw( void* drawingObject, lucWindow* window, lucViewportInfo*
 		strcat(displayString, currentTimeString);
 		strcat(displayString, "\0");
 	}
+#endif
+
+        sprintf( displayString, "Shortened distance (cm): %e", currentTime * 6.9444444444444e-4 );
 	
 
 	
@@ -282,10 +286,10 @@ void _lucTimeStep_Draw( void* drawingObject, lucWindow* window, lucViewportInfo*
 		self->colour.blue,
 		self->colour.opacity );
 
-	glRasterPos2i( viewportInfo->width/2 , viewportInfo->height - 13 );
+	glRasterPos2i( viewportInfo->width + 20 , viewportInfo->height - 13 );
 	stringWidth = lucStringWidth( displayString );
 
-	lucMoveRaster( - stringWidth/2, -20 );
+	/*lucMoveRaster( - stringWidth/2, -20 );*/
 	lucPrintString(displayString);
 
 	/* Free the memory */
