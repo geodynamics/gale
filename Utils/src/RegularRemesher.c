@@ -141,7 +141,10 @@ void _RegularRemesher_Remesh( void* _self ) {
    gen = self->mesh->generator;
    if( strcmp( gen->type, CartesianGenerator_Type ) )
       gen = NULL;
-   if( gen ) {
+   if( gen && (self->contactDepth[0][0] || self->contactDepth[0][1] ||
+               self->contactDepth[1][0] || self->contactDepth[1][1] ||
+               self->contactDepth[2][0] || self->contactDepth[2][1]) )
+   {
       int curInd;
       int ii, d_j;
 
