@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: FaultingMoresiMuhlhaus2006.c 783 2008-08-06 19:26:16Z LukeHodkinson $
+** $Id: FaultingMoresiMuhlhaus2006.c 793 2008-08-28 17:39:02Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -566,7 +566,7 @@ void _FaultingMoresiMuhlhaus2006_HasYielded(
            corr = self->minVisc - viscosity;
 
         /*ConstitutiveMatrix_IsotropicCorrection( constitutiveMatrix, corr );*/
-	ConstitutiveMatrix_SetSecondViscosity( constitutiveMatrix, viscosity * beta, normal );
+	ConstitutiveMatrix_SetSecondViscosity( constitutiveMatrix, -corr, normal );
 
 	particleExt = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, materialPoint, self->particleExtHandle );
 	particleExt->slipRate = self->storedSlipRateValue;
