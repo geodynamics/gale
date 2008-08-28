@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: FaultingMoresiMuhlhaus2006.h 781 2008-08-06 17:21:55Z LukeHodkinson $
+** $Id: FaultingMoresiMuhlhaus2006.h 794 2008-08-28 20:08:17Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -90,6 +90,7 @@
 		Bool                                                ignoreOldOrientation;	                \
 		Bool                                                updateOrientationAtMaxSoftness;        \
                 Bool                                                updateOrientations;                    \
+                Bool                                                isotropicCorrection;                   \
 		/* Stored values that are calculated once for each particle */ \
 		Eigenvector                                         currentEigenvectorList[3];             \
 		TensorArray                                         currentVelocityGradient;               \

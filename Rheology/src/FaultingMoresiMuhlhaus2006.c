@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: FaultingMoresiMuhlhaus2006.c 793 2008-08-28 17:39:02Z LukeHodkinson $
+** $Id: FaultingMoresiMuhlhaus2006.c 794 2008-08-28 20:08:17Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -271,6 +271,7 @@ void _FaultingMoresiMuhlhaus2006_Construct( void* rheology, Stg_ComponentFactory
 	director               =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "Director", Director, True, data );
 
         self->updateOrientations = Stg_ComponentFactory_GetBool( cf, self->name, "updateOrientations", True );
+        self->isotropicCorrection = Stg_ComponentFactory_GetBool( cf, self->name, "isotropicCorrection", True );
 	
 	_FaultingMoresiMuhlhaus2006_Init( 
 			self,
@@ -565,8 +566,10 @@ void _FaultingMoresiMuhlhaus2006_HasYielded(
         if( (viscosity + corr) < self->minVisc )
            corr = self->minVisc - viscosity;
 
-        /*ConstitutiveMatrix_IsotropicCorrection( constitutiveMatrix, corr );*/
-	ConstitutiveMatrix_SetSecondViscosity( constitutiveMatrix, -corr, normal );
+        if( self->isotropicCorrection )
+           ConstitutiveMatrix_IsotropicCorrection( constitutiveMatrix, corr );
+        else
+           ConstitutiveMatrix_SetSecondViscosity( constitutiveMatrix, -corr, normal );
 
 	particleExt = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, materialPoint, self->particleExtHandle );
 	particleExt->slipRate = self->storedSlipRateValue;
