@@ -217,8 +217,7 @@ void _ContactVC_Init(
 {
    ContactVC*			self = (ContactVC*)wallVC;
 
-   self->depth = 0;
-   self->includeTop = False;
+   self->deep = False;
 }
 
 
@@ -241,19 +240,14 @@ void _ContactVC_ReadDictionary( void* variableCondition, void* dictionary ) {
       Dictionary_Entry_Value_InitFromStruct(vcDictVal, dictionary);
    }
 
-#if 0
    if (vcDictVal) {
-      self->depth = Dictionary_Entry_Value_AsInt(
-         Dictionary_Entry_Value_GetMember( vcDictVal, "depth" ) );
-      entryVal = Dictionary_Entry_Value_GetMember( vcDictVal, "includeTop" );
+      entryVal = Dictionary_Entry_Value_GetMember( vcDictVal, "deep" );
       if( entryVal )
-         self->includeTop = Dictionary_Entry_Value_AsBool( entryVal );
+         self->deep = Dictionary_Entry_Value_AsBool( entryVal );
    }
    else {
-      self->depth = 0;
-      self->includeTop = False;
+      self->deep = False;
    }
-#endif
 }
 
 
@@ -349,7 +343,15 @@ IndexSet* _ContactVC_GetSet(void* variableCondition) {
             set = IndexSet_New( Mesh_GetDomainSize( self->_mesh, MT_VERTEX ) );
          }
          else {
-            set = RegularMeshUtils_CreateContactBottomSet(self->_mesh, gen->contactDepth[0][0], gen->contactDepth[0][1]);
+            if( self->deep ) {
+               set = RegularMeshUtils_CreateContactBottomSet(
+                  self->_mesh, gen->contactDepth[0][0], gen->contactDepth[0][1],
+                  gen->contactDepth[1][0] );
+            }
+            else {
+               set = RegularMeshUtils_CreateContactBottomSet(
+                  self->_mesh, gen->contactDepth[0][0], gen->contactDepth[0][1], 0 );
+            }
          }	
          break;
 			
@@ -373,7 +375,15 @@ IndexSet* _ContactVC_GetSet(void* variableCondition) {
             set = IndexSet_New( Mesh_GetDomainSize( self->_mesh, MT_VERTEX ) );
          }
          else {
-            set = RegularMeshUtils_CreateContactRightSet(self->_mesh, gen->contactDepth[1][0], gen->contactDepth[1][1]);
+            if( self->deep ) {
+               set = RegularMeshUtils_CreateContactRightSet(
+                  self->_mesh, gen->contactDepth[1][0], gen->contactDepth[1][1],
+                  gen->contactDepth[0][1] );
+            }
+            else {
+               set = RegularMeshUtils_CreateContactRightSet(
+                  self->_mesh, gen->contactDepth[1][0], gen->contactDepth[1][1], 0 );
+            }
          }
          break;
 			

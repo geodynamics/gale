@@ -50,8 +50,7 @@
 		/* Virtual info */ \
 		\
 		/* Stg_Class info */ \
-		int depth; \
-		Bool includeTop;
+		Bool deep;
 
 	struct _ContactVC { __ContactVC };
 	

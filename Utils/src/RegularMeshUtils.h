@@ -138,9 +138,9 @@
 	IndexSet* RegularMeshUtils_CreateLocalInGlobalBackSet( void* _mesh );
 
 IndexSet* RegularMeshUtils_CreateContactTopSet( void* _mesh, int lowDepth, int uppDepth );
-IndexSet* RegularMeshUtils_CreateContactBottomSet( void* _mesh, int lowDepth, int uppDepth );
+IndexSet* RegularMeshUtils_CreateContactBottomSet( void* _mesh, int lowDepth, int uppDepth, int inDepth );
 IndexSet* RegularMeshUtils_CreateContactLeftSet( void* _mesh, int lowDepth, int uppDepth );
-IndexSet* RegularMeshUtils_CreateContactRightSet( void* _mesh, int lowDepth, int uppDepth );
+IndexSet* RegularMeshUtils_CreateContactRightSet( void* _mesh, int lowDepth, int uppDepth, int inDepth );
 
 	Node_DomainIndex RegularMeshUtils_GetDiagOppositeAcrossElementNodeIndex( void* _mesh, 
 										 Element_DomainIndex refElement_dI, 

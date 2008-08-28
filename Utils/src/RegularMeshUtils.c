@@ -865,7 +865,7 @@ IndexSet* RegularMeshUtils_CreateContactTopSet( void* _mesh, int lowDepth, int u
    return set;
 }
 
-IndexSet* RegularMeshUtils_CreateContactBottomSet( void* _mesh, int lowDepth, int uppDepth ) {
+IndexSet* RegularMeshUtils_CreateContactBottomSet( void* _mesh, int lowDepth, int uppDepth, int inDepth ) {
    Mesh* mesh = (Mesh*)_mesh;
    Grid* grid;
    int nNodes;
@@ -888,12 +888,13 @@ IndexSet* RegularMeshUtils_CreateContactBottomSet( void* _mesh, int lowDepth, in
 */
    left = lowDepth;
    right = grid->sizes[0] - 1 - uppDepth;
-   bottom = 0;
-   top = 0;
+   bottom = inDepth;
+   top = inDepth;
    for( ii = 0; ii < nNodes; ii++ ) {
       Grid_Lift( grid, Mesh_DomainToGlobal( mesh, 0, ii ), ijk );
-      if( ijk[0] >= left && ijk[0] <= right && ijk[1] >= bottom && ijk[1] <= top )
+      if( ijk[0] >= left && ijk[0] <= right && ijk[1] >= bottom && ijk[1] <= top ) {
 	 IndexSet_Add( set, ii );
+      }
    }
 
    return set;
@@ -933,7 +934,7 @@ IndexSet* RegularMeshUtils_CreateContactLeftSet( void* _mesh, int lowDepth, int 
    return set;
 }
 
-IndexSet* RegularMeshUtils_CreateContactRightSet( void* _mesh, int lowDepth, int uppDepth ) {
+IndexSet* RegularMeshUtils_CreateContactRightSet( void* _mesh, int lowDepth, int uppDepth, int inDepth ) {
    Mesh* mesh = (Mesh*)_mesh;
    Grid* grid;
    int nNodes;
@@ -954,10 +955,10 @@ IndexSet* RegularMeshUtils_CreateContactRightSet( void* _mesh, int lowDepth, int
    bottom = depth + 1;
    top = grid->sizes[1] - 2;
 */
-   left = grid->sizes[0] - 1;
+   left = grid->sizes[0] - 1 - inDepth;
    right = grid->sizes[0] - 1;
-   bottom = lowDepth;
-   top = grid->sizes[1] - uppDepth - 1;
+   bottom = 0;
+   top = grid->sizes[1] - 1;
    for( ii = 0; ii < nNodes; ii++ ) {
       Grid_Lift( grid, Mesh_DomainToGlobal( mesh, 0, ii ), ijk );
       if( ijk[0] >= left && ijk[0] <= right && ijk[1] >= bottom && ijk[1] <= top )
