@@ -2320,10 +2320,10 @@ void CartesianGenerator_CalcGeom( CartesianGenerator* self, Mesh* mesh, Sync* sy
                       }
                    }
                    else {
-                      vert[d_i] = self->crdMin[d_i] + self->contactGeom[d_i] +
+                      vert[d_i] = self->crdMin[d_i] + (self->contactDepth[d_i][0] ? self->contactGeom[d_i] : 0.0) +
                          ((double)(inds[d_i] - self->contactDepth[d_i][0]) / 
                           (double)(grid->sizes[d_i] - (self->contactDepth[d_i][0] + self->contactDepth[d_i][1]) - 1)) *
-                         (steps[d_i] - 2.0 * self->contactGeom[d_i]);
+                         (steps[d_i] - (self->contactDepth[d_i][1] ? 2.0 : 1.0) * self->contactGeom[d_i]);
                    }
 		}
 	}
