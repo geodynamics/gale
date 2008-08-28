@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AbstractContext.c 4299 2008-08-25 06:59:12Z JohnMansour $
+** $Id: AbstractContext.c 4300 2008-08-28 05:28:26Z JohnMansour $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -189,6 +189,9 @@ void _AbstractContext_Init(
 		Dictionary_GetDefault( self->dictionary, "dumpEvery", Dictionary_Entry_Value_FromUnsignedInt( 10 ) ) );
 	self->checkpointEvery = Dictionary_Entry_Value_AsUnsignedInt( 
 		Dictionary_GetDefault( self->dictionary, "checkpointEvery", Dictionary_Entry_Value_FromUnsignedInt( 0 ) ) );
+	self->checkpointAtTimeInc = Dictionary_Entry_Value_AsDouble( 
+		Dictionary_GetDefault( self->dictionary, "checkpointAtTimeInc", Dictionary_Entry_Value_FromDouble( 0 ) ) );
+	self->nextCheckpointTime = self->checkpointAtTimeInc;
 	self->experimentName = StG_Strdup( Dictionary_Entry_Value_AsString( 
 		Dictionary_GetDefault( self->dictionary, "experimentName", Dictionary_Entry_Value_FromString( "experiment" ) ) ) );
 	self->outputPath = StG_Strdup( Dictionary_Entry_Value_AsString( 
@@ -479,6 +482,7 @@ void _AbstractContext_Print( void* abstractContext, Stream* stream ) {
 	Journal_Printf( (void*) stream, "\toutputEvery: %u\n", self->frequentOutputEvery );
 	Journal_Printf( (void*) stream, "\tdumpEvery: %u\n", self->dumpEvery );
 	Journal_Printf( (void*) stream, "\tcheckpointEvery: %u\n", self->checkpointEvery );
+	Journal_Printf( (void*) stream, "\tcheckpointAtTimeInc: %g\n", self->checkpointAtTimeInc );
 
 	if( self->outputPath ) {
 		Journal_Printf( (void*) stream, "\toutputPath: %s\n", self->outputPath );
@@ -952,6 +956,13 @@ void _AbstractContext_Execute_Hook( Context* context ) {
 		if ( self->checkpointEvery ) {
 			if ( self->timeStep % self->checkpointEvery == 0 )
 				AbstractContext_Save( self );
+		}	
+
+		if ( self->checkpointAtTimeInc ) {
+			if ( self->currentTime >= self->nextCheckpointTime){
+				AbstractContext_Save( self );
+				self->nextCheckpointTime += self->checkpointAtTimeInc; 
+			}
 		}	
 
 		if (self->maxTimeSteps && (self->timeStepSinceJobRestart >= self->maxTimeSteps)) break;

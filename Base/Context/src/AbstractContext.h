@@ -35,7 +35,7 @@
 **	This is a class, of which subclasses can be defined, which can override default methods.
 **	Currently built with only MeshPIC_Context in mind (for Snac).
 **
-** $Id: AbstractContext.h 4255 2008-04-17 04:49:17Z BelindaMay $
+** $Id: AbstractContext.h 4300 2008-08-28 05:28:26Z JohnMansour $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -110,6 +110,8 @@
 		unsigned int				frequentOutputEvery; \
 		unsigned int				dumpEvery; \
 		unsigned int				checkpointEvery; \
+		double				        checkpointAtTimeInc; \
+		double				        nextCheckpointTime; \
 		Name                                    experimentName; \
 		char*					outputPath; \
 		char*					checkpointReadPath; \
