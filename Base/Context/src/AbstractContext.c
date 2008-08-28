@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: AbstractContext.c 4300 2008-08-28 05:28:26Z JohnMansour $
+** $Id: AbstractContext.c 4301 2008-08-28 06:25:57Z JohnMansour $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -329,6 +329,7 @@ void _AbstractContext_Init(
 		self->loadFromCheckPoint = True;
 		self->timeStep = self->restartTimestep;
 		_AbstractContext_LoadTimeInfoFromCheckPoint( self, self->restartTimestep, &dtFromFile );
+		self->nextCheckpointTime += self->currentTime;
 	}
 	else {
 		self->loadFromCheckPoint = False;
