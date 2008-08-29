@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: FaultingMoresiMuhlhaus2006.c 794 2008-08-28 20:08:17Z LukeHodkinson $
+** $Id: FaultingMoresiMuhlhaus2006.c 795 2008-08-29 01:57:10Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -271,7 +271,7 @@ void _FaultingMoresiMuhlhaus2006_Construct( void* rheology, Stg_ComponentFactory
 	director               =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "Director", Director, True, data );
 
         self->updateOrientations = Stg_ComponentFactory_GetBool( cf, self->name, "updateOrientations", True );
-        self->isotropicCorrection = Stg_ComponentFactory_GetBool( cf, self->name, "isotropicCorrection", True );
+        self->isotropicCorrection = Stg_ComponentFactory_GetBool( cf, self->name, "isotropicCorrection", False );
 	
 	_FaultingMoresiMuhlhaus2006_Init( 
 			self,
