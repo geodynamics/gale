@@ -246,7 +246,7 @@ void _RegularRemesher_Remesh( void* _self ) {
                mesh->verts[v_i][d_i] = leftCrd + (gen->contactDepth[d_i][0] ? gen->contactGeom[d_i] : 0.0) +
                   ((double)(center - gen->contactDepth[d_i][0]) / 
                    (double)(vGrid->sizes[d_i] - (gen->contactDepth[d_i][0] + gen->contactDepth[d_i][1]) - 1)) *
-                  ((rightCrd - leftCrd) - (gen->contactDepth[d_i][1] ? 2.0 : 1.0) * gen->contactGeom[d_i]);
+                  ((rightCrd - leftCrd) - ((gen->contactDepth[d_i][1] ? 1.0 : 0.0) + (gen->contactDepth[d_i][0] ? 1.0 : 0.0)) * gen->contactGeom[d_i]);
             }
          }
          else {

@@ -345,8 +345,7 @@ IndexSet* _ContactVC_GetSet(void* variableCondition) {
          else {
             if( self->deep ) {
                set = RegularMeshUtils_CreateContactBottomSet(
-                  self->_mesh, gen->contactDepth[0][0], gen->contactDepth[0][1],
-                  gen->contactDepth[1][0] );
+                  self->_mesh, 0, 0, gen->contactDepth[1][0] );
             }
             else {
                set = RegularMeshUtils_CreateContactBottomSet(
@@ -377,8 +376,7 @@ IndexSet* _ContactVC_GetSet(void* variableCondition) {
          else {
             if( self->deep ) {
                set = RegularMeshUtils_CreateContactRightSet(
-                  self->_mesh, gen->contactDepth[1][0], gen->contactDepth[1][1],
-                  gen->contactDepth[0][1] );
+                  self->_mesh, 0, 0, gen->contactDepth[0][1] );
             }
             else {
                set = RegularMeshUtils_CreateContactRightSet(
