@@ -407,43 +407,6 @@ void _MaterialPointsSwarm_UpdateHook( void* timeIntegrator, void* swarm ) {
 				materialPoint->coord[ I_AXIS ],
 				materialPoint->coord[ J_AXIS ],
 				materialPoint->coord[ K_AXIS ] );
-
-                        /* Super hack. For the geomod benchmarks we need to convert frictional
-                           materials into regular materials as they cross the frictional boundaries. */
-                        if( self->geomodHack ) {
-                           Material* material;
-                           FeMesh* mesh;
-                           Grid* grid;
-                           int inds[3];
-
-                           mesh = (FeMesh*)((ElementCellLayout*)self->cellLayout)->mesh;
-                           grid = *Mesh_GetExtension( mesh, Grid**, "elementGrid" );
-                           material = MaterialPointsSwarm_GetMaterialOn( self, materialPoint );
-                           if( !strcmp( material->name, "quartzFriction" ) ) {
-                              Grid_Lift( grid, cell, inds );
-                              if( inds[0] < grid->sizes[0] - 2 && inds[1] > 1 ) {
-                                 materialPoint->materialIndex = Materials_Register_GetIndex( self->materials_Register, "quartz" );
-                              }
-                           }
-                           else if( !strcmp( material->name, "corundumFriction" ) ) {
-                              Grid_Lift( grid, cell, inds );
-                              if( inds[0] < grid->sizes[0] - 2 && inds[1] > 1 ) {
-                                 materialPoint->materialIndex = Materials_Register_GetIndex( self->materials_Register, "corundum" );
-                              }
-                           }
-                           if( !strcmp( material->name, "quartz" ) ) {
-                              Grid_Lift( grid, cell, inds );
-                              if( inds[0] >= grid->sizes[0] - 2 || inds[1] <= 1 ) {
-                                 materialPoint->materialIndex = Materials_Register_GetIndex( self->materials_Register, "quartzFriction" );
-                              }
-                           }
-                           else if( !strcmp( material->name, "corundum" ) ) {
-                              Grid_Lift( grid, cell, inds );
-                              if( inds[0] >= grid->sizes[0] - 2 || inds[1] <= 1 ) {
-                                 materialPoint->materialIndex = Materials_Register_GetIndex( self->materials_Register, "corundumFriction" );
-                              }
-                           }
-                        }
 		}
 	}
 
