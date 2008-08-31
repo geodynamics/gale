@@ -47,7 +47,7 @@
 ** Comments:
 **	There's an issue inside FE_Context_Build() see inside the code.
 **
-** $Id: Context.h 1207 2008-08-17 15:16:25Z LukeHodkinson $
+** $Id: Context.h 1212 2008-08-31 13:57:54Z LukeHodkinson $
 *
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -68,7 +68,6 @@
 		/* FiniteElementContext info */ \
 		SystemLinearEquationList*           slEquations;             \
 		ElementType_Register*               elementType_Register;    \
-		double                              dt;                      \
 		double                              prevTimestepDt;          \
 		Bool                                limitTimeStepIncreaseRate; \
 		double                              maxTimeStepIncreasePercentage; \
