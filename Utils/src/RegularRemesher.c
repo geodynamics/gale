@@ -125,6 +125,73 @@ void _RegularRemesher_Remesh( void* _self ) {
    vGrid = *Mesh_GetExtension( mesh, Grid**, "vertexGrid" );
    inds = Class_Array( self, int, nDims );
 
+   /* Meddle with the top right corner. */
+   if( self->diffuseCorners ) {
+      int nodeIndex, innerIndex, inner2Index;
+      double grad, *nodeVert, *innerVert, *inner2Vert;
+
+      inds[0] = vGrid->sizes[0] - 1;
+      inds[1] = vGrid->sizes[1] - 1;
+      nodeIndex = Grid_Project( vGrid, inds );
+      nodeVert = Mesh_GetVertex( mesh, nodeIndex );
+      inds[0]--;
+      innerIndex = Grid_Project( vGrid, inds );
+      innerVert = Mesh_GetVertex( mesh, innerIndex );
+      inds[0]--;
+      inner2Index = Grid_Project( vGrid, inds );
+      inner2Vert = Mesh_GetVertex( mesh, inner2Index );
+
+/*
+      grad = (innerVert[1] - inner2Vert[1]) / (innerVert[0] - inner2Vert[0]);
+      nodeVert[1] = innerVert[1] + grad * (innerVert[1] - nodeVert[1]);
+*/
+      nodeVert[1] = innerVert[1] - (inner2Vert[1] - innerVert[1]);
+   }
+   else if( self->diffuseSurface ) {
+      int nodeIndex, inds[2];
+      double *newHeights, sep, d, dt;
+      int ii;
+
+      newHeights = AllocArray( double, vGrid->sizes[0] );
+      d = self->diffusionCoef;
+      dt = self->ctx->dt;
+
+      inds[1] = vGrid->sizes[1] - 1;
+      inds[0] = 0;
+      nodeIndex = Grid_Project( vGrid, inds );
+      sep = Mesh_GetVertex( mesh, nodeIndex + 1 )[0] - Mesh_GetVertex( mesh, nodeIndex )[0];
+      newHeights[0] = Mesh_GetVertex( mesh, nodeIndex )[1] -
+         2.0 * Mesh_GetVertex( mesh, nodeIndex + 1 )[1] + 
+         Mesh_GetVertex( mesh, nodeIndex + 2 )[1];
+      newHeights[0] /= sep * sep;
+      newHeights[0] *= -d;
+
+      for( inds[0] = 1; inds[0] < vGrid->sizes[0] - 1; inds[0]++ ) {
+         nodeIndex = Grid_Project( vGrid, inds );
+         sep = (Mesh_GetVertex( mesh, nodeIndex + 1 )[0] - Mesh_GetVertex( mesh, nodeIndex - 1)[0]) * 0.5;
+         newHeights[inds[0]] = Mesh_GetVertex( mesh, nodeIndex - 1 )[1] -
+            2.0 * Mesh_GetVertex( mesh, nodeIndex )[1] + 
+            Mesh_GetVertex( mesh, nodeIndex + 1 )[1];
+         newHeights[inds[0]] /= sep * sep;
+         newHeights[inds[0]] *= -d;
+      }
+
+      nodeIndex = Grid_Project( vGrid, inds );
+      sep = -1.0 * (Mesh_GetVertex( mesh, nodeIndex - 1 )[0] - Mesh_GetVertex( mesh, nodeIndex )[0]);
+      newHeights[inds[0]] = Mesh_GetVertex( mesh, nodeIndex - 2 )[1] -
+         2.0 * Mesh_GetVertex( mesh, nodeIndex - 1 )[1] + 
+         Mesh_GetVertex( mesh, nodeIndex )[1];
+      newHeights[inds[0]] /= sep * sep;
+      newHeights[inds[0]] *= -d;
+
+      for( inds[0] = 0; inds[0] < vGrid->sizes[0]; inds[0]++ ) {
+         nodeIndex = Grid_Project( vGrid, inds );
+         mesh->verts[nodeIndex][1] += newHeights[inds[0]] * dt;
+      }
+
+      MemFree( newHeights );
+   }
+
    for( d_i = 0; d_i < nDims; d_i++ ) {
       for( w_i = 0; w_i < 2; w_i++ ) {
 	 if( !ISet_Has( self->staticWalls[w_i], d_i ) )

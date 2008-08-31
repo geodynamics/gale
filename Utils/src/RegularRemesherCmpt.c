@@ -172,6 +172,14 @@ void _RegularRemesherCmpt_Construct( void* remesher, Stg_ComponentFactory* cf, v
 
    self->regRemesh->contactDepth = Stg_ComponentFactory_GetInt( cf, self->name, "contactDepth", 0 );
    self->regRemesh->contactSize = Stg_ComponentFactory_GetDouble( cf, self->name, "contactSize", 0.0 );
+   self->regRemesh->diffuseCorners = Stg_ComponentFactory_GetBool(
+      cf, self->name, "diffuseCorners", False );
+   self->regRemesh->diffuseSurface = Stg_ComponentFactory_GetBool(
+      cf, self->name, "diffuseSurface", False );
+   self->regRemesh->diffusionCoef = Stg_ComponentFactory_GetDouble(
+      cf, self->name, "diffusionCoef", 1.0 );
+   self->regRemesh->ctx = Stg_ComponentFactory_ConstructByName(
+      cf, "context", AbstractContext, True, data );
 
    dict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( cf->componentDict, self->name ) );
    list = Dictionary_Get( dict, "remeshDims" );

@@ -41,6 +41,10 @@ MEMBER( int**, nWallVerts )
 MEMBER( int***, wallVerts )
 MEMBER( double***, wallCrds )
 MEMBER( double*, contactVerts )
+MEMBER( Bool, diffuseCorners )
+MEMBER( Bool, diffuseSurface )
+MEMBER( double, diffusionCoef )
+MEMBER( AbstractContext*, ctx )
 
 
 /*
