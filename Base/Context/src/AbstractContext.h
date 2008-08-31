@@ -35,7 +35,7 @@
 **	This is a class, of which subclasses can be defined, which can override default methods.
 **	Currently built with only MeshPIC_Context in mind (for Snac).
 **
-** $Id: AbstractContext.h 4300 2008-08-28 05:28:26Z JohnMansour $
+** $Id: AbstractContext.h 4302 2008-08-31 13:57:37Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -98,6 +98,7 @@
 		double					currentTime; \
 		unsigned int				timeStep; \
 		double					dtFactor; \
+		double                                  dt;                                 \
 		/** This additional timestep is necessary for checkpoint restart runs, so it can be compared against
 			maxTimeSteps (which is now relative to job restart).*/ \
 		unsigned int				timeStepSinceJobRestart; \
