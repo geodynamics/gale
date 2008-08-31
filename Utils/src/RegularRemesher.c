@@ -326,11 +326,113 @@ void _RegularRemesher_Remesh( void* _self ) {
       nodeVert[1] = innerVert[1] - (inner2Vert[1] - innerVert[1]);
    }
    else if( self->diffuseSurface ) {
+#if 0
+      Mat A;
+      Vec b, x;
+      KSP ksp;
+      int nodeIndex, nDofs;
+      double *delta;
+      double dt, sep;
+      double elMat[2][2], elVec[2], Ni[2], Nx[2], GNx[2], xi;
+      double jacDet, weightJacDet;
+      int nodeInds[2], rows[2];
+      double leftCrd, rightCrd;
+      double weight = 1.0;
+      int ii, jj, kk, ll;
+
+      nDofs = vGrid->sizes[0];
+      VecCreateSeq( PETSC_COMM_SELF, nDofs, &x );
+      VecDuplicate( x, &b );
+      MatCreateSeqAIJ( PETSC_COMM_SELF, nDofs, nDofs, 3, PETSC_NULL, &A );
+
+      inds[1] = vGrid->sizes[1] - 1;
+
+      for( ii = 0; ii < nDofs - 1; ii++ ) {
+
+         inds[0] = ii;
+         nodeInds[0] = Grid_Project( vGrid, inds );
+         inds[0]++;
+         nodeInds[1] = Grid_Project( vGrid, inds );
+
+         mesh->verts[nodeInds[0]][1] = (double)(ii*ii);
+         mesh->verts[nodeInds[1]][1] = (double)((ii+1)*(ii+1));
+
+         memset( elMat[0], 0, 4 * sizeof(double) );
+         memset( elVec, 0, 2 * sizeof(double) );
+
+         for( jj = 0; jj < 2; jj++ ) {
+
+            xi = (jj == 0) ? -0.57735026919 : 0.57735026919;
+            leftCrd = Mesh_GetVertex( self->mesh, nodeInds[0] )[0];
+            rightCrd = Mesh_GetVertex( self->mesh, nodeInds[1] )[0];
+            jacDet = (rightCrd - leftCrd) * 0.5;
+            weightJacDet = weight * jacDet;
+            Ni[0] = 0.5 * (1.0 - xi);
+            Ni[1] = 0.5 * (1.0 + xi);
+            Nx[0] = -0.5;
+            Nx[1] = 0.5;
+            GNx[0] = Nx[0] / jacDet;
+            GNx[1] = Nx[1] / jacDet;
+
+            for( kk = 0; kk < 2; kk++ ) {
+               for ( ll = 0 ; ll < 2; ll++ ) {
+                  elMat[kk][ll] += weightJacDet * Ni[kk] * Ni[ll];
+                  elVec[kk] += -weightJacDet * GNx[kk] * GNx[ll] * (double)nodeInds[ll] * 2.0; /** GNx[kk] * GNx[ll] *
+                                                       Mesh_GetVertex( mesh, nodeInds[ll] )[1];*/
+               }
+
+               if( kk == 0 ) {
+                  elVec[kk] += -1.0 * (GNx[0] * (double)nodeInds[0] * 2.0 + GNx[1] * (double)nodeInds[1] * 2.0);
+/*
+                  elVec[kk] += -1.0 * (GNx[0] * Mesh_GetVertex( mesh, nodeInds[0] )[1] +
+                                       GNx[1] * Mesh_GetVertex( mesh, nodeInds[1] )[1]);
+*/
+               }
+               else {
+                  elVec[kk] += 1.0 * (GNx[0] * (double)nodeInds[0] * 2.0 + GNx[1] * (double)nodeInds[1] * 2.0);
+/*
+                  elVec[kk] += 1.0 * (GNx[0] * Mesh_GetVertex( mesh, nodeInds[0] )[1] +
+                                      GNx[1] * Mesh_GetVertex( mesh, nodeInds[1] )[1]);
+*/
+               }
+            }
+         }
+
+         rows[0] = ii; rows[1] = ii + 1;
+         MatSetValues( A, 2, rows, 2, rows, elMat[0], ADD_VALUES );
+         VecSetValues( b, 2, rows, elVec, ADD_VALUES );
+
+      }
+
+      MatAssemblyBegin( A, MAT_FINAL_ASSEMBLY );
+      VecAssemblyBegin( b );
+      MatAssemblyEnd( A, MAT_FINAL_ASSEMBLY );
+      VecAssemblyEnd( b );
+
+      KSPCreate( PETSC_COMM_SELF, &ksp );
+      KSPSetOperators( ksp, A, A, DIFFERENT_NONZERO_PATTERN );
+      KSPSolve( ksp, b, x );
+
+      VecGetArray( x, &delta );
+      for( inds[0] = 0; inds[0] < vGrid->sizes[0]; inds[0]++ ) {
+         nodeIndex = Grid_Project( vGrid, inds );
+         mesh->verts[nodeIndex][1] -= self->diffusionCoef * self->ctx->dt * delta[inds[0]];
+      }
+      VecRestoreArray( x, &delta );
+
+      KSPDestroy( ksp );
+      MatDestroy( A );
+      VecDestroy( b );
+      VecDestroy( x );
+#endif
+
+
       Mat A;
       Vec b, x;
       KSP ksp;
       int cols[3], nDofs, nodeIndex;
-      double one = 1.0, rhs, coef, *soln, vals[3];
+      double one = 1.0, rhs, coef, *soln;
+      double matVals[3], vecVals[3];
       double d, dt, sep;
       int ii;
 
@@ -343,38 +445,39 @@ void _RegularRemesher_Remesh( void* _self ) {
       dt = self->ctx->dt;
       sep = Mesh_GetVertex( mesh, 1 )[0] - Mesh_GetVertex( mesh, 0 )[0];
       coef = d * dt / (2.0 * (sep * sep));
-      vals[0] = coef; vals[1] = -2.0 * coef; vals[2] = coef;
+      matVals[0] = -coef; matVals[1] = 1.0 + 2.0 * coef; matVals[2] = -coef;
+      vecVals[0] = coef;  vecVals[1] = 1.0 - 2.0 * coef; vecVals[2] = coef;
       inds[1] = vGrid->sizes[1] - 1;
+
       for( ii = 0; ii < nDofs; ii++ ) {
+         cols[0] = ii - 1; cols[1] = ii; cols[2] = ii + 1;
          if( ii == 0 ) {
-            cols[0] = ii; cols[1] = ii + 1; cols[2] = ii + 2;
+            MatSetValues( A, 1, &ii, 2, cols + 1, matVals + 1, ADD_VALUES );
+            MatSetValues( A, 1, &ii, 1, &ii, matVals, ADD_VALUES );
          }
          else if( ii == nDofs - 1 ) {
-            cols[0] = ii - 2; cols[1] = ii - 1; cols[2] = ii;
+            MatSetValues( A, 1, &ii, 2, cols, matVals, ADD_VALUES );
+            MatSetValues( A, 1, &ii, 1, &ii, matVals + 2, ADD_VALUES );
          }
-         else {
-            cols[0] = ii - 1; cols[1] = ii; cols[2] = ii + 1;
-         }
-         MatSetValues( A, 1, &ii, 3, cols, vals, ADD_VALUES );
-         MatSetValues( A, 1, &ii, 1, &ii, &one, ADD_VALUES );
+         else
+            MatSetValues( A, 1, &ii, 3, cols, matVals, ADD_VALUES );
 
          inds[0] = ii;
          nodeIndex = Grid_Project( vGrid, inds );
-         rhs = Mesh_GetVertex( mesh, nodeIndex )[1];
          if( ii == 0 ) {
-            rhs -= coef * (Mesh_GetVertex( mesh, nodeIndex )[1] -
-                           2.0 * Mesh_GetVertex( mesh, nodeIndex + 1 )[1] + 
-                           Mesh_GetVertex( mesh, nodeIndex + 2 )[1]);
+            rhs = vecVals[0] * Mesh_GetVertex( mesh, nodeIndex + 1 )[1] +
+               vecVals[1] * Mesh_GetVertex( mesh, nodeIndex )[1] + 
+               vecVals[2] * Mesh_GetVertex( mesh, nodeIndex )[1];
          }
          else if( ii == nDofs - 1 ) {
-            rhs -= coef * (Mesh_GetVertex( mesh, nodeIndex - 2 )[1] -
-                           2.0 * Mesh_GetVertex( mesh, nodeIndex - 1 )[1] + 
-                           Mesh_GetVertex( mesh, nodeIndex )[1]);
+            rhs = vecVals[0] * Mesh_GetVertex( mesh, nodeIndex )[1] +
+               vecVals[1] * Mesh_GetVertex( mesh, nodeIndex )[1] + 
+               vecVals[2] * Mesh_GetVertex( mesh, nodeIndex - 1 )[1];
          }
          else {
-            rhs -= coef * (Mesh_GetVertex( mesh, nodeIndex - 1 )[1] -
-                           2.0 * Mesh_GetVertex( mesh, nodeIndex )[1] + 
-                           Mesh_GetVertex( mesh, nodeIndex + 1 )[1]);
+            rhs = vecVals[0] * Mesh_GetVertex( mesh, nodeIndex + 1 )[1] +
+               vecVals[1] * Mesh_GetVertex( mesh, nodeIndex )[1] + 
+               vecVals[2] * Mesh_GetVertex( mesh, nodeIndex - 1 )[1];
          }
          VecSetValues( b, 1, &ii, &rhs, ADD_VALUES );
       }
@@ -399,6 +502,7 @@ void _RegularRemesher_Remesh( void* _self ) {
       MatDestroy( A );
       VecDestroy( b );
       VecDestroy( x );
+
 
 #if 0
       int nodeIndex, inds[2];
