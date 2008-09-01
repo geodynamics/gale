@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: ColourBar.c 785 2008-08-18 13:55:00Z LukeHodkinson $
+** $Id: ColourBar.c 791 2008-09-01 02:09:06Z JulianGiordani $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -59,8 +59,13 @@
 #include "ColourBar.h"
 
 #include <assert.h>
-#include <gl.h>
-#include <glu.h>
+#ifdef HAVE_OPENGL_FRAMEWORK
+	#include <OpenGL/gl.h>
+	#include <OpenGL/glu.h>
+#else
+	#include <gl.h>
+	#include <glu.h>
+#endif
 #include <string.h>
 
 #ifndef MASTER

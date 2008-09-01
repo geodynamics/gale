@@ -53,8 +53,13 @@
 
 #include <string.h>
 #include <assert.h>
-#include <gl.h>
-#include <glu.h>
+#ifdef HAVE_OPENGL_FRAMEWORK
+	#include <OpenGL/gl.h>
+	#include <OpenGL/glu.h>
+#else
+	#include <gl.h>
+	#include <glu.h>
+#endif
 
 const Type lucLight_Type = "lucLight";
 

@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: OpenGlUtil.c 740 2007-10-11 08:05:31Z SteveQuenette $
+** $Id: OpenGlUtil.c 791 2008-09-01 02:09:06Z JulianGiordani $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -50,8 +50,13 @@
 
 #include "types.h"
 #include "OpenGlUtil.h"
-#include <gl.h>
-#include <glu.h>
+#ifdef HAVE_OPENGL_FRAMEWORK
+	#include <OpenGL/gl.h>
+	#include <OpenGL/glu.h>
+#else
+	#include <gl.h>
+	#include <glu.h>
+#endif
 #include <string.h>
 
 void lucColour_SetOpenGLColour( lucColour* colour ) {

@@ -57,8 +57,13 @@
 #include "LightInteraction.h"
 
 #include <assert.h>
-#include <gl.h>
-#include <glu.h>
+#ifdef HAVE_OPENGL_FRAMEWORK
+	#include <OpenGL/gl.h>
+	#include <OpenGL/glu.h>
+#else
+	#include <gl.h>
+	#include <glu.h>
+#endif
 
 /* Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 const Type lucLightInteraction_Type = "lucLightInteraction";

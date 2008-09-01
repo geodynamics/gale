@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: Isosurface.c 746 2007-10-29 04:26:41Z RobertTurnbull $
+** $Id: Isosurface.c 791 2008-09-01 02:09:06Z JulianGiordani $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -57,8 +57,13 @@
 #include "Isosurface.h"
 
 #include <assert.h>
-#include <gl.h>
-#include <glu.h>
+#ifdef HAVE_OPENGL_FRAMEWORK
+	#include <OpenGL/gl.h>
+	#include <OpenGL/glu.h>
+#else
+	#include <gl.h>
+	#include <glu.h>
+#endif
 #include <string.h>
 
 #ifndef MASTER

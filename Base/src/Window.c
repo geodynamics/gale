@@ -39,7 +39,7 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: Window.c 754 2008-01-11 05:41:53Z RobertTurnbull $
+** $Id: Window.c 791 2008-09-01 02:09:06Z JulianGiordani $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -745,7 +745,11 @@ void lucViewportInfo_Create_MPI_Datatype() {
 
 #ifdef HAVE_GL
 
-#include <gl.h>
+#ifdef HAVE_OPENGL_FRAMEWORK
+	#include <OpenGL/gl.h>
+#else
+	#include <gl.h>
+#endif
 
 void _lucWindow_SetupGLRasterFont( void* window ) {
 	GLuint i, j;
