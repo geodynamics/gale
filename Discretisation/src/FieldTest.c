@@ -814,9 +814,12 @@ void FieldTest_GenerateErrFields( void* _context, void* data ) {
 				FieldTest_ElementErrAnalyticFromField( self, field_I, lElement_I, elErrorSq, elNormSq );
 
 			for( dof_I = 0; dof_I < numDofs; dof_I++ ) {
-				lAnalyticSq[dof_I] += elNormSq[dof_I];
-				lErrorSq[dof_I]    += elErrorSq[dof_I];
-				elError[dof_I] = normalise ? sqrt( elErrorSq[dof_I] / ( elNormSq[dof_I] + eps ) ) : sqrt( elErrorSq[dof_I] );
+				if( !self->normalise || elNormSq[dof_I] > eps ) {
+					lAnalyticSq[dof_I] += elNormSq[dof_I];
+					lErrorSq[dof_I]    += elErrorSq[dof_I];
+					//elError[dof_I] = normalise ? sqrt( elErrorSq[dof_I] / ( elNormSq[dof_I] + eps ) ) : sqrt( elErrorSq[dof_I] );
+					elError[dof_I] = normalise ? sqrt( elErrorSq[dof_I] / ( elNormSq[dof_I] ) ) : sqrt( elErrorSq[dof_I] );
+				}
 			}
 
 			/* constant mesh, so node and element indices map 1:1 */
@@ -829,7 +832,7 @@ void FieldTest_GenerateErrFields( void* _context, void* data ) {
 		for( dof_I = 0; dof_I < numDofs; dof_I++ ) {
 			self->gAnalyticSq[field_I][dof_I] = gAnalyticSq[dof_I];
 			self->gErrorSq[field_I][dof_I]    = gErrorSq[dof_I];
-			self->gErrorNorm[field_I][dof_I]  = fabs( 1.0 - sqrt( gErrorSq[dof_I] / gAnalyticSq[dof_I] ) );
+			self->gErrorNorm[field_I][dof_I]  = sqrt( gErrorSq[dof_I] / gAnalyticSq[dof_I] );
 
 			if( normalise )
 				Journal_Printf( context->info, "%s - dof %d normalised global error: %.8e\n", 
