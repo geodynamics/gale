@@ -109,6 +109,7 @@ FieldTest* _FieldTest_New(
 			NON_GLOBAL );
 
 	self->normalise = False;
+	self->epsilon = 0.0001;
 	self->referenceSolnFromFile = False;
 
 	/* Assign singleton ptr */
@@ -196,6 +197,7 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 	
 	self->referenceSolnPath		= Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "referenceSolutionFilePath" ) );
 	self->normalise			= Dictionary_Entry_Value_AsBool( Dictionary_Get( pluginDict, "normaliseByReferenceSolution" ) );
+	self->epsilon			= Dictionary_Entry_Value_AsDouble( Dictionary_Get( pluginDict, "epsilon" ) );
 	self->referenceSolnFromFile	= Dictionary_Entry_Value_AsBool( Dictionary_Get( pluginDict, "useReferenceSolutionFromFile" ) );
 	self->context			= Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
 
@@ -785,6 +787,7 @@ void FieldTest_GenerateErrFields( void* _context, void* data ) {
 	FieldTest_ExpectedResultFunc* expectedFunc;
 	Bool			pass;
 	double			numericTestResult;
+	double			eps			= self->epsilon;
 	
 	for( field_I = 0; field_I < self->fieldCount; field_I++ ) {
 		/* should be using MT_VOLUME for the reference field mesh, but seems to have a bug */
@@ -813,7 +816,7 @@ void FieldTest_GenerateErrFields( void* _context, void* data ) {
 			for( dof_I = 0; dof_I < numDofs; dof_I++ ) {
 				lAnalyticSq[dof_I] += elNormSq[dof_I];
 				lErrorSq[dof_I]    += elErrorSq[dof_I];
-				elError[dof_I] = normalise ? sqrt( elErrorSq[dof_I] / elNormSq[dof_I] ) : sqrt( elErrorSq[dof_I] );
+				elError[dof_I] = normalise ? sqrt( elErrorSq[dof_I] / ( elNormSq[dof_I] + eps ) ) : sqrt( elErrorSq[dof_I] );
 			}
 
 			/* constant mesh, so node and element indices map 1:1 */
@@ -826,7 +829,7 @@ void FieldTest_GenerateErrFields( void* _context, void* data ) {
 		for( dof_I = 0; dof_I < numDofs; dof_I++ ) {
 			self->gAnalyticSq[field_I][dof_I] = gAnalyticSq[dof_I];
 			self->gErrorSq[field_I][dof_I]    = gErrorSq[dof_I];
-			self->gErrorNorm[field_I][dof_I]  = sqrt( gErrorSq[dof_I] / gAnalyticSq[dof_I] );
+			self->gErrorNorm[field_I][dof_I]  = fabs( 1.0 - sqrt( gErrorSq[dof_I] / gAnalyticSq[dof_I] ) );
 
 			Journal_Printf( context->info, "%s - dof %d normalised global error: %.8e\n", 
 				     	self->numericFieldList[field_I]->name, dof_I, self->gErrorNorm[field_I][dof_I] );
@@ -959,8 +962,7 @@ void FieldTest_ElementErrReferenceFromSwarm( void* fieldTest, Index var_I, Index
 /* the first index 'func_I' denotes the index of the function in the analytic solution list to be applied to calculate
  * the analytic field at index 'field_I' in the analytic field list.
  *
- * the analytic fields are in the same order as their numeric counterparts are read in from the XML
- */
+ * the analytic fields are in the same order as their numeric counterparts are read in from the XML */
 void FieldTest_AddAnalyticSolutionFuncToListAtIndex( void* fieldTest, Index func_I, FieldTest_AnalyticSolutionFunc* func, Index field_I ) {
 	FieldTest* 	self 	= (FieldTest*) fieldTest;
 

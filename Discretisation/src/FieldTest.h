@@ -74,6 +74,9 @@
 		FeMesh*					constantMesh;		\
 		FeMesh*					elementMesh;		\
 		Bool					normalise;		\
+		/* constant to add to analytic element integral */ 		\
+		/* normalising by this so you dont get divide by zero issues */ \
+		double					epsilon;		\
 		double**				gAnalyticSq;		\
 		double**				gErrorSq;		\
 		double**				gError;			\
@@ -97,7 +100,6 @@
 		FieldTest_ExpectedResultFunc**		expectedFunc;		\
 		FeVariable**				expectedNumericField;	\
 		unsigned				expectedCount;		\
-		
 		
 
 	/** Brings together and manages the life-cycle of a a mesh and all the 
