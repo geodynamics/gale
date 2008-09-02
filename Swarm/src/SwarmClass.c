@@ -165,7 +165,8 @@ Swarm* _Swarm_New(
 	self->commHandlerList = Stg_ObjectList_New();
 	self->nSwarmVars = 0;
 	self->swarmVars = NULL;
-	
+	self->owningCellVariable = NULL;
+
 	/* Swarm info */
 	if( initFlag )
 		_Swarm_Init( 
@@ -322,7 +323,8 @@ void _Swarm_Delete( void* swarm ) {
 	if ( self->particles ) {
 		ExtensionManager_Free( self->particleExtensionMgr, self->particles );
 	}
-
+	if(self->owningCellVariable)
+		_SwarmVariable_Delete(self->owningCellVariable);
 	/* Delete SwarmVariable_Register if it has been created */
 	if ( self->swarmVariable_Register ) {
 		Stg_Class_Delete( self->swarmVariable_Register );

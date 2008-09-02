@@ -130,6 +130,7 @@ void SwarmVariable_InitAll( void* swarmVariable, Swarm* swarm, Variable* variabl
 
 void _SwarmVariable_Delete( void* swarmVariable ) {
 	SwarmVariable* self = (SwarmVariable*) swarmVariable;
+	_Variable_Delete(self->variable);
 	_Stg_Component_Delete( self );
 }
 
