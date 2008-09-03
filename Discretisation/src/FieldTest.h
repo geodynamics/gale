@@ -50,8 +50,14 @@
 #ifndef __StgFEM_Discretisation_FieldTest_h__
 #define __StgFEM_Discretisation_FieldTest_h__
 	
-	typedef void (FieldTest_AnalyticSolutionFunc) (void* fieldTest, double* coord, double* value );
-	typedef Bool (FieldTest_ExpectedResultFunc) (void* fieldTest, FeVariable* feVar, double* value);
+	typedef struct event {
+		double	time;
+		double	place[3];
+		double  value[9];
+	} Event;
+
+	typedef void (FieldTest_AnalyticSolutionFunc) ( void* fieldTest, double* coord, double* value );
+	typedef Bool (FieldTest_ExpectedResultFunc) ( void** data, void* context, Event* expected, Event* numeric, Event* tolerance );
 
 	/** Textual name of this class */
 	extern const Type FieldTest_Type;
@@ -93,13 +99,16 @@
 		Index*					analyticSolnForFeVarKey;\
 		FieldTest_AnalyticSolutionFunc**	_analyticSolutionList;	\
 		/* for the physics tests */ \
-		Name*					expectedFilename;	\
-		Name					expectedValuePath;	\
-		double*					expectedValue;		\
-		double*					expectedTolerance;	\
-		FieldTest_ExpectedResultFunc**		expectedFunc;		\
-		FeVariable**				expectedNumericField;	\
-		unsigned				expectedCount;		\
+		Name					expectedFileName;	\
+		Name					expectedFilePath;	\
+		void**					expectedData;		\
+		FieldTest_ExpectedResultFunc*		expectedFunc;		\
+		unsigned				expectedDofs;		\
+		Event*					expected;		\
+		Event*					numeric;		\
+		Event*					tolerance;		\
+		Bool					expectedPass;		\
+		Name					dumpExpectedFileName;	\
 		
 
 	/** Brings together and manages the life-cycle of a a mesh and all the 
@@ -168,7 +177,9 @@
 	void FieldTest_LoadReferenceSolutionFromFile( FeVariable* referenceField, Name referenceSolnName, Name referenceSolnPath, DomainContext* context );
 	void FieldTest_CalculateAnalyticSolutionForField( void* fieldTest, Index field_I );
 
-	void FieldTest_GenerateErrFields( void* fieldTest, void* data );
+	/* entry points */
+	void FieldTest_GenerateErrFields( void* _context, void* data );
+	void FieldTest_EvaluatePhysicsTest( void* _context, void* data );
 
 	void FieldTest_ElementErrAnalyticFromField( void* fieldTest, Index field_I, Index lElement_I, double* elErrorSq, double* elNormSq );
 	void FieldTest_ElementErrReferenceFromField( void* fieldTest, Index field_I, Index lElement_I, double* elErrorSq, double* elNormSq );

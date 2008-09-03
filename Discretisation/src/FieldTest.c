@@ -160,7 +160,7 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 	Index				swarmVar_I;
 	Name                    	fieldName;
 	Hook*				generateErrorFields;
-	Dictionary_Entry_Value*		expectedFileList;
+	Hook*				physicsTestHook;
 
 	fieldList = Dictionary_Get( pluginDict, "NumericFields" );
 	self->fieldCount = fieldList ? Dictionary_Entry_Value_GetCount( fieldList ) : 0;
@@ -201,21 +201,21 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 	self->referenceSolnFromFile	= Dictionary_Entry_Value_AsBool( Dictionary_Get( pluginDict, "useReferenceSolutionFromFile" ) );
 	self->context			= Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
 
-	expectedFileList = Dictionary_Get( pluginDict, "ExpectedFiles" );
-	self->expectedCount = (expectedFileList) ? Dictionary_Entry_Value_GetCount( expectedFileList ) : 0;
-	if( self->expectedCount ) {
-		self->expectedValuePath = Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "expectedValuePath" ) );
-
-		self->expectedFilename     = Memory_Alloc_Array_Unnamed( Name, self->expectedCount );
-		self->expectedValue        = Memory_Alloc_Array_Unnamed( double, self->expectedCount );
-		self->expectedTolerance    = Memory_Alloc_Array_Unnamed( double, self->expectedCount );
-		self->expectedFunc         = Memory_Alloc_Array_Unnamed( FieldTest_ExpectedResultFunc*, self->expectedCount );
-		self->expectedNumericField = Memory_Alloc_Array_Unnamed( FeVariable*, self->expectedCount );
-	}
+	/* for the physics test */
+	self->expectedFileName = Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "expectedFileName" ) );
+	self->expectedFilePath = Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "expectedFilePath" ) );
+	self->dumpExpectedFileName = Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "expectedOutputFileName" ) );
+	self->expectedPass     = False;
 
 	/* set up the entry point */
 	generateErrorFields = Hook_New( "Generate error fields hook", FieldTest_GenerateErrFields, self->name );
 	_EntryPoint_AppendHook( Context_GetEntryPoint( self->context, AbstractContext_EP_Solve ), generateErrorFields );
+
+	/* entry point for the fisix test func */
+	if( strlen(self->expectedFileName) > 1 ) {
+		physicsTestHook = Hook_New( "Physics test hook", FieldTest_EvaluatePhysicsTest, self->name );
+		_EntryPoint_AppendHook( Context_GetEntryPoint( self->context, AbstractContext_EP_Solve ), physicsTestHook );
+	}
 
 	self->LCRegister = cf->LCRegister;
 }
@@ -253,7 +253,6 @@ void _FieldTest_Build( void* fieldTest, void* data ) {
 	if( !self->referenceSolnFromFile ) {
 		self->analyticSolnForFeVarKey = Memory_Alloc_Array( unsigned, self->fieldCount, 
 								    "analytic solution index for ith feVariable" );
-		//self->_analyticSolutionList = malloc( sizeof( FieldTest_AnalyticSolutionFunc* ) * self->fieldCount );
 		self->_analyticSolutionList = Memory_Alloc_Array_Unnamed( FieldTest_AnalyticSolutionFunc*, self->fieldCount );
 	}
 }
@@ -261,9 +260,11 @@ void _FieldTest_Build( void* fieldTest, void* data ) {
 void _FieldTest_Initialise( void* fieldTest, void* data ) {
 	FieldTest* 		self 		= (FieldTest*) fieldTest;
 	Index			field_I;
-	Index			expected_I;
 	FILE*			expected_fp;
 	char*			expectedFilename;
+	int			num_time_steps;
+	int			dof_i, dim_i;
+	int			expected_i 	= 0;
 
 	for( field_I = 0; field_I < self->fieldCount; field_I++ ) {
 		Stg_Component_Initialise( self->numericFieldList[field_I], data, False );
@@ -289,21 +290,40 @@ void _FieldTest_Initialise( void* fieldTest, void* data ) {
 			FieldTest_CalculateAnalyticSolutionForField( self, field_I );
 	}
 
-	if( self->expectedCount ) {
-		for( expected_I = 0; expected_I < self->expectedCount; expected_I++ ) {
-			expectedFilename = Memory_Alloc_Array_Unnamed( char, strlen(self->expectedValuePath) + 
-							strlen(self->expectedFilename[expected_I]) + 1 );
-			sprintf( expectedFilename, "%s%s", self->expectedValuePath, self->expectedFilename[expected_I] );
+	if( strlen(self->expectedFileName) > 1 ) {
+		expectedFilename = Memory_Alloc_Array_Unnamed( char, strlen(self->expectedFilePath) + strlen(self->expectedFileName) + 1 );
+		sprintf( expectedFilename, "%s%s", self->expectedFilePath, self->expectedFileName );
 
-			expected_fp = fopen( expectedFilename, "r" );
+		expected_fp = fopen( expectedFilename, "r" );
 
-			fscanf( expected_fp, "%lf %lf", &self->expectedValue[expected_I], 
-							&self->expectedTolerance[expected_I] );
+		fscanf( expected_fp, "%d %d", &self->expectedDofs, &num_time_steps );
+	
+		self->expected  = Memory_Alloc_Array_Unnamed( Event, num_time_steps );
+		self->numeric   = Memory_Alloc_Array_Unnamed( Event, self->context->maxTimeSteps );
+		self->tolerance = Memory_Alloc_Array_Unnamed( Event, num_time_steps );
 
-			fclose( expected_fp );
+		while ( !feof( expected_fp ) ) {
+			fscanf( expected_fp, "%lf ", &self->expected[expected_i].time );
+			
+			for( dim_i = 0; dim_i < self->context->dim; dim_i++ )
+				fscanf( expected_fp, "%lf ", &self->expected[expected_i].place[dim_i] );
 
-			Memory_Free( expectedFilename );
+			for( dof_i = 0; dof_i < self->expectedDofs; dof_i++ )
+				fscanf( expected_fp, "%lf ", &self->expected[expected_i].value[dof_i] );
+
+			fscanf( expected_fp, "%lf ", &self->tolerance[expected_i].time );
+			
+			for( dim_i = 0; dim_i < self->context->dim; dim_i++ )
+				fscanf( expected_fp, "%lf ", &self->tolerance[expected_i].place[dim_i] );
+
+			for( dof_i = 0; dof_i < self->expectedDofs; dof_i++ )
+				fscanf( expected_fp, "%lf ", &self->tolerance[expected_i].value[dof_i] );
+
+			expected_i++;
 		}
+		fclose( expected_fp );
+
+		Memory_Free( expectedFilename );
 	}
 }
 
@@ -346,12 +366,10 @@ void _FieldTest_Destroy( void* fieldTest, void* data ) {
 	Memory_Free( self->gErrorSq );
 	Memory_Free( self->gError );
 	Memory_Free( self->gErrorNorm );
-	if( self->expectedCount ) {
-		Memory_Free( self->expectedFilename );
-		Memory_Free( self->expectedValue );
-		Memory_Free( self->expectedTolerance );
-		Memory_Free( self->expectedFunc );
-		Memory_Free( self->expectedNumericField );
+	if( strlen(self->expectedFileName) > 1 ) {
+		Memory_Free( self->expected );
+		Memory_Free( self->numeric );
+		Memory_Free( self->tolerance );
 	}
 	if( !self->referenceSolnFromFile ) {
 		Memory_Free( self->analyticSolnForFeVarKey );
@@ -768,6 +786,38 @@ void FieldTest_LoadReferenceSolutionFromFile( FeVariable* feVariable, Name refer
 #endif
 }
 
+/* by default, success of the physics test is set to false. this is reset if the test passes */
+void FieldTest_EvaluatePhysicsTest( void* _context, void* data ) {
+	DomainContext*			context			= (DomainContext*)_context;
+	/* dodgy!!! - not sure how else to pass the self reference at an entry point */
+	FieldTest*			self			= fieldTestSingleton;
+	FieldTest_ExpectedResultFunc*	expectedFunc		= self->expectedFunc;
+	FILE*				dumpExpectedFilePtr;
+	char*				dumpExpectedFileName;
+	int				dim_i, dof_i;
+
+	if( expectedFunc( self->expectedData, context, self->expected, self->numeric, self->tolerance ) )
+		self->expectedPass = True;
+
+	if( strlen(self->dumpExpectedFileName) > 1 ) {
+		dumpExpectedFileName = Memory_Alloc_Array_Unnamed( char, strlen(self->expectedFilePath) + 
+									 strlen(self->dumpExpectedFileName) + 5 );
+		sprintf( dumpExpectedFileName, "%s%s.out", self->expectedFilePath, self->dumpExpectedFileName );
+		dumpExpectedFilePtr = fopen( dumpExpectedFileName, "a" );
+
+		fprintf( dumpExpectedFilePtr, "%.8e ", self->expected[context->timeStep].time );
+		for( dim_i = 0; dim_i < context->dim; dim_i++ )
+			fprintf( dumpExpectedFilePtr, "%.8e ", self->expected[context->timeStep].place[dim_i] );
+		for( dof_i = 0; dof_i < self->expectedDofs; dof_i++ )
+			fprintf( dumpExpectedFilePtr, "%.8e ", self->expected[context->timeStep].value[dof_i] );
+
+		fprintf( dumpExpectedFilePtr, "\n" );
+
+		Memory_Free( dumpExpectedFileName );
+		fclose( dumpExpectedFilePtr );
+	}
+}
+
 void FieldTest_GenerateErrFields( void* _context, void* data ) {
 	DomainContext*		context			= (DomainContext*)_context;
 	/* this a really dodgy way to get the self ptr, as will only work if the textual name is consistent with that in 
@@ -784,7 +834,6 @@ void FieldTest_GenerateErrFields( void* _context, void* data ) {
 	Index			numDofs, dof_I;
 	Index			field_I;
 	Index			expected_I;
-	FieldTest_ExpectedResultFunc* expectedFunc;
 	Bool			pass;
 	double			numericTestResult;
 	double			eps			= self->epsilon;
@@ -840,18 +889,6 @@ void FieldTest_GenerateErrFields( void* _context, void* data ) {
 			else
 				Journal_Printf( context->info, "%s - dof %d global error: %.8e\n",
 					self->numericFieldList[field_I]->name, dof_I, sqrt( self->gErrorSq[field_I][dof_I] ) );
-		}
-	}
-
-	if( self->expectedCount ) {
-		for( expected_I = 0; expected_I < self->expectedCount; expected_I++ ) {
-			expectedFunc = self->expectedFunc[expected_I];
-			
-			pass = expectedFunc( self, self->expectedNumericField[expected_I], &numericTestResult );
-
-			Journal_Printf( context->info, "test %d - expected: %.8e, actual: %.8e, tolerance: %.8e, pass = %d\n",
-				     expected_I, self->expectedValue[expected_I], numericTestResult, 
-				     self->expectedTolerance[expected_I], pass );
 		}
 	}
 }
@@ -977,10 +1014,4 @@ void FieldTest_AddAnalyticSolutionFuncToListAtIndex( void* fieldTest, Index func
 	self->analyticSolnForFeVarKey[field_I] = func_I;
 }
 
-void FieldTest_AddExpectedFuncAndFieldToListAtIndex( void* fieldTest, FieldTest_ExpectedResultFunc* func, FeVariable* feVariable, Index i ) {
-	FieldTest* 	self 	= (FieldTest*) fieldTest;
-
-	self->expectedFunc[i] = func;
-	self->expectedNumericField[i] = feVariable;
-}
 
