@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FrequentOutput.c 964 2007-10-11 08:03:06Z SteveQuenette $
+** $Id: FrequentOutput.c 1219 2008-09-04 23:09:02Z JohnMansour $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 #include <string.h>
@@ -78,7 +78,7 @@ void _StgFEM_FrequentOutput_Construct( void* component, Stg_ComponentFactory* cf
 
 	/* Open File */
 	if ( context->rank == MASTER ) {
-		if ( context->loadFromCheckPoint == False ) {
+		if ( (context->loadFromCheckPoint == False) && (Dictionary_GetBool_WithDefault( context->dictionary, "visualOnly", False ) == False ) ) {
 			/* Always overwrite the file if starting a new run */
 			fileOpened = Stream_RedirectFile_WithPrependedPath( stream, context->outputPath, frequentOutputFilename );
 		}
