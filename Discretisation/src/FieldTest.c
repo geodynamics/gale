@@ -165,21 +165,23 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 	fieldList = Dictionary_Get( pluginDict, "NumericFields" );
 	self->fieldCount = fieldList ? Dictionary_Entry_Value_GetCount( fieldList ) : 0;
 
-	self->numericFieldList   	= Memory_Alloc_Array( FeVariable*, self->fieldCount, "numeric fields" );
-	self->referenceFieldList 	= Memory_Alloc_Array( FeVariable*, self->fieldCount, "reference fields" );
-	self->errorFieldList     	= Memory_Alloc_Array( FeVariable*, self->fieldCount, "error fields" );
-	self->referenceMagFieldList	= Memory_Alloc_Array( OperatorFeVariable*, self->fieldCount, "reference field magnitudes" );
-	self->errorMagFieldList		= Memory_Alloc_Array( OperatorFeVariable*, self->fieldCount, "error field magnitudes" );
+	if( self->fieldCount ) {
+		self->numericFieldList   	= Memory_Alloc_Array( FeVariable*, self->fieldCount, "numeric fields" );
+		self->referenceFieldList 	= Memory_Alloc_Array( FeVariable*, self->fieldCount, "reference fields" );
+		self->errorFieldList     	= Memory_Alloc_Array( FeVariable*, self->fieldCount, "error fields" );
+		self->referenceMagFieldList	= Memory_Alloc_Array( OperatorFeVariable*, self->fieldCount, "reference field magnitudes" );
+		self->errorMagFieldList		= Memory_Alloc_Array( OperatorFeVariable*, self->fieldCount, "error field magnitudes" );
 	
-	for( feVariable_I = 0; feVariable_I < self->fieldCount; feVariable_I++ ) {
-		fieldName = ( fieldList ) ? 
-			    Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( fieldList, feVariable_I ) ) :
-			    Dictionary_GetString( pluginDict, "FeVariable" );
+		for( feVariable_I = 0; feVariable_I < self->fieldCount; feVariable_I++ ) {
+			fieldName = ( fieldList ) ? 
+				    Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( fieldList, feVariable_I ) ) :
+				    Dictionary_GetString( pluginDict, "FeVariable" );
 			
-		self->numericFieldList[feVariable_I] = (FeVariable*) FieldVariable_Register_GetByName( fV_Register, fieldName );
+			self->numericFieldList[feVariable_I] = (FeVariable*) FieldVariable_Register_GetByName( fV_Register, fieldName );
 
-		if( !self->numericFieldList[feVariable_I] )
-			self->numericFieldList[feVariable_I] = Stg_ComponentFactory_ConstructByName( cf, fieldName, FeVariable, True, data ); 
+			if( !self->numericFieldList[feVariable_I] )
+				self->numericFieldList[feVariable_I] = Stg_ComponentFactory_ConstructByName( cf, fieldName, FeVariable, True, data ); 
+		}
 	}
 
 	self->integrationSwarm 	= LiveComponentRegister_Get( cf->LCRegister, Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "IntegrationSwarm" ) ) );
@@ -187,13 +189,15 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 	self->elementMesh      	= LiveComponentRegister_Get( cf->LCRegister, Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "ElementMesh"      ) ) );
 
 	self->swarmVarCount = swarmVarList ? Dictionary_Entry_Value_GetCount( swarmVarList ) : 0;
-	self->swarmVarNameList = Memory_Alloc_Array( Name, self->swarmVarCount, "numeric swarm variable names" );
+	if( self->swarmVarCount ) {
+		self->swarmVarNameList = Memory_Alloc_Array( Name, self->swarmVarCount, "numeric swarm variable names" );
 	
-	for( swarmVar_I = 0; swarmVar_I < self->swarmVarCount; swarmVar_I++ ) {
-		self->swarmVarNameList[swarmVar_I] = ( swarmVarList ) ? 
-				Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( swarmVarList, swarmVar_I ) ) :
-				Dictionary_GetString( pluginDict, "SwarmVariable" );
-	}	
+		for( swarmVar_I = 0; swarmVar_I < self->swarmVarCount; swarmVar_I++ ) {
+			self->swarmVarNameList[swarmVar_I] = ( swarmVarList ) ? 
+					Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( swarmVarList, swarmVar_I ) ) :
+					Dictionary_GetString( pluginDict, "SwarmVariable" );
+		}	
+	}
 	
 	self->referenceSolnPath		= Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "referenceSolutionFilePath" ) );
 	self->normalise			= Dictionary_Entry_Value_AsBool( Dictionary_Get( pluginDict, "normaliseByReferenceSolution" ) );
@@ -225,7 +229,7 @@ void _FieldTest_Build( void* fieldTest, void* data ) {
 	Index			field_I;
 	//Index			swarm_I;
 
-	Stg_Component_Build( self->constantMesh,  data, False );
+	if( self->constantMesh ) Stg_Component_Build( self->constantMesh,  data, False );
 
 	for( field_I = 0; field_I < self->fieldCount; field_I++ ) {
 		FieldTest_BuildReferenceField( self, field_I );
@@ -245,15 +249,17 @@ void _FieldTest_Build( void* fieldTest, void* data ) {
 					 self->context, &self->referenceSwarmList[swarm_I] );
 	}*/
 
-	self->gAnalyticSq = Memory_Alloc_2DArray( double, self->fieldCount, 3, "global reference solution squared" );
-	self->gErrorSq 	  = Memory_Alloc_2DArray( double, self->fieldCount, 3, "global L2 error squared" );
-	self->gError	  = Memory_Alloc_2DArray( double, self->fieldCount, 3, "global L2 error" );
-	self->gErrorNorm  = Memory_Alloc_2DArray( double, self->fieldCount, 3, "global L2 error normalised" );
+	if( self->fieldCount ) {
+		self->gAnalyticSq = Memory_Alloc_2DArray( double, self->fieldCount, 3, "global reference solution squared" );
+		self->gErrorSq 	  = Memory_Alloc_2DArray( double, self->fieldCount, 3, "global L2 error squared" );
+		self->gError	  = Memory_Alloc_2DArray( double, self->fieldCount, 3, "global L2 error" );
+		self->gErrorNorm  = Memory_Alloc_2DArray( double, self->fieldCount, 3, "global L2 error normalised" );
 
-	if( !self->referenceSolnFromFile ) {
-		self->analyticSolnForFeVarKey = Memory_Alloc_Array( unsigned, self->fieldCount, 
+		if( !self->referenceSolnFromFile ) {
+			self->analyticSolnForFeVarKey = Memory_Alloc_Array( unsigned, self->fieldCount, 
 								    "analytic solution index for ith feVariable" );
-		self->_analyticSolutionList = Memory_Alloc_Array_Unnamed( FieldTest_AnalyticSolutionFunc*, self->fieldCount );
+			self->_analyticSolutionList = Memory_Alloc_Array_Unnamed( FieldTest_AnalyticSolutionFunc*, self->fieldCount );
+		}
 	}
 }
 
@@ -298,9 +304,9 @@ void _FieldTest_Initialise( void* fieldTest, void* data ) {
 
 		fscanf( expected_fp, "%d %d", &self->expectedDofs, &num_time_steps );
 	
-		self->expected  = Memory_Alloc_Array_Unnamed( Event, num_time_steps );
-		self->numeric   = Memory_Alloc_Array_Unnamed( Event, self->context->maxTimeSteps );
-		self->tolerance = Memory_Alloc_Array_Unnamed( Event, num_time_steps );
+		self->expected  = Memory_Alloc_Array_Unnamed( Event, num_time_steps + 1 );
+		self->numeric   = Memory_Alloc_Array_Unnamed( Event, self->context->maxTimeSteps + 1 );
+		self->tolerance = Memory_Alloc_Array_Unnamed( Event, num_time_steps + 1 );
 
 		while ( !feof( expected_fp ) ) {
 			fscanf( expected_fp, "%lf ", &self->expected[expected_i].time );
@@ -805,13 +811,20 @@ void FieldTest_EvaluatePhysicsTest( void* _context, void* data ) {
 		sprintf( dumpExpectedFileName, "%s%s.out", self->expectedFilePath, self->dumpExpectedFileName );
 		dumpExpectedFilePtr = fopen( dumpExpectedFileName, "a" );
 
-		fprintf( dumpExpectedFilePtr, "%.8e ", self->expected[context->timeStep].time );
+		fprintf( dumpExpectedFilePtr, "%.8e ", self->numeric[context->timeStep].time );
 		for( dim_i = 0; dim_i < context->dim; dim_i++ )
-			fprintf( dumpExpectedFilePtr, "%.8e ", self->expected[context->timeStep].place[dim_i] );
+			fprintf( dumpExpectedFilePtr, "%.8e ", self->numeric[context->timeStep].place[dim_i] );
 		for( dof_i = 0; dof_i < self->expectedDofs; dof_i++ )
-			fprintf( dumpExpectedFilePtr, "%.8e ", self->expected[context->timeStep].value[dof_i] );
+			fprintf( dumpExpectedFilePtr, "%.8e ", self->numeric[context->timeStep].value[dof_i] );
 
 		fprintf( dumpExpectedFilePtr, "\n" );
+
+		if( context->timeStep == context->maxTimeSteps ) {
+			if( self->expectedPass )
+				fprintf( dumpExpectedFilePtr, "test result: PASS\n" );
+			else
+				fprintf( dumpExpectedFilePtr, "test result: FAIL\n" );
+		}
 
 		Memory_Free( dumpExpectedFileName );
 		fclose( dumpExpectedFilePtr );
