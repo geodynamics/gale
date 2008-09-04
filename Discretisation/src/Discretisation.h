@@ -46,7 +46,7 @@
 ** Comments:
 **	None so far.
 **
-** $Id: Discretisation.h 1144 2008-06-04 05:59:29Z DavidLee $
+** $Id: Discretisation.h 1218 2008-09-04 06:18:44Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -86,7 +86,9 @@
 	#include "FeSwarmVariable.h"
 	#include "AnalyticSolution.h"
 	#include "FieldTest.h"
-	
+
+	#include "FunctionSuite.h"
+
 	#include "Init.h"
 	#include "Finalise.h"
 
