@@ -115,7 +115,8 @@ void StgFEM_FeVariableList_PrintVariables( void* _context ){
         FieldVariable_Register* fV_Register;
         Index                   variablecount;
         Index                   countindex;
-        Index                   columnWidth     = 40;
+        Index                   columnWidth1     = 70;
+        Index                   columnWidth2     = 30;
         
         StgFEM_FeVariableList* self   = (StgFEM_FeVariableList*)LiveComponentRegister_Get( 
                                                                         context->CF->LCRegister, 
@@ -128,17 +129,17 @@ void StgFEM_FeVariableList_PrintVariables( void* _context ){
         
         /* Print header material */
         Journal_Printf( stream, "\n");
-        Journal_PrintString_WithLength( stream, "FeVariable", columnWidth );
-        Journal_PrintString_WithLength( stream, "FeVariableType", columnWidth );
+        Journal_PrintString_WithLength( stream, "FeVariable", columnWidth1 );
+        Journal_PrintString_WithLength( stream, "FeVariableType", columnWidth2 );
         Journal_Printf( stream, "\n");
-        Journal_PrintString_WithLength( stream, "------------------------", columnWidth );
-        Journal_PrintString_WithLength( stream, "------------------------", columnWidth );
+        Journal_PrintString_WithLength( stream, "------------------------", columnWidth1 );
+        Journal_PrintString_WithLength( stream, "------------------------", columnWidth2 );
         Journal_Printf( stream, "\n");  
         
         /* Print Variables */
         for(countindex = 1; countindex <= variablecount; ++countindex){
-                Journal_PrintString_WithLength( stream, fV_Register->objects->data[ countindex - 1 ]->name, columnWidth );
-                Journal_PrintString_WithLength( stream, fV_Register->objects->data[ countindex - 1 ]->type, columnWidth );
+                Journal_PrintString_WithLength( stream, fV_Register->objects->data[ countindex - 1 ]->name, columnWidth1 );
+                Journal_PrintString_WithLength( stream, fV_Register->objects->data[ countindex - 1 ]->type, columnWidth2 );
                 Journal_Printf( stream, "\n");
         }
         Journal_Printf( stream, "\n");
