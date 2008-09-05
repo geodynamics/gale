@@ -151,7 +151,7 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 	FieldTest* 			self 			= (FieldTest*)fieldTest;
 	Dictionary*			dict			= cf->rootDict;
 	Dictionary_Entry_Value*		dictEntryVal		= Dictionary_Get( dict, "pluginData" );
-	Dictionary_Entry_Value*		pluginDict		= Dictionary_Entry_Value_AsDictionary( dictEntryVal );
+	Dictionary*		pluginDict  =  Dictionary_Entry_Value_AsDictionary( dictEntryVal );
 	Dictionary_Entry_Value*		fieldList;
 	Dictionary_Entry_Value*		swarmVarList		= Dictionary_Get( dict, "NumericSwarmVariableNames" );
 	FieldVariable_Register* 	fV_Register     	= Stg_ObjectList_Get( cf->registerRegister, "FieldVariable_Register" );
@@ -184,9 +184,9 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 		}
 	}
 
-	self->integrationSwarm 	= LiveComponentRegister_Get( cf->LCRegister, Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "IntegrationSwarm" ) ) );
-	self->constantMesh     	= LiveComponentRegister_Get( cf->LCRegister, Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "ConstantMesh"     ) ) );
-	self->elementMesh      	= LiveComponentRegister_Get( cf->LCRegister, Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "ElementMesh"      ) ) );
+	self->integrationSwarm 	= (Swarm*)LiveComponentRegister_Get( cf->LCRegister, Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "IntegrationSwarm" ) ) );
+	self->constantMesh     	= (FeMesh*)LiveComponentRegister_Get( cf->LCRegister, Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "ConstantMesh"     ) ) );
+	self->elementMesh      	= (FeMesh*)LiveComponentRegister_Get( cf->LCRegister, Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "ElementMesh"      ) ) );
 
 	self->swarmVarCount = swarmVarList ? Dictionary_Entry_Value_GetCount( swarmVarList ) : 0;
 	if( self->swarmVarCount ) {
@@ -199,11 +199,12 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 		}	
 	}
 	
-	self->referenceSolnPath		= Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "referenceSolutionFilePath" ) );
-	self->normalise			= Dictionary_Entry_Value_AsBool( Dictionary_Get( pluginDict, "normaliseByReferenceSolution" ) );
-	self->epsilon			= Dictionary_Entry_Value_AsDouble( Dictionary_Get( pluginDict, "epsilon" ) );
-	self->referenceSolnFromFile	= Dictionary_Entry_Value_AsBool( Dictionary_Get( pluginDict, "useReferenceSolutionFromFile" ) );
-	self->context			= Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
+	self->referenceSolnPath     = Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "referenceSolutionFilePath" ) );
+	self->normalise             = Dictionary_Entry_Value_AsBool( Dictionary_Get( pluginDict, "normaliseByReferenceSolution" ) );
+	self->epsilon               = Dictionary_Entry_Value_AsDouble( Dictionary_Get( pluginDict, "epsilon" ) );
+	self->referenceSolnFromFile = Dictionary_Entry_Value_AsBool( Dictionary_Get( pluginDict, "useReferenceSolutionFromFile" ) );
+	self->appendToAnalysisFile  = Dictionary_GetBool_WithDefault( pluginDict, "appendToAnalysisFile", False ) ;
+	self->context               = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
 
 	/* for the physics test */
 	self->expectedFileName = Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "expectedFileName" ) );
@@ -296,7 +297,8 @@ void _FieldTest_Initialise( void* fieldTest, void* data ) {
 			FieldTest_CalculateAnalyticSolutionForField( self, field_I );
 	}
 
-	if( strlen(self->expectedFileName) > 1 ) {
+	if( strlen(self->expectedFileName) > 1 && strcmp( self->expectedFileName, "false" ) ) {
+		/* if the self->expectedFileName == False then don't go here */
 		expectedFilename = Memory_Alloc_Array_Unnamed( char, strlen(self->expectedFilePath) + strlen(self->expectedFileName) + 1 );
 		sprintf( expectedFilename, "%s%s", self->expectedFilePath, self->expectedFileName );
 
@@ -792,6 +794,38 @@ void FieldTest_LoadReferenceSolutionFromFile( FeVariable* feVariable, Name refer
 #endif
 }
 
+void _FieldTest_DumpToAnalysisFile( FieldTest* self, Stream* analysisStream ) {
+	int field_I, lMeshSize, numDofs, dim, dof_I;
+	double error;
+	FeVariable* errorField;
+	for( field_I = 0; field_I < self->fieldCount; field_I++ ) {
+		/* should be using MT_VOLUME for the reference field mesh, but seems to have a bug */
+		lMeshSize  = Mesh_GetLocalSize( self->constantMesh, MT_VERTEX );
+		errorField = self->errorFieldList[field_I];
+		numDofs	   = self->numericFieldList[field_I]->fieldComponentCount;
+		dim = self->numericFieldList[field_I]->dim;
+
+#if 0
+		/* Fancy error measurements of magnitudes and 2ndInvars, no needed
+		 * but I'm leaving it in incase */
+		if( dim == numDofs ) {
+			/* It's a vector */
+			error = StGermain_VectorMagnitude( self->gErrorNorm[field_I], dim );
+		} else if ( numDofs > self->numericFieldList[field_I]->dim ) {
+			/* Assume it's a symmetric tensor */
+			error = SymmetricTensor_2ndInvariant( self->gErrorNorm[field_I], dim );	
+		} else {
+			/* It's a scalar */
+			error = self->gErrorNorm[field_I][0];
+		}
+		Journal_Printf( analysisStream, "%.8e ", error );
+#endif
+		for( dof_I = 0; dof_I < numDofs; dof_I++ ) 
+			Journal_RPrintf( analysisStream, "%.8e ", self->gErrorNorm[field_I][dof_I] );
+
+	}
+}
+
 /* by default, success of the physics test is set to false. this is reset if the test passes */
 void FieldTest_EvaluatePhysicsTest( void* _context, void* data ) {
 	DomainContext*			context			= (DomainContext*)_context;
@@ -849,8 +883,32 @@ void FieldTest_GenerateErrFields( void* _context, void* data ) {
 	Index			expected_I;
 	Bool			pass;
 	double			numericTestResult;
+	Stream*     analysisStream;
 	double			eps			= self->epsilon;
 	
+	if( self->appendToAnalysisFile ) {
+		/* append (or create if not found ) a file to report results */
+		double length, elementResI;
+		char* filename;
+		analysisStream = Journal_Register( Info_Type, self->type );
+		Stg_asprintf( &filename, "%s-analysis.dat", self->name );
+		Stream_AppendFile( analysisStream, filename );
+		Memory_Free( filename );
+
+		/* write heading names in file */
+		Journal_RPrintf( analysisStream, "#Res ");
+		for(field_I = 0 ; field_I < self->fieldCount ; field_I++ ) {
+			numDofs = self->numericFieldList[field_I]->fieldComponentCount;
+			for( dof_I = 0; dof_I < numDofs; dof_I++ ) {
+				Journal_RPrintf( analysisStream, "%s%d ", self->numericFieldList[field_I]->name, dof_I+1 );
+			}
+		}
+		length = Dictionary_GetDouble( context->CF->rootDict, "maxX" ) - Dictionary_GetDouble( context->CF->rootDict, "minX" ) ;
+		elementResI = Dictionary_GetInt( context->CF->rootDict, "elementResI" );
+		/* assume square resolution */
+		Journal_RPrintf( analysisStream, "\n%e ", length/elementResI );
+	}
+
 	for( field_I = 0; field_I < self->fieldCount; field_I++ ) {
 		/* should be using MT_VOLUME for the reference field mesh, but seems to have a bug */
 		lMeshSize  = Mesh_GetLocalSize( self->constantMesh, MT_VERTEX );
@@ -896,14 +954,24 @@ void FieldTest_GenerateErrFields( void* _context, void* data ) {
 			self->gErrorSq[field_I][dof_I]    = gErrorSq[dof_I];
 			self->gErrorNorm[field_I][dof_I]  = sqrt( gErrorSq[dof_I] / gAnalyticSq[dof_I] );
 
-			if( normalise )
-				Journal_Printf( context->info, "%s - dof %d normalised global error: %.8e\n", 
+			if( normalise ) {
+				Journal_RPrintf( context->info, "%s - dof %d normalised global error: %.8e\n", 
 				     	self->numericFieldList[field_I]->name, dof_I, self->gErrorNorm[field_I][dof_I] );
-			else
-				Journal_Printf( context->info, "%s - dof %d global error: %.8e\n",
+			}
+			else {
+				Journal_RPrintf( context->info, "%s - dof %d global error: %.8e\n",
 					self->numericFieldList[field_I]->name, dof_I, sqrt( self->gErrorSq[field_I][dof_I] ) );
+			}
 		}
 	}
+
+	if( self->appendToAnalysisFile ) {
+		_FieldTest_DumpToAnalysisFile( self, analysisStream );
+		Journal_RPrintf( analysisStream, "\n" );
+		Stream_CloseAndFreeFile( analysisStream );
+	}
+
+
 }
 
 void FieldTest_ElementErrReferenceFromField( void* fieldTest, Index field_I, Index lElement_I, double* elErrorSq, double* elNormSq ) {

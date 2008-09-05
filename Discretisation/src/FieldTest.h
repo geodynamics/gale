@@ -109,6 +109,7 @@
 		Event*					tolerance;		\
 		Bool					expectedPass;		\
 		Name					dumpExpectedFileName;	\
+		Bool            appendToAnalysisFile;		\
 		
 
 	/** Brings together and manages the life-cycle of a a mesh and all the 
