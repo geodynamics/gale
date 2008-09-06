@@ -789,12 +789,6 @@ void _PCDVC_Calculate3D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
 
 	nump_orig = nump = cParticleCount = intSwarm->cellParticleCountTbl[lCell_I];
 
-	/* need a struct for the deletList because we must sort it by indexOnCPU and delete in reverse order
-           so we don't have the potential problem of  deleting a particle from the list that points to the last particle on the swarm */
-	deleteList = (struct deleteParticle*)malloc(nump*sizeof(struct deleteParticle));/* I don't think I am going to let you delete more than half the particles in a given cell */
-	splitList  = (Particle_Index*)malloc(nump*sizeof(Particle_Index));
-
-
 	Journal_Firewall( nump , Journal_Register(Error_Type, "PCDVC"), "Error in %s: Problem has an under resolved cell (Cell Id = %d), add more particles to your model\n", __func__, lCell_I );
 
 	dx = (BBXMAX - BBXMIN)/numx;
@@ -1035,6 +1029,10 @@ void _PCDVC_Calculate3D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
 		    break;
 	      }
 	}
+	/* need a struct for the deletList because we must sort it by indexOnCPU and delete in reverse order
+           so we don't have the potential problem of  deleting a particle from the list that points to the last particle on the swarm */
+	deleteList = (struct deleteParticle*)malloc(nump*sizeof(struct deleteParticle));/* I don't think I am going to let you delete more than half the particles in a given cell */
+	splitList  = (Particle_Index*)malloc(nump*sizeof(Particle_Index));
 	for(i=0;i<nump;i++){
 	      if(pList[i].w > maxW){ /* maxW = pList[i].w; maxI = i;*/ splitList[splitCount] = i; splitCount++;}
 	      if(pList[i].w < minW){
