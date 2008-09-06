@@ -891,7 +891,7 @@ void _PCDVC_Calculate3D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
 	      // Add a random number of new particles...
 	      // But Need to add them where they are needed. 
 	      for(i=0;i<ParticlesPerCell;i++){
-		    j  =  (int) ( numx*numy * (rand() / (RAND_MAX + 1.0)));
+		    j  =  (int) ( numx*numy*numz * (rand() / (RAND_MAX + 1.0)));
 		    xi[0] = cells[ j ].x;
 		    xi[1] = cells[ j ].y;
 		    xi[2] = cells[ j ].z;
