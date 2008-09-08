@@ -21,7 +21,7 @@
 	
 		<struct name="layersParticleDeviatoricStress">
 			<param name="Type">FeSwarmVariable</param>
-			<param name="FeVariable">recoveredTauInvariantField</param>
+			<param name="FeVariable">recoveredSigmaInvariantField</param>
 			<param name="Swarm">materialSwarm</param>
 		</struct>
 		

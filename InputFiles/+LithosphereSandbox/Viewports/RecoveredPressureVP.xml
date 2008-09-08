@@ -21,74 +21,77 @@
 	
 		<struct name="layersParticlePressure">
 			<param name="Type">FeSwarmVariable</param>
+			<param name="FeVariable">PressureField</param>
+			<param name="Swarm">materialSwarm</param>
+		</struct>
+		
+		<struct name="layersParticleRecoveredPressure">
+			<param name="Type">FeSwarmVariable</param>
 			<param name="FeVariable">recoveredPressureField</param>
 			<param name="Swarm">materialSwarm</param>
 		</struct>
 		
-		<struct name="pressureLayers-UpperCrust">
+		
+		<struct name="pressureLayers-MantleColourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours"> #440000 #FF6600 #FFFF00 </param>
+			<param name="dynamicRange">False</param>
+			<param name="minimum">0</param>
+			<param name="maximum">10</param>
+		</struct>
+		
+		<struct name="pressureLayers-CrustColourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours"> #1807a9 #390afe #50a1ff #ace0ff </param>
+			<param name="dynamicRange">True</param>
+			<param name="minimum">0</param>
+			<param name="maximum">10</param>
+		</struct>
+		
+		<struct name="pressureLayers-CrustColourBar">
+			<param name="Type">lucColourBar</param>
+			<param name="ColourMap">pressureLayers-CrustColourMap</param>
+		</struct>
+
+
+		<struct name="pressureLayers-MantleColourBar">
+			<param name="Type">lucColourBar</param>
+			<param name="ColourMap">pressureLayers-MantleColourMap</param>
+		</struct>
+		
+		
+		
+		
+		<struct name="pressureLayers-Crust">
 			<param name="Type">lucSwarmViewer</param>
 			<param name="Swarm">materialSwarm</param>
 			<param name="ColourVariable">layersParticlePressure</param>
-			<param name="ColourMap">UpperCrustColourMap</param>
+			<param name="ColourMap">pressureLayers-CrustColourMap</param>
 			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
 			<param name="maskType">EqualTo</param>
-			<param name="maskValue">4.5</param>
+			<param name="maskValue">4.0</param>
+			<param name="maskTolerance">1.1</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+
+		<struct name="pressureLayers-Mantle">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">layersParticlePressure</param>
+			<param name="ColourMap">pressureLayers-MantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">1.5</param>
 			<param name="maskTolerance">0.6</param>
 			<param name="pointSize">1.0</param>
-			<param name="positionRange">True</param>
-			<param name="minPositionX">-10</param>
-			<param name="maxPositionX">10</param>
-			<param name="minPositionY">-10</param>
-			<param name="maxPositionY">10</param>
-			<param name="minPositionZ">-10</param>
-			<param name="maxPositionZ">10</param>
-		</struct>
-
-		<struct name="pressureLayers-HalfUpperCrustX">
-			<param name="Type">lucSwarmViewer</param>
-			<param name="Swarm">materialSwarm</param>
-			<param name="ColourVariable">layersParticlePressure</param>
-			<param name="ColourMap">UpperCrustColourMap</param>
-			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
-			<param name="maskType">EqualTo</param>
-			<param name="maskValue">5.0</param>
-			<param name="pointSize">1.0</param>
-			<param name="positionRange">True</param>
-			<param name="minPositionX">-10</param>
-			<param name="maxPositionX">0.0</param>
-			<param name="minPositionY">-10</param>
-			<param name="maxPositionY">10</param>
-			<param name="minPositionZ">-10</param>
-			<param name="maxPositionZ">10</param>
-		</struct>
-
-		<struct name="pressureLayers-HalfUpperCrustZ">
-			<param name="Type">lucSwarmViewer</param>
-			<param name="Swarm">materialSwarm</param>
-			<param name="ColourVariable">layersParticlePressure</param>
-			<param name="ColourMap">UpperCrustColourMap</param>
-			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
-			<param name="maskType">EqualTo</param>
-			<param name="maskValue">5.0</param>
-			<param name="pointSize">1.0</param>
-			<param name="positionRange">True</param>
-			<param name="minPositionX">-10</param>
-			<param name="maxPositionX">10</param>
-			<param name="minPositionY">-10</param>
-			<param name="maxPositionY">10</param>
-			<param name="minPositionZ">-10</param>
-			<param name="maxPositionZ">0.0</param>
-		</struct>
-
-		<struct name="pressureLayers-LowerCrust">
-			<param name="Type">lucSwarmViewer</param>
-			<param name="Swarm">materialSwarm</param>
-			<param name="ColourVariable">layersParticlePressure</param>
-			<param name="ColourMap">LowerCrustColourMap</param>
-			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
-			<param name="maskType">EqualTo</param>
-			<param name="maskValue">4.0</param>
-			<param name="pointSize">1.0</param>
 			<param name="positionRange">False</param>
 			<param name="minPositionX">-10</param>
 			<param name="maxPositionX">10</param>
@@ -98,88 +101,76 @@
 			<param name="maxPositionZ">10</param>
 		</struct>
 
-		<struct name="pressureLayers-HalfLowerCrustX">
-			<param name="Type">lucSwarmViewer</param>
-			<param name="Swarm">materialSwarm</param>
-			<param name="ColourVariable">layersParticlePressure</param>
-			<param name="ColourMap">LowerCrustColourMap</param>
-			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
-			<param name="maskType">EqualTo</param>
-			<param name="maskValue">4.0</param>
-			<param name="pointSize">1.0</param>
-			<param name="positionRange">True</param>
-			<param name="minPositionX">-10</param>
-			<param name="maxPositionX">0.0</param>
-			<param name="minPositionY">-10</param>
-			<param name="maxPositionY">10</param>
-			<param name="minPositionZ">-10</param>
-			<param name="maxPositionZ">10</param>
-		</struct>
-
-		<struct name="pressureLayers-HalfLowerCrustZ">
-			<param name="Type">lucSwarmViewer</param>
-			<param name="Swarm">materialSwarm</param>
-			<param name="ColourVariable">layersParticlePressure</param>
-			<param name="ColourMap">LowerCrustColourMap</param>
-			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
-			<param name="maskType">EqualTo</param>
-			<param name="maskValue">4.0</param>
-			<param name="pointSize">1.0</param>
-			<param name="positionRange">True</param>
-			<param name="minPositionX">-10</param>
-			<param name="maxPositionX">10</param>
-			<param name="minPositionY">-10</param>
-			<param name="maxPositionY">10</param>
-			<param name="minPositionZ">-10</param>
-			<param name="maxPositionZ">0.0</param>
-		</struct>
-
-
-
-		<struct name="pressureLayers-MantleBaseLayer">
-			<param name="Type">lucSwarmViewer</param>
-			<param name="Swarm">materialSwarm</param>
-			<param name="ColourVariable">layersParticlePressure</param>
-			<param name="ColourMap">LowerMantleColourMap</param>
-			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
-			<param name="maskType">EqualTo</param>
-			<param name="maskValue">1.0</param>
-			<param name="pointSize">1.0</param>
-			<param name="positionRange">False</param>
-			<param name="minPositionX">-10</param>
-			<param name="maxPositionX">10</param>
-			<param name="minPositionY">-10</param>
-			<param name="maxPositionY">10</param>
-			<param name="minPositionZ">-10</param>
-			<param name="maxPositionZ">10</param>
-		</struct>
-
-		<struct name="pressureLayers-MantleUpperLayer">
-			<param name="Type">lucSwarmViewer</param>
-			<param name="Swarm">materialSwarm</param>
-			<param name="ColourVariable">layersParticlePressure</param>
-			<param name="ColourMap">UpperMantleColourMap</param>
-			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
-			<param name="maskType">EqualTo</param>
-			<param name="maskValue">2.0</param>
-			<param name="pointSize">1.0</param>
-			<param name="positionRange">False</param>
-			<param name="minPositionX">-10</param>
-			<param name="maxPositionX">0.5</param>
-			<param name="minPositionY">0.1</param>
-			<param name="maxPositionY">10</param>
-			<param name="minPositionZ">-10</param>
-			<param name="maxPositionZ">0.5</param>
-		</struct>
 
 		<struct name="pressureLayers-Air">
 			<param name="Type">lucSwarmViewer</param>
 			<param name="Swarm">materialSwarm</param>
 			<param name="ColourVariable">layersParticlePressure</param>
+			<param name="ColourMap">pressureLayers-CrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">0.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+		
+		
+
+		<struct name="recoveredPressureLayers-Crust">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">layersParticleRecoveredPressure</param>
+			<param name="ColourMap">pressureLayers-CrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">4.0</param>
+			<param name="maskTolerance">1.1</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+
+		<struct name="recoveredPressureLayers-Mantle">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">layersParticleRecoveredPressure</param>
+			<param name="ColourMap">pressureLayers-MantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">1.5</param>
+			<param name="maskTolerance">0.6</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">False</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+
+		<struct name="recoveredPressureLayers-Air">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">layersParticleRecoveredPressure</param>
 			<param name="ColourMap">UpperCrustColourMap</param>
 			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
 			<param name="maskType">EqualTo</param>
-			<param name="maskValue">5.0</param>
+			<param name="maskTolerance">0.5</param>
+			<param name="maskValue">0.0</param>
 			<param name="pointSize">1.0</param>
 			<param name="positionRange">True</param>
 			<param name="minPositionX">-10</param>
@@ -192,32 +183,43 @@
 
 
 
+
 		<struct name="pressureLayersPerspectiveVP1">
 			<param name="Type">lucViewport</param>
-			<param name="Camera">lithosphereSandboxPerspectiveViewCamera1</param>
+			<param name="Camera">lithosphereSandboxPerspectiveViewCamera2</param>
 			<param name="compositeEachObject">true</param>
 			<list name="DrawingObject">
-				<param> pressureLayers-UpperCrust </param>
-				<param> pressureLayers-LowerCrust </param>
-				<param> pressureLayers-MantleBaseLayer </param>
-				<param> pressureLayers-MantleUpperLayer </param>
+				<param> pressureLayers-Crust </param>
+				<param> pressureLayers-Mantle </param>
 				<param>Boxborder</param>
-				<param>UpperCrustColourBar</param>
+				<param>pressureLayers-CrustColourBar</param>
 			</list>
 		</struct>
 
+		<struct name="recoveredPressureLayersPerspectiveVP1">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">lithosphereSandboxPerspectiveViewCamera2</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<param> recoveredPressureLayers-Crust </param>
+				<param> recoveredPressureLayers-Mantle </param>
+				<param>Boxborder</param>
+				<param>pressureLayers-MantleColourBar</param>
+			</list>
+		</struct>
 
 		
 		<struct name="pressureLayersWindow">
 	        <param name="Type">lucDefaultWindow</param>
 	        <param name="RenderingEngine">RenderingEngine</param>
 			<param name="OutputFormat">PNGOutput</param>
-			<param name="height">592</param>
+			<param name="height">1184</param>
 			<param name="width">800</param>
 			<param name="interactive">f</param>
 			<param name="backgroundColour">White</param>
 			<list name="Viewport">
 				<param> pressureLayersPerspectiveVP1 </param>
+				<param> recoveredPressureLayersPerspectiveVP1 </param>
 			</list>
 		</struct>
 

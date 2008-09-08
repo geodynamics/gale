@@ -105,7 +105,7 @@
 	       		<param name="density">LowerCrustDefaultDensity</param>
 			<list name="Rheology">
 				<param>LowerCrustViscosity</param>
-				<param>LowerCrustYielding</param>
+				<param>LowerCrustYielding</param> 
 			</list>
 		</struct>
 			
@@ -117,7 +117,7 @@
 	       		<param name="density">UpperCrustDefaultDensity</param>
 			<list name="Rheology">
 				<param>UpperCrustViscosity</param>
-				<param>UpperCrustYielding</param>
+				<param>UpperCrustYielding</param> 
 			</list>
 		</struct>
 

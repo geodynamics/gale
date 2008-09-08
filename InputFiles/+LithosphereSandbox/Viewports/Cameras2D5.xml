@@ -10,24 +10,6 @@
 	<struct name="components" mergeType="merge">
 
 
-	<!--
-	<struct name="light1">
-		<param name="Type">lucLight</param>
-			<param name="posX">0 </param>
-			<param name="posY">3.33</param>
-			<param name="posZ">0.1 </param>
-			<param name="posW">0.0 </param>
-			<param name="model"> Ambient </param>
-			<param name="ambX">0 </param>
-			<param name="ambY">3.33</param>
-			<param name="ambZ">0.1 </param>
-			<param name="ambW">0.0 </param>
-			<param name="ambW">0.0 </param>
-		 	<param name="ambW">0.0 </param>
-	
-	</struct>
-	-->
-
 		<!-- setting up several default camera angles -->
 		
 		
@@ -99,19 +81,19 @@
 		</struct>	
 
 		<struct name="lithosphereSandboxPerspectiveViewCamera2">
-		        <param name="Type">lucCamera</param>
-		        <param name="coordX">0.0</param>
-		    	<param name="coordY">2.5</param>
-		        <param name="coordZ">3.8</param>
-		        <param name="focalPointX">0.0</param>
-		        <param name="focalPointY">0.5</param>
-		        <param name="focalPointZ">0.0</param>
-		        <param name="upDirectionX">0</param>
-		        <param name="upDirectionY">1</param>
-		        <param name="upDirectionZ">0</param>
-		        <param name="stereoType">Mono</param>
-		        <param name="eyeSeparation">0.2</param>
-		        <param name="focalLength">0</param>
+			<param name="Type">lucCamera</param>
+			<param name="coordX"> 0 </param>
+			<param name="coordY"> 3.7 </param>
+			<param name="coordZ">-3.0 </param>
+			<param name="focalPointX">0.0 </param>
+			<param name="focalPointY">0.2 </param>
+			<param name="focalPointZ">0.0 </param>
+			<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+			<param name="stereoType">Mono</param>
+			<param name="eyeSeparation">0.2</param>
+			<param name="focalLength">0</param>
 		</struct>	
 
 		<struct name="lithosphereSandboxPerspectiveViewCamera3">

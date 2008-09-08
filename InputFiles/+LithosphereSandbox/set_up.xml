@@ -44,12 +44,12 @@
 	     <param name="elementResJ"> 10 </param>
 	     <param name="elementResK"> 20 </param>
 	<param name="shadowDepth"> 1 </param>
-	<param name="minX"> 0.0 </param>
+	<param name="minX"> -1.0 </param>
 	<param name="minY"> 0.0 </param>
-	<param name="minZ"> 0.0 </param>
-	<param name="maxX"> 2.0 </param>
+	<param name="minZ"> -1.0 </param>
+	<param name="maxX"> 1.0 </param>
 	<param name="maxY"> 1.0 </param>
-	<param name="maxZ"> 2.0 </param>
+	<param name="maxZ"> 1.0 </param>
 	<param name="allowUnbalancing"> True </param>
 
 	<param name="particlesPerCell"> 16 </param>

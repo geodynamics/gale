@@ -403,27 +403,9 @@
 
 <!-- Strain rate block/s -->
 
-		<struct name="strainRateLayers-PerspectiveViewCamera2">
-			<param name="Type">lucCamera</param>
-			<param name="coordX"> 0 </param>
-			<param name="coordY"> 2.7 </param>
-			<param name="coordZ">-2.4 </param>
-			<param name="focalPointX">0.0 </param>
-			<param name="focalPointY">0.2 </param>
-			<param name="focalPointZ">0.0 </param>
-			<param name="upDirectionX">0</param>
-			<param name="upDirectionY">1</param>
-			<param name="upDirectionZ">0</param>
-			<param name="stereoType">Mono</param>
-			<param name="eyeSeparation">0.2</param>
-			<param name="focalLength">0</param>
-		</struct>
-		
-
-
 		<struct name="strainRateLayersPerspectiveVP1">
 			<param name="Type">lucViewport</param>
-			<param name="Camera">strainRateLayers-PerspectiveViewCamera2</param>
+			<param name="Camera">lithosphereSandboxPerspectiveViewCamera2</param>
 			<param name="compositeEachObject">true</param>
 			<list name="DrawingObject">
 				<param> strainRateLayers-UpperCrust1</param>
@@ -436,11 +418,10 @@
 		 		<param> strainRateLayers-UpperCrustColourBar</param>
 			</list>
 		</struct>
-
 					
 		<struct name="strainRateLayersBlocksPerspectiveVP1">
 			<param name="Type">lucViewport</param>
-			<param name="Camera">strainRateLayers-PerspectiveViewCamera2</param>
+			<param name="Camera">lithosphereSandboxPerspectiveViewCamera2</param>
 			<param name="compositeEachObject">true</param>
 			<list name="DrawingObject">
 				<param> strainRateLayers-CrustBlock1</param>

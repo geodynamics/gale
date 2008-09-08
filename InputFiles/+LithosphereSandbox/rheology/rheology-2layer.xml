@@ -60,8 +60,9 @@
 			<param name="dontUpdate">True</param>
 		</struct>
 		<struct name="UpperCrustYielding">
-			<param name="Type">FaultingMoresiMuhlhaus2006</param>
-			<param name="PressureField">PressureField</param>
+		<!--	<param name="Type">FaultingMoresiMuhlhaus2006</param>-->
+			<param name="Type">DruckerPrager</param>
+			<param name="PressureField">recoveredPressureField</param>
 			<param name="VelocityGradientsField">VelocityGradientsField</param>
 			<param name="StrainRateField">StrainRateField</param>
 			<param name="MaterialPointsSwarm">materialSwarm</param>
@@ -75,6 +76,7 @@
 			<param name="minimumYieldStress">crustMinimumYieldStress</param>
 			<param name="ignoreOldOrientation">false</param>
 		</struct>
+		
 		<struct name="LowerCrustYielding">
 			<param name="Type">FaultingMoresiMuhlhaus2006</param>
 			<param name="PressureField">PressureField</param>
