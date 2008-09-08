@@ -62,9 +62,10 @@
 		<struct name="UpperCrustYielding">
 		<!--	<param name="Type">FaultingMoresiMuhlhaus2006</param>-->
 			<param name="Type">DruckerPrager</param>
-			<param name="PressureField">recoveredPressureField</param>
+			<param name="PressureField">PressureField</param>
 			<param name="VelocityGradientsField">VelocityGradientsField</param>
-			<param name="StrainRateField">StrainRateField</param>
+			<param name="StrainRateField">StrainRateField</param> 
+		<!--<param name="StrainRateField">recoveredStrainRate</param> -->
 			<param name="MaterialPointsSwarm">materialSwarm</param>
 			<param name="Director">director</param>
 			<param name="Context">context</param>
@@ -78,10 +79,12 @@
 		</struct>
 		
 		<struct name="LowerCrustYielding">
-			<param name="Type">FaultingMoresiMuhlhaus2006</param>
+		<!--	<param name="Type">FaultingMoresiMuhlhaus2006</param>-->
+			<param name="Type">DruckerPrager</param>
 			<param name="PressureField">PressureField</param>
 			<param name="VelocityGradientsField">VelocityGradientsField</param> <!-- ?? is this used ?? -->
-			<param name="StrainRateField">StrainRateField</param>
+			<param name="StrainRateField">StrainRateField</param> 
+			<!--<param name="StrainRateField">recoveredStrainRate</param> -->
 			<param name="MaterialPointsSwarm">materialSwarm</param>
 			<param name="Director">director</param>
 			<param name="Context">context</param>

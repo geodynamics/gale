@@ -9,7 +9,7 @@
 		<!-- Shape Stuff -->
 		<struct name="backgroundShape">
 			<param name="Type">Everywhere</param>
-		</struct>	
+		</struct>
 		
 		<struct name="LowerMantleShape1">
 			<param name="Type">Box</param>
@@ -70,11 +70,15 @@
 
 
 		<!--Materials themselves -->
+		
 		<struct name="background"> 
 			<param name="Type">RheologyMaterial</param>
 			<param name="Shape">backgroundShape</param>
 			<param name="density">0.0</param>
-			<param name="Rheology">backgroundViscosity</param>
+			<list name="Rheology">
+				<param>backgroundViscosity</param>
+				<param>storeViscosity</param>
+			</list>
 		</struct>
 		
 		<struct name="LowerMantle"> 
@@ -83,8 +87,12 @@
 				<param>LowerMantleShape1</param>
 			</list>
 			<param name="density">1.1</param>
+			
 			<!-- Rheology Stuff -->
-			<param name="Rheology">LowerMantleViscosity</param>
+			<list name="Rheology">
+				<param>LowerMantleViscosity</param>
+				<param>storeViscosity</param>
+			</list>
 		</struct>
 
 		<struct name="UpperMantle"> 
@@ -94,7 +102,11 @@
 			</list>
 			<param name="density">1.1</param>
 			<!-- Rheology Stuff -->
-			<param name="Rheology">LowerMantleViscosity</param>
+			<list name="Rheology">
+				<param>LowerMantleViscosity</param>
+				<param>storeViscosity</param>	
+			</list>
+	
 		</struct>
 
 		<struct name="LowerCrust">
@@ -102,10 +114,13 @@
 			<list name="Shape">
 				<param>LowerCrustShape1</param>
 			</list>
-	       		<param name="density">LowerCrustDefaultDensity</param>
+			
+	       	<param name="density">LowerCrustDefaultDensity</param>
+	
 			<list name="Rheology">
-				<param>LowerCrustViscosity</param>
-				<param>LowerCrustYielding</param> 
+				<param>LowerCrustViscosity	</param>
+				<param>LowerCrustYielding	</param>
+				<param>storeViscosity		</param>
 			</list>
 		</struct>
 			
@@ -114,10 +129,13 @@
 			<list name="Shape">
 				<param>UpperCrustShape1</param>
 			</list>
-	       		<param name="density">UpperCrustDefaultDensity</param>
+			
+	       	<param name="density">UpperCrustDefaultDensity</param>
+			
 			<list name="Rheology">
 				<param>UpperCrustViscosity</param>
-				<param>UpperCrustYielding</param> 
+				<param>UpperCrustYielding</param>
+				<param>storeViscosity</param>
 			</list>
 		</struct>
 
@@ -130,6 +148,7 @@
 			<list name="Rheology">
 				<param>UpperCrustViscosity</param>
 				<param>UpperCrustYielding</param>
+				<param>storeViscosity</param>
 			</list>
 		</struct>
 

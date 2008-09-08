@@ -11,7 +11,7 @@
 	 fixed before we can release this functionality
 -->		
 
-	<include> Underworld/BaseApps/ExtensionIncompressibleShearBaseApp.xml </include>
+	<include> Underworld/BaseApps/ExtensionCompressionShearQ1Q1BaseApp.xml </include>
 	<!-- ><include>ExperimentalUnderworld/REP_Setup.xml</include> -->
 	
 	

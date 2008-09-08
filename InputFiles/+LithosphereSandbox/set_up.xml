@@ -32,10 +32,8 @@
 	<param name="journal-level-branch.debug.lucDebug">2</param>
 	<param name="journal-level-branch.debug.StgFEM"> 2 </param>	
 	
-	<!-- Geometry & Mesh setup -->
-	<param name="elementMesh"> linearMesh </param>
-	<param name="velocityMesh"> linearMesh </param>
-	<param name="pressureMesh"> constantMesh </param>
+	
+	
 	<param name="dim"> 3 </param>
 	<!-- Note : for proper resolution of the problem, it is strongly recommended you run
 	     this problem in parallel, with at least 100 * 50 * 100 elements. The values below are for
@@ -56,9 +54,6 @@
 	<param name="cellParticleCount"> 16 </param>
 	<param name="seed"> 13 </param>
 
-		
-	<!-- Set up BCs and ICs -->
-	<!-- ><include> Underworld/VariableConditions/velocityBCs.extension.xml </include> <-->
 
 	<param name="Gravity">10.0</param>
 </StGermainData>
