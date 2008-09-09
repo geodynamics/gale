@@ -29,12 +29,14 @@
 	struct EulerDeform_Context {
 		unsigned		nSystems;
 		EulerDeform_System*	systems;
+		AbstractContext*        ctx;
 	};
 
 	struct EulerDeform_System {
 		Mesh*		mesh;
 		double*		verts;
 		Remesher*	remesher;
+		int             interval;
 		FieldVariable*	velField;
 		unsigned	nFields;
 		FieldVariable**	fields;

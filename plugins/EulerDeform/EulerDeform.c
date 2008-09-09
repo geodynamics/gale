@@ -101,6 +101,7 @@ void _Underworld_EulerDeform_Construct( void* component, Stg_ComponentFactory* c
 				      uwCtx, 
 				      EulerDeform_ContextHandle );
 	memset( edCtx, 0, sizeof(EulerDeform_Context) );
+	edCtx->ctx = (AbstractContext*)uwCtx;
 
 	/* Get the dictionary. */
 	edDict = Dictionary_Get( uwCtx->dictionary, "EulerDeform" );
@@ -136,6 +137,7 @@ void _Underworld_EulerDeform_Construct( void* component, Stg_ComponentFactory* c
 			if( strcmp( remesherName, "" ) )
 				sys->remesher = Stg_ComponentFactory_ConstructByName( cf, remesherName, Remesher, True, data );
 			velFieldName = Dictionary_GetString( sysDict, "velocityField" );
+			sys->interval = Dictionary_GetInt_WithDefault( sysDict, "interval", -1 );
 			sys->wrapTop = Dictionary_GetBool_WithDefault( sysDict, "wrapTop", False );
 			sys->wrapBottom = Dictionary_GetBool_WithDefault( sysDict, "wrapBottom", False );
 			sys->wrapLeft = Dictionary_GetBool_WithDefault( sysDict, "wrapLeft", False );
@@ -568,6 +570,13 @@ void EulerDeform_Remesh( TimeIntegratee* crdAdvector, EulerDeform_Context* edCtx
 		if( !sys->remesher ) {
 			continue;
 		}
+
+		/* If a remesh interval is requested, check now. */
+		if( sys->interval <= 0 || edCtx->ctx->timeStep % sys->interval > 0 ) {
+		   printf( "*** EulerDeform: Not remeshing this timestep.\n" );
+		   continue;
+		}
+		printf( "*** EulerDeform: Remeshing.\n" );
 
 		/* Store old coordinates. */
 		nDomainNodes = FeMesh_GetNodeDomainSize( sys->mesh );
