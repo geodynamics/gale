@@ -572,7 +572,7 @@ void EulerDeform_Remesh( TimeIntegratee* crdAdvector, EulerDeform_Context* edCtx
 		}
 
 		/* If a remesh interval is requested, check now. */
-		if( sys->interval <= 0 || edCtx->ctx->timeStep % sys->interval > 0 ) {
+		if( sys->interval > 0 && edCtx->ctx->timeStep % sys->interval > 0 ) {
 		   printf( "*** EulerDeform: Not remeshing this timestep.\n" );
 		   continue;
 		}
