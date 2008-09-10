@@ -13,7 +13,7 @@ class PETScExt(SConfig.Package):
                          'petscext_ksp.h', 'petscext_snes.h']]
         self.libraries = [['petscext_utils',
                            'petscext_snes', 'petscext_ksp', 'petscext_pc',
-                           'petscext_mat', 'petscext_vec']]
+                           'petscext_mat', 'petscext_vec', 'petscext_helpers']]
 
     def process_installation(self, inst):
         # Have to get the architecture using this garbage...
