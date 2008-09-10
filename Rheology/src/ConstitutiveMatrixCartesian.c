@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: ConstitutiveMatrixCartesian.c 610 2007-10-11 08:09:29Z SteveQuenette $
+** $Id: ConstitutiveMatrixCartesian.c 801 2008-09-10 15:12:12Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -250,6 +250,8 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
 	double**                Dtilda_B;
 	Index                   tensorComponents    = StGermain_nSymmetricTensorVectorComponents( dim );
 
+	self->sle = sle;
+
 	/* Set the element type */
 	elementType       = FeMesh_GetElementType( variable1->feMesh, lElement_I );
 	elementNodeCount  = elementType->nodeCount;
@@ -288,6 +290,7 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
 
 		/* Assemble Constitutive Matrix */
 		// TODO : pass in the context here?
+		self->currentParticleIndex = swarm->cellParticleTbl[cell_I][cParticle_I];
 		ConstitutiveMatrix_Assemble( constitutiveMatrix, lElement_I, particle );
 
 		/* Turn D Matrix into D~ Matrix by multiplying in the weight and the detJac (this is a shortcut for speed) */

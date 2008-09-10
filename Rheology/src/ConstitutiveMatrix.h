@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: ConstitutiveMatrix.h 618 2007-10-29 07:53:04Z RobertTurnbull $
+** $Id: ConstitutiveMatrix.h 801 2008-09-10 15:12:12Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -77,6 +77,8 @@
 		Index                                        columnSize;                        \
 		Index                                        rowSize;                           \
 		Bool                                         previousSolutionExists;            \
+		int                                          currentParticleIndex; \
+		SystemLinearEquations*                       sle;	\
 		Iteration_Index                              sleNonLinearIteration_I;
 		
 	struct ConstitutiveMatrix { __ConstitutiveMatrix };

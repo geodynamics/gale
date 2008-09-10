@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: ConstitutiveMatrix.c 610 2007-10-11 08:09:29Z SteveQuenette $
+** $Id: ConstitutiveMatrix.c 801 2008-09-10 15:12:12Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -158,7 +158,8 @@ void _ConstitutiveMatrix_Init(
 		first solve */
 		self->previousSolutionExists = False;
 	}
-	
+
+	self->sle = NULL;
 	self->sleNonLinearIteration_I = 0;
 }
 
