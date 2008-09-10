@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: FeVariable.c 1203 2008-08-13 03:58:09Z BelindaMay $
+** $Id: FeVariable.c 1224 2008-09-10 13:28:46Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -725,12 +725,11 @@ void _FeVariable_Initialise( void* variable, void* data ) {
 			 * wouldn't want to add it if using a custom one. Ignore it for now - PatrickSunter, 5 July 2007 */
 			inputPathString = StG_Strdup( self->customInputPath );
 			/* do this check here rather than leave it up to the import parsers */
-			if ( inputPathString [ strlen( inputPathString ) ] != "/" ) {
+			if ( inputPathString [ strlen( inputPathString ) ] != '/' ) {
 				char* oldString = NULL;
 
 				oldString = inputPathString;
-				inputPathString = Memory_Alloc_Array( char*, strlen( inputPathString )+2,
-					"inputPathString" );
+				inputPathString = Memory_Alloc_Array( char, strlen( inputPathString )+2, "inputPathString" );
 				sprintf( inputPathString, "%s/", oldString ); 
 				Memory_Free( oldString ); 
 			}
