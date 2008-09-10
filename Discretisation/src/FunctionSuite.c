@@ -3,6 +3,10 @@
  *
  * */
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <assert.h>
+#include <string.h>
 #include <math.h>
 #include <mpi.h>
 #include <StGermain/StGermain.h>
@@ -50,7 +54,7 @@ void StgFEM_InterpolateValue_WithNi( void* _feVariable, Element_LocalIndex lElem
 	dofCount = self->dofLayout->dofCounts[0];
 
 	/* Initialise */
-	memset( value, 0, sizeof( double ) * dofCount );
+	memset( value, 0, sizeof( double )*dofCount );
 
 	FeMesh_GetElementNodes( self->feMesh, lElement_I, self->inc );
 	nInc = IArray_GetSize( self->inc );
@@ -82,7 +86,7 @@ void StgFEM_InterpolateDerivatives_WithGNx( void* _feVariable, Element_LocalInde
 	dofCount = self->dofLayout->dofCounts[0];
 
 	/* Initialise */
-	memset( value, 0, sizeof( double ) * dofCount * dim );
+	memset( value, 0, sizeof( double )*dofCount*dim );
 
 	FeMesh_GetElementNodes( self->feMesh, lElement_I, self->inc );
 	nInc = IArray_GetSize( self->inc );
