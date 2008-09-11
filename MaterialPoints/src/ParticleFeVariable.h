@@ -71,6 +71,7 @@
 		Name                                              massMatrixName;                 \
 		ForceVector*                                      massMatrix;                     \
 		ForceTerm*                                        massMatrixForceTerm;            \
+		int                                               currentParticleIndex;           \
 		Bool                                              useDeriv;                       \
 		double**                                          GNx;
 		

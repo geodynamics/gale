@@ -38,7 +38,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: ParticleFeVariable.c 583 2008-08-19 08:03:13Z LukeHodkinson $
+** $Id: ParticleFeVariable.c 595 2008-09-11 05:26:49Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -331,6 +331,7 @@ void ParticleFeVariable_AssembleElement( void* _forceTerm, ForceVector* forceVec
 		/* Find this particle in the element */
 		particle = (IntegrationPoint*) Swarm_ParticleInCellAt( swarm, cell_I, cParticle_I );
 
+		self->currentParticleIndex = swarm->cellParticleTbl[cell_I][cParticle_I];
 		ParticleFeVariable_ValueAtParticle( self, swarm, lElement_I, particle, particleValue );
 
 		ElementType_EvaluateShapeFunctionsAt( elementType, particle->xi, shapeFunc );
@@ -373,6 +374,7 @@ void ParticleFeVariable_AssembleElement_Deriv( void* _forceTerm, ForceVector* fo
 		ElementType_ShapeFunctionsGlobalDerivs( elementType, mesh, lElement_I,
 							particle->xi, dim, &detJac, self->GNx );
 
+		self->currentParticleIndex = swarm->cellParticleTbl[cell_I][cParticle_I];
 		ParticleFeVariable_ValueAtParticle( self, swarm, lElement_I, particle, particleValue );
 
 		for ( dof_I = 0 ; dof_I < dofCount ; dof_I++ ) {
