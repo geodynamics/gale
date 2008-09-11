@@ -38,7 +38,7 @@ env.build_toolbox('libPICellerator/Toolbox')
 # Build plugins. Note that this must happen after the shared library
 # has been built.
 env.build_plugin('plugins/CalculateParticleDisplacement')
-env.build_plugin('plugins/MaterialCentroid')
+env.build_plugin('plugins/Output/MaterialCentroid')
 
 #
 # Build static library.
