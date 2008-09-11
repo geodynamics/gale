@@ -2,10 +2,6 @@
 <!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 
-  <list name="import" mergeType="mergeType">
-    <param>Experimental</param>
-  </list>
-
 <!-- This file sets up extension and compression in 3D:
 		- Sets up REP for the pressure part of the failure models
 		- Allows inflow/outflow at the base/top of the box to preserve a surface level
@@ -15,17 +11,14 @@
 	 fixed before we can release this functionality
 -->		
 
-
-
 	<include> Underworld/BaseApps/ExtensionIncompressibleShearBaseApp.xml </include>
-	<include> Experimental/StoreViscosity.xml </include>
 	<!-- <include> Experimental/REP_Setup3D.xml </include> -->
 	
 	<list name="plugins" mergeType="merge">
 		<param>StgFEM_FrequentOutput </param>	
 		<param>Underworld_Vrms </param>	
 		<param>StgFEM_CPUTime </param>	
-		<param>Experimental_MCCproprietarySolvers</param>
+		<param>StgFEM_FeVariableList </param>
 	</list>
 	
 
@@ -35,6 +28,7 @@
 	<!-- shape options -->
 	
 	<include> ./4LayerModel.xml </include>	
+	<include> ./PassiveTracerTopography.xml </include>
 	<include> ./PassiveTracers3D.xml </include>
 
 
@@ -56,8 +50,10 @@
 	<!-- Visualisation -->
 
 
+	<include> Viewports/Cameras.xml </include> 
 	<!-- <include> Viewports/RecoveredPressureVP.xml </include> 
 	<include> Viewports/RecoveredStressVP.xml </include> -->
+	<include> Viewports/StrainRateVP.xml </include> 
 	
 	<!--
 	<struct name="components" mergeType="merge">
