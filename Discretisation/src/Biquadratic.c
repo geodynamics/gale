@@ -120,7 +120,7 @@ void _Biquadratic_Build( void* elementType, void* data ) {
 void _Biquadratic_Initialise( void* elementType, void* data ) {
 	Biquadratic*	self = (Biquadratic*)elementType;
 
-	self->faceNodes = Memory_Alloc_2DArray( unsigned, 4, 2, "node indices for element faces" );
+	self->faceNodes = Memory_Alloc_2DArray( unsigned, 4, 3, "node indices for element faces" );
 
 	self->faceNodes[0][0] = 0; self->faceNodes[0][1] = 1; self->faceNodes[0][2] = 2;
 	self->faceNodes[1][0] = 6; self->faceNodes[1][1] = 7; self->faceNodes[1][2] = 8;
