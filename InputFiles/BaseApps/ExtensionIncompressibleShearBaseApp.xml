@@ -10,16 +10,17 @@
 	</list>
 
 	<!-- Component Stuff -->
-	<include>StgFEM/ConstantMesh.xml                    </include>
 	<include>StgFEM/LinearMesh.xml                      </include>
 	<include>StgFEM/VelocityField.xml                   </include>
 	<include>StgFEM/PressureField.xml                   </include>
 	<include>Underworld/GaussSwarm.xml                  </include> 
 	<include>StgFEM/TimeIntegrator.xml                  </include>
 	<include>PICellerator/MaterialPointSwarm.xml        </include>
-	<include>Underworld/StokesFlowUzawaPIC.xml </include>
+	<include>Experimental/StokesFlowUzawaStable.xml </include>
 
 	<include>StgFEM/PeriodicZ.xml</include>
+
+	<param name="pressureMesh">linearMesh</param>
 
 
 	<param name="timeIntegratorOrder"> 1 </param>
@@ -51,10 +52,6 @@
 	<struct name="EulerDeform">
 		<list name="systems">
 			<struct>
-				<param name="mesh"> constantMesh </param>
-				<param name="velocityField"> VelocityField </param>
-			</struct>
-			<struct>
 				<param name="mesh"> velocityMesh </param>
 				<param name="remesher">velocityRemesher</param>
 				<param name="velocityField"> VelocityField </param>
@@ -62,6 +59,10 @@
 					<struct>
 						<param name="field">VelocityField</param>
 						<param name="variable">velocity</param>
+					</struct>
+					<struct>
+					  <param name="field">PressureField</param>
+					  <param name="variable">pressure</param>
 					</struct>
 				</list>
 			</struct>

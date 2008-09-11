@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: ConstitutiveMatrixCartesian.c 801 2008-09-10 15:12:12Z LukeHodkinson $
+** $Id: ConstitutiveMatrixCartesian.c 803 2008-09-11 05:22:20Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -290,8 +290,9 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
 
 		/* Assemble Constitutive Matrix */
 		// TODO : pass in the context here?
-		self->currentParticleIndex = swarm->cellParticleTbl[cell_I][cParticle_I];
-		ConstitutiveMatrix_Assemble( constitutiveMatrix, lElement_I, particle );
+		ConstitutiveMatrix_Assemble(
+		   constitutiveMatrix, lElement_I,
+		   swarm->cellParticleTbl[cell_I][cParticle_I], particle );
 
 		/* Turn D Matrix into D~ Matrix by multiplying in the weight and the detJac (this is a shortcut for speed) */
 		ConstitutiveMatrix_MultiplyByValue( constitutiveMatrix, detJac * particle->weight );

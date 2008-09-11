@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: ConstitutiveMatrix.c 801 2008-09-10 15:12:12Z LukeHodkinson $
+** $Id: ConstitutiveMatrix.c 803 2008-09-11 05:22:20Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -305,6 +305,7 @@ void _ConstitutiveMatrix_Destroy( void* constitutiveMatrix, void* data ) {
 void ConstitutiveMatrix_Assemble( 
 		void*                                              constitutiveMatrix,
 		Element_LocalIndex                                 lElement_I,
+		int                                                particleIndex,
 		IntegrationPoint*                                  particle )
 {
 	ConstitutiveMatrix*     self          = (ConstitutiveMatrix*)constitutiveMatrix;
@@ -328,6 +329,7 @@ void ConstitutiveMatrix_Assemble(
 	 */
 	material = (RheologyMaterial*) IntegrationPointsSwarm_GetMaterialOn( swarm, particle );
 	materialPoint = OneToOneMapper_GetMaterialPoint( swarm->mapper, particle, &materialSwarm );
+	self->currentParticleIndex = particleIndex;
 
 	RheologyMaterial_RunRheologies( material, self, materialSwarm, lElement_I, materialPoint, particle->xi );
 	Journal_DPrintfL( self->debug, 3, "Viscosity = %g\n", ConstitutiveMatrix_GetIsotropicViscosity( self ) );

@@ -193,7 +193,7 @@ void _MohrCoulomb_Construct( void* rheology, Stg_ComponentFactory* cf,
 			Stg_ComponentFactory_GetDouble( cf, self->name, "minimumYieldStress", 0.0 ) );
 
 	self->swarmStrainRate = Stg_ComponentFactory_ConstructByKey(
-	   cf, self->name, "swarmStrainRate", SwarmVariable, True, data );
+	   cf, self->name, "swarmStrainRate", SwarmVariable, False, data );
 }
 
 void _MohrCoulomb_Build( void* rheology, void* data ) {
@@ -399,12 +399,15 @@ void _MohrCoulomb_StoreCurrentParameters(
         int i;
 	
 	FeVariable_InterpolateWithinElement( self->pressureField, lElement_I, xi, &self->currentPressure );
-/*
-	FeVariable_InterpolateWithinElement( self->strainRateField, lElement_I, xi, tmpStrainRate );
-*/
-	SwarmVariable_ValueAt( self->swarmStrainRate,
-			       constitutiveMatrix->currentParticleIndex,
-			       self->currentStrainRate );
+	if( !self->swarmStrainRate ) {
+	   FeVariable_InterpolateWithinElement(
+	      self->strainRateField, lElement_I, xi, self->currentStrainRate );
+	}
+	else {
+	   SwarmVariable_ValueAt( self->swarmStrainRate,
+				  constitutiveMatrix->currentParticleIndex,
+				  self->currentStrainRate );
+	}
 
         SymmetricTensor_GetTrace(self->currentStrainRate, dim, &trace);
 

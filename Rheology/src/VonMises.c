@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: VonMises.c 779 2008-08-06 15:50:41Z LukeHodkinson $
+** $Id: VonMises.c 803 2008-09-11 05:22:20Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -154,7 +154,10 @@ void _VonMises_Construct( void* rheology, Stg_ComponentFactory* cf, void* data )
 	_YieldRheology_Construct( self, cf, data );
 	
 	strainRateField = Stg_ComponentFactory_ConstructByKey(  
-			cf, self->name, "StrainRateField", FeVariable, True, data );
+			cf, self->name, "StrainRateField", FeVariable, False, data );
+	self->swarmStrainRate = Stg_ComponentFactory_ConstructByKey(
+	   cf, self->name, "swarmStrainRate", SwarmVariable, False, data );
+	assert( strainRateField || self->swarmStrainRate );
 	
 	_VonMises_Init( 
 			self, 
@@ -200,7 +203,15 @@ double _VonMises_GetYieldIndicator(
 	double                            stressInv;
 	
 	/* Get Strain Rate */
-	FeVariable_InterpolateWithinElement( self->strainRateField, lElement_I, xi, strainRate );
+	if( self->strainRateField ) {
+	   FeVariable_InterpolateWithinElement(
+	      self->strainRateField, lElement_I, xi, strainRate );
+	}
+	else {
+	   SwarmVariable_ValueAt( self->swarmStrainRate,
+				  constitutiveMatrix->currentParticleIndex,
+				  strainRate );
+	}
 
 	/* Get Stress */
 	ConstitutiveMatrix_CalculateStress( constitutiveMatrix, strainRate, stress );

@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: ConstitutiveMatrix.h 801 2008-09-10 15:12:12Z LukeHodkinson $
+** $Id: ConstitutiveMatrix.h 803 2008-09-11 05:22:20Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -158,6 +158,7 @@
 	void ConstitutiveMatrix_Assemble( 
 		void*                                              constitutiveMatrix,
 		Element_LocalIndex                                 lElement_I,
+		int                                                particleIndex,
 		IntegrationPoint*                                  particle );
 
 	#define ConstitutiveMatrix_SetToNonLinear( constitutiveMatrix ) \

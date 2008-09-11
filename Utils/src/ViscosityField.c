@@ -213,7 +213,7 @@ void _ViscosityField_ValueAtParticle( void* viscosityField, IntegrationPointsSwa
 	IntegrationPoint* particle     = (IntegrationPoint*) _particle;
 	
 	/* Calculate viscosity from constitutive matrix */
-	ConstitutiveMatrix_Assemble( self->constitutiveMatrix, lElement_I, particle );
+	ConstitutiveMatrix_Assemble( self->constitutiveMatrix, lElement_I, self->currentParticleIndex, particle );
 	*viscosity = ConstitutiveMatrix_GetIsotropicViscosity( self->constitutiveMatrix );
 }
 

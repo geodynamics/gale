@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: VonMises.h 750 2008-07-07 02:26:33Z LukeHodkinson $
+** $Id: VonMises.h 803 2008-09-11 05:22:20Z LukeHodkinson $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -56,6 +56,7 @@
 		/* Virtual functions go here */ \
 		/* Material Parameters */\
 		FeVariable*                                         strainRateField;                      \
+		SwarmVariable*                                      swarmStrainRate;                      \
 		double                                              cohesion;                             \
 		double                                              cohesionAfterSoftening;               \
 		Bool                                                strainRateSoftening;                  \
