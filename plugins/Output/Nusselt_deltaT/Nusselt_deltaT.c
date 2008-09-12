@@ -49,6 +49,13 @@ void _Underworld_Nusselt_deltaT_Construct( void* component, Stg_ComponentFactory
 	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, Underworld_Nusselt_deltaT_Output );
 }
 
+void _Underworld_Nusselt_deltaT_Build( void* component, void* data ) {
+	Underworld_Nusselt_deltaT*	self = (Underworld_Nusselt_deltaT*)component;
+
+	Stg_Component_Build( self->dTField, data, False );
+}
+
+
 void* _Underworld_Nusselt_deltaT_DefaultNew( Name name ) {
 	return _Codelet_New(
 		sizeof(Underworld_Nusselt_deltaT),
@@ -58,7 +65,7 @@ void* _Underworld_Nusselt_deltaT_DefaultNew( Name name ) {
 		_Codelet_Copy,
 		_Underworld_Nusselt_deltaT_DefaultNew,
 		_Underworld_Nusselt_deltaT_Construct,
-		_Codelet_Build,
+		_Underworld_Nusselt_deltaT_Build,
 		_Codelet_Initialise,
 		_Codelet_Execute,
 		_Codelet_Destroy,

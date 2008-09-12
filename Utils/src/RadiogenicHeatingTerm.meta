@@ -13,7 +13,7 @@
 <param name="Parent">ForceTerm</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">This adds a radiogenic heating term on to the energy equation. To turn on this force term must be define it <b> as well as</b> extending the definitions of materials, by adding a heating element list to a material definition. <br/>One or more heating elements can be defined in this list.</param>
+<param name="Description">This adds a radiogenic heating term on to the energy equation. To turn on this force term must be define it <b> as well as</b> extending the definitions of materials, by adding a heating element list to a material definition. <br/>One or more heating elements can be defined in this list. Each heating element adds the following term to the energy equation: Q * exp( -lambda * time ), where 'Q' and 'lambda' are specified in the heating element list for each material.</param>
 
 <!--Now the interesting stuff-->
 
