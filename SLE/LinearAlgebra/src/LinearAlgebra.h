@@ -57,7 +57,6 @@
 	#include "Vector.h"
 	#include "Matrix.h"
 	#include "MatrixSolver.h"
-	#include "NonlinearSolver.h"
 
 #ifdef HAVE_PETSC
 	#include <petsc.h>
@@ -70,7 +69,6 @@
 	#include "PETScVector.h"
 	#include "PETScMatrix.h"
 	#include "PETScMatrixSolver.h"
-	#include "PETScNonlinearSolver.h"
 #endif
 
 	#include "Init.h"

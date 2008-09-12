@@ -54,12 +54,10 @@
 	typedef struct Vector			Vector;
 	typedef struct Matrix			Matrix;
 	typedef struct MatrixSolver		MatrixSolver;
-	typedef struct NonlinearSolver		NonlinearSolver;
 #ifdef HAVE_PETSC
 	typedef struct PETScVector		PETScVector;
 	typedef struct PETScMatrix		PETScMatrix;
 	typedef struct PETScMatrixSolver	PETScMatrixSolver;
-	typedef struct PETScNonlinearSolver	PETScNonlinearSolver;
 #endif
 
 	typedef enum {
