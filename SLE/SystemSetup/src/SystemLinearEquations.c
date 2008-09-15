@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: SystemLinearEquations.c 1190 2008-07-23 06:26:05Z JulianGiordani $
+** $Id: SystemLinearEquations.c 1230 2008-09-15 01:44:43Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -57,7 +57,7 @@ const Type SystemLinearEquations_Type = "SystemLinearEquations";
 SystemLinearEquations* SystemLinearEquations_New(
 		Name                                               name,
 		SLE_Solver*                                        solver,
-		NonlinearSolver*				   nlSolver,
+		void*				   		   nlSolver,
 		FiniteElementContext*                              context,
 		Bool                                               isNonLinear,
 		double                                             nonLinearTolerance,
@@ -138,7 +138,7 @@ SystemLinearEquations* _SystemLinearEquations_New(
 void _SystemLinearEquations_Init( 
 		void*                                              sle, 
 		SLE_Solver*                                        solver, 
-		NonlinearSolver*				   nlSolver,
+		void*				   		   nlSolver,
 		FiniteElementContext*                              context, 
 		Bool                                               makeConvergenceFile,  
 		Bool                                               isNonLinear,
@@ -178,7 +178,7 @@ void _SystemLinearEquations_Init(
 	
 	self->comm = comm;
 	self->solver = solver;
-	self->nlSolver = nlSolver;
+	self->nlSolver = (SNES)nlSolver;
 	self->stiffnessMatrices = Stg_ObjectList_New();
 	self->forceVectors = Stg_ObjectList_New();
 	self->solutionVectors = Stg_ObjectList_New();
@@ -249,7 +249,7 @@ void _SystemLinearEquations_Init(
 void SystemLinearEquations_InitAll( 
 		void*                                              sle, 
 		SLE_Solver*                                        solver,
-		NonlinearSolver*				   nlSolver,
+		void*				   		   nlSolver,
 		FiniteElementContext*                              context, 
 		Bool                                               isNonLinear,
 		double                                             nonLinearTolerance,
@@ -404,7 +404,7 @@ void _SystemLinearEquations_Construct( void* sle, Stg_ComponentFactory* cf, void
 	Bool                    makeConvergenceFile;
 	Iteration_Index         nonLinearMinIterations;                     
 	Name			nonLinearSolutionType;
-	NonlinearSolver*	nlSolver		= NULL;
+	SNES			nlSolver;
 	Name			optionsPrefix;
 	double double_from_dict;
 	Bool   bool_from_dict;
@@ -439,7 +439,7 @@ void _SystemLinearEquations_Construct( void* sle, Stg_ComponentFactory* cf, void
 	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, False, data );
 
 	if( isNonLinear ) {
-		nlSolver = PETScNonlinearSolver_New( "nonLinearSolver" );
+		SNESCreate( context->communicator, &nlSolver );
 		self->linearSolveInitGuess = Stg_ComponentFactory_GetBool( cf, self->name, "linearSolveInitialGuess", False );
 	}
 	
@@ -494,8 +494,6 @@ void _SystemLinearEquations_Build( void* sle, void* _context ) {
 	/* lastly, the solver - if required */
 	if( self->solver )
 		Stg_Component_Build( self->solver, self, False );
-	if( self->nlSolver )
-		Stg_Component_Build( self->nlSolver, self, False );
 
 	Stream_UnIndentBranch( StgFEM_Debug );
 }
@@ -535,8 +533,6 @@ void _SystemLinearEquations_Initialise( void* sle, void* _context ) {
 	/* lastly, the solver, if required */
 	if( self->solver )
 		Stg_Component_Initialise( self->solver, self, False );
-	if( self->nlSolver )
-		Stg_Component_Initialise( self->nlSolver, self, False );
 	Stream_UnIndentBranch( StgFEM_Debug );
 }
 
@@ -728,7 +724,7 @@ void SystemLinearEquations_NewtonInitialise( void* _context, void* data ) {
 	SystemLinearEquations*	sle             = (SystemLinearEquations*)context->slEquations->data[0];
 	PETScVector*		F;
 	SNES			snes;
-	SNES			oldSnes		= ((PETScNonlinearSolver*)sle->nlSolver)->snes;
+	SNES			oldSnes		= sle->nlSolver;
 
 	/* don't assume that a snes is being used for initial guess, check for this!!! */
 	if( oldSnes && context->timeStep == 1 && !sle->linearSolveInitGuess )
@@ -736,7 +732,7 @@ void SystemLinearEquations_NewtonInitialise( void* _context, void* data ) {
 
 	SNESCreate( sle->comm, &snes );
 
-	((PETScNonlinearSolver*)sle->nlSolver)->snes = snes;
+	sle->nlSolver = snes;
 	sle->_setFFunc( &sle->F, context );
 
 	SNESSetJacobian( snes, ((PETScMatrix*)sle->J)->petscMat, ((PETScMatrix*)sle->P)->petscMat, sle->_buildJ, sle->buildJContext );
@@ -749,7 +745,7 @@ void SystemLinearEquations_NewtonInitialise( void* _context, void* data ) {
 /* do this after the pre conditoiners have been set up in the problem specific SLE */
 void SystemLinearEquations_NewtonExecute( void* sle, void* _context ) {
 	SystemLinearEquations*	self            = (SystemLinearEquations*) sle;
-	SNES			snes		= ((PETScNonlinearSolver*)self->nlSolver)->snes;
+	SNES			snes		= self->nlSolver;
 
 	SNESSetOptionsPrefix( snes, self->optionsPrefix );
 	SNESSetFromOptions( snes );
@@ -760,7 +756,7 @@ void SystemLinearEquations_NewtonExecute( void* sle, void* _context ) {
 void SystemLinearEquations_NewtonFinalise( void* _context, void* data ) {
 	FiniteElementContext*	context		= (FiniteElementContext*)_context;
 	SystemLinearEquations*	sle             = (SystemLinearEquations*)context->slEquations->data[0];
-	SNES			snes		= ((PETScNonlinearSolver*)sle->nlSolver)->snes;
+	SNES			snes		= sle->nlSolver;
 
 	sle->_updateOldFields( &sle->X, context );
 	
@@ -770,13 +766,14 @@ void SystemLinearEquations_NewtonFinalise( void* _context, void* data ) {
 void SystemLinearEquations_NewtonMFFDExecute( void* sle, void* _context ) {
 	SystemLinearEquations*	self            = (SystemLinearEquations*) sle;
 	Vector*			F;
-	NonlinearSolver*	nlSolver	= self->nlSolver; //need to build this guy...
 
 	Vector_Duplicate( SystemLinearEquations_GetSolutionVectorAt( self, 0 )->vector, &F );
 
 	/* creates the nonlinear solver */
-	NonlinearSolver_SetComm( nlSolver, MPI_COMM_WORLD );
-	NonlinearSolver_SetFunction( nlSolver, F, self->_buildF, _context );
+	if( self->nlSolver != PETSC_NULL )
+		SNESDestroy( self->nlSolver );
+	SNESCreate( self->comm, &self->nlSolver );
+	SNESSetFunction( self->nlSolver, ((PETScVector*)F)->petscVec, self->_buildF, _context );
 
 	// set J (jacobian)
 	

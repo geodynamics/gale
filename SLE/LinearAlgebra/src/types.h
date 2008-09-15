@@ -43,7 +43,7 @@
 **
 ** Comments:
 **
-** $Id: types.h 1084 2008-03-25 00:04:14Z LukeHodkinson $
+** $Id: types.h 1230 2008-09-15 01:44:43Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -54,12 +54,10 @@
 	typedef struct Vector			Vector;
 	typedef struct Matrix			Matrix;
 	typedef struct MatrixSolver		MatrixSolver;
-	typedef struct NonlinearSolver		NonlinearSolver;
 #ifdef HAVE_PETSC
 	typedef struct PETScVector		PETScVector;
 	typedef struct PETScMatrix		PETScMatrix;
 	typedef struct PETScMatrixSolver	PETScMatrixSolver;
-	typedef struct PETScNonlinearSolver	PETScNonlinearSolver;
 #endif
 
 	typedef enum {

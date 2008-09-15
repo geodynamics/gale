@@ -51,7 +51,7 @@
 **	for storing and managing the matrices and vectors that make up a system, but uses
 **	the SLE_Solver class to actually implement a solution mechanism for the given eqn.
 **
-** $Id: SystemLinearEquations.h 1187 2008-07-18 04:44:58Z LukeHodkinson $
+** $Id: SystemLinearEquations.h 1230 2008-09-15 01:44:43Z DavidLee $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -69,8 +69,8 @@
 	typedef void (SystemLinearEquations_MG_SelectStiffMatsFunc) ( void* _sle, unsigned* nSMs, StiffnessMatrix*** sms );
 
 	/* for solving non linear systems using Newton's method */
-	typedef int (SystemLinearEquations_BuildFFunc) ( NonlinearSolver* nls, Vector* x, Vector* f, void* context );
-	typedef int (SystemLinearEquations_BuildJFunc) ( NonlinearSolver* nls, Vector* x, Matrix** A, Matrix** B, void* matStruct, void* context );	
+	typedef int (SystemLinearEquations_BuildFFunc) ( void* nls, Vector* x, Vector* f, void* context );
+	typedef int (SystemLinearEquations_BuildJFunc) ( void* nls, Vector* x, Matrix** A, Matrix** B, void* matStruct, void* context );	
 	typedef void (SystemLinearEquations_SetFFunc) ( Vector** F, void* context );
 	typedef void (SystemLinearEquations_ConfigureNonlinearSolver) ( void* nls, void* data );
 
@@ -143,7 +143,7 @@
 		SystemLinearEquations_BuildJFunc*		    _buildJ;		       \
 		void*						    buildFContext;             \
 		void*						    buildJContext;             \
-		NonlinearSolver*				    nlSolver;		       \
+		SNES				    		    nlSolver;		       \
 		Bool						    linearSolveInitGuess;      \
 		Vector*						    F;			       \
 		Vector*						    X;		       	       \
@@ -169,7 +169,7 @@
 	SystemLinearEquations* SystemLinearEquations_New(
 		Name                                               name,
 		SLE_Solver*                                        solver,
-		NonlinearSolver*				   nlSolver,
+		void*				   		   nlSolver,
 		FiniteElementContext*                              context,
 		Bool                                               isNonLinear,
 		double                                             nonLinearTolerance,
@@ -201,7 +201,7 @@
 	void SystemLinearEquations_InitAll( 
 		void*                                              sle, 
 		SLE_Solver*                                        solver, 
-		NonlinearSolver*				   nlSolver,
+		void*				   		   nlSolver,
 		FiniteElementContext*                              context, 
 		Bool                                               isNonLinear,
 		double                                             nonLinearTolerance,
