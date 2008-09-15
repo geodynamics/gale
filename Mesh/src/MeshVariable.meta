@@ -41,6 +41,7 @@
   </list>
 
   <param name="Example">
+  StgFEM/Apps/StgFEM_Components/VelocityField.xml
   </param>
 
 </StGermainData>
