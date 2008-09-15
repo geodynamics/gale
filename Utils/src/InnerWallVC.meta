@@ -39,6 +39,15 @@
   </list>
 
   <param name="Example">
+				<param name="type"> InnerWallVC </param>
+				<param name="wall"> bottom </param>
+				<list name="variables">
+					<struct>
+						<param name="name">vy</param>
+						<param name="type">double</param>
+						<param name="value"> 0 </param>
+					</struct>
+				</list>
   </param>
 
 </StGermainData>
