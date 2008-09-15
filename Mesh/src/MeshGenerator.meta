@@ -51,6 +51,7 @@
   </list>
 
   <param name="Example">
+  StgFEM/Apps/StgFEM_Components/LinearMesh.xml
   </param>
 
 </StGermainData>
