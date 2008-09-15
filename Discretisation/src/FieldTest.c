@@ -363,17 +363,20 @@ void _FieldTest_Execute( void* fieldTest, void* data ) {
 
 void _FieldTest_Destroy( void* fieldTest, void* data ) {
 	FieldTest* 		self 		= (FieldTest*) fieldTest;
-	
-	Memory_Free( self->numericFieldList );
-	Memory_Free( self->referenceFieldList );
-	Memory_Free( self->errorFieldList );
-	Memory_Free( self->referenceMagFieldList );
-	Memory_Free( self->errorMagFieldList );
 
-	Memory_Free( self->gAnalyticSq );
-	Memory_Free( self->gErrorSq );
-	Memory_Free( self->gError );
-	Memory_Free( self->gErrorNorm );
+	if( self->fieldCount ) {
+		Memory_Free( self->numericFieldList );
+		Memory_Free( self->referenceFieldList );
+		Memory_Free( self->errorFieldList );
+		Memory_Free( self->referenceMagFieldList );
+		Memory_Free( self->errorMagFieldList );
+
+		Memory_Free( self->gAnalyticSq );
+		Memory_Free( self->gErrorSq );
+		Memory_Free( self->gError );
+		Memory_Free( self->gErrorNorm );
+	}
+
 	if( strlen(self->expectedFileName) > 1 ) {
 		Memory_Free( self->expected );
 		Memory_Free( self->numeric );
