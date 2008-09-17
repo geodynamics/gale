@@ -45,6 +45,11 @@ env.build_plugin('plugins/Output/VTKOutput')
 env.build_plugin('plugins/Output/MaxVelocity')
 env.build_plugin('SysTest/AnalyticPlugins/VelicIC')
 env.build_plugin('SysTest/AnalyticPlugins/Velic_solA')
+env.build_plugin('SysTest/AnalyticPlugins/Velic_solB')
+env.build_plugin('SysTest/AnalyticPlugins/Velic_solCx')
+env.build_plugin('SysTest/AnalyticPlugins/Velic_solHA')
+env.build_plugin('SysTest/AnalyticPlugins/Velic_solKz')
+env.build_plugin('SysTest/AnalyticPlugins/Velic_solS')
 env.build_plugin('SysTest/AnalyticPlugins/newVelicSolA')
 
 #

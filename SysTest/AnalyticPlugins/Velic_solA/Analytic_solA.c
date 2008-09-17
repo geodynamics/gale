@@ -43,115 +43,100 @@
 
 #include "Analytic_solA.h"
 
-const Type Velic_solA_Type = "Analytic_Velic_solA";
+const Type Underworld_solA_Type = "Underworld_Velic_solA";
 
-void Velic_solA_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* pressure ) {
-	Velic_solA* self = (Velic_solA*) analyticSolution;
+void Underworld_solA_PressureFunction( void* analyticSolution, double* coord, double* pressure ) {
+	Underworld_solA* self = (Underworld_solA*) analyticSolution;
 	
-	_Velic_solA( coord, self->sigma, self->Z, self->n, self->km, NULL, pressure, NULL, NULL );
+	_Velic_solutionA( coord, self->sigma, self->Z, self->n, self->km, NULL, pressure, NULL, NULL );
 }
 
-void Velic_solA_VelocityFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* velocity ) {
-	Velic_solA* self = (Velic_solA*) analyticSolution;
+void Underworld_solA_VelocityFunction( void* analyticSolution, double* coord, double* velocity ) {
+	Underworld_solA* self = (Underworld_solA*) analyticSolution;
 	
-	_Velic_solA( coord, self->sigma, self->Z, self->n, self->km, velocity, NULL, NULL, NULL );
+	_Velic_solutionA( coord, self->sigma, self->Z, self->n, self->km, velocity, NULL, NULL, NULL );
 }
 
-void Velic_solA_StressFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* stress ) {
-	Velic_solA* self = (Velic_solA*) analyticSolution;
+void Underworld_solA_StressFunction( void* analyticSolution, double* coord, double* stress ) {
+	Underworld_solA* self = (Underworld_solA*) analyticSolution;
 	
-	_Velic_solA( coord, self->sigma, self->Z, self->n, self->km, NULL, NULL, stress, NULL );
+	_Velic_solutionA( coord, self->sigma, self->Z, self->n, self->km, NULL, NULL, stress, NULL );
 }
 
 
-void Velic_solA_StrainRateFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* strainRate ) {
-	Velic_solA* self = (Velic_solA*) analyticSolution;
+void Underworld_solA_StrainRateFunction( void* analyticSolution, double* coord, double* strainRate ) {
+	Underworld_solA* self = (Underworld_solA*) analyticSolution;
 	
-	_Velic_solA( coord, self->sigma, self->Z, self->n, self->km, NULL, NULL, NULL, strainRate );
+	_Velic_solutionA( coord, self->sigma, self->Z, self->n, self->km, NULL, NULL, NULL, strainRate );
 }
 
-void _Velic_solA_Init( Velic_solA* self, double sigma, double Z, double wavenumberY, int n ) {
+void _Underworld_solA_Init( Underworld_solA* self, double sigma, double Z, double wavenumberY, int n ) {
 	self->sigma = sigma;
 	self->Z     = Z;
 	self-> km   = M_PI * wavenumberY;
 	self->n     = n;	
 }
 
-void _Velic_solA_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
-	Velic_solA* self = (Velic_solA*) analyticSolution;
-	FeVariable*              velocityField;
-	FeVariable*              pressureField;
-	FeVariable*              stressField;
-	FeVariable*              strainRateField;
-	FeVariable*              recoveredStrainRateField;
-	FeVariable*              recoveredStressField;
+void _Underworld_solA_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+	Underworld_solA* 		self = (Underworld_solA*) analyticSolution;
 	Bool                     isCorrectInput = True;
 	double                   sigma, Z, wavenumberY, n;
 	
 
 	/* Construct Parent */
-	_AnalyticSolution_Construct( self, cf, data );
-
-	/* Create Analytic Fields */
-	velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data );
-	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, velocityField, Velic_solA_VelocityFunction );
-
-	pressureField = Stg_ComponentFactory_ConstructByName( cf, "PressureField", FeVariable, True, data );
-	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, pressureField, Velic_solA_PressureFunction );
-
-	stressField = Stg_ComponentFactory_ConstructByName( cf, "StressField", FeVariable, False, data );
-	if ( stressField )
-		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, stressField, Velic_solA_StressFunction );
-
-	strainRateField = Stg_ComponentFactory_ConstructByName( cf, "StrainRateField", FeVariable, False, data );
-	if ( strainRateField  ) {
-		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, strainRateField, Velic_solA_StrainRateFunction );
-	}
-
-	recoveredStrainRateField = Stg_ComponentFactory_ConstructByName( cf, "recoveredStrainRateField", FeVariable, False, data );
-	if ( recoveredStrainRateField )
-		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, recoveredStrainRateField, Velic_solA_StrainRateFunction );
-
-	recoveredStressField = Stg_ComponentFactory_ConstructByName( cf, "recoveredStressField", FeVariable, False, data );
-	if ( recoveredStressField )
-		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, recoveredStressField, Velic_solA_StressFunction );
-	
+	_FieldTest_Construct( self, cf, data );
 
 	sigma = Stg_ComponentFactory_GetRootDictDouble( cf, "solA_sigma", 1.0 );
 	Z = Stg_ComponentFactory_GetRootDictDouble( cf, "solA_Z", 1.0 );
 	wavenumberY = Stg_ComponentFactory_GetRootDictDouble( cf, "wavenumberY", 1.0 );
 	n = Stg_ComponentFactory_GetRootDictInt( cf, "wavenumberX", 1 );
 	
-	_Velic_solA_Init( self, sigma, Z, wavenumberY, n );
+	_Underworld_solA_Init( self, sigma, Z, wavenumberY, n );
 
 	isCorrectInput = _checkInputParams( self );
-	Journal_Firewall( isCorrectInput , Journal_Register( Error_Type, "Velic_solA" ),
+	Journal_Firewall( isCorrectInput , Journal_Register( Error_Type, "solA" ),
 			"Error in function %s: Bad Input parameters, solution check valid values in .tex documentation\n",
 			__func__ );
 }
 
-Bool _checkInputParams( Velic_solA* self ) {
+void _Underworld_solA_Build( void* analyticSolution, void* data ) {
+	Underworld_solA* 		self = (Underworld_solA*) analyticSolution;
+
+	_FieldTest_Build( self, data );
+
+	/* args list: self, Index func_I, FieldTest_AnalyticSolutionFunc* func, Index field_I */
+	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 0, Underworld_solA_VelocityFunction, 0 );
+	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 1, Underworld_solA_PressureFunction, 1 );
+	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 1, Underworld_solA_PressureFunction, 2 );
+	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 2, Underworld_solA_StrainRateFunction, 3 );
+	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 2, Underworld_solA_StrainRateFunction, 4 );
+	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 3, Underworld_solA_StressFunction, 5 );
+
+}
+
+Bool _checkInputParams( Underworld_solA* self ) {
 	return ( 
 			( self->sigma > 0.0 ) && ( self->Z > 0.0 ) &&
 			( self->km > 0.0 )    && ( self->n > 0 )  
 		);
 }
-void* _Velic_solA_DefaultNew( Name name ) {
-	return _AnalyticSolution_New(
-			sizeof(Velic_solA),
-			Velic_solA_Type,
-			_AnalyticSolution_Delete,
-			_AnalyticSolution_Print,
-			_AnalyticSolution_Copy,
-			_Velic_solA_DefaultNew,
-			_Velic_solA_Construct,
-			_AnalyticSolution_Build,
-			_AnalyticSolution_Initialise,
-			_AnalyticSolution_Execute,
-			_AnalyticSolution_Destroy,
+
+void* _Underworld_solA_DefaultNew( Name name ) {
+	return _FieldTest_New(
+			sizeof(Underworld_solA),
+			Underworld_solA_Type,
+			_FieldTest_Delete,
+			_FieldTest_Print,
+			_FieldTest_Copy,
+			_Underworld_solA_DefaultNew,
+			_Underworld_solA_Construct,
+			_Underworld_solA_Build,
+			_FieldTest_Initialise,
+			_FieldTest_Execute,
+			_FieldTest_Destroy,
 			name );
 }
 
 Index Underworld_Velic_solA_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, Velic_solA_Type, "0", _Velic_solA_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, Underworld_solA_Type, "0", _Underworld_solA_DefaultNew );
 }

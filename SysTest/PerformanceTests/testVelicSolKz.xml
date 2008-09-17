@@ -3,7 +3,12 @@
 
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 
+	<import>
+		<toolbox> Experimental </toolbox>
+	</import>
+
 	<include> Underworld/BaseApps/ThermalConvection.xml </include>
+	<include> Experimental/REP_Setup.xml </include>
 	
 	<list name="plugins" mergeType="merge">
 		<!-- Output Plugins -->
@@ -14,9 +19,24 @@
 		<param>Underworld_Velic_solKz</param>	
 	</list>
 
-	<!-- Test tolerances -->
-	<param name="VelocityField-Tolerance"> 7.9e-06 </param>
-	<param name="PressureField-Tolerance"> 0.000133 </param>
+	<struct name="pluginData">
+		<list name="NumericFields">
+			<param>VelocityField</param>
+			<param>PressureField</param>
+			<param>recoveredPressureField</param>
+			<param>StrainRateField</param>
+			<param>recoveredEpsDotField</param>
+			<param>recoveredSigmaField</param>
+		</list>
+		<param name="IntegrationSwarm">gaussSwarm</param>
+		<param name="ConstantMesh">constantMesh</param>
+		<param name="ElementMesh">linearMesh</param>
+		<param name="normaliseByReferenceSolution">false</param>
+		<param name="useReferenceSolutionFromFile">false</param>
+		<param name="appendToAnalysisFile">false</param>
+		<param name="epsilon">1e-3</param>
+		<param name="context">context</param>
+	</struct>
 
 	<struct name="temperatureICs">
 	  <param name="type">CompositeVC</param>
@@ -38,6 +58,27 @@
 	<param name="wavenumberY">1.0</param>
 	
 	<struct name="components" mergeType="merge">
+		<struct name="recoveredEpsDotField" mergeType="replace">
+			<param name="Type">RecoveredFeVariable</param>
+			<param name="RawField">StrainRateField</param>
+			<param name="OrderOfInterpolation">1</param>
+			<param name="recoverStrain">true</param>
+			<param name="recoverPressure">false</param>
+		</struct>
+		<struct name="recoveredSigmaField" mergeType="replace">
+			<param name="Type">RecoveredFeVariable</param>
+			<param name="RawField">StrainRateField</param>
+			<param name="recoverPressure">True</param>
+			<param name="OrderOfInterpolation">1</param>
+			<param name="RawPressureField">PressureField</param>
+		</struct>
+		<struct name="REP">
+			<param name="Type">REP_Algorithm</param>
+			<param name="IntegrationPoints">gaussSwarm</param>
+			<param name="ConstitutiveMatrix">constitutiveMatrix</param>
+			<param name="RepField">recoveredSigmaField</param>
+			<param name="RepField2">recoveredEpsDotField</param>
+		</struct>
 		<struct name="rheology">
 			<param name="Type">DepthDependentViscosity</param>
 			<param name="Mesh">linearMesh</param>

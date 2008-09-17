@@ -51,39 +51,32 @@
 
 const Type Velic_solHA_Type = "Underworld_Velic_solHA";
 
-void Velic_solHA_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* pressure ) {
+void Velic_solHA_PressureFunction( void* analyticSolution, double* coord, double* pressure ) {
 	Velic_solHA* self = (Velic_solHA*) analyticSolution;
 	
 	_Velic_solHA( coord, self->sigma, self->eta, self->dx, self->dy, self->x0, self->y0, NULL, pressure, NULL, NULL );
 }
 
-void Velic_solHA_VelocityFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* velocity ) {
+void Velic_solHA_VelocityFunction( void* analyticSolution, double* coord, double* velocity ) {
 	Velic_solHA* self = (Velic_solHA*) analyticSolution;
 	
 	_Velic_solHA( coord, self->sigma, self->eta, self->dx, self->dy, self->x0, self->y0, velocity, NULL, NULL, NULL );
 }
 
-void Velic_solHA_StressFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* stress ) {
+void Velic_solHA_StressFunction( void* analyticSolution, double* coord, double* stress ) {
 	Velic_solHA* self = (Velic_solHA*) analyticSolution;
 	
 	_Velic_solHA( coord, self->sigma, self->eta, self->dx, self->dy, self->x0, self->y0, NULL, NULL, stress, NULL );
 }
 
 
-void Velic_solHA_StrainRateFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* strainRate ) {
+void Velic_solHA_StrainRateFunction( void* analyticSolution, double* coord, double* strainRate ) {
 	Velic_solHA* self = (Velic_solHA*) analyticSolution;
 	
 	_Velic_solHA( coord, self->sigma, self->eta, self->dx, self->dy, self->x0, self->y0, NULL, NULL, NULL, strainRate );
 }
 
 void _Velic_solHA_Init( Velic_solHA* self, double sigma, double eta, double dx, double dy, double x0, double y0 ) {
-	// TODO	Bool                     correctInput = True;
-	// Set the general AnalyticSolution (parent class) field function pointers to the specific analytic sols to use
-        self->_getAnalyticVelocity    = Velic_solHA_VelocityFunction;
-	self->_getAnalyticPressure    = Velic_solHA_PressureFunction;
-	self->_getAnalyticTotalStress = Velic_solHA_StressFunction;
-	self->_getAnalyticStrainRate  = Velic_solHA_StrainRateFunction;
-
 	self->sigma = sigma;
 	self->eta = eta;
 	self->dx = dx;
@@ -95,50 +88,24 @@ void _Velic_solHA_Init( Velic_solHA* self, double sigma, double eta, double dx, 
 void _Velic_solHA_Build( void* analyticSolution, void* data ) {
 	Velic_solHA*          self  = (Velic_solHA*)analyticSolution;
 	
-	_AnalyticSolution_Build( self, data );
+	_FieldTest_Build( self, data );
+
+	/* args list: self, Index func_I, FieldTest_AnalyticSolutionFunc* func, Index field_I */
+	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 0, Velic_solHA_VelocityFunction, 0 );
+	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 1, Velic_solHA_PressureFunction, 1 );
+	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 1, Velic_solHA_PressureFunction, 2 );
+	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 2, Velic_solHA_StrainRateFunction, 3 );
+	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 2, Velic_solHA_StrainRateFunction, 4 );
+	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 3, Velic_solHA_StressFunction, 5 );
 }
 
 void _Velic_solHA_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	Velic_solHA* self = (Velic_solHA*) analyticSolution;
-	FeVariable*              velocityField;
-	FeVariable*              pressureField;
-	FeVariable*              recoveredPressureField;
-	FeVariable*              stressField;
-	FeVariable*              strainRateField;
-	FeVariable*              recoveredStrainRateField;
-	FeVariable*              recoveredStressField;
 	double                   sigma, eta, dx, dy, x0, y0;
 	double                   startX, endX, startY, endY;
 
 	/* Construct Parent */
-	_AnalyticSolution_Construct( self, cf, data );
-
-	/* Create Analytic Fields */
-	velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data );
-	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, velocityField, Velic_solHA_VelocityFunction );
-
-	pressureField = Stg_ComponentFactory_ConstructByName( cf, "PressureField", FeVariable, True, data );
-	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, pressureField, Velic_solHA_PressureFunction );
-
-	stressField = Stg_ComponentFactory_ConstructByName( cf, "StressField", FeVariable, False, data );
-	if ( stressField ) 
-		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, stressField, Velic_solHA_StressFunction );
-
-	strainRateField = Stg_ComponentFactory_ConstructByName( cf, "StrainRateField", FeVariable, False, data );
-	if ( strainRateField  )
-		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, strainRateField, Velic_solHA_StrainRateFunction );
-
-	recoveredStrainRateField = Stg_ComponentFactory_ConstructByName( cf, "recoveredStrainRateField", FeVariable, False, data );
-	if ( recoveredStrainRateField )
-		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, recoveredStrainRateField, Velic_solHA_StrainRateFunction );
-
-	recoveredStressField = Stg_ComponentFactory_ConstructByName( cf, "recoveredStressField", FeVariable, False, data );
-	if ( recoveredStressField )
-		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, recoveredStressField, Velic_solHA_StressFunction );
-
-	recoveredPressureField = Stg_ComponentFactory_ConstructByName( cf, "recoveredPressureField", FeVariable, False, data );
-	if ( recoveredPressureField )
-		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, recoveredPressureField, Velic_solHA_PressureFunction );
+	_FieldTest_Construct( self, cf, data );
 
 	sigma = Stg_ComponentFactory_GetRootDictDouble( cf, "solHA_sigma", 1.0 );
 	eta = Stg_ComponentFactory_GetRootDictDouble( cf, "solHA_eta", 1.0 );
@@ -159,18 +126,18 @@ void _Velic_solHA_Construct( void* analyticSolution, Stg_ComponentFactory* cf, v
 }
 
 void* _Velic_solHA_DefaultNew( Name name ) {
-	return _AnalyticSolution_New(
+	return _FieldTest_New(
 			sizeof(Velic_solHA),
 			Velic_solHA_Type,
-			_AnalyticSolution_Delete,
-			_AnalyticSolution_Print,
-			_AnalyticSolution_Copy,
+			_FieldTest_Delete,
+			_FieldTest_Print,
+			_FieldTest_Copy,
 			_Velic_solHA_DefaultNew,
 			_Velic_solHA_Construct,
 			_Velic_solHA_Build,
-			_AnalyticSolution_Initialise,
-			_AnalyticSolution_Execute,
-			_AnalyticSolution_Destroy,
+			_FieldTest_Initialise,
+			_FieldTest_Execute,
+			_FieldTest_Destroy,
 			name );
 }
 

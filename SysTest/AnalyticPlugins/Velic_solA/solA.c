@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <assert.h>
 
-void _Velic_solA( double* pos, 
+void _Velic_solutionA( double* pos, 
 		double sigma, double Z, int n, double km,
 		double* velocity, double* pressure, double* Tstress, double* strainRate );
 int main() {
@@ -19,7 +19,7 @@ int main() {
 		 pos[0] = i/100.0;
 		 pos[1] = j/100.0;
 
-		 _Velic_solA( pos,
+		 _Velic_solutionA( pos,
 				sigma, Z, n, km,
 				velocity, &pressure,  Tstress, strainRate );
 
@@ -35,7 +35,7 @@ int main() {
 	return 0;
 }
 
-void _Velic_solA( double* pos, 
+void _Velic_solutionA( double* pos, 
 		double sigma, double Z, int n, double km,
 		double* velocity, double* pressure,  double* Tstress, double* strainRate ) {
 	

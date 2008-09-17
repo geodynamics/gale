@@ -51,26 +51,26 @@
 
 const Type Velic_solS_Type = "Underworld_Velic_solS";
 
-void Velic_solS_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* pressure ) {
+void Velic_solS_PressureFunction( void* analyticSolution, double* coord, double* pressure ) {
 	Velic_solS* self = (Velic_solS*) analyticSolution;
 	
 	_Velic_solS( coord, self->_n, self->_eta, NULL, pressure, NULL, NULL );
 }
 
-void Velic_solS_VelocityFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* velocity ) {
+void Velic_solS_VelocityFunction( void* analyticSolution, double* coord, double* velocity ) {
 	Velic_solS* self = (Velic_solS*) analyticSolution;
 	
 	_Velic_solS( coord, self->_n, self->_eta, velocity, NULL, NULL, NULL );
 }
 
-void Velic_solS_StressFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* stress ) {
+void Velic_solS_StressFunction( void* analyticSolution, double* coord, double* stress ) {
 	Velic_solS* self = (Velic_solS*) analyticSolution;
 	
 	_Velic_solS( coord, self->_n, self->_eta, NULL, NULL, stress, NULL );
 }
 
 
-void Velic_solS_StrainRateFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* strainRate ) {
+void Velic_solS_StrainRateFunction( void* analyticSolution, double* coord, double* strainRate ) {
 	Velic_solS* self = (Velic_solS*) analyticSolution;
 	
 	_Velic_solS( coord, self->_n, self->_eta, NULL, NULL, NULL, strainRate );
@@ -78,11 +78,6 @@ void Velic_solS_StrainRateFunction( void* analyticSolution, FeVariable* analytic
 
 void _Velic_solS_Init( Velic_solS* self, double _eta, int _n ) {
 	Bool                     isCorrectInput = True;
-
-	self->_getAnalyticVelocity = Velic_solS_VelocityFunction;
-	self->_getAnalyticPressure = Velic_solS_PressureFunction;
-	self->_getAnalyticTotalStress = Velic_solS_StressFunction;
-	self->_getAnalyticStrainRate = Velic_solS_StrainRateFunction;
 
 	self->_eta = _eta;
 	self->_n = _n;
@@ -96,50 +91,25 @@ void _Velic_solS_Init( Velic_solS* self, double _eta, int _n ) {
 void _Velic_solS_Build( void* analyticSolution, void* data ) {
 	Velic_solS*          self  = (Velic_solS*)analyticSolution;
 	
+	_FieldTest_Build( self, data );
+
+	/* args list: self, Index func_I, FieldTest_AnalyticSolutionFunc* func, Index field_I */
+	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 0, Velic_solS_VelocityFunction, 0 );
+	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 1, Velic_solS_PressureFunction, 1 );
+	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 1, Velic_solS_PressureFunction, 2 );
+	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 2, Velic_solS_StrainRateFunction, 3 );
+	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 2, Velic_solS_StrainRateFunction, 4 );
+	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 3, Velic_solS_StressFunction, 5 );
 	_AnalyticSolution_Build( self, data );
 }
 
 void _Velic_solS_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	Velic_solS* self = (Velic_solS*) analyticSolution;
-	FeVariable*              velocityField;
-	FeVariable*              pressureField;
-	FeVariable*              stressField;
-	FeVariable*              strainRateField;
-	FeVariable*              recoveredStrainRateField;
-	FeVariable*              recoveredStressField;
-	FeVariable*              recoveredPressureField;
 	double                   _eta;
 	int                      _n;
 
 	/* Construct Parent */
-	_AnalyticSolution_Construct( self, cf, data );
-
-	/* Create Analytic Fields */
-	velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data );
-	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, velocityField, Velic_solS_VelocityFunction );
-
-	pressureField = Stg_ComponentFactory_ConstructByName( cf, "PressureField", FeVariable, True, data );
-	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, pressureField, Velic_solS_PressureFunction );
-
-	stressField = Stg_ComponentFactory_ConstructByName( cf, "StressField", FeVariable, False, data );
-	if ( stressField ) 
-		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, stressField, Velic_solS_StressFunction );
-
-	strainRateField = Stg_ComponentFactory_ConstructByName( cf, "StrainRateField", FeVariable, False, data );
-	if ( strainRateField  )
-		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, strainRateField, Velic_solS_StrainRateFunction );
-
-	recoveredStrainRateField = Stg_ComponentFactory_ConstructByName( cf, "recoveredStrainRateField", FeVariable, False, data );
-	if ( recoveredStrainRateField )
-		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, recoveredStrainRateField, Velic_solS_StrainRateFunction );
-
-	recoveredStressField = Stg_ComponentFactory_ConstructByName( cf, "recoveredStressField", FeVariable, False, data );
-	if ( recoveredStressField )
-		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, recoveredStressField, Velic_solS_StressFunction );
-
-	recoveredPressureField = Stg_ComponentFactory_ConstructByName( cf, "recoveredPressureField", FeVariable, False, data );
-	if ( recoveredPressureField )
-		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, recoveredPressureField, Velic_solS_PressureFunction );
+	_FieldTest_Construct( self, cf, data );
 	
 	_eta = Stg_ComponentFactory_GetRootDictDouble( cf, "solS_eta", 1.0 );
 	_n = Stg_ComponentFactory_GetRootDictInt( cf, "sinusoidalLidWavenumber", 1 );
@@ -153,18 +123,18 @@ Bool _checkInputParams( Velic_solS* self ) {
 		);
 }
 void* _Velic_solS_DefaultNew( Name name ) {
-	return _AnalyticSolution_New(
+	return  _FieldTest_New(
 			sizeof(Velic_solS),
 			Velic_solS_Type,
-			_AnalyticSolution_Delete,
-			_AnalyticSolution_Print,
-			_AnalyticSolution_Copy,
+			_FieldTest_Delete,
+			_FieldTest_Print,
+			_FieldTest_Copy,
 			_Velic_solS_DefaultNew,
 			_Velic_solS_Construct,
 			_Velic_solS_Build,
-			_AnalyticSolution_Initialise,
-			_AnalyticSolution_Execute,
-			_AnalyticSolution_Destroy,
+			_FieldTest_Initialise,
+			_FieldTest_Execute,
+			_FieldTest_Destroy,
 			name );
 }
 
