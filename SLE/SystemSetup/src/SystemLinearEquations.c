@@ -404,7 +404,7 @@ void _SystemLinearEquations_Construct( void* sle, Stg_ComponentFactory* cf, void
 	Bool                    makeConvergenceFile;
 	Iteration_Index         nonLinearMinIterations;                     
 	Name			nonLinearSolutionType;
-	SNES			nlSolver;
+	SNES                    nlSolver                 = NULL;
 	Name			optionsPrefix;
 	double double_from_dict;
 	Bool   bool_from_dict;
