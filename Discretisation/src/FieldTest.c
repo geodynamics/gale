@@ -122,13 +122,15 @@ void _FieldTest_Delete( void* fieldTest ) {
 	
 	if( self->integrationSwarm ) Stg_Class_Delete( self->integrationSwarm );
 
-	Memory_Free( self->gAnalyticSq );
-	Memory_Free( self->gErrorSq    );
-	Memory_Free( self->gError      );
-	Memory_Free( self->gErrorNorm  );
+	if( self->fieldCount ) {
+		Memory_Free( self->gAnalyticSq );
+		Memory_Free( self->gErrorSq    );
+		Memory_Free( self->gError      );
+		Memory_Free( self->gErrorNorm  );
 
-	Memory_Free( self->analyticSolnForFeVarKey );
-	Memory_Free( self->_analyticSolutionList );
+		Memory_Free( self->analyticSolnForFeVarKey );
+		Memory_Free( self->_analyticSolutionList );
+	}
 	
 	/* Stg_Class_Delete parent*/
 	_Stg_Component_Delete( self );
