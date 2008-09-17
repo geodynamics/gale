@@ -439,7 +439,11 @@ void _SystemLinearEquations_Construct( void* sle, Stg_ComponentFactory* cf, void
 	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, False, data );
 
 	if( isNonLinear ) {
+<<<<<<< local
 		SNESCreate( context->communicator, &nlSolver );
+=======
+		SNESCreate( self->comm, &nlSolver );
+>>>>>>> other
 		self->linearSolveInitGuess = Stg_ComponentFactory_GetBool( cf, self->name, "linearSolveInitialGuess", False );
 	}
 	
@@ -773,7 +777,11 @@ void SystemLinearEquations_NewtonMFFDExecute( void* sle, void* _context ) {
 	if( self->nlSolver != PETSC_NULL )
 		SNESDestroy( self->nlSolver );
 	SNESCreate( self->comm, &self->nlSolver );
+<<<<<<< local
 	SNESSetFunction( self->nlSolver, ((PETScVector*)F)->petscVec, self->_buildF, _context );
+=======
+	SNESSetFunction( self->nlSolver, F, self->_buildF, _context );
+>>>>>>> other
 
 	// set J (jacobian)
 	
