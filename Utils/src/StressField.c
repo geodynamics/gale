@@ -320,7 +320,7 @@ void _StressField_ValueAtParticle_Recalculate( void* stressField, IntegrationPoi
 	
 	/* Calculate stress from strain rate and constitutive matrix */
 	ConstitutiveMatrix_Assemble( self->constitutiveMatrix, lElement_I,
-				     self->currentParticleIndex, particle );
+				     self->constitutiveMatrix->currentParticleIndex, particle );
 	FeVariable_InterpolateWithinElement( self->strainRateField, lElement_I, particle->xi, strainRate );
 	ConstitutiveMatrix_CalculateStress( self->constitutiveMatrix, strainRate, stress );
 
