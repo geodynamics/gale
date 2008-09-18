@@ -138,7 +138,7 @@ void _lucColourMap_Init(
 
 	/* Allocate space for colour map */
 	self->colourList = Memory_Alloc_Array( lucColour , colourCount, "Colour map");
-		
+
 	/* Read String to get colour map */
 	charPointer = strtok( colourMapString, breakChars );
 	for ( colour_I = 0 ; colour_I < colourCount ; colour_I++ ) {
@@ -271,7 +271,20 @@ void _lucColourMap_Construct( void* colourMap, Stg_ComponentFactory* cf, void* d
 }
 
 void _lucColourMap_Build( void* colourMap, void* data ) { }
-void _lucColourMap_Initialise( void* colourMap, void* data ) { }
+
+void _lucColourMap_Initialise( void* colourMap, void* data ) { 
+	lucColourMap* self             = (lucColourMap*) colourMap;
+	int colour_I, colourCount;
+	colourCount = self->colourCount;
+
+	/* Initialise the space in the colour map */
+	for( colour_I = 0 ; colour_I < colourCount ; colour_I++ ) {
+		self->colourList[colour_I].red = 0;
+		self->colourList[colour_I].green = 0;
+		self->colourList[colour_I].blue = 0;
+		self->colourList[colour_I].opacity = 0;
+	}
+}
 void _lucColourMap_Execute( void* colourMap, void* data ) { }
 void _lucColourMap_Destroy( void* colourMap, void* data ) { }
 
