@@ -88,7 +88,7 @@ void _Underworld_solA_Construct( void* analyticSolution, Stg_ComponentFactory* c
 
 	sigma = Stg_ComponentFactory_GetRootDictDouble( cf, "solA_sigma", 1.0 );
 	Z = Stg_ComponentFactory_GetRootDictDouble( cf, "solA_Z", 1.0 );
-	wavenumberY = Stg_ComponentFactory_GetRootDictDouble( cf, "wavenumberY", 1.0 );
+	wavenumberY = Stg_ComponentFactory_GetRootDictDouble( cf, "wavenumberY", 1.5 );
 	n = Stg_ComponentFactory_GetRootDictInt( cf, "wavenumberX", 1 );
 	
 	_Underworld_solA_Init( self, sigma, Z, wavenumberY, n );
