@@ -295,8 +295,10 @@ void _FieldTest_Initialise( void* fieldTest, void* data ) {
 	}
 	/* calculate the analytic solutions */
 	else {
-		for( field_I = 0; field_I < self->fieldCount; field_I++ )
-			FieldTest_CalculateAnalyticSolutionForField( self, field_I );
+		for( field_I = 0; field_I < self->fieldCount; field_I++ ) {
+			FieldTest_CalculateAnalyticSolutionForField( self, field_I ); 
+			FeVariable_ZeroField( self->errorFieldList[field_I] );
+		}
 	}
 
 	if( strlen(self->expectedFileName) > 1 && strcmp( self->expectedFileName, "false" ) ) {
@@ -896,7 +898,7 @@ void FieldTest_GenerateErrFields( void* _context, void* data ) {
 		double length, elementResI;
 		char* filename;
 		analysisStream = Journal_Register( Info_Type, self->type );
-		Stg_asprintf( &filename, "%s-analysis.dat", self->name );
+		Stg_asprintf( &filename, "%s-analysis.cvg", self->name );
 		Stream_AppendFile( analysisStream, filename );
 		Memory_Free( filename );
 
@@ -939,12 +941,10 @@ void FieldTest_GenerateErrFields( void* _context, void* data ) {
 				FieldTest_ElementErrAnalyticFromField( self, field_I, lElement_I, elErrorSq, elNormSq );
 
 			for( dof_I = 0; dof_I < numDofs; dof_I++ ) {
-				if( !self->normalise || elNormSq[dof_I] > eps ) {
 					lAnalyticSq[dof_I] += elNormSq[dof_I];
 					lErrorSq[dof_I]    += elErrorSq[dof_I];
 					//elError[dof_I] = normalise ? sqrt( elErrorSq[dof_I] / ( elNormSq[dof_I] + eps ) ) : sqrt( elErrorSq[dof_I] );
 					elError[dof_I] = normalise ? sqrt( elErrorSq[dof_I] / ( elNormSq[dof_I] ) ) : sqrt( elErrorSq[dof_I] );
-				}
 			}
 
 			/* constant mesh, so node and element indices map 1:1 */
