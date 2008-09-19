@@ -240,6 +240,7 @@ void _SwarmDump_Execute( void* swarmDump, void* data ) {
 	Particle_Index    particleLocalCount;
 	SizeT             particleSize;
 	Name              filename;
+	Name              filenameTemp;
 	Index             swarm_I;
 	Swarm*            swarm;
 	Stream*           info = Journal_Register( Info_Type, self->type );
@@ -287,12 +288,21 @@ void _SwarmDump_Execute( void* swarmDump, void* data ) {
 		SwarmDump_DumpToHDF5( self, swarm, filename );
 #else
       Stg_asprintf( &filename, "%s.dat", filename );
-      Stream_RedirectFile( stream, filename );
+      /* write checkpoint file to a temporary file to avoid nfs issues */
+      Stg_asprintf( &filenameTemp, "%s.temp", filename );
+      Stream_RedirectFile( stream, filenameTemp );
 		MPIStream_WriteAllProcessors( stream, swarm->particles, particleSize, (SizeT) particleLocalCount, swarm->comm );
 		Stream_CloseFile( stream );
 #endif
+		/* remove old checkpoint file, if any exists... then move temp file to appropriate filename */
+		if(swarm->myRank == 0){
+		      remove( filename );
+		      rename( filenameTemp , filename );
+		}
 
 		Memory_Free( filename );
+		Memory_Free( filenameTemp );		
+
 	}
 	Stream_UnIndent( info );
 	Journal_DPrintf( info, "Proc %d: finished Swarm binary checkpoint.\n", self->swarmList[0]->myRank );
