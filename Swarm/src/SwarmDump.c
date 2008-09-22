@@ -293,13 +293,13 @@ void _SwarmDump_Execute( void* swarmDump, void* data ) {
       Stream_RedirectFile( stream, filenameTemp );
 		MPIStream_WriteAllProcessors( stream, swarm->particles, particleSize, (SizeT) particleLocalCount, swarm->comm );
 		Stream_CloseFile( stream );
-#endif
+
 		/* remove old checkpoint file, if any exists... then move temp file to appropriate filename */
 		if(swarm->myRank == 0){
 		      remove( filename );
 		      rename( filenameTemp , filename );
 		}
-
+#endif
 		Memory_Free( filename );
 		Memory_Free( filenameTemp );		
 
