@@ -153,7 +153,7 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 	FieldTest* 			self 			= (FieldTest*)fieldTest;
 	Dictionary*			dict			= cf->rootDict;
 	Dictionary_Entry_Value*		dictEntryVal		= Dictionary_Get( dict, "pluginData" );
-	Dictionary*		pluginDict  =  Dictionary_Entry_Value_AsDictionary( dictEntryVal );
+	Dictionary*			pluginDict  		=  Dictionary_Entry_Value_AsDictionary( dictEntryVal );
 	Dictionary_Entry_Value*		fieldList;
 	Dictionary_Entry_Value*		swarmVarList		= Dictionary_Get( dict, "NumericSwarmVariableNames" );
 	FieldVariable_Register* 	fV_Register     	= Stg_ObjectList_Get( cf->registerRegister, "FieldVariable_Register" );
@@ -164,8 +164,16 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 	Hook*				generateErrorFields;
 	Hook*				physicsTestHook;
 
+	self->referenceSolnPath     = Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "referenceSolutionFilePath" ) );
+	self->normalise             = Dictionary_Entry_Value_AsBool( Dictionary_Get( pluginDict, "normaliseByReferenceSolution" ) );
+	self->epsilon               = Dictionary_Entry_Value_AsDouble( Dictionary_Get( pluginDict, "epsilon" ) );
+	self->referenceSolnFromFile = Dictionary_Entry_Value_AsBool( Dictionary_Get( pluginDict, "useReferenceSolutionFromFile" ) );
+	self->appendToAnalysisFile  = Dictionary_GetBool_WithDefault( pluginDict, "appendToAnalysisFile", False ) ;
+	self->context               = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
+
 	fieldList = Dictionary_Get( pluginDict, "NumericFields" );
-	self->fieldCount = fieldList ? Dictionary_Entry_Value_GetCount( fieldList ) : 0;
+	//self->fieldCount = fieldList ? Dictionary_Entry_Value_GetCount( fieldList ) : 0;
+	self->fieldCount = fieldList ? Dictionary_Entry_Value_GetCount( fieldList ) / 2 : 0;
 
 	if( self->fieldCount ) {
 		self->numericFieldList   	= Memory_Alloc_Array( FeVariable*, self->fieldCount, "numeric fields" );
@@ -174,15 +182,26 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 		self->referenceMagFieldList	= Memory_Alloc_Array( OperatorFeVariable*, self->fieldCount, "reference field magnitudes" );
 		self->errorMagFieldList		= Memory_Alloc_Array( OperatorFeVariable*, self->fieldCount, "error field magnitudes" );
 	
+		if( !self->referenceSolnFromFile ) {
+			self->analyticSolnForFeVarKey = Memory_Alloc_Array( unsigned, self->fieldCount, 
+								    "analytic solution index for ith feVariable" );
+			self->_analyticSolutionList = Memory_Alloc_Array_Unnamed( FieldTest_AnalyticSolutionFunc*, self->fieldCount );
+		}
+
 		for( feVariable_I = 0; feVariable_I < self->fieldCount; feVariable_I++ ) {
+			/* read in the FeVariable from the tuple */
 			fieldName = ( fieldList ) ? 
-				    Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( fieldList, feVariable_I ) ) :
+				    Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( fieldList, 2 * feVariable_I ) ) :
 				    Dictionary_GetString( pluginDict, "FeVariable" );
 			
 			self->numericFieldList[feVariable_I] = (FeVariable*) FieldVariable_Register_GetByName( fV_Register, fieldName );
 
 			if( !self->numericFieldList[feVariable_I] )
 				self->numericFieldList[feVariable_I] = Stg_ComponentFactory_ConstructByName( cf, fieldName, FeVariable, True, data ); 
+
+			/* ...and the corresponding analytic function ptr index - these have to be consistent with how they're ordered in the plugin */
+			self->analyticSolnForFeVarKey[feVariable_I] = Dictionary_Entry_Value_AsUnsignedInt( 
+									Dictionary_Entry_Value_GetElement( fieldList, 2 * feVariable_I + 1 ) );
 		}
 	}
 
@@ -201,13 +220,6 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 		}	
 	}
 	
-	self->referenceSolnPath     = Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "referenceSolutionFilePath" ) );
-	self->normalise             = Dictionary_Entry_Value_AsBool( Dictionary_Get( pluginDict, "normaliseByReferenceSolution" ) );
-	self->epsilon               = Dictionary_Entry_Value_AsDouble( Dictionary_Get( pluginDict, "epsilon" ) );
-	self->referenceSolnFromFile = Dictionary_Entry_Value_AsBool( Dictionary_Get( pluginDict, "useReferenceSolutionFromFile" ) );
-	self->appendToAnalysisFile  = Dictionary_GetBool_WithDefault( pluginDict, "appendToAnalysisFile", False ) ;
-	self->context               = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
-
 	/* for the physics test */
 	self->expectedFileName = Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "expectedFileName" ) );
 	self->expectedFilePath = Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "expectedFilePath" ) );
@@ -257,12 +269,6 @@ void _FieldTest_Build( void* fieldTest, void* data ) {
 		self->gErrorSq 	  = Memory_Alloc_2DArray( double, self->fieldCount, 3, "global L2 error squared" );
 		self->gError	  = Memory_Alloc_2DArray( double, self->fieldCount, 3, "global L2 error" );
 		self->gErrorNorm  = Memory_Alloc_2DArray( double, self->fieldCount, 3, "global L2 error normalised" );
-
-		if( !self->referenceSolnFromFile ) {
-			self->analyticSolnForFeVarKey = Memory_Alloc_Array( unsigned, self->fieldCount, 
-								    "analytic solution index for ith feVariable" );
-			self->_analyticSolutionList = Memory_Alloc_Array_Unnamed( FieldTest_AnalyticSolutionFunc*, self->fieldCount );
-		}
 	}
 }
 
@@ -975,8 +981,6 @@ void FieldTest_GenerateErrFields( void* _context, void* data ) {
 		Journal_RPrintf( analysisStream, "\n" );
 		Stream_CloseAndFreeFile( analysisStream );
 	}
-
-
 }
 
 void FieldTest_ElementErrReferenceFromField( void* fieldTest, Index field_I, Index lElement_I, double* elErrorSq, double* elNormSq ) {
