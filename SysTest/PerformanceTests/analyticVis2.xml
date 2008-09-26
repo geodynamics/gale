@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+	<!-- This analytic views of velocity and pressure -->
+	<include> Underworld/Viewports/AnalyticStressInvariantVP.xml </include>
+	<include> Underworld/Viewports/StrainRateInvariantVP.xml </include>
+	<include> Underworld/Viewports/AnalyticStrainRateInvariantVP.xml </include>
+	<!--include> Underworld/Viewports/AnalyticPressureVP.xml </include-->
+	<include> Experimental/Viewports/REPStressVP.xml </include>
+	<include> Experimental/Viewports/REPStrainVP.xml </include>
+
+	<struct name="components" mergeType="merge">
+		<struct name="window2" mergeType="replace">
+      <param name="Type">lucDefaultWindow</param>
+      <param name="RenderingEngine">renderingEngine</param>
+      <list name="OutputFormat">
+        <param>imageOutput</param>
+      </list>
+      <param name="height">400</param>
+      <param name="width">800</param>
+      <param name="backgroundColour">white</param>
+      <param name="interactive">false</param>
+      <param name="xFontName">-adobe-helvetica-bold-r-normal--14-140-75-75-p-82-iso8859-1</param>
+			<list name="Viewport">
+				<param> AnalyticStressInvariantVP SigmaInvariantVP StressErrorInvariantVP </param>
+			  <param> AnalyticPressureVP recoveredPressureVP PressureErrorVP </param>
+			  <param> AnalyticEpsDotInvariantVP StrainRateInvariantVP EpsDotErrorInvariantVP </param>
+			  <param> AnalyticEpsDotInvariantVP EpsDotInvariantVP EpsDotErrorInvariantVP </param>
+			</list>
+		</struct>
+	</struct>
+</StGermainData>

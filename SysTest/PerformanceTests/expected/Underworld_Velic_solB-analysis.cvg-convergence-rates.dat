@@ -1,0 +1,23 @@
+#Res VelocityField1 VelocityField2 PressureField1 recoveredPressureField1 StrainRateField1 StrainRateField2 StrainRateField3 recoveredEpsDotField1 recoveredEpsDotField2 recoveredEpsDotField3 recoveredSigmaField1 recoveredSigmaField2 recoveredSigmaField3 
+6.250000e-02 8.66158855e-03 7.54252620e-03 1.19088099e-01 2.11071466e-02 5.69809170e-02 6.10237191e-02 2.82902778e-01 9.95728723e-03 1.03119863e-02 5.37683396e-02 9.86629773e-02 5.76850508e-03 5.37683396e-02 
+#Res VelocityField1 VelocityField2 PressureField1 recoveredPressureField1 StrainRateField1 StrainRateField2 StrainRateField3 recoveredEpsDotField1 recoveredEpsDotField2 recoveredEpsDotField3 recoveredSigmaField1 recoveredSigmaField2 recoveredSigmaField3 
+3.125000e-02 2.17016135e-03 1.88951509e-03 5.97386927e-02 6.82510482e-03 2.83783465e-02 3.04172786e-02 1.42553737e-01 2.71404233e-03 2.82460676e-03 1.50418310e-02 3.54493979e-02 1.25722165e-03 1.50418310e-02 
+#Res VelocityField1 VelocityField2 PressureField1 recoveredPressureField1 StrainRateField1 StrainRateField2 StrainRateField3 recoveredEpsDotField1 recoveredEpsDotField2 recoveredEpsDotField3 recoveredSigmaField1 recoveredSigmaField2 recoveredSigmaField3 
+1.562500e-02 5.42319527e-04 4.72145986e-04 2.98938170e-02 2.35704099e-03 1.41750198e-02 1.51967472e-02 7.14172108e-02 7.05478922e-04 7.37734780e-04 4.18216334e-03 1.26852651e-02 3.06155402e-04 4.18216334e-03 
+#Res VelocityField1 VelocityField2 PressureField1 recoveredPressureField1 StrainRateField1 StrainRateField2 StrainRateField3 recoveredEpsDotField1 recoveredEpsDotField2 recoveredEpsDotField3 recoveredSigmaField1 recoveredSigmaField2 recoveredSigmaField3 
+7.812500e-03 1.37029118e-04 1.19732224e-04 1.49499750e-02 8.29482838e-04 7.08575768e-03 7.59690485e-03 3.57261690e-02 1.80964258e-04 1.89711741e-04 1.21108968e-03 4.52018407e-03 7.53871453e-05 1.21108968e-03 
+#Res VelocityField1 VelocityField2 PressureField1 recoveredPressureField1 StrainRateField1 StrainRateField2 StrainRateField3 recoveredEpsDotField1 recoveredEpsDotField2 recoveredEpsDotField3 recoveredSigmaField1 recoveredSigmaField2 recoveredSigmaField3 
+3.906250e-03 3.63395561e-05 3.31893676e-05 7.47536829e-03 2.93444133e-04 3.54266441e-03 3.79826751e-03 1.78652905e-02 4.76367496e-05 4.93991562e-05 3.72553004e-04 1.60634820e-03 1.94802603e-05 3.72553004e-04 
+----------------------------------------------------------------------------------------
+                        Processed data    
+----------------------------------------------------------------------------------------
+-1.20412 -2.06240 -2.12248 -0.92413 -1.67557 -1.24427 -1.21450 -0.54836 -2.00186 -1.98666 -1.26947 -1.00585 -2.23894 -1.26947 
+-1.50515 -2.66351 -2.72365 -1.22374 -2.16589 -1.54701 -1.51688 -0.84602 -2.56638 -2.54904 -1.82270 -1.45039 -2.90059 -1.82270 
+-1.80618 -3.26574 -3.32592 -1.52442 -2.62763 -1.84848 -1.81825 -1.14620 -3.15152 -3.13210 -2.37860 -1.89670 -3.51406 -2.37860 
+-2.10721 -3.86319 -3.92179 -1.82536 -3.08119 -2.14961 -2.11936 -1.44701 -3.74241 -3.72191 -2.91682 -2.34484 -4.12270 -2.91682 
+-2.40824 -4.43962 -4.47900 -2.12637 -3.53247 -2.45067 -2.42041 -1.74799 -4.32206 -4.30628 -3.42881 -2.79416 -4.71041 -3.42881 
+----------------------------------------------------------------------------------------
+                        Convergence rates    
+----------------------------------------------------------------------------------------
+cvg. rate   1.98     1.96     1.00     1.54     1.00     1.00     1.00     1.93     1.93     1.80     1.49     2.05     1.80     
+corr.       0.999963 0.999885 1.000000 0.999859 0.999999 1.000000 0.999998 0.999971 0.999963 0.999863 0.999998 0.999765 0.999863 
