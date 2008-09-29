@@ -163,6 +163,10 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 	Name                    	fieldName;
 	Hook*				generateErrorFields;
 	Hook*				physicsTestHook;
+	Stream*     errStream = Journal_Register( Error_Type, "FieldTests" );
+
+	Journal_Firewall( pluginDict != NULL , errStream,
+			"\nError in %s: No pluginData xml was defined ... aborting\n", __func__ );
 
 	fieldList = Dictionary_Get( pluginDict, "NumericFields" );
 	self->fieldCount = fieldList ? Dictionary_Entry_Value_GetCount( fieldList ) : 0;
@@ -202,7 +206,7 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 	}
 	
 	self->referenceSolnPath     = Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "referenceSolutionFilePath" ) );
-	self->normalise             = Dictionary_Entry_Value_AsBool( Dictionary_Get( pluginDict, "normaliseByReferenceSolution" ) );
+	self->normalise             = Dictionary_Entry_Value_AsBool( Dictionary_Get( pluginDict, "normaliseByAnalyticSolution" ) );
 	self->epsilon               = Dictionary_Entry_Value_AsDouble( Dictionary_Get( pluginDict, "epsilon" ) );
 	self->referenceSolnFromFile = Dictionary_Entry_Value_AsBool( Dictionary_Get( pluginDict, "useReferenceSolutionFromFile" ) );
 	self->appendToAnalysisFile  = Dictionary_GetBool_WithDefault( pluginDict, "appendToAnalysisFile", False ) ;
@@ -235,7 +239,7 @@ void _FieldTest_Build( void* fieldTest, void* data ) {
 	if( self->constantMesh ) Stg_Component_Build( self->constantMesh,  data, False );
 
 	for( field_I = 0; field_I < self->fieldCount; field_I++ ) {
-		FieldTest_BuildReferenceField( self, field_I );
+		FieldTest_BuildAnalyticField( self, field_I );
 		FieldTest_BuildErrField( self, field_I );
 	
 		Stg_Component_Build( self->numericFieldList[field_I], data, False );
@@ -246,17 +250,17 @@ void _FieldTest_Build( void* fieldTest, void* data ) {
 	}
 
 	/*for( swarm_I = 0; swarm_I < self->swarmCount; swarm_I++ ) {
-		FieldTest_BuildReferenceSwarm( self->referenceMesh, self->numericSwarmList[swarm_I], 
+		FieldTest_BuildAnalyticSwarm( self->referenceMesh, self->numericSwarmList[swarm_I], 
 					       self->context, &self->referenceSwarmList[swarm_I] );
 		FieldTest_BuildErrSwarm( self->constantMesh, self->numericSwarmList[swarm_I], 
 					 self->context, &self->referenceSwarmList[swarm_I] );
 	}*/
 
 	if( self->fieldCount ) {
-		self->gAnalyticSq = Memory_Alloc_2DArray( double, self->fieldCount, 3, "global reference solution squared" );
-		self->gErrorSq 	  = Memory_Alloc_2DArray( double, self->fieldCount, 3, "global L2 error squared" );
-		self->gError	  = Memory_Alloc_2DArray( double, self->fieldCount, 3, "global L2 error" );
-		self->gErrorNorm  = Memory_Alloc_2DArray( double, self->fieldCount, 3, "global L2 error normalised" );
+		self->gAnalyticSq = Memory_Alloc_2DArray( double, self->fieldCount, 9, "global reference solution squared" );
+		self->gErrorSq 	  = Memory_Alloc_2DArray( double, self->fieldCount, 9, "global L2 error squared" );
+		self->gError	  = Memory_Alloc_2DArray( double, self->fieldCount, 9, "global L2 error" );
+		self->gErrorNorm  = Memory_Alloc_2DArray( double, self->fieldCount, 9, "global L2 error normalised" );
 
 		if( !self->referenceSolnFromFile ) {
 			self->analyticSolnForFeVarKey = Memory_Alloc_Array( unsigned, self->fieldCount, 
@@ -392,7 +396,7 @@ void _FieldTest_Destroy( void* fieldTest, void* data ) {
 	}
 }
 
-void FieldTest_BuildReferenceField( void* fieldTest, Index field_I ) {
+void FieldTest_BuildAnalyticField( void* fieldTest, Index field_I ) {
 	FieldTest* 		self 			= (FieldTest*) fieldTest;
 	FeVariable*		numericField		= self->numericFieldList[field_I];
 	FeMesh*			referenceMesh		= numericField->feMesh;
@@ -411,7 +415,7 @@ void FieldTest_BuildReferenceField( void* fieldTest, Index field_I ) {
 	unsigned		nDomainVerts		= Mesh_GetDomainSize( referenceMesh, MT_VERTEX );
 	static double*		arrayPtr;
 
-	tmpName = Stg_Object_AppendSuffix( numericField, "ReferenceVariable" );
+	tmpName = Stg_Object_AppendSuffix( numericField, "AnalyticVariable" );
 
 	if( componentsCount == 1 ) {
 		arrayPtr = Memory_Alloc_Array_Unnamed( double, nDomainVerts );
@@ -436,7 +440,7 @@ void FieldTest_BuildReferenceField( void* fieldTest, Index field_I ) {
 	}
 	Memory_Free( tmpName );
 
-	tmpName = Stg_Object_AppendSuffix( numericField, "ReferenceDofLayout" );
+	tmpName = Stg_Object_AppendSuffix( numericField, "AnalyticDofLayout" );
 
 	referenceDofLayout = DofLayout_New( tmpName, variable_Register, Mesh_GetDomainSize( referenceMesh, MT_VERTEX ), referenceMesh );
 	if( componentsCount == 1 )
@@ -461,7 +465,7 @@ void FieldTest_BuildReferenceField( void* fieldTest, Index field_I ) {
 
 	Memory_Free( tmpName );
 
-	tmpName = Stg_Object_AppendSuffix( numericField, "Reference" );
+	tmpName = Stg_Object_AppendSuffix( numericField, "Analytic" );
 
 	self->referenceFieldList[field_I] = FeVariable_New( tmpName, referenceMesh, referenceMesh, referenceDofLayout, NULL, NULL, NULL, 
 							Mesh_GetDimSize( referenceMesh ), False, "StgFEM_Native", "StgFEM_Native",
@@ -469,8 +473,16 @@ void FieldTest_BuildReferenceField( void* fieldTest, Index field_I ) {
 	/* so that the eqnation numbers don't get built for this guy */
 	self->referenceFieldList[field_I]->buildEqNums = False;
 
-	tmpName = Stg_Object_AppendSuffix( self->referenceFieldList[field_I], "Magnitude" );
-	self->referenceMagFieldList[field_I] = OperatorFeVariable_NewUnary( tmpName, self->referenceFieldList[field_I], "Magnitude" );
+	if( componentsCount > Mesh_GetDimSize( referenceMesh ) ) {
+		/* we're dealing with a tensor, so use invariant */
+		tmpName = Stg_Object_AppendSuffix( self->referenceFieldList[field_I], "Invariant" );
+		self->referenceMagFieldList[field_I] = OperatorFeVariable_NewUnary( tmpName, self->referenceFieldList[field_I], "SymmetricTensor_Invariant" );
+	} else {
+		/* we're dealing with a vector, so use magnitude */
+		tmpName = Stg_Object_AppendSuffix( self->referenceFieldList[field_I], "Magnitude" );
+		self->referenceMagFieldList[field_I] = OperatorFeVariable_NewUnary( tmpName, self->referenceFieldList[field_I], "Magnitude" );
+	}
+
 	Memory_Free( tmpName );
 	Stg_Component_Build( self->referenceMagFieldList[field_I], context, False );
 	self->referenceMagFieldList[field_I]->_operator = Operator_NewFromName( self->referenceMagFieldList[field_I]->operatorName, 
@@ -554,8 +566,15 @@ void FieldTest_BuildErrField( void* fieldTest, Index field_I ) {
 	/* so that the eqnation numbers don't get built for this guy */
 	self->errorFieldList[field_I]->buildEqNums = False;
 
-	tmpName = Stg_Object_AppendSuffix( self->errorFieldList[field_I], "Magnitude" );
-	self->errorMagFieldList[field_I] = OperatorFeVariable_NewUnary( tmpName, self->errorFieldList[field_I], "Magnitude" );
+	if( componentsCount > Mesh_GetDimSize( constantMesh ) ) {
+		/* we're dealing with a tensor, so use invariant */
+		tmpName = Stg_Object_AppendSuffix( self->errorFieldList[field_I], "Invariant" );
+		self->errorMagFieldList[field_I] = OperatorFeVariable_NewUnary( tmpName, self->errorFieldList[field_I], "SymmetricTensor_Invariant" );
+	} else {
+		/* we're dealing with a vector, so use magnitude */
+		tmpName = Stg_Object_AppendSuffix( self->errorFieldList[field_I], "Magnitude" );
+		self->errorMagFieldList[field_I] = OperatorFeVariable_NewUnary( tmpName, self->errorFieldList[field_I], "Magnitude" );
+	}
 	Memory_Free( tmpName );
 	Stg_Component_Build( self->errorMagFieldList[field_I], context, False );
 	self->errorMagFieldList[field_I]->_operator = Operator_NewFromName( self->errorMagFieldList[field_I]->operatorName, 
