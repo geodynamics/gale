@@ -33,7 +33,7 @@ if 'config' in COMMAND_LINE_TARGETS or 'help' in COMMAND_LINE_TARGETS:
     proj.dependency(SConfig.packages.cmath)
     proj.dependency(SConfig.packages.libXML2)
     proj.dependency(SConfig.packages.MPI)
-    proj.dependency(SConfig.packages.SVNRevision)
+    proj.dependency(SConfig.packages.HGRevision)
     proj.dependency(SConfig.packages.BlasLapack)
     
     if env['read_hdf5'] and env['write_hdf5']:
