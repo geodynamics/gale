@@ -1188,6 +1188,7 @@ Bool AbstractContext_CheckPointExists( void* context, Index timeStep ) {
 char* AbstractContext_GetTimeInfoFileNameForGivenTimeStep( void* context, Index timeStep, char* checkpointPath ) {
 	AbstractContext*       self = context;	
 	char*                  timeInfoFileName = NULL;
+	char*                  tmp = NULL;
 	Index                  timeInfoStrLen = 0;
 
 	timeInfoStrLen = strlen(checkpointPath) + 1 + 8 + 1 + 5 + 1 + 3 + 1;
@@ -1195,15 +1196,18 @@ char* AbstractContext_GetTimeInfoFileNameForGivenTimeStep( void* context, Index 
 		timeInfoStrLen += strlen(self->checkPointPrefixString) + 1;
 	}
 	timeInfoFileName = Memory_Alloc_Array( char, timeInfoStrLen, "timeInfoFileName" );
+	tmp = Memory_Alloc_Array( char, timeInfoStrLen, "TmptimeInfoFileName" );
 
 	if ( strlen(self->checkPointPrefixString) > 0 ) {
-		sprintf( timeInfoFileName, "%s/%s.", checkpointPath, self->checkPointPrefixString );
+		sprintf( tmp, "%s/%s.", checkpointPath, self->checkPointPrefixString );
 	}
 	else {
-		sprintf( timeInfoFileName, "%s/", checkpointPath );
+		sprintf( tmp, "%s/", checkpointPath );
 	}
 	
-    sprintf( timeInfoFileName, "%stimeInfo.%.5u", timeInfoFileName, timeStep );
+	sprintf( timeInfoFileName, "%stimeInfo.%.5u", tmp, timeStep );
+
+	Memory_Free( tmp );
 
 	return timeInfoFileName;
 }
