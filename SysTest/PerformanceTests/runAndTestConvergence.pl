@@ -6,6 +6,7 @@ sub runTests;
 sub testConvergence;
 sub generateConvergence;
 sub testNumbersAgainstExpected;
+sub readOptionsFile;
 
 ######  Main program    ######
 
@@ -24,51 +25,80 @@ my @resolutions = ( 16, 32, 64 ); #, 128, 256 );
 ######  End main program ######
 
 sub runTests {
-	my $arg;
 	my $res;
 	my $command;
+
+# read commandline args
+	my $arg;
+	my $ii = 0;
+	my $xmlFile = " ";
+	my $optFile = " ";
+	my $testsToRun = 4;
+	my @procs = (1,1,1,1);
+	my @commandLines = ("--elementResI=16 --elementResJ=16 --elementResK=16",
+											"--elementResI=32 --elementResJ=32 --elementResK=32",
+											"--elementResI=64 --elementResJ=64 --elementResK=64",
+											"--elementResI=128 --elementResJ=128 --elementResK=128");
+												
+	# check if xml exists and options file is specified
+	foreach $arg (@ARGV) {
+		if( $arg =~ m/.*\.xml$/ ) { $xmlFile = $arg; }
+		elsif( $arg =~ m/\-optionsFile/ ) { $optFile = $ARGV[$ii+1]; }
+		$ii++;
+	}
+	if( $xmlFile eq " " ) { die "\nNo xml file specified, stopped" ; }
+	if( !(-e $xmlFile) ) { die "\nCannot find input file: $xmlFile, stopped" ; }
+
+	# check if options file is given, otherwise run default
+	if( $optFile eq " " ) {
+		warn "\nNo run options file specifed using commandline arg '-optionsFile xxx'".
+				 "\nUsing default serial mode, with commandLines:\n"; foreach (@commandLines) { print "$_\n"; }
+	}	else {
+		if( !(-e $optFile) ) { die "\nCannot find run options file $optFile, stopped"; }
+		# read in run options file
+		$testsToRun = &readOptionsFile( $optFile, \@procs, \@commandLines );
+	}
+
+
+# do checks on executables and log files
+
 	my $exec = "udw";
 	my $stdout;
 	my $stderr;
-	my $xmlFile = "NULL";
-
-# check if xml exists
-	foreach $arg (@ARGV) {
-		if( $arg =~ m/.*\.xml$/ ) { $xmlFile = $arg; }
+	# Need to check for an executable
+	if( (-e "../../../build/bin/StGermain" eq 0 ) ) {
+		die "\nCan't find ../../../build/bin/StGermain - the executable which runs the test, stopped";
 	}
-
-	if( $xmlFile eq "NULL" ) { die "\nNo xml file specified, stopped" ; }
-	if( !(-e $xmlFile) ) { die "\nCannot find input file: $xmlFile, stopped" ; }
-
-# declare stdout and stderr files, in log dir.
+	print "\n--- Testing the convergence of $xmlFile ---\n";
+	# is the symbolic link there, if not create it
+	if( !(-e $exec) ) {
+		$command = "ln -s ../../../build/bin/StGermain $exec";
+		print "\n$command\n\n";
+		`$command`;
+	}	
+	# declare stdout and stderr files, in log dir.
 	$stdout = "log/$xmlFile"."_runs.stdout";
 	$stderr = "log/$xmlFile"."_runs.stderr";
 
-	print "\n### Testing the convergence of $xmlFile with resolutions:";
-	foreach $res (@resolutions) {
-		print " $res";
-	}
-	print " ###\n\n";
-
-# Need to check for an executable
-	if( (-e "../../../build/bin/StGermain" eq 0 ) ) {
-		die "Can't find ../../../build/bin/StGermain - the executable which runs the test, stopped";
-	}
-	print "Making softlink to executable ../../../build/bin/StGermain called $exec\n\n";
-	$command = "ln -s ../../../build/bin/StGermain $exec";
-	`$command`;
-
-
-# remove old log file if it exists
-	if( (-e "$stdout" ne 0 ) ) {
+	# remove old log file, if it exists
+	if( -e "$stdout" ) {
 		$command = "rm $stdout";
 		`$command`;
 	}
+	# remove old cvg file, if it exists
+	$command = "ls *\.cvg 2>/dev/null";
+	my $cvg = `$command`;
+	chomp( $cvg );
+	if( $cvg ne "" ) { $command = "rm $cvg"; `$command`;} 
 
-	foreach $res (@resolutions) {
+
+# commence running 
+	my $run_I = 0;
+
+	for( $run_I = 0 ; $run_I < $testsToRun ; $run_I++ ) {
 		# run test case
-		$command = "./$exec $xmlFile --elementResI=$res --elementResJ=$res --pluginData.appendToAnalysisFile=True >>$stdout";
-		print "Runing $command";
+		$command = "mpirun -np $procs[$run_I] ./$exec $xmlFile $commandLines[$run_I] --pluginData.appendToAnalysisFile=True >$stdout";
+		print "$command";
 		$command .= " 2>>$stderr";
 		`$command`;
 
@@ -79,19 +109,38 @@ sub runTests {
 				if( $line =~ m/[E|e]rror/ ) {
 					close(ERROR); 
 					$command = "rm $stderr"; `$command`;
-				 	die ("\n\tError: see $stderr - stopped" ); 
+				 	die ("\n\tError: see $stderr or $stdout - stopped" ); 
 				}
 			}
 			close(ERROR); 
 			$command = "rm $stderr"; `$command`;
 
-		print "\n\t\t\t\t....finished\n\n";
+		print " ....finished\n\n";
 	}
-# removing softlink
-	print "Removing the softlink $exec\n";
-	print "### Finished convergence runs ###\n\n";
+	# removing softlink
 	$command = "rm $exec";
+	print "$command\n";
 	`$command`;
+	print "--- Finished convergence runs ---\n\n";
+}
+
+sub readOptionsFile {
+	my ( $optFile, $procs, $commandLines ) = @_;
+	my $line;
+	# $line_I represents the number of tests to run
+	my $line_I = 0;
+	# open options file
+	open OPTFILE, "<$optFile" || die "Can't open options file $optFile, stopped" ;
+	foreach $line (<OPTFILE>) {
+		chomp $line;
+		# only process lines that start with np
+		if( $line =~ m/^np\s+(\d+)\s+(--.*)/ ) {
+			$procs->[$line_I] = $1;
+			$commandLines->[$line_I] = $2;
+			$line_I++;
+		} else { next; }
+	}
+	return $line_I;
 }
 
 sub testNumbersAgainstExpected {
@@ -106,7 +155,7 @@ sub testNumbersAgainstExpected {
 	my @expected;
 	
 	open( INPUT, "<$datFile");
-	print "\n### Testing the output against the expected file $expectedFile ###\n\n";
+	print "\n--- Testing the output against the expected file $expectedFile ---\n\n";
 
 	# get results from inputfile
 	foreach $line (<INPUT>) {
@@ -153,7 +202,7 @@ sub testNumbersAgainstExpected {
 		die "Error: The expected file \n\"$expectedFile\"\n".
 			"has a different number of results than the test file \n\"$datFile\"\n".
 			"so the results testing can't be done.\n".
-			"Add argument '-convergeOnly' to the executable to not check the resulting errors agains the expected file.\n"; 
+			"Remove argument '-againstExpected' to not check the resulting errors agains the expected file.\n"; 
 	}
 
 	my $error;
@@ -174,7 +223,7 @@ sub testNumbersAgainstExpected {
 		}
 	}
 	print "All values within tolerance\n";
-	print "\n### Finished testing the output against the expected file ###\n";
+	print "\n-- Finished testing the output against the expected file ---\n";
 }
 
 sub generateConvergence {
@@ -192,12 +241,12 @@ sub generateConvergence {
 	$datFile = "$cvgFile\-convergence\-rates.dat";
 	if( !(-e $datFile) ) { die "Can't find the convergence rate file: $datFile\n"; }
 
-	# search ARGV for convergeOnly flag
+	# search ARGV for againstExpected flag
 	my $arg;
-	my $runAgainstExpected = 1;
+	my $runAgainstExpected = 0;
 	foreach $arg (@ARGV) {
-		if( $arg =~ m/\-convergeOnly/ ) {
-			$runAgainstExpected = 0;
+		if( $arg =~ m/\-againstExpected/ ) {
+			$runAgainstExpected = 1;
 			last;
 		}
 	}
@@ -253,7 +302,7 @@ sub testConvergence {
 	my $result = "Pass";
 	my $report;
 	my $padding;
-	print "\nResults:\n";
+	print "--- Results of convergence ---\n\n";
 	for( $ii = 0 ; $ii < scalar(@correlations) ; $ii++ ) {
 		$status = "good";
 		$report = "";
@@ -268,20 +317,26 @@ sub testConvergence {
 		if( $correlations[$ii] < 0.99 ) {
 			$status = "BAD!!!";
 			$result = "Fail";
-			$report = $report . "\thas a correlation of $correlations[$ii], below the accepted threshold of 0.99\n";
+			$report = $report."\thas a correlation of $correlations[$ii], below the accepted threshold of 0.99\n";
 		}
 		if( $keys[$ii] =~ m/^Velocity/ ) {
 			if( $cvgRates[$ii] < 1.6 ) {
 				$status = "BAD!!!";
 				$result = "Fail";
-				$report = $report . "\thas a convergence rate of $cvgRates[$ii], theoretically velocity fields should converge at a rate ~ 2\n"
+				$report = $report."\thas a convergence rate of $cvgRates[$ii], theoretically velocity fields should converge at a rate ~ 2\n";
 			}
 		} elsif ($keys[$ii] =~ m/Pressure/ ) {
 			if( $cvgRates[$ii] < 0.9 ) {
 				$status = "BAD!!!";
 				$result = "Fail";
-				$report = $report . "\thas a convergence rate of $cvgRates[$ii], theoretically pressure fields should converge at a rate ~ 1\n"
+				$report = $report."\thas a convergence rate of $cvgRates[$ii], theoretically pressure fields should converge at a rate ~ 1\n";
 			}
+		} elsif ($keys[$ii] =~ m/StrainRate/ ) {
+				if( $cvgRates[$ii] < 0.85 ) {
+					$status = "BAD!!!";
+					$result = "Fail";
+					$report = $report."\thas a convergence rate of $cvgRates[$ii], theoretically pressure fields should converge at a rate ~ 1\n";
+				}
 		}
 		print "$status\n$report";
 	}
