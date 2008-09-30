@@ -130,7 +130,7 @@ void _Velic_solutionA( double* pos,
 	 u2 = -ss_z;
 	 pp = Z*(ss_zzz-kn*kn*ss_z)/kn;
 	 u3 = 2.0*kn*ss_z - pp;
-	 u4 = -Z*(ss_zzz + kn*kn*ss);
+	 u4 = -Z*(ss_zz + kn*kn*ss);
 	 txx = -2.0*Z*kn*ss_z - pp;
 	 
 	 
@@ -168,7 +168,7 @@ void _Velic_solutionA( double* pos,
 	 if( Tstress != NULL ) {
 		 Tstress[0] = sum6;
 		 Tstress[1] = sum3;
-		 Tstress[2] = sum4;
+		 Tstress[2] = sum4; /*2*Z*e_xz;*/
 	 }
 	 if( strainRate != NULL ) {
 		 strainRate[0] = e_xx;

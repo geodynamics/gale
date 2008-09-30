@@ -127,7 +127,6 @@ void _Velic_solB( double* pos,
 
 	 u1 = kn*ss;
 	 u2 = -ss_z;
-	 // TODO:Seek Mirko and ask what's up with this bit
 	 pp = Z*(ss_zzz-kn*kn*ss_z)/kn;
 	 u3 = 2.0*Z*kn*ss_z - pp;
 	 u4 = -Z*(ss_zz + kn*kn*ss);
@@ -149,7 +148,6 @@ void _Velic_solB( double* pos,
 
 	 e_zz = kn*ss_z*cos(kn*x);  /* zz rate of strain */
 	 e_xx = -e_zz;  /* xx rate of strain */
-	 //e_xz = -0.5*(ss_zzz+kn*kn*ss)*sin(kn*x); /* xz rate of strain */
 	 e_xz = -0.5*(ss_zz+kn*kn*ss)*sin(kn*x); /* xz rate of strain */
 
 	 ss *= sin(kn*x); /* stream function */
