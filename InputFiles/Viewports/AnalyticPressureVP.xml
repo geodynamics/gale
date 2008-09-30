@@ -46,7 +46,7 @@
 		<!-- Drawing Objects -->
 		<struct name="pressureErrorMap">
 			<param name="Type">lucScalarField</param>
-			<param name="FieldVariable">PressureField-ErrorMagnitudeField</param>
+			<param name="FieldVariable">PressureField-Error-Magnitude</param>
 			<param name="ColourMap">pressureErrorColourMap</param>
 			<param name="resolution">128</param>
 		</struct>

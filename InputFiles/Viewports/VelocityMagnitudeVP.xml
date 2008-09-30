@@ -11,7 +11,7 @@
 		</struct>
 		<struct name="velocityMagnitudeColourMap" mergeType="replace">
 			<param name="Type">lucColourMap</param>
-			<param name="colours">Purple Blue Green Yellow Orange Red Black</param>
+			<param name="colours">Purple Blue Green Yellow Orange Red</param>
 			<param name="dynamicRange">true</param>
 		</struct>
 		<struct name="timeStep">

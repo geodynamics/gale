@@ -11,7 +11,7 @@
 	   	</struct>
 		<struct name="analyticVelocityMagnitudeColourMap">
 			<param name="Type">lucColourMap</param>
-			<param name="colours">Purple Blue Green Yellow Orange Red Black</param>
+			<param name="colours">Purple Blue Green Yellow Orange Red</param>
 			<param name="dynamicRange">true</param>
 		</struct>
 		<!-- Drawing Objects -->
@@ -42,7 +42,7 @@
 		</struct>
 		<struct name="velocityErrorMagnitudeColourMap">
 			<param name="Type">lucColourMap</param>
-			<param name="colours">Purple Blue Green Yellow Orange Red Black</param>
+			<param name="colours">Purple Blue Green Yellow Orange Red</param>
 			<param name="dynamicRange">true</param>
 		</struct>
 		<struct name="errorVelocityMagnitudeTitle" mergeType="replace">
@@ -52,7 +52,7 @@
 		<!-- Drawing Objects -->
 		<struct name="velocityErrorMagnitudeMap">
 			<param name="Type">lucScalarField</param>
-			<param name="FieldVariable">VelocityField-ErrorMagnitudeField</param>
+			<param name="FieldVariable">VelocityField-Error-Magnitude</param>
 			<param name="ColourMap">velocityErrorMagnitudeColourMap</param>
 			<param name="resolution">128</param>
 		</struct>
