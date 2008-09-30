@@ -4,8 +4,6 @@
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 
 	<include>Underworld/BaseApps/ThermalConvectionPIC.xml</include>
-	<include> Experimental/REP_Setup.xml </include>
-
 
 	<list name="plugins" mergeType="merge">
 		<!-- Output Plugins -->
@@ -17,12 +15,9 @@
 
 	<struct name="pluginData">
 		<list name="NumericFields">
-			<param>VelocityField</param>
-			<param>PressureField</param>
-			<param>recoveredPressureField</param>
-			<param>StrainRateField</param>
-			<param>recoveredEpsDotField</param>
-			<param>recoveredSigmaField</param>
+			<param>VelocityField</param> <param> 0 </param>
+			<param>PressureField</param> <param> 1 </param>
+			<param>StrainRateField</param> <param> 2 </param>
 		</list>
 		<param name="IntegrationSwarm">gaussSwarm</param>
 		<param name="ConstantMesh">constantMesh</param>
