@@ -46,7 +46,7 @@
 	extern const Type Velic_solKz_Type;
 
 	typedef struct {
-		__AnalyticSolution
+		__FieldTest
 		double sigma;
 		double km;
 		int n;

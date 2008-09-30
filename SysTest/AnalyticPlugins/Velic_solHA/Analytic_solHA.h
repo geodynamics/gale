@@ -4,7 +4,7 @@
 	extern const Type Velic_solHA_Type;
 
 	typedef struct {
-		__AnalyticSolution
+		__FieldTest
 		double sigma;
 		double eta;
 		double dx;

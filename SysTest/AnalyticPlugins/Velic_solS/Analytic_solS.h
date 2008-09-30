@@ -46,7 +46,7 @@
 	extern const Type Velic_solS_Type;
 
 	typedef struct {
-		__AnalyticSolution
+		__FieldTest
 		int _n;
 		double _eta;
 	} Velic_solS;

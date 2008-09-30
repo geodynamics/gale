@@ -82,7 +82,6 @@ void _Underworld_solA_Construct( void* analyticSolution, Stg_ComponentFactory* c
 	Bool                     isCorrectInput = True;
 	double                   sigma, Z, wavenumberY, n;
 	
-
 	/* Construct Parent */
 	_FieldTest_Construct( self, cf, data );
 
@@ -104,13 +103,13 @@ void _Underworld_solA_Build( void* analyticSolution, void* data ) {
 
 	_FieldTest_Build( self, data );
 
-	/* args list: self, Index func_I, FieldTest_AnalyticSolutionFunc* func, Index field_I */
-	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 0, Underworld_solA_VelocityFunction, 0 );
-	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 1, Underworld_solA_PressureFunction, 1 );
-	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 1, Underworld_solA_PressureFunction, 2 );
-	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 2, Underworld_solA_StrainRateFunction, 3 );
-	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 2, Underworld_solA_StrainRateFunction, 4 );
-	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 3, Underworld_solA_StressFunction, 5 );
+	/* here we assign the memory and the func ptr for analytic sols */
+	self->_analyticSolutionList = Memory_Alloc_Array_Unnamed( FieldTest_AnalyticSolutionFunc*, 4 );
+	/* this order MUST be consistent with the xml file definition */
+	self->_analyticSolutionList[0] = Underworld_solA_VelocityFunction;
+	self->_analyticSolutionList[1] = Underworld_solA_PressureFunction;
+	self->_analyticSolutionList[2] = Underworld_solA_StrainRateFunction;
+	self->_analyticSolutionList[3] = Underworld_solA_StressFunction;
 
 }
 

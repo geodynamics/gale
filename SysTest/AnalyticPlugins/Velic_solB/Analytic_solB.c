@@ -103,13 +103,13 @@ void _Underworld_solB_Build( void* analyticSolution, void* data ) {
 
 	_FieldTest_Build( self, data );
 
-	/* args list: self, Index func_I, FieldTest_AnalyticSolutionFunc* func, Index field_I */
-	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 0, Underworld_solB_VelocityFunction, 0 );
-	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 1, Underworld_solB_PressureFunction, 1 );
-	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 1, Underworld_solB_PressureFunction, 2 );
-	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 2, Underworld_solB_StrainRateFunction, 3 );
-	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 2, Underworld_solB_StrainRateFunction, 4 );
-	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 3, Underworld_solB_StressFunction, 5 );
+	/* here we assign the memory and the func ptr for analytic sols */
+	self->_analyticSolutionList = Memory_Alloc_Array_Unnamed( FieldTest_AnalyticSolutionFunc*, 4 );
+	/* this order MUST be consistent with the xml file definition */
+	self->_analyticSolutionList[0] = Underworld_solB_VelocityFunction;
+	self->_analyticSolutionList[1] = Underworld_solB_PressureFunction;
+	self->_analyticSolutionList[2] = Underworld_solB_StrainRateFunction;
+	self->_analyticSolutionList[3] = Underworld_solB_StressFunction;
 }
 
 Bool _checkInputParams( Underworld_solB* self ) {

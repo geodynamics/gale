@@ -93,13 +93,13 @@ void _Velic_solKz_Build( void* analyticSolution, void* data ) {
 
 	_FieldTest_Build( self, data );
 
-	/* args list: self, Index func_I, FieldTest_AnalyticSolutionFunc* func, Index field_I */
-	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 0, Velic_solKz_VelocityFunction, 0 );
-	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 1, Velic_solKz_PressureFunction, 1 );
-	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 1, Velic_solKz_PressureFunction, 2 );
-	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 2, Velic_solKz_StrainRateFunction, 3 );
-	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 2, Velic_solKz_StrainRateFunction, 4 );
-	FieldTest_AddAnalyticSolutionFuncToListAtIndex( self, 3, Velic_solKz_StressFunction, 5 );
+	/* here we assign the memory and the func ptr for analytic sols */
+	self->_analyticSolutionList = Memory_Alloc_Array_Unnamed( FieldTest_AnalyticSolutionFunc*, 4 );
+	/* this order MUST be consistent with the xml file definition */
+	self->_analyticSolutionList[0] = Velic_solKz_VelocityFunction;
+	self->_analyticSolutionList[1] = Velic_solKz_PressureFunction;
+	self->_analyticSolutionList[2] = Velic_solKz_StrainRateFunction;
+	self->_analyticSolutionList[3] = Velic_solKz_StressFunction;
 }
 
 void _Velic_solKz_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
@@ -120,7 +120,7 @@ void _Velic_solKz_Construct( void* analyticSolution, Stg_ComponentFactory* cf, v
 }
 
 void* _Velic_solKz_DefaultNew( Name name ) {
-	return _AnalyticSolution_New(
+	return _FieldTest_New(
 			sizeof(Velic_solKz),
 			Velic_solKz_Type,
 			_FieldTest_Delete,
