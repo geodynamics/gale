@@ -789,7 +789,7 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 	double                  residual;
 	double                  tolerance       = self->nonLinearTolerance;
 	Iteration_Index         maxIterations   = self->nonLinearMaxIterations;
-	Bool                    converged;
+	Bool                    converged = False;
 	Stream*                 errorStream     = Journal_Register( Error_Type, self->type );
 	double					wallTime;
 	Iteration_Index         minIterations   = self->nonLinearMinIterations;
