@@ -13,7 +13,7 @@ deps = [ \
 	['https://csd.vpac.org/hg/StgDomain', 'StgDomain' ], \
 	['https://csd.vpac.org/hg/StGermain', 'StGermain' ], \
 	['https://csd.vpac.org/hg/StgFEM', 'StgFEM' ], \
-	['https://www.mcc.monash.edu.au/hg/Underworld', 'Underworld' ], \
+	['https://www.mcc.monash.edu.au/hg/Underworld', 'Underworld' ] ]
 
 # Make sure the '.hg' directory exists
 try:
