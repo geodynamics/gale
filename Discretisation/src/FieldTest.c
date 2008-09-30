@@ -182,7 +182,7 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 		if( !self->referenceSolnFromFile ) {
 			self->analyticSolnForFeVarKey = Memory_Alloc_Array( unsigned, self->fieldCount, 
 								    "analytic solution index for ith feVariable" );
-			self->_analyticSolutionList = Memory_Alloc_Array_Unnamed( FieldTest_AnalyticSolutionFunc*, self->fieldCount );
+		/*	self->_analyticSolutionList = Memory_Alloc_Array_Unnamed( FieldTest_AnalyticSolutionFunc*, self->fieldCount ); */
 		}
 
 		for( feVariable_I = 0; feVariable_I < self->fieldCount; feVariable_I++ ) {
