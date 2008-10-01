@@ -10,16 +10,12 @@ sub readOptionsFile;
 
 ######  Main program    ######
 
-# resolutions to run convergence tests at
-my @resolutions = ( 16, 32, 64 ); #, 128, 256 );
-
-# 1) Run the same xml at the resolutions specified in '@resolutions'
+# 1) Run the same xml at the different resolutions 
 #    these will generate error data
 &runTests();
 
 # 2) Use a linear regression algorithm on the data generated
 #    and check the results for good behavior and acceptable convergence
-#&generateConvergence();
 &testConvergence( &generateConvergence() );
 
 ######  End main program ######
@@ -76,6 +72,11 @@ sub runTests {
 		print "\n$command\n\n";
 		`$command`;
 	}	
+	# check if there's a log dir
+	if( !(-e "log/") ) {
+		$command = "mkdir log";
+		`$command`;
+	}
 	# declare stdout and stderr files, in log dir.
 	$stdout = "log/$xmlFile"."_runs.stdout";
 	$stderr = "log/$xmlFile"."_runs.stderr";
