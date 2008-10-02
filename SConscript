@@ -48,6 +48,7 @@ env.build_plugin('plugins/FeVariableImportExporters/FeVariable_ImportExport_Spec
 env.build_plugin('plugins/FileAnalyticSolution')
 env.build_plugin('plugins/Output/CPUTime')
 env.build_plugin('plugins/Output/FrequentOutput')
+env.build_plugin('plugins/Output/FeVariableList')
 env.build_plugin('plugins/Output/PeakMemory')
 env.build_plugin('plugins/Output/PrintFeVariableDiscreteValues')
 env.build_plugin('plugins/Output/PrintFeVariableDiscreteValues_2dBox')
