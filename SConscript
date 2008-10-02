@@ -50,7 +50,6 @@ env.build_plugin('SysTest/AnalyticPlugins/Velic_solCx')
 env.build_plugin('SysTest/AnalyticPlugins/Velic_solHA')
 env.build_plugin('SysTest/AnalyticPlugins/Velic_solKz')
 env.build_plugin('SysTest/AnalyticPlugins/Velic_solS')
-env.build_plugin('SysTest/AnalyticPlugins/newVelicSolA')
 
 #
 # Build static library.
