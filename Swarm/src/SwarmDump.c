@@ -299,9 +299,10 @@ void _SwarmDump_Execute( void* swarmDump, void* data ) {
 		      remove( filename );
 		      rename( filenameTemp , filename );
 		}
+		Memory_Free( filenameTemp );
 #endif
 		Memory_Free( filename );
-		Memory_Free( filenameTemp );		
+				
 
 	}
 	Stream_UnIndent( info );
