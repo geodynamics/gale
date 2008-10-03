@@ -62,123 +62,8 @@ typedef struct {
 	double     newDensity;
 } Underworld_DensityChange;
 
-double Underworld_DensityChange_GetDiffusivityFromIntPoint( void* _residualForceTerm, void* particle ) {
-
-	/* A function which should will only ever be called via a function pointer 
-	 * hanging off the residualForceTerm data structure.
-	 *
-	 * Role: 
-	 * Input: residualForceTerm and IntegrationPoint although both these are cast as void*
-	 * Return: the diffusivity which is 'mapped' to that materialPoint
-	 */
-	AdvDiffResidualForceTerm* residualForceTerm   = (AdvDiffResidualForceTerm*)_residualForceTerm;
-	IntegrationPointsSwarm*   integrationSwarm    = (IntegrationPointsSwarm*)residualForceTerm->integrationSwarm;
-	IntegrationPoint*         integrationParticle = (IntegrationPoint*)particle;
-	MaterialPointRef*         materialRef;
-
-	materialRef = OneToOneMapper_GetMaterialRef( (OneToOneMapper*)integrationSwarm->mapper, integrationParticle );
-	return Variable_GetValueDouble( residualForceTerm->diffusivityVariable, materialRef->particle_I );
-}
-
-void Underworld_lalala_Setup( UnderworldContext* context ) {
-	/* 
-	 * Role:
-	 * 1) create a new variable on the material Swarm, called thermalDiffusivity.
-	 * 2) modify the residualForceTerm used in the advection diffusion solver. The
-	 * 	modifications enables the materialSwarm parameters for thermalDiffusivity to
-	 * 	be used by the ResidualForceTerm instead of the default diffusivity
-	 *
-	 * Assumptions:
-	 * 	A OneToOneMapper is used
-	 *	AdvDiffResidualForceTerm setup and execution is compatible with it
-	 */
-
-
-	AdvectionDiffusionSLE*    energySLE           = context->energySLE;
-        /* TODO: This assumes OneToOne mapping of intPoints to matPoints, should be fixed in future */
-	OneToOneMapper*           mapper              = (OneToOneMapper*)context->picIntegrationPoints->mapper;
-
-	MaterialPointsSwarm*      materialSwarm = mapper->materialSwarm;
-	ExtensionInfo_Index       particleExtHandle;
-	SwarmVariable*            swarmVariable;
-	ForceVector*              residual;
-	AdvDiffResidualForceTerm* residualForceTerm;
-
-	assert( energySLE );
-	assert( materialSwarm );
-
-	 	
-
-	/* Add Material Extension */
-	particleExtHandle = ExtensionManager_Add( materialSwarm->particleExtensionMgr, 
-				CURR_MODULE_NAME, sizeof( double ) );
-
-	swarmVariable = Swarm_NewScalarVariable(
-			materialSwarm,
-			"thermalDiffusivity",
-			(ArithPointer) ExtensionManager_Get( materialSwarm->particleExtensionMgr, 0, particleExtHandle ),
-			Variable_DataType_Double );
-
-	/* Set Pointers */
-	residual = energySLE->residual;
-	residualForceTerm = Stg_CheckType( Stg_ObjectList_At( residual->forceTermList, 0 ), AdvDiffResidualForceTerm );
-	residualForceTerm->diffusivityVariable = swarmVariable->variable;
-	residualForceTerm->integrationSwarm    = (Swarm*) context->picIntegrationPoints;
-	/* Important that this function is defined here, but is used in 
-	 * StgFEM/SLE/ProvidedSystems/AdvectionDiffusion/src/Residual.c
-	 * see its _AdvDiffResidualForceTerm_AssembleElement for details
-	 */
-	residualForceTerm->_getDiffusivityFromIntPoint = Underworld_DensityChange_GetDiffusivityFromIntPoint;
-}
-
-void Underworld_DensityChange_Assign( UnderworldContext* context ) {
-	/* 
-	 * Role: 
-	 * Assign diffusivity values given via the input dictionary to the materialPoints.
-	 */ 
-	Materials_Register*               materialRegister = context->materials_Register;
-	Material*                         material;
-	Material_Index                    material_I;
-	Material_Index                    materialsCount = Materials_Register_GetCount( materialRegister );
-	Dictionary*                       dictionary;
-	double*                           materialThermalDiffusivity;
-	Particle_Index                    lParticle_I;
-	MaterialPointsSwarm*           	  materialSwarm;               
-	AdvectionDiffusionSLE*            energySLE           = context->energySLE;
-	ForceVector*                      residual;
-	AdvDiffResidualForceTerm*         residualForceTerm;
-	Variable*                         variable;
-
-	materialSwarm = (MaterialPointsSwarm*)Stg_ComponentFactory_ConstructByName( context->CF, "materialSwarm", MaterialPointsSwarm, True, 0 /* dummy */ );
-	assert(materialSwarm);
-	residual = energySLE->residual;
-	residualForceTerm = Stg_CheckType( Stg_ObjectList_At( residual->forceTermList, 0 ), AdvDiffResidualForceTerm );
-	variable = residualForceTerm->diffusivityVariable;
-
-	materialThermalDiffusivity = Memory_Alloc_Array( double, materialsCount, "materialThermalDiffusivity" );
-	
-	/* Loop over materials and get material properties from dictionary */
-	for ( material_I = 0 ; material_I < materialsCount ; material_I++ ) {
-		material    = Materials_Register_GetByIndex( materialRegister, material_I );
-		/* Get the material's dictionary */
-		dictionary  = material->dictionary;
-
-		materialThermalDiffusivity[ material_I ] = 
-			Dictionary_GetDouble_WithDefault( dictionary, "thermalDiffusivity", 1.0 );
-	}
-
-	/* Assign value to particle */
-	for ( lParticle_I = 0 ; lParticle_I < materialSwarm->particleLocalCount ; lParticle_I++ ) {
-		Variable_SetValueDouble( 
-			variable, 
-			lParticle_I, 
-			materialThermalDiffusivity[ MaterialPointsSwarm_GetMaterialIndexAt( materialSwarm, lParticle_I ) ] );
-	}
-
-	Memory_Free( materialThermalDiffusivity );
-}
-
 void Underworld_DensityChange_Check( UnderworldContext* context ) {
+	/* Function runs each timestep to check if centroid is at certain height */
 
 	double volume;
 	double centroid[3];
@@ -208,8 +93,7 @@ void Underworld_DensityChange_Check( UnderworldContext* context ) {
 
 }
 void Underworld_DensityChange_Setup( UnderworldContext* context ) {
-
-	
+		/* Function pulls and checks user input from the xml file */
 	BuoyancyForceTerm*  bft = NULL;
 	BuoyancyForceTerm_MaterialExt* materialExt = NULL;;
 	Materials_Register*  materialRegister = context->materials_Register;
@@ -252,16 +136,14 @@ void Underworld_DensityChange_Setup( UnderworldContext* context ) {
 	self->bftExt = materialExt;
 }
 
-
-
 void _Underworld_DensityChange_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext* context;
 
 	context = (UnderworldContext*)Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
 
 	/* Add functions to entry points */
-	ContextEP_Append( context, AbstractContext_EP_Initialise,  Underworld_DensityChange_Setup );
-	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, 			Underworld_DensityChange_Check );
+	ContextEP_Append( context, AbstractContext_EP_Initialise, Underworld_DensityChange_Setup );
+	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, Underworld_DensityChange_Check );
 	
 }
 
@@ -279,7 +161,7 @@ void* _Underworld_DensityChange_DefaultNew( Name name ) {
 			_Codelet_Execute,
 			_Codelet_Destroy,
 			name );
-	}
+}
 
 Index Underworld_DensityChangeAtDepth_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( 
