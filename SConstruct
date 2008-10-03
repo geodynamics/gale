@@ -27,8 +27,8 @@ if 'config' in COMMAND_LINE_TARGETS or 'help' in COMMAND_LINE_TARGETS:
     proj = env.Package(SConfig.Project)
     proj.opts.AddOptions(
         BoolOption('with_glucifer', 'Use gLucifer visualisation', 1),
-        BoolOption('read_hdf5', 'Read from HDF5 files when restarting from checkpoint', 1),
-        BoolOption('write_hdf5', 'Write checkpoint files as HDF5', 1)
+        BoolOption('read_hdf5', 'Read from HDF5 files when restarting from checkpoint', 0),
+        BoolOption('write_hdf5', 'Write checkpoint files as HDF5', 0)
         )
     proj.dependency(SConfig.packages.cmath)
     proj.dependency(SConfig.packages.libXML2)
@@ -42,7 +42,7 @@ if 'config' in COMMAND_LINE_TARGETS or 'help' in COMMAND_LINE_TARGETS:
         proj.dependency(SConfig.packages.HDF5, False, have_define='WRITE_HDF5')
     elif env['read_hdf5']:
         proj.dependency(SConfig.packages.HDF5, False, have_define='READ_HDF5')
-       
+    
     proj.dependency(SConfig.packages.PETSc, have_define='HAVE_PETSC')
     if env['with_glucifer']:
         proj.dependency(SConfig.packages.OpenGL, have_define='HAVE_GL')
@@ -54,6 +54,8 @@ if 'config' in COMMAND_LINE_TARGETS or 'help' in COMMAND_LINE_TARGETS:
         proj.dependency(SConfig.packages.libPNG, False, have_define='HAVE_PNG')
         proj.dependency(SConfig.packages.libJPEG, False, have_define='HAVE_JPEG')
         proj.dependency(SConfig.packages.libTIFF, False, have_define='HAVE_TIFF')
+        if platform.system() == 'Darwin':
+          proj.dependency(SConfig.packages.CoreServices)
     env.configure_packages()
 
     # Need to define the extension for shared libraries as well
@@ -61,6 +63,11 @@ if 'config' in COMMAND_LINE_TARGETS or 'help' in COMMAND_LINE_TARGETS:
     ext = env['ESCAPE']('"' + env['SHLIBSUFFIX'][1:] + '"')
     lib_dir = env['ESCAPE']('"' + os.path.abspath(env['build_dir']) + '/lib' + '"')
     env.AppendUnique(CPPDEFINES=[('MODULE_EXT', ext), ('LIB_DIR', lib_dir)])
+
+    # If we have no shared libraries, include a pre-processor definition to
+    # prevent modules from trying to load dynamically.
+    if not env['shared_libraries']:
+        env.AppendUnique(CPPDEFINES=['NOSHARED', 'SINGLE_EXE'])
 
     # Save results.
     env.save_config()
@@ -76,18 +83,54 @@ else:
     # INSERT TARGETS HERE.
     #
 
-    SConscript('StGermain/SConscript', exports='env')
+    module = SConscript('StGermain/SConscript', exports='env')
+    module_proto = module[0]
+    module_code = module[1]
     env.Prepend(LIBS='StGermain')
-    SConscript('StgDomain/SConscript', exports='env')
+    module = SConscript('StgDomain/SConscript', exports='env')
+    module_proto += module[0]
+    module_code += module[1]
     env.Prepend(LIBS='StgDomain')
-    SConscript('StgFEM/SConscript', exports='env')
+    module = SConscript('StgFEM/SConscript', exports='env')
+    module_proto += module[0]
+    module_code += module[1]
     env.Prepend(LIBS='StgFEM')
-    SConscript('PICellerator/SConscript', exports='env')
+    module = SConscript('PICellerator/SConscript', exports='env')
+    module_proto += module[0]
+    module_code += module[1]
     env.Prepend(LIBS='PICellerator')
-    SConscript('Underworld/SConscript', exports='env')
+    module = SConscript('Underworld/SConscript', exports='env')
+    module_proto += module[0]
+    module_code += module[1]
     env.Prepend(LIBS='Underworld')
     if env['with_glucifer']:
-        SConscript('gLucifer/SConscript', exports='env')
+        module += SConscript('gLucifer/SConscript', exports='env')
+        env.Prepend(LIBS='glucifer')
+        module_proto += module[0]
+        module_code += module[1]
+
+    # If we're building only with static libraries, we need to build the
+    # StGermain executable here, after we've finished building all the
+    # other static libraries.
+    if not env['shared_libraries'] and env['static_libraries']:
+        module_src = env.build_module_register(env.get_build_path('StGermain/ModuleRegister.c'), module_proto, module_code)
+        module_obj = env.SharedObject(module_src)
+        module_lib = env.Library(env.get_build_path('lib/ModuleRegister'), module_obj)
+        libs = env.get('LIBS', [])
+        ind = libs.index('StGermain')
+        libs.insert(ind + 1, module_lib)
+
+        src = 'StGermain/src/main.c'
+        obj_dst = env.get_build_path('StGermain/' + src[:-2])
+        obj = env.SharedObject(obj_dst, src)
+        prog_dst = env.get_build_path('bin/StGermain')
+        env.Program(prog_dst, obj, LIBS=libs)
+
+        src = 'StGermain/Base/FlattenXML/src/main.c'
+        obj_dst = env.get_build_path('StGermain/' + src[:-2])
+        obj = env.SharedObject(obj_dst, src)
+        prog_dst = env.get_build_path('bin/FlattenXML')
+        env.Program(prog_dst, obj, LIBS=libs)
 
     # Dump package config.
     filename = env.get_build_path('lib/pkgconfig/stgermain.pc')
