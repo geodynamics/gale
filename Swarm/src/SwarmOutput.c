@@ -248,7 +248,10 @@ void _SwarmOutput_Initialise( void* swarmOutput, void* data ) {
 	for ( lParticle_I = 0 ; lParticle_I < swarm->particleLocalCount ; lParticle_I++ ) {
 		/* Open file */
 		Stg_asprintf( &filename, "%s.%05d.dat", self->baseFilename, Variable_GetValueInt( globalIndexVariable, lParticle_I ) );
-		Stream_RedirectFile_WithPrependedPath( stream, context->outputPath, filename );
+		if( context->loadFromCheckPoint )
+			Stream_AppendFile_WithPrependedPath( stream, context->outputPath, filename );
+		else
+			Stream_RedirectFile_WithPrependedPath( stream, context->outputPath, filename );
 
 		/* Print to file */
 		SwarmOutput_PrintHeader( self, stream, lParticle_I, data );
