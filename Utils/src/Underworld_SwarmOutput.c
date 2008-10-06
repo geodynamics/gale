@@ -279,9 +279,13 @@ void _Underworld_SwarmOutput_Execute( void* uwSwarmOutput, void* data ) {
 			MPI_Recv( &canExecute, 1, MPI_INT, myRank - 1, FINISHED_WRITING_TAG, comm, &status );
 		}	
 
-		/* if myRank is 0, create file, otherwise append to file */
+		/* if myRank is 0, create or append file, otherwise append to file */
 		if (myRank == 0) {
-			outputFile = fopen( filename, "w" );
+			/* append to file if restarting from checkpoint */
+			if( context->loadFromCheckPoint )
+				outputFile = fopen( filename, "a" );
+			else
+				outputFile = fopen( filename, "w" );
 			fprintf( outputFile, "# FORMAT is:\n# MaterialID, Xpos, Ypos, Zpos, (values of field)\n" );
 		} else {
 		       	outputFile = fopen( filename, "a" );
