@@ -246,8 +246,8 @@ class Project(SConfig.Node):
             self.backup_variable(scons_env, d.keys(), old_state)
             scons_env.MergeFlags(d)
 
-	# Setup the optimisation flags
-        if self.env['with_optimise']:
+        # Setup the optimisation flags
+        if self.env['with_optimise'] and not self.env['with_debug']:
             d = scons_env.ParseFlags('-O3')
             self.backup_variable(scons_env, d.keys(), old_state)
             scons_env.MergeFlags(d)
