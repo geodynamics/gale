@@ -89,6 +89,11 @@
 	</struct>
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">
+		<struct name="temperatureColourBar">
+			<param name="Type">lucColourBar</param>
+			<param name="ColourMap">temperatureColourMap</param>
+		</struct>
+</param>
 
 </StGermainData>

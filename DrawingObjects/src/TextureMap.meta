@@ -102,6 +102,22 @@
 
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">
+		<struct name="textureMap">
+			<param name="Type">lucTextureMap</param>
+			<param name="image">./Bathymetry.ppm</param>
+			<param name="bottomLeftX">0.0</param>
+			<param name="bottomLeftY">0.0</param>
+
+			<param name="bottomRightX">1.0</param>
+			<param name="bottomRightY">0.0</param>
+			
+			<param name="topRightX">1.0</param>
+			<param name="topRightY">1.0</param>
+			
+			<param name="topLeftX">0.0</param>
+			<param name="topLeftY">1.0</param>
+		</struct>
+</param>
 
 </StGermainData>
