@@ -48,8 +48,14 @@ const Type CFile_Type = "CFile";
 
 JournalFile* CFile_New()
 {
-	return (JournalFile*)_CFile_New( sizeof(CFile), CFile_Type, _CFile_Delete, _CFile_Print, NULL );
+	return (JournalFile*)_CFile_New( sizeof(CFile), CFile_Type, _CFile_Delete, _CFile_Print, NULL, False );
 }
+
+JournalFile* CFileBinary_New()
+{
+	return (JournalFile*)_CFile_New( sizeof(CFile), CFile_Type, _CFile_Delete, _CFile_Print, NULL, True );
+}
+
 
 JournalFile* CFile_New2( char* fileName )
 {
@@ -70,11 +76,13 @@ CFile* _CFile_New(
 	Type type,
 	Stg_Class_DeleteFunction* _delete,
 	Stg_Class_PrintFunction* _print,
-	Stg_Class_CopyFunction* _copy )
+	Stg_Class_CopyFunction* _copy,
+	Bool                    binary)
 {
 	CFile* self;
 	
 	self = (CFile*)_Stg_Class_New( _sizeOfSelf, type, _delete, _print, _copy );
+	self->binary = binary;
 	
 	_CFile_Init( self );
 	
@@ -117,7 +125,10 @@ Bool _CFile_Open( void* file, char* fileName )
 	CFile* self = (CFile*) file;
 	FILE* filePtr;
 	
-	filePtr = fopen( fileName, "w" );
+	if(!self->binary)
+		filePtr = fopen( fileName, "w" );
+	else
+		filePtr = fopen( fileName, "wb" );
 	
 	if ( filePtr == NULL )
 	{
@@ -134,7 +145,10 @@ Bool _CFile_Append( void* file, char* fileName )
 	CFile* self = (CFile*) file;
 	FILE* filePtr;
 	
-	filePtr = fopen( fileName, "a" );
+	if(!self->binary)
+		filePtr = fopen( fileName, "a" );
+	else
+		filePtr = fopen( fileName, "ab" );
 	
 	if ( filePtr == NULL )
 	{

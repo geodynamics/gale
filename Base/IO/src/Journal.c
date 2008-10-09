@@ -45,6 +45,7 @@
 #include "Stream.h"
 #include "CStream.h"
 #include "MPIStream.h"
+#include "BinaryStream.h"
 #include "StreamFormatter.h"
 
 #include <assert.h>
