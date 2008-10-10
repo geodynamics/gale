@@ -1,0 +1,9 @@
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+  <struct name="components" mergeType="merge">
+    <struct name="storeViscosity">
+      <param name="Type">StoreVisc</param>
+      <param name="MaterialPointsSwarm">materialSwarm</param>
+    </struct>
+  </struct>
+</StGermainData>
