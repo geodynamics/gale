@@ -196,7 +196,10 @@ void VTKOutput_particles(IntegrationPointsSwarm*  picswarm,
           ( material->dictionary, "diffusivity", defaultDiffusivity );
         rheology_register=(Rheology_Register*)material->rheology_Register;
 
-        rheologyCount = Rheology_Register_GetCount( rheology_register );
+        if( rheology_register )
+           rheologyCount = Rheology_Register_GetCount( rheology_register );
+        else
+           rheologyCount = 0;
         
         coord = materialparticle->coord;
         yielding=0;
