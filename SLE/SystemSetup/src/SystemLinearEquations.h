@@ -131,6 +131,8 @@
 		EntryPoint*					    postNlEP;		       \
 		char*						    nlConvergedEPName;	       \
 		EntryPoint*					    nlConvergedEP;	       \
+                Bool                                                nlFormJacobian; \
+                Vec                                                 nlCurIterate; \
 		/* END LUKE'S FRICTIONAL BCS BIT */					       \
 		/* Multi-grid data. */ \
 		Bool                                                mgEnabled;                 \

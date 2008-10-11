@@ -30,6 +30,8 @@
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #include <mpi.h>
+#include <petsc.h>
+#include <petscvec.h>
 #include <StGermain/StGermain.h>
 #include <StgDomain/StgDomain.h>
 #include "StgFEM/Discretisation/Discretisation.h"
@@ -212,6 +214,8 @@ void _SystemLinearEquations_Init(
 	Stg_asprintf( &self->nlConvergedEPName, "%s-nlConvergedEP", self->name );
 	self->nlConvergedEP = EntryPoint_New( self->nlConvergedEPName, EntryPoint_2VoidPtr_CastType );
 	/* END LUKE'S FRICTIONAL BCS BIT */
+        self->nlFormJacobian = False;
+        self->nlCurIterate = PETSC_NULL;
 	
 	/* Initialise MG stuff. */
 	self->mgEnabled = False;
