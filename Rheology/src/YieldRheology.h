@@ -87,6 +87,8 @@
 		StrainWeakening*                                   strainWeakening;             \
 		ExtensionInfo_Index                                hasYieldedParticleExtHandle; \
 		SwarmVariable*                                     hasYieldedVariable;          \
+                double                                             yieldCriterion;              \
+                double                                             yieldIndicator;              \
 		double                                             minVisc;
 
 	struct YieldRheology { __YieldRheology };

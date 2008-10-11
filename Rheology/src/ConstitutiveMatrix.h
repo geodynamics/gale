@@ -70,6 +70,7 @@
 		\
 		/* ConstitutiveMatrix info */                                                   \
 		double**                                     matrixData;                        \
+                double                                       derivs[9];                         \
 		Dimension_Index                              dim;                               \
 		Bool                                         isSwarmTypeIntegrationPointsSwarm; \
 		Materials_Register*                          materials_Register;                \
@@ -77,8 +78,8 @@
 		Index                                        columnSize;                        \
 		Index                                        rowSize;                           \
 		Bool                                         previousSolutionExists;            \
-		int                                          currentParticleIndex; \
-		SystemLinearEquations*                       sle;	\
+		int                                          currentParticleIndex;              \
+		SystemLinearEquations*                       sle;                               \
 		Iteration_Index                              sleNonLinearIteration_I;
 		
 	struct ConstitutiveMatrix { __ConstitutiveMatrix };

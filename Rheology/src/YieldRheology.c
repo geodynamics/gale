@@ -147,6 +147,9 @@ void _YieldRheology_Init( YieldRheology* self, StrainWeakening* strainWeakening,
 	 * if there are no material points - this will be '-1'
 	 * if there are material points - all YieldRheology objects will refer to the same handle */
 	self->hasYieldedParticleExtHandle = handle;
+
+        self->yieldCriterion = 0.0;
+        self->minVisc = 0.0;
 }
 
 
@@ -186,9 +189,9 @@ void _YieldRheology_Construct( void* rheology, Stg_ComponentFactory* cf, void* d
 		False,
 		data  ) ;
 
-	self->minVisc = Stg_ComponentFactory_GetDouble( cf, self->name, "minimumViscosity", 0.0 );
-
 	_YieldRheology_Init( self, strainWeakening, materialPoints );
+
+	self->minVisc = Stg_ComponentFactory_GetDouble( cf, self->name, "minimumViscosity", 0.0 );
 }
 
 void _YieldRheology_Build( void* rheology, void* data ) {

@@ -71,7 +71,9 @@
 		FeVariable*                                         pressureField;                         \
 		double                                              minimumYieldStress;                    \
 		double                                              frictionCoefficient;                   \
-		double                                              frictionCoefficientAfterSoftening;
+		double                                              frictionCoefficientAfterSoftening; \
+                                                                        \
+                double curFrictionCoef;
 
 				
 	struct DruckerPrager { __DruckerPrager };
@@ -110,6 +112,15 @@
 			Element_LocalIndex               lElement_I,
 			MaterialPoint*                   materialPoint,
 			Coord                            xi );
+
+void _DruckerPrager_HasYielded( 
+		void*                            rheology,
+		ConstitutiveMatrix*              constitutiveMatrix,
+		MaterialPointsSwarm*             materialPointsSwarm,
+		Element_LocalIndex               lElement_I,
+		MaterialPoint*                   materialPoint,
+		double                           yieldCriterion,
+		double                           yieldIndicator );
 
 	void _DruckerPrager_UpdateDrawParameters( void* rheology ) ;
 	

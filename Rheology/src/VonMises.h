@@ -60,7 +60,9 @@
 		double                                              cohesion;                             \
 		double                                              cohesionAfterSoftening;               \
 		Bool                                                strainRateSoftening;                  \
-                double                                              maximumCorrectionFactor;
+                double                                              maximumCorrectionFactor; \
+                SymmetricTensor                                     stress;\
+                double                                              stressInv;
 
 	struct VonMises { __VonMises };
 	

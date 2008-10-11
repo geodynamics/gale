@@ -42,7 +42,7 @@
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-
+#include <math.h>
 #include <mpi.h>
 #include <StGermain/StGermain.h>
 #include <StgDomain/StgDomain.h>
@@ -186,6 +186,9 @@ double _VonMises_GetYieldCriterion(
 	effectiveCohesion =  self->cohesion * (1.0 - strainWeakeningRatio) + 
 			self->cohesionAfterSoftening * strainWeakeningRatio;
 
+        /* Store current yield criterion for jacobian evaluation. */
+        self->yieldCriterion = effectiveCohesion;
+
 	return effectiveCohesion;
 }
 
@@ -198,9 +201,7 @@ double _VonMises_GetYieldIndicator(
 		Coord                            xi )
 {
 	VonMises*                         self             = (VonMises*) rheology;
-	SymmetricTensor                   stress;
 	SymmetricTensor                   strainRate;
-	double                            stressInv;
 	
 	/* Get Strain Rate */
 	if( self->strainRateField ) {
@@ -214,10 +215,12 @@ double _VonMises_GetYieldIndicator(
 	}
 
 	/* Get Stress */
-	ConstitutiveMatrix_CalculateStress( constitutiveMatrix, strainRate, stress );
-	stressInv = SymmetricTensor_2ndInvariant( stress, constitutiveMatrix->dim );
+	ConstitutiveMatrix_CalculateStress( constitutiveMatrix, strainRate, self->stress );
+	self->stressInv = SymmetricTensor_2ndInvariant( self->stress, constitutiveMatrix->dim );
 
-	return stressInv;
+        self->yieldIndicator = self->stressInv;
+
+	return self->stressInv;
 }
 
 void _VonMises_HasYielded( 
@@ -237,14 +240,26 @@ void _VonMises_HasYielded(
 		viscosity = 2.0 * yieldCriterion * yieldCriterion * viscosity / 
 				( yieldCriterion * yieldCriterion + yieldIndicator * yieldIndicator );
 		ConstitutiveMatrix_SetIsotropicViscosity( constitutiveMatrix, viscosity );
-	}	
+	}
 	else {
-		double beta = 1.0 - yieldCriterion/yieldIndicator;
-		double corr = -viscosity * beta;
+                double beta = 1.0 - yieldCriterion / yieldIndicator;
+                double corr = -viscosity * beta;
 
 		if( (viscosity + corr) < self->minVisc )
 		   corr = self->minVisc - viscosity;
 		ConstitutiveMatrix_IsotropicCorrection( constitutiveMatrix, corr );
 	}
-}
 
+        if( constitutiveMatrix->sle && constitutiveMatrix->sle->nlFormJacobian ) {
+           double* derivs = constitutiveMatrix->derivs;
+           double coef;
+
+           coef = -viscosity * self->yieldCriterion / (2.0 * self->stressInv * self->stressInv * self->stressInv);
+           derivs[0] += coef * 2.0 * viscosity * self->stress[0];
+           derivs[4] += coef * 2.0 * viscosity * self->stress[1];
+           derivs[1] += coef * 2.0 * viscosity * self->stress[2];
+           derivs[3] += coef * 2.0 * viscosity * self->stress[2];
+
+        }
+
+}

@@ -262,6 +262,9 @@ void _ConstitutiveMatrix_Build( void* constitutiveMatrix, void* data ) {
 	Journal_DPrintf( self->debug, "In %s - for matrix %s\n", __func__, self->name );
 
 	self->matrixData = Memory_Alloc_2DArray( double, self->columnSize, self->rowSize, self->name );
+/*
+        self->deriv = AllocArray2D( double, (self->dim + 1), (self->dim + 1) );
+*/
 
 	for ( material_I = 0 ; material_I < materialCount ; material_I++ ) {
 		material = (RheologyMaterial*) Materials_Register_GetByIndex( self->materials_Register, material_I );
@@ -339,6 +342,7 @@ void ConstitutiveMatrix_ZeroMatrix( void* constitutiveMatrix ) {
 	ConstitutiveMatrix* self   = (ConstitutiveMatrix*)constitutiveMatrix;
 
 	memset( self->matrixData[0], 0, (self->columnSize * self->rowSize)*sizeof(double) );
+        memset( self->derivs, 0, 3 * 3 * sizeof(double) );
 	self->isDiagonal = True;
 }
 
@@ -364,6 +368,7 @@ void ConstitutiveMatrix_MultiplyByValue( void* constitutiveMatrix, double factor
 		for ( row_I = 0 ; row_I < rowSize ; row_I++ ) {
 			columnValue[ row_I ] *= factor;
 		}
+
 	}
 }
 	

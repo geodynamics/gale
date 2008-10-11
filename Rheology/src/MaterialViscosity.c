@@ -141,5 +141,14 @@ void _MaterialViscosity_ModifyConstitutiveMatrix(
 {
 	MaterialViscosity*	                      self              = (MaterialViscosity*) rheology;
 
-	ConstitutiveMatrix_SetIsotropicViscosity( constitutiveMatrix, self->eta0 );
+        ConstitutiveMatrix_SetIsotropicViscosity( constitutiveMatrix, self->eta0 );
+
+        if( constitutiveMatrix->sle && constitutiveMatrix->sle->nlFormJacobian ) {
+           double* derivs = constitutiveMatrix->derivs;
+
+           /* Clear the derivative term. This should be done before any rheology
+              is called, that way we can do nothing here. */
+           memset( derivs, 0, 3 * 3 * sizeof(double) );
+
+        }
 }

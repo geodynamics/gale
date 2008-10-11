@@ -227,7 +227,7 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
 		FiniteElementContext*                              context,
 		double**                                           elStiffMat ) 
 {
-	ConstitutiveMatrix*     self                = (ConstitutiveMatrix*) constitutiveMatrix;
+	ConstitutiveMatrixCartesian*     self                = (ConstitutiveMatrix*) constitutiveMatrix;
 	Swarm*                  swarm               = self->integrationSwarm;
 	FeVariable*             variable1           = stiffnessMatrix->rowVariable;
 	Dimension_Index         dim                 = stiffnessMatrix->dim;
@@ -241,6 +241,7 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
 	double                  detJac;
 	Cell_Index              cell_I;
 	ElementType*            elementType;
+        double                  Bj_x, Bj_y;
 	double                  Bi_x; 
 	double                  Bi_y;
 	double                  Bi_z;
@@ -249,6 +250,7 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
 	Dof_Index               nodeDofCount;
 	double**                Dtilda_B;
 	Index                   tensorComponents    = StGermain_nSymmetricTensorVectorComponents( dim );
+        double                  vel[3], velDerivs[9], *Ni, eta;
 
 	self->sle = sle;
 
@@ -258,7 +260,14 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
 	nodeDofCount      = dim;
 
 	/* allocate */
-	GNx      = Memory_Alloc_2DArray( double, dim, elementNodeCount, "Global Shape Function Derivatives" );
+        if( elementNodeCount > self->maxNumNodes ) {
+           self->maxNumNodes = elementNodeCount;
+           self->GNx = ReallocArray2D( self->GNx, double, dim, elementNodeCount );
+           self->Ni = ReallocArray( self->Ni, double, elementNodeCount );
+        }
+        GNx = self->GNx;
+        Ni = self->Ni;
+
 	Dtilda_B = Memory_Alloc_2DArray( double, tensorComponents , dim, "D~ times B matrix" );
 
 	/* Get number of particles per element */
@@ -288,17 +297,30 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
 			variable1->feMesh, lElement_I,
 			particle->xi, dim, &detJac, GNx );
 
+		ElementType_ShapeFunctionsGlobalDerivs( 
+			elementType,
+			variable1->feMesh, lElement_I,
+			particle->xi, dim, &detJac, GNx );
+
+                /* Evalulate velocity and velocity derivatives at this particle. */
+                FeVariable_InterpolateWithinElement(
+                   variable1, lElement_I, particle->xi, vel );
+                FeVariable_InterpolateDerivatives_WithGNx(
+                   variable1, lElement_I, GNx, velDerivs );
+
 		/* Assemble Constitutive Matrix */
 		// TODO : pass in the context here?
-		ConstitutiveMatrix_Assemble(
-		   constitutiveMatrix, lElement_I,
-		   swarm->cellParticleTbl[cell_I][cParticle_I], particle );
+		ConstitutiveMatrix_Assemble( constitutiveMatrix, lElement_I,
+                                             swarm->cellParticleTbl[cell_I][cParticle_I], particle );
+                eta = self->matrixData[2][2];
 
 		/* Turn D Matrix into D~ Matrix by multiplying in the weight and the detJac (this is a shortcut for speed) */
 		ConstitutiveMatrix_MultiplyByValue( constitutiveMatrix, detJac * particle->weight );
 
 		for( rowNode_I = 0 ; rowNode_I < elementNodeCount ; rowNode_I++ ) {
 			rowNodeDof_I = rowNode_I*nodeDofCount;
+                        Bj_x = GNx[0][rowNode_I];
+                        Bj_y = GNx[1][rowNode_I];
 			
 			/* Build D~ * B */
 			ConstitutiveMatrix_Assemble_D_B( constitutiveMatrix, GNx, rowNode_I, Dtilda_B );
@@ -310,10 +332,39 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
 				
 				/* Build BTrans * ( D~ * B ) */
 				if ( dim == 2 ) {
-					elStiffMat[ colNodeDof_I     ][ rowNodeDof_I     ] += Bi_x * Dtilda_B[0][0] + Bi_y * Dtilda_B[2][0];
-					elStiffMat[ colNodeDof_I     ][ rowNodeDof_I + 1 ] += Bi_x * Dtilda_B[0][1] + Bi_y * Dtilda_B[2][1];
-					elStiffMat[ colNodeDof_I + 1 ][ rowNodeDof_I     ] += Bi_y * Dtilda_B[1][0] + Bi_x * Dtilda_B[2][0];
-					elStiffMat[ colNodeDof_I + 1 ][ rowNodeDof_I + 1 ] += Bi_y * Dtilda_B[1][1] + Bi_x * Dtilda_B[2][1];
+
+                                        if( !sle->nlFormJacobian ) {
+
+                                           elStiffMat[ colNodeDof_I     ][ rowNodeDof_I     ] += Bi_x * Dtilda_B[0][0] + Bi_y * Dtilda_B[2][0];
+                                           elStiffMat[ colNodeDof_I     ][ rowNodeDof_I + 1 ] += Bi_x * Dtilda_B[0][1] + Bi_y * Dtilda_B[2][1];
+                                           elStiffMat[ colNodeDof_I + 1 ][ rowNodeDof_I     ] += Bi_y * Dtilda_B[1][0] + Bi_x * Dtilda_B[2][0];
+                                           elStiffMat[ colNodeDof_I + 1 ][ rowNodeDof_I + 1 ] += Bi_y * Dtilda_B[1][1] + Bi_x * Dtilda_B[2][1];
+
+                                        }
+                                        else {
+                                           double DuDx, DuDy, DvDx, DvDy;
+                                           double DetaDu, DetaDv;
+                                           double intFac, fac;
+
+                                           DuDx = velDerivs[0]; DuDy = velDerivs[1];
+                                           DvDx = velDerivs[2]; DvDy = velDerivs[3];
+                                           DetaDu = self->derivs[0] * Bj_x + self->derivs[1] * Bj_y + self->derivs[2] * Ni[rowNode_I];
+                                           DetaDv = self->derivs[3] * Bj_x + self->derivs[4] * Bj_y + self->derivs[5] * Ni[rowNode_I];
+                                           intFac = particle->weight * detJac;
+
+                                           fac = eta * Bj_y + DuDy * DetaDu + DvDx * DetaDu;
+                                           elStiffMat[colNodeDof_I][rowNodeDof_I] +=
+                                              intFac * (2.0 * Bi_x * (eta * Bj_x + DuDx * DetaDu) + Bi_y * fac);
+                                           elStiffMat[colNodeDof_I + 1][rowNodeDof_I] +=
+                                              intFac * (2.0 * Bi_y * DvDy * DetaDu + Bi_x * fac);
+
+                                           fac = eta * Bj_x + DvDx * DetaDv + DuDy * DetaDv;
+                                           elStiffMat[colNodeDof_I][rowNodeDof_I + 1] +=
+                                              intFac * (2.0 * Bi_x * DuDx * DetaDv + Bi_y * fac);
+                                           elStiffMat[colNodeDof_I + 1][rowNodeDof_I + 1] +=
+                                              intFac * (2.0 * Bi_y * (eta * Bj_y + DvDy * DetaDv) + Bi_x * fac);
+
+                                        }
 				}
 				else {
 					Bi_z = GNx[ K_AXIS ][colNode_I];
@@ -344,7 +395,6 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
 	}
 
 	/* free */
-	Memory_Free(GNx); 
 	Memory_Free(Dtilda_B); 
 }
 

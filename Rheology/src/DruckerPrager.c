@@ -164,6 +164,8 @@ void _DruckerPrager_Init(
 		(ArithPointer) &particleExt->tensileFailure - (ArithPointer) &materialPoint,
 		Variable_DataType_Char );
 
+        self->curFrictionCoef = 0.0;
+
 }
 
 void* _DruckerPrager_DefaultNew( Name name ) {
@@ -182,7 +184,7 @@ void* _DruckerPrager_DefaultNew( Name name ) {
 			_YieldRheology_ModifyConstitutiveMatrix,
 			_DruckerPrager_GetYieldCriterion,
 			_VonMises_GetYieldIndicator,
-			_VonMises_HasYielded,
+			_DruckerPrager_HasYielded,
 			name );
 }
 
@@ -325,13 +327,40 @@ double _DruckerPrager_GetYieldCriterion(
 	
 	
 	frictionalStrength = dpFrictionCoefficient * pressure + dpCohesion ;
-				
+
 	particleExt->tensileFailure = (frictionalStrength <= 0.0);
-			 
+
 	if ( frictionalStrength < minimumYieldStress) 
 		frictionalStrength = minimumYieldStress;
 
+        self->yieldCriterion = frictionalStrength;
+        self->curFrictionCoef = dpFrictionCoefficient;
+
 	return frictionalStrength;
+}
+
+void _DruckerPrager_HasYielded( 
+		void*                            rheology,
+		ConstitutiveMatrix*              constitutiveMatrix,
+		MaterialPointsSwarm*             materialPointsSwarm,
+		Element_LocalIndex               lElement_I,
+		MaterialPoint*                   materialPoint,
+		double                           yieldCriterion,
+		double                           yieldIndicator )
+{
+   DruckerPrager* self = (DruckerPrager*)rheology;
+   double viscosity = ConstitutiveMatrix_GetIsotropicViscosity( constitutiveMatrix );
+
+   _VonMises_HasYielded(
+      self, constitutiveMatrix, materialPointsSwarm, lElement_I, materialPoint,
+      yieldCriterion, yieldIndicator );
+
+   if( constitutiveMatrix->sle && constitutiveMatrix->sle->nlFormJacobian ) {
+
+      constitutiveMatrix->derivs[8] += viscosity * self->curFrictionCoef / yieldIndicator;
+
+   }
+
 }
 
 void _DruckerPrager_UpdateDrawParameters( void* rheology ) {
