@@ -197,8 +197,8 @@ void _DivergenceMatrixTerm_AssembleElement(
 {
    DivergenceMatrixTerm*        self         = Stg_CheckType( matrixTerm, DivergenceMatrixTerm );
    Swarm*                              swarm        = self->integrationSwarm;
-   FeVariable*                         variable_row = stiffnessMatrix->rowVariable;
-   FeVariable*                         variable_col = stiffnessMatrix->columnVariable;
+   FeVariable*                         variable_row = stiffnessMatrix->columnVariable;
+   FeVariable*                         variable_col = stiffnessMatrix->rowVariable;
    Dimension_Index                     dim          = stiffnessMatrix->dim;
    double*                             xi;
    double                              weight;
@@ -228,8 +228,8 @@ void _DivergenceMatrixTerm_AssembleElement(
    elementType_col = FeMesh_GetElementType( variable_col->feMesh, lElement_I );
    nodesPerEl_col = elementType_col->nodeCount;
 		
-   dofPerNode_row = 1;	/* velocity */
-   dofPerNode_col = dim;	/* pressure */
+   dofPerNode_row = dim;	/* velocity */
+   dofPerNode_col = 1;	/* pressure */
 	
    totalDofsThisElement_row = nodesPerEl_row * dofPerNode_row;
    totalDofsThisElement_col = nodesPerEl_col * dofPerNode_col;
@@ -264,8 +264,8 @@ void _DivergenceMatrixTerm_AssembleElement(
                for( colDof_I=0; colDof_I<dofPerNode_col; colDof_I++) {		
                   col = colNode_I*dofPerNode_col + colDof_I;
 						
-                  elStiffMat[row][col] +=
-                     + weight * ( -detJac ) * ( GNx_row[colDof_I][colNode_I] * Ni_col[rowNode_I] );
+                  elStiffMat[col][row] +=
+                     + weight * ( -detJac ) * ( GNx_row[rowDof_I][rowNode_I] * Ni_col[colNode_I] );
                }
             }
          }
