@@ -38,6 +38,7 @@
 #include "Stream.h"
 #include "CStream.h"
 #include "MPIStream.h"
+#include "BinaryStream.h"
 #include "StreamFormatter.h"
 #include "LineFormatter.h"
 #include "RankFormatter.h"
@@ -104,6 +105,12 @@ Bool BaseIO_Init( int* argc, char** argv[] )
 	typedStream = MPIStream_New( MPIStream_Type );
 	Stream_Enable( typedStream, True );
 	Stream_SetLevel( typedStream, 1 );
+
+	/* binary stream */
+	typedStream = BinaryStream_New( BinaryStream_Type );
+	Stream_Enable( typedStream, True );
+	Stream_SetLevel( typedStream, 1 );
+	
 	
 	Journal_RegisterTypedStream( typedStream );
 

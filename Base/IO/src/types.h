@@ -78,6 +78,7 @@
 	typedef struct Stream			Stream;
 	typedef struct CStream			CStream;
 	typedef struct MPIStream		MPIStream;
+	typedef struct BinaryStream	BinaryStream;
 	
 	typedef struct StreamFormatter		StreamFormatter;
 	typedef struct StreamFormatter_Buffer	StreamFormatter_Buffer;

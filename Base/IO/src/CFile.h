@@ -53,7 +53,9 @@
 	/** \def __CFile See CFile. */
 	#define __CFile \
 		/* General info */ \
-		__JournalFile
+		__JournalFile  \
+		/* open a binary file? */ \
+		Bool   binary;
 	struct CFile { __CFile };
 
 
@@ -63,6 +65,9 @@
 	/** Creates a new CFile, opening the file given by fileName. Returns NULL if system is unable to open the given file. */
 	JournalFile* CFile_New2( char* fileName );
 
+	/** Creates a new binary CFile with no opened file. JournalFile_Open() must be called. */
+	JournalFile* CFileBinary_New();
+	
 	/** Initialises an instance of CFile. Will not open any files. */
 	void CFile_Init( CFile* self );
 
@@ -73,7 +78,8 @@
 		Type type,
 		Stg_Class_DeleteFunction* _delete,
 		Stg_Class_PrintFunction* _print,
-		Stg_Class_CopyFunction* _copy );
+		Stg_Class_CopyFunction* _copy,
+		Bool                   binary);
 		
 	/** Init interface. */
 	void _CFile_Init( CFile* self );
