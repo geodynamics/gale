@@ -56,24 +56,25 @@
 #endif
 
 /* AbstractContext entry point names */
-Type AbstractContext_EP_Construct =		"Context_Construct";
+Type AbstractContext_EP_Construct =		        "Context_Construct";
 Type AbstractContext_EP_ConstructExtensions = 	"Context_ConstructExtensions";
-Type AbstractContext_EP_Build = 		"Context_Build";
-Type AbstractContext_EP_Initialise =		"Context_Initialise";
-Type AbstractContext_EP_Execute =		"Context_Execute";
-Type AbstractContext_EP_Destroy =		"Context_Destroy";
+Type AbstractContext_EP_Build = 		        "Context_Build";
+Type AbstractContext_EP_Initialise =	     	"Context_Initialise";
+Type AbstractContext_EP_Execute =		        "Context_Execute";
+Type AbstractContext_EP_Destroy =	         	"Context_Destroy";
 Type AbstractContext_EP_DestroyExtensions = 	"Context_DestroyExtensions";
 
-Type AbstractContext_EP_Dt =			"Context_Dt";
-Type AbstractContext_EP_Step =			"Context_Step";
-Type AbstractContext_EP_UpdateClass =		"Context_UpdateClass";
-Type AbstractContext_EP_Solve =			"Context_Solve";
-Type AbstractContext_EP_Sync =			"Context_Sync";
-Type AbstractContext_EP_FrequentOutput = 	"Context_FrequentOutput";
-Type AbstractContext_EP_Dump =			"Context_Dump";
-Type AbstractContext_EP_DumpClass =		"Context_DumpClass";
-Type AbstractContext_EP_Save =			"Context_Save";
-Type AbstractContext_EP_SaveClass =		"Context_SaveClass";
+Type AbstractContext_EP_Dt =			        "Context_Dt";
+Type AbstractContext_EP_Step =			        "Context_Step";
+Type AbstractContext_EP_UpdateClass =		    "Context_UpdateClass";
+Type AbstractContext_EP_Solve =			        "Context_Solve";
+Type AbstractContext_EP_PostSolvePreUpdate =    "Context_PostSolvePreUpdate";
+Type AbstractContext_EP_Sync =			        "Context_Sync";
+Type AbstractContext_EP_FrequentOutput = 	    "Context_FrequentOutput";
+Type AbstractContext_EP_Dump =			        "Context_Dump";
+Type AbstractContext_EP_DumpClass =		        "Context_DumpClass";
+Type AbstractContext_EP_Save =			        "Context_Save";
+Type AbstractContext_EP_SaveClass =		        "Context_SaveClass";
 
 
 /* Dictionary entry names */
@@ -372,6 +373,9 @@ void _AbstractContext_Init(
 	self->solveK = Context_AddEntryPoint( 
 		self, 
 		ContextEntryPoint_New( AbstractContext_EP_Solve, EntryPoint_VoidPtr_CastType ) );
+	self->postSolveK = Context_AddEntryPoint( 
+		self, 
+		ContextEntryPoint_New( AbstractContext_EP_PostSolvePreUpdate, EntryPoint_VoidPtr_CastType ) );
 	self->updateClassK = Context_AddEntryPoint( 
 		self, 
 		ContextEntryPoint_New( AbstractContext_EP_UpdateClass, EntryPoint_Class_VoidPtr_CastType ) );
@@ -417,10 +421,10 @@ void _AbstractContext_Init(
 		AbstractContext_Type );
 
 	Stg_ObjectList_ClassAppend( self->register_Register, (void*)self->extensionMgr_Register, "ExtensionManager_Register" );
-	Stg_ObjectList_ClassAppend( self->register_Register, (void*)self->variable_Register, "Variable_Register" );
-	Stg_ObjectList_ClassAppend( self->register_Register, (void*)self->condFunc_Register, "ConditionFunction_Register" );
-	Stg_ObjectList_ClassAppend( self->register_Register, (void*)self->entryPoint_Register, "EntryPoint_Register" );
-	Stg_ObjectList_ClassAppend( self->register_Register, (void*)self->pointer_Register, "Pointer_Register" );
+	Stg_ObjectList_ClassAppend( self->register_Register, (void*)self->variable_Register,     "Variable_Register" );
+	Stg_ObjectList_ClassAppend( self->register_Register, (void*)self->condFunc_Register,     "ConditionFunction_Register" );
+	Stg_ObjectList_ClassAppend( self->register_Register, (void*)self->entryPoint_Register,   "EntryPoint_Register" );
+	Stg_ObjectList_ClassAppend( self->register_Register, (void*)self->pointer_Register,      "Pointer_Register" );
 	
 	componentDict = Dictionary_GetDictionary( self->dictionary, "components" );
 
@@ -999,6 +1003,7 @@ void _AbstractContext_Step( Context* context, double dt ) {
 
 	self->_setDt( self, dt );
 	KeyCall( self, self->solveK, EntryPoint_VoidPtr_CallCast* )( KeyHandle(self,self->solveK), self );
+	KeyCall( self, self->postSolveK, EntryPoint_VoidPtr_CallCast* )( KeyHandle(self,self->postSolveK), self );	
 	KeyCall( self, self->updateClassK, EntryPoint_Class_VoidPtr_CallCast* )( KeyHandle(self,self->updateClassK), self );
 	KeyCall( self, self->syncK, EntryPoint_Class_VoidPtr_CallCast* )( KeyHandle(self,self->syncK), self );
 }

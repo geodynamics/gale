@@ -66,6 +66,7 @@
 	extern Type AbstractContext_EP_Step;
 	extern Type AbstractContext_EP_UpdateClass;
 	extern Type AbstractContext_EP_Solve;
+	extern Type AbstractContext_EP_PostSolvePreUpdate;
 	extern Type AbstractContext_EP_Sync;
 	extern Type AbstractContext_EP_FrequentOutput;
 	extern Type AbstractContext_EP_Dump;
@@ -139,6 +140,7 @@
 		EntryPoint_Index			stepK; \
 		EntryPoint_Index			updateClassK; \
 		EntryPoint_Index			solveK; \
+		EntryPoint_Index			postSolveK; \
 		EntryPoint_Index			syncK; \
 		EntryPoint_Index			frequentOutputK; \
 		EntryPoint_Index			dumpK; \
