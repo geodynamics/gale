@@ -58,6 +58,10 @@ Bool StgFEM_Discretisation_Finalise( void ) {
 
 	Stg_ObjectList_DeleteAllObjects( FeVariable_FileFormatImportExportList );
 	Stg_Class_Delete( FeVariable_FileFormatImportExportList );
+
+#ifdef HAVE_PETSC
+	PetscFinalize();
+#endif
 	
 	Stream_UnIndentBranch( StgFEM_Debug );
 	return True;

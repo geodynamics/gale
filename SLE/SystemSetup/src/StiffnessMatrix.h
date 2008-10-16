@@ -82,7 +82,9 @@
 		FeVariable*                                       columnVariable;                 \
 		ForceVector*                                      rhs;                            \
 		ForceVector*					  transRHS;			  \
-		Matrix*                                           matrix;                         \
+		Mat	                                          matrix;                         \
+		PETScShellMatrix*				  shellMatrix;			  \
+		Bool						  useShellMatrix;		  \
 		Stg_Component*                                    applicationDepInfo;             \
 		Bool                                              isNonLinear;                    \
 		Bool                                              allowZeroElementContributions;  \

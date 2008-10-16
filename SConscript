@@ -14,7 +14,7 @@ env.suite_objs = []
 #
 # Build standard stg directories.
 env.build_directory('Discretisation')
-env.build_directory('SLE/LinearAlgebra')
+# env.build_directory('SLE/LinearAlgebra')
 env.build_directory('SLE/SystemSetup')
 env.build_directory('SLE/ProvidedSystems/AdvectionDiffusion')
 env.build_directory('SLE/ProvidedSystems/Energy')

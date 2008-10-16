@@ -144,7 +144,8 @@
 	void _Stokes_SLE_PenaltySolver_Solve( void* solver, void* stokesSLE );
 
 	/* Get residual implementation */
-	Vector* _Stokes_SLE_PenaltySolver_GetResidual( void* solver, Index fv_I );
+	//Vector* _Stokes_SLE_PenaltySolver_GetResidual( void* solver, Index fv_I );
+	Vec _Stokes_SLE_PenaltySolver_GetResidual( void* solver, Index fv_I );
 
 #endif	
 

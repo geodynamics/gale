@@ -72,16 +72,16 @@
 		/* Stokes_SLE_UzawaSolver info */ \
 		\
 		/* Matrix solvers */ \
-		MatrixSolver*       velSolver;  /** Solver for the velocity system */ \
-		MatrixSolver*       pcSolver;   /** Solver for the preconditioner system */\
+		KSP                 velSolver;  /** Solver for the velocity system */ \
+		KSP                 pcSolver;   /** Solver for the preconditioner system */\
 		/* Auxiliary matrixes */ \
 		StiffnessMatrix*    preconditioner; 	\
 		/* auxillary vectors */ \
-		Vector*             pTempVec; \
-		Vector*             rVec; \
-		Vector*             sVec; \
-		Vector*             fTempVec; \
-		Vector*             vStarVec; \
+		Vec                 pTempVec; \
+		Vec                 rVec; \
+		Vec                 sVec; \
+		Vec                 fTempVec; \
+		Vec                 vStarVec; \
 		/* parameters */ \
 		Iteration_Index     maxUzawaIterations;	/** Max number of iterations the solver can run for */ \
 		Iteration_Index     minUzawaIterations; \
@@ -191,10 +191,14 @@
 	void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE );
 
 	/* Get residual implementation */
-	Vector* _Stokes_SLE_UzawaSolver_GetResidual( void* solver, Index fv_I );
+	//Vector* _Stokes_SLE_UzawaSolver_GetResidual( void* solver, Index fv_I );
+	Vec _Stokes_SLE_UzawaSolver_GetResidual( void* solver, Index fv_I );
 
-	void _Stokes_SLE_UzawaSolver_FormResidual( void *stokesSLE, void *solver, Vector *stg_r );
-	void _Stokes_SLE_UzawaSolver_GetRhs( void *stokesSLE, void *solver, Vector *stg_rhs );
-	void _Stokes_SLE_UzawaSolver_GetSolution( void *stokesSLE, void *solver, Vector **x );
+	//void _Stokes_SLE_UzawaSolver_FormResidual( void *stokesSLE, void *solver, Vector *stg_r );
+	//void _Stokes_SLE_UzawaSolver_GetRhs( void *stokesSLE, void *solver, Vector *stg_rhs );
+	//void _Stokes_SLE_UzawaSolver_GetSolution( void *stokesSLE, void *solver, Vector **x );
+	void _Stokes_SLE_UzawaSolver_FormResidual( void *stokesSLE, void *solver, Vec r );
+	void _Stokes_SLE_UzawaSolver_GetRhs( void *stokesSLE, void *solver, Vec rhs );
+	void _Stokes_SLE_UzawaSolver_GetSolution( void *stokesSLE, void *solver, Vec *x );
 
 #endif	

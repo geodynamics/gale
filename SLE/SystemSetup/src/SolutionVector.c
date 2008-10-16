@@ -144,13 +144,13 @@ void SolutionVector_Init(
 SolutionVector* _SolutionVector_New( 
 		SizeT						_sizeOfSelf,
 		Type						type,
-		Stg_Class_DeleteFunction*				_delete,
-		Stg_Class_PrintFunction*				_print,
+		Stg_Class_DeleteFunction*			_delete,
+		Stg_Class_PrintFunction*			_print,
 		Stg_Class_CopyFunction*				_copy, 
-		Stg_Component_DefaultConstructorFunction*			_defaultConstructor,
-		Stg_Component_ConstructFunction*			_construct,
+		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
+		Stg_Component_ConstructFunction*		_construct,
 		Stg_Component_BuildFunction*			_build,
-		Stg_Component_InitialiseFunction*			_initialise,
+		Stg_Component_InitialiseFunction*		_initialise,
 		Stg_Component_ExecuteFunction*			_execute,
 		Stg_Component_DestroyFunction*			_destroy,
 		Name 						name, 
@@ -196,7 +196,9 @@ void _SolutionVector_Delete( void* solutionVector ) {
 	
 	Journal_DPrintf( self->debug, "In %s - for soln. vector %s\n", __func__, self->name );
 	Stream_IndentBranch( StgFEM_Debug );
-	FreeObject( self->vector );
+	//FreeObject( self->vector );
+	if( self->vector != PETSC_NULL )
+		VecDestroy( self->vector );
 	
 	/* Stg_Class_Delete parent*/
 	_Stg_Component_Delete( self );
@@ -280,13 +282,19 @@ void _SolutionVector_Build( void* solutionVector, void* data ) {
 		Stg_Component_Build( self->feVariable, 0, False );
 
 	/* Allocate the vector */
-#ifdef HAVE_PETSC
-	self->vector = PETScVector_New( "" );
-#else
-	assert( 0 );
+//#ifdef HAVE_PETSC
+//	self->vector = PETScVector_New( "" );
+//#else
+//	assert( 0 );
+//#endif
+//	Vector_SetComm( self->vector, self->comm );
+//	Vector_SetLocalSize( self->vector, self->feVariable->eqNum->localEqNumsOwnedCount );
+	VecCreate( self->comm, &self->vector );
+	VecSetSizes( self->vector, self->feVariable->eqNum->localEqNumsOwnedCount, PETSC_DECIDE );
+	VecSetFromOptions( self->vector );
+#if( ( PETSC_VERSION_MINOR == 3 ) && ( PETSC_VERSION_SUBMINOR > 2 ) )
+	VecSetOption( self->vector, VEC_IGNORE_NEGATIVE_INDICES );
 #endif
-	Vector_SetComm( self->vector, self->comm );
-	Vector_SetLocalSize( self->vector, self->feVariable->eqNum->localEqNumsOwnedCount );
 
 	Stream_UnIndentBranch( StgFEM_Debug );
 }
@@ -319,6 +327,22 @@ void SolutionVector_ApplyBCsToVariables( void* solutionVector, void* data ) {
 	FeVariable_ApplyBCs( self->feVariable, data );
 }
 
+/* from the depreciated Vector class */
+_SolutionVector_VectorView( Vec v, Stream* stream ) {
+	unsigned	entry_i;
+	PetscInt	size;
+	PetscScalar*	array;
+
+	VecGetSize( v, &size );
+	VecGetArray( v, &array );
+
+	Journal_Printf( stream, "%p = [", v );
+	for( entry_i = 0; entry_i < size; entry_i++ ) 
+		Journal_Printf( stream, "\t%u: \t %.12g\n", entry_i, array[entry_i] );
+	Journal_Printf( stream, "];\n" );
+
+	VecRestoreArray( v, &array );
+}
 
 void SolutionVector_UpdateSolutionOntoNodes( void* solutionVector ) {
 	SolutionVector*		self = (SolutionVector *)solutionVector;
@@ -351,7 +375,7 @@ void SolutionVector_UpdateSolutionOntoNodes( void* solutionVector ) {
 	#if DEBUG
 	if ( Stream_IsPrintableLevel( self->debug, 3 ) ) {
 		Journal_DPrintf( self->debug, "Vector data:\n" );
-		Vector_View( self->vector, self->debug );
+		_SolutionVector_VectorView( self->vector, self->debug );
 	}
 	#endif
 
@@ -384,7 +408,8 @@ void SolutionVector_UpdateSolutionOntoNodes( void* solutionVector ) {
 	}
 	
 	/* Get the locally held part of the vector */
-	Vector_GetArray( self->vector, &localSolnVecValues );
+	//Vector_GetArray( self->vector, &localSolnVecValues );
+	VecGetArray( self->vector, &localSolnVecValues );
 	
 	for( lNode_I=0; lNode_I < Mesh_GetLocalSize( feMesh, MT_VERTEX ); lNode_I++ ) {
 		currNodeNumDofs = feVar->dofLayout->dofCounts[ lNode_I ];
@@ -458,7 +483,8 @@ void SolutionVector_UpdateSolutionOntoNodes( void* solutionVector ) {
 	Memory_Free( reqFromOthersCounts );
 	Memory_Free( reqFromOthersSizes );
 
-	Vector_RestoreArray( self->vector, &localSolnVecValues );
+	//Vector_RestoreArray( self->vector, &localSolnVecValues );
+	VecRestoreArray( self->vector, &localSolnVecValues );
 
 	/*
 	** Syncronise the FEVariable in question.
@@ -794,10 +820,13 @@ void SolutionVector_LoadCurrentFeVariableValuesOntoVector( void* solutionVector 
 		for ( dof_I = 0; dof_I < feVar->dofLayout->dofCounts[node_lI]; dof_I++ ) {
 			value = DofLayout_GetValueDouble( feVar->dofLayout, node_lI, dof_I );
 			insertionIndex = feVar->eqNum->destinationArray[node_lI][dof_I];
-			Vector_InsertEntries( self->vector, 1, &insertionIndex, &value );
+			//Vector_InsertEntries( self->vector, 1, &insertionIndex, &value );
+			VecSetValues( self->vector, 1, &insertionIndex, &value, INSERT_VALUES );
 		}	
 	}
 
-	Vector_AssemblyBegin( self->vector );
-	Vector_AssemblyEnd( self->vector ); 
+	//Vector_AssemblyBegin( self->vector );
+	//Vector_AssemblyEnd( self->vector ); 
+	VecAssemblyBegin( self->vector );
+	VecAssemblyEnd( self->vector ); 
 }

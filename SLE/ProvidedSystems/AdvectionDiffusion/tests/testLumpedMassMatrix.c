@@ -43,7 +43,7 @@
 #include <StGermain/StGermain.h>
 #include <StgDomain/StgDomain.h>
 #include "StgFEM/Discretisation/Discretisation.h"
-#include "StgFEM/SLE/LinearAlgebra/LinearAlgebra.h"
+//#include "StgFEM/SLE/LinearAlgebra/LinearAlgebra.h"
 #include "StgFEM/SLE/SystemSetup/SystemSetup.h"
 #include "StgFEM/SLE/ProvidedSystems/AdvectionDiffusion/AdvectionDiffusion.h"
 
@@ -148,7 +148,7 @@ int main( int argc, char* argv[] ) {
 	StGermain_Init( &argc, &argv );
 	StgDomain_Init( &argc, &argv );
 	StgFEM_Discretisation_Init( &argc, &argv );
-	StgFEM_SLE_LinearAlgebra_Init( &argc, &argv );
+	//StgFEM_SLE_LinearAlgebra_Init( &argc, &argv );
 	StgFEM_SLE_SystemSetup_Init( &argc, &argv );
 	StgFEM_SLE_ProvidedSystems_AdvectionDiffusion_Init( &argc, &argv );
 	MPI_Barrier( CommWorld ); /* Ensures copyright info always come first in output */
@@ -265,17 +265,18 @@ int main( int argc, char* argv[] ) {
 	ForceVector_Assemble( massMatrix );
 
 	/* Print out vector */
-	Vector_View( massMatrix->vector, outputStream );
+	//Vector_View( massMatrix->vector, outputStream );
 
 	/* Try out optimised one */
-	Vector_Zero( massMatrix->vector );
+	//Vector_Zero( massMatrix->vector );
+	VecSet( massMatrix->vector, 0.0 );
 
 	/* Assemble */
 	ForceTerm_SetAssembleElementFunction( massMatrixForceTerm, _LumpedMassMatrixForceTerm_AssembleElement_Box );
 	ForceVector_Assemble( massMatrix );
 
 	/* Print out vector */
-	Vector_View( massMatrix->vector, outputStream );	
+	//Vector_View( massMatrix->vector, outputStream );	
 
 	/* Destroy stuff */
 	Stg_Class_Delete( massMatrix );

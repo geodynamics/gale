@@ -319,13 +319,20 @@ void _ForceVector_Build( void* forceVector, void* data ) {
 	
 	/* Allocate the vector */
 	Journal_DPrintfL( self->debug, 2, "Allocating the L.A. Force Vector with %d local entries.\n", self->localSize );
-#ifdef HAVE_PETSC
-	self->vector = (Vector*)PETScVector_New( "" );
-#else
-#error *** No linear algebra package found.
+//#ifdef HAVE_PETSC
+//	self->vector = (Vector*)PETScVector_New( "" );
+//#else
+//#error *** No linear algebra package found.
+//#endif
+	//Vector_SetComm( self->vector, self->comm );
+	//Vector_SetLocalSize( self->vector, self->localSize );
+	VecCreate( self->comm, &self->vector );
+	VecSetSizes( self->vector, (PetscInt)self->localSize, PETSC_DECIDE );
+	VecSetFromOptions( self->vector );
+#if( ( PETSC_VERSION_MINOR == 3 ) && ( PETSC_VERSION_SUBMINOR > 2 ) )
+	VecSetOption( self->vector, VEC_IGNORE_NEGATIVE_INDICES );
 #endif
-	Vector_SetComm( self->vector, self->comm );
-	Vector_SetLocalSize( self->vector, self->localSize );
+
 	Stream_UnIndentBranch( StgFEM_Debug );
 
 	Assembler_SetVariables( self->bcAsm, self->feVariable, NULL );
@@ -418,6 +425,22 @@ void ForceVector_PrintElementForceVector(
 	NewClass_Delete( incArray );
 }
 
+/* from the depreciated Vector class */
+_ForceVector_VectorView( Vec v, Stream* stream ) {
+	unsigned	entry_i;
+	PetscInt	size;
+	PetscScalar*	array;
+
+	VecGetSize( v, &size );
+	VecGetArray( v, &array );
+
+	Journal_Printf( stream, "%p = [", v );
+	for( entry_i = 0; entry_i < size; entry_i++ ) 
+		Journal_Printf( stream, "\t%u: \t %.12g\n", entry_i, array[entry_i] );
+	Journal_Printf( stream, "];\n" );
+
+	VecRestoreArray( v, &array );
+}
 
 void ForceVector_GlobalAssembly_General( void* forceVector ) {
 	ForceVector*            self                 = (ForceVector*) forceVector;
@@ -515,7 +538,8 @@ void ForceVector_GlobalAssembly_General( void* forceVector ) {
                         }
 
 			/* Ok, assemble into global matrix */
-			Vector_AddEntries( self->vector, totalDofsThisElement, (Index*)(elementLM[0]), elForceVecToAdd );
+			//Vector_AddEntries( self->vector, totalDofsThisElement, (Index*)(elementLM[0]), elForceVecToAdd );
+			VecSetValues( self->vector, totalDofsThisElement, (PetscInt*)elementLM[0], elForceVecToAdd, ADD_VALUES );
 
 #if DEBUG
 			if( element_lI % outputInterval == 0 ) {
@@ -541,13 +565,15 @@ void ForceVector_GlobalAssembly_General( void* forceVector ) {
 	if( !feVar->eqNum->removeBCs )
 		Assembler_LoopVector( self->bcAsm );
 
-	Vector_AssemblyBegin( self->vector );
-	Vector_AssemblyEnd( self->vector ); 
+	//Vector_AssemblyBegin( self->vector );
+	//Vector_AssemblyEnd( self->vector ); 
+	VecAssemblyBegin( self->vector );
+	VecAssemblyEnd( self->vector );
 
 #if DEBUG
 	if ( Stream_IsPrintableLevel( self->debug, 3 ) ) {
 		Journal_DPrintf( self->debug, "Completely built vector %s is:\n", self->name );
-		Vector_View( self->vector, self->debug );
+		_ForceVector_VectorView( self->vector, self->debug );
 	}
 #endif
 
@@ -579,7 +605,8 @@ Bool ForceVector_BCAsm_RowR( void* forceVec, Assembler* assm ) {
 	bc = DofLayout_GetValueDouble( assm->rowVar->dofLayout, 
 				       assm->rowNodeInd, 
 				       assm->rowDofInd );
-	Vector_AddEntries( ((ForceVector*)forceVec)->vector, 1, &assm->rowEq, &bc );
+	//Vector_AddEntries( ((ForceVector*)forceVec)->vector, 1, &assm->rowEq, &bc );
+	VecSetValues( ((ForceVector*)forceVec)->vector, 1, &assm->rowEq, &bc, ADD_VALUES );
 	return True;
 }
 

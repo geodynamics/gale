@@ -65,8 +65,8 @@
 		/* Virtual info */ \
 		\
 		/* Energy_SLE_Solver info */ \
-		MatrixSolver*		matrixSolver; \
-		Vector*			residual; \
+		KSP			matrixSolver; \
+		Vec    			residual; \
 
 	/** Solves a basic SLE consisting of only one matrix, one force vector and one soln vector - see
 	Energy_SLE_Solver.h */
@@ -133,6 +133,7 @@
 	void _Energy_SLE_Solver_Solve( void* sleSolver, void* standardSLE );
 
 	/* Get residual implementation */
-	Vector* _Energy_SLE_GetResidual( void* sleSolver, Index fv_I );
+	//Vector* _Energy_SLE_GetResidual( void* sleSolver, Index fv_I );
+	Vec _Energy_SLE_GetResidual( void* sleSolver, Index fv_I );
 
 #endif

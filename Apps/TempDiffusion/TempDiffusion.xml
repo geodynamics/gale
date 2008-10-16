@@ -35,8 +35,8 @@
 	<param name="maxX"> 1.0f </param>
 	<param name="maxY"> 1.0f </param>
 	<param name="maxZ"> 1.0f </param>
-	<param name="elementResI"> 5 </param>
-	<param name="elementResJ"> 5 </param>
+	<param name="elementResI"> 128 </param>
+	<param name="elementResJ"> 128 </param>
 	<param name="elementResK"> 5 </param>
 
 	<!-- Set up BCs -->
