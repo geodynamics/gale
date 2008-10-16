@@ -1043,11 +1043,13 @@ void FeVariable_GetCoordAtNodeGlobal( void* feVariable, Node_GlobalIndex gNode_I
 void FeVariable_ZeroField( void* feVariable ) {
 	FeVariable* self = (FeVariable*) feVariable;
 	double*     values =  Memory_Alloc_Array( double, self->fieldComponentCount, "tempValues" );
-	Index       lNode_I;
+	Index       lNode_I, lNodeCount;
+
+	lNodeCount = FeMesh_GetNodeLocalSize( self->feMesh );
 
 	memset( values, 0, self->fieldComponentCount * sizeof(double) );
 
-	for( lNode_I = 0 ; lNode_I < FeMesh_GetNodeLocalSize( self->feMesh ); lNode_I++ ) {
+	for( lNode_I = 0 ; lNode_I < lNodeCount; lNode_I++ ) {
 		FeVariable_SetValueAtNode( self, lNode_I, values );
 	}
 

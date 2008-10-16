@@ -30,6 +30,8 @@
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #include <mpi.h>
+#include <petsc.h>
+#include <petscvec.h>
 #include <StGermain/StGermain.h>
 #include <StgDomain/StgDomain.h>
 #include "StgFEM/Discretisation/Discretisation.h"
@@ -212,6 +214,8 @@ void _SystemLinearEquations_Init(
 	Stg_asprintf( &self->nlConvergedEPName, "%s-nlConvergedEP", self->name );
 	self->nlConvergedEP = EntryPoint_New( self->nlConvergedEPName, EntryPoint_2VoidPtr_CastType );
 	/* END LUKE'S FRICTIONAL BCS BIT */
+        self->nlFormJacobian = False;
+        self->nlCurIterate = PETSC_NULL;
 	
 	/* Initialise MG stuff. */
 	self->mgEnabled = False;
@@ -404,7 +408,7 @@ void _SystemLinearEquations_Construct( void* sle, Stg_ComponentFactory* cf, void
 	Bool                    makeConvergenceFile;
 	Iteration_Index         nonLinearMinIterations;                     
 	Name			nonLinearSolutionType;
-	SNES			nlSolver;
+	SNES                    nlSolver                 = NULL;
 	Name			optionsPrefix;
 	double double_from_dict;
 	Bool   bool_from_dict;
@@ -789,7 +793,7 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 	double                  residual;
 	double                  tolerance       = self->nonLinearTolerance;
 	Iteration_Index         maxIterations   = self->nonLinearMaxIterations;
-	Bool                    converged;
+	Bool                    converged = False;
 	Stream*                 errorStream     = Journal_Register( Error_Type, self->type );
 	double					wallTime;
 	Iteration_Index         minIterations   = self->nonLinearMinIterations;

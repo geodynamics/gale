@@ -2173,7 +2173,7 @@ void __StiffnessMatrix_NewAssemble( void* stiffnessMatrix, Bool removeBCs, void*
 		StiffnessMatrix_AssembleElement( self, e_i, sle, _context, elStiffMat );
 
 		/* Correct for BCs providing I'm not keeping them in. */
-		if( vector ) {
+		if( vector && removeBCs ) {
 			memset( bcVals, 0, nRowDofs * sizeof(double) );
 
                         rowInd = 0;
@@ -2199,7 +2199,7 @@ void __StiffnessMatrix_NewAssemble( void* stiffnessMatrix, Bool removeBCs, void*
 
 			Vector_AddEntries( vector, nRowDofs, (unsigned*)rowEqNum->locationMatrix[e_i][0], bcVals );
 		}
-		if( transVector ) {
+		if( transVector && removeBCs ) {
 			memset( bcVals, 0, nColDofs * sizeof(double) );
 
                         colInd = 0;

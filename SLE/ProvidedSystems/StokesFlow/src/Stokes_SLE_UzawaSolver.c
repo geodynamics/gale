@@ -615,7 +615,15 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	
 	Journal_DPrintfL( self->debug, 2, "Fhat inner solution: Number of iterations: %d\n", innerLoopIterations );
 	
+        if ( D_Mat ) {
+          Matrix_Multiply( D_Mat, vStarVec, qTempVec );
+        }
+        else {
+          Matrix_TransposeMultiply( G_Mat, vStarVec, qTempVec );
+        }
+/*
 	Matrix_TransposeMultiply( G_Mat, vStarVec, qTempVec );
+*/
  	Vector_AddScaled( qTempVec, -1.0, hVec );
 	
 	/*  WARNING:
@@ -684,7 +692,15 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 		LM & DAM			
 	*/
 	
+        if ( D_Mat ) {
+           Matrix_Multiply( D_Mat, uVec, rVec );
+        }
+        else {
+           Matrix_TransposeMultiply( G_Mat, uVec, rVec );
+        }
+/*
 	Matrix_TransposeMultiply( G_Mat, uVec, rVec );
+*/
         rnorm0 = Vector_L2Norm( rVec );
 	divU = rnorm0 / Vector_L2Norm( uVec );  
 	
@@ -785,7 +801,15 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 			LM & DAM			
 		*/ 
 		
+                if ( D_Mat ) {
+                   Matrix_Multiply( D_Mat, vStarVec, qTempVec );
+                }
+                else {
+                   Matrix_TransposeMultiply( G_Mat, vStarVec, qTempVec );
+                }
+/*
 		Matrix_TransposeMultiply( G_Mat, vStarVec, qTempVec );
+*/
 		
 		/* Handling for NON-SYMMETRIC: relegated to sin bin (see comment above) 
 		
