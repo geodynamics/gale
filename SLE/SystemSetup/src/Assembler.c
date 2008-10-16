@@ -37,7 +37,6 @@
 #include <StGermain/StGermain.h>
 #include <StgDomain/StgDomain.h>
 #include "Discretisation/Discretisation.h"
-#include "SLE/LinearAlgebra/LinearAlgebra.h"
 #include "SystemSetup.h"
 
 

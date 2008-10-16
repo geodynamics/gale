@@ -45,15 +45,29 @@
 	extern const Type PETScShellMatrix_Type;
 
 	/** Virtual function types */
+	typedef void (PETScShellMatrix_SetCommFunc)( void* matrix, MPI_Comm comm );
+	typedef void (PETScShellMatrix_SetGlobalSizeFunc)( void* matrix, unsigned nRows, unsigned nColumns );
+	typedef void (PETScShellMatrix_SetLocalSizeFunc)( void* matrix, unsigned nRows, unsigned nColumns );
+	typedef void (PETScShellMatrix_SetNonZeroStructureFunc)( void* matrix, unsigned nNonZeros, 
+							unsigned* diagonalNonZeroIndices, unsigned* offDiagonalNonZeroIndices);
 
 	/** PETScShellMatrix class contents */
 	#define __PETScShellMatrix				\
 		/* General info */				\
-		__PETScMatrix					\
+		/*__PETScMatrix*/				\
+		__Stg_Component					\
 								\
 		/* Virtual info */				\
+		PETScShellMatrix_SetCommFunc*			setCommFunc;		\
+		PETScShellMatrix_SetGlobalSizeFunc*		setGlobalSizeFunc;	\
+		PETScShellMatrix_SetLocalSizeFunc*		setLocalSizeFunc;	\
+		PETScShellMatrix_SetNonZeroStructureFunc*	setNonZeroStructure;	\
 								\
 		/* PETScShellMatrix info */			\
+		Mat			matrix;			\
+		Bool			hasChanged;		\
+		MPI_Comm		comm;			\
+								\
 		StiffnessMatrix*	stiffMat;		\
 		SystemLinearEquations*	sle;			\
 								\
@@ -68,11 +82,21 @@
 	** Constructors
 	*/
 
-	#define PETSCSHELLMATRIX_DEFARGS \
-		PETSCMATRIX_DEFARGS
+	#define PETSCSHELLMATRIX_DEFARGS 						\
+		STG_COMPONENT_DEFARGS,							\
+		PETScShellMatrix_SetCommFunc*			setCommFunc,		\
+		PETScShellMatrix_SetGlobalSizeFunc*		setGlobalSizeFunc,	\
+		PETScShellMatrix_SetLocalSizeFunc*		setLocalSizeFunc,	\
+		PETScShellMatrix_SetNonZeroStructureFunc*	setNonZeroStructure
+		//PETSCMATRIX_DEFARGS
 
-	#define PETSCSHELLMATRIX_PASSARGS \
-		PETSCMATRIX_PASSARGS
+	#define PETSCSHELLMATRIX_PASSARGS 	\
+		STG_COMPONENT_PASSARGS		\
+		setCommFunc, 			\
+		setGlobalSizeFunc,		\
+		setLocalSizeFunc,		\
+		setNonZeroStructure
+		//PETSCMATRIX_PASSARGS
 
 	PETScShellMatrix* PETScShellMatrix_New( Name name );
 	PETScShellMatrix* _PETScShellMatrix_New( PETSCSHELLMATRIX_DEFARGS );

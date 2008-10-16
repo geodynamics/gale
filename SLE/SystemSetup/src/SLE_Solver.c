@@ -43,7 +43,6 @@
 #include <StGermain/StGermain.h>
 #include <StgDomain/StgDomain.h>
 #include "StgFEM/Discretisation/Discretisation.h"
-#include "StgFEM/SLE/LinearAlgebra/LinearAlgebra.h"
 #include "units.h"
 #include "types.h"
 #include "shortcuts.h"

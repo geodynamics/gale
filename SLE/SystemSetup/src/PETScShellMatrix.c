@@ -37,7 +37,6 @@
 #include <StGermain/StGermain.h>
 #include <StgDomain/StgDomain.h>
 #include "Discretisation/Discretisation.h"
-#include "SLE/LinearAlgebra/LinearAlgebra.h"
 #include "SystemSetup.h"
 
 
@@ -66,33 +65,6 @@ PETScShellMatrix* PETScShellMatrix_New( Name name ) {
 				      PETScShellMatrix_SetComm, 
 				      PETScShellMatrix_SetGlobalSize, 
 				      PETScShellMatrix_SetLocalSize, 
-				      PETScMatrix_AddEntries, 
-				      PETScMatrix_InsertEntries, 
-				      PETScMatrix_DiagonalAddEntries, 
-				      PETScMatrix_DiagonalInsertEntries, 
-				      PETScMatrix_Zero, 
-				      PETScMatrix_Dump, 
-				      PETScMatrix_Load, 
-				      PETScMatrix_AssemblyBegin, 
-				      PETScMatrix_AssemblyEnd, 
-				      PETScMatrix_Scale, 
-				      PETScMatrix_AddScaled, 
-				      PETScMatrix_DiagonalScale, 
-				      PETScMatrix_Multiply, 
-				      PETScMatrix_TransposeMultiply, 
-				      PETScMatrix_MultiplyAdd, 
-				      PETScMatrix_PAPt, 
-				      PETScMatrix_PtAP, 
-				      PETScMatrix_MatrixMultiply, 
-				      PETScMatrix_L2Norm, 
-				      PETScMatrix_Transpose, 
-				      PETScMatrix_GetGlobalSize, 
-				      PETScMatrix_GetLocalSize, 
-				      PETScMatrix_GetRow, 
-				      PETScMatrix_RestoreRow, 
-				      PETScMatrix_GetDiagonal, 
-				      PETScMatrix_Duplicate, 
-				      PETScMatrix_CopyEntries, 
 				      PETScShellMatrix_SetNonZeroStructure );
 }
 
@@ -101,9 +73,14 @@ PETScShellMatrix* _PETScShellMatrix_New( PETSCSHELLMATRIX_DEFARGS ) {
 
 	/* Allocate memory */
 	assert( sizeOfSelf >= sizeof(PETScShellMatrix) );
-	self = (PETScShellMatrix*)_PETScMatrix_New( PETSCMATRIX_PASSARGS );
+	//self = (PETScShellMatrix*)_PETScMatrix_New( PETSCMATRIX_PASSARGS );
+	self = (PETScShellMatrix*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
 
 	/* Virtual info */
+	self->setCommFunc = setCommFunc;
+	self->setGlobalSizeFunc = setGlobalSizeFunc;
+	self->setLocalSizeFunc = setLocalSizeFunc;
+	self->setNonZeroStructure = setNonZeroStructure;
 
 	/* PETScShellMatrix info */
 	_PETScShellMatrix_Init( self );
@@ -117,6 +94,8 @@ void _PETScShellMatrix_Init( PETScShellMatrix* self ) {
 	self->nRowDofs = 0;
 	self->nColDofs = 0;
 	self->elStiffMat = NULL;
+
+	self->matrix = PETSC_NULL;
 }
 
 
@@ -130,7 +109,9 @@ void _PETScShellMatrix_Delete( void* matrix ) {
 	assert( self && Stg_CheckType( self, PETScShellMatrix ) );
 
 	/* Delete the parent. */
-	_PETScMatrix_Delete( self );
+	//_PETScMatrix_Delete( self );
+	if( self->matrix != PETSC_NULL )
+		MatDestroy( self->matrix );
 }
 
 void _PETScShellMatrix_Print( void* matrix, Stream* stream ) {
@@ -144,7 +125,8 @@ void _PETScShellMatrix_Print( void* matrix, Stream* stream ) {
 
 	/* Print parent */
 	Journal_Printf( stream, "PETScShellMatrix (ptr): (%p)\n", self );
-	_PETScMatrix_Print( self, stream );
+	//_PETScMatrix_Print( self, stream );
+	_Stg_Component_Print( self, stream );
 }
 
 void _PETScShellMatrix_Construct( void* matrix, Stg_ComponentFactory* cf, void* data ) {
@@ -153,7 +135,7 @@ void _PETScShellMatrix_Construct( void* matrix, Stg_ComponentFactory* cf, void* 
 	assert( self && Stg_CheckType( self, PETScShellMatrix ) );
 	assert( cf );
 
-	_PETScMatrix_Construct( self, cf, data );
+	//_PETScMatrix_Construct( self, cf, data );
 
 	self->stiffMat = Stg_ComponentFactory_ConstructByKey( cf, self->name, "stiffnessMatrix", StiffnessMatrix, True, data );
 	self->sle = Stg_ComponentFactory_ConstructByKey( cf, self->name, "sle", SystemLinearEquations, True, data );
@@ -191,10 +173,11 @@ void PETScShellMatrix_SetComm( void* matrix, MPI_Comm comm ) {
 
 	assert( self && Stg_CheckType( self, PETScShellMatrix ) );
 
-	_Matrix_SetComm( self, comm );
+	//_Matrix_SetComm( self, comm );
+	self->comm = comm;
 
-	if( self->petscMat != PETSC_NULL ) {
-		ec = MatDestroy( self->petscMat );
+	if( self->matrix != PETSC_NULL ) {
+		ec = MatDestroy( self->matrix );
 		CheckPETScError( ec );
 	}
 
@@ -208,17 +191,17 @@ void PETScShellMatrix_SetGlobalSize( void* matrix, unsigned nRows, unsigned nCol
 	assert( self && Stg_CheckType( self, PETScShellMatrix ) );
 
 	ec = MatCreateShell( self->comm, PETSC_DETERMINE, PETSC_DETERMINE, (PetscInt)nRows, (PetscInt)nColumns, 
-			     self, &self->petscMat );
+			     self, &self->matrix );
 	CheckPETScError( ec );
-	ec = MatSetFromOptions( self->petscMat );
+	ec = MatSetFromOptions( self->matrix );
 	CheckPETScError( ec );
-	ec = MatShellSetOperation( self->petscMat, MATOP_MULT, (void (*)(void))PETScShellMatrix_MatMult );
+	ec = MatShellSetOperation( self->matrix, MATOP_MULT, (void (*)(void))PETScShellMatrix_MatMult );
 	CheckPETScError( ec );
-	ec = MatShellSetOperation( self->petscMat, MATOP_MULT_ADD, (void (*)(void))PETScShellMatrix_MatMultAdd );
+	ec = MatShellSetOperation( self->matrix, MATOP_MULT_ADD, (void (*)(void))PETScShellMatrix_MatMultAdd );
 	CheckPETScError( ec );
-	ec = MatShellSetOperation( self->petscMat, MATOP_MULT_TRANSPOSE, (void (*)(void))PETScShellMatrix_MatMultTranspose );
+	ec = MatShellSetOperation( self->matrix, MATOP_MULT_TRANSPOSE, (void (*)(void))PETScShellMatrix_MatMultTranspose );
 	CheckPETScError( ec );
-	ec = MatShellSetOperation( self->petscMat, MATOP_GET_DIAGONAL, (void (*)(void))PETScShellMatrix_MatGetDiagonal );
+	ec = MatShellSetOperation( self->matrix, MATOP_GET_DIAGONAL, (void (*)(void))PETScShellMatrix_MatGetDiagonal );
 	CheckPETScError( ec );
 
 	self->hasChanged = True;
@@ -231,17 +214,17 @@ void PETScShellMatrix_SetLocalSize( void* matrix, unsigned nRows, unsigned nColu
 	assert( self && Stg_CheckType( self, PETScShellMatrix ) );
 
 	ec = MatCreateShell( self->comm, (PetscInt)nRows, (PetscInt)nColumns, PETSC_DETERMINE, PETSC_DETERMINE, 
-			     self, &self->petscMat );
+			     self, &self->matrix );
 	CheckPETScError( ec );
-	ec = MatSetFromOptions( self->petscMat );
+	ec = MatSetFromOptions( self->matrix );
 	CheckPETScError( ec );
-	ec = MatShellSetOperation( self->petscMat, MATOP_MULT, (void (*)(void))PETScShellMatrix_MatMult );
+	ec = MatShellSetOperation( self->matrix, MATOP_MULT, (void (*)(void))PETScShellMatrix_MatMult );
 	CheckPETScError( ec );
-	ec = MatShellSetOperation( self->petscMat, MATOP_MULT_ADD, (void (*)(void))PETScShellMatrix_MatMultAdd );
+	ec = MatShellSetOperation( self->matrix, MATOP_MULT_ADD, (void (*)(void))PETScShellMatrix_MatMultAdd );
 	CheckPETScError( ec );
-	ec = MatShellSetOperation( self->petscMat, MATOP_MULT_TRANSPOSE, (void (*)(void))PETScShellMatrix_MatMultTranspose );
+	ec = MatShellSetOperation( self->matrix, MATOP_MULT_TRANSPOSE, (void (*)(void))PETScShellMatrix_MatMultTranspose );
 	CheckPETScError( ec );
-	ec = MatShellSetOperation( self->petscMat, MATOP_GET_DIAGONAL, (void (*)(void))PETScShellMatrix_MatGetDiagonal );
+	ec = MatShellSetOperation( self->matrix, MATOP_GET_DIAGONAL, (void (*)(void))PETScShellMatrix_MatGetDiagonal );
 	CheckPETScError( ec );
 
 	self->hasChanged = True;

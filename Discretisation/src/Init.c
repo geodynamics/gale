@@ -137,5 +137,15 @@ Bool StgFEM_Discretisation_Init( int* argc, char** argv[] ) {
 		FeVariable_ImportExportInfo_Print,
 		FeVariable_ImportExportInfo_Copy );
 
+#ifdef HAVE_PETSC
+
+	{
+		PetscErrorCode	ec;
+		ec = PetscInitialize( argc, argv, (char*)0, NULL );
+		CheckPETScError( ec );
+	}
+
+#endif
+
 	return True;
 }

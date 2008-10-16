@@ -42,7 +42,6 @@
 #include <StGermain/StGermain.h>
 #include <StgDomain/StgDomain.h>
 #include "StgFEM/Discretisation/Discretisation.h"
-#include "StgFEM/SLE/LinearAlgebra/LinearAlgebra.h"
 #include "StgFEM/SLE/SystemSetup/SystemSetup.h"
 #include "types.h"
 #include "Timestep.h"

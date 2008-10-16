@@ -63,7 +63,7 @@
 		\
 		/* StiffnessMatrix info */ \
 		Stream*						debug; \
-		Vector*						vector; \
+		Vec    						vector; \
 		MPI_Comm					comm; \
 		FeVariable*					feVariable; /** need to get # of global unconstrained dofs */\
 
@@ -98,13 +98,13 @@
 	SolutionVector* _SolutionVector_New(
 		SizeT						_sizeOfSelf,
 		Type						type,
-		Stg_Class_DeleteFunction*				_delete,
-		Stg_Class_PrintFunction*				_print,
+		Stg_Class_DeleteFunction*			_delete,
+		Stg_Class_PrintFunction*			_print,
 		Stg_Class_CopyFunction*				_copy, 
-		Stg_Component_DefaultConstructorFunction*			_defaultConstructor,
-		Stg_Component_ConstructFunction*			_construct,
+		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
+		Stg_Component_ConstructFunction*		_construct,
 		Stg_Component_BuildFunction*			_build,
-		Stg_Component_InitialiseFunction*			_initialise,
+		Stg_Component_InitialiseFunction*		_initialise,
 		Stg_Component_ExecuteFunction*			_execute,
 		Stg_Component_DestroyFunction*			_destroy,
 		Name						name,

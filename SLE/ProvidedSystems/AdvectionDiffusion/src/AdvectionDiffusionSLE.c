@@ -46,7 +46,6 @@
 #include <StGermain/StGermain.h>
 #include <StgDomain/StgDomain.h>
 #include "StgFEM/Discretisation/Discretisation.h"
-#include "StgFEM/SLE/LinearAlgebra/LinearAlgebra.h"
 #include "StgFEM/SLE/SystemSetup/SystemSetup.h"
 
 #include "types.h"
@@ -510,7 +509,8 @@ void _AdvectionDiffusionSLE_Execute( void* sle, void* _context ) {
 }
 
 
-Vector* _AdvectionDiffusionSLE_GetResidual( void* sle, Index fv_I ) {
+//Vector* _AdvectionDiffusionSLE_GetResidual( void* sle, Index fv_I ) {
+Vec _AdvectionDiffusionSLE_GetResidual( void* sle, Index fv_I ) {
 	AdvectionDiffusionSLE* self  = (AdvectionDiffusionSLE*) sle;
 	return self->residual->vector;
 }

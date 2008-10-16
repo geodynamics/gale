@@ -146,7 +146,8 @@
 	void _AdvectionDiffusionSLE_Execute( void* sle, void* _context ) ;
 	void _AdvectionDiffusionSLE_Destroy( void* sle, void* _context ) ;
 
-	Vector* _AdvectionDiffusionSLE_GetResidual( void* sle, Index fv_I );
+	//Vector* _AdvectionDiffusionSLE_GetResidual( void* sle, Index fv_I );
+	Vec _AdvectionDiffusionSLE_GetResidual( void* sle, Index fv_I );
 
 	void AdvectionDiffusionSLE_ResetStoredValues( void* sle ) ;
 

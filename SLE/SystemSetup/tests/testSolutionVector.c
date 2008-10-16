@@ -36,7 +36,6 @@
 #include <StGermain/StGermain.h>
 #include <StgDomain/StgDomain.h>
 #include "StgFEM/Discretisation/Discretisation.h"
-#include "StgFEM/SLE/LinearAlgebra/LinearAlgebra.h"
 #include "StgFEM/SLE/SystemSetup/SystemSetup.h"
 
 #include "StGermain/Base/Foundation/TestBegin.h"
@@ -145,7 +144,7 @@ void testSetup( int* argc, char** argv[] ) {
    StGermain_Init( argc, argv );
    StgDomain_Init( argc, argv );
    StgFEM_Discretisation_Init( argc, argv );
-   StgFEM_SLE_LinearAlgebra_Init( argc, argv );
+   //StgFEM_SLE_LinearAlgebra_Init( argc, argv );
    StgFEM_SLE_SystemSetup_Init( argc, argv );
    Stream_Enable( Journal_GetTypedStream( Debug_Type ), False );
    Stream_Enable( Journal_GetTypedStream( Info_Type ), False );
@@ -155,7 +154,7 @@ void testSetup( int* argc, char** argv[] ) {
 
 void testTeardown() {
    StgFEM_SLE_SystemSetup_Finalise();
-   StgFEM_SLE_LinearAlgebra_Finalise();
+   //StgFEM_SLE_LinearAlgebra_Finalise();
    StgFEM_Discretisation_Finalise();
    StgDomain_Finalise();
    StGermain_Finalise();

@@ -53,7 +53,6 @@
 #ifndef __StgFEM_SLE_h__
 #define __StgFEM_SLE_h__
 	
-	#include "LinearAlgebra/LinearAlgebra.h"
 	#include "SystemSetup/SystemSetup.h"
 	#include "ProvidedSystems/ProvidedSystems.h"
 

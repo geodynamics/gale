@@ -44,7 +44,6 @@
 #include <StgDomain/StgDomain.h>
 #include <StgFEM/Discretisation/Discretisation.h>
 #include <StgFEM/FrequentOutput/FrequentOutput.h>
-#include <StgFEM/SLE/LinearAlgebra/LinearAlgebra.h>
 
 #include "PeakMemory.h"
   

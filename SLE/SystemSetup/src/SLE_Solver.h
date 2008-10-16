@@ -60,11 +60,15 @@
 	/* virtual function interface */
 	typedef void		(SLE_Solver_SolverSetupFunction)	( void* sleSolver, void* sle );
 	typedef void		(SLE_Solver_SolveFunction)		( void* sleSolver, void* sle );
-	typedef Vector*	(SLE_Solver_GetResidualFunc)		( void* sleSolver, Index fvIndex );
+	//typedef Vector*	(SLE_Solver_GetResidualFunc)		( void* sleSolver, Index fvIndex );
+	typedef Vec    	(SLE_Solver_GetResidualFunc)		( void* sleSolver, Index fvIndex );
 
-        typedef void            (SLE_Solver_FormResidualFunc)        ( void *someSLE, void *someSolver, Vector* );
-        typedef void            (SLE_Solver_GetRhsFunc)              ( void *someSLE, void *someSovler, Vector* );
-        typedef void            (SLE_Solver_GetSolutionFunc)         ( void *someSLE, void *someSolver, Vector** );
+        //typedef void            (SLE_Solver_FormResidualFunc)        ( void *someSLE, void *someSolver, Vector* );
+        //typedef void            (SLE_Solver_GetRhsFunc)              ( void *someSLE, void *someSovler, Vector* );
+        //typedef void            (SLE_Solver_GetSolutionFunc)         ( void *someSLE, void *someSolver, Vector** );
+        typedef void            (SLE_Solver_FormResidualFunc)        ( void *someSLE, void *someSolver, Vec );
+        typedef void            (SLE_Solver_GetRhsFunc)              ( void *someSLE, void *someSovler, Vec );
+        typedef void            (SLE_Solver_GetSolutionFunc)         ( void *someSLE, void *someSolver, Vec* );
 
 	/** SLE_Solver class contents */
 	#define __SLE_Solver \

@@ -43,7 +43,6 @@
 #include <StGermain/StGermain.h>
 #include <StgDomain/StgDomain.h>
 #include "StgFEM/Discretisation/Discretisation.h"
-#include "StgFEM/SLE/LinearAlgebra/LinearAlgebra.h"
 #include "StgFEM/SLE/SystemSetup/SystemSetup.h"
 #include "StgFEM/SLE/ProvidedSystems/Energy/Energy.h"
 #include "StgFEM/SLE/ProvidedSystems/StokesFlow/StokesFlow.h"

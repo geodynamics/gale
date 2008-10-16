@@ -69,12 +69,16 @@
 	typedef void (SystemLinearEquations_MG_SelectStiffMatsFunc) ( void* _sle, unsigned* nSMs, StiffnessMatrix*** sms );
 
 	/* for solving non linear systems using Newton's method */
-	typedef int (SystemLinearEquations_BuildFFunc) ( void* nls, Vector* x, Vector* f, void* context );
-	typedef int (SystemLinearEquations_BuildJFunc) ( void* nls, Vector* x, Matrix** A, Matrix** B, void* matStruct, void* context );	
-	typedef void (SystemLinearEquations_SetFFunc) ( Vector** F, void* context );
+	//typedef int (SystemLinearEquations_BuildFFunc) ( void* nls, Vector* x, Vector* f, void* context );
+	//typedef int (SystemLinearEquations_BuildJFunc) ( void* nls, Vector* x, Matrix** A, Matrix** B, void* matStruct, void* context );	
+	//typedef void (SystemLinearEquations_SetFFunc) ( Vector** F, void* context );
+	typedef int (SystemLinearEquations_BuildFFunc) ( SNES nls, Vec x, Vec f, void* context );
+	typedef int (SystemLinearEquations_BuildJFunc) ( SNES nls, Vec x, Mat* A, Mat* B, MatStructure* matStruct, void* context );	
+	typedef void (SystemLinearEquations_SetFFunc) ( Vec* F, void* context );
 	typedef void (SystemLinearEquations_ConfigureNonlinearSolver) ( void* nls, void* data );
 
-	typedef void (SLE_FormFunctionFunc)( void *someSLE, Vector *X, Vector *F, void *ctx );
+	//typedef void (SLE_FormFunctionFunc)( void *someSLE, Vector *X, Vector *F, void *ctx );
+	typedef void (SLE_FormFunctionFunc)( void *someSLE, Vec X, Vec F, void *ctx );
 
 	
 	/*
@@ -147,10 +151,10 @@
 		void*						    buildJContext;             \
 		SNES				    		    nlSolver;		       \
 		Bool						    linearSolveInitGuess;      \
-		Vector*						    F;			       \
-		Vector*						    X;		       	       \
-		Matrix*						    J;			       \
-		Matrix*						    P;			       \
+		Vec    						    F;			       \
+		Vec    						    X;		       	       \
+		Mat    						    J;			       \
+		Mat    						    P;			       \
 		SystemLinearEquations_SetFFunc*		    	    _setFFunc;		       \
 		SystemLinearEquations_ConfigureNonlinearSolver*	    _configureNLSolverFunc;    \
 		SystemLinearEquations_SetFFunc*		    	    _updateOldFields;	       \

@@ -35,7 +35,6 @@
 #include <StGermain/StGermain.h>
 #include <StgDomain/StgDomain.h>
 #include "StgFEM/Discretisation/Discretisation.h"
-#include "StgFEM/SLE/LinearAlgebra/LinearAlgebra.h"
 #include "units.h"
 #include "types.h"
 #include "shortcuts.h"
@@ -463,10 +462,15 @@ void _SystemLinearEquations_Construct( void* sle, Stg_ComponentFactory* cf, void
 			entryPointRegister,
 			MPI_COMM_WORLD );
 
+	/*
 	self->X  = PETScVector_New( "delta x" );
 	self->F	 = PETScVector_New( "residual" );
 	self->J	 = PETScMatrix_New( "Jacobian" ); 
 	PETScMatrix_SetComm( self->J, self->comm );
+	*/
+	VecCreate( self->comm, &self->X );
+	VecCreate( self->comm, &self->F );
+	MatCreate( self->comm, &self->J );
 }
 
 /* Build */
@@ -717,7 +721,8 @@ void SystemLinearEquations_ZeroAllVectors( void* sle, void* _context ) {
 	for ( index = 0; index < self->forceVectors->count; index++ ) {
 		forceVector = (ForceVector*) self->forceVectors->data[index];
 		
-		Vector_Zero( forceVector->vector );
+		//Vector_Zero( forceVector->vector );
+		VecSet( forceVector->vector, 0.0 );
 	}
 }
 
@@ -726,7 +731,8 @@ pre conditioners is called (beginning of solve) */
 void SystemLinearEquations_NewtonInitialise( void* _context, void* data ) {
 	FiniteElementContext*	context		= (FiniteElementContext*)_context;
 	SystemLinearEquations*	sle             = (SystemLinearEquations*)context->slEquations->data[0];
-	PETScVector*		F;
+	//PETScVector*		F;
+	Vec			F;
 	SNES			snes;
 	SNES			oldSnes		= sle->nlSolver;
 
@@ -739,8 +745,10 @@ void SystemLinearEquations_NewtonInitialise( void* _context, void* data ) {
 	sle->nlSolver = snes;
 	sle->_setFFunc( &sle->F, context );
 
-	SNESSetJacobian( snes, ((PETScMatrix*)sle->J)->petscMat, ((PETScMatrix*)sle->P)->petscMat, sle->_buildJ, sle->buildJContext );
-	SNESSetFunction( snes, ((PETScVector*)sle->F)->petscVec, sle->_buildF, sle->buildFContext );
+	//SNESSetJacobian( snes, ((PETScMatrix*)sle->J)->petscMat, ((PETScMatrix*)sle->P)->petscMat, sle->_buildJ, sle->buildJContext );
+	//SNESSetFunction( snes, ((PETScVector*)sle->F)->petscVec, sle->_buildF, sle->buildFContext );
+	SNESSetJacobian( snes, sle->J, sle->P, sle->_buildJ, sle->buildJContext );
+	SNESSetFunction( snes, sle->F, sle->_buildF, sle->buildFContext );
 
 	/* configure the KSP */
 	sle->_configureNLSolverFunc( snes, context );
@@ -753,7 +761,8 @@ void SystemLinearEquations_NewtonExecute( void* sle, void* _context ) {
 
 	SNESSetOptionsPrefix( snes, self->optionsPrefix );
 	SNESSetFromOptions( snes );
-	SNESSolve( snes, PETSC_NULL, ((PETScVector*)self->X)->petscVec );
+	//SNESSolve( snes, PETSC_NULL, ((PETScVector*)self->X)->petscVec );
+	SNESSolve( snes, PETSC_NULL, self->X );
 }
 
 /* do this at end of solve step */
@@ -769,15 +778,18 @@ void SystemLinearEquations_NewtonFinalise( void* _context, void* data ) {
 
 void SystemLinearEquations_NewtonMFFDExecute( void* sle, void* _context ) {
 	SystemLinearEquations*	self            = (SystemLinearEquations*) sle;
-	Vector*			F;
+	//Vector*			F;
+	Vec    			F;
 
-	Vector_Duplicate( SystemLinearEquations_GetSolutionVectorAt( self, 0 )->vector, &F );
+	//Vector_Duplicate( SystemLinearEquations_GetSolutionVectorAt( self, 0 )->vector, &F );
+	VecDuplicate( SystemLinearEquations_GetSolutionVectorAt( self, 0 )->vector, &F );
 
 	/* creates the nonlinear solver */
 	if( self->nlSolver != PETSC_NULL )
 		SNESDestroy( self->nlSolver );
 	SNESCreate( self->comm, &self->nlSolver );
-	SNESSetFunction( self->nlSolver, ((PETScVector*)F)->petscVec, self->_buildF, _context );
+	//SNESSetFunction( self->nlSolver, ((PETScVector*)F)->petscVec, self->_buildF, _context );
+	SNESSetFunction( self->nlSolver, F, self->_buildF, _context );
 
 	// set J (jacobian)
 	
@@ -788,15 +800,19 @@ void SystemLinearEquations_NewtonMFFDExecute( void* sle, void* _context ) {
 
 void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 	SystemLinearEquations*	self            = (SystemLinearEquations*) sle;
-	Vector*                 previousVector;
-	Vector*                 currentVector;
+	//Vector*                 previousVector;
+	//Vector*                 currentVector;
+	Vec                     previousVector;
+	Vec                     currentVector;
 	double                  residual;
 	double                  tolerance       = self->nonLinearTolerance;
 	Iteration_Index         maxIterations   = self->nonLinearMaxIterations;
-	Bool                    converged = False;
+	Bool                    converged;
 	Stream*                 errorStream     = Journal_Register( Error_Type, self->type );
 	double					wallTime;
 	Iteration_Index         minIterations   = self->nonLinearMinIterations;
+
+	PetscScalar		currVecNorm, prevVecNorm;
 
 	Journal_Printf( self->info, "In %s\n", __func__ );
 	Stream_IndentBranch( StgFEM_Debug );
@@ -819,8 +835,9 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 
 	/* TODO - Give option which solution vector to test */
 	currentVector   = SystemLinearEquations_GetSolutionVectorAt( self, 0 )->vector; 
-	Vector_Duplicate( currentVector, (void**)&previousVector );
-	Vector_SetLocalSize( previousVector, Vector_GetLocalSize( currentVector ) );
+	//Vector_Duplicate( currentVector, (void**)&previousVector );
+	//Vector_SetLocalSize( previousVector, Vector_GetLocalSize( currentVector ) );
+	VecDuplicate( currentVector, &previousVector );
 	
 	for ( self->nonLinearIteration_I = 1 ; self->nonLinearIteration_I < maxIterations ; self->nonLinearIteration_I++ ) {
 		/*
@@ -838,7 +855,8 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 		*/
 
 
-		Vector_CopyEntries( currentVector, previousVector );
+		//Vector_CopyEntries( currentVector, previousVector );
+		VecCopy( currentVector, previousVector );
 	
 		Journal_Printf(self->info,"Non linear solver - iteration %d\n", self->nonLinearIteration_I);
 			
@@ -846,8 +864,13 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 //		PetscPrintf( PETSC_COMM_WORLD, "|Xn+1| = %12.12e \n", Vector_L2Norm(SystemLinearEquations_GetSolutionVectorAt(self,1)->vector) );
 
 		/* Calculate Residual */
-		Vector_AddScaled( previousVector, -1.0, currentVector );
-		residual = Vector_L2Norm( previousVector ) / Vector_L2Norm( currentVector );
+		//Vector_AddScaled( previousVector, -1.0, currentVector );
+		//residual = Vector_L2Norm( previousVector ) / Vector_L2Norm( currentVector );
+		VecAXPY( previousVector, -1.0, currentVector );
+		VecNorm( previousVector, NORM_2, &prevVecNorm );
+		VecNorm( currentVector, NORM_2, &currVecNorm );
+		residual = ((double)prevVecNorm) / ((double)currVecNorm);
+		
 		self->curResidual = residual;
 
                 /*
@@ -900,7 +923,8 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 
 	Stream_UnIndentBranch( StgFEM_Debug );
 
-	FreeObject( previousVector );
+	VecDestroy( previousVector );
+	//FreeObject( previousVector );
 }
 
 void SystemLinearEquations_AddNonLinearSetupEP( void* sle, const char* name, EntryPoint_2VoidPtr_Cast func ) {
@@ -933,11 +957,11 @@ Computes
   F1 := A(x) x -b  = -r,
   where r = b - A(x) x
 */
-void SystemLinearEquations_SNESPicardFormalResidual( void *someSLE, Vector *stg_X, Vector *stg_F, void *_context )
+//void SystemLinearEquations_SNESPicardFormalResidual( void *someSLE, Vector *stg_X, Vector *stg_F, void *_context )
+void SystemLinearEquations_SNESPicardFormalResidual( void *someSLE, Vec X, Vec F, void *_context )
 {
 	SystemLinearEquations *sle = (SystemLinearEquations*)someSLE;
     	SLE_Solver            *solver = (SLE_Solver*)sle->solver;
-	Vec                   F;
 	Stream*                 errorStream     = Journal_Register( Error_Type, sle->type );
 
 	Journal_Printf( errorStream, "    **** SystemLinearEquations_SNESPicardFormalResidual: This option is un-tested and does not yet function correctly. \n");
@@ -945,8 +969,9 @@ void SystemLinearEquations_SNESPicardFormalResidual( void *someSLE, Vector *stg_
 	Journal_Printf( errorStream, "    ****     [Dave May - 12 May, 2008] \n");
 	abort();
 
-	solver->_formResidual( (void*)sle,  (void*)solver, stg_F );
-	F = StgVectorGetPetscVec( stg_F );	
+	//solver->_formResidual( (void*)sle,  (void*)solver, stg_F );
+	solver->_formResidual( (void*)sle,  (void*)solver, F );
+	//F = StgVectorGetPetscVec( stg_F );	
 //	VecScale( F, -1.0 );
 }
 
@@ -988,19 +1013,22 @@ void SystemLinearEquations_SNESPicardKSPResidual( void *someSLE, Vector *stg_X, 
 /*
 stg_X must not get modified by this function !!
 */
-void SystemLinearEquations_SNESPicardKSPResidual( void *someSLE, Vector *stg_X, Vector *stg_F, void *_context )
+//void SystemLinearEquations_SNESPicardKSPResidual( void *someSLE, Vector *stg_X, Vector *stg_F, void *_context )
+void SystemLinearEquations_SNESPicardKSPResidual( void *someSLE, Vec X, Vec F, void *_context )
 {
         SystemLinearEquations *sle = (SystemLinearEquations*)someSLE;
         SLE_Solver            *solver = (SLE_Solver*)sle->solver;
-        Vector                *stg_Xstar;
-        Vec                   F,X,Xstar;
+        //Vector                *stg_Xstar;
+        //Vec                   F,X,Xstar;
+	Vec			Xstar;
 	PetscReal norm,norms;
 
-	solver->_getSolution( sle, solver, &stg_Xstar );
+	//solver->_getSolution( sle, solver, &stg_Xstar );
+	solver->_getSolution( sle, solver, &Xstar );
 
-        F = StgVectorGetPetscVec( stg_F );
-	X = StgVectorGetPetscVec( stg_X );
-	Xstar = StgVectorGetPetscVec( stg_Xstar );
+        //F = StgVectorGetPetscVec( stg_F );
+	//X = StgVectorGetPetscVec( stg_X );
+	//Xstar = StgVectorGetPetscVec( stg_Xstar );
 	
 	/* Map most current solution into stg object, vec->mesh  */
 	VecCopy( X, Xstar );  /* X* <- X */
@@ -1014,7 +1042,7 @@ void SystemLinearEquations_SNESPicardKSPResidual( void *someSLE, Vector *stg_X, 
 //	PetscPrintf(PETSC_COMM_WORLD,"  |X| = %12.12e : |x*| = %12.12e <pre>\n", norm, norms );
 
 	sle->linearExecute( sle, _context );    /* X* = A^{-1} b */
-	Xstar = StgVectorGetPetscVec( stg_Xstar );
+	//Xstar = StgVectorGetPetscVec( stg_Xstar );
 
 	VecNorm( X, NORM_2, &norm );
 	VecNorm( Xstar, NORM_2, &norms );
@@ -1023,12 +1051,14 @@ void SystemLinearEquations_SNESPicardKSPResidual( void *someSLE, Vector *stg_X, 
 	VecWAXPY( F, -1.0, Xstar, X ); /* F = -X* + X  */
 }
 
-void SLEComputeFunction( void *someSLE, Vector *stg_X, Vector *stg_F, void *_context )
+//void SLEComputeFunction( void *someSLE, Vector *stg_X, Vector *stg_F, void *_context )
+void SLEComputeFunction( void *someSLE, Vec X, Vec F, void *_context )
 {
         SystemLinearEquations *sle = (SystemLinearEquations*)someSLE;	
 
 	if (sle->_sleFormFunction!=NULL) {
-		sle->_sleFormFunction( sle, stg_X, stg_F, _context );
+		//sle->_sleFormFunction( sle, stg_X, stg_F, _context );
+		sle->_sleFormFunction( sle, X, F, _context );
 	}
 	else {
 		SETERRQ( PETSC_ERR_SUP, "SLEComputeFunction in not valid" );
@@ -1160,20 +1190,23 @@ void SystemLinearEquations_PicardExecute( void *sle, void *_context )
   PetscReal snes_ttol, snes_rtol, snes_abstol, snes_xtol;
   PetscInt  snes_maxits;
 
-  Vector *stg_X, *stg_F, *stg_Xstar;
+  //Vector *stg_X, *stg_F, *stg_Xstar;
   PetscTruth monitor_flg;
 
   /* setup temporary some vectors */
-  solver->_getSolution( self, solver, &stg_Xstar );
-  Xstar = StgVectorGetPetscVec( stg_Xstar );
+  //solver->_getSolution( self, solver, &stg_Xstar );
+  solver->_getSolution( self, solver, &Xstar );
+  //Xstar = StgVectorGetPetscVec( stg_Xstar );
 
-  Vector_Duplicate( stg_Xstar, (void**)&stg_X );
-  Vector_SetLocalSize( stg_X, Vector_GetLocalSize(stg_Xstar) );
-  X = StgVectorGetPetscVec( stg_X );
+  //Vector_Duplicate( stg_Xstar, (void**)&stg_X );
+  //Vector_SetLocalSize( stg_X, Vector_GetLocalSize(stg_Xstar) );
+  //X = StgVectorGetPetscVec( stg_X );
+  VecDuplicate( Xstar, &X );
 
-  Vector_Duplicate( stg_X, (void**)&stg_F );
-  Vector_SetLocalSize( stg_F, Vector_GetLocalSize(stg_X) );
-  F = StgVectorGetPetscVec( stg_F );
+  //Vector_Duplicate( stg_X, (void**)&stg_F );
+  //Vector_SetLocalSize( stg_F, Vector_GetLocalSize(stg_X) );
+  //F = StgVectorGetPetscVec( stg_F );
+  VecDuplicate( X, &F );
 
   VecDuplicate( F, &Y );
   VecDuplicate( F, &delta_X );
@@ -1202,7 +1235,7 @@ void SystemLinearEquations_PicardExecute( void *sle, void *_context )
     self->linearExecute( sle, _context );    /* X* = A^{-1} b */
     self->hasExecuted = True;
 
-    Xstar = StgVectorGetPetscVec( stg_Xstar );
+    //Xstar = StgVectorGetPetscVec( stg_Xstar );
     
     /* Map X <- X* */
     VecCopy( Xstar, X ); 
@@ -1212,7 +1245,8 @@ void SystemLinearEquations_PicardExecute( void *sle, void *_context )
 
   snes_iter = 0;
   snes_norm = 0;
-  SLEComputeFunction( sle, stg_X, stg_F, _context );
+  //SLEComputeFunction( sle, stg_X, stg_F, _context );
+  SLEComputeFunction( sle, X, F, _context );
   ierr = VecNorm(F, NORM_2, &fnorm);CHKERRQ(ierr); /* fnorm <- ||F||  */
   fnorm0 = fnorm;
   if( PetscIsInfOrNanReal(fnorm) ) SETERRQ(PETSC_ERR_FP,"Infinite or not-a-number generated in norm");
@@ -1248,7 +1282,8 @@ void SystemLinearEquations_PicardExecute( void *sle, void *_context )
     VecNorm( delta_X, NORM_2, &pnorm );
 
     /* Compute F(X^{new}) */
-    SLEComputeFunction( sle, stg_X, stg_F, _context );
+    //SLEComputeFunction( sle, stg_X, stg_F, _context );
+    SLEComputeFunction( sle, X, F, _context );
     ierr = VecNorm(F, NORM_2, &fnorm);CHKERRQ(ierr);
     if( PetscIsInfOrNanReal(fnorm) ) SETERRQ(PETSC_ERR_FP,"Infinite or not-a-number generated norm");
 
@@ -1274,8 +1309,10 @@ void SystemLinearEquations_PicardExecute( void *sle, void *_context )
   if (monitor_flg==PETSC_TRUE)
     PetscPrintf( PETSC_COMM_WORLD, "Nonlinear solve converged due to %s \n", SNESConvergedReasons[snes_reason] );
 
-  FreeObject( stg_X );
-  FreeObject( stg_F );
+  //FreeObject( stg_X );
+  //FreeObject( stg_F );
+  VecDestroy( X );
+  VecDestroy( F );
   VecDestroy( Y );
   VecDestroy( delta_X );
 

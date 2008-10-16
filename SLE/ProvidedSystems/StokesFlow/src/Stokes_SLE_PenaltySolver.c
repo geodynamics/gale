@@ -43,7 +43,6 @@
 #include <StGermain/StGermain.h>
 #include <StgDomain/StgDomain.h>
 #include "StgFEM/Discretisation/Discretisation.h"
-#include "StgFEM/SLE/LinearAlgebra/LinearAlgebra.h"
 #include "StgFEM/SLE/SystemSetup/SystemSetup.h"
 #include "types.h"
 #include "Stokes_SLE_PenaltySolver.h"
@@ -221,109 +220,153 @@ void _Stokes_SLE_PenaltySolver_Solve( void* solver,void* stokesSLE ) {
 	Stokes_SLE_PenaltySolver* self            = (Stokes_SLE_PenaltySolver*)solver;	
 	Stokes_SLE*             sle             = (Stokes_SLE*)stokesSLE;
 	/* Create shortcuts to stuff needed on sle */
-	Matrix*                 kMatrix         = sle->kStiffMat->matrix;
-	Matrix*                 gradMat         = sle->gStiffMat->matrix;
-	Matrix*                 divMat          = NULL;
-	Matrix*                 C_Mat           = sle->cStiffMat->matrix;
-	Vector*                 uVec            = sle->uSolnVec->vector;
-	Vector*                 pVec            = sle->pSolnVec->vector;
-	Vector*                 fVec            = sle->fForceVec->vector;
-	Vector*                 hVec            = sle->hForceVec->vector;
-	Vector* 		hTempVec;
-	Vector*			fTempVec;
+	Mat                     kMatrix         = sle->kStiffMat->matrix;
+	Mat                     gradMat         = sle->gStiffMat->matrix;
+	Mat                     divMat          = NULL;
+	Mat                     C_Mat           = sle->cStiffMat->matrix;
+	Vec                     uVec            = sle->uSolnVec->vector;
+	Vec                     pVec            = sle->pSolnVec->vector;
+	Vec                     fVec            = sle->fForceVec->vector;
+	Vec                     hVec            = sle->hForceVec->vector;
+	Vec     		hTempVec;
+	Vec    			fTempVec;
 
-	Matrix*			GTrans;
-	MatrixSolver*		sles_v;
+	Mat    			GTrans;
+	//MatrixSolver*		sles_v;
+	KSP			sles_v;
 	double	 		negOne=-1.0;
 	double	 		one=1.0;
-	Matrix*			kHat;
-	Matrix*			C_InvMat;
-	Vector*			diagC;
+	Mat    			kHat;
+	Mat    			C_InvMat;
+	Vec    			diagC;
 	
+	PC			pc;
+
 	Journal_DPrintf( self->debug, "In %s():\n", __func__ );
-	
+
+	/*	
 	Vector_Duplicate( hVec, (void**)&hTempVec );
 	Vector_SetLocalSize( hTempVec, Vector_GetLocalSize( hVec ) );
 	Vector_Duplicate( fVec, (void**)&fTempVec );
 	Vector_SetLocalSize( fTempVec, Vector_GetLocalSize( fVec ) );
 	Vector_Duplicate( pVec, (void**)&diagC );
 	Vector_SetLocalSize( diagC, Vector_GetLocalSize( pVec ) );
+	*/
+	VecDuplicate( hVec, &hTempVec );
+	VecDuplicate( fVec, &fTempVec );
+	VecDuplicate( pVec, &diagC );
 	
 	if( sle->dStiffMat == NULL ) {
 		Journal_DPrintf( self->debug, "Div matrix == NULL : Problem is assumed to be symmetric. ie Div = GTrans \n");
-		Matrix_Duplicate( gradMat, (void**)&GTrans );
-		Matrix_Transpose( gradMat, GTrans );
+		//Matrix_Duplicate( gradMat, (void**)&GTrans );
+		//Matrix_Transpose( gradMat, GTrans );
+		MatTranspose( gradMat, &GTrans );
 		divMat = GTrans;
 	}
 	else {
 		/* make a copy we can play with */
+		/*
 		Matrix_Duplicate( sle->dStiffMat->matrix, (void**)&GTrans );
 		Matrix_CopyEntries( sle->dStiffMat->matrix, GTrans );
+		*/
+		MatCreate( sle->comm, &GTrans );
+		MatCopy( sle->dStiffMat->matrix, GTrans, DIFFERENT_NONZERO_PATTERN );
 		divMat = GTrans;
 	}
 	
 	/* Create CInv */
-	Matrix_GetDiagonal( C_Mat, diagC );
-	Vector_Reciprocal( diagC );
-	Matrix_DiagonalInsertEntries( C_Mat, diagC );
+	//Matrix_GetDiagonal( C_Mat, diagC );
+	//Vector_Reciprocal( diagC );
+	//Matrix_DiagonalInsertEntries( C_Mat, diagC );
+	MatGetDiagonal( C_Mat, diagC );
+	VecReciprocal( diagC );
+	MatDiagonalSet( C_Mat, diagC, INSERT_VALUES );
 	C_InvMat = C_Mat;				/* Use pointer CInv since C has been inverted */
 	
 	/* Build RHS : rhs = f - GCInv h */
-	Matrix_Multiply( C_InvMat, hVec, hTempVec );		/* hTemp = CInv h	*/
-	Vector_Scale( hTempVec, negOne );		/* hTemp = -hTemp	: -CInv h	*/
-	Matrix_MultiplyAdd( gradMat, hTempVec, fVec, fTempVec );	/* fTemp = F + G hTemp	: fTemp = F - G CInv h */
+	//Matrix_Multiply( C_InvMat, hVec, hTempVec );		/* hTemp = CInv h	*/
+	//Vector_Scale( hTempVec, negOne );		/* hTemp = -hTemp	: -CInv h	*/
+	//Matrix_MultiplyAdd( gradMat, hTempVec, fVec, fTempVec );	/* fTemp = F + G hTemp	: fTemp = F - G CInv h */
+	MatMult( C_InvMat, hVec, hTempVec );
+	VecScale( hTempVec, negOne );
+	MatMultAdd( gradMat, hTempVec, fVec, fTempVec );
 	
 	/* Build G CInv GTrans */
 /* 	MatTranspose( gradMat, &GTrans ); */
 /* 	 since CInv is diagonal we can just scale mat entries by the diag vector */
-	Matrix_DiagonalScale( divMat, diagC, NULL );	/*  Div = CInve Div */
+	//Matrix_DiagonalScale( divMat, diagC, NULL );	/*  Div = CInve Div */
+	MatDiagonalScale( divMat, diagC, PETSC_NULL );
         /* 	MatMatMult_any( &tmpMat, C, *divMat );	*/ /* tmpMat = CInv Div */
 	
 	
 	Journal_DPrintf( self->debug, "UpdivMat mat mat mult \n");
-	Matrix_Duplicate( gradMat, (void**)&kHat );
-	Matrix_MatrixMultiply( gradMat, divMat, kHat );		/* tmpMat2 = G CInv Div */
+	//Matrix_Duplicate( gradMat, (void**)&kHat );
+	//Matrix_MatrixMultiply( gradMat, divMat, kHat );		/* tmpMat2 = G CInv Div */
+	MatPtAP( gradMat, divMat, MAT_INITIAL_MATRIX, 1.0, &kHat );
 	Journal_DPrintf( self->debug, "done mult \n");
-	Matrix_Scale( kHat, -1 );			/* tmpMat2 = - G CInv Div */
-	Matrix_AddScaled( kHat, one, kMatrix );	/* kHat = kHat + kMatrix */
+	//Matrix_Scale( kHat, -1 );			/* tmpMat2 = - G CInv Div */
+	//Matrix_AddScaled( kHat, one, kMatrix );	/* kHat = kHat + kMatrix */
+	MatScale( kHat, -1 );
+	MatAXPY( kHat, one, kMatrix, SAME_NONZERO_PATTERN );
 	
 	/* Setup solver context and make sure that it uses a direct solver */
 #ifndef HAVE_PETSC
 #error Need PETSc!
 #endif
-	sles_v = (MatrixSolver*)PETScMatrixSolver_New( "" );
-	MatrixSolver_SetComm( sles_v, sle->comm );
-	MatrixSolver_SetMatrix( sles_v, kHat );
-	PETScMatrixSolver_SetKSPType( sles_v, PETScMatrixSolver_KSPType_PreOnly );
-	PETScMatrixSolver_SetPCType( sles_v, PETScMatrixSolver_PCType_LU );
+	//sles_v = (MatrixSolver*)PETScMatrixSolver_New( "" );
+	//MatrixSolver_SetComm( sles_v, sle->comm );
+	//MatrixSolver_SetMatrix( sles_v, kHat );
+	//PETScMatrixSolver_SetKSPType( sles_v, PETScMatrixSolver_KSPType_PreOnly );
+	//PETScMatrixSolver_SetPCType( sles_v, PETScMatrixSolver_PCType_LU );
 
-	MatrixSolver_Solve( sles_v, fTempVec, uVec );
+	//MatrixSolver_Solve( sles_v, fTempVec, uVec );
+	KSPCreate( sle->comm, &sles_v );
+	//KSPSetOperators( sles_v, ((PETScMatrix*)kHat)->petscMat, ((PETScMatrix*)kHat)->petscMat, DIFFERENT_NONZERO_PATTERN );
+	KSPSetOperators( sles_v, kHat, kHat, DIFFERENT_NONZERO_PATTERN );
+	KSPSetType( sles_v, KSPPREONLY );
+	KSPGetPC( sles_v, &pc );
+	PCSetType( pc, PCLU );
+
+	//KSPSolve( sles_v, ((PETScVector*)fTempVec)->petscVec, ((PETScVector*)uVec)->petscVec );
+	KSPSolve( sles_v, fTempVec, uVec );
 	
 	/* Recover p */
 	if( sle->dStiffMat == NULL ) {
 /* 		 since Div was modified when C is diagonal, re build the transpose */
-		Matrix_Transpose( gradMat, GTrans );
+		//Matrix_Transpose( gradMat, GTrans );
+		MatTranspose( gradMat, &GTrans );
 		divMat = GTrans;
 	}
 	else {
 /* 		 never modified Div_null so set divMat to point back to it */
 		divMat = sle->dStiffMat->matrix;
 	}
-	Matrix_Multiply( divMat, uVec, hTempVec );		/* hTemp = Div v */
-	Vector_AddScaled( hVec, negOne, hTempVec );	/* hTemp = H - hTemp	: hTemp = H - Div v */
-	Matrix_Multiply( C_InvMat, hTempVec, pVec );		/* p = CInv hTemp	: p = CInv ( H - Div v ) */
+	//Matrix_Multiply( divMat, uVec, hTempVec );		/* hTemp = Div v */
+	//Vector_AddScaled( hVec, negOne, hTempVec );	/* hTemp = H - hTemp	: hTemp = H - Div v */
+	//Matrix_Multiply( C_InvMat, hTempVec, pVec );		/* p = CInv hTemp	: p = CInv ( H - Div v ) */
+	MatMult( divMat, uVec, hTempVec );
+	VecAXPY( hVec, negOne, hTempVec );
+	MatMult( C_InvMat, hTempVec, pVec );
 	
-	
+	/*
 	FreeObject( kHat );
 	FreeObject( fTempVec );
 	FreeObject( hTempVec );
 	FreeObject( diagC );
 	FreeObject( sles_v );
 	FreeObject( GTrans );
+	*/
+	if( kHat != PETSC_NULL )     MatDestroy( kHat );
+	if( fTempVec != PETSC_NULL ) VecDestroy( fTempVec );
+	if( hTempVec != PETSC_NULL ) VecDestroy( hTempVec );
+	if( diagC != PETSC_NULL )    VecDestroy( diagC );
+	if( sles_v != PETSC_NULL )   KSPDestroy( sles_v );
+	if( GTrans != PETSC_NULL )   MatDestroy( GTrans );
 }
 
 
-Vector* _Stokes_SLE_PenaltySolver_GetResidual( void* solver, Index fv_I ) {
+//Vector* _Stokes_SLE_PenaltySolver_GetResidual( void* solver, Index fv_I ) {
+Vec _Stokes_SLE_PenaltySolver_GetResidual( void* solver, Index fv_I ) {
 /* 	 TODO */
 	return NULL;
 }

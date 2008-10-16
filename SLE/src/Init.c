@@ -43,7 +43,6 @@
 #include <StGermain/StGermain.h>
 #include <StgDomain/StgDomain.h>
 #include "StgFEM/Discretisation/Discretisation.h"
-#include "StgFEM/SLE/LinearAlgebra/LinearAlgebra.h"
 #include "StgFEM/SLE/SystemSetup/SystemSetup.h"
 #include "StgFEM/SLE/ProvidedSystems/ProvidedSystems.h"
 
@@ -66,7 +65,7 @@ Bool StgFEM_SLE_Init( int* argc, char** argv[] ) {
 	Stream_Flush( Journal_Register( InfoStream_Type, "Context" ) );
 	Stream_SetPrintingRank( Journal_Register( InfoStream_Type, "Context" ), tmp );
 	
-	StgFEM_SLE_LinearAlgebra_Init( argc, argv );
+	//StgFEM_SLE_LinearAlgebra_Init( argc, argv );
 	StgFEM_SLE_SystemSetup_Init( argc, argv );
 	StgFEM_SLE_ProvidedSystems_Init( argc, argv );
 
