@@ -214,8 +214,8 @@ void lucDrawingObjectMask_Construct( lucDrawingObjectMask* self, Name drawingObj
 	maskTypeName = Stg_ComponentFactory_GetString( cf, drawingObjectName, "maskType", "GreaterThan" );
 	if ( strcasecmp( maskTypeName, "GreaterThan" ) == 0 ) 
 		self->type = GreaterThan;
-	else if ( strcasecmp( maskTypeName, "LesserThan" ) == 0 )
-		self->type = LesserThan;
+	else if ( strcasecmp( maskTypeName, "LesserThan" ) == 0 || strcasecmp( maskTypeName, "LessThan" ) == 0 )
+		self->type = LessThan;
 	else if ( strcasecmp( maskTypeName, "EqualTo" ) == 0 )
 		self->type = EqualTo;
 	else {
@@ -232,7 +232,7 @@ Bool lucDrawingObjectMask_Test( lucDrawingObjectMask* self, double value ) {
 			if (value > maskValue) 
 				return True;
 			return False;
-		case LesserThan:
+		case LessThan:
 			if (value < maskValue) 
 				return True;
 			return False;

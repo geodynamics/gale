@@ -16,29 +16,14 @@
 <param name="Description">SwarmViewerBase is an abstract class. It provides the main functionaily for a variable on a Swarm to be viewed as output.</param>
 
 <!--Now the interesting stuff-->
-
-
 <list name="Params">
-	
 	<struct>
-		<param name="Name">MaskType</param>
-		<param name="Type">String</param>
-		<param name="Default">GreaterThan</param>
-		<param name="Description">The type of mask that will be used. Options are: GreaterThan, LesserThen, EqualTo</param>
+		<param name="Name">pointSize</param>
+		<param name="Type">Double</param>
+		<param name="Default">1.0</param>
+		<param name="Description">Size of particle dots</param>
 	</struct>
-	<struct>
-		<param name="Name">MaskValue</param>
-		<param name="Type">double</param>
-		<param name="Default">0.0</param>
-		<param name="Description">Value of the MaskType</param>
-	</struct>
-	<struct>
-		<param name="Name">MaskTolerance</param>
-		<param name="Type">double</param>
-		<param name="Default">0.001</param>
-		<param name="Description">Tolerance of the masking condition in the case it's a floating point operation.</param>
-	</struct>
-	
+
 	<struct>
 		<param name="Name">drawParticleNumber</param>
 		<param name="Type">Bool</param>
@@ -99,11 +84,25 @@
 		<param name="Default">100000.0</param>
 		<param name="Description">Depened on positionRange and sets the volume this swarm viewer operates in</param>
 	</struct>
+
+	
 	<struct>
-		<param name="Name">pointSize</param>
-		<param name="Type">Double</param>
-		<param name="Default">1.0</param>
-		<param name="Description">Size of particle dots</param>
+		<param name="Name">maskType</param>
+		<param name="Type">String</param>
+		<param name="Default">GreaterThan</param>
+		<param name="Description">When testing whether to draw a particle - this mask compares the value of a SwarmVariable and compares it to a value. This is the nature of the comparison. It can be "GreaterThan", "LessThan" or "EqualTo".</param>
+	</struct>
+	<struct>
+		<param name="Name">maskValue</param>
+		<param name="Type">double</param>
+		<param name="Default">0.0</param>
+		<param name="Description">The value to compare against the mask SwarmVariable</param>
+	</struct>
+	<struct>
+		<param name="Name">maskTolerance</param>
+		<param name="Type">double</param>
+		<param name="Default">0.001</param>
+		<param name="Description">If the maskType is set to 'EqualTo', the mask is activated with the value of the mask Variable is within this tolerance to the mask value.</param>
 	</struct>
 
 </list>
@@ -143,5 +142,5 @@
 
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">N/A</param>
 

@@ -52,8 +52,9 @@
 
 	#define __lucTitle                              \
 		__lucOpenGLDrawingObject \
-		char*                               titleString;  \
-		lucColour                           colour;
+		char*                                              titleString;  \
+		lucColour                                          colour;       \
+		int                                                yPos;
 		
 	struct lucTitle {__lucTitle};
 
@@ -61,7 +62,8 @@
 	lucTitle* lucTitle_New( 
 		Name                                               name,
 		char*                                              string,
-		lucColour                                          colour );
+		lucColour                                          colour,
+		int                                                yPos );
 
 	lucTitle* _lucTitle_New(
 		SizeT                                              sizeOfSelf,
@@ -83,13 +85,15 @@
 
 	void lucTitle_InitAll( 
 		void*                                              title,
-		char*                                               string, 
-		lucColour                                          colour);
+		char*                                              string, 
+		lucColour                                          colour,
+		int                                                yPos );
 
 	void _lucTitle_Init( 
 		void*                                              title,
-		char*                                               string, 
-		lucColour                                        colour);
+		char*                                              string, 
+		lucColour                                          colour,
+		int                                                yPos );
 
 
 	void _lucTitle_Setup( void* drawingObject, void* _context );
