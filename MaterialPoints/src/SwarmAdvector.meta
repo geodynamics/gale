@@ -43,13 +43,13 @@
 </list>
 
 <!-- Add an exmaple XML if possible -->
-<param name="Example">
+<param name="Example"><![CDATA[
 		<struct name="materialPointsAdvector">
 			<param name="Type">SwarmAdvector</param>
 			<param name="Swarm">materialPointsSwarm</param>
 			<param name="TimeIntegrator">timeIntegrator</param>
 			<param name="VelocityField">VelocityField</param>
-		</struct>
+		</struct>]]>
 </param>
 
 </StGermainData>

@@ -95,9 +95,7 @@
 </list>
 
 <!-- Example XML -->
-<param name="Example">PICellerator/MaterialPointSwarm.xml</param>
-
-
+<param name="Example"><![CDATA[
 <!-- Example Usage -->
 <!-- Use this struct -->
 <struct name="weights" mergeType="replace">
@@ -164,3 +162,8 @@
 </struct>
 
 <!-- See MaterialPointsSwarm.xml in PICellerator/Apps/PIC_Components for an example -->
+]]>
+</param>
+
+</StGermainData>
+

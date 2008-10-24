@@ -28,11 +28,11 @@
 
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">
+<param name="Example"><![CDATA[
 		<struct name="weights">
 			<param name="Type">DiscreteVoronoiWeights</param>
 			<param name="DiscreteVoronoi">discreteVoronoi</param>
-		</struct>
+		</struct>]]>
 
 </param>
 

@@ -43,7 +43,7 @@
 	</struct>
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">
+<param name="Example"><![CDATA[
 		<struct name="buoyancyForceTerm">
 			<param name="Type">BuoyancyForceTermThermoChem</param>
 			<param name="ForceVector">mom_force</param>
@@ -51,7 +51,7 @@
 			<param name="Swarm">picIntegrationPoints</param>
 			<param name="RaT">RaT</param>
 			<param name="RaC">RaC</param>
-		</struct>
+		</struct>]]>
 </param>
 
 </StGermainData>

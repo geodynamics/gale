@@ -28,11 +28,11 @@
 	</struct>
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">
+<param name="Example"><![CDATA[
 		<struct name="weights">
 			<param name="Type">MomentBalanceWeights</param>
 			<param name="BackupWeights">constantWeights</param>
-		</struct>	
+		</struct>]]>	
 </param>
 
 </StGermainData>
