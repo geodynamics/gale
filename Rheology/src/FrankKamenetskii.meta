@@ -44,13 +44,13 @@
 	</struct>
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">
+<param name="Example"><![CDATA[
 	<struct name="temperatureDependence">
 		<param name="Type">FrankKamenetskii</param>
 		<param name="TemperatureField">TemperatureField</param>
 		<param name="eta0">1.0e6</param>
 		<param name="theta">13.815510558</param>
-	</struct>
+	</struct>]]>
 </param>
 
 </StGermainData>

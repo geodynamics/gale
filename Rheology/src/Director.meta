@@ -41,6 +41,7 @@
 		<param name="Type">Bool</param>
 		<param name="Default">False</param>
 		<param name="Description">If set to True, then the vector is still created but its update is inactive</param>
+	</struct>
 	<struct>
 		<param name="Essential">True</param>
 		<param name="Name">initialDirectionType</param>
@@ -59,7 +60,6 @@
 		<param name="Description">Used when initialDirectionType='random'. Specifies the random seed to generate the initial random directions of particles.</param>
 	</struct>	
 
-	</struct>
 
 </list>
 

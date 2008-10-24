@@ -130,7 +130,7 @@
 </list>
 
 <!-- Add an example XML if possible -->
-<param name="Example">
+<param name="Example"><![CDATA[
 	<struct name="orthotropic">
 		<param name="Type">Orthotropic</param>
 		<param name="viscosity1">300.0</param>
@@ -139,7 +139,7 @@
 		<param name="viscosity4">1.0</param>
 		<param name="viscosity5">1.0</param>
 		<param name="viscosity6">1.0</param>
-	</struct>
+	</struct>]]>
 </param>
 
 </StGermainData>

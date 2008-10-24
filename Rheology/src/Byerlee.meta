@@ -43,14 +43,14 @@
 	</struct>
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">
+<param name="Example"><![CDATA[
 	<struct name="yielding">
 		<param name="Type">Byerlee</param>
 		<param name="cohesion">0.04</param>
 		<param name="depthCoefficient">0.25</param>
 		<param name="FeMesh">mesh-linear</param>
 		<param name="BlockGeometry">geometry</param>
-	</struct>
+	</struct>]]>
 </param>
 
 </StGermainData>

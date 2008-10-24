@@ -31,11 +31,11 @@
 
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">
+<param name="Example"><![CDATA[
 	<struct name="viscosity">
 		<param name="Type">MaterialViscosity</param>
 		<param name="eta0">1.0e6</param>
-	</struct>
+	</struct>]]>
 </param>
 
 

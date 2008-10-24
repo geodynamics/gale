@@ -28,11 +28,11 @@
 	</struct>
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">
+<param name="Example"><![CDATA[
 	<struct name="densityField">
 		<param name="Type">DensityField</param>
 		<param name="BuoyancyForceTerm">buoyancyForceTerm</param>
-	</struct>
+	</struct>]]>
 </param>
 
 </StGermainData>

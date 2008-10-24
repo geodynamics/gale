@@ -34,12 +34,12 @@
 	</struct>
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">
+<param name="Example"><![CDATA[
 	<struct name="anisotropic">
 		<param name="Type">Anisotropic</param>
 		<param name="Director">director</param>
 		<param name="viscosityRatio">10.0</param>
-	</struct>
+	</struct>]]>
 </param>
 
 </StGermainData>

@@ -55,14 +55,14 @@
 </list>
 
 <!-- Add an exmaple XML if possible -->
-<param name="Example">
+<param name="Example"><![CDATA[
 	<struct name="temperatureDependence">
 		<param name="Type">Arrhenius</param>
 		<param name="TemperatureField">TemperatureField</param>
 		<param name="eta0">1.0e-6</param>
 		<param name="activationEnergy">27.63102112</param>
 		<param name="activationVolume">0.0</param>
-	</struct>
+	</struct>]]>
 </param>
 
 </StGermainData>

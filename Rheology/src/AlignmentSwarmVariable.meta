@@ -35,13 +35,13 @@
 	</struct>
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">
+<param name="Example"><![CDATA[
 	<struct name="alignment">
 		<param name="Type">AlignmentSwarmVariable</param>
 		<param name="Swarm">materialPoints</param>
 		<param name="Director">director</param>
 		<param name="VelocityField">VelocityField</param>
-	</struct>
+	</struct>]]>
 </param>
 
 </StGermainData>
