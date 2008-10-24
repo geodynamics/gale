@@ -52,7 +52,7 @@
 	</struct>
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">
+<param name="Example"><![CDATA[
 	<struct name="EnergyEqn">
 		<param name="Type">AdvectionDiffusionSLE</param>
 		<param name="SLE_Solver">predictorMulticorrector</param> 
@@ -61,7 +61,7 @@
 		<param name="Residual">residual</param>
 		<param name="MassMatrix">massMatrix</param>
 		<param name="courantFactor">0.5</param>
-	</struct>
+	</struct>]]>
 </param>
 
 </StGermainData>

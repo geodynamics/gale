@@ -22,12 +22,12 @@
 <list name="Dependencies">
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">
+<param name="Example"><![CDATA[
 	<struct name="lumpedMassMatrixForceTerm">
 		<param name="Type">LumpedMassMatrixForceTerm</param>
 		<param name="Swarm">gaussSwarm</param>
 		<param name="ForceVector">massMatrix</param>
-	</struct>
+	</struct>]]>
 </param>
 
 </StGermainData>

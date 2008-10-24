@@ -38,10 +38,10 @@
 
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">
+<param name="Example"><![CDATA[
 	<struct name="predictorMulticorrector">
 		<param name="Type">AdvDiffMulticorrector</param>
-	</struct>
+	</struct>]]>
 </param>
 
 </StGermainData>
