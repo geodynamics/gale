@@ -13,7 +13,7 @@
 <param name="Parent">Stg_Component</param>
 <param name="Reference">None</param>
 <param name="Summary">Associates a textual label with a piece of data in memory, which can then be referred to via the Variable Register.</param>
-<param name="Description">
+<param name="Description"><![CDATA[
 <p>Variable makes an association between a defined, textual name and a chunk of data in memory.  This data could take the form of a basic type (such as an int or double), or an element of an array, or an entire array or struct.  Variable may also index a regular series of non-contiguous locations in memory.  This capability to define arbitrary data within a datastructure makes it very powerful.</p>
 
 <p>For example, a Variable can refer to a series of ints in an array with an offset of 1 and a stride of 3.  This terminology will be familiar to those who are accustomed with  MPI. Once a Variable is defined, it is stored in the Variable Register.  Like other Registers of StGermain, it can be accessed by any other Component.
@@ -24,7 +24,7 @@
 <p>When specified throught the XML system, the Variable will actually allocate the memory of the underlying memory variable itself. When used in the C API, the Variable must be passed the underlying memory chunk (but the memory chunk itself need not yet be allocated until just before the Variable undergoes its build phase).</p>
 
 <p>The XML implementation of Variable doesn't allow the specification of complex data types or arrays. For arrays, components such as MeshVariable should be used</p>
-
+]]>
 </param>
 
 
@@ -60,7 +60,7 @@
 </list>
 
 
-<param name="Example">
+<param name="Example"><![CDATA[
 <p>Examples:
 XML version / MDF (Model Description File):
 Unlike the C usage, MDF automatically handles memory allocation.
@@ -115,7 +115,7 @@ Variable_NewVector(name,
                    data array, 
                    variable register, 
                    [optional: list of names of array items]);
-</p>
+</p>]]>
 </param>
 
 </StGermainData>
