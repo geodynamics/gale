@@ -44,12 +44,12 @@
 
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">
+<param name="Example"><![CDATA[
 	<struct name="swarmDump">
 		<param name="Type">SwarmDump</param>
 		<param name="Swarm">materialSwarm</param>
 		<param name="newFileEachTime">false</param>
-	</struct>
+	</struct>]]>
 </param>
 
 </StGermainData>

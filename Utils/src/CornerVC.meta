@@ -52,3 +52,6 @@ z direction - Back or Front;
 </list>
 <!-- Add an exmaple XML if possible -->
 <param name="Example">../tests/data/CornerVC.xml</param>
+
+</StGermainData>
+

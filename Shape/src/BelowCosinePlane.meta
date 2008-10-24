@@ -14,7 +14,7 @@
 <param name="Reference">...</param>
 <param name="Summary">...</param>
 <param name="Description">Defines a cosine shape, with the region less than the function included</param>
-<param name="Equation">$y \leq a_0 + b_0sin( (2\pi/T) x + \phi)$</param>
+<param name="Equation">$y \leq a_0 + b_0sin( (2\pi/T) x + \phi)$ </param>
 
 
 <!--Now the interesting stuff-->
@@ -30,7 +30,7 @@
 	<struct>
 		<param name="Name">period</param>
 		<param name="Type">Double</param>
-		<param name="Default">2*&pi;</param>
+		<param name="Default">2*&amp;pi</param>
 		<param name="Description"> $ T $ in the equation</param>
 	</struct>
 	<struct>

@@ -48,11 +48,11 @@
 
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">
+<param name="Example"><![CDATA[
 	<struct name="particleLayout">
 		<param name="Type">GaussParticleLayout</param>
 		<param name="gaussParticles">2</param>
-	</struct>
+	</struct>]]>
 </param>
 
 </StGermainData>

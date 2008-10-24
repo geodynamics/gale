@@ -37,7 +37,7 @@
 <list name="Dependencies">
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">
+<param name="Example"><![CDATA[
 	<struct name="particleLayoutExample1">
 		<param name="Type">LineParticleLayout</param>
 		<param name="totalInitialParticles">6</param>
@@ -72,7 +72,7 @@
 				<param name="z">2.0</param>
 			</struct>			
 		</list>		
-	</struct>	
+	</struct>]]>	
 </param>
 
 </StGermainData>

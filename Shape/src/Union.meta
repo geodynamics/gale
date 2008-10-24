@@ -26,7 +26,7 @@
 <!-- This component calls in another directory so the info above/below may not be complete-->
 	<struct>
 		<param name="Essential">True</param>
-		<param name="Name">&nameShape[1]</param>
+		<param name="Name">&amp;nameShape[1]</param>
 		<param name="Type">Stg_Shape</param>
 		<param name="Description">...</param>
 	</struct>

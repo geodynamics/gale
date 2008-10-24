@@ -31,12 +31,12 @@
 </list>
 
 <!-- Add an exmaple XML if possible -->
-<param name="Example">
+<param name="Example"><![CDATA[
 	<struct name="particleLayout">
 		<param name="Type">WithinShapeParticleLayout</param>
 		<param name="totalInitialParticles">6000</param>
 		<param name="shape">boxShape</param>
-	</struct>
+	</struct>]]>
 </param>
 
 

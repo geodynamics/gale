@@ -38,7 +38,7 @@
     n/a
   </list>
 
-  <param name="Example">
+  <param name="Example"><![CDATA[
 				<param name="type"> InnerWallVC </param>
 				<param name="wall"> bottom </param>
 				<list name="variables">
@@ -47,7 +47,7 @@
 						<param name="type">double</param>
 						<param name="value"> 0 </param>
 					</struct>
-				</list>
+				</list>]]>
   </param>
 
 </StGermainData>

@@ -35,13 +35,13 @@
 </list>
 
 <!-- Add an exmaple XML if possible -->
-<param name="Example">
+<param name="Example"><![CDATA[
 	<struct name="particleLayout">
 		<param name="Type">PlaneParticleLayout</param>
 		<param name="totalInitialParticles">6000</param>
 		<param name="planeAxis">y</param>
 		<param name="planeCoord">1.0</param>
-	</struct>
+	</struct>]]>
 </param>
 
 

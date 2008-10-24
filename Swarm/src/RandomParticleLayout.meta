@@ -38,12 +38,12 @@
 
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">
+<param name="Example"><![CDATA[
 	<struct name="particleLayoutExample1">
 		<param name="Type">RandomParticleLayout</param>
 		<param name="cellParticleLayout">20</param>
 		<param name="seed">2</param>
-	</struct>
+	</struct>]]>
 </param>
 
 </StGermainData>

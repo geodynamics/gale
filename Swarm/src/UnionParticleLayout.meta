@@ -27,7 +27,7 @@
 	</struct>
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">
+<param name="Example"><![CDATA[
 	<struct name="particleLayout">
 		<param name="Type">UnionParticleLayout</param>
 		<list name="ParticleLayoutList">
@@ -35,6 +35,8 @@
 			<param>ParticleLayout2</param>
 			<param>ParticleLayout3</param>
 		</list>
-	</struct>
+	</struct>]]>
 </param>
+
+</StGermainData>
 
