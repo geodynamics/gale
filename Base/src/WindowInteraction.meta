@@ -22,10 +22,10 @@
 <list name="Dependencies">
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">
+<param name="Example"><![CDATA[
 		<struct name="defaultWindowInteraction">
 			<param name="Type">lucWindowInteraction</param>
-		</struct>
+		</struct>]]>
 </param>
 
 </StGermainData>

@@ -54,12 +54,12 @@
 
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">
+<param name="Example"><![CDATA[
 		<struct name="temperatureColourMap">
 			<param name="Type">lucColourMap</param>
 			<param name="colours">#0B0133 White #B7210B</param>
 			<param name="dynamicRange">true</param>
-		</struct>
+		</struct>]]>
 </param>
 
 </StGermainData>

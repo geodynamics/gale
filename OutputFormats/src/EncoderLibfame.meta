@@ -59,11 +59,11 @@
 	</struct>
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">
+<param name="Example"><![CDATA[
 	<struct name="movie">
 		<param name="Type">lucEncoderLibfame</param>
 		<param name="Window">window</param>
-	</struct>	
+	</struct>]]>
 </param>
 
 </StGermainData>
