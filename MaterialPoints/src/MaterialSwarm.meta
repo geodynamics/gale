@@ -10,6 +10,7 @@
 <param name="License">https://csd.vpac.org/twiki/bin/view/Stgermain/SoftwareLicensehttp://www.opensource.org/licenses/bsd-license.php</param>
 <param name="Parent">PopulationControlSwarm</param>
 <param name="Description">...</param>
+<param name="Location">./PICellerator/MaterialPoints/src</param>
 
 <!--Now the interesting stuff-->
 
