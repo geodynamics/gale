@@ -45,7 +45,7 @@
 	<struct>
 		<param name="Essential">True</param>
 		<param name="Name">initialDirectionType</param>
-		<param name="Type">char*</param>
+		<param name="Type">String</param>
 		<param name="Default">global</param>
 		<param name="Description">This parameter is used to specify how the particles initial directions will be set up. The three options are: 'global', 'random' and 'perMaterial'. 
 		'global' sets the initial direction of each particle to the same direction, specified by the initialDirection parameters.
