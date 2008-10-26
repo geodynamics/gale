@@ -39,7 +39,7 @@
 	</struct>
 	<struct>
 		<param name="Name">maxCoord</param>
-		<param name="Type"></param>
+		<param name="Type">double</param>
 		<param name="Default"></param>
 		<param name="Description">A list of doubles representing the maximum coordinate in each dimension</param>
 	</struct>

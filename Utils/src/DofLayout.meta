@@ -32,7 +32,7 @@
 	</struct>
 	<struct>
 		<param name="Name"></param>
-		<param name="Type">UnsignedInt( cf, self->name, "BaseVariableCount", Dictionary_Entry_Value_GetCount</param>
+		<param name="Type">UnsignedInt</param>
 		<param name="Default"></param>
 		<param name="Description">...</param>
 	</struct>
