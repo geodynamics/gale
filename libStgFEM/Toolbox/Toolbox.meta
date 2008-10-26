@@ -5,6 +5,16 @@
 
 <!-- Note: suffixing the name by "_Toolbox" is important here! -->
 <param name="Name">StgFEM_Toolbox</param>
+<param name="Author">...</param>
+<param name="Organisation">VPAC</param>
+<param name="Project">StgFEM</param>
+<param name="Location">StgFEM/libStgFEM/Toolbox</param>
+<param name="Project Web">http://www.stgermainproject.org/StgFEM.html</param>
+<param name="Copyright">Copyright (C) 2004-2005 VPAC.</param>
+<param name="License">https://csd.vpac.org/twiki/bin/view/Stgermain/SoftwareLicense</param>
+<param name="Parent">SystemLinearEquations</param>
+<param name="Summary">...</param>
+<param name="Description">StgFEM Toolbox</param>
 
 <list name="dependenices">
 	<struct>

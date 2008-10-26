@@ -174,6 +174,8 @@
 	/* --- Public Functions --- */
 	void FieldTest_BuildReferenceField( void* fieldTest, Index field_I );
 	void FieldTest_BuildErrField( void* fieldTest, Index field_I );
+	void FieldTest_BuildAnalyticField( void* fieldTest, Index field_I );
+
 
 	void FieldTest_LoadReferenceSolutionFromFile( FeVariable* referenceField, Name referenceSolnName, Name referenceSolnPath, DomainContext* context );
 	void FieldTest_CalculateAnalyticSolutionForField( void* fieldTest, Index field_I );
