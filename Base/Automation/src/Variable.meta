@@ -31,14 +31,14 @@
 <list name="Params">
 	<struct>
 		<param name="Name">DataType</param>
-		<param name="Type">[Double,Float,Int,Char,Short]</param>
-		<param name="Default">None - not specifying causes an error</param>
+		<param name="Type">String</param>
+		<param name="Default">[Double,Float,Int,Char,Short], None - not specifying causes an error</param>
 		<param name="Description">Specifies the fundamental data type of the variable.</param>
 	</struct>
 	<struct>
 		<param name="Name">Rank</param>
-		<param name="Type">[Scalar,Vector]</param>
-		<param name="Default">None - not specifying causes an error</param>
+		<param name="Type">String</param>
+		<param name="Default">[Scalar,Vector], None - not specifying causes an error</param>
 		<param name="Description">Specifies whether the variable is of a vector not. If it is of a vector, VectorComponentCount and names is used to specify the number of vector subcomponents and the name of the variables to create for each component.</param>
 	</struct>
 	<struct>
