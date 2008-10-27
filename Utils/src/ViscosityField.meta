@@ -13,13 +13,12 @@
 <param name="Parent">ParticleFeVariable</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">...</param>
+<param name="Description">This creates a meshed isotropic viscosity field thoughout the total domain. A shape function averaging process is used to calculated the viscosity(stored on the particles)to the mesh nodal point. By default this field is stored at velocity mesh node location. Normally this fields is only used for visualisation purposes as it's values are determined through an averaging process.</param>
 
 <!--Now the interesting stuff-->
 
 
 <list name="Params">
-
 </list>
 
 <list name="Dependencies">
@@ -27,14 +26,22 @@
 		<param name="Essential">True</param>
 		<param name="Name">ConstitutiveMatrix</param>
 		<param name="Type">ConstitutiveMatrix</param>
-		<param name="Description">...</param>
+		<param name="Description">Will be used to calculate Constitutive information from the particles</param>
 	</struct>
-
-<!-- PLEASE, check the above struct information is accurate, in line number 174 of the c file and then remove this comment afterwards -->
-
-
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">
+<![CDATA[
+	<struct name="components" mergeType="merge">
+		<struct name="ViscosityField">
+			<param name="Type">ViscosityField</param>
+			<param name="Context">context</param>
+			<param name="Swarm">picIntegrationPoints</param>
+			<param name="Mesh">elementMesh</param>
+			<param name="ConstitutiveMatrix">constitutiveMatrix</param>
+		</struct>
+	</struct>
+	]]>
+</param>
 
 </StGermainData>
