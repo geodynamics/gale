@@ -13,7 +13,7 @@
 <param name="Parent">Stg_Shape</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">...</param>
+<param name="Description">This will create a convex hull geometry based on a vertex array supplied. Currently this definition only works for 3 vertecies in 2D and 4 in 3D.</param>
 
 <!--Now the interesting stuff-->
 
@@ -23,10 +23,42 @@
 </list>
 
 <list name="Dependencies">
-<!-- This component calls in another directory so the info above/below may not be complete-->
-
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">
+<![CDATA[
+	<struct name="shape">
+		<param name="Type">ConvexHull</param>
+		<list name="verticies">
+			<asciidata>
+				<columnDefinition name = "x" type="double"/>
+				<columnDefinition name = "y" type="double"/>
+				<columnDefinition name = "z" type="double"/>
+				 0.3	 0.0	 0.0
+				-0.3	 0.0	 0.0
+				 0.0	 0.3	 0.0
+			</asciidata>
+		</list>
+	</struct>
+
+
+	<!-- In 3D -->
+	<struct name="shape">
+		<param name="Type">ConvexHull</param>
+		<param name="startZ">0.3</param>
+		<list name="verticies">
+			<asciidata>
+				<columnDefinition name = "x" type="double"/>
+				<columnDefinition name = "y" type="double"/>
+				<columnDefinition name = "z" type="double"/>
+				 0.0	 0.5	-0.2
+				-0.5	-0.366	-0.2
+				 0.5	-0.366	-0.2
+				 0.0	 0.0	 0.666
+			</asciidata>
+		</list>
+	</struct>
+	]]>
+</param>
 
 </StGermainData>

@@ -20,40 +20,60 @@
 <p>DofLayout refers to scalar variables only, not vectors, though a wrapper can be applied later to convert vectors.</p>
 </param>
 
-<!--Now the interesting stuff-->
-
-
 <list name="Params">
 	<struct>
-		<param name="Name">Count</param>
-		<param name="Type">String</param>
-		<param name="Default">""</param>
-		<param name="Description">...</param>
-	</struct>
-	<struct>
-		<param name="Name"></param>
-		<param name="Type">UnsignedInt( cf, self->name, "BaseVariableCount", Dictionary_Entry_Value_GetCount</param>
-		<param name="Default"></param>
-		<param name="Description">...</param>
+		<param name="Name">BaseVariableCount</param>
+		<param name="Type">int</param>
+		<param name="Default">sizeof(BaseVariables) list</param>
+		<param name="Description">Number of BaseVariables (each components) to be stored by this dof</param>
 	</struct>
 
 </list>
 
 <list name="Dependencies">
-<!-- This component calls in another directory so the info above/below may not be complete-->
-<!-- This component calls in another directory so the info above/below may not be complete-->
 	<struct>
 		<param name="Essential">True</param>
-		<param name="Name">variableName</param>
-		<param name="Type">Variable</param>
-		<param name="Description">...</param>
+		<param name="Name">mesh</param>
+		<param name="Type">Mesh</param>
+		<param name="Description">The discrete mesh the variable will be associated with</param>
 	</struct>
-
-<!-- PLEASE, check the above struct information is accurate, in line number 320 of the c file and then remove this comment afterwards -->
+	<struct>
+		<param name="Essential">True</param>
+		<param name="Name">BaseVariables</param>
+		<param name="Type">list</param>
+		<param name="Description">The  BaseVariables (each components) to be stored  by this dof</param>
+	</struct>
 
 
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">
+<![CDATA[
+		<!-- velocityDofLayout -->
+		<struct name="velocityDofLayout">
+			<param name="Type">DofLayout</param>
+			<param name="mesh">velocityMesh</param>
+			<param name="BaseVariableCount">dim</param>
+			<list name="BaseVariables">
+				<param>vx</param>
+				<param>vy</param>
+				<param>vz</param>
+			</list>
+		</struct>
+		<!-- How the BaseVariables are defined -->
+		<struct name="velocity">
+			<param name="Type">MeshVariable</param>
+			<param name="mesh">velocityMesh</param>
+			<param name="Rank">Vector</param>
+			<param name="DataType">Double</param>
+			<param name="VectorComponentCount">dim</param>
+			<list name="names">
+				<param>vx</param>
+				<param>vy</param>
+				<param>vz</param>
+			</list>
+		</struct>
+	</param>
+]]>
 
 </StGermainData>
