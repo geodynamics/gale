@@ -101,14 +101,6 @@ If the name is NULL, there is no saved petsc object.
 
 */
 
-/*
-Types:
-  Matrix *matrix;
-  Vector *vector;
-*/
-#define GetPetscMatrix( matrix ) ( (Mat)( ((PETScMatrix*)(matrix))->petscMat ) )
-#define GetPetscVector( vector ) ( (Vec)( ((PETScVector*)(vector))->petscVec ) )
-
 void Underworld_ExtractPetscObjects_Dump( void* _context ) 
 {
 	UnderworldContext *context = (UnderworldContext*) _context;
@@ -184,13 +176,13 @@ void Underworld_ExtractPetscObjects_Dump( void* _context )
 		sprintf( mat_name, "%s/%s", context->outputPath, kName );
 		printf("  Writing kMatrix:                    %s \n",mat_name );
 		
-		
-		A = GetPetscMatrix( stokesSLE->kStiffMat->matrix );
+		if( !stokesSLE->kStiffMat->useShellMatrix )
+			A = stokesSLE->kStiffMat->matrix;
+		else
+			A = stokesSLE->kStiffMat->shellMatrix->matrix;
 		PetscViewerBinaryOpen( comm, mat_name, FILE_MODE_WRITE, &mat_view_file );
 		MatView( A, mat_view_file );
 		PetscViewerDestroy( mat_view_file );
-		
-		//Matrix_Dump( stokesSLE->kStiffMat, mat_name );
 	}
 	/* Write G to file */
 	if( stokesSLE->gStiffMat != NULL ) {
@@ -198,7 +190,10 @@ void Underworld_ExtractPetscObjects_Dump( void* _context )
 		sprintf( mat_name, "%s/%s", context->outputPath, GradName );
 		printf("  Writing Grad:                       %s \n",mat_name );
 		
-		A = GetPetscMatrix( stokesSLE->gStiffMat->matrix );
+		if( !stokesSLE->gStiffMat->useShellMatrix )
+			A = stokesSLE->gStiffMat->matrix;
+		else
+			A = stokesSLE->gStiffMat->shellMatrix->matrix;
 		PetscViewerBinaryOpen( comm, mat_name, FILE_MODE_WRITE, &mat_view_file );
 		MatView( A, mat_view_file );
 		PetscViewerDestroy( mat_view_file );
@@ -210,7 +205,10 @@ void Underworld_ExtractPetscObjects_Dump( void* _context )
 		sprintf( mat_name, "%s/%s", context->outputPath, DivName );
 		printf("  Writing Div:                        %s \n",mat_name );
 		
-		A = GetPetscMatrix( stokesSLE->dStiffMat->matrix );
+		if( !stokesSLE->dStiffMat->useShellMatrix )
+			A = stokesSLE->dStiffMat->matrix;
+		else
+			A = stokesSLE->dStiffMat->shellMatrix->matrix;
 		PetscViewerBinaryOpen( comm, mat_name, FILE_MODE_WRITE, &mat_view_file );
 		MatView( A, mat_view_file );
 		PetscViewerDestroy( mat_view_file );
@@ -222,7 +220,10 @@ void Underworld_ExtractPetscObjects_Dump( void* _context )
 		sprintf( mat_name, "%s/%s", context->outputPath, CName );
 		printf("  Writing C:                          %s \n",mat_name );
 		
-		A = GetPetscMatrix( stokesSLE->cStiffMat->matrix );
+		if( !stokesSLE->cStiffMat->useShellMatrix )
+			A = stokesSLE->cStiffMat->matrix;
+		else
+			A = stokesSLE->cStiffMat->shellMatrix->matrix;
 		PetscViewerBinaryOpen( comm, mat_name, FILE_MODE_WRITE, &mat_view_file );
 		MatView( A, mat_view_file );
 		PetscViewerDestroy( mat_view_file );
@@ -235,7 +236,7 @@ void Underworld_ExtractPetscObjects_Dump( void* _context )
 		sprintf( vec_name, "%s/%s", context->outputPath, FName );
 		printf("  Writing F:                          %s \n", vec_name );
 		
-		b = GetPetscVector( stokesSLE->fForceVec->vector );
+		b = stokesSLE->fForceVec->vector;
 		PetscViewerBinaryOpen( comm, vec_name, FILE_MODE_WRITE, &vec_view_file );
 		VecView( b, vec_view_file );
 		PetscViewerDestroy( vec_view_file );
@@ -247,7 +248,7 @@ void Underworld_ExtractPetscObjects_Dump( void* _context )
 		sprintf( vec_name, "%s/%s", context->outputPath, HName );
 		printf("  Writing H:                          %s \n", vec_name );
 		
-		b = GetPetscVector( stokesSLE->hForceVec->vector );
+		b = stokesSLE->hForceVec->vector;
 		PetscViewerBinaryOpen( comm, vec_name, FILE_MODE_WRITE, &vec_view_file );
 		VecView( b, vec_view_file );
 		PetscViewerDestroy( vec_view_file );
@@ -262,7 +263,7 @@ void Underworld_ExtractPetscObjects_Dump( void* _context )
 		printf("  Writing Schur pc operator (UW_Q22): %s \n",mat_name );
 	
 		uzawaSolver = (Stokes_SLE_UzawaSolver*)stokesSLE->solver;
-		A = GetPetscMatrix( uzawaSolver->preconditioner->matrix );
+		A = uzawaSolver->preconditioner->matrix;
 		PetscViewerBinaryOpen( comm, mat_name, FILE_MODE_WRITE, &mat_view_file );
 		MatView( A, mat_view_file );
 		PetscViewerDestroy( mat_view_file );
