@@ -47,6 +47,7 @@
 #include <mpi.h>
 #include <StGermain/StGermain.h>
 #include <StgDomain/StgDomain.h>
+#include <StgFEM/StgFEM.h>
 
 #include <glucifer/Base/Base.h>
 #include <glucifer/RenderingEngines/RenderingEngines.h>
@@ -66,9 +67,6 @@
 #endif
 #include <string.h>
 
-#ifndef MASTER
-	#define MASTER 0
-#endif
 
 /* Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 const Type lucScalarFieldOnMesh_Type = "lucScalarFieldOnMesh";
@@ -214,31 +212,29 @@ void _lucScalarFieldOnMesh_CleanUp( void* drawingObject, void* _context ) {
 }
 
 void _lucScalarFieldOnMesh_BuildDisplayList( void* drawingObject, void* _context ) {
-	lucScalarFieldOnMesh*     self          = (lucScalarFieldOnMesh*)drawingObject;
-	DomainContext*   context       = (DomainContext*) _context;
-	FieldVariable*           fieldVariable = self->fieldVariable;
-	Coord                    min;
-	Coord                    max;
+	lucScalarFieldOnMesh*  self          = (lucScalarFieldOnMesh*)drawingObject;
+	FeVariable*            fieldVariable = (FeVariable*) self->fieldVariable;
+	Mesh*                  mesh          = (Mesh*) fieldVariable->feMesh;
+	Grid*                  vertGrid;
 
-	/* Scale Colour Map */
-	FieldVariable_GetMinAndMaxGlobalCoords( fieldVariable, min, max );
+	vertGrid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
 	
-	if (context->dim == 2) {
-		lucScalarFieldOnMeshCrossSection_DrawCrossSection( self, min[ K_AXIS ], K_AXIS );
+	if (fieldVariable->dim == 2) {
+		lucScalarFieldOnMeshCrossSection_DrawCrossSection( self, 0, K_AXIS );
 	}
 	else {
 		if ( self->cullFace ) 
 			glEnable(GL_CULL_FACE);
 	
 		glFrontFace(GL_CCW);
-		lucScalarFieldOnMeshCrossSection_DrawCrossSection( self, min[ I_AXIS ], I_AXIS );
-		lucScalarFieldOnMeshCrossSection_DrawCrossSection( self, max[ J_AXIS ], J_AXIS );
-		lucScalarFieldOnMeshCrossSection_DrawCrossSection( self, min[ K_AXIS ], K_AXIS );
+		lucScalarFieldOnMeshCrossSection_DrawCrossSection( self, 0, I_AXIS );
+		lucScalarFieldOnMeshCrossSection_DrawCrossSection( self, vertGrid->sizes[ J_AXIS ] - 1, J_AXIS );
+		lucScalarFieldOnMeshCrossSection_DrawCrossSection( self, 0, K_AXIS );
 	
 		glFrontFace(GL_CW);
-		lucScalarFieldOnMeshCrossSection_DrawCrossSection( self, max[ I_AXIS ], I_AXIS );
-		lucScalarFieldOnMeshCrossSection_DrawCrossSection( self, min[ J_AXIS ], J_AXIS );
-		lucScalarFieldOnMeshCrossSection_DrawCrossSection( self, max[ K_AXIS ], K_AXIS );
+		lucScalarFieldOnMeshCrossSection_DrawCrossSection( self, vertGrid->sizes[ I_AXIS ] - 1, I_AXIS );
+		lucScalarFieldOnMeshCrossSection_DrawCrossSection( self, 0, J_AXIS );
+		lucScalarFieldOnMeshCrossSection_DrawCrossSection( self, vertGrid->sizes[ K_AXIS ] - 1, K_AXIS );
 
 		glDisable(GL_CULL_FACE);
 	}

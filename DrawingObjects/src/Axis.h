@@ -53,7 +53,7 @@
 	#define __lucAxis                              \
 		__lucOpenGLDrawingObject \
 		Coord                               origin;\
-		float 				    scale;\
+		float 				    length;\
 		lucColour                           colourX;\
 		lucColour                           colourY;\
 		lucColour                           colourZ;
@@ -64,7 +64,7 @@
 	lucAxis* lucAxis_New( 
 		Name                                               name,
 		Coord                                              origin,
-		float 						   scale,
+		float 						   length,
 		lucColour                                          colourX,
 		lucColour                                          colourY,
 		lucColour                                          colourZ);
@@ -90,7 +90,7 @@
 	void lucAxis_InitAll( 
 		void*                                              axis,
 		Coord                                              origin,
-		float                                              scale, 
+		float                                              length, 
 		lucColour                                          colourX,
 		lucColour                                          colourY,
 		lucColour                                          colourZ);
@@ -98,7 +98,7 @@
 	void _lucAxis_Init( 
 		void*                                              axis,
 		Coord                                              origin,
-		float 						   scale, 
+		float 						   length, 
 		lucColour                                          colourX,
 		lucColour                                          colourY,
 		lucColour                                          colourZ);

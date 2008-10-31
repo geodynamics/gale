@@ -59,8 +59,7 @@
 		FieldVariable*                                     fieldVariable;          \
 		Name                                               fieldVariableName;      \
 		lucColourMap*                                      colourMap;              \
-		IJK                                                resolution;             \
-		double                                             crossSectionValue;      \
+		Node_Index                                         crossSection_I;         \
 		Axis                                               crossSectionAxis;       \
 		XYZ                                                minCropValues;          \
 		XYZ                                                maxCropValues;          \
@@ -104,7 +103,9 @@
 
 	void _lucScalarFieldOnMeshCrossSection_BuildDisplayList( void* drawingObject, void* _context ) ;
 
-	void lucScalarFieldOnMeshCrossSection_DrawCrossSection( void* drawingObject, double crossSectionValue, Axis axis );
+	void lucScalarFieldOnMeshCrossSection_DrawCrossSection( void* drawingObject, Node_LocalIndex crossSection_I, Axis axis ) ;
 	Bool lucScalarFieldOnMeshCrossSection_PlotColouredVertex( void* drawingObject, Coord interpolationCoord, Coord plotCoord ) ;
+	void lucScalarFieldOnMeshCrossSection_PlotColouredNode( void* drawingObject, Node_LocalIndex lNode_I ) ;
+	
 
 #endif
