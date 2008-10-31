@@ -121,8 +121,6 @@ void _VonMises_Init(
 	/* needs a softening factor between +0 and 1 and a reference strain > 0 */
 	self->cohesionAfterSoftening = cohesionAfterSoftening;
 	self->strainRateSoftening    = strainRateSoftening;
-
-        self->maximumCorrectionFactor = maximumCorrectionFactor;
 }
 
 void* _VonMises_DefaultNew( Name name ) {
