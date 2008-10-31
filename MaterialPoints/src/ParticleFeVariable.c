@@ -296,12 +296,21 @@ void ParticleFeVariable_Update( void* materialFeVariable ) {
 	printf( "***\n*** Updating %s\n***\n", self->name );
 
 	/* Initialise Vectors */
+<<<<<<< local
+=======
+	//Vector_Zero( self->assemblyVector->vector );
+	//Vector_Zero( self->massMatrix->vector );
+>>>>>>> other
 	VecSet( self->assemblyVector->vector, 0.0 );
 	VecSet( self->massMatrix->vector, 0.0 );
 
 	ForceVector_Assemble( self->assemblyVector );
 	ForceVector_Assemble( self->massMatrix );
 
+<<<<<<< local
+=======
+	//Vector_PointwiseDivide( self->assemblyVector->vector, self->assemblyVector->vector, self->massMatrix->vector );
+>>>>>>> other
 	VecPointwiseDivide( self->assemblyVector->vector, self->assemblyVector->vector, self->massMatrix->vector );
 
 	SolutionVector_UpdateSolutionOntoNodes( self->assemblyVector );
