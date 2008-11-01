@@ -108,6 +108,8 @@
 			Stg_Component_DefaultConstructorFunction *func,
 			Stg_Component_Type_GetMetadataFunction* metadata );
 
+	/* Adds a Component to the database/register. It is a macro because of the auto argument generation based
+		ont the "componentType" argument, to load in the associated meta data function */
 	#define Stg_ComponentRegister_Add( self, componentType, version, func ) \
 	{ \
 		const char* componentType ##_GetMetadata(); \
