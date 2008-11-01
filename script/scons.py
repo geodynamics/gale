@@ -1,5 +1,10 @@
 import os
 from SCons.Script.SConscript import SConsEnvironment
+import pprint
+
+import stgDtd
+import stgMetaXsd
+import convert
 
 #
 # Helpful build utilities.
@@ -132,52 +137,38 @@ SConsEnvironment.build_module_register = build_module_register
 # Custom builders.
 #
 
+def loadXML( filename ):
+	xml_file = file( filename )
+	xml_lines = xml_file.readlines()
+	xml_text = ""
+	for l in xml_lines:
+	        xml_text += str(l)
+
+	try:
+		dtdDict = stgDtd.readXML( xml_text )
+	except:
+		print 'Failed to parse as a StGermain DTD'
+		raise
+	try:
+		return convert.dtdDict2metaXsdDict( dtdDict )
+	except:
+		print 'Failed to convert information from a StGermain Meta DTD to a StGermain Meta XSD'
+		raise
+
+
 # Builder for generating meta files (courtesy of Walter Landry).
 def create_meta(target, source, env):
-    output_file = file(str(target[0]),'wb')
-    output_file.write("#define XML_METADATA \"")
-    xml_file = file(str(source[0]))
-    xml_lines = xml_file.readlines()
-    for l in xml_lines:
-        output_file.write(l.replace('\"','\\\"')[:-1])
-    output_file.write("\"\n#define COMPONENT_NAME ")
-    for l in xml_lines:
-        start=l.find('<param name="Name">')
-        if start!=-1:
-            end=l.find('<',start+19)
-            if end==-1:
-                raise RunTimeError('Malformed XML file.  The file '
-                                   + str(source[0])
-                                   + ' does not close off <param name="Name"> on the same line.')
-            output_file.write(l[start+19:end])
-            output_file.write("\n")
-            break
-    output_file.write('''
-#define Stg_Component_Stringify( str ) #str
+	output_file = file( str( target[0] ), 'wb' )
+	xsdDict = loadXML( str( source[0] ) )
+	# TODO: Add here things like real location (rep & path), test results & sv/hg diff status
 
-/* Note: Two macros are used to resolve the the extra macro level */
-#define Stg_Component_Metadata_Create( name ) Stg_Component_Metadata_Create_Macro( name )
-#define Stg_Component_Metadata_Create_Macro( name ) \
-	const char* name ##_Meta = XML_METADATA; \
-	const char* name ##_Name = #name; \
-	const char* name ##_Version = VERSION; \
-	const char* name ##_Type_GetMetadata() { /* hack...won't be needed when hierarchy rollout is done */\
-		return name ##_Meta; \
-	} \
-	const char* name ##_GetMetadata() { \
-		return name ##_Meta; \
-	} \
-	const char* name ##_GetName() { \
-		return name ##_Name; \
-	} \
-	const char* name ##_GetVersion() { \
-		return name ##_Version; \
-	}
+	output_file.write( convert.metaXsdDict2stgCodeHeader() )
+	output_file.write( '\n' )
+	output_file.write( convert.metaXsdDict2stgStrings( xsdDict ) )
+	output_file.write( '\n' )
+	output_file.write( convert.metaXsdDict2stgDictionaryCode( xsdDict ) )
 
-#if defined(COMPONENT_NAME) && defined(VERSION) && defined(XML_METADATA)
-	Stg_Component_Metadata_Create( COMPONENT_NAME )
-#endif
-''')
+	output_file.close()
 
 def gen_meta_suffix(env, sources):
     return "-meta.c"
