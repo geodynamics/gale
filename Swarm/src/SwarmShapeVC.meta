@@ -25,7 +25,7 @@
 <list name="Dependencies">
 	<struct>
 		<param name="Essential">True</param>
-		<param name="Name">self->shapeName</param>
+		<param name="Name">shapeName</param>
 		<param name="Type">Stg_Shape</param>
 		<param name="Description">...</param>
 	</struct>
