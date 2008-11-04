@@ -44,13 +44,11 @@
 	extern const Type Stg_ComponentRegister_Type;
 	extern Stg_ComponentRegister *stgComponentRegister;
 
-	typedef const char* (Stg_Component_Type_GetMetadataFunction) ( );
-	
 	/*struct Stg_Component_DefaultConstructorFunction;*/
 	#define __Stg_ComponentRegisterElement \
 		Type								componentType; \
 		Stg_Component_DefaultConstructorFunction*			defaultConstructor; \
-		Stg_Component_Type_GetMetadataFunction*                              metadata; \
+		Stg_Component_MetaAsDictionaryFunction*                         metadata; \
 		Name								version;
 
 	struct Stg_ComponentRegisterElement{ __Stg_ComponentRegisterElement };
@@ -106,14 +104,15 @@
 			Name componentType,
 			Name version,
 			Stg_Component_DefaultConstructorFunction *func,
-			Stg_Component_Type_GetMetadataFunction* metadata );
+			Stg_Component_MetaAsDictionaryFunction* metadata );
 
 	/* Adds a Component to the database/register. It is a macro because of the auto argument generation based
 		ont the "componentType" argument, to load in the associated meta data function */
 	#define Stg_ComponentRegister_Add( self, componentType, version, func ) \
 	{ \
-		const char* componentType ##_GetMetadata(); \
-		Stg_ComponentRegister_AddFunc( self, componentType, version, func, componentType ##_GetMetadata ); \
+		Dictionary* componentType ##_MetaAsDictionary(); \
+		Dictionary* componentType ##_Type_MetaAsDictionary(); \
+		Stg_ComponentRegister_AddFunc( self, componentType, version, func, componentType ##_MetaAsDictionary ); \
 	}
 
 	Stg_Component_DefaultConstructorFunction* Stg_ComponentRegister_Get( 
@@ -127,7 +126,7 @@
 			Name                   componentType,
 			Name                   version ); 
 
-	Stg_Component_Type_GetMetadataFunction* Stg_ComponentRegister_GetMetadata(
+	Dictionary* Stg_ComponentRegister_GetMetadata(
 			Stg_ComponentRegister* self,
 			Name                   componentType,
 			Name                   version );

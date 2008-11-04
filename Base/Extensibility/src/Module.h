@@ -43,7 +43,7 @@
 	typedef char*       (Module_MangleNameFunction)         ( char* name );
 
 	/* Meta data stuff */
-	typedef const char* (Module_GetMetadataFunction)        ( void );
+	typedef Dictionary* (Module_GetMetadataFunction)        ( void );
 	typedef const char* (Module_GetNameFunction)            ( void );
 	typedef const char* (Module_GetVersionFunction)         ( void );
 	extern const char* PLUGIN_DEPENDENCY_NAME_KEY;
@@ -105,7 +105,7 @@
 	char* Module_MangledName( void* module );
 
 	/* Obtain the recorded dependancy information of the module */
-	Dictionary_Entry_Value* Module_GetDependencies( void* module );
+	Dictionary* Module_GetDependencies( void* module );
 	
 	/** Obtain the recorded meta information of the module */
 	Dictionary_Entry_Value* Module_GetValue( void* module, char* key );

@@ -70,11 +70,12 @@
 const Type Module_Type = "Module";
 
 static const char* MODULE_SUFFIX = "module.";
-static const char* MODULE_GETMETADATA_SUFFIX = "_GetMetadata";
+static const char* MODULE_GETMETADATA_SUFFIX = "_MetaAsDictionary";
 static const char* MODULE_GETNAME_SUFFIX = "_GetName";
 static const char* MODULE_GETVERSION_SUFFIX = "_GetVersion";
 
-const char* PLUGIN_DEPENDENCY_NAME_KEY = "plugin";
+const char* PLUGIN_DEPENDENCY_KEY = "associations";
+const char* PLUGIN_DEPENDENCY_NAME_KEY = "type";
 const char* PLUGIN_DEPENDENCY_VERSION_KEY = "version";
 const char* PLUGIN_DEPENDENCY_URL_KEY = "url";
 
@@ -175,14 +176,17 @@ void _Module_Init(
 	}
 	
 	/* Load the meta data */
-	self->_meta = Dictionary_New();
 	if( self->GetMetadata ) {
-		metadata = self->GetMetadata();
+		self->_meta = self->GetMetadata();
+		/* TODO: Needs to be replaced with the meta xsd equivalent SQ-20081103
 		if( metadata ) {
 			ioHandler = XML_IO_Handler_New();
 			IO_Handler_ReadAllFromBuffer( ioHandler, metadata, self->_meta );
 			Stg_Class_Delete( ioHandler );
-		}
+		}*/
+	}
+	else {
+		self->_meta = Dictionary_New();
 	}
 
 	if ( fullPathName ) {
@@ -205,7 +209,7 @@ void _Module_Delete( void* module ) {
 void _Module_Print( void* module, Stream* stream ) {
 	Module* self = (Module*)module;
 
-	Dictionary_Entry_Value* depList;
+	Dictionary* depList;
 	Index count = 0;
 	Index i;
 	const char* version;
@@ -221,7 +225,7 @@ void _Module_Print( void* module, Stream* stream ) {
 
 	depList = Module_GetDependencies( self );
 	if ( depList ) {
-		count = Dictionary_Entry_Value_GetCount( depList );
+		count = Dictionary_GetCount( depList );
 	}
 	for ( i = 0; i < count; ++i ) {
 		Dictionary* dep;
@@ -229,7 +233,7 @@ void _Module_Print( void* module, Stream* stream ) {
 		char* depVersion;
 		char* depUrl;
 		
-		dep = Dictionary_Entry_Value_AsDictionary( Dictionary_Entry_Value_GetElement( depList, i ) );
+		dep = Dictionary_Entry_Value_AsDictionary( Dictionary_GetByIndex( depList, i ) );
 		depName = Dictionary_GetString_WithDefault( dep, (char*)PLUGIN_DEPENDENCY_NAME_KEY, "NULL" );
 		depVersion = Dictionary_GetString_WithDefault( dep, (char*)PLUGIN_DEPENDENCY_VERSION_KEY, "Unknown" );
 		depUrl = Dictionary_GetString_WithDefault( dep, (char*)PLUGIN_DEPENDENCY_URL_KEY, "None" );
@@ -269,10 +273,19 @@ const char* Module_GetVersion( void* module ) {
 }
 
 
-Dictionary_Entry_Value* Module_GetDependencies( void* module ) {
+Dictionary* Module_GetDependencies( void* module ) {
 	Module* self = (Module*)module;
+	Dictionary_Entry_Value* dev;
 
-	return Dictionary_Get( self->_meta, "dependenices" );
+	/* Kinda important... we want to only return a real dictionary if the meta data has a dependency entry, even if it is
+	   empty. Otherwise, indicate the effective error state by returning null */
+	dev = Dictionary_Get( self->_meta, (char*)PLUGIN_DEPENDENCY_KEY );
+	if( dev ) {
+		return Dictionary_Entry_Value_AsDictionary( dev );
+	}
+	else {
+		return NULL;
+	}
 }
 
 Dictionary_Entry_Value* Module_GetValue( void* module, char* key ) {

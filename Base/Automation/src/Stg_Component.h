@@ -49,6 +49,9 @@
 	typedef void				(Stg_Component_InitialiseFunction)		( void* component, void* data );
 	typedef void				(Stg_Component_ExecuteFunction)			( void* component, void* data );
 	typedef void				(Stg_Component_DestroyFunction)			( void* component, void* data );
+
+	/* Prototypes from auto generated meta file functions */ 
+	typedef Dictionary* (Stg_Component_MetaAsDictionaryFunction) ( void );
 	
 	/* Textual name of this class */
 	extern const Type Stg_Component_Type;

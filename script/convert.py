@@ -248,7 +248,7 @@ def metaXsdDict2stgDictionaryCode( xsdDict ):
 	s += '\tparameters = Dictionary_New();\n'
 	for param in xsdDict["parameters"]:
 		s += '\t' + safecvar( param["name"] ) + 'Param = Dictionary_New();\n'
-		#s += '\tDictionary_Add( ' + safecval( param["name"] ) + 'Param, "name", Dictionary_Entry_Value_FromString( "' + safecval( param["name"] ) + '" ));\n'
+		s += '\tDictionary_Add( ' + safecvar( param["name"] ) + 'Param, "name", Dictionary_Entry_Value_FromString( "' + safecval( param["name"] ) + '" ));\n'
 		s += '\tDictionary_Add( ' + safecvar( param["name"] ) + 'Param, "type", Dictionary_Entry_Value_FromString( "' + safecval( param["type"] ) + '" ));\n'
 		try:
 			s += '\tDictionary_Add( ' + safecvar( param["name"] ) + 'Param, "default", Dictionary_Entry_Value_FromString( "' + safecval( param["default"] ) + '" ));\n'
@@ -267,7 +267,7 @@ def metaXsdDict2stgDictionaryCode( xsdDict ):
 	s += '\tassociations = Dictionary_New();\n'
 	for assoc in xsdDict["associations"]:
 		s += '\t' + safecvar( assoc["name"] ) + 'Assoc = Dictionary_New();\n'
-		#s += '\tDictionary_Add( ' + safecval( assoc["name"] ) + 'Assoc, "name", Dictionary_Entry_Value_FromString( "' + safecval( assoc["name"] ) + '" ));\n'
+		s += '\tDictionary_Add( ' + safecvar( assoc["name"] ) + 'Assoc, "name", Dictionary_Entry_Value_FromString( "' + safecval( assoc["name"] ) + '" ));\n'
 		s += '\tDictionary_Add( ' + safecvar( assoc["name"] ) + 'Assoc, "type", Dictionary_Entry_Value_FromString( "' + safecval( assoc["type"] ) + '" ));\n'
 		try:
 			s += '\tDictionary_Add( ' + safecvar( assoc["name"] ) + 'Assoc, "nillable", Dictionary_Entry_Value_FromString( "' + safecval( assoc["nillable"] ) + '" ));\n'
@@ -281,8 +281,13 @@ def metaXsdDict2stgDictionaryCode( xsdDict ):
 		s += '\n'
 	s += '\tDictionary_Add( meta, "associations", Dictionary_Entry_Value_FromStruct( associations ) );\n'
 	s += '\n'
-
 	s += '}\n'
+
+	# The _Type variant exists because of macro used for ComponentRegister_Add does a stringify on the Component_Type argument
+	s += 'Dictionary* ' + safecval( xsdDict["info"]["title"] ) + '_Type_MetaAsDictionary() {\n'
+	s += '\treturn ' + safecvar( xsdDict["info"]["title"] ) +  '_MetaAsDictionary();\n'
+	s += '}\n'
+
 	return s
 
 

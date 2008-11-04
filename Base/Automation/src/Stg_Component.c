@@ -478,48 +478,50 @@ void Stg_Component_SetupStreamFromDictionary( void* component, Dictionary* dicti
 
 Stg_ComponentMeta* _Stg_Component_CreateMeta( Name name, Type type ) {
 	Stg_ComponentMeta* meta;
-	const char* metadata;
 	Dictionary* metaDict;
+	Dictionary* infoDict;
+	Dictionary* codeDict;
+	Dictionary* implementsDict;
 	XML_IO_Handler* ioHandler;
 
 	Dictionary_Entry_Value* depList;
 	Dictionary_Entry_Value* paramList;
 
-	metadata = Stg_ComponentRegister_GetMetadata( Stg_ComponentRegister_Get_ComponentRegister(), type, "0" )();
-	
-	metaDict = Dictionary_New();
-	
-	ioHandler = XML_IO_Handler_New();
-	IO_Handler_ReadAllFromBuffer( ioHandler, metadata, metaDict );
-	
-	meta = Stg_ComponentMeta_New( name, type );
+	metaDict = Stg_ComponentRegister_GetMetadata( Stg_ComponentRegister_Get_ComponentRegister(), type, "0" );
 
-	meta->ioHandler = ioHandler;
+	meta = Stg_ComponentMeta_New( name, type );
+	meta->ioHandler = 0;
 	meta->dict = metaDict;
 	meta->type = type;
-	meta->project = Dictionary_GetString( metaDict, "Project" );
-	meta->location = Dictionary_GetString( metaDict, "Location" );
-	meta->web = Dictionary_GetString( metaDict, "Project Web" );
-	meta->copyright = Dictionary_GetString( metaDict, "Copyright" );
-	meta->license = Dictionary_GetString( metaDict, "License" );
-	meta->parent = Dictionary_GetString( metaDict, "Parent" );
-	meta->description = Dictionary_GetString( metaDict, "Description" );
 
-	depList = Dictionary_Get( metaDict, "Dependencies" );
-	if ( depList != NULL ) {
+	infoDict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( metaDict, "info" ) );
+	codeDict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( metaDict, "code" ) );
+	implementsDict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( metaDict, "implements" ) );
+
+	meta->project = Dictionary_GetString( infoDict, "subject" );
+	meta->location = Dictionary_GetString( infoDict, "source" );
+	meta->web = Dictionary_GetString( infoDict, "" ); /* No longer in schema */
+	meta->copyright = Dictionary_GetString( infoDict, "" ); /* No longer in schema */
+	meta->license = Dictionary_GetString( infoDict, "rights" );
+	meta->description = Dictionary_GetString( infoDict, "description" );
+
+	meta->parent = Dictionary_GetString( implementsDict, "inherits" );
+
+	depList = Dictionary_Get( metaDict, "associations" );
+	if( depList != NULL ) {
 		Dictionary_Entry_Value* current = Dictionary_Entry_Value_GetFirstElement( depList );
 
-		while ( current != NULL ) {
+		while( current != NULL ) {
 			char* depName;
 			char* depType;
 			char* depDescription;
 			Bool essential;
 			Dictionary* depDict = Dictionary_Entry_Value_AsDictionary( current );
 
-			depName = Dictionary_GetString( depDict, "Name" );
-			depType = Dictionary_GetString( depDict, "Type" );
-			depDescription = Dictionary_GetString( depDict, "Description" );
-			essential = Dictionary_GetBool( depDict, "Essential" );
+			depName = Dictionary_GetString( depDict, "name" );
+			depType = Dictionary_GetString( depDict, "type" );
+			depDescription = Dictionary_GetString( depDict, "documentation" );
+			essential = !Dictionary_GetBool( depDict, "nillable" );
 
 			Stg_ObjectList_Append( 
 					meta->allDependencies, 
@@ -539,11 +541,11 @@ Stg_ComponentMeta* _Stg_Component_CreateMeta( Name name, Type type ) {
 		}
 	}
 
-	paramList = Dictionary_Get( metaDict, "Params" );
-	if ( paramList != NULL ) {
+	paramList = Dictionary_Get( metaDict, "parameters" );
+	if( paramList != NULL ) {
 		Dictionary_Entry_Value* current = Dictionary_Entry_Value_GetFirstElement( paramList );
 
-		while ( current != NULL ) {
+		while( current != NULL ) {
 			char* paramName;
 			char* paramType;
 			char* paramDescription;
@@ -551,10 +553,10 @@ Stg_ComponentMeta* _Stg_Component_CreateMeta( Name name, Type type ) {
 
 			Dictionary* paramDict = Dictionary_Entry_Value_AsDictionary( Dictionary_Entry_Value_GetFirstElement( current ) );
 
-			paramName = Dictionary_GetString( paramDict, "Name" );
-			paramType = Dictionary_GetString( paramDict, "Type" );
-			paramDescription = Dictionary_GetString( paramDict, "Description" );
-			paramDefault = Dictionary_GetString( paramDict, "Default" );
+			paramName = Dictionary_GetString( paramDict, "name" );
+			paramType = Dictionary_GetString( paramDict, "type" );
+			paramDescription = Dictionary_GetString( paramDict, "documentation" );
+			paramDefault = Dictionary_GetString( paramDict, "default" );
 
 			Stg_ObjectList_Append( meta->allParams,
 					Stg_ComponentMeta_Value_New( paramName, paramType, paramDescription, paramDefault ) );
@@ -569,18 +571,12 @@ Stg_ComponentMeta* _Stg_Component_CreateMeta( Name name, Type type ) {
 
 Stg_ComponentMeta* _Stg_Component_Validate( void* component, Type type, Dictionary* componentDictionary ) {
 	Stg_Component* self = (Stg_Component*)component;
-
-	const char* metadata;
-	
 	Dictionary* dictionary;
-
 	Stg_ComponentMeta* result;
 	int entry_I;
 	int obj_I;
 
-	metadata = Stg_ComponentRegister_GetMetadata( Stg_ComponentRegister_Get_ComponentRegister(), type, "0" )();
-
-	dictionary = Dictionary_GetDictionary( componentDictionary, self->name );
+	dictionary = Stg_ComponentRegister_GetMetadata( Stg_ComponentRegister_Get_ComponentRegister(), type, "0" );
 
 	result = _Stg_Component_CreateMeta( self->name, self->type );
 

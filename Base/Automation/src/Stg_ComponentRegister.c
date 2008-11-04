@@ -138,7 +138,7 @@ int Stg_ComponentRegister_AddFunc(
 		Name componentType,
 		Name version,
 		Stg_Component_DefaultConstructorFunction *func,
-		Stg_Component_Type_GetMetadataFunction* metadata )
+		Stg_Component_MetaAsDictionaryFunction* metadata )
 {
 	Stg_ComponentRegisterElement *element = NULL;
 
@@ -210,7 +210,7 @@ Stg_Component_DefaultConstructorFunction* Stg_ComponentRegister_AssertGet(
 	return componentConstructorFunction;
 }
 
-Stg_Component_Type_GetMetadataFunction* Stg_ComponentRegister_GetMetadata(
+Dictionary* Stg_ComponentRegister_GetMetadata(
 		Stg_ComponentRegister* self,
 		Name                   componentType,
 		Name                   version ) 
@@ -231,7 +231,7 @@ Stg_Component_Type_GetMetadataFunction* Stg_ComponentRegister_GetMetadata(
 	if( node ){
 		element = (Stg_ComponentRegisterElement*) node->data;
 		if( element ){
-			return (void*) element->metadata;
+			return (void*) element->metadata();
 		}
 	}
 
