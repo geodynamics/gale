@@ -16,10 +16,12 @@
 <param name="Summary">...</param>
 <param name="Description">PICellerator toolbox</param>
 
-<list name="dependenices">
+<list name="Dependencies">
 	<struct>
-		<param name="plugin">StgFEM</param>
-		<param name="version">0</param>
+		<param name="Type">StgFEM</param>
+		<param name="Name">StgFEM</param>
+		<param name="Essential">True</param>
+		<param name="Description">StgFEM is required</param>
 	</struct>
 </list>
 
