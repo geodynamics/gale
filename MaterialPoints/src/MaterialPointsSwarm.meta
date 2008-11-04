@@ -14,11 +14,10 @@
 <param name="Reference">...</param>
 <param name="Summary">...</param>
 <param name="Description">Represents a set of points which track materials in the domain. It can be advected during the simulation
-and can be population controlled for load balancing purposes.
+and can be population controlled for load balancing purposes. This component adds 2 variables to a generic swarm point data structure: <br/>
+(1) the global position: called "PositionX", "PositionY", "PositionZ"<br/>
+(2) the material index of the point: called "MaterialIndex".
 </param>
-
-<!--Now the interesting stuff-->
-
 
 <list name="Params">
 </list>
@@ -59,7 +58,26 @@ and can be population controlled for load balancing purposes.
 		spread across the entire domain and will be assigned materials according to the all the materials. </param>
 	</struct>
 </list>
-<!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">
+
+<![CDATA[
+	<struct name="materialSwarm">
+		<param name="Type">MaterialPointsSwarm</param>
+		<param name="CellLayout">elementCellLayout</param>
+		<param name="ParticleLayout">materialSwarmParticleLayout</param>
+		<param name="FeMesh">elementMesh</param>
+		<!-- this list comes from a swarm definition -->
+		<list name="ParticleCommHandlers">
+			<param>pMovementHandler</param>
+			<param>pShadowSync</param>
+		</list>
+
+		<!-- These guys may or may not be created -->
+		<param name="SplittingRoutine">splittingRoutine</param>
+		<param name="RemovalRoutine">removalRoutine</param>
+		<param name="EscapedRoutine">escapedRoutine</param>
+	</struct>
+	]]>
+</param>
 
 </StGermainData>
