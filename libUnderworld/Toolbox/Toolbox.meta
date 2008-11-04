@@ -16,10 +16,12 @@
 <param name="Summary">...</param>
 <param name="Description">Underworld toolbox</param>
 
-<list name="dependenices">
+<list name="Dependencies">
 	<struct>
-		<param name="plugin">PICellerator</param>
-		<param name="version">0</param>
+		<param name="Type">PICellerator</param>
+		<param name="Name">PICellerator</param>
+		<param name="Essential">True</param>
+		<param name="Description">PICellerator is required</param>
 	</struct>
 </list>
 
