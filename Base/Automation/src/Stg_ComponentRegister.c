@@ -235,8 +235,6 @@ Dictionary* Stg_ComponentRegister_GetMetadata(
 		}
 	}
 
-	assert(0);
-
 	return NULL;
 }
 

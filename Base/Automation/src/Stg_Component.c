@@ -35,8 +35,8 @@
 
 #include "types.h"
 #include "shortcuts.h"
+#include "Meta.h"
 #include "Stg_Component.h"
-#include "Stg_ComponentMeta.h"
 #include "Stg_ComponentFactory.h"
 #include "LiveComponentRegister.h"
 #include "CallGraph.h"
@@ -387,23 +387,36 @@ void Stg_Component_Destroy( void* component, void* data, Bool force ) {
 
 /* TODO: UPT TO HERE */
 
-Bool Stg_Component_IsBuiltFunc( void* component ) {
+Bool Stg_Component_IsConstructed( void* component ) {
 	Stg_Component* self = (Stg_Component*)component;
 	
-	return Stg_Component_IsBuiltMacro( self );
+	return self->isConstructed;
 }
 
-Bool Stg_Component_IsInitialisedFunc( void* component ) {
+Bool Stg_Component_IsBuilt( void* component ) {
 	Stg_Component* self = (Stg_Component*)component;
 	
-	return Stg_Component_IsInitialisedMacro( self );
+	return self->isBuilt;
 }
 
-Bool Stg_Component_HasExecutedFunc( void* component ) {
+Bool Stg_Component_IsInitialised( void* component ) {
 	Stg_Component* self = (Stg_Component*)component;
 	
-	return Stg_Component_HasExecutedMacro( self );
+	return self->isInitialised;
 }
+
+Bool Stg_Component_HasExecuted( void* component ) {
+	Stg_Component* self = (Stg_Component*)component;
+	
+	return self->hasExecuted;
+}
+
+Bool Stg_Component_IsDestroyed( void* component ) {
+	Stg_Component* self = (Stg_Component*)component;
+	
+	return self->isDestroyed;
+}
+
 
 void Stg_Component_SetupStreamFromDictionary( void* component, Dictionary* dictionary ) {
 	Stg_Component* self = (Stg_Component*)component;
@@ -476,156 +489,3 @@ void Stg_Component_SetupStreamFromDictionary( void* component, Dictionary* dicti
 											
 }
 
-Stg_ComponentMeta* _Stg_Component_CreateMeta( Name name, Type type ) {
-	Stg_ComponentMeta* meta;
-	Dictionary* metaDict;
-	Dictionary* infoDict;
-	Dictionary* codeDict;
-	Dictionary* implementsDict;
-	XML_IO_Handler* ioHandler;
-
-	Dictionary_Entry_Value* depList;
-	Dictionary_Entry_Value* paramList;
-
-	metaDict = Stg_ComponentRegister_GetMetadata( Stg_ComponentRegister_Get_ComponentRegister(), type, "0" );
-
-	meta = Stg_ComponentMeta_New( name, type );
-	meta->ioHandler = 0;
-	meta->dict = metaDict;
-	meta->type = type;
-
-	infoDict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( metaDict, "info" ) );
-	codeDict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( metaDict, "code" ) );
-	implementsDict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( metaDict, "implements" ) );
-
-	meta->project = Dictionary_GetString( infoDict, "subject" );
-	meta->location = Dictionary_GetString( infoDict, "source" );
-	meta->web = Dictionary_GetString( infoDict, "" ); /* No longer in schema */
-	meta->copyright = Dictionary_GetString( infoDict, "" ); /* No longer in schema */
-	meta->license = Dictionary_GetString( infoDict, "rights" );
-	meta->description = Dictionary_GetString( infoDict, "description" );
-
-	meta->parent = Dictionary_GetString( implementsDict, "inherits" );
-
-	depList = Dictionary_Get( metaDict, "associations" );
-	if( depList != NULL ) {
-		Dictionary_Entry_Value* current = Dictionary_Entry_Value_GetFirstElement( depList );
-
-		while( current != NULL ) {
-			char* depName;
-			char* depType;
-			char* depDescription;
-			Bool essential;
-			Dictionary* depDict = Dictionary_Entry_Value_AsDictionary( current );
-
-			depName = Dictionary_GetString( depDict, "name" );
-			depType = Dictionary_GetString( depDict, "type" );
-			depDescription = Dictionary_GetString( depDict, "documentation" );
-			essential = !Dictionary_GetBool( depDict, "nillable" );
-
-			Stg_ObjectList_Append( 
-					meta->allDependencies, 
-					Stg_ComponentMeta_Value_New( depName, depType, depDescription, NULL ) );
-			if ( essential ) {
-				Stg_ObjectList_Append(
-					meta->essentialDependencies,
-					Stg_ComponentMeta_Value_New( depName, depType, depDescription, NULL ) );
-			}
-			else {
-				Stg_ObjectList_Append( 
-					meta->optionalDependencies,
-					Stg_ComponentMeta_Value_New( depName, depType, depDescription, NULL ) );
-			}
-
-			current = current->next;
-		}
-	}
-
-	paramList = Dictionary_Get( metaDict, "parameters" );
-	if( paramList != NULL ) {
-		Dictionary_Entry_Value* current = Dictionary_Entry_Value_GetFirstElement( paramList );
-
-		while( current != NULL ) {
-			char* paramName;
-			char* paramType;
-			char* paramDescription;
-			char* paramDefault;
-
-			Dictionary* paramDict = Dictionary_Entry_Value_AsDictionary( Dictionary_Entry_Value_GetFirstElement( current ) );
-
-			paramName = Dictionary_GetString( paramDict, "name" );
-			paramType = Dictionary_GetString( paramDict, "type" );
-			paramDescription = Dictionary_GetString( paramDict, "documentation" );
-			paramDefault = Dictionary_GetString( paramDict, "default" );
-
-			Stg_ObjectList_Append( meta->allParams,
-					Stg_ComponentMeta_Value_New( paramName, paramType, paramDescription, paramDefault ) );
-
-			current = current->next;
-		}
-
-	}
-
-	return meta;
-}
-
-Stg_ComponentMeta* _Stg_Component_Validate( void* component, Type type, Dictionary* componentDictionary ) {
-	Stg_Component* self = (Stg_Component*)component;
-	Dictionary* dictionary;
-	Stg_ComponentMeta* result;
-	int entry_I;
-	int obj_I;
-
-	dictionary = Stg_ComponentRegister_GetMetadata( Stg_ComponentRegister_Get_ComponentRegister(), type, "0" );
-
-	result = _Stg_Component_CreateMeta( self->name, self->type );
-
-	for ( entry_I = 0; entry_I < dictionary->count; ++entry_I ) {
-		Stg_ComponentMeta_Value* obj;
-		char* key;
-		Dictionary_Entry_Value* value;
-		key = dictionary->entryPtr[entry_I]->key;
-		value = Dictionary_GetByIndex( dictionary, entry_I );
-
-		/* Type special case */
-		if ( strcmp( key, "Type" ) == 0 ) {
-			continue;
-		}
-		
-		obj = (Stg_ComponentMeta_Value*)Stg_ObjectList_Get( result->allParams, key );
-		if ( obj != NULL ) {
-			obj->haveValue = True;
-			continue;
-		}
-
-		if ( (Stg_ComponentMeta_Value*)Stg_ObjectList_Get( result->allDependencies, key ) == NULL ) {
-			Stg_ObjectList_Append( 
-					result->unexpectedDependencies, 
-					Stg_ComponentMeta_Value_New( key, NULL, NULL, NULL ) );
-		}
-
-		obj = (Stg_ComponentMeta_Value*)Stg_ObjectList_Get( result->essentialDependencies, key );
-		if ( obj != NULL ) {
-			/* can do subtype checking here */
-			obj->haveValue = True;
-		}
-		obj = (Stg_ComponentMeta_Value*)Stg_ObjectList_Get( result->optionalDependencies, key );
-		if ( obj != NULL ) {
-			/* can do subtype checking here */
-			obj->haveValue = True;
-		}
-	}
-
-	for ( obj_I = 0; obj_I < result->essentialDependencies->count; ++obj_I ) {
-		Stg_ComponentMeta_Value* metaValue;
-		metaValue = (Stg_ComponentMeta_Value*)Stg_ObjectList_At( result->essentialDependencies, obj_I );
-		if ( metaValue->haveValue == False ) {
-			Stg_ObjectList_Append( 
-					result->missingDependencies,
-					Stg_ComponentMeta_Value_New( metaValue->name, metaValue->type, metaValue->description, metaValue->defaultValue ) );
-			result->isValid = False;
-		}
-	}
-
-	return result;
-}

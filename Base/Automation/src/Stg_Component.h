@@ -158,59 +158,20 @@
 	void Stg_Component_Destroy( void* component, void* data, Bool force );
 	
 	/** Is the component constructed? (i.e. its configration/setup performed) */
-	#define Stg_Component_IsConstructedMacro( component ) \
-		((component)->isConstructed)
-	Bool Stg_Component_IsConstructedFunc( void* component );
-	#ifdef MACRO_AS_FUNC
-		#define Stg_Component_IsConstructed Stg_Component_IsConstructedFunc
-	#else
-		#define Stg_Component_IsConstructed Stg_Component_IsConstructedMacro
-	#endif
-	#define IsConstructed Stg_Component_IsConstructed
+	Bool Stg_Component_IsConstructed( void* component );
 	
 	/** Is the component built? (i.e. instantiated) */
-	#define Stg_Component_IsBuiltMacro( component ) \
-		((component)->isBuilt)
-	Bool Stg_Component_IsBuiltFunc( void* component );
-	#ifdef MACRO_AS_FUNC
-		#define Stg_Component_IsBuilt Stg_Component_IsBuiltFunc
-	#else
-		#define Stg_Component_IsBuilt Stg_Component_IsBuiltMacro
-	#endif
-	#define IsBuilt Stg_Component_IsBuilt
+	Bool Stg_Component_IsBuilt( void* component );
 	
 	/** Is the component initialised? (i.e. all initial values set) */
-	#define Stg_Component_IsInitialisedMacro( component ) \
-		((component)->isInitialised)
-	Bool Stg_Component_IsInitialisedFunc( void* component );
-	#ifdef MACRO_AS_FUNC
-		#define Stg_Component_IsInitialised Stg_Component_IsInitialisedFunc
-	#else
-		#define Stg_Component_IsInitialised Stg_Component_IsInitialisedMacro
-	#endif
-	#define IsInitialised Stg_Component_IsInitialised
+	Bool Stg_Component_IsInitialised( void* component );
 	
 	/** Has the component executed? */
-	#define Stg_Component_HasExecutedMacro( component ) \
-		((component)->hasExecuted)
-	Bool Stg_Component_HasExecutedFunc( void* component );
-	#ifdef MACRO_AS_FUNC
-		#define Stg_Component_HasExecuted Stg_Component_HasExecutedFunc
-	#else
-		#define Stg_Component_HasExecuted Stg_Component_HasExecutedMacro
-	#endif
-	#define HasExecuted Stg_Component_HasExecuted
+	Bool Stg_Component_HasExecuted( void* component );
 	
 	/** Is the component destroyed? */
-	#define Stg_Component_IsDestroyedMacro( component ) \
-		((component)->isDestroyed)
-	Bool Stg_Component_IsDestroyedFunc( void* component );
-	#ifdef MACRO_AS_FUNC
-		#define Stg_Component_IsDestroyed Stg_Component_IsDestroyedFunc
-	#else
-		#define Stg_Component_IsDestroyed Stg_Component_IsDestroyedMacro
-	#endif
-	#define IsDestroyed Stg_Component_IsDestroyed
+	Bool Stg_Component_IsDestroyed( void* component );
+
 
 	/** Disowns the component from the current source, leaving the Live Stg_Component Register to 
 	    destroy it */
@@ -219,12 +180,5 @@
 
 	void Stg_Component_SetupStreamFromDictionary( void* component, Dictionary* dictionary );
 
-	#define Stg_Component_CreateMeta( name, type ) \
-		_Stg_Component_CreateMeta( name, type )
-	Stg_ComponentMeta* _Stg_Component_CreateMeta( Name name, Type type );
-
-	#define Stg_Component_Validate( component, type, dictionary ) \
-		_Stg_Component_Validate( component, type, dictionary )
-	Stg_ComponentMeta* _Stg_Component_Validate( void* component, Type type, Dictionary* dictionary );
 	
 #endif /* __Base_Automation_Stg_Component_h__ */

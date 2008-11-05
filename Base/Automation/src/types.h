@@ -47,8 +47,6 @@ typedef struct Comm Comm;
 
 	/* types/classes */
 	typedef struct Stg_Component			Stg_Component;
-	typedef struct Stg_ComponentMeta                Stg_ComponentMeta;
-	typedef struct Stg_ComponentMeta_Value          Stg_ComponentMeta_Value;
 	typedef struct Stg_ComponentRegisterElement     Stg_ComponentRegisterElement;
 	typedef struct Stg_ComponentRegister            Stg_ComponentRegister;
 	typedef struct LiveComponentRegister            LiveComponentRegister;

@@ -277,7 +277,7 @@ Bool ModulesManager_LoadModule( void* modulesManager, Name moduleName ) {
 	ModulesManager*	self = (ModulesManager*)modulesManager;
 	Module* theModule;
 
-	Dictionary* dependencies;
+	Dictionary* metadata;
 	Index depCount = 0;
 	Index dep_I;
 	
@@ -306,28 +306,15 @@ Bool ModulesManager_LoadModule( void* modulesManager, Name moduleName ) {
 
 	/* version check? */
 	
-	dependencies = Module_GetDependencies( theModule );
-	depCount = dependencies ? Dictionary_GetCount( dependencies ) : 0;
+	metadata = Module_GetMetadata( theModule );
+	depCount = metadata ? Stg_Meta_GetAssociationCount( metadata ) : 0;
 	for( dep_I = 0; dep_I < depCount; ++dep_I ) {
-		Dictionary* dep;
-		Dictionary_Entry_Value* depName;
-		Dictionary_Entry_Value* depVersion;
-		Dictionary_Entry_Value* depUrl;
 		char* name;
-		char* version;
-		char* url;
 
-		dep = Dictionary_Entry_Value_AsDictionary( Dictionary_GetByIndex( dependencies, dep_I ) );
-		depName = Dictionary_Get( dep, (char*)PLUGIN_DEPENDENCY_NAME_KEY );
-		depVersion = Dictionary_Get( dep, (char*)PLUGIN_DEPENDENCY_VERSION_KEY );
-		depUrl = Dictionary_Get( dep, (char*)PLUGIN_DEPENDENCY_URL_KEY );
+		name = Stg_Meta_GetAssociationType( metadata, dep_I );
+		Journal_Firewall( (Bool)name, stream, "Module name/type not found in dependency/associations meta entry\n" );
 
-		Journal_Firewall( (Bool)depName, debug, "Module name/type not found in dependency/associations meta entry\n" );
-		name = Dictionary_Entry_Value_AsString( depName );
-		version = (depVersion == NULL) ? NULL : Dictionary_Entry_Value_AsString( depVersion );
-		url = (depUrl == NULL) ? NULL : Dictionary_Entry_Value_AsString( depUrl );
-
-		if ( ! ModulesManager_LoadModule( self, name ) ) {
+		if( !ModulesManager_LoadModule( self, name ) ) {
 			Journal_Printf( stream, "Dependency %s failed to load\n", name );
 			Stg_Class_Delete( theModule );
 			return False;

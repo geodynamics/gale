@@ -74,11 +74,6 @@ static const char* MODULE_GETMETADATA_SUFFIX = "_MetaAsDictionary";
 static const char* MODULE_GETNAME_SUFFIX = "_GetName";
 static const char* MODULE_GETVERSION_SUFFIX = "_GetVersion";
 
-const char* PLUGIN_DEPENDENCY_KEY = "associations";
-const char* PLUGIN_DEPENDENCY_NAME_KEY = "type";
-const char* PLUGIN_DEPENDENCY_VERSION_KEY = "version";
-const char* PLUGIN_DEPENDENCY_URL_KEY = "url";
-
 #ifdef MEMORY_STATS
 	static const char* MODULE_FILENAME = "fileName";
 	static const char* MODULE_SYMBOLNAME = "symbolName";
@@ -178,12 +173,6 @@ void _Module_Init(
 	/* Load the meta data */
 	if( self->GetMetadata ) {
 		self->_meta = self->GetMetadata();
-		/* TODO: Needs to be replaced with the meta xsd equivalent SQ-20081103
-		if( metadata ) {
-			ioHandler = XML_IO_Handler_New();
-			IO_Handler_ReadAllFromBuffer( ioHandler, metadata, self->_meta );
-			Stg_Class_Delete( ioHandler );
-		}*/
 	}
 	else {
 		self->_meta = Dictionary_New();
@@ -223,22 +212,12 @@ void _Module_Print( void* module, Stream* stream ) {
 	}
 	Journal_Printf( stream, "Version: (version) %s\n", version );
 
-	depList = Module_GetDependencies( self );
-	if ( depList ) {
-		count = Dictionary_GetCount( depList );
-	}
-	for ( i = 0; i < count; ++i ) {
-		Dictionary* dep;
-		char* depName;
-		char* depVersion;
-		char* depUrl;
+	count = Stg_Meta_GetAssociationCount( self->_meta );
+	for( i = 0; i < count; ++i ) {
+		char* name;
 		
-		dep = Dictionary_Entry_Value_AsDictionary( Dictionary_GetByIndex( depList, i ) );
-		depName = Dictionary_GetString_WithDefault( dep, (char*)PLUGIN_DEPENDENCY_NAME_KEY, "NULL" );
-		depVersion = Dictionary_GetString_WithDefault( dep, (char*)PLUGIN_DEPENDENCY_VERSION_KEY, "Unknown" );
-		depUrl = Dictionary_GetString_WithDefault( dep, (char*)PLUGIN_DEPENDENCY_URL_KEY, "None" );
-	
-		Journal_RPrintf( stream, "Depends on: %s, version=%s, url=%s\n", depName, depVersion, depUrl );
+		name = Stg_Meta_GetAssociationType( self->_meta, i );
+		Journal_RPrintf( stream, "Depends on: %s\n", name ? name : "(type missing - erronous meta data)" );
 	}
 	
 	/* Print parent */
@@ -272,28 +251,6 @@ const char* Module_GetVersion( void* module ) {
 	return NULL;
 }
 
-
-Dictionary* Module_GetDependencies( void* module ) {
-	Module* self = (Module*)module;
-	Dictionary_Entry_Value* dev;
-
-	/* Kinda important... we want to only return a real dictionary if the meta data has a dependency entry, even if it is
-	   empty. Otherwise, indicate the effective error state by returning null */
-	dev = Dictionary_Get( self->_meta, (char*)PLUGIN_DEPENDENCY_KEY );
-	if( dev ) {
-		return Dictionary_Entry_Value_AsDictionary( dev );
-	}
-	else {
-		return NULL;
-	}
-}
-
-Dictionary_Entry_Value* Module_GetValue( void* module, char* key ) {
-	Module* self = (Module*)module;
-
-	return Dictionary_Get( self->_meta, key );
-}
-	
 
 void* Module_LoadSymbol( void* module, const char* suffix ) {
 	Module* self = (Module*)module;

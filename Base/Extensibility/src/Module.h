@@ -46,9 +46,6 @@
 	typedef Dictionary* (Module_GetMetadataFunction)        ( void );
 	typedef const char* (Module_GetNameFunction)            ( void );
 	typedef const char* (Module_GetVersionFunction)         ( void );
-	extern const char* PLUGIN_DEPENDENCY_NAME_KEY;
-	extern const char* PLUGIN_DEPENDENCY_VERSION_KEY;
-	extern const char* PLUGIN_DEPENDENCY_URL_KEY;
 	
 	/** Textual name of this class */
 	extern const Type Module_Type;
@@ -104,12 +101,6 @@
 	/** Return the mangled (symbol and file) name. Note: result needs to be freed */
 	char* Module_MangledName( void* module );
 
-	/* Obtain the recorded dependancy information of the module */
-	Dictionary* Module_GetDependencies( void* module );
-	
-	/** Obtain the recorded meta information of the module */
-	Dictionary_Entry_Value* Module_GetValue( void* module, char* key );
-	
 	/** Load a specific symbol of the module, where the symbol is prefixed by the module name */
 	void* Module_LoadSymbol( void* module, const char* suffix );
 

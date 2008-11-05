@@ -86,15 +86,20 @@ int main( int argc, char* argv[] ) {
 	helpTopic = stgParseHelpCmdLineArg( &argc, &argv );
 	if( helpTopic ) {
 		PluginsManager* plugins = PluginsManager_New();
-		Stg_ComponentMeta* metaTest;
+		Dictionary* metadata;
 
 		ModulesManager_Load( stgToolboxesManager, dictionary );
 		ModulesManager_Load( plugins, dictionary );
 
-		metaTest = Stg_Component_CreateMeta( NULL, helpTopic );
-		Stg_Class_Print( metaTest, stream );
+		metadata = Stg_ComponentRegister_GetMetadata( Stg_ComponentRegister_Get_ComponentRegister(), helpTopic, "0" );
+		if( metadata ) {
+			Stg_Meta_Print( metadata, stream );
+		}
+		else {
+			Journal_Printf( stream, "Help topic '%s' not found.\n", helpTopic );
+		}
 
-		Stg_Class_Delete( metaTest );
+		/* metadata is provided as a reference - don't delete */
 		Stg_Class_Delete( plugins );
 		Memory_Free( helpTopic );
 	}
