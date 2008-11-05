@@ -16,9 +16,6 @@
 <param name="isAbstractClass">True</param>
 <param name="Description">Abstract parent class for the different element type implementations. Also provides generic element type functionality.</param>
 
-<!--Now the interesting stuff-->
-
-
 <list name="Params">
 
 </list>
@@ -26,7 +23,6 @@
 <list name="Dependencies">
 
 </list>
-<!-- Add an exmaple XML if possible -->
 <param name="Example">n/a</param>
 
 </StGermainData>
