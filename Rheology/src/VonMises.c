@@ -112,8 +112,7 @@ void _VonMises_Init(
 		FeVariable* strainRateField, 
 		double      cohesion, 
 		double      cohesionAfterSoftening,
-		Bool        strainRateSoftening,
-                double      maximumCorrectionFactor )
+		Bool        strainRateSoftening)
 {
 	self->strainRateField        = strainRateField;
 	self->cohesion               = cohesion;
@@ -122,8 +121,6 @@ void _VonMises_Init(
 	/* needs a softening factor between +0 and 1 and a reference strain > 0 */
 	self->cohesionAfterSoftening = cohesionAfterSoftening;
 	self->strainRateSoftening    = strainRateSoftening;
-
-        self->maximumCorrectionFactor = maximumCorrectionFactor;
 }
 
 void* _VonMises_DefaultNew( Name name ) {
@@ -164,8 +161,7 @@ void _VonMises_Construct( void* rheology, Stg_ComponentFactory* cf, void* data )
 			strainRateField,
 			Stg_ComponentFactory_GetDouble( cf, self->name, "cohesion", 0.0 ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "cohesionAfterSoftening", 0.0 ),
-			Stg_ComponentFactory_GetBool(   cf, self->name, "strainRateSoftening", False ),
-                        Stg_ComponentFactory_GetDouble( cf, self->name, "maximumCorrectionFactor", 1.0 ) );
+			Stg_ComponentFactory_GetBool(   cf, self->name, "strainRateSoftening", False ) );
 }
 
 double _VonMises_GetYieldCriterion( 
