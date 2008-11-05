@@ -13,23 +13,20 @@
 <param name="Parent">Stg_Component</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">...</param>
-
-<!--Now the interesting stuff-->
-
+<param name="Description">Creates the background data structures for a variable across the whole domain. This class doesn't do much but just provides an api for accessing variable information. (The real work of a variable is done Variable class and the FeVariable class). As this is an abstract class it is not used explicitly in xml. </param>
 
 <list name="Params">
 	<struct>
 		<param name="Name">dim</param>
 		<param name="Type">UnsignedInt</param>
 		<param name="Default">0</param>
-		<param name="Description">...</param>
+		<param name="Description">Number of dimensions the field exists in</param>
 	</struct>
 	<struct>
 		<param name="Name">fieldComponentCount</param>
 		<param name="Type">UnsignedInt</param>
 		<param name="Default">0</param>
-		<param name="Description">...</param>
+		<param name="Description">Number of components which make up the field.</param>
 	</struct>
 
 </list>
@@ -37,7 +34,6 @@
 <list name="Dependencies">
 
 </list>
-<!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">N/A</param>
 
 </StGermainData>
