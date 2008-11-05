@@ -197,38 +197,73 @@ Bool Dictionary_Set( void* dictionary, Dictionary_Entry_Key key, Dictionary_Entr
 
 Dictionary_Entry_Value* Dictionary_Get( void* dictionary, Dictionary_Entry_Key key ) {
 	Dictionary* self = (Dictionary*)dictionary;
-	return self->get( dictionary, key );
+	/* Be less sensitive to whether the dictionary is NULL... yields nicer user code */
+	return self ? self->get( dictionary, key ) : NULL;
 }
 
 Dictionary_Entry_Source Dictionary_GetSource( void* dictionary, Dictionary_Entry_Key key ) {
 	Dictionary* self = (Dictionary*)dictionary;
-	return self->getSource( dictionary, key );
+	/* Be less sensitive to whether the dictionary is NULL... yields nicer user code */
+	return self ? self->getSource( dictionary, key ) : NULL;
 }
 
 Dictionary_Entry_Value* Dictionary_GetByIndex( void* dictionary, Dictionary_Index index ) {
-	return _Dictionary_GetByIndex( dictionary, index );
+	Dictionary* self = (Dictionary*)dictionary;
+	/* Be less sensitive to whether the dictionary is NULL... yields nicer user code */
+	return self ? _Dictionary_GetByIndex( dictionary, index ) : NULL;
 }
 
 Dictionary_Entry* Dictionary_GetEntry( void* dictionary, Dictionary_Entry_Key key ) {
 	Dictionary* self = dictionary;
 	Dictionary_Index index;
+	Dictionary_Index count;
+
+	/* Be less sensitive to whether the dictionary is NULL... yields nicer user code */
+	count = self ? self->count : 0;
 	
-	for( index = 0; index < self->count; index++ ) {
+	for( index = 0; index < count; index++ ) {
 		if( Dictionary_Entry_Compare( self->entryPtr[index], key ) != 0 ) {
 			return self->entryPtr[index];
 		}
 	}
-	return 0;
+	return NULL;
 }
 
 Dictionary_Entry* Dictionary_GetEntryByIndex( void* dictionary, Dictionary_Index index) {
 	Dictionary* self = dictionary;
 
+	/* Be less sensitive to whether the dictionary is NULL... yields nicer user code */
 	/* Check that self->entryPtr[index] is NOT NULL */
-	if( ! self->entryPtr[index] )
-		return 0;
+	if( !self || !self->entryPtr[index] )
+		return NULL;
 	else
 		return self->entryPtr[index];
+}
+
+Index Dictionary_GetCount( void* dictionary ) {
+	Dictionary* self = (Dictionary*) dictionary;
+	/* Be less sensitive to whether the dictionary is NULL... yields nicer user code */
+	return self ? self->count : 0;
+}
+
+Dictionary_Entry_Value* Dictionary_GetDefault( void* dictionary, Dictionary_Entry_Key key, Dictionary_Entry_Value* value ) {
+	Dictionary* self = (Dictionary*) dictionary;
+	Dictionary_Index index;
+	
+	for( index = 0; index < self->count; index++ ) {
+		if( Dictionary_Entry_Compare( self->entryPtr[index], key ) != 0 ) {
+			/* key found, so delete the default value */
+			Dictionary_Entry_Value_Delete( value );
+			return Dictionary_Entry_Get( self->entryPtr[index] );
+		}
+	}
+	
+	Journal_Printf( self->debugStream, "Warning - value %s not found in dictionary, using default value of ", key );
+	Dictionary_Entry_Value_Print( value, self->debugStream );
+	Journal_Printf( self->debugStream, "\n" );
+	
+	Dictionary_Add( dictionary, key, value );
+	return value;
 }
 
 
@@ -524,31 +559,6 @@ Dictionary_Entry_Source _Dictionary_GetSource( void* dictionary, Dictionary_Entr
 Dictionary_Entry_Value* _Dictionary_GetByIndex( void* dictionary, Dictionary_Index index ) {
 	Dictionary* self = (Dictionary*) dictionary;
 	return Dictionary_Entry_Get(self->entryPtr[index]);
-}
-
-Dictionary_Entry_Value* Dictionary_GetDefault( void* dictionary, Dictionary_Entry_Key key, Dictionary_Entry_Value* value ) {
-	Dictionary* self = (Dictionary*) dictionary;
-	Dictionary_Index index;
-	
-	for( index = 0; index < self->count; index++ ) {
-		if( Dictionary_Entry_Compare( self->entryPtr[index], key ) != 0 ) {
-			/* key found, so delete the default value */
-			Dictionary_Entry_Value_Delete( value );
-			return Dictionary_Entry_Get( self->entryPtr[index] );
-		}
-	}
-	
-	Journal_Printf( self->debugStream, "Warning - value %s not found in dictionary, using default value of ", key );
-	Dictionary_Entry_Value_Print( value, self->debugStream );
-	Journal_Printf( self->debugStream, "\n" );
-	
-	Dictionary_Add( dictionary, key, value );
-	return value;
-}
-
-Index Dictionary_GetCount( void* dictionary ) {
-	Dictionary* self = (Dictionary*) dictionary;
-	return self->count;
 }
 
 void Dictionary_ParseCommandLineParam( void* self, char* paramString, char* valueString ) {
