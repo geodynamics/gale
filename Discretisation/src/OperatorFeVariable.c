@@ -76,6 +76,30 @@ OperatorFeVariable* OperatorFeVariable_NewUnary(
 			feVariable->fieldVariable_Register );
 }
 
+OperatorFeVariable* OperatorFeVariable_NewUnary_OwnOperator( 
+		Name                                               name ,
+		void*                                              _feVariable,
+		Operator*                                          ownOperator )
+{
+	FeVariable* feVariable  = (FeVariable*) _feVariable;
+	Stream*     errorStream = Journal_Register( Error_Type, OperatorFeVariable_Type );
+
+	Journal_Firewall( feVariable != NULL, errorStream, "In func %s: Trying to operate on NULL field.\n", __func__ );
+       	
+	return OperatorFeVariable_New2( 
+			name,
+			OperatorFeVariable_UnaryInterpolationFunc, 
+			OperatorFeVariable_UnaryValueAtNodeFunc,
+			ownOperator,
+			1,
+			&feVariable, 
+			feVariable->dim,
+			feVariable->isCheckpointedAndReloaded,
+			feVariable->communicator,
+			feVariable->fieldVariable_Register );
+}
+
+
 OperatorFeVariable* OperatorFeVariable_NewBinary( 
 		Name                                               name ,
 		void*                                              _feVariable1,
@@ -119,6 +143,7 @@ void* OperatorFeVariable_DefaultNew( Name name ) {
 			_OperatorFeVariable_Destroy,
 			name,
 			False,
+			NULL,
 			_OperatorFeVariable_InterpolateValueAt,
 			_FeVariable_GetMinGlobalFieldMagnitude,
 			_FeVariable_GetMaxGlobalFieldMagnitude, 
@@ -165,6 +190,7 @@ OperatorFeVariable* OperatorFeVariable_New(
 			_OperatorFeVariable_Destroy,
 			name,
 			True,
+			NULL,
 			_OperatorFeVariable_InterpolateValueAt,
 			_FeVariable_GetMinGlobalFieldMagnitude,
 			_FeVariable_GetMaxGlobalFieldMagnitude, 
@@ -173,6 +199,53 @@ OperatorFeVariable* OperatorFeVariable_New(
 			interpolateWithinElement,
 			getValueAtNode,
 			operatorName,
+			feVariableCount,
+			feVariableList,
+			feVariable->feMesh,
+			feVariable->geometryMesh,
+			dim,
+			isCheckpointedAndReloaded,
+			communicator,
+			fV_Register );
+}
+
+OperatorFeVariable* OperatorFeVariable_New2( 
+		Name                                               name ,
+		FeVariable_InterpolateWithinElementFunction*       interpolateWithinElement,
+		FeVariable_GetValueAtNodeFunction*                 getValueAtNode,
+		Operator*                                           ownOperator,
+		Index                                              feVariableCount,
+		FeVariable**                                       feVariableList,
+		Dimension_Index                                    dim,
+		Bool                                               isCheckpointedAndReloaded,
+		MPI_Comm                                           communicator,
+		FieldVariable_Register*                            fV_Register )
+{
+	FeVariable* feVariable = feVariableList[0];
+
+		return _OperatorFeVariable_New( 
+			sizeof(OperatorFeVariable), 
+			OperatorFeVariable_Type, 
+			_OperatorFeVariable_Delete, 
+			_OperatorFeVariable_Print,
+			_OperatorFeVariable_Copy, 
+			(Stg_Component_DefaultConstructorFunction*)OperatorFeVariable_DefaultNew,
+			_OperatorFeVariable_Construct,
+			_OperatorFeVariable_Build, 
+			_OperatorFeVariable_Initialise, 
+			_OperatorFeVariable_Execute,
+			_OperatorFeVariable_Destroy,
+			name,
+			True,
+			ownOperator,
+			_OperatorFeVariable_InterpolateValueAt,
+			_FeVariable_GetMinGlobalFieldMagnitude,
+			_FeVariable_GetMaxGlobalFieldMagnitude, 
+			_FeVariable_GetMinAndMaxLocalCoords,
+			_FeVariable_GetMinAndMaxGlobalCoords,
+			interpolateWithinElement,
+			getValueAtNode,
+			ownOperator->name,
 			feVariableCount,
 			feVariableList,
 			feVariable->feMesh,
@@ -196,7 +269,8 @@ OperatorFeVariable* _OperatorFeVariable_New(
 		Stg_Component_ExecuteFunction*                     _execute,
 		Stg_Component_DestroyFunction*                     _destroy,
 		Name                                               name,
-		Bool										       initFlag,
+		Bool                                               initFlag,
+		Operator*                                          ownOperator,
 		FieldVariable_InterpolateValueAtFunction*          _interpolateValueAt,
 		FieldVariable_GetValueFunction*			   _getMinGlobalFieldMagnitude,
 		FieldVariable_GetValueFunction*                    _getMaxGlobalFieldMagnitude,
@@ -263,21 +337,22 @@ OperatorFeVariable* _OperatorFeVariable_New(
 			fV_Register );
 
 	if( initFlag ){
-		_OperatorFeVariable_Init( self, operatorName, feVariableCount, feVariableList );
+		_OperatorFeVariable_Init( self, operatorName, feVariableCount, feVariableList, ownOperator );
 	}
 
 	return self;
 }
 
-void _OperatorFeVariable_Init( void* oFeVar, Name operatorName, Index feVariableCount, FeVariable** feVariableList ) {
+void _OperatorFeVariable_Init( void* oFeVar, Name operatorName, Index feVariableCount, FeVariable** feVariableList, Operator* ownOperator ) {
 	OperatorFeVariable*         self              = (OperatorFeVariable*) oFeVar;
 	FeVariable*                 feVariable;
 	Index                       feVariable_I;
 	Stream*                     errorStream       = Journal_Register( Error_Type, self->type );
 
 	/* Assign values to object */
-	self->feVariableCount     = feVariableCount;
-	self->operatorName = operatorName;
+	self->feVariableCount = feVariableCount;
+	self->operatorName    = operatorName;
+	self->_operator       = ownOperator;
 
 	/* Copy field variable list */
 	self->feVariableList      = Memory_Alloc_Array( FeVariable*, feVariableCount, "Array of Field Variables" );
@@ -379,7 +454,7 @@ void _OperatorFeVariable_Construct( void* feVariable, Stg_ComponentFactory* cf, 
 		/* TODO: hack as always the default path - PatrickSunter 9/7/2007 */
 		NULL, NULL,
 		False, False );
-	_OperatorFeVariable_Init( self, operatorName, feVariableCount, feVariableList );
+	_OperatorFeVariable_Init( self, operatorName, feVariableCount, feVariableList, NULL );
 
 	Memory_Free( feVariableList );
 }
@@ -392,34 +467,40 @@ void _OperatorFeVariable_Build( void* feVariable, void* data ) {
 	for ( feVariable_I = 0 ; feVariable_I < self->feVariableCount ; feVariable_I++ ) 
 		Stg_Component_Build( self->feVariableList[ feVariable_I ] , data, False );
 
-	/* Check if we are using a gradient operator */
-	if ( strcasecmp( self->operatorName, "gradient" ) == 0 ) {
-		self->useGradient = True;
-		assert( self->feVariableCount == 1 );
-		self->fieldComponentCount = self->feVariableList[0]->fieldComponentCount * self->dim;
-	}
-	else {
-		/* just use normal operator */
-		self->useGradient = False;
-		/* Added 5 May 2006 by P Sunter: in the case of VectorScale, the fieldComponentCount should be based
-		on the 2nd operator. Also make sure the 2nd operator has at least as may dofs per node as the first. */
-		if ( self->feVariableCount == 2 ) {
-			Journal_Firewall( self->feVariableList[1]->fieldComponentCount >= self->feVariableList[0]->fieldComponentCount,
-				errorStream, "Error - in %s: tried to create a %s operator from feVariables \"%s\" "
-				"and \"%s\" - who have fieldCounts %d and %d - unsupported since operations "
-				"such as VectorScale require the 2nd feVariable to have >= the first's field count.\n",
-				__func__, self->operatorName, self->feVariableList[0]->name, self->feVariableList[1]->name,
-				self->feVariableList[0]->fieldComponentCount, self->feVariableList[1]->fieldComponentCount );
-			self->_operator  = Operator_NewFromName( self->operatorName, self->feVariableList[1]->fieldComponentCount,
-				self->dim );
+	if ( !self->_operator){
+		/* Check if we are using a gradient operator */
+		if ( strcasecmp( self->operatorName, "gradient" ) == 0 ) {
+			self->useGradient = True;
+			assert( self->feVariableCount == 1 );
+			self->fieldComponentCount = self->feVariableList[0]->fieldComponentCount * self->dim;
 		}
-		else {	
-			self->_operator  = Operator_NewFromName( self->operatorName, self->feVariableList[0]->fieldComponentCount,
-				self->dim );
+		else {
+			/* just use normal operator */
+			self->useGradient = False;
+			/* Added 5 May 2006 by P Sunter: in the case of VectorScale, the fieldComponentCount should be based
+			on the 2nd operator. Also make sure the 2nd operator has at least as may dofs per node as the first. */
+			if ( self->feVariableCount == 2 ) {
+				Journal_Firewall( self->feVariableList[1]->fieldComponentCount >= self->feVariableList[0]->fieldComponentCount,
+					errorStream, "Error - in %s: tried to create a %s operator from feVariables \"%s\" "
+					"and \"%s\" - who have fieldCounts %d and %d - unsupported since operations "
+					"such as VectorScale require the 2nd feVariable to have >= the first's field count.\n",
+					__func__, self->operatorName, self->feVariableList[0]->name, self->feVariableList[1]->name,
+					self->feVariableList[0]->fieldComponentCount, self->feVariableList[1]->fieldComponentCount );
+				self->_operator  = Operator_NewFromName( self->operatorName, self->feVariableList[1]->fieldComponentCount,
+					self->dim );
+			}
+			else {	
+				self->_operator  = Operator_NewFromName( self->operatorName, self->feVariableList[0]->fieldComponentCount,
+					self->dim );
+			}
+	
+			self->fieldComponentCount = self->_operator->resultDofs; /* reset this value from that which is from operator */
 		}
-
-		self->fieldComponentCount = self->_operator->resultDofs; /* reset this value from that which is from operator */
-	}
+	} else {
+			self->useGradient = False;
+			self->fieldComponentCount = self->_operator->resultDofs; /* reset this value from that which is from operator */
+	}		
+		
 	_OperatorFeVariable_SetFunctions( self );
 }
 
