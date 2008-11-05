@@ -39,7 +39,7 @@
 			<param name="Type">BelowCosinePlane</param>
 			<param name="offset">0.2</param>
 			<param name="amplitude">0.02</param>
-			<param name="period"> 1.8284 </param>
+			<param name="wavelength"> 1.8284 </param>
 			<param name="phase"> 0.0 </param>
 		</struct>		
 		<struct name="lightLayerViscosity">

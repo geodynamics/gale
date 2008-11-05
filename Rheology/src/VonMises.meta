@@ -48,6 +48,16 @@
 </list>
 
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">.
+<![CDATA[
+		<struct name="vonMises">
+			<param name="Type">VonMises</param>
+			<param name="StrainRateField">StrainRateField</param>
+			<param name="cohesion">50.0</param>
+			<param name="cohesionAfterSoftening">2.0</param>
+			<param name="strainRateSoftening">false</param>
+		</struct>
+		]]>
+</param>
 
 </StGermainData>
