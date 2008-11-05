@@ -238,14 +238,37 @@ Dictionary* Stg_ComponentRegister_GetMetadata(
 	return NULL;
 }
 
-Stg_ComponentRegister *Stg_ComponentRegister_Get_ComponentRegister( )
-{
-	if( stgComponentRegister ){
-		return stgComponentRegister;
-	}
-	else{
-		return NULL;
-	}
+Stg_ComponentRegister *Stg_ComponentRegister_Get_ComponentRegister() {
+	return stgComponentRegister;
+}
+
+BTreeIterator* Stg_ComponentRegister_GetIterator( void* componentRegister ) {
+	Stg_ComponentRegister* self = (Stg_ComponentRegister*)componentRegister;
+	return BTreeIterator_New( self->constructors );
+}
+
+Stg_ComponentRegisterElement* Stg_ComponentRegisterIterator_First( BTreeIterator* iterator ) {
+	return (Stg_ComponentRegisterElement*)BTreeIterator_First( iterator );
+}
+
+Stg_ComponentRegisterElement* Stg_ComponentRegisterIterator_Next( BTreeIterator* iterator ) {
+	return (Stg_ComponentRegisterElement*)BTreeIterator_Next( iterator );
+}
+
+Type Stg_ComponentRegisterElement_GetType( Stg_ComponentRegisterElement* element ) {
+	return element->componentType;
+}
+
+Name Stg_ComponentRegisterElement_GetVersion( Stg_ComponentRegisterElement* element ) {
+	return element->version;
+}
+
+Stg_Component_DefaultConstructorFunction* Stg_ComponentRegisterElement_GetConstructor( Stg_ComponentRegisterElement* element ) {
+	return element->defaultConstructor;
+}
+
+Dictionary* Stg_ComponentRegisterElement_GetMetadata( Stg_ComponentRegisterElement* element ) {
+	return element->metadata();
 }
 
 /* Private member functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

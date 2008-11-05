@@ -141,6 +141,29 @@
 		Stg_ComponentRegister* self,
 		Name                   componentType,
 		Name                   version );
-	void Stg_ComponentRegister_PrintAllTypes( void* componentRegister, void* stream ) ;
+	void Stg_ComponentRegister_PrintAllTypes( void* componentRegister, void* stream );
+
+	/* Functions for iterating through the component element list ------------------------------------------------------------*/
+
+	/** Obtain an iterator to the component element list */
+	BTreeIterator* Stg_ComponentRegister_GetIterator();
+
+	/** Initialise the iterator to the first component element in the list */
+	Stg_ComponentRegisterElement* Stg_ComponentRegisterIterator_First( BTreeIterator* iterator );
+
+	/** Step to the next component element in the list */
+	Stg_ComponentRegisterElement* Stg_ComponentRegisterIterator_Next( BTreeIterator* iterator );
+
+	/** Obtain the component type from the component list element */
+	Type Stg_ComponentRegisterElement_GetType( Stg_ComponentRegisterElement* element );
+
+	/** Obtain the component version from the component list element */
+	Name Stg_ComponentRegisterElement_GetVersion( Stg_ComponentRegisterElement* element );
+
+	/** Obtain the component constructor function from the component list element */
+	Stg_Component_DefaultConstructorFunction* Stg_ComponentRegisterElement_GetConstructor( Stg_ComponentRegisterElement* element );
+
+	/** Obtain the component metadata from the component list element */
+	Dictionary* Stg_ComponentRegisterElement_GetMetadata( Stg_ComponentRegisterElement* element );
 	
 #endif /* __Base_Automation_Stg_ComponentRegister_h__ */

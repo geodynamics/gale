@@ -61,6 +61,7 @@ int main( int argc, char* argv[] ) {
 	XML_IO_Handler*			ioHandler;
 	Stream*                         stream;
 	char*                           helpTopic;
+	char*                           listTopic;
 
 	/* Initialise PETSc, get world info */
 	MPI_Init( &argc, &argv );
@@ -84,19 +85,114 @@ int main( int argc, char* argv[] ) {
 	/* if the command line arguments ask for help, then load the toolboxes and plugins (to include all symbols/components, and
 	   print the help for the selected component */
 	helpTopic = stgParseHelpCmdLineArg( &argc, &argv );
-	if( helpTopic ) {
+	listTopic = stgParseListCmdLineArg( &argc, &argv );
+	if( helpTopic || listTopic ) {
 		PluginsManager* plugins = PluginsManager_New();
 		Dictionary* metadata;
+		Stg_ComponentRegister* cr = Stg_ComponentRegister_Get_ComponentRegister();
 
 		ModulesManager_Load( stgToolboxesManager, dictionary );
 		ModulesManager_Load( plugins, dictionary );
 
-		metadata = Stg_ComponentRegister_GetMetadata( Stg_ComponentRegister_Get_ComponentRegister(), helpTopic, "0" );
-		if( metadata ) {
-			Stg_Meta_Print( metadata, stream );
+		if( helpTopic ) {
+			metadata = Stg_ComponentRegister_GetMetadata( cr, helpTopic, "0" );
+			if( metadata ) {
+				Stg_Meta_Print( metadata, stream );
+			}
+			else {
+				Journal_Printf( stream, "Help topic '%s' not found.\n", helpTopic );
+			}
 		}
-		else {
-			Journal_Printf( stream, "Help topic '%s' not found.\n", helpTopic );
+		if( listTopic ) {
+			if( strcmp( listTopic, "all-components" ) == 0 ) {
+				BTreeIterator* i;
+				Stg_ComponentRegisterElement* cre;
+
+				Journal_Printf( stream, "Registered components are:\n" );
+				i = Stg_ComponentRegister_GetIterator( cr );
+				for( 
+					cre = Stg_ComponentRegisterIterator_First( i ); 
+					cre != NULL; 
+					cre = Stg_ComponentRegisterIterator_Next( i ) )
+				{
+					Journal_Printf( stream, "\t'%s'\n", Stg_ComponentRegisterElement_GetType( cre ) );
+				}
+
+				Stg_Class_Delete( i );
+			}
+			else if( strcmp( listTopic, "all-references" ) == 0 ) {
+				BTreeIterator* i;
+				Stg_ComponentRegisterElement* cre;
+
+				Journal_Printf( stream, "Component references are:\n" );
+				i = Stg_ComponentRegister_GetIterator( cr );
+				for( 
+					cre = Stg_ComponentRegisterIterator_First( i ); 
+					cre != NULL; 
+					cre = Stg_ComponentRegisterIterator_Next( i ) )
+				{
+					char* reference = Stg_Meta_GetReference( Stg_ComponentRegisterElement_GetMetadata( cre ) );
+					if( reference && reference[0] != 0 ) {
+						Journal_Printf( 
+							stream, 
+							"\t'%s': %s\n", 
+							Stg_ComponentRegisterElement_GetType( cre ),
+							reference );
+					}
+				}
+
+				Stg_Class_Delete( i );
+			}
+			else if( strcmp( listTopic, "all-equations" ) == 0 ) {
+				BTreeIterator* i;
+				Stg_ComponentRegisterElement* cre;
+
+				Journal_Printf( stream, "Component equations are:\n" );
+				i = Stg_ComponentRegister_GetIterator( cr );
+				for( 
+					cre = Stg_ComponentRegisterIterator_First( i ); 
+					cre != NULL; 
+					cre = Stg_ComponentRegisterIterator_Next( i ) )
+				{
+					char* equation = Stg_Meta_GetEquation( Stg_ComponentRegisterElement_GetMetadata( cre ) );
+					if( equation && equation[0] != 0 ) {
+						Journal_Printf( 
+							stream, 
+							"\t'%s': %s\n", 
+							Stg_ComponentRegisterElement_GetType( cre ),
+							equation );
+					}
+				}
+
+				Stg_Class_Delete( i );
+			}
+			else if( strcmp( listTopic, "all-rights" ) == 0 ) {
+				BTreeIterator* i;
+				Stg_ComponentRegisterElement* cre;
+
+				Journal_Printf( stream, "Component references are:\n" );
+				i = Stg_ComponentRegister_GetIterator( cr );
+				for( 
+					cre = Stg_ComponentRegisterIterator_First( i ); 
+					cre != NULL; 
+					cre = Stg_ComponentRegisterIterator_Next( i ) )
+				{
+					char* rights = Stg_Meta_GetRights( Stg_ComponentRegisterElement_GetMetadata( cre ) );
+					if( rights && rights[0] != 0 ) {
+						Journal_Printf( 
+							stream, 
+							"\t'%s': %s\n", 
+							Stg_ComponentRegisterElement_GetType( cre ),
+							rights );
+					}
+				}
+
+				Stg_Class_Delete( i );
+			}
+			else {
+				Journal_Printf( stream, "List topic '%s' not found.\n", listTopic );
+				Journal_Printf( stream, "Available topics are:\n\t'all-components'\n\t'all-references'\n\t'all-equations'\n\t'all-rights'\n", listTopic );
+			}
 		}
 
 		/* metadata is provided as a reference - don't delete */

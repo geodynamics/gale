@@ -28,5 +28,6 @@
 	
 	void stgRemoveCmdLineArg( int* argc, char** argv[], int index );
 	char* stgParseHelpCmdLineArg( int* argc, char** argv[] );
+	char* stgParseListCmdLineArg( int* argc, char** argv[] );
 
 #endif /* __Base_IO_CmdLineArgs_h__ */

@@ -78,3 +78,35 @@ char* stgParseHelpCmdLineArg( int* argc, char** argv[] ) {
 	return 0;
 }
 
+char* stgParseListCmdLineArg( int* argc, char** argv[] ) {
+	Index                   arg_I;
+
+	/* Loop over all the arguments from command line and reads all arguments of form "--help topic" */
+	for( arg_I = 1 ; arg_I < *argc; arg_I++ ) {
+		char*                   valueString = 0;
+		char*                   argumentString = (*argv)[arg_I];
+		const char*             preceedingString = "--list";
+		unsigned int            preceedingStringLength = strlen( preceedingString );
+
+		/* Check is string has preceeding string is "--list" if not then continue in loop */
+		if( strncmp( preceedingString, argumentString , preceedingStringLength ) != 0 ) {
+			continue;
+		}
+		if( strlen( argumentString ) != strlen( preceedingString ) ) {
+			continue;
+		}
+		if( arg_I >= (*argc - 1) ) { /* "--list" is the last commandline argument */
+			valueString = StG_Strdup( "" );
+			stgRemoveCmdLineArg( argc, argv, arg_I ); /* first argument: --list */
+			return valueString;
+		}
+
+		valueString = StG_Strdup( (*argv)[arg_I+1] );
+		stgRemoveCmdLineArg( argc, argv, arg_I ); /* first argument: --list */
+		stgRemoveCmdLineArg( argc, argv, arg_I ); /* second argument: topic */
+		return valueString;		
+	}
+
+	return 0;
+}
+
