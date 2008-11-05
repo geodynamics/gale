@@ -50,15 +50,23 @@
 	typedef struct {
 		__Codelet
 		OperatorFeVariable* reducedStrainRateFieldInvariantRoot;
-		OperatorFeVariable* reducedStrainRateField;
-		OperatorFeVariable* reducedStrainRateFieldInvariant;
 		double      plateness;
 	} Underworld_Plateness;
 
 	Index Underworld_Plateness_Register( PluginsManager* pluginsManager );
 	void Underworld_Plateness_Setup( UnderworldContext* context ) ;
 	void Underworld_Plateness_Output( UnderworldContext* context ) ;
-	void Underworld_Plateness_SymmetricTensor_LowerDimension_2d( void* operatorObject, double* operand0, double* result );
-	void Underworld_Plateness_SymmetricTensor_LowerDimension_3d( void* operatorObject, double* operand0, double* result );
+	void Underworld_Plateness_SymmetricTensor_LowerDimension_InvariantRoot_2d( void* operatorObject, double* operand0, double* result );
+	void Underworld_Plateness_SymmetricTensor_LowerDimension_InvariantRoot_3d( void* operatorObject, double* operand0, double* result );
+
+	double Plateness_IntegrateLayer_AxisIndependent( 
+		void* feVariable, void* _swarm,
+		Axis layerAxis, Index layerIndex, Dimension_Index dim, 
+		Axis axis0, Axis axis1, Axis axis2, double** value_weight_Matrix); //, double minValue, double maxValue );
+	double Plateness_IntegratePlane( void* feVariable, Axis planeAxis, double planeHeight, double** value_weight_Matrix); //, double minValue, double maxValue);
+	double Plateness_IntegrateElement_AxisIndependent( 
+			void* feVariable, void* _swarm,
+			Element_DomainIndex dElement_I, Dimension_Index dim, 
+			Axis axis0, Axis axis1, Axis axis2, double** value_weight_Matrix, double minValue, double maxValue) ;
 
 #endif
