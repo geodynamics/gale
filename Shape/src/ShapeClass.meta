@@ -13,7 +13,7 @@
 <param name="Parent">Stg_Component</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">...</param>
+<param name="Description">The parent class for how Shapes (geometries) are defined in Underworld. This parent class provides data structures and polymoric functions for its children classes - as such should never be an instance of this class, only its children.</param>
 
 <!--Now the interesting stuff-->
 
@@ -62,6 +62,6 @@
 
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">N/A</param>
 
 </StGermainData>

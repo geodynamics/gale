@@ -13,7 +13,7 @@
 <param name="Parent">Stg_Shape</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">...</param>
+<param name="Description">This creates a superellipsoid shape $ f(x,y,z) = \left{(\frac{x}{r_x})^{\frac{1}{e_1}} + (\frac{y}{r_y})^{\frac{1}{e_1}}\text{  in 2D}\\\left[(\frac{x}{r_x})^{\frac{1}{e_2}} + (\frac{y}{r_y})^{\frac{1}{e_2}}\right]^{\frac{e_2}{e_1}} +(\frac{z}{r_z})^{\frac{1}{e_1}}\text{  in 3D}\right $ A point is deemed inside the shape if f is &#8804; 1</param>
 
 <!--Now the interesting stuff-->
 
@@ -23,31 +23,31 @@
 		<param name="Name">radiusX</param>
 		<param name="Type">Double</param>
 		<param name="Default">1.0</param>
-		<param name="Description">...</param>
+		<param name="Description">Is $r_x$ in the above equation</param>
 	</struct>
 	<struct>
 		<param name="Name">radiusY</param>
 		<param name="Type">Double</param>
 		<param name="Default">1.0</param>
-		<param name="Description">...</param>
+		<param name="Description">Is $r_y$ in the above equation</param>
 	</struct>
 	<struct>
 		<param name="Name">radiusZ</param>
 		<param name="Type">Double</param>
 		<param name="Default">1.0</param>
-		<param name="Description">...</param>
+		<param name="Description">Is $r_y$ in the above equation</param>
 	</struct>
 	<struct>
 		<param name="Name">epsilon1</param>
 		<param name="Type">Double</param>
 		<param name="Default">1.0</param>
-		<param name="Description">...</param>
+		<param name="Description">Is $e_1$ in the above equation</param>
 	</struct>
 	<struct>
 		<param name="Name">epsilon2</param>
 		<param name="Type">Double</param>
 		<param name="Default">1.0</param>
-		<param name="Description">...</param>
+		<param name="Description">Is $e_2$ in the above equation</param>
 	</struct>
 
 </list>
@@ -56,6 +56,20 @@
 
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">
+<![CDATA[
+		<struct name="shape">
+			<param name="Type">Superellipsoid</param>
+			<param name="CentreX">0.0</param>
+			<param name="CentreY">0.0</param>
+			<param name="CentreZ">0.0</param>
+			<param name="epsilon1">0.5</param>
+			<param name="epsilon2">1.5</param>
+			<param name="radiusX">0.3</param>
+			<param name="radiusY">0.4</param>
+			<param name="radiusZ">0.4</param>
+		</struct>
+]]>
+</param>
 
 </StGermainData>

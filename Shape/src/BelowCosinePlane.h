@@ -49,7 +49,7 @@
 		/* Virtual Info */\
 		\
 		double                  amplitude;  \
-		double                  period; \
+		double                  wavelength; \
 		double                  phase;
 
 	struct BelowCosinePlane { __BelowCosinePlane };
@@ -75,7 +75,7 @@
 		Stg_Shape_DistanceFromCenterAxisFunction*   _distanceFromCenterAxis,
 		Name                                  name );
 	
-	void _BelowCosinePlane_Init( void* belowPlane, XYZ width, double amplitude, double period, double phase ) ;
+	void _BelowCosinePlane_Init( void* belowPlane, XYZ width, double amplitude, double wavelength, double phase ) ;
 	void BelowCosinePlane_InitAll( 
 		void*                                 belowPlane, 
 		Dimension_Index                       dim, 
@@ -88,7 +88,7 @@
 		XYZ                                   minValue,
 		XYZ                                   maxValue,
 		double                                amplitude,
-		double                                period,
+		double                                wavelength,
 		double                                phase );
 
 	/* Stg_Class_Delete BelowCosinePlane implementation */

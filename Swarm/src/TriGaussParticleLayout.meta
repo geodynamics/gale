@@ -13,7 +13,7 @@
 <param name="Parent">PerCellParticleLayout</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">...</param>
+<param name="Description">At present this particle layout will only put a single particle in the middle of triangular element. This layout type is not well tested or used... so use with care.</param>
 
 <!--Now the interesting stuff-->
 

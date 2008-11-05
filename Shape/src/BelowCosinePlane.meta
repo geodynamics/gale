@@ -28,7 +28,7 @@
 		<param name="Description">Is the amplitude of the oscillations, $ b_0 $ in the equation</param>
 	</struct>
 	<struct>
-		<param name="Name">period</param>
+		<param name="Name">wavelength</param>
 		<param name="Type">Double</param>
 		<param name="Default">2*&pi;</param>
 		<param name="Description"> $ T $ in the equation</param>
