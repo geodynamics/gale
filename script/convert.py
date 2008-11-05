@@ -234,11 +234,11 @@ def metaXsdDict2stgDictionaryCode( xsdDict ):
 	# Implements...
 	s += '\timplements = Dictionary_New();\n'
 	try:
-		s += '\tDictionary_Add( implements, "reference", Dictionary_Entry_Value_FromString( "' + safecval( xsdDict["code"]["reference"] ) + '" ));\n'
+		s += '\tDictionary_Add( implements, "reference", Dictionary_Entry_Value_FromString( "' + safecval( xsdDict["implements"]["reference"] ) + '" ));\n'
 	except KeyError:
 		pass
 	try:
-		s += '\tDictionary_Add( implements, "equation", Dictionary_Entry_Value_FromString( "' + safecval( xsdDict["code"]["equation"] ) + '" ));\n'
+		s += '\tDictionary_Add( implements, "equation", Dictionary_Entry_Value_FromString( "' + safecval( xsdDict["implements"]["equation"] ) + '" ));\n'
 	except KeyError:
 		pass
 	s += '\tDictionary_Add( meta, "implements", Dictionary_Entry_Value_FromStruct( implements ) );\n'
