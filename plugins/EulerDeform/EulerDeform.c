@@ -268,7 +268,7 @@ void _Underworld_EulerDeform_Destroy( void* component, void* data ) {
 /* This creates a set which makes sure not to include the corners if
    we have not made both sides of the corner static. */
 
-IndexSet* EulerDeform_CreateStaticSet(EulerDeform_System* sys)
+IndexSet* EulerDeform_CreateStaticSet(EulerDeform_System* sys, int dim)
 {
   Grid*		grid;
   unsigned	nNodes;
@@ -288,22 +288,22 @@ IndexSet* EulerDeform_CreateStaticSet(EulerDeform_System* sys)
     RegularMeshUtils_Node_1DTo3D
       ( sys->mesh, Mesh_DomainToGlobal( sys->mesh, MT_VERTEX, n_i ), ijk );
     if(ijk[0]==0) {
-      if(sys->staticLeft)
+      if(sys->staticLeft && dim == 0)
         add=True;
     }
 
     if(ijk[0]==grid->sizes[0]-1) {
-      if(sys->staticRight)
+      if(sys->staticRight && dim == 0)
         add=True;
     }
 
     if(ijk[1]==0) {
-      if(sys->staticBottom)
+      if(sys->staticBottom && dim == 1)
         add=True;
     }
 
     if(ijk[1]==grid->sizes[1]-1) {
-      if(sys->staticTop)
+      if(sys->staticTop && dim == 1)
         add=True;
     /* If wrapping the top, that does not imply fixing the corner, but
        it does not preclude it either.
@@ -313,12 +313,12 @@ IndexSet* EulerDeform_CreateStaticSet(EulerDeform_System* sys)
 
     if(sys->mesh->topo->nDims == 3) {
        if(ijk[2]==0) {
-          if(sys->staticBack)
+          if(sys->staticBack && dim == 2)
             add=True;
        }
         
        if(ijk[2]==grid->sizes[2]-1) {
-          if(sys->staticFront)
+          if(sys->staticFront && dim == 2)
             add=True;
        }
     }
@@ -405,20 +405,26 @@ void EulerDeform_IntegrationSetup( void* _timeIntegrator, void* context ) {
 			IndexSet	*tmpIndSet;
 			unsigned	nInds, *inds;
 			unsigned	nDims;
-			unsigned	ind_i;
+			unsigned	ind_i, d_i;
 
-			/* Collect indices of all the sides. */
-
-                        tmpIndSet = EulerDeform_CreateStaticSet(sys);
-                        IndexSet_GetMembers( tmpIndSet, &nInds, &inds );
-
-			/* Copy coords to temporary array. */
 			nDims = Mesh_GetDimSize( sys->mesh );
-			sys->sideCoords = AllocArray2D( double, nInds, nDims );
-			for( ind_i = 0; ind_i < nInds; ind_i++ )
-				memcpy( sys->sideCoords[ind_i], sys->mesh->verts[inds[ind_i]], nDims * sizeof(double) );
-                        FreeObject( tmpIndSet );
-                        FreeArray( inds );
+                        sys->sideCoords = AllocArray( double*, nDims );
+
+                        for( d_i = 0; d_i < nDims; d_i++ ) {
+
+                          tmpIndSet = EulerDeform_CreateStaticSet(sys, d_i);
+                          IndexSet_GetMembers( tmpIndSet, &nInds, &inds );
+
+                          /* Copy coords to temporary array. */
+                          sys->sideCoords[d_i] = AllocArray( double, nInds );
+
+                          for( ind_i = 0; ind_i < nInds; ind_i++ )
+                            sys->sideCoords[d_i][ind_i] = sys->mesh->verts[inds[ind_i]][d_i];
+
+                          FreeObject( tmpIndSet );
+                          FreeArray( inds );
+
+                        }
 		}
 	}
 
@@ -509,18 +515,23 @@ void EulerDeform_Remesh( TimeIntegratee* crdAdvector, EulerDeform_Context* edCtx
 		if( sys->staticSides ) {
 			IndexSet	*tmpIndSet;
 			unsigned	nInds, *inds;
-			unsigned	ind_i;
+			unsigned	ind_i, d_i;
 
-			/* Collect indices of all the sides. */
+                        for( d_i = 0; d_i < nDims; d_i++ ) {
 
-                        tmpIndSet = EulerDeform_CreateStaticSet(sys);
-                        IndexSet_GetMembers( tmpIndSet, &nInds, &inds );
+                          tmpIndSet = EulerDeform_CreateStaticSet(sys, d_i);
+                          IndexSet_GetMembers( tmpIndSet, &nInds, &inds );
 
-			/* Copy back coords. */
-			for( ind_i = 0; ind_i < nInds; ind_i++ )
-				memcpy( sys->mesh->verts[inds[ind_i]], sys->sideCoords[ind_i], nDims * sizeof(double) );
-                        FreeObject( tmpIndSet );
-			FreeArray( sys->sideCoords );
+                          /* Copy back coords. */
+                          for( ind_i = 0; ind_i < nInds; ind_i++ )
+                            sys->mesh->verts[inds[ind_i]][d_i] = sys->sideCoords[d_i][ind_i];
+
+                          FreeObject( tmpIndSet );
+                          FreeArray( sys->sideCoords[d_i] );
+
+                        }
+
+                        FreeArray( sys->sideCoords );
 		}
 
 		/*
