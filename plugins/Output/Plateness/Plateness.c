@@ -169,8 +169,8 @@ void Underworld_Plateness_Output( UnderworldContext* context ) {
 	
 	totalIntegral = Plateness_IntegratePlane( self->reducedStrainRateFieldInvariantRoot, J_AXIS, max[ J_AXIS ], value_weight_Matrix); //, minValue, maxValue );
 	
-	MPI_Allreduce( &value_weight_Matrix[0], &value_weight_Matrix_Global[0], 100, MPI_DOUBLE, MPI_SUM, context->communicator );
-	MPI_Allreduce( &value_weight_Matrix[1], &value_weight_Matrix_Global[1], 100, MPI_DOUBLE, MPI_SUM, context->communicator );
+	MPI_Allreduce( value_weight_Matrix[0], value_weight_Matrix_Global[0], 100, MPI_DOUBLE, MPI_SUM, context->communicator );
+	MPI_Allreduce( value_weight_Matrix[1], value_weight_Matrix_Global[1], 100, MPI_DOUBLE, MPI_SUM, context->communicator );
 	
 	integralSoFar = 0.;
 	weightSoFar   = 0.;
