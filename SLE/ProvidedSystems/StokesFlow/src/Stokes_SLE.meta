@@ -85,7 +85,24 @@
 	</struct>
 </list>
 
-<!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
-
+<param name="Example">
+<![CDATA[
+	<struct name="stokesEqn">
+			<param name="Type">Stokes_SLE</param>
+			<param name="SLE_Solver">uzawa</param>
+			<param name="Context">context</param>
+			<param name="StressTensorMatrix">k_matrix</param>
+			<param name="GradientMatrix">g_matrix</param>
+			<param name="DivergenceMatrix"></param>
+			<param name="CompressibilityMatrix"></param>
+			<param name="VelocityVector">solutionVelocity</param>
+			<param name="PressureVector">solutionPressure</param>
+			<param name="ForceVector">mom_force</param>
+			<param name="ContinuityForceVector">cont_force</param>
+			<param name="killNonConvergent">false</param>
+			<param name="nonLinearMaxIterations">nonLinearMaxIterations</param>
+			<param name="nonLinearTolerance">nonLinearTolerance</param>
+			<param name="makeConvergenceFile">false</param>
+		</struct>
+]]>
 </StGermainData>
