@@ -224,7 +224,7 @@ void _FileParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm ) 
 	int                  openResult;
 	MPI_Offset           bytesCount;
 	SizeT                particleSize = swarm->particleExtensionMgr->finalSize;
-	div_t                division;
+	ldiv_t                division;
 #endif
 
 	Journal_DPrintf( self->debug, "In %s(): for ParticleLayout \"%s\", of type %s\n",
@@ -285,8 +285,8 @@ void _FileParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm ) 
 	Journal_DPrintf( self->debug, "...calculated bytes total of %u.\n", bytesCount );
 	
 	/* Divide by particle size to get number of particles */
-	division = div( bytesCount, particleSize );
-	self->totalInitialParticles = division.quot;
+	division = ldiv( bytesCount, (long) particleSize );
+	self->totalInitialParticles = (unsigned int) division.quot;
 	
 	Journal_DPrintf( self->debug, "given bytes total %u / particle size %u ->\n"
 		"\ttotalInitialParticles = %u.\n", bytesCount, (unsigned int)particleSize,
