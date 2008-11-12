@@ -2,6 +2,7 @@
 syntax: glob
 
 *~
+*.pyc
 .scon*
 config.*
 build
