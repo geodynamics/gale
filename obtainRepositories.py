@@ -31,6 +31,7 @@ except OSError, e:
 # Download the dependancies...
 u = ui.ui()
 for dep in deps:
+	os.chdir(cwd)
 	try:
 		print dep[1], '...'
 		hg.clone( u, dep[0], dep[1] );
