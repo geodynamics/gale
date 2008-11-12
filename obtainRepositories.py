@@ -5,6 +5,11 @@ import urllib2
 import ConfigParser
 import os, errno
 
+# hacky way to find out what the name of the branch is
+branch = os.popen('hg branch').readlines()
+branch = branch[0].replace("\n","")
+cwd = os.getcwd()
+
 deps = [ \
 	['https://csd.vpac.org/hg/hgforest', '.hg/forest' ], \
 	['https://csd.vpac.org/hg/SConfigure', 'config' ], \
@@ -41,6 +46,15 @@ for dep in deps:
 			print 'Creation failed - ', e, ' and does not seem to be a valid repository'
 	except urllib2.URLError, e:
 		print 'Download failed - ', e
+
+	# and heres some more hackyness to get hg to switch branches
+        # I couldn't find any functionality to do this in the python bindings.
+        # JS - 12/11/2008
+        os.chdir(dep[1])
+        try:
+                os.system("hg up "+branch)
+        except:
+                print "fail"
 
 # Tell this root repository that its has forest
 c=ConfigParser.ConfigParser()
