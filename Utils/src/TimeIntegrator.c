@@ -460,7 +460,7 @@ void _TimeIntegrator_ExecuteRK4Simultaneous( void* timeIntegrator, void* data ) 
 	TimeIntegrator_Setup( self );
 	for ( integratee_I = 0 ; integratee_I < integrateeCount ; integratee_I++ ) {
 		integratee = TimeIntegrator_GetByIndex( self, integratee_I );
-		Journal_RPrintf(self->info,"\t2nd order (simultaneous): %s\n", integratee->name);
+		Journal_RPrintf(self->info,"\t4nd order (simultaneous): %s\n", integratee->name);
 
 		/* Store Original Position Variable */
 		originalVariableList[ integratee_I ]  = Variable_NewFromOld( integratee->variable, "Original", True );
