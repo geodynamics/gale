@@ -59,14 +59,16 @@ ExtensionInfo_Index Underworld_MeshAdvectionCorrection_ContextExtHandle;
 typedef struct {
 	/* Save the "old" execute function pointer (which we replace) */ 
 	Stg_Component_ExecuteFunction* energySolverExecute;
+	void (*_findArtificalVelocity)(void* feVariable, double* artVelocity, void* data);
+	Axis extAxis;
 } Underworld_MeshAdvectionCorrection_ContextExt;
 
 
-void MeshAdvectionCorrection_FindArtificalVelocity( void* feVariable, double* artVelocity, void* data ) {
+void MeshAdVectionCorrection_SingleAxisExtension( void* feVariable, double* artVelocity, void* data ) {
 	/* This function assumes the two plane walls in a single axis only are moving. */
 	FeVariable*                self          = (FeVariable*)  feVariable;
 	Mesh*                      mesh          = (Mesh*)        self->feMesh;
-	int                        planeAxis     = (int)data; /* recast data */
+	int                        planeAxis     = *(int*)data; /* recast data */
 	Grid*                      vertGrid;
 
 	double*                    valueMinSideWallLocal;
@@ -242,35 +244,38 @@ void MeshAdvectionCorrection_AddCorrection( FeVariable* feVariable, double* artV
 
 void MeshAdvectionCorrection( void* sle, void* data ) {
 	UnderworldContext*                                      context                 = (UnderworldContext*) data;
-	Underworld_MeshAdvectionCorrection_ContextExt*          contextExt;
+	Underworld_MeshAdvectionCorrection_ContextExt*          plugin;
 	FeVariable*                                             feVariable           = context->velocityField;
 	double*                                                 artVelocity;
 	int lNodeCount;
 	
-	
-	lNodeCount = FeMesh_GetNodeDomainSize( feVariable->feMesh );
+	lNodeCount = FeMesh_GetNodeLocalSize( feVariable->feMesh );
 
 	artVelocity = Memory_Alloc_Array( double, 
 			lNodeCount * feVariable->fieldComponentCount, 
 			"artificial nodal velocities" );
 
-	contextExt = ExtensionManager_Get( 
+	plugin = ExtensionManager_Get( 
 		context->extensionMgr, 
 		context, 
 		Underworld_MeshAdvectionCorrection_ContextExtHandle );
 
-	
 	/* Fine articfical nodal velocities */
-	MeshAdvectionCorrection_FindArtificalVelocity( feVariable, artVelocity, 0 );
+	/* IF plugin->extAxis is valid then */
+	plugin->_findArtificalVelocity( feVariable, artVelocity, (void*)&plugin->extAxis );
+	/* ELSE
+	 * 	yet to be implemented */
 
-	/* Correct velocity accordingly */
+	/* Correct velocity and re-sync shadow space */
 	MeshAdvectionCorrection_AddCorrection( feVariable, artVelocity, MINUS );
+	FeVariable_SyncShadowValues( feVariable );
 
 	/* Solve Energy equation */
-	contextExt->energySolverExecute( sle, context );
+	plugin->energySolverExecute( sle, context );
 
-	/* Reverse correction */
+	/* Reverse correction and re-sync */
 	MeshAdvectionCorrection_AddCorrection( feVariable, artVelocity, ADD );
+	FeVariable_SyncShadowValues( feVariable );
 
 	Memory_Free( artVelocity );
 }
@@ -278,7 +283,8 @@ void MeshAdvectionCorrection( void* sle, void* data ) {
 void _Underworld_MeshAdvectionCorrection_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext*                                      context = 
 	Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
-	Underworld_MeshAdvectionCorrection_ContextExt*       contextExt;
+	Underworld_MeshAdvectionCorrection_ContextExt*       plugin;
+	char* extAxisName = NULL;
 	
 	Journal_DFirewall( 
 		(Bool)context, 
@@ -294,13 +300,29 @@ void _Underworld_MeshAdvectionCorrection_Construct( void* component, Stg_Compone
 		context->extensionMgr, 
 		Underworld_MeshAdvectionCorrection_Type, 
 		sizeof( Underworld_MeshAdvectionCorrection_ContextExt ) );
-	contextExt = ExtensionManager_Get( 
+	plugin = ExtensionManager_Get( 
 		context->extensionMgr, 
 		context, 
 		Underworld_MeshAdvectionCorrection_ContextExtHandle );
+
+	extAxisName = Stg_ComponentFactory_GetRootDictString( cf, "MeshAdvectionCorrect_wallExtensionAxis", "x" );
+	switch ( extAxisName[0] ) {
+		case 'x': case 'X': case 'i': case 'I': case '0':
+			plugin->extAxis = I_AXIS; break;
+		case 'y': case 'Y': case 'j': case 'J': case '1':
+			plugin->extAxis = J_AXIS; break;
+		case 'z': case 'Z': case 'k': case 'K': case '2':
+			plugin->extAxis = K_AXIS; break;
+		default:
+			Journal_Firewall( False, Journal_Register( Error_Type, Underworld_MeshAdvectionCorrection_Type ),
+				"Error: MeshAdvectionCorrect doesn't know how to estimate wallVC\n"
+				"For example add:\n"
+				"<param name=\"MeshAdvectionCorrect_wallExtensionAxis\">x</param>\n");
+	}
 	
+	plugin->_findArtificalVelocity = MeshAdVectionCorrection_SingleAxisExtension;
 	/* Replace the energy SLE's execute with this one. Save the old value for use later. */
-	contextExt->energySolverExecute = context->energySLE->_execute;
+	plugin->energySolverExecute = context->energySLE->_execute;
 	context->energySLE->_execute = MeshAdvectionCorrection;
 }
 
