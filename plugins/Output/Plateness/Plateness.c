@@ -219,7 +219,7 @@ void Underworld_Plateness_SymmetricTensor_LowerDimension_InvariantRoot_3d( void*
 
 	temp[0] = operand0[0];
 	temp[1] = operand0[1];
-	temp[2] = operand0[6];
+	temp[2] = operand0[3];
 	
 	temp2 = SymmetricTensor_2ndInvariant( temp, 2 );
 	
