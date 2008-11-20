@@ -10,10 +10,7 @@
 <param name="Copyright">Copyright (c) 2005, Monash Cluster Computing</param>
 <param name="License">http://www.opensource.org/licenses/bsd-license.php</param>
 <param name="Parent">lucWindowInteraction</param>
-<param name="Description">...</param>
-
-<!--Now the interesting stuff-->
-
+<param name="Description">Currently unsupported.<p> Allows the user to interactively move the light in a viewport. This can only run under interactive mode. No dependencies or parameters are required for this functionality.</p></param>
 
 <list name="Params">
 
@@ -22,6 +19,5 @@
 <list name="Dependencies">
 
 </list>
-<!-- Add an exmaple XML if possible -->
 <param name="Example">...</param>
 

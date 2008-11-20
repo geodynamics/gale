@@ -23,9 +23,11 @@
 
 <!-- Add an exmaple XML if possible -->
 <param name="Example">
+<![CDATA[
 		<struct name="renderingEngine">
 			<param name="Type">lucRenderingEngineGL</param>
 		</struct>
+	]]>
 </param>
 
 </StGermainData>
