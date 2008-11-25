@@ -9,6 +9,7 @@ class BlasLapack(SConfig.Package):
                           ['flapack', 'fblas'],
                           ['flapack', 'fblas', 'gfortran'],
                           ['clapack', 'cblas'],
+                          ['f2clapack', 'f2cblas'],
                           ['mkl_lapack', 'mkl']]
         self.shared_libraries = ['lapack', 'blas']
         self.extra_libraries = ['gfortran']
