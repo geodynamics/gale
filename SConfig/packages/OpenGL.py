@@ -9,7 +9,7 @@ class OpenGL(SConfig.Package):
         self.headers = [['gl.h', 'glu.h']]
         self.libraries = [['GL', 'GLU']]
         self.frameworks = ['OpenGL']
-        self.candidate_checks += [self.check_glx]
+        self.candidate_checks += [self.check_glx, self.check_mac]
 
         self.require_glx = kw.get('require_glx', False)
         self.x11 = self.dependency(SConfig.packages.X11, required=self.require_glx)
@@ -28,3 +28,7 @@ class OpenGL(SConfig.Package):
         if self.require_glx and not paths:
             return False
         return True
+
+    def check_mac(self, cfg):
+        if self.platform.system == "Darwin":
+            self.env.AppendUnique(SHLINKFLAGS=["-dylib_file /System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib"])
