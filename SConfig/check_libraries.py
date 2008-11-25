@@ -283,10 +283,12 @@ int main( int argc, char* argv[] ) {
       printf( "Disconnected.\\n" );
    fina();
 
+/*
    if( lib1 )
       dlclose( lib1 );
    if( lib2 )
       dlclose( lib2 );
+*/
 
    return EXIT_SUCCESS;
 }

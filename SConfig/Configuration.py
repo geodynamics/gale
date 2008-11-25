@@ -20,6 +20,7 @@ class Configuration:
 
         # Preprocessor definitions.
         self.cpp_defines = []
+        self.link_flags = []
 
         # This list provides a way of modifying the printed output of
         # a configuration without needing to replace the print method.
@@ -61,6 +62,11 @@ class Configuration:
         if self.cpp_defines:
             self.inst.pkg.backup_variable(scons_env, 'CPPDEFINES', old_state)
             scons_env.AppendUnique(CPPDEFINES=self.cpp_defines)
+
+        # Add any link flags.
+        if self.link_flags:
+            self.inst.pkg.backup_variable(scons_env, 'LINKFLAGS', old_state)
+            scons_env.AppendUnique(LINKFLAGS=self.link_flags)
 
     def enable_dependencies(self, scons_env, old_state={}, lib_exclude=[]):
         """Enables all available dependencies."""

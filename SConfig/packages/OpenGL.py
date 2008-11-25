@@ -31,4 +31,5 @@ class OpenGL(SConfig.Package):
 
     def check_mac(self, cfg):
         if self.platform.system == "Darwin":
-            self.env.AppendUnique(SHLINKFLAGS=["-dylib_file /System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib"])
+            cfg.link_flags += ["-dylib_file", "/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib"]
+        return True
