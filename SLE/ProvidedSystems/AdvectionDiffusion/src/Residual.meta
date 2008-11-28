@@ -48,6 +48,7 @@
 </list>
 <!-- Add an exmaple XML if possible -->
 <param name="Example">
+<![CDATA[
 	<struct name="defaultResidualForceTerm">
 		<param name="Type">AdvDiffResidualForceTerm</param>
 		<param name="Swarm">gaussSwarm</param>
@@ -57,6 +58,7 @@
 		<param name="defaultDiffusivity">defaultDiffusivity</param>
 		<param name="UpwindXiFunction">DoublyAsymptoticAssumption</param> 
 	</struct>
+]]>
 </param>
 
 </StGermainData>
