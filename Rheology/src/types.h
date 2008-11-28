@@ -70,6 +70,7 @@
 	typedef struct Byerlee                          Byerlee;
 	
 	typedef struct DruckerPrager                    DruckerPrager;
+	typedef struct Pouliquen_etal                   Pouliquen_etal;
 	typedef struct FaultingMoresiMuhlhaus2006       FaultingMoresiMuhlhaus2006;
 	typedef struct MohrCoulomb MohrCoulomb;
 	
