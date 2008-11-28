@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<include>./Column_Base.xml </include>
+	<include>./Column_6LayersShape.xml </include>
+	<include>./BoundaryConditions/Dyn_Column_VelocityBCs.xml </include>
+
+	<param name="eta_init">  1.0e3 </param>
+	<param name="eta_final"> 1.0 </param>
+	<param name="eta_background"> 1.0e-2 </param>
+
+	<param name="maxTimeSteps"> 400 </param>
+	<param name="elementResI">  96  </param>
+	<param name="elementResJ">  64  </param>
+	<param name="elementResK"> 1    </param>
+   	<param name="minColumnX">  16.34 </param>
+   	<param name="maxColumnX">  20.0  </param>
+   	<param name="minColumnY">  0.0  </param>
+   	<param name="maxColumnY">  11.0 </param>
+   	<param name="minX"> 0.0  </param>
+	<param name="minY"> 0.0  </param>
+	<param name="minZ"> 0.0  </param>
+	<param name="maxX"> 20.0  </param>
+	<param name="maxY"> 12.0 </param>
+	<param name="maxZ"> 1    </param>
+
+</StGermainData>
