@@ -233,9 +233,32 @@ void _lucScalarFieldOnMeshCrossSection_Build( void* drawingObject, void* data ) 
 	lucScalarFieldOnMeshCrossSection*     self    = (lucScalarFieldOnMeshCrossSection*)drawingObject;
 	AbstractContext*                context = Stg_CheckType( data, AbstractContext );
 	Stg_ComponentFactory*           cf      = context->CF;
+	FeVariable*                     feVariable;
+	Mesh*                           mesh;
+	Stream*                         errorStream = Journal_Register( Error_Type, self->type );
+	
 
 	/* HACK - Get pointer to FieldVariable in build phase just to let FieldVariables be created in plugins */
-	self->fieldVariable = (FieldVariable*) Stg_ComponentFactory_ConstructByName( cf, self->fieldVariableName, FeVariable, True, 0 /* dummy */ );
+	feVariable =  Stg_ComponentFactory_ConstructByName( cf, self->fieldVariableName, FeVariable, True, 0 /* dummy */ );
+	self->fieldVariable = (FieldVariable*) feVariable;
+
+	Journal_Firewall( self->fieldVariable->fieldComponentCount == 1, errorStream,
+		"Error - in %s(): provided FieldVariable \"%s\" has %u components - but %s Component "
+		"can only visualise FieldVariables with 1 component. Did you mean to visualise the "
+		"magnitude of the given field?\n", __func__, self->fieldVariable->name,
+		self->fieldVariable->fieldComponentCount, self->type );
+
+	Stg_Component_Build( feVariable, data, False );
+	mesh    = (Mesh*) feVariable->feMesh;
+
+	/* Store the Vertex Grid */
+	self->vertexGridHandle = ExtensionManager_GetHandle( mesh->info, "vertexGrid" );
+	if ( self->vertexGridHandle == (ExtensionInfo_Index)-1 )
+
+	Journal_Firewall( self->vertexGridHandle != (ExtensionInfo_Index)-1, errorStream,
+		"Error - in %s(): provided FieldVariable \"%s\" doesn't have a Vertex Grid.\n"
+		"Try visualising with lucScalarField instead.\n", __func__, self->fieldVariable->name );
+		
 }
 
 void _lucScalarFieldOnMeshCrossSection_Initialise( void* drawingObject, void* data ) {}
@@ -265,17 +288,6 @@ void _lucScalarFieldOnMeshCrossSection_BuildDisplayList( void* drawingObject, vo
 	lucScalarFieldOnMeshCrossSection_DrawCrossSection( self, self->crossSection_I, self->crossSectionAxis );
 }
 
-#define FUDGE_FACTOR 0.0001
-
-Bool lucScalarFieldOnMeshCrossSection_IsInList(int nb, int *list, int nbList){
-	int i;
-	for (i=0; i<nbList; i++){
-		if(nb == list[i])
-			return True;
-	}
-	return False;
-}
-
 void lucScalarFieldOnMeshCrossSection_DrawCrossSection( void* drawingObject, Node_LocalIndex crossSection_I, Axis axis ) {
 	lucScalarFieldOnMeshCrossSection*       self            = (lucScalarFieldOnMeshCrossSection*)drawingObject;
 	FeVariable*          fieldVariable = (FeVariable*) self->fieldVariable;
@@ -298,7 +310,7 @@ void lucScalarFieldOnMeshCrossSection_DrawCrossSection( void* drawingObject, Nod
 	aAxis = ( axis == I_AXIS ? J_AXIS : I_AXIS );
 	bAxis = ( axis == K_AXIS ? J_AXIS : K_AXIS );
 	
-	vertGrid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+	vertGrid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, self->vertexGridHandle );
 	
 	Journal_DPrintfL( self->debugStream, 2, 
 			"%s called on field %s, with axis of cross section as %d, crossSection_I as %d\n",

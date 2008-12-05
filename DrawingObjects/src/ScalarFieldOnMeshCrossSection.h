@@ -63,6 +63,7 @@
 		Axis                                               crossSectionAxis;       \
 		XYZ                                                minCropValues;          \
 		XYZ                                                maxCropValues;          \
+		ExtensionInfo_Index                                vertexGridHandle;       \
 
 	struct lucScalarFieldOnMeshCrossSection { __lucScalarFieldOnMeshCrossSection };
 	

@@ -217,7 +217,7 @@ void _lucScalarFieldOnMesh_BuildDisplayList( void* drawingObject, void* _context
 	Mesh*                  mesh          = (Mesh*) fieldVariable->feMesh;
 	Grid*                  vertGrid;
 
-	vertGrid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+	vertGrid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, self->vertexGridHandle );
 	
 	if (fieldVariable->dim == 2) {
 		lucScalarFieldOnMeshCrossSection_DrawCrossSection( self, 0, K_AXIS );
