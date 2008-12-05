@@ -50,7 +50,6 @@
 
 #include <Carbon/Carbon.h>
 #include <AGL/agl.h>
-#include <AGL/agl.h>
 #include <OpenGL/OpenGL.h>
 
 #include <glucifer/Base/Base.h>

@@ -286,7 +286,9 @@ void lucScalarFieldOnMeshCrossSection_DrawCrossSection( void* drawingObject, Nod
 	IJK                  node_ijk;
 	float                normal[3];
 	Dimension_Index      dim_I;
-	Node_LocalIndex      node_lI;
+	Node_GlobalIndex     node_gI;
+	Node_DomainIndex     node_dI_1, node_dI_2;
+	Node_DomainIndex     nDomainNodes;
 	unsigned	     nIncVerts, *incVerts;
 	IArray*              inc;
 
@@ -308,17 +310,27 @@ void lucScalarFieldOnMeshCrossSection_DrawCrossSection( void* drawingObject, Nod
 	normal[bAxis] = 0.0;
 	glNormal3fv( normal );
 
+	nDomainNodes = Mesh_GetDomainSize( mesh, MT_VERTEX );
+
 	/* Plots cross section */
 	node_ijk[ axis ] = crossSection_I;
 	for ( node_ijk[ aAxis ] = 0 ; node_ijk[ aAxis ] < vertGrid->sizes[ aAxis ] - 1 ; node_ijk[ aAxis ]++ ) {
 		glBegin(GL_QUAD_STRIP);
 		for ( node_ijk[ bAxis ] = 0 ; node_ijk[ bAxis ] < vertGrid->sizes[ bAxis ] ; node_ijk[ bAxis ]++ ) {
-			node_lI = Grid_Project( vertGrid, node_ijk );
-			lucScalarFieldOnMeshCrossSection_PlotColouredNode( self, node_lI );
+			node_gI = Grid_Project( vertGrid, node_ijk );
+			/* Get Local Node Index */
+			if( !Mesh_GlobalToDomain( mesh, MT_VERTEX, node_gI, &node_dI_1 ) || node_dI_1 >= nDomainNodes ){
+				continue;
+			}
 			
 			node_ijk[ aAxis ]++;
-			node_lI = Grid_Project( vertGrid, node_ijk );
-			lucScalarFieldOnMeshCrossSection_PlotColouredNode( self, node_lI );
+			node_gI = Grid_Project( vertGrid, node_ijk );
+			/* Get Local Node Index */
+			if( !Mesh_GlobalToDomain( mesh, MT_VERTEX, node_gI, &node_dI_2 ) || node_dI_2 >= nDomainNodes ){
+				continue;
+			}
+			lucScalarFieldOnMeshCrossSection_PlotColouredNode( self, node_dI_1 );
+			lucScalarFieldOnMeshCrossSection_PlotColouredNode( self, node_dI_2 );
 			node_ijk[ aAxis ]--;
 
 			/* TODO Cropping */
