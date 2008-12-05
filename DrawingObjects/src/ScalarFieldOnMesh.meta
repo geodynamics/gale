@@ -15,9 +15,6 @@
 <param name="Summary">...</param>
 <param name="Description">Tiles the side walls of the model with colours derived from the value of a scalar field at the vertex of each tile.</param>
 
-<!--Now the interesting stuff-->
-
-
 <list name="Params">
 	<struct>
 		<param name="Name">cullFace</param>
@@ -25,19 +22,19 @@
 		<param name="Default">True</param>
 		<param name="Description">If this is False, all walls of the box will be drawn and you will not be able to see insdie the box. If this is true, only the far walls of the box will be drawn, allowing other things in the box to be visualised. In 2D this feature is ignored.</param>
 	</struct>
-
 </list>
 
 <list name="Dependencies">
 
 </list>
 
-<!-- Add an exmaple XML if possible -->
 <param name="Example">
+<![CDATA[
 		<struct name="temperatureMap">
 			<param name="Type">lucScalarFieldOnMesh</param>
 			<param name="FieldVariable">TemperatureField</param>
 			<param name="ColourMap">temperatureColourMap</param>
 		</struct>
+]]>
 </param>
 
