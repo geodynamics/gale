@@ -8,7 +8,7 @@
 <param name="Location">./StgFEM/Discretisation/src/</param>
 <param name="Project Web">http://www.stgermainproject.org/StgFEM.html</param>
 <param name="Copyright">Copyright (C) 2004-2005 VPAC.</param>
-<param name="License">https://csd.vpac.org/twiki/bin/view/Stgermain/SoftwareLicense</param>
+<param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
 <param name="Parent">MeshGenerator</param>
 <param name="Description">Generates a mesh with nodes situated at points internal to the element.</param>
 

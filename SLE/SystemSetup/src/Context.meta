@@ -8,7 +8,7 @@
 <param name="Location">./StgFEM/SLE/SystemSetup/src/</param>
 <param name="Project Web">http://www.stgermainproject.org/StgFEM.html</param>
 <param name="Copyright">Copyright (C) 2004-2005 VPAC.</param>
-<param name="License">http://www.opensource.org/licenses/bsd-license.php</param>
+<param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
 <param name="Parent">DomainContext</param>
 <param name="Description">Builds on the DomainContext to allow a FEM problem to be constructed and solved</param>
 

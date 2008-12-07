@@ -9,7 +9,7 @@
 <param name="Location">./StgFEM/SLE/ProvidedSystems/AdvectionDiffusion/src/</param>
 <param name="Project Web">http://www.stgermainproject.org/StgFEM.html</param>
 <param name="Copyright">Copyright (C) 2004-2005 VPAC.</param>
-<param name="License">https://csd.vpac.org/twiki/bin/view/Stgermain/SoftwareLicense</param>
+<param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
 <param name="Parent">SystemLinearEquations</param>
 <param name="Reference">Brooks, A. and T. Hughes, Streamline upwind Petrov-Galerkin formulations for convection dominated flows with paricular emphasis on the incompressible Navier-Stokes equation, Comput. Methods Apll. Mech. Eng., Vol 32, 1982, pp. 199-259</param>
 <param name="Summary">...</param>
