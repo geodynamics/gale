@@ -7,7 +7,7 @@
 <param name="Project">PICellerator</param>
 <param name="Project Web">http://www.stgermainproject.org/PICellerator.html</param>
 <param name="Copyright">Copyright (C) 2005 VPAC &amp; Monash Cluster Computing.</param>
-<param name="License">https://csd.vpac.org/twiki/bin/view/Stgermain/SoftwareLicensehttp://www.opensource.org/licenses/bsd-license.php</param>
+<param name="License">http://www.opensource.org/licenses/bsd-license.php</param>
 <param name="Parent">IPMapper</param>
 <param name="Description">...</param>
 <param name="Location">./PICellerator/MaterialPoints/src</param>

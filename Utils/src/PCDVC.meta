@@ -9,7 +9,7 @@
 <param name="Location">./PICellerator/Utils/src/</param>
 <param name="Project Web">http://www.stgermainproject.org/PICellerator.html</param>
 <param name="Copyright">Copyright (C) 2005 VPAC and Monash Cluster Computing.</param>
-<param name="License">https://csd.vpac.org/twiki/bin/view/Stgermain/SoftwareLicense http://www.opensource.org/licenses/bsd-license.php</param>
+<param name="License">http://www.opensource.org/licenses/bsd-license.php</param>
 <param name="Parent">DVCWeights</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
