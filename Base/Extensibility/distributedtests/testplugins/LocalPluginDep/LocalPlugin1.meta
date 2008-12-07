@@ -12,7 +12,7 @@
 <param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
 <param name="License">The Gnu Lesser General Public License http://www.gnu.org/licenses/lgpl.html</param>
 <param name="Parent">Stg_Component</param>
-<param name="Reference">None</param>
+<param name="Reference"></param>
 <param name="Summary">LocalPlugin1 (test)</param>
 <param name="Description">LocalPlugin1 (in the unit tests)</param>
 

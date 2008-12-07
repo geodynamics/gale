@@ -139,6 +139,13 @@ int main( int argc, char* argv[] ) {
 							Stg_ComponentRegisterElement_GetType( cre ),
 							reference );
 					}
+					else {
+						Journal_Printf( 
+							stream, 
+							"\t'%s': %s\n", 
+							Stg_ComponentRegisterElement_GetType( cre ),
+							"(None provided)" );
+					}
 				}
 
 				Stg_Class_Delete( i );

@@ -11,7 +11,7 @@
 <param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
 <param name="License">The Gnu Lesser General Public License http://www.gnu.org/licenses/lgpl.html</param>
 <param name="Parent">Stg_Component</param>
-<param name="Reference">None</param>
+<param name="Reference"></param>
 <param name="Summary">AbstractContext, although nowadays very far from abstract, is the base/underlying Context implementation. A Context is the home or main of a StGermain application. </param>
 <param name="Description">
 

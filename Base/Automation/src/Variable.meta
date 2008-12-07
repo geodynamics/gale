@@ -11,7 +11,7 @@
 <param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
 <param name="License">The Gnu Lesser General Public License http://www.gnu.org/licenses/lgpl.html</param>
 <param name="Parent">Stg_Component</param>
-<param name="Reference">None</param>
+<param name="Reference"></param>
 <param name="Summary">Associates a textual label with a piece of data in memory, which can then be referred to via the Variable Register.</param>
 <param name="Description"><![CDATA[
 <p>Variable makes an association between a defined, textual name and a chunk of data in memory.  This data could take the form of a basic type (such as an int or double), or an element of an array, or an entire array or struct.  Variable may also index a regular series of non-contiguous locations in memory.  This capability to define arbitrary data within a datastructure makes it very powerful.</p>

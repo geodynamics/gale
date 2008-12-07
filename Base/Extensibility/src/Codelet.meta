@@ -11,7 +11,7 @@
 <param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
 <param name="License">The Gnu Lesser General Public License http://www.gnu.org/licenses/lgpl.html</param>
 <param name="Parent">Stg_Component</param>
-<param name="Reference">None</param>
+<param name="Reference"></param>
 <param name="Summary">Codelets are components that are used to encapsulate the concerns of a plugin into one object.</param>
 <param name="Description">
 <p>Codelets are essentially nothing more than Components that are used for encapsulating the concerns/features of a plugin into one object. The plugin registration process expects Codelet to be submitted for addition to the component factory. Codelets are assumed to be instantiated only one (i.e. are singletons) by the system.</p>
