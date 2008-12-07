@@ -238,7 +238,8 @@ def metaXsdDict2stgDictionaryCode( xsdDict ):
 	except KeyError:
 		pass
 	try:
-		s += '\tDictionary_Add( implements, "equation", Dictionary_Entry_Value_FromString( "' + safecval( xsdDict["implements"]["equation"] ) + '" ));\n'
+		# BIG ASSUMPTION: equation is in latex
+		s += '\tDictionary_Add( implements, "equation", Dictionary_Entry_Value_FromString( "' + safecvalFromLatex( xsdDict["implements"]["equation"] ) + '" ));\n'
 	except KeyError:
 		pass
 	s += '\tDictionary_Add( meta, "implements", Dictionary_Entry_Value_FromStruct( implements ) );\n'
@@ -305,5 +306,10 @@ def safecvar( s ):
 	#		r += a
 	#return r
 	return s.replace( " ", "" ).replace( "-", "" ).replace( "\t", "" ).replace( "\n", "" ).replace( "\"", "" ).replace( "&", "" ).replace( "[", "" ).replace( "]", "" ).replace( "<", "" ).replace( ">", "" ).encode( 'ascii', 'ignore' )
+
+# Convert the python unicode string 's' that is of latex into an ascii string that is safe to put in a C string as a value
+def safecvalFromLatex( s ):
+	return safecval( s ).replace( "\\", "\\\\" )
+
 
 
