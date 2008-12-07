@@ -9,7 +9,7 @@
 <param name="Location">./StgDomain/Swarm/src</param>
 <param name="Project Web">http://www.stgermainproject.org/StgDomain.html</param>
 <param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
-<param name="License">https://csd.vpac.org/twiki/bin/view/Stgermain/SoftwareLicense</param>
+<param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
 <param name="Parent">GlobalParticleLayout</param>
 <param name="Reference">...</param>
 <param name="Description">This is a particle layout that simply combines many particle layouts together into one. When one particle layout finishes initialises all its particles, then the next one begins.</param>
