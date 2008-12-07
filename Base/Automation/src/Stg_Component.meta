@@ -10,7 +10,7 @@
   <param name="Location">./StGermain/Base/Automation/src/</param>
   <param name="Description">An abstract class representing the parent of all Components</param>
   <param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
-  <param name="License">The Gnu Lesser General Public License http://www.gnu.org/licenses/lgpl.html</param>
+  <param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
   <param name="Parent">Stg_Class</param>
 
   <param name="Description">

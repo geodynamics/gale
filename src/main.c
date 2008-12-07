@@ -132,20 +132,12 @@ int main( int argc, char* argv[] ) {
 					cre = Stg_ComponentRegisterIterator_Next( i ) )
 				{
 					char* reference = Stg_Meta_GetReference( Stg_ComponentRegisterElement_GetMetadata( cre ) );
-					if( reference && reference[0] != 0 ) {
-						Journal_Printf( 
-							stream, 
-							"\t'%s': %s\n", 
-							Stg_ComponentRegisterElement_GetType( cre ),
-							reference );
-					}
-					else {
-						Journal_Printf( 
-							stream, 
-							"\t'%s': %s\n", 
-							Stg_ComponentRegisterElement_GetType( cre ),
-							"(None provided)" );
-					}
+					Journal_Printf( 
+						stream, 
+						"\t'%s': %s\n", 
+						Stg_ComponentRegisterElement_GetType( cre ),
+						( reference && reference[0] ) ? reference : "(None provided)" );
+						/* i.e. if not null and not an empty string print the value else default */
 				}
 
 				Stg_Class_Delete( i );
@@ -162,13 +154,12 @@ int main( int argc, char* argv[] ) {
 					cre = Stg_ComponentRegisterIterator_Next( i ) )
 				{
 					char* equation = Stg_Meta_GetEquation( Stg_ComponentRegisterElement_GetMetadata( cre ) );
-					if( equation && equation[0] != 0 ) {
-						Journal_Printf( 
-							stream, 
-							"\t'%s': %s\n", 
-							Stg_ComponentRegisterElement_GetType( cre ),
-							equation );
-					}
+					Journal_Printf( 
+						stream, 
+						"\t'%s': %s\n", 
+						Stg_ComponentRegisterElement_GetType( cre ),
+						( equation && equation[0] ) ? equation : "(None provided)" );
+						/* i.e. if not null and not an empty string print the value else default */
 				}
 
 				Stg_Class_Delete( i );
@@ -185,13 +176,12 @@ int main( int argc, char* argv[] ) {
 					cre = Stg_ComponentRegisterIterator_Next( i ) )
 				{
 					char* rights = Stg_Meta_GetRights( Stg_ComponentRegisterElement_GetMetadata( cre ) );
-					if( rights && rights[0] != 0 ) {
-						Journal_Printf( 
-							stream, 
-							"\t'%s': %s\n", 
-							Stg_ComponentRegisterElement_GetType( cre ),
-							rights );
-					}
+					Journal_Printf( 
+						stream, 
+						"\t'%s': %s\n", 
+						Stg_ComponentRegisterElement_GetType( cre ),
+						( rights && rights[0] ) ? rights : "(None provided)" );
+						/* i.e. if not null and not an empty string print the value else default */
 				}
 
 				Stg_Class_Delete( i );
