@@ -50,7 +50,12 @@
 	typedef struct {
 		__Codelet
 		OperatorFeVariable* reducedStrainRateFieldInvariantRoot;
+		unsigned    totalBins;
 		double      plateness;
+		double      minValue;
+		double      maxValue;
+		double**    value_weight_Matrix;
+		Bool        constant;
 	} Underworld_Plateness;
 
 	Index Underworld_Plateness_Register( PluginsManager* pluginsManager );
@@ -62,11 +67,11 @@
 	double Plateness_IntegrateLayer_AxisIndependent( 
 		void* feVariable, void* _swarm,
 		Axis layerAxis, Index layerIndex, Dimension_Index dim, 
-		Axis axis0, Axis axis1, Axis axis2, double** value_weight_Matrix); //, double minValue, double maxValue );
-	double Plateness_IntegratePlane( void* feVariable, Axis planeAxis, double planeHeight, double** value_weight_Matrix); //, double minValue, double maxValue);
+		Axis axis0, Axis axis1, Axis axis2, void* plateness );
+	double Plateness_IntegratePlane( void* feVariable, Axis planeAxis, double planeHeight, void* plateness);
 	double Plateness_IntegrateElement_AxisIndependent( 
 			void* feVariable, void* _swarm,
 			Element_DomainIndex dElement_I, Dimension_Index dim, 
-			Axis axis0, Axis axis1, Axis axis2, double** value_weight_Matrix, double minValue, double maxValue) ;
+			Axis axis0, Axis axis1, Axis axis2, void* plateness ) ;
 
 #endif

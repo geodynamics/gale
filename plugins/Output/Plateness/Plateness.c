@@ -119,7 +119,7 @@ void Underworld_Plateness_Setup( UnderworldContext* context ) {
 
 	dim = strainRateField->dim;
 	/* setup required parameters to create new operate */
-	resultDofs       = 1 ; //( dim == 2 ? 1 : 3 );
+	resultDofs       = 1 ;
 	numberOfOperands = 1 ;
 	operandDofs      = ( dim == 2 ? 3 : 6 );
 	_carryOut        = ( dim == 2 ? Underworld_Plateness_SymmetricTensor_LowerDimension_InvariantRoot_2d : Underworld_Plateness_SymmetricTensor_LowerDimension_InvariantRoot_3d );
@@ -133,6 +133,10 @@ void Underworld_Plateness_Setup( UnderworldContext* context ) {
 
 	/* Add the variables to register so we can checkpoint & examine if necessary */
 	FieldVariable_Register_Add( fV_Register, self->reducedStrainRateFieldInvariantRoot );
+	
+	/* how many integral/area bins should be used? */
+	self->totalBins = 100;
+
 }
 
 void Underworld_Plateness_Output( UnderworldContext* context ) {
@@ -144,56 +148,68 @@ void Underworld_Plateness_Output( UnderworldContext* context ) {
 	double   weightSoFar;
 	double   weightSoFar2;
 	double   *min, *max;
-	double   **value_weight_Matrix;
 	double   **value_weight_Matrix_Global;
 	int ii;
 	int jj;
-	
+		
 	self = (Underworld_Plateness*)LiveComponentRegister_Get(
 				context->CF->LCRegister,
 				Underworld_Plateness_Type );
 
+	/* find the size of the domain */
 	min = Memory_Alloc_Array_Unnamed( double, Mesh_GetDimSize( self->reducedStrainRateFieldInvariantRoot->feMesh ) );
 	max = Memory_Alloc_Array_Unnamed( double, Mesh_GetDimSize( self->reducedStrainRateFieldInvariantRoot->feMesh ) );
 
 	Mesh_GetGlobalCoordRange( self->reducedStrainRateFieldInvariantRoot->feMesh, min, max );
 	
-	//minValue = self->reducedStrainRateFieldInvariantRoot->_getMinGlobalFieldMagnitude( self->reducedStrainRateFieldInvariantRoot );
-	//maxValue = self->reducedStrainRateFieldInvariantRoot->_getMaxGlobalFieldMagnitude( self->reducedStrainRateFieldInvariantRoot );
-
-	value_weight_Matrix        = Memory_Alloc_2DArray( double, 2, 100 , "value_weight_Matrix");
-	value_weight_Matrix_Global = Memory_Alloc_2DArray( double, 2, 100 , "value_weight_Matrix_Global");
+	/* create arrays to store the integral sum components within bins,
+	   one set of bins for the integral weights, and one for the integrand */
+	self->value_weight_Matrix  = Memory_Alloc_2DArray( double, 2, self->totalBins , "value_weight_Matrix");
+	value_weight_Matrix_Global = Memory_Alloc_2DArray( double, 2, self->totalBins , "value_weight_Matrix_Global");
 	
-	for(ii=0 ; ii<100; ii++) for(jj=0 ; jj<2; jj++)	value_weight_Matrix[jj][ii] = 0;
-	for(ii=0 ; ii<100; ii++) for(jj=0 ; jj<2; jj++)	value_weight_Matrix_Global[jj][ii] = 0;
+	/* initialize arrays to zero */
+	for(ii=0 ; ii< self->totalBins; ii++) for(jj=0 ; jj<2; jj++)	 self->value_weight_Matrix[jj][ii] = 0;
+	for(ii=0 ; ii< self->totalBins; ii++) for(jj=0 ; jj<2; jj++)	value_weight_Matrix_Global[jj][ii] = 0;
 	
-	totalIntegral = Plateness_IntegratePlane( self->reducedStrainRateFieldInvariantRoot, J_AXIS, max[ J_AXIS ], value_weight_Matrix); //, minValue, maxValue );
+	/* use modified integrate plane routine to do the work!
+	   these routines find the max and minimum value of the integrand, then split up the interal contributions
+	   such that the maximum integrand values are summed in the topmost bins, and the minimum integrand values 
+	   are summed in the lowermost bins.  the corresponding weights are also summed.
+	   this is performed across the top plane of the domain */
+	totalIntegral = Plateness_IntegratePlane( self->reducedStrainRateFieldInvariantRoot, J_AXIS, max[ J_AXIS ], self );
 	
-	MPI_Allreduce( value_weight_Matrix[0], value_weight_Matrix_Global[0], 100, MPI_DOUBLE, MPI_SUM, context->communicator );
-	MPI_Allreduce( value_weight_Matrix[1], value_weight_Matrix_Global[1], 100, MPI_DOUBLE, MPI_SUM, context->communicator );
+	/* first check to see if field is constant, in which case our method fails, but we know the required answer */
+	if( self->constant ){
+		self->plateness = 0.8;
+		StgFEM_FrequentOutput_PrintValue( context, self->plateness );
+	} else {
+		/* sum contributions from different processors into one global matrix */
+		MPI_Allreduce( self->value_weight_Matrix[0], value_weight_Matrix_Global[0], self->totalBins, MPI_DOUBLE, MPI_SUM, context->communicator );
+		MPI_Allreduce( self->value_weight_Matrix[1], value_weight_Matrix_Global[1], self->totalBins, MPI_DOUBLE, MPI_SUM, context->communicator );
+		
+		/* now sum bins, starting from the top, and stopping once bin contributions exceed 0.8*totalIntegral */
+		integralSoFar = 0.;
+		weightSoFar   = 0.;
+		for(ii = self->totalBins - 1; ii >= 0 ; ii--){
+			integralSoFar += value_weight_Matrix_Global[0][ii];
+			weightSoFar   += value_weight_Matrix_Global[1][ii];
+			if (integralSoFar > 0.8*totalIntegral) break;
+		}
 	
-	integralSoFar = 0.;
-	weightSoFar   = 0.;
-	for(ii = 99; ii >= 0 ; ii--){
-		integralSoFar += value_weight_Matrix_Global[0][ii];
-		weightSoFar   += value_weight_Matrix_Global[1][ii];
-		if (integralSoFar > 0.8*totalIntegral) break;
+		/* do sum again this time to find total area */
+		weightSoFar2   = 0.;
+		for(ii = self->totalBins - 1; ii >= 0 ; ii--){
+			weightSoFar2   += value_weight_Matrix_Global[1][ii];
+		}
+		
+		/* set plateness to be ratio of area for which 80% of the deformation occurs, to the total area */
+		self->plateness = weightSoFar/weightSoFar2;   
+		StgFEM_FrequentOutput_PrintValue( context, self->plateness );
 	}
-
-	integralSoFar = 0.;
-	weightSoFar2   = 0.;
-	for(ii = 99; ii >= 0 ; ii--){
-		integralSoFar += value_weight_Matrix_Global[0][ii];
-		weightSoFar2   += value_weight_Matrix_Global[1][ii];
-	}
-	
-	self->plateness = weightSoFar/weightSoFar2;
-	//printf("integral count, totalintegral, totalweight, plateness = %f, %f, %f, %f \n", integralSoFar, totalIntegral, weightSoFar2, self->plateness); 
-	StgFEM_FrequentOutput_PrintValue( context, self->plateness );
 	
 	FreeArray( min );
 	FreeArray( max );
-	FreeArray( value_weight_Matrix );
+	FreeArray( self->value_weight_Matrix );
 	FreeArray( value_weight_Matrix_Global );
 
 }
@@ -204,7 +220,7 @@ void Underworld_Plateness_SymmetricTensor_LowerDimension_InvariantRoot_2d( void*
 	
 	Operator_FirewallUnary( self );
 	Operator_FirewallResultDofs( self, self->operandDofs );
-
+	
 	temp      = operand0[0];
 	result[0] = fabs( temp );
 }
@@ -212,27 +228,25 @@ void Underworld_Plateness_SymmetricTensor_LowerDimension_InvariantRoot_2d( void*
 void Underworld_Plateness_SymmetricTensor_LowerDimension_InvariantRoot_3d( void* operator, double* operand0, double* result ) {
 	Operator* self = (Operator*) operator;
 	SymmetricTensor temp;
-	double temp2;
 	
 	Operator_FirewallUnary( self );
 	Operator_FirewallResultDofs( self, self->operandDofs );
-
-	temp[0] = operand0[0];
-	temp[1] = operand0[1];
-	temp[2] = operand0[3];
 	
-	temp2 = SymmetricTensor_2ndInvariant( temp, 2 );
+	temp[0] = operand0[0];  /* strainrate_{xx} */
+	temp[1] = operand0[2];  /* strainrate_{zz} */
+	temp[2] = operand0[4];  /* strainrate_{xz} */
 	
-	*result = sqrt( temp2 );
+	*result = SymmetricTensor_2ndInvariant( temp, 2 );
 }
 
 
-double Plateness_IntegratePlane( void* feVariable, Axis planeAxis, double planeHeight, double** value_weight_Matrix ){//, double minValue, double maxValue ) {
-	FeVariable*                self               = (FeVariable*)         feVariable;
+double Plateness_IntegratePlane( void* feVariable, Axis planeAxis, double planeHeight, void* _plateness  ){
+	FeVariable*                fevariable = (FeVariable*) feVariable;
+	Underworld_Plateness*      plateness  = (Underworld_Plateness*) _plateness;
 	IJK                        planeIJK;
 	Element_LocalIndex         lElement_I;
 	Element_GlobalIndex        gElement_I;
-	Element_LocalIndex         elementLocalCount  = FeMesh_GetElementLocalSize( self->feMesh );
+	Element_LocalIndex         elementLocalCount  = FeMesh_GetElementLocalSize( fevariable->feMesh );
 	Axis                       aAxis              = ( planeAxis == I_AXIS ? J_AXIS : I_AXIS );
 	Axis                       bAxis              = ( planeAxis == K_AXIS ? J_AXIS : K_AXIS );
 	double                     integral;
@@ -254,45 +268,45 @@ double Plateness_IntegratePlane( void* feVariable, Axis planeAxis, double planeH
 	Particle_InCellIndex       particlesPerDim[] = {2,2,2};
 
 	/* Find Elements which plane cuts through */
-	memcpy( planeCoord, Mesh_GetVertex( self->feMesh, 0 ), sizeof( Coord ) );
+	memcpy( planeCoord, Mesh_GetVertex( fevariable->feMesh, 0 ), sizeof( Coord ) );
 	planeCoord[ planeAxis ] = planeHeight;
 
-	if( Mesh_Algorithms_SearchElements( self->feMesh->algorithms, planeCoord, &lElement_I ) && 
+	if( Mesh_Algorithms_SearchElements( fevariable->feMesh->algorithms, planeCoord, &lElement_I ) && 
 	    lElement_I < elementLocalCount )
 	{
 		Coord		planeXiCoord;
 
-		gElement_I = FeMesh_ElementDomainToGlobal( self->feMesh, lElement_I );
-		RegularMeshUtils_Element_1DTo3D( self->feMesh, gElement_I, planeIJK );
+		gElement_I = FeMesh_ElementDomainToGlobal( fevariable->feMesh, lElement_I );
+		RegularMeshUtils_Element_1DTo3D( fevariable->feMesh, gElement_I, planeIJK );
 		planeLayer = planeIJK[ planeAxis ];
 		
 		/* Find Local Coordinate of plane */
-		FeMesh_CoordGlobalToLocal( self->feMesh, lElement_I, planeCoord, planeXiCoord );
+		FeMesh_CoordGlobalToLocal( fevariable->feMesh, lElement_I, planeCoord, planeXiCoord );
 		planeXi = planeXiCoord[ planeAxis ];
 	}
 	
 	/* Should be broadcast */
-	MPI_Allreduce( &planeXi,    &planeXiGlobal, 1, MPI_DOUBLE, MPI_MAX, self->communicator );
-	MPI_Allreduce( &planeLayer, &planeLayerGlobal, 1, MPI_UNSIGNED, MPI_MAX, self->communicator );
+	MPI_Allreduce( &planeXi,    &planeXiGlobal, 1, MPI_DOUBLE, MPI_MAX, fevariable->communicator );
+	MPI_Allreduce( &planeLayer, &planeLayerGlobal, 1, MPI_UNSIGNED, MPI_MAX, fevariable->communicator );
 
 	/* Create Swarm in plane */
 	extensionMgr_Register = ExtensionManager_Register_New();
 	dimExists[ aAxis ] = True;
-	if (self->dim == 3)
+	if (fevariable->dim == 3)
 		dimExists[ bAxis ] = True;
 	
 	singleCellLayout = SingleCellLayout_New( "cellLayout", dimExists, NULL, NULL );
 	particlesPerDim[ planeAxis ] = 1;
-	gaussParticleLayout = GaussParticleLayout_New( "particleLayout", self->dim - 1, particlesPerDim );
+	gaussParticleLayout = GaussParticleLayout_New( "particleLayout", fevariable->dim - 1, particlesPerDim );
 	tmpSwarm = Swarm_New( 
 			"tmpgaussSwarm",
 			singleCellLayout, 
 			gaussParticleLayout,
-			self->dim,
+			fevariable->dim,
 			sizeof(IntegrationPoint), 
 			extensionMgr_Register, 
 			NULL,
-			self->communicator,
+			fevariable->communicator,
 		        NULL	);
 	Stg_Component_Build( tmpSwarm, NULL, False );
 
@@ -307,8 +321,8 @@ double Plateness_IntegratePlane( void* feVariable, Axis planeAxis, double planeH
 		particle->xi[ planeAxis ] = planeXiGlobal;
 	}
 	
-	integral = Plateness_IntegrateLayer_AxisIndependent( self, tmpSwarm, planeAxis, planeLayerGlobal, 
-			self->dim - 1, aAxis, bAxis, planeAxis, value_weight_Matrix); //, minValue, maxValue );
+	integral = Plateness_IntegrateLayer_AxisIndependent( fevariable, tmpSwarm, planeAxis, planeLayerGlobal, 
+			fevariable->dim - 1, aAxis, bAxis, planeAxis, plateness ); 
 
 	/* Delete */
 	Stg_Class_Delete( tmpSwarm );
@@ -322,10 +336,11 @@ double Plateness_IntegratePlane( void* feVariable, Axis planeAxis, double planeH
 double Plateness_IntegrateLayer_AxisIndependent( 
 		void* feVariable, void* _swarm,
 		Axis layerAxis, Index layerIndex, Dimension_Index dim, 
-		Axis axis0, Axis axis1, Axis axis2, double** value_weight_Matrix) //, double minValue, double maxValue ) 
+		Axis axis0, Axis axis1, Axis axis2, void* _plateness )
 { 
-	FeVariable*                self               = (FeVariable*)         feVariable;
-	Swarm*                     swarm              = (Swarm*)              _swarm;
+	FeVariable*                fevariable = (FeVariable*)         feVariable;
+	Swarm*                     swarm      = (Swarm*)              _swarm;
+	Underworld_Plateness*      plateness  = (Underworld_Plateness*) _plateness;
 	Element_LocalIndex         lElement_I;
 	Element_GlobalIndex        gElement_I;
 	IJK                        elementIJK;
@@ -334,32 +349,34 @@ double Plateness_IntegrateLayer_AxisIndependent(
 	double                     integralGlobal;
 	double                     minValue;
 	double                     maxValue;
+	double                     localMinValue;
+	double                     localMaxValue;
 	IntegrationPoint*          particle;
 	Cell_LocalIndex            cell_I;
 	Particle_InCellIndex       cParticle_I;
 	Particle_InCellIndex       cellParticleCount;
 	double                     value;
 	
-	Journal_DPrintf( self->debug, "In %s() for FeVariable \"%s\":\n", __func__, self->name );
+	Journal_DPrintf( fevariable->debug, "In %s() for FeVariable \"%s\":\n", __func__, fevariable->name );
 
 	/* Initialise Sumation of Integral */
 	integral = 0.0;
 
-	Stream_Indent( self->debug );
+	Stream_Indent( fevariable->debug );
 	
-	/* Loop over all particles in element to get minValue and maxValue*/
-	minValue = 1.e300;
-	maxValue = 0.;
-	for ( gElement_I = 0 ; gElement_I < FeMesh_GetElementGlobalSize( self->feMesh ); gElement_I++ ) {
-		RegularMeshUtils_Element_1DTo3D( self->feMesh, gElement_I, elementIJK );
+	/* Loop over all particles in element to get localMinValue and localMaxValue*/
+	localMinValue = 1.e300;
+	localMaxValue = 0.;
+	for ( gElement_I = 0 ; gElement_I < FeMesh_GetElementGlobalSize( fevariable->feMesh ); gElement_I++ ) {
+		RegularMeshUtils_Element_1DTo3D( fevariable->feMesh, gElement_I, elementIJK );
 
 		/* Check if element is in layer plane */
 		if ( elementIJK[ layerAxis ] != layerIndex )
 			continue;
 
 		/* Check if element is local */
-		if( !FeMesh_ElementGlobalToDomain( self->feMesh, gElement_I, &lElement_I ) || 
-		    lElement_I >= FeMesh_GetElementLocalSize( self->feMesh ) )
+		if( !FeMesh_ElementGlobalToDomain( fevariable->feMesh, gElement_I, &lElement_I ) || 
+		    lElement_I >= FeMesh_GetElementLocalSize( fevariable->feMesh ) )
 		{
 			continue;
 		}
@@ -375,49 +392,58 @@ double Plateness_IntegrateLayer_AxisIndependent(
 			/* Interpolate Value of Field at Particle */
 			FeVariable_InterpolateWithinElement( feVariable, lElement_I, particle->xi, &value );
 			
-			if(value < minValue) minValue = value;
-			if(value > maxValue) maxValue = value;
-	
+			if(value < localMinValue) localMinValue = value;
+			if(value > localMaxValue) localMaxValue = value;
 		}
-		
 	}
 	
-	for ( gElement_I = 0 ; gElement_I < FeMesh_GetElementGlobalSize( self->feMesh ); gElement_I++ ) {
-		RegularMeshUtils_Element_1DTo3D( self->feMesh, gElement_I, elementIJK );
+	/* Broadcast */
+	MPI_Allreduce( &localMinValue, &(plateness->minValue), 1, MPI_DOUBLE, MPI_MIN, fevariable->communicator );
+	MPI_Allreduce( &localMaxValue, &(plateness->maxValue), 1, MPI_DOUBLE, MPI_MAX, fevariable->communicator );
+	
+	plateness->constant = False;
+	if( fabs(plateness->maxValue - plateness->minValue) < 1.0e-15 ){
+		plateness->constant = True;
+		return 0.;
+	}
+	
+	for ( gElement_I = 0 ; gElement_I < FeMesh_GetElementGlobalSize( fevariable->feMesh ); gElement_I++ ) {
+		RegularMeshUtils_Element_1DTo3D( fevariable->feMesh, gElement_I, elementIJK );
 
 		/* Check if element is in layer plane */
 		if ( elementIJK[ layerAxis ] != layerIndex )
 			continue;
 
 		/* Check if element is local */
-		if( !FeMesh_ElementGlobalToDomain( self->feMesh, gElement_I, &lElement_I ) || 
-		    lElement_I >= FeMesh_GetElementLocalSize( self->feMesh ) )
+		if( !FeMesh_ElementGlobalToDomain( fevariable->feMesh, gElement_I, &lElement_I ) || 
+		    lElement_I >= FeMesh_GetElementLocalSize( fevariable->feMesh ) )
 		{
 			continue;
 		}
 
-		elementIntegral = Plateness_IntegrateElement_AxisIndependent( self, swarm, lElement_I, dim, axis0, axis1, axis2,  value_weight_Matrix, minValue, maxValue );
-		Journal_DPrintfL( self->debug, 2, "Integral of element %d was %f\n", lElement_I, elementIntegral );
+		elementIntegral = Plateness_IntegrateElement_AxisIndependent( fevariable, swarm, lElement_I, dim, axis0, axis1, axis2,  plateness  );
+		Journal_DPrintfL( fevariable->debug, 2, "Integral of element %d was %f\n", lElement_I, elementIntegral );
 		integral += elementIntegral;
 	}
-	Stream_UnIndent( self->debug );
+	Stream_UnIndent( fevariable->debug );
 
 
 	/* Gather and sum integrals from other processors */
-	MPI_Allreduce( &integral, &integralGlobal, 1, MPI_DOUBLE, MPI_SUM, self->communicator );
+	MPI_Allreduce( &integral, &integralGlobal, 1, MPI_DOUBLE, MPI_SUM, fevariable->communicator );
 
-	Journal_DPrintf( self->debug, "Calculated global integral of layer %d in Axis %d was %f\n", layerIndex, layerAxis, integralGlobal );
+	Journal_DPrintf( fevariable->debug, "Calculated global integral of layer %d in Axis %d was %f\n", layerIndex, layerAxis, integralGlobal );
 	return integralGlobal;
 }
 
 double Plateness_IntegrateElement_AxisIndependent( 
 		void* feVariable, void* _swarm, 
 		Element_DomainIndex dElement_I, Dimension_Index dim, 
-		Axis axis0, Axis axis1, Axis axis2, double** value_weight_Matrix, double minValue, double maxValue ) 
+		Axis axis0, Axis axis1, Axis axis2, void* _plateness ) 
 {
-	FeVariable*          self               = (FeVariable*)         feVariable;
-	Swarm*               swarm              = (Swarm*)              _swarm;
-	FeMesh*			feMesh             = self->feMesh;
+	FeVariable*           fevariable = (FeVariable*)           feVariable;
+	Swarm*                swarm      = (Swarm*)                _swarm;
+	Underworld_Plateness* plateness  = (Underworld_Plateness*) _plateness;
+	FeMesh*			feMesh             = fevariable->feMesh;
 	FeMesh*			mesh;
 	ElementType*         elementType;
 	Cell_LocalIndex      cell_I;
@@ -452,19 +478,19 @@ double Plateness_IntegrateElement_AxisIndependent(
 		/* Interpolate Value of Field at Particle */
 		FeVariable_InterpolateWithinElement( feVariable, dElement_I, particle->xi, &value );
 
-		Journal_DPrintfL( self->debug, 3, "%s: Integrating element %d - particle %d - Value = %g\n", self->name, dElement_I, cParticle_I, value );
+		Journal_DPrintfL( fevariable->debug, 3, "%s: Integrating element %d - particle %d - Value = %g\n", fevariable->name, dElement_I, cParticle_I, value );
 
 		/* Calculate Determinant of Jacobian */
 		detJac = ElementType_JacobianDeterminant_AxisIndependent( 
 				elementType, mesh, dElement_I, particle->xi, dim, axis0, axis1, axis2 );
 		
-		whereBlock = -minValue*100/(maxValue-minValue) + value*100/(maxValue-minValue);
+		whereBlock = -plateness->minValue*plateness->totalBins/(plateness->maxValue-plateness->minValue) + value*plateness->totalBins/(plateness->maxValue-plateness->minValue);
 		whichBlock = (long)whereBlock;
-		if(whichBlock < 0 ) whichBlock = 0;
-		if(whichBlock > 99) whichBlock = 99;
+		if(whichBlock < 0                   ) whichBlock = 0;
+		if(whichBlock > plateness->totalBins - 1 ) whichBlock = plateness->totalBins - 1;
 		
-		value_weight_Matrix[0][whichBlock] += detJac * particle->weight * value;
-		value_weight_Matrix[1][whichBlock] += detJac * particle->weight;
+		plateness->value_weight_Matrix[0][whichBlock] += detJac * particle->weight * value;
+		plateness->value_weight_Matrix[1][whichBlock] += detJac * particle->weight;
 		
 		/* Sum Integral */
 		integral += detJac * particle->weight * value;
