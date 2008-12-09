@@ -15,9 +15,6 @@
 <param name="Summary">...</param>
 <param name="Description">Tiles a plane with colours derived from the value of a scalar field at the vertex of each tile.</param>
 
-<!--Now the interesting stuff-->
-
-
 <list name="Params">
 	<struct>
 		<param name="Name">crossSection</param>
@@ -79,13 +76,15 @@
 	</struct>
 
 </list>
-<!-- Add an exmaple XML if possible -->
+
 <param name="Example">
+<![CDATA[
 		<struct name="temperatureMapXSection">
 			<param name="Type">lucScalarFieldOnMeshCrossSection</param>
 			<param name="FieldVariable">TemperatureField</param>
 			<param name="ColourMap">temperatureColourMap</param>
 			<param name="crossSection">Y=5</param>
 		</struct>
+]]>
 </param>
 

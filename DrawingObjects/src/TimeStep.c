@@ -237,16 +237,19 @@ void _lucTimeStep_Draw( void* drawingObject, lucWindow* window, lucViewportInfo*
 	int time = context->timeStep;
 	double currentTime = context->currentTime;
 	/* Allocating Memory */
+
+
+  /* Luke's weird stuff - as per revision 74
 	char* displayString = Memory_Alloc_Array( char, 100, "displayString");
 	char* timeStepString = Memory_Alloc_Array( char, 10, "timeStepString");
  	char* currentTimeString = Memory_Alloc_Array( char, 20, "currentTimeString");
+  sprintf( displayString, "Shortened distance (cm): %e", currentTime * 6.9444444444444e-4 );
+  */
 	
+  char* displayString = Memory_Alloc_Array( char, 40, "displayString");
+	char* timeStepString = Memory_Alloc_Array( char, 10, "timeStepString");
+ 	char* currentTimeString = Memory_Alloc_Array( char, 20, "currentTimeString");
 
-	/*char* displayString  = malloc(40*sizeof(char));
-	char* timeStepString = malloc(10*sizeof(char));
-	char* currentTimeString = malloc(10*sizeof(char));*/
-
-#if 0
 	sprintf(timeStepString, "%d", time );	
 	sprintf(currentTimeString, "%e", currentTime );
 	
@@ -264,9 +267,7 @@ void _lucTimeStep_Draw( void* drawingObject, lucWindow* window, lucViewportInfo*
 		strcat(displayString, currentTimeString);
 		strcat(displayString, "\0");
 	}
-#endif
 
-        sprintf( displayString, "Shortened distance (cm): %e", currentTime * 6.9444444444444e-4 );
 	
 
 	
