@@ -15,6 +15,8 @@ from dl import dl
 from OpenGL import OpenGL
 from OSMesa import OSMesa
 from SDL import SDL
+from Carbon import Carbon
+from AGL import AGL
 from libPNG import libPNG
 from libJPEG import libJPEG
 from libTIFF import libTIFF
