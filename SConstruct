@@ -56,6 +56,8 @@ if 'config' in COMMAND_LINE_TARGETS or 'help' in COMMAND_LINE_TARGETS:
         proj.dependency(SConfig.packages.libTIFF, False, have_define='HAVE_TIFF')
         if platform.system() == 'Darwin':
           proj.dependency(SConfig.packages.CoreServices)
+          proj.dependency(SConfig.packages.Carbon, False, have_define='HAVE_CARBON')
+          proj.dependency(SConfig.packages.AGL, False, have_define='HAVE_AGL')
     env.configure_packages()
 
     # Need to define the extension for shared libraries as well
