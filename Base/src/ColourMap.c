@@ -62,11 +62,13 @@ lucColourMap* lucColourMap_New(
 		double                                             minimum,
 		double                                             maximum,
 		Bool                                               logScale,
-		Bool                                               dynamicRange )
+		Bool                                               dynamicRange,
+		Bool											   centreOnFixedValue,
+		double											   centringValue	 )
 {
 	lucColourMap* self = (lucColourMap*) _lucColourMap_DefaultNew( name );
 
-	lucColourMap_InitAll( self, colourMapString, minimum, maximum, logScale, dynamicRange );
+	lucColourMap_InitAll( self, colourMapString, minimum, maximum, logScale, dynamicRange, centreOnFixedValue, centringValue );
 
 	return self;
 }
@@ -113,8 +115,10 @@ void _lucColourMap_Init(
 		double                                             minimum,
 		double                                             maximum,
 		Bool                                               logScale,
-		Bool                                               dynamicRange )
-{
+		Bool                                               dynamicRange,
+		Bool											   centreOnFixedValue,
+		double											   centringValue	 )
+{	
 	char*        colourMapString = StG_Strdup( _colourMapString );
 	Colour_Index colourCount;
 	Colour_Index colour_I;
@@ -126,6 +130,8 @@ void _lucColourMap_Init(
 	self->maximum      = maximum;
 	self->logScale     = logScale;
 	self->dynamicRange = dynamicRange;
+	self->centreOnFixedValue = centreOnFixedValue;
+	self->centringValue = centringValue;
 	
 	/* Find number of colours */
 	colourCount = 1;
@@ -164,11 +170,13 @@ void lucColourMap_InitAll(
 		double                                             minimum,
 		double                                             maximum,
 		Bool                                               logScale,
-		Bool                                               dynamicRange )
+		Bool                                               dynamicRange, 
+		Bool											   centreOnFixedValue,
+		double											   centringValue	 )
 {
 	lucColourMap* self        = colourMap;
 
-	_lucColourMap_Init( self, colourMapString, minimum, maximum, logScale, dynamicRange );
+	_lucColourMap_Init( self, colourMapString, minimum, maximum, logScale, dynamicRange, centreOnFixedValue, centringValue );
 }
 		
 void _lucColourMap_Delete( void* colourMap ) {
@@ -233,11 +241,13 @@ void* _lucColourMap_Copy( void* colourMap, void* dest, Bool deep, Name nameExt, 
 
 	newColourMap = _Stg_Component_Copy( self, dest, deep, nameExt, ptrMap );
 
-	newColourMap->colourCount  = self->colourCount;
-	newColourMap->minimum      = self->minimum;
-	newColourMap->maximum      = self->maximum;
-	newColourMap->logScale     = self->logScale;
-	newColourMap->dynamicRange = self->dynamicRange;
+	newColourMap->colourCount         = self->colourCount;
+	newColourMap->minimum             = self->minimum;
+	newColourMap->maximum             = self->maximum;
+	newColourMap->logScale            = self->logScale;
+	newColourMap->dynamicRange        = self->dynamicRange;
+	newColourMap->centreOnFixedValue  = self->centreOnFixedValue;
+	newColourMap->centringValue       = self->centringValue;
 
 	if (deep)
 		memcpy( newColourMap->colourList, self->colourList, self->colourCount * sizeof(lucColour) );
@@ -273,13 +283,18 @@ void _lucColourMap_Construct( void* colourMap, Stg_ComponentFactory* cf, void* d
 			Stg_ComponentFactory_GetDouble( cf, self->name, "minimum", 0.0 ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "maximum", 1.0 ),
 			Stg_ComponentFactory_GetBool( cf, self->name, "logScale", False ),
-			Stg_ComponentFactory_GetBool( cf, self->name, "dynamicRange", False ) );
+			Stg_ComponentFactory_GetBool( cf, self->name, "dynamicRange", False ),
+			Stg_ComponentFactory_GetBool( cf, self->name, "centreOnFixedValue", False ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, "centringValue", 0.0 )
+	);
+
+
+	
 
         self->discrete = Stg_ComponentFactory_GetBool( cf, self->name, "discrete", False );
 }
 
 void _lucColourMap_Build( void* colourMap, void* data ) { }
-
 void _lucColourMap_Initialise( void* colourMap, void* data ) { }
 void _lucColourMap_Execute( void* colourMap, void* data ) { }
 void _lucColourMap_Destroy( void* colourMap, void* data ) { }
@@ -291,13 +306,39 @@ void lucColourMap_GetColourFromValue( void* colourMap, double value, lucColour* 
 	lucColour*    colourAbove;
 	float         remainder;
 	float         scaledValue;
+	float         scaledCentreValue;
 	Colour_Index  colourCount = self->colourCount;
+	
+	float 	      max, min, centre, sampleValue;
+		
+	/* To get a log scale, transform each value to log10(value) */
+	
+	if (self->logScale == True) {
+		max 	    = log10(self->maximum);
+		min  	    = log10(self->minimum);
+		centre 	    = log10(self->centringValue);
+		sampleValue = log10(value);
+	}
+	else {
+		max 	    = self->maximum;
+		min  	    = self->minimum;
+		centre 	    = self->centringValue;
+		sampleValue = value;
+	}
+	
 
-	/* Scale value so that it is between 0 and 1 */
-	if (self->logScale == True) 
-		scaledValue = (log10(value) - log10(self->minimum))/(log10(self->maximum) - log10(self->minimum));
+	/* Scale value so that it is between 0 and 1, taking into account
+		the fact that centringValue should be at a scaled value 0.5.
+		
+	   centringValue is set up correctly during max / min if the
+	 	centreOnFixedValue flag has not been set in the xml file
+ 	*/
+		
+	if(sampleValue > centre)
+		scaledValue = 0.5 + 0.5 * (value - centre)/(max - centre);
 	else
-		scaledValue = (value - self->minimum)/(self->maximum - self->minimum);
+		scaledValue = 0.5 * (value - min) / (centre - min); 
+	
 
 	if (scaledValue <= 0.0 || colourCount == 1) {
 		memcpy( colour, lucColourMap_GetColourFromList( self, 0 ), sizeof(lucColour) );
@@ -307,6 +348,8 @@ void lucColourMap_GetColourFromValue( void* colourMap, double value, lucColour* 
 		memcpy( colour, lucColourMap_GetColourFromList( self, colourCount - 1 ), sizeof(lucColour) );
 		return;
 	}
+	
+	/* Discrete colourmap option does not interpolate between colours */
 	
         if( !self->discrete ) {
            colourBelow_I = (Colour_Index) ( ( colourCount - 1 ) * scaledValue );
@@ -354,17 +397,30 @@ void lucColourMap_GetColourFromValue_ExplicitOpacity( void* colourMap, double va
 		return;
 	}
 	
-	colourBelow_I = (Colour_Index) ( ( colourCount - 1 ) * scaledValue );
-	colourBelow   = lucColourMap_GetColourFromList( self, colourBelow_I );
-	colourAbove   = lucColourMap_GetColourFromList( self, colourBelow_I + 1 );
-	
-	remainder = (float)( colourCount - 1 ) * scaledValue - (float) colourBelow_I;
-	
+		
 	/* Do linear interpolation between colours */
-	colour->red     = ( colourAbove->red     - colourBelow->red     ) * remainder + colourBelow->red;
-	colour->green   = ( colourAbove->green   - colourBelow->green   ) * remainder + colourBelow->green;
-	colour->blue    = ( colourAbove->blue    - colourBelow->blue    ) * remainder + colourBelow->blue;
-	colour->opacity =  opacity;
+	
+    if( !self->discrete ) {
+       colourBelow_I = (Colour_Index) ( ( colourCount - 1 ) * scaledValue );
+       colourBelow   = lucColourMap_GetColourFromList( self, colourBelow_I );
+       colourAbove   = lucColourMap_GetColourFromList( self, colourBelow_I + 1 );
+
+       remainder = (float)( colourCount - 1 ) * scaledValue - (float) colourBelow_I;
+
+       /* Do linear interpolation between colours */
+       colour->red     = ( colourAbove->red     - colourBelow->red     ) * remainder + colourBelow->red;
+       colour->green   = ( colourAbove->green   - colourBelow->green   ) * remainder + colourBelow->green;
+       colour->blue    = ( colourAbove->blue    - colourBelow->blue    ) * remainder + colourBelow->blue;
+       colour->opacity = ( colourAbove->opacity - colourBelow->opacity ) * remainder + colourBelow->opacity;
+    }
+    else {
+       colourBelow_I = (Colour_Index) ( (float)colourCount * scaledValue );
+       colourBelow = lucColourMap_GetColourFromList( self, colourBelow_I );
+       colour->red = colourBelow->red;
+       colour->green = colourBelow->green;
+       colour->blue = colourBelow->blue;
+       colour->opacity = colourBelow->opacity;
+    }
 }
 
 void lucColourMap_SetMinMax( void* colourMap, double min, double max ) {
@@ -380,6 +436,27 @@ void lucColourMap_SetMinMax( void* colourMap, double min, double max ) {
 	/* Copy to colour map */
 	self->minimum = min;
 	self->maximum = max;
+	
+	/* This will ensure that we can use the same routine regardless
+		of whether the centreOnFixedValue flag has been set */
+		
+	if(!self->centreOnFixedValue) {
+		self->centringValue = 0.5 * max + min;
+	}
+	else {
+		
+		/* If a centringValue has been imposed on a dynamic problem it should
+			force the max / min to contain it correctly */
+				
+		if (self->centringValue < min)
+			min = self->centringValue - tolerance;
+		
+		if (self->centringValue > max)	
+			max = self->centringValue + tolerance;
+		
+	}
+
+	
 }
 
 void lucColourMap_CalibrateFromVariable( void* colourMap, void* _variable ) {
