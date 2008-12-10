@@ -11,32 +11,46 @@
 	 fixed before we can release this functionality
 -->		
 
-	<include> Underworld/BaseApps/ExtensionCompressionShearQ1Q1BaseApp.xml </include>
-	<!-- ><include>ExperimentalUnderworld/REP_Setup.xml</include> -->
-	
+	<include> Underworld/BaseApps/ExtensionCompressionShearQ1Q1BaseApp.xml </include>	
 	
 	<list name="plugins" mergeType="merge">
 		<param>StgFEM_FrequentOutput </param>	
 		<param>Underworld_Vrms </param>	
 		<param>StgFEM_CPUTime </param>	
-	    <!-- ><param>ExperimentalUnderworld_PressureCalibration</param> -->
+		<param>StgFEM_FeVariableList </param>
+		<param>Experimental_ShearBandAnalysis</param>
+		<param>Experimental_ShearBandAnalysis</param>
 	</list>
 	
+	<struct name="ShearBandAnalysis" mergeType="replace">
+		<list name="materialIndices">
+			<param> 1 </param>
+			<param> 2 </param>
+			<param> 3 </param>
+			<param> 4 </param>
+			<param> 5 </param>
+		</list>		
+	<param name="weakeningThreshold"> 0.1 </param>
+	<param name="notIfHealing"> True </param>
+	</struct>	
+	
+	<param name="extensionReferenceHeight">0.8</param>
 	
 	<!-- All stuff associated with recovered pressures/stresses etc -->
-	<!--
+	
 	<struct name="components" mergeType="merge">
-		<struct name="recoveredStrainRate" mergeType="replace">
+		<struct name="recoveredStrainRateField" mergeType="replace">
 			<param name="Type">RecoveredFeVariable</param>
 			<param name="RawField">StrainRateField</param>
 			<param name="OrderOfInterpolation">1</param>
 			<param name="recoverStrain">true</param>
 			<param name="recoverPressure">false</param>
+			
 		</struct>
-		<struct name="recoveredSigmaField" mergeType="replace">
+		<struct name="recoveredStressField" mergeType="replace">
 			<param name="Type">RecoveredFeVariable</param>
 			<param name="RawField">StrainRateField</param>
-			<param name="recoverPressure">True</param>
+			<param name="recoverPressure">False</param>
 			<param name="OrderOfInterpolation">1</param>
 			<param name="RawPressureField">PressureField</param>
 		</struct>
@@ -44,20 +58,28 @@
 			<param name="Type">REP_Algorithm</param>
 			<param name="IntegrationPoints">picIntegrationPoints</param>
 			<param name="ConstitutiveMatrix">constitutiveMatrix</param>
-			<param name="RepField">recoveredStrainRate</param>
-			<param name="RepField2">recoveredSigmaField</param>
+			<param name="RepField">recoveredStrainRateField</param>
+			<param name="RepField2">recoveredStressField</param>
 		</struct>
 		
-		<struct name="recoveredStrainRateInvariant"> 
+		<struct name="recoveredStrainRateInvariantField"> 
 			<param name="Type">OperatorFeVariable</param>
 		     	<param name="Operator">SymmetricTensor_Invariant</param>
-			<param name="FeVariable">recoveredStrainRate</param>
+			<param name="FeVariable">recoveredStrainRateField</param>
 		</struct>
 		
-	</struct> -->
-
-
-	<param name="extensionReferenceHeight">0.8</param>
+		<struct name="recoveredDeviatoricStressField"> 
+			<param name="Type">OperatorFeVariable</param>
+		     	<param name="Operator">SymmetricTensor_MakeDeviatoric</param>
+			<param name="FeVariable">recoveredStressField</param>
+		</struct>
+		
+		<struct name="recoveredDeviatoricStressInvariantField"> 
+			<param name="Type">OperatorFeVariable</param>
+		     	<param name="Operator">SymmetricTensor_Invariant</param>
+			<param name="FeVariable">recoveredDeviatoricStressField</param>
+		</struct>
+	</struct> 
 
 
 	<include> ./set_up.xml </include>
@@ -65,22 +87,23 @@
 	<!-- shape options -->
 	
 	<include> ./4LayerModel.xml </include>	
+
+
 	
 	<!-- rheology options -->
 	<include> ./rheology/rheology-2layer.xml </include> <!-- this is also needed if you use rheology-4layer-LC_UM.xml -->
-
-
 	<!--><include> ./rheology/rheology-4layer-LC_UM.xml </include>  <--> 	<!-- this only has added  rheologies for the upper mantle and lower crust. you still need a 2 layer rheology if you use this 4 layer rheology-->
 	
 	<!-- Visualisation -->
 
 
 	<include> Viewports/Cameras2D5.xml </include> 	
-    <!--><include> Viewports/RecoveredPressureVP.xml </include> -->
-	<!-- ><include> Viewports/RecoveredStressVP.xml </include>  -->
+    <!--><include> Viewports/RecoveredPressureVP.xml </include>   -->
+	<!-- ><include> Viewports/RecoveredStressVP.xml </include>    -->
 	<!--><include> Viewports/RecoveredStrainRateVP.xml </include> -->
 	
 	<include> Viewports/StrainRateVP.xml </include> 
+/bunyip
 
 	<!-- general parameters that get changed alot -->	
 	<param name="outputPath"> ./output </param>
@@ -103,6 +126,8 @@
 	<!-- box size - we make this a long thin box sheared across the long length so that we can look at the shear-band numbers at
 	 	relatively high resolution -->
 	
+	<param name="dim"> 3 </param>
+	
 	<param name="maxX"> 2.0 </param>
 	<param name="maxY"> 1.0 </param>
 	<param name="maxZ"> 0.0625 </param>
@@ -113,12 +138,12 @@
 	
 	<!-- this is needed for centering the Viewports -->
 	<param name="midX"> 0.0 </param>
-	<param name="midY"> 0.0 </param>
+	<param name="midY"> 0.5 </param>
 	<param name="midZ"> 0.0 </param>
 
 	<!-- window sizes change depending on box size -->
 	
-	<param name="windowWidthZ">864</param><!--864 for maxZ=2, 1008 for maxZ=3, 1200 for maxZ=1200, 1504 for maxZ=5 -->
+	<param name="windowWidthZ">432</param><!--864 for maxZ=2, 1008 for maxZ=3, 1200 for maxZ=1200, 1504 for maxZ=5 -->
 	<param name="windowWidthX">864</param><!--864 for maxX=2, 1008 for maxX=3, 1200 for maxX=1200, 1504 for maxX=5 -->
 	
 </StGermainData>

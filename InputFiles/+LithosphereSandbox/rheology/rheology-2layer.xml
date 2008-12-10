@@ -43,10 +43,10 @@
 			<param name="TimeIntegrator">timeIntegrator</param>
 			<param name="MaterialPointsSwarm">materialSwarm</param>
 			<param name="softeningStrain">0.1</param>
-			<param name="initialDamageFraction">0.5</param>
+			<param name="initialDamageFraction">0.1</param>
 			<param name="initialDamageWavenumber">0.5</param>
-			<param name="initialDamageWavenumberZ">1.0</param>
-			<param name="initialDamageFactor">0.5</param>
+			<param name="initialDamageWavenumberZ">10.0</param>
+			<param name="initialDamageFactor">0.1</param>
 			<param name="healingRate">0.1</param>
 		</struct>
 		<struct name="director">
