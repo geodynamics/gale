@@ -290,7 +290,7 @@ void _ParticleFeVariable_Destroy( void* materialFeVariable, void* data ) {
 void ParticleFeVariable_Update( void* materialFeVariable ) {
 	ParticleFeVariable* self = (ParticleFeVariable*) materialFeVariable;
 
-	printf( "***\n*** Updating %s\n***\n", self->name );
+	/* printf( "***\n*** Updating %s\n***\n", self->name );   Why - shouldn't this be done properly ?? */
 
 	/* Initialise Vectors */
 	VecSet( self->assemblyVector->vector, 0.0 );
