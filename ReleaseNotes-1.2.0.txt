@@ -1,0 +1,154 @@
+﻿Release Notes Underworld-1.2:
+
+Engineering
+Full migration to new build system, scons. Existing system Vmake is no longer supported. (see http://www.underworldproject.org/documentation/CompileSCons.html for details )
+Full migration to new repository system, mercurial. Existing system svn is no longer supported for future releases.
+Numerics
+Stable checkpointing functionality: bug fixes in parallel behaviour of I/O routines. By default checkpointing now stores only essential information for restarting a problem, unlike it's previous algorithm which stored every field, mesh and swarm in the problem.
+PETSc compatibility layer has been deleted, now code call PETSc functions directly
+Project “Toolboxes” are now how codes build upon StGermain register their functionality to the executable.
+New meshing capabilities.  Can bunch rows and columns of nodes closer together in meshes with regular topology, subject to minor restrictions.
+Improvements to mesh deformation methods.  Boundaries can be forced to remain in their initial configuration on a per-dimension basis.
+Implementation of analytical solutions located at stgUnderworld/Underworld/SysTest/PerformanceTests/
+Userbase
+Population of component usage documentation (*.meta files) and release of component codex at http://auscope.monash.edu.au/codex-v1.2.0/
+Release of new website, http://www.underworldproject.org
+Release of Underworld User Manual, http://www.underworldproject.org/documents/UnderworldUserManual.pdf
+
+A listing of closed tickets assigned to Underworld 1.2
+http://csd.vpac.org/trac/CM/AuScope/all/query?status=closed&group=milestone&title=Sort+all+tickets+by+Milestone+(including+closed)&milestone=Underworld+1.2.0
+
+Underworld 1.2.0
+Project
+Ticket
+Summary
+Type
+StgNumerics Trac
+14
+PETSc compatibility strategy needs an overhaul
+enhancement
+StgNumerics Trac
+40
+Mesh refinement: Dual-Mesh
+enhancement
+StgNumerics Trac
+33
+"Next-gen" checkpointing - eg HDF5
+task
+StgNumerics Trac
+41
+Giving Rob access privileges to StgDomain
+defect
+StgNumerics Trac
+42
+FeSwarmVariable
+defect
+StgNumerics Trac
+45
+FeVariable checkpointing files no longer contain coordinates
+defect
+StgNumerics Trac
+46
+by defualt only checkpoint the necessaries
+enhancement
+StgNumerics Trac
+1
+Design an optimal system testing layout & refactor to use this
+enhancement
+Underworld
+9
+Viscoelastic Rheology in Underworld
+enhancement
+Underworld
+94
+Director update routine
+enhancement
+Underworld
+96
+Checkpointing-Restart: PIC cylinder
+defect
+Underworld
+100
+SwarmList output plugin
+task
+Underworld
+107
+Underworld_SwarmOutput hanggin in parallel
+defect
+StGermain
+12
+Convert checkpointing to a grouped system, e.g. 1 directory-per-timestep
+defect
+StGermain
+15
+build error, lazy symbol RE: libxml2
+defect
+AuScope Documentation
+12
+Fix the UnderworldPetscDownload page to be Underworld-version aware
+enhancement
+AuScope Documentation
+150
+Update Wiki regarding new executable
+enhancement
+AuScope Documentation
+160
+Update UnderworldContents Wikipage
+enhancement
+AuScope Documentation
+95
+Update compile instructions for tango with new mpi
+enhancement
+AuScope Documentation
+143
+Refresh Underworld front pages
+enhancement
+AuScope Documentation
+147
+Phase out UnderworldDownload page
+task
+AuScope Documentation
+148
+Underworld 1.2.0 Manual Release
+task
+AuScope Documentation
+149
+New Underworld domain
+task
+AuScope Documentation
+153
+Change the face of Underworld
+task
+AuScope Documentation
+154
+Update Wiki for Underworld 1.2.0 release
+task
+AuScope Documentation
+155
+Generate offline Wiki documentation for Underworld 1.2.0 release
+task
+AuScope Documentation
+156
+Proofread Underworld User Manual Draft
+task
+AuScope Documentation
+152
+Update Subversion / Mercurial related documentation after switch
+task
+AuScope Systems Integration
+204
+Report on Mercurial - Initial testing
+enhancement
+AuScope Systems Integration
+205
+StGermain trac doesn't send out emails
+defect
+AuScope Systems Integration
+167
+Update or delete Machines directory in Underworld for Underworld 1.0.0 stable build
+defect
+Experimental
+1
+"libExperimentalUnderworld" and references to ExperimentalUnderworld
+defect
+
