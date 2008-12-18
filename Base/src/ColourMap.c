@@ -131,7 +131,11 @@ void _lucColourMap_Init(
 	self->logScale     = logScale;
 	self->dynamicRange = dynamicRange;
 	self->centreOnFixedValue = centreOnFixedValue;
-	self->centringValue = centringValue;
+
+  if( centringValue == maximum || centringValue == minimum )
+    self->centringValue = 0.5*(maximum-minimum);
+  else
+    self->centringValue = centringValue;
 	
 	/* Find number of colours */
 	colourCount = 1;
