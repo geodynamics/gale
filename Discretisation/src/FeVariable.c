@@ -2136,16 +2136,16 @@ void FeVariable_SaveNodalValuesToFile_StgFEM_Native( void* feVariable, const cha
 	int               nProcs;
 	MPI_Status        status;
    Stream*           errorStr = Journal_Register( Error_Type, self->type );
-   
-#ifdef WRITE_HDF5
-   hid_t             file, fileSpace, fileData, props;
-   hid_t             memSpace;
-   hsize_t           start[2], count[2], size[2];
-   double*           buf;      
-#else
-   FILE*             outputFile;
    const int         FINISHED_WRITING_TAG = 100;
    int               confirmation = 0;   
+   
+#ifdef WRITE_HDF5
+   hid_t             file, fileSpace, fileData;
+   hid_t             memSpace;
+   hsize_t           start[2], count[2], size[2];
+   double*           buf;
+#else
+   FILE*             outputFile;
 #endif 
 
 	MPI_Comm_size( comm, (int*)&nProcs );
@@ -2160,56 +2160,77 @@ void FeVariable_SaveNodalValuesToFile_StgFEM_Native( void* feVariable, const cha
 #ifdef WRITE_HDF5
    /* Get filename */
 	sprintf( filename, "%s%s.%.5u.h5", prefixStr, self->name, timeStep );
-	
-	/* Create parallel file property list. */
-   props = H5Pcreate( H5P_FILE_ACCESS );
-   H5Pset_fapl_mpio( props, MPI_COMM_WORLD, MPI_INFO_NULL );
 
-   /* Open the HDF5 output file. */
-   file = H5Fcreate( filename, H5F_ACC_TRUNC, H5P_DEFAULT, props );
-   Journal_Firewall( 
-		file >= 0, 
-	   errorStr,
-		"Error in %s for %s '%s' - Cannot create file %s.\n", 
-		__func__, 
-		self->type, 
-		self->name, 
-		filename );
-		
-   H5Pclose( props );
-    
-   size[0] = Mesh_GetGlobalSize( self->feMesh, 0 );;
-   size[1] = dofAtEachNodeCount + 1;
-   if( saveCoords )
-	   size[1] += self->dim;
-	
-	/* Create filespace */   
-   fileSpace = H5Screate_simple( 2, size, NULL );         
-   #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
-   fileData = H5Dcreate( file, "/data", H5T_NATIVE_DOUBLE, fileSpace, H5P_DEFAULT );
-   #else
-   fileData = H5Dcreate( file, "/data", H5T_NATIVE_DOUBLE, fileSpace,
-                               H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
-   #endif
+	/* wait for go-ahead from process ranked lower than me, to avoid competition writing to file */
+	if ( myRank != 0 ) {
+		MPI_Recv( &confirmation, 1, MPI_INT, myRank - 1, FINISHED_WRITING_TAG, comm, &status );
+	}	
 
-   start[1] = 0;
+   /* Open the file */
+	if ( myRank == 0 ) {
+      /* Open the HDF5 output file. */
+      file = H5Fcreate( filename, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT );
+      Journal_Firewall( 
+         file >= 0, 
+         errorStr,
+         "Error in %s for %s '%s' - Cannot create file %s.\n", 
+         __func__, 
+         self->type, 
+         self->name, 
+         filename );
+       
+      size[0] = Mesh_GetGlobalSize( self->feMesh, 0 );;
+      size[1] = dofAtEachNodeCount + 1;
+      if( saveCoords )
+         size[1] += self->dim;
+      
+      /* Create filespace */   
+      fileSpace = H5Screate_simple( 2, size, NULL );         
+      #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+      fileData  = H5Dcreate( file, "/data", H5T_NATIVE_DOUBLE, fileSpace, H5P_DEFAULT );
+      #else
+      fileData  = H5Dcreate( file, "/data", H5T_NATIVE_DOUBLE, fileSpace,
+                                  H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+      #endif
+	} else {
+      /* Open the HDF5 output file. */
+      file = H5Fopen( filename, H5F_ACC_RDWR, H5P_DEFAULT );
+      Journal_Firewall( 
+         file >= 0, 
+         errorStr,
+         "Error in %s for %s '%s' - Cannot open file %s.\n", 
+         __func__, 
+         self->type, 
+         self->name, 
+         filename );
+
+      /* get the filespace */   
+      #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+      fileData  = H5Dopen( file, "/data" );
+      #else
+      fileData  = H5Dopen( file, "/data", H5P_DEFAULT );
+      #endif
+      /* get the filespace handle */
+      fileSpace = H5Dget_space(fileData);
+	}	
+	
+   /* get the section of fileSpace to write to... set start point to be the
+      global index of first local node */
 	count[0] = 1;
 	count[1] = dofAtEachNodeCount + 1;
-	if( saveCoords )
-	   count[1] += self->dim;
-	   
+   if( saveCoords )
+      count[1] += self->dim;
+
+   /* create memSpace */
    memSpace = H5Screate_simple( 2, count, NULL );
-   
-   props = H5Pcreate( H5P_DATASET_XFER );
-   H5Pset_dxpl_mpio( props, H5FD_MPIO_INDEPENDENT );
-    
+   H5Sselect_all( memSpace );
+
    buf = Memory_Alloc_Array( double, count[1], "fileBuffer" );
    
    for ( lNode_I = 0; lNode_I < FeMesh_GetNodeLocalSize( self->feMesh ); lNode_I++ ) {
 		gNode_I = FeMesh_NodeDomainToGlobal( self->feMesh, lNode_I );
-		
-		/* Create our memory space. */
-	   start[0] = gNode_I;        
+
+		/* write our global node index to the buffer */
 	   buf[0] = (double)gNode_I;
 	   
 	   /* If required, add coords to array */
@@ -2229,21 +2250,28 @@ void FeVariable_SaveNodalValuesToFile_StgFEM_Native( void* feVariable, const cha
 			else
 			   buf[dof_I + 1] = variableValues[dof_I];   
 		}	
-		         
-      /* Write the array to file */
+
+      /* select the region of dataspace to write to  */
+      start[0] = FeMesh_NodeDomainToGlobal( self->feMesh, lNode_I );
+      start[1] = 0;
       H5Sselect_hyperslab( fileSpace, H5S_SELECT_SET, start, NULL, count, NULL );
-      H5Sselect_all( memSpace );
-         
-      H5Dwrite( fileData, H5T_NATIVE_DOUBLE, memSpace, fileSpace, props, buf );
-	}   
+      /* Write the array to file */
+      H5Dwrite( fileData, H5T_NATIVE_DOUBLE, memSpace, fileSpace, H5P_DEFAULT, buf );
+   }   
+   /* free memory! */
+   Memory_Free( buf );
    
    /* Close all handles */
-   H5Pclose( props );
    H5Dclose( fileData );
    H5Sclose( memSpace );
    H5Sclose( fileSpace );
    H5Fclose( file );
-      
+   
+	/* send go-ahead to process ranked above me, to avoid competition writing to file */
+	if ( myRank != nProcs - 1 ) {
+		MPI_Ssend( &confirmation, 1, MPI_INT, myRank + 1, FINISHED_WRITING_TAG, comm );
+	}	
+
 #else
    /* Get filename */
    sprintf( filename, "%s%s.%.5u.dat", prefixStr, self->name, timeStep );
@@ -2294,7 +2322,7 @@ void FeVariable_SaveNodalValuesToFile_StgFEM_Native( void* feVariable, const cha
 	/* Close the file */
 	fclose( outputFile );
 	
-	/* send go-ahead from process ranked lower than me, to avoid competition writing to file */
+   /* send go-ahead to process ranked above me, to avoid competition writing to file */
 	if ( myRank != nProcs - 1 ) {
 		MPI_Ssend( &confirmation, 1, MPI_INT, myRank + 1, FINISHED_WRITING_TAG, comm );
 	}	
