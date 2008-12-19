@@ -1663,12 +1663,13 @@ void Swarm_ReplaceCurrentParticleLayoutWithFileParticleLayout( void* swarm, void
 
 void Swarm_GetCheckpointFilenameForGivenTimestep( Swarm* self, AbstractContext* context, char* swarmSaveFileName ) {
 #ifdef READ_HDF5
+        self->checkpointnfiles = context->checkpointnproc;
 	if ( strlen(context->checkPointPrefixString) > 0 ) {
-		sprintf( swarmSaveFileName, "%s/%s.%s.%05d.h5", context->checkpointReadPath,
+		sprintf( swarmSaveFileName, "%s/%s.%s.%05d", context->checkpointReadPath,
 			context->checkPointPrefixString, self->name, context->restartTimestep );
 	}
 	else {
-		sprintf( swarmSaveFileName, "%s/%s.%05d.h5", context->checkpointReadPath,
+		sprintf( swarmSaveFileName, "%s/%s.%05d", context->checkpointReadPath,
 			self->name, context->restartTimestep );
 	}
 #else

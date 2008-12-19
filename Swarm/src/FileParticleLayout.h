@@ -52,8 +52,9 @@
 		\
 		Name                                             filename;    \
 		Stream*                                          errorStream; \
-		hid_t* fileData; \
-		hid_t* fileSpace; \
+		hid_t** fileData; \
+		hid_t** fileSpace; \
+		Index* lastParticleIndex; \
 		hsize_t start[2]; \
 		hsize_t count[2];
 #else
