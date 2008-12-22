@@ -38,7 +38,7 @@
 *+		Patrick Sunter
 *+		Julian Giordani
 *+
-** $Id: ShapeTemperatureIC.c 691 2008-04-01 23:30:31Z BelindaMay $
+** $Id:  $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -53,12 +53,12 @@
 #include <string.h>
 #include <assert.h>
 
-const Type Underworld_ShapeTemperatureIC_Type = "Underworld_ShapeTemperatureIC";
+const Type Underworld_ShapeFemIC_Type = "Underworld_ShapeFemIC";
 typedef struct {
 	__Codelet
-} Underworld_ShapeTemperatureIC;
+} Underworld_ShapeFemIC;
 
-void Underworld_ShapeTemperatureICFunction( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void Underworld_SimpleShapeIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
 	UnderworldContext*      context            = (UnderworldContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
 	FeMesh*			mesh               = NULL;
@@ -103,7 +103,7 @@ void Underworld_GaussianIC( Node_LocalIndex node_lI, Variable_Index var_I, void*
 	shape = (Stg_Shape*) LiveComponentRegister_Get( context->CF->LCRegister, shapeName );
 	assert( shape );
 	Journal_Firewall( !strcmp(shape->type, "Sphere") || !strcmp(shape->type, "Cylinder"),
-			Journal_Register( Error_Type, Underworld_ShapeTemperatureIC_Type ),
+			Journal_Register( Error_Type, Underworld_ShapeFemIC_Type ),
 			"Error in %s: You're applying the GaussianIC to a shape of type %s, which can't be done."
 			" It can only work on Sphere\' or \'Cylinder\' shapes\n", __func__,  shape->type );
 	/* Find coordinate of node */
@@ -126,23 +126,23 @@ void Underworld_GaussianIC( Node_LocalIndex node_lI, Variable_Index var_I, void*
 
 }
 
-void _Underworld_ShapeTemperatureIC_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_ShapeFemIC_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
 	ConditionFunction*      condFunc;
 	UnderworldContext*      context;
 
 	context = (UnderworldContext*)Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
 	
-	condFunc = ConditionFunction_New( Underworld_ShapeTemperatureICFunction, "ShapeTemperatureIC" );
+	condFunc = ConditionFunction_New( Underworld_SimpleShapeIC, "Inside1_Outside0_ShapeIC" );
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 	condFunc = ConditionFunction_New( Underworld_GaussianIC, "GaussianIC" );
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 }
 
-void* _Underworld_ShapeTemperatureIC_DefaultNew( Name name ) {
+void* _Underworld_ShapeFemIC_DefaultNew( Name name ) {
 	return Codelet_New(
-		Underworld_ShapeTemperatureIC_Type,
-		_Underworld_ShapeTemperatureIC_DefaultNew,
-		_Underworld_ShapeTemperatureIC_Construct,
+		Underworld_ShapeFemIC_Type,
+		_Underworld_ShapeFemIC_DefaultNew,
+		_Underworld_ShapeFemIC_Construct,
 		_Codelet_Build,
 		_Codelet_Initialise,
 		_Codelet_Execute,
@@ -150,9 +150,9 @@ void* _Underworld_ShapeTemperatureIC_DefaultNew( Name name ) {
 		name );
 }
 
-Index Underworld_ShapeTemperatureIC_Register( PluginsManager* pluginsManager ) {
+Index Underworld_ShapeFemIC_Register( PluginsManager* pluginsManager ) {
 	Journal_DPrintf( Underworld_Debug, "In: %s( void* )\n", __func__ );
 
-	return PluginsManager_Submit( pluginsManager, Underworld_ShapeTemperatureIC_Type, "0", _Underworld_ShapeTemperatureIC_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, Underworld_ShapeFemIC_Type, "0", _Underworld_ShapeFemIC_DefaultNew );
 }
 

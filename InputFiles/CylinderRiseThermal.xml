@@ -14,7 +14,7 @@
 
 	<list name="plugins" mergeType="merge">
 			
-		<param>Underworld_ShapeTemperatureIC</param>	
+		<param>Underworld_ShapeFemIC</param>	
 
 		<!-- Output Plugins -->
 		<param>StgFEM_FrequentOutput</param>	
@@ -139,7 +139,7 @@
 					<struct>
 						<param name="name">temperature</param>
 						<param name="type">func</param>
-						<param name="value"> ShapeTemperatureIC </param>
+						<param name="value"> Inside1_Outside0_ShapeIC </param>
 					</struct>
 				</list>
 			</struct>
