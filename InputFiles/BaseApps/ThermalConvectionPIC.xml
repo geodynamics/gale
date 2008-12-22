@@ -7,8 +7,9 @@
 		<toolbox> Underworld </toolbox>
 	</import>
 
-	<list name="plugins" mergeType="Replace">
+	<list name="plugins" mergeType="merge">
 		<param>StgFEM_StandardConditionFunctions</param>
+    <param>Underworld_Ra_Scaling</param>
 	</list>
 
 	<!-- Component Stuff -->
