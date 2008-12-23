@@ -1060,7 +1060,8 @@ void StgFEM_StandardConditionFunctions_ConstantVector( Node_LocalIndex node_lI, 
 	
 	result[0] = Dictionary_GetDouble_WithDefault( dictionary, "ConstantValueX", 0.0 );
 	result[1] = Dictionary_GetDouble_WithDefault( dictionary, "ConstantValueY", 0.0 );
-	result[2] = Dictionary_GetDouble_WithDefault( dictionary, "ConstantValueZ", 0.0 );
+  if (context->dim == 3 ) 
+    result[2] = Dictionary_GetDouble_WithDefault( dictionary, "ConstantValueZ", 0.0 );
 }
 
 /* 3D spec ridge top BC (for milestone 1 of magma project) 
