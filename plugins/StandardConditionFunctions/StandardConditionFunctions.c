@@ -144,13 +144,7 @@ void _StgFEM_StandardConditionFunctions_Construct( void* component, Stg_Componen
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ErrorFunc, "ErrorFunc");
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ConstantValueX, "ConstantValueX");
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
-
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ConstantValueY, "ConstantValueY");
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
-
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ConstantValueZ, "ConstantValueZ");
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ConstantVector, "ConstantVector");
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_GaussianDistribution, "GaussianDistribution");
@@ -1059,30 +1053,15 @@ void StgFEM_StandardConditionFunctions_ConvectionBenchmark( Node_LocalIndex node
 	*result = ( 1 - y ) + ( cos( M_PI * x ) * sin( M_PI * y ) ) / 100 ;
 }
 
-void StgFEM_StandardConditionFunctions_ConstantValueX( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void StgFEM_StandardConditionFunctions_ConstantVector( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
 	DomainContext*		context            = (DomainContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
 	
 	result[0] = Dictionary_GetDouble_WithDefault( dictionary, "ConstantValueX", 0.0 );
-}
-
-void StgFEM_StandardConditionFunctions_ConstantValueY( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
-	DomainContext*		context            = (DomainContext*)_context;
-	Dictionary*             dictionary         = context->dictionary;
-	double*                 result             = (double*) _result;
-	
 	result[1] = Dictionary_GetDouble_WithDefault( dictionary, "ConstantValueY", 0.0 );
-}
-
-void StgFEM_StandardConditionFunctions_ConstantValueZ( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
-	DomainContext*		context            = (DomainContext*)_context;
-	Dictionary*             dictionary         = context->dictionary;
-	double*                 result             = (double*) _result;
-	
 	result[2] = Dictionary_GetDouble_WithDefault( dictionary, "ConstantValueZ", 0.0 );
 }
-
 
 /* 3D spec ridge top BC (for milestone 1 of magma project) 
  * to be applied to the top x-z plane of the domain */

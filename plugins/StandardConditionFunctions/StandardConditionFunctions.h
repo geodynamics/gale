@@ -94,11 +94,8 @@ void StgFEM_StandardConditionFunctions_ErrorFunc( Node_LocalIndex node_lI, Varia
 void StgFEM_StandardConditionFunctions_LinearVelocityLeftWall( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* result );
 void StgFEM_StandardConditionFunctions_LinearVelocityRightWall( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* result );
 
-
 void StgFEM_StandardConditionFunctions_ConvectionBenchmark( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
-void StgFEM_StandardConditionFunctions_ConstantValueX( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result );
-void StgFEM_StandardConditionFunctions_ConstantValueY( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result );
-void StgFEM_StandardConditionFunctions_ConstantValueZ( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result );
+void StgFEM_StandardConditionFunctions_ConstantVector( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result );
 
 void StgFEM_StandardConditionFunctions_GaussianDistribution( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result );
 void StgFEM_StandardConditionFunctions_1DGaussianDistribution( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result );
