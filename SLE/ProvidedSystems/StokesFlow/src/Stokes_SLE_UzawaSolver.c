@@ -1084,7 +1084,7 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	VecNorm( uVec, NORM_INFINITY, &uVecNormInf );
 	VecNorm( uVec, NORM_2, &uVecNorm );
 	VecGetSize( uVec, &uVecSize );
-	VecNorm( qVec, NORM_INFINITY, &qVecNorm );
+	VecNorm( qVec, NORM_INFINITY, &qVecNormInf );
 	VecNorm( qVec, NORM_2, &qVecNorm );
 	VecGetSize( qVec, &qVecSize );
         Journal_PrintfL( self->info, 1, "  |u|_{\\infty} = %.8e , u_rms = %.8e\n", 
