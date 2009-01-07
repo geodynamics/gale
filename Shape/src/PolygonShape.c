@@ -328,7 +328,7 @@ void _PolygonShape_Destroy( void* polygon, void* data ) {
  * Algorithm works by summing the angles between the test coordinate and each pair of verticies that make up an edge 
  * in the polygon. An inside point will give an angle of 2pi and and outside point will give an angle of 0 */
 
-Bool _PolygonShape_IsCoordInside( void* polygon, Coord testCoord ) {
+Bool _PolygonShape_IsCoordInside( void* polygon, Coord coord ) {
 	PolygonShape*        self                = (PolygonShape*) polygon;
 	Index           vertexCount         = self->vertexCount;
 	Coord_List      vertexList          = self->vertexList;
@@ -341,9 +341,13 @@ Bool _PolygonShape_IsCoordInside( void* polygon, Coord testCoord ) {
 	Index           vertex_I;
 	double*         startVertex;
 	double*         endVertex;
+       Coord           newCoord;
+
+	/* Transform coordinate into canonical reference frame */
+	Stg_Shape_TransformCoord( self, coord, newCoord );
 
 	/* Check to make sure that the coordinate is within startZ and endZ in 3D */
-	if ( self->dim == 3 && ( testCoord[ perpendicularAxis ] < self->start[perpendicularAxis] || testCoord[ perpendicularAxis ] > self->end[perpendicularAxis] ))
+	if ( self->dim == 3 && ( newCoord[ perpendicularAxis ] < self->start[perpendicularAxis] || newCoord[ perpendicularAxis ] > self->end[perpendicularAxis] ))
 		return False;	
 
 	for ( vertex_I = 0 ; vertex_I < vertexCount ; vertex_I++ ) {
@@ -352,8 +356,8 @@ Bool _PolygonShape_IsCoordInside( void* polygon, Coord testCoord ) {
 		endVertex   = vertexList[ (vertex_I + 1) % vertexCount ];
 
 		/* Work out vectors */
-		StGermain_VectorSubtraction( vectorToStartVertex, testCoord, startVertex, 3 );
-		StGermain_VectorSubtraction( vectorToEndVertex,   testCoord, endVertex,  3 );
+		StGermain_VectorSubtraction( vectorToStartVertex, newCoord, startVertex, 3 );
+		StGermain_VectorSubtraction( vectorToEndVertex,   newCoord, endVertex,  3 );
 
 		vectorToStartVertex[ perpendicularAxis ] = 0;
 		vectorToEndVertex[ perpendicularAxis ] = 0;
