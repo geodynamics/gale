@@ -386,6 +386,7 @@ void _Stokes_SLE_UzawaSolver_SolverSetup( void* solver, void* stokesSLE ) {
 	//KSPSetOperators( self->velSolver, ((PETScMatrix*)sle->kStiffMat->matrix)->petscMat, 
 	//		((PETScMatrix*)sle->kStiffMat->matrix)->petscMat, DIFFERENT_NONZERO_PATTERN );
 	KSPSetOperators( self->velSolver, sle->kStiffMat->matrix, sle->kStiffMat->matrix, DIFFERENT_NONZERO_PATTERN );
+  KSPSetFromOptions( self->velSolver );
 
 	if( self->pcSolver ) {
 		Journal_DPrintfL( self->debug, 1, "Setting up MatrixSolver for the Preconditioner.\n" );
@@ -393,6 +394,7 @@ void _Stokes_SLE_UzawaSolver_SolverSetup( void* solver, void* stokesSLE ) {
 		//KSPSetOperators( self->pcSolver, ((PETScMatrix*)self->preconditioner->matrix)->petscMat, 
 		//		((PETScMatrix*)self->preconditioner->matrix)->petscMat, DIFFERENT_NONZERO_PATTERN );
 		KSPSetOperators( self->pcSolver, self->preconditioner->matrix, self->preconditioner->matrix, DIFFERENT_NONZERO_PATTERN );
+    KSPSetFromOptions( self->pcSolver );
 	}
 
 	Stream_UnIndentBranch( StgFEM_Debug );
