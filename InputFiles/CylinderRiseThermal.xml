@@ -129,7 +129,7 @@
 
 	<!-- Boundary conditions -->
 	<include>Underworld/VariableConditions/velocityBCs.freeslip.xml</include>
-	<param name="temperatureICShape"> cylinder </param>
+	<param name="ShapeFemIC"> cylinder </param>
 	<struct name="temperatureICs">
 		<param name="type">CompositeVC</param>
 		<list name="vcList">

@@ -69,7 +69,7 @@ void Underworld_SimpleShapeIC( Node_LocalIndex node_lI, Variable_Index var_I, vo
 	
 	mesh       = context->temperatureField->feMesh;
 
-	shapeName = Dictionary_GetString( dictionary, "temperatureICShape" );
+	shapeName = Dictionary_GetString( dictionary, "ShapeFemIC" );
 	shape = (Stg_Shape*) LiveComponentRegister_Get( context->CF->LCRegister, shapeName );
 	assert( shape );
 
@@ -99,7 +99,7 @@ void Underworld_GaussianIC( Node_LocalIndex node_lI, Variable_Index var_I, void*
 	amplitude = Dictionary_GetDouble_WithDefault( dictionary, "GaussianIC-Amplitude", 1.0 );
 	width = Dictionary_GetDouble_WithDefault( dictionary, "GaussianIC-Width", 1e-2 );
 
-	shapeName = Dictionary_GetString( dictionary, "temperatureICShape" );
+	shapeName = Dictionary_GetString( dictionary, "ShapeFemIC" );
 	shape = (Stg_Shape*) LiveComponentRegister_Get( context->CF->LCRegister, shapeName );
 	assert( shape );
 	Journal_Firewall( !strcmp(shape->type, "Sphere") || !strcmp(shape->type, "Cylinder"),

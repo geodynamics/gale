@@ -183,7 +183,7 @@ appropriate parameters and their values if you use this xml from production runs
 	<param name="allowUnbalancing"> True </param>
 
 	<!-- Set up BCs and ICs -->
-	<param name="temperatureICShape"> HeatShape </param>
+	<param name="ShapeFemIC"> HeatShape </param>
 	<struct name="temperatureICs">
 		<param name="type">CompositeVC</param>
 		<list name="vcList">
