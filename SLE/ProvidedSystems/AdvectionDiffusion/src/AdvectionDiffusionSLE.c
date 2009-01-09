@@ -187,8 +187,14 @@ void _AdvectionDiffusionSLE_Init(
 	self->variableReg = variable_Register;
 	self->fieldVariableReg = fieldVariable_Register;
 
-	if ( self->context ) 
-		EP_AppendClassHook( self->context->calcDtEP, AdvectionDiffusionSLE_CalculateDt, self );
+	if ( self->context ) {
+    /* Create a specific name for the calcDt hook */
+    char* tmpName = Memory_Alloc_Array_Unnamed( char, strlen(self->name)+ 7 );
+    sprintf( tmpName, "%s_CalcDt", self->name );
+		EntryPoint_AppendClassHook( self->context->calcDtEP, tmpName, AdvectionDiffusionSLE_CalculateDt, self->type, self );
+		//EP_AppendClassHook( self->context->calcDtEP, AdvectionDiffusionSLE_CalculateDt, self );
+    Memory_Free( tmpName );
+  }
 }	
 
 void AdvectionDiffusionSLE_InitAll(
@@ -395,19 +401,19 @@ void _AdvectionDiffusionSLE_Build( void* sle, void* data ) {
 
     /* must create unique names otherwise multiple instances of this component
      * will index incorrect instances of this component's data */
-    fieldName = Memory_Alloc_Array_Unnamed( char, strlen(self->name)+7 );
+    fieldName = Memory_Alloc_Array_Unnamed( char, strlen(self->name)+8 );
     sprintf( fieldName, "%s-phiDot", self->name );
 
-    dofName = Memory_Alloc_Array_Unnamed( char, strlen(self->name)+10 );
+    dofName = Memory_Alloc_Array_Unnamed( char, strlen(self->name)+11 );
     sprintf( dofName, "%s-dofLayout", self->name );
 
-    fieldDotName  = Memory_Alloc_Array_Unnamed( char, strlen(self->name)+12 );
+    fieldDotName  = Memory_Alloc_Array_Unnamed( char, strlen(self->name)+13 );
     sprintf( fieldDotName, "%s-phiDotField", self->name );
 
-    phiVecName = Memory_Alloc_Array_Unnamed( char, strlen(self->name)+10 );
+    phiVecName = Memory_Alloc_Array_Unnamed( char, strlen(self->name)+11 );
     sprintf( phiVecName, "%s-phiVector", self->name );
 
-    phiDotVecName = Memory_Alloc_Array_Unnamed( char, strlen(self->name)+13 );
+    phiDotVecName = Memory_Alloc_Array_Unnamed( char, strlen(self->name)+14 );
     sprintf( phiDotVecName, "%s-phiDotVector", self->name );
 
 		variable = Variable_NewScalar( 
