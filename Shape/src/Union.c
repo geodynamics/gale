@@ -228,10 +228,6 @@ void _Union_Construct( void* combination, Stg_ComponentFactory* cf, void* data )
 	_Stg_Shape_Construct( self, cf, data );
 
 	optionsList = Dictionary_Get( dictionary, "shapes" );
-        /*	Journal_Firewall( vertexList != NULL,  */
-        /*		Journal_Register( Error_Type, self->type ), */
-        /*		"In func %s: vertexList specifying the combination is NULL.\n", */
-        /*		__func__); */
 
 	shapeCount = Dictionary_Entry_Value_GetCount(optionsList);
 
@@ -240,12 +236,6 @@ void _Union_Construct( void* combination, Stg_ComponentFactory* cf, void* data )
 	isComplement  = Memory_Alloc_Array( Bool, shapeCount, "Complement Array" );
 	memset( shapeList,     0, shapeCount * sizeof(Stg_Shape*) );
 	memset( isComplement,  0, shapeCount * sizeof(Bool) );
-	
-	/* TALK ABOUT WITH ROB, will there be some Flag for Union or Intersection type in the XML file. */
-	/* If so do we need another variable on the combination class which is this flag, and then use that flag  */
-	/* to determine the method of test if a particle is inside or outside the shape */
-
-
 	
 	Stream_Indent( stream );
 	for ( shape_I = 0 ; shape_I < shapeCount ; shape_I++) { 

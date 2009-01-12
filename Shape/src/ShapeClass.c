@@ -281,7 +281,9 @@ void Stg_Shape_TransformCoord( void* shape, Coord coord, Coord transformedCoord 
 void Stg_Shape_TranslateCoord( void* shape, Coord coord, Coord translatedCoord ) {
 	Stg_Shape* self              = (Stg_Shape*)shape;
 
-	Vec_Sub3D( translatedCoord, coord, self->centre );
+   self->dim == 2 ? 
+     Vec_Sub2D( translatedCoord, coord, self->centre ) :
+     Vec_Sub3D( translatedCoord, coord, self->centre ) ;
 }
 
 

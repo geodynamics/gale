@@ -13,7 +13,7 @@
 <param name="Parent">Stg_Shape</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">...</param>
+<param name="Description">Allows for a geometry to be defined in python.</param>
 
 <!--Now the interesting stuff-->
 
@@ -23,7 +23,7 @@
 		<param name="Name">Function</param>
 		<param name="Type">String</param>
 		<param name="Default">"0"</param>
-		<param name="Description">...</param>
+		<param name="Description">Geometry function</param>
 	</struct>
 
 </list>
@@ -32,6 +32,13 @@
 
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">
+<![CDATA[
+		<struct name="shape">
+			<param name="Type">PythonShape</param>
+			<param name="Function"> y > 4 * x * x - 0.5 </param>
+		</struct>
+	]]>
+</param>
 
 </StGermainData>

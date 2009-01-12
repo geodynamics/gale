@@ -13,17 +13,14 @@
 <param name="Parent">Stg_Shape</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">...</param>
-
-<!--Now the interesting stuff-->
-
+<param name="Description">This creates a sphere geometry</param>
 
 <list name="Params">
 	<struct>
 		<param name="Name">radius</param>
 		<param name="Type">Double</param>
 		<param name="Default">0.0</param>
-		<param name="Description">...</param>
+		<param name="Description">The radius of the sphere</param>
 	</struct>
 
 </list>
@@ -31,7 +28,6 @@
 <list name="Dependencies">
 
 </list>
-<!-- Add an exmaple XML if possible -->
 <param name="Example">...</param>
 
 </StGermainData>

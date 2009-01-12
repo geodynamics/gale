@@ -15,9 +15,6 @@
 <param name="Summary">...</param>
 <param name="Description">Defines a Box shape</param>
 
-<!--Now the interesting stuff-->
-
-
 <list name="Params">
 	<struct>
 		<param name="Name">startX</param>
@@ -78,8 +75,6 @@
 </list>
 
 <list name="Dependencies">
-<!-- This component calls in another directory so the info above/below may not be complete-->
-
 </list>
 <!-- Add an exmaple XML if possible -->
 <param name="Example">...</param>

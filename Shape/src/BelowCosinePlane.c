@@ -60,7 +60,7 @@ BelowCosinePlane* BelowCosinePlane_New(
 		XYZ                                   minValue,
 		XYZ                                   maxValue,
 		double                                amplitude,
-		double                                period,
+		double                                wavelength,
 		double                                phase )
 {
 	BelowCosinePlane* self = (BelowCosinePlane*) _BelowCosinePlane_DefaultNew( name );
@@ -77,7 +77,7 @@ BelowCosinePlane* BelowCosinePlane_New(
 		minValue,
 		maxValue,
 		amplitude,
-		period,
+		wavelength,
 		phase ) ;
 	return self;
 }
@@ -129,11 +129,11 @@ BelowCosinePlane* _BelowCosinePlane_New(
 	return self;
 }
 
-void _BelowCosinePlane_Init( void* belowPlane, XYZ width, double amplitude, double period, double phase ) {
+void _BelowCosinePlane_Init( void* belowPlane, XYZ width, double amplitude, double wavelength, double phase ) {
 	BelowCosinePlane* self = (BelowCosinePlane*)belowPlane;
 
 	self->amplitude = amplitude;
-	self->period = period;
+	self->wavelength = wavelength;
 	self->phase = phase;
 }
 
@@ -150,13 +150,13 @@ void BelowCosinePlane_InitAll(
 		XYZ                                   minValue,
 		XYZ                                   maxValue,
 		double                                amplitude,
-		double                                period,
+		double                                wavelength,
 		double                                phase )
 {
 	BelowCosinePlane* self = (BelowCosinePlane*)belowPlane;
 
 	BelowPlane_InitAll( self, dim, centre, alpha, beta, gamma, offset, width, minValue, maxValue );
-	_BelowCosinePlane_Init( self, width, amplitude, period, phase );
+	_BelowCosinePlane_Init( self, width, amplitude, wavelength, phase );
 }
 	
 
@@ -188,7 +188,7 @@ void* _BelowCosinePlane_Copy( void* belowPlane, void* dest, Bool deep, Name name
 	newBelowCosinePlane = (BelowCosinePlane*)_BelowPlane_Copy( self, dest, deep, nameExt, ptrMap );
 
 	newBelowCosinePlane->amplitude = self->amplitude;
-	newBelowCosinePlane->period = self->period;
+	newBelowCosinePlane->wavelength = self->wavelength;
 	newBelowCosinePlane->phase = self->phase;
 	
 	return (void*)newBelowCosinePlane;
@@ -217,16 +217,16 @@ void* _BelowCosinePlane_DefaultNew( Name name ) {
 void _BelowCosinePlane_Construct( void* belowPlane, Stg_ComponentFactory* cf, void* data ) {
 	BelowCosinePlane*            self          = (BelowCosinePlane*) belowPlane;
 	double                       amplitude;
-	double                       period;
+	double                       wavelength;
 	double                       phase;
 
 	_BelowPlane_Construct( self, cf, data );
 
 	amplitude = Stg_ComponentFactory_GetDouble( cf, self->name, "amplitude", 0.1 );
-	period = Stg_ComponentFactory_GetDouble( cf, self->name, "period", 2*M_PI );
+	wavelength = Stg_ComponentFactory_GetDouble( cf, self->name, "wavelength", 2*M_PI );
 	phase = Stg_ComponentFactory_GetDouble( cf, self->name, "phase", 0.0 );
 
-	_BelowCosinePlane_Init( self, self->width, amplitude, period, phase );
+	_BelowCosinePlane_Init( self, self->width, amplitude, wavelength, phase );
 }
 
 void _BelowCosinePlane_Build( void* belowPlane, void* data ) {
@@ -269,7 +269,7 @@ Bool _BelowCosinePlane_IsCoordInside( void* belowPlane, Coord coord ) {
 
 	x = newCoord[ I_AXIS ];
 
-	y =  self->offset + self->amplitude * cos( (2*M_PI * x /self->period)  + self->phase );
+	y =  self->offset + self->amplitude * cos( (2*M_PI * x /self->wavelength)  + self->phase );
 
 	if ( fabs( newCoord[ J_AXIS ] < y) ) {
 		return True;
@@ -280,15 +280,15 @@ Bool _BelowCosinePlane_IsCoordInside( void* belowPlane, Coord coord ) {
 double _BelowCosinePlane_CalculateVolume( void* belowPlane ) {
 	BelowCosinePlane* self = (BelowCosinePlane*)belowPlane;
 	double volume;
-	double period = self->period;
+	double wavelength = self->wavelength;
 	double dx = self->width[ I_AXIS ];
 
 	/* using the identity sin(u)-sin(v) = 2 * cos( (u+v)/2 ) * sin( (u-v)/2 ) */
 
-	volume = self->offset*dx + 2 * self->amplitude * period / (2*M_PI) *
+	volume = self->offset*dx + 2 * self->amplitude * wavelength / (2*M_PI) *
 				 (
-				 cos( (M_PI/period) * (self->maxValue[I_AXIS] - self->minValue[I_AXIS] ) + self->phase) *
-				 sin( (M_PI/period) * (self->maxValue[I_AXIS] - self->minValue[I_AXIS]) )
+				 cos( (M_PI/wavelength) * (self->maxValue[I_AXIS] - self->minValue[I_AXIS] ) + self->phase) *
+				 sin( (M_PI/wavelength) * (self->maxValue[I_AXIS] - self->minValue[I_AXIS]) )
 				 );
 
 	if ( self->dim == 3 ) 

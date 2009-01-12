@@ -13,19 +13,20 @@
 <param name="Parent">VariableCondition</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">...</param>
-
-<!--Now the interesting stuff-->
-
+<param name="Description">Provides a definition across all elements. AllElementsVC is not a strict component, so its definition in xml is not standard.</param>
 
 <list name="Params">
 
 </list>
 
 <list name="Dependencies">
-
+	<struct>
+		<param name="Name">variables</param>
+		<param name="Type">VC list</param>
+		<param name="Default">N/A</param>
+		<param name="Description">See example. Type can be a: int, double, short, char and func (function defined by a plugin)</param>
+	</struct>
 </list>
-<!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">N/A</param>
 
 </StGermainData>

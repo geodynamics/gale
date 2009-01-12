@@ -13,10 +13,7 @@
 <param name="Parent">Stg_Component</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">...</param>
-
-<!--Now the interesting stuff-->
-
+<param name="Description">Associates a certain type of TimeIntegrator (a data structure in charge of advection methods) with a given shape class. This creates a new vector variable called shapeCentreVariable. Unfortunately the author has no experience with this components and I can't elaborate more... pardon</param>
 
 <list name="Params">
 
@@ -27,32 +24,23 @@
 		<param name="Essential">True</param>
 		<param name="Name">TimeIntegrator</param>
 		<param name="Type">TimeIntegrator</param>
-		<param name="Description">...</param>
+		<param name="Description">The object in change of certain advection processes</param>
 	</struct>
-
-<!-- PLEASE, check the above struct information is accurate, in line number 178 of the c file and then remove this comment afterwards -->
 
 	<struct>
 		<param name="Essential">True</param>
 		<param name="Name">VelocityField</param>
 		<param name="Type">FieldVariable</param>
-		<param name="Description">...</param>
+		<param name="Description">The velocity field is needed because it's advection</param>
 	</struct>
-
-<!-- PLEASE, check the above struct information is accurate, in line number 179 of the c file and then remove this comment afterwards -->
-
 	<struct>
 		<param name="Essential">True</param>
 		<param name="Name">Shape</param>
 		<param name="Type">Stg_Shape</param>
-		<param name="Description">...</param>
+		<param name="Description">The shape which will be associated with the time integrator</param>
 	</struct>
 
-<!-- PLEASE, check the above struct information is accurate, in line number 180 of the c file and then remove this comment afterwards -->
-
-
 </list>
-<!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example"></param>
 
 </StGermainData>

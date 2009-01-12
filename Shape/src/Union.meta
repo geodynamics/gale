@@ -13,38 +13,41 @@
 <param name="Parent">Stg_Shape</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">...</param>
-
-<!--Now the interesting stuff-->
-
+<param name="Description">This is used to create a union geometry of two other geometries. Not can be used in the union if the geometry is preceded by a !</param>
 
 <list name="Params">
-
 </list>
 
 <list name="Dependencies">
-<!-- This component calls in another directory so the info above/below may not be complete-->
 	<struct>
 		<param name="Essential">True</param>
-		<param name="Name">&amp;nameShape[1]</param>
-		<param name="Type">Stg_Shape</param>
-		<param name="Description">...</param>
+		<param name="Name">shapes</param>
+		<param name="Type">list</param>
+		<param name="Description">A list of shapes (each defined in a param tag). A ! preceding the shape name will caused the not of that shape to be used in the union</param>
 	</struct>
-
-<!-- PLEASE, check the above struct information is accurate, in line number 243 of the c file and then remove this comment afterwards -->
-
-	<struct>
-		<param name="Essential">True</param>
-		<param name="Name">nameShape</param>
-		<param name="Type">Stg_Shape</param>
-		<param name="Description">...</param>
-	</struct>
-
-<!-- PLEASE, check the above struct information is accurate, in line number 247 of the c file and then remove this comment afterwards -->
-
-
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">
+<![CDATA[
+	<struct name="myUnion">
+		<param name="Type">Union</param>
+		<list name="shapes">
+			<param>box</param>
+			<param>sphere</param>
+		</list>
+	</struct>
+
+	<!-- With the NOT of a sphere -->
+	<struct name="myUnionWithNot">
+		<param name="Type">Union</param>
+		<list name="shapes">
+			<param>box</param>
+			<param>!sphere</param>
+		</list>
+	</struct>
+
+
+	]]>
+</param>
 
 </StGermainData>
