@@ -1055,6 +1055,19 @@ void _AbstractContext_LoadTimeInfoFromCheckPoint( Context* self, Index timeStep,
 	   
    H5Sclose( fileSpace );
    H5Dclose( fileData );
+	   
+   /* Read previous nproc from file */
+   #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+   fileData = H5Dopen( file, "/nproc" );
+   #else
+   fileData = H5Dopen( file, "/nproc", H5P_DEFAULT );
+   #endif
+   fileSpace = H5Dget_space( fileData );
+	   
+   H5Dread( fileData, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &(self->checkpointnproc) );
+	   
+   H5Sclose( fileSpace );
+   H5Dclose( fileData );
    
    H5Fclose( file );
 	   
@@ -1122,7 +1135,7 @@ void _AbstractContext_SaveTimeInfo( Context* context ) {
                                H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
    #endif
          
-   props = H5Pcreate( H5P_DATASET_XFER );      
+   props = H5Pcreate( H5P_DATASET_XFER );
    H5Dwrite( fileData, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, props, &(context->currentTime) );
    H5Pclose( props );
    H5Dclose( fileData );
@@ -1144,7 +1157,23 @@ void _AbstractContext_SaveTimeInfo( Context* context ) {
    H5Dclose( fileData );
    H5Sclose( fileSpace );
    
+   /* Dump nproc */
+   fileSpace = H5Screate_simple( 1, &count, NULL );         
+   #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+   fileData = H5Dcreate( file, "/nproc", H5T_NATIVE_INT, fileSpace, H5P_DEFAULT );
+   #else
+   fileData = H5Dcreate( file, "/nproc", H5T_NATIVE_INT, fileSpace,
+                               H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+   #endif
+         
+   props = H5Pcreate( H5P_DATASET_XFER );
+   H5Dwrite( fileData, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, props, &(context->nproc) );
+   H5Pclose( props );
+   H5Dclose( fileData );
+   H5Sclose( fileSpace );
+   
    H5Fclose( file );
+   
    
 #else	
     sprintf( timeInfoFileName, "%s.dat", timeInfoFileName );

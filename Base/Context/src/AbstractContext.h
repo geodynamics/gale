@@ -112,6 +112,7 @@
 		unsigned int				frequentOutputEvery; \
 		unsigned int				dumpEvery; \
 		unsigned int				checkpointEvery; \
+		unsigned int				checkpointnproc; \
 		double				        checkpointAtTimeInc; \
 		double				        nextCheckpointTime; \
 		Name                                    experimentName; \
