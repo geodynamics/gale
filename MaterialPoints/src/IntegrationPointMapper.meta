@@ -13,10 +13,7 @@
 <param name="Parent">Stg_Component</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">...</param>
-
-<!--Now the interesting stuff-->
-
+<param name="Description">IntegrationPointMapper is an abstract class which enables a mapping between PIC integration points (used for assembly of numerical objects) and material points (advecting particle which store the constitutive information of the fluid). This abstract class defines basic data structures and methods which all mappers have in common, thus this is a handy API for developers.</param>
 
 <list name="Params">
 
@@ -27,12 +24,11 @@
 		<param name="Essential">True</param>
 		<param name="Name">IntegrationPointsSwarm</param>
 		<param name="Type">IntegrationPointsSwarm</param>
-		<param name="Description">...</param>
+		<param name="Description">The integration point swarm, which will me mapped.</param>
 	</struct>
 
 
 </list>
-<!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">N/A</param>
 
 </StGermainData>

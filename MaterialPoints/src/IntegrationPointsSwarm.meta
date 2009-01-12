@@ -16,8 +16,6 @@
 <param name="Description">A specific swarm used for integration which is "aware" of the materials used. A mapper relationship links
 it with the physical material swarm(s) of which can actually be advected.</param>
 
-<!--Now the interesting stuff-->
-
 <list name="Params">
 	<struct>
 		<param name="Name">recalculateWeights</param>
@@ -56,6 +54,18 @@ it with the physical material swarm(s) of which can actually be advected.</param
 	</struct>
 
 </list>
-<param name="Example">...</param>
+<param name="Example">
+<![CDATA[
+	<struct name="picIntegrationPoints">
+		<param name="Type">IntegrationPointsSwarm</param>
+		<param name="CellLayout">elementCellLayout</param>
+		<param name="ParticleLayout">localLayout</param>
+		<param name="FeMesh">elementMesh</param>
+		<param name="WeightsCalculator">weights</param>
+		<param name="TimeIntegrator">timeIntegrator</param>
+		<param name="IntegrationPointMapper">mapper</param>
+	</struct>
+	]]>
+</param>
 
 </StGermainData>

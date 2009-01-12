@@ -13,10 +13,7 @@
 <param name="Parent">WeightsCalculator</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">...</param>
-
-<!--Now the interesting stuff-->
-
+<param name="Description">This sets the integration weight of each particle, within a cell, to be an equal share of the cell's weight.</param>
 
 <list name="Params">
 
@@ -25,7 +22,6 @@
 <list name="Dependencies">
 
 </list>
-<!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">N/A</param>
 
 </StGermainData>

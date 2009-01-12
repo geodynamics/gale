@@ -13,10 +13,7 @@
 <param name="Parent">FeVariable</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">...</param>
-
-<!--Now the interesting stuff-->
-
+<param name="Description">An abstract class which maps particle variables onto a mesh through the operator $\hat{\phi} = \frac{\sum_{n}N(\zeta)\phi(\zeta)}{\sum_{n}N(\zeta)}$<br/>, where $\hat{\phi}$ is the new mesh variable, $N$ are shape functions and $\phi$ is a particle value. <br/>This class sets up a domain-wide massMatrix (really a vector), forceVector and solutionVector. The massMatrix is the denominator of the equation, while the foceVector is the numerator. <br>This variable is evaluated at the end of the Solve_EP</param>
 
 <list name="Params">
 
@@ -27,32 +24,23 @@
 		<param name="Essential">True</param>
 		<param name="Name">Swarm</param>
 		<param name="Type">Swarm</param>
-		<param name="Description">...</param>
+		<param name="Description">The swarm to take shape function and particle values from</param>
 	</struct>
-
-<!-- PLEASE, check the above struct information is accurate, in line number 162 of the c file and then remove this comment afterwards -->
 
 	<struct>
 		<param name="Essential">True</param>
 		<param name="Name">Context</param>
 		<param name="Type">FiniteElementContext</param>
-		<param name="Description">...</param>
+		<param name="Description">The context, is required for adding an EP</param>
 	</struct>
-
-<!-- PLEASE, check the above struct information is accurate, in line number 163 of the c file and then remove this comment afterwards -->
 
 	<struct>
 		<param name="Essential">True</param>
 		<param name="Name">Mesh</param>
 		<param name="Type">FeMesh</param>
-		<param name="Description">...</param>
+		<param name="Description">The mesh to map the particle values to.</param>
 	</struct>
-
-<!-- PLEASE, check the above struct information is accurate, in line number 164 of the c file and then remove this comment afterwards -->
-
-
 </list>
-<!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">N/A, see ViscosityField</param>
 
 </StGermainData>

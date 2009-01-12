@@ -225,13 +225,10 @@ void _ParticleFeVariable_Build( void* materialFeVariable, void* data ) {
 	ParticleFeVariable* self = (ParticleFeVariable*) materialFeVariable;
 	int dataSize;
 
+	ForceTerm_SetAssembleElementFunction( self->assemblyTerm, ParticleFeVariable_AssembleElement );
 #if 0
 	if( self->useDeriv )
-#endif
 	   ForceTerm_SetAssembleElementFunction( self->assemblyTerm, ParticleFeVariable_AssembleElement_Deriv );
-#if 0
-	else
-	   ForceTerm_SetAssembleElementFunction( self->assemblyTerm, ParticleFeVariable_AssembleElement );
 #endif
 	
 	Stg_Component_Build( self->feMesh, data, False );
@@ -293,18 +290,15 @@ void _ParticleFeVariable_Destroy( void* materialFeVariable, void* data ) {
 void ParticleFeVariable_Update( void* materialFeVariable ) {
 	ParticleFeVariable* self = (ParticleFeVariable*) materialFeVariable;
 
-	printf( "***\n*** Updating %s\n***\n", self->name );
+	/* printf( "***\n*** Updating %s\n***\n", self->name );   Why - shouldn't this be done properly ?? */
 
 	/* Initialise Vectors */
-	//Vector_Zero( self->assemblyVector->vector );
-	//Vector_Zero( self->massMatrix->vector );
 	VecSet( self->assemblyVector->vector, 0.0 );
 	VecSet( self->massMatrix->vector, 0.0 );
 
 	ForceVector_Assemble( self->assemblyVector );
 	ForceVector_Assemble( self->massMatrix );
 
-	//Vector_PointwiseDivide( self->assemblyVector->vector, self->assemblyVector->vector, self->massMatrix->vector );
 	VecPointwiseDivide( self->assemblyVector->vector, self->assemblyVector->vector, self->massMatrix->vector );
 
 	SolutionVector_UpdateSolutionOntoNodes( self->assemblyVector );
@@ -325,7 +319,8 @@ void ParticleFeVariable_AssembleElement( void* _forceTerm, ForceVector* forceVec
 	Node_Index                 node_I;
 	Dof_Index                  dofCount          = self->fieldComponentCount;
 	Dof_Index                  dof_I;
-	double                     shapeFunc[8];
+	Dof_Index                  dim               = self->dim;
+	double                     shapeFunc[8], detJac;
 	double                     particleValue[9];
 
 	cellParticleCount = swarm->cellParticleCountTbl[ cell_I ];
@@ -337,16 +332,55 @@ void ParticleFeVariable_AssembleElement( void* _forceTerm, ForceVector* forceVec
 		self->currentParticleIndex = swarm->cellParticleTbl[cell_I][cParticle_I];
 		ParticleFeVariable_ValueAtParticle( self, swarm, lElement_I, particle, particleValue );
 
+		/* get shape function and detJac */
 		ElementType_EvaluateShapeFunctionsAt( elementType, particle->xi, shapeFunc );
+		detJac = ElementType_JacobianDeterminant( elementType, mesh, lElement_I, particle->xi, dim );
 
 		for ( dof_I = 0 ; dof_I < dofCount ; dof_I++ ) {
 			for ( node_I = 0 ; node_I < elementNodeCount ; node_I++ ) {
-				elForceVector[ node_I * dofCount + dof_I ] += shapeFunc[ node_I ] * particleValue[ dof_I ]; 
+				elForceVector[ node_I * dofCount + dof_I ] += particle->weight * detJac * shapeFunc[ node_I ] * particleValue[ dof_I ]; 
 			}
 		}
 	}
 }
 
+void ParticleFeVariable_AssembleElementShapeFunc( void* _forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elForceVector ) {
+	ForceTerm*                 forceTerm         = (ForceTerm*) _forceTerm;
+	ParticleFeVariable*        self              = Stg_CheckType( forceVector->feVariable, ParticleFeVariable );
+	Swarm*                     swarm             = forceTerm->integrationSwarm;
+	FeMesh*        		   mesh              = self->feMesh;
+	Element_NodeIndex          elementNodeCount  = FeMesh_GetElementNodeSize( mesh, lElement_I );
+	ElementType*               elementType       = FeMesh_GetElementType( mesh, lElement_I );
+	Cell_Index                 cell_I            = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
+	int                        dim = Mesh_GetDimSize( mesh );
+	Particle_InCellIndex       cellParticleCount;
+	Particle_InCellIndex       cParticle_I;
+	IntegrationPoint*          particle;
+	double                     detJac;
+	double                     shapeFunc[8];
+	Node_Index                 node_I;
+	Dof_Index                  dofCount          = self->fieldComponentCount;
+	Dof_Index                  dof_I;
+
+	cellParticleCount = swarm->cellParticleCountTbl[ cell_I ];
+	
+	for( cParticle_I = 0 ; cParticle_I < cellParticleCount; cParticle_I++ ) {
+		/* Find this particle in the element */
+		particle = (IntegrationPoint*) Swarm_ParticleInCellAt( swarm, cell_I, cParticle_I );
+
+		ElementType_EvaluateShapeFunctionsAt( elementType, particle->xi, shapeFunc );
+		detJac = ElementType_JacobianDeterminant( elementType, mesh, lElement_I, particle->xi, dim );
+
+		for ( dof_I = 0 ; dof_I < dofCount ; dof_I++ ) {
+			for ( node_I = 0 ; node_I < elementNodeCount ; node_I++ ) {
+			   elForceVector[ node_I * dofCount + dof_I ] += particle->weight * detJac * shapeFunc[node_I];
+			}
+		}
+	}
+}
+
+#if 0
+Commented out 31Oct08, by Julian. I don't think this is the way this guy should work
 void ParticleFeVariable_AssembleElement_Deriv( void* _forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elForceVector ) 
 {
 	ForceTerm*                 forceTerm         = (ForceTerm*) _forceTerm;
@@ -386,44 +420,6 @@ void ParticleFeVariable_AssembleElement_Deriv( void* _forceTerm, ForceVector* fo
 			}
 		}
 	}
-
 	Memory_Free( self->GNx );
 }
-
-void ParticleFeVariable_AssembleElementShapeFunc( void* _forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elForceVector ) 
-{
-	ForceTerm*                 forceTerm         = (ForceTerm*) _forceTerm;
-	ParticleFeVariable*        self              = Stg_CheckType( forceVector->feVariable, ParticleFeVariable );
-	Swarm*                     swarm             = forceTerm->integrationSwarm;
-	FeMesh*        		   mesh              = self->feMesh;
-	Element_NodeIndex          elementNodeCount  = FeMesh_GetElementNodeSize( mesh, lElement_I );
-	ElementType*               elementType       = FeMesh_GetElementType( mesh, lElement_I );
-	Cell_Index                 cell_I            = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
-	int                        dim = Mesh_GetDimSize( mesh );
-	Particle_InCellIndex       cellParticleCount;
-	Particle_InCellIndex       cParticle_I;
-	IntegrationPoint*          particle;
-	double                     detJac;
-	Node_Index                 node_I;
-	Dof_Index                  dofCount          = self->fieldComponentCount;
-	Dof_Index                  dof_I;
-
-	self->GNx = Memory_Alloc_2DArray( double, dim, elementNodeCount, "GNx" );
-	cellParticleCount = swarm->cellParticleCountTbl[ cell_I ];
-	
-	for( cParticle_I = 0 ; cParticle_I < cellParticleCount; cParticle_I++ ) {
-		/* Find this particle in the element */
-		particle = (IntegrationPoint*) Swarm_ParticleInCellAt( swarm, cell_I, cParticle_I );
-
-		ElementType_ShapeFunctionsGlobalDerivs( elementType, mesh, lElement_I,
-							particle->xi, dim, &detJac, self->GNx );
-
-		for ( dof_I = 0 ; dof_I < dofCount ; dof_I++ ) {
-			for ( node_I = 0 ; node_I < elementNodeCount ; node_I++ ) {
-			   elForceVector[ node_I * dofCount + dof_I ] += particle->weight * detJac;
-			}
-		}
-	}
-
-	Memory_Free( self->GNx );
-}
+#endif

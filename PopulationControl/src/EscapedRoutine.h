@@ -104,7 +104,7 @@
 		(EscapedRoutine*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	void* _EscapedRoutine_Copy( void* escapedRoutine, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
-void _EscapedRoutine_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+	void _EscapedRoutine_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 	void _EscapedRoutine_Build( void* escapedRoutine, void* data ) ;
 	void _EscapedRoutine_Initialise( void* escapedRoutine, void* data ) ;
 	void _EscapedRoutine_Execute( void* escapedRoutine, void* data );
