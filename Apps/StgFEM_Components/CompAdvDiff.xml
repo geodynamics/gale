@@ -6,45 +6,46 @@
 
 	<list name="FieldVariablesToCheckpoint" mergeType="merge">
 		<param> VelocityField </param>
-		<param> TemperatureField </param>
-		<!-- TemperatureField-phiDotField is never explicitly made in xml, 
+		<param> CompositionField </param>
+		<!-- the CompositionField-phiDotField is never explicitly made in xml, 
 		but in the AdvectionDiffusionSLE.c, it's a necessary field for restarting. -->
-		<param> TemperatureField-phiDotField </param>
+		<param> CompositionEqn-phiDotField </param>
 	</list>
 
 	<struct name="components" mergeType="merge">
-		<struct name="residual">
+		<struct name="cResidual">
 			<param name="Type">ForceVector</param>
-			<param name="FeVariable">TemperatureField</param>
+			<param name="FeVariable">CompositionField</param>
 		</struct>
-		<struct name="massMatrix">
+		<struct name="cMassMatrix">
 			<param name="Type">ForceVector</param>
-			<param name="FeVariable">TemperatureField</param>
+			<param name="FeVariable">CompositionField</param>
 		</struct>
-		<struct name="predictorMulticorrector">
+		<struct name="cPredictorMulticorrector">
 			<param name="Type">AdvDiffMulticorrector</param>
 		</struct>
-		<struct name="EnergyEqn">
+		<struct name="CompositionEqn">
 			<param name="Type">AdvectionDiffusionSLE</param>
-			<param name="SLE_Solver">predictorMulticorrector</param> 
+			<param name="SLE_Solver">cPredictorMulticorrector</param> 
 			<param name="Context">context</param>
-			<param name="PhiField">TemperatureField</param>
-			<param name="Residual">residual</param>
-			<param name="MassMatrix">massMatrix</param>
+			<param name="PhiField">CompositionField</param>
+			<param name="Residual">cResidual</param>
+			<param name="MassMatrix">cMassMatrix</param>
 			<param name="courantFactor">courantFactor</param>
 		</struct>
-		<struct name="lumpedMassMatrixForceTerm">
+		<struct name="cLumpedMassMatrixForceTerm" mergeType="merge">
+    <!-- Make this the same as the temperature massMatrix -->
 			<param name="Type">LumpedMassMatrixForceTerm</param>
 			<param name="Swarm">gaussSwarm</param>
-			<param name="ForceVector">massMatrix</param>
+			<param name="ForceVector">cMassMatrix</param>
 		</struct>
-		<struct name="defaultResidualForceTerm">
+		<struct name="cDefaultResidualForceTerm">
 			<param name="Type">AdvDiffResidualForceTerm</param>
 			<param name="Swarm">gaussSwarm</param>
-			<param name="ForceVector">residual</param>
-			<param name="ExtraInfo">EnergyEqn</param>
+			<param name="ForceVector">cResidual</param>
+			<param name="ExtraInfo">CompositionEqn</param>
 			<param name="VelocityField">VelocityField</param>
-			<param name="defaultDiffusivity">defaultDiffusivity</param>
+			<param name="defaultDiffusivity">compositionDiffusivity</param>
 			<!-- UpwindXiFunction can be 'Exact', 'DoublyAsymptoticAssumption' or 'CriticalAssumption' -->
 			<param name="UpwindXiFunction">DoublyAsymptoticAssumption</param> 
 		</struct>

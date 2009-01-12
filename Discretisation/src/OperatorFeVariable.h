@@ -83,13 +83,31 @@
 		void*                                              _feVariable2,
 		Name                                               operatorName );
 	
+	OperatorFeVariable* OperatorFeVariable_NewUnary_OwnOperator( 
+		Name                                               name,
+		void*                                              _feVariable,
+		Operator*                                          ownOperator );	
+	
 	/* Public Constructor */
 	void* OperatorFeVariable_DefaultNew( Name name );
+
 	OperatorFeVariable* OperatorFeVariable_New( 
 		Name                                               name,
 		FeVariable_InterpolateWithinElementFunction*       interpolateWithinElement,
 		FeVariable_GetValueAtNodeFunction*                 getValueAtNode,
 		Name                                               operatorName,
+		Index                                              feVariableCount,
+		FeVariable**                                       feVariableList,
+		Dimension_Index                                    dim,
+		Bool                                               isCheckpointedAndReloaded,
+		MPI_Comm                                           communicator,
+		FieldVariable_Register*                            fV_Register );
+
+	OperatorFeVariable* OperatorFeVariable_New2( 
+		Name                                               name,
+		FeVariable_InterpolateWithinElementFunction*       interpolateWithinElement,
+		FeVariable_GetValueAtNodeFunction*                 getValueAtNode,
+		Operator*                                          ownOperator,
 		Index                                              feVariableCount,
 		FeVariable**                                       feVariableList,
 		Dimension_Index                                    dim,
@@ -110,8 +128,9 @@
 		Stg_Component_InitialiseFunction*                  _initialise,
 		Stg_Component_ExecuteFunction*                     _execute,
 		Stg_Component_DestroyFunction*                     _destroy,
-		Name												name,
-		Bool												initFlag,
+		Name                                               name,
+		Bool                                               initFlag,
+		Operator*                                          ownOperator,
 		FieldVariable_InterpolateValueAtFunction*          interpolateValueAt,
 		FieldVariable_GetValueFunction*	                   _getMinGlobalFieldMagnitude,
 		FieldVariable_GetValueFunction*                    _getMaxGlobalFieldMagnitude,
@@ -129,7 +148,7 @@
 		MPI_Comm                                           communicator,
 		FieldVariable_Register*                            fV_Register );
 
-	void _OperatorFeVariable_Init( void* feVariable, Name operatorName, Index feVariableCount, FeVariable** feVariableList ) ;
+	void _OperatorFeVariable_Init( void* feVariable, Name operatorName, Index feVariableCount, FeVariable** feVariableList, Operator* ownOperator ) ;
 
 	/* 'Stg_Class' Virtual Implementations */
 	void _OperatorFeVariable_Delete( void* variable ) ;
