@@ -65,16 +65,15 @@
 	        Mesh*					mesh;			\
 		/* Other info */						\
 		/* Colour Stuff */						\
-		lucColour				colour;			\
+	        lucColour				localColour;		\
+		lucColour				shadowColour;		\
+		lucColour				vacantColour;		\
 	        /* Other Stuff */						\
 		/* Stg_Class info */						\
 		unsigned				nEdges;			\
 		unsigned**				edges;			\
 		lucMeshViewer_RenderEdgesFunc*		renderEdges;		\
 										\
-	        lucColour				localColour;		\
-		lucColour				shadowColour;		\
-		lucColour				vacantColour;		\
 		Bool                    		nodeNumbers;		\
 		Bool                    		elementNumbers;		\
 		Bool                    		displayNodes;

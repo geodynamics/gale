@@ -13,19 +13,25 @@
 <param name="Parent">lucInputFormat</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">...</param>
-
-<!--Now the interesting stuff-->
-
+<param name="Description">Allows the user to interactively query the value of a scalar field from a viewport. The user must point the mouse over a viewport containing a lucScalarFieldCrossSection object and then press the 'f' button; the xyz coordinates of that point and a scalar value will be printed at that location. It should be remembered that this will only work for lucScalarFieldCrossSection viewing objects which provide a 2D surface for this functionality. This can only run under interactive mode. No dependencies or parameters are required for this functionality.</param>
 
 <list name="Params">
-
 </list>
 
 <list name="Dependencies">
-
 </list>
-<!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">
+<![CDATA[
+		<struct name="FieldInteractions">
+			<param name="Type">lucFieldValueInteraction</param>
+		</struct>
+		<struct name="window" mergeType="merge">
+			<param name="Viewport">ParticleDensityVP StrainRateInvariantVP</param>
+			<list name="FieldInteractions">
+				<param>ColourBarInteractions</param>
+			</list>
+		</struct>
+		]]>
+</param>
 
 </StGermainData>

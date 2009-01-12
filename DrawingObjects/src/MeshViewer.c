@@ -49,7 +49,6 @@
 #include <StgDomain/StgDomain.h>
 #include <StgFEM/StgFEM.h>
 #ifdef GLUCIFER_USE_PICELLERATOR
-	#include <StgFEM/StgFEM.h>
 	#include <PICellerator/PICellerator.h>
 #endif
 
@@ -126,16 +125,15 @@ lucMeshViewer* _lucMeshViewer_New(
 void _lucMeshViewer_Init( 
                 lucMeshViewer*                                            self,
 		Mesh*                                                     mesh,
-		Name                                                      colourName,
-		lucColour                                                 localColour,
-		lucColour		                                  shadowColour, 
-		lucColour		                                  vacantColour)
+		Name                                                      localColourName,
+		Name                                                      shadowColourName,
+		Name                                                      vacantColourName )
 {
 	self->mesh  = mesh;
-	lucColour_FromString( &self->colour, colourName );
-	memcpy( &(self->localColour), &localColour, sizeof(lucColour) );
-	memcpy( &(self->shadowColour), &shadowColour, sizeof(lucColour) );
-	memcpy( &(self->vacantColour), &vacantColour, sizeof(lucColour) );
+	lucColour_FromString( &self->localColour, localColourName );
+	lucColour_FromString( &self->shadowColour, shadowColourName );
+	lucColour_FromString( &self->vacantColour, vacantColourName );
+	
 	assert( Stg_Class_IsInstance( mesh, Mesh_Type ) );
 
 	self->renderEdges = NULL;
@@ -143,6 +141,9 @@ void _lucMeshViewer_Init(
 
 void _lucMeshViewer_Delete( void* drawingObject ) {
 	lucMeshViewer*  self = (lucMeshViewer*)drawingObject;
+
+	if ( self->edges )
+		Memory_Free( self->edges );
 
 	_lucOpenGLDrawingObject_Delete( self );
 }
@@ -157,7 +158,6 @@ void* _lucMeshViewer_Copy( void* drawingObject, void* dest, Bool deep, Name name
 	lucMeshViewer*  self = (lucMeshViewer*)drawingObject;
 	lucMeshViewer* newDrawingObject;
 	newDrawingObject = _lucOpenGLDrawingObject_Copy( self, dest, deep, nameExt, ptrMap );
-	memcpy( &(newDrawingObject->colour),       &(self->colour),       sizeof(lucColour) );
 	memcpy( &(newDrawingObject->localColour),       &(self->localColour),       sizeof(lucColour) );
 	memcpy( &(newDrawingObject->shadowColour),       &(self->shadowColour),       sizeof(lucColour) );
 	memcpy( &(newDrawingObject->vacantColour),       &(self->vacantColour),       sizeof(lucColour) );
@@ -192,32 +192,23 @@ void* _lucMeshViewer_DefaultNew( Name name ) {
 void _lucMeshViewer_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
 	lucMeshViewer*         self = (lucMeshViewer*)drawingObject;
 	Mesh*                  mesh;
-	Name localColourName;
-	Name shadowColourName;
-	Name vacantColourName;
 	
 	/* Construct Parent */
 	_lucOpenGLDrawingObject_Construct( self, cf, data );
 	
 	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Mesh", Mesh, True, data );
-	localColourName = Stg_ComponentFactory_GetString( cf, self->name, "localColour", "Black") ;
-	shadowColourName = Stg_ComponentFactory_GetString( cf, self->name, "shadowColour", "Blue");
-	vacantColourName = Stg_ComponentFactory_GetString( cf, self->name, "vacantColour", "Grey");
+
 	self->nodeNumbers = Stg_ComponentFactory_GetBool( cf, self->name, "nodeNumbers", False);
 	self->elementNumbers = Stg_ComponentFactory_GetBool( cf, self->name, "elementNumbers", False);
 	self->displayNodes = Stg_ComponentFactory_GetBool( cf, self->name, "displayNodes", False);
 
-	lucColour_FromString( &self->localColour, localColourName );
-	lucColour_FromString( &self->shadowColour, shadowColourName );
-	lucColour_FromString( &self->vacantColour, vacantColourName );
-   
 	_lucMeshViewer_Init( 
 			self, 
 		        mesh,
-			Stg_ComponentFactory_GetString( cf, self->name, "colour", "black" ),
-			self->localColour,
-			self->shadowColour,
-	                self->vacantColour);
+			Stg_ComponentFactory_GetString( cf, self->name, "localColour", "black" ),
+			Stg_ComponentFactory_GetString( cf, self->name, "shadowColour", "blue" ),
+			Stg_ComponentFactory_GetString( cf, self->name, "vacantColour", "Grey" )
+			);
 }
 
 void _lucMeshViewer_Build( void* drawingObject, void* data ) {
@@ -271,11 +262,6 @@ void _lucMeshViewer_CleanUp( void* drawingObject, void* context ) {
 
 void _lucMeshViewer_BuildDisplayList( void* drawingObject, void* _context ) {
 	lucMeshViewer*	self = (lucMeshViewer*)drawingObject;
-	lucColour	colour;
-
-	/* Initialise colour value */
-	memcpy( &colour, &self->colour, sizeof(lucColour) );
-	lucColour_SetOpenGLColour( &colour );
 
 	glPointSize( 1.0 );
 
@@ -474,7 +460,7 @@ void lucMeshViewer_RenderLocal( void* drawingObject ) {
 		vertexFunc = glVertex2dv;
 
 	/* Set color. */
-	glColor3f( self->localColour.red, self->localColour.green, self->localColour.blue );
+	lucColour_SetOpenGLColour( &self->localColour );
 
 	/* Render vertices. */
 	if(self->displayNodes){
@@ -584,8 +570,18 @@ void lucMeshViewer_Render( void* drawingObject ) {
 
 void lucMeshViewer_BuildEdges( lucMeshViewer* self ) {
 #if 0
-	assert( self );
+	unsigned	e_i;
 
+	assert( self );
+	
+	self->nEdges = Mesh_GetLocalSize( self->mesh, MT_EDGE );
+	self->edges = Memory_Alloc_2DArray( unsigned, self->nEdges, 2, "edges" );
+
+	for( e_i = 0; e_i < self->nEdges; e_i++ ) {
+		/* Find node IDs for each edge */
+		
+	}
+		
 	nVerts = Mesh_GetLocalSize( );
 	done = AllocArray( Bool, nVerts );
 #endif

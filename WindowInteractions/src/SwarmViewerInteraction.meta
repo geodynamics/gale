@@ -13,20 +13,15 @@
 <param name="Parent">lucWindowInteraction</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">...</param>
-
-<!--Now the interesting stuff-->
-
+<param name="Description">Currently diabled. Allows the user to interactively query the particle index from a lucSwarmViewer type object. This can only run under interactive mode. No dependencies or parameters are required for this functionality.</param>
 
 <list name="Params">
-
 </list>
 
 <list name="Dependencies">
-
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example"></param>
 
 </StGermainData>
 

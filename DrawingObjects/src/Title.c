@@ -81,11 +81,12 @@ const Type lucTitle_Type = "lucTitle";
 lucTitle* lucTitle_New( 
 		Name                                               name,
     		char *                                             titleString,
-		lucColour                                             colour )
+		lucColour                                          colour,
+		int                                                yPos )
 {
 	lucTitle* self = (lucTitle*) _lucTitle_DefaultNew( name );
 
-	lucTitle_InitAll( self, titleString, colour);
+	lucTitle_InitAll( self, titleString, colour, yPos );
 
 	return self;
 }
@@ -136,26 +137,28 @@ lucTitle* _lucTitle_New(
 }
 
 void lucTitle_Init(		
-		lucTitle*                                         self,
-		char*                                             titleString,
-		lucColour                                         colour )
+		lucTitle*                                          self,
+		char*                                              titleString,
+		lucColour                                          colour,
+		int                                                yPos )
 {
 	
 	self->titleString = Memory_Alloc_Array( char, (strlen(titleString) + 1), "self->titleString" );
 	strcpy( self->titleString, titleString );
-	memcpy( &(self->colour), &colour, sizeof(lucColour) );	
-	
+	memcpy( &(self->colour), &colour, sizeof(lucColour) );
+	self->yPos = yPos;
 }
 
 void lucTitle_InitAll( 
 		void*                                              title,
 		char*                                              titleString,
-		lucColour                                          colour )
+		lucColour                                          colour,
+		int                                                yPos )
 {
 	lucTitle* self        = title;
 
 	/* TODO Init parent */
-	lucTitle_Init( self, titleString, colour );
+	lucTitle_Init( self, titleString, colour, yPos );
 }
 
 void _lucTitle_Delete( void* drawingObject ) {
@@ -217,8 +220,9 @@ void _lucTitle_Construct( void* title, Stg_ComponentFactory* cf, void* data ) {
 	lucColour_FromString( &self->colour, colourName );
 
 	lucTitle_InitAll( self, 
-			Stg_ComponentFactory_GetString( cf, self->name, "string", "NULL"),
-		        self->colour);
+			Stg_ComponentFactory_GetString( cf, self->name, "string", "" ),
+		        self->colour,
+			Stg_ComponentFactory_GetInt( cf, self->name, "yPos", 13 ) );
 			
 }
 
@@ -231,10 +235,12 @@ void _lucTitle_Setup( void* drawingObject, void* _context ) {
 	lucTitle*       self            = (lucTitle*)drawingObject;
 	_lucOpenGLDrawingObject_Setup( self, _context );
 }
+
 void _lucTitle_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* viewportInfo, void* _context ) {
-	lucTitle*      self            = (lucTitle*)drawingObject;
-        lucViewport* viewport = viewportInfo->viewport;
-	int stringWidth = 0;
+	lucTitle*    self            = (lucTitle*)drawingObject;
+        lucViewport* viewport        = viewportInfo->viewport;
+	int          stringWidth     = 0;
+	char*        title;
 	
 	/* Set up 2D Viewer the size of the viewport */
 	glMatrixMode(GL_PROJECTION);
@@ -242,38 +248,23 @@ void _lucTitle_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* vi
 	glLoadIdentity();
 	gluOrtho2D((GLfloat) 0.0, (GLfloat) viewportInfo->width, (GLfloat) 0.0, (GLfloat) viewportInfo->height );
 	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();	
+	glLoadIdentity();
 	
 	/* Disable lighting because we don't want a 3D effect */
 	glDisable(GL_LIGHTING);
 
-	/* Set the colour so that it'll show up against the background */
-	lucColour_SetComplimentaryOpenGLColour( &window->backgroundColour );
+	/* Set title */
+	title = strlen( self->titleString ) ? self->titleString : viewport->name;
+	stringWidth = lucStringWidth( title );
+
+	/* Set the colour */
+	lucColour_SetOpenGLColour( &self->colour );
+
+	/* Set the postition */
+	glRasterPos2i( viewportInfo->width/2 - stringWidth/2, viewportInfo->height - self->yPos );
 
 	/* Print Title */
-	if(strcmp(self->titleString, "NULL")) { /* The user has entered a string to be drawn*/
-		/* Set the colour */
-	       glColor4f(
-			self->colour.red,
-			self->colour.green,
-			self->colour.blue,
-			self->colour.opacity );
-
-		glRasterPos2i( viewportInfo->width/2, viewportInfo->height - 13 );
-		stringWidth = lucStringWidth( self->titleString );
-		lucMoveRaster( - stringWidth/2, 0 );
-		lucPrintString(self->titleString);
-	}
-	else {  /* No specific title, will display the viewport name by default */
-		/* Set the colour so that it'll show up against the background */
-		lucColour_SetComplimentaryOpenGLColour( &window->backgroundColour );
-
-		glRasterPos2i( viewportInfo->width/2, viewportInfo->height - 13 );
-		stringWidth = lucStringWidth( viewport->name );
-		lucMoveRaster( - stringWidth/2, 0 );
-		
-		lucPrintString( viewport->name );
-	}
+	lucPrintString( title );
 	
 	/* Put back settings */
 	glEnable(GL_LIGHTING);

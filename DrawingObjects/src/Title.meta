@@ -3,7 +3,7 @@
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 
 <param name="Name">lucTitle</param>
-<param name="Author">...</param>
+<param name="Author">Cecile Duboz</param>
 <param name="Organisation">MCC</param>
 <param name="Project">gLucifer</param>
 <param name="Location">./</param>
@@ -13,7 +13,7 @@
 <param name="Parent">lucOpenGLDrawingObject</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">Allows to diaply a title</param>
+<param name="Description">Displays a title at the top of a viewport.</param>
 
 <!--Now the interesting stuff-->
 
@@ -23,13 +23,19 @@
 		<param name="Name">colour</param>
 		<param name="Type">String</param>
 		<param name="Default">"Black"</param>
-		<param name="Description">Colour used to draw the title</param>
+		<param name="Description">Colour used to draw the title.</param>
+	</struct>
+	<struct>
+		<param name="Name">yPos</param>
+		<param name="Type">Int</param>
+		<param name="Default">13</param>
+		<param name="Description">Distance from the top of the viewport for the bottom of the text (in pixels).</param>
 	</struct>
 	<struct>
 		<param name="Name">string</param>
 		<param name="Type">String</param>
-		<param name="Default">"NULL"</param>
-		<param name="Description">String that will constitute the title. If this string is NULL, then the striong used by default is the viewport's name</param>
+		<param name="Default"></param>
+		<param name="Description">String that will constitute the title. If this string is empty, then it will use viewport's name</param>
 	</struct>
 
 </list>
@@ -38,7 +44,13 @@
 
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">
+                <struct name="tempandVelTitle" mergeType="replace">
+                        <param name="Type">lucTitle</param>
+                        <param name="color">grey</param>
+                        <param name="string">TemperatureField and Velocity Arrows</param>
+                </struct>
+</param>
 
 </StGermainData>
 

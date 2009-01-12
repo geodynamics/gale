@@ -482,7 +482,7 @@ void _lucSwarmViewerBase_SetParticleColourDefault( void* drawingObject, void* co
 	}
 	
 	/* Get Opacity Value */
-	if ( opacityVariable ){
+	if ( opacityVariable ){   /* This should have a greymap - similar to the colourmap but only one channel */
 		SwarmVariable_ValueAt( opacityVariable, lParticle_I, &opacity );
 		colour.opacity = (float)opacity;	
 	}

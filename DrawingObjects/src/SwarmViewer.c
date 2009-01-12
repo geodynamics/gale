@@ -232,7 +232,6 @@ void _lucSwarmViewer_CleanUp( void* drawingObject, void* context ) {
 void _lucSwarmViewer_BuildDisplayList( void* drawingObject, void* _context ) {
 	lucSwarmViewer*          self                = (lucSwarmViewer*)drawingObject;
 
- 	glPointSize( self->pointSize );
 	
 	/* lighting of small particle objects like particle dots seems to do more harm than good - 
 	   the gl lighting system doesn't seem to deal with lighting such tiny objects well. Lighting
@@ -245,6 +244,9 @@ void _lucSwarmViewer_BuildDisplayList( void* drawingObject, void* _context ) {
 		glEnable(GL_POINT_SMOOTH);
 	else 
 		glDisable(GL_POINT_SMOOTH);
+		
+	glPointSize( self->pointSize );
+ 		
 		
 	
 	glBegin( GL_POINTS );

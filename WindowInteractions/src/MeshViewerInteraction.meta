@@ -13,20 +13,15 @@
 <param name="Parent">lucWindowInteraction</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">Allows to print out node or element number by positioning the mouse on the desired spot and pressing 'n' for the node number, 'e' for the element number</param>
-
-<!--Now the interesting stuff-->
-
+<param name="Description">This is disabled at present. It allows the user to print out the node or element number closed to the cursor, by positioning the mouse on the desired spot and pressing 'n' for the node number, 'e' for the element number</param>
 
 <list name="Params">
-
 </list>
 
 <list name="Dependencies">
-
 </list>
-<!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+
+<param name="Example">N/A</param>
 
 </StGermainData>
 

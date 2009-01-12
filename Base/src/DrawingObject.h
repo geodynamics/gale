@@ -105,7 +105,7 @@ void _lucDrawingObject_Construct( void* drawingObject, Stg_ComponentFactory* cf,
 	void lucDrawingObject_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* viewportInfo, void* context ) ;
 	void lucDrawingObject_CleanUp( void* drawingObject, void* context ) ;
 
-	typedef enum { GreaterThan, LesserThan, EqualTo } lucDrawingObjectMask_Type;
+	typedef enum { GreaterThan, LessThan, EqualTo } lucDrawingObjectMask_Type;
 	typedef struct { 
 		lucDrawingObjectMask_Type type;
 		double                    value;
