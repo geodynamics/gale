@@ -11,71 +11,98 @@
 	 fixed before we can release this functionality
 -->		
 
-	<include> Underworld/BaseApps/ExtensionIncompressibleShearBaseApp.xml </include>
-	<!-- <include> Experimental/REP_Setup3D.xml </include> -->
+	<include> Underworld/BaseApps/ExtensionCompressionShearQ1Q1BaseApp.xml </include>	
 	
 	<list name="plugins" mergeType="merge">
 		<param>StgFEM_FrequentOutput </param>	
 		<param>Underworld_Vrms </param>	
 		<param>StgFEM_CPUTime </param>	
 		<param>StgFEM_FeVariableList </param>
+		<param>Experimental_ShearBandAnalysis</param>
 	</list>
 	
+	<struct name="ShearBandAnalysis" mergeType="replace">
+		<list name="materialIndices">
+			<param> 1 </param>
+			<param> 2 </param>
+			<param> 3 </param>
+			<param> 4 </param>
+			<param> 5 </param>
+		</list>	
+		<param name="weakeningThreshold"> 0.2 </param>
+		<param name="notIfHealing"> True </param>
+	</struct>	
 
+	<param name="extensionReferenceHeight">0.8</param>
+
+	<!-- All stuff associated with recovered pressures/stresses etc -->
+	
+	<struct name="components" mergeType="merge">
+		<struct name="recoveredStrainRateField" mergeType="replace">
+			<param name="Type">RecoveredFeVariable</param>
+			<param name="RawField">StrainRateField</param>
+			<param name="OrderOfInterpolation">1</param>
+			<param name="recoverStrain">true</param>
+			<param name="recoverPressure">false</param>
+		</struct>
+		<struct name="recoveredStressField" mergeType="replace">
+			<param name="Type">RecoveredFeVariable</param>
+			<param name="RawField">StrainRateField</param>
+			<param name="recoverPressure">False</param>
+			<param name="OrderOfInterpolation">1</param>
+			<param name="RawPressureField">PressureField</param>
+		</struct>
+		<struct name="REP">
+			<param name="Type">REP_Algorithm</param>
+			<param name="IntegrationPoints">picIntegrationPoints</param>
+			<param name="ConstitutiveMatrix">constitutiveMatrix</param>
+			<param name="RepField">recoveredStrainRateField</param>
+			<param name="RepField2">recoveredStressField</param>
+		</struct>
+		
+		<struct name="recoveredStrainRateInvariantField"> 
+			<param name="Type">OperatorFeVariable</param>
+		     	<param name="Operator">SymmetricTensor_Invariant</param>
+			<param name="FeVariable">recoveredStrainRateField</param>
+		</struct>
+		
+		<struct name="recoveredDeviatoricStressField"> 
+			<param name="Type">OperatorFeVariable</param>
+		     	<param name="Operator">SymmetricTensor_MakeDeviatoric</param>
+			<param name="FeVariable">recoveredStressField</param>
+		</struct>
+		
+		<struct name="recoveredDeviatoricStressInvariantField"> 
+			<param name="Type">OperatorFeVariable</param>
+		     	<param name="Operator">SymmetricTensor_Invariant</param>
+			<param name="FeVariable">recoveredDeviatoricStressField</param>
+		</struct>
+	</struct> 
+	
 
 	<include> ./set_up.xml </include>
 	
 	<!-- shape options -->
 	
 	<include> ./4LayerModel.xml </include>	
-	<include> ./PassiveTracerTopography.xml </include>
+	<include> ./PassiveTracer3DTopography.xml </include>
 	<include> ./PassiveTracers3D.xml </include>
-
-
-	<!-- weak zone options -->
-	<!--
-	<include> ./shape_configurations/upper_crust_depression_absent_lower_crust.xml </include>
-	<include> ./shape_configurations/mantle_upwelling_lower_crust_absent.xml </include>
-	<include> ./shape_configurations/lower_crust_intruding_down_absent_upper_mantle.xml </include>
-	-->
-	
-	<!--><include> ./shape_configurations/upper_crust_into_the_lower_crust_and_raised_above_surface_oct.xml </include> -->
 	
 	<!-- rheology options -->
 	<include> ./rheology/rheology-2layer.xml </include> <!-- this is also needed if you use rheology-4layer-LC_UM.xml -->
-
-
 	<!--><include> ./rheology/rheology-4layer-LC_UM.xml </include>  <--> 	<!-- this only has added  rheologies for the upper mantle and lower crust. you still need a 2 layer rheology if you use this 4 layer rheology-->
 	
 	<!-- Visualisation -->
 
 
-	<include> Viewports/Cameras.xml </include> 
-	<!-- <include> Viewports/RecoveredPressureVP.xml </include> 
-	<include> Viewports/RecoveredStressVP.xml </include> -->
-	<include> Viewports/StrainRateVP.xml </include> 
-	
-	<!--
-	<struct name="components" mergeType="merge">
-		<struct name="pressureStressLayersWindow">
-            <param name="Type">lucDefaultWindow</param>
-            <param name="RenderingEngine">RenderingEngine</param>
-        	<param name="OutputFormat">PNGOutput</param>
-        	<param name="height">592</param>
-        	<param name="width">1920</param>
-        	<param name="interactive">f</param>
-        	<param name="backgroundColour">White</param>
-        	<list name="Viewport">
-        		<param> pressureLayersPerspectiveVP1 deviatoricStressLayersPerspectiveVP1 strainRateLayersPerspectiveVP1</param>
-        	</list>
-        </struct>
+	<include> Viewports/Cameras3DBigger.xml </include> 
+	<!-- <include> Viewports/RecoveredPressureVP.xml </include>   -->
+	<!--><include> Viewports/RecoveredStrainRateVP.xml </include> -->
+	<!--><include> Viewports/RecoveredStressVP.xml </include>     -->
 
-		<struct name="pressureStressLayersMovie">
-			<param name="Type">lucEncoderLibfame</param>
-			<param name="Window">pressureStressLayersWindow</param>
-		</struct>
-	</struct>
--->
+	<include> Viewports/StrainRateVP.xml </include> 
+	<include> Viewports/ShearBandVP.xml </include> 
+		
 
 	<!-- general parameters that get changed alot -->	
 	<param name="outputPath"> ./output </param>

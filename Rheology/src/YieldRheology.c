@@ -120,6 +120,7 @@ void _YieldRheology_Init( YieldRheology* self, StrainWeakening* strainWeakening,
 		 * If handle is given a value of '-1' - that means that no extension has been added
 		 * with the YieldRheology_Type
 		 * We should then add the extension */
+		
 		handle = ExtensionManager_GetHandle( materialPointsSwarm->particleExtensionMgr, YieldRheology_Type );
 		
 		if ( handle == (ExtensionInfo_Index) -1 ) {
@@ -201,6 +202,7 @@ void _YieldRheology_Build( void* rheology, void* data ) {
 
 	/* This variable only needs to be built if there are material points (hasYieldedVariable is created
 	 * in _YieldRheology_Init only in that case) */
+	
 	if ( self->hasYieldedVariable ) {
 		Stg_Component_Build( self->hasYieldedVariable, data, False );
 	}
@@ -244,6 +246,7 @@ void _YieldRheology_ModifyConstitutiveMatrix(
 	 * If a particle has yielded, the initial viscosity is needed to update the strain weakening. But since this 
 	 * viscosity can be modified in the constitutive matrix by YieldRheology_HasYielded function, we need to do the update 
 	 * before */
+	
 	if ( self->strainWeakening ) {
 		StrainWeakening_AssignIncrement( self->strainWeakening, constitutiveMatrix, materialPointsSwarm,
 			lElement_I, materialPoint, yieldCriterion, yieldIndicator );

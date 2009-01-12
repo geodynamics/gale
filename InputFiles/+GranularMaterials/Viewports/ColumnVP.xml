@@ -1,0 +1,297 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<struct name="components" mergeType="merge">
+	<struct name="camera" mergeType="replace">
+		<param name="Type">lucCamera</param>
+		<param name="CentreFieldVariable">StrainRateInvariantField</param>
+		<param name="coordZ">20</param>
+	</struct>
+<!--
+-->
+<!--struct name="camera">
+        <param name="Type">lucCamera</param>
+        <param name="coordX">-2</param>
+        <param name="coordY">4</param>
+        <param name="coordZ">20</param>
+        <param name="focalPointX">-2</param>
+        <param name="focalPointY">4</param>
+        <param name="focalPointZ">0</param>
+        <param name="upDirectionX">0</param>
+        <param name="upDirectionY">1</param>
+        <param name="upDirectionZ">0</param>
+        <param name="stereoType">Mono</param>
+        <param name="eyeSeparation">0.2</param>
+        <param name="focalLength">0</param>
+</struct-->
+
+<!--camera ratio 3-->
+<!--
+<struct name="camera">
+        <param name="Type">lucCamera</param>
+        <param name="coordX">-3</param>
+        <param name="coordY">4</param>
+        <param name="coordZ">21.347</param>
+        <param name="focalPointX">-3</param>
+        <param name="focalPointY">4</param>
+        <param name="focalPointZ">0</param>
+        <param name="upDirectionX">0</param>
+        <param name="upDirectionY">1</param>
+        <param name="upDirectionZ">0</param>
+        <param name="stereoType">Mono</param>
+        <param name="eyeSeparation">0.2</param>
+        <param name="focalLength">0</param>
+</struct>
+-->
+
+<!--camera ratio 5.5-->
+<!--
+<struct name="camera">
+        <param name="Type">lucCamera</param>
+        <param name="coordX">-3</param>
+        <param name="coordY">4</param>
+        <param name="coordZ">25.572</param>
+        <param name="focalPointX">-3</param>
+        <param name="focalPointY">4</param>
+        <param name="focalPointZ">0</param>
+        <param name="upDirectionX">0</param>
+        <param name="upDirectionY">1</param>
+        <param name="upDirectionZ">0</param>
+        <param name="stereoType">Mono</param>
+        <param name="eyeSeparation">0.2</param>
+        <param name="focalLength">0</param>
+</struct>
+-->
+
+	<struct name="blueToRedColourMap">
+		<param name="Type">lucColourMap</param>
+		<param name="colours">blue green yellow orange red</param>
+		<param name="dynamicRange">t</param>
+		<param name="minimum">0.0</param>
+		<param name="maximum">2.0</param>
+	</struct>		
+
+	<struct name="blueToRedColourBar">
+		<param name="Type">lucColourBar</param>
+		<param name="ColourMap">blueToRedColourMap</param>
+	</struct>
+
+	<struct name="grayAndRedColourMap">
+		<param name="Type">lucColourMap</param>
+		<param name="colours">gray0 Red</param>
+		<param name="dynamicRange">False</param>
+		<param name="minimum">0.0</param>
+		<param name="maximum">1.0</param>
+	</struct>		
+
+	<struct name="blueAndDarkColourMap">
+		<param name="Type">lucColourMap</param>
+		<param name="colours">blue Dark</param>
+		<param name="dynamicRange">False</param>
+		<param name="minimum">0.0</param>
+		<param name="maximum">1.0</param>
+	</struct>	
+
+	<struct name="border" mergeType="replace">
+		<param name="Type">lucFieldVariableBorder</param>
+		<param name="FieldVariable">StrainRateInvariantField</param>
+	</struct>
+
+        <struct name="timeStep">
+                <param name="Type">lucTimeStep</param>
+                <param name="colour">Black</param>
+                <param name="frame">false</param>
+                <param name="time">true</param>
+        </struct>
+
+	<struct name="linearMeshView" mergeType="replace">
+		<param name="Type">lucMeshViewer</param>
+		<param name="Mesh">linearMesh</param>
+		<param name="localColour">black</param>
+	</struct>
+
+	<!--struct name="strainRateInvMap">
+		<param name="Type">lucScalarField</param>
+		<param name="FieldVariable">StrainRateInvariantField</param>
+		<param name="ColourMap">blueToRedColourMap</param>
+	</struct-->
+
+	<!--Strain rate on particles-->
+        <struct name="strainRateInvMapOnParticles">
+                <param name="Type">lucSwarmViewer</param>
+                <param name="Swarm">materialSwarm</param>
+                <param name="ColourVariable">strainRateSwarmVariable</param>
+                <param name="ColourMap">blueToRedColourMap</param>
+                <param name="MaskVariable">materialSwarm-MaterialIndex</param>
+                <param name="maskValue">0</param>
+                <param name="maskType">GreaterThan</param>
+                <param name="pointSize">0.2</param>
+        </struct>
+
+        <struct name="strainRateInvariantTitle">
+                <param name="Type">lucTitle</param>
+                <param name="string">Strain rate invariant</param>
+        </struct>
+
+	<struct name="StrainRateInvariantVP">
+		<param name="Type">lucViewport</param>
+		<param name="Camera">camera</param>
+		<list name="DrawingObject">
+			<param>timeStep</param>
+			<param>strainRateInvariantTitle</param>
+			<param>strainRateInvMapOnParticles</param>
+			<param>border</param>
+			<param>blueToRedColourBar</param>
+		</list>
+	</struct>		
+
+	<!-- Particles-->
+	<struct name="blackParticles">
+		<param name="Type">lucSwarmViewer</param>
+		<param name="Swarm">materialSwarm</param>
+		<!--param name="ColourVariable">materialSwarm-HasYielded</param>
+		<param name="ColourMap">grayAndRedColourMap </param-->
+		<param name="colour">black</param>
+		<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+		<param name="maskValue">1</param>
+		<param name="maskType">EqualTo</param>
+		<param name="pointSize">2.0</param>
+        </struct>
+        <struct name="redParticles">
+		<param name="Type">lucSwarmViewer</param>
+		<param name="Swarm">materialSwarm</param>
+		<param name="colour">red</param>
+		<!--param name="ColourVariable">materialSwarm-HasYielded</param>
+		<param name="ColourMap">blueAndDarkColourMap</param-->
+		<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+		<param name="maskValue">2</param>
+		<param name="maskType">EqualTo</param>
+		<param name="pointSize">2.0</param>
+        </struct>
+
+        <struct name="backgroundParticles">
+		<param name="Type">lucSwarmViewer</param>
+		<param name="Swarm">materialSwarm</param>
+		<param name="colour">yellow</param>
+		<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+		<param name="maskValue">0</param>
+		<param name="maskType">EqualTo</param>
+		<param name="pointSize">2.0</param>
+        </struct>
+ 
+        <struct name="particlesTitle">
+                <param name="Type">lucTitle</param>
+                <param name="string">Particles</param>
+        </struct>
+
+	<struct name="ParticlesVP">
+		<param name="Type">lucViewport</param>
+		<param name="Camera">camera</param>
+		<list name="DrawingObject">
+			<!--param>timeStep</param-->
+			<param>particlesTitle</param>
+			<param>border</param>
+			<param>blackParticles</param>
+			<param>redParticles</param>
+			<!--param>backgroundParticles</param-->
+		</list>
+       	</struct>
+
+	<!--Pressure on particles-->
+         <struct name="pressureMap">
+                <param name="Type">lucSwarmViewer</param>
+                <param name="Swarm">materialSwarm</param>
+                <param name="ColourVariable">pressureSwarmVariable</param>
+                <param name="ColourMap">blueToRedColourMap</param>
+                <param name="MaskVariable">materialSwarm-MaterialIndex</param>
+                <param name="maskValue">0</param>
+                <param name="maskType">GreaterThan</param>
+                <param name="pointSize">0.2</param>
+         </struct>
+         <struct name="pressureTitle">
+                <param name="Type">lucTitle</param>
+                <param name="string">Pressure</param>
+         </struct>
+         <struct name="PressureVP">
+                 <param name="Type">lucViewport</param>
+                 <param name="Camera">camera</param>
+                 <list name="DrawingObject">
+                        <param>pressureTitle</param>
+			<!--param>timeStep</param-->
+                        <param>pressureMap</param>
+                        <param>border</param>
+                        <param>blueToRedColourBar</param>
+                 </list>
+         </struct>
+
+	<!-- Tensile failure -->
+        <!--struct name="tensileFailureMap">
+		<param name="Type">lucSwarmViewer</param>
+		<param name="Swarm">materialSwarm</param>
+		<param name="ColourVariable">materialSwarm-DruckerPragerTensileFailure</param>
+		<param name="ColourMap">grayAndRedColourMap</param>
+                <param name="MaskVariable">materialSwarm-MaterialIndex</param>
+                <param name="maskValue">0</param>
+                <param name="maskType">GreaterThan</param>
+                <param name="pointSize">0.2</param>
+        </struct>
+
+        <struct name="tensileFailureTitle">
+                <param name="Type">lucTitle</param>
+                <param name="string">Tensile failure mode</param>
+        </struct>
+
+	<struct name="TensileFailureVP">
+		<param name="Type">lucViewport</param>
+		<param name="Camera">camera</param>
+		<list name="DrawingObject">
+			<param>timeStep</param>
+			<param>tensileFailureTitle</param>
+			<param>border</param>
+			<param>tensileFailureMap</param>
+			<param>linearMeshView</param>
+		</list>
+       	</struct-->
+
+	<!-- Viscosity on Particles -->
+        <struct name="viscositySand1Map">
+		<param name="Type">lucSwarmViewer</param>
+		<param name="Swarm">materialSwarm</param>
+		<param name="ColourVariable">materialSwarm-Viscosity</param>
+		<param name="ColourMap">blueToRedColourMap</param>
+                <param name="MaskVariable">materialSwarm-MaterialIndex</param>
+                <param name="maskValue">1</param>
+                <param name="maskType">EqualTo</param>
+                <param name="pointSize">0.2</param>
+        </struct>
+        <struct name="viscositySand2Map">
+		<param name="Type">lucSwarmViewer</param>
+		<param name="Swarm">materialSwarm</param>
+		<param name="ColourVariable">materialSwarm-Viscosity</param>
+		<param name="ColourMap">blueToRedColourMap</param>
+                <param name="MaskVariable">materialSwarm-MaterialIndex</param>
+                <param name="maskValue">2</param>
+                <param name="maskType">EqualTo</param>
+                <param name="pointSize">0.2</param>
+        </struct>
+
+        <struct name="viscosityTitle">
+                <param name="Type">lucTitle</param>
+                <param name="string">Viscosity</param>
+        </struct>
+
+	<struct name="ViscosityVP">
+		<param name="Type">lucViewport</param>
+		<param name="Camera">camera</param>
+		<list name="DrawingObject">
+			<!--param>timeStep</param-->
+			<param>viscosityTitle</param>
+			<param>border</param>
+			<param>viscositySand1Map</param>
+			<param>viscositySand2Map</param>
+                        <param>blueToRedColourBar</param>
+		</list>
+       	</struct>
+</struct>
+</StGermainData>

@@ -28,6 +28,9 @@
 			<param name="arrowHeadSize">0.15</param>	
 			<param name="lengthScale">0.15</param>	
 		</struct>
+		
+		
+		
 		<struct name="bordervx" mergeType="replace">
 			<param name="Type">lucFieldVariableBorder</param>
 			<param name="FieldVariable">VelocityXXField</param>

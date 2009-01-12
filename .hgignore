@@ -2,6 +2,9 @@
 syntax: glob
 
 *~
+*.pyc
+._*
+.DS_Store
 
 # switch to regexp syntax.
 syntax: regexp

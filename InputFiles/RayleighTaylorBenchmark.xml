@@ -3,7 +3,6 @@
 	P.E. van Keken et al, 'A comparison of methods for 
 	the modelling of thermochemical convection', JGR, 1997	-->
 
-
 <!-- DTD to validate against -->
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 
@@ -39,7 +38,7 @@
 			<param name="Type">BelowCosinePlane</param>
 			<param name="offset">0.2</param>
 			<param name="amplitude">0.02</param>
-			<param name="period"> 1.8284 </param>
+			<param name="wavelength"> 1.8284 </param>
 			<param name="phase"> 0.0 </param>
 		</struct>		
 		<struct name="lightLayerViscosity">

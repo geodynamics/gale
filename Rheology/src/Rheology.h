@@ -68,6 +68,7 @@
 	#include "ViscosityFieldRheology.h"
 	#include "Byerlee.h"
 	#include "DruckerPrager.h"
+	#include "Pouliquen_etal.h"
 	#include "FaultingMoresiMuhlhaus2006.h"
 	#include "MohrCoulomb.h"
 	#include "StrainWeakening.h"

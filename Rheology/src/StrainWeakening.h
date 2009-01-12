@@ -82,8 +82,8 @@
 		double                                 initialDamageWavenumber;           \
 		double                                 initialDamageWavenumberSinI;           \
 		double                                 initialDamageWavenumberCosI;           \
-		double                                 initialDamageWavenumberSinJ;           \
-		double                                 initialDamageWavenumberCosJ;           \
+		double                                 initialDamageWavenumberSinK;           \
+		double                                 initialDamageWavenumberCosK;           \
 		double                                 initialDamageFactor;               \
 		Stg_Shape*                             initialStrainShape;                \
 		long int                               randomSeed;
@@ -92,7 +92,7 @@
  
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
 	StrainWeakening* _StrainWeakening_New( 
-		SizeT                                              sizeOfSelf,
+		SizeT                                              sizeOfSelf, 
 		Type                                               type,
 		Stg_Class_DeleteFunction*                          _delete,
 		Stg_Class_PrintFunction*                           _print,
@@ -117,8 +117,8 @@
 		double                                             initialDamageWavenumber,
 		double                                             initialDamageWavenumberSinI,
 		double                                             initialDamageWavenumberCosI,
-		double                                             initialDamageWavenumberSinJ,
-		double                                             initialDamageWavenumberCosJ,
+		double                                             initialDamageWavenumberSinK,
+		double                                             initialDamageWavenumberCosK,
 		double                                             initialDamageFactor,
 		long int                                           randomSeed,
 		Stg_Shape*                                         initialStrainShape  );

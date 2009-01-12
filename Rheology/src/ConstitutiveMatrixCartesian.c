@@ -297,11 +297,6 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
 			variable1->feMesh, lElement_I,
 			particle->xi, dim, &detJac, GNx );
 
-		ElementType_ShapeFunctionsGlobalDerivs( 
-			elementType,
-			variable1->feMesh, lElement_I,
-			particle->xi, dim, &detJac, GNx );
-
                 /* Evalulate velocity and velocity derivatives at this particle. */
                 FeVariable_InterpolateWithinElement(
                    variable1, lElement_I, particle->xi, vel );

@@ -72,6 +72,11 @@
 				<param name="Type">lucColourBar</param>
 				<param name="ColourMap">strainRateLayers-UpperCrustColourMap</param>
 			</struct>
+			
+			<struct name="strainRateLayers-UpperCrust2ColourBar">
+				<param name="Type">lucColourBar</param>
+				<param name="ColourMap">strainRateLayers-UpperCrust2ColourMap</param>
+			</struct>
 
 			<struct name="strainRateLayers-LowerCrustColourBar">
 				<param name="Type">lucColourBar</param>
@@ -104,6 +109,7 @@
 			<param name="maskType">EqualTo</param>
 			<param name="maskValue">4.0</param>
 			<param name="pointSize">1.0</param>
+			<param name="pointSmoothing">False</param>
 			<param name="positionRange">True</param>
 			<param name="minPositionX">-10</param>
 			<param name="maxPositionX">10</param>
@@ -121,6 +127,26 @@
 			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
 			<param name="maskType">EqualTo</param>
 			<param name="maskValue">5.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="pointSmoothing">False</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+		
+		<struct name="strainRateLayers-UpperCrustNY">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">layersParticleStrainRate</param>
+			<param name="ColourMap">strainRateLayers-UpperCrust2ColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">6.0</param>
+			<param name="pointSmoothing">False</param>
 			<param name="pointSize">1.0</param>
 			<param name="positionRange">True</param>
 			<param name="minPositionX">-10</param>
@@ -140,6 +166,7 @@
 			<param name="maskType">EqualTo</param>
 			<param name="maskValue">3.0</param>
 			<param name="pointSize">1.0</param>
+			<param name="pointSmoothing">False</param>
 			<param name="positionRange">False</param>
 			<param name="minPositionX">-10</param>
 			<param name="maxPositionX">10</param>
@@ -166,6 +193,7 @@
 			<param name="maskTolerance">1.1</param>
 			<param name="maskValue">4.0</param>
 			<param name="pointSize">1.0</param>
+			<param name="pointSmoothing">False</param>
 			<param name="positionRange">True</param>
 			<param name="minPositionX">-10</param>
 			<param name="maxPositionX">10</param>
@@ -185,6 +213,7 @@
 			<param name="maskTolerance">1.1</param>
 			<param name="maskValue">4.0</param>
 			<param name="pointSize">1.0</param>
+			<param name="pointSmoothing">False</param>
 			<param name="positionRange">True</param>
 			<param name="minPositionX">-10</param>
 			<param name="maxPositionX">10</param>
@@ -204,6 +233,7 @@
 			<param name="maskTolerance">1.1</param>
 			<param name="maskValue">4.0</param>
 			<param name="pointSize">1.0</param>
+			<param name="pointSmoothing">False</param>
 			<param name="positionRange">True</param>
 			<param name="minPositionX">-10</param>
 			<param name="maxPositionX">10</param>
@@ -223,6 +253,7 @@
 			<param name="maskType">EqualTo</param>
 			<param name="maskValue">1.0</param>
 			<param name="pointSize">1.0</param>
+			<param name="pointSmoothing">False</param>
 			<param name="positionRange">False</param>
 			<param name="minPositionX">-10</param>
 			<param name="maxPositionX">10</param>
@@ -240,6 +271,7 @@
 			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
 			<param name="maskType">EqualTo</param>
 			<param name="maskValue">2.0</param>
+			<param name="pointSmoothing">False</param>
 			<param name="pointSize">1.0</param>
 			<param name="positionRange">False</param>
 			<param name="minPositionX">-10</param>
@@ -278,7 +310,8 @@
 	       	<param name="MaskVariable">materialSwarm-MaterialIndex</param>
 	       	<param name="maskType">EqualTo</param>
 	       	<param name="maskValue">4.0</param> 
-	       	<param name="pointSize">1.5</param>
+	       	<param name="pointSize">1.0</param>
+			<param name="pointSmoothing">False</param>
 	       	<param name="positionRange">True</param>
 	       	<param name="minPositionX">-10</param>
 	       	<param name="maxPositionX">10</param>
@@ -296,7 +329,8 @@
 		       	<param name="MaskVariable">materialSwarm-MaterialIndex</param>
 		       	<param name="maskType">EqualTo</param>
 		       	<param name="maskValue">5.0</param> 
-		       	<param name="pointSize">1.5</param>
+				<param name="pointSmoothing">False</param>
+		       	<param name="pointSize">1.0</param>
 		       	<param name="positionRange">True</param>
 		       	<param name="minPositionX">-10</param>
 		       	<param name="maxPositionX">10</param>
@@ -316,7 +350,8 @@
 	       	<param name="MaskVariable">materialSwarm-MaterialIndex</param>
 	       	<param name="maskType">EqualTo</param>
 	       	<param name="maskValue">4.0</param> 
-	       	<param name="pointSize">1.5</param>
+			<param name="pointSmoothing">False</param>
+	       	<param name="pointSize">1.0</param>
 	       	<param name="positionRange">True</param>
 	       	<param name="minPositionX">-10</param>
 	       	<param name="maxPositionX">10</param>
@@ -334,7 +369,8 @@
 		       	<param name="MaskVariable">materialSwarm-MaterialIndex</param>
 		       	<param name="maskType">EqualTo</param>
 		       	<param name="maskValue">5.0</param> 
-		       	<param name="pointSize">1.5</param>
+				<param name="pointSmoothing">False</param>
+		       	<param name="pointSize">1.0</param>
 		       	<param name="positionRange">True</param>
 		       	<param name="minPositionX">-10</param>
 		       	<param name="maxPositionX">10</param>
@@ -353,7 +389,8 @@
 		       	<param name="MaskVariable">materialSwarm-MaterialIndex</param>
 		       	<param name="maskType">EqualTo</param>
 		       	<param name="maskValue">4.0</param> 
-		       	<param name="pointSize">1.5</param>
+		       	<param name="pointSize">1.0</param>
+				<param name="pointSmoothing">False</param>
 		       	<param name="positionRange">True</param>
 		       	<param name="minPositionX">-10</param>
 		       	<param name="maxPositionX">10</param>
@@ -371,7 +408,8 @@
 		       	<param name="MaskVariable">materialSwarm-MaterialIndex</param>
 		       	<param name="maskType">EqualTo</param>
 		       	<param name="maskValue">5.0</param> 
-		       	<param name="pointSize">1.5</param>
+		       	<param name="pointSize">1.0</param>
+				<param name="pointSmoothing">False</param>
 		       	<param name="positionRange">True</param>
 		       	<param name="minPositionX">-10</param>
 		       	<param name="maxPositionX">10</param>
@@ -390,12 +428,13 @@
 		       	<param name="maskType">EqualTo</param>
 		       	<param name="maskValue">3.0</param> 
 		       	<param name="maskTolerance">0.001</param> 
-		       	<param name="pointSize">1.5</param>
+		       	<param name="pointSize">1.0</param>
+				<param name="pointSmoothing">False</param>
 		       	<param name="positionRange">True</param>
 		       	<param name="minPositionX">-10</param>
 		       	<param name="maxPositionX">10</param>
 		       	<param name="minPositionY">0.45</param>
-		       	<param name="maxPositionY">0.50</param>
+		       	<param name="maxPositionY">0.55</param>
 		       	<param name="minPositionZ">-10</param>
 		       	<param name="maxPositionZ">10</param>
 			</struct>
@@ -410,12 +449,13 @@
 			<list name="DrawingObject">
 				<param> strainRateLayers-UpperCrust1</param>
 				<param> strainRateLayers-UpperCrust2</param>
+				<param> strainRateLayers-UpperCrustNY</param>
 				<param> strainRateLayers-LowerCrust </param>
 				<param> strainRateLayers-MantleBaseLayer </param>
 				<param> strainRateLayers-MantleUpperLayer </param>
 				<!-- <param> passiveTracerDots </param> -->
 				<param> Boxborder </param>
-		 		<param> strainRateLayers-UpperCrustColourBar</param>
+		 		<param> strainRateLayers-UpperCrust2ColourBar</param>
 			</list>
 		</struct>
 					

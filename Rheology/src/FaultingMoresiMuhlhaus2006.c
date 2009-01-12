@@ -818,13 +818,12 @@ void _FaultingMoresiMuhlhaus2006_UpdateNormalAtMaxSoft( void* rheology, void* ma
 	SymmetricTensor_CalcAllEigenvectors( strainRate, dim, eigenvectorListStrain );
 	theta = M_PI / 4.0;
 
-	if(dim = 2){
+	if(dim == 2){
 		StGermain_RotateCoordinateAxis(   slip[0],   eigenvectorListStrain[0].vector, K_AXIS, -theta);
 		StGermain_RotateCoordinateAxis(   slip[1],   eigenvectorListStrain[0].vector, K_AXIS, +theta);
 		StGermain_RotateCoordinateAxis( normal[0],   eigenvectorListStrain[0].vector, K_AXIS, +theta);
 		StGermain_RotateCoordinateAxis( normal[1],   eigenvectorListStrain[0].vector, K_AXIS, -theta);
-	}
-	else{
+	} else {
 		StGermain_RotateVector( slip[0],   eigenvectorListStrain[0].vector, eigenvectorListStrain[1].vector, - theta );
 		StGermain_RotateVector( slip[1],   eigenvectorListStrain[0].vector, eigenvectorListStrain[1].vector, + theta );
 		StGermain_RotateVector( normal[0], eigenvectorListStrain[0].vector, eigenvectorListStrain[1].vector, + theta );

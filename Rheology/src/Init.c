@@ -76,6 +76,7 @@ Bool Underworld_Rheology_Init( int* argc, char** argv[] ) {
 	Stg_ComponentRegister_Add( componentRegister, DruckerPrager_Type,           "0", _DruckerPrager_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, FaultingMoresiMuhlhaus2006_Type,             "0", _FaultingMoresiMuhlhaus2006_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, MohrCoulomb_Type,             "0", _MohrCoulomb_DefaultNew );
+	Stg_ComponentRegister_Add( componentRegister, Pouliquen_etal_Type,          "0", _Pouliquen_etal_DefaultNew );
 
 	Stg_ComponentRegister_Add( componentRegister, StrainWeakening_Type,         "0", _StrainWeakening_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, BuiterStrainWeakening_Type,   "0", _BuiterStrainWeakening_DefaultNew );
@@ -109,7 +110,8 @@ Bool Underworld_Rheology_Init( int* argc, char** argv[] ) {
 	RegisterParent( Byerlee_Type,                    VonMises_Type );
 	RegisterParent( DruckerPrager_Type,              VonMises_Type );
 	RegisterParent( FaultingMoresiMuhlhaus2006_Type, YieldRheology_Type );
-	RegisterParent( MohrCoulomb_Type,             YieldRheology_Type );
+	RegisterParent( MohrCoulomb_Type,                YieldRheology_Type );
+	RegisterParent( Pouliquen_etal_Type,             VonMises_Type );
 	
 	RegisterParent( StrainWeakening_Type,         TimeIntegratee_Type );
 	RegisterParent( BuiterStrainWeakening_Type,   StrainWeakening_Type );

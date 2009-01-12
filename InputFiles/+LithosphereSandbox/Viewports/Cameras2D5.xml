@@ -84,7 +84,7 @@
 			<param name="Type">lucCamera</param>
 			<param name="coordX"> 0 </param>
 			<param name="coordY"> 3.7 </param>
-			<param name="coordZ">-3.0 </param>
+			<param name="coordZ"> 3.0 </param>
 			<param name="focalPointX">0.0 </param>
 			<param name="focalPointY">0.2 </param>
 			<param name="focalPointZ">0.0 </param>
@@ -99,8 +99,8 @@
 		<struct name="lithosphereSandboxPerspectiveViewCamera3">
 		        <param name="Type">lucCamera</param>
 		        <param name="coordX">0.0</param>
-		        <param name="coordY">3.0</param>
-		        <param name="coordZ">5.0</param>
+		        <param name="coordY">1.5</param>
+		        <param name="coordZ">2.5</param>
 		        <param name="focalPointX">0.0</param>
 		        <param name="focalPointY">0.5</param>
 		        <param name="focalPointZ">0.0</param>

@@ -93,7 +93,6 @@
     	</struct>
   	</struct>
 	
-
 	<!-- The velocity boundary conditions for this problem are entirely specific ...
 	 	 therefore we build them in here --> 
 	 
@@ -102,7 +101,6 @@
 	 <param name="backWallVelocity"> 0.0 </param>
 	 <param name="frontWallVelocity"> 0.0 </param>
 	 <param name="constantHeight"> 0.5 </param>
-	
 	
 	<!-- For the continuous pressure mess, pressure BCs are necessary -->
 	
@@ -122,8 +120,7 @@
 	      </struct>
 	    </list>
 	  </struct>	
-	
-	
+		
 	<!-- WARNING !!! FRONT / BACK VELOCITIES BREAK THIS SETUP SO WE NEED TO REMOVE THEM -->
 	
 		<struct name="velocityBCs">

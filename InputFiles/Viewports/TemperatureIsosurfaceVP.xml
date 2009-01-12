@@ -35,12 +35,6 @@
 			<param name="Type">lucColourBar</param>
 			<param name="ColourMap">temperatureColourMap</param>
 		</struct>
-		<struct name="temperatureMap">
-			<param name="Type">lucScalarField</param>
-			<param name="FieldVariable">TemperatureField</param>
-			<param name="ColourMap">temperatureColourMap</param>
-			<param name="resolution">128</param>
-		</struct>		
 		<struct name="tempIsoTitle">
 			<param name="Type">lucTitle</param>
 			<param name="string">TemperatureIsoSurface</param>

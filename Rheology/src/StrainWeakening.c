@@ -115,8 +115,8 @@ void _StrainWeakening_Init(
 		double                                             initialDamageWavenumber,
 		double                                             initialDamageWavenumberSinI,
 		double                                             initialDamageWavenumberCosI,
-		double                                             initialDamageWavenumberSinJ,
-		double                                             initialDamageWavenumberCosJ,
+		double                                             initialDamageWavenumberSinK,
+		double                                             initialDamageWavenumberCosK,
 		double                                             initialDamageFactor,
 		long int                                           randomSeed,
 		Stg_Shape*                                         initialStrainShape )
@@ -129,8 +129,8 @@ void _StrainWeakening_Init(
 	self->initialDamageWavenumber  = initialDamageWavenumber;
 	self->initialDamageWavenumberSinI = initialDamageWavenumberSinI;
 	self->initialDamageWavenumberCosI = initialDamageWavenumberCosI;
-	self->initialDamageWavenumberSinJ = initialDamageWavenumberSinJ;
-	self->initialDamageWavenumberCosJ = initialDamageWavenumberCosJ;
+	self->initialDamageWavenumberSinK = initialDamageWavenumberSinK;
+	self->initialDamageWavenumberCosK = initialDamageWavenumberCosK;
 	self->initialDamageFactor      = initialDamageFactor;
 	self->randomSeed               = randomSeed;
 	self->initialStrainShape       = initialStrainShape;
@@ -151,7 +151,10 @@ void _StrainWeakening_Init(
 
 		particleExt = ExtensionManager_Get( swarm->particleExtensionMgr, &particle, self->particleExtHandle );
 
-		/*Add variables for viz purpose*/
+		/*Add variables for vizualization / analysis purposes */
+		
+		
+		
 		self->postFailureWeakening = Swarm_NewScalarVariable(
 			swarm,
 			"PostFailureWeakening",
@@ -219,8 +222,8 @@ void _StrainWeakening_Construct( void* strainWeakening, Stg_ComponentFactory* cf
 	double                  initialDamageWavenumber;
 	double                  initialDamageWavenumberSinI;
 	double                  initialDamageWavenumberCosI;
-	double                  initialDamageWavenumberSinJ;
-	double                  initialDamageWavenumberCosJ;
+	double                  initialDamageWavenumberSinK;
+	double                  initialDamageWavenumberCosK;
 	double                  initialDamageFactor;
 	long int                randomSeed;
 	Stg_Shape*              initialStrainShape;
@@ -242,8 +245,8 @@ void _StrainWeakening_Construct( void* strainWeakening, Stg_ComponentFactory* cf
 	initialDamageWavenumber  = Stg_ComponentFactory_GetDouble( cf, self->name, "initialDamageWavenumber",  -1.0 );
 	initialDamageWavenumberSinI = Stg_ComponentFactory_GetDouble( cf, self->name, "initialDamageWavenumberSinI", -1.0 );
 	initialDamageWavenumberCosI = Stg_ComponentFactory_GetDouble( cf, self->name, "initialDamageWavenumberCosI", -1.0 );
-	initialDamageWavenumberSinJ = Stg_ComponentFactory_GetDouble( cf, self->name, "initialDamageWavenumberSinJ", -1.0 );
-	initialDamageWavenumberCosJ = Stg_ComponentFactory_GetDouble( cf, self->name, "initialDamageWavenumberCosJ", -1.0 );
+	initialDamageWavenumberSinK = Stg_ComponentFactory_GetDouble( cf, self->name, "initialDamageWavenumberSinK", -1.0 );
+	initialDamageWavenumberCosK = Stg_ComponentFactory_GetDouble( cf, self->name, "initialDamageWavenumberCosK", -1.0 );
 	initialDamageFactor      = Stg_ComponentFactory_GetDouble( cf, self->name, "initialDamageFactor",       1.0 );
 	randomSeed               = (long int) Stg_ComponentFactory_GetInt( cf, self->name, "randomSeed",        0 );
 	initialStrainShape       = Stg_ComponentFactory_ConstructByKey( cf, self->name, "initialStrainShape", Stg_Shape, False, data );
@@ -257,8 +260,8 @@ void _StrainWeakening_Construct( void* strainWeakening, Stg_ComponentFactory* cf
 			initialDamageWavenumber, 
 			initialDamageWavenumberSinI, 
 			initialDamageWavenumberCosI, 
-			initialDamageWavenumberSinJ, 
-			initialDamageWavenumberCosJ, 
+			initialDamageWavenumberSinK, 
+			initialDamageWavenumberCosK, 
 			initialDamageFactor,
 			randomSeed,
 			initialStrainShape );
@@ -277,7 +280,7 @@ void _StrainWeakening_Build( void* strainWeakening, void* data ) {
 }
 
 void _StrainWeakening_Initialise( void* strainWeakening, void* data ) {
-	StrainWeakening*                       self               = (StrainWeakening*) strainWeakening;
+	StrainWeakening*                       self  = (StrainWeakening*) strainWeakening;
 	Particle_Index                         lParticle_I;
 	Particle_Index                         particleLocalCount;
 	Variable*                              positionVariable   = self->swarm->particleCoordVariable->variable;
@@ -308,18 +311,20 @@ void _StrainWeakening_Initialise( void* strainWeakening, void* data ) {
 		for ( lParticle_I = 0 ; lParticle_I < particleLocalCount ; lParticle_I++ ) {
 			/* Initialise Increment to Zero */
 			Variable_SetValueDouble( self->postFailureWeakeningIncrement->variable, lParticle_I, 0.0 );
+			Variable_SetValueDouble( self->variable, lParticle_I, 0.0 );
 
 			/* Set initial damage parameter
 			 * There is a certain fraction of the number of particles which are given initial strain */
+			
 			postFailureWeakening = 0.0;
 			
 			if ( rand() < RAND_MAX*self->initialDamageFraction ) {
 
 				coord = Variable_GetPtrDouble( positionVariable, lParticle_I );
-
+				
 				if ( self->initialStrainShape && !Stg_Shape_IsCoordInside( self->initialStrainShape, coord ) ) {
-				Variable_SetValueDouble( self->variable, lParticle_I, postFailureWeakening );
-					continue;
+					Variable_SetValueDouble( self->variable, lParticle_I, postFailureWeakening );
+						continue;
 				}
 				
 				postFailureWeakening = self->initialDamageFactor * rand() * self->softeningStrain/RAND_MAX;
@@ -330,34 +335,29 @@ void _StrainWeakening_Initialise( void* strainWeakening, void* data ) {
 				/* Use old definition if new one is not set */
 				
 				if ( self->initialDamageWavenumber > 0.0 && self->initialDamageWavenumberCosI == -1.0 ) {				
-						coord = Variable_GetPtrDouble( positionVariable, lParticle_I );
 						postFailureWeakening *= 
-							pow(cos(M_PI * coord[ I_AXIS ] * self->initialDamageWavenumber),2.0);
+							pow(1.0+cos(M_PI * coord[ I_AXIS ] * self->initialDamageWavenumber),2.0);
 					}
 					
 				/* Alternate phase is appropriate for different bc's and choice of origin */	
 					
 				if ( self->initialDamageWavenumberCosI > 0.0 ) {				
-						coord = Variable_GetPtrDouble( positionVariable, lParticle_I );
 						postFailureWeakening *= 
-							pow(cos(M_PI * coord[ I_AXIS ] * self->initialDamageWavenumberCosI),2.0);
+							pow(1.0+cos(M_PI * coord[ I_AXIS ] * self->initialDamageWavenumberCosI),2.0);
 				}
 				
 				if ( self->initialDamageWavenumberSinI > 0.0 ) {				
-					coord = Variable_GetPtrDouble( positionVariable, lParticle_I );
 					postFailureWeakening *= 
-						pow(sin(M_PI * coord[ I_AXIS ] * self->initialDamageWavenumberSinI),2.0);
+						pow(1.0+sin(M_PI * coord[ I_AXIS ] * self->initialDamageWavenumberSinI),2.0);
 				}
 				
-				if ( self->initialDamageWavenumberCosJ > 0.0 ) {				
-					coord = Variable_GetPtrDouble( positionVariable, lParticle_I ); /* This could be done more efficiently */
+				if ( self->initialDamageWavenumberCosK > 0.0 ) {				
 					postFailureWeakening *= 
-						pow(cos(M_PI * coord[ J_AXIS ] * self->initialDamageWavenumberCosJ),2.0);
+						pow(1.0+cos(M_PI * coord[ K_AXIS ] * self->initialDamageWavenumberCosK),2.0);
 				}
-				if ( self->initialDamageWavenumberSinJ > 0.0 ) {				
-					coord = Variable_GetPtrDouble( positionVariable, lParticle_I ); 
+				if ( self->initialDamageWavenumberSinK > 0.0 ) {				
 					postFailureWeakening *= 
-						pow(sin(M_PI * coord[ J_AXIS ] * self->initialDamageWavenumberSinJ),2.0);
+						pow(1.0+sin(M_PI * coord[ K_AXIS ] * self->initialDamageWavenumberSinK),2.0);
 				}
 			}
 		
