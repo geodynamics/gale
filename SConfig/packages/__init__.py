@@ -2,6 +2,7 @@ from CompilerFlags import CompilerFlags
 from libXML2 import libXML2
 from MPI import MPI
 from PETSc import PETSc
+from PETScPrivate import PETScPrivate
 from PETScExt import PETScExt
 from cmath import cmath
 from SVNRevision import SVNRevision

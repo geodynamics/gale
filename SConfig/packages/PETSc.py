@@ -25,19 +25,20 @@ class PETSc(SConfig.Package):
         SConfig.Package.process_installation(self, inst)
 
         # Read the PETSc architecture.
-        inst.arch = self.get_arch(inst.base_dir)
+        self.base_dir = inst.base_dir
+        inst.arch = self.get_arch(self.base_dir)
         if not inst.arch:
             return
 
         # Add the bmake/arch include directory.
         hdr_dir = os.path.join('bmake', inst.arch)
-        if not os.path.exists(os.path.join(inst.base_dir, hdr_dir)):
+        if not os.path.exists(os.path.join(self.base_dir, hdr_dir)):
             return
         inst.add_hdr_dirs(hdr_dir)
 
         # Add the lib/arch library directory.
         lib_dir = os.path.join('lib', inst.arch)
-        if not os.path.exists(os.path.join(inst.base_dir, lib_dir)):
+        if not os.path.exists(os.path.join(self.base_dir, lib_dir)):
             return
         inst.add_lib_dirs(lib_dir)
 
