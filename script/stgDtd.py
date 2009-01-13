@@ -31,7 +31,7 @@ class Handler( xml.sax.handler.ContentHandler ):
                 self._top()["content"] = {}
                 self._top()["tag"] = "StGermainData"
             else:
-                raise RunTimeError( 'Invalid meta xml - parsing tag StGermainData' )
+                raise RuntimeError( 'Invalid meta xml - parsing tag StGermainData' )
         elif name == "param":
             if self.inStGermainData:
                 self.stack.append( {} )
@@ -42,7 +42,7 @@ class Handler( xml.sax.handler.ContentHandler ):
 		except KeyError:
 			pass
             else:
-                raise RunTimeError( 'Invalid meta xml - parsing tag param' )
+                raise RuntimeError( 'Invalid meta xml - parsing tag param' )
         elif name == "list":
             if self.inStGermainData:
                 self.stack.append( {} )
@@ -53,7 +53,7 @@ class Handler( xml.sax.handler.ContentHandler ):
 		except KeyError:
 			pass
             else:
-                raise RunTimeError( 'Invalid meta xml - parsing tag list' )
+                raise RuntimeError( 'Invalid meta xml - parsing tag list' )
         elif name == "struct":
             if self.inStGermainData:
                 self.stack.append( {} )
@@ -64,7 +64,7 @@ class Handler( xml.sax.handler.ContentHandler ):
 		except KeyError:
 			pass
             else:
-                raise RunTimeError( 'Invalid meta xml - parsing tag struct' )
+                raise RuntimeError( 'Invalid meta xml - parsing tag struct' )
 
     def characters( self, data ):
         if self._top()["tag"] == "param":
@@ -77,17 +77,17 @@ class Handler( xml.sax.handler.ContentHandler ):
             if self._top()["tag"] == "param":
                 self._pop()
             else:
-                raise RunTimeError( 'Invalid meta xml - parsing tag /param' )
+                raise RuntimeError( 'Invalid meta xml - parsing tag /param' )
         elif name == "list":
             if self._top()["tag"] == "list":
                 self._pop()
             else:
-                raise RunTimeError( 'Invalid meta xml - parsing tag /param' )
+                raise RuntimeError( 'Invalid meta xml - parsing tag /param' )
         elif name == "struct":
             if self._top()["tag"] == "struct":
                self._pop()
             else:
-                raise RunTimeError( 'Invalid meta xml - parsing tag /param' )
+                raise RuntimeError( 'Invalid meta xml - parsing tag /param' )
 
 
     def getDict( self ):
@@ -110,10 +110,10 @@ class Handler( xml.sax.handler.ContentHandler ):
                 key = self._top()["key"]
                 self._peek()["content"][key] = value
             except KeyError:
-                RunTimeError( 'Invalid meta xml - tag missing name attribute' )
+                RuntimeError( 'Invalid meta xml - tag missing name attribute' )
         elif self._peek()["tag"] == "list":
             self._peek()["content"].append( value )
         else:
-            raise RunTimeError( 'Invalid meta xml - parsing tag /param' )
+            raise RuntimeError( 'Invalid meta xml - parsing tag /param' )
         self.stack.pop()
 

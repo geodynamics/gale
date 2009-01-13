@@ -101,7 +101,7 @@ def dtdDict2metaXsdDict( stgDtdDict ):
 			elif param["Type"].lower().strip() == "list":
 				p["type"] = "stg:list"
 			else:
-				raise RunTimeError( 'Unknown parameter type' )
+				raise RuntimeError( 'Unknown parameter type' )
 			try:
 				p["default"] = param["Default"]
 			except KeyError:
