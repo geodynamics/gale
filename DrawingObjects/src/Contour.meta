@@ -78,6 +78,7 @@
 </list>
 <!-- Add an exmaple XML if possible -->
 <param name="Example">
+<![CDATA[
 		<struct name="temperatureContours">
 			<param name="Type">lucContour</param>
 			<param name="FieldVariable">TemperatureField</param>
@@ -86,6 +87,7 @@
 			<param name="resolution">20</param>
 			<param name="lineWidth">1</param>
 		</struct>
+]]>
 </param>
 
 </StGermainData>

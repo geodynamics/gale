@@ -11,8 +11,8 @@
 <param name="Copyright">Copyright (c) 2005, Monash Cluster Computing</param>
 <param name="License">http://www.opensource.org/licenses/bsd-license.php</param>
 <param name="Parent">lucOpenGLDrawingObject</param>
-<param name="Reference">N/A</param>
-<param name="Summary">N/A</param>
+<param name="Reference"></param>
+<param name="Summary"></param>
 <param name="Description"> This is equivalent to the lucSwarmViewer but one can apply a different variable to each of the Red, Green and Blue channels individually. If a colour channel is not associated to any swarm variable, then the value defaults to the corresponding value set with the parameter "colour". The colour variable is not used.</param>
 
 <!--Now the interesting stuff-->
@@ -42,6 +42,7 @@
 
 <!-- Add an exmaple XML if possible -->
 <param name="Example">
+<![CDATA[
 	<struct name="yteparticleDotsrgb">
 		<param name="Type">lucSwarmRGBColourViewer</param>
 		<param name="Swarm">materialSwarm</param>
@@ -54,6 +55,7 @@
 		<param name="ColourGreenVariable">materialSwarm-YieldTypeShear</param>
 		<param name="pointSize">2.0</param>
 	</struct>
+]]>
 </param>
 
 </StGermainData>

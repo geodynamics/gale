@@ -11,8 +11,8 @@
 <param name="Copyright">Copyright (c) 2005, Monash Cluster Computing</param>
 <param name="License">http://www.opensource.org/licenses/bsd-license.php</param>
 <param name="Parent">lucOpenGLDrawingObject</param>
-<param name="Reference">...</param>
-<param name="Summary">...</param>
+<param name="Reference"></param>
+<param name="Summary"></param>
 <param name="Description">Displays a title at the top of a viewport.</param>
 
 <!--Now the interesting stuff-->
@@ -45,11 +45,13 @@
 </list>
 <!-- Add an exmaple XML if possible -->
 <param name="Example">
+<![CDATA[
                 <struct name="tempandVelTitle" mergeType="replace">
                         <param name="Type">lucTitle</param>
                         <param name="color">grey</param>
                         <param name="string">TemperatureField and Velocity Arrows</param>
                 </struct>
+]]>
 </param>
 
 </StGermainData>

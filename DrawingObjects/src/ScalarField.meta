@@ -12,7 +12,7 @@
 <param name="License">http://www.opensource.org/licenses/bsd-license.php</param>
 <param name="Parent">lucScalarFieldCrossSection</param>
 <param name="Reference">N/A</param>
-<param name="Summary">...</param>
+<param name="Summary"></param>
 <param name="Description">Tiles the side walls of the model with colours derived from the value of a scalar field at the vertex of each tile.</param>
 
 <!--Now the interesting stuff-->
@@ -33,11 +33,13 @@
 </list>
 <!-- Add an exmaple XML if possible -->
 <param name="Example">
+<![CDATA[
 		<struct name="temperatureMap">
 			<param name="Type">lucScalarField</param>
 			<param name="FieldVariable">TemperatureField</param>
 			<param name="ColourMap">temperatureColourMap</param>
 		</struct>
+]]>
 </param>
 
 </StGermainData>
