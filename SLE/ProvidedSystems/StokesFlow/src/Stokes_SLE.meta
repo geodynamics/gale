@@ -11,9 +11,9 @@
 <param name="Copyright">Copyright (C) 2004-2005 VPAC.</param>
 <param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
 <param name="Parent">SystemLinearEquations</param>
-<param name="Reference">...</param>
-<param name="Summary">...</param>
-<param name="Description"> 
+<param name="Reference"></param>
+<param name="Summary"></param>
+<param name="Description"><![CDATA[
 	This SLE define the Stokes system of equations given by the 2x2 block matrix
 		[  K  G  ]{u} = {f}
 		[  D  C  ]{p} = {h} ........................................ (1)
@@ -27,7 +27,7 @@
 		u: VelocityVector
 		p: PressureVector
 		f: ForceVector
-		h: ContinuityForceVector:
+		h: ContinuityForceVector:]]>
 </param>
 
 <list name="Params">
@@ -103,6 +103,8 @@
 			<param name="nonLinearMaxIterations">nonLinearMaxIterations</param>
 			<param name="nonLinearTolerance">nonLinearTolerance</param>
 			<param name="makeConvergenceFile">false</param>
-		</struct>
+	</struct>
 ]]>
+</param>
+
 </StGermainData>

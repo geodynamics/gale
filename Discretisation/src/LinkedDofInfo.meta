@@ -30,7 +30,7 @@
 	<struct>
 		<param name="Essential">True</param>
 		<param name="Name">DofLayout</param>
-		<param name="Type">DofLayout</parm>
+		<param name="Type">DofLayout</param>
 		<param name="Description">The Dof Layout that this linking applies to.</param>
 	</struct>
 	<struct>
