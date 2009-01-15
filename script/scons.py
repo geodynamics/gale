@@ -64,7 +64,7 @@ def build_directory(env, dir, dst_dir='', with_tests=True):
     env.suite_hdrs += env.glob(dir + '/tests/*Suite.h')
     env.suite_objs += env.build_sources(env.glob(dir + '/tests/*Suite.c'), obj_dir)
 
-def build_plugin(env, dir, dst_dir='', name=''):
+def build_plugin(env, dir, dst_dir='', name='', with_lib=True):
     if not env.check_dir_target(dir): return
     if not dst_dir:
         dst_dir = dir
@@ -74,10 +74,14 @@ def build_plugin(env, dir, dst_dir='', name=''):
     env.build_headers(env.glob(dir + '/*.h'), 'include/' + env.project_name + '/' + dir.split('/')[-1])
     objs = env.build_sources(env.glob(dir + '/*.c'), env.project_name + '/' + dir)
     if env['shared_libraries']:
+        if with_lib:
+            libs = [env.project_name] + env.get('LIBS', [])
+        else:
+            libs = env.get('LIBS', [])
         env.SharedLibrary(env.get_build_path('lib/' + mod_name), objs,
                           SHLIBPREFIX='',
                           LIBPREFIXES=env.make_list(env['LIBPREFIXES']) + [''],
-                          LIBS=[env.project_name] + env.get('LIBS', []))
+                          LIBS=libs)
     if env['static_libraries']:
         env.src_objs += objs
         if not env['shared_libraries']:
