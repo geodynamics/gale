@@ -104,18 +104,21 @@ void _Velic_solKz_Build( void* analyticSolution, void* data ) {
 
 void _Velic_solKz_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	Velic_solKz* self = (Velic_solKz*) analyticSolution;
-	double                   sigma, km, B, twiceB;
+	double                   sigma, m, B, twiceB, km;
 	int                      n;
 
 	/* Construct Parent */
 	_FieldTest_Construct( self, cf, data );
 
 	sigma = Stg_ComponentFactory_GetRootDictDouble( cf, "solKz_sigma", 1.0 );
-	km = Stg_ComponentFactory_GetRootDictDouble( cf, "solKz_km", M_PI );
 	twiceB = Stg_ComponentFactory_GetRootDictDouble( cf, "solKz_twiceB", 2.0 );
 	B = Stg_ComponentFactory_GetRootDictDouble( cf, "solKz_B", 0.5 * twiceB );
+	m = Stg_ComponentFactory_GetRootDictDouble( cf, "solKz_m", 1 );
 	n = Stg_ComponentFactory_GetRootDictInt( cf, "solKz_n", 1 );
+
+  km = M_PI * m;
 	
+  /* Note: in the _Velic_solKz function km and n must be supplied */
 	_Velic_solKz_Init( self, sigma, km, B, n );
 }
 

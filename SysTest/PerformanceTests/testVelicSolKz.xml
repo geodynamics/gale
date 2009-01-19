@@ -3,6 +3,10 @@
 
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 
+<!-- VelicSolKz
+the z-axis defined in the solution pdf
+is the y-axis in the code 
+-->
 	<include> Underworld/BaseApps/ThermalConvection.xml </include>
 	
 	<list name="plugins" mergeType="merge">
@@ -46,15 +50,20 @@
 	    </list>
 	</struct>
 	
-	<param name="wavenumberX">1.0</param>
-	<param name="wavenumberY">1.0</param>
+
+  <param name="solKz_sigma"> 1.0 </param>
+	<param name="solKz_twiceB"> 2.0 </param>
+  <!-- solKz_m and wavenumberY must be equal -->
+	<param name="solKz_m"> 1.0 </param> <param name="wavenumberY">1.0</param>
+  <!-- solKz_n and wavenumberX must be equal -->
+	<param name="solKz_n"> 1.0 </param> <param name="wavenumberX">1.0</param>
 	
 	<struct name="components" mergeType="merge">
 		<struct name="rheology">
 			<param name="Type">DepthDependentViscosity</param>
 			<param name="Mesh">linearMesh</param>
-			<param name="eta0">1.0</param>
-			<param name="gamma">2</param>
+			<param name="eta0">solKz_sigma</param>
+			<param name="gamma">solKz_twiceB</param>
 			<param name="referencePoint">0.0</param>
 			<param name="variationAxis">y</param>
 		</struct>
