@@ -94,7 +94,7 @@ def save_config(env, filename='config.cfg'):
                                  'LIBPATH', 'LIBS', 'STATICLIBS',
                                  'RPATH', 'INTLIBS',
                                  'LINKFLAGS', 'SHLINKFLAGS',
-                                 'FRAMEWORKS'])
+                                 'FRAMEWORKS', 'found_packages'])
     env.AppendUnique(CONFIGVARS=env.package_options.keys())
 
     # Dump to file.

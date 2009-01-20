@@ -482,4 +482,4 @@ class Package(SConfig.Node):
         SConfig.Node.enable(self, scons_env, old_state)
         if self.selected:
             self.selected.enable(scons_env, old_state)
-            scons_env["with_" + self.command_name] = True
+            scons_env.AppendUnique(found_packages=[self.name])
