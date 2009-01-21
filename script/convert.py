@@ -282,6 +282,7 @@ def metaXsdDict2stgDictionaryCode( xsdDict ):
 		s += '\n'
 	s += '\tDictionary_Add( meta, "associations", Dictionary_Entry_Value_FromStruct( associations ) );\n'
 	s += '\n'
+	s += '\treturn meta;\n'
 	s += '}\n'
 
 	# The _Type variant exists because of macro used for ComponentRegister_Add does a stringify on the Component_Type argument
