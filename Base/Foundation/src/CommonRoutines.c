@@ -228,8 +228,8 @@ Bool Stg_StringIsNumeric( char* string ) {
 			continue;
 		}
 
-		/* Check for 'e' for scientific notation - only one allowed */
-		if ( ch == 'e' && eCount == 0 ) {
+		/* Check for 'e' or 'E' for scientific notation - only one allowed */
+		if ( ( ch == 'e' || ch == 'E' ) && eCount == 0 ) {
 			eCount++;
 
 			/* Reset counters because another number is allowed */
