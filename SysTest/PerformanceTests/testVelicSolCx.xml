@@ -13,6 +13,9 @@
 		<param>Underworld_Velic_solCx</param>
 	</list>
 
+  <!-- to disable scaling check --> 
+  <param name="Ra_ScalingCheck">false</param>
+
 	<struct name="pluginData">
 		<list name="NumericFields">
 			<param>VelocityField</param> <param> 0 </param>
