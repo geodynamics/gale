@@ -303,9 +303,6 @@ void _FieldVariable_Construct( void* fieldVariable, Stg_ComponentFactory* cf, vo
 				isCheckpointedAndReloaded = True;
 				break;
 			}
-			else {
-				continue;
-			}	
 		}
 	}
 	else {
