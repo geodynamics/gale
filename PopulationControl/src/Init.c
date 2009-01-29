@@ -46,7 +46,6 @@
 #include <StGermain/StGermain.h>
 #include <StgDomain/StgDomain.h>
 #include <StgFEM/StgFEM.h>
-#include <PICellerator/Voronoi/Voronoi.h>
 
 #include "PopulationControl.h"
 
@@ -57,18 +56,9 @@ Bool PICellerator_PopulationControl_Init( int* argc, char** argv[] ) {
 
 	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 
-	Stg_ComponentRegister_Add( componentsRegister, DiscreteVoronoiRemove_Type,      "0", _DiscreteVoronoiRemove_DefaultNew );
-	Stg_ComponentRegister_Add( componentsRegister, DiscreteVoronoiSplitting_Type,   "0", _DiscreteVoronoiSplitting_DefaultNew );
 	Stg_ComponentRegister_Add( componentsRegister, EscapedRoutine_Type,      	"0", _EscapedRoutine_DefaultNew );
-	Stg_ComponentRegister_Add( componentsRegister, ReseedSplitting_Type,            "0", _ReseedSplitting_DefaultNew );
 
-	RegisterParent( RemovalRoutine_Type,             Stg_Component_Type );
-	RegisterParent( DiscreteVoronoiRemove_Type,      RemovalRoutine_Type );
 	RegisterParent( EscapedRoutine_Type,      	 Stg_Component_Type );
 	
-	RegisterParent( SplittingRoutine_Type,           Stg_Component_Type );
-	RegisterParent( DiscreteVoronoiSplitting_Type,   SplittingRoutine_Type );
-	RegisterParent( ReseedSplitting_Type,            SplittingRoutine_Type );
-
 	return True;
 }

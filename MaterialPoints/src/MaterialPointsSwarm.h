@@ -64,8 +64,6 @@
 		\
 		FeMesh*                   mesh;                 \
 		SwarmAdvector*                        swarmAdvector;        \
-		RemovalRoutine*                       removalRoutine;       \
-		SplittingRoutine*                     splittingRoutine;     \
 		EscapedRoutine*                       escapedRoutine;       \
 		Material*                             material;             /**< For material assignment */ \
 		Materials_Register*                   materials_Register;   \
@@ -89,8 +87,6 @@
 		Particle_InCellIndex                  cellParticleTblDelta,
 		double                                extraParticlesFactor,
 		FeMesh*                   	      mesh,
-		RemovalRoutine*                       removalRoutine,
-		SplittingRoutine*                     splittingRoutine,
 		EscapedRoutine*                       escapedRoutine, 
 		Material*                             material,
 		Variable_Register*                    swarmVariable_Register,
@@ -141,8 +137,6 @@ void _MaterialPointsSwarm_Construct( void* shape, Stg_ComponentFactory* cf, void
 void _MaterialPointsSwarm_Init( 
 		void*                                 swarm,
 		FeMesh*                   mesh,
-		RemovalRoutine*                       removalRoutine,
-		SplittingRoutine*                     splittingRoutine,
 		EscapedRoutine*                       escapedRoutine, 
 		Material*                             material,
 		Materials_Register*                   materials_Register );

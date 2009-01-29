@@ -25,7 +25,6 @@
 	<include>PICellerator/MaterialPointSwarm.xml        </include>
 	<include>PICellerator/StokesFlowUzawa.xml </include>
 	<!--include>Underworld/StokesFlowUzawaCompressible.xml </include-->
-	<!--include>PICellerator/PopulationControl.xml </include-->
 
 	<list name="plugins" mergeType="merge">
 		<!-- Output Plugins -->

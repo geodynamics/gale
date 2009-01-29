@@ -46,7 +46,6 @@
 #include <StGermain/StGermain.h>
 #include <StgDomain/StgDomain.h>
 #include <StgFEM/StgFEM.h>
-#include <PICellerator/Voronoi/Voronoi.h>
 
 #include "Weights.h"
 
@@ -61,7 +60,6 @@ Bool PICellerator_Weights_Init( int* argc, char** argv[] ) {
 	Stg_ComponentRegister_Add( componentsRegister, VolumeWeights_Type,            "0", _VolumeWeights_DefaultNew );
 	Stg_ComponentRegister_Add( componentsRegister, IterativeWeights_Type,         "0", _IterativeWeights_DefaultNew );
 	Stg_ComponentRegister_Add( componentsRegister, MomentBalanceWeights_Type,     "0", _MomentBalanceWeights_DefaultNew );
-	Stg_ComponentRegister_Add( componentsRegister, DiscreteVoronoiWeights_Type,   "0", _DiscreteVoronoiWeights_DefaultNew );
 	Stg_ComponentRegister_Add( componentsRegister, DVCWeights_Type,   			  "0", _DVCWeights_DefaultNew );
 	
 	RegisterParent( WeightsCalculator_Type,      Stg_Component_Type );
@@ -69,7 +67,6 @@ Bool PICellerator_Weights_Init( int* argc, char** argv[] ) {
 	RegisterParent( VolumeWeights_Type,          WeightsCalculator_Type );
 	RegisterParent( IterativeWeights_Type,       WeightsCalculator_Type );
 	RegisterParent( MomentBalanceWeights_Type,   WeightsCalculator_Type );
-	RegisterParent( DiscreteVoronoiWeights_Type, WeightsCalculator_Type );
 	RegisterParent( DVCWeights_Type,             WeightsCalculator_Type );
 	
 	return True;

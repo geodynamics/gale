@@ -9,33 +9,15 @@
 			<param name="Type">ElementCellLayout</param>
 			<param name="Mesh">elementMesh</param>
 		</struct>
-		<!--struct name="discreteVoronoi">
-			<param name="Type">CellularAutomataVoronoi</param>
-			<param name="resolution">10</param>
-			<param name="diagonalNeighbours">true</param>
-		</struct-->		
-		<!--
+  <!--
 		<struct name="weights">
 			<param name="Type">ConstantWeights</param>
 		</struct>
-		-->
-		<!--struct name="weights">
-			<param name="Type">DiscreteVoronoiWeights</param>
-			<param name="DiscreteVoronoi">discreteVoronoi</param>
-		</struct-->
-
-		<!--
-		<struct name="weights">
-			<param name="Type">ConstantWeights</param>
-		</struct>	
-		-->
-
-<!--
 		<struct name="weights">
   			<param name="Type">DVCWeights</param>
  			 <param name="resolution">10</param>
 		</struct>
--->
+  -->
 		
 		<struct name="weights">
 		   <param name="Type">PCDVC</param>

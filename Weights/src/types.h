@@ -60,7 +60,6 @@
 	typedef struct ConstantWeights              ConstantWeights;
 	typedef struct VolumeWeights                VolumeWeights;
 	typedef struct IterativeWeights             IterativeWeights;
-	typedef struct DiscreteVoronoiWeights       DiscreteVoronoiWeights;
 	typedef struct MomentBalanceWeights         MomentBalanceWeights;
 	typedef struct DVCWeights                   DVCWeights;
 	

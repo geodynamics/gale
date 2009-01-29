@@ -57,7 +57,6 @@ Bool PICellerator_Init( int* argc, char** argv[] ) {
 	int tmp;
 	char* directory;
 
-	PICellerator_Voronoi_Init( argc, argv );
 	PICellerator_PopulationControl_Init( argc, argv );
 	PICellerator_Weights_Init( argc, argv );
 	PICellerator_MaterialPoints_Init( argc, argv );

@@ -58,7 +58,6 @@ Bool PICellerator_Finalise( void ) {
 	PICellerator_MaterialPoints_Finalise();
 	PICellerator_Weights_Finalise();
 	PICellerator_PopulationControl_Finalise();
-	PICellerator_Voronoi_Finalise();
 	
 	return True;
 }

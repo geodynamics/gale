@@ -56,13 +56,6 @@
 	#include "types.h"	
 	#include "Init.h"	
 	#include "Finalise.h"	
-	#include "RemovalRoutine.h"	
-	#include "SplittingRoutine.h"	
 	#include "EscapedRoutine.h"
-	
-	#include "ReseedSplitting.h"	
-
-	#include "DiscreteVoronoiRemove.h"	
-	#include "DiscreteVoronoiSplitting.h"	
 	
 #endif 

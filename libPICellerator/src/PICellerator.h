@@ -56,7 +56,6 @@
 #ifndef __PICellerator_h__
 #define __PICellerator_h__
 	
-	#include "Voronoi/Voronoi.h"
 	#include "PopulationControl/PopulationControl.h"
 	#include "Weights/Weights.h"
 	#include "MaterialPoints/MaterialPoints.h"

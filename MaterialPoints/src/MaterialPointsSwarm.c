@@ -47,7 +47,6 @@
 #include <StgDomain/StgDomain.h>
 #include <StgFEM/StgFEM.h>
 
-#include <PICellerator/Voronoi/Voronoi.h>
 #include <PICellerator/PopulationControl/PopulationControl.h>
 #include <PICellerator/Weights/Weights.h>
 
@@ -70,8 +69,6 @@ MaterialPointsSwarm* MaterialPointsSwarm_New(
 		Particle_InCellIndex                  cellParticleTblDelta,
 		double                                extraParticlesFactor,
 		FeMesh*                   mesh,
-		RemovalRoutine*                       removalRoutine,
-		SplittingRoutine*                     splittingRoutine,
 		EscapedRoutine*                       escapedRoutine, 
 		Material*                             material,
 		Variable_Register*                    swarmVariable_Register,
@@ -96,8 +93,6 @@ MaterialPointsSwarm* MaterialPointsSwarm_New(
 						NULL );
 		_MaterialPointsSwarm_Init(	self, 
 									mesh, 
-									removalRoutine, 
-									splittingRoutine,
 		 							escapedRoutine, 
 									material, 
 									materials_Register);
@@ -165,8 +160,6 @@ MaterialPointsSwarm* _MaterialPointsSwarm_New(
 void _MaterialPointsSwarm_Init( 
 		void*                                 swarm,
 		FeMesh*                   mesh,
-		RemovalRoutine*                       removalRoutine,
-		SplittingRoutine*                     splittingRoutine,
 		EscapedRoutine*                       escapedRoutine, 
 		Material*                             material,
 		Materials_Register*                   materials_Register )
@@ -177,8 +170,6 @@ void _MaterialPointsSwarm_Init(
 
 	self->mesh               = mesh;
 	self->swarmAdvector      = NULL;		/* If we're using a SwarmAdvector, it will 'attach' itself later on. */
-	self->removalRoutine     = removalRoutine;
-	self->splittingRoutine   = splittingRoutine;
 	self->escapedRoutine     = escapedRoutine;
 	self->material           = material;
 	self->materials_Register = materials_Register;
@@ -271,8 +262,6 @@ void* _MaterialPointsSwarm_DefaultNew( Name name ) {
 void _MaterialPointsSwarm_Construct( void* swarm, Stg_ComponentFactory* cf, void* data ) {
 	MaterialPointsSwarm*	        self          = (MaterialPointsSwarm*) swarm;
 	FeMesh*             mesh;
-	RemovalRoutine*                 removalRoutine;
-	SplittingRoutine*               splittingRoutine;
 	EscapedRoutine*                 escapedRoutine;
 	Material*                       material;
 	Materials_Register*             materials_Register;
@@ -280,8 +269,6 @@ void _MaterialPointsSwarm_Construct( void* swarm, Stg_ComponentFactory* cf, void
 	_Swarm_Construct( self, cf, data );
 
 	mesh             = Stg_ComponentFactory_ConstructByKey( cf, self->name, "FeMesh", FeMesh, True, data );
-	removalRoutine   = Stg_ComponentFactory_ConstructByKey( cf, self->name, "RemovalRoutine",     RemovalRoutine,     False, data );
-	splittingRoutine = Stg_ComponentFactory_ConstructByKey( cf, self->name, "SplittingRoutine",   SplittingRoutine,   False, data );
 	escapedRoutine   = Stg_ComponentFactory_ConstructByKey( cf, self->name, "EscapedRoutine",     EscapedRoutine,     False, data );
 	material         = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Material",           Material,           False, data );
 
@@ -291,8 +278,6 @@ void _MaterialPointsSwarm_Construct( void* swarm, Stg_ComponentFactory* cf, void
 	_MaterialPointsSwarm_Init(
 			self,
 			mesh, 
-			removalRoutine,
-			splittingRoutine,
 			escapedRoutine,
 			material,
 			materials_Register );
@@ -383,14 +368,6 @@ void _MaterialPointsSwarm_UpdateHook( void* timeIntegrator, void* swarm ) {
 	/* Need to check for escaped particles before the next block. */
 	if ( self->escapedRoutine ) {
 		Stg_Component_Execute( self->escapedRoutine, self, True );
-	}
-	/* These two should also come before the "outside box" check, so we
-	can check that split particles never end up outside the box either */
-	if ( self->removalRoutine ) {
-		RemovalRoutine_RemoveFromSwarm( self->removalRoutine, self );
-	}
-	if ( self->splittingRoutine ) {
-		Stg_Component_Execute( self->splittingRoutine, self, True );
 	}
 
 	/* Check that particles have not exited the box after advection */

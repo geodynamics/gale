@@ -13,7 +13,6 @@ env.suite_objs = []
 
 #
 # Build standard stg directories.
-env.build_directory('Voronoi')
 env.build_directory('PopulationControl')
 env.build_directory('Weights')
 env.build_directory('MaterialPoints')

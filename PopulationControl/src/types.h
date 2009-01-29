@@ -56,12 +56,7 @@
 #ifndef __PICellerator_PopulationControl_types_h__
 #define __PICellerator_PopulationControl_types_h__
 	
-	typedef struct RemovalRoutine               RemovalRoutine;
-	typedef struct SplittingRoutine             SplittingRoutine;
 	typedef struct EscapedRoutine		    EscapedRoutine;
-	typedef struct ReseedSplitting              ReseedSplitting;
-	typedef struct DiscreteVoronoiRemove        DiscreteVoronoiRemove;
-	typedef struct DiscreteVoronoiSplitting     DiscreteVoronoiSplitting;
 	
 #endif
 

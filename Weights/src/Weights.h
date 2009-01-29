@@ -59,7 +59,6 @@
 	#include "WeightsCalculator.h"
 	#include "ConstantWeights.h"
 	#include "VolumeWeights.h"
-	#include "DiscreteVoronoiWeights.h"
 	#include "IterativeWeights.h"
 	#include "MomentBalanceWeights.h"
 	#include "DVCWeights.h"

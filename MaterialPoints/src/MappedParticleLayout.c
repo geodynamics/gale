@@ -38,7 +38,6 @@
 #include <StgDomain/StgDomain.h>
 #include <StgFEM/StgFEM.h>
 
-#include <PICellerator/Voronoi/Voronoi.h>
 #include <PICellerator/PopulationControl/PopulationControl.h>
 #include <PICellerator/Weights/Weights.h>
 
