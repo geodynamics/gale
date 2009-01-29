@@ -4,7 +4,6 @@
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 
 	<include> Underworld/BaseApps/ExtensionBaseApp.xml </include>
-	<include> PICellerator/PopulationControl.xml </include>
 	
 	<list name="plugins" mergeType="merge">
 		<!-- Output Plugins -->

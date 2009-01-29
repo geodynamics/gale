@@ -33,7 +33,6 @@
 	<include>Experimental/SmoothStrainRateField.xml</include>
  	<include>Experimental/StoreViscosity.xml</include>
  
-	<include> ./PIC_Components/PopulationControl.xml </include>
 
 <!--include>Experimental/StokesFlowUzawaStable.xml</include>
   <include>Experimental/BorderGaussSwarm.xml</include>

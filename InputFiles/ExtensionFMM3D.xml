@@ -8,7 +8,6 @@
         </list>
 
 	<include> Underworld/BaseApps/ExtensionBaseApp.xml </include>
-	<!-- ><include> PICellerator/PopulationControl.xml </include> -->
 	
 	<list name="plugins" mergeType="merge">
 		<!-- Output Plugins -->
