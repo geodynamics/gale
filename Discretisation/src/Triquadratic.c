@@ -66,6 +66,7 @@ Triquadratic* Triquadratic_New( Name name ) {
 				  Triquadratic_EvalLocalDerivs,
 				  _ElementType_ConvertGlobalCoordToElLocal,
 				  Triquadratic_JacobianDeterminantSurface,
+				  _ElementType_SurfaceNormal,
 				  27 );
 }
 

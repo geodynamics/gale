@@ -94,6 +94,7 @@
 		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt,
 		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,
 		ElementType_JacobianDeterminantSurfaceFunction*			_jacobianDeterminantSurface,
+		ElementType_SurfaceNormalFunction*				_surfaceNormal,
 		Index								nodeCount );
 	
 	/* Initialise implementation */

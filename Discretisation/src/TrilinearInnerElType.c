@@ -62,7 +62,7 @@ void* TrilinearInnerElType_DefaultNew( Name name ) {
 		name, False, _TrilinearInnerElType_SF_allNodes, 
 		_TrilinearInnerElType_SF_allLocalDerivs_allNodes,
 		_ElementType_ConvertGlobalCoordToElLocal, _ElementType_JacobianDeterminantSurface,
-		_TrilinearInnerElType_NodeCount );
+		_TrilinearInnerElType_SurfaceNormal, _TrilinearInnerElType_NodeCount );
 }
 
 TrilinearInnerElType* TrilinearInnerElType_New( Name name ) {
@@ -72,7 +72,7 @@ TrilinearInnerElType* TrilinearInnerElType_New( Name name ) {
 		name, True, _TrilinearInnerElType_SF_allNodes, 
 		_TrilinearInnerElType_SF_allLocalDerivs_allNodes,
 		_ElementType_ConvertGlobalCoordToElLocal, _ElementType_JacobianDeterminantSurface,
-		_TrilinearInnerElType_NodeCount );
+		_TrilinearInnerElType_SurfaceNormal, _TrilinearInnerElType_NodeCount );
 }
 
 
@@ -94,6 +94,7 @@ TrilinearInnerElType* _TrilinearInnerElType_New(
 		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt,
 		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,
 		ElementType_JacobianDeterminantSurfaceFunction*			_jacobianDeterminantSurface,
+		ElementType_SurfaceNormalFunction*				_surfaceNormal,
 		Index								nodeCount )
 {
 	TrilinearInnerElType*		self;
@@ -101,8 +102,9 @@ TrilinearInnerElType* _TrilinearInnerElType_New(
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(TrilinearInnerElType) );
 	self = (TrilinearInnerElType*)_ElementType_New( _sizeOfSelf, type, _delete, _print, _copy, _defaultConstructor,
-			_construct, _build, _initialise, _execute, _destroy, name, initFlag, _evaluateShapeFunctionsAt,
-		_evaluateShapeFunctionLocalDerivsAt, _convertGlobalCoordToElLocal, _jacobianDeterminantSurface, nodeCount );
+		_construct, _build, _initialise, _execute, _destroy, name, initFlag, _evaluateShapeFunctionsAt,
+		_evaluateShapeFunctionLocalDerivsAt, _convertGlobalCoordToElLocal, _jacobianDeterminantSurface, 
+		_surfaceNormal, nodeCount );
 	
 	/* General info */
 	
@@ -318,5 +320,13 @@ void _TrilinearInnerElType_ConvertGlobalCoordToElLocal(
 	}
 }*/
 
+void _TrilinearInnerElType_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* normal ) {
+	Stream* errStream = Journal_Register( ErrorStream_Type, ElementType_Type );
+
+	Journal_Printf( errStream, "Surface normal function not yet implemented for this element type.\n" );
+	assert( 0 );
+
+	normal = NULL;
+}
 
 

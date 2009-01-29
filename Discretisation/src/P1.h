@@ -85,6 +85,7 @@
 
 	void P1_EvalBasis( void* elementType, const double* localCoord, double* derivs );
 	void P1_EvalLocalDerivs( void* elementType, const double* localCoord, double** derivs );
+	void _P1_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* normal );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Public functions

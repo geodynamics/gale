@@ -65,6 +65,7 @@ Biquadratic* Biquadratic_New( Name name ) {
 				 Biquadratic_EvalLocalDerivs, 
 				 _ElementType_ConvertGlobalCoordToElLocal, 
 				 Biquadratic_JacobianDeterminantSurface,
+				 _ElementType_SurfaceNormal,
 				 9 );
 }
 

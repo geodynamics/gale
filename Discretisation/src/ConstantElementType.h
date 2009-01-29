@@ -89,6 +89,7 @@
 		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt,
 		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,
 		ElementType_JacobianDeterminantSurfaceFunction*			_jacobianDeterminantSurface,
+		ElementType_SurfaceNormalFunction*				_surfaceNormal,
 		Index								nodeCount );
 	
 	/* Initialise a ConstantElementType construct */
@@ -127,7 +128,7 @@
 	*/
 	void _ConstantElementType_ConvertGlobalCoordToElLocal(
 		void*		elementType,
-		Mesh*		mesh, 
+		void*		mesh, 
 		unsigned	element, 
 		const double*	globalCoord,
 		double*		elLocalCoord );
@@ -138,5 +139,12 @@
 		const double	localCoord[],
 		unsigned*	nodes,
 		unsigned	norm );
+
+	void _ConstantElementType_SurfaceNormal(
+		void*		elementType,
+		unsigned	element_I,
+		unsigned	dim,
+		double*		xi,
+		double*		normal );
 
 #endif /* __StgFEM_Discretisation_ConstantElementType_h__ */

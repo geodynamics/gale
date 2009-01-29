@@ -73,6 +73,7 @@ void* ConstantElementType_DefaultNew( Name name ) {
 			_ConstantElementType_SF_allLocalDerivs_allNodes,
 			_ConstantElementType_ConvertGlobalCoordToElLocal,
 			_ElementType_JacobianDeterminantSurface,
+			_ConstantElementType_SurfaceNormal,
 			_ConstantElementType_NodeCount );
 }
 
@@ -95,6 +96,7 @@ ConstantElementType* ConstantElementType_New( Name name ) {
 			_ConstantElementType_SF_allLocalDerivs_allNodes,
 			_ConstantElementType_ConvertGlobalCoordToElLocal,
 			_ElementType_JacobianDeterminantSurface,
+			_ConstantElementType_SurfaceNormal,
 			_ConstantElementType_NodeCount );
 }
 
@@ -117,6 +119,7 @@ ConstantElementType* _ConstantElementType_New(
 		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt,
 		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,
 		ElementType_JacobianDeterminantSurfaceFunction*			_jacobianDeterminantSurface,
+		ElementType_SurfaceNormalFunction*				_surfaceNormal,
 		Index								nodeCount )
 {
 	ConstantElementType*		self;
@@ -126,7 +129,7 @@ ConstantElementType* _ConstantElementType_New(
 	self = (ConstantElementType*)_ElementType_New( _sizeOfSelf, type, _delete, _print, _copy,
 		_defaultConstructor, _construct, _build, _initialise, _execute, _destroy, name, initFlag,
 		_evaluateShapeFunctionsAt, _evaluateShapeFunctionLocalDerivsAt, _convertGlobalCoordToElLocal,
-		_jacobianDeterminantSurface, nodeCount );
+		_jacobianDeterminantSurface, _surfaceNormal, nodeCount );
 	
 	/* General info */
 	
@@ -226,7 +229,7 @@ void _ConstantElementType_SF_allLocalDerivs_allNodes( void* elementType, const d
 
 void _ConstantElementType_ConvertGlobalCoordToElLocal(
 		void*		elementType,
-		Mesh*		mesh, 
+		void*		mesh, 
 		unsigned	element, 
 		const double*	globalCoord,
 		double*		elLocalCoord )
@@ -234,3 +237,13 @@ void _ConstantElementType_ConvertGlobalCoordToElLocal(
 	/* See header file function introduction for explanation... */
 	elLocalCoord[0] = elLocalCoord[1] = elLocalCoord[2] = 0;
 }
+
+void _ConstantElementType_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* normal ) {
+	Stream*	errStream	= Journal_Register( ErrorStream_Type, ElementType_Type );
+
+	Journal_Printf( errStream, "surface normal not defined for this element type.\n" );
+	assert( 0 );
+
+	normal = NULL;
+}
+

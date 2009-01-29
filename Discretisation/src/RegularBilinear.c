@@ -65,6 +65,7 @@ RegularBilinear* RegularBilinear_New( Name name ) {
 				     _BilinearElementType_SF_allLocalDerivs_allNodes, 
 				     _ElementType_ConvertGlobalCoordToElLocal, 
 				     _BilinearElementType_JacobianDeterminantSurface,
+				     _ElementType_SurfaceNormal,
 				     4 );
 }
 

@@ -78,6 +78,7 @@ void* BilinearElementType_DefaultNew( Name name ) {
 			_BilinearElementType_SF_allLocalDerivs_allNodes,
 			_ElementType_ConvertGlobalCoordToElLocal,
 			_BilinearElementType_JacobianDeterminantSurface,
+			_ElementType_SurfaceNormal,
 			_BilinearElementType_NodeCount );
 }
 
@@ -86,7 +87,7 @@ BilinearElementType* BilinearElementType_New( Name name ) {
 		_BilinearElementType_Print, NULL, BilinearElementType_DefaultNew, _BilinearElementType_Construct, _BilinearElementType_Build,
 		_BilinearElementType_Initialise, _BilinearElementType_Execute, _BilinearElementType_Destroy, name, True, _BilinearElementType_SF_allNodes, 
 		_BilinearElementType_SF_allLocalDerivs_allNodes, _ElementType_ConvertGlobalCoordToElLocal, _BilinearElementType_JacobianDeterminantSurface,
-		_BilinearElementType_NodeCount );
+		_ElementType_SurfaceNormal, _BilinearElementType_NodeCount );
 }
 
 
@@ -108,6 +109,7 @@ BilinearElementType* _BilinearElementType_New(
 		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt,
 		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,
 		ElementType_JacobianDeterminantSurfaceFunction*			_jacobianDeterminantSurface,
+		ElementType_SurfaceNormalFunction*				_surfaceNormal,
 		Index								nodeCount )
 {
 	BilinearElementType*		self;
@@ -117,7 +119,7 @@ BilinearElementType* _BilinearElementType_New(
 	self = (BilinearElementType*)_ElementType_New( _sizeOfSelf, type, _delete, _print, _copy, _defaultConstructor,
 		_construct, _build, _initialise, _execute, _destroy, name, initFlag,
 		_evaluateShapeFunctionsAt, _evaluateShapeFunctionLocalDerivsAt, _convertGlobalCoordToElLocal,
-		_jacobianDeterminantSurface, nodeCount );
+		_jacobianDeterminantSurface, _surfaceNormal, nodeCount );
 	
 	/* General info */
 	

@@ -61,7 +61,7 @@ void* LinearTriangleElementType_DefaultNew( Name name ) {
 		_LinearTriangleElementType_Execute, _LinearTriangleElementType_Destroy, name, False,
 		_LinearTriangleElementType_SF_allNodes, 
 		_LinearTriangleElementType_SF_allLocalDerivs_allNodes, _ElementType_ConvertGlobalCoordToElLocal,
-		_ElementType_JacobianDeterminantSurface, _LinearTriangleElementType_NodeCount );
+		_ElementType_JacobianDeterminantSurface, _LinearTriangularElementType_SurfaceNormal, _LinearTriangleElementType_NodeCount );
 }
 
 LinearTriangleElementType* LinearTriangleElementType_New( Name name ) {
@@ -71,7 +71,7 @@ LinearTriangleElementType* LinearTriangleElementType_New( Name name ) {
 		_LinearTriangleElementType_Execute, _LinearTriangleElementType_Destroy, name, True,
 		_LinearTriangleElementType_SF_allNodes, 
 		_LinearTriangleElementType_SF_allLocalDerivs_allNodes, _ElementType_ConvertGlobalCoordToElLocal,
-		_ElementType_JacobianDeterminantSurface, _LinearTriangleElementType_NodeCount );
+		_ElementType_JacobianDeterminantSurface, _LinearTriangularElementType_SurfaceNormal, _LinearTriangleElementType_NodeCount );
 }
 
 
@@ -93,6 +93,7 @@ LinearTriangleElementType* _LinearTriangleElementType_New(
 		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt,
 		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,
 		ElementType_JacobianDeterminantSurfaceFunction*			_jacobianDeterminantSurface,
+		ElementType_SurfaceNormalFunction*				_surfaceNormal,
 		Index								nodeCount )
 {
 	LinearTriangleElementType*		self;
@@ -100,9 +101,9 @@ LinearTriangleElementType* _LinearTriangleElementType_New(
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(LinearTriangleElementType) );
 	self = (LinearTriangleElementType*)_ElementType_New( _sizeOfSelf, type, _delete, _print,
-			_copy, _defaultConstructor, _construct, _build, _initialise, _execute, _destroy, name, initFlag,
+		_copy, _defaultConstructor, _construct, _build, _initialise, _execute, _destroy, name, initFlag,
 		_evaluateShapeFunctionsAt, _evaluateShapeFunctionLocalDerivsAt, _convertGlobalCoordToElLocal,
-		_jacobianDeterminantSurface, nodeCount );
+		_jacobianDeterminantSurface, _surfaceNormal, nodeCount );
 	
 	/* General info */
 	
@@ -221,5 +222,12 @@ void _LinearTriangleElementType_SF_allLocalDerivs_allNodes( void* elementType, c
 	evaluatedDerivatives[1][2] =   1.0;
 }
 
+void _LinearTriangularElementType_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* norm ) {
+	Stream* errStream = Journal_Register( ErrorStream_Type, ElementType_Type );
 
+	Journal_Printf( errStream, "surface normal function not yet implemented for this element type.\n" );
+	assert( 0 );
+
+	norm = NULL;
+}
 

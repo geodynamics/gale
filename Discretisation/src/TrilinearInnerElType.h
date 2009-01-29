@@ -94,6 +94,7 @@
 		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt,
 		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,
 		ElementType_JacobianDeterminantSurfaceFunction*			_jacobianDeterminantSurface,
+		ElementType_SurfaceNormalFunction*				_surfaceNormal,
 		Index								nodeCount );
 	
 	/* Initialise implementation */
@@ -132,4 +133,7 @@
 		const double*	globalCoord,
 		double*		elLocalCoord );
 	*/
+
+	void _TrilinearInnerElType_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* normal );
+
 #endif /* __StgFEM_Discretisation_TrilinearInnerElType_h__ */

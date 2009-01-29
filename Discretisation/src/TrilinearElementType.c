@@ -61,7 +61,7 @@ void* TrilinearElementType_DefaultNew( Name name ) {
 		_TrilinearElementType_Build, _TrilinearElementType_Initialise, _TrilinearElementType_Execute, _TrilinearElementType_Destroy,
 		name, False, _TrilinearElementType_SF_allNodes, 
 		_TrilinearElementType_SF_allLocalDerivs_allNodes, _ElementType_ConvertGlobalCoordToElLocal,
-		_TrilinearElementType_JacobianDeterminantSurface, _TrilinearElementType_NodeCount );
+		_TrilinearElementType_JacobianDeterminantSurface, _ElementType_SurfaceNormal, _TrilinearElementType_NodeCount );
 }
 
 TrilinearElementType* TrilinearElementType_New( Name name ) {
@@ -70,7 +70,7 @@ TrilinearElementType* TrilinearElementType_New( Name name ) {
 		_TrilinearElementType_Build, _TrilinearElementType_Initialise, _TrilinearElementType_Execute, _TrilinearElementType_Destroy,
 		name, True, _TrilinearElementType_SF_allNodes, 
 		_TrilinearElementType_SF_allLocalDerivs_allNodes, _ElementType_ConvertGlobalCoordToElLocal,
-		_TrilinearElementType_JacobianDeterminantSurface, _TrilinearElementType_NodeCount );
+		_TrilinearElementType_JacobianDeterminantSurface, _ElementType_SurfaceNormal, _TrilinearElementType_NodeCount );
 }
 
 
@@ -92,6 +92,7 @@ TrilinearElementType* _TrilinearElementType_New(
 		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt,
 		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,
 		ElementType_JacobianDeterminantSurfaceFunction*			_jacobianDeterminantSurface,
+		ElementType_SurfaceNormalFunction*				_surfaceNormal,
 		Index								nodeCount )
 {
 	TrilinearElementType*		self;
@@ -99,8 +100,9 @@ TrilinearElementType* _TrilinearElementType_New(
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(TrilinearElementType) );
 	self = (TrilinearElementType*)_ElementType_New( _sizeOfSelf, type, _delete, _print, _copy, _defaultConstructor,
-			_construct, _build, _initialise, _execute, _destroy, name, initFlag, _evaluateShapeFunctionsAt,
-		_evaluateShapeFunctionLocalDerivsAt, _convertGlobalCoordToElLocal, _jacobianDeterminantSurface, nodeCount );
+		_construct, _build, _initialise, _execute, _destroy, name, initFlag, _evaluateShapeFunctionsAt,
+		_evaluateShapeFunctionLocalDerivsAt, _convertGlobalCoordToElLocal, _jacobianDeterminantSurface, 
+		_surfaceNormal, nodeCount );
 	
 	/* General info */
 	

@@ -78,6 +78,11 @@
 		const double	localCoord[],
 		unsigned	face_I,
 		unsigned 	norm );
+
+	typedef void	(ElementType_SurfaceNormalFunction)				( void* elementType, unsigned element_I,
+		unsigned	dim,
+		double*		xi,
+		double*		norm );
 	
 	/* ElementType information */
 	#define __ElementType  \
@@ -89,6 +94,7 @@
 		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt; \
 		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal; \
 		ElementType_JacobianDeterminantSurfaceFunction*			_jacobianDeterminantSurface; \
+		ElementType_SurfaceNormalFunction*				_surfaceNormal; \
 		\
 		/* ElementType info */ \
 		Index								nodeCount; \
@@ -117,6 +123,7 @@
 		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt,	\
 		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,		\
 		ElementType_JacobianDeterminantSurfaceFunction*			_jacobianDeterminantSurface, 		\
+		ElementType_SurfaceNormalFunction*				_surfaceNormal,				\
 		Index								nodeCount
 
 	#define ELEMENTTYPE_PASSARGS											\
@@ -137,6 +144,7 @@
 		_evaluateShapeFunctionLocalDerivsAt,	\
 		_convertGlobalCoordToElLocal,		\
 		_jacobianDeterminantSurface,		\
+		_surfaceNormal,				\
 		nodeCount
 	
 	
@@ -162,6 +170,7 @@
 		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt,
 		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,
 		ElementType_JacobianDeterminantSurfaceFunction*			_jacobianDeterminantSurface,
+		ElementType_SurfaceNormalFunction*				_surfaceNormal,
 		Index								nodeCount );
 	
 	/* Initialise implementation */
@@ -230,6 +239,20 @@
 		const double		localCoord[],
 		unsigned		face_I,
 		unsigned		norm );
+
+	void _ElementType_SurfaceNormal(
+		void*			elementType,
+		unsigned		lElement_I,
+		unsigned		dim,
+		double*			xi,
+		double*			normal );
+
+	void ElementType_SurfaceNormal(
+		void*			elementType,
+		unsigned		lElement_I,
+		unsigned		dim,
+		double*			xi,
+		double*			normal );
 
 	#define ElementType_Jacobian( elementType, mesh, elId, xi, dim, jacobian, GNi ) \
 		ElementType_Jacobian_AxisIndependent( elementType, mesh, elId, xi, dim, jacobian, GNi, I_AXIS, J_AXIS, K_AXIS )

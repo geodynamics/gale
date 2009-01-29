@@ -77,6 +77,7 @@ void* BilinearInnerElType_DefaultNew( Name name ) {
 			_BilinearInnerElType_SF_allLocalDerivs_allNodes,
 			_ElementType_ConvertGlobalCoordToElLocal,
 			_ElementType_JacobianDeterminantSurface,
+			_BilinearInnerElType_SurfaceNormal,
 			_BilinearInnerElType_NodeCount );
 }
 
@@ -85,7 +86,7 @@ BilinearInnerElType* BilinearInnerElType_New( Name name ) {
 		_BilinearInnerElType_Print, NULL, BilinearInnerElType_DefaultNew, _BilinearInnerElType_Construct, _BilinearInnerElType_Build,
 		_BilinearInnerElType_Initialise, _BilinearInnerElType_Execute, _BilinearInnerElType_Destroy, name, True, _BilinearInnerElType_SF_allNodes, 
 		_BilinearInnerElType_SF_allLocalDerivs_allNodes, _ElementType_ConvertGlobalCoordToElLocal, _ElementType_JacobianDeterminantSurface,
-		_BilinearInnerElType_NodeCount );
+		_BilinearInnerElType_SurfaceNormal, _BilinearInnerElType_NodeCount );
 }
 
 
@@ -107,6 +108,7 @@ BilinearInnerElType* _BilinearInnerElType_New(
 		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt,
 		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,
 		ElementType_JacobianDeterminantSurfaceFunction*			_jacobianDeterminantSurface,
+		ElementType_SurfaceNormalFunction*				_surfaceNormal,
 		Index								nodeCount )
 {
 	BilinearInnerElType*		self;
@@ -114,9 +116,9 @@ BilinearInnerElType* _BilinearInnerElType_New(
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(BilinearInnerElType) );
 	self = (BilinearInnerElType*)_ElementType_New( _sizeOfSelf, type, _delete, _print, _copy, _defaultConstructor,
-			_construct, _build, _initialise, _execute, _destroy, name, initFlag,
+		_construct, _build, _initialise, _execute, _destroy, name, initFlag,
 		_evaluateShapeFunctionsAt, _evaluateShapeFunctionLocalDerivsAt, _convertGlobalCoordToElLocal,
-		_jacobianDeterminantSurface, nodeCount );
+		_jacobianDeterminantSurface, _surfaceNormal, nodeCount );
 	
 	/* General info */
 	
@@ -250,3 +252,13 @@ void _BilinearInnerElType_SF_allLocalDerivs_allNodes( void* elementType, const d
 	evaluatedDerivatives[1][1] = - 0.5;
 	evaluatedDerivatives[1][2] = 1.0;
 }
+
+void _BilinearInnerElType_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* norm ) {
+	Stream*	errStream = Journal_Register( ErrorStream_Type, ElementType_Type );
+
+	Journal_Printf( errStream, "surface normal function not yet implemented for this element type.\n" );
+	assert( 0 );
+
+	norm = NULL;
+}
+
