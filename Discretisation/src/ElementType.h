@@ -79,7 +79,7 @@
 		unsigned	face_I,
 		unsigned 	norm );
 
-	typedef void	(ElementType_SurfaceNormalFunction)				( void* elementType, unsigned element_I,
+	typedef int 	(ElementType_SurfaceNormalFunction)			( void* elementType, unsigned element_I,
 		unsigned	dim,
 		double*		xi,
 		double*		norm );
@@ -240,14 +240,14 @@
 		unsigned		face_I,
 		unsigned		norm );
 
-	void _ElementType_SurfaceNormal(
+	int _ElementType_SurfaceNormal(
 		void*			elementType,
 		unsigned		lElement_I,
 		unsigned		dim,
 		double*			xi,
 		double*			normal );
 
-	void ElementType_SurfaceNormal(
+	int ElementType_SurfaceNormal(
 		void*			elementType,
 		unsigned		lElement_I,
 		unsigned		dim,

@@ -190,13 +190,15 @@ void P1_EvalLocalDerivs( void* elementType, const double* localCoord, double** d
 	derivs[1][4] = -2.0 * eta * a4;
 }
 
-void _P1_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* normal ) {
+int _P1_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* normal ) {
 	Stream* errStream = Journal_Register( ErrorStream_Type, ElementType_Type );
 
 	Journal_Printf( errStream, "surface normal function not implemented for this element type.\n" );
 	assert( 0 );
 
 	normal = NULL;
+
+	return -1;
 }
 
 /*----------------------------------------------------------------------------------------------------------------------------------

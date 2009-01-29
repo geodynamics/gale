@@ -140,7 +140,7 @@
 		unsigned*	nodes,
 		unsigned	norm );
 
-	void _ConstantElementType_SurfaceNormal(
+	int _ConstantElementType_SurfaceNormal(
 		void*		elementType,
 		unsigned	element_I,
 		unsigned	dim,

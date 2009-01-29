@@ -193,21 +193,34 @@ double ElementType_JacobianDeterminantSurface( void* elementType, void* mesh, un
 
 #define EPS 1.0E-6
 
-void _ElementType_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* normal ) {
+int _ElementType_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* normal ) {
 	ElementType* 	self = (ElementType*)elementType;
 	unsigned	dim_I;
+	int		surfaceIndex, surfaceDim = -1;
+	Bool		topSide = False;
 
 	for( dim_I = 0; dim_I < dim; dim_I++ ) {
-		if( xi[dim_I] < -1.0 + EPS )
+		if( xi[dim_I] < -1.0 + EPS ) {
 			normal[dim_I] = -1.0;
-		else if( xi[dim_I] > 1.0 - EPS )
+			surfaceDim = dim_I;
+		}
+		else if( xi[dim_I] > 1.0 - EPS ) {
 			normal[dim_I] = 1.0;
+			surfaceDim = dim_I;
+			topSide = True;
+		}
 		else
 			normal[dim_I] = 0.0;
 	}
+	
+	surfaceIndex = 2 * surfaceDim;
+	if( topSide )
+		surfaceIndex++;
+
+	return surfaceIndex;
 }
 
-void ElementType_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* normal ) {
+int ElementType_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* normal ) {
 	ElementType* 	self = (ElementType*)elementType;
 
 	return self->_surfaceNormal( self, element_I, dim, xi, normal );

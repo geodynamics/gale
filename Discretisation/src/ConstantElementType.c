@@ -238,12 +238,14 @@ void _ConstantElementType_ConvertGlobalCoordToElLocal(
 	elLocalCoord[0] = elLocalCoord[1] = elLocalCoord[2] = 0;
 }
 
-void _ConstantElementType_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* normal ) {
+int _ConstantElementType_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* normal ) {
 	Stream*	errStream	= Journal_Register( ErrorStream_Type, ElementType_Type );
 
 	Journal_Printf( errStream, "surface normal not defined for this element type.\n" );
 	assert( 0 );
 
 	normal = NULL;
+
+	return -1;
 }
 

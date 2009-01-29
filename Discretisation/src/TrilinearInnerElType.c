@@ -320,13 +320,15 @@ void _TrilinearInnerElType_ConvertGlobalCoordToElLocal(
 	}
 }*/
 
-void _TrilinearInnerElType_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* normal ) {
+int _TrilinearInnerElType_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* normal ) {
 	Stream* errStream = Journal_Register( ErrorStream_Type, ElementType_Type );
 
 	Journal_Printf( errStream, "Surface normal function not yet implemented for this element type.\n" );
 	assert( 0 );
 
 	normal = NULL;
+
+	return -1;
 }
 
 

@@ -253,12 +253,14 @@ void _BilinearInnerElType_SF_allLocalDerivs_allNodes( void* elementType, const d
 	evaluatedDerivatives[1][2] = 1.0;
 }
 
-void _BilinearInnerElType_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* norm ) {
+int _BilinearInnerElType_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* norm ) {
 	Stream*	errStream = Journal_Register( ErrorStream_Type, ElementType_Type );
 
 	Journal_Printf( errStream, "surface normal function not yet implemented for this element type.\n" );
 	assert( 0 );
 
 	norm = NULL;
+
+	return -1;
 }
 
