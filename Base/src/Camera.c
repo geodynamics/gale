@@ -61,6 +61,7 @@ lucCamera* lucCamera_New(
 		Name                                               name,
 		Coord                                              coord, 
 		Coord                                              focalPoint,
+		Coord                                              rotationCentre,
 		XYZ                                                upDirection,
 		double                                             focalLength,
 		double                                             aperture,
@@ -70,7 +71,7 @@ lucCamera* lucCamera_New(
 {
 	lucCamera* self = (lucCamera*) _lucCamera_DefaultNew( name );
 
-	lucCamera_InitAll( self, coord, focalPoint, upDirection, focalLength, aperture, eyeSeparation, stereoType, centreFieldVariable );
+	lucCamera_InitAll( self, coord, focalPoint, rotationCentre, upDirection, focalLength, aperture, eyeSeparation, stereoType, centreFieldVariable );
 
 	return self;
 }
@@ -115,6 +116,7 @@ void lucCamera_Init(
 		lucCamera*                                         self,
 		Coord                                              coord, 
 		Coord                                              focalPoint,
+		Coord                                              rotationCentre,
 		XYZ                                                upDirection,
 		double                                             focalLength,
 		double                                             aperture,
@@ -124,6 +126,7 @@ void lucCamera_Init(
 {
 	memcpy( self->coord, coord, sizeof(Coord) );
 	memcpy( self->focalPoint, focalPoint, sizeof(Coord) );
+	memcpy( self->rotationCentre, rotationCentre, sizeof(Coord) );
 	memcpy( self->upDirection, upDirection, sizeof(XYZ) );
 
 	self->focalLength         = focalLength;
@@ -142,6 +145,7 @@ void lucCamera_InitAll(
 		void*                                              camera,
 		Coord                                              coord, 
 		Coord                                              focalPoint,
+		Coord                                              rotationCentre,
 		XYZ                                                upDirection,
 		double                                             focalLength,
 		double                                             aperture,
@@ -152,7 +156,7 @@ void lucCamera_InitAll(
 	lucCamera* self        = camera;
 
 	/* TODO Init parent */
-	lucCamera_Init( self, coord, focalPoint, upDirection, focalLength, aperture, eyeSeparation, stereoType, centreFieldVariable );
+	lucCamera_Init( self, coord, focalPoint, rotationCentre, upDirection, focalLength, aperture, eyeSeparation, stereoType, centreFieldVariable );
 }
 
 void _lucCamera_Delete( void* camera ) {
@@ -176,6 +180,7 @@ void _lucCamera_Print( void* camera, Stream* stream ) {
 
 	Journal_PrintArray( stream, self->coord, 3 );
 	Journal_PrintArray( stream, self->focalPoint, 3 );
+	Journal_PrintArray( stream, self->rotationCentre, 3 );
 	Journal_PrintArray( stream, self->upDirection, 3 );
 	
 	Journal_PrintValue( stream, self->aperture );
@@ -210,6 +215,7 @@ void* _lucCamera_Copy( void* camera, void* dest, Bool deep, Name nameExt, PtrMap
 
 	memcpy( newCamera->coord,       self->coord,       sizeof(Coord) );
 	memcpy( newCamera->focalPoint,  self->focalPoint,  sizeof(Coord) );
+	memcpy( newCamera->rotationCentre,  self->rotationCentre,  sizeof(Coord) );
 	memcpy( newCamera->upDirection, self->upDirection, sizeof(XYZ) );
 	
 	newCamera->aperture      = self->aperture;
@@ -240,6 +246,7 @@ void _lucCamera_Construct( void* camera, Stg_ComponentFactory* cf, void* data ) 
 	lucCamera*             self               = (lucCamera*) camera;
 	Coord                  coord;
 	Coord                  focalPoint;
+	Coord                  rotationCentre;
 	XYZ                    upDirection;
 	FieldVariable*         centreFieldVariable;
 	double                 focalLength;
@@ -252,6 +259,10 @@ void _lucCamera_Construct( void* camera, Stg_ComponentFactory* cf, void* data ) 
 	focalPoint[I_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "focalPointX", 0.0 );
 	focalPoint[J_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "focalPointY", 0.0 );
 	focalPoint[K_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "focalPointZ", 0.0 );
+
+	rotationCentre[I_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "rotationCentreX", 0.0 );
+	rotationCentre[J_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "rotationCentreY", 0.0 );
+	rotationCentre[K_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "rotationCentreZ", 0.0 );
 
 	upDirection[I_AXIS] = Stg_ComponentFactory_GetDouble( cf, self->name, "upDirectionX", 0.0 );
 	upDirection[J_AXIS] = Stg_ComponentFactory_GetDouble( cf, self->name, "upDirectionY", 1.0 );
@@ -278,11 +289,26 @@ void _lucCamera_Construct( void* camera, Stg_ComponentFactory* cf, void* data ) 
 
 	centreFieldVariable = Stg_ComponentFactory_ConstructByKey( cf, self->name, "CentreFieldVariable", FieldVariable,False,data);
 
-	lucCamera_Init( self, coord, focalPoint, upDirection, focalLength, aperture, eyeSeparation, stereoType, centreFieldVariable );
+	lucCamera_Init( self, coord, focalPoint, rotationCentre, upDirection, focalLength, aperture, eyeSeparation, stereoType, centreFieldVariable );
 }
 
-void _lucCamera_Build( void* camera, void* data ) { }
-void _lucCamera_Initialise( void* camera, void* data ) { }
+void _lucCamera_Build( void* camera, void* data ) { 
+	lucCamera*     self = (lucCamera*) camera;
+	FieldVariable* fieldVariable = self->centreFieldVariable;
+
+	if ( fieldVariable ) {
+		Stg_Component_Build( fieldVariable, data, False );
+	}
+}
+void _lucCamera_Initialise( void* camera, void* data ) { 
+	lucCamera*     self = (lucCamera*) camera;
+	FieldVariable* fieldVariable = self->centreFieldVariable;
+
+	if ( fieldVariable ) {
+		Stg_Component_Initialise( fieldVariable, data, False );
+		lucCamera_CentreFromFieldVariable( self );
+	}
+}
 void _lucCamera_Execute( void* camera, void* data ) { }
 void _lucCamera_Destroy( void* camera, void* data ) { }
 
@@ -301,12 +327,16 @@ void lucCamera_Zoom( void* camera, double zoomFactor ) {
 
 void lucCamera_RotateAroundUpDirection( void* camera, double deltaTheta ) {
 	lucCamera* self                = camera;
-	XYZ        vectorFocusToCamera;
-	XYZ        rotatedVectorFocusToCamera;
+	XYZ        vec;
+	XYZ        rotatedVec;
 
-	StGermain_VectorSubtraction( vectorFocusToCamera, self->coord, self->focalPoint, 3 );
-	StGermain_RotateVector( rotatedVectorFocusToCamera, vectorFocusToCamera, self->upDirection, deltaTheta );
-	StGermain_VectorAddition( self->coord, rotatedVectorFocusToCamera, self->focalPoint, 3 );
+	StGermain_VectorSubtraction( vec, self->coord, self->rotationCentre, 3 );
+	StGermain_RotateVector( rotatedVec, vec, self->upDirection, deltaTheta );
+	StGermain_VectorAddition( self->coord, rotatedVec, self->rotationCentre, 3 );
+	
+	StGermain_VectorSubtraction( vec, self->focalPoint, self->rotationCentre, 3 );
+	StGermain_RotateVector( rotatedVec, vec, self->upDirection, deltaTheta );
+	StGermain_VectorAddition( self->focalPoint, rotatedVec, self->rotationCentre, 3 );
 	
 	self->needsToDraw = True;
 }
@@ -314,28 +344,33 @@ void lucCamera_RotateAroundUpDirection( void* camera, double deltaTheta ) {
 void lucCamera_RotateTowardsUpDirection( void* camera, double deltaTheta ) {
 	lucCamera*   self                = camera;
 	XYZ          rotationAxis;
-	XYZ          vectorFocusToCamera;
-	XYZ          rotatedVectorFocusToCamera;
+	XYZ          vec;
+	XYZ          rotatedVec;
 	double       angleBetween;
 	double       predictedAngle;
 	const double minAngle            = M_PI/180.0 * 0.1; /* A tenth of a degree */
 	const double maxAngle            = M_PI - minAngle;
 
-	StGermain_VectorSubtraction( vectorFocusToCamera, self->coord, self->focalPoint, 3 );
-	StGermain_VectorCrossProduct( rotationAxis, vectorFocusToCamera, self->upDirection );
+	StGermain_VectorSubtraction( vec, self->coord, self->focalPoint, 3 );
+	StGermain_VectorCrossProduct( rotationAxis, vec, self->upDirection );
 	StGermain_VectorNormalise( rotationAxis, 3 );
 
 	/* Check if angle is too large */
-	angleBetween = StGermain_AngleBetweenVectors( vectorFocusToCamera, self->upDirection, 3 );
+	angleBetween = StGermain_AngleBetweenVectors( vec, self->upDirection, 3 );
 	predictedAngle = angleBetween - deltaTheta;
 	if ( predictedAngle < minAngle ) 
 		deltaTheta = angleBetween - minAngle;
 	else if ( predictedAngle > maxAngle ) 
 		deltaTheta = angleBetween - maxAngle;
 		
-	StGermain_RotateVector( rotatedVectorFocusToCamera, vectorFocusToCamera, rotationAxis, deltaTheta );
+	StGermain_VectorSubtraction( vec, self->coord, self->rotationCentre, 3 );
+	StGermain_RotateVector( rotatedVec, vec, rotationAxis, deltaTheta );
+	StGermain_VectorAddition( self->coord, rotatedVec, self->rotationCentre, 3 );
 	
-	StGermain_VectorAddition( self->coord, rotatedVectorFocusToCamera, self->focalPoint, 3 );
+	StGermain_VectorSubtraction( vec, self->focalPoint, self->rotationCentre, 3 );
+	StGermain_RotateVector( rotatedVec, vec, rotationAxis, deltaTheta );
+	StGermain_VectorAddition( self->focalPoint, rotatedVec, self->rotationCentre, 3 );
+
 	self->needsToDraw = True;
 }
 
@@ -438,24 +473,27 @@ void lucCamera_CentreFromFieldVariable( void* camera ) {
 	self->coord[ J_AXIS ] += difference[ J_AXIS ] ;
 	self->coord[ K_AXIS ] += difference[ K_AXIS ] ;
 
+	/* Adjust the rotation centre */
+	memcpy( self->rotationCentre, self->focalPoint, sizeof( Coord ) );
+
 	/* Adjust Original Camera */
 	self->originalCamera->coord[ I_AXIS ] += difference[ I_AXIS ] ;
 	self->originalCamera->coord[ J_AXIS ] += difference[ J_AXIS ] ;
 	self->originalCamera->coord[ K_AXIS ] += difference[ K_AXIS ] ;
 	memcpy( self->originalCamera->focalPoint, self->focalPoint, sizeof( Coord ) );
+	memcpy( self->originalCamera->rotationCentre, self->rotationCentre, sizeof( Coord ) );
 }
 
 void lucCamera_ChangeFocalPoint( void* camera, Pixel_Index startx, Pixel_Index starty, Pixel_Index xpos, Pixel_Index ypos ){
-	lucCamera*     self = (lucCamera*) camera;
+	lucCamera*      self = (lucCamera*) camera;
 	XYZ             leftDirection;
 	Dimension_Index dim_I;
 
 	lucCamera_GetLeftDirection( camera, leftDirection );
 	for ( dim_I = 0 ; dim_I < 3 ; dim_I++ ) {
-		self->focalPoint[ dim_I ] -= 0.01 * ((double)xpos - (double)startx) * leftDirection[ dim_I ];
+		self->focalPoint[ dim_I ] += 0.01 * ((double)xpos - (double)startx) * leftDirection[ dim_I ];
 		self->focalPoint[ dim_I ] -= 0.01 * ((double)ypos - (double)starty) * self->upDirection[ dim_I ];
 	}
-	memcpy( self->originalCamera->focalPoint, self->focalPoint, sizeof( Coord ) );
 
 	self->needsToDraw = True;
 }
@@ -475,6 +513,10 @@ void lucCamera_Pickle( void* camera, Stream* stream ) {
 	Journal_Printf( stream, "<param name=\"focalPointY\">%.5g</param>\n", self->focalPoint[ J_AXIS ] );
 	Journal_Printf( stream, "<param name=\"focalPointZ\">%.5g</param>\n", self->focalPoint[ K_AXIS ] );
 
+	Journal_Printf( stream, "<param name=\"rotationCentreX\">%.5g</param>\n", self->rotationCentre[ I_AXIS ] );
+	Journal_Printf( stream, "<param name=\"rotationCentreY\">%.5g</param>\n", self->rotationCentre[ J_AXIS ] );
+	Journal_Printf( stream, "<param name=\"rotationCentreZ\">%.5g</param>\n", self->rotationCentre[ K_AXIS ] );
+
 	Journal_Printf( stream, "<param name=\"upDirectionX\">%.5g</param>\n", self->upDirection[ I_AXIS ] );
 	Journal_Printf( stream, "<param name=\"upDirectionY\">%.5g</param>\n", self->upDirection[ J_AXIS ] );
 	Journal_Printf( stream, "<param name=\"upDirectionZ\">%.5g</param>\n", self->upDirection[ K_AXIS ] );
@@ -493,23 +535,24 @@ void lucCamera_SetNeedsToDraw( void * camera ){
 	self->needsToDraw = True;
 }
 
-#define lucCamera_TypesCount 9
+#define lucCamera_TypesCount 10
 void lucCamera_Create_MPI_Datatype() {
 	MPI_Datatype        typeList[lucCamera_TypesCount]     = 
-		{ MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, MPI_INT, MPI_INT, MPI_INT };
-	int                 blocklen[lucCamera_TypesCount]     = {3, 3, 3, 1, 1, 1, 1, 1, 1};
+		{ MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, MPI_INT, MPI_INT, MPI_INT };
+	int                 blocklen[lucCamera_TypesCount]     = {3, 3, 3, 3, 1, 1, 1, 1, 1, 1};
 	MPI_Aint            displacement[lucCamera_TypesCount];
 	lucCamera           camera;
 
 	displacement[0] = GetOffsetOfMember( camera, coord );
 	displacement[1] = GetOffsetOfMember( camera, focalPoint );
-	displacement[2] = GetOffsetOfMember( camera, upDirection );
-	displacement[3] = GetOffsetOfMember( camera, focalLength );
-	displacement[4] = GetOffsetOfMember( camera, aperture );
-	displacement[5] = GetOffsetOfMember( camera, eyeSeparation );
-	displacement[6] = GetOffsetOfMember( camera, buffer );
-	displacement[7] = GetOffsetOfMember( camera, stereoType );
-	displacement[8] = GetOffsetOfMember( camera, needsToDraw );
+	displacement[2] = GetOffsetOfMember( camera, rotationCentre );
+	displacement[3] = GetOffsetOfMember( camera, upDirection );
+	displacement[4] = GetOffsetOfMember( camera, focalLength );
+	displacement[5] = GetOffsetOfMember( camera, aperture );
+	displacement[6] = GetOffsetOfMember( camera, eyeSeparation );
+	displacement[7] = GetOffsetOfMember( camera, buffer );
+	displacement[8] = GetOffsetOfMember( camera, stereoType );
+	displacement[9] = GetOffsetOfMember( camera, needsToDraw );
 	
 	MPI_Type_struct( lucCamera_TypesCount, blocklen, displacement, typeList, &lucCamera_MPI_Datatype );
 	MPI_Type_commit( & lucCamera_MPI_Datatype );

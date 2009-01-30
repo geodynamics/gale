@@ -144,8 +144,6 @@ void lucViewportInfo_SetOpenGLCamera( lucViewportInfo* viewportInfo ) {
 	GLenum pname = GL_STEREO;
 	GLboolean stereo_enabled;
 
-	lucCamera_CentreFromFieldVariable( camera );
-			
 	switch ( camera->stereoType ) {
 		case lucMono: case lucStereoToeIn:
 			/* set up projection transform */

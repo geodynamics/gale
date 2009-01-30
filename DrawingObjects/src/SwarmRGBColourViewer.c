@@ -122,7 +122,7 @@ void _lucSwarmRGBColourViewer_Init(
 		lucSwarmRGBColourViewer*                                     self,
 		Name                                                         colourRedVariableName,
 		Name                                                         colourGreenVariableName,
-		Name                                                         colourBlueVariableName)
+		Name                                                         colourBlueVariableName )
 {
 	self->colourRedVariableName           = colourRedVariableName;
 	self->colourGreenVariableName         = colourGreenVariableName;
@@ -177,17 +177,17 @@ void* _lucSwarmRGBColourViewer_DefaultNew( Name name ) {
 }
 
 void _lucSwarmRGBColourViewer_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
-	lucSwarmRGBColourViewer*         self = (lucSwarmRGBColourViewer*)drawingObject;
-	Name                    colourRedVariableName;
-	Name                    colourGreenVariableName;
-	Name                    colourBlueVariableName;
+	lucSwarmRGBColourViewer* self = (lucSwarmRGBColourViewer*)drawingObject;
+	Name                     colourRedVariableName;
+	Name                     colourGreenVariableName;
+	Name                     colourBlueVariableName;
 
 	/* Construct Parent */
 	_lucSwarmViewer_Construct( self, cf, data );
 
-	colourRedVariableName = Stg_ComponentFactory_GetString( cf, self->name, "ColourRedVariable", "" );
+	colourRedVariableName   = Stg_ComponentFactory_GetString( cf, self->name, "ColourRedVariable", "" );
 	colourGreenVariableName = Stg_ComponentFactory_GetString( cf, self->name, "ColourGreenVariable", "" );
-	colourBlueVariableName = Stg_ComponentFactory_GetString( cf, self->name, "ColourBlueVariable", "" );
+	colourBlueVariableName  = Stg_ComponentFactory_GetString( cf, self->name, "ColourBlueVariable", "" );
 	
 	_lucSwarmRGBColourViewer_Init( 
 			self, 
@@ -208,7 +208,7 @@ void _lucSwarmRGBColourViewer_Initialise( void* drawingObject, void* data ) {
 	if ( 0 != strcmp( self->colourRedVariableName, "" ) ) {
 		self->colourRedVariable  = SwarmVariable_Register_GetByName( swarmVariable_Register, self->colourRedVariableName );
 		Journal_Firewall( self->colourRedVariable != NULL, errorStr,
-					"Error - for gLucifer drawing object \"%s\" - in %s(): colour Variable name given was \"%s\", "
+					"Error - for gLucifer drawing object \"%s\" - in %s(): Colour Variable name given was \"%s\", "
 					"but no corresponding SwarmVariable found in the register for swarm \"%s\".\n",
 					self->name, __func__, self->colourRedVariableName, self->swarm->name );
 		
@@ -220,7 +220,7 @@ void _lucSwarmRGBColourViewer_Initialise( void* drawingObject, void* data ) {
 	if ( 0 != strcmp( self->colourGreenVariableName, "" ) ) {
 		self->colourGreenVariable  = SwarmVariable_Register_GetByName( swarmVariable_Register, self->colourGreenVariableName );
 		Journal_Firewall( self->colourGreenVariable != NULL, errorStr,
-					"Error - for gLucifer drawing object \"%s\" - in %s(): colour Variable name given was \"%s\", "
+					"Error - for gLucifer drawing object \"%s\" - in %s(): Colour Variable name given was \"%s\", "
 					"but no corresponding SwarmVariable found in the register for swarm \"%s\".\n",
 					self->name, __func__, self->colourGreenVariableName, self->swarm->name );
 	
@@ -231,14 +231,13 @@ void _lucSwarmRGBColourViewer_Initialise( void* drawingObject, void* data ) {
 	if ( 0 != strcmp( self->colourBlueVariableName, "" ) ) {
 		self->colourBlueVariable  = SwarmVariable_Register_GetByName( swarmVariable_Register, self->colourBlueVariableName );
 		Journal_Firewall( self->colourBlueVariable != NULL, errorStr,
-					"Error - for gLucifer drawing object \"%s\" - in %s(): colour Variable name given was \"%s\", "
+					"Error - for gLucifer drawing object \"%s\" - in %s(): Colour Variable name given was \"%s\", "
 					"but no corresponding SwarmVariable found in the register for swarm \"%s\".\n",
 					self->name, __func__, self->colourBlueVariableName, self->swarm->name );
 		
 		Stg_Component_Build( self->colourBlueVariable, data, False );
 		Stg_Component_Initialise( self->colourBlueVariable, data, False );
 	}
-
 }
 
 
@@ -268,38 +267,44 @@ void _lucSwarmRGBColourViewer_BuildDisplayList( void* drawingObject, void* _cont
 	_lucSwarmViewer_BuildDisplayList( self, _context );
 }
 
-void _lucSwarmRGBColourViewer_SetParticleColour( void* drawingObject, void* _context, Particle_Index lParticle_I, lucColour* colour ) {
-	lucSwarmRGBColourViewer*          self                = (lucSwarmRGBColourViewer*)drawingObject;
+void _lucSwarmRGBColourViewer_SetParticleColour( void* drawingObject, void* _context, Particle_Index lParticle_I ) {
+	lucSwarmRGBColourViewer* self                  = (lucSwarmRGBColourViewer*)drawingObject;
 	double                   colourValueRed        = 0.0;
 	double                   colourValueGreen      = 0.0;
 	double                   colourValueBlue       = 0.0;
-	double					 opacity = 0.0;
-	/* Get red colour */
-	if ( self->colourRedVariable){
+	double                   opacity               = 0.0;
+	lucColour                colour;
+
+	/* Copy the default colour */
+	memcpy( &colour, &self->colour, sizeof( lucColour ) );
+
+	/* Get Red colour */
+	if ( self->colourRedVariable ) {
 		SwarmVariable_ValueAt( self->colourRedVariable, lParticle_I, &colourValueRed );
-		(self->colour).red = colourValueRed;
+		colour.red = (float) colourValueRed;
 		/* Other way to do it... */
 		/* colour.red = Variable_GetValueFloat(colourRedVariable->variable, lParticle_I);*/
 	}
-	/* Get green colour */
-	if ( self->colourGreenVariable){
+		
+	/* Get Green colour */
+	if ( self->colourGreenVariable ){
 		SwarmVariable_ValueAt( self->colourGreenVariable, lParticle_I, &colourValueGreen );
-		(self->colour).green = colourValueGreen;
+		colour.green = (float) colourValueGreen;
 	}
 	
-	/* Get blue colour */
-	if ( self->colourBlueVariable){
+	/* Get Blue colour */
+	if ( self->colourBlueVariable ){
 		SwarmVariable_ValueAt( self->colourBlueVariable, lParticle_I, &colourValueBlue );
-		(self->colour).blue = colourValueBlue;
+		colour.blue = (float) colourValueBlue;
 	}
 	
-	//added this in
 	/* Get Opacity Value */
 	if ( self->opacityVariable ){
 		SwarmVariable_ValueAt( self->opacityVariable, lParticle_I, &opacity );
-		(self->colour).opacity = (float)opacity;	
+		colour.opacity = (float)opacity;	
 	}
-	lucColourMap_SetOpenGLColourFromRGB_ExplicitOpacity( (self->colour).red, (self->colour).green, (self->colour).blue, (self->colour).opacity );
+
+	lucColour_SetOpenGLColour( &colour );
 }
 
 

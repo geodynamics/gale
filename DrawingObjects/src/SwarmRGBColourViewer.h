@@ -56,26 +56,16 @@
 		__lucSwarmViewer \
 		/* Virtual functions go here */ \
 		/* Other info */\
-		ExtensionInfo_Index                                particleExtHandle;      \
-		/* Colour Stuff */ \
-		/* Opacity Stuff */ \
-		/* Mask Info */ \
+		ExtensionInfo_Index                                particleExtHandle;         \
 		/* Colour Info */ \
-		Name                                               colourRedVariableName;       \
-		SwarmVariable*                                     colourRedVariable;           \
-		Name                                               colourGreenVariableName;       \
-		SwarmVariable*                                     colourGreenVariable;          \
-		Name                                               colourBlueVariableName;       \
-		SwarmVariable*                                     colourBlueVariable;           \
+		Name                                               colourRedVariableName;     \
+		SwarmVariable*                                     colourRedVariable;         \
+		Name                                               colourGreenVariableName;   \
+		SwarmVariable*                                     colourGreenVariable;       \
+		Name                                               colourBlueVariableName;    \
+		SwarmVariable*                                     colourBlueVariable;        \
 	
 	struct lucSwarmRGBColourViewer { __lucSwarmRGBColourViewer };
-	
-	typedef struct {
-		double red;
-		double green;
-		double blue;
-	} lucSwarmRGBColourViewer_ParticleExt;
-	
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
 	lucSwarmRGBColourViewer* _lucSwarmRGBColourViewer_New( 
@@ -119,7 +109,7 @@
 	void _lucSwarmRGBColourViewer_PlotParticle( void* drawingObject, void* _context, Particle_Index lParticle_I ) ;
 	
 	/* SwarmViewer Implementations */	
-	void _lucSwarmRGBColourViewer_SetParticleColour( void* drawingObject, void* _context, Particle_Index lParticle_I, lucColour* colour ) ;
+	void _lucSwarmRGBColourViewer_SetParticleColour( void* drawingObject, void* _context, Particle_Index lParticle_I ) ;
 
 	void lucSwarmRGBColourViewer_UpdateVariables( void* drawingObject ) ;
 #endif

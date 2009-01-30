@@ -313,7 +313,7 @@ void _lucWindowInteraction_MouseClick( void* windowInteractor, lucWindow* window
 void _lucWindowInteraction_MouseMessage( void* windowInteractor, Stream* stream ) {
 	Journal_Printf( stream, "Left Button:                  Rotate camera around model.\n" );
 	Journal_Printf( stream, "Middle Button:                Zoom camera in or out of the model.\n" );
-	Journal_Printf( stream, "Right Button:                 Move camera's focal point (currently unavailable).\n" );
+	Journal_Printf( stream, "Right Button:                 Move camera's focal point.\n" );
 }
 
 void _lucWindowInteraction_KeyboardEvent( void* windowInteractor, lucWindow* window, char key, Pixel_Index xpos, Pixel_Index ypos) {

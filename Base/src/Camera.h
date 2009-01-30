@@ -57,6 +57,7 @@
 		FieldVariable*                                     centreFieldVariable;  \
 		Coord                                              coord;                \
 		Coord                                              focalPoint;           \
+		Coord                                              rotationCentre;       \
 		XYZ                                                upDirection;          \
 		double                                             focalLength;          \
 		double                                             aperture;             \
@@ -72,6 +73,7 @@
 		Name                                               name,
 		Coord                                              coord, 
 		Coord                                              focalPoint,
+		Coord                                              rotationCentre,
 		XYZ                                                upDirection,
 		double                                             focalLength,
 		double                                             aperture,
@@ -97,6 +99,7 @@
 		void*                                              camera,
 		Coord                                              coord, 
 		Coord                                              focalPoint,
+		Coord                                              rotationCentre,
 		XYZ                                                upDirection,
 		double                                             focalLength,
 		double                                             aperture,
