@@ -384,7 +384,7 @@ void SwarmDump_DumpToHDF5( SwarmDump* self, Swarm* swarm, const char* filename )
             fileData = H5Dcreate( file, dataSpaceName, H5T_NATIVE_INT, fileSpace, props );
             #else
             fileData = H5Dcreate( file, dataSpaceName, H5T_NATIVE_INT, fileSpace,
-                                   H5P_DEFAULT, H5P_DEFAULT, props );
+                                   H5P_DEFAULT, props, H5P_DEFAULT );
             #endif
             
             /* Loop through local particles */      
@@ -405,7 +405,7 @@ void SwarmDump_DumpToHDF5( SwarmDump* self, Swarm* swarm, const char* filename )
             fileData = H5Dcreate( file, dataSpaceName, H5T_NATIVE_CHAR, fileSpace, props );
             #else
             fileData = H5Dcreate( file, dataSpaceName, H5T_NATIVE_CHAR, fileSpace,
-                                   H5P_DEFAULT, H5P_DEFAULT, props );
+                                   H5P_DEFAULT, props, H5P_DEFAULT );
             #endif
             
             /* Loop through local particles */      
@@ -426,7 +426,7 @@ void SwarmDump_DumpToHDF5( SwarmDump* self, Swarm* swarm, const char* filename )
             fileData = H5Dcreate( file, dataSpaceName, H5T_NATIVE_FLOAT, fileSpace, props );
             #else
             fileData = H5Dcreate( file, dataSpaceName, H5T_NATIVE_FLOAT, fileSpace,
-                                   H5P_DEFAULT, H5P_DEFAULT, props );
+                                   H5P_DEFAULT, props, H5P_DEFAULT );
             #endif
             
             /* Loop through local particles */      
@@ -447,7 +447,7 @@ void SwarmDump_DumpToHDF5( SwarmDump* self, Swarm* swarm, const char* filename )
             fileData = H5Dcreate( file, dataSpaceName, H5T_NATIVE_DOUBLE, fileSpace, props );
             #else
             fileData = H5Dcreate( file, dataSpaceName, H5T_NATIVE_DOUBLE, fileSpace,
-                                   H5P_DEFAULT, H5P_DEFAULT, props );
+                                   H5P_DEFAULT, props, H5P_DEFAULT );
             #endif          
             
             /* Loop through local particles */      
