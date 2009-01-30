@@ -11,8 +11,8 @@
 <param name="Copyright">Copyright (c) 2005, Monash Cluster Computing</param>
 <param name="License">http://www.opensource.org/licenses/bsd-license.php</param>
 <param name="Parent">lucOpenGLDrawingObject</param>
-<param name="Reference">N/A</param>
-<param name="Summary">N/A</param>
+<param name="Reference"></param>
+<param name="Summary"></param>
 <param name="Description">Samples the values of a vector field in a plane and draws arrows to represent the direction and scaled to represent the magnitude.</param>
 
 <!--Now the interesting stuff-->
@@ -106,6 +106,7 @@
 </list>
 <!-- Add an exmaple XML if possible -->
 <param name="Example">
+<![CDATA[
 	<struct name="velocityArrowsCrossSection">
 		<param name="Type">lucVectorArrowCrossSection</param>
 		<param name="VectorVariable">VelocityField</param>
@@ -115,6 +116,7 @@
 		<param name="lengthScale">0.4</param>
 		<param name="resolution">10</param>
 	</struct>
+]]>
 </param>
 
 </StGermainData>

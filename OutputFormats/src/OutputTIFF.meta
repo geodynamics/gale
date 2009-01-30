@@ -23,10 +23,10 @@
 </list>
 
 <!-- Add an exmaple XML if possible -->
-<param name="Example">
+<param name="Example"><![CDATA[
 		<struct name="imageOutput">
 			<param name="Type">lucOutputTIFF</param>
-		</struct>
+		</struct>]]>
 </param>
 
 </StGermainData>

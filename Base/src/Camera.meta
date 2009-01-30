@@ -11,7 +11,7 @@
 <param name="Copyright">Copyright (c) 2005, Monash Cluster Computing</param>
 <param name="License">http://www.opensource.org/licenses/bsd-license.php</param>
 <param name="Parent">Stg_Component</param>
-<param name="Reference">N/A</param>
+<param name="Reference"></param>
 <param name="Summary">...</param>
 <param name="Description">Contols how the user views the visualisation scene in a lucViewport.</param>
 
@@ -109,12 +109,12 @@
 	</struct>
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">
+<param name="Example"><![CDATA[
 		<struct name="camera" mergeType="replace">
 			<param name="Type">lucCamera</param>
 			<param name="CentreFieldVariable">TemperatureField</param>
 			<param name="coordZ">1.5</param>
-		</struct>
+		</struct>]]>
 </param>
 
 </StGermainData>

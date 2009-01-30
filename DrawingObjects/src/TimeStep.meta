@@ -11,8 +11,8 @@
 <param name="Copyright">Copyright (c) 2005, Monash Cluster Computing</param>
 <param name="License">http://www.opensource.org/licenses/bsd-license.php</param>
 <param name="Parent">lucOpenGLDrawingObject</param>
-<param name="Reference">...</param>
-<param name="Summary">...</param>
+<param name="Reference"></param>
+<param name="Summary"></param>
 <param name="Description">Allows to display the accumulated time and the frame number</param>
 
 <!--Now the interesting stuff-->
@@ -45,11 +45,14 @@
 </list>
 <!-- Add an exmaple XML if possible -->
 <param name="Example">
+<![CDATA[
 		<struct name="timeStep">
                         <param name="Type">lucTimeStep</param>
                         <param name="colour">Black</param>
                         <param name="frame">false</param>
                         <param name="time">true</param>
                 </struct>
-</param>
+]]></param>
+
+</StGermainData>
 

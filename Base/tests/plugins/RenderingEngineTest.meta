@@ -26,9 +26,11 @@
 
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">
+<param name="Example"><![CDATA[
 		<struct name="renderingEngine">
 				<param name="Type">lucRenderingEngineTest</param>
-		</struct>
+		</struct>]]>
 </param>
+
+</StGermainData>
 

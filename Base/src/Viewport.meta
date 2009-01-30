@@ -60,7 +60,7 @@
 </list>
 
 <!-- Add an exmaple XML if possible -->
-<param name="Example">
+<param name="Example"><![CDATA[
 	<struct name="StressInvariantVP">
 		<param name="Type">lucViewport</param>
 		<param name="Camera">camera</param>
@@ -73,7 +73,7 @@
 		<param name="compositeEachObject">False</param>
 		<param name="farClipPlane">0.1</param>
 		<param name="farClipPlane">40.0</param>
-	</struct>
+	</struct>]]>
 </param>
 
 </StGermainData>

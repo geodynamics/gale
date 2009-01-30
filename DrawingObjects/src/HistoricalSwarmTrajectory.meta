@@ -11,8 +11,8 @@
 <param name="Copyright">Copyright (c) 2005, Monash Cluster Computing</param>
 <param name="License">http://www.opensource.org/licenses/bsd-license.php</param>
 <param name="Parent">lucOpenGLDrawingObject</param>
-<param name="Reference">N/A</param>
-<param name="Summary">See description.</param>
+<param name="Reference"></param>
+<param name="Summary"></param>
 <param name="Description">Draws a trail for each particle, showing where each one has been.</param>
 
 <!--Now the interesting stuff-->
@@ -63,6 +63,7 @@
 </list>
 <!-- Add an exmaple XML if possible -->
 <param name="Example">
+<![CDATA[
 	<struct name="swarmTrajectory">
 		<param name="Type">lucHistoricalSwarmTrajectory</param>
 		<param name="Swarm">materialPointSwarm</param>
@@ -71,6 +72,7 @@
 		<param name="historySteps">80</param>
 		<param name="historyTime">0.001</param>
 	</struct>
+]]>
 </param>
 
 </StGermainData>

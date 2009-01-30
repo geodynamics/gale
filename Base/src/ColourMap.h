@@ -65,7 +65,9 @@
 		double                                             maximum;      \
 		Bool                                               logScale;     \
 		Bool                                               dynamicRange; \
-                Bool discrete;
+        Bool 											   discrete; \
+		Bool											   centreOnFixedValue; \
+		double											   centringValue;
 
 	struct lucColourMap {__lucColourMap};
 
@@ -76,7 +78,10 @@
 		double                                             minimum,
 		double                                             maximum,
 		Bool                                               logScale,
-		Bool                                               dynamicRange );
+		Bool                                               dynamicRange,
+		Bool											   centreOnFixedValue,
+		double											   centringValue
+		 );
 
 	lucColourMap* _lucColourMap_New(
 		SizeT                                              sizeOfSelf,
@@ -98,7 +103,10 @@
 		double                                             minimum,
 		double                                             maximum,
 		Bool                                               logScale,
-		Bool                                               dynamicRange );
+		Bool                                               dynamicRange,
+		Bool											   centreOnFixedValue,
+		double											   centringValue
+		 );
 
 	/** Virtual Functions */
 	void _lucColourMap_Delete( void* colourMap ) ;
@@ -106,7 +114,7 @@
 	void* _lucColourMap_Copy( void* colourMap, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) ;
 
 	void* _lucColourMap_DefaultNew( Name name ) ;
-void _lucColourMap_Construct( void* colourMap, Stg_ComponentFactory* cf, void* data ) ;
+    void _lucColourMap_Construct( void* colourMap, Stg_ComponentFactory* cf, void* data ) ;
 	void _lucColourMap_Build( void* colourMap, void* data ) ;
 	void _lucColourMap_Initialise( void* colourMap, void* data ) ;
 	void _lucColourMap_Execute( void* colourMap, void* data ) ;

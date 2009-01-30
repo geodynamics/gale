@@ -20,5 +20,8 @@
 
 <list name="Dependencies">
 </list>
-<param name="Example">N/A</param>
+<!-- Add an exmaple XML if possible -->
+<param name="Example"></param>
+
+</StGermainData>
 

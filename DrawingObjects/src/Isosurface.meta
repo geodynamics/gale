@@ -12,7 +12,7 @@
 <param name="License">http://www.opensource.org/licenses/bsd-license.php</param>
 <param name="Parent">lucOpenGLDrawingObject</param>
 <param name="Reference">Lorensen, William and Harvey E. Cline. Marching Cubes: A High Resolution 3D Surface Construction Algorithm. Computer Graphics (SIGGRAPH 87 Proceedings) 21(4) July 1987, p. 163-170)</param>
-<param name="Summary">...</param>
+<param name="Summary"></param>
 <param name="Description">Visualises a scalar field in 3D by the use of a surface over which all the values of the field are constant (an isosurface). It gets the value of the field on a 3D grid and uses the Marching Cubes algorithm to construct the surface. This algorithm is described in Lorensen et al.</param>
 
 <!--Now the interesting stuff-->
@@ -128,6 +128,7 @@
 </list>
 <!-- Add an exmaple XML if possible -->
 <param name="Example">
+<![CDATA[
 		<struct name="temperatureIsosurface">
 			<param name="Type">lucIsosurface</param>
 			<param name="IsosurfaceField">TemperatureField</param>
@@ -135,6 +136,7 @@
 			<param name="isovalue">0.5</param>
 			<param name="drawWalls">false</param>			
 		</struct>
+]]>
 </param>
 
 </StGermainData>

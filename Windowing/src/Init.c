@@ -54,8 +54,12 @@
 
 const Type lucDefaultWindow_Type = "lucDefaultWindow";
 
-const char* lucDefaultWindow_Type_GetMetadata() {
-	return "";
+Dictionary* lucDefaultWindow_MetaAsDictionary() {
+	return Dictionary_New();
+}
+
+Dictionary* lucDefaultWindow_Type_MetaAsDictionary() {
+	return lucDefaultWindow_MetaAsDictionary();
 }
 
 Bool lucWindowing_Init() {

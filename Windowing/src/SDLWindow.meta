@@ -26,7 +26,7 @@
 
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">
+<param name="Example"><![CDATA[
 	<struct name="window">
 		<param name="Type">lucX11Window</param>
 		<param name="RenderingEngine">renderingEngine</param>
@@ -37,7 +37,7 @@
 		<param name="width">800</param>
 		<param name="interactive">true</param>
 		<param name="backgroundColour">white</param>
-	</struct>
+	</struct>]]>
 </param>
 
 </StGermainData>

@@ -11,8 +11,8 @@
 <param name="Copyright">Copyright (c) 2005, Monash Cluster Computing</param>
 <param name="License">http://www.opensource.org/licenses/bsd-license.php</param>
 <param name="Parent">lucSwarmViewer</param>
-<param name="Reference">N/A</param>
-<param name="Summary">N/A</param>
+<param name="Reference"></param>
+<param name="Summary"></param>
 <param name="Description">Plots a square on each of the particles in a swarm.</param>
 
 <!--Now the interesting stuff-->
@@ -49,6 +49,7 @@
 </list>
 <!-- Add an exmaple XML if possible -->
 <param name="Example">
+<![CDATA[
 	<struct name="faultSquares">
 		<param name="Type">lucSwarmSquares</param>
 		<param name="Swarm">materialSwarm</param>
@@ -62,6 +63,7 @@
 		<param name="PlaneVectorVariable">materialSwarm-SlipVector</param>
 		<param name="LengthVariable">materialSwarm-Length</param>
 	</struct>
+]]>
 </param>
 
 </StGermainData>

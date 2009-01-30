@@ -11,8 +11,8 @@
 <param name="Copyright">Copyright (c) 2005, Monash Cluster Computing</param>
 <param name="License">http://www.opensource.org/licenses/bsd-license.php</param>
 <param name="Parent">lucOpenGLDrawingObject</param>
-<param name="Reference">N/A</param>
-<param name="Summary">N/A</param>
+<param name="Reference"></param>
+<param name="Summary"></param>
 <param name="Description">Displays a mesh, using different colour for the different node categories (local, shadow..)</param>
 
 <!--Now the interesting stuff-->
@@ -68,11 +68,15 @@
 </list>
 <!-- Add an exmaple XML if possible -->
 <param name="Example">
+<![CDATA[
 		<struct name="meshViewer">
                         <param name="Type">lucMeshViewer</param>
                         <param name="Mesh">linearMesh</param>
                         <param name="displayNodes">true</param>
                         <param name="localColour">blue</param>
                 </struct>
+]]>
 </param>
+
+</StGermainData>
 

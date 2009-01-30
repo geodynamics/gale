@@ -11,8 +11,8 @@
 <param name="Copyright">Copyright (c) 2005, Monash Cluster Computing</param>
 <param name="License">http://www.opensource.org/licenses/bsd-license.php</param>
 <param name="Parent">lucOpenGLDrawingObject</param>
-<param name="Reference">...</param>
-<param name="Summary">...</param>
+<param name="Reference"></param>
+<param name="Summary"></param>
 <param name="Description">Tiles a plane with colours derived from the value of a scalar field at the vertex of each tile.</param>
 
 <!--Now the interesting stuff-->
@@ -105,6 +105,7 @@
 </list>
 <!-- Add an exmaple XML if possible -->
 <param name="Example">
+<![CDATA[
 		<struct name="crosssection">
 			<param name="Type">lucScalarFieldCrossSection</param>
 			<param name="ColourMap">temperatureColourMap</param>
@@ -112,6 +113,7 @@
 			<param name="crossSection">z=0.5</param>
 			<param name="resolution">256</param>
 		</struct>
+]]>
 </param>
 
 

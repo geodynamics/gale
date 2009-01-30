@@ -44,7 +44,7 @@
 
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">
+<param name="Example"><![CDATA[
 	<struct name="window">
 		<param name="Type">lucCarbonWindow</param>
 		<param name="RenderingEngine">renderingEngine</param>
@@ -58,7 +58,7 @@
 		<param name="maxIdleTime">1000000</param>
 		<param name="interactive">true</param>
 		<param name="backgroundColour">white</param>
-	</struct>
+	</struct>]]>
 </param>
 
 </StGermainData>
