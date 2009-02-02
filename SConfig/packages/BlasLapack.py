@@ -11,7 +11,7 @@ class BlasLapack(SConfig.Package):
                           ['clapack', 'cblas'],
                           ['f2clapack', 'f2cblas'],
                           ['mkl_lapack', 'mkl']]
-        self.shared_libraries = ['lapack', 'blas']
+        self.shared_libraries = ['lapack', 'blas', 'mkl_lapack', 'mkl']
         self.extra_libraries = ['gfortran']
         self.frameworks = ['Accelerate']
         self.symbols = [(['dgeev'], 'FORTRAN_NORMAL'),

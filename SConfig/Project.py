@@ -22,6 +22,8 @@ class Project(SConfig.Node):
                                     'optimising with -03 flag', 1),
             SCons.Script.BoolOption('with_eptiming',
                                     'enable parallel EP execution timing', 0),
+            SCons.Script.BoolOption('with_warnings',
+                                    'enable compile warnings', 0),	    
             SCons.Script.BoolOption('with_tau',
                                     'use tau instrumentation', 0),
             ('tau_cc', 'tau compiler to use if tau is enabled', 'tau_cc.sh'),
@@ -251,6 +253,12 @@ class Project(SConfig.Node):
         # Setup the optimisation flags
         if self.env['with_optimise'] and not self.env['with_debug']:
             d = scons_env.ParseFlags('-O3')
+            self.backup_variable(scons_env, d.keys(), old_state)
+            scons_env.MergeFlags(d)
+
+	# Setup the warnings flags
+        if self.env['with_warnings']:
+            d = scons_env.ParseFlags('-Wall')
             self.backup_variable(scons_env, d.keys(), old_state)
             scons_env.MergeFlags(d)
 
