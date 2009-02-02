@@ -158,17 +158,22 @@ void _FeEntryPoint_Run_AssembleStiffnessMatrix(
 {
 	FeEntryPoint* self = (FeEntryPoint*)feEntryPoint;
 	Hook_Index hookIndex;
+  double wallTime;
 	
 	#ifdef USE_PROFILE
 		Stg_CallGraph_Push( stgCallGraph, _FeEntryPoint_Run_AssembleStiffnessMatrix, self->name );
 	#endif
 
 	for( hookIndex = 0; hookIndex < self->hooks->count; hookIndex++ ) {
+    wallTime = MPI_Wtime();
+
 		((FeEntryPoint_AssembleStiffnessMatrix_Function*)((Hook*)self->hooks->data[hookIndex])->funcPtr) (
 			stiffnessMatrix,
 			bcRemoveQuery,
 			_sle,
 			_context );
+
+    stg_profile_EntryPoint( self->name, self->hooks->data[hookIndex]->name, MPI_Wtime() - wallTime );
 	}
 
 	#ifdef USE_PROFILE
@@ -180,16 +185,21 @@ void _FeEntryPoint_Run_AssembleForceVector(
 		void* feEntryPoint, 
 		void* forceVector ) 
 {
-	FeEntryPoint* self = (FeEntryPoint*)feEntryPoint;
-	Hook_Index hookIndex;
+  FeEntryPoint* self = (FeEntryPoint*)feEntryPoint;
+  Hook_Index hookIndex;
+  double wallTime;
 	
 	#ifdef USE_PROFILE
 		Stg_CallGraph_Push( stgCallGraph, _FeEntryPoint_Run_AssembleForceVector, self->name );
 	#endif
 
 	for( hookIndex = 0; hookIndex < self->hooks->count; hookIndex++ ) {
-		((FeEntryPoint_AssembleForceVector_Function*)((Hook*)self->hooks->data[hookIndex])->funcPtr) (
-			forceVector );
+    wallTime = MPI_Wtime();
+
+    ((FeEntryPoint_AssembleForceVector_Function*)((Hook*)self->hooks->data[hookIndex])->funcPtr) (
+      forceVector );
+
+    stg_profile_EntryPoint( self->name, self->hooks->data[hookIndex]->name, MPI_Wtime() - wallTime );
 	}
 
 	#ifdef USE_PROFILE
