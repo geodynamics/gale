@@ -20,6 +20,8 @@ class Project(SConfig.Node):
                                     'Build shared libraries', 1),
             SCons.Script.BoolOption('with_optimise',
                                     'optimising with -03 flag', 1),
+            SCons.Script.BoolOption('with_eptiming',
+                                    'enable parallel EP execution timing', 0),
             SCons.Script.BoolOption('with_tau',
                                     'use tau instrumentation', 0),
             ('tau_cc', 'tau compiler to use if tau is enabled', 'tau_cc.sh'),
@@ -252,6 +254,12 @@ class Project(SConfig.Node):
             self.backup_variable(scons_env, d.keys(), old_state)
             scons_env.MergeFlags(d)
 
+        # Setup the ep timing flags
+        if self.env['with_eptiming']:
+            d = scons_env.ParseFlags('-DENABLE_STGERMAIN_LOG')
+            self.backup_variable(scons_env, d.keys(), old_state)
+            scons_env.MergeFlags(d)
+
         # Setup the include paths.
         inc_dir = self.env.get_build_path('include')
         self.backup_variable(scons_env, 'CPPPATH', old_state)
@@ -269,3 +277,5 @@ class Project(SConfig.Node):
 	# TODO print compiler flags without quotes and commas so they can be copied clenly
 	self.ctx.Display( "Compiler flags: " )
 	print scons_env['CCFLAGS'][:]
+	self.ctx.Display( "Precompiler defines" )
+	print scons_env['CPPDEFINES'][:]
