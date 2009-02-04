@@ -25,8 +25,14 @@
 <list name="Dependencies">
 	<struct>
 		<param name="Essential">True</param>
-		<param name="Name">FeVariable</param>
-		<param name="Type">FeVariable</param>
+		<param name="Name">stiffnessMatrix</param>
+		<param name="Type">StiffnessMatrix</param>
+		<param name="Description">...</param>
+	</struct>
+	<struct>
+		<param name="Essential">True</param>
+		<param name="Name">sle</param>
+		<param name="Type">SystemLinearEquations</param>
 		<param name="Description">...</param>
 	</struct>
 
@@ -35,6 +41,12 @@
 
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example"><![CDATA[
+	<struct name="kMat">
+		<param name="Type">PETScShellMatrix</param>
+		<param name="stiffnessMatrix">k_matrix</param>
+		<param name="sle">stokesEqn</param>
+	</struct]]>
+</param>
 
 </StGermainData>

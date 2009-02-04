@@ -35,6 +35,11 @@
 
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example"><![CDATA[
+	<struct name="solutionVelocity">
+		<param name="Type">SolutionVector</param>
+		<param name="FeVariable">VelocityField</param>
+	</struct]]>
+</param>
 
 </StGermainData>

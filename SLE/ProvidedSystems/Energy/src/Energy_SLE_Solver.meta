@@ -26,6 +26,11 @@
 
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example"><![CDATA[
+	<struct name="energy_SLE_Solver">
+		<param name="Type">Energy_SLE_Solver</param>
+		<param name="matrixSolver">matrixSolver</param>
+	</struct]]>
+</param>
 
 </StGermainData>

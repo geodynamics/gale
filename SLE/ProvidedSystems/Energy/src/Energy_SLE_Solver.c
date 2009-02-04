@@ -182,18 +182,6 @@ void _Energy_SLE_Solver_Construct( void* sleSolver, Stg_ComponentFactory* cf, vo
 	assert( cf && Stg_CheckType( cf, Stg_ComponentFactory ) );
 
 	_SLE_Solver_Construct( self, cf, data );
-
-	/*
-	self->matrixSolver = Stg_ComponentFactory_ConstructByKey( cf, self->name, "matrixSolver", MatrixSolver, 
-								  False, data );
-	if( !self->matrixSolver ) {
-#ifdef HAVE_PETSC
-		self->matrixSolver = (MatrixSolver*)PETScMatrixSolver_New( "" );
-#else
-		self->matrixSolver = NULL;
-#endif
-	}
-	*/
 }
 
 /* Build */
@@ -208,10 +196,6 @@ void _Energy_SLE_Solver_Build( void* sleSolver, void* standardSLE ) {
 
 	Stg_Component_Build( stiffMat, standardSLE, False );
 
-	//if( self->matrixSolver ) {
-	//	MatrixSolver_SetComm( self->matrixSolver, sle->comm );
-	//	Stg_Component_Build( self->matrixSolver, NULL, False );
-	//}
 	if( self->matrixSolver == PETSC_NULL )
 		KSPCreate( sle->comm, &self->matrixSolver );
 
@@ -225,9 +209,6 @@ void _Energy_SLE_Solver_Initialise( void* sleSolver, void* standardSLE ) {
 	
 	/* Initialise parent. */
 	_SLE_Solver_Initialise( self, sle );
-
-	//if( self->matrixSolver )
-	//	Stg_Component_Initialise( self->matrixSolver, NULL, False );
 }
 
 void _Energy_SLE_Solver_Execute( void* sleSolver, void* data ) {
@@ -245,20 +226,13 @@ void _Energy_SLE_Solver_SolverSetup( void* sleSolver, void* standardSLE ) {
 	Stream_IndentBranch( StgFEM_SLE_ProvidedSystems_Energy_Debug );
 	
 	Journal_DPrintf( self->debug, "Initialising the L.A. solver for the \"%s\" matrix.\n", stiffMat->name );
-	//MatrixSolver_SetMatrix( self->matrixSolver, stiffMat->matrix );
-	//KSPSetOperators( self->matrixSolver, ((PETScMatrix*)stiffMat->matrix)->petscMat, 
-	//		((PETScMatrix*)stiffMat->matrix)->petscMat, DIFFERENT_NONZERO_PATTERN );
 	KSPSetOperators( self->matrixSolver, stiffMat->matrix, stiffMat->matrix, DIFFERENT_NONZERO_PATTERN );
 	Stream_UnIndentBranch( StgFEM_SLE_ProvidedSystems_Energy_Debug );
 	
 	if( self->maxIterations > 0 ) {
-		//MatrixSolver_SetMaxIterations( self->matrixSolver, self->maxIterations );
 		KSPSetTolerances( self->matrixSolver, PETSC_DEFAULT, PETSC_DEFAULT, PETSC_DEFAULT, self->maxIterations );
 	}
 
-	//Vector_Duplicate( ((ForceVector**)sle->forceVectors->data)[0]->vector, (void**)&self->residual );
-	//Vector_SetLocalSize( self->residual, 
-	//		     Vector_GetLocalSize( ((ForceVector**)sle->forceVectors->data)[0]->vector ) );
 	VecDuplicate( ((ForceVector**)sle->forceVectors->data)[0]->vector, &self->residual );
 }
 
@@ -285,15 +259,6 @@ void _Energy_SLE_Solver_Solve( void* sleSolver, void* standardSLE ) {
 			" solution vectors.\n" );
 	}
 
-	//MatrixSolver_Solve( self->matrixSolver, 
-	//		    ((ForceVector*) sle->forceVectors->data[0])->vector, 
-	//		    ((SolutionVector*) sle->solutionVectors->data[0])->vector );
-	//iterations = MatrixSolver_GetIterations( self->matrixSolver );
-	/*
-	KSPSolve( self->matrixSolver,
-		    ((PETScVector*)((ForceVector*) sle->forceVectors->data[0])->vector)->petscVec, 
-		    ((PETScVector*)((SolutionVector*) sle->solutionVectors->data[0])->vector)->petscVec );
-	*/
 	KSPSolve( self->matrixSolver,
 		    ((ForceVector*) sle->forceVectors->data[0])->vector, 
 		    ((SolutionVector*) sle->solutionVectors->data[0])->vector );
@@ -304,12 +269,6 @@ void _Energy_SLE_Solver_Solve( void* sleSolver, void* standardSLE ) {
 	
 	/* calculate the residual */
 	/* TODO: need to make this optional */
-	/*
-	Matrix_Multiply( ((StiffnessMatrix**)sle->stiffnessMatrices->data)[0]->matrix, 
-			 ((SolutionVector**)sle->solutionVectors->data)[0]->vector, 
-			 self->residual );
-	Vector_ScaleAdd( self->residual, -1.0, ((ForceVector**)sle->forceVectors->data)[0]->vector );
-	*/
 	MatMult( ((StiffnessMatrix**)sle->stiffnessMatrices->data)[0]->matrix, 
 		 ((SolutionVector**)sle->solutionVectors->data)[0]->vector, 
 		 self->residual );
@@ -317,7 +276,6 @@ void _Energy_SLE_Solver_Solve( void* sleSolver, void* standardSLE ) {
 }
 
 
-//Vector* _Energy_SLE_GetResidual( void* sleSolver, Index fv_I ) {
 Vec _Energy_SLE_GetResidual( void* sleSolver, Index fv_I ) {
 	Energy_SLE_Solver*	self = (Energy_SLE_Solver*)sleSolver;
 

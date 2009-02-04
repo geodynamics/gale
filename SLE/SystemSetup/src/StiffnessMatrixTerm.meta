@@ -29,30 +29,26 @@
 		<param name="Type">StiffnessMatrix</param>
 		<param name="Description">...</param>
 	</struct>
-
-<!-- PLEASE, check the above struct information is accurate, in line number 204 of the c file and then remove this comment afterwards -->
-
 	<struct>
 		<param name="Essential">True</param>
 		<param name="Name">Swarm</param>
 		<param name="Type">Swarm</param>
 		<param name="Description">...</param>
 	</struct>
-
-<!-- PLEASE, check the above struct information is accurate, in line number 205 of the c file and then remove this comment afterwards -->
-
 	<struct>
 		<param name="Essential">No</param>
 		<param name="Name">ExtraInfo</param>
 		<param name="Type">Stg_Component</param>
 		<param name="Description">...</param>
 	</struct>
-
-<!-- PLEASE, check the above struct information is accurate, in line number 206 of the c file and then remove this comment afterwards -->
-
-
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example"><![CDATA[
+	<struct name="gradientStiffnessMatrixTerm">
+		<param name="Type">StiffnessMatrixTerm</param>
+		<param name="Swarm">gaussSwarm</param>
+		<param name="StiffnessMatrix">g_matrix</param>
+	</struct]]>
+</param>
 
 </StGermainData>

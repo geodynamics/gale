@@ -32,6 +32,12 @@
 
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example"><![CDATA[
+	<struct name="mom_force">
+		<param name="Type">ForceVector</param>
+		<param name="FeVariable">VelocityField</param>
+		<param name="ExtraInfo">context</param>
+	</struct]]>
+</param>
 
 </StGermainData>
