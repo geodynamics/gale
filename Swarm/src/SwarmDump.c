@@ -368,11 +368,11 @@ void SwarmDump_DumpToHDF5( SwarmDump* self, Swarm* swarm, const char* filename )
          
          props  = H5Pcreate( H5P_DATASET_CREATE );
          /* turn on hdf chunking.. as it is required for compression */
-         status = H5Pset_chunk(props, 2, cdims);
+         //status = H5Pset_chunk(props, 2, cdims);
          /* turn on compression */
-         status = H5Pset_deflate( props, 6);
+         //status = H5Pset_deflate( props, 6);
          /* turn on data checksum */ 
-         status = H5Pset_fletcher32(props);
+         //status = H5Pset_fletcher32(props);
 
          /* Create a new dataspace */
          sprintf( dataSpaceName, "/%s", swarmVar->name );
