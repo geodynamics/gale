@@ -84,6 +84,6 @@ Bool StgFEM_Assembly_Init( int* argc, char** argv[] ) {
 	RegisterParent( IsoviscousStressTensorTerm_Type,   StiffnessMatrixTerm_Type );
 	RegisterParent( PressureGradMatrixTerm_Type,   StiffnessMatrixTerm_Type );
 	RegisterParent( PressureGradForceTerm_Type,     ForceTerm_Type );
-	
+
 	return True;
 }

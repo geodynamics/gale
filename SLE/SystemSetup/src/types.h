@@ -63,6 +63,8 @@
 	typedef struct SLE_Solver                   SLE_Solver;
 	typedef struct FiniteElementContext         FiniteElementContext;
 	typedef struct Assembler		Assembler;
+	
+	typedef struct _OperatorFunction	    OperatorFunction;
 
 	/* types for lists etc ... for readability */
 	typedef Index                       StiffnessMatrix_Index;

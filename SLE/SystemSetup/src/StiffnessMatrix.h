@@ -90,6 +90,8 @@
 		Bool                                              allowZeroElementContributions;  \
 		EntryPoint_Register*                              entryPoint_Register;            \
 		Stg_ObjectList*                                   stiffnessMatrixTermList;        \
+		/* dave - 02.002.09 */ \
+		Stg_ObjectList*					  operatorFunctionList;		  \
 		FeEntryPoint*                                     assembleStiffnessMatrix;        \
 		Name                                              _assembleStiffnessMatrixEPName; \
 		MPI_Comm                                          comm;                           \
@@ -287,7 +289,10 @@
 		Index elStiffMatToAddRowSize,
 		Index elStiffMatToAddColSize );
 	
-	void StiffnessMatrix_AddStiffnessMatrixTerm( void* stiffnessMatrixVector, StiffnessMatrixTerm* stiffnessMatrixTerm ) ;
+	void StiffnessMatrix_AddStiffnessMatrixTerm( void* stiffnessMatrix, StiffnessMatrixTerm* stiffnessMatrixTerm ) ;
+
+	/* corresponding function for the OperatorFunctionList */
+	void StiffnessMatrix_AddOperatorFunction( void* stiffnessMatrix, OperatorFunction* operatorFunction );
 
 	void StiffnessMatrix_RefreshMatrix( StiffnessMatrix* self );
 

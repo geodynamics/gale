@@ -66,6 +66,8 @@
 	#include "ForceTerm.h"
 	#include "Assembler.h"
 
+	#include "OperatorFunction.h"
+
 #ifdef HAVE_PETSC
 	#include "PETScShellMatrix.h"
 #endif
