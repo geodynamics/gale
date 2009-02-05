@@ -52,11 +52,11 @@
 #define __StgFEM_Assembly_types_h__
 	
 	/* FE types/classes */
-	typedef struct ThermalBuoyancyForceTerm                ThermalBuoyancyForceTerm;
-	typedef struct GradientStiffnessMatrixTerm             GradientStiffnessMatrixTerm;
-	typedef struct DivergenceMatrixTerm             DivergenceMatrixTerm;
-	typedef struct LaplacianStiffnessMatrixTerm            LaplacianStiffnessMatrixTerm;
-	typedef struct IsoviscousStressTensorTerm              IsoviscousStressTensorTerm;
+	typedef struct ThermalBuoyancyForceTerm			ThermalBuoyancyForceTerm;
+	typedef struct GradientStiffnessMatrixTerm		GradientStiffnessMatrixTerm;
+	typedef struct DivergenceMatrixTerm             	DivergenceMatrixTerm;
+	typedef struct LaplacianStiffnessMatrixTerm		LaplacianStiffnessMatrixTerm;
+	typedef struct IsoviscousStressTensorTerm		IsoviscousStressTensorTerm;
 	typedef struct PressureGradForceTerm			PressureGradForceTerm;
 	typedef struct PressureGradMatrixTerm			PressureGradMatrixTerm;
 

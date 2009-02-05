@@ -64,7 +64,7 @@
 	#include "IsoviscousStressTensorTerm.h"
 	#include "PressureGradMatrixTerm.h"
 	#include "PressureGradForceTerm.h"
-	
+
 	#include "Init.h"
 	#include "Finalise.h"
 

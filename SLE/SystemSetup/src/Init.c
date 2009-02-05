@@ -80,8 +80,8 @@ Bool StgFEM_SLE_SystemSetup_Init( int* argc, char** argv[] ) {
 	//RegisterParent( PETScShellMatrix_Type,         PETScMatrix_Type );
 	RegisterParent( PETScShellMatrix_Type,         Stg_Component_Type );
 	RegisterParent( Assembler_Type, Stg_Class_Type );
-	
 	RegisterParent( FiniteElementContext_Type,     DomainContext_Type );
+	RegisterParent( OperatorFunction_Type,	       Stg_Component_Type );
 
 	return True;
 }
