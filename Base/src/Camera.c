@@ -213,16 +213,21 @@ void* _lucCamera_Copy( void* camera, void* dest, Bool deep, Name nameExt, PtrMap
 
 	newCamera = _Stg_Component_Copy( self, dest, deep, nameExt, ptrMap );
 
-	memcpy( newCamera->coord,       self->coord,       sizeof(Coord) );
-	memcpy( newCamera->focalPoint,  self->focalPoint,  sizeof(Coord) );
-	memcpy( newCamera->rotationCentre,  self->rotationCentre,  sizeof(Coord) );
-	memcpy( newCamera->upDirection, self->upDirection, sizeof(XYZ) );
-	
+	newCamera->originalCamera      = NULL;
+   newCamera->centreFieldVariable = NULL;
+
+	memcpy( newCamera->coord,          self->coord,          sizeof(Coord) );
+	memcpy( newCamera->focalPoint,     self->focalPoint,     sizeof(Coord) );
+	memcpy( newCamera->rotationCentre, self->rotationCentre, sizeof(Coord) );
+	memcpy( newCamera->upDirection,    self->upDirection,    sizeof(XYZ  ) );
+
+   newCamera->focalLength   = self->focalLength;
 	newCamera->aperture      = self->aperture;
-	newCamera->stereoType    = self->stereoType;
-	newCamera->eyeSeparation = self->eyeSeparation;
+	newCamera->eyeSeparation = self->eyeSeparation;   
 	newCamera->buffer        = self->buffer;
-	
+	newCamera->stereoType    = self->stereoType;
+	newCamera->needsToDraw   = self->needsToDraw;
+
 	return (void*) newCamera;
 }
 
