@@ -13,7 +13,7 @@
 <param name="Parent"></param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">This component allows for a given list of FeVariables to be calculated on the MaterialPointsSwarm. The output of these calculations is sent to a file called, "nameOfField".materialPointsSwarm."timeStep".dat, that is found in the output directory.</param>
+<param name="Description">This component allows for a given list of FeVariables to be calculated on a swarm. The output of these calculations is sent to a file called, "nameOfField"."swarmName"."timeStep".dat, that is found in the output directory.<br/>If you just want the positions of the particles in the swarm then add the PressureField to the feVariable list as per the example. (You'll get the positions of the particles as well as the pressurefield values on the particles for free).</param>
 
 <list name="Params">
 </list>
