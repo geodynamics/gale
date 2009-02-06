@@ -13,41 +13,38 @@
 <param name="Parent">Stg_Component</param>
 <param name="Reference">http://opengl.org/documentation/specs/man_pages/hardcopy/GL/html/gl/lightmodel.html ...</param>
 <param name="Summary">...</param>
-<param name="Description">...</param>
-
-<!--Now the interesting stuff-->
-
+<param name="Description">Enables an OpenGL light in a model.</param>
 
 <list name="Params">
 	<struct>
-		<param name="Name">ambX</param>
+		<param name="Name">ambR</param>
 		<param name="Type">Double</param>
 		<param name="Default">0.2</param>
-		<param name="Description">...</param>
+		<param name="Description">R - red value [1.0, -1.0]</param>
 	</struct>
 	<struct>
-		<param name="Name">ambY</param>
+		<param name="Name">ambG</param>
 		<param name="Type">Double</param>
 		<param name="Default">0.2</param>
-		<param name="Description">...</param>
+		<param name="Description">G - green value [1.0, -1.0]</param>
 	</struct>
 	<struct>
-		<param name="Name">ambZ</param>
+		<param name="Name">ambB</param>
 		<param name="Type">Double</param>
 		<param name="Default">0.2</param>
-		<param name="Description">...</param>
+		<param name="Description">B - blue value [1.0, -1.0]</param>
 	</struct>
 	<struct>
-		<param name="Name">ambW</param>
+		<param name="Name">ambA</param>
 		<param name="Type">Double</param>
 		<param name="Default">1.0</param>
-		<param name="Description">...</param>
+		<param name="Description">A - alpha value [1.0, -1.0]</param>
 	</struct>
 	<struct>
 		<param name="Name">model</param>
 		<param name="Type">String</param>
 		<param name="Default">"TwoSide"</param>
-		<param name="Description">There are 3 options: 'Ambient', 'Local', 'TwoSide'</param>
+		<param name="Description">There are 3 options: 'Ambient' (enables GL_LIGHT_MODEL_AMBIENT), 'Local' (enables GL_LIGHT_MODEL_LOCAL_VIEWER) , 'TwoSide' (enables GL_LIGHT_MODEL_TWO_SIDE)</param>
 	</struct>
 	<struct>
 		<param name="Name">posX</param>
@@ -71,22 +68,58 @@
 		<param name="Name">posW</param>
 		<param name="Type">Double</param>
 		<param name="Default">0.0</param>
-		<param name="Description">...</param>
+		<param name="Description">If 0 it's a directional light where position xyz define the all light ray vectors. If posW is not 0 the position of the light is important as the light is a point source.</param>
 	</struct>
 	<struct>
 		<param name="Name">material</param>
 		<param name="Type">String</param>
 		<param name="Default">"lucMono"</param>
-		<param name="Description">...</param>
+		<param name="Description">?unknown?</param>
 	</struct>
-
+  <struct>
+		<param name="Name">spotCutOff</param>
+		<param name="Type">double</param>
+		<param name="Default">180</param>
+		<param name="Description">Value used to set GL_SPOT_CUTOFF - [0,90] or 180. If 180 is defined sporDirectionX/Y/Z are insignificant as light is uniformly distributed.</param>
+	</struct>
+  <struct>
+		<param name="Name">spotDirectionX</param>
+		<param name="Type">double</param>
+		<param name="Default">0</param>
+		<param name="Description">defines the x value for the GL_SPOT_DIRECTION vector</param>
+	</struct>
+  <struct>
+		<param name="Name">spotDirectionY</param>
+		<param name="Type">double</param>
+		<param name="Default">0</param>
+		<param name="Description">defines the y value for the GL_SPOT_DIRECTION vector</param>
+	</struct>
+  <struct>
+		<param name="Name">spotDirectionZ</param>
+		<param name="Type">double</param>
+		<param name="Default">-1.0</param>
+		<param name="Description">defines the z value for the GL_SPOT_DIRECTION vector</param>
+	</struct>
 </list>
 
 <list name="Dependencies">
 
 </list>
-<!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example"><![CDATA[
+  <struct name="light1">
+		<param name="Type">lucLight</param>
+			<param name="posX">0 </param>
+			<param name="posY">3.33</param>
+			<param name="posZ">0.1 </param>
+			<param name="posW">0.0 </param>
+			<param name="model"> Ambient </param>
+			<param name="ambR">0 </param>
+			<param name="ambG">3.33</param>
+			<param name="ambB">0.1 </param>
+			<param name="ambW">0.0 </param>
+	</struct>
+]]>
+</param>
 
 </StGermainData>
 

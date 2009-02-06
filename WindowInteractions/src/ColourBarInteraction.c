@@ -195,7 +195,7 @@ void _lucColourBarInteraction_KeyboardEvent( void* windowInteraction, lucWindow*
 	int                         startPos[2];
 
 
-	/* This function works when the key pressed is 'f' */
+	/* This function works when the key pressed is 'c' */
 	if ( key != 'c' )
 		return;
 	
@@ -214,7 +214,7 @@ void _lucColourBarInteraction_KeyboardEvent( void* windowInteraction, lucWindow*
 	for ( object_I = 0 ; object_I < objectCount ; object_I++ ) {
 		object = lucDrawingObject_Register_GetByIndex( viewport->drawingObject_Register, object_I );
 
-		/* Check if this drawing object is a scalar field */
+		/* Check if this drawing object is a colourBar type */
 		if ( Stg_Class_IsInstance( object, lucColourBar_Type ) ) {
 			colourBar = (lucColourBar*) object;
 			length        = (Pixel_Index) ((double) viewportInfo->width * colourBar->lengthFactor);
@@ -238,7 +238,7 @@ void _lucColourBarInteraction_KeyboardEvent( void* windowInteraction, lucWindow*
 
 void _lucColourBarInteraction_KeyboardMessage( void* windowInteraction, Stream* stream ) {
 	Journal_Printf( stream,
-			"c:                            The value of ColourBar's colour under the cursor with be printed to screen.\n" );
+			"c:                            The value of ColourBar's colour under the cursor will be printed to screen.\n" );
 }
 
 

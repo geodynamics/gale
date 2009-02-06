@@ -15,9 +15,6 @@
 <param name="Summary"></param>
 <param name="Description">Draws a set of X,Y,Z axes.</param>
 
-<!--Now the interesting stuff-->
-
-
 <list name="Params">
 	<struct>
 		<param name="Name">colourX</param>
@@ -67,15 +64,9 @@
 <list name="Dependencies">
 
 </list>
-<!-- Add an exmaple XML if possible -->
 <param name="Example">
 <![CDATA[
-		<struct name="axes" mergeType="replace">
-			<param name="Type">lucAxis</param>
-			<param name="originX">0.0</param>
-			<param name="scale">2.0</param>
-		</struct>
-		<struct name="axes" mergeType="replace">
+		<struct name="axis">
 			<param name="Type">lucAxis</param>
 			<param name="originX">-0.1</param>
 			<param name="length">0.5</param>

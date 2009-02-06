@@ -15,9 +15,6 @@
 <param name="Summary"></param>
 <param name="Description">Displays a title at the top of a viewport.</param>
 
-<!--Now the interesting stuff-->
-
-
 <list name="Params">
 	<struct>
 		<param name="Name">colour</param>
@@ -43,7 +40,6 @@
 <list name="Dependencies">
 
 </list>
-<!-- Add an exmaple XML if possible -->
 <param name="Example">
 <![CDATA[
                 <struct name="tempandVelTitle" mergeType="replace">

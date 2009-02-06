@@ -28,7 +28,7 @@
 		<struct name="window" mergeType="merge">
 			<param name="Viewport">ParticleDensityVP StrainRateInvariantVP</param>
 			<list name="FieldInteractions">
-				<param>ColourBarInteractions</param>
+				<param>FieldInteractions</param>
 			</list>
 		</struct>
 		]]>

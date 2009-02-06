@@ -13,10 +13,7 @@
 <param name="Parent">lucWindowInteraction</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">...</param>
-
-<!--Now the interesting stuff-->
-
+<param name="Description">Allows the user to interactively query the value of a colourBar from a viewport. The user must point the mouse over a viewport containing a lucColourBar object and then press the 'c' button. The value of that colour will be printed in stdout.</param>
 
 <list name="Params">
 
@@ -25,7 +22,18 @@
 <list name="Dependencies">
 
 </list>
-<!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+<param name="Example">
+<![CDATA[
+		<struct name="ColourBarInteractions">
+			<param name="Type">lucColourBarInteraction</param>
+		</struct>
+		<struct name="window" mergeType="merge">
+			<param name="Viewport">ParticleDensityVP StrainRateInvariantVP</param>
+			<list name="WindowInteraction">
+				<param>ColourBarInteractions</param>
+			</list>
+		</struct>
+		]]>
+</param>
 
 </StGermainData>

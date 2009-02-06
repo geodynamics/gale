@@ -262,10 +262,10 @@ void _lucLight_Construct( void* light, Stg_ComponentFactory* cf, void* data ) {
 
         
 	/* Ambient values*/
-	lmodel_ambient[0] = Stg_ComponentFactory_GetDouble( cf, self->name, "ambX", 0.2 );
-	lmodel_ambient[1] = Stg_ComponentFactory_GetDouble( cf, self->name, "ambY", 0.2 );
-	lmodel_ambient[2] = Stg_ComponentFactory_GetDouble( cf, self->name, "ambZ", 0.2 );
-	lmodel_ambient[3] = Stg_ComponentFactory_GetDouble( cf, self->name, "ambW", 1.0 );
+	lmodel_ambient[0] = Stg_ComponentFactory_GetDouble( cf, self->name, "ambR", 0.2 );
+	lmodel_ambient[1] = Stg_ComponentFactory_GetDouble( cf, self->name, "ambG", 0.2 );
+	lmodel_ambient[2] = Stg_ComponentFactory_GetDouble( cf, self->name, "ambB", 0.2 );
+	lmodel_ambient[3] = Stg_ComponentFactory_GetDouble( cf, self->name, "ambA", 1.0 );
 
 
 	modelName = Stg_ComponentFactory_GetString( cf, self->name, "model", "TwoSide" );
