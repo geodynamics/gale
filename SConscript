@@ -59,6 +59,7 @@ env.build_plugin('Apps/StokesMomentumUzawa/tests/LinearVelocityAnalytic')
 env.build_plugin('Apps/StokesMomentumUzawa/tests/LidDrivenIsoviscousAnalytic')
 env.build_plugin('Apps/StokesMomentumUzawa/tests/SimpleShearAnalytic')
 env.build_plugin('Apps/StokesMomentumUzawa/tests/LidDrivenStokesAnalytic')
+env.build_plugin('Apps/TempDiffusion/tests/LinearTemperatureField');
 
 #
 # Build static library.
