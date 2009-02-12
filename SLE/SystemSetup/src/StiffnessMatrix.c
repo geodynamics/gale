@@ -500,32 +500,6 @@ void _StiffnessMatrix_Construct( void* stiffnessMatrix, Stg_ComponentFactory* cf
 		rankToWatch = Dictionary_GetUnsignedInt_WithDefault( cf->rootDict, "rankToWatch", 0 );
 		Stream_SetPrintingRank( stream, rankToWatch );
 	}
-
-	/* new operator stuff, June 2008 */
-	/* doing this using an OperatorFunction list, same as for the StiffnessMatrixTerms... 02.02.09 */
-/*
-	{
-		Dictionary_Entry_Value*	operatorsDEV;
-
-		operatorsDEV = _Stg_ComponentFactory_GetDictionaryValue( cf, self->name, "operators", 0 );
-		if( operatorsDEV ) {
-			Index count, i;
-
-			count = Dictionary_Entry_Value_GetCount( operatorsDEV );
-			for( i = 0; i < count; i++ ) {
-				Dictionary_Entry_Value* operatorDEV;
-				char* operatorStr;
-
-				operatorDEV = Dictionary_Entry_Value_GetElement( operatorsDEV, i );
-*/
-				/* returns the OperatorFunction */
-				/*OperatorFunction_Register_Get( Dictionary_Entry_Value_AsString( operatorDEV ) );*/
-				/* TODO: but where to put it & how to call it?? - dave, 30.01.09 */
-/*
-			}
-		}
-	}
-*/
 }
 
 void _StiffnessMatrix_Build( void* stiffnessMatrix, void* data ) {
@@ -952,17 +926,10 @@ void StiffnessMatrix_GlobalAssembly_General( void* stiffnessMatrix, Bool bcRemov
 	Journal_DPrintf( self->debug, "In %s - for matrix \"%s\"\n", __func__, self->name );
 	Stream_IndentBranch( StgFEM_Debug );
 
-	/* may use StiffnessMatrices or OperatorFunctions for now, dave - 02.02.09 */
-	/*
 	Journal_Firewall( Stg_ObjectList_Count( self->stiffnessMatrixTermList ) != 0,
 			  Journal_Register(Error_Type, self->type),
 			  "Error in func %s for %s '%s' - No StiffnessMatrixTerms registered.\n", 
 			  __func__, self->type, self->name );
-	Journal_Firewall( Stg_ObjectList_Count( self->operatorFunctionList ) != 0,
-			  Journal_Register(Error_Type, self->type),
-			  "Error in func %s for %s '%s' - No OperatorFunctions registered.\n", 
-			  __func__, self->type, self->name );
-	*/
 
 	totalDofsThisElement[ROW_VAR] = Memory_Alloc( Dof_Index, "el nodal dofs" );
 	totalDofsPrevElement[ROW_VAR] = Memory_Alloc( Dof_Index, "el nodal dofs (prev element)" );
