@@ -31,12 +31,7 @@
 		<param name="Default">False</param>
 		<param name="Description">...</param>
 	</struct>
-	<struct>
-		<param name="Name">allowZeroElementContributions</param>
-		<param name="Type">Bool</param>
-		<param name="Default">False</param>
-		<param name="Description">...</param>
-	</struct>
+
 </list>
 
 <list name="Dependencies">
@@ -76,31 +71,9 @@
 
 <!-- PLEASE, check the above struct information is accurate, in line number 379 of the c file and then remove this comment afterwards -->
 
-	<struct>
-		<param name="Essential">No</param>
-		<param name="Name">transposeRHS</param>
-		<param name="Type">ForceVector</param>
-		<param name="Description">...</param>
-	</struct>
-
-	<struct>
-		<param name="Essential">No</param>
-		<param name="Name">matrix</param>
-		<param name="Type">PETScShellMatrix</param>
-		<param name="Description">...</param>
-	</struct>
 
 </list>
 <!-- Add an exmaple XML if possible -->
-<param name="Example"><![CDATA[
-	<struct name="k_matrix">
-		<param name="Type">StiffnessMatrix</param>
-		<param name="matrix">kMat</param>
-		<param name="RowVariable">VelocityField</param>
-		<param name="ColumnVariable">VelocityField</param>
-		<param name="RHS">mom_force</param>
-		<param name="allowZeroElementContributions">False</param>
-	</struct]]>
-</param>
+<param name="Example">...</param>
 
 </StGermainData>

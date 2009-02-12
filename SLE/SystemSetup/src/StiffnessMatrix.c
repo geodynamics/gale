@@ -60,7 +60,6 @@
 #include "SolutionVector.h"
 #include "ForceVector.h"
 #include "Assembler.h"
-#include "OperatorFunction.h"
 
 void __StiffnessMatrix_NewAssemble( void* stiffnessMatrix, Bool removeBCs, void* _sle, void* _context );
 void StiffnessMatrix_NewAssemble( void* stiffnessMatrix, Bool removeBCs, void* _sle, void* _context );
@@ -1406,7 +1405,6 @@ inline void StiffMatAssLog_GetOperatorDimensions( struct StiffMatAss_Log *log, M
 	MatGetLocalSize( matrix, (unsigned*)&log->local_nr, (unsigned*)&log->local_nc );
 }
 
-
 void StiffMatAssLog_Delete( struct StiffMatAss_Log** _log )
 {
         struct StiffMatAss_Log *log = *_log;
@@ -2751,8 +2749,6 @@ void _StiffnessMatrix_PrintElementStiffnessMatrix(
 	}
 }
 
-/* modified this function so that the element can be assembled from either StiffnessMatrices or
- * OperatorFunctions for now... dave - 02.02.09 */
 void StiffnessMatrix_AssembleElement(
 	void* stiffnessMatrix,
 	Element_LocalIndex element_lI,
@@ -2765,29 +2761,12 @@ void StiffnessMatrix_AssembleElement(
 	Index                   stiffnessMatrixTermCount  = Stg_ObjectList_Count( self->stiffnessMatrixTermList );
 	Index                   stiffnessMatrixTerm_I;
 	StiffnessMatrixTerm*    stiffnessMatrixTerm;
-	Index			operatorFunctionCount	  = Stg_ObjectList_Count( self->operatorFunctionList );
-	Index			operatorFunction_I;
-	OperatorFunction*	operatorFunction;
 
-	/* ultimate want to remove this conditional when completely using OperatorFunctions for better performance */
-	if( stiffnessMatrixTermCount ) {
-		for ( stiffnessMatrixTerm_I = 0 ; stiffnessMatrixTerm_I < stiffnessMatrixTermCount ; stiffnessMatrixTerm_I++ ) {
-			stiffnessMatrixTerm = (StiffnessMatrixTerm*)
-				Stg_ObjectList_At( self->stiffnessMatrixTermList, stiffnessMatrixTerm_I );
+	for ( stiffnessMatrixTerm_I = 0 ; stiffnessMatrixTerm_I < stiffnessMatrixTermCount ; stiffnessMatrixTerm_I++ ) {
+		stiffnessMatrixTerm = (StiffnessMatrixTerm*)
+			Stg_ObjectList_At( self->stiffnessMatrixTermList, stiffnessMatrixTerm_I );
 
-			StiffnessMatrixTerm_AssembleElement( stiffnessMatrixTerm, self, element_lI, sle, context, elStiffMatToAdd );
-		}
-	}
-	/* preserve lists for the OperatorFunctions, so that an element may be assembled as a linear combination of basic 
-	 * operators */
-	if( operatorFunctionCount ) {
-		for( operatorFunction_I = 0; operatorFunction_I < operatorFunctionCount; operatorFunction_I++ ) {
-			operatorFunction = (OperatorFunction*) Stg_ObjectList_At( self->operatorFunctionList, operatorFunction_I );
-
-			OperatorFunction_ApplyMatrix( operatorFunction, self, element_lI, elStiffMatToAdd, operatorFunction->_values );
-			if( operatorFunction->applyNeumann )
-				OperatorFunction_ApplyNeumann( operatorFunction, self, element_lI, elStiffMatToAdd, operatorFunction->_values );
-		}
+		StiffnessMatrixTerm_AssembleElement( stiffnessMatrixTerm, self, element_lI, sle, context, elStiffMatToAdd );
 	}
 }
 
@@ -2830,14 +2809,6 @@ void StiffnessMatrix_AddStiffnessMatrixTerm( void* stiffnessMatrix, StiffnessMat
 
 	stiffnessMatrixTerm = Stg_CheckType( stiffnessMatrixTerm, StiffnessMatrixTerm );
 	Stg_ObjectList_Append( self->stiffnessMatrixTermList, stiffnessMatrixTerm );
-}
-
-/* corresponding function for the OperatorFunction list, dave - 02.02.09 */
-void StiffnessMatrix_AddOperatorFunction( void* stiffnessMatrix, OperatorFunction* operatorFunction ) {
-	StiffnessMatrix*        self                 = (StiffnessMatrix*) stiffnessMatrix;
-	
-	operatorFunction = Stg_CheckType( operatorFunction, OperatorFunction );
-	Stg_ObjectList_Append( self->operatorFunctionList, operatorFunction );
 }
 
 void StiffnessMatrix_RefreshMatrix( StiffnessMatrix* self ) {

@@ -291,9 +291,6 @@
 	
 	void StiffnessMatrix_AddStiffnessMatrixTerm( void* stiffnessMatrix, StiffnessMatrixTerm* stiffnessMatrixTerm ) ;
 
-	/* corresponding function for the OperatorFunctionList */
-	void StiffnessMatrix_AddOperatorFunction( void* stiffnessMatrix, OperatorFunction* operatorFunction );
-
 	void StiffnessMatrix_RefreshMatrix( StiffnessMatrix* self );
 
 	void StiffnessMatrix_CalcNonZeros( void* stiffnessMatrix );
