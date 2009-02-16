@@ -9,7 +9,7 @@
 			<param name="Type">ElementCellLayout</param>
 			<param name="Mesh">elementMesh</param>
 		</struct>
-  <!--
+<!--
 		<struct name="weights">
 			<param name="Type">ConstantWeights</param>
 		</struct>
@@ -17,7 +17,7 @@
   			<param name="Type">DVCWeights</param>
  			 <param name="resolution">10</param>
 		</struct>
-  -->
+-->
 		
 		<struct name="weights">
 		   <param name="Type">PCDVC</param>
@@ -48,10 +48,16 @@
 			<param name="IntegrationPointsSwarm">picIntegrationPoints</param>
 			<param name="MaterialPointsSwarm">materialSwarm</param>
 		</struct>
-		<struct name="materialSwarmParticleLayout">
-			<param name="Type">SpaceFillerParticleLayout</param>
-			<param name="averageInitialParticlesPerCell">particlesPerCell</param>
-		</struct>
+    <struct name="materialSwarmParticleLayout">
+      <param name="Type">SpaceFillerParticleLayout</param>
+      <param name="averageInitialParticlesPerCell">particlesPerCell</param>
+      <!--
+      This will cause the material points to be initially location at the 
+      gauss quadrature point. 
+      Remember population control will try and add more particles by default. 
+      <param name="Type">GaussParticleLayout</param>
+      -->
+    </struct>
 		<struct name="pMovementHandler"> 
 			<param name="Type">ParticleMovementHandler</param>
 		</struct>

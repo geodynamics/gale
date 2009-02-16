@@ -57,8 +57,7 @@ Bool PICellerator_PopulationControl_Init( int* argc, char** argv[] ) {
 	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 
 	Stg_ComponentRegister_Add( componentsRegister, EscapedRoutine_Type,      	"0", _EscapedRoutine_DefaultNew );
-
 	RegisterParent( EscapedRoutine_Type,      	 Stg_Component_Type );
-	
+
 	return True;
 }
