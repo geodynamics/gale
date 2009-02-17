@@ -699,6 +699,7 @@ void _FeVariable_Initialise( void* variable, void* data ) {
 	FeVariable*              self = (FeVariable*)variable;
 	DomainContext*   context = (DomainContext*)data;
 	char*                    inputPathString = NULL;
+   Dictionary_Entry_Value* feVarsList = NULL;
 	
 	Journal_DPrintf( self->debug, "In %s- for %s:\n", __func__, self->name );
 	Stream_IndentBranch( StgFEM_Debug );
@@ -770,6 +771,27 @@ void _FeVariable_Initialise( void* variable, void* data ) {
 		}
 	}
 	Stream_UnIndent( self->debug );
+
+   /* also include check to see if this fevariable should be checkpointed, just incase it didn't go through the fieldvariable construct phase */ 
+   feVarsList = Dictionary_Get( context->dictionary, "fieldVariablesToCheckpoint" );
+   if ( NULL == feVarsList ) {
+      feVarsList = Dictionary_Get( context->dictionary, "FieldVariablesToCheckpoint" );
+   }
+   if (feVarsList != NULL ) {
+      Index                    listLength = Dictionary_Entry_Value_GetCount( feVarsList );
+      Index                    var_I = 0;
+      Dictionary_Entry_Value*  feVarDictValue = NULL;
+      char*                    fieldVariableName;
+   
+      for ( var_I = 0; var_I < listLength; var_I++ ) {
+         feVarDictValue = Dictionary_Entry_Value_GetElement( feVarsList, var_I );
+         fieldVariableName = Dictionary_Entry_Value_AsString( feVarDictValue ); 
+         if ( 0 == strcmp( self->name, fieldVariableName ) ) {
+            self->isCheckpointedAndReloaded = True;
+            break;
+         }
+      }
+   }
 
 	if ( self->bcs ) {
 		Stg_Component_Initialise( self->bcs, data, False );
