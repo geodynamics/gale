@@ -197,9 +197,16 @@ void _Underworld_SwarmOutput_Construct( void* uwSwarmOutput, Stg_ComponentFactor
 				"\t<param>PressureField</param>\n"
 			"</list>\n", __func__ );
 	
-	
-	
 	listCount = Dictionary_Entry_Value_GetCount( list );
+
+  Journal_Firewall(
+			listCount != 0,
+			errorStream,
+			"Error in %s:\n"
+			"You have no FeVariables defined in the FeVariable list. At least one FeVariable must be included. Example:\n"
+			"<list name=\"FeVariables\">\n"
+				"\t<param>PressureField</param>\n"
+			"</list>\n", __func__ );
 	
 	/* Allocate the memory to store pointers to them */
 	self->feVariableList = Memory_Alloc_Array( FeVariable*, listCount, "List FeVariables" );
