@@ -173,7 +173,7 @@ void _ViscosityField_Build( void* viscosityField, void* data ) {
 
 	/* Create Dof Layout */
 	assert( Class_IsSuper( self->feMesh->topo, IGraph ) );
-	tmpName = Stg_Object_AppendSuffix( self, "DataVariable" );
+	tmpName = Stg_Object_AppendSuffix( self, "viscosityVariable" );
 	self->dataVariable = Variable_NewScalar( 	
 			tmpName,
 			Variable_DataType_Double, 
@@ -184,7 +184,7 @@ void _ViscosityField_Build( void* viscosityField, void* data ) {
 	Memory_Free( tmpName );
 	self->fieldComponentCount = 1;
 	
-	tmpName = Stg_Object_AppendSuffix( self, "DofLayout" );
+	tmpName = Stg_Object_AppendSuffix( self, "viscosityDOF" );
 	self->dofLayout = DofLayout_New( tmpName, self->variable_Register, 0, self->feMesh );
 	self->dofLayout->_numItemsInLayout = FeMesh_GetNodeDomainSize( self->feMesh );
 	DofLayout_AddAllFromVariableArray( self->dofLayout, 1, &self->dataVariable );
