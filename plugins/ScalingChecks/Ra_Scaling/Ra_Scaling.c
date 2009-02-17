@@ -83,27 +83,22 @@ void _Ra_CheckScalings_Func( void* context, void* ptrToContext ) {
 
     /* in order to get eta0, we must check all rheologies which specify an eta0 */
     /* In future this list will need to grow if new rheologies with eta0 are added */
-    if( rheology->type == Arrhenius_Type) 
-      eta0 = ((Arrhenius*)rheology)->eta0;
-    else if( rheology->type == DepthDependentViscosity_Type ) 
-      eta0 = ((DepthDependentViscosity*)rheology)->eta0;
-    else if( rheology->type == FrankKamenetskii_Type) 
-      eta0 = ((FrankKamenetskii*)rheology)->eta0;
-    else if( rheology->type == MaterialViscosity_Type ) 
+    if( rheology->type == MaterialViscosity_Type ) { 
       eta0 = ((MaterialViscosity*)rheology)->eta0;
 
-    diffusivity   = Stg_ComponentFactory_GetDouble( self->CF, "defaultResidualForceTerm", "defaultDiffusivity", 1.0 );
-    gravity       = Stg_ComponentFactory_GetRootDictDouble( self->CF, "gravity", 1.0 );
+      diffusivity   = Stg_ComponentFactory_GetDouble( self->CF, "defaultResidualForceTerm", "defaultDiffusivity", 1.0 );
+      gravity       = Stg_ComponentFactory_GetRootDictDouble( self->CF, "gravity", 1.0 );
 
-    Ra_0 = (gravity * thermalExp)/(diffusivity * eta0 );
-    if( abs(Ra - Ra_0) > 1e-3 ) {
-      isBad=1;
-      Stg_asprintf( &errorMesg2, "* Error - Your combination of diffusivity, gravity and eta0 (rheology) don't agree with your Ra:"
-          "input:\ndiffusivity = %g\ngravity = %g\neta0 = %g from rheology %s\nthermal expansivity force = %g\nRa = %g\n", diffusivity, gravity, eta0, rheology->name, thermalExp, Ra );
-    }
-    if( isBad ) {
-      Journal_RPrintf( self->info, "\n\n** Scaling issues detected **\n%s\n%s\nIf you believe the problem(s) above are ok in your model and you want to get rid of this error message use the command line argument --Ra_ScalingCheck=false\n\n", errorMesg1, errorMesg2 );
-      exit(0);
+      Ra_0 = (gravity * thermalExp)/(diffusivity * eta0 );
+      if( abs(Ra - Ra_0) > 1e-3 ) {
+        isBad=1;
+        Stg_asprintf( &errorMesg2, "* Error - Your combination of diffusivity, gravity and eta0 (rheology) don't agree with your Ra:"
+            "input:\ndiffusivity = %g\ngravity = %g\neta0 = %g from rheology %s\nthermal expansivity force = %g\nRa = %g\n", diffusivity, gravity, eta0, rheology->name, thermalExp, Ra );
+      }
+      if( isBad ) {
+        Journal_RPrintf( self->info, "\n\n** Scaling issues detected **\n%s\n%s\nIf you believe the problem(s) above are ok in your model and you want to get rid of this error message use the command line argument --Ra_ScalingCheck=false\n\n", errorMesg1, errorMesg2 );
+        exit(0);
+      }
     }
   }
 }
