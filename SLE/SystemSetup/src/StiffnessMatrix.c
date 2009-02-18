@@ -55,7 +55,6 @@
 #include "StiffnessMatrix.h"
 #include "StiffnessMatrixTerm.h"
 #include "SystemLinearEquations.h"
-#include "PETScShellMatrix.h"
 #include "EntryPoint.h"
 #include "SolutionVector.h"
 #include "ForceVector.h"
@@ -281,8 +280,8 @@ void _StiffnessMatrix_Init(
         self->modifyCBs = NULL;
 
 	self->matrix = PETSC_NULL;
-	self->shellMatrix = NULL;
-	self->useShellMatrix = False;
+/* 	self->shellMatrix = NULL; */
+/* 	self->useShellMatrix = False; */
 }
 
 
@@ -334,7 +333,6 @@ void _StiffnessMatrix_Print( void* stiffnessMatrix, Stream* stream ) {
 	Journal_Printf( stiffnessMatrixStream, "\tcolumnVariable (ptr): %p\n", self->columnVariable );
 	Journal_Printf( stiffnessMatrixStream, "\t\tvariable name: %s\n", self->columnVariable->name );
 	Journal_Printf( stiffnessMatrixStream, "\tMatrix (ptr): %p\n", self->matrix );
-	Journal_Printf( stiffnessMatrixStream, "\tShell Matrix (ptr): %p\n", self->shellMatrix );
 	Journal_Printf( stiffnessMatrixStream, "\tComm: %u\n", self->comm );
 	Journal_Printf( stiffnessMatrixStream, "\trowLocalSize: %u\n", self->rowLocalSize );
 	Journal_Printf( stiffnessMatrixStream, "\tcolLocalSize: %u\n", self->colLocalSize );
@@ -363,7 +361,7 @@ void* _StiffnessMatrix_Copy( void* stiffnessMatrix, void* dest, Bool deep, Name 
 	
 	/* TODO: copy matrix */
 	newStiffnessMatrix->matrix = self->matrix;
-	newStiffnessMatrix->shellMatrix = self->shellMatrix;
+/* 	newStiffnessMatrix->shellMatrix = self->shellMatrix; */
 	newStiffnessMatrix->entryPoint_Register = self->entryPoint_Register;
 	newStiffnessMatrix->comm = self->comm;
 	newStiffnessMatrix->rowLocalSize = self->rowLocalSize;
@@ -480,15 +478,15 @@ void _StiffnessMatrix_Construct( void* stiffnessMatrix, Stg_ComponentFactory* cf
 	self->transRHS = Stg_ComponentFactory_ConstructByKey( cf, self->name, "transposeRHS", ForceVector, False, data );
 
 	/* Read the matrix type from the dictionary. */
-	self->shellMatrix = Stg_ComponentFactory_ConstructByKey( cf, self->name, "matrix", PETScShellMatrix, False, data );
-	if( !self->shellMatrix ) {
-		self->useShellMatrix = False;
-	}
-	else {
-		EP_ReplaceAll( self->assembleStiffnessMatrix, StiffnessMatrix_ShellAssembly );
+/* 	self->shellMatrix = Stg_ComponentFactory_ConstructByKey( cf, self->name, "matrix", PETScShellMatrix, False, data ); */
+/* 	if( !self->shellMatrix ) { */
+/* 		self->useShellMatrix = False; */
+/* 	} */
+/* 	else { */
+/* 		EP_ReplaceAll( self->assembleStiffnessMatrix, StiffnessMatrix_ShellAssembly ); */
 
-		self->useShellMatrix = True;
-	}
+/* 		self->useShellMatrix = True; */
+/* 	} */
 
 	/* Setup the stream. */
 	stream = Journal_Register( Info_Type, self->type );
@@ -522,8 +520,8 @@ void _StiffnessMatrix_Build( void* stiffnessMatrix, void* data ) {
 	if( self->columnVariable )
 		Stg_Component_Build( self->columnVariable, data, False );
 	
-	if( self->useShellMatrix )
-		Stg_Component_Build( self->shellMatrix, data, False );
+/* 	if( self->useShellMatrix ) */
+/* 		Stg_Component_Build( self->shellMatrix, data, False ); */
 	
 #if DEBUG
 	if ( Stream_IsPrintableLevel( self->debug, 3 ) ) {
@@ -594,8 +592,8 @@ void _StiffnessMatrix_Initialise( void* stiffnessMatrix, void* data ) {
 	if( self->columnVariable )
 		Stg_Component_Initialise( self->columnVariable, data, False );
 
-	if( self->useShellMatrix )
-		Stg_Component_Initialise( self->shellMatrix, data, False );
+/* 	if( self->useShellMatrix ) */
+/* 		Stg_Component_Initialise( self->shellMatrix, data, False ); */
 }
 
 
@@ -909,7 +907,8 @@ void StiffnessMatrix_GlobalAssembly_General( void* stiffnessMatrix, Bool bcRemov
 	Bool			updateRHS;
 	MPI_Comm		comm;
 
-	Mat			matrix		      = ( self->useShellMatrix ) ? self->shellMatrix->matrix : self->matrix;
+/* 	Mat			matrix		      = ( self->useShellMatrix ) ? self->shellMatrix->matrix : self->matrix; */
+	Mat                     matrix = self->matrix;
 
 	/* Do some type checking */
 	assert( !sle || Stg_CheckType( sle, SystemLinearEquations ) );
@@ -1498,7 +1497,8 @@ void _StiffMatAss( struct StiffMatAss_Log *log, void* stiffnessMatrix, Bool remo
         unsigned                        nColNodes, *colNodes;
         unsigned                        maxDofs, maxRCDofs, nDofs, nRowDofs, nColDofs;
         double**                        elStiffMat;
-        Mat                             matrix		= ( self->useShellMatrix ) ? self->shellMatrix->matrix : self->matrix;
+/*         Mat                             matrix		= ( self->useShellMatrix ) ? self->shellMatrix->matrix : self->matrix; */
+	Mat                             matrix = self->matrix;
         unsigned                        e_i, n_i;
 
         int c_dof, r_dof;
@@ -1610,7 +1610,8 @@ void _StiffMatAss_vector_corrections(  struct StiffMatAss_Log *log, void *stiffn
         unsigned                        maxDofs, maxRCDofs, nDofs, nRowDofs, nColDofs;
         double**                        elStiffMat;
         double*                         bcVals;
-	Mat				matrix		= ( self->useShellMatrix ) ? self->shellMatrix->matrix : self->matrix;
+/* 	Mat				matrix		= ( self->useShellMatrix ) ? self->shellMatrix->matrix : self->matrix; */
+	Mat                             matrix = self->matrix;
 	Vec				vector, transVector;
         unsigned                        e_i, n_i;
 
@@ -1823,7 +1824,8 @@ void _StiffMatAss_vector_corrections_from_transpose( struct StiffMatAss_Log *log
         unsigned                        maxDofs, maxRCDofs, nDofs, nRowDofs, nColDofs;
         double**                        elStiffMat;
         double*                         bcVals;
-	Mat				matrix		= ( self->useShellMatrix ) ? self->shellMatrix->matrix : self->matrix;
+/* 	Mat				matrix		= ( self->useShellMatrix ) ? self->shellMatrix->matrix : self->matrix; */
+	Mat                             matrix = self->matrix;
 	Vec				transVector;
         unsigned                        e_i, n_i, si,sj;
 
@@ -2036,7 +2038,8 @@ void _StiffMatAss_vector_corrections_from_transpose( struct StiffMatAss_Log *log
 void StiffnessMatrix_NewAssemble( void* stiffnessMatrix, Bool removeBCs, void* _sle, void* _context )
 {
         StiffnessMatrix *self = (StiffnessMatrix*)stiffnessMatrix;
-	Mat		mat	= ( self->useShellMatrix ) ? self->shellMatrix->matrix : self->matrix;
+/* 	Mat		mat	= ( self->useShellMatrix ) ? self->shellMatrix->matrix : self->matrix; */
+	Mat             mat = self->matrix;
 	Vec		vector, transVector;	
 	struct StiffMatAss_Log *log;
 
@@ -2095,7 +2098,8 @@ void __StiffnessMatrix_NewAssemble( void* stiffnessMatrix, Bool removeBCs, void*
 	unsigned			maxDofs, maxRCDofs, nDofs, nRowDofs, nColDofs;
 	double**			elStiffMat;
 	double*				bcVals;
-	Mat				matrix		= ( self->useShellMatrix ) ? self->shellMatrix->matrix : self->matrix;
+/* 	Mat				matrix		= ( self->useShellMatrix ) ? self->shellMatrix->matrix : self->matrix; */
+	Mat                             matrix = self->matrix;
 	Vec				vector, transVector;
         int nRowNodeDofs, nColNodeDofs;
         int rowInd, colInd;
@@ -2279,146 +2283,146 @@ void __StiffnessMatrix_NewAssemble( void* stiffnessMatrix, Bool removeBCs, void*
 	MatAssemblyEnd( matrix, MAT_FINAL_ASSEMBLY );
 }
 
-void StiffnessMatrix_ShellAssembly( void* stiffnessMatrix, Bool removeBCs, void* data ) {
-	StiffnessMatrix*	self = (StiffnessMatrix*)stiffnessMatrix;
-	Vec    			rhs;
-	FeVariable		*rowVar, *colVar;
-	FeMesh			*rowMesh, *colMesh;
-	FeEquationNumber	*rowEqNum, *colEqNum;
-	DofLayout		*rowDofs, *colDofs;
-	unsigned		nRowEls;
-	unsigned		nRowNodes, *rowNodes;
-	unsigned		nColNodes, *colNodes;
-	unsigned		maxDofs, nDofs, nRowDofs, nColDofs;
-	double**		elStiffMat;
-	double*			values;
-	unsigned*		indices;
-	unsigned		curRow, curCol;
-	unsigned		colEq;
-	double			bc;
-	unsigned		e_i, n_i, n_j, dof_i, dof_j;
+/* void StiffnessMatrix_ShellAssembly( void* stiffnessMatrix, Bool removeBCs, void* data ) { */
+/* 	StiffnessMatrix*	self = (StiffnessMatrix*)stiffnessMatrix; */
+/* 	Vec    			rhs; */
+/* 	FeVariable		*rowVar, *colVar; */
+/* 	FeMesh			*rowMesh, *colMesh; */
+/* 	FeEquationNumber	*rowEqNum, *colEqNum; */
+/* 	DofLayout		*rowDofs, *colDofs; */
+/* 	unsigned		nRowEls; */
+/* 	unsigned		nRowNodes, *rowNodes; */
+/* 	unsigned		nColNodes, *colNodes; */
+/* 	unsigned		maxDofs, nDofs, nRowDofs, nColDofs; */
+/* 	double**		elStiffMat; */
+/* 	double*			values; */
+/* 	unsigned*		indices; */
+/* 	unsigned		curRow, curCol; */
+/* 	unsigned		colEq; */
+/* 	double			bc; */
+/* 	unsigned		e_i, n_i, n_j, dof_i, dof_j; */
 
-	assert( self && Stg_CheckType( self, StiffnessMatrix ) );
+/* 	assert( self && Stg_CheckType( self, StiffnessMatrix ) ); */
 
-	/* The whole point of this routine is to remove the BCs. */
-	if( !removeBCs )
-		return;
+/* 	/\* The whole point of this routine is to remove the BCs. *\/ */
+/* 	if( !removeBCs ) */
+/* 		return; */
 
-	rhs = self->rhs->vector;
-	rowVar = self->rowVariable;
-	colVar = self->columnVariable ? self->columnVariable : rowVar;
-	if( rowVar != colVar ) {
-		FeVariable* 	tmp = rowVar;
-		rowVar = colVar;
-		colVar = tmp;
-	}
-	rowEqNum = rowVar->eqNum;
-	colEqNum = colVar->eqNum;
-	rowMesh = rowVar->feMesh;
-	colMesh = colVar->feMesh;
-	rowDofs = rowVar->dofLayout;
-	colDofs = colVar->dofLayout;
-	nRowEls = FeMesh_GetElementLocalSize( rowMesh );
-	elStiffMat = NULL;
-	values = NULL;
-	indices = NULL;
-	maxDofs = 0;
+/* 	rhs = self->rhs->vector; */
+/* 	rowVar = self->rowVariable; */
+/* 	colVar = self->columnVariable ? self->columnVariable : rowVar; */
+/* 	if( rowVar != colVar ) { */
+/* 		FeVariable* 	tmp = rowVar; */
+/* 		rowVar = colVar; */
+/* 		colVar = tmp; */
+/* 	} */
+/* 	rowEqNum = rowVar->eqNum; */
+/* 	colEqNum = colVar->eqNum; */
+/* 	rowMesh = rowVar->feMesh; */
+/* 	colMesh = colVar->feMesh; */
+/* 	rowDofs = rowVar->dofLayout; */
+/* 	colDofs = colVar->dofLayout; */
+/* 	nRowEls = FeMesh_GetElementLocalSize( rowMesh ); */
+/* 	elStiffMat = NULL; */
+/* 	values = NULL; */
+/* 	indices = NULL; */
+/* 	maxDofs = 0; */
 
-	for( e_i = 0; e_i < nRowEls; e_i++ ) {
-		FeMesh_GetElementNodes( rowMesh, e_i, self->rowInc );
-		nRowNodes = IArray_GetSize( self->rowInc );
-		rowNodes = IArray_GetPtr( self->rowInc );
-		FeMesh_GetElementNodes( colMesh, e_i, self->colInc );
-		nColNodes = IArray_GetSize( self->colInc );
-		colNodes = IArray_GetPtr( self->colInc );
+/* 	for( e_i = 0; e_i < nRowEls; e_i++ ) { */
+/* 		FeMesh_GetElementNodes( rowMesh, e_i, self->rowInc ); */
+/* 		nRowNodes = IArray_GetSize( self->rowInc ); */
+/* 		rowNodes = IArray_GetPtr( self->rowInc ); */
+/* 		FeMesh_GetElementNodes( colMesh, e_i, self->colInc ); */
+/* 		nColNodes = IArray_GetSize( self->colInc ); */
+/* 		colNodes = IArray_GetPtr( self->colInc ); */
 
-		/* If none of the column equations on this element have BCs then skip it. */
-		for( n_i = 0; n_i < nRowNodes; n_i++ ) {
-			for( dof_i = 0; dof_i < rowDofs->dofCounts[rowNodes[n_i]]; dof_i++ ) {
-				if( rowEqNum->locationMatrix[e_i][n_i][dof_i] == (unsigned)-1 )
-					continue;
-				for( n_j = 0; n_j < nColNodes; n_j++ ) {
-					for( dof_j = 0; dof_j < colDofs->dofCounts[colNodes[n_j]]; dof_j++ ) {
-						if( colEqNum->locationMatrix[e_i][n_j][dof_j] == (unsigned)-1 )
-							break;
-					}
-					if( dof_j < colDofs->dofCounts[colNodes[n_j]] )
-						break;
-				}
-				if( n_j < nColNodes )
-					break;
-			}
-			if( dof_i < rowDofs->dofCounts[rowNodes[n_i]] )
-				break;
-		}
-		if( n_i == nRowNodes )
-			continue;
+/* 		/\* If none of the column equations on this element have BCs then skip it. *\/ */
+/* 		for( n_i = 0; n_i < nRowNodes; n_i++ ) { */
+/* 			for( dof_i = 0; dof_i < rowDofs->dofCounts[rowNodes[n_i]]; dof_i++ ) { */
+/* 				if( rowEqNum->locationMatrix[e_i][n_i][dof_i] == (unsigned)-1 ) */
+/* 					continue; */
+/* 				for( n_j = 0; n_j < nColNodes; n_j++ ) { */
+/* 					for( dof_j = 0; dof_j < colDofs->dofCounts[colNodes[n_j]]; dof_j++ ) { */
+/* 						if( colEqNum->locationMatrix[e_i][n_j][dof_j] == (unsigned)-1 ) */
+/* 							break; */
+/* 					} */
+/* 					if( dof_j < colDofs->dofCounts[colNodes[n_j]] ) */
+/* 						break; */
+/* 				} */
+/* 				if( n_j < nColNodes ) */
+/* 					break; */
+/* 			} */
+/* 			if( dof_i < rowDofs->dofCounts[rowNodes[n_i]] ) */
+/* 				break; */
+/* 		} */
+/* 		if( n_i == nRowNodes ) */
+/* 			continue; */
 
-		/* Do we need more space to assemble this element? */
-		nRowDofs = 0;
-		for( n_i = 0; n_i < nRowNodes; n_i++ )
-			nRowDofs += rowDofs->dofCounts[rowNodes[n_i]];
-		nColDofs = 0;
-		for( n_i = 0; n_i < nColNodes; n_i++ )
-			nColDofs += colDofs->dofCounts[colNodes[n_i]];
-		nDofs = nRowDofs * nColDofs;
-		if( nDofs > maxDofs ) {
-#if 0
-			elStiffMat = ReallocArray2D( elStiffMat, double, nRowDofs, nColDofs );
-#endif
-			values = ReallocArray( values, double, nDofs );
-			indices = ReallocArray( indices, unsigned, nDofs );
-			maxDofs = nDofs;
-		}
+/* 		/\* Do we need more space to assemble this element? *\/ */
+/* 		nRowDofs = 0; */
+/* 		for( n_i = 0; n_i < nRowNodes; n_i++ ) */
+/* 			nRowDofs += rowDofs->dofCounts[rowNodes[n_i]]; */
+/* 		nColDofs = 0; */
+/* 		for( n_i = 0; n_i < nColNodes; n_i++ ) */
+/* 			nColDofs += colDofs->dofCounts[colNodes[n_i]]; */
+/* 		nDofs = nRowDofs * nColDofs; */
+/* 		if( nDofs > maxDofs ) { */
+/* #if 0 */
+/* 			elStiffMat = ReallocArray2D( elStiffMat, double, nRowDofs, nColDofs ); */
+/* #endif */
+/* 			values = ReallocArray( values, double, nDofs ); */
+/* 			indices = ReallocArray( indices, unsigned, nDofs ); */
+/* 			maxDofs = nDofs; */
+/* 		} */
 
-#if 0
-		/* Assemble the element. */
-		memset( &elStiffMat[0][0], 0, nDofs * sizeof(double) );
-		StiffnessMatrix_AssembleElement( self, e_i, sle, elStiffMat );
-#endif
+/* #if 0 */
+/* 		/\* Assemble the element. *\/ */
+/* 		memset( &elStiffMat[0][0], 0, nDofs * sizeof(double) ); */
+/* 		StiffnessMatrix_AssembleElement( self, e_i, sle, elStiffMat ); */
+/* #endif */
 
-		elStiffMat = ((PETScShellMatrix*)self->matrix)->elStiffMat;	assert( elStiffMat );
+/* 		elStiffMat = ((PETScShellMatrix*)self->matrix)->elStiffMat;	assert( elStiffMat ); */
 
-		/* Update the force vector with BCs. */
-		curRow = 0;
-		memset( values, 0, nDofs * sizeof(double) );
-		for( n_i = 0; n_i < nRowNodes; n_i++ ) {
-			for( dof_i = 0; dof_i < rowDofs->dofCounts[rowNodes[n_i]]; dof_i++ ) {
-				indices[curRow] = rowEqNum->locationMatrix[e_i][n_i][dof_i];
-				if( indices[curRow] == (unsigned)-1 ) {
-					curRow++;
-					continue;
-				}
+/* 		/\* Update the force vector with BCs. *\/ */
+/* 		curRow = 0; */
+/* 		memset( values, 0, nDofs * sizeof(double) ); */
+/* 		for( n_i = 0; n_i < nRowNodes; n_i++ ) { */
+/* 			for( dof_i = 0; dof_i < rowDofs->dofCounts[rowNodes[n_i]]; dof_i++ ) { */
+/* 				indices[curRow] = rowEqNum->locationMatrix[e_i][n_i][dof_i]; */
+/* 				if( indices[curRow] == (unsigned)-1 ) { */
+/* 					curRow++; */
+/* 					continue; */
+/* 				} */
 
-				curCol = 0;
-				for( n_j = 0; n_j < nColNodes; n_j++ ) {
-					for( dof_j = 0; dof_j < colDofs->dofCounts[colNodes[n_j]]; dof_j++ ) {
-						colEq = colEqNum->locationMatrix[e_i][n_j][dof_j];
-						if( colEq != (unsigned)-1 ) {
-							curCol++;
-							continue;
-						}
+/* 				curCol = 0; */
+/* 				for( n_j = 0; n_j < nColNodes; n_j++ ) { */
+/* 					for( dof_j = 0; dof_j < colDofs->dofCounts[colNodes[n_j]]; dof_j++ ) { */
+/* 						colEq = colEqNum->locationMatrix[e_i][n_j][dof_j]; */
+/* 						if( colEq != (unsigned)-1 ) { */
+/* 							curCol++; */
+/* 							continue; */
+/* 						} */
 
-						bc = DofLayout_GetValueDouble( colDofs, colNodes[n_j], dof_j );
-						values[curRow] -= elStiffMat[curRow][curCol] * bc;
+/* 						bc = DofLayout_GetValueDouble( colDofs, colNodes[n_j], dof_j ); */
+/* 						values[curRow] -= elStiffMat[curRow][curCol] * bc; */
 
-						curCol++;
-					}
-				}
+/* 						curCol++; */
+/* 					} */
+/* 				} */
 
-				curRow++;
-			}
-		}
+/* 				curRow++; */
+/* 			} */
+/* 		} */
 
-		VecSetValues( rhs, curRow, indices, values, ADD_VALUES );
-	}
+/* 		VecSetValues( rhs, curRow, indices, values, ADD_VALUES ); */
+/* 	} */
 
-	FreeArray( values );
-	FreeArray( indices );
+/* 	FreeArray( values ); */
+/* 	FreeArray( indices ); */
 
-	VecAssemblyBegin( rhs );
-	VecAssemblyEnd( rhs );
-}
+/* 	VecAssemblyBegin( rhs ); */
+/* 	VecAssemblyEnd( rhs ); */
+/* } */
 
 
 
@@ -2787,13 +2791,13 @@ void StiffnessMatrix_RefreshMatrix( StiffnessMatrix* self ) {
 	/* Note: I'd like to make this a dereference, just in case there is another class still using 
 	   the old matrix, but that'd require two matrices to exist at one time; i.e. lots of memory. 
 	   Keeping it as a free just means that other classes need to assume they never own the matrix. */
-	if( self->useShellMatrix ) {
-		PETScShellMatrix_SetComm( self->shellMatrix, self->comm );
-		PETScShellMatrix_SetLocalSize( self->shellMatrix, self->rowLocalSize, self->colLocalSize );
-		PETScShellMatrix_SetNonZeroStructure( self->shellMatrix, self->nonZeroCount,
-			       			      self->diagonalNonZeroIndices, self->offDiagonalNonZeroIndices );
-	}
-	else {
+/* 	if( self->useShellMatrix ) { */
+/* 		PETScShellMatrix_SetComm( self->shellMatrix, self->comm ); */
+/* 		PETScShellMatrix_SetLocalSize( self->shellMatrix, self->rowLocalSize, self->colLocalSize ); */
+/* 		PETScShellMatrix_SetNonZeroStructure( self->shellMatrix, self->nonZeroCount, */
+/* 			       			      self->diagonalNonZeroIndices, self->offDiagonalNonZeroIndices ); */
+/* 	} */
+/* 	else { */
 		if( self->matrix != PETSC_NULL )
 			MatDestroy( self->matrix );
 		MatCreate( self->comm, &self->matrix );
@@ -2813,7 +2817,7 @@ void StiffnessMatrix_RefreshMatrix( StiffnessMatrix* self ) {
 			else
 				MatSeqAIJSetPreallocation( self->matrix, self->nonZeroCount, PETSC_NULL );
 		}
-	}
+/* 	} */
 }
 
 

@@ -66,10 +66,6 @@
 	#include "ForceTerm.h"
 	#include "Assembler.h"
 
-#ifdef HAVE_PETSC
-	#include "PETScShellMatrix.h"
-#endif
-
 	#include "SystemLinearEquations.h"
 	#include "SLE_Solver.h"
 

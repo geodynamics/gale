@@ -281,11 +281,7 @@ void _SolutionVector_Build( void* solutionVector, void* data ) {
 		Stg_Component_Build( self->feVariable, 0, False );
 
 	/* Allocate the vector */
-//#ifdef HAVE_PETSC
 //	self->vector = PETScVector_New( "" );
-//#else
-//	assert( 0 );
-//#endif
 //	Vector_SetComm( self->vector, self->comm );
 //	Vector_SetLocalSize( self->vector, self->feVariable->eqNum->localEqNumsOwnedCount );
 	VecCreate( self->comm, &self->vector );

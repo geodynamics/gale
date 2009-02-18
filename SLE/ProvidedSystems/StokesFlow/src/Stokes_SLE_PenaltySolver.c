@@ -282,9 +282,6 @@ void _Stokes_SLE_PenaltySolver_Solve( void* solver,void* stokesSLE ) {
 	MatAXPY( kHat, one, kMatrix, SAME_NONZERO_PATTERN );
 	
 	/* Setup solver context and make sure that it uses a direct solver */
-#ifndef HAVE_PETSC
-#error Need PETSc!
-#endif
 	KSPCreate( sle->comm, &sles_v );
 	KSPSetOperators( sles_v, kHat, kHat, DIFFERENT_NONZERO_PATTERN );
 	KSPSetType( sles_v, KSPPREONLY );

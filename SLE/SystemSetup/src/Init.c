@@ -67,8 +67,6 @@ Bool StgFEM_SLE_SystemSetup_Init( int* argc, char** argv[] ) {
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), StiffnessMatrixTerm_Type, "0", _StiffnessMatrixTerm_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), SystemLinearEquations_Type, "0", _SystemLinearEquations_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), ForceTerm_Type, "0", _ForceTerm_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), 
-				   PETScShellMatrix_Type, "0", (void*(*)(Name))PETScShellMatrix_New );
 
 	RegisterParent( SystemLinearEquations_Type,    Stg_Component_Type );
 	RegisterParent( SLE_Solver_Type,               Stg_Component_Type );
@@ -77,7 +75,6 @@ Bool StgFEM_SLE_SystemSetup_Init( int* argc, char** argv[] ) {
 	RegisterParent( SolutionVector_Type,           Stg_Component_Type );
 	RegisterParent( ForceVector_Type,              SolutionVector_Type );
 	RegisterParent( ForceTerm_Type,                Stg_Component_Type );
-	RegisterParent( PETScShellMatrix_Type,         Stg_Component_Type );
 	RegisterParent( Assembler_Type, Stg_Class_Type );
 	RegisterParent( FiniteElementContext_Type,     DomainContext_Type );
 

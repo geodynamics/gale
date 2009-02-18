@@ -77,9 +77,6 @@ void testStiffnessMatrixCompareFunction( FiniteElementContext* context ) {
 		Journal_Printf( infoStream, "Patching file '%s'\n", filename );
 	}
 
-#ifndef HAVE_PETSC
-#error No PETSc!
-#endif
 	savedMatrix = (Matrix*)PETScMatrix_New( "" );
 	Matrix_Load( savedMatrix, filename );
 

@@ -56,7 +56,6 @@
 	#include "units.h"
 	#include "types.h"
 
-#ifdef HAVE_PETSC
 	#include <petsc.h>
 	#include <petscvec.h>
 	#include <petscmat.h>
@@ -64,7 +63,6 @@
 	#include <petscmg.h>
 	#include <petscsnes.h>
 	#include "PETScErrorChecking.h"
-#endif
 
 	#include "FeMesh_Algorithms.h"
 	#include "FeMesh_ElementType.h"

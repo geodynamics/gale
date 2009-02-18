@@ -83,8 +83,7 @@
 		ForceVector*                                      rhs;                            \
 		ForceVector*					  transRHS;			  \
 		Mat	                                          matrix;                         \
-		PETScShellMatrix*				  shellMatrix;			  \
-		Bool						  useShellMatrix;		  \
+/* 		Bool						  useShellMatrix;		  \ */ \
 		Stg_Component*                                    applicationDepInfo;             \
 		Bool                                              isNonLinear;                    \
 		Bool                                              allowZeroElementContributions;  \
@@ -222,7 +221,7 @@
 	*/
 	void StiffnessMatrix_GlobalAssembly_General( void* stiffnessMatrix, Bool bcRemoveQuery, void* _sle, void* _context );
 
-	void StiffnessMatrix_ShellAssembly( void* stiffnessMatrix, Bool removeBCs, void* data );
+/* 	void StiffnessMatrix_ShellAssembly( void* stiffnessMatrix, Bool removeBCs, void* data ); */
 
 	/* +++ Private Functions +++ */
 

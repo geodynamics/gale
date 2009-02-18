@@ -58,7 +58,6 @@
 	typedef struct ForceVector                  ForceVector;
 	typedef struct ForceTerm                    ForceTerm;
 	typedef struct SolutionVector               SolutionVector;
-	typedef struct PETScShellMatrix		PETScShellMatrix;
 	typedef struct SystemLinearEquations        SystemLinearEquations;
 	typedef struct SLE_Solver                   SLE_Solver;
 	typedef struct FiniteElementContext         FiniteElementContext;

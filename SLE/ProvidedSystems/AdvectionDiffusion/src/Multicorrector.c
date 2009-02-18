@@ -184,12 +184,8 @@ void _AdvDiffMulticorrector_Construct( void* solver, Stg_ComponentFactory* cf, v
 	//self->matrixSolver = Stg_ComponentFactory_ConstructByKey( cf, self->name, "matrixSolver", MatrixSolver, 
 	//							  False, data );
 	if( self->matrixSolver == PETSC_NULL ) {
-//#ifdef HAVE_PETSC
 		//self->matrixSolver = (MatrixSolver*)PETScMatrixSolver_New( "" );
 		KSPCreate( MPI_COMM_WORLD, &self->matrixSolver );
-//#else
-		//self->matrixSolver = NULL;
-//#endif
 	}
 }
 

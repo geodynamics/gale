@@ -318,11 +318,7 @@ void _ForceVector_Build( void* forceVector, void* data ) {
 	
 	/* Allocate the vector */
 	Journal_DPrintfL( self->debug, 2, "Allocating the L.A. Force Vector with %d local entries.\n", self->localSize );
-//#ifdef HAVE_PETSC
 //	self->vector = (Vector*)PETScVector_New( "" );
-//#else
-//#error *** No linear algebra package found.
-//#endif
 	//Vector_SetComm( self->vector, self->comm );
 	//Vector_SetLocalSize( self->vector, self->localSize );
 	VecCreate( self->comm, &self->vector );
