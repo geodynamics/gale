@@ -176,10 +176,10 @@ void Underworld_ExtractPetscObjects_Dump( void* _context )
 		sprintf( mat_name, "%s/%s", context->outputPath, kName );
 		printf("  Writing kMatrix:                    %s \n",mat_name );
 		
-		if( !stokesSLE->kStiffMat->useShellMatrix )
+/* 		if( !stokesSLE->kStiffMat->useShellMatrix ) */
 			A = stokesSLE->kStiffMat->matrix;
-		else
-			A = stokesSLE->kStiffMat->shellMatrix->matrix;
+/* 		else */
+/* 			A = stokesSLE->kStiffMat->shellMatrix->matrix; */
 		PetscViewerBinaryOpen( comm, mat_name, FILE_MODE_WRITE, &mat_view_file );
 		MatView( A, mat_view_file );
 		PetscViewerDestroy( mat_view_file );
@@ -190,10 +190,10 @@ void Underworld_ExtractPetscObjects_Dump( void* _context )
 		sprintf( mat_name, "%s/%s", context->outputPath, GradName );
 		printf("  Writing Grad:                       %s \n",mat_name );
 		
-		if( !stokesSLE->gStiffMat->useShellMatrix )
+/* 		if( !stokesSLE->gStiffMat->useShellMatrix ) */
 			A = stokesSLE->gStiffMat->matrix;
-		else
-			A = stokesSLE->gStiffMat->shellMatrix->matrix;
+/* 		else */
+/* 			A = stokesSLE->gStiffMat->shellMatrix->matrix; */
 		PetscViewerBinaryOpen( comm, mat_name, FILE_MODE_WRITE, &mat_view_file );
 		MatView( A, mat_view_file );
 		PetscViewerDestroy( mat_view_file );
@@ -205,10 +205,10 @@ void Underworld_ExtractPetscObjects_Dump( void* _context )
 		sprintf( mat_name, "%s/%s", context->outputPath, DivName );
 		printf("  Writing Div:                        %s \n",mat_name );
 		
-		if( !stokesSLE->dStiffMat->useShellMatrix )
+/* 		if( !stokesSLE->dStiffMat->useShellMatrix ) */
 			A = stokesSLE->dStiffMat->matrix;
-		else
-			A = stokesSLE->dStiffMat->shellMatrix->matrix;
+/* 		else */
+/* 			A = stokesSLE->dStiffMat->shellMatrix->matrix; */
 		PetscViewerBinaryOpen( comm, mat_name, FILE_MODE_WRITE, &mat_view_file );
 		MatView( A, mat_view_file );
 		PetscViewerDestroy( mat_view_file );
@@ -220,10 +220,10 @@ void Underworld_ExtractPetscObjects_Dump( void* _context )
 		sprintf( mat_name, "%s/%s", context->outputPath, CName );
 		printf("  Writing C:                          %s \n",mat_name );
 		
-		if( !stokesSLE->cStiffMat->useShellMatrix )
+/* 		if( !stokesSLE->cStiffMat->useShellMatrix ) */
 			A = stokesSLE->cStiffMat->matrix;
-		else
-			A = stokesSLE->cStiffMat->shellMatrix->matrix;
+/* 		else */
+/* 			A = stokesSLE->cStiffMat->shellMatrix->matrix; */
 		PetscViewerBinaryOpen( comm, mat_name, FILE_MODE_WRITE, &mat_view_file );
 		MatView( A, mat_view_file );
 		PetscViewerDestroy( mat_view_file );
