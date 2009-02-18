@@ -58,6 +58,7 @@ for dep in deps:
                 print "fail"
 
 # Tell this root repository that its has forest
+os.chdir(cwd)
 c=ConfigParser.ConfigParser()
 c.read('.hg/hgrc')
 try:
