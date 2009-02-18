@@ -4,7 +4,7 @@ Import('env')
 #
 # Prepare the construction environment by copying the one we
 # were given.
-env = env.Clone()
+env = env.Copy()
 env.project_name = 'StgDomain'
 env.AppendUnique(CPPPATH=[env.get_build_path('include/' + env.project_name)])
 env.src_objs = []
