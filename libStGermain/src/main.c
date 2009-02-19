@@ -48,7 +48,15 @@
 #include <stdio.h>
 
 
-void stgMainLoop( Dictionary* dictionary, MPI_Comm CommWorld ) {
+void stgMain( Dictionary* dictionary, MPI_Comm CommWorld ) {
+	AbstractContext* context;
+
+	context = stgMainInit( dictionary, CommWorld );
+	stgMainLoop( context );
+	stgMainDestroy( context );
+}
+
+AbstractContext* stgMainInit( Dictionary* dictionary, MPI_Comm CommWorld ) {
 	AbstractContext*		context = NULL;
 	
 	/* Construction phase -----------------------------------------------------------------------------------------------*/
@@ -80,11 +88,18 @@ void stgMainLoop( Dictionary* dictionary, MPI_Comm CommWorld ) {
 	
 	/* Initialisaton phase ----------------------------------------------------------------------------------------------*/
 	Stg_Component_Initialise( context, 0 /* dummy */, False );
+
+	return context;
+}
 	
+void stgMainLoop( AbstractContext* context ) {
 	/* Run (Solve) phase ------------------------------------------------------------------------------------------------*/
 	AbstractContext_Dump( context );
 	Stg_Component_Execute( context, 0 /* dummy */, False );
+}
 
+
+void stgMainDestroy( AbstractContext* context ) {
 	/* Destruct phase ---------------------------------------------------------------------------------------------------*/
 	Stg_Component_Destroy( context, 0 /* dummy */, False );
 	Stg_Class_Delete( context );
