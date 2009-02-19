@@ -57,6 +57,87 @@ static void deleteListArgItem( void* ptr ) {
 	Memory_Free( ptr );
 }
 
+typedef void (ForEachFunc) ( Stream* stream, Type componentType );
+
+static void forEachComponent( Stream* stream, ForEachFunc* forEach ) {
+	BTreeIterator* i;
+	Stg_ComponentRegisterElement* cre;
+
+	i = Stg_ComponentRegister_GetIterator( Stg_ComponentRegister_Get_ComponentRegister() );
+	for( cre = Stg_ComponentRegisterIterator_First( i ); cre != NULL; cre = Stg_ComponentRegisterIterator_Next( i ) ) {
+		Type componentType = Stg_ComponentRegisterElement_GetType( cre );
+		forEach( stream, componentType );
+	}
+
+	Stg_Class_Delete( i );
+}
+
+static void forEachLiveComponent( Stream* stream, ForEachFunc* forEach ) {
+	Stg_ObjectList* uniqueComponentTypes;
+	Index i;
+
+	/* Add each instantiated component type to a list, ensuring the list is of unique entries */
+	uniqueComponentTypes = Stg_ObjectList_New();
+	for( i = 0; i < LiveComponentRegister_GetCount( stgLiveComponentRegister ); i ++ ) {
+		Type componentType = Stg_Class_GetType( LiveComponentRegister_At( stgLiveComponentRegister, i ) );
+		Index j;
+		Bool found;
+
+		found = False;
+		for( j = 0; componentType && j < Stg_ObjectList_Count( uniqueComponentTypes ); j++ ) {
+			char* added = (char*)Stg_ObjectAdaptor_Object( (Stg_ObjectAdaptor*)Stg_ObjectList_At( uniqueComponentTypes, j ) );
+			if( strcmp( componentType, added ) == 0 ) {
+				found = True;
+			}
+		}
+		if( componentType && !found ) {
+			Stg_ObjectList_PointerAppend( uniqueComponentTypes, componentType, 0, 0, 0, 0 );
+		}
+	}
+
+	for( i = 0; i < Stg_ObjectList_Count( uniqueComponentTypes ); i ++ ) {
+		Type componentType = (char*)Stg_ObjectAdaptor_Object( (Stg_ObjectAdaptor*)Stg_ObjectList_At( uniqueComponentTypes, i ) );
+		forEach( stream, componentType );
+	}
+	
+	Stg_Class_Delete( uniqueComponentTypes );
+}
+
+static void printComponentListItem( Stream* stream, Type componentType ) {
+	Journal_Printf( stream, "\t'%s'\n", componentType );
+}
+
+static void printReferencesListItem( Stream* stream, Type componentType ) {
+	char* reference = Stg_Meta_GetReference( Stg_ComponentRegister_GetMetadata( Stg_ComponentRegister_Get_ComponentRegister(), componentType, "0" ) );
+	Journal_Printf( 
+		stream, 
+		"\t'%s': %s\n", 
+		componentType,
+		( reference && reference[0] ) ? reference : "(None provided)" );
+		/* i.e. if not null and not an empty string print the value else default */
+}
+
+static void printEquationsListItem( Stream* stream, Type componentType ) {
+	char* equation = Stg_Meta_GetEquation( Stg_ComponentRegister_GetMetadata( Stg_ComponentRegister_Get_ComponentRegister(), componentType, "0" ) );
+	Journal_Printf( 
+		stream, 
+		"\t'%s': %s\n", 
+		componentType,
+		( equation && equation[0] ) ? equation : "(None provided)" );
+		/* i.e. if not null and not an empty string print the value else default */
+}
+
+static void printRightsListItem( Stream* stream, Type componentType ) {
+	char* rights = Stg_Meta_GetRights( Stg_ComponentRegister_GetMetadata( Stg_ComponentRegister_Get_ComponentRegister(), componentType, "0" ) );
+	Journal_Printf( 
+		stream, 
+		"\t'%s': %s\n", 
+		componentType,
+		( rights && rights[0] ) ? rights : "(None provided)" );
+		/* i.e. if not null and not an empty string print the value else default */
+}
+
+
 int main( int argc, char* argv[] ) {
 	/* StGermain standard bits & pieces */
 	MPI_Comm			CommWorld;
@@ -107,14 +188,14 @@ int main( int argc, char* argv[] ) {
 	if( helpTopic || Stg_ObjectList_Count( listAllTopics ) ) {
 		PluginsManager* plugins = PluginsManager_New();
 		Dictionary* metadata;
-		Stg_ComponentRegister* cr = Stg_ComponentRegister_Get_ComponentRegister();
 		Index i;
 
 		ModulesManager_Load( stgToolboxesManager, dictionary );
 		ModulesManager_Load( plugins, dictionary );
 
+		/* "--help" parameter */
 		if( helpTopic ) {
-			metadata = Stg_ComponentRegister_GetMetadata( cr, helpTopic, "0" );
+			metadata = Stg_ComponentRegister_GetMetadata( Stg_ComponentRegister_Get_ComponentRegister(), helpTopic, "0" );
 			if( metadata ) {
 				Stg_Meta_Print( metadata, stream );
 			}
@@ -124,94 +205,30 @@ int main( int argc, char* argv[] ) {
 			Memory_Free( helpTopic );
 			helpTopic = 0;
 		}
+
+		/* "--list-all" parameters */
 		for( i = 0; i < Stg_ObjectList_Count( listAllTopics ); i++ ) {
 			listAllTopic = (char*)Stg_ObjectAdaptor_Object( (Stg_ObjectAdaptor*)Stg_ObjectList_At( listAllTopics, i ) );
 
 			if( strcmp( listAllTopic, "components" ) == 0 ) {
-				BTreeIterator* i;
-				Stg_ComponentRegisterElement* cre;
-
 				Journal_Printf( stream, "Registered components are:\n" );
-				i = Stg_ComponentRegister_GetIterator( cr );
-				for( 
-					cre = Stg_ComponentRegisterIterator_First( i ); 
-					cre != NULL; 
-					cre = Stg_ComponentRegisterIterator_Next( i ) )
-				{
-					Journal_Printf( stream, "\t'%s'\n", Stg_ComponentRegisterElement_GetType( cre ) );
-				}
-
-				Stg_Class_Delete( i );
+				forEachComponent( stream, printComponentListItem );
 			}
 			else if( strcmp( listAllTopic, "references" ) == 0 ) {
-				BTreeIterator* i;
-				Stg_ComponentRegisterElement* cre;
-
-				Journal_Printf( stream, "Component references are:\n" );
-				i = Stg_ComponentRegister_GetIterator( cr );
-				for( 
-					cre = Stg_ComponentRegisterIterator_First( i ); 
-					cre != NULL; 
-					cre = Stg_ComponentRegisterIterator_Next( i ) )
-				{
-					char* reference = Stg_Meta_GetReference( Stg_ComponentRegisterElement_GetMetadata( cre ) );
-					Journal_Printf( 
-						stream, 
-						"\t'%s': %s\n", 
-						Stg_ComponentRegisterElement_GetType( cre ),
-						( reference && reference[0] ) ? reference : "(None provided)" );
-						/* i.e. if not null and not an empty string print the value else default */
-				}
-
-				Stg_Class_Delete( i );
+				Journal_Printf( stream, "Registered components references are:\n" );
+				forEachComponent( stream, printReferencesListItem );
 			}
 			else if( strcmp( listAllTopic, "equations" ) == 0 ) {
-				BTreeIterator* i;
-				Stg_ComponentRegisterElement* cre;
-
-				Journal_Printf( stream, "Component equations are:\n" );
-				i = Stg_ComponentRegister_GetIterator( cr );
-				for( 
-					cre = Stg_ComponentRegisterIterator_First( i ); 
-					cre != NULL; 
-					cre = Stg_ComponentRegisterIterator_Next( i ) )
-				{
-					char* equation = Stg_Meta_GetEquation( Stg_ComponentRegisterElement_GetMetadata( cre ) );
-					Journal_Printf( 
-						stream, 
-						"\t'%s': %s\n", 
-						Stg_ComponentRegisterElement_GetType( cre ),
-						( equation && equation[0] ) ? equation : "(None provided)" );
-						/* i.e. if not null and not an empty string print the value else default */
-				}
-
-				Stg_Class_Delete( i );
+				Journal_Printf( stream, "Registered components equations are:\n" );
+				forEachComponent( stream, printEquationsListItem );
 			}
 			else if( strcmp( listAllTopic, "rights" ) == 0 ) {
-				BTreeIterator* i;
-				Stg_ComponentRegisterElement* cre;
-
-				Journal_Printf( stream, "Component references are:\n" );
-				i = Stg_ComponentRegister_GetIterator( cr );
-				for( 
-					cre = Stg_ComponentRegisterIterator_First( i ); 
-					cre != NULL; 
-					cre = Stg_ComponentRegisterIterator_Next( i ) )
-				{
-					char* rights = Stg_Meta_GetRights( Stg_ComponentRegisterElement_GetMetadata( cre ) );
-					Journal_Printf( 
-						stream, 
-						"\t'%s': %s\n", 
-						Stg_ComponentRegisterElement_GetType( cre ),
-						( rights && rights[0] ) ? rights : "(None provided)" );
-						/* i.e. if not null and not an empty string print the value else default */
-				}
-
-				Stg_Class_Delete( i );
+				Journal_Printf( stream, "Registered components rights are:\n" );
+				forEachComponent( stream, printRightsListItem );
 			}
 			else {
-				Journal_Printf( stream, "List topic '%s' not found.\n", listAllTopic );
-				Journal_Printf( stream, "Available topics are:\n\t'all-components'\n\t'all-references'\n\t'all-equations'\n\t'all-rights'\n", listAllTopic );
+				Journal_Printf( stream, "List-all topic '%s' not found.\n", listAllTopic );
+				Journal_Printf( stream, "Available topics are:\n\t'components'\n\t'references'\n\t'equations'\n\t'rights'\n", listAllTopic );
 			}
 		}
 
@@ -220,61 +237,50 @@ int main( int argc, char* argv[] ) {
 	}
 	else {  /* ... run the app */
 		Index i;
-		AbstractContext*                context;
+		AbstractContext* context;
 
 		/* Magic happens here! */
 		context = stgMainInit( dictionary, CommWorld );
 		stgMainLoop( context );
 
+		/* "--list" parameters */
 		for( i = 0; i < Stg_ObjectList_Count( listTopics ); i++ ) {
 			listTopic = (char*)Stg_ObjectAdaptor_Object( (Stg_ObjectAdaptor*)Stg_ObjectList_At( listTopics, i ) );
 
 			if( strcmp( listTopic, "components" ) == 0 ) {
-				Stg_ObjectList* uniqueComponentTypes;
-				Index i;
-
-				/* Add each instantiated component type to a list, ensuring the list is of unique entries */
-				uniqueComponentTypes = Stg_ObjectList_New();
-				for( i = 0; i < LiveComponentRegister_GetCount( stgLiveComponentRegister ); i ++ ) {
-					Type componentType = Stg_Class_GetType( LiveComponentRegister_At( stgLiveComponentRegister, i ) );
-					Index j;
-					Bool found;
-
-					found = False;
-					for( j = 0; componentType && j < Stg_ObjectList_Count( uniqueComponentTypes ); j++ ) {
-						char* added = (char*)Stg_ObjectAdaptor_Object( (Stg_ObjectAdaptor*)Stg_ObjectList_At( uniqueComponentTypes, j ) );
-						if( strcmp( componentType, added ) == 0 ) {
-							found = True;
-						}
-					}
-					if( componentType && !found ) {
-						Stg_ObjectList_PointerAppend( uniqueComponentTypes, componentType, 0, 0, 0, 0 );
-					}
-				}
-
 				Journal_Printf( stream, "Instantiated/used components are:\n" );
-				for( i = 0; i < Stg_ObjectList_Count( uniqueComponentTypes ); i ++ ) {
-					Type componentType = (char*)Stg_ObjectAdaptor_Object( (Stg_ObjectAdaptor*)Stg_ObjectList_At( uniqueComponentTypes, i ) );
-					Journal_Printf( stream, "\t'%s'\n", componentType );
-				}
-				
-				Stg_Class_Delete( uniqueComponentTypes );
+				forEachLiveComponent( stream, printComponentListItem );
+			}
+			else if( strcmp( listTopic, "references" ) == 0 ) {
+				Journal_Printf( stream, "Instantiated/used components references are:\n" );
+				forEachLiveComponent( stream, printReferencesListItem );
+			}
+			else if( strcmp( listTopic, "equations" ) == 0 ) {
+				Journal_Printf( stream, "Instantiated/used components equations are:\n" );
+				forEachLiveComponent( stream, printEquationsListItem );
+			}
+			else if( strcmp( listTopic, "rights" ) == 0 ) {
+				Journal_Printf( stream, "Instantiated/used components rights are:\n" );
+				forEachLiveComponent( stream, printRightsListItem );
+			}
+			else {
+				Journal_Printf( stream, "List topic '%s' not found.\n", listTopic );
+				Journal_Printf( stream, "Available topics are:\n\t'components'\n\t'references'\n\t'equations'\n\t'rights'\n", listTopic );
 			}
 		}
 
 		stgMainDestroy( context );
 	}
 	
+
+	/* Close off everything */
 	Stg_Class_Delete( listAllTopics );
 	Stg_Class_Delete( listTopics );
 	Stg_Class_Delete( dictionary );
-	
-	/* Close off everything */
 	#ifdef HAVE_PYTHON
 		Py_Finalize();
 	#endif
 	StGermain_Finalise();
-//	Journal_Printf( stream, "Finalised: StGermain Framework.\n");
 	MPI_Finalize();
 	
 	return 0; /* success */
