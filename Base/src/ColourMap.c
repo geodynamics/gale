@@ -321,7 +321,7 @@ void lucColourMap_GetColourFromValue( void* colourMap, double value, lucColour* 
 		max 	    = log10(self->maximum);
 		min  	    = log10(self->minimum);
                 if(Num_Approx(self->centringValue, 0.0))
-                  centre = 0.0;
+                  centre = 0.5*(max - min);
                 else
                   centre 	    = log10(self->centringValue);
 		sampleValue = log10(value);
