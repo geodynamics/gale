@@ -69,6 +69,7 @@
 		ExtensionInfo_Index                                 particleExtHandle;                     \
 		/* Param passed in */\
 		FeVariable*                                         pressureField;                         \
+                SwarmVariable*                                      swarmPressure;                         \
 		double                                              minimumYieldStress;                    \
 		double                                              frictionCoefficient;                   \
 		double                                              frictionCoefficientAfterSoftening; \

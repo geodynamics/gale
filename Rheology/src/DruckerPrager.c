@@ -198,7 +198,10 @@ void _DruckerPrager_Construct( void* druckerPrager, Stg_ComponentFactory* cf, vo
 	_VonMises_Construct( self, cf, data );
 	
 	pressureField      = (FeVariable *) 
-			Stg_ComponentFactory_ConstructByKey( cf, self->name, "PressureField", FeVariable, True, data );
+            Stg_ComponentFactory_ConstructByKey( cf, self->name, "PressureField", FeVariable, False, data );
+        self->swarmPressure = Stg_ComponentFactory_ConstructByKey(
+            cf, self->name, "swarmPressure", SwarmVariable, False, data );
+	assert( pressureField || self->swarmPressure );
 			
 	materialPointsSwarm     = (MaterialPointsSwarm*)
 			Stg_ComponentFactory_ConstructByKey( cf, self->name, "MaterialPointsSwarm", MaterialPointsSwarm, True, data );
@@ -299,7 +302,13 @@ double _DruckerPrager_GetYieldCriterion(
 	
 	particleExt = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, materialPoint, self->particleExtHandle );
 
-	FeVariable_InterpolateWithinElement( pressureField, lElement_I, xi, &pressure );
+        if( self->pressureField )
+          FeVariable_InterpolateWithinElement( self->pressureField, lElement_I, xi, &pressure );
+        else {
+          SwarmVariable_ValueAt( self->swarmPressure,
+                                 constitutiveMatrix->currentParticleIndex,
+                                 &pressure );
+        }
 	
 	/* Strain softening of yield stress - if the strain weakening is not defined then this function returns 
 	 * a 0 value */
