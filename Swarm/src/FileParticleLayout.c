@@ -364,8 +364,10 @@ void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm
       for( swarmVar_I = 0; swarmVar_I < swarm->swarmVariable_Register->objects->count; swarmVar_I++ ) {
          swarmVar = SwarmVariable_Register_GetByIndex( swarm->swarmVariable_Register, swarmVar_I );
          /* only retrieve variable if it does not have a parent, as these
-            are not stored, and the data is retrieved when the parent is */
-            if( !swarmVar->variable->parent ) {
+            are not stored, and the data is retrieved when the parent is. 
+	    Also do make sure variable is of type SwarmVariable (as opposed 
+	    to materialSwarmVariable, which is not checkpointed). */
+         if((0 == strcmp(swarmVar->type, "SwarmVariable")) && !swarmVar->variable->parent ) {
             
             sprintf( dataSpaceName, "/%s", swarmVar->name );
             
@@ -447,8 +449,10 @@ void _FileParticleLayout_InitialiseParticle(
    for( swarmVar_I = 0; swarmVar_I < swarm->nSwarmVars; swarmVar_I++ ) {
       swarmVar = SwarmVariable_Register_GetByIndex( swarm->swarmVariable_Register, swarmVar_I );
       /* only retrieve variable if it does not have a parent, as these
-         are not stored, and the data is retrieved when the parent is */
-      if( !swarmVar->variable->parent ) {          
+         are not stored, and the data is retrieved when the parent is. 
+         Also do make sure variable is of type SwarmVariable (as opposed 
+         to materialSwarmVariable, which is not checkpointed). */
+      if((0 == strcmp(swarmVar->type, "SwarmVariable")) && !swarmVar->variable->parent ) {          
          /* Update the hyperslab. */   
          self->count[1] = swarmVar->dofCount;
          memSpace = H5Screate_simple( 2, self->count, NULL );
