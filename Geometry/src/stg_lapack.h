@@ -39,13 +39,13 @@
 #ifndef __Domain_Geometry_stg_lapack_h__
 #define __Domain_Geometry_stg_lapack_h__
 
-#ifdef FORTRAN_NORMAL
+#ifdef BLASLAPACK_NORMAL
 	#define stg_dgeev dgeev
-#elif FORTRAN_SINGLE_TRAILINGBAR
+#elif BLASLAPACK_SINGLE_UNDERBAR
 	#define stg_dgeev dgeev_
-#elif FORTRAN_DOUBLE_TRAILINGBAR
+#elif BLASLAPACK_DOUBLE_UNDERBAR
 	#define stg_dgeev dgeev__
-#elif FORTRAN_UPPERCASE
+#elif BLASLAPACK_CAPS
 	#define stg_dgeev DGEEV
 #else 
 	/* FALLBACK - eg for Intel MKL C implementation*/
