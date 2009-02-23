@@ -268,6 +268,8 @@ void _Swarm_Init(
 	}
 
 	self->incArray = IArray_New();
+
+	self->expanding = 0;
 }
 
 
@@ -1536,13 +1538,13 @@ void Swarm_Realloc( void* swarm ) {
 	Particle_Index delta              = self->particlesArrayDelta;
 	int v_i;
 
-	if ( particleLocalCount <= self->particlesArraySize - delta ) {
+	if ( !self->expanding && particleLocalCount <= self->particlesArraySize - delta ) {
 		/* Decrease size of array if necessary */
 		self->particlesArraySize = particleLocalCount;
 	}
 	else if ( particleLocalCount >= self->particlesArraySize ) {
-		/* Increase size of array if necessary */
-		self->particlesArraySize = particleLocalCount + delta;
+	    /* Increase size of array if necessary */
+	    self->particlesArraySize = (particleLocalCount/delta + 1)*delta;
 	}
 	else {
 		/* If no change in the size of the array happened then get out of this function */
