@@ -56,15 +56,14 @@
 		__lucOpenGLDrawingObject \
 		/* Virtual functions go here */ \
 		/* Other info */\
-		FieldVariable*                                     fieldVariable;          \
-		lucColourMap*                                      colourMap;              \
-		lucColour                                          colour;                 \
-		IJK                                                resolution;             \
-		float                                              lineWidth;              \
-		Index                                              isovalueCount;          \
-		double*                                            isovalueList;           \
+		FieldVariable*            fieldVariable;          \
+		lucColourMap*             colourMap;              \
+		lucColour                 colour;                 \
+		IJK                       resolution;             \
+		float                     lineWidth;              \
+		Bool                      showValues;             \
 		/* Interval Stuff */ \
-		double                                             interval;               \
+		double                    interval;               \
 
 	struct lucContour { __lucContour };
 	
