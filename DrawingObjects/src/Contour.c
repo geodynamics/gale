@@ -117,32 +117,26 @@ lucContour* _lucContour_New(
 }
 
 void _lucContour_Init( 
-		lucContour*                                         self,
-		FieldVariable*                                      fieldVariable,
-		lucColourMap*                                       colourMap,
-		Name                                                colourName,
-		IJK                                                 resolution,
-		double                                              lineWidth,
-		Index                                               isovalueCount,
-		double*                                             isovalueList,
-		double                                              interval )
+		lucContour*      self,
+		FieldVariable*   fieldVariable,
+		lucColourMap*    colourMap,
+		Name             colourName,
+		IJK              resolution,
+		double           lineWidth,
+    Bool             showValues,
+		double           interval )
 {
 	self->fieldVariable = fieldVariable;
 	self->colourMap     = colourMap;
 	lucColour_FromString( &self->colour, colourName );
 	memcpy( self->resolution, resolution, sizeof(IJK) );
 	self->lineWidth = lineWidth;
-	self->isovalueCount = isovalueCount;
-
-	self->isovalueList = Memory_Alloc_Array( double, isovalueCount, "isovalue list" );
-	memcpy( self->isovalueList, isovalueList, isovalueCount * sizeof(double) );
+	self->showValues = showValues;
 	self->interval = interval;
 }
 
 void _lucContour_Delete( void* drawingObject ) {
 	lucContour*  self = (lucContour*)drawingObject;
-
-	Memory_Free( self->isovalueList );
 
 	_lucOpenGLDrawingObject_Delete( self );
 }
@@ -192,6 +186,7 @@ void _lucContour_Construct( void* drawingObject, Stg_ComponentFactory* cf, void*
 	FieldVariable*   fieldVariable;
 	lucColourMap*    colourMap;
 	IJK              resolution;
+	Bool             showValues;
 
 	/* Construct Parent */
 	_lucOpenGLDrawingObject_Construct( self, cf, data );
@@ -199,6 +194,7 @@ void _lucContour_Construct( void* drawingObject, Stg_ComponentFactory* cf, void*
 	fieldVariable =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "FieldVariable", FieldVariable, True,  data );
 	colourMap     =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "ColourMap",     lucColourMap,  False, data );
 
+	showValues = Stg_ComponentFactory_GetBool( cf, self->name, "showValues", True );
 	defaultResolution = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolution", 8 );
 	resolution[ I_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolutionX", defaultResolution );
 	resolution[ J_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolutionY", defaultResolution );
@@ -211,9 +207,8 @@ void _lucContour_Construct( void* drawingObject, Stg_ComponentFactory* cf, void*
 			Stg_ComponentFactory_GetString( cf, self->name, "colour", "black" ),
 			resolution,
 			(float) Stg_ComponentFactory_GetDouble( cf, self->name, "lineWidth", 1.0 ),
-			0,
-			NULL,
-			Stg_ComponentFactory_GetDouble( cf, self->name, "interval", -1.0 ) ) ;
+      showValues,
+			Stg_ComponentFactory_GetDouble( cf, self->name, "interval", 0.33 ) ) ;
 }
 
 void _lucContour_Build( void* drawingObject, void* data ) {}
@@ -244,7 +239,6 @@ void _lucContour_BuildDisplayList( void* drawingObject, void* _context ) {
 	double                 minIsovalue     = FieldVariable_GetMinGlobalFieldMagnitude( fieldVariable );
 	double                 maxIsovalue     = FieldVariable_GetMaxGlobalFieldMagnitude( fieldVariable );
 	lucColourMap*          colourMap       = self->colourMap;
-	Index                  isovalue_I;
 	Coord min, max;
 	
 	glLineWidth(self->lineWidth);
@@ -253,16 +247,6 @@ void _lucContour_BuildDisplayList( void* drawingObject, void* _context ) {
 	
 	lucColour_SetOpenGLColour( &self->colour );
 
-	/* Draw static isovalues */
-	for ( isovalue_I = 0 ; isovalue_I < self->isovalueCount ; isovalue_I++ ) {
-		isovalue = self->isovalueList[isovalue_I];
-	
-		if ( colourMap )
-			lucColourMap_SetOpenGLColourFromValue( colourMap, isovalue );
-
-		lucContour_DrawContourWalls( self, isovalue, min, max );
-	}
-	
 	/* Draw isovalues at interval */
 	if ( interval <= 0.0 ) 
 		return;
@@ -322,7 +306,10 @@ void lucContour_DrawContour(
 	double **              array;
 	Index                  resolutionA     = self->resolution[ aAxis ];
 	Index                  resolutionB     = self->resolution[ bAxis ];
+  char                   numberStr[10];
 	double                 dA, dB;
+  int rememberCoord = 0;
+  double writePos[2];
 	
 	/* Find position of cross - section */
 	pos[planeAxis] = planeHeight;
@@ -385,7 +372,11 @@ void lucContour_DrawContour(
 					/*  ##  */	
 					lucContour_PlotPoint( LEFT, isovalue, array[i][j], array[i+1][j], array[i][j+1], array[i+1][j+1], pos, dA, dB, planeAxis );
 					lucContour_PlotPoint( RIGHT, isovalue, array[i][j], array[i+1][j], array[i][j+1], array[i+1][j+1], pos, dA, dB, planeAxis );
-					break;
+					if( rememberCoord == 0 )  {
+            writePos[0] = pos[aAxis] + dA;
+            writePos[1] = pos[bAxis] + dB;
+            rememberCoord = 1;
+          }break;
 				case 4:
 					/*  #@  */
 					/*  @@  */
@@ -397,7 +388,11 @@ void lucContour_DrawContour(
 					/*  #@  */
 					lucContour_PlotPoint( TOP   , isovalue, array[i][j], array[i+1][j], array[i][j+1], array[i+1][j+1], pos, dA, dB, planeAxis );
 					lucContour_PlotPoint( BOTTOM, isovalue, array[i][j], array[i+1][j], array[i][j+1], array[i+1][j+1], pos, dA, dB, planeAxis );
-					break;
+					if( rememberCoord == 0 )  {
+            writePos[0] = pos[aAxis] + dA;
+            writePos[1] = pos[bAxis] + dB;
+            rememberCoord = 1;
+          }break;
 				case 6:
 					/*  #@  */
 					/*  @#  */
@@ -433,6 +428,11 @@ void lucContour_DrawContour(
 					/*  @#  */
 					lucContour_PlotPoint( TOP, isovalue, array[i][j], array[i+1][j], array[i][j+1], array[i+1][j+1], pos, dA, dB, planeAxis );
 					lucContour_PlotPoint( BOTTOM, isovalue, array[i][j], array[i+1][j], array[i][j+1], array[i+1][j+1], pos, dA, dB, planeAxis );
+          if( rememberCoord == 0 )  {
+            writePos[0] = pos[aAxis] + dA;
+            writePos[1] = pos[bAxis] + dB;
+            rememberCoord = 1;
+          }
 					break;
 				case 11:
 					/*  @#  */
@@ -445,7 +445,11 @@ void lucContour_DrawContour(
 					/*  @@  */
 					lucContour_PlotPoint( LEFT, isovalue, array[i][j], array[i+1][j], array[i][j+1], array[i+1][j+1], pos, dA, dB, planeAxis );
 					lucContour_PlotPoint( RIGHT, isovalue, array[i][j], array[i+1][j], array[i][j+1], array[i+1][j+1], pos, dA, dB, planeAxis );
-					break;
+					if( rememberCoord == 0 )  {
+            writePos[0] = pos[aAxis] + dA;
+            writePos[1] = pos[bAxis] + dB;
+            rememberCoord = 1;
+          }break;
 				case 13:
 					/*  ##  */
 					/*  #@  */
@@ -470,6 +474,14 @@ void lucContour_DrawContour(
 		}
 	}
 	glEnd();
+
+  /* print the isovalue "near" the last isovalue */
+  glRasterPos2d( writePos[0], writePos[1] );
+
+  sprintf( numberStr, "%g", isovalue );
+  lucPrintString( numberStr );
+  rememberCoord= 0;
+
 	glEnable(GL_LIGHTING);
 
 	/* Clean up */
