@@ -433,7 +433,7 @@ Bool Mesh_Search( void* mesh, double* point,
 Bool Mesh_SearchElements( void* mesh, double* point, unsigned* elInd ) {
 	Mesh*	self = (Mesh*)mesh;
 
-	assert( self && Stg_CheckType( self, Mesh ) );
+/* 	assert( self && Stg_CheckType( self, Mesh ) ); */
 
 	return Mesh_Algorithms_SearchElements( self->algorithms, point, elInd );
 }
