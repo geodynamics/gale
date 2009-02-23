@@ -15,10 +15,10 @@
 			<param name="dynamicRange">True</param>
 		</struct>
 		<!-- Drawing Objects -->
-                <struct name="tempContoursTitle" mergeType="replace">
-                        <param name="Type">lucTitle</param>
-                        <param name="string">Temperature Contours</param>
-                </struct>
+    <struct name="tempContoursTitle" mergeType="replace">
+      <param name="Type">lucTitle</param>
+      <param name="string">Temperature Contours</param>
+    </struct>
 
 		<struct name="temperatureMap">
 			<param name="Type">lucScalarField</param>
@@ -30,9 +30,9 @@
 			<param name="Type">lucContour</param>
 			<param name="FieldVariable">TemperatureField</param>
 			<param name="colour">black</param>
-			<param name="interval">0.1</param>
+			<param name="interval">0.2</param>
 			<param name="resolution">20</param>
-			<param name="lineWidth">1</param>
+			<param name="lineWidth">2</param>
 		</struct>
 		<struct name="border" mergeType="replace">
 			<param name="Type">lucFieldVariableBorder</param>
@@ -49,9 +49,9 @@
 			<param name="compositeEachObject">t</param>
 			<list name="DrawingObject">
 				<param>tempContoursTitle</param>
+				<param>temperatureContours</param>
 				<param>temperatureMap</param>
 				<param>border</param>
-				<param>temperatureContours</param>
 				<param>temperatureColourBar</param>
 			</list>
 		</struct>
