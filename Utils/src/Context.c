@@ -197,6 +197,7 @@ void _UnderworldContext_Print( void* context, Stream* stream ) {
 
 	Journal_PrintPointer( stream, self->stokesSLE );
 	Journal_PrintPointer( stream, self->energySLE );
+	Journal_PrintPointer( stream, self->compositionSLE );
 	Journal_PrintPointer( stream, self->constitutiveMatrix );
 	
 	Journal_PrintPointer( stream, self->gaussSwarm );
@@ -241,6 +242,7 @@ void UnderworldContext_AssignPointers( void* context, void* ptrToContext ) {
 	/* Get SLEs */
 	self->stokesSLE = (Stokes_SLE*)            LiveComponentRegister_Get( self->CF->LCRegister, "stokesEqn" );
 	self->energySLE = (AdvectionDiffusionSLE*) LiveComponentRegister_Get( self->CF->LCRegister, "EnergyEqn" );
+	self->compositionSLE = (AdvectionDiffusionSLE*) LiveComponentRegister_Get( self->CF->LCRegister, "CompositionEqn" );
 	self->constitutiveMatrix = (ConstitutiveMatrix*) LiveComponentRegister_Get( self->CF->LCRegister, "constitutiveMatrix" );
 	
 	/* Swarms */

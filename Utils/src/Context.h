@@ -60,10 +60,11 @@
 		/* SLE Stuff */ \
 		Stokes_SLE*                    stokesSLE;                     \
 		AdvectionDiffusionSLE*         energySLE;                     \
+		AdvectionDiffusionSLE*         compositionSLE;                \
 		ConstitutiveMatrix*            constitutiveMatrix;            \
 		/* Swarms */ \
 		Swarm*                         gaussSwarm;                    \
-		IntegrationPointsSwarm*        picIntegrationPoints;                \
+		IntegrationPointsSwarm*        picIntegrationPoints;          \
 		/* FeVariables */ \
 		FeVariable*                    velocityField;                 \
 		FeVariable*                    velocityGradientsField;        \

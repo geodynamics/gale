@@ -22,7 +22,8 @@
 		/* Virtual functions go here */ \
 		\
 		/* Passed in parameters */ \
-		BuoyancyForceTerm*       buoyancyForceTerm;
+		BuoyancyForceTerm*       buoyancyForceTerm; \
+		Variable_Register*       variable_Register;
 		
 	struct DensityField { __DensityField };
 	

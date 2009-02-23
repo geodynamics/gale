@@ -80,30 +80,10 @@ void _DensityField_Init(
 		BuoyancyForceTerm*                               buoyancyForceTerm,
 		Variable_Register*                                variable_Register )
 {
-	Name              tmpName;
 
 	/* Assign Pointers */
 	self->buoyancyForceTerm = buoyancyForceTerm;
-
-	/* Create Dof Layout */
-	assert( Class_IsSuper( self->feMesh->topo, IGraph ) );
-	tmpName = Stg_Object_AppendSuffix( self, "DataVariable" );
-	self->dataVariable = Variable_NewScalar( 	
-			tmpName,
-			Variable_DataType_Double, 
-			&((IGraph*)self->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 
-			NULL,
-			(void**)&self->data, 
-			variable_Register );
-	Memory_Free( tmpName );
-	self->fieldComponentCount = 1;
-	
-	tmpName = Stg_Object_AppendSuffix( self, "DofLayout" );
-	self->dofLayout = DofLayout_New( tmpName, variable_Register, 0, self->feMesh );
-	DofLayout_AddAllFromVariableArray( self->dofLayout, 1, &self->dataVariable );
-	Memory_Free( tmpName );
-	self->eqNum->dofLayout = self->dofLayout;
-	
+	self->variable_Register = variable_Register;
 	
 	/* Set pointers to swarm to be the same as the one on the constitutive matrix */
 	self->assemblyTerm->integrationSwarm = self->buoyancyForceTerm->integrationSwarm;
@@ -188,6 +168,28 @@ void _DensityField_Construct( void* densityField, Stg_ComponentFactory* cf, void
 
 void _DensityField_Build( void* densityField, void* data ) {
 	DensityField* self = (DensityField*) densityField;
+	Variable_Register* variable_Register = (Variable_Register*) self->variable_Register;
+	Name              tmpName;
+
+  	/* Create Dof Layout */
+	assert( Class_IsSuper( self->feMesh->topo, IGraph ) );
+	tmpName = Stg_Object_AppendSuffix( self, "densityVariable" );
+	self->dataVariable = Variable_NewScalar( 	
+			tmpName,
+			Variable_DataType_Double, 
+			&((IGraph*)self->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 
+			NULL,
+			(void**)&self->data, 
+			variable_Register );
+	Memory_Free( tmpName );
+	self->fieldComponentCount = 1;
+	
+	tmpName = Stg_Object_AppendSuffix( self, "densityDOF" );
+	self->dofLayout = DofLayout_New( tmpName, variable_Register, 0, self->feMesh );
+	self->dofLayout->_numItemsInLayout = FeMesh_GetNodeDomainSize( self->feMesh );
+	DofLayout_AddAllFromVariableArray( self->dofLayout, 1, &self->dataVariable );
+	Memory_Free( tmpName );
+	self->eqNum->dofLayout = self->dofLayout;
 
 	_ParticleFeVariable_Build( self, data );
 }
