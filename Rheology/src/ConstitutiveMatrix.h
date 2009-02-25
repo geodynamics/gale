@@ -70,7 +70,7 @@
 		\
 		/* ConstitutiveMatrix info */                                                   \
 		double**                                     matrixData;                        \
-                double                                       derivs[9];                         \
+    double                                       derivs[9];                         \
 		Dimension_Index                              dim;                               \
 		Bool                                         isSwarmTypeIntegrationPointsSwarm; \
 		Materials_Register*                          materials_Register;                \
@@ -80,7 +80,11 @@
 		Bool                                         previousSolutionExists;            \
 		int                                          currentParticleIndex;              \
 		SystemLinearEquations*                       sle;                               \
-		Iteration_Index                              sleNonLinearIteration_I;
+		Iteration_Index                              sleNonLinearIteration_I;           \
+    /* below is needed to store the constitutiveMatrix per particle */ \
+		Bool                                         storeConstitutiveMatrix;           \
+		Index                                        storedConstHandle;                 \
+		SwarmVariable*                               swarmVar_cMatrix;                  \
 		
 	struct ConstitutiveMatrix { __ConstitutiveMatrix };
 
@@ -167,5 +171,15 @@
 
 	#define ConstitutiveMatrix_GetMesh( constitutiveMatrix ) \
 		( (constitutiveMatrix)->stiffnessMatrix->rowVariable->feMesh )
+
+  /* Returns the handle to the particle constitutiveMatrix storage extension */
+  Index ConstitutiveMatrix_GetParticleConstExtHandle( void* constitutiveMatrix );
+
+  /* Returns the stored constitutiveMatrix on a material point which maps
+   * to the give integration point */
+  void ConstitutiveMatrix_GetStoredMatrixOnParticle( 
+    void* constitutiveMatrix,
+    IntegrationPoint* particle,
+    double** outputC );
 
 #endif /* __Underworld_Rheology_ConstitutiveMatrix_h__ */

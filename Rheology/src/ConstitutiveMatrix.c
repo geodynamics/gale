@@ -161,6 +161,26 @@ void _ConstitutiveMatrix_Init(
 
 	self->sle = NULL;
 	self->sleNonLinearIteration_I = 0;
+
+    /* store the each particle's constitutiveMatrix */
+  if( self->storeConstitutiveMatrix ) {
+    /* only 2-D at present */
+    IntegrationPointsSwarm* swarm = (IntegrationPointsSwarm*)self->integrationSwarm;
+    int materialSwarmCount;
+    MaterialPointsSwarm **materialSwarms = IntegrationPointMapper_GetMaterialPointsSwarms( swarm->mapper, &materialSwarmCount );
+    MaterialPointsSwarm *materialSwarm = materialSwarms[0];
+    MaterialPoint particle;
+    Index storedConstHandle = ExtensionManager_Add( materialSwarm->particleExtensionMgr, self->type, 9*sizeof(double) );
+    double *cMatrix = ExtensionManager_Get( materialSwarm->particleExtensionMgr, &particle, storedConstHandle );
+    if( materialSwarmCount > 1 ) exit(0);
+
+    self->swarmVar_cMatrix = Swarm_NewVectorVariable( materialSwarm, "ConstitutiveMatrix",
+            (ArithPointer)cMatrix - (ArithPointer)&particle,
+            Variable_DataType_Double, 9,
+            "c00", "c01", "c02",
+            "c10", "c11", "c12",
+            "c20", "c21", "c22" );
+  }
 }
 
 
@@ -246,6 +266,7 @@ void _ConstitutiveMatrix_Construct( void* constitutiveMatrix, Stg_ComponentFacto
 	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
 
 	context = (FiniteElementContext*)Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data );
+  self->storeConstitutiveMatrix = Stg_ComponentFactory_GetBool( cf, self->name, "storeConstitutiveMatrix", False );
 
 	_ConstitutiveMatrix_Init( self, dim, context, materialsRegister );
 }
@@ -279,6 +300,8 @@ void _ConstitutiveMatrix_Build( void* constitutiveMatrix, void* data ) {
 		if ( RheologyMaterial_IsNonLinear( material ) ) 
 			ConstitutiveMatrix_SetToNonLinear( self );
 	}
+  
+
 }
 
 
@@ -287,6 +310,7 @@ void _ConstitutiveMatrix_Initialise( void* constitutiveMatrix, void* data ) {
 
 	Journal_DPrintf( self->debug, "In %s - for matrix %s\n", __func__, self->name );
 	
+  
 	_StiffnessMatrixTerm_Initialise( self, data );
 
 	ConstitutiveMatrix_ZeroMatrix( self ) ;
@@ -335,6 +359,14 @@ void ConstitutiveMatrix_Assemble(
 	self->currentParticleIndex = particleIndex;
 
 	RheologyMaterial_RunRheologies( material, self, materialSwarm, lElement_I, materialPoint, particle->xi );
+
+  if( self->storeConstitutiveMatrix ) {
+    double* cMatrix = ExtensionManager_Get( materialSwarm->particleExtensionMgr, materialPoint, self->storedConstHandle );
+
+    cMatrix[0] = self->matrixData[0][0]; cMatrix[1] = self->matrixData[0][1]; cMatrix[2] = self->matrixData[0][2];
+    cMatrix[3] = self->matrixData[1][0]; cMatrix[4] = self->matrixData[1][1]; cMatrix[5] = self->matrixData[1][2];
+    cMatrix[6] = self->matrixData[2][0]; cMatrix[7] = self->matrixData[2][1]; cMatrix[8] = self->matrixData[2][2];
+  }
 	Journal_DPrintfL( self->debug, 3, "Viscosity = %g\n", ConstitutiveMatrix_GetIsotropicViscosity( self ) );
 }
 
@@ -383,5 +415,32 @@ void ConstitutiveMatrix_PrintContents( void* constitutiveMatrix, Stream* stream 
 		}
 		Journal_Printf( stream, "\n" );
 	}
+}
+
+Index ConstitutiveMatrix_GetParticleConstExtHandle( void* constitutiveMatrix ) {
+  /* Function definition:
+   * gets the handle that defines the "constitutive matrix on particles" extension */
+	ConstitutiveMatrix* self   = (ConstitutiveMatrix*)constitutiveMatrix;
+  return self->storedConstHandle;
+}
+
+void ConstitutiveMatrix_GetStoredMatrixOnParticle( 
+    void* constitutiveMatrix,
+    IntegrationPoint* particle,
+    double** outputC ) {
+  /* Function definition:
+   * given a integration point the function returns the stored constitutiveMatrix,
+   * if it's defined on the materialPoints, which maps to the int. particle
+   */
+	ConstitutiveMatrix* self   = (ConstitutiveMatrix*)constitutiveMatrix;
+  ExtensionInfo_Index handle = self->storedConstHandle;
+
+  double* particleExt = _OneToOneMapper_GetExtensionOn( 
+      ((IntegrationPointsSwarm*)self->integrationSwarm)->mapper, 
+      particle, handle );
+
+  outputC[0][0] = particleExt[0]; outputC[0][1] = particleExt[1]; outputC[0][2] = particleExt[2]; 
+  outputC[1][0] = particleExt[3]; outputC[1][1] = particleExt[4]; outputC[1][2] = particleExt[5]; 
+  outputC[2][0] = particleExt[6]; outputC[2][1] = particleExt[7]; outputC[2][2] = particleExt[8];
 }
 
