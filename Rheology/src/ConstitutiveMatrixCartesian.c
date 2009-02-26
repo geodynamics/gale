@@ -369,39 +369,38 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
 				
 				/* Build BTrans * ( D~ * B ) */
 				if ( dim == 2 ) {
+          if( !sle->nlFormJacobian ) {
 
-                                        if( !sle->nlFormJacobian ) {
+             elStiffMat[ colNodeDof_I     ][ rowNodeDof_I     ] += Bi_x * Dtilda_B[0][0] + Bi_y * Dtilda_B[2][0];
+             elStiffMat[ colNodeDof_I     ][ rowNodeDof_I + 1 ] += Bi_x * Dtilda_B[0][1] + Bi_y * Dtilda_B[2][1];
+             elStiffMat[ colNodeDof_I + 1 ][ rowNodeDof_I     ] += Bi_y * Dtilda_B[1][0] + Bi_x * Dtilda_B[2][0];
+             elStiffMat[ colNodeDof_I + 1 ][ rowNodeDof_I + 1 ] += Bi_y * Dtilda_B[1][1] + Bi_x * Dtilda_B[2][1];
 
-                                           elStiffMat[ colNodeDof_I     ][ rowNodeDof_I     ] += Bi_x * Dtilda_B[0][0] + Bi_y * Dtilda_B[2][0];
-                                           elStiffMat[ colNodeDof_I     ][ rowNodeDof_I + 1 ] += Bi_x * Dtilda_B[0][1] + Bi_y * Dtilda_B[2][1];
-                                           elStiffMat[ colNodeDof_I + 1 ][ rowNodeDof_I     ] += Bi_y * Dtilda_B[1][0] + Bi_x * Dtilda_B[2][0];
-                                           elStiffMat[ colNodeDof_I + 1 ][ rowNodeDof_I + 1 ] += Bi_y * Dtilda_B[1][1] + Bi_x * Dtilda_B[2][1];
+          }
+          else {
+             double DuDx, DuDy, DvDx, DvDy;
+             double DetaDu, DetaDv;
+             double intFac, fac;
 
-                                        }
-                                        else {
-                                           double DuDx, DuDy, DvDx, DvDy;
-                                           double DetaDu, DetaDv;
-                                           double intFac, fac;
+             DuDx = velDerivs[0]; DuDy = velDerivs[1];
+             DvDx = velDerivs[2]; DvDy = velDerivs[3];
+             DetaDu = self->derivs[0] * Bj_x + self->derivs[1] * Bj_y + self->derivs[2] * Ni[rowNode_I];
+             DetaDv = self->derivs[3] * Bj_x + self->derivs[4] * Bj_y + self->derivs[5] * Ni[rowNode_I];
+             intFac = particle->weight * detJac;
 
-                                           DuDx = velDerivs[0]; DuDy = velDerivs[1];
-                                           DvDx = velDerivs[2]; DvDy = velDerivs[3];
-                                           DetaDu = self->derivs[0] * Bj_x + self->derivs[1] * Bj_y + self->derivs[2] * Ni[rowNode_I];
-                                           DetaDv = self->derivs[3] * Bj_x + self->derivs[4] * Bj_y + self->derivs[5] * Ni[rowNode_I];
-                                           intFac = particle->weight * detJac;
+             fac = eta * Bj_y + DuDy * DetaDu + DvDx * DetaDu;
+             elStiffMat[colNodeDof_I][rowNodeDof_I] +=
+                intFac * (2.0 * Bi_x * (eta * Bj_x + DuDx * DetaDu) + Bi_y * fac);
+             elStiffMat[colNodeDof_I + 1][rowNodeDof_I] +=
+                intFac * (2.0 * Bi_y * DvDy * DetaDu + Bi_x * fac);
 
-                                           fac = eta * Bj_y + DuDy * DetaDu + DvDx * DetaDu;
-                                           elStiffMat[colNodeDof_I][rowNodeDof_I] +=
-                                              intFac * (2.0 * Bi_x * (eta * Bj_x + DuDx * DetaDu) + Bi_y * fac);
-                                           elStiffMat[colNodeDof_I + 1][rowNodeDof_I] +=
-                                              intFac * (2.0 * Bi_y * DvDy * DetaDu + Bi_x * fac);
+             fac = eta * Bj_x + DvDx * DetaDv + DuDy * DetaDv;
+             elStiffMat[colNodeDof_I][rowNodeDof_I + 1] +=
+                intFac * (2.0 * Bi_x * DuDx * DetaDv + Bi_y * fac);
+             elStiffMat[colNodeDof_I + 1][rowNodeDof_I + 1] +=
+                intFac * (2.0 * Bi_y * (eta * Bj_y + DvDy * DetaDv) + Bi_x * fac);
 
-                                           fac = eta * Bj_x + DvDx * DetaDv + DuDy * DetaDv;
-                                           elStiffMat[colNodeDof_I][rowNodeDof_I + 1] +=
-                                              intFac * (2.0 * Bi_x * DuDx * DetaDv + Bi_y * fac);
-                                           elStiffMat[colNodeDof_I + 1][rowNodeDof_I + 1] +=
-                                              intFac * (2.0 * Bi_y * (eta * Bj_y + DvDy * DetaDv) + Bi_x * fac);
-
-                                        }
+          }
 				}
 				else {
 					Bi_z = GNx[ K_AXIS ][colNode_I];
