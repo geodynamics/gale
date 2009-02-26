@@ -113,15 +113,17 @@ ConstitutiveMatrix* _ConstitutiveMatrix_New(
 }
 
 void _ConstitutiveMatrix_Init(
-		ConstitutiveMatrix*	                   self,
-		Dimension_Index                            dim,	
-		FiniteElementContext*                      context,	
-		Materials_Register*                        materials_Register ) 
+      ConstitutiveMatrix*	                   self,
+      Dimension_Index                        dim,	
+      Bool                                   storeConstitutiveMatrix,
+      FiniteElementContext*                  context,	
+      Materials_Register*                    materials_Register ) 
 {
 	/* General and Function pointers for this class that are not on the parent class should be set here should already be set */
 	
 	/* ConstitutiveMatrix info */
 	self->isConstructed = True;
+  self->storeConstitutiveMatrix = storeConstitutiveMatrix;
 
 	self->matrixData = NULL;
 	self->dim                 = dim;
@@ -162,25 +164,6 @@ void _ConstitutiveMatrix_Init(
 	self->sle = NULL;
 	self->sleNonLinearIteration_I = 0;
 
-    /* store the each particle's constitutiveMatrix */
-  if( self->storeConstitutiveMatrix ) {
-    /* only 2-D at present */
-    IntegrationPointsSwarm* swarm = (IntegrationPointsSwarm*)self->integrationSwarm;
-    int materialSwarmCount;
-    MaterialPointsSwarm **materialSwarms = IntegrationPointMapper_GetMaterialPointsSwarms( swarm->mapper, &materialSwarmCount );
-    MaterialPointsSwarm *materialSwarm = materialSwarms[0];
-    MaterialPoint particle;
-    Index storedConstHandle = ExtensionManager_Add( materialSwarm->particleExtensionMgr, self->type, 9*sizeof(double) );
-    double *cMatrix = ExtensionManager_Get( materialSwarm->particleExtensionMgr, &particle, storedConstHandle );
-    if( materialSwarmCount > 1 ) exit(0);
-
-    self->swarmVar_cMatrix = Swarm_NewVectorVariable( materialSwarm, "ConstitutiveMatrix",
-            (ArithPointer)cMatrix - (ArithPointer)&particle,
-            Variable_DataType_Double, 9,
-            "c00", "c01", "c02",
-            "c10", "c11", "c12",
-            "c20", "c21", "c22" );
-  }
 }
 
 
@@ -195,7 +178,7 @@ void ConstitutiveMatrix_InitAll(
 	ConstitutiveMatrix* self = (ConstitutiveMatrix*)constitutiveMatrix;
 
 	StiffnessMatrixTerm_InitAll( self, stiffnessMatrix, swarm, NULL );
-	_ConstitutiveMatrix_Init( self, dim, context, materials_Register );
+	_ConstitutiveMatrix_Init( self, dim, False, context, materials_Register );
 }
 
 void _ConstitutiveMatrix_Delete( void* constitutiveMatrix ) {
@@ -257,6 +240,7 @@ void _ConstitutiveMatrix_Construct( void* constitutiveMatrix, Stg_ComponentFacto
 	Dimension_Index             dim;
 	Materials_Register*         materialsRegister;
 	FiniteElementContext*       context;
+  Bool                        storeConstitutiveMatrix;
 
 	_StiffnessMatrixTerm_Construct( self, cf, data );
 	
@@ -266,9 +250,9 @@ void _ConstitutiveMatrix_Construct( void* constitutiveMatrix, Stg_ComponentFacto
 	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
 
 	context = (FiniteElementContext*)Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data );
-  self->storeConstitutiveMatrix = Stg_ComponentFactory_GetBool( cf, self->name, "storeConstitutiveMatrix", False );
+  storeConstitutiveMatrix = Stg_ComponentFactory_GetBool( cf, self->name, "storeConstitutiveMatrix", False );
 
-	_ConstitutiveMatrix_Init( self, dim, context, materialsRegister );
+	_ConstitutiveMatrix_Init( self, dim, storeConstitutiveMatrix, context, materialsRegister );
 }
 
 void _ConstitutiveMatrix_Build( void* constitutiveMatrix, void* data ) {
@@ -300,8 +284,6 @@ void _ConstitutiveMatrix_Build( void* constitutiveMatrix, void* data ) {
 		if ( RheologyMaterial_IsNonLinear( material ) ) 
 			ConstitutiveMatrix_SetToNonLinear( self );
 	}
-  
-
 }
 
 
@@ -361,11 +343,14 @@ void ConstitutiveMatrix_Assemble(
 	RheologyMaterial_RunRheologies( material, self, materialSwarm, lElement_I, materialPoint, particle->xi );
 
   if( self->storeConstitutiveMatrix ) {
+    /* copy the recently calculated self->matrixData, the constitutive matrix, onto the particle extension */
     double* cMatrix = ExtensionManager_Get( materialSwarm->particleExtensionMgr, materialPoint, self->storedConstHandle );
+    Index row_I, rowSize = self->rowSize;
+    Index columnSize = self->columnSize;
 
-    cMatrix[0] = self->matrixData[0][0]; cMatrix[1] = self->matrixData[0][1]; cMatrix[2] = self->matrixData[0][2];
-    cMatrix[3] = self->matrixData[1][0]; cMatrix[4] = self->matrixData[1][1]; cMatrix[5] = self->matrixData[1][2];
-    cMatrix[6] = self->matrixData[2][0]; cMatrix[7] = self->matrixData[2][1]; cMatrix[8] = self->matrixData[2][2];
+    /* flatten the matrix into a 1D array */
+    for( row_I = 0 ; row_I < rowSize ; row_I++ ) 
+      memcpy( &cMatrix[columnSize*row_I], self->matrixData[row_I], columnSize*sizeof(double) );
   }
 	Journal_DPrintfL( self->debug, 3, "Viscosity = %g\n", ConstitutiveMatrix_GetIsotropicViscosity( self ) );
 }

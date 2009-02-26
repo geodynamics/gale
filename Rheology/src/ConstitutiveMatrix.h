@@ -84,7 +84,7 @@
     /* below is needed to store the constitutiveMatrix per particle */ \
 		Bool                                         storeConstitutiveMatrix;           \
 		Index                                        storedConstHandle;                 \
-		SwarmVariable*                               swarmVar_cMatrix;                  \
+		SwarmVariable*                               storedConstSwarmVar;               \
 		
 	struct ConstitutiveMatrix { __ConstitutiveMatrix };
 

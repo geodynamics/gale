@@ -137,6 +137,48 @@ void _ConstitutiveMatrixCartesian_Init(
 {
 	self->rowSize    = StGermain_nSymmetricTensorVectorComponents( self->dim );
 	self->columnSize = StGermain_nSymmetricTensorVectorComponents( self->dim );
+
+  /* store each particle's constitutiveMatrix */
+  if( self->storeConstitutiveMatrix ) {
+    IntegrationPointsSwarm* swarm = (IntegrationPointsSwarm*)self->integrationSwarm;
+    MaterialPointsSwarm **materialSwarms, *materialSwarm;
+    MaterialPoint particle;
+    int materialSwarmCount;
+
+    /* get material swram mapped to the integration points,
+     * currently only one on material point is mapped 26 FEB 09 */
+    materialSwarms = IntegrationPointMapper_GetMaterialPointsSwarms( swarm->mapper, &materialSwarmCount );
+    assert( materialSwarmCount < 2 );
+    materialSwarm = materialSwarms[0];
+
+    /* add extension to material swarm */
+    Index storedConstHandle = ExtensionManager_Add( 
+        materialSwarm->particleExtensionMgr, 
+        self->type, 
+        self->rowSize * self->columnSize * sizeof(double) );
+
+    double *cMatrix = ExtensionManager_Get( materialSwarm->particleExtensionMgr, &particle, storedConstHandle );
+
+    if( self->dim == 2 ) {
+      /* TODO: clean up this vector logic. The only reson there's an if is because
+       * of the list of names the must be given as the final arguments to this function.  */ 
+      self->storedConstSwarmVar = Swarm_NewVectorVariable( materialSwarm, "ConstitutiveMatrix",
+              (ArithPointer)cMatrix - (ArithPointer)&particle,
+              Variable_DataType_Double, self->rowSize * self->columnSize,
+              "c00", "c01", "c02", "c10", "c11", "c12", "c20", "c21", "c22" );
+    } else {
+      self->storedConstSwarmVar = Swarm_NewVectorVariable( materialSwarm, "ConstitutiveMatrix",
+              (ArithPointer)cMatrix - (ArithPointer)&particle,
+              Variable_DataType_Double, self->rowSize * self->columnSize,
+              "c00", "c01", "c02", "c03", "c04", "c05",
+              "c10", "c11", "c12", "c13", "c14", "c15",
+              "c20", "c21", "c22", "c23", "c24", "c25",
+              "c30", "c31", "c32", "c33", "c34", "c35",
+              "c40", "c41", "c42", "c43", "c44", "c45",
+              "c50", "c51", "c52", "c53", "c54", "c55" );
+    }
+
+  }
 }
 
 void ConstitutiveMatrixCartesian_InitAll( 
@@ -227,7 +269,7 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
 		FiniteElementContext*                              context,
 		double**                                           elStiffMat ) 
 {
-	ConstitutiveMatrixCartesian*     self                = (ConstitutiveMatrix*) constitutiveMatrix;
+	ConstitutiveMatrixCartesian*     self       = (ConstitutiveMatrixCartesian*) constitutiveMatrix;
 	Swarm*                  swarm               = self->integrationSwarm;
 	FeVariable*             variable1           = stiffnessMatrix->rowVariable;
 	Dimension_Index         dim                 = stiffnessMatrix->dim;
