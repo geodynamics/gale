@@ -82,6 +82,9 @@
 	typedef struct StoreStress                      StoreStress;
 	typedef struct StoreVisc                        StoreVisc;
 	
+	typedef struct ConstitutiveMat_Refactored       ConstitutiveMat_Refactored;
+	typedef struct ConstitutiveMatCartesian_Refactored  ConstitutiveMatCartesian_Refactored;
+
 	/* typedefs for readability */
 	typedef Index                                   Rheology_Index;
 

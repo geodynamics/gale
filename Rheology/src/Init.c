@@ -88,6 +88,7 @@ Bool Underworld_Rheology_Init( int* argc, char** argv[] ) {
 	Stg_ComponentRegister_Add( componentRegister, StoreStress_Type,             "0", _StoreStress_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, StoreVisc_Type,               "0", _StoreVisc_DefaultNew );
 	
+	Stg_ComponentRegister_Add( componentRegister, ConstitutiveMatCartesian_Refactored_Type, "0", _ConstitutiveMatCartesian_Refactored_DefaultNew );
 
 	/* Register Parents for type checking */
 	RegisterParent( Rheology_Type,                Stg_Component_Type );
@@ -123,6 +124,9 @@ Bool Underworld_Rheology_Init( int* argc, char** argv[] ) {
 	RegisterParent( RheologyMaterial_Type,            Material_Type );
 	RegisterParent( MultiRheologyMaterial_Type,       RheologyMaterial_Type );
 	RegisterParent( Compressible_Type,                StiffnessMatrixTerm_Type );
+
+	RegisterParent( ConstitutiveMat_Refactored_Type,          Stg_Component_Type );
+	RegisterParent( ConstitutiveMatCartesian_Refactored_Type, ConstitutiveMat_Refactored_Type );
 
 	return True;
 }

@@ -79,5 +79,7 @@
 	#include "StoreViscosity.h"
 	#include "Init.h"
 	#include "Finalise.h"
+	#include "ConstitutiveMat_Refactored.h"
+	#include "ConstitutiveMatCartesian_Refactored.h"
 	
 #endif
