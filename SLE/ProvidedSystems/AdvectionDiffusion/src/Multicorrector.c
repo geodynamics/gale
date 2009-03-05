@@ -266,6 +266,23 @@ void _AdvDiffMulticorrector_Solve( void* solver, void* _sle ) {
 	VecDestroy( deltaPhiDot );
 }
 
+void ViewPETScVector( Vec vec, Stream* stream ) {
+	PetscInt	size;
+	PetscScalar*	array;
+	unsigned	entry_i;
+
+	if( !stream )
+		stream = Journal_Register( Info_Type, "tmp" );
+
+	VecGetLocalSize( vec, &size );
+	VecGetArray( vec, &array );
+	
+	for( entry_i = 0; entry_i < size; entry_i++ )
+		Journal_Printf( stream, "\t%u: \t %.12g\n", entry_i, array[entry_i] );
+
+	VecRestoreArray( vec, &array );
+}
+
 /** See Eqns. 4.2.3-4 */
 void AdvDiffMulticorrector_Predictors( AdvDiffMulticorrector* self, AdvectionDiffusionSLE* sle, double dt ) {
 	double factor       = dt * ( 1.0 - self->gamma );
@@ -283,9 +300,9 @@ void AdvDiffMulticorrector_Predictors( AdvDiffMulticorrector* self, AdvectionDif
 		Journal_PrintValue( debugStream, factor );
 
 		Journal_DPrintf( debugStream, "Phi:\n" );
-		Vector_View( sle->phiVector->vector, debugStream );
+		ViewPETScVector( sle->phiVector->vector, debugStream );
 		Journal_DPrintf( debugStream, "Phi Dot:\n" );
-		Vector_View( sle->phiDotVector->vector, debugStream );
+		ViewPETScVector( sle->phiDotVector->vector, debugStream );
 
 		Stream_UnIndent( debugStream );
 	}
@@ -304,7 +321,7 @@ void AdvDiffMulticorrector_Predictors( AdvDiffMulticorrector* self, AdvectionDif
 	#if DEBUG
 	if ( Stream_IsPrintableLevel( debugStream, 3 ) ) {
 		Journal_DPrintf( debugStream, "At end of %s: Phi is:\n", __func__ );
-		Vector_View( sle->phiVector->vector, debugStream );
+		ViewPETScVector( sle->phiVector->vector, debugStream );
 	}
 	#endif
 }
@@ -324,7 +341,7 @@ void AdvDiffMulticorrector_Solution( AdvDiffMulticorrector* self, AdvectionDiffu
 	#if DEBUG
 	if ( Stream_IsPrintableLevel( self->debug, 3 ) ) {
 		Journal_DPrintf( self->debug, "Delta Phi Dot is:\n" );
-		Vector_View( deltaPhiDot, self->debug );
+		ViewPETScVector( deltaPhiDot, self->debug );
 	}
 	#endif
 }
