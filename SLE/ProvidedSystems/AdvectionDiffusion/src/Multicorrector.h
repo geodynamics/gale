@@ -95,7 +95,7 @@
 	void _AdvDiffMulticorrector_Print( void* solver, Stream* stream );
 
 	void* _AdvDiffMulticorrector_DefaultNew( Name name ) ;
-void _AdvDiffMulticorrector_Construct( void* solver, Stg_ComponentFactory* cf, void* data ) ;
+	void _AdvDiffMulticorrector_Construct( void* solver, Stg_ComponentFactory* cf, void* data ) ;
 	void _AdvDiffMulticorrector_Build( void* solver, void* data ) ;
 	void _AdvDiffMulticorrector_Initialise( void* solver, void* data ) ;
 	void _AdvDiffMulticorrector_Execute( void* solver, void* data ) ;
@@ -105,16 +105,12 @@ void _AdvDiffMulticorrector_Construct( void* solver, Stg_ComponentFactory* cf, v
 	void _AdvDiffMulticorrector_Solve( void* solver, void* _sle ) ;
 
 	void AdvDiffMulticorrector_Predictors( AdvDiffMulticorrector* self, AdvectionDiffusionSLE* sle, double dt ) ;
-	//void AdvDiffMulticorrector_Solution( AdvDiffMulticorrector* self, AdvectionDiffusionSLE* sle, Vector* deltaPhiDot ) ;
-	//void AdvDiffMulticorrector_Correctors( AdvDiffMulticorrector* self, AdvectionDiffusionSLE* sle, Vector* deltaPhiDot, double dt ) ;
 
-	//void AdvDiffMulticorrector_CalculatePhiDot( AdvDiffMulticorrector* self, AdvectionDiffusionSLE* sle, Vector* deltaPhiDot ) ;
-	//void _AdvDiffMulticorrector_CalculatePhiDot_Explicit( AdvDiffMulticorrector* self, AdvectionDiffusionSLE* sle, Vector* deltaPhiDot ) ;
-	//void _AdvDiffMulticorrector_CalculatePhiDot_Implicit( AdvDiffMulticorrector* self, AdvectionDiffusionSLE* sle, Vector* deltaPhiDot ) ;
 	void AdvDiffMulticorrector_Solution( AdvDiffMulticorrector* self, AdvectionDiffusionSLE* sle, Vec deltaPhiDot ) ;
 	void AdvDiffMulticorrector_Correctors( AdvDiffMulticorrector* self, AdvectionDiffusionSLE* sle, Vec deltaPhiDot, double dt ) ;
 
 	void AdvDiffMulticorrector_CalculatePhiDot( AdvDiffMulticorrector* self, AdvectionDiffusionSLE* sle, Vec deltaPhiDot ) ;
 	void _AdvDiffMulticorrector_CalculatePhiDot_Explicit( AdvDiffMulticorrector* self, AdvectionDiffusionSLE* sle, Vec deltaPhiDot ) ;
+	void _AdvDiffMulticorrector_CalculatePhiDot_Implicit( AdvDiffMulticorrector* self, AdvectionDiffusionSLE* sle, Vec deltaPhiDot ) ;
 
 #endif

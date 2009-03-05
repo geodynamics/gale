@@ -327,7 +327,6 @@ void AdvDiffMulticorrector_Predictors( AdvDiffMulticorrector* self, AdvectionDif
 }
 	
 	
-//void AdvDiffMulticorrector_Solution( AdvDiffMulticorrector* self, AdvectionDiffusionSLE* sle, Vector* deltaPhiDot ) {
 void AdvDiffMulticorrector_Solution( AdvDiffMulticorrector* self, AdvectionDiffusionSLE* sle, Vec deltaPhiDot ) {
 	Journal_DPrintf( sle->debug, "In func %s:\n", __func__ );
 
@@ -349,7 +348,6 @@ void AdvDiffMulticorrector_Solution( AdvDiffMulticorrector* self, AdvectionDiffu
 
 	
 /* Correct \phi and \dot \phi - See Eqns. 4.2.7-8 */
-//void AdvDiffMulticorrector_Correctors( AdvDiffMulticorrector* self, AdvectionDiffusionSLE* sle, Vector* deltaPhiDot, double dt ) {
 void AdvDiffMulticorrector_Correctors( AdvDiffMulticorrector* self, AdvectionDiffusionSLE* sle, Vec deltaPhiDot, double dt ) {
 	double factor = dt * self->gamma;
 	
@@ -365,7 +363,6 @@ void AdvDiffMulticorrector_Correctors( AdvDiffMulticorrector* self, AdvectionDif
 }
 
 
-//void AdvDiffMulticorrector_CalculatePhiDot( AdvDiffMulticorrector* self, AdvectionDiffusionSLE* sle, Vector* deltaPhiDot ) {
 void AdvDiffMulticorrector_CalculatePhiDot( AdvDiffMulticorrector* self, AdvectionDiffusionSLE* sle, Vec deltaPhiDot ) {
 	Stg_Component* massMatrix = sle->massMatrix;
 
@@ -381,19 +378,14 @@ void AdvDiffMulticorrector_CalculatePhiDot( AdvDiffMulticorrector* self, Advecti
 }
 
 /* Lump all things onto diagonal of matrix - which is stored as a vector - Eq. 4.2.11 */
-//void _AdvDiffMulticorrector_CalculatePhiDot_Explicit( AdvDiffMulticorrector* self, AdvectionDiffusionSLE* sle, Vector* deltaPhiDot ) {
 void _AdvDiffMulticorrector_CalculatePhiDot_Explicit( AdvDiffMulticorrector* self, AdvectionDiffusionSLE* sle, Vec deltaPhiDot ) {
 	ForceVector* massMatrix = Stg_CheckType( sle->massMatrix, ForceVector );
 
 	/* Calculate change in \dot \phi - See Eq. 4.2.5 */
-	//Vector_PointwiseDivide( deltaPhiDot, sle->residual->vector, massMatrix->vector );
 	VecPointwiseDivide( deltaPhiDot, sle->residual->vector, massMatrix->vector );
 }
 
-//void _AdvDiffMulticorrector_CalculatePhiDot_Implicit( AdvDiffMulticorrector* self, AdvectionDiffusionSLE* sle, Vector* deltaPhiDot ) {
 void _AdvDiffMulticorrector_CalculatePhiDot_Implicit( AdvDiffMulticorrector* self, AdvectionDiffusionSLE* sle, Vec deltaPhiDot ) {
 
-	//MatrixSolver_Solve( self->matrixSolver, deltaPhiDot, sle->residual->vector );
-	//KSPSolve( self->matrixSolver, ((PETScVector*)deltaPhiDot)->petscVec, ((PETScVector*)sle->residual->vector)->petscVec );
 	KSPSolve( self->matrixSolver, deltaPhiDot, sle->residual->vector );
 }
