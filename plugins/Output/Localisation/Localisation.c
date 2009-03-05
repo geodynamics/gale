@@ -116,7 +116,7 @@ void Underworld_Localisation_Setup( UnderworldContext* context ) {
         StgFEM_FrequentOutput_PrintString( context, "Localisation" );
 
 	/* get localisation parameter */
-	self->deformationFactor = Dictionary_GetDouble_WithDefault( context->dictionary, "LocalisationDeformationFactor", 0.8 );
+	self->deformationFactor = Dictionary_GetDouble_WithDefault( context->dictionary, "localisationDeformationFactor", 0.8 );
 
         Journal_Firewall( 
                         context->gaussSwarm != NULL, 

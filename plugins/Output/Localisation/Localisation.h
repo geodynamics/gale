@@ -73,8 +73,6 @@
 		__Codelet
 		OperatorFeVariable*    reducedStrainRateFieldInvariantRoot;
 		double                 Localisation;
-		double                 minValue;
-		double                 maxValue;
 		double                 deformationFactor;
 		IntegrandWeightStruct* integrandWeight;
 	} Underworld_Localisation;
