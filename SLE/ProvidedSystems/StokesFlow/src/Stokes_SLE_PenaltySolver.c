@@ -247,7 +247,11 @@ void _Stokes_SLE_PenaltySolver_Solve( void* solver,void* stokesSLE ) {
 	
 	if( sle->dStiffMat == NULL ) {
 		Journal_DPrintf( self->debug, "Div matrix == NULL : Problem is assumed to be symmetric. ie Div = GTrans \n");
+#if( PETSC_VERSION_MAJOR <= 2 )
 		MatTranspose( gradMat, &GTrans );
+#else
+		MatTranspose( gradMat, MAT_INITIAL_MATRIX, &GTrans );
+#endif
 		divMat = GTrans;
 	}
 	else {
@@ -293,7 +297,11 @@ void _Stokes_SLE_PenaltySolver_Solve( void* solver,void* stokesSLE ) {
 	/* Recover p */
 	if( sle->dStiffMat == NULL ) {
 /* 		 since Div was modified when C is diagonal, re build the transpose */
+#if( PETSC_VERSION_MAJOR <= 2 )
 		MatTranspose( gradMat, &GTrans );
+#else
+		MatTranspose( gradMat, MAT_INITIAL_MATRIX, &GTrans );
+#endif
 		divMat = GTrans;
 	}
 	else {
