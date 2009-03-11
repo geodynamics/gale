@@ -1,77 +1,98 @@
 import os
 Import('env')
 
-#
-# Prepare the construction environment by copying the one we
-# were given.
-env = env.Copy()
-env.project_name = 'PICellerator'
-env.AppendUnique(CPPPATH=[env.get_build_path('include/' + env.project_name)])
-env.src_objs = []
-env.suite_hdrs = []
-env.suite_objs = []
+# Need to make a copy because SCons uses the environment
+# at it's final state, so StGermain ends up depending on
+# StgDomain, etc.
+env = env.Clone()
 
-#
-# Build standard stg directories.
-env.build_directory('PopulationControl')
-env.build_directory('Weights')
-env.build_directory('MaterialPoints')
-env.build_directory('Utils')
+# Inside each project we will be accessing headers without the
+# project name as a prefix, so we need to let SCons know how to
+# find those headers.
+env.Append(CPPPATH='#' + env['build_dir'] + '/include/PICellerator')
 
-#
-# Need to handle libPICellerator differently.
-env.build_headers(env.glob('libPICellerator/src/*.h'), 'include/PICellerator')
-env.src_objs += env.build_sources(env.glob('libPICellerator/src/*.c'), 'PICellerator/libPICellerator')
-env.src_objs += env.build_metas(env.glob('libPICellerator/src/*.meta'), 'PICellerator/libPICellerator')
+# Keep a list of all the objects we build so we can make a library
+# afterwards.
+objs = []
+suites = []
 
-#
-# Build shared library.
+# Process each directory uniformly.
+dirs = Split('Voronoi PopulationControl Weights MaterialPoints Utils ' \
+                 'libPICellerator')
+for d in dirs:
+
+    # Need the module name, which is just the directory.
+    mod_name = env['ESCAPE']('"' + ''.join(d.split('/')) + '"')
+    cpp_defs = [('CURR_MODULE_NAME', mod_name)] + env.get('CPPDEFINES', [])
+
+    # Setup where to look for files.
+    src_dir = d + '/src'
+    inc_dir = '#' + env['build_dir'] + '/include/PICellerator/' + d
+    tst_dir = d + '/tests'
+
+    # Install the headers and '.def' files.
+    hdrs = env.Install(inc_dir, Glob(src_dir + '/*.h'))
+    defs = env.Install(inc_dir, Glob(src_dir + '/*.def'))
+
+    # Build our source files.
+    srcs = Glob(src_dir + '/*.c')
+    srcs = [s for s in srcs if s.path.find('-meta.c') == -1]
+    objs += env.SharedObject(srcs, CPPDEFINES=cpp_defs)
+
+    # Build any meta files.
+    objs += env.stgSharedMeta(Glob(src_dir + '/*.meta'), CPPDEFINES=cpp_defs)
+
+    # If we found any '.def' files make sure to register them as
+    # explicit dependencies.
+    if defs:
+        env.Depends(hdrs + objs, defs)
+
+    # Build any test suites we might find.
+    suites += env.Object(Glob(tst_dir + '/*Suite.c'))
+
+# Need to install headers from libPICellerator.
+env.Install('#' + env['build_dir'] + '/include/PICellerator', Glob('libPICellerator/src/*.h'))
+
+# Build libraries.
 if env['shared_libraries']:
-    env.SharedLibrary(env.get_build_path('lib/PICellerator'), env.src_objs)
+    env.SharedLibrary('#' + env['build_dir'] + '/lib/PICellerator', objs)
 
-#
-# Build toolbox.
-env.build_toolbox('libPICellerator/Toolbox')
+# Need to include the PICellerator library for binaries.
+libs = ['PICellerator'] + env.get('LIBS', [])
 
-#
-# Build plugins. Note that this must happen after the shared library
-# has been built.
-env.build_plugin('plugins/CalculateParticleDisplacement')
-env.build_plugin('plugins/Output/MaterialCentroid')
+# Test runner program.
+env.PCUTest('#' + env['build_dir'] + '/tests/testPICellerator', suites,
+            PCU_SETUP="StGermain_Init(&argc, &argv);StgDomain_Init(&argc, &argv);" \
+                "StgFEM_Init(&argc, &argv);PICellerator_Init(&argc, &argv);",
+            PCU_TEARDOWN="PICellerator_Finalise();StgFEM_Finalise();" \
+                "StgDomain_Finalise();StGermain_Finalise();",
+            LIBS=libs)
 
-#
-# Build static library.
-if env['static_libraries']:
-    env.Library(env.get_build_path('lib/PICellerator'), env.src_objs)
+# Build plugins.
+dirs = Split('libPICellerator/Toolbox plugins/CalculateParticleDisplacement ' \
+                 'plugins/Output/MaterialCentroid')
+for d in dirs:
 
-#
-# Build unit test runner.
-if not env.get('dir_target', ''):
-    env['PCURUNNERINIT'] = ''
-    env['PCURUNNERSETUP'] = """StGermain_Init( &argc, &argv );
-   StgDomain_Init( &argc, &argv );
-   StgFEM_Init( &argc, &argv );
-   PICellerator_Init( &argc, &argv );"""
-    env['PCURUNNERTEARDOWN'] = """PICellerator_Finalise();
-   StgFEM_Finalise();
-   StgDomain_Finalise();
-   StGermain_Finalise();"""
-    runner_src = env.PCUSuiteRunner(env.get_build_path('PICellerator/testPICellerator.c'), env.suite_hdrs)
-    runner_obj = env.SharedObject(runner_src)
-    env.Program(env.get_build_path('bin/testPICellerator'),
-            runner_obj + env.suite_objs,
-            LIBS=['PICellerator', 'pcu'] + env.get('LIBS', []))
+    name = 'PICellerator_' + d.split('/')[-1] + 'module'
+    mod_name = env['ESCAPE']('"' + ''.join(d.split('/')) + '"')
+    cpp_defs = [('CURR_MODULE_NAME', mod_name)] + env.get('CPPDEFINES', [])
 
-#
-# Copy over XML files.
-xml_bases = ['']
-for base in xml_bases:
-    dst = env.get_build_path('lib/StGermain/PICellerator/' + base)
-    for file in env.glob('Apps/src/' + base + '/*.xml'):
-        if env.check_dir_target(file):
-            env.Install(dst, file)
+    env.Install('#' + env['build_dir'] + '/include/PICellerator/' + d.split('/')[-1],
+                Glob(d + '/*.h'))
 
-#
-# Return any module code we need to build into a static binary.
-module = (env.get('STGMODULEPROTO', ''), env.get('STGMODULECODE', ''))
-Return('module')
+    srcs = Glob(d + '/*.c')
+    srcs = [s for s in srcs if s.path.find('-meta.c') == -1]
+    objs = env.SharedObject(srcs, CPPDEFINES=cpp_defs)
+    objs += env.stgSharedMeta(Glob(d + '/*.meta'), CPPDEFINES=cpp_defs)
+
+    if env['shared_libraries']:
+        lib_pre = env['LIBPREFIXES']
+        if not isinstance(lib_pre, list):
+            lib_pre = [lib_pre]
+        env.SharedLibrary('#' + env['build_dir'] + '/lib/' + name, objs,
+                          SHLIBPREFIX='',
+                          LIBPREFIXES=lib_pre + [''],
+                          LIBS=libs)
+
+# Install XML input files.
+env.Install('#' + env['build_dir'] + '/lib/StGermain/PICellerator', Glob('Apps/src/*.xml'))
