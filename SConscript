@@ -1,96 +1,91 @@
 import os
 Import('env')
 
-#
-# Prepare the construction environment by copying the one we
-# were given.
+# Need to make a copy because SCons uses the environment
+# at it's final state, so StGermain ends up depending on
+# StgDomain, etc.
 env = env.Clone()
-env.project_name = 'StGermain'
-env.AppendUnique(CPPPATH=[env.get_build_path('include/' + env.project_name)])
-SConscript('pcu/script/scons.py', exports='env')
-SConscript('script/scons.py', exports='env')
-env.src_objs = []
-env.suite_hdrs = []
-env.suite_objs = []
 
-#
-# These couple of files need to be explicitly copied immediately.
-env.build_files(['Base/IO/src/mpirecord/none/mpimessaging.h'],
-                'include/StGermain/Base/IO/mpirecord')
-env.build_files(['Base/Foundation/src/ClassSetup.h', 'Base/Foundation/src/ClassEmpty.h'],
-                'include/StGermain/Base/Foundation')
-
-#
-# Build standard stg directories.
-env.build_directory('Base/Foundation')
-env.build_directory('Base/IO')
-env.build_directory('Base/Container')
-env.build_directory('Base/Automation')
-env.build_directory('Base/Extensibility')
-env.build_directory('Base/Context')
-env.build_directory('Base')
-env.build_directory('Utils')
-
-#
-# Need to handle libStGermain differently.
-env.build_headers(env.glob('libStGermain/src/*.h'), 'include/StGermain')
-env.src_objs += env.build_sources(env.glob('libStGermain/src/*.c'), 'StGermain/libStGermain')
-env.src_objs += env.build_metas(env.glob('libStGermain/src/*.meta'), 'StGermain/libStGermain')
-
-#
-# Build libraries.
-if env['static_libraries']:
-    env.Library(env.get_build_path('lib/StGermain'), env.src_objs)
-if env['shared_libraries']:
-    env.SharedLibrary(env.get_build_path('lib/StGermain'), env.src_objs)
-
-#
-# FlattenXML program.
-if env['shared_libraries']:
-    src = 'Base/FlattenXML/src/main.c'
-    if env.check_dir_target(src):
-        obj = env.SharedObject(env.get_build_path('StGermain/' + src[:-2]), src)
-        env.Program(env.get_build_path('bin/FlattenXML'), obj,
-                    LIBS=['StGermain'] + env.get('LIBS', []))
-
-#
-# StGermain program. We can only build this guy here if we're using
-# shared libraries.
-if env['shared_libraries']:
-    src = 'src/main.c'
-    if env.check_dir_target(src):
-        obj = env.SharedObject(env.get_build_path('StGermain/' + src[:-2]), src)
-        env.Program(env.get_build_path('bin/StGermain'), obj,
-                    LIBS=['StGermain'] + env.get('LIBS', []))
-
-#
-# Build unit testing framework.
+# Build the 'pcu' sub-project.
 SConscript('pcu/SConscript', exports='env')
 
-#
-# Build unit test runner.
-if not env.get('dir_target', ''):
-    env['PCURUNNERINIT'] = ''
-    env['PCURUNNERSETUP'] = 'StGermain_Init( &argc, &argv );'
-    env['PCURUNNERTEARDOWN'] = 'StGermain_Finalise();'
-    runner_src = env.PCUSuiteRunner(env.get_build_path('StGermain/testStGermain.c'),
-                                    env.suite_hdrs)
-    runner_obj = env.SharedObject(runner_src)
-    env.Program(env.get_build_path('bin/testStGermain'),
-                runner_obj + env.suite_objs,
-                LIBS=['StGermain', 'pcu'] + env.get('LIBS', []))
+# Inside each project we will be accessing headers without the
+# project name as a prefix, so we need to let SCons know how to
+# find those headers.
+env.Append(CPPPATH='#' + env['build_dir'] + '/include/StGermain')
 
-#
-# Copy scripts to correct destinations.
-if env.check_dir_target('script/scons.py'):
-    env.Install(env.get_build_path('script/StGermain'), 'script/scons.py')
+# As a bit of a special case we need to copy these headers across
+# first up. Can't use the install builder either, have to actually
+# copy the bastards.
+dir = Dir('#' + env['build_dir'] + '/include/StGermain/Base/IO/mpirecord').abspath
+if not os.path.exists(os.path.join(dir, 'mpimessaging.h')):
+    if not os.path.exists(dir):
+        os.makedirs(dir)
+    Execute(Copy(File('#' + env['build_dir'] + '/include/StGermain/Base/IO/mpirecord/mpimessaging.h'),
+                 File('Base/IO/src/mpirecord/none/mpimessaging.h')))
+dir = Dir('#' + env['build_dir'] + '/include/StGermain/Base/Foundation').abspath
+if not os.path.exists(os.path.join(dir, 'ClassSetup.h')):
+    if not os.path.exists(dir):
+        os.makedirs(dir)
+    Execute(Copy(File('#' + env['build_dir'] + '/include/StGermain/Base/Foundation/ClassSetup.h'),
+                 File('Base/Foundation/src/ClassSetup.h')))
+    Execute(Copy(File('#' + env['build_dir'] + '/include/StGermain/Base/Foundation/ClassEmpty.h'),
+                 File('Base/Foundation/src/ClassEmpty.h')))
 
-#
+# Keep a list of all the objects we build so we can make a library
+# afterwards.
+objs = []
+suites = []
+
+# Process each directory uniformly.
+dirs = Split('Base/Foundation Base/IO Base/Container Base/Automation Base/Extensibility ' \
+                 'Base/Context Base Utils libStGermain')
+for d in dirs:
+
+    # Need the module name, which is just the directory.
+    mod_name = env['ESCAPE']('"' + ''.join(d.split('/')) + '"')
+    cpp_defs = [('CURR_MODULE_NAME', mod_name)] + env.get('CPPDEFINES', [])
+
+    # Setup where to look for files.
+    src_dir = d + '/src'
+    inc_dir = '#' + env['build_dir'] + '/include/StGermain/' + d
+    tst_dir = d + '/tests'
+
+    # Install the headers and '.def' files.
+    hdrs = env.Install(inc_dir, Glob(src_dir + '/*.h'))
+    defs = env.Install(inc_dir, Glob(src_dir + '/*.def'))
+
+    # Build our source files.
+    srcs = Glob(src_dir + '/*.c')
+    srcs = [s for s in srcs if s.path.find('-meta.c') == -1]
+    objs += env.SharedObject(srcs, CPPDEFINES=cpp_defs)
+
+    # Build any meta files.
+    objs += env.stgSharedMeta(Glob(src_dir + '/*.meta'), CPPDEFINES=cpp_defs)
+
+    # If we found any '.def' files make sure to register them as
+    # explicit dependencies.
+    if defs:
+        env.Depends(hdrs + objs, defs)
+
+    # Build any test suites we might find.
+    suites += env.Object(Glob(tst_dir + '/*Suite.c'))
+
+# Need to install headers from libStGermain.
+env.Install('#' + env['build_dir'] + '/include/StGermain', Glob('libStGermain/src/*.h'))
+
+# Build libraries.
+if env['shared_libraries']:
+    env.SharedLibrary('#' + env['build_dir'] + '/lib/StGermain', objs)
+
+# FlattenXML, StGermain and test runner programs.
+libs = ['StGermain'] + env.get('LIBS', [])
+env.Program('bin/FlattenXML', 'Base/FlattenXML/src/main.c', LIBS=libs)
+env.Program('bin/StGermain', 'src/main.c', LIBS=libs)
+env.PCUTest('#' + env['build_dir'] + '/tests/testStGermain', suites,
+            PCU_SETUP="StGermain_Init(&argc, &argv);",
+            PCU_TEARDOWN="StGermain_Finalise();",
+            LIBS=libs)
+
 # Copy XML validation file to correct destination.
-if env.check_dir_target('Base/IO/src/StGermain.xsd'):
-    env.Install(env.get_build_path('lib'), 'Base/IO/src/StGermain.xsd')
-
-#
-# Return any module code we need to build into a static binary.
-module = (env.get('STGMODULEPROTO', ''), env.get('STGMODULECODE', ''))
-Return('module')
+env.Install('#' + env['build_dir'] + '/lib', 'Base/IO/src/StGermain.xsd')

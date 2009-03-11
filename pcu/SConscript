@@ -1,21 +1,17 @@
+import os
 Import('env')
 
+# Need to add header directory.
+env.Append(CPPPATH='#' + env['build_dir'] + '/include/pcu')
+
 # Move headers to our build directory.
-headers = env.glob('src/*.h')
-for hdr in headers:
-    env.Install(env.get_build_path('include/pcu'), hdr)
+env.Install('#' + env['build_dir'] + '/include/pcu', Glob('src/*.h'))
 
 # Build our source files.
-sources = env.glob('src/*.c')
-src_objs = []
-for src in sources:
-    src_objs += env.SharedObject(env.get_target_name('pcu/' + src, '.c'), src)
+objs = env.SharedObject(Glob('src/*.c'))
 
 # Build a library (if needed) and register destination.
 if env['static_libraries']:
-    env.Library(env.get_target_name('lib/pcu'), src_objs)
+    env.Library('#' + env['build_dir'] + '/lib/pcu', objs)
 if env['shared_libraries']:
-    env.SharedLibrary(env.get_target_name('lib/pcu'), src_objs)
-
-# Copy the script to the build directory.
-env.Install(env.get_build_path('script/pcu'), 'script/scons.py')
+    env.SharedLibrary('#' + env['build_dir'] + '/lib/pcu', objs)
