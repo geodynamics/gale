@@ -1,100 +1,128 @@
 import os
 Import('env')
 
-#
-# Prepare the construction environment by copying the one we
-# were given.
+# Need to make a copy because SCons uses the environment
+# at it's final state, so StGermain ends up depending on
+# StgDomain, etc.
 env = env.Clone()
-env.project_name = 'Underworld'
-env.AppendUnique(CPPPATH=[env.get_build_path('include/' + env.project_name)])
-env.src_objs = []
-env.suite_hdrs = []
-env.suite_objs = []
 
-#
-# Build standard stg directories.
-env.build_directory('Rheology')
-env.build_directory('Utils')
+# Inside each project we will be accessing headers without the
+# project name as a prefix, so we need to let SCons know how to
+# find those headers.
+env.Append(CPPPATH='#' + env['build_dir'] + '/include/Underworld')
 
-#
-# Need to handle libUnderworld differently.
-env.build_headers(env.glob('libUnderworld/src/*.h'), 'include/Underworld')
-env.src_objs += env.build_sources(env.glob('libUnderworld/src/*.c'), 'Underworld/libUnderworld')
-env.src_objs += env.build_metas(env.glob('libUnderworld/src/*.meta'), 'Underworld/libUnderworld')
+# Keep a list of all the objects we build so we can make a library
+# afterwards.
+objs = []
+suites = []
 
-#
-# Build shared library.
+# Process each directory uniformly.
+dirs = Split('Rheology Utils libUnderworld')
+for d in dirs:
+
+    # Need the module name, which is just the directory.
+    mod_name = env['ESCAPE']('"' + ''.join(d.split('/')) + '"')
+    cpp_defs = [('CURR_MODULE_NAME', mod_name)] + env.get('CPPDEFINES', [])
+
+    # Setup where to look for files.
+    src_dir = d + '/src'
+    inc_dir = '#' + env['build_dir'] + '/include/Underworld/' + d
+    tst_dir = d + '/tests'
+
+    # Install the headers and '.def' files.
+    hdrs = env.Install(inc_dir, Glob(src_dir + '/*.h'))
+    defs = env.Install(inc_dir, Glob(src_dir + '/*.def'))
+
+    # Build our source files.
+    srcs = Glob(src_dir + '/*.c')
+    srcs = [s for s in srcs if s.path.find('-meta.c') == -1]
+    objs += env.SharedObject(srcs, CPPDEFINES=cpp_defs)
+
+    # Build any meta files.
+    objs += env.stgSharedMeta(Glob(src_dir + '/*.meta'), CPPDEFINES=cpp_defs)
+
+    # If we found any '.def' files make sure to register them as
+    # explicit dependencies.
+    if defs:
+        env.Depends(hdrs + objs, defs)
+
+    # Build any test suites we might find.
+    suites += env.Object(Glob(tst_dir + '/*Suite.c'))
+
+# Need to install headers from libUnderworld.
+env.Install('#' + env['build_dir'] + '/include/Underworld', Glob('libUnderworld/src/*.h'))
+
+# Build libraries.
 if env['shared_libraries']:
-    env.SharedLibrary(env.get_build_path('lib/Underworld'), env.src_objs)
+    env.SharedLibrary('#' + env['build_dir'] + '/lib/Underworld', objs)
 
-#
-# Build toolbox.
-env.build_toolbox('libUnderworld/Toolbox')
+# Need to include the Underworld library for binaries.
+libs = ['Underworld'] + env.get('LIBS', [])
 
-#
-# Build plugins. Note that this must happen after the shared library
-# has been built.
-env.build_plugin('plugins/EulerDeform')
-env.build_plugin('plugins/ExtractPetscObjects')
-env.build_plugin('plugins/IncompressibleExtensionBC')
-env.build_plugin('plugins/Output/BuoyancyIntegrals')
-env.build_plugin('plugins/DensityChangeAtDepth')
-env.build_plugin('plugins/MaterialThermalDiffusivity')
-env.build_plugin('plugins/MeshAdvectionCorrection')
-env.build_plugin('plugins/VariableConditions/ShapeFemIC')
-env.build_plugin('plugins/Output/Vrms')
-env.build_plugin('plugins/Output/Plateness')
-env.build_plugin('plugins/Output/Mobility')
-env.build_plugin('plugins/Output/Nusselt')
-env.build_plugin('plugins/Output/VTKOutput')
-env.build_plugin('plugins/Output/MaxTemperature')
-env.build_plugin('plugins/Output/MaxVelocity')
-env.build_plugin('plugins/Output/BoundaryLayers')
-env.build_plugin('plugins/Output/AverageTemperature')
-env.build_plugin('plugins/ScalingChecks/Ra_Scaling')
-env.build_plugin('SysTest/AnalyticPlugins/VelicIC')
-env.build_plugin('SysTest/AnalyticPlugins/Velic_solA')
-env.build_plugin('SysTest/AnalyticPlugins/Velic_solB')
-env.build_plugin('SysTest/AnalyticPlugins/Velic_solCx')
-env.build_plugin('SysTest/AnalyticPlugins/Velic_solHA')
-env.build_plugin('SysTest/AnalyticPlugins/Velic_solKz')
-env.build_plugin('SysTest/AnalyticPlugins/Velic_solS')
+# Test runner program.
+env.PCUTest('#' + env['build_dir'] + '/tests/testUnderworld', suites,
+            PCU_SETUP="StGermain_Init(&argc, &argv);StgDomain_Init(&argc, &argv);" \
+                "StgFEM_Init(&argc, &argv);PICellerator_Init(&argc, &argv);" \
+                "Underworld_Init(&argc, &argv);",
+            PCU_TEARDOWN="Underworld_Finalise();PICellerator_Finalise();StgFEM_Finalise();" \
+                "StgDomain_Finalise();StGermain_Finalise();",
+            LIBS=libs)
 
-#
-# Build static library.
-if env['static_libraries']:
-    env.Library(env.get_build_path('lib/Underworld'), env.src_objs)
+# Build plugins.
+dirs = ['libUnderworld/Toolbox',
+        'plugins/EulerDeform',
+        'plugins/IncompressibleExtensionBC',
+        'plugins/Output/BuoyancyIntegrals',
+        'plugins/DensityChangeAtDepth',
+        'plugins/MaterialThermalDiffusivity',
+        'plugins/MeshAdvectionCorrection',
+        'plugins/VariableConditions/ShapeFemIC',
+        'plugins/Output/Vrms',
+        'plugins/Output/Plateness',
+        'plugins/Output/Mobility',
+        'plugins/Output/Nusselt',
+        'plugins/Output/VTKOutput',
+        'plugins/Output/MaxTemperature',
+        'plugins/Output/MaxVelocity',
+        'plugins/Output/BoundaryLayers',
+        'plugins/Output/AverageTemperature',
+        'plugins/ScalingChecks/Ra_Scaling',
+        'SysTest/AnalyticPlugins/VelicIC',
+        'SysTest/AnalyticPlugins/Velic_solA',
+        'SysTest/AnalyticPlugins/Velic_solB',
+        'SysTest/AnalyticPlugins/Velic_solCx',
+        'SysTest/AnalyticPlugins/Velic_solHA',
+        'SysTest/AnalyticPlugins/Velic_solKz',
+        'SysTest/AnalyticPlugins/Velic_solS']
+for d in dirs:
 
-#
-# Build unit test runner.
-if not env.get('dir_target', ''):
-    env['PCURUNNERINIT'] = ''
-    env['PCURUNNERSETUP'] = """StGermain_Init( &argc, &argv );
-   StgDomain_Init( &argc, &argv );
-   StgFEM_Init( &argc, &argv );
-   PICellerator_Init( &argc, &argv );
-   Underworld_Init( &argc, &argv );"""
-    env['PCURUNNERTEARDOWN'] = """Underworld_Finalise();
-   PICellerator_Finalise();
-   StgFEM_Finalise();
-   StgDomain_Finalise();
-   StGermain_Finalise();"""
-    runner_src = env.PCUSuiteRunner(env.get_build_path('Underworld/testUnderworld.c'), env.suite_hdrs)
-    runner_obj = env.SharedObject(runner_src)
-    env.Program(env.get_build_path('bin/testUnderworld'),
-                runner_obj + env.suite_objs,
-                LIBS=['Underworld', 'pcu'] + env.get('LIBS', []))
+    name = 'Underworld_' + d.split('/')[-1] + 'module'
+    mod_name = env['ESCAPE']('"' + ''.join(d.split('/')) + '"')
+    cpp_defs = [('CURR_MODULE_NAME', mod_name)] + env.get('CPPDEFINES', [])
 
-#
-# Copy over XML files.
-xml_bases = ['', 'BaseApps', 'VariableConditions', 'Viewports']
-for base in xml_bases:
-    dst = env.get_build_path('lib/StGermain/Underworld/' + base)
-    for file in env.glob('InputFiles/src/' + base + '/*.xml'):
-        if env.check_dir_target(file):
-            env.Install(dst, file)
+    env.Install('#' + env['build_dir'] + '/include/Underworld/' + d.split('/')[-1],
+                Glob(d + '/*.h'))
 
-#
-# Return any module code we need to build into a static binary.
-module = (env.get('STGMODULEPROTO', ''), env.get('STGMODULECODE', ''))
-Return('module')
+    srcs = Glob(d + '/*.c')
+    srcs = [s for s in srcs if s.path.find('-meta.c') == -1]
+    objs = env.SharedObject(srcs, CPPDEFINES=cpp_defs)
+    objs += env.stgSharedMeta(Glob(d + '/*.meta'), CPPDEFINES=cpp_defs)
+
+    if env['shared_libraries']:
+        lib_pre = env['LIBPREFIXES']
+        if not isinstance(lib_pre, list):
+            lib_pre = [lib_pre]
+        env.SharedLibrary('#' + env['build_dir'] + '/lib/' + name, objs,
+                          SHLIBPREFIX='',
+                          LIBPREFIXES=lib_pre + [''],
+                          LIBS=libs)
+
+# Install XML input files.
+env.Install('#' + env['build_dir'] + '/lib/StGermain/Underworld',
+            Glob('InputFiles/Underworld_Components/*.xml'))
+env.Install('#' + env['build_dir'] + '/lib/StGermain/Underworld/BaseApps',
+            Glob('InputFiles/BaseApps/*.xml'))
+env.Install('#' + env['build_dir'] + '/lib/StGermain/Underworld/VariableConditions',
+            Glob('InputFiles/VariableConditions/*.xml'))
+env.Install('#' + env['build_dir'] + '/lib/StGermain/Underworld/Viewports',
+            Glob('InputFiles/Viewports/*.xml'))
