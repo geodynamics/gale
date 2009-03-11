@@ -72,9 +72,11 @@ Bool StgDomainUtils_Init( int* argc, char** argv[] ) {
 				   "0", (void*  (*)(Name))_MeshShapeVC_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), MeshBoundaryShape_Type, 
 				   "0", (void*  (*)(Name))MeshBoundaryShape_New );
+#ifdef HAVE_PETSC
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), 
 				   RegularRemesherCmpt_Type, 
 				   "0", (void* (*)(Name))_RegularRemesherCmpt_DefaultNew );
+#endif
 /*
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), Remesher_Type, 
 				   "0", (void* (*)(Name))_Remesher_DefaultNew );
@@ -103,7 +105,9 @@ Bool StgDomainUtils_Init( int* argc, char** argv[] ) {
 	RegisterParent( MeshShapeVC_Type,                  VariableCondition_Type );
 	RegisterParent( MeshBoundaryShape_Type,        Stg_Shape_Type );
 	RegisterParent( DofLayout_Type,                Stg_Component_Type );
+#ifdef HAVE_PETSC
 	RegisterParent( RegularRemesherCmpt_Type,      Remesher_Type );
+#endif
 /*
 	RegisterParent( Remesher_Type,                 Stg_Component_Type );
 	RegisterParent( StripRemesher_Type,            Remesher_Type );

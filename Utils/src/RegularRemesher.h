@@ -42,9 +42,13 @@
 #ifndef __StGermain_Domain_Utils_RegularRemesher_h__
 #define __StGermain_Domain_Utils_RegularRemesher_h__
 
+#ifdef HAVE_PETSC
+
 #include "StGermain/Base/Foundation/ClassClear.h"
 #define CLASSDIR StgDomain/Utils
 #define CLASSNAME RegularRemesher
 #include "StGermain/Base/Foundation/ClassHdr.h"
+
+#endif
 
 #endif /* __StGermain_Domain_Utils_RegularRemesher_h__ */
