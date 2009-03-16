@@ -80,8 +80,8 @@ if env['shared_libraries']:
 
 # FlattenXML, StGermain and test runner programs.
 libs = ['StGermain'] + env.get('LIBS', [])
-env.Program('bin/FlattenXML', 'Base/FlattenXML/src/main.c', LIBS=libs)
-env.Program('bin/StGermain', 'src/main.c', LIBS=libs)
+env.Program('#' + env['build_dir'] + '/bin/FlattenXML', 'Base/FlattenXML/src/main.c', LIBS=libs)
+env.Program('#' + env['build_dir'] + '/bin/StGermain', 'src/main.c', LIBS=libs)
 env.PCUTest('#' + env['build_dir'] + '/tests/testStGermain', suites,
             PCU_SETUP="StGermain_Init(&argc, &argv);",
             PCU_TEARDOWN="StGermain_Finalise();",
