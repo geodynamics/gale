@@ -430,6 +430,15 @@ Bool Mesh_Search( void* mesh, double* point,
 	return Mesh_Algorithms_Search( self->algorithms, point, dim, ind );
 }
 
+/* Mesh_SearchElements (
+ * mesh -- is a mesh
+ * point -- is a global coordinate
+ * elInd -- will be filled in by a local elementID
+ * )
+ * returns:
+ * False if the point is not in the DOMAIN space of the proc 
+ * True if the point is in the DOMAIN space
+ */
 Bool Mesh_SearchElements( void* mesh, double* point, unsigned* elInd ) {
 	Mesh*	self = (Mesh*)mesh;
 

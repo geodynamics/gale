@@ -208,18 +208,21 @@ void _SurfaceAdaptor_Destroy( void* adaptor, void* data ) {
 */
 
 void SurfaceAdaptor_Generate( void* adaptor, void* _mesh, void* data ) {
-	SurfaceAdaptor*			self = (SurfaceAdaptor*)adaptor;
-	Mesh*				mesh = (Mesh*)_mesh;
-	const Sync*			sync;
-	SurfaceAdaptor_DeformFunc*	deformFunc;
-	Grid				*grid;
-	unsigned*			inds;
-        double                          deform;
-	unsigned			n_i;
+	SurfaceAdaptor* self = (SurfaceAdaptor*)adaptor;
+	Mesh* mesh = (Mesh*)_mesh;
+	const Sync* sync;
+	SurfaceAdaptor_DeformFunc* deformFunc;
+	Grid *grid;
+	unsigned* inds;
+	double deform;
+	unsigned n_i;
 
 	/* Build base mesh, which is assumed to be cartesian. */
 	MeshGenerator_Generate( self->generator, mesh, data );
 
+	/* if loading from checkpoint then forget about this step */
+	if( ((Context*)data)->loadFromCheckPoint == True )
+		return;
 	/* If we're not 2D or 3D, forget about it. */
 	if( mesh->topo->nDims != 2 && mesh->topo->nDims != 3 )
 		return;
