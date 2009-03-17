@@ -277,7 +277,7 @@ void _FaultingMoresiMuhlhaus2006_Construct( void* rheology, Stg_ComponentFactory
 			self,
 			pressureField,
 			velocityGradientsField,
-			materialPointsSwarm, 
+			materialPointsSwarm,  
 			context,
 			director,
 			Stg_ComponentFactory_GetDouble( cf, self->name, "cohesion", 0.0 ),
@@ -360,20 +360,26 @@ void _FaultingMoresiMuhlhaus2006_Initialise( void* rheology, void* data ) {
 				LM  */
 		
 		
-                        if( initialDamageFraction > 0.0 ) {
-                           /*if (1 || rand() < RAND_MAX*initialDamageFraction) {*/
+                        if( initialDamageFraction > 0.0 && (rand() < RAND_MAX*initialDamageFraction)) {
                            normalLength2 = 0.0;
-				
+					
                            for( dof_I=0; dof_I < dim ; dof_I++) {
+							  if (3==dim && 1==dof_I){ /* Option: horizontal only in 3D case */
+								normal[dof_I] = 0.0;
+								continue;
+							 }
+								
                               normal[dof_I] = 1.0 - (2.0 * (double)rand())/(double)RAND_MAX;
                               normalLength2 += normal[dof_I] * normal[dof_I];
                            }
+
 
                            invNormalLength = 1.0/sqrt(normalLength2);
 
                            for( dof_I=0; dof_I < dim ; dof_I++){
                               normal[dof_I] *= invNormalLength; 
                            }
+					
 
                            /*TODO : improve this initialisation (is it really needed ?)
                              Dear Dr TODO, If you mean "is the slip really needed" then
@@ -431,12 +437,14 @@ void _FaultingMoresiMuhlhaus2006_ModifyConstitutiveMatrix(
 	postFailureWeakening = StrainWeakening_GetPostFailureWeakening( self->strainWeakening, materialPoint );
 	
 	/* First part : treatment of the existing weakened directions.
-           Note: If we don't want to update orientations that means we want to use
+           Note: If we don't want to update orientations at all that means we want to use
            the existing preset ones, so we'll always go in here. */
+
 	if( !self->updateOrientations || (!self->ignoreOldOrientation && postFailureWeakening > 0.0) ) {
 	
 		/* tryingOldOrientation is a flag used to know where we are. This is necessary because some parts are treated differently
 		 * if we are dealing with old orientation or with pristine material (see for example _FaultingMoresiMuhlhaus2006_GetYieldIndicator) */
+	
 		self->tryingOldOrientation = True;
 
 		if ( _FaultingMoresiMuhlhaus2006_OldOrientationStillSoftening( self, materialPointsSwarm, materialPoint, constitutiveMatrix->dim ) ) {
@@ -456,10 +464,23 @@ void _FaultingMoresiMuhlhaus2006_ModifyConstitutiveMatrix(
 				return;
 			}
 		}
+		 
+		/* 
+		     If it falls through to here, old orientation is now hardening  */
+				
+		YieldRheology_SetParticleFlag( self, materialPointsSwarm, materialPoint, 0 );
+		
 	}
 
-	/* Second part : treatment of pristine material with no direction favoured */
+	/* Second part : treatment of pristine material with no previously stored direction  */
+	
+	
 	self->tryingOldOrientation = False;
+	
+	/* This calls the standard yielding Constitutive matrix routine defined on the parent BUT
+		the individual calls are to the FMM routines so this should choose the appropriate softening
+		orientation for pristine material */
+	
 	_YieldRheology_ModifyConstitutiveMatrix( self, constitutiveMatrix, materialPointsSwarm, lElement_I, materialPoint, xi );
 }
 
@@ -469,7 +490,7 @@ double _FaultingMoresiMuhlhaus2006_GetYieldIndicator(
 		MaterialPointsSwarm*                               materialPointsSwarm,
 		Element_LocalIndex                                 lElement_I,
 		MaterialPoint*                                     materialPoint,
-		Coord                                              xi )
+		Coord                                              xi ) 
 {
 	FaultingMoresiMuhlhaus2006*           self             = (FaultingMoresiMuhlhaus2006*) rheology;
 	double*                               stress           = self->currentStress;
@@ -531,7 +552,7 @@ double _FaultingMoresiMuhlhaus2006_GetYieldCriterion(
 
 	frictionalStrength = effectiveFrictionCoefficient * sigma_nn + effectiveCohesion;
 
-	/* Check if it should break in tension (strictly : frictionalStrength < tensileStrength) */
+	/* Check if it should break in tension (strictly : frictionalStrength < tensileStrength and not zero) */
 	particleExt->tensileFailure = (frictionalStrength < 0.0);
 	
 	/* Make sure frictionalStrength is above the minimum */
@@ -601,6 +622,7 @@ Bool _FaultingMoresiMuhlhaus2006_OldOrientationStillSoftening( void* rheology, M
 	 * The slip direction should be set to the direction of maximum shear stress and stored
 	 * for plotting 
 	 * (it does not need to be updated as a history variable like the director ) */
+	
 	if ( dim == 2 ) {
 		traction[0] = stress[0] * n[0] + stress[2] * n[1];
 		traction[1] = stress[2] * n[0] + stress[1] * n[1];
@@ -610,6 +632,7 @@ Bool _FaultingMoresiMuhlhaus2006_OldOrientationStillSoftening( void* rheology, M
 		s[0] = traction[0] - tau_nn * n[0];
 		s[1] = traction[1] - tau_nn * n[1];
 	}
+	
 	else {
 		traction[0] = stress[0] * n[0] + stress[3] * n[1] + stress[4] * n[2];
 		traction[1] = stress[3] * n[0] + stress[1] * n[1] + stress[5] * n[2];
@@ -621,6 +644,7 @@ Bool _FaultingMoresiMuhlhaus2006_OldOrientationStillSoftening( void* rheology, M
 		s[1] = traction[1] - tau_nn * n[1];
 		s[2] = traction[2] - tau_nn * n[2];
 	}
+	
 	StGermain_VectorNormalise( s, dim );
 	
 	/* Store tau_nn so that we can use it in calculating sigma_nn in _FaultingMoresiMuhlhaus2006_Sigma_nn */
@@ -638,9 +662,11 @@ Bool _FaultingMoresiMuhlhaus2006_OldOrientationStillSoftening( void* rheology, M
 	/* We should only continue testing this plane if it is also in the 
 	 * softening orientation with respect to the strain-rate gradient rather than hardening */
 
-        /* The above is untrue if we are keeping the same director normals. */
+        /* The above is untrue if we are keeping the same director normals .  */
 	
-	return (dVparalleldXperpendicular1 < dVparalleldXperpendicular) ? True : !self->updateOrientations;
+	/* LM: No, I don't think this is true ... in this case we keep the orientation unless it hardens as well */
+			
+	return (dVparalleldXperpendicular1 < dVparalleldXperpendicular); // ? True : !self->updateOrientations;
 }
 
 double* _FaultingMoresiMuhlhaus2006_UpdateNormalDirection( void* rheology, MaterialPointsSwarm* materialPointsSwarm, void* materialPoint, Dimension_Index dim ) {
@@ -696,7 +722,9 @@ double* _FaultingMoresiMuhlhaus2006_UpdateNormalDirection( void* rheology, Mater
            strainRate_ns[1] = fabs(TensorArray_MultiplyByVectors( velocityGradient, slip[1], normal[1], dim ));
 
            /* Choose the plane which is oriented favorably for continued slip */
-           favourablePlane = strainRate_ns[0] > strainRate_ns[1] ? 0 : 1;
+
+	
+           favourablePlane = (strainRate_ns[0] > strainRate_ns[1] ? 0 : 1);
 
            memcpy( normalDirector,      normal[favourablePlane], dim * sizeof(double) );
            memcpy( particleExt->slip,   slip[favourablePlane],   dim * sizeof(double) );
@@ -705,7 +733,7 @@ double* _FaultingMoresiMuhlhaus2006_UpdateNormalDirection( void* rheology, Mater
 
         }
 
-        /* If we're not interested in changing director normals, just use existing ones. */
+        /* If we're not interested in changing director normals, just us e existing ones. */
         else {
 
            self->storedSlipRateValue = fabs(TensorArray_MultiplyByVectors(
@@ -722,20 +750,22 @@ double _FaultingMoresiMuhlhaus2006_EffectiveCohesion( void* rheology, void* mate
 	FaultingMoresiMuhlhaus2006_Particle* particleExt                   = (FaultingMoresiMuhlhaus2006_Particle*) particleExtIn; 
 	
 	if ( self->tryingOldOrientation || self->ignoreOldOrientation ) {
-		/* If this is the old orientation or old orientations are ignored
+		/* If this is the old orientation or old orientations are completely ignored
 		 * then the weakening should be considered here   */
+		
 		double strainWeakeningRatio = StrainWeakening_CalcRatio( self->strainWeakening, materialPoint );
 	
 		effectiveCohesion =  self->cohesion * (1.0 - strainWeakeningRatio) + 
 				self->cohesionAfterSoftening * strainWeakeningRatio;
 				
-		/* Flag particle as fully softened if strainWeakeningRation > 0.99 */ 
+		/* Flag particle as fully softened if strainWeakeningRatio > 0.99 */ 
 		
 		particleExt->fullySoftened = ( strainWeakeningRatio > 0.99 );
 	}
 	else {
-		/*	If old orientations are given priority and this is an unbroken direction 
+		/*	If old orientations are tested first and this is an unbroken direction 
 		 *	then consider material as completely pristine */
+		
 		effectiveCohesion =  self->cohesion;
 	}
 
@@ -811,7 +841,7 @@ void _FaultingMoresiMuhlhaus2006_UpdateNormalAtMaxSoft( void* rheology, void* ma
 
 	normalDirector = Director_GetNormalPtr( self->director, materialPoint);
 
-        /* If we don't want to update normals, leave as is. */
+    /* If we don't want to update normals, leave as is. */
         if( !self->updateOrientations )
            return;
 
@@ -823,7 +853,8 @@ void _FaultingMoresiMuhlhaus2006_UpdateNormalAtMaxSoft( void* rheology, void* ma
 		StGermain_RotateCoordinateAxis(   slip[1],   eigenvectorListStrain[0].vector, K_AXIS, +theta);
 		StGermain_RotateCoordinateAxis( normal[0],   eigenvectorListStrain[0].vector, K_AXIS, +theta);
 		StGermain_RotateCoordinateAxis( normal[1],   eigenvectorListStrain[0].vector, K_AXIS, -theta);
-	} else {
+	}
+	else{
 		StGermain_RotateVector( slip[0],   eigenvectorListStrain[0].vector, eigenvectorListStrain[1].vector, - theta );
 		StGermain_RotateVector( slip[1],   eigenvectorListStrain[0].vector, eigenvectorListStrain[1].vector, + theta );
 		StGermain_RotateVector( normal[0], eigenvectorListStrain[0].vector, eigenvectorListStrain[1].vector, + theta );
@@ -986,7 +1017,7 @@ void _FaultingMoresiMuhlhaus2006_UpdateDrawParameters( void* rheology ) {
 	fprintf(stderr,"globalMeanSlipRate = %g\n",globalMeanSlipRate); 
 	fprintf(stderr,"averagedGlobalMaxSlipRate = %g\n",averagedGlobalMaxSlipRate);
 	
-	fprintf(stderr,"Number of particles failing = %d\n",localFailed);
+	fprintf(stderr,"Number of particles failing = %d/%d\n",localFailed,particleLocalCount);
 	
 	
 	

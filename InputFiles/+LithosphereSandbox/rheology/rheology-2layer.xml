@@ -64,8 +64,8 @@
 			<param name="Type">DruckerPrager</param>
 			<param name="PressureField">PressureField</param>
 			<param name="VelocityGradientsField">VelocityGradientsField</param>
-			<param name="StrainRateField">StrainRateField</param> 
-		<!--<param name="StrainRateField">recoveredStrainRate</param> -->
+		    <param name="StrainRateField">StrainRateField</param> 
+		    <!-- ><param name="StrainRateField">recoveredStrainRateField</param> -->
 			<param name="MaterialPointsSwarm">materialSwarm</param>
 			<param name="Director">director</param>
 			<param name="Context">context</param>
@@ -84,7 +84,7 @@
 			<param name="PressureField">PressureField</param>
 			<param name="VelocityGradientsField">VelocityGradientsField</param> <!-- ?? is this used ?? -->
 			<param name="StrainRateField">StrainRateField</param> 
-			<!--<param name="StrainRateField">recoveredStrainRate</param> -->
+			<!-- ><param name="StrainRateField">recoveredStrainRateField</param> -->
 			<param name="MaterialPointsSwarm">materialSwarm</param>
 			<param name="Director">director</param>
 			<param name="Context">context</param>

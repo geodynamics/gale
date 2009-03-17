@@ -12,6 +12,9 @@
 -->		
 
 	<include> Underworld/BaseApps/ExtensionCompressionShearQ1Q1BaseApp.xml </include>	
+	<!--><include> Underworld/BaseApps/ExtensionIncompressibleShearBaseApp.xml </include> 
+	<include>Experimental/StoreViscosity.xml</include> -->
+	
 	
 	<list name="plugins" mergeType="merge">
 		<param>StgFEM_FrequentOutput </param>	
@@ -20,7 +23,7 @@
 		<param>StgFEM_FeVariableList </param>
 		<param>Experimental_ShearBandAnalysis</param>
 	</list>
-	
+		
 	<struct name="ShearBandAnalysis" mergeType="replace">
 		<list name="materialIndices">
 			<param> 1 </param>
@@ -35,7 +38,7 @@
 
 	<param name="extensionReferenceHeight">0.8</param>
 
-	<!-- All stuff associated with recovered pressures/stresses etc -->
+	<!-- All stuff associated with recovered pressures/stresses etc --> 
 	
 	<struct name="components" mergeType="merge">
 		<struct name="recoveredStrainRateField" mergeType="replace">
@@ -51,13 +54,18 @@
 			<param name="recoverPressure">False</param>
 			<param name="OrderOfInterpolation">1</param>
 			<param name="RawPressureField">PressureField</param>
+			<param name="CalibratePressure"> 1 </param>
+			
 		</struct>
 		<struct name="REP">
 			<param name="Type">REP_Algorithm</param>
 			<param name="IntegrationPoints">picIntegrationPoints</param>
 			<param name="ConstitutiveMatrix">constitutiveMatrix</param>
-			<param name="RepField">recoveredStrainRateField</param>
-			<param name="RepField2">recoveredStressField</param>
+			<list name="RepFieldList">
+				<param>recoveredStrainRateField</param>
+				<param>recoveredStressField</param>
+			</list>
+		    
 		</struct>
 		
 		<struct name="recoveredStrainRateInvariantField"> 
@@ -72,13 +80,20 @@
 			<param name="FeVariable">recoveredStressField</param>
 		</struct>
 		
+		<struct name="recoveredPressureField"> 
+			<param name="Type">OperatorFeVariable</param>
+			<param name="Operator">SymmetricTensor_NegAverageTrace</param>
+			<param name="FeVariable">recoveredStressField</param>
+		</struct>		
+		
+		
 		<struct name="recoveredDeviatoricStressInvariantField"> 
 			<param name="Type">OperatorFeVariable</param>
 		     	<param name="Operator">SymmetricTensor_Invariant</param>
 			<param name="FeVariable">recoveredDeviatoricStressField</param>
 		</struct>
 	</struct> 
-	
+
 
 	<include> ./set_up.xml </include>
 	

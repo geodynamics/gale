@@ -287,6 +287,8 @@ void _StrainWeakening_Initialise( void* strainWeakening, void* data ) {
 	double                                 postFailureWeakening;
 	double*                                coord;
 	AbstractContext*                       context = (AbstractContext*)data;
+
+	int myrank;
 	
 	/* Initialise Parent */
 	_TimeIntegratee_Initialise( self, data );
@@ -306,8 +308,14 @@ void _StrainWeakening_Initialise( void* strainWeakening, void* data ) {
 	
 	if ( !(context && (True == context->loadFromCheckPoint)) ) {
 		/* Initialise random number generator */
-		srand( self->randomSeed );
-			
+		if(self->randomSeed==0) {
+                    MPI_Comm_rank( context->communicator, &myrank);
+		    srand( self->randomSeed );
+		}
+		else {
+			srand( self->randomSeed );
+		}
+	
 		for ( lParticle_I = 0 ; lParticle_I < particleLocalCount ; lParticle_I++ ) {
 			/* Initialise Increment to Zero */
 			Variable_SetValueDouble( self->postFailureWeakeningIncrement->variable, lParticle_I, 0.0 );
@@ -336,28 +344,28 @@ void _StrainWeakening_Initialise( void* strainWeakening, void* data ) {
 				
 				if ( self->initialDamageWavenumber > 0.0 && self->initialDamageWavenumberCosI == -1.0 ) {				
 						postFailureWeakening *= 
-							pow(1.0+cos(M_PI * coord[ I_AXIS ] * self->initialDamageWavenumber),2.0);
+							pow(0.5+0.5*cos(M_PI * coord[ I_AXIS ] * self->initialDamageWavenumber),2.0);
 					}
 					
 				/* Alternate phase is appropriate for different bc's and choice of origin */	
 					
 				if ( self->initialDamageWavenumberCosI > 0.0 ) {				
 						postFailureWeakening *= 
-							pow(1.0+cos(M_PI * coord[ I_AXIS ] * self->initialDamageWavenumberCosI),2.0);
+							pow(0.5+0.5*cos(M_PI * coord[ I_AXIS ] * self->initialDamageWavenumberCosI),2.0);
 				}
 				
 				if ( self->initialDamageWavenumberSinI > 0.0 ) {				
 					postFailureWeakening *= 
-						pow(1.0+sin(M_PI * coord[ I_AXIS ] * self->initialDamageWavenumberSinI),2.0);
+						pow(0.5+0.5*sin(M_PI * coord[ I_AXIS ] * self->initialDamageWavenumberSinI),2.0);
 				}
 				
 				if ( self->initialDamageWavenumberCosK > 0.0 ) {				
 					postFailureWeakening *= 
-						pow(1.0+cos(M_PI * coord[ K_AXIS ] * self->initialDamageWavenumberCosK),2.0);
+						pow(0.5+0.5*cos(M_PI * coord[ K_AXIS ] * self->initialDamageWavenumberCosK),2.0);
 				}
 				if ( self->initialDamageWavenumberSinK > 0.0 ) {				
 					postFailureWeakening *= 
-						pow(1.0+sin(M_PI * coord[ K_AXIS ] * self->initialDamageWavenumberSinK),2.0);
+						pow(0.5+0.5*sin(M_PI * coord[ K_AXIS ] * self->initialDamageWavenumberSinK),2.0);
 				}
 			}
 		
@@ -404,14 +412,22 @@ double _StrainWeakening_CalcIncrementIsotropic(
 		double                           yieldIndicator )
 {
 	StrainWeakening*               self             = (StrainWeakening*) strainWeakening;
+	StrainWeakening_ParticleExt*   particleExt;
 	double                         beta             = 1.0 - yieldCriterion / yieldIndicator;
 	double                         healingRate      = self->healingRate;
 	double                         viscosity        = ConstitutiveMatrix_GetIsotropicViscosity( constitutiveMatrix );
+	double 						   postFailureWeakening;
+	
+	
+	particleExt = ExtensionManager_Get( self->swarm->particleExtensionMgr, particle, self->particleExtHandle );
+	postFailureWeakening = particleExt->postFailureWeakening;
 	
 	if (beta < 0.0)
 		beta = 0.0;
 
-	return (yieldCriterion/viscosity) * ( beta/(1.0-beta) - healingRate);
+	return(    (yieldCriterion/viscosity) * ( beta/(1.0-beta)    /* growth term depends on plastic strain rate */
+	 		 - healingRate * postFailureWeakening)               /* decay term */
+			);
 }
 
 double StrainWeakening_CalcRatio( void* strainWeakening, void* particle ) {

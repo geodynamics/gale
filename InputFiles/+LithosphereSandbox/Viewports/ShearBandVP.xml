@@ -121,9 +121,9 @@
 				<param name="ColourMap">shearBandViewer-ColourMap</param>
 				<param name="MaskVariable">materialSwarm-PostFailureWeakening</param>
 				<param name="maskType">GreaterThan</param>
-				<param name="maskValue">0.11</param>
-				<param name="pointSize">2.0</param>
-				<param name="pointSmoothing">True</param>
+				<param name="maskValue">0.1</param>
+				<param name="pointSize">1.0</param>
+				<param name="pointSmoothing">False</param>
 				<param name="positionRange">False</param>
 				<param name="minPositionX">-10</param>
 				<param name="maxPositionX">10</param>
@@ -133,24 +133,23 @@
 				<param name="maxPositionZ">10</param>
 			</struct>
 			
-			
 	
 			<struct name="shearBandViewer-BackgroundByVz">
 				<param name="Type">lucSwarmViewer</param>
 				<param name="Swarm">materialSwarm</param>
 				<param name="ColourVariable">shearBandViewer-ParticleVz</param>
 				<param name="ColourMap">shearBandViewer-velocityColourMap</param>
-				<param name="MaskVariable">materialSwarm-PostFailureWeakeningIncrement</param>
+				<param name="MaskVariable">materialSwarm-PostFailureWeakening</param>
 				<param name="maskType">LesserThan</param>
 				<param name="maskTolerance">0.0</param>
-				<param name="maskValue">0.0</param>
-				<param name="pointSize">2.0</param>
-				<param name="pointSmoothing">True</param>
+				<param name="maskValue">0.5</param>
+				<param name="pointSize">1.0</param>
+				<param name="pointSmoothing">False</param>
 				<param name="positionRange">True</param>
 				<param name="minPositionX">-10</param>
 				<param name="maxPositionX">10</param>
-				<param name="minPositionY">0.55</param>
-				<param name="maxPositionY">0.75</param>
+				<param name="minPositionY">0.6</param>
+				<param name="maxPositionY">0.9</param>
 				<param name="minPositionZ">-10</param>
 				<param name="maxPositionZ">10</param>
 			</struct>
@@ -161,12 +160,12 @@
 				<param name="Swarm">materialSwarm</param>
 				<param name="ColourVariable">shearBandViewer-ParticleVy</param>
 				<param name="ColourMap">shearBandViewer-velocityColourMap</param>
-				<param name="MaskVariable">materialSwarm-PostFailureWeakeningIncrement</param>
+				<param name="MaskVariable">materialSwarm-PostFailureWeakening</param>
 				<param name="maskType">LesserThan</param>
 				<param name="maskTolerance">0.0</param>
-				<param name="maskValue">0.0</param>
-				<param name="pointSize">2.0</param>
-				<param name="pointSmoothing">True</param>
+				<param name="maskValue">0.5</param>
+				<param name="pointSize">1.0</param>
+				<param name="pointSmoothing">False</param>
 				<param name="positionRange">True</param>
 				<param name="minPositionX">-10</param>
 				<param name="maxPositionX">10</param>
@@ -185,9 +184,9 @@
 				<param name="ColourMap">shearBandViewer-StrainIncrementColourMap</param>
 				<param name="MaskVariable">materialSwarm-PostFailureWeakening</param>
 				<param name="maskType">GreaterThan</param>
-				<param name="maskValue">0.11</param>
-				<param name="pointSize">2.0</param>
-				<param name="pointSmoothing">True</param>
+				<param name="maskValue">0.1</param>
+				<param name="pointSize">1.0</param>
+				<param name="pointSmoothing">False</param>
 				<param name="positionRange">False</param>
 				<param name="minPositionX">-10</param>
 				<param name="maxPositionX">10</param>
@@ -200,8 +199,6 @@
 
 		<!-- Tries to pick up all 3 crust materials with the loose tolerance
 		
-			
-		
 		  -->
 	
 		<struct name="shearBandViewer-CrustBlock1">
@@ -213,8 +210,8 @@
 			<param name="maskType">EqualTo</param>
 			<param name="maskTolerance">1.1</param>
 			<param name="maskValue">4.0</param>
-			<param name="pointSize">2.0</param>
-			<param name="pointSmoothing">True</param>
+			<param name="pointSize">1.0</param>
+			<param name="pointSmoothing">False</param>
 			<param name="positionRange">True</param>
 			<param name="minPositionX">-10</param>
 			<param name="maxPositionX">10</param>
@@ -233,8 +230,8 @@
 			<param name="maskType">EqualTo</param>
 			<param name="maskTolerance">1.1</param>
 			<param name="maskValue">4.0</param>
-			<param name="pointSize">2.0</param>
-			<param name="pointSmoothing">True</param>
+			<param name="pointSize">1.0</param>
+			<param name="pointSmoothing">False</param>
 			<param name="positionRange">True</param>
 			<param name="minPositionX">-10</param>
 			<param name="maxPositionX">10</param>
@@ -253,8 +250,8 @@
 			<param name="maskType">EqualTo</param>
 			<param name="maskTolerance">1.1</param>
 			<param name="maskValue">4.0</param>
-			<param name="pointSize">2.0</param>
-			<param name="pointSmoothing">True</param>
+			<param name="pointSize">1.0</param>
+			<param name="pointSmoothing">False</param>
 			<param name="positionRange">True</param>
 			<param name="minPositionX">-10</param>
 			<param name="maxPositionX">10</param>
@@ -273,8 +270,8 @@
 			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
 			<param name="maskType">EqualTo</param>
 			<param name="maskValue">1.0</param>
-			<param name="pointSize">2.0</param>
-			<param name="pointSmoothing">True</param>
+			<param name="pointSize">1.0</param>
+			<param name="pointSmoothing">False</param>
 			<param name="positionRange">False</param>
 			<param name="minPositionX">-10</param>
 			<param name="maxPositionX">10</param>
@@ -292,8 +289,8 @@
 			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
 			<param name="maskType">EqualTo</param>
 			<param name="maskValue">2.0</param>
-			<param name="pointSmoothing">True</param>
-			<param name="pointSize">2.0</param>
+			<param name="pointSmoothing">False</param>
+			<param name="pointSize">1.0</param>
 			<param name="positionRange">False</param>
 			<param name="minPositionX">-10</param>
 			<param name="maxPositionX">0.5</param>
