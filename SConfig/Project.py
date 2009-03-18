@@ -245,6 +245,9 @@ class Project(SConfig.Node):
             d = scons_env.ParseFlags('-g')
             self.backup_variable(scons_env, d.keys(), old_state)
             scons_env.MergeFlags(d)
+            d = scons_env.ParseFlags('-DDEBUG')
+            self.backup_variable(scons_env, d.keys(), old_state)
+            scons_env.MergeFlags(d)
         else:
             d = scons_env.ParseFlags('-DNDEBUG')
             self.backup_variable(scons_env, d.keys(), old_state)
