@@ -1,117 +1,97 @@
 import os
 Import('env')
 
-# Need to make a copy because SCons uses the environment
-# at it's final state, so StGermain ends up depending on
-# StgDomain, etc.
+#
+# Prepare the construction environment by copying the one we
+# were given.
 env = env.Clone()
+env.project_name = 'StgFEM'
+env.AppendUnique(CPPPATH=[env.get_build_path('include/' + env.project_name)])
+env.src_objs = []
+env.suite_hdrs = []
+env.suite_objs = []
 
-# Inside each project we will be accessing headers without the
-# project name as a prefix, so we need to let SCons know how to
-# find those headers.
-env.Append(CPPPATH='#' + env['build_dir'] + '/include/StgFEM')
+#
+# Build standard stg directories.
+env.build_directory('Discretisation')
+# env.build_directory('SLE/LinearAlgebra')
+env.build_directory('SLE/SystemSetup')
+env.build_directory('SLE/ProvidedSystems/AdvectionDiffusion')
+env.build_directory('SLE/ProvidedSystems/AdvDiff_CharGalerkin')
+env.build_directory('SLE/ProvidedSystems/Energy')
+env.build_directory('SLE/ProvidedSystems/StokesFlow')
+env.build_directory('SLE/ProvidedSystems')
+env.build_directory('SLE')
+env.build_directory('Assembly')
 
-# Keep a list of all the objects we build so we can make a library
-# afterwards.
-objs = []
-suites = []
+#
+# Need to handle libStgFEM differently.
+env.build_headers(env.glob('libStgFEM/src/*.h'), 'include/StgFEM')
+env.src_objs += env.build_sources(env.glob('libStgFEM/src/*.c'), 'StgFEM/libStgFEM')
+env.src_objs += env.build_metas(env.glob('libStgFEM/src/*.meta'), 'StgFEM/libStgFEM')
 
-# Process each directory uniformly.
-dirs = Split('Discretisation SLE/SystemSetup SLE/ProvidedSystems/AdvectionDiffusion ' \
-                 'SLE/ProvidedSystems/AdvDiff_CharGalerkin SLE/ProvidedSystems/Energy ' \
-                 'SLE/ProvidedSystems/StokesFlow SLE/ProvidedSystems SLE ' \
-                 'Assembly libStgFEM')
-for d in dirs:
-
-    # Need the module name, which is just the directory.
-    mod_name = env['ESCAPE']('"' + ''.join(d.split('/')) + '"')
-    cpp_defs = [('CURR_MODULE_NAME', mod_name)] + env.get('CPPDEFINES', [])
-
-    # Setup where to look for files.
-    src_dir = d + '/src'
-    inc_dir = '#' + env['build_dir'] + '/include/StgFEM/' + d
-    tst_dir = d + '/tests'
-
-    # Install the headers and '.def' files.
-    hdrs = env.Install(inc_dir, Glob(src_dir + '/*.h'))
-    defs = env.Install(inc_dir, Glob(src_dir + '/*.def'))
-
-    # Build our source files.
-    srcs = Glob(src_dir + '/*.c')
-    srcs = [s for s in srcs if s.path.find('-meta.c') == -1]
-    objs += env.SharedObject(srcs, CPPDEFINES=cpp_defs)
-
-    # Build any meta files.
-    objs += env.stgSharedMeta(Glob(src_dir + '/*.meta'), CPPDEFINES=cpp_defs)
-
-    # If we found any '.def' files make sure to register them as
-    # explicit dependencies.
-    if defs:
-        env.Depends(hdrs + objs, defs)
-
-    # Build any test suites we might find.
-    suites += env.Object(Glob(tst_dir + '/*Suite.c'))
-
-# Need to install headers from libStgFEM.
-env.Install('#' + env['build_dir'] + '/include/StgFEM', Glob('libStgFEM/src/*.h'))
-
-# Build libraries.
+#
+# Build shared library.
 if env['shared_libraries']:
-    env.SharedLibrary('#' + env['build_dir'] + '/lib/StgFEM', objs)
+    env.SharedLibrary(env.get_build_path('lib/StgFEM'), env.src_objs)
 
-# Need to include the StgFEM library for binaries.
-libs = ['StgFEM'] + env.get('LIBS', [])
+#
+# Build toolbox.
+env.build_toolbox('libStgFEM/Toolbox')
 
-# Test runner program.
-env.PCUTest('#' + env['build_dir'] + '/tests/testStgFEM', suites,
-            PCU_SETUP="StGermain_Init(&argc, &argv);StgDomain_Init(&argc, &argv);" \
-                "StgFEM_Init(&argc, &argv);",
-            PCU_TEARDOWN="StgFEM_Finalise();StgDomain_Finalise();" \
-                "StGermain_Finalise();",
-            LIBS=libs)
+#
+# Build plugins. Note that this must happen after the shared library
+# has been built.
+env.build_plugin('plugins/CompareFeVariableAgainstReferenceSolution')
+env.build_plugin('plugins/Document')
+env.build_plugin('plugins/FeVariableImportExporters/FeVariable_ImportExport_ABAQUS')
+env.build_plugin('plugins/FeVariableImportExporters/FeVariable_ImportExport_SpecRidge2D')
+env.build_plugin('plugins/FileAnalyticSolution')
+env.build_plugin('plugins/Output/CPUTime')
+env.build_plugin('plugins/Output/FrequentOutput')
+env.build_plugin('plugins/Output/FeVariableList')
+env.build_plugin('plugins/Output/SwarmVariableList')
+env.build_plugin('plugins/Output/PeakMemory')
+env.build_plugin('plugins/Output/PrintFeVariableDiscreteValues')
+env.build_plugin('plugins/Output/PrintFeVariableDiscreteValues_2dBox')
+env.build_plugin('plugins/StandardConditionFunctions')
+env.build_plugin('Apps/StokesMomentumUzawa/tests/LinearVelocityAnalytic')
+env.build_plugin('Apps/StokesMomentumUzawa/tests/LidDrivenIsoviscousAnalytic')
+env.build_plugin('Apps/StokesMomentumUzawa/tests/SimpleShearAnalytic')
+env.build_plugin('Apps/StokesMomentumUzawa/tests/LidDrivenStokesAnalytic')
+env.build_plugin('Apps/TempDiffusion/tests/LinearTemperatureField');
 
-# Build plugins.
-dirs = ['libStgFEM/Toolbox',
-     'plugins/CompareFeVariableAgainstReferenceSolution',
-     'plugins/Document',
-     'plugins/FeVariableImportExporters/FeVariable_ImportExport_ABAQUS',
-     'plugins/FeVariableImportExporters/FeVariable_ImportExport_SpecRidge2D',
-     'plugins/FileAnalyticSolution',
-     'plugins/Output/CPUTime',
-     'plugins/Output/FrequentOutput',
-     'plugins/Output/FeVariableList',
-     'plugins/Output/SwarmVariableList',
-     'plugins/Output/PeakMemory',
-     'plugins/Output/PrintFeVariableDiscreteValues',
-     'plugins/Output/PrintFeVariableDiscreteValues_2dBox',
-     'plugins/StandardConditionFunctions',
-     'Apps/StokesMomentumUzawa/tests/LinearVelocityAnalytic',
-     'Apps/StokesMomentumUzawa/tests/LidDrivenIsoviscousAnalytic',
-     'Apps/StokesMomentumUzawa/tests/SimpleShearAnalytic',
-     'Apps/StokesMomentumUzawa/tests/LidDrivenStokesAnalytic']
-for d in dirs:
+#
+# Build static library.
+if env['static_libraries']:
+    env.Library(env.get_build_path('lib/StgFEM'), env.src_objs)
 
-    name = 'StgFEM_' + d.split('/')[-1] + 'module'
-    mod_name = env['ESCAPE']('"' + ''.join(d.split('/')) + '"')
-    cpp_defs = [('CURR_MODULE_NAME', mod_name)] + env.get('CPPDEFINES', [])
+#
+# Build unit test runner.
+if not env.get('dir_target', ''):
+    env['PCURUNNERINIT'] = ''
+    env['PCURUNNERSETUP'] = """StGermain_Init( &argc, &argv );
+   StgDomain_Init( &argc, &argv );
+   StgFEM_Init( &argc, &argv );"""
+    env['PCURUNNERTEARDOWN'] = """StgFEM_Finalise();
+   StgDomain_Finalise();
+   StGermain_Finalise();"""
+    runner_src = env.PCUSuiteRunner(env.get_build_path('StgFEM/testStgFEM.c'), env.suite_hdrs)
+    runner_obj = env.SharedObject(runner_src)
+    env.Program(env.get_build_path('bin/testStgFEM'),
+                runner_obj + env.suite_objs,
+                LIBS=['StgFEM', 'pcu'] + env.get('LIBS', []))
 
-    env.Install('#' + env['build_dir'] + '/include/StgFEM/' + d.split('/')[-1],
-                Glob(d + '/*.h'))
+#
+# Copy over XML files.
+xml_bases = ['']
+for base in xml_bases:
+    dst = env.get_build_path('lib/StGermain/StgFEM/' + base)
+    for file in env.glob('Apps/StgFEM_Components/' + base + '/*.xml'):
+        if env.check_dir_target(file):
+            env.Install(dst, file)
 
-    srcs = Glob(d + '/*.c')
-    srcs = [s for s in srcs if s.path.find('-meta.c') == -1]
-    objs = env.SharedObject(srcs, CPPDEFINES=cpp_defs)
-    objs += env.stgSharedMeta(Glob(d + '/*.meta'), CPPDEFINES=cpp_defs)
-
-    if env['shared_libraries']:
-        lib_pre = env['LIBPREFIXES']
-        if not isinstance(lib_pre, list):
-            lib_pre = [lib_pre]
-        env.SharedLibrary('#' + env['build_dir'] + '/lib/' + name, objs,
-                          SHLIBPREFIX='',
-                          LIBPREFIXES=lib_pre + [''],
-                          LIBS=libs)
-
-# Install XML input files.
-env.Install('#' + env['build_dir'] + '/lib/StGermain/StgFEM',
-            Glob('Apps/StgFEM_Components/*.xml'))
+#
+# Return any module code we need to build into a static binary.
+module = (env.get('STGMODULEPROTO', ''), env.get('STGMODULECODE', ''))
+Return('module')
