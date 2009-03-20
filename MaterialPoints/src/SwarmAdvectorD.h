@@ -61,8 +61,9 @@
 	/* SwarmAdvectorD information */
 	#define __SwarmAdvectorD \
 		/* General info */ \
-		__SwarmAdvector 	/** Now inherits from SwarmAdvector class */
-
+		__SwarmAdvector 	/** Now inherits from SwarmAdvector class */ \
+		int				whichaxis;								
+		
 	struct SwarmAdvectorD { __SwarmAdvectorD };
 	
 	/*---------------------------------------------------------------------------------------------------------------------
@@ -93,7 +94,8 @@
 		Name                                       name );
 
 	void _SwarmAdvectorD_Init( 
-		SwarmAdvectorD*                             self );
+		SwarmAdvectorD*                             self,
+		int											whichaxis);
 
 	void _SwarmAdvectorD_Delete( void* materialSwarm );
 	void _SwarmAdvectorD_Print( void* materialSwarm, Stream* stream );

@@ -60,6 +60,8 @@
 #include <string.h>
 #include <math.h>
 
+/*I am generalising this so that I can use it- Wendy S*/
+
 
 /* Textual name of this class */
 const Type SwarmAdvectorD_Type = "SwarmAdvectorD";
@@ -76,12 +78,13 @@ SwarmAdvectorD* SwarmAdvectorD_New(
 		PeriodicBoundariesManager*                 periodicBCsManager )
 {
 	SwarmAdvectorD* self = (SwarmAdvectorD*) _SwarmAdvectorD_DefaultNew( name );
-
+	int whichaxis;
+	
 	/* 	SwarmAdvectorD_InitAll */
 	_TimeIntegratee_Init( self, timeIntegrator, swarm->particleCoordVariable->variable, 0, NULL,
 		allowFallbackToFirstOrder );
-	_SwarmAdvector_Init( (SwarmAdvector*)self, velocityField, swarm, periodicBCsManager );
-	_SwarmAdvectorD_Init( self );
+	_SwarmAdvector_Init( (SwarmAdvector*)self, velocityField, swarm, periodicBCsManager);
+	_SwarmAdvectorD_Init( self, whichaxis );
 
 	return self;
 }
@@ -129,15 +132,16 @@ SwarmAdvectorD* _SwarmAdvectorD_New(
 	return self;
 }
 
-void _SwarmAdvectorD_Init( SwarmAdvectorD* self )
+void _SwarmAdvectorD_Init( SwarmAdvectorD* self, int whichaxis )
 {
+	/* Adding parameter which axis as the user can choose to prevent the advection of a tracer in the X (0), Y (1) or Z (2) directions */
+	self->whichaxis = whichaxis;
 }
 
 
 /*------------------------------------------------------------------------------------------------------------------------
 ** Virtual functions
 */
-
 void _SwarmAdvectorD_Delete( void* swarmAdvector ) {
 	SwarmAdvectorD* self = (SwarmAdvectorD*)swarmAdvector;
 
@@ -187,12 +191,13 @@ void* _SwarmAdvectorD_DefaultNew( Name name ) {
 }
 
 
-void _SwarmAdvectorD_Construct( void* swarmAdvector, Stg_ComponentFactory* cf, void* data ) {
+void _SwarmAdvectorD_Construct( void* swarmAdvector, Stg_ComponentFactory* cf, void* data) {
 	SwarmAdvectorD*	            self          = (SwarmAdvectorD*) swarmAdvector;
-
+	int							whichaxis;
 	_SwarmAdvector_Construct( self, cf, data );
-	/* Everything constructed by parent already */
-	_SwarmAdvectorD_Init( self );
+	/* Everything except whichaxis constructed by parent already */
+	whichaxis = Stg_ComponentFactory_GetInt( cf, self->name, "whichaxis",  1 );
+	_SwarmAdvectorD_Init( self, whichaxis );
 }
 
 
@@ -206,8 +211,10 @@ Bool _SwarmAdvectorD_TimeDeriv( void* swarmAdvector, Index array_I, double* time
 	coord = Variable_GetPtrDouble( self->variable, array_I );
 
 	result = FieldVariable_InterpolateValueAt( velocityField, coord, timeDeriv );
+	
 	if( velocityField->dim == 3 )
-	        timeDeriv[ K_AXIS ] = 0.0;
+			/* This prevents advection in the X, Y or Z direction */
+	        timeDeriv[ self->whichaxis ] = 0.0;
 
 
 	if ( result == OTHER_PROC || result == OUTSIDE_GLOBAL || isinf(timeDeriv[0]) || isinf(timeDeriv[1]) || 
