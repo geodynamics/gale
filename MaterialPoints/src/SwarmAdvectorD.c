@@ -212,9 +212,9 @@ Bool _SwarmAdvectorD_TimeDeriv( void* swarmAdvector, Index array_I, double* time
 
 	result = FieldVariable_InterpolateValueAt( velocityField, coord, timeDeriv );
 	
-	if( velocityField->dim == 3 )
-			/* This prevents advection in the X, Y or Z direction */
-	        timeDeriv[ self->whichaxis ] = 0.0;
+	
+	/* This prevents advection in the X, Y or Z direction */
+	timeDeriv[ self->whichaxis ] = 0.0;
 
 
 	if ( result == OTHER_PROC || result == OUTSIDE_GLOBAL || isinf(timeDeriv[0]) || isinf(timeDeriv[1]) || 
