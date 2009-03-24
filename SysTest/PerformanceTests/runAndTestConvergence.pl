@@ -100,16 +100,16 @@ sub runTests {
 		# run test case
 		$command = "mpirun -np $procs[$run_I] ./$exec $xmlFile $commandLines[$run_I] --pluginData.appendToAnalysisFile=True >$stdout";
 		print "$command";
-		$command .= " 2>>$stderr";
+		$command .= " 2>$stderr";
 		`$command`;
 
 			# check error stream for error result
-			open( ERROR, "<$stderr" );
+      open( ERROR, "<$stderr" );
 			my $line;
 			foreach $line (<ERROR>) {
 				if( $line =~ m/[E|e]rror/ ) {
 					close(ERROR); 
-					$command = "rm $stderr"; `$command`;
+#	$command = "rm $stderr"; `$command`;
 				 	die ("\n\tError: see $stderr or $stdout - stopped" ); 
 				}
 			}
@@ -135,7 +135,7 @@ sub readOptionsFile {
 	foreach $line (<OPTFILE>) {
 		chomp $line;
 		# only process lines that start with np
-		if( $line =~ m/^np\s+(\d+)\s+(--.*)/ ) {
+		if( $line =~ m/^np\s+(\d+)\s+(.*)/ ) {
 			$procs->[$line_I] = $1;
 			$commandLines->[$line_I] = $2;
 			$line_I++;
