@@ -5,7 +5,7 @@
 
 	<!-- Visualisation stuff -->
 	<include> Underworld/Viewports/VelocityMagnitudeVP.xml </include>
-	<include> Underworld/Viewports/TemperatureContours.xml </include>
+	<include> Underworld/Viewports/TemperatureContoursVP.xml </include>
 	<include> Underworld/Viewports/PressureVP.xml </include>
 	<include> Underworld/Viewports/AnalyticVelocityMagnitudeVP.xml </include>
 	<include> Underworld/Viewports/AnalyticPressureVP.xml </include>
