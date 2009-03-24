@@ -92,7 +92,7 @@
 	</struct>
 
 	<param name="journal.info.Context-verbose">true</param>
-        <param name="journal.debug.Plugins">true</param>
+	<param name="journal.debug.Plugins">true</param>
 	<param name="journal-level.info.Stg_ComponentFactory">2</param>
 	<param name="journal-enable-branch.debug.StG_FEM">f</param>
 	<param name="journal-level-branch.debug.StG_FEM"> 2 </param>
