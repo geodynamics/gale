@@ -12,6 +12,7 @@
 
 const Type Underworld_OutputForSPModel_Type = "Underworld_OutputForSPModel";
 
+FILE *iFile, *oFile;
 Index Underworld_OutputForSPModel_Register( PluginsManager* pluginsManager );
 void _Underworld_OutputForSPModel_Construct( void* component, Stg_ComponentFactory* cf, void* data );
 void* _Underworld_OutputForSPModel_DefaultNew( Name name );
@@ -38,98 +39,149 @@ void myConvertGlobalCoordToElLocal( double *tmpMax, double *tmpMin, double *want
 	lProjCoord[1] = ( (2*wantCoord[2]-tmpMin[2]-tmpMax[2])/(tmpMax[2]-tmpMin[2]) );
 }
 
-void Underworld_OutputForSPModel_InterpolateHeightInXZ( FeMesh* mesh, double* wantCoord ) {
-	Grid* elGrid;
+Bool OutputForSPModel_Recursive( FeMesh* mesh, double* wantCoord, unsigned *minIJK, unsigned *maxIJK, unsigned* set, int axis ) {
+	unsigned IJK[3];
+	double maxX, halfX;
+	if ( (maxIJK[axis] - minIJK[axis]) == 1 ) {
+		set[0] = minIJK[axis];
+		set[1] = maxIJK[axis];
+		return True;
+	}
+
+	/* set IJK to be the same as minIJK but in the axis of interest */
+	memcpy( IJK, minIJK, 3*sizeof(unsigned) );
+	/* new index = x0 + (x1-x0)/2 */
+	IJK[axis] =  (double)( minIJK[axis] + ((maxIJK[axis] - minIJK[axis])/2) );
+
+	halfX = Mesh_GetVertex( mesh, RegularMeshUtils_Node_3DTo1D( mesh, IJK ) )[axis];
+	maxX = Mesh_GetVertex( mesh, RegularMeshUtils_Node_3DTo1D( mesh, maxIJK ) )[axis];
+
+	if( Num_InRange( wantCoord[axis], halfX, maxX ) ) {
+		/* halfX < wantCoord <= maxX */
+		return OutputForSPModel_Recursive( mesh, wantCoord, IJK, maxIJK, set, axis );
+	} else {
+		/* minX < wantCoord <= halfX */
+		return OutputForSPModel_Recursive( mesh, wantCoord, minIJK, IJK, set, axis );
+	}
+	/* report error */
+	return 0;
+}
+
+int Underworld_OutputForSPModel_InterpolateHeightInXZ( FeMesh* mesh, double* wantCoord ) {
+	Grid* vertGrid;
 	IArray* inc;
 	ElementType* elType;
-	double *coord, tmpMin[3], tmpMax[3], lProjCoord[2], Nx[4];
-	unsigned elID, nodes[4], node_I, minIJK[3], maxIJK[3], nodesPerFace;
+	double *coord, tmpMin[3], tmpMax[3], lProjCoord[2], Nx[4], tmpGMin[3], tmpGMax[3];
+	unsigned setI[2], setK[2], nodes[4], node_I, minIJK[3], maxIJK[3], nodesPerFace, gMinVertOnProc, gMaxVertOnProc;
 	int ii, jj, kk, ijk[3];
-
-	MPI_Comm comm;
-	int      myRank;
-	int      nProcs;
-
-	comm = Comm_GetMPIComm( Mesh_GetCommTopology( mesh, MT_VERTEX ) );
-
-	MPI_Comm_size( comm, (int*)&nProcs );
-	MPI_Comm_rank( comm, (int*)&myRank );
 
 	inc = IArray_New();
 
 	assert( mesh );
-	elGrid = *(Grid**)ExtensionManager_Get( mesh->info, mesh,
-  	ExtensionManager_GetHandle( mesh->info, "elementGrid" ) );
+
+	/* first check if location is on this proc */
+	Mesh_GetLocalCoordRange( mesh, tmpMin, tmpMax );
+	Mesh_GetGlobalCoordRange( mesh, tmpGMin, tmpGMax );
+	if( !Num_Approx( tmpGMax[1], tmpMax[1] ) ) {
+		/* not of this proc */
+		exit(EXIT_FAILURE);
+	}
+
+	if( !Num_InRange( wantCoord[0], tmpMin[0], tmpMax[0] ) || !Num_InRange( wantCoord[2], tmpMin[2], tmpMax[2] ) )
+		exit(EXIT_FAILURE);
+
+	vertGrid = *(Grid**)ExtensionManager_Get( mesh->info, mesh,
+  	ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
 
 	nodesPerFace = 4;
 	/* set up IJK parametrisation of nodes */
 	minIJK[0] = minIJK[1] = minIJK[2] = 0;
 
-	maxIJK[0] = elGrid->sizes[0]-1;
-	maxIJK[1] = elGrid->sizes[1]-1;
-	maxIJK[2] = elGrid->sizes[2]-1;
+	maxIJK[0] = vertGrid->sizes[0];
+	maxIJK[1] = vertGrid->sizes[1];
+	maxIJK[2] = vertGrid->sizes[2];
 
-	jj = maxIJK[1];
-	for( ii = 0 ; ii < maxIJK[0] ; ii++ ) {
+	jj = maxIJK[1]-1;
+	/* get global indicies of min max nodes
+	 * ASSUME they are the left bottom closest corner and the right heighest farthest corner ??? */
+	gMinVertOnProc = Mesh_DomainToGlobal( mesh, MT_VERTEX, 0 ); 
+	gMaxVertOnProc = Mesh_DomainToGlobal( mesh, MT_VERTEX, Mesh_GetLocalSize(mesh, MT_VERTEX)-1 ); 
+	
+	/* convert to ijk definitions */
+	RegularMeshUtils_Node_1DTo3D( mesh, gMinVertOnProc, minIJK );
+	RegularMeshUtils_Node_1DTo3D( mesh, gMaxVertOnProc, maxIJK );
 
-		for( kk = 0 ; kk < maxIJK[1] ; kk++ ) {
-			ijk[0] = ii; ijk[1] = jj; ijk[2]= kk; 
+	OutputForSPModel_Recursive( mesh, wantCoord, minIJK, maxIJK, setI, 0 );
+	OutputForSPModel_Recursive( mesh, wantCoord, minIJK, maxIJK, setK, 2 );
 
-			/* get element */
-			elID = RegularMeshUtils_Element_3DTo1D( mesh, ijk );
-			elType = FeMesh_GetElementType( mesh, elID );
-			/* get element's top surface nodes */
-			ElementType_GetFaceNodes( elType, (Mesh*)mesh, elID, 1, nodesPerFace, nodes );
-			/* test if wantCoord is in that */
+	/* set y to maximum */
+	minIJK[1] = jj;
+	/* move in x */
+	minIJK[0] = setI[0]; minIJK[2] = setK[0];
+	nodes[0] = RegularMeshUtils_Node_3DTo1D( mesh, minIJK );
+	minIJK[0] = setI[1]; minIJK[2] = setK[0];
+	nodes[1] = RegularMeshUtils_Node_3DTo1D( mesh, minIJK );
 
-			/* initialise tmp min and max coord, in x-z only */
-			tmpMax[0] = tmpMin[0] = Mesh_GetVertex(mesh, nodes[0])[0];
-			tmpMax[2] = tmpMin[2] = Mesh_GetVertex(mesh, nodes[0])[2];
-			for( node_I = 1 ; node_I < nodesPerFace ; node_I++ ) { 
-				coord = Mesh_GetVertex( mesh, nodes[node_I] );
-				/* x-coord test */
-				if( coord[0] > tmpMax[0] )
-					tmpMax[0] = coord[0];
-				else if (coord[0] < tmpMin[0] ) 
-					tmpMin[0] = coord[0];
-				/* z-coord test */
-				if( coord[2] > tmpMax[2] )
-					tmpMax[2] = coord[2];
-				else if (coord[2] < tmpMin[2] ) 
-					tmpMin[2] = coord[2];
-			}
+	/* move in z */
+	minIJK[0] = setI[0]; minIJK[2] = setK[1];
+	nodes[2] = RegularMeshUtils_Node_3DTo1D( mesh, minIJK );
+	minIJK[0] = setI[1]; minIJK[2] = setK[1];
+	nodes[3] = RegularMeshUtils_Node_3DTo1D( mesh, minIJK );
 
-			/* ASSUMPTION: if the wantCoord isn't in this x-range, then assume it's not 
-			 * in any of these ii elements */
-			if( wantCoord[0] < tmpMax[0] && wantCoord[0] > tmpMin[0] )  {
-				/* lets get interested */
-				if( wantCoord[2] < tmpMax[2] && wantCoord[2] > tmpMin[2] ) {
-					/* wantCoord is in this face, now take the shapeFunctions of this element
-					 * to aid interpolation */
-					myConvertGlobalCoordToElLocal( tmpMax, tmpMin, wantCoord, lProjCoord );
-					/* evaluate the shape functions at that local spot */
-					_BilinearElementType_SF_allNodes( elType, lProjCoord, Nx ); 
+	tmpMax[0] = tmpMin[0] = Mesh_GetVertex(mesh, nodes[0])[0];
+	tmpMax[2] = tmpMin[2] = Mesh_GetVertex(mesh, nodes[0])[2];
 
-					Underworld_DoHeightInterpolation( mesh, elType, nodes, Nx, nodesPerFace, &wantCoord[1] );
-				} else /* this break implements the above assumption */
-						break;
-			}
+	for( node_I = 1 ; node_I < nodesPerFace ; node_I++ ) { 
+		coord = Mesh_GetVertex( mesh, nodes[node_I] );
+		/* x-coord test */
+		if( coord[0] > tmpMax[0] )
+			tmpMax[0] = coord[0];
+		else if (coord[0] < tmpMin[0] ) 
+			tmpMin[0] = coord[0];
+		/* z-coord test */
+		if( coord[2] > tmpMax[2] )
+			tmpMax[2] = coord[2];
+		else if (coord[2] < tmpMin[2] ) 
+			tmpMin[2] = coord[2];
+	}
+
+	if( Num_InRange( wantCoord[0], tmpMin[0], tmpMax[0] ) )  {
+		/* lets get interested */
+		if( Num_InRange( wantCoord[2], tmpMin[2], tmpMax[2] ) ) {
+			/* wantCoord is in this face, now take the shapeFunctions of this element
+			 * to aid interpolation */
+			myConvertGlobalCoordToElLocal( tmpMax, tmpMin, wantCoord, lProjCoord );
+			/* evaluate the shape functions at that local spot */
+			_BilinearElementType_SF_allNodes( elType, lProjCoord, Nx ); 
+
+			Underworld_DoHeightInterpolation( mesh, elType, nodes, Nx, nodesPerFace, &wantCoord[1] );
+			return 1;
 		}
 	}
+	/* report failure */
+	return 0;
 }
 
 void Underworld_OutputForSPModelDo( UnderworldContext* context ) {
 	FeMesh* mesh = context->velocityField->feMesh;
-	double wantCoord[3] = { 0.33333, 0.0, 0.3333 };
+	double wantCoord[3];
+	double originalHeight, bc;
+	int coordCount, line_I = 0;
+	char buffer[512];
 	
 	MPI_Comm comm;
 	int      myRank;
 	int      nProcs;
 
-	FILE* oFile = NULL;
+	double startTime;
+
+	oFile = NULL;
+	iFile = NULL; 
+	
+	char *iFileName = Dictionary_GetString_WithDefault( context->dictionary, "OutputForSPModel_InputFile", "spm.input" );
 	char *oFileName = Memory_Alloc_Array_Unnamed( char, 
 			/*		outputPath/SPModelMeshOutput.time.dat */ 
-			strlen(context->outputPath)+1+strlen("spmMeshOutput")+1+5+1+3 );
+			strlen(context->outputPath)+1+strlen("spmMeshOutput")+2+5+1+3 );
 
 	comm = Comm_GetMPIComm( Mesh_GetCommTopology( mesh, MT_VERTEX ) );
 
@@ -137,6 +189,25 @@ void Underworld_OutputForSPModelDo( UnderworldContext* context ) {
 	MPI_Comm_rank( comm, (int*)&myRank );
 
 	sprintf( oFileName, "%s/spmMeshOutput.%.5u.dat", context->outputPath, context->timeStep );
+
+	startTime = MPI_Wtime();
+
+	/* open the input file and get the number of test coord */
+	if( (iFile=fopen(iFileName, "r" )) == NULL ) {
+		printf("ERROR in %s: couldn't open file %s\n", __func__, iFileName );
+		exit(0);
+	}
+	while( fgets( buffer, 512, iFile ) != NULL ) { line_I++; }
+	/* allocate the right amount of memory for the coords */
+	coordCount = line_I;
+
+	/* close and re-open the file */
+	fclose( iFile );
+	if( (iFile=fopen(iFileName, "r" )) == NULL ) {
+			printf("ERROR in %s: couldn't open file %s\n", __func__, iFileName );
+			exit(0);
+	}
+	
 	/* open file if proc 0 */
 	if( myRank == 0 ) 
 		oFile = fopen( oFileName, "w" );
@@ -145,13 +216,26 @@ void Underworld_OutputForSPModelDo( UnderworldContext* context ) {
 
 	assert( mesh );
 
-	/* do top surface interpolation at the (x-z) - where 
-	 * x = wantCoord[0]
-	 * z = wantCoord[2]
-	 * and the interpolated y will be evaluate in wantCoord[1] */
-	Underworld_OutputForSPModel_InterpolateHeightInXZ( mesh, wantCoord );
+	for( line_I = 0 ; line_I < coordCount ; line_I++ ) {
+		fscanf( iFile, "%lf %lf %lf %lf", &(wantCoord[0]), &originalHeight, &(wantCoord[2]), &bc);
+		/* do top surface interpolation at the (x-z) - where 
+		 * x = wantCoord[0]
+		 * z = wantCoord[2]
+		 * and the interpolated y will be evaluate in wantCoord[1] */
+		if (Underworld_OutputForSPModel_InterpolateHeightInXZ( mesh, wantCoord ) == 0 ) {
+			/* report error */
+			printf("\n\nError with the %d-th coord = (%g, %g, %g)\n\n", line_I, wantCoord[0], wantCoord[1], wantCoord[2] );
+		}
+		/* output is in format (x,y,z). Where y is the interpolated coord */
+		fprintf( oFile, "%lf %lf %lf %lf\n", wantCoord[0], wantCoord[1], wantCoord[2], bc );
+	}
 
-	printf(" the interpolated height at (x,z) - (%.5g, %.5g) = %.5g\n", wantCoord[0], wantCoord[2], wantCoord[1] );
+	printf("*******************************\n");
+	printf("Time taken for OutputForSPModel\n");
+	printf("            %g\n", MPI_Wtime()-startTime);
+	printf("*******************************\n");
+
+	fclose( iFile );
 	fclose( oFile );
 	Memory_Free( oFileName );
 }
@@ -177,6 +261,7 @@ void* _Underworld_OutputForSPModel_DefaultNew( Name name ) {
 
 void _Underworld_OutputForSPModel_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext* context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data );
-	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, Underworld_OutputForSPModelDo );
+	//ContextEP_Append( context, AbstractContext_EP_FrequentOutput, Underworld_OutputForSPModelDo );
+	ContextEP_Append( context, AbstractContext_EP_Dump, Underworld_OutputForSPModelDo );
 }
 
