@@ -64,39 +64,38 @@ void _Ra_CheckScalings_Func( void* context, void* ptrToContext ) {
     RheologyMaterial* material;
     Rheology* rheology;
     Materials_Register*     materials_Register = Stg_ObjectList_Get( self->CF->registerRegister, "Materials_Register" );
-    char* errorMesg1 = "";
-    char* errorMesg2 = "";
+    char* errorMesg = "";
     double Ra, Ra_0, eta0, diffusivity, gravity, thermalExp=1;
-    int isBad = 0;
+    int isValid = 1; /* is this scaling check valid */
 
-    /* check if there's one material and does it argree with this Ra number */
+    /* check if there's only one material */
     if( Materials_Register_GetCount( materials_Register ) > 1 ) {
-      isBad=1;
-      Stg_asprintf( &errorMesg1, "* Error - 2 or more materials are used but only one Ra is defined for this simulation.\n" );
+      isValid=0; 
+			Journal_RPrintf( self->info, "\n\n** Warning - The Ra_ScalingCheck plugin is on but you're using more than two materials, thus the Ra_ScalingCheck is invalid because a Rayleigh number doesn't make sense when multiply materials are used **\n" );
     }
 
+		/* get the material rheology */
     material = (RheologyMaterial*)Materials_Register_GetByIndex( materials_Register, 0 );
-    
-    /* check if the Ra matches the viscosity, gravity, thermal expansivity and diffusivity of the problem */
-    Ra        = ((ThermalBuoyancyForceTerm*)bfTerm)->rayleighNumber;
-    rheology  = Rheology_Register_GetByIndex( material->rheology_Register, 0 ); //assume one rheology
 
-    /* in order to get eta0, we must check all rheologies which specify an eta0 */
-    /* In future this list will need to grow if new rheologies with eta0 are added */
-    if( rheology->type == MaterialViscosity_Type ) { 
+    /* check if there's only one rheology on that material */
+		if (material->rheology_Register->objects->count > 1 ) isValid = 0;
+    
+    Ra        = ((ThermalBuoyancyForceTerm*)bfTerm)->rayleighNumber;
+    rheology  = Rheology_Register_GetByIndex( material->rheology_Register, 0 ); /* assume one rheology */
+
+    /* check if this is a valid test */
+    if( rheology->type == MaterialViscosity_Type && isValid ) { 
       eta0 = ((MaterialViscosity*)rheology)->eta0;
 
       diffusivity   = Stg_ComponentFactory_GetDouble( self->CF, "defaultResidualForceTerm", "defaultDiffusivity", 1.0 );
       gravity       = Stg_ComponentFactory_GetRootDictDouble( self->CF, "gravity", 1.0 );
 
       Ra_0 = (gravity * thermalExp)/(diffusivity * eta0 );
+			/* check if the Ra matches the viscosity, gravity, thermal expansivity and diffusivity of the problem */
       if( abs(Ra - Ra_0) > 1e-3 ) {
-        isBad=1;
-        Stg_asprintf( &errorMesg2, "* Error - Your combination of diffusivity, gravity and eta0 (rheology) don't agree with your Ra:"
+        Stg_asprintf( &errorMesg, "* Error - Your combination of diffusivity, gravity and eta0 (rheology) don't agree with your Ra:"
             "input:\ndiffusivity = %g\ngravity = %g\neta0 = %g from rheology %s\nthermal expansivity force = %g\nRa = %g\n", diffusivity, gravity, eta0, rheology->name, thermalExp, Ra );
-      }
-      if( isBad ) {
-        Journal_RPrintf( self->info, "\n\n** Scaling issues detected **\n%s\n%s\nIf you believe the problem(s) above are ok in your model and you want to get rid of this error message use the command line argument --Ra_ScalingCheck=false\n\n", errorMesg1, errorMesg2 );
+        Journal_RPrintf( self->info, "\n\n** Scaling issues detected **\n%s\nIf you believe the problem(s) above are ok in your model and you want to get rid of this error message use the command line argument --Ra_ScalingCheck=false\n\n", errorMesg );
         exit(0);
       }
     }
@@ -117,7 +116,7 @@ void _Underworld_Ra_Scaling_Construct( void* component, Stg_ComponentFactory* cf
     EntryPoint_Append( Context_GetEntryPoint( context, AbstractContext_EP_Build ),
       "Underworld CheckScalings",
       _Ra_CheckScalings_Func,
-      __func__ );
+      Underworld_Ra_Scaling_Type );
   }
 }
 

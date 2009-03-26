@@ -268,7 +268,7 @@
 			<param name="initialDirectionX">0.0</param>
 			<param name="initialDirectionY">1.0</param>
 			<param name="initialDirectionZ">0.0</param>
-			<param name="dontUpdate">True</param>
+			<param name="dontUpdate">False</param>
 		</struct>	
 		<struct name="yielding">
 			<param name="Type">FaultingMoresiMuhlhaus2006</param>
@@ -340,7 +340,8 @@
 	<param name="maxTimeSteps"> 10 </param>
 	<param name="outputPath"> ./output </param>
 	<param name="dumpEvery"> 1 </param>	
-	<param name="checkpointEvery"> 0 </param>
+	<param name="checkpointEvery"> 5 </param>
+	<param name="saveCoordsWithFields"> 5 </param>
 
     <!--   choose what to checkpoint
 	<list name="FieldVariablesToCheckpoint">
