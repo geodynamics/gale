@@ -29,7 +29,7 @@ def build_suite_runner(env, target, hdrs, objs, **kw):
     for h in hdrs:
         name = os.path.splitext(os.path.basename(h.path))[0]
         suite_txt += "pcu_runner_addSuite( %s, %s );\n"%(name, name + init)
-        hdr_txt += "#include \"%s\""%str(h)
+        hdr_txt += "#include \"%s\""%str(h.abspath)
 
     src = """#include <stdlib.h>
 #include <mpi.h>
