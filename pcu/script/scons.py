@@ -10,9 +10,9 @@ def build_suite_runner(target, source, env):
     if teardown: teardown = '\n   ' + teardown
     for node in source:
         name = os.path.basename(node.path[:node.path.rfind('.')])
-        suites += "pcu_runner_addSuite( %s, %s );\n" % (name, name + init)
+        suites += "   pcu_runner_addSuite( %s, %s );\n" % (name, name + init)
         name = node.abspath[:node.abspath.rfind('.')]
-        hdrs += "#include \"%s.h\"" % name
+        hdrs += "#include \"%s.h\"\n" % name
     src = """#include <stdlib.h>
 #include <mpi.h>
 #include <pcu/pcu.h>
@@ -24,7 +24,7 @@ int main( int argc, char* argv[] ) {
    MPI_Init( &argc, &argv );
    pcu_runner_init( argc, argv );%s
 
-   %s
+%s
    lsnr = pcu_textoutput_create();
    pcu_runner_run( lsnr );
    pcu_textoutput_destroy( lsnr );
