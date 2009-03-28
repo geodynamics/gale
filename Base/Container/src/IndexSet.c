@@ -211,13 +211,21 @@ void IndexSet_Remove( void* indexSet, Index index ) {
 
 Bool IndexSet_IsMember( void* indexSet, Index index ) {
 	IndexSet* self = (IndexSet*)indexSet;
+	Bool retFlag = False;
 
 	#ifdef CAUTIOUS
 		Journal_Firewall( index < self->size, self->error, "Error- %s: index %u outside current size %d. Aborting.\n",
 			__func__, index, self->size);
 	#endif
 	
-	return IS_MEMBER( self, index );
+	if ( 0 == IS_MEMBER( self, index ) ) {
+		retFlag = False;
+	}
+	else {
+		retFlag = True;
+	}
+	
+	return retFlag;
 }
 
 
