@@ -264,7 +264,7 @@ void Underworld_Localisation_SymmetricTensor_LowerDimension_InvariantRoot_2d( vo
         double    temp;
         
         Operator_FirewallUnary( self );
-        Operator_FirewallResultDofs( self, self->operandDofs );
+        Operator_FirewallResultDofs( self, 1 );
         
         temp      = operand0[0];
         result[0] = fabs( temp );
@@ -275,7 +275,7 @@ void Underworld_Localisation_SymmetricTensor_LowerDimension_InvariantRoot_3d( vo
         SymmetricTensor temp;
         
         Operator_FirewallUnary( self );
-        Operator_FirewallResultDofs( self, self->operandDofs );
+        Operator_FirewallResultDofs( self, 1 );
         
         temp[0] = operand0[0];  /* strainrate_{xx} */
         temp[1] = operand0[2];  /* strainrate_{zz} */
