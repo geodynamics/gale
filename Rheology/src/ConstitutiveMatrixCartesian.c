@@ -146,18 +146,18 @@ void _ConstitutiveMatrixCartesian_Init(
     int materialSwarmCount;
 
     /* get material swram mapped to the integration points,
-     * currently only one on material point is mapped 26 FEB 09 */
+     * currently only one material point is mapped 26 FEB 09 */
     materialSwarms = IntegrationPointMapper_GetMaterialPointsSwarms( swarm->mapper, &materialSwarmCount );
     assert( materialSwarmCount < 2 );
     materialSwarm = materialSwarms[0];
 
     /* add extension to material swarm */
-    Index storedConstHandle = ExtensionManager_Add( 
+    self->storedConstHandle = ExtensionManager_Add( 
         materialSwarm->particleExtensionMgr, 
         self->type, 
         self->rowSize * self->columnSize * sizeof(double) );
 
-    double *cMatrix = ExtensionManager_Get( materialSwarm->particleExtensionMgr, &particle, storedConstHandle );
+    double *cMatrix = ExtensionManager_Get( materialSwarm->particleExtensionMgr, &particle, self->storedConstHandle );
 
     if( self->dim == 2 ) {
       /* TODO: clean up this vector logic. The only reson there's an if is because
