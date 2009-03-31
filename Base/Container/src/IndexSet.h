@@ -155,18 +155,20 @@
 	void IndexSet_GetVacancies( void* indexSet, IndexSet_Index* countPtr, Index** arrayPtr );
 	
 	/** Do a binary OR on each pair of corresponding members of 2 given sets,
-	and save the result to the first set. Note that if the sets are different
-	lengths, the OR operation is only applied up to the shorter of the 2
-	lengths. Thus if the second set is shorter, there will be some uncompared
-	values at the end of the first set.
+	and save the result to the first set.
+	Note that if the sets are different lengths:
+	If the first set is shorter, the OR operation is only applied up to length of first list.
+	If the first set is longer, since this is an OR operation, all entries beyond the length
+         of the shorter second set will remain unchanged in the first set.
 	*/
 	void IndexSet_Merge_OR( void* indexSet, void* merger );
 	
 	/** Do a binary AND on each pair of corresponding members of 2 given sets,
-	and save the result to the first set. Note that if the sets are different
-	lengths, the AND operation is only applied up to the shorter of the 2
-	lengths. Thus if the second set is shorter, there will be some uncompared
-	values at the end of the first set.
+	and save the result to the first set.
+	Note that if the sets are different lengths:
+	If the first set is shorter, the AND operation is only applied up to length of first list.
+	If the first set is longer, since this is an AND operation, all entries beyond the length
+         of the shorter second set will be set to 0.
 	*/
 	void IndexSet_Merge_AND( void* indexSet, void* merger );
 	

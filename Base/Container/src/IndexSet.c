@@ -337,6 +337,12 @@ void IndexSet_Merge_AND(void* indexSet, void* indexSetTwo )
 	
 	for (i = 0; i < size; i++)
 		self->_container[i] &= secondSet->_container[i];
+
+	/* As specified in header file description, if first given IndexSet is larger, zero out the
+	 * remaining entries since this is an AND operation */
+	for( i = size; i < self->_containerSize; i++) {
+		self->_container[i] &= 0x00;
+	}
 	
 	self->membersCount = (unsigned int)-1;
 }
