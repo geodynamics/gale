@@ -15,4 +15,5 @@ from libpng import libpng
 from libjpeg import libjpeg
 from libfame import libfame
 from Cocoa import Cocoa
+from Carbon import Carbon
 from pcu import pcu
