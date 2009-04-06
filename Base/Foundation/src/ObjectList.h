@@ -337,6 +337,9 @@
 		#define Stg_ObjectList_At Stg_ObjectList_AtMacro
 	#endif
 
+	/* Caution: using this function implies you _know_ that the stored object at
+	 * given index is stored inside an ObjectAdaptor. If this isn't the case, you
+	 * should use Stg_ObjectList_At() instead. */
 	#define Stg_ObjectList_ObjectAt( self, index ) \
 		( Stg_ObjectAdaptor_Object( (Stg_ObjectAdaptor*)( (self)->data[index] ) ) )
 	
