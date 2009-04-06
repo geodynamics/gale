@@ -69,7 +69,7 @@ void IndexSetSuite_TestRemoveAll( IndexSetSuiteData* data ) {
    IndexSet_Add( data->is, 24 );
    IndexSet_RemoveAll( data->is );
    for ( ii=0; ii< IS1_SIZE; ii++ ) {
-      pcu_assert_true( 0 == IndexSet_IsMember( data->is, ii ) );
+      pcu_check_true( 0 == IndexSet_IsMember( data->is, ii ) );
    }
 }
 
@@ -80,7 +80,7 @@ void IndexSetSuite_TestAddAll( IndexSetSuiteData* data ) {
    /* Index set will be starting in empty state */
    IndexSet_AddAll( data->is );
    for ( ii=0; ii< IS1_SIZE; ii++ ) {
-      pcu_assert_true( True == IndexSet_IsMember( data->is, ii ) );
+      pcu_check_true( True == IndexSet_IsMember( data->is, ii ) );
    }
 }
 
@@ -96,10 +96,10 @@ void IndexSetSuite_TestInsertion( IndexSetSuiteData* data ) {
    IndexSet_Add( data->is, 24 );
    for ( ii=0; ii< IS1_SIZE; ii++ ) {
       if ( (ii==0) || (ii==7) || (ii==8) || (ii==22) || (ii==24) ) {
-         pcu_assert_true( True == IndexSet_IsMember( data->is, ii ) );
+         pcu_check_true( True == IndexSet_IsMember( data->is, ii ) );
       }
       else {
-         pcu_assert_true( False == IndexSet_IsMember( data->is, ii ) );
+         pcu_check_true( False == IndexSet_IsMember( data->is, ii ) );
       }
    }
 }
@@ -123,10 +123,10 @@ void IndexSetSuite_TestRemoval( IndexSetSuiteData* data ) {
 
    for ( ii=0; ii< IS1_SIZE; ii++ ) {
       if ( (ii==0) || (ii==8) || (ii==22) ) {
-         pcu_assert_true( True == IndexSet_IsMember( data->is, ii ) );
+         pcu_check_true( True == IndexSet_IsMember( data->is, ii ) );
       }
       else {
-         pcu_assert_true( False == IndexSet_IsMember( data->is, ii ) );
+         pcu_check_true( False == IndexSet_IsMember( data->is, ii ) );
       }
    }
 }
@@ -137,7 +137,7 @@ void IndexSetSuite_TestUpdateMembersCount( IndexSetSuiteData* data ) {
    IndexSet_RemoveAll( data->is );
 
    IndexSet_UpdateMembersCount( data->is );
-   pcu_assert_true( 0 == data->is->membersCount );
+   pcu_check_true( 0 == data->is->membersCount );
 
    /* Add some members, to generate a count */
    for ( ii=0; ii < 5; ii++ ) {
@@ -147,7 +147,7 @@ void IndexSetSuite_TestUpdateMembersCount( IndexSetSuiteData* data ) {
       IndexSet_Add( data->is, ii );
    }
    IndexSet_UpdateMembersCount( data->is );
-   pcu_assert_true( 10 == data->is->membersCount );
+   pcu_check_true( 10 == data->is->membersCount );
 
 }
 
@@ -167,7 +167,7 @@ void IndexSetSuite_TestGetIndexOfNthMember( IndexSetSuiteData* data ) {
    /* now check we are able to recover their indices correctly */
    for( ii = 0; ii < data->is->membersCount; ii++ ) {
       retreivedIndex = IndexSet_GetIndexOfNthMember( data->is, ii );
-      pcu_assert_true( testIndices[ii] == retreivedIndex );
+      pcu_check_true( testIndices[ii] == retreivedIndex );
    }
 }
 
@@ -186,12 +186,12 @@ void IndexSetSuite_TestGetMembers( IndexSetSuiteData* data ) {
    IndexSet_Add( data->is, 24 );
 
    IndexSet_GetMembers( data->is, &setArraySize, &setArray );
-   pcu_assert_true( 5 == setArraySize );
-   pcu_assert_true( 0 == setArray[0] );
-   pcu_assert_true( 7 == setArray[1] );
-   pcu_assert_true( 8 == setArray[2] );
-   pcu_assert_true( 22 == setArray[3] );
-   pcu_assert_true( 24 == setArray[4] );
+   pcu_check_true( 5 == setArraySize );
+   pcu_check_true( 0 == setArray[0] );
+   pcu_check_true( 7 == setArray[1] );
+   pcu_check_true( 8 == setArray[2] );
+   pcu_check_true( 22 == setArray[3] );
+   pcu_check_true( 24 == setArray[4] );
 
    Memory_Free( setArray );
 }
@@ -213,9 +213,9 @@ void IndexSetSuite_TestGetVacancies( IndexSetSuiteData* data ) {
 
    IndexSet_GetVacancies( data->is, &setArraySize, &setArray );
 
-   pcu_assert_true( (IS1_SIZE/5) == setArraySize );
+   pcu_check_true( (IS1_SIZE/5) == setArraySize );
    for ( ii=0; ii < IS1_SIZE/5; ii++ ) {
-      pcu_assert_true( ii*5 == setArray[ii] );
+      pcu_check_true( ii*5 == setArray[ii] );
    }
 
    Memory_Free( setArray );
@@ -237,11 +237,11 @@ void IndexSetSuite_TestDuplicate( IndexSetSuiteData* data ) {
    isDup = IndexSet_Duplicate( data->is );
 
    /* check it's exactly the same */
-   pcu_assert_true( isDup->size == data->is->size );
-   pcu_assert_true( isDup->membersCount == data->is->membersCount );
+   pcu_check_true( isDup->size == data->is->size );
+   pcu_check_true( isDup->membersCount == data->is->membersCount );
 
    for ( ii=0; ii< IS1_SIZE; ii++ ) {
-      pcu_assert_true( IndexSet_IsMember( isDup, ii ) == IndexSet_IsMember( data->is, ii ) );
+      pcu_check_true( IndexSet_IsMember( isDup, ii ) == IndexSet_IsMember( data->is, ii ) );
    }
 }
 
@@ -281,12 +281,12 @@ void IndexSetSuite_TestMerge_OR( IndexSetSuiteData* data ) {
    for ( ii=0; ii< IS1_SIZE; ii++ ) {
       /* check that an OR of the original list gives the same result as in merged list */
       if ( IndexSet_IsMember( is1_preMerge, ii ) || IndexSet_IsMember( is2_preMerge, ii ) ) {
-         pcu_assert_true( IndexSet_IsMember( data->is, ii ) );
+         pcu_check_true( IndexSet_IsMember( data->is, ii ) );
       }
    }
    /* merge function isn't supposed to modify its second argument. Check this. */
    for ( ii=0; ii< IS2_SIZE; ii++ ) {
-      pcu_assert_true( IndexSet_IsMember( data->is2, ii ) == IndexSet_IsMember( is2_preMerge, ii ) );
+      pcu_check_true( IndexSet_IsMember( data->is2, ii ) == IndexSet_IsMember( is2_preMerge, ii ) );
    }
 
    /* ok - now try reverse operation, merging into is2. Result up to IS1_SIZE should be
@@ -305,16 +305,16 @@ void IndexSetSuite_TestMerge_OR( IndexSetSuiteData* data ) {
    for ( ii=0; ii< IS1_SIZE; ii++ ) {
       /* check that an OR of the original list gives the same result as in merged list */
       if ( IndexSet_IsMember( is1_preMerge, ii ) || IndexSet_IsMember( is2_preMerge, ii ) ) {
-         pcu_assert_true( IndexSet_IsMember( data->is2, ii ) );
+         pcu_check_true( IndexSet_IsMember( data->is2, ii ) );
       }
    }
    /* check unchanged for last part of is2 */
    for ( ii=IS1_SIZE; ii< IS2_SIZE; ii++ ) {
-      pcu_assert_true( IndexSet_IsMember( data->is2, ii ) == IndexSet_IsMember( is2_preMerge, ii ) );
+      pcu_check_true( IndexSet_IsMember( data->is2, ii ) == IndexSet_IsMember( is2_preMerge, ii ) );
    }
    /* merge function isn't supposed to modify its second argument. Check this. */
    for ( ii=0; ii< IS1_SIZE; ii++ ) {
-      pcu_assert_true( IndexSet_IsMember( data->is, ii ) == IndexSet_IsMember( is1_preMerge, ii ) );
+      pcu_check_true( IndexSet_IsMember( data->is, ii ) == IndexSet_IsMember( is1_preMerge, ii ) );
    }
 }
 
@@ -351,12 +351,12 @@ void IndexSetSuite_TestMerge_AND( IndexSetSuiteData* data ) {
    for ( ii=0; ii< IS1_SIZE; ii++ ) {
       /* check that an AND of the original list gives the same result as in merged list */
       if ( IndexSet_IsMember( is1_preMerge, ii ) && IndexSet_IsMember( is2_preMerge, ii ) ) {
-         pcu_assert_true( IndexSet_IsMember( data->is, ii ) );
+         pcu_check_true( IndexSet_IsMember( data->is, ii ) );
       }
    }
    /* merge function isn't supposed to modify its second argument. Check this. */
    for ( ii=0; ii< IS2_SIZE; ii++ ) {
-      pcu_assert_true( IndexSet_IsMember( data->is2, ii ) == IndexSet_IsMember( is2_preMerge, ii ) );
+      pcu_check_true( IndexSet_IsMember( data->is2, ii ) == IndexSet_IsMember( is2_preMerge, ii ) );
    }
 
    /* ok - now try reverse operation, merging into is2. Result up to IS1_SIZE should be
@@ -375,16 +375,16 @@ void IndexSetSuite_TestMerge_AND( IndexSetSuiteData* data ) {
    for ( ii=0; ii< IS1_SIZE; ii++ ) {
       /* check that an AND of the original list gives the same result as in merged list */
       if ( IndexSet_IsMember( is1_preMerge, ii ) && IndexSet_IsMember( is2_preMerge, ii ) ) {
-         pcu_assert_true( IndexSet_IsMember( data->is2, ii ) );
+         pcu_check_true( IndexSet_IsMember( data->is2, ii ) );
       }
    }
    /* check last part of is2, beyond length of is1, has all entries set to 0 */
    for ( ii=IS1_SIZE; ii< IS2_SIZE; ii++ ) {
-      pcu_assert_true( False == IndexSet_IsMember( data->is2, ii ) );
+      pcu_check_true( False == IndexSet_IsMember( data->is2, ii ) );
    }
    /* merge function isn't supposed to modify its second argument. Check this. */
    for ( ii=0; ii< IS1_SIZE; ii++ ) {
-      pcu_assert_true( IndexSet_IsMember( data->is, ii ) == IndexSet_IsMember( is1_preMerge, ii ) );
+      pcu_check_true( IndexSet_IsMember( data->is, ii ) == IndexSet_IsMember( is1_preMerge, ii ) );
    }
 }
 

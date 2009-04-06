@@ -72,30 +72,30 @@ void CommonRoutinesSuite_Teardown( CommonRoutinesSuiteData* data ) {
 
 
 CommonRoutinesSuite_TestLMS( CommonRoutinesSuiteData* data ) {
-   pcu_assert_true( 1 == Stg_LongestMatchingSubsequenceLength( "Acrobat", "BOAT", True ) );
-   pcu_assert_true( 6 == Stg_LongestMatchingSubsequenceLength( "Abracadabra", "Yabbadabbadoo", True ) );
-   pcu_assert_true( 7 == Stg_LongestMatchingSubsequenceLength( "Abracadabra", "Yabbadabbadoo", False ) );
-   pcu_assert_true( 6 == Stg_LongestMatchingSubsequenceLength( "Python", "PythonShape", False ) );
+   pcu_check_true( 1 == Stg_LongestMatchingSubsequenceLength( "Acrobat", "BOAT", True ) );
+   pcu_check_true( 6 == Stg_LongestMatchingSubsequenceLength( "Abracadabra", "Yabbadabbadoo", True ) );
+   pcu_check_true( 7 == Stg_LongestMatchingSubsequenceLength( "Abracadabra", "Yabbadabbadoo", False ) );
+   pcu_check_true( 6 == Stg_LongestMatchingSubsequenceLength( "Python", "PythonShape", False ) );
 }
 
 
 CommonRoutinesSuite_TestStringIsNumeric( CommonRoutinesSuiteData* data ) {
-   pcu_assert_true( False == Stg_StringIsNumeric( "nan" ) );
-   pcu_assert_true( True == Stg_StringIsNumeric( "567" ) );
-   pcu_assert_true( True == Stg_StringIsNumeric( "1.0e90" ) );
-   pcu_assert_true( False ==  Stg_StringIsNumeric( "1e90e80" ) );
-   pcu_assert_true( False == Stg_StringIsNumeric(".asdfasdf" ) );
-   pcu_assert_true( True == Stg_StringIsNumeric(".0032" ) );
-   pcu_assert_true( False == Stg_StringIsNumeric(".0032.00" ) );
+   pcu_check_true( False == Stg_StringIsNumeric( "nan" ) );
+   pcu_check_true( True == Stg_StringIsNumeric( "567" ) );
+   pcu_check_true( True == Stg_StringIsNumeric( "1.0e90" ) );
+   pcu_check_true( False ==  Stg_StringIsNumeric( "1e90e80" ) );
+   pcu_check_true( False == Stg_StringIsNumeric(".asdfasdf" ) );
+   pcu_check_true( True == Stg_StringIsNumeric(".0032" ) );
+   pcu_check_true( False == Stg_StringIsNumeric(".0032.00" ) );
 }
  
   
 CommonRoutinesSuite_TestStringIsEmpty( CommonRoutinesSuiteData* data ) {
-   pcu_assert_true( True  == Stg_StringIsEmpty( "\t \n" ) );
-   pcu_assert_true( False == Stg_StringIsEmpty( "asdf" ) );
-   pcu_assert_true( True  == Stg_StringIsEmpty( "    " ) );
-   pcu_assert_true( True  == Stg_StringIsEmpty( "    \n" ) );
-   pcu_assert_true( False == Stg_StringIsEmpty( "  sdf  \n" ) );
+   pcu_check_true( True  == Stg_StringIsEmpty( "\t \n" ) );
+   pcu_check_true( False == Stg_StringIsEmpty( "asdf" ) );
+   pcu_check_true( True  == Stg_StringIsEmpty( "    " ) );
+   pcu_check_true( True  == Stg_StringIsEmpty( "    \n" ) );
+   pcu_check_true( False == Stg_StringIsEmpty( "  sdf  \n" ) );
 }
 
 
@@ -120,7 +120,7 @@ CommonRoutinesSuite_TestStG_RoundDoubleToNDecimalPlaces( CommonRoutinesSuiteData
          errorMargin = fabs( roundedValue -
             expectedRoundedToDecPlaces[testValue_I][nDecPlaces] );
 
-         pcu_assert_le( errorMargin, data->tolerances[testValue_I] );
+         pcu_check_le( errorMargin, data->tolerances[testValue_I] );
       }
    }
 }
@@ -146,7 +146,7 @@ CommonRoutinesSuite_TestStG_RoundDoubleToNSigFigs( CommonRoutinesSuiteData* data
             data->testValues[testValue_I], nSigFigs );
          errorMargin = fabs( roundedValue -
             expectedRoundedToSigFigs[testValue_I][nSigFigs] );
-         pcu_assert_le( errorMargin, data->tolerances[testValue_I] );
+         pcu_check_le( errorMargin, data->tolerances[testValue_I] );
       }
    }
 }

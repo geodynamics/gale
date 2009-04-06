@@ -9,6 +9,7 @@
 #include "listener.h"
 #include "textoutput.h"
 #include "runner.h"
-#include "test_asserts.h"
+#include "checks.h"
+#include "pcuassert.h"
 
 #endif

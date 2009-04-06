@@ -72,23 +72,23 @@ void MPIRoutinesSuite_TestArrayConv( MPIRoutinesSuiteData* data ) {
    unsigned*   disps;
 
    Array_1DTo2D( nBlocks, sizes, src, (void***)&dst2D, sizeof(unsigned) );
-   pcu_assert_true( dst2D[0][0] == 0 && dst2D[0][1] == 1 && 
+   pcu_check_true( dst2D[0][0] == 0 && dst2D[0][1] == 1 && 
        dst2D[1][0] == 2 && dst2D[1][1] == 3 && dst2D[1][2] == 4 && dst2D[1][3] == 5 && 
        dst2D[2][0] == 6 );
 
    Array_2DTo1D( nBlocks, sizes, (void**)dst2D, (void*)&dst1D, sizeof(unsigned), &disps );
-   pcu_assert_true( dst1D[0] == 0 && dst1D[1] == 1 && dst1D[2] == 2 && dst1D[3] == 3 && 
+   pcu_check_true( dst1D[0] == 0 && dst1D[1] == 1 && dst1D[2] == 2 && dst1D[3] == 3 && 
        dst1D[4] == 4 && dst1D[5] == 5 && dst1D[6] == 6 && 
        disps[0] == 0 && disps[1] == 2 && disps[2] == 6 );
 
    /* This time it tests the function can handle a 2D array with a zero-size column */
    sizes[1] = 0;
    Array_1DTo2D( nBlocks, sizes, src, (void***)&dst2D, sizeof(unsigned) );
-   pcu_assert_true( dst2D[0][0] == 0 && dst2D[0][1] == 1 && 
+   pcu_check_true( dst2D[0][0] == 0 && dst2D[0][1] == 1 && 
        dst2D[2][0] == 2 );
 
    Array_2DTo1D( nBlocks, sizes, (void**)dst2D, (void*)&dst1D, sizeof(unsigned), &disps );
-   pcu_assert_true( dst1D[0] == 0 && dst1D[1] == 1 && dst1D[2] == 2 && 
+   pcu_check_true( dst1D[0] == 0 && dst1D[1] == 1 && dst1D[2] == 2 && 
        disps[0] == 0 && disps[1] == 2 && disps[2] == 2 );
 
    FreeArray( dst2D );
@@ -114,7 +114,7 @@ void MPIRoutinesSuite_TestBcast( MPIRoutinesSuiteData* data ) {
    for( ii = 0; ii < size; ii++ )
       if( src[ii] != ii ) break;
 
-   pcu_assert_true( ii == size );
+   pcu_check_true( ii == size );
 
    FreeArray( src );
    return;
@@ -139,7 +139,7 @@ void MPIRoutinesSuite_TestGather( MPIRoutinesSuiteData* data ) {
        * The others shouldn't receive anything in dstArrays */
       if ( data->rank == watch ) {
          for( ii = 0; ii < data->nProcs; ii++ ) {
-            pcu_assert_true( dstSizes[ii] == size );
+            pcu_check_true( dstSizes[ii] == size );
          }
 
          /* Check the contents of the arrays are correct. Note, I've kept Alan's approach
@@ -155,7 +155,7 @@ void MPIRoutinesSuite_TestGather( MPIRoutinesSuiteData* data ) {
                if( dstArrays[ii][jj] != ii * size + jj ) break;
             if( jj < size ) break;
          }
-         pcu_assert_true( ii == data->nProcs );
+         pcu_check_true( ii == data->nProcs );
 
          /* Free the dst arrays, so we can test they are autmatically re-created properly
           * next loop */
@@ -188,7 +188,7 @@ void MPIRoutinesSuite_TestAllgather( MPIRoutinesSuiteData* data ) {
     *  concurrently */
 
    for( ii = 0; ii < data->nProcs; ii++ ) {
-      pcu_assert_true( dstSizes[ii] == size );
+      pcu_check_true( dstSizes[ii] == size );
    }
 
    for( ii = 0; ii < data->nProcs; ii++ ) {
@@ -200,7 +200,7 @@ void MPIRoutinesSuite_TestAllgather( MPIRoutinesSuiteData* data ) {
       }
       if( jj < size ) break;
    }
-   pcu_assert_true( ii == data->nProcs );
+   pcu_check_true( ii == data->nProcs );
 
    FreeArray( dstSizes );
    FreeArray( dstArrays );
@@ -237,8 +237,8 @@ void MPIRoutinesSuite_TestAlltoall_1D( MPIRoutinesSuiteData* data ) {
    FreeArray( srcArrays );
 
    for( procNum = 0; procNum < data->nProcs; procNum++ ) {
-      pcu_assert_true( dstSizes[procNum] == 1);
-      pcu_assert_true( dstArrays[procNum][0] == data->rank + procMulti * procNum );
+      pcu_check_true( dstSizes[procNum] == 1);
+      pcu_check_true( dstArrays[procNum][0] == data->rank + procMulti * procNum );
    }
 
    FreeArray( dstSizes );
@@ -276,9 +276,9 @@ void MPIRoutinesSuite_TestAlltoall_2D( MPIRoutinesSuiteData* data ) {
    FreeArray( srcArrays );
 
    for( procNum = 0; procNum < data->nProcs; procNum++ ) {
-      pcu_assert_true( dstSizes[procNum] == SecondDimSize);
+      pcu_check_true( dstSizes[procNum] == SecondDimSize);
       for ( ii=0; ii<SecondDimSize; ii++ ) {
-         pcu_assert_true( dstArrays[procNum][ii] == data->rank * SecondDimSize + procNum * procMulti + ii );
+         pcu_check_true( dstArrays[procNum][ii] == data->rank * SecondDimSize + procNum * procMulti + ii );
       }
    }
 

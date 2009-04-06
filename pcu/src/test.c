@@ -1,3 +1,22 @@
+/*
+**  Copyright 2008 Luke Hodkinson
+**
+**  This file is part of pcu.
+**
+**  pcu is free software: you can redistribute it and/or modify
+**  it under the terms of the GNU General Public License as published by
+**  the Free Software Foundation, either version 3 of the License, or
+**  (at your option) any later version.
+**
+**  Foobar is distributed in the hope that it will be useful,
+**  but WITHOUT ANY WARRANTY; without even the implied warranty of
+**  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+**  GNU General Public License for more details.
+**
+**  You should have received a copy of the GNU General Public License
+**  along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include <stdlib.h>
 #include <assert.h>
 #include <mpi.h>
@@ -109,43 +128,45 @@ void pcu_test_gathersources( pcu_test_t* test ) {
 
    /* Gather them all up. */
    totalsize = 0;
-   MPI_Reduce( &buflen, &totalsize, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD );
-   if( rank == 0 && totalsize ) {
-      totalbuf = malloc( totalsize );
-      alllens = (int*)malloc( nranks * sizeof(int) );
-      disps = (int*)malloc( nranks * sizeof(int) );
-   }
-   MPI_Gather( &buflen, 1, MPI_INT, alllens, 1, MPI_INT, 0, MPI_COMM_WORLD );
-   if( rank == 0 ) {
-      disps[0] = 0;
-      for( ii = 1; ii < nranks; ii++ )
-	 disps[ii] = disps[ii - 1] + alllens[ii - 1];
-   }
-   MPI_Gatherv( buf, buflen, MPI_BYTE, totalbuf, alllens, disps, 
-		MPI_BYTE, 0, MPI_COMM_WORLD );
-   if( buf )
-      free( buf );
-
-   if( rank == 0 ) {
-      /* Free arrays. */
-      if( alllens )
-	 free( alllens );
-      if( disps )
-	 free( disps );
-
-      /* Unpack sources into the list. */
-      ptr = totalbuf;
-      while( ptr < totalbuf + totalsize ) {
-	 cur = (pcu_source_t*)malloc( sizeof(pcu_source_t) );
-	 pcu_source_init( cur );
-	 pcu_source_unpack( cur, ptr );
-	 cur->test = test;
-	 ptr += pcu_source_getPackLen( cur );
-	 pcu_test_addSource( test, cur );
+   MPI_Allreduce( &buflen, &totalsize, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD );
+   if( totalsize ) {
+      if( rank == 0 ) {
+         totalbuf = malloc( totalsize );
+         alllens = (int*)malloc( nranks * sizeof(int) );
+         disps = (int*)malloc( nranks * sizeof(int) );
       }
+      MPI_Gather( &buflen, 1, MPI_INT, alllens, 1, MPI_INT, 0, MPI_COMM_WORLD );
+      if( rank == 0 ) {
+         disps[0] = 0;
+         for( ii = 1; ii < nranks; ii++ )
+            disps[ii] = disps[ii - 1] + alllens[ii - 1];
+      }
+      MPI_Gatherv( buf, buflen, MPI_BYTE, totalbuf, alllens, disps, 
+                   MPI_BYTE, 0, MPI_COMM_WORLD );
+      if( buf )
+         free( buf );
 
-      /* Free global buffer. */
-      if( totalbuf )
-	 free( totalbuf );
+      if( rank == 0 ) {
+         /* Free arrays. */
+         if( alllens )
+            free( alllens );
+         if( disps )
+            free( disps );
+
+         /* Unpack sources into the list. */
+         ptr = totalbuf;
+         while( ptr < totalbuf + totalsize ) {
+            cur = (pcu_source_t*)malloc( sizeof(pcu_source_t) );
+            pcu_source_init( cur );
+            pcu_source_unpack( cur, ptr );
+            cur->test = test;
+            ptr += pcu_source_getPackLen( cur );
+            pcu_test_addSource( test, cur );
+         }
+
+         /* Free global buffer. */
+         if( totalbuf )
+            free( totalbuf );
+      }
    }
 }
