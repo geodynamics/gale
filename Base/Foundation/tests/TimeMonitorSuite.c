@@ -82,7 +82,7 @@ void TimeMonitorSuite_TestTimingPeriod( TimeMonitorSuiteData* data ) {
    /* Note: I don't like this test approach, but it seems the only way without changing the
     * Component significantly to return TimeMonitor info by methods, rather than just printing
     * -- PatrickSunter, 3 Apr 2009 */
-   pcu_assert_true( 0 == strcmp( "\tTimeMonitor(test):  ts: 3 (secs), dt(67%): 2s\n", infoString ) );
+   pcu_check_true( 0 == strcmp( "\tTimeMonitor(test):  ts: 3 (secs), dt(67%): 2s\n", infoString ) );
    Stg_TimeMonitor_Delete( tm );
    free( infoString );
 }

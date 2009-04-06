@@ -120,7 +120,7 @@ void ObjectListSuite_TestAppend( ObjectListSuiteData* data ) {
    Stg_ObjectList_PointerAppend(  data->ol2, (data->addPtr2 = DummyPointer_New()), "a", 0, DummyPointer_Print, DummyPointer_Copy );
    Stg_ObjectList_GlobalPointerAppend(  data->ol3, (data->addPtr3 = (void*)DummyFunc1), "a" );
 
-   pcu_assert_true(
+   pcu_check_true(
       data->addPtr0 == Stg_ObjectList_Get( data->ol0, "a" ) &&
       data->addPtr0 == Stg_ObjectList_ObjectAt( data->ol0, 0 ) &&
       Stg_ObjectList_Count( data->ol0 ) == 1 &&
@@ -148,22 +148,22 @@ void ObjectListSuite_TestPrepend( ObjectListSuiteData* data ) {
    Stg_ObjectList_PointerPrepend(  data->ol2, (data->addPtr2 = DummyPointer_New()), "b", 0, DummyPointer_Print, DummyPointer_Copy );
    Stg_ObjectList_GlobalPointerPrepend(  data->ol3, (data->addPtr3 = (void*)DummyFunc2), "b" );
 
-   pcu_assert_true(
+   pcu_check_true(
       data->addPtr0 == Stg_ObjectList_Get( data->ol0, "b" ) &&
       data->addPtr0 == Stg_ObjectList_ObjectAt( data->ol0, 0 ) &&
       Stg_ObjectList_Count( data->ol0 ) == 2 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( data->ol0, 1 ) ), "a" ) == 0 );
-   pcu_assert_true(
+   pcu_check_true(
       data->addPtr1 == Stg_ObjectList_Get( &data->ol1, "b" ) &&
       data->addPtr1 == Stg_ObjectList_ObjectAt( &data->ol1, 0 ) &&
       Stg_ObjectList_Count( &data->ol1 ) == 2 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( &data->ol1, 1 ) ), "a" ) == 0 );
-   pcu_assert_true(
+   pcu_check_true(
       data->addPtr2 == Stg_ObjectList_Get( data->ol2, "b" ) &&
       data->addPtr2 == Stg_ObjectList_ObjectAt( data->ol2, 0 ) &&
       Stg_ObjectList_Count( data->ol2 ) == 2 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( data->ol2, 1 ) ), "a" ) == 0 );
-   pcu_assert_true(
+   pcu_check_true(
       data->addPtr3 == Stg_ObjectList_Get( data->ol3, "b" ) &&
       data->addPtr3 == Stg_ObjectList_ObjectAt( data->ol3, 0 ) &&
       Stg_ObjectList_Count( data->ol3 ) == 2 &&
@@ -194,25 +194,25 @@ void ObjectListSuite_TestInsertBefore( ObjectListSuiteData* data ) {
       DummyPointer_Copy );
    Stg_ObjectList_GlobalPointerInsertBefore(  data->ol3, "a", (data->addPtr3 = (void*)DummyFunc3), "c" );
 
-   pcu_assert_true(
+   pcu_check_true(
       data->addPtr0 == Stg_ObjectList_Get( data->ol0, "c" ) &&
       data->addPtr0 == Stg_ObjectList_ObjectAt( data->ol0, 1 ) &&
       Stg_ObjectList_Count( data->ol0 ) == 3 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( data->ol0, 0 ) ), "b" ) == 0 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( data->ol0, 2 ) ), "a" ) == 0 );
-   pcu_assert_true(
+   pcu_check_true(
       data->addPtr1 == Stg_ObjectList_Get( &data->ol1, "c" ) &&
       data->addPtr1 == Stg_ObjectList_ObjectAt( &data->ol1, 1 ) &&
       Stg_ObjectList_Count( &data->ol1 ) == 3 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( &data->ol1, 0 ) ), "b" ) == 0 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( &data->ol1, 2 ) ), "a" ) == 0 );
-   pcu_assert_true(
+   pcu_check_true(
       data->addPtr2 == Stg_ObjectList_Get( data->ol2, "c" ) &&
       data->addPtr2 == Stg_ObjectList_ObjectAt( data->ol2, 1 ) &&
       Stg_ObjectList_Count( data->ol2 ) == 3 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( data->ol2, 0 ) ), "b" ) == 0 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( data->ol2, 2 ) ), "a" ) == 0 );
-   pcu_assert_true(
+   pcu_check_true(
       data->addPtr3 == Stg_ObjectList_Get( data->ol3, "c" ) &&
       data->addPtr3 == Stg_ObjectList_ObjectAt( data->ol3, 1 ) &&
       Stg_ObjectList_Count( data->ol3 ) == 3 &&
@@ -249,28 +249,28 @@ void ObjectListSuite_TestInsertAfter( ObjectListSuiteData* data ) {
       DummyPointer_Copy );
    Stg_ObjectList_GlobalPointerInsertAfter(  data->ol3, "c", (data->addPtr3 = (void*)DummyFunc4), "d" );
 
-   pcu_assert_true(
+   pcu_check_true(
       data->addPtr0 == Stg_ObjectList_Get( data->ol0, "d" ) &&
       data->addPtr0 == Stg_ObjectList_ObjectAt( data->ol0, 2 ) &&
       Stg_ObjectList_Count( data->ol0 ) == 4 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( data->ol0, 0 ) ), "b" ) == 0 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( data->ol0, 1 ) ), "c" ) == 0 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( data->ol0, 3 ) ), "a" ) == 0 );
-   pcu_assert_true(
+   pcu_check_true(
       data->addPtr1 == Stg_ObjectList_Get( &data->ol1, "d" ) &&
       data->addPtr1 == Stg_ObjectList_ObjectAt( &data->ol1, 2 ) &&
       Stg_ObjectList_Count( &data->ol1 ) == 4 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( &data->ol1, 0 ) ), "b" ) == 0 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( &data->ol1, 1 ) ), "c" ) == 0 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( &data->ol1, 3 ) ), "a" ) == 0 );
-   pcu_assert_true(
+   pcu_check_true(
       data->addPtr2 == Stg_ObjectList_Get( data->ol2, "d" ) &&
       data->addPtr2 == Stg_ObjectList_ObjectAt( data->ol2, 2 ) &&
       Stg_ObjectList_Count( data->ol2 ) == 4 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( data->ol2, 0 ) ), "b" ) == 0 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( data->ol2, 1 ) ), "c" ) == 0 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( data->ol2, 3 ) ), "a" ) == 0 );
-   pcu_assert_true(
+   pcu_check_true(
       data->addPtr3 == Stg_ObjectList_Get( data->ol3, "d" ) &&
       data->addPtr3 == Stg_ObjectList_ObjectAt( data->ol3, 2 ) &&
       Stg_ObjectList_Count( data->ol3 ) == 4 &&
@@ -311,28 +311,28 @@ void ObjectListSuite_TestReplace( ObjectListSuiteData* data ) {
       DummyPointer_Print, 
       DummyPointer_Copy );
    Stg_ObjectList_GlobalPointerReplace(  data->ol3, "d", DELETE, (data->addPtr3 = (void*)DummyFunc5), "e" );
-   pcu_assert_true(
+   pcu_check_true(
       data->addPtr0 == Stg_ObjectList_Get( data->ol0, "e" ) &&
       data->addPtr0 == Stg_ObjectList_ObjectAt( data->ol0, 2 ) &&
       Stg_ObjectList_Count( data->ol0 ) == 4 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( data->ol0, 0 ) ), "b" ) == 0 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( data->ol0, 1 ) ), "c" ) == 0 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( data->ol0, 3 ) ), "a" ) == 0 );
-   pcu_assert_true(
+   pcu_check_true(
       data->addPtr1 == Stg_ObjectList_Get( &data->ol1, "e" ) &&
       data->addPtr1 == Stg_ObjectList_ObjectAt( &data->ol1, 2 ) &&
       Stg_ObjectList_Count( &data->ol1 ) == 4 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( &data->ol1, 0 ) ), "b" ) == 0 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( &data->ol1, 1 ) ), "c" ) == 0 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( &data->ol1, 3 ) ), "a" ) == 0 );
-   pcu_assert_true(
+   pcu_check_true(
       data->addPtr2 == Stg_ObjectList_Get( data->ol2, "e" ) &&
       data->addPtr2 == Stg_ObjectList_ObjectAt( data->ol2, 2 ) &&
       Stg_ObjectList_Count( data->ol2 ) == 4 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( data->ol2, 0 ) ), "b" ) == 0 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( data->ol2, 1 ) ), "c" ) == 0 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( data->ol2, 3 ) ), "a" ) == 0 );
-   pcu_assert_true(
+   pcu_check_true(
       data->addPtr3 == Stg_ObjectList_Get( data->ol3, "e" ) &&
       data->addPtr3 == Stg_ObjectList_ObjectAt( data->ol3, 2 ) &&
       Stg_ObjectList_Count( data->ol3 ) == 4 &&
@@ -366,22 +366,22 @@ void ObjectListSuite_TestRemove( ObjectListSuiteData* data ) {
    Stg_ObjectList_Remove(  data->ol2, "c", DELETE );
    Stg_ObjectList_Remove(  data->ol3, "c", DELETE );
 
-   pcu_assert_true(
+   pcu_check_true(
       Stg_ObjectList_Count( data->ol0 ) == 3 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( data->ol0, 0 ) ), "b" ) == 0 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( data->ol0, 1 ) ), "e" ) == 0 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( data->ol0, 2 ) ), "a" ) == 0 );
-   pcu_assert_true(
+   pcu_check_true(
       Stg_ObjectList_Count( &data->ol1 ) == 3 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( &data->ol1, 0 ) ), "b" ) == 0 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( &data->ol1, 1 ) ), "e" ) == 0 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( &data->ol1, 2 ) ), "a" ) == 0 );
-   pcu_assert_true(
+   pcu_check_true(
       Stg_ObjectList_Count( data->ol2 ) == 3 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( data->ol2, 0 ) ), "b" ) == 0 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( data->ol2, 1 ) ), "e" ) == 0 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( data->ol2, 2 ) ), "a" ) == 0 );
-   pcu_assert_true(
+   pcu_check_true(
       Stg_ObjectList_Count( data->ol3 ) == 3 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( data->ol3, 0 ) ), "b" ) == 0 &&
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( data->ol3, 1 ) ), "e" ) == 0 &&
@@ -415,19 +415,19 @@ void ObjectListSuite_TestReplaceAll( ObjectListSuiteData* data ) {
       DummyPointer_Print, 
       DummyPointer_Copy );
    Stg_ObjectList_GlobalPointerReplaceAll(  data->ol3, DELETE, (data->addPtr3 = (void*)DummyFunc6), "f" );
-   pcu_assert_true(
+   pcu_check_true(
       data->addPtr0 == Stg_ObjectList_Get( data->ol0, "f" ) &&
       data->addPtr0 == Stg_ObjectList_ObjectAt( data->ol0, 0 ) &&
       Stg_ObjectList_Count( data->ol0 ) == 1 );
-   pcu_assert_true(
+   pcu_check_true(
       data->addPtr1 == Stg_ObjectList_Get( &data->ol1, "f" ) &&
       data->addPtr1 == Stg_ObjectList_ObjectAt( &data->ol1, 0 ) &&
       Stg_ObjectList_Count( &data->ol1 ) == 1 );
-   pcu_assert_true(
+   pcu_check_true(
       data->addPtr2 == Stg_ObjectList_Get( data->ol2, "f" ) &&
       data->addPtr2 == Stg_ObjectList_ObjectAt( data->ol2, 0 ) &&
       Stg_ObjectList_Count( data->ol2 ) == 1 );
-   pcu_assert_true(
+   pcu_check_true(
       data->addPtr3 == Stg_ObjectList_Get( data->ol3, "f" ) &&
       data->addPtr3 == Stg_ObjectList_ObjectAt( data->ol3, 0 ) &&
       Stg_ObjectList_Count( data->ol3 ) == 1 );
@@ -453,21 +453,21 @@ void ObjectListSuite_TestCopy( ObjectListSuiteData* data ) {
    ol2deep = Stg_Class_Copy(  data->ol2, 0, True, 0, 0 );
    ol3deep = Stg_Class_Copy(  data->ol3, 0, True, 0, 0 );
 
-   pcu_assert_true(
+   pcu_check_true(
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( ol0deep, 0 ) ), "f" ) == 0 &&
       Stg_ObjectList_Count( ol0deep ) == 1 &&
       Stg_ObjectList_ObjectAt( data->ol0, 0 ) != Stg_ObjectList_ObjectAt( ol0deep, 0 ) &&
       Stg_Class_GetType( (Stg_Class*)Stg_ObjectList_ObjectAt( data->ol0, 0 ) ) == Stg_Class_GetType( (Stg_Class*)Stg_ObjectList_ObjectAt( ol0deep, 0 ) ) );
-   pcu_assert_true(
+   pcu_check_true(
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( ol1deep, 0 ) ), "f" ) == 0 &&
       Stg_ObjectList_Count( ol1deep ) == 1 &&
       Stg_ObjectList_ObjectAt( &data->ol1, 0 ) != Stg_ObjectList_ObjectAt( ol1deep, 0 ) &&
       Stg_Class_GetType( (Stg_Class*)Stg_ObjectList_ObjectAt( &data->ol1, 0 ) ) == Stg_Class_GetType( (Stg_Class*)Stg_ObjectList_ObjectAt( ol1deep, 0 ) ) );
-   pcu_assert_true(
+   pcu_check_true(
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( ol2deep, 0 ) ), "f" ) == 0 &&
       Stg_ObjectList_Count( ol2deep ) == 1 &&
       Stg_ObjectList_ObjectAt( data->ol2, 0 ) != Stg_ObjectList_ObjectAt( ol2deep, 0 ) );
-   pcu_assert_true(
+   pcu_check_true(
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( ol3deep, 0 ) ), "f" ) == 0 &&
       Stg_ObjectList_Count( ol3deep ) == 1 &&
       Stg_ObjectList_ObjectAt( data->ol3, 0 ) == Stg_ObjectList_ObjectAt( ol3deep, 0 ) && /* different to others */
