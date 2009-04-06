@@ -108,6 +108,8 @@ class Package(Module):
 
 
     def setup_trial(self, trial):
+        trial["apply_compile"] = self.apply_compile
+        trial["apply_link"] = self.apply_link
         trial["make_compile_env"] = self.make_compile_env
         trial["make_link_env"] = self.make_link_env
 
@@ -446,6 +448,15 @@ class Package(Module):
             for lib_dirs in lib_dirs_set:
                 yield [base_dir, inc_dirs, lib_dirs]
 
+    def apply_compile(self, cfg, env, com, lang):
+        for d in cfg["valid_deps"][0]:
+            self.apply_compile_dependency(d, com, lang, env)
+        cfg["make_compile_env"](cfg, env, com, lang)
+
+    def apply_link(self, cfg, env, lnk):
+        for d in cfg["valid_deps"][0]:
+            self.apply_link_dependency(d, lnk, env)
+        cfg["make_link_env"](cfg, env, lnk)
 
     def make_compile_env(self, cfg, env, com, lang):
         com_env = cfg["com"][com][lang]

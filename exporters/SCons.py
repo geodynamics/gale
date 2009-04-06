@@ -95,7 +95,7 @@ class SCons(config.Exporter):
 
         # Make the environement.
         local = com.clone()
-        cfg["make_compile_env"](cfg, local, com, lang)
+        cfg["apply_compile"](cfg, local, com, lang)
 
         # Produce the compile command line.
         cmd_str = local.subst("$compile_cmd_" + lang)
@@ -108,7 +108,7 @@ class SCons(config.Exporter):
 
         # Produce program link command line.
         local = lnk.clone()
-        cfg["make_link_env"](cfg, local, lnk)
+        cfg["apply_link"](cfg, local, lnk)
 
         cmd_str = local.subst("$link_prog_cmd")
         opt_dict = com["options"].gather(com["options"].parse_option_string(cmd_str))
