@@ -58,14 +58,25 @@ void MemorySuite_Teardown( MemorySuiteData* data ) {
 
 
 void MemorySuite_Test2DArray( MemorySuiteData* data ) {
-   double**   array2d = NULL;
-   Index      ii = 0;
-   Index      jj = 0;
+   double**       array2d = NULL;
+   Index          ii = 0;
+   Index          jj = 0;
+   MemoryPointer* memoryPtr;
 
    array2d = Memory_Alloc_2DArray_Unnamed( double, 2, 3 );
    pcu_check_true( NULL != array2d );
    #ifdef MEMORY_STATS
    pcu_check_true( Memory_IsAllocated( array2d ) == True );
+   memoryPtr = Memory_Find_Pointer( array2d );
+   pcu_check_true( NULL != memoryPtr );
+   pcu_check_true( memoryPtr->allocType == MEMORY_2DARRAY );
+   pcu_check_true( 0 == strcmp( memoryPtr->type->value, "double" ) );
+   pcu_check_true( 0 == strcmp( memoryPtr->file->value, "MemorySuite.c" ) );
+   pcu_check_true( 0 == strcmp( memoryPtr->func->value, __func__ ) );
+   pcu_check_true( memoryPtr->itemSize == sizeof(double) * (2+1) * 3 );
+   pcu_check_true( memoryPtr->itemSize == sizeof(double) * (2+1) * 3 );
+   pcu_check_true( memoryPtr->length.twoD[0] == 2 );
+   pcu_check_true( memoryPtr->length.twoD[1] == 3 );
    #endif
 
    /* Simply write values to specified array entries, and check they're able to be read back properly */
@@ -74,10 +85,27 @@ void MemorySuite_Test2DArray( MemorySuiteData* data ) {
          array2d[ii][jj] = ii + (jj / 10.0);
       }
    }
-
    for ( ii = 0; ii < 2; ii++ ) {
       for ( jj = 0; jj < 3; jj++ ) {
          pcu_check_true( fabs(array2d[ii][jj] - (ii + (jj / 10.0))) <= DOUBLE_TOLERANCE );
+      }
+   }
+
+   array2d = Memory_Realloc_2DArray( array2d, double, 4, 4 );
+   /* Check that the realloc hasn't corrupted existing values, then re-write and re-check */
+   for ( ii = 0; ii < 2; ii++ ) {
+      for ( jj = 0; jj < 3; jj++ ) {
+         pcu_check_true( fabs(array2d[ii][jj] - (ii + (jj / 10.0))) <= DOUBLE_TOLERANCE );
+      }
+   }
+   for ( ii = 0; ii < 4; ii++ ) {
+      for ( jj = 0; jj < 4; jj++ ) {
+         array2d[ii][jj] = ii + (jj / 20.0);
+      }
+   }
+   for ( ii = 0; ii < 4; ii++ ) {
+      for ( jj = 0; jj < 4; jj++ ) {
+         pcu_check_true( fabs(array2d[ii][jj] - (ii + (jj / 20.0))) <= DOUBLE_TOLERANCE );
       }
    }
 
@@ -92,6 +120,7 @@ void MemorySuite_Test2DArray( MemorySuiteData* data ) {
    #ifdef MEMORY_STATS
    pcu_check_true( Memory_IsAllocated( array2d ) == False );
    #endif
+
 }
 
 
@@ -114,16 +143,40 @@ void MemorySuite_Test3DArray( MemorySuiteData* data ) {
          }
       }
    }
-
    for ( ii = 0; ii < 4; ii++ ) {
       for ( jj = 0; jj < 3; jj++ ) {
          for ( kk = 0; kk < 2; kk++ ) {
-            array3d[ii][jj][kk] = ii + (jj / 10.0) + (kk / 100.0);
             pcu_check_true( fabs(array3d[ii][jj][kk] - (ii + (jj / 10.0) + (kk / 100.0))) <= DOUBLE_TOLERANCE );
          }
       }
    }
 
+   array3d = Memory_Realloc_3DArray( array3d, double, 5, 5, 5 );
+   /* Check that the realloc hasn't corrupted existing values, then re-write and re-check */
+   for ( ii = 0; ii < 4; ii++ ) {
+      for ( jj = 0; jj < 3; jj++ ) {
+         for ( kk = 0; kk < 2; kk++ ) {
+            pcu_check_true( fabs(array3d[ii][jj][kk] - (ii + (jj / 10.0) + (kk / 100.0))) <= DOUBLE_TOLERANCE );
+         }
+      }
+   }
+   for ( ii = 0; ii < 5; ii++ ) {
+      for ( jj = 0; jj < 5; jj++ ) {
+         for ( kk = 0; kk < 5; kk++ ) {
+            array3d[ii][jj][kk] = ii + (jj / 20.0) + (kk / 200.0);
+         }
+      }
+   }
+   for ( ii = 0; ii < 5; ii++ ) {
+      for ( jj = 0; jj < 5; jj++ ) {
+         for ( kk = 0; kk < 5; kk++ ) {
+            pcu_check_true( fabs(array3d[ii][jj][kk] - (ii + (jj / 20.0) + (kk / 200.0))) <= DOUBLE_TOLERANCE );
+         }
+      }
+   }
+
+   /* Note: this test would work better compiled with MEMORY_STATS enabled. Not sure how to
+    * do this in scons yet. -- PatrickSunter, 7 Apr 2009 */
    #ifdef MEMORY_STATS
    pcu_check_true( Memory_CountGet( array3d ) == 0 );
    Memory_CountInc( array3d );
@@ -160,7 +213,6 @@ void MemorySuite_Test4DArray( MemorySuiteData* data ) {
          }
       }
    }
-
    for ( ii = 0; ii < 4; ii++ ) {
       for ( jj = 0; jj < 3; jj++ ) {
          for ( kk = 0; kk < 2; kk++ ) {
@@ -171,6 +223,9 @@ void MemorySuite_Test4DArray( MemorySuiteData* data ) {
          }
       }
    }
+
+   /* There doesn't yet seem to be a function to Re-Alloc a 4D array, so no test for it.
+    *  -- Patrick Sunter, 7 Apr 2009 */
 
    #ifdef MEMORY_STATS
    pcu_check_true( Memory_CountGet( array4d ) == 0 );
@@ -199,10 +254,27 @@ void MemorySuite_Test2DArrayAs1D( MemorySuiteData* data ) {
          Memory_Access2D( one2d, ii, jj, 2 ) = ii + (jj / 10.0);
       }
    }
-
    for ( ii = 0; ii < 3; ii++ ) {
       for ( jj = 0; jj < 2; jj++ ) {
          pcu_check_true( fabs( Memory_Access2D( one2d, ii, jj, 2 ) - (ii + (jj / 10.0))) <= DOUBLE_TOLERANCE );
+      }
+   }
+
+   one2d = Memory_Realloc_2DArrayAs1D( one2d, double, 3, 2, 4, 4 );
+   /* Check that the realloc hasn't corrupted existing values, then re-write and re-check */
+   for ( ii = 0; ii < 3; ii++ ) {
+      for ( jj = 0; jj < 2; jj++ ) {
+         pcu_check_true( fabs( Memory_Access2D( one2d, ii, jj, 4 ) - (ii + (jj / 10.0))) <= DOUBLE_TOLERANCE );
+      }
+   }
+   for ( ii = 0; ii < 4; ii++ ) {
+      for ( jj = 0; jj < 4; jj++ ) {
+         Memory_Access2D( one2d, ii, jj, 4 ) = ii + (jj / 20.0);
+      }
+   }
+   for ( ii = 0; ii < 4; ii++ ) {
+      for ( jj = 0; jj < 4; jj++ ) {
+         pcu_check_true( fabs( Memory_Access2D( one2d, ii, jj, 4 ) - (ii + (jj / 20.0))) <= DOUBLE_TOLERANCE );
       }
    }
 
@@ -226,12 +298,37 @@ void MemorySuite_Test3DArrayAs1D( MemorySuiteData* data ) {
          }
       }
    }
-
    for ( ii = 0; ii < 4; ii++ ) {
       for ( jj = 0; jj < 3; jj++ ) {
          for ( kk = 0; kk < 2; kk++ ) {
             pcu_check_true( fabs( Memory_Access3D( one3d, ii, jj, kk, 3, 2 ) - 
                (ii + (jj / 10.0) + (kk / 100.0))) <= DOUBLE_TOLERANCE );
+         }
+      }
+   }
+
+   one3d = Memory_Realloc_3DArrayAs1D( one3d, double, 4, 3, 2, 5, 5, 5 );
+   /* Check that the realloc hasn't corrupted existing values, then re-write and re-check */
+   for ( ii = 0; ii < 4; ii++ ) {
+      for ( jj = 0; jj < 3; jj++ ) {
+         for ( kk = 0; kk < 2; kk++ ) {
+            pcu_check_true( fabs( Memory_Access3D( one3d, ii, jj, kk, 5, 5 ) - 
+               (ii + (jj / 10.0) + (kk / 100.0))) <= DOUBLE_TOLERANCE );
+         }
+      }
+   }
+   for ( ii = 0; ii < 5; ii++ ) {
+      for ( jj = 0; jj < 5; jj++ ) {
+         for ( kk = 0; kk < 5; kk++ ) {
+            Memory_Access3D( one3d, ii, jj, kk, 5, 5 ) = ii + (jj / 20.0) + (kk / 200.0);
+         }
+      }
+   }
+   for ( ii = 0; ii < 5; ii++ ) {
+      for ( jj = 0; jj < 5; jj++ ) {
+         for ( kk = 0; kk < 5; kk++ ) {
+            pcu_check_true( fabs( Memory_Access3D( one3d, ii, jj, kk, 5, 5 ) -
+               (ii + (jj / 20.0) + (kk / 200.0))) <= DOUBLE_TOLERANCE );
          }
       }
    }
