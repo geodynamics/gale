@@ -49,7 +49,6 @@
 	#include "Extensibility/Extensibility.h"
 	#include "Context/Context.h"
 	#include "Init.h"
-	#include "main.h"
 	#include "Finalise.h"
 	
 #endif /* __StGermain_Base_h__ */

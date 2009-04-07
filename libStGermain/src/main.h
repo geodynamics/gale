@@ -41,8 +41,17 @@
 #ifndef __StGermain_main_h__
 #define __StGermain_main_h__
 
-	/** The StGermain main loop - the context life cycle */
-	void stgMainLoop( Dictionary* dictionary, MPI_Comm CommWorld );
+	/** The StGermain main - the context life cycle */
+	void stgMain( Dictionary* dictionary, MPI_Comm CommWorld );
+
+	/** The StGermain main initialisation */
+	AbstractContext* stgMainInit( Dictionary* dictionary, MPI_Comm CommWorld );
+
+	/** The StGermain main loop */
+	void stgMainLoop( AbstractContext* context );
+
+	/** The StGermain main destruction */
+	void stgMainDestroy( AbstractContext* context );
 
 	/** Add a toolbox to the "import" list in the dictionary */
 	void stgImportToolbox( Dictionary* dictionary, char* toolboxName );
