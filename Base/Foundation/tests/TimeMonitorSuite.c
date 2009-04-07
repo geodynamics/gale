@@ -63,7 +63,7 @@ void TimeMonitorSuite_TestTimingPeriod( TimeMonitorSuiteData* data ) {
     * Note: ideally would redirect to a char* buffer, but the StG journal doesn't seem
     * to have this functionality yet */
    timeMonitorStream = Journal_Register( Info_Type, Stg_TimeMonitor_InfoStreamName );
-	Stream_RedirectFile( timeMonitorStream, timeMonitorOutputFilename );
+   Stream_RedirectFile( timeMonitorStream, timeMonitorOutputFilename );
    Journal_Enable_TypedStream( Info_Type, True );
 	Stream_Enable( timeMonitorStream, True );
 
