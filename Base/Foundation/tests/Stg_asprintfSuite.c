@@ -28,63 +28,41 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#include "Base/Foundation/Foundation.h"
-#include "Regresstor/libRegresstor/Regresstor.h"
-
-#include "JournalWrappers.h"
-
 #include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <mpi.h>
 #include <string.h>
 
+#include "pcu/pcu.h"
+#include "StGermain/Base/Foundation/Foundation.h"
+#include "StGermain/Base/Foundation/forwardDecl.h" /* For Journal stuff */
+#include "Stg_asprintfSuite.h"
 
-int main(int argc, char *argv[])
-{
-	int			rank;
-	int			procCount;
-	int			procToWatch;
-	Stream*			stream;
+typedef struct {
+} Stg_asprintfSuiteData;
 
-	/* Initialise MPI, get world info */
-	MPI_Init(&argc, &argv);
-	MPI_Comm_size(MPI_COMM_WORLD, &procCount);
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+void Stg_asprintfSuite_Setup( Stg_asprintfSuiteData* data ) {
+}
 
-	BaseFoundation_Init( &argc, &argv );
+void Stg_asprintfSuite_Teardown( Stg_asprintfSuiteData* data ) {
+}
 
-	RegressionTest_Init( "Base/Foundation/CommonRoutines" );
+void Stg_asprintfSuite_TestPrint( Stg_asprintfSuiteData* data ) {
+	const char*  fiftyBytes = "01234567890123456789012345678901234567890123456789";
+	char*        testString;
+	char*        testStringPtr;
+   unsigned int offset=0;
 
-	stream = Journal_Register( "info", "myStream" );
-	
-	if( argc >= 2 ) {
-		procToWatch = atoi( argv[1] );
-	}
-	else {
-		procToWatch = 0;
-	}
+	/* Stress testing Stg_asprintf beyond the default alloc number of bytes */
+	Stg_asprintf( &testString, "%s%s%s%s", fiftyBytes, fiftyBytes, fiftyBytes, fiftyBytes );
+	pcu_check_true( 200 == strlen( testString ) );
+   for ( offset=0; offset < 200; offset+=50 ) {
+      testStringPtr = testString + offset;
+      pcu_check_true( 0 == strncmp( fiftyBytes, testStringPtr, 50 ) );
+   }
+	Memory_Free( testString );
+}
 
-	if ( rank == procToWatch ) {
-		const char* fiftyBytes = "01234567890123456789012345678901234567890123456789";
-
-		char* testString;
-
-		Journal_Printf( stream, "Stress testing Stg_asprintf beyond the default alloc number of bytes\n" );
-
-		Stg_asprintf( &testString, "%s%s%s%s", fiftyBytes, fiftyBytes, fiftyBytes, fiftyBytes );
-
-		Journal_Printf( stream, "%s\n", testString );
-
-		Memory_Free( testString );
-	}
-
-	RegressionTest_Finalise();
-
-	BaseFoundation_Finalise();
-	
-	/* Close off MPI */
-	MPI_Finalize();
-	
-	return 0; /* success */
+void Stg_asprintfSuite( pcu_suite_t* suite ) {
+   pcu_suite_setData( suite, Stg_asprintfSuiteData );
+   pcu_suite_setFixtures( suite, Stg_asprintfSuite_Setup, Stg_asprintfSuite_Teardown );
+   pcu_suite_addTest( suite, Stg_asprintfSuite_TestPrint );
 }
