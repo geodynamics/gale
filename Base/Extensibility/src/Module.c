@@ -259,7 +259,7 @@ void* Module_LoadSymbol( void* module, const char* suffix ) {
 	void*   result;
 	
 	mangledName = self->MangleName( self->name );
-	symbolText = Memory_Alloc_Array( char, strlen( mangledName ) + strlen( suffix ) + 2, MODULE_SYMBOLNAME );
+	symbolText = Memory_Alloc_Array( char, strlen( mangledName ) + strlen( suffix ) + 3, MODULE_SYMBOLNAME );
 
 	sprintf( symbolText, "%s%s",  mangledName, suffix );
 

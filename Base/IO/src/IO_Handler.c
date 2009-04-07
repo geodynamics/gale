@@ -88,8 +88,7 @@ void _IO_Handler_Init( IO_Handler* self ) {
 	self->resource = NULL;
 	self->currPath = NULL;
 	self->schema = NULL;
-	self->validate = malloc( sizeof( int ) );
-	*(self->validate) = 0;
+	self->validate = 0;
 }
 
 
@@ -446,9 +445,9 @@ void _get_XML(void* ioHandler, char* argv[], int argc) {
 			if ( strcasecmp( option, "-schema" ) == 0 )
 				schema = 1;
 			if ( strcasecmp( option, "-dontXMLValidate" ) == 0 )
-				*(self->validate) = 0;
+				(self->validate) = 0;
 			if ( strcasecmp( option, "-XMLValidate" ) == 0 )
-				*(self->validate) = 1;
+				(self->validate) = 1;
 		}
 	}
 }

@@ -233,7 +233,6 @@ XML_IO_Handler* XML_IO_Handler_New_Schema( XML_IO_Handler* old ) {
 					
 	// copy the schema and validation from prvious XML_IO_Handler
 
-	newHandler->validate = malloc( sizeof( int ) );
 	newHandler->validate = old->validate;
 	if ( old->schema != NULL ) {
 		newHandler->schema = malloc( strlen( old->schema ) +1 );
@@ -297,6 +296,7 @@ void _XML_IO_Handler_Init( XML_IO_Handler* self ) {
 	self->currNameSpace = NULL;
 	self->tokeniserCalls = 0;
 	self->listEncoding = PerList;
+	self->validate = 0;
 	
 	self->typeKeywords = Stg_ObjectList_New();
 	lookupType = Memory_Alloc( Dictionary_Entry_Value_Type, "Lookup-type" );
@@ -766,7 +766,7 @@ static void _XML_IO_Handler_ValidateFile( XML_IO_Handler* self, const char* file
 			ret = xmlTextReaderRead( reader );
 		}
 
-		if ( *(self->validate) == 1 ) {
+		if ( (self->validate) == 1 ) {
 			/*
 			if ( self->schema == NULL )
 				Journal_Firewall( 

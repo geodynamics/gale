@@ -71,7 +71,7 @@
 		char*					resource; \
 		char*					currPath; \
 		char*					schema; \
-		int*					validate;
+		int           validate;
 	struct _IO_Handler { __IO_Handler };
 	
 	/* No "IO_Handler_New" and "IO_Handler_Init" as this is an abstract class */
