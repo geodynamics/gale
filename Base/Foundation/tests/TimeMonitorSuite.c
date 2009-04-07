@@ -65,7 +65,7 @@ void TimeMonitorSuite_TestTimingPeriod( TimeMonitorSuiteData* data ) {
    timeMonitorStream = Journal_Register( Info_Type, Stg_TimeMonitor_InfoStreamName );
    Stream_RedirectFile( timeMonitorStream, timeMonitorOutputFilename );
    Journal_Enable_TypedStream( Info_Type, True );
-	Stream_Enable( timeMonitorStream, True );
+   Stream_Enable( timeMonitorStream, True );
 
    Stg_TimeMonitor* tm = Stg_TimeMonitor_New( "test", True, True, MPI_COMM_WORLD );
    sleep( 1 );
