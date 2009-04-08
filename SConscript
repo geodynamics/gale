@@ -9,7 +9,7 @@ env = env.Clone()
 # Inside each project we will be accessing headers without the
 # project name as a prefix, so we need to let SCons know how to
 # find those headers.
-env.Append(CPPPATH='#' + env['build_dir'] + '/include/StgFEM')
+env.Append(CPPPATH=env['build_dir'] + '/include/StgFEM')
 
 # Keep a list of all the objects we build so we can make a library
 # afterwards.
@@ -29,7 +29,7 @@ for d in dirs:
 
     # Setup where to look for files.
     src_dir = d + '/src'
-    inc_dir = '#' + env['build_dir'] + '/include/StgFEM/' + d
+    inc_dir = env['build_dir'] + '/include/StgFEM/' + d
     tst_dir = d + '/tests'
 
     # Install the headers and '.def' files.
@@ -53,17 +53,17 @@ for d in dirs:
     suites += env.Object(Glob(tst_dir + '/*Suite.c'))
 
 # Need to install headers from libStgFEM.
-env.Install('#' + env['build_dir'] + '/include/StgFEM', Glob('libStgFEM/src/*.h'))
+env.Install(env['build_dir'] + '/include/StgFEM', Glob('libStgFEM/src/*.h'))
 
 # Build libraries.
 if env['shared_libraries']:
-    env.SharedLibrary('#' + env['build_dir'] + '/lib/StgFEM', objs)
+    env.SharedLibrary(env['build_dir'] + '/lib/StgFEM', objs)
 
 # Need to include the StgFEM library for binaries.
 libs = ['StgFEM'] + env.get('LIBS', [])
 
 # Test runner program.
-env.PCUTest('#' + env['build_dir'] + '/tests/testStgFEM', suites,
+env.PCUTest(env['build_dir'] + '/tests/testStgFEM', suites,
             PCU_SETUP="StGermain_Init(&argc, &argv);StgDomain_Init(&argc, &argv);" \
                 "StgFEM_Init(&argc, &argv);",
             PCU_TEARDOWN="StgFEM_Finalise();StgDomain_Finalise();" \
@@ -95,7 +95,7 @@ for d in dirs:
     mod_name = env['ESCAPE']('"' + ''.join(d.split('/')) + '"')
     cpp_defs = [('CURR_MODULE_NAME', mod_name)] + env.get('CPPDEFINES', [])
 
-    env.Install('#' + env['build_dir'] + '/include/StgFEM/' + d.split('/')[-1],
+    env.Install(env['build_dir'] + '/include/StgFEM/' + d.split('/')[-1],
                 Glob(d + '/*.h'))
 
     srcs = Glob(d + '/*.c')
@@ -107,11 +107,11 @@ for d in dirs:
         lib_pre = env['LIBPREFIXES']
         if not isinstance(lib_pre, list):
             lib_pre = [lib_pre]
-        env.SharedLibrary('#' + env['build_dir'] + '/lib/' + name, objs,
+        env.SharedLibrary(env['build_dir'] + '/lib/' + name, objs,
                           SHLIBPREFIX='',
                           LIBPREFIXES=lib_pre + [''],
                           LIBS=libs)
 
 # Install XML input files.
-env.Install('#' + env['build_dir'] + '/lib/StGermain/StgFEM',
+env.Install(env['build_dir'] + '/lib/StGermain/StgFEM',
             Glob('Apps/StgFEM_Components/*.xml'))
