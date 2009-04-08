@@ -59,6 +59,12 @@ typedef struct {
    Index                      testEntriesCount;
    char**                     testKeys;
    Dictionary_Entry_Value**   testValues;
+   char*                      testString;
+   double                     testDouble;
+   unsigned int               testUint;
+   int                        testInt;
+   unsigned long              testUnsignedlong;
+   Bool                       testBool;
    double*                    testList;
    Index                      testListCount;
    TestStruct*                testStruct;
@@ -82,19 +88,25 @@ void DictionarySuite_Setup( DictionarySuiteData* data ) {
       data->testValues[ii] = NULL;
    }
 
+   Stg_asprintf( &data->testString, "hello" );
+   data->testDouble=45.567;
+   data->testUint = 5;
+   data->testInt = -5;
+   data->testUnsignedlong = 52342423;
+   data->testBool = True;
    iter = 0;
    Stg_asprintf( &data->testKeys[iter], "test_cstring" );
-   data->testValues[iter] = Dictionary_Entry_Value_FromString( "hello" );
+   data->testValues[iter] = Dictionary_Entry_Value_FromString( data->testString );
    Stg_asprintf( &data->testKeys[++iter], "test_double" );
-   data->testValues[iter] = Dictionary_Entry_Value_FromDouble( 45.567 );
+   data->testValues[iter] = Dictionary_Entry_Value_FromDouble( data->testDouble );
    Stg_asprintf( &data->testKeys[++iter], "test_uint" );
-   data->testValues[iter] = Dictionary_Entry_Value_FromUnsignedInt( 5 );
+   data->testValues[iter] = Dictionary_Entry_Value_FromUnsignedInt( data->testUint );
    Stg_asprintf( &data->testKeys[++iter], "test_int" );
-   data->testValues[iter] = Dictionary_Entry_Value_FromInt( -5 );
+   data->testValues[iter] = Dictionary_Entry_Value_FromInt( data->testInt );
    Stg_asprintf( &data->testKeys[++iter], "test_unsignedlong" );
-   data->testValues[iter] = Dictionary_Entry_Value_FromUnsignedLong( 52342423 );
+   data->testValues[iter] = Dictionary_Entry_Value_FromUnsignedLong( data->testUnsignedlong );
    Stg_asprintf( &data->testKeys[++iter], "test_bool" );
-   data->testValues[iter] = Dictionary_Entry_Value_FromUnsignedInt( 1 );
+   data->testValues[iter] = Dictionary_Entry_Value_FromUnsignedInt( data->testBool );
 
    /* adding a list */
    data->testListCount = 5;
@@ -318,6 +330,57 @@ void DictionarySuite_TestAddElement( DictionarySuiteData* data ) {
 }
 
 
+void DictionarySuite_TestShortcuts( DictionarySuiteData* data ) {
+
+   DictionarySuite_PopulateDictWithTestValues( data );
+
+   /* Testing GetString_WithDefault. If an entry with that key already exists, then
+    *  the value of the existing key should be returned, and the default passed in
+    *  ignored. However if the given key _doesn't_ exist, the default should be 
+    *  returned, and a new entry with the given key added to the dict. */
+   pcu_check_true( 0 == strcmp( data->testString,
+      Dictionary_GetString_WithDefault( data->dict, "test_cstring", "heya" ) ) );
+   pcu_check_true( 0 == strcmp( "heya",
+      Dictionary_GetString_WithDefault( data->dict, "test_cstring2", "heya" ) ) );
+   pcu_check_true( NULL != Dictionary_Get( data->dict, "test_cstring2" ) );
+   pcu_check_true( data->testDouble =
+      Dictionary_GetDouble_WithDefault( data->dict, "test_double", 2.8 ) );
+   pcu_check_true( 2.8 ==
+      Dictionary_GetDouble_WithDefault( data->dict, "test_double2", 2.8 ) );
+   pcu_check_true( NULL != Dictionary_Get( data->dict, "test_double2" ) );
+   pcu_check_true( data->testUint =
+      Dictionary_GetUnsignedInt_WithDefault( data->dict, "test_uint", 33 ) );
+   pcu_check_true( 33 ==
+      Dictionary_GetUnsignedInt_WithDefault( data->dict, "test_uint2", 33 ) );
+   pcu_check_true( NULL != Dictionary_Get( data->dict, "test_uint2" ) );
+   pcu_check_true( data->testInt =
+      Dictionary_GetInt_WithDefault( data->dict, "test_int", -24 ) );
+   pcu_check_true( -24 ==
+      Dictionary_GetInt_WithDefault( data->dict, "test_int2", -24 ) );
+   pcu_check_true( NULL != Dictionary_Get( data->dict, "test_int2" ) );
+   pcu_check_true( data->testUnsignedlong =
+      Dictionary_GetUnsignedLong_WithDefault( data->dict, "test_unsignedlong", 32433 ) );
+   pcu_check_true( 32433 ==
+      Dictionary_GetUnsignedLong_WithDefault( data->dict, "test_unsignedlong2", 32433 ) );
+   pcu_check_true( NULL != Dictionary_Get( data->dict, "test_unsignedlong2" ) );
+   pcu_check_true( data->testBool =
+      Dictionary_GetBool_WithDefault( data->dict, "test_bool", False ) );
+   pcu_check_true( False ==
+      Dictionary_GetBool_WithDefault( data->dict, "test_bool2", False ) );
+   pcu_check_true( NULL != Dictionary_Get( data->dict, "test_bool2" ) );
+
+   pcu_check_true( 0 == strcmp( data->testString,
+      Dictionary_GetString_WithPrintfDefault( data->dict, "test_cstring",
+         "heya%s%u", "hey", 3 ) ) );
+   pcu_check_true( 0 == strcmp( "heyahey3",
+      Dictionary_GetString_WithPrintfDefault( data->dict, "test_cstring3",
+         "heya%s%u", "hey", 3 ) ) );
+   pcu_check_true( NULL != Dictionary_Get( data->dict, "test_cstring3" ) );
+
+   Dictionary_Empty( data->dict );
+}
+
+
 void DictionarySuite( pcu_suite_t* suite ) {
    pcu_suite_setData( suite, DictionarySuiteData );
    pcu_suite_setFixtures( suite, DictionarySuite_Setup, DictionarySuite_Teardown );
@@ -327,4 +390,5 @@ void DictionarySuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, DictionarySuite_TestGet );
    pcu_suite_addTest( suite, DictionarySuite_TestSet );
    pcu_suite_addTest( suite, DictionarySuite_TestAddElement );
+   pcu_suite_addTest( suite, DictionarySuite_TestShortcuts );
 }
