@@ -35,10 +35,10 @@ class Context(object):
             m.setup_options()
 
     def parse_options(self):
-        if self.process_options:
-            self.process_options(self)
         opts = self.options.parse_option_list(sys.argv[1:])
         self.option_dict = self.options.gather(opts)
+        if self.process_options:
+            self.process_options(self)
         for m in self.order:
             m.parse_options()
             m.process_options()
