@@ -183,6 +183,7 @@ void _TrilinearElementType_Initialise( void* elementType, void *data ){
 	faceNodes = Memory_Alloc_2DArray( unsigned, 6, 4, "node indices for element faces" );
 
 	faceNodes[0][0] = 0; faceNodes[0][1] = 1; faceNodes[0][2] = 4; faceNodes[0][3] = 5;
+	/* the top face */
 	faceNodes[1][0] = 2; faceNodes[1][1] = 3; faceNodes[1][2] = 6; faceNodes[1][3] = 7;
 	faceNodes[2][0] = 0; faceNodes[2][1] = 4; faceNodes[2][2] = 2; faceNodes[2][3] = 6;
 	faceNodes[3][0] = 1; faceNodes[3][1] = 5; faceNodes[3][2] = 3; faceNodes[3][3] = 7;

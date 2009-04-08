@@ -189,7 +189,7 @@ void _AdvectionDiffusionSLE_Init(
 
 	if ( self->context ) {
     /* Create a specific name for the calcDt hook */
-    char* tmpName = Memory_Alloc_Array_Unnamed( char, strlen(self->name)+ 7 );
+    char* tmpName = Memory_Alloc_Array_Unnamed( char, strlen(self->name) + 7 + 1 );
     sprintf( tmpName, "%s_CalcDt", self->name );
 		EntryPoint_AppendClassHook( self->context->calcDtEP, tmpName, AdvectionDiffusionSLE_CalculateDt, self->type, self );
 		//EP_AppendClassHook( self->context->calcDtEP, AdvectionDiffusionSLE_CalculateDt, self );

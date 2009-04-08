@@ -2905,10 +2905,8 @@ PetscErrorCode _VecScatterBeginEnd( VecScatter vscat, Vec FROM, Vec TO, InsertMo
 	// 2.3.2 ordering of args
 	VecScatterBegin( FROM, TO, addv, mode, vscat );
 	VecScatterEnd( FROM, TO, addv, mode, vscat );
-#endif
-	
-#if( (PETSC_VERSION_MAJOR==2) && (PETSC_VERSION_MINOR==3) && (PETSC_VERSION_SUBMINOR>=3) )
-	// 2.3.3
+#else
+	// 2.3.3 or 3.0.0
 	VecScatterBegin( vscat, FROM, TO, addv, mode );
 	VecScatterEnd( vscat, FROM, TO, addv, mode );
 #endif
