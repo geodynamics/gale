@@ -8,6 +8,6 @@ class Exporter(object):
         self.modules = list(self.ctx.order)
         while len(self.modules):
             m = self.modules.pop()
-            if m.configs and m.mode > 0:
+            if m.configs and m.mode > 0 and m.enabled:
                 cfg = m.configs[0]
                 m.visit(cfg, self)
