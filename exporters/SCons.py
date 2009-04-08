@@ -47,9 +47,9 @@ class SCons(config.Exporter):
         self._com = cfg
 
         self.env["CC"] = cfg["command"]
-        self.env.append_unique("CPPDEFINES", cfg.subst("$pp_defs"))
-        self.env.append_unique("CFLAGS", cfg.subst("$bool($comflags)"))
-        self.env.append_unique("CFLAGS", cfg.subst("$dcomflags"))
+        self.env.append_unique("CPPDEFINES", cfg.subst("$pp_defs").split())
+        self.env.append_unique("CFLAGS", cfg.subst("$bool($comflags)").split())
+        self.env.append_unique("CFLAGS", cfg.subst("$dcomflags").split())
 
         # Need to handle Darwin.
         if platform.system() == "Darwin":
@@ -116,7 +116,7 @@ class SCons(config.Exporter):
                                 *utils.conv.to_list(lib_paths))
 
         # Add any special link options.
-        self.env.append_unique("LINKFLAGS", cfg.subst("$lnkprogflags"))
+        self.env.append_unique("LINKFLAGS", cfg.subst("$lnkprogflags").split())
 
         # Add some names to identify which packages have
         # been found. Not sure I'll keep this one.
