@@ -115,6 +115,9 @@ class SCons(config.Exporter):
         self.env.prepend_unique("LIBS", make_list=True,
                                 *utils.conv.to_list(lib_paths))
 
+        # Add any special link options.
+        self.env.append_unique("LINKFLAGS", cfg.subst("$lnkprogflags"))
+
         # Add some names to identify which packages have
         # been found. Not sure I'll keep this one.
         self.env.append_unique("found_packages", mod.name[mod.name.rfind(".") + 1:],
