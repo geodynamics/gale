@@ -412,7 +412,7 @@ Index ConstitutiveMatrix_GetParticleConstExtHandle( void* constitutiveMatrix ) {
 void ConstitutiveMatrix_GetStoredMatrixOnParticle( 
     void* constitutiveMatrix,
     IntegrationPoint* particle,
-    double** outputC ) {
+    double** cm ) {
   /* Function definition:
    * given a integration point the function returns the stored constitutiveMatrix,
    * if it's defined on the materialPoints, which maps to the int. particle
@@ -420,12 +420,21 @@ void ConstitutiveMatrix_GetStoredMatrixOnParticle(
 	ConstitutiveMatrix* self   = (ConstitutiveMatrix*)constitutiveMatrix;
   ExtensionInfo_Index handle = self->storedConstHandle;
 
-  double* particleExt = _OneToOneMapper_GetExtensionOn( 
+  double* ext = _OneToOneMapper_GetExtensionOn( 
       ((IntegrationPointsSwarm*)self->integrationSwarm)->mapper, 
       particle, handle );
 
-  outputC[0][0] = particleExt[0]; outputC[0][1] = particleExt[1]; outputC[0][2] = particleExt[2]; 
-  outputC[1][0] = particleExt[3]; outputC[1][1] = particleExt[4]; outputC[1][2] = particleExt[5]; 
-  outputC[2][0] = particleExt[6]; outputC[2][1] = particleExt[7]; outputC[2][2] = particleExt[8];
+	if( self->dim == 2 ) {
+		cm[0][0] = ext[0]; cm[0][1] = ext[1]; cm[0][2] = ext[2]; 
+		cm[1][0] = ext[3]; cm[1][1] = ext[4]; cm[1][2] = ext[5]; 
+		cm[2][0] = ext[6]; cm[2][1] = ext[7]; cm[2][2] = ext[8];
+	} else {
+		cm[0][0] = ext[0]; cm[0][1] = ext[1]; cm[0][2] = ext[2]; cm[0][3] = ext[3] ; cm[0][4] = ext[4]; cm[0][5] = ext[5]; 
+		cm[1][0] = ext[6]; cm[1][1] = ext[7]; cm[1][2] = ext[8]; cm[1][3] = ext[9] ; cm[1][4] = ext[10]; cm[1][5] = ext[11]; 
+		cm[2][0] = ext[12]; cm[2][1] = ext[13]; cm[2][2] = ext[14]; cm[2][3] = ext[15] ; cm[2][4] = ext[16]; cm[2][5] = ext[17]; 
+		cm[3][0] = ext[18]; cm[3][1] = ext[19]; cm[3][2] = ext[20]; cm[3][3] = ext[21] ; cm[3][4] = ext[22]; cm[3][5] = ext[23]; 
+		cm[4][0] = ext[24]; cm[4][1] = ext[25]; cm[4][2] = ext[26]; cm[4][3] = ext[27] ; cm[4][4] = ext[28]; cm[4][5] = ext[29]; 
+		cm[5][0] = ext[30]; cm[5][1] = ext[31]; cm[5][2] = ext[32]; cm[5][3] = ext[33] ; cm[5][4] = ext[34]; cm[5][5] = ext[35]; 
+	}
 }
 

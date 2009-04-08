@@ -169,7 +169,8 @@ void _Underworld_SwarmOutput( Underworld_SwarmOutput* self,
 	self->_getFeValuesFunc = _Underworld_SwarmOutput_GetFeVariableValues;
 	self->_printFunc = _Underworld_SwarmOutput_PrintStandardFormat;
 
-	EP_AppendClassHook( Context_GetEntryPoint( context, AbstractContext_EP_DumpClass ), _Underworld_SwarmOutput_Execute, self );
+	/* my Swarm output will run on the SaveClass EP - the same time as standard checkpointing */
+	EP_AppendClassHook( Context_GetEntryPoint( context, AbstractContext_EP_SaveClass ), _Underworld_SwarmOutput_Execute, self );
 }
 
 void _Underworld_SwarmOutput_Construct( void* uwSwarmOutput, Stg_ComponentFactory* cf, void* data ) {
@@ -185,6 +186,7 @@ void _Underworld_SwarmOutput_Construct( void* uwSwarmOutput, Stg_ComponentFactor
 	
 	context      =  Stg_ComponentFactory_ConstructByName(  cf,  "context", PICelleratorContext,  True, data ) ;
 	materialSwarm = (MaterialPointsSwarm*)Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm", MaterialPointsSwarm, True, data );
+	
 	/* Get all Swarms specified in input file, under swarms */
 	list = Dictionary_Get( dictionary, "FeVariables" );
 	

@@ -219,8 +219,6 @@ void _ConstitutiveMat_Refactored_Construct( void* constitutiveMatrix, Stg_Compon
 	Materials_Register*         materialsRegister;
 	FiniteElementContext*       context;
 
-	Stg_Component_Construct( self, cf, data, False );
-	
 	materialsRegister = Stg_ObjectList_Get( cf->registerRegister, "Materials_Register" );
 	assert( materialsRegister );
 
@@ -237,8 +235,6 @@ void _ConstitutiveMat_Refactored_Build( void* constitutiveMatrix, void* data ) {
 	Material_Index      materialCount = Materials_Register_GetCount( self->materials_Register );
 	RheologyMaterial*   material;
 	Stream*             errorStream = Journal_Register( Error_Type, self->type );
-
-	Stg_Component_Build( self, data, False );
 
 	Journal_DPrintf( self->debug, "In %s - for matrix %s\n", __func__, self->name );
 
@@ -271,8 +267,6 @@ void _ConstitutiveMat_Refactored_Initialise( void* constitutiveMatrix, void* dat
 
 	Journal_DPrintf( self->debug, "In %s - for matrix %s\n", __func__, self->name );
 	
-	Stg_Component_Initialise( self, data, False );
-
 	ConstitutiveMat_Refactored_ZeroMatrix( self ) ;
 }
 
