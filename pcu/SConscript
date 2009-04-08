@@ -2,16 +2,16 @@ import os
 Import('env')
 
 # Need to add header directory.
-env.Append(CPPPATH='#' + env['build_dir'] + '/include/pcu')
+env.Append(CPPPATH=env['build_dir'] + '/include/pcu')
 
 # Move headers to our build directory.
-env.Install('#' + env['build_dir'] + '/include/pcu', Glob('src/*.h'))
+env.Install(env['build_dir'] + '/include/pcu', Glob('src/*.h'))
 
 # Build our source files.
 objs = env.SharedObject(Glob('src/*.c'))
 
 # Build a library (if needed) and register destination.
 if env['static_libraries']:
-    env.Library('#' + env['build_dir'] + '/lib/pcu', objs)
+    env.Library(env['build_dir'] + '/lib/pcu', objs)
 if env['shared_libraries']:
-    env.SharedLibrary('#' + env['build_dir'] + '/lib/pcu', objs)
+    env.SharedLibrary(env['build_dir'] + '/lib/pcu', objs)
