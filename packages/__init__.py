@@ -17,3 +17,9 @@ from libfame import libfame
 from Cocoa import Cocoa
 from Carbon import Carbon
 from pcu import pcu
+from StGermain import StGermain
+from StgDomain import StgDomain
+from StgFEM import StgFEM
+from gLucifer import gLucifer
+from PICellerator import PICellerator
+from Underworld import Underworld

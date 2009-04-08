@@ -7,30 +7,25 @@ from Linker import Linker
 
 class gcc(CCompiler, Linker):
 
-
     def __init__(self, ctx):
         CCompiler.__init__(self, ctx)
+        Linker.__init__(self, ctx)
         self.commands = ["gcc", "cc"]
-
 
     def setup_defaults(self):
         CCompiler.setup_defaults(self)
         Linker.setup_defaults(self)
 
-
     def _setup_dependencies(self):
         CCompiler._setup_dependencies(self)
-
 
     def _setup_members(self):
         self.ctx.get_module(CCompiler).add_member(self)
         self.ctx.get_module(config.tools.Linker).add_member(self)
 
-
     def setup_trial(self, cfg):
         CCompiler.setup_trial(self, cfg)
         Linker.setup_trial(self, cfg)
-
 
     def _test(self, cfg):
         if not CCompiler._test(self, cfg):
@@ -40,6 +35,10 @@ class gcc(CCompiler, Linker):
         self.parse_rt_libs(cfg)
         return True
 
+    def apply_env(self, cfg, env):
+        self.apply_compile_env(cfg, env)
+        if cfg.is_valid(Linker):
+            self.apply_link_env(cfg, env)
 
     def test_compile_options(self, cfg):
         lang = self.language
@@ -120,7 +119,6 @@ class gcc(CCompiler, Linker):
                 stdout = stdout.splitlines()[0]
                 ver = stdout[stdout.rfind(' ') + 1:]
                 cfg["version"] = ver.split('.')
-
 
     def get_link_rt_args(self, cfg, out, err):
         words = config.tools.Compiler.get_link_rt_args(self, cfg, out, err)

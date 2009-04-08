@@ -164,6 +164,8 @@ class Option(object):
 
 class OptionSet(object):
 
+    Option = Option
+
     def __init__(self):
         self.options = {}
         self._order = []
@@ -201,6 +203,10 @@ class OptionSet(object):
 
     def has_option(self, name):
         return name in self.options
+
+    def get_flags(self):
+        return self._flg_to_opt.keys()
+    flags = property(get_flags, None)
 
     def merge(self, opts):
         for name in opts._order:

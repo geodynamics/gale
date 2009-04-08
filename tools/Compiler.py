@@ -11,6 +11,7 @@ class Compiler(config.Tool):
         self.language = ""
         self.source_empty = {}
         self.source_lib = {}
+        self.compile_env = config.Environment()
 
     def setup_defaults(self):
         if os.name in ["posix", "mac"]:
@@ -23,11 +24,20 @@ class Compiler(config.Tool):
         self.cc = self.add_member(config.tools.CCompiler)
         self.f77 = self.add_member(config.tools.F77Compiler)
 
+    def setup(self):
+        if self.__class__ == Compiler:
+            self.setup_compile_env()
+
+    def setup_compile_env(self):
+        for m in self.members:
+            m.compile_env.merge(self.compile_env)
+            m.setup_compile_env()
+
     def setup_trial(self, cfg):
         config.Tool.setup_trial(self, cfg)
         cfg["compile"] = self.compile
-        cfg["compile_cmd"] = "$command $bool(compile) $bool($comflags) $string(output,$target) " \
-            "$string(pp_def,$pp_defs) " \
+        cfg["compile_cmd"] = "$command $bool(compile) $bool($comflags) $dcomflags " \
+            "$string(output,$target) $string(pp_def,$pp_defs) " \
             "$string(inc_dir,$strip($default_inc_dirs,$inc_dirs)) $source"
         cfg["compile_success"] = self.success
         cfg.append_unique("default_inc_dirs", *self.default_inc_dirs)
@@ -35,6 +45,7 @@ class Compiler(config.Tool):
         if "exts" not in cfg:
             cfg["exts"] = {}
         cfg["exts"][self.language] = self.ctx.lang_exts[self.language][0]
+        cfg.merge(self.compile_env)
 
     def _test(self, cfg):
         if not self.test_core_compile_options(cfg):
@@ -92,16 +103,54 @@ class Compiler(config.Tool):
                                       src_fn]):
             return False
 
+        # optimisation
+        src_fn = self.ctx.make_temp_file(src_empty, ext=cfg["exts"][lang])
+        out_fn = utils.path.replext(src_fn, ".o")
+        opts = Option("opt0", "-O0", type="bool")
+        if not self.test_option(cfg, opts, products=out_fn,
+                                args=[("compile", True), ("output", out_fn), ("opt0", True),
+                                      src_fn]):
+            return False
+        src_fn = self.ctx.make_temp_file(src_empty, ext=cfg["exts"][lang])
+        out_fn = utils.path.replext(src_fn, ".o")
+        opts = Option("opt1", "-O1", type="bool")
+        if not self.test_option(cfg, opts, products=out_fn,
+                                args=[("compile", True), ("output", out_fn), ("opt1", True),
+                                      src_fn]):
+            return False
+        src_fn = self.ctx.make_temp_file(src_empty, ext=cfg["exts"][lang])
+        out_fn = utils.path.replext(src_fn, ".o")
+        opts = Option("opt2", "-O2", type="bool")
+        if not self.test_option(cfg, opts, products=out_fn,
+                                args=[("compile", True), ("output", out_fn), ("opt2", True),
+                                      src_fn]):
+            return False
+        src_fn = self.ctx.make_temp_file(src_empty, ext=cfg["exts"][lang])
+        out_fn = utils.path.replext(src_fn, ".o")
+        opts = Option("opt3", "-O3", type="bool")
+        if not self.test_option(cfg, opts, products=out_fn,
+                                args=[("compile", True), ("output", out_fn), ("opt3", True),
+                                      src_fn]):
+            return False
+
         return True
 
     def test_options(cfg):
         return True
 
+    def apply_env(self, cfg, env):
+        self.apply_compile_env(cfg, env)
+
+    def apply_compile_env(self, cfg, env):
+        env.merge(self.compile_env)
+
     def compile(self, cfg, lang="", env={}, **kw):
         cmd = "compile_cmd"
         if lang:
             cmd += "_" + lang
-        return self.execute(cfg, cmd, env, **kw)
+        local = self.compile_env.clone()
+        local.merge(env)
+        return self.execute(cfg, cmd, local, **kw)
 
     def parse_rt_libs(self, cfg):
         # Do this for both static and shared linking.

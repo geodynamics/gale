@@ -46,6 +46,7 @@ class Tool(Module):
                 self.add_candidate(nc)
 
     def setup_trial(self, cfg):
+        Module.setup_trial(self, cfg)
         cfg["execute"] = self.execute
         cfg["make_command_line"] = self.make_command_line
         cfg["success"] = self.success
@@ -83,15 +84,6 @@ class Tool(Module):
                 cfg["options"].add_option(old_opt)
 
             utils.log("Failed.", post_indent=-1)
-#             utils.log("Failed, error code %d, output and error follows:"%res, post_indent=1)
-#             if out:
-#                 utils.log("stdout:", post_indent=1)
-#                 utils.log(out, post_indent=-1)
-#             if err:
-#                 utils.log("stderr:", post_indent=1)
-#                 utils.log(err, post_indent=-1)
-
-#             utils.log.unindent(2)
         utils.log.unindent()
         return False
 
@@ -208,41 +200,3 @@ class Tool(Module):
     def make_help_dict(self):
         Module.make_help_dict(self)
         self.help["location"] = "Specify the command to use for %s."%self.opt_name
-
-#     #
-#     # Tool.Config
-#     #
-
-#     class Config(config.Config):
-
-#         def __init__(self, ctx, cmd, **kw):
-#             config.Config.__init__(self, ctx, **kw)
-#             self.command = cmd
-#             self.options = utils.options.OptionSet()
-
-#         def execute(self, args, options=None):
-#             cl = self.make_command_line(args, options)
-#             return utils.command.run(cl)
-
-#         def make_command_line(self, args, options=None):
-#             if options is None:
-#                 options = self.options
-#             arg_str = options.make_option_string(args)
-#             if arg_str:
-#                 return "%s %s" % (self.command, arg_str)
-#             return self.command
-
-#         def merge(self, op):
-#             self.options.merge(op.options)
-#             config.Config.merge(self, op)
-
-#         def copy(self):
-#             cpy = Tool.Config(self._ctx, self.command)
-#             cpy.merge(self)
-#             return cpy
-
-#         def is_equal(self, op):
-#             if not hasattr(op, "command"):
-#                 return False
-#             return os.path.realpath(self.command) == \
-#                 os.path.realpath(op.command)

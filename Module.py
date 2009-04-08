@@ -90,6 +90,12 @@ class Module(object):
     def _setup_members(self):
         pass
 
+    def setup(self):
+        pass
+
+    def setup_trial(self, trial):
+        trial["apply_env"] = self.apply_env
+
     def search(self):
         if not self.do_search:
             utils.log("Not searching %s."%(repr(self.name)))
@@ -186,6 +192,9 @@ class Module(object):
     def set_mode(self, mode):
         if mode > self.mode:
             self.mode = mode
+
+    def apply_env(self, env):
+        pass
 
     #
     # Handle configuration of candidates/uses.

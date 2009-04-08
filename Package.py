@@ -24,9 +24,6 @@ class Package(Module):
         self._rt_libs = {}
         self._rt_lib_dirs = []
         self._rt_rpaths = []
-        self.help["base_dir"] ="Specify package location to be used " + \
-            "for <name> plan."
-        self.help["enable"] = "Enable or disable the plan <name>."
 
     @staticmethod
     def new_candidate(ctx, base_dir, inc_dirs, lib_dirs, incs, lib_paths):
@@ -108,6 +105,7 @@ class Package(Module):
 
 
     def setup_trial(self, trial):
+        Module.setup_trial(self, trial)
         trial["apply_compile"] = self.apply_compile
         trial["apply_link"] = self.apply_link
         trial["make_compile_env"] = self.make_compile_env
@@ -216,36 +214,25 @@ class Package(Module):
     def make_run_command_line(self, cfg, fn, deps):
         return os.path.join(".", fn)
 
-
     def find_incs(self, dirs, incs):
         return utils.path.find_all(incs, dirs)
-
 
     def find_static_libs(self, dirs, libs):
         return utils.path.find_all(libs, dirs,
                                    self.ctx.static_lib_prefixes,
                                    self.ctx.static_lib_exts)
 
-
     def find_shared_libs(self, dirs, libs):
         return utils.path.find_all(libs, dirs,
                                    self.ctx.shared_lib_prefixes,
                                    self.ctx.shared_lib_exts)
 
-
     def add_library_set(self, incs, libs, aux_libs=None):
-        env = config.Environment(incs=utils.conv.to_list(incs))
-#         if static_libs is not None or shared_libs is not None:
-#             if static_libs:
-#                 env["static_libs"] = utils.conv.to_list(static_libs)
-#             if shared_libs:
-#                 env["shared_libs"] = utils.conv.to_list(shared_libs)
-#         else:
-        env["libs"] = utils.conv.to_list(libs)
+        env = config.Environment(incs=utils.conv.to_list(incs),
+                                 libs=utils.conv.to_list(libs))
         self._lib_sets.append(env)
         if aux_libs is not None:
             env["aux_libs"] = utils.conv.to_list(aux_libs)
-
 
     def add_auxilliary_libs(self, langs, libs):
         langs = utils.conv.to_list(langs)
@@ -255,11 +242,9 @@ class Package(Module):
                 self._aux_lib_cands[l] = [[]]
             self._aux_lib_cands[l].append(libs)
 
-
     def _search(self):
         for cand in self.gen_candidates():
             self.add_candidate(cand)
-
 
     def gen_candidates(self):
         utils.log("Generating candidates.", post_indent=1)
@@ -267,12 +252,10 @@ class Package(Module):
             yield c
         utils.log.unindent()
 
-
     def _gen_candidates(self):
         for ds in self.gen_dir_sets():
             for cfg in self.gen_cands_from_dir_set(ds):
                 yield cfg
-
 
     def gen_cands_from_dir_set(self, ds):
         for info in self.gen_lib_cands(ds):
@@ -281,26 +264,21 @@ class Package(Module):
             self.finalise_candidate(ds, info, cfg)
             yield cfg
 
-
     def finalise_candidate(self, dirs, info, cand):
         pass
-
 
     def gen_dir_sets(self):
         for ds in self._gen_dir_sets():
             yield ds
-
 
     def _gen_dir_sets(self, **kw):
         for base_dir in self.gen_base_dirs():
             for ds in self.gen_from_base_dir(base_dir):
                 yield ds
 
-
     def candidate_from_dirs(self, dirs):
         cfg = self.ctx.new_candidate(self, dirs[0], dirs[1], dirs[2])
         return cfg
-
 
     def is_candidate(self, cand):
         utils.log("Checking %s:"%repr(cand), post_indent=1)
@@ -312,10 +290,8 @@ class Package(Module):
         utils.log.unindent()
         return res
 
-
     def _is_candidate(self, cand):
         return self.search_dirs(cand)
-
 
     def gen_lib_cands(self, dirs):
         for env in self._lib_sets:
@@ -521,3 +497,9 @@ class Package(Module):
 
         if base_dir is not None:
             self.forced_base_dirs = [base_dir]
+
+    def make_help_dict(self):
+        Module.make_help_dict(self)
+        self.help["base_dir"] ="Specify package location to be used " + \
+            "for %s."%repr(self.name)
+        self.help["enable"] = "Enable or disable the %s."%repr(self.name)

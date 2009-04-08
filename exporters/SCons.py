@@ -26,24 +26,20 @@ class SCons(config.Exporter):
 
     def export(self, fn):
         self.env.clear()
-        self.export_context()
+        self.export_global_env()
         config.Exporter.export(self)
+
         if "LINKFLAGS" in self.env:
             self.env.append("LINKFLAGS", "$__RPATH")
+
         out_f = open(fn, "w")
         for k, v in self.env.iteritems():
             out_f.write(k + " = " + repr(v) + "\n")
-#             if isinstance(v, list):
-#                 out_f.write(k + "=" + " ".join(v) + "\n")
-#             else:
-#                 out_f.write(k + "=" + v + "\n")
         out_f.close()
 
-        
-    def export_context(self):
-        for k, v in self.ctx.option_dict.iteritems():
+    def export_global_env(self):
+        for k, v in self.global_env.iteritems():
             self.env.append_unique(k, v)
-
 
     def ccompiler(self, mod, cfg):
         # Store the compiler so we can figure out whether to include
@@ -51,11 +47,9 @@ class SCons(config.Exporter):
         self._com = cfg
 
         self.env["CC"] = cfg["command"]
-        type = self.ctx.option_dict.get("build_type", None)
-        if type == "debug":
-            self._add_opt(cfg["options"], "CFLAGS", ("debug", True))
-        else:
-            self.env.append_unique("CPPDEFINES", "NDEBUG")
+        self.env.append_unique("CPPDEFINES", cfg.subst("$pp_defs"))
+        self.env.append_unique("CFLAGS", cfg.subst("$bool($comflags)"))
+        self.env.append_unique("CFLAGS", cfg.subst("$dcomflags"))
 
         # Need to handle Darwin.
         if platform.system() == "Darwin":
@@ -64,19 +58,17 @@ class SCons(config.Exporter):
                             "-undefined", "suppress", "-install_name", "${_abspath(TARGET)}")
             self.env.append("_abspath", Command("lambda x: File(x).abspath"))
 
-
     def linker(self, mod, cfg):
         self.env["LINKER"] = cfg["command"]
-        arch = self.ctx.option_dict.get("lib_arch", None)
+        arch = self.global_env.get("lib_arch", None)
         if arch == "32":
             self._add_opt(cfg["options"], "LINKFLAGS", ("32bit", True))
         elif arch == "64":
             self._add_opt(cfg["options"], "LINKFLAGS", ("64bit", True))
 
-        type = self.ctx.option_dict.get("build_type", None)
+        type = self.global_env.get("build_type", None)
         if type == "debug":
             self._add_opt(cfg["options"], "LINKFLAGS", ("debug", True))
-
 
     def package(self, mod, cfg):
         # Should really iterate over package compilers and languages.
@@ -128,8 +120,9 @@ class SCons(config.Exporter):
         self.env.append_unique("found_packages", mod.name[mod.name.rfind(".") + 1:],
                                make_list=True)
 
-
     def _add_opt(self, opts, scons_name, opt_args):
+        if opt_args is None:
+            return
         if not isinstance(opt_args, list):
             opt_args = [opt_args]
         flg = opts.make_option_string(opt_args)

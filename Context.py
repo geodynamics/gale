@@ -16,7 +16,11 @@ class Context(object):
         self.module_dict = {}
         self.candidates = []
         self.order = []
+
+        self.add_options = None
+        self.process_options = None
         self.options = utils.options.OptionSet()
+        self.option_dict = {}
 
         self._old_wd = os.getcwd()
         self._tmp_dir = ""
@@ -25,13 +29,17 @@ class Context(object):
         self.setup_platform()
 
     def setup_options(self):
-        for m in self.modules:
+        if self.add_options:
+            self.add_options(self)
+        for m in self.order:
             m.setup_options()
 
     def parse_options(self):
+        if self.process_options:
+            self.process_options(self)
         opts = self.options.parse_option_list(sys.argv[1:])
         self.option_dict = self.options.gather(opts)
-        for m in self.modules:
+        for m in self.order:
             m.parse_options()
             m.process_options()
 
@@ -62,6 +70,7 @@ class Context(object):
         utils.log.unindent()
 
         self.setup_depends()
+        self.order = self.order_modules()
 
         # Parse any options.
         self.setup_options()
@@ -75,6 +84,7 @@ class Context(object):
 
         else:
             self.setup_modes()
+            self.setup()
             self.search()
             self.scan()
 
@@ -82,7 +92,7 @@ class Context(object):
             # any additional modules that have been created
             # in 'search' and 'scan'.
 #             self.setup_requirements()
-            self.order = self.order_modules()
+#             self.order = self.order_modules()
 
             utils.log("Configuring %d modules."%len(self.order), post_indent=1)
             for m in self.order:
@@ -113,10 +123,26 @@ class Context(object):
         self.__del__()
 
     def print_help(self):
-        sys.stdout.write(self.options.make_help_string())
+        help = ""
+        done_flags = []
+        for n in self.options._order:
+            o = self.options.options[n]
+            f = o._vars[0].flgs[0]
+            if f in done_flags:
+                continue
+            done_flags.append(f)
+            help += o.make_help_string() + "\n"
         for m in self.modules:
-            if m.mode > 0:
-                sys.stdout.write(m.options.make_help_string())
+            if m.mode == 0:
+                continue
+            for n in m.options._order:
+                o = m.options.options[n]
+                f = o._vars[0].flgs[0]
+                if f in done_flags:
+                    continue
+                done_flags.append(f)
+                help += o.make_help_string() + "\n"
+        sys.stdout.write(help)
 
     def setup_depends(self):
         utils.log("Setting up dependencies.", post_indent=1)
@@ -134,6 +160,10 @@ class Context(object):
                 utils.log("%s"%m.name)
             utils.log.unindent()
         utils.log.unindent()
+
+    def setup(self):
+        for m in self.modules:
+            m.setup()
 
     def order_modules(self):
         """Here we want to analyse the dependency graph to
@@ -356,8 +386,8 @@ class Context(object):
         if self._tmp_dir:
             os.chdir(self._old_wd)
 
-        report_fn = self.option_dict.get("build_report", "")
-        if report_fn:
+        if "build_report" in self.option_dict:
+            report_fn = "report.tgz"
             import tools
             comp = self[tools.Compressor]
             if not comp.configs:

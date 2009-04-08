@@ -11,7 +11,7 @@ class Linker(config.Tool):
         self.help["location"] = "Specifies the command to use " + \
             "for linking object files with the plan <name>."
         self.setup_defaults()
-
+        self.link_env = config.Environment()
 
     def setup_defaults(self):
         if os.name in ["posix", "mac"]:
@@ -20,16 +20,13 @@ class Linker(config.Tool):
             # TODO
             pass
 
-
     def _setup_dependencies(self):
         self.com = self.add_dependency(config.tools.Compiler, required=True, mode=0)
-
 
     def _setup_members(self):
         if self.__module__ == "config.tools.Linker":
             self.add_member(config.tools.Compiler)
             self.add_member(config.tools.ld)
-
 
     def setup_trial(self, cfg):
         config.Tool.setup_trial(self, cfg)
@@ -71,7 +68,6 @@ class Linker(config.Tool):
         cfg["_rt_begin"] = "$strip($rt.static.rt_begin,$rt_begin)"
         cfg["_rt_end"] = "$strip($rt.static.rt_end,$rt_end)"
 
-
     def _test(self, cfg):
         if not self.find_obj(cfg):
             return False
@@ -82,7 +78,6 @@ class Linker(config.Tool):
         cfg.validate_modules([self, Linker])
         self.parse_version_string(cfg)
         return True
-
 
     def test_core_link_options(self, cfg):
         # in order to use the extra run-time libraries for unnatural linkers we
@@ -103,7 +98,6 @@ class Linker(config.Tool):
         cfg["_simple_prog"] = out_fn
 
         return True
-
 
     def test_link_options(self, cfg):
         # shared library
@@ -156,58 +150,22 @@ class Linker(config.Tool):
 
         return True
 
+    def apply_env(self, cfg, env):
+        self.apply_link_env(cfg, env)
+
+    def apply_link_env(self, cfg, env):
+        env.merge(self.compile_env)
+        env["lnk"] = cfg["command"]
 
     def link_prog(self, cfg, env={}, **kw):
-#         # Remove any libraries from the environment that appear in the run-time
-#         # libraries of this linker.
-#         if "rt" in cfg:
-#             bak = env.backup("libs", "rt_libs")
-#             new_libs = []
-#             for l in env["libs"]:
-#                 if l not in cfg["rt"]["static"]["rt_libs"]:
-#                     new_libs.append(l)
-#             env["libs"] = new_libs
-#             new_libs = []
-#             for l in env["rt_libs"]:
-#                 if l not in cfg["rt"]["static"]["rt_libs"]:
-#                     new_libs.append(l)
-#             env["rt_libs"] = new_libs
-
-        # Run.
-        res = self.execute(cfg, "link_prog_cmd", env, **kw)
-
-#         # Restore environment.
-#         if "rt" in cfg:
-#             env.restore(bak)
-
-        return res
-
+        local = self.link_env.clone()
+        local.merge(env)
+        return self.execute(cfg, "link_prog_cmd", local, **kw)
 
     def link_shared(self, cfg, env, **kw):
-#         # Remove any libraries from the environment that appear in the run-time
-#         # libraries of this linker.
-#         if "rt" in cfg:
-#             bak = env.backup("libs", "rt_libs")
-#             new_libs = []
-#             for l in env["libs"]:
-#                 if l not in cfg["rt"]["shared"]["rt_libs"]:
-#                     new_libs.append(l)
-#             env["libs"] = new_libs
-#             new_libs = []
-#             for l in env["rt_libs"]:
-#                 if l not in cfg["rt"]["shared"]["rt_libs"]:
-#                     new_libs.append(l)
-#             env["rt_libs"] = new_libs
-
-        # Run.
-        res = self.execute(cfg, "link_shared_cmd", env, **kw)
-
-#         # Restore environment.
-#         if "rt" in cfg:
-#             env.restore(bak)
-
-        return res
-
+        local = self.link_env.clone()
+        local.merge(env)
+        return self.execute(cfg, "link_shared_cmd", local, **kw)
 
     def find_obj(self, cfg):
         for com in self.com.configs:

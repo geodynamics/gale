@@ -63,6 +63,13 @@ class Environment(object):
             else:
                 dst[k] = v
 
+    def merge(self, env):
+        for k, v in env.iteritems():
+            if isinstance(v, list):
+                self.append_unique(k, *v)
+            else:
+                self.append_unique(k, v)
+
     def backup(self, *args):
         bak = {}
         for k in args:
@@ -83,6 +90,8 @@ class Environment(object):
                 del self[k]
 
     def append(self, k, *args, **kw):
+        args = conv.flatten(list(args))
+        args = [a for a in args if a != ""]
         if isinstance(k, (dict, Environment)):
             self._handle_dict(k, self.append, **kw)
         else:
@@ -99,12 +108,15 @@ class Environment(object):
                 self[k] = list(args)
 
     def append_unique(self, k, *args, **kw):
+        args = conv.flatten(list(args))
         if isinstance(k, (dict, Environment)):
             self._handle_dict(k, self.append_unique, **kw)
         else:
             self.append(k, *self._make_unique(k, args), **kw)
 
     def prepend(self, k, *args, **kw):
+        args = conv.flatten(list(args))
+        args = [a for a in args if a != ""]
         if k in self:
             if not isinstance(self[k], list):
                 self[k] = conv.to_list(self[k])
@@ -118,6 +130,7 @@ class Environment(object):
             self[k] = list(args)
 
     def prepend_unique(self, k, *args, **kw):
+        args = conv.flatten(list(args))
         self.prepend(k, *self._make_unique(k, args), **kw)
 
     def _make_unique(self, k, args):

@@ -195,12 +195,11 @@ def subst(line, env, pos=0, string=True):
         # If we matched a function, handle the contents.
         if line[span[1] - 1] == "(":
             func = env.get(macro, None)
-            if func:
-                if not callable(func):
-                    raise "Non-callable used as function."
-                res = parse_args(line, env, pos)
-                pos = res[1]
-                res = subst(func(env, *res[0]), env, string=string)
+            if not callable(func):
+                raise "Non-callable used as function."
+            res = parse_args(line, env, pos)
+            pos = res[1]
+            res = subst(func(env, *res[0]), env, string=string)
 
         else:
             if macro not in env:
