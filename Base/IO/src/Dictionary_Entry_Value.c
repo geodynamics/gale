@@ -299,36 +299,7 @@ void Dictionary_Entry_Value_AddElement( Dictionary_Entry_Value* self, Dictionary
 	/* check type - convert to a list if not so... */
 	if (Dictionary_Entry_Value_Type_List != self->type) {
 		Dictionary_Entry_Value* copy = NULL;
-		
-		switch (self->type) {
-			case Dictionary_Entry_Value_Type_String:
-				copy = Dictionary_Entry_Value_FromString( self->as.typeString );
-				break;
-			case Dictionary_Entry_Value_Type_Double:
-				copy = Dictionary_Entry_Value_FromDouble( self->as.typeDouble );
-				break;
-			case Dictionary_Entry_Value_Type_UnsignedInt:
-				copy = Dictionary_Entry_Value_FromUnsignedInt( self->as.typeUnsignedInt );
-				break;
-			case Dictionary_Entry_Value_Type_Int:
-				copy = Dictionary_Entry_Value_FromInt( self->as.typeInt );
-				break;
-			case Dictionary_Entry_Value_Type_UnsignedLong:
-				copy = Dictionary_Entry_Value_FromUnsignedLong( self->as.typeUnsignedLong );
-				break;
-			case Dictionary_Entry_Value_Type_Bool:
-				copy = Dictionary_Entry_Value_FromBool( self->as.typeBool );
-				break;
-			case Dictionary_Entry_Value_Type_Struct:
-				copy = Dictionary_Entry_Value_NewStruct();
-				copy->as.typeStruct = self->as.typeStruct;
-				break;
-			default: {
-				Stream* errorStream = Journal_Register( Error_Type, "Dictionary_Entry_Value" );
-				Journal_Firewall( False, errorStream, "In func %s: self->type '%d' is invalid.\n", __func__, self->type );
-			}
-		}
-		
+		copy = Dictionary_Entry_Value_Copy( self, True );
 		Dictionary_Entry_Value_SetNewList( self );	
 		Dictionary_Entry_Value_AddElement( self, copy );
 	}
@@ -343,42 +314,16 @@ void Dictionary_Entry_Value_AddElement( Dictionary_Entry_Value* self, Dictionary
 }
 
 
-void Dictionary_Entry_Value_AddElementWithSource( Dictionary_Entry_Value* self, Dictionary_Entry_Value* element,
-							Dictionary_Entry_Source source )
+void Dictionary_Entry_Value_AddElementWithSource(
+		Dictionary_Entry_Value* self,
+		Dictionary_Entry_Value* element,
+		Dictionary_Entry_Source source )
 {
 	/* check type - convert to a list if not so... */
 	if (Dictionary_Entry_Value_Type_List != self->type) {
 		Dictionary_Entry_Value* copy = NULL;
-		
-		switch (self->type) {
-			case Dictionary_Entry_Value_Type_String:
-				copy = Dictionary_Entry_Value_FromString( self->as.typeString );
-				break;
-			case Dictionary_Entry_Value_Type_Double:
-				copy = Dictionary_Entry_Value_FromDouble( self->as.typeDouble );
-				break;
-			case Dictionary_Entry_Value_Type_UnsignedInt:
-				copy = Dictionary_Entry_Value_FromUnsignedInt( self->as.typeUnsignedInt );
-				break;
-			case Dictionary_Entry_Value_Type_Int:
-				copy = Dictionary_Entry_Value_FromInt( self->as.typeInt );
-				break;
-			case Dictionary_Entry_Value_Type_UnsignedLong:
-				copy = Dictionary_Entry_Value_FromUnsignedLong( self->as.typeUnsignedLong );
-				break;
-			case Dictionary_Entry_Value_Type_Bool:
-				copy = Dictionary_Entry_Value_FromBool( self->as.typeBool );
-				break;
-			case Dictionary_Entry_Value_Type_Struct:
-				copy = Dictionary_Entry_Value_NewStruct();
-				copy->as.typeStruct = self->as.typeStruct;
-				break;
-			default: {
-				Stream* errorStream = Journal_Register( Error_Type, "Dictionary_Entry_Value" );
-				Journal_Firewall( False, errorStream, "In func %s: self->type '%d' is invalid.\n", __func__, self->type );
-			}
-		}
-		
+		copy = Dictionary_Entry_Value_Copy( self, True );
+
 		Dictionary_Entry_Value_SetNewList( self );	
 		Dictionary_Entry_Value_AddElementWithSource( self, copy, source );
 	}
@@ -1092,4 +1037,128 @@ void Dictionary_Entry_Value_SetMemberWithSource( Dictionary_Entry_Value* self,
 		default:
 			Journal_Firewall( False, errorStream, "In func %s: self->type '%d' is invalid.\n", __func__, self->type );
 	};
+}
+
+
+Bool Dictionary_Entry_Value_Compare( Dictionary_Entry_Value* self, Dictionary_Entry_Value* dev ) {
+	Bool         retValue = True; 
+	Stream*      errorStream = Journal_Register( Error_Type, "Dictionary_Entry_Value" );
+
+	if ( self->type != dev->type ) {
+		return False;
+	}
+
+	switch( self->type ) {
+		case Dictionary_Entry_Value_Type_String:
+			if ( 0 != strcmp( self->as.typeString, dev->as.typeString ) )
+				retValue = False;
+			break;
+		case Dictionary_Entry_Value_Type_Double:
+			if ( self->as.typeDouble != dev->as.typeDouble )
+				retValue = False;
+			break;
+		case Dictionary_Entry_Value_Type_UnsignedInt:
+			if ( self->as.typeUnsignedInt != dev->as.typeUnsignedInt )
+				retValue = False;
+			break;
+		case Dictionary_Entry_Value_Type_Int:
+			if ( self->as.typeInt != dev->as.typeInt )
+				retValue = False;
+			break;
+		case Dictionary_Entry_Value_Type_UnsignedLong:
+			if ( self->as.typeUnsignedLong != dev->as.typeUnsignedLong )
+				retValue = False;
+			break;
+		case Dictionary_Entry_Value_Type_Bool:
+			if ( self->as.typeBool != dev->as.typeBool )
+				retValue = False;
+			break;
+		case Dictionary_Entry_Value_Type_Struct:
+			retValue = Dictionary_CompareAllEntries( self->as.typeStruct, dev->as.typeStruct );
+			break;
+		case Dictionary_Entry_Value_Type_List: {
+			Dictionary_Entry_Value* cur1 = NULL;
+			Dictionary_Entry_Value* cur2 = NULL;
+			if ( self->as.typeList->count != dev->as.typeList->count ) {
+				retValue = False;
+				break;
+			}
+			cur1 = self->as.typeList->first;
+			cur2 = dev->as.typeList->first;
+			while ( cur1 ) {
+				retValue = Dictionary_Entry_Value_Compare( cur1, cur2 );
+				if ( retValue == False ) break;
+				cur1 = cur1->next;
+				cur2 = cur2->next;
+			}	
+			break;
+		}
+		default:
+			Journal_Firewall( False, errorStream, "In func %s: self->type '%d' is invalid.\n", __func__, self->type );
+	};
+
+	return retValue;
+}
+
+
+Dictionary_Entry_Value* Dictionary_Entry_Value_Copy(
+		Dictionary_Entry_Value*  self,
+		Bool deep )
+{
+	Dictionary_Entry_Value* copy = NULL;
+	
+	switch (self->type) {
+		case Dictionary_Entry_Value_Type_String:
+			copy = Dictionary_Entry_Value_FromString( self->as.typeString );
+			break;
+		case Dictionary_Entry_Value_Type_Double:
+			copy = Dictionary_Entry_Value_FromDouble( self->as.typeDouble );
+			break;
+		case Dictionary_Entry_Value_Type_UnsignedInt:
+			copy = Dictionary_Entry_Value_FromUnsignedInt( self->as.typeUnsignedInt );
+			break;
+		case Dictionary_Entry_Value_Type_Int:
+			copy = Dictionary_Entry_Value_FromInt( self->as.typeInt );
+			break;
+		case Dictionary_Entry_Value_Type_UnsignedLong:
+			copy = Dictionary_Entry_Value_FromUnsignedLong( self->as.typeUnsignedLong );
+			break;
+		case Dictionary_Entry_Value_Type_Bool:
+			copy = Dictionary_Entry_Value_FromBool( self->as.typeBool );
+			break;
+		case Dictionary_Entry_Value_Type_List:
+			if ( False == deep ) {
+				Stream* errorStream = Journal_Register( Error_Type, "Dictionary_Entry_Value" );
+				Journal_Firewall( False, errorStream, "In func %s: Shallow copy operation of list DEV not supported.\n", __func__ );
+			}
+			else {
+				Dictionary_Entry_Value* cur = self->as.typeList->first;
+				Dictionary_Entry_Value* copiedEntry = NULL;
+
+				copy = Dictionary_Entry_Value_NewList();
+				while ( cur ) {
+					copiedEntry = Dictionary_Entry_Value_Copy( cur, True );
+					Dictionary_Entry_Value_AddElement( copy, copiedEntry );
+					cur = cur->next;
+				}	
+			}
+			break;
+		case Dictionary_Entry_Value_Type_Struct:
+			if ( False == deep ) {
+				copy = Dictionary_Entry_Value_FromStruct( self->as.typeStruct );
+			}
+			else {
+				Dictionary* copiedDict;
+				copiedDict = Stg_Class_Copy( self->as.typeStruct,
+					NULL, True, NULL, NULL );
+				copy = Dictionary_Entry_Value_FromStruct( copiedDict );
+			}
+			break;
+		default: {
+			Stream* errorStream = Journal_Register( Error_Type, "Dictionary_Entry_Value" );
+			Journal_Firewall( False, errorStream, "In func %s: self->type '%d' is invalid.\n", __func__, self->type );
+		}
+	}
+
+	return copy;
 }

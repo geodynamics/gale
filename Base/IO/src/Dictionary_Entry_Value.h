@@ -221,7 +221,6 @@
 	/** get any element from a list (bear in mind whole list must be processed */
 	Dictionary_Entry_Value* Dictionary_Entry_Value_GetElement( Dictionary_Entry_Value* self, Index index );
 	
-
 	
 	/** Get the number of elements currently in a list */
 	Index Dictionary_Entry_Value_GetCount( Dictionary_Entry_Value* self );
@@ -231,7 +230,6 @@
 	
 	/** Get the encoding type of a list */
 	Encoding Dictionary_Entry_Value_GetEncoding( Dictionary_Entry_Value* self );
-	
 
 	
 	/** Setting the value of a struct member */
@@ -245,6 +243,13 @@
 	/** Getting/accessing members out of a struct */
 	Dictionary_Entry_Value* Dictionary_Entry_Value_GetMember( Dictionary_Entry_Value* self, Dictionary_Entry_Key name );
 
+	/** Compare two DEVs. Returns True if they are semantically identical. */
+	Bool Dictionary_Entry_Value_Compare( Dictionary_Entry_Value* self, Dictionary_Entry_Value* dev );
 	
+	/** Copy a DEV. This means new memory will created for both the new DEV, and
+	 * any values it points to */	
+	Dictionary_Entry_Value* Dictionary_Entry_Value_Copy(
+		Dictionary_Entry_Value* self,
+		Bool deep );
 	
 #endif /* __Base_IO_Dictionary_Entry_Value_h__ */

@@ -133,6 +133,14 @@
 	/** Concise dictionary info print */
 	void Dictionary_PrintConcise( void* dictionary, Stream* stream );
 	
+	/** Implementation of Stg_Class_Copy() */
+	void* _Dictionary_Copy( void* indexMap, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
+
+	/** Empty the Dictionary's entry list and re-set count to zero.
+	 *   Will also call Delete() on each entry currently in the dictionary.
+	 */  	
+	void Dictionary_Empty( void* dictionary );
+
 	/** Add an entry to the dictionary... orignal implementation... appends keys */
 	void Dictionary_Add( void* dictionary, Dictionary_Entry_Key key, Dictionary_Entry_Value* value );
 
@@ -208,5 +216,8 @@
 
 	/** Loops over command line arguments and reads in values with format "--param=value" */
 	void Dictionary_ReadAllParamFromCommandLine( void* dictionary, int argc, char* argv[] ) ;
+
+	/** Compares two dictionaries, returns True if all entries are identical */
+	Bool Dictionary_CompareAllEntries( void* dictionary1, void* dictionary2 );
 
 #endif /* __Base_IO_Dictionary_h__ */

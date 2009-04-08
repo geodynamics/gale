@@ -32,6 +32,7 @@
 
 #include "types.h"
 #include "shortcuts.h"
+#include "forwardDecl.h"
 #include "Dictionary.h"
 #include "Journal.h"
 #include "JournalFile.h"
@@ -53,7 +54,7 @@ static const int STRUCT_INIT_SIZE = 2;
 static const int STRUCT_DELTA = 2;
 
 Dictionary* Dictionary_New( void ) {
-	return _Dictionary_New( sizeof(Dictionary), Dictionary_Type, _Dictionary_Delete, _Dictionary_Print, NULL, 
+	return _Dictionary_New( sizeof(Dictionary), Dictionary_Type, _Dictionary_Delete, _Dictionary_Print, _Dictionary_Copy, 
 		_Dictionary_Add, _Dictionary_AddWithSource, _Dictionary_Set, _Dictionary_SetWithSource, _Dictionary_Get, _Dictionary_GetSource );
 }
 
@@ -100,15 +101,16 @@ void Dictionary_Init( Dictionary* self ) {
 	self->_deleteSelf = False;
 	
 	/* Virtual info */
+	_Stg_Class_Init( (Stg_Class*)self );
 	self->_print = _Dictionary_Print;
 	self->_delete = _Dictionary_Delete;
+	self->_copy = _Dictionary_Copy;
 	self->add = _Dictionary_Add;
 	self->addWithSource = _Dictionary_AddWithSource;
 	self->set = _Dictionary_Set;
 	self->setWithSource = _Dictionary_SetWithSource;
 	self->get = _Dictionary_Get;
 	self->getSource = _Dictionary_GetSource;
-	_Stg_Class_Init( (Stg_Class*)self );
 	
 	/* Dictionary info */
 	_Dictionary_Init( self );
@@ -177,6 +179,75 @@ void Dictionary_PrintConcise( void* dictionary, Stream* stream ) {
 	Journal_Printf( stream, "}\n" );
 	Stream_UnIndent( stream );
 }
+
+
+void Dictionary_Empty( void* dictionary ) {
+	Dictionary*      self = (Dictionary*) dictionary;
+	Dictionary_Index index;
+	
+	for( index = 0; index < self->count; index++ ) {
+		Dictionary_Entry_Delete( self->entryPtr[index] );
+	}
+	
+	self->count=0;
+	self->size = DEFAULT_INIT_SIZE;
+	self->entryPtr = Memory_Realloc_Array( self->entryPtr, Dictionary_Entry*, self->size );
+}
+
+
+void* _Dictionary_Copy( void* dictionary, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
+	Dictionary*      self = (Dictionary*) dictionary;
+	Dictionary_Index index;
+	Dictionary*	 newDict;
+	Bool             ownMap = False;
+	
+	if( !ptrMap ) {
+		ptrMap = PtrMap_New( 10 );
+		ownMap = True;
+	}
+
+	newDict = _Stg_Class_Copy( self, dest, deep, nameExt, ptrMap );
+
+	newDict->add = self->add;
+	newDict->addWithSource = self->addWithSource;
+	newDict->set = self->set;
+	newDict->setWithSource = self->setWithSource;
+	newDict->get = self->get;
+	newDict->getSource = self->getSource;
+
+	newDict->size = self->size;
+	newDict->delta = self->delta;
+
+	if ( False == deep ) {
+		newDict->debugStream = self->debugStream;
+	}
+	else {
+		newDict->debugStream = Stg_Class_Copy( self->debugStream, NULL, deep, nameExt, ptrMap );
+	}
+
+	newDict->entryPtr = Memory_Alloc_Array( Dictionary_Entry*, self->size, "Dictionary->entryPtr" );
+	if ( False == deep ) {
+		newDict->count = self->count;
+		memcpy( newDict->entryPtr, self->entryPtr, sizeof(Dictionary_Entry*) * self->count );
+		for( index = 0; index < self->count; index++ ) {
+			newDict->entryPtr[index] = self->entryPtr[index];
+		}
+	}
+	else {
+		newDict->count = 0;
+		for( index = 0; index < self->count; index++ ) {
+			Dictionary_Add( newDict, self->entryPtr[index]->key,
+				Dictionary_Entry_Value_Copy( self->entryPtr[index]->value, True ) );
+		}
+	}
+
+	if( ownMap ) {
+		Stg_Class_Delete( ptrMap );
+	}
+
+	return (void*)newDict;
+}
+
 
 void Dictionary_Add( void* dictionary, Dictionary_Entry_Key key, Dictionary_Entry_Value* value ) {
 	Dictionary* self = (Dictionary*)dictionary;
@@ -797,4 +868,28 @@ void Dictionary_ReadAllParamFromCommandLine( void* dictionary, int argc, char* a
 		/* Free memory that we have allocated */
 		Memory_Free( paramString );
 	}
+}
+
+
+Bool Dictionary_CompareAllEntries( void* dictionary1, void* dictionary2 ) {
+	Dictionary*          dict1 = (Dictionary*)dictionary1;
+	Dictionary*          dict2 = (Dictionary*)dictionary2;
+	Dictionary_Entry*    entryPtr1 = NULL;	
+	Dictionary_Entry*    entryPtr2 = NULL;	
+	Bool                 retValue = True;
+	Dictionary_Index     index;
+
+	if ( dict1->count != dict2->count ) return False;
+
+	for( index = 0; index < dict1->count; index++ ) {
+		entryPtr1 = dict1->entryPtr[index];
+		entryPtr2 = dict2->entryPtr[index];
+		retValue = Dictionary_Entry_Compare( entryPtr1, entryPtr2->key );
+		if (retValue == False ) break;
+		retValue = Dictionary_Entry_Value_Compare( entryPtr1->value,
+			entryPtr2->value );
+		if (retValue == False ) break;
+	}
+
+	return retValue;
 }
