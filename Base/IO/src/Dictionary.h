@@ -217,7 +217,12 @@
 	/** Loops over command line arguments and reads in values with format "--param=value" */
 	void Dictionary_ReadAllParamFromCommandLine( void* dictionary, int argc, char* argv[] ) ;
 
+	/** Compares two dictionaries, returns True if all entries are identical. Default to loose
+	  *  type check */
+	#define Dictionary_CompareAllEntries( dict1, dict2 ) \
+		 ( Dictionary_CompareAllEntriesFull( (dict1), (dict2), False ) )
+
 	/** Compares two dictionaries, returns True if all entries are identical */
-	Bool Dictionary_CompareAllEntries( void* dictionary1, void* dictionary2 );
+	Bool Dictionary_CompareAllEntriesFull( void* dictionary1, void* dictionary2, Bool strictTypeCheck );
 
 #endif /* __Base_IO_Dictionary_h__ */

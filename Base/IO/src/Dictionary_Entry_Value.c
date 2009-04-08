@@ -1040,45 +1040,89 @@ void Dictionary_Entry_Value_SetMemberWithSource( Dictionary_Entry_Value* self,
 }
 
 
-Bool Dictionary_Entry_Value_Compare( Dictionary_Entry_Value* self, Dictionary_Entry_Value* dev ) {
+Bool Dictionary_Entry_Value_CompareFull( Dictionary_Entry_Value* self, Dictionary_Entry_Value* dev, Bool strictTypeCheck ) {
 	Bool         retValue = True; 
 	Stream*      errorStream = Journal_Register( Error_Type, "Dictionary_Entry_Value" );
 
-	if ( self->type != dev->type ) {
-		return False;
+	if ( strictTypeCheck ) {
+		if ( self->type != dev->type ) {
+			return False;
+		}
 	}
 
 	switch( self->type ) {
-		case Dictionary_Entry_Value_Type_String:
-			if ( 0 != strcmp( self->as.typeString, dev->as.typeString ) )
-				retValue = False;
+		case Dictionary_Entry_Value_Type_String: {
+			/* Comparing as strings is tricky. When both are strings it's fine. If the dev to compare to is stored
+			 * natively as a number, we should convert the first to a number also for comparison. Otherwise, you
+			 * can get false Negatives when the entries are numerically the same, but use different notation
+			 * (e.g. scientific vs decimal) */ 	
+			switch( dev->type ) {
+				case Dictionary_Entry_Value_Type_String:
+					if ( 0 != strcmp( self->as.typeString, dev->as.typeString ) ) 
+						retValue = False;
+					break;
+				case Dictionary_Entry_Value_Type_Double:
+					if ( dev->as.typeDouble != Dictionary_Entry_Value_AsDouble( self ) )
+						retValue = False;
+					break;
+				case Dictionary_Entry_Value_Type_UnsignedInt:
+					if ( dev->as.typeUnsignedInt != Dictionary_Entry_Value_AsUnsignedInt( self ) )
+						retValue = False;
+					break;
+				case Dictionary_Entry_Value_Type_Int:
+					if ( dev->as.typeInt != Dictionary_Entry_Value_AsInt( self ) )
+						retValue = False;
+					break;
+				case Dictionary_Entry_Value_Type_UnsignedLong:
+					if ( dev->as.typeUnsignedLong != Dictionary_Entry_Value_AsUnsignedLong( self ) )
+						retValue = False;
+					break;
+				case Dictionary_Entry_Value_Type_Bool:
+					if ( dev->as.typeBool != Dictionary_Entry_Value_AsBool( self ) )
+				case Dictionary_Entry_Value_Type_Struct:
+				case Dictionary_Entry_Value_Type_List:
+					retValue = False;
+					break;
+				default:
+					Journal_Firewall( False, errorStream, "In func %s: dev->type '%d' is invalid.\n", __func__, dev->type );
+			}
 			break;
+		}
 		case Dictionary_Entry_Value_Type_Double:
-			if ( self->as.typeDouble != dev->as.typeDouble )
+			if ( self->as.typeDouble != Dictionary_Entry_Value_AsDouble( dev ) )
 				retValue = False;
 			break;
 		case Dictionary_Entry_Value_Type_UnsignedInt:
-			if ( self->as.typeUnsignedInt != dev->as.typeUnsignedInt )
+			if ( self->as.typeUnsignedInt != Dictionary_Entry_Value_AsUnsignedInt( dev ) )
 				retValue = False;
 			break;
 		case Dictionary_Entry_Value_Type_Int:
-			if ( self->as.typeInt != dev->as.typeInt )
+			if ( self->as.typeInt != Dictionary_Entry_Value_AsInt( dev ) )
 				retValue = False;
 			break;
 		case Dictionary_Entry_Value_Type_UnsignedLong:
-			if ( self->as.typeUnsignedLong != dev->as.typeUnsignedLong )
+			if ( self->as.typeUnsignedLong != Dictionary_Entry_Value_AsUnsignedLong( dev ) )
 				retValue = False;
 			break;
 		case Dictionary_Entry_Value_Type_Bool:
-			if ( self->as.typeBool != dev->as.typeBool )
+			if ( self->as.typeBool != Dictionary_Entry_Value_AsBool( dev ) )
 				retValue = False;
 			break;
 		case Dictionary_Entry_Value_Type_Struct:
-			retValue = Dictionary_CompareAllEntries( self->as.typeStruct, dev->as.typeStruct );
+			if ( dev->type != Dictionary_Entry_Value_Type_Struct ) {
+				retValue = False;
+				break;
+			}
+			retValue = Dictionary_CompareAllEntriesFull( self->as.typeStruct, dev->as.typeStruct, strictTypeCheck );
 			break;
 		case Dictionary_Entry_Value_Type_List: {
 			Dictionary_Entry_Value* cur1 = NULL;
 			Dictionary_Entry_Value* cur2 = NULL;
+
+			if ( dev->type != Dictionary_Entry_Value_Type_List ) {
+				retValue = False;
+				break;
+			}
 			if ( self->as.typeList->count != dev->as.typeList->count ) {
 				retValue = False;
 				break;
@@ -1086,7 +1130,7 @@ Bool Dictionary_Entry_Value_Compare( Dictionary_Entry_Value* self, Dictionary_En
 			cur1 = self->as.typeList->first;
 			cur2 = dev->as.typeList->first;
 			while ( cur1 ) {
-				retValue = Dictionary_Entry_Value_Compare( cur1, cur2 );
+				retValue = Dictionary_Entry_Value_CompareFull( cur1, cur2, strictTypeCheck );
 				if ( retValue == False ) break;
 				cur1 = cur1->next;
 				cur2 = cur2->next;

@@ -243,8 +243,11 @@
 	/** Getting/accessing members out of a struct */
 	Dictionary_Entry_Value* Dictionary_Entry_Value_GetMember( Dictionary_Entry_Value* self, Dictionary_Entry_Key name );
 
-	/** Compare two DEVs. Returns True if they are semantically identical. */
-	Bool Dictionary_Entry_Value_Compare( Dictionary_Entry_Value* self, Dictionary_Entry_Value* dev );
+	/** Compare two DEVs. Returns True if they are semantically identical. Default to a loose type check */
+	#define Dictionary_Entry_Value_Compare( self, dev ) \
+		( Dictionary_Entry_Value_CompareFull( (self), (dev), False ) )
+
+	Bool Dictionary_Entry_Value_CompareFull( Dictionary_Entry_Value* self, Dictionary_Entry_Value* dev, Bool strictTypeCheck );
 	
 	/** Copy a DEV. This means new memory will created for both the new DEV, and
 	 * any values it points to */	

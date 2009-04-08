@@ -871,7 +871,7 @@ void Dictionary_ReadAllParamFromCommandLine( void* dictionary, int argc, char* a
 }
 
 
-Bool Dictionary_CompareAllEntries( void* dictionary1, void* dictionary2 ) {
+Bool Dictionary_CompareAllEntriesFull( void* dictionary1, void* dictionary2, Bool strictTypeCheck ) {
 	Dictionary*          dict1 = (Dictionary*)dictionary1;
 	Dictionary*          dict2 = (Dictionary*)dictionary2;
 	Dictionary_Entry*    entryPtr1 = NULL;	
@@ -886,8 +886,8 @@ Bool Dictionary_CompareAllEntries( void* dictionary1, void* dictionary2 ) {
 		entryPtr2 = dict2->entryPtr[index];
 		retValue = Dictionary_Entry_Compare( entryPtr1, entryPtr2->key );
 		if (retValue == False ) break;
-		retValue = Dictionary_Entry_Value_Compare( entryPtr1->value,
-			entryPtr2->value );
+		retValue = Dictionary_Entry_Value_CompareFull( entryPtr1->value,
+			entryPtr2->value, strictTypeCheck );
 		if (retValue == False ) break;
 	}
 
