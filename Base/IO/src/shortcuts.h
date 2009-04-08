@@ -79,6 +79,8 @@
 
 	double	Dictionary_GetDouble_WithDefault( Dictionary* dictionary, Dictionary_Entry_Key key, const double defaultVal );
 	
+	unsigned long	Dictionary_GetUnsignedLong_WithDefault( Dictionary* dictionary, Dictionary_Entry_Key key, const unsigned long defaultVal );
+	
 	float	Dictionary_GetFloat_WithDefault( Dictionary* dictionary, Dictionary_Entry_Key key, const float defaultVal );
 	
 	Bool	Dictionary_GetBool_WithDefault( Dictionary* dictionary, Dictionary_Entry_Key key, const Bool defaultVal );

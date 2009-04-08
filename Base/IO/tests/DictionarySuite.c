@@ -135,11 +135,11 @@ void DictionarySuite_Setup( DictionarySuiteData* data ) {
    Stg_asprintf( &data->testKeys[++iter], "test_struct" );
    data->testValues[iter] = testStruct;
    Dictionary_Entry_Value_AddMember( testStruct, "height",
-      Dictionary_Entry_Value_FromDouble( 37 ) );
+      Dictionary_Entry_Value_FromDouble( data->testStruct->height ) );
    Dictionary_Entry_Value_AddMember( testStruct, "anisotropic",
-      Dictionary_Entry_Value_FromBool( True ) );
+      Dictionary_Entry_Value_FromBool( data->testStruct->anisotropic ) );
    Dictionary_Entry_Value_AddMember( testStruct, "person",
-      Dictionary_Entry_Value_FromString( "Patrick" ) );
+      Dictionary_Entry_Value_FromString( data->testStruct->person ) );
 
    /* Adding a 2nd struct within the first struct */
    testStruct2 = Dictionary_Entry_Value_NewStruct();
@@ -381,6 +381,76 @@ void DictionarySuite_TestShortcuts( DictionarySuiteData* data ) {
 }
 
 
+void DictionarySuite_TestMerge( DictionarySuiteData* data ) {
+   Dictionary_Entry_Value*    testStruct2=NULL;
+   Dictionary_Entry_Value*    testGeomStruct2=NULL;
+   Dictionary_Entry_Value*    mergedStruct=NULL;
+   Dictionary_Entry_Value*    expectedMergedStruct=NULL;
+
+   testStruct2 = Dictionary_Entry_Value_NewStruct();
+   Dictionary_Entry_Value_AddMember( testStruct2, "height",
+      Dictionary_Entry_Value_FromDouble( data->testStruct->height ) );
+   Dictionary_Entry_Value_AddMember( testStruct2, "anisotropic",
+      Dictionary_Entry_Value_FromBool( False ) );
+   Dictionary_Entry_Value_AddMember( testStruct2, "new_person",
+      Dictionary_Entry_Value_FromString( "Luke" ) );
+   testGeomStruct2 = Dictionary_Entry_Value_NewStruct();
+   Dictionary_Entry_Value_AddMember( testStruct2, "geom", testGeomStruct2 );
+   Dictionary_Entry_Value_AddMember( testGeomStruct2, "startx",
+      Dictionary_Entry_Value_FromUnsignedInt( data->testStruct->geom.startx ) );
+   Dictionary_Entry_Value_AddMember( testGeomStruct2, "startz",
+      Dictionary_Entry_Value_FromUnsignedInt( 222 ) );
+
+   /* Testing Merge_Append */
+   DictionarySuite_PopulateDictWithTestValues( data );
+   /* Do a copy of the DEV during merge, since we don't want it being deleted */
+   Dictionary_AddMerge( data->dict, "test_struct",
+      Dictionary_Entry_Value_Copy( testStruct2, True ), Dictionary_MergeType_Append );
+   /* OK: since this was an append, we expect _two_ entries called "test_struct",
+    * one preceding the other, one with the orig data, one with new data */    
+   pcu_check_true( (data->testEntriesCount+1) == data->dict->count );
+   pcu_check_true( Dictionary_Entry_Value_Compare( data->testValues[7],
+      Dictionary_Get( data->dict, "test_struct" ) ) );
+   pcu_check_true( Dictionary_Entry_Value_Compare( testStruct2,
+      data->dict->entryPtr[8]->value ) );
+   Dictionary_Empty( data->dict );
+
+   /* Testing Merge_Merge */
+   DictionarySuite_PopulateDictWithTestValues( data );
+
+   /* The nicest way for this test I think is to manually build a merged struct
+    *  to compare against */
+   expectedMergedStruct = Dictionary_Entry_Value_Copy( data->testValues[7], True );
+   Dictionary_Set( expectedMergedStruct->as.typeStruct, "anisotropic", 
+      Dictionary_Entry_Value_FromBool( False ) );
+   Dictionary_Add( expectedMergedStruct->as.typeStruct, "new_person",
+      Dictionary_Entry_Value_FromString( "Luke" ) );
+   Dictionary_Set( (Dictionary_Get( expectedMergedStruct->as.typeStruct, "geom" ))->as.typeStruct, "startz", 
+      Dictionary_Entry_Value_FromUnsignedInt( 222 ) );
+
+   Dictionary_AddMerge( data->dict, "test_struct",
+      Dictionary_Entry_Value_Copy( testStruct2, True ), Dictionary_MergeType_Merge );
+   /* This time, the new struct should be merged into the existing one */
+   pcu_check_true( data->testEntriesCount == data->dict->count );
+   mergedStruct = Dictionary_Get( data->dict, "test_struct" );
+   pcu_check_true( Dictionary_Entry_Value_Compare( mergedStruct,
+      expectedMergedStruct ) );
+   Dictionary_Empty( data->dict );
+   Dictionary_Entry_Value_Delete( expectedMergedStruct );
+
+   /* Testing Merge_Replace */
+   DictionarySuite_PopulateDictWithTestValues( data );
+   Dictionary_AddMerge( data->dict, "test_struct",
+      Dictionary_Entry_Value_Copy( testStruct2, True ), Dictionary_MergeType_Replace );
+   pcu_check_true( data->testEntriesCount == data->dict->count );
+   pcu_check_true( Dictionary_Entry_Value_Compare( testStruct2,
+      Dictionary_Get( data->dict, "test_struct" ) ) );
+   Dictionary_Empty( data->dict );
+
+   Dictionary_Entry_Value_Delete( testStruct2 );
+}
+
+
 void DictionarySuite( pcu_suite_t* suite ) {
    pcu_suite_setData( suite, DictionarySuiteData );
    pcu_suite_setFixtures( suite, DictionarySuite_Setup, DictionarySuite_Teardown );
@@ -391,4 +461,5 @@ void DictionarySuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, DictionarySuite_TestSet );
    pcu_suite_addTest( suite, DictionarySuite_TestAddElement );
    pcu_suite_addTest( suite, DictionarySuite_TestShortcuts );
+   pcu_suite_addTest( suite, DictionarySuite_TestMerge );
 }
