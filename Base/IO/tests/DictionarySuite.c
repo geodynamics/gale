@@ -451,6 +451,113 @@ void DictionarySuite_TestMerge( DictionarySuiteData* data ) {
 }
 
 
+void DictionarySuite_TestReadAllParamFromCommandLine( DictionarySuiteData* data ) {
+   int                        argc;
+   char**                     argv;
+   char**                     expectedKeys;
+   Dictionary_Entry_Value**   expectedVals;
+   Index                      ii;
+   Dictionary_Entry_Value*    tmpStruct=NULL;
+   Dictionary_Entry_Value*    tmpStruct2=NULL;
+   Dictionary_Entry_Value*    tmpList=NULL;
+   Index                      numExp = 7;
+
+   argc = 16;
+   argv = Memory_Alloc_Array_Unnamed( char*, argc );
+   expectedVals = Memory_Alloc_Array_Unnamed( Dictionary_Entry_Value*, numExp );
+   expectedKeys = Memory_Alloc_Array_Unnamed( char*, numExp );
+
+   /* Now fill in our mock command line, and create the expected values to test
+    *  against along the way */   
+   Stg_asprintf( &argv[0], "./testStGermain");
+   Stg_asprintf( &argv[1], "-param=hey");
+   Stg_asprintf( &argv[2], "--option");
+   Stg_asprintf( &argv[3], "--output-dir=");
+   Stg_asprintf( &expectedKeys[0], "output-dir" );
+   expectedVals[0] = Dictionary_Entry_Value_FromString( "" );
+   Stg_asprintf( &argv[4], "--Ra=1.0e4");
+   Stg_asprintf( &expectedKeys[1], "Ra" );
+   expectedVals[1] = Dictionary_Entry_Value_FromDouble( 1.0e4 );
+   Stg_asprintf( &argv[5], "--foo.bar=5");
+   Stg_asprintf( &expectedKeys[2], "foo" );
+   expectedVals[2] = Dictionary_Entry_Value_NewStruct();
+   Dictionary_Entry_Value_AddMember( expectedVals[2], "bar",
+      Dictionary_Entry_Value_FromDouble( 5 ) );
+   Stg_asprintf( &argv[6], "--vpac.csd.steve=cool");
+   Stg_asprintf( &expectedKeys[3], "vpac" );
+   expectedVals[3] = Dictionary_Entry_Value_NewStruct();
+   Dictionary_Entry_Value_AddMember( expectedVals[3], "csd",
+      tmpStruct = Dictionary_Entry_Value_NewStruct() );
+   Dictionary_Entry_Value_AddMember( tmpStruct, "steve",
+      Dictionary_Entry_Value_FromString( "cool" ) );
+   Stg_asprintf( &argv[7], "--foo.bot=7");
+   Dictionary_Entry_Value_AddMember( expectedVals[2], "bot",
+      Dictionary_Entry_Value_FromDouble( 7 ) );
+   Stg_asprintf( &argv[8], "--sports[]=hockey");
+   Stg_asprintf( &expectedKeys[4], "sports" );
+   expectedVals[4] = Dictionary_Entry_Value_NewList();
+   Dictionary_Entry_Value_AddElement( expectedVals[4], 
+      Dictionary_Entry_Value_FromString( "hockey" ) );
+   Stg_asprintf( &argv[9], "--sports[]=chess");
+   /* This should be overwritten by next entry, so ignore */
+   Stg_asprintf( &argv[10], "--sports[1]=tennis");
+   Dictionary_Entry_Value_AddElement( expectedVals[4], 
+      Dictionary_Entry_Value_FromString( "tennis" ) );
+   Stg_asprintf( &argv[11], "--sles[].name=pressure");
+   Stg_asprintf( &expectedKeys[5], "sles" );
+   expectedVals[5] = Dictionary_Entry_Value_NewList();
+   Dictionary_Entry_Value_AddElement( expectedVals[5], 
+      tmpStruct = Dictionary_Entry_Value_NewStruct() );
+   Dictionary_Entry_Value_AddMember( tmpStruct, "name",
+      Dictionary_Entry_Value_FromString( "pressure" ) );
+   Stg_asprintf( &argv[12], "--sles[].name=temperature");
+   Dictionary_Entry_Value_AddElement( expectedVals[5], 
+      tmpStruct2 = Dictionary_Entry_Value_NewStruct() );
+   Dictionary_Entry_Value_AddMember( tmpStruct2, "name",
+      Dictionary_Entry_Value_FromString( "temperature" ) );
+   Stg_asprintf( &argv[13], "--sles[0].solver=mg");
+   Dictionary_Entry_Value_AddMember( tmpStruct, "solver",
+      Dictionary_Entry_Value_FromString( "mg" ) );
+   Stg_asprintf( &argv[14], "--sles[1].solver=direct");
+   Dictionary_Entry_Value_AddMember( tmpStruct2, "solver",
+      Dictionary_Entry_Value_FromString( "direct" ) );
+   Stg_asprintf( &argv[15], "--some.crazy[].shit=here");
+   Stg_asprintf( &expectedKeys[6], "some" );
+   expectedVals[6] = Dictionary_Entry_Value_NewStruct();
+   Dictionary_Entry_Value_AddMember( expectedVals[6], "crazy",
+      tmpList = Dictionary_Entry_Value_NewList() );
+   Dictionary_Entry_Value_AddElement( tmpList, 
+      tmpStruct = Dictionary_Entry_Value_NewStruct() );
+   Dictionary_Entry_Value_AddMember( tmpStruct, "shit",
+      Dictionary_Entry_Value_FromString( "here" ) );
+
+   Dictionary_ReadAllParamFromCommandLine( data->dict, argc, argv );
+
+   for (ii=0; ii < numExp; ii++) {
+      pcu_check_true( Dictionary_Entry_Compare(
+         data->dict->entryPtr[ii],
+         expectedKeys[ii]));
+      pcu_check_true( Dictionary_Entry_Value_Compare(
+         expectedVals[ii],
+         data->dict->entryPtr[ii]->value ));
+   }
+
+   for (ii=0; ii < argc; ii++) {
+      Memory_Free( argv[ii] );
+   }
+   Memory_Free( argv );
+
+   for (ii=0; ii < numExp; ii++) {
+      Memory_Free( expectedKeys[ii] );
+      Memory_Free( expectedVals[ii] );
+   }
+   Memory_Free( expectedKeys );
+   Memory_Free( expectedVals );
+
+   Dictionary_Empty( data->dict );
+}
+
+
 void DictionarySuite( pcu_suite_t* suite ) {
    pcu_suite_setData( suite, DictionarySuiteData );
    pcu_suite_setFixtures( suite, DictionarySuite_Setup, DictionarySuite_Teardown );
@@ -462,4 +569,5 @@ void DictionarySuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, DictionarySuite_TestAddElement );
    pcu_suite_addTest( suite, DictionarySuite_TestShortcuts );
    pcu_suite_addTest( suite, DictionarySuite_TestMerge );
+   pcu_suite_addTest( suite, DictionarySuite_TestReadAllParamFromCommandLine );
 }
