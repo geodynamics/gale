@@ -27,6 +27,12 @@
 	</struct>
 		
 	<struct>
+		<param name="Name">testTimestep</param>
+		<param name="Type">int</param>
+		<param name="Default">0</param>
+		<param name="Description">The timestep at which the testing will occur. If this is 0 (or undefined) the testing will occur after the first solve.</param>
+	</struct>
+	<struct>
 		<param name="Name">numericVariableName</param>
 		<param name="Type">String</param>
 		<param name="Default">""</param>

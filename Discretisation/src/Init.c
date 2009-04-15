@@ -56,7 +56,6 @@ Stream* StgFEM_Discretisation_Debug = NULL;
 such as streams etc */
 Bool StgFEM_Discretisation_Init( int* argc, char** argv[] ) {
 	Stg_ComponentRegister*          componentRegister = Stg_ComponentRegister_Get_ComponentRegister();
-	FeVariable_ImportExportInfo*    stgFEM_NativeImportExportInfo = NULL;
 	int tmp;
 	
 	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
@@ -119,31 +118,11 @@ Bool StgFEM_Discretisation_Init( int* argc, char** argv[] ) {
 
 	RegisterParent( FieldTest_Type,			   Stg_Component_Type );
 
-	/* initialise new MPI types */
-	/*FeEquationNumber_Create_CritPointInfo_MPI_Datatype();*/
-
-	/* Initialise singletons / registers */
-	FeVariable_FileFormatImportExportList = Stg_ObjectList_New();
-	/* Initially add the standard StgFEM import/export type */
-	stgFEM_NativeImportExportInfo = Memory_Alloc( FeVariable_ImportExportInfo, "stgFEM_NativeImportExportInfo" );
-	stgFEM_NativeImportExportInfo->readNodalValuesFromFile = FeVariable_ReadNodalValuesFromFile_StgFEM_Native;
-	stgFEM_NativeImportExportInfo->saveNodalValuesToFile = FeVariable_SaveNodalValuesToFile_StgFEM_Native;
-
-	Stg_ObjectList_PointerAppend( 
-		FeVariable_FileFormatImportExportList, 
-		stgFEM_NativeImportExportInfo,
-		StgFEM_Native_ImportExportType,
-		FeVariable_ImportExportInfo_Delete,
-		FeVariable_ImportExportInfo_Print,
-		FeVariable_ImportExportInfo_Copy );
-
-
 	{
 		PetscErrorCode	ec;
 		ec = PetscInitialize( argc, argv, (char*)0, NULL );
 		CheckPETScError( ec );
 	}
-
 
 	return True;
 }

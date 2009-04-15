@@ -56,9 +56,6 @@ Bool StgFEM_Discretisation_Finalise( void ) {
 	
 	Stream_IndentBranch( StgFEM_Debug );
 
-	Stg_ObjectList_DeleteAllObjects( FeVariable_FileFormatImportExportList );
-	Stg_Class_Delete( FeVariable_FileFormatImportExportList );
-
 	PetscFinalize();
 	
 	Stream_UnIndentBranch( StgFEM_Debug );

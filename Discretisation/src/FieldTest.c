@@ -158,9 +158,9 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 	Dictionary_Entry_Value*		swarmVarList		= Dictionary_Get( dict, "NumericSwarmVariableNames" );
 	FieldVariable_Register* 	fV_Register     	= Stg_ObjectList_Get( cf->registerRegister, "FieldVariable_Register" );
 	FieldVariable_Register* 	sW_Register     	= Stg_ObjectList_Get( cf->registerRegister, "SwarmVariable_Register" );
-	Index				feVariable_I;
+	Index				feVariable_I, referenceFieldCount;
 	Index				swarmVar_I;
-	Name                    	fieldName;
+	Name        fieldName;
 	Hook*				generateErrorFields;
 	Hook*				physicsTestHook;
 	Stream*     errStream = Journal_Register( Error_Type, "FieldTests" );
@@ -182,8 +182,17 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 		if( !self->referenceSolnFromFile ) {
 			self->analyticSolnForFeVarKey = Memory_Alloc_Array( unsigned, self->fieldCount, 
 								    "analytic solution index for ith feVariable" );
-		/*	self->_analyticSolutionList = Memory_Alloc_Array_Unnamed( FieldTest_AnalyticSolutionFunc*, self->fieldCount ); */
 		}
+#if 0	
+		else {
+			fieldList = Dictionary_Get( pluginDict, "ReferenceFields" );
+			referenceFieldCount = fieldList ? Dictionary_Entry_Value_GetCount( fieldList ) : assert(0);
+
+			for( feVariable_I = 0; feVariable_I < referenceFieldCount; feVariable_I++ ) {
+				referenceSolnFileList
+			}
+		}
+#endif
 
 		for( feVariable_I = 0; feVariable_I < self->fieldCount; feVariable_I++ ) {
 			/* read in the FeVariable from the tuple */
@@ -220,6 +229,7 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 	self->referenceSolnPath     = Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "referenceSolutionFilePath" ) );
 	self->normalise             = Dictionary_Entry_Value_AsBool( Dictionary_Get( pluginDict, "normaliseByAnalyticSolution" ) );
 	self->epsilon               = Dictionary_Entry_Value_AsDouble( Dictionary_Get( pluginDict, "epsilon" ) );
+	self->testTimestep          = Dictionary_GetInt_WithDefault( pluginDict, "testTimestep", 0 );
 	self->referenceSolnFromFile = Dictionary_Entry_Value_AsBool( Dictionary_Get( pluginDict, "useReferenceSolutionFromFile" ) );
 	self->appendToAnalysisFile  = Dictionary_GetBool_WithDefault( pluginDict, "appendToAnalysisFile", False ) ;
 	self->context               = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
@@ -297,10 +307,17 @@ void _FieldTest_Initialise( void* fieldTest, void* data ) {
 
 	/* load the reference solution from file if req'd */
 	if( self->referenceSolnFromFile ) {
+		char *referenceSolnFileName;
 		for( field_I = 0; field_I < self->fieldCount; field_I++ ) {
-			FieldTest_LoadReferenceSolutionFromFile( self->referenceFieldList[field_I],
-				       				 self->referenceSolnFileList[field_I],
-								 self->referenceSolnPath, self->context );
+			/* create the name of the reference file, the apprendix is handled by FieldTest_LoadReferenceSolutionFromFile */
+			referenceSolnFileName = Memory_Alloc_Array_Unnamed( char, strlen((char*)self->referenceSolnPath) + 1 + strlen((char*)self->numericFieldList[field_I]->name) + 1 + 5 + strlen(".h5\0") );
+			//sprintf( referenceSolnFileName, "/%s.%.5d", self->numericFieldList[field_I]->name, self->testTimestep );
+			sprintf( referenceSolnFileName, "%s/%s.%.5d.h5", self->referenceSolnPath, self->numericFieldList[field_I]->name, self->testTimestep );
+			FeVariable_ReadFromFile( self->referenceFieldList[field_I], referenceSolnFileName );
+	/*		FieldTest_LoadReferenceSolutionFromFile( self->referenceFieldList[field_I],
+																								referenceSolnFileName,
+																								self->referenceSolnPath, self->context ); */
+			Memory_Free( referenceSolnFileName );
 		}
 	}
 	/* calculate the analytic solutions */
@@ -462,8 +479,6 @@ void FieldTest_BuildAnalyticField( void* fieldTest, Index field_I ) {
 			Memory_Free( varName[var_I] );
 		}
 
-		//referenceDofLayout->baseVariables = Memory_Alloc_Array_Unnamed( Variable*, componentsCount );
-		//referenceDofLayout->baseVariables[0] = baseVariable;
 	}
 
 	Stg_Component_Build( referenceDofLayout, NULL, False );
@@ -474,8 +489,7 @@ void FieldTest_BuildAnalyticField( void* fieldTest, Index field_I ) {
 	tmpName = Stg_Object_AppendSuffix( numericField, "Analytic" );
 
 	self->referenceFieldList[field_I] = FeVariable_New( tmpName, referenceMesh, referenceMesh, referenceDofLayout, NULL, NULL, NULL, 
-							Mesh_GetDimSize( referenceMesh ), False, "StgFEM_Native", "StgFEM_Native",
-							"", "", False, False, context->fieldVariable_Register );
+							Mesh_GetDimSize( referenceMesh ), False, False, False, context->fieldVariable_Register );
 	/* so that the eqnation numbers don't get built for this guy */
 	self->referenceFieldList[field_I]->buildEqNums = False;
 
@@ -567,8 +581,7 @@ void FieldTest_BuildErrField( void* fieldTest, Index field_I ) {
 	tmpName = Stg_Object_AppendSuffix( numericField, "Error" );
 
 	self->errorFieldList[field_I] = FeVariable_New( tmpName, constantMesh, constantMesh, errorDofLayout, NULL, NULL, NULL, 
-							Mesh_GetDimSize( constantMesh ), False, "StgFEM_Native", "StgFEM_Native",
-							"", "", False, False, context->fieldVariable_Register );
+							Mesh_GetDimSize( constantMesh ), False, False, False, context->fieldVariable_Register );
 	/* so that the eqnation numbers don't get built for this guy */
 	self->errorFieldList[field_I]->buildEqNums = False;
 
@@ -827,12 +840,11 @@ void FieldTest_LoadReferenceSolutionFromFile( FeVariable* feVariable, Name refer
 }
 
 void _FieldTest_DumpToAnalysisFile( FieldTest* self, Stream* analysisStream ) {
-	int field_I, lMeshSize, numDofs, dim, dof_I;
+	int field_I, numDofs, dim, dof_I;
 	double error;
 	FeVariable* errorField;
 	for( field_I = 0; field_I < self->fieldCount; field_I++ ) {
 		/* should be using MT_VOLUME for the reference field mesh, but seems to have a bug */
-		lMeshSize  = Mesh_GetLocalSize( self->constantMesh, MT_VERTEX );
 		errorField = self->errorFieldList[field_I];
 		numDofs	   = self->numericFieldList[field_I]->fieldComponentCount;
 		dim = self->numericFieldList[field_I]->dim;
@@ -910,7 +922,7 @@ void FieldTest_GenerateErrFields( void* _context, void* data ) {
 	double			lAnalyticSq[3], gAnalyticSq[3];
 	double			lErrorSq[3], gErrorSq[3];
 	Bool			normalise		= self->normalise;
-	Index			numDofs, dof_I;
+	Index			numDofs, dof_I, fieldCount;
 	Index			field_I;
 	Index			expected_I;
 	Bool			pass;
@@ -918,6 +930,13 @@ void FieldTest_GenerateErrFields( void* _context, void* data ) {
 	Stream*     analysisStream;
 	double			eps			= self->epsilon;
 	
+	/* if testTimestep is NOT initialise and NOT equal to the current timestep
+	 * we skip this function */
+	if( self->testTimestep != context->timeStep && self->testTimestep != 0 )
+		return;
+
+	fieldCount = self->fieldCount;
+
 	if( self->appendToAnalysisFile ) {
 		/* append (or create if not found ) a file to report results */
 		double length, elementResI;
@@ -929,7 +948,7 @@ void FieldTest_GenerateErrFields( void* _context, void* data ) {
 
 		/* write heading names in file */
 		Journal_RPrintf( analysisStream, "#Res ");
-		for(field_I = 0 ; field_I < self->fieldCount ; field_I++ ) {
+		for(field_I = 0 ; field_I < fieldCount ; field_I++ ) {
 			numDofs = self->numericFieldList[field_I]->fieldComponentCount;
 			for( dof_I = 0; dof_I < numDofs; dof_I++ ) {
 				Journal_RPrintf( analysisStream, "%s%d ", self->numericFieldList[field_I]->name, dof_I+1 );
@@ -941,7 +960,7 @@ void FieldTest_GenerateErrFields( void* _context, void* data ) {
 		Journal_RPrintf( analysisStream, "\n%e ", length/elementResI );
 	}
 
-	for( field_I = 0; field_I < self->fieldCount; field_I++ ) {
+	for( field_I = 0; field_I < fieldCount; field_I++ ) {
 		/* should be using MT_VOLUME for the reference field mesh, but seems to have a bug */
 		lMeshSize  = Mesh_GetLocalSize( self->constantMesh, MT_VERTEX );
 		errorField = self->errorFieldList[field_I];

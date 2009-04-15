@@ -434,10 +434,6 @@ void _AdvectionDiffusionSLE_Build( void* sle, void* data ) {
 			self->phiField,
 			self->phiDotDofLayout,
 			NULL,
-			self->phiField->importFormatType,
-			self->phiField->exportFormatType,
-			self->phiField->customInputPath,
-			self->phiField->customOutputPath,
 			False, False,
 			fieldVariable_Register );
 

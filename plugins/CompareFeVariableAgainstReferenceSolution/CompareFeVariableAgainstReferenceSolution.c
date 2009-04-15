@@ -168,10 +168,6 @@ void _CompareFeVariableAgainstReferenceSolution_Construct( void* compareFeVariab
 			self->type );
 	}
 
-	self->importFormatType = StG_Strdup( Dictionary_GetString_WithDefault( dictionary, "importFormatType",
-		StgFEM_Native_ImportExportType ) );
-	self->exportFormatType = StG_Strdup( Dictionary_GetString_WithDefault( dictionary, "exportFormatType",
-		StgFEM_Native_ImportExportType ) );
 	self->referenceFeVariableSuffix = StG_Strdup( Dictionary_GetString_WithDefault( dictionary, "referenceFeVariableSuffix", 
 		"Reference" ) );
 		
@@ -264,6 +260,7 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 
 	char*                    tmpName;
 	char*                    tmpName2;
+	char*                    filename;
 	Bool                     scalar;
         Dof_Index                componentsCount;
 /* 				 TODO: hardcode for now - should be read in constructor, or read from the reference */
@@ -417,10 +414,6 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 			feVarToTest,
 			referenceDofLayout, 
 			NULL, 
-			self->importFormatType,
-			self->exportFormatType,
-			self->referencePath,
-			NULL,
 			True,  /* isReference = True */
 			False, /* Don't set the "test every timestep var", since we re-create this guy each
 				  timestep anyway*/
@@ -432,10 +425,6 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 			feVarToTest, 
 			roundedDofLayout, 
 			NULL, 
-			feVarToTest->importFormatType,
-			self->exportFormatType,
-			NULL,
-			NULL,
 			False,
 			False,
 			feVarToTest->fieldVariable_Register );
@@ -449,7 +438,13 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 	Stg_Component_Initialise( referenceFeVar, NULL, False );
 	Stg_Component_Initialise( roundedFeVar, NULL, False );
 
-	FeVariable_ReadFromFile( referenceFeVar, self->referencePath, self->context->timeStep );
+	filename = Memory_Alloc_Array_Unnamed( char, strlen(self->referencePath) + strlen(self->name) + 1 + 5 + 1 + 3 + 1 );
+#ifdef READ_HDF5
+				sprintf( filename, "%s/%s.%.5u.h5", self->referencePath, self->name, self->context->timeStep );
+#else
+				sprintf( filename, "%s/%s.%.5u.h5", self->referencePath, self->name, self->context->timeStep );
+#endif
+	FeVariable_ReadFromFile( referenceFeVar, filename );
 
 	/* Note this is a bit inelegant, but kind of necessary unless we rewrite the FeVariable
 	 * checkpointing-reading code again to be more general - see my comment above when

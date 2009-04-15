@@ -224,7 +224,7 @@ int main( int argc, char* argv[] ) {
 	/* Create the fe variable */
 	fV_Register = FieldVariable_Register_New();
 	feVariable = FeVariable_New( velocityName, feMesh, NULL, dofLayout, compositeVC, NULL, NULL, numDims,False,
-		StgFEM_Native_ImportExportType, StgFEM_Native_ImportExportType, fV_Register );
+		False, False fV_Register );
 	
 	/* Create a hack swarm ptr - we won't actually use it in this test */
 	swarm = feVariable;

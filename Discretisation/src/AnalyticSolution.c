@@ -508,7 +508,6 @@ FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVari
 	tmpName = Stg_Object_AppendSuffix( feVariable, "Analytic" );
 	analyticFeVariable = FeVariable_New( tmpName, feVariable->feMesh, feVariable->geometryMesh, dofLayout,
 		NULL, NULL, NULL, feVariable->dim, feVariable->isCheckpointedAndReloaded, 
-		feVariable->importFormatType, feVariable->exportFormatType, NULL, NULL,
 		False, False,
 		feVariable->fieldVariable_Register );
 

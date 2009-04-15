@@ -216,21 +216,9 @@ void FeVariable_SaveNodalValuesToFile_SpecRidge2D( void* _feVariable, const char
 
 void _StgFEM_FeVariable_ImportExport_SpecRidge2D_Construct( void* componment, Stg_ComponentFactory* cf, void* data ) {
 	AbstractContext* context;
-	FeVariable_ImportExportInfo*    specRidge2DImportExportInfo = NULL;
 
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
 	
-	specRidge2DImportExportInfo = Memory_Alloc( FeVariable_ImportExportInfo, "SpecRidge2D_ImportExportInfo" );
-	specRidge2DImportExportInfo->readNodalValuesFromFile = FeVariable_ReadNodalValuesFromFile_SpecRidge2D;
-	specRidge2DImportExportInfo->saveNodalValuesToFile = FeVariable_SaveNodalValuesToFile_SpecRidge2D;
-
-	Stg_ObjectList_PointerAppend( 
-		FeVariable_FileFormatImportExportList, 
-		specRidge2DImportExportInfo,
-		SpecRidge2D_ImportExportType,
-		FeVariable_ImportExportInfo_Delete,
-		FeVariable_ImportExportInfo_Print,
-		FeVariable_ImportExportInfo_Copy );
 }
 
 void* _StgFEM_FeVariable_ImportExport_SpecRidge2D_DefaultNew( Name name ) {

@@ -221,8 +221,7 @@ int main( int argc, char* argv[] ) {
 	/* Create the finite element field variable*/
 	fV_Register = FieldVariable_Register_New();
 	feVariable = FeVariable_New( "phi", feMesh, NULL, dofs, wallVC, NULL, NULL, context->dim,
-		False, StgFEM_Native_ImportExportType, StgFEM_Native_ImportExportType, NULL, NULL,
-		False, False, fV_Register );
+		False, False, False, fV_Register );
 	
 	/* Create Stream */
 	outputStream = Journal_Register( InfoStream_Type, CURR_MODULE_NAME );

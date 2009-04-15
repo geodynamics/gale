@@ -153,10 +153,6 @@ ShapeFeVariable* _ShapeFeVariable_New(
 			1,      /* fieldComponentCount */ 
 			dim,	/* dim */
 			isCheckpointedAndReloaded, /* Checkpointing boolean */
-			StgFEM_Native_ImportExportType,	/* import format type */
-			StgFEM_Native_ImportExportType,	/* export format type */
-			NULL, /* customInputPath */
-			NULL, /* customOutputPath */
 			False,	/* isReference */
 			False,  /* loadReferenceEachTimestep */
 			communicator,	/* communicator */

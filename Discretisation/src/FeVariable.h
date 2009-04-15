@@ -61,32 +61,13 @@
 	
 	/* Function prototypes for import / export */
 	typedef void (FeVariable_ReadNodalValuesFromFile_Function) (void* feVariable, const char* prefixStr, unsigned int timeStep );
-	typedef void (FeVariable_SaveNodalValuesToFile_Function) (void* feVariable, const char* prefixStr, unsigned int timeStep, Bool saveCoords );
-
-	/** Struct containing info of how to read from / export to a certain file format */
-	/* We expect several of these guys to be registered in the Discretisation Init phase, and possibly by later
-	 * plugins */
-	typedef struct FeVariable_ImportExportInfo {
-		FeVariable_ReadNodalValuesFromFile_Function*  readNodalValuesFromFile;   
-		FeVariable_SaveNodalValuesToFile_Function*    saveNodalValuesToFile;   
-	} FeVariable_ImportExportInfo;
-
-	void FeVariable_ImportExportInfo_Delete( void* ptr );
-	void FeVariable_ImportExportInfo_Print ( void* ptr, struct Stream* stream );
-	void* FeVariable_ImportExportInfo_Copy( 
-		void*					ptr, 
-		void*					dest,
-		Bool					deep,
-		Name					nameExt, 
-		struct PtrMap*				ptrMap );
+	typedef void (FeVariable_IO_File_Function) (void* feVariable, const char* fileName, Bool saveCoords );
 
 	/* A global list of import/export info objects - can be added to later by plugins. Needs to be initialised in
 	 * FeDiscretisation_Init() */
 	/* TODO: maybe should move this to the StgFEM_Context later???  */
 	extern Stg_ObjectList*   FeVariable_FileFormatImportExportList;
 
-	extern const char*       StgFEM_Native_ImportExportType;
-	
 	/** FeVariable class contents */
 	#define __FeVariable \
 		/* General info */ \
@@ -96,10 +77,10 @@
 		FeVariable_InterpolateWithinElementFunction*      _interpolateWithinElement; \
 		FeVariable_GetValueAtNodeFunction*                _getValueAtNode;          \
 		FeVariable_SyncShadowValuesFunc*		_syncShadowValues; \
-		\
+		FeVariable_IO_File_Function         *_saveToFile; \
+		FeVariable_IO_File_Function         *_readToFile; \
 		/* FeVariable info */ \
-		\
-		Stream*                                           debug; \
+		Stream*                            debug; \
 		/** Mesh that this variable is discretised over */ \
 		FeMesh*						feMesh; \
 		/** The mesh that this variable can create the determinant of the jacobian from */ \
@@ -114,23 +95,15 @@
 		VariableCondition*                                ics; \
 		/** Info on which dofs are linked together: optional, may be NULL */ \
 		LinkedDofInfo*                                    linkedDofInfo; \
-		/** Equation number array: maps where each dof of this Variable goes in any matrices
-		based off it. */ \
+		/** Equation number array: maps where each dof of this Variable goes in any matrices based off it. */ \
 		FeEquationNumber*                                 eqNum;  \
 		/** Records whether the user has sync'd shadow values yet. */ \
 		Bool                                              shadowValuesSynchronised;  \
 		/** A "template" feVariable this one is based on - ie this one's mesh and BCs is based off that one */ \
 		FeVariable*                                       templateFeVariable; \
-		/** A type recording what import/export system for loading and saving should be used */ \
-		char*                                             importFormatType; \
-		char*                                             exportFormatType; \
-		char*                                             customInputPath; \
-		char*                                             customOutputPath; \
-		/** Records whether this FeVariable is a reference solution - and should be loaded from a file, regardless
-		 * of checkpointing status */ \
+		/** Records whether this FeVariable is a reference solution - and should be loaded from a file, regardless of checkpointing status */ \
 		Bool                                              isReferenceSolution; \
-		/* if self->isReferenceSolution is true, this param determines if it's loaded once at the start, or every
-		 * timestep. */ \
+		/* if self->isReferenceSolution is true, this param determines if it's loaded once at the start, or every timestep. */ \
 		Bool                                              loadReferenceEachTimestep; \
 		Bool                                              buildEqNums; \
 									\
@@ -157,10 +130,6 @@
 		void*                                           linkedDofInfo,
 		Dimension_Index                                 dim,
 		Bool                                            isCheckpointedAndReloaded,
-		const char* const                               importFormatType,
-		const char* const                               exportFormatType,
-		const char* const                               customInputPath,
-		const char* const                               customOutputPath,
 		Bool                                            referenceSoulution,
 		Bool                                            loadReferenceEachTimestep,
 		FieldVariable_Register*                         fV_Register );
@@ -173,10 +142,6 @@
 		void*                                          	templateFeVariable,
 		DofLayout*                                      dofLayout, 
 		void*                                          	ics,
-		const char* const                               importFormatType,
-		const char* const                               exportFormatType,
-		const char* const                               customInputPath,
-		const char* const                               customOutputPath,
 		Bool                                            isReferenceSolution,
 		Bool                                            loadReferenceEachTimestep,
 		FieldVariable_Register*                         fV_Register );
@@ -194,10 +159,6 @@
 		Index                                           fieldComponentCount,
 		Dimension_Index                                 dim,
 		Bool                                            isCheckpointedAndReloaded,
-		const char* const                               importFormatType,
-		const char* const                               exportFormatType,
-		const char* const                               customInputPath,
-		const char* const                               customOutputPath,
 		Bool                                            referenceSoulution,
 		Bool                                            loadReferenceEachTimestep,
 		MPI_Comm                                        communicator,
@@ -236,10 +197,6 @@
 		Index                                           fieldComponentCount,
 		Dimension_Index                                 dim,
 		Bool                                            isCheckpointedAndReloaded,
-		const char* const                               importFormatType,
-		const char* const                               exportFormatType,
-		const char* const                               customInputPath,
-		const char* const                               customOutputPath,
 		Bool                                            referenceSoulution,
 		Bool                                            loadReferenceEachTimestep,
 		MPI_Comm                                        communicator,
@@ -255,10 +212,6 @@
 		void*                                           ics,
 		void*                                           linkedDofInfo,
 		void*                                           templateFeVariable,
-		const char* const                               importFormatType,
-		const char* const                               exportFormatType,
-		const char* const                               customInputPath,
-		const char* const                               customOutputPath,
 		Bool                                            referenceSoulution,
 		Bool                                            loadReferenceEachTimestep );
 	
@@ -360,13 +313,13 @@
 	void FeVariable_PrintLocalDiscreteValues_2dBox( void* variable, Stream* stream );
 
 	/** Saves the current mesh coordinates, and value of each dof in the feVariable, to file */
-	void FeVariable_SaveToFile( void* feVariable, const char* prefixStr, unsigned int timeStep, Bool saveCoords );
-	void FeVariable_SaveNodalValuesToFile_StgFEM_Native( void* feVariable, const char* prefixStr, unsigned int timeStep, Bool saveCoords );
+	void FeVariable_SaveToFile( void* feVariable, const char* filename, Bool saveCoords );
 
 	/** Reads in everything to initialise a built FeVariable from a file */
-	void FeVariable_ReadFromFile( void* feVariable, const char* prefixStr, unsigned int timeStep );
-	void FeVariable_ReadNodalValuesFromFile_StgFEM_Native( void* feVariable, const char* prefixStr, unsigned int timeStep );
+	void FeVariable_ReadFromFile( void* feVariable, const char* filename );
 
+	/** Reads in everything from a FeVariable file defined on a seperate mesh */
+	void FeVariable_InterpolateFromFile( void* feVariable, const char* filename );
 	/** Evaluates Spatial Derivatives using shape functions */
 	Bool FeVariable_InterpolateDerivativesAt( void* variable, double* globalCoord, double* value ) ;
 	

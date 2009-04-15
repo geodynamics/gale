@@ -324,13 +324,6 @@ OperatorFeVariable* _OperatorFeVariable_New(
 			0 /* fieldComponentCount - this will be reset later */,
 			dim,
 			False, /* isCheckpointedAndReloaded */
-			/* TODO: hack as always StgFEM_Native for now - PatrickSunter - 7 July 2006 */
-			StgFEM_Native_ImportExportType,
-			StgFEM_Native_ImportExportType,
-			NULL,
-			/* TODO: as above, potentially might want to save to non-standard paths... fix
-			 * later though.- PatrickSunter - 9 July 2007 */
-			NULL,
 			False, /* Not a reference variable, so this line and following False */
 			False, 
 			communicator,
@@ -448,12 +441,7 @@ void _OperatorFeVariable_Construct( void* feVariable, Stg_ComponentFactory* cf, 
 	}
 
 	_FeVariable_Init( (FeVariable*) self, feVariableList[0]->feMesh, feVariableList[0]->geometryMesh,
-		feVariableList[0]->dofLayout, NULL, NULL, NULL, NULL,
-		/* TODO: hack as always StgFEM native for now - PatrickSunter 7/7/2006 */
-		StgFEM_Native_ImportExportType, StgFEM_Native_ImportExportType,
-		/* TODO: hack as always the default path - PatrickSunter 9/7/2007 */
-		NULL, NULL,
-		False, False );
+		feVariableList[0]->dofLayout, NULL, NULL, NULL, NULL, False, False );
 	_OperatorFeVariable_Init( self, operatorName, feVariableCount, feVariableList, NULL );
 
 	Memory_Free( feVariableList );

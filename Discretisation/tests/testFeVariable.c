@@ -115,8 +115,7 @@ FeVariable* buildFeVar() {
 
    fieldReg = FieldVariable_Register_New();
    feVar = FeVariable_New( "velocity", feMesh, NULL, dofs, bcs, NULL, NULL, 2, True, 
-			   StgFEM_Native_ImportExportType, StgFEM_Native_ImportExportType, 
-			   NULL, NULL, False, False, fieldReg );
+			   False, False, fieldReg );
 
    for( n_i = 0; n_i < Mesh_GetLocalSize( feMesh, 0 ); n_i++ ) {
       /*const double pi=acos(-1.0);*/

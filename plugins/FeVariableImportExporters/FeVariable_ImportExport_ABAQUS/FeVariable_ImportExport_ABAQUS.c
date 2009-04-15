@@ -212,21 +212,9 @@ void FeVariable_SaveNodalValuesToFile_ABAQUS( void* _feVariable, const char* pre
 
 void _StgFEM_FeVariable_ImportExport_ABAQUS_Construct( void* componment, Stg_ComponentFactory* cf, void* data ) {
 	AbstractContext* context;
-	FeVariable_ImportExportInfo*    abaqusImportExportInfo = NULL;
 
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
 	
-	abaqusImportExportInfo = Memory_Alloc( FeVariable_ImportExportInfo, "ABAQUS_ImportExportInfo" );
-	abaqusImportExportInfo->readNodalValuesFromFile = FeVariable_ReadNodalValuesFromFile_ABAQUS;
-	abaqusImportExportInfo->saveNodalValuesToFile = FeVariable_SaveNodalValuesToFile_ABAQUS;
-
-	Stg_ObjectList_PointerAppend( 
-		FeVariable_FileFormatImportExportList, 
-		abaqusImportExportInfo,
-		ABAQUS_ImportExportType,
-		FeVariable_ImportExportInfo_Delete,
-		FeVariable_ImportExportInfo_Print,
-		FeVariable_ImportExportInfo_Copy );
 }
 
 void* _StgFEM_FeVariable_ImportExport_ABAQUS_DefaultNew( Name name ) {

@@ -485,16 +485,8 @@ void _FiniteElementContext_SaveFeVariables( void* context ) {
 	if ( strlen(self->checkPointPrefixString) > 0 ) {
 		outputStrLen += strlen(self->checkPointPrefixString) + 1;
 	}
-	outputPathString = Memory_Alloc_Array( char, outputStrLen, "outputPathString" );
 
-	if ( strlen(self->checkPointPrefixString) > 0 ) {
-		sprintf( outputPathString, "%s/%s.", self->checkpointWritePath, self->checkPointPrefixString );
-	}
-	else {
-		sprintf( outputPathString, "%s/", self->checkpointWritePath );
-	}
-
-	/* Save the variables that have had their "isCheckpointedAndReloaded" flag enabled - 
+		/* Save the variables that have had their "isCheckpointedAndReloaded" flag enabled - 
 	 *  default is true, but the user may restrict the list by specifying the "FieldVariablesToCheckpoint"
 	 *  flag in their constructor - see _FeVariable_Construct().
 	 */ 	
@@ -504,14 +496,29 @@ void _FiniteElementContext_SaveFeVariables( void* context ) {
 		if ( Stg_Class_IsInstance( fieldVar, FeVariable_Type ) ) {
 			feVar = (FeVariable*)fieldVar;
 
+#ifdef WRITE_HDF5
+			/*                                                prefix            /       self->name       . 00000 .   h5 \0 */
+			outputPathString = Memory_Alloc_Array_Unnamed( char, outputStrLen + 1 + strlen(feVar->name) + 1 + 5 + 1 + 2 + 1 );
+			if ( strlen(self->checkPointPrefixString) > 0 ) 
+				sprintf( outputPathString, "%s/%s%s.%.5u.h5", self->checkpointWritePath, self->checkPointPrefixString, feVar->name, self->timeStep );
+			else 
+				sprintf( outputPathString, "%s/%s.%.5u.h5", self->checkpointWritePath, feVar->name, self->timeStep );
+#else
+			/*                                                prefix            /       self->name       . 00000 .  dat \0 */
+			outputPathString = Memory_Alloc_Array_Unnamed( char, outputStrLen + 1 + strlen(self->name) + 1 + 5 + 1 + 3 + 1 );
+			if ( strlen(self->checkPointPrefixString) > 0 )
+				sprintf( outputPathString, "%s/%s%s.%.5u.dat", self->checkpointWritePath, self->checkPointPrefixString, feVar->name, self->timeStep );
+			else
+				sprintf( outputPathString, "%s%s.%.5u.dat", self->checkpointWritePath, feVar->name, self->timeStep );
+#endif
 			if ( feVar->isCheckpointedAndReloaded ) {
-			   FeVariable_SaveToFile( feVar, outputPathString, self->timeStep, 
-			               Dictionary_GetBool_WithDefault( self->dictionary, "saveCoordsWithFields", False ) );           
+				 FeVariable_SaveToFile( feVar, outputPathString, 
+										 Dictionary_GetBool_WithDefault( self->dictionary, "saveCoordsWithFields", False ) );           
 			}
 		}
+		Memory_Free( outputPathString );
+		outputPathString = NULL;
 	}
-
-	Memory_Free( outputPathString );
 }
 
 

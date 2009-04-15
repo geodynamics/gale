@@ -62,7 +62,6 @@
 
 const Type   FeVariable_Type = "FeVariable";
 const Name   defaultFeVariableFeEquationNumberName = "defaultFeVariableFeEqName";
-const char*  StgFEM_Native_ImportExportType = "StgFEM_Native";
 
 /* MPI Tags */
 static const int DOF_VALUES_TAG = 10;
@@ -104,10 +103,6 @@ void* FeVariable_DefaultNew( Name name )
 		0,
 		0,
 		False,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
 		False,
 		False,
 		MPI_COMM_WORLD,
@@ -125,10 +120,6 @@ FeVariable* FeVariable_New(
 		void*                                           linkedDofInfo,
 		Dimension_Index                                 dim,
 		Bool                                            isCheckpointedAndReloaded,
-		const char* const                               importFormatType,
-		const char* const                               exportFormatType,
-		const char* const                               customInputPath,
-		const char* const                               customOutputPath,
 		Bool                                            isReferenceSolution,
 		Bool                                            loadReferenceEachTimestep,
 		FieldVariable_Register*                         fV_Register )		
@@ -145,11 +136,7 @@ FeVariable* FeVariable_New(
 		NULL,
 		dofLayout->_totalVarCount,
 		dim,
-	    	isCheckpointedAndReloaded,
-		importFormatType,
-		exportFormatType,
-		customInputPath,
-		customOutputPath,
+	  isCheckpointedAndReloaded,
 		isReferenceSolution,
 		loadReferenceEachTimestep,
 		((IGraph*)((FeMesh*)feMesh)->topo)->remotes[MT_VERTEX]->comm->mpiComm, 
@@ -162,10 +149,6 @@ FeVariable* FeVariable_New_FromTemplate(
 		void*                                          	_templateFeVariable,
 		DofLayout*                                      dofLayout, 
 		void*                                          	ics,
-		const char* const                               importFormatType,
-		const char* const                               exportFormatType,
-		const char* const                               customInputPath,
-		const char* const                               customOutputPath,
 		Bool                                            isReferenceSolution,
 		Bool                                            loadReferenceEachTimestep,
 		FieldVariable_Register*                         fV_Register )
@@ -185,10 +168,6 @@ FeVariable* FeVariable_New_FromTemplate(
 		templateFeVariable->fieldComponentCount,
 		templateFeVariable->dim,
 		templateFeVariable->isCheckpointedAndReloaded,
-		importFormatType,
-		exportFormatType,
-		customInputPath,
-		customOutputPath,
 		isReferenceSolution,
 		loadReferenceEachTimestep,
 		templateFeVariable->communicator,
@@ -211,10 +190,6 @@ FeVariable* FeVariable_New_Full(
 		Index                                           fieldComponentCount,
 		Dimension_Index                                 dim,
 		Bool                                            isCheckpointedAndReloaded,
-		const char* const                               importFormatType,
-		const char* const                               exportFormatType,
-		const char* const                               customInputPath,
-		const char* const                               customOutputPath,
 		Bool                                            isReferenceSolution,
 		Bool                                            loadReferenceEachTimestep,
 		MPI_Comm                                        communicator,
@@ -252,10 +227,6 @@ FeVariable* FeVariable_New_Full(
 		fieldComponentCount,
 		dim,
 		isCheckpointedAndReloaded,
-		importFormatType,
-		exportFormatType,
-		customInputPath,
-		customOutputPath,
 		isReferenceSolution,
 		loadReferenceEachTimestep,
 		communicator,
@@ -284,7 +255,7 @@ FeVariable* _FeVariable_New(
 		FieldVariable_GetCoordFunction*                 _getMinAndMaxGlobalCoords,		
 		FeVariable_InterpolateWithinElementFunction*    _interpolateWithinElement,	
 		FeVariable_GetValueAtNodeFunction*              _getValueAtNode,	
-		FeVariable_SyncShadowValuesFunc*		_syncShadowValues, 
+		FeVariable_SyncShadowValuesFunc*                _syncShadowValues, 
 		void*                                           feMesh,
 		void*                                           geometryMesh,
 		DofLayout*                                      dofLayout, 
@@ -295,10 +266,6 @@ FeVariable* _FeVariable_New(
 		Index                                           fieldComponentCount,
 		Dimension_Index                                 dim,
 		Bool                                            isCheckpointedAndReloaded,
-		const char* const                               importFormatType,
-		const char* const                               exportFormatType,
-		const char* const                               customInputPath,
-		const char* const                               customOutputPath,
 		Bool                                            isReferenceSolution,
 		Bool                                            loadReferenceEachTimestep,
 		MPI_Comm                                        communicator,
@@ -345,8 +312,7 @@ FeVariable* _FeVariable_New(
 	/* FeVariable info */
 	if( initFlag ){
 		_FeVariable_Init( self, feMesh, geometryMesh, dofLayout, bcs, ics, linkedDofInfo,
-			templateFeVariable, importFormatType, exportFormatType,
-			customInputPath, customOutputPath, isReferenceSolution, loadReferenceEachTimestep  );
+			templateFeVariable, isReferenceSolution, loadReferenceEachTimestep  );
 	}
 	
 	return self;
@@ -362,10 +328,6 @@ void _FeVariable_Init(
 		void*                                           ics,
 		void*                                           linkedDofInfo,
 		void*                                           templateFeVariable,
-		const char* const                               importFormatType,
-		const char* const                               exportFormatType,
-		const char* const                               customInputPath,
-		const char* const                               customOutputPath,
 		Bool                                            isReferenceSolution,
 		Bool                                            loadReferenceEachTimestep )
 {
@@ -404,28 +366,13 @@ void _FeVariable_Init(
 	else
 		self->eqNum = NULL;
 
-	/* NOte: at Construct time, we'll just take the _name_ of the filter the user wants to use. Since the actual
-	 * filters may be loaded in plugins which get loaded AFTER this construct currently, we'll only check they
-	 * exist properly at that point. -- PatrickSunter, 27 July 2007 */
-	self->importFormatType = StG_Strdup( importFormatType );
-	self->exportFormatType = StG_Strdup( exportFormatType );
-	
-	self->customInputPath = NULL;
-	if ( NULL != customInputPath ) {
-		self->customInputPath = StG_Strdup( customInputPath ) ;
-	}	
-	self->customOutputPath = NULL;
-	if ( NULL != customOutputPath ) {
-		self->customOutputPath = StG_Strdup( customOutputPath );
-	}
-
 	self->isReferenceSolution = isReferenceSolution;
 	self->loadReferenceEachTimestep = loadReferenceEachTimestep;
 	Journal_Firewall( (self->loadReferenceEachTimestep != True), errorStream,
 		 "The loadReferenceEachTimestep feature isn't implemented yet, sorry.\n" );
 
-        self->dynamicBCs[0] = NULL;
-        self->dynamicBCs[1] = NULL;
+	self->dynamicBCs[0] = NULL;
+	self->dynamicBCs[1] = NULL;
 	self->dynamicBCs[2] = NULL;
 
 	self->buildEqNums = True;
@@ -441,14 +388,6 @@ void _FeVariable_Delete( void* variable ) {
 	Stream_IndentBranch( StgFEM_Debug );
 	if( self->eqNum && ( NULL == self->templateFeVariable ) ) {
 		Stg_Class_Delete( self->eqNum );
-	}
-	Memory_Free( self->importFormatType );
-	Memory_Free( self->exportFormatType );
-	if ( self->customInputPath ) {
-		Memory_Free( self->customInputPath );
-	}
-	if ( self->customOutputPath ) {
-		Memory_Free( self->customOutputPath );
 	}
 	/* feMesh bc and doflayout are purposely not deleted */
 
@@ -579,38 +518,6 @@ void _FeVariable_Build( void* variable, void* data ) {
 		Journal_DPrintf( self->debug, "In %s- for %s:\n", __func__, self->name );
 		Stream_IndentBranch( StgFEM_Debug );
 
-		/* NOte: We are checking this now instead of at Construct time because of ordering & plugins - see
-		 * comment in Construct. -- PatrickSunter, 27 July 2007 */
-		/* check the given file format is actually among the registered list. If not, print them and exit. */
-		if( NULL == Stg_ObjectList_Get( FeVariable_FileFormatImportExportList, self->importFormatType ) ) {
-			Stream*    errorStream = Journal_Register( Error_Type, self->type );
-			
-			Journal_Printf( errorStream, "Error - in %s() - for FeVariable \"%s\": you specified this "
-				"FeVariable's import type as %s, which is not in the register of known "
-				"FeVariable import/export types\n.", __func__, self->name, self->importFormatType );
-			Journal_Printf( errorStream, "Currently registered import/export types are:\n" );
-			Stream_Indent( errorStream );
-			Stg_ObjectList_PrintAllEntryNames( FeVariable_FileFormatImportExportList, errorStream );
-			Stream_UnIndent( errorStream );
-			
-			Journal_Firewall( 0, errorStream, "Exiting.\n" );
-		}	
-
-		/* check the given file format is actually among the registered list. If not, print them and exit. */
-		if( NULL == Stg_ObjectList_Get( FeVariable_FileFormatImportExportList, self->exportFormatType ) ) {
-			Stream*    errorStream = Journal_Register( Error_Type, self->type );
-			
-			Journal_Printf( errorStream, "Error - in %s() - for FeVariable \"%s\": you specified this "
-				"FeVariable's export type as %s, which is not in the register of known "
-				"FeVariable import/export types\n.", __func__, self->name, self->exportFormatType );
-			Journal_Printf( errorStream, "Currently registered import/export types are:\n" );
-			Stream_Indent( errorStream );
-			Stg_ObjectList_PrintAllEntryNames( FeVariable_FileFormatImportExportList, errorStream );
-			Stream_UnIndent( errorStream );
-			
-			Journal_Firewall( 0, errorStream, "Exiting.\n" );
-		}
-
 		/* build the BCs */
 		Stg_Component_Build( self->feMesh, data, False );
 		Stg_Component_Build( self->dofLayout, data, False );
@@ -642,16 +549,12 @@ void _FeVariable_Build( void* variable, void* data ) {
 void _FeVariable_Construct( void* variable, Stg_ComponentFactory* cf, void* data ) 
 {
 	FeVariable*         self          	= (FeVariable*)variable;
-	FeMesh*		    feMesh        	= NULL;
-	FeMesh*		    geometryMesh  	= NULL;
+	FeMesh*             feMesh        	= NULL;
+	FeMesh*             geometryMesh  	= NULL;
 	DofLayout*          dofLayout     	= NULL;
 	VariableCondition*  bc            	= NULL;
 	VariableCondition*  ic            	= NULL;
 	LinkedDofInfo*      linkedDofInfo 	= NULL;
-	char*               importFormatType 	= NULL;
-	char*               exportFormatType 	= NULL;
-	char*               customInputPath 	= NULL;
-	char*               customOutputPath 	= NULL;
 	Bool                isReferenceSolution = False;
 	Bool                loadReferenceEachTimestep = False;
 
@@ -660,25 +563,6 @@ void _FeVariable_Construct( void* variable, Stg_ComponentFactory* cf, void* data
 	feMesh        = Stg_ComponentFactory_ConstructByKey( cf, self->name, "FEMesh",        FeMesh, True, data );
 	geometryMesh  = Stg_ComponentFactory_ConstructByKey( cf, self->name, "GeometryMesh",  FeMesh, False, data );
 	dofLayout     = Stg_ComponentFactory_ConstructByKey( cf, self->name, DofLayout_Type,  DofLayout,          True, data );
-	importFormatType =  StG_Strdup( Stg_ComponentFactory_GetString( cf, self->name, "importFormatType",
-		StgFEM_Native_ImportExportType ) );
-	exportFormatType =  StG_Strdup( Stg_ComponentFactory_GetString( cf, self->name, "exportFormatType",
-		StgFEM_Native_ImportExportType ) );
-	customInputPath =  StG_Strdup( Stg_ComponentFactory_GetString( cf, self->name, "customInputPath",
-		"" ) );
-	customOutputPath =  StG_Strdup( Stg_ComponentFactory_GetString( cf, self->name, "customOutputPath",
-		"" ) );
-
-	/* The following lines are because we want customInportPath to be a NULL string if it's empty, rather than ""
-	 *  - PatrickSunter, 5 July 2007 */
-	if ( 0 == strcmp( "", customInputPath ) ) {
-		Memory_Free( customInputPath );
-		customInputPath = NULL;
-	}
-	if ( 0 == strcmp( "", customOutputPath ) ) {
-		Memory_Free( customOutputPath );
-		customOutputPath = NULL;
-	}
 
 	ic            = Stg_ComponentFactory_ConstructByKey( cf, self->name, "IC",            VariableCondition,  False, data );
 	bc            = Stg_ComponentFactory_ConstructByKey( cf, self->name, "BC",            VariableCondition,  False, data );
@@ -691,7 +575,6 @@ void _FeVariable_Construct( void* variable, Stg_ComponentFactory* cf, void* data
 	self->removeBCs = Stg_ComponentFactory_GetBool( cf, self->name, "removeBCs", True );
 
 	_FeVariable_Init( self, feMesh, geometryMesh, dofLayout, bc, ic, linkedDofInfo, NULL,
-		importFormatType, exportFormatType, customInputPath, customOutputPath,
 		isReferenceSolution, loadReferenceEachTimestep );
 }
 
@@ -716,34 +599,24 @@ void _FeVariable_Initialise( void* variable, void* data ) {
 		FeEquationNumber_Initialise( self->eqNum );
 	}
 
-	if ( context ) {
-		/* Get the input path string once here - single point of control */
-		inputPathString = Context_GetCheckPointInputPrefixString( context );
-		if ( self->customInputPath != NULL ) {
-			/* over-ride the general StGermain input path with the particular one for this Variable */
-			Memory_Free( inputPathString );
-			/* TODO: not really sure how we should handle context->checkPointPrefixString here - I can see reasons why you
-			 * wouldn't want to add it if using a custom one. Ignore it for now - PatrickSunter, 5 July 2007 */
-			inputPathString = StG_Strdup( self->customInputPath );
-			/* do this check here rather than leave it up to the import parsers */
-			if ( inputPathString [ strlen( inputPathString ) ] != '/' ) {
-				char* oldString = NULL;
-
-				oldString = inputPathString;
-				inputPathString = Memory_Alloc_Array( char, strlen( inputPathString )+2, "inputPathString" );
-				sprintf( inputPathString, "%s/", oldString ); 
-				Memory_Free( oldString ); 
-			}
-		}
-	}
-	
 	/* If the reference solution option is enabled, just load this up regardless of checkpointing options below.
 	 * Want to allow option of disabling this feature, if you're manually setting up a FeVariable without a context etc. */
 	if ( context && self->isReferenceSolution ) {
+		char * filename = NULL;
 		Journal_DPrintf( self->debug, "Reference FeVariable -> loading nodal values from file.\n" );
 		
-		FeVariable_ReadFromFile( self, inputPathString, context->restartTimestep );
-		
+		/* Make filename */
+		/*                                                prefix             self->name       . 00000 .  dat \0 */
+		filename = Memory_Alloc_Array_Unnamed( char, strlen(inputPathString) + strlen(self->name) + 1 + 5 + 1 + 3 + 1 );
+		 
+#ifdef READ_HDF5
+		sprintf( filename, "%s%s.%.5u.h5", inputPathString, self->name, context->restartTimestep );
+#else
+		sprintf( filename, "%s%s.%.5u.dat", inputPathString, self->name, context->restartTimestep );
+#endif
+		FeVariable_ReadFromFile( self, filename );
+
+		Memory_Free( filename );
 		Memory_Free( inputPathString );
 		Stream_UnIndentBranch( StgFEM_Debug );
 		return;
@@ -760,13 +633,24 @@ void _FeVariable_Initialise( void* variable, void* data ) {
 			VariableCondition_Apply( self->ics, data );
 		}
 		else {
+			char * filename = NULL;
 			Journal_DPrintf( self->debug, "restart from checkpoint mode -> loading checkpointed "
 				"nodal values as initial conditions, ignoring ics specified via XML/constructor\n" );
+			/* Make filename */
 
-         FeVariable_ReadFromFile( self, inputPathString, context->restartTimestep );
+			/*                                                prefix             self->name       . 00000 .  dat \0 */
+			filename = Memory_Alloc_Array_Unnamed( char, strlen(inputPathString) + strlen(self->name) + 1 + 5 + 1 + 3 + 1 );
+			 
+#ifdef READ_HDF5
+			sprintf( filename, "%s%s.%.5u.h5", inputPathString, self->name, context->restartTimestep );
+#else
+			sprintf( filename, "%s%s.%.5u.dat", inputPathString, self->name, context->restartTimestep );
+#endif
+			FeVariable_ReadFromFile( self, filename );
 			/* TODO: maybe we want a mechanism in future to over-ride the checkpointed ICs in certain regions too
 			so the user can introduce new phenomena into the model */
 
+			Memory_Free( filename );
 			Memory_Free( inputPathString );
 		}
 	}
@@ -2108,45 +1992,8 @@ void FeVariable_ImportExportInfo_Delete( void* ptr ) {
 	/* Nothing to do - the ObjectAdaptor will take care of deleting the actual struct itself */
 }
 
-void FeVariable_ImportExportInfo_Print ( void* ptr, struct Stream* stream ) {
-	FeVariable_ImportExportInfo*      importExportInfo = (FeVariable_ImportExportInfo*)ptr;
-
-	Journal_Printf( stream, "readNodalValuesFromFile (func ptr): %p", importExportInfo->readNodalValuesFromFile );
-	Journal_Printf( stream, "saveNodalValuesToFile (func ptr): %p", importExportInfo->saveNodalValuesToFile );
-}
-
-void* FeVariable_ImportExportInfo_Copy( 
-		void*					ptr, 
-		void*					dest,
-		Bool					deep,
-		Name					nameExt, 
-		struct PtrMap*				ptrMap ) {
-	FeVariable_ImportExportInfo*	 feVariable_ImportExportInfo = NULL;		
-	/* TODO */
-	assert( 0 );
-	return feVariable_ImportExportInfo;		
-}		
-
-
-void FeVariable_SaveToFile( void* feVariable, const char* prefixStr, unsigned int timeStep, Bool saveCoords ) {
-	FeVariable*                       self = (FeVariable*)feVariable;
-	FeVariable_ImportExportInfo*      importExportInfo;
-	/* put in an extra loop here that first checks if the feVariable should be
-	saved to file. */
-	if (self->isCheckpointedAndReloaded) {
-	
-		importExportInfo = Stg_ObjectList_Get( FeVariable_FileFormatImportExportList, 
-								self->exportFormatType );
-		assert( importExportInfo );
-		importExportInfo->saveNodalValuesToFile( feVariable, prefixStr, timeStep, saveCoords );
-	}
-		
-}
-
-
-void FeVariable_SaveNodalValuesToFile_StgFEM_Native( void* feVariable, const char* prefixStr, unsigned int timeStep, Bool saveCoords ) {
+void FeVariable_SaveToFile( void* feVariable, const char* filename, Bool saveCoords ) {
 	FeVariable*       self = (FeVariable*)feVariable;
-	char*             filename;
 	Node_LocalIndex   lNode_I = 0;
 	Node_GlobalIndex  gNode_I = 0;
 	double*           coord;
@@ -2173,16 +2020,10 @@ void FeVariable_SaveNodalValuesToFile_StgFEM_Native( void* feVariable, const cha
 	MPI_Comm_size( comm, (int*)&nProcs );
 	MPI_Comm_rank( comm, (int*)&myRank );
 	
-	/*                                                prefix             self->name       . 00000 .  dat \0 */
-	filename = Memory_Alloc_Array_Unnamed( char, strlen(prefixStr) + strlen(self->name) + 1 + 5 + 1 + 3 + 1 );
-	
 	/* Note: assumes same number of dofs at each node */
 	dofAtEachNodeCount = self->fieldComponentCount;
 	
 #ifdef WRITE_HDF5
-   /* Get filename */
-	sprintf( filename, "%s%s.%.5u.h5", prefixStr, self->name, timeStep );
-
 	/* wait for go-ahead from process ranked lower than me, to avoid competition writing to file */
 	if ( myRank != 0 ) {
 		MPI_Recv( &confirmation, 1, MPI_INT, myRank - 1, FINISHED_WRITING_TAG, comm, &status );
@@ -2295,9 +2136,6 @@ void FeVariable_SaveNodalValuesToFile_StgFEM_Native( void* feVariable, const cha
 	}	
 
 #else
-   /* Get filename */
-   sprintf( filename, "%s%s.%.5u.dat", prefixStr, self->name, timeStep );
-	   
 	/* wait for go-ahead from process ranked lower than me, to avoid competition writing to file */
 	if ( myRank != 0 ) {
 		MPI_Recv( &confirmation, 1, MPI_INT, myRank - 1, FINISHED_WRITING_TAG, comm, &status );
@@ -2350,37 +2188,13 @@ void FeVariable_SaveNodalValuesToFile_StgFEM_Native( void* feVariable, const cha
 	}	
 
 #endif
-	
-	Memory_Free( filename );
 }
 
-
-void FeVariable_ReadFromFile( void* feVariable, const char* prefixStr, unsigned int timeStep ) {
-	FeVariable*        self = (FeVariable*)feVariable;
-	FeVariable_ImportExportInfo*     importExportInfo;
-	/* Note: if we wish to support changing grid resolution half way through, then we'll need to make this function smarter,
-	and probably save some mesh info as part of the CP so we can work out how to subsample (probably can then just create
-	a temporary feVariable using the old size mesh, then keep calling InterpolateValueAt on it whereever our nodes are
-	located, though this may not work easily in parallel ),. - PatrickSunter 9 Jun 2006
-	*/
-
-	/* Note - REMOVED a check here that isCheckpointedAndReloaded is True, since we want to use this function to load
-	 * referenceFeVars even when checkpointing is disabled. The isCheckpointedAndReloaded check should be done at the
-	 *  Initialise() stage - which it is. PatrickSunter, 25 Jun 2007 */ 	
-	importExportInfo = Stg_ObjectList_Get( FeVariable_FileFormatImportExportList, 
-						self->importFormatType );
-	assert( importExportInfo );
-	importExportInfo->readNodalValuesFromFile( feVariable, prefixStr, timeStep );
-
-	/* Need to re-sync the values. */
-	FeVariable_SyncShadowValues( self );
-}
 
 #define MAX_LINE_LENGTH_DEFINE 1024
 
-void FeVariable_ReadNodalValuesFromFile_StgFEM_Native( void* feVariable, const char* prefixStr, unsigned int timeStep ) {
+void FeVariable_ReadFromFile( void* feVariable, const char* filename ) {
 	FeVariable*        self = (FeVariable*)feVariable;
-	char*              filename;
 	Node_LocalIndex    lNode_I = 0;
 	Node_GlobalIndex   gNode_I = 0;
 	Dof_Index          dof_I;
@@ -2414,12 +2228,9 @@ void FeVariable_ReadNodalValuesFromFile_StgFEM_Native( void* feVariable, const c
 	MPI_Comm_rank( comm, (int*)&rank );
 	MPI_Comm_size( comm, (int*)&nRanks );
 	
-	/*                                                prefix            self->name        . 00000 .  dat \0 */
-	filename = Memory_Alloc_Array_Unnamed( char, strlen(prefixStr) + strlen(self->name) + 1 + 5 + 1 + 3 + 1 );
 	dofAtEachNodeCount = self->fieldComponentCount;
 	
 #ifdef READ_HDF5	
-   sprintf( filename, "%s%s.%.5u.h5", prefixStr, self->name, timeStep );
    
    /* Open the file and data set. */
 	file = H5Fopen( filename, H5F_ACC_RDONLY, H5P_DEFAULT );
@@ -2482,7 +2293,6 @@ void FeVariable_ReadNodalValuesFromFile_StgFEM_Native( void* feVariable, const c
    Memory_Free( buf );
    
 #else   
-	sprintf( filename, "%s%s.%.5u.dat", prefixStr, self->name, timeStep );
 
 	/* This loop used to stop 2 processors trying to open the file at the same time, which
 	  * seems to cause problems */
@@ -2494,9 +2304,8 @@ void FeVariable_ReadNodalValuesFromFile_StgFEM_Native( void* feVariable, const c
 			inputFile = fopen( filename, "r" );
 
 			if ( False == inputFile ) {
-				Journal_Firewall( 0, errorStr, "Error- in %s(), for feVariable \"%s\": Couldn't find checkpoint file with "
-					"prefix \"%s\", timestep %d - thus full filename \"%s\" - aborting.\n", __func__, self->name,
-					prefixStr, timeStep, filename );
+				Journal_Firewall( 0, errorStr, "Error- in %s(), for feVariable \"%s\": Couldn't import from file: "
+					"\"%s\" - aborting.\n", __func__, self->name, filename );
 					
 			}
 			rewind( inputFile );
