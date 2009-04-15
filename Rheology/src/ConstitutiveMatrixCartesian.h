@@ -117,33 +117,23 @@ void _ConstitutiveMatrixCartesian_Construct( void* constitutiveMatrix, Stg_Compo
 		FiniteElementContext*                                context,
 		double**                                             elStiffMat ) ;
 
-	void _ConstitutiveMatrixCartesian_SetValueInAllEntries( void* constitutiveMatrix, double value ) ;
 	void _ConstitutiveMatrixCartesian2D_SetValueInAllEntries( void* constitutiveMatrix, double value ) ;
 	void _ConstitutiveMatrixCartesian3D_SetValueInAllEntries( void* constitutiveMatrix, double value ) ;
 
-	double _ConstitutiveMatrixCartesian_GetIsotropicViscosity( void* constitutiveMatrix ) ;
 	double _ConstitutiveMatrixCartesian2D_GetIsotropicViscosity( void* constitutiveMatrix ) ;
 	double _ConstitutiveMatrixCartesian3D_GetIsotropicViscosity( void* constitutiveMatrix ) ;
 
-	void _ConstitutiveMatrixCartesian_IsotropicCorrection( void* constitutiveMatrix, double isotropicCorrection ) ;
 	void _ConstitutiveMatrixCartesian2D_IsotropicCorrection( void* constitutiveMatrix, double isotropicCorrection ) ;
 	void _ConstitutiveMatrixCartesian3D_IsotropicCorrection( void* constitutiveMatrix, double isotropicCorrection ) ;
 
-	void _ConstitutiveMatrixCartesian_SetSecondViscosity( void* constitutiveMatrix, double deltaViscosity, XYZ director ) ;
 	void _ConstitutiveMatrixCartesian2D_SetSecondViscosity( void* constitutiveMatrix, double deltaViscosity, XYZ director );
 	void _ConstitutiveMatrixCartesian3D_SetSecondViscosity( void* constitutiveMatrix, double deltaViscosity, XYZ director );
 
-	void _ConstitutiveMatrixCartesian_Assemble_D_B( void* constitutiveMatrix, double** GNx, Node_Index node_I, double** D_B ) ;
 	void _ConstitutiveMatrixCartesian2D_Assemble_D_B( void* constitutiveMatrix, double** GNx, Node_Index node_I, double** D_B );
 	void _ConstitutiveMatrixCartesian3D_Assemble_D_B( void* constitutiveMatrix, double** GNx, Node_Index node_I, double** D_B );
 
-	void _ConstitutiveMatrixCartesian_CalculateStress( void* constitutiveMatrix, SymmetricTensor strainRate, SymmetricTensor stress ) ;
 	void _ConstitutiveMatrixCartesian2D_CalculateStress( void* constitutiveMatrix, SymmetricTensor strainRate, SymmetricTensor stress ) ;
 	void _ConstitutiveMatrixCartesian3D_CalculateStress( void* constitutiveMatrix, SymmetricTensor strainRate, SymmetricTensor stress ) ;
-
-
-
-
 
 
 #endif

@@ -239,12 +239,12 @@ void* _ConstitutiveMatrixCartesian_DefaultNew( Name name ) {
 		_ConstitutiveMatrixCartesian_Execute,
 		_ConstitutiveMatrixCartesian_Destroy,
 		_ConstitutiveMatrixCartesian_AssembleElement,
-		_ConstitutiveMatrixCartesian_SetValueInAllEntries,
-		_ConstitutiveMatrixCartesian_GetIsotropicViscosity,
-		_ConstitutiveMatrixCartesian_IsotropicCorrection,
-		_ConstitutiveMatrixCartesian_SetSecondViscosity,
-		_ConstitutiveMatrixCartesian_Assemble_D_B,
-		_ConstitutiveMatrixCartesian_CalculateStress,
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		NULL,
 		name );
 }
 
@@ -450,16 +450,6 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
 	Memory_Free(Dtilda_B); 
 }
 
-void _ConstitutiveMatrixCartesian_SetValueInAllEntries( void* constitutiveMatrix, double value ) {
-	ConstitutiveMatrix* self   = (ConstitutiveMatrix*) constitutiveMatrix;
-
-	self->_setValue = ( self->dim == 2 ? 
-			_ConstitutiveMatrixCartesian2D_SetValueInAllEntries :
-			_ConstitutiveMatrixCartesian3D_SetValueInAllEntries );
-
-	ConstitutiveMatrix_SetValueInAllEntries( self, value );
-}
-
 void _ConstitutiveMatrixCartesian2D_SetValueInAllEntries( void* constitutiveMatrix, double value ) {
 	ConstitutiveMatrix* self   = (ConstitutiveMatrix*) constitutiveMatrix;
 
@@ -495,16 +485,6 @@ void _ConstitutiveMatrixCartesian3D_SetValueInAllEntries( void* _constitutiveMat
 	}
 }
 
-double _ConstitutiveMatrixCartesian_GetIsotropicViscosity( void* constitutiveMatrix ) {
-	ConstitutiveMatrix* self   = (ConstitutiveMatrix*) constitutiveMatrix;
-
-	self->_getViscosity = ( self->dim == 2 ? 
-			_ConstitutiveMatrixCartesian2D_GetIsotropicViscosity :
-			_ConstitutiveMatrixCartesian3D_GetIsotropicViscosity );
-
-	return ConstitutiveMatrix_GetIsotropicViscosity( self );
-}
-
 double _ConstitutiveMatrixCartesian2D_GetIsotropicViscosity( void* constitutiveMatrix ) {
 	ConstitutiveMatrix* self = (ConstitutiveMatrix*) constitutiveMatrix;
 
@@ -515,16 +495,6 @@ double _ConstitutiveMatrixCartesian3D_GetIsotropicViscosity( void* constitutiveM
 	ConstitutiveMatrix* self = (ConstitutiveMatrix*) constitutiveMatrix;
 
 	return self->matrixData[3][3];
-}
-
-void _ConstitutiveMatrixCartesian_IsotropicCorrection( void* constitutiveMatrix, double isotropicCorrection ) {
-	ConstitutiveMatrix* self   = (ConstitutiveMatrix*) constitutiveMatrix;
-
-	self->_isotropicCorrection = ( self->dim == 2 ? 
-			_ConstitutiveMatrixCartesian2D_IsotropicCorrection :
-			_ConstitutiveMatrixCartesian3D_IsotropicCorrection );
-
-	ConstitutiveMatrix_IsotropicCorrection( self, isotropicCorrection );
 }
 
 void _ConstitutiveMatrixCartesian2D_IsotropicCorrection( void* constitutiveMatrix, double isotropicCorrection ) {
@@ -547,16 +517,6 @@ void _ConstitutiveMatrixCartesian3D_IsotropicCorrection( void* constitutiveMatri
 	D[3][3] += isotropicCorrection;
 	D[4][4] += isotropicCorrection;
 	D[5][5] += isotropicCorrection;
-}
-
-void _ConstitutiveMatrixCartesian_SetSecondViscosity( void* constitutiveMatrix, double deltaViscosity, XYZ director ) {
-	ConstitutiveMatrix* self   = (ConstitutiveMatrix*) constitutiveMatrix;
-
-	self->_setSecondViscosity = ( self->dim == 2 ? 
-			_ConstitutiveMatrixCartesian2D_SetSecondViscosity :
-			_ConstitutiveMatrixCartesian3D_SetSecondViscosity );
-
-	ConstitutiveMatrix_SetSecondViscosity( self, deltaViscosity, director );
 }
 
 void _ConstitutiveMatrixCartesian2D_SetSecondViscosity( void* constitutiveMatrix, double deltaViscosity, XYZ director ) {
@@ -626,17 +586,6 @@ void _ConstitutiveMatrixCartesian3D_SetSecondViscosity( void* constitutiveMatrix
 	D[5][0] += a05 ; D[5][1] += a15 ; D[5][2] += a25 ; D[5][3] += a35 ; D[5][4] += a45 ; D[5][5] += a55 ;
 
 	self->isDiagonal = False;
-}
-
-
-void _ConstitutiveMatrixCartesian_Assemble_D_B( void* constitutiveMatrix, double** GNx, Node_Index node_I, double** D_B ) {
-	ConstitutiveMatrix* self   = (ConstitutiveMatrix*) constitutiveMatrix;
-
-	self->_assemble_D_B = ( self->dim == 2 ? 
-			_ConstitutiveMatrixCartesian2D_Assemble_D_B :
-			_ConstitutiveMatrixCartesian3D_Assemble_D_B );
-
-	ConstitutiveMatrix_Assemble_D_B( self, GNx, node_I, D_B );
 }
 
 /*
@@ -736,17 +685,6 @@ void _ConstitutiveMatrixCartesian3D_Assemble_D_B( void* constitutiveMatrix, doub
 		D_B[5][1] = D[5][1] * d_dy + D[5][3] * d_dx + D[5][5] * d_dz;
 		D_B[5][2] = D[5][2] * d_dz + D[5][4] * d_dx + D[5][5] * d_dy;
 	}
-}
-
-
-void _ConstitutiveMatrixCartesian_CalculateStress( void* constitutiveMatrix, SymmetricTensor strainRate, SymmetricTensor stress ) {
-	ConstitutiveMatrix* self   = (ConstitutiveMatrix*) constitutiveMatrix;
-
-	self->_calculateStress = ( self->dim == 2 ? 
-			_ConstitutiveMatrixCartesian2D_CalculateStress :
-			_ConstitutiveMatrixCartesian3D_CalculateStress );
-
-	ConstitutiveMatrix_CalculateStress( self, strainRate, stress );
 }
 
 void _ConstitutiveMatrixCartesian2D_CalculateStress( void* constitutiveMatrix, SymmetricTensor strainRate, SymmetricTensor stress ) {
