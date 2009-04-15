@@ -177,8 +177,7 @@ void PICellerator_testElementIntegral( DomainContext* context ) {
 
 	/* Create FeVariable */
 	feVariable = FeVariable_New_Full( "feVariable", mesh, NULL, NULL, NULL, NULL, NULL, NULL, 
-			1, context->dim, False, StgFEM_Native_ImportExportType, StgFEM_Native_ImportExportType,
-			NULL, NULL, False, False, MPI_COMM_WORLD, context->fieldVariable_Register );
+			1, context->dim, False, False, False, MPI_COMM_WORLD, context->fieldVariable_Register );
 
 	funcName = Dictionary_GetString( context->dictionary, "FunctionName" );
 	if ( strcasecmp( funcName, "ShapeFunction" ) == 0 ) {
