@@ -138,6 +138,22 @@ void _ConstitutiveMatrixCartesian_Init(
 	self->rowSize    = StGermain_nSymmetricTensorVectorComponents( self->dim );
 	self->columnSize = StGermain_nSymmetricTensorVectorComponents( self->dim );
 
+	if( self->dim == 2 ) {
+		self->_setValue = _ConstitutiveMatrixCartesian2D_SetValueInAllEntries;
+		self->_setSecondViscosity = _ConstitutiveMatrixCartesian2D_SetSecondViscosity;
+		self->_getViscosity = _ConstitutiveMatrixCartesian2D_GetIsotropicViscosity;
+		self->_isotropicCorrection = _ConstitutiveMatrixCartesian2D_IsotropicCorrection;
+		self->_assemble_D_B = _ConstitutiveMatrixCartesian2D_Assemble_D_B;
+		self->_calculateStress = _ConstitutiveMatrixCartesian2D_CalculateStress;
+	} else {
+		self->_setValue = _ConstitutiveMatrixCartesian3D_SetValueInAllEntries;
+		self->_setSecondViscosity = _ConstitutiveMatrixCartesian3D_SetSecondViscosity;
+		self->_getViscosity = _ConstitutiveMatrixCartesian3D_GetIsotropicViscosity;
+		self->_isotropicCorrection = _ConstitutiveMatrixCartesian3D_IsotropicCorrection;
+		self->_assemble_D_B = _ConstitutiveMatrixCartesian3D_Assemble_D_B;
+		self->_calculateStress = _ConstitutiveMatrixCartesian3D_CalculateStress;
+	}
+
   /* store each particle's constitutiveMatrix */
   if( self->storeConstitutiveMatrix ) {
     IntegrationPointsSwarm* swarm = (IntegrationPointsSwarm*)self->integrationSwarm;
