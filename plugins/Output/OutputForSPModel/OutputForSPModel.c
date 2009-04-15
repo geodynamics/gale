@@ -82,13 +82,10 @@ int Underworld_OutputForSPModel_InterpolateHeightInXZ( FeMesh* mesh, double* wan
 	/* first check if location is on this proc */
 	Mesh_GetLocalCoordRange( mesh, tmpMin, tmpMax );
 	Mesh_GetGlobalCoordRange( mesh, tmpGMin, tmpGMax );
-	if( !Num_Approx( tmpGMax[1], tmpMax[1] ) ) {
-		/* not of this proc */
+	if( !Num_InRange( wantCoord[0], tmpMin[0], tmpMax[0] ) || !Num_InRange( wantCoord[2], tmpMin[2], tmpMax[2] ) ) {
+		printf("Error ... the coord (x,z) = (%g, %g), is not a local coord!!!\n", wantCoord[0], wantCoord[2] );
 		exit(EXIT_FAILURE);
 	}
-
-	if( !Num_InRange( wantCoord[0], tmpMin[0], tmpMax[0] ) || !Num_InRange( wantCoord[2], tmpMin[2], tmpMax[2] ) )
-		exit(EXIT_FAILURE);
 
 	vertGrid = *(Grid**)ExtensionManager_Get( mesh->info, mesh,
   	ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
@@ -111,7 +108,10 @@ int Underworld_OutputForSPModel_InterpolateHeightInXZ( FeMesh* mesh, double* wan
 	RegularMeshUtils_Node_1DTo3D( mesh, gMinVertOnProc, minIJK );
 	RegularMeshUtils_Node_1DTo3D( mesh, gMaxVertOnProc, maxIJK );
 
+	/* get the 2 nodes indecies in the I-axis */
 	OutputForSPModel_Recursive( mesh, wantCoord, minIJK, maxIJK, setI, 0 );
+
+	/* get the 2 nodes indecies in the K-axis */
 	OutputForSPModel_Recursive( mesh, wantCoord, minIJK, maxIJK, setK, 2 );
 
 	/* set y to maximum */
@@ -154,6 +154,7 @@ int Underworld_OutputForSPModel_InterpolateHeightInXZ( FeMesh* mesh, double* wan
 			/* evaluate the shape functions at that local spot */
 			_BilinearElementType_SF_allNodes( elType, lProjCoord, Nx ); 
 
+			/* now we have the nodes, next interpolate heights */
 			Underworld_DoHeightInterpolation( mesh, elType, nodes, Nx, nodesPerFace, &wantCoord[1] );
 			return 1;
 		}
@@ -217,7 +218,7 @@ void Underworld_OutputForSPModelDo( UnderworldContext* context ) {
 	assert( mesh );
 
 	for( line_I = 0 ; line_I < coordCount ; line_I++ ) {
-		fscanf( iFile, "%lf %lf %lf %lf", &(wantCoord[0]), &originalHeight, &(wantCoord[2]), &bc);
+		fscanf( iFile, "%lf %lf %lf %lf", &(wantCoord[0]), &(wantCoord[2]), &originalHeight, &bc);
 		/* do top surface interpolation at the (x-z) - where 
 		 * x = wantCoord[0]
 		 * z = wantCoord[2]
