@@ -599,6 +599,10 @@ void _FeVariable_Initialise( void* variable, void* data ) {
 		FeEquationNumber_Initialise( self->eqNum );
 	}
 
+	if ( context ) {
+		/* Get the input path string once here - single point of control */
+		inputPathString = Context_GetCheckPointInputPrefixString( context );
+	}
 	/* If the reference solution option is enabled, just load this up regardless of checkpointing options below.
 	 * Want to allow option of disabling this feature, if you're manually setting up a FeVariable without a context etc. */
 	if ( context && self->isReferenceSolution ) {
