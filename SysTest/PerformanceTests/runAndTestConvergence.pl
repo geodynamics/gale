@@ -7,6 +7,23 @@ sub testConvergence;
 sub generateConvergence;
 sub testNumbersAgainstExpected;
 sub readOptionsFile;
+our $progHelp = "To run convergence tests:
+
+./runAndTestConvergence.pl <xmlFile> [ OPTIONS ]
+
+where OPTIONS:
+  -optionsFile <fileName>   : where <fileName> is the option file. By default serial runs of resolution 16sq, 32sq, 64sq, 124sq are done.
+  -againstExpected          : will check the generated numbers against a file in the 'expected' dir. By default check will not occur
+
+EXAMPLE:
+  ./runAndTestConvergence.pl testVelicSolS.xml -optionsFile OFile.dat
+      Runs with option file OFile.dat and NO check against the expected file.
+
+These scripts measure the convergence rates in numerical fields generated in Underworld against analytic solutions supplied by Mirko Velic.
+The error of FEM fields should decrease with higher resolution - depending on the choice of element type that represents a given field.
+These scripts run error measures on given field at several resolutions and then process how the error converges.
+
+The optionsFile can be used to set how each run of the analytic problem differs from the next, see the OFile.dat for details.\n\n\n";
 
 ######  Main program    ######
 
@@ -39,7 +56,9 @@ sub runTests {
 	# check if xml exists and options file is specified
 	foreach $arg (@ARGV) {
 		if( $arg =~ m/.*\.xml$/ ) { $xmlFile = $arg; }
-		elsif( $arg =~ m/\-optionsFile/ ) { $optFile = $ARGV[$ii+1]; }
+		elsif( $arg =~ m/\-optionsFile/ ) { $optFile = $ARGV[$ii+1]; $ii++; }
+		elsif( $arg =~ m/^\-h$/ ) { print $progHelp; exit }
+		elsif( $arg =~ m/^\-\-help$/ ) { print $progHelp; exit }
 		$ii++;
 	}
 	if( $xmlFile eq " " ) { die "\nNo xml file specified, stopped" ; }
