@@ -135,8 +135,8 @@ ConstitutiveMatrixCartesian* _ConstitutiveMatrixCartesian_New(
 void _ConstitutiveMatrixCartesian_Init( 
 		ConstitutiveMatrixCartesian*                 self )
 {
-	self->rowSize    = StGermain_nSymmetricTensorVectorComponents( self->dim );
-	self->columnSize = StGermain_nSymmetricTensorVectorComponents( self->dim );
+	self->rowSize = self->columnSize = StGermain_nSymmetricTensorVectorComponents( self->dim );
+	self->Dtilda_B = Memory_Alloc_2DArray( double, self->rowSize, self->dim, "D~ times B matrix" );
 
 	if( self->dim == 2 ) {
 		self->_setValue = _ConstitutiveMatrixCartesian2D_SetValueInAllEntries;
@@ -274,7 +274,12 @@ void _ConstitutiveMatrixCartesian_Execute( void* constitutiveMatrix, void* data 
 }
 
 void _ConstitutiveMatrixCartesian_Destroy( void* constitutiveMatrix, void* data ) {
+	ConstitutiveMatrixCartesian* self = (ConstitutiveMatrixCartesian*)constitutiveMatrix;
+
 	_ConstitutiveMatrix_Destroy( constitutiveMatrix, data );
+
+	Memory_Free( self->Dtilda_B );
+	Memory_Free( self->Ni );
 }
 
 void _ConstitutiveMatrixCartesian_AssembleElement( 
@@ -307,8 +312,7 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
 	Dof_Index               colNodeDof_I;
 	Dof_Index               nodeDofCount;
 	double**                Dtilda_B;
-	Index                   tensorComponents    = StGermain_nSymmetricTensorVectorComponents( dim );
-        double                  vel[3], velDerivs[9], *Ni, eta;
+	double                  vel[3], velDerivs[9], *Ni, eta;
 
 	self->sle = sle;
 
@@ -318,15 +322,14 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
 	nodeDofCount      = dim;
 
 	/* allocate */
-        if( elementNodeCount > self->maxNumNodes ) {
-           self->maxNumNodes = elementNodeCount;
-           self->GNx = ReallocArray2D( self->GNx, double, dim, elementNodeCount );
-           self->Ni = ReallocArray( self->Ni, double, elementNodeCount );
-        }
-        GNx = self->GNx;
-        Ni = self->Ni;
-
-	Dtilda_B = Memory_Alloc_2DArray( double, tensorComponents , dim, "D~ times B matrix" );
+	if( elementNodeCount > self->max_nElNodes ) {
+		 self->max_nElNodes = elementNodeCount;
+		 self->GNx = ReallocArray2D( self->GNx, double, dim, elementNodeCount );
+		 self->Ni = ReallocArray( self->Ni, double, elementNodeCount );
+	}
+	GNx = self->GNx;
+	Ni = self->Ni;
+	Dtilda_B = self->Dtilda_B;
 
 	/* Get number of particles per element */
 	cell_I            = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
@@ -445,9 +448,6 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
 			}
 		}
 	}
-
-	/* free */
-	Memory_Free(Dtilda_B); 
 }
 
 void _ConstitutiveMatrixCartesian2D_SetValueInAllEntries( void* constitutiveMatrix, double value ) {
