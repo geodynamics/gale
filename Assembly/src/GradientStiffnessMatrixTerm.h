@@ -48,10 +48,10 @@
 	#define __GradientStiffnessMatrixTerm \
 		/* General info */ \
 		__StiffnessMatrixTerm \
-		\
 		/* Virtual info */ \
-		\
 		/* GradientStiffnessMatrixTerm info */ \
+		int         max_nElNodes_col;    \
+		double      *Ni_col;
 
 	struct GradientStiffnessMatrixTerm { __GradientStiffnessMatrixTerm };
 

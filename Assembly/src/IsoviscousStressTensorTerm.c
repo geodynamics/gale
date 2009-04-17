@@ -236,8 +236,12 @@ void _IsoviscousStressTensorTerm_AssembleElement(
 	nodalDofs = nodesPerEl * dim;
 	dofsPerNode = dim;
 	
-	/* allocate */
-	GNx = Memory_Alloc_2DArray( double, dim, nodesPerEl, "GNx" );
+	if( nodesPerEl > self->max_nElNodes ) {
+		/* reallocate */
+		self->GNx = ReallocArray2D( self->GNx, double, dim, nodesPerEl );
+		self->max_nElNodes = nodesPerEl;
+	}
+	GNx = self->GNx;
 
 	cell_I = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
 	cellParticleCount = swarm->cellParticleCountTbl[ cell_I ];
@@ -285,9 +289,6 @@ void _IsoviscousStressTensorTerm_AssembleElement(
 			}
 		}
 	}
-	
-	/* free */
-	Memory_Free(GNx); 
 	
 	return;
 }

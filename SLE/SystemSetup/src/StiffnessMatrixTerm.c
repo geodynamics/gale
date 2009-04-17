@@ -127,6 +127,10 @@ void _StiffnessMatrixTerm_Init(
 	self->extraInfo        = extraInfo;	
 	self->integrationSwarm = integrationSwarm;	
 	self->stiffnessMatrix  = stiffnessMatrix;
+	self->max_nElNodes = 0; /* initialise to zero, in assembly routine it will change value */
+	self->GNx = NULL;
+
+
 
 	StiffnessMatrix_AddStiffnessMatrixTerm( stiffnessMatrix, self );
 }
@@ -258,6 +262,9 @@ void _StiffnessMatrixTerm_Execute( void* stiffnessMatrixTerm, void* data ) {
 }
 
 void _StiffnessMatrixTerm_Destroy( void* stiffnessMatrixTerm, void* data ) {
+	StiffnessMatrixTerm* self = (StiffnessMatrixTerm*)stiffnessMatrixTerm;
+	/* free GNx memory */
+	if( self->GNx ) Memory_Free( self->GNx );
 }
 
 void StiffnessMatrixTerm_AssembleElement( 

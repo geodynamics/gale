@@ -113,6 +113,8 @@ GradientStiffnessMatrixTerm* _GradientStiffnessMatrixTerm_New(
 void _GradientStiffnessMatrixTerm_Init( 
 		GradientStiffnessMatrixTerm*                                    self )
 {
+	self->max_nElNodes_col = 0;
+	self->Ni_col = NULL;
 }
 
 void GradientStiffnessMatrixTerm_InitAll( 
@@ -183,7 +185,11 @@ void _GradientStiffnessMatrixTerm_Execute( void* matrixTerm, void* data ) {
 }
 
 void _GradientStiffnessMatrixTerm_Destroy( void* matrixTerm, void* data ) {
+	GradientStiffnessMatrixTerm* self = (GradientStiffnessMatrixTerm*)matrixTerm;
+
 	_StiffnessMatrixTerm_Destroy( matrixTerm, data );
+
+	Memory_Free( self->Ni_col );
 }
 
 
@@ -234,9 +240,19 @@ void _GradientStiffnessMatrixTerm_AssembleElement(
 	totalDofsThisElement_row = nodesPerEl_row * dofPerNode_row;
 	totalDofsThisElement_col = nodesPerEl_col * dofPerNode_col;
 	
-	/* allocate */
-	GNx_row = Memory_Alloc_2DArray( double, dim, nodesPerEl_row, "GNx_row" );
-	Ni_col = Memory_Alloc_Array( double, nodesPerEl_col, "Ni_col" );
+	if( nodesPerEl_row > self->max_nElNodes ) {
+		/* reallocate */
+		self->GNx = ReallocArray2D( self->GNx, double, dim, nodesPerEl_row );
+		self->max_nElNodes = nodesPerEl_row;
+	}
+	GNx_row = self->GNx;
+
+	if( nodesPerEl_col > self->max_nElNodes_col ) {
+   /* allocate */
+		self->Ni_col = ReallocArray( self->Ni_col, double, nodesPerEl_col );
+		self->max_nElNodes_col = nodesPerEl_col;
+	}
+	Ni_col = self->Ni_col;
 	
 	cell_I = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
 	cellParticleCount = swarm->cellParticleCountTbl[ cell_I ];
@@ -271,8 +287,4 @@ void _GradientStiffnessMatrixTerm_AssembleElement(
 			}
 		}
 	}
-	
-	/* free */
-	Memory_Free(GNx_row); 
-	Memory_Free(Ni_col); 
 }

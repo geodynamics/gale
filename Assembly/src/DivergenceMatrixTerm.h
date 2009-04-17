@@ -45,13 +45,14 @@
 extern const Type DivergenceMatrixTerm_Type;
 
 /** DivergenceMatrixTerm class contents */
-#define __DivergenceMatrixTerm                          \
-   /* General info */                                   \
-   __StiffnessMatrixTerm                                \
-                                                        \
-   /* Virtual info */                                   \
-                                                        \
-   /* DivergenceMatrixTerm info */                      \
+#define __DivergenceMatrixTerm         \
+	/* General info */                   \
+	__StiffnessMatrixTerm                \
+	/* Virtual info */                   \
+	/* DivergenceMatrixTerm info */      \
+	int         max_nElNodes_col;    \
+	double      *Ni_col; 
+
 
 struct DivergenceMatrixTerm { __DivergenceMatrixTerm };
 
