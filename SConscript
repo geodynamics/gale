@@ -27,7 +27,7 @@ for d in dirs:
 
     # Setup where to look for files.
     src_dir = d + '/src'
-    inc_dir = env['build_dir'] + '/include/PICellerator/' + d
+    inc_dir = 'include/PICellerator/' + d
     tst_dir = d + '/tests'
 
     # Install the headers and '.def' files.
@@ -51,17 +51,17 @@ for d in dirs:
     suites += env.Object(Glob(tst_dir + '/*Suite.c'))
 
 # Need to install headers from libPICellerator.
-env.Install(env['build_dir'] + '/include/PICellerator', Glob('libPICellerator/src/*.h'))
+env.Install('include/PICellerator', Glob('libPICellerator/src/*.h'))
 
 # Build libraries.
 if env['shared_libraries']:
-    env.SharedLibrary(env['build_dir'] + '/lib/PICellerator', objs)
+    env.SharedLibrary('lib/PICellerator', objs)
 
 # Need to include the PICellerator library for binaries.
 libs = ['PICellerator'] + env.get('LIBS', [])
 
 # Test runner program.
-env.PCUTest(env['build_dir'] + '/tests/testPICellerator', suites,
+env.PCUTest('tests/testPICellerator', suites,
             PCU_SETUP="StGermain_Init(&argc, &argv);StgDomain_Init(&argc, &argv);" \
                 "StgFEM_Init(&argc, &argv);PICellerator_Init(&argc, &argv);",
             PCU_TEARDOWN="PICellerator_Finalise();StgFEM_Finalise();" \
@@ -77,8 +77,7 @@ for d in dirs:
     mod_name = env['ESCAPE']('"' + ''.join(d.split('/')) + '"')
     cpp_defs = [('CURR_MODULE_NAME', mod_name)] + env.get('CPPDEFINES', [])
 
-    env.Install(env['build_dir'] + '/include/PICellerator/' + d.split('/')[-1],
-                Glob(d + '/*.h'))
+    env.Install('include/PICellerator/' + d.split('/')[-1], Glob(d + '/*.h'))
 
     srcs = Glob(d + '/*.c')
     srcs = [s for s in srcs if s.path.find('-meta.c') == -1]
@@ -89,7 +88,7 @@ for d in dirs:
         lib_pre = env['LIBPREFIXES']
         if not isinstance(lib_pre, list):
             lib_pre = [lib_pre]
-        env.SharedLibrary(env['build_dir'] + '/lib/' + name, objs,
+        env.SharedLibrary('lib/' + name, objs,
                           SHLIBPREFIX='',
                           LIBPREFIXES=lib_pre + [''],
                           LIBS=libs)
