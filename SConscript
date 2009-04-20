@@ -10,7 +10,7 @@ env = env.Clone()
 SConscript('pcu/SConscript', exports='env')
 
 # Inside each project we will be accessing headers without the
-# project name as a prefix, so we need to let SCons know how to
+# project name as a build_dir, so we need to let SCons know how to
 # find those headers.
 env.Append(CPPPATH=env['build_dir'] + '/include/StGermain')
 
@@ -21,8 +21,8 @@ dir = Dir(env['build_dir'] + '/include/StGermain/Base/IO/mpirecord').abspath
 if not os.path.exists(os.path.join(dir, 'mpimessaging.h')):
     if not os.path.exists(dir):
         os.makedirs(dir)
-    Execute(Copy(File(env['build_dir'] + '/include/StGermain/Base/IO/mpirecord/mpimessaging.h'),
-                 File('Base/IO/src/mpirecord/none/mpimessaging.h')))
+    h = Execute(Copy(File(env['build_dir'] + '/include/StGermain/Base/IO/mpirecord/mpimessaging.h'),
+                     File('Base/IO/src/mpirecord/none/mpimessaging.h')))
 dir = Dir(env['build_dir'] + '/include/StGermain/Base/Foundation').abspath
 if not os.path.exists(os.path.join(dir, 'ClassSetup.h')):
     if not os.path.exists(dir):
@@ -48,7 +48,7 @@ for d in dirs:
 
     # Setup where to look for files.
     src_dir = d + '/src'
-    inc_dir = env['build_dir'] + '/include/StGermain/' + d
+    inc_dir = 'include/StGermain/' + d
     tst_dir = d + '/tests'
 
     # Install the headers and '.def' files.
@@ -72,20 +72,20 @@ for d in dirs:
     suites += env.Object(Glob(tst_dir + '/*Suite.c'))
 
 # Need to install headers from libStGermain.
-env.Install(env['build_dir'] + '/include/StGermain', Glob('libStGermain/src/*.h'))
+hdrs = env.Install('include/StGermain', Glob('libStGermain/src/*.h'))
 
 # Build libraries.
 if env['shared_libraries']:
-    env.SharedLibrary(env['build_dir'] + '/lib/StGermain', objs)
+    env.SharedLibrary('lib/StGermain', objs)
 
 # FlattenXML, StGermain and test runner programs.
 libs = ['StGermain'] + env.get('LIBS', [])
-env.Program(env['build_dir'] + '/bin/FlattenXML', 'Base/FlattenXML/src/main.c', LIBS=libs)
-env.Program(env['build_dir'] + '/bin/StGermain', 'src/main.c', LIBS=libs)
-env.PCUTest(env['build_dir'] + '/tests/testStGermain', suites,
+env.Program('bin/FlattenXML', 'Base/FlattenXML/src/main.c', LIBS=libs)
+env.Program('bin/StGermain', 'src/main.c', LIBS=libs)
+env.PCUTest('tests/testStGermain', suites,
             PCU_SETUP="StGermain_Init(&argc, &argv);",
             PCU_TEARDOWN="StGermain_Finalise();",
             LIBS=libs)
 
 # Copy XML validation file to correct destination.
-env.Install(env['build_dir'] + '/lib', 'Base/IO/src/StGermain.xsd')
+xmls = env.Install('lib', 'Base/IO/src/StGermain.xsd')
