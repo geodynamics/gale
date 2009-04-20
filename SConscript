@@ -26,7 +26,7 @@ for d in dirs:
 
     # Setup where to look for files.
     src_dir = d + '/src'
-    inc_dir = env['build_dir'] + '/include/Underworld/' + d
+    inc_dir = 'include/Underworld/' + d
     tst_dir = d + '/tests'
 
     # Install the headers and '.def' files.
@@ -50,17 +50,17 @@ for d in dirs:
     suites += env.Object(Glob(tst_dir + '/*Suite.c'))
 
 # Need to install headers from libUnderworld.
-env.Install(env['build_dir'] + '/include/Underworld', Glob('libUnderworld/src/*.h'))
+env.Install('include/Underworld', Glob('libUnderworld/src/*.h'))
 
 # Build libraries.
 if env['shared_libraries']:
-    env.SharedLibrary(env['build_dir'] + '/lib/Underworld', objs)
+    env.SharedLibrary('lib/Underworld', objs)
 
 # Need to include the Underworld library for binaries.
 libs = ['Underworld'] + env.get('LIBS', [])
 
 # Test runner program.
-env.PCUTest(env['build_dir'] + '/tests/testUnderworld', suites,
+env.PCUTest('tests/testUnderworld', suites,
             PCU_SETUP="StGermain_Init(&argc, &argv);StgDomain_Init(&argc, &argv);" \
                 "StgFEM_Init(&argc, &argv);PICellerator_Init(&argc, &argv);" \
                 "Underworld_Init(&argc, &argv);",
@@ -100,8 +100,7 @@ for d in dirs:
     mod_name = env['ESCAPE']('"' + ''.join(d.split('/')) + '"')
     cpp_defs = [('CURR_MODULE_NAME', mod_name)] + env.get('CPPDEFINES', [])
 
-    env.Install(env['build_dir'] + '/include/Underworld/' + d.split('/')[-1],
-                Glob(d + '/*.h'))
+    env.Install('include/Underworld/' + d.split('/')[-1], Glob(d + '/*.h'))
 
     srcs = Glob(d + '/*.c')
     srcs = [s for s in srcs if s.path.find('-meta.c') == -1]
@@ -112,17 +111,14 @@ for d in dirs:
         lib_pre = env['LIBPREFIXES']
         if not isinstance(lib_pre, list):
             lib_pre = [lib_pre]
-        env.SharedLibrary(env['build_dir'] + '/lib/' + name, objs,
+        env.SharedLibrary('lib/' + name, objs,
                           SHLIBPREFIX='',
                           LIBPREFIXES=lib_pre + [''],
                           LIBS=libs)
 
 # Install XML input files.
-env.Install(env['build_dir'] + '/lib/StGermain/Underworld',
-            Glob('InputFiles/Underworld_Components/*.xml'))
-env.Install(env['build_dir'] + '/lib/StGermain/Underworld/BaseApps',
-            Glob('InputFiles/BaseApps/*.xml'))
-env.Install(env['build_dir'] + '/lib/StGermain/Underworld/VariableConditions',
+env.Install('lib/StGermain/Underworld', Glob('InputFiles/Underworld_Components/*.xml'))
+env.Install('lib/StGermain/Underworld/BaseApps', Glob('InputFiles/BaseApps/*.xml'))
+env.Install('lib/StGermain/Underworld/VariableConditions',
             Glob('InputFiles/VariableConditions/*.xml'))
-env.Install(env['build_dir'] + '/lib/StGermain/Underworld/Viewports',
-            Glob('InputFiles/Viewports/*.xml'))
+env.Install('lib/StGermain/Underworld/Viewports', Glob('InputFiles/Viewports/*.xml'))
