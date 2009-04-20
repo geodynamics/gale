@@ -27,7 +27,7 @@ for d in dirs:
 
     # Setup where to look for files.
     src_dir = d + '/src'
-    inc_dir = env['build_dir'] + '/include/glucifer/' + d
+    inc_dir = 'include/glucifer/' + d
     tst_dir = d + '/tests'
 
     # Install the headers and '.def' files.
@@ -51,17 +51,17 @@ for d in dirs:
     suites += env.Object(Glob(tst_dir + '/*Suite.c'))
 
 # Need to install headers from libglucifer.
-env.Install(env['build_dir'] + '/include/glucifer', Glob('libglucifer/src/*.h'))
+env.Install('include/glucifer', Glob('libglucifer/src/*.h'))
 
 # Build libraries.
 if env['shared_libraries']:
-    env.SharedLibrary(env['build_dir'] + '/lib/glucifer', objs)
+    env.SharedLibrary('lib/glucifer', objs)
 
 # Need to include the gLucifer library for binaries.
 libs = ['glucifer'] + env.get('LIBS', [])
 
 # Test runner program.
-env.PCUTest(env['build_dir'] + '/tests/testglucifer', suites,
+env.PCUTest('tests/testglucifer', suites,
             PCU_SETUP="StGermain_Init(&argc, &argv);StgDomain_Init(&argc, &argv);" \
                 "StgFEM_Init(&argc, &argv);glucifer_Init(&argc, &argv);",
             PCU_TEARDOWN="glucifer_Finalise();StgFEM_Finalise();" \
@@ -81,7 +81,7 @@ for d in dirs:
     mod_name = env['ESCAPE']('"' + ''.join(d.split('/')) + '"')
     cpp_defs = [('CURR_MODULE_NAME', mod_name)] + env.get('CPPDEFINES', [])
 
-    env.Install(env['build_dir'] + '/include/glucifer/' + d.split('/')[-1],
+    env.Install('include/glucifer/' + d.split('/')[-1],
                 Glob(d + '/*.h'))
 
     srcs = Glob(d + '/*.c')
@@ -93,11 +93,10 @@ for d in dirs:
         lib_pre = env['LIBPREFIXES']
         if not isinstance(lib_pre, list):
             lib_pre = [lib_pre]
-        env.SharedLibrary(env['build_dir'] + '/lib/' + name, objs,
+        env.SharedLibrary('lib/' + name, objs,
                           SHLIBPREFIX='',
                           LIBPREFIXES=lib_pre + [''],
                           LIBS=libs)
 
 # Install XML input files.
-env.Install(env['build_dir'] + '/lib/StGermain/glucifer',
-            Glob('ModelComponents/*.xml'))
+env.Install('lib/StGermain/glucifer', Glob('ModelComponents/*.xml'))
