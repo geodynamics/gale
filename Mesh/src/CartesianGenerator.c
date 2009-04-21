@@ -2302,29 +2302,7 @@ void CartesianGenerator_CalcGeom( CartesianGenerator* self, Mesh* mesh, Sync* sy
 
 		/* Calculate coordinate. */
 		for( d_i = 0; d_i < mesh->topo->nDims; d_i++ ) {
-                   if( inds[d_i] <= self->contactDepth[d_i][0] ) {
-                      mesh->verts[n_i][d_i] = self->crdMin[d_i];
-                      if( self->contactDepth[d_i][0] ) {
-                         mesh->verts[n_i][d_i] +=
-                            ((double)inds[d_i] / (double)self->contactDepth[d_i][0]) *
-                            self->contactGeom[d_i];
-                      }
-                   }
-                   else if( inds[d_i] >= grid->sizes[d_i] - self->contactDepth[d_i][1] - 1 ) {
-                      mesh->verts[n_i][d_i] = self->crdMax[d_i];
-                      if( self->contactDepth[d_i][1] ) {
-                         mesh->verts[n_i][d_i] -=
-                            ((double)(grid->sizes[d_i] - 1 - inds[d_i]) /
-                             (double)self->contactDepth[d_i][1]) *
-                            self->contactGeom[d_i];
-                      }
-                   }
-                   else {
-                      vert[d_i] = self->crdMin[d_i] + (self->contactDepth[d_i][0] ? self->contactGeom[d_i] : 0.0) +
-                         ((double)(inds[d_i] - self->contactDepth[d_i][0]) / 
-                          (double)(grid->sizes[d_i] - (self->contactDepth[d_i][0] + self->contactDepth[d_i][1]) - 1)) *
-                         (steps[d_i] - ((self->contactDepth[d_i][1] ? 1.0 : 0.0) + (self->contactDepth[d_i][0] ? 1.0 : 0.0)) * self->contactGeom[d_i]);
-                   }
+		    vert[d_i] = self->crdMin[d_i] + ((double)(inds[d_i]) / (double)(grid->sizes[d_i] - 1)) * steps[d_i];
 		}
 	}
 }
