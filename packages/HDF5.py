@@ -21,7 +21,7 @@ int main( int argc, char** argv ) {
                                        required=False, combine=True)
 
     def setup_libraries(self):
-        self.add_library_set("c", ["hdf5.h"], ["hdf5"])
+        self.add_library_set(["hdf5.h"], ["hdf5"])
         self.add_auxilliary_libs("c", ["pthread"])
         self.add_auxilliary_libs("c", ["pthread", "z", "sz"])
 

@@ -363,7 +363,7 @@ class Package(Module):
             if not okay:
                 continue
             yield inc_dirs
-            for e in self.inc_exts:
+            for e in self.gen_inc_exts(inc_dirs, **kw):
                 found = False
                 ext_dirs = []
                 for d in inc_dirs:
@@ -376,11 +376,13 @@ class Package(Module):
                 if found:
                     yield inc_dirs + ext_dirs
 
-
     def gen_inc_dir_sets(self, base_dir):
         for d in self.ctx.pkg_inc_dirs:
             yield d
 
+    def gen_inc_exts(self, inc_dirs, **kw):
+        for e in self.inc_exts:
+            yield e
 
     def combine_lib_dirs(self, base_dir, **kw):
         if self.forced_lib_dirs:

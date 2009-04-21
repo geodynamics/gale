@@ -15,15 +15,12 @@ class nm(SymLister):
 
     def _test(self, cfg):
         if self.test_list(cfg):
-            cfg.validate_modules([self, SymLister])
-            cfg["list_symbols"] = self.list_symbols
-            cfg["get_symbols"] = self.get_symbols
             self.test_dynamic(cfg)
             return True
         return False
 
     def test_list(self, cfg):
-        src_fn = self.comp.configs[0]["_simple_obj"]
+        src_fn = self.com.configs[0]["_simple_obj"]
         args = [src_fn]
         res, out, err = self.execute(cfg, args)
         if res or err:
@@ -34,7 +31,7 @@ class nm(SymLister):
         return True
 
     def test_dynamic(self, cfg):
-        src_fn = self.comp.configs[0]["_shared_lib"]
+        src_fn = self.com.configs[0]["_shared_lib"]
         args = [src_fn]
         opts = Option("dynamic", "-D", type="bool")
         if not self.test_option(cfg, opts,

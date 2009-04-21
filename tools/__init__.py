@@ -11,6 +11,8 @@ from F77Compiler import F77Compiler
 from Linker import Linker
 from nm import nm
 from SymLister import SymLister
+from ldd import ldd
+from DLTool import DLTool
 from MPICompiler import MPICompiler
 from Compressor import Compressor
 from tar import tar
