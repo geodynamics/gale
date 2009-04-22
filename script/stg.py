@@ -3,12 +3,7 @@ from SCons.Script import *
 
 def generate(env, **kw):
 
-    dir = os.path.join(os.getcwd(), 'script')
-    if os.path.exists(dir):
-        sys.path.insert(0, dir)
-    else:
-        dir = os.path.join(os.getcwd(), 'StGermain', 'script')
-        sys.path.insert(0, dir)
+    sys.path.insert(0, os.path.dirname(__file__))
 
     import stgDtd
     import stgMetaXsd
