@@ -505,7 +505,7 @@ void _FiniteElementContext_SaveFeVariables( void* context ) {
 				sprintf( outputPathString, "%s/%s.%.5u.h5", self->checkpointWritePath, feVar->name, self->timeStep );
 #else
 			/*                                                prefix            /       self->name       . 00000 .  dat \0 */
-			outputPathString = Memory_Alloc_Array_Unnamed( char, outputStrLen + 1 + strlen(self->name) + 1 + 5 + 1 + 3 + 1 );
+			outputPathString = Memory_Alloc_Array_Unnamed( char, outputStrLen + 1 + strlen(feVar->name) + 1 + 5 + 1 + 3 + 1 );
 			if ( strlen(self->checkPointPrefixString) > 0 )
 				sprintf( outputPathString, "%s/%s%s.%.5u.dat", self->checkpointWritePath, self->checkPointPrefixString, feVar->name, self->timeStep );
 			else
