@@ -73,7 +73,6 @@
 		ForceTerm*                                        massMatrixForceTerm;            \
 		int                                               currentParticleIndex;           \
 		Bool                                              useDeriv;                       \
-		double**                                          GNx;
 		
 		
 	struct ParticleFeVariable { __ParticleFeVariable };
