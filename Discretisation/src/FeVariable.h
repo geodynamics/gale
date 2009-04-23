@@ -87,6 +87,8 @@
 		FeMesh*						geometryMesh; \
 		/** DofLayout for this variable: relates each mesh node to the Variable's */ \
 		DofLayout*                                        dofLayout; \
+		/** Temporary GNx for operations */ \
+		double                                            **GNx; \
 		/** Boundary conditions applied to this variable - Compulsory, so the eq num table can be worked out*/ \
 		VariableCondition*                                bcs; \
 		DynamicVC*					dynamicBCs[3]; /* Temporary hack */	\

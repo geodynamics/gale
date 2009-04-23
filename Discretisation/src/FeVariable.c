@@ -511,6 +511,7 @@ void* _FeVariable_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, P
 void _FeVariable_Build( void* variable, void* data ) {
 	FeVariable* self = (FeVariable*)variable;
 	DomainContext*   context = (DomainContext*)data;
+	unsigned dim;
 	
 	if ( False == self->isBuilt ) {
 		self->isBuilt = True;
@@ -535,6 +536,10 @@ void _FeVariable_Build( void* variable, void* data ) {
 
 		/* Extract component count. */
 		self->fieldComponentCount = self->dofLayout->_totalVarCount;
+
+		dim = Mesh_GetDimSize(self->feMesh);
+		/** allocate GNx here */
+		self->GNx = Memory_Alloc_2DArray( double, dim, /*this is ugly*/(dim==2)?4:9, "Global Shape Function Derivatives" );
 		
 		/* don't build the equation numbers for fields that aren't being solved for 
 		 * (ie: error and reference fields) */
@@ -750,6 +755,10 @@ void _FeVariable_Execute( void* variable, void* data ) {
 }
 
 void _FeVariable_Destroy( void* variable, void* data ) {
+	FeVariable* self = (FeVariable*)variable;
+
+	Memory_Free( self->GNx );
+	_FieldVariable_Destroy( self, data );
 }
 
 void FeVariable_PrintLocalDiscreteValues( void* variable, Stream* stream ) {
@@ -1218,7 +1227,7 @@ void FeVariable_InterpolateDerivativesToElLocalCoord( void* _feVariable, Element
 	double                  detJac;
 	Dimension_Index         dim         = self->dim;
 
-	GNx = Memory_Alloc_2DArray( double, dim, elementNodeCount, "Global Shape Function Derivatives" );
+	GNx = self->GNx;
 
 	/* Evaluate Global Shape Functions */
 	ElementType_ShapeFunctionsGlobalDerivs( 
@@ -1228,8 +1237,6 @@ void FeVariable_InterpolateDerivativesToElLocalCoord( void* _feVariable, Element
 
 	/* Do Interpolation */
 	FeVariable_InterpolateDerivatives_WithGNx( self, lElement_I, GNx, value );
-	
-	Memory_Free(GNx);
 }
 
 void FeVariable_InterpolateDerivatives_WithGNx( void* _feVariable, Element_LocalIndex lElement_I, double** GNx, double* value ) {

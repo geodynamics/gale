@@ -74,7 +74,10 @@
 		Stream*                                              debug;                    \
 		Swarm*                                               integrationSwarm;         \
 		Stg_Component*                                       extraInfo;                \
-		StiffnessMatrix*                                     stiffnessMatrix;
+		StiffnessMatrix*                                     stiffnessMatrix;          \
+		/* Data for GNx storage */ \
+	  double                   **GNx; /* store globalDerivative ptr here */ \
+		int                      max_nElNodes;  /* holds the maxNumNodes per element */ 
 	
 	struct StiffnessMatrixTerm { __StiffnessMatrixTerm };
 	

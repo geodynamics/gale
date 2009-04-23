@@ -149,11 +149,12 @@ void _LinearTriangleElementType_Print( void* elementType, Stream* stream ) {
 }
 
 void _LinearTriangleElementType_Construct( void* elementType, Stg_ComponentFactory *cf, void* data ){
-	
+	LinearTriangleElementType* self = (LinearTriangleElementType*)elementType;
+	self->dim = 1;
 }
 	
 void _LinearTriangleElementType_Build( void* elementType, void *data ){
-	
+	LinearTriangleElementType* self = (LinearTriangleElementType*)elementType;
 }
 	
 void _LinearTriangleElementType_Initialise( void* elementType, void *data ){
@@ -165,6 +166,9 @@ void _LinearTriangleElementType_Execute( void* elementType, void *data ){
 }
 	
 void _LinearTriangleElementType_Destroy( void* elementType, void *data ){
+	LinearTriangleElementType* self = (LinearTriangleElementType*)elementType;
+
+	_ElementType_Destroy( self, data );
 	
 }
 	
