@@ -13,6 +13,7 @@
 const Type Underworld_OutputForSPModel_Type = "Underworld_OutputForSPModel";
 
 FILE *iFile, *oFile;
+unsigned outputTimestep=0;
 Index Underworld_OutputForSPModel_Register( PluginsManager* pluginsManager );
 void _Underworld_OutputForSPModel_Construct( void* component, Stg_ComponentFactory* cf, void* data );
 void* _Underworld_OutputForSPModel_DefaultNew( Name name );
@@ -174,6 +175,9 @@ void Underworld_OutputForSPModelDo( UnderworldContext* context ) {
 	int      myRank;
 	int      nProcs;
 
+	/* don't do anything if this isn't the outputTimestep */
+	if( context->timeStep != outputTimestep ) return; 
+
 	double startTime;
 
 	oFile = NULL;
@@ -263,6 +267,7 @@ void* _Underworld_OutputForSPModel_DefaultNew( Name name ) {
 void _Underworld_OutputForSPModel_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext* context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data );
 	//ContextEP_Append( context, AbstractContext_EP_FrequentOutput, Underworld_OutputForSPModelDo );
+	outputTimestep = Dictionary_GetUnsignedInt_WithDefault( context->dictionary, "OutputForSPModel_OutputTimestep", 10 );
 	ContextEP_Append( context, AbstractContext_EP_Dump, Underworld_OutputForSPModelDo );
 }
 
