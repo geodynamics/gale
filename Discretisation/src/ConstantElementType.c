@@ -176,7 +176,8 @@ void _ConstantElementType_Print( void* elementType, Stream* stream ) {
 }
 
 void _ConstantElementType_Construct( void* elementType, Stg_ComponentFactory *cf, void* data ){
-	
+	ConstantElementType* self = (ConstantElementType*)elementType;
+	self->dim = 0;
 }
 	
 void _ConstantElementType_Initialise( void* elementType, void *data ){
@@ -188,10 +189,11 @@ void _ConstantElementType_Execute( void* elementType, void *data ){
 }
 	
 void _ConstantElementType_Destroy( void* elementType, void *data ){
-	
+	ConstantElementType* self = (ConstantElementType*)elementType;
 }
 
 void _ConstantElementType_Build( void* elementType, void *data ) {
+	ConstantElementType* self = (ConstantElementType*)elementType;
 	/* NOTHING */
 
 }

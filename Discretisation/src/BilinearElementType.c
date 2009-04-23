@@ -134,18 +134,22 @@ BilinearElementType* _BilinearElementType_New(
 }
 
 void _BilinearElementType_Init( BilinearElementType* self ) {
-	Dimension_Index dim_I=0;
+	Dimension_Index dim, dim_I=0;
 	/* General and Virtual info should already be set */
 	
 	/* BilinearElementType info */
 	self->isConstructed = True;
-	for ( dim_I = 0; dim_I < 2; dim_I++ ) {
+
+	/* set the dimensionality of the element */
+	dim = self->dim = 2;
+
+	for ( dim_I = 0; dim_I < dim; dim_I++ ) {
 		self->minElLocalCoord[dim_I] = -1;
 		self->maxElLocalCoord[dim_I] = 1;
 		self->elLocalLength[dim_I] = self->maxElLocalCoord[dim_I] - self->minElLocalCoord[dim_I];
 	}
 
-	self->triInds = Memory_Alloc_2DArray( unsigned, 2, 3, "BilinearElementType::triInds" );
+	self->triInds = Memory_Alloc_2DArray( unsigned, dim, 3, "BilinearElementType::triInds" );
 	self->triInds[0][0] = 0; self->triInds[0][1] = 1; self->triInds[0][2] = 2;
 	self->triInds[1][0] = 1; self->triInds[1][1] = 3; self->triInds[1][2] = 2;
 }
@@ -204,6 +208,11 @@ void _BilinearElementType_Initialise( void* elementType, void *data ){
 	self->faceNodes[1][0] = 2; self->faceNodes[1][1] = 3;
 	self->faceNodes[2][0] = 0; self->faceNodes[2][1] = 2;
 	self->faceNodes[3][0] = 1; self->faceNodes[3][1] = 3;
+
+	self->evaluatedShapeFunc = Memory_Alloc_Array( double, self->nodeCount, "evaluatedShapeFuncs" );
+	self->GNi = Memory_Alloc_2DArray( double, self->dim, self->nodeCount, "localShapeFuncDerivitives" );
+
+
 }
 	
 void _BilinearElementType_Execute( void* elementType, void *data ){
@@ -214,10 +223,16 @@ void _BilinearElementType_Destroy( void* elementType, void *data ){
 	BilinearElementType*	self	= (BilinearElementType*) self;
 
 	Memory_Free( self->faceNodes );	
+	Memory_Free( self->evaluatedShapeFunc );
+	Memory_Free( self->GNi );
+
+
+
+	_ElementType_Destroy( self, data );
 }
 
 void _BilinearElementType_Build( void* elementType, void *data ) {
-
+	BilinearElementType*	self	= (BilinearElementType*) self;
 }
 
 /*

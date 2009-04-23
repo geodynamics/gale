@@ -119,13 +119,14 @@ TrilinearElementType* _TrilinearElementType_New(
 
 
 void _TrilinearElementType_Init( TrilinearElementType* self ) {
-	Dimension_Index dim_I=0;
+	Dimension_Index dim, dim_I=0;
 
 	/* General and Virtual info should already be set */
 	
 	/* TrilinearElementType info */
 	self->isConstructed = True;
-	for ( dim_I = 0; dim_I < 3; dim_I++ ) {
+	dim = self->dim = 3;
+	for ( dim_I = 0; dim_I < dim; dim_I++ ) {
 		self->minElLocalCoord[dim_I] = -1;
 		self->maxElLocalCoord[dim_I] = 1;
 		self->elLocalLength[dim_I] = self->maxElLocalCoord[dim_I] - self->minElLocalCoord[dim_I];
@@ -191,6 +192,10 @@ void _TrilinearElementType_Initialise( void* elementType, void *data ){
 	faceNodes[5][0] = 4; faceNodes[5][1] = 5; faceNodes[5][2] = 6; faceNodes[5][3] = 7;
 
 	self->faceNodes = faceNodes;
+
+	self->evaluatedShapeFunc = Memory_Alloc_Array( double, self->nodeCount, "evaluatedShapeFuncs" );
+	self->GNi = Memory_Alloc_2DArray( double, self->dim, self->nodeCount, "localShapeFuncDerivitives" );
+
 }
 	
 void _TrilinearElementType_Execute( void* elementType, void *data ){
@@ -201,10 +206,14 @@ void _TrilinearElementType_Destroy( void* elementType, void *data ){
 	TrilinearElementType* 	self = (TrilinearElementType*)elementType;
 
 	Memory_Free( self->faceNodes );
+	Memory_Free( self->evaluatedShapeFunc );
+	Memory_Free( self->GNi );
+	_ElementType_Destroy( self, data );
 }
 
 void _TrilinearElementType_Build( void* elementType, void *data ) {
-	
+	TrilinearElementType* 	self = (TrilinearElementType*)elementType;
+
 }
 
 #if 0

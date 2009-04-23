@@ -112,6 +112,7 @@ void _ElementType_Init(
 {
 	/* General and Virtual info should already be set */
 	
+	self->dim = 0;
 	/* ElementType info */
 	self->isConstructed = True;
 	self->nodeCount = nodeCount;
@@ -119,6 +120,12 @@ void _ElementType_Init(
 	self->inc = IArray_New();
 }
 
+
+void _ElementType_Destroy( void* elementType, void* data ){
+	ElementType* self = (ElementType*)elementType;
+
+	Stg_Component_Destroy( self, data, False );
+}
 
 void _ElementType_Delete( void* elementType ) {
 	ElementType* self = (ElementType*)elementType;
@@ -156,7 +163,10 @@ void _ElementType_Print( void* elementType, Stream* stream ) {
 void ElementType_Build( void* elementType, void *data ) {
 	ElementType* self = (ElementType*)elementType;
 	
-	self->_build( self, data );
+	/* ElementType's are implemented NOT in the standard parent child
+	 * manner as the rest of StGermain. Here the parents calls the child's
+	 * build function */
+	self->_build( self, data);
 }
 
 void ElementType_EvaluateShapeFunctionsAt( void* elementType, const double localCoord[], double* const evaluatedValues ) {
@@ -257,12 +267,12 @@ void _ElementType_ConvertGlobalCoordToElLocal(
 	Iteration_Index     iteration_I;
 	Node_Index          node_I;
 	Node_Index          nodeCount       = self->nodeCount;
-	double*             evaluatedShapeFuncs;
+	double*             evaluatedShapeFuncs = self->evaluatedShapeFunc;
 	XYZ                 rightHandSide;
 	XYZ                 xiIncrement;
 	double              shapeFunc;
 	double*       	    nodeCoord;
-	double**            GNi;
+	double**            GNi = self->GNi;
 	unsigned	    nInc, *inc;
 	Dimension_Index     dim             = Mesh_GetDimSize( mesh );
 
@@ -284,9 +294,6 @@ void _ElementType_ConvertGlobalCoordToElLocal(
 	 * see http://en.wikipedia.org/wiki/Newton-Raphson_method
 	 *
 	 * */
-
-	evaluatedShapeFuncs = Memory_Alloc_Array( double, nodeCount, "evaluatedShapeFuncs" );
-	GNi = Memory_Alloc_2DArray( double, dim, nodeCount, "localShapeFuncDerivitives" );
 
 	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), element, MT_VERTEX, self->inc );
 	nInc = IArray_GetSize( self->inc );
@@ -359,9 +366,6 @@ void _ElementType_ConvertGlobalCoordToElLocal(
 		if ( maxResidual < tolerance )
 			break;
 	}
-		
-	Memory_Free( evaluatedShapeFuncs );
-	Memory_Free( GNi );
 }				
 
 
@@ -394,7 +398,7 @@ void ElementType_ShapeFunctionsGlobalDerivs(
 	rows=Mesh_GetDimSize( mesh );
 	cols=self->nodeCount;	
 	
-	GNi = Memory_Alloc_2DArray( double, rows, cols, "GNi" );
+	GNi = self->GNi;
 
 	nodesPerEl = self->nodeCount;
 
@@ -507,8 +511,6 @@ void ElementType_ShapeFunctionsGlobalDerivs(
 			GNx[dx][n] = globalSF_DerivVal;
 		}
 	}
-	
-	Memory_Free( GNi );
 }
 
 void ElementType_Jacobian_AxisIndependent( 

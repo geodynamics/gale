@@ -98,9 +98,13 @@
 		\
 		/* ElementType info */ \
 		Index								nodeCount; \
+		Index								dim; \
 		Stream*								debug;	\
 		IArray* 							inc; \
-		unsigned**							faceNodes;
+		unsigned**							faceNodes; \
+		/* below are temporary storage data structures */ \
+		double     **GNi; \
+		double     *evaluatedShapeFunc;
 
 	struct ElementType { __ElementType };
 
@@ -186,6 +190,8 @@
 	
 	/** Build the element type */
 	void ElementType_Build( void* elementType, void *data );
+
+	void _ElementType_Destroy( void* elementType, void* data );
 
 	/** Evaluate the value of the shape functions at a local coordinate.
 	Note that in Hughes FEM notation, localCoord -> Xi, and evaluatedValues -> Ni */
