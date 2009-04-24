@@ -56,9 +56,8 @@
 		/* Virtual functions go here */ \
 		\
 		/* ConstitutiveMatrixCartesian info */ \
-                int maxNumNodes;                       \
-                double** GNx;                          \
-                double* Ni;
+		double** Dtilda_B; \
+		double*  Ni;
 
 	struct ConstitutiveMatrixCartesian { __ConstitutiveMatrixCartesian };
 
