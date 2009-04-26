@@ -66,7 +66,9 @@
 		RheologyMaterial_RunRheologiesFunction*            _runRheologies;    \
 		/* Other info */ \
 		Rheology_Register*                                 rheology_Register; \
-		Compressible*                                      compressible;
+		Compressible*                                      compressible;      \
+		/* necessary for the refactored PDE scheme */ \
+		Bool						   isCompressible;
 
 	struct RheologyMaterial { __RheologyMaterial };
 
@@ -109,7 +111,8 @@
 		void*                                              rheologyMaterial,
 		Rheology**                                         rheologyList,
 		Rheology_Index                                     rheologyCount,
-		Compressible*                                      compressible );
+		Compressible*                                      compressible,
+	        Bool						   isCompressible );
 
 	/* 'Stg_Class' implementations */
 	void _RheologyMaterial_Delete( void* rheologyMaterial );

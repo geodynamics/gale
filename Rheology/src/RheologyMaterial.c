@@ -178,6 +178,7 @@ void _RheologyMaterial_Construct( void* rheologyMaterial, Stg_ComponentFactory* 
 	Rheology**                  rheologyList;
 	Rheology_Index              rheologyCount;
 	Compressible*               compressible;
+	Bool			    isCompressible;
 
 	_Material_Construct( self, cf, data );
 
@@ -199,7 +200,9 @@ void _RheologyMaterial_Construct( void* rheologyMaterial, Stg_ComponentFactory* 
 		False,
 		data ) ;
 
-	_RheologyMaterial_Init( self, rheologyList, rheologyCount, compressible );
+	isCompressible = Stg_ComponentFactory_GetBool( cf, self->name, "isCompressible", False );
+
+	_RheologyMaterial_Init( self, rheologyList, rheologyCount, compressible, isCompressible );
 
 	Memory_Free( rheologyList );
 }
@@ -209,12 +212,14 @@ void _RheologyMaterial_Init(
 		void*                                              rheologyMaterial,
 		Rheology**                                         rheologyList,
 		Rheology_Index                                     rheologyCount,
-		Compressible*                                      compressible )
+		Compressible*                                      compressible,
+	        Bool						   isCompressible )
 {
 	RheologyMaterial* self = (RheologyMaterial*)rheologyMaterial;
 	Rheology_Index    rheology_I;
 
 	self->compressible      = compressible;
+	self->isCompressible    = isCompressible;
 	self->rheology_Register = Rheology_Register_New();
 
 	/* Add rheologies */

@@ -210,7 +210,8 @@ void _MultiRheologyMaterial_Construct( void* material, Stg_ComponentFactory* cf,
 		self, 
 		NULL, 
 		0, 
-		Stg_ComponentFactory_ConstructByKey( cf, self->name, "Compressible", Compressible, False, data ) );
+		Stg_ComponentFactory_ConstructByKey( cf, self->name, "Compressible", Compressible, False, data ),
+	        Stg_ComponentFactory_GetBool( cf, self->name, "isCompressible", False ) );
 
 	multiRheologyList = Dictionary_Get( currDictionary, "MultiRheologies" );
 	assert( multiRheologyList );
@@ -225,7 +226,7 @@ void _MultiRheologyMaterial_Construct( void* material, Stg_ComponentFactory* cf,
 	for ( rheologyList_I = 0 ; rheologyList_I < rheologyListCount ; rheologyList_I++ ){
 		rheologyList = Dictionary_Entry_Value_GetElement( multiRheologyList, rheologyList_I );
 		rheologyCountList[ rheologyList_I ] = Dictionary_Entry_Value_GetCount( rheologyList );
-		rheologyListList[ rheologyList_I ] = Memory_Alloc_Array( Rheology*, rheologyCountList[ rheologyList_I ], "rheologyList" );
+	 rheologyListList[ rheologyList_I ] = Memory_Alloc_Array( Rheology*, rheologyCountList[ rheologyList_I ], "rheologyList" );
 	
 		Journal_PrintfL( stream, 2, "%s \"%s's\" rheological component '%u' has %u rheologies.\n", 
 				self->type, self->name, rheologyList_I, rheologyCountList[ rheologyList_I ] );
