@@ -250,8 +250,7 @@ def check_libraries(ctx, env, output, coms, lnks, apply_com_dep, apply_lnk_dep,
                             utils.log.unindent()
                             continue
 
-                        # Try running the program. We need to run to ensure the
-                        # dependencies don't cause conflicts.
+                        # Try running the program.
                         res, run_info = lnk_env["run_test_prog"](lnk_env, lnk_info["prog_fn"])
                         if not res:
                             utils.log.unindent()

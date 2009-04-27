@@ -43,6 +43,16 @@ class Context(object):
             m.parse_options()
             m.process_options()
 
+    def print_summary(self):
+        sys.stdout.write("\n")
+        for m in self.order:
+            if not m.enabled or m.mode == 0:
+                continue
+            if m.configs:
+                sys.stdout.write(m.configs[0].get_summary(m) + "\n")
+#             else:
+#                 sys.stdout.write("Module %s has no configuration.\n"%repr(m.name))
+
     #
     # Configuring and access to results.
     #

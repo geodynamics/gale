@@ -306,13 +306,15 @@ class PETSc(config.Package):
 #include <petscmat.h>
 #include <petscksp.h>
 int main( int argc, char** argv ) {
+  MPI_Comm comm;
   Vec vec;
   Mat mat;
   KSP ksp;
   PetscInitialize( &argc, &argv, PETSC_NULL, PETSC_NULL );
-  VecCreate( PETSC_COMM_WORLD, &vec );
-  MatCreate( PETSC_COMM_WORLD, &mat );
-  KSPCreate( PETSC_COMM_WORLD, &ksp );
+  MPI_Comm_dup(MPI_COMM_WORLD, &comm);
+  VecCreate( comm, &vec );
+  MatCreate( comm, &mat );
+  KSPCreate( comm, &ksp );
   KSPDestroy( ksp );
   MatDestroy( mat );
   VecDestroy( vec );

@@ -23,6 +23,7 @@ class BlasLapack(config.Package):
         self.add_library_set([], ["f2clapack", "f2cblas"])
         self.add_library_set([], ["mkl_lapack", "mkl"])
         self.add_library_set([], ["guide", "mkl_lapack", "mkl"])
+        self.add_library_set([], ["scs"])
         self.add_auxilliary_libs(["c", "f77"], ["m"])
         self.add_auxilliary_libs(["c", "f77"], ["gfortran", "m"])
         self.add_auxilliary_libs(["c", "f77"], ["pthread", "m"])

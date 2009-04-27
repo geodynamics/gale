@@ -448,6 +448,13 @@ class Package(Module):
         env.append_unique("lib_paths", *cfg["lib_paths"])
         env.append_unique(cfg["lnk"][lnk])
 
+    def get_summary_items(self, cfg):
+        itms = []
+        for k in ["base_dir", "inc_dirs", "lib_dirs", "incs", "lib_paths"]:
+            if k in cfg:
+                itms.append((k, cfg[k]))
+        return itms
+
     def visit(self, cfg, visitor):
         visitor.package(self, cfg)
 

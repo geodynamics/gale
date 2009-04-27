@@ -182,6 +182,13 @@ class Tool(Module):
             if not os.path.exists(p): return True
         return False
 
+    def get_summary_items(self, cfg):
+        itms = []
+        for k in ["command"]:
+            if k in cfg:
+                itms.append((k, cfg[k]))
+        return itms
+
     def setup_options(self):
         Module.setup_options(self)
         self.options.add_option(

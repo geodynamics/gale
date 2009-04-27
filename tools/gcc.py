@@ -45,24 +45,6 @@ class gcc(CCompiler, Linker):
         src_empty = self.source_empty[lang]
         src_lib = self.source_lib[lang]
 
-        # 32bit flag
-        src_fn = self.ctx.make_temp_file(src_empty, ext=cfg["exts"][lang])
-        out_fn = utils.path.replext(src_fn, ".o")
-        opts = Option("32bit", "-m32", type="bool")
-        if not self.test_option(cfg, opts, products=out_fn,
-                                args=[("compile", True), ("output", out_fn), ("32bit", True),
-                                      src_fn]):
-            return False
-
-        # 64bit flag
-        src_fn = self.ctx.make_temp_file(src_empty, ext=cfg["exts"][lang])
-        out_fn = utils.path.replext(src_fn, ".o")
-        opts = Option("64bit", "-m64", type="bool")
-        if not self.test_option(cfg, opts, products=out_fn,
-                                args=[("compile", True), ("output", out_fn), ("64bit", True),
-                                      src_fn]):
-            return False
-
         # position independant code
         src_fn = self.ctx.make_temp_file(src_lib, ext=cfg["exts"][lang])
         out_fn = utils.path.replext(src_fn, ".o")
@@ -84,6 +66,24 @@ class gcc(CCompiler, Linker):
         if not self.test_option(cfg, opts, err_okay=True,
                                 args=[("dump_cmds", True), cfg["_simple_obj"]]):
             return False
+
+        # 32bit flag
+        src_fn = self.ctx.make_temp_file(src_empty, ext=cfg["exts"][lang])
+        out_fn = utils.path.replext(src_fn, ".o")
+        opts = [Option("32bit", "-m32", type="bool"),
+                Option("32bit", "-m32-bit", type="bool")]
+        self.test_option(cfg, opts, products=out_fn,
+                         args=[("compile", True), ("output", out_fn), ("32bit", True),
+                               src_fn])
+
+        # 64bit flag
+        src_fn = self.ctx.make_temp_file(src_empty, ext=cfg["exts"][lang])
+        out_fn = utils.path.replext(src_fn, ".o")
+        opts = [Option("64bit", "-m64", type="bool"),
+                Option("64bit", "-m64-bit", type="bool")]
+        self.test_option(cfg, opts, products=out_fn,
+                         args=[("compile", True), ("output", out_fn), ("64bit", True),
+                               src_fn])
 
         # flat namespace.
         out_fn = self.ctx.make_temp_file()

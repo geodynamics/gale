@@ -334,6 +334,9 @@ class Module(object):
                 return True
         return False
 
+    def get_summary_items(self, cfg):
+        return []
+
     #
     # Help and options.
     #

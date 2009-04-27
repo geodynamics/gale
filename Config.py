@@ -93,6 +93,13 @@ class Config(Environment):
                 return False
         return True
 
+    def get_summary(self, mod):
+        itms = mod.get_summary_items(self)
+        s = "%s:\n"%mod.name
+        for k, v in itms:
+            s += "  %s = %s\n"%(str(k), repr(v))
+        return s
+
     def print_summary(self):
         pass
 
