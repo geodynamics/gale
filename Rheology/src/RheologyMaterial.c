@@ -167,7 +167,7 @@ RheologyMaterial* _RheologyMaterial_New(
 	self->_runRheologies = _runRheologies;
 	
 	/* Now call the member-assigner, Init() */
-	_RheologyMaterial_Init( self, rheologyList, rheologyCount, compressible );
+	_RheologyMaterial_Init( self, rheologyList, rheologyCount, compressible, False );
 
 	return self;
 }
