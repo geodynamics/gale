@@ -43,6 +43,8 @@ void myConvertGlobalCoordToElLocal( double *tmpMax, double *tmpMin, double *want
 Bool OutputForSPModel_Recursive( FeMesh* mesh, double* wantCoord, unsigned *minIJK, unsigned *maxIJK, unsigned* set, int axis ) {
 	unsigned IJK[3];
 	double maxX, halfX;
+
+	/* finish condition */
 	if ( (maxIJK[axis] - minIJK[axis]) == 1 ) {
 		set[0] = minIJK[axis];
 		set[1] = maxIJK[axis];
@@ -85,7 +87,7 @@ int Underworld_OutputForSPModel_InterpolateHeightInXZ( FeMesh* mesh, double* wan
 	Mesh_GetGlobalCoordRange( mesh, tmpGMin, tmpGMax );
 	if( !Num_InRange( wantCoord[0], tmpMin[0], tmpMax[0] ) || !Num_InRange( wantCoord[2], tmpMin[2], tmpMax[2] ) ) {
 		printf("Error ... the coord (x,z) = (%g, %g), is not a local coord!!!\n", wantCoord[0], wantCoord[2] );
-		exit(EXIT_FAILURE);
+		assert(0);
 	}
 
 	vertGrid = *(Grid**)ExtensionManager_Get( mesh->info, mesh,
@@ -166,7 +168,7 @@ int Underworld_OutputForSPModel_InterpolateHeightInXZ( FeMesh* mesh, double* wan
 
 void Underworld_OutputForSPModelDo( UnderworldContext* context ) {
 	FeMesh* mesh = context->velocityField->feMesh;
-	double wantCoord[3];
+	double wantCoord[3], minInputCrd[2], maxInputCrd[2], uw_Coord[3], Trans[3][3];
 	double originalHeight, bc;
 	int coordCount, line_I = 0;
 	char buffer[512];
@@ -202,12 +204,52 @@ void Underworld_OutputForSPModelDo( UnderworldContext* context ) {
 		printf("ERROR in %s: couldn't open file %s\n", __func__, iFileName );
 		exit(0);
 	}
-	while( fgets( buffer, 512, iFile ) != NULL ) { line_I++; }
+
+	maxInputCrd[0] = maxInputCrd[1] = 0;
+	minInputCrd[0] = minInputCrd[1] = 0;
+
+	while( fgets( buffer, 512, iFile ) != NULL ) { 
+		line_I++; 
+		/* test for the max and min coord in x and z */
+		sscanf( buffer, "%lf %lf", &wantCoord[0], &wantCoord[2] );
+		if( wantCoord[0] > maxInputCrd[0] ) maxInputCrd[0] = wantCoord[0];
+		else if (wantCoord[0] < minInputCrd[0] ) minInputCrd[0] = wantCoord[0];
+
+		if( wantCoord[2] > maxInputCrd[1] ) maxInputCrd[1] = wantCoord[2];
+		else if (wantCoord[2] < minInputCrd[1] ) minInputCrd[1] = wantCoord[2];
+	}
 	/* allocate the right amount of memory for the coords */
 	coordCount = line_I;
 
-	/* close and re-open the file */
+	/* close the input file */
 	fclose( iFile );
+
+
+	/* setup affine transformation.
+	 * |x'|   | A 0 xt | |x|
+	 * |z'| = | 0 B yt | |z|
+	 * |1 |   | 0 0 1  | |1|
+	 *
+	 * where:
+	 *  x' and z' are the uw_Coord
+	 *  x and z are the spmodel coords
+	 *  xt and yt and the scaled offsets in each axis
+	 */
+
+	/* setup coord transform matrix */
+	Trans[0][0] = Trans[0][1] = Trans[0][2] = 0;
+	Trans[1][0] = Trans[1][1] = Trans[1][2] = 0;
+	Trans[2][0] = Trans[2][1] = Trans[2][2] = 0;
+
+	/* setup scaling transformation */
+	Trans[0][0] = (mesh->maxGlobalCrd[0]-mesh->minGlobalCrd[0]) / (maxInputCrd[0] - minInputCrd[0]);
+	Trans[1][1] = (mesh->maxGlobalCrd[2]-mesh->minGlobalCrd[2]) / (maxInputCrd[1] - minInputCrd[1]);
+
+	/* setup translation transformation */
+	Trans[0][2] = mesh->minGlobalCrd[0]- (Trans[0][0]*minInputCrd[0]);
+	Trans[1][2] = mesh->minGlobalCrd[2]- (Trans[1][1]*minInputCrd[1]);
+
+	/* re-open the input file */
 	if( (iFile=fopen(iFileName, "r" )) == NULL ) {
 			printf("ERROR in %s: couldn't open file %s\n", __func__, iFileName );
 			exit(0);
@@ -227,12 +269,17 @@ void Underworld_OutputForSPModelDo( UnderworldContext* context ) {
 		 * x = wantCoord[0]
 		 * z = wantCoord[2]
 		 * and the interpolated y will be evaluate in wantCoord[1] */
-		if (Underworld_OutputForSPModel_InterpolateHeightInXZ( mesh, wantCoord ) == 0 ) {
+
+		/* do an transformation here, into the Underworld coords */
+		uw_Coord[0] = Trans[0][0]*wantCoord[0] + Trans[0][1]*wantCoord[2] + Trans[0][2]*1;
+		uw_Coord[2] = Trans[1][0]*wantCoord[0] + Trans[1][1]*wantCoord[2] + Trans[1][2]*1;
+
+		if (Underworld_OutputForSPModel_InterpolateHeightInXZ( mesh, uw_Coord ) == 0 ) {
 			/* report error */
 			printf("\n\nError with the %d-th coord = (%g, %g, %g)\n\n", line_I, wantCoord[0], wantCoord[1], wantCoord[2] );
 		}
 		/* output is in format (x,y,z). Where y is the interpolated coord */
-		fprintf( oFile, "%lf %lf %lf %lf\n", wantCoord[0], wantCoord[1], wantCoord[2], bc );
+		fprintf( oFile, "%lf %lf %lf %lf\n", wantCoord[0], uw_Coord[1], wantCoord[2], bc );
 	}
 
 	printf("*******************************\n");
@@ -266,8 +313,9 @@ void* _Underworld_OutputForSPModel_DefaultNew( Name name ) {
 
 void _Underworld_OutputForSPModel_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext* context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data );
-	//ContextEP_Append( context, AbstractContext_EP_FrequentOutput, Underworld_OutputForSPModelDo );
+
 	outputTimestep = Dictionary_GetUnsignedInt_WithDefault( context->dictionary, "OutputForSPModel_OutputTimestep", 10 );
+
 	ContextEP_Append( context, AbstractContext_EP_Dump, Underworld_OutputForSPModelDo );
 }
 
