@@ -9,7 +9,7 @@ env = env.Clone()
 # Inside each project we will be accessing headers without the
 # project name as a prefix, so we need to let SCons know how to
 # find those headers.
-env.Append(CPPPATH='#' + env['build_dir'] + '/include/StgDomain')
+env.Append(CPPPATH=env['build_dir'] + '/include/StgDomain')
 
 # Keep a list of all the objects we build so we can make a library
 # afterwards.
@@ -26,7 +26,7 @@ for d in dirs:
 
     # Setup where to look for files.
     src_dir = d + '/src'
-    inc_dir = '#' + env['build_dir'] + '/include/StgDomain/' + d
+    inc_dir = 'include/StgDomain/' + d
     tst_dir = d + '/tests'
 
     # Install the headers and '.def' files.
@@ -50,17 +50,17 @@ for d in dirs:
     suites += env.Object(Glob(tst_dir + '/*Suite.c'))
 
 # Need to install headers from libStgDomain.
-env.Install('#' + env['build_dir'] + '/include/StgDomain', Glob('libStgDomain/src/*.h'))
+env.Install('include/StgDomain', Glob('libStgDomain/src/*.h'))
 
 # Build libraries.
 if env['shared_libraries']:
-    env.SharedLibrary('#' + env['build_dir'] + '/lib/StgDomain', objs)
+    env.SharedLibrary('lib/StgDomain', objs)
 
 # Need to include the StgDomain library for binaries.
 libs = ['StgDomain'] + env.get('LIBS', [])
 
 # Test runner program.
-env.PCUTest('#' + env['build_dir'] + '/tests/testStgDomain', suites,
+env.PCUTest('tests/testStgDomain', suites,
             PCU_SETUP="StGermain_Init(&argc, &argv);StgDomain_Init(&argc, &argv);",
             PCU_TEARDOWN="StgDomain_Finalise();StGermain_Finalise();",
             LIBS=libs)
@@ -82,7 +82,7 @@ for d in dirs:
         lib_pre = env['LIBPREFIXES']
         if not isinstance(lib_pre, list):
             lib_pre = [lib_pre]
-        env.SharedLibrary('#' + env['build_dir'] + '/lib/' + name, objs,
+        env.SharedLibrary('lib/' + name, objs,
                           SHLIBPREFIX='',
                           LIBPREFIXES=lib_pre + [''],
                           LIBS=libs)
