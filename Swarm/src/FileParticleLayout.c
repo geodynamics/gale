@@ -216,10 +216,13 @@ void _FileParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm ) 
    
 #ifdef READ_HDF5
    hid_t                file, fileData, fileSpace;
+   hid_t                group_id, attrib_id;
    hsize_t              size[2];
    char                 dataSpaceName[1024];
    SwarmVariable*       swarmVar;
    Index                ii;
+   int                  nParticles;
+   herr_t               status;
 #else
    MPI_File             mpiFile;
    int                  openResult;
@@ -252,26 +255,41 @@ void _FileParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm ) 
               self->name,
               filenameTemp );
       
-      /* Open a dataspace */
-      swarmVar = SwarmVariable_Register_GetByIndex( swarm->swarmVariable_Register, 0 );
-      sprintf( dataSpaceName, "/%s", swarmVar->name );
-      
+      /* get the file attributes to determine if this file contains particles */
       #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
-      fileData = H5Dopen( file, dataSpaceName );
+         group_id  = H5Gopen(file, "/");
+         attrib_id = H5Aopen_name(group_id, "Swarm Particle Count");
       #else
-      fileData = H5Dopen( file, dataSpaceName, H5P_DEFAULT );
+         group_id  = H5Gopen(file, "/", H5P_DEFAULT);
+         attrib_id = H5Aopen(group_id, "Swarm Particle Count", H5P_DEFAULT);
       #endif
-      fileSpace = H5Dget_space( fileData );
+      status = H5Aread(attrib_id, H5T_NATIVE_INT, &nParticles);
       
-      /* Get the dimensions of the open dataspace */
-      H5Sget_simple_extent_dims( fileSpace, size, NULL );
-      
-      self->totalInitialParticles += size[0];
+      /* The following conditional should be deprecated after a sufficient grace period to allow backwards
+         compatibility with previous implementations of checkpointing  JohnMansour 28042009 */
+      if(status < 0){
+         /* Open a dataspace */
+         swarmVar = SwarmVariable_Register_GetByIndex( swarm->swarmVariable_Register, 0 );
+         sprintf( dataSpaceName, "/%s", swarmVar->name );
+         
+         #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+         fileData = H5Dopen( file, dataSpaceName );
+         #else
+         fileData = H5Dopen( file, dataSpaceName, H5P_DEFAULT );
+         #endif
+         fileSpace = H5Dget_space( fileData );
+         
+         /* Get the dimensions of the open dataspace */
+         H5Sget_simple_extent_dims( fileSpace, size, NULL );
+         H5Sclose( fileSpace );
+         H5Dclose( fileData );
+
+         nParticles = size[0];
+      }
+      self->totalInitialParticles += nParticles;
       self->lastParticleIndex[ii-1] = self->totalInitialParticles;
       
       /* Close the dataspace and file */
-      H5Sclose( fileSpace );
-      H5Dclose( fileData );
       H5Fclose( file );
    }
 #else
@@ -331,16 +349,25 @@ void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm
    
 #ifdef READ_HDF5
    SwarmVariable*         swarmVar;
-   Index                  swarmVar_I, dof_I;
+   Index                  swarmVar_I;
    char                   dataSpaceName[1024];
    hid_t                  file[swarm->checkpointnfiles];
-   Index                  ii;
+   Index                  ii, jj, kk;
+   hid_t                  group_id, attrib_id;
+   int                    nParticles;
+   herr_t                 status;
      
    /* Allocate space to store arrays of dataspaces */   
    assert( swarm->swarmVariable_Register );  
    self->fileData  = Memory_Alloc_2DArray( hid_t, swarm->swarmVariable_Register->objects->count, swarm->checkpointnfiles, "fileData" );
    self->fileSpace = Memory_Alloc_2DArray( hid_t, swarm->swarmVariable_Register->objects->count, swarm->checkpointnfiles, "fileSpace" );
-    
+   /* set these spaces to null initially */
+   for( jj = 0 ; jj < swarm->swarmVariable_Register->objects->count ; jj++)
+      for( kk = 0 ; kk < swarm->checkpointnfiles ; kk++){
+         self->fileData [jj][kk] = NULL;
+         self->fileSpace[jj][kk] = NULL;
+      }
+      
    /* Open the files */
    for( ii = 1 ; ii <= swarm->checkpointnfiles ; ii++ ){
       char  filenameTemp[4096];
@@ -360,25 +387,37 @@ void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm
             self->name, 
             self->filename );
 
-      /* Open a dataspace for each swarmVariable */
-      for( swarmVar_I = 0; swarmVar_I < swarm->swarmVariable_Register->objects->count; swarmVar_I++ ) {
-         swarmVar = SwarmVariable_Register_GetByIndex( swarm->swarmVariable_Register, swarmVar_I );
-         /* only retrieve variable if it does not have a parent, as these
-            are not stored, and the data is retrieved when the parent is. 
-	    Also do make sure variable is of type SwarmVariable (as opposed 
-	    to materialSwarmVariable, which is not checkpointed). */
-         if((0 == strcmp(swarmVar->type, "SwarmVariable")) && !swarmVar->variable->parent ) {
-            
-            sprintf( dataSpaceName, "/%s", swarmVar->name );
-            
-            #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
-               self->fileData[swarmVar_I][ii-1]  = H5Dopen( file[ii-1], dataSpaceName );
-            #else
-               self->fileData[swarmVar_I][ii-1]  = H5Dopen( file[ii-1], dataSpaceName, H5P_DEFAULT );
-            #endif
-               self->fileSpace[swarmVar_I][ii-1] = H5Dget_space( self->fileData[swarmVar_I][ii-1] );
-            
-            Variable_Update( swarmVar->variable );
+      /* get the file attributes to determine if this file contains particles */
+      #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+         group_id  = H5Gopen(file[ii-1], "/");
+         attrib_id = H5Aopen_name(group_id, "Swarm Particle Count");
+      #else
+         group_id  = H5Gopen(file[ii-1], "/", H5P_DEFAULT);
+         attrib_id = H5Aopen(group_id, "Swarm Particle Count", H5P_DEFAULT);
+      #endif
+      status = H5Aread(attrib_id, H5T_NATIVE_INT, &nParticles);
+
+      if(nParticles > 0){
+         /* Open a dataspace for each swarmVariable */
+         for( swarmVar_I = 0; swarmVar_I < swarm->swarmVariable_Register->objects->count; swarmVar_I++ ) {
+            swarmVar = SwarmVariable_Register_GetByIndex( swarm->swarmVariable_Register, swarmVar_I );
+            /* only retrieve variable if it does not have a parent, as these
+               are not stored, and the data is retrieved when the parent is. 
+          Also do make sure variable is of type SwarmVariable (as opposed 
+          to materialSwarmVariable, which is not checkpointed). */
+            if((0 == strcmp(swarmVar->type, "SwarmVariable")) && !swarmVar->variable->parent ) {
+               
+               sprintf( dataSpaceName, "/%s", swarmVar->name );
+               
+               #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+                  self->fileData[swarmVar_I][ii-1]  = H5Dopen( file[ii-1], dataSpaceName );
+               #else
+                  self->fileData[swarmVar_I][ii-1]  = H5Dopen( file[ii-1], dataSpaceName, H5P_DEFAULT );
+               #endif
+                  self->fileSpace[swarmVar_I][ii-1] = H5Dget_space( self->fileData[swarmVar_I][ii-1] );
+               
+               Variable_Update( swarmVar->variable );
+            }
          }
       }
    }
@@ -393,8 +432,8 @@ void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm
       for( swarmVar_I = 0; swarmVar_I < swarm->swarmVariable_Register->objects->count; swarmVar_I++ ) {
          swarmVar = SwarmVariable_Register_GetByIndex( swarm->swarmVariable_Register, swarmVar_I );
          if( !swarmVar->variable->parent ) {
-            H5Sclose( self->fileSpace[swarmVar_I][ii-1] );
-            H5Dclose( self->fileData[swarmVar_I][ii-1] );
+            if ( self->fileSpace[swarmVar_I][ii-1] ) H5Sclose( self->fileSpace[swarmVar_I][ii-1] );
+            if ( self->fileData [swarmVar_I][ii-1] ) H5Dclose( self->fileData [swarmVar_I][ii-1] );
          }
       }
       H5Fclose( file[ii-1] );

@@ -272,25 +272,27 @@ void _SwarmDump_Execute( void* swarmDump, void* data ) {
                         }
                 }       
 
-                for ( rank_I = 0; rank_I < swarm->nProc; rank_I++ ) {
-                        if ( swarm->myRank == rank_I ) {
-                                Journal_DPrintf( info, "Proc %d: for swarm \"%s\", dumping its %u particles of size %u bytes "
-                                        "each (= %g bytes total) to file %s\n", swarm->myRank, swarm->name, particleLocalCount,
-                                        particleSize, (float)(particleLocalCount * particleSize), filename );
-                        }       
-                        MPI_Barrier( swarm->comm );
-                }
+                #ifdef DEBUG
+                   for ( rank_I = 0; rank_I < swarm->nProc; rank_I++ ) {
+                           if ( swarm->myRank == rank_I ) {
+                                   Journal_DPrintf( info, "Proc %d: for swarm \"%s\", dumping its %u particles of size %u bytes "
+                                           "each (= %g bytes total) to file %s\n", swarm->myRank, swarm->name, particleLocalCount,
+                                           particleSize, (float)(particleLocalCount * particleSize), filename );
+                           }       
+                           MPI_Barrier( swarm->comm );
+                   }
+                #endif
 
-#ifdef WRITE_HDF5
-                if(swarm->nProc == 1)
-                        Stg_asprintf( &filename, "%s.h5", filename );
-                else
-                        Stg_asprintf( &filename, "%s.%dof%d.h5", filename, (swarm->myRank + 1), swarm->nProc );
-                SwarmDump_DumpToHDF5( self, swarm, filename );
-#else
-                Stg_asprintf( &filename, "%s.dat", filename );
-                BinaryStream_WriteAllProcessors( filename, swarm->particles, particleSize, (SizeT) particleLocalCount, swarm->comm );
-#endif
+                #ifdef WRITE_HDF5
+                   if(swarm->nProc == 1)
+                           Stg_asprintf( &filename, "%s.h5", filename );
+                   else
+                           Stg_asprintf( &filename, "%s.%dof%d.h5", filename, (swarm->myRank + 1), swarm->nProc );
+                   SwarmDump_DumpToHDF5( self, swarm, filename );
+                #else
+                   Stg_asprintf( &filename, "%s.dat", filename );
+                   BinaryStream_WriteAllProcessors( filename, swarm->particles, particleSize, (SizeT) particleLocalCount, swarm->comm );
+                #endif
                 Memory_Free( filename );
                                 
 
@@ -314,18 +316,17 @@ void SwarmDump_DumpToHDF5( SwarmDump* self, Swarm* swarm, const char* filename )
    hid_t                   file, fileSpace, fileData;
    hid_t                   memSpace;
    hid_t                   props;
+   hid_t                   attribData_id, attrib_id, group_id;
    herr_t                  status;
    hsize_t                 size[2];
    hsize_t                 cdims[2];
-   int                     intSize;
-   int                     rank, nRanks;
+   hsize_t                 a_dims;
+   int                     attribData;
    hsize_t                 count[2];
    Particle_Index          lParticle_I = 0;
-   Particle_Index          particleGlobalCount;
    Stream*                 errorStr = Journal_Register( Error_Type, self->type );
    SwarmVariable*          swarmVar;
-   Index                   swarmVar_I, dof_I;
-   unsigned                maxDofs = 0;
+   Index                   swarmVar_I;
    char                    dataSpaceName[1024];
                 
    /* Open the HDF5 output file. */
@@ -339,133 +340,150 @@ void SwarmDump_DumpToHDF5( SwarmDump* self, Swarm* swarm, const char* filename )
                 self->name, 
                 filename );
 
-   /* Loop through the swarmVariable_Register */
-   for( swarmVar_I = 0; swarmVar_I < swarm->swarmVariable_Register->objects->count; swarmVar_I++ ) {
-      swarmVar = SwarmVariable_Register_GetByIndex( swarm->swarmVariable_Register, swarmVar_I );
+   /* create file attribute to indicate whether file is empty, as HDF5 does not allow empty datasets */
+   attribData = swarm->particleLocalCount;
+   a_dims = 1;
+   attribData_id = H5Screate_simple(1, &a_dims, NULL);
+   #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+      group_id  = H5Gopen(file, "/");
+      attrib_id = H5Acreate(group_id, "Swarm Particle Count", H5T_STD_I32BE, attribData_id, H5P_DEFAULT);
+   #else
+      group_id  = H5Gopen(file, "/", H5P_DEFAULT);
+      attrib_id = H5Acreate(group_id, "Swarm Particle Count", H5T_STD_I32BE, attribData_id, H5P_DEFAULT, H5P_DEFAULT);
+   #endif
+   H5Awrite(attrib_id, H5T_NATIVE_INT, &attribData);
+   H5Aclose(attrib_id);
+   H5Gclose(group_id);
+   H5Sclose(attribData_id);
 
-      /* check that the swarmVariable is of type SwarmVariable, and not alternate such as 
-         MaterialSwarmVariable which shouldn't be stored. 
-         Also, if the variable has a parent, do not store, as 
-         data will be stored when parent is stored.*/
-      if((0 == strcmp(swarmVar->type, "SwarmVariable")) && !swarmVar->variable->parent ) {
-         
-         /* Create our file space. */
-         size[0]  = swarm->particleLocalCount;
-         size[1]  = swarmVar->dofCount;   
-         fileSpace = H5Screate_simple( 2, size, NULL );
-         
-         /* Create our memory space. */
-         count[0] = swarm->particleLocalCount;
-         count[1] = swarmVar->dofCount;
-         memSpace = H5Screate_simple( 2, count, NULL );
-         H5Sselect_all( memSpace );
-        
-         /* set data chunking size.  as we are not opening and closing
-            dataset frequently, a large chunk size (the largest!) seems
-            appropriate, and gives good compression */
-         cdims[0] = swarm->particleLocalCount;
-         cdims[1] = swarmVar->dofCount;
-         
-         props  = H5Pcreate( H5P_DATASET_CREATE );
-         /* turn on hdf chunking.. as it is required for compression */
-         //status = H5Pset_chunk(props, 2, cdims);
-         /* turn on compression */
-         //status = H5Pset_deflate( props, 6);
-         /* turn on data checksum */ 
-         //status = H5Pset_fletcher32(props);
-
-         /* Create a new dataspace */
-         sprintf( dataSpaceName, "/%s", swarmVar->name );
-         if( swarmVar->variable->dataTypes[0] == Variable_DataType_Int ) {
-            /* Allocate space for the values to be written to file */
-            int** value = Memory_Alloc_2DArray( int, swarm->particleLocalCount, swarmVar->dofCount, "swarmVariableValue" );
+   if(swarm->particleLocalCount > 0){
+      /* Loop through the swarmVariable_Register */
+      for( swarmVar_I = 0; swarmVar_I < swarm->swarmVariable_Register->objects->count; swarmVar_I++ ) {
+         swarmVar = SwarmVariable_Register_GetByIndex( swarm->swarmVariable_Register, swarmVar_I );
+   
+         /* check that the swarmVariable is of type SwarmVariable, and not alternate such as 
+            MaterialSwarmVariable which shouldn't be stored. 
+            Also, if the variable has a parent, do not store, as 
+            data will be stored when parent is stored.*/
+         if((0 == strcmp(swarmVar->type, "SwarmVariable")) && !swarmVar->variable->parent ) {
             
-            #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
-            fileData = H5Dcreate( file, dataSpaceName, H5T_NATIVE_INT, fileSpace, props );
-            #else
-            fileData = H5Dcreate( file, dataSpaceName, H5T_NATIVE_INT, fileSpace,
-                                   H5P_DEFAULT, props, H5P_DEFAULT );
-            #endif
+            /* Create our file space. */
+            size[0]  = swarm->particleLocalCount;
+            size[1]  = swarmVar->dofCount;   
+            fileSpace = H5Screate_simple( 2, size, NULL );
             
-            /* Loop through local particles */      
-            for( lParticle_I=0; lParticle_I < swarm->particleLocalCount; lParticle_I++ ) {
-               /* Write the value of the current swarmVariable at the current particle to the temp array */
-               Variable_GetValue( swarmVar->variable, lParticle_I, value[lParticle_I] );
+            /* Create our memory space. */
+            count[0] = swarm->particleLocalCount;
+            count[1] = swarmVar->dofCount;
+            memSpace = H5Screate_simple( 2, count, NULL );
+            H5Sselect_all( memSpace );
+           
+            /* set data chunking size.  as we are not opening and closing
+               dataset frequently, a large chunk size (the largest!) seems
+               appropriate, and gives good compression */
+            cdims[0] = swarm->particleLocalCount;
+            cdims[1] = swarmVar->dofCount;
+            
+            props  = H5Pcreate( H5P_DATASET_CREATE );
+            /* turn on hdf chunking.. as it is required for compression */
+            //status = H5Pset_chunk(props, 2, cdims);
+            /* turn on compression */
+            //status = H5Pset_deflate( props, 6);
+            /* turn on data checksum */ 
+            //status = H5Pset_fletcher32(props);
+   
+            /* Create a new dataspace */
+            sprintf( dataSpaceName, "/%s", swarmVar->name );
+            if( swarmVar->variable->dataTypes[0] == Variable_DataType_Int ) {
+               /* Allocate space for the values to be written to file */
+               int** value = Memory_Alloc_2DArray( int, swarm->particleLocalCount, swarmVar->dofCount, "swarmVariableValue" );
+               
+               #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+               fileData = H5Dcreate( file, dataSpaceName, H5T_NATIVE_INT, fileSpace, props );
+               #else
+               fileData = H5Dcreate( file, dataSpaceName, H5T_NATIVE_INT, fileSpace,
+                                      H5P_DEFAULT, props, H5P_DEFAULT );
+               #endif
+               
+               /* Loop through local particles */      
+               for( lParticle_I=0; lParticle_I < swarm->particleLocalCount; lParticle_I++ ) {
+                  /* Write the value of the current swarmVariable at the current particle to the temp array */
+                  Variable_GetValue( swarmVar->variable, lParticle_I, value[lParticle_I] );
+               }
+               /* Write array to dataspace */
+               H5Dwrite( fileData, H5T_NATIVE_INT, memSpace, fileSpace, H5P_DEFAULT, *value );
+               Memory_Free( value );
             }
-            /* Write array to dataspace */
-            H5Dwrite( fileData, H5T_NATIVE_INT, memSpace, fileSpace, H5P_DEFAULT, *value );
-            Memory_Free( value );
-         }
-         else if( swarmVar->variable->dataTypes[0] == Variable_DataType_Char) {
-            char** value;
-            /* Allocate space for the values to be written to file */
-            value = Memory_Alloc_2DArray( char, swarm->particleLocalCount, swarmVar->dofCount, "swarmVariableValue" );
-            
-            #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
-            fileData = H5Dcreate( file, dataSpaceName, H5T_NATIVE_CHAR, fileSpace, props );
-            #else
-            fileData = H5Dcreate( file, dataSpaceName, H5T_NATIVE_CHAR, fileSpace,
-                                   H5P_DEFAULT, props, H5P_DEFAULT );
-            #endif
-            
-            /* Loop through local particles */      
-            for( lParticle_I=0; lParticle_I < swarm->particleLocalCount; lParticle_I++ ) {
-               /* Write the value of the current swarmVariable at the current particle to the temp array */
-               Variable_GetValue( swarmVar->variable, lParticle_I, value[lParticle_I] );
+            else if( swarmVar->variable->dataTypes[0] == Variable_DataType_Char) {
+               char** value;
+               /* Allocate space for the values to be written to file */
+               value = Memory_Alloc_2DArray( char, swarm->particleLocalCount, swarmVar->dofCount, "swarmVariableValue" );
+               
+               #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+               fileData = H5Dcreate( file, dataSpaceName, H5T_NATIVE_CHAR, fileSpace, props );
+               #else
+               fileData = H5Dcreate( file, dataSpaceName, H5T_NATIVE_CHAR, fileSpace,
+                                      H5P_DEFAULT, props, H5P_DEFAULT );
+               #endif
+               
+               /* Loop through local particles */      
+               for( lParticle_I=0; lParticle_I < swarm->particleLocalCount; lParticle_I++ ) {
+                  /* Write the value of the current swarmVariable at the current particle to the temp array */
+                  Variable_GetValue( swarmVar->variable, lParticle_I, value[lParticle_I] );
+               }
+               /* Write array to dataspace */
+               H5Dwrite( fileData, H5T_NATIVE_CHAR, memSpace, fileSpace, H5P_DEFAULT, *value );
+               Memory_Free( value );
             }
-            /* Write array to dataspace */
-            H5Dwrite( fileData, H5T_NATIVE_CHAR, memSpace, fileSpace, H5P_DEFAULT, *value );
-            Memory_Free( value );
-         }
-         else if( swarmVar->variable->dataTypes[0] == Variable_DataType_Float ) {
-            float** value;
-            /* Allocate space for the values to be written to file */
-            value = Memory_Alloc_2DArray( float, swarm->particleLocalCount, swarmVar->dofCount, "swarmVariableValue" );
-            
-            #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
-            fileData = H5Dcreate( file, dataSpaceName, H5T_NATIVE_FLOAT, fileSpace, props );
-            #else
-            fileData = H5Dcreate( file, dataSpaceName, H5T_NATIVE_FLOAT, fileSpace,
-                                   H5P_DEFAULT, props, H5P_DEFAULT );
-            #endif
-            
-            /* Loop through local particles */      
-            for( lParticle_I=0; lParticle_I < swarm->particleLocalCount; lParticle_I++ ) {       
-               /* Write the value of the current swarmVariable at the current particle to the temp array */
-               Variable_GetValue( swarmVar->variable, lParticle_I, value[lParticle_I] );
+            else if( swarmVar->variable->dataTypes[0] == Variable_DataType_Float ) {
+               float** value;
+               /* Allocate space for the values to be written to file */
+               value = Memory_Alloc_2DArray( float, swarm->particleLocalCount, swarmVar->dofCount, "swarmVariableValue" );
+               
+               #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+               fileData = H5Dcreate( file, dataSpaceName, H5T_NATIVE_FLOAT, fileSpace, props );
+               #else
+               fileData = H5Dcreate( file, dataSpaceName, H5T_NATIVE_FLOAT, fileSpace,
+                                      H5P_DEFAULT, props, H5P_DEFAULT );
+               #endif
+               
+               /* Loop through local particles */      
+               for( lParticle_I=0; lParticle_I < swarm->particleLocalCount; lParticle_I++ ) {       
+                  /* Write the value of the current swarmVariable at the current particle to the temp array */
+                  Variable_GetValue( swarmVar->variable, lParticle_I, value[lParticle_I] );
+               }
+               /* Write array to dataspace */
+               H5Dwrite( fileData, H5T_NATIVE_FLOAT, memSpace, fileSpace, H5P_DEFAULT, *value );
+               Memory_Free( value );
             }
-            /* Write array to dataspace */
-            H5Dwrite( fileData, H5T_NATIVE_FLOAT, memSpace, fileSpace, H5P_DEFAULT, *value );
-            Memory_Free( value );
-         }
-         else {
-            double** value;
-            /* Allocate space for the values to be written to file */
-            value = Memory_Alloc_2DArray( double, swarm->particleLocalCount, swarmVar->dofCount, "swarmVariableValue" );
-            
-            #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
-            fileData = H5Dcreate( file, dataSpaceName, H5T_NATIVE_DOUBLE, fileSpace, props );
-            #else
-            fileData = H5Dcreate( file, dataSpaceName, H5T_NATIVE_DOUBLE, fileSpace,
-                                   H5P_DEFAULT, props, H5P_DEFAULT );
-            #endif          
-            
-            /* Loop through local particles */      
-            for( lParticle_I=0; lParticle_I < swarm->particleLocalCount; lParticle_I++ ) {
-               /* Write the value of the current swarmVariable at the current particle to the temp array */
-               Variable_GetValue( swarmVar->variable, lParticle_I, value[lParticle_I] );
+            else {
+               double** value;
+               /* Allocate space for the values to be written to file */
+               value = Memory_Alloc_2DArray( double, swarm->particleLocalCount, swarmVar->dofCount, "swarmVariableValue" );
+               
+               #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+               fileData = H5Dcreate( file, dataSpaceName, H5T_NATIVE_DOUBLE, fileSpace, props );
+               #else
+               fileData = H5Dcreate( file, dataSpaceName, H5T_NATIVE_DOUBLE, fileSpace,
+                                      H5P_DEFAULT, props, H5P_DEFAULT );
+               #endif          
+               
+               /* Loop through local particles */      
+               for( lParticle_I=0; lParticle_I < swarm->particleLocalCount; lParticle_I++ ) {
+                  /* Write the value of the current swarmVariable at the current particle to the temp array */
+                  Variable_GetValue( swarmVar->variable, lParticle_I, value[lParticle_I] );
+               }
+               /* Write array to dataspace */
+               H5Dwrite( fileData, H5T_NATIVE_DOUBLE, memSpace, fileSpace, H5P_DEFAULT, *value );
+               Memory_Free( value );
             }
-            /* Write array to dataspace */
-            H5Dwrite( fileData, H5T_NATIVE_DOUBLE, memSpace, fileSpace, H5P_DEFAULT, *value );
-            Memory_Free( value );
+            /* Close the dataspace */
+            H5Dclose( fileData );
+            H5Sclose( fileSpace );
+            H5Pclose( props );
          }
-         /* Close the dataspace */
-         H5Dclose( fileData );
-         H5Sclose( fileSpace );
-         H5Pclose( props );
-      }
-   }  
-
+      }  
+   }
    /* Close off all our handles. */
    H5Fclose( file );
    
