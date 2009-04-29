@@ -17,8 +17,10 @@ class Context(object):
         self.candidates = []
         self.order = []
 
-        self.add_options = None
-        self.process_options = None
+        self.add_options_funcs = []
+        self.process_options_funcs = []
+        self.add_modules_funcs = []
+
         self.options = utils.options.OptionSet()
         self.option_dict = {}
 
@@ -28,17 +30,35 @@ class Context(object):
 
         self.setup_platform()
 
+    def scan_subdirs(self):
+        dir_list = os.listdir(".")
+        for dir in dir_list:
+            if not os.path.isdir(dir):
+                continue
+            for path, dirs, files in os.walk(dir):
+                if "configure.proj" in files:
+                    sys.stdout.write("Found sub-project in %s\n"%repr(path))
+                    loc = locals()
+                    glo = globals()
+                    glo["config"] = __import__("config")
+                    execfile(os.path.join(path, "configure.proj"), glo, loc)
+                    for k, l in [("add_options", self.add_options_funcs),
+                                 ("process_options", self.process_options_funcs),
+                                 ("add_modules", self.add_modules_funcs)]:
+                        if k in loc.keys():
+                            l.append(loc[k])
+
     def setup_options(self):
-        if self.add_options:
-            self.add_options(self)
+        for c in self.add_options_funcs:
+            c(self)
         for m in self.order:
             m.setup_options()
 
     def parse_options(self):
         opts = self.options.parse_option_list(sys.argv[1:])
         self.option_dict = self.options.gather(opts)
-        if self.process_options:
-            self.process_options(self)
+        for c in self.process_options_funcs:
+            c(self)
         for m in self.order:
             m.parse_options()
             m.process_options()
@@ -58,6 +78,12 @@ class Context(object):
     #
 
     def configure(self, *args):
+
+        self.scan_subdirs()
+
+        # Add modules.
+        for c in self.add_modules_funcs:
+            c(self)
 
         # Need to parse options for the context ahead of schedule.
         self.options.add_option(

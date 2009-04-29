@@ -6,8 +6,8 @@ from DLTool import DLTool
 
 class ldd(DLTool):
 
-    def __init__(self, ctx):
-        DLTool.__init__(self, ctx)
+    def __init__(self, ctx, **kw):
+        DLTool.__init__(self, ctx, **kw)
         self.commands = ["ldd"]
 
     def _setup_members(self):
@@ -17,7 +17,7 @@ class ldd(DLTool):
         return self.test_list(cfg)
 
     def test_list(self, cfg):
-        src_fn = self.comp.configs[0]["_shared_lib"]
+        src_fn = self.com.configs[0]["_shared_lib"]
         res, out, err = cfg["list_libraries"](cfg, [src_fn])
         if res or err:
             return False

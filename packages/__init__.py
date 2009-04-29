@@ -25,3 +25,4 @@ from StgFEM import StgFEM
 from gLucifer import gLucifer
 from PICellerator import PICellerator
 from Underworld import Underworld
+from ParMETIS import ParMETIS
