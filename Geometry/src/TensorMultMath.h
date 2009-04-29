@@ -81,18 +81,31 @@ double SymmetricTensor_DoubleContraction(SymmetricTensor tensorA, SymmetricTenso
 void NonSquareMatrix_Transpose( double** originalMatrix, Dimension_Index rowDimOrig, 
 	Dimension_Index colDimOrig, double** newMatrix );
 
+/** This function multiplies 2 non square matrices and returns the in the resultMatrix. 
+ * It requires the columns in MatrixA = rows in BMatrix
+ * resultMatrix_ik = AMatrix_ij x BMatrix_jk */
 void NonSquareMatrix_MultiplicationByNonSquareMatrix( double **AMatrix, int rowsInA, int colsInA,
 					 double **BMatrix, int rowsInB, int colsInB, 
 					 double** resultMatrix );	
 
+/** This function multiplies 2 non square matrices and adds the result to the passed in resultMatrix. 
+ * It requires the columns in MatrixA = rows in BMatrix
+ * resultMatrix_ik += AMatrix_ij x BMatrix_jk */
 void NonSquareMatrix_CumulativeMultiplicationByNonSquareMatrix( double **AMatrix, int rowDimA, int colDimA,
 					 double **BMatrix, int rowDimB, int colDimB, 
 					 double** resultMatrix );
 
+/** This function multiplies a M x N matrices by a N vector.. It requires the columns in AMatrix = rows in BVec 
+ * resultVector_i = AMatrix_ij x BVec_j */
 void NonSquareMatrix_MatrixVectorMultiplication( double** AMatrix, int rowsInA, int colsInA,
 		                               double* BVec, int rowsInB, double* resultVector );
+
+/** This function multiplies a M x N matrices by a N vector, and then adds this result
+ * to the passed in 'solution Vector'. It requires the columns in MatrixA = rows in BVec
+ * resultVector_i += AMatrix_ij x BVec_j */
 void NonSquareMatrix_CumulativeMatrixVectorMultiplication( double** AMatrix, int rowsInA, int colsInA,
 		                               double* BVec, int rowsInB, double* resultVector ); 						   
+
 /** Print a named NonSquareMatrix */
 #define Journal_PrintNonSquareMatrix(stream, matrix, rowDim, colDim) \
 	do {	\

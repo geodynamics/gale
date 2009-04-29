@@ -55,9 +55,10 @@
 	} SurfaceAdaptor_SurfaceType;
 
 	typedef struct {
-              double	offs;
-              double    endOffs;
-              double	grad;
+				/* these vectors represent things in the x-axis and z-axis */
+              double	offs[2];
+              double  endOffs[2];
+              double	grad[2];
 	} SurfaceAdaptor_WedgeInfo;
 
 	typedef struct {
@@ -121,7 +122,9 @@
 	** Private Member functions
 	*/
 
-	double SurfaceAdaptor_Wedge( SurfaceAdaptor* self, Mesh* mesh, 
+	double SurfaceAdaptor_Wedge2D( SurfaceAdaptor* self, Mesh* mesh, 
+				     unsigned* globalSize, unsigned vertex, unsigned* vertexInds );
+	double SurfaceAdaptor_Wedge3D( SurfaceAdaptor* self, Mesh* mesh, 
 				     unsigned* globalSize, unsigned vertex, unsigned* vertexInds );
 	double SurfaceAdaptor_Sine( SurfaceAdaptor* self, Mesh* mesh, 
 				    unsigned* globalSize, unsigned vertex, unsigned* vertexInds );

@@ -147,7 +147,18 @@
 	unsigned Mesh_NearestVertex( void* mesh, double* point );
 	Bool Mesh_Search( void* mesh, double* point, 
 			  MeshTopology_Dim* dim, unsigned* ind );
+
 	Bool Mesh_SearchElements( void* mesh, double* point, unsigned* elInd );
+	/* Mesh_SearchElements (
+	 * mesh -- is a mesh
+	 * point -- is a global coordinate
+	 * elInd -- will be filled in by a local elementID
+	 * )
+	 * returns:
+	 * False if the point is not in the DOMAIN space of the proc 
+	 * True if the point is in the DOMAIN space
+	 */
+
 	Bool Mesh_ElementHasPoint( void* mesh, unsigned element, double* point, 
 				   MeshTopology_Dim* dim, unsigned* ind );
 	Mesh_ElementType* Mesh_GetElementType( void* mesh, unsigned element );

@@ -150,9 +150,13 @@ void _SurfaceAdaptor_Construct( void* adaptor, Stg_ComponentFactory* cf, void* d
 	surfaceType = Stg_ComponentFactory_GetString( cf, self->name, "surfaceType", "" );
 	if( !strcmp( surfaceType, "wedge" ) ) {
 		self->surfaceType = SurfaceAdaptor_SurfaceType_Wedge;
-		self->info.wedge.offs = Stg_ComponentFactory_GetDouble( cf, self->name, "beginOffset", 0.0 );
-		self->info.wedge.endOffs = Stg_ComponentFactory_GetDouble( cf, self->name, "endOffset", 1.0 );
-		self->info.wedge.grad = Stg_ComponentFactory_GetDouble( cf, self->name, "gradient", 0.5 );
+		self->info.wedge.offs[0] = Stg_ComponentFactory_GetDouble( cf, self->name, "beginOffset", 0.0 );
+		self->info.wedge.endOffs[0] = Stg_ComponentFactory_GetDouble( cf, self->name, "endOffset", 1.0 );
+		self->info.wedge.grad[0] = Stg_ComponentFactory_GetDouble( cf, self->name, "gradient", 0.5 );
+		/* get the parameters for the z-axis */
+		self->info.wedge.offs[1] = Stg_ComponentFactory_GetDouble( cf, self->name, "beginOffsetZ", 0.0 );
+		self->info.wedge.endOffs[1] = Stg_ComponentFactory_GetDouble( cf, self->name, "endOffsetZ", 1.0 );
+		self->info.wedge.grad[1] = Stg_ComponentFactory_GetDouble( cf, self->name, "gradientZ", 0.5 );
 	}
 	else if( !strcmp( surfaceType, "sine" ) || !strcmp( surfaceType, "cosine" ) ) {
 		Dictionary_Entry_Value*	originList;
@@ -208,18 +212,21 @@ void _SurfaceAdaptor_Destroy( void* adaptor, void* data ) {
 */
 
 void SurfaceAdaptor_Generate( void* adaptor, void* _mesh, void* data ) {
-	SurfaceAdaptor*			self = (SurfaceAdaptor*)adaptor;
-	Mesh*				mesh = (Mesh*)_mesh;
-	const Sync*			sync;
-	SurfaceAdaptor_DeformFunc*	deformFunc;
-	Grid				*grid;
-	unsigned*			inds;
-        double                          deform;
-	unsigned			n_i;
+	SurfaceAdaptor* self = (SurfaceAdaptor*)adaptor;
+	Mesh* mesh = (Mesh*)_mesh;
+	const Sync* sync;
+	SurfaceAdaptor_DeformFunc* deformFunc;
+	Grid *grid;
+	unsigned* inds;
+	double deform;
+	unsigned n_i;
 
 	/* Build base mesh, which is assumed to be cartesian. */
 	MeshGenerator_Generate( self->generator, mesh, data );
 
+	/* if loading from checkpoint then forget about this step */
+	if( ((Context*)data)->loadFromCheckPoint == True )
+		return;
 	/* If we're not 2D or 3D, forget about it. */
 	if( mesh->topo->nDims != 2 && mesh->topo->nDims != 3 )
 		return;
@@ -227,7 +234,8 @@ void SurfaceAdaptor_Generate( void* adaptor, void* _mesh, void* data ) {
 	/* What kind of surface do we want? */
 	switch( self->surfaceType ) {
 	case SurfaceAdaptor_SurfaceType_Wedge:
-		deformFunc = SurfaceAdaptor_Wedge;
+		if ( mesh->topo->nDims == 3 ) { deformFunc = SurfaceAdaptor_Wedge3D ; }
+		else { deformFunc = SurfaceAdaptor_Wedge2D; }
 		break;
 	case SurfaceAdaptor_SurfaceType_Sine:
 		deformFunc = SurfaceAdaptor_Sine;
@@ -274,14 +282,30 @@ void SurfaceAdaptor_Generate( void* adaptor, void* _mesh, void* data ) {
 ** Private Functions
 */
 
-double SurfaceAdaptor_Wedge( SurfaceAdaptor* self, Mesh* mesh, 
+double SurfaceAdaptor_Wedge2D( SurfaceAdaptor* self, Mesh* mesh, 
 			     unsigned* globalSize, unsigned vertex, unsigned* vertexInds )
 {
-   if( mesh->verts[vertex][0] >= self->info.wedge.offs ) {
-      if( mesh->verts[vertex][0] >= self->info.wedge.endOffs )
-         return (self->info.wedge.endOffs - self->info.wedge.offs) * self->info.wedge.grad;
+   if( mesh->verts[vertex][0] >= self->info.wedge.offs[0] ) {
+      if( mesh->verts[vertex][0] >= self->info.wedge.endOffs[0] )
+         return (self->info.wedge.endOffs[0] - self->info.wedge.offs[0]) * self->info.wedge.grad[0];
       else
-         return (mesh->verts[vertex][0] - self->info.wedge.offs) * self->info.wedge.grad;
+         return (mesh->verts[vertex][0] - self->info.wedge.offs[0]) * self->info.wedge.grad[0];
+   }
+   else 
+      return 0.0;
+}
+
+double SurfaceAdaptor_Wedge3D( SurfaceAdaptor* self, Mesh* mesh, 
+			     unsigned* globalSize, unsigned vertex, unsigned* vertexInds )
+{
+   if( mesh->verts[vertex][0] >= self->info.wedge.offs[0] ) {
+      if( mesh->verts[vertex][0] >= self->info.wedge.endOffs[0] ) {
+         return (self->info.wedge.endOffs[0] - self->info.wedge.offs[0]) * self->info.wedge.grad[0] + 
+					 (mesh->verts[vertex][2] - self->info.wedge.offs[1]) * self->info.wedge.grad[1];
+			} else {
+         return (mesh->verts[vertex][0] - self->info.wedge.offs[0]) * self->info.wedge.grad[0] +
+					 (mesh->verts[vertex][2] - self->info.wedge.offs[1]) * self->info.wedge.grad[1];
+			}
    }
    else 
       return 0.0;

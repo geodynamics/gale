@@ -59,7 +59,6 @@
 	#include "ParallelDelaunay.h"
 	#include "ComplexVectorMath.h"
 	#include "stg_lapack.h"
-	#include "FullTensorMath.h"
 	#include "TensorMultMath.h"
 	#include "Simplex.h"
 	#include "Hex.h"

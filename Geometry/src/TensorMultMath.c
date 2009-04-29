@@ -572,6 +572,9 @@ void NonSquareMatrix_Transpose( double** originalMatrix, Dimension_Index rowDimO
 	return;
 }
 
+/** This function multiplies 2 non square matrices and returns the in the resultMatrix. 
+ * It requires the columns in MatrixA = rows in BMatrix
+ * resultMatrix_ik = AMatrix_ij x BMatrix_jk */
 void NonSquareMatrix_MultiplicationByNonSquareMatrix( double **AMatrix, int rowDimA, int colDimA,
 					 double **BMatrix, int rowDimB, int colDimB, 
 					 double** resultMatrix ) {
@@ -579,14 +582,16 @@ void NonSquareMatrix_MultiplicationByNonSquareMatrix( double **AMatrix, int rowD
 	for( counter = 0 ; counter < rowDimA ; counter++ ) {
 		memset( resultMatrix[counter], 0, sizeof( double ) * colDimB );
 	}
-NonSquareMatrix_CumulativeMultiplicationByNonSquareMatrix(AMatrix,rowDimA,colDimA,
-					 BMatrix,rowDimB, colDimB, 
-					 resultMatrix );	
+
+	NonSquareMatrix_CumulativeMultiplicationByNonSquareMatrix(AMatrix,rowDimA,colDimA,
+		 	BMatrix,rowDimB, colDimB, 
+			resultMatrix );	
 	
 }
-/** This function multiplies 2 non square matrices. It requires the row and column 
-	dimensions for each matrix. Columns In Matrix A = Rows In Matrix B
-	resultMatrix_ik = AMatrix_ij x BMatrix_jk */
+
+/** This function multiplies 2 non square matrices and adds the result to the passed in resultMatrix. 
+ * It requires the columns in MatrixA = rows in BMatrix
+ * resultMatrix_ik += AMatrix_ij x BMatrix_jk */
 void NonSquareMatrix_CumulativeMultiplicationByNonSquareMatrix( double **AMatrix, 
 					 int rowDimA, int colDimA,
 					 double **BMatrix, int rowDimB, int colDimB, 
@@ -595,19 +600,13 @@ void NonSquareMatrix_CumulativeMultiplicationByNonSquareMatrix( double **AMatrix
   int row_I, col_I; /* location with resultMatrix  */
   int counter;      /* counter which facilitates the multiplication of AMatrix and BMatrix */
 	/** Error Checking Code */				 
-	if (colDimA != rowDimB) {
-		Stream* error = Journal_Register( ErrorStream_Type, "TensorMultMath" );
-		Journal_Firewall( False, error,
-				"In func '%s'  row dimension B, %u != column dimension A, %u\n", 
-			__func__, rowDimB, colDimA );
-	}
-	if ((AMatrix == NULL) || (BMatrix == NULL) || (resultMatrix == NULL) ) {
-		Stream* error = Journal_Register( ErrorStream_Type, "TensorMultMath" );
-		Journal_Firewall( False, error,
-				"In func '%s', Input matrices: %s %s, or Output matrix: %s is NULL \n", 
-			__func__, AMatrix, BMatrix, resultMatrix);
-	}
-	/** End error checking code */
+	Journal_Firewall( (colDimA == rowDimB), Journal_Register( ErrorStream_Type, "TensorMultMath" ),
+			"In func '%s'  row dimension B, %u != column dimension A, %u\n", 
+		__func__, rowDimB, colDimA );
+	Journal_Firewall( (AMatrix && BMatrix && resultMatrix), Journal_Register( ErrorStream_Type, "TensorMultMath" ),
+			"In func '%s', Input matrices: %s %s, or Output matrix: %s is NULL \n", 
+		__func__, AMatrix, BMatrix, resultMatrix);
+
 	/** Calculate result matrix */
 	for( row_I = 0 ; row_I < rowDimA ; row_I++ ) {
 		for( col_I = 0 ; col_I < colDimB ; col_I++ ) {
@@ -619,9 +618,8 @@ void NonSquareMatrix_CumulativeMultiplicationByNonSquareMatrix( double **AMatrix
 	}
 }
 
-/** This function multiplies a M x N matrices by a N vector.. It requires the column 
-	dimensions of the matrix and the row dimension. Columns In Matrix A = Rows In Vector B
-	resultMatrix_ij = AMatrix_ij x BVector_j */
+/** This function multiplies a M x N matrices by a N vector.. It requires the columns in AMatrix = rows in BVec
+	resultVector_i = AMatrix_ij x BVec_j */
 void NonSquareMatrix_MatrixVectorMultiplication( double** AMatrix, int rowsInA, int colsInA,
 		     double* BVec, int rowsInB,double* resultVector ) {
   /*This assumes the resultVector is of the correct length. */
@@ -629,27 +627,21 @@ void NonSquareMatrix_MatrixVectorMultiplication( double** AMatrix, int rowsInA, 
 	NonSquareMatrix_CumulativeMatrixVectorMultiplication( AMatrix, rowsInA, colsInA,
 		                     BVec, rowsInB, resultVector);						   
 }
-/**This function multiplies a M x N matrices by a N vector, and then adds this result
-to the passed in 'solution Vector'. It requires the column 
-	dimensions of the matrix and the row dimension. Columns In Matrix A = Rows In Vector B
-	resultMatrix_ij = AMatrix_ij x BVector_j
-*/
+
+/** This function multiplies a M x N matrices by a N vector, and then adds this result
+ * to the passed in 'solution Vector'. It requires the columns in MatrixA = rows in BVec
+ * resultVector_i = AMatrix_ij x BVec_j */
 void NonSquareMatrix_CumulativeMatrixVectorMultiplication( double** AMatrix, int rowsInA, int colsInA,
 		                               double* BVec, int rowsInB, double* resultVector ) {
   int row_I, col_I; /* counters through matrix rows and columns respectively */
 	/** Error Checking Code */  
-  	if ( colsInA != rowsInB ) {
-		Stream* error = Journal_Register( ErrorStream_Type, "TensorMultMath" );
-		Journal_Firewall( False, error,
-			"In func '%s' column dimensions of A_Matrix = %d is not equal to the row dimensions of B_Vec = %d\n",
-			__func__, colsInA, rowsInB );
-	}
-	if( (resultVector == NULL) || (AMatrix == NULL) || (BVec == NULL) ) {
-		Stream* error = Journal_Register( ErrorStream_Type, "TensorMultMath" );
-		Journal_Firewall( False , error,
-			"In func '%s', Input matrices: %p %p, or Output matrix: %p is NULL \n", 
-			__func__, AMatrix, BVec, resultVector);
-	}
+	Journal_Firewall( ( colsInA == rowsInB ), Journal_Register( ErrorStream_Type, "TensorMultMath" ),
+		"In func '%s' column dimensions of A_Matrix = %d is not equal to the row dimensions of B_Vec = %d\n",
+		__func__, colsInA, rowsInB );
+	Journal_Firewall( (resultVector && AMatrix && BVec) , Journal_Register( ErrorStream_Type, "TensorMultMath" ),
+		"In func '%s', Input matrices: %p %p, or Output matrix: %p is NULL \n", 
+		__func__, AMatrix, BVec, resultVector);
+
 	/* calculate the result Vector */
 	for( row_I = 0 ; row_I < rowsInA ; row_I++ ) {
 		for( col_I = 0 ; col_I < colsInA ; col_I++ ) {
