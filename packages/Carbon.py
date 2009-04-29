@@ -8,6 +8,9 @@ class Carbon(config.Package):
         config.Package.__init__(self, ctx)
         self.base_dirs.append("/System/Library/Frameworks/Carbon.framework")
 
+    def _setup_dependencies(self):
+        config.Package._setup_dependencies(self)
+        self.agl = self.add_dependency(config.packages.AGL, required=True, combine=True)
 
     def setup_libraries(self):
         self.add_library_set(["Carbon.h"], ["Carbon"])

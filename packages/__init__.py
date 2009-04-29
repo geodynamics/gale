@@ -16,6 +16,7 @@ from libjpeg import libjpeg
 from libfame import libfame
 from Cocoa import Cocoa
 from Carbon import Carbon
+from AGL import AGL
 from pcu import pcu
 from Python import Python
 from StGermain import StGermain
