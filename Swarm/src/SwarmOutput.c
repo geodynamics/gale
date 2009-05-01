@@ -243,7 +243,7 @@ void _SwarmOutput_Initialise( void* swarmOutput, void* data ) {
 	
 	Stg_Component_Initialise( self->globalIndexVariable, context, False );
 
-	_SwarmOutput_SetGlobalIndicies( self, context );
+   if( !context->loadFromCheckPoint ) _SwarmOutput_SetGlobalIndicies( self, context );
 
 	for ( lParticle_I = 0 ; lParticle_I < swarm->particleLocalCount ; lParticle_I++ ) {
 		/* Open file */
