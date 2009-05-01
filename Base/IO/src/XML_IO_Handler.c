@@ -315,6 +315,9 @@ void _XML_IO_Handler_Init( XML_IO_Handler* self ) {
 	*lookupType = Dictionary_Entry_Value_Type_Int;
 	Stg_ObjectList_PointerAppend( self->typeKeywords, lookupType, "int", 0, LookupTypePrint, LookupTypeCopy );
 	lookupType = Memory_Alloc( Dictionary_Entry_Value_Type, "Lookup-type" );
+	*lookupType = Dictionary_Entry_Value_Type_UnsignedLong;
+	Stg_ObjectList_PointerAppend( self->typeKeywords, lookupType, "unsigned long", 0, LookupTypePrint, LookupTypeCopy );
+	lookupType = Memory_Alloc( Dictionary_Entry_Value_Type, "Lookup-type" );
 	*lookupType = Dictionary_Entry_Value_Type_Bool;
 	Stg_ObjectList_PointerAppend( self->typeKeywords, lookupType, "bool", 0, LookupTypePrint, LookupTypeCopy );
 	lookupType = Memory_Alloc( Dictionary_Entry_Value_Type, "Lookup-type" );
@@ -328,6 +331,7 @@ void _XML_IO_Handler_Init( XML_IO_Handler* self ) {
 	self->TYPE_KEYWORDS[Dictionary_Entry_Value_Type_Double] = "double";
 	self->TYPE_KEYWORDS[Dictionary_Entry_Value_Type_UnsignedInt] = "uint";
 	self->TYPE_KEYWORDS[Dictionary_Entry_Value_Type_Int] = "int";
+	self->TYPE_KEYWORDS[Dictionary_Entry_Value_Type_UnsignedLong] = "ulong";
 	self->TYPE_KEYWORDS[Dictionary_Entry_Value_Type_Bool] = "bool";
 	self->TYPE_KEYWORDS[Dictionary_Entry_Value_Type_Struct] = "struct";
 	self->TYPE_KEYWORDS[Dictionary_Entry_Value_Type_List] = "list";
@@ -335,11 +339,13 @@ void _XML_IO_Handler_Init( XML_IO_Handler* self ) {
 	self->WRITING_FIELD_EXTRAS[Dictionary_Entry_Value_Type_Double] = 7;
 	self->WRITING_FIELD_EXTRAS[Dictionary_Entry_Value_Type_UnsignedInt] = 6; 
 	self->WRITING_FIELD_EXTRAS[Dictionary_Entry_Value_Type_Int] = 6; 
+	self->WRITING_FIELD_EXTRAS[Dictionary_Entry_Value_Type_UnsignedLong] = 6; 
 	self->WRITING_FIELD_EXTRAS[Dictionary_Entry_Value_Type_Bool] = 1;
 	self->_setWritingPrecision( self, Dictionary_Entry_Value_Type_String, 30 );
 	self->_setWritingPrecision( self, Dictionary_Entry_Value_Type_Double, 5 );
 	self->_setWritingPrecision( self, Dictionary_Entry_Value_Type_UnsignedInt, 5 );
 	self->_setWritingPrecision( self, Dictionary_Entry_Value_Type_Int, 5 );
+	self->_setWritingPrecision( self, Dictionary_Entry_Value_Type_UnsignedLong, 5 );
 	self->_setWritingPrecision( self, Dictionary_Entry_Value_Type_Bool, 5 );
 	self->writeExplicitTypes = False;
 	
