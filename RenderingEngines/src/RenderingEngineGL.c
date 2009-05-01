@@ -89,6 +89,7 @@ lucRenderingEngineGL* _lucRenderingEngineGL_New(
 		Stg_Component_ExecuteFunction*                     _execute,
 		Stg_Component_DestroyFunction*                     _destroy,
 		lucRenderingEngine_RenderFunction*                 _render,
+		lucRenderingEngine_ClearFunction*             	   _clear,
 		lucRenderingEngine_GetPixelDataFunction*           _getPixelData,
 		lucRenderingEngine_CompositeViewportFunction*      _compositeViewport,
 		Name                                               name ) 
@@ -110,6 +111,7 @@ lucRenderingEngineGL* _lucRenderingEngineGL_New(
 			_execute,
 			_destroy,
 			_render,
+			_clear,
 			_getPixelData,
 			_compositeViewport,
 			name );
@@ -161,6 +163,7 @@ void* _lucRenderingEngineGL_DefaultNew( Name name ) {
 		_lucRenderingEngineGL_Execute,
 		_lucRenderingEngineGL_Destroy,
 		_lucRenderingEngineGL_Render,
+		_lucRenderingEngineGL_Clear,
 		_lucRenderingEngineGL_GetPixelData,
 		_lucRenderingEngineGL_CompositeViewport_Manual,
 		name );
@@ -211,7 +214,7 @@ void _lucRenderingEngineGL_Render( void* renderingEngine, lucWindow* window, Abs
 	lucWindow_Broadcast( window, 0, MPI_COMM_WORLD );
 	lucWindow_CheckCameraFlag( window );
 	lucWindow_CheckLightFlag( window );
-		
+
 	for ( viewport_I = 0 ; viewport_I < viewportCount ; viewport_I++ ) {
 		viewportInfo = &window->viewportInfoList[ viewport_I ];
 		viewport = viewportInfo->viewport;
@@ -220,6 +223,7 @@ void _lucRenderingEngineGL_Render( void* renderingEngine, lucWindow* window, Abs
 		Stream_Indent( lucDebug );
 		
 		/* Set viewport */
+		Journal_DPrintfL( lucDebug, 2, "Rendering viewport: (%d,%d) %d x %d\n", viewportInfo->startx, viewportInfo->starty, viewportInfo->width, viewportInfo->height);
 		glViewport( viewportInfo->startx, viewportInfo->starty, viewportInfo->width, viewportInfo->height);
 		glScissor( viewportInfo->startx, viewportInfo->starty, viewportInfo->width, viewportInfo->height);
 		if ( ! viewportInfo->needsToDraw ) {
@@ -238,12 +242,15 @@ void _lucRenderingEngineGL_Render( void* renderingEngine, lucWindow* window, Abs
 										      \nVector image will not be created correctly.\n\n" );
 		#endif
 		
-		lucRenderingEngineGL_Clear( self, window );
+		/* Clear viewport */
+		self->_clear(self, window, False);
 
 		if (context->rank == MASTER)
 			lucRenderingEngineGL_WriteViewportText( self, window, viewportInfo, context );
 			
 			
+		Journal_DPrintfL( lucDebug, 2, "(%s) Resetting camera...", __func__);
+		
 		switch ( viewport->camera->stereoType ) {
 			case lucMono:
 				lucViewportInfo_SetOpenGLCamera( viewportInfo );
@@ -276,6 +283,8 @@ void _lucRenderingEngineGL_Render( void* renderingEngine, lucWindow* window, Abs
 										      \nVector image will not be created correctly.\n\n" );
 		#endif		
 	}
+
+	glFinish();  /* OK - block until all rendering complete */
 	
 	Stream_UnIndent( lucDebug );
 	Journal_DPrintfL( lucDebug, 2, "Leaving func %s\n", __func__ );
@@ -289,11 +298,13 @@ void _lucRenderingEngineGL_GetPixelData( void* renderingEngine, lucWindow* windo
 	
 	if ( lucWindow_HasStereoCamera( window ) ) {
 		if ( window->currStereoBuffer == lucRight )
-			glReadBuffer( GL_FRONT_RIGHT );
+			glReadBuffer( GL_BACK_RIGHT );
 		else
-			glReadBuffer( GL_FRONT_LEFT );
+			glReadBuffer( GL_BACK_LEFT );
 	}
-
+	else
+		glReadBuffer( GL_BACK );
+	
 	/* Actually read the pixels. */
 	glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, buffer); 
 }
@@ -326,7 +337,12 @@ void lucRenderingEngineGL_WriteViewportText( void* renderingEngine, lucWindow* w
 	glPopMatrix();
 }
 
-void lucRenderingEngineGL_Clear( void* renderingEngineGL, lucWindow* window ) {
+void _lucRenderingEngineGL_Clear( void* renderingEngineGL, lucWindow* window, Bool clearAll ) {
+	if (clearAll)
+	{
+		glViewport(0, 0, window->width, window->height);
+		glScissor(0, 0, window->width, window->height);
+	}
 	glEnable (GL_SCISSOR_TEST);
 	glClearColor( 
 		window->backgroundColour.red, 
@@ -490,6 +506,7 @@ void _lucRenderingEngineGL_CompositeViewport_Stencil(
 	glDisable( GL_STENCIL_TEST );
 	glEnable(GL_DEPTH_TEST);
 	glPopMatrix();
+	Journal_DPrintfL( lucDebug, 2, "(%s) Resetting camera...", __func__);
 	lucViewportInfo_SetOpenGLCamera( viewportInfo );
 
 	/* Clean up allocated memory */

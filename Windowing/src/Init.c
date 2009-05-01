@@ -82,20 +82,19 @@ Bool lucWindowing_Init() {
 			Stg_ComponentRegister_Add( componentRegister, lucDefaultWindow_Type, "0", _lucX11Window_DefaultNew );
 	#endif	
 
-	#ifdef HAVE_OSMESA
-		Stg_ComponentRegister_Add( componentRegister, lucOSMesaWindow_Type,     "0", _lucOSMesaWindow_DefaultNew );
-		RegisterParent( lucOSMesaWindow_Type, lucWindow_Type );
-		if ( !Stg_ComponentRegister_Get( componentRegister, lucDefaultWindow_Type, "0" ) )
-			Stg_ComponentRegister_Add( componentRegister, lucDefaultWindow_Type, "0", _lucOSMesaWindow_DefaultNew );
-	#endif
-
-
 	#ifdef HAVE_SDL
 		Stg_ComponentRegister_Add( componentRegister, lucSDLWindow_Type,     "0", _lucSDLWindow_DefaultNew );
 		RegisterParent( lucSDLWindow_Type, lucWindow_Type );
 		if ( !Stg_ComponentRegister_Get( componentRegister, lucDefaultWindow_Type, "0" ) )
 			Stg_ComponentRegister_Add( componentRegister, lucDefaultWindow_Type, "0", _lucSDLWindow_DefaultNew );		
 	#endif		
+	
+	#ifdef HAVE_OSMESA
+		Stg_ComponentRegister_Add( componentRegister, lucOSMesaWindow_Type,     "0", _lucOSMesaWindow_DefaultNew );
+		RegisterParent( lucOSMesaWindow_Type, lucWindow_Type );
+		if ( !Stg_ComponentRegister_Get( componentRegister, lucDefaultWindow_Type, "0" ) )
+			Stg_ComponentRegister_Add( componentRegister, lucDefaultWindow_Type, "0", _lucOSMesaWindow_DefaultNew );
+	#endif
 	
 	#ifdef HAVE_VTK
 		Stg_ComponentRegister_Add( componentRegister, lucVTKWindow_Type,     "0", _lucVTKWindow_DefaultNew );

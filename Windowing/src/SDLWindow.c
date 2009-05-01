@@ -45,7 +45,15 @@
 
 #ifdef HAVE_SDL
 
-#include <mpi.h>
+/*** SDL is setup to use OSMesa as the OpenGL implementation if it is present, by copying the OSMesa output
+ *** to the SDL display, this allows SDL on-screen and OSMesa off-screen rendering available in the same binary.
+ *** For this to work, OSMesa must be linked without any other OpenGL implementations, which the 
+ *** config system does not presently allow for. Once this is fixed below lines can be removed to enable feature */
+#ifdef HAVE_OSMESA
+#undef HAVE_OSMESA
+#endif
+/****************/
+
 #include <StGermain/StGermain.h>
 #include <StgDomain/StgDomain.h>
 
@@ -53,12 +61,12 @@
 
 #include "types.h"
 #include "SDLWindow.h"
+#include <stdlib.h>
 
 #include <assert.h>
-#include <SDL/SDL.h>
 
-#ifndef MASTER
-	#define MASTER 0
+#ifdef HAVE_OSMESA
+	#include <osmesa.h>
 #endif
 
 /* Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
@@ -77,6 +85,9 @@ lucSDLWindow* _lucSDLWindow_New(
 		Stg_Component_InitialiseFunction*                  _initialise,
 		Stg_Component_ExecuteFunction*                     _execute,
 		Stg_Component_DestroyFunction*                     _destroy,
+		lucWindow_DisplayFunction						   _displayWindow,	
+		lucWindow_EventsWaitingFunction*				   _eventsWaiting,	
+		lucWindow_EventProcessorFunction				   _eventProcessor,	
 		Name                                               name ) 
 {
 	lucSDLWindow*					self;
@@ -95,18 +106,17 @@ lucSDLWindow* _lucSDLWindow_New(
 			_initialise,
 			_execute,
 			_destroy,
+			_displayWindow,	
+			_eventsWaiting,
+			_eventProcessor,
 			name );
 	
 	return self;
 }
 
-void _lucSDLWindow_Init( lucSDLWindow*                                      self ) {
-}
 
 void _lucSDLWindow_Delete( void* window ) {
-	lucSDLWindow*  self = (lucSDLWindow*)window;
-
-	_lucWindow_Delete( self );
+	_lucWindow_Delete( window );
 }
 
 void _lucSDLWindow_Print( void* window, Stream* stream ) {
@@ -141,115 +151,255 @@ void* _lucSDLWindow_DefaultNew( Name name ) {
 		_lucSDLWindow_Initialise,
 		_lucSDLWindow_Execute,
 		_lucSDLWindow_Destroy,
+		_lucSDLWindow_Display,	
+		_lucSDLWindow_EventsWaiting,
+		_lucSDLWindow_EventProcessor, 
 		name );
 }
 
-void _lucSDLWindow_Construct( void* window, Stg_ComponentFactory* cf, void* data ){
+void _lucSDLWindow_Construct( void* window, Stg_ComponentFactory* cf, void* data ) {
 	lucSDLWindow*  self = (lucSDLWindow*)window;
 
 	/* Construct Parent */
 	_lucWindow_Construct( self, cf, data );
-	
-	_lucSDLWindow_Init( self );
 } 
 
-void _lucSDLWindow_Build( void* window, void* data ) {}
-void _lucSDLWindow_Initialise( void* window, void* data ) {}
+void _lucSDLWindow_Build( void* window, void* data ) {
+	/* Run the parent function to build window... */
+	_lucWindow_Build(window, data);	
+}
 
-void _lucSDLWindow_Execute( void* window, void* data ) {
+void _lucSDLWindow_Initialise( void* window, void* data ) {
 	lucSDLWindow*     self      = (lucSDLWindow*)window;
-	AbstractContext*  context   = (AbstractContext*) data;
+	SDL_Surface* screen = (SDL_Surface*)self->screen;
 
-	lucDebug_PrintFunctionBegin( self, 1 );
-	
-	lucWindow_SetViewportNeedsToSetupFlag( self, True );
-	lucWindow_SetViewportNeedsToDrawFlag( self, True );
-
-	/* Initialise SDL */
-	if( SDL_Init( SDL_INIT_VIDEO ) < 0 ) {
+	/* Initialise SDL Video subsystem */
+	putenv("SDL_VIDEO_CENTERED=1");
+	if( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_TIMER ) < 0 ) { 
 		Journal_Printf( lucError, "In func %s: Unable to initialize SDL: %s\n", __func__, SDL_GetError() );
 		abort();
 	}
 
-	/* Create a OpenGL screen */
-	if( SDL_SetVideoMode( self->width, self->height, 0, SDL_OPENGL ) == NULL ) {
-		Journal_Printf( lucError, "In func %s: Unable to create OpenGL screen: %s\n", __func__, SDL_GetError() );
+    SDL_WM_SetCaption( self->title, NULL );
+	/* Hide if not using interactive mode */
+	if (!self->interactive) SDL_WM_IconifyWindow();
+	
+    const SDL_VideoInfo *pSDLVideoInfo = SDL_GetVideoInfo();
+
+    if( !pSDLVideoInfo )
+    {
+		Journal_Printf( lucError, "In func %s: SDL_GetVideoInfo() failed. SDL Error: %s\n", __func__, SDL_GetError() );
+        SDL_Quit();
+        exit(1);
+    }
+
+	#ifdef HAVE_OSMESA
+	   	self->sdlFlags = 0;
+		self->osMesaContext = OSMesaCreateContextExt( GL_RGBA, 16, 0, 0, NULL );
+		if (!self->osMesaContext) {
+			Journal_Printf( lucError, "In func %s: OSMesaCreateContext failed!\n", __func__);
+			abort();
+		}
+	#else
+	   	self->sdlFlags = SDL_OPENGL | SDL_GL_DOUBLEBUFFER | SDL_RESIZABLE | SDL_HWPALETTE;
+		if( pSDLVideoInfo->hw_available ) // Hardware surfaces enabled?
+		    self->sdlFlags |= SDL_HWSURFACE;
+		else
+		    self->sdlFlags |= SDL_SWSURFACE;
+		if( pSDLVideoInfo->blit_hw ) // Hardware supported blitting?
+		    self->sdlFlags |= SDL_HWACCEL;
+	  
+		SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 ); // Enable OpenGL Doublebuffering
+	#endif
+	
+    /* Create our rendering surface */
+    self->screen = SDL_SetVideoMode( self->width, self->height, 32, self->sdlFlags );
+    //self->screen = SDL_SetVideoMode( self->width, self->height, pSDLVideoInfo->vfmt->BitsPerPixel, self->sdlFlags );
+    if( !self->screen)
+    {
+		Journal_Printf( lucError, "In func %s: Call to SDL_SetVideoMode() failed! - SDL_Error: %s\n", __func__, SDL_GetError() );
+        SDL_Quit();
 		abort();
 	}
 
-	_lucWindow_SetupGLRasterFont( self );
+	#ifdef HAVE_OSMESA
+	    /* SDL interprets each pixel as a 32-bit number, so our masks must depend
+		   on the endianness (byte order) of the machine */
+		Uint32 rmask, gmask, bmask, amask;
+		#if SDL_BYTEORDER == SDL_BIG_ENDIAN /* Is this the default anyway? */
+			rmask = 0xff000000;
+			gmask = 0x00ff0000;
+			bmask = 0x0000ff00;
+			amask = 0x000000ff;
+		#else
+			rmask = 0x000000ff;
+			gmask = 0x0000ff00;
+			bmask = 0x00ff0000;
+			amask = 0xff000000;
+		#endif
+		/* buffer for display */
+		SDL_Surface* buffer = (SDL_Surface*)self->buffer;
+		buffer = SDL_CreateRGBSurface(SDL_SWSURFACE, self->width, self->height, 32, rmask, gmask,  bmask, amask);
+
+		/* Bind the buffer to the context and make it current */
+	   	if (!OSMesaMakeCurrent( self->osMesaContext, buffer->pixels, GL_UNSIGNED_BYTE, self->width, self->height )) {
+			Journal_Printf( lucError, "In func %s: OSMesaMakeCurrent failed!\n", __func__);
+			abort();
+	   	}
+		OSMesaPixelStore(OSMESA_Y_UP,0);
+	#endif
 	
-	/* Draw Window */
-	lucWindow_Draw( self, context );
-	SDL_GL_SwapBuffers();
-	if ( self->interactive ) {
-		lucWindow_InteractionHelpMessage( self, Journal_MyStream( Info_Type, self ) );
-		lucSDLWindow_EventLoop( self, context );
-	}
+	/* Install 1sec idle timer */
+	self->timer = SDL_AddTimer(1000, lucSDLWindow_IdleTimer, self);
 	
-	/* Dump image */
-	lucWindow_Dump( self, context );
-	lucWindow_CleanUp( self, context );
+	/* Run the parent function to init window... */
+	_lucWindow_Initialise(window, data);	
+}
+
+void _lucSDLWindow_Execute( void* window, void* data ) {
+
+	/* Run the parent function to execute the window... */
+	_lucWindow_Execute(window, data);	
+}
+
+void _lucSDLWindow_Destroy( void* window, void* data ) {
+	lucSDLWindow*        self = (lucSDLWindow*) window; 
+
+	/* Run the parent function to destroy window... */
+	_lucWindow_Destroy(window, data);	
+
+	#ifdef HAVE_OSMESA
+	   /* free the image buffer */
+	 	SDL_FreeSurface(self->buffer);
+
+	   /* destroy the context */
+	   OSMesaDestroyContext( self->osMesaContext );
+	#endif
 	
+	/* Shut down SDL */
 	SDL_Quit();
 }
 
-void _lucSDLWindow_Destroy( void* window, void* data ) {}
+/* Window Virtuals */
+void _lucSDLWindow_Display( void* window ) {
+	lucSDLWindow*        self = (lucSDLWindow*) window; 
 
-void lucSDLWindow_EventLoop( void* window, AbstractContext* context) {
-	lucSDLWindow*     self      = (lucSDLWindow*)window;
-	SDL_Event         event;
-	Pixel_Index       startx     = 0;
-	Pixel_Index       starty     = 0;
-	int               button     = 0;
-	char              keyPressed;
-	Bool              buttonDown = False;
-	
-	lucWindow_BeginEventLoop( self );
-	while ( !self->quitEventLoop ) {
-		if( SDL_WaitEvent( &event ) ) {
-			switch( event.type ) {
-				case SDL_QUIT:
-					return ;
-				case SDL_VIDEORESIZE:
-					lucWindow_SetViewportNeedsToDrawFlag( self, True );
-					break;
-				case SDL_MOUSEMOTION:
-					if (!buttonDown) break;
-					lucWindow_MouseMotion(self, button , event.motion.x, self->height - event.motion.y, startx, starty);
-					startx = event.motion.x;
-					starty = self->height - event.motion.y;
-					break;
-				case SDL_KEYDOWN:
-					keyPressed = event.key.keysym.sym;
-					lucWindow_KeyboardEvent( self, keyPressed, startx, starty);
-					break;
-				case SDL_MOUSEBUTTONDOWN: 
-					button = event.button.button;
-					startx = event.button.x;
-					starty = self->height - event.button.y;
-					lucWindow_MouseClick( self, button, event.type, startx, starty);
-					buttonDown = True;
-					break;
-				case SDL_MOUSEBUTTONUP:
-					buttonDown = False;
-					break;
-				default:
-					lucWindow_SetViewportNeedsToDrawFlag( self, True );
-			}
+	/* Run the parent function to display window... */
+	lucWindow_Display(window);	
 
-			/* check to see whether we should continue interactivity */
-			MPI_Bcast( &self->quitEventLoop, 1, MPI_INT, MASTER, context->communicator );
-			if ( self->quitEventLoop )
-				break;
-			
-			lucWindow_Draw( window, context );
-			SDL_GL_SwapBuffers();
-		}
-	}
+	#ifdef HAVE_OSMESA
+		/* Render to SDL using OSMesa output buffer */
+		SDL_Rect dest;
+		SDL_Rect oclip;
 
+		dest.y = 0;
+		dest.x = 0;
+		dest.w = self->width;
+		dest.h = self->height;
+
+		/* make backup of clipping area */
+		SDL_GetClipRect(self->screen,&oclip);
+
+		/* clip to full screen */
+		SDL_SetClipRect(self->screen,NULL);
+		SDL_BlitSurface(self->buffer,NULL,self->screen,NULL);
+		SDL_SetClipRect(self->screen,&oclip);
+		SDL_Flip(self->screen);
+	#else	
+		/* Swap buffers */
+		SDL_GL_SwapBuffers();
+	#endif
 }
 
+int _lucSDLWindow_EventsWaiting( void* window )
+{
+	/* Check for events without removing from queue */
+	return SDL_PollEvent(NULL);
+}
+
+Bool _lucSDLWindow_EventProcessor( void* window ) {
+	lucSDLWindow*     self      = (lucSDLWindow*)window;
+	char              keyPressed;
+	static int               button     = 0;
+	static Bool              buttonDown = False;
+	SDL_Event         event;
+	
+	/* Wait for next event */
+	SDL_WaitEvent( &event );
+
+	switch( event.type ) {
+		case SDL_QUIT:
+			lucWindow_ToggleApplicationQuit( window );
+			break;	
+		case SDL_VIDEORESIZE:
+			SDL_SetVideoMode(event.resize.w, event.resize.h, 32, self->sdlFlags);
+			_lucWindow_Initialise(window, self->context);	/* Reset font stuff */
+			lucWindow_Resize( self, event.resize.w, event.resize.h);
+			break;
+		case SDL_KEYDOWN:
+			keyPressed = event.key.keysym.sym;
+			int xpos, ypos;
+			SDL_GetMouseState(&xpos, &ypos);
+			lucWindow_KeyboardEvent( self, keyPressed, xpos, ypos);
+			break;
+		case SDL_MOUSEMOTION:
+			if (buttonDown) lucWindow_MouseMotion(self, button , event.motion.x, self->height - event.motion.y);
+			break;
+		case SDL_MOUSEBUTTONDOWN: 
+			buttonDown = True;
+			button = event.button.button;
+			lucWindow_MouseClick( self, button, event.type, event.button.x, self->height - event.button.y);
+			break;
+		case SDL_MOUSEBUTTONUP:
+			buttonDown = False;
+			break;
+		case SDL_ACTIVEEVENT:
+			if (event.active.state == SDL_APPACTIVE)	/* Restored from icon */
+				lucWindow_SetViewportNeedsToDrawFlag( self, True );
+			else
+				return False;
+			break;
+		case SDL_VIDEOEXPOSE:
+			return True;
+			break;
+		default:	
+			return False;	/* No change to display, don't redraw */
+	}
+
+	/* Reset idle timer */
+	lucWindow_IdleReset(self);
+
+	/* Returns true if event processed */
+	return True;
+}
+
+/* Timer callback */
+Uint32 lucSDLWindow_IdleTimer(Uint32 interval, void* param) {
+	lucSDLWindow*        self = (lucSDLWindow*) param; 
+	/* idle timeout check */
+	if (self->interactive)
+		lucWindow_IdleCheck(self);
+	else
+	{   
+		/* No longer interactive? Drop timer and minimize window */
+		SDL_RemoveTimer(self->timer);
+		SDL_WM_IconifyWindow();
+	}
+	
+/*
+    SDL_Event event;
+    SDL_UserEvent userevent;
+  
+    userevent.type = SDL_USEREVENT;
+    userevent.code = 0;
+    userevent.data1 = NULL;
+    userevent.data2 = NULL;
+
+    event.type = SDL_USEREVENT;
+    event.user = userevent;
+    SDL_PushEvent(&event);*/
+	
+    return(interval);
+}
 
 #endif
-

@@ -73,6 +73,9 @@
 		Stg_Component_InitialiseFunction*                  _initialise,
 		Stg_Component_ExecuteFunction*                     _execute,
 		Stg_Component_DestroyFunction*                     _destroy,
+		lucWindow_DisplayFunction*						   _displayWindow,	
+		lucWindow_EventsWaitingFunction*				   _eventsWaiting,	
+		lucWindow_EventProcessorFunction*				   _eventProcessor,	
 		Name                                               name );
 
 	void _lucOSMesaWindow_Delete( void* window ) ;
@@ -86,6 +89,5 @@
 	void _lucOSMesaWindow_Initialise( void* window, void* data ) ;
 	void _lucOSMesaWindow_Execute( void* window, void* data );
 	void _lucOSMesaWindow_Destroy( void* window, void* data ) ;
-
 #endif
 

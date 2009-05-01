@@ -63,6 +63,10 @@
 	#define MASTER 0
 #endif
 
+#include <signal.h>
+#include <sys/time.h>
+lucWindow* parent;	/* Need to save in global so signal handler for idle timer can access */
+
 /* Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 const Type lucX11Window_Type = "lucX11Window";
 
@@ -79,6 +83,9 @@ lucX11Window* _lucX11Window_New(
 		Stg_Component_InitialiseFunction*                  _initialise,
 		Stg_Component_ExecuteFunction*                     _execute,
 		Stg_Component_DestroyFunction*                     _destroy,
+		lucWindow_DisplayFunction						   _displayWindow,	
+		lucWindow_EventsWaitingFunction*				   _eventsWaiting,	
+		lucWindow_EventProcessorFunction				   _eventProcessor,	
 		Name                                               name ) 
 {
 	lucX11Window*					self;
@@ -97,6 +104,9 @@ lucX11Window* _lucX11Window_New(
 			_initialise,
 			_execute,
 			_destroy,
+			_displayWindow,	
+			_eventsWaiting,
+			_eventProcessor,
 			name );
 	
 	return self;
@@ -107,9 +117,7 @@ void _lucX11Window_Init(
 		Name                                               xFontName,
 		Name                                               host,
 		unsigned int                                       displayNumber,
-		unsigned int                                       displayScreen,
-		Bool                                               isTimedOut,
-		double                                             maxIdleTime ) 
+		unsigned int                                       displayScreen )
 {
 
 	/* Setup display name */
@@ -117,23 +125,13 @@ void _lucX11Window_Init(
 	self->host          = StG_Strdup( host );
 	self->displayNumber = displayNumber;
 	self->displayScreen = displayScreen;
-	self->isTimedOut    = isTimedOut;
-	self->maxIdleTime   = maxIdleTime;
 
 	/* Get font from X11 */
 	self->xFontName = xFontName;
 }
 
 void _lucX11Window_Delete( void* window ) {
-	lucX11Window*  self = (lucX11Window*)window;
-
-	lucX11Window_CloseBackgroundWindow( self );
-	lucX11Window_CloseInteractiveWindow( self );
-
-	Memory_Free( self->displayName );
-	Memory_Free( self->host );
-
-	_lucWindow_Delete( self );
+	_lucWindow_Delete( window );
 }
 
 void _lucX11Window_Print( void* window, Stream* stream ) {
@@ -168,6 +166,9 @@ void* _lucX11Window_DefaultNew( Name name ) {
 		_lucX11Window_Initialise,
 		_lucX11Window_Execute,
 		_lucX11Window_Destroy,
+		_lucX11Window_Display,	
+		_lucX11Window_EventsWaiting,
+		_lucX11Window_EventProcessor, 
 		name );
 }
 
@@ -182,146 +183,175 @@ void _lucX11Window_Construct( void* window, Stg_ComponentFactory* cf, void* data
 			Stg_ComponentFactory_GetString( cf, self->name, "xFontName", "-adobe-courier-bold-r-normal--14-140-75-75-m-90-iso8859-1" ),
 			Stg_ComponentFactory_GetString( cf, self->name, "host", "localhost" ),
 			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "displayNumber", 0 ),
-			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "displayScreen", 0 ),
-			Stg_ComponentFactory_GetBool( cf, self->name, "isTimedOut", True ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "maxIdleTime", 600.0 ) );
+			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "displayScreen", 0 ) );
 			
 			
 }
 
-void _lucX11Window_Build( void* window, void* data ) {}
-void _lucX11Window_Initialise( void* window, void* data ) {}
+void _lucX11Window_Build( void* window, void* data ) {
+	/* Run the parent function to build window... */
+	_lucWindow_Build(window, data);	
+}
 
-void _lucX11Window_Execute( void* window, void* data ) {
-	lucX11Window*     self      = (lucX11Window*)window;
-	AbstractContext*  context   = (AbstractContext*) data;
-	Bool              iAmMaster = (context->rank == MASTER);
+void _lucX11Window_Initialise( void* window, void* data ) {
+	lucX11Window*  self = (lucX11Window*)window;
 
 	lucDebug_PrintFunctionBegin( self, 1 );
+
+	XSetErrorHandler(lucX11Window_Error);
 	
-	lucWindow_SetViewportNeedsToSetupFlag( self, True );
-	lucWindow_SetViewportNeedsToDrawFlag( self, True );
-
-	#ifdef __APPLE__
-	UpdateSystemActivity(IdleActivity);
-	#endif
-
-	if ( self->interactive ) {
-		if (iAmMaster) {
-			Journal_DPrintf( lucDebug, "Opening Interactive window.\n");
-			lucX11Window_CreateInteractiveWindow( self ); 
-		}
-		else {
-			Journal_DPrintf( lucDebug, "Using background window on slave processor.\n");
-			lucX11Window_CreateBackgroundWindow( self );
-		}
-
-		lucX11Window_MakeCurrent( self );
-		lucX11Window_EventLoop( self, context );
+	if ( self->interactive && self->isMaster) {
+		Journal_DPrintf( lucDebug, "Opening Interactive window.\n");
+		lucX11Window_CreateInteractiveWindow( self ); 
 	}
 	else {
-		/* Open window */
+		Journal_DPrintf( lucDebug, "Opening background window.\n");
 		lucX11Window_CreateBackgroundWindow( self );
-		
-		lucX11Window_MakeCurrent( self );
-		lucWindow_Draw( self, context );
 	}
-	
-	/* Dump image */
-	lucWindow_Dump( self, context );
 
-	lucWindow_CleanUp( self, context );
-	lucX11Window_CloseInteractiveWindow( self );
+	/* Setup timer */
+	parent = (lucWindow*)window;	/* Save parent ref for signal handler... */
+	signal(SIGALRM, lucX11Window_Timer);
+	struct itimerval timerval;
+	timerval.it_value.tv_sec	= 1;
+	timerval.it_value.tv_usec	= 0;
+	timerval.it_interval = timerval.it_value;
+	setitimer(ITIMER_REAL, &timerval, NULL);
+
+	/* Run the parent function to init window... */
+	_lucWindow_Initialise(window, data);
+
+	/* call here to override default font display lists */
+	lucX11Window_SetupFonts( self );
 
 	lucDebug_PrintFunctionEnd( self, 1 );
 }
 
-void _lucX11Window_Destroy( void* window, void* data ) {}
+void _lucX11Window_Execute( void* window, void* data ) {
+	/* Run the parent function to execute the window... */
+	_lucWindow_Execute(window, data);	
+}
 
-Bool lucX11Window_EventLoop( void* window, AbstractContext* context) {
-	lucX11Window*  self             = (lucX11Window*)window;
-	Display*       dpy              = self->display;
+void _lucX11Window_Destroy( void* window, void* data ) {
+	lucX11Window*  self = (lucX11Window*)window;
+
+	/* Run the parent function to destroy window... */
+	_lucWindow_Destroy(window, data);	
+
+	if (self->win) 
+		lucX11Window_CloseInteractiveWindow( self );
+	else
+		lucX11Window_CloseBackgroundWindow( self );
+
+	/* Close glx window */
+	XFree( self->vi );
+	self->vi = 0;
+
+	glXDestroyContext( self->display,  self->glxcontext);
+	self->glxcontext = 0;
+
+	XSetCloseDownMode( self->display,  DestroyAll);
+	XCloseDisplay( self->display );
+	self->display = 0;
+
+	/* Moved from _Delete */
+	Memory_Free( self->displayName );
+	Memory_Free( self->host );
+
+	lucDebug_PrintFunctionEnd( self, 1 );
+}
+
+/* Window Virtuals */
+void _lucX11Window_Display( void* window ) {
+	lucX11Window*        self = (lucX11Window*) window; 
+
+	/* Run the parent function to display window... */
+	lucWindow_Display(window);	
+
+	/* Swap buffers if interactive */
+	if ( self->isMaster && self->interactive && self->doubleBuffer) 
+		glXSwapBuffers(self->display, self->win);
+}
+
+int _lucX11Window_EventsWaiting( void* window )
+{
+	lucX11Window*  self = (lucX11Window*)window;
+	return XPending(self->display);
+
+}
+
+Bool _lucX11Window_EventProcessor( void* window ) {
+	lucX11Window*  self = (lucX11Window*)window;
 	KeySym         ks;
 	XEvent         event;
 	Atom           wmDeleteWindow;
-	unsigned int   button           = 0;
-	Pixel_Index    startx           = 0;
-	Pixel_Index    starty           = 0;
-	Bool           iAmMaster        = (context->rank == MASTER);
-	Bool           handledEvent     = False;
-	double         maxIdleTime      = MPI_Wtime() + self->maxIdleTime;
+	static unsigned int button = 0;
+	static int visible = True;
+	static int hiding = False;
+	int width, height;
 
 	lucDebug_PrintFunctionBegin( self, 1 );
+	/* Avoid busy wait loop by using blocking event check 
+	   (signal callback wakes every few seconds to check idle timeout) */
 	
-	lucWindow_BeginEventLoop( self );
+	XNextEvent(self->display, &event);
 
-	while( 1 ) {
-		if ( iAmMaster ) {
-			while ( XEventsQueued(dpy, QueuedAfterFlush ) ) {
-				handledEvent = True;
-				XNextEvent(dpy, &event);
-				switch (event.type) {
-					case ConfigureNotify:
-						lucWindow_Resize( self, event.xconfigure.width, event.xconfigure.height);
-						/* fall through... */
-					case Expose:
-						lucWindow_SetViewportNeedsToDrawFlag( self, True );
-						break;
-					case ButtonPress: case ButtonRelease:
-						button = event.xbutton.button;
-						startx = event.xbutton.x;
-						starty = self->height - event.xbutton.y;
-						lucWindow_MouseClick( self, button, event.type, startx, starty);
-						break;
-					case MotionNotify:
-						lucWindow_MouseMotion( self, button , event.xmotion.x, self->height - event.xmotion.y, startx, starty);
-						startx = event.xmotion.x;
-						starty = self->height - event.xmotion.y;
-						break;
-					case KeyPress:
-						ks = XLookupKeysym((XKeyEvent *) & event, 0);
-						lucWindow_KeyboardEvent( self, ks, event.xkey.x, self->height - event.xkey.y);
-						break;
-					case ClientMessage:
-						if (event.xclient.data.l[0] == wmDeleteWindow)
-							lucWindow_QuitEventLoop( self );
-						break;
-					default:
-						lucWindow_SetViewportNeedsToDrawFlag( self, True );
-				}
-			}
-
-			if(self->isTimedOut){
-				if ( MPI_Wtime() > maxIdleTime ) {
-					Journal_Printf( lucError, 
-							"Error in func '%s'" 
-							" - Interactive window '%s' open for too long (over %g seconds) without interaction.\n",
-							__func__, self->name, self->maxIdleTime );
-					abort();
-				}
-			}
-		}
-
-		MPI_Bcast( &handledEvent, 1, MPI_INT, MASTER, context->communicator );
-		if ( !handledEvent )
-			continue;
-
-		MPI_Bcast( &self->quitEventLoop, 1, MPI_INT, MASTER, context->communicator );
-		if ( self->quitEventLoop )
+	/* Reset idle timer */
+	lucWindow_IdleReset(window);
+	
+	switch (event.type) {
+		case ButtonRelease:
+		case ButtonPress: 
+			button = event.xbutton.button;
+    		lucWindow_MouseClick( self, button, event.type, event.xmotion.x, self->height - event.xmotion.y);
+	    	break;
+		case MotionNotify:
+			lucWindow_MouseMotion( self, button , event.xmotion.x, self->height - event.xmotion.y);
+    		break;
+		case KeyPress:
+			ks = XLookupKeysym((XKeyEvent *) & event, 0);
+			lucWindow_KeyboardEvent( self, ks, event.xkey.x, self->height - event.xkey.y);
 			break;
-
-		Journal_DPrintfL( lucDebug, 2, "In func %s: Event handled - Now redrawing.\n", __func__ );
-		lucWindow_Draw( self, context );
-		lucX11Window_SwapBuffers( self, context );
-		handledEvent = False;
-		maxIdleTime = MPI_Wtime() + self->maxIdleTime;
+    	case ClientMessage:
+			if (event.xclient.data.l[0] == self->wmDeleteWindow)
+				lucWindow_ToggleApplicationQuit( window );
+			break;
+   		case MapNotify:
+			/* Window shown */
+			if (!visible) lucWindow_SetViewportNeedsToDrawFlag( window, True );
+			visible = True;
+			break;
+   		case UnmapNotify:
+			/* Window hidden, iconized */
+			visible = False;
+			if (hiding) 
+			{
+				lucWindow_SetViewportNeedsToDrawFlag( window, True );
+				self->_displayWindow( self );
+				self->interactive = False;
+			}
+			break;
+   		case ConfigureNotify:
+		{
+			/* Notification of window actions */
+			width = event.xconfigure.width;
+			height = event.xconfigure.height;
+			/* Only resize viewports if window dimensions changed */
+			if (width != self->width || height != self->height)
+				lucWindow_Resize( self, width, height);
+    		break;
+		}
 	}
 
-	if( self->toggleApplicationQuit ) {
-		context->gracefulQuit = True;
+	if (!self->interactive && !hiding)
+	{
+		/* Hide window, must now wait for UnmapNotify */
+		hiding = True; 
+		self->interactive = True;   /* Reset until events processed */
+		XUnmapWindow(self->display, self->win);	 
 	}
 
-	lucDebug_PrintFunctionEnd( self, 1 );
+	/* Returns true if event processed */
 	return True;
 }
 
@@ -332,41 +362,8 @@ void lucX11Window_SetupFonts( void* window ) {
 
 	/* Tell GLX to use this font */
 	glXUseXFont( self->font->fid, 32, 96, 2000+32 );
-	glListBase(2000);
 	
 	lucDebug_PrintFunctionEnd( self, 2 );
-}
-
-void lucX11Window_SwapBuffers( void* window, AbstractContext* context ) {
-	lucX11Window*  self      = (lucX11Window*)window;
-	
-	lucDebug_PrintFunctionBegin( self, 2 );
-
-	if (self->doubleBuffer && context->rank == MASTER) 
-		glXSwapBuffers(self->display, self->win);
-	
-	lucDebug_PrintFunctionEnd( self, 2 );
-}
-
-
-
-void lucX11Window_MakeCurrent( void* window )  {
-	lucX11Window*  self         = (lucX11Window*)window;
-	
-	lucDebug_PrintFunctionBegin( self, 1 );
-
-	if ( self->backgroundWindowOpen ) {
-		glXMakeCurrent( self->display, self->glxpmap, self->glxcontext);
-	}
-	else if ( self->interactiveWindowOpen ){
-		glXMakeCurrent( self->display, self->win, self->glxcontext);
-		XMapWindow( self->display, self->win );
-		glXSwapBuffers( self->display, self->win );
-	}
-
-	lucX11Window_SetupFonts( self );
-	
-	lucDebug_PrintFunctionEnd( self, 1 );
 }
 
 Bool lucX11Window_CreateDisplay( void* window )  {
@@ -375,72 +372,62 @@ Bool lucX11Window_CreateDisplay( void* window )  {
 			GLX_RED_SIZE, 1, GLX_GREEN_SIZE, 1, GLX_BLUE_SIZE, 1, None};
 	static int alphaConfiguration[] = { GLX_DOUBLEBUFFER, GLX_RGBA, GLX_DEPTH_SIZE, 16,
 			GLX_RED_SIZE, 1, GLX_GREEN_SIZE, 1, GLX_BLUE_SIZE, 1, GLX_ALPHA_SIZE, 1, None};
-	Display *display;
-	XVisualInfo* vi;
-	GLXContext   glxcontext;
 	
 	/*********************** Create Display ******************************/
-	display = XOpenDisplay(NULL);
-	if (display == NULL) {
+	self->display = XOpenDisplay(NULL);
+	if (self->display == NULL) {
 		Journal_Printf( lucError, "In func %s: Function XOpenDisplay(NULL) returned NULL\n", __func__);
 
 		/* Second Try */
-		display = XOpenDisplay(self->displayName);
-		if (display == NULL) {
+		self->display = XOpenDisplay(self->displayName);
+		if (self->display == NULL) {
 			Journal_Printf( lucError, "In func %s: Function XOpenDisplay(%s) didn't work.\n", __func__ , self->displayName);
 		
 			/* Third Try */
-			display = XOpenDisplay(":0.0");
-			if (display == NULL) {
+			self->display = XOpenDisplay(":0.0");
+			if (self->display == NULL) {
 				Journal_Printf( lucError, "In func %s: Function XOpenDisplay(\":0.0\") returned NULL\n", __func__);
 
 				return False;
 			}
 		}
 	}
-	/* Store display on context */
-	self->display = display;
 	
 	/* Check to make sure display we've just opened has a glx extension */
-	if (!glXQueryExtension(display, NULL, NULL)) {
+	if (!glXQueryExtension(self->display, NULL, NULL)) {
 		Journal_Printf( lucError,"In func %s: X server has no OpenGL GLX extension\n", __func__);
 		return False;
 	}
 
 	/* find an OpenGL-capable display - trying different configurations if nessesary */
-	vi = glXChooseVisual(display, DefaultScreen(display), &alphaConfiguration[0]);
+	self->vi = glXChooseVisual(self->display, DefaultScreen(self->display), &alphaConfiguration[0]);
 	self->doubleBuffer = True;
-	if (vi == NULL) {
+	if (self->vi == NULL) {
 		Journal_Printf( lucError, "In func %s: Couldn't open RGBA Double Buffer display\n", __func__);
-		vi = glXChooseVisual( self->display, DefaultScreen( self->display), &alphaConfiguration[1]);
+		self->vi = glXChooseVisual( self->display, DefaultScreen( self->display), &alphaConfiguration[1]);
 		self->doubleBuffer = False;
 	}
-	if (vi == NULL) {
+	if (self->vi == NULL) {
 		Journal_Printf( lucError, "In func %s: Couldn't open RGBA display\n", __func__);
-		vi = glXChooseVisual(display, DefaultScreen(display), &configuration[0]);
+		self->vi = glXChooseVisual(self->display, DefaultScreen(self->display), &configuration[0]);
 		self->doubleBuffer = True;
 	}
-	if (vi == NULL) {
+	if (self->vi == NULL) {
 		Journal_Printf( lucError, "In func %s: Couldn't open Double Buffer display\n", __func__);
-		vi = glXChooseVisual(display, DefaultScreen(display), &configuration[1]);
+		self->vi = glXChooseVisual(self->display, DefaultScreen(self->display), &configuration[1]);
 		self->doubleBuffer = False;
 	}
-	if (vi == NULL) {
+	if (self->vi == NULL) {
 		Journal_Printf( lucError, "In func %s: Couldn't open display\n", __func__);
 		return False;
 	}
 
-	/* Store visual on context */
-	self->vi = vi;
-
 	/* Create an OpenGL rendering context */
-	glxcontext = glXCreateContext(display, vi, NULL, False);
-	if (glxcontext == NULL) {
+	self->glxcontext = glXCreateContext(self->display, self->vi, NULL, True); //Enable Direct Rendering
+	if (self->glxcontext == NULL) {
 		Journal_Printf(  lucError, "In func %s: Could not create GLX rendering context.\n", __func__);
 		return False;
 	}
-	/* Store rendering context on our context extension */
-	self->glxcontext = glxcontext;
 	
 	self->font = XLoadQueryFont( self->display, self->xFontName );
 		
@@ -503,29 +490,22 @@ void lucX11Window_CreateBackgroundWindow( void* window )  {
 	
 	lucDebug_PrintFunctionBegin( self, 1 );
 
-	lucX11Window_CloseInteractiveWindow( self );
+	Journal_Firewall( 
+		lucX11Window_CreateDisplay( self ),
+		lucError,
+		"Error in func '%s' for %s '%s': Cannot create display.\n", __func__, self->type, self->name );
+	
+	/* Create Pixmap Window */
+	self->pmap = XCreatePixmap(
+			self->display,
+			RootWindow(self->display, self->vi->screen ), 
+			self->width, 
+			self->height,
+			self->vi->depth );
 
-	if ( self->backgroundWindowOpen ) {
-		Journal_DPrintf( lucDebug, "Background window already open - returning.\n");
-	}
-	else {
-		Journal_Firewall( 
-			lucX11Window_CreateDisplay( self ),
-			lucError,
-			"Error in func '%s' for %s '%s': Cannot create display.\n", __func__, self->type, self->name );
-		
-		/* Create Pixmap Window */
-		self->pmap = XCreatePixmap(
-				self->display,
-				RootWindow(self->display, self->vi->screen ), 
-				self->width, 
-				self->height,
-				self->vi->depth );
+	self->glxpmap = glXCreateGLXPixmap( self->display,  self->vi, self->pmap );
 
-		self->glxpmap = glXCreateGLXPixmap( self->display,  self->vi, self->pmap );
-		
-		self->backgroundWindowOpen = True;
-	}
+	glXMakeCurrent( self->display, self->glxpmap, self->glxcontext);
 	
 	lucDebug_PrintFunctionEnd( self, 1 );
 }
@@ -533,14 +513,10 @@ void lucX11Window_CreateBackgroundWindow( void* window )  {
 
 void lucX11Window_CreateInteractiveWindow( void* window ) {
 	lucX11Window*        self         = (lucX11Window*)window;
-	Pixel_Index          windowWidth  = self->width;
-	Pixel_Index          windowHeight = self->height;
 	Colormap             cmap;
 	XSetWindowAttributes swa;
 	XWMHints *           wmHints;
-	Atom                 wmDeleteWindow;
-	Display*             display;
-	XVisualInfo*         vi;
+	XSizeHints *		 sHints;
 	
 	lucDebug_PrintFunctionBegin( self, 1 );
 		
@@ -549,51 +525,67 @@ void lucX11Window_CreateInteractiveWindow( void* window ) {
 		lucError,
 		"Error in func '%s' for %s '%s': Cannot create display.\n", __func__, self->type, self->name );
 
-	display = self->display;
-	vi = self->vi;
-
 	/* Create Colourmap */
 	cmap = lucX11Window_GetShareableColormap( self );
 	swa.colormap = cmap;
 	swa.border_pixel = 0;
-	swa.event_mask = ExposureMask | StructureNotifyMask | ButtonPressMask | ButtonMotionMask | KeyPressMask;
+	swa.event_mask = StructureNotifyMask | ButtonPressMask | ButtonMotionMask | KeyPressMask;
 
-	/* Create X window */
-	self->win = XCreateWindow(
-			display, 
-			RootWindow(display, vi->screen),
+	/* Setup window manager hints */
+	sHints = XAllocSizeHints();
+	wmHints = XAllocWMHints();
+
+    if ( sHints && wmHints) {
+        sHints->min_width = 32;
+        sHints->min_height = 32;
+        sHints->max_height = 4096;
+        sHints->max_width = 4096;
+
+		sHints->flags = PMaxSize | PMinSize | USPosition;
+        /* Center */
+	    sHints->x = (DisplayWidth(self->display, self->vi->screen) - self->width) / 2;
+		sHints->y = (DisplayHeight(self->display, self->vi->screen) - self->height) / 2;
+    
+
+		/* Create X window */
+		self->win = XCreateWindow(
+			self->display, 
+			RootWindow(self->display, self->vi->screen),
+			sHints->x,
+			sHints->y, 
+			self->width,
+			self->height, 
 			0,
-			0, 
-			windowWidth,
-			windowHeight, 
-			0,
-			vi->depth, 
+			self->vi->depth, 
 			InputOutput, 
-			vi->visual, 
+			self->vi->visual, 
 			CWBorderPixel | CWColormap | CWEventMask, 
 			&swa);
-		
-	XSetStandardProperties(display, self->win, self->name, self->name, None, NULL, 0, NULL);
-	
-	wmHints = XAllocWMHints();
-	wmHints->initial_state = NormalState;
-	wmHints->flags = StateHint;
-	
-	XSetWMHints(display, self->win, wmHints);
-	
-	wmDeleteWindow = XInternAtom(display, "WM_DELETE_WINDOW", False);
-	XSetWMProtocols(display, self->win, &wmDeleteWindow, 1);
 
-	self->interactiveWindowOpen = True;
+		wmHints->initial_state = NormalState;
+		wmHints->flags = StateHint;
 
-	lucWindow_InteractionHelpMessage( self, Journal_MyStream( Info_Type, self ) );
+		XTextProperty title;
+		XStringListToTextProperty(&self->title, 1, &title); 	/* argv, argc, normal_hints, wm_hints, class_hints */
+		XSetWMProperties(self->display, self->win, &title, &title, NULL, 0, sHints, wmHints, NULL);
+
+		self->wmDeleteWindow = XInternAtom(self->display, "WM_DELETE_WINDOW", True);
+		XSetWMProtocols(self->display, self->win, &self->wmDeleteWindow, 1);
+	
+		glXMakeCurrent( self->display, self->win, self->glxcontext);
+	
+		XMapWindow( self->display, self->win ); /* Show the window */
+	}
+	else
+		abort();
+	
+	if (sHints) XFree(sHints);
+	if (wmHints) XFree(wmHints);
 	
 	lucDebug_PrintFunctionEnd( self, 1 );
 }	
 
 Colormap lucX11Window_GetShareableColormap( lucX11Window* self ) {
-	Display*           display = self->display;
-	XVisualInfo*       vi      =  self->vi;
 	Status             status;
 	XStandardColormap* standardCmaps;
 	Colormap           cmap;
@@ -603,27 +595,27 @@ Colormap lucX11Window_GetShareableColormap( lucX11Window* self ) {
 	lucDebug_PrintFunctionBegin( self, 2 );
 	
 	/* be lazy; using DirectColor too involved for this example */
-	if (vi->class != TrueColor)
+	if (self->vi->class != TrueColor)
 		Journal_Printf( lucError, "No support for non-TrueColor visual.");
 	
 	/* if no standard colormap but TrueColor, just make an unshared one */
-	status = XmuLookupStandardColormap(display, vi->screen, vi->visualid,
-		vi->depth, XA_RGB_DEFAULT_MAP, /* replace */ False, /* retain */ True);
+	status = XmuLookupStandardColormap(self->display, self->vi->screen, self->vi->visualid,
+		self->vi->depth, XA_RGB_DEFAULT_MAP, /* replace */ False, /* retain */ True);
 		
 	if (status == 1) {
-		status = XGetRGBColormaps(display, RootWindow(display, vi->screen),
+		status = XGetRGBColormaps(self->display, RootWindow(self->display, self->vi->screen),
 			&standardCmaps, &numCmaps, XA_RGB_DEFAULT_MAP);
 	
 		if (status == 1)
 			for (i = 0; i < numCmaps; i++)
-				if (standardCmaps[i].visualid == vi->visualid) {
+				if (standardCmaps[i].visualid == self->vi->visualid) {
 					cmap = standardCmaps[i].colormap;
 					XFree(standardCmaps);
 					lucDebug_PrintFunctionEnd( self, 2 );
 					return cmap;
 				}
 	}
-	cmap = XCreateColormap(display, RootWindow(display, vi->screen), vi->visual, AllocNone);
+	cmap = XCreateColormap(self->display, RootWindow(self->display, self->vi->screen), self->vi->visual, AllocNone);
 	
 	lucDebug_PrintFunctionEnd( self, 2 );
 	return cmap;
@@ -633,20 +625,11 @@ void lucX11Window_CloseInteractiveWindow( lucX11Window* self ) {
 	
 	lucDebug_PrintFunctionBegin( self, 1 );
 
-	if ( ! self->interactiveWindowOpen ) {
-		Journal_DPrintf( lucDebug, "No interactive window open - returning.\n");
-	}
-	else {
-		Journal_DPrintf( lucDebug, "Calling XDestroyWindow.\n");
+	Journal_DPrintf( lucDebug, "Calling XDestroyWindow.\n");
 
-		XDestroyWindow( self->display , self->win );
+	XDestroyWindow( self->display , self->win );
+	self->win = 0;
 
-		self->win = 0;
-
-		lucX11Window_CloseDisplay( self );
-		self->interactiveWindowOpen = False;
-	}
-	
 	lucDebug_PrintFunctionEnd( self, 1 );
 }
 	
@@ -654,36 +637,34 @@ void lucX11Window_CloseBackgroundWindow( lucX11Window* self ) {
 
 	lucDebug_PrintFunctionBegin( self, 1 );
 
-	if ( ! self->backgroundWindowOpen ) {
-		Journal_DPrintf( lucDebug, "No background window open - returning.\n");
-	}
-	else {
-		glXDestroyGLXPixmap(self->display, self->glxpmap);
-		self->glxpmap = 0;
-		XFreePixmap(self->display, self->pmap);
-		self->pmap = 0;
-		lucX11Window_CloseDisplay( self );
-		self->backgroundWindowOpen = False;
-	}
-	
+	glXDestroyGLXPixmap(self->display, self->glxpmap);
+	self->glxpmap = 0;
+	XFreePixmap(self->display, self->pmap);
+	self->pmap = 0;
+
 	lucDebug_PrintFunctionEnd( self, 1 );
 }
 
-void lucX11Window_CloseDisplay( lucX11Window* self ) {
-	
-	lucDebug_PrintFunctionBegin( self, 1 );
-			
-	XFree( self->vi );
-	self->vi = 0;
+void lucX11Window_Timer( int x)
+{
+	if (parent->interactive)
+		lucWindow_IdleCheck(parent);
+	else
+	{
+		/* Remove timer */
+		struct itimerval timerval;
+		timerval.it_value.tv_sec = 0;
+		timerval.it_value.tv_usec = 0;
+		timerval.it_interval = timerval.it_value;
+		setitimer(ITIMER_REAL, &timerval, NULL);
+	}
+}
 
-	glXDestroyContext( self->display,  self->glxcontext);
-	self->glxcontext = 0;
-
-	XSetCloseDownMode( self->display,  DestroyAll);
-	XCloseDisplay( self->display );
-	self->display = 0;
-	
-	lucDebug_PrintFunctionEnd( self, 1 );
+int lucX11Window_Error(Display* display, XErrorEvent* error)
+{
+	char error_str[256];
+	XGetErrorText(display, error->error_code, error_str, 256);
+	Journal_DPrintf( lucError, "X11 Error: %d -> %s\n", error->error_code, error_str);
 }
 
 #endif

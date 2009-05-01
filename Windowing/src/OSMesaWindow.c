@@ -45,7 +45,6 @@
 
 #ifdef HAVE_OSMESA
 
-#include <mpi.h>
 #include <StGermain/StGermain.h>
 #include <StgDomain/StgDomain.h>
 
@@ -73,6 +72,9 @@ lucOSMesaWindow* _lucOSMesaWindow_New(
 		Stg_Component_InitialiseFunction*                  _initialise,
 		Stg_Component_ExecuteFunction*                     _execute,
 		Stg_Component_DestroyFunction*                     _destroy,
+		lucWindow_DisplayFunction*						   _displayWindow,	
+		lucWindow_EventsWaitingFunction*				   _eventsWaiting,	
+		lucWindow_EventProcessorFunction*				   _eventProcessor,	
 		Name                                               name ) 
 {
 	lucOSMesaWindow*					self;
@@ -91,23 +93,19 @@ lucOSMesaWindow* _lucOSMesaWindow_New(
 			_initialise,
 			_execute,
 			_destroy,
+			_displayWindow,
+			_eventsWaiting,
+			_eventProcessor,
 			name );
 	
 	return self;
 }
 
 void _lucOSMesaWindow_Init( lucOSMesaWindow* self ) {
-	self->pixelBuffer = Memory_Alloc_Array( lucAlphaPixel, self->width * self->height, "pixelBuffer" );
-	self->osMesaContext = OSMesaCreateContext( OSMESA_RGBA, NULL );
 }
 
 void _lucOSMesaWindow_Delete( void* window ) {
-	lucOSMesaWindow*  self = (lucOSMesaWindow*)window;
-
-	OSMesaDestroyContext( self->osMesaContext );
-	Memory_Free( self->pixelBuffer );
-
-	_lucWindow_Delete( self );
+	_lucWindow_Delete( window );
 }
 
 void _lucOSMesaWindow_Print( void* window, Stream* stream ) {
@@ -144,6 +142,9 @@ void* _lucOSMesaWindow_DefaultNew( Name name ) {
 		_lucOSMesaWindow_Initialise,
 		_lucOSMesaWindow_Execute,
 		_lucOSMesaWindow_Destroy,
+		lucWindow_Display,	/* Use parent class default implementations */
+		lucWindow_EventsWaiting,
+		lucWindow_EventProcessor,
 		name );
 }
 
@@ -156,27 +157,38 @@ void _lucOSMesaWindow_Construct( void* window, Stg_ComponentFactory* cf, void* d
 	_lucOSMesaWindow_Init( self );
 }
 
-void _lucOSMesaWindow_Build( void* window, void* data ) {}
-void _lucOSMesaWindow_Initialise( void* window, void* data ) {}
-
-void _lucOSMesaWindow_Execute( void* window, void* data ) {
-	lucOSMesaWindow*     self      = (lucOSMesaWindow*)window;
-
-	lucDebug_PrintFunctionBegin( self, 1 );
-	
-	lucWindow_SetViewportNeedsToSetupFlag( self, True );
-	lucWindow_SetViewportNeedsToDrawFlag( self, True );
-
-	OSMesaMakeCurrent( self->osMesaContext, self->pixelBuffer, GL_UNSIGNED_BYTE, self->width, self->height );
-	_lucWindow_SetupGLRasterFont( self );
-	
-	lucWindow_Draw( self, data );
-	lucWindow_Dump( self, data );
-	lucWindow_CleanUp( self, data );
-	
-	lucDebug_PrintFunctionEnd( self, 1 );
+void _lucOSMesaWindow_Build( void* window, void* data ) {
+	/* Run the parent function to build window... */
+	_lucWindow_Build(window, data);	
 }
 
-void _lucOSMesaWindow_Destroy( void* window, void* data ) {}
+void _lucOSMesaWindow_Initialise( void* window, void* data ) {
+	lucOSMesaWindow*     self      = (lucOSMesaWindow*)window;
+
+	/* Init OSMesa display buffer */
+	self->pixelBuffer = Memory_Alloc_Array( lucAlphaPixel, self->width * self->height, "pixelBuffer" );
+	self->osMesaContext = OSMesaCreateContext( OSMESA_RGBA, NULL );
+
+	OSMesaMakeCurrent( self->osMesaContext, self->pixelBuffer, GL_UNSIGNED_BYTE, self->width, self->height );
+
+	/* Run the parent function to init window... */
+	_lucWindow_Initialise(window, data);	
+}
+
+void _lucOSMesaWindow_Execute( void* window, void* data ) {
+	/* Run the parent function to execute window... */
+	_lucWindow_Execute(window, data);	
+}
+
+void _lucOSMesaWindow_Destroy( void* window, void* data ) {
+	lucOSMesaWindow*     self      = (lucOSMesaWindow*)window;
+
+	/* Moved from _Delete */
+	OSMesaDestroyContext( self->osMesaContext );
+	Memory_Free( self->pixelBuffer );
+
+	/* Run the parent function to destroy window... */
+	_lucWindow_Destroy(window, data);	
+}
 
 #endif /* HAVE_OSMESA */

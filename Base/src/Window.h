@@ -47,29 +47,45 @@
 #ifndef __lucWindow_h__
 #define __lucWindow_h__
 
+	typedef void (lucWindow_DisplayFunction) ( void* object );
+	typedef int (lucWindow_EventsWaitingFunction) ( void* object );
+	typedef Bool (lucWindow_EventProcessorFunction) ( void* object );
+
 	extern const Type lucWindow_Type;
 
 	extern MPI_Datatype lucWindow_MPI_Datatype;
 	extern MPI_Datatype lucViewportInfo_MPI_Datatype;
 
-	#define __lucWindow                                     \
-		__Stg_Component                                                              \
+	#define __lucWindow															\
+		__Stg_Component                                                         \
 		/* Virtual Functions */ \
+		lucWindow_DisplayFunction*			_displayWindow;						\
+		lucWindow_EventsWaitingFunction*	_eventsWaiting;						\
+		lucWindow_EventProcessorFunction*   _eventProcessor;					\
 		\
 		/* Other Info */ \
-		lucRenderingEngine*                            renderingEngine;            \
-		lucViewportInfo*                               viewportInfoList;           \
-		Viewport_Index                                 viewportCount;              \
-		lucOutputFormat_Register*                      outputFormat_Register;      \
-		lucWindowInteraction_Register*                 windowInteraction_Register; \
-		lucWindowInteraction*                          defaultWindowInteraction;   \
-		Pixel_Index                                    width;                      \
-		Pixel_Index                                    height;                     \
-		Bool                                           interactive;                \
-		lucColour                                      backgroundColour;           \
-		lucStereoBuffer                                currStereoBuffer;           \
-		Bool                                           quitEventLoop;              \
-		Bool                                           toggleApplicationQuit;      \
+		lucRenderingEngine*                         renderingEngine;			\
+		lucViewportInfo*                            viewportInfoList;			\
+		Viewport_Index                              viewportCount;				\
+		lucOutputFormat_Register*                   outputFormat_Register;		\
+		lucWindowInteraction_Register*              windowInteraction_Register;	\
+		lucWindowInteraction*                       defaultWindowInteraction;	\
+		Pixel_Index                                 width;						\
+		Pixel_Index                                 height;						\
+		Bool                                        interactive;				\
+		Bool                                        continuous;					\
+		lucColour                                   backgroundColour;			\
+		lucStereoBuffer                             currStereoBuffer;			\
+		Bool                                        quitEventLoop;				\
+		Bool                                        toggleApplicationQuit;		\
+		AbstractContext*                            context;					\
+		Bool                                        isMaster;					\
+		Bool                                        isTimedOut;         		\
+		double                                     	maxIdleTime;        		\
+		double										idleTime;					\
+		Pixel_Index									startx;						\
+		Pixel_Index									starty;						\
+		char*										title;            	  		\
 			
 	struct lucWindow {__lucWindow};
 
@@ -84,7 +100,10 @@
 		Stg_Component_BuildFunction*                       _build,
 		Stg_Component_InitialiseFunction*                  _initialise,
 		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,		
+		Stg_Component_DestroyFunction*                     _destroy,
+		lucWindow_DisplayFunction*						   _displayWindow,	
+		lucWindow_EventsWaitingFunction*				   _eventsWaiting,	
+		lucWindow_EventProcessorFunction*				   _eventProcessor,	
 		Name                                               name );
 
 	void _lucWindow_Delete( void* window ) ;
@@ -99,16 +118,18 @@
 	void _lucWindow_Execute( void* window, void* data ) ;
 	void _lucWindow_Destroy( void* window, void* data ) ;
 
+	/* Window Virtual Functions */
+	void lucWindow_Display( void* window );		
+	int lucWindow_EventsWaiting( void* window);	
+	Bool lucWindow_EventProcessor( void* window );	
+
 	/* +++ Public Functions +++ */
-	void lucWindow_Draw( void* window, AbstractContext* context ) ;
 	void lucWindow_Dump( void* window, AbstractContext* context ) ;
 	void lucWindow_CleanUp( void* window, void* context ) ;
 
 	/** Functions for interactivity */
-	void lucWindow_MouseMotion( void* window, lucMouseButton button, Pixel_Index xpos, Pixel_Index ypos, Pixel_Index startx, Pixel_Index starty) ;
+	void lucWindow_MouseMotion( void* window, lucMouseButton button, Pixel_Index xpos, Pixel_Index ypos) ;
 	void lucWindow_MouseClick( void* window, lucMouseButton button, lucMouseState state, Pixel_Index xpos, Pixel_Index ypos) ;
-/*	void lucWindow_MouseClickPosition( void* window, lucMouseButton button, lucMouseState state, Pixel_Index xpos, Pixel_Index ypos) ;*/
-
 	void lucWindow_KeyboardEvent( void* window, char key, Pixel_Index xpos, Pixel_Index ypos) ;
 
 	Bool lucWindow_HasStereoCamera( lucWindow* self ) ;
@@ -144,9 +165,11 @@
 
 	void _lucWindow_SetupGLRasterFont( void* window );
 	void lucWindow_ChangeInteractiveMode( void* window );
+	void lucWindow_ChangeContinuousMode( void* window );
 
-	void lucWindow_BeginEventLoop( void* window ) ;
 	void lucWindow_QuitEventLoop( void* window ) ;
 	void lucWindow_ToggleApplicationQuit( void* window ) ;
 	void lucWindow_Resize( void* window, Pixel_Index newWidth, Pixel_Index newHeight ) ;
+	void lucWindow_IdleReset(void *window);
+	void lucWindow_IdleCheck(void *window);
 #endif

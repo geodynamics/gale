@@ -45,6 +45,8 @@
 
 #ifdef HAVE_SDL
 
+#include <SDL/SDL.h>
+
 #ifndef __lucSDLWindow_h__
 #define __lucSDLWindow_h__
 
@@ -57,6 +59,11 @@
 		__lucWindow \
 		/* Virtual functions go here */ \
 		/* Other info */\
+		int													sdlFlags;				\
+		void*												screen;					\
+		void*												buffer;					\
+		void*                                               osMesaContext;			\
+		SDL_TimerID											timer;					\
 
 	struct lucSDLWindow { __lucSDLWindow };
 	
@@ -73,6 +80,9 @@
 		Stg_Component_InitialiseFunction*                  _initialise,
 		Stg_Component_ExecuteFunction*                     _execute,
 		Stg_Component_DestroyFunction*                     _destroy,
+		lucWindow_DisplayFunction*						   _displayWindow,	
+		lucWindow_EventsWaitingFunction*				   _eventsWaiting,	
+		lucWindow_EventProcessorFunction*				   _eventProcessor,	
 		Name                                               name );
 
 	void _lucSDLWindow_Delete( void* window ) ;
@@ -87,7 +97,13 @@
 	void _lucSDLWindow_Execute( void* window, void* data );
 	void _lucSDLWindow_Destroy( void* window, void* data ) ;
 
-	void lucSDLWindow_EventLoop( void* window, AbstractContext* context) ;
+	/* Window Virtuals */
+	void _lucSDLWindow_Display( void* window );
+	int _lucSDLWindow_EventsWaiting( void* window ) ;
+	Bool _lucSDLWindow_EventProcessor( void* window ) ;
+	
+	/* Timer callback */
+	Uint32 lucSDLWindow_IdleTimer(Uint32 interval, void* param);
 
 #endif
 
