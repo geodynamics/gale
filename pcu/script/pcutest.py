@@ -18,6 +18,8 @@ def build_suite_runner(env, target, hdrs, objs, **kw):
     suite_txt = ""
     init = multiget([kw, env], "PCU_INIT", "")
 
+    libheaders = multiget([kw, env], "PCU_LIBHEADERS", "")
+
     setup = multiget([kw, env], "PCU_SETUP", "")
     if setup:
         setup = '\n   ' + setup
@@ -35,6 +37,7 @@ def build_suite_runner(env, target, hdrs, objs, **kw):
 #include <mpi.h>
 #include <pcu/pcu.h>
 %s
+%s
 
 int main( int argc, char* argv[] ) {
    pcu_listener_t* lsnr;
@@ -51,7 +54,7 @@ int main( int argc, char* argv[] ) {
    MPI_Finalize();
    return EXIT_SUCCESS;
 }
-"""%(hdr_txt, setup, suite_txt, teardown)
+"""%(libheaders, hdr_txt, setup, suite_txt, teardown)
 
     dir_path = os.path.dirname(target.abspath)
     if not os.path.exists(dir_path):

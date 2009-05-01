@@ -83,6 +83,7 @@ libs = ['StGermain'] + env.get('LIBS', [])
 env.Program('bin/FlattenXML', 'Base/FlattenXML/src/main.c', LIBS=libs)
 env.Program('bin/StGermain', 'src/main.c', LIBS=libs)
 env.PCUTest('tests/testStGermain', suites,
+            PCU_LIBHEADERS="#include <StGermain/StGermain.h>",
             PCU_SETUP="StGermain_Init(&argc, &argv);",
             PCU_TEARDOWN="StGermain_Finalise();",
             LIBS=libs)
