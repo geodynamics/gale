@@ -55,6 +55,9 @@ typedef struct {
 
 void IO_HandlerSuite_Setup( IO_HandlerSuiteData* data ) {
    data->io_handler = XML_IO_Handler_New();
+   /* We don't want output in the tests by default */
+   Stream_Enable( Journal_Register( Debug_Type, XML_IO_Handler_Type ), False );
+   Stream_Enable( Journal_Register( Info_Type, XML_IO_Handler_Type ), False );
    data->dict1 = Dictionary_New();
    data->dict2 = Dictionary_New();
    data->testDD   = Memory_Alloc_Unnamed( DictionarySuite_TestDictData );
