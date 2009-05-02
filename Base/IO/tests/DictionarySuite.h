@@ -1,9 +1,6 @@
 #ifndef StGermain_DictionarySuite_h
 #define StGermain_DictionarySuite_h
 
-#include "StGermain/Base/Foundation/Foundation.h"
-#include "StGermain/Base/IO/IO.h"
-
 void DictionarySuite( pcu_suite_t* suite );
 
 /* The following are useful for several other testing suites in this dir */
