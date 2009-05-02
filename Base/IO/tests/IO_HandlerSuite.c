@@ -33,6 +33,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #include "pcu/pcu.h"
 #include "StGermain/Base/Foundation/Foundation.h"
@@ -44,6 +47,7 @@
 const char* IO_HandlerSuite_XMLStartString1 = "<?xml version=\"1.0\"?>\n";
 const char* IO_HandlerSuite_XMLStartString2 = "<StGermainData xmlns=\"http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003\">\n";
 const char* IO_HandlerSuite_XMLEndString = "</StGermainData>\n";
+const char* IO_HandlerSuite_XMLEmptyDataString = "<StGermainData xmlns=\"http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003\"/>\n";
 
 typedef struct {
    XML_IO_Handler*                io_handler;
@@ -51,6 +55,22 @@ typedef struct {
    Dictionary*                    dict2;
    DictionarySuite_TestDictData*  testDD;
 } IO_HandlerSuiteData;
+
+
+void _IO_HandlerSuite_CreateTestXMLFile( const char* testXMLFileName,
+     const char* entriesString )
+{
+   FILE*         testFile = NULL;
+   testFile = fopen(testXMLFileName, "w");
+   fwrite( IO_HandlerSuite_XMLStartString1, sizeof(char),
+      strlen( IO_HandlerSuite_XMLStartString1 ), testFile );
+   fwrite( IO_HandlerSuite_XMLStartString2, sizeof(char),
+      strlen( IO_HandlerSuite_XMLStartString2 ), testFile );
+   fwrite( entriesString, sizeof(char), strlen( entriesString ), testFile );
+   fwrite( IO_HandlerSuite_XMLEndString, sizeof(char),
+      strlen( IO_HandlerSuite_XMLEndString ), testFile );
+   fclose( testFile );
+}
 
 
 void IO_HandlerSuite_Setup( IO_HandlerSuiteData* data ) {
@@ -78,13 +98,14 @@ void IO_HandlerSuite_Teardown( IO_HandlerSuiteData* data ) {
 /* Just populate a test dictionary, write it out to a file, read it back in again to a different dict, and check all the values are the same */
 void IO_HandlerSuite_TestWriteReadNormalEntries( IO_HandlerSuiteData* data ) {
    Index         ii;
+   const char*   xmlTestFileName = "xmlTest.xml";
 
    Dictionary_Empty( data->dict1 );
    Dictionary_Empty( data->dict2 );
    DictionarySuite_PopulateDictWithTestValues( data->dict1, data->testDD );
 
-   IO_Handler_WriteAllToFile( data->io_handler, "dictTest.xml", data->dict1 );
-   IO_Handler_ReadAllFromFile( data->io_handler, "dictTest.xml", data->dict2 ); 
+   IO_Handler_WriteAllToFile( data->io_handler, xmlTestFileName, data->dict1 );
+   IO_Handler_ReadAllFromFile( data->io_handler, xmlTestFileName, data->dict2 ); 
 
    pcu_check_true( data->dict1->count == data->dict2->count );
    for (ii=0; ii<data->dict1->count; ii++) {
@@ -94,18 +115,20 @@ void IO_HandlerSuite_TestWriteReadNormalEntries( IO_HandlerSuiteData* data ) {
          data->dict2->entryPtr[ii]->value) );
    }
 
-   remove("dictTest.xml");
+   remove(xmlTestFileName);
    Dictionary_Empty( data->dict1 );
    Dictionary_Empty( data->dict2 );
 }
 
 
 /* Similar to above test, except using the function to write just one entry at a time */
-void IO_HandlerSuite_TestWriteNormalSingleEntry( IO_HandlerSuiteData* data ) {
+void IO_HandlerSuite_TestWriteReadNormalSingleEntry( IO_HandlerSuiteData* data ) {
    Index         ii;
    const char*   fileName = "singleEntry.xml";
 
+   Dictionary_Empty( data->dict1 );
    Dictionary_Empty( data->dict2 );
+   DictionarySuite_PopulateDictWithTestValues( data->dict1, data->testDD );
 
    for (ii=0; ii<data->dict1->count; ii++) {
       XML_IO_Handler_WriteEntryToFile( data->io_handler, fileName,
@@ -115,15 +138,47 @@ void IO_HandlerSuite_TestWriteNormalSingleEntry( IO_HandlerSuiteData* data ) {
       IO_Handler_ReadAllFromFile( data->io_handler, fileName, data->dict2 ); 
 
       pcu_check_true( 1 == data->dict2->count );
-      pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[1],
+      pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0],
          data->testDD->testKeys[ii]) );
-      pcu_check_true( Dictionary_Entry_Value_Compare( data->dict2->entryPtr[1]->value,
+      pcu_check_true( Dictionary_Entry_Value_Compare( data->dict2->entryPtr[0]->value,
          data->testDD->testValues[ii] ) );
 
       Dictionary_Empty( data->dict2 );
       remove(fileName);
    }
 
+   Dictionary_Empty( data->dict1 );
+   Dictionary_Empty( data->dict2 );
+}
+
+
+/* Similar to above test, except test we can write out an empty Dictionary, then read in */
+void IO_HandlerSuite_TestWriteReadEmpty( IO_HandlerSuiteData* data ) {
+   Index         ii;
+   const char*   xmlTestFileName = "empty.xml";
+   FILE*         testFile = NULL;
+   const int     MAXLINE = 1000;
+   char*         xmlLine = NULL;
+
+   Dictionary_Empty( data->dict1 );
+   Dictionary_Empty( data->dict2 );
+
+   IO_Handler_WriteAllToFile( data->io_handler, xmlTestFileName, data->dict1 );
+
+   testFile = fopen(xmlTestFileName, "r");
+   xmlLine = Memory_Alloc_Array_Unnamed( char, MAXLINE );
+   pcu_check_true( fgets( xmlLine, sizeof(char*)*MAXLINE, testFile ) );
+   pcu_check_true( 0 == strcmp( IO_HandlerSuite_XMLStartString1, xmlLine ) );
+   pcu_check_true( fgets( xmlLine, sizeof(char*)*MAXLINE, testFile ) );
+   pcu_check_true( 0 == strcmp( IO_HandlerSuite_XMLEmptyDataString, xmlLine ) );
+   Memory_Free( xmlLine );
+   fclose(testFile);
+
+   IO_Handler_ReadAllFromFile( data->io_handler, xmlTestFileName, data->dict2 ); 
+   pcu_check_true( 0 == data->dict2->count );
+
+   remove(xmlTestFileName);
+   Dictionary_Empty( data->dict1 );
    Dictionary_Empty( data->dict2 );
 }
 
@@ -132,7 +187,7 @@ void IO_HandlerSuite_TestWriteNormalSingleEntry( IO_HandlerSuiteData* data ) {
  * check against expected text. */
 void IO_HandlerSuite_TestWriteExplicitTypes( IO_HandlerSuiteData* data ) {
    Index         ii=0;
-   const char*   testFileName = "dictTest-explicittypes.xml";
+   const char*   testFileName = "xmlTest-explicittypes.xml";
    const int     MAXLINE = 1000;
    FILE*         testFile = NULL;
    char*         xmlLine = NULL;
@@ -168,10 +223,9 @@ void IO_HandlerSuite_TestWriteExplicitTypes( IO_HandlerSuiteData* data ) {
    DictionarySuite_PopulateDictWithTestValues( data->dict1, data->testDD );
 
    XML_IO_Handler_SetWriteExplicitTypes( data->io_handler, True );
-   IO_Handler_WriteAllToFile( data->io_handler, "dictTest-explicittypes.xml", data->dict1 );
+   IO_Handler_WriteAllToFile( data->io_handler, testFileName, data->dict1 );
 
    testFile = fopen(testFileName, "r");
-
    pcu_check_true( fgets( xmlLine, sizeof(char*)*MAXLINE, testFile ) );
    pcu_check_true( 0 == strcmp( IO_HandlerSuite_XMLStartString1, xmlLine ) );
    pcu_check_true( fgets( xmlLine, sizeof(char*)*MAXLINE, testFile ) );
@@ -182,19 +236,125 @@ void IO_HandlerSuite_TestWriteExplicitTypes( IO_HandlerSuiteData* data ) {
    }
    pcu_check_true( fgets( xmlLine, sizeof(char*)*MAXLINE, testFile ) );
    pcu_check_true( 0 == strcmp( IO_HandlerSuite_XMLEndString, xmlLine ) );
-
    fclose(testFile);
+
    remove(testFileName);
    Memory_Free( xmlLine );
    Dictionary_Empty( data->dict1 );
 }
 
-//TODO: tests for reading input with various whitespaces, bad values etc
+
+void IO_HandlerSuite_TestReadWhitespaceEntries( IO_HandlerSuiteData* data ) {
+   Index             ii;
+   const char*       testFileName = "xmlTest-whitespaces.xml";
+   char*             whiteSpacesEntry = NULL;
+   const char*       testKey = "spacedKey";
+   const char*       testValString = "spacedVal";
+
+   Dictionary_Empty( data->dict2 );
+
+   Stg_asprintf( &whiteSpacesEntry, "<param name=\"    %s   \"> \t %s \n\t</param>\n",
+      testKey, testValString );
+   _IO_HandlerSuite_CreateTestXMLFile( testFileName, whiteSpacesEntry );
+   Memory_Free( whiteSpacesEntry );
+
+   IO_Handler_ReadAllFromFile( data->io_handler, testFileName, data->dict2 ); 
+
+   pcu_check_true( 1 == data->dict2->count );
+   pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0],
+      (Dictionary_Entry_Key)testKey) );
+   pcu_check_true( 0 == strcmp(
+      Dictionary_Entry_Value_AsString( data->dict2->entryPtr[0]->value ), testValString ) );
+
+   remove( testFileName );
+   Dictionary_Empty( data->dict2 );
+}
+
+
+/* Testing the functionality of using included files. Including specifying a search path */
+void IO_HandlerSuite_TestReadIncludedFile( IO_HandlerSuiteData* data ) {
+   Index             ii;
+   const char*       testFileName = "xmlTest-include.xml";
+   const char*       testIncludedFileName = "xmlTest-included.xml";
+   const char*       testSearchPathSubdir = "./testXML-subdir";
+   const char*       testIncludedFileNameSP = "xmlTest-includedSP.xml";
+   char*             subdirIncludedFileNameSP = NULL;
+   char*             xmlEntry = NULL;
+   char*             includeLine = NULL;
+   char*             searchPathLine = NULL;
+   char*             includeLineSP = NULL;
+   char*             xmlTestEntries = NULL;
+   const char*       testKey = "regularKey";
+   const char*       testValString = "regularVal";
+   const char*       testKeyInc = "keyInc";
+   const char*       testValStringInc = "valInc";
+   const char*       testKeyIncSP = "keyIncSP";
+   const char*       testValStringIncSP = "valIncSP";
+
+   Dictionary_Empty( data->dict2 );
+
+   Stg_asprintf( &subdirIncludedFileNameSP, "%s/%s", testSearchPathSubdir, testIncludedFileNameSP );
+
+   Stg_asprintf( &xmlEntry, "<param name=\"%s\">%s</param>\n",
+      testKey, testValString );
+   Stg_asprintf( &includeLine, "<include>%s</include>\n", testIncludedFileName );
+   Stg_asprintf( &searchPathLine, "<searchPath>%s</searchPath>\n", testSearchPathSubdir );
+   Stg_asprintf( &includeLineSP, "<include>%s</include>\n", testIncludedFileNameSP );
+   Stg_asprintf( &xmlTestEntries, "%s%s%s%s", xmlEntry, includeLine, searchPathLine,
+      includeLineSP );
+   _IO_HandlerSuite_CreateTestXMLFile( testFileName, xmlTestEntries );
+   Memory_Free( xmlEntry );
+   Memory_Free( includeLine );
+   Memory_Free( searchPathLine );
+   Memory_Free( includeLineSP );
+   Memory_Free( xmlTestEntries );
+
+   Stg_asprintf( &xmlEntry, "<param name=\"%s\">%s</param>\n",
+      testKeyInc, testValStringInc );
+   _IO_HandlerSuite_CreateTestXMLFile( testIncludedFileName, xmlEntry );
+   Memory_Free( xmlEntry );
+
+   mkdir( testSearchPathSubdir, 0755 );
+   Stg_asprintf( &xmlEntry, "<param name=\"%s\">%s</param>\n",
+      testKeyIncSP, testValStringIncSP );
+   _IO_HandlerSuite_CreateTestXMLFile( subdirIncludedFileNameSP, xmlEntry );
+   Memory_Free( xmlEntry );
+
+   IO_Handler_ReadAllFromFile( data->io_handler, testFileName, data->dict2 ); 
+
+   pcu_check_true( 3 == data->dict2->count );
+   pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0],
+      (Dictionary_Entry_Key)testKey) );
+   pcu_check_true( 0 == strcmp(
+      Dictionary_Entry_Value_AsString( data->dict2->entryPtr[0]->value ), testValString ) );
+   pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[1],
+      (Dictionary_Entry_Key)testKeyInc) );
+   pcu_check_true( 0 == strcmp(
+      Dictionary_Entry_Value_AsString( data->dict2->entryPtr[1]->value ), testValStringInc ) );
+   pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[2],
+      (Dictionary_Entry_Key)testKeyIncSP) );
+   pcu_check_true( 0 == strcmp(
+      Dictionary_Entry_Value_AsString( data->dict2->entryPtr[2]->value ), testValStringIncSP ) );
+
+   remove( testFileName );
+   remove( testIncludedFileName );
+   remove( subdirIncludedFileNameSP );
+   Memory_Free( subdirIncludedFileNameSP );
+   rmdir( testSearchPathSubdir );
+   Dictionary_Empty( data->dict2 );
+}
+
+// TODO read: raw data
+// TODO read: mock cmd line, with multiple files
+// TODO read: various bad entries
 
 void IO_HandlerSuite( pcu_suite_t* suite ) {
    pcu_suite_setData( suite, IO_HandlerSuiteData );
    pcu_suite_setFixtures( suite, IO_HandlerSuite_Setup, IO_HandlerSuite_Teardown );
    pcu_suite_addTest( suite, IO_HandlerSuite_TestWriteReadNormalEntries );
-   pcu_suite_addTest( suite, IO_HandlerSuite_TestWriteNormalSingleEntry );
+   pcu_suite_addTest( suite, IO_HandlerSuite_TestWriteReadNormalSingleEntry );
+   pcu_suite_addTest( suite, IO_HandlerSuite_TestWriteReadEmpty );
    pcu_suite_addTest( suite, IO_HandlerSuite_TestWriteExplicitTypes );
+   pcu_suite_addTest( suite, IO_HandlerSuite_TestReadWhitespaceEntries );
+   pcu_suite_addTest( suite, IO_HandlerSuite_TestReadIncludedFile );
 }
