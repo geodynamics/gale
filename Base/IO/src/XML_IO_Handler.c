@@ -1924,7 +1924,7 @@ Bool XML_IO_Handler_WriteEntryToFile( void* xml_io_handler, const char* filename
 Bool _XML_IO_Handler_WriteEntryToFile( void* xml_io_handler, const char* filename,
 	Dictionary_Entry_Key name, Dictionary_Entry_Value* value, Dictionary_Entry_Source source )
 {
-	Stream* stream = Journal_Register (Info_Type, "myStream");
+	Stream* stream = Journal_Register (Info_Type, XML_IO_Handler_Type );
 	/* create/overwrite new document */
 	XML_IO_Handler* self = (XML_IO_Handler*) xml_io_handler;
 	xmlNodePtr rootNode;
