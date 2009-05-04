@@ -2863,8 +2863,10 @@ void FeEquationNumber_BuildWithDave( FeEquationNumber* self ) {
 
    FreeArray( locals );
 
+   /* 
    printf( "%d: localEqNumsOwned = %d\n", rank, self->localEqNumsOwnedCount );
    printf( "%d: globalSumUnconstrainedDofs = %d\n", rank, self->globalSumUnconstrainedDofs );
+   */
 }
 
 
