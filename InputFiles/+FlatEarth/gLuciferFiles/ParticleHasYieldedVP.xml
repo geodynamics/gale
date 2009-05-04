@@ -24,9 +24,9 @@
 			<param name="string">ParticleHasYieldedViewport</param>
 		</struct>
 		<!-- Viewport -->
-		<struct name="ParticleHasYieldedVP">
+		<struct name="FlatEarthParticleHasYieldedVP">
 			<param name="Type">lucViewport</param>
-			<param name="Camera">camera</param>
+			<param name="Camera">flatEarthPerspectiveViewCamera1</param>
 			<list name="DrawingObject">
 				<param>hymtitle</param>
 				<param>hyparticleDots</param>

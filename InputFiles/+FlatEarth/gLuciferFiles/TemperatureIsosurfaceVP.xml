@@ -5,6 +5,7 @@
 
 	<struct name="components" mergeType="merge">
 		
+		
 		<struct name="temperatureIsoSurfaceColourMap">
 			<param name="Type">lucColourMap</param>
 			<param name="colours">#0B0133 White #B7210B</param>
@@ -75,7 +76,7 @@
 		
 		<struct name="TemperatureIsosurfaceVP">
 			<param name="Type">lucViewport</param>
-			<param name="Camera">camera</param>
+			<param name="Camera">flatEarthPerspectiveViewCamera1</param>
 			<list name="DrawingObject">
 				<param>temperatureIsoSurfaceMap</param>
 				<param>temperatureIsosurface50</param>

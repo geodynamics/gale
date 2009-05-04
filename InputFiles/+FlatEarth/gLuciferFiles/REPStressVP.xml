@@ -13,12 +13,12 @@
 	<!-- SigmaVP setup -->
 	<struct name="sigmaInvMap">
 		<param name="Type">lucScalarField</param>
-		<param name="FieldVariable">recoveredSigmaInvariantField</param>
+		<param name="FieldVariable">recoveredStressInvariantField</param>
 		<param name="ColourMap">sigmaInvColourMap</param>
 	</struct>
 	<struct name="sigmaInvTitle" mergeType="replace">
 		<param name="Type">lucTitle</param>
-		<param name="string">Recovered Sigma Invariant (via REP)</param>
+		<param name="string">Recovered stress Invariant (via REP)</param>
 	</struct>
 
 	<struct name="sigmaInvColourBar">
@@ -28,7 +28,7 @@
 
 	<struct name="SigmaInvariantVP">
 		<param name="Type">lucViewport</param>
-		<param name="Camera">camera</param>
+		<param name="Camera">flatEarthPerspectiveViewCamera1</param>
 		<list name="DrawingObject">
 			<param>sigmaInvMap</param>
 			<param>border</param>
@@ -46,6 +46,8 @@
 		<param name="Type">lucScalarField</param>
 		<param name="FieldVariable">recoveredPressureField</param>
 		<param name="ColourMap">recoveredPressureColourMap</param>
+		<param name="cullFace"> False </param>
+		
 	</struct>
 	<struct name="recoveredPressureTitle" mergeType="replace">
 		<param name="Type">lucTitle</param>
@@ -61,7 +63,7 @@
 	<struct name="materialSwarm-recoveredDeviatoricStress">
 		<param name="Type">FeSwarmVariable</param>
 		<param name="Swarm">materialSwarm</param>
-		<param name="FeVariable">recoveredTauInvariantField</param>
+		<param name="FeVariable">recoveredDeviatoricStressInvariantField</param>
 	</struct>
 	
 	<struct name="materialSwarm-recoveredPressure">
@@ -143,12 +145,12 @@
 	</struct>
 	<struct name="tauInvMap">
 		<param name="Type">lucScalarField</param>
-		<param name="FieldVariable">recoveredTauInvariantField</param>
+		<param name="FieldVariable"> recoveredDeviatoricStressInvariantField </param>
 		<param name="ColourMap">tauInvColourMap</param>
 	</struct>
 	<struct name="tauInvTitle" mergeType="replace">
 		<param name="Type">lucTitle</param>
-		<param name="string">Recovered Tau Invariant (via REP)</param>
+		<param name="string">Recovered Deviatoric Stress Invariant (via REP)</param>
 	</struct>
 
 	<struct name="tauInvColourBar">
@@ -158,7 +160,7 @@
 
 	<struct name="TauInvariantVP">
 		<param name="Type">lucViewport</param>
-		<param name="Camera">camera</param>
+		<param name="Camera">flatEarthPerspectiveViewCamera1</param>
 		<list name="DrawingObject">
 			<param>tauInvMap</param>
 			<param>border</param>
@@ -169,7 +171,7 @@
 	
 	<struct name="TauInvariantParticleVP">
 		<param name="Type">lucViewport</param>
-		<param name="Camera">camera</param>
+		<param name="Camera">flatEarthPerspectiveViewCamera1</param>
 		<list name="DrawingObject">
 			<param>tauInvParticleDots0</param>
 			<param>tauInvParticleDots1</param>
@@ -182,7 +184,7 @@
 
 	<struct name="recoveredPressureVP">
 		<param name="Type">lucViewport</param>
-		<param name="Camera">camera</param>
+		<param name="Camera">flatEarthPerspectiveViewCamera1</param>
 		<list name="DrawingObject">
 			<param>recoveredPressureMap</param>
 			<param>border</param>
@@ -193,7 +195,7 @@
 	
 	<struct name="recoveredPressureParticleVP">
 		<param name="Type">lucViewport</param>
-		<param name="Camera">camera</param>
+		<param name="Camera">flatEarthPerspectiveViewCamera1</param>
 		<list name="DrawingObject">
 			<param>pressureParticleDots0</param>
 			<param>pressureParticleDots1</param>

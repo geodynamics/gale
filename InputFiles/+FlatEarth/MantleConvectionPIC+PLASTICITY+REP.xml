@@ -4,11 +4,11 @@
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 
         <list name="import">
-                <param> Underworld </param>
+            <param> Underworld </param>
+            <param> Experimental </param>
         </list>
 
 		<include> Underworld/BaseApps/ThermoChem.xml </include>
-		<include> Underworld/REP_Setup2D.xml </include>
 	
 	<list name="plugins" mergeType="merge">
 		<!-- Output Plugins -->
@@ -16,18 +16,81 @@
 		<param>Underworld_Nusselt</param>	
 		<param>Underworld_Vrms</param>	
 		<param>StgFEM_CPUTime</param>	
+		<param>Experimental_PressureCalibration</param>
+		
 	</list>
 
 	<struct name="components" mergeType="merge">
+		
+		<struct name="recoveredStrainRateField" mergeType="replace">
+			<param name="Type">RecoveredFeVariable</param>
+			<param name="RawField">StrainRateField</param>
+			<param name="OrderOfInterpolation">1</param>
+			<param name="recoverStrain">true</param>
+			<param name="recoverPressure">false</param>
+		</struct>
+		
+		<struct name="recoveredStressField" mergeType="replace">
+			<param name="Type">RecoveredFeVariable</param>
+			<param name="RawField">StrainRateField</param>
+			<param name="recoverPressure">true</param>
+			<param name="OrderOfInterpolation">1</param>
+			<param name="RawPressureField">PressureField</param>
+			<param name="CalibratePressure"> 1 </param>
+		</struct>
+		
+		<struct name="REP">
+			<param name="Type">REP_Algorithm</param>
+			<param name="IntegrationPoints">picIntegrationPoints</param>
+			<param name="ConstitutiveMatrix">constitutiveMatrix</param>
+			<list name="RepFieldList">
+				<param>recoveredStrainRateField</param>
+				<param>recoveredStressField</param>
+			</list>
+		</struct>
+		
+		<struct name="recoveredStrainRateInvariantField"> 
+			<param name="Type">OperatorFeVariable</param>
+		     	<param name="Operator">SymmetricTensor_Invariant</param>
+			<param name="FeVariable">recoveredStrainRateField</param>
+		</struct>
+		
+		<struct name="recoveredStressInvariantField"> 
+			<param name="Type">OperatorFeVariable</param>
+		     	<param name="Operator">SymmetricTensor_Invariant</param>
+			<param name="FeVariable">recoveredStressField</param>
+		</struct>
+		
+		<struct name="recoveredDeviatoricStressField"> 
+			<param name="Type">OperatorFeVariable</param>
+		     	<param name="Operator">SymmetricTensor_MakeDeviatoric</param>
+			<param name="FeVariable">recoveredStressField</param>
+		</struct>
+		
+		<struct name="recoveredPressureField"> 
+			<param name="Type">OperatorFeVariable</param>
+			<param name="Operator">SymmetricTensor_NegAverageTrace</param>
+			<param name="FeVariable">recoveredStressField</param>
+		</struct>		
+		
+		
+		<struct name="recoveredDeviatoricStressInvariantField"> 
+			<param name="Type">OperatorFeVariable</param>
+		     	<param name="Operator">SymmetricTensor_Invariant</param>
+			<param name="FeVariable">recoveredDeviatoricStressField</param>
+		</struct>
+
 		<struct name="temperatureDependence">
 			<param name="Type">Arrhenius</param>
 			<param name="TemperatureField">TemperatureField</param>
 			<param name="eta0">1.0e-6</param>
 			<param name="activationEnergy">27.63102112</param>
 		</struct>
+		
 		<struct name="shape">
 			<param name="Type">Everywhere</param>
 		</struct>		
+		
 		<struct name="material">
 			<param name="Type">RheologyMaterial</param>
 			<param name="Shape">shape</param>
@@ -35,7 +98,7 @@
 			<param name="alpha">   1.0 </param>
 			<list name="Rheology">
 				<param> temperatureDependence </param>
-				<param> yielding </param>
+				<!--><param> yielding </param> -->       <!-- Not needed for the isoviscous run -->
 			</list>
 		</struct>	
 	
@@ -63,8 +126,8 @@
 			<param name="MaterialPointsSwarm">materialSwarm</param>
 			<param name="StrainRateField">StrainRateField</param>
 			<param name="Context">context</param>
-			<param name="cohesion">1.0e6</param>
-			<param name="cohesionAfterSoftening">5.0e5</param>
+			<param name="cohesion">1.0e5</param>
+			<param name="cohesionAfterSoftening">5.0e4</param>
 			<param name="frictionCoefficient">0.5</param>
 			<param name="frictionCoefficientAfterSoftening">0.5</param>
 			<param name="minimumYieldStress">1.0e3</param>
@@ -88,13 +151,13 @@
 	</list>
 	-->
 
-        <!--  restart from a previous checkpoint 
+     <!--  restart from a previous checkpoint 
         <param name="restartTimestep"> 10 </param>
          -->
 	
 	<param name="gravity"> 1e6 </param>	
 	
-	<param name="courantFactor"> 0.5 </param>	
+	<param name="courantFactor"> 0.75 </param>	
 	
 	<!-- Integration Scheme configuration -->
 	<param name="particlesPerCell"> 10 </param>
@@ -117,12 +180,12 @@
 	<param name="elementResJ"> 64 </param>
 	<param name="elementResK"> 1 </param>
 	<param name="shadowDepth"> 1 </param>
-	<param name="minX"> 0.0 </param>
-	<param name="minY"> 0.0 </param>
-	<param name="minZ"> 0.0 </param>
-	<param name="maxX"> 1.0 </param>
-	<param name="maxY"> 1.0 </param>
-	<param name="maxZ"> 1.0 </param>
+	<param name="minX"> -1.0 </param>
+	<param name="minY"> -1.0 </param>
+	<param name="minZ"> -1.0 </param>
+	<param name="maxX">  1.0 </param>
+	<param name="maxY">  1.0 </param>
+	<param name="maxZ">  1.0 </param>
 	<param name="allowUnbalancing"> True </param>
 
 	<!-- Set up BCs and ICs -->
@@ -133,28 +196,23 @@
 	<!-- Integration Scheme configuration -->
 
 	<!-- Viewport stuff -->
-	<include>Underworld/Viewports/TemperatureAndVelocityArrowsVP.xml</include>
-	<include>Underworld/Viewports/StrainRateInvariantVP.xml</include>
-	<include>Underworld/Viewports/ParticleDensityVP.xml</include>
-	<include>Underworld/Viewports/REPStressVP.xml</include>
-	<include>Underworld/Viewports/ParticleHasYieldedVP.xml</include>
-	<include>glucifer/window.xml</include>
+	<include> ./gLuciferFiles/Cameras3D-4x4x1.xml</include>
+	<include> ./gLuciferFiles/TemperatureAndVelocityArrowsVP.xml </include>
+	<include> ./gLuciferFiles/TemperatureIsosurfaceVP.xml </include>
+	<include> ./gLuciferFiles/StrainRateInvariantVP.xml </include> 
+	<!--><include>Underworld/Viewports/ParticleDensityVP.xml</include> -->
+	<include> ./gLuciferFiles/REPStressVP.xml</include>
+	<include> ./gLuciferFiles/ParticleHasYieldedVP.xml</include>
+	<include> ./gLuciferFiles/FlatEarthBoxWindow.xml</include>
 	
-	
+	<!-- Add this  -->
 	<struct name="components" mergeType="merge">
-		<struct name="window" mergeType="merge">
-			<param name="width" mergeType="replace"> 1200 </param>
-			<param name="height" mergeType="replace"> 1024 </param>
+		<struct name="FlatEarthBoxView1" mergeType="merge">
 			<list name="Viewport" mergeType="replace">
-				<param>	 TemperatureAndVelocityArrowsVP		</param>
-				<param>  ParticleHasYieldedVP 				</param>
-				<param>  recoveredPressureVP 				</param>
-				<param>	 StrainRateInvariantVP				</param>
+				<param>FlatEarthTemperatureAndVelocityArrowsVP FlatEarthVerticalTemperatureGradientVP</param>
+				<param>FlatEarthParticleHasYieldedVP recoveredPressureVP </param>
 			</list>
 		</struct>
-		<struct name="camera" mergeType="merge">
-			<param name="coordZ" mergeType="replace"> 3.0 </param>	
-		</struct>	
 	</struct>
 
 </StGermainData>
