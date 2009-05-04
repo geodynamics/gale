@@ -495,8 +495,9 @@ void lucWindow_MouseMotion( void* window, lucMouseButton button, Pixel_Index xpo
 	Index                 windowInteraction_I;
 	Index                 windowInteractionCount = lucWindowInteraction_Register_GetCount( self->windowInteraction_Register ); 
 	lucWindowInteraction* windowInteraction;
-	
+
 	lucDebug_PrintFunctionBegin( self, 2 );
+	
 	for ( windowInteraction_I = 0 ; windowInteraction_I < windowInteractionCount ; windowInteraction_I++ ) {
 		windowInteraction = lucWindowInteraction_Register_GetByIndex( self->windowInteraction_Register, windowInteraction_I );
 		lucWindowInteraction_MouseMotion( windowInteraction, window, button, xpos, ypos, self->startx, self->starty );

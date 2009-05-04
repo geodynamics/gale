@@ -60,8 +60,8 @@
 		/* Virtual functions go here */ \
 		/* Other info */\
 		int													sdlFlags;				\
-		void*												screen;					\
-		void*												buffer;					\
+		SDL_Surface*										screen;					\
+		SDL_Surface*										buffer;					\
 		void*                                               osMesaContext;			\
 		SDL_TimerID											timer;					\
 
@@ -101,7 +101,10 @@
 	void _lucSDLWindow_Display( void* window );
 	int _lucSDLWindow_EventsWaiting( void* window ) ;
 	Bool _lucSDLWindow_EventProcessor( void* window ) ;
-	
+
+	/* Resize video */	
+	void lucSDLWindow_Resize( void* window, Pixel_Index width, Pixel_Index height ) ;
+
 	/* Timer callback */
 	Uint32 lucSDLWindow_IdleTimer(Uint32 interval, void* param);
 
