@@ -21,16 +21,35 @@
   	<include>StgFEM/LinearMesh.xml                   </include>
 	<include>StgFEM/VelocityField.xml                </include>
 	<include>StgFEM/TemperatureField.xml             </include>
-	<include>./ContinuousLinearPressureField.xml     </include>
+    <include>StgFEM/PressureField.xml</include>
 	<include>Underworld/GaussSwarm.xml               </include>
 	<include>StgFEM/TimeIntegrator.xml               </include>
 	<include>PICellerator/MaterialPointSwarm.xml     </include>
-	<include>./StokesFlowUzawaStableTest.xml         </include>
-	<include>Experimental/NodalViscosityField.xml    </include>
+    <include>Experimental/StokesFlowStable.xml</include>
+<!--	<include>Experimental/NodalViscosityField.xml    </include> -->
 	<include>Experimental/StoreViscosity.xml         </include>
 	<include>StgFEM/TempAdvDiff.xml                  </include>
 
 
+    <param name="pressureMesh">linearMesh</param>
+
+
+  <struct name="pressureBCs">
+    <param name="type">CompositeVC</param>
+    <list name="vcList">
+      <struct>
+	<param name="type">WallVC</param>
+	<param name="wall">top</param>
+	<list name="variables">
+	  <struct>
+	    <param name="name">pressure</param>
+	    <param name="type">double</param>
+	    <param name="value">0</param>
+	  </struct>
+	</list>
+      </struct>
+    </list>
+  </struct>
 
 
 	<struct name="components" mergeType="merge">
@@ -233,7 +252,7 @@
 		<struct name="FlatEarthBoxView1" mergeType="merge">
 			<list name="Viewport" mergeType="replace">
 				<param>FlatEarthTemperatureAndVelocityArrowsVP FlatEarthVerticalTemperatureGradientVP</param>
-				<param>FlatEarthParticleHasYieldedVP recoveredPressureVP </param>
+				<param>FlatEarthParticleHasYieldedVP PressureVP </param>
 			</list>
 		</struct>
 	</struct>
