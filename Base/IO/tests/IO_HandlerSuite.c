@@ -462,7 +462,6 @@ void IO_HandlerSuite_TestReadAllFromCommandLine( IO_HandlerSuiteData* data ) {
    argc = data->testDD->testEntriesCount + 1 + fakeParamArgsCount;
    argv = Memory_Alloc_Array_Unnamed( char*, argc );
 
-
    for ( ii=0; ii < data->testDD->testEntriesCount; ii++ ) {
       Stg_asprintf( &xmlTestFileNames[ii], "readFromCommandLineTest%u.xml", ii );
       XML_IO_Handler_WriteEntryToFile( data->io_handler, xmlTestFileNames[ii],
@@ -509,6 +508,188 @@ void IO_HandlerSuite_TestReadAllFromCommandLine( IO_HandlerSuiteData* data ) {
 }
 
 
+/* It's only worthwhile to test the different mergeType operations for one type (eg struct)
+ * in this test - the thorough testing of all the merge operations themselves should be 
+ * done in DictionarySuite.c */
+void IO_HandlerSuite_TestReadDuplicateEntryKeys( IO_HandlerSuiteData* data ) {
+   Index                   ii=0;
+   const char*             xmlTestFileName = "testXML-dupKeys.xml";
+   const char*             struct1Name = "structOne";
+   const int               struct1_OrigParamCount = 2;
+   const char*             paramNames[2] = { "paramOne", "paramTwo" };
+   const char*             paramNames2[2] = { "2nd-paramOne", "2nd-paramTwo" };
+   const unsigned int      paramVals[2] = { 1, 2 };
+   const unsigned int      paramVals2[2] = { 3, 4 };
+   char                    struct1Entry[10000];
+   char                    struct2Entry[10000];
+   char                    xmlLine[1000];
+   char*                   testEntries = NULL;
+   Dictionary_Entry_Value* structDev = NULL;
+   Dictionary_Entry_Value* elementDev = NULL;
+   Dictionary*             structDict = NULL;
+
+   Dictionary_Empty( data->dict2 );
+
+   sprintf( xmlLine, "<struct name=\"%s\">\n", struct1Name );
+   strcat( struct1Entry, xmlLine );
+   sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames[0], paramVals[0] );
+   strcat( struct1Entry, xmlLine );
+   sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames[1], paramVals[1] );
+   strcat( struct1Entry, xmlLine );
+   sprintf( xmlLine, "</struct>\n" );
+   strcat( struct1Entry, xmlLine );
+
+   /* Sub-test 1: we expect default behaviour is "replace", therefore the 2nd struct
+    *  should be the only entry */
+   pcu_check_true( IO_Handler_DefaultMergeType == Dictionary_MergeType_Replace );
+
+   sprintf( xmlLine, "<struct name=\"%s\">\n", struct1Name );
+   strcat( struct2Entry, xmlLine );
+   sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames2[0], paramVals2[0] );
+   strcat( struct2Entry, xmlLine );
+   sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames2[1], paramVals2[1] );
+   strcat( struct2Entry, xmlLine );
+   sprintf( xmlLine, "</struct>\n" );
+   strcat( struct2Entry, xmlLine );
+
+   Stg_asprintf( &testEntries, "%s%s", struct1Entry, struct2Entry );
+   _IO_HandlerSuite_CreateTestXMLFile( xmlTestFileName, testEntries );
+   Memory_Free( testEntries );
+   IO_Handler_ReadAllFromFile( data->io_handler, xmlTestFileName, data->dict2 );
+
+   pcu_check_true( 1 == data->dict2->count );
+   pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0],
+      (Dictionary_Entry_Key)struct1Name) );
+   structDev = data->dict2->entryPtr[0]->value;
+   pcu_check_true( Dictionary_Entry_Value_Type_Struct == structDev->type );
+   pcu_check_true( struct1_OrigParamCount == Dictionary_Entry_Value_GetCount( structDev ) );
+   for (ii=0; ii < struct1_OrigParamCount; ii++ ) {
+      elementDev = Dictionary_Entry_Value_GetMember( structDev,
+         (Dictionary_Entry_Key)paramNames2[ii] );
+      pcu_check_true( paramVals2[ii] == Dictionary_Entry_Value_AsUnsignedInt( elementDev ) );
+   }
+   remove( xmlTestFileName );
+   Dictionary_Empty( data->dict2 );
+
+   /* Sub-test 2: with mergeType as "append", the 2 structs should be 2 separate entries */
+   sprintf( struct2Entry, "" );
+   sprintf( xmlLine, "<struct name=\"%s\" mergeType=\"append\">\n", struct1Name );
+   strcat( struct2Entry, xmlLine );
+   sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames[0], paramVals2[0] );
+   strcat( struct2Entry, xmlLine );
+   sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames[1], paramVals2[1] );
+   strcat( struct2Entry, xmlLine );
+   sprintf( xmlLine, "</struct>\n" );
+   strcat( struct2Entry, xmlLine );
+
+   Stg_asprintf( &testEntries, "%s%s", struct1Entry, struct2Entry );
+   _IO_HandlerSuite_CreateTestXMLFile( xmlTestFileName, testEntries );
+   Memory_Free( testEntries );
+   IO_Handler_ReadAllFromFile( data->io_handler, xmlTestFileName, data->dict2 );
+
+   pcu_check_true( 2 == data->dict2->count );
+   /* First entry should be unchanged */
+   pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0],
+      (Dictionary_Entry_Key)struct1Name) );
+   structDev = data->dict2->entryPtr[0]->value;
+   pcu_check_true( Dictionary_Entry_Value_Type_Struct == structDev->type );
+   pcu_check_true( struct1_OrigParamCount == Dictionary_Entry_Value_GetCount( structDev ) );
+   for (ii=0; ii < struct1_OrigParamCount; ii++ ) {
+      elementDev = Dictionary_Entry_Value_GetMember( structDev,
+         (Dictionary_Entry_Key)paramNames[ii] );
+      pcu_check_true( paramVals[ii] == Dictionary_Entry_Value_AsUnsignedInt( elementDev ) );
+   }
+   /* Second entry should be struct2 */
+   pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[1],
+      (Dictionary_Entry_Key)struct1Name) );
+   structDev = data->dict2->entryPtr[1]->value;
+   pcu_check_true( Dictionary_Entry_Value_Type_Struct == structDev->type );
+   pcu_check_true( struct1_OrigParamCount == Dictionary_Entry_Value_GetCount( structDev ) );
+   for (ii=0; ii < struct1_OrigParamCount; ii++ ) {
+      elementDev = Dictionary_Entry_Value_GetMember( structDev,
+         (Dictionary_Entry_Key)paramNames[ii] );
+      pcu_check_true( paramVals2[ii] == Dictionary_Entry_Value_AsUnsignedInt( elementDev ) );
+   }
+   //remove( xmlTestFileName );
+   Dictionary_Empty( data->dict2 );
+
+   /* Sub-test 3.1: with mergeType as "merge", structs to be merged.
+    * However, default childrenMergeType is "append", so all entries added */
+   sprintf( struct2Entry, "" );
+   sprintf( xmlLine, "<struct name=\"%s\" mergeType=\"merge\">\n", struct1Name );
+   strcat( struct2Entry, xmlLine );
+   sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames[1], paramVals2[1] );
+   strcat( struct2Entry, xmlLine );
+   sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames2[0], paramVals2[0] );
+   strcat( struct2Entry, xmlLine );
+   sprintf( xmlLine, "</struct>\n" );
+   strcat( struct2Entry, xmlLine );
+
+   Stg_asprintf( &testEntries, "%s%s", struct1Entry, struct2Entry );
+   _IO_HandlerSuite_CreateTestXMLFile( xmlTestFileName, testEntries );
+   Memory_Free( testEntries );
+   IO_Handler_ReadAllFromFile( data->io_handler, xmlTestFileName, data->dict2 );
+
+   pcu_check_true( 1 == data->dict2->count );
+   pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0],
+      (Dictionary_Entry_Key)struct1Name) );
+   structDev = data->dict2->entryPtr[0]->value;
+   structDict = structDev->as.typeStruct;
+   pcu_check_true( Dictionary_Entry_Value_Type_Struct == structDev->type );
+   pcu_check_true( struct1_OrigParamCount*2 == Dictionary_Entry_Value_GetCount( structDev ) );
+   pcu_check_true( 0 == strcmp( structDict->entryPtr[0]->key, paramNames[0] ) );
+   elementDev = structDict->entryPtr[0]->value;
+   pcu_check_true( paramVals[0] == Dictionary_Entry_Value_AsUnsignedInt( elementDev ) );
+   pcu_check_true( 0 == strcmp( structDict->entryPtr[1]->key, paramNames[1] ) );
+   elementDev = structDict->entryPtr[1]->value;
+   pcu_check_true( paramVals[1] == Dictionary_Entry_Value_AsUnsignedInt( elementDev ) );
+   pcu_check_true( 0 == strcmp( structDict->entryPtr[2]->key, paramNames[1] ) );
+   elementDev = structDict->entryPtr[2]->value;
+   pcu_check_true( paramVals2[1] == Dictionary_Entry_Value_AsUnsignedInt( elementDev ) );
+   pcu_check_true( 0 == strcmp( structDict->entryPtr[3]->key, paramNames2[0] ) );
+   elementDev = structDict->entryPtr[3]->value;
+   pcu_check_true( paramVals2[0] == Dictionary_Entry_Value_AsUnsignedInt( elementDev ) );
+   remove( xmlTestFileName );
+   Dictionary_Empty( data->dict2 );
+
+   /* Sub-test 3.2: with mergeType as "merge", structs to be merged.
+    * childrenMergeType set to merge also */
+   sprintf( struct2Entry, "" );
+   sprintf( xmlLine, "<struct name=\"%s\" mergeType=\"merge\" childrenMergeType=\"merge\">\n", struct1Name );
+   strcat( struct2Entry, xmlLine );
+   sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames[1], paramVals2[1] );
+   strcat( struct2Entry, xmlLine );
+   sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames2[0], paramVals2[0] );
+   strcat( struct2Entry, xmlLine );
+   sprintf( xmlLine, "</struct>\n" );
+   strcat( struct2Entry, xmlLine );
+
+   Stg_asprintf( &testEntries, "%s%s", struct1Entry, struct2Entry );
+   _IO_HandlerSuite_CreateTestXMLFile( xmlTestFileName, testEntries );
+   Memory_Free( testEntries );
+   IO_Handler_ReadAllFromFile( data->io_handler, xmlTestFileName, data->dict2 );
+
+   pcu_check_true( 1 == data->dict2->count );
+   pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0],
+      (Dictionary_Entry_Key)struct1Name) );
+   structDev = data->dict2->entryPtr[0]->value;
+   structDict = structDev->as.typeStruct;
+   pcu_check_true( Dictionary_Entry_Value_Type_Struct == structDev->type );
+   pcu_check_true( struct1_OrigParamCount+1 == Dictionary_Entry_Value_GetCount( structDev ) );
+   pcu_check_true( 0 == strcmp( structDict->entryPtr[0]->key, paramNames[0] ) );
+   elementDev = structDict->entryPtr[0]->value;
+   pcu_check_true( paramVals[0] == Dictionary_Entry_Value_AsUnsignedInt( elementDev ) );
+   pcu_check_true( 0 == strcmp( structDict->entryPtr[1]->key, paramNames[1] ) );
+   elementDev = structDict->entryPtr[1]->value;
+   pcu_check_true( paramVals2[1] == Dictionary_Entry_Value_AsUnsignedInt( elementDev ) );
+   pcu_check_true( 0 == strcmp( structDict->entryPtr[2]->key, paramNames2[0] ) );
+   elementDev = structDict->entryPtr[2]->value;
+   pcu_check_true( paramVals2[0] == Dictionary_Entry_Value_AsUnsignedInt( elementDev ) );
+   remove( xmlTestFileName );
+   Dictionary_Empty( data->dict2 );
+}
+
+
 // TODO read: various bad entries
 
 void IO_HandlerSuite( pcu_suite_t* suite ) {
@@ -522,4 +703,5 @@ void IO_HandlerSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, IO_HandlerSuite_TestReadIncludedFile );
    pcu_suite_addTest( suite, IO_HandlerSuite_TestReadRawDataEntries );
    pcu_suite_addTest( suite, IO_HandlerSuite_TestReadAllFromCommandLine );
+   pcu_suite_addTest( suite, IO_HandlerSuite_TestReadDuplicateEntryKeys );
 }
