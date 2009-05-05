@@ -446,8 +446,69 @@ void IO_HandlerSuite_TestReadRawDataEntries( IO_HandlerSuiteData* data ) {
    Dictionary_Empty( data->dict2 );
 }
 
+void IO_HandlerSuite_TestReadAllFromCommandLine( IO_HandlerSuiteData* data ) {
+   Index          ii;
+   char**         xmlTestFileNames;
+   int            argc;
+   char**         argv;
+   int            fakeParamArgsCount = 2;
+   
+   Dictionary_Empty( data->dict1 );
+   Dictionary_Empty( data->dict2 );
 
-// TODO read: mock cmd line, with multiple files
+   DictionarySuite_PopulateDictWithTestValues( data->dict1, data->testDD );
+
+   xmlTestFileNames = Memory_Alloc_Array_Unnamed( char*, data->testDD->testEntriesCount );
+   argc = data->testDD->testEntriesCount + 1 + fakeParamArgsCount;
+   argv = Memory_Alloc_Array_Unnamed( char*, argc );
+
+
+   for ( ii=0; ii < data->testDD->testEntriesCount; ii++ ) {
+      Stg_asprintf( &xmlTestFileNames[ii], "readFromCommandLineTest%u.xml", ii );
+      XML_IO_Handler_WriteEntryToFile( data->io_handler, xmlTestFileNames[ii],
+            data->testDD->testKeys[ii],
+            data->testDD->testValues[ii], 
+            NULL );
+   }
+
+   /* Create the argv command line */
+   Stg_asprintf( &argv[0], "./testStGermain");
+   for ( ii=0; ii < data->testDD->testEntriesCount; ii++ ) {
+      Stg_asprintf( &argv[1+ii], "%s", xmlTestFileNames[ii] );
+   }
+   /* Now just add a couple of extra cmd line entries, to simulate user passing other 
+    *  parameters, which should be ignored by the XML IO Handler */
+   for ( ii=0; ii < fakeParamArgsCount; ii++ ) {
+      Stg_asprintf( &argv[1+data->testDD->testEntriesCount+ii], "simParam%u=test", ii );
+   }
+
+   IO_Handler_ReadAllFilesFromCommandLine( data->io_handler, argc, argv, data->dict2 );
+
+   /* Now, dict2 should correspond to dict1, having read in and combined all the
+    *  separate files. */
+   pcu_check_true( data->dict1->count == data->dict2->count );
+   for (ii=0; ii<data->dict1->count; ii++) {
+      pcu_check_true( Dictionary_Entry_Compare( data->dict1->entryPtr[ii],
+         data->dict2->entryPtr[ii]->key) );
+      pcu_check_true( Dictionary_Entry_Value_Compare( data->dict1->entryPtr[ii]->value,
+         data->dict2->entryPtr[ii]->value) );
+   }
+
+
+   for ( ii=0; ii < data->testDD->testEntriesCount; ii++ ) {
+      remove(xmlTestFileNames[ii]);
+      Memory_Free( xmlTestFileNames[ii] );
+   }
+   Memory_Free( xmlTestFileNames );
+   for ( ii=0; ii < argc; ii++ ) {
+      Memory_Free( argv[ii] );
+   }
+   Memory_Free( argv );
+   Dictionary_Empty( data->dict1 );
+   Dictionary_Empty( data->dict2 );
+}
+
+
 // TODO read: various bad entries
 
 void IO_HandlerSuite( pcu_suite_t* suite ) {
@@ -460,4 +521,5 @@ void IO_HandlerSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, IO_HandlerSuite_TestReadWhitespaceEntries );
    pcu_suite_addTest( suite, IO_HandlerSuite_TestReadIncludedFile );
    pcu_suite_addTest( suite, IO_HandlerSuite_TestReadRawDataEntries );
+   pcu_suite_addTest( suite, IO_HandlerSuite_TestReadAllFromCommandLine );
 }
