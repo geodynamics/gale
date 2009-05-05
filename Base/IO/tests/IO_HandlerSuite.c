@@ -344,7 +344,109 @@ void IO_HandlerSuite_TestReadIncludedFile( IO_HandlerSuiteData* data ) {
    Dictionary_Empty( data->dict2 );
 }
 
-// TODO read: raw data
+
+void IO_HandlerSuite_TestReadRawDataEntries( IO_HandlerSuiteData* data ) {
+   Index             ii;
+   const char*       testFileName = "xmlTest-rawData.xml";
+   char*             xmlEntries = NULL;
+   char*             rawDataEntry1 = NULL;
+   char*             rawDataEntry2 = NULL;
+   char*             entryLine = NULL;
+   const char*       list1Name = "bcs";
+   const int         list1EntryCount = 2;
+   const int         list1Vals[2][3] = { {1, 3, 6}, {2, 9, 14} };
+   const char*       list2Name = "boundary_conditions2";
+   const int         list2CompCount = 5;
+   const int         list2EntryCount = 3;
+   const char*       list2CompNames[5] = {"side", "xval", "yval", "zval", "active"};
+   const char*       list2CompTypes[5] = {"string", "int", "int", "int", "bool"};
+   const char*       list2StringVals[3] = {"top", "bottom", "left"};
+   const int         list2CoordVals[3][3] = { {4,5,8}, {3,5,9}, {9,3,4} };
+   const Bool        list2BoolVals[3] = { True, False, True };
+   const char*       list2BoolValStrings[3] = { "True", "False", "1" };
+
+   Dictionary_Empty( data->dict2 );
+
+   Stg_asprintf( &rawDataEntry1, "<list name=\"%s\">\n<asciidata>\n%d %d %d\n%d %d %d\n"
+      "</asciidata>\n</list>\n",
+      list1Name, list1Vals[0][0], list1Vals[0][1], list1Vals[0][2], 
+      list1Vals[1][0], list1Vals[1][1], list1Vals[1][2] );
+
+   rawDataEntry2 = Memory_Alloc_Array_Unnamed( char, 10000 );
+   entryLine = Memory_Alloc_Array_Unnamed( char, 1000 );
+   sprintf( rawDataEntry2, "<list name=\"%s\">\n<asciidata>\n", list2Name );
+   for (ii=0; ii < list2CompCount; ii++ ) {
+      sprintf( entryLine, "<columnDefinition name=\"%s\" type=\"%s\"/>\n",
+         list2CompNames[ii], list2CompTypes[ii] );
+      strcat( rawDataEntry2, entryLine );
+   }
+   for (ii=0; ii < list2EntryCount; ii++ ) {
+      sprintf( entryLine, "%s %i %i %i %s\n", list2StringVals[ii],
+         list2CoordVals[ii][0], list2CoordVals[ii][1], list2CoordVals[ii][2],
+         list2BoolValStrings[ii] );
+      strcat( rawDataEntry2, entryLine );
+   }
+   sprintf( entryLine, "</asciidata>\n</list>\n" );
+   strcat( rawDataEntry2, entryLine );
+
+   Stg_asprintf( &xmlEntries, "%s%s", rawDataEntry1, rawDataEntry2 );
+   _IO_HandlerSuite_CreateTestXMLFile( testFileName, xmlEntries );
+   Memory_Free( xmlEntries );
+   Memory_Free( rawDataEntry1 );
+   Memory_Free( rawDataEntry2 );
+   Memory_Free( entryLine );
+
+   IO_Handler_ReadAllFromFile( data->io_handler, testFileName, data->dict2 ); 
+
+   {
+      Dictionary_Entry_Value* dev = NULL;
+      int                     intVal = 0;
+      char*                   strVal = 0;
+      Bool                    boolVal = False;
+
+      pcu_check_true( 2 == data->dict2->count );
+      pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0],
+         (Dictionary_Entry_Key)list1Name) );
+      pcu_check_true( Dictionary_Entry_Value_Type_List ==
+         data->dict2->entryPtr[0]->value->type );
+      for (ii=0; ii < list1EntryCount; ii++ ) {
+         dev = Dictionary_Entry_Value_GetElement( data->dict2->entryPtr[0]->value, ii );
+         intVal = Dictionary_Entry_Value_AsInt( Dictionary_Entry_Value_GetMember( dev, "0" ) );
+         pcu_check_true( intVal == list1Vals[ii][0] );
+         intVal = Dictionary_Entry_Value_AsInt( Dictionary_Entry_Value_GetMember( dev, "1" ) );
+         pcu_check_true( intVal == list1Vals[ii][1] );
+         intVal = Dictionary_Entry_Value_AsInt( Dictionary_Entry_Value_GetMember( dev, "2" ) );
+         pcu_check_true( intVal == list1Vals[ii][2] );
+      }
+      pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[1],
+         (Dictionary_Entry_Key)list2Name) );
+      pcu_check_true( Dictionary_Entry_Value_Type_List ==
+         data->dict2->entryPtr[1]->value->type );
+      for (ii=0; ii < list2EntryCount; ii++ ) {
+         dev = Dictionary_Entry_Value_GetElement( data->dict2->entryPtr[1]->value, ii );
+         strVal = Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetMember(
+            dev, (Dictionary_Entry_Key)list2CompNames[0] ) );
+         pcu_check_true( 0 == strcmp( list2StringVals[ii], strVal ) );
+         intVal = Dictionary_Entry_Value_AsInt( Dictionary_Entry_Value_GetMember(
+            dev, (Dictionary_Entry_Key)list2CompNames[1] ) );
+         pcu_check_true( intVal == list2CoordVals[ii][0] );
+         intVal = Dictionary_Entry_Value_AsInt( Dictionary_Entry_Value_GetMember(
+            dev, (Dictionary_Entry_Key)list2CompNames[2] ) );
+         pcu_check_true( intVal == list2CoordVals[ii][1] );
+         intVal = Dictionary_Entry_Value_AsInt( Dictionary_Entry_Value_GetMember(
+            dev, (Dictionary_Entry_Key)list2CompNames[3] ) );
+         pcu_check_true( intVal == list2CoordVals[ii][2] );
+         boolVal = Dictionary_Entry_Value_AsBool( Dictionary_Entry_Value_GetMember(
+            dev, (Dictionary_Entry_Key)list2CompNames[4] ) );
+         pcu_check_true( boolVal == list2BoolVals[ii] );
+      }
+   }
+
+   remove( testFileName );
+   Dictionary_Empty( data->dict2 );
+}
+
+
 // TODO read: mock cmd line, with multiple files
 // TODO read: various bad entries
 
@@ -357,4 +459,5 @@ void IO_HandlerSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, IO_HandlerSuite_TestWriteExplicitTypes );
    pcu_suite_addTest( suite, IO_HandlerSuite_TestReadWhitespaceEntries );
    pcu_suite_addTest( suite, IO_HandlerSuite_TestReadIncludedFile );
+   pcu_suite_addTest( suite, IO_HandlerSuite_TestReadRawDataEntries );
 }
