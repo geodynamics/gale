@@ -443,6 +443,8 @@ Stream* Journal_Register( const Type type, const Name name )
 
 	typedStream = Journal_GetTypedStream( type );
 	namedStream = Journal_GetNamedStream( typedStream, name );	
+	
+	Stream_SetPrintingRank( namedStream, 0); /* Default when registering a Journal stream is to have it print from Rank 0 only) */
 
 	return namedStream;
 }
