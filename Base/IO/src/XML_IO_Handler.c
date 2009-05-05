@@ -618,7 +618,7 @@ MPI_Comm_rank( MPI_COMM_WORLD, &rank );
 	_XML_IO_Handler_ValidateFile( self, filename );
 	
 	/* call parse nodes, starting on the first child */
-	_XML_IO_Handler_ParseNodes( self, cur, NULL, Dictionary_MergeType_Replace, NULL );
+	_XML_IO_Handler_ParseNodes( self, cur, NULL, IO_Handler_DefaultMergeType, NULL );
 	
 	/* free memory */
 	xmlFreeDoc( self->currDoc );
@@ -1212,7 +1212,7 @@ static void _XML_IO_Handler_ParseList( XML_IO_Handler* self, xmlNodePtr cur, Dic
 				spaceStrippedMergeType,
 				defaultMergeType == Dictionary_MergeType_Append ? APPEND_TAG : 
 					defaultMergeType == Dictionary_MergeType_Merge ? MERGE_TAG :
-					defaultMergeType == Dictionary_MergeType_Replace ? APPEND_TAG :
+					defaultMergeType == Dictionary_MergeType_Replace ? REPLACE_TAG :
 					APPEND_TAG );
 			mergeType = defaultMergeType;
 		}
@@ -1520,7 +1520,7 @@ static void _XML_IO_Handler_ParseStruct(
 				spaceStrippedName,
 				defaultMergeType == Dictionary_MergeType_Append ? APPEND_TAG : 
 					defaultMergeType == Dictionary_MergeType_Merge ? MERGE_TAG :
-					defaultMergeType == Dictionary_MergeType_Replace ? APPEND_TAG :
+					defaultMergeType == Dictionary_MergeType_Replace ? REPLACE_TAG :
 					APPEND_TAG );
 			mergeType = defaultMergeType;
 		}
@@ -1632,7 +1632,7 @@ static void _XML_IO_Handler_ParseParameter(
 				spaceStrippedName,
 				defaultMergeType == Dictionary_MergeType_Append ? APPEND_TAG : 
 					/* WHERE THIS COME FROM?defaultMergeType == Dictionary_MergeType_Prepend ? PREPEND_TAG : */
-					defaultMergeType == Dictionary_MergeType_Replace ? APPEND_TAG :
+					defaultMergeType == Dictionary_MergeType_Replace ? REPLACE_TAG :
 					APPEND_TAG );
 			mergeType = defaultMergeType;
 		}
