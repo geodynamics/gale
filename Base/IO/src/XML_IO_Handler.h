@@ -51,6 +51,12 @@
 	/** textual class name */
 	extern const Type XML_IO_Handler_Type;
 	
+	extern const xmlChar* APPEND_TAG;
+	extern const xmlChar* MERGE_TAG;
+	extern const xmlChar* REPLACE_TAG;
+	/** A useful map for getting xml versions of Dictionary_MergeTypes */
+	extern xmlChar* XML_IO_Handler_MergeTypeMap[3];
+
 	/** The Xml search path list. */
 	extern Stg_ObjectList* xmlSearchPaths;
 	

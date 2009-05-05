@@ -34,15 +34,25 @@
 
 #include "types.h"
 #include "shortcuts.h"
+#include "Dictionary.h"
+#include "Dictionary_Entry.h"
+#include "Dictionary_Entry_Value.h"
+#include "IO_Handler.h"
+#include "XML_IO_Handler.h"
+#include "Journal.h"
 #include "JournalFile.h"
+#include "CFile.h"
+#include "MPIFile.h"
 #include "Stream.h"
 #include "CStream.h"
 #include "MPIStream.h"
 #include "BinaryStream.h"
 #include "StreamFormatter.h"
 #include "LineFormatter.h"
+#include "IndentFormatter.h"
 #include "RankFormatter.h"
-#include "Journal.h"
+#include "PathUtils.h"
+#include "CmdLineArgs.h"
 #include "Init.h"
 
 #include <stdio.h>
@@ -57,6 +67,11 @@ Bool BaseIO_Init( int* argc, char** argv[] )
 {
 	Stream* typedStream;
 	Stream*	general;
+
+	/* Set up a useful map in the XML_IO_Handler */
+	XML_IO_Handler_MergeTypeMap[Dictionary_MergeType_Append] = APPEND_TAG;
+	XML_IO_Handler_MergeTypeMap[Dictionary_MergeType_Merge] = MERGE_TAG;
+	XML_IO_Handler_MergeTypeMap[Dictionary_MergeType_Replace] = REPLACE_TAG;
 
 	stgStreamFormatter_Buffer = StreamFormatter_Buffer_New(); 
 

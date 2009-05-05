@@ -76,9 +76,12 @@ static const xmlChar* PARAM_ATTR = (const xmlChar*) "param";
 
 static const xmlChar* ASCII_DATA_TAG = (const xmlChar*) "asciidata";
 static const xmlChar* COLUMN_DEFINITION_TAG = (const xmlChar*) "columnDefinition";
-static const xmlChar* APPEND_TAG = (const xmlChar*) "append";
-static const xmlChar* MERGE_TAG = (const xmlChar*) "merge";
-static const xmlChar* REPLACE_TAG = (const xmlChar*) "replace";
+
+const xmlChar* APPEND_TAG = (const xmlChar*) "append";
+const xmlChar* MERGE_TAG = (const xmlChar*) "merge";
+const xmlChar* REPLACE_TAG = (const xmlChar*) "replace";
+xmlChar* XML_IO_Handler_MergeTypeMap[3];
+
 static const xmlChar* SEARCH_PATH_TAG = (const xmlChar*) "searchPath";
 static const xmlChar* ELEMENT_TAG = (const xmlChar*) "element";
 
@@ -140,6 +143,8 @@ static void _XML_IO_Handler_ParseToolbox( XML_IO_Handler*, xmlNodePtr, Dictionar
 static void _XML_IO_Handler_ParseComponents( XML_IO_Handler*, xmlNodePtr, Dictionary_Entry_Value*, 
 					Dictionary_MergeType, Dictionary_Entry_Source );
 static Dictionary_Entry_Value_Type _XML_IO_Handler_GetDictValueType( XML_IO_Handler* self, char* type );
+static Dictionary_MergeType _XML_IO_Handler_GetMergeType( XML_IO_Handler* self, const xmlChar* mergeTypeStr, 
+		const char* funcName, const char* tagStr, xmlChar* entryName, Dictionary_MergeType defaultMergeType );
 static xmlChar* _XML_IO_Handler_StripLeadingTrailingWhiteSpace( XML_IO_Handler* self, const xmlChar* const );
 static Bool _XML_IO_Handler_IsOnlyWhiteSpace( char* );
 /* Writing Function prototypes */
@@ -287,7 +292,6 @@ void _XML_IO_Handler_Init( XML_IO_Handler* self ) {
 
 	Dictionary_Entry_Value_Type* lookupType;
 	
-
 	/* XML_IO_Handler info */
 	self->nameSpacesList = NULL;
 	_XML_IO_Handler_AddNameSpace( self, "http://www.vpac.org/StGermain/XML_IO_Handler/", "Jun2003" );
@@ -1191,65 +1195,15 @@ static void _XML_IO_Handler_ParseList( XML_IO_Handler* self, xmlNodePtr cur, Dic
 	else if (source) {
 		spaceStrippedSourceFile = _XML_IO_Handler_StripLeadingTrailingWhiteSpace( self, (xmlChar*) source );
 	}
-	if( mergeTypeStr ) {
-		spaceStrippedMergeType = _XML_IO_Handler_StripLeadingTrailingWhiteSpace( self, mergeTypeStr );
-		if( !xmlStrcmp( spaceStrippedMergeType, APPEND_TAG ) ) {
-			mergeType = Dictionary_MergeType_Append;
-		}
-		else if( !xmlStrcmp( spaceStrippedMergeType, MERGE_TAG ) ) {
-			mergeType = Dictionary_MergeType_Merge;
-		}
-		else if( !xmlStrcmp( spaceStrippedMergeType, REPLACE_TAG ) ) {
-			mergeType = Dictionary_MergeType_Replace;
-		}
-		else {
-			Journal_DPrintf(
-				Journal_Register( Debug_Type, XML_IO_Handler_Type ),
-				"_XML_IO_Handler_ParseList called on tag %s, with name=\"%s\", and "
-				"mergeType \"%s\" unknown reverting to \"%s\".\n", 
-				(char *)cur->name, 
-				spaceStrippedName,
-				spaceStrippedMergeType,
-				defaultMergeType == Dictionary_MergeType_Append ? APPEND_TAG : 
-					defaultMergeType == Dictionary_MergeType_Merge ? MERGE_TAG :
-					defaultMergeType == Dictionary_MergeType_Replace ? REPLACE_TAG :
-					APPEND_TAG );
-			mergeType = defaultMergeType;
-		}
-	}
-	if( childrenMergeTypeStr ) {
-		spaceStrippedChildrenMergeType = _XML_IO_Handler_StripLeadingTrailingWhiteSpace(
-			self,
-			childrenMergeTypeStr );
-							
-		if( !xmlStrcmp( spaceStrippedMergeType, APPEND_TAG ) ) {
-			childrenMergeType = Dictionary_MergeType_Append;
-		}
-		else if( !xmlStrcmp( spaceStrippedMergeType, MERGE_TAG ) ) {
-			childrenMergeType = Dictionary_MergeType_Merge;
-		}
-		else if( !xmlStrcmp( spaceStrippedMergeType, REPLACE_TAG ) ) {
-			childrenMergeType = Dictionary_MergeType_Replace;
-		}
-		else {
-			Journal_DPrintf(
-				Journal_Register( Debug_Type, XML_IO_Handler_Type ),
-				 "_XML_IO_Handler_ParseList called on tag %s, with name=\"%s\", and "
-				 "mergeType \"%s\" unknown reverting to \"%s\".\n", 
-				(char *)cur->name, 
-				spaceStrippedName,
-				spaceStrippedMergeType,
-				APPEND_TAG );
-			childrenMergeType = Dictionary_MergeType_Append;
-		}
-	}
+	mergeType = _XML_IO_Handler_GetMergeType( self, mergeTypeStr, __func__, (char*)cur->name, spaceStrippedName, defaultMergeType );
+	childrenMergeType = _XML_IO_Handler_GetMergeType( self, childrenMergeTypeStr, __func__, (char*)cur->name, spaceStrippedName, IO_Handler_DefaultChildrenMergeType );
 
 	Journal_DPrintf(
 		Journal_Register( Debug_Type, XML_IO_Handler_Type ),
 		"_XML_IO_Handler_ParseList called on tag %s, with name=\"%s\", and mergeType=\"%s\"\n", 
 		(char *) cur->name, 
 		spaceStrippedName, 
-		spaceStrippedMergeType );
+		mergeTypeStr );
 	
 	/* set/add the list */
 	newList = IO_Handler_DictSetAddValueWithSource(
@@ -1489,7 +1443,7 @@ static void _XML_IO_Handler_ParseStruct(
 	xmlChar* spaceStrippedChildrenMergeType = NULL;
 	Dictionary_Entry_Value* newStruct = NULL;
 	Dictionary_MergeType mergeType = defaultMergeType;
-	Dictionary_MergeType childrenMergeType = Dictionary_MergeType_Append;
+	Dictionary_MergeType childrenMergeType = IO_Handler_DefaultChildrenMergeType;
 	
 	if ( name ) {
 		spaceStrippedName = _XML_IO_Handler_StripLeadingTrailingWhiteSpace( self, name );
@@ -1500,54 +1454,8 @@ static void _XML_IO_Handler_ParseStruct(
 	else if (source) {
 		spaceStrippedSourceFile = _XML_IO_Handler_StripLeadingTrailingWhiteSpace( self, (xmlChar*) source );
 	}
-	if( mergeTypeStr ) {
-		spaceStrippedMergeType = _XML_IO_Handler_StripLeadingTrailingWhiteSpace( self, mergeTypeStr );
-		if( !xmlStrcmp( spaceStrippedMergeType, APPEND_TAG ) ) {
-			mergeType = Dictionary_MergeType_Append;
-		}
-		else if( !xmlStrcmp( spaceStrippedMergeType, MERGE_TAG ) ) {
-			mergeType = Dictionary_MergeType_Merge;
-		}
-		else if( !xmlStrcmp( spaceStrippedMergeType, REPLACE_TAG ) ) {
-			mergeType = Dictionary_MergeType_Replace;
-		}
-		else {
-			Journal_DPrintf( 
-				Journal_Register( Debug_Type, XML_IO_Handler_Type ),
-				"_XML_IO_Handler_ParseList called on tag %s, with name=\"%s\", and mergeType \"%s\" unknown "
-				"reverting to \"%s\".\n", 
-				(char *)cur->name, 
-				spaceStrippedName,
-				defaultMergeType == Dictionary_MergeType_Append ? APPEND_TAG : 
-					defaultMergeType == Dictionary_MergeType_Merge ? MERGE_TAG :
-					defaultMergeType == Dictionary_MergeType_Replace ? REPLACE_TAG :
-					APPEND_TAG );
-			mergeType = defaultMergeType;
-		}
-	}
-	if( childrenMergeTypeStr ) {
-		spaceStrippedChildrenMergeType = _XML_IO_Handler_StripLeadingTrailingWhiteSpace( self, childrenMergeTypeStr );
-		if( !xmlStrcmp( spaceStrippedMergeType, APPEND_TAG ) ) {
-			childrenMergeType = Dictionary_MergeType_Append;
-		}
-		else if( !xmlStrcmp( spaceStrippedMergeType, MERGE_TAG ) ) {
-			childrenMergeType = Dictionary_MergeType_Merge;
-		}
-		else if( !xmlStrcmp( spaceStrippedMergeType, REPLACE_TAG ) ) {
-			childrenMergeType = Dictionary_MergeType_Replace;
-		}
-		else {
-			Journal_DPrintf( 
-				Journal_Register( Debug_Type, XML_IO_Handler_Type ),
-				"_XML_IO_Handler_ParseList called on tag %s, with name=\"%s\", and mergeType \"%s\" unknown "
-				"reverting to \"%s\".\n", 
-				(char *)cur->name, 
-				spaceStrippedName,
-				spaceStrippedMergeType,
-				APPEND_TAG );
-			childrenMergeType = Dictionary_MergeType_Append;
-		}
-	}
+	mergeType = _XML_IO_Handler_GetMergeType( self, mergeTypeStr, __func__, (char*)cur->name, spaceStrippedName, defaultMergeType );
+	childrenMergeType = _XML_IO_Handler_GetMergeType( self, childrenMergeTypeStr, __func__, (char*)cur->name, spaceStrippedName, IO_Handler_DefaultChildrenMergeType );
 
 	Journal_DPrintf( 
 		Journal_Register( Debug_Type, XML_IO_Handler_Type ),
@@ -1612,31 +1520,7 @@ static void _XML_IO_Handler_ParseParameter(
 		spaceStrippedSourceFile = _XML_IO_Handler_StripLeadingTrailingWhiteSpace( self, (xmlChar*) source );
 	}
 
-	if( mergeTypeStr ) {
-		spaceStrippedMergeType = _XML_IO_Handler_StripLeadingTrailingWhiteSpace( self, mergeTypeStr );
-		if( !xmlStrcmp( spaceStrippedMergeType, APPEND_TAG ) ) {
-			mergeType = Dictionary_MergeType_Append;
-		}
-		else if( !xmlStrcmp( spaceStrippedMergeType, MERGE_TAG ) ) {
-			mergeType = Dictionary_MergeType_Merge;
-		}
-		else if( !xmlStrcmp( spaceStrippedMergeType, REPLACE_TAG ) ) {
-			mergeType = Dictionary_MergeType_Replace;
-		}
-		else {
-			Journal_Printf( 
-				Journal_Register( Info_Type, XML_IO_Handler_Type ),
-				"_XML_IO_Handler_ParseList called on tag %s, with name=\"%s\", and mergeType \"%s\" unknown "
-				"reverting to \"%s\".\n", 
-				(char *)cur->name, 
-				spaceStrippedName,
-				defaultMergeType == Dictionary_MergeType_Append ? APPEND_TAG : 
-					/* WHERE THIS COME FROM?defaultMergeType == Dictionary_MergeType_Prepend ? PREPEND_TAG : */
-					defaultMergeType == Dictionary_MergeType_Replace ? REPLACE_TAG :
-					APPEND_TAG );
-			mergeType = defaultMergeType;
-		}
-	}
+	mergeType = _XML_IO_Handler_GetMergeType( self, mergeTypeStr, __func__, (char*)cur->name, spaceStrippedName, defaultMergeType );
 
 	if ( NULL == value ) {
 		strippedVal = Memory_Alloc_Array( xmlChar, 1, "strippedVal" );
@@ -2402,4 +2286,41 @@ static void _XML_IO_Handler_WriteParameter( XML_IO_Handler* self, char* name, Di
 	{
 		xmlNewProp( newNode, PARAMTYPE_ATTR, (xmlChar*) self->TYPE_KEYWORDS[(int) value->type] );
 	}
+}
+
+static Dictionary_MergeType _XML_IO_Handler_GetMergeType( XML_IO_Handler* self, const xmlChar* mergeTypeStr, 
+		const char* funcName, const char* tagStr, xmlChar* entryName, Dictionary_MergeType defaultMergeType )
+{
+	Dictionary_MergeType         mergeType = defaultMergeType;
+	xmlChar*                     spaceStrippedMergeType = NULL;
+
+	if( mergeTypeStr ) {
+		spaceStrippedMergeType = _XML_IO_Handler_StripLeadingTrailingWhiteSpace( self, mergeTypeStr );
+		if( !xmlStrcmp( spaceStrippedMergeType, APPEND_TAG ) ) {
+			mergeType = Dictionary_MergeType_Append;
+		}
+		else if( !xmlStrcmp( spaceStrippedMergeType, MERGE_TAG ) ) {
+			mergeType = Dictionary_MergeType_Merge;
+		}
+		else if( !xmlStrcmp( spaceStrippedMergeType, REPLACE_TAG ) ) {
+			mergeType = Dictionary_MergeType_Replace;
+		}
+		else {
+			Journal_DPrintf( 
+				Journal_Register( Debug_Type, XML_IO_Handler_Type ),
+				"%s() called on tag %s, with name=\"%s\", and mergeType \"%s\" unknown "
+				"reverting to \"%s\".\n", 
+				__func__,
+				tagStr, 
+				entryName,
+				spaceStrippedMergeType,
+				XML_IO_Handler_MergeTypeMap[defaultMergeType] );
+			mergeType = defaultMergeType;
+		}
+	}
+	else {
+		mergeType = defaultMergeType;
+	}
+
+	return mergeType;
 }
