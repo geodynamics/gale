@@ -57,6 +57,7 @@
 	typedef struct MaterialSwarmVariable            MaterialSwarmVariable;
 	typedef struct BuoyancyForceTerm                BuoyancyForceTerm;
 	typedef struct BuoyancyForceTermThermoChem      BuoyancyForceTermThermoChem;
+        typedef struct DiffusionSMT DiffusionSMT;
         typedef struct PCDVC                        	PCDVC;
 
 #endif 
