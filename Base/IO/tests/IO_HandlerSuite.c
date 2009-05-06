@@ -766,7 +766,7 @@ void IO_HandlerSuite_TestReadInvalid( IO_HandlerSuiteData* data ) {
          invalidXMLFilename );
       pcu_check_true( fgets( errorLine, sizeof(char*)*MAXLINE, errorFile ) );
       pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
-      //remove( errorFileName );
+      remove( errorFileName );
    }
    remove( invalidXMLFilename );
 
