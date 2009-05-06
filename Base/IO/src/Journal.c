@@ -32,6 +32,7 @@
 #include <mpi.h>
 
 
+#include "pcu/pcu.h"	/* We'll use pcu_assert in Firewall function */
 #include "Base/Foundation/Foundation.h"
 
 #include "types.h"
@@ -604,7 +605,9 @@ int Journal_Firewall( int expression, void* _stream, char* fmt, ... )
 	}
 	
 	if ( stJournal->firewallProducesAssert == True ) {
-		assert( expression );
+		/* Use pcu_assert, so that StGermain PCU tests can check that a Firewall
+		 * is correctly produced. */ 
+		pcu_assert( expression );
 	}
 	else {
 		/* TODO: Don't use FAILURE until Pat beef's up the test scripts to do .error checks

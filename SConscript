@@ -79,7 +79,7 @@ if env['shared_libraries']:
     env.SharedLibrary('lib/StGermain', objs)
 
 # FlattenXML, StGermain and test runner programs.
-libs = ['StGermain'] + env.get('LIBS', [])
+libs = ['StGermain'] + ['pcu'] + env.get('LIBS', [])
 env.Program('bin/FlattenXML', 'Base/FlattenXML/src/main.c', LIBS=libs)
 env.Program('bin/StGermain', 'src/main.c', LIBS=libs)
 env.PCUTest('tests/testStGermain', suites,
