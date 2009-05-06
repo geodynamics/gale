@@ -131,9 +131,11 @@ void _MaterialSwarmVariable_Init(
 		ExtensionInfo_Index                                 materialExtensionHandle,
 		SizeT                                               offset )
 {
-	self->materials_Register      = materials_Register;
-	self->materialExtensionHandle = materialExtensionHandle;
-	self->offset                  = offset;
+	self->materials_Register        = materials_Register;
+	self->materialExtensionHandle   = materialExtensionHandle;
+	self->offset                    = offset;
+   /* variable does not store data, so is not checkpointed */
+   self->isCheckpointedAndReloaded = False;
 }
 
 void MaterialSwarmVariable_InitAll( 
