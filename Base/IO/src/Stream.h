@@ -86,7 +86,7 @@
 		int				_currentLine; 		\
 									\
 		Stream*				_parent; 		\
-		Stg_ObjectList*		_children; 
+		Stg_ObjectList*			_children; 
 	struct Stream { __Stream };
 
 	/** Constructor interface. */
