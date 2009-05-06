@@ -61,6 +61,8 @@
 		Index                                              dofCount;                    \
 		Dimension_Index                                    dim;                         \
 		SwarmVariable_Register*                            swarmVariable_Register;      \
+		/* set whether variable should be checkpointed and reloaded*/ \
+		Bool                                               isCheckpointedAndReloaded;
 
 	struct SwarmVariable { __SwarmVariable };	
 

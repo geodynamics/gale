@@ -361,11 +361,8 @@ void SwarmDump_DumpToHDF5( SwarmDump* self, Swarm* swarm, const char* filename )
       for( swarmVar_I = 0; swarmVar_I < swarm->swarmVariable_Register->objects->count; swarmVar_I++ ) {
          swarmVar = SwarmVariable_Register_GetByIndex( swarm->swarmVariable_Register, swarmVar_I );
    
-         /* check that the swarmVariable is of type SwarmVariable, and not alternate such as 
-            MaterialSwarmVariable which shouldn't be stored. 
-            Also, if the variable has a parent, do not store, as 
-            data will be stored when parent is stored.*/
-         if((0 == strcmp(swarmVar->type, "SwarmVariable")) && !swarmVar->variable->parent ) {
+         /* check that the swarmVariable should be stored */
+         if( swarmVar->isCheckpointedAndReloaded ) {
             
             /* Create our file space. */
             size[0]  = swarm->particleLocalCount;

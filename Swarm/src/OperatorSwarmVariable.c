@@ -211,6 +211,8 @@ void _OperatorSwarmVariable_Init( void* ofv, Name operatorName, Index swarmVaria
 	self->_operator              = Operator_NewFromName( operatorName, swarmVariableList[0]->dofCount, self->dim );
 	self->dofCount               = self->_operator->resultDofs; /* reset value */
 	self->swarmVariableCount     = swarmVariableCount;
+   /* variable does not store data, so is not checkpointed */
+   self->isCheckpointedAndReloaded = False;
 
 	/* Copy swarm variable list */
 	self->swarmVariableList      = Memory_Alloc_Array( SwarmVariable*, swarmVariableCount, "Array of Swarm Variables" );

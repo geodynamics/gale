@@ -261,6 +261,9 @@ void _Swarm_Init(
 			GetOffsetOfMember( particle , owningCell ),
 			Variable_DataType_Int ); /* Should be unsigned int */
 
+   /* disable checkpointing of OwningCell as it is reinitialised on startup */   
+   self->owningCellVariable->isCheckpointedAndReloaded = False;
+
 	self->swarmReg_I = Swarm_Register_Add( Swarm_Register_GetSwarm_Register(), self );
 
 	if ( ics ) {
@@ -1448,7 +1451,9 @@ SwarmVariable* Swarm_NewScalarVariable(
 		variable_Register );
 
 	swarmVariable = SwarmVariable_New( name, self, variable, 1 );
-	
+   /* set variable to be checkpointed */
+	swarmVariable->isCheckpointedAndReloaded = True;
+
 	Memory_Free( name );
 
 	return swarmVariable;
@@ -1513,15 +1518,19 @@ SwarmVariable* Swarm_NewVectorVariable(
 	/* Need to free these guys individually */
 	for( vector_I = 0; vector_I < dataTypeCount; vector_I++ ) {
 		if ( swarmVariable_Register && variable_Register ) {
-			SwarmVariable_New( 
+			swarmVariable = SwarmVariable_New( 
 					dataNames[ vector_I ],
 					self, 
 					Variable_Register_GetByName( variable_Register, dataNames[ vector_I ] ),
 					1 );
+         /* disable checkpointing of children, as data is stored when parent is checkpointed */
+         swarmVariable->isCheckpointedAndReloaded = False;
 		}
 		Memory_Free( dataNames[ vector_I ] );
 	}
 	swarmVariable = SwarmVariable_New( name, self, variable, dataTypeCount );
+   /* set variable to be checkpointed */
+   swarmVariable->isCheckpointedAndReloaded = True;
 
 	Memory_Free( dataNames );
 	Memory_Free( name );

@@ -107,11 +107,12 @@ void _SwarmVariable_Init( SwarmVariable* self, Swarm* swarm, Variable* variable,
 	/* Add ourselves to the register for later retrieval by clients */
 	self->isConstructed = True;
 
-	self->swarm                  = swarm;
-	self->variable               = variable;
-	self->dofCount               = dofCount;
-	self->swarmVariable_Register = swarm->swarmVariable_Register;
-	self->dim                    = swarm->dim;
+	self->swarm                     = swarm;
+	self->variable                  = variable;
+	self->dofCount                  = dofCount;
+	self->swarmVariable_Register    = swarm->swarmVariable_Register;
+	self->dim                       = swarm->dim;
+   self->isCheckpointedAndReloaded = True;
 	
 	if( swarm )
 		Swarm_AddVariable( swarm, self );

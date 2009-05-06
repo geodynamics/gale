@@ -401,12 +401,8 @@ void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm
          /* Open a dataspace for each swarmVariable */
          for( swarmVar_I = 0; swarmVar_I < swarm->swarmVariable_Register->objects->count; swarmVar_I++ ) {
             swarmVar = SwarmVariable_Register_GetByIndex( swarm->swarmVariable_Register, swarmVar_I );
-            /* only retrieve variable if it does not have a parent, as these
-               are not stored, and the data is retrieved when the parent is. 
-          Also do make sure variable is of type SwarmVariable (as opposed 
-          to materialSwarmVariable, which is not checkpointed). */
-            if((0 == strcmp(swarmVar->type, "SwarmVariable")) && !swarmVar->variable->parent ) {
-               
+            
+            if( swarmVar->isCheckpointedAndReloaded ) {
                sprintf( dataSpaceName, "/%s", swarmVar->name );
                
                #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
@@ -431,7 +427,7 @@ void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm
    for( ii = 1 ; ii <= swarm->checkpointnfiles ; ii++ ){
       for( swarmVar_I = 0; swarmVar_I < swarm->swarmVariable_Register->objects->count; swarmVar_I++ ) {
          swarmVar = SwarmVariable_Register_GetByIndex( swarm->swarmVariable_Register, swarmVar_I );
-         if( !swarmVar->variable->parent ) {
+         if( swarmVar->isCheckpointedAndReloaded ) {
             if ( self->fileSpace[swarmVar_I][ii-1] ) H5Sclose( self->fileSpace[swarmVar_I][ii-1] );
             if ( self->fileData [swarmVar_I][ii-1] ) H5Dclose( self->fileData [swarmVar_I][ii-1] );
          }
@@ -491,7 +487,7 @@ void _FileParticleLayout_InitialiseParticle(
          are not stored, and the data is retrieved when the parent is. 
          Also do make sure variable is of type SwarmVariable (as opposed 
          to materialSwarmVariable, which is not checkpointed). */
-      if((0 == strcmp(swarmVar->type, "SwarmVariable")) && !swarmVar->variable->parent ) {          
+      if( swarmVar->isCheckpointedAndReloaded ) {          
          /* Update the hyperslab. */   
          self->count[1] = swarmVar->dofCount;
          memSpace = H5Screate_simple( 2, self->count, NULL );
