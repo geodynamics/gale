@@ -458,7 +458,7 @@ Stream* Journal_Register2( const Type streamType, const Type componentType, cons
 	return instanceStream;
 }
 
-JournalFile* Journal_GetFile( char* fileName )
+JournalFile* Journal_GetFile( const char* const fileName )
 {
 	return (JournalFile*) Stg_ObjectList_Get( stJournal->_files, fileName );
 }
@@ -527,7 +527,7 @@ void Journal_PrintConcise()
 	Journal_Printf( stream, "\n" );
 }
 
-int Journal_Printf ( void* _stream, char* fmt, ... )
+int Journal_Printf ( void* _stream, const char* const fmt, ... )
 {
 	int result;
 	Stream* stream = (Stream*)_stream;
@@ -548,7 +548,7 @@ int Journal_Printf ( void* _stream, char* fmt, ... )
 	return result;
 }
 
-int Journal_PrintfL( void* _stream, JournalLevel level, char* fmt, ... )
+int Journal_PrintfL( void* _stream, JournalLevel level, const char* const fmt, ... )
 {
 	int result;
 	Stream* stream = (Stream*)_stream;
@@ -571,7 +571,7 @@ int Journal_PrintfL( void* _stream, JournalLevel level, char* fmt, ... )
 int Journal_Firewall_Func( int expression, char* expressionText, 
 	const char* file, const char* func, int line, void* _stream, char* fmt, ... )
 */
-int Journal_Firewall( int expression, void* _stream, char* fmt, ... )
+int Journal_Firewall( int expression, void* _stream, const char* const fmt, ... )
 {
 	int result = 0;
 	Stream* stream = (Stream*)_stream;
@@ -647,7 +647,7 @@ Bool Journal_Dump( void* _stream, void* data )
 
 
 /* Only rank 0 will print to stream */
-int Journal_RPrintf ( void* _stream, char* fmt, ... )
+int Journal_RPrintf ( void* _stream, const char* const fmt, ... )
 {
 	Stream* stream = (Stream*)_stream;
 	int result, init_stream_rank;
@@ -672,7 +672,7 @@ int Journal_RPrintf ( void* _stream, char* fmt, ... )
 }
 
 /* Only rank 0 will print to stream */
-int Journal_RPrintfL ( void* _stream, JournalLevel level, char* fmt, ... )
+int Journal_RPrintfL ( void* _stream, JournalLevel level, const char* const fmt, ... )
 {
         Stream* stream = (Stream*)_stream;
         int result, init_stream_rank;

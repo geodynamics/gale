@@ -53,7 +53,7 @@ JournalFile* MPIFile_New()
 	return (JournalFile*)_MPIFile_New( sizeof(MPIFile), MPIFile_Type, _MPIFile_Delete, _MPIFile_Print, NULL );
 }
 
-JournalFile* MPIFile_New2( char* fileName )
+JournalFile* MPIFile_New2( const char* const fileName )
 {
 	JournalFile* result = MPIFile_New();
 
@@ -114,14 +114,14 @@ void _MPIFile_Print( void* cfile, Stream* stream )
 }
 
 	
-Bool _MPIFile_Open( void* file, char* fileName )
+Bool _MPIFile_Open( void* file, const char* const fileName )
 {
 	MPIFile* self = (MPIFile*) file;
 
 	/* Remove the file */
         remove( fileName );
 
-	MPI_File_open( MPI_COMM_WORLD, fileName, MPI_MODE_CREATE | MPI_MODE_WRONLY | MPI_MODE_EXCL, 
+	MPI_File_open( MPI_COMM_WORLD, (char*)fileName, MPI_MODE_CREATE | MPI_MODE_WRONLY | MPI_MODE_EXCL, 
 			MPI_INFO_NULL, &(self->mpiFile) );
 
 	self->fileHandle = &(self->mpiFile);
@@ -129,11 +129,11 @@ Bool _MPIFile_Open( void* file, char* fileName )
 	return True;	
 }
 	
-Bool _MPIFile_Append( void* file, char* fileName )
+Bool _MPIFile_Append( void* file, const char* const fileName )
 {
 	MPIFile* self = (MPIFile*) file;
 
-	MPI_File_open( MPI_COMM_WORLD, fileName, MPI_MODE_WRONLY, MPI_INFO_NULL, &(self->mpiFile) );
+	MPI_File_open( MPI_COMM_WORLD, (char*)fileName, MPI_MODE_WRONLY, MPI_INFO_NULL, &(self->mpiFile) );
 
 	self->fileHandle = &(self->mpiFile);
 	

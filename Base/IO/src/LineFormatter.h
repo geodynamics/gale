@@ -89,7 +89,7 @@
 
 
 	/** Formats a output string of printf by prepending a tag in front of every line detected. */
-	char* _LineFormatter_Format( void* formatter, char* fmt );
+	char* _LineFormatter_Format( void* formatter, const char* const fmt );
 
 
 #endif /* __Base_IO_LineFormatter_h__ */
