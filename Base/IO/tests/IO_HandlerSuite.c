@@ -36,6 +36,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <libxml/xmlerror.h>
 
 #include "pcu/pcu.h"
 #include "StGermain/Base/Foundation/Foundation.h"
@@ -108,11 +109,13 @@ void IO_HandlerSuite_TestWriteReadNormalEntries( IO_HandlerSuiteData* data ) {
    IO_Handler_ReadAllFromFile( data->io_handler, xmlTestFileName, data->dict2 ); 
 
    pcu_check_true( data->dict1->count == data->dict2->count );
-   for (ii=0; ii<data->dict1->count; ii++) {
-      pcu_check_true( Dictionary_Entry_Compare( data->dict1->entryPtr[ii],
-         data->dict2->entryPtr[ii]->key) );
-      pcu_check_true( Dictionary_Entry_Value_Compare( data->dict1->entryPtr[ii]->value,
-         data->dict2->entryPtr[ii]->value) );
+   if ( data->dict1->count == data->dict2->count ) {
+      for (ii=0; ii<data->dict1->count; ii++) {
+         pcu_check_true( Dictionary_Entry_Compare( data->dict1->entryPtr[ii],
+            data->dict2->entryPtr[ii]->key) );
+         pcu_check_true( Dictionary_Entry_Value_Compare( data->dict1->entryPtr[ii]->value,
+            data->dict2->entryPtr[ii]->value) );
+      }
    }
 
    remove(xmlTestFileName);
@@ -138,10 +141,12 @@ void IO_HandlerSuite_TestWriteReadNormalSingleEntry( IO_HandlerSuiteData* data )
       IO_Handler_ReadAllFromFile( data->io_handler, fileName, data->dict2 ); 
 
       pcu_check_true( 1 == data->dict2->count );
-      pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0],
-         data->testDD->testKeys[ii]) );
-      pcu_check_true( Dictionary_Entry_Value_Compare( data->dict2->entryPtr[0]->value,
-         data->testDD->testValues[ii] ) );
+      if ( 1 == data->dict2->count ) {
+         pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0],
+            data->testDD->testKeys[ii]) );
+         pcu_check_true( Dictionary_Entry_Value_Compare( data->dict2->entryPtr[0]->value,
+            data->testDD->testValues[ii] ) );
+      }
 
       Dictionary_Empty( data->dict2 );
       remove(fileName);
@@ -261,10 +266,12 @@ void IO_HandlerSuite_TestReadWhitespaceEntries( IO_HandlerSuiteData* data ) {
    IO_Handler_ReadAllFromFile( data->io_handler, testFileName, data->dict2 ); 
 
    pcu_check_true( 1 == data->dict2->count );
-   pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0],
-      (Dictionary_Entry_Key)testKey) );
-   pcu_check_true( 0 == strcmp(
-      Dictionary_Entry_Value_AsString( data->dict2->entryPtr[0]->value ), testValString ) );
+   if ( 1 == data->dict2->count ) {
+      pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0],
+         (Dictionary_Entry_Key)testKey) );
+      pcu_check_true( 0 == strcmp(
+         Dictionary_Entry_Value_AsString( data->dict2->entryPtr[0]->value ), testValString ) );
+   }
 
    remove( testFileName );
    Dictionary_Empty( data->dict2 );
@@ -323,18 +330,20 @@ void IO_HandlerSuite_TestReadIncludedFile( IO_HandlerSuiteData* data ) {
    IO_Handler_ReadAllFromFile( data->io_handler, testFileName, data->dict2 ); 
 
    pcu_check_true( 3 == data->dict2->count );
-   pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0],
-      (Dictionary_Entry_Key)testKey) );
-   pcu_check_true( 0 == strcmp(
-      Dictionary_Entry_Value_AsString( data->dict2->entryPtr[0]->value ), testValString ) );
-   pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[1],
-      (Dictionary_Entry_Key)testKeyInc) );
-   pcu_check_true( 0 == strcmp(
-      Dictionary_Entry_Value_AsString( data->dict2->entryPtr[1]->value ), testValStringInc ) );
-   pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[2],
-      (Dictionary_Entry_Key)testKeyIncSP) );
-   pcu_check_true( 0 == strcmp(
-      Dictionary_Entry_Value_AsString( data->dict2->entryPtr[2]->value ), testValStringIncSP ) );
+   if ( 3 == data->dict2->count ) {
+      pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0],
+         (Dictionary_Entry_Key)testKey) );
+      pcu_check_true( 0 == strcmp(
+         Dictionary_Entry_Value_AsString( data->dict2->entryPtr[0]->value ), testValString ) );
+      pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[1],
+         (Dictionary_Entry_Key)testKeyInc) );
+      pcu_check_true( 0 == strcmp(
+         Dictionary_Entry_Value_AsString( data->dict2->entryPtr[1]->value ), testValStringInc ) );
+      pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[2],
+         (Dictionary_Entry_Key)testKeyIncSP) );
+      pcu_check_true( 0 == strcmp(
+         Dictionary_Entry_Value_AsString( data->dict2->entryPtr[2]->value ), testValStringIncSP ) );
+   }
 
    remove( testFileName );
    remove( testIncludedFileName );
@@ -690,7 +699,162 @@ void IO_HandlerSuite_TestReadDuplicateEntryKeys( IO_HandlerSuiteData* data ) {
 }
 
 
-// TODO read: various bad entries
+void IO_HandlerSuite_TestReadNonExistent( IO_HandlerSuiteData* data ) {
+   const char*    errorFileName = "./errorMsg-NonExist.txt";
+   const char*    notExistFilename = "I_Dont_Exist.xml";
+   FILE*          errorFile;
+   #define        MAXLINE 1000
+   char           errorLine[MAXLINE];
+   char           expectedErrorMsg[MAXLINE];
+
+   Stream_RedirectFile( Journal_Register( Error_Type, XML_IO_Handler_Type ), errorFileName );
+   pcu_check_assert( IO_Handler_ReadAllFromFile( data->io_handler, notExistFilename, data->dict2 ) );
+   pcu_check_true(errorFile = fopen( errorFileName, "r" ));
+   if (errorFile) {
+      pcu_check_true( fgets( errorLine, sizeof(char*)*MAXLINE, errorFile ) );
+      sprintf( expectedErrorMsg, "Error: File %s doesn't exist, not readable, or not valid.\n",
+         notExistFilename );
+      pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
+      remove( errorFileName );
+   }
+   
+   Dictionary_Empty( data->dict2 );
+}
+
+
+void errorHandler( void* ctx, const char* msg, ... )
+{
+   va_list ap;
+   va_start( ap, msg );
+   Stream_Printf(
+      Journal_Register( Error_Type, XML_IO_Handler_Type ),
+      msg, ap );
+   va_end(ap);
+}
+
+
+void IO_HandlerSuite_TestReadInvalid( IO_HandlerSuiteData* data ) {
+   const char*    errorFileName = "./errorMsg-Invalid.txt";
+   const char*    invalidXMLFilename = "Invalid.xml";
+   FILE*          errorFile;
+   #define        MAXLINE 1000
+   char           errorLine[MAXLINE];
+   char           expectedErrorMsg[MAXLINE];
+
+   Stream_RedirectFile( Journal_Register( Error_Type, XML_IO_Handler_Type ), errorFileName );
+
+   /* Create an invalid XML file */
+   _IO_HandlerSuite_CreateTestXMLFile( invalidXMLFilename, "<invalid></param>\n" );
+
+   xmlSetGenericErrorFunc( errorFile, errorHandler);
+
+   pcu_check_assert( IO_Handler_ReadAllFromFile( data->io_handler, invalidXMLFilename, data->dict2 ) );
+   pcu_check_true( (errorFile = fopen( errorFileName, "r" )) );
+   if ( errorFile ) { 
+      sprintf( expectedErrorMsg, ".//%s:3: parser error : Opening and ending tag mismatch: "
+         "invalid line 3 and param\n",
+         invalidXMLFilename );
+      pcu_check_true( fgets( errorLine, sizeof(char*)*MAXLINE, errorFile ) );
+      pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
+      sprintf( expectedErrorMsg, "<invalid></param>\n" );
+      pcu_check_true( fgets( errorLine, sizeof(char*)*MAXLINE, errorFile ) );
+      pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
+      sprintf( expectedErrorMsg, "                 ^\n" );
+      pcu_check_true( fgets( errorLine, sizeof(char*)*MAXLINE, errorFile ) );
+      pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
+      sprintf( expectedErrorMsg, "Error: File %s doesn't exist, not readable, or not valid.\n",
+         invalidXMLFilename );
+      pcu_check_true( fgets( errorLine, sizeof(char*)*MAXLINE, errorFile ) );
+      pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
+      //remove( errorFileName );
+   }
+   remove( invalidXMLFilename );
+
+   Dictionary_Empty( data->dict2 );
+}
+
+
+void IO_HandlerSuite_TestReadWrongNS( IO_HandlerSuiteData* data ) {
+   const char*    wrongNS_XMLFilename = "WrongNS.xml";
+   FILE*          wrongNS_XMLFile = NULL;
+   const char*    wrongNS_Line = "<StGermainData xmlns=\"http://www.wrong.com/StGermain/XML_IO_Handler/Jun2003\">";
+   const char*    errorFileName = "./errorMsg-wrongNS.txt";
+   FILE*          errorFile;
+   #define        MAXLINE 1000
+   char           errorLine[MAXLINE];
+   char           expectedErrorMsg[MAXLINE];
+
+   Stream_RedirectFile( Journal_Register( Error_Type, XML_IO_Handler_Type ), errorFileName );
+
+   /* Create an XML file with wrong NS - thus can't use our standard test XML creator */
+   wrongNS_XMLFile = fopen(wrongNS_XMLFilename, "w");
+   fwrite( IO_HandlerSuite_XMLStartString1, sizeof(char),
+      strlen( IO_HandlerSuite_XMLStartString1 ), wrongNS_XMLFile );
+   fwrite( wrongNS_Line, sizeof(char), strlen( wrongNS_Line ), wrongNS_XMLFile );
+   fwrite( IO_HandlerSuite_XMLEndString, sizeof(char),
+      strlen( IO_HandlerSuite_XMLEndString ), wrongNS_XMLFile );
+   fclose( wrongNS_XMLFile );
+
+   pcu_check_assert( IO_Handler_ReadAllFromFile( data->io_handler, wrongNS_XMLFilename, data->dict2 ) );
+   pcu_check_true( errorFile = fopen( errorFileName, "r" ));
+   if (errorFile) {
+      sprintf( expectedErrorMsg, "Error: resource .//%s of the wrong type, unknown namespace "
+         "wasn't expected value of http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003.\n",
+         wrongNS_XMLFilename );
+      pcu_check_true( fgets( errorLine, sizeof(char*)*MAXLINE, errorFile ) );
+      pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
+      sprintf( expectedErrorMsg, "Error: File %s not valid/readable.\n",
+         wrongNS_XMLFilename );
+      pcu_check_true( fgets( errorLine, sizeof(char*)*MAXLINE, errorFile ) );
+      pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
+      remove( errorFileName );
+   }
+   remove( wrongNS_XMLFilename );
+   Dictionary_Empty( data->dict2 );
+}
+
+
+void IO_HandlerSuite_TestReadWrongRootNode( IO_HandlerSuiteData* data ) {
+   const char*    wrongRootNode_XMLFilename = "WrongRootNode.xml";
+   FILE*          wrongRootNode_XMLFile = NULL;
+   const char*    wrongRootNode_Line = "<Wrong xmlns=\"http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003\">\n";
+   const char*    wrongRootNode_EndLine = "</Wrong>";
+   const char*    errorFileName = "./errorMsg-wrongRootNode.txt";
+   FILE*          errorFile;
+   #define        MAXLINE 1000
+   char           errorLine[MAXLINE];
+   char           expectedErrorMsg[MAXLINE];
+
+   Stream_RedirectFile( Journal_Register( Error_Type, XML_IO_Handler_Type ), errorFileName );
+
+   /* Create an XML file with wrong NS - thus can't use our standard test XML creator */
+   wrongRootNode_XMLFile = fopen(wrongRootNode_XMLFilename, "w");
+   fwrite( IO_HandlerSuite_XMLStartString1, sizeof(char),
+      strlen( IO_HandlerSuite_XMLStartString1 ), wrongRootNode_XMLFile );
+   fwrite( wrongRootNode_Line, sizeof(char), strlen( wrongRootNode_Line ), wrongRootNode_XMLFile );
+   fwrite( wrongRootNode_EndLine, sizeof(char), strlen( wrongRootNode_EndLine ), wrongRootNode_XMLFile );
+   fclose( wrongRootNode_XMLFile );
+
+   pcu_check_assert( IO_Handler_ReadAllFromFile( data->io_handler, wrongRootNode_XMLFilename, data->dict2 ) );
+   pcu_check_true( (errorFile = fopen( errorFileName, "r" )) );
+   if ( errorFile ) {
+      sprintf( expectedErrorMsg, "resource .//%s of wrong type, root node "
+         "=%s, should be <StGermainData>.\n", wrongRootNode_XMLFilename, "<Wrong>" );
+      pcu_check_true( fgets( errorLine, sizeof(char*)*MAXLINE, errorFile ) );
+      pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
+      sprintf( expectedErrorMsg, "Not parsing.\n" );
+      pcu_check_true( fgets( errorLine, sizeof(char*)*MAXLINE, errorFile ) );
+      pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
+      sprintf( expectedErrorMsg, "Error: File %s not valid/readable.\n",
+         wrongRootNode_XMLFilename );
+      pcu_check_true( fgets( errorLine, sizeof(char*)*MAXLINE, errorFile ) );
+      pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
+      remove( errorFileName );
+   }
+   remove( wrongRootNode_XMLFilename );
+   Dictionary_Empty( data->dict2 );
+}
+
 
 void IO_HandlerSuite( pcu_suite_t* suite ) {
    pcu_suite_setData( suite, IO_HandlerSuiteData );
@@ -704,4 +868,8 @@ void IO_HandlerSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, IO_HandlerSuite_TestReadRawDataEntries );
    pcu_suite_addTest( suite, IO_HandlerSuite_TestReadAllFromCommandLine );
    pcu_suite_addTest( suite, IO_HandlerSuite_TestReadDuplicateEntryKeys );
+   pcu_suite_addTest( suite, IO_HandlerSuite_TestReadNonExistent );
+   pcu_suite_addTest( suite, IO_HandlerSuite_TestReadInvalid );
+   pcu_suite_addTest( suite, IO_HandlerSuite_TestReadWrongNS );
+   pcu_suite_addTest( suite, IO_HandlerSuite_TestReadWrongRootNode );
 }
