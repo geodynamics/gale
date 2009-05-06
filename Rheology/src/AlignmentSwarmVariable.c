@@ -111,6 +111,8 @@ void _AlignmentSwarmVariable_Init(
 	self->dofCount = 1;
 	self->director = director;
 	self->velocityField = velocityField;
+   /* variable does not store data, so is not checkpointed */
+   self->isCheckpointedAndReloaded = False;
 }
 
 void* _AlignmentSwarmVariable_DefaultNew( Name name ) {
