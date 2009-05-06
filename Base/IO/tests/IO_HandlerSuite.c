@@ -36,7 +36,6 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <libxml/xmlerror.h>
 
 #include "pcu/pcu.h"
 #include "StGermain/Base/Foundation/Foundation.h"
@@ -745,8 +744,6 @@ void IO_HandlerSuite_TestReadInvalid( IO_HandlerSuiteData* data ) {
 
    /* Create an invalid XML file */
    _IO_HandlerSuite_CreateTestXMLFile( invalidXMLFilename, "<invalid></param>\n" );
-
-   xmlSetGenericErrorFunc( errorFile, errorHandler);
 
    pcu_check_assert( IO_Handler_ReadAllFromFile( data->io_handler, invalidXMLFilename, data->dict2 ) );
    pcu_check_true( (errorFile = fopen( errorFileName, "r" )) );

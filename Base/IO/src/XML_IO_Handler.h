@@ -175,4 +175,8 @@
 
 	void XML_IO_Handler_AddDirectory( Name name, char* directory ); 
 
+	/** A function to handle errors produced by libXML through the Stg Stream system. Should be hooked
+	 *  up using xmlSetGenericErrorFunc(), e.g. at the Init() stage. */
+	void XML_IO_Handler_LibXMLErrorHandler( void* ctx, const char* msg, ... );
+
 #endif /* __Base_IO_XML_IO_Handler_h__ */

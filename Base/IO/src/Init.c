@@ -28,7 +28,10 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#include "mpi.h"
+#include <stdio.h>
+#include <stdarg.h>
+#include <mpi.h>
+#include <libxml/xmlerror.h>
 
 #include "Base/Foundation/Foundation.h"
 
@@ -54,9 +57,6 @@
 #include "PathUtils.h"
 #include "CmdLineArgs.h"
 #include "Init.h"
-
-#include <stdio.h>
-#include <stdarg.h>
 
 const Name     LiveDebugName = "LiveDebug";
 Stream*        LiveDebug = NULL;
@@ -149,6 +149,9 @@ Bool BaseIO_Init( int* argc, char** argv[] )
 	general = Journal_Register( Info_Type, "general" );
 	Stream_SetPrintingRank( general, 0 );
 	stgErrorStream = Journal_Register( Error_Type, "stgErrorStream" );
+
+	/* Handle the output of libXML properly, by redirecting to the XML_IO_Handler error stream */
+	xmlSetGenericErrorFunc( NULL, XML_IO_Handler_LibXMLErrorHandler );
 	
 	return True;
 }

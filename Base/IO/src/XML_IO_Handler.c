@@ -2335,3 +2335,11 @@ static Dictionary_MergeType _XML_IO_Handler_GetMergeType( XML_IO_Handler* self, 
 
 	return mergeType;
 }
+
+
+void XML_IO_Handler_LibXMLErrorHandler( void* ctx, const char* msg, ... ) {
+   va_list ap;
+   va_start( ap, msg );
+   Stream_Printf( Journal_Register( Error_Type, XML_IO_Handler_Type ), msg, ap );
+   va_end(ap);
+}
