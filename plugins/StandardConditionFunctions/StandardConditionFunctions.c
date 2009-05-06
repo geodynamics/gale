@@ -168,6 +168,8 @@ void _StgFEM_StandardConditionFunctions_Construct( void* component, Stg_Componen
         condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_GaussianTube, "GaussianTube");
         ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 
+        condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_GravitationalPotential, "GravitationalPotential");
+        ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 }
 
 void* _StgFEM_StandardConditionFunctions_DefaultNew( Name name ) {
@@ -1315,6 +1317,21 @@ void StgFEM_StandardConditionFunctions_GaussianDistribution( Node_LocalIndex nod
 	*result = gaussianScale * exp( -distsq / ( 2.0 * sigma * sigma ) ) + background;
 }
 
+void StgFEM_StandardConditionFunctions_GravitationalPotential( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	FiniteElementContext *	context            = (FiniteElementContext*)_context;
+	FeVariable*             feVariable         = NULL;
+	Dictionary*             dictionary         = context->dictionary;
+	double*                 result             = (double*) _result;
+	Name			variableName;
+	double*			coord;
+
+	variableName = Dictionary_GetString_WithDefault( dictionary, "FieldVariable", "" );
+	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, variableName );
+	coord = Mesh_GetVertex( feVariable->feMesh, node_lI );
+
+	*result = -1.0 * coord[J_AXIS];
+}
+
 void StgFEM_StandardConditionFunctions_1DGaussianDistribution( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
 	FiniteElementContext *	context            = (FiniteElementContext*)_context;
 	FeVariable*             feVariable         = NULL;
@@ -1460,7 +1477,4 @@ void StgFEM_StandardConditionFunctions_GaussianTube( Node_LocalIndex node_lI, Va
 
 
 }
-
-
-
 
