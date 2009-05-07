@@ -697,3 +697,51 @@ int Journal_RPrintfL ( void* _stream, JournalLevel level, const char* const fmt,
 }
 
 
+void Journal_SetupDefaultTypedStreams() {
+	Stream* typedStream;
+
+	/* info */
+	typedStream = CStream_New( Info_Type );
+	Stream_Enable( typedStream, True );
+	Stream_SetLevel( typedStream, 1 );
+	Stream_SetFile( typedStream, stJournal->stdOut );
+	Stream_SetAutoFlush( typedStream, True );
+	Journal_RegisterTypedStream( typedStream );
+
+	/* debug */
+	typedStream = CStream_New( Debug_Type );
+	Stream_Enable( typedStream, False );
+	Stream_SetLevel( typedStream, 1 );
+	Stream_SetFile( typedStream, stJournal->stdOut );
+	Stream_SetAutoFlush( typedStream, True );
+	Stream_AddFormatter( typedStream, RankFormatter_New() );
+	Journal_RegisterTypedStream( typedStream );
+	
+	/* dump */
+	typedStream = CStream_New( Dump_Type );
+	Stream_Enable( typedStream, False );
+	Stream_SetLevel( typedStream, 1 );
+	Stream_SetFile( typedStream, stJournal->stdOut );
+	Journal_RegisterTypedStream( typedStream );
+	
+	/* error */
+	typedStream = CStream_New( Error_Type );
+	Stream_Enable( typedStream, True );
+	Stream_SetLevel( typedStream, 1 );
+	Stream_SetFile( typedStream, stJournal->stdErr );
+	Stream_SetAutoFlush( typedStream, True );
+	Stream_AddFormatter( typedStream, RankFormatter_New() );
+	Journal_RegisterTypedStream( typedStream );
+	
+	/* mpi stream */
+	typedStream = MPIStream_New( MPIStream_Type );
+	Stream_Enable( typedStream, True );
+	Stream_SetLevel( typedStream, 1 );
+	Journal_RegisterTypedStream( typedStream );
+
+	/* binary stream */
+	typedStream = BinaryStream_New( BinaryStream_Type );
+	Stream_Enable( typedStream, True );
+	Stream_SetLevel( typedStream, 1 );
+	Journal_RegisterTypedStream( typedStream );
+}

@@ -248,5 +248,8 @@
 
 	int Journal_RPrintf ( void* _stream, const char* const fmt, ... );
 	int Journal_RPrintfL ( void* _stream, JournalLevel level, const char* const fmt, ... );
+
+	/** Set up the default type streams expected throughout StGermain */
+	void Journal_SetupDefaultTypedStreams();
 	
 #endif /* __Base_IO_Journal_h__ */

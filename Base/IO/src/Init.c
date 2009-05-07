@@ -65,7 +65,6 @@ Stream* stgErrorStream;
 
 Bool BaseIO_Init( int* argc, char** argv[] )
 {
-	Stream* typedStream;
 	Stream*	general;
 
 	/* Set up a useful map in the XML_IO_Handler */
@@ -76,65 +75,14 @@ Bool BaseIO_Init( int* argc, char** argv[] )
 	stgStreamFormatter_Buffer = StreamFormatter_Buffer_New(); 
 
 	stJournal = Journal_New();
-
 	/* Create default Typed Streams. */
-
-	/* info */
-	typedStream = CStream_New( Info_Type );
-	Stream_Enable( typedStream, True );
-	Stream_SetLevel( typedStream, 1 );
-	Stream_SetFile( typedStream, stJournal->stdOut );
-	Stream_SetAutoFlush( typedStream, True );
-	
-	Journal_RegisterTypedStream( typedStream );
-
-	/* debug */
-	typedStream = CStream_New( Debug_Type );
-	Stream_Enable( typedStream, False );
-	Stream_SetLevel( typedStream, 1 );
-	Stream_SetFile( typedStream, stJournal->stdOut );
-	Stream_SetAutoFlush( typedStream, True );
-	Stream_AddFormatter( typedStream, RankFormatter_New() );
-	
-	Journal_RegisterTypedStream( typedStream );
-	
-	/* dump */
-	typedStream = CStream_New( Dump_Type );
-	Stream_Enable( typedStream, False );
-	Stream_SetLevel( typedStream, 1 );
-	Stream_SetFile( typedStream, stJournal->stdOut );
-	
-	Journal_RegisterTypedStream( typedStream );
-	
-	/* error */
-	typedStream = CStream_New( Error_Type );
-	Stream_Enable( typedStream, True );
-	Stream_SetLevel( typedStream, 1 );
-	Stream_SetFile( typedStream, stJournal->stdErr );
-	Stream_SetAutoFlush( typedStream, True );
-	Stream_AddFormatter( typedStream, RankFormatter_New() );
-	
-	Journal_RegisterTypedStream( typedStream );
-	
-	/* mpi stream */
-	typedStream = MPIStream_New( MPIStream_Type );
-	Stream_Enable( typedStream, True );
-	Stream_SetLevel( typedStream, 1 );
-
-	/* binary stream */
-	typedStream = BinaryStream_New( BinaryStream_Type );
-	Stream_Enable( typedStream, True );
-	Stream_SetLevel( typedStream, 1 );
-	
-	
-	Journal_RegisterTypedStream( typedStream );
+	Journal_SetupDefaultTypedStreams();
 
 	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 	
 	stgMemory->infoStream = Stg_Class_Copy( Journal_GetTypedStream( Info_Type ), 0, True, 0, 0 );
 	stgMemory->debugStream = Stg_Class_Copy( Journal_GetTypedStream( Debug_Type ), 0, True, 0, 0 );
 	stgMemory->errorStream = Stg_Class_Copy( Journal_GetTypedStream( Error_Type ), 0, True, 0, 0 );
-
 
 	/* more inits from the Foundation level */
 	Stream_Enable( Journal_Register( Info_Type, Stg_TimeMonitor_InfoStreamName ), False );
