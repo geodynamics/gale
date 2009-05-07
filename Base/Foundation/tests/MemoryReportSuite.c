@@ -92,6 +92,7 @@ void MemoryReportSuite_TestReportPrints( MemoryReportSuiteData* data ) {
    char*           memoryReportOutputFilename = "./MemoryReportSuite_TestOutput.txt";
    FILE*           memoryReportOutputFile = NULL;
    char*           memoryReportString = NULL;
+   #define         MAXLINE 1000
    
    /* This whole test relies on the MEMORY_STATS being enabled, so that there are some reported
     *  values to compare against. */
@@ -126,7 +127,7 @@ void MemoryReportSuite_TestReportPrints( MemoryReportSuiteData* data ) {
 
    memoryReportOutputFile = fopen(memoryReportOutputFilename, "r");
 
-   fgets( memoryReportString, sizeof(char*)*1000, memoryReportOutputFile );
+   fgets( memoryReportString, MAXLINE, memoryReportOutputFile );
    printf( "%s", memoryReportString );
    pcu_check_true( 0 == strcmp( memoryReportString,
       "TODO: expected string here\n" ) );

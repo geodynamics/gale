@@ -51,6 +51,7 @@ void TimeMonitorSuite_TestTimingPeriod( TimeMonitorSuiteData* data ) {
    char*           timeMonitorOutputFilename = "./TimeMonitorSuite_TestOutput.txt";
    FILE*           timeMonitorOutputFile = NULL;
    char*           infoString = NULL;
+   #define         MAXLINE 1000
 
    infoString = malloc( sizeof(char*) * 1000 );
    
@@ -75,7 +76,7 @@ void TimeMonitorSuite_TestTimingPeriod( TimeMonitorSuiteData* data ) {
 
    /* Now we have to do some good ole' C file manipulation to get the output back */
    timeMonitorOutputFile = fopen(timeMonitorOutputFilename, "r");
-   fgets( infoString, sizeof(char*)*1000, timeMonitorOutputFile );
+   fgets( infoString, MAXLINE, timeMonitorOutputFile );
    fclose( timeMonitorOutputFile );
    remove( timeMonitorOutputFilename );
 

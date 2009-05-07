@@ -171,9 +171,9 @@ void IO_HandlerSuite_TestWriteReadEmpty( IO_HandlerSuiteData* data ) {
 
    testFile = fopen(xmlTestFileName, "r");
    xmlLine = Memory_Alloc_Array_Unnamed( char, MAXLINE );
-   pcu_check_true( fgets( xmlLine, sizeof(char*)*MAXLINE, testFile ) );
+   pcu_check_true( fgets( xmlLine, MAXLINE, testFile ) );
    pcu_check_true( 0 == strcmp( IO_HandlerSuite_XMLStartString1, xmlLine ) );
-   pcu_check_true( fgets( xmlLine, sizeof(char*)*MAXLINE, testFile ) );
+   pcu_check_true( fgets( xmlLine, MAXLINE, testFile ) );
    pcu_check_true( 0 == strcmp( IO_HandlerSuite_XMLEmptyDataString, xmlLine ) );
    Memory_Free( xmlLine );
    fclose(testFile);
@@ -230,15 +230,15 @@ void IO_HandlerSuite_TestWriteExplicitTypes( IO_HandlerSuiteData* data ) {
    IO_Handler_WriteAllToFile( data->io_handler, testFileName, data->dict1 );
 
    testFile = fopen(testFileName, "r");
-   pcu_check_true( fgets( xmlLine, sizeof(char*)*MAXLINE, testFile ) );
+   pcu_check_true( fgets( xmlLine, MAXLINE, testFile ) );
    pcu_check_true( 0 == strcmp( IO_HandlerSuite_XMLStartString1, xmlLine ) );
-   pcu_check_true( fgets( xmlLine, sizeof(char*)*MAXLINE, testFile ) );
+   pcu_check_true( fgets( xmlLine, MAXLINE, testFile ) );
    pcu_check_true( 0 == strcmp( IO_HandlerSuite_XMLStartString2, xmlLine ) );
    for ( ii=0; ii< explicityTypesExpectedLineNum; ii++ ) {
-      pcu_check_true( fgets( xmlLine, sizeof(char*)*MAXLINE, testFile ) );
+      pcu_check_true( fgets( xmlLine, MAXLINE, testFile ) );
       pcu_check_true( 0 == strcmp( explicitTypesExpected[ii], xmlLine ) );
    }
-   pcu_check_true( fgets( xmlLine, sizeof(char*)*MAXLINE, testFile ) );
+   pcu_check_true( fgets( xmlLine, MAXLINE, testFile ) );
    pcu_check_true( 0 == strcmp( IO_HandlerSuite_XMLEndString, xmlLine ) );
    fclose(testFile);
 
@@ -710,7 +710,7 @@ void IO_HandlerSuite_TestReadNonExistent( IO_HandlerSuiteData* data ) {
    pcu_check_assert( IO_Handler_ReadAllFromFile( data->io_handler, notExistFilename, data->dict2 ) );
    pcu_check_true(errorFile = fopen( errorFileName, "r" ));
    if (errorFile) {
-      pcu_check_true( fgets( errorLine, sizeof(char*)*MAXLINE, errorFile ) );
+      pcu_check_true( fgets( errorLine, MAXLINE, errorFile ) );
       sprintf( expectedErrorMsg, "Error: File %s doesn't exist, not readable, or not valid.\n",
          notExistFilename );
       pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
@@ -751,17 +751,17 @@ void IO_HandlerSuite_TestReadInvalid( IO_HandlerSuiteData* data ) {
       sprintf( expectedErrorMsg, ".//%s:3: parser error : Opening and ending tag mismatch: "
          "invalid line 3 and param\n",
          invalidXMLFilename );
-      pcu_check_true( fgets( errorLine, sizeof(char*)*MAXLINE, errorFile ) );
+      pcu_check_true( fgets( errorLine, MAXLINE, errorFile ) );
       pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
       sprintf( expectedErrorMsg, "<invalid></param>\n" );
-      pcu_check_true( fgets( errorLine, sizeof(char*)*MAXLINE, errorFile ) );
+      pcu_check_true( fgets( errorLine, MAXLINE, errorFile ) );
       pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
       sprintf( expectedErrorMsg, "                 ^\n" );
-      pcu_check_true( fgets( errorLine, sizeof(char*)*MAXLINE, errorFile ) );
+      pcu_check_true( fgets( errorLine, MAXLINE, errorFile ) );
       pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
       sprintf( expectedErrorMsg, "Error: File %s doesn't exist, not readable, or not valid.\n",
          invalidXMLFilename );
-      pcu_check_true( fgets( errorLine, sizeof(char*)*MAXLINE, errorFile ) );
+      pcu_check_true( fgets( errorLine, MAXLINE, errorFile ) );
       pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
       remove( errorFileName );
    }
@@ -798,11 +798,11 @@ void IO_HandlerSuite_TestReadWrongNS( IO_HandlerSuiteData* data ) {
       sprintf( expectedErrorMsg, "Error: resource .//%s of the wrong type, unknown namespace "
          "wasn't expected value of http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003.\n",
          wrongNS_XMLFilename );
-      pcu_check_true( fgets( errorLine, sizeof(char*)*MAXLINE, errorFile ) );
+      pcu_check_true( fgets( errorLine, MAXLINE, errorFile ) );
       pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
       sprintf( expectedErrorMsg, "Error: File %s not valid/readable.\n",
          wrongNS_XMLFilename );
-      pcu_check_true( fgets( errorLine, sizeof(char*)*MAXLINE, errorFile ) );
+      pcu_check_true( fgets( errorLine, MAXLINE, errorFile ) );
       pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
       remove( errorFileName );
    }
@@ -837,14 +837,14 @@ void IO_HandlerSuite_TestReadWrongRootNode( IO_HandlerSuiteData* data ) {
    if ( errorFile ) {
       sprintf( expectedErrorMsg, "resource .//%s of wrong type, root node "
          "=%s, should be <StGermainData>.\n", wrongRootNode_XMLFilename, "<Wrong>" );
-      pcu_check_true( fgets( errorLine, sizeof(char*)*MAXLINE, errorFile ) );
+      pcu_check_true( fgets( errorLine, MAXLINE, errorFile ) );
       pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
       sprintf( expectedErrorMsg, "Not parsing.\n" );
-      pcu_check_true( fgets( errorLine, sizeof(char*)*MAXLINE, errorFile ) );
+      pcu_check_true( fgets( errorLine, MAXLINE, errorFile ) );
       pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
       sprintf( expectedErrorMsg, "Error: File %s not valid/readable.\n",
          wrongRootNode_XMLFilename );
-      pcu_check_true( fgets( errorLine, sizeof(char*)*MAXLINE, errorFile ) );
+      pcu_check_true( fgets( errorLine, MAXLINE, errorFile ) );
       pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
       remove( errorFileName );
    }
