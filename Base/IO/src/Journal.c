@@ -527,7 +527,7 @@ void Journal_PrintConcise()
 	Journal_Printf( stream, "\n" );
 }
 
-int Journal_Printf ( void* _stream, const char* const fmt, ... )
+int Journal_Printf( void* _stream, const char* const fmt, ... )
 {
 	int result;
 	Stream* stream = (Stream*)_stream;
