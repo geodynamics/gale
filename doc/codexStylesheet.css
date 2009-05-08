@@ -1,0 +1,570 @@
+/* Screen layout: */
+
+body {
+padding: 0;
+margin: 0;
+font: 76% tahoma, verdana, sans-serif;
+background: #99A89B;
+color: #303030;
+}
+
+a {
+text-decoration: none;
+color: #286ea0;
+}
+
+a:hover {
+text-decoration: underline;
+}
+
+#toptabs {
+margin: 10px auto -10px auto; /* was 10px auto -13px auto; a glitch in the original design? 
+Looks best with bottom margin at -10 or -11. */
+font-size: 0.9em;
+width: 800px;
+}
+
+#toptabs p {
+text-align: right;
+color: #343835;
+}
+
+.toptab {
+padding: 3px 5px 3px 5px;
+margin: 0 0 0 4px;
+text-decoration: none;
+background: #f0f0f0 url(images/corner3b.gif) top left no-repeat;
+color: #808080;
+border-bottom: 1px solid #99A89B;
+}
+
+.toptab:hover {
+background: #fafafa url(images/corner3b.gif) top left no-repeat;
+border-bottom: 1px solid #99A89B; /* this is the same as background colour for margins of page */
+color: #505050;
+text-decoration: none;
+}
+
+/* This is the width parameter to change to make the white section wider */ 
+#container {
+margin: 0 auto 15px auto;
+width: 985px;
+padding: 5px 20px 20px 20px;
+background: #ffffff;
+}
+
+#breadcrumbtrail {
+margin: 15px 0 0 0;
+font-size: 0.5em;
+color: #467044;
+}
+
+#breadcrumbtrail h1 a {
+color: #467044;
+text-decoration: none;
+font-size: 1.5em;
+}
+
+#breadcrumbtrail h1 a:hover {
+text-decoration: underline;
+}
+
+#breadcrumbtrail table {
+float: right;
+}
+#navitabs {
+clear: both;
+}
+
+.navitab {
+padding: 4px 8px 4px 8px;
+margin: 0 0 4px 0;
+text-decoration: none;
+letter-spacing: 1px;
+background: #D1DBC7 url(images/corner4.gif) top left no-repeat;
+border-bottom: 1px solid #ffffff;
+border-left: 1px solid #ffffff;
+}
+
+.navitab:hover {
+text-decoration: none;
+background: #99A89B url(images/corner4.gif) top left no-repeat;
+}
+
+.activenavitab {
+padding: 4px 8px 5px 8px;
+color: #ffffff;
+margin: 0 0 5px 0;
+text-decoration: none;
+background: #505050 url(images/corner4.gif) top left no-repeat;
+}
+
+.activenavitab:hover {
+text-decoration: none;
+}
+
+/* TODO: replace images/front2.jpg with a different image per project 
+(ie: one for gLucifer, another for StGermain, etc. 
+Image properties: 800 pixels wide * 200 wide.  The rectangle on the leftmost
+third of the image from 0-319 pixels sould have a diffuse/low-contrast background
+that's generally darkish in colour so that it contrasts with the white text. 
+A vertical white line at x=320* divides the image and the righthand portion of
+the photo can be anything that suits the project's theme. 
+The alternative images are in /images and named banner1.jpg, banner2.jpg, etc.
+I've used original photos or sourced from public domain (such as NASA), then did some
+image manipulation in PaintshopPro to make them fit-in with the existing "look". */
+
+/* TODO: aarrgh, move this to the html file to allow each to be different...
+...or make a different CSS per project (kinda messy). 
+Is it possible to replace with <style background: #505050 url(images/banner1.jpg) top left no-repeat; > 
+in each file, using different file for each component? */
+
+#desc { height: 200px; color: #ffffff; padding: 0; background: #878463 url(images/UnderworldBanner.jpg) 
+top left no-repeat; clear: both; margin: 5px 0 0 0; }
+#desc p { padding: 0 0 0 15px; width: 290px; font-size: 1em; line-height: 1.3em; }
+#desc h2 { padding: 5px 10px 0 15px; font-size: 2.5em; }
+#desc a { padding: 4px 15px 0 15px; text-decoration: underline; color: #ffffff; }
+
+/* Different styles/backgrounds for each component.
+This is a messy hack and probably should be replaced by some other trick, eg: using z-index to define how layers of image and text are layered-up. 
+Consider desc to be the default (used only for main/home, a new code or by accident, with main classes for:
+desc-glucifer, desc-stgermain, desc-picellerator, desc-underworld and desc-stgfem. */
+/* TODO: experiment with putting the bulk of this repeated stuff inside one div, the
+different parts inside unique divs, and hope inheritence works how I want in CSS... */
+#desc-glucifer { height: 200px; color: #ffffff; padding: 0; background: #878463 url(images/gLuciferBanner.jpg) 
+top left no-repeat; clear: both; margin: 5px 0 0 0; }
+#desc-glucifer p { padding: 0 0 0 15px; width: 290px; font-size: 1em; line-height: 1.3em; }
+#desc-glucifer h2 { padding: 5px 10px 0 15px; font-size: 2.5em; }
+#desc-glucifer a { padding: 4px 15px 0 15px; text-decoration: underline; color: #ffffff; }
+
+#desc-stgermain { height: 200px; color: #ffffff; padding: 0; background: #878463 url(images/StGermainBanner.jpg) 
+top left no-repeat; clear: both; margin: 5px 0 0 0; }
+#desc-stgermain p { padding: 0 0 0 15px; width: 290px; font-size: 1em; line-height: 1.3em; }
+#desc-stgermain h2 { padding: 5px 10px 0 15px; font-size: 2.5em; }
+#desc-stgermain a { padding: 4px 15px 0 15px; text-decoration: underline; color: #ffffff; }
+
+#desc-stgdomain { height: 200px; color: #ffffff; padding: 0; background: #878463 url(images/StgDomainBanner.jpg) 
+top left no-repeat; clear: both; margin: 5px 0 0 0; }
+#desc-stgdomain p { padding: 0 0 0 15px; width: 290px; font-size: 1em; line-height: 1.3em; }
+#desc-stgdomain h2 { padding: 5px 10px 0 15px; font-size: 2.5em; }
+#desc-stgdomain a { padding: 4px 15px 0 15px; text-decoration: underline; color: #ffffff; }
+
+#desc-picellerator { height: 200px; color: #ffffff; padding: 0; background: #878463 url(images/PICelleratorBanner.jpg) 
+top left no-repeat; clear: both; margin: 5px 0 0 0; }
+#desc-picellerator p { padding: 0 0 0 15px; width: 290px; font-size: 1em; line-height: 1.3em; }
+#desc-picellerator h2 { padding: 5px 10px 0 15px; font-size: 2.5em; }
+#desc-picellerator a { padding: 4px 15px 0 15px; text-decoration: underline; color: #ffffff; }
+
+#desc-underworld { height: 200px; color: #ffffff; padding: 0; background: #878463 url(images/UnderworldBanner.jpg) 
+top left no-repeat; clear: both; margin: 5px 0 0 0; }
+#desc-underworld p { padding: 0 0 0 15px; width: 250px; font-size: 1em; line-height: 1.3em; }
+#desc-underworld h2 { padding: 5px 10px 0 15px; font-size: 2.5em; }
+#desc-underworld a { padding: 4px 15px 0 15px; text-decoration: underline; color: #ffffff; }
+
+#desc-stgfem { height: 200px; color: #ffffff; padding: 0; background: #878463 url(images/StgFEMBanner.jpg) 
+top left no-repeat; clear: both; margin: 5px 0 0 0; }
+#desc-stgfem p { padding: 0 0 0 15px; width: 290px; font-size: 1em; line-height: 1.3em; }
+#desc-stgfem h2 { padding: 5px 10px 0 15px; font-size: 2.5em; }
+#desc-stgfem a { padding: 4px 15px 0 15px; text-decoration: underline; color: #ffffff; }
+
+
+#main {
+width: 700px; /* was 590 but got shrunk to fit wide sidebar/links.
+TODO: expand it again by increadsing overall width? */
+float: right;
+padding: 0 0 0 15px;
+background: #ffffff;
+/* border-left: 1px solid #d0d0d0;
+TODO: remove this line? 
+Can have a border-right here or a border-left on main, but both is inadvisable.
+It looks a bit ugly if the main section of the doc is longer than the sidebar, as the line doesn't extend down as far as the footer.  
+Options:
+* include both lines -> hideous
+* remove both lines -> poor appearance
+* shrink the Main section slightly by reducing space between lines/sections -> bothersome and may impact on readability
+* bulk-out the sidebar with a picture or quote -> CSS-code is there, but what content do you use?
+* bulk-out the sidebar with links/tabs to other Codes or main -> not difficult to implement but kinda redundant
+* remove both lines and fake it with a tiny background image that repeats all the way down -> TODO test it...
+* do nothing and hope nobody nit-picks -> easy ;)
+*/
+}
+
+/* Codebox is a block to highlight a bunch of example code.
+* It comforms to the size/border parameters of the surrounding object, so to change layout/column effects, look at the div is't nested inside.
+* Non-code portions or explanatory text should be kept outside codeboxes.
+* Code samples don't need <tt> or <quote> tags, and you can do coloured syntax highlighting using <span class="cbelement">, <span class="cbparam"> and <span class="cbval"> for elements, parameters and values, respectively.
+* For consistancy and ease of reading, if a value is inside quotes in the code, 
+then highlight the quote characters as well.  eg: <span class="cbval">"42"</span>
+* "Normal" text inside a codebox will appear black by default.
+* TODO: add <span class="cbcomment">?  It may be added later but at the moment, it renders black by default. */
+
+#codebox {
+background: #F0F0D8; /* was E5E3AE then #E2DDC8 */
+font-family: courier, serif;
+text-decoration: none;
+font-weight: normal;
+font-size: 1.0em;
+line-height: 1.0em;
+padding: 2px 2px 2px 2px; 
+margin: 0px;
+}
+
+#codebox p {
+text-align: left;
+}
+
+.cbelement {
+color: #803000;
+}
+
+.cbparam {
+color: #006050;
+}
+
+.cbval {
+color: #0030FF;
+}
+
+.sectionheading {
+margin: 0 0 10px 0;
+font-size: 1em;
+line-height: 1.3em;
+color: #467044;
+font-weight: bold;
+}
+
+/* Images inside an equation class of paragraph align to the middle of the line of text. */
+p.equation img {
+vertical-align: middle; /* Value: baseline | sub | super | top | text-top | middle | bottom | text-bottom | <percentage>  */
+}
+
+
+/* TODO: this experiment is to make a two-column, centre-justified block 
+that can be repeated for ech field of information int he body of a Component. 
+Essecntially, they're quite similar, except the left is right-justified and the right column is left-justified.
+Both have a plain background.  Default text styles can be set in here as a shortcut, or maybe styles can just
+be inherited from the "main" block that's effectively a wrapper now. 
+
+Backgrounds are deliberately off-coloured so that blocks stand-out during testing.  Once happy with size/layout, remove those lines!
+*/
+
+#componentInfo {
+width: 700px;
+float: left;
+padding: 3px 0 1px 0;
+background: #ffffff; /* When testing, use: #F000D8; */
+}
+
+#componentInfoTitle {
+width: 100px;
+float: left;
+background: #ffffff; /* When testing, use: background: #F0F0D8; */
+}
+
+#componentInfoTitle p {
+text-align: right;
+padding: 1px 0 1px 0;
+margin: 2px 2px 2px 2px;
+font-size: 1em;
+line-height: 1.3em;
+color: #467044;
+text-decoration: none;
+font-weight: bold;
+}
+
+#componentInfoData {
+width: 590px;
+float: right;
+background: #ffffff; /* When testing, use: background: #00F0D8; */
+}
+
+#componentInfoData p {
+text-align: left;
+padding: 1px 0 1px 0;
+margin: 2px 2px 2px 2px;
+color: #343835;  /* TODO: Check to see if this is pure black, font size, etc */
+font-size: 1em;
+line-height: 1.3em;
+text-decoration: none;
+font-weight: normal;
+}
+
+/* componentInfoDescription is different from the other componentInfo* divs because it is not
+nested inside a componentInfoDescription.  This means makes it stand-out from the other sub-divs
+as it goes the full width of the "main" block instead of conforming to the column layout.
+It main purpose is to specify that paragraphs are indented, as requested by Jules.
+TODO: discuss with Stave and Julian...I prefer no indents, and a medium amount of bottom margin between paras.
+Jules' prefered settings, something like: text-indent: 15px; margin: 0px 0px 5px 0px; 
+My prefered settings: text-indent: 0px; margin: 0px 0px 10px 0px; */
+#componentInfoDescription p {
+text-indent: 15px;
+margin: 0px 0px 5px 0px;
+}
+
+#params {
+width: 700px;
+float: right;
+padding: 0 0 20px 15px;
+font-size: 1em;
+}
+
+#params p {
+margin: 0 0 10px 0;
+}
+
+#params h2 {
+margin: 0 0 10px 0;
+font-size: 1em;
+line-height: 1.3em;
+color: #467044;
+font-weight: bold;
+}
+
+/* Images inside a params div align to the bottom of text.
+ie: descenders and subscripts in the image will hopefully align with those of surronding text.
+Change this to "baseline"? */
+params img {
+vertical-align: bottom;
+}
+
+/* Zebra-striped tables.
+Every second table row (1, 3, 5... where the row immediately below
+the table-header (row 0, naturally) is considered row 1) should type "odd". */
+#paramtable table {
+font-size: 1em;
+}
+
+#paramtable th {
+text-align: left;
+font-weight: bold;
+padding: 0.2em 0.5em 0.2em 0.5em;
+background-color: #99A89B;
+font-size: 0.8em;
+}
+
+#paramtable tbody tr td {
+text-align: left ;
+background-color: #f0f0f0;
+padding: 0.2em 0.5em 0.2em 0.5em;
+font-size: 0.8em;
+}
+
+#paramtable tbody{
+vertical-align: top;
+}
+/*#paramtable tbody tr.odd  td {
+text-align: left;
+background-color: #ffffff;
+padding: 0.2em 0.5em 0.2em 0.5em;
+}
+*/
+
+#dependencies {
+width: 700px;
+float: right;
+padding: 0 0 20px 15px;
+font-size: 1em;
+}
+
+#dependencies p {
+margin: 0 0 10px 0;
+}
+
+#dependencies h2 {
+margin: 0 0 10px 0;
+font-size: 1em;
+line-height: 1.3em;
+color: #467044;
+font-weight: bold;
+}
+
+/* Images inside a dependencies as per params, above. */
+dependencies img {
+vertical-align: bottom;
+}
+
+/* Dependencies table. Probably could do something clever and save a few lines by merging it with the parapeters-table above, but that could cause a lot of confusion. 
+So, playing it safe, it's mostly the same, with the only difference being that the table is a different colour.
+Like the parameter table above, the colour of the dependencies table's header is loosely based on the original colour of the table-header in the component larder designed by Julian. */
+
+/* Zebra-striped tables.
+Every second table row (1, 3, 5... where the row immediately below
+the table-header (row 0, naturally) is considered row 1) should type "odd". */
+#deptable table {
+
+}
+
+#deptable th {
+text-align: left;
+font-weight: bold;
+padding: 0.2em 0.5em 0.2em 0.5em;
+background-color: #B5A4AF; /* use B5A4AF or DBC8C7? */
+font-size: 0.8em;
+width: 20%;
+}
+
+#deptable tbody tr td {
+text-align: left;
+background-color: #f0f0f0; /* first test used D8DBD6 but I considered this too dark compared with the white it alternates wich, and it was de-emphasising the table heading. */
+padding: 0.2em 0.5em 0.2em 0.5em;
+font-size: 0.8em;
+}
+
+#deptable tbody{
+vertical-align: top;
+}
+
+/*
+#deptable tbody tr.odd  td {
+text-align: left;
+background-color: #ffffff;
+padding: 0.2em 0.5em 0.2em 0.5em;
+}
+
+*/
+
+#sidebar {
+width:260px; /* was 140 but got stretched to fit wider sidelinks */
+/*float:left; */
+padding: 0 5px 0 0;
+border-right: 1px solid #d0d0d0;
+background: #ffffff;
+/* The following options allows the menu to "follow" the user down and up the page */
+position: absolute;
+top: 150px;
+
+
+/* TODO: remove this line? Can have a border-right here or a border-left on main, but not both. */
+}
+
+#sidebar p {
+font-size: 0.9em;
+line-height: 1.3em;
+margin: 0 0 12px 0;
+}
+
+#sidebar h3 {
+font-size: 1.1em;
+font-weight: bold;
+}
+
+.sidelink {
+text-align: left;
+display: block;
+width: 175px; /* was 120, Widen to accomodate longest module name comfortably.
+If this changes, update .activesidelink, below. */
+background: #D1DBC7 url(images/corner4.gif) top left no-repeat;
+padding: 3px 4px 3px 8px;
+margin: 5px 10px 5px 0;
+}
+
+.sidelink:hover {
+background: #99A89B url(images/corner4.gif) top left no-repeat;
+text-decoration: none;
+}
+
+/* TODO: make an .activesidelink and activesidelink:hover here. */
+.activesidelink {
+text-align: left;
+display: block;
+width: 175px; /* Keep this the same as width of .sidelink, above. */
+color: #ffffff;
+text-decoration: none;
+background: #505050 url(images/corner4.gif) top left no-repeat;
+padding: 3px 4px 3px 8px;
+margin: 5px 10px 5px 0;
+}
+
+.activesidelink:hover {
+text-decoration: none;
+}
+
+
+.tier1sidelink {
+text-align: left;
+display: block;
+width: 120px; /* was 120, Widen to accomodate longest module name comfortably.
+If this changes, update .activetier1sidelink, below. */
+background: #D1DBC7 url(images/corner4.gif) top left no-repeat;
+padding: 3px 4px 3px 8px;
+margin: 5px 10px 5px 0;
+}
+
+.tier1sidelink:hover {
+background: #99A89B url(images/corner4.gif) top left no-repeat;
+text-decoration: none;
+}
+
+/* TODO: make an .activesidelink and activesidelink:hover here. */
+.tier1activesidelink {
+text-align: left;
+display: block;
+width: 120px; /* Keep this the same as width of .sidelink, above. */
+color: #ffffff;
+text-decoration: none;
+background: #505050 url(images/corner4.gif) top left no-repeat;
+padding: 3px 4px 3px 8px;
+margin: 5px 10px 5px 0;
+}
+
+.tier1activesidelink:hover {
+text-decoration: none;
+}
+
+#footer {
+clear: both;
+background: #fafafa;
+color: #808080;
+font-size: 0.9em;
+padding: 8px 0 8px 0;
+border-top: 1px solid #d0d0d0;
+border-bottom: 1px solid #d0d0d0;
+text-align: center;
+}
+
+#footer a {
+color: #808080;
+}
+
+h1 {
+margin: 0 0 20px 0;
+font-size: 2.1em;
+font-weight: normal;
+}
+
+h2 {
+margin: 0 0 10px 0;
+font-size: 1.6em;
+font-weight: normal;
+}
+
+h3 {
+margin: 20px 0 10px 0;
+font-size: 1.4em;
+font-weight: normal;
+}
+
+p {
+margin: 0 0 15px 0;
+line-height: 1.5em;
+text-align: left;
+}
+
+.right {
+text-align: right;
+}
+
+a img {
+border: 0;
+}
+
+.photo {
+padding: 5px;
+display: block;
+margin: 0 auto 15px auto;
+background-color: #f0f0f0;
+}
+
+.hide {
+display: none;
+}
