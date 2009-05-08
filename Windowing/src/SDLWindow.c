@@ -53,7 +53,7 @@
 #include "types.h"
 #include "SDLWindow.h"
 #include <stdlib.h>
-
+#include <signal.h>
 #include <assert.h>
 
 #ifdef HAVE_OSMESA
@@ -212,6 +212,10 @@ void _lucSDLWindow_Initialise( void* window, void* data ) {
 	/* Install 1sec idle timer */
 	self->timer = SDL_AddTimer(1000, lucSDLWindow_IdleTimer, self);
 	
+	/* NOTE: we still want Ctrl-C to work, so we undo the SDL redirections */
+    signal(SIGINT, SIG_DFL);
+    signal(SIGQUIT, SIG_DFL);
+	
 	/* Run the parent function to init window... */
 	_lucWindow_Initialise(window, data);	
 }
@@ -276,7 +280,7 @@ Bool _lucSDLWindow_EventProcessor( void* window ) {
 	char            keyPressed;
 	static int      button = 0;
 	static Bool     buttonDown = False;
-	Bool			processed = True;
+	Bool			redisplay = True;
 	SDL_Event       event;
 	
 	/* Wait for next event */
@@ -310,7 +314,7 @@ Bool _lucSDLWindow_EventProcessor( void* window ) {
 					break;
 				}
 			}
-			processed = False;
+			redisplay = False;
 			break;
 		case SDL_MOUSEBUTTONDOWN: 
 			buttonDown = True;
@@ -324,18 +328,25 @@ Bool _lucSDLWindow_EventProcessor( void* window ) {
 			if (event.active.state == SDL_APPACTIVE)	/* Restored from icon */
 				lucWindow_SetViewportNeedsToDrawFlag( self, True );
 			else
-				processed = False;
+				redisplay = False;
 			break;
 		case SDL_VIDEOEXPOSE:
 		default:	
-			processed = False;	/* No change to display, don't redraw */
+			redisplay = False;	/* No change to display, don't redraw */
 	}
 
+	if (!self->interactive) {
+		/* No longer interactive? Drop timer, minimize window and quit event loop */
+		SDL_RemoveTimer(self->timer);
+		SDL_WM_IconifyWindow();
+		self->quitEventLoop = True;
+	 }
+	 
 	/* Reset idle timer */
 	lucWindow_IdleReset(self);
 
 	/* Returns true if display needs refresh */
-	return processed;
+	return redisplay;
 }
 
 void lucSDLWindow_Resize( void* window, Pixel_Index width, Pixel_Index height ) {
@@ -384,16 +395,9 @@ void lucSDLWindow_Resize( void* window, Pixel_Index width, Pixel_Index height ) 
 Uint32 lucSDLWindow_IdleTimer(Uint32 interval, void* param) {
 	lucSDLWindow*        self = (lucSDLWindow*) param; 
 	/* idle timeout check */
-	if (self->interactive)
-		lucWindow_IdleCheck(self);
-	else
-	{   
-		/* No longer interactive? Drop timer and minimize window */
-		SDL_RemoveTimer(self->timer);
-		SDL_WM_IconifyWindow();
-	}
+	lucWindow_IdleCheck(self);
 	
-/*
+	/*
     SDL_Event event;
     SDL_UserEvent userevent;
   
@@ -404,9 +408,9 @@ Uint32 lucSDLWindow_IdleTimer(Uint32 interval, void* param) {
 
     event.type = SDL_USEREVENT;
     event.user = userevent;
-    SDL_PushEvent(&event);*/
+    SDL_PushEvent(&event);
 	
-    return(interval);
+    return(interval);*/
 }
 
 #endif

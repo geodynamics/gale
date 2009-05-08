@@ -200,6 +200,10 @@ void _lucX11Window_Initialise( void* window, void* data ) {
 
 	XSetErrorHandler(lucX11Window_Error);
 	
+	Journal_Firewall(lucX11Window_CreateDisplay( self ),
+					 lucError,
+					 "Error in func '%s' for %s '%s': Cannot create display.\n", __func__, self->type, self->name );
+
 	if ( self->interactive && self->isMaster) {
 		Journal_DPrintf( lucDebug, "Opening Interactive window.\n");
 		lucX11Window_CreateInteractiveWindow( self ); 
@@ -269,7 +273,7 @@ void _lucX11Window_Display( void* window ) {
 	lucWindow_Display(window);	
 
 	/* Swap buffers if interactive */
-	if ( self->isMaster && self->interactive && self->doubleBuffer) 
+	if ( self->isMaster && self->doubleBuffer && self->interactive)
 		glXSwapBuffers(self->display, self->win);
 }
 
@@ -286,22 +290,24 @@ Bool _lucX11Window_EventProcessor( void* window ) {
 	XEvent         event;
 	Atom           wmDeleteWindow;
 	static unsigned int button = 0;
-	static int visible = True;
-	static int hiding = False;
-	int width, height;
+	static int width = 0, height = 0;
+	static Bool visible = True;
+	Bool redisplay = True;
+	
+	if (width == 0) width = self->width;
+	if (height == 0) height = self->height;
 
 	lucDebug_PrintFunctionBegin( self, 1 );
+	
 	/* Avoid busy wait loop by using blocking event check 
 	   (signal callback wakes every few seconds to check idle timeout) */
-	
 	XNextEvent(self->display, &event);
 
 	/* Reset idle timer */
 	lucWindow_IdleReset(window);
 	
 	switch (event.type) {
-		case ButtonRelease:
-		case ButtonPress: 
+		case ButtonPress:
 			button = event.xbutton.button;
     		lucWindow_MouseClick( self, button, event.type, event.xmotion.x, self->height - event.xmotion.y);
 	    	break;
@@ -316,43 +322,44 @@ Bool _lucX11Window_EventProcessor( void* window ) {
 			if (event.xclient.data.l[0] == self->wmDeleteWindow)
 				lucWindow_ToggleApplicationQuit( window );
 			break;
-   		case MapNotify:
-			/* Window shown */
+		case MapNotify:
+ 			/* Window shown */
 			if (!visible) lucWindow_SetViewportNeedsToDrawFlag( window, True );
 			visible = True;
 			break;
-   		case UnmapNotify:
+		case UnmapNotify:
 			/* Window hidden, iconized */
 			visible = False;
-			if (hiding) 
-			{
-				lucWindow_SetViewportNeedsToDrawFlag( window, True );
-				self->_displayWindow( self );
-				self->interactive = False;
-			}
-			break;
+			lucWindow_SetViewportNeedsToDrawFlag( window, True );
+ 			break;
    		case ConfigureNotify:
-		{
-			/* Notification of window actions */
+			/* Notification of window actions, including resize */
 			width = event.xconfigure.width;
 			height = event.xconfigure.height;
-			/* Only resize viewports if window dimensions changed */
-			if (width != self->width || height != self->height)
-				lucWindow_Resize( self, width, height);
     		break;
-		}
+		default:
+			redisplay = False;
 	}
-
-	if (!self->interactive && !hiding)
+	
+	/* Processing to be done when event queue empty, resizing window */
+	if (self->_eventsWaiting(self) == 0)
+		/* Resize viewports if window dimensions changed */
+		if (width != self->width || height != self->height)
+			lucWindow_Resize( self, width, height);
+	
+	/* Close window and create background window if switched out of interactive mode */
+	if (!self->interactive)
 	{
-		/* Hide window, must now wait for UnmapNotify */
-		hiding = True; 
-		self->interactive = True;   /* Reset until events processed */
-		XUnmapWindow(self->display, self->win);	 
+		lucX11Window_CloseInteractiveWindow( self );
+		lucX11Window_CreateBackgroundWindow( self );
+		self->quitEventLoop = True;
+		/* Run the parent function to re-init window... */
+		_lucWindow_Initialise(window, self->context);
+		lucX11Window_SetupFonts( self );	/* OVerride default raster font */
 	}
-
-	/* Returns true if event processed */
-	return True;
+		
+	/* Returns true if display refresh required */
+	return redisplay;
 }
 
 void lucX11Window_SetupFonts( void* window ) {
@@ -422,21 +429,31 @@ Bool lucX11Window_CreateDisplay( void* window )  {
 		return False;
 	}
 
-	/* Create an OpenGL rendering context */
-	self->glxcontext = glXCreateContext(self->display, self->vi, NULL, True); //Enable Direct Rendering
-	if (self->glxcontext == NULL) {
-		Journal_Printf(  lucError, "In func %s: Could not create GLX rendering context.\n", __func__);
-		return False;
-	}
-	
+	/* Attempt to load provided font name */
 	self->font = XLoadQueryFont( self->display, self->xFontName );
 		
-	if (! lucX11Window_FindFont( window) ){
+	if (self->font == NULL && ! lucX11Window_FindFont( window) ){
 		Journal_Printf(  lucError, "In func %s: Attempt to request a different font failed.\n", __func__);
 		Journal_Printf(  lucError, "In func %s: Can not find any suitable font \n", __func__ );
 		return True;
 	}
 
+	return True;
+}
+
+
+Bool lucX11Window_CreateContext( void* window, Bool direct )  {
+	lucX11Window*  self      = (lucX11Window*)window;
+
+	if (self->glxcontext)
+		glXDestroyContext( self->display,  self->glxcontext);
+	
+	/* Create an OpenGL rendering context */
+	self->glxcontext = glXCreateContext(self->display, self->vi, NULL, direct); 
+	if (self->glxcontext == NULL) {
+		Journal_Printf(  lucError, "In func %s: Could not create GLX rendering context.\n", __func__);
+		return False;
+	}
 	return True;
 }
 
@@ -490,10 +507,8 @@ void lucX11Window_CreateBackgroundWindow( void* window )  {
 	
 	lucDebug_PrintFunctionBegin( self, 1 );
 
-	Journal_Firewall( 
-		lucX11Window_CreateDisplay( self ),
-		lucError,
-		"Error in func '%s' for %s '%s': Cannot create display.\n", __func__, self->type, self->name );
+	/* Create rendering context, direct rendering disabled */
+	lucX11Window_CreateContext(self, False);
 	
 	/* Create Pixmap Window */
 	self->pmap = XCreatePixmap(
@@ -502,11 +517,11 @@ void lucX11Window_CreateBackgroundWindow( void* window )  {
 			self->width, 
 			self->height,
 			self->vi->depth );
-
-	self->glxpmap = glXCreateGLXPixmap( self->display,  self->vi, self->pmap );
-
-	glXMakeCurrent( self->display, self->glxpmap, self->glxcontext);
 	
+	self->glxpmap = glXCreateGLXPixmap( self->display,  self->vi, self->pmap );
+	if (glXMakeCurrent( self->display, self->glxpmap, self->glxcontext) == False)
+		Journal_Printf( lucError, "In func %s: glXMakeCurrent failed\n", __func__);
+		
 	lucDebug_PrintFunctionEnd( self, 1 );
 }
 
@@ -519,11 +534,9 @@ void lucX11Window_CreateInteractiveWindow( void* window ) {
 	XSizeHints *		 sHints;
 	
 	lucDebug_PrintFunctionBegin( self, 1 );
-		
-	Journal_Firewall( 
-		lucX11Window_CreateDisplay( self ),
-		lucError,
-		"Error in func '%s' for %s '%s': Cannot create display.\n", __func__, self->type, self->name );
+
+	/* Create rendering context, direct rendering enabled */
+	lucX11Window_CreateContext(self, True);
 
 	/* Create Colourmap */
 	cmap = lucX11Window_GetShareableColormap( self );

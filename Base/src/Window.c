@@ -354,53 +354,51 @@ void _lucWindow_Initialise( void* window, void* data ) {
 	/* Setup fonts */
 	_lucWindow_SetupGLRasterFont( self );
 
-	/* Flag display lists must be created */
+	/* Flag display lists must be created and objects drawn */
 	lucWindow_SetViewportNeedsToSetupFlag( self, True );
+	lucWindow_SetViewportNeedsToDrawFlag( self, True );
 }
 
 void _lucWindow_Execute( void* window, void* data ) { 
 	/* Display graphics and allow GUI interaction if enabled */
 	lucWindow*     self         = (lucWindow*) window ;
 	lucDebug_PrintFunctionBegin( self, 1 );
-
+	
 	/* Reset idle timer */
 	lucWindow_IdleReset(self);	
 	
 	/* Flag viewports need to re-render new information */
 	lucWindow_SetViewportNeedsToSetupFlag( self, True );
 	lucWindow_SetViewportNeedsToDrawFlag( self, True );
-
+	
 	/* Draw Window (Call virtual to display) 
-	   initial output for background & interactive modes */
+	 initial output for background & interactive modes */
 	self->_displayWindow( self );
 	
 	/* Interactive mode? Enter event loop processing */
 	if ( self->isMaster && self->interactive ) {
 		lucWindow_InteractionHelpMessage( self, Journal_MyStream( Info_Type, self ) );
-
+		
 		/* Clear quit flags */
 		self->quitEventLoop = False;
 		self->toggleApplicationQuit = False;
 		
 		while ( !self->quitEventLoop ) {
-
+			
 			/* Check for events */
 			int events = self->_eventsWaiting(self);
 			if (self->continuous && events == 0)
-				/* Continuous mode and no events waiting, quit loop */
+			/* Continuous mode and no events waiting, quit loop */
 				self->quitEventLoop = True; 
 			else	
-				/* Call virtual to wait for and process events */
+			/* Call virtual to wait for and process events */
 				if (!self->_eventProcessor(self)) 
-					continue;   /* skip redisplay etc if event ignored (false returned) */
-
-			/* Quit interactive mode if requested */
-			if ( !self->interactive || self->quitEventLoop ) break;
-
+					continue;   /* skip redisplay if false returned) */
+			
 			/* Redraw Window (Call virtual to display) */
 			self->_displayWindow( self );
 		}
-
+		
 		/* Close application if requested */
 		if( self->toggleApplicationQuit ) {
 			self->context->gracefulQuit = True;
@@ -409,14 +407,14 @@ void _lucWindow_Execute( void* window, void* data ) {
 	
 	/* Dump outputs to disk */
 	if ( self->isMaster ) lucWindow_Dump( self, self->context );
-
+	
 	/* Broadcast information */
 	MPI_Bcast( &self->quitEventLoop, 1, MPI_INT, MASTER, self->context->communicator );
 	MPI_Bcast( &self->interactive, 1, MPI_INT, MASTER, self->context->communicator );
-
+	
 	/* Stop idle timeout */
 	self->idleTime = 0;
-		
+	
 	lucDebug_PrintFunctionEnd( self, 1 );
 }
 
