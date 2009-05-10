@@ -2,7 +2,6 @@ import os
 import config
 import config.utils as utils
 
-
 class OSMesa(config.Package):
 
     def __init__(self, ctx, **kw):
@@ -10,16 +9,14 @@ class OSMesa(config.Package):
         self.base_dirs = ["/usr/X11R6"]
         self.inc_exts = ["GL"]
 
-
     def _setup_deps(self):
         config.Package._setup_deps(self)
         self.gl = self.add_dependency(config.packages.OpenGL,
                                        required=True, combine=True)
 
-
     def setup_libraries(self):
         self.add_library_set(["osmesa.h"], ["OSMesa"])
-
+        self.add_auxilliary_libs("c", ["dl"])
 
     source_code = {"c": """#include <stdlib.h>
 #include <gl.h>
