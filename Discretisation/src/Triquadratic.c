@@ -89,6 +89,8 @@ Triquadratic* _Triquadratic_New( TRIQUADRATIC_DEFARGS ) {
 
 void _Triquadratic_Init( Triquadratic* self ) {
 	assert( self && Stg_CheckType( self, Triquadratic ) );
+
+	self->dim = 3;
 }
 
 /*----------------------------------------------------------------------------------------------------------------------------------

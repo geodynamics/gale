@@ -88,6 +88,8 @@ Biquadratic* _Biquadratic_New( BIQUADRATIC_DEFARGS ) {
 
 void _Biquadratic_Init( Biquadratic* self ) {
 	assert( self && Stg_CheckType( self, Biquadratic ) );
+
+	self->dim = 2;
 }
 
 
