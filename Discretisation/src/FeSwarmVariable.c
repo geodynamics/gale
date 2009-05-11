@@ -97,7 +97,9 @@ FeSwarmVariable* _FeSwarmVariable_New(
 void _FeSwarmVariable_Init( void* swarmVariable, FeVariable* feVariable ) {
 	FeSwarmVariable*         self              = (FeSwarmVariable*) swarmVariable;
 
-	self->feVariable = feVariable;
+	self->feVariable                = feVariable;
+   /* variable does not store data, so is not checkpointed */
+   self->isCheckpointedAndReloaded = False;
 }
 
 void _FeSwarmVariable_Delete( void* _swarmVariable ) {
