@@ -178,34 +178,52 @@ void JournalSuite_TestPrintBasics( JournalSuiteData* data ) {
    pcu_check_true( NULL == fgets( outLine, MAXLINE, data->testStdOutFile ));
 }
 
-/* TODO */
+
 void JournalSuite_TestPrintfL( JournalSuiteData* data ) {
    Stream* myStream;
+   #define     MAXLINE 1000
+   char        outLine[MAXLINE];
 
    myStream = Journal_Register( InfoStream_Type, "myComponent");
    Journal_PrintfL( myStream, 1, "Hello\n" );
+   pcu_check_true(         fgets( outLine, MAXLINE, data->testStdOutFile ));
+   pcu_check_true( 0 == strcmp( outLine, "Hello\n" ));
+   /* We should get a blank line, since level 2 printing not enabled by default */
    Journal_PrintfL( myStream, 2, "Hello\n" );
+   pcu_check_true( NULL ==fgets( outLine, MAXLINE, data->testStdOutFile ));
+   /* Now enable level 2, and try again */
+   Stream_SetLevel( myStream, 2 );
+   Journal_PrintfL( myStream, 2, "Hello\n" );
+   pcu_check_true(         fgets( outLine, MAXLINE, data->testStdOutFile ));
+   pcu_check_true( 0 == strcmp( outLine, "Hello\n" ));
 }
 
 
-/* TODO */
-void JournalSuite_TestPrintfD( JournalSuiteData* data ) {
-   Stream* myInfo;
+void JournalSuite_TestDPrintf( JournalSuiteData* data ) {
+   Stream*     myInfo;
+   #define     MAXLINE 1000
+   char        outLine[MAXLINE];
 
+   myInfo = Journal_Register( InfoStream_Type, "MyInfo");
    Journal_DPrintf( myInfo, "DPrintf\n" );
+   #ifdef DEBUG
+   pcu_check_true(         fgets( outLine, MAXLINE, data->testStdOutFile ));
+   pcu_check_true( 0 == strcmp( outLine, "DPrintf\n" ));
+   #else
+   pcu_check_true( NULL == fgets( outLine, MAXLINE, data->testStdOutFile ));
+   #endif
 }
 
 
-/* TODO */
-void JournalSuite_TestChildStreams( JournalSuiteData* data ) {
-   Stream* myStream;
-
-   Stream* childStream1;
-   Stream* childStream2;
-
-   myStream = Journal_Register( InfoStream_Type, "myComponent");
+void JournalSuite_TestPrintChildStreams( JournalSuiteData* data ) {
+   Stream*     myStream;
+   Stream*     childStream1;
+   Stream*     childStream2;
+   #define     MAXLINE 1000
+   char        outLine[MAXLINE];
 
   /* Make sure the hierarchy works*/
+   myStream = Journal_Register( InfoStream_Type, "myComponent");
    childStream1 = Stream_RegisterChild( myStream, "child1" );
    childStream2 = Stream_RegisterChild( childStream1, "child2" );
 
@@ -219,6 +237,18 @@ void JournalSuite_TestChildStreams( JournalSuiteData* data ) {
    Stream_UnIndentBranch( myStream );
    Journal_Printf( childStream1, "1 with no indent\n" );
    Journal_Printf( childStream2, "2 with no indent\n" );
+   pcu_check_true(         fgets( outLine, MAXLINE, data->testStdOutFile ));
+   pcu_check_true( 0 == strcmp( outLine, "0 no indent\n" ));
+   pcu_check_true(         fgets( outLine, MAXLINE, data->testStdOutFile ));
+   pcu_check_true( 0 == strcmp( outLine, "\t1 with 1 indent\n" ));
+   pcu_check_true(         fgets( outLine, MAXLINE, data->testStdOutFile ));
+   pcu_check_true( 0 == strcmp( outLine, "\t\t2 with 2 indent\n" ));
+   pcu_check_true(         fgets( outLine, MAXLINE, data->testStdOutFile ));
+   pcu_check_true( 0 == strcmp( outLine, "\t2 with 1 indent\n" ));
+   pcu_check_true(         fgets( outLine, MAXLINE, data->testStdOutFile ));
+   pcu_check_true( 0 == strcmp( outLine, "1 with no indent\n" ));
+   pcu_check_true(         fgets( outLine, MAXLINE, data->testStdOutFile ));
+   pcu_check_true( 0 == strcmp( outLine, "2 with no indent\n" ));
 }
 
 
@@ -228,4 +258,7 @@ void JournalSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, JournalSuite_TestRegister );
    pcu_suite_addTest( suite, JournalSuite_TestRegister2 );
    pcu_suite_addTest( suite, JournalSuite_TestPrintBasics );
+   pcu_suite_addTest( suite, JournalSuite_TestPrintfL );
+   pcu_suite_addTest( suite, JournalSuite_TestDPrintf );
+   pcu_suite_addTest( suite, JournalSuite_TestPrintChildStreams );
 }
