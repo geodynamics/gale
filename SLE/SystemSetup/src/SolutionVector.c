@@ -304,7 +304,7 @@ void _SolutionVector_Initialise( void* solutionVector, void* data ) {
 	Stream_IndentBranch( StgFEM_Debug );
 	/* ensure variables are initialised */
 	if( self->feVariable ) {
-		Stg_Component_Initialise( self->feVariable, 0, False );
+		Stg_Component_Initialise( self->feVariable, data, False );
 	}
 		
 	Stream_UnIndentBranch( StgFEM_Debug );
