@@ -589,16 +589,16 @@ IndexSet* _InnerWallVC_GetSet(void* variableCondition)
 	IndexSet	*set = NULL;
 	Stream*		warningStr = Journal_Register( Error_Type, self->type );
 	unsigned	nDims;
-	unsigned*	gSize;
+	Grid*		vertGrid;
 
 	nDims = Mesh_GetDimSize( self->_mesh );
-	gSize = (unsigned*)ExtensionManager_Get( self->_mesh->info, self->_mesh, 
-						 ExtensionManager_GetHandle( self->_mesh->info, 
-									     "cartesianGlobalSize" ) );
+	vertGrid = *(Grid**)ExtensionManager_Get( self->_mesh->info, self->_mesh, 
+						  ExtensionManager_GetHandle( self->_mesh->info, 
+									      "vertexGrid" ) );
 	
 	switch (self->_innerWall) {
 	case InnerWallVC_InnerWall_Front:
-		if ( nDims < 3 || !gSize[2] ) {
+		if ( nDims < 3 || !vertGrid->sizes[2] ) {
 			Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
 					"when mesh has no elements in the %s axis. Returning an empty set.\n", __func__,
 					InnerWallVC_InnerWallEnumToStr[self->_innerWall], "K" );
@@ -610,7 +610,7 @@ IndexSet* _InnerWallVC_GetSet(void* variableCondition)
 		break;
 			
 	case InnerWallVC_InnerWall_Back:
-		if ( nDims < 3 || !gSize[2] ) {
+		if ( nDims < 3 || !vertGrid->sizes[2] ) {
 			Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
 					"when mesh has no elements in the %s axis. Returning an empty set.\n", __func__,
 					InnerWallVC_InnerWallEnumToStr[self->_innerWall], "K" );
@@ -622,7 +622,7 @@ IndexSet* _InnerWallVC_GetSet(void* variableCondition)
 		break;
 			
 	case InnerWallVC_InnerWall_Top:
-		if ( nDims < 2 || !gSize[1] ) {
+		if ( nDims < 2 || !vertGrid->sizes[1] ) {
 			Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
 					"when mesh has no elements in the %s axis. Returning an empty set.\n", __func__,
 					InnerWallVC_InnerWallEnumToStr[self->_innerWall], "J" );
@@ -634,7 +634,7 @@ IndexSet* _InnerWallVC_GetSet(void* variableCondition)
 		break;
 			
 	case InnerWallVC_InnerWall_Bottom:
-		if ( nDims < 2 || !gSize[1] ) {
+		if ( nDims < 2 || !vertGrid->sizes[1] ) {
 			Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
 					"when mesh has no elements in the %s axis. Returning an empty set.\n", __func__,
 					InnerWallVC_InnerWallEnumToStr[self->_innerWall], "J" );
