@@ -14,7 +14,7 @@ class Python(config.Package):
     def gen_inc_exts(self, inc_dirs):
         ext_map = []
         inc_d = inc_dirs[0]
-        for d in glob.iglob(os.path.join(inc_d, "python*")):
+        for d in glob.glob(os.path.join(inc_d, "python*")):
             if not os.path.isdir(d):
                 continue
             d = os.path.basename(d)
