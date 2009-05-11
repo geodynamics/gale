@@ -48,6 +48,8 @@ const Type Triquadratic_Type = "Triquadratic";
 ** Constructors
 */
 
+#define TRIQUADRATICNODECOUNT 27
+
 Triquadratic* Triquadratic_New( Name name ) {
 	return _Triquadratic_New( sizeof(Triquadratic),
 				  Triquadratic_Type,
@@ -67,7 +69,7 @@ Triquadratic* Triquadratic_New( Name name ) {
 				  _ElementType_ConvertGlobalCoordToElLocal,
 				  Triquadratic_JacobianDeterminantSurface,
 				  _ElementType_SurfaceNormal,
-				  27 );
+				  TRIQUADRATICNODECOUNT );
 }
 
 Triquadratic* _Triquadratic_New( TRIQUADRATIC_DEFARGS ) {
@@ -149,6 +151,9 @@ void _Triquadratic_Initialise( void* elementType, void* data ) {
 	faceNodes[5][6] = 24; faceNodes[5][7] = 25; faceNodes[5][8] = 26;
 
 	self->faceNodes = faceNodes;
+
+	self->evaluatedShapeFunc = Memory_Alloc_Array( double, self->nodeCount, "evaluatedShapeFuncs" );
+	self->GNi = Memory_Alloc_2DArray( double, self->dim, self->nodeCount, "evaluatedShapeFuncDerivatives" );
 }
 
 void _Triquadratic_Execute( void* elementType, void* data ) {
@@ -158,6 +163,10 @@ void _Triquadratic_Destroy( void* elementType, void* data ) {
 	Triquadratic*	self 		= (Triquadratic*)elementType;
 
 	Memory_Free( self->faceNodes );
+	Memory_Free( self->evaluatedShapeFunc );
+	Memory_Free( self->GNi );
+
+	_ElementType_Destroy( elementType, data );
 }
 
 
