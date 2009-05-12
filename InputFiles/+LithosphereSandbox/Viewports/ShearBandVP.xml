@@ -121,7 +121,7 @@
 				<param name="ColourMap">shearBandViewer-ColourMap</param>
 				<param name="MaskVariable">materialSwarm-PostFailureWeakening</param>
 				<param name="maskType">GreaterThan</param>
-				<param name="maskValue">0.1</param>
+				<param name="maskValue">0.5</param>
 				<param name="pointSize">1.0</param>
 				<param name="pointSmoothing">False</param>
 				<param name="positionRange">False</param>
@@ -149,7 +149,7 @@
 				<param name="minPositionX">-10</param>
 				<param name="maxPositionX">10</param>
 				<param name="minPositionY">0.6</param>
-				<param name="maxPositionY">0.9</param>
+				<param name="maxPositionY">1.2</param>
 				<param name="minPositionZ">-10</param>
 				<param name="maxPositionZ">10</param>
 			</struct>
@@ -170,7 +170,7 @@
 				<param name="minPositionX">-10</param>
 				<param name="maxPositionX">10</param>
 				<param name="minPositionY">0.6</param>
-				<param name="maxPositionY">0.9</param>
+				<param name="maxPositionY">1.2</param>
 				<param name="minPositionZ">-10</param>
 				<param name="maxPositionZ">10</param>
 			</struct>
@@ -186,12 +186,12 @@
 				<param name="maskType">GreaterThan</param>
 				<param name="maskValue">0.1</param>
 				<param name="pointSize">1.0</param>
-				<param name="pointSmoothing">False</param>
-				<param name="positionRange">False</param>
+				<param name="pointSmoothing">True</param>
+				<param name="positionRange">True</param>
 				<param name="minPositionX">-10</param>
 				<param name="maxPositionX">10</param>
-				<param name="minPositionY">-10</param>
-				<param name="maxPositionY">10</param>
+				<param name="minPositionY">0.5</param>
+				<param name="maxPositionY">1.2</param>
 				<param name="minPositionZ">-10</param>
 				<param name="maxPositionZ">10</param>
 			</struct>

@@ -11,10 +11,9 @@
 	 fixed before we can release this functionality
 -->		
 
-	<include> Underworld/BaseApps/ExtensionIncompressibleQ1Q1BaseApp.xml </include>
-	<include>PICellerator/AllowOutflow.xml</include>
-  
-	
+	<include> BaseApps/ExtensionIncompressibleQ1Q1FreeBaseApp.xml </include>
+	<include> PICellerator/AllowOutflow.xml</include>
+  	
 	<list name="plugins" mergeType="merge">
 		<param>StgFEM_FrequentOutput</param>	
 		<param>Underworld_Vrms</param>	
@@ -98,9 +97,8 @@
 	
 	<!-- shape options -->
 	
-	<include> ./4LayerModel.xml </include>	
-	<include> ./PassiveTracer3DTopography.xml </include>
-	<include> ./PassiveTracers3D.xml </include>  
+	<include> ./4LayerModel-Free.xml </include>	
+	<!--><include> ./PassiveTracers3D.xml </include>  -->
 	
 	<!-- rheology options -->
 	<include> ./rheology/rheology-2layer.xml </include>  <!-- this is also needed if you use rheology-4layer-LC_UM.xml -->
@@ -113,6 +111,7 @@
 	<!--><include> Viewports/RecoveredStressVP.xml </include> -->
 	<include> Viewports/StrainRateVP.xml </include> 
 	<include> Viewports/ShearBandVP.xml </include> 
+	<include> Viewports/MeshVP.xml </include> 
 	
 	
 	<!-- general parameters that get changed alot -->	

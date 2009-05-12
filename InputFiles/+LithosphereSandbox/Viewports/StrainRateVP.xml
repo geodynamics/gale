@@ -440,6 +440,15 @@
 			</struct>
 
 
+			<struct name="strainRateMeshView">
+				<param name="Type">lucMeshViewer</param>
+				<param name="Mesh">linearMesh</param>
+				<param name="Colour">black</param>	
+			</struct>
+
+
+
+
 <!-- Strain rate block/s -->
 
 		<struct name="strainRateLayersPerspectiveVP1">
@@ -453,8 +462,9 @@
 				<param> strainRateLayers-LowerCrust </param>
 				<param> strainRateLayers-MantleBaseLayer </param>
 				<param> strainRateLayers-MantleUpperLayer </param>
+				<param> strainRateMeshView </param> 
 				<!-- <param> passiveTracerDots </param> -->
-				<param> Boxborder </param>
+				<!--><param> Boxborder </param> -->
 		 		<param> strainRateLayers-UpperCrust2ColourBar</param>
 			</list>
 		</struct>
@@ -506,8 +516,6 @@
 
 
 
-
-
 <!-- Strain rate slices -->
 
 		<struct name="strainRateSlicesViewport">
@@ -553,9 +561,6 @@
 			</list>				
 			-->
 		</struct>
-
-
-
 
 		<struct name="strainRateSlicesWindow">
 	        <param name="Type">lucDefaultWindow</param>

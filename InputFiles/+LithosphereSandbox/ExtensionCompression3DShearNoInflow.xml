@@ -11,7 +11,7 @@
 	 fixed before we can release this functionality
 -->		
 
-	<include> Underworld/BaseApps/ExtensionCompressionShearQ1Q1BaseApp.xml </include>	
+	<include> ./BaseApps/ExtensionCompressionShearQ1Q1BaseApp.xml </include>	
 	<!--><include> Underworld/BaseApps/ExtensionIncompressibleShearBaseApp.xml </include> 
 	<include>Experimental/StoreViscosity.xml</include> -->
 	
@@ -116,6 +116,7 @@
 	<!--><include> Viewports/RecoveredStressVP.xml </include>     -->
 
 	<include> Viewports/StrainRateVP.xml </include> 
+	<include> Viewports/PressureVP.xml </include> 
 	<include> Viewports/ShearBandVP.xml </include> 
 		
 

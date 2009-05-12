@@ -27,7 +27,7 @@
 		<param>StgFEM_CPUTime</param>
 	</list>
 
-	<include> ./set_up.xml </include>
+	<!--><include> ./set_up.xml </include>-->
 	<!-- shape options -->
 	<include> ./4LayerModel.xml </include>	
 

@@ -102,7 +102,7 @@
 			<param name="Type">lucCamera</param>
 			<param name="coordX"> 0 </param>
 			<param name="coordY"> 3.8 </param>
-			<param name="coordZ">-3.5 </param>
+			<param name="coordZ"> 3.5 </param>
 			<param name="focalPointX">0.0 </param>
 			<param name="focalPointY">0.2 </param>
 			<param name="focalPointZ">0.0 </param>

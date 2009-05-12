@@ -11,7 +11,7 @@
 		<struct name="lithosphereSandboxTopoTopViewCamera">
 			<param name="Type">lucCamera</param>
 			<param name="coordX">0.00</param>
-			<param name="coordY">3.40</param>
+			<param name="coordY">4.50</param>
 			<param name="coordZ">0.02</param>
 			<param name="focalPointX">0</param>
 			<param name="focalPointY">0.8</param>
@@ -28,8 +28,8 @@
 		<struct name="lithosphereSandboxTopoViewCamera">
 			<param name="Type">lucCamera</param>
 			<param name="coordX">2.00</param>
-			<param name="coordY">2.25</param>
-			<param name="coordZ">0.0</param>
+			<param name="coordY">3.50</param>
+			<param name="coordZ">0.02</param>
 			<param name="focalPointX">0</param>
 			<param name="focalPointY">0.5</param>
 			<param name="focalPointZ">0</param>
@@ -44,8 +44,8 @@
 	<struct name="lithosphereSandboxMohoViewCamera">
 			<param name="Type">lucCamera</param>
 			<param name="coordX">1.75</param>
-			<param name="coordY">2.20</param>
-			<param name="coordZ">0.0</param>
+			<param name="coordY">3.40</param>
+			<param name="coordZ">0.02</param>
 			<param name="focalPointX">0</param>
 			<param name="focalPointY">-0.2</param>
 			<param name="focalPointZ">0</param>

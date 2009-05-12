@@ -247,12 +247,12 @@
 	<include> ./gLuciferFiles/ParticleHasYieldedVP.xml</include>
 	<include> ./gLuciferFiles/FlatEarthBoxWindow.xml</include>
 	
-	<!-- Add this  -->
+	<!-- Add visuals  -->
 	<struct name="components" mergeType="merge">
 		<struct name="FlatEarthBoxView1" mergeType="merge">
 			<list name="Viewport" mergeType="replace">
 				<param>FlatEarthTemperatureAndVelocityArrowsVP FlatEarthVerticalTemperatureGradientVP</param>
-				<param>FlatEarthParticleHasYieldedVP PressureVP </param>
+				<param>FlatEarthTemperatureHotColdVP PressureVP </param>
 			</list>
 		</struct>
 	</struct>

@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<struct name="components" mergeType="merge">
+		
+		
+	<struct name="materialSwarm-Pressure">
+		<param name="Type">FeSwarmVariable</param>
+		<param name="Swarm">materialSwarm</param>
+		<param name="FeVariable">PressureField</param>
+	</struct>
+		
+	 <struct name="pressureParticleDots">
+	 	<param name="Type">lucSwarmViewer</param>
+	 	<param name="Swarm">materialSwarm</param>
+	 	<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+	 	<param name="maskValue">1.0</param>
+	 	<param name="maskTolerance">0.1</param>
+	 	<param name="maskType">GreaterThan</param> 
+		<param name="positionRange">False</param>
+	 	<param name="maxPositionZ">2.0</param> 
+	 	<param name="maxPositionX">2.0</param> 
+	 	<param name="ColourVariable">materialSwarm-Pressure</param>
+	 	<param name="ColourMap">pressureColourMap</param>
+	 	<param name="pointSize">2.0</param>
+	 </struct>
+			
+			
+		<struct name="pressureTitle" mergeType="replace">
+			<param name="Type">lucTitle</param>
+			<param name="string">Pressure</param>
+		</struct>
+		<struct name="pressureColourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours">Black Purple DarkRed Orange Yellow</param>
+			<param name="dynamicRange">true</param>
+		</struct>
+		<!-- Drawing Objects -->
+		<struct name="pressureMap">
+			<param name="Type">lucScalarField</param>
+			<param name="FieldVariable">PressureField</param>
+			<param name="ColourMap">pressureColourMap</param>
+			<param name="cullFace"> False </param>
+		</struct>
+		<struct name="border" mergeType="replace">
+			<param name="Type">lucFieldVariableBorder</param>
+			<param name="FieldVariable">PressureField</param>
+		</struct>
+		<struct name="pressureColourBar">
+			<param name="Type">lucColourBar</param>
+			<param name="ColourMap">pressureColourMap</param>
+		</struct>
+		<!-- Put these althogether in a viewport -->
+		<struct name="PressureVP">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">lithosphereSandboxPerspectiveViewCamera3</param>
+			<list name="DrawingObject">
+				<param>pressureTitle</param>
+				<param>pressureMap</param>
+				<param>border</param>
+				<param>pressureColourBar</param>
+			</list>
+		</struct>
+		
+		<struct name="PressureDotsVP">
+			<param name="Type">lucViewport</param>
+				<param name="Camera">lithosphereSandboxPerspectiveViewCamera3</param>
+				<list name="DrawingObject">
+					<param>pressureTitle</param>
+					<param>pressureParticleDots</param>
+					<param>border</param>
+					<param>pressureColourBar</param>
+				</list>
+		</struct>
+		
+		<struct name="PressureBoxWindow">
+	        <param name="Type">lucDefaultWindow</param>
+	        <param name="RenderingEngine">RenderingEngine</param>
+			<param name="OutputFormat">PNGOutput</param>
+			<param name="height">592</param>
+			<param name="width">900</param>
+			<param name="interactive">f</param>
+			<param name="backgroundColour">White</param>
+			<list name="Viewport">
+				<param> PressureVP PressureDotsVP </param>
+			</list>
+		</struct>
+		
+		
+		
+	</struct>
+</StGermainData>

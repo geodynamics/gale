@@ -5,6 +5,7 @@
 	
 	<list name="import" mergeType="merge">
 		<param>Underworld</param>
+		<param>Experimental</param>
 	</list>
 
 	<list name="plugins" mergeType="Replace">
@@ -22,10 +23,10 @@
 	<include>Underworld/GaussSwarm.xml                  </include> 
 	<include>StgFEM/TimeIntegrator.xml                  </include>
 	<include>PICellerator/MaterialPointSwarm.xml        </include>
-	<!--><include>Underworld/StokesFlowUzawaPIC.xml 			</include> -->
-	<include>Experimental/StokesFlowStable.xml </include>
-	<include>Experimental/NodalViscosityField.xml</include>
-	<include>Experimental/StoreViscosity.xml</include>
+	<include>Experimental/StokesFlowStable.xml          </include>
+	<include>Experimental/NodalViscosityField.xml       </include>
+	<include>Experimental/StoreViscosity.xml            </include>
+	<include>PICellerator/AllowOutflow.xml              </include>
 
 
 	<param name="timeIntegratorOrder"> 1 </param>
@@ -59,6 +60,8 @@
 		</struct>
 	</struct>
 	
+	<!-- ?? Pressure mesh needs deforming too ?? -->
+	
 	<struct name="EulerDeform">
 		<list name="systems">
 			<struct>
@@ -82,7 +85,7 @@
 	<struct name="components" mergeType="merge">
 		<!-- Make the mesh non-regular / regular as needed -->
 		<struct name="linearMeshGenerator" mergeType="merge">
-			<param name="regular"> True </param>
+			<param name="regular"> False </param>
 		</struct>
 		
 		<!-- Mesh particle layout needs to be element-by-element for free surface -->
@@ -100,7 +103,7 @@
 	 <param name="rightWallVelocity"> 0.5 </param>
 	 <param name="backWallVelocity"> 0.0 </param>
 	 <param name="frontWallVelocity"> 0.0 </param>
-	 <param name="constantHeight"> 0.5 </param>
+	 <param name="constantHeight"> 1.0 </param>
 	
 	<!-- For the continuous pressure mess, pressure BCs are necessary -->
 
@@ -171,7 +174,7 @@
 						</struct>
 					</list>
 				</struct>
-				<struct>
+				<!-- ><struct>
 					<param name="type"> WallVC </param>
 					<param name="wall"> top </param>
 					<list name="variables">
@@ -181,7 +184,7 @@
 							<param name="value"> IncompressibleExtensionBC_TopCondition </param>
 						</struct>
 					</list>
-				</struct>
+				</struct> -->
 				<struct>
 					<param name="type"> WallVC </param>
 					<param name="wall"> bottom </param>
