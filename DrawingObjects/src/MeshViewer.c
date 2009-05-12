@@ -468,11 +468,14 @@ void lucMeshViewer_RenderLocal( void* drawingObject ) {
 		unsigned	v_i;
 
 		nVerts = Mesh_GetLocalSize( mesh, MT_VERTEX );
-		glPointSize( 5 );
+
+		glPointSize( 2 );
+		glEnable(GL_POINT_SMOOTH);
 		glBegin( GL_POINTS );
 		for( v_i = 0; v_i < nVerts; v_i ++ )
 			vertexFunc( Mesh_GetVertex( mesh, v_i ) );
 		glEnd();
+		glDisable(GL_POINT_SMOOTH);
 	}
 
 	/* Render edges */
