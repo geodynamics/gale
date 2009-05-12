@@ -389,6 +389,20 @@ void IndexSetSuite_TestMerge_AND( IndexSetSuiteData* data ) {
 }
 
 
+void IndexSetSuite_TestBadAccess( IndexSetSuiteData* data ) {
+   stJournal->enable = False;
+   pcu_check_assert( IndexSet_IsMember( data->is, IS1_SIZE ) );
+   stJournal->enable = True;
+}
+
+
+void IndexSetSuite_TestBadAssign( IndexSetSuiteData* data ) {
+   stJournal->enable = False;
+   pcu_check_assert( IndexSet_Add( data->is, IS1_SIZE ) );
+   stJournal->enable = True;
+}
+
+
 void IndexSetSuite( pcu_suite_t* suite ) {
    pcu_suite_setData( suite, IndexSetSuiteData );
    pcu_suite_setFixtures( suite, IndexSetSuite_Setup, IndexSetSuite_Teardown );
@@ -403,4 +417,8 @@ void IndexSetSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, IndexSetSuite_TestDuplicate );
    pcu_suite_addTest( suite, IndexSetSuite_TestMerge_OR );
    pcu_suite_addTest( suite, IndexSetSuite_TestMerge_AND );
+   #ifdef CAUTIOUS
+   pcu_suite_addTest( suite, IndexSetSuite_TestBadAccess );
+   pcu_suite_addTest( suite, IndexSetSuite_TestBadAssign );
+   #endif
 }
