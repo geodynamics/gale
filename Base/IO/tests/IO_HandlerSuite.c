@@ -100,8 +100,6 @@ void IO_HandlerSuite_TestWriteReadNormalEntries( IO_HandlerSuiteData* data ) {
    Index         ii;
    const char*   xmlTestFileName = "xmlTest.xml";
 
-   Dictionary_Empty( data->dict1 );
-   Dictionary_Empty( data->dict2 );
    DictionarySuite_PopulateDictWithTestValues( data->dict1, data->testDD );
 
    IO_Handler_WriteAllToFile( data->io_handler, xmlTestFileName, data->dict1 );
@@ -118,8 +116,6 @@ void IO_HandlerSuite_TestWriteReadNormalEntries( IO_HandlerSuiteData* data ) {
    }
 
    remove(xmlTestFileName);
-   Dictionary_Empty( data->dict1 );
-   Dictionary_Empty( data->dict2 );
 }
 
 
@@ -128,8 +124,6 @@ void IO_HandlerSuite_TestWriteReadNormalSingleEntry( IO_HandlerSuiteData* data )
    Index         ii;
    const char*   fileName = "singleEntry.xml";
 
-   Dictionary_Empty( data->dict1 );
-   Dictionary_Empty( data->dict2 );
    DictionarySuite_PopulateDictWithTestValues( data->dict1, data->testDD );
 
    for (ii=0; ii<data->dict1->count; ii++) {
@@ -150,9 +144,6 @@ void IO_HandlerSuite_TestWriteReadNormalSingleEntry( IO_HandlerSuiteData* data )
       Dictionary_Empty( data->dict2 );
       remove(fileName);
    }
-
-   Dictionary_Empty( data->dict1 );
-   Dictionary_Empty( data->dict2 );
 }
 
 
@@ -163,9 +154,6 @@ void IO_HandlerSuite_TestWriteReadEmpty( IO_HandlerSuiteData* data ) {
    FILE*         testFile = NULL;
    const int     MAXLINE = 1000;
    char*         xmlLine = NULL;
-
-   Dictionary_Empty( data->dict1 );
-   Dictionary_Empty( data->dict2 );
 
    IO_Handler_WriteAllToFile( data->io_handler, xmlTestFileName, data->dict1 );
 
@@ -182,8 +170,6 @@ void IO_HandlerSuite_TestWriteReadEmpty( IO_HandlerSuiteData* data ) {
    pcu_check_true( 0 == data->dict2->count );
 
    remove(xmlTestFileName);
-   Dictionary_Empty( data->dict1 );
-   Dictionary_Empty( data->dict2 );
 }
 
 
@@ -244,7 +230,6 @@ void IO_HandlerSuite_TestWriteExplicitTypes( IO_HandlerSuiteData* data ) {
 
    remove(testFileName);
    Memory_Free( xmlLine );
-   Dictionary_Empty( data->dict1 );
 }
 
 
@@ -254,8 +239,6 @@ void IO_HandlerSuite_TestReadWhitespaceEntries( IO_HandlerSuiteData* data ) {
    char*             whiteSpacesEntry = NULL;
    const char*       testKey = "spacedKey";
    const char*       testValString = "spacedVal";
-
-   Dictionary_Empty( data->dict2 );
 
    Stg_asprintf( &whiteSpacesEntry, "<param name=\"    %s   \"> \t %s \n\t</param>\n",
       testKey, testValString );
@@ -273,7 +256,6 @@ void IO_HandlerSuite_TestReadWhitespaceEntries( IO_HandlerSuiteData* data ) {
    }
 
    remove( testFileName );
-   Dictionary_Empty( data->dict2 );
 }
 
 
@@ -296,8 +278,6 @@ void IO_HandlerSuite_TestReadIncludedFile( IO_HandlerSuiteData* data ) {
    const char*       testValStringInc = "valInc";
    const char*       testKeyIncSP = "keyIncSP";
    const char*       testValStringIncSP = "valIncSP";
-
-   Dictionary_Empty( data->dict2 );
 
    Stg_asprintf( &subdirIncludedFileNameSP, "%s/%s", testSearchPathSubdir, testIncludedFileNameSP );
 
@@ -349,7 +329,6 @@ void IO_HandlerSuite_TestReadIncludedFile( IO_HandlerSuiteData* data ) {
    remove( subdirIncludedFileNameSP );
    Memory_Free( subdirIncludedFileNameSP );
    rmdir( testSearchPathSubdir );
-   Dictionary_Empty( data->dict2 );
 }
 
 
@@ -372,8 +351,6 @@ void IO_HandlerSuite_TestReadRawDataEntries( IO_HandlerSuiteData* data ) {
    const int         list2CoordVals[3][3] = { {4,5,8}, {3,5,9}, {9,3,4} };
    const Bool        list2BoolVals[3] = { True, False, True };
    const char*       list2BoolValStrings[3] = { "True", "False", "1" };
-
-   Dictionary_Empty( data->dict2 );
 
    Stg_asprintf( &rawDataEntry1, "<list name=\"%s\">\n<asciidata>\n%d %d %d\n%d %d %d\n"
       "</asciidata>\n</list>\n",
@@ -451,7 +428,6 @@ void IO_HandlerSuite_TestReadRawDataEntries( IO_HandlerSuiteData* data ) {
    }
 
    remove( testFileName );
-   Dictionary_Empty( data->dict2 );
 }
 
 void IO_HandlerSuite_TestReadAllFromCommandLine( IO_HandlerSuiteData* data ) {
@@ -461,9 +437,6 @@ void IO_HandlerSuite_TestReadAllFromCommandLine( IO_HandlerSuiteData* data ) {
    char**         argv;
    int            fakeParamArgsCount = 2;
    
-   Dictionary_Empty( data->dict1 );
-   Dictionary_Empty( data->dict2 );
-
    DictionarySuite_PopulateDictWithTestValues( data->dict1, data->testDD );
 
    xmlTestFileNames = Memory_Alloc_Array_Unnamed( char*, data->testDD->testEntriesCount );
@@ -511,8 +484,6 @@ void IO_HandlerSuite_TestReadAllFromCommandLine( IO_HandlerSuiteData* data ) {
       Memory_Free( argv[ii] );
    }
    Memory_Free( argv );
-   Dictionary_Empty( data->dict1 );
-   Dictionary_Empty( data->dict2 );
 }
 
 
@@ -535,8 +506,6 @@ void IO_HandlerSuite_TestReadDuplicateEntryKeys( IO_HandlerSuiteData* data ) {
    Dictionary_Entry_Value* structDev = NULL;
    Dictionary_Entry_Value* elementDev = NULL;
    Dictionary*             structDict = NULL;
-
-   Dictionary_Empty( data->dict2 );
 
    sprintf( xmlLine, "<struct name=\"%s\">\n", struct1Name );
    strcat( struct1Entry, xmlLine );
@@ -618,7 +587,7 @@ void IO_HandlerSuite_TestReadDuplicateEntryKeys( IO_HandlerSuiteData* data ) {
          (Dictionary_Entry_Key)paramNames[ii] );
       pcu_check_true( paramVals2[ii] == Dictionary_Entry_Value_AsUnsignedInt( elementDev ) );
    }
-   //remove( xmlTestFileName );
+   remove( xmlTestFileName );
    Dictionary_Empty( data->dict2 );
 
    /* Sub-test 3.1: with mergeType as "merge", structs to be merged.
@@ -694,7 +663,6 @@ void IO_HandlerSuite_TestReadDuplicateEntryKeys( IO_HandlerSuiteData* data ) {
    elementDev = structDict->entryPtr[2]->value;
    pcu_check_true( paramVals2[0] == Dictionary_Entry_Value_AsUnsignedInt( elementDev ) );
    remove( xmlTestFileName );
-   Dictionary_Empty( data->dict2 );
 }
 
 
@@ -716,19 +684,6 @@ void IO_HandlerSuite_TestReadNonExistent( IO_HandlerSuiteData* data ) {
       pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
       remove( errorFileName );
    }
-   
-   Dictionary_Empty( data->dict2 );
-}
-
-
-void errorHandler( void* ctx, const char* msg, ... )
-{
-   va_list ap;
-   va_start( ap, msg );
-   Stream_Printf(
-      Journal_Register( Error_Type, XML_IO_Handler_Type ),
-      msg, ap );
-   va_end(ap);
 }
 
 
@@ -766,8 +721,6 @@ void IO_HandlerSuite_TestReadInvalid( IO_HandlerSuiteData* data ) {
       remove( errorFileName );
    }
    remove( invalidXMLFilename );
-
-   Dictionary_Empty( data->dict2 );
 }
 
 
@@ -807,7 +760,6 @@ void IO_HandlerSuite_TestReadWrongNS( IO_HandlerSuiteData* data ) {
       remove( errorFileName );
    }
    remove( wrongNS_XMLFilename );
-   Dictionary_Empty( data->dict2 );
 }
 
 
@@ -849,7 +801,6 @@ void IO_HandlerSuite_TestReadWrongRootNode( IO_HandlerSuiteData* data ) {
       remove( errorFileName );
    }
    remove( wrongRootNode_XMLFilename );
-   Dictionary_Empty( data->dict2 );
 }
 
 

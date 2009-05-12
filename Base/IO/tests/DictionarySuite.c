@@ -135,6 +135,7 @@ void DictionarySuite_Setup( DictionarySuiteData* data ) {
 }
 
 void DictionarySuite_Teardown( DictionarySuiteData* data ) {
+   Dictionary_Empty( data->dict );
    Stg_Class_Delete( data->dict );
    DictionarySuite_DictionaryData_Free( data->testDD );
    Memory_Free( data->testDD );
@@ -234,7 +235,6 @@ void DictionarySuite_TestAddEmpty( DictionarySuiteData* data ) {
       pcu_check_true( Dictionary_Entry_Value_Compare( entryPtr->value, data->testDD->testValues[ii] ) ); 
    }
 
-   /* Empty the dict for future tests, but don't call Delete on the test values */
    Dictionary_Empty( data->dict );
    pcu_check_true( 0 == data->dict->count );
 }
@@ -250,8 +250,6 @@ void DictionarySuite_TestGet( DictionarySuiteData* data ) {
    yValue = Dictionary_Entry_Value_GetMember(
       Dictionary_Entry_Value_GetMember(testStruct, "geom"), "starty");
    pcu_check_true( data->testDD->testStruct->geom.starty == Dictionary_Entry_Value_AsDouble( yValue ) );
-
-   Dictionary_Empty( data->dict );
 }
 
 
@@ -285,8 +283,6 @@ void DictionarySuite_TestSet( DictionarySuiteData* data ) {
          - Dictionary_Entry_Value_AsDouble( currValue )), 0.01 );
       currValue = currValue->next;
    }
-
-   Dictionary_Empty( data->dict );
 }
 
 
@@ -311,8 +307,6 @@ void DictionarySuite_TestAddElement( DictionarySuiteData* data ) {
    pcu_check_le( fabs( data->testDD->testStruct->geom.starty - Dictionary_Entry_Value_AsDouble( currValue )), 0.01 );
    currValue = currValue->next;
    pcu_check_le( fabs( newVal - Dictionary_Entry_Value_AsDouble( currValue )), 0.01 );
-
-   Dictionary_Empty( data->dict );
 }
 
 
@@ -362,8 +356,6 @@ void DictionarySuite_TestShortcuts( DictionarySuiteData* data ) {
       Dictionary_GetString_WithPrintfDefault( data->dict, "test_cstring3",
          "heya%s%u", "hey", 3 ) ) );
    pcu_check_true( NULL != Dictionary_Get( data->dict, "test_cstring3" ) );
-
-   Dictionary_Empty( data->dict );
 }
 
 
@@ -539,8 +531,6 @@ void DictionarySuite_TestReadAllParamFromCommandLine( DictionarySuiteData* data 
    }
    Memory_Free( expectedKeys );
    Memory_Free( expectedVals );
-
-   Dictionary_Empty( data->dict );
 }
 
 
