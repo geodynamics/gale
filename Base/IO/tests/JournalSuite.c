@@ -105,7 +105,6 @@ void JournalSuite_TestRegister( JournalSuiteData* data ) {
    pcu_check_true( 0 == strcmp( myDump->name, "MyDump" ) );
    pcu_check_true( myDump->_parent == Journal_GetTypedStream( Dump_Type ) );
    pcu_check_true( myDump->_children->count == 0 );
-   pcu_check_true( 0 == Stream_GetPrintingRank( myDump ));
    pcu_check_true( 0 == strcmp( myError->name, "MyError" ) );
    pcu_check_true( myError->_parent == Journal_GetTypedStream( Error_Type ) );
    pcu_check_true( myError->_children->count == 0 );
