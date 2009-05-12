@@ -726,8 +726,6 @@ void Journal_SetupDefaultTypedStreams() {
 	Stream_SetLevel( typedStream, 1 );
 	Stream_SetFile( typedStream, stJournal->stdOut );
 	Journal_RegisterTypedStream( typedStream );
-	/* Default when registering a Journal stream is to have it print from Rank 0 only) */
-	Stream_SetPrintingRank( typedStream, 0);
 	
 	/* error */
 	typedStream = CStream_New( Error_Type );
@@ -743,14 +741,11 @@ void Journal_SetupDefaultTypedStreams() {
 	Stream_Enable( typedStream, True );
 	Stream_SetLevel( typedStream, 1 );
 	Journal_RegisterTypedStream( typedStream );
-	/* Default when registering a Journal stream is to have it print from Rank 0 only) */
-	Stream_SetPrintingRank( typedStream, 0);
+	/* MPI Streams need to print from all ranks */
 
 	/* binary stream */
 	typedStream = BinaryStream_New( BinaryStream_Type );
 	Stream_Enable( typedStream, True );
 	Stream_SetLevel( typedStream, 1 );
 	Journal_RegisterTypedStream( typedStream );
-	/* Default when registering a Journal stream is to have it print from Rank 0 only) */
-	Stream_SetPrintingRank( typedStream, 0);
 }
