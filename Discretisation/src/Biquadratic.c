@@ -47,6 +47,8 @@ const Type Biquadratic_Type = "Biquadratic";
 ** Constructors
 */
 
+#define BIQUADRATICNODECOUNT 9
+
 Biquadratic* Biquadratic_New( Name name ) {
 	return _Biquadratic_New( sizeof(Biquadratic), 
 				 Biquadratic_Type, 
@@ -66,7 +68,7 @@ Biquadratic* Biquadratic_New( Name name ) {
 				 _ElementType_ConvertGlobalCoordToElLocal, 
 				 Biquadratic_JacobianDeterminantSurface,
 				 _ElementType_SurfaceNormal,
-				 9 );
+				 BIQUADRATICNODECOUNT );
 }
 
 Biquadratic* _Biquadratic_New( BIQUADRATIC_DEFARGS ) {
@@ -86,6 +88,8 @@ Biquadratic* _Biquadratic_New( BIQUADRATIC_DEFARGS ) {
 
 void _Biquadratic_Init( Biquadratic* self ) {
 	assert( self && Stg_CheckType( self, Biquadratic ) );
+
+	self->dim = 2;
 }
 
 
@@ -127,6 +131,9 @@ void _Biquadratic_Initialise( void* elementType, void* data ) {
 	self->faceNodes[1][0] = 6; self->faceNodes[1][1] = 7; self->faceNodes[1][2] = 8;
 	self->faceNodes[2][0] = 0; self->faceNodes[2][1] = 3; self->faceNodes[2][2] = 6;
 	self->faceNodes[3][0] = 2; self->faceNodes[3][1] = 5; self->faceNodes[3][2] = 8;
+
+	self->evaluatedShapeFunc = Memory_Alloc_Array( double, self->nodeCount, "evaluatedShapeFuncs" );
+	self->GNi = Memory_Alloc_2DArray( double, self->dim, self->nodeCount, "localShapeFuncDerivatives" );
 }
 
 void _Biquadratic_Execute( void* elementType, void* data ) {
@@ -136,6 +143,10 @@ void _Biquadratic_Destroy( void* elementType, void* data ) {
 	Biquadratic*	self = (Biquadratic*)elementType;
 
 	Memory_Free( self->faceNodes );
+	Memory_Free( self->evaluatedShapeFunc );
+	Memory_Free( self->GNi );
+
+	_ElementType_Destroy( elementType, data );
 }
 
 

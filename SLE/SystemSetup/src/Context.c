@@ -509,15 +509,16 @@ void _FiniteElementContext_SaveFeVariables( void* context ) {
 			if ( strlen(self->checkPointPrefixString) > 0 )
 				sprintf( outputPathString, "%s/%s%s.%.5u.dat", self->checkpointWritePath, self->checkPointPrefixString, feVar->name, self->timeStep );
 			else
-				sprintf( outputPathString, "%s%s.%.5u.dat", self->checkpointWritePath, feVar->name, self->timeStep );
+				sprintf( outputPathString, "%s/%s.%.5u.dat", self->checkpointWritePath, feVar->name, self->timeStep );
 #endif
 			if ( feVar->isCheckpointedAndReloaded ) {
 				 FeVariable_SaveToFile( feVar, outputPathString, 
-										 Dictionary_GetBool_WithDefault( self->dictionary, "saveCoordsWithFields", False ) );           
+						 Dictionary_GetBool_WithDefault( self->dictionary, "saveCoordsWithFields", False ) );           
 			}
+
+			Memory_Free( outputPathString );
+			outputPathString = NULL;
 		}
-		Memory_Free( outputPathString );
-		outputPathString = NULL;
 	}
 }
 

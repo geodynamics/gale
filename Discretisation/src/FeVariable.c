@@ -511,7 +511,7 @@ void* _FeVariable_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, P
 void _FeVariable_Build( void* variable, void* data ) {
 	FeVariable* self = (FeVariable*)variable;
 	DomainContext*   context = (DomainContext*)data;
-	unsigned dim;
+	unsigned dim, numNodes;
 	
 	if ( False == self->isBuilt ) {
 		self->isBuilt = True;
@@ -539,7 +539,13 @@ void _FeVariable_Build( void* variable, void* data ) {
 
 		dim = Mesh_GetDimSize(self->feMesh);
 		/** allocate GNx here */
-		self->GNx = Memory_Alloc_2DArray( double, dim, /*this is ugly*/(dim==2)?4:9, "Global Shape Function Derivatives" );
+		if( !strcmp( self->feMesh->name, "linearMesh" ) ) {
+			numNodes = ( dim == 2 ) ? 4 : 8;
+		}
+		else if( !strcmp( self->feMesh->name, "quadraticMesh" ) ) {
+			numNodes = ( dim == 2 ) ? 9 : 27;
+		}
+		self->GNx = Memory_Alloc_2DArray( double, dim, numNodes, "Global Shape Function Derivatives" );
 		
 		/* don't build the equation numbers for fields that aren't being solved for 
 		 * (ie: error and reference fields) */
@@ -2366,4 +2372,7 @@ void FeVariable_ReadFromFile( void* feVariable, const char* filename ) {
 #endif	
 
 	Mesh_DeformationUpdate( self->feMesh );
+
+	/* Sync shadow values now, as all procs should have required input */
+	FeVariable_SyncShadowValues( self );
 }
