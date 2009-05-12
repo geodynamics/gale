@@ -48,6 +48,8 @@
 #include "MPIStream.h"
 #include "BinaryStream.h"
 #include "StreamFormatter.h"
+#include "LineFormatter.h"
+#include "RankFormatter.h"
 
 #include <assert.h>
 #include <stdlib.h>
@@ -457,7 +459,7 @@ Stream* Journal_Register2( const Type streamType, const Type componentType, cons
 	return instanceStream;
 }
 
-JournalFile* Journal_GetFile( const char* const fileName )
+JournalFile* Journal_GetFile( const Name const fileName )
 {
 	return (JournalFile*) Stg_ObjectList_Get( stJournal->_files, fileName );
 }
