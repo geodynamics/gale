@@ -347,6 +347,125 @@ void JournalSuite_TestReadFromDictionary( JournalSuiteData* data ) {
 }
 
 
+void JournalSuite_TestShortcuts( JournalSuiteData* data ) {
+   Stream*      myStream    = Journal_Register( Info_Type, "TestStream" );
+   char*        string        = "helloWorldHowDoYouDo";
+   double       doubleValue   = 3142e20;
+   double       floatValue    = 2.173425;
+   int          intValue      = 3;
+   unsigned int uintValue     = 3980;
+   int          char_I;
+   char         charValue     = 'V';
+   double       doubleArray[] = { 10.23, 393.1, -89, 1231 };        
+   Index        uintArray[]   = { 10, 2021, 231, 2, 3, 4, 55 };
+   #define      MAXLINE 1000
+   char         outLine[MAXLINE];
+   const char*  stringLengthTestFilename = "./testJournalPrintStringWithLength.txt" ;
+   FILE*        stringLengthTestFile = NULL;
+   const char*  shortcutTestFilename = "./testJournalPrintShortcuts.txt" ;
+   FILE*        shortcutTestFile = NULL;
+
+   Stream_RedirectFile( myStream, stringLengthTestFilename );
+
+   for ( char_I = -1 ; char_I < 25 ; char_I++ ) {
+      Journal_PrintString_WithLength( myStream, string, char_I );
+      Journal_Printf( myStream, "\n" );
+   }
+
+   stringLengthTestFile = fopen( stringLengthTestFilename, "r" );
+
+   pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
+   pcu_check_true( 0 == strcmp( outLine, "\n" )); 
+   pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
+   pcu_check_true( 0 == strcmp( outLine, "\n" ));
+   pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
+   pcu_check_true( 0 == strcmp( outLine, "h\n" ));
+   pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
+   pcu_check_true( 0 == strcmp( outLine, "h.\n" ));
+   pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
+   pcu_check_true( 0 == strcmp( outLine, "h..\n" ));
+   pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
+   pcu_check_true( 0 == strcmp( outLine, "h...\n" ));
+   pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
+   pcu_check_true( 0 == strcmp( outLine, "h...o\n" ));
+   pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
+   pcu_check_true( 0 == strcmp( outLine, "he...o\n" ));
+   pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
+   pcu_check_true( 0 == strcmp( outLine, "he...Do\n" ));
+   pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
+   pcu_check_true( 0 == strcmp( outLine, "hel...Do\n" ));
+   pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
+   pcu_check_true( 0 == strcmp( outLine, "hel...uDo\n" ));
+   pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
+   pcu_check_true( 0 == strcmp( outLine, "hell...uDo\n" ));
+   pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
+   pcu_check_true( 0 == strcmp( outLine, "hell...ouDo\n" ));
+   pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
+   pcu_check_true( 0 == strcmp( outLine, "hello...ouDo\n" ));
+   pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
+   pcu_check_true( 0 == strcmp( outLine, "hello...YouDo\n" ));
+   pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
+   pcu_check_true( 0 == strcmp( outLine, "helloW...YouDo\n" ));
+   pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
+   pcu_check_true( 0 == strcmp( outLine, "helloW...oYouDo\n" ));
+   pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
+   pcu_check_true( 0 == strcmp( outLine, "helloWo...oYouDo\n" ));
+   pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
+   pcu_check_true( 0 == strcmp( outLine, "helloWo...DoYouDo\n" ));
+   pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
+   pcu_check_true( 0 == strcmp( outLine, "helloWor...DoYouDo\n" ));
+   pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
+   pcu_check_true( 0 == strcmp( outLine, "helloWor...wDoYouDo\n" ));
+   pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
+   pcu_check_true( 0 == strcmp( outLine, "helloWorldHowDoYouDo\n" ));
+   pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
+   pcu_check_true( 0 == strcmp( outLine, " helloWorldHowDoYouDo\n" ));
+   pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
+   pcu_check_true( 0 == strcmp( outLine, "  helloWorldHowDoYouDo\n" ));
+   pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
+   pcu_check_true( 0 == strcmp( outLine, "   helloWorldHowDoYouDo\n" ));
+   pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
+   pcu_check_true( 0 == strcmp( outLine, "    helloWorldHowDoYouDo\n" ));
+
+   fclose( stringLengthTestFile );
+   remove( stringLengthTestFilename );
+
+   /* Testing String Printing Shortcuts */
+   Stream_RedirectFile( myStream, shortcutTestFilename );
+
+   Journal_PrintString( myStream, string );
+   Journal_PrintValue( myStream, doubleValue );
+   Journal_PrintValue( myStream, floatValue );
+   Journal_PrintValue( myStream, intValue );
+   Journal_PrintValue( myStream, uintValue );
+   Journal_PrintChar(  myStream, charValue );
+   Journal_PrintArray( myStream, doubleArray, 4 );
+   Journal_PrintArray( myStream, uintArray, 7 );
+
+   shortcutTestFile = fopen( shortcutTestFilename, "r\n" );
+
+   pcu_check_true(         fgets( outLine, MAXLINE, shortcutTestFile ));
+   pcu_check_true( 0 == strcmp( outLine, "string = helloWorldHowDoYouDo\n" ));
+   pcu_check_true(         fgets( outLine, MAXLINE, shortcutTestFile ));
+   pcu_check_true( 0 == strcmp( outLine, "doubleValue = 3.142e+23\n" ));
+   pcu_check_true(         fgets( outLine, MAXLINE, shortcutTestFile ));
+   pcu_check_true( 0 == strcmp( outLine, "floatValue = 2.1734\n" ));
+   pcu_check_true(         fgets( outLine, MAXLINE, shortcutTestFile ));
+   pcu_check_true( 0 == strcmp( outLine, "intValue = 3\n" ));
+   pcu_check_true(         fgets( outLine, MAXLINE, shortcutTestFile ));
+   pcu_check_true( 0 == strcmp( outLine, "uintValue = 3980\n" ));
+   pcu_check_true(         fgets( outLine, MAXLINE, shortcutTestFile ));
+   pcu_check_true( 0 == strcmp( outLine, "charValue = V\n" ));
+   pcu_check_true(         fgets( outLine, MAXLINE, shortcutTestFile ));
+   pcu_check_true( 0 == strcmp( outLine, "doubleArray = { 10.23, 393.1, -89, 1231 }\n" ));
+   pcu_check_true(         fgets( outLine, MAXLINE, shortcutTestFile ));
+   pcu_check_true( 0 == strcmp( outLine, "uintArray = { 10, 2021, 231, 2, 3, 4, 55 }\n" ));
+
+   fclose( shortcutTestFile );
+   remove( shortcutTestFilename );
+}
+
+
 void JournalSuite( pcu_suite_t* suite ) {
    pcu_suite_setData( suite, JournalSuiteData );
    pcu_suite_setFixtures( suite, JournalSuite_Setup, JournalSuite_Teardown );
@@ -357,4 +476,5 @@ void JournalSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, JournalSuite_TestDPrintf );
    pcu_suite_addTest( suite, JournalSuite_TestPrintChildStreams );
    pcu_suite_addTest( suite, JournalSuite_TestReadFromDictionary );
+   pcu_suite_addTest( suite, JournalSuite_TestShortcuts );
 }
