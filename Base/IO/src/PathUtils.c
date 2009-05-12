@@ -32,7 +32,7 @@ void FindFile( char* fullPath, char* filename, char* searchPaths ) {
 	
 	fullPath[0] = 0;
 	
-	if( searchPaths && !(filename[0] == '/' || filename[0] == '~') ) {
+	if( searchPaths && !(filename[0] == '/' || filename[0] == '~' || filename[0] == '.' ) ) {
 		spaths = Memory_Alloc_Array_Unnamed(char,(strlen( searchPaths ) + 1));
 		strcpy( spaths, searchPaths );
 		pos = strtok( spaths, ":" );
