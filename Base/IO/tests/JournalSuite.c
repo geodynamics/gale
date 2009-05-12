@@ -466,6 +466,23 @@ void JournalSuite_TestShortcuts( JournalSuiteData* data ) {
 }
 
 
+void JournalSuite_TestFirewall( JournalSuiteData* data ) {
+   Stream*      myInfo = NULL;
+
+   myInfo = Journal_Register( Info_Type, "MyInfo" );
+
+   stJournal->firewallProducesAssert = True;
+
+   pcu_check_assert( Journal_Firewall( 1 == 0, myInfo, "Firewall\n" ) );
+   /* We expect nothing to happen on this first run - in effect the test would "fail" if an uncaught assert()
+    *  terminated the program */   
+   Journal_Firewall( 1, myInfo, "Firewall\n" );
+   /* We can use pcu_check_assert to make sure a pcu_assert is generated. This is actually quite important
+    *  as many other tests rely on this functionality. */   
+   pcu_check_assert( Journal_Firewall( 1 == 0, myInfo, "Firewall\n" ) );
+}
+
+
 void JournalSuite( pcu_suite_t* suite ) {
    pcu_suite_setData( suite, JournalSuiteData );
    pcu_suite_setFixtures( suite, JournalSuite_Setup, JournalSuite_Teardown );
@@ -477,4 +494,5 @@ void JournalSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, JournalSuite_TestPrintChildStreams );
    pcu_suite_addTest( suite, JournalSuite_TestReadFromDictionary );
    pcu_suite_addTest( suite, JournalSuite_TestShortcuts );
+   pcu_suite_addTest( suite, JournalSuite_TestFirewall );
 }
