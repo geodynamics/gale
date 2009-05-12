@@ -2366,4 +2366,7 @@ void FeVariable_ReadFromFile( void* feVariable, const char* filename ) {
 #endif	
 
 	Mesh_DeformationUpdate( self->feMesh );
+
+	/* Sync shadow values now, as all procs should have required input */
+	FeVariable_SyncShadowValues( self );
 }
