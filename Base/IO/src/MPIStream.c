@@ -121,7 +121,7 @@ SizeT _MPIStream_Printf( Stream* stream, char *fmt, va_list args )
 	MPI_Status status;
 	char* buffer;
 	SizeT numChars;
-	SizeT result;
+	int   writeResult;
 	
 	if ( self->_file == NULL )
 	{
@@ -130,19 +130,49 @@ SizeT _MPIStream_Printf( Stream* stream, char *fmt, va_list args )
 
 	numChars = Stg_vasprintf( &buffer, fmt, args );
 
-	result = MPI_File_write( *(MPI_File*)(self->_file->fileHandle), buffer, numChars, MPI_BYTE, &status );
+	writeResult = MPI_File_write( *(MPI_File*)(self->_file->fileHandle), buffer, numChars, MPI_BYTE, &status );
+
+	if (writeResult != MPI_SUCCESS) {
+		char         errorString[2000];
+		int          errorStringLength = 0;
+		Stream*      errorStream = Journal_Register( Error_Type, MPIFile_Type );
+		int          myRank = 0;
+
+		MPI_Comm_rank( MPI_COMM_WORLD, &myRank );
+		MPI_Error_string( writeResult, errorString, &errorStringLength);
+		Journal_Printf( errorStream, "%3d: %s\n", myRank, errorString );
+		JournalFile_Close( self->_file );
+		MPI_Abort(MPI_COMM_WORLD, writeResult );
+	}
 
 	Memory_Free( buffer );
 	
-	return result;
+	return 0;
 }
 	
 SizeT _MPIStream_Write( Stream* stream, void *data, SizeT elem_size, SizeT num_elems )
 {
 	MPIStream* self = (MPIStream*)stream;
 	MPI_Status status;
+	int   writeResult;
 	
-	return MPI_File_write( *(MPI_File*)(self->_file->fileHandle), data, num_elems * elem_size, MPI_BYTE, &status );
+	writeResult = MPI_File_write( *(MPI_File*)(self->_file->fileHandle), data, num_elems * elem_size,
+		 			MPI_BYTE, &status );
+
+	if (writeResult != MPI_SUCCESS) {
+		char         errorString[2000];
+		int          errorStringLength = 0;
+		Stream*      errorStream = Journal_Register( Error_Type, MPIFile_Type );
+		int          myRank = 0;
+
+		MPI_Comm_rank( MPI_COMM_WORLD, &myRank );
+		MPI_Error_string( writeResult, errorString, &errorStringLength);
+		Journal_Printf( errorStream, "%3d: %s\n", myRank, errorString );
+		JournalFile_Close( self->_file );
+		MPI_Abort(MPI_COMM_WORLD, writeResult );
+	}
+
+	return num_elems;
 }
 	
 Bool _MPIStream_Dump( Stream* stream, void *data )
