@@ -194,6 +194,9 @@ void _ConstitutiveMatrixCartesian_Init(
               "c50", "c51", "c52", "c53", "c54", "c55" );
     }
 
+		/* set the storedConstitutive matrix NOT to be checkpointed */
+		self->storedConstSwarmVar->isCheckpointedAndReloaded = False;
+
   }
 }
 
