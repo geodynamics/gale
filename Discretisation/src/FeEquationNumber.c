@@ -3028,7 +3028,8 @@ int GenerateEquationNumbering(
 	}
 	
 	MPI_Allreduce( &local_eqnum_count, &global_eqnum_count, 1, MPI_INT, MPI_SUM, PETSC_COMM_WORLD );
-	PetscPrintf( PETSC_COMM_SELF, "[%d] number of local,global equations (without dofs) %d,%d \n", rank, local_eqnum_count, global_eqnum_count );
+	/* PetscPrintf( PETSC_COMM_SELF, 
+	    "[%d] number of local,global equations (without dofs) %d,%d \n", rank, local_eqnum_count, global_eqnum_count ); */
 	/* check */
 	spanx = NX;
 	spany = NY;
@@ -3141,7 +3142,7 @@ int GenerateEquationNumbering(
 	VecDestroy(offset_list);
 	VecDestroy(seq_offset_list);
 	
-	PetscPrintf( PETSC_COMM_SELF, "[%d]: offset = %d \n", rank, offset );
+	/* PetscPrintf( PETSC_COMM_SELF, "[%d]: offset = %d \n", rank, offset ); */
 	
 	
 	VecGetArray( local_eqnum, &_local_eqnum );
