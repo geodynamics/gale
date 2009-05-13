@@ -6,7 +6,7 @@ SConscript('config/SConfig/SConscript')
 
 #
 # CUSTOMISE THE ENVIRONMENT HERE.
-#
+# 
 
 env = Environment(ENV=os.environ)
 env['_abspath'] = lambda x: File(x).abspath # Needed by Darwin.
