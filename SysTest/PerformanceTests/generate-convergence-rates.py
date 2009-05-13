@@ -46,7 +46,7 @@ def generate_convergence_rate():
 
 	if Filename == "NULL":
 		sys.stdout.write( "Please specify a file containg errors via -errorfile xxx\n" )
-		sys.exit(0)
+		sys.exit(1)
 
 	## Check if want data which can be graphed
 	for arg in sys.argv:
@@ -286,7 +286,7 @@ def CalculateLinearRegression_pearson( x_param, y_param, a_param, b_param, r_par
 		sys.stdout.write( "Error: CalculateLinearRegression() \n" )
 		sys.stdout.write( "Cannot perform regression with less than 2 points \n" )
 		a_deta = b_deta = r_deta = -6699.0	
-		sys.exit(0)
+		sys.exit(1)
 
 	for i in range( 1, N ):
 		sweep = (i) / (i+1)
