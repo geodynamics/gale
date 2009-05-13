@@ -544,7 +544,9 @@ void _FeVariable_Build( void* variable, void* data ) {
 		}
 		else if( !strcmp( self->feMesh->name, "quadraticMesh" ) ) {
 			numNodes = ( dim == 2 ) ? 9 : 27;
-		}
+		} 
+		else { numNodes = 0; } /* for constantMesh type */
+
 		self->GNx = Memory_Alloc_2DArray( double, dim, numNodes, "Global Shape Function Derivatives" );
 		
 		/* don't build the equation numbers for fields that aren't being solved for 
