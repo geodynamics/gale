@@ -267,7 +267,7 @@ void MemoryReport_Print_Helper( void *memoryPointer, void* memReport )
 	prevField = rootField;
 	while ( prevField->subCount == 1 )
 	{
-		Journal_Printf( stgMemory->infoStream, "%s ", prevField->value );
+		Journal_Printf( stgMemory->infoStream, "%s \n", prevField->value );
 		prevField = prevField->subFields[0];
 	}
 	
