@@ -50,7 +50,7 @@
 	#include "ParticleFeVariable.h"
 	#include "MaterialFeVariable.h"
 	#include "SwarmAdvector.h"
-	#include "SwarmAdvectorD.h"
+	#include "SwarmAdvectionInAPlane.h"
 
 	#include "PeriodicBoundariesManager.h"
 

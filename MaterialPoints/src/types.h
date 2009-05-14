@@ -76,7 +76,7 @@
 	typedef struct MaterialPoint                MaterialPoint;
 	typedef struct MaterialPointRef             MaterialPointRef;
 	typedef struct SwarmAdvector                SwarmAdvector;
-	typedef struct SwarmAdvectorD                SwarmAdvectorD;
+	typedef struct SwarmAdvectionInAPlane                SwarmAdvectionInAPlane;
 
 	typedef struct PeriodicBoundariesManager    PeriodicBoundariesManager;
 

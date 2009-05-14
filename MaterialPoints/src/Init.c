@@ -73,7 +73,7 @@ Bool PICellerator_MaterialPoints_Init( int* argc, char** argv[] ) {
 	Stg_ComponentRegister_Add( componentsRegister, GaussMapper_Type,              "0", _GaussMapper_DefaultNew );
 	
 	Stg_ComponentRegister_Add( componentsRegister, SwarmAdvector_Type,            "0", _SwarmAdvector_DefaultNew );
-	Stg_ComponentRegister_Add( componentsRegister, SwarmAdvectorD_Type,            "0", _SwarmAdvectorD_DefaultNew );
+	Stg_ComponentRegister_Add( componentsRegister, SwarmAdvectionInAPlane_Type,            "0", _SwarmAdvectionInAPlane_DefaultNew );
 
 	Stg_ComponentRegister_Add( componentsRegister, PeriodicBoundariesManager_Type,"0", _PeriodicBoundariesManager_DefaultNew );
 	
@@ -97,7 +97,7 @@ Bool PICellerator_MaterialPoints_Init( int* argc, char** argv[] ) {
 	RegisterParent( ParticleFeVariable_Type,        FeVariable_Type );
 	RegisterParent( PeriodicBoundariesManager_Type, Stg_Component_Type );
 	RegisterParent( SwarmAdvector_Type,             TimeIntegratee_Type );
-	RegisterParent( SwarmAdvectorD_Type,            SwarmAdvector_Type );
+	RegisterParent( SwarmAdvectionInAPlane_Type,            SwarmAdvector_Type );
 	
 	/* dave, 18.09.07 */
 	RegisterParent( SwarmVariableField_Type,        ParticleFeVariable_Type );
