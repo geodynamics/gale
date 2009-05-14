@@ -67,6 +67,7 @@
 #include "MeshAdaptor.h"
 #include "SurfaceAdaptor.h"
 #include "CompressionAdaptor.h"
+#include "linearSpaceAdaptor.h"
 #include "MeshVariable.h"
 #include "SpatialTree.h"
 #include "Remesher.h"

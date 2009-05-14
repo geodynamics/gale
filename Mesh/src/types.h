@@ -136,6 +136,7 @@ typedef enum {
 	typedef struct MeshAdaptor			MeshAdaptor;
 	typedef struct SurfaceAdaptor			SurfaceAdaptor;
 	typedef struct CompressionAdaptor		CompressionAdaptor;
+        typedef struct LinearSpaceAdaptor               LinearSpaceAdaptor;
 	typedef struct MeshVariable			MeshVariable;
 	typedef struct Remesher Remesher;
 
