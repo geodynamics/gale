@@ -42,11 +42,11 @@ def runTests():
 
 	if xmlFile == "NULL":
 		sys.stdout.write( "\nNo xml file specified, stopped" )
-		sys.exit(0)
+		sys.exit(1)
 	
 	if os.path.exists( xmlFile ) != True:
 		sys.stdout.write( "\nCannot find input file: " + xmlFile + ", stopped" )
-		sys.exit(0)
+		sys.exit(1)
 
 	# check if options file is given, otherwise run default
 	if optFile == "NULL":
@@ -57,14 +57,14 @@ def runTests():
 	else:
 		if os.path.exists( optFile ) != True:
 			sys.stdout.write( "\nCannot find run options file $optFile, stopped" )
-			sys.exit(0)
+			sys.exit(1)
 
 	# do checks on executables and log files
 	executable = "udw"
 	# Need to check for an executable
 	if os.path.exists( "../../../build/bin/StGermain" ) != True:
 		sys.stdout.write( "\nCan't find ../../../build/bin/StGermain - the executable which runs the test, stopped" )
-		sys.exit(0)
+		sys.exit(1)
 
 	sys.stdout.write( "\n--- Testing the convergence of " + xmlFile + "---\n" )
 	# is the symbolic link there, if not create it
@@ -118,7 +118,7 @@ def runTests():
 					if RESULT != None:
 						ERROR.close()
 						sys.stdout.write( "\n\tError: see " + stderr + " or " + stdout + " - stopped" )
-						os.exit(0)
+						sys.exit(1)
  	
 					line = ERROR.readline()	
 			finally:
@@ -242,7 +242,7 @@ def testNumbersAgainstExpected( datFile, expectedFile ):
 	for index, item in enumerate( input ):
 		if item != expected[ index ]:
 			sys.stdout.write( "Error: The expected file \n\"" + expectedFile + "\nhas a different number of results than the test file \n\"" + datFile + "\nso the results testing can't be done.\nRemove argument '-againstExpected' to not check the resulting errors agains the expected file.\n" )
-			os.exit(0)
+			sys.exit(1)
 
 	error = 0.0
 	r_error = 0.0
@@ -273,7 +273,7 @@ def generateConvergence():
 
 	if cvgStatus != 0:
 		sys.stdout.write( "There is no cvg file found analyse\n" )
-		sys.exit(0)
+		sys.exit(1)
 
 	cvgFile = commands.getoutput( "ls *.cvg" )	
 	# run David A. May's convergence tester, cheers Mayhem		
@@ -283,7 +283,7 @@ def generateConvergence():
 	datFile = cvgFile + "-convergence-rates.dat"
 	if os.path.exists( datFile ) != True:
 		sys.stdout.write( "Can't find the convergence rate file:" + datFile )
-		sys.exit(0)
+		sys.exit(1)
 
 	runAgainstExpected = 0
 
@@ -300,7 +300,7 @@ def generateConvergence():
 			testnumbersAgainstExpected( datFile, "./expected/" + datFile )
 		else:
 			sys.stdout.write( "Can't find the expected file: ./expected/" + datFile + "\n Consider adding argument \'-convergeOnly\' to the executable to not check the resulting errors agains the expected file.\n" )
-			sys.exit(0)
+			sys.exit(1)
 
 	# remove the old file
 	command = "rm *.cvg"

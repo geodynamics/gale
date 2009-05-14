@@ -134,5 +134,8 @@ void _ConstitutiveMatrixCartesian_Construct( void* constitutiveMatrix, Stg_Compo
 	void _ConstitutiveMatrixCartesian2D_CalculateStress( void* constitutiveMatrix, SymmetricTensor strainRate, SymmetricTensor stress ) ;
 	void _ConstitutiveMatrixCartesian3D_CalculateStress( void* constitutiveMatrix, SymmetricTensor strainRate, SymmetricTensor stress ) ;
 
+	/* a function which defines the storage of each particle's constitutive information on the particle, 
+	 * should be called before the "Build" phase */
+	void ConstitutiveMatrixCartesian_SetupParticleStorage( ConstitutiveMatrixCartesian* self );
 
 #endif

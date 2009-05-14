@@ -155,49 +155,9 @@ void _ConstitutiveMatrixCartesian_Init(
 	}
 
   /* store each particle's constitutiveMatrix */
-  if( self->storeConstitutiveMatrix ) {
-    IntegrationPointsSwarm* swarm = (IntegrationPointsSwarm*)self->integrationSwarm;
-    MaterialPointsSwarm **materialSwarms, *materialSwarm;
-    MaterialPoint particle;
-    int materialSwarmCount;
+  if( self->storeConstitutiveMatrix ) 
+		ConstitutiveMatrixCartesian_SetupParticleStorage( self );
 
-    /* get material swram mapped to the integration points,
-     * currently only one material point is mapped 26 FEB 09 */
-    materialSwarms = IntegrationPointMapper_GetMaterialPointsSwarms( swarm->mapper, &materialSwarmCount );
-    assert( materialSwarmCount < 2 );
-    materialSwarm = materialSwarms[0];
-
-    /* add extension to material swarm */
-    self->storedConstHandle = ExtensionManager_Add( 
-        materialSwarm->particleExtensionMgr, 
-        self->type, 
-        self->rowSize * self->columnSize * sizeof(double) );
-
-    double *cMatrix = ExtensionManager_Get( materialSwarm->particleExtensionMgr, &particle, self->storedConstHandle );
-
-    if( self->dim == 2 ) {
-      /* TODO: clean up this vector logic. The only reson there's an if is because
-       * of the list of names the must be given as the final arguments to this function.  */ 
-      self->storedConstSwarmVar = Swarm_NewVectorVariable( materialSwarm, "ConstitutiveMatrix",
-              (ArithPointer)cMatrix - (ArithPointer)&particle,
-              Variable_DataType_Double, self->rowSize * self->columnSize,
-              "c00", "c01", "c02", "c10", "c11", "c12", "c20", "c21", "c22" );
-    } else {
-      self->storedConstSwarmVar = Swarm_NewVectorVariable( materialSwarm, "ConstitutiveMatrix",
-              (ArithPointer)cMatrix - (ArithPointer)&particle,
-              Variable_DataType_Double, self->rowSize * self->columnSize,
-              "c00", "c01", "c02", "c03", "c04", "c05",
-              "c10", "c11", "c12", "c13", "c14", "c15",
-              "c20", "c21", "c22", "c23", "c24", "c25",
-              "c30", "c31", "c32", "c33", "c34", "c35",
-              "c40", "c41", "c42", "c43", "c44", "c45",
-              "c50", "c51", "c52", "c53", "c54", "c55" );
-    }
-
-		/* set the storedConstitutive matrix NOT to be checkpointed */
-		self->storedConstSwarmVar->isCheckpointedAndReloaded = False;
-
-  }
 }
 
 void ConstitutiveMatrixCartesian_InitAll( 
@@ -741,3 +701,55 @@ void _ConstitutiveMatrixCartesian3D_CalculateStress( void* constitutiveMatrix, S
 	}
 }
 
+void ConstitutiveMatrixCartesian_SetupParticleStorage( ConstitutiveMatrixCartesian* self ) {
+	/* a function which defines the storage of each particle's constitutive information on the particle, 
+	 * should be called before the "Build" phase */
+
+	static int beenHere = 0; /* don't want to do this routine twice */
+
+	IntegrationPointsSwarm* swarm = (IntegrationPointsSwarm*)self->integrationSwarm;
+	MaterialPointsSwarm **materialSwarms, *materialSwarm;
+	MaterialPoint particle;
+	int materialSwarmCount;
+	double *cMatrix = NULL;
+
+	if( beenHere ) return; 
+
+	beenHere = 1;
+
+	/* get material swram mapped to the integration points,
+	*      * currently only one material point is mapped 26 FEB 09 */
+	materialSwarms = IntegrationPointMapper_GetMaterialPointsSwarms( swarm->mapper, &materialSwarmCount );
+	assert( materialSwarmCount < 2 );
+	materialSwarm = materialSwarms[0];
+
+	/* add extension to material swarm */
+	self->storedConstHandle = ExtensionManager_Add( 
+	materialSwarm->particleExtensionMgr, 
+	self->type, 
+	self->rowSize * self->columnSize * sizeof(double) );
+
+	cMatrix = ExtensionManager_Get( materialSwarm->particleExtensionMgr, &particle, self->storedConstHandle );
+
+	if( self->dim == 2 ) {
+		/* TODO: clean up this vector logic. The only reson there's an if is because
+		*        * of the list of names the must be given as the final arguments to this function.  */ 
+		self->storedConstSwarmVar = Swarm_NewVectorVariable( materialSwarm, "ConstitutiveMatrix",
+		(ArithPointer)cMatrix - (ArithPointer)&particle,
+		Variable_DataType_Double, self->rowSize * self->columnSize,
+		"c00", "c01", "c02", "c10", "c11", "c12", "c20", "c21", "c22" );
+	} else {
+		self->storedConstSwarmVar = Swarm_NewVectorVariable( materialSwarm, "ConstitutiveMatrix",
+		(ArithPointer)cMatrix - (ArithPointer)&particle,
+		Variable_DataType_Double, self->rowSize * self->columnSize,
+		"c00", "c01", "c02", "c03", "c04", "c05",
+		"c10", "c11", "c12", "c13", "c14", "c15",
+		"c20", "c21", "c22", "c23", "c24", "c25",
+		"c30", "c31", "c32", "c33", "c34", "c35",
+		"c40", "c41", "c42", "c43", "c44", "c45",
+		"c50", "c51", "c52", "c53", "c54", "c55" );
+	}
+
+	/* set the storedConstitutive matrix NOT to be checkpointed */
+	self->storedConstSwarmVar->isCheckpointedAndReloaded = False;
+}
