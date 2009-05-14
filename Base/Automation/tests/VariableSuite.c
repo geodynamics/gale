@@ -714,6 +714,171 @@ void VariableSuite_TestVariable_Short( VariableSuiteData* data ) {
 }
 
 
+/* A few typedefs needed for the next test */
+#define VECTOR_DATA_COUNT 3
+typedef double Triple[VECTOR_DATA_COUNT];
+
+struct ComplexStuff {
+	int x;
+	float y;
+	char z; /* variablise the y and z member */
+};
+typedef struct ComplexStuff ComplexStuff;
+
+struct MockContext {
+	float*               scalars;
+	Index                scalarCount;
+	Triple*              vectors;
+	Index                vectorCount;
+	ComplexStuff*        stuff;
+	Index                stuffCount;
+	SizeT                complexStuffSize;
+   Variable_Register*   vr;
+};
+typedef struct MockContext MockContext;
+
+void VariableSuite_TestVariableCopy( VariableSuiteData* data ) {
+   MockContext*         ctx1 = NULL;
+   MockContext*         ctx2 = NULL;
+	Variable*            scalar = NULL;
+	Variable*            vector = NULL;
+	Variable*            complexStuff = NULL;
+   PtrMap*              ptrMap = PtrMap_New( 10 );
+   Index                ii=0;
+   Index                jj=0;
+   Index                var_I=0;
+
+
+   ctx1 = Memory_Alloc( MockContext, "ctx1" );
+   ctx2 = Memory_Alloc( MockContext, "ctx2" );
+
+	ctx1->scalarCount = 10;
+	ctx1->vectorCount = 10;
+	ctx1->stuffCount = 10;
+	ctx1->complexStuffSize = sizeof( ComplexStuff );
+
+	ctx1->scalars = Memory_Alloc_Array( float, ctx1->scalarCount, "ctx1->scalars" );
+	ctx1->vectors = Memory_Alloc_Array( Triple, ctx1->vectorCount, "ctx1->vectors" );
+	ctx1->stuff = Memory_Alloc_Array( ComplexStuff, ctx1->stuffCount, "ctx1->stuff" );
+
+   ctx1->vr = Variable_Register_New();
+
+	Variable_NewScalar(
+		"Scalar",
+		Variable_DataType_Float,
+		&(ctx1->scalarCount),
+		NULL,
+		(void**)&(ctx1->scalars),
+		ctx1->vr );
+	Variable_NewVector(
+		"Vector",
+		Variable_DataType_Double,
+		VECTOR_DATA_COUNT,
+		&(ctx1->vectorCount),
+		NULL,
+		(void**)&(ctx1->vectors),
+		ctx1->vr,
+		"x",
+		"y",
+		"z" );
+	{
+		ComplexStuff tmp;
+		SizeT dataOffsets[] = { 0, 0 };
+		Variable_DataType dataTypes[] = { Variable_DataType_Float, Variable_DataType_Char };
+		Index dataTypeCounts[] = { 1, 1 };
+		Name dataNames[] = { "complexY", "complexZ" };
+		
+		dataOffsets[0] = (ArithPointer)&tmp.y - (ArithPointer)&tmp;
+		dataOffsets[1] = (ArithPointer)&tmp.z - (ArithPointer)&tmp;
+
+		Variable_New(
+			"Complex",
+			2,
+			dataOffsets,
+			dataTypes,
+			dataTypeCounts,
+			dataNames,
+			&(ctx1->complexStuffSize),
+			&(ctx1->stuffCount),
+			NULL,
+			(void**)&(ctx1->stuff),
+			ctx1->vr );
+	}
+
+	Variable_Register_BuildAll( ctx1->vr );
+
+   scalar = Variable_Register_GetByName( ctx1->vr, "Scalar" );
+	vector = Variable_Register_GetByName( ctx1->vr, "Vector" );
+	complexStuff = Variable_Register_GetByName( ctx1->vr, "Complex" );
+
+   for ( ii = 0; ii < ctx1->scalarCount; ++ii ) {
+      Variable_SetValueFloat( scalar, ii, (float)ii );
+   }
+   for ( ii = 0; ii < ctx1->vectorCount; ++ii ) {
+      Variable_SetValueAtDouble( vector, ii, 0, (double)ii );
+      Variable_SetValueAtDouble( vector, ii, 1, (double)ii );
+      Variable_SetValueAtDouble( vector, ii, 2, (double)ii );
+   }
+   for ( ii = 0; ii < ctx1->stuffCount; ++ii ) {
+      ComplexStuff* stuff = Variable_GetStructPtr( complexStuff, ii );
+      stuff->y = (float)ii;
+      stuff->z = '0' + ii;
+   }
+
+	/* Indicate the area of memory which is given for data so that Variables can attach to it */
+	PtrMap_Append( ptrMap, &(ctx1->scalars), &(ctx2->scalars) );
+	PtrMap_Append( ptrMap, &(ctx1->vectors), &(ctx2->vectors) );
+	PtrMap_Append( ptrMap, &(ctx1->stuff), &(ctx2->stuff) );
+	
+	PtrMap_Append( ptrMap, &(ctx1->scalarCount), &(ctx2->scalarCount) );
+	PtrMap_Append( ptrMap, &(ctx1->vectorCount), &(ctx2->vectorCount) );
+	PtrMap_Append( ptrMap, &(ctx1->stuffCount), &(ctx2->stuffCount) );
+	PtrMap_Append( ptrMap, &(ctx1->complexStuffSize), &(ctx2->complexStuffSize) );
+
+	ctx2->scalars = Memory_Alloc_Array( float, ctx1->scalarCount, "scalars" );
+	ctx2->vectors = Memory_Alloc_Array( Triple, ctx1->vectorCount, "vectors" );
+	ctx2->stuff = Memory_Alloc_Array( ComplexStuff, ctx1->stuffCount, "stuff" );
+	PtrMap_Append( ptrMap, ctx1->scalars, ctx2->scalars );
+	PtrMap_Append( ptrMap, ctx1->vectors, ctx2->vectors );
+	PtrMap_Append( ptrMap, ctx1->stuff, ctx2->stuff );
+
+   /* Doing a copy of the whole Variable Register, should trigger a copy of the values in all the variables */
+	ctx2->vr = Stg_Class_Copy( ctx1->vr, NULL, True, NULL, ptrMap );
+
+   /* test equality of copy */
+   for ( ii = 0; ii < ctx1->scalarCount; ++ii ) {
+      pcu_check_true( ctx1->scalars[ii] == ctx2->scalars[ii] );
+   }
+   for ( ii = 0; ii < ctx1->vectorCount; ++ii ) {
+      for ( jj = 0; jj < VECTOR_DATA_COUNT; ++jj ) {
+         pcu_check_true( ctx1->vectors[ii][jj] == ctx2->vectors[ii][jj] );
+      }
+   }
+   for ( ii = 0; ii < ctx1->stuffCount; ++ii ) {
+      pcu_check_true( ctx1->stuff->y == ctx2->stuff->y );
+      pcu_check_true( ctx1->stuff->z == ctx2->stuff->z );
+   }
+
+   /* Clean up */
+	for ( var_I = 0; var_I < ctx1->vr->count; ++var_I ) {
+		Stg_Class_Delete( ctx1->vr->_variable[var_I] );
+	}
+	Memory_Free( ctx1->scalars );
+	Memory_Free( ctx1->vectors );
+	Memory_Free( ctx1->stuff );
+	Stg_Class_Delete( ctx1->vr );
+	Memory_Free( ctx1 );
+	for ( var_I = 0; var_I < ctx2->vr->count; ++var_I ) {
+		Stg_Class_Delete( ctx2->vr->_variable[var_I] );
+	}
+	Memory_Free( ctx2->scalars );
+	Memory_Free( ctx2->vectors );
+	Memory_Free( ctx2->stuff );
+	Stg_Class_Delete( ctx2->vr );
+	Memory_Free( ctx2 );
+}
+
+
 void VariableSuite( pcu_suite_t* suite ) {
    pcu_suite_setData( suite, VariableSuiteData );
    pcu_suite_setFixtures( suite, VariableSuite_Setup, VariableSuite_Teardown );
@@ -726,4 +891,5 @@ void VariableSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, VariableSuite_TestVariable_Float );
    pcu_suite_addTest( suite, VariableSuite_TestVariable_Int );
    pcu_suite_addTest( suite, VariableSuite_TestVariable_Short );
+   pcu_suite_addTest( suite, VariableSuite_TestVariableCopy );
 }
