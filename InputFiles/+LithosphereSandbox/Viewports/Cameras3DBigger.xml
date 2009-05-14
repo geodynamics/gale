@@ -63,6 +63,22 @@
 			<param name="eyeSeparation">0.2</param>
 			<param name="focalLength">0</param>
 		</struct>
+		
+		<struct name="lithosphereSandboxSideViewCamera">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">0.01 </param>
+			<param name="coordY">0.50</param>
+			<param name="coordZ">5.00 </param>
+			<param name="focalPointX">0.0</param>
+			<param name="focalPointY">0.5</param>
+			<param name="focalPointZ">0.0</param>
+			<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+			<param name="stereoType">Mono</param>
+			<param name="eyeSeparation">0.2</param>
+			<param name="focalLength">0</param>
+		</struct>
 
 		<struct name="lithosphereSandboxHighViewCamera">
 			<param name="Type">lucCamera</param>
@@ -79,8 +95,6 @@
 			<param name="eyeSeparation">0.2</param>
 			<param name="focalLength">0</param>
 		</struct>
-
-
 
 		<struct name="lithosphereSandboxPerspectiveViewCamera1">
 		        <param name="Type">lucCamera</param>

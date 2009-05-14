@@ -11,104 +11,6 @@
 			<param name="Type">Everywhere</param>
 		</struct>
 		
-		<struct name="PerturbationShapeLeft">  <!-- To help suppress edge effects -->
-			<param name="Type">Box</param>
-			<param name="startX"> minX </param> <param name="endX"> -1.5 </param>
-			<param name="startY"> 0.80 </param> <param name="endY"> 0.83 </param>
-			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
-		</struct>		
-		<struct name="PerturbationShapeRight">
-			<param name="Type">Box</param>
-			<param name="startX"> 1.5 </param> <param name="endX"> maxX </param>
-			<param name="startY"> 0.80 </param> <param name="endY"> 0.83 </param>
-			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
-		</struct>		
-		
-		<struct name="PerturbationShape1">
-			<param name="Type">Box</param>
-			<param name="startX"> -0.51 </param> <param name="endX"> -0.50 </param>
-			<param name="startY"> 0.80 </param> <param name="endY"> 0.81 </param>
-			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
-		</struct>		
-		<struct name="PerturbationShape2">
-			<param name="Type">Box</param>
-			<param name="startX"> -0.41 </param> <param name="endX"> -0.40 </param>
-			<param name="startY"> 0.80 </param> <param name="endY"> 0.81 </param>
-			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
-		</struct>
-		<struct name="PerturbationShape3">
-			<param name="Type">Box</param>
-			<param name="startX"> -0.31 </param> <param name="endX"> -0.30 </param>
-			<param name="startY"> 0.80 </param> <param name="endY"> 0.81 </param>
-			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
-		</struct>
-		<struct name="PerturbationShape4">
-			<param name="Type">Box</param>
-			<param name="startX"> -0.21 </param> <param name="endX"> -0.20 </param>
-			<param name="startY"> 0.80 </param> <param name="endY"> 0.81 </param>
-			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
-		</struct>
-		<struct name="PerturbationShape5">
-			<param name="Type">Box</param>
-			<param name="startX"> -0.11 </param> <param name="endX"> -0.10 </param>
-			<param name="startY"> 0.80 </param> <param name="endY"> 0.81 </param>
-			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
-		</struct>
-		<struct name="PerturbationShape6">
-			<param name="Type">Box</param>
-			<param name="startX"> -0.01 </param> <param name="endX"> -0.00 </param>
-			<param name="startY"> 0.80 </param> <param name="endY"> 0.81 </param>
-			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
-		</struct>
-		<struct name="PerturbationShape7">
-			<param name="Type">Box</param>
-			<param name="startX"> 0.10 </param> <param name="endX"> 0.11 </param>
-			<param name="startY"> 0.80 </param> <param name="endY"> 0.81 </param>
-			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
-		</struct>
-		<struct name="PerturbationShape8">
-			<param name="Type">Box</param>
-			<param name="startX"> 0.20 </param> <param name="endX"> 0.21 </param>
-			<param name="startY"> 0.80 </param> <param name="endY"> 0.81 </param>
-			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
-		</struct>
-		<struct name="PerturbationShape9">
-			<param name="Type">Box</param>
-			<param name="startX"> 0.30 </param> <param name="endX"> 0.31 </param>
-			<param name="startY"> 0.80 </param> <param name="endY"> 0.81 </param>
-			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
-		</struct>
-		<struct name="PerturbationShape10">
-			<param name="Type">Box</param>
-			<param name="startX"> 0.40 </param> <param name="endX"> 0.41 </param>
-			<param name="startY"> 0.80 </param> <param name="endY"> 0.81 </param>
-			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
-		</struct>
-		<struct name="PerturbationShape11">
-			<param name="Type">Box</param>
-			<param name="startX"> 0.50 </param> <param name="endX"> 0.51 </param>
-			<param name="startY"> 0.80 </param> <param name="endY"> 0.81 </param>
-			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
-		</struct>
-		
-		<struct name="PerturbationShape">
-			<param name="Type">Union</param>
-			<list name="shapes">
-				<!--><param>PerturbationShapeLeft</param> -->
-				<param>PerturbationShape1</param>
-				<param>PerturbationShape2</param>
-				<param>PerturbationShape3</param>
-				<param>PerturbationShape4</param>
-				<param>PerturbationShape5</param>
-				<param>PerturbationShape6</param>
-				<param>PerturbationShape7</param>
-				<param>PerturbationShape8</param>
-				<param>PerturbationShape9</param>
-				<param>PerturbationShape10</param>
-				<param>PerturbationShape11</param>
-				<!-- ><param>PerturbationShapeRight</param> -->
-			</list>
-		</struct>	
 
 		
 		
@@ -129,21 +31,21 @@
 		<struct name="LowerCrustShape1">
 			<param name="Type">Box</param>
 			<param name="startX"> minX </param> <param name="endX"> maxX </param>
-			<param name="startY"> 0.4 </param> <param name="endY"> 0.45 </param>
+			<param name="startY"> 0.4 </param> <param name="endY"> 0.50 </param>
 			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
 		</struct>	
 		
 		<struct name="LowerCrustNotYieldingShape1">
 			<param name="Type">Box</param>
 			<param name="startX"> minX </param> <param name="endX"> -1.8 </param>
-			<param name="startY"> 0.4 </param> <param name="endY"> 0.45 </param>
+			<param name="startY"> 0.4 </param> <param name="endY"> 0.50 </param>
 			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
 		</struct>
 			
 		<struct name="LowerCrustNotYieldingShape2">
 			<param name="Type">Box</param>
 			<param name="startX"> 1.8 </param> <param name="endX"> maxX </param>
-			<param name="startY"> 0.4 </param> <param name="endY"> 0.45 </param>
+			<param name="startY"> 0.4 </param> <param name="endY"> 0.50 </param>
 			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
 		</struct>	
 		
@@ -159,7 +61,7 @@
 		<struct name="UpperCrustShape1">
 			<param name="Type">Box</param>
 			<param name="startX"> minX </param> <param name="endX"> maxX </param>
-			<param name="startY"> 0.45 </param> <param name="endY"> 1.0 </param>
+			<param name="startY"> 0.50 </param> <param name="endY"> 1.0 </param>
 			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
 		</struct>	
 
@@ -167,21 +69,20 @@
 			<param name="Type">Union</param>
 			<list name="shapes">
 				<param>UpperCrustShape1</param>
-				<param>PerturbationShape</param>
 			</list>
 		</struct>	
 
 		<struct name="UpperCrustNotYieldingShape1">
 			<param name="Type">Box</param>
 			<param name="startX"> minX </param> <param name="endX"> -1.8 </param>
-			<param name="startY"> 0.45 </param> <param name="endY"> 1.00 </param>
+			<param name="startY"> 0.50 </param> <param name="endY"> 1.00 </param>
 			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
 		</struct>
 			
 		<struct name="UpperCrustNotYieldingShape2">
 			<param name="Type">Box</param>
 			<param name="startX"> 1.8 </param> <param name="endX"> maxX </param>
-			<param name="startY"> 0.45 </param> <param name="endY"> 1.00 </param>
+			<param name="startY"> 0.50 </param> <param name="endY"> 1.00 </param>
 			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
 		</struct>	
 
@@ -196,35 +97,35 @@
 		<struct name="UpperCrustStripe1">
 			<param name="Type">Box</param>
 			<param name="startX"> minX </param> <param name="endX"> maxX </param>
-			<param name="startY"> 0.45 </param> <param name="endY"> 1.0 </param>
+			<param name="startY"> 0.50 </param> <param name="endY"> 1.0 </param>
 			<param name="startZ"> -0.1 </param> <param name="endZ"> 0.1 </param>
 		</struct>	
 		
 		<struct name="UpperCrustStripe2">
 			<param name="Type">Box</param>
 			<param name="startX"> minX </param> <param name="endX"> maxX </param>
-			<param name="startY"> 0.45 </param> <param name="endY"> 1.0 </param>
-			<param name="startZ"> 0.45 </param> <param name="endZ"> 0.65 </param>
+			<param name="startY"> 0.50 </param> <param name="endY"> 1.0 </param>
+			<param name="startZ"> 0.50 </param> <param name="endZ"> 0.65 </param>
 		</struct>	
 
 		<struct name="UpperCrustStripe3">
 			<param name="Type">Box</param>
 			<param name="startX"> minX </param> <param name="endX"> maxX </param>
-			<param name="startY"> 0.45 </param> <param name="endY"> 0.8 </param>
-			<param name="startZ"> -0.65 </param> <param name="endZ"> -0.45 </param>
+			<param name="startY"> 0.50 </param> <param name="endY"> 1.0 </param>
+			<param name="startZ"> -0.65 </param> <param name="endZ"> -0.50 </param>
 		</struct>	
 		
 		<struct name="UpperCrustStripe4">
 			<param name="Type">Box</param>
 			<param name="startX"> minX </param> <param name="endX"> maxX </param>
-			<param name="startY"> 0.45 </param> <param name="endY"> 1.0 </param>
+			<param name="startY"> 0.50 </param> <param name="endY"> 1.0 </param>
 			<param name="startZ"> -1.65 </param> <param name="endZ"> -1.45 </param>
 		</struct>	
 		
 		<struct name="UpperCrustStripe5">
 			<param name="Type">Box</param>
 			<param name="startX"> minX </param> <param name="endX"> maxX </param>
-			<param name="startY"> 0.45 </param> <param name="endY"> 1.0 </param>
+			<param name="startY"> 0.50 </param> <param name="endY"> 1.0 </param>
 			<param name="startZ"> 1.45 </param> <param name="endZ"> 1.65 </param>
 		</struct>	
 

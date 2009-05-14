@@ -61,6 +61,16 @@
 				<param> lithosphereSandboxParticleMaterialDots </param> 
 			</list>
 		</struct>
+		
+		<struct name="meshSideViewVP1">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">lithosphereSandboxSideViewCamera</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<param> lithosphereSandboxMeshView </param> 
+				<param> lithosphereSandboxParticleMaterialDots </param> 
+			</list>
+		</struct>
 					
 		<struct name="meshViewWindow">
 	        <param name="Type">lucDefaultWindow</param>
@@ -74,7 +84,20 @@
 				<param> meshViewPerspectiveVP1 </param>
 			</list>
 		</struct>	
- 
+		
+		<struct name="meshSideViewWindow">
+	        <param name="Type">lucDefaultWindow</param>
+	        <param name="RenderingEngine">RenderingEngine</param>
+			<param name="OutputFormat">PNGOutput</param>
+			<param name="height">400</param>
+			<param name="width">1000</param>
+			<param name="interactive">f</param>
+			<param name="backgroundColour">White</param>
+			<list name="Viewport">
+				<param> meshSideViewVP1 </param>
+			</list>
+		</struct>	
+
 	</struct>
 </StGermainData>
 

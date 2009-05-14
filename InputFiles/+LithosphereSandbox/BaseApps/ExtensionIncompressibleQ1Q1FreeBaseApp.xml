@@ -51,7 +51,7 @@
 		<struct name="velocityRemesher">
 			<param name="Type">RegularRemesherCmpt</param>
 			<param name="mesh">velocityMesh</param>
-			<!-- ><param name="wrapTop">true</param> FOR FREE SURFACE --> 
+			<param name="wrapTop">true</param> <!--FOR FREE SURFACE --> 
 			<list name="remeshDims">
 				<param>0</param>
 				<param>1</param>
