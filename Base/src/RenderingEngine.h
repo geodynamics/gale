@@ -92,7 +92,7 @@
 	void _lucRenderingEngine_Print( void* renderingEngine, Stream* stream ) ;
 	void* _lucRenderingEngine_Copy( void* renderingEngine, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) ;
 
-void _lucRenderingEngine_Construct( void* renderingEngine, Stg_ComponentFactory* cf, void* data ) ;
+	void _lucRenderingEngine_Construct( void* renderingEngine, Stg_ComponentFactory* cf, void* data ) ;
 	void _lucRenderingEngine_Build( void* renderingEngine, void* data );
 	void _lucRenderingEngine_Initialise( void* renderingEngine, void* data );
 	void _lucRenderingEngine_Execute( void* renderingEngine, void* data );

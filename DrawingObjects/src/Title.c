@@ -222,7 +222,7 @@ void _lucTitle_Construct( void* title, Stg_ComponentFactory* cf, void* data ) {
 	lucTitle_InitAll( self, 
 			Stg_ComponentFactory_GetString( cf, self->name, "string", "" ),
 		        self->colour,
-			Stg_ComponentFactory_GetInt( cf, self->name, "yPos", 13 ) );
+			Stg_ComponentFactory_GetInt( cf, self->name, "yPos", 20 ) );
 			
 }
 
@@ -238,43 +238,28 @@ void _lucTitle_Setup( void* drawingObject, void* _context ) {
 
 void _lucTitle_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* viewportInfo, void* _context ) {
 	lucTitle*    self            = (lucTitle*)drawingObject;
-        lucViewport* viewport        = viewportInfo->viewport;
-	int          stringWidth     = 0;
+    lucViewport* viewport        = viewportInfo->viewport;
 	char*        title;
 	
 	/* Set up 2D Viewer the size of the viewport */
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	gluOrtho2D((GLfloat) 0.0, (GLfloat) viewportInfo->width, (GLfloat) 0.0, (GLfloat) viewportInfo->height );
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	
-	/* Disable lighting because we don't want a 3D effect */
-	glDisable(GL_LIGHTING);
+	lucViewport2d(True, viewportInfo);
 
 	/* Set title */
 	title = strlen( self->titleString ) ? self->titleString : viewport->name;
-	stringWidth = lucStringWidth( title );
+
+	/* Print white first for contrast */
+	lucColour white = {1.0f, 1.0f, 1.0f, 1.0f};
+	lucColour_SetOpenGLColour( &white );
+	lucPrint(viewportInfo->width/2 - lucStringWidth(title)/2 - 1, self->yPos - 1, title );
 
 	/* Set the colour */
 	lucColour_SetOpenGLColour( &self->colour );
 
-	/* Set the postition */
-	glRasterPos2i( viewportInfo->width/2 - stringWidth/2, viewportInfo->height - self->yPos );
-
 	/* Print Title */
-	lucPrintString( title );
-	
-	/* Put back settings */
-	glEnable(GL_LIGHTING);
-	glPopMatrix();
-	
-	/*Set back the viewport to what it should be to render any other object */
-	/* If this is not done, than any object displayed after the colour bar will not appear,*/
-	/* because the projection matrix and lookAt point have been altered */
-	lucViewportInfo_SetOpenGLCamera( viewportInfo );
+	lucPrint(viewportInfo->width/2 - lucStringWidth(title)/2, self->yPos, title );
 
+	/* Restore the viewport */
+	lucViewport2d(False, viewportInfo);
 }
 
 void _lucTitle_CleanUp( void* drawingObject, void* _context ) {

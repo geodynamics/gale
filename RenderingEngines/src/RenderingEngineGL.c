@@ -181,7 +181,7 @@ void _lucRenderingEngineGL_Construct( void* renderingEngine, Stg_ComponentFactor
 void _lucRenderingEngineGL_Build( void* renderingEngine, void* data ) {}
 void _lucRenderingEngineGL_Initialise( void* renderingEngine, void* data ) {}
 void _lucRenderingEngineGL_Execute( void* renderingEngine, void* data ) {}
-void _lucRenderingEngineGL_Destroy( void* renderingEngine, void* data ) {}
+void _lucRenderingEngineGL_Destroy( void* renderingEngine, void* data ) { lucDeleteFont(); }
 
 
 void _lucRenderingEngineGL_Render( void* renderingEngine, lucWindow* window, AbstractContext* context ) {
@@ -206,10 +206,8 @@ void _lucRenderingEngineGL_Render( void* renderingEngine, lucWindow* window, Abs
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 	glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
-	
-	glEnable(GL_DEPTH_TEST);
 
-	/* Set up lighting */
+	glEnable(GL_DEPTH_TEST);
 
 	lucWindow_Broadcast( window, 0, MPI_COMM_WORLD );
 	lucWindow_CheckCameraFlag( window );
@@ -237,7 +235,7 @@ void _lucRenderingEngineGL_Render( void* renderingEngine, lucWindow* window, Abs
 			glGetIntegerv(GL_VIEWPORT, viewport_gl2ps);
 			state = gl2psBeginViewport(viewport_gl2ps);
 			if(state == 5)
-				Journal_Printf( Journal_MyStream( Error_Type, self ), "\nError. Insufficient GL feedback buffer size. \ 
+				Journal_Printf( Journal_MyStream( Error_Type, self ), "\nError. Insufficient GL feedback buffer size. \
 										       \nConsider increasing the OutputVECTOR buffersize. \
 										      \nVector image will not be created correctly.\n\n" );
 		#endif
@@ -278,14 +276,12 @@ void _lucRenderingEngineGL_Render( void* renderingEngine, lucWindow* window, Abs
 		#ifdef HAVE_GL2PS		
 			state = gl2psEndViewport();
 			if(state == 5)
-				Journal_Printf( Journal_MyStream( Error_Type, self ), "\nError. Insufficient GL feedback buffer size. \ 
+				Journal_Printf( Journal_MyStream( Error_Type, self ), "\nError. Insufficient GL feedback buffer size. \
 										       \nConsider increasing the OutputVECTOR buffersize. \
 										      \nVector image will not be created correctly.\n\n" );
 		#endif		
 	}
 
-	glFinish();  /* OK - block until all rendering complete */
-	
 	Stream_UnIndent( lucDebug );
 	Journal_DPrintfL( lucDebug, 2, "Leaving func %s\n", __func__ );
 }
@@ -311,16 +307,10 @@ void _lucRenderingEngineGL_GetPixelData( void* renderingEngine, lucWindow* windo
 
 void lucRenderingEngineGL_WriteViewportText( void* renderingEngine, lucWindow* window, lucViewportInfo* viewportInfo, AbstractContext* context ) {
 	lucViewport* viewport = viewportInfo->viewport;
-//	int stringWidth = lucStringWidth( viewport->name );
 
 	/* Set up 2D Viewer the size of the viewport */
-	glPushMatrix();
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluOrtho2D((GLfloat) 0.0, (GLfloat) viewportInfo->width, (GLfloat) 0.0, (GLfloat) viewportInfo->height );
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();	
-
+	lucViewport2d(True, viewportInfo);
+	
 	/* Set the colour so that it'll show up against the background */
 	lucColour_SetComplimentaryOpenGLColour( &window->backgroundColour );
 
@@ -329,12 +319,13 @@ void lucRenderingEngineGL_WriteViewportText( void* renderingEngine, lucWindow* w
 	if (viewport->drawTime) {
 		char* timeString;
 		Stg_asprintf( &timeString, "%g", context->currentTime );
-		glRasterPos2i( 0, viewportInfo->height - 13 );
+		glRasterPos2i( 0, 13 );
 		lucPrintString( timeString );
 		Memory_Free( timeString );
 	}
 
-	glPopMatrix();
+	/* Restore the viewport */
+	lucViewport2d(False, viewportInfo);	
 }
 
 void _lucRenderingEngineGL_Clear( void* renderingEngineGL, lucWindow* window, Bool clearAll ) {

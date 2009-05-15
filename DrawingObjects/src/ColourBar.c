@@ -282,35 +282,65 @@ void _lucColourBar_Draw( void* drawingObject, lucWindow* window, lucViewportInfo
 	Pixel_Index              pixel_I;
 	double                   value;
 	double                   tickValue;
-	int                      startPos[2];
-	GLint                    rasterPos[2];
+	int                      	startx, starty;
 	char                     string[20];
-	int                      stringWidth;
 	int i = 0;
 	AbstractContext*         context       = (AbstractContext*) _context;
 
-	
 	/* Only get master to draw colour bar */
 	if ( context->rank != MASTER )
 		return;
 
 	/* Set up 2D Viewer the size of the viewport */
-	
-	
-	//glPushMatrix();
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	gluOrtho2D((GLfloat) 0.0, (GLfloat) viewportInfo->width, (GLfloat) 0.0, (GLfloat) viewportInfo->height );
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+	lucViewport2d(True, viewportInfo);
 
-	/* Disable lighting because we don't want a 3D effect */
-	glDisable(GL_LIGHTING);
-
-	startPos[0] = (viewportInfo->width - length)/2;
-	startPos[1] = self->margin;
+	lucSetFontCharset(FONT_SMALL);
 	
+	startx = (viewportInfo->width - length)/2;
+	starty = viewportInfo->height - self->margin - self->height;
+
+	/* Write scale */
+	if ( !self->scientific && fabs(colourMap->minimum) < 1.0e-5 )
+		sprintf( string, "0" );
+	else{
+		 _lucColourBar_WithPrecision(string, self->scientific, self->precision,  self->scaleValue, colourMap->minimum);
+	}
+	lucPrint(startx - (int) (0.5 * (float)lucStringWidth(string)),  starty + 12, string );
+	
+	if ( !self->scientific && fabs(colourMap->maximum) < 1.0e-5 )
+		sprintf( string, "0" );
+	else{
+		_lucColourBar_WithPrecision( string, self->scientific, self->precision, self->scaleValue, colourMap->maximum);
+	}
+	lucPrint(startx + length - (int) (0.5 * (float)lucStringWidth(string)),  starty + 12, string );
+
+	/* Write ticks */
+	for(i = 1; i< self->ticks; i++){
+        /* Draws the tick */
+		glLineWidth( self->borderWidth );
+		lucColour_SetComplimentaryOpenGLColour( &window->backgroundColour );
+		glBegin(GL_LINES);
+			glVertex2i( startx+ i*(length/ self->ticks), starty+5+self->height );
+			glVertex2i( startx + i*(length/ self->ticks), starty+self->height);
+		glEnd();
+
+		
+		/* Computse the tick value */
+		if( colourMap->logScale ) {
+		   tickValue = log10(colourMap->minimum) + 
+			  ((double)i * (log10(colourMap->maximum) - log10(colourMap->minimum)) / (double)self->ticks);
+		   tickValue = pow( 10.0, tickValue );
+		}
+		else
+		   tickValue = colourMap->minimum + ( i*(colourMap->maximum - colourMap->minimum)/self->ticks );
+		
+		if(self->printTickValue)  {
+			_lucColourBar_WithPrecision( string, self->scientific, self->precision, self->scaleValue, tickValue);
+			
+			lucPrint(startx+ i*(length/ self->ticks) - (int) (0.5 * (float)lucStringWidth(string)),  starty + 12, string );
+		}
+	}
+
 	/* Draw Colour Bar */
 	for ( pixel_I = 0 ; pixel_I < length ; pixel_I++ ) {
            if( colourMap->logScale ) {
@@ -323,90 +353,19 @@ void _lucColourBar_Draw( void* drawingObject, lucWindow* window, lucViewportInfo
 
 		lucColourMap_SetOpenGLColourFromValue( colourMap, value );
 	
-		glRecti( startPos[0] + pixel_I, startPos[1], startPos[0] + pixel_I + 1 , startPos[1] + height );
+		glRecti( startx + pixel_I, starty, startx + pixel_I + 1 , starty + height );
 	}
 
 	/* Draw Box around colour bar */
-	glLineWidth( self->borderWidth );
 	lucColour_SetComplimentaryOpenGLColour( &window->backgroundColour );
-	glBegin( GL_LINE_LOOP );
-		glVertex2i( startPos[0], startPos[1] );
-		glVertex2i( startPos[0] + length, startPos[1] );
-		glVertex2i( startPos[0] + length, startPos[1] + height );
-		glVertex2i( startPos[0] , startPos[1] + height );
-	glEnd();
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glRecti(startx, starty, startx + length + 1, starty + height);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	/* Write scale */
-	if ( !self->scientific && fabs(colourMap->minimum) < 1.0e-5 )
-		sprintf( string, "0" );
-	else{
-		 _lucColourBar_WithPrecision(string, self->scientific, self->precision,  self->scaleValue, colourMap->minimum);
-	}
-	stringWidth = lucStringWidth( string );
+	lucSetFontCharset(FONT_DEFAULT);
 
-	rasterPos[0] = startPos[0] - (int) (0.5 * (float)stringWidth);
-	rasterPos[1] = startPos[1] - 13;
-	if (rasterPos[0] < 0)
-		rasterPos[0] = 1;
-
-	glRasterPos2iv( rasterPos );
-	lucPrintString( string );
-	
-	if ( !self->scientific && fabs(colourMap->maximum) < 1.0e-5 )
-		sprintf( string, "0" );
-	else{
-		_lucColourBar_WithPrecision( string, self->scientific, self->precision, self->scaleValue, colourMap->maximum);
-	}
-	stringWidth = lucStringWidth( string );
-
-	rasterPos[0] = startPos[0] + length - (int) (0.5 * (float)stringWidth);
-	glRasterPos2iv( rasterPos );
-	lucPrintString( string );
-
-	/* Write ticks */
-	for(i = 1; i< self->ticks; i++){
-		/* Computes the tick position */
-	       	rasterPos[0] = startPos[0]+ i*(length/ self->ticks);
-        	rasterPos[1] = startPos[1] - 13;
-
-                /* Draws the tick */
-		glLineWidth( self->borderWidth );
-		lucColour_SetComplimentaryOpenGLColour( &window->backgroundColour );
-		glBegin(GL_LINES);
-			glVertex2i( startPos[0]+ i*(length/ self->ticks), startPos[1]-5 );
-			glVertex2i( startPos[0] + i*(length/ self->ticks), startPos[1] );
-		glEnd();
-
-		
-		/* Computse the tick value */
-                if( colourMap->logScale ) {
-                   tickValue = log10(colourMap->minimum) + 
-                      ((double)i * (log10(colourMap->maximum) - log10(colourMap->minimum)) / (double)self->ticks);
-                   tickValue = pow( 10.0, tickValue );
-                }
-                else
-                   tickValue = colourMap->minimum + ( i*(colourMap->maximum - colourMap->minimum)/self->ticks );
-		
-		if(self->printTickValue)  {
-			_lucColourBar_WithPrecision( string, self->scientific, self->precision, self->scaleValue, tickValue);
-			
-			stringWidth = lucStringWidth( string );
-			rasterPos[0] -= (int) (0.5 * (float)stringWidth);
-			glRasterPos2iv( rasterPos );
-			lucPrintString( string );
-		}
-
-	}
-
-	/* Put back settings */
-	glEnable(GL_LIGHTING);
-	glPopMatrix();
-	
-	
-	/*Set back the viewport to what it should be to render any other object */
-	/* If this is not done, than any object displayed after the colour bar will not appear,*/
-	/* because the projection matrix and lookAt point have been altered */
-	lucViewportInfo_SetOpenGLCamera( viewportInfo );
+	/* Restore the viewport */
+	lucViewport2d(False, viewportInfo);
 }
 
 void _lucColourBar_CleanUp( void* drawingObject, void* _context ) {

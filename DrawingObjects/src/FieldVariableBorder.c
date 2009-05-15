@@ -231,35 +231,46 @@ void _lucFieldVariableBorder_BuildDisplayList( void* drawingObject, void* _conte
 	glDisable(GL_LIGHTING);
 
 	glEnable(GL_LINE_SMOOTH);
+		glHint (GL_LINE_SMOOTH_HINT, GL_NICEST);
 	glEnable(GL_BLEND);
+		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glPolygonMode ( GL_FRONT_AND_BACK, GL_LINE ) ;
 
 	lucColour_SetOpenGLColour( &self->colour );
 	glLineWidth( self->lineWidth );
 
-	
-	if (dim == 2) 
-		glRectd( min[ I_AXIS ], min[ J_AXIS ], max[ I_AXIS ], max[ J_AXIS ] );
-	else if ( dim == 3 ) {
-		glBegin( GL_QUAD_STRIP );
-			glVertex3d( min[ I_AXIS ], min[ J_AXIS ], min[ K_AXIS ] );
-			glVertex3d( min[ I_AXIS ], max[ J_AXIS ], min[ K_AXIS ] );
+	/* Create front/back (inner/outer in 3d) border, offset from rest of rendering */
+	float adj = 0.0005f;	/* Adjustment helps border remain visible against rendered data from all angles */
+	float a;
+	for (a = -adj; a <= adj; a += 2*adj)
+	{
+		if (dim == 2) 
+		{
+			glTranslatef(0, 0, a);
+			glRectd( min[ I_AXIS ], min[ J_AXIS ], max[ I_AXIS ], max[ J_AXIS ]);
+			glTranslatef(0, 0, -a);
+		}
+		else if ( dim == 3 ) {
+			glBegin( GL_QUAD_STRIP );
+				glVertex3d( min[ I_AXIS ] + a, min[ J_AXIS ] + a, min[ K_AXIS ] + a);
+				glVertex3d( min[ I_AXIS ] + a, max[ J_AXIS ] + a, min[ K_AXIS ] + a);
 
-			glVertex3d( max[ I_AXIS ], min[ J_AXIS ], min[ K_AXIS ] );
-			glVertex3d( max[ I_AXIS ], max[ J_AXIS ], min[ K_AXIS ] );
+				glVertex3d( max[ I_AXIS ] - a, min[ J_AXIS ] + a, min[ K_AXIS ] + a);
+				glVertex3d( max[ I_AXIS ] - a, max[ J_AXIS ] + a, min[ K_AXIS ] + a);
 
-			glVertex3d( max[ I_AXIS ], min[ J_AXIS ], max[ K_AXIS ] );
-			glVertex3d( max[ I_AXIS ], max[ J_AXIS ], max[ K_AXIS ] );
+				glVertex3d( max[ I_AXIS ] - a, min[ J_AXIS ] + a, max[ K_AXIS ] - a);
+				glVertex3d( max[ I_AXIS ] - a, max[ J_AXIS ] - a, max[ K_AXIS ] - a);
 
-			glVertex3d( min[ I_AXIS ], min[ J_AXIS ], max[ K_AXIS ] );
-			glVertex3d( min[ I_AXIS ], max[ J_AXIS ], max[ K_AXIS ] );
-			
-			glVertex3d( min[ I_AXIS ], min[ J_AXIS ], min[ K_AXIS ] );
-			glVertex3d( min[ I_AXIS ], max[ J_AXIS ], min[ K_AXIS ] );
-		glEnd();
+				glVertex3d( min[ I_AXIS ] + a, min[ J_AXIS ] + a, max[ K_AXIS ] - a);
+				glVertex3d( min[ I_AXIS ] + a, max[ J_AXIS ] - a, max[ K_AXIS ] - a);
+				
+				glVertex3d( min[ I_AXIS ] + a, min[ J_AXIS ] + a, min[ K_AXIS ] + a);
+				glVertex3d( min[ I_AXIS ] + a, max[ J_AXIS ] - a, min[ K_AXIS ] + a);
+			glEnd();
+		}
 	}
 	
 	/* Clean up OpenGL stuff */
-	glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL ) ;
+ 	glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL ) ;
 	glEnable( GL_LIGHTING );
 }

@@ -65,21 +65,21 @@ const Type lucSDLWindow_Type = "lucSDLWindow";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
 lucSDLWindow* _lucSDLWindow_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucWindow_DisplayFunction						   _displayWindow,	
-		lucWindow_EventsWaitingFunction*				   _eventsWaiting,	
-		lucWindow_EventProcessorFunction				   _eventProcessor,	
-		Name                                               name ) 
+		SizeT                                           sizeOfSelf,
+		Type                                            type,
+		Stg_Class_DeleteFunction*                       _delete,
+		Stg_Class_PrintFunction*                        _print,
+		Stg_Class_CopyFunction*                         _copy, 
+		Stg_Component_DefaultConstructorFunction*       _defaultConstructor,
+		Stg_Component_ConstructFunction*                _construct,
+		Stg_Component_BuildFunction*                    _build,
+		Stg_Component_InitialiseFunction*               _initialise,
+		Stg_Component_ExecuteFunction*                  _execute,
+		Stg_Component_DestroyFunction*                  _destroy,
+		lucWindow_DisplayFunction						_displayWindow,	
+		lucWindow_EventsWaitingFunction*				_eventsWaiting,	
+		lucWindow_EventProcessorFunction				_eventProcessor,	
+		Name                                            name ) 
 {
 	lucSDLWindow*					self;
 
@@ -172,8 +172,6 @@ void _lucSDLWindow_Initialise( void* window, void* data ) {
 	}
 
     SDL_WM_SetCaption( self->title, NULL );
-	/* Hide if not using interactive mode */
-	if (!self->interactive) SDL_WM_IconifyWindow();
 	
     const SDL_VideoInfo *pSDLVideoInfo = SDL_GetVideoInfo();
 
@@ -209,6 +207,9 @@ void _lucSDLWindow_Initialise( void* window, void* data ) {
 	self->buffer = NULL;
 	lucSDLWindow_Resize(self, self->width, self->height);
 	
+	/* Hide if not using interactive mode */
+	if (!self->interactive) SDL_WM_IconifyWindow();
+
 	/* Install 1sec idle timer */
 	self->timer = SDL_AddTimer(1000, lucSDLWindow_IdleTimer, self);
 	
@@ -302,19 +303,10 @@ Bool _lucSDLWindow_EventProcessor( void* window ) {
 			lucWindow_KeyboardEvent( self, keyPressed, xpos, ypos);
 			break;
 		case SDL_MOUSEMOTION:
-			if (buttonDown){
-				int x = event.motion.x;
-				int y = self->height - event.motion.y;
-				int dx, dy;
-				dx = x - self->startx;
-				dy = y - self->starty;
-				if (dx * dx + dy * dy > 25)	/* Process if movement magnitude > 5 */
-				{
-					lucWindow_MouseMotion(self, button , x, y);
-					break;
-				}
-			}
-			redisplay = False;
+			if (buttonDown)
+				lucWindow_MouseMotion(self, button , event.motion.x, self->height - event.motion.y);
+			else
+				redisplay = False;
 			break;
 		case SDL_MOUSEBUTTONDOWN: 
 			buttonDown = True;
@@ -334,14 +326,15 @@ Bool _lucSDLWindow_EventProcessor( void* window ) {
 		default:	
 			redisplay = False;	/* No change to display, don't redraw */
 	}
-
+	
 	if (!self->interactive) {
 		/* No longer interactive? Drop timer, minimize window and quit event loop */
 		SDL_RemoveTimer(self->timer);
 		SDL_WM_IconifyWindow();
+		lucWindow_SetViewportNeedsToDrawFlag( self, True );
 		self->quitEventLoop = True;
-	 }
-	 
+	}	
+
 	/* Reset idle timer */
 	lucWindow_IdleReset(self);
 
@@ -365,7 +358,7 @@ void lucSDLWindow_Resize( void* window, Pixel_Index width, Pixel_Index height ) 
 	    /* SDL interprets each pixel as a 32-bit number, so our masks must depend
 		   on the endianness (byte order) of the machine */
 		Uint32 rmask, gmask, bmask, amask;
-		#if SDL_BYTEORDER == SDL_BIG_ENDIAN /* Is this the default anyway? */
+		#if SDL_BYTEORDER == SDL_BIG_ENDIAN 
 			rmask = 0xff000000;
 			gmask = 0x00ff0000;
 			bmask = 0x0000ff00;
@@ -396,21 +389,6 @@ Uint32 lucSDLWindow_IdleTimer(Uint32 interval, void* param) {
 	lucSDLWindow*        self = (lucSDLWindow*) param; 
 	/* idle timeout check */
 	lucWindow_IdleCheck(self);
-	
-	/*
-    SDL_Event event;
-    SDL_UserEvent userevent;
-  
-    userevent.type = SDL_USEREVENT;
-    userevent.code = 0;
-    userevent.data1 = NULL;
-    userevent.data2 = NULL;
-
-    event.type = SDL_USEREVENT;
-    event.user = userevent;
-    SDL_PushEvent(&event);
-	
-    return(interval);*/
 }
 
 #endif

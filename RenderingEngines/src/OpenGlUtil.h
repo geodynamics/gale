@@ -47,22 +47,43 @@
 #ifndef __lucRenderingEngines_OpenGlUtil_h__
 #define __lucRenderingEngines_OpenGlUtil_h__
 
-#ifdef HAVE_GL2PS
-/* call to gl2pText is required for text output using vector formats, 
- * as no text is stored in the GL feedback buffer */  
-	#define lucPrintString( A )       gl2psText( A, "Times-Roman", 16); glCallLists( strlen( A ), GL_UNSIGNED_BYTE, A )
-#else
-	#define lucPrintString( A )       glListBase(2000); glCallLists( strlen( A ), GL_UNSIGNED_BYTE, A ); glListBase(0)
-#endif
+#include <stdio.h>
+#include <stdarg.h>
+#include <stdlib.h>
+#include <gl.h>
 
-/* Big hack !! - Assumes that font width is 10 pixels - this is hardly ever true */
-#define lucStringWidth( A )     (strlen( A ) * 10) 
+#define GL_Error_Check \
+  { \
+    GLenum error = GL_NO_ERROR; \
+    while ((error = glGetError()) != GL_NO_ERROR) { \
+		fprintf(stderr, "OpenGL error found. [ %s : %s : %s] \"%s\".\n",  \
+				__FILE__, __LINE__, #cmd, gluErrorString(error)); \
+    } \
+  }
+
+#define FONT_FIXED 	0
+#define FONT_SMALL 	1
+#define FONT_NORMAL	2
+#define FONT_SERIF 	3
+#define FONT_LARGE 	4
+
+#define FONT_DEFAULT FONT_NORMAL
 
 /* In OpenGL you cannot set the raster position to be outside the viewport - 
  * but this is a hack which OpenGL allows (and advertises) - That you can get the raster position to a legal value
  * and then move the raster position by calling glBitmap with a NULL bitmap */
 #define lucMoveRaster( deltaX, deltaY ) \
 	glBitmap( 0,0,0.0,0.0, (float)(deltaX), (float)(deltaY), NULL )
+
+void lucViewport2d(Bool enabled, lucViewportInfo* viewportInfo);
+void lucPrintString(const char* str);
+void lucPrintf(int x, int y, const char* fmt, ...);
+void lucPrint(int x, int y, const char* str);
+void lucSetFontCharset(int charset);
+int lucStringWidth(const char *string);
+void lucSetupRasterFont();
+void lucBuildFont(int glyphsize, int columns, int startidx, int stopidx);
+void lucDeleteFont();
 
 void lucColour_SetOpenGLColour( lucColour* colour ) ;
 void lucColour_SetComplimentaryOpenGLColour( lucColour* colour ) ;

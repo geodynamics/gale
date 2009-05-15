@@ -72,21 +72,21 @@ const Type lucX11Window_Type = "lucX11Window";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
 lucX11Window* _lucX11Window_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucWindow_DisplayFunction						   _displayWindow,	
-		lucWindow_EventsWaitingFunction*				   _eventsWaiting,	
-		lucWindow_EventProcessorFunction				   _eventProcessor,	
-		Name                                               name ) 
+		SizeT                                           sizeOfSelf,
+		Type                                            type,
+		Stg_Class_DeleteFunction*                       _delete,
+		Stg_Class_PrintFunction*                        _print,
+		Stg_Class_CopyFunction*                         _copy, 
+		Stg_Component_DefaultConstructorFunction*       _defaultConstructor,
+		Stg_Component_ConstructFunction*                _construct,
+		Stg_Component_BuildFunction*                    _build,
+		Stg_Component_InitialiseFunction*               _initialise,
+		Stg_Component_ExecuteFunction*                  _execute,
+		Stg_Component_DestroyFunction*                  _destroy,
+		lucWindow_DisplayFunction						_displayWindow,	
+		lucWindow_EventsWaitingFunction*				_eventsWaiting,	
+		lucWindow_EventProcessorFunction				_eventProcessor,	
+		Name                                            name ) 
 {
 	lucX11Window*					self;
 
@@ -291,6 +291,7 @@ Bool _lucX11Window_EventProcessor( void* window ) {
 	Atom           wmDeleteWindow;
 	static unsigned int button = 0;
 	static int width = 0, height = 0;
+	int mx = 0, my = 0;
 	static Bool visible = True;
 	Bool redisplay = True;
 	
@@ -312,6 +313,9 @@ Bool _lucX11Window_EventProcessor( void* window ) {
     		lucWindow_MouseClick( self, button, event.type, event.xmotion.x, self->height - event.xmotion.y);
 	    	break;
 		case MotionNotify:
+		//	mx = event.xmotion.x;
+	//		my = self->height - event.xmotion.y;
+			//redisplay = False;
 			lucWindow_MouseMotion( self, button , event.xmotion.x, self->height - event.xmotion.y);
     		break;
 		case KeyPress:
@@ -336,6 +340,7 @@ Bool _lucX11Window_EventProcessor( void* window ) {
 			/* Notification of window actions, including resize */
 			width = event.xconfigure.width;
 			height = event.xconfigure.height;
+			redisplay = False;
     		break;
 		default:
 			redisplay = False;
@@ -343,9 +348,14 @@ Bool _lucX11Window_EventProcessor( void* window ) {
 	
 	/* Processing to be done when event queue empty, resizing window */
 	if (self->_eventsWaiting(self) == 0)
+	{
 		/* Resize viewports if window dimensions changed */
 		if (width != self->width || height != self->height)
+		{
 			lucWindow_Resize( self, width, height);
+			redisplay = True;
+		}
+	}
 	
 	/* Close window and create background window if switched out of interactive mode */
 	if (!self->interactive)
@@ -368,6 +378,8 @@ void lucX11Window_SetupFonts( void* window ) {
 	lucDebug_PrintFunctionBegin( self, 2 );
 
 	/* Tell GLX to use this font */
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glEnable(GL_BLEND);	
 	glXUseXFont( self->font->fid, 32, 96, 2000+32 );
 	
 	lucDebug_PrintFunctionEnd( self, 2 );
@@ -454,6 +466,12 @@ Bool lucX11Window_CreateContext( void* window, Bool direct )  {
 		Journal_Printf(  lucError, "In func %s: Could not create GLX rendering context.\n", __func__);
 		return False;
 	}
+
+    if (glXIsDirect(self->display, self->glxcontext))
+		Journal_DPrintf( lucDebug, "GLX: Direct Rendering enabled.\n");
+    else
+        Journal_DPrintf( lucDebug, "GLX: Sorry, no Direct Rendering possible\n");
+
 	return True;
 }
 
@@ -587,7 +605,7 @@ void lucX11Window_CreateInteractiveWindow( void* window ) {
 	
 		glXMakeCurrent( self->display, self->win, self->glxcontext);
 	
-		XMapWindow( self->display, self->win ); /* Show the window */
+		XMapRaised( self->display, self->win ); /* Show the window */
 	}
 	else
 		abort();
@@ -637,8 +655,6 @@ Colormap lucX11Window_GetShareableColormap( lucX11Window* self ) {
 void lucX11Window_CloseInteractiveWindow( lucX11Window* self ) {
 	
 	lucDebug_PrintFunctionBegin( self, 1 );
-
-	Journal_DPrintf( lucDebug, "Calling XDestroyWindow.\n");
 
 	XDestroyWindow( self->display , self->win );
 	self->win = 0;
