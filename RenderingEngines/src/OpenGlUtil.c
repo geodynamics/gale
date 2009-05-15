@@ -190,12 +190,13 @@ void lucBuildFont(int glyphsize, int columns, int startidx, int stopidx)
 {
 	/* Build font display lists */
 	int i;
-	static float yoffset = 0;
+	static float yoffset;
 	float divX = IMAGE_WIDTH / (float)glyphsize;
 	float divY = IMAGE_HEIGHT / (float)glyphsize;
 	float glyphX = 1 / divX;	/* Width & height of a glyph in texture coords */
 	float glyphY = 1 / divY;
 	GLfloat cx, cy, cx1, cy1;         /* the character coordinates in our texture */
+    if (startidx == 0) yoffset = 0;
 	glBindTexture(GL_TEXTURE_2D, texture);
 	for (i = 0; i < (stopidx - startidx); i++)
 	{
