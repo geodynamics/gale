@@ -71,12 +71,9 @@
 		GLXPixmap                                           glxpmap;                 \
 		XVisualInfo*                                        vi;                      \
 		Bool                                                doubleBuffer;            \
-		Bool                                                backgroundWindowOpen;    \
-		Bool                                                interactiveWindowOpen;   \
 		XFontStruct*                                        font;                    \
 		Name                                                xFontName;               \
-		Bool                                                isTimedOut;              \
-		double                                              maxIdleTime;             \
+		Atom             									wmDeleteWindow;			 \
 		/* Display name stuff */ \
 		Name                                                displayName;             \
 		Name                                                host;                    \
@@ -98,6 +95,9 @@
 		Stg_Component_InitialiseFunction*                  _initialise,
 		Stg_Component_ExecuteFunction*                     _execute,
 		Stg_Component_DestroyFunction*                     _destroy,
+		lucWindow_DisplayFunction*						   _displayWindow,	
+		lucWindow_EventsWaitingFunction*				   _eventsWaiting,	
+		lucWindow_EventProcessorFunction*				   _eventProcessor,	
 		Name                                               name );
 
 	void _lucX11Window_Delete( void* window ) ;
@@ -112,11 +112,12 @@
 	void _lucX11Window_Execute( void* window, void* data );
 	void _lucX11Window_Destroy( void* window, void* data ) ;
 
-	Bool lucX11Window_EventLoop( void* window, AbstractContext* context) ;
-
+	/* Window Virtuals */
+	void _lucX11Window_Display( void* window );
+	int _lucX11Window_EventsWaiting( void* window ) ;
+	Bool _lucX11Window_EventProcessor( void* window ) ;
+	
 	void lucX11Window_SetupFonts( void* window ) ;
-	void lucX11Window_SwapBuffers( void* window, AbstractContext* context ) ;
-	void lucX11Window_MakeCurrent( void* window )  ;
 
 	Bool lucX11Window_CreateDisplay( void* window )  ;
 	void lucX11Window_CreateBackgroundWindow( void* window )  ;
@@ -125,8 +126,10 @@
 	Colormap lucX11Window_GetShareableColormap( lucX11Window* self ) ;
 	void lucX11Window_CloseInteractiveWindow( lucX11Window* self ) ;
 	void lucX11Window_CloseBackgroundWindow( lucX11Window* self ) ;
-	void lucX11Window_CloseDisplay( lucX11Window* self ) ;
 	Bool lucX11Window_FindFont( void* window )  ;
+
+	void lucX11Window_Timer( int ) ;
+    int lucX11Window_Error(Display* display, XErrorEvent* error);
 
 #endif
 

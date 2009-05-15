@@ -171,9 +171,9 @@ void lucViewportInfo_SetOpenGLCamera( lucViewportInfo* viewportInfo ) {
 			
 			glGetBooleanv(pname, &stereo_enabled);
 			if( stereo_enabled == GL_FALSE)
-				printf(" Stereo not supported XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n");
+				Journal_DPrintfL( lucDebug, 2, " Stereo not supported\n");
 			else 
-				printf(" Stereo is supported XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n");
+				Journal_DPrintfL( lucDebug, 2, " Stereo is supported\n");
 				
 				
 			radians = DTOR * camera->aperture/2.0;

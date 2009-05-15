@@ -71,6 +71,7 @@ lucRenderingEngine* _lucRenderingEngine_New(
 		Stg_Component_ExecuteFunction*                     _execute,
 		Stg_Component_DestroyFunction*                     _destroy,		
 		lucRenderingEngine_RenderFunction*                 _render,
+		lucRenderingEngine_ClearFunction*				   _clear,
 		lucRenderingEngine_GetPixelDataFunction*           _getPixelData,
 		lucRenderingEngine_CompositeViewportFunction*      _compositeViewport,
 		Name                                               name )
@@ -95,6 +96,7 @@ lucRenderingEngine* _lucRenderingEngine_New(
 			NON_GLOBAL );
 
 	self->_render            = _render;
+	self->_clear			 = _clear;
 	self->_getPixelData      = _getPixelData;
 	self->_compositeViewport = _compositeViewport;
 	
@@ -158,6 +160,16 @@ void lucRenderingEngine_Render( void* renderingEngine, lucWindow* window, Abstra
 	lucDebug_PrintFunctionBegin( self, 2 );
 
 	self->_render( self, window, context );
+	
+	lucDebug_PrintFunctionEnd( self, 2 );
+}
+
+void lucRenderingEngine_Clear( void* renderingEngine,  lucWindow* window, Bool clearAll ) {
+	lucRenderingEngine*   self       = (lucRenderingEngine*) renderingEngine ;
+	
+	lucDebug_PrintFunctionBegin( self, 2 );
+
+	self->_clear( self, window, clearAll );
 	
 	lucDebug_PrintFunctionEnd( self, 2 );
 }

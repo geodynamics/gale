@@ -42,7 +42,6 @@
 ** $Id: Window.c 791 2008-09-01 02:09:06Z JulianGiordani $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
 #include <mpi.h>
 #include <StGermain/StGermain.h>
 #include <StgDomain/StgDomain.h>
@@ -72,6 +71,10 @@
 /* ASCII Characters */
 #define ESCAPE 27
 
+#ifndef MASTER
+	#define MASTER 0
+#endif
+	
 const Type lucWindow_Type = "lucWindow";
 
 MPI_Datatype lucWindow_MPI_Datatype;
@@ -89,6 +92,9 @@ lucWindow* _lucWindow_New(
 		Stg_Component_InitialiseFunction*                  _initialise,
 		Stg_Component_ExecuteFunction*                     _execute,
 		Stg_Component_DestroyFunction*                     _destroy,		
+		lucWindow_DisplayFunction						   _displayWindow,	
+		lucWindow_EventsWaitingFunction*				   _eventsWaiting,	
+		lucWindow_EventProcessorFunction				   _eventProcessor,	
 		Name                                               name )
 {
 	lucWindow*    self;
@@ -110,6 +116,11 @@ lucWindow* _lucWindow_New(
 			name, 
 			NON_GLOBAL );
 
+	/* Virtual functions */
+	self->_displayWindow = _displayWindow;
+	self->_eventsWaiting = _eventsWaiting;
+	self->_eventProcessor = _eventProcessor;
+	
 	return self;
 }
 
@@ -126,7 +137,10 @@ void _lucWindow_Init(
 		Pixel_Index                                        width,
 		Pixel_Index                                        height,
 		Name                                               backgroundColourName,
-		Bool                                               interactive )
+		Bool                                               interactive,
+		Bool                                               continuous,
+		Bool                                               isTimedOut,
+		double                                             maxIdleTime ) 
 {
 	OutputFormat_Index   outputFormat_I;
 	WindowInteraction_Index windowInteraction_I;
@@ -135,6 +149,7 @@ void _lucWindow_Init(
 	self->width = width;
 	self->height = height;
 	self->interactive = interactive;
+	self->continuous = continuous; 
 
 	self->viewportInfoList = Memory_Alloc_Array( lucViewportInfo, viewportCount, "viewport info Array" );
 	memcpy( self->viewportInfoList, viewportInfoList, viewportCount * sizeof( lucViewportInfo ) );
@@ -160,16 +175,25 @@ void _lucWindow_Init(
 	/* Get window to 'execute' at each 'Dump' entry point, and force the context not to re-execute itself. */
 	//context->hasExecuted = True;
 	EP_AppendClassHook( Context_GetEntryPoint( context, AbstractContext_EP_DumpClass ), self->_execute, self );
+	
+	self->isTimedOut    = isTimedOut;
+	self->maxIdleTime   = maxIdleTime;
+	self->idleTime = 0;
+	self->startx = 0;
+	self->starty = 0;
+	
+	self->title = Memory_Alloc_Array( char, 100, "title string" );
+	strcpy(self->title, " gLucifer Interactive Output ");
 }
 		
 void _lucWindow_Delete( void* window ) {
-	lucWindow* self        = window;
+	lucWindow*     self      = (lucWindow*)window;
 
 	Stg_Class_Delete( self->outputFormat_Register );
 	Stg_Class_Delete( self->defaultWindowInteraction );
 	Stg_Class_Delete( self->windowInteraction_Register );
-		
-	_Stg_Component_Delete( self );
+
+	_Stg_Component_Delete( window );
 }
 
 void _lucWindow_Print( void* window, Stream* stream ) {
@@ -186,6 +210,7 @@ void _lucWindow_Print( void* window, Stream* stream ) {
 	Journal_PrintValue( stream, self->width );
 	Journal_PrintValue( stream, self->height );
 	Journal_PrintValue( stream, self->interactive );
+	Journal_PrintValue( stream, self->continuous );
 	Journal_Printf( stream, "self->currStereoBuffer = ");
 	switch ( self->currStereoBuffer ) {
 		case lucLeft:
@@ -221,6 +246,9 @@ void* _lucWindow_DefaultNew( Name name ) {
 			_lucWindow_Initialise,
 			_lucWindow_Execute,
 			_lucWindow_Destroy,
+			lucWindow_Display,
+			lucWindow_EventsWaiting,
+			lucWindow_EventProcessor,
 			name );
 }
 
@@ -238,6 +266,8 @@ void _lucWindow_Construct( void* window, Stg_ComponentFactory* cf, void* data ) 
 	WindowInteraction_Index  windowInteractionCount;
 	Bool                     interactiveDefault;
 	Bool                     interactive;
+	Bool                     continuousDefault;
+	Bool                     continuous;
 	
 	width = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "width", 400 );
 	height = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "height", 400 );
@@ -247,6 +277,10 @@ void _lucWindow_Construct( void* window, Stg_ComponentFactory* cf, void* data ) 
 	 * Specific lucWindow objects can override this parameter in their own component structs */
 	interactiveDefault = Stg_ComponentFactory_GetRootDictBool( cf, "interactive", False );
 	interactive = Stg_ComponentFactory_GetBool( cf, self->name, "interactive", interactiveDefault );
+
+	/* Get information about whether this window is in continuous mode or not */
+	continuousDefault = Stg_ComponentFactory_GetRootDictBool( cf, "continuous", False );
+	continuous = Stg_ComponentFactory_GetBool( cf, self->name, "continuous", continuousDefault );
 
 	/* Grab information about what viewports are going to be plotting in this window */
 	viewportInfoList = lucWindow_ConstructViewportInfoList( self, cf, width, height, &viewportCount, data );
@@ -273,8 +307,8 @@ void _lucWindow_Construct( void* window, Stg_ComponentFactory* cf, void* data ) 
 		&windowInteractionCount,
 		data );
 		
-	/* The window needs information about the context so that it can attach itself onto the AbstractContext_EP_DumpClass entry 
-	 * point. */
+	/* The window needs information about the context so that it can attach itself 
+	 * onto the AbstractContext_EP_DumpClass entry point. */
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
 
 	renderingEngine = Stg_ComponentFactory_ConstructByKey( cf, self->name, "RenderingEngine", lucRenderingEngine, True, data );
@@ -292,7 +326,11 @@ void _lucWindow_Construct( void* window, Stg_ComponentFactory* cf, void* data ) 
 			width,
 			height,
 			Stg_ComponentFactory_GetString( cf, self->name, "backgroundColour", "white" ),
-			interactive );
+			interactive,
+			continuous,
+			Stg_ComponentFactory_GetBool( cf, self->name, "isTimedOut", True ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, "maxIdleTime", 600.0 ) 
+			);
 		
 	/* Free Memory */
 	Memory_Free(viewportInfoList); 
@@ -303,24 +341,113 @@ void _lucWindow_Construct( void* window, Stg_ComponentFactory* cf, void* data ) 
 
 }
 
-void _lucWindow_Build( void* window, void* data ) { }
-void _lucWindow_Initialise( void* window, void* data ) { }
-void _lucWindow_Execute( void* window, void* data ) { 
-	lucWindow*     self         = (lucWindow*) window ;
+void _lucWindow_Build( void* window, void* data ) {
+	/* Save context and master flag */
+	lucWindow*  self = (lucWindow*)window;
+	self->context   = (AbstractContext*) data;
+	self->isMaster = (self->context->rank == MASTER);
+}
 
+void _lucWindow_Initialise( void* window, void* data ) {
+	lucWindow*           self            = (lucWindow*)window;
+
+	/* Setup fonts */
+	_lucWindow_SetupGLRasterFont( self );
+
+	/* Flag display lists must be created and objects drawn */
 	lucWindow_SetViewportNeedsToSetupFlag( self, True );
 	lucWindow_SetViewportNeedsToDrawFlag( self, True );
-
-	lucWindow_Draw( self, data );
-	lucWindow_Dump( self, data );
-	lucWindow_CleanUp( self, data );
 }
-void _lucWindow_Destroy( void* window, void* data ) { }
 
-void lucWindow_Draw( void* window, AbstractContext* context ) {
+void _lucWindow_Execute( void* window, void* data ) { 
+	/* Display graphics and allow GUI interaction if enabled */
 	lucWindow*     self         = (lucWindow*) window ;
+	lucDebug_PrintFunctionBegin( self, 1 );
+	
+	/* Reset idle timer */
+	lucWindow_IdleReset(self);	
+	
+	/* Flag viewports need to re-render new information */
+	lucWindow_SetViewportNeedsToSetupFlag( self, True );
+	lucWindow_SetViewportNeedsToDrawFlag( self, True );
+	
+	/* Draw Window (Call virtual to display) 
+	 initial output for background & interactive modes */
+	self->_displayWindow( self );
+	
+	/* Interactive mode? Enter event loop processing */
+	if ( self->isMaster && self->interactive ) {
+		lucWindow_InteractionHelpMessage( self, Journal_MyStream( Info_Type, self ) );
+		
+		/* Clear quit flags */
+		self->quitEventLoop = False;
+		self->toggleApplicationQuit = False;
+		
+		while ( !self->quitEventLoop ) {
+			
+			/* Check for events */
+			int events = self->_eventsWaiting(self);
+			if (self->continuous && events == 0)
+			/* Continuous mode and no events waiting, quit loop */
+				self->quitEventLoop = True; 
+			else	
+			/* Call virtual to wait for and process events */
+				if (!self->_eventProcessor(self)) 
+					continue;   /* skip redisplay if false returned) */
+			
+			/* Redraw Window (Call virtual to display) */
+			self->_displayWindow( self );
+		}
+		
+		/* Close application if requested */
+		if( self->toggleApplicationQuit ) {
+			self->context->gracefulQuit = True;
+		}
+	}
+	
+	/* Dump outputs to disk */
+	if ( self->isMaster ) lucWindow_Dump( self, self->context );
+	
+	/* Broadcast information */
+	MPI_Bcast( &self->quitEventLoop, 1, MPI_INT, MASTER, self->context->communicator );
+	MPI_Bcast( &self->interactive, 1, MPI_INT, MASTER, self->context->communicator );
+	
+	/* Stop idle timeout */
+	self->idleTime = 0;
+	
+	lucDebug_PrintFunctionEnd( self, 1 );
+}
 
-	lucRenderingEngine_Render( self->renderingEngine, self, context );
+void _lucWindow_Destroy( void* window, void* data ) {
+	lucWindow*     self      = (lucWindow*)window;
+
+	lucWindow_CleanUp( window, data );
+	
+	Memory_Free(self->title);
+
+}
+
+void lucWindow_Display( void* window )
+{
+	/* Default display function... */
+	lucWindow*     self      = (lucWindow*)window;
+
+	lucRenderingEngine_Render( self->renderingEngine, self, self->context );
+}
+
+int lucWindow_EventsWaiting( void* window )
+{
+	/* Dummy events waiting function... */
+	return 0;
+}
+
+Bool lucWindow_EventProcessor( void *window)
+{
+	/* Dummy event processor function... */
+	lucWindow*     self      = (lucWindow*)window;
+	self->quitEventLoop = True;
+	/* Returns true if event processed */
+	return True;
 }
 
 void lucWindow_Dump( void* window, AbstractContext* context ) {
@@ -329,7 +456,7 @@ void lucWindow_Dump( void* window, AbstractContext* context ) {
 	Pixel_Index    height       = self->height;
 	lucPixel*      imageBuffer  = NULL;
 	Stream*        errorStream  = Journal_MyStream( Error_Type, self );
-	
+
 	lucDebug_PrintFunctionBegin( self, 1 );
 
 	/* Allocate Memory */
@@ -360,18 +487,21 @@ void lucWindow_CleanUp( void* window, void* context ) {
 	}
 }
 
-void lucWindow_MouseMotion( void* window, lucMouseButton button, Pixel_Index xpos, Pixel_Index ypos, Pixel_Index startx, Pixel_Index starty) {
+/* Window event processing - mouse & keyboard */
+void lucWindow_MouseMotion( void* window, lucMouseButton button, Pixel_Index xpos, Pixel_Index ypos) {
 	lucWindow*            self      = (lucWindow*) window;
 	Index                 windowInteraction_I;
 	Index                 windowInteractionCount = lucWindowInteraction_Register_GetCount( self->windowInteraction_Register ); 
 	lucWindowInteraction* windowInteraction;
-	
-	lucDebug_PrintFunctionBegin( self, 2 );
 
+	lucDebug_PrintFunctionBegin( self, 2 );
+	
 	for ( windowInteraction_I = 0 ; windowInteraction_I < windowInteractionCount ; windowInteraction_I++ ) {
 		windowInteraction = lucWindowInteraction_Register_GetByIndex( self->windowInteraction_Register, windowInteraction_I );
-		lucWindowInteraction_MouseMotion( windowInteraction, window, button, xpos, ypos, startx, starty );
+		lucWindowInteraction_MouseMotion( windowInteraction, window, button, xpos, ypos, self->startx, self->starty );
 	}
+	self->startx = xpos;
+	self->starty = ypos;
 
 	lucDebug_PrintFunctionEnd( self, 2 );
 }
@@ -383,11 +513,12 @@ void lucWindow_MouseClick( void* window, lucMouseButton button, lucMouseState st
 	lucWindowInteraction* windowInteraction;
 	
 	lucDebug_PrintFunctionBegin( self, 2 );
-
 	for ( windowInteraction_I = 0 ; windowInteraction_I < windowInteractionCount ; windowInteraction_I++ ) {
 		windowInteraction = lucWindowInteraction_Register_GetByIndex( self->windowInteraction_Register, windowInteraction_I );
 		lucWindowInteraction_MouseClick( windowInteraction, window, button, state, xpos, ypos );
 	}
+	self->startx = xpos;
+	self->starty = ypos;
 
 	lucDebug_PrintFunctionEnd( self, 2 );
 }
@@ -404,6 +535,8 @@ void lucWindow_KeyboardEvent( void* window, char key, Pixel_Index xpos, Pixel_In
 		windowInteraction = lucWindowInteraction_Register_GetByIndex( self->windowInteraction_Register, windowInteraction_I );
 		lucWindowInteraction_KeyboardEvent( windowInteraction, window, key, xpos, ypos );
 	}
+	self->startx = xpos;
+	self->starty = ypos;
 
 	lucDebug_PrintFunctionEnd( self, 2 );
 }
@@ -514,7 +647,7 @@ void lucWindow_SetViewportNeedsToSetupFlag( void* window, Bool flag ) {
 void lucWindow_SetViewportNeedsToDrawFlag( void* window, Bool flag ) {
 	lucWindow*              self         = (lucWindow*) window ;
 	Viewport_Index          viewport_I;
-	
+
 	lucDebug_PrintFunctionBegin( self, 2 );
 	
 	for ( viewport_I = 0 ; viewport_I < self->viewportCount ; viewport_I++ ) {
@@ -859,8 +992,6 @@ void _lucWindow_SetupGLRasterFont( void* window ) {
 		glBitmap(8, 13, 0.0, 2.0, 10.0, 0.0, rasters[i]);
 		glEndList();
 	}
-	glListBase(2000);
-
 }	
 
 void lucWindow_ChangeInteractiveMode( void* window ) {
@@ -869,11 +1000,9 @@ void lucWindow_ChangeInteractiveMode( void* window ) {
 }
 
 
-void lucWindow_BeginEventLoop( void* window ) {
+void lucWindow_ChangeContinuousMode( void* window ) {
 	lucWindow*              self         = (lucWindow*) window ;
-
-	self->quitEventLoop = False;
-	self->toggleApplicationQuit = False;
+	self->continuous = !self->continuous;
 }
 
 void lucWindow_QuitEventLoop( void* window ) {
@@ -894,22 +1023,53 @@ void lucWindow_Resize( void* window, Pixel_Index newWidth, Pixel_Index newHeight
 	Viewport_Index   viewport_I;
 	Viewport_Index   viewportCount = self->viewportCount;
 	lucViewportInfo* viewportInfo;
-	double           xScale = (double) newWidth  / (double) self->width;
-	double           yScale = (double) newHeight / (double) self->height;
 
+	/* Pixel data returned is corrupt after resize unless dimensions multiple of 4, 
+	   so force until can determine why - clear at full size before rounding */
+	Pixel_Index nWidth = newWidth - newWidth % 4;
+	Pixel_Index nHeight = newHeight - newHeight % 4;
+	double xScale = (double) nWidth  / (double) self->width;
+	double yScale = (double) nHeight / (double) self->height;
+	self->width = newWidth;
+	self->height = newHeight;
+	lucRenderingEngine_Clear(self->renderingEngine, self, True);
+	self->_displayWindow(window);   /* Refresh display after blanking window */
+		
 	for ( viewport_I = 0 ; viewport_I < viewportCount ; viewport_I++ ) {
 		viewportInfo = &self->viewportInfoList[ viewport_I ];
-		
+		/* Scale both dimensions and position, rounding up */
 		viewportInfo->startx = (Pixel_Index) ( xScale * (double) viewportInfo->startx + 0.5 );
 		viewportInfo->width  = (Pixel_Index) ( xScale * (double) viewportInfo->width  + 0.5 );
 		viewportInfo->starty = (Pixel_Index) ( yScale * (double) viewportInfo->starty + 0.5 );
 		viewportInfo->height = (Pixel_Index) ( yScale * (double) viewportInfo->height + 0.5 );
 		viewportInfo->needsToDraw = True;
 	}
-	
-	self->width = newWidth;
-	self->height = newHeight;
 
+	self->width = nWidth;
+	self->height = nHeight;
+
+	Journal_DPrintfL( lucDebug, 2, "Window resized %d x %d\n", self->width, self->height);
+
+	/* Redraw graphics */
+	self->_displayWindow(window);
+}
+
+void lucWindow_IdleReset(void *window) {
+	/* Update Idle timer */
+	lucWindow* self = (lucWindow*)window;
+	self->idleTime = MPI_Wtime();
+}
+
+void lucWindow_IdleCheck(void *window) {
+	lucWindow* self = (lucWindow*)window;
+	if (self->isTimedOut && self->idleTime > 0){
+		if ( MPI_Wtime() > self->idleTime + self->maxIdleTime ) {
+			Journal_Printf( lucError, "Error in func '%s' - Interactive window '%s' open for too long (over %g seconds) without interaction.\n",
+							__func__, self->name, self->maxIdleTime );
+			abort();
+		}
+	}
 }
 
 #endif /* HAVE_GL */
+

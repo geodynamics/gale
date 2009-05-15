@@ -44,11 +44,9 @@
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 #ifdef HAVE_CARBON
 
-#include <mpi.h>
 #include <StGermain/StGermain.h>
 #include <StgDomain/StgDomain.h>
 
-#include <Carbon/Carbon.h>
 #include <AGL/agl.h>
 #include <OpenGL/OpenGL.h>
 
@@ -59,10 +57,6 @@
 
 #include <assert.h>
 
-#ifndef MASTER
-	#define MASTER 0
-#endif
-	
 static pascal OSStatus lucCarbonWindow_EventHandler(EventHandlerCallRef nextHandler, EventRef event, void *data) ;
 Bool lucCarbonWindow_IsPointOutsideWindow( lucCarbonWindow* self, Point* point ) ;
 void lucCarbonWindow_GetPixelIndicies( lucCarbonWindow* self, Point* point, Pixel_Index *xPos, Pixel_Index *yPos ) ;
@@ -87,6 +81,9 @@ lucCarbonWindow* _lucCarbonWindow_New(
 		Stg_Component_InitialiseFunction*                  _initialise,
 		Stg_Component_ExecuteFunction*                     _execute,
 		Stg_Component_DestroyFunction*                     _destroy,
+		lucWindow_DisplayFunction*						   _displayWindow,	
+		lucWindow_EventsWaitingFunction*				   _eventsWaiting,	
+		lucWindow_EventProcessorFunction*				   _eventProcessor,	
 		Name                                               name ) 
 {
 	lucCarbonWindow*					self;
@@ -105,6 +102,9 @@ lucCarbonWindow* _lucCarbonWindow_New(
 			_initialise,
 			_execute,
 			_destroy,
+			_displayWindow,		
+			_eventsWaiting,		
+			_eventProcessor,	
 			name );
 	
 	return self;
@@ -116,27 +116,12 @@ void _lucCarbonWindow_Init(
 		Pixel_Index                                        offsetY,
 		double                                             maxIdleTime ) 
 {
-	int titleLength;
-
-	/* Title */
-	titleLength = strlen( self->name );
-	self->title = Memory_Alloc_Array( unsigned char, titleLength + 2, "title + extras" );
-	self->title[ 0 ] = (unsigned char) titleLength;
-	strcpy( (char*) (self->title + 1), self->name );
-	
 	self->offsetX = offsetX;
 	self->offsetY = offsetY;
-
-	self->fontID = 0;
-	self->fontSize = 12;
 }
 
 void _lucCarbonWindow_Delete( void* window ) {
-	lucCarbonWindow*  self = (lucCarbonWindow*)window;
-
-	Memory_Free( self->title );
-
-	_lucWindow_Delete( self );
+	_lucWindow_Delete( window );
 }
 
 void _lucCarbonWindow_Print( void* window, Stream* stream ) {
@@ -171,6 +156,9 @@ void* _lucCarbonWindow_DefaultNew( Name name ) {
 		_lucCarbonWindow_Initialise,
 		_lucCarbonWindow_Execute,
 		_lucCarbonWindow_Destroy,
+		_lucCarbonWindow_Display,
+		_lucCarbonWindow_EventsWaiting,
+		_lucCarbonWindow_EventProcessor,
 		name );
 }
 
@@ -187,169 +175,103 @@ void _lucCarbonWindow_Construct( void* window, Stg_ComponentFactory* cf, void* d
 			Stg_ComponentFactory_GetDouble( cf, self->name, "maxIdleTime", 600.0 ) );
 }
 
-void _lucCarbonWindow_Build( void* window, void* data ) {}
-void _lucCarbonWindow_Initialise( void* window, void* data ) {}
-
-void _lucCarbonWindow_Execute( void* carbonWindow, void* data ) {
-	lucCarbonWindow*        self       = (lucCarbonWindow*) carbonWindow; 
-	
-	lucWindow_SetViewportNeedsToSetupFlag( self, True );
-	lucWindow_SetViewportNeedsToDrawFlag( self, True );
-	
-	self->currentContext = (AbstractContext*) data;
-	
-	if (self->interactive) {
-		_lucCarbonWindow_ExecuteInteractive( self, data );
-	}
-	else {
-		_lucCarbonWindow_ExecuteOffscreen( self, data );
-	}
+void _lucCarbonWindow_Build( void* window, void* data ) {
+	/* Run the parent function to build window... */
+	_lucWindow_Build(window, data);	
 }
 
-
-void _lucCarbonWindow_ExecuteOffscreen( void* carbonWindow, void* data ) {
-	lucCarbonWindow*        self       = (lucCarbonWindow*) carbonWindow; 
-
-	lucCarbonWindow_CreateBackgroundWindow( self, data );
-
-	/***** Perform offscreen drawing *****/
-	/* Setup fonts */
-	_lucWindow_SetupGLRasterFont( self );
-
-	lucWindow_Draw( self, self->currentContext );	
-	
-	/* Dump image */
-	lucWindow_Dump( self, data );
-
-	/* Clean Up */
-	lucWindow_CleanUp( self, data );
-	
-	lucCarbonWindow_DestroyWindow( self, data );
-}
-
-
-	
-void _lucCarbonWindow_ExecuteInteractive( void* carbonWindow, void* data ) {
-	lucCarbonWindow*        self = (lucCarbonWindow*) carbonWindow; 
-	AbstractContext*        context;
-	Bool                    iAmMaster;
-
-	lucDebug_PrintFunctionBegin( self, 1 );
-
-	context   = self->currentContext;
-	iAmMaster = ( context->rank == MASTER );
-
+void _lucCarbonWindow_Initialise( void* window, void* data ) {
+	/* OK: Moved from ExecuteInteractive/Offscreen */
+	lucCarbonWindow*     self      = (lucCarbonWindow*)window;
+		
 	/* Create the window...  */
-	lucCarbonWindow_CreateWindow( self, data );
-
-	/* Loop for interactivity */
-	lucWindow_BeginEventLoop( self );
-	while ( !self->quitEventLoop ) {
-		if ( iAmMaster ) {
-			if (self->windowIsVisible)
-				SetEventLoopTimerNextFireTime( self->timer, 0.05);
-
-			RunApplicationEventLoop();
-		}
-
-		/* Broadcast information about loop */
-		MPI_Bcast( &self->quitEventLoop,        1, MPI_INT, MASTER, context->communicator );
-		MPI_Bcast( &self->interactive,          1, MPI_INT, MASTER, context->communicator );
-		MPI_Bcast( &self->windowIsVisible,      1, MPI_INT, MASTER, context->communicator );
-		MPI_Bcast( &self->hackNonInteractive,   1, MPI_INT, MASTER, context->communicator );
-
-		if (self->hackNonInteractive) {
-			lucCarbonWindow_Draw(self);
-			break;
-		}
-
-		if (self->windowIsVisible) {
-			lucCarbonWindow_Draw(self);
-		}
-
-		if ( !self->interactive )
-			break;
-	}
-
-	/* Dump image */
-	if ( iAmMaster )
-		lucWindow_Dump( self, data );
-
-	/* Clean Up */
-	lucWindow_CleanUp( self, data );
-
-	lucCarbonWindow_DestroyWindow( self, data );
-
-	lucDebug_PrintFunctionEnd( self, 1 );
-
-}
-
-void _lucCarbonWindow_Destroy( void* window, void* data ) {}
-
-void lucCarbonWindow_Draw( void* window ) {
-	lucCarbonWindow*        self        = (lucCarbonWindow*) window;
-	AbstractContext*        context     = self->currentContext;
-	Bool                    iAmMaster   = ( context->rank == MASTER );
-	
-	lucDebug_PrintFunctionBegin( self, 2 );
-
-	if ( self->windowIsInteractive )
-		aglSetCurrentContext(self->graphicsContext);
-
-	/* Setup fonts */
-	_lucWindow_SetupGLRasterFont( self );
-#if 0
-	aglUseFont( self->graphicsContext, self->fontID, bold, self->fontSize, 32, 96, 2000 );
-	glListBase(2000);
-#endif
-
-	lucWindow_Draw( self, self->currentContext );
-	if ( iAmMaster )
-		aglSwapBuffers(self->graphicsContext);
-	
-	lucDebug_PrintFunctionEnd( self, 2 );
-}
-
-
-
-void lucCarbonWindow_CreateWindow( void* carbonWindow, void* data ) {
-	lucCarbonWindow*        self      = (lucCarbonWindow*) carbonWindow; 
-	AbstractContext*        context   = self->currentContext;
-	Bool                    iAmMaster = ( context->rank == MASTER );
-
-	if ( iAmMaster && self->interactive ) {
-		lucCarbonWindow_CreateInteractiveWindow( self, data );
+	if ( self->isMaster && self->interactive ) {
+		lucCarbonWindow_CreateInteractiveWindow( self );
 	}
 	else {
-		lucCarbonWindow_CreateBackgroundWindow( self, data );
-	}
+		lucCarbonWindow_CreateBackgroundWindow( self );
+	}	
+
+	/* Run the parent function to init window... */
+	_lucWindow_Initialise(window, data);	
 }
 
-void lucCarbonWindow_CreateInteractiveWindow( void* carbonWindow, void* data ) {
-	lucCarbonWindow*        self = (lucCarbonWindow*) carbonWindow; 
+
+void _lucCarbonWindow_Execute( void* window, void* data ) {
+
+	/* Post a dummy event, hack to ensure waiting events are processed in continuous mode */
+	if (_lucCarbonWindow_EventsWaiting(window) == 0)
+	{
+		EventRef dummyEvent;
+		OSStatus        err;
+		err = CreateEvent(NULL, kEventClassWindow, kEventWindowDrawContent, GetCurrentEventTime(), kEventAttributeNone, &dummyEvent);
+		if (err == noErr) err = PostEventToQueue(GetMainEventQueue(), dummyEvent, kEventPriorityHigh);
+	}
+	
+	/* Run the parent function to execute window... */
+	_lucWindow_Execute(window, data);	
+}
+
+void _lucCarbonWindow_Destroy( void* window, void* data ) {
+	lucCarbonWindow*        self = (lucCarbonWindow*) window; 
+
+	/* Run the parent function to destroy window... */
+	_lucWindow_Destroy(window, data);	
+	
+	/* Destroy the window...  */
+	if ( self->window )
+		lucCarbonWindow_DestroyInteractiveWindow( self );
+	else 
+		lucCarbonWindow_DestroyBackgroundWindow( self );
+}
+
+/* Window Virtuals */
+void _lucCarbonWindow_Display( void* window ) {
+	lucCarbonWindow*        self = (lucCarbonWindow*) window; 
+	
+	/* Run the parent function to display window... */
+	lucWindow_Display(window);	
+
+	/* Swap buffers if interactive */
+	if ( self->isMaster && self->interactive)
+		aglSwapBuffers(self->graphicsContext);
+}
+
+int _lucCarbonWindow_EventsWaiting( void* window ) {
+	EventQueueRef evq = GetMainEventQueue();
+	return GetNumEventsInQueue(evq);
+}
+
+Bool _lucCarbonWindow_EventProcessor( void* window ) {
+
+	RunApplicationEventLoop();
+	/* Returns true if event processed */
+	return True;	return True;
+}
+
+
+void lucCarbonWindow_CreateInteractiveWindow( void* window ) {
+	lucCarbonWindow*        self = (lucCarbonWindow*) window; 
 	AGLPixelFormat          format;		/* OpenGL pixel format */
-	WindowPtr               window;		/* Window */
 	int                     winattrs;	/* Window attributes */
 	Rect                    rect;		/* Rectangle definition */
-	EventHandlerUPP	        handler;	/* Event handler */
-	EventLoopTimerUPP       thandler;	/* Timer handler */
-	EventLoopTimerRef       timer;		/* Timer for animating the window */
 	ProcessSerialNumber     psn;		/* Process serial number */
 	static EventTypeSpec    events[] =	/* Events we are interested in... */
 			{
 			  { kEventClassMouse, kEventMouseDown },
 			  { kEventClassMouse, kEventMouseUp },
-			  { kEventClassMouse, kEventMouseMoved },
+//			  { kEventClassMouse, kEventMouseMoved },
 			  { kEventClassMouse, kEventMouseDragged },
 			  { kEventClassMouse, kEventMouseWheelMoved },
 			  { kEventClassKeyboard, kEventRawKeyDown },
 			  { kEventClassWindow, kEventWindowDrawContent },
-			  { kEventClassWindow, kEventWindowShown },
-			  { kEventClassWindow, kEventWindowHidden },
-			  { kEventClassWindow, kEventWindowActivated },
-			  { kEventClassWindow, kEventWindowDeactivated },
+//			  { kEventClassWindow, kEventWindowShown },
+//			  { kEventClassWindow, kEventWindowHidden },
+//			  { kEventClassWindow, kEventWindowActivated },
+//			  { kEventClassWindow, kEventWindowDeactivated },
 			  { kEventClassWindow, kEventWindowClose },
-			  { kEventClassWindow, kEventWindowBoundsChanged }
+			  { kEventClassWindow, kEventWindowBoundsChanged },
+			  { kEventClassWindow, kEventWindowResizeCompleted},
 			};
 	static GLint 		attributes[] =	/* OpenGL attributes */
 			{
@@ -362,16 +284,9 @@ void lucCarbonWindow_CreateInteractiveWindow( void* carbonWindow, void* data ) {
 
 	lucDebug_PrintFunctionBegin( self, 1 );
 
-	Journal_Firewall( 
-			self->currentContext->rank == MASTER,
-			Journal_MyStream( Error_Type, self ),
-			"Error in func %s for %s '%s':\n"
-			"Only the MASTER processor should be calling this function.\n", 
-			__func__, self->type, self->name );
-
 	/* Create the window...  */
 	self->graphicsContext = NULL;
-	self->windowIsVisible = False;
+	//self->windowIsVisible = False;
 
 	SetRect(&rect, (int)self->offsetX, (int) self->offsetY, (int) (self->width + self->offsetX), (int) (self->height + self->offsetY) );
 
@@ -380,33 +295,24 @@ void lucCarbonWindow_CreateInteractiveWindow( void* carbonWindow, void* data ) {
 		     kWindowResizableAttribute | kWindowLiveResizeAttribute;
 	winattrs &= GetAvailableWindowAttributes(kDocumentWindowClass);
 
-	CreateNewWindow(kDocumentWindowClass, winattrs, &rect, &window);
-	SetWTitle(window, self->title);
+	CreateNewWindow(kDocumentWindowClass, winattrs, &rect, &self->window);
+	SetWTitle(self->window, (unsigned char*)self->title);
+//	SetWindowTitleWithCFString(self->window, CFSTR(self->title));
 
-	handler = NewEventHandlerUPP(lucCarbonWindow_EventHandler);
-	InstallWindowEventHandler(window, handler,
-				    sizeof(events) / sizeof(events[0]),
-				    events, self, 0L);
-	thandler = NewEventLoopTimerUPP((void (*)(EventLoopTimerRef, void *)) lucCarbonWindow_IdleFunc );
-	InstallEventLoopTimer(GetMainEventLoop(), 0, 0, thandler, 0, &timer);
+	self->handler = NewEventHandlerUPP(lucCarbonWindow_EventHandler);
+	InstallWindowEventHandler(self->window, self->handler, sizeof(events) / sizeof(events[0]), events, self, 0L);
 
-	/* This hack with the 'if' condition is to make the CarbonWindowing code not crash if it starts with an interactive window then starts to use a non-interactive window - if it was originally interactive it must continue to use the same windowing code, but we will just arrange so that it doesn't show up for the user */
-	if ( ! self->hackNonInteractive ) {
-		GetCurrentProcess(&psn);
-		/* this is a secret undocumented Mac function that allows code that isn't part of a bundle to be a foreground operation */
-		CPSEnableForegroundOperation( &psn ); 
-		SetFrontProcess( &psn );
+    self->timerHandler = NewEventLoopIdleTimerUPP(lucCarbonWindow_IdleTimer);
+    InstallEventLoopIdleTimer(GetMainEventLoop(), kEventDurationSecond * 2, kEventDurationSecond * 1, self->timerHandler, self, &self->timer);
 
-		/* Window operations - Not all of these are nessesary */
-		DrawGrowIcon(window);
-		ShowWindow(window);
-		SetUserFocusWindow( window );
-		BringToFront( window );
-		ActivateWindow( window, true );
-		SelectWindow(window);
+	GetCurrentProcess(&psn);
+	/* this is a secret undocumented Mac function that allows code that isn't part of a bundle to be a foreground operation */
+	CPSEnableForegroundOperation( &psn ); 
+	SetFrontProcess( &psn );
 
-		lucWindow_InteractionHelpMessage( self, Journal_MyStream( Info_Type, self ) );
-	}
+	/* Show Window */
+	ShowWindow(self->window);
+	SelectWindow(self->window);
 
 	/* Create the OpenGL context and bind it to the window.  */
 	format = aglChoosePixelFormat(NULL, 0, attributes);
@@ -414,19 +320,15 @@ void lucCarbonWindow_CreateInteractiveWindow( void* carbonWindow, void* data ) {
 	assert( self->graphicsContext );
 	aglDestroyPixelFormat(format);
 	
-	aglSetDrawable(self->graphicsContext, GetWindowPort(window));
+	aglSetDrawable(self->graphicsContext, GetWindowPort(self->window));
+	aglSetCurrentContext(self->graphicsContext);
 
-	self->windowIsInteractive = True;
-	self->timer = timer;
-	self->timerHandler = thandler;
-	self->handler = handler;
-	self->window = window;
 }
 
 /* Steps taken from http://gemma.apple.com/documentation/GraphicsImaging/Conceptual/OpenGL-MacProgGuide/OpenGLProg_MacOSX.pdf */
 
-void lucCarbonWindow_CreateBackgroundWindow( void* carbonWindow, void* data ) {
-	lucCarbonWindow*        self       = (lucCarbonWindow*) carbonWindow; 
+void lucCarbonWindow_CreateBackgroundWindow( void* window ) {
+	lucCarbonWindow*        self       = (lucCarbonWindow*) window; 
 
 	GLint                   numPixelFormats;
 	CGLContextObj           contextObj;
@@ -440,13 +342,6 @@ void lucCarbonWindow_CreateBackgroundWindow( void* carbonWindow, void* data ) {
 	 * Sets up an array of pixel format attributes 
 	 * - an offscreen drawable object and a color buffer with a size of 32 bytes. 
 	 * Note that the list must be terminated by NULL. */
-	
-/*	CGLPixelFormatAttribute attribs[] = 	{
-		kCGLPFARemotePBuffer,
-		kCGLPFAOffScreen,
-		kCGLPFAColorSize, 32,
-		NULL
-	} ; */
 	
 	/* Note: the apple document referred to above was recently updated */
 	
@@ -504,45 +399,43 @@ void lucCarbonWindow_CreateBackgroundWindow( void* carbonWindow, void* data ) {
 		Journal_DPrintf( lucDebug,"Error setting up background window (Step 6): %s", CGLErrorString(cglReturnValue));
 
 	/* Set pointer to graphics context on my object */
-	self->windowIsInteractive = False;
 	self->graphicsContext = contextObj;
+	
+	self->window = 0;
 }
 
+void lucCarbonWindow_DestroyInteractiveWindow( void* window ) {
+	lucCarbonWindow*        self      = (lucCarbonWindow*) window; 
 
-void lucCarbonWindow_DestroyWindow( void* carbonWindow, void* data ) {
-	lucCarbonWindow*        self      = (lucCarbonWindow*) carbonWindow; 
+	DisposeEventHandlerUPP( self->handler ); 
+    if (self->timer != NULL) RemoveEventLoopTimer( self->timer );
+    DisposeEventLoopIdleTimerUPP( self->timerHandler ); 
+	DisposeWindow( self->window );
 
-	if ( self->windowIsInteractive ) {
-		RemoveEventLoopTimer( self->timer );
-		DisposeEventLoopTimerUPP( self->timerHandler ); 
-		DisposeEventHandlerUPP( self->handler ); 
-		DisposeWindow( self->window );
+	aglSetDrawable( self->graphicsContext, 0 );
+	aglSetCurrentContext( 0 );
+	aglDestroyContext( self->graphicsContext );
+	self->graphicsContext = NULL;
+}
 
-		aglSetDrawable( self->graphicsContext, 0 );
-		aglSetCurrentContext( 0 );
-		aglDestroyContext( self->graphicsContext );
-		self->graphicsContext = NULL;
-	}
+void lucCarbonWindow_DestroyBackgroundWindow( void* window ) {
+	lucCarbonWindow*        self      = (lucCarbonWindow*) window; 
+
+	CGLContextObj contextObj = (CGLContextObj) self->graphicsContext;
+	CGLPBufferObj pBuffer;
+	CGLError cglReturnValue;
+	GLenum face;
+	GLint level;
+	GLint screen;
 	
-	else {
-				
-		CGLContextObj contextObj = (CGLContextObj) self->graphicsContext;
-		CGLPBufferObj pBuffer;
-		CGLError cglReturnValue;
-		GLenum face;
-		GLint level;
-		GLint screen;
+	cglReturnValue = CGLGetPBuffer( contextObj, &pBuffer, &face, &level, &screen ) ;		
+	if(cglReturnValue != kCGLNoError)
+		Journal_DPrintf( lucDebug,"Error cleaning up background window: %s", CGLErrorString(cglReturnValue));
 	
-		cglReturnValue = CGLGetPBuffer( contextObj, &pBuffer, &face, &level, &screen ) ;		
-		if(cglReturnValue != kCGLNoError)
-			Journal_DPrintf( lucDebug,"Error cleaning up background window: %s", CGLErrorString(cglReturnValue));
-		
-		
-			CGLDestroyPBuffer (pBuffer);
-			CGLSetCurrentContext (NULL);
-			CGLClearDrawable (contextObj);
-			CGLDestroyContext (contextObj);		
-	}
+	CGLDestroyPBuffer (pBuffer);
+	CGLSetCurrentContext (NULL);
+	CGLClearDrawable (contextObj);
+	CGLDestroyContext (contextObj);		
 }
 
 static pascal OSStatus lucCarbonWindow_EventHandler(EventHandlerCallRef nextHandler, EventRef event, void* userData) {
@@ -551,10 +444,9 @@ static pascal OSStatus lucCarbonWindow_EventHandler(EventHandlerCallRef nextHand
 	Rect                    rect;			/* New window size */
 	EventMouseButton        button;			/* Mouse button */
 	static Point            point;			/* Mouse position */
-	static Pixel_Index      startx      = 0;
-	static Pixel_Index      starty      = 0;
 	static lucMouseButton   whichButton = 0;
 	static lucMouseState    mouseState  = 0;
+	static Pixel_Index      width, height;
 	EventClass              eventClass;
 	Pixel_Index             xPos, yPos;
 	SInt32					delta;
@@ -567,34 +459,27 @@ static pascal OSStatus lucCarbonWindow_EventHandler(EventHandlerCallRef nextHand
 	if (eventClass == kEventClassWindow) {
 		switch (kind) {
 			case kEventWindowDrawContent:
-				if (self->windowIsVisible && self->graphicsContext) 
-					lucCarbonWindow_Draw(self); 
 				break; 
+			case kEventWindowResizeCompleted:
+				if (self->width != width || self->height != height)
+				{
+					aglSetCurrentContext (self->graphicsContext);
+					aglUpdateContext (self->graphicsContext);
+					lucWindow_Resize( self, width, height );
+				}	
+				break;
 			case kEventWindowBoundsChanged:
-			       GetEventParameter(event, kEventParamCurrentBounds, typeQDRectangle, NULL, sizeof(Rect), NULL, &rect); 
-			       
-			       if (self->graphicsContext)
-				      aglUpdateContext(self->graphicsContext);
-
-			       self->offsetX = (Pixel_Index) rect.left;
-			       self->offsetY = (Pixel_Index) rect.top; 
-			       lucWindow_Resize( self, (Pixel_Index) (rect.right - rect.left), (Pixel_Index) (rect.bottom - rect.top) );
-			       
-			       if (self->windowIsVisible && self->graphicsContext)
-				      lucCarbonWindow_Draw(self); 
-			       break; 
-			case kEventWindowShown: 
-			       self->windowIsVisible = True; 
-			       
-			       if (self->graphicsContext) 
-				       lucCarbonWindow_Draw(self); 
-			       break; 
-			case kEventWindowHidden: 
-			       self->windowIsVisible = False; 
-			       break; 
-			
+			{
+				GetEventParameter(event, kEventParamCurrentBounds, typeQDRectangle, NULL, sizeof(Rect), NULL, &rect); 
+				width =  (Pixel_Index) (rect.right - rect.left);
+				height = (Pixel_Index) (rect.bottom - rect.top);
+				self->offsetX = (Pixel_Index) rect.left;
+				self->offsetY = (Pixel_Index) rect.top; 
+				break; 
+			}
 			case kEventWindowClose: 
-				   lucWindow_QuitEventLoop( self );
+				   lucWindow_ToggleApplicationQuit(self);
+				   self->quitEventLoop = true;
 			       break; 
 		} 
 	} 
@@ -605,19 +490,17 @@ static pascal OSStatus lucCarbonWindow_EventHandler(EventHandlerCallRef nextHand
 			lucCarbonWindow_GetPixelIndicies( self, &point, &xPos, &yPos );
 
 			lucWindow_KeyboardEvent( self, key, xPos, yPos );
-			/* HACK */
-			if ( key == 'i' ) {
-				self->interactive = true;
-				self->hackNonInteractive = true;
+
+			if ( !self->interactive )
+			{
+				/* Hide Window */
+				HideWindow(self->window);
 				self->quitEventLoop = true;
 			}
 		}
 	}
 	else if ( eventClass == kEventClassMouse ) { 
 		switch (kind) { 
-			case kEventMouseMoved:
-				GetEventParameter(event, kEventParamMouseLocation, typeQDPoint, NULL, sizeof(Point), NULL, &point); 
-				return (CallNextEventHandler(nextHandler, event)); 			
 			case kEventMouseDown:  case kEventMouseUp:
 				GetEventParameter(event, kEventParamMouseButton, typeMouseButton, NULL, sizeof(EventMouseButton), NULL, &button); 
 				GetEventParameter(event, kEventParamMouseLocation, typeQDPoint, NULL, sizeof(Point), NULL, &point); 
@@ -626,14 +509,14 @@ static pascal OSStatus lucCarbonWindow_EventHandler(EventHandlerCallRef nextHand
 				if ( lucCarbonWindow_IsPointOutsideWindow( self, &point )) 
 					return (CallNextEventHandler(nextHandler, event)); 
 					
-				lucCarbonWindow_GetPixelIndicies( self, &point, &startx, &starty );					
+				lucCarbonWindow_GetPixelIndicies( self, &point, &xPos, &yPos );
 
 				whichButton = ( button == kEventMouseButtonTertiary ? lucMiddleButton :
 						button == kEventMouseButtonSecondary ? lucRightButton : lucLeftButton );
 
 				mouseState = (kind == kEventMouseDown ? lucButtonPress : lucButtonRelease );
 
-				lucWindow_MouseClick( self, whichButton, mouseState, startx, starty);
+				lucWindow_MouseClick( self, whichButton, mouseState, xPos, yPos);
 				break; 
 			case kEventMouseDragged : 
 				GetEventParameter(event, kEventParamMouseLocation, typeQDPoint, NULL, sizeof(Point), NULL, &point); 
@@ -643,9 +526,7 @@ static pascal OSStatus lucCarbonWindow_EventHandler(EventHandlerCallRef nextHand
 					return (CallNextEventHandler(nextHandler, event)); 
 				
 				lucCarbonWindow_GetPixelIndicies( self, &point, &xPos, &yPos );
-				lucWindow_MouseMotion(self, whichButton, xPos, yPos, startx, starty);
-				startx = xPos;
-				starty = yPos;
+				lucWindow_MouseMotion(self, whichButton, xPos, yPos); 
 				break; 
 			case kEventMouseWheelMoved:
 				GetEventParameter(event, kEventParamMouseLocation, typeQDPoint, NULL, sizeof(Point), NULL, &point); 
@@ -654,12 +535,12 @@ static pascal OSStatus lucCarbonWindow_EventHandler(EventHandlerCallRef nextHand
 				/* Make sure that mouse click was within window */
 				if ( lucCarbonWindow_IsPointOutsideWindow( self, &point )) 
 					return (CallNextEventHandler(nextHandler, event)); 
-					
-				lucCarbonWindow_GetPixelIndicies( self, &point, &startx, &starty );					
+
+				lucCarbonWindow_GetPixelIndicies( self, &point, &xPos, &yPos );
 
 				whichButton = ( delta > 0 ? lucWheelUp : lucWheelDown );
 
-				lucWindow_MouseClick( self, whichButton, lucButtonPress, startx, starty);
+				lucWindow_MouseClick( self, whichButton, lucButtonPress, xPos, yPos);
 				break;
 			default : 
 				return (CallNextEventHandler(nextHandler, event)); 
@@ -669,13 +550,37 @@ static pascal OSStatus lucCarbonWindow_EventHandler(EventHandlerCallRef nextHand
 		Journal_Firewall( False, Journal_MyStream( Error_Type, self ), 
 				"In func '%s' - Cannot understand event class type '%d'\n", __func__, eventClass );
 	}
-	
-	/* Return whether we handled the event...  */ 
+
+	/* Break out of event processing if no more events */
+	if (self->quitEventLoop || _lucCarbonWindow_EventsWaiting(self) == 0)
+		QuitApplicationEventLoop();
+
 	return  noErr;
 }
 
-void lucCarbonWindow_IdleFunc() {
-  QuitApplicationEventLoop();
+pascal void lucCarbonWindow_IdleTimer(EventLoopTimerRef inTimer, EventLoopIdleTimerMessage inState, void * inUserData) {
+		
+	lucCarbonWindow*        self = (lucCarbonWindow*) inUserData;
+
+	/* idle timeout check */
+	if (inState == kEventLoopIdleTimerIdling)
+	{
+		if (self->interactive)
+			lucWindow_IdleCheck(inUserData);
+		else
+		{
+			RemoveEventLoopTimer( self->timer );
+			self->timer = NULL;
+		}
+
+		/* Drop out of event loop if in continuous mode */
+		if (self->continuous) QuitApplicationEventLoop();
+	}
+	else
+	{
+		/* Reset idle timer */
+		lucWindow_IdleReset(inUserData);
+	}
 }
 
 Bool lucCarbonWindow_IsPointOutsideWindow( lucCarbonWindow* self, Point* point ) {

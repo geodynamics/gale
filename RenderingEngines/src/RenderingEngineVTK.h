@@ -77,6 +77,7 @@
 		Stg_Component_ExecuteFunction*                     _execute,
 		Stg_Component_DestroyFunction*                     _destroy,
 		lucRenderingEngine_RenderFunction*                 _render,
+		lucRenderingEngine_ClearFunction*             	   _clear,
 		lucRenderingEngine_GetPixelDataFunction*           _getPixelData,
 		lucRenderingEngine_CompositeViewportFunction*      _compositeViewport,
 		Name                                               name );
@@ -94,10 +95,10 @@
 	void _lucRenderingEngineVTK_Destroy( void* renderingEngine, void* data ) ;
 
 	void _lucRenderingEngineVTK_Render( void* renderingEngine, lucWindow* window, AbstractContext* context ) ;
+	void _lucRenderingEngineVTK_Clear( void* renderingEngine, lucWindow* window, Bool clearAll ) ;
 	void _lucRenderingEngineVTK_GetPixelData( void* renderingEngine, lucWindow* window, lucPixel* buffer ) ;
 
 	void lucRenderingEngineVTK_DrawTitle( void* renderingEngine, lucWindow* window, lucViewportInfo* viewportInfo ) ;
-	void lucRenderingEngineVTK_Clear( void* renderingEngine, lucWindow* window ) ;
 
 	/** Compositing Functions */
 	Index lucRenderingEngineVTK_MapBufferIdToRank( void* renderingEngine, Index bufferId, Index mergeCount ) ;

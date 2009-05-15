@@ -336,6 +336,7 @@ void _lucWindowInteraction_KeyboardEvent( void* windowInteractor, lucWindow* win
 		case 'q': case ' ':
 			lucDebug_PrintFunctionEnd( self, 2 );
 			lucWindow_QuitEventLoop( window );
+			break;
 		case 'h': 
 			lucWindow_InteractionHelpMessage( window, Journal_MyStream( Info_Type, window ) );     
 			break;
@@ -360,7 +361,13 @@ void _lucWindowInteraction_KeyboardEvent( void* windowInteractor, lucWindow* win
 			if (viewport)
 				lucCamera_Zoom( viewport->camera, 0.9 );
 			break;
-			
+		case 'o':
+			lucWindow_ChangeContinuousMode( window );
+			Journal_Printf( Journal_MyStream( Info_Type, self ), "Continuous for %s '%s' is %s.\n",
+					window->type, window->name, window->continuous ? "True" : "False" );
+			lucWindow_QuitEventLoop( window );
+			break;
+		
 		default:
 			break;
 	}
@@ -377,4 +384,5 @@ void _lucWindowInteraction_KeyboardMessage( void* windowInteractor, Stream* stre
 	Journal_Printf( stream, "s:                            Output information for camera associated with viewport under cursor.\n" );
 	Journal_Printf( stream, "[:                            Zoom out with camera associated with viewport under cursor.\n" );
 	Journal_Printf( stream, "]:                            Zoom in with camera associated with viewport under cursor.\n" );
+	Journal_Printf( stream, "o:                            Continuous mode on/off (keep rendering new frames while interacting).\n" );
 }

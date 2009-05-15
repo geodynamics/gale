@@ -50,6 +50,7 @@
 	extern const Type lucRenderingEngine_Type;
 
 	typedef void (lucRenderingEngine_RenderFunction) ( void* renderingEngine, lucWindow* window, AbstractContext* context);
+	typedef void (lucRenderingEngine_ClearFunction) ( void* renderingEngine, lucWindow* window, Bool clearAll );
 	typedef void (lucRenderingEngine_GetPixelDataFunction) ( void* renderingEngine, lucWindow* window, lucPixel* pixelData);
 	typedef void (lucRenderingEngine_CompositeViewportFunction) (  
 		void*                                              renderingEngine, 
@@ -61,9 +62,10 @@
 	#define __lucRenderingEngine                           \
 		__Stg_Component                                   \
 		/* Virtual Functions */ \
-		lucRenderingEngine_RenderFunction*                 _render;                  \
-		lucRenderingEngine_GetPixelDataFunction*           _getPixelData;            \
-		lucRenderingEngine_CompositeViewportFunction*      _compositeViewport;
+		lucRenderingEngine_RenderFunction*                 _render;                 \
+		lucRenderingEngine_ClearFunction*				   _clear;					\
+		lucRenderingEngine_GetPixelDataFunction*           _getPixelData;           \
+		lucRenderingEngine_CompositeViewportFunction*      _compositeViewport;	    \
 
 	struct lucRenderingEngine {__lucRenderingEngine};
 
@@ -80,6 +82,7 @@
 		Stg_Component_ExecuteFunction*                     _execute,
 		Stg_Component_DestroyFunction*                     _destroy,		
 		lucRenderingEngine_RenderFunction*                 _render,
+		lucRenderingEngine_ClearFunction*				   _clear,
 		lucRenderingEngine_GetPixelDataFunction*           _getPixelData,
 		lucRenderingEngine_CompositeViewportFunction*      _compositeViewport,
 		Name                                               name );
@@ -97,6 +100,7 @@ void _lucRenderingEngine_Construct( void* renderingEngine, Stg_ComponentFactory*
 
 	/* +++ Public Functions +++ */
 	void lucRenderingEngine_Render( void* renderingEngine, lucWindow* window, AbstractContext* context ) ;
+	void lucRenderingEngine_Clear( void* renderingEngine, lucWindow* window, Bool clearAll ) ;
 	void lucRenderingEngine_GetPixelData( void* renderingEngine, lucWindow* window, lucPixel* pixelData ) ;
 	void lucRenderingEngine_CompositeViewport( 
 		void*                                              renderingEngine, 

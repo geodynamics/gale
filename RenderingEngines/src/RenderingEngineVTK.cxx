@@ -40,6 +40,7 @@ lucRenderingEngineVTK* _lucRenderingEngineVTK_New(
 		Stg_Component_ExecuteFunction*                     _execute,
 		Stg_Component_DestroyFunction*                     _destroy,
 		lucRenderingEngine_RenderFunction*                 _render,
+		lucRenderingEngine_ClearFunction*             	   _clear,
 		lucRenderingEngine_GetPixelDataFunction*           _getPixelData,
 		lucRenderingEngine_CompositeViewportFunction*      _compositeViewport,
 		Name                                               name ) 
@@ -61,6 +62,7 @@ lucRenderingEngineVTK* _lucRenderingEngineVTK_New(
 			_execute,
 			_destroy,
 			_render,
+			_clear,
 			_getPixelData,
 			_compositeViewport,
 			name );
@@ -112,6 +114,7 @@ void* _lucRenderingEngineVTK_DefaultNew( Name name ) {
 		_lucRenderingEngineVTK_Execute,
 		_lucRenderingEngineVTK_Destroy,
 		_lucRenderingEngineVTK_Render,
+		_lucRenderingEngineVTK_Clear,
 		_lucRenderingEngineVTK_GetPixelData,
 		_lucRenderingEngineVTK_CompositeViewport_Stencil,
 		name );
@@ -267,7 +270,8 @@ void _lucRenderingEngineVTK_Render( void* renderingEngine, lucWindow* window, Ab
 			continue;
 		}
 
-		lucRenderingEngineVTK_Clear( self, window );
+		//lucRenderingEngineVTK_Clear( self, window, False );
+		self->_clear(self, window);
 
 		if (context->rank == MASTER)
 			lucRenderingEngineVTK_DrawTitle( self, window, viewportInfo );
@@ -342,7 +346,7 @@ void lucRenderingEngineVTK_DrawTitle( void* renderingEngine, lucWindow* window, 
 	}*/
 }
 
-void lucRenderingEngineVTK_Clear( void* renderingEngineVTK, lucWindow* window ) {
+void _lucRenderingEngineVTK_Clear( void* renderingEngineVTK, lucWindow* window, Bool clearAll ) {
 	}
 
 Index lucRenderingEngineVTK_MapBufferIdToRank( void* renderingEngineVTK, Index bufferId, Index mergeCount ) {

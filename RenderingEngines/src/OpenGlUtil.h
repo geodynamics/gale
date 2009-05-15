@@ -52,7 +52,7 @@
  * as no text is stored in the GL feedback buffer */  
 	#define lucPrintString( A )       gl2psText( A, "Times-Roman", 16); glCallLists( strlen( A ), GL_UNSIGNED_BYTE, A )
 #else
-	#define lucPrintString( A )       glCallLists( strlen( A ), GL_UNSIGNED_BYTE, A )
+	#define lucPrintString( A )       glListBase(2000); glCallLists( strlen( A ), GL_UNSIGNED_BYTE, A ); glListBase(0)
 #endif
 
 /* Big hack !! - Assumes that font width is 10 pixels - this is hardly ever true */
