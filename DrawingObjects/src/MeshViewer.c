@@ -127,7 +127,8 @@ void _lucMeshViewer_Init(
 		Mesh*                                                     mesh,
 		Name                                                      localColourName,
 		Name                                                      shadowColourName,
-		Name                                                      vacantColourName )
+		Name                                                      vacantColourName,
+		float                                                        lineWidth )
 {
 	self->mesh  = mesh;
 	lucColour_FromString( &self->localColour, localColourName );
@@ -207,7 +208,8 @@ void _lucMeshViewer_Construct( void* drawingObject, Stg_ComponentFactory* cf, vo
 		        mesh,
 			Stg_ComponentFactory_GetString( cf, self->name, "localColour", "black" ),
 			Stg_ComponentFactory_GetString( cf, self->name, "shadowColour", "blue" ),
-			Stg_ComponentFactory_GetString( cf, self->name, "vacantColour", "Grey" )
+			Stg_ComponentFactory_GetString( cf, self->name, "vacantColour", "Grey" ),
+	        (float) Stg_ComponentFactory_GetDouble( cf, self->name, "lineWidth", 1.0 )
 			);
 }
 
@@ -264,7 +266,8 @@ void _lucMeshViewer_BuildDisplayList( void* drawingObject, void* _context ) {
 	lucMeshViewer*	self = (lucMeshViewer*)drawingObject;
 
 	glPointSize( 1.0 );
-
+	glLineWidth( self->lineWidth );
+	
 	/* Plot the mesh */
 	lucMeshViewer_Render( drawingObject );
 }
@@ -468,14 +471,11 @@ void lucMeshViewer_RenderLocal( void* drawingObject ) {
 		unsigned	v_i;
 
 		nVerts = Mesh_GetLocalSize( mesh, MT_VERTEX );
-
-		glPointSize( 2 );
-		glEnable(GL_POINT_SMOOTH);
+		glPointSize( 5 );
 		glBegin( GL_POINTS );
 		for( v_i = 0; v_i < nVerts; v_i ++ )
 			vertexFunc( Mesh_GetVertex( mesh, v_i ) );
 		glEnd();
-		glDisable(GL_POINT_SMOOTH);
 	}
 
 	/* Render edges */
