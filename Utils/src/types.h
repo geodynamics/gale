@@ -84,6 +84,8 @@ typedef struct RegularRemesherCmpt RegularRemesherCmpt;
 		WallVC_Wall_Right,
 		WallVC_Wall_Top,
 		WallVC_Wall_Front,
+		WallVC_Wall_BottomLeft,
+		WallVC_Wall_BottomRight,
 		WallVC_Wall_Size
 	} WallVC_Wall;
 
