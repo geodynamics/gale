@@ -207,11 +207,11 @@ void _DiffusionSMT_Build( void* matrixTerm, void* data ) {
 
 	if ( cf ) {
 	    materialExt->diffusion = Stg_ComponentFactory_GetDouble(
-		cf, material->name, "diffusion", 0.0 );
+		cf, material->name, "diffusivity", 0.0 );
 	}
 	else {
 	    materialExt->diffusion = Dictionary_GetDouble_WithDefault(
-		material->dictionary, "diffusion", 0.0 );
+		material->dictionary, "diffusivity", 0.0 );
 	}
     }
 
@@ -222,7 +222,7 @@ void _DiffusionSMT_Build( void* matrixTerm, void* data ) {
 	MaterialSwarmVariable*, self->materialSwarmCount, "DiffusionVariables");
 
     for ( ii = 0; ii < self->materialSwarmCount; ++ii ) {
-	name = Stg_Object_AppendSuffix( materialSwarms[ii], "Diffusion" );
+	name = Stg_Object_AppendSuffix( materialSwarms[ii], "diffusivity" );
 	self->diffusionSwarmVariables[ii] = MaterialSwarmVariable_New( 
 	    name, 
 	    materialSwarms[ii], 
