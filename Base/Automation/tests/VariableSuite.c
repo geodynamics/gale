@@ -879,6 +879,59 @@ void VariableSuite_TestVariableCopy( VariableSuiteData* data ) {
 }
 
 
+void VariableSuite_TestVariableValueCompare( VariableSuiteData* data ) {
+   Variable*           orig;
+   Variable*           compare;
+   double*             dataArray;
+   double*             dataArray2;
+   Index               arrayCount      = 150;
+   Index               componentCount  = 4;
+   Index               index;
+   double              amp             = 0.1;
+   double              tolerance       = 0.04;
+
+   dataArray = Memory_Alloc_Array( double, arrayCount * componentCount, "test" );
+   dataArray2 = Memory_Alloc_Array( double, arrayCount * componentCount, "test" );
+   for( index = 0; index < arrayCount * componentCount; index++ ) {
+      dataArray[index] = 1.0f / (arrayCount+2) * (index+1); 
+      dataArray2[ index ] = dataArray[ index ] + amp * cos( index );
+   }		
+   
+   orig = Variable_NewVector( 
+         "orig", 
+         Variable_DataType_Double, 
+         componentCount,
+         &arrayCount,
+         NULL,
+         (void**)&dataArray,
+         data->vr,
+         "orig1",
+         "orig2",
+         "orig3",
+         "orig4" );
+   compare = Variable_NewVector( 
+         "compare", 
+         Variable_DataType_Double, 
+         componentCount,
+         &arrayCount,
+         NULL,
+         (void**)&dataArray2,
+         data->vr,
+         "compare1",
+         "compare2",
+         "compare3",
+         "compare4" );
+   Stg_Component_Build( orig, 0, False );
+   Stg_Component_Build( compare, 0, False );
+
+   pcu_check_true( abs( 0.030987 - Variable_ValueCompare( orig, compare ) ) < 0.00001 );
+   pcu_check_true( True == Variable_ValueCompareWithinTolerance( orig, compare, tolerance ) );
+
+   Memory_Free( dataArray );
+   Memory_Free( dataArray2 );
+}
+
+
 void VariableSuite( pcu_suite_t* suite ) {
    pcu_suite_setData( suite, VariableSuiteData );
    pcu_suite_setFixtures( suite, VariableSuite_Setup, VariableSuite_Teardown );
@@ -892,4 +945,5 @@ void VariableSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, VariableSuite_TestVariable_Int );
    pcu_suite_addTest( suite, VariableSuite_TestVariable_Short );
    pcu_suite_addTest( suite, VariableSuite_TestVariableCopy );
+   pcu_suite_addTest( suite, VariableSuite_TestVariableValueCompare );
 }
