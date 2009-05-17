@@ -582,6 +582,8 @@ unsigned int Dictionary_Entry_Value_AsUnsignedInt( Dictionary_Entry_Value* self 
 			return (unsigned int)self->as.typeDouble;
 		case Dictionary_Entry_Value_Type_UnsignedInt:
 			return self->as.typeUnsignedInt;
+		case Dictionary_Entry_Value_Type_Int:
+			return self->as.typeInt;
 		case Dictionary_Entry_Value_Type_UnsignedLong:
 			return self->as.typeUnsignedLong;
 		case Dictionary_Entry_Value_Type_Bool:
