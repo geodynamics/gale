@@ -43,6 +43,9 @@
 #ifdef HAVE_PYTHON
 	#include <Python.h>
 #endif
+#ifdef HAVE_SDL /* On Mac OS X, SDL needs to redefine main() so SDL.h must be included here */
+   #include <SDL/SDL.h>
+#endif
 #include <mpi.h>
 #include <StGermain/StGermain.h>
 
