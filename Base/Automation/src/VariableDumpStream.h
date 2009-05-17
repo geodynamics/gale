@@ -100,7 +100,7 @@
 	void* _VariableDumpStream_Copy( void* variableDumpStream, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 
 	/** Sets the information that this stream dumps. */
-	void VariableDumpStream_SetVariable( void* stream, Variable* data, int numItems, unsigned int dumpEvery, char* fileName );
+	void VariableDumpStream_SetVariable( void* stream, Variable* data, int numItems, unsigned int dumpEvery, const Name const fileName );
 	
 	
 #endif /* __IO_VariableDumpStreamFile_h__ */
