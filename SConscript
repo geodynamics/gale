@@ -64,6 +64,8 @@ libs = ['StgFEM'] + env.get('LIBS', [])
 
 # Test runner program.
 env.PCUTest('tests/testStgFEM', suites,
+            PCU_LIBHEADERS="#include <StGermain/StGermain.h>\n#include <StgDomain/StgDomain.h>\n" \
+                "#include <StgFEM/StgFEM.h>",
             PCU_SETUP="StGermain_Init(&argc, &argv);StgDomain_Init(&argc, &argv);" \
                 "StgFEM_Init(&argc, &argv);",
             PCU_TEARDOWN="StgFEM_Finalise();StgDomain_Finalise();" \
