@@ -323,6 +323,22 @@ Bool _lucSDLWindow_EventProcessor( void* window ) {
 		case SDL_MOUSEBUTTONUP:
 			buttonDown = False;
 			break;
+		case SDL_USEREVENT:
+			/* Timer event */
+			if (!self->interactive) 
+			{
+				/* Interactive mode switched off */
+				lucWindow_SetViewportNeedsToDrawFlag( self, True );
+				SDL_RemoveTimer(self->timer);
+				self->quitEventLoop = True;
+			}
+			else
+			{
+				/* idle timeout check */
+				lucWindow_IdleCheck(self);
+			}
+			redisplay = False;
+			break;
 		case SDL_ACTIVEEVENT:
 			if (event.active.state == SDL_APPACTIVE)	/* Restored from icon */
 				lucWindow_SetViewportNeedsToDrawFlag( self, True );
@@ -334,16 +350,15 @@ Bool _lucSDLWindow_EventProcessor( void* window ) {
 			redisplay = False;	/* No change to display, don't redraw */
 	}
 	
-	if (!self->interactive) {
-		/* No longer interactive? Drop timer, minimize window and quit event loop */
-		SDL_RemoveTimer(self->timer);
-		SDL_WM_IconifyWindow();
-		lucWindow_SetViewportNeedsToDrawFlag( self, True );
-		self->quitEventLoop = True;
-	}	
-
 	/* Reset idle timer */
 	lucWindow_IdleReset(self);
+
+	if (!self->interactive) {
+		/* No longer interactive? Minimize, quit event loop and stop timer on next fire... */
+		SDL_WM_IconifyWindow();
+		lucWindow_SetViewportNeedsToDrawFlag( self, True );
+		redisplay = False;
+	}	
 
 	/* Returns true if display needs refresh */
 	return redisplay;
@@ -393,8 +408,18 @@ void lucSDLWindow_Resize( void* window, Pixel_Index width, Pixel_Index height ) 
 /* Timer callback */
 Uint32 lucSDLWindow_IdleTimer(Uint32 interval, void* param) {
 	lucSDLWindow*        self = (lucSDLWindow*) param; 
-	/* idle timeout check */
-	lucWindow_IdleCheck(self);
+
+    /* Create a user event and post */
+    SDL_Event event;
+    
+    event.type = SDL_USEREVENT;
+    event.user.code = 1;
+    event.user.data1 = 0;
+    event.user.data2 = 0;
+    
+    SDL_PushEvent(&event);
+
+	return interval;
 }
 
 #endif
