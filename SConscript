@@ -62,6 +62,8 @@ libs = ['glucifer'] + env.get('LIBS', [])
 
 # Test runner program.
 env.PCUTest('tests/testglucifer', suites,
+            PCU_LIBHEADERS="#include <StGermain/StGermain.h>\n#include <StgDomain/StgDomain.h>\n"
+                "#include <StgFEM/StgFEM.h>\n#include <glucifer/glucifer.h>",
             PCU_SETUP="StGermain_Init(&argc, &argv);StgDomain_Init(&argc, &argv);" \
                 "StgFEM_Init(&argc, &argv);glucifer_Init(&argc, &argv);",
             PCU_TEARDOWN="glucifer_Finalise();StgFEM_Finalise();" \
