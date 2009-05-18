@@ -359,7 +359,7 @@ void _lucColourBar_Draw( void* drawingObject, lucWindow* window, lucViewportInfo
 	/* Draw Box around colour bar */
 	lucColour_SetComplimentaryOpenGLColour( &window->backgroundColour );
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	glRecti(startx, starty, startx + length + 1, starty + height);
+	glRecti(startx, starty, startx + length, starty + height);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	lucSetFontCharset(FONT_DEFAULT);

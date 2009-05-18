@@ -465,8 +465,8 @@ static pascal OSStatus lucCarbonWindow_EventHandler(EventHandlerCallRef nextHand
 				{
 					aglSetCurrentContext (self->graphicsContext);
 					aglUpdateContext (self->graphicsContext);
-			        _lucWindow_Initialise(window, self->context);	/* Reset font stuff */
 					lucWindow_Resize( self, width, height );
+			        _lucWindow_Initialise(window, self->context);	/* Reset font stuff */
 				}	
 				break;
 			case kEventWindowBoundsChanged:

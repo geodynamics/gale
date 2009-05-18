@@ -186,6 +186,7 @@ void _lucSDLWindow_Initialise( void* window, void* data ) {
  	 *** to the SDL display. This allows SDL on-screen and OSMesa off-screen rendering available in the same binary.
 	 *** For this to work, OSMesa must be linked without/before any other OpenGL implementations. */
 	#ifdef HAVE_OSMESA
+		Journal_Printf( Journal_MyStream( Info_Type, self ), "*** Using OSMesa library for OpenGL graphics in SDL Window ***.\n" );
 	   	self->sdlFlags = SDL_RESIZABLE | SDL_HWPALETTE;
 		self->osMesaContext = OSMesaCreateContextExt( GL_RGBA, 16, 0, 0, NULL );
 		if (!self->osMesaContext) {
@@ -273,7 +274,10 @@ void _lucSDLWindow_Display( void* window ) {
 int _lucSDLWindow_EventsWaiting( void* window )
 {
 	/* Check for events without removing from queue */
-	return SDL_PollEvent(NULL);
+	int numevents = 0;
+	SDL_Event events[10];
+	SDL_PumpEvents();
+	return SDL_PeepEvents(events, 10, SDL_PEEKEVENT, SDL_ALLEVENTS);
 }
 
 Bool _lucSDLWindow_EventProcessor( void* window ) {
@@ -293,8 +297,8 @@ Bool _lucSDLWindow_EventProcessor( void* window ) {
 			break;	
 		case SDL_VIDEORESIZE:
 			lucSDLWindow_Resize(window, event.resize.w, event.resize.h);
-			_lucWindow_Initialise(window, self->context);	/* Reset font stuff */
 			lucWindow_Resize( self, event.resize.w, event.resize.h);
+			_lucWindow_Initialise(window, self->context);	/* Reset font stuff */
 			break;
 		case SDL_KEYDOWN:
 			keyPressed = event.key.keysym.sym;
