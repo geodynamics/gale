@@ -187,7 +187,7 @@ void _lucSwarmViewer_Construct( void* drawingObject, Stg_ComponentFactory* cf, v
 	_lucSwarmViewer_Init( 
 		self, 
 		(float) Stg_ComponentFactory_GetDouble( cf, self->name, "pointSize",      1.0 ),
-		(Bool ) Stg_ComponentFactory_GetBool(   cf, self->name, "pointSmoothing", 0) //1 )
+		(Bool ) Stg_ComponentFactory_GetBool(   cf, self->name, "pointSmoothing", 1 )
 	  );
 }
 

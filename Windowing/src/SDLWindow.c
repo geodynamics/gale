@@ -197,11 +197,11 @@ void _lucSDLWindow_Initialise( void* window, void* data ) {
 	   	self->sdlFlags = SDL_OPENGL | SDL_GL_DOUBLEBUFFER | SDL_RESIZABLE | SDL_HWPALETTE;
 	#endif
 
-	if( pSDLVideoInfo->hw_available ) // Hardware surfaces enabled?
+	if( pSDLVideoInfo->hw_available ) 	/* Hardware surfaces enabled? */
 		self->sdlFlags |= SDL_HWSURFACE;
 	else
 		self->sdlFlags |= SDL_SWSURFACE;
-	if( pSDLVideoInfo->blit_hw ) // Hardware supported blitting?
+	if( pSDLVideoInfo->blit_hw ) 		/* Hardware supported blitting? */
 		self->sdlFlags |= SDL_HWACCEL;
 
 	/* Resize/init the display */	
@@ -220,6 +220,9 @@ void _lucSDLWindow_Initialise( void* window, void* data ) {
 	
 	/* Run the parent function to init window... */
 	_lucWindow_Initialise(window, data);	
+
+	/* Refresh display */
+	_lucSDLWindow_Display(window);
 }
 
 void _lucSDLWindow_Execute( void* window, void* data ) {
@@ -359,8 +362,7 @@ void lucSDLWindow_Resize( void* window, Pixel_Index width, Pixel_Index height ) 
 	}
 
 	#ifdef HAVE_OSMESA
-	    /* SDL interprets each pixel as a 32-bit number, so our masks must depend
-		   on the endianness (byte order) of the machine */
+	    /* SDL interprets each pixel as a 32-bit number, so our masks depend on the byte order */
 		Uint32 rmask, gmask, bmask, amask;
 		#if SDL_BYTEORDER == SDL_BIG_ENDIAN 
 			rmask = 0xff000000;

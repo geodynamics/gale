@@ -80,6 +80,19 @@
 #define __lucWindowing_h__
 	
 
+/* Exclude incompatible windowing systems */
+/* OSMesa will not work with system OpenGL implementations required by X11 & Carbon */
+#ifdef HAVE_OSMESA	
+#undef HAVE_X11
+#undef HAVE_CARBON
+#endif
+/* X11 and Carbon have conflicting types */
+#ifdef HAVE_CARBON 
+#undef HAVE_X11
+#endif
+/*#ifdef HAVE_X11 
+#undef HAVE_CARBON
+#endif*/
 
 #include "types.h"
 #include "VTKWindow.h"

@@ -67,7 +67,7 @@ Bool lucWindowing_Init() {
 
 	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 
-    /* Order of priority for default output window: SDL, OSMesa, Carbon, X11, VTK */
+    /* Order of priority for default output window: SDL, OSMesa, X11, Carbon, VTK */
     /* SDL will work with OSMesa to allow on/off-screen rendering so if present is first choice */
     /* If OSMesa is linked, Carbon and X11 will NOT work as they depend on the system OpenGL */
     /* library, which OSMesa replaces. */ 
@@ -86,6 +86,13 @@ Bool lucWindowing_Init() {
 			Stg_ComponentRegister_Add( componentRegister, lucDefaultWindow_Type, "0", _lucOSMesaWindow_DefaultNew );
 	#endif
 	
+	#ifdef HAVE_X11
+		Stg_ComponentRegister_Add( componentRegister, lucX11Window_Type,     "0", _lucX11Window_DefaultNew );
+		RegisterParent( lucX11Window_Type, lucWindow_Type );
+		if ( !Stg_ComponentRegister_Get( componentRegister, lucDefaultWindow_Type, "0" ) )
+			Stg_ComponentRegister_Add( componentRegister, lucDefaultWindow_Type, "0", _lucX11Window_DefaultNew );
+	#endif	
+
 	#ifdef HAVE_CARBON
 		Stg_ComponentRegister_Add( componentRegister, lucCarbonWindow_Type,     "0", _lucCarbonWindow_DefaultNew );
 		RegisterParent( lucCarbonWindow_Type, lucWindow_Type );
@@ -94,13 +101,6 @@ Bool lucWindowing_Init() {
 
 	#endif
 		
-	#ifdef HAVE_X11
-		Stg_ComponentRegister_Add( componentRegister, lucX11Window_Type,     "0", _lucX11Window_DefaultNew );
-		RegisterParent( lucX11Window_Type, lucWindow_Type );
-		if ( !Stg_ComponentRegister_Get( componentRegister, lucDefaultWindow_Type, "0" ) )
-			Stg_ComponentRegister_Add( componentRegister, lucDefaultWindow_Type, "0", _lucX11Window_DefaultNew );
-	#endif	
-
 	#ifdef HAVE_VTK
 		Stg_ComponentRegister_Add( componentRegister, lucVTKWindow_Type,     "0", _lucVTKWindow_DefaultNew );
 		RegisterParent( lucVTKWindow_Type, lucWindow_Type );
