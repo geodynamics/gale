@@ -198,7 +198,7 @@ void _lucSDLWindow_Initialise( void* window, void* data ) {
 	#endif
 
 	if( pSDLVideoInfo->hw_available ) 	/* Hardware surfaces enabled? */
-		self->sdlFlags |= SDL_HWSURFACE;
+		self->sdlFlags |= SDL_HWSURFACE | SDL_DOUBLEBUF;
 	else
 		self->sdlFlags |= SDL_SWSURFACE;
 	if( pSDLVideoInfo->blit_hw ) 		/* Hardware supported blitting? */

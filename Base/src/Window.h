@@ -55,55 +55,55 @@
 	extern MPI_Datatype lucWindow_MPI_Datatype;
 	extern MPI_Datatype lucViewportInfo_MPI_Datatype;
 
-	#define __lucWindow																				\
-		__Stg_Component                                                         						\
-		/* Virtual Functions */ \
-		lucWindow_DisplayFunction*					_displayWindow;						\
-		lucWindow_EventsWaitingFunction*		_eventsWaiting;						\
-		lucWindow_EventProcessorFunction*   	_eventProcessor;						\
+	#define __lucWindow														\
+		__Stg_Component                                                     \
+		/* Virtual Functions */ 											\
+		lucWindow_DisplayFunction*			_displayWindow;					\
+		lucWindow_EventsWaitingFunction*	_eventsWaiting;					\
+		lucWindow_EventProcessorFunction*  	_eventProcessor;				\
 		\
 		/* Other Info */ \
-		lucRenderingEngine*                         	renderingEngine;						\
-		lucViewportInfo*                            		viewportInfoList;						\
-		Viewport_Index                              		viewportCount;							\
-		lucOutputFormat_Register*                   outputFormat_Register;			\
-		lucWindowInteraction_Register*            windowInteraction_Register;		\
-		lucWindowInteraction*                       	defaultWindowInteraction;		\
-		Pixel_Index                                 			width;										\
-		Pixel_Index                                 			height;										\
-		Bool                                        				interactive;								\
-		Bool                                        				continuous;								\
-		lucColour                                   			backgroundColour;					\
-		lucStereoBuffer                             		currStereoBuffer;						\
-		Bool                                        				quitEventLoop;							\
-		Bool                                        				toggleApplicationQuit;				\
-		AbstractContext*                            		context;									\
-		Bool                                        				isMaster;									\
-		Bool                                        				isTimedOut;         						\
-		double                                     			maxIdleTime;        					\
-		double												idleTime;									\
-		Pixel_Index											startx;										\
-		Pixel_Index											starty;										\
-		char*													title;            	  							\
+		lucRenderingEngine*                	renderingEngine;				\
+		lucViewportInfo*              		viewportInfoList;				\
+		Viewport_Index                		viewportCount;					\
+		lucOutputFormat_Register*     		outputFormat_Register;			\
+		lucWindowInteraction_Register*		windowInteraction_Register;		\
+		lucWindowInteraction*				defaultWindowInteraction;		\
+		Pixel_Index							width;							\
+		Pixel_Index							height;							\
+		Bool								interactive;					\
+		Bool								continuous;						\
+		lucColour							backgroundColour;				\
+		lucStereoBuffer						currStereoBuffer;				\
+		Bool								quitEventLoop;					\
+		Bool								toggleApplicationQuit;			\
+		AbstractContext*					context;						\
+		Bool								isMaster;						\
+		Bool								isTimedOut;         			\
+		double								maxIdleTime;        			\
+		double								idleTime;						\
+		Pixel_Index							startx;							\
+		Pixel_Index							starty;							\
+		char*								title;            	  			\
 			
 	struct lucWindow {__lucWindow};
 
 	lucWindow* _lucWindow_New(
-		SizeT                                           						sizeOfSelf,
-		Type                                            						type,
-		Stg_Class_DeleteFunction*                       			_delete,
-		Stg_Class_PrintFunction*                        			_print,
-		Stg_Class_CopyFunction*                         			_copy, 
-		Stg_Component_DefaultConstructorFunction*    _defaultConstructor,
-		Stg_Component_ConstructFunction*                	_construct,
-		Stg_Component_BuildFunction*                    	_build,
-		Stg_Component_InitialiseFunction*               	_initialise,
-		Stg_Component_ExecuteFunction*              		_execute,
-		Stg_Component_DestroyFunction*                 	_destroy,
-		lucWindow_DisplayFunction*								_displayWindow,	
-		lucWindow_EventsWaitingFunction*					_eventsWaiting,	
-		lucWindow_EventProcessorFunction*				_eventProcessor,	
-		Name                                            					name );
+		SizeT                                    	sizeOfSelf,
+		Type                                     	type,
+		Stg_Class_DeleteFunction*                	_delete,
+		Stg_Class_PrintFunction*                 	_print,
+		Stg_Class_CopyFunction*                  	_copy, 
+		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
+		Stg_Component_ConstructFunction*            _construct,
+		Stg_Component_BuildFunction*				_build,
+		Stg_Component_InitialiseFunction*			_initialise,
+		Stg_Component_ExecuteFunction*				_execute,
+		Stg_Component_DestroyFunction*				_destroy,
+		lucWindow_DisplayFunction*					_displayWindow,	
+		lucWindow_EventsWaitingFunction*			_eventsWaiting,	
+		lucWindow_EventProcessorFunction*			_eventProcessor,	
+		Name										name );
 
 	void _lucWindow_Delete( void* window ) ;
 	void _lucWindow_Print( void* window, Stream* stream ) ;

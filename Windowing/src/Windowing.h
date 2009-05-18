@@ -90,9 +90,6 @@
 #ifdef HAVE_CARBON 
 #undef HAVE_X11
 #endif
-/*#ifdef HAVE_X11 
-#undef HAVE_CARBON
-#endif*/
 
 #include "types.h"
 #include "VTKWindow.h"
