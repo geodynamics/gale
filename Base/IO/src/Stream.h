@@ -196,6 +196,9 @@
 	/** Sets whether a stream should flush after an output statement. */
 	void Stream_SetAutoFlush( void* stream, Bool autoFlush );
 
+	/** Gets the AutoFlush status of a stream */
+	Bool Stream_GetAutoFlush( void* stream );
+
 	/** Sets whether a stream and all of its sub-streams should flush after an output statement. */
 	void Stream_SetAutoFlushBranch( void* stream, Bool autoFlush );
 

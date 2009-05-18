@@ -137,7 +137,7 @@
 		Journal_Register2( (streamType), (component)->type, (component)->name )
 
 	/** Returns a registered file from the system. If the file does not exist, NULL is returned. */
-	JournalFile* Journal_GetFile( const char* const fileName );
+	JournalFile* Journal_GetFile( const Name const fileName );
 
 	/** Registers a file with the Journal system. If the argument is NULL, no operation is performed. */
 	void Journal_RegisterFile( JournalFile* newFile );

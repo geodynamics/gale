@@ -64,6 +64,8 @@ MemoryReport* MemoryReport_New( )
 	
 void _MemoryReport_Init( MemoryReport* memoryReport )
 {
+	Index ii=0;
+
 	memoryReport->groupCount = 0;
 	memoryReport->groupSize = MEMORYREPORT_SIZE;
 	memoryReport->groups = (MemoryReportGroup*) malloc( sizeof(MemoryReportGroup) * MEMORYREPORT_SIZE );
@@ -71,6 +73,9 @@ void _MemoryReport_Init( MemoryReport* memoryReport )
 	memoryReport->conditionSize = MEMORYREPORT_SIZE;
 	memoryReport->conditionGroups = (MemoryReportGroup*) malloc( sizeof(MemoryReportGroup) * MEMORYREPORT_SIZE );
 	memoryReport->conditionValues = (char**) malloc( sizeof(char*) * MEMORYREPORT_SIZE );
+	for ( ii=0; ii < MEMORYREPORT_SIZE; ii++ ) {
+		memoryReport->conditionValues[ii] = NULL;
+	}
 }
 	
 void MemoryReport_Delete( MemoryReport* memoryReport )
@@ -88,6 +93,7 @@ void MemoryReport_Delete( MemoryReport* memoryReport )
 	 	}
 	}
 	free( memoryReport->conditionValues );
+	free( memoryReport );
 }
 
 void MemoryReport_AddGroup( MemoryReport* memoryReport, MemoryReportGroup group )
@@ -261,7 +267,7 @@ void MemoryReport_Print_Helper( void *memoryPointer, void* memReport )
 	prevField = rootField;
 	while ( prevField->subCount == 1 )
 	{
-		Journal_Printf( stgMemory->infoStream, "%s ", prevField->value );
+		Journal_Printf( stgMemory->infoStream, "%s \n", prevField->value );
 		prevField = prevField->subFields[0];
 	}
 	

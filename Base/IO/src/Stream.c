@@ -498,6 +498,12 @@ void Stream_SetAutoFlush( void* stream, Bool autoFlush )
 	self->_autoFlush = autoFlush;
 }
 
+Bool Stream_GetAutoFlush( void* stream )
+{
+	Stream* self = (Stream*) stream;
+	return self->_autoFlush;
+}
+
 void Stream_SetAutoFlushBranch( void* stream, Bool autoFlush )
 {
 	int i;

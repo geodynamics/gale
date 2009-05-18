@@ -48,6 +48,8 @@
 #include "MPIStream.h"
 #include "BinaryStream.h"
 #include "StreamFormatter.h"
+#include "LineFormatter.h"
+#include "RankFormatter.h"
 
 #include <assert.h>
 #include <stdlib.h>
@@ -445,7 +447,6 @@ Stream* Journal_Register( const Type type, const Name name )
 	typedStream = Journal_GetTypedStream( type );
 	namedStream = Journal_GetNamedStream( typedStream, name );	
 	
-	Stream_SetPrintingRank( namedStream, 0); /* Default when registering a Journal stream is to have it print from Rank 0 only) */
 
 	return namedStream;
 }
@@ -458,7 +459,7 @@ Stream* Journal_Register2( const Type streamType, const Type componentType, cons
 	return instanceStream;
 }
 
-JournalFile* Journal_GetFile( const char* const fileName )
+JournalFile* Journal_GetFile( const Name const fileName )
 {
 	return (JournalFile*) Stg_ObjectList_Get( stJournal->_files, fileName );
 }
@@ -707,6 +708,8 @@ void Journal_SetupDefaultTypedStreams() {
 	Stream_SetFile( typedStream, stJournal->stdOut );
 	Stream_SetAutoFlush( typedStream, True );
 	Journal_RegisterTypedStream( typedStream );
+	/* Default when registering a Journal stream is to have it print from Rank 0 only) */
+	Stream_SetPrintingRank( typedStream, 0);
 
 	/* debug */
 	typedStream = CStream_New( Debug_Type );
@@ -716,6 +719,8 @@ void Journal_SetupDefaultTypedStreams() {
 	Stream_SetAutoFlush( typedStream, True );
 	Stream_AddFormatter( typedStream, RankFormatter_New() );
 	Journal_RegisterTypedStream( typedStream );
+	/* Default when registering a Journal stream is to have it print from Rank 0 only) */
+	Stream_SetPrintingRank( typedStream, 0);
 	
 	/* dump */
 	typedStream = CStream_New( Dump_Type );
@@ -738,6 +743,7 @@ void Journal_SetupDefaultTypedStreams() {
 	Stream_Enable( typedStream, True );
 	Stream_SetLevel( typedStream, 1 );
 	Journal_RegisterTypedStream( typedStream );
+	/* MPI Streams need to print from all ranks */
 
 	/* binary stream */
 	typedStream = BinaryStream_New( BinaryStream_Type );

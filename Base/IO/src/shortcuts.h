@@ -45,6 +45,28 @@
 	#define Write			Journal_Write
 	#define Dump			Journal_Dump
 
+	/* Macros to add things to the dictionary more easily */
+	#define Dictionary_AddFromUnsignedInt( dict, key, uintVal ) \
+		( Dictionary_Add( (dict), (key), Dictionary_Entry_Value_FromUnsignedInt( (uintVal) ) ) )
+	
+	#define Dictionary_AddFromInt( dict, key, intVal ) \
+		( Dictionary_Add( (dict), (key), Dictionary_Entry_Value_FromInt( (intVal) ) ) )
+	
+	#define Dictionary_AddFromDouble( dict, key, doubleVal ) \
+		( Dictionary_Add( (dict), (key), Dictionary_Entry_Value_FromDouble( (doubleVal) ) ) )
+
+	#define Dictionary_AddFromUnsignedLong( dict, key, uLongVal ) \
+		( Dictionary_Add( (dict), (key), Dictionary_Entry_Value_FromUnsignedLong( (uLongVal) ) ) )
+
+	#define Dictionary_AddFromString( dict, key, stringVal ) \
+		( Dictionary_Add( (dict), (key), Dictionary_Entry_Value_FromString( (stringVal) ) ) )
+
+	#define Dictionary_AddFromBool( dict, key, boolVal ) \
+		( Dictionary_Add( (dict), (key), Dictionary_Entry_Value_FromBool( (boolVal) ) ) )
+
+	#define Dictionary_AddFromDictionary( dict, key, dictVal ) \
+		( Dictionary_Add( (dict), (key), Dictionary_Entry_Value_FromStruct( (dictVal) ) ) )
+
 	/* Macros to get things out of the dictionary more easily */
 	#define Dictionary_GetUnsignedInt( dictionary, key ) \
 		( Dictionary_Entry_Value_AsUnsignedInt( Dictionary_Get( dictionary, key ) ) )
@@ -54,9 +76,6 @@
 	
 	#define Dictionary_GetDouble( dictionary, key ) \
 		( Dictionary_Entry_Value_AsDouble( Dictionary_Get( dictionary, key ) ) )
-
-	#define Dictionary_GetFloat( dictionary, key ) \
-		( Dictionary_Entry_Value_AsFloat( Dictionary_Get( dictionary, key ) ) )
 
 	#define Dictionary_GetUnsignedLong( dictionary, key ) \
 		( Dictionary_Entry_Value_AsUnsignedLong( Dictionary_Get( dictionary, key ) ) )

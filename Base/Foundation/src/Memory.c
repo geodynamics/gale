@@ -1542,7 +1542,15 @@ Bool Memory_IsAllocated( void* ptr ) {
 
 	#ifdef MEMORY_STATS
 		if ( stgMemory->enable ) {
-			return Memory_Find_Pointer( ptr ) != NULL;
+			MemoryPointer *memPtr = NULL;
+
+			memPtr = Memory_Find_Pointer( ptr );
+			if ( (memPtr == NULL) || (memPtr->status == MEMORY_POINTER_RELEASED) ) {
+				return False;
+			}
+			else {
+				return True;
+			}
 		}
 		else {
 			#ifdef DEBUG

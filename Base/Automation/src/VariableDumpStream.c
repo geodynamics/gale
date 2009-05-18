@@ -182,7 +182,7 @@ Bool _VariableDumpStream_Dump( Stream* stream, void* _loop )
 	return True;
 }
 
-void VariableDumpStream_SetVariable( void* stream, Variable* data, int numItems, unsigned int dumpEvery, char* fileName )
+void VariableDumpStream_SetVariable( void* stream, Variable* data, int numItems, unsigned int dumpEvery, const Name const fileName )
 {
 	VariableDumpStream* self = (VariableDumpStream*)stream;
 	JournalFile* file;

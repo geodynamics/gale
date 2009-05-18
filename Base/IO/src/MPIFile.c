@@ -116,27 +116,53 @@ void _MPIFile_Print( void* cfile, Stream* stream )
 	
 Bool _MPIFile_Open( void* file, const char* const fileName )
 {
-	MPIFile* self = (MPIFile*) file;
+	MPIFile*   self = (MPIFile*) file;
+	int        fileOpenResult = 0;
 
 	/* Remove the file */
         remove( fileName );
 
-	MPI_File_open( MPI_COMM_WORLD, (char*)fileName, MPI_MODE_CREATE | MPI_MODE_WRONLY | MPI_MODE_EXCL, 
-			MPI_INFO_NULL, &(self->mpiFile) );
+	fileOpenResult = MPI_File_open( MPI_COMM_WORLD, (char*)fileName,
+				MPI_MODE_CREATE | MPI_MODE_WRONLY | MPI_MODE_EXCL, 
+				MPI_INFO_NULL, &(self->mpiFile) );
+
+	if (fileOpenResult != MPI_SUCCESS) {
+		char         errorString[2000];
+		int          errorStringLength = 0;
+		Stream*      errorStream = Journal_Register( Error_Type, MPIFile_Type );
+		int          myRank = 0;
+
+		MPI_Comm_rank( MPI_COMM_WORLD, &myRank );
+		MPI_Error_string( fileOpenResult, errorString, &errorStringLength);
+		Journal_Printf( errorStream, "%3d: %s\n", myRank, errorString );
+		MPI_Abort(MPI_COMM_WORLD, fileOpenResult );
+	}
 
 	self->fileHandle = &(self->mpiFile);
-	
 	return True;	
 }
 	
 Bool _MPIFile_Append( void* file, const char* const fileName )
 {
-	MPIFile* self = (MPIFile*) file;
+	MPIFile*   self = (MPIFile*) file;
+	int        fileOpenResult = 0;
 
-	MPI_File_open( MPI_COMM_WORLD, (char*)fileName, MPI_MODE_WRONLY, MPI_INFO_NULL, &(self->mpiFile) );
+	fileOpenResult = MPI_File_open( MPI_COMM_WORLD, (char*)fileName, MPI_MODE_WRONLY, MPI_INFO_NULL,
+		&(self->mpiFile) );
+
+	if (fileOpenResult != MPI_SUCCESS) {
+		char         errorString[2000];
+		int          errorStringLength = 0;
+		Stream*      errorStream = Journal_Register( Error_Type, MPIFile_Type );
+		int          myRank = 0;
+
+		MPI_Comm_rank( MPI_COMM_WORLD, &myRank );
+		MPI_Error_string( fileOpenResult, errorString, &errorStringLength);
+		Journal_Printf( errorStream, "%3d: %s\n", myRank, errorString );
+		MPI_Abort(MPI_COMM_WORLD, fileOpenResult );
+	}
 
 	self->fileHandle = &(self->mpiFile);
-	
 	return True;	
 }
 

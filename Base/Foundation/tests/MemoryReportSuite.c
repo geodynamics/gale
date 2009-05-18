@@ -71,29 +71,38 @@ void MemoryReportSuite_Teardown( MemoryReportSuiteData* data ) {
 
 
 void MemoryReportSuite_TestReportPrints( MemoryReportSuiteData* data ) {
-   MemoryReport* report;
-   void* bytesObj;
-   void* bytesArray;
-   StructA*   object;
-   StructB*   array1d;
-   StructC**   array2d;
-   StructA***   array3d;
-   StructB****   array4d;
-   StructC*   one2d;
-   StructA*   one3d;
-   StructB*   one4d;
-   StructC**   complex2d;
-   Index**      setup;
-   StructA***   complex3d;
-   Index x1 = 4;
-   Index y1[] = { 1, 2, 3, 4 };
-   Index x2 = 2;
-   Index y2[] = { 1, 1 };
-   char*           memoryReportOutputFilename = "./MemoryReportSuite_TestOutput.txt";
-   FILE*           memoryReportOutputFile = NULL;
-   char*           memoryReportString = NULL;
-   #define         MAXLINE 1000
+   MemoryReport*  report;
+   void*          bytesObj;
+   void*          bytesArray;
+   StructA*       object;
+   StructB*       array1d;
+   StructC**      array2d;
+   StructA***     array3d;
+   StructB****    array4d;
+   StructC*       one2d;
+   StructA*       one3d;
+   StructB*       one4d;
+   StructC**      complex2d;
+   Index**        setup;
+   StructA***     complex3d;
+   Index          x1 = 4;
+   Index          y1[] = { 1, 2, 3, 4 };
+   Index          x2 = 2;
+   Index          y2[] = { 1, 1 };
+   #define        MAXLINE 1000
+   char*          memoryReportOutputFilename = "./MemoryReportSuite_TestOutput.txt";
+   FILE*          memoryReportOutputFile = NULL;
+   char           memoryReportString[MAXLINE];
    
+   Stream_RedirectFile( stgMemory->infoStream, memoryReportOutputFilename );
+   Journal_Enable_TypedStream( Info_Type, True );
+   Stream_Enable( stgMemory->infoStream, True );
+
+   Journal_Printf( Journal_Register( Error_Type, "MemoryReportSuite" ),
+      "Warning: MemoryReport_Print() seems to be broken code. Unsure if this component is deprecated.\n:" );
+   pcu_check_true( 0 );
+   /* -----------------------------------------------------------------------------------------*/
+
    /* This whole test relies on the MEMORY_STATS being enabled, so that there are some reported
     *  values to compare against. */
    bytesObj = Memory_Alloc_Bytes( 5, "Bytes", "Test1" );
@@ -115,10 +124,6 @@ void MemoryReportSuite_TestReportPrints( MemoryReportSuiteData* data ) {
    setup[1][0] = 3;
    complex3d = Memory_Alloc_3DComplex( StructA, x2, y2, setup, "Test1" );
 
-   Stream_RedirectFile( stgMemory->infoStream, memoryReportOutputFilename );
-   Journal_Enable_TypedStream( Info_Type, True );
-   Stream_Enable( stgMemory->infoStream, True );
-
    report = MemoryReport_New();
    MemoryReport_AddGroup( report, MEMORYREPORT_TYPE );
    MemoryReport_AddGroup( report, MEMORYREPORT_NAME );
@@ -126,11 +131,9 @@ void MemoryReportSuite_TestReportPrints( MemoryReportSuiteData* data ) {
    MemoryReport_Delete( report );
 
    memoryReportOutputFile = fopen(memoryReportOutputFilename, "r");
-
    fgets( memoryReportString, MAXLINE, memoryReportOutputFile );
    printf( "%s", memoryReportString );
-   pcu_check_true( 0 == strcmp( memoryReportString,
-      "TODO: expected string here\n" ) );
+   //pcu_check_true( 0 == strcmp( memoryReportString, "TODO: expected string here\n" ) );
 
    report = MemoryReport_New();
    MemoryReport_AddCondition( report, MEMORYREPORT_NAME, "Test1" );
