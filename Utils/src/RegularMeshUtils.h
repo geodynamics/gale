@@ -146,4 +146,7 @@ IndexSet* RegularMeshUtils_CreateContactRightSet( void* _mesh, int lowDepth, int
 										 Element_DomainIndex refElement_dI, 
 										 Node_DomainIndex refNode_dI );
 
+IndexSet* RegularMeshUtils_CreateGlobalBottomRightSet( void* _mesh );
+IndexSet* RegularMeshUtils_CreateGlobalBottomLeftSet( void* _mesh );
+
 #endif /* __Domain_Utils_RegularMeshUtils_h__ */

@@ -314,6 +314,10 @@ void _WallVC_ReadDictionary( void* variableCondition, void* dictionary ) {
 			self->_wall = WallVC_Wall_Top;
 		else if (!strcasecmp(wallStr, "front"))
 			self->_wall = WallVC_Wall_Front;
+		else if (!strcasecmp(wallStr, "bottomLeft"))
+		    self->_wall = WallVC_Wall_BottomLeft;
+		else if (!strcasecmp(wallStr, "bottomRight"))
+		    self->_wall = WallVC_Wall_BottomRight;
 		else {
 			assert( 0 );
 			self->_wall = WallVC_Wall_Size; /* invalid entry */
@@ -667,6 +671,30 @@ IndexSet* _WallVC_GetSet(void* variableCondition)
 		else {
 			set = RegularMeshUtils_CreateGlobalRightSet(self->_mesh);
 		}
+		break;
+
+	case WallVC_Wall_BottomLeft:
+		if ( nDims < 2 || !vertGrid->sizes[1] ) {
+			Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
+					"when mesh has no elements in the %s axis. Returning an empty set.\n", __func__,
+					WallVC_WallEnumToStr[self->_wall], "J" );
+			set = IndexSet_New( Mesh_GetDomainSize( self->_mesh, MT_VERTEX ) );
+		}
+		else {
+			set = RegularMeshUtils_CreateGlobalBottomLeftSet(self->_mesh);
+		}	
+		break;
+
+	case WallVC_Wall_BottomRight:
+		if ( nDims < 2 || !vertGrid->sizes[1] ) {
+			Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
+					"when mesh has no elements in the %s axis. Returning an empty set.\n", __func__,
+					WallVC_WallEnumToStr[self->_wall], "J" );
+			set = IndexSet_New( Mesh_GetDomainSize( self->_mesh, MT_VERTEX ) );
+		}
+		else {
+			set = RegularMeshUtils_CreateGlobalBottomRightSet(self->_mesh);
+		}	
 		break;
 			
 	case WallVC_Wall_Size:

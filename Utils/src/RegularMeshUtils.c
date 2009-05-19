@@ -304,14 +304,20 @@ IndexSet* RegularMeshUtils_CreateGlobalInnerBottomSet( void* _mesh ) {
 
 	for( n_i = 0; n_i < nNodes; n_i++ ) {
 		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
-		if( ijk[1] == 0 && 
-		    (ijk[0] != grid->sizes[0] - 1 || (nDims == 3 && ijk[2] != grid->sizes[2] - 1)) && 
-		    (ijk[0] != 0 || (nDims == 3 && ijk[2] != grid->sizes[2] - 1)) && 
-		    (ijk[0] != grid->sizes[0] - 1 || (nDims == 3 && ijk[2] != 0)) && 
-		    (ijk[0] != 0 || (nDims == 3 && ijk[2] != 0)) )
+		if(ijk[1] == 0 &&
+		   (ijk[0] != grid->sizes[0] - 1 && ijk[0] != 0) &&
+		   (nDims != 3 || (ijk[2] != grid->sizes[2] - 1 && ijk[2] != 0)))
 		{
-			IndexSet_Add( set, n_i );
+		    IndexSet_Add( set, n_i );
 		}
+/* 		if( ijk[1] == 0 &&  */
+/* 		    (ijk[0] != grid->sizes[0] - 1 || (nDims == 3 && ijk[2] != grid->sizes[2] - 1)) &&  */
+/* 		    (ijk[0] != 0 || (nDims == 3 && ijk[2] != grid->sizes[2] - 1)) &&  */
+/* 		    (ijk[0] != grid->sizes[0] - 1 || (nDims == 3 && ijk[2] != 0)) &&  */
+/* 		    (ijk[0] != 0 || (nDims == 3 && ijk[2] != 0)) ) */
+/* 		{ */
+/* 			IndexSet_Add( set, n_i ); */
+/* 		} */
 	}
 
 	return set;
@@ -516,6 +522,7 @@ IndexSet* RegularMeshUtils_CreateGlobalTopLeftFrontSet( void* _mesh ) {
 	IndexSet*	set;
 	IJK		ijk;
 	unsigned	n_i;
+	int nDims;
 
 	assert( mesh );
 	assert( Mesh_GetDimSize( mesh ) >= 2 );
@@ -523,6 +530,7 @@ IndexSet* RegularMeshUtils_CreateGlobalTopLeftFrontSet( void* _mesh ) {
 	grid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
 					      ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
 
+        nDims = Mesh_GetDimSize( mesh );
 	nNodes = Mesh_GetDomainSize( mesh, MT_VERTEX );
 	set = IndexSet_New( nNodes );
 
@@ -530,7 +538,7 @@ IndexSet* RegularMeshUtils_CreateGlobalTopLeftFrontSet( void* _mesh ) {
 		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
 		if( ijk[0] == 0 && 
 		    ijk[1] == grid->sizes[1] - 1 && 
-		    ijk[2] == grid->sizes[2] - 1 )
+		    (nDims != 3 || ijk[2] == grid->sizes[2] - 1) )
 		{
 			IndexSet_Add( set, n_i );
 		}
@@ -546,6 +554,7 @@ IndexSet* RegularMeshUtils_CreateGlobalTopRightFrontSet( void* _mesh ) {
 	IndexSet*	set;
 	IJK		ijk;
 	unsigned	n_i;
+	int nDims;
 
 	assert( mesh );
 	assert( Mesh_GetDimSize( mesh ) >= 2 );
@@ -553,6 +562,7 @@ IndexSet* RegularMeshUtils_CreateGlobalTopRightFrontSet( void* _mesh ) {
 	grid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
 					      ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
 
+        nDims = Mesh_GetDimSize( mesh );
 	nNodes = Mesh_GetDomainSize( mesh, MT_VERTEX );
 	set = IndexSet_New( nNodes );
 
@@ -560,7 +570,7 @@ IndexSet* RegularMeshUtils_CreateGlobalTopRightFrontSet( void* _mesh ) {
 		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
 		if( ijk[0] == grid->sizes[0] - 1 && 
 		    ijk[1] == grid->sizes[1] - 1 && 
-		    ijk[2] == grid->sizes[2] - 1 )
+		    (nDims != 3 || ijk[2] == grid->sizes[2] - 1) )
 		{
 			IndexSet_Add( set, n_i );
 		}
@@ -574,6 +584,7 @@ IndexSet* RegularMeshUtils_CreateGlobalBottomLeftBackSet( void* _mesh ) {
 	Grid*		grid;
 	unsigned	nNodes;
 	IndexSet*	set;
+	int nDims;
 	IJK		ijk;
 	unsigned	n_i;
 
@@ -583,6 +594,7 @@ IndexSet* RegularMeshUtils_CreateGlobalBottomLeftBackSet( void* _mesh ) {
 	grid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
 					      ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
 
+        nDims = Mesh_GetDimSize( mesh );
 	nNodes = Mesh_GetDomainSize( mesh, MT_VERTEX );
 	set = IndexSet_New( nNodes );
 
@@ -590,7 +602,7 @@ IndexSet* RegularMeshUtils_CreateGlobalBottomLeftBackSet( void* _mesh ) {
 		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
 		if( ijk[0] == 0 && 
 		    ijk[1] == 0 && 
-		    ijk[2] == 0 )
+		    (nDims != 3 || ijk[2] == 0))
 		{
 			IndexSet_Add( set, n_i );
 		}
@@ -603,6 +615,7 @@ IndexSet* RegularMeshUtils_CreateGlobalBottomRightBackSet( void* _mesh ) {
 	Mesh*		mesh = (Mesh*)_mesh;
 	Grid*		grid;
 	unsigned	nNodes;
+	int nDims;
 	IndexSet*	set;
 	IJK		ijk;
 	unsigned	n_i;
@@ -613,6 +626,7 @@ IndexSet* RegularMeshUtils_CreateGlobalBottomRightBackSet( void* _mesh ) {
 	grid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
 					      ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
 
+        nDims = Mesh_GetDimSize( mesh );
 	nNodes = Mesh_GetDomainSize( mesh, MT_VERTEX );
 	set = IndexSet_New( nNodes );
 
@@ -620,7 +634,7 @@ IndexSet* RegularMeshUtils_CreateGlobalBottomRightBackSet( void* _mesh ) {
 		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
 		if( ijk[0] == grid->sizes[0] - 1 && 
 		    ijk[1] == 0 && 
-		    ijk[2] == 0 )
+		    (nDims != 3 || ijk[2] == 0) )
 		{
 			IndexSet_Add( set, n_i );
 		}
@@ -636,6 +650,7 @@ IndexSet* RegularMeshUtils_CreateGlobalTopLeftBackSet( void* _mesh ) {
 	IndexSet*	set;
 	IJK		ijk;
 	unsigned	n_i;
+	int nDims;
 
 	assert( mesh );
 	assert( Mesh_GetDimSize( mesh ) >= 2 );
@@ -643,6 +658,7 @@ IndexSet* RegularMeshUtils_CreateGlobalTopLeftBackSet( void* _mesh ) {
 	grid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
 					      ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
 
+        nDims = Mesh_GetDimSize( mesh );
 	nNodes = Mesh_GetDomainSize( mesh, MT_VERTEX );
 	set = IndexSet_New( nNodes );
 
@@ -650,7 +666,7 @@ IndexSet* RegularMeshUtils_CreateGlobalTopLeftBackSet( void* _mesh ) {
 		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
 		if( ijk[0] == 0 && 
 		    ijk[1] == grid->sizes[1] - 1 && 
-		    ijk[2] == 0 )
+		    (nDims != 3 || ijk[2] == 0) )
 		{
 			IndexSet_Add( set, n_i );
 		}
@@ -666,6 +682,7 @@ IndexSet* RegularMeshUtils_CreateGlobalTopRightBackSet( void* _mesh ) {
 	IndexSet*	set;
 	IJK		ijk;
 	unsigned	n_i;
+	int nDims;
 
 	assert( mesh );
 	assert( Mesh_GetDimSize( mesh ) >= 2 );
@@ -673,6 +690,7 @@ IndexSet* RegularMeshUtils_CreateGlobalTopRightBackSet( void* _mesh ) {
 	grid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
 					      ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
 
+        nDims = Mesh_GetDimSize( mesh );
 	nNodes = Mesh_GetDomainSize( mesh, MT_VERTEX );
 	set = IndexSet_New( nNodes );
 
@@ -680,7 +698,7 @@ IndexSet* RegularMeshUtils_CreateGlobalTopRightBackSet( void* _mesh ) {
 		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
 		if( ijk[0] == grid->sizes[0] - 1 && 
 		    ijk[1] == grid->sizes[1] - 1 && 
-		    ijk[2] == 0 )
+		    (nDims != 3 || ijk[2] == 0) )
 		{
 			IndexSet_Add( set, n_i );
 		}
@@ -1021,4 +1039,56 @@ Node_DomainIndex RegularMeshUtils_GetDiagOppositeAcrossElementNodeIndex( void* _
 	oppositeNode_dI = currElementNodes[oppositeNode_eI];
 	NewClass_Delete( inc );
 	return oppositeNode_dI;
+}
+
+IndexSet* RegularMeshUtils_CreateGlobalBottomLeftSet( void* _mesh ) {
+	Mesh*		mesh = (Mesh*)_mesh;
+	unsigned	nNodes;
+	IndexSet*	set;
+	IJK		ijk;
+	int nDims;
+	unsigned	n_i;
+
+	assert( mesh );
+	assert( Mesh_GetDimSize( mesh ) >= 2 );
+
+        nDims = Mesh_GetDimSize( mesh );
+	nNodes = Mesh_GetDomainSize( mesh, MT_VERTEX );
+	set = IndexSet_New( nNodes );
+
+	for( n_i = 0; n_i < nNodes; n_i++ ) {
+		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
+		if( ijk[1] == 0 && ijk[0] == 0 )
+			IndexSet_Add( set, n_i );
+	}
+
+	return set;
+}
+
+IndexSet* RegularMeshUtils_CreateGlobalBottomRightSet( void* _mesh ) {
+	Mesh*		mesh = (Mesh*)_mesh;
+	unsigned	nNodes;
+	IndexSet*	set;
+	IJK		ijk;
+	Grid*	grid;
+	int nDims;
+	unsigned	n_i;
+
+	assert( mesh );
+	assert( Mesh_GetDimSize( mesh ) >= 2 );
+
+	grid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
+					      ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+
+        nDims = Mesh_GetDimSize( mesh );
+	nNodes = Mesh_GetDomainSize( mesh, MT_VERTEX );
+	set = IndexSet_New( nNodes );
+
+	for( n_i = 0; n_i < nNodes; n_i++ ) {
+		RegularMeshUtils_Node_1DTo3D( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
+		if( ijk[1] == 0 && ijk[0] == grid->sizes[0] - 1 )
+			IndexSet_Add( set, n_i );
+	}
+
+	return set;
 }
