@@ -300,8 +300,8 @@ Bool _lucSDLWindow_EventProcessor( void* window ) {
 			break;	
 		case SDL_VIDEORESIZE:
 			lucSDLWindow_Resize(window, event.resize.w, event.resize.h);
-			lucWindow_Resize( self, event.resize.w, event.resize.h);
 			_lucWindow_Initialise(window, self->context);	/* Reset font stuff */
+			lucWindow_Resize( self, event.resize.w, event.resize.h);
 			break;
 		case SDL_KEYDOWN:
 			keyPressed = event.key.keysym.sym;
@@ -328,7 +328,6 @@ Bool _lucSDLWindow_EventProcessor( void* window ) {
 			if (!self->interactive) 
 			{
 				/* Interactive mode switched off */
-				lucWindow_SetViewportNeedsToDrawFlag( self, True );
 				SDL_RemoveTimer(self->timer);
 				self->quitEventLoop = True;
 			}
