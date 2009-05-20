@@ -59,232 +59,148 @@ ExtensionInfo_Index Underworld_MeshAdvectionCorrection_ContextExtHandle;
 typedef struct {
 	/* Save the "old" execute function pointer (which we replace) */ 
 	Stg_Component_ExecuteFunction* energySolverExecute;
-	void (*_findArtificalVelocity)(void* feVariable, double* artVelocity, void* data);
-	Axis extAxis;
+	FeVariable* artDisplacement;
+	double dt;
 } Underworld_MeshAdvectionCorrection_ContextExt;
 
-
-void MeshAdVectionCorrection_SingleAxisExtension( void* feVariable, double* artVelocity, void* data ) {
-	/* This function assumes the two plane walls in a single axis only are moving. */
-	FeVariable*                self          = (FeVariable*)  feVariable;
-	Mesh*                      mesh          = (Mesh*)        self->feMesh;
-	int                        planeAxis     = *(int*)data; /* recast data */
-	Grid*                      vertGrid;
-
-	double*                    valueMinSideWallLocal;
-	double*                    valueMaxSideWallLocal;
-	double*                    valueMinSideWallGlobal;
-	double*                    valueMaxSideWallGlobal;
-	double                     minCoord[3], maxCoord[3];
-	double*                    coord;
-	int                        globalNodeIJK[3];
- 	double                     artificialVelocity[3] = {0,0,0};
-	Dimension_Index            aAxis, bAxis;
-	IJK                        minNodeIJK, maxNodeIJK;
-	Index                      array_I;
-	Node_Index                 aNode_I, bNode_I;
-	Node_GlobalIndex           minNodeGlobal_I, maxNodeGlobal_I;
-	Node_LocalIndex            minNodeLocal_I, maxNodeLocal_I;
-	Node_Index                 sideNodeCount, lNodeCount, lNode_I, gNode_I;
-	//MPI_Comm                   comm;
-	Dof_Index                  dof           = self->fieldComponentCount;
-	Dof_Index                  dof_I;
-
-	//comm = Mesh_GetCommTopology( mesh, MT_VERTEX ) ;
-	vertGrid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
-						  ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
-	
-	lNodeCount = FeMesh_GetNodeLocalSize( mesh );
-
-	aAxis =  ( planeAxis == I_AXIS ? J_AXIS : I_AXIS );
-	sideNodeCount = vertGrid->sizes[ aAxis ];
-
-	if( self->dim == 3 ) {
-		bAxis = ( planeAxis == K_AXIS ? I_AXIS : K_AXIS );
-		sideNodeCount = vertGrid->sizes[ aAxis ] * vertGrid->sizes[ bAxis ];
-	}
-
-	valueMinSideWallLocal = Memory_Alloc_Array( double, sideNodeCount*dof, "valueMinSideWallLocal" );
-	valueMaxSideWallLocal = Memory_Alloc_Array( double, sideNodeCount*dof, "valueMaxSideWallLocal" );
-	valueMinSideWallGlobal = Memory_Alloc_Array( double, sideNodeCount*dof, "valueMinSideWallGlobal" );
-	valueMaxSideWallGlobal = Memory_Alloc_Array( double, sideNodeCount*dof, "valueMaxSideWallGlobal" );
-
-	/* Loop over all nodes on the minimum side wall and the maximum side wall */
-	minNodeIJK[ planeAxis ] = 0;
-	maxNodeIJK[ planeAxis ] = vertGrid->sizes[ planeAxis ] - 1 ;
-	array_I = 0;
-
-	if( self->dim == 3 ) {
-		for ( aNode_I = 0 ; aNode_I < vertGrid->sizes[ aAxis ] ; aNode_I++ ) {
-			minNodeIJK[ aAxis ] = maxNodeIJK[ aAxis ] = aNode_I;
-			for ( bNode_I = 0 ; bNode_I < vertGrid->sizes[ bAxis ] ; bNode_I++ ) {
-				minNodeIJK[ bAxis ] = maxNodeIJK[ bAxis ] = bNode_I;
-
-				/* Get Global Node Indicies for the node at these walls */
-				minNodeGlobal_I = Grid_Project( vertGrid, minNodeIJK );
-				maxNodeGlobal_I = Grid_Project( vertGrid, maxNodeIJK );
-
-				/* Check to see whether this min node is on this processor */
-				if ( Mesh_GlobalToDomain( mesh, MT_VERTEX, minNodeGlobal_I, &minNodeLocal_I ) )
-					FeVariable_GetValueAtNode( feVariable, minNodeLocal_I, &valueMinSideWallLocal[ array_I*dof ] );
-				else {
-					for ( dof_I = 0 ; dof_I < dof ; dof_I++ ) 
-						/* Initialise all values to some really large value so that 
-						 * MPI_Allreduce can find value from correct processor */
-						valueMinSideWallLocal[ array_I*dof + dof_I ] = HUGE_VAL;
-				}
-				
-				/* Check to see whether this max node is on this processor */
-				if ( Mesh_GlobalToDomain( mesh, MT_VERTEX, maxNodeGlobal_I, &maxNodeLocal_I ) )
-					FeVariable_GetValueAtNode( feVariable, maxNodeLocal_I, &valueMaxSideWallLocal[ array_I*dof ] );
-				else {
-					for ( dof_I = 0 ; dof_I < dof ; dof_I++ ) 
-						/* Initialise all values to some really large value so that 
-						 * MPI_Allreduce can find value from correct processor */
-						valueMaxSideWallLocal[ array_I*dof + dof_I ] = HUGE_VAL;
-				}
-				
-				/* Increment counter for side wall node index */
-				array_I++;
-			}
-		}
-	} else {
-		for( aNode_I = 0 ; aNode_I < vertGrid->sizes[ aAxis ] ; aNode_I++ ) {
-			minNodeIJK[ aAxis ] = maxNodeIJK[ aAxis ] = aNode_I;
-			/* Get Global Node Indicies for the node at these walls */
-			minNodeGlobal_I = Grid_Project( vertGrid, minNodeIJK );
-			maxNodeGlobal_I = Grid_Project( vertGrid, maxNodeIJK );
-
-			/* Check to see whether this min node is on this processor */
-			if ( Mesh_GlobalToDomain( mesh, MT_VERTEX, minNodeGlobal_I, &minNodeLocal_I ) )
-				FeVariable_GetValueAtNode( feVariable, minNodeLocal_I, &valueMinSideWallLocal[ array_I*dof ] );
-			else {
-				for ( dof_I = 0 ; dof_I < dof ; dof_I++ ) 
-					/* Initialise all values to some really large value so that 
-					 * MPI_Allreduce can find value from correct processor */
-					valueMinSideWallLocal[ array_I*dof + dof_I ] = HUGE_VAL;
-			}
-			
-			/* Check to see whether this max node is on this processor */
-			if ( Mesh_GlobalToDomain( mesh, MT_VERTEX, maxNodeGlobal_I, &maxNodeLocal_I ) )
-				FeVariable_GetValueAtNode( feVariable, maxNodeLocal_I, &valueMaxSideWallLocal[ array_I*dof ] );
-			else {
-				for ( dof_I = 0 ; dof_I < dof ; dof_I++ ) 
-					/* Initialise all values to some really large value so that 
-					 * MPI_Allreduce can find value from correct processor */
-					valueMaxSideWallLocal[ array_I*dof + dof_I ] = HUGE_VAL;
-			}
-			
-			/* Increment counter for side wall node index */
-			array_I++;
-		}
-	}
-
-
-	MPI_Allreduce( valueMinSideWallLocal, valueMinSideWallGlobal, sideNodeCount*dof, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD );
-	MPI_Allreduce( valueMaxSideWallLocal, valueMaxSideWallGlobal, sideNodeCount*dof, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD );
-
-	Memory_Free( valueMinSideWallLocal );
-	Memory_Free( valueMaxSideWallLocal );
-	
-	/** Set artificial velcoity field **/
-
-	Mesh_GetGlobalCoordRange( mesh, minCoord, maxCoord );
-
-	for( lNode_I = 0 ; lNode_I < lNodeCount ; lNode_I++ ) {
-		/* get node coord */
-		coord = Mesh_GetVertex( mesh, lNode_I );
-
-		/* get IJK params for node */
-		gNode_I = Mesh_DomainToGlobal( mesh, MT_VERTEX, lNode_I );
-		Grid_Lift( vertGrid, gNode_I, globalNodeIJK );
-
-		/* assumes 2D only, and extension in X */
-		array_I = globalNodeIJK[aAxis] * dof + planeAxis;
-		/* 3D */
-		if( self->dim==3 ) 
-			array_I = (globalNodeIJK[aAxis]*vertGrid->sizes[bAxis] + globalNodeIJK[bAxis]) * dof + planeAxis;
-
-		artificialVelocity[ planeAxis ] = 
-			(coord[ planeAxis ] - minCoord[ planeAxis ])/(maxCoord[ planeAxis ] - minCoord[ planeAxis ]) * 
-			( valueMaxSideWallGlobal[ array_I ] - valueMinSideWallGlobal[ array_I ] ) + valueMinSideWallGlobal[ array_I ];
-
-		memcpy( &artVelocity[lNode_I*dof] , artificialVelocity, dof*sizeof(double) );
-	}
-}
 
 typedef enum {
 	ADD,
 	MINUS
 } CorrectionFlag;
 
-void MeshAdvectionCorrection_AddCorrection( FeVariable* feVariable, double* artVelocity, CorrectionFlag flag ) {
-	/* This function offset the VelocityField by the artificialVelocityField */
-	FeVariable*  self          = (FeVariable*)  feVariable;
+void MeshAdvectionCorrection_AddCorrection( FeVariable* velocityField, double* oldVelocity, double* artVelocity, CorrectionFlag flag ) {
+	/* This function offsets the VelocityField depending on the the flag:
+	 * if flag == ADD
+	 * 		velocity = oldVelocity
+	 * else {
+	 * 		if( artificalVelocity ) {	velocity = artVelocity }
+	 * 		else { velocity = (0,0) } 
+	 */
+	FeVariable*  self          = (FeVariable*)  velocityField;
 	FeMesh*      mesh          = self->feMesh;
 	int          lNodeCount    = FeMesh_GetNodeLocalSize( mesh );
 	int          dof           = self->fieldComponentCount;
 	int          dim           = self->dim;
-	double       oldVec[3], currentVec[3], newVec[3];
+	double       oldV[3], artV[3], zero[3];
 	int lNode_I;
 
+	zero[0]=zero[1]=zero[2] = 0;
+
 	for( lNode_I = 0 ; lNode_I < lNodeCount ; lNode_I++ ) {
-		memcpy( oldVec, &artVelocity[lNode_I*dof], dof*sizeof(double) );
 
-		FeVariable_GetValueAtNode( feVariable, lNode_I, currentVec );
+		if ( flag == ADD ) {
+			/* velocity = stored values from oldVelocity */
+			memcpy( oldV, &oldVelocity[lNode_I*dof], dof*sizeof(double) );
+			FeVariable_SetValueAtNode( velocityField, lNode_I, oldV );
+		}
+		else {
+			if( artVelocity != 0 ) { /* use artificial velocity */
+				memcpy( artV, &artVelocity[lNode_I*dof], dof*sizeof(double) );
+				FeVariable_SetValueAtNode( velocityField, lNode_I, artV );
+			} else { /* just zero the velocity */
+				FeVariable_SetValueAtNode( velocityField, lNode_I, zero );
+			}
+		}
 
-		if ( flag == ADD ) 
-			StGermain_VectorAddition(newVec, currentVec, oldVec, dim );
-		else 
-			StGermain_VectorSubtraction(newVec, currentVec, oldVec, dim );
-
-		FeVariable_SetValueAtNode( feVariable, lNode_I, newVec );
 	}
+}
+
+MeshAdvectionCorrection_StoreCurrentVelocity( FeVariable *velocityField, double *oldVelocity ) {
+	/* save the current values of the velocity field in the oldVelocity array */
+	FeMesh *mesh = velocityField->feMesh;
+	unsigned dof = velocityField->fieldComponentCount;
+	unsigned numLocalNodes = FeMesh_GetNodeLocalSize( mesh );
+	unsigned lNode_I;
+	double vel[3];
+
+	for( lNode_I = 0 ; lNode_I < numLocalNodes ; lNode_I++ ) {
+		FeVariable_GetValueAtNode( velocityField, lNode_I, vel );
+		memcpy( &oldVelocity[lNode_I*dof], vel, dof*sizeof(double) );
+	}
+}
+
+void MeshAdvectionCorrection_EulerDeformCorrection( FeVariable *artDField, double *artVelocity, double dt ) {
+	/* save the purely artificial bit of the remeshing in the artVelocity */
+	FeMesh*      mesh = artDField->feMesh;
+	Dof_Index    dof  = artDField->fieldComponentCount;
+	double       artV[3], artD[3];
+	int numLocalNodes = FeMesh_GetNodeLocalSize( mesh );
+	Dof_Index    dof_I, lNode_I;
+
+		/* INITIAL CONDITION: artV = 0 */
+	if( dt == 0 ) {
+		for( lNode_I = 0 ; lNode_I < numLocalNodes ; lNode_I++ ) {
+			for( dof_I = 0 ; dof_I < dof ; dof_I++ ) 
+				artV[dof_I] = 0;
+
+			memcpy( &artVelocity[lNode_I*dof] , artV, dof*sizeof(double) );
+		}
+		return;
+	}
+	
+	 /* GENERAL algorithm artV = -1*artD / dt. It's -ve because we 
+		* want to reverse the effects of the artificial displacement */
+	for( lNode_I = 0 ; lNode_I < numLocalNodes ; lNode_I++ ) {
+		FeVariable_GetValueAtNode( artDField, lNode_I, artD );
+		/* artV = artD / dt */
+		for( dof_I = 0 ; dof_I < dof ; dof_I++ ) 
+			artV[dof_I] = -1*artD[dof_I] / dt;
+
+		memcpy( &artVelocity[lNode_I*dof] , artV, dof*sizeof(double) );
+	}
+
 }
 
 void MeshAdvectionCorrection( void* sle, void* data ) {
 	UnderworldContext*                                      context                 = (UnderworldContext*) data;
 	Underworld_MeshAdvectionCorrection_ContextExt*          plugin;
-	FeVariable*                                             feVariable           = context->velocityField;
-	double*                                                 artVelocity;
+	FeVariable*                                             velocityField           = context->velocityField;
+	double dt = context->dt;
+	double *artVelocity, *oldVelocity;
 	int lNodeCount;
-	
-	lNodeCount = FeMesh_GetNodeLocalSize( feVariable->feMesh );
+	lNodeCount = FeMesh_GetNodeLocalSize( velocityField->feMesh );
 
-	artVelocity = Memory_Alloc_Array( double, 
-			lNodeCount * feVariable->fieldComponentCount, 
+	artVelocity = oldVelocity = NULL;
+
+	/* store the current velocity in oldVelocity */
+	oldVelocity = Memory_Alloc_Array( double, 
+			lNodeCount * velocityField->fieldComponentCount, 
 			"artificial nodal velocities" );
 
+	/* get the plugin from the context */
 	plugin = ExtensionManager_Get( 
 		context->extensionMgr, 
 		context, 
 		Underworld_MeshAdvectionCorrection_ContextExtHandle );
 
-	/* Fine articfical nodal velocities */
-	/* IF plugin->extAxis is valid then */
-	plugin->_findArtificalVelocity( feVariable, artVelocity, (void*)&plugin->extAxis );
-	/* ELSE
-	 * 	yet to be implemented */
+	MeshAdvectionCorrection_StoreCurrentVelocity( velocityField, oldVelocity );
+
+	if( plugin->artDisplacement ) {
+		artVelocity = Memory_Alloc_Array( double, lNodeCount * velocityField->fieldComponentCount, "artificial nodal velocities" );
+		MeshAdvectionCorrection_EulerDeformCorrection( plugin->artDisplacement, artVelocity, dt );
+	}
 
 	/* Correct velocity and re-sync shadow space */
-	MeshAdvectionCorrection_AddCorrection( feVariable, artVelocity, MINUS );
-	FeVariable_SyncShadowValues( feVariable );
+	MeshAdvectionCorrection_AddCorrection( velocityField, oldVelocity, artVelocity, MINUS );
+	FeVariable_SyncShadowValues( velocityField );
 
 	/* Solve Energy equation */
 	plugin->energySolverExecute( sle, context );
 
 	/* Reverse correction and re-sync */
-	MeshAdvectionCorrection_AddCorrection( feVariable, artVelocity, ADD );
-	FeVariable_SyncShadowValues( feVariable );
+	MeshAdvectionCorrection_AddCorrection( velocityField, oldVelocity, artVelocity, ADD );
+	FeVariable_SyncShadowValues( velocityField );
 
-	Memory_Free( artVelocity );
+	if( plugin->artDisplacement )
+		Memory_Free( artVelocity );
+	Memory_Free( oldVelocity );
 }
 
 void _Underworld_MeshAdvectionCorrection_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext*                                      context = 
 	Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
 	Underworld_MeshAdvectionCorrection_ContextExt*       plugin;
-	char* extAxisName = NULL;
 	
 	Journal_DFirewall( 
 		(Bool)context, 
@@ -305,22 +221,11 @@ void _Underworld_MeshAdvectionCorrection_Construct( void* component, Stg_Compone
 		context, 
 		Underworld_MeshAdvectionCorrection_ContextExtHandle );
 
-	extAxisName = Stg_ComponentFactory_GetRootDictString( cf, "MeshAdvectionCorrect_wallExtensionAxis", "x" );
-	switch ( extAxisName[0] ) {
-		case 'x': case 'X': case 'i': case 'I': case '0':
-			plugin->extAxis = I_AXIS; break;
-		case 'y': case 'Y': case 'j': case 'J': case '1':
-			plugin->extAxis = J_AXIS; break;
-		case 'z': case 'Z': case 'k': case 'K': case '2':
-			plugin->extAxis = K_AXIS; break;
-		default:
-			Journal_Firewall( False, Journal_Register( Error_Type, Underworld_MeshAdvectionCorrection_Type ),
-				"Error: MeshAdvectionCorrect doesn't know how to estimate wallVC\n"
-				"For example add:\n"
-				"<param name=\"MeshAdvectionCorrect_wallExtensionAxis\">x</param>\n");
+	if( Stg_ComponentFactory_GetRootDictBool( cf, "MeshAdvectionCorrection_UseArtDisplacementField", False) ) {
+		/* get the artificial displacement field */
+		plugin->artDisplacement = Stg_ComponentFactory_ConstructByName( cf, "ArtDisplacementField", FeVariable, True, data );
 	}
-	
-	plugin->_findArtificalVelocity = MeshAdVectionCorrection_SingleAxisExtension;
+
 	/* Replace the energy SLE's execute with this one. Save the old value for use later. */
 	plugin->energySolverExecute = context->energySLE->_execute;
 	context->energySLE->_execute = MeshAdvectionCorrection;
