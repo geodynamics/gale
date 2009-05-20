@@ -109,8 +109,8 @@ void _Underworld_EulerDeform_Construct( void* component, Stg_ComponentFactory* c
 		return;
 	}
 
-	/* Grab the ArtificialDisplacementField from the dictionary */
-	edCtx->artDField = Stg_ComponentFactory_ConstructByName( cf, "ArtificialDisplacementField", FeVariable, False, data );
+	/* Grab the ArtDisplacementField from the dictionary */
+	edCtx->artDField = Stg_ComponentFactory_ConstructByName( cf, "ArtDisplacementField", FeVariable, False, data );
 
 	/* Read system list. */
 	sysLst = Dictionary_Entry_Value_GetMember( edDict, "systems" );
