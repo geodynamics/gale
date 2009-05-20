@@ -294,10 +294,13 @@ class Package(Module):
         return self.search_dirs(cand)
 
     def gen_lib_cands(self, dirs):
+        utils.log("Searching %s"%repr(dirs), post_indent=1)
         for env in self._lib_sets:
 
+            utils.log("Trying %s"%repr(env), post_indent=1)
             inc_paths = self.find_incs(dirs[1], env["incs"])
             if inc_paths is None:
+                utils.log("Could not find includes.", post_indent=-1)
                 continue
 
             if self.forced_libs:
@@ -337,6 +340,9 @@ class Package(Module):
             st_lib_paths = [p for p in st_lib_paths if p is not None]
             if len(st_lib_paths) == len(libs) and st_lib_paths != lib_paths:
                 yield {"incs": env["incs"], "lib_paths": st_lib_paths}
+
+            utils.log.unindent()
+        utils.log.unindent()
 
 
     def gen_base_dirs(self):
