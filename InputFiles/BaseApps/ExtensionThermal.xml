@@ -6,11 +6,17 @@
 	<include>ExtensionBaseApp.xml</include>
 
 	<list name="plugins" mergeType="merge">
-		<param>Underworld_MovingMeshEnergyCorrection</param>
+		<param>Underworld_MeshAdvectionCorrection</param>
 	</list>
 
 	<include>StgFEM/TemperatureField.xml       </include>
 	<include>StgFEM/TempAdvDiff.xml            </include>
+	<include>Underworld/ArtDisplacementField.xml</include>
+
+	<!-- This param should probably be True always, it controls if the Underworld_MeshAdvectionCorrection plugin
+	uses the artifical displacement field caused by the EulerDeform plugin or not,
+ 	I've left it optional for testing, 20May09, JG -->
+	<param name="MeshAdvectionCorrection_UseArtDisplacementField">True</param>
 
 
 </StGermainData>
