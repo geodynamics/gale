@@ -109,6 +109,9 @@ void _Underworld_EulerDeform_Construct( void* component, Stg_ComponentFactory* c
 		return;
 	}
 
+	/* Grab the ArtificialDisplacementField from the dictionary */
+	edCtx->artDField = Stg_ComponentFactory_ConstructByName( cf, "ArtificialDisplacementField", FeVariable, False, data );
+
 	/* Read system list. */
 	sysLst = Dictionary_Entry_Value_GetMember( edDict, "systems" );
 	if( sysLst ) {
@@ -503,7 +506,7 @@ void EulerDeform_Remesh( TimeIntegratee* crdAdvector, EulerDeform_Context* edCtx
 		double**		newCrds;
 		unsigned		nDomainNodes;
 		unsigned		nDims;
-		unsigned		var_i, n_i;
+		unsigned		var_i, n_i, dof_i;
 
 		nDims = Mesh_GetDimSize( sys->mesh );
 
@@ -611,6 +614,20 @@ void EulerDeform_Remesh( TimeIntegratee* crdAdvector, EulerDeform_Context* edCtx
 		for( var_i = 0; var_i < sys->nFields; var_i++ )
 		   EulerDeform_InterpVar( sys->fields[var_i],
 					  NULL/*sys->vars[var_i]*/, sys->mesh, newCrds );
+
+		/* Create an artificial displacement field from the nodal displacements between newCrds and oldCrds.
+		 * This displacement is currently used to correct the advDiffEqn's nodal velocity input */
+		if( edCtx->artDField ) {
+			double artDis[3]; /* temporary displacement vector */
+
+			for( n_i = 0 ; n_i < nDomainNodes; n_i++ ) {
+				for( dof_i = 0 ; dof_i < nDims ; dof_i++ ) {
+					artDis[dof_i] = newCrds[n_i][dof_i] - oldCrds[n_i][dof_i];
+				}
+				FeVariable_SetValueAtNode( edCtx->artDField, n_i, artDis );
+			}
+
+		}
 
 		/* Swap back coordinates and free memory. */
 		sys->mesh->verts = newCrds;
