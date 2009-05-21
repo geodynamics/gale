@@ -239,9 +239,12 @@ void _lucSwarmViewer_BuildDisplayList( void* drawingObject, void* _context ) {
 	   PatrickSunter - 8 Jun 2006 */
 			
 	glDisable(GL_LIGHTING);
-		
-	if(self->pointSmoothing) 
+
+	if(self->pointSmoothing) {
 		glEnable(GL_POINT_SMOOTH);
+		/* Point smoothing will not work correctly with depth testing enabled*/
+		glDisable(GL_DEPTH_TEST);
+	}
 	else 
 		glDisable(GL_POINT_SMOOTH);
 		
@@ -254,11 +257,11 @@ void _lucSwarmViewer_BuildDisplayList( void* drawingObject, void* _context ) {
 	glEnd( );
 
 	/* Put back lighting / smoothing settings to low-impact options */
-	
 	glEnable(GL_LIGHTING);	
 		
 	if(self->pointSmoothing) {
 		glDisable(GL_POINT_SMOOTH);
+		glEnable(GL_DEPTH_TEST);
 	}
 }
 
