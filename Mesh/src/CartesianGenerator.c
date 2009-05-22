@@ -2053,8 +2053,8 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
 	
 #ifdef READ_HDF5
 	hid_t             file, fileSpace, fileData;
-	hsize_t           start[2], count[2], size[2];
-	hid_t             memSpace;
+	hsize_t           start[2], count[2], size[2], maxSize[2];   
+	hid_t             memSpace, error;
 	double            buf[4];
    Node_LocalIndex   lNode_I = 0;
 	Node_GlobalIndex  gNode_I = 0;
@@ -2149,15 +2149,39 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
 	      count[1] = mesh->topo->nDims + 1;
          memSpace = H5Screate_simple( 2, count, NULL );
          totalVerts = Mesh_GetGlobalSize( mesh, 0 );
-            
+
+         /* Get size of dataspace to check consistency */
+         H5Sget_simple_extent_dims( fileSpace, size, maxSize ); 
+
+         Journal_Firewall( 
+            (maxSize[0] == totalVerts), 
+            errorStream,
+            "\n\nError in %s for %s '%s'\n"
+            "Number of mesh vertices (%u) stored in %s does not correspond to total number of requested mesh vertices (%u).\n", 
+            __func__, 
+            self->type, 
+            self->name, 
+            (unsigned int)maxSize[0],
+            meshSaveFileName,
+            totalVerts);
+
 	      for( ii=0; ii<totalVerts; ii++ ) {   
 	         start[0] = ii;
                   
             H5Sselect_hyperslab( fileSpace, H5S_SELECT_SET, start, NULL, count, NULL );
             H5Sselect_all( memSpace );
             
-            H5Dread( fileData, H5T_NATIVE_DOUBLE, memSpace, fileSpace, H5P_DEFAULT, buf );
+            error = H5Dread( fileData, H5T_NATIVE_DOUBLE, memSpace, fileSpace, H5P_DEFAULT, buf );
             gNode_I = (int)buf[0];
+
+            Journal_Firewall( 
+               error >= 0, 
+               errorStream,
+               "\n\nError in %s for %s '%s' - Cannot read data in %s.\n", 
+               __func__, 
+               self->type, 
+               self->name, 
+               meshSaveFileName );
             
             if( Mesh_GlobalToDomain( mesh, MT_VERTEX, gNode_I, &lNode_I ) && 
 		          lNode_I < Mesh_GetLocalSize( mesh, MT_VERTEX ) )
