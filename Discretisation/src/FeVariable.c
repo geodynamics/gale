@@ -2229,9 +2229,8 @@ void FeVariable_ReadFromFile( void* feVariable, const char* filename ) {
 	Stream*            errorStr = Journal_Register( Error_Type, self->type );
 	
 #ifdef READ_HDF5
-   hid_t             file, fileSpace, fileData;
-   int               totalNodes, ii;
-   hid_t             props;
+   hid_t             file, fileSpace, fileData, error;
+   unsigned          totalNodes, ii;
    hid_t             memSpace;
    hsize_t           start[2], count[2], size[2], maxSize[2];
    double*           buf; 
@@ -2273,7 +2272,7 @@ void FeVariable_ReadFromFile( void* feVariable, const char* filename ) {
    
    /* Get size of dataspace to determine if coords are in file */
    H5Sget_simple_extent_dims( fileSpace, size, maxSize ); 
-   
+
    if( maxSize[1] > dofAtEachNodeCount + 1 ) 
       savedCoords = True;
        
@@ -2286,6 +2285,19 @@ void FeVariable_ReadFromFile( void* feVariable, const char* filename ) {
    memSpace = H5Screate_simple( 2, count, NULL );
    totalNodes = Mesh_GetGlobalSize( self->feMesh, 0 );
    buf = Memory_Alloc_Array( double, count[1], "fileBuffer" );
+
+   Journal_Firewall( 
+      (maxSize[0] == totalNodes), 
+      errorStr,
+      "\n\nError in %s for %s '%s'\n"
+      "Number of node values (%u) stored in %s does not correspond to total number of requested mesh nodes (%u).\n", 
+      __func__, 
+      self->type, 
+      self->name, 
+      (unsigned int)maxSize[0],
+      filename,
+      totalNodes);
+   
          
    /* Read from HDF5 checkpint file */
    for( ii=0; ii<totalNodes; ii++ ) {   
@@ -2294,9 +2306,18 @@ void FeVariable_ReadFromFile( void* feVariable, const char* filename ) {
       H5Sselect_hyperslab( fileSpace, H5S_SELECT_SET, start, NULL, count, NULL );
       H5Sselect_all( memSpace );
          
-      H5Dread( fileData, H5T_NATIVE_DOUBLE, memSpace, fileSpace, H5P_DEFAULT, buf );
+      error = H5Dread( fileData, H5T_NATIVE_DOUBLE, memSpace, fileSpace, H5P_DEFAULT, buf );
       gNode_I = (int)buf[0];
-         
+
+      Journal_Firewall( 
+         error >= 0, 
+         errorStr,
+         "\n\nError in %s for %s '%s' - Cannot read data in %s.\n", 
+         __func__, 
+         self->type, 
+         self->name, 
+         filename );
+      
       if( Mesh_GlobalToDomain( self->feMesh, MT_VERTEX, gNode_I, &lNode_I ) && 
 		   lNode_I < Mesh_GetLocalSize( self->feMesh, MT_VERTEX ) )
 		{
