@@ -240,7 +240,10 @@ void _SwarmOutput_Initialise( void* swarmOutput, void* data ) {
 	Particle_Index   lParticle_I;
 	Name             filename;
 	Stream*          stream              = Journal_Register( Info_Type, SwarmOutput_Type );
-	
+
+   /* re-enable printing from current rank process */
+	Stream_SetPrintingRank( stream, context->rank );
+   
 	Stg_Component_Initialise( self->globalIndexVariable, context, False );
 
    if( !context->loadFromCheckPoint ) _SwarmOutput_SetGlobalIndicies( self, context );
@@ -268,6 +271,9 @@ void _SwarmOutput_Execute( void* swarmOutput, void* data ) {
 	Particle_Index    lParticle_I;
 	Name              filename;
 	Stream*           stream              = Journal_Register( Info_Type, SwarmOutput_Type );
+
+   /* re-enable printing from current rank process */
+	Stream_SetPrintingRank( stream, context->rank );
 
 	Variable_Update( globalIndexVariable );
 
