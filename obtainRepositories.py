@@ -12,7 +12,7 @@ cwd = os.getcwd()
 
 deps = [ \
 	['https://csd.vpac.org/hg/hgforest', '.hg/forest' ], \
-	['https://csd.vpac.org/hg/SConfigure', 'config' ], \
+	['https://csd.vpac.org/hg/SConfigure/trunk', 'config' ], \
 	['https://www.mcc.monash.edu.au/hg/gLucifer', 'gLucifer' ], \
 	['https://csd.vpac.org/hg/PICellerator', 'PICellerator' ], \
 	['https://csd.vpac.org/hg/StgDomain', 'StgDomain' ], \
@@ -53,11 +53,12 @@ for dep in deps:
         # JS - 12/11/2008
         os.chdir(dep[1])
         try:
-                os.system("hg up "+branch)
+                os.system("hg up -C "+branch)
         except:
                 print "fail"
 
 # Tell this root repository that its has forest
+os.chdir(cwd)
 c=ConfigParser.ConfigParser()
 c.read('.hg/hgrc')
 try:
