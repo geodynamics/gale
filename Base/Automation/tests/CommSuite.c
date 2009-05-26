@@ -53,6 +53,7 @@ void CommSuite_Teardown( CommSuiteData* data ) {
 void CommSuite_TestConstruct( CommSuiteData* data ) {
    Comm* comm;
 
+   pcu_check_true( 0 == "The Comm macro-style component seems to be broken currently - aborting test." ); return;
    comm = Comm_New();
    pcu_check_true( comm );
    pcu_check_true( comm->mpiComm == MPI_COMM_WORLD );
@@ -67,6 +68,7 @@ void CommSuite_TestConstruct( CommSuiteData* data ) {
 void CommSuite_TestSetMPIComm( CommSuiteData* data ) {
    Comm* comm;
 
+   pcu_check_true( 0 == "The Comm macro-style component seems to be broken currently - aborting test." ); return;
    comm = Comm_New();
    Comm_SetMPIComm( comm, MPI_COMM_WORLD );
    pcu_check_true( comm->mpiComm == MPI_COMM_WORLD );
@@ -80,6 +82,7 @@ void CommSuite_TestSetNbrs( CommSuiteData* data ) {
    int nRanks, rank;
    int nNbrs, nbrs[2];
 
+   pcu_check_true( 0 == "The Comm macro-style component seems to be broken currently - aborting test." ); return;
    MPI_Comm_size( MPI_COMM_WORLD, &nRanks );
    MPI_Comm_rank( MPI_COMM_WORLD, &rank );
    if( nRanks > 1 ) {
@@ -141,6 +144,7 @@ void CommSuite_TestAddNbrs( CommSuiteData* data ) {
    int nRanks, rank;
    int nNbrs, nbrs[2];
 
+   pcu_check_true( 0 == "The Comm macro-style component seems to be broken currently - aborting test." ); return;
    MPI_Comm_size( MPI_COMM_WORLD, &nRanks );
    MPI_Comm_rank( MPI_COMM_WORLD, &rank );
    if( nRanks > 1 ) {
@@ -209,6 +213,7 @@ void CommSuite_TestRemNbrs( CommSuiteData* data ) {
    int nNbrs, nbrs[2];
    IMap mapObj, *map = &mapObj;
 
+   pcu_check_true( 0 == "The Comm macro-style component seems to be broken currently - aborting test." ); return;
    MPI_Comm_size( MPI_COMM_WORLD, &nRanks );
    MPI_Comm_rank( MPI_COMM_WORLD, &rank );
    if( nRanks > 1 ) {
@@ -276,6 +281,7 @@ void CommSuite_TestAllgather( CommSuiteData* data ) {
    int nRanks, rank;
    int nNbrs, nbrs[2];
 
+   pcu_check_true( 0 == "The Comm macro-style component seems to be broken currently - aborting test." ); return;
    MPI_Comm_size( MPI_COMM_WORLD, &nRanks );
    MPI_Comm_rank( MPI_COMM_WORLD, &rank );
    if( nRanks > 1 ) {
