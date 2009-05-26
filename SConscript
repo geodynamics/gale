@@ -61,6 +61,9 @@ libs = ['Underworld'] + env.get('LIBS', [])
 
 # Test runner program.
 env.PCUTest('tests/testUnderworld', suites,
+            PCU_LIBHEADERS="#include <StGermain/StGermain.h>\n#include <StgDomain/StgDomain.h>\n" \
+                "#include <StgFEM/StgFEM.h>\n#include <PICellerator/PICellerator.h>\n" \
+                "#include <Underworld/Underworld.h>", 
             PCU_SETUP="StGermain_Init(&argc, &argv);StgDomain_Init(&argc, &argv);" \
                 "StgFEM_Init(&argc, &argv);PICellerator_Init(&argc, &argv);" \
                 "Underworld_Init(&argc, &argv);",
