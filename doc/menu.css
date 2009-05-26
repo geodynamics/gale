@@ -1,0 +1,105 @@
+/* This script was based off the script from:
+http://www.brothercake.com/scripts/navmeister/page.php
+It is designed to create a cascading menu.
+*/
+
+
+/* hover effect */
+
+ul.menu ul { display:none; }
+ul.menu li:hover ul { display:inline; }
+
+ul.menu li:hover ul ul { display:none; }
+ul.menu li ul li:hover ul { display:inline; }
+
+ul.menu li:hover ul ul ul { display:none; }
+ul.menu li ul li ul li:hover ul { display:inline; }
+
+ul.menu li ul li:hover ul ul ul { display:none; }
+ul.menu li ul li ul li ul li:hover ul { display:inline; }
+
+ul.menu li ul li ul li:hover ul ul ul { display:none; }
+ul.menu li ul li ul li ul li ul li:hover ul { display:inline; }
+
+/* 
+extend infinitely by adding deeper levels of none/inline combination
+*/
+
+
+/* position the main list container */
+
+ul.menu {
+	float:left;
+	padding:0;
+	}
+
+
+/* style the list items */
+
+ul.menu li {
+	list-style-type:none;
+text-align: left;
+display: block;
+width: 120px; /* was 120, Widen to accomodate longest module name comfortably.
+If this changes, update .activesidelink, below. */
+
+	}
+	
+ul.menu li.youAreHere {
+text-align: left;
+display: block;
+width: 120px; /* Keep this the same as width of .sidelink, above. */
+text-decoration: none;
+
+	}
+
+ul.menu li:hover {
+	background: #99A89B url(images/corner4.gif) top left no-repeat;
+text-decoration: none;
+	}
+	
+ul.menu li a {
+	-moz-border-radius:4px;
+	text-decoration:none;
+	display:block;
+
+	}
+
+/* position and size the sub list and container */
+
+ul.menu ul li {
+	width:10em; /* _both_ width definitions are necessary and must be the same */
+	}
+	
+ul.menu ul {
+	width:10em; /* _both_ width definitions are necessary and must be the same */
+	position:absolute;
+	left:8em;
+	margin:0;
+	margin-top:-4em;
+	padding:0;
+	}
+
+/* 
+position the child list container
+this cascades from here until you change it ..
+*/
+
+ul.menu ul li ul {
+	position:absolute;
+	right:-9.2em;
+	}
+
+
+/*
+position the great-grandchild list container
+this also cascades from here until you change it ..
+*/
+
+ul.menu ul li ul li ul li ul {
+	position:absolute;
+	right:9.2em;
+	}
+
+/* hide nested list items for browsers which support it */
+ul.menu ul { display:none; }
