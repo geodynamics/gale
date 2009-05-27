@@ -234,6 +234,44 @@ void EntryPointSuite_TestRun( EntryPointSuiteData* data ) {
    }
 }
 
+
+void EntryPointSuite_TestPrintConcise( EntryPointSuiteData* data ) {
+   Hook_Index     hookIndex;
+   Stream*        stream = NULL;
+   const char*    testFilename = "testEP-PrintConcise.txt";
+   FILE*          testFile = NULL;
+   #define        MAX_LINE_SIZE 1000
+   char           readLine[MAX_LINE_SIZE];
+   char           expString[MAX_LINE_SIZE];
+
+   data->ep = EntryPoint_New( "testEntryPoint", EntryPoint_VoidPtr_CastType );
+   EntryPoint_Append( data->ep, "TestHook0", (void*)TestHook0, "testCode" );
+   EntryPoint_Append( data->ep, "TestHook1", (void*)TestHook1, "testCode" );
+   EntryPoint_Append( data->ep, "TestHook2", (void*)TestHook2, "testCode" );
+   EntryPoint_Append( data->ep, "TestHook3", (void*)TestHook3, "testCode" );
+   EntryPoint_Append( data->ep, "TestHook4", (void*)TestHook4, "testCode" );
+   
+   pcu_check_true( data->ep->hooks->count == 5 );
+
+   stream = Journal_Register( InfoStream_Type, EntryPoint_Type );
+   Stream_RedirectFile( stream, testFilename );
+   EntryPoint_PrintConcise( data->ep, stream );
+
+   testFile = fopen( testFilename, "r" );
+   pcu_check_true( fgets( readLine, MAX_LINE_SIZE, testFile ) );
+   sprintf( expString, "\tEP: %s\n", data->ep->name );
+   pcu_check_true( 0 == strcmp( readLine, expString ) );
+
+   for (hookIndex = 0; hookIndex < data->ep->hooks->count; hookIndex++ ) {
+      pcu_check_true( fgets( readLine, MAX_LINE_SIZE, testFile ) );
+      sprintf( expString, "\t\tH: \"TestHook%u\" (%s)\n", hookIndex, "testCode" );
+      pcu_check_true( 0 == strcmp( readLine, expString ) );
+   }
+
+   fclose( testFile );
+   remove( testFilename );
+}
+
 /***** For the ClassHook test ************************/
 
 #define __Listener \
@@ -371,6 +409,7 @@ void EntryPointSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, EntryPointSuite_TestReplaceAll );
    pcu_suite_addTest( suite, EntryPointSuite_TestPurge );
    pcu_suite_addTest( suite, EntryPointSuite_TestRun );
+   pcu_suite_addTest( suite, EntryPointSuite_TestPrintConcise );
    pcu_suite_addTest( suite, EntryPointSuite_TestClassHook );
    pcu_suite_addTest( suite, EntryPointSuite_TestMinMax );
 }
