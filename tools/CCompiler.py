@@ -40,12 +40,12 @@ class CCompiler(Compiler):
     def setup_options(self):
         Compiler.setup_options(self)
         self.options.add_option(
-            utils.options.Option("flags", "--cflags", pref_sep="=",
+            utils.options.Option("cflags", "--cflags", pref_sep="=",
                                  help=self.help["flags"]))
 
     def process_options(self):
         Compiler.process_options(self)
-        flags = self.get_option("flags", [])
+        flags = self.get_option("cflags", [])
         if flags:
             flags = [flags]
         self.compile_env.append_unique("dcomflags", make_list=True, *flags)

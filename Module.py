@@ -352,10 +352,11 @@ class Module(object):
         self.make_help_dict()
 
         # Add options.
-        self.options.add_option(
-            utils.options.Option("with", "--with-" + self.opt_name, type="bool",
-                                 pref_true_flag="yes", pref_false_flag="no", pref_sep="=",
-                                 help=self.help["enable"]))
+        if "with" not in self.options:
+            self.options.add_option(
+                utils.options.Option("with", "--with-" + self.opt_name, type="bool",
+                                     pref_true_flag="yes", pref_false_flag="no", pref_sep="=",
+                                     help=self.help["enable"]))
 
     def parse_options(self):
         opts = self.options.parse_option_list(sys.argv[1:])

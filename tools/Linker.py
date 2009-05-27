@@ -35,7 +35,7 @@ class Linker(config.Tool):
         cfg["link_success"] = self.success
         cfg["default_lib_dirs"] = self.default_lib_dirs
         if platform.system() == "Darwin":
-            cfg["link_prog_cmd"] = "$command $lnkprogflags $bool($lnkflags) " \
+            cfg["link_prog_cmd"] = "$command $lnkprogflags $bool($lnkflags) $dlnkflags " \
                 "$string(output,$target) " \
                 "$__lib_dirs $_rt_begin " \
                 "$source $lib_paths $__libs " \
@@ -43,15 +43,15 @@ class Linker(config.Tool):
             cfg["link_shared_cmd"] = "$command $bool(shared) "\
                 "$string(install_name,$target_abs) " \
                 "$string(undefined,suppress) $bool(flat_namespace) " \
-                "$bool($lnkflags) $string(output,$target) " \
+                "$bool($lnkflags) $dlnkflags $string(output,$target) " \
                 "$__lib_dirs $source $lib_paths $__libs"
         else:
-            cfg["link_prog_cmd"] = "$command $lnkprogflags $bool($lnkflags) " \
+            cfg["link_prog_cmd"] = "$command $lnkprogflags $bool($lnkflags) $dlnkflags " \
                 "$string(output,$target) $__rpaths " \
                 "$__lib_dirs $_rt_begin " \
                 "$source $lib_paths $__libs " \
                 "$_rt_end"
-            cfg["link_shared_cmd"] = "$command $bool(shared) $bool($lnkflags) $string(output,$target) " \
+            cfg["link_shared_cmd"] = "$command $bool(shared) $bool($lnkflags) $dlnkflags $string(output,$target) " \
                 "$__rpaths $__lib_dirs $source $lib_paths $__libs"
 
         cfg["_lib_dirs"] = "$extend($strip($default_lib_dirs,$lib_dirs)," \
@@ -67,6 +67,7 @@ class Linker(config.Tool):
         cfg["_rt_libs"] = "$strip($rt.static.rt_libs,$rt_libs)"
         cfg["_rt_begin"] = "$strip($rt.static.rt_begin,$rt_begin)"
         cfg["_rt_end"] = "$strip($rt.static.rt_end,$rt_end)"
+        cfg.merge(self.link_env)
 
     def _test(self, cfg):
         if not self.find_obj(cfg):
@@ -186,10 +187,21 @@ class Linker(config.Tool):
                 return True
         return False
 
+    def setup_options(self):
+        config.Tool.setup_options(self)
+        self.options.add_option(
+            utils.options.Option("lflags", "--link-flags", pref_sep="=",
+                                 help="Specify additional linker flags."))
+
+    def process_options(self):
+        config.Tool.process_options(self)
+        flags = self.get_option("lflags", [])
+        if flags:
+            flags = [flags]
+        self.link_env.append_unique("dlnkflags", make_list=True, *flags)
 
     def parse_version_string(self, cfg):
         pass
-
 
     def visit(self, cfg, visitor):
         visitor.linker(self, cfg)

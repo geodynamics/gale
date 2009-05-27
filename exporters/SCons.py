@@ -70,6 +70,8 @@ class SCons(config.Exporter):
         if type == "debug":
             self._add_opt(cfg["options"], "LINKFLAGS", ("debug", True))
 
+        self.env.append_unique("LINKFLAGS", cfg.subst("$dlnkflags").split())
+
     def package(self, mod, cfg):
         # Should really iterate over package compilers and languages.
         if hasattr(self, "_com"):

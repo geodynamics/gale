@@ -10,6 +10,7 @@ class pgf95(F77Compiler, Linker):
 
     def __init__(self, ctx):
         F77Compiler.__init__(self, ctx)
+        Linker.__init__(self, ctx)
         self.language = "f90"
         self.commands = ["pgf95"]
 

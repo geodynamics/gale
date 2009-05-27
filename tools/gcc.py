@@ -128,3 +128,11 @@ class gcc(CCompiler, Linker):
         for w in words:
             cmd_args.append(w[1:-1])
         return cmd_args
+
+    def setup_options(self):
+        CCompiler.setup_options(self)
+        Linker.setup_options(self)
+
+    def process_options(self):
+        CCompiler.process_options(self)
+        Linker.process_options(self)

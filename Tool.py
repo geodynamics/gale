@@ -191,9 +191,10 @@ class Tool(Module):
 
     def setup_options(self):
         Module.setup_options(self)
-        self.options.add_option(
-            utils.options.Option("location", "--" + self.opt_name, pref_sep="=",
-                                 help=self.help["location"]))
+        if "location" not in self.options:
+            self.options.add_option(
+                utils.options.Option("location", "--" + self.opt_name, pref_sep="=",
+                                     help=self.help["location"]))
 
     def process_options(self):
         Module.process_options(self)

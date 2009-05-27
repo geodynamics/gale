@@ -10,6 +10,7 @@ class gfortran(F77Compiler, Linker):
 
     def __init__(self, ctx):
         F77Compiler.__init__(self, ctx)
+        Linker.__init__(self, ctx)
         self.commands = ["g77", "f77", "gfortran"]
 
 
