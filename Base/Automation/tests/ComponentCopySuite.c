@@ -3,12 +3,12 @@
 ** Copyright (C), 2003, Victorian Partnership for Advanced Computing (VPAC) Ltd, 110 Victoria Street, Melbourne, 3053, Australia.
 **
 ** Authors:
-**	Stevan M. Quenette, Senior Software Engineer, VPAC. (steve@vpac.org)
-**	Patrick D. Sunter, Software Engineer, VPAC. (pds@vpac.org)
-**	Luke J. Hodkinson, Computational Engineer, VPAC. (lhodkins@vpac.org)
-**	Siew-Ching Tan, Software Engineer, VPAC. (siew@vpac.org)
-**	Alan H. Lo, Computational Engineer, VPAC. (alan@vpac.org)
-**	Raquibul Hassan, Computational Engineer, VPAC. (raq@vpac.org)
+**   Stevan M. Quenette, Senior Software Engineer, VPAC. (steve@vpac.org)
+**   Patrick D. Sunter, Software Engineer, VPAC. (pds@vpac.org)
+**   Luke J. Hodkinson, Computational Engineer, VPAC. (lhodkins@vpac.org)
+**   Siew-Ching Tan, Software Engineer, VPAC. (siew@vpac.org)
+**   Alan H. Lo, Computational Engineer, VPAC. (alan@vpac.org)
+**   Raquibul Hassan, Computational Engineer, VPAC. (raq@vpac.org)
 **
 **  This library is free software; you can redistribute it and/or
 **  modify it under the terms of the GNU Lesser General Public
@@ -24,25 +24,22 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** Role:
-** 	Tests Stg_Component copying
 **
-** $Id: testLiveComponentRegister.c 2136 2005-05-10 02:47:13Z RaquibulHassan $
+** $Id: testJournal-Dictionary.c 2745 2005-03-05 08:12:18Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#include <mpi.h>
-#include "Base/Foundation/Foundation.h"
-#include "Base/IO/IO.h"
-#include "Base/Container/Container.h"
-#include "Base/Automation/Automation.h"
-
-#include "Regresstor/libRegresstor/Regresstor.h"
-
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <math.h>
+
+#include "pcu/pcu.h"
+#include "StGermain/Base/Foundation/Foundation.h"
+#include "StGermain/Base/IO/IO.h"
+#include "StGermain/Base/Container/Container.h"
+#include "StGermain/Base/Automation/Automation.h"
+#include "ComponentCopySuite.h"
+
+/****************************************************************************/
 
 /*
  * A
@@ -152,6 +149,9 @@ void Stg_ComponentA_Execute( void* component, void* data ) {
 void Stg_ComponentA_Destroy( void* component, void* data ) {
 
 }
+Dictionary* Stg_ComponentA_Type_MetaAsDictionary() {
+   return NULL;
+}
 
 #define __Stg_ComponentB \
 	__Stg_Component
@@ -214,6 +214,10 @@ void Stg_ComponentB_Initialise( void* component, void* data ) {
 void Stg_ComponentB_Execute( void* component, void* data ) {
 }
 void Stg_ComponentB_Destroy( void* component, void* data ) {
+}
+
+Dictionary* Stg_ComponentB_Type_MetaAsDictionary() {
+   return NULL;
 }
 
 
@@ -294,145 +298,106 @@ void Stg_ComponentC_Execute( void* component, void* data ) {
 void Stg_ComponentC_Destroy( void* component, void* data ) {
 
 }
-
-
-
-
-
-int main( int argc, char *argv[] ) {
-	int		rank;
-	int		procCount;
-	int		procToWatch;
-	Stream*		stream;
-	
-	/* Initialise MPI, get world info */
-	MPI_Init( &argc, &argv );
-	MPI_Comm_size( MPI_COMM_WORLD, &procCount );
-	MPI_Comm_rank( MPI_COMM_WORLD, &rank );
-	
-	BaseFoundation_Init( &argc, &argv );
-
-	RegressionTest_Init( "Base/Automation/Stg_Component" );
-	
-	BaseIO_Init( &argc, &argv );
-	BaseContainer_Init( &argc, &argv );
-	BaseAutomation_Init( &argc, &argv );
-
-	stream = Journal_Register( Info_Type, __FILE__ );
-	
-	if( argc >= 2 ) {
-		procToWatch = atoi( argv[1] );
-	}
-	else {
-		procToWatch = 0;
-	}
-	if( rank == procToWatch ) {
-		Stg_ComponentA* a;
-		Stg_ComponentA* aCopy;
-		XML_IO_Handler* ioHandler;
-		Dictionary* dictionary;
-		Dictionary* componentDictionary;
-
-		Stg_ComponentFactory* cf;
-
-		Stg_ComponentRegister_Add( 
-			Stg_ComponentRegister_Get_ComponentRegister(), 
-			Stg_ComponentA_Type, 
-			"0", 
-			(Stg_Component_DefaultConstructorFunction*)Stg_ComponentA_NewDefault );
-
-		Stg_ComponentRegister_Add( 
-			Stg_ComponentRegister_Get_ComponentRegister(), 
-			Stg_ComponentB_Type,
-			"0",
-			(Stg_Component_DefaultConstructorFunction*)Stg_ComponentB_NewDefault );
-
-		Stg_ComponentRegister_Add( 
-			Stg_ComponentRegister_Get_ComponentRegister(), 
-			Stg_ComponentC_Type,
-			"0",
-			(Stg_Component_DefaultConstructorFunction*)Stg_ComponentC_NewDefault );
-
-		/* Create the application's dictionary */
-		dictionary = Dictionary_New();
-                                                                                                                                    
-		/* Read input */
-		ioHandler = XML_IO_Handler_New();
-		IO_Handler_ReadAllFromFile( ioHandler, "data/copy.xml", dictionary );
-                                                                                                                                    
-		Journal_ReadFromDictionary( dictionary );
-
-		componentDictionary = Dictionary_GetDictionary( dictionary, "components" );
-		if ( componentDictionary ) {
-			cf = Stg_ComponentFactory_New( dictionary, componentDictionary, Stg_ObjectList_New() );
-
-			Stg_ComponentFactory_CreateComponents( cf );
-			Stg_ComponentFactory_ConstructComponents( cf, 0 /* dummy */ );
-
-			a = (Stg_ComponentA*)LiveComponentRegister_Get( cf->LCRegister, "a" );
-			
-			RegressionTest_Check(
-				a != NULL &&
-				a->b != NULL &&
-				a->c != NULL &&
-				a->b == a->c->b,
-				stream,
-				"Stg_Components creation",
-				"Can we create the components from dictionary" );
-
-			if ( a ) {
-				Stg_Class_Print( a, stream );
-				
-				aCopy = Stg_Class_Copy( a, NULL, True, "_dup", NULL );
-
-				/* Disown the copy. Why? Because main() doesn't own the original neither.
-				 * The instance counting then matches up.
-				 */
-				Stg_Component_Disown( aCopy );
-
-				RegressionTest_Check(
-					aCopy != NULL &&
-					aCopy->b != NULL &&
-					aCopy->c != NULL &&
-					aCopy->b == aCopy->c->b,
-					stream,
-					"Stg_Components copy",
-					"Can we copy the components and subcomponents correctly" );
-
-				if ( aCopy ) {
-					Stg_Class_Print( aCopy, stream );
-				}
-
-				RegressionTest_Check(
-					Memory_CountGet( a ) == Memory_CountGet( aCopy ) &&
-					Memory_CountGet( a->b ) == Memory_CountGet( aCopy->b ) &&
-					Memory_CountGet( a->c ) == Memory_CountGet( aCopy->c ),
-					stream,
-					"Instance counter",
-					"Are the instance counters correct" );
-				
-				Stg_Class_Print( cf->LCRegister, stream );
-			}
-
-		}
-
-		Stg_Class_Delete( ioHandler );
-		Stg_Class_Delete( dictionary );
-	}
-
-	
-	BaseAutomation_Finalise();
-	BaseContainer_Finalise();
-	BaseIO_Finalise();
-
-	RegressionTest_Finalise();
-	
-	BaseFoundation_Finalise();
-
-	
-	/* Close off MPI */
-	MPI_Finalize();
-	
-	return 0; /* success */
+Dictionary* Stg_ComponentC_Type_MetaAsDictionary() {
+   return NULL;
 }
 
+/****************************************************************************/
+
+typedef struct {
+   Dictionary*    dict;
+} ComponentCopySuiteData;
+
+
+void ComponentCopySuite_Setup( ComponentCopySuiteData* data ) {
+   data->dict = Dictionary_New();
+}
+
+
+void ComponentCopySuite_Teardown( ComponentCopySuiteData* data ) {
+   Stg_Class_Delete( data->dict );
+}
+   
+
+void ComponentCopySuite_TestCopy( ComponentCopySuiteData* data ) {
+   Stg_ComponentA* a=NULL;
+   Stg_ComponentA* aCopy=NULL;
+   Dictionary* componentsDictionary=NULL;
+   Dictionary* componentDict=NULL;
+
+   Stg_ComponentFactory* cf;
+
+   Stg_ComponentRegister_Add( 
+      Stg_ComponentRegister_Get_ComponentRegister(), 
+      Stg_ComponentA_Type, 
+      "0", 
+      (Stg_Component_DefaultConstructorFunction*)Stg_ComponentA_NewDefault );
+
+   Stg_ComponentRegister_Add( 
+      Stg_ComponentRegister_Get_ComponentRegister(), 
+      Stg_ComponentB_Type,
+      "0",
+      (Stg_Component_DefaultConstructorFunction*)Stg_ComponentB_NewDefault );
+
+   Stg_ComponentRegister_Add( 
+      Stg_ComponentRegister_Get_ComponentRegister(), 
+      Stg_ComponentC_Type,
+      "0",
+      (Stg_Component_DefaultConstructorFunction*)Stg_ComponentC_NewDefault );
+
+   /* Creating a dictionary of components */
+   componentsDictionary = Dictionary_New();
+   componentDict = Dictionary_New();
+   Dictionary_AddFromString( componentDict, "Type", "Stg_ComponentA" );
+   Dictionary_AddFromDictionary( componentsDictionary, "a", componentDict );
+   componentDict = Dictionary_New();
+   Dictionary_AddFromString( componentDict, "Type", "Stg_ComponentB" );
+   Dictionary_AddFromDictionary( componentsDictionary, "b", componentDict );
+   componentDict = Dictionary_New();
+   Dictionary_AddFromString( componentDict, "Type", "Stg_ComponentC" );
+   Dictionary_AddFromDictionary( componentsDictionary, "c", componentDict );
+
+   Dictionary_AddFromDictionary( data->dict, "components", componentsDictionary );
+
+   cf = Stg_ComponentFactory_New( data->dict, componentsDictionary, Stg_ObjectList_New() );
+   Stream_Enable( cf->infoStream, False );
+
+   Stg_ComponentFactory_CreateComponents( cf );
+   Stg_ComponentFactory_ConstructComponents( cf, 0 /* dummy */ );
+
+   a = (Stg_ComponentA*)LiveComponentRegister_Get( cf->LCRegister, "a" );
+   
+   /* "Stg_Components creation" */
+   pcu_check_true(
+      a != NULL &&
+      a->b != NULL &&
+      a->c != NULL &&
+      a->b == a->c->b );
+
+   aCopy = Stg_Class_Copy( a, NULL, True, "_dup", NULL );
+
+   /* Disown the copy. Why? Because main() doesn't own the original neither.
+    * The instance counting then matches up.
+    */
+   Stg_Component_Disown( aCopy );
+
+   /*   "Can we copy the components and subcomponents correctly" */
+   pcu_check_true(
+      aCopy != NULL &&
+      aCopy->b != NULL &&
+      aCopy->c != NULL &&
+      aCopy->b == aCopy->c->b );
+
+   /*   "Are the instance counters correct" */
+   pcu_check_true(
+      Memory_CountGet( a ) == Memory_CountGet( aCopy ) &&
+      Memory_CountGet( a->b ) == Memory_CountGet( aCopy->b ) &&
+      Memory_CountGet( a->c ) == Memory_CountGet( aCopy->c ) );
+}
+
+
+void ComponentCopySuite( pcu_suite_t* suite ) {
+   pcu_suite_setData( suite, ComponentCopySuiteData );
+   pcu_suite_setFixtures( suite, ComponentCopySuite_Setup, ComponentCopySuite_Teardown );
+   pcu_suite_addTest( suite, ComponentCopySuite_TestCopy );
+}
