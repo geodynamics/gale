@@ -433,6 +433,9 @@ void* _ExtensionManager_Copy( void* extensionManager, void* dest, Bool deep, Nam
 			}
 		}
 	}
+	else {
+		newExtensionManager->_extensionsToExisting = NULL;
+	}
 
 	if ( self->_array ) {
 		/* Array case */
@@ -728,8 +731,8 @@ void* ExtensionManager_GetFunc( void* extension, void* ptr, ExtensionInfo_Index 
 }
 
 void* ExtensionManager_HashGet( void* extension, void* ptr, Name key ) {
-	/*
 	ExtensionManager*			self = (ExtensionManager*)extension;
+	/*
 
 	HashTable* extHt;
 	void* result;
@@ -758,6 +761,8 @@ void* ExtensionManager_HashGet( void* extension, void* ptr, Name key ) {
 /*
 	return result;
 */
+	Journal_Firewall( False, Journal_Register( ErrorStream_Type, self->type ),
+		"%s() currently disabled.\n", __func__ );
 	return NULL;
 }
 
