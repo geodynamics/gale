@@ -116,7 +116,7 @@ void EntryPointSuite_TestRunEmpty( EntryPointSuiteData* data ) {
 void EntryPointSuite_TestAppendPrepend( EntryPointSuiteData* data ) {
    Index    ii=0;
 
-   data->ep = EntryPoint_New( "testEP", EntryPoint_0_CastType );
+   data->ep = EntryPoint_New( "testEntryPoint", EntryPoint_0_CastType );
    EntryPoint_Append( data->ep, "TestHook0", (void*)TestHook0, "testCode" );
    /* TestHook0 */
    EntryPoint_Prepend( data->ep, "TestHook1", (void*)TestHook1, "testCode" );
@@ -134,7 +134,7 @@ void EntryPointSuite_TestAppendPrepend( EntryPointSuiteData* data ) {
 
 
 void EntryPointSuite_TestInsertBeforeAfterReplace( EntryPointSuiteData* data ) {
-   data->ep = EntryPoint_New( "testEP", EntryPoint_0_CastType );
+   data->ep = EntryPoint_New( "testEntryPoint", EntryPoint_0_CastType );
    EntryPoint_Append( data->ep, "TestHook2", (void*)TestHook2, "testCode" );
    EntryPoint_Append( data->ep, "TestHook3", (void*)TestHook3, "testCode" );
    /* TestHook2, TestHook3 */
@@ -162,7 +162,7 @@ void EntryPointSuite_TestInsertBeforeAfterReplace( EntryPointSuiteData* data ) {
 
 
 void EntryPointSuite_TestAlwaysFirstLast( EntryPointSuiteData* data ) {
-   data->ep = EntryPoint_New( "testEP", EntryPoint_0_CastType );
+   data->ep = EntryPoint_New( "testEntryPoint", EntryPoint_0_CastType );
    EntryPoint_Append_AlwaysLast( data->ep, "TestHook8", (void*)TestHook8, "testCode" );
    /* - TestHook8 */
    EntryPoint_Append( data->ep, "TestHook9", (void*)TestHook9, "testCode" );
@@ -189,7 +189,7 @@ void EntryPointSuite_TestAlwaysFirstLast( EntryPointSuiteData* data ) {
 
 
 void EntryPointSuite_TestReplaceAll( EntryPointSuiteData* data ) {
-   data->ep = EntryPoint_New( "testEP", EntryPoint_0_CastType );
+   data->ep = EntryPoint_New( "testEntryPoint", EntryPoint_0_CastType );
    EntryPoint_Append( data->ep, "TestHook0", (void*)TestHook0, "testCode" );
    EntryPoint_Append( data->ep, "TestHook1", (void*)TestHook0, "testCode" );
    /* TestHook0, TestHook1 */
@@ -202,7 +202,7 @@ void EntryPointSuite_TestReplaceAll( EntryPointSuiteData* data ) {
 
 
 void EntryPointSuite_TestPurge( EntryPointSuiteData* data ) {
-   data->ep = EntryPoint_New( "testEP", EntryPoint_0_CastType );
+   data->ep = EntryPoint_New( "testEntryPoint", EntryPoint_0_CastType );
    EntryPoint_Append( data->ep, "TestHook2", (void*)TestHook2, "testCode" );
    EntryPoint_Append( data->ep, "TestHook3", (void*)TestHook3, "testCode" );
    /* TestHook2, TestHook3 */
@@ -215,7 +215,7 @@ void EntryPointSuite_TestPurge( EntryPointSuiteData* data ) {
 void EntryPointSuite_TestRun( EntryPointSuiteData* data ) {
    Hook_Index hookIndex;
 
-   data->ep = EntryPoint_New( "testEP", EntryPoint_VoidPtr_CastType );
+   data->ep = EntryPoint_New( "testEntryPoint", EntryPoint_VoidPtr_CastType );
    EntryPoint_Append( data->ep, "TestHook0", (void*)TestHook0, "testCode" );
    EntryPoint_Append( data->ep, "TestHook1", (void*)TestHook1, "testCode" );
    EntryPoint_Append( data->ep, "TestHook2", (void*)TestHook2, "testCode" );
@@ -237,76 +237,127 @@ void EntryPointSuite_TestRun( EntryPointSuiteData* data ) {
 /***** For the ClassHook test ************************/
 
 #define __Listener \
-	__Stg_Class \
-	int   number; \
-	Bool  hasRun_0_func; \
-	Bool  hasRun_VoidPtr_func; \
-	int   calcVal;
+   __Stg_Class \
+   int   number; \
+   Bool  hasRun_0_func; \
+   Bool  hasRun_VoidPtr_func; \
+   int   calcVal;
 struct Listener { __Listener };
 typedef struct Listener Listener;
 
 Listener* Listener_New( int number ) {
-	Listener* result = (Listener*)_Stg_Class_New(
-		sizeof( Listener ),
-		"Listener",
-		_Stg_Class_Delete,
-		NULL,
-		NULL );
-	result->number = number;
-	result->hasRun_0_func = False;
-	result->hasRun_VoidPtr_func = False;
-	result->calcVal = -1;
-	return result;
+   Listener* result = (Listener*)_Stg_Class_New(
+      sizeof( Listener ),
+      "Listener",
+      _Stg_Class_Delete,
+      NULL,
+      NULL );
+   result->number = number;
+   result->hasRun_0_func = False;
+   result->hasRun_VoidPtr_func = False;
+   result->calcVal = -1;
+   return result;
 }
 
 void Listener_0_Func( void* ref ) {
-	Listener* self = (Listener*) ref;
+   Listener* self = (Listener*) ref;
    self->hasRun_0_func = True;
 }
 void Listener_VoidPtr_Func( void* ref, void* data0 ) {
-	Listener* self = (Listener*) ref;
-	int* data = (int*)data0;
+   Listener* self = (Listener*) ref;
+   int* data = (int*)data0;
    self->hasRun_VoidPtr_func = True;
    self->calcVal = self->number * (*data);
 }
 
 void EntryPointSuite_TestClassHook( EntryPointSuiteData* data ) {
-	EntryPoint*    classVoidPtr;
-	#define        NUM_LISTENERS 3
-	Listener*      listeners[NUM_LISTENERS];
-	char           hookName[100];
-	int            ii;
-	int            inputData = 5;
+   EntryPoint*    classVoidPtr;
+   #define        NUM_LISTENERS 3
+   Listener*      listeners[NUM_LISTENERS];
+   char           hookName[100];
+   int            ii;
+   int            inputData = 5;
 
-	data->ep = EntryPoint_New( "Class0", EntryPoint_Class_0_CastType );
-	classVoidPtr = EntryPoint_New( "Class_VoidPtr", EntryPoint_Class_VoidPtr_CastType );
+   data->ep = EntryPoint_New( "Class0", EntryPoint_Class_0_CastType );
+   classVoidPtr = EntryPoint_New( "Class_VoidPtr", EntryPoint_Class_VoidPtr_CastType );
 
-	for ( ii = 0; ii < NUM_LISTENERS; ++ii ) {
-		listeners[ii] = Listener_New( ii );
-		sprintf( hookName, "hook%d", ii );
-		EntryPoint_AppendClassHook( data->ep, hookName, (void*)Listener_0_Func,
+   for ( ii = 0; ii < NUM_LISTENERS; ++ii ) {
+      listeners[ii] = Listener_New( ii );
+      sprintf( hookName, "hook%d", ii );
+      EntryPoint_AppendClassHook( data->ep, hookName, (void*)Listener_0_Func,
           __FILE__, listeners[ii] );
-		EntryPoint_AppendClassHook( classVoidPtr, hookName, (void*)Listener_VoidPtr_Func,
+      EntryPoint_AppendClassHook( classVoidPtr, hookName, (void*)Listener_VoidPtr_Func,
           __FILE__, listeners[ii] );
-	}
+   }
 
-	pcu_check_true(
-		data->ep->hooks->count == NUM_LISTENERS &&
-		classVoidPtr->hooks->count ==  NUM_LISTENERS );
+   pcu_check_true(
+      data->ep->hooks->count == NUM_LISTENERS &&
+      classVoidPtr->hooks->count ==  NUM_LISTENERS );
 
-	/* Run the entry points */
-	((EntryPoint_Class_0_CallCast*) data->ep->run)( data->ep );
-	((EntryPoint_Class_VoidPtr_CallCast*) classVoidPtr->run)( classVoidPtr, &inputData );
+   /* Run the entry points */
+   ((EntryPoint_Class_0_CallCast*) data->ep->run)( data->ep );
+   ((EntryPoint_Class_VoidPtr_CallCast*) classVoidPtr->run)( classVoidPtr, &inputData );
 
-	for ( ii = 0; ii < NUM_LISTENERS; ++ii ) {
+   for ( ii = 0; ii < NUM_LISTENERS; ++ii ) {
       pcu_check_true( listeners[ii]->hasRun_0_func == True );
       pcu_check_true( listeners[ii]->hasRun_VoidPtr_func == True );
       pcu_check_true( listeners[ii]->calcVal == ii*inputData );
    }
 
-	for ( ii = 0; ii < NUM_LISTENERS; ++ii ) {
-		Stg_Class_Delete( listeners[ii] );
-	}
+   for ( ii = 0; ii < NUM_LISTENERS; ++ii ) {
+      Stg_Class_Delete( listeners[ii] );
+   }
+
+   /* the second EntryPoint won't be automatically deleted by the tearDown func, so delete here */
+   Stg_Class_Delete( classVoidPtr );
+}
+
+/******** For the MinMax test *****************/
+double Return1( Stream* stream ) {
+   Journal_Printf( stream, "In func %s\n", __func__ );
+   return 1.0;
+}
+   
+double Return89( Stream* stream ) {
+   Journal_Printf( stream, "In func %s\n", __func__ );
+   return 89.0;
+}
+
+double ReturnNeg43( Stream* stream ) {
+   Journal_Printf( stream, "In func %s\n", __func__ );
+   return -43;
+}
+double ReturnZero( Stream* stream ) {
+   Journal_Printf( stream, "In func %s\n", __func__ );
+   return 0.0;
+}
+
+
+void EntryPointSuite_TestMinMax( EntryPointSuiteData* data ) {
+   const Name  testEpName = "testEntryPoint";
+   double      result;
+   Stream*     stream;
+
+   stream = Journal_Register( InfoStream_Type, "myStream" );
+   Stream_Enable( stream, False );
+
+   data->ep = EntryPoint_New( testEpName, EntryPoint_Maximum_VoidPtr_CastType );
+   EntryPoint_Append( data->ep, "TestHook0", Return1, "testMinMaxFunc" );
+   EntryPoint_Append( data->ep, "TestHook1", Return89, "testMinMaxFunc" );
+   EntryPoint_Append( data->ep, "TestHook2", ReturnNeg43, "testMinMaxFunc" );
+   EntryPoint_Append( data->ep, "TestHook3", ReturnZero, "testMinMaxFunc" );
+   result = ((EntryPoint_Maximum_VoidPtr_CallCast*) data->ep->run)( data->ep, stream );
+   pcu_check_true( result == 89.0 );
+   Stg_Class_Delete( data->ep );
+
+   /* Get Minimum of Values */
+   data->ep = EntryPoint_New( testEpName, EntryPoint_Minimum_VoidPtr_CastType );
+   EntryPoint_Append( data->ep, "TestHook0", Return1, "testMinMaxFunc" );
+   EntryPoint_Append( data->ep, "TestHook1", Return89, "testMinMaxFunc" );
+   EntryPoint_Append( data->ep, "TestHook2", ReturnNeg43, "testMinMaxFunc" );
+   EntryPoint_Append( data->ep, "TestHook3", ReturnZero, "testMinMaxFunc" );
+   result = ((EntryPoint_Minimum_VoidPtr_CallCast*) data->ep->run)( data->ep, stream );
+   pcu_check_true( result == -43 );
 }
 
 
@@ -321,4 +372,5 @@ void EntryPointSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, EntryPointSuite_TestPurge );
    pcu_suite_addTest( suite, EntryPointSuite_TestRun );
    pcu_suite_addTest( suite, EntryPointSuite_TestClassHook );
+   pcu_suite_addTest( suite, EntryPointSuite_TestMinMax );
 }
