@@ -234,7 +234,81 @@ void EntryPointSuite_TestRun( EntryPointSuiteData* data ) {
    }
 }
 
-/* testEP-ClassHook-test with some class hooks involved */
+/***** For the ClassHook test ************************/
+
+#define __Listener \
+	__Stg_Class \
+	int   number; \
+	Bool  hasRun_0_func; \
+	Bool  hasRun_VoidPtr_func; \
+	int   calcVal;
+struct Listener { __Listener };
+typedef struct Listener Listener;
+
+Listener* Listener_New( int number ) {
+	Listener* result = (Listener*)_Stg_Class_New(
+		sizeof( Listener ),
+		"Listener",
+		_Stg_Class_Delete,
+		NULL,
+		NULL );
+	result->number = number;
+	result->hasRun_0_func = False;
+	result->hasRun_VoidPtr_func = False;
+	result->calcVal = -1;
+	return result;
+}
+
+void Listener_0_Func( void* ref ) {
+	Listener* self = (Listener*) ref;
+   self->hasRun_0_func = True;
+}
+void Listener_VoidPtr_Func( void* ref, void* data0 ) {
+	Listener* self = (Listener*) ref;
+	int* data = (int*)data0;
+   self->hasRun_VoidPtr_func = True;
+   self->calcVal = self->number * (*data);
+}
+
+void EntryPointSuite_TestClassHook( EntryPointSuiteData* data ) {
+	EntryPoint*    classVoidPtr;
+	#define        NUM_LISTENERS 3
+	Listener*      listeners[NUM_LISTENERS];
+	char           hookName[100];
+	int            ii;
+	int            inputData = 5;
+
+	data->ep = EntryPoint_New( "Class0", EntryPoint_Class_0_CastType );
+	classVoidPtr = EntryPoint_New( "Class_VoidPtr", EntryPoint_Class_VoidPtr_CastType );
+
+	for ( ii = 0; ii < NUM_LISTENERS; ++ii ) {
+		listeners[ii] = Listener_New( ii );
+		sprintf( hookName, "hook%d", ii );
+		EntryPoint_AppendClassHook( data->ep, hookName, (void*)Listener_0_Func,
+          __FILE__, listeners[ii] );
+		EntryPoint_AppendClassHook( classVoidPtr, hookName, (void*)Listener_VoidPtr_Func,
+          __FILE__, listeners[ii] );
+	}
+
+	pcu_check_true(
+		data->ep->hooks->count == NUM_LISTENERS &&
+		classVoidPtr->hooks->count ==  NUM_LISTENERS );
+
+	/* Run the entry points */
+	((EntryPoint_Class_0_CallCast*) data->ep->run)( data->ep );
+	((EntryPoint_Class_VoidPtr_CallCast*) classVoidPtr->run)( classVoidPtr, &inputData );
+
+	for ( ii = 0; ii < NUM_LISTENERS; ++ii ) {
+      pcu_check_true( listeners[ii]->hasRun_0_func == True );
+      pcu_check_true( listeners[ii]->hasRun_VoidPtr_func == True );
+      pcu_check_true( listeners[ii]->calcVal == ii*inputData );
+   }
+
+	for ( ii = 0; ii < NUM_LISTENERS; ++ii ) {
+		Stg_Class_Delete( listeners[ii] );
+	}
+}
+
 
 void EntryPointSuite( pcu_suite_t* suite ) {
    pcu_suite_setData( suite, EntryPointSuiteData );
@@ -246,4 +320,5 @@ void EntryPointSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, EntryPointSuite_TestReplaceAll );
    pcu_suite_addTest( suite, EntryPointSuite_TestPurge );
    pcu_suite_addTest( suite, EntryPointSuite_TestRun );
+   pcu_suite_addTest( suite, EntryPointSuite_TestClassHook );
 }
