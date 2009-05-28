@@ -183,19 +183,23 @@ def createDoxygen(dictionary):
         if (line.find("INPUT=") != -1) or ((line.find("INPUT ") != -1) and (line.find("=") != -1)):
             newLine = "INPUT = "+ dictionary['directoryPath']
             print "Found INPUT"
+            print newLine
         elif (line.find("STRIP_FROM_PATH") != -1)and (line.find("=") != -1):
             newLine = "STRIP_FROM_PATH = "+ dictionary['directoryPath']
             print "Found STRIP_FROM_PATH"
+            print newLine
         elif ((line.find("PROJECT_NUMBER") != -1) and (line.find("=") != -1)):
             newLine = "PROJECT_NUMBER = "+ dictionary['projectNumber']
             print "Found PROJECT_NUMBER"
+            print newLine
         elif ((line.find("OUTPUT_DIRECTORY") != -1) and (line.find("=") != -1)):
             newLine = "OUTPUT_DIRECTORY = " + dictionary['docPath'] +"/"+dictionary['doxygenSubDir']+'/'
             print "Found OUTPUT_DIRECTORY"
             print newLine
         elif ((line.find("FILTER_PATTERNS") != -1) and (line.find("=") != -1)):
-            newline = "FILTER_PATTERNS = *.h="+dictionary['headerFilterPath']
-            print "Found FILTER_PATTERNS"
+            newLine = "FILTER_PATTERNS = *.h="+dictionary['headerFilterPath']
+            print "Found FILTER_PATTERNS: "
+            print newLine
 
         #HTML_STYLESHEET        =
         #HTML_FOOTER            =
