@@ -458,9 +458,242 @@ void ExtensionSuite_TestOfExistingObject( ExtensionSuiteData* data ) {
 }
 
 
+void ExtensionSuite_TestAddArrayToExistingObject( ExtensionSuiteData* data ) {
+   ExtensionManager*    objExtension=NULL;
+   BaseClass*           baseObject=NULL;
+   Index                ii=0;
+   ExtensionStruct0*    objType0=NULL;
+   ExtensionStruct1*    objTemp0=NULL;
+
+   baseObject = Memory_Alloc( BaseClass, "BaseObject" );
+   objExtension = ExtensionManager_New_OfExistingObject( "obj", baseObject );
+
+   ExtensionManager_Add( objExtension, Type0, sizeof(ExtensionStruct0) );
+   ExtensionManager_AddArray( objExtension, Temp0, sizeof(ExtensionStruct1), 10 );
+   
+   {
+      objType0 = (ExtensionStruct0*)ExtensionManager_Get(
+         objExtension, 
+         baseObject, 
+         ExtensionManager_GetHandle( objExtension, "Type0" ) );
+      
+      objTemp0 = (ExtensionStruct1*)ExtensionManager_Get( 
+         objExtension, 
+         baseObject, 
+         ExtensionManager_GetHandle( objExtension, "Temp0" ) );
+
+      objType0->type = 'a';
+      for ( ii = 0; ii < 10; ++ii ) {
+         objTemp0[ii].temp = (double)ii;
+      }
+   }
+
+   objTemp0 = (ExtensionStruct1*)ExtensionManager_Get( 
+      objExtension, 
+      baseObject, 
+      ExtensionManager_GetHandle( objExtension, "Temp0" ) );
+
+   for ( ii = 0; ii < 10; ++ii ) {
+      pcu_check_true( objTemp0[ii].temp == ii );
+   }
+
+   Memory_Free( baseObject );
+   Stg_Class_Delete( objExtension );
+}
+
+
+void ExtensionSuite_TestExtendOfExtendedArray( ExtensionSuiteData* data ) {
+   ExtensionManager*       structExtension=NULL;
+   ExtensionManager*       arrayExtension=NULL;
+   BaseClass*              nArray=NULL;
+   BaseClass*              current=NULL;
+   ExtensionStruct0*       nType0=NULL;
+   ExtensionStruct1*       nTemp0=NULL;
+   ExtensionStruct2*       nPres0=NULL;
+   Index                   array_I=0;
+   const Index             ArraySize = 8;
+   Index                   ii=0;
+
+   structExtension = ExtensionManager_New_OfStruct( "Node", sizeof(BaseClass) );
+
+   ExtensionManager_Add( structExtension, Type0, sizeof(ExtensionStruct0) );
+   ExtensionManager_AddArray( structExtension, Temp0, sizeof(ExtensionStruct1), 10 );
+   
+   nArray = (BaseClass*)ExtensionManager_Malloc( structExtension, ArraySize );
+
+   /* Testing "Simple" extension on allocated extended struct */
+   arrayExtension = ExtensionManager_New_OfExtendedArray( "Ext", nArray, structExtension, ArraySize );
+
+   /* Since the nArray is already allocated, this function should realloc it to put the extended array
+    * at the end */
+   ExtensionManager_Add( arrayExtension, Pres0, sizeof(ExtensionStruct2) );
+
+   for ( array_I = 0; array_I < ArraySize; ++array_I ) {
+      current = ExtensionManager_At( structExtension, nArray, array_I );
+
+      nType0 = (ExtensionStruct0*)ExtensionManager_Get(
+         structExtension,
+         current,
+         ExtensionManager_GetHandle( structExtension, "Type0" ) );
+      nTemp0 = (ExtensionStruct1*)ExtensionManager_Get(
+         structExtension,
+         current,
+         ExtensionManager_GetHandle( structExtension, "Temp0" ) );
+
+      nType0->type = 'a';
+      for ( ii = 0; ii < 10; ++ii ) {
+         nTemp0[ii].temp = (double)((array_I * 10) + ii);
+      }
+      
+      nPres0 = (ExtensionStruct2*)ExtensionManager_Get(
+         arrayExtension,
+         ExtensionManager_At( arrayExtension, nArray, array_I ),
+         ExtensionManager_GetHandle( arrayExtension, "Pres0" ) );
+      
+      nPres0->pres = (double)array_I;
+      nPres0->flag = 'b';
+   }
+   
+   for ( array_I = 0; array_I < ArraySize; ++array_I ) {
+      current = ExtensionManager_At( structExtension, nArray, array_I );
+      nType0 = (ExtensionStruct0*)ExtensionManager_Get(
+         structExtension,
+         current,
+         ExtensionManager_GetHandle( structExtension, "Type0" ) );
+      nTemp0 = (ExtensionStruct1*)ExtensionManager_Get(
+         structExtension,
+         current,
+         ExtensionManager_GetHandle( structExtension, "Temp0" ) );
+
+      pcu_check_true( nType0->type == 'a' );
+      for ( ii = 0; ii < 10; ++ii ) {
+         pcu_check_true( nTemp0[ii].temp == (double)((array_I * 10) + ii) );
+      }
+
+      nPres0 = (ExtensionStruct2*)ExtensionManager_Get(
+         arrayExtension,
+         ExtensionManager_At( arrayExtension, nArray, array_I ),
+         ExtensionManager_GetHandle( arrayExtension, "Pres0" ) );
+   
+      pcu_check_true( nPres0->pres == (double)array_I );
+      pcu_check_true( nPres0->flag == 'b' );
+   }
+
+   ExtensionManager_Free( structExtension, nArray );
+
+   Stg_Class_Delete( structExtension );
+   Stg_Class_Delete( arrayExtension );
+}
+
+
+void ExtensionSuite_TestCopyExtendedArray( ExtensionSuiteData* data ) {
+   ExtensionManager*       structExtension=NULL;
+   ExtensionManager*       arrayExtension=NULL;
+   BaseClass*              nArray=NULL;
+   BaseClass*              current=NULL;
+   ExtensionStruct0*       nType0=NULL;
+   ExtensionStruct1*       nTemp0=NULL;
+   ExtensionStruct2*       nPres0=NULL;
+   Index                   array_I=0;
+   const Index             ArraySize = 8;
+   Index                   ii=0;
+   ExtensionManager*       structExtensionCopy=NULL;
+   ExtensionManager*       arrayExtensionCopy=NULL;
+   BaseClass*              nArrayCopy=NULL;
+   PtrMap*                 copyMap=NULL;
+
+   structExtension = ExtensionManager_New_OfStruct( "Node", sizeof(BaseClass) );
+
+   ExtensionManager_Add( structExtension, Type0, sizeof(ExtensionStruct0) );
+   ExtensionManager_AddArray( structExtension, Temp0, sizeof(ExtensionStruct1), 10 );
+   
+   nArray = (BaseClass*)ExtensionManager_Malloc( structExtension, ArraySize );
+
+   /* Testing "Simple" extension on allocated extended struct */
+   arrayExtension = ExtensionManager_New_OfExtendedArray( "Ext", nArray, structExtension, ArraySize );
+
+   /* Since the nArray is already allocated, this function should realloc it to put the extended array
+    * at the end */
+   ExtensionManager_Add( arrayExtension, Pres0, sizeof(ExtensionStruct2) );
+
+   for ( array_I = 0; array_I < ArraySize; ++array_I ) {
+      current = ExtensionManager_At( structExtension, nArray, array_I );
+
+      nType0 = (ExtensionStruct0*)ExtensionManager_Get(
+         structExtension,
+         current,
+         ExtensionManager_GetHandle( structExtension, "Type0" ) );
+      nTemp0 = (ExtensionStruct1*)ExtensionManager_Get(
+         structExtension,
+         current,
+         ExtensionManager_GetHandle( structExtension, "Temp0" ) );
+
+      nType0->type = 'a';
+      for ( ii = 0; ii < 10; ++ii ) {
+         nTemp0[ii].temp = (double)((array_I * 10) + ii);
+      }
+      
+      nPres0 = (ExtensionStruct2*)ExtensionManager_Get(
+         arrayExtension,
+         ExtensionManager_At( arrayExtension, nArray, array_I ),
+         ExtensionManager_GetHandle( arrayExtension, "Pres0" ) );
+      
+      nPres0->pres = (double)array_I;
+      nPres0->flag = 'b';
+   }
+
+   /* Copy time! */
+   
+   copyMap = PtrMap_New( 1 );
+   arrayExtensionCopy = Stg_Class_Copy( arrayExtension, NULL, True, "_dup", copyMap );
+   structExtensionCopy = Stg_Class_Copy( structExtension, NULL, True, "_dup", copyMap );
+   nArrayCopy = PtrMap_Find( copyMap, arrayExtension->_array );
+
+   pcu_check_true( nArrayCopy != NULL && nArrayCopy == arrayExtensionCopy->_array );
+
+   for ( array_I = 0; array_I < ArraySize; ++array_I ) {
+      current = ExtensionManager_At( arrayExtensionCopy, nArrayCopy, array_I );
+
+      nType0 = (ExtensionStruct0*)ExtensionManager_Get(
+         arrayExtensionCopy,
+         current,
+         ExtensionManager_GetHandle( structExtension, "Type0" ) );
+      nTemp0 = (ExtensionStruct1*)ExtensionManager_Get(
+         arrayExtensionCopy,
+         current,
+         ExtensionManager_GetHandle( structExtension, "Temp0" ) );
+   
+      pcu_check_true( nType0->type == 'a' );
+      for ( ii = 0; ii < 10; ++ii ) {
+         pcu_check_true( nTemp0[ii].temp == (double)((array_I * 10) + ii) );
+      }
+
+      nPres0 = (ExtensionStruct2*)ExtensionManager_Get(
+         arrayExtension,
+         ExtensionManager_At( arrayExtension, nArray, array_I ),
+         ExtensionManager_GetHandle( arrayExtension, "Pres0" ) );
+   
+      pcu_check_true( nPres0->pres == (double)array_I );
+      pcu_check_true( nPres0->flag == 'b' );
+   }
+
+   ExtensionManager_Free( structExtension, nArray );
+   Stg_Class_Delete( structExtension );
+   Stg_Class_Delete( arrayExtension );
+
+   ExtensionManager_Free( structExtensionCopy, nArrayCopy );
+   Stg_Class_Delete( structExtensionCopy );
+   Stg_Class_Delete( arrayExtensionCopy );
+   Stg_Class_Delete( copyMap );
+}
+
+
 void ExtensionSuite( pcu_suite_t* suite ) {
    pcu_suite_setData( suite, ExtensionSuiteData );
    pcu_suite_setFixtures( suite, ExtensionSuite_Setup, ExtensionSuite_Teardown );
    pcu_suite_addTest( suite, ExtensionSuite_TestOfStruct );
    pcu_suite_addTest( suite, ExtensionSuite_TestOfExistingObject );
+   pcu_suite_addTest( suite, ExtensionSuite_TestAddArrayToExistingObject );
+   pcu_suite_addTest( suite, ExtensionSuite_TestExtendOfExtendedArray );
+   pcu_suite_addTest( suite, ExtensionSuite_TestCopyExtendedArray );
 }

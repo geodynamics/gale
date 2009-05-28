@@ -370,18 +370,18 @@ void _AbstractContext_Init(
 	self->stepK = Context_AddEntryPoint( 
 		self, 
 		ContextEntryPoint_New( AbstractContext_EP_Step, ContextEntryPoint_Step_CastType ) );
+	self->updateClassK = Context_AddEntryPoint( 
+		self, 
+		ContextEntryPoint_New( AbstractContext_EP_UpdateClass, EntryPoint_Class_VoidPtr_CastType ) );
 	self->solveK = Context_AddEntryPoint( 
 		self, 
 		ContextEntryPoint_New( AbstractContext_EP_Solve, EntryPoint_VoidPtr_CastType ) );
 	self->postSolveK = Context_AddEntryPoint( 
 		self, 
 		ContextEntryPoint_New( AbstractContext_EP_PostSolvePreUpdate, EntryPoint_VoidPtr_CastType ) );
-	self->updateClassK = Context_AddEntryPoint( 
-		self, 
-		ContextEntryPoint_New( AbstractContext_EP_UpdateClass, EntryPoint_Class_VoidPtr_CastType ) );
 	self->syncK = Context_AddEntryPoint( 
 		self, 
-		ContextEntryPoint_New( AbstractContext_EP_Sync, EntryPoint_Class_VoidPtr_CastType ) );
+		ContextEntryPoint_New( AbstractContext_EP_Sync, EntryPoint_VoidPtr_CastType ) );
 	self->frequentOutputK =	Context_AddEntryPoint( 
 		self, 
 		ContextEntryPoint_New( AbstractContext_EP_FrequentOutput, EntryPoint_VoidPtr_CastType ) );
@@ -791,7 +791,7 @@ void AbstractContext_ErrorIfNoHooks( void* context, EntryPoint_Index epIndex, co
 void AbstractContext_FrequentOutput( void* context ) {
 	AbstractContext* self = (AbstractContext*)context;
 
-	KeyCall( self, self->frequentOutputK, EntryPoint_Class_VoidPtr_CallCast* )( 
+	KeyCall( self, self->frequentOutputK, EntryPoint_VoidPtr_CallCast* )( 
 			KeyHandle(self,self->frequentOutputK), self );
 }
 
@@ -1005,7 +1005,7 @@ void _AbstractContext_Step( Context* context, double dt ) {
 	KeyCall( self, self->solveK, EntryPoint_VoidPtr_CallCast* )( KeyHandle(self,self->solveK), self );
 	KeyCall( self, self->postSolveK, EntryPoint_VoidPtr_CallCast* )( KeyHandle(self,self->postSolveK), self );	
 	KeyCall( self, self->updateClassK, EntryPoint_Class_VoidPtr_CallCast* )( KeyHandle(self,self->updateClassK), self );
-	KeyCall( self, self->syncK, EntryPoint_Class_VoidPtr_CallCast* )( KeyHandle(self,self->syncK), self );
+	KeyCall( self, self->syncK, EntryPoint_VoidPtr_CallCast* )( KeyHandle(self,self->syncK), self );
 }
 
 
