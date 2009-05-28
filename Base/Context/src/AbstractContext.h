@@ -229,7 +229,6 @@
 	
 	EntryPoint_Index AbstractContext_AddEntryPoint( void* abstractContext, void* entryPoint );
 	
-	/* Add an entry point. "castType" is ignored unless this is a new entry point. Returns a key to the entry. */
 	EntryPoint* AbstractContext_GetEntryPoint( void* abstractContext, const Name entryPointName ); 
 	
 	/* Runs the AbstractContext_EP_FrequentOutput Entry Point */
