@@ -30,7 +30,7 @@ headerfilter.py:
 
 Python script to filter C files so that they parse out their class information to Doxygen. May soon move into scripts directory.
 
-codexStyleshhet.css, print.css and menu.css:
+codexStylesheet.css, print.css and menu.css:
 --------------------------------------------
 Stylesheets for creation of the Component Codex
 
@@ -40,7 +40,7 @@ java script code to create moving menus in the Component Codex website. Used by 
 
 IndexContent*.html:
 -------------------
-Content for the Component Codex's index.html page. Explains what each of the meta file do. There is a version for 'dtd' and 'xsd' versions of meta files.
+Content for the Component Codex's index.html page. Explains what each of the meta files do. There is a version for 'dtd' and 'xsd' versions of meta files.
 
 images/ :
 ---------

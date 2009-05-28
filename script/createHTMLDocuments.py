@@ -543,7 +543,7 @@ class createHTMLDocuments(createDocuments):
         for meta in project.metas:
             if meta.dictionary['Name'] == name:
                 # Add meta data to file
-                print project.name,  name,  meta.dictionary['Location']
+                #print project.name,  name,  meta.dictionary['Location']
                 text +='<h3 align="center">\n'
                 
                 text +='<a name="'+meta.dictionary['Name']+'">'+meta.dictionary['Name']+'</a>\n'
