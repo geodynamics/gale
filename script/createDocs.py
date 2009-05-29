@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import createHTMLDocuments, createDocument
-import sys, os.path, os, string, subprocess
+import sys, os.path, os, string, subprocess, shutil
 from createDocument import createDocuments
 from createDocument import Project
 from createDocument import Meta
@@ -33,21 +33,21 @@ def createListDictionary(arg1, arg2, arg3, arg4, directoryPath, docPath):
     dictionary['directoryPath'] = directoryPath
 
     dictionary['docPath'] = docPath
-
+    dictionary['docDataPath'] = os.path.realpath(os.path.join(directoryPath,'StGermain/doc/'))
     # Define Codex values
     # Codex Subdir
     dictionary['codexSubDir'] = 'Codex'
     dictionary['codexSubDirPath'] = os.path.join(dictionary['docPath'], dictionary['codexSubDir'])    
     # Define stylesheet data to input
-    dictionary['stylesheetList'] = [os.path.join(docPath, 'print.css'),os.path.join(dictionary['docPath'], 'menu.css'),os.path.join(dictionary['docPath'], 'codexStylesheet.css')]
+    dictionary['stylesheetList'] = [os.path.join(dictionary['docDataPath'], 'print.css'),os.path.join(dictionary['docDataPath'], 'menu.css'),os.path.join(dictionary['docDataPath'], 'codexStylesheet.css')]
 
     # Define javascript to input
-    dictionary['script'] =[os.path.join(dictionary['docPath'], 'menuscript.js')] 
+    dictionary['script'] =[os.path.join(dictionary['docDataPath'], 'menuscript.js')] 
     #Define blurb
     dictionary['documentBlurb'] ="This is a list of the available components."
     
     # Define picture directory
-    dictionary['imagePath'] = os.path.join(dictionary['docPath'], 'images')
+    dictionary['imagePath'] = os.path.join(dictionary['docDataPath'], 'images')
 
     #Define output picture directory
     dictionary['pictureDirectory'] = 'images/'
@@ -84,19 +84,19 @@ def createListDictionary(arg1, arg2, arg3, arg4, directoryPath, docPath):
     
         #Define location of content for index html page
     if (dictionary['metaFlag'] == 'dtd'):
-        dictionary['indexFileName'] = os.path.join(dictionary['docPath'], 'IndexContent-Dtd.html')
+        dictionary['indexFileName'] = os.path.join(dictionary['docDataPath'], 'IndexContent-Dtd.html')
     elif (dictionary['metaFlag'] == 'xsd'):
-        dictionary['indexFileName'] = os.path.join(dictionary['docPath'], 'IndexContent-Xsd.html')
+        dictionary['indexFileName'] = os.path.join(dictionary['docDataPath'], 'IndexContent-Xsd.html')
     else:
         dictionary['indexFileName'] = ""
 
     # Doxygen values
     dictionary['doxygenSubDir'] = 'Doxygen'
     dictionary['doxygenSubDirPath'] = os.path.join(dictionary['docPath'], dictionary['doxygenSubDir'])
-    dictionary['configPath'] = os.path.join(dictionary['docPath'], dictionary['configFile'])
-    dictionary['headerFilterPath'] = dictionary['docPath']+"/headerfilter.py"
+    dictionary['configPath'] = os.path.join(dictionary['docDataPath'], dictionary['configFile'])
+    dictionary['headerFilterPath'] = dictionary['docDataPath']+"/headerfilter.py"
     dictionary['projectNumber'] = 'Bleeding Edge'
-    dictionary['configPathNew'] = os.path.join(dictionary['docPath'], "Doxyfile.new")
+    dictionary['configPathNew'] = os.path.join(dictionary['docDataPath'], "Doxyfile.new")
     return dictionary
 
 # Print help statement
@@ -112,6 +112,9 @@ def printHelpStatement(dictionary):
          print "EMAIL: 'underworld-users@vpac.org'\n"
          print "DOXYGENCONFIG: Doxyfile"
 
+         print "*******WARNING********"
+         print "ALL data in "+dictionary['docPath']+ " will be overwritten or removed!"
+         print "**********************" 
          print "Other defaults: \n"
          print dictionary.items()
 
@@ -137,6 +140,8 @@ def createCodex(dictionary):
         projectList.append(project)
         projectList.sort()
         
+
+
     #now create the HTML documents
     print "Now creating HTML documents in directory: " + os.path.realpath(dictionary['codexSubDirPath'])
     
@@ -178,19 +183,23 @@ def createDoxygen(dictionary):
         if (line.find("INPUT=") != -1) or ((line.find("INPUT ") != -1) and (line.find("=") != -1)):
             newLine = "INPUT = "+ dictionary['directoryPath']
             print "Found INPUT"
+            print newLine
         elif (line.find("STRIP_FROM_PATH") != -1)and (line.find("=") != -1):
             newLine = "STRIP_FROM_PATH = "+ dictionary['directoryPath']
             print "Found STRIP_FROM_PATH"
+            print newLine
         elif ((line.find("PROJECT_NUMBER") != -1) and (line.find("=") != -1)):
             newLine = "PROJECT_NUMBER = "+ dictionary['projectNumber']
             print "Found PROJECT_NUMBER"
+            print newLine
         elif ((line.find("OUTPUT_DIRECTORY") != -1) and (line.find("=") != -1)):
             newLine = "OUTPUT_DIRECTORY = " + dictionary['docPath'] +"/"+dictionary['doxygenSubDir']+'/'
             print "Found OUTPUT_DIRECTORY"
             print newLine
         elif ((line.find("FILTER_PATTERNS") != -1) and (line.find("=") != -1)):
-            newline = "FILTER_PATTERNS = *.h="+dictionary['headerFilterPath']
-            print "Found FILTER_PATTERNS"
+            newLine = "FILTER_PATTERNS = *.h="+dictionary['headerFilterPath']
+            print "Found FILTER_PATTERNS: "
+            print newLine
 
         #HTML_STYLESHEET        =
         #HTML_FOOTER            =
@@ -203,11 +212,11 @@ def createDoxygen(dictionary):
 
     
     #write new doxyfile
-
+    
     doxyfileNew = open(dictionary['configPathNew'], 'w')
     doxyfileNew.write(newDoxyfileString)
     doxyfileNew.close()
-
+    
     #run doxygen ( this command checks PATH for doxygen.
     print "Creating Doxygen documentation for " + str(dictionary['configPath'])
     print " using modified file: "+str(dictionary['configPathNew']) 
@@ -216,25 +225,20 @@ def createDoxygen(dictionary):
 
     #remove temporary Doxyfile
     os.remove(dictionary['configPathNew'])
-    
-#def createIndexPage(dictionary):
-
-   #
+   
 if __name__=='__main__':
     values = sys.argv
     for i in range(5):
         if len(values)< 5:
             values.append("")
     
-    #print "values =" + str(values)
 
     #Define input directory (relative to ~/stgUnderworldE/ )
     directoryPath = os.path.realpath('.')
     print directoryPath
     # Create the output directory. This is relative to the ./mainProj/config page.(relative to ~/stgUnderworldE/ )
     docPath = os.path.realpath('./doc/')
-    createDocument.checkOutputPath(docPath)
-
+    
     # createDictionary
     mainDictionary = createListDictionary(values[1],values[2], values[3], values[4], directoryPath, docPath)
 
@@ -243,7 +247,10 @@ if __name__=='__main__':
         printHelpStatement(mainDictionary)
 
     else:
+        #check the directory now exists.
+        createDocument.checkOutputPath(docPath)
+
         createCodex(mainDictionary)
         createDoxygen(mainDictionary)
-#        createIndexPage(mainDictionary)
+
 
