@@ -75,14 +75,13 @@ pcu_source_t* pcu_test_addSource( pcu_test_t* test, pcu_source_t* src ) {
    assert( test );
    assert( src );
    if( test->srcs ) {
-      pcu_source_t* cur = test->srcs;
-
-      while( cur->next )
-	 cur = cur->next;
-      cur->next = src;
+      test->lastSrc->next = src;
+      test->lastSrc = src;
    }
-   else
+   else {
       test->srcs = src;
+      test->lastSrc = src;
+   }
    test->nsrcs++;
 
    return src;

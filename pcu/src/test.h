@@ -29,6 +29,7 @@ struct pcu_test_t {
       int globalresult;
       int nsrcs;
       pcu_source_t* srcs;
+      pcu_source_t* lastSrc;
 };
 
 void pcu_test_run( pcu_test_t* test, pcu_listener_t* lsnr );
