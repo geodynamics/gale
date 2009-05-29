@@ -427,7 +427,9 @@ int HashTable_InsertEntry ( HashTable *ht, const void *voidKey, unsigned int key
 	ht->count++;
 	*hep = he;
 		
-	return count; /*returning the number of collisions incurred. Ideally should be 1*/
+	/*returning the number of collisions incurred. 0 means no collisions and a new entry
+	 * at that index, 1 means 1 collision, and so on */ 	
+	return count; 
 }
 
 int HashTable_InsertEntryCopyData ( HashTable *ht, const void *voidKey, unsigned int keyLen, void *data, SizeT dataSize ) {
