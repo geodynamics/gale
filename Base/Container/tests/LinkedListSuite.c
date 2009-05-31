@@ -47,7 +47,7 @@ typedef struct {
 } LinkedListSuiteData;
 
 
-static int compareFunction(void *data1, void *data2)
+int LinkedListSuite_CompareFunction(void *data1, void *data2)
 {
 	int *d1 = NULL, *d2 = NULL;
 
@@ -69,7 +69,7 @@ static int compareFunction(void *data1, void *data2)
 	}
 }
 
-static void dataPrintFunction( void *nodeData, void *args )
+void LinkedListSuite_DataPrintFunction( void *nodeData, void *args )
 {
 	Stream *myStream = NULL;
 	
@@ -79,7 +79,7 @@ static void dataPrintFunction( void *nodeData, void *args )
 	Journal_Printf( myStream, "\t%d\n", *(int*)nodeData );
 }
 
-static void dataCopyFunction( void **nodeData, void *newData, SizeT dataSize)
+void LinkedListSuite_DataCopyFunction( void **nodeData, void *newData, SizeT dataSize)
 {
 	*nodeData = Memory_Alloc_Bytes_Unnamed(dataSize, "char");
 	memset(*nodeData, 0, dataSize);
@@ -91,9 +91,9 @@ void LinkedListSuite_Setup( LinkedListSuiteData* data ) {
    Index          ii = 0;
 
    data->numList = LinkedList_New(
-            compareFunction,
-            dataCopyFunction,
-            dataPrintFunction,
+            LinkedListSuite_CompareFunction,
+            LinkedListSuite_DataCopyFunction,
+            LinkedListSuite_DataPrintFunction,
             NULL,
             LINKEDLIST_UNSORTED);
 
