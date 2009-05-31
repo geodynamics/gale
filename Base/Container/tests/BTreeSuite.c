@@ -50,7 +50,7 @@ typedef struct praseFunctionArguments_t{
    double result;
 }parseFunctionArguments;
 
-int compareFunction(void *data1, void *data2)
+static int compareFunction(void *data1, void *data2)
 {
    int *d1 = NULL, *d2 = NULL;
 
@@ -72,14 +72,14 @@ int compareFunction(void *data1, void *data2)
    }
 }
 
-void dataPrintFunction( void *nodeData, Stream *printStream )
+static void dataPrintFunction( void *nodeData, Stream *printStream )
 {
    assert (nodeData);
 
    Journal_Printf( printStream, "\t%d\n", *(int*)nodeData );
 }
 
-void dataCopyFunction( void **nodeData, void *newData, SizeT dataSize)
+static void dataCopyFunction( void **nodeData, void *newData, SizeT dataSize)
 {
    *nodeData = malloc( dataSize );
    memset(*nodeData, 0, dataSize);
@@ -87,7 +87,7 @@ void dataCopyFunction( void **nodeData, void *newData, SizeT dataSize)
    memcpy(*nodeData, newData, dataSize);
 }
 
-void dataDeleteFunction( void *nodeData )
+static void dataDeleteFunction( void *nodeData )
 {
    if( nodeData != NULL ){
       free( nodeData );
