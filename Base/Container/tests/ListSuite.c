@@ -32,7 +32,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <mpi.h>
 #include "pcu/pcu.h"
 #include "StGermain/Base/Foundation/Foundation.h"
 #include "StGermain/Base/IO/IO.h"
