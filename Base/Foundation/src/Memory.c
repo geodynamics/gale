@@ -216,7 +216,7 @@ void Memory_Delete()
 void* _Memory_Alloc_Func(
 	SizeT size,
 	Type type,
-	Name name,
+	const char* const name,
 	const char* fileName,
 	const char* funcName,
 	int lineNumber )
