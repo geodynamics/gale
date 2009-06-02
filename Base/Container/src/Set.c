@@ -249,7 +249,9 @@ void* _Set_Subtraction( void* set, void* operand ) {
 ** Public Functions
 */
 
-Bool Set_Insert( Set* self, void* data ) {
+Bool Set_Insert( void* set, void* data ) {
+	Set*      self = (Set*)set;
+
 	if( BTree_FindNode( self->_btree, data ) != NULL ) {
 		return False;
 	}
@@ -260,12 +262,16 @@ Bool Set_Insert( Set* self, void* data ) {
 }
 
 
-void Set_Traverse( Set* self, BTree_parseFunction* func, void* args ) {
+void Set_Traverse( void* set, BTree_parseFunction* func, void* args ) {
+	Set*      self = (Set*)set;
+
 	BTree_ParseTree( self->_btree, func, args );
 }
 
 
-Bool Set_Exists( Set* self, void* data ) {
+Bool Set_Exists( void* set, void* data ) {
+	Set*      self = (Set*)set;
+
 	return (BTree_FindNode( self->_btree, data ) != NULL) ? True : False;
 }
 

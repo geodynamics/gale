@@ -119,25 +119,6 @@
 	** Public functions
 	*/
 
-	#define PtrSet_Insert( self, data ) \
-		Set_Insert( (Set*)self, data )
-
-	#define PtrSet_Union \
-		Set_Union
-
-	#define PtrSet_Intersection \
-		Set_Intersection
-
-	#define PtrSet_Subtraction \
-		Set_Subtraction
-
-	#define PtrSet_Traverse( self, func, args ) \
-		Set_Traverse( (Set*)self, func, args )
-
-	#define PtrSet_Exists( self, data ) \
-		Set_Exists( (Set*)self, data )
-
-	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Private Member functions
 	*/
