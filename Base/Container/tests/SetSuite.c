@@ -69,7 +69,7 @@ static void copyFunc( void** newData, void* data, SizeT size ) {
 }
 
 
-void deleteFunc( void* data ) {
+static void deleteFunc( void* data ) {
    assert( data );
    Memory_Free( data );
 }
@@ -93,7 +93,7 @@ void SetSuite_Teardown( SetSuiteData* data ) {
 }
 
 
-void markArray( void* setItem, void* args ) {
+static void markArray( void* setItem, void* args ) {
    SetSuiteData*  data = (SetSuiteData*)args;
    assert( data );
 
