@@ -111,13 +111,6 @@
 		AbstractContext*                                   context, 
 		Bool                                               broadcast ) ;
 
-	void lucRenderingEngineGL_CombineToMaster( 
-		void*                                              renderingEngine,
-		lucViewportInfo*                                   viewportInfo,
-		AbstractContext*                                   context,
-		lucPixel*                                          imageBuffer, 
-		float*                                             depthBuffer );
-
 	void _lucRenderingEngineGL_CompositeViewport_Manual( 
 		void*                                              renderingEngine, 
 		lucViewportInfo*                                   viewportInfo, 

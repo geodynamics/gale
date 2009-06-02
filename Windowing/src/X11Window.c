@@ -86,6 +86,7 @@ lucX11Window* _lucX11Window_New(
 		lucWindow_DisplayFunction						_displayWindow,	
 		lucWindow_EventsWaitingFunction*				_eventsWaiting,	
 		lucWindow_EventProcessorFunction				_eventProcessor,	
+		lucWindow_ResizeFunction						_resizeWindow,	
 		Name                                            name ) 
 {
 	lucX11Window*					self;
@@ -107,6 +108,7 @@ lucX11Window* _lucX11Window_New(
 			_displayWindow,	
 			_eventsWaiting,
 			_eventProcessor,
+			_resizeWindow,	
 			name );
 	
 	return self;
@@ -114,7 +116,6 @@ lucX11Window* _lucX11Window_New(
 
 void _lucX11Window_Init( 
 		lucX11Window*                                      self,
-		Name                                               xFontName,
 		Name                                               host,
 		unsigned int                                       displayNumber,
 		unsigned int                                       displayScreen )
@@ -125,9 +126,6 @@ void _lucX11Window_Init(
 	self->host          = StG_Strdup( host );
 	self->displayNumber = displayNumber;
 	self->displayScreen = displayScreen;
-
-	/* Get font from X11 */
-	self->xFontName = xFontName;
 }
 
 void _lucX11Window_Delete( void* window ) {
@@ -169,6 +167,7 @@ void* _lucX11Window_DefaultNew( Name name ) {
 		_lucX11Window_Display,	
 		_lucX11Window_EventsWaiting,
 		_lucX11Window_EventProcessor, 
+		_lucX11Window_Resize,	
 		name );
 }
 
@@ -180,7 +179,6 @@ void _lucX11Window_Construct( void* window, Stg_ComponentFactory* cf, void* data
 				
 	_lucX11Window_Init( 
 			self,
-			Stg_ComponentFactory_GetString( cf, self->name, "xFontName", "-adobe-courier-bold-r-normal--14-140-75-75-m-90-iso8859-1" ),
 			Stg_ComponentFactory_GetString( cf, self->name, "host", "localhost" ),
 			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "displayNumber", 0 ),
 			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "displayScreen", 0 ) );
@@ -206,27 +204,15 @@ void _lucX11Window_Initialise( void* window, void* data ) {
 
 	if ( self->interactive && self->isMaster) {
 		Journal_DPrintf( lucDebug, "Opening Interactive window.\n");
-		lucX11Window_CreateInteractiveWindow( self ); 
+		lucX11Window_CreateInteractiveWindow( self );
 	}
 	else {
 		Journal_DPrintf( lucDebug, "Opening background window.\n");
 		lucX11Window_CreateBackgroundWindow( self );
 	}
 
-	/* Setup timer */
-	parent = (lucWindow*)window;	/* Save parent ref for signal handler... */
-	signal(SIGALRM, lucX11Window_Timer);
-	struct itimerval timerval;
-	timerval.it_value.tv_sec	= 1;
-	timerval.it_value.tv_usec	= 0;
-	timerval.it_interval = timerval.it_value;
-	setitimer(ITIMER_REAL, &timerval, NULL);
-
 	/* Run the parent function to init window... */
 	_lucWindow_Initialise(window, data);
-
-	/* call here to override default font display lists */
-	lucX11Window_SetupFonts( self );
 
 	lucDebug_PrintFunctionEnd( self, 1 );
 }
@@ -281,7 +267,6 @@ int _lucX11Window_EventsWaiting( void* window )
 {
 	lucX11Window*  self = (lucX11Window*)window;
 	return XPending(self->display);
-
 }
 
 Bool _lucX11Window_EventProcessor( void* window ) {
@@ -290,13 +275,8 @@ Bool _lucX11Window_EventProcessor( void* window ) {
 	XEvent         event;
 	Atom           wmDeleteWindow;
 	static unsigned int button = 0;
-	static int width = 0, height = 0;
-	int mx = 0, my = 0;
 	static Bool visible = True;
 	Bool redisplay = True;
-	
-	if (width == 0) width = self->width;
-	if (height == 0) height = self->height;
 
 	lucDebug_PrintFunctionBegin( self, 1 );
 	
@@ -313,9 +293,6 @@ Bool _lucX11Window_EventProcessor( void* window ) {
     		lucWindow_MouseClick( self, button, event.type, event.xmotion.x, self->height - event.xmotion.y);
 	    	break;
 		case MotionNotify:
-		//	mx = event.xmotion.x;
-	//		my = self->height - event.xmotion.y;
-			//redisplay = False;
 			lucWindow_MouseMotion( self, button , event.xmotion.x, self->height - event.xmotion.y);
     		break;
 		case KeyPress:
@@ -337,60 +314,49 @@ Bool _lucX11Window_EventProcessor( void* window ) {
 			lucWindow_SetViewportNeedsToDrawFlag( window, True );
  			break;
    		case ConfigureNotify:
+        {
 			/* Notification of window actions, including resize */
-			width = event.xconfigure.width;
-			height = event.xconfigure.height;
-			redisplay = False;
+    		redisplay = lucWindow_SetSize( self, event.xconfigure.width, event.xconfigure.height);
     		break;
+        }
 		default:
 			redisplay = False;
 	}
+
+    if (!self->interactive) self->resized = True;  /* Flag mode switch required */
 	
-	/* Processing to be done when event queue empty, resizing window */
-	if (self->_eventsWaiting(self) == 0)
-	{
-		/* Resize viewports if window dimensions changed */
-		if (width != self->width || height != self->height)
-		{
-			lucWindow_Resize( self, width, height);
-			redisplay = True;
-		}
-	}
-	
+	/* Returns true if display refresh required */
+	return redisplay;
+}
+
+void _lucX11Window_Resize( void* window ) {
+	lucX11Window*        self = (lucX11Window*) window; 
+
+    /* Master window resized? Create new background pixmap of required size */
+    if (self->interactive && !self->isMaster)
+    {
+    	lucX11Window_CloseBackgroundWindow( self );
+   		lucX11Window_CreateBackgroundWindow( self );
+    }
+
 	/* Close window and create background window if switched out of interactive mode */
 	if (!self->interactive)
 	{
 		lucX11Window_CloseInteractiveWindow( self );
 		lucX11Window_CreateBackgroundWindow( self );
 		self->quitEventLoop = True;
-		/* Run the parent function to re-init window... */
-		_lucWindow_Initialise(window, self->context);
-		lucX11Window_SetupFonts( self );	/* OVerride default raster font */
 	}
-		
-	/* Returns true if display refresh required */
-	return redisplay;
-}
 
-void lucX11Window_SetupFonts( void* window ) {
-	lucX11Window*  self      = (lucX11Window*)window;
-	
-	lucDebug_PrintFunctionBegin( self, 2 );
-
-	/* Tell GLX to use this font */
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			glEnable(GL_BLEND);	
-	glXUseXFont( self->font->fid, 32, 96, 2000+32 );
-	
-	lucDebug_PrintFunctionEnd( self, 2 );
+	/* Run the parent function to resize window... */
+	lucWindow_Resize(window);	
 }
 
 Bool lucX11Window_CreateDisplay( void* window )  {
 	lucX11Window*  self      = (lucX11Window*)window;
 	static int configuration[] = { GLX_DOUBLEBUFFER, GLX_RGBA, GLX_DEPTH_SIZE, 16,
-			GLX_RED_SIZE, 1, GLX_GREEN_SIZE, 1, GLX_BLUE_SIZE, 1, None};
+			GLX_STENCIL_SIZE, 1, GLX_RED_SIZE, 1, GLX_GREEN_SIZE, 1, GLX_BLUE_SIZE, 1, None};
 	static int alphaConfiguration[] = { GLX_DOUBLEBUFFER, GLX_RGBA, GLX_DEPTH_SIZE, 16,
-			GLX_RED_SIZE, 1, GLX_GREEN_SIZE, 1, GLX_BLUE_SIZE, 1, GLX_ALPHA_SIZE, 1, None};
+			GLX_STENCIL_SIZE, 1, GLX_RED_SIZE, 1, GLX_GREEN_SIZE, 1, GLX_BLUE_SIZE, 1, GLX_ALPHA_SIZE, 1, None};
 	
 	/*********************** Create Display ******************************/
 	self->display = XOpenDisplay(NULL);
@@ -441,15 +407,6 @@ Bool lucX11Window_CreateDisplay( void* window )  {
 		return False;
 	}
 
-	/* Attempt to load provided font name */
-	self->font = XLoadQueryFont( self->display, self->xFontName );
-		
-	if (self->font == NULL && ! lucX11Window_FindFont( window) ){
-		Journal_Printf(  lucError, "In func %s: Attempt to request a different font failed.\n", __func__);
-		Journal_Printf(  lucError, "In func %s: Can not find any suitable font \n", __func__ );
-		return True;
-	}
-
 	return True;
 }
 
@@ -472,51 +429,6 @@ Bool lucX11Window_CreateContext( void* window, Bool direct )  {
     else
         Journal_DPrintf( lucDebug, "GLX: Sorry, no Direct Rendering possible\n");
 
-	return True;
-}
-
-Bool lucX11Window_FindFont( void* window )  {
-	lucX11Window*  self      = (lucX11Window*)window;
-  	Index font_I = 0;
-	Name fontNames[] = {
-			"-misc-fixed-bold-r-normal--14-130-75-75-c-70-iso10646-1",
-			"-misc-fixed-bold-r-normal--14-130-75-75-c-70-iso8859-1",
-			"-misc-fixed-bold-r-normal--14-130-75-75-c-70-iso8859-14",
-			"-misc-fixed-bold-r-normal--14-130-75-75-c-70-iso8859-15",
-			"-misc-fixed-bold-r-normal--14-130-75-75-c-70-iso8859-2",
-			"-misc-fixed-bold-r-normal--14-130-75-75-c-70-iso8859-5",
-			"-misc-fixed-bold-r-normal--14-130-75-75-c-70-iso8859-7",
-			"-misc-fixed-bold-r-normal--14-130-75-75-c-70-iso8859-8",
-			"-misc-fixed-bold-r-normal--14-130-75-75-c-70-iso8859-9",
-			"-misc-fixed-medium-o-normal--13-120-75-75-c-70-iso10646-1",
-			"-misc-fixed-medium-o-normal--13-120-75-75-c-70-iso8859-1",
-			"-misc-fixed-medium-o-normal--13-120-75-75-c-70-iso8859-14",
-			"-misc-fixed-medium-o-normal--13-120-75-75-c-70-iso8859-15",
-			"-misc-fixed-medium-o-normal--13-120-75-75-c-70-iso8859-2",
-			"-misc-fixed-medium-o-normal--13-120-75-75-c-70-iso8859-5",
-			"-misc-fixed-medium-o-normal--13-120-75-75-c-70-iso8859-7",
-			"-misc-fixed-medium-o-normal--13-120-75-75-c-70-iso8859-9",
-			"-misc-fixed-medium-o-normal--13-120-75-75-c-80-iso10646-1",
-			"-misc-fixed-medium-o-normal--13-120-75-75-c-80-iso8859-1",
-			"-misc-fixed-medium-o-normal--13-120-75-75-c-80-iso8859-14",
-			"-misc-fixed-medium-o-normal--13-120-75-75-c-80-iso8859-15",
-			"-misc-fixed-medium-o-normal--13-120-75-75-c-80-iso8859-2",
-			"-misc-fixed-medium-o-normal--13-120-75-75-c-80-iso8859-5",
-			"-misc-fixed-medium-o-normal--13-120-75-75-c-80-iso8859-7",
-			"-misc-fixed-medium-o-normal--13-120-75-75-c-80-iso8859-9"
-		};
-		
-	for ( font_I = 0 ; font_I < 25 ; font_I++ ) {
-		/* Get font from X11 */
-		self->font = XLoadQueryFont( self->display, fontNames[font_I] );
-		
-		if( self->font != NULL ){
-			Stg_asprintf(&self->xFontName, fontNames[font_I]);
-			return True;
-		}
-	}
-	if( self->font == NULL )
-		return False;
 	return True;
 }
 
@@ -606,6 +518,8 @@ void lucX11Window_CreateInteractiveWindow( void* window ) {
 		glXMakeCurrent( self->display, self->win, self->glxcontext);
 	
 		XMapRaised( self->display, self->win ); /* Show the window */
+
+        XFlush(self->display);  /* Flush output buffer */
 	}
 	else
 		abort();
@@ -613,6 +527,15 @@ void lucX11Window_CreateInteractiveWindow( void* window ) {
 	if (sHints) XFree(sHints);
 	if (wmHints) XFree(wmHints);
 	
+    /* Setup timer */
+    parent = (lucWindow*)window;	/* Save parent ref for signal handler... */
+    signal(SIGALRM, lucX11Window_Timer);
+    struct itimerval timerval;
+    timerval.it_value.tv_sec	= 1;
+    timerval.it_value.tv_usec	= 0;
+    timerval.it_interval = timerval.it_value;
+    setitimer(ITIMER_REAL, &timerval, NULL);
+
 	lucDebug_PrintFunctionEnd( self, 1 );
 }	
 

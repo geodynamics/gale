@@ -45,6 +45,7 @@ lucVTKWindow* _lucVTKWindow_New(
 		lucWindow_DisplayFunction*						_displayWindow,	
 		lucWindow_EventsWaitingFunction*				_eventsWaiting,	
 		lucWindow_EventProcessorFunction*				_eventProcessor,	
+		lucWindow_ResizeFunction*						_resizeWindow,	
 		Name                                            name ) 
 {
 	lucVTKWindow*					self;
@@ -66,6 +67,7 @@ lucVTKWindow* _lucVTKWindow_New(
 			_displayWindow,
 			_eventsWaiting,
 			_eventProcessor,
+			_resizeWindow,
 			name );
 	
 	return self;
@@ -138,6 +140,7 @@ void* _lucVTKWindow_DefaultNew( Name name ) {
 		lucWindow_Display,	/* Use parent class default implementations */
 		lucWindow_EventsWaiting,
 		lucWindow_EventProcessor,
+		lucWindow_Resize,
 		name );
 }
 

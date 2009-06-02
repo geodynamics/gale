@@ -75,6 +75,7 @@ lucOSMesaWindow* _lucOSMesaWindow_New(
 		lucWindow_DisplayFunction*						_displayWindow,	
 		lucWindow_EventsWaitingFunction*				_eventsWaiting,	
 		lucWindow_EventProcessorFunction*				_eventProcessor,	
+		lucWindow_ResizeFunction*						_resizeWindow,	
 		Name                                            name ) 
 {
 	lucOSMesaWindow*					self;
@@ -96,6 +97,7 @@ lucOSMesaWindow* _lucOSMesaWindow_New(
 			_displayWindow,
 			_eventsWaiting,
 			_eventProcessor,
+			_resizeWindow,
 			name );
 	
 	return self;
@@ -145,6 +147,7 @@ void* _lucOSMesaWindow_DefaultNew( Name name ) {
 		lucWindow_Display,	/* Use parent class default implementations */
 		lucWindow_EventsWaiting,
 		lucWindow_EventProcessor,
+		lucWindow_Resize,
 		name );
 }
 
@@ -167,7 +170,7 @@ void _lucOSMesaWindow_Initialise( void* window, void* data ) {
 
 	/* Init OSMesa display buffer */
 	self->pixelBuffer = Memory_Alloc_Array( lucAlphaPixel, self->width * self->height, "OSMesa pixelBuffer" );
-	self->osMesaContext = OSMesaCreateContext( OSMESA_RGBA, NULL );
+	self->osMesaContext = OSMesaCreateContextExt( OSMESA_RGBA, 16, 1, 0, NULL); /* 16 bit depth, 1 bit stencil */
 
 	OSMesaMakeCurrent( self->osMesaContext, self->pixelBuffer, GL_UNSIGNED_BYTE, self->width, self->height );
 

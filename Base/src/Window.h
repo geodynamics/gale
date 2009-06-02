@@ -49,6 +49,7 @@
 	typedef void (lucWindow_DisplayFunction) ( void* object );
 	typedef int (lucWindow_EventsWaitingFunction) ( void* object );
 	typedef Bool (lucWindow_EventProcessorFunction) ( void* object );
+	typedef void (lucWindow_ResizeFunction) ( void* object );
 
 	extern const Type lucWindow_Type;
 
@@ -61,16 +62,19 @@
 		lucWindow_DisplayFunction*			_displayWindow;					\
 		lucWindow_EventsWaitingFunction*	_eventsWaiting;					\
 		lucWindow_EventProcessorFunction*  	_eventProcessor;				\
+		lucWindow_ResizeFunction*  	        _resizeWindow;				    \
 		\
 		/* Other Info */ \
 		lucRenderingEngine*                	renderingEngine;				\
 		lucViewportInfo*              		viewportInfoList;				\
 		Viewport_Index                		viewportCount;					\
+        Viewport_Index                      verticalCount;                  \
 		lucOutputFormat_Register*     		outputFormat_Register;			\
 		lucWindowInteraction_Register*		windowInteraction_Register;		\
 		lucWindowInteraction*				defaultWindowInteraction;		\
 		Pixel_Index							width;							\
 		Pixel_Index							height;							\
+        Bool                                resized;                        \
 		Bool								interactive;					\
 		Bool								continuous;						\
 		lucColour							backgroundColour;				\
@@ -103,6 +107,7 @@
 		lucWindow_DisplayFunction*					_displayWindow,	
 		lucWindow_EventsWaitingFunction*			_eventsWaiting,	
 		lucWindow_EventProcessorFunction*			_eventProcessor,	
+		lucWindow_ResizeFunction*					_resizeWindow,	
 		Name										name );
 
 	void _lucWindow_Delete( void* window ) ;
@@ -121,6 +126,7 @@
 	void lucWindow_Display( void* window );		
 	int lucWindow_EventsWaiting( void* window);	
 	Bool lucWindow_EventProcessor( void* window );	
+    void lucWindow_Resize( void* window);
 
 	/* +++ Public Functions +++ */
 	void lucWindow_Dump( void* window, AbstractContext* context ) ;
@@ -167,7 +173,7 @@
 
 	void lucWindow_QuitEventLoop( void* window ) ;
 	void lucWindow_ToggleApplicationQuit( void* window ) ;
-	void lucWindow_Resize( void* window, Pixel_Index newWidth, Pixel_Index newHeight ) ;
+	Bool lucWindow_SetSize( void* window, Pixel_Index newWidth, Pixel_Index newHeight ) ;
 	void lucWindow_IdleReset(void *window);
 	void lucWindow_IdleCheck(void *window);
 

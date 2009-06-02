@@ -288,8 +288,7 @@ void _lucColourBar_Draw( void* drawingObject, lucWindow* window, lucViewportInfo
 	AbstractContext*         context       = (AbstractContext*) _context;
 
 	/* Only get master to draw colour bar */
-	if ( context->rank != MASTER )
-		return;
+	if ( context->rank != MASTER ) return;
 
 	/* Set up 2D Viewer the size of the viewport */
 	lucViewport2d(True, viewportInfo);

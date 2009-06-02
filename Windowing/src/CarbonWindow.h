@@ -86,6 +86,7 @@
 		lucWindow_DisplayFunction*						_displayWindow,	
 		lucWindow_EventsWaitingFunction*				_eventsWaiting,	
 		lucWindow_EventProcessorFunction*				_eventProcessor,	
+		lucWindow_ResizeFunction*						_resizeWindow,	
 		Name                                            name );
 
 	void _lucCarbonWindow__Delete( void* window ) ;
@@ -104,6 +105,7 @@
 	void _lucCarbonWindow_Display( void* window );
 	int _lucCarbonWindow_EventsWaiting( void* window ) ;
 	Bool _lucCarbonWindow_EventProcessor( void* window ) ;
+	void _lucCarbonWindow_Resize( void* window );
 
 	void lucCarbonWindow_CreateInteractiveWindow( void* window ) ;
 	void lucCarbonWindow_CreateBackgroundWindow( void* window ) ;

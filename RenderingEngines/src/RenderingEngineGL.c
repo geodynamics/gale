@@ -165,7 +165,7 @@ void* _lucRenderingEngineGL_DefaultNew( Name name ) {
 		_lucRenderingEngineGL_Render,
 		_lucRenderingEngineGL_Clear,
 		_lucRenderingEngineGL_GetPixelData,
-		_lucRenderingEngineGL_CompositeViewport_Manual,
+		_lucRenderingEngineGL_CompositeViewport_Stencil,
 		name );
 }
 
@@ -206,6 +206,8 @@ void _lucRenderingEngineGL_Render( void* renderingEngine, lucWindow* window, Abs
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 	glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
+
+    glShadeModel( GL_FLAT );    /* Don't interpolate colours between polygon vertices, looks nice but not accurate */
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -334,13 +336,13 @@ void _lucRenderingEngineGL_Clear( void* renderingEngineGL, lucWindow* window, Bo
 		glViewport(0, 0, window->width, window->height);
 		glScissor(0, 0, window->width, window->height);
 	}
-	glEnable (GL_SCISSOR_TEST);
-	glClearColor( 
-		window->backgroundColour.red, 
-		window->backgroundColour.green, 
-		window->backgroundColour.blue, 
-		window->backgroundColour.opacity );
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    else
+    {
+    	glEnable (GL_SCISSOR_TEST);
+    	glClearColor(window->backgroundColour.red, window->backgroundColour.green,
+            		window->backgroundColour.blue, window->backgroundColour.opacity );
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    }
 }
 
 Index lucRenderingEngineGL_MapBufferIdToRank( void* renderingEngineGL, Index bufferId, Index mergeCount ) {
@@ -355,9 +357,7 @@ Index lucRenderingEngineGL_MapBufferIdToRank( void* renderingEngineGL, Index buf
 }
 
 /* This function is quite a bit faster that the _lucRenderingEngineGL_CompositeViewport_Manual one but it will not work if
- * you don't have the stencil buffer - 
- * There's also been some problems with this one on the altix in uq - This shouldn't be the default function yet until this
- * problem is sorted out */
+ * you don't have the stencil buffer */ 
 void _lucRenderingEngineGL_CompositeViewport_Stencil( 
 		void*                                              renderingEngine, 
 		lucViewportInfo*                                   viewportInfo, 

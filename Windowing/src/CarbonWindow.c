@@ -84,6 +84,7 @@ lucCarbonWindow* _lucCarbonWindow_New(
 		lucWindow_DisplayFunction*						   _displayWindow,	
 		lucWindow_EventsWaitingFunction*				   _eventsWaiting,	
 		lucWindow_EventProcessorFunction*				   _eventProcessor,	
+		lucWindow_ResizeFunction*						   _resizeWindow,	
 		Name                                               name ) 
 {
 	lucCarbonWindow*					self;
@@ -105,6 +106,7 @@ lucCarbonWindow* _lucCarbonWindow_New(
 			_displayWindow,		
 			_eventsWaiting,		
 			_eventProcessor,	
+			_resizeWindow,		
 			name );
 	
 	return self;
@@ -159,6 +161,7 @@ void* _lucCarbonWindow_DefaultNew( Name name ) {
 		_lucCarbonWindow_Display,
 		_lucCarbonWindow_EventsWaiting,
 		_lucCarbonWindow_EventProcessor,
+		_lucCarbonWindow_Resize,
 		name );
 }
 
@@ -249,6 +252,15 @@ Bool _lucCarbonWindow_EventProcessor( void* window ) {
 	return True;	return True;
 }
 
+void _lucCarbonWindow_Resize( void* window ) {
+	lucCarbonWindow*        self = (lucCarbonWindow*) window; 
+	
+	aglSetCurrentContext (self->graphicsContext);
+	aglUpdateContext (self->graphicsContext);
+
+	/* Run the parent function to resize window... */
+	lucWindow_Resize(window);	
+}
 
 void lucCarbonWindow_CreateInteractiveWindow( void* window ) {
 	lucCarbonWindow*        self = (lucCarbonWindow*) window; 
@@ -260,15 +272,10 @@ void lucCarbonWindow_CreateInteractiveWindow( void* window ) {
 			{
 			  { kEventClassMouse, kEventMouseDown },
 			  { kEventClassMouse, kEventMouseUp },
-//			  { kEventClassMouse, kEventMouseMoved },
 			  { kEventClassMouse, kEventMouseDragged },
 			  { kEventClassMouse, kEventMouseWheelMoved },
 			  { kEventClassKeyboard, kEventRawKeyDown },
 			  { kEventClassWindow, kEventWindowDrawContent },
-//			  { kEventClassWindow, kEventWindowShown },
-//			  { kEventClassWindow, kEventWindowHidden },
-//			  { kEventClassWindow, kEventWindowActivated },
-//			  { kEventClassWindow, kEventWindowDeactivated },
 			  { kEventClassWindow, kEventWindowClose },
 			  { kEventClassWindow, kEventWindowBoundsChanged },
 			  { kEventClassWindow, kEventWindowResizeCompleted},
@@ -279,6 +286,7 @@ void lucCarbonWindow_CreateInteractiveWindow( void* window ) {
 			  AGL_GREEN_SIZE, 1,
 			  AGL_DOUBLEBUFFER,
 			  AGL_DEPTH_SIZE, 16,
+              AGL_STENCIL_SIZE, 1,
 			  AGL_NONE
 			};
 
@@ -286,7 +294,6 @@ void lucCarbonWindow_CreateInteractiveWindow( void* window ) {
 
 	/* Create the window...  */
 	self->graphicsContext = NULL;
-	//self->windowIsVisible = False;
 
 	SetRect(&rect, (int)self->offsetX, (int) self->offsetY, (int) (self->width + self->offsetX), (int) (self->height + self->offsetY) );
 
@@ -349,6 +356,7 @@ void lucCarbonWindow_CreateBackgroundWindow( void* window ) {
 		kCGLPFAOffScreen,
 		kCGLPFAColorSize, 32,
 		kCGLPFADepthSize, 16,
+		kCGLPFAStencilSize, 1,
 		0
 	} ;
 	
@@ -461,13 +469,7 @@ static pascal OSStatus lucCarbonWindow_EventHandler(EventHandlerCallRef nextHand
 			case kEventWindowDrawContent:
 				break; 
 			case kEventWindowResizeCompleted:
-				if (self->width != width || self->height != height)
-				{
-					aglSetCurrentContext (self->graphicsContext);
-					aglUpdateContext (self->graphicsContext);
-					lucWindow_Resize( self, width, height );
-			        _lucWindow_Initialise(self, self->context);	/* Reset font stuff */
-				}	
+				lucWindow_SetSize( self, width, height );
 				break;
 			case kEventWindowBoundsChanged:
 			{

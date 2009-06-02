@@ -186,7 +186,7 @@ void _lucFieldVariableBorder_Construct( void* drawingObject, Stg_ComponentFactor
 			self, 
 			fieldVariable, 
 			Stg_ComponentFactory_GetString( cf, self->name, "colour", "Black" ),
-			(float) Stg_ComponentFactory_GetDouble( cf, self->name, "lineWidth", 1.0 ) );
+			(float) Stg_ComponentFactory_GetDouble( cf, self->name, "lineWidth", 0.5 ) );
 
 }
 
@@ -223,11 +223,7 @@ void _lucFieldVariableBorder_BuildDisplayList( void* drawingObject, void* _conte
 	/* Grab values from field variable */
 	FieldVariable_GetMinAndMaxGlobalCoords( field, min, max );
 
-	if ( context->rank != MASTER )
-		return;
-
 	/* Initialise OpenGL stuff */
-	glShadeModel(GL_SMOOTH);
 	glDisable(GL_LIGHTING);
 
 	/* Line smoothing will not work correctly with depth testing enabled*/

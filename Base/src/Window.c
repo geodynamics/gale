@@ -95,6 +95,7 @@ lucWindow* _lucWindow_New(
 		lucWindow_DisplayFunction*						_displayWindow,	
 		lucWindow_EventsWaitingFunction*				_eventsWaiting,	
 		lucWindow_EventProcessorFunction*				_eventProcessor,
+		lucWindow_ResizeFunction*						_resizeWindow,	
 		Name                                            name )
 {
 	lucWindow*    self;
@@ -120,6 +121,7 @@ lucWindow* _lucWindow_New(
 	self->_displayWindow = _displayWindow;
 	self->_eventsWaiting = _eventsWaiting;
 	self->_eventProcessor = _eventProcessor;
+	self->_resizeWindow = _resizeWindow;
 	
 	return self;
 }
@@ -148,6 +150,7 @@ void _lucWindow_Init(
 	self->renderingEngine = renderingEngine;
 	self->width = width;
 	self->height = height;
+    self->resized = False;
 	self->interactive = interactive;
 	self->continuous = continuous; 
 
@@ -249,6 +252,7 @@ void* _lucWindow_DefaultNew( Name name ) {
 			lucWindow_Display,
 			lucWindow_EventsWaiting,
 			lucWindow_EventProcessor,
+			lucWindow_Resize,
 			name );
 }
 
@@ -362,21 +366,21 @@ void _lucWindow_Execute( void* window, void* data ) {
 	/* Display graphics and allow GUI interaction if enabled */
 	lucWindow*     self         = (lucWindow*) window ;
 	lucDebug_PrintFunctionBegin( self, 1 );
-	
+
 	/* Reset idle timer */
 	lucWindow_IdleReset(self);	
-	
+
 	/* Flag viewports need to re-render new information */
 	lucWindow_SetViewportNeedsToSetupFlag( self, True );
 	lucWindow_SetViewportNeedsToDrawFlag( self, True );
-	
+
 	/* Draw Window (Call virtual to display) 
 	 initial output for background & interactive modes */
 	self->_displayWindow( self );
-	
+
 	/* Interactive mode? Enter event loop processing */
-	if ( self->isMaster && self->interactive ) {
-		Bool redisplay = False;;
+	if ( self->interactive ) {
+		Bool redisplay = False;
 		lucWindow_InteractionHelpMessage( self, Journal_MyStream( Info_Type, self ) );
 		
 		/* Clear quit flags */
@@ -384,19 +388,27 @@ void _lucWindow_Execute( void* window, void* data ) {
 		self->toggleApplicationQuit = False;
 		
 		while ( !self->quitEventLoop ) {
-			
-			/* Check for events */
-			int events = self->_eventsWaiting(self);
-			if (self->continuous && events == 0)
-			{
-				/* Continuous mode and no events waiting, quit loop */
-				self->quitEventLoop = True; 
-				redisplay = True;
-			}
-			else	
-				/* Call virtual to wait for and process events */
-				if (self->_eventProcessor(self) || events > 1) redisplay = True;
+            /* Only master processes events */
+            int events = 0;
+			if (self->isMaster)
+            {  
+                /* Check for events */
+                events = self->_eventsWaiting(self);
+                if (self->continuous && events == 0)
+                {
+                    /* Continuous mode and no events waiting, quit loop */
+                    self->quitEventLoop = True; 
+                    redisplay = True;
+                }
+                else	
+                    /* Call virtual to wait for and process events */
+                    if (self->_eventProcessor(self) || events > 1) redisplay = True;
+            }
 
+        	/* Broadcast information about event loop*/ 
+        	MPI_Bcast( &events, 1, MPI_INT, MASTER, self->context->communicator );
+        	MPI_Bcast( &redisplay, 1, MPI_INT, MASTER, self->context->communicator );
+      
 			/* Still events to process? delay redisplay until queue empty */
 			if (events <= 1)
 			{
@@ -405,7 +417,7 @@ void _lucWindow_Execute( void* window, void* data ) {
 				redisplay = False;
 			}
 		}
-		
+
 		/* Close application if requested */
 		if( self->toggleApplicationQuit ) {
 			self->context->gracefulQuit = True;
@@ -414,10 +426,6 @@ void _lucWindow_Execute( void* window, void* data ) {
 	
 	/* Dump outputs to disk */
 	if ( self->isMaster ) lucWindow_Dump( self, self->context );
-	
-	/* Broadcast information */
-	MPI_Bcast( &self->quitEventLoop, 1, MPI_INT, MASTER, self->context->communicator );
-	MPI_Bcast( &self->interactive, 1, MPI_INT, MASTER, self->context->communicator );
 	
 	/* Stop idle timeout */
 	self->idleTime = 0;
@@ -434,9 +442,14 @@ void _lucWindow_Destroy( void* window, void* data ) {
 
 void lucWindow_Display( void* window )
 {
-	/* Default display function... */
+	/* Default display function... to be called from derived class display function */
 	lucWindow*     self      = (lucWindow*)window;
 
+	lucWindow_Broadcast( window, 0, MPI_COMM_WORLD );
+
+    /* Resize viewports if necessary */
+    if (self->resized) self->_resizeWindow(window);
+    
 	lucRenderingEngine_Render( self->renderingEngine, self, self->context );
 }
 
@@ -451,8 +464,30 @@ Bool lucWindow_EventProcessor( void *window)
 	/* Dummy event processor function... */
 	lucWindow*     self      = (lucWindow*)window;
 	self->quitEventLoop = True;
-	/* Returns true if event processed */
-	return True;
+	/* Returns true redisplay required */
+	return False;
+}
+
+void lucWindow_Resize( void* window ) {
+    /* Default window resize function */
+	lucWindow*       self      = (lucWindow*) window;
+	Viewport_Index   viewport_I;
+	Viewport_Index   viewportCount = self->viewportCount;
+	Viewport_Index   horizontalCount = viewportCount / self->verticalCount;
+	lucViewportInfo* viewportInfo;
+
+	for ( viewport_I = 0 ; viewport_I < viewportCount ; viewport_I++ ) {
+		viewportInfo = &self->viewportInfoList[ viewport_I ];
+        int vertical_I = viewport_I / horizontalCount;
+        int horizontal_I = viewport_I % horizontalCount;
+		viewportInfo->width  = div( self->width, horizontalCount ).quot;
+		viewportInfo->height = div( self->height, self->verticalCount ).quot;
+		viewportInfo->startx = horizontal_I * viewportInfo->width;
+		viewportInfo->starty = (self->verticalCount - 1 - vertical_I) * viewportInfo->height;
+	}
+
+    self->resized = False;
+     _lucWindow_Initialise(self, self->context);	/* Reset font stuff */
 }
 
 void lucWindow_Dump( void* window, AbstractContext* context ) {
@@ -636,10 +671,6 @@ void lucWindow_CheckLightFlag( void* window ) {
 	lucDebug_PrintFunctionEnd( self, 2 );
 }
 
-
-
-
-
 void lucWindow_SetViewportNeedsToSetupFlag( void* window, Bool flag ) {
 	lucWindow*              self         = (lucWindow*) window ;
 	Viewport_Index          viewport_I;
@@ -657,7 +688,6 @@ void lucWindow_SetViewportNeedsToDrawFlag( void* window, Bool flag ) {
 	Viewport_Index          viewport_I;
 
 	lucDebug_PrintFunctionBegin( self, 2 );
-	
 	for ( viewport_I = 0 ; viewport_I < self->viewportCount ; viewport_I++ ) {
 		self->viewportInfoList[ viewport_I ].needsToDraw = flag;
 	}
@@ -734,10 +764,9 @@ lucViewportInfo* lucWindow_ConstructViewportInfoList(
 		Viewport_Index* viewportCount,
 		void* data ) 
 {
-	Viewport_Index          verticalCount;
-	Viewport_Index          horizontalCount;
 	Viewport_Index          vertical_I;
 	Viewport_Index          horizontal_I;
+	Viewport_Index          horizontalCount;
 	Viewport_Index          total_I                 = 0;
 	Pixel_Index             viewportHeight;
 	Pixel_Index             viewportWidth;
@@ -756,12 +785,12 @@ lucViewportInfo* lucWindow_ConstructViewportInfoList(
 	list = Dictionary_Get( dictionary, "Viewport" );
 	Journal_Firewall( list != NULL, lucError, "Cannot Find 'Viewport' for %s '%s'.\n", self->type, self->name );
 		
-	verticalCount = Dictionary_Entry_Value_GetCount( list );
+	self->verticalCount = Dictionary_Entry_Value_GetCount( list );
 
 	/* Calculate viewport height */
-	viewportHeight = div( height, verticalCount ).quot;
+	viewportHeight = div( height, self->verticalCount ).quot;
 
-	for ( vertical_I = 0 ; vertical_I < verticalCount ; vertical_I++ ) {
+	for ( vertical_I = 0 ; vertical_I < self->verticalCount ; vertical_I++ ) {
 		horizontalVP_String = StG_Strdup( Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( list, vertical_I ) ) );
 	
 		/* Find number of horizontal layers */
@@ -793,7 +822,7 @@ lucViewportInfo* lucWindow_ConstructViewportInfoList(
 
 			/* Setup viewport dimensions */
 			currViewportInfo->startx = horizontal_I * viewportWidth;
-			currViewportInfo->starty = (verticalCount - 1 - vertical_I) * viewportHeight;
+			currViewportInfo->starty = (self->verticalCount - 1 - vertical_I) * viewportHeight;
 			currViewportInfo->width  = viewportWidth;
 			currViewportInfo->height = viewportHeight;
 
@@ -848,18 +877,20 @@ void lucWindow_InteractionHelpMessage( void* window, Stream* stream ) {
 }
 	
 
-#define lucWindow_TypesCount 5
+#define lucWindow_TypesCount 7
 void lucWindow_Create_MPI_Datatype() {
-	MPI_Datatype        typeList[lucWindow_TypesCount]     = { MPI_INT, MPI_INT, MPI_INT, MPI_FLOAT, MPI_INT };
-	int                 blocklen[lucWindow_TypesCount]     = {1, 1, 1, 4, 1};
+	MPI_Datatype        typeList[lucWindow_TypesCount]     = { MPI_INT, MPI_INT, MPI_INT, MPI_INT, MPI_INT, MPI_FLOAT, MPI_INT };
+	int                 blocklen[lucWindow_TypesCount]     = {1, 1, 1, 1, 1, 4, 1};
 	MPI_Aint            displacement[lucWindow_TypesCount];
 	lucWindow           window;
 
 	displacement[0] = GetOffsetOfMember( window, width );
 	displacement[1] = GetOffsetOfMember( window, height );
 	displacement[2] = GetOffsetOfMember( window, interactive );
-	displacement[3] = GetOffsetOfMember( window, backgroundColour );
-	displacement[4] = GetOffsetOfMember( window, currStereoBuffer );
+	displacement[3] = GetOffsetOfMember( window, quitEventLoop );
+	displacement[4] = GetOffsetOfMember( window, resized );
+	displacement[5] = GetOffsetOfMember( window, backgroundColour );
+	displacement[6] = GetOffsetOfMember( window, currStereoBuffer );
 	
 	MPI_Type_struct( lucWindow_TypesCount, blocklen, displacement, typeList, &lucWindow_MPI_Datatype );
 	MPI_Type_commit( & lucWindow_MPI_Datatype );
@@ -907,40 +938,19 @@ void lucWindow_ToggleApplicationQuit( void* window ) {
 	self->toggleApplicationQuit = True;
 }
 
-void lucWindow_Resize( void* window, Pixel_Index newWidth, Pixel_Index newHeight ) {
+Bool lucWindow_SetSize( void* window, Pixel_Index newWidth, Pixel_Index newHeight ) {
 	lucWindow*       self      = (lucWindow*) window;
-	Viewport_Index   viewport_I;
-	Viewport_Index   viewportCount = self->viewportCount;
-	lucViewportInfo* viewportInfo;
 
-	/* Pixel data returned is corrupt after resize unless dimensions multiple of 4, 
-	   so force until can determine why - clear at full size before rounding */
-	Pixel_Index nWidth = newWidth - newWidth % 4;
-	Pixel_Index nHeight = newHeight - newHeight % 4;
-	double xScale = (double) nWidth  / (double) self->width;
-	double yScale = (double) nHeight / (double) self->height;
+	if (newWidth < 32 || newHeight < 32) return False;
+    if (newWidth == self->width && newHeight == self->height) return False; /* No resize neccessary */
+
 	self->width = newWidth;
 	self->height = newHeight;
-	lucRenderingEngine_Clear(self->renderingEngine, self, True);
-	self->_displayWindow(window);   /* Refresh display after blanking window */
-		
-	for ( viewport_I = 0 ; viewport_I < viewportCount ; viewport_I++ ) {
-		viewportInfo = &self->viewportInfoList[ viewport_I ];
-		/* Scale both dimensions and position, rounding up */
-		viewportInfo->startx = (Pixel_Index) ( xScale * (double) viewportInfo->startx + 0.5 );
-		viewportInfo->width  = (Pixel_Index) ( xScale * (double) viewportInfo->width  + 0.5 );
-		viewportInfo->starty = (Pixel_Index) ( yScale * (double) viewportInfo->starty + 0.5 );
-		viewportInfo->height = (Pixel_Index) ( yScale * (double) viewportInfo->height + 0.5 );
-		viewportInfo->needsToDraw = True;
-	}
 
-	self->width = nWidth;
-	self->height = nHeight;
+    self->resized = True;
+  	Journal_DPrintfL( lucDebug, 2, "Window resized %d x %d\n", self->width, self->height);
 
-	Journal_DPrintfL( lucDebug, 2, "Window resized %d x %d\n", self->width, self->height);
-
-	/* Redraw graphics */
-	self->_displayWindow(window);
+    return True;
 }
 
 void lucWindow_IdleReset(void *window) {

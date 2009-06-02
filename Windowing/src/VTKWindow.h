@@ -93,6 +93,7 @@
 		lucWindow_DisplayFunction*						_displayWindow,	
 		lucWindow_EventsWaitingFunction*				_eventsWaiting,	
 		lucWindow_EventProcessorFunction*				_eventProcessor,	
+		lucWindow_ResizeFunction*						_resizeWindow,	
 		Name                                            name );
 
 	void _lucVTKWindow_Delete( void* window ) ;

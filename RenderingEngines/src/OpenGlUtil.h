@@ -56,8 +56,8 @@
   { \
     GLenum error = GL_NO_ERROR; \
     while ((error = glGetError()) != GL_NO_ERROR) { \
-		fprintf(stderr, "OpenGL error found. [ %s : %s : %s] \"%s\".\n",  \
-				__FILE__, __LINE__, #cmd, gluErrorString(error)); \
+		fprintf(stderr, "OpenGL error found. [ %s : %d ] \"%s\".\n",  \
+				__FILE__, __LINE__, gluErrorString(error)); \
     } \
   }
 

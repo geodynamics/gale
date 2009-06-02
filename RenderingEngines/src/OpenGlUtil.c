@@ -59,7 +59,7 @@
 #endif
 #include <string.h>
 
-#include  "font.c"
+#include  "font.h"
 
 unsigned int fontbase = -1, fontcharset = FONT_DEFAULT, texture;
 
@@ -225,6 +225,7 @@ void lucDeleteFont()
 {
 	/* Delete fonts */
 	glDeleteLists(fontbase, GLYPHS);
+    glDeleteTextures(1, &texture);
 }
 
 void lucColour_SetOpenGLColour( lucColour* colour ) {

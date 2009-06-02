@@ -1,3 +1,5 @@
+#ifndef _FONT_DATA
+#define _FONT_DATA
 /* GIMP RGBA C-Source image dump 1-byte-run-length-encoded (font.c) */
 /* 5 fonts, 4 small 16*16 @ 96 characters each + 1 large 18*18 @ 98 chars */
 /* Fixed width 16 * 9, small variable width sans, variable width sans, variable width serif, large variable width sans */
@@ -4250,4 +4252,4 @@ static const unsigned char IMAGE_rle_pixel_data[126603] =
  "\0\0\0\0\5\0\0\0\14\0\0\0\304\0\0\0\275\0\0\0y\0\0\0\4\263\0\0\0\0\3\0\0\0"
  "L\0\0\0\377\0\0\0""0\377\0\0\0\0\377\0\0\0\0\377\0\0\0\0\377\0\0\0\0\356\0"
  "\0\0\0");
-
+#endif
