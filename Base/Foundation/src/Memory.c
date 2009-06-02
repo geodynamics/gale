@@ -1609,6 +1609,12 @@ MemoryPointer* Memory_Find_Pointer( Pointer ptr )
 	BTreeNode *node = NULL;
 	MemoryPointer *result = NULL;
 	
+	/* Added on 3/6/2009: a NULL ptr should always return as not found, yet in some cases
+	 * it was returning a MemoryPointer (perhaps from a free'd array) */
+	if ( ptr == NULL ) {
+		return NULL;
+	}
+
 	if ( stgMemory->ptrCache == ptr ){
 		return stgMemory->memCache;
 	}
