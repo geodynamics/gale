@@ -39,6 +39,17 @@ extern const Type Stg_TimeMonitor_InfoStreamName;
 extern const Type Stg_TimeMonitor_TagType;
 
 typedef struct {
+	double totalSinceInit;
+	double dt;
+	double aveProcDt;	
+	double minProcDt;
+	double maxProcDt;
+	double percentTM_ofTotal;
+	Bool   criterionPassed;
+} TimeMonitorData;
+
+
+typedef struct {
 	double t1;
 	double t2;
 	char* tag;
@@ -55,6 +66,7 @@ Stg_TimeMonitor* Stg_TimeMonitor_New( char* tag, Bool criteria, Bool print, int 
 void Stg_TimeMonitor_Delete( Stg_TimeMonitor* tm );
 
 void Stg_TimeMonitor_Begin( Stg_TimeMonitor* tm );
-double Stg_TimeMonitor_End( Stg_TimeMonitor* tm );
+/* As well as printing, will also store all relevant info in the passed-in tmData reference */
+double Stg_TimeMonitor_End( Stg_TimeMonitor* tm, TimeMonitorData* tmData );
 
 #endif
