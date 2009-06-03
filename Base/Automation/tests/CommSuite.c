@@ -40,49 +40,39 @@
 #include "CommSuite.h"
 
 typedef struct {
+   Comm*    comm;
 } CommSuiteData;
 
 
 void CommSuite_Setup( CommSuiteData* data ) {
+   data->comm = Comm_New();
 }
 
 void CommSuite_Teardown( CommSuiteData* data ) {
+   NewClass_Delete( data->comm );
 }
 
    
 void CommSuite_TestConstruct( CommSuiteData* data ) {
-   Comm* comm;
+   pcu_check_true( data->comm );
+   pcu_check_true( data->comm->mpiComm == MPI_COMM_WORLD );
+   pcu_check_true( data->comm->recvs == NULL );
+   pcu_check_true( data->comm->sends == NULL );
+   pcu_check_true( data->comm->stats == NULL );
 
-   pcu_check_true( 0 == "The Comm macro-style component seems to be broken currently - aborting test." ); return;
-   comm = Comm_New();
-   pcu_check_true( comm );
-   pcu_check_true( comm->mpiComm == MPI_COMM_WORLD );
-   pcu_check_true( comm->recvs == NULL );
-   pcu_check_true( comm->sends == NULL );
-   pcu_check_true( comm->stats == NULL );
-
-   NewClass_Delete( comm );
 }
 
 
 void CommSuite_TestSetMPIComm( CommSuiteData* data ) {
-   Comm* comm;
-
-   pcu_check_true( 0 == "The Comm macro-style component seems to be broken currently - aborting test." ); return;
-   comm = Comm_New();
-   Comm_SetMPIComm( comm, MPI_COMM_WORLD );
-   pcu_check_true( comm->mpiComm == MPI_COMM_WORLD );
-
-   NewClass_Delete( comm );
+   Comm_SetMPIComm( data->comm, MPI_COMM_WORLD );
+   pcu_check_true( data->comm->mpiComm == MPI_COMM_WORLD );
 }
 
 
 void CommSuite_TestSetNbrs( CommSuiteData* data ) {
-   Comm* comm;
    int nRanks, rank;
    int nNbrs, nbrs[2];
 
-   pcu_check_true( 0 == "The Comm macro-style component seems to be broken currently - aborting test." ); return;
    MPI_Comm_size( MPI_COMM_WORLD, &nRanks );
    MPI_Comm_rank( MPI_COMM_WORLD, &rank );
    if( nRanks > 1 ) {
@@ -103,48 +93,44 @@ void CommSuite_TestSetNbrs( CommSuiteData* data ) {
    else
       nNbrs = 0;
 
-   comm = Comm_New();
-   Comm_SetMPIComm( comm, MPI_COMM_WORLD );
-   Comm_SetNeighbours( comm, nNbrs, nbrs );
+   data->comm = Comm_New();
+   Comm_SetMPIComm( data->comm, MPI_COMM_WORLD );
+   Comm_SetNeighbours( data->comm, nNbrs, nbrs );
 
    if( nRanks > 1 ) {
       if( rank == 0 ) {
-	 pcu_check_true( comm->nbrs.size == 1 );
-	 pcu_check_true( comm->nbrs.ptr[0] == rank + 1 );
+	 pcu_check_true( data->comm->nbrs.size == 1 );
+	 pcu_check_true( data->comm->nbrs.ptr[0] == rank + 1 );
 	 pcu_check_true( 1 );
       }
       else if( rank == nRanks - 1 ) {
-	 pcu_check_true( comm->nbrs.size == 1 );
-	 pcu_check_true( comm->nbrs.ptr[0] == rank - 1 );
+	 pcu_check_true( data->comm->nbrs.size == 1 );
+	 pcu_check_true( data->comm->nbrs.ptr[0] == rank - 1 );
 	 pcu_check_true( 1 );
       }
       else {
-	 pcu_check_true( comm->nbrs.size == 2 );
-	 pcu_check_true( comm->nbrs.ptr[0] == rank - 1 );
-	 pcu_check_true( comm->nbrs.ptr[1] == rank + 1 );
+	 pcu_check_true( data->comm->nbrs.size == 2 );
+	 pcu_check_true( data->comm->nbrs.ptr[0] == rank - 1 );
+	 pcu_check_true( data->comm->nbrs.ptr[1] == rank + 1 );
       }
-      pcu_check_true( comm->recvs != NULL );
-      pcu_check_true( comm->sends != NULL );
-      pcu_check_true( comm->stats != NULL );
+      pcu_check_true( data->comm->recvs != NULL );
+      pcu_check_true( data->comm->sends != NULL );
+      pcu_check_true( data->comm->stats != NULL );
    }
    else {
-      pcu_check_true( comm->nbrs.size == 0 );
-      pcu_check_true( comm->nbrs.ptr == NULL );
-      pcu_check_true( comm->recvs == NULL );
-      pcu_check_true( comm->sends == NULL );
-      pcu_check_true( comm->stats == NULL );
+      pcu_check_true( data->comm->nbrs.size == 0 );
+      pcu_check_true( data->comm->nbrs.ptr == NULL );
+      pcu_check_true( data->comm->recvs == NULL );
+      pcu_check_true( data->comm->sends == NULL );
+      pcu_check_true( data->comm->stats == NULL );
    }
-
-   NewClass_Delete( comm );
 }
 
 
 void CommSuite_TestAddNbrs( CommSuiteData* data ) {
-   Comm* comm;
    int nRanks, rank;
    int nNbrs, nbrs[2];
 
-   pcu_check_true( 0 == "The Comm macro-style component seems to be broken currently - aborting test." ); return;
    MPI_Comm_size( MPI_COMM_WORLD, &nRanks );
    MPI_Comm_rank( MPI_COMM_WORLD, &rank );
    if( nRanks > 1 ) {
@@ -164,56 +150,52 @@ void CommSuite_TestAddNbrs( CommSuiteData* data ) {
    else
       nNbrs = 0;
 
-   comm = Comm_New();
-   Comm_SetMPIComm( comm, MPI_COMM_WORLD );
-   Comm_SetNeighbours( comm, nNbrs, nbrs );
+   data->comm = Comm_New();
+   Comm_SetMPIComm( data->comm, MPI_COMM_WORLD );
+   Comm_SetNeighbours( data->comm, nNbrs, nbrs );
    if( rank > 0 && rank < nRanks - 1 ) {
       nNbrs = 1;
       nbrs[0] = rank + 1;
    }
    else
       nNbrs = 0;
-   Comm_AddNeighbours( comm, nNbrs, nbrs );
+   Comm_AddNeighbours( data->comm, nNbrs, nbrs );
 
    if( nRanks > 1 ) {
       if( rank == 0 ) {
-	 pcu_check_true( comm->nbrs.size == 1 );
-	 pcu_check_true( comm->nbrs.ptr[0] == rank + 1 );
+	 pcu_check_true( data->comm->nbrs.size == 1 );
+	 pcu_check_true( data->comm->nbrs.ptr[0] == rank + 1 );
 	 pcu_check_true( 1 );
       }
       else if( rank == nRanks - 1 ) {
-	 pcu_check_true( comm->nbrs.size == 1 );
-	 pcu_check_true( comm->nbrs.ptr[0] == rank - 1 );
+	 pcu_check_true( data->comm->nbrs.size == 1 );
+	 pcu_check_true( data->comm->nbrs.ptr[0] == rank - 1 );
 	 pcu_check_true( 1 );
       }
       else {
-	 pcu_check_true( comm->nbrs.size == 2 );
-	 pcu_check_true( comm->nbrs.ptr[0] == rank - 1 );
-	 pcu_check_true( comm->nbrs.ptr[1] == rank + 1 );
+	 pcu_check_true( data->comm->nbrs.size == 2 );
+	 pcu_check_true( data->comm->nbrs.ptr[0] == rank - 1 );
+	 pcu_check_true( data->comm->nbrs.ptr[1] == rank + 1 );
       }
-      pcu_check_true( comm->recvs != NULL );
-      pcu_check_true( comm->sends != NULL );
-      pcu_check_true( comm->stats != NULL );
+      pcu_check_true( data->comm->recvs != NULL );
+      pcu_check_true( data->comm->sends != NULL );
+      pcu_check_true( data->comm->stats != NULL );
    }
    else {
-      pcu_check_true( comm->nbrs.size == 0 );
-      pcu_check_true( comm->nbrs.ptr == NULL );
-      pcu_check_true( comm->recvs == NULL );
-      pcu_check_true( comm->sends == NULL );
-      pcu_check_true( comm->stats == NULL );
+      pcu_check_true( data->comm->nbrs.size == 0 );
+      pcu_check_true( data->comm->nbrs.ptr == NULL );
+      pcu_check_true( data->comm->recvs == NULL );
+      pcu_check_true( data->comm->sends == NULL );
+      pcu_check_true( data->comm->stats == NULL );
    }
-
-   NewClass_Delete( comm );
 }
 
 
 void CommSuite_TestRemNbrs( CommSuiteData* data ) {
-   Comm* comm;
    int nRanks, rank;
    int nNbrs, nbrs[2];
    IMap mapObj, *map = &mapObj;
 
-   pcu_check_true( 0 == "The Comm macro-style component seems to be broken currently - aborting test." ); return;
    MPI_Comm_size( MPI_COMM_WORLD, &nRanks );
    MPI_Comm_rank( MPI_COMM_WORLD, &rank );
    if( nRanks > 1 ) {
@@ -234,9 +216,8 @@ void CommSuite_TestRemNbrs( CommSuiteData* data ) {
    else
       nNbrs = 0;
 
-   comm = Comm_New();
-   Comm_SetMPIComm( comm, MPI_COMM_WORLD );
-   Comm_SetNeighbours( comm, nNbrs, nbrs );
+   Comm_SetMPIComm( data->comm, MPI_COMM_WORLD );
+   Comm_SetNeighbours( data->comm, nNbrs, nbrs );
    if( rank > 0 && rank < nRanks - 1 ) {
       nNbrs = 1;
       nbrs[0] = 0; /* local index */
@@ -244,44 +225,41 @@ void CommSuite_TestRemNbrs( CommSuiteData* data ) {
    else
       nNbrs = 0;
    IMap_Construct( map );
-   Comm_RemoveNeighbours( comm, nNbrs, nbrs, map );
+   Comm_RemoveNeighbours( data->comm, nNbrs, nbrs, map );
 
    if( nRanks > 1 ) {
       if( rank == 0 ) {
-	 pcu_check_true( comm->nbrs.size == 1 );
-	 pcu_check_true( comm->nbrs.ptr[0] == rank + 1 );
+	 pcu_check_true( data->comm->nbrs.size == 1 );
+	 pcu_check_true( data->comm->nbrs.ptr[0] == rank + 1 );
       }
       else if( rank == nRanks - 1 ) {
-	 pcu_check_true( comm->nbrs.size == 1 );
-	 pcu_check_true( comm->nbrs.ptr[0] == rank - 1 );
+	 pcu_check_true( data->comm->nbrs.size == 1 );
+	 pcu_check_true( data->comm->nbrs.ptr[0] == rank - 1 );
       }
       else {
-	 pcu_check_true( comm->nbrs.size == 1 );
-	 pcu_check_true( comm->nbrs.ptr[0] == rank + 1 );
+	 pcu_check_true( data->comm->nbrs.size == 1 );
+	 pcu_check_true( data->comm->nbrs.ptr[0] == rank + 1 );
       }
-      pcu_check_true( comm->recvs != NULL );
-      pcu_check_true( comm->sends != NULL );
-      pcu_check_true( comm->stats != NULL );
+      pcu_check_true( data->comm->recvs != NULL );
+      pcu_check_true( data->comm->sends != NULL );
+      pcu_check_true( data->comm->stats != NULL );
    }
    else {
-      pcu_check_true( comm->nbrs.size == 0 );
-      pcu_check_true( comm->nbrs.ptr == NULL );
-      pcu_check_true( comm->recvs == NULL );
-      pcu_check_true( comm->sends == NULL );
-      pcu_check_true( comm->stats == NULL );
+      pcu_check_true( data->comm->nbrs.size == 0 );
+      pcu_check_true( data->comm->nbrs.ptr == NULL );
+      pcu_check_true( data->comm->recvs == NULL );
+      pcu_check_true( data->comm->sends == NULL );
+      pcu_check_true( data->comm->stats == NULL );
    }
 
-   NewClass_Delete( comm );
    IMap_Destruct( map );
 }
 
 
 void CommSuite_TestAllgather( CommSuiteData* data ) {
-   Comm* comm;
    int nRanks, rank;
    int nNbrs, nbrs[2];
 
-   pcu_check_true( 0 == "The Comm macro-style component seems to be broken currently - aborting test." ); return;
    MPI_Comm_size( MPI_COMM_WORLD, &nRanks );
    MPI_Comm_rank( MPI_COMM_WORLD, &rank );
    if( nRanks > 1 ) {
@@ -302,12 +280,10 @@ void CommSuite_TestAllgather( CommSuiteData* data ) {
    else
       nNbrs = 0;
 
-   comm = Comm_New();
-   Comm_SetMPIComm( comm, MPI_COMM_WORLD );
-   Comm_SetNeighbours( comm, nNbrs, nbrs );
-   /* TODO */
+   Comm_SetMPIComm( data->comm, MPI_COMM_WORLD );
+   Comm_SetNeighbours( data->comm, nNbrs, nbrs );
 
-   NewClass_Delete( comm );
+   /* TODO - yet to be written */
 }
 
 
@@ -319,5 +295,6 @@ void CommSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, CommSuite_TestSetNbrs );
    pcu_suite_addTest( suite, CommSuite_TestAddNbrs );
    pcu_suite_addTest( suite, CommSuite_TestRemNbrs );
-   pcu_suite_addTest( suite, CommSuite_TestAllgather );
+   /* Test below not yet completed */
+   /* pcu_suite_addTest( suite, CommSuite_TestAllgather ); */
 }
