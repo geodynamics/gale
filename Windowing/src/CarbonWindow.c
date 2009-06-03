@@ -197,6 +197,9 @@ void _lucCarbonWindow_Initialise( void* window, void* data ) {
 
 	/* Run the parent function to init window... */
 	_lucWindow_Initialise(window, data);	
+	
+	/* Run the parent function to display window... */
+	lucWindow_Display(window);	
 }
 
 
@@ -248,16 +251,29 @@ int _lucCarbonWindow_EventsWaiting( void* window ) {
 Bool _lucCarbonWindow_EventProcessor( void* window ) {
 
 	RunApplicationEventLoop();
-	/* Returns true if event processed */
-	return True;	return True;
+	/* Returns true when redisplay required */
+	return True;
 }
 
 void _lucCarbonWindow_Resize( void* window ) {
 	lucCarbonWindow*        self = (lucCarbonWindow*) window; 
-	
-	aglSetCurrentContext (self->graphicsContext);
-	aglUpdateContext (self->graphicsContext);
 
+    if (self->interactive) 
+	{
+		if (self->isMaster)
+		{
+			/* Reset context after resize */
+			aglSetCurrentContext (self->graphicsContext);
+			aglUpdateContext (self->graphicsContext);
+		}
+		else
+		{
+			/* Master window resized? Create new background window of required size */
+			lucCarbonWindow_DestroyBackgroundWindow( self );
+			lucCarbonWindow_CreateBackgroundWindow( self );
+		}
+	}
+	
 	/* Run the parent function to resize window... */
 	lucWindow_Resize(window);	
 }
@@ -481,9 +497,9 @@ static pascal OSStatus lucCarbonWindow_EventHandler(EventHandlerCallRef nextHand
 				break; 
 			}
 			case kEventWindowClose: 
-				   lucWindow_ToggleApplicationQuit(self);
-				   self->quitEventLoop = true;
-			       break; 
+				lucWindow_ToggleApplicationQuit(self);
+				self->quitEventLoop = true;
+			    break; 
 		} 
 	} 
 	else if ( eventClass == kEventClassKeyboard ) {
