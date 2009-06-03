@@ -207,7 +207,8 @@ void _lucRenderingEngineGL_Render( void* renderingEngine, lucWindow* window, Abs
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 	glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
 
-    glShadeModel( GL_FLAT );    /* Don't interpolate colours between polygon vertices, looks nice but not accurate */
+    /* Interpolate colours between polygon vertices, looks nice but not technically accurate */
+    glShadeModel( GL_SMOOTH ); 
 
 	glEnable(GL_DEPTH_TEST);
 
