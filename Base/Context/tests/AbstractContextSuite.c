@@ -181,8 +181,8 @@ void AbstractContextSuite_Setup( AbstractContextSuiteData* data ) {
    data->dict = Dictionary_New();
 
    Dictionary_Add( data->dict, "outputPath", Dictionary_Entry_Value_FromString( "output" ) );
-   Dictionary_Add( data->dict, "checkpointEvery", Dictionary_Entry_Value_FromUnsignedInt( 2 ) );
-   Dictionary_Add( data->dict, "dumpEvery", Dictionary_Entry_Value_FromUnsignedInt( 5 ) );
+   Dictionary_Add( data->dict, "checkpointEvery", Dictionary_Entry_Value_FromUnsignedInt( 5 ) );
+   Dictionary_Add( data->dict, "dumpEvery", Dictionary_Entry_Value_FromUnsignedInt( 2 ) );
    Dictionary_Add( data->dict, "maxTimeSteps", Dictionary_Entry_Value_FromUnsignedInt( 10 ) );
    
    for (ii=0; ii < MAX_TIME_STEPS; ii++) {
@@ -276,8 +276,10 @@ void AbstractContextSuite_TestRunBasic( AbstractContextSuiteData* data ) {
    pcu_check_true( data->ctx->solve2HookCalled == 10 );
    pcu_check_true( data->ctx->syncHookCalled == 10 );
    pcu_check_true( data->ctx->outputHookCalled == 10 );
-   pcu_check_true( data->ctx->dumpHookCalled == 10/5 );
-   pcu_check_true( data->ctx->checkpointHookCalled == 10/2 );
+   pcu_check_true( data->ctx->dumpHookCalled == 
+      10/Dictionary_GetUnsignedInt(data->dict, "dumpEvery" ) );
+   pcu_check_true( data->ctx->checkpointHookCalled == 
+      10/Dictionary_GetUnsignedInt(data->dict, "checkpointEvery" ) );
 
    Stg_Component_Destroy( data->ctx, 0 /* dummy */, False );
 }
