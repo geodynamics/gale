@@ -17,7 +17,7 @@ METHOD( SetNeighbours, void, (void* self, int nNbrs, const int* nbrs),
 	(self, nNbrs, nbrs) )
 METHOD( AddNeighbours, void, (void* self, int nNbrs, const int* nbrs), 
 	(self, nNbrs, nbrs) )
-METHOD( RemoveNeighbours, void, (void* self, int nNbrs, const int* nbrs, IMap* map), 
+METHOD( RemoveNeighbours, void, (void* self, int nNbrs, const int* nbrLocalIndices, IMap* map), 
 	(self, nNbrs, nbrs, map) )
 
 METHOD( GetMPIComm, MPI_Comm, (const void* self), (self) )
@@ -42,6 +42,7 @@ METHOD( AlltoallEnd, void, (const void* self), (self) )
 
 MEMBER( MPI_Comm, mpiComm )
 MEMBER( IArray, nbrs )
+/* "inv" member is a Map of global rank to local rank indices */ 
 MEMBER( IMap, inv )
 MEMBER( MPI_Request*, recvs )
 MEMBER( MPI_Request*, sends )

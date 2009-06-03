@@ -137,15 +137,25 @@ void Comm_AddNeighbours( void* _self, int nNbrs, const int* nbrs ) {
    self->stats = Class_Rearray( self, self->stats, MPI_Status, netNbrs );
 }
 
-void Comm_RemoveNeighbours( void* _self, int nNbrs, const int* nbrs, IMap* map ) {
+
+/** Note: nbrLocalIndices is _not_ the ranks of neighbours to remove, but local indices of local
+ * neighbours in the nbrs array */
+void Comm_RemoveNeighbours( void* _self, int nNbrs, const int* nbrLocalIndices, IMap* map ) {
    Comm* self = Class_Cast( _self, Comm );
    int netNbrs;
    int n_i;
+   int globalIndex;
 
-   IArray_Remove( &self->nbrs, nNbrs, nbrs, map );
+   /* First, we need to map the local index to a global, so we know what to remove from the inverse
+    * mapping array next */
+   for( n_i = 0; n_i < nNbrs; n_i++ ) {
+      globalIndex = Comm_RankLocalToGlobal( self, nbrLocalIndices[n_i] );
+      IMap_Remove( &self->inv, globalIndex );
+   }
+   /* Now remove the local to global listings */
+   IArray_Remove( &self->nbrs, nNbrs, nbrLocalIndices, map );
+   /* Finally, update sizes */
    netNbrs = IArray_GetSize( &self->nbrs );
-   for( n_i = 0; n_i < nNbrs; n_i++ )
-      IMap_Remove( &self->inv, nbrs[n_i] );
    IMap_SetMaxSize( &self->inv, netNbrs );
    self->recvs = Class_Rearray( self, self->recvs, MPI_Request, netNbrs );
    self->sends = Class_Rearray( self, self->sends, MPI_Request, netNbrs );
