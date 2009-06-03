@@ -66,7 +66,7 @@ TestBegin( Insert ) {
       int tmp = 10 * c_i;
       STreeMap_Insert( map, &c_i, &tmp );
    }
-   TestTrue( STree_GetSize( map ) == 10 );
+   pcu_check_true( STree_GetSize( map ) == 10 );
 
   done:
    NewClass_Delete( map );
@@ -86,7 +86,7 @@ TestBegin( Map ) {
       STreeMap_Insert( map, &c_i, &tmp );
    }
    for( c_i = 0; c_i < 10; c_i++ ) {
-      TestTrue( *((int*)STreeMap_Map( map, &c_i )) == 10 * c_i );
+      pcu_check_true( *((int*)STreeMap_Map( map, &c_i )) == 10 * c_i );
    }
 
   done:
