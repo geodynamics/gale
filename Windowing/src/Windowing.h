@@ -87,8 +87,8 @@
 #undef HAVE_CARBON
 #endif
 /* X11 and Carbon have conflicting types */
-#ifdef HAVE_CARBON 
-#undef HAVE_X11
+#ifdef HAVE_X11 
+#undef HAVE_CARBON
 #endif
 
 #include "types.h"
