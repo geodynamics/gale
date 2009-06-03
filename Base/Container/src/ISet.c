@@ -31,7 +31,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+#include "pcu/pcu.h"
 #include "StGermain/Base/Foundation/Foundation.h"
 #include "types.h"
 #include "IArray.h"
@@ -68,7 +68,7 @@ void _ISet_Copy( void* _self, const void* _op ) {
    const ISet* op = (const ISet*)_op;
    ISetIter iterObj, *iter = &iterObj;
 
-   assert( self && op );
+   pcu_assert( self && op );
    ISet_Clear( self );
    ISet_SetMaxSize( self, op->maxSize );
    ISetIter_Construct( iter );
@@ -93,7 +93,7 @@ void ISet_SetMaxSize( void* _self, int maxSize ) {
    ISetItem* itm;
    int i_i;
 
-   assert( self );
+   pcu_assert( self );
    nOldItms = self->curSize;
    keys = Class_Array( self, int, self->curSize );
    ISet_GetArray( self, keys );
@@ -122,9 +122,9 @@ void ISet_Insert( void* _self, int key ) {
    ISetItem *itm, *cur;
    int ind;
 
-   assert( self );
+   pcu_assert( self );
    ind = ISet_Hash( self, key );
-   assert( ind < self->tblSize );
+   pcu_assert( ind < self->tblSize );
    itm = self->tbl + ind;
    if( !self->used[ind] ) {
       itm->key = key;
@@ -136,7 +136,7 @@ void ISet_Insert( void* _self, int key ) {
       cur = itm;
       do {
 	 if( cur->key == key ) {
-	    assert( cur->key != key );
+	    pcu_assert( cur->key != key );
 	 }
 	 cur = cur->next;
       } while( cur );
@@ -154,9 +154,9 @@ Bool ISet_TryInsert( void* _self, int key ) {
    ISetItem *itm, *cur;
    int ind;
 
-   assert( self );
+   pcu_assert( self );
    ind = ISet_Hash( self, key );
-   assert( ind < self->tblSize );
+   pcu_assert( ind < self->tblSize );
    itm = self->tbl + ind;
    if( !self->used[ind] ) {
       itm->key = key;
@@ -184,10 +184,10 @@ void ISet_Remove( void* _self, int key ) {
    ISetItem *itm, *prev, *toDel;
    int ind;
 
-   assert( self );
+   pcu_assert( self );
    ind = ISet_Hash( self, key );
-   assert( ind < self->tblSize );
-   assert( self->used[ind] );
+   pcu_assert( ind < self->tblSize );
+   pcu_assert( self->used[ind] );
    itm = self->tbl + ind;
    if( itm->key == key ) {
       toDel = itm->next;
@@ -209,7 +209,7 @@ void ISet_Remove( void* _self, int key ) {
 	 prev = toDel;
 	 toDel = toDel->next;
       }
-      assert( toDel );
+      pcu_assert( toDel );
    }
    if( toDel )
       Class_Free( self, toDel );
@@ -221,9 +221,9 @@ Bool ISet_TryRemove( void* _self, int key ) {
    ISetItem *itm, *prev, *toDel;
    int ind;
 
-   assert( self );
+   pcu_assert( self );
    ind = ISet_Hash( self, key );
-   assert( ind < self->tblSize );
+   pcu_assert( ind < self->tblSize );
    if( !self->used[ind] )
       return False;
    itm = self->tbl + ind;
@@ -261,7 +261,7 @@ void ISet_Clear( void* _self ) {
    ISetItem *itm, *cur, *nxt;
    int i_i;
 
-   assert( self );
+   pcu_assert( self );
    for( i_i = 0; i_i < self->tblSize; i_i++ ) {
       self->used[i_i] = False;
       itm = self->tbl + i_i;
@@ -285,7 +285,7 @@ void ISet_Union( void* _self, const void* _op ) {
    const int* arrPtr;
    int i_i;
 
-   assert( self && op );
+   pcu_assert( self && op );
    ISetIter_Construct( iter );
    IArray_Construct( array );
    for( ISet_First( op, iter ); Iter_IsValid( iter ); ISetIter_Next( iter ) ) {
@@ -312,7 +312,7 @@ void ISet_Isect( void* _self, const void* _op ) {
    const int* arrPtr;
    int i_i;
 
-   assert( self && op );
+   pcu_assert( self && op );
    ISetIter_Construct( iter );
    IArray_Construct( array );
    for( ISet_First( op, iter ); Iter_IsValid( iter ); ISetIter_Next( iter ) ) {
@@ -340,7 +340,7 @@ void ISet_Subtr( void* _self, const void* _op ) {
    const int* arrPtr;
    int i_i;
 
-   assert( self && op );
+   pcu_assert( self && op );
    ISetIter_Construct( iter );
    IArray_Construct( array );
    for( ISet_First( self, iter ); Iter_IsValid( iter ); ISetIter_Next( iter ) ) {
@@ -360,12 +360,12 @@ void ISet_Subtr( void* _self, const void* _op ) {
 }
 
 int ISet_GetMaxSize( const void* self ) {
-   assert( self );
+   pcu_assert( self );
    return ((ISet*)self)->maxSize;
 }
 
 int ISet_GetSize( const void* self ) {
-   assert( self );
+   pcu_assert( self );
    return ((ISet*)self)->curSize;
 }
 
@@ -374,7 +374,7 @@ void ISet_GetArray( const void* _self, int* keys ) {
    ISetIter iterObj, *iter = &iterObj;
    int i_i;
 
-   assert( self );
+   pcu_assert( self );
    ISetIter_Construct( iter );
    for( i_i = 0, ISet_First( self, iter );
 	Iter_IsValid( iter );
@@ -390,9 +390,9 @@ Bool ISet_Has( const void* _self, int key ) {
    ISetItem* itm;
    int ind;
 
-   assert( self );
+   pcu_assert( self );
    ind = ISet_Hash( self, key );
-   assert( ind < self->tblSize );
+   pcu_assert( ind < self->tblSize );
    if( !self->used[ind] )
       return False;
    itm = self->tbl + ind;
@@ -413,7 +413,7 @@ void ISet_First( const void* _self, ISetIter* iter ) {
    const ISet* self = (ISet*)_self;
    int i_i;
 
-   assert( self && iter );
+   pcu_assert( self && iter );
    for( i_i = 0; i_i < self->tblSize; i_i++ ) {
       if( self->used[i_i] ) {
 	 iter->iset = (ISet*)self;
