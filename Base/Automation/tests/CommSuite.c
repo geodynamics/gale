@@ -220,17 +220,18 @@ void CommSuite_TestRemNbrs( CommSuiteData* data ) {
    Comm_SetNeighbours( data->comm, nNbrs, nbrs );
    if( rank > 0 && rank < nRanks - 1 ) {
       nNbrs = 1;
-      nbrs[0] = 0; /* local index */
+      nbrs[0] = 0; /* Local index of nbrs to remove - i.e. this should map to rank -1 */
    }
    else
       nNbrs = 0;
+
    IMap_Construct( map );
    Comm_RemoveNeighbours( data->comm, nNbrs, nbrs, map );
 
    if( nRanks > 1 ) {
       if( rank == 0 ) {
 	 pcu_check_true( data->comm->nbrs.size == 1 );
-	 pcu_check_true( data->comm->nbrs.ptr[0] == rank + 1 );
+	 pcu_check_true( data->comm->nbrs.ptr[0] == 0 + 1 );
       }
       else if( rank == nRanks - 1 ) {
 	 pcu_check_true( data->comm->nbrs.size == 1 );
