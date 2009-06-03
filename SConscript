@@ -58,6 +58,8 @@ if env['shared_libraries']:
 
 # Need to include the Underworld library for binaries.
 libs = ['Underworld'] + env.get('LIBS', [])
+# create Underworld executable -> it's just a copy of StGermain executable
+env.Command('../bin/Underworld', '../bin/StGermain', 'cp $SOURCES $TARGET')
 
 # Test runner program.
 env.PCUTest('tests/testUnderworld', suites,
