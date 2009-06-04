@@ -36,6 +36,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <mpi.h>
 
 #include "pcu/pcu.h"
 #include "StGermain/Base/Foundation/Foundation.h"
@@ -50,10 +51,13 @@ const char* IO_HandlerSuite_XMLEndString = "</StGermainData>\n";
 const char* IO_HandlerSuite_XMLEmptyDataString = "<StGermainData xmlns=\"http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003\"/>\n";
 
 typedef struct {
-   XML_IO_Handler*                io_handler;
-   Dictionary*                    dict1;
-   Dictionary*                    dict2;
-   DictionarySuite_TestDictData*  testDD;
+   XML_IO_Handler*                  io_handler;
+   Dictionary*                      dict1;
+   Dictionary*                      dict2;
+   DictionarySuite_TestDictData*    testDD;
+   Index                            rank;
+   Index                            nProcs;
+   MPI_Comm                         comm;
 } IO_HandlerSuiteData;
 
 
@@ -74,6 +78,10 @@ void _IO_HandlerSuite_CreateTestXMLFile( const char* testXMLFileName,
 
 
 void IO_HandlerSuite_Setup( IO_HandlerSuiteData* data ) {
+   data->comm = MPI_COMM_WORLD;
+   MPI_Comm_rank( data->comm, &data->rank );
+   MPI_Comm_size( data->comm, &data->nProcs );
+
    data->io_handler = XML_IO_Handler_New();
    /* We don't want output in the tests by default */
    Stream_Enable( Journal_Register( Debug_Type, XML_IO_Handler_Type ), False );
@@ -91,7 +99,6 @@ void IO_HandlerSuite_Teardown( IO_HandlerSuiteData* data ) {
    Stg_Class_Delete( data->dict2 );
    DictionarySuite_DictionaryData_Free( data->testDD );
    Memory_Free( data->testDD );
-
 }
 
 
@@ -99,11 +106,20 @@ void IO_HandlerSuite_Teardown( IO_HandlerSuiteData* data ) {
 void IO_HandlerSuite_TestWriteReadNormalEntries( IO_HandlerSuiteData* data ) {
    Index         ii;
    const char*   xmlTestFileName = "xmlTest.xml";
+   Index         rank_I=0;
 
    DictionarySuite_PopulateDictWithTestValues( data->dict1, data->testDD );
 
-   IO_Handler_WriteAllToFile( data->io_handler, xmlTestFileName, data->dict1 );
-   IO_Handler_ReadAllFromFile( data->io_handler, xmlTestFileName, data->dict2 ); 
+   if (data->rank == 0) {
+      IO_Handler_WriteAllToFile( data->io_handler, xmlTestFileName, data->dict1 );
+   }
+
+   for(rank_I=0; rank_I<data->nProcs;rank_I++) {
+      if ( rank_I == data->rank ) {
+         IO_Handler_ReadAllFromFile( data->io_handler, xmlTestFileName, data->dict2 ); 
+      }
+      MPI_Barrier( data->comm );
+   }
 
    pcu_check_true( data->dict1->count == data->dict2->count );
    if ( data->dict1->count == data->dict2->count ) {
@@ -115,23 +131,35 @@ void IO_HandlerSuite_TestWriteReadNormalEntries( IO_HandlerSuiteData* data ) {
       }
    }
 
-   remove(xmlTestFileName);
+   MPI_Barrier( data->comm );
+   if (data->rank==0) {
+      remove(xmlTestFileName);
+   }
 }
 
 
 /* Similar to above test, except using the function to write just one entry at a time */
 void IO_HandlerSuite_TestWriteReadNormalSingleEntry( IO_HandlerSuiteData* data ) {
-   Index         ii;
-   const char*   fileName = "singleEntry.xml";
+   Index          ii;
+   const char*    fileName = "singleEntry.xml";
+   Index          rank_I=0;
 
    DictionarySuite_PopulateDictWithTestValues( data->dict1, data->testDD );
 
    for (ii=0; ii<data->dict1->count; ii++) {
-      XML_IO_Handler_WriteEntryToFile( data->io_handler, fileName,
+      if (data->rank == 0) {
+         XML_IO_Handler_WriteEntryToFile( data->io_handler, fileName,
             data->testDD->testKeys[ii],
             data->testDD->testValues[ii], 
             NULL );
-      IO_Handler_ReadAllFromFile( data->io_handler, fileName, data->dict2 ); 
+      }
+
+      for ( rank_I=0; rank_I< data->nProcs; rank_I++ ) {
+         if ( rank_I == data->rank ) {
+            IO_Handler_ReadAllFromFile( data->io_handler, fileName, data->dict2 ); 
+         }
+         MPI_Barrier( data->comm );
+      }
 
       pcu_check_true( 1 == data->dict2->count );
       if ( 1 == data->dict2->count ) {
@@ -142,22 +170,34 @@ void IO_HandlerSuite_TestWriteReadNormalSingleEntry( IO_HandlerSuiteData* data )
       }
 
       Dictionary_Empty( data->dict2 );
-      remove(fileName);
+      MPI_Barrier( data->comm );
+      if ( data->rank == 0 ) {
+         remove(fileName);
+      }
    }
 }
 
 
 /* Similar to above test, except test we can write out an empty Dictionary, then read in */
 void IO_HandlerSuite_TestWriteReadEmpty( IO_HandlerSuiteData* data ) {
-   Index         ii;
-   const char*   xmlTestFileName = "empty.xml";
-   FILE*         testFile = NULL;
-   const int     MAXLINE = 1000;
-   char*         xmlLine = NULL;
+   Index          ii;
+   const char*    xmlTestFileName = "empty.xml";
+   FILE*          testFile = NULL;
+   const int      MAXLINE = 1000;
+   char*          xmlLine = NULL;
+   Index          rank_I;
 
-   IO_Handler_WriteAllToFile( data->io_handler, xmlTestFileName, data->dict1 );
+   if (data->rank == 0) {
+      IO_Handler_WriteAllToFile( data->io_handler, xmlTestFileName, data->dict1 );
+   }
 
-   testFile = fopen(xmlTestFileName, "r");
+   for (rank_I=0; rank_I<data->nProcs; rank_I++) {
+      if (rank_I==data->rank) {
+         testFile = fopen(xmlTestFileName, "r");
+         rewind( testFile );
+      }
+      MPI_Barrier(data->comm);
+   }
    xmlLine = Memory_Alloc_Array_Unnamed( char, MAXLINE );
    pcu_check_true( fgets( xmlLine, MAXLINE, testFile ) );
    pcu_check_true( 0 == strcmp( IO_HandlerSuite_XMLStartString1, xmlLine ) );
@@ -166,23 +206,33 @@ void IO_HandlerSuite_TestWriteReadEmpty( IO_HandlerSuiteData* data ) {
    Memory_Free( xmlLine );
    fclose(testFile);
 
-   IO_Handler_ReadAllFromFile( data->io_handler, xmlTestFileName, data->dict2 ); 
+   for ( rank_I=0; rank_I< data->nProcs; rank_I++ ) {
+      if ( rank_I == data->rank ) {
+         IO_Handler_ReadAllFromFile( data->io_handler, xmlTestFileName, data->dict2 ); 
+      }
+      MPI_Barrier( data->comm );
+   }
+
    pcu_check_true( 0 == data->dict2->count );
 
-   remove(xmlTestFileName);
+   MPI_Barrier(data->comm);
+   if (data->rank == 0) {
+      remove(xmlTestFileName);
+   }
 }
 
 
 /* In this case, want to make sure the types are written explicitly into the output, so will
  * check against expected text. */
 void IO_HandlerSuite_TestWriteExplicitTypes( IO_HandlerSuiteData* data ) {
-   Index         ii=0;
-   const char*   testFileName = "xmlTest-explicittypes.xml";
-   const int     MAXLINE = 1000;
-   FILE*         testFile = NULL;
-   char*         xmlLine = NULL;
+   Index          ii=0;
+   const char*    testFileName = "xmlTest-explicittypes.xml";
+   const int      MAXLINE = 1000;
+   FILE*          testFile = NULL;
+   char*          xmlLine = NULL;
    const unsigned explicityTypesExpectedLineNum = 23;
-   const char* explicitTypesExpected[] = {
+   Index          rank_I;
+   const char*    explicitTypesExpected[] = {
       "  <element type=\"param\" name=\"test_cstring\" paramType=\"string\">hello</element>\n",
       "  <element type=\"param\" name=\"test_double\" paramType=\"double\">45.567</element>\n",
       "  <element type=\"param\" name=\"test_uint\" paramType=\"uint\">5</element>\n",
@@ -213,9 +263,17 @@ void IO_HandlerSuite_TestWriteExplicitTypes( IO_HandlerSuiteData* data ) {
    DictionarySuite_PopulateDictWithTestValues( data->dict1, data->testDD );
 
    XML_IO_Handler_SetWriteExplicitTypes( data->io_handler, True );
-   IO_Handler_WriteAllToFile( data->io_handler, testFileName, data->dict1 );
+   if (data->rank == 0) {
+      IO_Handler_WriteAllToFile( data->io_handler, testFileName, data->dict1 );
+   }
 
-   testFile = fopen(testFileName, "r");
+   for (rank_I=0; rank_I<data->nProcs; rank_I++) {
+      if (rank_I==data->rank) {
+         testFile = fopen(testFileName, "r");
+         rewind(testFile);
+      }
+      MPI_Barrier(data->comm);
+   }
    pcu_check_true( fgets( xmlLine, MAXLINE, testFile ) );
    pcu_check_true( 0 == strcmp( IO_HandlerSuite_XMLStartString1, xmlLine ) );
    pcu_check_true( fgets( xmlLine, MAXLINE, testFile ) );
@@ -228,7 +286,10 @@ void IO_HandlerSuite_TestWriteExplicitTypes( IO_HandlerSuiteData* data ) {
    pcu_check_true( 0 == strcmp( IO_HandlerSuite_XMLEndString, xmlLine ) );
    fclose(testFile);
 
-   remove(testFileName);
+   MPI_Barrier(data->comm);
+   if (data->rank==0) {
+      remove(testFileName);
+   }
    Memory_Free( xmlLine );
 }
 
@@ -239,13 +300,22 @@ void IO_HandlerSuite_TestReadWhitespaceEntries( IO_HandlerSuiteData* data ) {
    char*             whiteSpacesEntry = NULL;
    const char*       testKey = "spacedKey";
    const char*       testValString = "spacedVal";
+   Index             rank_I;
 
-   Stg_asprintf( &whiteSpacesEntry, "<param name=\"    %s   \"> \t %s \n\t</param>\n",
-      testKey, testValString );
-   _IO_HandlerSuite_CreateTestXMLFile( testFileName, whiteSpacesEntry );
-   Memory_Free( whiteSpacesEntry );
+   if( data->rank==0 ) {
+      Stg_asprintf( &whiteSpacesEntry, "<param name=\"    %s   \"> \t %s \n\t</param>\n",
+         testKey, testValString );
+      _IO_HandlerSuite_CreateTestXMLFile( testFileName, whiteSpacesEntry );
+      Memory_Free( whiteSpacesEntry );
+   }
+   MPI_Barrier(data->comm);
 
-   IO_Handler_ReadAllFromFile( data->io_handler, testFileName, data->dict2 ); 
+   for ( rank_I=0; rank_I< data->nProcs; rank_I++ ) {
+      if ( rank_I == data->rank ) {
+         IO_Handler_ReadAllFromFile( data->io_handler, testFileName, data->dict2 ); 
+      }
+      MPI_Barrier( data->comm );
+   }
 
    pcu_check_true( 1 == data->dict2->count );
    if ( 1 == data->dict2->count ) {
@@ -255,7 +325,10 @@ void IO_HandlerSuite_TestReadWhitespaceEntries( IO_HandlerSuiteData* data ) {
          Dictionary_Entry_Value_AsString( data->dict2->entryPtr[0]->value ), testValString ) );
    }
 
-   remove( testFileName );
+   MPI_Barrier(data->comm);
+   if (data->rank==0) {
+      remove( testFileName );
+   }
 }
 
 
@@ -267,46 +340,56 @@ void IO_HandlerSuite_TestReadIncludedFile( IO_HandlerSuiteData* data ) {
    const char*       testSearchPathSubdir = "./testXML-subdir";
    const char*       testIncludedFileNameSP = "xmlTest-includedSP.xml";
    char*             subdirIncludedFileNameSP = NULL;
-   char*             xmlEntry = NULL;
-   char*             includeLine = NULL;
-   char*             searchPathLine = NULL;
-   char*             includeLineSP = NULL;
-   char*             xmlTestEntries = NULL;
    const char*       testKey = "regularKey";
    const char*       testValString = "regularVal";
    const char*       testKeyInc = "keyInc";
    const char*       testValStringInc = "valInc";
    const char*       testKeyIncSP = "keyIncSP";
    const char*       testValStringIncSP = "valIncSP";
+   Index             rank_I;
 
    Stg_asprintf( &subdirIncludedFileNameSP, "%s/%s", testSearchPathSubdir, testIncludedFileNameSP );
 
-   Stg_asprintf( &xmlEntry, "<param name=\"%s\">%s</param>\n",
-      testKey, testValString );
-   Stg_asprintf( &includeLine, "<include>%s</include>\n", testIncludedFileName );
-   Stg_asprintf( &searchPathLine, "<searchPath>%s</searchPath>\n", testSearchPathSubdir );
-   Stg_asprintf( &includeLineSP, "<include>%s</include>\n", testIncludedFileNameSP );
-   Stg_asprintf( &xmlTestEntries, "%s%s%s%s", xmlEntry, includeLine, searchPathLine,
-      includeLineSP );
-   _IO_HandlerSuite_CreateTestXMLFile( testFileName, xmlTestEntries );
-   Memory_Free( xmlEntry );
-   Memory_Free( includeLine );
-   Memory_Free( searchPathLine );
-   Memory_Free( includeLineSP );
-   Memory_Free( xmlTestEntries );
+   if (data->rank==0) {
+      char*             xmlEntry = NULL;
+      char*             xmlTestEntries = NULL;
+      char*             includeLine = NULL;
+      char*             searchPathLine = NULL;
+      char*             includeLineSP = NULL;
 
-   Stg_asprintf( &xmlEntry, "<param name=\"%s\">%s</param>\n",
-      testKeyInc, testValStringInc );
-   _IO_HandlerSuite_CreateTestXMLFile( testIncludedFileName, xmlEntry );
-   Memory_Free( xmlEntry );
+      Stg_asprintf( &xmlEntry, "<param name=\"%s\">%s</param>\n",
+         testKey, testValString );
+      Stg_asprintf( &includeLine, "<include>%s</include>\n", testIncludedFileName );
+      Stg_asprintf( &searchPathLine, "<searchPath>%s</searchPath>\n", testSearchPathSubdir );
+      Stg_asprintf( &includeLineSP, "<include>%s</include>\n", testIncludedFileNameSP );
+      Stg_asprintf( &xmlTestEntries, "%s%s%s%s", xmlEntry, includeLine, searchPathLine,
+         includeLineSP );
+      _IO_HandlerSuite_CreateTestXMLFile( testFileName, xmlTestEntries );
+      Memory_Free( xmlEntry );
+      Memory_Free( includeLine );
+      Memory_Free( searchPathLine );
+      Memory_Free( includeLineSP );
+      Memory_Free( xmlTestEntries );
 
-   mkdir( testSearchPathSubdir, 0755 );
-   Stg_asprintf( &xmlEntry, "<param name=\"%s\">%s</param>\n",
-      testKeyIncSP, testValStringIncSP );
-   _IO_HandlerSuite_CreateTestXMLFile( subdirIncludedFileNameSP, xmlEntry );
-   Memory_Free( xmlEntry );
+      Stg_asprintf( &xmlEntry, "<param name=\"%s\">%s</param>\n",
+         testKeyInc, testValStringInc );
+      _IO_HandlerSuite_CreateTestXMLFile( testIncludedFileName, xmlEntry );
+      Memory_Free( xmlEntry );
 
-   IO_Handler_ReadAllFromFile( data->io_handler, testFileName, data->dict2 ); 
+      mkdir( testSearchPathSubdir, 0755 );
+      Stg_asprintf( &xmlEntry, "<param name=\"%s\">%s</param>\n",
+         testKeyIncSP, testValStringIncSP );
+      _IO_HandlerSuite_CreateTestXMLFile( subdirIncludedFileNameSP, xmlEntry );
+      Memory_Free( xmlEntry );
+   }
+   MPI_Barrier(data->comm);
+
+   for ( rank_I=0; rank_I< data->nProcs; rank_I++ ) {
+      if ( rank_I == data->rank ) {
+         IO_Handler_ReadAllFromFile( data->io_handler, testFileName, data->dict2 ); 
+      }
+      MPI_Barrier( data->comm );
+   }
 
    pcu_check_true( 3 == data->dict2->count );
    if ( 3 == data->dict2->count ) {
@@ -324,21 +407,20 @@ void IO_HandlerSuite_TestReadIncludedFile( IO_HandlerSuiteData* data ) {
          Dictionary_Entry_Value_AsString( data->dict2->entryPtr[2]->value ), testValStringIncSP ) );
    }
 
-   remove( testFileName );
-   remove( testIncludedFileName );
-   remove( subdirIncludedFileNameSP );
+   MPI_Barrier(data->comm);
+   if (data->rank==0) {
+      remove( testFileName );
+      remove( testIncludedFileName );
+      remove( subdirIncludedFileNameSP );
+      rmdir( testSearchPathSubdir );
+   }
    Memory_Free( subdirIncludedFileNameSP );
-   rmdir( testSearchPathSubdir );
 }
 
 
 void IO_HandlerSuite_TestReadRawDataEntries( IO_HandlerSuiteData* data ) {
    Index             ii;
    const char*       testFileName = "xmlTest-rawData.xml";
-   char*             xmlEntries = NULL;
-   char*             rawDataEntry1 = NULL;
-   char*             rawDataEntry2 = NULL;
-   char*             entryLine = NULL;
    const char*       list1Name = "bcs";
    const int         list1EntryCount = 2;
    const int         list1Vals[2][3] = { {1, 3, 6}, {2, 9, 14} };
@@ -351,37 +433,51 @@ void IO_HandlerSuite_TestReadRawDataEntries( IO_HandlerSuiteData* data ) {
    const int         list2CoordVals[3][3] = { {4,5,8}, {3,5,9}, {9,3,4} };
    const Bool        list2BoolVals[3] = { True, False, True };
    const char*       list2BoolValStrings[3] = { "True", "False", "1" };
+   Index             rank_I;
 
-   Stg_asprintf( &rawDataEntry1, "<list name=\"%s\">\n<asciidata>\n%d %d %d\n%d %d %d\n"
-      "</asciidata>\n</list>\n",
-      list1Name, list1Vals[0][0], list1Vals[0][1], list1Vals[0][2], 
-      list1Vals[1][0], list1Vals[1][1], list1Vals[1][2] );
+   if (data->rank==0) {
+      char*             xmlEntries = NULL;
+      char*             rawDataEntry1 = NULL;
+      char*             rawDataEntry2 = NULL;
+      char*             entryLine = NULL;
 
-   rawDataEntry2 = Memory_Alloc_Array_Unnamed( char, 10000 );
-   entryLine = Memory_Alloc_Array_Unnamed( char, 1000 );
-   sprintf( rawDataEntry2, "<list name=\"%s\">\n<asciidata>\n", list2Name );
-   for (ii=0; ii < list2CompCount; ii++ ) {
-      sprintf( entryLine, "<columnDefinition name=\"%s\" type=\"%s\"/>\n",
-         list2CompNames[ii], list2CompTypes[ii] );
+      Stg_asprintf( &rawDataEntry1, "<list name=\"%s\">\n<asciidata>\n%d %d %d\n%d %d %d\n"
+         "</asciidata>\n</list>\n",
+         list1Name, list1Vals[0][0], list1Vals[0][1], list1Vals[0][2], 
+         list1Vals[1][0], list1Vals[1][1], list1Vals[1][2] );
+
+      rawDataEntry2 = Memory_Alloc_Array_Unnamed( char, 10000 );
+      entryLine = Memory_Alloc_Array_Unnamed( char, 1000 );
+      sprintf( rawDataEntry2, "<list name=\"%s\">\n<asciidata>\n", list2Name );
+      for (ii=0; ii < list2CompCount; ii++ ) {
+         sprintf( entryLine, "<columnDefinition name=\"%s\" type=\"%s\"/>\n",
+            list2CompNames[ii], list2CompTypes[ii] );
+         strcat( rawDataEntry2, entryLine );
+      }
+      for (ii=0; ii < list2EntryCount; ii++ ) {
+         sprintf( entryLine, "%s %i %i %i %s\n", list2StringVals[ii],
+            list2CoordVals[ii][0], list2CoordVals[ii][1], list2CoordVals[ii][2],
+            list2BoolValStrings[ii] );
+         strcat( rawDataEntry2, entryLine );
+      }
+      sprintf( entryLine, "</asciidata>\n</list>\n" );
       strcat( rawDataEntry2, entryLine );
-   }
-   for (ii=0; ii < list2EntryCount; ii++ ) {
-      sprintf( entryLine, "%s %i %i %i %s\n", list2StringVals[ii],
-         list2CoordVals[ii][0], list2CoordVals[ii][1], list2CoordVals[ii][2],
-         list2BoolValStrings[ii] );
-      strcat( rawDataEntry2, entryLine );
-   }
-   sprintf( entryLine, "</asciidata>\n</list>\n" );
-   strcat( rawDataEntry2, entryLine );
 
-   Stg_asprintf( &xmlEntries, "%s%s", rawDataEntry1, rawDataEntry2 );
-   _IO_HandlerSuite_CreateTestXMLFile( testFileName, xmlEntries );
-   Memory_Free( xmlEntries );
-   Memory_Free( rawDataEntry1 );
-   Memory_Free( rawDataEntry2 );
-   Memory_Free( entryLine );
+      Stg_asprintf( &xmlEntries, "%s%s", rawDataEntry1, rawDataEntry2 );
+      _IO_HandlerSuite_CreateTestXMLFile( testFileName, xmlEntries );
+      Memory_Free( xmlEntries );
+      Memory_Free( rawDataEntry1 );
+      Memory_Free( rawDataEntry2 );
+      Memory_Free( entryLine );
+   }
+   MPI_Barrier(data->comm);
 
-   IO_Handler_ReadAllFromFile( data->io_handler, testFileName, data->dict2 ); 
+   for ( rank_I=0; rank_I< data->nProcs; rank_I++ ) {
+      if ( rank_I == data->rank ) {
+         IO_Handler_ReadAllFromFile( data->io_handler, testFileName, data->dict2 ); 
+      }
+      MPI_Barrier( data->comm );
+   }
 
    {
       Dictionary_Entry_Value* dev = NULL;
@@ -427,8 +523,12 @@ void IO_HandlerSuite_TestReadRawDataEntries( IO_HandlerSuiteData* data ) {
       }
    }
 
-   remove( testFileName );
+   MPI_Barrier(data->comm);
+   if (data->rank==0) {
+      remove( testFileName );
+   }
 }
+
 
 void IO_HandlerSuite_TestReadAllFromCommandLine( IO_HandlerSuiteData* data ) {
    Index          ii;
@@ -436,6 +536,7 @@ void IO_HandlerSuite_TestReadAllFromCommandLine( IO_HandlerSuiteData* data ) {
    int            argc;
    char**         argv;
    int            fakeParamArgsCount = 2;
+   Index          rank_I;
    
    DictionarySuite_PopulateDictWithTestValues( data->dict1, data->testDD );
 
@@ -443,13 +544,15 @@ void IO_HandlerSuite_TestReadAllFromCommandLine( IO_HandlerSuiteData* data ) {
    argc = data->testDD->testEntriesCount + 1 + fakeParamArgsCount;
    argv = Memory_Alloc_Array_Unnamed( char*, argc );
 
-   for ( ii=0; ii < data->testDD->testEntriesCount; ii++ ) {
-      Stg_asprintf( &xmlTestFileNames[ii], "readFromCommandLineTest%u.xml", ii );
-      XML_IO_Handler_WriteEntryToFile( data->io_handler, xmlTestFileNames[ii],
-            data->testDD->testKeys[ii],
-            data->testDD->testValues[ii], 
-            NULL );
-   }
+      for ( ii=0; ii < data->testDD->testEntriesCount; ii++ ) {
+         Stg_asprintf( &xmlTestFileNames[ii], "readFromCommandLineTest%u.xml", ii );
+         if (data->rank == 0) {
+            XML_IO_Handler_WriteEntryToFile( data->io_handler, xmlTestFileNames[ii],
+               data->testDD->testKeys[ii],
+               data->testDD->testValues[ii], 
+               NULL );
+         }
+      }
 
    /* Create the argv command line */
    Stg_asprintf( &argv[0], "./testStGermain");
@@ -462,7 +565,12 @@ void IO_HandlerSuite_TestReadAllFromCommandLine( IO_HandlerSuiteData* data ) {
       Stg_asprintf( &argv[1+data->testDD->testEntriesCount+ii], "simParam%u=test", ii );
    }
 
-   IO_Handler_ReadAllFilesFromCommandLine( data->io_handler, argc, argv, data->dict2 );
+   for ( rank_I=0; rank_I< data->nProcs; rank_I++ ) {
+      if ( rank_I == data->rank ) {
+         IO_Handler_ReadAllFilesFromCommandLine( data->io_handler, argc, argv, data->dict2 );
+      }
+      MPI_Barrier( data->comm );
+   }
 
    /* Now, dict2 should correspond to dict1, having read in and combined all the
     *  separate files. */
@@ -475,8 +583,11 @@ void IO_HandlerSuite_TestReadAllFromCommandLine( IO_HandlerSuiteData* data ) {
    }
 
 
+   MPI_Barrier(data->comm);
    for ( ii=0; ii < data->testDD->testEntriesCount; ii++ ) {
-      remove(xmlTestFileNames[ii]);
+      if (data->rank==0) {
+         remove(xmlTestFileNames[ii]);
+      }
       Memory_Free( xmlTestFileNames[ii] );
    }
    Memory_Free( xmlTestFileNames );
@@ -499,40 +610,50 @@ void IO_HandlerSuite_TestReadDuplicateEntryKeys( IO_HandlerSuiteData* data ) {
    const char*             paramNames2[2] = { "2nd-paramOne", "2nd-paramTwo" };
    const unsigned int      paramVals[2] = { 1, 2 };
    const unsigned int      paramVals2[2] = { 3, 4 };
-   char                    struct1Entry[10000];
-   char                    struct2Entry[10000];
-   char                    xmlLine[1000];
-   char*                   testEntries = NULL;
    Dictionary_Entry_Value* structDev = NULL;
    Dictionary_Entry_Value* elementDev = NULL;
    Dictionary*             structDict = NULL;
-
-   sprintf( xmlLine, "<struct name=\"%s\">\n", struct1Name );
-   strcat( struct1Entry, xmlLine );
-   sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames[0], paramVals[0] );
-   strcat( struct1Entry, xmlLine );
-   sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames[1], paramVals[1] );
-   strcat( struct1Entry, xmlLine );
-   sprintf( xmlLine, "</struct>\n" );
-   strcat( struct1Entry, xmlLine );
+   char                    struct1Entry[10000];
+   char                    struct2Entry[10000];
+   char*                   testEntries = NULL;
+   char                    xmlLine[1000];
+   Index                   rank_I;
 
    /* Sub-test 1: we expect default behaviour is "replace", therefore the 2nd struct
     *  should be the only entry */
    pcu_check_true( IO_Handler_DefaultMergeType == Dictionary_MergeType_Replace );
 
-   sprintf( xmlLine, "<struct name=\"%s\">\n", struct1Name );
-   strcat( struct2Entry, xmlLine );
-   sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames2[0], paramVals2[0] );
-   strcat( struct2Entry, xmlLine );
-   sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames2[1], paramVals2[1] );
-   strcat( struct2Entry, xmlLine );
-   sprintf( xmlLine, "</struct>\n" );
-   strcat( struct2Entry, xmlLine );
+   if (data->rank==0) {
+      sprintf( xmlLine, "<struct name=\"%s\">\n", struct1Name );
+      strcat( struct1Entry, xmlLine );
+      sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames[0], paramVals[0] );
+      strcat( struct1Entry, xmlLine );
+      sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames[1], paramVals[1] );
+      strcat( struct1Entry, xmlLine );
+      sprintf( xmlLine, "</struct>\n" );
+      strcat( struct1Entry, xmlLine );
 
-   Stg_asprintf( &testEntries, "%s%s", struct1Entry, struct2Entry );
-   _IO_HandlerSuite_CreateTestXMLFile( xmlTestFileName, testEntries );
-   Memory_Free( testEntries );
-   IO_Handler_ReadAllFromFile( data->io_handler, xmlTestFileName, data->dict2 );
+      sprintf( xmlLine, "<struct name=\"%s\">\n", struct1Name );
+      strcat( struct2Entry, xmlLine );
+      sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames2[0], paramVals2[0] );
+      strcat( struct2Entry, xmlLine );
+      sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames2[1], paramVals2[1] );
+      strcat( struct2Entry, xmlLine );
+      sprintf( xmlLine, "</struct>\n" );
+      strcat( struct2Entry, xmlLine );
+
+      Stg_asprintf( &testEntries, "%s%s", struct1Entry, struct2Entry );
+      _IO_HandlerSuite_CreateTestXMLFile( xmlTestFileName, testEntries );
+      Memory_Free( testEntries );
+   }
+   MPI_Barrier(data->comm);
+
+   for ( rank_I=0; rank_I< data->nProcs; rank_I++ ) {
+      if ( rank_I == data->rank ) {
+         IO_Handler_ReadAllFromFile( data->io_handler, xmlTestFileName, data->dict2 );
+      }
+      MPI_Barrier( data->comm );
+   }
 
    pcu_check_true( 1 == data->dict2->count );
    pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0],
@@ -545,24 +666,36 @@ void IO_HandlerSuite_TestReadDuplicateEntryKeys( IO_HandlerSuiteData* data ) {
          (Dictionary_Entry_Key)paramNames2[ii] );
       pcu_check_true( paramVals2[ii] == Dictionary_Entry_Value_AsUnsignedInt( elementDev ) );
    }
-   remove( xmlTestFileName );
+   MPI_Barrier(data->comm);
+   if(data->rank==0) {
+      remove( xmlTestFileName );
+   }
    Dictionary_Empty( data->dict2 );
 
    /* Sub-test 2: with mergeType as "append", the 2 structs should be 2 separate entries */
-   sprintf( struct2Entry, "" );
-   sprintf( xmlLine, "<struct name=\"%s\" mergeType=\"append\">\n", struct1Name );
-   strcat( struct2Entry, xmlLine );
-   sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames[0], paramVals2[0] );
-   strcat( struct2Entry, xmlLine );
-   sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames[1], paramVals2[1] );
-   strcat( struct2Entry, xmlLine );
-   sprintf( xmlLine, "</struct>\n" );
-   strcat( struct2Entry, xmlLine );
+   if (data->rank==0) {
+      sprintf( struct2Entry, "" );
+      sprintf( xmlLine, "<struct name=\"%s\" mergeType=\"append\">\n", struct1Name );
+      strcat( struct2Entry, xmlLine );
+      sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames[0], paramVals2[0] );
+      strcat( struct2Entry, xmlLine );
+      sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames[1], paramVals2[1] );
+      strcat( struct2Entry, xmlLine );
+      sprintf( xmlLine, "</struct>\n" );
+      strcat( struct2Entry, xmlLine );
 
-   Stg_asprintf( &testEntries, "%s%s", struct1Entry, struct2Entry );
-   _IO_HandlerSuite_CreateTestXMLFile( xmlTestFileName, testEntries );
-   Memory_Free( testEntries );
-   IO_Handler_ReadAllFromFile( data->io_handler, xmlTestFileName, data->dict2 );
+      Stg_asprintf( &testEntries, "%s%s", struct1Entry, struct2Entry );
+      _IO_HandlerSuite_CreateTestXMLFile( xmlTestFileName, testEntries );
+      Memory_Free( testEntries );
+   }
+   MPI_Barrier(data->comm);
+
+   for ( rank_I=0; rank_I< data->nProcs; rank_I++ ) {
+      if ( rank_I == data->rank ) {
+         IO_Handler_ReadAllFromFile( data->io_handler, xmlTestFileName, data->dict2 );
+      }
+      MPI_Barrier( data->comm );
+   }
 
    pcu_check_true( 2 == data->dict2->count );
    /* First entry should be unchanged */
@@ -587,25 +720,37 @@ void IO_HandlerSuite_TestReadDuplicateEntryKeys( IO_HandlerSuiteData* data ) {
          (Dictionary_Entry_Key)paramNames[ii] );
       pcu_check_true( paramVals2[ii] == Dictionary_Entry_Value_AsUnsignedInt( elementDev ) );
    }
-   remove( xmlTestFileName );
+   MPI_Barrier(data->comm);
+   if (data->rank==0) {
+      remove( xmlTestFileName );
+   }
    Dictionary_Empty( data->dict2 );
 
    /* Sub-test 3.1: with mergeType as "merge", structs to be merged.
     * However, default childrenMergeType is "append", so all entries added */
-   sprintf( struct2Entry, "" );
-   sprintf( xmlLine, "<struct name=\"%s\" mergeType=\"merge\">\n", struct1Name );
-   strcat( struct2Entry, xmlLine );
-   sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames[1], paramVals2[1] );
-   strcat( struct2Entry, xmlLine );
-   sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames2[0], paramVals2[0] );
-   strcat( struct2Entry, xmlLine );
-   sprintf( xmlLine, "</struct>\n" );
-   strcat( struct2Entry, xmlLine );
+   if (data->rank==0) {
+      sprintf( struct2Entry, "" );
+      sprintf( xmlLine, "<struct name=\"%s\" mergeType=\"merge\">\n", struct1Name );
+      strcat( struct2Entry, xmlLine );
+      sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames[1], paramVals2[1] );
+      strcat( struct2Entry, xmlLine );
+      sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames2[0], paramVals2[0] );
+      strcat( struct2Entry, xmlLine );
+      sprintf( xmlLine, "</struct>\n" );
+      strcat( struct2Entry, xmlLine );
 
-   Stg_asprintf( &testEntries, "%s%s", struct1Entry, struct2Entry );
-   _IO_HandlerSuite_CreateTestXMLFile( xmlTestFileName, testEntries );
-   Memory_Free( testEntries );
-   IO_Handler_ReadAllFromFile( data->io_handler, xmlTestFileName, data->dict2 );
+      Stg_asprintf( &testEntries, "%s%s", struct1Entry, struct2Entry );
+      _IO_HandlerSuite_CreateTestXMLFile( xmlTestFileName, testEntries );
+      Memory_Free( testEntries );
+   }
+   MPI_Barrier(data->comm);
+
+   for ( rank_I=0; rank_I< data->nProcs; rank_I++ ) {
+      if ( rank_I == data->rank ) {
+         IO_Handler_ReadAllFromFile( data->io_handler, xmlTestFileName, data->dict2 );
+      }
+      MPI_Barrier( data->comm );
+   }
 
    pcu_check_true( 1 == data->dict2->count );
    pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0],
@@ -626,25 +771,37 @@ void IO_HandlerSuite_TestReadDuplicateEntryKeys( IO_HandlerSuiteData* data ) {
    pcu_check_true( 0 == strcmp( structDict->entryPtr[3]->key, paramNames2[0] ) );
    elementDev = structDict->entryPtr[3]->value;
    pcu_check_true( paramVals2[0] == Dictionary_Entry_Value_AsUnsignedInt( elementDev ) );
-   remove( xmlTestFileName );
+   MPI_Barrier(data->comm);
+   if(data->rank==0) {
+      remove( xmlTestFileName );
+   }
    Dictionary_Empty( data->dict2 );
 
    /* Sub-test 3.2: with mergeType as "merge", structs to be merged.
     * childrenMergeType set to merge also */
-   sprintf( struct2Entry, "" );
-   sprintf( xmlLine, "<struct name=\"%s\" mergeType=\"merge\" childrenMergeType=\"merge\">\n", struct1Name );
-   strcat( struct2Entry, xmlLine );
-   sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames[1], paramVals2[1] );
-   strcat( struct2Entry, xmlLine );
-   sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames2[0], paramVals2[0] );
-   strcat( struct2Entry, xmlLine );
-   sprintf( xmlLine, "</struct>\n" );
-   strcat( struct2Entry, xmlLine );
+   if (data->rank==0) {
+      sprintf( struct2Entry, "" );
+      sprintf( xmlLine, "<struct name=\"%s\" mergeType=\"merge\" childrenMergeType=\"merge\">\n", struct1Name );
+      strcat( struct2Entry, xmlLine );
+      sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames[1], paramVals2[1] );
+      strcat( struct2Entry, xmlLine );
+      sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames2[0], paramVals2[0] );
+      strcat( struct2Entry, xmlLine );
+      sprintf( xmlLine, "</struct>\n" );
+      strcat( struct2Entry, xmlLine );
 
-   Stg_asprintf( &testEntries, "%s%s", struct1Entry, struct2Entry );
-   _IO_HandlerSuite_CreateTestXMLFile( xmlTestFileName, testEntries );
-   Memory_Free( testEntries );
-   IO_Handler_ReadAllFromFile( data->io_handler, xmlTestFileName, data->dict2 );
+      Stg_asprintf( &testEntries, "%s%s", struct1Entry, struct2Entry );
+      _IO_HandlerSuite_CreateTestXMLFile( xmlTestFileName, testEntries );
+      Memory_Free( testEntries );
+   }
+   MPI_Barrier(data->comm);
+
+   for ( rank_I=0; rank_I< data->nProcs; rank_I++ ) {
+      if ( rank_I == data->rank ) {
+         IO_Handler_ReadAllFromFile( data->io_handler, xmlTestFileName, data->dict2 );
+      }
+      MPI_Barrier( data->comm );
+   }
 
    pcu_check_true( 1 == data->dict2->count );
    pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0],
@@ -662,46 +819,76 @@ void IO_HandlerSuite_TestReadDuplicateEntryKeys( IO_HandlerSuiteData* data ) {
    pcu_check_true( 0 == strcmp( structDict->entryPtr[2]->key, paramNames2[0] ) );
    elementDev = structDict->entryPtr[2]->value;
    pcu_check_true( paramVals2[0] == Dictionary_Entry_Value_AsUnsignedInt( elementDev ) );
-   remove( xmlTestFileName );
+   MPI_Barrier(data->comm);
+   if(data->rank==0) {
+      remove( xmlTestFileName );
+   }
 }
 
 
 void IO_HandlerSuite_TestReadNonExistent( IO_HandlerSuiteData* data ) {
-   const char*    errorFileName = "./errorMsg-NonExist.txt";
-   const char*    notExistFilename = "I_Dont_Exist.xml";
+   char*          errorFileName;
+   char*          notExistFilename = "I_Dont_Exist.xml";
    FILE*          errorFile;
    #define        MAXLINE 1000
    char           errorLine[MAXLINE];
    char           expectedErrorMsg[MAXLINE];
+   Index          rank_I;
 
+   Stg_asprintf( &errorFileName, "./errorMsg-NonExist-%d.txt", data->rank );
    Stream_RedirectFile( Journal_Register( Error_Type, XML_IO_Handler_Type ), errorFileName );
-   pcu_check_assert( IO_Handler_ReadAllFromFile( data->io_handler, notExistFilename, data->dict2 ) );
-   pcu_check_true(errorFile = fopen( errorFileName, "r" ));
+   Stream_ClearCustomFormatters( Journal_Register( Error_Type, XML_IO_Handler_Type ) );
+   for ( rank_I=0; rank_I< data->nProcs; rank_I++ ) {
+      if (rank_I==data->rank) {
+         pcu_check_assert( IO_Handler_ReadAllFromFile( data->io_handler, notExistFilename, data->dict2 ) );
+         errorFile = fopen( errorFileName, "r" );
+         rewind(errorFile);
+      }
+      MPI_Barrier(data->comm);
+   }
+   pcu_check_true( errorFile );
+   MPI_Barrier(data->comm);
    if (errorFile) {
       pcu_check_true( fgets( errorLine, MAXLINE, errorFile ) );
       sprintf( expectedErrorMsg, "Error: File %s doesn't exist, not readable, or not valid.\n",
          notExistFilename );
       pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
-      remove( errorFileName );
+      if(data->rank==0) {
+         remove( errorFileName );
+      }
    }
 }
 
 
 void IO_HandlerSuite_TestReadInvalid( IO_HandlerSuiteData* data ) {
-   const char*    errorFileName = "./errorMsg-Invalid.txt";
+   char*          errorFileName;
    const char*    invalidXMLFilename = "Invalid.xml";
    FILE*          errorFile;
    #define        MAXLINE 1000
    char           errorLine[MAXLINE];
    char           expectedErrorMsg[MAXLINE];
+   Index          rank_I;
 
+   Stg_asprintf( &errorFileName, "./errorMsg-Invalid-%d.txt", data->rank );
    Stream_RedirectFile( Journal_Register( Error_Type, XML_IO_Handler_Type ), errorFileName );
+   Stream_ClearCustomFormatters( Journal_Register( Error_Type, XML_IO_Handler_Type ) );
 
+   if (data->rank==0) {
    /* Create an invalid XML file */
-   _IO_HandlerSuite_CreateTestXMLFile( invalidXMLFilename, "<invalid></param>\n" );
+      _IO_HandlerSuite_CreateTestXMLFile( invalidXMLFilename, "<invalid></param>\n" );
+   }
+   MPI_Barrier(data->comm);
 
-   pcu_check_assert( IO_Handler_ReadAllFromFile( data->io_handler, invalidXMLFilename, data->dict2 ) );
-   pcu_check_true( (errorFile = fopen( errorFileName, "r" )) );
+   for ( rank_I=0; rank_I< data->nProcs; rank_I++ ) {
+      if ( rank_I == data->rank ) {
+         pcu_check_assert( IO_Handler_ReadAllFromFile( data->io_handler, invalidXMLFilename, data->dict2 ) );
+         errorFile = fopen( errorFileName, "r" );
+         rewind(errorFile);
+      }
+      MPI_Barrier(data->comm);
+   }
+   pcu_check_true( errorFile );
+   MPI_Barrier(data->comm);
    if ( errorFile ) { 
       sprintf( expectedErrorMsg, ".//%s:3: parser error : Opening and ending tag mismatch: "
          "invalid line 3 and param\n",
@@ -718,35 +905,53 @@ void IO_HandlerSuite_TestReadInvalid( IO_HandlerSuiteData* data ) {
          invalidXMLFilename );
       pcu_check_true( fgets( errorLine, MAXLINE, errorFile ) );
       pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
-      remove( errorFileName );
+      if(data->rank==0) {
+         remove( errorFileName );
+      }
    }
-   remove( invalidXMLFilename );
+   if(data->rank==0) {
+      remove( invalidXMLFilename );
+   }
 }
 
 
 void IO_HandlerSuite_TestReadWrongNS( IO_HandlerSuiteData* data ) {
    const char*    wrongNS_XMLFilename = "WrongNS.xml";
-   FILE*          wrongNS_XMLFile = NULL;
-   const char*    wrongNS_Line = "<StGermainData xmlns=\"http://www.wrong.com/StGermain/XML_IO_Handler/Jun2003\">";
-   const char*    errorFileName = "./errorMsg-wrongNS.txt";
+   char*          errorFileName;
    FILE*          errorFile;
    #define        MAXLINE 1000
    char           errorLine[MAXLINE];
    char           expectedErrorMsg[MAXLINE];
+   Index          rank_I;
 
+   Stg_asprintf( &errorFileName, "./errorMsg-wrongNS-%d.txt", data->rank );
    Stream_RedirectFile( Journal_Register( Error_Type, XML_IO_Handler_Type ), errorFileName );
+   Stream_ClearCustomFormatters( Journal_Register( Error_Type, XML_IO_Handler_Type ) );
 
    /* Create an XML file with wrong NS - thus can't use our standard test XML creator */
-   wrongNS_XMLFile = fopen(wrongNS_XMLFilename, "w");
-   fwrite( IO_HandlerSuite_XMLStartString1, sizeof(char),
-      strlen( IO_HandlerSuite_XMLStartString1 ), wrongNS_XMLFile );
-   fwrite( wrongNS_Line, sizeof(char), strlen( wrongNS_Line ), wrongNS_XMLFile );
-   fwrite( IO_HandlerSuite_XMLEndString, sizeof(char),
-      strlen( IO_HandlerSuite_XMLEndString ), wrongNS_XMLFile );
-   fclose( wrongNS_XMLFile );
+   if (data->rank==0) {
+      FILE*          wrongNS_XMLFile = NULL;
+      const char*    wrongNS_Line = "<StGermainData xmlns=\"http://www.wrong.com/StGermain/XML_IO_Handler/Jun2003\">";
 
-   pcu_check_assert( IO_Handler_ReadAllFromFile( data->io_handler, wrongNS_XMLFilename, data->dict2 ) );
-   pcu_check_true( errorFile = fopen( errorFileName, "r" ));
+      wrongNS_XMLFile = fopen(wrongNS_XMLFilename, "w");
+      fwrite( IO_HandlerSuite_XMLStartString1, sizeof(char),
+         strlen( IO_HandlerSuite_XMLStartString1 ), wrongNS_XMLFile );
+      fwrite( wrongNS_Line, sizeof(char), strlen( wrongNS_Line ), wrongNS_XMLFile );
+      fwrite( IO_HandlerSuite_XMLEndString, sizeof(char),
+         strlen( IO_HandlerSuite_XMLEndString ), wrongNS_XMLFile );
+      fclose( wrongNS_XMLFile );
+   }
+
+   for ( rank_I=0; rank_I< data->nProcs; rank_I++ ) {
+      if ( rank_I == data->rank ) {
+         pcu_check_assert( IO_Handler_ReadAllFromFile( data->io_handler, wrongNS_XMLFilename, data->dict2 ) );
+         errorFile = fopen( errorFileName, "r" );
+         rewind(errorFile);
+      }
+      MPI_Barrier(data->comm);
+   }
+   pcu_check_true( errorFile );
+   MPI_Barrier(data->comm);
    if (errorFile) {
       sprintf( expectedErrorMsg, "Error: resource .//%s of the wrong type, unknown namespace "
          "wasn't expected value of http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003.\n",
@@ -757,35 +962,54 @@ void IO_HandlerSuite_TestReadWrongNS( IO_HandlerSuiteData* data ) {
          wrongNS_XMLFilename );
       pcu_check_true( fgets( errorLine, MAXLINE, errorFile ) );
       pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
-      remove( errorFileName );
+      if(data->rank==0) {
+         remove( errorFileName );
+      }
    }
-   remove( wrongNS_XMLFilename );
+   MPI_Barrier(data->comm);
+   if(data->rank==0) {
+      remove( wrongNS_XMLFilename );
+   }
 }
 
 
 void IO_HandlerSuite_TestReadWrongRootNode( IO_HandlerSuiteData* data ) {
    const char*    wrongRootNode_XMLFilename = "WrongRootNode.xml";
-   FILE*          wrongRootNode_XMLFile = NULL;
-   const char*    wrongRootNode_Line = "<Wrong xmlns=\"http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003\">\n";
-   const char*    wrongRootNode_EndLine = "</Wrong>";
-   const char*    errorFileName = "./errorMsg-wrongRootNode.txt";
+   char*          errorFileName;
    FILE*          errorFile;
    #define        MAXLINE 1000
    char           errorLine[MAXLINE];
    char           expectedErrorMsg[MAXLINE];
+   Index          rank_I;
 
+   Stg_asprintf( &errorFileName, "./errorMsg-wrongRootNode-%d.txt", data->rank );
    Stream_RedirectFile( Journal_Register( Error_Type, XML_IO_Handler_Type ), errorFileName );
+   Stream_ClearCustomFormatters( Journal_Register( Error_Type, XML_IO_Handler_Type ) );
 
-   /* Create an XML file with wrong NS - thus can't use our standard test XML creator */
-   wrongRootNode_XMLFile = fopen(wrongRootNode_XMLFilename, "w");
-   fwrite( IO_HandlerSuite_XMLStartString1, sizeof(char),
-      strlen( IO_HandlerSuite_XMLStartString1 ), wrongRootNode_XMLFile );
-   fwrite( wrongRootNode_Line, sizeof(char), strlen( wrongRootNode_Line ), wrongRootNode_XMLFile );
-   fwrite( wrongRootNode_EndLine, sizeof(char), strlen( wrongRootNode_EndLine ), wrongRootNode_XMLFile );
-   fclose( wrongRootNode_XMLFile );
+   if (data->rank==0) {
+      FILE*          wrongRootNode_XMLFile = NULL;
+      const char*    wrongRootNode_Line = "<Wrong xmlns=\"http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003\">\n";
+      const char*    wrongRootNode_EndLine = "</Wrong>";
 
-   pcu_check_assert( IO_Handler_ReadAllFromFile( data->io_handler, wrongRootNode_XMLFilename, data->dict2 ) );
-   pcu_check_true( (errorFile = fopen( errorFileName, "r" )) );
+      /* Create an XML file with wrong NS - thus can't use our standard test XML creator */
+      wrongRootNode_XMLFile = fopen(wrongRootNode_XMLFilename, "w");
+      fwrite( IO_HandlerSuite_XMLStartString1, sizeof(char),
+         strlen( IO_HandlerSuite_XMLStartString1 ), wrongRootNode_XMLFile );
+      fwrite( wrongRootNode_Line, sizeof(char), strlen( wrongRootNode_Line ), wrongRootNode_XMLFile );
+      fwrite( wrongRootNode_EndLine, sizeof(char), strlen( wrongRootNode_EndLine ), wrongRootNode_XMLFile );
+      fclose( wrongRootNode_XMLFile );
+   }
+
+   for ( rank_I=0; rank_I< data->nProcs; rank_I++ ) {
+      if ( rank_I == data->rank ) {
+         pcu_check_assert( IO_Handler_ReadAllFromFile( data->io_handler, wrongRootNode_XMLFilename, data->dict2 ) );
+         errorFile = fopen( errorFileName, "r" );
+         rewind(errorFile);
+      }
+      MPI_Barrier(data->comm);
+   }
+   pcu_check_true( errorFile );
+   MPI_Barrier(data->comm);
    if ( errorFile ) {
       sprintf( expectedErrorMsg, "resource .//%s of wrong type, root node "
          "=%s, should be <StGermainData>.\n", wrongRootNode_XMLFilename, "<Wrong>" );
@@ -798,7 +1022,9 @@ void IO_HandlerSuite_TestReadWrongRootNode( IO_HandlerSuiteData* data ) {
          wrongRootNode_XMLFilename );
       pcu_check_true( fgets( errorLine, MAXLINE, errorFile ) );
       pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
-      remove( errorFileName );
+      if(data->rank==0) {
+         remove( errorFileName );
+      }
    }
    remove( wrongRootNode_XMLFilename );
 }
