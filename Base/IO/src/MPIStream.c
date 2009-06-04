@@ -194,11 +194,12 @@ Bool _MPIStream_SetFile( Stream* stream, JournalFile* file )
 #define MPIStream_OffsetTag 167
 
 Bool MPIStream_SetOffset( Stream* stream, SizeT sizeToWrite, MPI_Comm communicator ) {
-	MPI_Offset offset    = 0;
-	MPI_Offset endOffset = 0;
-	MPI_Status status;
-	int        rank;
-	int        nproc;
+	MPI_Offset    offset    = 0;
+	MPI_Status    status;
+	int           rank;
+	int           nproc;
+	unsigned int  localSizeToWrite;
+	unsigned int  sizePartialSum;
 	
 	if ( stream->_file == NULL ) {
 		return False;
@@ -211,16 +212,11 @@ Bool MPIStream_SetOffset( Stream* stream, SizeT sizeToWrite, MPI_Comm communicat
 	MPI_Comm_rank( communicator, &rank );
 	MPI_Comm_size( communicator, &nproc );
 
-	/* Receive offset from guy on left to find out what point I want to write in the file */
-	if ( rank != 0 ) {
-		MPI_Recv( &offset, sizeof(MPI_Offset), MPI_BYTE, rank - 1, MPIStream_OffsetTag, communicator, &status );
-	}
-
-	/* Send offset to guy on right */
-	endOffset = offset + sizeToWrite;
-	if ( rank != nproc - 1 ) {
-		MPI_Send( &endOffset, sizeof(MPI_Offset), MPI_BYTE, rank + 1, MPIStream_OffsetTag, communicator );
-	}
+	/* Sum up the individual sizeToWrites for processors lower than this one */
+	localSizeToWrite = sizeToWrite;
+	MPI_Scan( &localSizeToWrite, &sizePartialSum, 1, MPI_UNSIGNED, MPI_SUM, communicator ); 
+	/* Now, just subtract the sizeToWrite of current processor to get our start point */
+	offset = sizePartialSum - localSizeToWrite;
 	
 	MPI_File_seek( *(MPI_File*)stream->_file->fileHandle, offset, MPI_SEEK_SET ); 
 	
