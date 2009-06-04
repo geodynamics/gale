@@ -35,24 +35,24 @@ class Linker(config.Tool):
         cfg["link_success"] = self.success
         cfg["default_lib_dirs"] = self.default_lib_dirs
         if platform.system() == "Darwin":
-            cfg["link_prog_cmd"] = "$command $lnkprogflags $bool($lnkflags) $dlnkflags " \
+            cfg["link_prog_cmd"] = "$command $lnkprogflags $bool($lnkflags) " \
                 "$string(output,$target) " \
                 "$__lib_dirs $_rt_begin " \
-                "$source $lib_paths $__libs " \
-                "$_rt_end"
+                "$source $lib_paths $__libs $dlnkflags " \
+                "$rawflags $_rt_end"
             cfg["link_shared_cmd"] = "$command $bool(shared) "\
                 "$string(install_name,$target_abs) " \
                 "$string(undefined,suppress) $bool(flat_namespace) " \
-                "$bool($lnkflags) $dlnkflags $string(output,$target) " \
-                "$__lib_dirs $source $lib_paths $__libs"
+                "$bool($lnkflags) $string(output,$target) " \
+                "$__lib_dirs $source $lib_paths $__libs $rawflags $dlnkflags"
         else:
-            cfg["link_prog_cmd"] = "$command $lnkprogflags $bool($lnkflags) $dlnkflags " \
+            cfg["link_prog_cmd"] = "$command $lnkprogflags $bool($lnkflags) " \
                 "$string(output,$target) $__rpaths " \
                 "$__lib_dirs $_rt_begin " \
-                "$source $lib_paths $__libs " \
-                "$_rt_end"
-            cfg["link_shared_cmd"] = "$command $bool(shared) $bool($lnkflags) $dlnkflags $string(output,$target) " \
-                "$__rpaths $__lib_dirs $source $lib_paths $__libs"
+                "$source $lib_paths $__libs $dlnkflags " \
+                "$rawflags $_rt_end"
+            cfg["link_shared_cmd"] = "$command $bool(shared) $bool($lnkflags) $string(output,$target) " \
+                "$__rpaths $__lib_dirs $source $lib_paths $__libs $rawflags $dlnkflags"
 
         cfg["_lib_dirs"] = "$extend($strip($default_lib_dirs,$lib_dirs)," \
             "$strip($default_lib_dirs,$rt_lib_dirs))"
