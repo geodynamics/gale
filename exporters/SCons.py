@@ -120,6 +120,7 @@ class SCons(config.Exporter):
         # Add any special link options.
         self.env.append_unique("LINKFLAGS", cfg.subst("$lnkprogflags").split())
         self.env.append_unique("LINKFLAGS", cfg.subst("$dlnkflags").split())
+        self.env.append_unique("RAWFLAGS", cfg.subst("$rawflags").split())
 
         # Add some names to identify which packages have
         # been found. Not sure I'll keep this one.
