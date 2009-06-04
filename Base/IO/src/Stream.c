@@ -638,6 +638,16 @@ void Stream_AddFormatter( void* stream, StreamFormatter* formatter )
 	formatter->_stream = self;
 }
 
+void Stream_ClearCustomFormatters( void* stream ) {
+	Stream* self = (Stream*) stream;
+
+	Memory_Free( self->_formatter );
+	self->_formatter = NULL;
+	self->_formatterSize = 0;
+	self->_formatterCount = 0;
+}
+
+
 void Stream_SetCurrentInfo( void* stream, const char* const currentSource, const char* const currentFunction, int line )
 {
 	Stream* self = (Stream*)stream;

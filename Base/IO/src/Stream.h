@@ -230,7 +230,9 @@
 
 	/** Adds a formatter to the stream for custom formatting. */
 	void Stream_AddFormatter( void* stream, StreamFormatter* formatter );
-	
+
+	/** Remove any and all formatters currently applied to a stream */
+	void Stream_ClearCustomFormatters( void* stream );
 	
 	/** Sets miscellaneous information to the stream.
 	 **
