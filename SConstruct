@@ -19,6 +19,7 @@ env.Decider("MD5-timestamp")
 values = {}
 execfile("output.cfg", globals(), values)
 env._dict.update(values)
+env.ParseFlags(env.get("RAWFLAGS", ""))
 
 # Need to manipulate the build directory to keep SCons happy. Because of SCons' target
 # rules we need to make the build directory a default target.
