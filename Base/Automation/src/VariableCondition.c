@@ -585,12 +585,17 @@ void VariableCondition_ApplyToIndexVariable(
 	ConditionFunction*	cf;
 	Index			index;
 	
+/*
+ * NOTE: This algorithm here is RIDICULOUSLY slow. I've added a mapping
+ *       to the class, that should help.
+
 	for (index = 0; index < self->indexCount; index++)
 		if (self->indexTbl[index] == localIndex)
 			break;
-			
-	if (index == self->indexCount)
-		return;
+*/
+
+	if(!UIntMap_Map( self->mapping, localIndex, &index ))
+	    return;
 	
 	globalVarIndex = self->vcTbl[index][varIndex].varIndex;
 	var = self->variable_Register->_variable[globalVarIndex];
@@ -680,6 +685,10 @@ Bool VariableCondition_IsCondition( void* variableCondition, Index localIndex, V
 		assert(0);	
 		return False;
 	}
+
+	if(!UIntMap_Map( self->mapping, localIndex, &i ))
+	    return False;
+/*
 	if ( !IndexSet_IsMember( self->_set, localIndex ) ) {
 		return False;
 	}
@@ -689,7 +698,7 @@ Bool VariableCondition_IsCondition( void* variableCondition, Index localIndex, V
 			
 	if (i == self->indexCount)
 		return False;
-
+*/
 	
 	/* now check if the Variable they've given us is actually in the list to apply at the given index */
 	for (vcVar_I = 0; vcVar_I < self->vcVarCountTbl[i]; vcVar_I++) {
