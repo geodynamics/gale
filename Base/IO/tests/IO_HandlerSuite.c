@@ -853,9 +853,7 @@ void IO_HandlerSuite_TestReadNonExistent( IO_HandlerSuiteData* data ) {
       sprintf( expectedErrorMsg, "Error: File %s doesn't exist, not readable, or not valid.\n",
          notExistFilename );
       pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
-      if(data->rank==0) {
-         remove( errorFileName );
-      }
+      remove( errorFileName );
    }
 }
 
@@ -905,9 +903,7 @@ void IO_HandlerSuite_TestReadInvalid( IO_HandlerSuiteData* data ) {
          invalidXMLFilename );
       pcu_check_true( fgets( errorLine, MAXLINE, errorFile ) );
       pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
-      if(data->rank==0) {
-         remove( errorFileName );
-      }
+      remove( errorFileName );
    }
    if(data->rank==0) {
       remove( invalidXMLFilename );
@@ -962,9 +958,7 @@ void IO_HandlerSuite_TestReadWrongNS( IO_HandlerSuiteData* data ) {
          wrongNS_XMLFilename );
       pcu_check_true( fgets( errorLine, MAXLINE, errorFile ) );
       pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
-      if(data->rank==0) {
-         remove( errorFileName );
-      }
+      remove( errorFileName );
    }
    MPI_Barrier(data->comm);
    if(data->rank==0) {
@@ -1022,9 +1016,7 @@ void IO_HandlerSuite_TestReadWrongRootNode( IO_HandlerSuiteData* data ) {
          wrongRootNode_XMLFilename );
       pcu_check_true( fgets( errorLine, MAXLINE, errorFile ) );
       pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
-      if(data->rank==0) {
-         remove( errorFileName );
-      }
+      remove( errorFileName );
    }
    remove( wrongRootNode_XMLFilename );
 }

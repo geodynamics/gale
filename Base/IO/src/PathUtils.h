@@ -32,7 +32,11 @@
 #define __Base_IO_PathUtils_h__
 
 
-void FindFile( char* fullPath, char* filename, char* searchPaths );
+/** Note that this function is designed as call-by-reference to modify fullPath to the found
+ * full path of the chosen file.
+ * WARNING: because this function uses fopen() to check the file's existence, then it
+ * shouldn't be called by multiple processors simultaneously */
+void FindFile( char* fullPath, const char* filename, const char* searchPaths );
 
 Bool FindFileInPathList( char* fullPath, char* filename, char** searchPaths, Index searchPathsSize );
 

@@ -40,8 +40,9 @@
 #include "HierarchyTableSuite.h"
 
 typedef struct {
-   HierarchyTable*  hTable;
-   HierarchyTable*  stgHierarchyTable_Store;
+   HierarchyTable*   hTable;
+   HierarchyTable*   stgHierarchyTable_Store;
+   unsigned int      rank;
 } HierarchyTableSuiteData;
 
 
@@ -62,6 +63,7 @@ void HierarchyTableSuite_Setup( HierarchyTableSuiteData* data ) {
    HierarchyTable_RegisterParent( data->hTable, C_Type, B_Type );
    HierarchyTable_RegisterParent( data->hTable, D_Type, C_Type );
    HierarchyTable_RegisterParent( data->hTable, BB_Type, AA_Type );
+   MPI_Comm_rank( MPI_COMM_WORLD, &data->rank );
 }
 
 void HierarchyTableSuite_Teardown( HierarchyTableSuiteData* data ) {
@@ -118,10 +120,6 @@ void HierarchyTableSuite_TestIsChild( HierarchyTableSuiteData* data ) {
 void HierarchyTableSuite_TestPrintParents( HierarchyTableSuiteData* data ) {
    Stream*           stream = Journal_Register( Info_Type, "testStream" );
    const char* const testFilename = "./testHTable-PrintParents.txt";
-   FILE*             testFile = NULL;
-   #define           MAXLINE 1000
-   char              outLines[100][MAXLINE];
-   Index             ii;
 
    Stream_RedirectFile( stream, testFilename );
 
@@ -132,38 +130,41 @@ void HierarchyTableSuite_TestPrintParents( HierarchyTableSuiteData* data ) {
    HierarchyTable_PrintParents( data->hTable, AA_Type, stream );
    HierarchyTable_PrintParents( data->hTable, BB_Type, stream );
 
-   testFile = fopen( testFilename, "r" );
-   while( fgets( outLines[ii++], MAXLINE, testFile ) ) {};
-   ii = 0;
-   pcu_check_true( 0 == strcmp( outLines[ii++], "Type 'A' inherits from:\n" ));
-   pcu_check_true( 0 == strcmp( outLines[ii++], "Type 'B' inherits from:\n" ));
-   pcu_check_true( 0 == strcmp( outLines[ii++], "\tA\n" ));
-   pcu_check_true( 0 == strcmp( outLines[ii++], "Type 'C' inherits from:\n" ));
-   pcu_check_true( 0 == strcmp( outLines[ii++], "\tB\n" ));
-   pcu_check_true( 0 == strcmp( outLines[ii++], "\tA\n" ));
-   pcu_check_true( 0 == strcmp( outLines[ii++], "Type 'D' inherits from:\n" ));
-   pcu_check_true( 0 == strcmp( outLines[ii++], "\tC\n" ));
-   pcu_check_true( 0 == strcmp( outLines[ii++], "\tB\n" ));
-   pcu_check_true( 0 == strcmp( outLines[ii++], "\tA\n" ));
-   pcu_check_true( 0 == strcmp( outLines[ii++], "Type 'AA' inherits from:\n" ));
-   pcu_check_true( 0 == strcmp( outLines[ii++], "Type 'BB' inherits from:\n" ));
-   pcu_check_true( 0 == strcmp( outLines[ii++], "\tAA\n" ));
+   /* Just do these print tests with rank 0, to avoid I/O problems */
+   if (data->rank==0) {
+      FILE*             testFile = NULL;
+      #define           MAXLINE 1000
+      char              outLines[100][MAXLINE];
+      Index             ii;
 
-   fclose( testFile );
-   remove( testFilename );
+      testFile = fopen( testFilename, "r" );
+      while( fgets( outLines[ii++], MAXLINE, testFile ) ) {};
+      ii = 0;
+      pcu_check_true( 0 == strcmp( outLines[ii++], "Type 'A' inherits from:\n" ));
+      pcu_check_true( 0 == strcmp( outLines[ii++], "Type 'B' inherits from:\n" ));
+      pcu_check_true( 0 == strcmp( outLines[ii++], "\tA\n" ));
+      pcu_check_true( 0 == strcmp( outLines[ii++], "Type 'C' inherits from:\n" ));
+      pcu_check_true( 0 == strcmp( outLines[ii++], "\tB\n" ));
+      pcu_check_true( 0 == strcmp( outLines[ii++], "\tA\n" ));
+      pcu_check_true( 0 == strcmp( outLines[ii++], "Type 'D' inherits from:\n" ));
+      pcu_check_true( 0 == strcmp( outLines[ii++], "\tC\n" ));
+      pcu_check_true( 0 == strcmp( outLines[ii++], "\tB\n" ));
+      pcu_check_true( 0 == strcmp( outLines[ii++], "\tA\n" ));
+      pcu_check_true( 0 == strcmp( outLines[ii++], "Type 'AA' inherits from:\n" ));
+      pcu_check_true( 0 == strcmp( outLines[ii++], "Type 'BB' inherits from:\n" ));
+      pcu_check_true( 0 == strcmp( outLines[ii++], "\tAA\n" ));
+
+      fclose( testFile );
+      remove( testFilename );
+   }
 }
    
 
 void HierarchyTableSuite_TestPrintChildren( HierarchyTableSuiteData* data ) {
    Stream*     stream = Journal_Register( Info_Type, "testStream" );
    const char* const testFilename = "./testHTable-PrintChildren.txt";
-   FILE*             testFile = NULL;
-   #define           MAXLINE 1000
-   char              outLines[100][MAXLINE];
-   Index             ii;
 
    Stream_RedirectFile( stream, testFilename );
-
 
    HierarchyTable_PrintChildren( data->hTable, A_Type, stream );
    HierarchyTable_PrintChildren( data->hTable, B_Type, stream );
@@ -172,25 +173,33 @@ void HierarchyTableSuite_TestPrintChildren( HierarchyTableSuiteData* data ) {
    HierarchyTable_PrintChildren( data->hTable, AA_Type, stream );
    HierarchyTable_PrintChildren( data->hTable, BB_Type, stream );
 
-   testFile = fopen( testFilename, "r" );
-   while( fgets( outLines[ii++], MAXLINE, testFile ) ) {};
-   ii = 0;
-   pcu_check_true( 0 == strcmp( outLines[ii++], "A \t\t\t (Abstract Class)\n" ));
-   pcu_check_true( 0 == strcmp( outLines[ii++], "\tB \t\t\t (Abstract Class)\n" ));
-   pcu_check_true( 0 == strcmp( outLines[ii++], "\t\tC \t\t\t (Abstract Class)\n" ));
-   pcu_check_true( 0 == strcmp( outLines[ii++], "\t\t\tD \t\t\t (Abstract Class)\n" ));
-   pcu_check_true( 0 == strcmp( outLines[ii++], "B \t\t\t (Abstract Class)\n" ));
-   pcu_check_true( 0 == strcmp( outLines[ii++], "\tC \t\t\t (Abstract Class)\n" ));
-   pcu_check_true( 0 == strcmp( outLines[ii++], "\t\tD \t\t\t (Abstract Class)\n" ));
-   pcu_check_true( 0 == strcmp( outLines[ii++], "C \t\t\t (Abstract Class)\n" ));
-   pcu_check_true( 0 == strcmp( outLines[ii++], "\tD \t\t\t (Abstract Class)\n" ));
-   pcu_check_true( 0 == strcmp( outLines[ii++], "D \t\t\t (Abstract Class)\n" ));
-   pcu_check_true( 0 == strcmp( outLines[ii++], "AA \t\t\t (Abstract Class)\n" ));
-   pcu_check_true( 0 == strcmp( outLines[ii++], "\tBB \t\t\t (Abstract Class)\n" ));
-   pcu_check_true( 0 == strcmp( outLines[ii++], "BB \t\t\t (Abstract Class)\n" ));
+   /* Just do these print tests with rank 0, to avoid I/O problems */
+   if (data->rank==0) {
+      FILE*             testFile = NULL;
+      #define           MAXLINE 1000
+      char              outLines[100][MAXLINE];
+      Index             ii;
 
-   fclose( testFile );
-   remove( testFilename );
+      testFile = fopen( testFilename, "r" );
+      while( fgets( outLines[ii++], MAXLINE, testFile ) ) {};
+      ii = 0;
+      pcu_check_true( 0 == strcmp( outLines[ii++], "A \t\t\t (Abstract Class)\n" ));
+      pcu_check_true( 0 == strcmp( outLines[ii++], "\tB \t\t\t (Abstract Class)\n" ));
+      pcu_check_true( 0 == strcmp( outLines[ii++], "\t\tC \t\t\t (Abstract Class)\n" ));
+      pcu_check_true( 0 == strcmp( outLines[ii++], "\t\t\tD \t\t\t (Abstract Class)\n" ));
+      pcu_check_true( 0 == strcmp( outLines[ii++], "B \t\t\t (Abstract Class)\n" ));
+      pcu_check_true( 0 == strcmp( outLines[ii++], "\tC \t\t\t (Abstract Class)\n" ));
+      pcu_check_true( 0 == strcmp( outLines[ii++], "\t\tD \t\t\t (Abstract Class)\n" ));
+      pcu_check_true( 0 == strcmp( outLines[ii++], "C \t\t\t (Abstract Class)\n" ));
+      pcu_check_true( 0 == strcmp( outLines[ii++], "\tD \t\t\t (Abstract Class)\n" ));
+      pcu_check_true( 0 == strcmp( outLines[ii++], "D \t\t\t (Abstract Class)\n" ));
+      pcu_check_true( 0 == strcmp( outLines[ii++], "AA \t\t\t (Abstract Class)\n" ));
+      pcu_check_true( 0 == strcmp( outLines[ii++], "\tBB \t\t\t (Abstract Class)\n" ));
+      pcu_check_true( 0 == strcmp( outLines[ii++], "BB \t\t\t (Abstract Class)\n" ));
+
+      fclose( testFile );
+      remove( testFilename );
+   }
 }
 
 

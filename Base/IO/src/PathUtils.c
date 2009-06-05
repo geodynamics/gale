@@ -23,7 +23,7 @@
 static const char*      joiner = "/";
 
 
-void FindFile( char* fullPath, char* filename, char* searchPaths ) {
+void FindFile( char* fullPath, const char* filename, const char* searchPaths ) {
 	char*   spaths;
 	char*   pos;
 	FILE*   f;

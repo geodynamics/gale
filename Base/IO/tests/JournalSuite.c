@@ -34,6 +34,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <mpi.h>
 
 #include "pcu/pcu.h"
 #include "StGermain/Base/Foundation/Foundation.h"
@@ -42,14 +43,18 @@
 
 
 void JournalSuite_Setup( JournalSuiteData* data ) {
+   data->comm = MPI_COMM_WORLD;  
+   MPI_Comm_rank( data->comm, &data->rank );
+   MPI_Comm_size( data->comm, &data->nProcs );
+
    /* This is where we'll save the Journal, to be restored after the test, and create one for testing */
    data->savedJournal = stJournal;
-  	stJournal = Journal_New();
+   stJournal = Journal_New();
    Journal_SetupDefaultTypedStreams();
 
    /* For testing, we want our custom Journal to output to saved files */
-   Stg_asprintf( &data->testStdOutFilename, "./testStdOut.txt" );
-   Stg_asprintf( &data->testStdErrFilename, "./testStdErr.txt" );
+   Stg_asprintf( &data->testStdOutFilename, "./testStdOut-%d.txt", data->rank );
+   Stg_asprintf( &data->testStdErrFilename, "./testStdErr-%d.txt", data->rank );
 
    Stg_Class_Delete( stJournal->stdOut );
    Stg_Class_Delete( stJournal->stdErr );
@@ -59,9 +64,15 @@ void JournalSuite_Setup( JournalSuiteData* data ) {
    JournalFile_Open( stJournal->stdErr, data->testStdErrFilename );
 
    Stream_SetFile( Journal_GetTypedStream(Info_Type), stJournal->stdOut );
+   Stream_SetPrintingRank( Journal_GetTypedStream(Info_Type), STREAM_ALL_RANKS );
    Stream_SetFile( Journal_GetTypedStream(Debug_Type), stJournal->stdOut );
+   Stream_SetPrintingRank( Journal_GetTypedStream(Debug_Type), STREAM_ALL_RANKS );
    Stream_SetFile( Journal_GetTypedStream(Dump_Type), stJournal->stdOut );
+   Stream_SetPrintingRank( Journal_GetTypedStream(Dump_Type), STREAM_ALL_RANKS );
    Stream_SetFile( Journal_GetTypedStream(Error_Type), stJournal->stdErr );
+   Stream_SetPrintingRank( Journal_GetTypedStream(Error_Type), STREAM_ALL_RANKS );
+   /* We don't want the rank formatting stuff interefering with tests unnecessarily */
+   Stream_ClearCustomFormatters( Journal_GetTypedStream(Error_Type) );
 
    data->testStdOutFile = fopen( data->testStdOutFilename, "r" );
    data->testStdErrFile = fopen( data->testStdErrFilename, "r" );
@@ -80,12 +91,17 @@ void JournalSuite_Teardown( JournalSuiteData* data ) {
 
 
 void JournalSuite_TestRegister( JournalSuiteData* data ) {
+   Journal* testJournal;
    Stream* myInfo;
    Stream* myDebug;
    Stream* myDump;
    Stream* myError;
    Stream* allNew;   /* Will use for testing a non-standard type stream */
    
+   /* We want to test properties of the "real" journal in this test. Thus save & restore our testing one */   
+   testJournal = stJournal;
+   stJournal = data->savedJournal;
+
    myInfo = Journal_Register( Info_Type, "MyInfo" );
    myDebug = Journal_Register( Debug_Type, "MyDebug" );
    myDump = Journal_Register( Dump_Type, "MyDump" );
@@ -109,6 +125,8 @@ void JournalSuite_TestRegister( JournalSuiteData* data ) {
    pcu_check_true( myError->_parent == Journal_GetTypedStream( Error_Type ) );
    pcu_check_true( myError->_children->count == 0 );
    pcu_check_true( STREAM_ALL_RANKS == Stream_GetPrintingRank( myError ));
+   pcu_check_true( myError->_formatterCount == 1 );
+   pcu_check_true( myError->_formatter[0]->type == RankFormatter_Type );
    pcu_check_true( 0 == strcmp( allNew->name, "allNew" ) );
    pcu_check_true( allNew->_parent == Journal_GetTypedStream( "New_Type" ) );
    pcu_check_true( allNew->_children->count == 0 );
@@ -120,6 +138,9 @@ void JournalSuite_TestRegister( JournalSuiteData* data ) {
    pcu_check_true( Stg_ObjectList_Get( Journal_GetTypedStream(Dump_Type)->_children, "MyDump" ) == myDump );
    pcu_check_true( Stg_ObjectList_Get( Journal_GetTypedStream(Error_Type)->_children, "MyError" ) == myError );
    pcu_check_true( Stg_ObjectList_Get( Journal_GetTypedStream("New_Type")->_children, "allNew" ) == allNew );
+
+   /* Ok, restore the testing journal */
+   stJournal = testJournal;
 }
 
 
@@ -273,10 +294,6 @@ void JournalSuite_TestReadFromDictionary( JournalSuiteData* data ) {
    Stream*     propTest2;
    const char* testNewTypeFilename1 = "./testJournal-out1.txt";
    const char* testNewTypeFilename2 = "./testJournal-out2.txt";
-   FILE*       testNewTypeFile1;
-   FILE*       testNewTypeFile2;
-   #define     MAXLINE 1000
-   char        outLine[MAXLINE];
 
    infoTest1 = Journal_Register( Info_Type, "test1" );
    infoTest2 = Journal_Register( Info_Type, "test2" );
@@ -285,24 +302,24 @@ void JournalSuite_TestReadFromDictionary( JournalSuiteData* data ) {
    dumpTest1 = Journal_Register( Dump_Type, "test1" );
    dumpTest2 = Journal_Register( Dump_Type, "test2" );
 
-	Dictionary_Add( testDict, "journal.debug.test1", Dictionary_Entry_Value_FromBool(  True ));
-	Dictionary_Add( testDict, "journal.dump.test1", Dictionary_Entry_Value_FromBool(  True ));
+   Dictionary_Add( testDict, "journal.debug.test1", Dictionary_Entry_Value_FromBool(  True ));
+   Dictionary_Add( testDict, "journal.dump.test1", Dictionary_Entry_Value_FromBool(  True ));
    Dictionary_Add( testDict, "journal.info.test2", Dictionary_Entry_Value_FromBool( False ));
-	Dictionary_Add( testDict, "journal.info.test2", Dictionary_Entry_Value_FromBool( False ));
-	Dictionary_Add( testDict, "journal.info.test1.new1", Dictionary_Entry_Value_FromBool(  True ));
-	Dictionary_Add( testDict, "journal.info.test1.new2", Dictionary_Entry_Value_FromBool(  False ));
-	Dictionary_Add( testDict, "journal-level.info.test1.new1",
+   Dictionary_Add( testDict, "journal.info.test2", Dictionary_Entry_Value_FromBool( False ));
+   Dictionary_Add( testDict, "journal.info.test1.new1", Dictionary_Entry_Value_FromBool(  True ));
+   Dictionary_Add( testDict, "journal.info.test1.new2", Dictionary_Entry_Value_FromBool(  False ));
+   Dictionary_Add( testDict, "journal-level.info.test1.new1",
       Dictionary_Entry_Value_FromUnsignedInt( 3 ));
-	Dictionary_Add( testDict, "journal.newtype", Dictionary_Entry_Value_FromBool(  True ));
-	Dictionary_Add( testDict, "journal-file.newtype",
+   Dictionary_Add( testDict, "journal.newtype", Dictionary_Entry_Value_FromBool(  True ));
+   Dictionary_Add( testDict, "journal-file.newtype",
       Dictionary_Entry_Value_FromString( testNewTypeFilename1 ));
-	Dictionary_Add( testDict, "journal-file.newtype.other",
+   Dictionary_Add( testDict, "journal-file.newtype.other",
       Dictionary_Entry_Value_FromString( testNewTypeFilename2 ));
-	Dictionary_Add( testDict, "journal-rank.info.propertiestest1",
+   Dictionary_Add( testDict, "journal-rank.info.propertiestest1",
       Dictionary_Entry_Value_FromUnsignedInt( 0 ));
-	Dictionary_Add( testDict, "journal-rank.info.propertiestest2",
+   Dictionary_Add( testDict, "journal-rank.info.propertiestest2",
       Dictionary_Entry_Value_FromUnsignedInt( 5 ));
-	Dictionary_Add( testDict, "journal-autoflush.info.propertiestest1",
+   Dictionary_Add( testDict, "journal-autoflush.info.propertiestest1",
       Dictionary_Entry_Value_FromBool( False ));
 
    Journal_ReadFromDictionary( testDict );
@@ -317,32 +334,40 @@ void JournalSuite_TestReadFromDictionary( JournalSuiteData* data ) {
    pcu_check_true( False == newTest2->_enable );
    pcu_check_true( 3 == newTest1->_level );
    
-   /* We do actually need to do some printing to the newtype streams, as the filename isn't stored
-    *  on the CFile or JournalFile struct*/
-   fileTest1 = Journal_Register( "newtype", "hello" );
-   fileTest2 = Journal_Register( "newtype", "other" );
-   Journal_Printf( fileTest1, "yay!\n" );
-   Journal_Printf( fileTest2, "double yay!\n" );
-   Stream_Flush( fileTest1 );
-   Stream_Flush( fileTest2 );
-   testNewTypeFile1 = fopen( testNewTypeFilename1, "r" );
-   testNewTypeFile2 = fopen( testNewTypeFilename2, "r" );
-   pcu_check_true(         fgets( outLine, MAXLINE, testNewTypeFile1 ));
-   pcu_check_true( 0 == strcmp( outLine, "yay!\n" ));
-   pcu_check_true(         fgets( outLine, MAXLINE, testNewTypeFile2 ));
-   pcu_check_true( 0 == strcmp( outLine, "double yay!\n" ));
+   /* Just do the rest of this test with 1 proc to avoid parallel I/O problems */
+   if ( data->rank==0 ) {
+      FILE*       testNewTypeFile1;
+      FILE*       testNewTypeFile2;
+      #define     MAXLINE 1000
+      char        outLine[MAXLINE];
 
-   propTest1 = Journal_Register( Info_Type, "propertiestest1" );
-   propTest2 = Journal_Register( Info_Type, "propertiestest2" );
-   pcu_check_true( 0 == Stream_GetPrintingRank( propTest1 ));
-   pcu_check_true( 5 == Stream_GetPrintingRank( propTest2 ));
-   pcu_check_true( False == Stream_GetAutoFlush( propTest1 ));
+      /* We do actually need to do some printing to the newtype streams, as the filename isn't stored
+       *  on the CFile or JournalFile struct*/
+      fileTest1 = Journal_Register( "newtype", "hello" );
+      fileTest2 = Journal_Register( "newtype", "other" );
+      Journal_Printf( fileTest1, "yay!\n" );
+      Journal_Printf( fileTest2, "double yay!\n" );
+      Stream_Flush( fileTest1 );
+      Stream_Flush( fileTest2 );
+      testNewTypeFile1 = fopen( testNewTypeFilename1, "r" );
+      testNewTypeFile2 = fopen( testNewTypeFilename2, "r" );
+      pcu_check_true(         fgets( outLine, MAXLINE, testNewTypeFile1 ));
+      pcu_check_true( 0 == strcmp( outLine, "yay!\n" ));
+      pcu_check_true(         fgets( outLine, MAXLINE, testNewTypeFile2 ));
+      pcu_check_true( 0 == strcmp( outLine, "double yay!\n" ));
 
+      propTest1 = Journal_Register( Info_Type, "propertiestest1" );
+      propTest2 = Journal_Register( Info_Type, "propertiestest2" );
+      pcu_check_true( 0 == Stream_GetPrintingRank( propTest1 ));
+      pcu_check_true( 5 == Stream_GetPrintingRank( propTest2 ));
+      pcu_check_true( False == Stream_GetAutoFlush( propTest1 ));
+
+      fclose( testNewTypeFile1 );
+      fclose( testNewTypeFile2 );
+      remove( testNewTypeFilename1 );
+      remove( testNewTypeFilename2 );
+   }
    Stg_Class_Delete( testDict );
-   fclose( testNewTypeFile1 );
-   fclose( testNewTypeFile2 );
-   remove( testNewTypeFilename1 );
-   remove( testNewTypeFilename2 );
 }
 
 
@@ -363,6 +388,9 @@ void JournalSuite_TestShortcuts( JournalSuiteData* data ) {
    FILE*        stringLengthTestFile = NULL;
    const char*  shortcutTestFilename = "./testJournalPrintShortcuts.txt" ;
    FILE*        shortcutTestFile = NULL;
+
+   /* Just do this test with rank 0 */
+   if (data->rank != 0) return;
 
    Stream_RedirectFile( myStream, stringLengthTestFilename );
 

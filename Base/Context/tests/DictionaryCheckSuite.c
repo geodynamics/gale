@@ -42,9 +42,11 @@
 #include "DictionaryCheckSuite.h"
 
 typedef struct {
+   unsigned int   rank;
 } DictionaryCheckSuiteData;
 
 void DictionaryCheckSuite_Setup( DictionaryCheckSuiteData* data ) {
+   MPI_Comm_rank( MPI_COMM_WORLD, &data->rank );
 }
 
 void DictionaryCheckSuite_Teardown( DictionaryCheckSuiteData* data ) {
@@ -52,17 +54,18 @@ void DictionaryCheckSuite_Teardown( DictionaryCheckSuiteData* data ) {
 
   
 void DictionaryCheckSuite_TestCheckKeys( DictionaryCheckSuiteData* data ) {
-   Dictionary*			dictionary = Dictionary_New();
-   Dictionary*			dictionary2 = Dictionary_New();
+   Dictionary*       dictionary = Dictionary_New();
+   Dictionary*       dictionary2 = Dictionary_New();
    const char*       testFilename = "./testDictionaryCheck.txt";
    FILE*             testFile = NULL;
    #define           MAXLINE 1000
    char              inputLine[MAXLINE];
+   Dictionary_Index   index;
+   char*             errMessage = "Component dictionary must have unique names\n";
    
-   Dictionary_Index	index;
-   char*			errMessage = "Component dictionary must have unique names\n";
-   
-	Stream_RedirectFile(Journal_Register( Error_Type, "DictionaryCheck"), testFilename );
+   Stream_RedirectFile(Journal_Register( Error_Type, "DictionaryCheck"), testFilename );
+   Stream_SetPrintingRank(Journal_Register( Error_Type, "DictionaryCheck"), 0 );
+   Stream_ClearCustomFormatters( Journal_Register( Error_Type, "DictionaryCheck") );
 
    /* Create a set of Dictionary entries */
    /* For dictionary */
@@ -71,7 +74,7 @@ void DictionaryCheckSuite_TestCheckKeys( DictionaryCheckSuiteData* data ) {
    Dictionary_Add( dictionary, "test_dict_double",
       Dictionary_Entry_Value_FromDouble( 45.567 ) );
    Dictionary_Add( dictionary, "test_dict_string",
-      Dictionary_Entry_Value_FromString( "goodbye" ) );	
+      Dictionary_Entry_Value_FromString( "goodbye" ) );   
    Dictionary_Add( dictionary, "test_dict_string",
       Dictionary_Entry_Value_FromString( "hello" ) );
    Dictionary_Add( dictionary, "test_dict_string2",
@@ -79,17 +82,19 @@ void DictionaryCheckSuite_TestCheckKeys( DictionaryCheckSuiteData* data ) {
    
    CheckDictionaryKeys(dictionary,  errMessage);
 
-   testFile = fopen( testFilename, "r" );
-   pcu_check_true( fgets( inputLine, MAXLINE, testFile ));
-   pcu_check_true( 0 == strcmp( inputLine, errMessage ));
-   pcu_check_true( fgets( inputLine, MAXLINE, testFile ));
-   /* Ignore the actual 2nd line, since it includes a memory ptr print and hard to compare */
-   pcu_check_true( fgets( inputLine, MAXLINE, testFile ));
-   pcu_check_true( 0 == strcmp( inputLine, "The following keys were repeated:\n" ));
-   pcu_check_true( fgets( inputLine, MAXLINE, testFile ));
-   pcu_check_true( 0 == strcmp( inputLine, "\t\"test_dict_string\"\n" ));
-   pcu_check_true( fgets( inputLine, MAXLINE, testFile ));
-   pcu_check_true( 0 == strcmp( inputLine, "Error in CheckDictionaryKeys with 1 entries in dictionary keys\n"));
+   if ( data->rank==0 ) {
+      testFile = fopen( testFilename, "r" );
+      pcu_check_true( fgets( inputLine, MAXLINE, testFile ));
+      pcu_check_true( 0 == strcmp( inputLine, errMessage ));
+      pcu_check_true( fgets( inputLine, MAXLINE, testFile ));
+      /* Ignore the actual 2nd line, since it includes a memory ptr print and hard to compare */
+      pcu_check_true( fgets( inputLine, MAXLINE, testFile ));
+      pcu_check_true( 0 == strcmp( inputLine, "The following keys were repeated:\n" ));
+      pcu_check_true( fgets( inputLine, MAXLINE, testFile ));
+      pcu_check_true( 0 == strcmp( inputLine, "\t\"test_dict_string\"\n" ));
+      pcu_check_true( fgets( inputLine, MAXLINE, testFile ));
+      pcu_check_true( 0 == strcmp( inputLine, "Error in CheckDictionaryKeys with 1 entries in dictionary keys\n"));
+   }
 
    /* For dictionary2 */
    Dictionary_Add( dictionary2, "test_dict_string",
@@ -103,14 +108,19 @@ void DictionaryCheckSuite_TestCheckKeys( DictionaryCheckSuiteData* data ) {
    CheckDictionaryKeys(dictionary2, errMessage);
 
    /* there shouldn't be any more error lines printed about the 2nd dictionary */
-   pcu_check_true( NULL == fgets( inputLine, MAXLINE, testFile ) );
+   if ( data->rank==0 ) {
+      pcu_check_true( NULL == fgets( inputLine, MAXLINE, testFile ) );
+   }
    
    Stg_Class_Delete( dictionary );
    Stg_Class_Delete( dictionary2 );
 
-   fclose( testFile );
-   remove( testFilename );
+   if ( data->rank==0 ) {
+      fclose( testFile );
+      remove( testFilename );
+   }
 }
+
 
 void DictionaryCheckSuite( pcu_suite_t* suite ) {
    pcu_suite_setData( suite, DictionaryCheckSuiteData );

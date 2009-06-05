@@ -42,12 +42,12 @@
 
 Stream* stream;
 
-
 #define NUM_TEST_FUNCS 10
 
 typedef struct {
-   EntryPoint* ep;
-   Bool        testFuncsRan[NUM_TEST_FUNCS];
+   EntryPoint*    ep;
+   Bool           testFuncsRan[NUM_TEST_FUNCS];
+   unsigned int   rank;
 } EntryPointSuiteData;
 
 void TestHook0( EntryPointSuiteData* data ) {
@@ -98,6 +98,7 @@ void EntryPointSuite_Setup( EntryPointSuiteData* data ) {
    for (ii=0; ii < NUM_TEST_FUNCS; ii++ ) {
       data->testFuncsRan[ii] = False;
    }
+   MPI_Comm_rank( MPI_COMM_WORLD, &data->rank );
 }
 
 
@@ -236,13 +237,8 @@ void EntryPointSuite_TestRun( EntryPointSuiteData* data ) {
 
 
 void EntryPointSuite_TestPrintConcise( EntryPointSuiteData* data ) {
-   Hook_Index     hookIndex;
    Stream*        stream = NULL;
    const char*    testFilename = "testEP-PrintConcise.txt";
-   FILE*          testFile = NULL;
-   #define        MAX_LINE_SIZE 1000
-   char           readLine[MAX_LINE_SIZE];
-   char           expString[MAX_LINE_SIZE];
 
    data->ep = EntryPoint_New( "testEntryPoint", EntryPoint_VoidPtr_CastType );
    EntryPoint_Append( data->ep, "TestHook0", (void*)TestHook0, "testCode" );
@@ -257,19 +253,27 @@ void EntryPointSuite_TestPrintConcise( EntryPointSuiteData* data ) {
    Stream_RedirectFile( stream, testFilename );
    EntryPoint_PrintConcise( data->ep, stream );
 
-   testFile = fopen( testFilename, "r" );
-   pcu_check_true( fgets( readLine, MAX_LINE_SIZE, testFile ) );
-   sprintf( expString, "\tEP: %s\n", data->ep->name );
-   pcu_check_true( 0 == strcmp( readLine, expString ) );
+   if (data->rank==0) {
+      FILE*          testFile = NULL;
+      #define        MAX_LINE_SIZE 1000
+      char           readLine[MAX_LINE_SIZE];
+      char           expString[MAX_LINE_SIZE];
+      Hook_Index     hookIndex;
 
-   for (hookIndex = 0; hookIndex < data->ep->hooks->count; hookIndex++ ) {
+      testFile = fopen( testFilename, "r" );
       pcu_check_true( fgets( readLine, MAX_LINE_SIZE, testFile ) );
-      sprintf( expString, "\t\tH: \"TestHook%u\" (%s)\n", hookIndex, "testCode" );
+      sprintf( expString, "\tEP: %s\n", data->ep->name );
       pcu_check_true( 0 == strcmp( readLine, expString ) );
-   }
 
-   fclose( testFile );
-   remove( testFilename );
+      for (hookIndex = 0; hookIndex < data->ep->hooks->count; hookIndex++ ) {
+         pcu_check_true( fgets( readLine, MAX_LINE_SIZE, testFile ) );
+         sprintf( expString, "\t\tH: \"TestHook%u\" (%s)\n", hookIndex, "testCode" );
+         pcu_check_true( 0 == strcmp( readLine, expString ) );
+      }
+
+      fclose( testFile );
+      remove( testFilename );
+   }
 }
 
 /***** For the ClassHook test ************************/
