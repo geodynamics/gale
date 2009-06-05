@@ -160,7 +160,9 @@ void _HashTable_DeleteFunc( void *ht )
 	self = (HashTable*)ht;
 	assert (self);
 	
-	for( i=0; i<self->max; i++ ){
+	/* In the case of a ptrHash table at least, it's possible to have keys that hash to 255 - the default max. So,
+	 * need to check that entry for possible deletion. -- PatrickSunter, 5 Jun 2009 */
+	for( i=0; i<self->max+1; i++ ){
 		he = self->entries[i];
 		
 		if(he){
@@ -538,7 +540,9 @@ void HashTable_ParseTable( HashTable *ht, HashTable_parseFunction *parseFunction
 	assert( self );
 	assert( parseFunction );
 	
-	for( i=0; i<self->max; i++ ){
+	/* In the case of a ptrHash table at least, it's possible to have keys that hash to 255 - the default max. So,
+	 * need to check that entry for possible handling. -- PatrickSunter, 5 Jun 2009 */
+	for( i=0; i<(self->max+1); i++ ){
 		he = self->entries[i];
 		
 		if(he){
