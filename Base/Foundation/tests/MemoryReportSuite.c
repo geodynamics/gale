@@ -98,9 +98,7 @@ void MemoryReportSuite_TestReportPrints( MemoryReportSuiteData* data ) {
    Journal_Enable_TypedStream( Info_Type, True );
    Stream_Enable( stgMemory->infoStream, True );
 
-   Journal_Printf( Journal_Register( Error_Type, "MemoryReportSuite" ),
-      "Warning: MemoryReport_Print() seems to be broken code. Unsure if this component is deprecated.\n:" );
-   pcu_check_true( 0 );
+   pcu_check_true(0 =="Warning: MemoryReport_Print() seems to be broken code. Unsure if this component is deprecated.\n:" );
    /* -----------------------------------------------------------------------------------------*/
 
    /* This whole test relies on the MEMORY_STATS being enabled, so that there are some reported
