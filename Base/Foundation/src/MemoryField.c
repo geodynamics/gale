@@ -136,7 +136,7 @@ MemoryField* MemoryField_Register( MemoryField* memoryField, const char* subValu
 }
 
 
-void MemoryField_Update( MemoryField* memoryField, SizeT bytes ) {
+void MemoryField_Update( MemoryField* memoryField, int bytes ) {
 	memoryField->currentAllocation += bytes;
 	
 	memoryField->peakAllocation = MAX( memoryField->currentAllocation, memoryField->peakAllocation );

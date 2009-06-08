@@ -100,7 +100,9 @@
 	MemoryField* MemoryField_Register( MemoryField* memoryField, const char* subValue );
 	
 	/** Updates the statisical information of this field. Should only be used for leaf fields. */
-	void MemoryField_Update( MemoryField* memoryField, SizeT bytes );
+   /* Note the "bytes" argument is an int, since it can be negative if a ptr has just been
+    *  freed, or realloc'd to be smaller */
+	void MemoryField_Update( MemoryField* memoryField, int bytes );
 	
 	/** Updates statisical information of this field based on its children (branches and leaves). */
 	void MemoryField_UpdateAsSumOfSubFields( MemoryField* memoryField );
