@@ -66,7 +66,8 @@
 		Index                conditionCount;		\
 		Index                conditionSize;		\
 		MemoryReportGroup*   conditionGroups;	/**< The groups which are to be filtered by a condition. */ \
-		char**               conditionValues;	/**< The value to match in the condition. */
+		char**               conditionValues;	/**< The value to match in the condition. */ \
+      MemoryField*         reportField;      /**< A MemoryReport used for storing results on when printing */
 	struct MemoryReport { __MemoryReport };
 
 	/** Creates an empty report. */
@@ -85,10 +86,11 @@
 	void MemoryReport_AddCondition( MemoryReport* memoryReport, MemoryReportGroup group, const char* condition );
 	
 	/** Displays the report of the memory module based on the groups and conditions. */
-	void MemoryReport_Print( MemoryReport* memoryReport );
+	void MemoryReport_Print( void* memoryReport );
 	
 	void MemoryReport_Print_Helper( void *memoryPointer, void* memoryReport );
 
+   const char* _MemoryReport_GetValue( MemoryReport* memoryReport, MemoryReportGroup reportGroup, MemoryPointer* memPtr );
 		
 #endif /* __Base_Foundation_MemoryReport_h__ */
 

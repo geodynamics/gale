@@ -1391,8 +1391,8 @@ void Memory_Print_Type_Name_Func( Type type, Name name )
 	nameField = MemoryField_Register( typeField, name );
 	
 	Journal_PrintfL( stgMemory->infoStream, 1, "Type: %s\n", type );
-	MemoryField_PrintHeaderAll( "Name" );
-	MemoryField_PrintAll( nameField );
+	MemoryField_PrintHeader( "Name", MEMORYFIELD_ALL, strlen(name) );
+	MemoryField_Print( nameField, MEMORYFIELD_ALL, strlen(name) );
 	
 	Stream_Indent( stgMemory->infoStream );
 	
@@ -1435,8 +1435,10 @@ void Memory_Print_File_Function( char* fileName, char* funcName )
 	funcField = MemoryField_Register( fileField, funcName );
 	
 	Journal_PrintfL( stgMemory->infoStream, 1, "File: %s\n", fileName );
-	MemoryField_PrintHeaderAll( "Function" );
-	MemoryField_PrintAll( funcField );
+   
+   _MemoryField_CalcLongestSubFieldNameLen( funcField );
+	MemoryField_PrintHeader( "Function", MEMORYFIELD_ALL, strlen(funcName) );
+	MemoryField_Print( funcField, MEMORYFIELD_ALL, strlen(funcName) );
 	
 	Stream_Indent( stgMemory->infoStream );
 	

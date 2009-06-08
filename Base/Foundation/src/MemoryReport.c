@@ -53,19 +53,18 @@ const int MEMORYREPORT_SIZE = 2;	/**< Number of items an array begins with. */
 int MemoryReport_Find_Group( int numGroups, MemoryReportGroup* groups, MemoryReportGroup search );
 
 
-MemoryReport* MemoryReport_New( )
-{
+MemoryReport* MemoryReport_New( ) {
 	MemoryReport* result = (MemoryReport*) malloc( sizeof(MemoryReport) );
 	
 	_MemoryReport_Init( result );
-	
 	return result;
 }
 	
 
 void _MemoryReport_Init( MemoryReport* memoryReport )
 {
-	Index ii=0;
+	char     reportQueryName[1000];
+	Index    ii=0;
 
 	memoryReport->groupCount = 0;
 	memoryReport->groupSize = MEMORYREPORT_SIZE;
@@ -77,6 +76,9 @@ void _MemoryReport_Init( MemoryReport* memoryReport )
 	for ( ii=0; ii < MEMORYREPORT_SIZE; ii++ ) {
 		memoryReport->conditionValues[ii] = NULL;
 	}
+
+	
+	memoryReport->reportField = MemoryField_New( "Report Query:" );
 }
 	
 
@@ -96,6 +98,8 @@ void MemoryReport_Delete( MemoryReport* memoryReport )
 	}
 	free( memoryReport->conditionValues );
 	free( memoryReport );
+
+	MemoryField_Delete( memoryReport->reportField );
 }
 
 
@@ -135,10 +139,9 @@ void MemoryReport_AddCondition( MemoryReport* memoryReport, MemoryReportGroup gr
 	memoryReport->conditionGroups[memoryReport->conditionCount] = group;
 	
 	if ( condition ) {
-		char*	ptr = memoryReport->conditionValues[memoryReport->conditionCount];
-
-		ptr = (char*)malloc( (strlen(condition) + 1) * sizeof(char) );
+		char*	ptr = (char*)malloc( (strlen(condition) + 1) * sizeof(char) );
 		strcpy( ptr, condition );
+		memoryReport->conditionValues[memoryReport->conditionCount] = ptr;
 	}
 	else {
 		/* NULL is a condition as well, such as Type_Invalid and Name_Invalid. */
@@ -149,29 +152,14 @@ void MemoryReport_AddCondition( MemoryReport* memoryReport, MemoryReportGroup gr
 }
 
 
-void MemoryReport_Print( MemoryReport* memoryReport )
+void MemoryReport_Print( void* memoryReport )
 {
-	BTree_ParseTree ( stgMemory->pointers, MemoryReport_Print_Helper, (void*) memoryReport );
-}
+	MemoryReport*  self = (MemoryReport*) memoryReport;
 
-
-void MemoryReport_Print_Helper( void *memoryPointer, void* memReport )
-{
-	MemoryField* rootField;		/* The top level container for where the results begin. */
-	MemoryField* prevField; 	/* A temporary pointer to hold previous fields. */
-	Bool valid;	/* Whether a memory pointer record matches the conditions. */
-	MemoryReport* memoryReport = (MemoryReport*)memReport;
-	MemoryPointer* memPtr = (MemoryPointer*) memoryPointer;
-	Index iGroup, iCondition;	/* Iterators. */
-	
-	assert ( memoryPointer );
-	assert ( memoryReport );
-		
-	if ( memoryReport->groupCount == 0 ) {
+	if ( self->groupCount == 0 ) {
 		return;
 	}
 	
-	rootField = MemoryField_New( "Report Query:" );
 
 	/* Algorithm:
 	 * - Iterate through all MemoryPointers recorded.
@@ -184,78 +172,61 @@ void MemoryReport_Print_Helper( void *memoryPointer, void* memReport )
 	 * The alternative is to always record stats for all combinations (useful ones) but that will have a large impact on run
 	 * time as well as memory space.
 	 */
+		
+	/* Derive the statistics, using a BTree parse */
+	BTree_ParseTree( stgMemory->pointers, MemoryReport_Print_Helper, self );
+	
+	//prevField = rootField;
+	//while ( prevField->subCount == 1 ) {
+	//	Journal_Printf( stgMemory->infoStream, "%s \n", prevField->value );
+	//	prevField = prevField->subFields[0];
+	//}
+	
+	// TODO: replace reportField->value with a name representative of conditions
+	MemoryField_PrintSummary( self->reportField, "~Report~" );
+}
+
+
+/* Used for a BTree parse to gather statistics */
+void MemoryReport_Print_Helper( void *memoryPointer, void* memoryReport ) {
+	MemoryPointer* memPtr = (MemoryPointer*) memoryPointer;
+	MemoryReport*  memReport = (MemoryReport*)memoryReport;
+	MemoryField*   subField = NULL;
+	Bool           valid;             /* Whether a memory pointer record matches the conditions. */
+	Index          iGroup, iCondition;/* Iterators. */
+	const char*    valueStr = NULL;
+
+	assert ( memPtr );
 
 	/* check condition */
 	valid = True;
-	for ( iCondition = 0; iCondition < memoryReport->conditionCount && valid; ++iCondition ) {
-		switch ( memoryReport->conditionGroups[iCondition] ) {
-			case MEMORYREPORT_TYPE:
-				if ( MemoryField_StringCompare( memPtr->type->value,
-					memoryReport->conditionValues[iCondition] ) != 0 ) {
-					valid = False;
-				}
-				break;
-			case MEMORYREPORT_NAME:
-				if ( MemoryField_StringCompare( memPtr->name->value,
-					memoryReport->conditionValues[iCondition] ) != 0 ) {
-					valid = False;
-				}
-				break;
-			case MEMORYREPORT_FILE:
-				if ( MemoryField_StringCompare( memPtr->file->value,
-					memoryReport->conditionValues[iCondition] ) != 0 ) {
-					valid = False;
-				}
-				break;
-			case MEMORYREPORT_FUNC:
-				if ( MemoryField_StringCompare( memPtr->func->value,
-					memoryReport->conditionValues[iCondition] ) != 0 ) {
-					valid = False;
-				}
-				break;
+	for ( iCondition = 0; iCondition < memReport->conditionCount && valid; ++iCondition ) {
+		valueStr = _MemoryReport_GetValue( memReport, memReport->conditionGroups[iCondition], memPtr );
+		if ( MemoryField_StringCompare( valueStr, memReport->conditionValues[iCondition] ) != 0 ) {
+			valid = False;
 		}
 	}
 		
 	if ( valid ) {
 		/* Add this entry, sorted by the groups of the report. */
-		prevField = rootField;
-		for ( iGroup = 0; iGroup < memoryReport->groupCount; ++iGroup ) {
-			switch ( memoryReport->groups[iGroup] ) {
-				case MEMORYREPORT_TYPE:
-					prevField = MemoryField_Register( prevField, memPtr->type->value );
-					break;
-				case MEMORYREPORT_NAME:
-					prevField = MemoryField_Register( prevField, memPtr->name->value );
-					break;
-				case MEMORYREPORT_FILE:
-					prevField = MemoryField_Register( prevField, memPtr->file->value );
-					break;
-				case MEMORYREPORT_FUNC:
-					prevField = MemoryField_Register( prevField, memPtr->func->value );
-					break;
-			}
+		/* Start at the root field */
+		subField = memReport->reportField;
+		/*  The way MemoryReport is designed, keep adding "sub-fields" of more specialised info. */
+		for ( iGroup = 0; iGroup < memReport->groupCount; ++iGroup ) {
+			valueStr = _MemoryReport_GetValue( memReport, memReport->groups[iGroup], memPtr );
+			subField = MemoryField_Register( subField, valueStr );
 		}
-		
-		/* Derive the statistics. */
-		prevField->allocCount++;
+
+		/* Add statistics for this entry - "subField" will now be most specialised info */
+		subField->allocCount++;
 		if ( memPtr->ptr == NULL ) {
-			prevField->freeCount++;
+			subField->freeCount++;
 		}
 		else {
-			prevField->currentAllocation += memPtr->totalSize;
+		       subField->currentAllocation += memPtr->totalSize;
 		}
-		prevField->totalAllocation += memPtr->totalSize;
+		subField->totalAllocation += memPtr->totalSize;
 	}
-	
-	prevField = rootField;
-	while ( prevField->subCount == 1 ) {
-		Journal_Printf( stgMemory->infoStream, "%s \n", prevField->value );
-		prevField = prevField->subFields[0];
-	}
-	
-	MemoryField_PrintSummary( prevField, "~Report~" );
-
-	MemoryField_Delete( rootField );
 }
 
 
@@ -272,4 +243,25 @@ int MemoryReport_Find_Group( int numGroups, MemoryReportGroup* groups, MemoryRep
 	}
 	
 	return -1;
+}
+
+
+const char* _MemoryReport_GetValue( MemoryReport* memoryReport, MemoryReportGroup reportGroup, MemoryPointer* memPtr ) {
+	const char* valueString = NULL;
+
+	switch ( reportGroup ) {
+		case MEMORYREPORT_TYPE:
+			valueString = memPtr->type->value;
+			break;
+		case MEMORYREPORT_NAME:
+			valueString = memPtr->name->value;
+			break;
+		case MEMORYREPORT_FILE:
+			valueString = memPtr->file->value;
+			break;
+		case MEMORYREPORT_FUNC:
+			valueString = memPtr->func->value;
+			break;
+	}
+	return valueString;
 }
