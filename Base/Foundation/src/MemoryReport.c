@@ -86,6 +86,8 @@ void MemoryReport_Delete( MemoryReport* memoryReport )
 {
 	Index i;
 	
+	MemoryField_Delete( memoryReport->reportField );
+
 	free( memoryReport->groups );
 	free( memoryReport->conditionGroups );
 	
@@ -98,8 +100,6 @@ void MemoryReport_Delete( MemoryReport* memoryReport )
 	}
 	free( memoryReport->conditionValues );
 	free( memoryReport );
-
-	MemoryField_Delete( memoryReport->reportField );
 }
 
 
