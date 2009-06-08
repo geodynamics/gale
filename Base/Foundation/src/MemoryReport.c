@@ -183,7 +183,7 @@ void MemoryReport_Print( void* memoryReport )
 	//}
 	
 	// TODO: replace reportField->value with a name representative of conditions
-	MemoryField_PrintSummary( self->reportField, "~Report~" );
+	MemoryField_PrintSummary( self->reportField, "~Report~", (MEMORYFIELD_ALL-MEMORYFIELD_PEAK) );
 }
 
 

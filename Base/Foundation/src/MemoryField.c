@@ -228,11 +228,10 @@ void MemoryField_PrintHeader( const char* fieldName, MemoryFieldColumn columns,
 }
 
 
-void MemoryField_PrintSummary( MemoryField* memoryField, const char* tableTitle ) {
+void MemoryField_PrintSummary( MemoryField* memoryField, const char* tableTitle, MemoryFieldColumn cols ) {
 	Index             i;
-	MemoryFieldColumn cols = MEMORYFIELD_ALL;
 	MemoryFieldColumn colsNoVal;
-	unsigned int      longestSubFieldNameLen = 0;
+	unsigned int      nameFieldWidth = 0;
 
 	colsNoVal = MEMORYFIELD_ALL - MEMORYFIELD_VALUE;
 
@@ -243,9 +242,6 @@ void MemoryField_PrintSummary( MemoryField* memoryField, const char* tableTitle 
 	if ( memoryField->subCount > 0 ) {
 		MemoryField_UpdateAsSumOfSubFields( memoryField );
 
-		MemoryField_Sort( memoryField );
-		longestSubFieldNameLen = _MemoryField_CalcLongestSubFieldNameLen( memoryField );
-
 		Journal_Printf( stgMemory->infoStream, "%s\n", memoryField->value );
 
 		Stream_Indent( stgMemory->infoStream );
@@ -254,10 +250,16 @@ void MemoryField_PrintSummary( MemoryField* memoryField, const char* tableTitle 
 
 		Stream_Indent( stgMemory->infoStream );
 		
-		MemoryField_PrintHeader( tableTitle, cols, longestSubFieldNameLen );
+		MemoryField_Sort( memoryField );
+		nameFieldWidth = _MemoryField_CalcLongestSubFieldNameLen( memoryField );
+		if ( strlen(tableTitle) > nameFieldWidth ) {
+			nameFieldWidth = strlen(tableTitle);
+		}
+
+		MemoryField_PrintHeader( tableTitle, cols, nameFieldWidth );
 		for ( i = 0; i < memoryField->subCount; ++i ) {
 			if ( memoryField->subFields[i]->allocCount > 0 ) {
-				MemoryField_Print( memoryField->subFields[i], cols, longestSubFieldNameLen );
+				MemoryField_Print( memoryField->subFields[i], cols, nameFieldWidth );
 			}
 		}
 		

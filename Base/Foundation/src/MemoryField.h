@@ -124,8 +124,7 @@
 		unsigned int valueFieldWidth );
 	
 	/** Displays a summary of this field and its children. */
-	void MemoryField_PrintSummary( MemoryField* memoryField, const char* tableTitle );
-
+	void MemoryField_PrintSummary( MemoryField* memoryField, const char* tableTitle, MemoryFieldColumn cols  );
 
 	/** Sorts the children of this field lexographically in ascending order. */
 	void MemoryField_Sort( MemoryField* memoryField );

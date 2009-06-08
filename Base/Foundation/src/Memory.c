@@ -1310,14 +1310,14 @@ void Memory_Print_Summary()
 {
 	Index i;
 	
-	MemoryField_PrintSummary( stgMemory->types, "Type" );
+	MemoryField_PrintSummary( stgMemory->types, "Type", MEMORYFIELD_ALL );
 	
 	Stream_Indent( stgMemory->infoStream );
 	
 	for ( i = 0; i < stgMemory->types->subCount; ++i )
 	{
 		Journal_Printf( stgMemory->infoStream, "\n" );
-		MemoryField_PrintSummary( stgMemory->types->subFields[i], "Name" );
+		MemoryField_PrintSummary( stgMemory->types->subFields[i], "Name", MEMORYFIELD_ALL );
 	}
 	
 	Stream_UnIndent( stgMemory->infoStream );
@@ -1376,7 +1376,7 @@ void Memory_Print_Type_Func( Type type )
 	
 	typeField = MemoryField_Register( stgMemory->types, type );
 	
-	MemoryField_PrintSummary( typeField, "Name" );
+	MemoryField_PrintSummary( typeField, "Name", MEMORYFIELD_ALL );
 }
 
 void Memory_Print_Type_Name_Func( Type type, Name name )
@@ -1421,7 +1421,7 @@ void Memory_Print_File( char* fileName )
 	
 	fileField = MemoryField_Register( stgMemory->files, fileName );
 	
-	MemoryField_PrintSummary( fileField, "Function" );
+	MemoryField_PrintSummary( fileField, "Function", MEMORYFIELD_ALL );
 }
 
 void Memory_Print_File_Function( char* fileName, char* funcName )
