@@ -156,10 +156,15 @@ char* StreamFormatter_Buffer_AllocNext( Index size ) {
 		stgStreamFormatter_Buffer->lengthPtr = &stgStreamFormatter_Buffer->length1;
 	}
 
-	/* Realloc/alloc as needed */
+	/* Realloc/alloc as needed: make sure stats get entered */
 	if ( size > *stgStreamFormatter_Buffer->lengthPtr ) {
 		*stgStreamFormatter_Buffer->lengthPtr = size;
-		*stgStreamFormatter_Buffer->current = (char*)Memory_Realloc( *stgStreamFormatter_Buffer->current, size );
+      if ( *stgStreamFormatter_Buffer->current == NULL ) {
+         *stgStreamFormatter_Buffer->current = Memory_Alloc_Array( char, size, "StreamFormatter-Buffer-Current" );
+      }
+      else {
+		   *stgStreamFormatter_Buffer->current = (char*)Memory_Realloc( *stgStreamFormatter_Buffer->current, size );
+      }
 	}
 
 	return *stgStreamFormatter_Buffer->current;
