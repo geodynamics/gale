@@ -376,7 +376,7 @@ void MemoryReportSuite_TestReportPrintsTwo( MemoryReportSuiteData* data ) {
       pcu_check_true( totalBytes == data->groupTwo_strC_total );
 
       fclose( memoryReportOutputFile );
-      //remove( memoryReportOutputFilename );
+      remove( memoryReportOutputFilename );
    }
 }
 
@@ -435,7 +435,7 @@ void MemoryReportSuite_TestReportPrintsThree( MemoryReportSuiteData* data ) {
       pcu_check_true( totalBytes == data->groupTwoFunc_total );
 
       fclose( memoryReportOutputFile );
-      //remove( memoryReportOutputFilename );
+      remove( memoryReportOutputFilename );
    }
 }
 
