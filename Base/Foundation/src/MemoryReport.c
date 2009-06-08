@@ -62,6 +62,7 @@ MemoryReport* MemoryReport_New( )
 	return result;
 }
 	
+
 void _MemoryReport_Init( MemoryReport* memoryReport )
 {
 	Index ii=0;
@@ -78,6 +79,7 @@ void _MemoryReport_Init( MemoryReport* memoryReport )
 	}
 }
 	
+
 void MemoryReport_Delete( MemoryReport* memoryReport )
 {
 	Index i;
@@ -96,16 +98,15 @@ void MemoryReport_Delete( MemoryReport* memoryReport )
 	free( memoryReport );
 }
 
+
 void MemoryReport_AddGroup( MemoryReport* memoryReport, MemoryReportGroup group )
 {
-	if ( MemoryReport_Find_Group( memoryReport->groupCount, memoryReport->groups, group ) >= 0 )
-	{
+	if ( MemoryReport_Find_Group( memoryReport->groupCount, memoryReport->groups, group ) >= 0 ) {
 		return;
 	}
 
 	/* Extend the groups array if needed. */
-	if ( memoryReport->groupCount == memoryReport->groupSize )
-	{
+	if ( memoryReport->groupCount == memoryReport->groupSize ) {
 		memoryReport->groupSize += MEMORYREPORT_DELTA;
 		memoryReport->groups = (MemoryReportGroup*)
 			realloc( memoryReport->groups, sizeof(MemoryReportGroup) * memoryReport->groupSize );	
@@ -118,14 +119,12 @@ void MemoryReport_AddGroup( MemoryReport* memoryReport, MemoryReportGroup group 
 void MemoryReport_AddCondition( MemoryReport* memoryReport, MemoryReportGroup group, const char* condition )
 {
 	/* Add this group if it does not already exist. */
-	if ( MemoryReport_Find_Group( memoryReport->groupCount, memoryReport->groups, group ) < 0 )
-	{
+	if ( MemoryReport_Find_Group( memoryReport->groupCount, memoryReport->groups, group ) < 0 ) {
 		MemoryReport_AddGroup( memoryReport, group );	
 	}
 	
 	/* Extend the condition arrays if needed. */
-	if ( memoryReport->conditionCount == memoryReport->conditionSize )
-	{
+	if ( memoryReport->conditionCount == memoryReport->conditionSize ) {
 		memoryReport->conditionSize += MEMORYREPORT_DELTA;
 		memoryReport->conditionGroups = (MemoryReportGroup*)
 			realloc( memoryReport->conditionGroups, sizeof(MemoryReportGroup) * memoryReport->conditionSize );
@@ -135,15 +134,13 @@ void MemoryReport_AddCondition( MemoryReport* memoryReport, MemoryReportGroup gr
 	
 	memoryReport->conditionGroups[memoryReport->conditionCount] = group;
 	
-	if ( condition )
-	{
+	if ( condition ) {
 		char*	ptr = memoryReport->conditionValues[memoryReport->conditionCount];
 
 		ptr = (char*)malloc( (strlen(condition) + 1) * sizeof(char) );
 		strcpy( ptr, condition );
 	}
-	else
-	{
+	else {
 		/* NULL is a condition as well, such as Type_Invalid and Name_Invalid. */
 		memoryReport->conditionValues[memoryReport->conditionCount] = NULL;
 	}
@@ -151,27 +148,26 @@ void MemoryReport_AddCondition( MemoryReport* memoryReport, MemoryReportGroup gr
 	memoryReport->conditionCount++;
 }
 
+
 void MemoryReport_Print( MemoryReport* memoryReport )
 {
 	BTree_ParseTree ( stgMemory->pointers, MemoryReport_Print_Helper, (void*) memoryReport );
 }
+
 
 void MemoryReport_Print_Helper( void *memoryPointer, void* memReport )
 {
 	MemoryField* rootField;		/* The top level container for where the results begin. */
 	MemoryField* prevField; 	/* A temporary pointer to hold previous fields. */
 	Bool valid;	/* Whether a memory pointer record matches the conditions. */
-	MemoryReport* memoryReport;
-	MemoryPointer* memPtr;
+	MemoryReport* memoryReport = (MemoryReport*)memReport;
+	MemoryPointer* memPtr = (MemoryPointer*) memoryPointer;
 	Index iGroup, iCondition;	/* Iterators. */
 	
 	assert ( memoryPointer );
-	assert ( memReport );
-
-	memoryReport = (MemoryReport*) memReport;
+	assert ( memoryReport );
 		
-	if ( memoryReport->groupCount == 0 )
-	{
+	if ( memoryReport->groupCount == 0 ) {
 		return;
 	}
 	
@@ -188,53 +184,43 @@ void MemoryReport_Print_Helper( void *memoryPointer, void* memReport )
 	 * The alternative is to always record stats for all combinations (useful ones) but that will have a large impact on run
 	 * time as well as memory space.
 	 */
-	memPtr = (MemoryPointer*) memoryPointer;
 
 	/* check condition */
 	valid = True;
-	for ( iCondition = 0; iCondition < memoryReport->conditionCount && valid; ++iCondition )
-	{
-		switch ( memoryReport->conditionGroups[iCondition] )
-		{
+	for ( iCondition = 0; iCondition < memoryReport->conditionCount && valid; ++iCondition ) {
+		switch ( memoryReport->conditionGroups[iCondition] ) {
 			case MEMORYREPORT_TYPE:
 				if ( MemoryField_StringCompare( memPtr->type->value,
-					memoryReport->conditionValues[iCondition] ) != 0 )
-				{
+					memoryReport->conditionValues[iCondition] ) != 0 ) {
 					valid = False;
 				}
 				break;
 			case MEMORYREPORT_NAME:
 				if ( MemoryField_StringCompare( memPtr->name->value,
-					memoryReport->conditionValues[iCondition] ) != 0 )
-				{
+					memoryReport->conditionValues[iCondition] ) != 0 ) {
 					valid = False;
 				}
 				break;
 			case MEMORYREPORT_FILE:
 				if ( MemoryField_StringCompare( memPtr->file->value,
-					memoryReport->conditionValues[iCondition] ) != 0 )
-				{
+					memoryReport->conditionValues[iCondition] ) != 0 ) {
 					valid = False;
 				}
 				break;
 			case MEMORYREPORT_FUNC:
 				if ( MemoryField_StringCompare( memPtr->func->value,
-					memoryReport->conditionValues[iCondition] ) != 0 )
-				{
+					memoryReport->conditionValues[iCondition] ) != 0 ) {
 					valid = False;
 				}
 				break;
 		}
 	}
 		
-	if ( valid )
-	{
+	if ( valid ) {
 		/* Add this entry, sorted by the groups of the report. */
 		prevField = rootField;
-		for ( iGroup = 0; iGroup < memoryReport->groupCount; ++iGroup )
-		{
-			switch ( memoryReport->groups[iGroup] )
-			{
+		for ( iGroup = 0; iGroup < memoryReport->groupCount; ++iGroup ) {
+			switch ( memoryReport->groups[iGroup] ) {
 				case MEMORYREPORT_TYPE:
 					prevField = MemoryField_Register( prevField, memPtr->type->value );
 					break;
@@ -252,21 +238,17 @@ void MemoryReport_Print_Helper( void *memoryPointer, void* memReport )
 		
 		/* Derive the statistics. */
 		prevField->allocCount++;
-		if ( memPtr->ptr == NULL )
-		{
+		if ( memPtr->ptr == NULL ) {
 			prevField->freeCount++;
 		}
-		else
-		{
+		else {
 			prevField->currentAllocation += memPtr->totalSize;
 		}
 		prevField->totalAllocation += memPtr->totalSize;
 	}
 	
-	
 	prevField = rootField;
-	while ( prevField->subCount == 1 )
-	{
+	while ( prevField->subCount == 1 ) {
 		Journal_Printf( stgMemory->infoStream, "%s \n", prevField->value );
 		prevField = prevField->subFields[0];
 	}
@@ -275,6 +257,7 @@ void MemoryReport_Print_Helper( void *memoryPointer, void* memReport )
 
 	MemoryField_Delete( rootField );
 }
+
 
 int MemoryReport_Find_Group( int numGroups, MemoryReportGroup* groups, MemoryReportGroup search )
 {
