@@ -1,10 +1,11 @@
 from SCons.Script import *
 
-def ConfigurePackage(env, mod, name, **kw):
-    pkg = env['packages'].get(mod[0], None)
+def ConfigurePackage(env, mod, **kw):
+    name = mod.__module__[mod.__module__.rfind('.') + 1:]
+    pkg = env['packages'].get(mod, None)
     if not pkg:
-        pkg = mod[0](name[0], env, **kw)
-        env['packages'][mod[0]] = pkg
+        pkg = mod(name, env, **kw)
+        env['packages'][mod] = pkg
         # Don't configure if we're cleaning or helping.
         if not (GetOption('clean') or GetOption('help')):
             env._dict.update(pkg()._dict)
@@ -25,7 +26,7 @@ def generate(env, options=[]):
         if GetOption(o[1]) is not None:
             env[o[1]] = GetOption(o[1])
 
-    env.Append(BUILDERS={'ConfigurePackage': ConfigurePackage})
+    env.AddMethod(ConfigurePackage)
     env['packages'] = {}
 
 def exists(env):

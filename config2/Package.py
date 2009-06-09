@@ -32,6 +32,7 @@ class Package:
         env = self.env.Clone()
         env.AppendUnique(CPPPATH=loc[1])
         env.AppendUnique(LIBPATH=loc[2])
+        env.AppendUnique(RPATH=loc[2])
         yield env
 
     def __call__(self):
@@ -50,6 +51,9 @@ class Package:
         self.result = False
 
         for loc in self._gen_locations():
+
+            # Stash on the package.
+            self.location = loc
 
             for env in self.gen_envs(loc):
 

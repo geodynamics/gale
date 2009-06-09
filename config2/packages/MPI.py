@@ -7,24 +7,35 @@ class MPI(Package):
         yield ('', ['/usr/local/include'], ['/usr/local/lib'])
         yield ('', ['/usr/local/include/mpi'], ['/usr/local/lib'])
 
+    def gen_envs(self, loc):
+        for env in Package.gen_envs(self, loc):
+
+            # Not sure which extra libraries to check for, so try them all.
+            extra_libs = [[], ['rt'], ['pthread', 'rt'],
+                          ['dl'], ['dl', 'rt'], ['dl', 'pthread'],
+                          ['dl', 'pthread', 'rt']]
+            for libs in extra_libs:
+
+                # Check for general MPI.
+                lib_env = env.Clone()
+                lib_env.PrependUnique(LIBS=['mpi'] + libs)
+                yield lib_env
+
+                # Check for MPICH.
+                lib_env = env.Clone()
+                lib_env.PrependUnique(LIBS=['mpich'] + libs)
+                yield lib_env
+                lib_env = env.Clone()
+                lib_env.PrependUnique(LIBS=['pmpich', 'mpich'] + libs)
+                yield lib_env
+
+                # Check for OpenMPI.
+                lib_env = env.Clone()
+                lib_env.PrependUnique(LIBS=['mpi', 'open-rte', 'open-pal'] + libs)
+                yield lib_env
+                lib_env = env.Clone()
+                lib_env.PrependUnique(LIBS=['mpi', 'open-rte', 'open-pal', 'nsl', 'util'] + libs)
+                yield lib_env
+
     def check(self, conf):
-        # Not sure which extra libraries to check for, so try them all.
-        extra_libs = [[], ['rt'], ['pthread', 'rt'],
-                      ['dl'], ['dl', 'rt'], ['dl', 'pthread'],
-                      ['dl', 'pthread', 'rt']]
-        for libs in extra_libs:
-
-            # Check for general MPI.
-            if conf.CheckLibsWithHeader(['mpi'] + libs, 'mpi.h', 'c'):
-                return True
-
-            # Check for MPICH.
-            if conf.CheckLibsWithHeader(['mpich'] + libs, 'mpi.h', 'c') or \
-                    conf.CheckLibsWithHeader(['mpich', 'pmpich'] + libs, 'mpi.h', 'c'):
-                return True
-
-            # Check for OpenMPI.
-            if conf.CheckLibsWithHeader(['mpi', 'open-rte', 'open-pal'], 'mpi.h', 'c') or \
-                    conf.CheckLibsWithHeader(['mpi', 'open-rte', 'open-pal', 'nsl', 'util'],
-                                             'mpi.h', 'c'):
-                return True
+        return conf.CheckLibWithHeader(None, 'mpi.h', 'c')
