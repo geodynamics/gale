@@ -30,6 +30,7 @@
 
 #include <stdarg.h>
 #include <mpi.h>
+#include <math.h>
 
 #include "pcu/pcu.h"
 #include "types.h"
