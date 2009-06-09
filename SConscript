@@ -53,7 +53,7 @@ for d in dirs:
 env.Install('include/Underworld', Glob('libUnderworld/src/*.h'))
 
 # Build libraries.
-if env['shared_libraries']:
+if env['shared_libs']:
     env.SharedLibrary('lib/Underworld', objs)
 
 # Need to include the Underworld library for binaries.
@@ -112,7 +112,7 @@ for d in dirs:
     objs = env.SharedObject(srcs, CPPDEFINES=cpp_defs)
     objs += env.stgSharedMeta(Glob(d + '/*.meta'), CPPDEFINES=cpp_defs)
 
-    if env['shared_libraries']:
+    if env['shared_libs']:
         lib_pre = env['LIBPREFIXES']
         if not isinstance(lib_pre, list):
             lib_pre = [lib_pre]
