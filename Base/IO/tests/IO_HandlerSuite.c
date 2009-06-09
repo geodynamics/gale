@@ -620,6 +620,9 @@ void IO_HandlerSuite_TestReadDuplicateEntryKeys( IO_HandlerSuiteData* data ) {
    pcu_check_true( IO_Handler_DefaultMergeType == Dictionary_MergeType_Replace );
 
    if (data->rank==0) {
+      struct1Entry[0] = '\0';
+      struct2Entry[0] = '\0';
+
       sprintf( xmlLine, "<struct name=\"%s\">\n", struct1Name );
       strcat( struct1Entry, xmlLine );
       sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames[0], paramVals[0] );
