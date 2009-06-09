@@ -53,6 +53,10 @@
 		void*					entryPoint;
 	struct Context_CallInfo { __Base_Context_CallInfo };
 	
+	typedef enum CheckpointFileFormat {
+		CHECKPOINT_FORMAT_ASCII,	/** Default Stg Ascii text format */
+		CHECKPOINT_FORMAT_HDF5		/** Format using HDF5 library */
+	} CheckpointFileFormat;
 	
 	/* AbstractContext entry point names */
 	extern Type AbstractContext_EP_Construct;
@@ -266,7 +270,7 @@
 	void AbstractContext_InitialiseAllLiveComponents( void* context ) ;
 
 	Bool AbstractContext_CheckPointExists( void* context, Index timeStep );
-	char* AbstractContext_GetTimeInfoFileNameForGivenTimeStep( void* context, Index timeStep, char* checkpointPath );
+	char* AbstractContext_GetTimeInfoFileNameForGivenTimeStep( void* context, Index timeStep, char* checkpointPath, CheckpointFileFormat checkpointFileFormat );
 
 	/* Works out the prefix string to use for checkpoint files (input path + C.P. prefix)
 	 * Note this allocates a string which the user needs to free when done. */ 
