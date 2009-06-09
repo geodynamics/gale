@@ -1,0 +1,52 @@
+import packages
+import cc
+
+#
+# Add options to be passed on to build.
+#
+
+options = [
+    ('--prefix', 'prefix', 'Installation prefix.', '/usr/local'),
+    ('--build-dir', 'build_dir', 'Sandbox location.', 'build'),
+    ('--static-libs', 'static_libs', 'Enable static libraries', 'yes'),
+    ('--shared-libs', 'shared_libs', 'Enable shared libraries', 'yes'),
+    ('--cc', 'CC', 'C compiler', None),
+    ('--cflags', 'CFLAGS', 'Flags for the C compiler', None),
+    ('--with-glucifer', 'with_glucifer', 'Enable gLucifer', 1, 'int')
+]
+
+#
+# Setup the environment.
+#
+
+env = Environment()
+env.Tool('config', toolpath=['.'], options=options)
+
+#
+# Perform configuration.
+#
+
+if GetOption('CC'):
+    cc.apply_cc(env, GetOption('CC'))
+
+env.ConfigurePackage(packages.libXML2, 'libXML2')
+env.ConfigurePackage(packages.MPI, 'MPI')
+env.ConfigurePackage(packages.PETSc, 'PETSc')
+env.ConfigurePackage(packages.PETScExt, 'PETScExt', required=False)
+
+
+#
+# Export the environment.
+#
+
+if not (GetOption('help') or GetOption('clean')):
+
+    out = open('config.cfg', 'w')
+    opts = [o[1] for o in options] + [
+        'CPPPATH', 'LIBPATH', 'LIBS', 'CPPDEFINES'
+        ]
+    for o in opts:
+        v = env.get(o, None)
+        if v is not None:
+            out.write('%s = %s\n'%(o, repr(env[o])))
+    out.close()
