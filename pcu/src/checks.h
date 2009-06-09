@@ -20,6 +20,9 @@
 #ifndef pcu_checks_h
 #define pcu_checks_h
 
+/* For the streq macro */
+#include <string.h>
+
 #include "types.h"
 #include "listener.h"
 #include "suite.h"
@@ -57,6 +60,18 @@ extern pcu_suite_t* pcu_cursuite;
 
 #define pcu_check_le( a, b )                                            \
    _pcu_check_eval( (a) <= (b), (a) <= (b), NULL, "less than or equal" )
+
+/** Check that two strings are equal */
+#define pcu_check_streq( a, b ) \
+   do { \
+      _pcu_check_eval( (a) != NULL, 0 == strcmp( (a), (b) ), "First string passed to pcu_check_streq was NULL", "equal strings-preCheck" ); \
+      _pcu_check_eval( (b) != NULL, 0 == strcmp( (a), (b) ), "Second string passed to pcu_check_streq was NULL", "equal strings-preCheck" ); \
+      if ( (a) && (b) ) { \
+         char  msgString[1000]; \
+         sprintf( msgString, "Actual strings were- \"%s\", \"%s\"", a, b ); \
+         _pcu_check_eval( 0 == strcmp( (a), (b) ), 0 == strcmp( (a), (b) ), msgString, "equal strings" ); \
+      } \
+   } while( 0 )
 
 #ifndef NDEBUG
 
