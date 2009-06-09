@@ -64,12 +64,15 @@ extern pcu_suite_t* pcu_cursuite;
 /** Check that two strings are equal */
 #define pcu_check_streq( a, b ) \
    do { \
-      _pcu_check_eval( (a) != NULL, 0 == strcmp( (a), (b) ), "First string passed to pcu_check_streq was NULL", "equal strings-preCheck" ); \
-      _pcu_check_eval( (b) != NULL, 0 == strcmp( (a), (b) ), "Second string passed to pcu_check_streq was NULL", "equal strings-preCheck" ); \
-      if ( (a) && (b) ) { \
+      /* The temporary ptrs are so ++ operations etc inside (a) or (b) aren't done several times */ \
+      char* tempStr1 = (a); \
+      char* tempStr2 = (b); \
+      _pcu_check_eval( tempStr1 != NULL, 0 == strcmp( a, b ), "First string passed to pcu_check_streq was NULL", "equal strings-preCheck" ); \
+      _pcu_check_eval( tempStr2 != NULL, 0 == strcmp( a, b ), "Second string passed to pcu_check_streq was NULL", "equal strings-preCheck" ); \
+      if ( tempStr1 && tempStr2 ) { \
          char  msgString[1000]; \
-         sprintf( msgString, "Actual strings were- \"%s\", \"%s\"", a, b ); \
-         _pcu_check_eval( 0 == strcmp( (a), (b) ), 0 == strcmp( (a), (b) ), msgString, "equal strings" ); \
+         sprintf( msgString, "Actual strings were- \"%s\", \"%s\"", tempStr1, tempStr2 ); \
+         _pcu_check_eval( 0 == strcmp( tempStr1, tempStr2 ), 0 == strcmp( a, b ), msgString, "equal strings" ); \
       } \
    } while( 0 )
 
