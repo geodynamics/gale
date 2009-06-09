@@ -85,15 +85,15 @@ void DictionaryCheckSuite_TestCheckKeys( DictionaryCheckSuiteData* data ) {
    if ( data->rank==0 ) {
       testFile = fopen( testFilename, "r" );
       pcu_check_true( fgets( inputLine, MAXLINE, testFile ));
-      pcu_check_true( 0 == strcmp( inputLine, errMessage ));
+      pcu_check_streq( inputLine, errMessage );
       pcu_check_true( fgets( inputLine, MAXLINE, testFile ));
       /* Ignore the actual 2nd line, since it includes a memory ptr print and hard to compare */
       pcu_check_true( fgets( inputLine, MAXLINE, testFile ));
-      pcu_check_true( 0 == strcmp( inputLine, "The following keys were repeated:\n" ));
+      pcu_check_streq( inputLine, "The following keys were repeated:\n" );
       pcu_check_true( fgets( inputLine, MAXLINE, testFile ));
-      pcu_check_true( 0 == strcmp( inputLine, "\t\"test_dict_string\"\n" ));
+      pcu_check_streq( inputLine, "\t\"test_dict_string\"\n" );
       pcu_check_true( fgets( inputLine, MAXLINE, testFile ));
-      pcu_check_true( 0 == strcmp( inputLine, "Error in CheckDictionaryKeys with 1 entries in dictionary keys\n"));
+      pcu_check_streq( inputLine, "Error in CheckDictionaryKeys with 1 entries in dictionary keys\n" );
    }
 
    /* For dictionary2 */

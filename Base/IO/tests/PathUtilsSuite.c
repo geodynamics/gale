@@ -68,7 +68,7 @@ void PathUtilsSuite_TestPathJoin( PathUtilsSuiteData* data ) {
    
    PathJoin( &searchPaths[len + 1], 6, "..", "..", "..", "does", "not", "exist" );
    
-   pcu_check_true( 0 == strcmp( searchPaths, ".:./data:../../../does/not/exist" ));
+   pcu_check_streq( searchPaths, ".:./data:../../../does/not/exist" );
 }
 
 
@@ -101,19 +101,19 @@ void PathUtilsSuite_TestFindFile( PathUtilsSuiteData* data ) {
    if (data->rank==0) {
       /* This first test is to make sure it can handle files preceded with ./ */
       FindFile( fullPath, currDirFilename, searchPaths );
-      pcu_check_true( 0 == strcmp( fullPath, currDirFilename ));
+      pcu_check_streq( fullPath, currDirFilename );
 
       FindFile( fullPath, "currDirTest.xml", searchPaths );
-      pcu_check_true( 0 == strcmp( fullPath, currDirFilename ));
+      pcu_check_streq( fullPath, currDirFilename );
       
       FindFile( fullPath, "subDirTest.xml", searchPaths );
-      pcu_check_true( 0 == strcmp( fullPath, subDirFilename ));
+      pcu_check_streq( fullPath, subDirFilename );
       
       FindFile( fullPath, "nofile.man", searchPaths );
-      pcu_check_true( 0 == strcmp( fullPath, "" ));
+      pcu_check_streq( fullPath, "" );
       
       FindFile( fullPath, "/Users/luke/Projects/StGermain/env_vars", searchPaths );
-      pcu_check_true( 0 == strcmp( fullPath, "" ));
+      pcu_check_streq( fullPath, "" );
    }
 
    if (data->rank==0) {

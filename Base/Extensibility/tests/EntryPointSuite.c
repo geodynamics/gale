@@ -124,12 +124,12 @@ void EntryPointSuite_TestAppendPrepend( EntryPointSuiteData* data ) {
    /* TestHook1, TestHook0 */
 
    pcu_check_true( data->ep->hooks->count == 2 );
-   pcu_check_true( 0 == strcmp( data->ep->hooks->data[0]->name, "TestHook1" ) );
+   pcu_check_streq( data->ep->hooks->data[0]->name, "TestHook1" );
    pcu_check_true( ((Hook*)data->ep->hooks->data[0])->funcPtr == TestHook1 );
-   pcu_check_true( 0 == strcmp( data->ep->hooks->data[1]->name, "TestHook0" ) );
+   pcu_check_streq( data->ep->hooks->data[1]->name, "TestHook0" );
    pcu_check_true( ((Hook*)data->ep->hooks->data[1])->funcPtr == TestHook0 );
    for (ii=0; ii < data->ep->hooks->count; ii++ ) {
-      pcu_check_true( 0 == strcmp( ((Hook*)data->ep->hooks->data[ii])->addedBy, "testCode" ) );
+      pcu_check_streq( ((Hook*)data->ep->hooks->data[ii])->addedBy, "testCode" );
    }
 }
 
@@ -149,15 +149,15 @@ void EntryPointSuite_TestInsertBeforeAfterReplace( EntryPointSuiteData* data ) {
    /* TestHook4, TestHook6, TestHook2, TestHook7, TestHook3 */
 
    pcu_check_true( data->ep->hooks->count == 5 );
-   pcu_check_true( 0 == strcmp( data->ep->hooks->data[0]->name, "TestHook4" ) );
+   pcu_check_streq( data->ep->hooks->data[0]->name, "TestHook4" );
    pcu_check_true( ((Hook*)data->ep->hooks->data[0])->funcPtr == TestHook4 );
-   pcu_check_true( 0 == strcmp( data->ep->hooks->data[1]->name, "TestHook6" ) );
+   pcu_check_streq( data->ep->hooks->data[1]->name, "TestHook6" );
    pcu_check_true( ((Hook*)data->ep->hooks->data[1])->funcPtr == TestHook6 );
-   pcu_check_true( 0 == strcmp( data->ep->hooks->data[2]->name, "TestHook2" ) );
+   pcu_check_streq( data->ep->hooks->data[2]->name, "TestHook2" );
    pcu_check_true( ((Hook*)data->ep->hooks->data[2])->funcPtr == TestHook2 );
-   pcu_check_true( 0 == strcmp( data->ep->hooks->data[3]->name, "TestHook7" ) );
+   pcu_check_streq( data->ep->hooks->data[3]->name, "TestHook7" );
    pcu_check_true( ((Hook*)data->ep->hooks->data[3])->funcPtr == TestHook7 );
-   pcu_check_true( 0 == strcmp( data->ep->hooks->data[4]->name, "TestHook3" ) );
+   pcu_check_streq( data->ep->hooks->data[4]->name, "TestHook3" );
    pcu_check_true( ((Hook*)data->ep->hooks->data[4])->funcPtr == TestHook3 );
 }
 
@@ -174,17 +174,17 @@ void EntryPointSuite_TestAlwaysFirstLast( EntryPointSuiteData* data ) {
    /* TestHook0 - TestHook1, TestHook9 - TestHook8 */
 
    pcu_check_true( data->ep->hooks->count == 4 );
-   pcu_check_true( 0 == strcmp( data->ep->hooks->data[0]->name, "TestHook0" ) );
+   pcu_check_streq( data->ep->hooks->data[0]->name, "TestHook0" );
    pcu_check_true( ((Hook*)data->ep->hooks->data[0])->funcPtr == TestHook0 );
-   pcu_check_true( 0 == strcmp( data->ep->hooks->data[1]->name, "TestHook1" ) );
+   pcu_check_streq( data->ep->hooks->data[1]->name, "TestHook1" );
    pcu_check_true( ((Hook*)data->ep->hooks->data[1])->funcPtr == TestHook1 );
-   pcu_check_true( 0 == strcmp( data->ep->hooks->data[2]->name, "TestHook9" ) );
+   pcu_check_streq( data->ep->hooks->data[2]->name, "TestHook9" );
    pcu_check_true( ((Hook*)data->ep->hooks->data[2])->funcPtr == TestHook9 );
-   pcu_check_true( 0 == strcmp( data->ep->hooks->data[3]->name, "TestHook8" ) );
+   pcu_check_streq( data->ep->hooks->data[3]->name, "TestHook8" );
    pcu_check_true( ((Hook*)data->ep->hooks->data[3])->funcPtr == TestHook8 );
-   pcu_check_true( 0 == strcmp( data->ep->alwaysFirstHook->name, "TestHook0" ) );
+   pcu_check_streq( data->ep->alwaysFirstHook->name, "TestHook0" );
    pcu_check_true( ((Hook*)data->ep->alwaysFirstHook)->funcPtr == TestHook0 );
-   pcu_check_true( 0 == strcmp( data->ep->alwaysLastHook->name, "TestHook8" ) );
+   pcu_check_streq( data->ep->alwaysLastHook->name, "TestHook8" );
    pcu_check_true( ((Hook*)data->ep->alwaysLastHook)->funcPtr == TestHook8 );
 }
 
@@ -197,7 +197,7 @@ void EntryPointSuite_TestReplaceAll( EntryPointSuiteData* data ) {
    EntryPoint_ReplaceAll( data->ep, "TestHook2", (void*)TestHook2, "testCode" );
    /* TestHook2 */
    pcu_check_true( data->ep->hooks->count == 1 );
-   pcu_check_true( 0 == strcmp( data->ep->hooks->data[0]->name, "TestHook2" ) );
+   pcu_check_streq( data->ep->hooks->data[0]->name, "TestHook2" );
    pcu_check_true( ((Hook*)data->ep->hooks->data[0])->funcPtr == TestHook2 );
 }
 
@@ -263,12 +263,12 @@ void EntryPointSuite_TestPrintConcise( EntryPointSuiteData* data ) {
       testFile = fopen( testFilename, "r" );
       pcu_check_true( fgets( readLine, MAX_LINE_SIZE, testFile ) );
       sprintf( expString, "\tEP: %s\n", data->ep->name );
-      pcu_check_true( 0 == strcmp( readLine, expString ) );
+      pcu_check_streq( readLine, expString );
 
       for (hookIndex = 0; hookIndex < data->ep->hooks->count; hookIndex++ ) {
          pcu_check_true( fgets( readLine, MAX_LINE_SIZE, testFile ) );
          sprintf( expString, "\t\tH: \"TestHook%u\" (%s)\n", hookIndex, "testCode" );
-         pcu_check_true( 0 == strcmp( readLine, expString ) );
+         pcu_check_streq( readLine, expString );
       }
 
       fclose( testFile );

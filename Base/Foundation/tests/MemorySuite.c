@@ -67,12 +67,12 @@ void MemorySuite_Test2DArray( MemorySuiteData* data ) {
    pcu_check_true( NULL != array2d );
    #ifdef MEMORY_STATS
    pcu_check_true( Memory_IsAllocated( array2d ) == True );
-   memoryPtr = Memory_Find_Pointer( array2d );
+   memoryPtr = (MemoryPointer*)Memory_Find_Pointer( array2d );
    pcu_check_true( NULL != memoryPtr );
    pcu_check_true( memoryPtr->allocType == MEMORY_2DARRAY );
-   pcu_check_true( 0 == strcmp( memoryPtr->type->value, "double" ) );
-   pcu_check_true( 0 == strcmp( memoryPtr->file->value, "StGermain/Base/Foundation/tests/MemorySuite.c" ) );
-   pcu_check_true( 0 == strcmp( memoryPtr->func->value, __func__ ) );
+   pcu_check_streq( memoryPtr->type->value, "double" );
+   pcu_check_streq( memoryPtr->file->value, "StGermain/Base/Foundation/tests/MemorySuite.c" );
+   pcu_check_streq( memoryPtr->func->value, __func__ );
    pcu_check_true( memoryPtr->itemSize == sizeof(double));
    pcu_check_true( memoryPtr->totalSize == sizeof(double)*2*3 + sizeof(double*)*2 );
    pcu_check_true( memoryPtr->length.twoD[0] == 2 );

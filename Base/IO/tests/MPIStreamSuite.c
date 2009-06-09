@@ -106,7 +106,7 @@ void MPIStreamSuite_TestWriteAllProcessors( MPIStreamSuiteData* data ) {
    }
 
    pcu_check_true( fgets( outLine, MAXLINE, testMPIFile ));
-   pcu_check_true( 0 == strcmp( outLine, compString ));
+   pcu_check_streq( outLine, compString );
    fclose( testMPIFile );
    /* Make sure not to delete the file until all processors have read from it */
    MPI_Barrier( data->comm );
@@ -168,7 +168,7 @@ void MPIStreamSuite_TestPrintWithOffset( MPIStreamSuiteData* data ) {
    }
 
    pcu_check_true( fgets( outLine, MAXLINE, testMPIFile ));
-   pcu_check_true( 0 == strcmp( outLine, compString ) );
+   pcu_check_streq( outLine, compString );
    fclose( testMPIFile );
    /* Make sure not to delete the file until all processors have read from it */
    MPI_Barrier( data->comm );

@@ -162,7 +162,7 @@ void DictionarySuite_TestCreateValues( DictionarySuiteData* data ) {
    /* Don't use the pre-created test values. Want to do a very fundamental test here */
    dev = Dictionary_Entry_Value_FromString( "hello" );
    pcu_check_true( Dictionary_Entry_Value_Type_String == dev->type );
-   pcu_check_true( 0 == strcmp( "hello", dev->as.typeString ) );
+   pcu_check_streq( "hello", dev->as.typeString );
    Dictionary_Entry_Value_Delete( dev );
    dev = Dictionary_Entry_Value_FromDouble( 45.567 );
    pcu_check_true( Dictionary_Entry_Value_Type_Double == dev->type );
@@ -318,10 +318,8 @@ void DictionarySuite_TestShortcuts( DictionarySuiteData* data ) {
     *  the value of the existing key should be returned, and the default passed in
     *  ignored. However if the given key _doesn't_ exist, the default should be 
     *  returned, and a new entry with the given key added to the dict. */
-   pcu_check_true( 0 == strcmp( data->testDD->testString,
-      Dictionary_GetString_WithDefault( data->dict, "test_cstring", "heya" ) ) );
-   pcu_check_true( 0 == strcmp( "heya",
-      Dictionary_GetString_WithDefault( data->dict, "test_cstring2", "heya" ) ) );
+   pcu_check_streq( data->testDD->testString, Dictionary_GetString_WithDefault( data->dict, "test_cstring", "heya" ) );
+   pcu_check_streq( "heya", Dictionary_GetString_WithDefault( data->dict, "test_cstring2", "heya" ) );
    pcu_check_true( NULL != Dictionary_Get( data->dict, "test_cstring2" ) );
    pcu_check_true( data->testDD->testDouble =
       Dictionary_GetDouble_WithDefault( data->dict, "test_double", 2.8 ) );
@@ -349,12 +347,10 @@ void DictionarySuite_TestShortcuts( DictionarySuiteData* data ) {
       Dictionary_GetBool_WithDefault( data->dict, "test_bool2", False ) );
    pcu_check_true( NULL != Dictionary_Get( data->dict, "test_bool2" ) );
 
-   pcu_check_true( 0 == strcmp( data->testDD->testString,
-      Dictionary_GetString_WithPrintfDefault( data->dict, "test_cstring",
-         "heya%s%u", "hey", 3 ) ) );
-   pcu_check_true( 0 == strcmp( "heyahey3",
-      Dictionary_GetString_WithPrintfDefault( data->dict, "test_cstring3",
-         "heya%s%u", "hey", 3 ) ) );
+   pcu_check_streq( data->testDD->testString, 
+      Dictionary_GetString_WithPrintfDefault( data->dict, "test_cstring", "heya%s%u", "hey", 3 ) );
+   pcu_check_streq( "heyahey3",
+      Dictionary_GetString_WithPrintfDefault( data->dict, "test_cstring3", "heya%s%u", "hey", 3 ) );
    pcu_check_true( NULL != Dictionary_Get( data->dict, "test_cstring3" ) );
 }
 

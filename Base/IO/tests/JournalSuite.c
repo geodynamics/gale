@@ -110,24 +110,24 @@ void JournalSuite_TestRegister( JournalSuiteData* data ) {
 
    /* Check the streams themselves were created properly */
    /* Including Louis' requirement that they default to have printingRank 0 */
-   pcu_check_true( 0 == strcmp( myInfo->name, "MyInfo" ) );
+   pcu_check_streq( myInfo->name, "MyInfo" );
    pcu_check_true( myInfo->_parent == Journal_GetTypedStream( Info_Type ) );
    pcu_check_true( myInfo->_children->count == 0 );
    pcu_check_true( 0 == Stream_GetPrintingRank( myInfo ));
-   pcu_check_true( 0 == strcmp( myDebug->name, "MyDebug" ) );
+   pcu_check_streq( myDebug->name, "MyDebug" );
    pcu_check_true( myDebug->_parent == Journal_GetTypedStream( Debug_Type ) );
    pcu_check_true( myDebug->_children->count == 0 );
    pcu_check_true( 0 == Stream_GetPrintingRank( myDebug ));
-   pcu_check_true( 0 == strcmp( myDump->name, "MyDump" ) );
+   pcu_check_streq( myDump->name, "MyDump" );
    pcu_check_true( myDump->_parent == Journal_GetTypedStream( Dump_Type ) );
    pcu_check_true( myDump->_children->count == 0 );
-   pcu_check_true( 0 == strcmp( myError->name, "MyError" ) );
+   pcu_check_streq( myError->name, "MyError" );
    pcu_check_true( myError->_parent == Journal_GetTypedStream( Error_Type ) );
    pcu_check_true( myError->_children->count == 0 );
    pcu_check_true( STREAM_ALL_RANKS == Stream_GetPrintingRank( myError ));
    pcu_check_true( myError->_formatterCount == 1 );
    pcu_check_true( myError->_formatter[0]->type == RankFormatter_Type );
-   pcu_check_true( 0 == strcmp( allNew->name, "allNew" ) );
+   pcu_check_streq( allNew->name, "allNew" );
    pcu_check_true( allNew->_parent == Journal_GetTypedStream( "New_Type" ) );
    pcu_check_true( allNew->_children->count == 0 );
    pcu_check_true( STREAM_ALL_RANKS == Stream_GetPrintingRank( allNew ));
@@ -176,14 +176,14 @@ void JournalSuite_TestPrintBasics( JournalSuiteData* data ) {
 
    Journal_Printf( myInfo, "%s\n", "HELLOInfo" );
    pcu_check_true(         fgets( outLine, MAXLINE, data->testStdOutFile ));
-   pcu_check_true( 0 == strcmp( outLine, "HELLOInfo\n" ));
+   pcu_check_streq( outLine, "HELLOInfo\n" );
    Journal_Printf( myDebug, "%s\n", "WORLDDebug" );
    pcu_check_true( NULL == fgets( outLine, MAXLINE, data->testStdErrFile ));
    Journal_Printf( myDump, "%s\n", "HELLODump" );
    pcu_check_true( NULL == fgets( outLine, MAXLINE, data->testStdOutFile ));
    Journal_Printf( myError, "%s\n", "WORLDError" );
    pcu_check_true(         fgets( outLine, MAXLINE, data->testStdErrFile ));
-   pcu_check_true( 0 == strcmp( outLine, "WORLDError\n" ));
+   pcu_check_streq( outLine, "WORLDError\n" );
 
    Journal_Enable_NamedStream( Info_Type, "MyInfo", False );
    Journal_Printf( myInfo, "%s\n", "HELLOInfo2" );
@@ -197,7 +197,7 @@ void JournalSuite_TestPrintBasics( JournalSuiteData* data ) {
    pcu_check_true( NULL == fgets( outLine, MAXLINE, data->testStdOutFile ));
    Stream_Flush( Journal_GetTypedStream(Dump_Type) );
    pcu_check_true(         fgets( outLine, MAXLINE, data->testStdOutFile ));
-   pcu_check_true( 0 == strcmp( outLine, "HELLODump2\n" ));
+   pcu_check_streq( outLine, "HELLODump2\n" );
    
    stJournal->enable = False;
    Journal_Printf( myDump, "%s\n", "HELLODump3" );
@@ -213,7 +213,7 @@ void JournalSuite_TestPrintfL( JournalSuiteData* data ) {
    myStream = Journal_Register( InfoStream_Type, "myComponent");
    Journal_PrintfL( myStream, 1, "Hello\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, data->testStdOutFile ));
-   pcu_check_true( 0 == strcmp( outLine, "Hello\n" ));
+   pcu_check_streq( outLine, "Hello\n" );
    /* We should get a blank line, since level 2 printing not enabled by default */
    Journal_PrintfL( myStream, 2, "Hello\n" );
    pcu_check_true( NULL ==fgets( outLine, MAXLINE, data->testStdOutFile ));
@@ -221,7 +221,7 @@ void JournalSuite_TestPrintfL( JournalSuiteData* data ) {
    Stream_SetLevel( myStream, 2 );
    Journal_PrintfL( myStream, 2, "Hello\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, data->testStdOutFile ));
-   pcu_check_true( 0 == strcmp( outLine, "Hello\n" ));
+   pcu_check_streq( outLine, "Hello\n" );
 }
 
 
@@ -234,7 +234,7 @@ void JournalSuite_TestDPrintf( JournalSuiteData* data ) {
    Journal_DPrintf( myInfo, "DPrintf\n" );
    #ifdef DEBUG
    pcu_check_true(         fgets( outLine, MAXLINE, data->testStdOutFile ));
-   pcu_check_true( 0 == strcmp( outLine, "DPrintf\n" ));
+   pcu_check_streq( outLine, "DPrintf\n" );
    #else
    pcu_check_true( NULL == fgets( outLine, MAXLINE, data->testStdOutFile ));
    #endif
@@ -264,17 +264,17 @@ void JournalSuite_TestPrintChildStreams( JournalSuiteData* data ) {
    Journal_Printf( childStream1, "1 with no indent\n" );
    Journal_Printf( childStream2, "2 with no indent\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, data->testStdOutFile ));
-   pcu_check_true( 0 == strcmp( outLine, "0 no indent\n" ));
+   pcu_check_streq( outLine, "0 no indent\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, data->testStdOutFile ));
-   pcu_check_true( 0 == strcmp( outLine, "\t1 with 1 indent\n" ));
+   pcu_check_streq( outLine, "\t1 with 1 indent\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, data->testStdOutFile ));
-   pcu_check_true( 0 == strcmp( outLine, "\t\t2 with 2 indent\n" ));
+   pcu_check_streq( outLine, "\t\t2 with 2 indent\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, data->testStdOutFile ));
-   pcu_check_true( 0 == strcmp( outLine, "\t2 with 1 indent\n" ));
+   pcu_check_streq( outLine, "\t2 with 1 indent\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, data->testStdOutFile ));
-   pcu_check_true( 0 == strcmp( outLine, "1 with no indent\n" ));
+   pcu_check_streq( outLine, "1 with no indent\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, data->testStdOutFile ));
-   pcu_check_true( 0 == strcmp( outLine, "2 with no indent\n" ));
+   pcu_check_streq( outLine, "2 with no indent\n" );
 }
 
 
@@ -352,9 +352,9 @@ void JournalSuite_TestReadFromDictionary( JournalSuiteData* data ) {
       testNewTypeFile1 = fopen( testNewTypeFilename1, "r" );
       testNewTypeFile2 = fopen( testNewTypeFilename2, "r" );
       pcu_check_true(         fgets( outLine, MAXLINE, testNewTypeFile1 ));
-      pcu_check_true( 0 == strcmp( outLine, "yay!\n" ));
+      pcu_check_streq( outLine, "yay!\n" );
       pcu_check_true(         fgets( outLine, MAXLINE, testNewTypeFile2 ));
-      pcu_check_true( 0 == strcmp( outLine, "double yay!\n" ));
+      pcu_check_streq( outLine, "double yay!\n" );
 
       propTest1 = Journal_Register( Info_Type, "propertiestest1" );
       propTest2 = Journal_Register( Info_Type, "propertiestest2" );
@@ -402,57 +402,57 @@ void JournalSuite_TestShortcuts( JournalSuiteData* data ) {
    stringLengthTestFile = fopen( stringLengthTestFilename, "r" );
 
    pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
-   pcu_check_true( 0 == strcmp( outLine, "\n" )); 
+   pcu_check_streq( outLine, "\n" ); 
    pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
-   pcu_check_true( 0 == strcmp( outLine, "\n" ));
+   pcu_check_streq( outLine, "\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
-   pcu_check_true( 0 == strcmp( outLine, "h\n" ));
+   pcu_check_streq( outLine, "h\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
-   pcu_check_true( 0 == strcmp( outLine, "h.\n" ));
+   pcu_check_streq( outLine, "h.\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
-   pcu_check_true( 0 == strcmp( outLine, "h..\n" ));
+   pcu_check_streq( outLine, "h..\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
-   pcu_check_true( 0 == strcmp( outLine, "h...\n" ));
+   pcu_check_streq( outLine, "h...\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
-   pcu_check_true( 0 == strcmp( outLine, "h...o\n" ));
+   pcu_check_streq( outLine, "h...o\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
-   pcu_check_true( 0 == strcmp( outLine, "he...o\n" ));
+   pcu_check_streq( outLine, "he...o\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
-   pcu_check_true( 0 == strcmp( outLine, "he...Do\n" ));
+   pcu_check_streq( outLine, "he...Do\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
-   pcu_check_true( 0 == strcmp( outLine, "hel...Do\n" ));
+   pcu_check_streq( outLine, "hel...Do\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
-   pcu_check_true( 0 == strcmp( outLine, "hel...uDo\n" ));
+   pcu_check_streq( outLine, "hel...uDo\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
-   pcu_check_true( 0 == strcmp( outLine, "hell...uDo\n" ));
+   pcu_check_streq( outLine, "hell...uDo\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
-   pcu_check_true( 0 == strcmp( outLine, "hell...ouDo\n" ));
+   pcu_check_streq( outLine, "hell...ouDo\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
-   pcu_check_true( 0 == strcmp( outLine, "hello...ouDo\n" ));
+   pcu_check_streq( outLine, "hello...ouDo\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
-   pcu_check_true( 0 == strcmp( outLine, "hello...YouDo\n" ));
+   pcu_check_streq( outLine, "hello...YouDo\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
-   pcu_check_true( 0 == strcmp( outLine, "helloW...YouDo\n" ));
+   pcu_check_streq( outLine, "helloW...YouDo\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
-   pcu_check_true( 0 == strcmp( outLine, "helloW...oYouDo\n" ));
+   pcu_check_streq( outLine, "helloW...oYouDo\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
-   pcu_check_true( 0 == strcmp( outLine, "helloWo...oYouDo\n" ));
+   pcu_check_streq( outLine, "helloWo...oYouDo\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
-   pcu_check_true( 0 == strcmp( outLine, "helloWo...DoYouDo\n" ));
+   pcu_check_streq( outLine, "helloWo...DoYouDo\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
-   pcu_check_true( 0 == strcmp( outLine, "helloWor...DoYouDo\n" ));
+   pcu_check_streq( outLine, "helloWor...DoYouDo\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
-   pcu_check_true( 0 == strcmp( outLine, "helloWor...wDoYouDo\n" ));
+   pcu_check_streq( outLine, "helloWor...wDoYouDo\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
-   pcu_check_true( 0 == strcmp( outLine, "helloWorldHowDoYouDo\n" ));
+   pcu_check_streq( outLine, "helloWorldHowDoYouDo\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
-   pcu_check_true( 0 == strcmp( outLine, " helloWorldHowDoYouDo\n" ));
+   pcu_check_streq( outLine, " helloWorldHowDoYouDo\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
-   pcu_check_true( 0 == strcmp( outLine, "  helloWorldHowDoYouDo\n" ));
+   pcu_check_streq( outLine, "  helloWorldHowDoYouDo\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
-   pcu_check_true( 0 == strcmp( outLine, "   helloWorldHowDoYouDo\n" ));
+   pcu_check_streq( outLine, "   helloWorldHowDoYouDo\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, stringLengthTestFile ));
-   pcu_check_true( 0 == strcmp( outLine, "    helloWorldHowDoYouDo\n" ));
+   pcu_check_streq( outLine, "    helloWorldHowDoYouDo\n" );
 
    fclose( stringLengthTestFile );
    remove( stringLengthTestFilename );
@@ -472,21 +472,21 @@ void JournalSuite_TestShortcuts( JournalSuiteData* data ) {
    shortcutTestFile = fopen( shortcutTestFilename, "r\n" );
 
    pcu_check_true(         fgets( outLine, MAXLINE, shortcutTestFile ));
-   pcu_check_true( 0 == strcmp( outLine, "string = helloWorldHowDoYouDo\n" ));
+   pcu_check_streq( outLine, "string = helloWorldHowDoYouDo\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, shortcutTestFile ));
-   pcu_check_true( 0 == strcmp( outLine, "doubleValue = 3.142e+23\n" ));
+   pcu_check_streq( outLine, "doubleValue = 3.142e+23\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, shortcutTestFile ));
-   pcu_check_true( 0 == strcmp( outLine, "floatValue = 2.1734\n" ));
+   pcu_check_streq( outLine, "floatValue = 2.1734\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, shortcutTestFile ));
-   pcu_check_true( 0 == strcmp( outLine, "intValue = 3\n" ));
+   pcu_check_streq( outLine, "intValue = 3\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, shortcutTestFile ));
-   pcu_check_true( 0 == strcmp( outLine, "uintValue = 3980\n" ));
+   pcu_check_streq( outLine, "uintValue = 3980\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, shortcutTestFile ));
-   pcu_check_true( 0 == strcmp( outLine, "charValue = V\n" ));
+   pcu_check_streq( outLine, "charValue = V\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, shortcutTestFile ));
-   pcu_check_true( 0 == strcmp( outLine, "doubleArray = { 10.23, 393.1, -89, 1231 }\n" ));
+   pcu_check_streq( outLine, "doubleArray = { 10.23, 393.1, -89, 1231 }\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, shortcutTestFile ));
-   pcu_check_true( 0 == strcmp( outLine, "uintArray = { 10, 2021, 231, 2, 3, 4, 55 }\n" ));
+   pcu_check_streq( outLine, "uintArray = { 10, 2021, 231, 2, 3, 4, 55 }\n" );
 
    fclose( shortcutTestFile );
    remove( shortcutTestFilename );

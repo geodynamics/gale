@@ -121,7 +121,9 @@ void HierarchyTableSuite_TestPrintParents( HierarchyTableSuiteData* data ) {
    Stream*           stream = Journal_Register( Info_Type, "testStream" );
    const char* const testFilename = "./testHTable-PrintParents.txt";
 
-   Stream_RedirectFile( stream, testFilename );
+   if (data->rank==0) {
+      Stream_RedirectFile( stream, testFilename );
+   }
 
    HierarchyTable_PrintParents( data->hTable, A_Type, stream );
    HierarchyTable_PrintParents( data->hTable, B_Type, stream );
@@ -135,27 +137,34 @@ void HierarchyTableSuite_TestPrintParents( HierarchyTableSuiteData* data ) {
       FILE*             testFile = NULL;
       #define           MAXLINE 1000
       char              outLines[100][MAXLINE];
-      Index             ii;
+      Index             ii=0;
+      Index             expectedNumLines = 13;
+      char*             fGetsResult;
 
       testFile = fopen( testFilename, "r" );
-      while( fgets( outLines[ii++], MAXLINE, testFile ) ) {};
+      for( ii=0; ii<expectedNumLines; ii++ ) {
+         fGetsResult = fgets( outLines[ii], MAXLINE, testFile );
+         pcu_check_true( fGetsResult );
+         if (NULL == fGetsResult) break;
+      }
+      pcu_check_true( ii == expectedNumLines );
       ii = 0;
-      pcu_check_true( 0 == strcmp( outLines[ii++], "Type 'A' inherits from:\n" ));
-      pcu_check_true( 0 == strcmp( outLines[ii++], "Type 'B' inherits from:\n" ));
-      pcu_check_true( 0 == strcmp( outLines[ii++], "\tA\n" ));
-      pcu_check_true( 0 == strcmp( outLines[ii++], "Type 'C' inherits from:\n" ));
-      pcu_check_true( 0 == strcmp( outLines[ii++], "\tB\n" ));
-      pcu_check_true( 0 == strcmp( outLines[ii++], "\tA\n" ));
-      pcu_check_true( 0 == strcmp( outLines[ii++], "Type 'D' inherits from:\n" ));
-      pcu_check_true( 0 == strcmp( outLines[ii++], "\tC\n" ));
-      pcu_check_true( 0 == strcmp( outLines[ii++], "\tB\n" ));
-      pcu_check_true( 0 == strcmp( outLines[ii++], "\tA\n" ));
-      pcu_check_true( 0 == strcmp( outLines[ii++], "Type 'AA' inherits from:\n" ));
-      pcu_check_true( 0 == strcmp( outLines[ii++], "Type 'BB' inherits from:\n" ));
-      pcu_check_true( 0 == strcmp( outLines[ii++], "\tAA\n" ));
+      pcu_check_streq( outLines[ii++], "Type 'A' inherits from:\n" );
+      pcu_check_streq( outLines[ii++], "Type 'B' inherits from:\n" );
+      pcu_check_streq( outLines[ii++], "\tA\n" );
+      pcu_check_streq( outLines[ii++], "Type 'C' inherits from:\n" );
+      pcu_check_streq( outLines[ii++], "\tB\n" );
+      pcu_check_streq( outLines[ii++], "\tA\n" );
+      pcu_check_streq( outLines[ii++], "Type 'D' inherits from:\n" );
+      pcu_check_streq( outLines[ii++], "\tC\n" );
+      pcu_check_streq( outLines[ii++], "\tB\n" );
+      pcu_check_streq( outLines[ii++], "\tA\n" );
+      pcu_check_streq( outLines[ii++], "Type 'AA' inherits from:\n" );
+      pcu_check_streq( outLines[ii++], "Type 'BB' inherits from:\n" );
+      pcu_check_streq( outLines[ii++], "\tAA\n" );
 
       fclose( testFile );
-      remove( testFilename );
+      //remove( testFilename );
    }
 }
    
@@ -164,7 +173,9 @@ void HierarchyTableSuite_TestPrintChildren( HierarchyTableSuiteData* data ) {
    Stream*     stream = Journal_Register( Info_Type, "testStream" );
    const char* const testFilename = "./testHTable-PrintChildren.txt";
 
-   Stream_RedirectFile( stream, testFilename );
+   if (data->rank==0) {
+      Stream_RedirectFile( stream, testFilename );
+   }
 
    HierarchyTable_PrintChildren( data->hTable, A_Type, stream );
    HierarchyTable_PrintChildren( data->hTable, B_Type, stream );
@@ -178,27 +189,34 @@ void HierarchyTableSuite_TestPrintChildren( HierarchyTableSuiteData* data ) {
       FILE*             testFile = NULL;
       #define           MAXLINE 1000
       char              outLines[100][MAXLINE];
-      Index             ii;
+      Index             ii=0;
+      Index             expectedNumLines = 13;
+      char*             fGetsResult;
 
       testFile = fopen( testFilename, "r" );
-      while( fgets( outLines[ii++], MAXLINE, testFile ) ) {};
+      for( ii=0; ii<expectedNumLines; ii++ ) {
+         fGetsResult = fgets( outLines[ii], MAXLINE, testFile );
+         pcu_check_true( fGetsResult );
+         if (NULL == fGetsResult) break;
+      }
+      pcu_check_true( ii == expectedNumLines );
       ii = 0;
-      pcu_check_true( 0 == strcmp( outLines[ii++], "A \t\t\t (Abstract Class)\n" ));
-      pcu_check_true( 0 == strcmp( outLines[ii++], "\tB \t\t\t (Abstract Class)\n" ));
-      pcu_check_true( 0 == strcmp( outLines[ii++], "\t\tC \t\t\t (Abstract Class)\n" ));
-      pcu_check_true( 0 == strcmp( outLines[ii++], "\t\t\tD \t\t\t (Abstract Class)\n" ));
-      pcu_check_true( 0 == strcmp( outLines[ii++], "B \t\t\t (Abstract Class)\n" ));
-      pcu_check_true( 0 == strcmp( outLines[ii++], "\tC \t\t\t (Abstract Class)\n" ));
-      pcu_check_true( 0 == strcmp( outLines[ii++], "\t\tD \t\t\t (Abstract Class)\n" ));
-      pcu_check_true( 0 == strcmp( outLines[ii++], "C \t\t\t (Abstract Class)\n" ));
-      pcu_check_true( 0 == strcmp( outLines[ii++], "\tD \t\t\t (Abstract Class)\n" ));
-      pcu_check_true( 0 == strcmp( outLines[ii++], "D \t\t\t (Abstract Class)\n" ));
-      pcu_check_true( 0 == strcmp( outLines[ii++], "AA \t\t\t (Abstract Class)\n" ));
-      pcu_check_true( 0 == strcmp( outLines[ii++], "\tBB \t\t\t (Abstract Class)\n" ));
-      pcu_check_true( 0 == strcmp( outLines[ii++], "BB \t\t\t (Abstract Class)\n" ));
+      pcu_check_streq( outLines[ii++], "A \t\t\t (Abstract Class)\n" );
+      pcu_check_streq( outLines[ii++], "\tB \t\t\t (Abstract Class)\n" );
+      pcu_check_streq( outLines[ii++], "\t\tC \t\t\t (Abstract Class)\n" );
+      pcu_check_streq( outLines[ii++], "\t\t\tD \t\t\t (Abstract Class)\n" );
+      pcu_check_streq( outLines[ii++], "B \t\t\t (Abstract Class)\n" );
+      pcu_check_streq( outLines[ii++], "\tC \t\t\t (Abstract Class)\n" );
+      pcu_check_streq( outLines[ii++], "\t\tD \t\t\t (Abstract Class)\n" );
+      pcu_check_streq( outLines[ii++], "C \t\t\t (Abstract Class)\n" );
+      pcu_check_streq( outLines[ii++], "\tD \t\t\t (Abstract Class)\n" );
+      pcu_check_streq( outLines[ii++], "D \t\t\t (Abstract Class)\n" );
+      pcu_check_streq( outLines[ii++], "AA \t\t\t (Abstract Class)\n" );
+      pcu_check_streq( outLines[ii++], "\tBB \t\t\t (Abstract Class)\n" );
+      pcu_check_streq( outLines[ii++], "BB \t\t\t (Abstract Class)\n" );
 
       fclose( testFile );
-      remove( testFilename );
+      //remove( testFilename );
    }
 }
 

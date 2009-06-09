@@ -81,23 +81,23 @@ void RankFormatterSuite_TestPrintWithRank( RankFormatterSuiteData* data ) {
    Journal_Printf( myInfo, "Hello world\n" );
    sprintf( expLine, "%sHello world\n", prefixStr );
    pcu_check_true(         fgets( outLine, MAXLINE, testOutFile ));
-   pcu_check_true( 0 == strcmp( outLine, expLine ));
+   pcu_check_streq( outLine, expLine );
    Journal_Printf( myInfo, "\n\n\n" );
    sprintf( expLine, "%s\n", prefixStr );
    for (ii=0; ii<3; ii++ ) {
       pcu_check_true(         fgets( outLine, MAXLINE, testOutFile ));
-      pcu_check_true( 0 == strcmp( outLine, expLine ));
+      pcu_check_streq( outLine, expLine );
    }
    Journal_Printf( myInfo, "abc\ndef\nghi\n" );
    sprintf( expLine, "%sabc\n", prefixStr );
    pcu_check_true(         fgets( outLine, MAXLINE, testOutFile ));
-   pcu_check_true( 0 == strcmp( outLine, expLine ));
+   pcu_check_streq( outLine, expLine );
    sprintf( expLine, "%sdef\n", prefixStr );
    pcu_check_true(         fgets( outLine, MAXLINE, testOutFile ));
-   pcu_check_true( 0 == strcmp( outLine, expLine ));
+   pcu_check_streq( outLine, expLine );
    sprintf( expLine, "%sghi\n", prefixStr );
    pcu_check_true(         fgets( outLine, MAXLINE, testOutFile ));
-   pcu_check_true( 0 == strcmp( outLine, expLine ));
+   pcu_check_streq( outLine, expLine );
 
    fclose( testOutFile );
    remove( testOutFilename );

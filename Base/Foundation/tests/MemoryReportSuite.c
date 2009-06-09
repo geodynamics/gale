@@ -289,31 +289,31 @@ void MemoryReportSuite_TestReportPrintsOne( MemoryReportSuiteData* data ) {
 
       /* Due to sorting, order should be: bytes, index, strA, strB, strC */
       fscanf( memoryReportOutputFile, "%s %u %u %u %u\n", valString, &timesAlloc, &timesFree, &currBytes, &totalBytes ); 
-      pcu_check_true( 0 == strcmp( valString, "Bytes" ) );
+      pcu_check_streq( valString, "Bytes" );
       pcu_check_true( timesAlloc == data->bytes_alloc );
       pcu_check_true( timesFree == 0 );
       pcu_check_true( currBytes == data->bytes_total );
       pcu_check_true( totalBytes == data->bytes_total );
       fscanf( memoryReportOutputFile, "%s %u %u %u %u\n", valString, &timesAlloc, &timesFree, &currBytes, &totalBytes ); 
-      pcu_check_true( 0 == strcmp( valString, "Index" ) );
+      pcu_check_streq( valString, "Index" );
       pcu_check_true( timesAlloc == data->index_alloc );
       pcu_check_true( timesFree == 0 );
       pcu_check_true( currBytes == data->index_total );
       pcu_check_true( totalBytes == data->index_total );
       fscanf( memoryReportOutputFile, "%s %u %u %u %u\n", valString, &timesAlloc, &timesFree, &currBytes, &totalBytes ); 
-      pcu_check_true( 0 == strcmp( valString, "StructA" ) );
+      pcu_check_streq( valString, "StructA" );
       pcu_check_true( timesAlloc == data->strA_alloc );
       pcu_check_true( timesFree == 0 );
       pcu_check_true( currBytes == data->strA_total );
       pcu_check_true( totalBytes == data->strA_total );
       fscanf( memoryReportOutputFile, "%s %u %u %u %u\n", valString, &timesAlloc, &timesFree, &currBytes, &totalBytes ); 
-      pcu_check_true( 0 == strcmp( valString, "StructB" ) );
+      pcu_check_streq( valString, "StructB" );
       pcu_check_true( timesAlloc == data->strB_alloc );
       pcu_check_true( timesFree == 0 );
       pcu_check_true( currBytes == data->strB_total );
       pcu_check_true( totalBytes == data->strB_total );
       fscanf( memoryReportOutputFile, "%s %u %u %u %u\n", valString, &timesAlloc, &timesFree, &currBytes, &totalBytes ); 
-      pcu_check_true( 0 == strcmp( valString, "StructC" ) );
+      pcu_check_streq( valString, "StructC" );
       pcu_check_true( timesAlloc == data->strC_alloc );
       pcu_check_true( timesFree == 0 );
       pcu_check_true( currBytes == data->strC_total );
@@ -357,19 +357,19 @@ void MemoryReportSuite_TestReportPrintsTwo( MemoryReportSuiteData* data ) {
 
       /* Due to sorting, order should be: index, strA, strB, strC */
       fscanf( memoryReportOutputFile, "%s %u %u %u %u\n", valString, &timesAlloc, &timesFree, &currBytes, &totalBytes ); 
-      pcu_check_true( 0 == strcmp( valString, "StructA" ) );
+      pcu_check_streq( valString, "StructA" );
       pcu_check_true( timesAlloc == data->groupTwo_strA_alloc );
       pcu_check_true( timesFree == 0 );
       pcu_check_true( currBytes == data->groupTwo_strA_total );
       pcu_check_true( totalBytes == data->groupTwo_strA_total );
       fscanf( memoryReportOutputFile, "%s %u %u %u %u\n", valString, &timesAlloc, &timesFree, &currBytes, &totalBytes ); 
-      pcu_check_true( 0 == strcmp( valString, "StructB" ) );
+      pcu_check_streq( valString, "StructB" );
       pcu_check_true( timesAlloc == data->groupTwo_strB_alloc );
       pcu_check_true( timesFree == 0 );
       pcu_check_true( currBytes == data->groupTwo_strB_total );
       pcu_check_true( totalBytes == data->groupTwo_strB_total );
       fscanf( memoryReportOutputFile, "%s %u %u %u %u\n", valString, &timesAlloc, &timesFree, &currBytes, &totalBytes ); 
-      pcu_check_true( 0 == strcmp( valString, "StructC" ) );
+      pcu_check_streq( valString, "StructC" );
       pcu_check_true( timesAlloc == data->groupTwo_strC_alloc );
       pcu_check_true( timesFree == 0 );
       pcu_check_true( currBytes == data->groupTwo_strC_total );
@@ -416,19 +416,19 @@ void MemoryReportSuite_TestReportPrintsThree( MemoryReportSuiteData* data ) {
 
       /* Due to sorting, order should be: allocBytes, allocGroupOne, allocGroupTwo */
       fscanf( memoryReportOutputFile, "%s %u %u %u %u\n", valString, &timesAlloc, &timesFree, &currBytes, &totalBytes ); 
-      pcu_check_true( 0 == strcmp( valString, "MemoryReportSuite_AllocBytes" ) );
+      pcu_check_streq( valString, "MemoryReportSuite_AllocBytes" );
       pcu_check_true( timesAlloc == data->bytesFunc_alloc );
       pcu_check_true( timesFree == 0 );
       pcu_check_true( currBytes == data->bytesFunc_total );
       pcu_check_true( totalBytes == data->bytesFunc_total );
       fscanf( memoryReportOutputFile, "%s %u %u %u %u\n", valString, &timesAlloc, &timesFree, &currBytes, &totalBytes ); 
-      pcu_check_true( 0 == strcmp( valString, "MemoryReportSuite_AllocGroupOne" ) );
+      pcu_check_streq( valString, "MemoryReportSuite_AllocGroupOne" );
       pcu_check_true( timesAlloc == data->groupOneFunc_alloc );
       pcu_check_true( timesFree == 0 );
       pcu_check_true( currBytes == data->groupOneFunc_total );
       pcu_check_true( totalBytes == data->groupOneFunc_total );
       fscanf( memoryReportOutputFile, "%s %u %u %u %u\n", valString, &timesAlloc, &timesFree, &currBytes, &totalBytes ); 
-      pcu_check_true( 0 == strcmp( valString, "MemoryReportSuite_AllocGroupTwo" ) );
+      pcu_check_streq( valString, "MemoryReportSuite_AllocGroupTwo" );
       pcu_check_true( timesAlloc == data->groupTwoFunc_alloc );
       pcu_check_true( timesFree == 0 );
       pcu_check_true( currBytes == data->groupTwoFunc_total );
@@ -473,7 +473,7 @@ void MemoryReportSuite_TestReportPrintsFour( MemoryReportSuiteData* data ) {
 
       /* Due to sorting, order should be: allocBytes, allocGroupOne, allocGroupTwo */
       fscanf( memoryReportOutputFile, "%s %u %u %u %u\n", valString, &timesAlloc, &timesFree, &currBytes, &totalBytes ); 
-      pcu_check_true( 0 == strcmp( valString, "StGermain/Base/Foundation/tests/MemoryReportSuite.c" ) );
+      pcu_check_streq( valString, "StGermain/Base/Foundation/tests/MemoryReportSuite.c" );
       pcu_check_true( timesAlloc == data->groupTwo_strA_alloc );
       pcu_check_true( timesFree == 0 );
       pcu_check_true( currBytes == data->groupTwo_strA_total );

@@ -200,9 +200,9 @@ void IO_HandlerSuite_TestWriteReadEmpty( IO_HandlerSuiteData* data ) {
    }
    xmlLine = Memory_Alloc_Array_Unnamed( char, MAXLINE );
    pcu_check_true( fgets( xmlLine, MAXLINE, testFile ) );
-   pcu_check_true( 0 == strcmp( IO_HandlerSuite_XMLStartString1, xmlLine ) );
+   pcu_check_streq( IO_HandlerSuite_XMLStartString1, xmlLine );
    pcu_check_true( fgets( xmlLine, MAXLINE, testFile ) );
-   pcu_check_true( 0 == strcmp( IO_HandlerSuite_XMLEmptyDataString, xmlLine ) );
+   pcu_check_streq( IO_HandlerSuite_XMLEmptyDataString, xmlLine );
    Memory_Free( xmlLine );
    fclose(testFile);
 
@@ -275,15 +275,15 @@ void IO_HandlerSuite_TestWriteExplicitTypes( IO_HandlerSuiteData* data ) {
       MPI_Barrier(data->comm);
    }
    pcu_check_true( fgets( xmlLine, MAXLINE, testFile ) );
-   pcu_check_true( 0 == strcmp( IO_HandlerSuite_XMLStartString1, xmlLine ) );
+   pcu_check_streq( IO_HandlerSuite_XMLStartString1, xmlLine );
    pcu_check_true( fgets( xmlLine, MAXLINE, testFile ) );
-   pcu_check_true( 0 == strcmp( IO_HandlerSuite_XMLStartString2, xmlLine ) );
+   pcu_check_streq( IO_HandlerSuite_XMLStartString2, xmlLine );
    for ( ii=0; ii< explicityTypesExpectedLineNum; ii++ ) {
       pcu_check_true( fgets( xmlLine, MAXLINE, testFile ) );
-      pcu_check_true( 0 == strcmp( explicitTypesExpected[ii], xmlLine ) );
+      pcu_check_streq( explicitTypesExpected[ii], xmlLine );
    }
    pcu_check_true( fgets( xmlLine, MAXLINE, testFile ) );
-   pcu_check_true( 0 == strcmp( IO_HandlerSuite_XMLEndString, xmlLine ) );
+   pcu_check_streq( IO_HandlerSuite_XMLEndString, xmlLine );
    fclose(testFile);
 
    MPI_Barrier(data->comm);
@@ -321,8 +321,7 @@ void IO_HandlerSuite_TestReadWhitespaceEntries( IO_HandlerSuiteData* data ) {
    if ( 1 == data->dict2->count ) {
       pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0],
          (Dictionary_Entry_Key)testKey) );
-      pcu_check_true( 0 == strcmp(
-         Dictionary_Entry_Value_AsString( data->dict2->entryPtr[0]->value ), testValString ) );
+      pcu_check_streq( Dictionary_Entry_Value_AsString( data->dict2->entryPtr[0]->value ), testValString );
    }
 
    MPI_Barrier(data->comm);
@@ -395,16 +394,13 @@ void IO_HandlerSuite_TestReadIncludedFile( IO_HandlerSuiteData* data ) {
    if ( 3 == data->dict2->count ) {
       pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0],
          (Dictionary_Entry_Key)testKey) );
-      pcu_check_true( 0 == strcmp(
-         Dictionary_Entry_Value_AsString( data->dict2->entryPtr[0]->value ), testValString ) );
+      pcu_check_streq( Dictionary_Entry_Value_AsString( data->dict2->entryPtr[0]->value ), testValString );
       pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[1],
          (Dictionary_Entry_Key)testKeyInc) );
-      pcu_check_true( 0 == strcmp(
-         Dictionary_Entry_Value_AsString( data->dict2->entryPtr[1]->value ), testValStringInc ) );
+      pcu_check_streq( Dictionary_Entry_Value_AsString( data->dict2->entryPtr[1]->value ), testValStringInc );
       pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[2],
          (Dictionary_Entry_Key)testKeyIncSP) );
-      pcu_check_true( 0 == strcmp(
-         Dictionary_Entry_Value_AsString( data->dict2->entryPtr[2]->value ), testValStringIncSP ) );
+      pcu_check_streq( Dictionary_Entry_Value_AsString( data->dict2->entryPtr[2]->value ), testValStringIncSP );
    }
 
    MPI_Barrier(data->comm);
@@ -507,7 +503,7 @@ void IO_HandlerSuite_TestReadRawDataEntries( IO_HandlerSuiteData* data ) {
          dev = Dictionary_Entry_Value_GetElement( data->dict2->entryPtr[1]->value, ii );
          strVal = Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetMember(
             dev, (Dictionary_Entry_Key)list2CompNames[0] ) );
-         pcu_check_true( 0 == strcmp( list2StringVals[ii], strVal ) );
+         pcu_check_streq( list2StringVals[ii], strVal );
          intVal = Dictionary_Entry_Value_AsInt( Dictionary_Entry_Value_GetMember(
             dev, (Dictionary_Entry_Key)list2CompNames[1] ) );
          pcu_check_true( intVal == list2CoordVals[ii][0] );
@@ -759,16 +755,16 @@ void IO_HandlerSuite_TestReadDuplicateEntryKeys( IO_HandlerSuiteData* data ) {
    structDict = structDev->as.typeStruct;
    pcu_check_true( Dictionary_Entry_Value_Type_Struct == structDev->type );
    pcu_check_true( struct1_OrigParamCount*2 == Dictionary_Entry_Value_GetCount( structDev ) );
-   pcu_check_true( 0 == strcmp( structDict->entryPtr[0]->key, paramNames[0] ) );
+   pcu_check_streq( structDict->entryPtr[0]->key, paramNames[0] );
    elementDev = structDict->entryPtr[0]->value;
    pcu_check_true( paramVals[0] == Dictionary_Entry_Value_AsUnsignedInt( elementDev ) );
-   pcu_check_true( 0 == strcmp( structDict->entryPtr[1]->key, paramNames[1] ) );
+   pcu_check_streq( structDict->entryPtr[1]->key, paramNames[1] );
    elementDev = structDict->entryPtr[1]->value;
    pcu_check_true( paramVals[1] == Dictionary_Entry_Value_AsUnsignedInt( elementDev ) );
-   pcu_check_true( 0 == strcmp( structDict->entryPtr[2]->key, paramNames[1] ) );
+   pcu_check_streq( structDict->entryPtr[2]->key, paramNames[1] );
    elementDev = structDict->entryPtr[2]->value;
    pcu_check_true( paramVals2[1] == Dictionary_Entry_Value_AsUnsignedInt( elementDev ) );
-   pcu_check_true( 0 == strcmp( structDict->entryPtr[3]->key, paramNames2[0] ) );
+   pcu_check_streq( structDict->entryPtr[3]->key, paramNames2[0] );
    elementDev = structDict->entryPtr[3]->value;
    pcu_check_true( paramVals2[0] == Dictionary_Entry_Value_AsUnsignedInt( elementDev ) );
    MPI_Barrier(data->comm);
@@ -810,13 +806,13 @@ void IO_HandlerSuite_TestReadDuplicateEntryKeys( IO_HandlerSuiteData* data ) {
    structDict = structDev->as.typeStruct;
    pcu_check_true( Dictionary_Entry_Value_Type_Struct == structDev->type );
    pcu_check_true( struct1_OrigParamCount+1 == Dictionary_Entry_Value_GetCount( structDev ) );
-   pcu_check_true( 0 == strcmp( structDict->entryPtr[0]->key, paramNames[0] ) );
+   pcu_check_streq( structDict->entryPtr[0]->key, paramNames[0] );
    elementDev = structDict->entryPtr[0]->value;
    pcu_check_true( paramVals[0] == Dictionary_Entry_Value_AsUnsignedInt( elementDev ) );
-   pcu_check_true( 0 == strcmp( structDict->entryPtr[1]->key, paramNames[1] ) );
+   pcu_check_streq( structDict->entryPtr[1]->key, paramNames[1] );
    elementDev = structDict->entryPtr[1]->value;
    pcu_check_true( paramVals2[1] == Dictionary_Entry_Value_AsUnsignedInt( elementDev ) );
-   pcu_check_true( 0 == strcmp( structDict->entryPtr[2]->key, paramNames2[0] ) );
+   pcu_check_streq( structDict->entryPtr[2]->key, paramNames2[0] );
    elementDev = structDict->entryPtr[2]->value;
    pcu_check_true( paramVals2[0] == Dictionary_Entry_Value_AsUnsignedInt( elementDev ) );
    MPI_Barrier(data->comm);
@@ -852,7 +848,7 @@ void IO_HandlerSuite_TestReadNonExistent( IO_HandlerSuiteData* data ) {
       pcu_check_true( fgets( errorLine, MAXLINE, errorFile ) );
       sprintf( expectedErrorMsg, "Error: File %s doesn't exist, not readable, or not valid.\n",
          notExistFilename );
-      pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
+      pcu_check_streq( errorLine, expectedErrorMsg );
       remove( errorFileName );
    }
 }
@@ -892,17 +888,17 @@ void IO_HandlerSuite_TestReadInvalid( IO_HandlerSuiteData* data ) {
          "invalid line 3 and param\n",
          invalidXMLFilename );
       pcu_check_true( fgets( errorLine, MAXLINE, errorFile ) );
-      pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
+      pcu_check_streq( errorLine, expectedErrorMsg );
       sprintf( expectedErrorMsg, "<invalid></param>\n" );
       pcu_check_true( fgets( errorLine, MAXLINE, errorFile ) );
-      pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
+      pcu_check_streq( errorLine, expectedErrorMsg );
       sprintf( expectedErrorMsg, "                 ^\n" );
       pcu_check_true( fgets( errorLine, MAXLINE, errorFile ) );
-      pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
+      pcu_check_streq( errorLine, expectedErrorMsg );
       sprintf( expectedErrorMsg, "Error: File %s doesn't exist, not readable, or not valid.\n",
          invalidXMLFilename );
       pcu_check_true( fgets( errorLine, MAXLINE, errorFile ) );
-      pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
+      pcu_check_streq( errorLine, expectedErrorMsg );
       remove( errorFileName );
    }
    if(data->rank==0) {
@@ -953,11 +949,11 @@ void IO_HandlerSuite_TestReadWrongNS( IO_HandlerSuiteData* data ) {
          "wasn't expected value of http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003.\n",
          wrongNS_XMLFilename );
       pcu_check_true( fgets( errorLine, MAXLINE, errorFile ) );
-      pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
+      pcu_check_streq( errorLine, expectedErrorMsg );
       sprintf( expectedErrorMsg, "Error: File %s not valid/readable.\n",
          wrongNS_XMLFilename );
       pcu_check_true( fgets( errorLine, MAXLINE, errorFile ) );
-      pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
+      pcu_check_streq( errorLine, expectedErrorMsg );
       remove( errorFileName );
    }
    MPI_Barrier(data->comm);
@@ -1008,14 +1004,14 @@ void IO_HandlerSuite_TestReadWrongRootNode( IO_HandlerSuiteData* data ) {
       sprintf( expectedErrorMsg, "resource .//%s of wrong type, root node "
          "=%s, should be <StGermainData>.\n", wrongRootNode_XMLFilename, "<Wrong>" );
       pcu_check_true( fgets( errorLine, MAXLINE, errorFile ) );
-      pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
+      pcu_check_streq( errorLine, expectedErrorMsg );
       sprintf( expectedErrorMsg, "Not parsing.\n" );
       pcu_check_true( fgets( errorLine, MAXLINE, errorFile ) );
-      pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
+      pcu_check_streq( errorLine, expectedErrorMsg );
       sprintf( expectedErrorMsg, "Error: File %s not valid/readable.\n",
          wrongRootNode_XMLFilename );
       pcu_check_true( fgets( errorLine, MAXLINE, errorFile ) );
-      pcu_check_true( 0 == strcmp( errorLine, expectedErrorMsg ) );
+      pcu_check_streq( errorLine, expectedErrorMsg );
       remove( errorFileName );
    }
    remove( wrongRootNode_XMLFilename );

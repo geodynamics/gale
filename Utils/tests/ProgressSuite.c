@@ -23,7 +23,7 @@ void ProgressSuite_TestSetTitle( ProgressSuiteData* data ) {
    Progress_SetTitle( data->prog, NULL );
    pcu_check_true( data->prog->title == NULL );
    Progress_SetTitle( data->prog, "foo" );
-   pcu_check_true( !strcmp( data->prog->title, "foo" ) );
+   pcu_check_streq( data->prog->title, "foo" );
    Progress_SetTitle( data->prog, NULL );
    pcu_check_true( data->prog->title == NULL );
 }
@@ -32,7 +32,7 @@ void ProgressSuite_TestSetPrefix( ProgressSuiteData* data ) {
    Progress_SetPrefix( data->prog, NULL );
    pcu_check_true( data->prog->preStr == NULL );
    Progress_SetPrefix( data->prog, "foo" );
-   pcu_check_true( !strcmp( data->prog->preStr, "foo" ) );
+   pcu_check_streq( data->prog->preStr, "foo" );
    Progress_SetPrefix( data->prog, NULL );
    pcu_check_true( data->prog->preStr == NULL );
 }
@@ -42,7 +42,7 @@ void ProgressSuite_TestSetRange( ProgressSuiteData* data ) {
    pcu_check_true( data->prog->start == 5 );
    pcu_check_true( data->prog->end == 10 );
    Progress_SetPrefix( data->prog, "foo" );
-   pcu_check_true( !strcmp( data->prog->preStr, "foo" ) );
+   pcu_check_streq( data->prog->preStr, "foo" );
    Progress_SetPrefix( data->prog, NULL );
    pcu_check_true( data->prog->preStr == NULL );
 }

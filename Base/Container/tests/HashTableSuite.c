@@ -268,7 +268,7 @@ void HashTableSuite_TestSearch( HashTableSuiteData* data ) {
    for (ii=0; ii<NUM_WORDS; ii++) {
       searchResult = (char*)HashTable_FindEntry( data->table, WordList_Global[ii], strlen(WordList_Global[ii]), char* );
       pcu_check_true( searchResult != NULL );
-      pcu_check_true( 0 == strcmp( WordList_Global[ii], searchResult ) );
+      pcu_check_streq( WordList_Global[ii], searchResult );
    }
 }
 
@@ -334,7 +334,7 @@ void HashTableSuite_TestSearchPointers( HashTableSuiteData* data ) {
    for (ii=0; ii<NUM_WORDS; ii++) {
       searchResult = (char*)HashTable_FindEntry( data->ptrTable, (void*)dataRefs[ii].ptr, 0, char* );
       pcu_check_true( searchResult != NULL );
-      pcu_check_true( 0 == strcmp( WordList_Global[ii], searchResult ) );
+      pcu_check_streq( WordList_Global[ii], searchResult );
    }
 }
 
