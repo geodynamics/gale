@@ -155,7 +155,7 @@ double Stg_TimeMonitor_End( Stg_TimeMonitor* tm, TimeMonitorData* tmData ) {
 		else {
 			Journal_Printf( 
 				Journal_Register( Info_Type, Stg_TimeMonitor_InfoStreamName ),
-				"\t%s(%s):  curr sim time=%.2g (secs), dt= %.2gs (%.2g%% of total)\n"
+				"\t%s(%s):  curr sim time=%.2g (secs), ave dt/proc= %.2gs (%.2g%% of total)\n"
 				"\t\t(individual proc time spent min/max = %.2g/%.2gs)\n", 
 				Stg_TimeMonitor_InfoStreamName,
 				tm->tag,
