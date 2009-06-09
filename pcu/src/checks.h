@@ -65,8 +65,8 @@ extern pcu_suite_t* pcu_cursuite;
 #define pcu_check_streq( a, b ) \
    do { \
       /* The temporary ptrs are so ++ operations etc inside (a) or (b) aren't done several times */ \
-      char* tempStr1 = (a); \
-      char* tempStr2 = (b); \
+      const char* tempStr1 = (a); \
+      const char* tempStr2 = (b); \
       _pcu_check_eval( tempStr1 != NULL, 0 == strcmp( a, b ), "First string passed to pcu_check_streq was NULL", "equal strings-preCheck" ); \
       _pcu_check_eval( tempStr2 != NULL, 0 == strcmp( a, b ), "Second string passed to pcu_check_streq was NULL", "equal strings-preCheck" ); \
       if ( tempStr1 && tempStr2 ) { \
