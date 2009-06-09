@@ -75,7 +75,7 @@ for d in dirs:
 hdrs = env.Install('include/StGermain', Glob('libStGermain/src/*.h'))
 
 # Build libraries.
-if env['shared_libraries']:
+if env['shared_libs']:
     env.SharedLibrary('lib/StGermain', objs)
 
 # FlattenXML, StGermain and test runner programs.

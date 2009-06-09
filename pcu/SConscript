@@ -17,7 +17,7 @@ env.Install('include/pcu', Glob('src/*.h'))
 objs = env.SharedObject(Glob('src/*.c'))
 
 # Build a library (if needed) and register destination.
-if env['static_libraries']:
+if env['static_libs']:
     env.Library(env['build_dir'] + '/lib/pcu', objs)
-if env['shared_libraries']:
+if env['shared_libs']:
     env.SharedLibrary('lib/pcu', objs)
