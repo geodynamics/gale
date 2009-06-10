@@ -12,6 +12,8 @@ def ConfigurePackage(env, mod, **kw):
     return pkg
 
 def generate(env, options=[]):
+    import platform
+
     # Add the options to SCons.
     for o in options:
         if len(o) > 4:
@@ -25,6 +27,14 @@ def generate(env, options=[]):
     for o in options:
         if GetOption(o[1]) is not None:
             env[o[1]] = GetOption(o[1])
+
+    # Need to handle Darwin shared libraries.
+    if platform.system() == 'Darwin':
+        env['_RPATH'] = ''
+        env.Append(SHLINKFLAGS=['-dynamiclib', '-flat_namespace',
+                                '-single_module', '-undefined', 'suppress',
+                                '-install_name', '${_abspath(TARGET)}'])
+        env['_abspath']=lambda x: File(x).abspath
 
     env.AddMethod(ConfigurePackage)
     env['packages'] = {}

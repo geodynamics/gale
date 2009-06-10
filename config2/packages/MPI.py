@@ -1,4 +1,4 @@
-from config2 import Package
+from Package import Package
 
 class MPI(Package):
 

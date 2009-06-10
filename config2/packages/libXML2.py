@@ -1,5 +1,5 @@
 import os
-from config2 import Package
+from Package import Package
 
 class libXML2(Package):
 
