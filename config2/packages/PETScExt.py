@@ -16,11 +16,17 @@ class PETScExt(Package):
         # Must have the architecture as well.
         self.arch = self.petsc.arch
 
-        if loc[1]:
+        if self.arch is not None:
+            if loc[1]:
+                env.AppendUnique(CPPPATH=loc[1])
+            if loc[2]:
+                env.AppendUnique(LIBPATH=[os.path.join(loc[2][0], self.arch)])
+                env.AppendUnique(RPATH=[os.path.join(loc[2][0], self.arch)])
+
+        else:
             env.AppendUnique(CPPPATH=loc[1])
-        if loc[2]:
-            env.AppendUnique(LIBPATH=[os.path.join(loc[2][0], self.arch)])
-            env.AppendUnique(RPATH=[os.path.join(loc[2][0], self.arch)])
+            env.AppendUnique(LIBPATH=loc[2])
+            env.AppendUnique(RPATH=loc[2])
 
         # In addition, export the PETSc base directory.
         if self.petsc.location[0]:

@@ -26,6 +26,7 @@ class PETSc(Package):
 
         # Try to find PETSc information.
         extra_libs = []
+        okay = False
         if loc[0]:
             bmake_dir = os.path.join(loc[0], 'bmake')
             # If we don't alrady have an arch, try read it.
@@ -33,33 +34,31 @@ class PETSc(Package):
                 petscconf = os.path.join(bmake_dir, 'petscconf')
                 try:
                     inf = open(petscconf)
+                    self.arch = inf.readline().split('=')[1].strip()
                 except:
-                    return
-                self.arch = inf.readline().split('=')[1].strip()
-            petscconf = os.path.join(bmake_dir, self.arch, 'petscconf')
-            # Does it exist?
-            if os.path.exists(petscconf):
-                # Add the include directories.
-                env.AppendUnique(CPPPATH=loc[1] + [os.path.dirname(petscconf)])
-                # Add arch to the library directory.
-                env.AppendUnique(LIBPATH=[os.path.join(loc[2][0], self.arch)])
-                env.AppendUnique(RPATH=[os.path.join(loc[2][0], self.arch)])
-                # Add additional libraries.
-                from distutils import sysconfig
-                vars = {}
-                sysconfig.parse_makefile(petscconf, vars)
-                flags = sysconfig.expand_makefile_vars(vars['PACKAGES_LIBS'], vars)
-                flag_dict = env.ParseFlags(flags)
-                if 'LIBS' in flag_dict:
-                    extra_libs = flag_dict['LIBS']
-                    del flag_dict['LIBS']
-                env.MergeFlags(flag_dict)
+                    pass
+            if self.arch is not None:
+                petscconf = os.path.join(bmake_dir, self.arch, 'petscconf')
+                # Does it exist?
+                if os.path.exists(petscconf):
+                    # Add the include directories.
+                    env.AppendUnique(CPPPATH=loc[1] + [os.path.dirname(petscconf)])
+                    # Add arch to the library directory.
+                    env.AppendUnique(LIBPATH=[os.path.join(loc[2][0], self.arch)])
+                    env.AppendUnique(RPATH=[os.path.join(loc[2][0], self.arch)])
+                    # Add additional libraries.
+                    from distutils import sysconfig
+                    vars = {}
+                    sysconfig.parse_makefile(petscconf, vars)
+                    flags = sysconfig.expand_makefile_vars(vars['PACKAGES_LIBS'], vars)
+                    flag_dict = env.ParseFlags(flags)
+                    if 'LIBS' in flag_dict:
+                        extra_libs = flag_dict['LIBS']
+                        del flag_dict['LIBS']
+                    env.MergeFlags(flag_dict)
+                    okay = True
 
-            else:
-                env.AppendUnique(CPPPATH=loc[1])
-                env.AppendUnique(LIBPATH=loc[2])
-                env.AppendUnique(RPATH=loc[2])
-        else:
+        if not okay:
             env.AppendUnique(CPPPATH=loc[1])
             env.AppendUnique(LIBPATH=loc[2])
             env.AppendUnique(RPATH=loc[2])
