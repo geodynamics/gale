@@ -50,7 +50,7 @@ env.AppendUnique(RPATH=env.Dir(env['build_dir'] + '/lib').abspath)
 
 # If we have no shared libraries, include a pre-processor definition to
 # prevent modules from trying to load dynamically.
-if not env['shared_libraries']:
+if not env['shared_libs']:
     env.AppendUnique(CPPDEFINES=['NOSHARED', 'SINGLE_EXE'])
 
 # Need to extract some kind of hg version number.
