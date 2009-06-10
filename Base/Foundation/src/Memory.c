@@ -78,8 +78,10 @@ void Memory_SetupPointer_3DArray(
 	Index yLength,
 	Index zLength );
 
-/** Moves data inside an enlarged 2D array to the appropriate position. */
-void Memory_Relocate_2DArray(
+/** Moves data inside an enlarged 2D array to the appropriate position.
+ * Note that it just moves the data of the array - in the case of a traditional
+ * 2D array, will also need to separately update the pointer indices. */
+void Memory_Relocate_2DArrayData(
 	void* destPtr, 
 	void* srcPtr,
 	SizeT itemSize, 
@@ -88,8 +90,10 @@ void Memory_Relocate_2DArray(
 	Index newX, 
 	Index newY );
 
-/** Moves data inside an enlarged 3D array to the appropriate position. */
-void Memory_Relocate_3DArray( 
+/** Moves data inside an enlarged 3D array to the appropriate position.
+ * Note that it just moves the data of the array - in the case of a traditional
+ * 2D array, will also need to separately update the pointer indices. */
+void Memory_Relocate_3DArrayData( 
 	void* destPtr, 
 	void* srcPtr,
 	SizeT itemSize, 
@@ -905,7 +909,7 @@ void* _Memory_Realloc_2DArray_Func(
 	
 	if ( ptr != NULL )
 	{
-		Memory_Relocate_2DArray( (Pointer)( (ArithPointer)result + (newX * sizeof(Pointer)) ),
+		Memory_Relocate_2DArrayData( (Pointer)( (ArithPointer)result + (newX * sizeof(Pointer)) ),
 					 (Pointer)( (ArithPointer)result + (oldX * sizeof(Pointer)) ),
 					 itemSize, oldX, oldY, newX, newY );
 	}
@@ -1000,7 +1004,7 @@ void* _Memory_Realloc_3DArray_Func(
 	
 	if ( ptr != NULL )
 	{
-		Memory_Relocate_3DArray( (Pointer)( (ArithPointer)result + ( (newX + (newX * newY)) * sizeof(Pointer) ) ),
+		Memory_Relocate_3DArrayData( (Pointer)( (ArithPointer)result + ( (newX + (newX * newY)) * sizeof(Pointer) ) ),
 					 (Pointer)( (ArithPointer)result + ( (oldX + (oldX * oldY)) * sizeof(Pointer) ) ),
 					 itemSize, oldX, oldY, oldZ, newX, newY, newZ );
 	}
@@ -1083,7 +1087,7 @@ void* _Memory_Realloc_2DArrayAs1D_Func(
 	
 	if ( ptr != NULL )
 	{
-		Memory_Relocate_2DArray( result, result, itemSize, oldX, oldY, newX, newY );
+		Memory_Relocate_2DArrayData( result, result, itemSize, oldX, oldY, newX, newY );
 	}
 	
 	#ifdef MEMORY_STATS
@@ -1162,7 +1166,7 @@ void* _Memory_Realloc_3DArrayAs1D_Func(
 	
 	if ( ptr != NULL )
 	{
-		Memory_Relocate_3DArray( result, result, itemSize, oldX, oldY, oldZ, newX, newY, newZ );
+		Memory_Relocate_3DArrayData( result, result, itemSize, oldX, oldY, oldZ, newX, newY, newZ );
 	}
 	
 	#ifdef MEMORY_STATS
@@ -1435,8 +1439,8 @@ void Memory_Print_File_Function( char* fileName, char* funcName )
 	funcField = MemoryField_Register( fileField, funcName );
 	
 	Journal_PrintfL( stgMemory->infoStream, 1, "File: %s\n", fileName );
-   
-   _MemoryField_CalcLongestSubFieldNameLen( funcField );
+
+	_MemoryField_CalcLongestSubFieldNameLen( funcField );
 	MemoryField_PrintHeader( "Function", MEMORYFIELD_ALL, strlen(funcName) );
 	MemoryField_Print( funcField, MEMORYFIELD_ALL, strlen(funcName) );
 	
@@ -1698,7 +1702,7 @@ void Memory_SetupPointer_3DArray(
 }
 
 
-void Memory_Relocate_2DArray(
+void Memory_Relocate_2DArrayData(
 	void* destPtr, 
 	void* srcPtr,
 	SizeT itemSize, 
@@ -1717,18 +1721,18 @@ void Memory_Relocate_2DArray(
 	}
 	
 	/* copy in reverse order to avoid overwritting data */
-	for ( i = oldX - 1; i >= 0; --i )
-	{
-		for ( j = oldY - 1; j >= 0; --j )
-		{
-			memcpy( (Pointer)((ArithPointer)destPtr + ( ((i * newY) + j) * itemSize ) ),
+	/* Note: using memmove because this function is often called to relocate data within an existing
+	 * array that's been resized - thus data may be overlapping */
+	for ( i = oldX - 1; i >= 0; --i ) {
+		for ( j = oldY - 1; j >= 0; --j ) {
+			memmove( (Pointer)((ArithPointer)destPtr + ( ((i * newY) + j) * itemSize ) ),
 				(Pointer)((ArithPointer)srcPtr + (  ((i * oldY) + j) * itemSize ) ),
 				itemSize );
 		}
 	}
 }
 
-void Memory_Relocate_3DArray( 
+void Memory_Relocate_3DArrayData( 
 	void* destPtr, 
 	void* srcPtr,
 	SizeT itemSize, 
@@ -1748,13 +1752,12 @@ void Memory_Relocate_3DArray(
 	}
 	
 	/* copy in reverse order to avoid overwritting data */
-	for ( i = oldX - 1; i >= 0; --i )
-	{
-		for ( j = oldY - 1; j >= 0; --j )
-		{
-			for ( k = oldZ - 1; k >= 0; --k )
-			{
-				memcpy( (Pointer)((ArithPointer)destPtr + ( ((i * newY * newZ) + (j * newZ) + k) * itemSize ) ),
+	/* Note: using memmove because this function is often called to relocate data within an existing
+	 * array that's been resized - thus data may be overlapping */
+	for ( i = oldX - 1; i >= 0; --i ) {
+		for ( j = oldY - 1; j >= 0; --j ) {
+			for ( k = oldZ - 1; k >= 0; --k ) {
+				memmove( (Pointer)((ArithPointer)destPtr + ( ((i * newY * newZ) + (j * newZ) + k) * itemSize ) ),
 					(Pointer)((ArithPointer)srcPtr  + ( ((i * oldY * oldZ) + (j * oldZ) + k) * itemSize ) ),
 					itemSize );
 			}
