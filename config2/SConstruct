@@ -23,7 +23,7 @@ options = [
 # Setup the environment.
 #
 
-env = Environment()
+env = Environment(ENV=os.environ)
 env.Tool('config', toolpath=['.'], options=options)
 
 #
