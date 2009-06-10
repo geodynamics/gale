@@ -48,8 +48,8 @@ Bool StGermain_Finalise( void ) {
 	Stg_ObjectList_DeleteAllObjects( moduleDirectories );
 	Stg_Class_Delete( moduleDirectories );
 	
-	Stg_ObjectList_DeleteAllObjects(xmlSearchPaths);
-	Stg_Class_Delete( xmlSearchPaths );
+	Stg_ObjectList_DeleteAllObjects(Project_XMLSearchPaths);
+	Stg_Class_Delete( Project_XMLSearchPaths );
 
 	/* Finalise all the bits and pieces */
 	BaseContext_Finalise();

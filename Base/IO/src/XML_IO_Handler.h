@@ -58,7 +58,7 @@
 	extern const xmlChar* XML_IO_Handler_MergeTypeMap[3];
 
 	/** The Xml search path list. */
-	extern Stg_ObjectList* xmlSearchPaths;
+	extern Stg_ObjectList* Project_XMLSearchPaths;
 	
 	/* additional class function ptr typedefs */
 	typedef Bool (XML_IO_Handler_WriteEntryToFileFunction) ( void* xml_io_handler, const char* filename,

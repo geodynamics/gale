@@ -53,7 +53,7 @@
 const Type XML_IO_Handler_Type = "XML_IO_Handler";
 
 /** The Xml search path list. */
-Stg_ObjectList* xmlSearchPaths = NULL;
+Stg_ObjectList* Project_XMLSearchPaths = NULL;
 
 #define XML_OLD_DTD 1
 
@@ -498,20 +498,20 @@ void XML_IO_Handler_AddDirectory( Name name, char* directory ) {
 	}
 
 	/* Check if dictionary already exists */
-	if(xmlSearchPaths == NULL) {
-		xmlSearchPaths = Stg_ObjectList_New();
+	if(Project_XMLSearchPaths == NULL) {
+		Project_XMLSearchPaths = Stg_ObjectList_New();
 	}
 	
 	/* Add path to global list */
 	found = False;
-	for( dir_i =  0; dir_i < xmlSearchPaths->count; dir_i++ ){
-		if( strcmp( directory, Stg_ObjectList_ObjectAt( xmlSearchPaths, dir_i ) ) == 0 ) {
+	for( dir_i =  0; dir_i < Project_XMLSearchPaths->count; dir_i++ ){
+		if( strcmp( directory, Stg_ObjectList_ObjectAt( Project_XMLSearchPaths, dir_i ) ) == 0 ) {
 			found = True;
 		}
 	}
 	
 	if( !found ) {
-		Stg_ObjectList_PointerAppend( xmlSearchPaths, StG_Strdup( directory ), name, 0, 0, 0 ); 
+		Stg_ObjectList_PointerAppend( Project_XMLSearchPaths, StG_Strdup( directory ), name, 0, 0, 0 ); 
 	}
 }	
 /** add a path to the search paths */
@@ -579,12 +579,12 @@ Bool _XML_IO_Handler_ReadAllFromFile( void* xml_io_handler, const char* filename
 		_XML_IO_Handler_AddSearchPath( self, "./" );
 
 	/* 3. XML paths from other projects */
-	if (xmlSearchPaths != NULL) {
+	if (Project_XMLSearchPaths != NULL) {
 		int index_I;
-		for (index_I = 0; index_I  < xmlSearchPaths->count; index_I++){
+		for (index_I = 0; index_I  < Project_XMLSearchPaths->count; index_I++){
 			_XML_IO_Handler_AddSearchPath( 
 					self, 
-					Stg_ObjectList_ObjectAt( xmlSearchPaths,index_I )
+					Stg_ObjectList_ObjectAt( Project_XMLSearchPaths,index_I )
 				); 
 		}
 	}
