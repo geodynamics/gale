@@ -30,10 +30,10 @@ env.Tool('config', toolpath=['.'], options=options)
 # Perform configuration.
 #
 
-if GetOption('CC'):
-    cc.apply_cc(env, GetOption('CC'))
+if env.get('CC', None) is not None:
+    cc.apply_cc(env, env['CC'])
 
-if GetOption('debug'):
+if env.get('build_type', None) == 'debug':
     env.MergeFlags('-g -DDEBUG')
 else:
     env.MergeFlags('-DNDEBUG')

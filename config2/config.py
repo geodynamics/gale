@@ -27,6 +27,8 @@ def generate(env, options=[]):
     for o in options:
         if GetOption(o[1]) is not None:
             env[o[1]] = GetOption(o[1])
+        elif o[1].upper() in os.environ:
+            env[o[1]] = os.environ[o[1].upper()]
 
     # Need to handle Darwin shared libraries.
     if platform.system() == 'Darwin':
