@@ -30,13 +30,15 @@ env.Tool('config', toolpath=['.'], options=options)
 # Perform configuration.
 #
 
-if env.get('CC', None) is not None:
-    cc.apply_cc(env, env['CC'])
+if not (GetOption('help') or GetOption('clean')):
 
-if env.get('build_type', None) == 'debug':
-    env.MergeFlags('-g -DDEBUG')
-else:
-    env.MergeFlags('-DNDEBUG')
+    if env.get('CC', None) is not None:
+        cc.apply_cc(env, env['CC'])
+
+    if env.get('build_type', None) == 'debug':
+        env.MergeFlags('-g -DDEBUG')
+    else:
+        env.MergeFlags('-DNDEBUG')
 
 env.ConfigurePackage(packages.libXML2)
 env.ConfigurePackage(packages.MPI)
