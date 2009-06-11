@@ -21,25 +21,30 @@ class MPI(Package):
             for libs in extra_libs:
 
                 # Check for general MPI.
-                lib_env = env.Clone()
-                lib_env.PrependUnique(LIBS=['mpi'] + libs)
-                yield lib_env
+                if self.find_libraries(loc[2], 'mpi'):
+                    lib_env = env.Clone()
+                    lib_env.PrependUnique(LIBS=['mpi'] + libs)
+                    yield lib_env
 
                 # Check for MPICH.
-                lib_env = env.Clone()
-                lib_env.PrependUnique(LIBS=['mpich'] + libs)
-                yield lib_env
-                lib_env = env.Clone()
-                lib_env.PrependUnique(LIBS=['pmpich', 'mpich'] + libs)
-                yield lib_env
+                if self.find_libraries(loc[2], 'mpich'):
+                    lib_env = env.Clone()
+                    lib_env.PrependUnique(LIBS=['mpich'] + libs)
+                    yield lib_env
+                if self.find_libraries(loc[2], ['mpich', 'pmpich']):
+                    lib_env = env.Clone()
+                    lib_env.PrependUnique(LIBS=['pmpich', 'mpich'] + libs)
+                    yield lib_env
 
                 # Check for OpenMPI.
-                lib_env = env.Clone()
-                lib_env.PrependUnique(LIBS=['mpi', 'open-rte', 'open-pal'] + libs)
-                yield lib_env
-                lib_env = env.Clone()
-                lib_env.PrependUnique(LIBS=['mpi', 'open-rte', 'open-pal', 'nsl', 'util'] + libs)
-                yield lib_env
+                if self.find_libraries(loc[2], 'mpi'):
+                    lib_env = env.Clone()
+                    lib_env.PrependUnique(LIBS=['mpi', 'open-rte', 'open-pal'] + libs)
+                    yield lib_env
+                if self.find_libraries(loc[2], 'mpi'):
+                    lib_env = env.Clone()
+                    lib_env.PrependUnique(LIBS=['mpi', 'open-rte', 'open-pal', 'nsl', 'util'] + libs)
+                    yield lib_env
 
     def check(self, conf, env):
         return conf.CheckLibWithHeader(None, 'mpi.h', 'c', autoadd=0)

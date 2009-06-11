@@ -11,5 +11,6 @@ class libXML2(Package):
     def gen_envs(self, loc):
         for env in Package.gen_envs(self, loc):
             env['pkg_headers'] = [os.path.join('libxml', 'parser.h')]
-            env.PrependUnique(LIBS=['libxml2'])
-            yield env
+            if self.find_libraries(loc[2], 'libxml'):
+                env.PrependUnique(LIBS=['libxml2'])
+                yield env

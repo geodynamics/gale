@@ -1,4 +1,5 @@
 import os, SCons.SConf, checks
+import utils, platform
 
 class Package:
 
@@ -129,6 +130,27 @@ class Package:
             # Now check environment.
             return os.environ.get(name.upper(), None)
         return val
+
+    def find_libraries(self, dirs, libs):
+        # If no directories were given, return okay.
+        if not dirs:
+            return True
+
+        prefixes = ['lib']
+        suffixes = ['.a']
+        if platform.system() == 'Linux':
+            suffixes += ['.so']
+        if platform.system() == 'Darwin':
+            suffixes += ['.dylib']
+        if platform.system() == 'Windows':
+            prefixes += ['']
+            suffixes += ['.dll']
+
+        libs = utils.conv.to_list(libs)
+        for l in libs:
+            if not [p for p in utils.path.find(l, dirs, prefixes, suffixes)]:
+                return False
+        return True
 
     def _gen_locations(self):
         ln = self.name.lower()

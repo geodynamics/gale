@@ -15,33 +15,32 @@ class PETScExt(Package):
 
         # Must have the architecture as well.
         self.arch = self.petsc.arch
-
         if self.arch is not None:
-            if loc[1]:
-                env.AppendUnique(CPPPATH=loc[1])
             if loc[2]:
-                env.AppendUnique(LIBPATH=[os.path.join(loc[2][0], self.arch)])
-                env.AppendUnique(RPATH=[os.path.join(loc[2][0], self.arch)])
+                loc[2][0] = os.path.join(loc[2][0], self.arch)
 
-        else:
-            env.AppendUnique(CPPPATH=loc[1])
-            env.AppendUnique(LIBPATH=loc[2])
-            env.AppendUnique(RPATH=loc[2])
+        env.AppendUnique(CPPPATH=loc[1])
+        env.AppendUnique(LIBPATH=loc[2])
+        env.AppendUnique(RPATH=loc[2])
 
         # In addition, export the PETSc base directory.
         if self.petsc.location[0]:
             env.AppendUnique(CPPPATH=[self.petsc.location[0]])
 
         # Try each library set.
-        lib_env = env.Clone()
-        lib_env.PrependUnique(LIBS=['petscext_utils', 'petscext_snes', 'petscext_ksp',
-                                    'petscext_pc', 'petscext_mat', 'petscext_vec',
-                                    'petscext_helpers'])
-        yield lib_env
-        lib_env = env.Clone()
-        lib_env.PrependUnique(LIBS=['petscext_utils', 'petscext_snes', 'petscext_ksp',
-                                    'petscext_pc', 'petscext_mat', 'petscext_vec'])
-        yield lib_env
+        libs = ['petscext_utils', 'petscext_snes', 'petscext_ksp',
+                'petscext_pc', 'petscext_mat', 'petscext_vec',
+                'petscext_helpers']
+        if self.find_libraries(loc[2], libs):
+            lib_env = env.Clone()
+            lib_env.PrependUnique(LIBS=libs)
+            yield lib_env
+        libs = ['petscext_utils', 'petscext_snes', 'petscext_ksp',
+                'petscext_pc', 'petscext_mat', 'petscext_vec']
+        if self.find_libraries(loc[2], libs):
+            lib_env = env.Clone()
+            lib_env.PrependUnique(LIBS=libs)
+            yield lib_env
 
     def check(self, conf, env):
         return conf.CheckLibWithHeader(None,

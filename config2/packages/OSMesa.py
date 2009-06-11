@@ -12,5 +12,6 @@ class OSMesa(Package):
     def gen_envs(self, loc):
         for env in Package.gen_envs(self, loc):
             env['pkg_headers'] = ['osmesa.h', 'glu.h']
-            env.PrependUnique(LIBS=['OSMesa', 'GLU'])
-            yield env
+            if self.find_libraries(loc[2], 'OSMesa'):
+                env.PrependUnique(LIBS=['OSMesa', 'GLU'])
+                yield env

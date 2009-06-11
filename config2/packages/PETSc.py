@@ -42,10 +42,9 @@ class PETSc(Package):
                 # Does it exist?
                 if os.path.exists(petscconf):
                     # Add the include directories.
-                    env.AppendUnique(CPPPATH=loc[1] + [os.path.dirname(petscconf)])
+                    loc[1].append(os.path.dirname(petscconf))
                     # Add arch to the library directory.
-                    env.AppendUnique(LIBPATH=[os.path.join(loc[2][0], self.arch)])
-                    env.AppendUnique(RPATH=[os.path.join(loc[2][0], self.arch)])
+                    loc[2][0] = os.path.join(loc[2][0], self.arch)
                     # Add additional libraries.
                     from distutils import sysconfig
                     vars = {}
@@ -58,17 +57,17 @@ class PETSc(Package):
                     env.MergeFlags(flag_dict)
                     okay = True
 
-        if not okay:
-            env.AppendUnique(CPPPATH=loc[1])
-            env.AppendUnique(LIBPATH=loc[2])
-            env.AppendUnique(RPATH=loc[2])
+        env.AppendUnique(CPPPATH=loc[1])
+        env.AppendUnique(LIBPATH=loc[2])
+        env.AppendUnique(RPATH=loc[2])
 
         # Add the libraries.
-        env.PrependUnique(LIBS=['petscsnes', 'petscksp', 'petscdm',
-                                'petscmat', 'petscvec', 'petsc'])
-        env.AppendUnique(LIBS=extra_libs)
-
-        yield env
+        libs = ['petscsnes', 'petscksp', 'petscdm',
+                'petscmat', 'petscvec', 'petsc']
+        if self.find_libraries(loc[2], libs):
+            env.PrependUnique(LIBS=libs)
+            env.AppendUnique(LIBS=extra_libs)
+            yield env
 
     def check(self, conf, env):
         return conf.CheckLibWithHeader(None,

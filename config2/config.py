@@ -20,7 +20,8 @@ def SaveConfig(env, filename='config.cfg'):
 
         out = open(filename, 'w')
         opts = [o[1] for o in env['cfg_options']] + [
-            'CPPPATH', 'LIBPATH', 'RPATH', 'LIBS', 'CPPDEFINES'
+            'CPPPATH', 'LIBPATH', 'RPATH', 'LIBS', 'CPPDEFINES',
+            'CFLAGS', 'CCFLAGS'
             ]
         for o in opts:
             v = env.get(o, None)
