@@ -6,8 +6,13 @@ class Package:
         self.name = name
         self.env = env
         self.required = kw.get('required', True)
-        self.result = False
+        self.result = None
+        self.setup_dependencies()
         self.setup_options()
+
+    def setup_dependencies(self):
+        # self.add_dependency(...)
+        pass
 
     def setup_options(self):
         from SCons.Script.Main import AddOption
@@ -22,9 +27,6 @@ class Package:
         AddOption('--%s-libs'%ln, dest='%s_libs'%ln, nargs=1, type='string',
                   action='store', help='%s libraries.'%n)
 
-    def setup_dependencies(self):
-        pass
-
     def gen_locations(self):
         return
 
@@ -35,7 +37,24 @@ class Package:
         env.AppendUnique(RPATH=loc[2])
         yield env
 
-    def __call__(self):
+    def check(self, conf, env):
+        return conf.CheckLibWithHeader(None, env.get('pkg_headers', []), 'c',
+                                       autoadd=0)
+
+    def __call__(self, **kw):
+
+        # Don't run twice.
+        if self.result is not None:
+            return self.env
+
+        # Process dependencies.
+        if hasattr(self, 'deps'):
+            for d in self.deps:
+                d()
+
+        # Check for overrides.
+        if 'required' in kw:
+            self.required = kw['required']
 
         # Handle dependencies.
         self.setup_dependencies()
@@ -65,8 +84,10 @@ class Package:
                         }
                     )
 
-                # Run the checks.
-                self.result = self.check(conf)
+                # Run the checks and remove temporary header variable.
+                self.result = self.check(conf, env)
+                if 'pkg_headers' in env:
+                    del env['pkg_headers']
 
                 # If successful, export a definition.
                 if self.result:
@@ -87,10 +108,19 @@ class Package:
 
         # If this package was required and it failed print out a message.
         if not self.result and self.required:
-            print "Failed to locate required package %s."%self.name
+            print
+            print 'Failed to locate required package %s.'%self.name
+            print 'Details in \'config/config2/config.log\''
+            print
             self.env.Exit()
 
         return self.result and env or self.env
+
+    def add_dependency(self, mod):
+        if not hasattr(self, 'deps'):
+            self.deps = []
+        self.deps.append(self.env.UsePackage(mod))
+        return self.deps[-1]
 
     def get_option(self, name):
         # First check command line.

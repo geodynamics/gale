@@ -5,7 +5,7 @@ from MPI import MPI
 class PETSc(Package):
 
     def setup_dependencies(self):
-        self.mpi = self.env.ConfigurePackage(MPI)
+        self.mpi = self.add_dependency(MPI)
 
     def setup_options(self):
         from SCons.Script.Main import AddOption
@@ -70,7 +70,8 @@ class PETSc(Package):
 
         yield env
 
-    def check(self, conf):
+    def check(self, conf, env):
         return conf.CheckLibWithHeader(None,
                                        ['mpi.h', 'petsc.h', 'petscvec.h', 'petscmat.h',
-                                        'petscksp.h', 'petscsnes.h'], 'c')
+                                        'petscksp.h', 'petscsnes.h'], 'c',
+                                       autoadd=0)

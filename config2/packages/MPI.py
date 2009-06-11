@@ -41,5 +41,5 @@ class MPI(Package):
                 lib_env.PrependUnique(LIBS=['mpi', 'open-rte', 'open-pal', 'nsl', 'util'] + libs)
                 yield lib_env
 
-    def check(self, conf):
-        return conf.CheckLibWithHeader(None, 'mpi.h', 'c')
+    def check(self, conf, env):
+        return conf.CheckLibWithHeader(None, 'mpi.h', 'c', autoadd=0)

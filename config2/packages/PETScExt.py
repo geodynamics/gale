@@ -5,7 +5,7 @@ from PETSc import PETSc
 class PETScExt(Package):
 
     def setup_dependencies(self):
-        self.petsc = self.env.ConfigurePackage(PETSc)
+        self.petsc = self.add_dependency(PETSc)
 
     def gen_locations(self):
         yield ('/usr/local', ['/usr/local/include'], ['/usr/local/lib'])
@@ -43,9 +43,10 @@ class PETScExt(Package):
                                     'petscext_pc', 'petscext_mat', 'petscext_vec'])
         yield lib_env
 
-    def check(self, conf):
+    def check(self, conf, env):
         return conf.CheckLibWithHeader(None,
                                        ['mpi.h', 'petsc.h', 'petscvec.h', 'petscmat.h',
                                         'petscksp.h', 'petscsnes.h',
                                         'petscext.h', 'petscext_vec.h', 'petscext_mat.h',
-                                        'petscext_ksp.h', 'petscext_snes.h'], 'c')
+                                        'petscext_ksp.h', 'petscext_snes.h'], 'c',
+                                       autoadd=0)

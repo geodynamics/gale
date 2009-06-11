@@ -1,4 +1,4 @@
-import sys, os
+import sys, os, platform
 sys.path.insert(0, os.getcwd())
 
 import packages
@@ -27,6 +27,18 @@ env = Environment(ENV=os.environ)
 env.Tool('config', toolpath=['.'], options=options)
 
 #
+# Declare which packages we're going to use.
+#
+
+env.UsePackage(packages.libXML2)
+env.UsePackage(packages.PETScExt)
+env.UsePackage(packages.HDF5)
+env.UsePackage(packages.OSMesa)
+env.UsePackage(packages.OpenGL)
+env.UsePackage(packages.SDL)
+env.UsePackage(packages.X11)
+
+#
 # Perform configuration.
 #
 
@@ -40,24 +52,68 @@ if not (GetOption('help') or GetOption('clean')):
     else:
         env.MergeFlags('-DNDEBUG')
 
-env.ConfigurePackage(packages.libXML2)
-env.ConfigurePackage(packages.MPI)
-env.ConfigurePackage(packages.PETSc)
-env.ConfigurePackage(packages.PETScExt, required=False)
+    env.ConfigurePackage(packages.libXML2)
+    env.ConfigurePackage(packages.MPI)
+    env.ConfigurePackage(packages.PETSc)
+    env.ConfigurePackage(packages.PETScExt, required=False)
+    env.ConfigurePackage(packages.HDF5, required=False)
 
+    # If we're building with gLucifer then we need some more
+    # packages.
+    if env.get('with_glucifer', None):
+
+        # Try for OSMesa first.
+        res = env.ConfigurePackage(packages.OSMesa, required=False).result
+
+        # If not, go for OpenGL.
+        if not res:
+            res = env.ConfigurePackage(packages.OpenGL).result
+            if not res:
+                print
+                print 'Need either OSMesa or OpenGL in order to use gLucifer'
+                print 'but neither could be found.'
+                print 'Details in \'config/config2/config.log\''
+                print
+                env.Exit()
+
+        # Need an extra CPPDEFINE for gLucifer.
+        env.AppendUnique(CPPDEFINES=['HAVE_GL'])
+
+        # If we're on Darwin go for a native windowing system first.
+        if platform.system() == 'Darwin':
+
+            res = env.ConfigurePackage(packages.Carbon, required=False).result
+            if not res:
+                res = env.ConfigurePackage(packages.Cocoa, required=False).result
+
+            # Then SDL.
+            if not res:
+                res = env.ConfigurePackage(packages.SDL, required=False).result
+
+            # Then X11.
+            if not res:
+                res = env.ConfigurePackage(packages.X11, required=False).result
+                if not res:
+                    print
+                    print 'Need a windowing system for gLucifer, one of either SDL,'
+                    print 'X11 or VTK. None of these could be found.'
+                    print 'Details in \'config/config2/config.log\''
+                    print
+                    env.Exit()
 
 #
 # Export the environment.
 #
 
-if not (GetOption('help') or GetOption('clean')):
+env.SaveConfig()
 
-    out = open('config.cfg', 'w')
-    opts = [o[1] for o in options] + [
-        'CPPPATH', 'LIBPATH', 'RPATH', 'LIBS', 'CPPDEFINES'
-        ]
-    for o in opts:
-        v = env.get(o, None)
-        if v is not None:
-            out.write('%s = %s\n'%(o, repr(env[o])))
-    out.close()
+#
+# Print success message.
+#
+
+print
+print '***************************************'
+print '* Successfully configured.            *'
+print '* Now run \'./scons.py\' to build.      *'
+print '***************************************'
+print
