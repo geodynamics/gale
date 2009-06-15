@@ -7,3 +7,6 @@ from OSMesa import OSMesa
 from OpenGL import OpenGL
 from SDL import SDL
 from X11 import X11
+from libPNG import libPNG
+from libJPEG import libJPEG
+from libFAME import libFAME

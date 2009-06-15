@@ -37,6 +37,9 @@ env.UsePackage(packages.OSMesa)
 env.UsePackage(packages.OpenGL)
 env.UsePackage(packages.SDL)
 env.UsePackage(packages.X11)
+env.UsePackage(packages.libPNG)
+env.UsePackage(packages.libJPEG)
+env.UsePackage(packages.libFAME)
 
 #
 # Perform configuration.
@@ -100,6 +103,11 @@ if not (GetOption('help') or GetOption('clean')):
                     print 'Details in \'config/config2/config.log\''
                     print
                     env.Exit()
+
+        # Add auxilliary gLucifer packages.
+        env.ConfigurePackage(packages.libPNG, required=False)
+        env.ConfigurePackage(packages.libJPEG, required=False)
+        env.ConfigurePackage(packages.libFAME, required=False)
 
 #
 # Export the environment.
