@@ -1,0 +1,126 @@
+import sys, os, platform
+sys.path.insert(0, os.getcwd())
+
+import packages
+import cc
+
+#
+# Add options to be passed on to build.
+#
+
+options = [
+    ('--prefix', 'prefix', 'Installation prefix.', '/usr/local'),
+    ('--build-dir', 'build_dir', 'Sandbox location.', 'build'),
+    ('--build-type', 'build_type', 'Build type (debug or optimised)', 'debug'),
+    ('--static-libs', 'static_libs', 'Enable static libraries', 1, 'int'),
+    ('--shared-libs', 'shared_libs', 'Enable shared libraries', 1, 'int'),
+    ('--cc', 'CC', 'C compiler', None),
+    ('--cflags', 'CFLAGS', 'Flags for the C compiler', None),
+    ('--with-glucifer', 'with_glucifer', 'Enable gLucifer', 1, 'int')
+]
+
+#
+# Setup the environment.
+#
+
+env = Environment(ENV=os.environ)
+env.Tool('config', toolpath=['.'], options=options)
+
+#
+# Declare which packages we're going to use.
+#
+
+env.UsePackage(packages.libXML2)
+env.UsePackage(packages.PETSc)
+env.UsePackage(packages.HDF5)
+env.UsePackage(packages.OSMesa)
+env.UsePackage(packages.OpenGL)
+env.UsePackage(packages.SDL)
+env.UsePackage(packages.X11)
+env.UsePackage(packages.libPNG)
+env.UsePackage(packages.libJPEG)
+env.UsePackage(packages.libFAME)
+
+#
+# Perform configuration.
+#
+
+if not (GetOption('help') or GetOption('clean')):
+
+    if env.get('CC', None) is not None:
+        cc.apply_cc(env, env['CC'])
+
+    if env.get('build_type', None) == 'debug':
+        env.MergeFlags('-g -DDEBUG')
+    else:
+        env.MergeFlags('-DNDEBUG')
+
+    env.ConfigurePackage(packages.libXML2)
+    env.ConfigurePackage(packages.MPI)
+    env.ConfigurePackage(packages.PETSc)
+    env.ConfigurePackage(packages.HDF5, required=False)
+
+    # If we're building with gLucifer then we need some more
+    # packages.
+    if env.get('with_glucifer', None):
+
+        # Try for OSMesa first.
+        res = env.ConfigurePackage(packages.OSMesa, required=False).result
+
+        # If not, go for OpenGL.
+        if not res:
+            res = env.ConfigurePackage(packages.OpenGL).result
+            if not res:
+                print
+                print 'Need either OSMesa or OpenGL in order to use gLucifer'
+                print 'but neither could be found.'
+                print 'Details in \'config/config2/config.log\''
+                print
+                env.Exit()
+
+        # Need an extra CPPDEFINE for gLucifer.
+        env.AppendUnique(CPPDEFINES=['HAVE_GL'])
+
+        # If we're on Darwin go for a native windowing system first.
+        if platform.system() == 'Darwin':
+
+            res = env.ConfigurePackage(packages.Carbon, required=False).result
+            if not res:
+                res = env.ConfigurePackage(packages.Cocoa, required=False).result
+
+            # Then SDL.
+            if not res:
+                res = env.ConfigurePackage(packages.SDL, required=False).result
+
+            # Then X11.
+            if not res:
+                res = env.ConfigurePackage(packages.X11, required=False).result
+                if not res:
+                    print
+                    print 'Need a windowing system for gLucifer, one of either SDL,'
+                    print 'X11 or VTK. None of these could be found.'
+                    print 'Details in \'config/config2/config.log\''
+                    print
+                    env.Exit()
+
+        # Add auxilliary gLucifer packages.
+        env.ConfigurePackage(packages.libPNG, required=False)
+        env.ConfigurePackage(packages.libJPEG, required=False)
+        env.ConfigurePackage(packages.libFAME, required=False)
+
+#
+# Export the environment.
+#
+
+env.SaveConfig()
+
+#
+# Print success message.
+#
+
+print
+print '***************************************'
+print '* Successfully configured.            *'
+print '* Now run \'./scons.py\' to build.      *'
+print '***************************************'
+print
