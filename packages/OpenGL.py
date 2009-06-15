@@ -19,6 +19,11 @@ class OpenGL(config.Package):
 
 
     def _test(self, cfg):
+	# Fail if OSMesa enabled, conflicts with other OpenGL libraries
+        if self.ctx.option_dict["with_osmesa"] == True:
+	    print "(OSMesa enabled, for interactive graphics use: --with-osmesa=0)"
+	    return False;
+
         # If we're on Darwin we need this hack.
         if platform.system() == "Darwin":
             cfg.append_unique("lnkprogflags",

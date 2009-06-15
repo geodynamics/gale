@@ -9,6 +9,9 @@ class X11(config.Package):
         self.base_dirs = ["/usr/X11R6"]
         self.inc_exts = ["X11"]
 
+    def _setup_dependencies(self):
+        config.Package._setup_dependencies(self)
+        self.gl = self.add_dependency(config.packages.OpenGL, required=True, combine=True)
 
     def setup_libraries(self):
         self.add_library_set(["Xlib.h"], ["X11", "Xmu", "xcb", "xcb-xlib", "Xau", "Xdmcp"])

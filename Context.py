@@ -51,6 +51,8 @@ class Context(object):
     def setup_options(self):
         for c in self.add_options_funcs:
             c(self)
+
+    def setup_module_options(self):
         for m in self.order:
             m.setup_options()
 
@@ -81,16 +83,18 @@ class Context(object):
 
         self.scan_subdirs()
 
-        # Add modules.
-        for c in self.add_modules_funcs:
-            c(self)
-
-        # Need to parse options for the context ahead of schedule.
+        # Parse options straight away to give access to global options
+        # so we can select modules.
+        self.setup_options()
         self.options.add_option(
             utils.options.Option("build_report", "--build-report", type="bool",
                                  help="Create a tarball with bug reports."))
         opts = self.options.parse_option_list(sys.argv[1:])
         self.option_dict = self.options.gather(opts)
+
+        # Add modules.
+        for c in self.add_modules_funcs:
+            c(self)
 
         # If the user wants to build a bug report, make sure we configure a
         # compressor.
@@ -109,7 +113,7 @@ class Context(object):
         self.order = self.order_modules()
 
         # Parse any options.
-        self.setup_options()
+        self.setup_module_options()
         self.parse_options()
 
         # Need to setup requirement flags so the plans can

@@ -12,7 +12,11 @@ class SDL(config.Package):
 
     def _setup_dependencies(self):
         config.Package._setup_dependencies(self)
-	self.opengl = self.add_dependency(config.packages.OpenGL, required=True, combine=True)
+	# Able to use OSMesa or OpenGL
+        if self.ctx.option_dict["with_osmesa"] == False:
+           self.opengl = self.add_dependency(config.packages.OpenGL, required=False, combine=True)
+        else:
+           self.osmesa = self.add_dependency(config.packages.OSMesa, required=False, combine=True)
 	if platform.system() == "Darwin":
             self.cocoa = self.add_dependency(config.packages.Cocoa, required=False, combine=True)
 
@@ -26,6 +30,8 @@ class SDL(config.Package):
     source_code = {"c": """#include <stdlib.h>
 #include <SDL.h>
 int main( int argc, char** argv ) {
+  SDL_Init(SDL_INIT_VIDEO);
+  SDL_Quit();
   return EXIT_SUCCESS;
 }
 """}
