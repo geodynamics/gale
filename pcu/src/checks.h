@@ -46,6 +46,24 @@ extern pcu_suite_t* pcu_cursuite;
          )                                              \
       )
 
+
+/* Use this version if you need manual control over the file and line to be printed in case of failure.
+ * Also, the "exprstring" should be an actual string, rather than "strexpr" in the above function which will be stringified. */
+#define _pcu_check_eval2( expr, exprstring, msg, type, file, line )     \
+   pcu_cursuite->lsnr->checkdone(                       \
+      pcu_cursuite->lsnr,                               \
+      pcu_test_addSource(                               \
+         pcu_cursuite->curtest,                         \
+         pcu_source_create( (expr) ? 1 : 0,             \
+                            type,                       \
+                            file,                   \
+                            line,                   \
+                            exprstring,              \
+                            msg,                        \
+                            pcu_cursuite->curtest )     \
+         )                                              \
+      )
+
 #define pcu_check_true( expr )			\
    _pcu_check_eval( expr, expr, NULL, "true" )
 
@@ -75,6 +93,13 @@ extern pcu_suite_t* pcu_cursuite;
          _pcu_check_eval( 0 == strcmp( tempStr1, tempStr2 ), 0 == strcmp( a, b ), msgString, "equal strings" ); \
       } \
    } while( 0 )
+
+#define pcu_check_fileEq( fnameA, fnameB ) \
+   _pcu_check_fileEq( (fnameA), (fnameB), #fnameA, #fnameB, pcu_cursuite, __FILE__, __LINE__ )
+
+void _pcu_check_fileEq( const char* const fileName1, const char* const fileName2,
+      const char* const fName1Expr, const char* const fName2Expr, pcu_suite_t* pcu_cursuite,
+      const char* sourceFile, const unsigned int sourceLine );
 
 #ifndef NDEBUG
 
