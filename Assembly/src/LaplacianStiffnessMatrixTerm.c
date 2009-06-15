@@ -247,6 +247,4 @@ void _LaplacianStiffnessMatrixTerm_AssembleElement(
 			}
 		}
 	}
-	
-	Memory_Free(GNx); 
 }
