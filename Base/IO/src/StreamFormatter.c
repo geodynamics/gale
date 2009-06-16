@@ -163,7 +163,7 @@ char* StreamFormatter_Buffer_AllocNext( Index size ) {
          *stgStreamFormatter_Buffer->current = Memory_Alloc_Array( char, size, "StreamFormatter-Buffer-Current" );
       }
       else {
-		   *stgStreamFormatter_Buffer->current = (char*)Memory_Realloc( *stgStreamFormatter_Buffer->current, size );
+		   *stgStreamFormatter_Buffer->current = (char*)Memory_Realloc_Array( *stgStreamFormatter_Buffer->current, char, size );
       }
 	}
 
