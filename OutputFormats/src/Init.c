@@ -66,17 +66,17 @@ Bool lucOutputFormats_Init() {
 	  RegisterParent( lucOutputVECTOR_Type,         lucOutputFormat_Type );
 	#endif
 
-	#ifdef HAVE_LIBPNG
+	#ifdef HAVE_PNG
 	   Stg_ComponentRegister_Add( componentRegister, lucOutputPNG_Type,      "0", _lucOutputPNG_DefaultNew );
 	   RegisterParent( lucOutputPNG_Type,         lucOutputFormat_Type );
 	#endif	
 	
-	#ifdef HAVE_LIBJPEG
+	#ifdef HAVE_JPEG
     	Stg_ComponentRegister_Add( componentRegister, lucOutputJPEG_Type,     "0", _lucOutputJPEG_DefaultNew );
     	RegisterParent( lucOutputJPEG_Type,        lucOutputFormat_Type );
     #endif
     
-    #ifdef HAVE_LIBTIFF
+    #ifdef HAVE_TIFF
     	Stg_ComponentRegister_Add( componentRegister, lucOutputTIFF_Type,     "0", _lucOutputTIFF_DefaultNew );
     	RegisterParent( lucOutputTIFF_Type,        lucOutputFormat_Type );
     #endif

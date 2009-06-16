@@ -58,17 +58,17 @@ Bool lucInputFormats_Init() {
 	lucInputFormat_Register_Add( lucInputFormat_Register_Singleton, ".ppm", lucInputPPM_Type, "0", _lucInputPPM_DefaultNew );
 	RegisterParent( lucInputPPM_Type,         lucInputFormat_Type );
 		
-	#ifdef HAVE_LIBTIFF
+	#ifdef HAVE_TIFF
     	lucInputFormat_Register_Add( lucInputFormat_Register_Singleton, ".tiff", lucInputTIFF_Type, "0", _lucInputTIFF_DefaultNew );
     	RegisterParent( lucInputTIFF_Type,        lucInputFormat_Type );
 	#endif
 			
-/*	#ifdef HAVE_LIBPNG
+/*	#ifdef HAVE_PNG
 	   lucInputFormat_Register_Add( lucInputFormat_Register_Singleton, ".png",      "0", _lucInputPNG_DefaultNew );
 	   RegisterParent( lucInputPNG_Type,         lucInputFormat_Type );
 	#endif	
 	
-	#ifdef HAVE_LIBJPEG
+	#ifdef HAVE_JPEG
     	lucInputFormat_Register_Add( lucInputFormat_Register_Singleton, ".jpeg",      "0", _lucInputJPEG_DefaultNew );
     	RegisterParent( lucInputJPEG_Type,        lucInputFormat_Type );
     #endif

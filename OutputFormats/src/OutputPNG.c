@@ -42,7 +42,7 @@
 ** $Id: OutputPNG.c 740 2007-10-11 08:05:31Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-#ifdef HAVE_LIBPNG
+#ifdef HAVE_PNG
 
 #include <mpi.h>
 #include <png.h>
@@ -220,5 +220,5 @@ void _lucOutputPNG_Output( void* outputFormat, lucWindow* window, AbstractContex
 	Stream_CloseFile( stream );	/* Release this file. Otherwise too many files will be opened at a time. */
 }
 
-#endif /* HAVE_LIBPNG */
+#endif /* HAVE_PNG */
 
