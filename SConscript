@@ -36,6 +36,8 @@ if not os.path.exists(os.path.join(dir, 'ClassSetup.h')):
 # afterwards.
 objs = []
 suites = []
+tst_exp = []
+tst_input = []
 
 # Process each directory uniformly.
 dirs = Split('Base/Foundation Base/IO Base/Container Base/Automation Base/Extensibility ' \
@@ -75,8 +77,8 @@ for d in dirs:
     suites += env.Object(Glob(tst_dir + '/*Suite.c'))
 
     # Install any test expected and input files
-    tst_exp = env.Install(tst_install_dir + '/expected', Glob(tst_exp_dir + '/*'))
-    tst_input = env.Install(tst_install_dir + '/input', Glob(tst_input_dir + '/*'))
+    tst_exp += env.Install(tst_install_dir + '/expected', Glob(tst_exp_dir + '/*'))
+    tst_input += env.Install(tst_install_dir + '/input', Glob(tst_input_dir + '/*'))
 
 # Need to install headers from libStGermain.
 hdrs = env.Install('include/StGermain', Glob('libStGermain/src/*.h'))
