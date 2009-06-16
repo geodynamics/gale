@@ -15,6 +15,8 @@ env.Append(CPPPATH=env['build_dir'] + '/include/StgFEM')
 # afterwards.
 objs = []
 suites = []
+tst_exp = []
+tst_input = []
 
 # Process each directory uniformly.
 dirs = Split('Discretisation SLE/SystemSetup SLE/ProvidedSystems/AdvectionDiffusion ' \
@@ -31,6 +33,9 @@ for d in dirs:
     src_dir = d + '/src'
     inc_dir = 'include/StgFEM/' + d
     tst_dir = d + '/tests'
+    tst_exp_dir = tst_dir + '/expected'
+    tst_input_dir = tst_dir + '/input'
+    tst_install_dir = 'tests/StgFEM/' + d
 
     # Install the headers and '.def' files.
     hdrs = env.Install(inc_dir, Glob(src_dir + '/*.h'))
@@ -51,6 +56,10 @@ for d in dirs:
 
     # Build any test suites we might find.
     suites += env.Object(Glob(tst_dir + '/*Suite.c'))
+
+    # Install any test expected and input files
+    tst_exp += env.Install(tst_install_dir + '/expected', Glob(tst_exp_dir + '/*'))
+    tst_input += env.Install(tst_install_dir + '/input', Glob(tst_input_dir + '/*'))
 
 # Need to install headers from libStgFEM.
 env.Install('include/StgFEM', Glob('libStgFEM/src/*.h'))
