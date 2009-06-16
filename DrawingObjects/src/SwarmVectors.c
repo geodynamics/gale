@@ -268,17 +268,18 @@ void _lucSwarmVectors_BuildDisplayList( void* drawingObject, void* _context ) {
 }
 
 void _lucSwarmVectors_PlotParticle( void* drawingObject, void* _context, Particle_Index lParticle_I ) {
-	lucSwarmVectors*         self                = (lucSwarmVectors*)drawingObject;
-	DomainContext*   context             = (DomainContext*) _context;
-	GlobalParticle*          particle            = (GlobalParticle*)Swarm_ParticleAt( self->swarm, lParticle_I );
-	SwarmVariable*           lengthVariable      = self->lengthVariable;
-	SwarmVariable*           thicknessVariable   = self->thicknessVariable;
-	double*                  coord               = particle->coord;
-	double                   length              = self->length;
-	double                   thickness           = self->thickness;
-	XYZ                      direction           = { 0, 0, 0 };
+	lucSwarmVectors*        self                = (lucSwarmVectors*)drawingObject;
+	DomainContext*   		context             = (DomainContext*) _context;
+	GlobalParticle*         particle            = (GlobalParticle*)Swarm_ParticleAt( self->swarm, lParticle_I );
+	SwarmVariable*          lengthVariable      = self->lengthVariable;
+	SwarmVariable*          thicknessVariable   = self->thicknessVariable;
+	double*                 coord               = particle->coord;
+	double                  length              = self->length;
+	double                  thickness           = self->thickness;
+	XYZ                     direction           = { 0, 0, 0 };
 
-	SwarmVariable_ValueAt( self->directionVariable, lParticle_I, direction );
+	if ( self->directionVariable )
+		SwarmVariable_ValueAt( self->directionVariable, lParticle_I, direction );
 
 	if ( lengthVariable )
 		SwarmVariable_ValueAt( lengthVariable, lParticle_I, &length );

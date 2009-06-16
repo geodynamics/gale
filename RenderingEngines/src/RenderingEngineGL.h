@@ -73,6 +73,7 @@
 		Stg_Component_ExecuteFunction*                     _execute,
 		Stg_Component_DestroyFunction*                     _destroy,
 		lucRenderingEngine_RenderFunction*                 _render,
+		lucRenderingEngine_ClearFunction*             	   _clear,
 		lucRenderingEngine_GetPixelDataFunction*           _getPixelData,
 		lucRenderingEngine_CompositeViewportFunction*      _compositeViewport,
 		Name                                               name );
@@ -90,10 +91,10 @@
 	void _lucRenderingEngineGL_Destroy( void* renderingEngine, void* data ) ;
 
 	void _lucRenderingEngineGL_Render( void* renderingEngine, lucWindow* window, AbstractContext* context ) ;
+	void _lucRenderingEngineGL_Clear( void* renderingEngine, lucWindow* window, Bool clearAll ) ;
 	void _lucRenderingEngineGL_GetPixelData( void* renderingEngine, lucWindow* window, lucPixel* buffer ) ;
 
 	void lucRenderingEngineGL_WriteViewportText( void* renderingEngine, lucWindow* window, lucViewportInfo* viewportInfo, AbstractContext* context ) ;
-	void lucRenderingEngineGL_Clear( void* renderingEngine, lucWindow* window ) ;
 
 	/** Compositing Functions */
 	Index lucRenderingEngineGL_MapBufferIdToRank( void* renderingEngine, Index bufferId, Index mergeCount ) ;
@@ -109,13 +110,6 @@
 		lucViewportInfo*                                   viewportInfo, 
 		AbstractContext*                                   context, 
 		Bool                                               broadcast ) ;
-
-	void lucRenderingEngineGL_CombineToMaster( 
-		void*                                              renderingEngine,
-		lucViewportInfo*                                   viewportInfo,
-		AbstractContext*                                   context,
-		lucPixel*                                          imageBuffer, 
-		float*                                             depthBuffer );
 
 	void _lucRenderingEngineGL_CompositeViewport_Manual( 
 		void*                                              renderingEngine, 

@@ -240,25 +240,27 @@ void _lucSwarmViewer_BuildDisplayList( void* drawingObject, void* _context ) {
 			
 	glDisable(GL_LIGHTING);
 		
-	if(self->pointSmoothing) 
+	if(self->pointSmoothing) { 
+        /* Round, smooth points */
 		glEnable(GL_POINT_SMOOTH);
+		/* Point smoothing will not work correctly with depth testing enabled*/
+	    glDepthFunc(GL_ALWAYS);
+    }
 	else 
 		glDisable(GL_POINT_SMOOTH);
 		
 	glPointSize( self->pointSize );
- 		
-		
 	
 	glBegin( GL_POINTS );
 	_lucSwarmViewerBase_BuildDisplayList( self, _context );
 	glEnd( );
 
 	/* Put back lighting / smoothing settings to low-impact options */
-	
 	glEnable(GL_LIGHTING);	
 		
 	if(self->pointSmoothing) {
 		glDisable(GL_POINT_SMOOTH);
+	    glDepthFunc(GL_LESS);
 	}
 }
 
@@ -268,10 +270,10 @@ void _lucSwarmViewer_PlotParticle( void* drawingObject, void* _context, Particle
 	DomainContext*   context             = (DomainContext*) _context;
 	GlobalParticle*          particle            = (GlobalParticle*)Swarm_ParticleAt( self->swarm, lParticle_I );
 	double*                  coord               = particle->coord;
-	float                    offset              = 0.001;
-      
+	float                    offset              = 0.001; 
+
 	if (context->dim == 2)
-		glVertex3f( (float)coord[0], (float)coord[1], offset );
+		glVertex3f( (float)coord[0], (float)coord[1], offset);
 	else   
 		glVertex3dv( coord );
 }

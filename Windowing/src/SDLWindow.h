@@ -45,6 +45,9 @@
 
 #ifdef HAVE_SDL
 
+#include <SDL/SDL.h>
+#include <gl.h>
+
 #ifndef __lucSDLWindow_h__
 #define __lucSDLWindow_h__
 
@@ -57,23 +60,34 @@
 		__lucWindow \
 		/* Virtual functions go here */ \
 		/* Other info */\
+		int													sdlFlags;				\
+		SDL_Surface*										screen;					\
+		SDL_Surface*										buffer;					\
+		void*                                               osMesaContext;			\
+		lucAlphaPixel*                                      pixelBuffer;            \
+		SDL_TimerID											timer;					\
+        void*                                               osBuffer;               \
 
 	struct lucSDLWindow { __lucSDLWindow };
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
 	lucSDLWindow* _lucSDLWindow_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		Name                                               name );
+		SizeT                                           sizeOfSelf,
+		Type                                            type,
+		Stg_Class_DeleteFunction*                       _delete,
+		Stg_Class_PrintFunction*                        _print,
+		Stg_Class_CopyFunction*                         _copy, 
+		Stg_Component_DefaultConstructorFunction*       _defaultConstructor,
+		Stg_Component_ConstructFunction*                _construct,
+		Stg_Component_BuildFunction*                    _build,
+		Stg_Component_InitialiseFunction*               _initialise,
+		Stg_Component_ExecuteFunction*                  _execute,
+		Stg_Component_DestroyFunction*                  _destroy,
+		lucWindow_DisplayFunction*						_displayWindow,	
+		lucWindow_EventsWaitingFunction*				_eventsWaiting,	
+		lucWindow_EventProcessorFunction*				_eventProcessor,	
+		lucWindow_ResizeFunction*						_resizeWindow,	
+		Name                                            name );
 
 	void _lucSDLWindow_Delete( void* window ) ;
 	void _lucSDLWindow_Print( void* window, Stream* stream ) ;
@@ -87,7 +101,16 @@
 	void _lucSDLWindow_Execute( void* window, void* data );
 	void _lucSDLWindow_Destroy( void* window, void* data ) ;
 
-	void lucSDLWindow_EventLoop( void* window, AbstractContext* context) ;
+	/* Window Virtuals */
+	void _lucSDLWindow_Display( void* window );
+	int _lucSDLWindow_EventsWaiting( void* window ) ;
+	Bool _lucSDLWindow_EventProcessor( void* window ) ;
+	void _lucSDLWindow_Resize( void* window );
+
+	/* Timer callback */
+	Uint32 lucSDLWindow_IdleTimer(Uint32 interval, void* param);
+    void lucSDLWindow_CreateWindow(void *window);
+    void lucSDLWindow_DeleteWindow(void *window);
 
 #endif
 

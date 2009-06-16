@@ -71,12 +71,7 @@
 		GLXPixmap                                           glxpmap;                 \
 		XVisualInfo*                                        vi;                      \
 		Bool                                                doubleBuffer;            \
-		Bool                                                backgroundWindowOpen;    \
-		Bool                                                interactiveWindowOpen;   \
-		XFontStruct*                                        font;                    \
-		Name                                                xFontName;               \
-		Bool                                                isTimedOut;              \
-		double                                              maxIdleTime;             \
+		Atom             									wmDeleteWindow;			 \
 		/* Display name stuff */ \
 		Name                                                displayName;             \
 		Name                                                host;                    \
@@ -87,18 +82,22 @@
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
 	lucX11Window* _lucX11Window_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		Name                                               name );
+		SizeT                                           sizeOfSelf,
+		Type                                            type,
+		Stg_Class_DeleteFunction*                       _delete,
+		Stg_Class_PrintFunction*                        _print,
+		Stg_Class_CopyFunction*                         _copy, 
+		Stg_Component_DefaultConstructorFunction*       _defaultConstructor,
+		Stg_Component_ConstructFunction*                _construct,
+		Stg_Component_BuildFunction*                    _build,
+		Stg_Component_InitialiseFunction*               _initialise,
+		Stg_Component_ExecuteFunction*                  _execute,
+		Stg_Component_DestroyFunction*                  _destroy,
+		lucWindow_DisplayFunction*						_displayWindow,	
+		lucWindow_EventsWaitingFunction*				_eventsWaiting,	
+		lucWindow_EventProcessorFunction*				_eventProcessor,	
+		lucWindow_ResizeFunction*						_resizeWindow,	
+		Name                                            name );
 
 	void _lucX11Window_Delete( void* window ) ;
 	void _lucX11Window_Print( void* window, Stream* stream ) ;
@@ -112,12 +111,12 @@
 	void _lucX11Window_Execute( void* window, void* data );
 	void _lucX11Window_Destroy( void* window, void* data ) ;
 
-	Bool lucX11Window_EventLoop( void* window, AbstractContext* context) ;
-
-	void lucX11Window_SetupFonts( void* window ) ;
-	void lucX11Window_SwapBuffers( void* window, AbstractContext* context ) ;
-	void lucX11Window_MakeCurrent( void* window )  ;
-
+	/* Window Virtual implementations */
+	void _lucX11Window_Display( void* window );
+	int _lucX11Window_EventsWaiting( void* window ) ;
+	Bool _lucX11Window_EventProcessor( void* window ) ;
+	void _lucX11Window_Resize( void* window );
+	
 	Bool lucX11Window_CreateDisplay( void* window )  ;
 	void lucX11Window_CreateBackgroundWindow( void* window )  ;
 	void lucX11Window_CreateInteractiveWindow( void* window ) ;
@@ -125,8 +124,9 @@
 	Colormap lucX11Window_GetShareableColormap( lucX11Window* self ) ;
 	void lucX11Window_CloseInteractiveWindow( lucX11Window* self ) ;
 	void lucX11Window_CloseBackgroundWindow( lucX11Window* self ) ;
-	void lucX11Window_CloseDisplay( lucX11Window* self ) ;
-	Bool lucX11Window_FindFont( void* window )  ;
+
+	void lucX11Window_Timer( int ) ;
+    int lucX11Window_Error(Display* display, XErrorEvent* error);
 
 #endif
 

@@ -59,6 +59,175 @@
 #endif
 #include <string.h>
 
+#include  "font.h"
+
+unsigned int fontbase = -1, fontcharset = FONT_DEFAULT, texture;
+
+void lucViewport2d(Bool enabled, lucViewportInfo* viewportInfo)
+{
+	if (enabled)
+	{
+		/* Set up 2D Viewer the size of the viewport */
+		glDisable( GL_DEPTH_TEST );
+		glPushMatrix();
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glOrtho((GLfloat) 0.0, (GLfloat) viewportInfo->width, (GLfloat) viewportInfo->height, (GLfloat) 0.0, -1.0f,1.0f);
+		
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		
+		/* Disable lighting because we don't want a 3D effect */
+		glDisable(GL_LIGHTING);
+		/* Disable line smoothing in 2d mode */
+		glDisable(GL_LINE_SMOOTH);
+	}
+	else
+	{
+		/* Put back settings */
+		glEnable(GL_LIGHTING);
+		glEnable( GL_DEPTH_TEST );
+		glEnable(GL_LINE_SMOOTH);
+		glPopMatrix();
+		
+		/*Set back the viewport to what it should be to render any other object */
+		/* If this is not done, than any object displayed after the colour bar will not appear,*/
+		/* because the projection matrix and lookAt point have been altered */
+		lucViewportInfo_SetOpenGLCamera( viewportInfo );
+	}
+}
+
+void lucPrintString(const char* str)
+{
+	if (fontbase < 0)								/* Load font if not yet done */
+		lucSetupRasterFont();
+	
+	if (fontcharset > FONT_LARGE || fontcharset < FONT_FIXED)		/* Character set valid? */
+		fontcharset = FONT_FIXED;	
+
+	glEnable(GL_TEXTURE_2D);				 					/* Enable Texture Mapping */
+	glListBase(fontbase - 32 + (96 * fontcharset));		/* Choose the font and charset */
+
+	glCallLists(strlen(str),GL_UNSIGNED_BYTE, str);		/* Display */
+	glDisable(GL_TEXTURE_2D);									/* Disable Texture Mapping */
+
+	#ifdef HAVE_GL2PS
+	/* call to gl2pText is required for text output using vector formats, 
+	 * as no text is stored in the GL feedback buffer */  
+		gl2psText( A, "Times-Roman", 16);
+	#endif
+}
+
+void lucPrintf(int x, int y, const char *fmt, ...)
+{
+	char text[512];
+	va_list		ap;							/* Pointer to arguments list */
+	if (fmt == NULL) return; 		/* No format string */
+	va_start(ap, fmt);						/* Parse format string for variables */
+		vsprintf(text, fmt, ap);			/* Convert symbols */
+	va_end(ap);
+
+	lucPrint(x, y, text);					/* Print result string */
+}
+
+void lucPrint(int x, int y, const char *str)
+{
+	glPushMatrix();
+	glLoadIdentity();
+	glTranslated(x, y, 0);
+	lucPrintString(str);
+	glPopMatrix();
+}
+
+void lucSetFontCharset(int charset)
+{
+	fontcharset = charset;
+}
+
+/* String width calc */ 
+int lucStringWidth(const char *string)
+{
+	/* Sum character widths in string */
+	int i, len = 0, slen = strlen(string);
+	for (i = 0; i < slen; i++)
+		len += font_charwidths[string[i]-32 + (96 * fontcharset)];
+
+	return len + slen;	/* Additional pixel of spacing for each character */
+}
+
+void lucSetupRasterFont() {
+	/* Load font bitmaps and Convert To Textures */
+	int i, j;
+ 	unsigned char pixel_data[IMAGE_HEIGHT * IMAGE_WIDTH * IMAGE_BYTES_PER_PIXEL];
+   	unsigned char fontdata[IMAGE_HEIGHT][IMAGE_WIDTH];	/* font texture data */
+	
+	/* Get font pixels from source data - only need alpha channel */
+	IMAGE_RUN_LENGTH_DECODE(pixel_data, IMAGE_RLE_PIXEL_DATA, IMAGE_WIDTH * IMAGE_HEIGHT, IMAGE_BYTES_PER_PIXEL);
+	for (i = 0; i < IMAGE_HEIGHT; i++)
+		for (j = 0; j < IMAGE_WIDTH; j++)
+				fontdata[ i ][ j ] = pixel_data[ IMAGE_BYTES_PER_PIXEL * (IMAGE_WIDTH * i + j) + 3 ];
+	
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
+
+	/* create and bind texture */
+	glGenTextures(1, &texture);	
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glEnable(GL_COLOR_MATERIAL);
+	/* use linear filtering */
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	/* generate the texture from bitmap alpha data */
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, IMAGE_WIDTH, IMAGE_HEIGHT, 0, GL_ALPHA, GL_UNSIGNED_BYTE, fontdata);
+	fontbase = glGenLists(GLYPHS);
+
+	/* Build font display lists */
+	lucBuildFont(16, 16, 0, 384);		/* 16x16 glyphs, 16 columns - glyphs 0-383 = first 4 fonts */
+	lucBuildFont(18, 14, 384, 512);	/* 18x18 glyphs, 14 columns - glyphs 384-511 = last font */
+}
+
+void lucBuildFont(int glyphsize, int columns, int startidx, int stopidx)
+{
+	/* Build font display lists */
+	int i;
+	static float yoffset;
+	float divX = IMAGE_WIDTH / (float)glyphsize;
+	float divY = IMAGE_HEIGHT / (float)glyphsize;
+	float glyphX = 1 / divX;	/* Width & height of a glyph in texture coords */
+	float glyphY = 1 / divY;
+	GLfloat cx, cy, cx1, cy1;         /* the character coordinates in our texture */
+    if (startidx == 0) yoffset = 0;
+	glBindTexture(GL_TEXTURE_2D, texture);
+	for (i = 0; i < (stopidx - startidx); i++)
+	{
+		cx = (float) (i % columns) / divX;
+		cy = yoffset + (float) (i / columns) / divY;
+		glNewList(fontbase + startidx + i, GL_COMPILE);
+			glBegin(GL_QUADS);
+				glTexCoord2f(cx, cy + glyphY);
+				glVertex2i(0, glyphsize);
+				glTexCoord2f(cx + glyphX, cy + glyphY);
+				glVertex2i(glyphsize, glyphsize);
+				glTexCoord2f(cx + glyphX, cy);
+				glVertex2i(glyphsize, 0);
+				glTexCoord2f(cx, cy);
+				glVertex2i(0, 0);
+			glEnd();
+			/* Shift right width of character + 1 */
+			glTranslated(font_charwidths[startidx + i]+1, 0, 0);
+		glEndList();
+	}
+	/* Save vertical offset to resume from */
+	yoffset = cy + glyphY;
+}
+
+void lucDeleteFont()
+{
+	/* Delete fonts */
+	glDeleteLists(fontbase, GLYPHS);
+    glDeleteTextures(1, &texture);
+}
+
 void lucColour_SetOpenGLColour( lucColour* colour ) {
 	glColor4f(
 			colour->red,
@@ -171,9 +340,9 @@ void lucViewportInfo_SetOpenGLCamera( lucViewportInfo* viewportInfo ) {
 			
 			glGetBooleanv(pname, &stereo_enabled);
 			if( stereo_enabled == GL_FALSE)
-				printf(" Stereo not supported XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n");
+				Journal_DPrintfL( lucDebug, 2, " Stereo not supported\n");
 			else 
-				printf(" Stereo is supported XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n");
+				Journal_DPrintfL( lucDebug, 2, " Stereo is supported\n");
 				
 				
 			radians = DTOR * camera->aperture/2.0;

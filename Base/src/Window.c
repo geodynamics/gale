@@ -42,7 +42,6 @@
 ** $Id: Window.c 791 2008-09-01 02:09:06Z JulianGiordani $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
 #include <mpi.h>
 #include <StGermain/StGermain.h>
 #include <StgDomain/StgDomain.h>
@@ -72,24 +71,32 @@
 /* ASCII Characters */
 #define ESCAPE 27
 
+#ifndef MASTER
+	#define MASTER 0
+#endif
+
 const Type lucWindow_Type = "lucWindow";
 
 MPI_Datatype lucWindow_MPI_Datatype;
 MPI_Datatype lucViewportInfo_MPI_Datatype;
 
 lucWindow* _lucWindow_New(
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,		
-		Name                                               name )
+		SizeT                                           sizeOfSelf,
+		Type                                            type,
+		Stg_Class_DeleteFunction*                       _delete,
+		Stg_Class_PrintFunction*                        _print,
+		Stg_Class_CopyFunction*                         _copy, 
+		Stg_Component_DefaultConstructorFunction*       _defaultConstructor,
+		Stg_Component_ConstructFunction*                _construct,
+		Stg_Component_BuildFunction*                    _build,
+		Stg_Component_InitialiseFunction*               _initialise,
+		Stg_Component_ExecuteFunction*                  _execute,
+		Stg_Component_DestroyFunction*                  _destroy,		
+		lucWindow_DisplayFunction*						_displayWindow,	
+		lucWindow_EventsWaitingFunction*				_eventsWaiting,	
+		lucWindow_EventProcessorFunction*				_eventProcessor,
+		lucWindow_ResizeFunction*						_resizeWindow,	
+		Name                                            name )
 {
 	lucWindow*    self;
 
@@ -110,6 +117,12 @@ lucWindow* _lucWindow_New(
 			name, 
 			NON_GLOBAL );
 
+	/* Virtual functions */
+	self->_displayWindow = _displayWindow;
+	self->_eventsWaiting = _eventsWaiting;
+	self->_eventProcessor = _eventProcessor;
+	self->_resizeWindow = _resizeWindow;
+	
 	return self;
 }
 
@@ -126,7 +139,10 @@ void _lucWindow_Init(
 		Pixel_Index                                        width,
 		Pixel_Index                                        height,
 		Name                                               backgroundColourName,
-		Bool                                               interactive )
+		Bool                                               interactive,
+		Bool                                               continuous,
+		Bool                                               isTimedOut,
+		double                                             maxIdleTime ) 
 {
 	OutputFormat_Index   outputFormat_I;
 	WindowInteraction_Index windowInteraction_I;
@@ -134,7 +150,9 @@ void _lucWindow_Init(
 	self->renderingEngine = renderingEngine;
 	self->width = width;
 	self->height = height;
+    self->resized = False;
 	self->interactive = interactive;
+	self->continuous = continuous; 
 
 	self->viewportInfoList = Memory_Alloc_Array( lucViewportInfo, viewportCount, "viewport info Array" );
 	memcpy( self->viewportInfoList, viewportInfoList, viewportCount * sizeof( lucViewportInfo ) );
@@ -160,16 +178,25 @@ void _lucWindow_Init(
 	/* Get window to 'execute' at each 'Dump' entry point, and force the context not to re-execute itself. */
 	//context->hasExecuted = True;
 	EP_AppendClassHook( Context_GetEntryPoint( context, AbstractContext_EP_DumpClass ), self->_execute, self );
+	
+	self->isTimedOut    = isTimedOut;
+	self->maxIdleTime   = maxIdleTime;
+	self->idleTime = 0;
+	self->startx = 0;
+	self->starty = 0;
+	
+	self->title = Memory_Alloc_Array( char, 100, "title string" );
+	strcpy(self->title, " gLucifer Interactive Output ");
 }
 		
 void _lucWindow_Delete( void* window ) {
-	lucWindow* self        = window;
+	lucWindow*     self      = (lucWindow*)window;
 
 	Stg_Class_Delete( self->outputFormat_Register );
 	Stg_Class_Delete( self->defaultWindowInteraction );
 	Stg_Class_Delete( self->windowInteraction_Register );
-		
-	_Stg_Component_Delete( self );
+
+	_Stg_Component_Delete( window );
 }
 
 void _lucWindow_Print( void* window, Stream* stream ) {
@@ -186,6 +213,7 @@ void _lucWindow_Print( void* window, Stream* stream ) {
 	Journal_PrintValue( stream, self->width );
 	Journal_PrintValue( stream, self->height );
 	Journal_PrintValue( stream, self->interactive );
+	Journal_PrintValue( stream, self->continuous );
 	Journal_Printf( stream, "self->currStereoBuffer = ");
 	switch ( self->currStereoBuffer ) {
 		case lucLeft:
@@ -221,6 +249,10 @@ void* _lucWindow_DefaultNew( Name name ) {
 			_lucWindow_Initialise,
 			_lucWindow_Execute,
 			_lucWindow_Destroy,
+			lucWindow_Display,
+			lucWindow_EventsWaiting,
+			lucWindow_EventProcessor,
+			lucWindow_Resize,
 			name );
 }
 
@@ -238,6 +270,8 @@ void _lucWindow_Construct( void* window, Stg_ComponentFactory* cf, void* data ) 
 	WindowInteraction_Index  windowInteractionCount;
 	Bool                     interactiveDefault;
 	Bool                     interactive;
+	Bool                     continuousDefault;
+	Bool                     continuous;
 	
 	width = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "width", 400 );
 	height = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "height", 400 );
@@ -247,6 +281,10 @@ void _lucWindow_Construct( void* window, Stg_ComponentFactory* cf, void* data ) 
 	 * Specific lucWindow objects can override this parameter in their own component structs */
 	interactiveDefault = Stg_ComponentFactory_GetRootDictBool( cf, "interactive", False );
 	interactive = Stg_ComponentFactory_GetBool( cf, self->name, "interactive", interactiveDefault );
+
+	/* Get information about whether this window is in continuous mode or not */
+	continuousDefault = Stg_ComponentFactory_GetRootDictBool( cf, "continuous", False );
+	continuous = Stg_ComponentFactory_GetBool( cf, self->name, "continuous", continuousDefault );
 
 	/* Grab information about what viewports are going to be plotting in this window */
 	viewportInfoList = lucWindow_ConstructViewportInfoList( self, cf, width, height, &viewportCount, data );
@@ -273,8 +311,8 @@ void _lucWindow_Construct( void* window, Stg_ComponentFactory* cf, void* data ) 
 		&windowInteractionCount,
 		data );
 		
-	/* The window needs information about the context so that it can attach itself onto the AbstractContext_EP_DumpClass entry 
-	 * point. */
+	/* The window needs information about the context so that it can attach itself 
+	 * onto the AbstractContext_EP_DumpClass entry point. */
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
 
 	renderingEngine = Stg_ComponentFactory_ConstructByKey( cf, self->name, "RenderingEngine", lucRenderingEngine, True, data );
@@ -292,7 +330,11 @@ void _lucWindow_Construct( void* window, Stg_ComponentFactory* cf, void* data ) 
 			width,
 			height,
 			Stg_ComponentFactory_GetString( cf, self->name, "backgroundColour", "white" ),
-			interactive );
+			interactive,
+			continuous,
+			Stg_ComponentFactory_GetBool( cf, self->name, "isTimedOut", True ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, "maxIdleTime", 600.0 ) 
+			);
 		
 	/* Free Memory */
 	Memory_Free(viewportInfoList); 
@@ -303,24 +345,149 @@ void _lucWindow_Construct( void* window, Stg_ComponentFactory* cf, void* data ) 
 
 }
 
-void _lucWindow_Build( void* window, void* data ) { }
-void _lucWindow_Initialise( void* window, void* data ) { }
-void _lucWindow_Execute( void* window, void* data ) { 
-	lucWindow*     self         = (lucWindow*) window ;
+void _lucWindow_Build( void* window, void* data ) {
+	/* Save context and master flag */
+	lucWindow*  self = (lucWindow*)window;
+	self->context   = (AbstractContext*) data;
+	self->isMaster = (self->context->rank == MASTER);
+}
 
+void _lucWindow_Initialise( void* window, void* data ) {
+	lucWindow*           self            = (lucWindow*)window;
+
+	lucSetupRasterFont();
+
+	/* Flag display lists must be created and objects drawn */
+	lucWindow_SetViewportNeedsToSetupFlag( self, True );
+	lucWindow_SetViewportNeedsToDrawFlag( self, True );
+}
+
+void _lucWindow_Execute( void* window, void* data ) { 
+	/* Display graphics and allow GUI interaction if enabled */
+	lucWindow*     self         = (lucWindow*) window ;
+	lucDebug_PrintFunctionBegin( self, 1 );
+
+	/* Reset idle timer */
+	lucWindow_IdleReset(self);	
+
+	/* Flag viewports need to re-render new information */
 	lucWindow_SetViewportNeedsToSetupFlag( self, True );
 	lucWindow_SetViewportNeedsToDrawFlag( self, True );
 
-	lucWindow_Draw( self, data );
-	lucWindow_Dump( self, data );
-	lucWindow_CleanUp( self, data );
+	/* Draw Window (Call virtual to display) 
+	 initial output for background & interactive modes */
+	self->_displayWindow( self );
+
+	/* Interactive mode? Enter event loop processing */
+	if ( self->interactive ) {
+		Bool redisplay = False;
+		lucWindow_InteractionHelpMessage( self, Journal_MyStream( Info_Type, self ) );
+		
+		/* Clear quit flags */
+		self->quitEventLoop = False;
+		self->toggleApplicationQuit = False;
+		
+		while ( !self->quitEventLoop ) {
+            /* Only master processes events */
+            int events = 0;
+			if (self->isMaster)
+            {  
+                /* Check for events */
+                events = self->_eventsWaiting(self);
+                if (self->continuous && events == 0)
+                {
+                    /* Continuous mode and no events waiting, quit loop */
+                    self->quitEventLoop = True; 
+                    redisplay = True;
+                }
+                else	
+                    /* Call virtual to wait for and process events */
+                    if (self->_eventProcessor(self) || events > 1) redisplay = True;
+            }
+
+        	/* Broadcast information about event loop*/ 
+        	MPI_Bcast( &events, 1, MPI_INT, MASTER, self->context->communicator );
+        	MPI_Bcast( &redisplay, 1, MPI_INT, MASTER, self->context->communicator );
+      
+			/* Still events to process? delay redisplay until queue empty */
+			if (events <= 1)
+			{
+				/* Redraw Window (Call virtual to display) */
+				if (redisplay) self->_displayWindow( self );
+				redisplay = False;
+			}
+		}
+
+		/* Close application if requested */
+		if( self->toggleApplicationQuit ) {
+			self->context->gracefulQuit = True;
+		}
+	}
+	
+	/* Dump outputs to disk */
+	if ( self->isMaster ) lucWindow_Dump( self, self->context );
+	
+	/* Stop idle timeout */
+	self->idleTime = 0;
+	
+	lucDebug_PrintFunctionEnd( self, 1 );
 }
-void _lucWindow_Destroy( void* window, void* data ) { }
 
-void lucWindow_Draw( void* window, AbstractContext* context ) {
-	lucWindow*     self         = (lucWindow*) window ;
+void _lucWindow_Destroy( void* window, void* data ) {
+	lucWindow*     self      = (lucWindow*)window;
 
-	lucRenderingEngine_Render( self->renderingEngine, self, context );
+	lucWindow_CleanUp( window, data );
+	Memory_Free(self->title);
+}
+
+void lucWindow_Display( void* window )
+{
+	/* Default display function... to be called from derived class display function */
+	lucWindow*     self      = (lucWindow*)window;
+
+	lucWindow_Broadcast( window, 0, MPI_COMM_WORLD );
+
+    /* Resize viewports if necessary */
+    if (self->resized) self->_resizeWindow(window);
+    
+	lucRenderingEngine_Render( self->renderingEngine, self, self->context );
+}
+
+int lucWindow_EventsWaiting( void* window )
+{
+	/* Dummy events waiting function... */
+	return 0;
+}
+
+Bool lucWindow_EventProcessor( void *window)
+{
+	/* Dummy event processor function... */
+	lucWindow*     self      = (lucWindow*)window;
+	self->quitEventLoop = True;
+	/* Returns true redisplay required */
+	return False;
+}
+
+void lucWindow_Resize( void* window ) {
+    /* Default window resize function */
+	lucWindow*       self      = (lucWindow*) window;
+	Viewport_Index   viewport_I;
+	Viewport_Index   viewportCount = self->viewportCount;
+	Viewport_Index   horizontalCount = viewportCount / self->verticalCount;
+	lucViewportInfo* viewportInfo;
+
+	for ( viewport_I = 0 ; viewport_I < viewportCount ; viewport_I++ ) {
+		viewportInfo = &self->viewportInfoList[ viewport_I ];
+        int vertical_I = viewport_I / horizontalCount;
+        int horizontal_I = viewport_I % horizontalCount;
+		viewportInfo->width  = div( self->width, horizontalCount ).quot;
+		viewportInfo->height = div( self->height, self->verticalCount ).quot;
+		viewportInfo->startx = horizontal_I * viewportInfo->width;
+		viewportInfo->starty = (self->verticalCount - 1 - vertical_I) * viewportInfo->height;
+	}
+
+    self->resized = False;
+     _lucWindow_Initialise(self, self->context);	/* Reset font stuff */
 }
 
 void lucWindow_Dump( void* window, AbstractContext* context ) {
@@ -329,8 +496,11 @@ void lucWindow_Dump( void* window, AbstractContext* context ) {
 	Pixel_Index    height       = self->height;
 	lucPixel*      imageBuffer  = NULL;
 	Stream*        errorStream  = Journal_MyStream( Error_Type, self );
-	
+
 	lucDebug_PrintFunctionBegin( self, 1 );
+
+	/* Block until all rendering complete */
+	glFinish();  
 
 	/* Allocate Memory */
 	imageBuffer = Memory_Alloc_Array( lucPixel, width * height, "Pixels" );
@@ -360,18 +530,21 @@ void lucWindow_CleanUp( void* window, void* context ) {
 	}
 }
 
-void lucWindow_MouseMotion( void* window, lucMouseButton button, Pixel_Index xpos, Pixel_Index ypos, Pixel_Index startx, Pixel_Index starty) {
+/* Window event processing - mouse & keyboard */
+void lucWindow_MouseMotion( void* window, lucMouseButton button, Pixel_Index xpos, Pixel_Index ypos) {
 	lucWindow*            self      = (lucWindow*) window;
 	Index                 windowInteraction_I;
 	Index                 windowInteractionCount = lucWindowInteraction_Register_GetCount( self->windowInteraction_Register ); 
 	lucWindowInteraction* windowInteraction;
-	
+
 	lucDebug_PrintFunctionBegin( self, 2 );
 
 	for ( windowInteraction_I = 0 ; windowInteraction_I < windowInteractionCount ; windowInteraction_I++ ) {
 		windowInteraction = lucWindowInteraction_Register_GetByIndex( self->windowInteraction_Register, windowInteraction_I );
-		lucWindowInteraction_MouseMotion( windowInteraction, window, button, xpos, ypos, startx, starty );
+		lucWindowInteraction_MouseMotion( windowInteraction, window, button, xpos, ypos, self->startx, self->starty );
 	}
+	self->startx = xpos;
+	self->starty = ypos;
 
 	lucDebug_PrintFunctionEnd( self, 2 );
 }
@@ -383,11 +556,12 @@ void lucWindow_MouseClick( void* window, lucMouseButton button, lucMouseState st
 	lucWindowInteraction* windowInteraction;
 	
 	lucDebug_PrintFunctionBegin( self, 2 );
-
 	for ( windowInteraction_I = 0 ; windowInteraction_I < windowInteractionCount ; windowInteraction_I++ ) {
 		windowInteraction = lucWindowInteraction_Register_GetByIndex( self->windowInteraction_Register, windowInteraction_I );
 		lucWindowInteraction_MouseClick( windowInteraction, window, button, state, xpos, ypos );
 	}
+	self->startx = xpos;
+	self->starty = ypos;
 
 	lucDebug_PrintFunctionEnd( self, 2 );
 }
@@ -404,6 +578,8 @@ void lucWindow_KeyboardEvent( void* window, char key, Pixel_Index xpos, Pixel_In
 		windowInteraction = lucWindowInteraction_Register_GetByIndex( self->windowInteraction_Register, windowInteraction_I );
 		lucWindowInteraction_KeyboardEvent( windowInteraction, window, key, xpos, ypos );
 	}
+	self->startx = xpos;
+	self->starty = ypos;
 
 	lucDebug_PrintFunctionEnd( self, 2 );
 }
@@ -495,10 +671,6 @@ void lucWindow_CheckLightFlag( void* window ) {
 	lucDebug_PrintFunctionEnd( self, 2 );
 }
 
-
-
-
-
 void lucWindow_SetViewportNeedsToSetupFlag( void* window, Bool flag ) {
 	lucWindow*              self         = (lucWindow*) window ;
 	Viewport_Index          viewport_I;
@@ -514,9 +686,8 @@ void lucWindow_SetViewportNeedsToSetupFlag( void* window, Bool flag ) {
 void lucWindow_SetViewportNeedsToDrawFlag( void* window, Bool flag ) {
 	lucWindow*              self         = (lucWindow*) window ;
 	Viewport_Index          viewport_I;
-	
+
 	lucDebug_PrintFunctionBegin( self, 2 );
-	
 	for ( viewport_I = 0 ; viewport_I < self->viewportCount ; viewport_I++ ) {
 		self->viewportInfoList[ viewport_I ].needsToDraw = flag;
 	}
@@ -593,10 +764,9 @@ lucViewportInfo* lucWindow_ConstructViewportInfoList(
 		Viewport_Index* viewportCount,
 		void* data ) 
 {
-	Viewport_Index          verticalCount;
-	Viewport_Index          horizontalCount;
 	Viewport_Index          vertical_I;
 	Viewport_Index          horizontal_I;
+	Viewport_Index          horizontalCount;
 	Viewport_Index          total_I                 = 0;
 	Pixel_Index             viewportHeight;
 	Pixel_Index             viewportWidth;
@@ -615,12 +785,12 @@ lucViewportInfo* lucWindow_ConstructViewportInfoList(
 	list = Dictionary_Get( dictionary, "Viewport" );
 	Journal_Firewall( list != NULL, lucError, "Cannot Find 'Viewport' for %s '%s'.\n", self->type, self->name );
 		
-	verticalCount = Dictionary_Entry_Value_GetCount( list );
+	self->verticalCount = Dictionary_Entry_Value_GetCount( list );
 
 	/* Calculate viewport height */
-	viewportHeight = div( height, verticalCount ).quot;
+	viewportHeight = div( height, self->verticalCount ).quot;
 
-	for ( vertical_I = 0 ; vertical_I < verticalCount ; vertical_I++ ) {
+	for ( vertical_I = 0 ; vertical_I < self->verticalCount ; vertical_I++ ) {
 		horizontalVP_String = StG_Strdup( Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( list, vertical_I ) ) );
 	
 		/* Find number of horizontal layers */
@@ -652,7 +822,7 @@ lucViewportInfo* lucWindow_ConstructViewportInfoList(
 
 			/* Setup viewport dimensions */
 			currViewportInfo->startx = horizontal_I * viewportWidth;
-			currViewportInfo->starty = (verticalCount - 1 - vertical_I) * viewportHeight;
+			currViewportInfo->starty = (self->verticalCount - 1 - vertical_I) * viewportHeight;
 			currViewportInfo->width  = viewportWidth;
 			currViewportInfo->height = viewportHeight;
 
@@ -707,23 +877,24 @@ void lucWindow_InteractionHelpMessage( void* window, Stream* stream ) {
 }
 	
 
-#define lucWindow_TypesCount 5
+#define lucWindow_TypesCount 7
 void lucWindow_Create_MPI_Datatype() {
-	MPI_Datatype        typeList[lucWindow_TypesCount]     = { MPI_INT, MPI_INT, MPI_INT, MPI_FLOAT, MPI_INT };
-	int                 blocklen[lucWindow_TypesCount]     = {1, 1, 1, 4, 1};
+	MPI_Datatype        typeList[lucWindow_TypesCount]     = { MPI_INT, MPI_INT, MPI_INT, MPI_INT, MPI_INT, MPI_FLOAT, MPI_INT };
+	int                 blocklen[lucWindow_TypesCount]     = {1, 1, 1, 1, 1, 4, 1};
 	MPI_Aint            displacement[lucWindow_TypesCount];
 	lucWindow           window;
 
 	displacement[0] = GetOffsetOfMember( window, width );
 	displacement[1] = GetOffsetOfMember( window, height );
 	displacement[2] = GetOffsetOfMember( window, interactive );
-	displacement[3] = GetOffsetOfMember( window, backgroundColour );
-	displacement[4] = GetOffsetOfMember( window, currStereoBuffer );
+	displacement[3] = GetOffsetOfMember( window, quitEventLoop );
+	displacement[4] = GetOffsetOfMember( window, resized );
+	displacement[5] = GetOffsetOfMember( window, backgroundColour );
+	displacement[6] = GetOffsetOfMember( window, currStereoBuffer );
 	
 	MPI_Type_struct( lucWindow_TypesCount, blocklen, displacement, typeList, &lucWindow_MPI_Datatype );
 	MPI_Type_commit( & lucWindow_MPI_Datatype );
 }
-
 
 
 #define lucViewportInfo_TypesCount 5
@@ -743,137 +914,15 @@ void lucViewportInfo_Create_MPI_Datatype() {
 	MPI_Type_commit( & lucViewportInfo_MPI_Datatype );
 }
 
-#ifdef HAVE_GL
-
-#ifdef HAVE_OPENGL_FRAMEWORK
-	#include <OpenGL/gl.h>
-#else
-	#include <gl.h>
-#endif
-
-void _lucWindow_SetupGLRasterFont( void* window ) {
-	GLuint i, j;
-
-	GLubyte rasters[][13] = {
-	{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, 
-	{0x00, 0x00, 0x18, 0x18, 0x00, 0x00, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18}, 
-	{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x36, 0x36, 0x36, 0x36}, 
-	{0x00, 0x00, 0x00, 0x66, 0x66, 0xff, 0x66, 0x66, 0xff, 0x66, 0x66, 0x00, 0x00}, 
-	{0x00, 0x00, 0x18, 0x7e, 0xff, 0x1b, 0x1f, 0x7e, 0xf8, 0xd8, 0xff, 0x7e, 0x18}, 
-	{0x00, 0x00, 0x0e, 0x1b, 0xdb, 0x6e, 0x30, 0x18, 0x0c, 0x76, 0xdb, 0xd8, 0x70}, 
-	{0x00, 0x00, 0x7f, 0xc6, 0xcf, 0xd8, 0x70, 0x70, 0xd8, 0xcc, 0xcc, 0x6c, 0x38}, 
-	{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x18, 0x1c, 0x0c, 0x0e}, 
-	{0x00, 0x00, 0x0c, 0x18, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x18, 0x0c}, 
-	{0x00, 0x00, 0x30, 0x18, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x18, 0x30}, 
-	{0x00, 0x00, 0x00, 0x00, 0x99, 0x5a, 0x3c, 0xff, 0x3c, 0x5a, 0x99, 0x00, 0x00}, 
-	{0x00, 0x00, 0x00, 0x18, 0x18, 0x18, 0xff, 0xff, 0x18, 0x18, 0x18, 0x00, 0x00}, 
-	{0x00, 0x00, 0x30, 0x18, 0x1c, 0x1c, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, 
-	{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00}, 
-	{0x00, 0x00, 0x00, 0x38, 0x38, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, 
-	{0x00, 0x60, 0x60, 0x30, 0x30, 0x18, 0x18, 0x0c, 0x0c, 0x06, 0x06, 0x03, 0x03}, 
-	{0x00, 0x00, 0x3c, 0x66, 0xc3, 0xe3, 0xf3, 0xdb, 0xcf, 0xc7, 0xc3, 0x66, 0x3c}, 
-	{0x00, 0x00, 0x7e, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x78, 0x38, 0x18}, 
-	{0x00, 0x00, 0xff, 0xc0, 0xc0, 0x60, 0x30, 0x18, 0x0c, 0x06, 0x03, 0xe7, 0x7e}, 
-	{0x00, 0x00, 0x7e, 0xe7, 0x03, 0x03, 0x07, 0x7e, 0x07, 0x03, 0x03, 0xe7, 0x7e}, 
-	{0x00, 0x00, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0xff, 0xcc, 0x6c, 0x3c, 0x1c, 0x0c}, 
-	{0x00, 0x00, 0x7e, 0xe7, 0x03, 0x03, 0x07, 0xfe, 0xc0, 0xc0, 0xc0, 0xc0, 0xff}, 
-	{0x00, 0x00, 0x7e, 0xe7, 0xc3, 0xc3, 0xc7, 0xfe, 0xc0, 0xc0, 0xc0, 0xe7, 0x7e}, 
-	{0x00, 0x00, 0x30, 0x30, 0x30, 0x30, 0x18, 0x0c, 0x06, 0x03, 0x03, 0x03, 0xff}, 
-	{0x00, 0x00, 0x7e, 0xe7, 0xc3, 0xc3, 0xe7, 0x7e, 0xe7, 0xc3, 0xc3, 0xe7, 0x7e}, 
-	{0x00, 0x00, 0x7e, 0xe7, 0x03, 0x03, 0x03, 0x7f, 0xe7, 0xc3, 0xc3, 0xe7, 0x7e}, 
-	{0x00, 0x00, 0x00, 0x38, 0x38, 0x00, 0x00, 0x38, 0x38, 0x00, 0x00, 0x00, 0x00}, 
-	{0x00, 0x00, 0x30, 0x18, 0x1c, 0x1c, 0x00, 0x00, 0x1c, 0x1c, 0x00, 0x00, 0x00}, 
-	{0x00, 0x00, 0x06, 0x0c, 0x18, 0x30, 0x60, 0xc0, 0x60, 0x30, 0x18, 0x0c, 0x06}, 
-	{0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0x00, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00}, 
-	{0x00, 0x00, 0x60, 0x30, 0x18, 0x0c, 0x06, 0x03, 0x06, 0x0c, 0x18, 0x30, 0x60}, 
-	{0x00, 0x00, 0x18, 0x00, 0x00, 0x18, 0x18, 0x0c, 0x06, 0x03, 0xc3, 0xc3, 0x7e}, 
-	{0x00, 0x00, 0x3f, 0x60, 0xcf, 0xdb, 0xd3, 0xdd, 0xc3, 0x7e, 0x00, 0x00, 0x00}, 
-	{0x00, 0x00, 0xc3, 0xc3, 0xc3, 0xc3, 0xff, 0xc3, 0xc3, 0xc3, 0x66, 0x3c, 0x18}, 
-	{0x00, 0x00, 0xfe, 0xc7, 0xc3, 0xc3, 0xc7, 0xfe, 0xc7, 0xc3, 0xc3, 0xc7, 0xfe}, 
-	{0x00, 0x00, 0x7e, 0xe7, 0xc0, 0xc0, 0xc0, 0xc0, 0xc0, 0xc0, 0xc0, 0xe7, 0x7e}, 
-	{0x00, 0x00, 0xfc, 0xce, 0xc7, 0xc3, 0xc3, 0xc3, 0xc3, 0xc3, 0xc7, 0xce, 0xfc}, 
-	{0x00, 0x00, 0xff, 0xc0, 0xc0, 0xc0, 0xc0, 0xfc, 0xc0, 0xc0, 0xc0, 0xc0, 0xff}, 
-	{0x00, 0x00, 0xc0, 0xc0, 0xc0, 0xc0, 0xc0, 0xc0, 0xfc, 0xc0, 0xc0, 0xc0, 0xff}, 
-	{0x00, 0x00, 0x7e, 0xe7, 0xc3, 0xc3, 0xcf, 0xc0, 0xc0, 0xc0, 0xc0, 0xe7, 0x7e}, 
-	{0x00, 0x00, 0xc3, 0xc3, 0xc3, 0xc3, 0xc3, 0xff, 0xc3, 0xc3, 0xc3, 0xc3, 0xc3}, 
-	{0x00, 0x00, 0x7e, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x7e}, 
-	{0x00, 0x00, 0x7c, 0xee, 0xc6, 0x06, 0x06, 0x06, 0x06, 0x06, 0x06, 0x06, 0x06}, 
-	{0x00, 0x00, 0xc3, 0xc6, 0xcc, 0xd8, 0xf0, 0xe0, 0xf0, 0xd8, 0xcc, 0xc6, 0xc3}, 
-	{0x00, 0x00, 0xff, 0xc0, 0xc0, 0xc0, 0xc0, 0xc0, 0xc0, 0xc0, 0xc0, 0xc0, 0xc0}, 
-	{0x00, 0x00, 0xc3, 0xc3, 0xc3, 0xc3, 0xc3, 0xc3, 0xdb, 0xff, 0xff, 0xe7, 0xc3}, 
-	{0x00, 0x00, 0xc7, 0xc7, 0xcf, 0xcf, 0xdf, 0xdb, 0xfb, 0xf3, 0xf3, 0xe3, 0xe3}, 
-	{0x00, 0x00, 0x7e, 0xe7, 0xc3, 0xc3, 0xc3, 0xc3, 0xc3, 0xc3, 0xc3, 0xe7, 0x7e}, 
-	{0x00, 0x00, 0xc0, 0xc0, 0xc0, 0xc0, 0xc0, 0xfe, 0xc7, 0xc3, 0xc3, 0xc7, 0xfe}, 
-	{0x00, 0x00, 0x3f, 0x6e, 0xdf, 0xdb, 0xc3, 0xc3, 0xc3, 0xc3, 0xc3, 0x66, 0x3c}, 
-	{0x00, 0x00, 0xc3, 0xc6, 0xcc, 0xd8, 0xf0, 0xfe, 0xc7, 0xc3, 0xc3, 0xc7, 0xfe}, 
-	{0x00, 0x00, 0x7e, 0xe7, 0x03, 0x03, 0x07, 0x7e, 0xe0, 0xc0, 0xc0, 0xe7, 0x7e}, 
-	{0x00, 0x00, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0xff}, 
-	{0x00, 0x00, 0x7e, 0xe7, 0xc3, 0xc3, 0xc3, 0xc3, 0xc3, 0xc3, 0xc3, 0xc3, 0xc3}, 
-	{0x00, 0x00, 0x18, 0x3c, 0x3c, 0x66, 0x66, 0xc3, 0xc3, 0xc3, 0xc3, 0xc3, 0xc3}, 
-	{0x00, 0x00, 0xc3, 0xe7, 0xff, 0xff, 0xdb, 0xdb, 0xc3, 0xc3, 0xc3, 0xc3, 0xc3}, 
-	{0x00, 0x00, 0xc3, 0x66, 0x66, 0x3c, 0x3c, 0x18, 0x3c, 0x3c, 0x66, 0x66, 0xc3}, 
-	{0x00, 0x00, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x3c, 0x3c, 0x66, 0x66, 0xc3}, 
-	{0x00, 0x00, 0xff, 0xc0, 0xc0, 0x60, 0x30, 0x7e, 0x0c, 0x06, 0x03, 0x03, 0xff}, 
-	{0x00, 0x00, 0x3c, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x3c}, 
-	{0x00, 0x03, 0x03, 0x06, 0x06, 0x0c, 0x0c, 0x18, 0x18, 0x30, 0x30, 0x60, 0x60}, 
-	{0x00, 0x00, 0x3c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x3c}, 
-	{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xc3, 0x66, 0x3c, 0x18}, 
-	{0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, 
-	{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x18, 0x38, 0x30, 0x70}, 
-	{0x00, 0x00, 0x7f, 0xc3, 0xc3, 0x7f, 0x03, 0xc3, 0x7e, 0x00, 0x00, 0x00, 0x00}, 
-	{0x00, 0x00, 0xfe, 0xc3, 0xc3, 0xc3, 0xc3, 0xfe, 0xc0, 0xc0, 0xc0, 0xc0, 0xc0}, 
-	{0x00, 0x00, 0x7e, 0xc3, 0xc0, 0xc0, 0xc0, 0xc3, 0x7e, 0x00, 0x00, 0x00, 0x00}, 
-	{0x00, 0x00, 0x7f, 0xc3, 0xc3, 0xc3, 0xc3, 0x7f, 0x03, 0x03, 0x03, 0x03, 0x03}, 
-	{0x00, 0x00, 0x7f, 0xc0, 0xc0, 0xfe, 0xc3, 0xc3, 0x7e, 0x00, 0x00, 0x00, 0x00}, 
-	{0x00, 0x00, 0x30, 0x30, 0x30, 0x30, 0x30, 0xfc, 0x30, 0x30, 0x30, 0x33, 0x1e}, 
-	{0x7e, 0xc3, 0x03, 0x03, 0x7f, 0xc3, 0xc3, 0xc3, 0x7e, 0x00, 0x00, 0x00, 0x00}, 
-	{0x00, 0x00, 0xc3, 0xc3, 0xc3, 0xc3, 0xc3, 0xc3, 0xfe, 0xc0, 0xc0, 0xc0, 0xc0}, 
-	{0x00, 0x00, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x00, 0x00, 0x18, 0x00}, 
-	{0x38, 0x6c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x00, 0x00, 0x0c, 0x00}, 
-	{0x00, 0x00, 0xc6, 0xcc, 0xf8, 0xf0, 0xd8, 0xcc, 0xc6, 0xc0, 0xc0, 0xc0, 0xc0}, 
-	{0x00, 0x00, 0x7e, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x78}, 
-	{0x00, 0x00, 0xdb, 0xdb, 0xdb, 0xdb, 0xdb, 0xdb, 0xfe, 0x00, 0x00, 0x00, 0x00}, 
-	{0x00, 0x00, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xfc, 0x00, 0x00, 0x00, 0x00}, 
-	{0x00, 0x00, 0x7c, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0x7c, 0x00, 0x00, 0x00, 0x00}, 
-	{0xc0, 0xc0, 0xc0, 0xfe, 0xc3, 0xc3, 0xc3, 0xc3, 0xfe, 0x00, 0x00, 0x00, 0x00}, 
-	{0x03, 0x03, 0x03, 0x7f, 0xc3, 0xc3, 0xc3, 0xc3, 0x7f, 0x00, 0x00, 0x00, 0x00}, 
-	{0x00, 0x00, 0xc0, 0xc0, 0xc0, 0xc0, 0xc0, 0xe0, 0xfe, 0x00, 0x00, 0x00, 0x00}, 
-	{0x00, 0x00, 0xfe, 0x03, 0x03, 0x7e, 0xc0, 0xc0, 0x7f, 0x00, 0x00, 0x00, 0x00}, 
-	{0x00, 0x00, 0x1c, 0x36, 0x30, 0x30, 0x30, 0x30, 0xfc, 0x30, 0x30, 0x30, 0x00}, 
-	{0x00, 0x00, 0x7e, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0x00, 0x00, 0x00, 0x00}, 
-	{0x00, 0x00, 0x18, 0x3c, 0x3c, 0x66, 0x66, 0xc3, 0xc3, 0x00, 0x00, 0x00, 0x00}, 
-	{0x00, 0x00, 0xc3, 0xe7, 0xff, 0xdb, 0xc3, 0xc3, 0xc3, 0x00, 0x00, 0x00, 0x00}, 
-	{0x00, 0x00, 0xc3, 0x66, 0x3c, 0x18, 0x3c, 0x66, 0xc3, 0x00, 0x00, 0x00, 0x00}, 
-	{0xc0, 0x60, 0x60, 0x30, 0x18, 0x3c, 0x66, 0x66, 0xc3, 0x00, 0x00, 0x00, 0x00}, 
-	{0x00, 0x00, 0xff, 0x60, 0x30, 0x18, 0x0c, 0x06, 0xff, 0x00, 0x00, 0x00, 0x00}, 
-	{0x00, 0x00, 0x0f, 0x18, 0x18, 0x18, 0x38, 0xf0, 0x38, 0x18, 0x18, 0x18, 0x0f}, 
-	{0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18}, 
-	{0x00, 0x00, 0xf0, 0x18, 0x18, 0x18, 0x1c, 0x0f, 0x1c, 0x18, 0x18, 0x18, 0xf0}, 
-	{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x8f, 0xf1, 0x60, 0x00, 0x00, 0x00} 
-	};
-
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-	for (i = 0,j = ' ' ; j < '~' ; i++,j++) {
-		glNewList( 2000 + j, GL_COMPILE);
-		glBitmap(8, 13, 0.0, 2.0, 10.0, 0.0, rasters[i]);
-		glEndList();
-	}
-	glListBase(2000);
-
-}	
-
 void lucWindow_ChangeInteractiveMode( void* window ) {
 	lucWindow*              self         = (lucWindow*) window ;
 	self->interactive = !self->interactive;
 }
 
 
-void lucWindow_BeginEventLoop( void* window ) {
+void lucWindow_ChangeContinuousMode( void* window ) {
 	lucWindow*              self         = (lucWindow*) window ;
-
-	self->quitEventLoop = False;
-	self->toggleApplicationQuit = False;
+	self->continuous = !self->continuous;
 }
 
 void lucWindow_QuitEventLoop( void* window ) {
@@ -889,27 +938,36 @@ void lucWindow_ToggleApplicationQuit( void* window ) {
 	self->toggleApplicationQuit = True;
 }
 
-void lucWindow_Resize( void* window, Pixel_Index newWidth, Pixel_Index newHeight ) {
+Bool lucWindow_SetSize( void* window, Pixel_Index newWidth, Pixel_Index newHeight ) {
 	lucWindow*       self      = (lucWindow*) window;
-	Viewport_Index   viewport_I;
-	Viewport_Index   viewportCount = self->viewportCount;
-	lucViewportInfo* viewportInfo;
-	double           xScale = (double) newWidth  / (double) self->width;
-	double           yScale = (double) newHeight / (double) self->height;
 
-	for ( viewport_I = 0 ; viewport_I < viewportCount ; viewport_I++ ) {
-		viewportInfo = &self->viewportInfoList[ viewport_I ];
-		
-		viewportInfo->startx = (Pixel_Index) ( xScale * (double) viewportInfo->startx + 0.5 );
-		viewportInfo->width  = (Pixel_Index) ( xScale * (double) viewportInfo->width  + 0.5 );
-		viewportInfo->starty = (Pixel_Index) ( yScale * (double) viewportInfo->starty + 0.5 );
-		viewportInfo->height = (Pixel_Index) ( yScale * (double) viewportInfo->height + 0.5 );
-		viewportInfo->needsToDraw = True;
-	}
-	
+	if (newWidth < 32 || newHeight < 32) return False;
+    if (newWidth == self->width && newHeight == self->height) return False; /* No resize neccessary */
+
 	self->width = newWidth;
 	self->height = newHeight;
 
+    self->resized = True;
+  	Journal_DPrintfL( lucDebug, 2, "Window resized %d x %d\n", self->width, self->height);
+
+    return True;
 }
 
-#endif /* HAVE_GL */
+void lucWindow_IdleReset(void *window) {
+	/* Update Idle timer */
+	lucWindow* self = (lucWindow*)window;
+	self->idleTime = MPI_Wtime();
+}
+
+void lucWindow_IdleCheck(void *window) {
+	lucWindow* self = (lucWindow*)window;
+	if (self->isTimedOut && self->idleTime > 0){
+		if ( MPI_Wtime() > self->idleTime + self->maxIdleTime ) {
+			Journal_Printf( lucError, "Error in func '%s' - Interactive window '%s' open for too long (over %g seconds) without interaction.\n",
+							__func__, self->name, self->maxIdleTime );
+			abort();
+		}
+	}
+}
+
+

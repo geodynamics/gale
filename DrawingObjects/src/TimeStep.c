@@ -269,18 +269,8 @@ void _lucTimeStep_Draw( void* drawingObject, lucWindow* window, lucViewportInfo*
 	}
 
 	
-
-	
 	/* Set up 2D Viewer the size of the viewport */
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	gluOrtho2D((GLfloat) 0.0, (GLfloat) viewportInfo->width, (GLfloat) 0.0, (GLfloat) viewportInfo->height );
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();	
-	
-	/* Disable lighting because we don't want a 3D effect */
-	glDisable(GL_LIGHTING);
+	lucViewport2d(True, viewportInfo);
 
 	/* Set the colour so that it'll show up against the background */
 	lucColour_SetComplimentaryOpenGLColour( &window->backgroundColour );
@@ -292,9 +282,7 @@ void _lucTimeStep_Draw( void* drawingObject, lucWindow* window, lucViewportInfo*
 		self->colour.blue,
 		self->colour.opacity );
 
-	glRasterPos2i( viewportInfo->width/2 , viewportInfo->height - 13 );
-	stringWidth = lucStringWidth( displayString );
-
+	stringWidth = lucStringWidth(displayString );
 	lucMoveRaster( - stringWidth/2, -20 );
 	lucPrintString(displayString);
 
@@ -303,16 +291,8 @@ void _lucTimeStep_Draw( void* drawingObject, lucWindow* window, lucViewportInfo*
 	Memory_Free(currentTimeString);
 	Memory_Free(displayString);
 
-
-	
-	/* Put back settings */
-	glEnable(GL_LIGHTING);
-	glPopMatrix();
-	
-	/*Set back the viewport to what it should be to render any other object */
-	/* If this is not done, than any object displayed after the colour bar will not appear,*/
-	/* because the projection matrix and lookAt point have been altered */
-	lucViewportInfo_SetOpenGLCamera( viewportInfo );
+	/* Restore the viewport */
+	lucViewport2d(False, viewportInfo);
 
 }
 

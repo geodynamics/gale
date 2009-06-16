@@ -89,6 +89,7 @@ lucRenderingEngineGL* _lucRenderingEngineGL_New(
 		Stg_Component_ExecuteFunction*                     _execute,
 		Stg_Component_DestroyFunction*                     _destroy,
 		lucRenderingEngine_RenderFunction*                 _render,
+		lucRenderingEngine_ClearFunction*             	   _clear,
 		lucRenderingEngine_GetPixelDataFunction*           _getPixelData,
 		lucRenderingEngine_CompositeViewportFunction*      _compositeViewport,
 		Name                                               name ) 
@@ -110,6 +111,7 @@ lucRenderingEngineGL* _lucRenderingEngineGL_New(
 			_execute,
 			_destroy,
 			_render,
+			_clear,
 			_getPixelData,
 			_compositeViewport,
 			name );
@@ -161,8 +163,9 @@ void* _lucRenderingEngineGL_DefaultNew( Name name ) {
 		_lucRenderingEngineGL_Execute,
 		_lucRenderingEngineGL_Destroy,
 		_lucRenderingEngineGL_Render,
+		_lucRenderingEngineGL_Clear,
 		_lucRenderingEngineGL_GetPixelData,
-		_lucRenderingEngineGL_CompositeViewport_Manual,
+		_lucRenderingEngineGL_CompositeViewport_Stencil,
 		name );
 }
 
@@ -178,7 +181,7 @@ void _lucRenderingEngineGL_Construct( void* renderingEngine, Stg_ComponentFactor
 void _lucRenderingEngineGL_Build( void* renderingEngine, void* data ) {}
 void _lucRenderingEngineGL_Initialise( void* renderingEngine, void* data ) {}
 void _lucRenderingEngineGL_Execute( void* renderingEngine, void* data ) {}
-void _lucRenderingEngineGL_Destroy( void* renderingEngine, void* data ) {}
+void _lucRenderingEngineGL_Destroy( void* renderingEngine, void* data ) { lucDeleteFont(); }
 
 
 void _lucRenderingEngineGL_Render( void* renderingEngine, lucWindow* window, AbstractContext* context ) {
@@ -203,15 +206,16 @@ void _lucRenderingEngineGL_Render( void* renderingEngine, lucWindow* window, Abs
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 	glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
-	
-	glEnable(GL_DEPTH_TEST);
 
-	/* Set up lighting */
+    /* Interpolate colours between polygon vertices, looks nice but not technically accurate */
+    glShadeModel( GL_SMOOTH ); 
+
+	glEnable(GL_DEPTH_TEST);
 
 	lucWindow_Broadcast( window, 0, MPI_COMM_WORLD );
 	lucWindow_CheckCameraFlag( window );
 	lucWindow_CheckLightFlag( window );
-		
+
 	for ( viewport_I = 0 ; viewport_I < viewportCount ; viewport_I++ ) {
 		viewportInfo = &window->viewportInfoList[ viewport_I ];
 		viewport = viewportInfo->viewport;
@@ -220,6 +224,7 @@ void _lucRenderingEngineGL_Render( void* renderingEngine, lucWindow* window, Abs
 		Stream_Indent( lucDebug );
 		
 		/* Set viewport */
+		Journal_DPrintfL( lucDebug, 2, "Rendering viewport: (%d,%d) %d x %d\n", viewportInfo->startx, viewportInfo->starty, viewportInfo->width, viewportInfo->height);
 		glViewport( viewportInfo->startx, viewportInfo->starty, viewportInfo->width, viewportInfo->height);
 		glScissor( viewportInfo->startx, viewportInfo->starty, viewportInfo->width, viewportInfo->height);
 		if ( ! viewportInfo->needsToDraw ) {
@@ -233,17 +238,20 @@ void _lucRenderingEngineGL_Render( void* renderingEngine, lucWindow* window, Abs
 			glGetIntegerv(GL_VIEWPORT, viewport_gl2ps);
 			state = gl2psBeginViewport(viewport_gl2ps);
 			if(state == 5)
-				Journal_Printf( Journal_MyStream( Error_Type, self ), "\nError. Insufficient GL feedback buffer size. \ 
+				Journal_Printf( Journal_MyStream( Error_Type, self ), "\nError. Insufficient GL feedback buffer size. \
 										       \nConsider increasing the OutputVECTOR buffersize. \
 										      \nVector image will not be created correctly.\n\n" );
 		#endif
 		
-		lucRenderingEngineGL_Clear( self, window );
+		/* Clear viewport */
+		self->_clear(self, window, False);
 
 		if (context->rank == MASTER)
 			lucRenderingEngineGL_WriteViewportText( self, window, viewportInfo, context );
 			
 			
+		Journal_DPrintfL( lucDebug, 2, "(%s) Resetting camera...", __func__);
+		
 		switch ( viewport->camera->stereoType ) {
 			case lucMono:
 				lucViewportInfo_SetOpenGLCamera( viewportInfo );
@@ -271,12 +279,12 @@ void _lucRenderingEngineGL_Render( void* renderingEngine, lucWindow* window, Abs
 		#ifdef HAVE_GL2PS		
 			state = gl2psEndViewport();
 			if(state == 5)
-				Journal_Printf( Journal_MyStream( Error_Type, self ), "\nError. Insufficient GL feedback buffer size. \ 
+				Journal_Printf( Journal_MyStream( Error_Type, self ), "\nError. Insufficient GL feedback buffer size. \
 										       \nConsider increasing the OutputVECTOR buffersize. \
 										      \nVector image will not be created correctly.\n\n" );
 		#endif		
 	}
-	
+
 	Stream_UnIndent( lucDebug );
 	Journal_DPrintfL( lucDebug, 2, "Leaving func %s\n", __func__ );
 }
@@ -289,27 +297,23 @@ void _lucRenderingEngineGL_GetPixelData( void* renderingEngine, lucWindow* windo
 	
 	if ( lucWindow_HasStereoCamera( window ) ) {
 		if ( window->currStereoBuffer == lucRight )
-			glReadBuffer( GL_FRONT_RIGHT );
+			glReadBuffer( GL_BACK_RIGHT );
 		else
-			glReadBuffer( GL_FRONT_LEFT );
+			glReadBuffer( GL_BACK_LEFT );
 	}
-
+	else
+		glReadBuffer( GL_BACK );
+	
 	/* Actually read the pixels. */
 	glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, buffer); 
 }
 
 void lucRenderingEngineGL_WriteViewportText( void* renderingEngine, lucWindow* window, lucViewportInfo* viewportInfo, AbstractContext* context ) {
 	lucViewport* viewport = viewportInfo->viewport;
-//	int stringWidth = lucStringWidth( viewport->name );
 
 	/* Set up 2D Viewer the size of the viewport */
-	glPushMatrix();
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluOrtho2D((GLfloat) 0.0, (GLfloat) viewportInfo->width, (GLfloat) 0.0, (GLfloat) viewportInfo->height );
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();	
-
+	lucViewport2d(True, viewportInfo);
+	
 	/* Set the colour so that it'll show up against the background */
 	lucColour_SetComplimentaryOpenGLColour( &window->backgroundColour );
 
@@ -318,22 +322,28 @@ void lucRenderingEngineGL_WriteViewportText( void* renderingEngine, lucWindow* w
 	if (viewport->drawTime) {
 		char* timeString;
 		Stg_asprintf( &timeString, "%g", context->currentTime );
-		glRasterPos2i( 0, viewportInfo->height - 13 );
+		glRasterPos2i( 0, 13 );
 		lucPrintString( timeString );
 		Memory_Free( timeString );
 	}
 
-	glPopMatrix();
+	/* Restore the viewport */
+	lucViewport2d(False, viewportInfo);	
 }
 
-void lucRenderingEngineGL_Clear( void* renderingEngineGL, lucWindow* window ) {
-	glEnable (GL_SCISSOR_TEST);
-	glClearColor( 
-		window->backgroundColour.red, 
-		window->backgroundColour.green, 
-		window->backgroundColour.blue, 
-		window->backgroundColour.opacity );
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+void _lucRenderingEngineGL_Clear( void* renderingEngineGL, lucWindow* window, Bool clearAll ) {
+	if (clearAll)
+	{
+		glViewport(0, 0, window->width, window->height);
+		glScissor(0, 0, window->width, window->height);
+	}
+    else
+    {
+    	glEnable (GL_SCISSOR_TEST);
+    	glClearColor(window->backgroundColour.red, window->backgroundColour.green,
+            		window->backgroundColour.blue, window->backgroundColour.opacity );
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    }
 }
 
 Index lucRenderingEngineGL_MapBufferIdToRank( void* renderingEngineGL, Index bufferId, Index mergeCount ) {
@@ -348,9 +358,7 @@ Index lucRenderingEngineGL_MapBufferIdToRank( void* renderingEngineGL, Index buf
 }
 
 /* This function is quite a bit faster that the _lucRenderingEngineGL_CompositeViewport_Manual one but it will not work if
- * you don't have the stencil buffer - 
- * There's also been some problems with this one on the altix in uq - This shouldn't be the default function yet until this
- * problem is sorted out */
+ * you don't have the stencil buffer */ 
 void _lucRenderingEngineGL_CompositeViewport_Stencil( 
 		void*                                              renderingEngine, 
 		lucViewportInfo*                                   viewportInfo, 
@@ -490,6 +498,7 @@ void _lucRenderingEngineGL_CompositeViewport_Stencil(
 	glDisable( GL_STENCIL_TEST );
 	glEnable(GL_DEPTH_TEST);
 	glPopMatrix();
+	Journal_DPrintfL( lucDebug, 2, "(%s) Resetting camera...", __func__);
 	lucViewportInfo_SetOpenGLCamera( viewportInfo );
 
 	/* Clean up allocated memory */

@@ -76,7 +76,8 @@
 										\
 		Bool                    		nodeNumbers;		\
 		Bool                    		elementNumbers;		\
-		Bool                    		displayNodes;
+		Bool                    		displayNodes;				\
+		float                                              lineWidth;
 
 	struct lucMeshViewer { __lucMeshViewer };
 

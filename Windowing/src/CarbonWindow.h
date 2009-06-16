@@ -42,7 +42,9 @@
 ** $Id: Arrhenius.c 78 2005-11-29 11:58:21Z RobertTurnbull $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+#ifdef HAVE_CARBON
 
+#include <Carbon/Carbon.h>
 
 #ifndef __lucCarbonWindow_h__
 #define __lucCarbonWindow_h__
@@ -56,38 +58,36 @@
 		__lucWindow \
 		/* Virtual functions go here */ \
 		/* Other info */\
-		unsigned char*                                     title;                    \
 		Pixel_Index                                        offsetX;                  \
 		Pixel_Index                                        offsetY;                  \
 		void*                                              graphicsContext;          \
 		Bool                                               windowIsVisible;          \
-		AbstractContext*                                   currentContext;           \
-		int                                                fontID;                   \
-		int                                                fontSize;                 \
 		/* Stuff for interactive windows */ \
-		Bool                                               windowIsInteractive;      \
-		Bool                                               hackNonInteractive;       \
-		void*                                              handler;                  \
-		void*                                              timerHandler;             \
-		void*                                              timer;                    \
-		void*                                              window;                   \
+		EventHandlerUPP                                    handler;                  \
+        EventLoopIdleTimerUPP                              timerHandler;             \
+        EventLoopTimerRef								   timer;                    \
+		WindowPtr                                          window;                   \
 		
 	struct lucCarbonWindow { __lucCarbonWindow };
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
 	lucCarbonWindow* _lucCarbonWindow_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		Name                                               name );
+		SizeT                                           sizeOfSelf,
+		Type                                            type,
+		Stg_Class_DeleteFunction*                       _delete,
+		Stg_Class_PrintFunction*                        _print,
+		Stg_Class_CopyFunction*                         _copy, 
+		Stg_Component_DefaultConstructorFunction*       _defaultConstructor,
+		Stg_Component_ConstructFunction*                _construct,
+		Stg_Component_BuildFunction*                    _build,
+		Stg_Component_InitialiseFunction*               _initialise,
+		Stg_Component_ExecuteFunction*                  _execute,
+		Stg_Component_DestroyFunction*                  _destroy,
+		lucWindow_DisplayFunction*						_displayWindow,	
+		lucWindow_EventsWaitingFunction*				_eventsWaiting,	
+		lucWindow_EventProcessorFunction*				_eventProcessor,	
+		lucWindow_ResizeFunction*						_resizeWindow,	
+		Name                                            name );
 
 	void _lucCarbonWindow__Delete( void* window ) ;
 	void _lucCarbonWindow_Print( void* window, Stream* stream ) ;
@@ -101,15 +101,19 @@
 	void _lucCarbonWindow_Execute( void* window, void* data );
 	void _lucCarbonWindow_Destroy( void* window, void* data ) ;
 
-	void _lucCarbonWindow_ExecuteOffscreen( void* carbonWindow, void* data ) ;
-	void _lucCarbonWindow_ExecuteInteractive( void* carbonWindow, void* data ) ;
+	/* Window Virtuals */
+	void _lucCarbonWindow_Display( void* window );
+	int _lucCarbonWindow_EventsWaiting( void* window ) ;
+	Bool _lucCarbonWindow_EventProcessor( void* window ) ;
+	void _lucCarbonWindow_Resize( void* window );
 
-	void lucCarbonWindow_CreateWindow( void* carbonWindow, void* data ) ;
-	void lucCarbonWindow_CreateInteractiveWindow( void* carbonWindow, void* data ) ;
-	void lucCarbonWindow_CreateBackgroundWindow( void* carbonWindow, void* data ) ;
-	void lucCarbonWindow_DestroyWindow( void* carbonWindow, void* data ) ;
-
+	void lucCarbonWindow_CreateInteractiveWindow( void* window ) ;
+	void lucCarbonWindow_CreateBackgroundWindow( void* window ) ;
+	void lucCarbonWindow_DestroyInteractiveWindow( void* window ) ;
+	void lucCarbonWindow_DestroyBackgroundWindow( void* window ) ;
+	
 	void lucCarbonWindow_Draw( void* window ) ;
-	void lucCarbonWindow_IdleFunc() ;
-
+	pascal void lucCarbonWindow_IdleTimer(EventLoopTimerRef inTimer, EventLoopIdleTimerMessage inState, void * inUserData);
 #endif
+
+#endif /* HAVE_CARBON */

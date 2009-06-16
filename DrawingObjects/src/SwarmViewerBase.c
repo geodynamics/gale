@@ -370,14 +370,14 @@ void _lucSwarmViewerBase_BuildDisplayList( void* drawingObject, void* _context )
 			particle            = (GlobalParticle*)Swarm_ParticleAt( self->swarm, lParticle_I );
 			coord               = particle->coord;
 
-			if( coord[0] < minPosition[I_AXIS] || coord[1] < minPosition[J_AXIS] || 
-			    coord[0] > maxPosition[I_AXIS] || coord[1] > maxPosition[J_AXIS] )
+			if( coord[0] <= minPosition[I_AXIS] || coord[1] <= minPosition[J_AXIS] || 
+			    coord[0] >= maxPosition[I_AXIS] || coord[1] >= maxPosition[J_AXIS] )
 			{
 				continue;
 			}
 
 			if( ((DomainContext*)_context)->dim == 3 ) {
-				if( coord[2] < minPosition[K_AXIS] || coord[2] > maxPosition[K_AXIS] )
+				if( coord[2] <= minPosition[K_AXIS] || coord[2] >= maxPosition[K_AXIS] )
 					continue;
 			}
 		}

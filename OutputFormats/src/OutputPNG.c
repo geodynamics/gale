@@ -177,7 +177,7 @@ void _lucOutputPNG_Output( void* outputFormat, lucWindow* window, AbstractContex
 	Pixel_Index   width        = window->width;
 	Pixel_Index   height       = window->height;
 	png_bytep     pixels       = (png_bytep) pixelData;
-	int           rowStride    = (width * 3 + 3) & ~0x3;
+	int           rowStride    = width * 3; /* Don't pad lines! pack alignment is set to 1 */
 	Stream*       stream       = lucOutputFormat_OpenStream( self, window, context );
 	png_bytep*    row_pointers = Memory_Alloc_Array( png_bytep, height, "Row Pointers" );
 	png_structp   pngWrite;
