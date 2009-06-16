@@ -425,6 +425,12 @@ Bool Stream_SetFileBranch( Stream* stream, JournalFile* file )
 	return result;
 }
 
+JournalFile* Stream_GetFile( void* stream ) {
+	Stream* self = (Stream*) stream;
+
+	return self->_file;
+}
+
 Bool Stream_IsEnable( void* stream )
 {
 	Stream* self = (Stream*) stream;

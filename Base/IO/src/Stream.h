@@ -154,6 +154,9 @@
 	 ** This funciton may fail if an unusable file type is given to the stream. */
 	Bool Stream_SetFileBranch( Stream* stream, JournalFile* file );
 
+	/** returns a ptr to the stream's JournalFile */
+	JournalFile* Stream_GetFile( void* stream );
+
 	/** Returns True if this stream is valid to produce output. */
 	Bool Stream_IsEnable( void* stream );
 
