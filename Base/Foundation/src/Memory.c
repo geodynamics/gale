@@ -1203,23 +1203,22 @@ void* _Memory_Realloc_3DArrayAs1D_Func(
 }
 
 
+/* This function should only be called on ptrs allocated by StGermain's Memory routines */
 void _Memory_Free_Func( void* ptr )
 {
 	MemoryPointer* memoryPointer = NULL;
 
 	if( !ptr ) return;
 	
+	#ifdef MEMORY_STATS
 	memoryPointer = Memory_Find_Pointer( ptr );
-	
-	if ( memoryPointer )
-	{
-		Memory_Free_Pointer( memoryPointer );
-	}
-	else
-	{
-		_Memory_InternalFree( ptr );
-		//free( ptr );
-	}
+	/* If memory stats is enabled, then any pointer allocated using the Stg memory system should _always_ have a MemoryPointer
+	 * associated with it, and findable */
+	pcu_assert( memoryPointer );
+	Memory_Free_Pointer( memoryPointer );
+	#else
+	_Memory_InternalFree( ptr );
+	#endif
 }
 	
 SizeT Memory_Length_1DArray( SizeT itemSize, Index length )
