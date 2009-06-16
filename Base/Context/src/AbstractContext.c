@@ -1026,7 +1026,7 @@ void _AbstractContext_LoadTimeInfoFromCheckPoint( Context* self, Index timeStep,
 	file = H5Fopen( timeInfoFileName, H5F_ACC_RDONLY, H5P_DEFAULT );
 	Journal_Firewall( 
 		file >= 0, 
-		errorStr, "Error- in %s(), Couldn't find checkpoint time info file with "
+		errorStr, "\n\nError- in %s(), Couldn't find checkpoint time info file with "
 		"filename \"%s\" - aborting.\n", __func__, timeInfoFileName );
 		   	
 	/* Read currentTime from file */
