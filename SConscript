@@ -50,6 +50,9 @@ for d in dirs:
     src_dir = d + '/src'
     inc_dir = 'include/StGermain/' + d
     tst_dir = d + '/tests'
+    tst_exp_dir = tst_dir + '/expected'
+    tst_input_dir = tst_dir + '/input'
+    tst_install_dir = 'tests/StGermain/' + d
 
     # Install the headers and '.def' files.
     hdrs = env.Install(inc_dir, Glob(src_dir + '/*.h'))
@@ -71,6 +74,10 @@ for d in dirs:
     # Build any test suites we might find.
     suites += env.Object(Glob(tst_dir + '/*Suite.c'))
 
+    # Install any test expected and input files
+    tst_exp = env.Install(tst_install_dir + '/expected', Glob(tst_exp_dir + '/*'))
+    tst_input = env.Install(tst_install_dir + '/input', Glob(tst_input_dir + '/*'))
+
 # Need to install headers from libStGermain.
 hdrs = env.Install('include/StGermain', Glob('libStGermain/src/*.h'))
 
@@ -83,10 +90,10 @@ libs = ['StGermain'] + ['pcu'] + env.get('LIBS', [])
 env.Program('bin/FlattenXML', 'Base/FlattenXML/src/main.c', LIBS=libs)
 env.Program('bin/StGermain', 'src/main.c', LIBS=libs)
 env.PCUTest('tests/testStGermain', suites,
-            PCU_LIBHEADERS="#include <StGermain/StGermain.h>",
-            PCU_SETUP="StGermain_Init(&argc, &argv);",
-            PCU_TEARDOWN="StGermain_Finalise();",
-            LIBS=libs)
+    PCU_LIBHEADERS="#include <StGermain/StGermain.h>",
+    PCU_SETUP="StGermain_Init(&argc, &argv);",
+    PCU_TEARDOWN="StGermain_Finalise();",
+    LIBS=libs)
 
 # Copy XML validation file to correct destination.
 xmls = env.Install('lib', 'Base/IO/src/StGermain.xsd')
