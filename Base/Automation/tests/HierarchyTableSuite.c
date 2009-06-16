@@ -164,7 +164,7 @@ void HierarchyTableSuite_TestPrintParents( HierarchyTableSuiteData* data ) {
       pcu_check_streq( outLines[ii++], "\tAA\n" );
 
       fclose( testFile );
-      //remove( testFilename );
+      remove( testFilename );
    }
 }
    
@@ -216,7 +216,7 @@ void HierarchyTableSuite_TestPrintChildren( HierarchyTableSuiteData* data ) {
       pcu_check_streq( outLines[ii++], "BB \t\t\t (Abstract Class)\n" );
 
       fclose( testFile );
-      //remove( testFilename );
+      remove( testFilename );
    }
 }
 
