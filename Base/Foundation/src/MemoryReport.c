@@ -76,7 +76,8 @@ void _MemoryReport_Init( MemoryReport* memoryReport )
 	for ( ii=0; ii < MEMORYREPORT_SIZE; ii++ ) {
 		memoryReport->conditionValues[ii] = NULL;
 	}
-
+   
+	memoryReport->memoryManager = stgMemory;   /* Use this as the default, unless user overrides */
 	
 	memoryReport->reportField = MemoryField_New( "Report Query:" );
 }
@@ -152,6 +153,13 @@ void MemoryReport_AddCondition( MemoryReport* memoryReport, MemoryReportGroup gr
 }
 
 
+void MemoryReport_SetCustomMemoryManager( void* memoryReport, Memory* memoryManager ) {
+	MemoryReport*  self = (MemoryReport*) memoryReport;
+	
+	self->memoryManager = memoryManager;
+}
+
+
 void MemoryReport_Print( void* memoryReport )
 {
 	MemoryReport*  self = (MemoryReport*) memoryReport;
@@ -174,7 +182,7 @@ void MemoryReport_Print( void* memoryReport )
 	 */
 		
 	/* Derive the statistics, using a BTree parse */
-	BTree_ParseTree( stgMemory->pointers, MemoryReport_Print_Helper, self );
+	BTree_ParseTree( self->memoryManager->pointers, MemoryReport_Print_Helper, self );
 	
 	//prevField = rootField;
 	//while ( prevField->subCount == 1 ) {

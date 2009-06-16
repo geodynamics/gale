@@ -60,14 +60,15 @@
 
 	/** \def __MemoryReport See MemoryReport */
 	#define __MemoryReport \
-		Index                groupCount;		\
-		Index                groupSize;		\
-		MemoryReportGroup*   groups; 		/**< The groups to display in order. */ \
+		Index                groupCount;   \
+		Index                groupSize;	   \
+		MemoryReportGroup*   groups;           /**< The groups to display in order. */ \
 		Index                conditionCount;		\
-		Index                conditionSize;		\
-		MemoryReportGroup*   conditionGroups;	/**< The groups which are to be filtered by a condition. */ \
-		char**               conditionValues;	/**< The value to match in the condition. */ \
-      MemoryField*         reportField;      /**< A MemoryReport used for storing results on when printing */
+		Index                conditionSize;  \
+		MemoryReportGroup*   conditionGroups;  /**< The groups which are to be filtered by a condition. */ \
+		char**               conditionValues;  /**< The value to match in the condition. */ \
+		MemoryField*         reportField;      /**< A MemoryReport used for storing results on when printing */ \
+		Memory*              memoryManager;    /**< The MemoryManager this report will be applied to: defaults to stgMemory global ptr */
 	struct MemoryReport { __MemoryReport };
 
 	/** Creates an empty report. */
@@ -85,6 +86,8 @@
 	/** Adds a condition where a field has to match a given value. If group does not exist, it will be automatically added. */
 	void MemoryReport_AddCondition( MemoryReport* memoryReport, MemoryReportGroup group, const char* condition );
 	
+	void MemoryReport_SetCustomMemoryManager( void* memoryReport, Memory* memoryManager );
+
 	/** Displays the report of the memory module based on the groups and conditions. */
 	void MemoryReport_Print( void* memoryReport );
 	
