@@ -41,7 +41,7 @@
 
 typedef struct {
    HierarchyTable*   hTable;
-   HierarchyTable*   stgHierarchyTable_Store;
+   HierarchyTable*   savedHierarchyTable;
    unsigned int      rank;
 } HierarchyTableSuiteData;
 
@@ -56,9 +56,10 @@ const Type BB_Type = "BB";
 
 void HierarchyTableSuite_Setup( HierarchyTableSuiteData* data ) {
    /* We need to operate on the stgHierarchyTable ptr, since HierarchyTable_New() even uses this */
-   data->stgHierarchyTable_Store = stgHierarchyTable;
+   data->savedHierarchyTable = stgHierarchyTable;
    stgHierarchyTable = NULL;
    data->hTable = HierarchyTable_New();
+   stgHierarchyTable = data->savedHierarchyTable;
    HierarchyTable_RegisterParent( data->hTable, B_Type, A_Type );
    HierarchyTable_RegisterParent( data->hTable, C_Type, B_Type );
    HierarchyTable_RegisterParent( data->hTable, D_Type, C_Type );
@@ -68,7 +69,6 @@ void HierarchyTableSuite_Setup( HierarchyTableSuiteData* data ) {
 
 void HierarchyTableSuite_Teardown( HierarchyTableSuiteData* data ) {
    Stg_Class_Delete( data->hTable );
-   stgHierarchyTable = data->stgHierarchyTable_Store;
 }
    
 
