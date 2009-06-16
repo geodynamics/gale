@@ -15,6 +15,7 @@ class Module(object):
         self.configs = []
         self.depends = []
         self.dependees = []
+        self.conflicts = []
         self.members = []
         self.member_of = []
         self.help = {}
@@ -161,7 +162,7 @@ class Module(object):
 #                 yield c
 
     #
-    # Handle dependencies.
+    # Handle dependencies (and conflicts).
     #
 
     def add_dependency(self, mod, required=False, combine=False, mode=1):
@@ -173,6 +174,11 @@ class Module(object):
         else:
             self.depends.append([m, required, combine])
             m.dependees.append(self)
+        return m
+
+    def add_conflict(self, mod, mode=1):
+        m = self.ctx.get_module(mod, mode)
+        self.conflicts.append(m)
         return m
 
     def add_member(self, mod):
@@ -237,6 +243,15 @@ class Module(object):
                 utils.log("Required module dependency failed.")
                 res = False
                 break
+
+        # Conflict detection
+        for c in self.conflicts:
+            r = c.configure()
+            if r: 
+                utils.log("Conflicting module found.");
+                res = False
+                break
+
         return res
 
     def config_members(self):

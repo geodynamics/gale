@@ -12,18 +12,16 @@ class OpenGL(config.Package):
 	if platform.system() == "Darwin":
             self.base_dirs.append("/System/Library/Frameworks/OpenGL.framework")
 
+    def _setup_dependencies(self):
+        config.Package._setup_dependencies(self)
+        # Register conflict with OSMesa
+        self.opengl = self.add_conflict(config.packages.OSMesa)
 
     def setup_libraries(self):
         self.add_library_set(["gl.h", "glu.h"], ["GL", "GLU"])
         self.add_library_set(["gl.h", "glu.h"], ["OpenGL"])
 
-
     def _test(self, cfg):
-	# Fail if OSMesa enabled, conflicts with other OpenGL libraries
-        if self.ctx.option_dict["with_osmesa"] == True:
-	    print "(OSMesa enabled, for interactive graphics use: --with-osmesa=0)"
-	    return False;
-
         # If we're on Darwin we need this hack.
         if platform.system() == "Darwin":
             cfg.append_unique("lnkprogflags",

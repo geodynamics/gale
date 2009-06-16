@@ -11,11 +11,6 @@ class OSMesa(config.Package):
         #if platform.system() == "Darwin":
         #  self.base_dirs.append("/System/Library/Frameworks/OpenGL.framework")
 
-    #def _setup_deps(self):
-     #   config.Package._setup_deps(self)
-      #  self.gl = self.add_dependency(config.packages.OpenGL,
-       #                                required=True, combine=True)
-
     def setup_libraries(self):
         self.add_library_set(["osmesa.h", "gl.h", "glu.h"], ["OSMesa", "GLU"])
         #self.add_library_set(["gl.h", "glu.h"], ["GLU"])
