@@ -62,47 +62,48 @@ struct StructC
 typedef struct StructC StructC;
 
 typedef struct {
-   MemoryReport*  report;
-   unsigned int   rank;   
-   void*          bytesObj;
-   void*          bytesArray;
-   StructA*       object;
-   StructB*       array1d;
-   StructC**      array2d;
-   StructA***     array3d;
-   StructB****    array4d;
-   StructC*       one2d;
-   StructA*       one3d;
-   StructB*       one4d;
-   StructC**      complex2d;
-   Index**        setup;
-   StructA***     complex3d;
-   unsigned       strA_alloc;
-   unsigned       strB_alloc;
-   unsigned       strC_alloc;
-   unsigned       bytes_alloc;
-   unsigned       index_alloc;
-   unsigned       strA_total;
-   unsigned       strB_total;
-   unsigned       strC_total;
-   unsigned       bytes_total;
-   unsigned       index_total;
-   unsigned       groupTwo_strA_alloc;
-   unsigned       groupTwo_strB_alloc;
-   unsigned       groupTwo_strC_alloc;
-   unsigned       groupTwo_strA_total;
-   unsigned       groupTwo_strB_total;
-   unsigned       groupTwo_strC_total;
-   unsigned       groupOneFunc_alloc;
-   unsigned       groupTwoFunc_alloc;
-   unsigned       groupTwoName_alloc;
-   unsigned       bytesFunc_alloc;
-   unsigned       groupOneFunc_total;
-   unsigned       groupTwoFunc_total;
-   unsigned       groupTwoName_total;
-   unsigned       bytesFunc_total;
-   unsigned       file_alloc;
-   unsigned       file_total;
+   Memory*                 savedStgMemory;
+   MemoryReport*           report;
+   unsigned int            rank;   
+   void*                   bytesObj;
+   void*                   bytesArray;
+   StructA*                object;
+   StructB*                array1d;
+   StructC**               array2d;
+   StructA***              array3d;
+   StructB****             array4d;
+   StructC*                one2d;
+   StructA*                one3d;
+   StructB*                one4d;
+   StructC**               complex2d;
+   Index**                 setup;
+   StructA***              complex3d;
+   unsigned                strA_alloc;
+   unsigned                strB_alloc;
+   unsigned                strC_alloc;
+   unsigned                bytes_alloc;
+   unsigned                index_alloc;
+   unsigned                strA_total;
+   unsigned                strB_total;
+   unsigned                strC_total;
+   unsigned                bytes_total;
+   unsigned                index_total;
+   unsigned                groupTwo_strA_alloc;
+   unsigned                groupTwo_strB_alloc;
+   unsigned                groupTwo_strC_alloc;
+   unsigned                groupTwo_strA_total;
+   unsigned                groupTwo_strB_total;
+   unsigned                groupTwo_strC_total;
+   unsigned                groupOneFunc_alloc;
+   unsigned                groupTwoFunc_alloc;
+   unsigned                groupTwoName_alloc;
+   unsigned                bytesFunc_alloc;
+   unsigned                groupOneFunc_total;
+   unsigned                groupTwoFunc_total;
+   unsigned                groupTwoName_total;
+   unsigned                bytesFunc_total;
+   unsigned                file_alloc;
+   unsigned                file_total;
 } MemoryReportSuiteData;
 
 
@@ -195,20 +196,20 @@ void MemoryReportSuite_AllocBytes( MemoryReportSuiteData* data ) {
 }
 
 
-void MemoryReportSuite_Setup( MemoryReportSuiteData* data ) {
-   Journal_Enable_TypedStream( Info_Type, True );
-   Stream_Enable( stgMemory->infoStream, True );
-
-   data->report = MemoryReport_New();
-   MPI_Comm_rank( MPI_COMM_WORLD, &data->rank );
-
-   /* Now: re-do the stgMemory struct, to create a clean area for next test */
-   Memory_Delete();
+Memory* MemoryReportSuite_SaveStgMemoryAndCreateTemp( MemoryReportSuiteData* data ) {
+   /* Save the main stgMemory struct, and create a special one for this test */
+   data->savedStgMemory = stgMemory;
    stgMemory = Memory_Init();
    stgMemory->infoStream = Stg_Class_Copy( (Stream*)Journal_GetTypedStream( Info_Type ), 0, True, 0, 0 );
    stgMemory->debugStream = Stg_Class_Copy( (Stream*)Journal_GetTypedStream( Debug_Type ), 0, True, 0, 0 );
    stgMemory->errorStream = Stg_Class_Copy( (Stream*)Journal_GetTypedStream( Error_Type ), 0, True, 0, 0 );
+   Journal_Enable_TypedStream( Info_Type, True );
+   return stgMemory;
+}
 
+
+void MemoryReportSuite_Setup( MemoryReportSuiteData* data ) {
+   MPI_Comm_rank( MPI_COMM_WORLD, &data->rank );
 
    data->strA_alloc=0;
    data->strB_alloc=0;
@@ -236,6 +237,14 @@ void MemoryReportSuite_Setup( MemoryReportSuiteData* data ) {
    data->bytesFunc_total=0;
    data->file_alloc=0;
    data->file_total=0;
+}
+
+
+void MemoryReportSuite_Teardown( MemoryReportSuiteData* data ) {
+}
+
+
+void MemoryReportSuite_AllocTestMemoryObjects( MemoryReportSuiteData* data ) {
    MemoryReportSuite_AllocGroupOne( data );
    MemoryReportSuite_AllocGroupTwo( data );
    MemoryReportSuite_AllocBytes( data );
@@ -246,8 +255,7 @@ void MemoryReportSuite_Setup( MemoryReportSuiteData* data ) {
 }
 
 
-void MemoryReportSuite_Teardown( MemoryReportSuiteData* data ) {
-   MemoryReport_Delete( data->report );
+void MemoryReportSuite_FreeTestMemoryObjects( MemoryReportSuiteData* data ) {
    Memory_Free( data->bytesObj );
    Memory_Free( data->bytesArray );
    Memory_Free_Type( StructA );
@@ -256,12 +264,19 @@ void MemoryReportSuite_Teardown( MemoryReportSuiteData* data ) {
 }
 
 
+/*Test 1: MemoryReport: (Type), where file is this test*/
 void MemoryReportSuite_TestReportPrintsOne( MemoryReportSuiteData* data ) {
    char*          memoryReportOutputFilename = "./MemoryReportSuite_TestOutput-1.txt";
-   
+   Memory*        tempMemoryManager;   
+
    Stream_RedirectFile( stgMemory->infoStream, memoryReportOutputFilename );
 
-   /*Test 1: MemoryReport: (Type), where file is this test*/
+   tempMemoryManager = MemoryReportSuite_SaveStgMemoryAndCreateTemp( data );
+   MemoryReportSuite_AllocTestMemoryObjects( data );
+   stgMemory = data->savedStgMemory;
+
+   data->report = MemoryReport_New();
+   MemoryReport_SetCustomMemoryManager( data->report, tempMemoryManager );
    MemoryReport_AddGroup( data->report, MEMORYREPORT_TYPE );
    MemoryReport_AddCondition( data->report, MEMORYREPORT_FILE, "StGermain/Base/Foundation/tests/MemoryReportSuite.c" );
    MemoryReport_Print( data->report );
@@ -272,6 +287,8 @@ void MemoryReportSuite_TestReportPrintsOne( MemoryReportSuiteData* data ) {
       char           memoryReportString[MAXLINE];
       unsigned       timesAlloc, timesFree, currBytes, totalBytes;
       char           valString[1000];
+
+      valString[0] = '\0';
 
       memoryReportOutputFile = fopen(memoryReportOutputFilename, "r");
       /* Just skip first 2 lines: headings */
@@ -322,14 +339,29 @@ void MemoryReportSuite_TestReportPrintsOne( MemoryReportSuiteData* data ) {
       fclose( memoryReportOutputFile );
       remove( memoryReportOutputFilename );
    }
+
+   stgMemory = tempMemoryManager;
+   MemoryReportSuite_FreeTestMemoryObjects( data );
+   Memory_Delete();
+   stgMemory = data->savedStgMemory;
+
+   MemoryReport_Delete( data->report );
 }
 
 
+/*Test 2: MemoryReport: (Type), where name=Test1*/
 void MemoryReportSuite_TestReportPrintsTwo( MemoryReportSuiteData* data ) {
    char*          memoryReportOutputFilename = "./MemoryReportSuite_TestOutput-2.txt";
+   Memory*        tempMemoryManager;   
    
    Stream_RedirectFile( stgMemory->infoStream, memoryReportOutputFilename );
-   /*Test 2: MemoryReport: (Type), where name=Test1*/
+
+   tempMemoryManager = MemoryReportSuite_SaveStgMemoryAndCreateTemp( data );
+   MemoryReportSuite_AllocTestMemoryObjects( data );
+   stgMemory = data->savedStgMemory;
+
+   data->report = MemoryReport_New();
+   MemoryReport_SetCustomMemoryManager( data->report, tempMemoryManager );
    MemoryReport_AddGroup( data->report, MEMORYREPORT_TYPE );
    MemoryReport_AddCondition( data->report, MEMORYREPORT_NAME, "GroupTwo" );
    MemoryReport_Print( data->report );
@@ -340,6 +372,8 @@ void MemoryReportSuite_TestReportPrintsTwo( MemoryReportSuiteData* data ) {
       char           memoryReportString[MAXLINE];
       unsigned       timesAlloc, timesFree, currBytes, totalBytes;
       char           valString[1000];
+
+      valString[0] = '\0';
 
       memoryReportOutputFile = fopen(memoryReportOutputFilename, "r");
       /* Just skip first 2 lines: headings */
@@ -378,14 +412,29 @@ void MemoryReportSuite_TestReportPrintsTwo( MemoryReportSuiteData* data ) {
       fclose( memoryReportOutputFile );
       remove( memoryReportOutputFilename );
    }
+
+   stgMemory = tempMemoryManager;
+   MemoryReportSuite_FreeTestMemoryObjects( data );
+   Memory_Delete();
+   stgMemory = data->savedStgMemory;
+
+   MemoryReport_Delete( data->report );
 }
 
 
+/*Test 3: MemoryReport: (Func), where file= this file */
 void MemoryReportSuite_TestReportPrintsThree( MemoryReportSuiteData* data ) {
    char*          memoryReportOutputFilename = "./MemoryReportSuite_TestOutput-3.txt";
+   Memory*        tempMemoryManager;   
    
    Stream_RedirectFile( stgMemory->infoStream, memoryReportOutputFilename );
-   /*Test 3: MemoryReport: (Func), where file= this file */
+
+   tempMemoryManager = MemoryReportSuite_SaveStgMemoryAndCreateTemp( data );
+   MemoryReportSuite_AllocTestMemoryObjects( data );
+   stgMemory = data->savedStgMemory;
+
+   data->report = MemoryReport_New();
+   MemoryReport_SetCustomMemoryManager( data->report, tempMemoryManager );
    MemoryReport_AddGroup( data->report, MEMORYREPORT_FUNC );
    MemoryReport_AddGroup( data->report, MEMORYREPORT_FILE );
    MemoryReport_AddGroup( data->report, MEMORYREPORT_TYPE );
@@ -399,6 +448,8 @@ void MemoryReportSuite_TestReportPrintsThree( MemoryReportSuiteData* data ) {
       char           memoryReportString[MAXLINE];
       unsigned       timesAlloc, timesFree, currBytes, totalBytes;
       char           valString[1000];
+
+      valString[0] = '\0';
 
       memoryReportOutputFile = fopen(memoryReportOutputFilename, "r");
       /* Just skip first 2 lines: headings */
@@ -437,14 +488,29 @@ void MemoryReportSuite_TestReportPrintsThree( MemoryReportSuiteData* data ) {
       fclose( memoryReportOutputFile );
       remove( memoryReportOutputFilename );
    }
+
+   stgMemory = tempMemoryManager;
+   MemoryReportSuite_FreeTestMemoryObjects( data );
+   Memory_Delete();
+   stgMemory = data->savedStgMemory;
+
+   MemoryReport_Delete( data->report );
 }
 
 
+/*Test 4: MemoryReport: (File), where type=StructA and name=Test2 */
 void MemoryReportSuite_TestReportPrintsFour( MemoryReportSuiteData* data ) {
    char*          memoryReportOutputFilename = "./MemoryReportSuite_TestOutput-4.txt";
+   Memory*        tempMemoryManager;   
    
    Stream_RedirectFile( stgMemory->infoStream, memoryReportOutputFilename );
-   /*Test 4: MemoryReport: (File), where type=StructA and name=Test2 */
+
+   tempMemoryManager = MemoryReportSuite_SaveStgMemoryAndCreateTemp( data );
+   MemoryReportSuite_AllocTestMemoryObjects( data );
+   stgMemory = data->savedStgMemory;
+
+   data->report = MemoryReport_New();
+   MemoryReport_SetCustomMemoryManager( data->report, tempMemoryManager );
    MemoryReport_AddGroup( data->report, MEMORYREPORT_FILE );
    MemoryReport_AddCondition( data->report, MEMORYREPORT_TYPE, "StructA" );
    MemoryReport_AddCondition( data->report, MEMORYREPORT_NAME, "GroupTwo" );
@@ -456,6 +522,8 @@ void MemoryReportSuite_TestReportPrintsFour( MemoryReportSuiteData* data ) {
       char           memoryReportString[MAXLINE];
       unsigned       timesAlloc, timesFree, currBytes, totalBytes;
       char           valString[1000];
+
+      valString[0] = '\0';
 
       memoryReportOutputFile = fopen(memoryReportOutputFilename, "r");
       /* Just skip first 2 lines: headings */
@@ -482,6 +550,13 @@ void MemoryReportSuite_TestReportPrintsFour( MemoryReportSuiteData* data ) {
       fclose( memoryReportOutputFile );
       remove( memoryReportOutputFilename );
    }
+
+   stgMemory = tempMemoryManager;
+   MemoryReportSuite_FreeTestMemoryObjects( data );
+   Memory_Delete();
+   stgMemory = data->savedStgMemory;
+
+   MemoryReport_Delete( data->report );
 }
 
 
