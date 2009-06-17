@@ -10,3 +10,4 @@ from X11 import X11
 from libPNG import libPNG
 from libJPEG import libJPEG
 from libFAME import libFAME
+from stgGlobus import stgGlobus
