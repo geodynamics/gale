@@ -42,26 +42,26 @@ class createHTMLDocuments(createDocuments):
         projectName = self.projectList[count].name
         print "Creating HTML page for project: " + str(projectName)
         # create string for content of page
-        htmlPage ='<html>\n'
+        htmlPage =u'<html>\n'
         
-        htmlPage += self.createHeader(projectName)
-        htmlPage +='<body>\n'
-        htmlPage += self.createTopMenu()
+        htmlPage += unicode(self.createHeader(projectName))
+        htmlPage +=u'<body>\n'
+        htmlPage += unicode(self.createTopMenu())
         
-        htmlPage += '<div id="'+self.div.container+'">\n'
-        htmlPage += self.createBreadcrumbTrail(projectName)
-        htmlPage += self.createNavitab(projectName)
-        htmlPage += self.createSidebar(count)
+        htmlPage += u'<div id="'+unicode(self.div.container)+u'">\n'
+        htmlPage += unicode(self.createBreadcrumbTrail(projectName))
+        htmlPage += unicode(self.createNavitab(projectName))
+        htmlPage += unicode(self.createSidebar(count))
         
-        htmlPage += '<div id="'+self.div.main+'">\n'         
-        htmlPage += self.createBlurb(projectName)       
-        htmlPage += self.createMain(count)
-        htmlPage +='</div>\n'
-        htmlPage += self.createFooter()
-        htmlPage += '\n</div>'
-        htmlPage +=self.addScripts()
-        htmlPage +='\n</body>\n</html>'
-        
+        htmlPage += u'<div id="'+unicode(self.div.main)+u'">\n'         
+        htmlPage += unicode(self.createBlurb(projectName))       
+        htmlPage += unicode(self.createMain(count))
+        htmlPage +=u'</div>\n'
+        htmlPage += unicode(self.createFooter())
+        htmlPage += u'\n</div>'
+        htmlPage +=unicode(self.addScripts())
+        htmlPage +=u'\n</body>\n</html>'
+        htmlPage = unicode(htmlPage)
         # write page to file
         filename = self.path + '/'+ self.projectList[count].name + '.html'
         page = open(filename,  'w')
@@ -332,12 +332,12 @@ class createHTMLDocuments(createDocuments):
     # For the simpler componentInfo entries, can easily fit into this function.    
     def addSimpleComponentInfo(self, name, value):
                 text = ''
-                text += '<div id="'+self.div.componentInfo[0]+'">\n'
-                text += '<div id="'+self.div.componentInfo[1]+'">\n'
-                text += '<b>'+str(name)+'</b>: </div>\n'
-                text += '<div id="'+self.div.componentInfo[2]+'">'+str(value)+'<br>\n'
+                text += '<div id="'+unicode(self.div.componentInfo[0])+'">\n'
+                text += '<div id="'+unicode(self.div.componentInfo[1])+'">\n'
+                text += '<b>'+unicode(name)+'</b>: </div>\n'
+                text += '<div id="'+self.div.componentInfo[2]+'">'+value+'<br>\n'
                 text += '</div>\n</div>\n'        
-                return text
+                return unicode(text)
     # Example part of meta component            
     def addExampleInfo(self,  name,  value):
         text = ''
@@ -410,10 +410,10 @@ class createHTMLDocuments(createDocuments):
                             myList[listValue+1] = newString
                             picsIndex = picsIndex + 1
                          #turn list back into string   
-                        text += '<td>'+ string.lstrip(string.join(myList))+'</td>'    
+                        text += '<td>'+ (string.lstrip(string.join(myList))).encode('ascii','xmlcharrefreplace')+'</td>'    
                     else:
                         # add code to table
-                        text += '<td>'+item[title]+'</td>'
+                        text += '<td>'+(item[title]).encode('ascii','xmlcharrefreplace')+'</td>'
                 else:
                     text += '<td> </td>'
             text +='</tr>\n'
@@ -546,40 +546,41 @@ class createHTMLDocuments(createDocuments):
                 #print project.name,  name,  meta.dictionary['Location']
                 text +='<h3 align="center">\n'
                 
-                text +='<a name="'+meta.dictionary['Name']+'">'+meta.dictionary['Name']+'</a>\n'
+                text +='<a name="'+unicode(meta.dictionary['Name'])+'">'+unicode(meta.dictionary['Name'])+'</a>\n'
                 text += '</h3>\n<br>\n'
                 if meta.dictionary.has_key('Organisation'):
-                    text += self.addSimpleComponentInfo('Organisation', meta.dictionary['Organisation'])
+                    text += self.addSimpleComponentInfo('Organisation', unicode(meta.dictionary['Organisation']))
                 
-                text += self.addSimpleComponentInfo('Project', meta.dictionary['Project'])
-                text += self.addSimpleComponentInfo('Location', meta.dictionary['Location'])
+                text += self.addSimpleComponentInfo('Project', unicode(meta.dictionary['Project']))
+                text += self.addSimpleComponentInfo('Location', unicode(meta.dictionary['Location']))
                 if meta.dictionary.has_key('Project Web'):
-                    text += self.addSimpleComponentInfo('Project Web', meta.dictionary['Project Web'])
-                text += self.addSimpleComponentInfo('Copyright', meta.dictionary['Copyright'])
-                text += self.addSimpleComponentInfo('License', meta.dictionary['License'])
+                    text += self.addSimpleComponentInfo('Project Web', unicode(meta.dictionary['Project Web']))
+                text += self.addSimpleComponentInfo('Copyright', unicode(meta.dictionary['Copyright']))
+                text += self.addSimpleComponentInfo('License', unicode(meta.dictionary['License']))
                 #This one may need work
                 if meta.dictionary.has_key('Parent'):
-                    text += self.addParentInfoDtd('Parent', 'Name', meta.dictionary['Parent'])
+                    text += self.addParentInfoDtd('Parent', 'Name', unicode(meta.dictionary['Parent']))
                 
-                text += self.addChildrenInfoDtd('Children', 'Parent', 'Name', meta.dictionary['Name'])
+                text += self.addChildrenInfoDtd('Children', 'Parent', 'Name', (meta.dictionary['Name']).encode('ascii','xmlcharrefreplace'))
                 
-                text += self.addSimpleComponentInfo('Description', meta.dictionary['Description'])
+                text += self.addSimpleComponentInfo('Description', (meta.dictionary['Description']).encode('ascii','xmlcharrefreplace'))
                 # Next comes reference, if any
                 if meta.dictionary.has_key('Reference'):
-                    text += self.addSimpleComponentInfo('Reference', meta.dictionary['Reference'])
+                    refValue = unicode(meta.dictionary['Reference'])
+                    text += self.addSimpleComponentInfo('Reference', refValue.encode('ascii','xmlcharrefreplace'))
                 #next comes Example, if any
                 if meta.dictionary.has_key('Example'):
-                    text +=self.addExampleInfo('Example',  meta.dictionary['Example'])
+                    text +=self.addExampleInfo('Example',  (meta.dictionary['Example']).encode('ascii','xmlcharrefreplace'))
                 #Then equation if any
                 if meta.dictionary.has_key('Equation'):
-                    text +=self.addEquationInfo(meta.dictionary['Name'],  meta.dictionary['Equation'])
+                    text +=self.addEquationInfo(unicode(meta.dictionary['Name']),  (meta.dictionary['Equation']).encode('ascii','xmlcharrefreplace'))
                 if meta.dictionary.has_key('Params'):
                 # then params if any
                     text +=self.addListComponentInfo('Params',  'paramtable', meta.dictionary['Params'],  meta.dictionary['Name'])
                 # then dependencies, if any
                 if meta.dictionary.has_key('Dependencies'):
                     text +=self.addListComponentInfo("Dependencies", 'deptable',  meta.dictionary['Dependencies'],  meta.dictionary['Name'])
-        return text        
+        return unicode(text)        
         
     # Find the parent info for meta component, using xsd.    
     def addParentInfoXsd(self, titleName,  infoTitle, nameTitle, parentName):
@@ -647,7 +648,7 @@ class createHTMLDocuments(createDocuments):
                 if meta.dictionary['implements'].has_key('equation'):
                     text +=self.addEquationInfo(meta.dictionary['info']['title'],  meta.dictionary['implements']['equation'])
                 if meta.dictionary['implements'].has_key('reference'):
-                    text += self.addSimpleComponentInfo('reference', meta.dictionary['implements']['reference']) 
+                    text += self.addSimpleComponentInfo('reference', (meta.dictionary['implements']['reference']).encode('ascii','xmlcharrefreplace')) 
                 text += '<h4 align="center">Code</h4>\n'
                 #This one may need work
                 if meta.dictionary['code'].has_key('inherits'):
