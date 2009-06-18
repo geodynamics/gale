@@ -65,31 +65,8 @@ env.AppendUnique(CPPDEFINES=[("VERSION", env["ESCAPE"]('"' + out.split()[0].stri
 
 # Need to insert some 'HAVE_*' definitions based on what packages we
 # found during configuration.
-if 'found_packages' in env:
-    if "OpenGL" in env["found_packages"]:
-        env.AppendUnique(CPPDEFINES=["HAVE_GL"])
-    if "libpng" in env["found_packages"]:
-        env.AppendUnique(CPPDEFINES=["HAVE_PNG"])
-    if "libjpeg" in env["found_packages"]:
-        env.AppendUnique(CPPDEFINES=["HAVE_JPEG"])
-    if "libfame" in env["found_packages"]:
-        env.AppendUnique(CPPDEFINES=["HAVE_LIBFAME"])
-    if "SDL" in env["found_packages"]:
-        env.AppendUnique(CPPDEFINES=["HAVE_SDL"])
-    if "OSMesa" in env["found_packages"]:
-        env.AppendUnique(CPPDEFINES=["HAVE_OSMESA"])
-    if "PETScExt" in env["found_packages"]:
-        env.AppendUnique(CPPDEFINES=["HAVE_PETSCEXT"])
-    if "PETSc" in env["found_packages"]:
-        env.AppendUnique(CPPDEFINES=["HAVE_PETSC"])
-    if "X11" in env["found_packages"]:
-        env.AppendUnique(CPPDEFINES=["HAVE_X11"])
-    elif "Carbon" in env["found_packages"]:
-        env.AppendUnique(CPPDEFINES=["HAVE_CARBON"])
-    if "HDF5" in env["found_packages"]:
-        env.AppendUnique(CPPDEFINES=["READ_HDF5", "WRITE_HDF5"])
-    if "Python" in env["found_packages"]:
-        env.AppendUnique(CPPDEFINES=["Python"])
+if 'HAVE_HDF5' in env['CPPDEFINES']:
+    env.AppendUnique(CPPDEFINES=["READ_HDF5", "WRITE_HDF5"])
 
 #
 # Make sure 'install' has a proper target.

@@ -1,8 +1,5 @@
-import sys, os, platform
-sys.path.insert(0, os.getcwd())
-
-import packages
-import cc
+import platform, os
+from config import packages, cc
 
 #
 # Add options to be passed on to build.
@@ -24,7 +21,7 @@ options = [
 #
 
 env = Environment(ENV=os.environ)
-env.Tool('config', toolpath=['.'], options=options)
+env.Tool('config', toolpath=['config'], options=options)
 
 #
 # Declare which packages we're going to use.
@@ -37,6 +34,8 @@ env.UsePackage(packages.OSMesa)
 env.UsePackage(packages.OpenGL)
 env.UsePackage(packages.SDL)
 env.UsePackage(packages.X11)
+env.UsePackage(packages.Carbon)
+env.UsePackage(packages.Cocoa)
 env.UsePackage(packages.libPNG)
 env.UsePackage(packages.libJPEG)
 env.UsePackage(packages.libFAME)
@@ -112,6 +111,7 @@ if not (GetOption('help') or GetOption('clean')):
 # Export the environment.
 #
 
+env.PrintSummary()
 env.SaveConfig()
 
 #
