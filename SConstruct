@@ -11,6 +11,9 @@ env = Environment(ENV=os.environ,
                   toolpath=['StGermain/pcu/script', 'StGermain/script',
                             'script'])
 
+# Needed for Darwin.
+env['_abspath'] = lambda x: File(x).abspath
+
 # Ludicrous-speed!
 env.Decider("MD5-timestamp")
 
@@ -104,6 +107,11 @@ SConscript('Underworld/SConscript',
            variant_dir=env['build_dir'] + '/Underworld',
            duplicate=0)
 env.Prepend(LIBS=['Underworld'])
+
+SConscript('Experimental/SConscript',
+           variant_dir=env['build_dir'] + '/Experimental',
+           duplicate=0)
+env.Prepend(LIBS=['Experimental'])
 
 if env['with_glucifer']:
     SConscript('gLucifer/SConscript',
