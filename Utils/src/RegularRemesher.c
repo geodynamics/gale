@@ -29,6 +29,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+#ifdef HAVE_PETSC
+
 #include <stdlib.h>
 #include <string.h>
 #include <petsc.h>
@@ -722,3 +724,5 @@ void RegularRemesher_SetStaticWall( void* _self, int dim, int wall, Bool state )
    else if( ISet_Has( self->staticWalls[wall], dim ) )
       ISet_Remove( self->staticWalls[wall], dim );
 }
+
+#endif

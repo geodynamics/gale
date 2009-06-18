@@ -41,6 +41,8 @@
 #ifndef __StGermain_Domain_Utils_RegularRemesherCmpt_h__
 #define __StGermain_Domain_Utils_RegularRemesherCmpt_h__
 
+#ifdef HAVE_PETSC
+
 /* Textual name of this class. */
 extern const Type RegularRemesherCmpt_Type;
 
@@ -98,5 +100,7 @@ void _RegularRemesherCmpt_Destroy( void* remesher, void* data );
 /*-----------------------------------------------------------------------------------------------------------------------------
 ** Private Member functions
 */
+
+#endif
 
 #endif

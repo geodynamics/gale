@@ -249,6 +249,7 @@ void _GlobalParticleLayout_InitialiseParticles( void* particleLayout, void* _swa
 	Cell_Index		cell_I;
 	Particle_Index          globalParticlesInitialisedCount=0;
 	Progress*		prog;
+	int                     nRanks;
 	Stream*                 errorStream = Journal_Register( Error_Type, self->type );
 
 	Journal_DPrintf( self->debug, "In %s(): for ParticleLayout \"%s\" (of type %s):\n",
@@ -267,6 +268,15 @@ void _GlobalParticleLayout_InitialiseParticles( void* particleLayout, void* _swa
 	Progress_SetPrefix( prog, "\t" );
 	Progress_SetRange( prog, 0, self->totalInitialParticles );
 	Progress_Update( prog );
+
+	/* Allocate a guess at the particle size to prevent a TONNE of unnecessary
+	   reallocation. */
+	MPI_Comm_size( MPI_COMM_WORLD, &nRanks );
+	assert( swarm->particleLocalCount == 0 );
+	swarm->particleLocalCount = self->totalInitialParticles/nRanks;
+	Swarm_Realloc( swarm );
+	swarm->particleLocalCount = 0;
+	swarm->expanding = 1;
 
 	while( newParticle_I < self->totalInitialParticles ) {
 		
@@ -303,6 +313,11 @@ void _GlobalParticleLayout_InitialiseParticles( void* particleLayout, void* _swa
 
 		Progress_Increment( prog );
 	}
+
+	/* Removing the lock on the swarm and realloc once more to remove any
+	   unused space. */
+	swarm->expanding = 0;
+	Swarm_Realloc( swarm );
 
 	/* Delete progress meter. */
 	Stg_Class_Delete( prog );

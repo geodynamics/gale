@@ -3,6 +3,9 @@ syntax: glob
 
 *~
 *.pyc
+*.o
+*.os
+*-meta.c
 
 # switch to regexp syntax.
 syntax: regexp

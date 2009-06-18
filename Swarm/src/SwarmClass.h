@@ -127,7 +127,9 @@
 						\
 		IArray*				incArray; \
 		/** number of files previous checkpoint stored across */ \
-		Index                           checkpointnfiles;
+		Index                           checkpointnfiles;\
+								 \
+	        int                             expanding;
 
 	struct Swarm { __Swarm };
 	
