@@ -8,9 +8,10 @@ class MPI(Package):
         yield ('', ['/usr/local/include/mpi'], ['/usr/local/lib'])
 
     def gen_envs(self, loc):
-        # First try an empty environment just in case we have
-        # been given an MPI compiler.
-        yield self.env.Clone()
+	# If we've been given an MPI compiler just try that.
+	if self.env['CC'] in ['mpicc', 'mpicxx']:
+            yield self.env.Clone()
+            return
 
         for env in Package.gen_envs(self, loc):
 
