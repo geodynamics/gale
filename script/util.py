@@ -26,7 +26,7 @@ def dirEntries( dir_name, subdir, *args ):
                     fileList.append(dirfile)
         # recursively access file names in subdirectories
         elif os.path.isdir(dirfile) and subdir:
-            print "Accessing directory:", dirfile
+            #print "Accessing directory:", dirfile
             fileList.extend(dirEntries(dirfile, subdir, *args))
     return fileList
 

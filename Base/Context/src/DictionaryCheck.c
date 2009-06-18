@@ -56,7 +56,8 @@ void CheckDictionaryKeys( Dictionary* dictionary, char* errorMessage)
 	Stream* errStream = Journal_Register( Error_Type, "DictionaryCheck");
 	int errCount;
 	int** keyIndexArray;
-
+	Index errIndex = 0;
+	Bool  alreadyFoundRepeat = False;
 
 	keyIndexArray = Memory_Alloc_2DArray( int, ((dictionary->count)*(dictionary->count - 1)), 
 					2, "Key Index Array" );
@@ -64,6 +65,16 @@ void CheckDictionaryKeys( Dictionary* dictionary, char* errorMessage)
 	errCount = 0;
 	for ( index_I = 0; index_I < dictionary->count; ++index_I )
 	{
+		alreadyFoundRepeat = False;
+		/* First, check if the current key has already been found & flagged as a repeat*/
+		for ( errIndex=0; errIndex < errCount; errIndex++) {
+			if ( index_I == keyIndexArray[errIndex][1] ) {
+				alreadyFoundRepeat = True;
+				break;
+			}
+		}
+		if (alreadyFoundRepeat==True) continue; 
+
 		/*For Each key, search through dictionary to see if there is another 
 		key the same*/
 		for (index_J = index_I+1; index_J < dictionary->count; ++index_J ) {
@@ -73,16 +84,24 @@ void CheckDictionaryKeys( Dictionary* dictionary, char* errorMessage)
 				if ( (0 == strcasecmp( dictionary->entryPtr[index_I]->key, 
 					dictionary->entryPtr[index_J]->key)) )
 				{
+					/* Check for the case that this is a 2nd or later 
+					 * repeat - in which case we don't need to add it */ 	
+					for ( errIndex=0; errIndex < errCount; errIndex++) {
+						if ( index_J == keyIndexArray[errIndex][0] ) {
+							alreadyFoundRepeat = True;
+							break;
+						}
+					}
+					if (alreadyFoundRepeat==True) break;
 
 /* 					preserve indexes index_I, index_J */
 					keyIndexArray[errCount][0] = index_I;
 					keyIndexArray[errCount][1] = index_J;					
 /* 					increment counter */
 					errCount++;
-					
+					break;
 				}
 			}
-			
 		}
 	}
 	/*if keyIndexArray is not empty, then do a print to error stream 

@@ -127,7 +127,7 @@ void* _LineFormatter_Copy( void* lineFormatter, void* dest, Bool deep, Name name
 	return newLineFormatter;
 }
 
-char* _LineFormatter_Format( void* formatter, char* fmt )
+char* _LineFormatter_Format( void* formatter, const char* const fmt )
 {
 	LineFormatter* self = (LineFormatter*)formatter;
 	char* result;

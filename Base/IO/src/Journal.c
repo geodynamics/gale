@@ -32,6 +32,7 @@
 #include <mpi.h>
 
 
+#include "pcu/pcu.h"	/* We'll use pcu_assert in Firewall function */
 #include "Base/Foundation/Foundation.h"
 
 #include "types.h"
@@ -47,6 +48,8 @@
 #include "MPIStream.h"
 #include "BinaryStream.h"
 #include "StreamFormatter.h"
+#include "LineFormatter.h"
+#include "RankFormatter.h"
 
 #include <assert.h>
 #include <stdlib.h>
@@ -444,7 +447,6 @@ Stream* Journal_Register( const Type type, const Name name )
 	typedStream = Journal_GetTypedStream( type );
 	namedStream = Journal_GetNamedStream( typedStream, name );	
 	
-	Stream_SetPrintingRank( namedStream, 0); /* Default when registering a Journal stream is to have it print from Rank 0 only) */
 
 	return namedStream;
 }
@@ -457,7 +459,7 @@ Stream* Journal_Register2( const Type streamType, const Type componentType, cons
 	return instanceStream;
 }
 
-JournalFile* Journal_GetFile( char* fileName )
+JournalFile* Journal_GetFile( const Name const fileName )
 {
 	return (JournalFile*) Stg_ObjectList_Get( stJournal->_files, fileName );
 }
@@ -526,7 +528,7 @@ void Journal_PrintConcise()
 	Journal_Printf( stream, "\n" );
 }
 
-int Journal_Printf ( void* _stream, char* fmt, ... )
+int Journal_Printf( void* _stream, const char* const fmt, ... )
 {
 	int result;
 	Stream* stream = (Stream*)_stream;
@@ -547,7 +549,7 @@ int Journal_Printf ( void* _stream, char* fmt, ... )
 	return result;
 }
 
-int Journal_PrintfL( void* _stream, JournalLevel level, char* fmt, ... )
+int Journal_PrintfL( void* _stream, JournalLevel level, const char* const fmt, ... )
 {
 	int result;
 	Stream* stream = (Stream*)_stream;
@@ -570,7 +572,7 @@ int Journal_PrintfL( void* _stream, JournalLevel level, char* fmt, ... )
 int Journal_Firewall_Func( int expression, char* expressionText, 
 	const char* file, const char* func, int line, void* _stream, char* fmt, ... )
 */
-int Journal_Firewall( int expression, void* _stream, char* fmt, ... )
+int Journal_Firewall( int expression, void* _stream, const char* const fmt, ... )
 {
 	int result = 0;
 	Stream* stream = (Stream*)_stream;
@@ -604,7 +606,9 @@ int Journal_Firewall( int expression, void* _stream, char* fmt, ... )
 	}
 	
 	if ( stJournal->firewallProducesAssert == True ) {
-		assert( expression );
+		/* Use pcu_assert, so that StGermain PCU tests can check that a Firewall
+		 * is correctly produced. */ 
+		pcu_assert( expression );
 	}
 	else {
 		/* TODO: Don't use FAILURE until Pat beef's up the test scripts to do .error checks
@@ -644,7 +648,7 @@ Bool Journal_Dump( void* _stream, void* data )
 
 
 /* Only rank 0 will print to stream */
-int Journal_RPrintf ( void* _stream, char* fmt, ... )
+int Journal_RPrintf ( void* _stream, const char* const fmt, ... )
 {
 	Stream* stream = (Stream*)_stream;
 	int result, init_stream_rank;
@@ -669,7 +673,7 @@ int Journal_RPrintf ( void* _stream, char* fmt, ... )
 }
 
 /* Only rank 0 will print to stream */
-int Journal_RPrintfL ( void* _stream, JournalLevel level, char* fmt, ... )
+int Journal_RPrintfL ( void* _stream, JournalLevel level, const char* const fmt, ... )
 {
         Stream* stream = (Stream*)_stream;
         int result, init_stream_rank;
@@ -694,3 +698,56 @@ int Journal_RPrintfL ( void* _stream, JournalLevel level, char* fmt, ... )
 }
 
 
+void Journal_SetupDefaultTypedStreams() {
+	Stream* typedStream;
+
+	/* info */
+	typedStream = CStream_New( Info_Type );
+	Stream_Enable( typedStream, True );
+	Stream_SetLevel( typedStream, 1 );
+	Stream_SetFile( typedStream, stJournal->stdOut );
+	Stream_SetAutoFlush( typedStream, True );
+	Journal_RegisterTypedStream( typedStream );
+	/* Default when registering a Journal stream is to have it print from Rank 0 only) */
+	Stream_SetPrintingRank( typedStream, 0);
+
+	/* debug */
+	typedStream = CStream_New( Debug_Type );
+	Stream_Enable( typedStream, False );
+	Stream_SetLevel( typedStream, 1 );
+	Stream_SetFile( typedStream, stJournal->stdOut );
+	Stream_SetAutoFlush( typedStream, True );
+	Stream_AddFormatter( typedStream, RankFormatter_New() );
+	Journal_RegisterTypedStream( typedStream );
+	/* Default when registering a Journal stream is to have it print from Rank 0 only) */
+	Stream_SetPrintingRank( typedStream, 0);
+	
+	/* dump */
+	typedStream = CStream_New( Dump_Type );
+	Stream_Enable( typedStream, False );
+	Stream_SetLevel( typedStream, 1 );
+	Stream_SetFile( typedStream, stJournal->stdOut );
+	Journal_RegisterTypedStream( typedStream );
+	
+	/* error */
+	typedStream = CStream_New( Error_Type );
+	Stream_Enable( typedStream, True );
+	Stream_SetLevel( typedStream, 1 );
+	Stream_SetFile( typedStream, stJournal->stdErr );
+	Stream_SetAutoFlush( typedStream, True );
+	Stream_AddFormatter( typedStream, RankFormatter_New() );
+	Journal_RegisterTypedStream( typedStream );
+	
+	/* mpi stream */
+	typedStream = MPIStream_New( MPIStream_Type );
+	Stream_Enable( typedStream, True );
+	Stream_SetLevel( typedStream, 1 );
+	Journal_RegisterTypedStream( typedStream );
+	/* MPI Streams need to print from all ranks */
+
+	/* binary stream */
+	typedStream = BinaryStream_New( BinaryStream_Type );
+	Stream_Enable( typedStream, True );
+	Stream_SetLevel( typedStream, 1 );
+	Journal_RegisterTypedStream( typedStream );
+}

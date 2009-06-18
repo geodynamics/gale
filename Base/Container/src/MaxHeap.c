@@ -63,7 +63,7 @@ MaxHeap* MaxHeap_New( void **keys, int keyLength, int numArrayElements,
 									_MaxHeap_PrintFunc,
 									NULL,
 									MaxHeap_Heapify,
-									MaxHeap_Extract,
+									(Heap_ExtractFunction*)MaxHeap_Extract,
 									MaxHeap_InsertFunc,
 									keySwap,
 									keyCompare,
@@ -145,23 +145,23 @@ void MaxHeap_Heapify( _Heap *heap, int index )
 	}
 }
 
-void* MaxHeap_Extract( _Heap *heap )
-{
-	void *max;
+void* MaxHeap_Extract( void* heap ) {
+	MaxHeap*	self = (MaxHeap*)heap;
+	void*		max;
 	
-	assert( heap );
+	assert( self );
 
-	if( heap->numHeapElements < 1 ){
+	if( self->numHeapElements < 1 ){
 		fprintf( stderr, "Heap Underflow..!!\n Aborting..!!\n" );
 		assert( 0 );
 	}
 
-	max = heap->keys[0];
+	max = self->keys[0];
 
-	heap->keySwap( &(heap->keys[0]), &(heap->keys[heap->numHeapElements-1]) );
-	heap->numHeapElements -= 1;
+	self->keySwap( &(self->keys[0]), &(self->keys[self->numHeapElements-1]) );
+	self->numHeapElements -= 1;
 
-	heap->heapify( heap, 1 );
+	self->heapify( (_Heap*)self, 1 );
 
 	return max;
 }

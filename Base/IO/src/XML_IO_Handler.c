@@ -53,7 +53,7 @@
 const Type XML_IO_Handler_Type = "XML_IO_Handler";
 
 /** The Xml search path list. */
-Stg_ObjectList* xmlSearchPaths = NULL;
+Stg_ObjectList* Project_XMLSearchPaths = NULL;
 
 #define XML_OLD_DTD 1
 
@@ -76,9 +76,12 @@ static const xmlChar* PARAM_ATTR = (const xmlChar*) "param";
 
 static const xmlChar* ASCII_DATA_TAG = (const xmlChar*) "asciidata";
 static const xmlChar* COLUMN_DEFINITION_TAG = (const xmlChar*) "columnDefinition";
-static const xmlChar* APPEND_TAG = (const xmlChar*) "append";
-static const xmlChar* MERGE_TAG = (const xmlChar*) "merge";
-static const xmlChar* REPLACE_TAG = (const xmlChar*) "replace";
+
+const xmlChar* APPEND_TAG = (const xmlChar*) "append";
+const xmlChar* MERGE_TAG = (const xmlChar*) "merge";
+const xmlChar* REPLACE_TAG = (const xmlChar*) "replace";
+const xmlChar* XML_IO_Handler_MergeTypeMap[3];
+
 static const xmlChar* SEARCH_PATH_TAG = (const xmlChar*) "searchPath";
 static const xmlChar* ELEMENT_TAG = (const xmlChar*) "element";
 
@@ -114,7 +117,7 @@ static xmlNodePtr _XML_IO_Handler_OpenCheckBuffer( XML_IO_Handler*, const char* 
 static void _XML_IO_Handler_OpenFile( XML_IO_Handler*, const char* );
 static void _XML_IO_Handler_ValidateFile( XML_IO_Handler*, const char* );
 static void _XML_IO_Handler_OpenBuffer( XML_IO_Handler*, const char* );
-static xmlNodePtr _XML_IO_Handler_Check( XML_IO_Handler* );
+static Bool _XML_IO_Handler_Check( XML_IO_Handler*, xmlDocPtr currDoc );
 static void _XML_IO_Handler_ParseNodes( XML_IO_Handler*, xmlNodePtr, Dictionary_Entry_Value*, 
 					Dictionary_MergeType, Dictionary_Entry_Source source );
 static void _XML_IO_Handler_ParseList( XML_IO_Handler*, xmlNodePtr, Dictionary_Entry_Value*, 
@@ -140,6 +143,8 @@ static void _XML_IO_Handler_ParseToolbox( XML_IO_Handler*, xmlNodePtr, Dictionar
 static void _XML_IO_Handler_ParseComponents( XML_IO_Handler*, xmlNodePtr, Dictionary_Entry_Value*, 
 					Dictionary_MergeType, Dictionary_Entry_Source );
 static Dictionary_Entry_Value_Type _XML_IO_Handler_GetDictValueType( XML_IO_Handler* self, char* type );
+static Dictionary_MergeType _XML_IO_Handler_GetMergeType( XML_IO_Handler* self, const xmlChar* mergeTypeStr, 
+		const char* funcName, const char* tagStr, xmlChar* entryName, Dictionary_MergeType defaultMergeType );
 static xmlChar* _XML_IO_Handler_StripLeadingTrailingWhiteSpace( XML_IO_Handler* self, const xmlChar* const );
 static Bool _XML_IO_Handler_IsOnlyWhiteSpace( char* );
 /* Writing Function prototypes */
@@ -287,7 +292,6 @@ void _XML_IO_Handler_Init( XML_IO_Handler* self ) {
 
 	Dictionary_Entry_Value_Type* lookupType;
 	
-
 	/* XML_IO_Handler info */
 	self->nameSpacesList = NULL;
 	_XML_IO_Handler_AddNameSpace( self, "http://www.vpac.org/StGermain/XML_IO_Handler/", "Jun2003" );
@@ -315,6 +319,9 @@ void _XML_IO_Handler_Init( XML_IO_Handler* self ) {
 	*lookupType = Dictionary_Entry_Value_Type_Int;
 	Stg_ObjectList_PointerAppend( self->typeKeywords, lookupType, "int", 0, LookupTypePrint, LookupTypeCopy );
 	lookupType = Memory_Alloc( Dictionary_Entry_Value_Type, "Lookup-type" );
+	*lookupType = Dictionary_Entry_Value_Type_UnsignedLong;
+	Stg_ObjectList_PointerAppend( self->typeKeywords, lookupType, "unsigned long", 0, LookupTypePrint, LookupTypeCopy );
+	lookupType = Memory_Alloc( Dictionary_Entry_Value_Type, "Lookup-type" );
 	*lookupType = Dictionary_Entry_Value_Type_Bool;
 	Stg_ObjectList_PointerAppend( self->typeKeywords, lookupType, "bool", 0, LookupTypePrint, LookupTypeCopy );
 	lookupType = Memory_Alloc( Dictionary_Entry_Value_Type, "Lookup-type" );
@@ -328,6 +335,7 @@ void _XML_IO_Handler_Init( XML_IO_Handler* self ) {
 	self->TYPE_KEYWORDS[Dictionary_Entry_Value_Type_Double] = "double";
 	self->TYPE_KEYWORDS[Dictionary_Entry_Value_Type_UnsignedInt] = "uint";
 	self->TYPE_KEYWORDS[Dictionary_Entry_Value_Type_Int] = "int";
+	self->TYPE_KEYWORDS[Dictionary_Entry_Value_Type_UnsignedLong] = "ulong";
 	self->TYPE_KEYWORDS[Dictionary_Entry_Value_Type_Bool] = "bool";
 	self->TYPE_KEYWORDS[Dictionary_Entry_Value_Type_Struct] = "struct";
 	self->TYPE_KEYWORDS[Dictionary_Entry_Value_Type_List] = "list";
@@ -335,11 +343,13 @@ void _XML_IO_Handler_Init( XML_IO_Handler* self ) {
 	self->WRITING_FIELD_EXTRAS[Dictionary_Entry_Value_Type_Double] = 7;
 	self->WRITING_FIELD_EXTRAS[Dictionary_Entry_Value_Type_UnsignedInt] = 6; 
 	self->WRITING_FIELD_EXTRAS[Dictionary_Entry_Value_Type_Int] = 6; 
+	self->WRITING_FIELD_EXTRAS[Dictionary_Entry_Value_Type_UnsignedLong] = 6; 
 	self->WRITING_FIELD_EXTRAS[Dictionary_Entry_Value_Type_Bool] = 1;
 	self->_setWritingPrecision( self, Dictionary_Entry_Value_Type_String, 30 );
 	self->_setWritingPrecision( self, Dictionary_Entry_Value_Type_Double, 5 );
 	self->_setWritingPrecision( self, Dictionary_Entry_Value_Type_UnsignedInt, 5 );
 	self->_setWritingPrecision( self, Dictionary_Entry_Value_Type_Int, 5 );
+	self->_setWritingPrecision( self, Dictionary_Entry_Value_Type_UnsignedLong, 5 );
 	self->_setWritingPrecision( self, Dictionary_Entry_Value_Type_Bool, 5 );
 	self->writeExplicitTypes = False;
 	
@@ -488,20 +498,20 @@ void XML_IO_Handler_AddDirectory( Name name, char* directory ) {
 	}
 
 	/* Check if dictionary already exists */
-	if(xmlSearchPaths == NULL) {
-		xmlSearchPaths = Stg_ObjectList_New();
+	if(Project_XMLSearchPaths == NULL) {
+		Project_XMLSearchPaths = Stg_ObjectList_New();
 	}
 	
 	/* Add path to global list */
 	found = False;
-	for( dir_i =  0; dir_i < xmlSearchPaths->count; dir_i++ ){
-		if( strcmp( directory, Stg_ObjectList_ObjectAt( xmlSearchPaths, dir_i ) ) == 0 ) {
+	for( dir_i =  0; dir_i < Project_XMLSearchPaths->count; dir_i++ ){
+		if( strcmp( directory, Stg_ObjectList_ObjectAt( Project_XMLSearchPaths, dir_i ) ) == 0 ) {
 			found = True;
 		}
 	}
 	
 	if( !found ) {
-		Stg_ObjectList_PointerAppend( xmlSearchPaths, StG_Strdup( directory ), name, 0, 0, 0 ); 
+		Stg_ObjectList_PointerAppend( Project_XMLSearchPaths, StG_Strdup( directory ), name, 0, 0, 0 ); 
 	}
 }	
 /** add a path to the search paths */
@@ -533,13 +543,14 @@ void _XML_IO_Handler_AddSearchPath( void* xml_io_handler, char* path ) {
  * exists, and contains valid XML. */
 Bool _XML_IO_Handler_ReadAllFromFile( void* xml_io_handler, const char* filename, Dictionary* dictionary ) {
 	XML_IO_Handler* self = (XML_IO_Handler*) xml_io_handler;
-	xmlNodePtr cur = NULL;
+	xmlNodePtr rootElement = NULL;
+	xmlNodePtr firstElement = NULL;
 	int rank;
 	
 	Journal_DPrintf( Journal_Register( Debug_Type, XML_IO_Handler_Type ), "XML_IO_Handler called to read file %s.\n", filename );
 	
 	assert( self && filename && dictionary );
-MPI_Comm_rank( MPI_COMM_WORLD, &rank );	
+	MPI_Comm_rank( MPI_COMM_WORLD, &rank );	
 	/* set the current dictionary to the one being read */
 	self->currDictionary = dictionary;
 
@@ -568,12 +579,12 @@ MPI_Comm_rank( MPI_COMM_WORLD, &rank );
 		_XML_IO_Handler_AddSearchPath( self, "./" );
 
 	/* 3. XML paths from other projects */
-	if (xmlSearchPaths != NULL) {
+	if (Project_XMLSearchPaths != NULL) {
 		int index_I;
-		for (index_I = 0; index_I  < xmlSearchPaths->count; index_I++){
+		for (index_I = 0; index_I  < Project_XMLSearchPaths->count; index_I++){
 			_XML_IO_Handler_AddSearchPath( 
 					self, 
-					Stg_ObjectList_ObjectAt( xmlSearchPaths,index_I )
+					Stg_ObjectList_ObjectAt( Project_XMLSearchPaths,index_I )
 				); 
 		}
 	}
@@ -605,14 +616,15 @@ MPI_Comm_rank( MPI_COMM_WORLD, &rank );
 
 	
 	/* open the file and check syntax */
-	if ( !(cur = _XML_IO_Handler_OpenCheckFile( self, filename )) ) {
+	if ( !(rootElement = _XML_IO_Handler_OpenCheckFile( self, filename )) ) {
 		return False;
 	}
 	
 	_XML_IO_Handler_ValidateFile( self, filename );
 	
 	/* call parse nodes, starting on the first child */
-	_XML_IO_Handler_ParseNodes( self, cur, NULL, Dictionary_MergeType_Replace, NULL );
+	firstElement = rootElement->xmlChildrenNode;
+	_XML_IO_Handler_ParseNodes( self, firstElement, NULL, IO_Handler_DefaultMergeType, NULL );
 	
 	/* free memory */
 	xmlFreeDoc( self->currDoc );
@@ -626,7 +638,8 @@ MPI_Comm_rank( MPI_COMM_WORLD, &rank );
  * FORCES the source file to be added to each Dictionary_Entry_Source (even if XML didn't have a source entry)*/
 Bool _XML_IO_Handler_ReadAllFromFileForceSource( void* xml_io_handler, const char* filename, Dictionary* dictionary ) {
 	XML_IO_Handler* self = (XML_IO_Handler*) xml_io_handler;
-	xmlNodePtr cur = NULL;
+	xmlNodePtr rootElement = NULL;
+	xmlNodePtr firstElement = NULL;
 	
 	Journal_DPrintf( Journal_Register( Debug_Type, XML_IO_Handler_Type ), "XML_IO_Handler called to read file %s.\n", filename );
 	
@@ -642,13 +655,16 @@ Bool _XML_IO_Handler_ReadAllFromFileForceSource( void* xml_io_handler, const cha
 		_XML_IO_Handler_AddSearchPath( self, "./" );
 	
 	/* open the file and check syntax */
-	if ( !(cur = _XML_IO_Handler_OpenCheckFile( self, filename )) ) {
+	if ( !(rootElement = _XML_IO_Handler_OpenCheckFile( self, filename )) ) {
 		xmlCleanupParser();
 		return False;
 	}	
 	
 	/* call parse nodes, starting on the first child */
-	_XML_IO_Handler_ParseNodes( self, cur, NULL, Dictionary_MergeType_Replace, (char*) cur->doc->URL );
+	
+
+	firstElement = rootElement->xmlChildrenNode;
+	_XML_IO_Handler_ParseNodes( self, firstElement, NULL, Dictionary_MergeType_Replace, (char*) rootElement->doc->URL );
 	
 	/* free memory */
 	xmlFreeDoc( self->currDoc );
@@ -659,7 +675,7 @@ Bool _XML_IO_Handler_ReadAllFromFileForceSource( void* xml_io_handler, const cha
 
 Bool _XML_IO_Handler_ReadAllFromBuffer( void* xml_io_handler, const char* buffer, Dictionary* dictionary ) {
 	XML_IO_Handler* self = (XML_IO_Handler*) xml_io_handler;
-	xmlNodePtr cur = NULL;
+	xmlNodePtr rootElement = NULL;
 
 	assert( self && buffer && dictionary );
 	
@@ -667,13 +683,13 @@ Bool _XML_IO_Handler_ReadAllFromBuffer( void* xml_io_handler, const char* buffer
 	self->currDictionary = dictionary;
 	
 	/* open the buffer and check syntax */
-	if ( !(cur = _XML_IO_Handler_OpenCheckBuffer( self, buffer )) ) {
+	if ( !(rootElement = _XML_IO_Handler_OpenCheckBuffer( self, buffer )) ) {
 		xmlCleanupParser();
 		return False;
 	}	
 	
 	/* call parse nodes, starting on the first child */
-	_XML_IO_Handler_ParseNodes( self, cur, NULL, Dictionary_MergeType_Replace, NULL );
+	_XML_IO_Handler_ParseNodes( self, rootElement, NULL, Dictionary_MergeType_Replace, NULL );
 	
 	/* free memory */
 	xmlFreeDoc( self->currDoc );
@@ -686,7 +702,8 @@ Bool _XML_IO_Handler_ReadAllFromBuffer( void* xml_io_handler, const char* buffer
  * \return a pointer to the root node if the file is valid, NULL otherwise. */
 static xmlNodePtr _XML_IO_Handler_OpenCheckFile( XML_IO_Handler* self, const char* filename )
 {
-	xmlChar absolute[1024];
+	xmlChar      absolute[1024];
+	xmlNodePtr   cur = NULL;
 
 	if ( FindFileInPathList(
 		(char*)absolute,
@@ -702,17 +719,32 @@ static xmlNodePtr _XML_IO_Handler_OpenCheckFile( XML_IO_Handler* self, const cha
 		"Error: File %s doesn't exist, not readable, or not valid.\n",
 		filename );
 
-	return _XML_IO_Handler_Check( self );
+	cur = xmlDocGetRootElement( self->currDoc );
+	Journal_Firewall( _XML_IO_Handler_Check( self, self->currDoc ),
+		Journal_Register( Error_Type, XML_IO_Handler_Type ),
+		"Error: File %s not valid/readable.\n",
+		filename );
+
+	return cur;
 	 
 }
 
 static xmlNodePtr _XML_IO_Handler_OpenCheckBuffer( XML_IO_Handler* self, const char* buffer ) {
+	xmlNodePtr   rootElement = NULL;
+
 	_XML_IO_Handler_OpenBuffer( self, buffer );
 	if ( self->currDoc == NULL ) {
 		return NULL;
 	}
 
-	return _XML_IO_Handler_Check( self );
+	rootElement = xmlDocGetRootElement( self->currDoc );
+
+	Journal_Firewall( _XML_IO_Handler_Check( self, self->currDoc ),
+		Journal_Register( Error_Type, XML_IO_Handler_Type ),
+		"Error: XML buffer provided not valid/readable.\n"
+		);
+
+	return rootElement;
 }
 
 static void _processNode(xmlTextReaderPtr reader) {
@@ -820,46 +852,38 @@ static void _XML_IO_Handler_OpenBuffer( XML_IO_Handler* self, const char* buffer
 	self->resource = StG_Strdup( "buffer" );
 }
 
-static xmlNodePtr _XML_IO_Handler_Check( XML_IO_Handler* self ) {
-	xmlNodePtr cur = NULL;
+Bool _XML_IO_Handler_Check( XML_IO_Handler* self, xmlDocPtr currDoc ) {
+	xmlNodePtr    rootElement = NULL;
+	xmlNodePtr    cur = NULL;
 	
-	cur = xmlDocGetRootElement( self->currDoc );
-	if (cur == NULL) {
+	rootElement = xmlDocGetRootElement( self->currDoc );
+	if (rootElement == NULL) {
 		Journal_Printf(
-			Journal_Register( Info_Type, XML_IO_Handler_Type ),
+			Journal_Register( Error_Type, XML_IO_Handler_Type ),
 			"Error: empty document. Not parsing.\n" );
 		xmlFreeDoc( self->currDoc );
-		return NULL;
+		return False;
 	}
 	
 	/* check the namespace */
-	(void) _XML_IO_Handler_CheckNameSpace( self, cur ); 
+	if( False == _XML_IO_Handler_CheckNameSpace( self, rootElement ) ) {
+		xmlFreeDoc( self->currDoc );
+		return False;
+	}
 	
 	/* check root element */
-	if (xmlStrcmp(cur->name, (const xmlChar *) ROOT_NODE_NAME)) {
+	if (xmlStrcmp(rootElement->name, (const xmlChar *) ROOT_NODE_NAME)) {
 		Journal_Printf( 
-			Journal_Register( Info_Type, XML_IO_Handler_Type ),
+			Journal_Register( Error_Type, XML_IO_Handler_Type ),
 			"resource %s of wrong type, root node =<%s>, should be <%s>.\nNot parsing.\n",
 			self->resource,
-			(const char*) cur->name, 
+			(const char*) rootElement->name, 
 			ROOT_NODE_NAME );
 		xmlFreeDoc( self->currDoc );
-		return NULL;
+		return False;
 	}
 	
-	/* get first child */
-	cur = cur->xmlChildrenNode;
-	while ( cur && xmlIsBlankNode ( cur ) ) {
-		cur = cur -> next;
-	}
-	if ( cur == NULL ) {
-		Journal_Printf( 
-			Journal_Register( Info_Type, XML_IO_Handler_Type ),
-			"Error: no children nodes in resource (path)%s. Not parsing.\n",
-			self->resource );
-	}
-	
-	return cur;
+	return True;
 }
 
 
@@ -873,11 +897,9 @@ Bool _XML_IO_Handler_CheckNameSpace( XML_IO_Handler* self, xmlNodePtr curNode )
 	char* correctNameSpace;
 	int correctLength = ( strlen(currNsInfo->location) + strlen(currNsInfo->version) ) + 1; 
 	
-	if ( !(correctNameSpace = Memory_Alloc_Array_Unnamed( char, correctLength )) ) {
-		Journal_Printf( 
-			Journal_Register( Info_Type, XML_IO_Handler_Type ),
+	Journal_Firewall( NULL != (correctNameSpace = Memory_Alloc_Array_Unnamed( char, correctLength )),
+			Journal_Register( Error_Type, XML_IO_Handler_Type ),
 			"Error: couldn't allocate memory for namespace.\n" );
-	}
 	strcpy( correctNameSpace, currNsInfo->location );
 	strcat( correctNameSpace, currNsInfo->version );
 	
@@ -898,7 +920,7 @@ Bool _XML_IO_Handler_CheckNameSpace( XML_IO_Handler* self, xmlNodePtr curNode )
 			
 			if ( NULL == (lastSlash = strrchr( (const char*) nsArray[i]->href, '/' )) ) {
 				Journal_Printf( 
-					Journal_Register( Info_Type, XML_IO_Handler_Type ),
+					Journal_Register( Error_Type, XML_IO_Handler_Type ),
 					"Warning: resource %s has namespace \"%s\" not of expected URI form.\n",
 					self->resource, 
 					nsArray[i]->href );
@@ -909,7 +931,7 @@ Bool _XML_IO_Handler_CheckNameSpace( XML_IO_Handler* self, xmlNodePtr curNode )
 			
 			if ( 0 == xmlStrncmp( nsArray[i]->href, (const xmlChar*) currNsInfo->location, locationLength ) ) {
 				Journal_Printf(
-					Journal_Register( Info_Type, XML_IO_Handler_Type ),
+					Journal_Register( Error_Type, XML_IO_Handler_Type ),
 					"Warning: resource %s of the correct type (\"%s\") but wrong version (\"%s\") as "
 					"compared to correct one of \"%s\".\n", 
 					self->resource,
@@ -922,12 +944,11 @@ Bool _XML_IO_Handler_CheckNameSpace( XML_IO_Handler* self, xmlNodePtr curNode )
 				currNsInfo = currNsInfo->next;
 				
 				/* search the IO_Handler's parent for matches */
-				while ( currNsInfo )
-				{
+				while ( currNsInfo ) {
 					self->currNameSpace = nsArray[i];
 					if ( 0 == xmlStrncmp( nsArray[i]->href, (const xmlChar*) currNsInfo->location, locationLength ) ) {
 						Journal_Printf(
-							Journal_Register( Info_Type, XML_IO_Handler_Type ),
+							Journal_Register( Error_Type, XML_IO_Handler_Type ),
 							"Warning: resource %s of the type of a parent namespace (\"%s\") as "
 							"compared to correct one of %s. "
 							"Some input features may not work.\n", 
@@ -936,24 +957,24 @@ Bool _XML_IO_Handler_CheckNameSpace( XML_IO_Handler* self, xmlNodePtr curNode )
 							correctNameSpace );
 						retVal = False;
 					}
-				}	
+				}
 				
 				if ( True == retVal ) {
-					Journal_Printf(
-						Journal_Register( Info_Type, XML_IO_Handler_Type ),
+					Journal_Printf( 
+						Journal_Register( Error_Type, XML_IO_Handler_Type ),
 						"Error: resource %s of the wrong type, unknown namespace wasn't expected "
 						"value of %s.\n", 
 						self->resource, 
 						correctNameSpace );
 					retVal = False;	
-				}		
+				}
 			}
 		}
-	}	
+	}
 	
 	Memory_Free( correctNameSpace );
 	return retVal;
-}			
+}
 
 
 /** given a document node and the parent of that node, parses all the information on that node and any of its children
@@ -1036,7 +1057,7 @@ static void _XML_IO_Handler_ParseNodes( XML_IO_Handler* self, xmlNodePtr cur, Di
 				
 				if ( 0 == xmlStrcmp( spaceStrippedFileName, (const xmlChar*) self->resource ) ) { 
 					Journal_Printf(
-						Journal_Register( Info_Type, XML_IO_Handler_Type ),
+						Journal_Register( Error_Type, XML_IO_Handler_Type ),
 						"Warning- while parsing file %s: Ignoring request to parse same file "
 						"(to avoid infinite loop.\n", 
 						self->resource );
@@ -1080,7 +1101,7 @@ static void _XML_IO_Handler_ParseNodes( XML_IO_Handler* self, xmlNodePtr cur, Di
 											     self->currDictionary ) ) )
 					{
 						Journal_Printf(
-							Journal_Register( Info_Type, XML_IO_Handler_Type ),
+							Journal_Register( Error_Type, XML_IO_Handler_Type ),
 							"Warning: Failed to parse file %s from include command.\n", 
 							spaceStrippedFileName );
 					}
@@ -1185,65 +1206,15 @@ static void _XML_IO_Handler_ParseList( XML_IO_Handler* self, xmlNodePtr cur, Dic
 	else if (source) {
 		spaceStrippedSourceFile = _XML_IO_Handler_StripLeadingTrailingWhiteSpace( self, (xmlChar*) source );
 	}
-	if( mergeTypeStr ) {
-		spaceStrippedMergeType = _XML_IO_Handler_StripLeadingTrailingWhiteSpace( self, mergeTypeStr );
-		if( !xmlStrcmp( spaceStrippedMergeType, APPEND_TAG ) ) {
-			mergeType = Dictionary_MergeType_Append;
-		}
-		else if( !xmlStrcmp( spaceStrippedMergeType, MERGE_TAG ) ) {
-			mergeType = Dictionary_MergeType_Merge;
-		}
-		else if( !xmlStrcmp( spaceStrippedMergeType, REPLACE_TAG ) ) {
-			mergeType = Dictionary_MergeType_Replace;
-		}
-		else {
-			Journal_DPrintf(
-				Journal_Register( Debug_Type, XML_IO_Handler_Type ),
-				"_XML_IO_Handler_ParseList called on tag %s, with name=\"%s\", and "
-				"mergeType \"%s\" unknown reverting to \"%s\".\n", 
-				(char *)cur->name, 
-				spaceStrippedName,
-				spaceStrippedMergeType,
-				defaultMergeType == Dictionary_MergeType_Append ? APPEND_TAG : 
-					defaultMergeType == Dictionary_MergeType_Merge ? MERGE_TAG :
-					defaultMergeType == Dictionary_MergeType_Replace ? APPEND_TAG :
-					APPEND_TAG );
-			mergeType = defaultMergeType;
-		}
-	}
-	if( childrenMergeTypeStr ) {
-		spaceStrippedChildrenMergeType = _XML_IO_Handler_StripLeadingTrailingWhiteSpace(
-			self,
-			childrenMergeTypeStr );
-							
-		if( !xmlStrcmp( spaceStrippedMergeType, APPEND_TAG ) ) {
-			childrenMergeType = Dictionary_MergeType_Append;
-		}
-		else if( !xmlStrcmp( spaceStrippedMergeType, MERGE_TAG ) ) {
-			childrenMergeType = Dictionary_MergeType_Merge;
-		}
-		else if( !xmlStrcmp( spaceStrippedMergeType, REPLACE_TAG ) ) {
-			childrenMergeType = Dictionary_MergeType_Replace;
-		}
-		else {
-			Journal_DPrintf(
-				Journal_Register( Debug_Type, XML_IO_Handler_Type ),
-				 "_XML_IO_Handler_ParseList called on tag %s, with name=\"%s\", and "
-				 "mergeType \"%s\" unknown reverting to \"%s\".\n", 
-				(char *)cur->name, 
-				spaceStrippedName,
-				spaceStrippedMergeType,
-				APPEND_TAG );
-			childrenMergeType = Dictionary_MergeType_Append;
-		}
-	}
+	mergeType = _XML_IO_Handler_GetMergeType( self, mergeTypeStr, __func__, (char*)cur->name, spaceStrippedName, defaultMergeType );
+	childrenMergeType = _XML_IO_Handler_GetMergeType( self, childrenMergeTypeStr, __func__, (char*)cur->name, spaceStrippedName, IO_Handler_DefaultChildrenMergeType );
 
 	Journal_DPrintf(
 		Journal_Register( Debug_Type, XML_IO_Handler_Type ),
 		"_XML_IO_Handler_ParseList called on tag %s, with name=\"%s\", and mergeType=\"%s\"\n", 
 		(char *) cur->name, 
 		spaceStrippedName, 
-		spaceStrippedMergeType );
+		mergeTypeStr );
 	
 	/* set/add the list */
 	newList = IO_Handler_DictSetAddValueWithSource(
@@ -1334,7 +1305,7 @@ static void _XML_IO_Handler_ParseAsciiData( XML_IO_Handler* self, xmlNodePtr cur
 		}
 		else {
 			Journal_Printf( 
-				Journal_Register( Info_Type, XML_IO_Handler_Type ),
+				Journal_Register( Error_Type, XML_IO_Handler_Type ),
 				"Error - while parsing resource %s: type of binary data must be specified "
 				"through dictionary or <%s> tag. Ignoring data.\n", 
 				self->resource,
@@ -1380,7 +1351,7 @@ static void _XML_IO_Handler_ParseAsciiData( XML_IO_Handler* self, xmlNodePtr cur
 			}
 			else {
 				Journal_Printf(
-					Journal_Register( Info_Type, XML_IO_Handler_Type ),
+					Journal_Register( Error_Type, XML_IO_Handler_Type ),
 					"Warning - while parsing resource %s: last row of Ascii data partially full. "
 					"Discarding row.\n", 
 					self->resource );
@@ -1483,7 +1454,7 @@ static void _XML_IO_Handler_ParseStruct(
 	xmlChar* spaceStrippedChildrenMergeType = NULL;
 	Dictionary_Entry_Value* newStruct = NULL;
 	Dictionary_MergeType mergeType = defaultMergeType;
-	Dictionary_MergeType childrenMergeType = Dictionary_MergeType_Append;
+	Dictionary_MergeType childrenMergeType = IO_Handler_DefaultChildrenMergeType;
 	
 	if ( name ) {
 		spaceStrippedName = _XML_IO_Handler_StripLeadingTrailingWhiteSpace( self, name );
@@ -1494,54 +1465,8 @@ static void _XML_IO_Handler_ParseStruct(
 	else if (source) {
 		spaceStrippedSourceFile = _XML_IO_Handler_StripLeadingTrailingWhiteSpace( self, (xmlChar*) source );
 	}
-	if( mergeTypeStr ) {
-		spaceStrippedMergeType = _XML_IO_Handler_StripLeadingTrailingWhiteSpace( self, mergeTypeStr );
-		if( !xmlStrcmp( spaceStrippedMergeType, APPEND_TAG ) ) {
-			mergeType = Dictionary_MergeType_Append;
-		}
-		else if( !xmlStrcmp( spaceStrippedMergeType, MERGE_TAG ) ) {
-			mergeType = Dictionary_MergeType_Merge;
-		}
-		else if( !xmlStrcmp( spaceStrippedMergeType, REPLACE_TAG ) ) {
-			mergeType = Dictionary_MergeType_Replace;
-		}
-		else {
-			Journal_DPrintf( 
-				Journal_Register( Debug_Type, XML_IO_Handler_Type ),
-				"_XML_IO_Handler_ParseList called on tag %s, with name=\"%s\", and mergeType \"%s\" unknown "
-				"reverting to \"%s\".\n", 
-				(char *)cur->name, 
-				spaceStrippedName,
-				defaultMergeType == Dictionary_MergeType_Append ? APPEND_TAG : 
-					defaultMergeType == Dictionary_MergeType_Merge ? MERGE_TAG :
-					defaultMergeType == Dictionary_MergeType_Replace ? APPEND_TAG :
-					APPEND_TAG );
-			mergeType = defaultMergeType;
-		}
-	}
-	if( childrenMergeTypeStr ) {
-		spaceStrippedChildrenMergeType = _XML_IO_Handler_StripLeadingTrailingWhiteSpace( self, childrenMergeTypeStr );
-		if( !xmlStrcmp( spaceStrippedMergeType, APPEND_TAG ) ) {
-			childrenMergeType = Dictionary_MergeType_Append;
-		}
-		else if( !xmlStrcmp( spaceStrippedMergeType, MERGE_TAG ) ) {
-			childrenMergeType = Dictionary_MergeType_Merge;
-		}
-		else if( !xmlStrcmp( spaceStrippedMergeType, REPLACE_TAG ) ) {
-			childrenMergeType = Dictionary_MergeType_Replace;
-		}
-		else {
-			Journal_DPrintf( 
-				Journal_Register( Debug_Type, XML_IO_Handler_Type ),
-				"_XML_IO_Handler_ParseList called on tag %s, with name=\"%s\", and mergeType \"%s\" unknown "
-				"reverting to \"%s\".\n", 
-				(char *)cur->name, 
-				spaceStrippedName,
-				spaceStrippedMergeType,
-				APPEND_TAG );
-			childrenMergeType = Dictionary_MergeType_Append;
-		}
-	}
+	mergeType = _XML_IO_Handler_GetMergeType( self, mergeTypeStr, __func__, (char*)cur->name, spaceStrippedName, defaultMergeType );
+	childrenMergeType = _XML_IO_Handler_GetMergeType( self, childrenMergeTypeStr, __func__, (char*)cur->name, spaceStrippedName, IO_Handler_DefaultChildrenMergeType );
 
 	Journal_DPrintf( 
 		Journal_Register( Debug_Type, XML_IO_Handler_Type ),
@@ -1606,31 +1531,7 @@ static void _XML_IO_Handler_ParseParameter(
 		spaceStrippedSourceFile = _XML_IO_Handler_StripLeadingTrailingWhiteSpace( self, (xmlChar*) source );
 	}
 
-	if( mergeTypeStr ) {
-		spaceStrippedMergeType = _XML_IO_Handler_StripLeadingTrailingWhiteSpace( self, mergeTypeStr );
-		if( !xmlStrcmp( spaceStrippedMergeType, APPEND_TAG ) ) {
-			mergeType = Dictionary_MergeType_Append;
-		}
-		else if( !xmlStrcmp( spaceStrippedMergeType, MERGE_TAG ) ) {
-			mergeType = Dictionary_MergeType_Merge;
-		}
-		else if( !xmlStrcmp( spaceStrippedMergeType, REPLACE_TAG ) ) {
-			mergeType = Dictionary_MergeType_Replace;
-		}
-		else {
-			Journal_Printf( 
-				Journal_Register( Info_Type, XML_IO_Handler_Type ),
-				"_XML_IO_Handler_ParseList called on tag %s, with name=\"%s\", and mergeType \"%s\" unknown "
-				"reverting to \"%s\".\n", 
-				(char *)cur->name, 
-				spaceStrippedName,
-				defaultMergeType == Dictionary_MergeType_Append ? APPEND_TAG : 
-					/* WHERE THIS COME FROM?defaultMergeType == Dictionary_MergeType_Prepend ? PREPEND_TAG : */
-					defaultMergeType == Dictionary_MergeType_Replace ? APPEND_TAG :
-					APPEND_TAG );
-			mergeType = defaultMergeType;
-		}
-	}
+	mergeType = _XML_IO_Handler_GetMergeType( self, mergeTypeStr, __func__, (char*)cur->name, spaceStrippedName, defaultMergeType );
 
 	if ( NULL == value ) {
 		strippedVal = Memory_Alloc_Array( xmlChar, 1, "strippedVal" );
@@ -1797,7 +1698,7 @@ static xmlChar* _XML_IO_Handler_StripLeadingTrailingWhiteSpace( XML_IO_Handler* 
 		
 		if ( !(newString = Memory_Alloc_Array_Unnamed( xmlChar, newLength + 1 ) ) ) {
 			Journal_Printf( 
-				Journal_Register( Info_Type, XML_IO_Handler_Type ), 
+				Journal_Register( Error_Type, XML_IO_Handler_Type ), 
 				"Error - while parsing file %s: out of memory. exiting.\n", 
 				self->resource );
 			exit( EXIT_FAILURE );
@@ -1864,7 +1765,7 @@ Bool _XML_IO_Handler_WriteAllToFile( void* xml_io_handler, const char* filename,
 	
 	if ( !(correctNameSpace = Memory_Alloc_Array( char, correctLength, "courrectNameSpace" )) ) {
 		Journal_Printf( 
-			Journal_Register( Info_Type, XML_IO_Handler_Type ),
+			Journal_Register( Error_Type, XML_IO_Handler_Type ),
 			"Error: couldn't allocate memory for namespace.\n" );
 		return False;
 	}
@@ -1885,7 +1786,7 @@ Bool _XML_IO_Handler_WriteAllToFile( void* xml_io_handler, const char* filename,
 	} else
 	{
 		Journal_Printf( 
-			Journal_Register( Info_Type, XML_IO_Handler_Type ),
+			Journal_Register( Error_Type, XML_IO_Handler_Type ),
 			 "Warning: failed to write dictionary contents to file %s.\n", 
 			 filename );
 	}
@@ -1918,7 +1819,7 @@ Bool XML_IO_Handler_WriteEntryToFile( void* xml_io_handler, const char* filename
 Bool _XML_IO_Handler_WriteEntryToFile( void* xml_io_handler, const char* filename,
 	Dictionary_Entry_Key name, Dictionary_Entry_Value* value, Dictionary_Entry_Source source )
 {
-	Stream* stream = Journal_Register (Info_Type, "myStream");
+	Stream* stream = Journal_Register (Info_Type, XML_IO_Handler_Type );
 	/* create/overwrite new document */
 	XML_IO_Handler* self = (XML_IO_Handler*) xml_io_handler;
 	xmlNodePtr rootNode;
@@ -1944,7 +1845,7 @@ Bool _XML_IO_Handler_WriteEntryToFile( void* xml_io_handler, const char* filenam
 	
 	if ( !(correctNameSpace = Memory_Alloc_Array( char, correctLength, "correctNameSpace" )) ) {
 		Journal_Printf(
-			Journal_Register( Info_Type, XML_IO_Handler_Type ),
+			Journal_Register( Error_Type, XML_IO_Handler_Type ),
 			"Error: couldn't allocate memory for namespace.\n" );
 		return False;
 	}
@@ -1965,7 +1866,7 @@ Bool _XML_IO_Handler_WriteEntryToFile( void* xml_io_handler, const char* filenam
 	} else
 	{
 		Journal_Printf( 
-			Journal_Register( Info_Type, XML_IO_Handler_Type ),
+			Journal_Register( Error_Type, XML_IO_Handler_Type ),
 			"Warning: failed to write dictionary entry %s to file %s.\n", 
 			name, 
 			filename );
@@ -2088,7 +1989,7 @@ static void _XML_IO_Handler_WriteList( XML_IO_Handler* self, char* name, Diction
 				
 				default:
 					Journal_Printf( 
-						Journal_Register( Info_Type, XML_IO_Handler_Type ),
+						Journal_Register( Error_Type, XML_IO_Handler_Type ),
 						"Warning - while writing file %s: list %s in dictionary specifies "
 						"unknown encoding format. Writing as XML.\n", 
 						self->resource, 
@@ -2176,7 +2077,7 @@ static void _XML_IO_Handler_WriteListElementsRawASCII( XML_IO_Handler* self, Dic
 	if ( False == _XML_IO_Handler_CheckListCanBePrintedRaw( list ) )
 	{
 		Journal_Printf(
-			Journal_Register( Info_Type, XML_IO_Handler_Type ),
+			Journal_Register( Error_Type, XML_IO_Handler_Type ),
 			"Warning- while writing file %s: _XML_IO_Handler_WriteListElementsRaw called on "
 			"list %s not suited for Raw writing. Printing as plain XML instead.\n", 
 			self->resource,
@@ -2195,7 +2096,7 @@ static void _XML_IO_Handler_WriteListElementsRawASCII( XML_IO_Handler* self, Dic
 	if ( NULL == (bufferPtr = xmlBufferCreateSize( writtenElementSize ) ) )
 	{
 		Journal_Printf( 
-			Journal_Register( Info_Type, XML_IO_Handler_Type ),
+			Journal_Register( Error_Type, XML_IO_Handler_Type ),
 			"Error- while writing file %s: out of memory allocating raw data buffer. "
 			"Returning.\n", 
 			self->resource );
@@ -2297,7 +2198,7 @@ static void _XML_IO_Handler_WriteMemberAscii( XML_IO_Handler* self, Dictionary_E
 		
 		default:
 			Journal_Printf( 
-				Journal_Register( Info_Type, XML_IO_Handler_Type ),
+				Journal_Register( Error_Type, XML_IO_Handler_Type ),
 				"Warning- while writing to file %s: unknown type of Dictionary_Entry_Value. "
 				"Outputting as a string.\n", 
 				self->resource );
@@ -2396,4 +2297,49 @@ static void _XML_IO_Handler_WriteParameter( XML_IO_Handler* self, char* name, Di
 	{
 		xmlNewProp( newNode, PARAMTYPE_ATTR, (xmlChar*) self->TYPE_KEYWORDS[(int) value->type] );
 	}
+}
+
+static Dictionary_MergeType _XML_IO_Handler_GetMergeType( XML_IO_Handler* self, const xmlChar* mergeTypeStr, 
+		const char* funcName, const char* tagStr, xmlChar* entryName, Dictionary_MergeType defaultMergeType )
+{
+	Dictionary_MergeType         mergeType = defaultMergeType;
+	xmlChar*                     spaceStrippedMergeType = NULL;
+
+	if( mergeTypeStr ) {
+		spaceStrippedMergeType = _XML_IO_Handler_StripLeadingTrailingWhiteSpace( self, mergeTypeStr );
+		if( !xmlStrcmp( spaceStrippedMergeType, APPEND_TAG ) ) {
+			mergeType = Dictionary_MergeType_Append;
+		}
+		else if( !xmlStrcmp( spaceStrippedMergeType, MERGE_TAG ) ) {
+			mergeType = Dictionary_MergeType_Merge;
+		}
+		else if( !xmlStrcmp( spaceStrippedMergeType, REPLACE_TAG ) ) {
+			mergeType = Dictionary_MergeType_Replace;
+		}
+		else {
+			Journal_DPrintf( 
+				Journal_Register( Debug_Type, XML_IO_Handler_Type ),
+				"%s() called on tag %s, with name=\"%s\", and mergeType \"%s\" unknown "
+				"reverting to \"%s\".\n", 
+				__func__,
+				tagStr, 
+				entryName,
+				spaceStrippedMergeType,
+				XML_IO_Handler_MergeTypeMap[defaultMergeType] );
+			mergeType = defaultMergeType;
+		}
+	}
+	else {
+		mergeType = defaultMergeType;
+	}
+
+	return mergeType;
+}
+
+
+void XML_IO_Handler_LibXMLErrorHandler( void* ctx, const char* msg, ... ) {
+   va_list ap;
+   va_start( ap, msg );
+   Stream_Printf( Journal_Register( Error_Type, XML_IO_Handler_Type ), msg, ap );
+   va_end(ap);
 }

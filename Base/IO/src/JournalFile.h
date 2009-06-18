@@ -59,8 +59,8 @@
 	extern const Type JournalFile_Type;
 
 	typedef JournalFile* (JournalFile_Constructor) (void);
-	typedef Bool (JournalFile_OpenFunction) (void* file, char* fileName );
-	typedef Bool (JournalFile_AppendFunction) (void* file, char* fileName );
+	typedef Bool (JournalFile_OpenFunction) (void* file, const char* const fileName );
+	typedef Bool (JournalFile_AppendFunction) (void* file, const char* const fileName );
 	typedef Bool (JournalFile_CloseFunction) (void* file );
 	typedef Bool (JournalFile_FlushFunction) (void* file );
 		
@@ -111,7 +111,7 @@
 	 **
 	 ** @param journalFile An instance of a JournalFile sub-class.
 	 **/
-	Bool JournalFile_Open( void* journalFile, char* fileName );
+	Bool JournalFile_Open( void* journalFile, const char* const fileName );
 	
 	
 	/** Reopen a file for writing. It will use the previous name it was opened with.
@@ -128,7 +128,7 @@
 	 **
 	 ** @param journalFile An instance of a JournalFile sub-class.
 	 **/
-	Bool JournalFile_Append( void* journalFile, char* fileName );
+	Bool JournalFile_Append( void* journalFile, const char* const fileName );
 
 	/** Close a file. If successful, returns True.
 	 **

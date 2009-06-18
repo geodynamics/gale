@@ -77,7 +77,7 @@
 	
 	void MaxHeap_Heapify( _Heap *heap, int index );
 
-	void* MaxHeap_Extract( _Heap *heap );
+	void* MaxHeap_Extract( void *heap );
 
 	/** Stg_Class_Delete interface. */
 		/** Stg_Class delete function */

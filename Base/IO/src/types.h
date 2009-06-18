@@ -48,12 +48,12 @@
 		Dictionary_Entry_Value_Type_String,
 		Dictionary_Entry_Value_Type_Double,
 		Dictionary_Entry_Value_Type_UnsignedInt,
-		Dictionary_Entry_Value_Type_Bool,
-		Dictionary_Entry_Value_Type_VoidPtr, /* proposed... not in use yet */
-		Dictionary_Entry_Value_Type_Struct,
-		Dictionary_Entry_Value_Type_List,
 		Dictionary_Entry_Value_Type_Int,
 		Dictionary_Entry_Value_Type_UnsignedLong,
+		Dictionary_Entry_Value_Type_Bool,
+		Dictionary_Entry_Value_Type_Struct,
+		Dictionary_Entry_Value_Type_List,
+		Dictionary_Entry_Value_Type_VoidPtr, /* proposed... not in use yet */
 		Dictionary_Entry_Value_Num_Types
 	} Dictionary_Entry_Value_Type;
 

@@ -138,6 +138,9 @@ void _Stream_Delete( void* stream )
 		Memory_Free( self->_formatter );
 	}
 
+	if ( self->_currentSource ) Memory_Free( self->_currentSource );
+	if ( self->_currentFunction ) Memory_Free( self->_currentFunction );
+
 	Stg_ObjectList_DeleteAllObjects( self->_children );
 	Stg_Class_Delete( self->_children );
 
@@ -266,7 +269,7 @@ void* _Stream_Copy( void* stream, void* dest, Bool deep, Name nameExt, struct Pt
 }
 
 
-SizeT Stream_Printf( Stream *stream, char *fmt, va_list args )
+SizeT Stream_Printf( Stream *stream, const char const *fmt, va_list args )
 {
 	int i;
 	SizeT result;
@@ -345,7 +348,7 @@ Bool Stream_Dump( Stream *stream, void *data )
 	return result;
 }
 
-Bool Stream_RedirectFile( Stream* stream, char* fileName ) {
+Bool Stream_RedirectFile( Stream* stream, const char* const fileName ) {
 	JournalFile* file;
 
 	file = Journal_GetFile( fileName );
@@ -362,7 +365,7 @@ Bool Stream_RedirectFile( Stream* stream, char* fileName ) {
 }
 
 
-Bool Stream_RedirectFileBranch( Stream* stream, char* fileName ) {
+Bool Stream_RedirectFileBranch( Stream* stream, const char* const fileName ) {
 	JournalFile* file;
 
 	file = Journal_GetFile( fileName );
@@ -375,7 +378,7 @@ Bool Stream_RedirectFileBranch( Stream* stream, char* fileName ) {
 	return Stream_SetFileBranch( stream, file );
 }
 
-Bool Stream_AppendFile( Stream* stream, char* fileName ) {
+Bool Stream_AppendFile( Stream* stream, const char* const fileName ) {
 	JournalFile* file;
 
 	file = Journal_GetFile( fileName );
@@ -420,6 +423,12 @@ Bool Stream_SetFileBranch( Stream* stream, JournalFile* file )
 		}
 	}
 	return result;
+}
+
+JournalFile* Stream_GetFile( void* stream ) {
+	Stream* self = (Stream*) stream;
+
+	return self->_file;
 }
 
 Bool Stream_IsEnable( void* stream )
@@ -493,6 +502,12 @@ void Stream_SetAutoFlush( void* stream, Bool autoFlush )
 {
 	Stream* self = (Stream*) stream;
 	self->_autoFlush = autoFlush;
+}
+
+Bool Stream_GetAutoFlush( void* stream )
+{
+	Stream* self = (Stream*) stream;
+	return self->_autoFlush;
 }
 
 void Stream_SetAutoFlushBranch( void* stream, Bool autoFlush )
@@ -629,12 +644,24 @@ void Stream_AddFormatter( void* stream, StreamFormatter* formatter )
 	formatter->_stream = self;
 }
 
-void Stream_SetCurrentInfo( void* stream, char* currentSource, char* currentFunction, int line )
+void Stream_ClearCustomFormatters( void* stream ) {
+	Stream* self = (Stream*) stream;
+
+	Memory_Free( self->_formatter );
+	self->_formatter = NULL;
+	self->_formatterSize = 0;
+	self->_formatterCount = 0;
+}
+
+
+void Stream_SetCurrentInfo( void* stream, const char* const currentSource, const char* const currentFunction, int line )
 {
 	Stream* self = (Stream*)stream;
 
-	self->_currentSource = currentSource;
-	self->_currentFunction = currentFunction;
+	if ( self->_currentSource ) Memory_Free( self->_currentSource );
+	if ( self->_currentFunction ) Memory_Free( self->_currentFunction );
+	Stg_asprintf( &self->_currentSource, "%s", currentSource );
+	Stg_asprintf( &self->_currentFunction, "%s", currentFunction );
 	self->_currentLine = line;
 }
 

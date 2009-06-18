@@ -211,13 +211,21 @@ void IndexSet_Remove( void* indexSet, Index index ) {
 
 Bool IndexSet_IsMember( void* indexSet, Index index ) {
 	IndexSet* self = (IndexSet*)indexSet;
+	Bool retFlag = False;
 
 	#ifdef CAUTIOUS
 		Journal_Firewall( index < self->size, self->error, "Error- %s: index %u outside current size %d. Aborting.\n",
 			__func__, index, self->size);
 	#endif
 	
-	return IS_MEMBER( self, index );
+	if ( 0 == IS_MEMBER( self, index ) ) {
+		retFlag = False;
+	}
+	else {
+		retFlag = True;
+	}
+	
+	return retFlag;
 }
 
 
@@ -329,6 +337,12 @@ void IndexSet_Merge_AND(void* indexSet, void* indexSetTwo )
 	
 	for (i = 0; i < size; i++)
 		self->_container[i] &= secondSet->_container[i];
+
+	/* As specified in header file description, if first given IndexSet is larger, zero out the
+	 * remaining entries since this is an AND operation */
+	for( i = size; i < self->_containerSize; i++) {
+		self->_container[i] &= 0x00;
+	}
 	
 	self->membersCount = (unsigned int)-1;
 }

@@ -55,6 +55,12 @@
 	/** Textual name for IO_Handler class */
 	extern const Type IO_Handler_Type;
 	
+	/** Default merge type for IO_Handler instantiations to use when inserting into dictionary */
+	extern const Dictionary_MergeType IO_Handler_DefaultMergeType;
+	/** Default merge type for IO_Handler instantiations to use when inserting children entries
+	 * (ie of lists, structs) into dictionary */
+	extern const Dictionary_MergeType IO_Handler_DefaultChildrenMergeType;
+
 	/** \def __IO_Handler See IO_Handler */
 	#define __IO_Handler \
 		/* General info */ \

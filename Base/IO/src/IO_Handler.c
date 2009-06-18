@@ -47,6 +47,10 @@
 /** Textual name of this class */
 const Type IO_Handler_Type = Type_Invalid;
 
+/* Setting the default merge types centrally here */
+const Dictionary_MergeType IO_Handler_DefaultMergeType = Dictionary_MergeType_Replace;
+const Dictionary_MergeType IO_Handler_DefaultChildrenMergeType = Dictionary_MergeType_Append;
+
 /* TODO: register with IO_Handler registry */
 
 IO_Handler* _IO_Handler_New( 

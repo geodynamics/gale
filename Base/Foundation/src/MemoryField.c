@@ -37,7 +37,6 @@
 #include "MemoryField.h"
 #include "Memory.h"
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -52,23 +51,20 @@ const Name Memory_IgnoreName = "Memory_IgnoreName";
 const Index MEMORYFIELD_DELTA = 4;	/**< Number of fields to extend by when array resizes. */
 
 
-MemoryField* MemoryField_New( const char* value )
-{
+MemoryField* MemoryField_New( const char* value ) {
 	MemoryField* result = (MemoryField*) malloc( sizeof(MemoryField) );
 	_MemoryField_Init( result, value );
 
 	return result;	
 }
-	
-void _MemoryField_Init( MemoryField* memoryField, const char* value )
-{
-	if ( value )
-	{
+
+
+void _MemoryField_Init( MemoryField* memoryField, const char* value ) {
+	if ( value ) {
 		memoryField->value = (char*)malloc( (strlen(value) + 1) * sizeof(char) );
 		strcpy( memoryField->value, value );
 	}
-	else
-	{
+	else {
 		memoryField->value = NULL;
 	}
 	
@@ -84,20 +80,17 @@ void _MemoryField_Init( MemoryField* memoryField, const char* value )
 	
 	memoryField->memCache = NULL;
 }
+
 	
-void MemoryField_Delete( MemoryField* memoryField )
-{
+void MemoryField_Delete( MemoryField* memoryField ) {
 	Index i;
 	
-	if ( memoryField->value )
-	{
+	if ( memoryField->value ) {
 		free( memoryField->value );	
 	}
 	
-	if ( memoryField->subFields )
-	{
-		for ( i = 0; i < memoryField->subCount; ++i )
-		{
+	if ( memoryField->subFields ) {
+		for ( i = 0; i < memoryField->subCount; ++i ) {
 			MemoryField_Delete( memoryField->subFields[i] );
 		}
 		free( memoryField->subFields );
@@ -106,24 +99,19 @@ void MemoryField_Delete( MemoryField* memoryField )
 }
 	
 
-MemoryField* MemoryField_Register( MemoryField* memoryField, const char* subValue )
-{
+MemoryField* MemoryField_Register( MemoryField* memoryField, const char* subValue ) {
 	Index i;
 	
 	/* Search cache first for localisation. */
-	if ( memoryField->memCache )
-	{
-		if ( MemoryField_StringCompare( memoryField->memCache->value, subValue ) == 0 )
-		{
+	if ( memoryField->memCache ) {
+		if ( MemoryField_StringCompare( memoryField->memCache->value, subValue ) == 0 ) {
 			return memoryField->memCache;
 		}
 	}
 	
 	/* Not in cache so linear search. */
-	for ( i = 0; i < memoryField->subCount; ++i )
-	{
-		if ( MemoryField_StringCompare( memoryField->subFields[i]->value, subValue ) == 0 )
-		{
+	for ( i = 0; i < memoryField->subCount; ++i ) {
+		if ( MemoryField_StringCompare( memoryField->subFields[i]->value, subValue ) == 0 ) {
 			/* Value exists, update cache and return the field. */
 			memoryField->memCache = memoryField->subFields[i];
 			return memoryField->subFields[i];
@@ -133,8 +121,7 @@ MemoryField* MemoryField_Register( MemoryField* memoryField, const char* subValu
 	/* Not exist, add to registry. */
 	
 	/* Extend array if needed. */
-	if ( memoryField->subCount == memoryField->subSize )
-	{
+	if ( memoryField->subCount == memoryField->subSize ) {
 		memoryField->subSize += MEMORYFIELD_DELTA;
 		memoryField->subFields = (MemoryField**)
 			realloc( memoryField->subFields, sizeof(MemoryField*) * memoryField->subSize );
@@ -148,24 +135,22 @@ MemoryField* MemoryField_Register( MemoryField* memoryField, const char* subValu
 	return memoryField->subFields[memoryField->subCount - 1];
 }
 
-void MemoryField_Update( MemoryField* memoryField, SizeT bytes )
-{
+
+void MemoryField_Update( MemoryField* memoryField, int bytes ) {
 	memoryField->currentAllocation += bytes;
 	
 	memoryField->peakAllocation = MAX( memoryField->currentAllocation, memoryField->peakAllocation );
 	
-	if ( bytes > 0 )
-	{
+	if ( bytes > 0 ) {
 		memoryField->totalAllocation += bytes;
 	}
 }
 
-void MemoryField_UpdateAsSumOfSubFields( MemoryField* memoryField )
-{
+
+void MemoryField_UpdateAsSumOfSubFields( MemoryField* memoryField ) {
 	Index i;
 
-	if( memoryField->subCount < 1 )
-	{
+	if( memoryField->subCount < 1 ) {
 		return;	
 	}
 	
@@ -175,10 +160,8 @@ void MemoryField_UpdateAsSumOfSubFields( MemoryField* memoryField )
 	memoryField->peakAllocation = 0;
 	memoryField->totalAllocation = 0;
 	
-	for ( i = 0; i < memoryField->subCount; ++i )
-	{
-		if ( !MemoryField_StringCompare( memoryField->subFields[i]->value, Memory_IgnoreName ) == 0 )
-		{
+	for ( i = 0; i < memoryField->subCount; ++i ) {
+		if ( !MemoryField_StringCompare( memoryField->subFields[i]->value, Memory_IgnoreName ) == 0 ) {
 			MemoryField_UpdateAsSumOfSubFields( memoryField->subFields[i] );
 			memoryField->allocCount += memoryField->subFields[i]->allocCount;
 			memoryField->freeCount += memoryField->subFields[i]->freeCount;
@@ -189,130 +172,112 @@ void MemoryField_UpdateAsSumOfSubFields( MemoryField* memoryField )
 	}
 }
 
-void MemoryField_Print( MemoryField* memoryField, MemoryFieldColumn columns )
+
+void MemoryField_Print( MemoryField* memoryField, MemoryFieldColumn columns,
+      unsigned int valueFieldWidth )
 {
-	if ( MemoryField_StringCompare( memoryField->value, Memory_IgnoreName ) == 0 )
-	{
+	if ( MemoryField_StringCompare( memoryField->value, Memory_IgnoreName ) == 0 ) {
 		return;
 	}
 
-	if ( columns & MEMORYFIELD_VALUE )
-	{
-		Journal_PrintfL( stgMemory->infoStream, 1, "%-20s ", memoryField->value );
+	if ( columns & MEMORYFIELD_VALUE ) {
+		Journal_PrintfL( stgMemory->infoStream, 1, "%-*s ", valueFieldWidth, memoryField->value );
 	}
-	if ( columns & MEMORYFIELD_ALLOC )
-	{
+	if ( columns & MEMORYFIELD_ALLOC ) {
 		Journal_PrintfL( stgMemory->infoStream, 1, "%15d ", memoryField->allocCount );
 	}
-	if ( columns & MEMORYFIELD_FREE )
-	{
+	if ( columns & MEMORYFIELD_FREE ) {
 		Journal_PrintfL( stgMemory->infoStream, 1, "%10d ", memoryField->freeCount );
 	}
-	if ( columns & MEMORYFIELD_CURRENT )
-	{
+	if ( columns & MEMORYFIELD_CURRENT ) {
 		Journal_PrintfL( stgMemory->infoStream, 1, "%13d ", memoryField->currentAllocation );
 	}
-	if ( columns & MEMORYFIELD_PEAK )
-	{
+	if ( columns & MEMORYFIELD_PEAK ) {
 		Journal_PrintfL( stgMemory->infoStream, 1, "%10d ", memoryField->peakAllocation );
 	}
-	if ( columns & MEMORYFIELD_TOTAL )
-	{
+	if ( columns & MEMORYFIELD_TOTAL ) {
 		Journal_PrintfL( stgMemory->infoStream, 1, "%11d", memoryField->totalAllocation );
 	}
 	Journal_PrintfL( stgMemory->infoStream, 1, "\n" );
-
 }
-void MemoryField_PrintHeader( const char* fieldName, MemoryFieldColumn columns )
+
+
+void MemoryField_PrintHeader( const char* fieldName, MemoryFieldColumn columns,
+		unsigned int valueFieldWidth )
 {
-	if ( columns & MEMORYFIELD_VALUE )
-	{
-		Journal_PrintfL( stgMemory->infoStream, 1, "%-20s ", fieldName );
+	if ( columns & MEMORYFIELD_VALUE ) {
+		Journal_PrintfL( stgMemory->infoStream, 1, "%-*s ", valueFieldWidth, fieldName );
 	}
-	if ( columns & MEMORYFIELD_ALLOC )
-	{
+	if ( columns & MEMORYFIELD_ALLOC ) {
 		Journal_PrintfL( stgMemory->infoStream, 1, "Times Allocated " );
 	}
-	if ( columns & MEMORYFIELD_FREE )
-	{
+	if ( columns & MEMORYFIELD_FREE ) {
 		Journal_PrintfL( stgMemory->infoStream, 1, "Times Free " );
 	}
-	if ( columns & MEMORYFIELD_CURRENT )
-	{
+	if ( columns & MEMORYFIELD_CURRENT ) {
 		Journal_PrintfL( stgMemory->infoStream, 1, "Current bytes " );
 	}
-	if ( columns & MEMORYFIELD_PEAK )
-	{
+	if ( columns & MEMORYFIELD_PEAK ) {
 		Journal_PrintfL( stgMemory->infoStream, 1, "Peak bytes " );
 	}
-	if ( columns & MEMORYFIELD_TOTAL )
-	{
+	if ( columns & MEMORYFIELD_TOTAL ) {
 		Journal_PrintfL( stgMemory->infoStream, 1, "Total bytes " );
 	}
 
 	Journal_PrintfL( stgMemory->infoStream, 1, "\n" );
 }
 
-void MemoryField_PrintSummary( MemoryField* memoryField, const char* tableTitle )
-{
-	Index i;
 
-	if ( MemoryField_StringCompare( memoryField->value, Memory_IgnoreName ) == 0 )
-	{
+void MemoryField_PrintSummary( MemoryField* memoryField, const char* tableTitle, MemoryFieldColumn cols ) {
+	Index             i;
+	MemoryFieldColumn colsNoVal;
+	unsigned int      nameFieldWidth = 0;
+
+	colsNoVal = MEMORYFIELD_ALL - MEMORYFIELD_VALUE;
+
+	if ( MemoryField_StringCompare( memoryField->value, Memory_IgnoreName ) == 0 ) {
 		return;
 	}
 
-	if ( memoryField->subCount > 0 )
-	{
+	if ( memoryField->subCount > 0 ) {
 		MemoryField_UpdateAsSumOfSubFields( memoryField );
-
-		MemoryField_Sort( memoryField );
 
 		Journal_Printf( stgMemory->infoStream, "%s\n", memoryField->value );
 
 		Stream_Indent( stgMemory->infoStream );
-		MemoryField_PrintHeader( NULL, (MemoryFieldColumn)(
-			MEMORYFIELD_ALLOC |
-			MEMORYFIELD_FREE |
-			MEMORYFIELD_CURRENT | 
-			MEMORYFIELD_PEAK |
-			MEMORYFIELD_TOTAL) );
-		MemoryField_Print( memoryField, (MemoryFieldColumn)(
-			MEMORYFIELD_ALLOC |
-			MEMORYFIELD_FREE |
-			MEMORYFIELD_CURRENT |
-			MEMORYFIELD_PEAK |
-			MEMORYFIELD_TOTAL) );
+		MemoryField_PrintHeader( NULL, (cols & colsNoVal), 0 );
+		MemoryField_Print( memoryField, (cols & colsNoVal), 0 );
 
 		Stream_Indent( stgMemory->infoStream );
 		
-		MemoryField_PrintHeaderAll( tableTitle );
-		for ( i = 0; i < memoryField->subCount; ++i )
-		{
-			if ( memoryField->subFields[i]->allocCount > 0 )
-			{
-				MemoryField_PrintAll( memoryField->subFields[i] );
+		MemoryField_Sort( memoryField );
+		nameFieldWidth = _MemoryField_CalcLongestSubFieldNameLen( memoryField );
+		if ( strlen(tableTitle) > nameFieldWidth ) {
+			nameFieldWidth = strlen(tableTitle);
+		}
+
+		MemoryField_PrintHeader( tableTitle, cols, nameFieldWidth );
+		for ( i = 0; i < memoryField->subCount; ++i ) {
+			if ( memoryField->subFields[i]->allocCount > 0 ) {
+				MemoryField_Print( memoryField->subFields[i], cols, nameFieldWidth );
 			}
 		}
 		
 		Stream_UnIndent( stgMemory->infoStream );
-
 		Stream_UnIndent( stgMemory->infoStream );
 	}
 }
 
-void MemoryField_Sort( MemoryField* memoryField )
-{
+
+void MemoryField_Sort( MemoryField* memoryField ) {
 	/* insertion sort */
 	Index i, j;
 	MemoryField* tmp;
 
-	for ( i = 0; i < memoryField->subCount; ++i )
-	{
+	for ( i = 0; i < memoryField->subCount; ++i ) {
 		j = i;
 		tmp = memoryField->subFields[j];
-		while ( j > 0 && MemoryField_StringCompare( memoryField->subFields[j - 1]->value, tmp->value ) > 0 )
-		{
+		while ( j > 0 && MemoryField_StringCompare( memoryField->subFields[j - 1]->value, tmp->value ) > 0 ) {
 			memoryField->subFields[j] = memoryField->subFields[j - 1];
 			--j;
 		}
@@ -320,11 +285,29 @@ void MemoryField_Sort( MemoryField* memoryField )
 	}
 }
 
-int MemoryField_StringCompare( const char* s1, const char* s2 )
-{
-	if ( s1 && s2 )
-	{
+
+int MemoryField_StringCompare( const char* s1, const char* s2 ) {
+	if ( s1 && s2 ) {
 		return strcmp( s1, s2 );
 	}
 	return (long)s1 - (long)s2;
+}
+
+
+unsigned int _MemoryField_CalcLongestSubFieldNameLen( MemoryField* memoryField ) {
+	/* insertion sort */
+	Index         ii;
+	unsigned int  longestSubFieldNameLen=0;
+	unsigned int  currSubFieldNameLen=0;
+
+	for ( ii = 0; ii < memoryField->subCount; ii++ ) {
+		if ( NULL == memoryField->subFields[ii]->value ) continue;
+
+		currSubFieldNameLen = strlen( memoryField->subFields[ii]->value );
+		if ( currSubFieldNameLen > longestSubFieldNameLen ) {
+			longestSubFieldNameLen = currSubFieldNameLen;
+		}	
+	}
+
+	return longestSubFieldNameLen;
 }

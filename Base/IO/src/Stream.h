@@ -86,7 +86,7 @@
 		int				_currentLine; 		\
 									\
 		Stream*				_parent; 		\
-		Stg_ObjectList*		_children; 
+		Stg_ObjectList*			_children; 
 	struct Stream { __Stream };
 
 	/** Constructor interface. */
@@ -124,7 +124,7 @@
 	void* _Stream_Copy( void* stream, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 	
 	/** Performs a printf() on the given stream. */
-	SizeT Stream_Printf( Stream* stream, char* fmt, va_list args );
+	SizeT Stream_Printf( Stream* stream, const char* const fmt, va_list args );
 
 	/** Performs a write() on the given stream. */
 	SizeT Stream_Write( Stream* stream, void* data, SizeT elem_size, SizeT num_elems );
@@ -134,17 +134,17 @@
 
 	/** Opens a registers a file for this stream if not already opened and assigns it for output
 	    Defaults CFile for now. TODO for next io commit */
-	Bool Stream_RedirectFile( Stream* stream, char* fileName );
+	Bool Stream_RedirectFile( Stream* stream, const char* const fileName );
 
 	/** Opens a registers a file for this stream if not already opened and assigns it for output for whole branch */
-	Bool Stream_RedirectFileBranch( Stream* stream, char* fileName );
+	Bool Stream_RedirectFileBranch( Stream* stream, const char* const fileName );
 
 	/** Opens and registers a file for this stream if not already opened, goes to end of file and assigns it for output
 	    Defaults CFile for now. TODO for next io commit */
-	Bool Stream_AppendFile( Stream* stream, char* fileName );
+	Bool Stream_AppendFile( Stream* stream, const char* const fileName );
 	
-	/** Opens a registers a file for this stream if not already opened and assigns it for output for whole branch */
-	Bool Stream_RedirectFileBranch( Stream* stream, char* fileName );
+	/** Opens a registers a file for this stream if not alreconst ady opened and assigns it for output for whole branch */
+	Bool Stream_RedirectFileBranch( Stream* stream, const char* const fileName );
 
 	/** Sets the file which the stream is directed to, returning True if successful.
 	 ** This function may fail if an unusable file type is given to the stream. */
@@ -153,6 +153,9 @@
 	/** Sets the file which the stream and its sub-streams is directed to, returning True if all was successful.
 	 ** This funciton may fail if an unusable file type is given to the stream. */
 	Bool Stream_SetFileBranch( Stream* stream, JournalFile* file );
+
+	/** returns a ptr to the stream's JournalFile */
+	JournalFile* Stream_GetFile( void* stream );
 
 	/** Returns True if this stream is valid to produce output. */
 	Bool Stream_IsEnable( void* stream );
@@ -196,6 +199,9 @@
 	/** Sets whether a stream should flush after an output statement. */
 	void Stream_SetAutoFlush( void* stream, Bool autoFlush );
 
+	/** Gets the AutoFlush status of a stream */
+	Bool Stream_GetAutoFlush( void* stream );
+
 	/** Sets whether a stream and all of its sub-streams should flush after an output statement. */
 	void Stream_SetAutoFlushBranch( void* stream, Bool autoFlush );
 
@@ -227,7 +233,9 @@
 
 	/** Adds a formatter to the stream for custom formatting. */
 	void Stream_AddFormatter( void* stream, StreamFormatter* formatter );
-	
+
+	/** Remove any and all formatters currently applied to a stream */
+	void Stream_ClearCustomFormatters( void* stream );
 	
 	/** Sets miscellaneous information to the stream.
 	 **
@@ -235,7 +243,11 @@
 	 ** @param currentFunction The function which output is currently being done.
 	 ** @param line The current line which output is currently being done.
 	 **/
-	void Stream_SetCurrentInfo( void* stream, char* currentSource, char* currentFunction, int line );
+	void Stream_SetCurrentInfo(
+		void* stream,
+		const char* const currentSource,
+		const char* const currentFunction,
+		int line );
 	
 	/** Retrives a sub stream of the given name. If stream does not exist, a new sub stream is created and returned.
 	 ** Dotted-decimal notation can be used to retrive nested sub-streams. */

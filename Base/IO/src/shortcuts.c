@@ -56,10 +56,17 @@ int Dictionary_GetInt_WithDefault( Dictionary* dictionary, Dictionary_Entry_Key 
 		Dictionary_GetDefault( dictionary, key, 
 		Dictionary_Entry_Value_FromInt( defaultVal ) ) );
 }
+
 double Dictionary_GetDouble_WithDefault( Dictionary* dictionary, Dictionary_Entry_Key key, const double defaultVal ) {
 	return	Dictionary_Entry_Value_AsDouble( 
 		Dictionary_GetDefault( dictionary, key, 
 		Dictionary_Entry_Value_FromDouble( defaultVal ) ) );
+}
+
+unsigned long Dictionary_GetUnsignedLong_WithDefault( Dictionary* dictionary, Dictionary_Entry_Key key, const unsigned long defaultVal ) {
+	return	Dictionary_Entry_Value_AsUnsignedLong( 
+		Dictionary_GetDefault( dictionary, key, 
+		Dictionary_Entry_Value_FromUnsignedLong( defaultVal ) ) );
 }
 
 float Dictionary_GetFloat_WithDefault( Dictionary* dictionary, Dictionary_Entry_Key key, const float defaultVal ) {

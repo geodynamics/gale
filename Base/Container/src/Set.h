@@ -144,7 +144,7 @@
 	** Public functions
 	*/
 
-	Bool Set_Insert( Set* self, void* data );
+	Bool Set_Insert( void* set, void* data );
 
 	#define Set_Union( self, operand ) \
 		(self)->_unionFunc( self, operand )
@@ -155,9 +155,9 @@
 	#define Set_Subtraction( self, operand ) \
 		(self)->_subtractionFunc( self, operand )
 
-	void Set_Traverse( Set* self, BTree_parseFunction* func, void* args );
+	void Set_Traverse( void* set, BTree_parseFunction* func, void* args );
 
-	Bool Set_Exists( Set* self, void* data );
+	Bool Set_Exists( void* set, void* data );
 
 	
 	/*--------------------------------------------------------------------------------------------------------------------------

@@ -73,8 +73,8 @@
 	typedef Index (Stg_ObjectList_InsertBeforeFunction) ( void* objects,  Name reference, void* objectPtr );
 	typedef Index (Stg_ObjectList_InsertAfterFunction) ( void* objects,  Name reference, void* objectPtr );
 	typedef Index (Stg_ObjectList_RemoveFunction) ( void* objects,  Name reference, ReplacementOption option );
-	typedef Index (Stg_ObjectList_GetIndexFunction) ( void* objects, Name toGet );
-	typedef void* (Stg_ObjectList_GetFunction) ( void* objects, Name toGet );
+	typedef Index (Stg_ObjectList_GetIndexFunction) ( void* objects, const Name const toGet );
+	typedef void* (Stg_ObjectList_GetFunction) ( void* objects, const Name const toGet );
 	typedef void  (Stg_ObjectList_AllocMoreMemoryFunction) ( void* objects );
 	typedef void (Stg_ObjectList_InsertAtIndexFunction) ( void* objects, Index index, void* objectPtr );
 	typedef void (Stg_ObjectList_RemoveByIndexFunction) ( void* objects, Index index, ReplacementOption option );
@@ -310,10 +310,10 @@
 	Index Stg_ObjectList_Remove( void* objectList, Name reference, ReplacementOption option ) ;
 	
 	/** Find an object's index in the list, by name. Returns (unsigned)-1 if not found. */
-	Index Stg_ObjectList_GetIndex( void* objectList, Name toGet );
+	Index Stg_ObjectList_GetIndex( void* objectList, const Name const toGet );
 	
 	/** Get an object's ptr from the list, by name. Returns NULL if not found. */
-	void* Stg_ObjectList_Get( void* objectList, Name toGet );
+	void* Stg_ObjectList_Get( void* objectList, const Name const toGet );
 	
 	/** Deletes all the objects in the list. */
 	void Stg_ObjectList_DeleteAllObjects( void* objectList );
@@ -337,6 +337,9 @@
 		#define Stg_ObjectList_At Stg_ObjectList_AtMacro
 	#endif
 
+	/* Caution: using this function implies you _know_ that the stored object at
+	 * given index is stored inside an ObjectAdaptor. If this isn't the case, you
+	 * should use Stg_ObjectList_At() instead. */
 	#define Stg_ObjectList_ObjectAt( self, index ) \
 		( Stg_ObjectAdaptor_Object( (Stg_ObjectAdaptor*)( (self)->data[index] ) ) )
 	

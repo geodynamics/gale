@@ -135,12 +135,6 @@ struct IMapItem {
 	}
 	KeyType;
 
-#define LinkedListIterator_First( it ) \
-	(it==NULL)?NULL:(it->list == NULL)?NULL:((it->curr = it->list->head)==NULL)?NULL:it->curr->data
-
-#define LinkedListIterator_Next( it ) \
-	(it==NULL)?NULL:(it->curr == NULL)?NULL:((it->curr = it->curr->next)==NULL)?NULL:it->curr->data
-
 
 	typedef struct {
 		unsigned	begin;

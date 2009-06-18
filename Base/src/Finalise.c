@@ -41,6 +41,7 @@
 
 #include <stdio.h>
 
+/* Note: this function is a duplicate of StGermain_Finalise currently - since StGermain_Finalise doesn't call Base_Finalise */
 Bool StGermainBase_Finalise( void ) {
 	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 	
@@ -48,8 +49,8 @@ Bool StGermainBase_Finalise( void ) {
 	Stg_ObjectList_DeleteAllObjects( moduleDirectories );
 	Stg_Class_Delete( moduleDirectories );
 	
-	Stg_ObjectList_DeleteAllObjects(xmlSearchPaths);
-	Stg_Class_Delete( xmlSearchPaths );
+	Stg_ObjectList_DeleteAllObjects( Project_XMLSearchPaths );
+	Stg_Class_Delete( Project_XMLSearchPaths );
 
 	/* Finalise all the bits and pieces */
 	BaseContext_Finalise();

@@ -440,9 +440,6 @@
 	
 	/** Given an array of an extended class, obtain the pointer to the extended class at the desired index. Relevant to
 	    "OfStruct" extensions only (returns 0 otherwise). */
-
-	/** Given an array of an extended class, obtain the pointer to the extended class at the desired index. Relevant to
-	    "OfStruct" extensions only (returns 0 otherwise). */
 	void* ExtensionManager_AtFunc( void* extension, void* ptr, Index index );
 	#ifdef MACRO_AS_FUNC
 		#define ExtensionManager_At ExtensionManager_AtFunc

@@ -60,7 +60,7 @@
 	JournalFile* MPIFile_New();
 
 	/** Creates a new MPIFile, opening the file given by fileName. Returns NULL if system is unable to open the given file. */
-	JournalFile* MPIFile_New2( char* fileName );
+	JournalFile* MPIFile_New2( const char* const fileName );
 
 	/** Initialises an instance of MPIFile. Will not open any files. */
 	void MPIFile_Init( MPIFile* self );
@@ -85,10 +85,10 @@
 	
 	
 	/** Implementation for Open function. */
-	Bool _MPIFile_Open( void* file, char* fileName );
+	Bool _MPIFile_Open( void* file, const char* const fileName );
 
 	/** Implementation for Append function. */
-	Bool _MPIFile_Append( void* file, char* fileName );
+	Bool _MPIFile_Append( void* file, const char* const fileName );
 
 	/** Implementation for Close function. */
 	Bool _MPIFile_Close( void* file );

@@ -51,8 +51,14 @@
 	/** textual class name */
 	extern const Type XML_IO_Handler_Type;
 	
+	extern const xmlChar* APPEND_TAG;
+	extern const xmlChar* MERGE_TAG;
+	extern const xmlChar* REPLACE_TAG;
+	/** A useful map for getting xml versions of Dictionary_MergeTypes */
+	extern const xmlChar* XML_IO_Handler_MergeTypeMap[3];
+
 	/** The Xml search path list. */
-	extern Stg_ObjectList* xmlSearchPaths;
+	extern Stg_ObjectList* Project_XMLSearchPaths;
 	
 	/* additional class function ptr typedefs */
 	typedef Bool (XML_IO_Handler_WriteEntryToFileFunction) ( void* xml_io_handler, const char* filename,
@@ -168,5 +174,9 @@
 		Dictionary_Entry_Value* value, Dictionary_Entry_Source source );
 
 	void XML_IO_Handler_AddDirectory( Name name, char* directory ); 
+
+	/** A function to handle errors produced by libXML through the Stg Stream system. Should be hooked
+	 *  up using xmlSetGenericErrorFunc(), e.g. at the Init() stage. */
+	void XML_IO_Handler_LibXMLErrorHandler( void* ctx, const char* msg, ... );
 
 #endif /* __Base_IO_XML_IO_Handler_h__ */

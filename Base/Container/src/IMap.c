@@ -32,6 +32,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include "pcu/pcu.h"
 #include "StGermain/Base/Foundation/Foundation.h"
 #include "types.h"
 #include "Iter.h"
@@ -67,7 +68,7 @@ void _IMap_Copy( void* _self, const void* _op ) {
    const IMap* op = (const IMap*)_op;
    IMapIter iter;
 
-   assert( self && op );
+   pcu_assert( self && op );
    IMap_Clear( self );
    IMap_SetMaxSize( self, op->maxSize );
    IMapIter_Construct( &iter );
@@ -83,7 +84,7 @@ void IMap_SetMaxSize( void* _self, int maxSize ) {
    IMapItem* itm;
    int i_i;
 
-   assert( self );
+   pcu_assert( self );
    nOldItms = self->curSize;
    keys = Class_Array( self, int, self->curSize );
    vals = Class_Array( self, int, self->curSize );
@@ -123,9 +124,9 @@ void IMap_Insert( void* _self, int key, int val ) {
    IMapItem *itm, *cur;
    int ind;
 
-   assert( self );
+   pcu_assert( self );
    ind = IMap_Hash( self, key );
-   assert( ind < self->tblSize );
+   pcu_assert( ind < self->tblSize );
    itm = self->tbl + ind;
    if( !self->used[ind] ) {
       itm->key = key;
@@ -137,7 +138,7 @@ void IMap_Insert( void* _self, int key, int val ) {
 #ifndef NDEBUG
       cur = itm;
       do {
-	 assert( cur->key != key );
+	 pcu_assert( cur->key != key );
 	 cur = cur->next;
       } while( cur );
 #endif
@@ -155,17 +156,17 @@ void IMap_SetValue( void* _self, int key, int val ) {
    IMapItem *itm;
    int ind;
 
-   assert( self );
+   pcu_assert( self );
    ind = IMap_Hash( self, key );
-   assert( ind < self->tblSize );
-   assert( self->used[ind] );
+   pcu_assert( ind < self->tblSize );
+   pcu_assert( self->used[ind] );
    itm = self->tbl + ind;
    do {
       if( itm->key == key )
 	 break;
       itm = itm->next;
    } while( itm );
-   assert( itm );
+   pcu_assert( itm );
    itm->val = val;
 }
 
@@ -174,10 +175,10 @@ void IMap_Remove( void* _self, int key ) {
    IMapItem *itm, *prev, *toDel;
    int ind;
 
-   assert( self );
+   pcu_assert( self );
    ind = IMap_Hash( self, key );
-   assert( ind < self->tblSize );
-   assert( self->used[ind] );
+   pcu_assert( ind < self->tblSize );
+   pcu_assert( self->used[ind] );
    itm = self->tbl + ind;
    if( itm->key == key ) {
       toDel = itm->next;
@@ -200,7 +201,7 @@ void IMap_Remove( void* _self, int key ) {
 	 prev = toDel;
 	 toDel = toDel->next;
       }
-      assert( toDel );
+      pcu_assert( toDel );
    }
    if( toDel )
       Class_Free( self, toDel );
@@ -212,7 +213,7 @@ void IMap_Clear( void* _self ) {
    IMapItem *itm, *cur, *nxt;
    int i_i;
 
-   assert( self );
+   pcu_assert( self );
    for( i_i = 0; i_i < self->tblSize; i_i++ ) {
       self->used[i_i] = False;
       itm = self->tbl + i_i;
@@ -228,12 +229,12 @@ void IMap_Clear( void* _self ) {
 }
 
 int IMap_GetSize( const void* self ) {
-   assert( self );
+   pcu_assert( self );
    return ((IMap*)self)->curSize;
 }
 
 int IMap_GetMaxSize( const void* self ) {
-   assert( self );
+   pcu_assert( self );
    return ((IMap*)self)->maxSize;
 }
 
@@ -242,17 +243,17 @@ int IMap_Map( const void* _self, int key ) {
    IMapItem* itm;
    int ind;
 
-   assert( self );
+   pcu_assert( self );
    ind = IMap_Hash( self, key );
-   assert( ind < self->tblSize );
-   assert( self->used[ind] );
+   pcu_assert( ind < self->tblSize );
+   pcu_assert( self->used[ind] );
    itm = self->tbl + ind;
    do {
       if( itm->key == key )
 	 break;
       itm = itm->next;
    } while( itm );
-   assert( itm );
+   pcu_assert( itm );
    return itm->val;
 }
 
@@ -261,9 +262,9 @@ Bool IMap_TryMap( const void* _self, int key, int* val ) {
    IMapItem* itm;
    int ind;
 
-   assert( self && val );
+   pcu_assert( self && val );
    ind = IMap_Hash( self, key );
-   assert( ind < self->tblSize );
+   pcu_assert( ind < self->tblSize );
    if( !self->used[ind] )
       return False;
    itm = self->tbl + ind;
@@ -283,9 +284,9 @@ Bool IMap_Has( const void* _self, int key ) {
    IMapItem* itm;
    int ind;
 
-   assert( self );
+   pcu_assert( self );
    ind = IMap_Hash( self, key );
-   assert( ind < self->tblSize );
+   pcu_assert( ind < self->tblSize );
    if( !self->used[ind] )
       return False;
    itm = self->tbl + ind;
@@ -306,7 +307,7 @@ void IMap_First( const void* _self, IMapIter* iter ) {
    const IMap* self = (IMap*)_self;
    int i_i;
 
-   assert( self && iter );
+   pcu_assert( self && iter );
    for( i_i = 0; i_i < self->tblSize; i_i++ ) {
       if( self->used[i_i] ) {
 	 iter->imap = (IMap*)self;

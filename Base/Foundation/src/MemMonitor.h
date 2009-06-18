@@ -38,8 +38,20 @@ extern const Type Stg_MemMonitor_InfoStreamName;
 extern const Type Stg_MemMonitor_TagType;
 
 typedef struct {
-	MemoryOpStamp t1;
-	MemoryOpStamp t2;
+	SizeT    memFinal;          /* memory used at end of monitoring period - note this is different from Peak memory */
+	int      memDiff;           /* Is an int rather than SizeT, since it may be negative */
+	double   avgProcMemDiff;	
+	double   minProcMemDiff;
+	double   maxProcMemDiff;
+	double   percentChange;    /* Unlike the TimeMonitor, decided a percent change over the monitored period was better than
+                                 percent of monitored period over total, as allocated memory can go up _and_ down */
+	Bool     criterionPassed;
+} MemMonitorData;
+
+
+typedef struct {
+	MemoryOpStamp m1;
+	MemoryOpStamp m2;
 	SizeT totalMem1;
 	SizeT totalMem2;
 	char* tag;
@@ -50,12 +62,16 @@ typedef struct {
 
 void Stg_MemMonitor_Initialise();
 void Stg_MemMonitor_Finalise();
+/* Note: it's assumed this criteria should be considered passed for both +ve and -ve changes of greater magnitude than
+ * ratio specified (thus same semantics as the percentChange calculated). */
 void Stg_MemMonitor_SetMemoryWatchCriteria( double ratioOfTotalMemory );
 
 Stg_MemMonitor* Stg_MemMonitor_New( char* tag, Bool criteria, Bool print, int comm );
-void Stg_MemMonitor_Delete( Stg_MemMonitor* tm );
+void Stg_MemMonitor_Delete( Stg_MemMonitor* mm );
 
-void Stg_MemMonitor_Begin( Stg_MemMonitor* tm );
-double Stg_MemMonitor_End( Stg_MemMonitor* tm );
+void Stg_MemMonitor_Begin( Stg_MemMonitor* mm );
+double Stg_MemMonitor_End( Stg_MemMonitor* mm, MemMonitorData* mmData );
+
+void Stg_MemMonitor_ConvertBytesToPrintingUnit( int bytesInput, double* convertedAmt, char* unitString );
 
 #endif

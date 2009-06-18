@@ -29,6 +29,13 @@
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stddef.h>
+
+#include "pcu/pcu.h"
+
 #include "types.h"
 #include "forwardDecl.h"
 
@@ -37,11 +44,6 @@
 #include "MemoryPointer.h"
 #include "Memory.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <string.h>
-#include <stddef.h>
 
 #ifndef MAX
 #define MAX( x, y ) ((x > y) ? x : y)
@@ -78,8 +80,10 @@ void Memory_SetupPointer_3DArray(
 	Index yLength,
 	Index zLength );
 
-/** Moves data inside an enlarged 2D array to the appropriate position. */
-void Memory_Relocate_2DArray(
+/** Moves data inside an enlarged 2D array to the appropriate position.
+ * Note that it just moves the data of the array - in the case of a traditional
+ * 2D array, will also need to separately update the pointer indices. */
+void Memory_Relocate_2DArrayData(
 	void* destPtr, 
 	void* srcPtr,
 	SizeT itemSize, 
@@ -88,8 +92,10 @@ void Memory_Relocate_2DArray(
 	Index newX, 
 	Index newY );
 
-/** Moves data inside an enlarged 3D array to the appropriate position. */
-void Memory_Relocate_3DArray( 
+/** Moves data inside an enlarged 3D array to the appropriate position.
+ * Note that it just moves the data of the array - in the case of a traditional
+ * 2D array, will also need to separately update the pointer indices. */
+void Memory_Relocate_3DArrayData( 
 	void* destPtr, 
 	void* srcPtr,
 	SizeT itemSize, 
@@ -216,7 +222,7 @@ void Memory_Delete()
 void* _Memory_Alloc_Func(
 	SizeT size,
 	Type type,
-	Name name,
+	const char* const name,
 	const char* fileName,
 	const char* funcName,
 	int lineNumber )
@@ -732,49 +738,46 @@ void* _Memory_Realloc_Func(
 	Pointer result = NULL;
 	
 	memoryPointer = Memory_Find_Pointer( ptr );
+
 	result = _Memory_InternalRealloc( ptr, newSize );
 	
 	if ( stgMemory->enable ) {
-		if ( memoryPointer )
-		{
-			if ( memoryPointer->allocType == MEMORY_OBJECT )
-			{
-				if ( result != NULL )
-				{
-					if (stgMemory->pointers){
-						node = BTree_FindNode( stgMemory->pointers, (void*) memoryPointer );
-						assert( node );
-					
-						BTree_DeleteNode( stgMemory->pointers, (BTreeNode*) node );
-					}
-					
-					diffBytes = newSize - memoryPointer->totalSize;
-					MemoryField_Update( memoryPointer->name, diffBytes );
-					MemoryField_Update( memoryPointer->func, diffBytes );
-					memoryPointer->ptr = result;
-					memoryPointer->ptrReference = result;
-					memoryPointer->stamp = stgMemory->stamp++;
-					
-					memoryPointer->itemSize = newSize;
-					memoryPointer->totalSize = newSize;
-					stgMemory->ptrCache = result;
-					stgMemory->memCache = memoryPointer;
-		
-					if (stgMemory->pointers){
-						BTree_InsertNode( stgMemory->pointers, memoryPointer, sizeof( MemoryPointer* ) );
-					}
+		if ( memoryPointer ) {
+			/* Make sure user has called the correct Realloc func for the current ptr type (eg arrays originally
+			 * allocated using Memory_Alloc_XXArray should be realloced with the appropriate array realloc function.*/
+			pcu_assert( memoryPointer->allocType == MEMORY_OBJECT );
+
+			if ( result != NULL ) {
+				if (stgMemory->pointers){
+					node = BTree_FindNode( stgMemory->pointers, (void*) memoryPointer );
+					assert( node );
+				
+					BTree_DeleteNode( stgMemory->pointers, (BTreeNode*) node );
 				}
-				else
-				{
-					memoryPointer->ptr = NULL;
-					memoryPointer->status = MEMORY_POINTER_RELEASED;
-					memoryPointer->stamp = stgMemory->stamp++;
+				
+				diffBytes = newSize - memoryPointer->totalSize;
+				MemoryField_Update( memoryPointer->name, diffBytes );
+				MemoryField_Update( memoryPointer->func, diffBytes );
+				memoryPointer->ptr = result;
+				memoryPointer->ptrReference = result;
+				memoryPointer->stamp = stgMemory->stamp++;
+				
+				memoryPointer->itemSize = newSize;
+				memoryPointer->totalSize = newSize;
+				stgMemory->ptrCache = result;
+				stgMemory->memCache = memoryPointer;
+	
+				if (stgMemory->pointers){
+					BTree_InsertNode( stgMemory->pointers, memoryPointer, sizeof( MemoryPointer* ) );
 				}
 			}
-			/* Any other pointer type is invalid use of function */
+			else {
+				memoryPointer->ptr = NULL;
+				memoryPointer->status = MEMORY_POINTER_RELEASED;
+				memoryPointer->stamp = stgMemory->stamp++;
+			}
 		}
-		else
-		{
+		else {
 			memoryPointer = MemoryPointer_New( result, stgMemory->stamp++, type, Name_Invalid,
 				fileName, funcName, lineNumber, MEMORY_OBJECT, newSize, newSize );
 			memoryPointer->length.oneD = 1;
@@ -808,58 +811,55 @@ void* _Memory_Realloc_Array_Func(
 	result = _Memory_InternalRealloc( ptr, newSize );
 	
 	if ( stgMemory->enable ) {
-		if ( memoryPointer )
-		{
-			if ( memoryPointer->allocType == MEMORY_1DARRAY )
+		if ( memoryPointer ) {
+			/* Make sure user has called the correct Realloc func for the current ptr type (eg arrays originally
+			 * allocated using Memory_Alloc_XXArray should be realloced with the appropriate array realloc function.*/
+			pcu_assert( memoryPointer->allocType == MEMORY_1DARRAY );
+			if ( result != NULL )
 			{
-				if ( result != NULL )
-				{
-					MemoryPointer* copy;
-					
-					if (stgMemory->pointers){
-						node = BTree_FindNode( stgMemory->pointers, (void*) memoryPointer );
-						assert( node );
-					
-						BTree_DeleteNode( stgMemory->pointers, (BTreeNode*) node );
-					}
-					
-					diffBytes = newSize - memoryPointer->totalSize;
-					MemoryField_Update( memoryPointer->name, diffBytes );
-					MemoryField_Update( memoryPointer->func, diffBytes );
-					
-					memoryPointer->ptr = result;
-					memoryPointer->ptrReference = result;
-					memoryPointer->stamp = stgMemory->stamp++;
-					memoryPointer->itemSize = itemSize;
-					memoryPointer->totalSize = newSize;
-					memoryPointer->length.oneD = newLength;
-					
-					copy = (MemoryPointer*)_Memory_InternalMalloc( sizeof( MemoryPointer ) );
-					memcpy( copy, memoryPointer, sizeof( MemoryPointer) );
-					
-					copy->ptr = result;
-					copy->ptrReference = result;
-					
-					
-					stgMemory->ptrCache = result;
-					stgMemory->memCache = memoryPointer;
-					
-					if (stgMemory->pointers){
-						BTree_InsertNode( stgMemory->pointers, memoryPointer, sizeof( MemoryPointer* ) );
-					}
-					
+				MemoryPointer* copy;
+				
+				if (stgMemory->pointers){
+					node = BTree_FindNode( stgMemory->pointers, (void*) memoryPointer );
+					assert( node );
+				
+					BTree_DeleteNode( stgMemory->pointers, (BTreeNode*) node );
 				}
-				else
-				{
-					memoryPointer->ptr = NULL;
-					memoryPointer->status = MEMORY_POINTER_RELEASED;
-					memoryPointer->stamp = stgMemory->stamp++;
+				
+				diffBytes = newSize - memoryPointer->totalSize;
+				MemoryField_Update( memoryPointer->name, diffBytes );
+				MemoryField_Update( memoryPointer->func, diffBytes );
+				
+				memoryPointer->ptr = result;
+				memoryPointer->ptrReference = result;
+				memoryPointer->stamp = stgMemory->stamp++;
+				memoryPointer->itemSize = itemSize;
+				memoryPointer->totalSize = newSize;
+				memoryPointer->length.oneD = newLength;
+				
+				copy = (MemoryPointer*)_Memory_InternalMalloc( sizeof( MemoryPointer ) );
+				memcpy( copy, memoryPointer, sizeof( MemoryPointer) );
+				
+				copy->ptr = result;
+				copy->ptrReference = result;
+				
+				
+				stgMemory->ptrCache = result;
+				stgMemory->memCache = memoryPointer;
+				
+				if (stgMemory->pointers){
+					BTree_InsertNode( stgMemory->pointers, memoryPointer, sizeof( MemoryPointer* ) );
 				}
+				
 			}
-			/* Any other pointer type is invalid use of function */
+			else
+			{
+				memoryPointer->ptr = NULL;
+				memoryPointer->status = MEMORY_POINTER_RELEASED;
+				memoryPointer->stamp = stgMemory->stamp++;
+			}
 		}
-		else
-		{
+		else {
 			memoryPointer = MemoryPointer_New( result, stgMemory->stamp++, type, Name_Invalid,
 				fileName, funcName, lineNumber, MEMORY_1DARRAY, itemSize, newSize );
 			memoryPointer->length.oneD = newLength;
@@ -893,8 +893,7 @@ void* _Memory_Realloc_2DArray_Func(
 	Pointer result = NULL;
 	Pointer* array;
 	
-	if ( ptr != NULL )
-	{
+	if ( ptr != NULL ) {
 		array = (Pointer*)ptr;
 		oldX = ( (ArithPointer)array[0] - (ArithPointer)ptr ) / sizeof(Pointer);
 		oldY = ( (ArithPointer)array[1] - (ArithPointer)array[0] ) / itemSize;
@@ -903,9 +902,8 @@ void* _Memory_Realloc_2DArray_Func(
 	newSize = Memory_Length_2DArray( itemSize, newX, newY );
 	result = _Memory_InternalRealloc( ptr, newSize );
 	
-	if ( ptr != NULL )
-	{
-		Memory_Relocate_2DArray( (Pointer)( (ArithPointer)result + (newX * sizeof(Pointer)) ),
+	if ( ptr != NULL ) {
+		Memory_Relocate_2DArrayData( (Pointer)( (ArithPointer)result + (newX * sizeof(Pointer)) ),
 					 (Pointer)( (ArithPointer)result + (oldX * sizeof(Pointer)) ),
 					 itemSize, oldX, oldY, newX, newY );
 	}
@@ -915,38 +913,36 @@ void* _Memory_Realloc_2DArray_Func(
 	#ifdef MEMORY_STATS
 	if ( stgMemory->enable ) {
 		memoryPointer = Memory_Find_Pointer( ptr );
-		if ( memoryPointer )
-		{
-			if ( memoryPointer->allocType == MEMORY_2DARRAY )
-			{
-				if (stgMemory->pointers){
-					node = BTree_FindNode( stgMemory->pointers, (void*) memoryPointer );
-					assert( node );
-				
-					BTree_DeleteNode( stgMemory->pointers, (void*) node );
-				}
-				
-				diffBytes = newSize - memoryPointer->totalSize;
-				MemoryField_Update( memoryPointer->name, diffBytes );
-				MemoryField_Update( memoryPointer->func, diffBytes );
-				memoryPointer->ptr = result;
-				memoryPointer->ptrReference = result;
-				memoryPointer->stamp = stgMemory->stamp++;
-				memoryPointer->itemSize = itemSize;
-				memoryPointer->totalSize = newSize;
-				memoryPointer->length.twoD[0] = newX;
-				memoryPointer->length.twoD[1] = newY;
-				stgMemory->ptrCache = result;
-				stgMemory->memCache = memoryPointer;
-				
-				if (stgMemory->pointers){
-					BTree_InsertNode( stgMemory->pointers, memoryPointer, sizeof( MemoryPointer* ) );
-				}
+		if ( memoryPointer ) {
+			/* Make sure user has called the correct Realloc func for the current ptr type (eg arrays originally
+			 * allocated using Memory_Alloc_XXArray should be realloced with the appropriate array realloc function.*/
+			pcu_assert( memoryPointer->allocType == MEMORY_2DARRAY );
+			
+			if (stgMemory->pointers){
+				node = BTree_FindNode( stgMemory->pointers, (void*) memoryPointer );
+				assert( node );
+			
+				BTree_DeleteNode( stgMemory->pointers, (void*) node );
 			}
-			/* Any other pointer type is invalid use of function */
+			
+			diffBytes = newSize - memoryPointer->totalSize;
+			MemoryField_Update( memoryPointer->name, diffBytes );
+			MemoryField_Update( memoryPointer->func, diffBytes );
+			memoryPointer->ptr = result;
+			memoryPointer->ptrReference = result;
+			memoryPointer->stamp = stgMemory->stamp++;
+			memoryPointer->itemSize = itemSize;
+			memoryPointer->totalSize = newSize;
+			memoryPointer->length.twoD[0] = newX;
+			memoryPointer->length.twoD[1] = newY;
+			stgMemory->ptrCache = result;
+			stgMemory->memCache = memoryPointer;
+			
+			if (stgMemory->pointers){
+				BTree_InsertNode( stgMemory->pointers, memoryPointer, sizeof( MemoryPointer* ) );
+			}
 		}
-		else
-		{
+		else {
 			memoryPointer = MemoryPointer_New( result, stgMemory->stamp++, type, Name_Invalid,
 				fileName, funcName, lineNumber, MEMORY_2DARRAY, itemSize, newSize );
 			memoryPointer->length.twoD[0] = newX;
@@ -985,8 +981,7 @@ void* _Memory_Realloc_3DArray_Func(
 	Pointer* array;
 	Pointer** array2;
 	
-	if ( ptr != NULL )
-	{
+	if ( ptr != NULL ) {
 		array = (Pointer*)ptr;
 		array2 = (Pointer**)ptr;
 		
@@ -998,9 +993,8 @@ void* _Memory_Realloc_3DArray_Func(
 	newSize = Memory_Length_3DArray( itemSize, newX, newY, newZ );
 	result = _Memory_InternalRealloc( ptr, newSize );
 	
-	if ( ptr != NULL )
-	{
-		Memory_Relocate_3DArray( (Pointer)( (ArithPointer)result + ( (newX + (newX * newY)) * sizeof(Pointer) ) ),
+	if ( ptr != NULL ) {
+		Memory_Relocate_3DArrayData( (Pointer)( (ArithPointer)result + ( (newX + (newX * newY)) * sizeof(Pointer) ) ),
 					 (Pointer)( (ArithPointer)result + ( (oldX + (oldX * oldY)) * sizeof(Pointer) ) ),
 					 itemSize, oldX, oldY, oldZ, newX, newY, newZ );
 	}
@@ -1010,39 +1004,37 @@ void* _Memory_Realloc_3DArray_Func(
 	#ifdef MEMORY_STATS
 	if ( stgMemory->enable ) {
 		memoryPointer = Memory_Find_Pointer( ptr );
-		if ( memoryPointer )
-		{
-			if ( memoryPointer->allocType == MEMORY_3DARRAY )
-			{
-				if (stgMemory->pointers){
-					node = BTree_FindNode( stgMemory->pointers, (void*) memoryPointer );
-					assert( node );
-				
-					BTree_DeleteNode( stgMemory->pointers, (void*) node );
-				}
-				
-				diffBytes = newSize - memoryPointer->totalSize;
-				MemoryField_Update( memoryPointer->name, diffBytes );
-				MemoryField_Update( memoryPointer->func, diffBytes );
-				memoryPointer->ptr = result;
-				memoryPointer->ptrReference = result;
-				memoryPointer->stamp = stgMemory->stamp++;
-				memoryPointer->itemSize = itemSize;
-				memoryPointer->totalSize = newSize;
-				memoryPointer->length.threeD[0] = newX;
-				memoryPointer->length.threeD[1] = newY;
-				memoryPointer->length.threeD[2] = newZ;
-				stgMemory->ptrCache = result;
-				stgMemory->memCache = memoryPointer;
-				
-				if (stgMemory->pointers){
-					BTree_InsertNode( stgMemory->pointers, memoryPointer, sizeof( MemoryPointer* ) );
-				}
+		if ( memoryPointer ) {
+			/* Make sure user has called the correct Realloc func for the current ptr type (eg arrays originally
+			 * allocated using Memory_Alloc_XXArray should be realloced with the appropriate array realloc function.*/
+			pcu_assert( memoryPointer->allocType == MEMORY_3DARRAY );
+			
+			if (stgMemory->pointers){
+				node = BTree_FindNode( stgMemory->pointers, (void*) memoryPointer );
+				assert( node );
+			
+				BTree_DeleteNode( stgMemory->pointers, (void*) node );
 			}
-			/* Any other pointer type is invalid use of function */
+			
+			diffBytes = newSize - memoryPointer->totalSize;
+			MemoryField_Update( memoryPointer->name, diffBytes );
+			MemoryField_Update( memoryPointer->func, diffBytes );
+			memoryPointer->ptr = result;
+			memoryPointer->ptrReference = result;
+			memoryPointer->stamp = stgMemory->stamp++;
+			memoryPointer->itemSize = itemSize;
+			memoryPointer->totalSize = newSize;
+			memoryPointer->length.threeD[0] = newX;
+			memoryPointer->length.threeD[1] = newY;
+			memoryPointer->length.threeD[2] = newZ;
+			stgMemory->ptrCache = result;
+			stgMemory->memCache = memoryPointer;
+			
+			if (stgMemory->pointers){
+				BTree_InsertNode( stgMemory->pointers, memoryPointer, sizeof( MemoryPointer* ) );
+			}
 		}
-		else
-		{
+		else {
 			memoryPointer = MemoryPointer_New( result, stgMemory->stamp++, type, Name_Invalid,
 				fileName, funcName, lineNumber, MEMORY_3DARRAY, itemSize, newSize );
 			memoryPointer->length.twoD[0] = newX;
@@ -1083,44 +1075,42 @@ void* _Memory_Realloc_2DArrayAs1D_Func(
 	
 	if ( ptr != NULL )
 	{
-		Memory_Relocate_2DArray( result, result, itemSize, oldX, oldY, newX, newY );
+		Memory_Relocate_2DArrayData( result, result, itemSize, oldX, oldY, newX, newY );
 	}
 	
 	#ifdef MEMORY_STATS
 	if ( stgMemory->enable ) {
 		memoryPointer = Memory_Find_Pointer( ptr );
-		if ( memoryPointer )
-		{
-			if ( memoryPointer->allocType == MEMORY_2DAS1D )
-			{
-				if (stgMemory->pointers){
-					node = BTree_FindNode( stgMemory->pointers, (void*) memoryPointer );
-					assert( node );
-				
-					BTree_DeleteNode( stgMemory->pointers, (void*) node );
-				}
-				
-				diffBytes = newSize - memoryPointer->totalSize;
-				MemoryField_Update( memoryPointer->name, diffBytes );
-				MemoryField_Update( memoryPointer->func, diffBytes );
-				memoryPointer->ptr = result;
-				memoryPointer->ptrReference = result;
-				memoryPointer->stamp = stgMemory->stamp;
-				memoryPointer->itemSize = itemSize;
-				memoryPointer->totalSize = newSize;
-				memoryPointer->length.twoD[0] = newX;
-				memoryPointer->length.twoD[1] = newY;
-				stgMemory->ptrCache = result;
-				stgMemory->memCache = memoryPointer;
-				
-				if (stgMemory->pointers){
-					BTree_InsertNode( stgMemory->pointers, memoryPointer, sizeof( MemoryPointer* ) );
-				}
+		if ( memoryPointer ) {
+			/* Make sure user has called the correct Realloc func for the current ptr type (eg arrays originally
+			 * allocated using Memory_Alloc_XXArray should be realloced with the appropriate array realloc function.*/
+			pcu_assert( memoryPointer->allocType == MEMORY_2DAS1D );
+
+			if (stgMemory->pointers){
+				node = BTree_FindNode( stgMemory->pointers, (void*) memoryPointer );
+				assert( node );
+			
+				BTree_DeleteNode( stgMemory->pointers, (void*) node );
 			}
-			/* Any other pointer type is invalid use of function */
+			
+			diffBytes = newSize - memoryPointer->totalSize;
+			MemoryField_Update( memoryPointer->name, diffBytes );
+			MemoryField_Update( memoryPointer->func, diffBytes );
+			memoryPointer->ptr = result;
+			memoryPointer->ptrReference = result;
+			memoryPointer->stamp = stgMemory->stamp;
+			memoryPointer->itemSize = itemSize;
+			memoryPointer->totalSize = newSize;
+			memoryPointer->length.twoD[0] = newX;
+			memoryPointer->length.twoD[1] = newY;
+			stgMemory->ptrCache = result;
+			stgMemory->memCache = memoryPointer;
+			
+			if (stgMemory->pointers){
+				BTree_InsertNode( stgMemory->pointers, memoryPointer, sizeof( MemoryPointer* ) );
+			}
 		}
-		else
-		{
+		else {
 			memoryPointer = MemoryPointer_New( result, stgMemory->stamp++, type, Name_Invalid,
 				fileName, funcName, lineNumber, MEMORY_2DAS1D, itemSize, newSize );
 			memoryPointer->length.twoD[0] = newX;
@@ -1160,47 +1150,44 @@ void* _Memory_Realloc_3DArrayAs1D_Func(
 	newSize = itemSize * newX * newY * newZ;
 	result = _Memory_InternalRealloc( ptr, newSize );
 	
-	if ( ptr != NULL )
-	{
-		Memory_Relocate_3DArray( result, result, itemSize, oldX, oldY, oldZ, newX, newY, newZ );
+	if ( ptr != NULL ) {
+		Memory_Relocate_3DArrayData( result, result, itemSize, oldX, oldY, oldZ, newX, newY, newZ );
 	}
 	
 	#ifdef MEMORY_STATS
 	if ( stgMemory->enable ) {
 		memoryPointer = Memory_Find_Pointer( ptr );
-		if ( memoryPointer )
-		{
-			if ( memoryPointer->allocType == MEMORY_3DAS1D )
-			{
-				if (stgMemory->pointers){
-					node = BTree_FindNode( stgMemory->pointers, (void*) memoryPointer );
-					assert( node );
-				
-					BTree_DeleteNode( stgMemory->pointers, (void*) node );
-				}
-				
-				diffBytes = newSize - memoryPointer->totalSize;
-				MemoryField_Update( memoryPointer->name, diffBytes );
-				MemoryField_Update( memoryPointer->func, diffBytes );
-				memoryPointer->ptr = result;
-				memoryPointer->ptrReference = result;
-				memoryPointer->stamp = stgMemory->stamp++;
-				memoryPointer->itemSize = itemSize;
-				memoryPointer->totalSize = newSize;
-				memoryPointer->length.threeD[0] = newX;
-				memoryPointer->length.threeD[1] = newY;
-				memoryPointer->length.threeD[2] = newZ;
-				stgMemory->ptrCache = result;
-				stgMemory->memCache = memoryPointer;
-				
-				if (stgMemory->pointers){
-					BTree_InsertNode( stgMemory->pointers, memoryPointer, sizeof( MemoryPointer* ) );
-				}
+		if ( memoryPointer ) {
+			/* Make sure user has called the correct Realloc func for the current ptr type (eg arrays originally
+			 * allocated using Memory_Alloc_XXArray should be realloced with the appropriate array realloc function.*/
+			pcu_assert( memoryPointer->allocType == MEMORY_3DAS1D );
+
+			if (stgMemory->pointers){
+				node = BTree_FindNode( stgMemory->pointers, (void*) memoryPointer );
+				assert( node );
+			
+				BTree_DeleteNode( stgMemory->pointers, (void*) node );
 			}
-			/* Any other pointer type is invalid use of function */
+			
+			diffBytes = newSize - memoryPointer->totalSize;
+			MemoryField_Update( memoryPointer->name, diffBytes );
+			MemoryField_Update( memoryPointer->func, diffBytes );
+			memoryPointer->ptr = result;
+			memoryPointer->ptrReference = result;
+			memoryPointer->stamp = stgMemory->stamp++;
+			memoryPointer->itemSize = itemSize;
+			memoryPointer->totalSize = newSize;
+			memoryPointer->length.threeD[0] = newX;
+			memoryPointer->length.threeD[1] = newY;
+			memoryPointer->length.threeD[2] = newZ;
+			stgMemory->ptrCache = result;
+			stgMemory->memCache = memoryPointer;
+			
+			if (stgMemory->pointers){
+				BTree_InsertNode( stgMemory->pointers, memoryPointer, sizeof( MemoryPointer* ) );
+			}
 		}
-		else
-		{
+		else {
 			memoryPointer = MemoryPointer_New( result, stgMemory->stamp++, type, Name_Invalid,
 				fileName, funcName, lineNumber, MEMORY_3DAS1D, itemSize, newSize );
 			memoryPointer->length.twoD[0] = newX;
@@ -1216,22 +1203,22 @@ void* _Memory_Realloc_3DArrayAs1D_Func(
 }
 
 
+/* This function should only be called on ptrs allocated by StGermain's Memory routines */
 void _Memory_Free_Func( void* ptr )
 {
 	MemoryPointer* memoryPointer = NULL;
 
 	if( !ptr ) return;
 	
+	#ifdef MEMORY_STATS
 	memoryPointer = Memory_Find_Pointer( ptr );
-	
-	if ( memoryPointer )
-	{
-		Memory_Free_Pointer( memoryPointer );
-	}
-	else
-	{
-		_Memory_InternalFree( ptr );
-	}
+	/* If memory stats is enabled, then any pointer allocated using the Stg memory system should _always_ have a MemoryPointer
+	 * associated with it, and findable */
+	pcu_assert( memoryPointer );
+	Memory_Free_Pointer( memoryPointer );
+	#else
+	_Memory_InternalFree( ptr );
+	#endif
 }
 	
 SizeT Memory_Length_1DArray( SizeT itemSize, Index length )
@@ -1310,14 +1297,14 @@ void Memory_Print_Summary()
 {
 	Index i;
 	
-	MemoryField_PrintSummary( stgMemory->types, "Type" );
+	MemoryField_PrintSummary( stgMemory->types, "Type", MEMORYFIELD_ALL );
 	
 	Stream_Indent( stgMemory->infoStream );
 	
 	for ( i = 0; i < stgMemory->types->subCount; ++i )
 	{
 		Journal_Printf( stgMemory->infoStream, "\n" );
-		MemoryField_PrintSummary( stgMemory->types->subFields[i], "Name" );
+		MemoryField_PrintSummary( stgMemory->types->subFields[i], "Name", MEMORYFIELD_ALL );
 	}
 	
 	Stream_UnIndent( stgMemory->infoStream );
@@ -1376,7 +1363,7 @@ void Memory_Print_Type_Func( Type type )
 	
 	typeField = MemoryField_Register( stgMemory->types, type );
 	
-	MemoryField_PrintSummary( typeField, "Name" );
+	MemoryField_PrintSummary( typeField, "Name", MEMORYFIELD_ALL );
 }
 
 void Memory_Print_Type_Name_Func( Type type, Name name )
@@ -1391,8 +1378,8 @@ void Memory_Print_Type_Name_Func( Type type, Name name )
 	nameField = MemoryField_Register( typeField, name );
 	
 	Journal_PrintfL( stgMemory->infoStream, 1, "Type: %s\n", type );
-	MemoryField_PrintHeaderAll( "Name" );
-	MemoryField_PrintAll( nameField );
+	MemoryField_PrintHeader( "Name", MEMORYFIELD_ALL, strlen(name) );
+	MemoryField_Print( nameField, MEMORYFIELD_ALL, strlen(name) );
 	
 	Stream_Indent( stgMemory->infoStream );
 	
@@ -1421,7 +1408,7 @@ void Memory_Print_File( char* fileName )
 	
 	fileField = MemoryField_Register( stgMemory->files, fileName );
 	
-	MemoryField_PrintSummary( fileField, "Function" );
+	MemoryField_PrintSummary( fileField, "Function", MEMORYFIELD_ALL );
 }
 
 void Memory_Print_File_Function( char* fileName, char* funcName )
@@ -1435,8 +1422,10 @@ void Memory_Print_File_Function( char* fileName, char* funcName )
 	funcField = MemoryField_Register( fileField, funcName );
 	
 	Journal_PrintfL( stgMemory->infoStream, 1, "File: %s\n", fileName );
-	MemoryField_PrintHeaderAll( "Function" );
-	MemoryField_PrintAll( funcField );
+
+	_MemoryField_CalcLongestSubFieldNameLen( funcField );
+	MemoryField_PrintHeader( "Function", MEMORYFIELD_ALL, strlen(funcName) );
+	MemoryField_Print( funcField, MEMORYFIELD_ALL, strlen(funcName) );
 	
 	Stream_Indent( stgMemory->infoStream );
 	
@@ -1542,7 +1531,15 @@ Bool Memory_IsAllocated( void* ptr ) {
 
 	#ifdef MEMORY_STATS
 		if ( stgMemory->enable ) {
-			return Memory_Find_Pointer( ptr ) != NULL;
+			MemoryPointer *memPtr = NULL;
+
+			memPtr = Memory_Find_Pointer( ptr );
+			if ( (memPtr == NULL) || (memPtr->status == MEMORY_POINTER_RELEASED) ) {
+				return False;
+			}
+			else {
+				return True;
+			}
 		}
 		else {
 			#ifdef DEBUG
@@ -1601,6 +1598,12 @@ MemoryPointer* Memory_Find_Pointer( Pointer ptr )
 	BTreeNode *node = NULL;
 	MemoryPointer *result = NULL;
 	
+	/* Added on 3/6/2009: a NULL ptr should always return as not found, yet in some cases
+	 * it was returning a MemoryPointer (perhaps from a free'd array) */
+	if ( ptr == NULL ) {
+		return NULL;
+	}
+
 	if ( stgMemory->ptrCache == ptr ){
 		return stgMemory->memCache;
 	}
@@ -1682,7 +1685,7 @@ void Memory_SetupPointer_3DArray(
 }
 
 
-void Memory_Relocate_2DArray(
+void Memory_Relocate_2DArrayData(
 	void* destPtr, 
 	void* srcPtr,
 	SizeT itemSize, 
@@ -1701,18 +1704,18 @@ void Memory_Relocate_2DArray(
 	}
 	
 	/* copy in reverse order to avoid overwritting data */
-	for ( i = oldX - 1; i >= 0; --i )
-	{
-		for ( j = oldY - 1; j >= 0; --j )
-		{
-			memcpy( (Pointer)((ArithPointer)destPtr + ( ((i * newY) + j) * itemSize ) ),
+	/* Note: using memmove because this function is often called to relocate data within an existing
+	 * array that's been resized - thus data may be overlapping */
+	for ( i = oldX - 1; i >= 0; --i ) {
+		for ( j = oldY - 1; j >= 0; --j ) {
+			memmove( (Pointer)((ArithPointer)destPtr + ( ((i * newY) + j) * itemSize ) ),
 				(Pointer)((ArithPointer)srcPtr + (  ((i * oldY) + j) * itemSize ) ),
 				itemSize );
 		}
 	}
 }
 
-void Memory_Relocate_3DArray( 
+void Memory_Relocate_3DArrayData( 
 	void* destPtr, 
 	void* srcPtr,
 	SizeT itemSize, 
@@ -1732,13 +1735,12 @@ void Memory_Relocate_3DArray(
 	}
 	
 	/* copy in reverse order to avoid overwritting data */
-	for ( i = oldX - 1; i >= 0; --i )
-	{
-		for ( j = oldY - 1; j >= 0; --j )
-		{
-			for ( k = oldZ - 1; k >= 0; --k )
-			{
-				memcpy( (Pointer)((ArithPointer)destPtr + ( ((i * newY * newZ) + (j * newZ) + k) * itemSize ) ),
+	/* Note: using memmove because this function is often called to relocate data within an existing
+	 * array that's been resized - thus data may be overlapping */
+	for ( i = oldX - 1; i >= 0; --i ) {
+		for ( j = oldY - 1; j >= 0; --j ) {
+			for ( k = oldZ - 1; k >= 0; --k ) {
+				memmove( (Pointer)((ArithPointer)destPtr + ( ((i * newY * newZ) + (j * newZ) + k) * itemSize ) ),
 					(Pointer)((ArithPointer)srcPtr  + ( ((i * oldY * oldZ) + (j * oldZ) + k) * itemSize ) ),
 					itemSize );
 			}

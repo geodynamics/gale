@@ -1,3 +1,22 @@
+/*
+**  Copyright 2008 Luke Hodkinson
+**
+**  This file is part of pcu.
+**
+**  pcu is free software: you can redistribute it and/or modify
+**  it under the terms of the GNU General Public License as published by
+**  the Free Software Foundation, either version 3 of the License, or
+**  (at your option) any later version.
+**
+**  Foobar is distributed in the hope that it will be useful,
+**  but WITHOUT ANY WARRANTY; without even the implied warranty of
+**  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+**  GNU General Public License for more details.
+**
+**  You should have received a copy of the GNU General Public License
+**  along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <mpi.h>
@@ -32,7 +51,7 @@ void pcu_textoutput_testend( pcu_listener_t* lsnr, pcu_test_t* test ) {
    printstatus( lsnr, test->suite, 0 );
 }
 
-void pcu_textoutput_assertdone( pcu_listener_t* lsnr, pcu_source_t* src ) {
+void pcu_textoutput_checkdone( pcu_listener_t* lsnr, pcu_source_t* src ) {
 }
 
 pcu_listener_t* pcu_textoutput_create() {
@@ -43,7 +62,7 @@ pcu_listener_t* pcu_textoutput_create() {
    lsnr->suiteend = pcu_textoutput_suiteend;
    lsnr->testbegin = pcu_textoutput_testbegin;
    lsnr->testend = pcu_textoutput_testend;
-   lsnr->assertdone = pcu_textoutput_assertdone;
+   lsnr->checkdone = pcu_textoutput_checkdone;
    lsnr->data = malloc( sizeof(textoutputdata_t) );
    MPI_Comm_rank( MPI_COMM_WORLD, 
 		  &((textoutputdata_t*)lsnr->data)->rank );
@@ -80,10 +99,12 @@ void printsources( pcu_listener_t* lsnr, pcu_suite_t* suite ) {
       src = test->srcs;
       while( src ) {
 	 if( !src->result ) {
-	    printf( "\n\tAssert '%s' failed:\n", src->type );
+	    printf( "\n\tCheck '%s' failed:\n", src->type );
 	    printf( "\t\tLocation: \t%s:%d\n", src->file, src->line );
 	    printf( "\t\tTest name: \t%s\n", src->test->name );
 	    printf( "\t\tExpression: \t%s\n", src->expr );
+            if( src->msg )
+               printf( "\t\tMessage: \t%s\n", src->msg );
 	    printf( "\t\tRank: \t\t%d\n", src->rank );
 	    nfails++;
 	 }

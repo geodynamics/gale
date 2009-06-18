@@ -137,7 +137,7 @@
 		Journal_Register2( (streamType), (component)->type, (component)->name )
 
 	/** Returns a registered file from the system. If the file does not exist, NULL is returned. */
-	JournalFile* Journal_GetFile( char* fileName );
+	JournalFile* Journal_GetFile( const Name const fileName );
 
 	/** Registers a file with the Journal system. If the argument is NULL, no operation is performed. */
 	void Journal_RegisterFile( JournalFile* newFile );
@@ -165,13 +165,13 @@
 
 
 	/** Performs a printf() with the given stream. */
-	int Journal_Printf( void* _stream, char* fmt, ... );
+	int Journal_Printf( void* _stream, const char* const fmt, ... );
 
 	/** Performs a printf() with the given stream and level of printing.
 	 **
 	 ** Output is only produced if the stream's level of printing is equal or greater.
 	 **/
-	int Journal_PrintfL( void* _stream, JournalLevel level, char* fmt, ... );
+	int Journal_PrintfL( void* _stream, JournalLevel level, const char* const fmt, ... );
 	
 	#ifdef DEBUG
 		/** Performs a Journal_Printf() only if DEBUG is defined. */
@@ -223,7 +223,7 @@
 	*/
 	
 	/* Temporary revert back to old protoype to avoid compilation issues. Need to fix. */
-	int Journal_Firewall( int expression, void* stream, char* fmt, ... );
+	int Journal_Firewall( int expression, void* stream, const char* const fmt, ... );
 	
 	#ifdef DEBUG
 		/** Performs a Journal_Firewall() only if DEBUG is defined. */
@@ -246,7 +246,10 @@
 	/** Performs a dump depending on the implemenation of the given stream. */
 	Bool Journal_Dump( void* stream, void* data );
 
-	int Journal_RPrintf ( void* _stream, char* fmt, ... );
-	int Journal_RPrintfL ( void* _stream, JournalLevel level, char* fmt, ... );
+	int Journal_RPrintf ( void* _stream, const char* const fmt, ... );
+	int Journal_RPrintfL ( void* _stream, JournalLevel level, const char* const fmt, ... );
+
+	/** Set up the default type streams expected throughout StGermain */
+	void Journal_SetupDefaultTypedStreams();
 	
 #endif /* __Base_IO_Journal_h__ */

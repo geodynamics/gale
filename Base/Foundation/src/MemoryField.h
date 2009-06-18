@@ -74,16 +74,17 @@
 
 	/** \def __MemoryField See MemoryField. */
 	#define __MemoryField \
-		char*		value;			\
-		Index		allocCount;		\
-		Index		freeCount;		\
-		SizeT		currentAllocation;	\
-		SizeT		peakAllocation;		\
-		SizeT		totalAllocation;	\
-		Index		subCount;		\
-		Index		subSize;		\
-		MemoryField**	subFields;		\
-		MemoryField*	memCache;		/**< A cache to speedup localised searches. */
+		char*          value;			\
+		Index          allocCount;		\
+		Index          freeCount;		\
+		SizeT          currentAllocation;	\
+		SizeT          peakAllocation;		\
+		SizeT          totalAllocation;	\
+		Index          subCount;		\
+		Index          subSize;		\
+		MemoryField**  subFields;		\
+		MemoryField*   memCache;		/**< A cache to speedup localised searches. */
+
 	struct MemoryField { __MemoryField };
 
 	/** Creates a new MemoryField with a value from a field. */
@@ -100,7 +101,9 @@
 	MemoryField* MemoryField_Register( MemoryField* memoryField, const char* subValue );
 	
 	/** Updates the statisical information of this field. Should only be used for leaf fields. */
-	void MemoryField_Update( MemoryField* memoryField, SizeT bytes );
+   /* Note the "bytes" argument is an int, since it can be negative if a ptr has just been
+    *  freed, or realloc'd to be smaller */
+	void MemoryField_Update( MemoryField* memoryField, int bytes );
 	
 	/** Updates statisical information of this field based on its children (branches and leaves). */
 	void MemoryField_UpdateAsSumOfSubFields( MemoryField* memoryField );
@@ -110,36 +113,25 @@
 	 **
 	 ** @param columns A Bit flag of The fields to be displayed.
 	 **/
-	void MemoryField_Print( MemoryField* memoryField, MemoryFieldColumn columns );
-	
-	/** Displays all fields of a MemoryField. */
-	#define MemoryField_PrintAll( memoryField ) \
-		MemoryField_Print( memoryField, MEMORYFIELD_ALL ) 
+	void MemoryField_Print( MemoryField* memoryField, MemoryFieldColumn columns,
+		unsigned int valueFieldWidth );
 	
 	/** Displays a heading row for MemoryField printouts.
 	 **
 	 ** @param columns A Bit flag of The fields to be displayed.
 	 **/
-	void MemoryField_PrintHeader( const char* fieldName, MemoryFieldColumn columns );
+	void MemoryField_PrintHeader( const char* fieldName, MemoryFieldColumn columns,
+		unsigned int valueFieldWidth );
 	
-	/** Displays all headings of a MemoryField. */
-	#define MemoryField_PrintHeaderAll( fieldName ) \
-		MemoryField_PrintHeader( fieldName, (MemoryFieldColumn)MEMORYFIELD_ALL )
-
-
 	/** Displays a summary of this field and its children. */
-	void MemoryField_PrintSummary( MemoryField* memoryField, const char* tableTitle );
-
+	void MemoryField_PrintSummary( MemoryField* memoryField, const char* tableTitle, MemoryFieldColumn cols  );
 
 	/** Sorts the children of this field lexographically in ascending order. */
 	void MemoryField_Sort( MemoryField* memoryField );
 
 	/** Compares two strings which can potentially NULL, lexographically. NULLs are considered smallest. */
 	int MemoryField_StringCompare( const char* s1, const char* s2 );
+	
+	unsigned int _MemoryField_CalcLongestSubFieldNameLen( MemoryField* memoryField );
 
 #endif /* __Base_Foundation_MemoryField_h__ */
-
-
-
-
-
