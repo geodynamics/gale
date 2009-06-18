@@ -220,5 +220,5 @@ void _lucOutputPNG_Output( void* outputFormat, lucWindow* window, AbstractContex
 	Stream_CloseFile( stream );	/* Release this file. Otherwise too many files will be opened at a time. */
 }
 
-#endif /* HAV_PNG */
+#endif /* HAVE_PNG */
 
