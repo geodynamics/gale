@@ -129,6 +129,7 @@ void _Underworld_EulerDeform_Construct( void* component, Stg_ComponentFactory* c
 			char*			meshName;
 			char*			remesherName;
 			char*			velFieldName;
+			char* name;
 
 			/* Get the dictionary for this system. */
 			sysDict = Dictionary_Entry_Value_AsDictionary( Dictionary_Entry_Value_GetElement( sysLst, sys_i ) );
@@ -139,6 +140,11 @@ void _Underworld_EulerDeform_Construct( void* component, Stg_ComponentFactory* c
 			remesherName = Dictionary_GetString( sysDict, "remesher" );
 			if( strcmp( remesherName, "" ) )
 				sys->remesher = Stg_ComponentFactory_ConstructByName( cf, remesherName, Remesher, True, data );
+			name = Dictionary_GetString(sysDict, "displacementField");
+			if(strcmp(name, ""))
+			    sys->dispField = Stg_ComponentFactory_ConstructByName(cf, name, FeVariable, True, data);
+			else
+			    sys->dispField = NULL;
 			velFieldName = Dictionary_GetString( sysDict, "velocityField" );
 			sys->interval = Dictionary_GetInt_WithDefault( sysDict, "interval", -1 );
 			sys->wrapTop = Dictionary_GetBool_WithDefault( sysDict, "wrapTop", False );
@@ -493,7 +499,6 @@ void EulerDeform_Remesh( TimeIntegratee* crdAdvector, EulerDeform_Context* edCtx
 
 	assert( edCtx );
 
-
         /* We do the second system first, because that is the vertex
            centered system.  We want the cell centered and vertex
            centered systems to be compatible, so the cell centered
@@ -507,6 +512,22 @@ void EulerDeform_Remesh( TimeIntegratee* crdAdvector, EulerDeform_Context* edCtx
 		unsigned		nDomainNodes;
 		unsigned		nDims;
 		unsigned		var_i, n_i, dof_i;
+
+		/* Update the displacement field. */
+		if(sys->dispField) {
+		    double disp[3];
+		    int num_verts, num_dims;
+		    int ii, jj;
+
+		    num_dims = Mesh_GetDimSize(sys->mesh);
+		    num_verts = Mesh_GetLocalSize(sys->mesh, MT_VERTEX);
+		    for(ii = 0; ii < num_verts; ii++) {
+			FeVariable_GetValueAtNode(sys->dispField, ii, disp);
+			for(jj = 0; jj < num_dims; jj++)
+			    disp[jj] += sys->verts[ii*num_dims + jj] - sys->mesh->verts[ii][jj];
+			FeVariable_SetValueAtNode(sys->dispField, ii, disp);
+		    }
+		}
 
 		nDims = Mesh_GetDimSize( sys->mesh );
 
