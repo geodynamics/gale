@@ -1,0 +1,38 @@
+========================
+  Installation Guide
+========================
+
+Two steps: configuration and build.
+
+------------------------
+1. Configuration
+------------------------
+
+To configure:
+
+  ./configure.py
+
+Available options can be listed with:
+
+  ./configure.py --help
+
+------------------------
+2. Build
+------------------------
+
+To build:
+
+  ./scons.py
+
+To rebuild as fast as possible (note that this is
+not garaunteed to produce a consistent build):
+
+  ./fast-scons.py
+
+To run tests:
+
+  ./scons.py check
+
+To install:
+
+  ./scons.py install
