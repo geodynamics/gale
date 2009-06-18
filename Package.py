@@ -111,7 +111,7 @@ class Package:
         if not self.result and self.required:
             print
             print 'Failed to locate required package %s.'%self.name
-            print 'Details in \'config/config2/config.log\''
+            print 'Details in \'config.log\''
             print
             self.env.Exit()
 
