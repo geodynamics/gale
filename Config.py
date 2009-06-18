@@ -24,11 +24,11 @@ def SaveConfig(env, filename='config.cfg'):
     if not (GetOption('help') or GetOption('clean')):
 
         out = open(filename, 'w')
-#         opts = [o[1] for o in env['cfg_options']] + [
-#             'CPPPATH', 'LIBPATH', 'RPATH', 'LIBS', 'CPPDEFINES',
-#             'CFLAGS', 'CCFLAGS', 'FRAMEWORKS',
-#             ]
-        for o in env.iterkeys():#for o in opts:
+        opts = [o[1] for o in env['cfg_options']] + [
+            'CPPPATH', 'LIBPATH', 'RPATH', 'LIBS', 'CPPDEFINES',
+            'CFLAGS', 'CCFLAGS', 'FRAMEWORKS',
+            ] + env.get('save_vars', [])
+        for o in opts:
             v = env.get(o, None)
             if v is not None:
                 out.write('%s = %s\n'%(o, repr(env[o])))
@@ -69,9 +69,7 @@ def generate(env, options=[]):
                                 '-single_module', '-undefined', 'suppress',
                                 '-install_name', '${_abspath(TARGET)}'])
         env['_abspath']=lambda x: File(x).abspath
-
-        # And add the framework to the command line.
-        env['_CCCOMCOM'] = ' '.join(env['_CCCOMCOM'].split() + ['$_FRAMEWORKS'])
+	env.AppendUnique(save_vars=['_RPATH', 'SHLINKFLAGS'])
 
     env.AddMethod(UsePackage)
     env.AddMethod(ConfigurePackage)

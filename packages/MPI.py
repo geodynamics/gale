@@ -48,4 +48,4 @@ class MPI(Package):
                     yield lib_env
 
     def check(self, conf, env):
-        return conf.CheckLibWithHeader(None, 'mpi.h', 'c', autoadd=0)
+        return conf.CheckLibWithHeader(None, 'mpi.h', 'c', call='MPI_Finalize();', autoadd=0)
