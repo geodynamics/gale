@@ -1,5 +1,5 @@
 import os
-from Package import Package
+from config import Package
 from PETSc import PETSc
 
 class PETScExt(Package):

@@ -1,4 +1,4 @@
-from Package import Package
+from config import Package
 from AGL import AGL
 
 class Carbon(Package):

@@ -1,4 +1,4 @@
-from Package import Package
+from config import Package
 
 class OSMesa(Package):
 
