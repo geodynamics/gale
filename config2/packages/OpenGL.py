@@ -19,3 +19,4 @@ class OpenGL(Package):
 	if platform.system() == "Darwin":
             env.AppendUnique(CPPPATH=['/System/Library/Frameworks/OpenGL.framework/Headers'])
             env.AppendUnique(FRAMEWORKS=['OpenGL'])
+            yield env

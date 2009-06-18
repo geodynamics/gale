@@ -10,4 +10,7 @@ from X11 import X11
 from libPNG import libPNG
 from libJPEG import libJPEG
 from libFAME import libFAME
+from Carbon import Carbon
+from Cocoa import Cocoa
+from AGL import AGL
 from stgGlobus import stgGlobus

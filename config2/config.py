@@ -9,6 +9,11 @@ def UsePackage(env, mod, **kw):
     return pkg
 
 def ConfigurePackage(env, mod, **kw):
+    # If we aren't aware of the package throw an error.
+    if mod not in env['packages']:
+        print 'Error: UsePackage not called prior to ConfigurePackage for'
+        print '       package %s.'%repr(mod.__module__)
+        env.Exit()
     # Don't configure if we're cleaning or helping.
     pkg = env['packages'][mod]
     if not (GetOption('clean') or GetOption('help')):
@@ -21,7 +26,7 @@ def SaveConfig(env, filename='config.cfg'):
         out = open(filename, 'w')
         opts = [o[1] for o in env['cfg_options']] + [
             'CPPPATH', 'LIBPATH', 'RPATH', 'LIBS', 'CPPDEFINES',
-            'CFLAGS', 'CCFLAGS'
+            'CFLAGS', 'CCFLAGS', 'FRAMEWORKS'
             ]
         for o in opts:
             v = env.get(o, None)
@@ -56,6 +61,9 @@ def generate(env, options=[]):
                                 '-single_module', '-undefined', 'suppress',
                                 '-install_name', '${_abspath(TARGET)}'])
         env['_abspath']=lambda x: File(x).abspath
+
+        # And add the framework to the command line.
+        env['_CCCOMCOM'] = ' '.join(env['_CCCOMCOM'].split() + ['$_FRAMEWORKS'])
 
     env.AddMethod(UsePackage)
     env.AddMethod(ConfigurePackage)

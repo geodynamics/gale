@@ -29,7 +29,7 @@ class Package:
                   action='store', help='%s libraries.'%n)
 
     def gen_locations(self):
-        return
+	yield
 
     def gen_envs(self, loc):
         env = self.env.Clone()
@@ -117,10 +117,10 @@ class Package:
 
         return self.result and env or self.env
 
-    def add_dependency(self, mod):
+    def add_dependency(self, mod, **kw):
         if not hasattr(self, 'deps'):
             self.deps = []
-        self.deps.append(self.env.UsePackage(mod))
+        self.deps.append(self.env.UsePackage(mod, **kw))
         return self.deps[-1]
 
     def get_option(self, name):
