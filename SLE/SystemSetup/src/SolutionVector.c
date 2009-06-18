@@ -287,9 +287,9 @@ void _SolutionVector_Build( void* solutionVector, void* data ) {
 	VecCreate( self->comm, &self->vector );
 	VecSetSizes( self->vector, self->feVariable->eqNum->localEqNumsOwnedCount, PETSC_DECIDE );
 	VecSetFromOptions( self->vector );
-#if( PETSC_VERSION_MAJOR <= 2 )
+#if( PETSC_VERSION_MAJOR <= 2 && PETSC_VERSION_MINOR >= 3 && PETSC_VERSION_SUBMINOR >= 3 )
 	VecSetOption( self->vector, VEC_IGNORE_NEGATIVE_INDICES );
-#else
+#elif( PETSC_VERSION_MAJOR >= 3 )
 	VecSetOption( self->vector, VEC_IGNORE_NEGATIVE_INDICES, PETSC_TRUE );
 #endif
 
