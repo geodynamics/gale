@@ -43,7 +43,7 @@
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifdef HAVE_JPEG
+#ifdef HAVE_LIBJPEG
 
 #include <mpi.h>
 #include <StGermain/StGermain.h>

@@ -63,12 +63,12 @@ Bool lucInputFormats_Init() {
     	RegisterParent( lucInputTIFF_Type,        lucInputFormat_Type );
 	#endif
 			
-/*	#ifdef HAVE_PNG
+/*	#ifdef HAVE_LIBPNG
 	   lucInputFormat_Register_Add( lucInputFormat_Register_Singleton, ".png",      "0", _lucInputPNG_DefaultNew );
 	   RegisterParent( lucInputPNG_Type,         lucInputFormat_Type );
 	#endif	
 	
-	#ifdef HAVE_JPEG
+	#ifdef HAVE_LIBJPEG
     	lucInputFormat_Register_Add( lucInputFormat_Register_Singleton, ".jpeg",      "0", _lucInputJPEG_DefaultNew );
     	RegisterParent( lucInputJPEG_Type,        lucInputFormat_Type );
     #endif

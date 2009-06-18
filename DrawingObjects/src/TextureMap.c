@@ -68,7 +68,7 @@
 #include <tiffio.h>
 #endif
 
-#ifdef HAVE_JPEG
+#ifdef HAVE_LIBJPEG
 #include <jpeglib.h>
 #endif
 

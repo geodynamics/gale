@@ -42,7 +42,7 @@
 ** $Id: OutputPNG.c 740 2007-10-11 08:05:31Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-#ifdef HAVE_PNG
+#ifdef HAVE_LIBPNG
 
 #include <mpi.h>
 #include <png.h>
