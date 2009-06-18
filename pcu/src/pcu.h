@@ -11,5 +11,6 @@
 #include "runner.h"
 #include "checks.h"
 #include "pcuassert.h"
+#include "filename.h"
 
 #endif
