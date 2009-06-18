@@ -34,6 +34,14 @@ def SaveConfig(env, filename='config.cfg'):
                 out.write('%s = %s\n'%(o, repr(env[o])))
         out.close()
 
+def PrintSummary(env):
+    if not (GetOption('help') or GetOption('clean')):
+        print ''
+        print 'C compiler:     %s'%repr(env['CC'])
+        print 'C flags:        %s'%repr(env.get('CFLAGS', []) + env.get('CCFLAGS', []))
+        print 'C preprocessor: %s'%repr(env.get('CPPDEFINES'))
+        print ''
+
 def generate(env, options=[]):
     import platform
 
@@ -68,6 +76,7 @@ def generate(env, options=[]):
     env.AddMethod(UsePackage)
     env.AddMethod(ConfigurePackage)
     env.AddMethod(SaveConfig)
+    env.AddMethod(PrintSummary)
     env['packages'] = {}
 
 def exists(env):
