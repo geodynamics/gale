@@ -225,39 +225,8 @@ void IO_HandlerSuite_TestWriteReadEmpty( IO_HandlerSuiteData* data ) {
 /* In this case, want to make sure the types are written explicitly into the output, so will
  * check against expected text. */
 void IO_HandlerSuite_TestWriteExplicitTypes( IO_HandlerSuiteData* data ) {
-   Index          ii=0;
    const char*    testFileName = "xmlTest-explicittypes.xml";
-   const int      MAXLINE = 1000;
-   FILE*          testFile = NULL;
-   char*          xmlLine = NULL;
-   const unsigned explicityTypesExpectedLineNum = 23;
-   Index          rank_I;
-   const char*    explicitTypesExpected[] = {
-      "  <element type=\"param\" name=\"test_cstring\" paramType=\"string\">hello</element>\n",
-      "  <element type=\"param\" name=\"test_double\" paramType=\"double\">45.567</element>\n",
-      "  <element type=\"param\" name=\"test_uint\" paramType=\"uint\">5</element>\n",
-      "  <element type=\"param\" name=\"test_int\" paramType=\"int\">-5</element>\n",
-      "  <element type=\"param\" name=\"test_unsignedlong\" paramType=\"ulong\">52342423</element>\n",
-      "  <element type=\"param\" name=\"test_bool\" paramType=\"uint\">1</element>\n",
-      "  <element type=\"list\" name=\"test_list\">\n",
-      "    <element type=\"param\" paramType=\"double\">0</element>\n",
-      "    <element type=\"param\" paramType=\"double\">10</element>\n",
-      "    <element type=\"param\" paramType=\"double\">20</element>\n",
-      "    <element type=\"param\" paramType=\"double\">30</element>\n",
-      "    <element type=\"param\" paramType=\"double\">40</element>\n",
-      "  </element>\n",
-      "  <element type=\"struct\" name=\"test_struct\">\n",
-      "    <element type=\"param\" name=\"height\" paramType=\"double\">37</element>\n",
-      "    <element type=\"param\" name=\"anisotropic\" paramType=\"bool\">true</element>\n",
-      "    <element type=\"param\" name=\"person\" paramType=\"string\">Patrick</element>\n",
-      "    <element type=\"struct\" name=\"geom\">\n",
-      "      <element type=\"param\" name=\"startx\" paramType=\"uint\">45</element>\n",
-      "      <element type=\"param\" name=\"starty\" paramType=\"uint\">60</element>\n",
-      "      <element type=\"param\" name=\"startz\" paramType=\"uint\">70</element>\n",
-      "    </element>\n",
-      "  </element>\n"};
-
-   xmlLine = Memory_Alloc_Array_Unnamed( char, MAXLINE );
+   char*          explicitTypesExpectedFileName = NULL;
 
    Dictionary_Empty( data->dict1 );
    DictionarySuite_PopulateDictWithTestValues( data->dict1, data->testDD );
@@ -267,30 +236,16 @@ void IO_HandlerSuite_TestWriteExplicitTypes( IO_HandlerSuiteData* data ) {
       IO_Handler_WriteAllToFile( data->io_handler, testFileName, data->dict1 );
    }
 
-   for (rank_I=0; rank_I<data->nProcs; rank_I++) {
-      if (rank_I==data->rank) {
-         testFile = fopen(testFileName, "r");
-         rewind(testFile);
-      }
-      MPI_Barrier(data->comm);
-   }
-   pcu_check_true( fgets( xmlLine, MAXLINE, testFile ) );
-   pcu_check_streq( IO_HandlerSuite_XMLStartString1, xmlLine );
-   pcu_check_true( fgets( xmlLine, MAXLINE, testFile ) );
-   pcu_check_streq( IO_HandlerSuite_XMLStartString2, xmlLine );
-   for ( ii=0; ii< explicityTypesExpectedLineNum; ii++ ) {
-      pcu_check_true( fgets( xmlLine, MAXLINE, testFile ) );
-      pcu_check_streq( explicitTypesExpected[ii], xmlLine );
-   }
-   pcu_check_true( fgets( xmlLine, MAXLINE, testFile ) );
-   pcu_check_streq( IO_HandlerSuite_XMLEndString, xmlLine );
-   fclose(testFile);
+	explicitTypesExpectedFileName = Memory_Alloc_Array_Unnamed( char, 
+		pcu_filename_expectedLen( "explicitTypesExpected.xml" ));
+   pcu_filename_expected( "explicitTypesExpected.xml", explicitTypesExpectedFileName );
+   pcu_check_fileEq( testFileName, explicitTypesExpectedFileName );
 
-   MPI_Barrier(data->comm);
    if (data->rank==0) {
       remove(testFileName);
    }
-   Memory_Free( xmlLine );
+   
+   Memory_Free( explicitTypesExpectedFileName );
 }
 
 
@@ -416,7 +371,7 @@ void IO_HandlerSuite_TestReadIncludedFile( IO_HandlerSuiteData* data ) {
 
 void IO_HandlerSuite_TestReadRawDataEntries( IO_HandlerSuiteData* data ) {
    Index             ii;
-   const char*       testFileName = "xmlTest-rawData.xml";
+   char*             testFileName=NULL;
    const char*       list1Name = "bcs";
    const int         list1EntryCount = 2;
    const int         list1Vals[2][3] = { {1, 3, 6}, {2, 9, 14} };
@@ -431,42 +386,8 @@ void IO_HandlerSuite_TestReadRawDataEntries( IO_HandlerSuiteData* data ) {
    const char*       list2BoolValStrings[3] = { "True", "False", "1" };
    Index             rank_I;
 
-   if (data->rank==0) {
-      char*             xmlEntries = NULL;
-      char*             rawDataEntry1 = NULL;
-      char*             rawDataEntry2 = NULL;
-      char*             entryLine = NULL;
-
-      Stg_asprintf( &rawDataEntry1, "<list name=\"%s\">\n<asciidata>\n%d %d %d\n%d %d %d\n"
-         "</asciidata>\n</list>\n",
-         list1Name, list1Vals[0][0], list1Vals[0][1], list1Vals[0][2], 
-         list1Vals[1][0], list1Vals[1][1], list1Vals[1][2] );
-
-      rawDataEntry2 = Memory_Alloc_Array_Unnamed( char, 10000 );
-      entryLine = Memory_Alloc_Array_Unnamed( char, 1000 );
-      sprintf( rawDataEntry2, "<list name=\"%s\">\n<asciidata>\n", list2Name );
-      for (ii=0; ii < list2CompCount; ii++ ) {
-         sprintf( entryLine, "<columnDefinition name=\"%s\" type=\"%s\"/>\n",
-            list2CompNames[ii], list2CompTypes[ii] );
-         strcat( rawDataEntry2, entryLine );
-      }
-      for (ii=0; ii < list2EntryCount; ii++ ) {
-         sprintf( entryLine, "%s %i %i %i %s\n", list2StringVals[ii],
-            list2CoordVals[ii][0], list2CoordVals[ii][1], list2CoordVals[ii][2],
-            list2BoolValStrings[ii] );
-         strcat( rawDataEntry2, entryLine );
-      }
-      sprintf( entryLine, "</asciidata>\n</list>\n" );
-      strcat( rawDataEntry2, entryLine );
-
-      Stg_asprintf( &xmlEntries, "%s%s", rawDataEntry1, rawDataEntry2 );
-      _IO_HandlerSuite_CreateTestXMLFile( testFileName, xmlEntries );
-      Memory_Free( xmlEntries );
-      Memory_Free( rawDataEntry1 );
-      Memory_Free( rawDataEntry2 );
-      Memory_Free( entryLine );
-   }
-   MPI_Barrier(data->comm);
+   testFileName = Memory_Alloc_Array_Unnamed( char, pcu_filename_inputLen( "xmlTest-rawData.xml" ) );
+	pcu_filename_input( "xmlTest-rawData.xml", testFileName );
 
    for ( rank_I=0; rank_I< data->nProcs; rank_I++ ) {
       if ( rank_I == data->rank ) {
@@ -520,9 +441,7 @@ void IO_HandlerSuite_TestReadRawDataEntries( IO_HandlerSuiteData* data ) {
    }
 
    MPI_Barrier(data->comm);
-   if (data->rank==0) {
-      remove( testFileName );
-   }
+   Memory_Free( testFileName );
 }
 
 
