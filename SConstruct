@@ -16,7 +16,7 @@ env.Decider("MD5-timestamp")
 
 # Load configuration.
 values = {}
-execfile("config/config2/config.cfg", globals(), values)
+execfile("config.cfg", globals(), values)
 env._dict.update(values)
 
 # Need to manipulate the build directory to keep SCons happy. Because of SCons' target
