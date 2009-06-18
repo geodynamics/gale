@@ -1,43 +1,22 @@
-import os, platform
-import config
-import config.utils as utils
+import platform
+from Package import Package
 
+class OpenGL(Package):
 
-class OpenGL(config.Package):
+    def gen_locations(self):
+        yield ('/usr', ['/usr/include/GL'], ['/usr/lib'])
+        yield ('/usr/X11R6', ['/usr/X11R6/include'], ['/usr/X11R6/lib'])
+        yield ('/usr/X11R6', ['/usr/X11R6/include/GL'], ['/usr/X11R6/lib'])
+        yield ('/usr/local', ['/usr/local'], ['/usr/local'])
+        yield ('/usr/local', ['/usr/local/GL'], ['/usr/local'])
 
-    def __init__(self, ctx):
-        config.Package.__init__(self, ctx)
-        self.base_dirs = ["/usr/X11R6"]
-        self.inc_exts = ["GL"]
+    def gen_envs(self, loc):
+        for env in Package.gen_envs(self, loc):
+            env['pkg_headers'] = ['gl.h', 'glu.h']
+            env.PrependUnique(LIBS=['GL', 'GLU'])
+            yield env
+
 	if platform.system() == "Darwin":
-            self.base_dirs.append("/System/Library/Frameworks/OpenGL.framework")
-
-    def _setup_dependencies(self):
-        config.Package._setup_dependencies(self)
-        # Register conflict with OSMesa
-        self.opengl = self.add_conflict(config.packages.OSMesa)
-
-    def setup_libraries(self):
-        self.add_library_set(["gl.h", "glu.h"], ["GL", "GLU"])
-        self.add_library_set(["gl.h", "glu.h"], ["OpenGL"])
-
-    def _test(self, cfg):
-        # If we're on Darwin we need this hack.
-        if platform.system() == "Darwin":
-            cfg.append_unique("lnkprogflags",
-                              "-dylib_file /System/Library/Frameworks/" \
-                                  "OpenGL.framework/Versions/A/Libraries/libGL.dylib" \
-                                  ":/System/Library/Frameworks/OpenGL.framework/Versions" \
-                                  "/A/Libraries/libGL.dylib", make_list=True)
-
-        # Now do normal procedure.
-        return config.Package._test(self, cfg)
-
-
-    source_code = {"c": """#include <stdlib.h>
-#include <gl.h>
-#include <glu.h>
-int main( int argc, char** argv ) {
-  return EXIT_SUCCESS;
-}
-"""}
+            env.AppendUnique(CPPPATH=['/System/Library/Frameworks/OpenGL.framework/Headers'])
+            env.AppendUnique(FRAMEWORKS=['OpenGL'])
+            yield env

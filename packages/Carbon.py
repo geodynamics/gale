@@ -1,24 +1,13 @@
-import os, platform
-import config
-import config.utils as utils
+from Package import Package
+from AGL import AGL
 
-class Carbon(config.Package):
+class Carbon(Package):
 
-    def __init__(self, ctx):
-        config.Package.__init__(self, ctx)
-        self.base_dirs.append("/System/Library/Frameworks/Carbon.framework")
+    def setup_dependencies(self):
+        self.agl = self.add_dependency(AGL, required=False)
 
-    def _setup_dependencies(self):
-        config.Package._setup_dependencies(self)
-        self.agl = self.add_dependency(config.packages.AGL, required=True, combine=True)
-        # Register conflict with X11
-        self.x11 = self.add_conflict(config.packages.X11)
-
-    def setup_libraries(self):
-        self.add_library_set(["Carbon.h"], ["Carbon"])
-
-    source_code = {"c": """#include <stdlib.h>
-int main( int argc, char** argv ) {
-  return EXIT_SUCCESS;
-}
-"""}
+    def gen_envs(self, loc):
+        env = self.env.Clone()
+        env['pkg_headers'] = ['Carbon/Carbon.h']
+        env.AppendUnique(FRAMEWORKS=['Carbon'])
+        yield env

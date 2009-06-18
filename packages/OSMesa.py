@@ -1,29 +1,17 @@
-import os, platform
-import config
-import config.utils as utils
+from Package import Package
 
-class OSMesa(config.Package):
+class OSMesa(Package):
 
-    def __init__(self, ctx, **kw):
-        config.Package.__init__(self, ctx, **kw)
-        self.base_dirs = ["/usr/X11R6"]
-        self.inc_exts = ["GL"]
-        #if platform.system() == "Darwin":
-        #  self.base_dirs.append("/System/Library/Frameworks/OpenGL.framework")
+    def gen_locations(self):
+        yield ('/usr', ['/usr/include/GL'], ['/usr/lib'])
+        yield ('/usr/X11R6', ['/usr/X11R6/include'], ['/usr/X11R6/lib'])
+        yield ('/usr/X11R6', ['/usr/X11R6/include/GL'], ['/usr/X11R6/lib'])
+        yield ('/usr/local', ['/usr/local'], ['/usr/local'])
+        yield ('/usr/local', ['/usr/local/GL'], ['/usr/local'])
 
-    def setup_libraries(self):
-        self.add_library_set(["osmesa.h", "gl.h", "glu.h"], ["OSMesa", "GLU"])
-        #self.add_library_set(["gl.h", "glu.h"], ["GLU"])
-        self.add_auxilliary_libs("c", ["dl"])
-
-    source_code = {"c": """#include <stdlib.h>
-#include <gl.h>
-#include <glu.h>
-#include <osmesa.h>
-int main( int argc, char** argv ) {
-  void* ctx;
-  ctx = OSMesaCreateContext(OSMESA_RGBA, NULL);
-  OSMesaDestroyContext(ctx);
-  return EXIT_SUCCESS;
-}
-"""}
+    def gen_envs(self, loc):
+        for env in Package.gen_envs(self, loc):
+            env['pkg_headers'] = ['osmesa.h', 'glu.h']
+            if self.find_libraries(loc[2], 'OSMesa'):
+                env.PrependUnique(LIBS=['OSMesa', 'GLU'])
+                yield env

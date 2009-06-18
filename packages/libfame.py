@@ -1,18 +1,13 @@
-import os
-import config
-import config.utils as utils
+from Package import Package
 
-class libfame(config.Package):
+class libFAME(Package):
 
-    source_code = {"c": """#include <stdlib.h>
-#include <fame.h>
-int main( int argc, char** argv ) {
-  return EXIT_SUCCESS;
-}
-"""}
+    def gen_locations(self):
+        yield ('/usr/local', ['/usr/local/include'], ['/usr/local/lib'])
 
-    def __init__(self, ctx, **kw):
-        config.Package.__init__(self, ctx, **kw)
-
-    def setup_libraries(self):
-        self.add_library_set(["fame.h"], ["fame"])
+    def gen_envs(self, loc):
+        for env in Package.gen_envs(self, loc):
+            env['pkg_headers'] = ['fame.h']
+            if self.find_libraries(loc[2], 'fame'):
+                env.PrependUnique(LIBS=['fame'])
+                yield env

@@ -1,23 +1,16 @@
 import os
-import config
-import config.utils as utils
+from Package import Package
 
+class libXML2(Package):
 
-class libxml2(config.Package):
+    def gen_locations(self):
+        yield ('', ['/usr/include/libxml2'], [])
+        yield ('/usr/local', ['/usr/local/include'], ['/usr/local/lib'])
+        yield ('/usr/local', ['/usr/local/include/libxml2'], ['/usr/local/lib'])
 
-    def __init__(self, ctx, **kw):
-        config.Package.__init__(self, ctx, **kw)
-        self.inc_exts = ["libxml2"]
-
-
-    def setup_libraries(self):
-        inc = os.path.join("libxml", "parser.h")
-        self.add_library_set([inc], ["xml2"])
-
-
-    source_code = {"c": """#include <stdlib.h>
-#include <libxml/parser.h>
-int main( int argc, char** argv ) {
-  return EXIT_SUCCESS;
-}
-"""}
+    def gen_envs(self, loc):
+        for env in Package.gen_envs(self, loc):
+            env['pkg_headers'] = [os.path.join('libxml', 'parser.h')]
+            if self.find_libraries(loc[2], 'libxml'):
+                env.PrependUnique(LIBS=['libxml2'])
+                yield env

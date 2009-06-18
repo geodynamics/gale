@@ -1,110 +1,83 @@
-from utils.Environment import Environment
-import utils
+from SCons.Script import *
 
-class Config(Environment):
+def UsePackage(env, mod, **kw):
+    name = mod.__module__[mod.__module__.rfind('.') + 1:]
+    pkg = env['packages'].get(mod, None)
+    if not pkg:
+        pkg = mod(name, env, **kw)
+        env['packages'][mod] = pkg
+    return pkg
 
-    def __init__(self, ctx, id, **kw):
-        Environment.__init__(self, **kw)
-        self.ctx = ctx
-        self.id = id
-        self.base_modules = []
-        self.cand_modules = []
-        self.valid_modules = []
-        self.done = False
+def ConfigurePackage(env, mod, **kw):
+    # If we aren't aware of the package throw an error.
+    if mod not in env['packages']:
+        print 'Error: UsePackage not called prior to ConfigurePackage for'
+        print '       package %s.'%repr(mod.__module__)
+        env.Exit()
+    # Don't configure if we're cleaning or helping.
+    pkg = env['packages'][mod]
+    if not (GetOption('clean') or GetOption('help')):
+        env._dict.update(pkg(**kw)._dict)
+    return pkg
 
-    def dup(self):
-        return Config(self.ctx, self.id)
+def SaveConfig(env, filename='config.cfg'):
+    if not (GetOption('help') or GetOption('clean')):
 
-    def test(self):
-        if not self.done:
-            self.done = True
-            for m in self.cand_modules:
-                m.test(self)
+        out = open(filename, 'w')
+        opts = [o[1] for o in env['cfg_options']] + [
+            'CPPPATH', 'LIBPATH', 'RPATH', 'LIBS', 'CPPDEFINES',
+            'CFLAGS', 'CCFLAGS', 'FRAMEWORKS'
+            ]
+        for o in opts:
+            v = env.get(o, None)
+            if v is not None:
+                out.write('%s = %s\n'%(o, repr(env[o])))
+        out.close()
 
-    def validate_modules(self, mods):
-        mods = utils.conv.to_list(mods)
-        for m in mods:
-            m = self.ctx.get_module(m)
-            if m not in self.valid_modules:
-                self.valid_modules.append(m)
+def PrintSummary(env):
+    if not (GetOption('help') or GetOption('clean')):
+        print ''
+        print 'C compiler:     %s'%repr(env['CC'])
+        print 'C flags:        %s'%repr(env.get('CFLAGS', []) + env.get('CCFLAGS', []))
+        print 'C preprocessor: %s'%repr(env.get('CPPDEFINES'))
+        print ''
 
-#     def validate_modules(self, mods):
-#         mods = utils.conv.to_list(mods)
-#         for m in mods:
+def generate(env, options=[]):
+    import platform
 
-#             m = self.ctx.get_module(m)
-#             if m in self.valid_modules:
-#                 raise "Validating for overlapping modules."
-#             self.valid_modules[m] = m
-#             if m not in self._all_valid_mods:
-#                 self._all_valid_mods.append(m)
+    # Add the options to SCons.
+    env['cfg_options'] = options
+    for o in options:
+        if len(o) > 4:
+            type = o[4]
+        else:
+            type = 'string'
+        AddOption(o[0], dest=o[1], nargs=1, type=type,
+                  action='store', help=o[2], default=o[3])
 
-#             cur = m._member_of
-#             while len(cur):
-#                 new_set = []
-#                 for vm in cur:
-#                     if vm not in self.valid_modules:
-#                         self.valid_modules[vm] = m
-#                     if vm not in self._all_valid_mods:
-#                         self._all_valid_mods.append(vm)
-#                     for mem in vm._member_of:
-#                         if mem not in new_set:
-#                             new_set.append(mem)
-#                 cur = new_set
+    # Store option values on the environment.
+    for o in options:
+        if GetOption(o[1]) is not None:
+            env[o[1]] = GetOption(o[1])
+        elif o[1].upper() in os.environ:
+            env[o[1]] = os.environ[o[1].upper()]
 
-#         import pdb
-#         pdb.set_trace()
-#         print "Huzzah"
+    # Need to handle Darwin shared libraries.
+    if platform.system() == 'Darwin':
+        env['_RPATH'] = ''
+        env.Append(SHLINKFLAGS=['-dynamiclib', '-flat_namespace',
+                                '-single_module', '-undefined', 'suppress',
+                                '-install_name', '${_abspath(TARGET)}'])
+        env['_abspath']=lambda x: File(x).abspath
 
-    def is_valid(self, mod):
-        return self.are_all_valid(mod)
+        # And add the framework to the command line.
+        env['_CCCOMCOM'] = ' '.join(env['_CCCOMCOM'].split() + ['$_FRAMEWORKS'])
 
-    def are_any_valid(self, mods):
-        mods = utils.conv.to_list(mods)
-        for m in mods:
-            m = self.ctx.get_module(m)
-            if m in self.valid_modules:
-                return True
-        return False
+    env.AddMethod(UsePackage)
+    env.AddMethod(ConfigurePackage)
+    env.AddMethod(SaveConfig)
+    env.AddMethod(PrintSummary)
+    env['packages'] = {}
 
-    def are_all_valid(self, mods):
-        mods = utils.conv.to_list(mods)
-        for m in mods:
-            m = self.ctx.get_module(m)
-            if m not in self.valid_modules:
-                return False
-        return True
-
-    def add_base_modules(self, mods):
-        mods = utils.conv.to_list(mods)
-        for m in mods:
-            if m not in self.base_modules:
-                self.base_modules.append(m)
-
-    def add_cand_modules(self, mods):
-        mods = utils.conv.to_list(mods)
-        for m in mods:
-            if m not in self.cand_modules:
-                self.cand_modules.append(m)
-
-    def same_candidate(self, cand):
-        for m in self.base_modules:
-            if not m.same_candidates(self, cand):
-                return False
-        return True
-
-    def get_summary(self, mod):
-        itms = mod.get_summary_items(self)
-        s = "%s:\n"%mod.name
-        for k, v in itms:
-            s += "  %s = %s\n"%(str(k), repr(v))
-        return s
-
-    def print_summary(self):
-        pass
-
-    def print_fail_reason(self):
-        pass
-
-    def __repr__(self):
-        return self.id
+def exists(env):
+    return True

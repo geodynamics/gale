@@ -1,26 +1,13 @@
-import os
-import config
-import config.utils as utils
+from Package import Package
 
-class HDF5(config.Package):
+class HDF5(Package):
 
-    def __init__(self, ctx, **kw):
-        config.Package.__init__(self, ctx, **kw)
-        self.patterns = ["*hdf5*", "*HDF5*"]
+    def gen_locations(self):
+        yield ('/usr/local', ['/usr/local'], ['/usr/local'])
 
-    def _setup_deps(self):
-        config.Package._setup_deps(self)
-        self.mpi = self.add_dependency(config.packages.MPI,
-                                       required=False, combine=True)
-
-    def setup_libraries(self):
-        self.add_library_set(["hdf5.h"], ["hdf5"])
-        self.add_auxilliary_libs("c", ["pthread"])
-        self.add_auxilliary_libs("c", ["pthread", "z", "sz"])
-
-    source_code = {"c": """#include <stdlib.h>
-#include <hdf5.h>
-int main( int argc, char** argv ) {
-  return EXIT_SUCCESS;
-}
-"""}
+    def gen_envs(self, loc):
+        for env in Package.gen_envs(self, loc):
+            env['pkg_headers'] = ['hdf5.h']
+            if self.find_libraries(loc[2], 'hdf5'):
+                env.PrependUnique(LIBS=['hdf5'])
+                yield env
