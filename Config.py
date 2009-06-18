@@ -24,11 +24,11 @@ def SaveConfig(env, filename='config.cfg'):
     if not (GetOption('help') or GetOption('clean')):
 
         out = open(filename, 'w')
-        opts = [o[1] for o in env['cfg_options']] + [
-            'CPPPATH', 'LIBPATH', 'RPATH', 'LIBS', 'CPPDEFINES',
-            'CFLAGS', 'CCFLAGS', 'FRAMEWORKS'
-            ]
-        for o in opts:
+#         opts = [o[1] for o in env['cfg_options']] + [
+#             'CPPPATH', 'LIBPATH', 'RPATH', 'LIBS', 'CPPDEFINES',
+#             'CFLAGS', 'CCFLAGS', 'FRAMEWORKS',
+#             ]
+        for o in env.iterkeys():#for o in opts:
             v = env.get(o, None)
             if v is not None:
                 out.write('%s = %s\n'%(o, repr(env[o])))
