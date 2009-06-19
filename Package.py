@@ -29,7 +29,7 @@ class Package:
                   action='store', help='%s libraries.'%n)
 
     def gen_locations(self):
-	yield
+	yield None
 
     def gen_envs(self, loc):
         env = self.env.Clone()
@@ -168,4 +168,5 @@ class Package:
             else:
                 yield ('', [], [])
                 for loc in self.gen_locations():
-                    yield loc
+                    if loc is not None:
+                        yield loc
