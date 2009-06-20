@@ -162,6 +162,9 @@ void _StgFEM_StandardConditionFunctions_Construct( void* component, Stg_Componen
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_DiagonalLine, "DiagonalLine");
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_DeltaFunction, "DeltaFunction");
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_InflowBottom, "InflowBottom");
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 
@@ -1405,6 +1408,23 @@ void StgFEM_StandardConditionFunctions_DiagonalLine( Node_LocalIndex node_lI, Va
 		*result = 1.0;
 	else
 		*result = 0.0;
+}
+
+void StgFEM_StandardConditionFunctions_DeltaFunction( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	FiniteElementContext *	context            = (FiniteElementContext*)_context;
+	Dictionary*             dictionary         = context->dictionary;
+	double*                 result             = (double*) _result;
+	double			epsilon		   = Dictionary_GetDouble_WithDefault( dictionary, "deltaFunctionEpsilon", 0.001 );
+	unsigned		dim		   = Dictionary_GetUnsignedInt_WithDefault( dictionary, "deltaFunctionDim", 0 );
+	double			centre		   = Dictionary_GetDouble_WithDefault( dictionary, "deltaFunctionCentre", 0.5 );
+	double			value		   = Dictionary_GetDouble_WithDefault( dictionary, "deltaFunctionValue", 1.0 );
+	double*			coord;
+	Name			variableName	   = Dictionary_GetString_WithDefault( dictionary, "DeltaFunctionFeVariable", "" );
+	FeVariable*		feVariable	   = (FeVariable*) FieldVariable_Register_GetByName( context->fieldVariable_Register, variableName );
+
+	coord = Mesh_GetVertex( feVariable->feMesh, node_lI );
+	
+	*result = (fabs( coord[dim] - centre ) < epsilon) ? value : 0.0;
 }
 
 void StgFEM_StandardConditionFunctions_InflowBottom( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
