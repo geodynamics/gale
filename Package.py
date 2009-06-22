@@ -31,6 +31,10 @@ class Package:
     def gen_locations(self):
 	yield None
 
+    def gen_base_extensions(self, base):
+        yield (['include'], ['lib'])
+        yield (['include'], ['lib64'])
+
     def gen_envs(self, loc):
         env = self.env.Clone()
         env.AppendUnique(CPPPATH=loc[1])
@@ -154,18 +158,29 @@ class Package:
 
     def _gen_locations(self):
         ln = self.name.lower()
+
+        # If we were given a base directory try that.
         base = self.get_option(ln + '_dir')
         if base:
-            yield (base, [os.path.join(base, 'include')],
-                   [os.path.join(base, 'lib')])
+            for inc, lib in self.gen_base_extensions(base):
+                inc = utils.conv.to_list(inc)
+                lib = utils.conv.to_list(lib)
+                yield (base,
+                       [os.path.join(base, i) for i in inc],
+                       [os.path.join(base, l) for l in lib])
 
         else:
+
+            # If we were given an include and library dir,
+            # use that instead.
             inc_dir = self.get_option(ln + '_inc_dir')
             lib_dir = self.get_option(ln + '_lib_dir')
             if inc_dir and lib_dir:
                 yield ('', [inc_dir], [lib_dir])
 
             else:
+                # Finally try an empty search followed by locations
+                # specific to the package.
                 yield ('', [], [])
                 for loc in self.gen_locations():
                     if loc is not None:
