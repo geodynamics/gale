@@ -1,3 +1,4 @@
+import os
 from config import Package
 
 class MPI(Package):
@@ -9,7 +10,7 @@ class MPI(Package):
 
     def gen_envs(self, loc):
 	# If we've been given an MPI compiler just try that.
-	if self.env['CC'] in ['mpicc', 'mpicxx']:
+	if os.path.basename(self.env['CC']) in ['mpicc', 'mpicxx']:
             yield self.env.Clone()
             return
 
