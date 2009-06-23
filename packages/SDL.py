@@ -12,10 +12,10 @@ class SDL(Package):
         for env in Package.gen_envs(self, loc):
             env['pkg_headers'] = ['SDL.h']
             lib_env = env.Clone()
-            env.PrependUnique(LIBS=['SDL'])
+            lib_env.PrependUnique(LIBS=['SDL'])
             yield lib_env
             lib_env = env.Clone()
-            env.PrependUnique(LIBS=['SDL', 'SDLmain'])
+            lib_env.PrependUnique(LIBS=['SDL', 'SDLmain'])
             yield lib_env
 
 	if platform.system() == "Darwin":
