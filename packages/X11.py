@@ -13,7 +13,7 @@ class X11(Package):
         for env in Package.gen_envs(self, loc):
             env['pkg_headers'] = ['Xlib.h']
             lib_env = env.Clone()
-            lib_env.PrependUnique(LIBS=['X11'])
+            lib_env.PrependUnique(LIBS=['X11', 'Xmu'])
             yield lib_env
             lib_env = env.Clone()
             lib_env.PrependUnique(LIBS=['X11', 'Xmu', 'Xau', 'Xdmcp'])
