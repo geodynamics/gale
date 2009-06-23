@@ -1,10 +1,11 @@
 import platform
 from config import Package
+from Cocoa import Cocoa
 
 class SDL(Package):
 
     def setup_dependencies(self):
-	    if platform.system() == "Darwin":
+        if platform.system() == "Darwin":
             self.cocoa = self.add_dependency(Cocoa, required=True)
 
     def gen_locations(self):
