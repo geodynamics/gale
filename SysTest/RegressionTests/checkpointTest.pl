@@ -94,6 +94,7 @@ sub runTests {
 	<struct name=\"pluginData\" mergeType=\"replace\">
 		<list name=\"NumericFields\">
 			<param>VelocityField</param> <param>0</param>
+			<param>PressureField</param> <param>1</param>
 		</list> 
 		<param name=\"IntegrationSwarm\">gaussSwarm</param>
 		<param name=\"ConstantMesh\">constantMesh</param>
@@ -107,6 +108,7 @@ sub runTests {
 		<param name=\"referenceSolutionFilePath\">./expected/$xmlFile</param>
 		<list name=\"ReferenceFields\">
 			<param>VelocityField</param>
+			<param>PressureField</param>
 		</list> 
 	</struct> 
 </StGermainData>";
@@ -179,7 +181,7 @@ sub runTests {
 	# removing help.xml
 	$command = "rm help.xml";
 	print "$command\n";
-	`$command`;
+  `$command`;
 
 	# removing softlink
 	$command = "rm $exec";
@@ -217,7 +219,7 @@ sub readOptionsFile {
 sub testConvergence {
  	my $datFile = $_[0]; 
 	my @keys;
-	my $tolerance = 0.01;
+	my $tolerance = 0.000001;
 	my @errors;
 	my $line;
 	my $nKeys;
@@ -254,7 +256,7 @@ sub testConvergence {
 			$result = "Fail";
 			$report .= "***BAD NEWS*** ... $keys[$ii] differs by more than " . $tolerance*100 . "\% tolerance from expected file\n";
 		} else {
-			$report .= "pass ... $keys[$ii] within a ". $tolerance*100 ."\% tolerance from expected file\n";
+			$report .= "pass ... $keys[$ii] within a ". $tolerance*100 ."\% relative tolerance from expected file\n";
 		}
 	}
 
