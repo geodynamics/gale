@@ -3,6 +3,10 @@ from config import Package
 
 class SDL(Package):
 
+    def setup_dependencies(self):
+	    if platform.system() == "Darwin":
+            self.cocoa = self.add_dependency(Cocoa, required=True)
+
     def gen_locations(self):
         yield ('/usr', ['/usr/include/SDL'], ['/usr/lib'])
         yield ('/usr/local', ['/usr/local'], ['/usr/local'])
