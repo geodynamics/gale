@@ -1,5 +1,13 @@
 from SCons.Script import *
 
+class SaveFile:
+
+    def __init__(self, f):
+        self.path = f.abspath
+
+    def __repr__(self):
+        return 'File(\'' + self.path + '\')'
+
 def UsePackage(env, mod, **kw):
     name = mod.__module__[mod.__module__.rfind('.') + 1:]
     pkg = env['packages'].get(mod, None)
@@ -22,6 +30,12 @@ def ConfigurePackage(env, mod, **kw):
 
 def SaveConfig(env, filename='config.cfg'):
     if not (GetOption('help') or GetOption('clean')):
+
+ 	# Need to make sure there are no SCons files in the
+	# LIBS environment.
+	for i in range(len(env['LIBS'])):
+	    if not isinstance(env['LIBS'][i], str):
+		env['LIBS'][i] = SaveFile(env['LIBS'][i])
 
         out = open(filename, 'w')
         opts = [o[1] for o in env['cfg_options']] + [
