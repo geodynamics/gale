@@ -45,7 +45,6 @@
 	<!-- In 3D -->
 	<struct name="shape">
 		<param name="Type">ConvexHull</param>
-		<param name="startZ">0.3</param>
 		<list name="verticies">
 			<asciidata>
 				<columnDefinition name = "x" type="double"/>
