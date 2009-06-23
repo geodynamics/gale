@@ -25,7 +25,7 @@ def ConfigurePackage(env, mod, **kw):
     # Don't configure if we're cleaning or helping.
     pkg = env['packages'][mod]
     if not (GetOption('clean') or GetOption('help')):
-        env._dict.update(pkg(**kw)._dict)
+        pkg(**kw)
     return pkg
 
 def SaveConfig(env, filename='config.cfg'):

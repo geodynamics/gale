@@ -61,9 +61,6 @@ class Package:
         if 'required' in kw:
             self.required = kw['required']
 
-        # Handle dependencies.
-        self.setup_dependencies()
-
         # Show an initial message.
         SCons.SConf.progress_display('Checking for package %s... '%self.name,
                                      append_newline=0)
@@ -119,7 +116,11 @@ class Package:
             print
             self.env.Exit()
 
-        return self.result and env or self.env
+        # If successful, update the original environment.
+        if self.result:
+            self.env._dict.update(env._dict)
+
+        return self.result
 
     def add_dependency(self, mod, **kw):
         if not hasattr(self, 'deps'):
