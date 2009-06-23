@@ -19,7 +19,7 @@ tst_exp = []
 tst_input = []
 
 # Process each directory uniformly.
-dirs = Split('Voronoi PopulationControl Weights MaterialPoints Utils ' \
+dirs = Split('PopulationControl Weights MaterialPoints Utils ' \
                  'libPICellerator')
 for d in dirs:
 
