@@ -50,6 +50,7 @@
 
 #include <glucifer/Base/Base.h>
 
+#include <glu.h>
 #include <osmesa.h>
 #include "types.h"
 #include "OSMesaWindow.h"

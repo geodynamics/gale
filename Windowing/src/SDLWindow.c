@@ -56,6 +56,7 @@
 #include <signal.h>
 #include <assert.h>
 #include <gl.h>
+#include <glu.h>
 
 #ifdef HAVE_OSMESA
 	#include <osmesa.h>
