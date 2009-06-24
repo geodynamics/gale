@@ -1,0 +1,3 @@
+resource .//./StGermain/Base/IO/input/WrongRootNode.xml of wrong type, root node =<Wrong>, should be <StGermainData>.
+Not parsing.
+Error: File ./StGermain/Base/IO/input/WrongRootNode.xml not valid/readable.

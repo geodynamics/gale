@@ -1,0 +1,4 @@
+.//./StGermain/Base/IO/input/Invalid.xml:3: parser error : Opening and ending tag mismatch: invalid line 3 and param
+<invalid></param>
+                 ^
+Error: File ./StGermain/Base/IO/input/Invalid.xml doesn't exist, not readable, or not valid.
