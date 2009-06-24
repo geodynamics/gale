@@ -80,7 +80,8 @@ env.PCUTest('tests/testUnderworld', suites,
                 "Underworld_Init(&argc, &argv);",
             PCU_TEARDOWN="Underworld_Finalise();PICellerator_Finalise();StgFEM_Finalise();" \
                 "StgDomain_Finalise();StGermain_Finalise();",
-            LIBS=libs)
+            LIBS=libs,
+            PROJECT="Underworld")
 
 # Build plugins.
 dirs = ['libUnderworld/Toolbox',
