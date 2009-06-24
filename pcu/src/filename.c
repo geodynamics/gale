@@ -24,10 +24,28 @@
 #include <mpi.h>
 #include "types.h"
 
+char* PCU_FILENAME_PROJECT = NULL;
+
+const char* pcu_filename_getProject();
+
+void pcu_filename_setProject( const char* const projectName ) {
+   if ( PCU_FILENAME_PROJECT ) {
+      free( PCU_FILENAME_PROJECT );
+   }
+
+   PCU_FILENAME_PROJECT = strdup( projectName );
+}
+
+
+const char* pcu_filename_getProject() {
+   return PCU_FILENAME_PROJECT;
+}
+
+
 unsigned pcu_filename_expectedLen( const char* expectedFileName ) {
-   char*          projSubDir = "StGermain";
-   char*          testSuiteSubDir = "Base/IO";
-   char*          fileType = "expected";
+   const char*          testSuiteSubDir = "Base/IO";
+   const char*          fileType = "expected";
+   const char*          projSubDir = pcu_filename_getProject();
 
    assert( expectedFileName );
 
@@ -39,9 +57,9 @@ unsigned pcu_filename_expectedLen( const char* expectedFileName ) {
 /* Callers of this function should already have allocated the fullPathFileName buffer to the correct size using
  * pcu_filename_expectedLen */
 void pcu_filename_expected( const char* const expectedFileName, char* const fullPathFileName ) {
-   char*          projSubDir = "StGermain";
-   char*          testSuiteSubDir = "Base/IO";
-   char*          fileType = "expected";
+   const char*          testSuiteSubDir = "Base/IO";
+   const char*          fileType = "expected";
+   const char*          projSubDir = pcu_filename_getProject();
 
    assert( expectedFileName );
    assert( fullPathFileName );
@@ -50,9 +68,9 @@ void pcu_filename_expected( const char* const expectedFileName, char* const full
 
 
 unsigned pcu_filename_inputLen( const char* inputFileName ) {
-   char*          projSubDir = "StGermain";
-   char*          testSuiteSubDir = "Base/IO";
-   char*          fileType = "input";
+   const char*          testSuiteSubDir = "Base/IO";
+   const char*          fileType = "input";
+   const char*          projSubDir = pcu_filename_getProject();
 
    assert( inputFileName );
 
@@ -62,9 +80,9 @@ unsigned pcu_filename_inputLen( const char* inputFileName ) {
 
 
 void pcu_filename_input( const char* const inputFileName, char* const fullPathFileName ) {
-   char*          projSubDir = "StGermain";
-   char*          testSuiteSubDir = "Base/IO/";
-   char*          fileType = "input";
+   const char*          testSuiteSubDir = "Base/IO/";
+   const char*          fileType = "input";
+   const char*          projSubDir = pcu_filename_getProject();
 
    sprintf( fullPathFileName, "./%s/%s/%s/%s", projSubDir, testSuiteSubDir, fileType, inputFileName );
 }

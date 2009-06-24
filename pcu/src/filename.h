@@ -20,6 +20,8 @@
 #ifndef pcu_files_h
 #define pcu_files_h
 
+void pcu_filename_setProject( const char* const projectName );
+
 unsigned pcu_filename_expectedLen( const char* expectedFileName );
 
 /** Get the full path name of a given expected file for use in testing
