@@ -12,7 +12,7 @@ def findProjectDirectories(mainDirectory):
     projectNames = os.listdir(directory)
     # remove items from list that are not projects:
     # known examples: config, DOC, Doc, doc
-    directoryValues = ['config', 'DOC', 'doc', 'Doc', '.hg', 'DOXYGEN', 'build', 'script', '.sconf_temp']
+    directoryValues = ['config', 'DOC', 'doc', 'Doc', '.hg', 'DOXYGEN', 'build', 'script', '.sconf_temp', 'scons']
     for value in directoryValues:
         if (projectNames.count(value) > 0) :
             projectNames.remove(value)

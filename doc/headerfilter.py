@@ -34,7 +34,7 @@ class Input():
         lineCount = 0
         for line in text:
 			# find the function Name of the macro:
-			# Find line that starts with: "#define __" and ends with " \\"
+			# Find line that starts with: "#define __" and ends with " \"
 			stringStart = (str(line)).find("#define __" )
 			if stringStart >= 0:
 				stringEnd =(str(line)).find("\\")
@@ -47,18 +47,20 @@ class Input():
 					stringTemp = ""
 					# find the parentName if one exists:
 					# Find line that starts with "__" and ends with "\\"
-					for i in range(1,10):
-					    if (lineCount + i) < len(text):
+					for i in range(1,15):
+					    if (lineCount + i) < (len(text)-1):
 					        stringNextStart = (str(text[lineCount +i])).find("__")
 					    else:
 					        stringNextStart = (str(text[len(text)-1])).find("__")
-						if stringNextStart >=0:
-							stringNextEnd =(str(text[lineCount+i])).find("\\")
-							if stringNextEnd >= 0:
-								self.parentName = ((text[lineCount +i][stringNextStart + 2:stringNextEnd]).lstrip()).rstrip()
-								#print self.parentName
-						stringNextStart = -1
-						stringNextEnd = -1
+                                                
+					    if stringNextStart >=0:
+                                                #print "FOUND __ for parent" 
+						stringNextEnd =(str(text[lineCount+i])).find("\\")
+						if stringNextEnd >= 0:
+							self.parentName = ((text[lineCount +i][stringNextStart + 2:stringNextEnd]).lstrip()).rstrip()
+							#print self.parentName
+					    stringNextStart = -1
+					    stringNextEnd = -1
 			stringStart = -1
 			stringEnd = -1
 			
@@ -77,9 +79,9 @@ class Input():
 			
 			
 			lineCount = lineCount + 1		
-		#print self.functionName
-		#print self.parentName		
-		#print self.lines
+	#print self.functionName
+	#print self.parentName		
+	#print self.lines
 		
 		# Now, if there is text to replace:
         if self.functionName != "":
@@ -109,15 +111,21 @@ class Input():
 				for lines in range(0, self.lines[0]-1):
 					self.output += text[lines]
 				self.output += self.addedText
+
+                                #Add in public: statement just in case.
+                                self.output += "public: \n" 
 				#print lines
 				#print len(text)
+
+                # Find #endif statement and insert bracket before it.
 				for lines in range(self.lines[1]+1, len(text)):
-					if ((text[lines]).find("#endif ") >= 0):
+					if ((text[lines]).find("#endif") >= 0):
+                                           #print "FOUND IT"
 					   self.output +=  "};\n" + text[lines]
 					else:
 					    self.output += text[lines]
 				#print "*********"
-                # Find #endif statement and insert bracket before it.
+
                 
 		# if no alterations are needed, then write output to screen as is	
         elif self.functionName == "":
@@ -145,14 +153,18 @@ class Input():
 			print self.output
 		else:
 			print self.file
-		return
+		
 
     
 #####
 if __name__ == "__main__":
 	# script to run function:
 	# sys.argv[1] is the filename to parse.
-	
-	inputValues = Input(sys.argv[1])
+	values = sys.argv
+        if len(values)>1:
+	    inputValues = Input(sys.argv[1])
 
-	out = inputValues.main()
+	    inputValues.main()
+        else:
+            print "NO INPUT FILE!!!!!!!!!!!"            
+

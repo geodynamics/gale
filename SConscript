@@ -41,7 +41,7 @@ tst_input = []
 
 # Process each directory uniformly.
 dirs = Split('Base/Foundation Base/IO Base/Container Base/Automation Base/Extensibility ' \
-                 'Base/Context Base Utils libStGermain')
+                 'Base/Context Base/Charon/CharonSchema Base/Charon/CharonFactorySchema Base Utils libStGermain')
 for d in dirs:
 
     # Need the module name, which is just the directory.
@@ -60,10 +60,20 @@ for d in dirs:
     hdrs = env.Install(inc_dir, Glob(src_dir + '/*.h'))
     defs = env.Install(inc_dir, Glob(src_dir + '/*.def'))
 
+    # STUPID GLOBUS! Because of stupid globus we have to do this:
+    cpppath = list(env['CPPPATH'])
+    if 'Charon' in d:
+        new_cpppath = []
+        for i in range(len(cpppath)):
+            if 'libxml' not in cpppath[i]:
+                new_cpppath.append(cpppath[i])
+        cpppath = new_cpppath
+
     # Build our source files.
     srcs = Glob(src_dir + '/*.c')
     srcs = [s for s in srcs if s.path.find('-meta.c') == -1]
-    objs += env.SharedObject(srcs, CPPDEFINES=cpp_defs)
+    objs += env.SharedObject(srcs, CPPDEFINES=cpp_defs,
+                             CPPPATH=cpppath)
 
     # Build any meta files.
     objs += env.stgSharedMeta(Glob(src_dir + '/*.meta'), CPPDEFINES=cpp_defs)
