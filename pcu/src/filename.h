@@ -22,6 +22,9 @@
 
 void pcu_filename_setProject( const char* const projectName );
 
+/** For setting the module within a project, e.g. "Base/IO" */
+void pcu_filename_setModule( const char* const moduleName );
+
 unsigned pcu_filename_expectedLen( const char* expectedFileName );
 
 /** Get the full path name of a given expected file for use in testing

@@ -25,8 +25,10 @@
 #include "types.h"
 
 char* PCU_FILENAME_PROJECT = NULL;
+char* PCU_FILENAME_MODULE = NULL;
 
 const char* pcu_filename_getProject();
+const char* pcu_filename_getModule();
 
 void pcu_filename_setProject( const char* const projectName ) {
    if ( PCU_FILENAME_PROJECT ) {
@@ -36,16 +38,30 @@ void pcu_filename_setProject( const char* const projectName ) {
    PCU_FILENAME_PROJECT = strdup( projectName );
 }
 
-
 const char* pcu_filename_getProject() {
+   assert(PCU_FILENAME_PROJECT);
    return PCU_FILENAME_PROJECT;
 }
 
 
+void pcu_filename_setModule( const char* const moduleName ) {
+   if ( PCU_FILENAME_MODULE ) {
+      free( PCU_FILENAME_MODULE );
+   }
+
+   PCU_FILENAME_MODULE = strdup( moduleName );
+}
+
+const char* pcu_filename_getModule() {
+   assert(PCU_FILENAME_MODULE);
+   return PCU_FILENAME_MODULE;
+}
+
+
 unsigned pcu_filename_expectedLen( const char* expectedFileName ) {
-   const char*          testSuiteSubDir = "Base/IO";
    const char*          fileType = "expected";
    const char*          projSubDir = pcu_filename_getProject();
+   const char*          testSuiteSubDir = pcu_filename_getModule(); 
 
    assert( expectedFileName );
 
@@ -57,9 +73,9 @@ unsigned pcu_filename_expectedLen( const char* expectedFileName ) {
 /* Callers of this function should already have allocated the fullPathFileName buffer to the correct size using
  * pcu_filename_expectedLen */
 void pcu_filename_expected( const char* const expectedFileName, char* const fullPathFileName ) {
-   const char*          testSuiteSubDir = "Base/IO";
    const char*          fileType = "expected";
    const char*          projSubDir = pcu_filename_getProject();
+   const char*          testSuiteSubDir = pcu_filename_getModule(); 
 
    assert( expectedFileName );
    assert( fullPathFileName );
@@ -68,9 +84,9 @@ void pcu_filename_expected( const char* const expectedFileName, char* const full
 
 
 unsigned pcu_filename_inputLen( const char* inputFileName ) {
-   const char*          testSuiteSubDir = "Base/IO";
    const char*          fileType = "input";
    const char*          projSubDir = pcu_filename_getProject();
+   const char*          testSuiteSubDir = pcu_filename_getModule(); 
 
    assert( inputFileName );
 
@@ -80,9 +96,9 @@ unsigned pcu_filename_inputLen( const char* inputFileName ) {
 
 
 void pcu_filename_input( const char* const inputFileName, char* const fullPathFileName ) {
-   const char*          testSuiteSubDir = "Base/IO/";
    const char*          fileType = "input";
    const char*          projSubDir = pcu_filename_getProject();
+   const char*          testSuiteSubDir = pcu_filename_getModule(); 
 
    sprintf( fullPathFileName, "./%s/%s/%s/%s", projSubDir, testSuiteSubDir, fileType, inputFileName );
 }

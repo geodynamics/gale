@@ -941,6 +941,7 @@ void IO_HandlerSuite_TestReadWrongRootNode( IO_HandlerSuiteData* data ) {
 
 
 void IO_HandlerSuite( pcu_suite_t* suite ) {
+   pcu_filename_setModule( "Base/IO" );
    pcu_suite_setData( suite, IO_HandlerSuiteData );
    pcu_suite_setFixtures( suite, IO_HandlerSuite_Setup, IO_HandlerSuite_Teardown );
    pcu_suite_addTest( suite, IO_HandlerSuite_TestWriteReadNormalEntries );
