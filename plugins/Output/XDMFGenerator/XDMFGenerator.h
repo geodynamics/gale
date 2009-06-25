@@ -64,6 +64,6 @@
     void  _Underworld_XDMFGenerator_WriteHeader( UnderworldContext* context, Stream* stream );
     void  _Underworld_XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream );
     void  _Underworld_XDMFGenerator_WriteSwarmSchema( UnderworldContext* context, Stream* stream );
-    void  _Underworld_XDMFGenerator_SendSwarmSchema( UnderworldContext* context );
+    void  _Underworld_XDMFGenerator_SendInfo( UnderworldContext* context );
     void  _Underworld_XDMFGenerator_WriteFooter( UnderworldContext* context, Stream* stream );
 #endif  
