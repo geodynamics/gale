@@ -14,9 +14,10 @@ class PETSc(Package):
                   action='store', help='PETSc architecture.')
 
     def gen_locations(self):
-        yield ('/usr/local', ['/usr/local/include/petsc'], [])
         yield ('/usr/local', ['/usr/local/include'], ['/usr/local/lib'])
+        yield ('/usr/local', ['/usr/local/include'], ['/usr/local/lib64'])
         yield ('/usr/local', ['/usr/local/include/petsc'], ['/usr/local/lib'])
+        yield ('/usr/local', ['/usr/local/include/petsc'], ['/usr/local/lib64'])
 
     def gen_envs(self, loc):
         env = self.env.Clone()
