@@ -1,71 +1,133 @@
+#
+# File: options.py
+#
+# An option is specified as:
+#   <flag>[separator][value]([<delimiter><value>])*
+#
+
 import re
 import conv, format
 
-class OptionVariant(object):
+#
+# Class: OptionVariant
+#
 
-    def __init__(self, flgs, type="string", sep=[" ", "="], delim=",", **kw):
-        flgs = conv.to_list(flgs)
-        for i in range(len(flgs) - 1):
-            if flgs[i] in flgs[i + 1:]:
-                raise "Duplicate option string given to Option."
-        sep = conv.to_list(sep)
-        for i in range(len(sep) - 1):
-            if sep[i] in sep[i + 1:]:
-                raise "Duplicate separators in list."
-        for s in sep:
-            if len(s) > 1:
-                raise "Separator of length > 1."
-        delim = conv.to_list(delim)
-        for i in range(len(delim) - 1):
-            if delim[i] in delim[i + 1:]:
-                raise "Duplicate delimiters in list."
-        for d in delim:
-            if len(d) > 1:
-                raise "Delimeter of length > 1."
+class OptionVariant(object):
+    """OptionVariant represents the different ways a single option
+    may be specified."""
+
+    def __init__(self, flags, type="string", **kw):
+        """flags: Either a string or list of the exact flags that
+        can represent this option variant.
+        type: A string representing the kind of option. One of "string",
+        "enum" or "bool"."""
+
+        # Convert the flags to a list.
+        self.flags = conv.to_list(flags)
+
+        # Extract parameters from the keywords.
+        self.seps = conv.to_list(kw.get("seps", ["=", " "]))
+        self.pref_sep = sep and kw.get("pref_sep", sep[0]) or None
+        self.delims = conv.to_list(kw.get("delims", ""))
+        self.pref_delim = delim and kw.get("pref_delim", delim[0]) or None
+
+        # Error on duplicate flags.
+        for i in range(len(self.flags) - 1):
+            if self.flags[i] in self.flags[i + 1:]:
+                raise "Duplicate flag given to OptionVariant."
+
+        # Error on duplicate separators.
+        for i in range(len(self.sep) - 1):
+            if self.sep[i] in self.sep[i + 1:]:
+                raise "Duplicate separators given to OptionVariant."
+
+        # Error on separators that are not single characters.
+        for s in self.seps:
+            if len(s) != 1:
+                raise "Separator of length != 1."
+
+        # Error on duplicate delimiters.
+        for i in range(len(self.delims) - 1):
+            if self.delims[i] in self.delims[i + 1:]:
+                raise "Duplicate delimiter given to OptionVariant."
+
+        # Error on delimiters that are not single characters or
+        # delimiters that are whitespaces.
+        for d in self.delims:
+            if len(d) != 1:
+                raise "Delimeter of length != 1."
             if d == " ":
                 raise "Whitespace delimeter."
 
-        self.flgs = flgs
-        self.type = type
-        self.sep = conv.to_list(sep)
-        self._pref_sep = kw.get("pref_sep", self.sep[0])
-        self.sep.sort(lambda x,y: len(y)-len(x))
-        self.delim = conv.to_list(delim)
-        self._pref_delim = self.delim[0]
-        self.delim.sort(lambda x,y: len(y)-len(x))
+        # Sort the separators and delimiters so that we don't mistake shorter
+        # ones for longer ones.
+        self.seps.sort(lambda x,y: len(y)-len(x))
+        self.delims.sort(lambda x,y: len(y)-len(x))
+
+        #
+        # Handle the different kinds of option types. We need to set
+        # the conversion method "to_str", set the parsing method
+        # "parse_val" and setup any type specific details.
+        #
 
         if self.type == "bool":
+
             self.to_str = self._bool_to_str
             self.parse_val = self._parse_bool
-            bf = kw.get("bool_flags", (["", "yes", "1", "t"], ["no", "0", "f"]))
-            self._pref_true_flag = kw.get("pref_true_flag", conv.to_list(bf[0])[0])
-            self._pref_false_flag = kw.get("pref_false_flag", conv.to_list(bf[1])[0])
-            self.bool_flags = (zip(conv.to_list(bf[0]), [True for i in range(len(bf[0]))]) +
+
+            # Boolean options accept an optional parameter defining
+            # what indicates a positive and negative value. It should be
+            # specified as a tuple of two lists, the first being the
+            # positive values the second the negative.
+            bf = kw.get("bool_values", (["", "yes", "1", "t"], ["no", "0", "f"]))
+
+            # Boolean's also accept additional parameters for specifying
+            # which positive and negative values are preferential. These
+            # will influence conversion of option lists to strings. By default
+            # the first values in the "bool_values" list are considered
+            # preferential.
+            self._pref_true_flag = kw.get("pref_true_value", conv.to_list(bf[0])[0])
+            self._pref_false_flag = kw.get("pref_false_value", conv.to_list(bf[1])[0])
+
+            # Setup the values. We sort the list by the length of the values
+            # in descending order so that when we parse option strings we don't
+            # mistake shorter options for longer ones.
+            self.bool_values = (zip(conv.to_list(bf[0]), [True for i in range(len(bf[0]))]) +
                                zip(conv.to_list(bf[1]), [False for i in range(len(bf[1]))]))
-            self.bool_flags.sort(lambda x,y: len(y[0])-len(x[0]))
+            self.bool_values.sort(lambda x,y: len(y[0])-len(x[0]))
+
         elif self.type == "enum":
+
             self.to_str = self._enum_to_str
             self.parse_val = self._parse_enum
+
+            # An additional option for enumerations is "enum", which defines a
+            # a mapping from the string values expected in the option strings to
+            # an internal string representation. It accepts either a dictionary
+            # or a string.  In the case of a list each entry maps to itself.
             self.enum = kw.get("enum", {})
             if isinstance(self.enum, list):
                 self.enum = dict(zip(self.enum, self.enum))
+
         else:
+
             self.to_str = self._str_to_str
             self.parse_val = self._parse_str
 
     def _bool_to_str(self, val):
-        if val:
-            f = self._pref_true_flag
-        else:
-            f = self._pref_false_flag
+        """Convert a true/false value to a an option string."""
+
+        f = val and self.pref_true_flag or self.pref_false_flag
         if f:
-            s = "%s%s%s" % (self.flgs[0], self._pref_sep, f)
+            s = "%s%s%s" % (self.flags[0], self.pref_sep, f)
         else:
-            s = "%s" % self.flgs[0]
+            s = "%s" % self.flags[0]
         return s.strip()
 
     def _parse_bool(self, val_str):
-        for f, v in self.bool_flags:
+        """Convert a string to a boolean value."""
+
+        for f, v in self.bool_values:
             if f == "":
                 return (v, False)
             if f == val_str:
@@ -93,7 +155,7 @@ class OptionVariant(object):
 
     def _str_to_str(self, val):
         val = conv.to_list(val)
-        return "%s%s%s" % (self.flgs[0], self._pref_sep, self._pref_delim.join(val))
+        return "%s%s%s" % (self.flags[0], self._pref_sep, self._pref_delim.join(val))
 
     def _parse_str(self, val):
         if not val:
@@ -108,25 +170,52 @@ class OptionVariant(object):
         return None
 
     def __repr__(self):
-        return "/".join(self.flgs)
+        return "/".join(self.flags)
+
+#
+# Class: Option
+#
 
 class Option(object):
+    """A container for a set of OptionVariant instances. Each option
+    has to have a single type."""
 
     def __init__(self, name, *args, **kw):
         self.name = name
+
+        # If we were given a 'variants' keyword then take that as
+        # one or a list of OptionVariant instances.
         vars = kw.get("variants", None)
         if vars is None:
+            # Otherwise all the parameters we were given are to create
+            # a new OptionVariant.
             vars = OptionVariant(*args, **kw)
-        self._vars = conv.to_list(vars)
-        self.type = self._vars[0].type
+        self.variants = conv.to_list(vars)
+
+        # We take the type of the first variant to be the type of
+        # this option.
+        self.type = self.variants[0].type
+
+        # This mapping is for moving from a flag string to the variant
+        # that represents it.
         self._flg_to_var = {}
-        for v in self._vars:
+
+        for v in self.variants:
+
+            # Make sure we don't have multiple types in the variants.
             if self.type != v.type:
                 raise "Inconsistent OptionVariant types."
-            for f in v.flgs:
+
+            for f in v.flags:
+
+                # Make sure we don't have multiple variants trying to
+                # represent the same flag.
                 if f in self._flg_to_var:
                     raise "Duplicate option flags in Option."
+
+                # Inser the flag/variant into the mapping.
                 self._flg_to_var[f] = v
+
         self.help = kw.get("help", None)
         self.default = kw.get("default", None)
 
@@ -134,11 +223,11 @@ class Option(object):
         return self._flg_to_var[flg]
 
     def make_help_string(self):
-        v = self._vars[0]
-        if len(v.flgs) > 1:
-            help = "%s" % "|".join(v.flgs)
+        v = self.variants[0]
+        if len(v.flags) > 1:
+            help = "%s" % "|".join(v.flags)
         else:
-            help = str(v.flgs[0])
+            help = str(v.flags[0])
         if v.type == "string":
             help += v._pref_sep + "<string>"
         elif v.type == "enum":
@@ -158,9 +247,13 @@ class Option(object):
 
     def __repr__(self):
         s = []
-        for v in self._vars:
+        for v in self.variants:
             s.append(str(v))
         return "/".join(s)
+
+#
+# Class: OptionSet
+#
 
 class OptionSet(object):
 
@@ -277,14 +370,14 @@ class OptionSet(object):
         for name, opt in self.options.iteritems():
             if opt.default is None or name in found_opts:
                 continue
-            defs.append((opt.name, opt._vars[0].parse_val(opt.default)[0]))
+            defs.append((opt.name, opt.variants[0].parse_val(opt.default)[0]))
         return defs
 
     def make_option_string(self, args):
         s = []
         for a in args:
             if isinstance(a, tuple) and len(a) == 2:
-                s.append(self.options[a[0]]._vars[0].to_str(a[1]))
+                s.append(self.options[a[0]].variants[0].to_str(a[1]))
             elif isinstance(a, str):
                 s.append(a)
             else:
@@ -310,12 +403,12 @@ class OptionSet(object):
         return "\n".join(help) + "\n"
 
     def _make_expr(self):
-        flgs = []
+        flags = []
         for f, o in self._flg_to_opt.iteritems():
-            flgs.append((f, o))
-        flgs.sort(lambda x,y: len(y[0])-len(x[0]))
+            flags.append((f, o))
+        flags.sort(lambda x,y: len(y[0])-len(x[0]))
         l = []
-        for f in flgs:
+        for f in flags:
             l.append("(%s)" % f[0])
         self._expr = re.compile("|".join(l))
 
