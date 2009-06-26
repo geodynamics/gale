@@ -3,10 +3,12 @@
 use strict;
 
 sub runTests;
+sub executeCommandline;
 sub testConvergence;
 sub generateConvergence;
 sub testNumbersAgainstExpected;
 sub readOptionsFile;
+our $testReport = "JericoReport\n";
 our $progHelp = "To run checkpoint tests:
 
 ./checkpointTest.pl <xmlFile> [ OPTIONS ]
@@ -32,17 +34,17 @@ exit &testConvergence( &runTests() );
 sub runTests {
 	my $res;
 	my $command;
-	my $createTest=0; # create an expected file
+	my $createTest=0; #boolean to create an expected file, defaut 0
 
 # read commandline args
 	my $arg;
 	my $ii = 0;
 	my $xmlFile = " ";
 	my $optFile = " ";
-	my $testsToRun = 1;
 	my $numberOfTimeSteps = 10; # testing Timestep is 10 by default
 	my @procs = (1,1,1,1);
 	my @commandLines = ("--elementResI=32 --elementResJ=32 " );
+	my $outputPath = " ";
 												
 	# check if xml exists and options file is specified
 	foreach $arg (@ARGV) {
@@ -64,7 +66,7 @@ sub runTests {
 	}	else {
 		if( !(-e $optFile) ) { die "\nCannot find run options file $optFile, stopped"; }
 		# read in run options file
-		$testsToRun = &readOptionsFile( $optFile, \@procs, \@commandLines );
+		&readOptionsFile( $optFile, \@procs, \@commandLines );
 	}
 
 
@@ -114,7 +116,7 @@ sub runTests {
 </StGermainData>";
 
 	# Need to check for an executable
-	if( (-e "../../../build/bin/StGermain" eq 0 ) ) {
+	if( !(-e "../../../build/bin/StGermain" ) ) {
 		die "\nCan't find ../../../build/bin/StGermain - the executable which runs the test, stopped";
 	}
 	print "\n--- Testing the $xmlFile ---\n";
@@ -122,12 +124,12 @@ sub runTests {
 	if( !(-e $exec) ) {
 		$command = "ln -s ../../../build/bin/StGermain $exec";
 		print "\n$command\n\n";
-		`$command`;
+		&executeCommandline( $command );
 	}	
 	# check if there's a log dir
 	if( !(-e "log/") ) {
 		$command = "mkdir log";
-		`$command`;
+		&executeCommandline( $command );
 	}
 	# declare stdout and stderr files, in log dir.
 	$stdout = "log/$xmlFile"."_runs.stdout";
@@ -136,13 +138,13 @@ sub runTests {
 	# remove old log file, if it exists
 	if( -e "$stdout" ) {
 		$command = "rm $stdout";
-		`$command`;
+		&executeCommandline( $command );
 	}
-	# remove old cvg file, if it exists
-	$command = "ls *\.cvg 2>/dev/null";
-	my $cvg = `$command`;
-	chomp( $cvg );
-	if( $cvg ne "" ) { $command = "rm $cvg"; `$command`;} 
+	# remove old cvg file, if it exists 
+	if( scalar (glob "*.cvg") ) { 
+		$command = "rm *.cvg"; 
+		&executeCommandline( $command );
+	} 
 
 	# create help.xml for setting up test
 	if( $createTest ) {
@@ -150,49 +152,62 @@ sub runTests {
 	} else {
 		$command = "echo \'$xmlSegmentToTest\' > help.xml ";
 	}
-	`$command`;
+	&executeCommandline($command);
 
- # commence running 
-	my $run_I = 0;
+	# run test case
+	$command = "mpirun -np $procs[0] ./$exec $xmlFile help.xml $commandLines[0] --pluginData.appendToAnalysisFile=True >$stdout";
+	print "$command";
+	$command .= " 2>$stderr";
+	&executeCommandline( $command );
 
-	for( $run_I = 0 ; $run_I < $testsToRun ; $run_I++ ) {
-		# run test case
-		$command = "mpirun -np $procs[$run_I] ./$exec $xmlFile help.xml $commandLines[$run_I] --pluginData.appendToAnalysisFile=True >$stdout";
-		print "$command";
-		$command .= " 2>$stderr";
-		`$command`;
-
-			# check error stream for error result
-      open( ERROR, "<$stderr" );
-			my $line;
-			foreach $line (<ERROR>) {
-				if( $line =~ m/[E|e]rror/ ) {
-					close(ERROR); 
-				 	die ("\n\tError: see $stderr or $stdout - stopped" ); 
-				}
-			}
-			# if no error close file and delete it
+	# check error stream for error result
+	open( ERROR, "<$stderr" );
+	my $line;
+	foreach $line (<ERROR>) {
+		if( $line =~ m/[E|e]rror/ ) {
 			close(ERROR); 
-			$command = "rm $stderr"; `$command`;
-
-		print " ....finished\n\n";
+			die ("\n\tError: see $stderr or $stdout - stopped" ); 
+		}
 	}
-
+	# if no error close file and delete it
+	close(ERROR); 
+	$command = "rm $stderr"; `$command`;
 	# removing help.xml
 	$command = "rm help.xml";
-	print "$command\n";
-  `$command`;
+	print "\n$command\n";
+	&executeCommandline($command);
 
 	# removing softlink
 	$command = "rm $exec";
 	print "$command\n";
-	`$command`;
+	&executeCommandline($command);
 	print "--- Finished  ---\n\n";
 
 	if( $createTest ) { exit(0); }
 
+	#search for things to report
+	my @options;
+	my $option;
+	my $resx;
+	my $resy;
+	my $resz;
+	$testReport .= "proc=$procs[0]\n";
+	my $resolution;
+	@options = split (/\s+/, $commandLines[0]);
+	foreach $option (@options) {
+		if( $option =~ m/--elementResI=(\d+)/ ) { $resx = $1; }
+		elsif( $option =~ m/--elementResJ=(\d+)/ ) { $resy = $1; }
+		elsif( $option =~ m/--elementResK=(\d+)/ ) { $resz = $1; }
+	}
+
+	#append to report string
+	$testReport .= "resx=$resx\n";
+	$testReport .= "resy=$resy\n";
+	if ( defined $resz ) { $testReport .= "resz=$resz\n"; }
+	else { $testReport .= "resz=0\n"; }
+
 	$command = "ls *\.cvg 2>/dev/null";
-	$cvg = `$command`;
+	my $cvg = &executeCommandline($command);
 	chomp( $cvg );
 	return $cvg;
 }
@@ -250,6 +265,8 @@ sub testConvergence {
 	$result = "Pass";
 	$report = "";
 
+	$testReport .= "tolerance=$tolerance\n";
+
 	# go through all  errors and check if they're within tolerance
 	for( $ii = 1 ; $ii < $nKeys ; $ii++ ) {
 		if( abs($errors[$ii]) > 0.02 ) {
@@ -257,6 +274,7 @@ sub testConvergence {
 			$report .= "***BAD NEWS*** ... $keys[$ii] differs by more than " . $tolerance*100 . "\% tolerance from expected file\n";
 		} else {
 			$report .= "pass ... $keys[$ii] within a ". $tolerance*100 ."\% relative tolerance from expected file\n";
+			$testReport .= "error in $keys[$ii]=$errors[$ii]\n";
 		}
 	}
 
@@ -267,11 +285,27 @@ sub testConvergence {
 
 	# remove the used data file
 	$command = "rm $datFile";
-	`$command`;
+	&executeCommandline($command);
+
+	print "$testReport\n";
 
 	if( $result eq "Pass" ) {
 		exit(0);
 	} else {
 		exit(1);
 	}
+}
+
+
+sub executeCommandline {
+# pass in single string to execute on the command
+	my $command = $_[0];
+
+  my $output = qx{$command};            # that's the new shell's $$
+	my $exitStatus = $? >> 8;
+
+	# check the exit status of the command
+	if( $exitStatus ne 0 ) { die "\n\n### ERROR ###\nCouldn't execute the command\n$command\n\n"; }
+
+	return $output;
 }
