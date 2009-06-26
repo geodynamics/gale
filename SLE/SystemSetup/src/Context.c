@@ -636,23 +636,28 @@ void _FiniteElementContext_DumpMeshAscii( void* context, char* filename ) {
 #ifdef WRITE_HDF5
 void _FiniteElementContext_DumpMeshHDF5( void* context, char* filename ) {
    FiniteElementContext*   self = (FiniteElementContext*) context;
-   int               rank, nRanks;
-   FieldVariable*    fieldVar = NULL;
-   FeVariable*       feVar = NULL;
-   Mesh*             mesh;
-   unsigned          nDims;
-   hid_t             file, fileSpace, fileData;
-   hid_t             memSpace;
-   hsize_t           start[2], count[2], size[2];
-   unsigned          nVerts, totalVerts;
-   Node_LocalIndex   lNode_I = 0;
-   Node_GlobalIndex  gNode_I = 0;
-   double*           coord;
-   double            buf[4];
-	MPI_Status        status;
-	int               confirmation = 0;
-	Stream*           errorStr = Journal_Register( Error_Type, self->type );
-   
+   int                     rank, nRanks;
+   FieldVariable*          fieldVar = NULL;
+   FeVariable*             feVar = NULL;
+   Mesh*                   mesh;
+   unsigned                nDims;
+   hid_t                   file, fileSpace, fileData, fileSpace2, fileData2;
+   hid_t                   memSpace;
+   hsize_t                 start[2], count[2], size[2];
+   unsigned                totalVerts;
+   Node_LocalIndex         lNode_I = 0;
+   Node_GlobalIndex        gNode_I = 0;
+   double*                 coord;
+   double                  buf[4];
+   int                     buf_int[5];
+	MPI_Status              status;
+	int                     confirmation = 0;
+	Stream*                 errorStr = Journal_Register( Error_Type, self->type );
+   Element_LocalIndex      lElement_I;
+   Element_GlobalIndex     gElement_I;
+   Index                   maxNodes;
+   IArray*                 iarray = IArray_New();
+
    MPI_Comm_rank( self->communicator, &rank);
    MPI_Comm_size( self->communicator, &nRanks );   
 
@@ -663,8 +668,7 @@ void _FiniteElementContext_DumpMeshHDF5( void* context, char* filename ) {
       mesh   = (Mesh*)feVar->feMesh;
    
       nDims  = Mesh_GetDimSize( mesh );
-      nVerts = Mesh_GetDomainSize( mesh, 0 );
-      
+
       /* wait for go-ahead from process ranked lower than me, to avoid competition writing to file */
       if ( rank != 0 ) {
          MPI_Recv( &confirmation, 1, MPI_INT, rank - 1, FINISHED_WRITING_TAG, self->communicator, &status );
@@ -705,13 +709,37 @@ void _FiniteElementContext_DumpMeshHDF5( void* context, char* filename ) {
          /* Create our output space and data objects. */
          totalVerts = Mesh_GetGlobalSize( mesh, 0 );
          size[0] = (hsize_t)totalVerts;
-         size[1] = (hsize_t)nDims + 1;
+         size[1] = (hsize_t)nDims;
          
          fileSpace = H5Screate_simple( 2, size, NULL );
          #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
          fileData = H5Dcreate( file, "/data", H5T_NATIVE_DOUBLE, fileSpace, H5P_DEFAULT );
          #else
          fileData = H5Dcreate( file, "/data", H5T_NATIVE_DOUBLE, fileSpace,
+                               H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+         #endif
+
+         /* setup element connectivity dataspaces */
+         if (mesh->nElTypes == 1)
+            maxNodes = FeMesh_GetElementNodeSize( mesh, 0);
+         else {
+            /* determine the maximum number of nodes each element has */
+            maxNodes = 0;
+            for ( gElement_I = 0 ; gElement_I < FeMesh_GetElementGlobalSize(mesh); gElement_I++ ) {
+               unsigned numNodes;
+               numNodes = FeMesh_GetElementNodeSize( mesh, gElement_I);
+               if( maxNodes < numNodes ) maxNodes = numNodes;
+            }
+         }
+         
+         size[0] = (hsize_t)FeMesh_GetElementGlobalSize(mesh);
+         size[1] = (hsize_t)maxNodes;
+         /* Create our output space and data objects. */         
+         fileSpace2 = H5Screate_simple( 2, size, NULL );
+         #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+         fileData2 = H5Dcreate( file, "/connectivity", H5T_NATIVE_INT, fileSpace2, H5P_DEFAULT );
+         #else
+         fileData2 = H5Dcreate( file, "/connectivity", H5T_NATIVE_INT, fileSpace2,
                                H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
          #endif
 
@@ -727,7 +755,7 @@ void _FiniteElementContext_DumpMeshHDF5( void* context, char* filename ) {
             self->name, 
             filename );
    
-         /* get the filespace */   
+         /* get the node filespace */   
          #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
          fileData  = H5Dopen( file, "/data" );
          #else
@@ -735,10 +763,19 @@ void _FiniteElementContext_DumpMeshHDF5( void* context, char* filename ) {
          #endif
          /* get the filespace handle */
          fileSpace = H5Dget_space(fileData);
+
+         /* get the connectivity */   
+         #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+         fileData2  = H5Dopen( file, "/connectivity" );
+         #else
+         fileData2  = H5Dopen( file, "/connectivity", H5P_DEFAULT );
+         #endif
+         /* get the filespace handle */
+         fileSpace2 = H5Dget_space(fileData2);
       }	
          
       count[0] = 1;
-      count[1] = nDims + 1;
+      count[1] = nDims;
       memSpace = H5Screate_simple( 2, count, NULL );
       H5Sselect_all( memSpace );
                         
@@ -746,25 +783,58 @@ void _FiniteElementContext_DumpMeshHDF5( void* context, char* filename ) {
          gNode_I = FeMesh_NodeDomainToGlobal( mesh, lNode_I );
          
          coord = Mesh_GetVertex( mesh, lNode_I );
-         buf[0] = (double)gNode_I;
-         buf[1] = coord[0];
-         if( nDims >= 2 )
-            buf[2] = coord[1];
-         if( nDims >= 3 )
-            buf[3] = coord[2];
-               
+         
          /* select the region of dataspace to write to  */
          start[1] = 0;
          start[0] = gNode_I;
          H5Sselect_hyperslab( fileSpace, H5S_SELECT_SET, start, NULL, count, NULL );
          
-         H5Dwrite( fileData, H5T_NATIVE_DOUBLE, memSpace, fileSpace, H5P_DEFAULT, buf );
+         H5Dwrite( fileData, H5T_NATIVE_DOUBLE, memSpace, fileSpace, H5P_DEFAULT, coord );
       }
       
       /* Close off all our handles. */
       H5Sclose( memSpace );
       H5Dclose( fileData );
       H5Sclose( fileSpace );
+
+      H5Sget_simple_extent_dims( fileSpace2, size, NULL );
+      count[0] = 1;
+      count[1] = size[1];
+      memSpace = H5Screate_simple( 2, count, NULL );
+      H5Sselect_all( memSpace );
+                        
+      for ( lElement_I = 0 ; lElement_I < FeMesh_GetElementLocalSize(mesh); lElement_I++ ) {
+         int*    nodeList, nodesPerEl;
+         int     node_I;
+         
+         gElement_I = FeMesh_ElementDomainToGlobal( mesh,lElement_I );
+
+         /* get element nodes */
+         FeMesh_GetElementNodes( mesh, lElement_I, iarray );
+         nodesPerEl = IArray_GetSize( iarray );
+         nodeList   = IArray_GetPtr(  iarray );
+         
+         for( node_I = 0 ; node_I < nodesPerEl ; node_I++ )
+            buf_int[node_I] = nodeList[node_I];
+         /* some reordering is required to account for standard node ordering */ 
+         buf_int[3] = nodeList[2];
+         buf_int[2] = nodeList[3];
+         if( nDims == 3 ) {
+            buf_int[7] = nodeList[6];
+            buf_int[6] = nodeList[7];
+         }
+         /* select the region of dataspace to write to  */
+         start[1] = 0;
+         start[0] = gElement_I;
+         H5Sselect_hyperslab( fileSpace2, H5S_SELECT_SET, start, NULL, count, NULL );
+         
+         H5Dwrite( fileData2, H5T_NATIVE_INT, memSpace, fileSpace2, H5P_DEFAULT, buf_int );
+      }
+      
+      /* Close off all our handles. */
+      H5Sclose( memSpace );
+      H5Dclose( fileData2 );
+      H5Sclose( fileSpace2 );
       H5Fclose( file );
 
       /* send go-ahead from process ranked lower than me, to avoid competition writing to file */
@@ -773,6 +843,8 @@ void _FiniteElementContext_DumpMeshHDF5( void* context, char* filename ) {
       }	
       
    }
+   
+   NewClass_Delete( iarray );
 }
 #endif
 

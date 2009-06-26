@@ -2062,7 +2062,7 @@ void FeVariable_SaveToFile( void* feVariable, const char* filename, Bool saveCoo
          filename );
        
       size[0] = Mesh_GetGlobalSize( self->feMesh, 0 );;
-      size[1] = dofAtEachNodeCount + 1;
+      size[1] = dofAtEachNodeCount;
       if( saveCoords )
          size[1] += self->dim;
       
@@ -2099,7 +2099,7 @@ void FeVariable_SaveToFile( void* feVariable, const char* filename, Bool saveCoo
    /* get the section of fileSpace to write to... set start point to be the
       global index of first local node */
 	count[0] = 1;
-	count[1] = dofAtEachNodeCount + 1;
+	count[1] = dofAtEachNodeCount;
    if( saveCoords )
       count[1] += self->dim;
 
@@ -2112,25 +2112,22 @@ void FeVariable_SaveToFile( void* feVariable, const char* filename, Bool saveCoo
    for ( lNode_I = 0; lNode_I < FeMesh_GetNodeLocalSize( self->feMesh ); lNode_I++ ) {
 		gNode_I = FeMesh_NodeDomainToGlobal( self->feMesh, lNode_I );
 
-		/* write our global node index to the buffer */
-	   buf[0] = (double)gNode_I;
-	   
 	   /* If required, add coords to array */
 	   if( saveCoords ) {
 	      coord = Mesh_GetVertex( self->feMesh, lNode_I );
-	      buf[1] = coord[0];
-	      buf[2] = coord[1];
+	      buf[0] = coord[0];
+	      buf[1] = coord[1];
 	      if( self->dim == 3 )
-	         buf[3] = coord[2]; 
+	         buf[2] = coord[2]; 
 	   }
 	   
 	   /* Add field value at current node to array */
       FeVariable_GetValueAtNode( self, lNode_I, variableValues );
 		for ( dof_I = 0; dof_I < dofAtEachNodeCount; dof_I++ ) {
 		   if( saveCoords )
-			   buf[dof_I + self->dim + 1] = variableValues[dof_I];
+			   buf[dof_I + self->dim] = variableValues[dof_I];
 			else
-			   buf[dof_I + 1] = variableValues[dof_I];   
+			   buf[dof_I] = variableValues[dof_I];   
 		}	
 
       /* select the region of dataspace to write to  */
