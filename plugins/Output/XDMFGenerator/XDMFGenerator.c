@@ -154,6 +154,8 @@ void _Underworld_XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Str
    Bool                 saveCoords  = Dictionary_GetBool_WithDefault( context->dictionary, "saveCoordsWithFields", False );
    Stream*              errorStream = Journal_Register( Error_Type, CURR_MODULE_NAME );
    Name                 variableType;
+   Name                 topologyType;
+   
    /** we follow the method in SystemSetup/Context.c to get the mesh info. 
        this method seems unsatisfactory, and may be updated soon JohnMansour 20090626  **/ 
    fieldVar = FieldVariable_Register_GetByIndex( context->fieldVariable_Register, 0 );
@@ -179,17 +181,25 @@ void _Underworld_XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Str
       }
       /** now write all the xdmf geometry info **/
       /**----------------------- START GEOMETRY   ------------------------------------------------------------------------------------------------------------------- **/
+      if(         maxNodes == 4 ){
+         Stg_asprintf( &topologyType, "Quadrilateral" );
+      } else if ( maxNodes == 8  ) {
+         Stg_asprintf( &topologyType, "Hexahedron" );
+      } else {
+         Journal_Firewall( NULL, errorStream, "\n\n number of element nodes %u not supported...\n should be 4 (2D quadrilateral) " 
+                                 "or should be 8 (3D hexahedron). \n\n", maxNodes );
+      }
       /** first create the grid which is applicable to the checkpointed fevariables **/
                               Journal_Printf( stream, "   <Grid Name=\"FeVariable_Grid\">\n\n" );
                               Journal_Printf( stream, "      <Time Value=\"%f\" />\n\n", context->currentTime );
       /** now print out topology info, only quadrilateral elements are supported at the moment **/
-                              Journal_Printf( stream, "         <Topology Type=\"Quadrilateral\" NumberOfElements=\"%u\"> \n", elementGlobalSize );
+                              Journal_Printf( stream, "         <Topology Type=\"%s\" NumberOfElements=\"%u\"> \n", topologyType, elementGlobalSize );
                               Journal_Printf( stream, "            <DataItem Format=\"HDF\" DataType=\"Int\"  Dimensions=\"%u %u\">Mesh.%05d.h5:/connectivity</DataItem>\n", elementGlobalSize, maxNodes, context->timeStep );
                               Journal_Printf( stream, "         </Topology>\n\n" );
                               Journal_Printf( stream, "         <Geometry Type=\"XYZ\">\n" );
 
       Stg_asprintf( &variableType, "NumberType=\"Float\" Precision=\"8\"" );                              
-      if( nDims == 2 ){
+      if(         nDims == 2 ){
          /** note that for 2d, we feed back a quasi 3d array, with the 3rd Dof zeroed.  so in effect we always work in 3d.
              this is done because paraview in particular seems to do everything in 3d, and if you try and give it a 2d vector 
              or array, it complains.... and hence the verbosity of the following 2d definitions**/
@@ -235,7 +245,7 @@ void _Underworld_XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Str
                   /** all feVariables are currently stored as doubles **/
                   Stg_asprintf( &variableType, "NumberType=\"Float\" Precision=\"8\"" );
                   /** determine whether feVariable data is cell centered (like Pressure), or on the nodes (like Velocity) **/
-                  if( meshSize == elementGlobalSize ){
+                  if(        meshSize == elementGlobalSize ){
                      Stg_asprintf( &centering, "Cell" );
                   } else if( meshSize == totalVerts ) {
                      Stg_asprintf( &centering, "Node" );
@@ -244,14 +254,14 @@ void _Underworld_XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Str
                   }
                   /** how many degrees of freedom does the fevariable have? **/
                   dofAtEachNodeCount = feVar->fieldComponentCount;
-                  if ( dofAtEachNodeCount == 1 ) {
+                  if (        dofAtEachNodeCount == 1 ) {
                               Journal_Printf( stream, "         <Attribute Type=\"Scalar\" Center=\"%s\" Name=\"%s\">\n", centering,  feVar->name);
                               Journal_Printf( stream, "            <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" >\n", meshSize );
                               Journal_Printf( stream, "               <DataItem Dimensions=\"3 2\" Format=\"XML\"> 0 %u 1 1 %u 1 </DataItem>\n", offset, meshSize );
                               Journal_Printf( stream, "               <DataItem Format=\"HDF\" %s Dimensions=\"%u %u\">%s.%05d.h5:/data</DataItem>\n", variableType, meshSize, (offset + dofAtEachNodeCount), feVar->name, context->timeStep);
                               Journal_Printf( stream, "            </DataItem>\n" );
                               Journal_Printf( stream, "         </Attribute>\n\n" );
-                  } else if( dofAtEachNodeCount == 2 ){
+                  } else if ( dofAtEachNodeCount == 2 ){
                      /** note that for 2d, we feed back a quasi 3d array, with the 3rd Dof zeroed.  so in effect we always work in 3d.
                          this is done because paraview in particular seems to do everything in 3d, and if you try and give it a 2d vector 
                          or array, it complains.... and hence the verbosity of the following 2d definitions **/
@@ -293,7 +303,8 @@ void _Underworld_XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Str
       }
    }
                               Journal_Printf( stream, "   </Grid>\n\n" );
-            Memory_Free( variableType );         
+Memory_Free( variableType );
+Memory_Free( topologyType );
 }
 
 void _Underworld_XDMFGenerator_WriteSwarmSchema( UnderworldContext* context, Stream* stream ) {
@@ -352,17 +363,17 @@ void _Underworld_XDMFGenerator_WriteSwarmSchema( UnderworldContext* context, Str
             Memory_Free( swarmVarName );
             
             /** check what precision it Position variable is stored at **/
-            if( swarmVar->variable->dataTypes[0] == Variable_DataType_Int ){
+            if(        swarmVar->variable->dataTypes[0] == Variable_DataType_Int ){
                Journal_Firewall( NULL, errorStream, "\n\n Position variable can not be of type Int... something is amiss! \n\n" );
-            } else if( swarmVar->variable->dataTypes[0] == Variable_DataType_Char){
+            } else if ( swarmVar->variable->dataTypes[0] == Variable_DataType_Char){
                Journal_Firewall( NULL, errorStream, "\n\n Position variable can not be of type Char... something is amiss! \n\n" );
-            } else if( swarmVar->variable->dataTypes[0] == Variable_DataType_Float ){
+            } else if ( swarmVar->variable->dataTypes[0] == Variable_DataType_Float ){
                Stg_asprintf( &variableType, "NumberType=\"Float\" Precision=\"4\"" );
             } else {
                Stg_asprintf( &variableType, "NumberType=\"Float\" Precision=\"8\"" );
             }
            
-            if( swarmVar->dofCount == 2 ){
+            if(         swarmVar->dofCount == 2 ){
                /** note that for 2d, we feed back a quasi 3d array, with the 3rd Dof zeroed.  so in effect we always work in 3d.
                    this is done because paraview in particular seems to do everything in 3d, and if you try and give it a 2d vector 
                    or array, it complains.... and hence the verbosity of the following 2d definitions**/
@@ -393,20 +404,20 @@ void _Underworld_XDMFGenerator_WriteSwarmSchema( UnderworldContext* context, Str
                swarmVar = SwarmVariable_Register_GetByIndex( currentSwarm->swarmVariable_Register, countindex );
                if( swarmVar->isCheckpointedAndReloaded ) {
             /**----------------------- START ATTRIBUTES ------------------------------------------------------------------------------------------------------------------- **/
-                  if( swarmVar->variable->dataTypes[0] == Variable_DataType_Int ){
+                  if(         swarmVar->variable->dataTypes[0] == Variable_DataType_Int ){
                      Stg_asprintf( &variableType, "NumberType=\"Int\"" );
-                  } else if( swarmVar->variable->dataTypes[0] == Variable_DataType_Char){
+                  } else if ( swarmVar->variable->dataTypes[0] == Variable_DataType_Char){
                      Stg_asprintf( &variableType, "NumberType=\"Char\"" );
-                  } else if( swarmVar->variable->dataTypes[0] == Variable_DataType_Float ){
+                  } else if ( swarmVar->variable->dataTypes[0] == Variable_DataType_Float ){
                      Stg_asprintf( &variableType, "NumberType=\"Float\" Precision=\"4\"" );
                   } else {
                      Stg_asprintf( &variableType, "NumberType=\"Float\" Precision=\"8\"" );
                   }
-                  if ( swarmVar->dofCount == 1 ) {
+                  if (        swarmVar->dofCount == 1 ) {
                               Journal_Printf( stream, "         <Attribute Type=\"Scalar\" Center=\"Node\" Name=\"%s\">\n", swarmVar->name);
                               Journal_Printf( stream, "            <DataItem Format=\"HDF\" %s Dimensions=\"%u 1\">%s.%05d%s.h5:/%s</DataItem>\n", variableType, swarmParticleLocalCount, currentSwarm->name, context->timeStep, filename_part, swarmVar->name);
                               Journal_Printf( stream, "         </Attribute>\n\n" );
-                  } else if( swarmVar->dofCount == 2 ){
+                  } else if ( swarmVar->dofCount == 2 ){
                      /** note that for 2d, we feed back a quasi 3d array, with the 3rd Dof zeroed.  so in effect we always work in 3d.
                          this is done because paraview in particular seems to do everything in 3d, and if you try and give it a 2d vector 
                          or array, it complains.... and hence the verbosity of the following 2d definitions **/
