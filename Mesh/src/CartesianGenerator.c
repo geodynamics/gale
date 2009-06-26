@@ -2146,7 +2146,7 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
          
          start[1] = 0;
 	      count[0] = 1;
-	      count[1] = mesh->topo->nDims + 1;
+	      count[1] = mesh->topo->nDims;
          memSpace = H5Screate_simple( 2, count, NULL );
          totalVerts = Mesh_GetGlobalSize( mesh, 0 );
 
@@ -2172,7 +2172,7 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
             H5Sselect_all( memSpace );
             
             error = H5Dread( fileData, H5T_NATIVE_DOUBLE, memSpace, fileSpace, H5P_DEFAULT, buf );
-            gNode_I = (int)buf[0];
+            gNode_I = ii;
 
             Journal_Firewall( 
                error >= 0, 
@@ -2189,11 +2189,10 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
 			      double *vert;
 
 			      vert = Mesh_GetVertex( mesh, lNode_I );
-			      vert[0] = buf[1];
-			      if( mesh->topo->nDims >= 2 )
-				      vert[1] = buf[2];
-			      if( mesh->topo->nDims >=3 )
-				      vert[2] = buf[3];
+			      vert[0] = buf[0];
+               vert[1] = buf[1];
+			      if( mesh->topo->nDims ==3 )
+				      vert[2] = buf[2];
 		      }
 	      }
 	   	      
