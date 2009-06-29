@@ -6,7 +6,7 @@ class SDL(Package):
 
     def setup_dependencies(self):
         if platform.system() == "Darwin":
-            self.cocoa = self.add_dependency(Cocoa, required=True)
+            self.cocoa = self.add_dependency(Cocoa, required=False)
 
     def gen_locations(self):
         yield ('/usr', ['/usr/include/SDL'], ['/usr/lib'])
@@ -24,5 +24,7 @@ class SDL(Package):
             yield lib_env
 
 	if platform.system() == "Darwin":
+            env = self.env.Clone()
             env.AppendUnique(CPPPATH=['/System/Library/Frameworks/SDL.framework/Headers'])
             env.AppendUnique(FRAMEWORKS=['SDL'])
+            yield env
