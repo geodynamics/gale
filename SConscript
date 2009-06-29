@@ -77,7 +77,8 @@ env.PCUTest('tests/testglucifer', suites,
                 "StgFEM_Init(&argc, &argv);glucifer_Init(&argc, &argv);",
             PCU_TEARDOWN="glucifer_Finalise();StgFEM_Finalise();" \
                 "StgDomain_Finalise();StGermain_Finalise();",
-            LIBS=libs)
+            LIBS=libs,
+            PROJECT="glucifer")
 
 # Build plugins.
 dirs = [('plugins/lucPlugin', 'lucPlugin')]
