@@ -73,7 +73,8 @@ env.PCUTest('tests/testStgDomain', suites,
             PCU_LIBHEADERS="#include <StGermain/StGermain.h>\n#include <StgDomain/StgDomain.h>",
             PCU_SETUP="StGermain_Init(&argc, &argv);StgDomain_Init(&argc, &argv);",
             PCU_TEARDOWN="StgDomain_Finalise();StGermain_Finalise();",
-            LIBS=libs)
+            LIBS=libs,
+            PROJECT="StgDomain")
 
 # Build plugins.
 dirs = Split('libStgDomain/Toolbox')
