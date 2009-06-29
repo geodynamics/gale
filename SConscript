@@ -77,7 +77,8 @@ env.PCUTest('tests/testPICellerator', suites,
                 "StgFEM_Init(&argc, &argv);PICellerator_Init(&argc, &argv);",
             PCU_TEARDOWN="PICellerator_Finalise();StgFEM_Finalise();" \
                 "StgDomain_Finalise();StGermain_Finalise();",
-            LIBS=libs)
+            LIBS=libs,
+            PROJECT="PICellerator")
 
 # Build plugins.
 dirs = Split('libPICellerator/Toolbox plugins/CalculateParticleDisplacement ' \
