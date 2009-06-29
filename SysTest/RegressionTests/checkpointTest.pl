@@ -2,14 +2,19 @@
 #
 use strict;
 
+##### SUBROUTINES #####
 sub runTests;
 sub executeCommandline;
 sub testConvergence;
 sub generateConvergence;
 sub testNumbersAgainstExpected;
 sub readOptionsFile;
-our $testReport = "JericoReport\n";
-our $progHelp = "To run checkpoint tests:
+
+
+##### GLOBAL VARS #####
+our $testReport = "[Bitten] purpose=test current numerical fields against previously checkpoint fields of this model\n";
+our $cvgFileName = "";
+our $helpStr = "To run checkpoint tests:
 
 ./checkpointTest.pl <xmlFile> [ OPTIONS ]
 
@@ -22,36 +27,38 @@ where OPTIONS:
 EXAMPLE:
   ./checkpointTest.pl testVelicSolS.xml -optionsFile OFile.dat\n\t(Runs with option file OFile.dat and checks against the expected file)\n\n";
 
-######  Main program    ######
+######  MAIN PROGRAM    ######
 
 # 1) Run the xml 
+$cvgFileName = &runTests();
 
 # 2) Check against expected, checkpoint files 
-exit &testConvergence( &runTests() );
+exit &testConvergence( $cvgFileName );
 
-######  End main program ######
+######  END MAIN  ######
+
 
 sub runTests {
 	my $res;
 	my $command;
 	my $createTest=0; #boolean to create an expected file, defaut 0
 
-# read commandline args
+	# read commandline args
 	my $arg;
 	my $ii = 0;
 	my $xmlFile = " ";
 	my $optFile = " ";
 	my $numberOfTimeSteps = 10; # testing Timestep is 10 by default
 	my @procs = (1,1,1,1);
-	my @commandLines = ("--elementResI=32 --elementResJ=32 " );
+	my @commandLines = ""; #("--elementResI=32 --elementResJ=32 " );
 	my $outputPath = " ";
 												
 	# check if xml exists and options file is specified
 	foreach $arg (@ARGV) {
 		if( $arg =~ m/.*\.xml$/ ) { $xmlFile = $arg; }
 		elsif( $arg =~ m/\-optionsFile/ ) { $optFile = $ARGV[$ii+1]; $ii++; }
-		elsif( $arg =~ m/^\-h$/ ) { print $progHelp; exit }
-		elsif( $arg =~ m/^\-\-help$/ ) { print $progHelp; exit }
+		elsif( $arg =~ m/^\-h$/ ) { print $helpStr; exit }
+		elsif( $arg =~ m/^\-\-help$/ ) { print $helpStr; exit }
 		elsif( $arg =~ m/^\-c/ ) { $createTest=1; }
 		elsif( $arg =~ m/^\-n/ ) { $numberOfTimeSteps=$ARGV[$ii+1]; $ii++; }
 		$ii++;
@@ -60,22 +67,19 @@ sub runTests {
 	if( !(-e $xmlFile) ) { die "\nCannot find input file: $xmlFile, stopped" ; }
 
 	# check if options file is given, otherwise run default
-	if( $optFile eq " " ) {
-		warn "\nNo run options file specifed using commandline arg '-optionsFile xxx'".
-				 "\nUsing default serial mode, with commandLines:\n"; foreach (@commandLines) { print "$_\n"; }
-	}	else {
+	if( $optFile ne " " ) {
 		if( !(-e $optFile) ) { die "\nCannot find run options file $optFile, stopped"; }
+
 		# read in run options file
 		&readOptionsFile( $optFile, \@procs, \@commandLines );
+		print "\nUsing options file $optFile, specifed options are:\n-n $procs[0] "; foreach (@commandLines) { print "$_ "; }
 	}
 
-
-# do checks on executables and log files
-
-	my $exec = "udw";
+	my $exec = "udw"; # executable name
 	my $stdout;
 	my $stderr;
 
+	# create strings for 1) creating checkpoint data & 2) testing against checkpointed data
 	my $xmlSegmentCreateTest = "<StGermainData xmlns=\"http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003\">
 		<param name=\"checkpointEvery\" mergeType=\"replace\">10</param>
 		<param name=\"outputPath\" mergeType=\"replace\">./expected/$xmlFile</param>
@@ -119,18 +123,26 @@ sub runTests {
 	if( !(-e "../../../build/bin/StGermain" ) ) {
 		die "\nCan't find ../../../build/bin/StGermain - the executable which runs the test, stopped";
 	}
-	print "\n--- Testing the $xmlFile ---\n";
+
+	if( $createTest ) {
+		print "\n--- Creating checkpoint files for $xmlFile at timestep $numberOfTimeSteps---\n";
+	} else {
+		print "\n--- Testing the $xmlFile ---\n";
+	}
+
 	# is the symbolic link there, if not create it
 	if( !(-e $exec) ) {
 		$command = "ln -s ../../../build/bin/StGermain $exec";
 		print "\n$command\n\n";
 		&executeCommandline( $command );
 	}	
+
 	# check if there's a log dir
 	if( !(-e "log/") ) {
 		$command = "mkdir log";
 		&executeCommandline( $command );
 	}
+
 	# declare stdout and stderr files, in log dir.
 	$stdout = "log/$xmlFile"."_runs.stdout";
 	$stderr = "log/$xmlFile"."_runs.stderr";
@@ -140,6 +152,7 @@ sub runTests {
 		$command = "rm $stdout";
 		&executeCommandline( $command );
 	}
+
 	# remove old cvg file, if it exists 
 	if( scalar (glob "*.cvg") ) { 
 		$command = "rm *.cvg"; 
@@ -155,9 +168,9 @@ sub runTests {
 	&executeCommandline($command);
 
 	# run test case
-	$command = "mpirun -np $procs[0] ./$exec $xmlFile help.xml $commandLines[0] --pluginData.appendToAnalysisFile=True >$stdout";
-	print "$command";
+	$command = "mpiexec -n $procs[0] ./$exec $xmlFile help.xml $commandLines[0] --pluginData.appendToAnalysisFile=True >$stdout";
 	$command .= " 2>$stderr";
+	print "$command";
 	&executeCommandline( $command );
 
 	# check error stream for error result
@@ -169,43 +182,48 @@ sub runTests {
 			die ("\n\tError: see $stderr or $stdout - stopped" ); 
 		}
 	}
+
 	# if no error close file and delete it
 	close(ERROR); 
-	$command = "rm $stderr"; `$command`;
+	$command = "rm $stderr"; &executeCommandline($command);
+
 	# removing help.xml
 	$command = "rm help.xml";
-	print "\n$command\n";
-	&executeCommandline($command);
+	print "\n$command\n"; &executeCommandline($command);
 
 	# removing softlink
 	$command = "rm $exec";
-	print "$command\n";
-	&executeCommandline($command);
+	print "$command\n"; &executeCommandline($command);
+
 	print "--- Finished  ---\n\n";
 
+	# if we're only creating checkpoint file, end program here
 	if( $createTest ) { exit(0); }
 
-	#search for things to report
-	my @options;
-	my $option;
+	$testReport .= "[Bitten] proc=$procs[0]\n";
+
+	#search for resolution to report
 	my $resx;
 	my $resy;
 	my $resz;
-	$testReport .= "proc=$procs[0]\n";
+	open( FLATOUTPUT, "./output/$xmlFile/input.xml" )
+		or die ("\n\n### ERROR ###\n\t\tCouldn't open output file, ./output/$xmlFile/input.xml " );
+
 	my $resolution;
-	@options = split (/\s+/, $commandLines[0]);
-	foreach $option (@options) {
-		if( $option =~ m/--elementResI=(\d+)/ ) { $resx = $1; }
-		elsif( $option =~ m/--elementResJ=(\d+)/ ) { $resy = $1; }
-		elsif( $option =~ m/--elementResK=(\d+)/ ) { $resz = $1; }
+	foreach $line (<FLATOUTPUT>) {
+		if( $line =~ m/\"elementResI\">(\d+)</ ) { $resx = $1; }
+		elsif( $line =~ m/\"elementResJ\">(\d+)</ ) { $resy = $1; }
+		elsif( $line =~ m/\"elementResK\">(\d+)</ ) { $resz = $1; }
 	}
+	close( FLATOUTPUT );
 
 	#append to report string
-	$testReport .= "resx=$resx\n";
-	$testReport .= "resy=$resy\n";
-	if ( defined $resz ) { $testReport .= "resz=$resz\n"; }
-	else { $testReport .= "resz=0\n"; }
+	$testReport .= "[Bitten] resx=$resx\n";
+	$testReport .= "[Bitten] resy=$resy\n";
+	if ( defined $resz ) { $testReport .= "[Bitten] resz=$resz\n"; }
+	else { $testReport .= "[Bitten] resz=0\n"; }
 
+	# return convergence file name
 	$command = "ls *\.cvg 2>/dev/null";
 	my $cvg = &executeCommandline($command);
 	chomp( $cvg );
@@ -234,7 +252,7 @@ sub readOptionsFile {
 sub testConvergence {
  	my $datFile = $_[0]; 
 	my @keys;
-	my $tolerance = 0.000001;
+	my $tolerance = 1e-5;
 	my @errors;
 	my $line;
 	my $nKeys;
@@ -265,16 +283,17 @@ sub testConvergence {
 	$result = "Pass";
 	$report = "";
 
-	$testReport .= "tolerance=$tolerance\n";
+	$testReport .= "[Bitten] tolerance=$tolerance\n";
 
 	# go through all  errors and check if they're within tolerance
 	for( $ii = 1 ; $ii < $nKeys ; $ii++ ) {
-		if( abs($errors[$ii]) > 0.02 ) {
+		if( abs($errors[$ii]) > $tolerance ) {
 			$result = "Fail";
-			$report .= "***BAD NEWS*** ... $keys[$ii] differs by more than " . $tolerance*100 . "\% tolerance from expected file\n";
+			$report .= "***BAD NEWS*** ... $keys[$ii] differs by more than " . $tolerance*100 . "\% tolerance from expected file, error is $errors[$ii]\n";
+			$testReport .= "[Bitten] error in $keys[$ii]=$errors[$ii]\n";
 		} else {
 			$report .= "pass ... $keys[$ii] within a ". $tolerance*100 ."\% relative tolerance from expected file\n";
-			$testReport .= "error in $keys[$ii]=$errors[$ii]\n";
+			$testReport .= "[Bitten] error in $keys[$ii]=$errors[$ii]\n";
 		}
 	}
 
@@ -283,11 +302,14 @@ sub testConvergence {
 	print "\n$report";
 	print "\nResult = $result\n";
 
+	$testReport .= "[Bitten] status=$result\n";
+
 	# remove the used data file
 	$command = "rm $datFile";
 	&executeCommandline($command);
 
-	print "$testReport\n";
+	open ( JERICO_FILE, "+>.jericoFile" );
+	print JERICO_FILE "$testReport\n";
 
 	if( $result eq "Pass" ) {
 		exit(0);
