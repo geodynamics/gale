@@ -25,6 +25,6 @@ class SDL(Package):
 
 	if platform.system() == "Darwin":
             env = self.env.Clone()
+            env.PrependUnique(LIBS=['SDL', 'SDLmain'])
             env.AppendUnique(CPPPATH=['/System/Library/Frameworks/SDL.framework/Headers'])
-            env.AppendUnique(FRAMEWORKS=['SDL'])
             yield env
