@@ -105,7 +105,8 @@ env.PCUTest('tests/testStGermain', suites,
     PCU_LIBHEADERS="#include <StGermain/StGermain.h>",
     PCU_SETUP="StGermain_Init(&argc, &argv);",
     PCU_TEARDOWN="StGermain_Finalise();",
-    LIBS=libs)
+    LIBS=libs,
+    PROJECT="StGermain")
 
 # Copy XML validation file to correct destination.
 xmls = env.Install('lib', 'Base/IO/src/StGermain.xsd')
