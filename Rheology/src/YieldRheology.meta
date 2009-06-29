@@ -18,7 +18,12 @@
 <!--Now the interesting stuff-->
 
 <list name="Params">
-
+	<struct>
+		<param name="Name">minimumViscosity</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.0</param>
+		<param name="Description">Sets the minimum viscosity the material point can have after it has yielded from the failure criterion.</param>
+	</struct>
 </list>
 
 <list name="Dependencies">
