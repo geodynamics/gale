@@ -387,7 +387,7 @@ void IO_HandlerSuite_TestReadRawDataEntries( IO_HandlerSuiteData* data ) {
    Index             rank_I;
 
    testFilename = Memory_Alloc_Array_Unnamed( char, pcu_filename_inputLen( "xmlTest-rawData.xml" ) );
-	pcu_filename_input( "xmlTest-rawData.xml", testFilename );
+   pcu_filename_input( "xmlTest-rawData.xml", testFilename );
 
    for ( rank_I=0; rank_I< data->nProcs; rank_I++ ) {
       if ( rank_I == data->rank ) {
@@ -829,7 +829,6 @@ void IO_HandlerSuite_TestReadWrongRootNode( IO_HandlerSuiteData* data ) {
 
 
 void IO_HandlerSuite( pcu_suite_t* suite ) {
-   pcu_filename_setModule( "Base/IO" );
    pcu_suite_setData( suite, IO_HandlerSuiteData );
    pcu_suite_setFixtures( suite, IO_HandlerSuite_Setup, IO_HandlerSuite_Teardown );
    pcu_suite_addTest( suite, IO_HandlerSuite_TestWriteReadNormalEntries );

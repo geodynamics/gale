@@ -19,6 +19,7 @@
 
 #include <stdlib.h>
 #include <assert.h>
+#include <string.h>
 #include "types.h"
 #include "runner.h"
 #include "suite.h"
@@ -67,15 +68,19 @@ void pcu_runner_run( pcu_listener_t* lsnr ) {
 }
 
 void _pcu_runner_addSuite( const char* name, 
-			   void (initfunc)( pcu_suite_t* ) )
+			   void (initfunc)( pcu_suite_t* ),
+            const char* moduleDir )
 {
    pcu_suite_t* suite;
 
    assert( initfunc );
+   assert( name );
+   assert( moduleDir );
 
    /* Setup the new suite. */
    suite = (pcu_suite_t*)malloc( sizeof(pcu_suite_t) );
-   suite->name = name;
+   suite->name = strdup( name );
+   suite->moduleDir = strdup( moduleDir );
    suite->ntests = 0;
    suite->tests = NULL;
    suite->npassed = 0;

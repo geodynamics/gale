@@ -32,7 +32,8 @@ def build_suite_runner(env, target, hdrs, objs, **kw):
 
     for h in hdrs:
         name = os.path.splitext(os.path.basename(h.path))[0]
-        suite_txt += "   pcu_runner_addSuite( %s, %s );\n"%(name, name + init)
+        moduleDir = os.path.split( os.path.dirname( h.path ) )[0]
+        suite_txt += "   pcu_runner_addSuite( %s, %s, %s );\n"%(name, name + init, moduleDir )
         hdr_txt += "#include \"%s\"\n"%str(h.abspath)
 
     src = """#include <stdlib.h>
@@ -47,8 +48,6 @@ int main( int argc, char* argv[] ) {
    MPI_Init( &argc, &argv );
    pcu_runner_init( argc, argv );%s
 
-   pcu_filename_setProject( "%s" );
-
 %s
    lsnr = pcu_textoutput_create();
    pcu_runner_run( lsnr );
@@ -58,7 +57,7 @@ int main( int argc, char* argv[] ) {
    MPI_Finalize();
    return EXIT_SUCCESS;
 }
-"""%(libheaders, hdr_txt, setup, project_name, suite_txt, teardown)
+"""%(libheaders, hdr_txt, setup, suite_txt, teardown)
 
     dir_path = os.path.dirname(target.abspath)
     if not os.path.exists(dir_path):

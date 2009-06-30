@@ -165,6 +165,9 @@ void pcu_suite_clear( pcu_suite_t* suite ) {
    pcu_source_t* src;
    pcu_suite_t* sub;
 
+   free( suite->name );
+   free( suite->moduleDir );
+
    while( suite->tests ) {
       while( suite->tests->srcs ) {
          src = suite->tests->srcs->next;

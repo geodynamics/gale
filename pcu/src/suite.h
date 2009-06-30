@@ -21,7 +21,8 @@
 #define pcu_suite_h
 
 struct pcu_suite_t {
-      const char* name;
+      char* name;
+      char* moduleDir;
       int ntests;
       pcu_test_t* tests;
       int npassed;

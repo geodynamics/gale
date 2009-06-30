@@ -24,9 +24,10 @@ void pcu_runner_init( int argc, char* argv[] );
 void pcu_runner_finalise();
 void pcu_runner_run( pcu_listener_t* lsnr );
 void _pcu_runner_addSuite( const char* name,
-			   void (initfunc)( pcu_suite_t* ) );
+			   void (initfunc)( pcu_suite_t* ),
+            const char* moduleDir );
 
-#define pcu_runner_addSuite( suite, initfunc )  \
-   _pcu_runner_addSuite( #suite, initfunc )
+#define pcu_runner_addSuite( suite, initfunc, moduleDir )  \
+   _pcu_runner_addSuite( #suite, initfunc, #moduleDir )
 
 #endif
