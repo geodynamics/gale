@@ -41,6 +41,7 @@
 #include "ModulesManager.h"
 #include "ToolboxesManager.h"
 
+#include <stdlib.h>
 
 /* Textual name of this class */
 const Type ToolboxesManager_Type = "ToolboxesManager";
@@ -103,12 +104,20 @@ void _ToolboxesManager_Init( void* toolboxesManager, int* argc, char*** argv ) {
 	
 	self->argc = argc;
 	self->argv = argv;
+	self->_initialisedSize = 8;
+	self->initialised = Memory_Alloc_Array( char*, self->_initialisedSize, ToolboxesManager_Type );
+	self->_initialisedCount = 0;
 }
 
 
 void _ToolboxesManager_Delete( void* toolboxesManager ) {
 	ToolboxesManager*         self = (ToolboxesManager*)toolboxesManager;
 
+	Memory_Free( self->initialised );
+	self->_initialisedSize = 0;
+	self->_initialisedCount = 0;
+	self->initialised = 0;
+	
 	/* Delete parent */
 	_ModulesManager_Delete( self );
 }
@@ -118,6 +127,17 @@ void _ToolboxesManager_Print( void* toolboxesManager, Stream* stream ) {
 	
 	/* General info */
 	Journal_Printf( (void*) stream, "Toolboxes (ptr): %p\n", self );
+	
+	if( self->_initialisedCount > 0 ) {
+		Index i;
+		
+		Journal_Printf( stream, "Initialised Modules:\n" );
+		Stream_Indent( stream );
+		for( i = 0; i < self->_initialisedCount; ++i ) {
+			Journal_Printf( stream, "%s\n", self->initialised[i] );
+		}
+		Stream_UnIndent( stream );
+	}
 	
 	/* Print parent */
 	_ModulesManager_Print( self, stream );
@@ -149,4 +169,35 @@ Bool _ToolboxesManager_UnloadToolbox( void* toolboxesManager, Module* toolbox ) 
 	((Toolbox*)toolbox)->Finalise( self );
     
 	return True;
+}
+
+Index ToolboxesManager_SetInitialised( void* initRegister, char* label ) {
+	ToolboxesManager* self = (ToolboxesManager*)initRegister;
+	
+	if( self->_initialisedCount == self->_initialisedSize ) {
+		Index oldSize = self->_initialisedSize;
+		char** tmp;
+		
+		self->_initialisedSize += 8;
+		tmp = Memory_Alloc_Array( char*, self->_initialisedSize, ToolboxesManager_Type );
+		memcpy( tmp, self->initialised, sizeof( char* ) * oldSize );
+		Memory_Free( self->initialised );
+		self->initialised = tmp;
+	}
+	
+	self->initialised[self->_initialisedCount] = StG_Strdup( label );
+	self->_initialisedCount += 1;
+	return self->_initialisedCount - 1;
+}
+
+Bool ToolboxesManager_IsInitialised( void* initRegister, char* label ) {
+	ToolboxesManager* self = (ToolboxesManager*)initRegister;
+	Index i;
+	
+	for( i = 0; i < self->_initialisedCount; i++ ) {
+		if( strcmp( label, self->initialised[i] ) == 0 ) {
+			return True;
+		}
+	}
+	return False;
 }

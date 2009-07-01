@@ -55,7 +55,10 @@
 		\
 		/* Toolboxes info */ \
 		int*       argc; \
-		char***    argv; 
+		char***    argv; \
+		char**     initialised; \
+		Index      _initialisedSize; \
+		Index      _initialisedCount;
 		
 	struct ToolboxesManager { __ToolboxesManager };
 	
@@ -88,7 +91,7 @@
 	/* Print implementation */
 	void _ToolboxesManager_Print( void* toolboxesManager, Stream* stream );
 	
-	/** Get the plugins list from the dictionary */
+	/** Get the toolbox list from the dictionary */
 	Dictionary_Entry_Value* _ToolboxesManager_GetToolboxesList(  void* toolboxesManager, void* dictionary );
 	
 	/** Exactly what to do to load the toolbox */
@@ -98,5 +101,15 @@
 	Bool _ToolboxesManager_UnloadToolbox( void* toolboxesManager, Module* toolbox );
 
 	#define ToolboxesManager_Submit ModulesManager_Submit
+
+	/** Let StGermain know that the "Init" function of a module has been called. This exists to handle the case where a module
+	   is linked into a binary and the user attempts to module load the module too. */
+	Index ToolboxesManager_SetInitialised( void* toolboxesManager, char* label );
+	
+	/** This exists to handle the case where a module is linked into a binary and the user attempts to module load the module too. 
+	   Its expected at modules will check to see if they have been inited already before doing initialisation work in the init 
+	   function. */
+	Bool ToolboxesManager_IsInitialised( void* toolboxesManager, char* label );
+
 
 #endif /* __Base_Extensibility_ToolboxesManager_h__ */
