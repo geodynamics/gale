@@ -54,31 +54,37 @@
 /** Initialises this package, then any init for this package
 such as streams etc */
 Bool PICellerator_Init( int* argc, char** argv[] ) {
-	int tmp;
-	char* directory;
+	/* This init function tells StGermain of all the component types, etc this module contributes. Because it can be linked at compile
+	   time or linked in by a toolbox at runtime, we need to make sure it isn't run twice (compiled in and loaded through a toolbox.*/
+	if( !ToolboxesManager_IsInitialised( stgToolboxesManager, "PICellerator" ) ) {
+		int tmp;
+		char* directory;
 
-	PICellerator_PopulationControl_Init( argc, argv );
-	PICellerator_Weights_Init( argc, argv );
-	PICellerator_MaterialPoints_Init( argc, argv );
-	PICellerator_Utils_Init( argc, argv );
+		PICellerator_PopulationControl_Init( argc, argv );
+		PICellerator_Weights_Init( argc, argv );
+		PICellerator_MaterialPoints_Init( argc, argv );
+		PICellerator_Utils_Init( argc, argv );
 	
-	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
-	tmp = Stream_GetPrintingRank( Journal_Register( InfoStream_Type, "Context" ) );
-	Stream_SetPrintingRank( Journal_Register( InfoStream_Type, "Context" ), 0 );
-	Journal_Printf( /* DO NOT CHANGE OR REMOVE */
-		Journal_Register( InfoStream_Type, "Context" ), 
-		"Particle-In-Cellerator (FEM/PIC framework) revision %s. Copyright (C) 2005 VPAC & Monash Cluster Computing.\n", VERSION );
-	Stream_Flush( Journal_Register( InfoStream_Type, "Context" ) );
-	Stream_SetPrintingRank( Journal_Register( InfoStream_Type, "Context" ), tmp );
+		Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
+		tmp = Stream_GetPrintingRank( Journal_Register( InfoStream_Type, "Context" ) );
+		Stream_SetPrintingRank( Journal_Register( InfoStream_Type, "Context" ), 0 );
+		Journal_Printf( /* DO NOT CHANGE OR REMOVE */
+			Journal_Register( InfoStream_Type, "Context" ), 
+			"Particle-In-Cellerator (FEM/PIC framework) revision %s. Copyright (C) 2005 VPAC & Monash Cluster Computing.\n", VERSION );
+		Stream_Flush( Journal_Register( InfoStream_Type, "Context" ) );
+		Stream_SetPrintingRank( Journal_Register( InfoStream_Type, "Context" ), tmp );
 
-	/* Add the PICellerator path to the global xml path dictionary */
-	directory = Memory_Alloc_Array( char, 200, "xmlDirectory" ) ;
-	sprintf(directory, "%s%s", LIB_DIR, "/StGermain" );
-	XML_IO_Handler_AddDirectory( "PICellerator", directory );
-	Memory_Free(directory);
+		/* Add the PICellerator path to the global xml path dictionary */
+		directory = Memory_Alloc_Array( char, 200, "xmlDirectory" ) ;
+		sprintf(directory, "%s%s", LIB_DIR, "/StGermain" );
+		XML_IO_Handler_AddDirectory( "PICellerator", directory );
+		Memory_Free(directory);
 	
-	/* Add the plugin path to the global plugin list */
-	ModulesManager_AddDirectory( "PICellerator", LIB_DIR );
+		/* Add the plugin path to the global plugin list */
+		ModulesManager_AddDirectory( "PICellerator", LIB_DIR );
 
-	return True;
+		ToolboxesManager_SetInitialised( stgToolboxesManager, "PICellerator" );
+		return True;
+	}
+	return False;
 }
