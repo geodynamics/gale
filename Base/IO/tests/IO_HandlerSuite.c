@@ -287,6 +287,8 @@ void IO_HandlerSuite_TestReadWhitespaceEntries( IO_HandlerSuiteData* data ) {
 
 
 /* Testing the functionality of using included files. Including specifying a search path */
+/* Note: it'd be good to use the PCU input fule capabilities, but unfortunately Scons glob doesn't seem to support
+ * subdirectories currently. */
 void IO_HandlerSuite_TestReadIncludedFile( IO_HandlerSuiteData* data ) {
    Index             ii;
    const char*       testFilename = "xmlTest-include.xml";
@@ -360,10 +362,10 @@ void IO_HandlerSuite_TestReadIncludedFile( IO_HandlerSuiteData* data ) {
 
    MPI_Barrier(data->comm);
    if (data->rank==0) {
-      //remove( testFilename );
-      //remove( testIncludedFilename );
-      //remove( subdirIncludedFilenameSP );
-      //rmdir( testSearchPathSubdir );
+      remove( testFilename );
+      remove( testIncludedFilename );
+      remove( subdirIncludedFilenameSP );
+      rmdir( testSearchPathSubdir );
    }
    Memory_Free( subdirIncludedFilenameSP );
 }
