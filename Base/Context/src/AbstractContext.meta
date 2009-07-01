@@ -23,16 +23,6 @@
 
 <p>The Context is the first component to start. An AbstractContext goes through a setup phase before proceeding to its run phase.  During setup, it goes through build and then initialise function calls. Each step contains entry point, and a hook is positioned there to attach each function call.  Following the setup phase, AbstractContext enters the Run phase.  It encapsulates timing, stepping through iterations to solve the equation, and collating and saving output. </p>
 
-<p>A note on checkpoints: Checkpoints are places where states of variables are saved.
-When using checkpoints, identify which variables to checkpoint and specify the frequency (the number of timesteps between checkpoint event).
-You may want to restart from last checkpoint to:
-modify parameters at a moment and run from there rather than re-calculating the all timesteps
-save the state before a scheduled interruption, or for when time-sharing processor/memory resources where a modelling job may take weeks in total to run
-save current state if you think it may be a useful point to rollback to, or to resume from after an unscheduled interruption
-skip the setup process for frequently performed tasks to save time.
-</p>
-
-<p>For more information on checkpointing, see the wiki.</p>
 </param>
 
 
