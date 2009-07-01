@@ -360,10 +360,10 @@ void IO_HandlerSuite_TestReadIncludedFile( IO_HandlerSuiteData* data ) {
 
    MPI_Barrier(data->comm);
    if (data->rank==0) {
-      remove( testFilename );
-      remove( testIncludedFilename );
-      remove( subdirIncludedFilenameSP );
-      rmdir( testSearchPathSubdir );
+      //remove( testFilename );
+      //remove( testIncludedFilename );
+      //remove( subdirIncludedFilenameSP );
+      //rmdir( testSearchPathSubdir );
    }
    Memory_Free( subdirIncludedFilenameSP );
 }
@@ -518,7 +518,10 @@ void IO_HandlerSuite_TestReadAllFromCommandLine( IO_HandlerSuiteData* data ) {
  * done in DictionarySuite.c */
 void IO_HandlerSuite_TestReadDuplicateEntryKeys( IO_HandlerSuiteData* data ) {
    Index                   ii=0;
-   const char*             xmlTestFilename = "testXML-dupKeys.xml";
+   char                    xmlTestFilename1[PCU_PATH_MAX];
+   char                    xmlTestFilename2[PCU_PATH_MAX];
+   char                    xmlTestFilename3_1[PCU_PATH_MAX];
+   char                    xmlTestFilename3_2[PCU_PATH_MAX];
    const char*             struct1Name = "structOne";
    const int               struct1_OrigParamCount = 2;
    const char*             paramNames[2] = { "paramOne", "paramTwo" };
@@ -534,44 +537,15 @@ void IO_HandlerSuite_TestReadDuplicateEntryKeys( IO_HandlerSuiteData* data ) {
    char                    xmlLine[1000];
    Index                   rank_I;
 
+   /* Only do this test for processor 0, to avoid probs with multiple opens */
+   if ( data->rank != 0 ) return;
+   
    /* Sub-test 1: we expect default behaviour is "replace", therefore the 2nd struct
     *  should be the only entry */
    pcu_check_true( IO_Handler_DefaultMergeType == Dictionary_MergeType_Replace );
 
-   if (data->rank==0) {
-      struct1Entry[0] = '\0';
-      struct2Entry[0] = '\0';
-
-      sprintf( xmlLine, "<struct name=\"%s\">\n", struct1Name );
-      strcat( struct1Entry, xmlLine );
-      sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames[0], paramVals[0] );
-      strcat( struct1Entry, xmlLine );
-      sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames[1], paramVals[1] );
-      strcat( struct1Entry, xmlLine );
-      sprintf( xmlLine, "</struct>\n" );
-      strcat( struct1Entry, xmlLine );
-
-      sprintf( xmlLine, "<struct name=\"%s\">\n", struct1Name );
-      strcat( struct2Entry, xmlLine );
-      sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames2[0], paramVals2[0] );
-      strcat( struct2Entry, xmlLine );
-      sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames2[1], paramVals2[1] );
-      strcat( struct2Entry, xmlLine );
-      sprintf( xmlLine, "</struct>\n" );
-      strcat( struct2Entry, xmlLine );
-
-      Stg_asprintf( &testEntries, "%s%s", struct1Entry, struct2Entry );
-      _IO_HandlerSuite_CreateTestXMLFile( xmlTestFilename, testEntries );
-      Memory_Free( testEntries );
-   }
-   MPI_Barrier(data->comm);
-
-   for ( rank_I=0; rank_I< data->nProcs; rank_I++ ) {
-      if ( rank_I == data->rank ) {
-         IO_Handler_ReadAllFromFile( data->io_handler, xmlTestFilename, data->dict2 );
-      }
-      MPI_Barrier( data->comm );
-   }
+   pcu_filename_input( "testXML-dupKeys-1.xml", xmlTestFilename1 );
+   IO_Handler_ReadAllFromFile( data->io_handler, xmlTestFilename1, data->dict2 );
 
    pcu_check_true( 1 == data->dict2->count );
    pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0],
@@ -584,36 +558,11 @@ void IO_HandlerSuite_TestReadDuplicateEntryKeys( IO_HandlerSuiteData* data ) {
          (Dictionary_Entry_Key)paramNames2[ii] );
       pcu_check_true( paramVals2[ii] == Dictionary_Entry_Value_AsUnsignedInt( elementDev ) );
    }
-   MPI_Barrier(data->comm);
-   if(data->rank==0) {
-      remove( xmlTestFilename );
-   }
    Dictionary_Empty( data->dict2 );
 
    /* Sub-test 2: with mergeType as "append", the 2 structs should be 2 separate entries */
-   if (data->rank==0) {
-      sprintf( struct2Entry, "" );
-      sprintf( xmlLine, "<struct name=\"%s\" mergeType=\"append\">\n", struct1Name );
-      strcat( struct2Entry, xmlLine );
-      sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames[0], paramVals2[0] );
-      strcat( struct2Entry, xmlLine );
-      sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames[1], paramVals2[1] );
-      strcat( struct2Entry, xmlLine );
-      sprintf( xmlLine, "</struct>\n" );
-      strcat( struct2Entry, xmlLine );
-
-      Stg_asprintf( &testEntries, "%s%s", struct1Entry, struct2Entry );
-      _IO_HandlerSuite_CreateTestXMLFile( xmlTestFilename, testEntries );
-      Memory_Free( testEntries );
-   }
-   MPI_Barrier(data->comm);
-
-   for ( rank_I=0; rank_I< data->nProcs; rank_I++ ) {
-      if ( rank_I == data->rank ) {
-         IO_Handler_ReadAllFromFile( data->io_handler, xmlTestFilename, data->dict2 );
-      }
-      MPI_Barrier( data->comm );
-   }
+   pcu_filename_input( "testXML-dupKeys-2.xml", xmlTestFilename2 );
+   IO_Handler_ReadAllFromFile( data->io_handler, xmlTestFilename2, data->dict2 );
 
    pcu_check_true( 2 == data->dict2->count );
    /* First entry should be unchanged */
@@ -638,37 +587,12 @@ void IO_HandlerSuite_TestReadDuplicateEntryKeys( IO_HandlerSuiteData* data ) {
          (Dictionary_Entry_Key)paramNames[ii] );
       pcu_check_true( paramVals2[ii] == Dictionary_Entry_Value_AsUnsignedInt( elementDev ) );
    }
-   MPI_Barrier(data->comm);
-   if (data->rank==0) {
-      remove( xmlTestFilename );
-   }
    Dictionary_Empty( data->dict2 );
 
    /* Sub-test 3.1: with mergeType as "merge", structs to be merged.
     * However, default childrenMergeType is "append", so all entries added */
-   if (data->rank==0) {
-      sprintf( struct2Entry, "" );
-      sprintf( xmlLine, "<struct name=\"%s\" mergeType=\"merge\">\n", struct1Name );
-      strcat( struct2Entry, xmlLine );
-      sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames[1], paramVals2[1] );
-      strcat( struct2Entry, xmlLine );
-      sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames2[0], paramVals2[0] );
-      strcat( struct2Entry, xmlLine );
-      sprintf( xmlLine, "</struct>\n" );
-      strcat( struct2Entry, xmlLine );
-
-      Stg_asprintf( &testEntries, "%s%s", struct1Entry, struct2Entry );
-      _IO_HandlerSuite_CreateTestXMLFile( xmlTestFilename, testEntries );
-      Memory_Free( testEntries );
-   }
-   MPI_Barrier(data->comm);
-
-   for ( rank_I=0; rank_I< data->nProcs; rank_I++ ) {
-      if ( rank_I == data->rank ) {
-         IO_Handler_ReadAllFromFile( data->io_handler, xmlTestFilename, data->dict2 );
-      }
-      MPI_Barrier( data->comm );
-   }
+   pcu_filename_input( "testXML-dupKeys-3_1.xml", xmlTestFilename3_1 );
+   IO_Handler_ReadAllFromFile( data->io_handler, xmlTestFilename3_1, data->dict2 );
 
    pcu_check_true( 1 == data->dict2->count );
    pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0],
@@ -689,37 +613,12 @@ void IO_HandlerSuite_TestReadDuplicateEntryKeys( IO_HandlerSuiteData* data ) {
    pcu_check_streq( structDict->entryPtr[3]->key, paramNames2[0] );
    elementDev = structDict->entryPtr[3]->value;
    pcu_check_true( paramVals2[0] == Dictionary_Entry_Value_AsUnsignedInt( elementDev ) );
-   MPI_Barrier(data->comm);
-   if(data->rank==0) {
-      remove( xmlTestFilename );
-   }
    Dictionary_Empty( data->dict2 );
 
    /* Sub-test 3.2: with mergeType as "merge", structs to be merged.
     * childrenMergeType set to merge also */
-   if (data->rank==0) {
-      sprintf( struct2Entry, "" );
-      sprintf( xmlLine, "<struct name=\"%s\" mergeType=\"merge\" childrenMergeType=\"merge\">\n", struct1Name );
-      strcat( struct2Entry, xmlLine );
-      sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames[1], paramVals2[1] );
-      strcat( struct2Entry, xmlLine );
-      sprintf( xmlLine, "<param name=\"%s\">%u</param>\n", paramNames2[0], paramVals2[0] );
-      strcat( struct2Entry, xmlLine );
-      sprintf( xmlLine, "</struct>\n" );
-      strcat( struct2Entry, xmlLine );
-
-      Stg_asprintf( &testEntries, "%s%s", struct1Entry, struct2Entry );
-      _IO_HandlerSuite_CreateTestXMLFile( xmlTestFilename, testEntries );
-      Memory_Free( testEntries );
-   }
-   MPI_Barrier(data->comm);
-
-   for ( rank_I=0; rank_I< data->nProcs; rank_I++ ) {
-      if ( rank_I == data->rank ) {
-         IO_Handler_ReadAllFromFile( data->io_handler, xmlTestFilename, data->dict2 );
-      }
-      MPI_Barrier( data->comm );
-   }
+   pcu_filename_input( "testXML-dupKeys-3_2.xml", xmlTestFilename3_2 );
+   IO_Handler_ReadAllFromFile( data->io_handler, xmlTestFilename3_2, data->dict2 );
 
    pcu_check_true( 1 == data->dict2->count );
    pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0],
@@ -737,10 +636,6 @@ void IO_HandlerSuite_TestReadDuplicateEntryKeys( IO_HandlerSuiteData* data ) {
    pcu_check_streq( structDict->entryPtr[2]->key, paramNames2[0] );
    elementDev = structDict->entryPtr[2]->value;
    pcu_check_true( paramVals2[0] == Dictionary_Entry_Value_AsUnsignedInt( elementDev ) );
-   MPI_Barrier(data->comm);
-   if(data->rank==0) {
-      remove( xmlTestFilename );
-   }
 }
 
 
