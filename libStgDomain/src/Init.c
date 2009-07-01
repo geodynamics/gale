@@ -42,21 +42,28 @@
 #include <stdio.h>
 
 Bool StgDomain_Init( int* argc, char** argv[] ) {
-	int tmp;
+	/* This init function tells StGermain of all the component types, etc this module contributes. Because it can be linked at compile
+	   time or linked in by a toolbox at runtime, we need to make sure it isn't run twice (compiled in and loaded through a toolbox.*/
+	if( !ToolboxesManager_IsInitialised( stgToolboxesManager, "StgDomain" ) ) {
+		int tmp;
 	
-	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
-	tmp = Stream_GetPrintingRank( Journal_Register( InfoStream_Type, "Context" ) );
-	Stream_SetPrintingRank( Journal_Register( InfoStream_Type, "Context" ), 0 );
-	Journal_Printf( /* DO NOT CHANGE OR REMOVE */
-		Journal_Register( InfoStream_Type, "Context" ), 
-		"StGermain Domain Library revision %s. Copyright (C) 2003-2007 VPAC.\n", VERSION );
-	Stream_Flush( Journal_Register( InfoStream_Type, "Context" ) );
-	Stream_SetPrintingRank( Journal_Register( InfoStream_Type, "Context" ), tmp );
+		Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
+		tmp = Stream_GetPrintingRank( Journal_Register( InfoStream_Type, "Context" ) );
+		Stream_SetPrintingRank( Journal_Register( InfoStream_Type, "Context" ), 0 );
+		Journal_Printf( /* DO NOT CHANGE OR REMOVE */
+			Journal_Register( InfoStream_Type, "Context" ), 
+			"StGermain Domain Library revision %s. Copyright (C) 2003-2007 VPAC.\n", VERSION );
+		Stream_Flush( Journal_Register( InfoStream_Type, "Context" ) );
+		Stream_SetPrintingRank( Journal_Register( InfoStream_Type, "Context" ), tmp );
 	
-	StgDomainGeometry_Init( argc, argv );
-	StgDomainShape_Init( argc, argv );
-	StgDomainMesh_Init( argc, argv );
-	StgDomainUtils_Init( argc, argv );
-	StgDomainSwarm_Init( argc, argv );
-	return True;
+		StgDomainGeometry_Init( argc, argv );
+		StgDomainShape_Init( argc, argv );
+		StgDomainMesh_Init( argc, argv );
+		StgDomainUtils_Init( argc, argv );
+		StgDomainSwarm_Init( argc, argv );
+
+		ToolboxesManager_SetInitialised( stgToolboxesManager, "StgDomain" );
+		return True;
+	}
+	return False;
 }
