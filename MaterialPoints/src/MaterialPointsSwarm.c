@@ -307,7 +307,7 @@ void _MaterialPointsSwarm_Build( void* swarm, void* data ) {
 		}
 	}
 
-	Journal_Firewall( ( self->commHandlerList >= 1) && (movementCommHandlerFound == True),
+	Journal_Firewall( (Stg_ObjectList_Count(self->commHandlerList) >= 1) && (movementCommHandlerFound == True),
 		errorStream, "Error: for MaterialPointsSwarm Swarms, at least one ParticleMovementHandler"
 			" commHandler must be registered. Please rectify this in your XML / code.\n" );
 
