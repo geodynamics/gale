@@ -41,6 +41,9 @@
 
 #define NUM_DATA 100
 
+/*
+ * Define the context data structure to be usesd for each test-case.
+ */
 typedef struct {
    LinkedList*       numList;
    int*              array[NUM_DATA];
@@ -197,8 +200,13 @@ void LinkedListSuite_TestFindNodeData( LinkedListSuiteData* data ) {
 
 
 void LinkedListSuite( pcu_suite_t* suite ) {
+    /* Tell PCU the context data type to pass to each test-case in this suite. */
    pcu_suite_setData( suite, LinkedListSuiteData );
+
+   /* Set the fixtures to be run before and after each test-case. */
    pcu_suite_setFixtures( suite, LinkedListSuite_Setup, LinkedListSuite_Teardown );
+
+   /* Add all the test-cases. */
    pcu_suite_addTest( suite, LinkedListSuite_TestInsert );
    pcu_suite_addTest( suite, LinkedListSuite_TestDelete );
    pcu_suite_addTest( suite, LinkedListSuite_TestReturnArray );
