@@ -236,8 +236,8 @@ void IO_HandlerSuite_TestWriteExplicitTypes( IO_HandlerSuiteData* data ) {
       IO_Handler_WriteAllToFile( data->io_handler, testFilename, data->dict1 );
    }
 
-	explicitTypesExpectedFilename = Memory_Alloc_Array_Unnamed( char, 
-		pcu_filename_expectedLen( "explicitTypesExpected.xml" ));
+   explicitTypesExpectedFilename = Memory_Alloc_Array_Unnamed( char, 
+      pcu_filename_expectedLen( "explicitTypesExpected.xml" ));
    pcu_filename_expected( "explicitTypesExpected.xml", explicitTypesExpectedFilename );
    pcu_check_fileEq( testFilename, explicitTypesExpectedFilename );
 
