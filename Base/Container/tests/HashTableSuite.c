@@ -40,108 +40,10 @@
 #include "HashTableSuite.h"
 
 
-#define NUM_WORDS 100
-const char* WordList_Global[NUM_WORDS] = {
-   "antarctic", 
-   "escheat", 
-   "cardioid", 
-   "solidus", 
-   "memoir", 
-   "piteous", 
-   "felt", 
-   "frown", 
-   "fanout", 
-   "allowance", 
-   "up", 
-   "semester", 
-   "threat", 
-   "plunge", 
-   "head", 
-   "sepal", 
-   "gumbo", 
-   "textile", 
-   "slugging", 
-   "blurt", 
-   "thanksgiving", 
-   "apace", 
-   "pattern", 
-   "stance", 
-   "circumspect", 
-   "buret", 
-   "sudden", 
-   "sequent", 
-   "monitor", 
-   "diabase", 
-   "bandstand", 
-   "nitride", 
-   "clothesmen", 
-   "assassin", 
-   "firemen", 
-   "us", 
-   "depression", 
-   "bastard", 
-   "climatology", 
-   "nether", 
-   "posthumous", 
-   "virile", 
-   "caulk", 
-   "etude", 
-   "germinate", 
-   "licensor", 
-   "potlatch", 
-   "stanch", 
-   "crucifixion", 
-   "millions", 
-   "misshapen", 
-   "lottery", 
-   "worth", 
-   "chert", 
-   "observe", 
-   "fidelity", 
-   "precaution", 
-   "intelligentsia", 
-   "bleed", 
-   "kennel", 
-   "town", 
-   "cabinet", 
-   "univariate", 
-   "anatomy", 
-   "exogamy", 
-   "embolden", 
-   "kibitz", 
-   "anyplace", 
-   "cavort", 
-   "clipboard", 
-   "divorcee", 
-   "melodic", 
-   "grillwork", 
-   "magnitude", 
-   "fiduciary", 
-   "electronic", 
-   "infantrymen", 
-   "wildlife", 
-   "excrescent", 
-   "steepen", 
-   "exhale", 
-   "insuppressible", 
-   "heal", 
-   "drawl", 
-   "presentation", 
-   "whinny", 
-   "free", 
-   "involve", 
-   "controller", 
-   "orchestrate", 
-   "amoeba", 
-   "eerie", 
-   "loin", 
-   "jiggle", 
-   "biology", 
-   "fairy", 
-   "buggy", 
-   "ephemerides", 
-   "arhat", 
-   "conscript" };
+unsigned int NumWords_Global = 0; 
+/* Expect to read in ~100 words */
+char* WordList_Global[1000];
+
 
 typedef struct {
    HashTable*       table;
@@ -181,7 +83,7 @@ void checkFunction( void *entry, void *arg ){
 	
 	assert( entry );
 
-   for (ii=0; ii<NUM_WORDS; ii++) {
+   for (ii=0; ii<NumWords_Global; ii++) {
 	   if ( 0 == strcmp( entry, WordList_Global[ii] ) ) {
          wordFoundArray[ii] = True;
          break;
@@ -195,7 +97,7 @@ void checkPtrFunction( void *entry, void *arg ){
 	
 	assert( entry );
 
-   for (ii=0; ii<NUM_WORDS; ii++) {
+   for (ii=0; ii<NumWords_Global; ii++) {
       /* Deliberately comparing ptrs here, rather than strings */
 	   if ( entry == dataRefs[ii].ptr ) {
          dataRefs[ii].found = True;
@@ -206,13 +108,32 @@ void checkPtrFunction( void *entry, void *arg ){
 
 
 void HashTableSuite_Setup( HashTableSuiteData* data ) {
+   char     dictFilename[PCU_PATH_MAX];
+   FILE*    dictFile=NULL;
+   char     wordBuffer[1024];
+
+   /* Read in the words from the dictionary file */
+   pcu_filename_input( "dictionary.txt", dictFilename );
+   dictFile = fopen( dictFilename, "r+" );
+   NumWords_Global=0;
+   while( (fgets( wordBuffer, sizeof(wordBuffer), dictFile ) != NULL) ){
+      WordList_Global[NumWords_Global++] = StG_Strdup(wordBuffer);
+   }
+   fclose( dictFile );
+
    data->table = HashTable_New( NULL, printFunction, NULL, HASHTABLE_STRING_KEY );
    data->ptrTable = HashTable_New( NULL, ptrPrintFunction, deleteFunction, HASHTABLE_POINTER_KEY );
 }
 
 void HashTableSuite_Teardown( HashTableSuiteData* data ) {
+   Index    ii;
+
    Stg_Class_Delete( data->table );
    Stg_Class_Delete( data->ptrTable );
+   for ( ii=0; ii < NumWords_Global; ii++ ) {
+      Memory_Free( WordList_Global[ii] );
+   }
+   NumWords_Global=0;
 }
 
 
@@ -220,19 +141,19 @@ void HashTableSuite_TestInsert( HashTableSuiteData* data ) {
    char           *word = NULL;
    int            result = 0;
    int            sum = 0;
-   Bool           wordFoundArray[NUM_WORDS];
+   Bool           wordFoundArray[NumWords_Global];
    Index          ii=0;
    
    
    /* Testing hash table with string keys..\n\n */
    /* Inserting data into the hash table\n\n */
-   for (ii=0; ii<NUM_WORDS; ii++) {
+   for (ii=0; ii<NumWords_Global; ii++) {
       word = StG_Strdup(WordList_Global[ii]);
       result = HashTable_InsertEntry( data->table, (void*)word, strlen(word), (void*)word, strlen(word));
       sum += result;
    }
    
-   pcu_check_true( NUM_WORDS == data->table->count );
+   pcu_check_true( NumWords_Global == data->table->count );
 
    /* The count of insertion operations should be at least the number of entries we inserted */
    pcu_check_true( sum >= 0 );
@@ -244,11 +165,11 @@ void HashTableSuite_TestInsert( HashTableSuiteData* data ) {
    
    /* Now parse the tree, and check the actual entries - note they won't necessarily be in same 'order'
     * while being parsed */
-   for (ii=0; ii<NUM_WORDS; ii++) {
+   for (ii=0; ii<NumWords_Global; ii++) {
       wordFoundArray[ii] = False;
    }   
    HashTable_ParseTable( data->table, checkFunction, wordFoundArray );
-   for (ii=0; ii<NUM_WORDS; ii++) {
+   for (ii=0; ii<NumWords_Global; ii++) {
       pcu_check_true( wordFoundArray[ii] == True );
    }
 }
@@ -260,12 +181,12 @@ void HashTableSuite_TestSearch( HashTableSuiteData* data ) {
    char*          searchResult = NULL;
 
    /* Inserting data into the hash table\n\n */
-   for (ii=0; ii<NUM_WORDS; ii++) {
+   for (ii=0; ii<NumWords_Global; ii++) {
       word = StG_Strdup(WordList_Global[ii]);
       HashTable_InsertEntry( data->table, (void*)word, strlen(word), (void*)word, strlen(word));
    }
    
-   for (ii=0; ii<NUM_WORDS; ii++) {
+   for (ii=0; ii<NumWords_Global; ii++) {
       searchResult = (char*)HashTable_FindEntry( data->table, WordList_Global[ii], strlen(WordList_Global[ii]), char* );
       pcu_check_true( searchResult != NULL );
       pcu_check_streq( WordList_Global[ii], searchResult );
@@ -277,24 +198,24 @@ void HashTableSuite_TestInsertPointers( HashTableSuiteData* data ) {
    char           *word = NULL;
    int            result = 0;
    int            sum = 0;
-   DataRef        dataRefs[NUM_WORDS];
+   DataRef        dataRefs[NumWords_Global];
    Index          ii=0;
 
-   for (ii=0; ii<NUM_WORDS; ii++) {
+   for (ii=0; ii<NumWords_Global; ii++) {
       dataRefs[ii].ptr = NULL;
       dataRefs[ii].found = False;
    }
    /* Testing hash table with pointer keys..\n\n */
    /* Inserting data into the hash table\n\n */
    
-   for (ii=0; ii<NUM_WORDS; ii++) {
+   for (ii=0; ii<NumWords_Global; ii++) {
       word = StG_Strdup(WordList_Global[ii]);
       result = HashTable_InsertEntry( data->ptrTable, (void*)word, sizeof(void*), (void*)word, strlen(word));
       sum += result;
       dataRefs[ii].ptr = word;
    }
    
-   pcu_check_true( NUM_WORDS == data->ptrTable->count );
+   pcu_check_true( NumWords_Global == data->ptrTable->count );
 
    /* The count of insertion operations should be at least the number of entries we inserted */
    pcu_check_true( sum >= 0 );
@@ -307,7 +228,7 @@ void HashTableSuite_TestInsertPointers( HashTableSuiteData* data ) {
    /* Now parse the tree, and check the actual entries - note they won't necessarily be in same 'order'
     * while being parsed */
    HashTable_ParseTable( data->ptrTable, checkPtrFunction, dataRefs );
-   for (ii=0; ii<NUM_WORDS; ii++) {
+   for (ii=0; ii<NumWords_Global; ii++) {
       pcu_check_true( dataRefs[ii].found == True );
    }
 }
@@ -316,22 +237,22 @@ void HashTableSuite_TestInsertPointers( HashTableSuiteData* data ) {
 /* Searching for items in the table:\n\n */
 void HashTableSuite_TestSearchPointers( HashTableSuiteData* data ) {
    char           *word = NULL;
-   DataRef        dataRefs[NUM_WORDS];
+   DataRef        dataRefs[NumWords_Global];
    Index          ii=0;
    char*          searchResult = NULL;
 
-   for (ii=0; ii<NUM_WORDS; ii++) {
+   for (ii=0; ii<NumWords_Global; ii++) {
       dataRefs[ii].ptr = NULL;
       dataRefs[ii].found = False;
    }
    /* Inserting data into the hash table\n\n */
-   for (ii=0; ii<NUM_WORDS; ii++) {
+   for (ii=0; ii<NumWords_Global; ii++) {
       word = StG_Strdup(WordList_Global[ii]);
       HashTable_InsertEntry( data->ptrTable, (void*)word, sizeof(void*), (void*)word, strlen(word));
       dataRefs[ii].ptr = word;
    }
  
-   for (ii=0; ii<NUM_WORDS; ii++) {
+   for (ii=0; ii<NumWords_Global; ii++) {
       searchResult = (char*)HashTable_FindEntry( data->ptrTable, (void*)dataRefs[ii].ptr, 0, char* );
       pcu_check_true( searchResult != NULL );
       pcu_check_streq( WordList_Global[ii], searchResult );
