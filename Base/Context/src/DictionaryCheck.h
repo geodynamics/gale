@@ -43,6 +43,6 @@
 	
 	void BaseContext_DictionaryCheck( Dictionary* dictionary );
 	
-	void CheckDictionaryKeys(Dictionary* dictionary, char* errorMessage);
+	void CheckDictionaryKeys(Dictionary* dictionary, const char* errorMessage);
 	
 #endif /* __Base_BaseContext_DictionaryCheck_h__ */

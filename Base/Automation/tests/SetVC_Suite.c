@@ -40,6 +40,7 @@
 #include "StGermain/Base/Automation/Automation.h"
 #include "SetVC_Suite.h"
 
+/* Note that these params below must match up with setVC.xml input file for the test to work */
 #define NUM_VARS 7
 #define X_INDEX 0
 #define Y_INDEX 1
@@ -68,7 +69,6 @@ typedef struct {
    Index                         arraySize;
    char*                         varNames[NUM_VARS];
    Variable*                     var[NUM_VARS];
-   char*                         setVC_Key;
    VariableCondition*            vc;
 } SetVC_SuiteData;
 
@@ -79,68 +79,16 @@ void quadratic(Index index, Variable_Index var_I, void* context, void* result)
 }
 
 
-void SetVC_Suite_CreateDictEntries( SetVC_SuiteData* data ) {
-   Dictionary*             setVCDict = NULL;
-   Dictionary_Entry_Value* indicesList = NULL;
-   Dictionary_Entry_Value* variablesList = NULL;
-   Dictionary*             variableEntry = NULL;
-   Dictionary_Entry_Value* arrayIndicesList = NULL;
-   Index                   node_I=0, array_I=0;
-
-   setVCDict = Dictionary_New();
-
-   Dictionary_AddFromString(  setVCDict, "type", "SetVC" );
-   Dictionary_AddFromInt(     setVCDict, "indexCount", NUM_NODES );
-
-   indicesList = Dictionary_Entry_Value_NewList();
-   for (node_I=0; node_I <= LAST_VC_NODE_INDEX; node_I++) {
-      if ( (node_I%2) == 0) {
-         Dictionary_Entry_Value_AddElement( indicesList, Dictionary_Entry_Value_FromInt( node_I ) );
-      }
-   }
-   Dictionary_Add( setVCDict, "indices", indicesList );
-
-   variablesList = Dictionary_Entry_Value_NewList();
-   variableEntry = Dictionary_New();
-   Dictionary_AddFromString(  variableEntry, "name",  data->varNames[VX_INDEX] );
-   Dictionary_AddFromString(  variableEntry, "type",  "double" );
-   Dictionary_AddFromDouble(  variableEntry, "value", VX_CONDVALUE );
-   Dictionary_Entry_Value_AddElement( variablesList, Dictionary_Entry_Value_FromStruct( variableEntry ) );
-   variableEntry = Dictionary_New();
-   Dictionary_AddFromString(  variableEntry, "name",  data->varNames[VY_INDEX] );
-   Dictionary_AddFromString(  variableEntry, "type",  "func" );
-   Dictionary_AddFromString(  variableEntry, "value", "quadratic" );
-   Dictionary_Entry_Value_AddElement( variablesList, Dictionary_Entry_Value_FromStruct( variableEntry ) );
-   variableEntry = Dictionary_New();
-   Dictionary_AddFromString(  variableEntry, "name",  data->varNames[VZ_INDEX] );
-   Dictionary_AddFromString(  variableEntry, "type",  "double" );
-   Dictionary_AddFromDouble(  variableEntry, "value", VZ_CONDVALUE );
-   Dictionary_Entry_Value_AddElement( variablesList, Dictionary_Entry_Value_FromStruct( variableEntry ) );
-   variableEntry = Dictionary_New();
-   Dictionary_AddFromString(  variableEntry, "name",  data->varNames[TEMP_INDEX] );
-   Dictionary_AddFromString(  variableEntry, "type",  "array" );
-   arrayIndicesList = Dictionary_Entry_Value_NewList();
-   for (array_I=0; array_I < TEMP_VAR_ARRAYSIZE ; array_I++) {
-      Dictionary_Entry_Value_AddElement( arrayIndicesList,
-         Dictionary_Entry_Value_FromInt( TEMP_CONDVALUE_BASE + array_I ) );
-   }
-   Dictionary_Add(  variableEntry, "value", arrayIndicesList );
-   Dictionary_Entry_Value_AddElement( variablesList, Dictionary_Entry_Value_FromStruct( variableEntry ) );
-   Dictionary_Add( setVCDict, "variables", variablesList );
-
-   Dictionary_AddFromDictionary( data->dict, data->setVC_Key, setVCDict );
-}
-
-
 void SetVC_Suite_Setup( SetVC_SuiteData* data ) {
-   Index                         ii=0;
-   
+   Index             ii=0;
+   char              setVC_XMLFilename[PCU_PATH_MAX];
+   XML_IO_Handler*   io_handler = XML_IO_Handler_New();
+
    data->vr = Variable_Register_New();
    data->conFunc_Register = ConditionFunction_Register_New();
    data->dict = Dictionary_New();
    data->arraySize = NUM_NODES;
 
-   Stg_asprintf( &data->setVC_Key, "setVC" );
    Stg_asprintf( &data->varNames[X_INDEX], "x" );
    Stg_asprintf( &data->varNames[Y_INDEX], "y" );
    Stg_asprintf( &data->varNames[Z_INDEX], "z" );
@@ -149,7 +97,9 @@ void SetVC_Suite_Setup( SetVC_SuiteData* data ) {
    Stg_asprintf( &data->varNames[VZ_INDEX], "vz" );
    Stg_asprintf( &data->varNames[TEMP_INDEX], "temp" );
 
-   SetVC_Suite_CreateDictEntries( data );
+   /* Load the definition of the SetVC from XML */
+   pcu_filename_input( "setVC.xml", setVC_XMLFilename );
+   IO_Handler_ReadAllFromFile( io_handler, setVC_XMLFilename, data->dict );
    
    /* Create CF stuff */
    data->quadCF = ConditionFunction_New( quadratic, "quadratic" );
@@ -171,7 +121,7 @@ void SetVC_Suite_Setup( SetVC_SuiteData* data ) {
    Variable_Register_BuildAll( data->vr );
    
    /* Create the VC */
-   data->vc = (VariableCondition*)SetVC_New( "SetVC", data->setVC_Key, data->vr, data->conFunc_Register, data->dict );
+   data->vc = (VariableCondition*)SetVC_New( "setVC", "setVC", data->vr, data->conFunc_Register, data->dict );
    Stg_Component_Build( data->vc, 0, False );
 
    /* Blank the memory to be applied to before the test */
@@ -179,6 +129,8 @@ void SetVC_Suite_Setup( SetVC_SuiteData* data ) {
       memset(data->array[ii], 0, sizeof(double)*NUM_NODES);
    }
    memset(data->array[TEMP_INDEX], 0, sizeof(double)*NUM_NODES*TEMP_VAR_ARRAYSIZE);
+
+   Memory_Free( io_handler );
 }
 
 

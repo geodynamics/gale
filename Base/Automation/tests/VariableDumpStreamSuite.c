@@ -126,6 +126,8 @@ void VariableDumpStreamSuite_TestDump( VariableDumpStreamSuiteData* data ) {
    Stream_Flush( dumpStream2 );
 
    /* Really, you'd think there'd be a function to read a dumpStream. Anyway, hard-code for now */
+   /* Don't want to use expected files here, since we need to continually check the writing ability
+    * of these dump streams */ 
    scalarDumpFile = fopen( scalarDumpFilename, "r" );
    vectorDumpFile = fopen( vectorDumpFilename, "r" );
    for ( i = 0; i < length; ++i ) {

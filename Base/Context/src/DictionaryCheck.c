@@ -49,7 +49,7 @@
 
 
 
-void CheckDictionaryKeys( Dictionary* dictionary, char* errorMessage)
+void CheckDictionaryKeys( Dictionary* dictionary, const char* errorMessage)
 {
 	Dictionary_Index index_I, index_J;
 	/* Put in the Journal_Firewall stream */
@@ -111,7 +111,7 @@ void CheckDictionaryKeys( Dictionary* dictionary, char* errorMessage)
 	if (errCount > 0) {
 		Index errIndex;
 		Journal_Printf(errStream, errorMessage);
-		Journal_Printf(errStream,"Error found in dictionary (ptr) %p:\n",dictionary);
+		Journal_Printf(errStream,"Error found in given dictionary:\n", dictionary);
 		Journal_Printf(errStream,"The following keys were repeated:\n");
 		Stream_Indent(errStream);
 		for (errIndex = 0; errIndex < errCount; errIndex++) {
