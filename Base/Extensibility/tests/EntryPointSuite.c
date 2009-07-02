@@ -254,24 +254,10 @@ void EntryPointSuite_TestPrintConcise( EntryPointSuiteData* data ) {
    EntryPoint_PrintConcise( data->ep, stream );
 
    if (data->rank==0) {
-      FILE*          testFile = NULL;
-      #define        MAX_LINE_SIZE 1000
-      char           readLine[MAX_LINE_SIZE];
-      char           expString[MAX_LINE_SIZE];
-      Hook_Index     hookIndex;
+      char        expectedFilename[PCU_PATH_MAX];
 
-      testFile = fopen( testFilename, "r" );
-      pcu_check_true( fgets( readLine, MAX_LINE_SIZE, testFile ) );
-      sprintf( expString, "\tEP: %s\n", data->ep->name );
-      pcu_check_streq( readLine, expString );
-
-      for (hookIndex = 0; hookIndex < data->ep->hooks->count; hookIndex++ ) {
-         pcu_check_true( fgets( readLine, MAX_LINE_SIZE, testFile ) );
-         sprintf( expString, "\t\tH: \"TestHook%u\" (%s)\n", hookIndex, "testCode" );
-         pcu_check_streq( readLine, expString );
-      }
-
-      fclose( testFile );
+      pcu_filename_expected( testFilename, expectedFilename );
+      pcu_check_fileEq( testFilename, expectedFilename );
       remove( testFilename );
    }
 }
