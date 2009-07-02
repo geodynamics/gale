@@ -20,9 +20,11 @@
 #ifndef pcu_runner_h
 #define pcu_runner_h
 
+typedef enum { PCU_RUNNER_FAILS, PCU_RUNNER_ALLPASS } PCU_Runner_Status;
+
 void pcu_runner_init( int argc, char* argv[] );
 void pcu_runner_finalise();
-void pcu_runner_run( pcu_listener_t* lsnr );
+PCU_Runner_Status pcu_runner_run( pcu_listener_t* lsnr );
 void _pcu_runner_addSuite( const char* name,
 			   void (initfunc)( pcu_suite_t* ),
             const char* moduleDir );

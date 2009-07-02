@@ -58,10 +58,11 @@ void pcu_runner_finalise() {
    }
 }
 
-void pcu_runner_run( pcu_listener_t* lsnr ) {
+PCU_Runner_Status pcu_runner_run( pcu_listener_t* lsnr ) {
    pcu_suite_t* cur;
    unsigned int totalPasses=0; 
    unsigned int totalTests=0; 
+   PCU_Runner_Status returnStatus;
 
    cur = pcu_suites;
    while( cur ) {
@@ -75,6 +76,15 @@ void pcu_runner_run( pcu_listener_t* lsnr ) {
       printf( "-----------------------------------------------------------\n" );
       printf( "Total passes: %d/%d\n", totalPasses, totalTests );
    }
+
+   if ( totalPasses == totalTests ) {
+      returnStatus = PCU_RUNNER_ALLPASS;
+   }
+   else {
+      returnStatus = PCU_RUNNER_FAILS;
+   }
+   
+   return returnStatus;
 }
 
 void _pcu_runner_addSuite( const char* name, 

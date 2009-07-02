@@ -43,19 +43,25 @@ def build_suite_runner(env, target, hdrs, objs, **kw):
 %s
 
 int main( int argc, char* argv[] ) {
-   pcu_listener_t* lsnr;
+   pcu_listener_t*   lsnr;
+   PCU_Runner_Status result;
 
    MPI_Init( &argc, &argv );
    pcu_runner_init( argc, argv );%s
 
 %s
    lsnr = pcu_textoutput_create();
-   pcu_runner_run( lsnr );
+   result = pcu_runner_run( lsnr );
    pcu_textoutput_destroy( lsnr );
 %s
    pcu_runner_finalise();
    MPI_Finalize();
-   return EXIT_SUCCESS;
+   if ( result == PCU_RUNNER_ALLPASS ) {
+      return EXIT_SUCCESS;
+   }
+   else {
+      return EXIT_FAILURE;
+   }
 }
 """%(libheaders, hdr_txt, setup, suite_txt, teardown)
 
