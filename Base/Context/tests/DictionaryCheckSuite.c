@@ -56,14 +56,12 @@ void DictionaryCheckSuite_Teardown( DictionaryCheckSuiteData* data ) {
 void DictionaryCheckSuite_TestCheckKeys( DictionaryCheckSuiteData* data ) {
    Dictionary*       dictionary = Dictionary_New();
    Dictionary*       dictionary2 = Dictionary_New();
-   const char*       testFilename = "./testDictionaryCheck.txt";
-   FILE*             testFile = NULL;
-   #define           MAXLINE 1000
-   char              inputLine[MAXLINE];
-   Dictionary_Index   index;
-   char*             errMessage = "Component dictionary must have unique names\n";
+   const char*       testFilename1 = "testDictionaryCheck-1.txt";
+   const char*       testFilename2 = "testDictionaryCheck-2.txt";
+   char              expectedFilename[PCU_PATH_MAX];
+   const char*       errMessage = "Component dictionary must have unique names\n";
    
-   Stream_RedirectFile(Journal_Register( Error_Type, "DictionaryCheck"), testFilename );
+   Stream_RedirectFile(Journal_Register( Error_Type, "DictionaryCheck"), testFilename1 );
    Stream_SetPrintingRank(Journal_Register( Error_Type, "DictionaryCheck"), 0 );
    Stream_ClearCustomFormatters( Journal_Register( Error_Type, "DictionaryCheck") );
 
@@ -83,17 +81,9 @@ void DictionaryCheckSuite_TestCheckKeys( DictionaryCheckSuiteData* data ) {
    CheckDictionaryKeys(dictionary,  errMessage);
 
    if ( data->rank==0 ) {
-      testFile = fopen( testFilename, "r" );
-      pcu_check_true( fgets( inputLine, MAXLINE, testFile ));
-      pcu_check_streq( inputLine, errMessage );
-      pcu_check_true( fgets( inputLine, MAXLINE, testFile ));
-      /* Ignore the actual 2nd line, since it includes a memory ptr print and hard to compare */
-      pcu_check_true( fgets( inputLine, MAXLINE, testFile ));
-      pcu_check_streq( inputLine, "The following keys were repeated:\n" );
-      pcu_check_true( fgets( inputLine, MAXLINE, testFile ));
-      pcu_check_streq( inputLine, "\t\"test_dict_string\"\n" );
-      pcu_check_true( fgets( inputLine, MAXLINE, testFile ));
-      pcu_check_streq( inputLine, "Error in CheckDictionaryKeys with 1 entries in dictionary keys\n" );
+      pcu_filename_expected( testFilename1, expectedFilename );
+      pcu_check_fileEq( testFilename1, expectedFilename );
+      remove( testFilename1 );
    }
 
    /* For dictionary2 */
@@ -105,19 +95,22 @@ void DictionaryCheckSuite_TestCheckKeys( DictionaryCheckSuiteData* data ) {
       Dictionary_Entry_Value_FromString( "hello") );
 
    /* Call DictionaryCheck function */
+   Stream_RedirectFile(Journal_Register( Error_Type, "DictionaryCheck"), testFilename2 );
    CheckDictionaryKeys(dictionary2, errMessage);
 
-   /* there shouldn't be any more error lines printed about the 2nd dictionary */
+   /* This file expected to be empty */
    if ( data->rank==0 ) {
-      pcu_check_true( NULL == fgets( inputLine, MAXLINE, testFile ) );
+      pcu_filename_expected( testFilename2, expectedFilename );
+      pcu_check_fileEq( testFilename2, expectedFilename );
+      remove( testFilename2 );
    }
    
    Stg_Class_Delete( dictionary );
    Stg_Class_Delete( dictionary2 );
 
    if ( data->rank==0 ) {
-      fclose( testFile );
-      remove( testFilename );
+      remove( testFilename1 );
+      remove( testFilename2 );
    }
 }
 
