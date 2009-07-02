@@ -62,10 +62,10 @@ void pcu_suite_run( pcu_suite_t* suite, pcu_listener_t* lsnr ) {
    while( suite->curtest ) {
       /* Run the test. */
       if( suite->setup )
-	 suite->setup( suite->data );
+         suite->setup( suite->data );
       pcu_test_run( suite->curtest, lsnr );
       if( suite->teardown )
-	 suite->teardown( suite->data );
+         suite->teardown( suite->data );
 
       /* Move to the next test. */
       suite->curtest = suite->curtest->next;

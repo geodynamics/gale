@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
+#include <stdio.h>
 #include "types.h"
 #include "runner.h"
 #include "suite.h"
@@ -59,11 +60,20 @@ void pcu_runner_finalise() {
 
 void pcu_runner_run( pcu_listener_t* lsnr ) {
    pcu_suite_t* cur;
+   unsigned int totalPasses=0; 
+   unsigned int totalTests=0; 
 
    cur = pcu_suites;
    while( cur ) {
       pcu_suite_run( cur, lsnr );
+      totalPasses += cur->npassed;
+      totalTests += cur->ntests;
       cur = cur->next;
+   }
+
+   if ( pcu_nsuites > 1 ) {
+      printf( "-----------------------------------------------------------\n" );
+      printf( "Total passes: %d/%d\n", totalPasses, totalTests );
    }
 }
 
