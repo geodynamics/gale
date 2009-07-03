@@ -11,7 +11,7 @@
 <param name="Copyright">Copyright (c) 2005, Monash Cluster Computing</param>
 <param name="License">http://www.opensource.org/licenses/bsd-license.php</param>
 <param name="Parent">YieldRheology</param>
-<param name="Reference">See following reference for details : Anisotropic viscous models of large-deformation Mohr–Coulomb failure, Moresi, L.; Muhlhaus, H.-B., Philosophical Magazine, Volume 86, Numbers 21-22, -22/21 July–1 August 2006, pp. 3287-3305</param>
+<param name="Reference">See following reference for details : Anisotropic viscous models of large-deformation Mohr-Coulomb failure, Moresi, L.; Muhlhaus, H.-B., Philosophical Magazine, Volume 86, Numbers 21-22, -22/21 July–1 August 2006, pp. 3287-3305</param>
 <param name="Summary">...</param>
 <param name="Description">Implements faulting behaviour based on Mohr-Coulomb failure criterion. </param>
 
