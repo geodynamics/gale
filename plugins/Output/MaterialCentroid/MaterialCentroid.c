@@ -63,6 +63,8 @@ void MaterialCentroid( PICelleratorContext* context ) {
 		Name                 swarmName;
 		Name                 materialName;
 		Name                 filename;
+      Bool                 fileOpened;
+      Stream*              errorStream  = Journal_Register( Error_Type, CURR_MODULE_NAME );
 
 		swarmName = Dictionary_GetString_WithDefault( context->dictionary, "MaterialCentroid_Swarm", "picIntegrationPoints" );
 		
@@ -77,7 +79,19 @@ void MaterialCentroid( PICelleratorContext* context ) {
 		
 		/* Set up stream */
 		Stg_asprintf( &filename, "%sCentroid.dat", materialName );
-		Stream_RedirectFile_WithPrependedPath( stream, context->outputPath, filename );
+      /* Open File */
+      if ( context->rank == 0 ) {
+         if ( context->loadFromCheckPoint == False ) {
+            /* Always overwrite the file if starting a new run */
+            fileOpened = Stream_RedirectFile_WithPrependedPath( stream, context->outputPath, filename );
+         } else {
+            /* Just append to the file if doing a restart from checkpoint */
+            fileOpened = Stream_AppendFile_WithPrependedPath( stream, context->outputPath, filename );
+         }
+         Journal_Firewall( fileOpened, errorStream, 
+               "Could not open file %s/%s. Possibly directory %s does not exist or is not writable.\n"
+               "Check 'outputPath' in input file.\n", context->outputPath, filename, context->outputPath );
+      }
 		Memory_Free( filename );
 		Stream_SetAutoFlush( stream, True );
 
