@@ -177,12 +177,13 @@ void lucDrawingObject_Setup( void* drawingObject, void* context ) {
 
 void lucDrawingObject_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* viewportInfo, void* context ) {
 	lucDrawingObject*   self       = (lucDrawingObject*) drawingObject ;
-
+   double time;
+   
 	lucDebug_PrintFunctionBegin( self, 2 );
 
 	lucDrawingObject_Setup( self, context );
 	
-	double time = MPI_Wtime();
+	time = MPI_Wtime();
 	
 	self->_draw( self, window, viewportInfo, context );
 	
