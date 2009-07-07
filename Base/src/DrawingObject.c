@@ -188,7 +188,7 @@ void lucDrawingObject_Draw( void* drawingObject, lucWindow* window, lucViewportI
 	self->_draw( self, window, viewportInfo, context );
 	
 	time = MPI_Wtime() - time;
-	Journal_DPrintfL( lucDebug, 2, "(%s) Drawing took %f seconds\n", time, self->name );
+	Journal_DPrintfL( lucDebug, 2, "(%s) Drawing took %f seconds\n", self->name, time );
 
 	lucDebug_PrintFunctionEnd( self, 2 );
 }
