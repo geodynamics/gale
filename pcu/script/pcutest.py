@@ -99,11 +99,13 @@ def generate(env, **kw):
         prog_src = build_suite_runner(env, File(str(target[0]) + ".c"), hdrs, objs, **kw)
 
         # Build everything.
+        exps = multiget([kw, env], 'PCU_EXP', [])
+        inputs = multiget([kw, env], 'PCU_INPUT', [])
         objs = env.StaticObject(os.path.splitext(prog_src.abspath)[0], prog_src) + objs
         libs = multiget([kw, env], 'LIBS', []) + ["pcu"]
         test = env.Program(target[0], objs, LIBS=libs)
         runner = env.Action(test[0].abspath)
-        env.Alias(env["PCUTEST_TARGET"], test, runner)
+        env.Alias(env["PCUTEST_TARGET"], [exps, inputs, test], runner)
         env.AlwaysBuild(env["PCUTEST_TARGET"])
         return test
 

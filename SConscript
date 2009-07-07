@@ -106,6 +106,8 @@ env.PCUTest('tests/testStGermain', suites,
     PCU_SETUP="StGermain_Init(&argc, &argv);",
     PCU_TEARDOWN="StGermain_Finalise();",
     LIBS=libs,
+    PCU_EXP=tst_exp,
+    PCU_INPUT=tst_input,
     PROJECT="StGermain")
 
 # Copy XML validation file to correct destination.
