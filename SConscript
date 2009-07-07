@@ -78,6 +78,8 @@ env.PCUTest('tests/testglucifer', suites,
             PCU_TEARDOWN="glucifer_Finalise();StgFEM_Finalise();" \
                 "StgDomain_Finalise();StGermain_Finalise();",
             LIBS=libs,
+            PCU_EXP=tst_exp,
+            PCU_INPUT=tst_input,
             PROJECT="glucifer")
 
 # Build plugins.
