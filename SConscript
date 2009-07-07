@@ -80,6 +80,8 @@ env.PCUTest('tests/testStgFEM', suites,
             PCU_TEARDOWN="StgFEM_Finalise();StgDomain_Finalise();" \
                 "StGermain_Finalise();",
             LIBS=libs,
+            PCU_EXP=tst_exp,
+            PCU_INPUT=tst_input,
             PROJECT="StgFEM")
 
 # Build plugins.
