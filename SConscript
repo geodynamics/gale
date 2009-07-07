@@ -78,6 +78,8 @@ env.PCUTest('tests/testPICellerator', suites,
             PCU_TEARDOWN="PICellerator_Finalise();StgFEM_Finalise();" \
                 "StgDomain_Finalise();StGermain_Finalise();",
             LIBS=libs,
+            PCU_EXP=tst_exp,
+            PCU_INPUT=tst_input,
             PROJECT="PICellerator")
 
 # Build plugins.
