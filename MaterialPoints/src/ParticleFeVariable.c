@@ -155,8 +155,10 @@ void _ParticleFeVariable_Init( ParticleFeVariable* self, IntegrationPointsSwarm*
 		ForceTerm_New( "massMatrixForceTerm", self->massMatrix, (Swarm*)swarm, (Stg_Component*) self );
 	ForceTerm_SetAssembleElementFunction( self->massMatrixForceTerm, ParticleFeVariable_AssembleElementShapeFunc );
 	
-	/*EP_AppendClassHook( Context_GetEntryPoint( context, AbstractContext_EP_UpdateClass ),	ParticleFeVariable_Update, self );*/
-	EP_AppendClassHook( Context_GetEntryPoint( context, "stokesEqn-execute" ), _ParticleFeVariable_Execute, self );
+   
+   /* Changed by PatrickSunter, 8/7/2009 - used to append onto stokesEqn-execute. However
+    * this component should work for other FE systems other than the Stokes solver */
+	EP_InsertClassHookBefore( Context_GetEntryPoint( context, AbstractContext_EP_UpdateClass ), "TimeIntegrator_UpdateClass", _ParticleFeVariable_Execute, self );
 	ParticleFeVariable_names[ParticleFeVariable_nNames++] = self->name;
 
 	self->useDeriv = False;
