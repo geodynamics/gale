@@ -52,12 +52,16 @@
 #include <stdio.h>
 
 Bool PICellerator_Finalise( void ) {
-	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
-	
-	PICellerator_Utils_Finalise();
-	PICellerator_MaterialPoints_Finalise();
-	PICellerator_Weights_Finalise();
-	PICellerator_PopulationControl_Finalise();
-	
-	return True;
+	if( !ToolboxesManager_IsInitialised( stgToolboxesManager, "PICellerator" ) ) {
+		Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
+		
+		PICellerator_Utils_Finalise();
+		PICellerator_MaterialPoints_Finalise();
+		PICellerator_Weights_Finalise();
+		PICellerator_PopulationControl_Finalise();
+		
+		return True;
+	} else {
+		return False;
+	}
 }
