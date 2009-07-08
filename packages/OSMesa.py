@@ -4,6 +4,7 @@ class OSMesa(Package):
 
     def gen_locations(self):
         yield ('/usr', ['/usr/include/GL'], ['/usr/lib'])
+        yield ('/usr', ['/usr/include/GL'], ['/usr/lib64'])
         yield ('/usr', ['/usr/include/GL'], ['/usr/X11R6/lib'])
         yield ('/usr', ['/usr/include/GL'], ['/usr/X11R6/lib64'])
         yield ('/usr/X11R6', ['/usr/X11R6/include'], ['/usr/X11R6/lib'])
