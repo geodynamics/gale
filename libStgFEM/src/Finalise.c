@@ -50,12 +50,16 @@
 #include <stdio.h>
 
 Bool StgFEM_Finalise( void ) {
-	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
-	
-	Stream_IndentBranch( StgFEM_Debug );
-	StgFEM_Discretisation_Finalise();
-	StgFEM_SLE_Finalise();
-	StgFEM_Assembly_Finalise();
-	Stream_UnIndentBranch( StgFEM_Debug );
-	return True;
+	if( !ToolboxesManager_IsInitialised( stgToolboxesManager, "StgFEM" ) ) {
+		Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
+		
+		Stream_IndentBranch( StgFEM_Debug );
+		StgFEM_Discretisation_Finalise();
+		StgFEM_SLE_Finalise();
+		StgFEM_Assembly_Finalise();
+		Stream_UnIndentBranch( StgFEM_Debug );
+		return True;
+	} else {
+		return False;
+	}
 }
