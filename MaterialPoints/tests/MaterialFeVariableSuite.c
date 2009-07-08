@@ -47,7 +47,6 @@ void MaterialFeVariableSuite_Setup( MaterialFeVariableSuiteData* data ) {
    Dictionary*       dictionary = NULL;
    Bool              result;
    XML_IO_Handler*   ioHandler;
-   AbstractContext*  context;
 
    dictionary = Dictionary_New();
    ioHandler = XML_IO_Handler_New();
@@ -56,20 +55,18 @@ void MaterialFeVariableSuite_Setup( MaterialFeVariableSuiteData* data ) {
    Journal_ReadFromDictionary( dictionary );
 
    /* Magic happens here! */
-   context = stgMainInit( dictionary, MPI_COMM_WORLD );
-   stgMainLoop( context );
+   data->context = (PICelleratorContext*)stgMainInit( dictionary, MPI_COMM_WORLD );
+   stgMainLoop( (AbstractContext*)data->context );
 } 
 
 
 void MaterialFeVariableSuite_Teardown( MaterialFeVariableSuiteData* data ) {
-   Stg_Component_Destroy( data->context, 0 /* dummy */, False );
-   Stg_Class_Delete( data->context );
+   stgMainDestroy( (AbstractContext*)data->context );
 }
 
 
 void MaterialFeVariableSuite_TestVolume( MaterialFeVariableSuiteData* data ) {
 /** Test Definition: This test compares the volume of a swarm as calculated based on the material points swarm and as calculate from a MaterialFeVariable */
-   PICelleratorContext* context = data->context;
    IntegrationPointsSwarm* swarm;
    MaterialFeVariable* materialFeVariable;
    Material*           material;
@@ -80,8 +77,8 @@ void MaterialFeVariableSuite_TestVolume( MaterialFeVariableSuiteData* data ) {
 
    char   testStr[] = "This test compares the volume of a swarm as calculated based on the material points swarm and as calculate from a MaterialFeVariable\n";
 
-   materialFeVariable = (MaterialFeVariable*) LiveComponentRegister_Get( context->CF->LCRegister, "materialFeVariable" );
-   gaussSwarm = (Swarm*) LiveComponentRegister_Get( context->CF->LCRegister, "gaussSwarm" );
+   materialFeVariable = (MaterialFeVariable*) LiveComponentRegister_Get( data->context->CF->LCRegister, "materialFeVariable" );
+   gaussSwarm = (Swarm*) LiveComponentRegister_Get( data->context->CF->LCRegister, "gaussSwarm" );
 
    assert(materialFeVariable);
    assert(gaussSwarm);
