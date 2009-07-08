@@ -117,6 +117,8 @@ TestContext* TestContext_New(
    ctx->dumpHookCalled = 0;
    ctx->checkpointHookCalled = 0;
    ctx->computedValue = 0;
+   
+   return ctx;
 }
 
 
