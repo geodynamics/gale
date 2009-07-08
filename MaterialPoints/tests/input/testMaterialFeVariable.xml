@@ -7,18 +7,15 @@
 		<param>PICellerator</param>
 	</list>
 
-	<include>StgFEM/ConstantMesh.xml</include>
 	<include>StgFEM/LinearMesh.xml</include>
 	<include>StgFEM/VelocityField.xml</include>
-	<include>StgFEM/PressureField.xml</include>
 	<include>StgFEM/GaussSwarm.xml</include>
 	<include>StgFEM/TimeIntegrator.xml</include>
-	<include>StgFEM/StokesFlowUzawa.xml</include>
 
 	<struct name="components" mergeType="merge">
 		<struct name="elementCellLayout">
 			<param name="Type">ElementCellLayout</param>
-			<param name="Mesh">linearMesh</param>
+			<param name="Mesh">elementMesh</param>
 		</struct>
 		<struct name="everywhereShape">
 			<param name="Type">Everywhere</param>
@@ -52,7 +49,7 @@
 			<param name="Type">IntegrationPointsSwarm</param>
 			<param name="CellLayout">elementCellLayout</param>
 			<param name="ParticleLayout">localLayout</param>
-			<param name="FeMesh">linearMesh</param>
+			<param name="FeMesh">elementMesh</param>
 			<param name="WeightsCalculator">weights</param>
 			<param name="TimeIntegrator">timeIntegrator</param>
 			<param name="IntegrationPointMapper">mapper</param>
@@ -69,7 +66,7 @@
 			<param name="Type">MaterialPointsSwarm</param>
 			<param name="CellLayout">elementCellLayout</param>
 			<param name="ParticleLayout">picIntegrationPointsParticleLayout</param>
-			<param name="FeMesh">linearMesh</param>
+			<param name="FeMesh">elementMesh</param>
 			<list name="ParticleCommHandlers">
 				<param>pMovementHandler</param>
 			</list>			
@@ -87,13 +84,12 @@
 			<param name="Swarm">picIntegrationPoints</param>
 			<param name="Material">material</param>
 			<param name="Context">context</param>
-			<param name="Mesh">linearMesh</param>
+			<param name="Mesh">elementMesh</param>
 		</struct>		
 	</struct>
 
 	<list name="plugins">
 		<param>StgFEM_StandardConditionFunctions</param>
-		<param>StgFEM_PrintFeVariableDiscreteValues_2dBox</param>
 	</list>
 	
 	<param name="journal.info.Context-verbose">true</param>
@@ -107,8 +103,10 @@
 	<param name="maxTimeSteps"> 1 </param>
 	<param name="dumpEvery"> 1 </param>
 	<param name="outputPath"> ./output </param>
-	<param name="dim"> 2 </param>
 	
+	<!-- General decomp stuff -->
+	<param name="dim"> 2 </param>
+	<param name="elementMesh"> linearMesh </param>
 	<!-- Mesh Stuff -->
 	<param name="elementResI"> 20 </param>
 	<param name="elementResJ"> 20 </param>
@@ -124,8 +122,10 @@
 	<param name="allowUnbalancing"> True </param>
 	<param name="buildElementNodeTbl"> True </param>
 
-	<list name="PrintFeVariableDiscreteValues_2dBox">
-		<param>materialFeVariable</param>
-	</list>
+	<!-- gauss integration point swarm parameters -->
+	<param name="gaussParticlesX"> 2 </param>
+	<param name="gaussParticlesY"> 2 </param>
+	<param name="gaussParticlesZ"> 2 </param>
+
 
 </StGermainData>
