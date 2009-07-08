@@ -18,6 +18,8 @@ def build_suite_runner(env, target, hdrs, objs, **kw):
     suite_txt = ""
     init = multiget([kw, env], "PCU_INIT", "")
 
+    bld_tests_dir = os.path.join( env['build_dir'], "tests" )
+
     libheaders = multiget([kw, env], "PCU_LIBHEADERS", "")
 
     project_name = multiget([kw, env], "PROJECT", "")
@@ -46,6 +48,8 @@ int main( int argc, char* argv[] ) {
    pcu_listener_t*   lsnr;
    PCU_Runner_Status result;
 
+   chdir( "%s" );
+
    MPI_Init( &argc, &argv );
    pcu_runner_init( argc, argv );%s
 
@@ -63,7 +67,7 @@ int main( int argc, char* argv[] ) {
       return EXIT_FAILURE;
    }
 }
-"""%(libheaders, hdr_txt, setup, suite_txt, teardown)
+"""%(libheaders, hdr_txt, bld_tests_dir, setup, suite_txt, teardown)
 
     dir_path = os.path.dirname(target.abspath)
     if not os.path.exists(dir_path):
