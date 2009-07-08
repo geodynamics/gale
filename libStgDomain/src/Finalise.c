@@ -42,13 +42,16 @@
 #include <stdio.h>
 
 Bool StgDomain_Finalise( void ) {
-	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
-	
-	StgDomainSwarm_Finalise();
-	StgDomainUtils_Finalise();
-	StgDomainMesh_Finalise();
-	StgDomainShape_Finalise();
-	StgDomainGeometry_Finalise();
-	
-	return True;
+	if( !ToolboxesManager_IsInitialised( stgToolboxesManager, "StgDomain" ) ) {
+		Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
+		
+		StgDomainSwarm_Finalise();
+		StgDomainUtils_Finalise();
+		StgDomainMesh_Finalise();
+		StgDomainShape_Finalise();
+		StgDomainGeometry_Finalise();
+		return True;
+	} else { 
+		return False;
+	}
 }
