@@ -36,7 +36,9 @@
 #include <StGermain/StGermain.h>
 #include <StgDomain/StgDomain.h>
 #include <StgFEM/StgFEM.h>
-#include "PICellerator/PICellerator.h"
+#include "PICellerator/PopulationControl/PopulationControl.h"
+#include "PICellerator/Weights/Weights.h"
+#include "PICellerator/MaterialPoints/MaterialPoints.h"
 
 typedef struct {
    PICelleratorContext* context;
@@ -48,14 +50,14 @@ void MaterialFeVariableSuite_Setup( MaterialFeVariableSuiteData* data ) {
    Bool              result;
    XML_IO_Handler*   ioHandler;
 
+   pcu_filename_input( "testMaterialFeVariable.xml", xmlInputFilename );
    dictionary = Dictionary_New();
    ioHandler = XML_IO_Handler_New();
-   pcu_filename_input( "testMaterialFeVariable.xml", xmlInputFilename );
    result = IO_Handler_ReadAllFromFile( ioHandler, xmlInputFilename, dictionary );
    Journal_ReadFromDictionary( dictionary );
 
-   /* Magic happens here! */
    data->context = (PICelleratorContext*)stgMainInit( dictionary, MPI_COMM_WORLD );
+
    stgMainLoop( (AbstractContext*)data->context );
 } 
 
