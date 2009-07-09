@@ -273,7 +273,7 @@ void _GlobalParticleLayout_InitialiseParticles( void* particleLayout, void* _swa
 	   reallocation. */
 	MPI_Comm_size( MPI_COMM_WORLD, &nRanks );
 	assert( swarm->particleLocalCount == 0 );
-	swarm->particleLocalCount = self->totalInitialParticles/nRanks;
+	swarm->particleLocalCount = self->totalInitialParticles/nRanks + 1;
 	Swarm_Realloc( swarm );
 	swarm->particleLocalCount = 0;
 	swarm->expanding = 1;
