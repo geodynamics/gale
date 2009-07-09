@@ -79,7 +79,10 @@ env.PCUTest('tests/testStgFEM', suites,
                 "StgFEM_Init(&argc, &argv);",
             PCU_TEARDOWN="StgFEM_Finalise();StgDomain_Finalise();" \
                 "StGermain_Finalise();",
-            LIBS=libs)
+            LIBS=libs,
+            PCU_EXP=tst_exp,
+            PCU_INPUT=tst_input,
+            PROJECT="StgFEM")
 
 # Build plugins.
 dirs = ['libStgFEM/Toolbox',

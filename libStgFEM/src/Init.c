@@ -52,30 +52,36 @@
 /** Initialises the Linear Algebra package, then any init for this package
 such as streams etc */
 Bool StgFEM_Init( int* argc, char** argv[] ) {
-	int tmp;
-	char* directory;
+	/* This init function tells StGermain of all the component types, etc this module contributes. Because it can be linked at compile
+	   time or linked in by a toolbox at runtime, we need to make sure it isn't run twice (compiled in and loaded through a toolbox.*/
+	if( !ToolboxesManager_IsInitialised( stgToolboxesManager, "StgFEM" ) ) {
+		int tmp;
+		char* directory;
 
-	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
-	tmp = Stream_GetPrintingRank( Journal_Register( InfoStream_Type, "Context" ) );
-	Stream_SetPrintingRank( Journal_Register( InfoStream_Type, "Context" ), 0 );
-	Journal_Printf( /* DO NOT CHANGE OR REMOVE */
-		Journal_Register( InfoStream_Type, "Context" ), 
-		"StGermain Finite Element Framework revision %s. Copyright (C) 2003-2005 VPAC.\n", VERSION );
-	Stream_Flush( Journal_Register( InfoStream_Type, "Context" ) );
-	Stream_SetPrintingRank( Journal_Register( InfoStream_Type, "Context" ), tmp );
+		Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
+		tmp = Stream_GetPrintingRank( Journal_Register( InfoStream_Type, "Context" ) );
+		Stream_SetPrintingRank( Journal_Register( InfoStream_Type, "Context" ), 0 );
+		Journal_Printf( /* DO NOT CHANGE OR REMOVE */
+			Journal_Register( InfoStream_Type, "Context" ), 
+			"StGermain Finite Element Framework revision %s. Copyright (C) 2003-2005 VPAC.\n", VERSION );
+		Stream_Flush( Journal_Register( InfoStream_Type, "Context" ) );
+		Stream_SetPrintingRank( Journal_Register( InfoStream_Type, "Context" ), tmp );
 	
-	StgFEM_Discretisation_Init( argc, argv );
-	StgFEM_SLE_Init( argc, argv );
-	StgFEM_Assembly_Init( argc, argv );
+		StgFEM_Discretisation_Init( argc, argv );
+		StgFEM_SLE_Init( argc, argv );
+		StgFEM_Assembly_Init( argc, argv );
 
-	/* Add the StgFEM path to the global xml path dictionary */
-	directory = Memory_Alloc_Array( char, 200, "xmlDirectory" ) ;
-	sprintf(directory, "%s%s", LIB_DIR, "/StGermain" );
-	XML_IO_Handler_AddDirectory("StgFEM", directory );
-	Memory_Free(directory);
+		/* Add the StgFEM path to the global xml path dictionary */
+		directory = Memory_Alloc_Array( char, 200, "xmlDirectory" ) ;
+		sprintf(directory, "%s%s", LIB_DIR, "/StGermain" );
+		XML_IO_Handler_AddDirectory("StgFEM", directory );
+		Memory_Free(directory);
 	
-	/* Add the plugin path to the global plugin list */
-	ModulesManager_AddDirectory( "StgFEM", LIB_DIR );
+		/* Add the plugin path to the global plugin list */
+		ModulesManager_AddDirectory( "StgFEM", LIB_DIR );
 
-	return True;
+		ToolboxesManager_SetInitialised( stgToolboxesManager, "StgFEM" );
+		return True;
+	}
+	return False;
 }
