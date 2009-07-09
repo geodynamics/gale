@@ -60,9 +60,10 @@ typedef struct {
    ExtensionManager_Register* extensionMgr_Register;
    Mesh*                      mesh;
    ElementCellLayout*         elementCellLayout;
-   RandomParticleLayout*      randomParticleLayout;
+   ParticleLayout*            particleLayout;
    Swarm*                     swarm;
    PeriodicBoundariesManager* perBCsManager;
+   Stg_Shape*                 shape;
 } PeriodicBoundariesManagerSuiteData;
 
 
@@ -70,11 +71,6 @@ FeMesh* configureFeMesh( double minCrd[3], double maxCrd[3], unsigned int sizes[
    CartesianGenerator*   gen;
    FeMesh*         feMesh;
    unsigned      maxDecomp[3] = {0, 1, 1};
-
-   sizes[0] = sizes[1] = 6;
-   sizes[2] = 1;
-   minCrd[0] = minCrd[1] = minCrd[2] = 0.0;
-   maxCrd[0] = maxCrd[1] = maxCrd[2] = 1.2;
 
    gen = CartesianGenerator_New( "" );
    CartesianGenerator_SetDimSize( gen, nDims );
@@ -94,6 +90,8 @@ void PeriodicBoundariesManagerSuite_Setup( PeriodicBoundariesManagerSuiteData* d
    unsigned                   numElements[3];
    double                     minCoords[3];
    double                     maxCoords[3];
+   Coord                      shapeCenter;
+   Coord                      shapeWidth;
    unsigned int               dim = 2;
 
    /* *** Journal stuff *** */
@@ -102,8 +100,8 @@ void PeriodicBoundariesManagerSuite_Setup( PeriodicBoundariesManagerSuiteData* d
 
    /* Read input */
    data->dictionary = Dictionary_New();
-   numElements[0] = 12;
-   numElements[1] = 12;
+   numElements[0] = 10;
+   numElements[1] = 10;
    numElements[2] = 1;
    minCoords[0] = 0.0f;
    minCoords[1] = 0.0f;
@@ -115,15 +113,21 @@ void PeriodicBoundariesManagerSuite_Setup( PeriodicBoundariesManagerSuiteData* d
    Dictionary_Add( data->dictionary, "seed", Dictionary_Entry_Value_FromUnsignedInt( 13 ) );
    /*  TODO: a 2nd test with the periodic shadowing enabled. Its handy to keep the orig one */
    /*    without it though. */
-   /* Dictionary_Add( dictionary, "isPeriodicI", Dictionary_Entry_Value_FromBool( True ) ); */
-   /* Dictionary_Add( dictionary, "isPeriodicJ", Dictionary_Entry_Value_FromBool( True ) ); */
 
    /* +++ CONSTRUCT PHASE +++ */
    data->extensionMgr_Register = ExtensionManager_Register_New();
    data->mesh = (Mesh*)configureFeMesh( minCoords, maxCoords, numElements, dim );
-   data->elementCellLayout = ElementCellLayout_New( "data->elementCellLayout", data->mesh );
-   data->randomParticleLayout = RandomParticleLayout_New( "data->randomParticleLayout", 1, 13 );
-   data->swarm = Swarm_New( "testSwarm", data->elementCellLayout, data->randomParticleLayout, 3, sizeof(Particle),
+   data->elementCellLayout = ElementCellLayout_New( "elementCellLayout", data->mesh );
+   shapeCenter[0] = 0.05;
+   shapeCenter[1] = 0.5;
+   shapeCenter[2] = 0.5;
+   shapeWidth[0] = 0.04;
+   shapeWidth[1] = 1;
+   shapeWidth[2] = 1;
+   data->shape = (Stg_Shape*)_Box_DefaultNew( "shape" );
+   Box_InitAll( data->shape, dim, shapeCenter, 0, 0, 0, shapeWidth );
+   data->particleLayout = (ParticleLayout*)WithinShapeParticleLayout_New( "particleLayout", dim, 10, data->shape );
+   data->swarm = Swarm_New( "testSwarm", data->elementCellLayout, data->particleLayout, 3, sizeof(Particle),
       data->extensionMgr_Register, NULL, MPI_COMM_WORLD, NULL );
    data->perBCsManager = PeriodicBoundariesManager_New( "perBCsManager", data->mesh, data->swarm,
       data->dictionary );
@@ -146,7 +150,8 @@ void PeriodicBoundariesManagerSuite_Teardown( PeriodicBoundariesManagerSuiteData
    /* Destroy stuff */
    Stg_Class_Delete( data->perBCsManager );
    Stg_Class_Delete( data->swarm );
-   Stg_Class_Delete( data->randomParticleLayout );
+   Stg_Class_Delete( data->shape );
+   Stg_Class_Delete( data->particleLayout );
    Stg_Class_Delete( data->elementCellLayout );
    Stg_Class_Delete( data->mesh );
    Stg_Class_Delete( data->extensionMgr_Register );
@@ -154,27 +159,34 @@ void PeriodicBoundariesManagerSuite_Teardown( PeriodicBoundariesManagerSuiteData
 }
 
 
-void PeriodicBoundariesManagerSuite_TestAdvectOverBoundaries( PeriodicBoundariesManagerSuiteData* data ) {
+void PeriodicBoundariesManagerSuite_TestAdvectOverLeftBoundary( PeriodicBoundariesManagerSuiteData* data ) {
    Index                      timeStep;
+   GlobalParticle*            currParticle;
+   Particle_Index             lParticle_I;
 
-   for ( timeStep=1; timeStep <= 5; timeStep++ ) {
-      Particle_Index lParticle_I;
-      
+   for ( timeStep=1; timeStep <= 10; timeStep++ ) {
       UpdateParticlePositionsToLeft( data->swarm );
-
       for ( lParticle_I = 0; lParticle_I < data->swarm->particleLocalCount ; lParticle_I++ ) {
          PeriodicBoundariesManager_UpdateParticle( data->perBCsManager, lParticle_I );
       }
-
       Swarm_UpdateAllParticleOwners( data->swarm );
    }
+
+   /* After 10 timesteps, all the particles should have been advected from the left row of cells, to the right row,
+    *  to a coord somewhere between 0.9 and 1.0 */   
+   /* TODO: first check the particles all still exist */
+   for( lParticle_I=0; lParticle_I < data->swarm->particleLocalCount; lParticle_I++ ) {
+      currParticle = (GlobalParticle*)Swarm_ParticleAt( data->swarm, lParticle_I );
+      pcu_check_true( currParticle->coord[0] >= 0.9 && currParticle->coord[0] <= 1.0 ); 
+   }
+   /* TODO: check that their cell ownership is correct */
 }
 
 
 void PeriodicBoundariesManagerSuite( pcu_suite_t* suite ) {
    pcu_suite_setData( suite, PeriodicBoundariesManagerSuiteData );
    pcu_suite_setFixtures( suite, PeriodicBoundariesManagerSuite_Setup, PeriodicBoundariesManagerSuite_Teardown );
-   pcu_suite_addTest( suite, PeriodicBoundariesManagerSuite_TestAdvectOverBoundaries );
+   pcu_suite_addTest( suite, PeriodicBoundariesManagerSuite_TestAdvectOverLeftBoundary );
 }
 
 
@@ -199,7 +211,7 @@ void UpdateParticlePositionsToLeft( Swarm* swarm ) {
          Stream_Indent( debugStream );
          Journal_Printf( debugStream, "Updating particleInCell %d:\n", cParticle_I );
 
-         movementVector[I_AXIS] = -0.1;
+         movementVector[I_AXIS] = -0.01;
 
          for ( dim_I=0; dim_I < 3; dim_I++ ) {
             newParticleCoord[dim_I] = (*oldCoord)[dim_I] + movementVector[dim_I];
