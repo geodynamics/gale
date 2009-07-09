@@ -89,7 +89,7 @@ void MaterialFeVariableSuite_TestVolume( MaterialFeVariableSuiteData* data ) {
    volumePIC = Material_Volume( material, swarm, centroid );
    volumeFEM = FeVariable_Integrate( materialFeVariable, gaussSwarm );
 
-   pcu_check_true(  fabs(volumePIC-volumeFEM) < 1e-7 );
+   pcu_check_true(  fabs(volumePIC-volumeFEM) < 1e-4 );
 }
 
 void MaterialFeVariableSuite( pcu_suite_t* suite ) {
