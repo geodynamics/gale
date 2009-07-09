@@ -56,127 +56,54 @@ struct _Particle {
 void UpdateParticlePositionsToLeft( Swarm* swarm );
 
 typedef struct {
-   Dictionary*                dictionary;
-   ExtensionManager_Register* extensionMgr_Register;
-   Mesh*                      mesh;
-   ElementCellLayout*         elementCellLayout;
-   ParticleLayout*            particleLayout;
-   Swarm*                     swarm;
-   PeriodicBoundariesManager* perBCsManager;
-   Stg_Shape*                 shape;
+   PICelleratorContext*       context;
 } PeriodicBoundariesManagerSuiteData;
 
 
-FeMesh* configureFeMesh( double minCrd[3], double maxCrd[3], unsigned int sizes[3], unsigned nDims ) {
-   CartesianGenerator*   gen;
-   FeMesh*         feMesh;
-   unsigned      maxDecomp[3] = {0, 1, 1};
-
-   gen = CartesianGenerator_New( "" );
-   CartesianGenerator_SetDimSize( gen, nDims );
-   CartesianGenerator_SetTopologyParams( gen, sizes, 0, NULL, maxDecomp );
-   CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
-   CartesianGenerator_SetShadowDepth( gen, 0 );
-
-   feMesh = FeMesh_New( "" );
-   Mesh_SetGenerator( feMesh, gen );
-   FeMesh_SetElementFamily( feMesh, "linear" );
-
-   return feMesh;
-}
-
-
 void PeriodicBoundariesManagerSuite_Setup( PeriodicBoundariesManagerSuiteData* data ) {
-   unsigned                   numElements[3];
-   double                     minCoords[3];
-   double                     maxCoords[3];
-   Coord                      shapeCenter;
-   Coord                      shapeWidth;
-   unsigned int               dim = 2;
+   char              xmlInputFilename[PCU_PATH_MAX];
+   Dictionary*       dictionary = NULL;
+   Bool              result;
+   XML_IO_Handler*   ioHandler;
 
-   /* *** Journal stuff *** */
-   Journal_Enable_TypedStream( DebugStream_Type, False );
-   Stream_EnableBranch( Journal_Register( Info_Type, ParticleCommHandler_Type ), False );
+   pcu_filename_input( "testPeriodicBoundariesManager.xml", xmlInputFilename );
+   dictionary = Dictionary_New();
+   ioHandler = XML_IO_Handler_New();
+   result = IO_Handler_ReadAllFromFile( ioHandler, xmlInputFilename, dictionary );
+   Journal_ReadFromDictionary( dictionary );
 
-   /* Read input */
-   data->dictionary = Dictionary_New();
-   numElements[0] = 10;
-   numElements[1] = 10;
-   numElements[2] = 1;
-   minCoords[0] = 0.0f;
-   minCoords[1] = 0.0f;
-   minCoords[2] = 0.0f;
-   maxCoords[0] = 1.0f;
-   maxCoords[1] = 1.0f;
-   maxCoords[2] = 1.0f;
-   Dictionary_Add( data->dictionary, "particlesPerCell", Dictionary_Entry_Value_FromUnsignedInt( 1 ) );
-   Dictionary_Add( data->dictionary, "seed", Dictionary_Entry_Value_FromUnsignedInt( 13 ) );
-   /*  TODO: a 2nd test with the periodic shadowing enabled. Its handy to keep the orig one */
-   /*    without it though. */
-
-   /* +++ CONSTRUCT PHASE +++ */
-   data->extensionMgr_Register = ExtensionManager_Register_New();
-   data->mesh = (Mesh*)configureFeMesh( minCoords, maxCoords, numElements, dim );
-   data->elementCellLayout = ElementCellLayout_New( "elementCellLayout", data->mesh );
-   shapeCenter[0] = 0.05;
-   shapeCenter[1] = 0.5;
-   shapeCenter[2] = 0.5;
-   shapeWidth[0] = 0.04;
-   shapeWidth[1] = 1;
-   shapeWidth[2] = 1;
-   data->shape = (Stg_Shape*)_Box_DefaultNew( "shape" );
-   Box_InitAll( data->shape, dim, shapeCenter, 0, 0, 0, shapeWidth );
-   data->particleLayout = (ParticleLayout*)WithinShapeParticleLayout_New( "particleLayout", dim, 10, data->shape );
-   data->swarm = Swarm_New( "testSwarm", data->elementCellLayout, data->particleLayout, 3, sizeof(Particle),
-      data->extensionMgr_Register, NULL, MPI_COMM_WORLD, NULL );
-   data->perBCsManager = PeriodicBoundariesManager_New( "perBCsManager", data->mesh, data->swarm,
-      data->dictionary );
-   
-   /* +++ BUILD PHASE +++ */
-   Stg_Component_Build( data->mesh, 0, False );
-   Stg_Component_Build( data->swarm, 0, False );
-   Stg_Component_Build( data->perBCsManager, 0, False );
-
-   PeriodicBoundariesManager_AddPeriodicBoundary( data->perBCsManager, I_AXIS );
-
-   /* +++ INITIALISE PHASE +++ */
-   Stg_Component_Initialise( data->mesh, 0, False );
-   Stg_Component_Initialise( data->swarm, 0, False );
-   Stg_Component_Initialise( data->perBCsManager, 0, False );
+   data->context = (PICelleratorContext*)stgMainInit( dictionary, MPI_COMM_WORLD );
 } 
 
 
 void PeriodicBoundariesManagerSuite_Teardown( PeriodicBoundariesManagerSuiteData* data ) {
-   /* Destroy stuff */
-   Stg_Class_Delete( data->perBCsManager );
-   Stg_Class_Delete( data->swarm );
-   Stg_Class_Delete( data->shape );
-   Stg_Class_Delete( data->particleLayout );
-   Stg_Class_Delete( data->elementCellLayout );
-   Stg_Class_Delete( data->mesh );
-   Stg_Class_Delete( data->extensionMgr_Register );
-   Stg_Class_Delete( data->dictionary );
+   stgMainDestroy( (AbstractContext*)data->context );
 }
 
 
 void PeriodicBoundariesManagerSuite_TestAdvectOverLeftBoundary( PeriodicBoundariesManagerSuiteData* data ) {
+   Swarm*                     swarm;
+   PeriodicBoundariesManager* perBCsManager;
    Index                      timeStep;
    GlobalParticle*            currParticle;
    Particle_Index             lParticle_I;
 
+   swarm = (Swarm*) LiveComponentRegister_Get( data->context->CF->LCRegister, "swarm" );
+   perBCsManager = (PeriodicBoundariesManager*) LiveComponentRegister_Get( data->context->CF->LCRegister, "perBCsManager" );
+
    for ( timeStep=1; timeStep <= 10; timeStep++ ) {
-      UpdateParticlePositionsToLeft( data->swarm );
-      for ( lParticle_I = 0; lParticle_I < data->swarm->particleLocalCount ; lParticle_I++ ) {
-         PeriodicBoundariesManager_UpdateParticle( data->perBCsManager, lParticle_I );
+      UpdateParticlePositionsToLeft( swarm );
+      for ( lParticle_I = 0; lParticle_I < swarm->particleLocalCount ; lParticle_I++ ) {
+         PeriodicBoundariesManager_UpdateParticle( perBCsManager, lParticle_I );
       }
-      Swarm_UpdateAllParticleOwners( data->swarm );
+      Swarm_UpdateAllParticleOwners( swarm );
    }
 
    /* After 10 timesteps, all the particles should have been advected from the left row of cells, to the right row,
     *  to a coord somewhere between 0.9 and 1.0 */   
    /* TODO: first check the particles all still exist */
-   for( lParticle_I=0; lParticle_I < data->swarm->particleLocalCount; lParticle_I++ ) {
-      currParticle = (GlobalParticle*)Swarm_ParticleAt( data->swarm, lParticle_I );
+   for( lParticle_I=0; lParticle_I < swarm->particleLocalCount; lParticle_I++ ) {
+      currParticle = (GlobalParticle*)Swarm_ParticleAt( swarm, lParticle_I );
       pcu_check_true( currParticle->coord[0] >= 0.9 && currParticle->coord[0] <= 1.0 ); 
    }
    /* TODO: check that their cell ownership is correct */
