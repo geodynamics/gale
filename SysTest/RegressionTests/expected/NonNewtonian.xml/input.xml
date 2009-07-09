@@ -439,7 +439,7 @@
       <element type="param" name="Type">lucOutputPNG</element>
     </element>
     <element type="struct" name="window">
-      <element type="param" name="Type">lucOSMesaWindow</element>
+      <element type="param" name="Type">lucDefaultWindow</element>
       <element type="param" name="RenderingEngine">renderingEngine</element>
       <element type="list" name="OutputFormat">
         <element type="param">imageOutput</element>
@@ -448,6 +448,7 @@
       <element type="param" name="width">800</element>
       <element type="param" name="backgroundColour">white</element>
       <element type="param" name="interactive">False</element>
+      <element type="param" name="xFontName">-adobe-helvetica-bold-r-normal--14-140-75-75-p-82-iso8859-1</element>
       <element type="param" name="Viewport">TemperatureAndVelocityArrowsVP</element>
     </element>
   </components>

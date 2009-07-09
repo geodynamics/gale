@@ -341,7 +341,7 @@
 	<param name="outputPath"> ./output </param>
 	<param name="dumpEvery"> 1 </param>	
 	<param name="checkpointEvery"> 5 </param>
-	<param name="saveCoordsWithFields"> 5 </param>
+	<param name="saveCoordsWithFields"> False </param>
 
     <!--   choose what to checkpoint
 	<list name="FieldVariablesToCheckpoint">

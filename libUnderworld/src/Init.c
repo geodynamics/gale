@@ -66,56 +66,62 @@ Stream* Underworld_Info = NULL;
 Stream* Underworld_Error = NULL;
 
 Bool Underworld_Init( int* argc, char** argv[] ) {
-	char* argString;
-	int arg_I;
-	int tmp;
-	Bool useSignalHandler = True;
-	char* directory;
+	/* This init function tells StGermain of all the component types, etc this module contributes. Because it can be linked at compile
+	   time or linked in by a toolbox at runtime, we need to make sure it isn't run twice (compiled in and loaded through a toolbox.*/
+	if( !ToolboxesManager_IsInitialised( stgToolboxesManager, "Underworld" ) ) {
+		char* argString;
+		int arg_I;
+		int tmp;
+		Bool useSignalHandler = True;
+		char* directory;
 
-	for ( arg_I = 0; argc && arg_I < *argc; arg_I++ ) {
-		argString = (*argv)[arg_I];
-		/* Leverage from PETSC's no signal flag */
-		if ( strcmp( argString, "-no_signal_handler" ) == 0 ) {
-			useSignalHandler = False;
+		for ( arg_I = 0; argc && arg_I < *argc; arg_I++ ) {
+			argString = (*argv)[arg_I];
+			/* Leverage from PETSC's no signal flag */
+			if ( strcmp( argString, "-no_signal_handler" ) == 0 ) {
+				useSignalHandler = False;
+			}
 		}
+
+		if ( useSignalHandler ) {
+			signal( SIGSEGV, Underworld_SignalHandler );
+			signal( SIGTERM, Underworld_SignalHandler );
+		}
+
+		Underworld_Rheology_Init( argc, argv );
+		Underworld_Utils_Init( argc, argv );
+	
+		Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
+		tmp = Stream_GetPrintingRank( Journal_Register( InfoStream_Type, "Context" ) );
+		Stream_SetPrintingRank( Journal_Register( InfoStream_Type, "Context" ), 0 );
+		Journal_Printf( /* DO NOT CHANGE OR REMOVE */
+			Journal_Register( InfoStream_Type, "Context" ), 
+			"Underworld (Geodynamics framework) revision %s. Copyright (C) 2005 Monash Cluster Computing.\n", VERSION );
+		Stream_Flush( Journal_Register( InfoStream_Type, "Context" ) );
+		Stream_SetPrintingRank( Journal_Register( InfoStream_Type, "Context" ), tmp );
+
+		/* Create Streams */
+		Underworld_Debug  = Journal_Register( Debug_Type, "Context" );
+		Underworld_Info   = Journal_Register( Info_Type,  "Context" );
+		Underworld_Error  = Journal_Register( Error_Type, "Context" );
+	
+		/* Add the Underworld path to the global xml path dictionary */
+		directory = Memory_Alloc_Array( char, 400, "xmlDirectory" ) ;
+		sprintf(directory, "%s%s", LIB_DIR, "/StGermain" );
+		XML_IO_Handler_AddDirectory( "Underworld", directory );
+		Memory_Free(directory);
+
+		/* Add the plugin path to the global plugin list */
+		#ifdef GLUCIFER_LIBDIR
+			ModulesManager_AddDirectory( "gLucifer", GLUCIFER_LIBDIR );
+		#endif
+	
+		ModulesManager_AddDirectory( "Underworld", LIB_DIR );
+
+		ToolboxesManager_SetInitialised( stgToolboxesManager, "Underworld" );
+		return True;
 	}
-
-	if ( useSignalHandler ) {
-		signal( SIGSEGV, Underworld_SignalHandler );
-		signal( SIGTERM, Underworld_SignalHandler );
-	}
-
-	Underworld_Rheology_Init( argc, argv );
-	Underworld_Utils_Init( argc, argv );
-	
-	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
-	tmp = Stream_GetPrintingRank( Journal_Register( InfoStream_Type, "Context" ) );
-	Stream_SetPrintingRank( Journal_Register( InfoStream_Type, "Context" ), 0 );
-	Journal_Printf( /* DO NOT CHANGE OR REMOVE */
-		Journal_Register( InfoStream_Type, "Context" ), 
-		"Underworld (Geodynamics framework) revision %s. Copyright (C) 2005 Monash Cluster Computing.\n", VERSION );
-	Stream_Flush( Journal_Register( InfoStream_Type, "Context" ) );
-	Stream_SetPrintingRank( Journal_Register( InfoStream_Type, "Context" ), tmp );
-
-	/* Create Streams */
-	Underworld_Debug  = Journal_Register( Debug_Type, "Context" );
-	Underworld_Info   = Journal_Register( Info_Type,  "Context" );
-	Underworld_Error  = Journal_Register( Error_Type, "Context" );
-	
-	/* Add the Underworld path to the global xml path dictionary */
-	directory = Memory_Alloc_Array( char, 400, "xmlDirectory" ) ;
-	sprintf(directory, "%s%s", LIB_DIR, "/StGermain" );
-	XML_IO_Handler_AddDirectory( "Underworld", directory );
-	Memory_Free(directory);
-
-	/* Add the plugin path to the global plugin list */
-	#ifdef GLUCIFER_LIBDIR
-		ModulesManager_AddDirectory( "gLucifer", GLUCIFER_LIBDIR );
-	#endif
-	
-	ModulesManager_AddDirectory( "Underworld", LIB_DIR );
-
-	return True;
+	return False;
 }
 
 

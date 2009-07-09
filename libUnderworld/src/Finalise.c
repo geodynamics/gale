@@ -57,10 +57,14 @@
 #include <stdio.h>
 
 Bool Underworld_Finalise( void ) {
-	Underworld_Utils_Finalise();
-	Underworld_Rheology_Finalise();
-	
-	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
+	if( !ToolboxesManager_IsInitialised( stgToolboxesManager, "Underworld" ) ) {
+		Underworld_Utils_Finalise();
+		Underworld_Rheology_Finalise();
+		
+		Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 
-	return True;
+		return True;
+	} else {
+		return False;
+	}
 }
