@@ -104,6 +104,7 @@ sub runTests {
 		<list name=\"NumericFields\">
 			<param>VelocityField</param> <param>0</param>
 			<param>PressureField</param> <param>1</param>
+			<param>TemperatureField</param> <param>2</param>
 		</list> 
 		<param name=\"IntegrationSwarm\">gaussSwarm</param>
 		<param name=\"ConstantMesh\">constantMesh</param>
@@ -118,6 +119,7 @@ sub runTests {
 		<list name=\"ReferenceFields\">
 			<param>VelocityField</param>
 			<param>PressureField</param>
+			<param>TemperatureField</param>
 		</list> 
 	</struct> 
 </StGermainData>";
@@ -335,6 +337,7 @@ sub testConvergence {
 
 	open ( JERICO_FILE, "+>.jericoFile" );
 	print JERICO_FILE "$testReport\n";
+	close( JERICO_FILE );
 
 	if( $result eq "Pass" ) {
 		exit(0);
