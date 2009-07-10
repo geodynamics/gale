@@ -202,8 +202,18 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 			
 			self->numericFieldList[feVariable_I] = (FeVariable*) FieldVariable_Register_GetByName( fV_Register, fieldName );
 
-			if( !self->numericFieldList[feVariable_I] )
-				self->numericFieldList[feVariable_I] = Stg_ComponentFactory_ConstructByName( cf, fieldName, FeVariable, True, data ); 
+			if( !self->numericFieldList[feVariable_I] ) {
+				/* if the numericFieldList[x] can't be found in register 
+					 and can't be constructed through the factory then 
+					 skip this entry and take one off self->fieldCount 
+					 needed for simple regression test
+				 */
+				self->numericFieldList[feVariable_I] = Stg_ComponentFactory_ConstructByName( cf, fieldName, FeVariable, False, data ); 
+				if( self->numericFieldList[feVariable_I]==NULL ) { 
+					self->fieldCount--; 
+					continue; 
+				}
+			}
 
 			/* ...and the corresponding analytic function ptr index - these have to be consistent with how they're ordered in the plugin */
 			self->analyticSolnForFeVarKey[feVariable_I] = Dictionary_Entry_Value_AsUnsignedInt( 
