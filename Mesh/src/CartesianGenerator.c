@@ -195,11 +195,10 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
 	Stream*			errorStream = Journal_Register( Error_Type, self->type );
 	unsigned		d_i, i;
 	unsigned 		restartTimestep;
-	char* 			meshSaveFileName;
 	char*			checkpointPath;
 	char*			checkpointPrefix;
 	Index                   meshStrLen;
-	
+   AbstractContext*        context;	
 #ifdef READ_HDF5
 	hid_t file, fileData;
 	hid_t             props;
@@ -208,6 +207,9 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
 	
 	assert( self && Stg_CheckType( self, CartesianGenerator ) );
 	assert( cf );
+
+   /* get the context which is required for filename determination */
+   context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ) ;
 
 	/* Call parent construct. */
 	_MeshGenerator_Construct( self, cf, data );
@@ -302,34 +304,21 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
 
 		restartTimestep = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "restartTimestep", 0 );	
 		if( restartTimestep ) {
-			checkpointPath = Stg_ComponentFactory_GetRootDictString( cf, "checkpointReadPath", "./" );
-			checkpointPrefix = Stg_ComponentFactory_GetRootDictString( cf, "checkPointPrefixString", "" );
+         char*  meshReadFileName;
+         char*  meshReadFileNamePart;   
 
-			meshStrLen = strlen(checkpointPath) + 2 + 5 + 5 + 4;
-			if ( strlen(checkpointPrefix) > 0 ) {
-				meshStrLen += strlen(checkpointPrefix) + 1;
-			}
-			meshSaveFileName = Memory_Alloc_Array( char, meshStrLen, "Construct_meshSaveFileName" );
+         meshReadFileNamePart = Context_GetCheckPointReadPrefixString( context );
 
-			if ( strlen(checkpointPrefix) > 0 ) {
-				sprintf( meshSaveFileName, "%s/%s.Mesh.%05d", checkpointPath,
-					checkpointPrefix, restartTimestep );
-			}
-			else {
-				sprintf( meshSaveFileName, "%s/Mesh.%05d", checkpointPath,
-					restartTimestep );
-			}			
-	
-#ifdef READ_HDF5	
-	      sprintf( meshSaveFileName, "%s.h5", meshSaveFileName );
+#ifdef WRITE_HDF5
+         Stg_asprintf( &meshReadFileName, "%sMesh.%.5u.h5", meshReadFileNamePart, restartTimestep );
 	      
 	      /* Read in minimum coord. */
-	      file = H5Fopen( meshSaveFileName, H5F_ACC_RDONLY, H5P_DEFAULT );
+	      file = H5Fopen( meshReadFileName, H5F_ACC_RDONLY, H5P_DEFAULT );
 	      
 	      if( !file ) {
 				Journal_Printf( errorStream, 
 					"Warning - Couldn't find checkpoint mesh file with filename \"%s\".\n", 
-					meshSaveFileName );
+					meshReadFileName );
 			}
 			else {
 			
@@ -354,20 +343,20 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
 	      }
 	      
 #else	
-	      sprintf( meshSaveFileName, "%s.dat", meshSaveFileName );
+	      Stg_asprintf( &meshReadFileName, "%sMesh.%.5u.dat", meshReadFileNamePart, restartTimestep );
 	        
-			FILE* meshFile = fopen( meshSaveFileName, "r" );	
+			FILE* meshFile = fopen( meshReadFileName, "r" );	
 			/*Journal_Firewall( 
 				meshFile != 0, 
 				errorStream, 
 				"Error in %s - Couldn't find checkpoint mesh file with filename \"%s\" - aborting.\n", 
 				__func__,  
-				meshSaveFileName );*/
+				meshReadFileName );*/
 
 			if( meshFile == 0 ) {
 				Journal_Printf( errorStream, 
 					"Warning - Couldn't find checkpoint mesh file with filename \"%s\".\n", 
-					meshSaveFileName );
+					meshReadFileName );
 			}
 			else {
 				
@@ -385,7 +374,9 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
 			}
 #endif
 				
-			Memory_Free( meshSaveFileName );
+			Memory_Free( meshReadFileName );
+			Memory_Free( meshReadFileNamePart );
+
 		}	
 		   
 		/* Initial setup. */
@@ -2046,7 +2037,6 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
 	Stream*			   stream = Journal_Register( Info_Type, self->type );
 	Sync*			      sync;
 	AbstractContext* 	context = (AbstractContext*)data;
-	char* 			   meshSaveFileName;
 	Index			      meshStrLen;
 	Stream*			   errorStream = Journal_Register( Error_Type, self->type );
 	int			      rank, nRanks;
@@ -2081,38 +2071,28 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
 					 "Mesh::verts" );
 
 	if( context && context->restartTimestep && context->timeStep == context->restartTimestep ) {
+      char*  meshReadFileName;
+      char*  meshReadFileNamePart;   
+
 		/* Loading from checkpoint */
 
 		MPI_Comm_rank( self->mpiComm, &rank );
 		MPI_Comm_size( self->mpiComm, &nRanks );
-		
-		meshStrLen = strlen(context->checkpointReadPath)  + 2 + 5 + 5 + 4;
-		if ( strlen(context->checkPointPrefixString) > 0 ) {
-			meshStrLen += strlen(context->checkPointPrefixString) + 1;
-		}
-		meshSaveFileName = Memory_Alloc_Array( char, meshStrLen, "GenGeom_meshSaveFileName" );
 
-		if ( strlen( context->checkPointPrefixString ) > 0 ) {
-			sprintf( meshSaveFileName, "%s/%s.Mesh.%05d", context->checkpointReadPath,
-				context->checkPointPrefixString, context->restartTimestep );
-		}
-		else {
-			sprintf( meshSaveFileName, "%s/Mesh.%05d", context->checkpointReadPath,
-				context->restartTimestep );
-		}
+      meshReadFileNamePart = Context_GetCheckPointReadPrefixString( context );
 
 #ifdef READ_HDF5
-      sprintf( meshSaveFileName, "%s.h5", meshSaveFileName );
-      
-      Journal_Printf( stream, "... loading from file %s.\n", meshSaveFileName );
+      Stg_asprintf( &meshReadFileName, "%sMesh.%.5u.h5", meshReadFileNamePart, context->restartTimestep );
+
+      Journal_Printf( stream, "... loading from file %s.\n", meshReadFileName );
 		
       /* Open the file and data set. */
-	   file = H5Fopen( meshSaveFileName, H5F_ACC_RDONLY, H5P_DEFAULT );
+	   file = H5Fopen( meshReadFileName, H5F_ACC_RDONLY, H5P_DEFAULT );
 		
 	   if( file < 0 ) {
 			Journal_Printf( errorStream, 
 				"Warning - Couldn't find checkpoint mesh file with filename \"%s\".\n", 
-				meshSaveFileName );
+				meshReadFileName );
 			
 			Grid*			      grid;
 			unsigned*		   inds;
@@ -2162,7 +2142,7 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
             self->type, 
             self->name, 
             (unsigned int)maxSize[0],
-            meshSaveFileName,
+            meshReadFileName,
             totalVerts);
 
 	      for( ii=0; ii<totalVerts; ii++ ) {   
@@ -2181,7 +2161,7 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
                __func__, 
                self->type, 
                self->name, 
-               meshSaveFileName );
+               meshReadFileName );
             
             if( Mesh_GlobalToDomain( mesh, MT_VERTEX, gNode_I, &lNode_I ) && 
 		          lNode_I < Mesh_GetLocalSize( mesh, MT_VERTEX ) )
@@ -2204,9 +2184,9 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
 	   }
 	   
 #else
-      sprintf( meshSaveFileName, "%s.dat", meshSaveFileName );
+      Stg_asprintf( &meshReadFileName, "%sMesh.%.5u.dat", meshReadFileNamePart, context->restartTimestep );
       
-      Journal_Printf( stream, "... loading from file %s.\n", meshSaveFileName );
+      Journal_Printf( stream, "... loading from file %s.\n", meshReadFileName );
       
       /* This loop used to stop 2 processors trying to open the file at the same time, which
 	   * seems to cause problems */
@@ -2215,12 +2195,12 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
 		   if ( proc_I == rank ) {
 			   /* Do the following since in parallel on some systems, the file
 			    * doesn't get re-opened at the start automatically. */
-			   inputFile = fopen( meshSaveFileName, "r" );
+			   inputFile = fopen( meshReadFileName, "r" );
 
 			   /*if ( !inputFile ) {
 				   Stream*    errorStr = Journal_Register( Error_Type, self->type );
 				   Journal_Firewall( 0, errorStr, "Error- in %s(): Couldn't find mesh checkpoint file with "
-					   "filename \"%s\" - aborting.\n", __func__, meshSaveFileName );
+					   "filename \"%s\" - aborting.\n", __func__, meshReadFileName );
 					
 			   }*/
 			   
@@ -2228,7 +2208,7 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
 		      if( !inputFile ) {
 			      Journal_Printf( errorStream, 
 				      "Warning - Couldn't find mesh checkpoint file with filename \"%s\".\n", 
-				      meshSaveFileName );
+				      meshReadFileName );
 			
 			      Grid*			      grid;
 			      unsigned*		   inds;
@@ -2283,7 +2263,8 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
 #endif
       Mesh_Sync( mesh );
       
-		Memory_Free( meshSaveFileName );
+		Memory_Free( meshReadFileName );
+      Memory_Free( meshReadFileNamePart );
 	}
 	else {
 	   Grid*			      grid;

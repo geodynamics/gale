@@ -239,12 +239,12 @@ void _FileParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm ) 
    self->lastParticleIndex  = Memory_Alloc_Array( Index, swarm->checkpointnfiles, "lastParticleIndex" );
    self->totalInitialParticles = 0;
    for( ii = 1 ; ii <= swarm->checkpointnfiles ; ii++ ){
-      char filenameTemp[4096];
+      char* filenameTemp = NULL;
       /* Open the swarm checkpointing file */
       if(swarm->checkpointnfiles == 1)
-         sprintf( filenameTemp, "%s.h5", filename );
+         Stg_asprintf( &filenameTemp, "%s.h5", filename );
       else 
-         sprintf( filenameTemp, "%s.%dof%d.h5", filename, ii, swarm->checkpointnfiles );
+         Stg_asprintf( &filenameTemp, "%s.%dof%d.h5", filename, ii, swarm->checkpointnfiles );
       
       file = H5Fopen( filenameTemp, H5F_ACC_RDONLY, H5P_DEFAULT );
       Journal_Firewall( file >= 0,
@@ -291,6 +291,7 @@ void _FileParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm ) 
       
       /* Close the dataspace and file */
       H5Fclose( file );
+      Memory_Free( filenameTemp );
    }
 #else
    Journal_DPrintf( self->debug, "Finding number of bytes in checkpoint file \"%s\":\n",
@@ -370,12 +371,12 @@ void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm
       
    /* Open the files */
    for( ii = 1 ; ii <= swarm->checkpointnfiles ; ii++ ){
-      char  filenameTemp[4096];
+      char*  filenameTemp = NULL;
       /* Open the swarm checkpointing file */
       if(swarm->checkpointnfiles == 1)
-         sprintf( filenameTemp, "%s.h5", self->filename );
+         Stg_asprintf( &filenameTemp, "%s.h5", self->filename );
       else 
-         sprintf( filenameTemp, "%s.%dof%d.h5", self->filename, ii, swarm->checkpointnfiles );
+         Stg_asprintf( &filenameTemp, "%s.%dof%d.h5", self->filename, ii, swarm->checkpointnfiles );
 
       file[ii-1] = H5Fopen( filenameTemp, H5F_ACC_RDONLY, H5P_DEFAULT );
       Journal_Firewall( 
@@ -416,6 +417,7 @@ void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm
             }
          }
       }
+      Memory_Free( filenameTemp );
    }
        
    self->start[1] = 0;

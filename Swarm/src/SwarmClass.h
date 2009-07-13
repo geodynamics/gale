@@ -331,9 +331,6 @@
 	/** For loading from checkpoints : replaces current particle layout with a file particle layout */
 	void Swarm_ReplaceCurrentParticleLayoutWithFileParticleLayout( void* swarm, void* _context );
 
-	/** simple function that determines logic for creating a swarm checkpoint filename */
-	void Swarm_GetCheckpointFilenameForGivenTimestep( Swarm* self, AbstractContext* context, char* swarmSaveFileName );
-
 	/** Function that adds a Communication Handler to a swarm. Expected to be run through C, since in
 	 * constructing via XML you should have just passed in a list at the Construct phase. */
 	Bool Swarm_AddCommHandler( Swarm *self, void *commHandler );

@@ -1645,11 +1645,19 @@ StandardParticle* Swarm_CreateNewParticle( void* swarm, Particle_Index* newParti
 void Swarm_ReplaceCurrentParticleLayoutWithFileParticleLayout( void* swarm, void* _context ) {
 	Swarm*               self = (Swarm*)swarm;
 	AbstractContext*     context = (AbstractContext*)_context;
-	char                 name[1024];
-	char                 swarmSaveFileName[4096];
+	char*                name = NULL;
+	char*                swarmFileName     = NULL;
+	char*                swarmFileNamePart = NULL;
 
-	sprintf( name, "%s-fileParticleLayout", self->name );
-	Swarm_GetCheckpointFilenameForGivenTimestep( self, context, swarmSaveFileName );
+	Stg_asprintf( &name, "%s-fileParticleLayout", self->name );
+
+   swarmFileNamePart = Context_GetCheckPointReadPrefixString( context );
+#ifdef READ_HDF5
+   self->checkpointnfiles = context->checkpointnproc;
+	Stg_asprintf( &swarmFileName, "%s%s.%05d", swarmFileNamePart, self->name, context->restartTimestep );
+#else
+	Stg_asprintf( &swarmFileName, "%s%s.%05d.dat", swarmFileNamePart, self->name, context->restartTimestep );
+#endif
 	
 	Journal_DPrintf( self->debug, "overriding the particleLayout specified via XML/constructor\n"
 		"of \"%s\" (of type %s) with a FileParticleLayout to load\n"
@@ -1658,7 +1666,7 @@ void Swarm_ReplaceCurrentParticleLayoutWithFileParticleLayout( void* swarm, void
 		self->particleLayout->name, self->particleLayout->type,
 		context->checkpointReadPath,
 		context->checkPointPrefixString, context->restartTimestep,
-		swarmSaveFileName );
+		swarmFileName );
 
 	/* TODO: deleting this makes sense if this swarm "owns" the particle layout. Is it
 	* possible for 2 swarms to have the same particle layout? I guess so - may need
@@ -1668,31 +1676,12 @@ void Swarm_ReplaceCurrentParticleLayoutWithFileParticleLayout( void* swarm, void
 	*/
 	Stg_Class_Delete( self->particleLayout );
 
-	self->particleLayout = (ParticleLayout*)FileParticleLayout_New( name, swarmSaveFileName ); 
-}
+	self->particleLayout = (ParticleLayout*)FileParticleLayout_New( name, swarmFileName );
 
-
-void Swarm_GetCheckpointFilenameForGivenTimestep( Swarm* self, AbstractContext* context, char* swarmSaveFileName ) {
-#ifdef READ_HDF5
-        self->checkpointnfiles = context->checkpointnproc;
-	if ( strlen(context->checkPointPrefixString) > 0 ) {
-		sprintf( swarmSaveFileName, "%s/%s.%s.%05d", context->checkpointReadPath,
-			context->checkPointPrefixString, self->name, context->restartTimestep );
-	}
-	else {
-		sprintf( swarmSaveFileName, "%s/%s.%05d", context->checkpointReadPath,
-			self->name, context->restartTimestep );
-	}
-#else
-	if ( strlen(context->checkPointPrefixString) > 0 ) {
-		sprintf( swarmSaveFileName, "%s/%s.%s.%05d.dat", context->checkpointReadPath,
-			context->checkPointPrefixString, self->name, context->restartTimestep );
-	}
-	else {
-		sprintf( swarmSaveFileName, "%s/%s.%05d.dat", context->checkpointReadPath,
-			self->name, context->restartTimestep );
-	}
-#endif
+   Memory_Free( name );
+   Memory_Free( swarmFileName );
+   Memory_Free( swarmFileNamePart );
+   
 }
 
 Bool Swarm_AddCommHandler( Swarm *self, void *commHandler )

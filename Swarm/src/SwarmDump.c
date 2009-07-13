@@ -238,7 +238,6 @@ void _SwarmDump_Execute( void* swarmDump, void* data ) {
         AbstractContext*  context             = Stg_CheckType( data, AbstractContext );
         Particle_Index    particleLocalCount;
         SizeT             particleSize;
-        Name              filename;
         Index             swarm_I;
         Swarm*            swarm;
         Stream*           info = Journal_Register( Info_Type, self->type );
@@ -248,36 +247,27 @@ void _SwarmDump_Execute( void* swarmDump, void* data ) {
         Stream_Indent( info );
         
         for ( swarm_I = 0 ; swarm_I < self->swarmCount ; swarm_I++ ) {
+                char*			swarmSaveFileName      = NULL;
+                char*			swarmSaveFileNamePart1 = NULL;
+                char*			swarmSaveFileNamePart2 = NULL;
+
+                swarmSaveFileNamePart1 = Context_GetCheckPointWritePrefixString( context );
+
                 swarm = self->swarmList[ swarm_I ];
                 particleLocalCount = swarm->particleLocalCount;
                 particleSize = (SizeT) swarm->particleExtensionMgr->finalSize;
 
-                if ( self->newFileEachTime ) {
-                        if ( strlen(context->checkPointPrefixString) > 0 ) {
-                                Stg_asprintf( &filename, "%s/%s.%s.%05d", context->checkpointWritePath,
-                                        context->checkPointPrefixString, swarm->name, context->timeStep );
-                        }
-                        else {
-                                Stg_asprintf( &filename, "%s/%s.%05d", context->checkpointWritePath,
-                                        swarm->name, context->timeStep );
-                        }
-                }       
-                else { 
-                        if ( strlen(context->checkPointPrefixString) > 0 ) {
-                                Stg_asprintf( &filename, "%s/%s.%s", context->checkpointWritePath,
-                                        context->checkPointPrefixString, swarm->name );
-                        }
-                        else {
-                                Stg_asprintf( &filename, "%s/%s", context->checkpointWritePath, swarm->name );
-                        }
-                }       
+                if ( self->newFileEachTime )
+                    Stg_asprintf( &swarmSaveFileNamePart2, "%s/%s.%05d", swarmSaveFileNamePart1, swarm->name, context->timeStep );
+                else
+                    Stg_asprintf( &swarmSaveFileNamePart2, "%s/%s"     , swarmSaveFileNamePart1, swarm->name );
 
                 #ifdef DEBUG
                    for ( rank_I = 0; rank_I < swarm->nProc; rank_I++ ) {
                            if ( swarm->myRank == rank_I ) {
                                    Journal_DPrintf( info, "Proc %d: for swarm \"%s\", dumping its %u particles of size %u bytes "
                                            "each (= %g bytes total) to file %s\n", swarm->myRank, swarm->name, particleLocalCount,
-                                           particleSize, (float)(particleLocalCount * particleSize), filename );
+                                           particleSize, (float)(particleLocalCount * particleSize), swarmSaveFileNamePart2 );
                            }       
                            MPI_Barrier( swarm->comm );
                    }
@@ -285,16 +275,17 @@ void _SwarmDump_Execute( void* swarmDump, void* data ) {
 
                 #ifdef WRITE_HDF5
                    if(swarm->nProc == 1)
-                           Stg_asprintf( &filename, "%s.h5", filename );
+                           Stg_asprintf( &swarmSaveFileName, "%s.h5", swarmSaveFileNamePart2 );
                    else
-                           Stg_asprintf( &filename, "%s.%dof%d.h5", filename, (swarm->myRank + 1), swarm->nProc );
-                   SwarmDump_DumpToHDF5( self, swarm, filename );
+                           Stg_asprintf( &swarmSaveFileName, "%s.%dof%d.h5", swarmSaveFileNamePart2, (swarm->myRank + 1), swarm->nProc );
+                   SwarmDump_DumpToHDF5( self, swarm, swarmSaveFileName );
                 #else
-                   Stg_asprintf( &filename, "%s.dat", filename );
-                   BinaryStream_WriteAllProcessors( filename, swarm->particles, particleSize, (SizeT) particleLocalCount, swarm->comm );
+                   Stg_asprintf( &swarmSaveFileName, "%s.dat", swarmSaveFileNamePart2 );
+                   BinaryStream_WriteAllProcessors( swarmSaveFileName, swarm->particles, particleSize, (SizeT) particleLocalCount, swarm->comm );
                 #endif
-                Memory_Free( filename );
-                                
+                Memory_Free( swarmSaveFileName );
+                Memory_Free( swarmSaveFileNamePart1 );
+                Memory_Free( swarmSaveFileNamePart2 );
 
         }
         Stream_UnIndent( info );
