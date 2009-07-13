@@ -11,7 +11,7 @@ class X11(Package):
 
     def gen_envs(self, loc):
         for env in Package.gen_envs(self, loc):
-            env['pkg_headers'] = ['Xlib.h', 'GL/glx.h']
+            self.headers = ['Xlib.h', 'GL/glx.h']
             lib_env = env.Clone()
             lib_env.PrependUnique(LIBS=['X11', 'Xmu', 'GL'])
             yield lib_env

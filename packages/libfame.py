@@ -7,7 +7,7 @@ class libFAME(Package):
 
     def gen_envs(self, loc):
         for env in Package.gen_envs(self, loc):
-            env['pkg_headers'] = ['fame.h']
+            self.headers = ['fame.h']
             if self.find_libraries(loc[2], 'fame'):
                 env.PrependUnique(LIBS=['fame'])
                 yield env

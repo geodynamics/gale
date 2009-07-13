@@ -8,6 +8,6 @@ class Carbon(Package):
 
     def gen_envs(self, loc):
         env = self.env.Clone()
-        env['pkg_headers'] = ['Carbon/Carbon.h']
+        self.headers = ['Carbon/Carbon.h']
         env.AppendUnique(FRAMEWORKS=['Carbon'])
         yield env

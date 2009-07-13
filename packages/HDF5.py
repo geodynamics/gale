@@ -7,7 +7,7 @@ class HDF5(Package):
 
     def gen_envs(self, loc):
         for env in Package.gen_envs(self, loc):
-            env['pkg_headers'] = ['hdf5.h']
+            self.headers = ['hdf5.h']
             if self.find_libraries(loc[2], 'hdf5'):
                 env.PrependUnique(LIBS=['hdf5'])
                 yield env

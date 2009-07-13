@@ -15,7 +15,7 @@ class SDL(Package):
 
     def gen_envs(self, loc):
         for env in Package.gen_envs(self, loc):
-            env['pkg_headers'] = ['SDL.h']
+            self.headers = ['SDL.h']
             lib_env = env.Clone()
             lib_env.PrependUnique(LIBS=['SDL'])
             yield lib_env
