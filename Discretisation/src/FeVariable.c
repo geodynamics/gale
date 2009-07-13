@@ -614,7 +614,7 @@ void _FeVariable_Initialise( void* variable, void* data ) {
 
 	if ( context ) {
 		/* Get the input path string once here - single point of control */
-		inputPathString = Context_GetCheckPointInputPrefixString( context );
+		inputPathString = Context_GetCheckPointReadPrefixString( context );
 	}
 	/* If the reference solution option is enabled, just load this up regardless of checkpointing options below.
 	 * Want to allow option of disabling this feature, if you're manually setting up a FeVariable without a context etc. */
@@ -622,14 +622,11 @@ void _FeVariable_Initialise( void* variable, void* data ) {
 		char * filename = NULL;
 		Journal_DPrintf( self->debug, "Reference FeVariable -> loading nodal values from file.\n" );
 		
-		/* Make filename */
-		/*                                                prefix             self->name       . 00000 .  dat \0 */
-		filename = Memory_Alloc_Array_Unnamed( char, strlen(inputPathString) + strlen(self->name) + 1 + 5 + 1 + 3 + 1 );
 		 
 #ifdef READ_HDF5
-		sprintf( filename, "%s%s.%.5u.h5", inputPathString, self->name, context->restartTimestep );
+		Stg_asprintf( &filename, "%s%s.%.5u.h5", inputPathString, self->name, context->restartTimestep );
 #else
-		sprintf( filename, "%s%s.%.5u.dat", inputPathString, self->name, context->restartTimestep );
+		Stg_asprintf( &filename, "%s%s.%.5u.dat", inputPathString, self->name, context->restartTimestep );
 #endif
 		FeVariable_ReadFromFile( self, filename );
 
@@ -653,15 +650,11 @@ void _FeVariable_Initialise( void* variable, void* data ) {
 			char * filename = NULL;
 			Journal_DPrintf( self->debug, "restart from checkpoint mode -> loading checkpointed "
 				"nodal values as initial conditions, ignoring ics specified via XML/constructor\n" );
-			/* Make filename */
-
-			/*                                                prefix             self->name       . 00000 .  dat \0 */
-			filename = Memory_Alloc_Array_Unnamed( char, strlen(inputPathString) + strlen(self->name) + 1 + 5 + 1 + 3 + 1 );
 			 
 #ifdef READ_HDF5
-			sprintf( filename, "%s%s.%.5u.h5", inputPathString, self->name, context->restartTimestep );
+			Stg_asprintf( &filename, "%s%s.%.5u.h5", inputPathString, self->name, context->restartTimestep );
 #else
-			sprintf( filename, "%s%s.%.5u.dat", inputPathString, self->name, context->restartTimestep );
+			Stg_asprintf( &filename, "%s%s.%.5u.dat", inputPathString, self->name, context->restartTimestep );
 #endif
 			FeVariable_ReadFromFile( self, filename );
 			/* TODO: maybe we want a mechanism in future to over-ride the checkpointed ICs in certain regions too
@@ -2270,12 +2263,12 @@ void FeVariable_ReadFromFile( void* feVariable, const char* filename ) {
    /* Get size of dataspace to determine if coords are in file */
    H5Sget_simple_extent_dims( fileSpace, size, maxSize ); 
 
-   if( maxSize[1] > dofAtEachNodeCount + 1 ) 
+   if( maxSize[1] > dofAtEachNodeCount  ) 
       savedCoords = True;
        
    start[1] = 0;
 	count[0] = 1;
-	count[1] = dofAtEachNodeCount + 1;
+	count[1] = dofAtEachNodeCount ;
 	if( savedCoords )  
 	   count[1] += self->dim;
 	   
@@ -2320,9 +2313,9 @@ void FeVariable_ReadFromFile( void* feVariable, const char* filename ) {
 		{
 		   for ( dof_I = 0; dof_I < dofAtEachNodeCount; dof_I++ ) {
 		      if( savedCoords )
-		         variableVal = buf[dof_I + self->dim + 1];
+		         variableVal = buf[dof_I + self->dim ];
 		      else
-				   variableVal = buf[dof_I + 1];
+				   variableVal = buf[dof_I ];
 				DofLayout_SetValueDouble( self->dofLayout, lNode_I, dof_I, variableVal );
 			}  
 		}

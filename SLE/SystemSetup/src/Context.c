@@ -478,15 +478,8 @@ void _FiniteElementContext_SaveFeVariables( void* context ) {
 	Index                     var_I = 0;
 	FieldVariable*            fieldVar = NULL;
 	FeVariable*               feVar = NULL;
-	char*                     outputPathString = NULL;
-	Index                     outputStrLen = 0;
 
-	outputStrLen = strlen(self->checkpointWritePath) + 1 + 1;
-	if ( strlen(self->checkPointPrefixString) > 0 ) {
-		outputStrLen += strlen(self->checkPointPrefixString) + 1;
-	}
-
-		/* Save the variables that have had their "isCheckpointedAndReloaded" flag enabled - 
+    /* Save the variables that have had their "isCheckpointedAndReloaded" flag enabled - 
 	 *  default is true, but the user may restrict the list by specifying the "FieldVariablesToCheckpoint"
 	 *  flag in their constructor - see _FeVariable_Construct().
 	 */ 	
@@ -494,30 +487,24 @@ void _FiniteElementContext_SaveFeVariables( void* context ) {
 		fieldVar = FieldVariable_Register_GetByIndex( self->fieldVariable_Register, var_I );
 
 		if ( Stg_Class_IsInstance( fieldVar, FeVariable_Type ) ) {
-			feVar = (FeVariable*)fieldVar;
+			feVar = (FeVariable*)fieldVar;	
+			if ( feVar->isCheckpointedAndReloaded ) {
+            char*			feVarSaveFileName     = NULL;
+            char*			feVarSaveFileNamePart = NULL;   
+
+            feVarSaveFileNamePart = Context_GetCheckPointWritePrefixString( self );
 
 #ifdef WRITE_HDF5
-			/*                                                prefix            /       self->name       . 00000 .   h5 \0 */
-			outputPathString = Memory_Alloc_Array_Unnamed( char, outputStrLen + 1 + strlen(feVar->name) + 1 + 5 + 1 + 2 + 1 );
-			if ( strlen(self->checkPointPrefixString) > 0 ) 
-				sprintf( outputPathString, "%s/%s%s.%.5u.h5", self->checkpointWritePath, self->checkPointPrefixString, feVar->name, self->timeStep );
-			else 
-				sprintf( outputPathString, "%s/%s.%.5u.h5", self->checkpointWritePath, feVar->name, self->timeStep );
+            Stg_asprintf( &feVarSaveFileName, "%s%s.%.5u.h5" , feVarSaveFileNamePart, feVar->name, self->timeStep );
 #else
-			/*                                                prefix            /       self->name       . 00000 .  dat \0 */
-			outputPathString = Memory_Alloc_Array_Unnamed( char, outputStrLen + 1 + strlen(feVar->name) + 1 + 5 + 1 + 3 + 1 );
-			if ( strlen(self->checkPointPrefixString) > 0 )
-				sprintf( outputPathString, "%s/%s%s.%.5u.dat", self->checkpointWritePath, self->checkPointPrefixString, feVar->name, self->timeStep );
-			else
-				sprintf( outputPathString, "%s/%s.%.5u.dat", self->checkpointWritePath, feVar->name, self->timeStep );
+            Stg_asprintf( &feVarSaveFileName, "%s%s.%.5u.dat", feVarSaveFileNamePart, feVar->name, self->timeStep );
 #endif
-			if ( feVar->isCheckpointedAndReloaded ) {
-				 FeVariable_SaveToFile( feVar, outputPathString, 
-						 Dictionary_GetBool_WithDefault( self->dictionary, "saveCoordsWithFields", False ) );           
-			}
+            FeVariable_SaveToFile( feVar, feVarSaveFileName, 
+                   Dictionary_GetBool_WithDefault( self->dictionary, "saveCoordsWithFields", False ) );           
 
-			Memory_Free( outputPathString );
-			outputPathString = NULL;
+            Memory_Free( feVarSaveFileName );
+            Memory_Free( feVarSaveFileNamePart );
+         }
 		}
 	}
 }
@@ -534,34 +521,24 @@ void _FiniteElementContext_SaveSwarms( void* context ) {
 void _FiniteElementContext_SaveMesh( void* context ) {
    FiniteElementContext*   self = (FiniteElementContext*) context;
 	char*			meshSaveFileName;
+	char*			meshSaveFileNamePart;   
 	Index			meshStrLen;
    Stream*         	info = Journal_Register( Info_Type, "Context" );
    
 	Journal_Printf( info, "In %s(): about to save the mesh to disk:\n", __func__ );
 	
-	meshStrLen = strlen(self->checkpointReadPath) + 2 + 5 + 5 + 4;
-	if ( strlen(self->checkPointPrefixString) > 0 ) {
-		meshStrLen += strlen(self->checkPointPrefixString) + 1;
-	}
-	meshSaveFileName = Memory_Alloc_Array( char, meshStrLen, "SaveMesh-meshSaveFileName" );
-	
-	if ( strlen(self->checkPointPrefixString) > 0 ) {
-		sprintf( meshSaveFileName, "%s/%s.Mesh.%05d", self->checkpointWritePath,
-			self->checkPointPrefixString, self->timeStep );
-	}
-	else {
-		sprintf( meshSaveFileName, "%s/Mesh.%05d", self->checkpointWritePath, self->timeStep );
-	}
+   meshSaveFileNamePart = Context_GetCheckPointWritePrefixString( self );
 
 #ifdef WRITE_HDF5
-   sprintf( meshSaveFileName, "%s.h5", meshSaveFileName );
+   Stg_asprintf( &meshSaveFileName, "%sMesh.%.5u.h5", meshSaveFileNamePart, self->timeStep );
    _FiniteElementContext_DumpMeshHDF5( context, meshSaveFileName );
 #else
-   sprintf( meshSaveFileName, "%s.dat", meshSaveFileName );
+   Stg_asprintf( &meshSaveFileName, "%sMesh.%.5u.dat", meshSaveFileNamePart, self->timeStep );
    _FiniteElementContext_DumpMeshAscii( context, meshSaveFileName );
 #endif
 
 	Memory_Free( meshSaveFileName );
+   Memory_Free( meshSaveFileNamePart );
 	Journal_Printf( info, "%s: saving of mesh completed.\n", __func__ );
 }
 
