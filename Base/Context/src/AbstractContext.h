@@ -123,6 +123,7 @@
 		char*					outputPath; \
 		char*					checkpointReadPath; \
 		char*					checkpointWritePath; \
+		Bool                                    checkpointAppendStep;      \
 		Bool                                    loadFromCheckPoint;      \
 		unsigned int                            restartTimestep;         \
 		char*                                   checkPointPrefixString;  \
@@ -270,11 +271,14 @@
 	void AbstractContext_InitialiseAllLiveComponents( void* context ) ;
 
 	Bool AbstractContext_CheckPointExists( void* context, Index timeStep );
-	char* AbstractContext_GetTimeInfoFileNameForGivenTimeStep( void* context, Index timeStep, char* checkpointPath, CheckpointFileFormat checkpointFileFormat );
 
-	/* Works out the prefix string to use for checkpoint files (input path + C.P. prefix)
+	/* Works out the prefix string to use for reading checkpoint files (input path + C.P. prefix)
 	 * Note this allocates a string which the user needs to free when done. */ 
-	char* Context_GetCheckPointInputPrefixString( void* context );
+	char* Context_GetCheckPointReadPrefixString( void* context );
+	
+	/* Works out the prefix string to use for writing checkpoint files (input path + C.P. prefix)
+	 * Note this allocates a string which the user needs to free when done. */ 
+	char* Context_GetCheckPointWritePrefixString( void* context );
 	
 	/* Context private methods ************************************************************************************************/
 	
@@ -292,5 +296,5 @@
 	
 	void _AbstractContext_LoadTimeInfoFromCheckPoint( Context* self, Index timeStep, double* dtLoadedFromFile );
 	void _AbstractContext_SaveTimeInfo( Context* context );
-
+	void _AbstractContext_CreateCheckpointDirectory( Context* context );
 #endif /* __Base_Context_AbstractContext_h__ */

@@ -207,6 +207,8 @@ void _AbstractContext_Init(
 		Dictionary_GetDefault( self->dictionary, "checkpointPath", Dictionary_Entry_Value_FromString( self->outputPath ) ) ) );
 	self->checkpointWritePath = StG_Strdup( Dictionary_Entry_Value_AsString( 
 		Dictionary_GetDefault( self->dictionary, "checkpointWritePath", Dictionary_Entry_Value_FromString( self->checkpointWritePath ) ) ) );
+	self->checkpointAppendStep = Dictionary_Entry_Value_AsBool( 
+		Dictionary_GetDefault( self->dictionary, "checkpointAppendStep", Dictionary_Entry_Value_FromBool( True ) ) ) ;
 
 	if ( self->rank == 0 ) {
 		if ( ! Stg_DirectoryExists( self->outputPath ) ) {
@@ -418,6 +420,11 @@ void _AbstractContext_Init(
 		AbstractContext_GetEntryPoint( self, AbstractContext_EP_Save ),
 		"SaveTimeInfo", 
 		(Func_Ptr)_AbstractContext_SaveTimeInfo, 
+		AbstractContext_Type );
+	EntryPoint_Prepend_AlwaysFirst( 
+		AbstractContext_GetEntryPoint( self, AbstractContext_EP_Save ),
+		"CreateCheckpointDirectory", 
+		(Func_Ptr)_AbstractContext_CreateCheckpointDirectory, 
 		AbstractContext_Type );
 
 	Stg_ObjectList_ClassAppend( self->register_Register, (void*)self->extensionMgr_Register, "ExtensionManager_Register" );
@@ -1011,6 +1018,7 @@ void _AbstractContext_Step( Context* context, double dt ) {
 
 void _AbstractContext_LoadTimeInfoFromCheckPoint( Context* self, Index timeStep, double* dtLoadedFromFile ) {
 	char*                  timeInfoFileName = NULL;
+	char*                  timeInfoFileNamePart = NULL;
 	FILE*                  timeInfoFile;		
 	Stream*                errorStr = Journal_Register( Error_Type, self->type );
 
@@ -1019,8 +1027,9 @@ void _AbstractContext_LoadTimeInfoFromCheckPoint( Context* self, Index timeStep,
 #endif
 
 	
-#ifdef READ_HDF5
-	timeInfoFileName = AbstractContext_GetTimeInfoFileNameForGivenTimeStep( self, timeStep, self->checkpointReadPath, CHECKPOINT_FORMAT_HDF5 ); 
+   timeInfoFileNamePart = Context_GetCheckPointReadPrefixString( self );
+#ifdef WRITE_HDF5
+   Stg_asprintf( &timeInfoFileName, "%stimeInfo.%.5u.h5", timeInfoFileNamePart, self->restartTimestep );
 	 
 	/* Open the file and data set. */
 	file = H5Fopen( timeInfoFileName, H5F_ACC_RDONLY, H5P_DEFAULT );
@@ -1071,7 +1080,7 @@ void _AbstractContext_LoadTimeInfoFromCheckPoint( Context* self, Index timeStep,
 	H5Fclose( file );
 	   
 #else	
-	timeInfoFileName = AbstractContext_GetTimeInfoFileNameForGivenTimeStep( self, timeStep, self->checkpointReadPath, CHECKPOINT_FORMAT_ASCII ); 
+   Stg_asprintf( &timeInfoFileName, "%stimeInfo.%.5u.h5", timeInfoFileNamePart, self->restartTimestep );
 	 
 	timeInfoFile = fopen( timeInfoFileName, "r" );
 	Journal_Firewall( NULL != timeInfoFile, errorStr, "Error- in %s(), Couldn't find checkpoint time info file with "
@@ -1084,27 +1093,26 @@ void _AbstractContext_LoadTimeInfoFromCheckPoint( Context* self, Index timeStep,
 #endif
 	
 	Memory_Free( timeInfoFileName );
+   Memory_Free( timeInfoFileNamePart );
 }
 		
 
 void _AbstractContext_SaveTimeInfo( Context* context ) {
 	AbstractContext*       self = context;	
 	char*                  timeInfoFileName = NULL;
+   char*                  timeInfoFileNamePart = NULL;
 	Stream*                errorStr = Journal_Register( Error_Type, self->type );
 #ifdef WRITE_HDF5
 	hid_t                  file, fileSpace, fileData, props;
 	hsize_t                count;
 	double                 Dt;
-#else
-	FILE*                  timeInfoFile;	
 #endif 
 
 	/* Only the master process needs to write this file */
-	if ( 0 != self->rank ) return;
-
-	
+	if ( self->rank == 0 ) {
+   timeInfoFileNamePart = Context_GetCheckPointWritePrefixString( self );
 #ifdef WRITE_HDF5
-	timeInfoFileName = AbstractContext_GetTimeInfoFileNameForGivenTimeStep( self, self->timeStep, self->checkpointWritePath, CHECKPOINT_FORMAT_HDF5 ); 
+   Stg_asprintf( &timeInfoFileName, "%stimeInfo.%.5u.h5", timeInfoFileNamePart, self->timeStep );
 	
 	/* Create parallel file property list. */
 	props = H5Pcreate( H5P_FILE_ACCESS );
@@ -1173,7 +1181,7 @@ void _AbstractContext_SaveTimeInfo( Context* context ) {
 	
 	
 #else	
-	timeInfoFileName = AbstractContext_GetTimeInfoFileNameForGivenTimeStep( self, self->timeStep, self->checkpointWritePath, CHECKPOINT_FORMAT_ASCII ); 
+   Stg_asprintf( &timeInfoFileName, "%stimeInfo.%.5u.dat", timeInfoFileNamePart, self->timeStep );
 	 
 	timeInfoFile = fopen( timeInfoFileName, "w" );
 
@@ -1190,21 +1198,28 @@ void _AbstractContext_SaveTimeInfo( Context* context ) {
 #endif
 	
 	Memory_Free( timeInfoFileName );
+   Memory_Free( timeInfoFileNamePart );
+} 
 }
 
 
 Bool AbstractContext_CheckPointExists( void* context, Index timeStep ) {
 	AbstractContext*       self = context;	
 	char*                  timeInfoFileName = NULL;
+	char*                  timeInfoFileNamePart = NULL;   
 	struct stat            statInfo;
 	int                    statResult;
 
-#ifdef READ_HDF5
-	timeInfoFileName = AbstractContext_GetTimeInfoFileNameForGivenTimeStep( self, self->timeStep, self->checkpointWritePath, CHECKPOINT_FORMAT_HDF5 ); 
+   timeInfoFileNamePart = Context_GetCheckPointWritePrefixString( self );
+#ifdef WRITE_HDF5
+   Stg_asprintf( &timeInfoFileName, "%stimeInfo.%.5u.h5", timeInfoFileNamePart, timeStep );
 #else	
-	timeInfoFileName = AbstractContext_GetTimeInfoFileNameForGivenTimeStep( self, self->timeStep, self->checkpointWritePath, CHECKPOINT_FORMAT_ASCII ); 
+   Stg_asprintf( &timeInfoFileName, "%stimeInfo.%.5u.dat", timeInfoFileNamePart, timeStep );
 #endif	
 	statResult = stat( timeInfoFileName, &statInfo );
+
+	Memory_Free( timeInfoFileName );
+   Memory_Free( timeInfoFileNamePart );
 
 	if ( 0 == statResult ) {
 		return True;
@@ -1214,65 +1229,78 @@ Bool AbstractContext_CheckPointExists( void* context, Index timeStep ) {
 	}
 }
 
-
-char* AbstractContext_GetTimeInfoFileNameForGivenTimeStep( void* context, Index timeStep, char* checkpointPath, CheckpointFileFormat checkpointFileFormat ) {
+char* Context_GetCheckPointReadPrefixString( void* context ) {
 	AbstractContext*       self = context;	
-	char*                  timeInfoFileName = NULL;
-	char*                  tmp = NULL;
-	Index                  timeInfoStrLen = 0;
+	Index                  readStrLen = 0;
+	char*                  readPathString = NULL;
 
-	timeInfoStrLen = strlen(checkpointPath) + 1 + 8 + 1 + 5 + 1 + 3 + 1;
-	if ( strlen(self->checkPointPrefixString) > 0 ) {
-		timeInfoStrLen += strlen(self->checkPointPrefixString) + 1;
-	}
-	timeInfoFileName = Memory_Alloc_Array( char, timeInfoStrLen, "timeInfoFileName" );
-	tmp = Memory_Alloc_Array( char, timeInfoStrLen, "tmpTimeInfoFileName" );
+   if ( self->checkpointAppendStep ) {
+      if ( strlen(self->checkPointPrefixString) > 0 ) {
+         Stg_asprintf( &readPathString, "%s/Checkpoint%.5u/%s.", self->checkpointReadPath, self->restartTimestep, self->checkPointPrefixString );
+      }
+      else {
+         Stg_asprintf( &readPathString, "%s/Checkpoint%.5u/", self->checkpointReadPath, self->restartTimestep );
+      }
+   } else {
+      if ( strlen(self->checkPointPrefixString) > 0 ) {
+         Stg_asprintf( &readPathString, "%s/%s.", self->checkpointReadPath, self->checkPointPrefixString );
+      }
+      else {
+         Stg_asprintf( &readPathString, "%s/", self->checkpointReadPath );
+      }
+   }
 
-	if ( strlen(self->checkPointPrefixString) > 0 ) {
-		sprintf( tmp, "%s/%s.", checkpointPath, self->checkPointPrefixString );
-	}
-	else {
-		sprintf( tmp, "%s/", checkpointPath );
-	}
-	
-	sprintf( timeInfoFileName, "%stimeInfo.%.5u", tmp, timeStep );
-
-	switch ( checkpointFileFormat ) {
-		case CHECKPOINT_FORMAT_HDF5:
-			strcat( timeInfoFileName, ".h5" );
-			break;
-		case CHECKPOINT_FORMAT_ASCII:
-			strcat( timeInfoFileName, ".dat" );
-			break;
-		default:
-			Journal_Firewall( 0, Journal_Register( Error_Type, self->type),
-				"Error: in %s: passed unknown checkpoint format option.\n",
-				__func__ ); 
-	}
-
-	Memory_Free( tmp );
-
-	return timeInfoFileName;
+	return readPathString;
 }
 
-
-char* Context_GetCheckPointInputPrefixString( void* context ) {
+char* Context_GetCheckPointWritePrefixString( void* context ) {
 	AbstractContext*       self = context;	
-	Index                  inputStrLen = 0;
-	char*                  inputPathString = NULL;
+	Index                  writeStrLen = 0;
+	char*                  writePathString = NULL;
 
-	inputStrLen = strlen(self->checkpointReadPath) + 1 + 1;
-	if ( strlen(self->checkPointPrefixString) > 0 ) {
-		inputStrLen += strlen(self->checkPointPrefixString) + 1;
-	}
-	inputPathString = Memory_Alloc_Array( char, inputStrLen, "inputPathString" );
+   if ( self->checkpointAppendStep ) {
+      if ( strlen(self->checkPointPrefixString) > 0 ) {
+         Stg_asprintf( &writePathString, "%s/Checkpoint%.5u/%s.", self->checkpointWritePath, self->timeStep, self->checkPointPrefixString );
+      }
+      else {
+         Stg_asprintf( &writePathString, "%s/Checkpoint%.5u/", self->checkpointWritePath, self->timeStep );
+      }
+   } else {
+      if ( strlen(self->checkPointPrefixString) > 0 ) {
+         Stg_asprintf( &writePathString, "%s/%s.", self->checkpointWritePath, self->checkPointPrefixString );
+      }
+      else {
+         Stg_asprintf( &writePathString, "%s/", self->checkpointWritePath );
+      }
+   }
 
-	if ( strlen(self->checkPointPrefixString) > 0 ) {
-		sprintf( inputPathString, "%s/%s.", self->checkpointReadPath, self->checkPointPrefixString );
-	}
-	else {
-		sprintf( inputPathString, "%s/", self->checkpointReadPath );
-	}
+	return writePathString;
+}
 
-	return inputPathString;
+void _AbstractContext_CreateCheckpointDirectory( Context* context ) {
+	AbstractContext*       self = context;	
+   /* if we are creating individual directories for each checkpoint timestep, first create the directory if it doesn't exist. */
+   if ( self->checkpointAppendStep ) {
+      /* Only the master process creates the directory */      
+      if ( self->rank == 0 ) {
+         char*                  writePathString = NULL;
+         Stg_asprintf( &writePathString, "%s/Checkpoint%.5u/", self->checkpointWritePath, self->timeStep );
+         if ( ! Stg_DirectoryExists( writePathString ) ) {
+            Bool ret;
+            if ( Stg_FileExists( writePathString ) )
+               Journal_Firewall( 
+                  0, 
+                  self->info, 
+                  "checkpoint outputPath '%s' is a file an not a directory! Exiting...\n", self->outputPath );
+            ret = Stg_CreateDirectory( writePathString );
+            Journal_Firewall( ret, self->info, "Unable to create non-existing outputPath to '%s'\n", self->outputPath );
+         }
+         /* other processes may proceed now that required directory has been created */
+         MPI_Barrier( self->communicator );
+			Memory_Free( writePathString );
+			writePathString = NULL;
+      } else
+      /* barrier to stop other processes continuing until required directory has been created */ 
+      MPI_Barrier( self->communicator );
+   }
 }
