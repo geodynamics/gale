@@ -61,7 +61,6 @@ void lucPlugin_VisualOnlyRun( Context* _context ) {
 	Index                   fieldVar_I;
 	FieldVariable*          fieldVar;
 	Swarm_Register*         swarm_Register = Swarm_Register_GetSwarm_Register();
-	char                    newSwarmCheckpointFilename[1024];
 	Swarm*                  swarm;
 	Index                   swarm_I;
 	
@@ -131,12 +130,21 @@ void lucPlugin_VisualOnlyRun( Context* _context ) {
 				swarm = Swarm_Register_At( swarm_Register, swarm_I );
 				
 				if ( True == swarm->isSwarmTypeToCheckPointAndReload ) {
+               char*  swarmFileName     = NULL;
+               char*  swarmFileNamePart = NULL;
 
 					Stg_CheckType( swarm->particleLayout, FileParticleLayout );
 
-					Swarm_GetCheckpointFilenameForGivenTimestep( swarm, (AbstractContext*)context,
-						newSwarmCheckpointFilename );
-					((FileParticleLayout*)swarm->particleLayout)->filename = newSwarmCheckpointFilename;
+               swarmFileNamePart = Context_GetCheckPointReadPrefixString( (AbstractContext*)context );
+               #ifdef READ_HDF5
+                  swarm->checkpointnfiles = context->checkpointnproc;
+                  Stg_asprintf( &swarmFileName, "%s%s.%05d", swarmFileNamePart, swarm->name, context->restartTimestep );
+               #else
+                  Stg_asprintf( &swarmFileName, "%s%s.%05d.dat", swarmFileNamePart, swarm->name, context->restartTimestep );
+               #endif
+               
+					((FileParticleLayout*)swarm->particleLayout)->filename = swarmFileName;
+               
 					/* Need to re-build & initialise the particles in case the number of particles changed
 					due to pop. control */
 					Memory_Free( swarm->cellParticleCountTbl );
@@ -145,6 +153,9 @@ void lucPlugin_VisualOnlyRun( Context* _context ) {
 					ExtensionManager_Free( swarm->particleExtensionMgr, swarm->particles );
 					_Swarm_BuildParticles( swarm, context );
 					_Swarm_InitialiseParticles( swarm, context );
+
+               Memory_Free( swarmFileName );
+               Memory_Free( swarmFileNamePart );               
 				}
 			}	
 
