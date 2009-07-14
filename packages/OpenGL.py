@@ -9,8 +9,8 @@ class OpenGL(Package):
         yield ('/usr/X11R6', [], [])
         yield ('/usr/local', [], [])
 
-    def gen_base_extensions(self, base):
-        for e in Package.gen_base_extensions(self, base):
+    def gen_base_extensions(self):
+        for e in Package.gen_base_extensions(self):
             yield e
             yield ([os.path.join(h, 'GL') for h in e[0]], e[1])
 
