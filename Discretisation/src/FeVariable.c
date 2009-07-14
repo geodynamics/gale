@@ -2103,7 +2103,6 @@ void FeVariable_SaveToFile( void* feVariable, const char* filename, Bool saveCoo
    buf = Memory_Alloc_Array( double, count[1], "fileBuffer" );
    
    for ( lNode_I = 0; lNode_I < FeMesh_GetNodeLocalSize( self->feMesh ); lNode_I++ ) {
-		gNode_I = FeMesh_NodeDomainToGlobal( self->feMesh, lNode_I );
 
 	   /* If required, add coords to array */
 	   if( saveCoords ) {
@@ -2297,7 +2296,7 @@ void FeVariable_ReadFromFile( void* feVariable, const char* filename ) {
       H5Sselect_all( memSpace );
          
       error = H5Dread( fileData, H5T_NATIVE_DOUBLE, memSpace, fileSpace, H5P_DEFAULT, buf );
-      gNode_I = (int)buf[0];
+      gNode_I = ii;
 
       Journal_Firewall( 
          error >= 0, 
