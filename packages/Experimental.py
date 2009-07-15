@@ -1,11 +1,11 @@
 import os
 from config import Package
-from PICellerator import PICellerator
+from Underworld import Underworld
 
-class Underworld(Package):
+class Experimental(Package):
 
     def setup_dependencies(self):
-        self.picellerator = self.add_dependency(PICellerator, required=True)
+        self.underworld = self.add_dependency(Underworld, required=True)
 
     def gen_locations(self):
         yield ('/usr', [], [])
@@ -17,7 +17,8 @@ class Underworld(Package):
                             os.path.join('StgDomain', 'StgDomain.h'),
                             os.path.join('StgFEM', 'StgFEM.h'),
                             os.path.join('PICellerator', 'PICellerator.h'),
-                            os.path.join('Underworld', 'Underworld.h')]
+                            os.path.join('Underworld', 'Underworld.h'),
+                            os.path.join('Experimental', 'Experimental.h')]
             if self.find_libraries(loc[2], 'Underworld'):
                 env.PrependUnique(LIBS=['Underworld'])
                 yield env

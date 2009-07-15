@@ -13,4 +13,6 @@ from libFAME import libFAME
 from Carbon import Carbon
 from Cocoa import Cocoa
 from AGL import AGL
+from pcu import pcu
 from stgGlobus import stgGlobus
+from Experimental import Experimental

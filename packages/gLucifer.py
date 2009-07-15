@@ -1,32 +1,21 @@
 import os
-import config
+from config import Package
+from StgDomain import StgDomain
 
-class gLucifer(config.Package):
-
-    def __init__(self, ctx, **kw):
-        config.Package.__init__(self, ctx, **kw)
-        self.inc_exts = ["gLucifer"]
+class gLucifer(Package):
 
     def setup_dependencies(self):
-        config.Package.setup_dependencies(self)
-        self.fem = self.add_dependency(config.packages.StgFEM, required=True, combine=True)
+        self.stgdomain = self.add_dependency(StgDomain, required=True)
 
-    def setup_libraries(self):
-        self.add_library_set([os.path.join("gLucifer", "gLucifer.h")], ["gLucifer"])
+    def gen_locations(self):
+        yield ('/usr', [], [])
+        yield ('/usr/local', [], [])
 
-    def process_options(self):
-        config.Package.process_options(self)
-        self.stg = self.fem.dom.stg
-        base_dir = self.stg.get_option("stg_dir", None)
-        if base_dir is not None:
-            self.forced_base_dirs = [base_dir]
-
-    source_code = {"c": """#include <stdlib.h>
-#include <StGermain/StGermain.h>
-#include <StgDomain/StgDomain.h>
-#include <StgFEM/StgFEM.h>
-#include <gLucifer/gLucifer.h>
-int main( int argc, char** argv ) {
-  return EXIT_SUCCESS;
-}
-"""}
+    def gen_envs(self, loc):
+        for env in Package.gen_envs(self, loc):
+            self.headers = [os.path.join('StGermain', 'StGermain.h'),
+                            os.path.join('StgDomain', 'StgDomain.h'),
+                            os.path.join('glucifer', 'glucifer.h'),
+            if self.find_libraries(loc[2], 'glucifer'):
+                env.PrependUnique(LIBS=['glucifer'])
+                yield env

@@ -1,32 +1,23 @@
 import os
-import config
+from config import Package
+from StgDomain import StgDomain
+from PETSc import PETSc
 
-class StgFEM(config.Package):
-
-    def __init__(self, ctx, **kw):
-        config.Package.__init__(self, ctx, **kw)
-        self.inc_exts = ["StgFEM"]
+class StgFEM(Package):
 
     def setup_dependencies(self):
-        config.Package.setup_dependencies(self)
-        self.add_dependency(config.packages.PETSc, required=True, combine=True)
-        self.dom = self.add_dependency(config.packages.StgDomain, required=True, combine=True)
+        self.petsc = self.add_dependency(PETSc, required=True)
+        self.stgdomain = self.add_dependency(StgDomain, required=True)
 
-    def setup_libraries(self):
-        self.add_library_set([os.path.join("StgFEM", "StgFEM.h")], ["StgFEM"])
+    def gen_locations(self):
+        yield ('/usr', [], [])
+        yield ('/usr/local', [], [])
 
-    def process_options(self):
-        config.Package.process_options(self)
-        self.stg = self.dom.stg
-        base_dir = self.stg.get_option("stg_dir", None)
-        if base_dir is not None:
-            self.forced_base_dirs = [base_dir]
-
-    source_code = {"c": """#include <stdlib.h>
-#include <StGermain/StGermain.h>
-#include <StgDomain/StgDomain.h>
-#include <StgFEM/StgFEM.h>
-int main( int argc, char** argv ) {
-  return EXIT_SUCCESS;
-}
-"""}
+    def gen_envs(self, loc):
+        for env in Package.gen_envs(self, loc):
+            self.headers = [os.path.join('StGermain', 'StGermain.h'),
+                            os.path.join('StgDomain', 'StgDomain.h'),
+                            os.path.join('StgFEM', 'StgFEM.h')]
+            if self.find_libraries(loc[2], 'StgFEM'):
+                env.PrependUnique(LIBS=['StgFEM'])
+                yield env
