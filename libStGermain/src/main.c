@@ -48,15 +48,15 @@
 #include <stdio.h>
 
 
-void stgMain( Dictionary* dictionary, MPI_Comm CommWorld ) {
+void stgMain( Dictionary* dictionary, MPI_Comm communicator ) {
 	AbstractContext* context;
 
-	context = stgMainInit( dictionary, CommWorld );
+	context = stgMainInit( dictionary, communicator );
 	stgMainLoop( context );
 	stgMainDestroy( context );
 }
 
-AbstractContext* stgMainInit( Dictionary* dictionary, MPI_Comm CommWorld ) {
+AbstractContext* stgMainInit( Dictionary* dictionary, MPI_Comm communicator ) {
 	AbstractContext*		context = NULL;
 	
 	/* Construction phase -----------------------------------------------------------------------------------------------*/
@@ -77,7 +77,7 @@ AbstractContext* stgMainInit( Dictionary* dictionary, MPI_Comm CommWorld ) {
 	                NULL,
 	                0,
 	                0,
-	                CommWorld,
+	                communicator,
 	                dictionary );
 
 	/* Construction phase -----------------------------------------------------------------------------------------------*/
@@ -91,6 +91,29 @@ AbstractContext* stgMainInit( Dictionary* dictionary, MPI_Comm CommWorld ) {
 
 	return context;
 }
+
+
+AbstractContext* stgMainInitFromXML( char* xmlInputFilename, MPI_Comm communicator ) {
+   AbstractContext*  context = NULL;
+   Dictionary*       dictionary = NULL;
+   Bool              result;
+   XML_IO_Handler*   ioHandler;
+
+   dictionary = Dictionary_New();
+   ioHandler = XML_IO_Handler_New();
+   result = IO_Handler_ReadAllFromFile( ioHandler, xmlInputFilename, dictionary );
+   /* In case the user has put any journal configuration in the XML, read here */
+   Journal_ReadFromDictionary( dictionary );
+
+   context = stgMainInit( dictionary, communicator );
+   
+   /* We don't need the XML IO handler again (however don't delete the dictionary as it's 
+    * 'owned' by the context from hereon */
+   Stg_Class_Delete( ioHandler );
+
+   return context;
+}
+
 	
 void stgMainLoop( AbstractContext* context ) {
 	/* Run (Solve) phase ------------------------------------------------------------------------------------------------*/
