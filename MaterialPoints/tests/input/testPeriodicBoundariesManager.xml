@@ -43,6 +43,8 @@
 	<param name="journal.info.Context-verbose">false</param>
 	<param name="journal-level.info.Stg_ComponentFactory"> 0 </param>
 	<param name="journal.debug">f</param>
+   <!-- for the purpose of testing, reduce output as much as possible. If the test fails,
+    comment out the line below to help diagnose source of error -->
 	<param name="journal.info">f</param>
 
 	<param name="maxTimeSteps"> 1 </param>

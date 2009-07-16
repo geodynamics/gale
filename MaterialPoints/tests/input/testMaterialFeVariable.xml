@@ -99,6 +99,9 @@
 	<param name="journal.debug">f</param>
 	<param name="journal-enable-branch.debug.StgFEM">f</param>
 	<param name="journal-level-branch.debug.StgFEM"> 2 </param>
+   <!-- for the purpose of testing, reduce output as much as possible. If the test fails,
+    comment out the line below to help diagnose source of error -->
+	<param name="journal.info">f</param>
 
 	<param name="maxTimeSteps"> 1 </param>
 	<param name="dumpEvery"> 1 </param>
