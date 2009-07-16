@@ -46,17 +46,9 @@ typedef struct {
 
 void MaterialFeVariableSuite_Setup( MaterialFeVariableSuiteData* data ) {
    char              xmlInputFilename[PCU_PATH_MAX];
-   Dictionary*       dictionary = NULL;
-   Bool              result;
-   XML_IO_Handler*   ioHandler;
 
    pcu_filename_input( "testMaterialFeVariable.xml", xmlInputFilename );
-   dictionary = Dictionary_New();
-   ioHandler = XML_IO_Handler_New();
-   result = IO_Handler_ReadAllFromFile( ioHandler, xmlInputFilename, dictionary );
-   Journal_ReadFromDictionary( dictionary );
-
-   data->context = (PICelleratorContext*)stgMainInit( dictionary, MPI_COMM_WORLD );
+   data->context = (PICelleratorContext*)stgMainInitFromXML( xmlInputFilename, MPI_COMM_WORLD );
 
    stgMainLoop( (AbstractContext*)data->context );
 } 
