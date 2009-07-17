@@ -56,6 +56,7 @@
 	#include "PressureTemperatureOutput.h"
 	#include "Underworld_SwarmOutput.h"
 	#include "RadiogenicHeatingTerm.h"
+	#include "XDMFGenerator.h"
 	#include "Init.h"
 	#include "Finalise.h"
 #endif 

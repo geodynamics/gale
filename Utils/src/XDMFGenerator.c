@@ -45,6 +45,7 @@
 #include <StgFEM/StgFEM.h>
 #include <PICellerator/PICellerator.h>
 #include <Underworld/Underworld.h>
+
 #include "XDMFGenerator.h"
 
 #include <stdlib.h>
@@ -54,42 +55,9 @@
 	#define MASTER 0
 #endif
 
-const Type Underworld_XDMFGenerator_Type = "Underworld_XDMFGenerator";
+const Type XDMFGenerator_Type = "XDMFGenerator";
 
-void _Underworld_XDMFGenerator_Construct( void* component, Stg_ComponentFactory* cf, void *data ) {
-	Underworld_XDMFGenerator* self         = (Underworld_XDMFGenerator*) component;
-   UnderworldContext*        context;
-
-   context = (UnderworldContext*)Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data );
-
-/** only run this plugin if we are writing HDF5 files **/
-#ifdef WRITE_HDF5
-
-   ContextEP_Append( context, AbstractContext_EP_Dump, _Underworld_XDMFGenerator_GenerateAll );
-
-#endif
-}
-
-void* _Underworld_XDMFGenerator_DefaultNew( Name name ) {
-   return Codelet_New(
-         Underworld_XDMFGenerator_Type,
-         _Underworld_XDMFGenerator_DefaultNew,
-         _Underworld_XDMFGenerator_Construct,
-         _Codelet_Build,
-         _Codelet_Initialise,
-         _Codelet_Execute,
-         _Codelet_Destroy,
-         name );
-}
-
-Index Underworld_XDMFGenerator_Register( PluginsManager* pluginsManager ) {
-   Journal_DPrintf( StgFEM_Debug, "In: %s( void* )\n", __func__ );
-
-   return PluginsManager_Submit( pluginsManager, Underworld_XDMFGenerator_Type, "0", _Underworld_XDMFGenerator_DefaultNew );
-}
-
-
-void _Underworld_XDMFGenerator_GenerateAll( void* _context ) {
+void XDMFGenerator_GenerateAll( void* _context ) {
    UnderworldContext*   context    = (UnderworldContext*)_context;
    Stream*              stream;
       
@@ -99,49 +67,53 @@ void _Underworld_XDMFGenerator_GenerateAll( void* _context ) {
 
    /** only the MASTER process writes to the file.  other processes send information to the MASTER where required **/   
    if(context->rank == MASTER) {
-      Name                 filename;
       Bool                 fileOpened;
       Stream*              errorStream  = Journal_Register( Error_Type, CURR_MODULE_NAME );
+      char*                 filename;
+      char*                outputPathString;
 
       /** Create Stream **/
       stream = Journal_Register( InfoStream_Type, "XDMFOutputFile" );
    
       /** Set auto flush on stream **/
       Stream_SetAutoFlush( stream, True );
+
+		outputPathString = Context_GetCheckPointWritePrefixString( context );
    
-      /** Get name of frequent output file **/
-      Stg_asprintf( &filename, "%s/XDMF.%05d.xmf", context->checkpointWritePath, context->timeStep );
+      /** Get name of XDMF schema file **/
+      Stg_asprintf( &filename, "%s/XDMF.%05d.xmf", outputPathString, context->timeStep );
    
       /** Init file, always overwriting any existing **/
       fileOpened = Stream_RedirectFile( stream, filename );
       Journal_Firewall( fileOpened, errorStream, 
-            "Could not open file %s/%s. Possibly directory %s does not exist or is not writable.\n"
-            "Check 'checkpointWritePath' in input file.\n", context->checkpointWritePath, filename, context->checkpointWritePath );
+            "Could not open file %s. Possibly directory %s does not exist or is not writable.\n"
+            "Check 'checkpointWritePath' in input file.\n", filename, outputPathString );
       Memory_Free( filename );
+      Memory_Free( outputPathString );
       
       /** write header information **/
-      _Underworld_XDMFGenerator_WriteHeader( context, stream );
+      _XDMFGenerator_WriteHeader( context, stream );
 
       /** Write all (checkpointed) FeVariable field information  **/
-      _Underworld_XDMFGenerator_WriteFieldSchema( context, stream );
+      _XDMFGenerator_WriteFieldSchema( context, stream );
 
       /** Write all (checkpointed) FeVariable field information  **/
-      _Underworld_XDMFGenerator_WriteSwarmSchema( context, stream);
+      _XDMFGenerator_WriteSwarmSchema( context, stream);
 
       /** writes footer information and close file/stream **/
-      _Underworld_XDMFGenerator_WriteFooter( context, stream );
+      _XDMFGenerator_WriteFooter( context, stream );
 
       /** close the file **/
-      Stream_CloseFile( stream);	
+      Stream_CloseFile( stream );	
 
    } else {
       /** other process send information about swarms populations to MASTER **/
-      _Underworld_XDMFGenerator_SendInfo( context );
+      _XDMFGenerator_SendInfo( context );
    }
 
 }
 
-void _Underworld_XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream ) {
+void _XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream ) {
    FieldVariable*       fieldVar = NULL;
    FeVariable*          feVar    = NULL;
    Mesh*                mesh;
@@ -186,8 +158,9 @@ void _Underworld_XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Str
       } else if ( maxNodes == 8  ) {
          Stg_asprintf( &topologyType, "Hexahedron" );
       } else {
-         Journal_Firewall( NULL, errorStream, "\n\n number of element nodes %u not supported...\n should be 4 (2D quadrilateral) " 
+         Journal_DPrintf( errorStream, "\n\n number of element nodes %u not supported...\n should be 4 (2D quadrilateral) " 
                                  "or should be 8 (3D hexahedron). \n\n", maxNodes );
+         Stg_asprintf( &topologyType, "UNKNOWN_POSSIBLY_ERROR" );
       }
       /** first create the grid which is applicable to the checkpointed fevariables **/
                               Journal_Printf( stream, "   <Grid Name=\"FeVariable_Grid\">\n\n" );
@@ -206,18 +179,18 @@ void _Underworld_XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Str
                               Journal_Printf( stream, "            <DataItem ItemType=\"Function\"  Dimensions=\"%u 3\" Function=\"JOIN($0, $1, 0*$1)\">\n", totalVerts );
                               Journal_Printf( stream, "               <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" Name=\"XCoords\">\n", totalVerts );
                               Journal_Printf( stream, "                  <DataItem Dimensions=\"3 2\" Format=\"XML\"> 0 0 1 1 %u 1 </DataItem>\n", totalVerts );
-                              Journal_Printf( stream, "                  <DataItem Format=\"HDF\" %s Dimensions=\"%u 2\">Mesh.%05d.h5:/data</DataItem>\n", variableType, totalVerts, context->timeStep );
+                              Journal_Printf( stream, "                  <DataItem Format=\"HDF\" %s Dimensions=\"%u 2\">Mesh.%05d.h5:/vertices</DataItem>\n", variableType, totalVerts, context->timeStep );
                               Journal_Printf( stream, "               </DataItem>\n" );
                               Journal_Printf( stream, "               <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" Name=\"YCoords\">\n", totalVerts );
                               Journal_Printf( stream, "                  <DataItem Dimensions=\"3 2\" Format=\"XML\"> 0 1 1 1 %u 1 </DataItem>\n", totalVerts );
-                              Journal_Printf( stream, "                  <DataItem Format=\"HDF\" %s Dimensions=\"%u 2\">Mesh.%05d.h5:/data</DataItem>\n", variableType, totalVerts, context->timeStep );
+                              Journal_Printf( stream, "                  <DataItem Format=\"HDF\" %s Dimensions=\"%u 2\">Mesh.%05d.h5:/vertices</DataItem>\n", variableType, totalVerts, context->timeStep );
                               Journal_Printf( stream, "               </DataItem>\n" );
                               Journal_Printf( stream, "            </DataItem>\n" );
       } else if ( nDims == 3 ) {
          /** in 3d we simply feed back the 3d hdf5 array, nice and easy **/
-                              Journal_Printf( stream, "            <DataItem Format=\"HDF\" %s Dimensions=\"%u 3\">Mesh.%05d.h5:/data</DataItem>\n", variableType, totalVerts, context->timeStep );
+                              Journal_Printf( stream, "            <DataItem Format=\"HDF\" %s Dimensions=\"%u 3\">Mesh.%05d.h5:/vertices</DataItem>\n", variableType, totalVerts, context->timeStep );
       } else {
-         Journal_Firewall( NULL, errorStream, "\n\n Position SwarmVariable is not of dofCount 2 or 3.  Should this swarm be checkpointed?\n\n" );
+         Journal_DPrintf( errorStream, "\n\n Position SwarmVariable is not of dofCount 2 or 3.  Should this swarm be checkpointed?\n\n" );
       }
                               Journal_Printf( stream, "         </Geometry>\n\n" );
       /**----------------------- FINISH GEOMETRY  ------------------------------------------------------------------------------------------------------------------- **/
@@ -250,7 +223,8 @@ void _Underworld_XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Str
                   } else if( meshSize == totalVerts ) {
                      Stg_asprintf( &centering, "Node" );
                   } else {
-                     Journal_Firewall( NULL, errorStream, "\n\n mesh global size must equal number of nodes, or number of elements... something is amiss! \n\n" );
+                     /* unknown/unsupported type */
+                     Stg_asprintf( &centering, "UNKNOWN_POSSIBLY_ERROR" );
                   }
                   /** how many degrees of freedom does the fevariable have? **/
                   dofAtEachNodeCount = feVar->fieldComponentCount;
@@ -307,7 +281,7 @@ Memory_Free( variableType );
 Memory_Free( topologyType );
 }
 
-void _Underworld_XDMFGenerator_WriteSwarmSchema( UnderworldContext* context, Stream* stream ) {
+void _XDMFGenerator_WriteSwarmSchema( UnderworldContext* context, Stream* stream ) {
    Swarm_Register* swarmRegister = Swarm_Register_GetSwarm_Register();
    Index           swarmCount;
    Index           swarmcountindex;
@@ -359,14 +333,14 @@ void _Underworld_XDMFGenerator_WriteSwarmSchema( UnderworldContext* context, Str
                               Journal_Printf( stream, "         <Geometry Type=\"XYZ\">\n" );
             Stg_asprintf( &swarmVarName, "%s-Position", currentSwarm->name );
             swarmVar = SwarmVariable_Register_GetByName( currentSwarm->swarmVariable_Register, swarmVarName );
-            Journal_Firewall( swarmVar, errorStream, "\n\n Could not find required Position SwarmVariable.  Should this swarm be checkpointed?\n\n" );
+            Journal_DPrintf( errorStream, "\n\n Could not find required Position SwarmVariable.  Should this swarm be checkpointed?\n\n" );
             Memory_Free( swarmVarName );
             
             /** check what precision it Position variable is stored at **/
             if(        swarmVar->variable->dataTypes[0] == Variable_DataType_Int ){
-               Journal_Firewall( NULL, errorStream, "\n\n Position variable can not be of type Int... something is amiss! \n\n" );
+               Journal_DPrintf( errorStream, "\n\n Position variable can not be of type Int... something is amiss! \n\n" );
             } else if ( swarmVar->variable->dataTypes[0] == Variable_DataType_Char){
-               Journal_Firewall( NULL, errorStream, "\n\n Position variable can not be of type Char... something is amiss! \n\n" );
+               Journal_DPrintf( errorStream, "\n\n Position variable can not be of type Char... something is amiss! \n\n" );
             } else if ( swarmVar->variable->dataTypes[0] == Variable_DataType_Float ){
                Stg_asprintf( &variableType, "NumberType=\"Float\" Precision=\"4\"" );
             } else {
@@ -391,7 +365,7 @@ void _Underworld_XDMFGenerator_WriteSwarmSchema( UnderworldContext* context, Str
                /** in 3d we simply feed back the 3d hdf5 array, nice and easy **/
                               Journal_Printf( stream, "            <DataItem Format=\"HDF\" %s Dimensions=\"%u 3\">%s.%05d%s.h5:/%s-Position</DataItem>\n", variableType, swarmParticleLocalCount, currentSwarm->name, context->timeStep, filename_part, currentSwarm->name );
             } else {
-               Journal_Firewall( NULL, errorStream, "\n\n Position SwarmVariable is not of dofCount 2 or 3.  Should this swarm be checkpointed?\n\n" );
+               Journal_DPrintf( errorStream, "\n\n Position SwarmVariable is not of dofCount 2 or 3.  Should this swarm be checkpointed?\n\n" );
             }
                               Journal_Printf( stream, "         </Geometry>\n\n" );
             /**----------------------- FINISH GEOMETRY  ------------------------------------------------------------------------------------------------------------------- **/
@@ -470,7 +444,7 @@ Memory_Free( filename_part );
 
 }
 
-void  _Underworld_XDMFGenerator_WriteHeader( UnderworldContext* context, Stream* stream ) {
+void  _XDMFGenerator_WriteHeader( UnderworldContext* context, Stream* stream ) {
    
 	/** Print XDMF header info **/
                               Journal_Printf( stream, "<?xml version=\"1.0\" ?>\n" );
@@ -483,7 +457,7 @@ void  _Underworld_XDMFGenerator_WriteHeader( UnderworldContext* context, Stream*
 }
 
 
-void _Underworld_XDMFGenerator_WriteFooter( UnderworldContext* context, Stream* stream ) {
+void _XDMFGenerator_WriteFooter( UnderworldContext* context, Stream* stream ) {
 
                               Journal_Printf( stream, "</Domain>\n" );
                               Journal_Printf( stream, "\n" );
@@ -492,7 +466,7 @@ void _Underworld_XDMFGenerator_WriteFooter( UnderworldContext* context, Stream* 
 
 }
 
-void _Underworld_XDMFGenerator_SendInfo( UnderworldContext* context ) {
+void _XDMFGenerator_SendInfo( UnderworldContext* context ) {
    Swarm_Register* swarmRegister = Swarm_Register_GetSwarm_Register();
    Index           swarmCount;
    Index           swarmcountindex;

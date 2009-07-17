@@ -49,9 +49,11 @@
 #include <StgFEM/StgFEM.h>
 #include <PICellerator/PICellerator.h>
 #include <Underworld/Rheology/Rheology.h>
+#include <Underworld/Rheology/Rheology.h>
 
 #include "types.h"
 #include "Context.h"
+#include "XDMFGenerator.h"
 
 /* Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 const Type UnderworldContext_Type = "UnderworldContext";
@@ -170,6 +172,12 @@ void _UnderworldContext_Init( UnderworldContext* self ) {
 			   "Underworld App Assign Pointers",
 			   UnderworldContext_AssignPointers,
 			   "Underworld_App_Construct" );
+
+   /* always generate XDMF files when we generate HDF5 checkpoints */
+#ifdef WRITE_HDF5
+   ContextEP_Append( self, AbstractContext_EP_Save, XDMFGenerator_GenerateAll );
+#endif
+   
 
 }
 

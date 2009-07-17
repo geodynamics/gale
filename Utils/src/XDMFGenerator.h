@@ -50,20 +50,15 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Underworld_XDMFGenerator_h__
-#define __Underworld_XDMFGenerator_h__
+#ifndef __XDMFGenerator_h__
+#define __XDMFGenerator_h__
 
-    extern const Type Underworld_XDMFGenerator_Type;
-    
-    typedef struct {
-        __Codelet
-    } Underworld_XDMFGenerator;
-    
-    Index _Underworld_XDMFGenerator_Register( PluginsManager* pluginsManager );
-    void  _Underworld_XDMFGenerator_GenerateAll( void* _context );
-    void  _Underworld_XDMFGenerator_WriteHeader( UnderworldContext* context, Stream* stream );
-    void  _Underworld_XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream );
-    void  _Underworld_XDMFGenerator_WriteSwarmSchema( UnderworldContext* context, Stream* stream );
-    void  _Underworld_XDMFGenerator_SendInfo( UnderworldContext* context );
-    void  _Underworld_XDMFGenerator_WriteFooter( UnderworldContext* context, Stream* stream );
+    extern const Type XDMFGenerator_Type;
+        
+    void  XDMFGenerator_GenerateAll( void* _context );
+    void  _XDMFGenerator_WriteHeader( UnderworldContext* context, Stream* stream );
+    void  _XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream );
+    void  _XDMFGenerator_WriteSwarmSchema( UnderworldContext* context, Stream* stream );
+    void  _XDMFGenerator_SendInfo( UnderworldContext* context );
+    void  _XDMFGenerator_WriteFooter( UnderworldContext* context, Stream* stream );
 #endif  
