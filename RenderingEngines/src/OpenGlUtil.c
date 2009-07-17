@@ -106,6 +106,7 @@ void lucPrintString(const char* str)
 		fontcharset = FONT_FIXED;	
 
 	glEnable(GL_TEXTURE_2D);				 					/* Enable Texture Mapping */
+	glBindTexture(GL_TEXTURE_2D, texture);
 	glListBase(fontbase - 32 + (96 * fontcharset));		/* Choose the font and charset */
 
 	glCallLists(strlen(str),GL_UNSIGNED_BYTE, str);		/* Display */
@@ -116,6 +117,7 @@ void lucPrintString(const char* str)
 	 * as no text is stored in the GL feedback buffer */  
 		gl2psText( A, "Times-Roman", 16);
 	#endif
+	glDisable(GL_TEXTURE_2D);				 					/* Turn off Texture Mapping */
 }
 
 void lucPrintf(int x, int y, const char *fmt, ...)

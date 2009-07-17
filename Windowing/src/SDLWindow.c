@@ -207,7 +207,7 @@ void _lucSDLWindow_Initialise( void* window, void* data ) {
     SDL_GL_SetAttribute(SDL_GL_RED_SIZE,        8);
     SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE,      8);
     SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE,       8);
-    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE,       8);
+    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE,      8);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE,      16);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE,    1);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER,    1);
@@ -270,7 +270,7 @@ void _lucSDLWindow_Display( void* window ) {
 	/* Run the parent function to display window... */
 	lucWindow_Display(window);	
 
-    if (!self->interactive || !self->isMaster) return;    
+    //if (!self->interactive || !self->isMaster) return;    
   #ifdef HAVE_OSMESA
 	/* Render to SDL using OSMesa output buffer */
 	SDL_BlitSurface(self->buffer,NULL,self->screen,NULL);

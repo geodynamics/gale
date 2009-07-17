@@ -43,6 +43,13 @@
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+#ifdef HAVE_OPENGL_FRAMEWORK
+	#include <OpenGL/gl.h>
+	#include <OpenGL/glu.h>
+#else
+	#include <gl.h>
+	#include <glu.h>
+#endif
 
 #ifndef __lucRenderingEngineGL_h__
 #define __lucRenderingEngineGL_h__
@@ -56,6 +63,7 @@
 		__lucRenderingEngine \
 		/* Virtual functions go here */ \
 		/* Other info */\
+		GLboolean               doubleBuffered;            \
 
 	struct lucRenderingEngineGL { __lucRenderingEngineGL };
 	

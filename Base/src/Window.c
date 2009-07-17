@@ -406,6 +406,7 @@ void _lucWindow_Execute( void* window, void* data ) {
             }
 
         	/* Broadcast information about event loop*/ 
+        	MPI_Bcast( &self->quitEventLoop, 1, MPI_INT, MASTER, self->context->communicator );
         	MPI_Bcast( &events, 1, MPI_INT, MASTER, self->context->communicator );
         	MPI_Bcast( &redisplay, 1, MPI_INT, MASTER, self->context->communicator );
       
@@ -498,9 +499,6 @@ void lucWindow_Dump( void* window, AbstractContext* context ) {
 	Stream*        errorStream  = Journal_MyStream( Error_Type, self );
 
 	lucDebug_PrintFunctionBegin( self, 1 );
-
-	/* Block until all rendering complete */
-	glFinish();  
 
 	/* Allocate Memory */
 	imageBuffer = Memory_Alloc_Array( lucPixel, width * height, "Pixels" );
