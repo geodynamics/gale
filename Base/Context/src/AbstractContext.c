@@ -142,6 +142,12 @@ void _AbstractContext_Init(
 	Dictionary_Entry_Value* dictEntryVal = NULL;
 	Dictionary *componentDict = NULL;
 	char buf[80];
+
+#ifdef READ_HDF5
+   /* disable HDF5 error reporting, as verbosity can be excessive, and some 
+      errors are expected and need not be reported */
+   H5Eset_auto(NULL, NULL);
+#endif
 	
 	/* General and Virtual info should already be set */
 	
@@ -208,7 +214,7 @@ void _AbstractContext_Init(
 	self->checkpointWritePath = StG_Strdup( Dictionary_Entry_Value_AsString( 
 		Dictionary_GetDefault( self->dictionary, "checkpointWritePath", Dictionary_Entry_Value_FromString( self->checkpointWritePath ) ) ) );
 	self->checkpointAppendStep = Dictionary_Entry_Value_AsBool( 
-		Dictionary_GetDefault( self->dictionary, "checkpointAppendStep", Dictionary_Entry_Value_FromBool( True ) ) ) ;
+		Dictionary_GetDefault( self->dictionary, "checkpointAppendStep", Dictionary_Entry_Value_FromBool( False ) ) ) ;
 
 	if ( self->rank == 0 ) {
 		if ( ! Stg_DirectoryExists( self->outputPath ) ) {
