@@ -701,6 +701,7 @@ void FieldTest_LoadReferenceSolutionFromFile( FeVariable* feVariable, Name refer
 		H5Sselect_hyperslab( dataSpace, H5S_SELECT_SET, start, NULL, count, NULL );
 		H5Dread( dataSet, H5T_NATIVE_DOUBLE, memSpace, dataSpace, H5P_DEFAULT, data );
 
+      dataPos  = 0;
 		nodeDummy = data[dataPos++];
 		posx[lineNum] = data[dataPos++];
 		posy[lineNum] = data[dataPos++];
