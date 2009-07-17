@@ -262,25 +262,29 @@ void _SwarmDump_Execute( void* swarmDump, void* data ) {
                 else
                     Stg_asprintf( &swarmSaveFileNamePart2, "%s/%s"     , swarmSaveFileNamePart1, swarm->name );
 
+                #ifdef WRITE_HDF5
+                   if(swarm->nProc == 1)
+                           Stg_asprintf( &swarmSaveFileName, "%s.h5", swarmSaveFileNamePart2 );
+                   else
+                           Stg_asprintf( &swarmSaveFileName, "%s.%dof%d.h5", swarmSaveFileNamePart2, (swarm->myRank + 1), swarm->nProc );
+                #else
+                   Stg_asprintf( &swarmSaveFileName, "%s.dat", swarmSaveFileNamePart2 );
+                #endif
+                 
                 #ifdef DEBUG
                    for ( rank_I = 0; rank_I < swarm->nProc; rank_I++ ) {
                            if ( swarm->myRank == rank_I ) {
                                    Journal_DPrintf( info, "Proc %d: for swarm \"%s\", dumping its %u particles of size %u bytes "
                                            "each (= %g bytes total) to file %s\n", swarm->myRank, swarm->name, particleLocalCount,
-                                           particleSize, (float)(particleLocalCount * particleSize), swarmSaveFileNamePart2 );
+                                           particleSize, (float)(particleLocalCount * particleSize), swarmSaveFileName );
                            }       
                            MPI_Barrier( swarm->comm );
                    }
                 #endif
 
                 #ifdef WRITE_HDF5
-                   if(swarm->nProc == 1)
-                           Stg_asprintf( &swarmSaveFileName, "%s.h5", swarmSaveFileNamePart2 );
-                   else
-                           Stg_asprintf( &swarmSaveFileName, "%s.%dof%d.h5", swarmSaveFileNamePart2, (swarm->myRank + 1), swarm->nProc );
                    SwarmDump_DumpToHDF5( self, swarm, swarmSaveFileName );
                 #else
-                   Stg_asprintf( &swarmSaveFileName, "%s.dat", swarmSaveFileNamePart2 );
                    BinaryStream_WriteAllProcessors( swarmSaveFileName, swarm->particles, particleSize, (SizeT) particleLocalCount, swarm->comm );
                 #endif
                 Memory_Free( swarmSaveFileName );

@@ -264,7 +264,9 @@ void _FileParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm ) 
          attrib_id = H5Aopen(group_id, "Swarm Particle Count", H5P_DEFAULT);
       #endif
       status = H5Aread(attrib_id, H5T_NATIVE_INT, &nParticles);
-      
+      H5Aclose(attrib_id);
+      H5Gclose(group_id);
+
       /* The following conditional should be deprecated after a sufficient grace period to allow backwards
          compatibility with previous implementations of checkpointing  JohnMansour 28042009 */
       if(status < 0){
@@ -397,6 +399,9 @@ void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm
          attrib_id = H5Aopen(group_id, "Swarm Particle Count", H5P_DEFAULT);
       #endif
       status = H5Aread(attrib_id, H5T_NATIVE_INT, &nParticles);
+
+      H5Aclose(attrib_id);
+      H5Gclose(group_id);
 
       if(nParticles > 0){
          /* Open a dataspace for each swarmVariable */

@@ -284,8 +284,8 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
 	if( minList && maxList ) {
 		assert( Dictionary_Entry_Value_GetCount( minList ) >= self->nDims );
 		assert( Dictionary_Entry_Value_GetCount( maxList ) >= self->nDims );
-		crdMin = Memory_Alloc_Array_Unnamed( double, self->nDims );
-		crdMax = Memory_Alloc_Array_Unnamed( double, self->nDims );
+		crdMin = Memory_Alloc_Array_Unnamed( double, 3 );
+		crdMax = Memory_Alloc_Array_Unnamed( double, 3 );
 		for( d_i = 0; d_i < self->nDims; d_i++ ) {	
 			tmp = Dictionary_Entry_Value_GetElement( minList, d_i );
 			rootKey = Dictionary_Entry_Value_AsString( tmp );
@@ -2115,18 +2115,117 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
 	      FreeArray( steps );
 		}
 		else {
+         unsigned int noffset;
+         MeshCheckpointFileVersion ver;
+         hid_t   attrib_id, group_id;
+         herr_t  status;
+         char* verticeName;
+
+         /** get the file attributes to sanity and version checks */
+         #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+            group_id  = H5Gopen(file, "/");
+            attrib_id = H5Aopen_name(group_id, "checkpoint file version");
+         #else
+            group_id  = H5Gopen(file, "/", H5P_DEFAULT);
+            attrib_id = H5Aopen(group_id, "checkpoint file version", H5P_DEFAULT);
+         #endif
+         /** if this attribute does not exist (attrib_id < 0) then we assume MeshCHECKPOINT_V1 and continue without checking attributes */
+         if(attrib_id < 0)
+            ver = MeshCHECKPOINT_V1;
+         else {
+            int checkVer;
+            int ndims;
+            int res[self->nDims];
+            unsigned*  sizes;
+      
+            /** check for known checkpointing version type */
+      
+            status = H5Aread(attrib_id, H5T_NATIVE_INT, &checkVer);
+            H5Aclose(attrib_id);
+            if(checkVer == 2)
+               ver = MeshCHECKPOINT_V2;
+            else
+               Journal_Firewall( (0), errorStream,
+                  "\n\nError in %s for %s '%s'\n"
+                  "Unknown checkpoint version (%u) for checkpoint file (%s).\n", 
+                  __func__, self->type, self->name, (unsigned int) checkVer, meshReadFileName);
+      
+            /** check for correct number of dimensions */
+      
+            #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+               attrib_id = H5Aopen_name(group_id, "dimensions");
+            #else
+               attrib_id = H5Aopen(group_id, "dimensions", H5P_DEFAULT);
+            #endif
+            status = H5Aread(attrib_id, H5T_NATIVE_INT, &ndims);
+            H5Aclose(attrib_id);      
+            Journal_Firewall( (ndims == self->nDims), errorStream,
+               "\n\nError in %s for %s '%s'\n"
+               "Number of dimensions (%u) for checkpoint file (%s) does not correspond to simulation dimensions (%u).\n", 
+               __func__, self->type, self->name, (unsigned int) ndims, meshReadFileName,
+               self->nDims);
+      
+            /** check for correct mesh size */
+            
+            #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+               attrib_id = H5Aopen_name(group_id, "mesh resolution");
+            #else
+               attrib_id = H5Aopen(group_id, "mesh resolution", H5P_DEFAULT);
+            #endif
+            status = H5Aread(attrib_id, H5T_NATIVE_INT, &res);
+            H5Aclose(attrib_id);
+
+            sizes = Grid_GetSizes( self->elGrid ); /** global no. of elements in each dim */
+            if(self->nDims == 2)
+               Journal_Firewall( 
+                  ( (sizes[0] == res[0]) && (sizes[1] == res[1]) ), 
+                  errorStream,
+                  "\n\nError in %s for %s '%s'\n"
+                  "Size of mesh (%u,%u) for checkpoint file (%s) does not correspond to simulation mesh size (%u, %u).\n", 
+                  __func__, self->type, self->name, 
+                  (unsigned int) res[0], (unsigned int) res[1],
+                  meshReadFileName,
+                  (unsigned int) sizes[0], (unsigned int) sizes[1]);
+            else
+               Journal_Firewall( 
+                  ( (sizes[0] == res[0]) && (sizes[1] == res[1]) && (sizes[2] == res[2]) ), 
+                  errorStream,
+                  "\n\nError in %s for %s '%s'\n"
+                  "Size of mesh (%u,%u,%u) for checkpoint file (%s) does not correspond to simulation mesh size (%u,%u,%u).\n", 
+                  __func__, self->type, self->name, 
+                  (unsigned int) res[0], (unsigned int) res[1], (unsigned int) res[2],
+                  meshReadFileName,
+                  (unsigned int) sizes[0], (unsigned int) sizes[1], (unsigned int) sizes[2]);
+         }
+         H5Gclose(group_id);
+         
+         /** account for different versions of checkpointing */
+         switch ( ver ) {
+            case MeshCHECKPOINT_V1:
+               noffset = 1;
+               Stg_asprintf( &verticeName, "/data" );
+               break;
+            case MeshCHECKPOINT_V2:
+               noffset = 0;
+               Stg_asprintf( &verticeName, "/vertices" );
+               break;
+            default:
+               Journal_Firewall( 0, errorStream,
+                  "Error: in %s: unknown checkpoint file version.\n",
+                  __func__ ); 
+         }
       	
 	      /* Prepare to read vertices from file */		
          #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
-	      fileData = H5Dopen( file, "/data" );
+	      fileData = H5Dopen( file, verticeName );
          #else
-	      fileData = H5Dopen( file, "/data", H5P_DEFAULT );
+	      fileData = H5Dopen( file, verticeName, H5P_DEFAULT );
          #endif
 	      fileSpace = H5Dget_space( fileData );
-         
+         Memory_Free( verticeName );
          start[1] = 0;
 	      count[0] = 1;
-	      count[1] = mesh->topo->nDims;
+	      count[1] = mesh->topo->nDims + noffset;
          memSpace = H5Screate_simple( 2, count, NULL );
          totalVerts = Mesh_GetGlobalSize( mesh, 0 );
 
@@ -2169,10 +2268,10 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
 			      double *vert;
 
 			      vert = Mesh_GetVertex( mesh, lNode_I );
-			      vert[0] = buf[0];
-               vert[1] = buf[1];
+			      vert[0] = buf[0 + noffset];
+               vert[1] = buf[1 + noffset];
 			      if( mesh->topo->nDims ==3 )
-				      vert[2] = buf[2];
+				      vert[2] = buf[2 + noffset];
 		      }
 	      }
 	   	      
