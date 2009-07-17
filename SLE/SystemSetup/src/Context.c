@@ -652,9 +652,69 @@ void _FiniteElementContext_DumpMeshHDF5( void* context, char* filename ) {
       }	
 
       if ( rank == 0 ) {
+         hid_t      attribData_id, attrib_id, group_id;
+         hsize_t    a_dims;
+         int        attribData;
+         int        res[3];
+         Grid**     grid;
+         unsigned*  sizes;
+
          /* Open the HDF5 output file. */
          file = H5Fcreate( filename, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT );
          assert( file );
+
+         /** create file attribute */
+         /** first store the fevariable checkpointing version */
+         a_dims = 1;
+         attribData = MeshCHECKPOINT_V2;
+         attribData_id = H5Screate_simple(1, &a_dims, NULL);
+         #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+            group_id  = H5Gopen(file, "/");
+            attrib_id = H5Acreate(group_id, "checkpoint file version", H5T_STD_I32BE, attribData_id, H5P_DEFAULT);
+         #else
+            group_id  = H5Gopen(file, "/", H5P_DEFAULT);
+            attrib_id = H5Acreate(group_id, "checkpoint file version", H5T_STD_I32BE, attribData_id, H5P_DEFAULT, H5P_DEFAULT);
+         #endif
+         H5Awrite(attrib_id, H5T_NATIVE_INT, &attribData);
+         H5Aclose(attrib_id);
+         H5Gclose(group_id);
+         H5Sclose(attribData_id);
+
+         /** store the mesh dimensionality */
+         a_dims = 1;
+         attribData = self->dim;
+         attribData_id = H5Screate_simple(1, &a_dims, NULL);
+         #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+            group_id  = H5Gopen(file, "/");
+            attrib_id = H5Acreate(group_id, "dimensions", H5T_STD_I32BE, attribData_id, H5P_DEFAULT);
+         #else
+            group_id  = H5Gopen(file, "/", H5P_DEFAULT);
+            attrib_id = H5Acreate(group_id, "dimensions", H5T_STD_I32BE, attribData_id, H5P_DEFAULT, H5P_DEFAULT);
+         #endif
+         H5Awrite(attrib_id, H5T_NATIVE_INT, &attribData);
+         H5Aclose(attrib_id);
+         H5Gclose(group_id);
+         H5Sclose(attribData_id);
+          
+         /** store the mesh resolution if mesh is cartesian */
+         if ( !strcmp( feVar->feMesh->generator->type, "CartesianGenerator" ) ) {
+            a_dims = self->dim;
+            grid   = (Grid**) Mesh_GetExtension( feVar->feMesh, Grid*, "elementGrid" );	
+            sizes  =          Grid_GetSizes( *grid ); /** global no. of elements in each dim */
+            
+            attribData_id = H5Screate_simple(1, &a_dims, NULL);
+            #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+               group_id  = H5Gopen(file, "/");
+               attrib_id = H5Acreate(group_id, "mesh resolution", H5T_STD_I32BE, attribData_id, H5P_DEFAULT);
+            #else
+               group_id  = H5Gopen(file, "/", H5P_DEFAULT);
+               attrib_id = H5Acreate(group_id, "mesh resolution", H5T_STD_I32BE, attribData_id, H5P_DEFAULT, H5P_DEFAULT);
+            #endif
+            H5Awrite(attrib_id, H5T_NATIVE_INT, sizes);
+            H5Aclose(attrib_id);
+            H5Gclose(group_id);
+            H5Sclose(attribData_id);
+         }       
       
          /* Dump the min and max coords, and number of processes. */
          count[0] = (hsize_t)nDims;
@@ -690,9 +750,9 @@ void _FiniteElementContext_DumpMeshHDF5( void* context, char* filename ) {
          
          fileSpace = H5Screate_simple( 2, size, NULL );
          #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
-         fileData = H5Dcreate( file, "/data", H5T_NATIVE_DOUBLE, fileSpace, H5P_DEFAULT );
+         fileData = H5Dcreate( file, "/vertices", H5T_NATIVE_DOUBLE, fileSpace, H5P_DEFAULT );
          #else
-         fileData = H5Dcreate( file, "/data", H5T_NATIVE_DOUBLE, fileSpace,
+         fileData = H5Dcreate( file, "/vertices", H5T_NATIVE_DOUBLE, fileSpace,
                                H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
          #endif
 
@@ -734,9 +794,9 @@ void _FiniteElementContext_DumpMeshHDF5( void* context, char* filename ) {
    
          /* get the node filespace */   
          #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
-         fileData  = H5Dopen( file, "/data" );
+         fileData  = H5Dopen( file, "/vertices" );
          #else
-         fileData  = H5Dopen( file, "/data", H5P_DEFAULT );
+         fileData  = H5Dopen( file, "/vertices", H5P_DEFAULT );
          #endif
          /* get the filespace handle */
          fileSpace = H5Dget_space(fileData);

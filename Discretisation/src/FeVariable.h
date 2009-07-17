@@ -115,6 +115,13 @@
 	/* Brings together and manages the life cycle of all the components required by the
 	Finite Element Method about a variable to be solved for - see FeVariable.h */
 	struct FeVariable { __FeVariable };
+
+	/* Checkpoint file version enum */
+	typedef enum FeCheckpointFileVersion {
+		FeCHECKPOINT_V1 = 1,	/** Original checkpointing format   */
+		FeCHECKPOINT_V2	        /** No longer store nodes within checkpoint files, and now store attributes including 
+		                            checkpoint version, number of dimensions and cartesion mesh size */
+	} FeCheckpointFileVersion;
 	
 	/* --- Contstructors / Destructors --- */
 	
