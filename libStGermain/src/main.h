@@ -45,7 +45,11 @@
 	void stgMain( Dictionary* dictionary, MPI_Comm CommWorld );
 
 	/** The StGermain main initialisation */
-	AbstractContext* stgMainInit( Dictionary* dictionary, MPI_Comm CommWorld );
+	AbstractContext* stgMainInit( Dictionary* dictionary, MPI_Comm communicator );
+
+   /** Initialise the context, from a particular XML file. This saves the user manipulating
+    * an IO_Handler and dictionary to get the data into the context. Useful for test code. */
+   AbstractContext* stgMainInitFromXML( char* xmlInputFilename, MPI_Comm communicator );
 
 	/** The StGermain main loop */
 	void stgMainLoop( AbstractContext* context );
