@@ -304,12 +304,12 @@ void _DVCWeights_ClaimCells(struct chain **bbchain,struct cell **ccells,struct p
        /* This is the bit needed for mallocing */
        /* do a test here to see if we need to realloc bchain->new_claimed_cells and bchain->new_bound_cells */
        if( count > bchain->new_claimed_cells_malloced - 1 ){
-	     temp = (int *)realloc( bchain->new_claimed_cells, (bchain->new_claimed_cells_malloced + INC)*sizeof(int) );
+	     temp = (int *)realloc( bchain->new_claimed_cells, (bchain->new_claimed_cells_malloced + DVC_INC)*sizeof(int) );
 	     bchain->new_claimed_cells = temp;
-	     bchain->new_claimed_cells_malloced += INC;
-	     temp = (int *)realloc( bchain->new_bound_cells, (bchain->new_bound_cells_malloced + INC)*sizeof(int) );
+	     bchain->new_claimed_cells_malloced += DVC_INC;
+	     temp = (int *)realloc( bchain->new_bound_cells, (bchain->new_bound_cells_malloced + DVC_INC)*sizeof(int) );
 	     bchain->new_bound_cells = temp;
-	     bchain->new_bound_cells_malloced += INC;	  
+	     bchain->new_bound_cells_malloced += DVC_INC;	  
        }
        /* end of bit needed for mallocing */
       bchain->new_claimed_cells[count] = cell_num0;
@@ -362,12 +362,12 @@ void _DVCWeights_ClaimCells2D(struct chain **bbchain,struct cell2d **ccells,stru
        /* This is the bit needed for mallocing */
        /* do a test here to see if we need to realloc bchain->new_claimed_cells and bchain->new_bound_cells */
        if( count > bchain->new_claimed_cells_malloced - 1 ){
-	     temp = (int *)realloc( bchain->new_claimed_cells, (bchain->new_claimed_cells_malloced + INC)*sizeof(int) );
+	     temp = (int *)realloc( bchain->new_claimed_cells, (bchain->new_claimed_cells_malloced + DVC_INC)*sizeof(int) );
 	     bchain->new_claimed_cells = temp;
-	     bchain->new_claimed_cells_malloced += INC;
-	     temp = (int *)realloc( bchain->new_bound_cells, (bchain->new_bound_cells_malloced + INC)*sizeof(int) );
+	     bchain->new_claimed_cells_malloced += DVC_INC;
+	     temp = (int *)realloc( bchain->new_bound_cells, (bchain->new_bound_cells_malloced + DVC_INC)*sizeof(int) );
 	     bchain->new_bound_cells = temp;
-	     bchain->new_bound_cells_malloced += INC;	  
+	     bchain->new_bound_cells_malloced += DVC_INC;	  
        }
        /* end of bit needed for mallocing */
       bchain->new_claimed_cells[count] = cell_num0;
@@ -449,12 +449,12 @@ void _DVCWeights_UpdateBchain(struct chain **bbchain,struct cell **ccells,int p_
 	   /* This is the bit needed for mallocing */	   
 	   /* do a test here to see if we need to realloc bchain->new_claimed_cells and bchain->new_bound_cells */
 	   if( count > bchain->new_bound_cells_malloced - 1 ){
-		 temp = (int *)realloc( bchain->new_claimed_cells, (bchain->new_claimed_cells_malloced + INC)*sizeof(int) );
+		 temp = (int *)realloc( bchain->new_claimed_cells, (bchain->new_claimed_cells_malloced + DVC_INC)*sizeof(int) );
 		 bchain->new_claimed_cells = temp;
-		 bchain->new_claimed_cells_malloced += INC;
-		 temp = (int *)realloc( bchain->new_bound_cells, (bchain->new_bound_cells_malloced + INC)*sizeof(int) );
+		 bchain->new_claimed_cells_malloced += DVC_INC;
+		 temp = (int *)realloc( bchain->new_bound_cells, (bchain->new_bound_cells_malloced + DVC_INC)*sizeof(int) );
 		 bchain->new_bound_cells = temp;
-		 bchain->new_bound_cells_malloced += INC; 
+		 bchain->new_bound_cells_malloced += DVC_INC; 
 	   }
 	   /* end of bit needed for mallocing */
 	  bchain->new_bound_cells[count] = cell_num1;
@@ -500,12 +500,12 @@ void _DVCWeights_UpdateBchain2D(struct chain **bbchain,struct cell2d **ccells,in
 	   /* This is the bit needed for mallocing */	   
 	   /* do a test here to see if we need to realloc bchain->new_claimed_cells and bchain->new_bound_cells */
 	   if( count > bchain->new_bound_cells_malloced - 1 ){
-		 temp = (int *)realloc( bchain->new_claimed_cells, (bchain->new_claimed_cells_malloced + INC)*sizeof(int) );
+		 temp = (int *)realloc( bchain->new_claimed_cells, (bchain->new_claimed_cells_malloced + DVC_INC)*sizeof(int) );
 		 bchain->new_claimed_cells = temp;
-		 bchain->new_claimed_cells_malloced += INC;
-		 temp = (int *)realloc( bchain->new_bound_cells, (bchain->new_bound_cells_malloced + INC)*sizeof(int) );
+		 bchain->new_claimed_cells_malloced += DVC_INC;
+		 temp = (int *)realloc( bchain->new_bound_cells, (bchain->new_bound_cells_malloced + DVC_INC)*sizeof(int) );
 		 bchain->new_bound_cells = temp;
-		 bchain->new_bound_cells_malloced += INC; 
+		 bchain->new_bound_cells_malloced += DVC_INC; 
 	   }
 	   /* end of bit needed for mallocing */
 	  bchain->new_bound_cells[count] = cell_num1;
@@ -645,10 +645,10 @@ void _DVCWeights_InitialiseStructs( struct chain **bchain, struct particle **pLi
       }
       // note that doing bchain[i]->new... doesn't work
       for(i=0;i<nump;i++){
-	 (*bchain)[i].new_claimed_cells = (int *)malloc(INC*sizeof(int));
-	 (*bchain)[i].new_claimed_cells_malloced = INC;
-	 (*bchain)[i].new_bound_cells = (int *)malloc(INC*sizeof(int));
-	 (*bchain)[i].new_bound_cells_malloced = INC;
+	 (*bchain)[i].new_claimed_cells = (int *)malloc(DVC_INC*sizeof(int));
+	 (*bchain)[i].new_claimed_cells_malloced = DVC_INC;
+	 (*bchain)[i].new_bound_cells = (int *)malloc(DVC_INC*sizeof(int));
+	 (*bchain)[i].new_bound_cells_malloced = DVC_INC;
       }
       if( (*pList = (struct particle *)malloc( nump*sizeof(struct particle ) )) == 0){
 	 Journal_Firewall( 0 , Journal_Register(Error_Type, "DVC_Weights"),"No memory for pList in '%s'\nCannot continue.\n", __func__);
@@ -665,10 +665,10 @@ void _DVCWeights_InitialiseStructs2D( struct chain **bchain, struct particle2d *
       }
       //
       for(i=0;i<nump;i++){
-	 (*bchain)[i].new_claimed_cells = (int *)malloc(INC*sizeof(int));
-	 (*bchain)[i].new_claimed_cells_malloced = INC;
-	 (*bchain)[i].new_bound_cells = (int *)malloc(INC*sizeof(int));
-	 (*bchain)[i].new_bound_cells_malloced = INC;
+	 (*bchain)[i].new_claimed_cells = (int *)malloc(DVC_INC*sizeof(int));
+	 (*bchain)[i].new_claimed_cells_malloced = DVC_INC;
+	 (*bchain)[i].new_bound_cells = (int *)malloc(DVC_INC*sizeof(int));
+	 (*bchain)[i].new_bound_cells_malloced = DVC_INC;
       }
       if( (*pList = (struct particle2d *)malloc( nump*sizeof(struct particle2d ) )) == 0){
 	 Journal_Firewall( 0 , Journal_Register(Error_Type, "DVC_Weights"),"No memory for pList in '%s'\nCannot continue.\n", __func__);

@@ -69,7 +69,7 @@
 
 	struct DVCWeights { __DVCWeights };
 	
-#define INC 150
+#define DVC_INC 150
 	
 struct cell{
   int p;/*particle index number*/
