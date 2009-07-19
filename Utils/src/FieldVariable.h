@@ -97,6 +97,8 @@
 		MPI_Comm                                           communicator;                \
 		FieldVariable_Register*                            fieldVariable_Register;      \
 		Bool                                               isCheckpointedAndReloaded;    \
+		/* Bool to determine whether the field variable should be saved on the saveData entry point */ \
+		Bool                                               isSavedData;    
 
 	struct FieldVariable { __FieldVariable };	
 
