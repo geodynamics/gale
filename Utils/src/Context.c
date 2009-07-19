@@ -175,8 +175,10 @@ void _UnderworldContext_Init( UnderworldContext* self ) {
 
    /* always generate XDMF files when we generate HDF5 checkpoints */
 #ifdef WRITE_HDF5
-	if( Dictionary_Entry_Value_AsBool( Dictionary_GetDefault( self->dictionary, "generateXDMF", Dictionary_Entry_Value_FromBool( True ) ) ) )
+if( Dictionary_Entry_Value_AsBool( Dictionary_GetDefault( self->dictionary, "generateXDMF", Dictionary_Entry_Value_FromBool( True ) ) ) ){
       ContextEP_Append( self, AbstractContext_EP_Save, XDMFGenerator_GenerateAll );
+      ContextEP_Append( self, AbstractContext_EP_DataSave, XDMFGenerator_GenerateAll );
+}
 #endif
    
 

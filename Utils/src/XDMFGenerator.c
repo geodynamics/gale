@@ -60,10 +60,6 @@ const Type XDMFGenerator_Type = "XDMFGenerator";
 void XDMFGenerator_GenerateAll( void* _context ) {
    UnderworldContext*   context    = (UnderworldContext*)_context;
    Stream*              stream;
-      
-   /** Only generate XDML if current timestep is a checkpointing step **/
-   if( (context->timeStep % context->checkpointEvery != 0) || (context->timeStep == 0))
-      return;
 
    /** only the MASTER process writes to the file.  other processes send information to the MASTER where required **/   
    if(context->rank == MASTER) {
@@ -98,7 +94,7 @@ void XDMFGenerator_GenerateAll( void* _context ) {
       _XDMFGenerator_WriteFieldSchema( context, stream );
 
       /** Write all (checkpointed) FeVariable field information  **/
-      _XDMFGenerator_WriteSwarmSchema( context, stream);
+      if (context->isDataSave == False) _XDMFGenerator_WriteSwarmSchema( context, stream);
 
       /** writes footer information and close file/stream **/
       _XDMFGenerator_WriteFooter( context, stream );
@@ -158,7 +154,7 @@ void _XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream
       } else if ( maxNodes == 8  ) {
          Stg_asprintf( &topologyType, "Hexahedron" );
       } else {
-         Journal_DPrintf( errorStream, "\n\n number of element nodes %u not supported...\n should be 4 (2D quadrilateral) " 
+         Journal_DPrintf( errorStream, "\n\n Error: number of element nodes %u not supported...\n should be 4 (2D quadrilateral) " 
                                  "or should be 8 (3D hexahedron). \n\n", maxNodes );
          Stg_asprintf( &topologyType, "UNKNOWN_POSSIBLY_ERROR" );
       }
@@ -190,7 +186,7 @@ void _XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream
          /** in 3d we simply feed back the 3d hdf5 array, nice and easy **/
                               Journal_Printf( stream, "            <DataItem Format=\"HDF\" %s Dimensions=\"%u 3\">Mesh.%05d.h5:/vertices</DataItem>\n", variableType, totalVerts, context->timeStep );
       } else {
-         Journal_DPrintf( errorStream, "\n\n Position SwarmVariable is not of dofCount 2 or 3.  Should this swarm be checkpointed?\n\n" );
+         Journal_DPrintf( errorStream, "\n\n Error: Mesh vertex location is not of dofCount 2 or 3.\n\n" );
       }
                               Journal_Printf( stream, "         </Geometry>\n\n" );
       /**----------------------- FINISH GEOMETRY  ------------------------------------------------------------------------------------------------------------------- **/
@@ -204,7 +200,7 @@ void _XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream
 
 		if ( Stg_Class_IsInstance( fieldVar, FeVariable_Type ) ) {
 			feVar = (FeVariable*)fieldVar;
-            if ( feVar->isCheckpointedAndReloaded ) {
+         if ( (feVar->isCheckpointedAndReloaded && context->isDataSave==False) || (feVar->isSavedData && context->isDataSave==True) ){ 
                   Name   variableType;
                   Name   centering;
                   Index  offset = 0;
@@ -333,14 +329,15 @@ void _XDMFGenerator_WriteSwarmSchema( UnderworldContext* context, Stream* stream
                               Journal_Printf( stream, "         <Geometry Type=\"XYZ\">\n" );
             Stg_asprintf( &swarmVarName, "%s-Position", currentSwarm->name );
             swarmVar = SwarmVariable_Register_GetByName( currentSwarm->swarmVariable_Register, swarmVarName );
-            Journal_DPrintf( errorStream, "\n\n Could not find required Position SwarmVariable.  Should this swarm be checkpointed?\n\n" );
+            if (!swarmVar) 
+               Journal_DPrintf( errorStream, "\n\n Error: Could not find required Position SwarmVariable. \n\n" );
             Memory_Free( swarmVarName );
             
             /** check what precision it Position variable is stored at **/
             if(        swarmVar->variable->dataTypes[0] == Variable_DataType_Int ){
-               Journal_DPrintf( errorStream, "\n\n Position variable can not be of type Int... something is amiss! \n\n" );
+               Journal_DPrintf( errorStream, "\n\n Error: Position variable can not be of type Int. \n\n" );
             } else if ( swarmVar->variable->dataTypes[0] == Variable_DataType_Char){
-               Journal_DPrintf( errorStream, "\n\n Position variable can not be of type Char... something is amiss! \n\n" );
+               Journal_DPrintf( errorStream, "\n\n Error: Position variable can not be of type Char. \n\n" );
             } else if ( swarmVar->variable->dataTypes[0] == Variable_DataType_Float ){
                Stg_asprintf( &variableType, "NumberType=\"Float\" Precision=\"4\"" );
             } else {
@@ -365,7 +362,7 @@ void _XDMFGenerator_WriteSwarmSchema( UnderworldContext* context, Stream* stream
                /** in 3d we simply feed back the 3d hdf5 array, nice and easy **/
                               Journal_Printf( stream, "            <DataItem Format=\"HDF\" %s Dimensions=\"%u 3\">%s.%05d%s.h5:/%s-Position</DataItem>\n", variableType, swarmParticleLocalCount, currentSwarm->name, context->timeStep, filename_part, currentSwarm->name );
             } else {
-               Journal_DPrintf( errorStream, "\n\n Position SwarmVariable is not of dofCount 2 or 3.  Should this swarm be checkpointed?\n\n" );
+               Journal_DPrintf( errorStream, "\n\n Error: Position SwarmVariable is not of dofCount 2 or 3.\n\n" );
             }
                               Journal_Printf( stream, "         </Geometry>\n\n" );
             /**----------------------- FINISH GEOMETRY  ------------------------------------------------------------------------------------------------------------------- **/
