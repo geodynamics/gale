@@ -687,6 +687,28 @@ void _FeVariable_Initialise( void* variable, void* data ) {
       }
    }
 
+   feVarsList = NULL;
+   /** also include check to see if this fevariable should be saved for analysis purposes */ 
+   feVarsList = Dictionary_Get( context->dictionary, "fieldVariablesToSave" );
+   if ( NULL == feVarsList ) {
+      feVarsList = Dictionary_Get( context->dictionary, "FieldVariablesToSave" );
+   }
+   if (feVarsList != NULL ) {
+      Index                    listLength = Dictionary_Entry_Value_GetCount( feVarsList );
+      Index                    var_I = 0;
+      Dictionary_Entry_Value*  feVarDictValue = NULL;
+      char*                    fieldVariableName;
+   
+      for ( var_I = 0; var_I < listLength; var_I++ ) {
+         feVarDictValue = Dictionary_Entry_Value_GetElement( feVarsList, var_I );
+         fieldVariableName = Dictionary_Entry_Value_AsString( feVarDictValue ); 
+         if ( 0 == strcmp( self->name, fieldVariableName ) ) {
+            self->isSavedData = True;
+            break;
+         }
+      }
+   }
+   
 	if ( self->bcs ) {
 		Stg_Component_Initialise( self->bcs, data, False );
 		Journal_DPrintf( self->debug, "applying the B.C.s for this Variable.\n" ); 

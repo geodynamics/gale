@@ -249,6 +249,12 @@ void _FiniteElementContext_Init( FiniteElementContext* self ) {
 		"saveFeVariables",
 		_FiniteElementContext_SaveFeVariables,
 		FiniteElementContext_Type );
+
+	EntryPoint_Append(
+		Context_GetEntryPoint( self, AbstractContext_EP_DataSave ),
+		"saveFeVariables",
+		_FiniteElementContext_SaveFeVariables,
+		FiniteElementContext_Type );
 	/* The FEM context needs to save gauss swarms so they can be re-loaded for restart later.
 	   This will automatically save material point swarms too if PICellerator is used.
 	 */
@@ -260,6 +266,12 @@ void _FiniteElementContext_Init( FiniteElementContext* self ) {
 
 	EntryPoint_Append(
 		Context_GetEntryPoint( self, AbstractContext_EP_Save ),
+		"saveMesh",
+		_FiniteElementContext_SaveMesh,
+		FiniteElementContext_Type );
+
+	EntryPoint_Append(
+		Context_GetEntryPoint( self, AbstractContext_EP_DataSave ),
 		"saveMesh",
 		_FiniteElementContext_SaveMesh,
 		FiniteElementContext_Type );
@@ -488,7 +500,7 @@ void _FiniteElementContext_SaveFeVariables( void* context ) {
 
 		if ( Stg_Class_IsInstance( fieldVar, FeVariable_Type ) ) {
 			feVar = (FeVariable*)fieldVar;	
-			if ( feVar->isCheckpointedAndReloaded ) {
+			if ( (feVar->isCheckpointedAndReloaded && self->isDataSave==False) || (feVar->isSavedData && self->isDataSave==True) ) {
             char*			feVarSaveFileName     = NULL;
             char*			feVarSaveFileNamePart = NULL;   
 
