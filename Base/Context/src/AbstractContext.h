@@ -77,6 +77,8 @@
 	extern Type AbstractContext_EP_DumpClass;
 	extern Type AbstractContext_EP_Save;
 	extern Type AbstractContext_EP_SaveClass;
+	extern Type AbstractContext_EP_DataSave;
+	extern Type AbstractContext_EP_DataSaveClass;
 	
 	/* Textual name of this class */
 	extern const Type AbstractContext_Type;
@@ -116,6 +118,7 @@
 		unsigned int				frequentOutputEvery; \
 		unsigned int				dumpEvery; \
 		unsigned int				checkpointEvery; \
+		unsigned int				saveDataEvery; \
 		unsigned int				checkpointnproc; \
 		double				        checkpointAtTimeInc; \
 		double				        nextCheckpointTime; \
@@ -125,6 +128,8 @@
 		char*					checkpointWritePath; \
 		Bool                                    checkpointAppendStep;      \
 		Bool                                    loadFromCheckPoint;      \
+		/* Bool to determine whether we are storing a full checkpoint (for restart) or only data for analysis */ \
+		Bool                                    isDataSave;      \
 		unsigned int                            restartTimestep;         \
 		char*                                   checkPointPrefixString;  \
 		Stream*					info; \
@@ -153,6 +158,8 @@
 		EntryPoint_Index			dumpClassK; \
 		EntryPoint_Index			saveK; \
 		EntryPoint_Index			saveClassK; \
+		EntryPoint_Index			dataSaveK; \
+		EntryPoint_Index			dataSaveClassK; \
 		\
 		Stg_ObjectList*				objectList; \
 		ConditionFunction_Register*		condFunc_Register; \

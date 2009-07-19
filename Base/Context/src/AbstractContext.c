@@ -75,6 +75,8 @@ Type AbstractContext_EP_Dump =			        "Context_Dump";
 Type AbstractContext_EP_DumpClass =		        "Context_DumpClass";
 Type AbstractContext_EP_Save =			        "Context_Save";
 Type AbstractContext_EP_SaveClass =		        "Context_SaveClass";
+Type AbstractContext_EP_DataSave =			     "Context_DataSave";
+Type AbstractContext_EP_DataSaveClass =		  "Context_DataSaveClass";
 
 
 /* Dictionary entry names */
@@ -146,7 +148,12 @@ void _AbstractContext_Init(
 #ifdef READ_HDF5
    /* disable HDF5 error reporting, as verbosity can be excessive, and some 
       errors are expected and need not be reported */
+	#if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
    H5Eset_auto(NULL, NULL);
+	#else
+   H5Eset_auto2(H5E_DEFAULT, NULL, NULL);
+	#endif
+   
 #endif
 	
 	/* General and Virtual info should already be set */
@@ -196,6 +203,8 @@ void _AbstractContext_Init(
 		Dictionary_GetDefault( self->dictionary, "dumpEvery", Dictionary_Entry_Value_FromUnsignedInt( 10 ) ) );
 	self->checkpointEvery = Dictionary_Entry_Value_AsUnsignedInt( 
 		Dictionary_GetDefault( self->dictionary, "checkpointEvery", Dictionary_Entry_Value_FromUnsignedInt( 0 ) ) );
+	self->saveDataEvery = Dictionary_Entry_Value_AsUnsignedInt( 
+		Dictionary_GetDefault( self->dictionary, "saveDataEvery", Dictionary_Entry_Value_FromUnsignedInt( 0 ) ) );
 	self->checkpointAtTimeInc = Dictionary_Entry_Value_AsDouble( 
 		Dictionary_GetDefault( self->dictionary, "checkpointAtTimeInc", Dictionary_Entry_Value_FromDouble( 0 ) ) );
 	self->nextCheckpointTime = self->checkpointAtTimeInc;
@@ -405,6 +414,12 @@ void _AbstractContext_Init(
 	self->saveClassK = Context_AddEntryPoint( 
 		self, 
 		ContextEntryPoint_New( AbstractContext_EP_SaveClass, EntryPoint_Class_VoidPtr_CastType ) );
+	self->dataSaveK = Context_AddEntryPoint( 
+		self, 
+		ContextEntryPoint_New( AbstractContext_EP_DataSave, EntryPoint_VoidPtr_CastType ) );
+	self->dataSaveClassK = Context_AddEntryPoint( 
+		self, 
+		ContextEntryPoint_New( AbstractContext_EP_DataSaveClass, EntryPoint_Class_VoidPtr_CastType ) );
 	
 	/* add initial hooks */
 	EntryPoint_Append( 
@@ -429,6 +444,11 @@ void _AbstractContext_Init(
 		AbstractContext_Type );
 	EntryPoint_Prepend_AlwaysFirst( 
 		AbstractContext_GetEntryPoint( self, AbstractContext_EP_Save ),
+		"CreateCheckpointDirectory", 
+		(Func_Ptr)_AbstractContext_CreateCheckpointDirectory, 
+		AbstractContext_Type );
+	EntryPoint_Prepend_AlwaysFirst( 
+		AbstractContext_GetEntryPoint( self, AbstractContext_EP_DataSave ),
 		"CreateCheckpointDirectory", 
 		(Func_Ptr)_AbstractContext_CreateCheckpointDirectory, 
 		AbstractContext_Type );
@@ -500,6 +520,7 @@ void _AbstractContext_Print( void* abstractContext, Stream* stream ) {
 	Journal_Printf( (void*) stream, "\toutputEvery: %u\n", self->frequentOutputEvery );
 	Journal_Printf( (void*) stream, "\tdumpEvery: %u\n", self->dumpEvery );
 	Journal_Printf( (void*) stream, "\tcheckpointEvery: %u\n", self->checkpointEvery );
+   Journal_Printf( (void*) stream, "\tsaveDataEvery: %u\n", self->saveDataEvery );
 	Journal_Printf( (void*) stream, "\tcheckpointAtTimeInc: %g\n", self->checkpointAtTimeInc );
 
 	if( self->outputPath ) {
@@ -826,6 +847,15 @@ void AbstractContext_Save( void* context ) {
 			KeyHandle(self,self->saveClassK), self );
 }
 
+void AbstractContext_DataSave( void* context ) {
+	AbstractContext* self = (AbstractContext*)context;
+
+	KeyCall( self, self->dataSaveK, EntryPoint_VoidPtr_CallCast* )(     
+			KeyHandle(self,self->dataSaveK), self );
+	KeyCall( self, self->dataSaveClassK, EntryPoint_Class_VoidPtr_CallCast* )(      
+			KeyHandle(self,self->dataSaveClassK), self );
+}
+
 
 void AbstractContext_BuildAllLiveComponents( void* context ) {
 	AbstractContext*       self = (AbstractContext*) context;	
@@ -972,12 +1002,22 @@ void _AbstractContext_Execute_Hook( Context* context ) {
 				AbstractContext_Dump( self );
 		}	
 		if ( self->checkpointEvery ) {
-			if ( self->timeStep % self->checkpointEvery == 0 )
+			if ( self->timeStep % self->checkpointEvery == 0 ){
+            self->isDataSave = False;
 				AbstractContext_Save( self );
+         }
+		}	
+
+		if ( self->saveDataEvery ) {
+			if ( self->timeStep % self->saveDataEvery == 0 ){
+            self->isDataSave = True;
+				AbstractContext_DataSave( self );
+         }
 		}	
 
 		if ( self->checkpointAtTimeInc ) {
 			if ( self->currentTime >= self->nextCheckpointTime){
+            self->isDataSave = False;
 				AbstractContext_Save( self );
 				self->nextCheckpointTime += self->checkpointAtTimeInc; 
 			}
@@ -1242,10 +1282,10 @@ char* Context_GetCheckPointReadPrefixString( void* context ) {
 
    if ( self->checkpointAppendStep ) {
       if ( strlen(self->checkPointPrefixString) > 0 ) {
-         Stg_asprintf( &readPathString, "%s/Checkpoint%.5u/%s.", self->checkpointReadPath, self->restartTimestep, self->checkPointPrefixString );
+         Stg_asprintf( &readPathString, "%s/data.%.5u/%s.", self->checkpointReadPath, self->restartTimestep, self->checkPointPrefixString );
       }
       else {
-         Stg_asprintf( &readPathString, "%s/Checkpoint%.5u/", self->checkpointReadPath, self->restartTimestep );
+         Stg_asprintf( &readPathString, "%s/data.%.5u/", self->checkpointReadPath, self->restartTimestep );
       }
    } else {
       if ( strlen(self->checkPointPrefixString) > 0 ) {
@@ -1266,10 +1306,10 @@ char* Context_GetCheckPointWritePrefixString( void* context ) {
 
    if ( self->checkpointAppendStep ) {
       if ( strlen(self->checkPointPrefixString) > 0 ) {
-         Stg_asprintf( &writePathString, "%s/Checkpoint%.5u/%s.", self->checkpointWritePath, self->timeStep, self->checkPointPrefixString );
+         Stg_asprintf( &writePathString, "%s/data.%.5u/%s.", self->checkpointWritePath, self->timeStep, self->checkPointPrefixString );
       }
       else {
-         Stg_asprintf( &writePathString, "%s/Checkpoint%.5u/", self->checkpointWritePath, self->timeStep );
+         Stg_asprintf( &writePathString, "%s/data.%.5u/", self->checkpointWritePath, self->timeStep );
       }
    } else {
       if ( strlen(self->checkPointPrefixString) > 0 ) {
@@ -1290,7 +1330,7 @@ void _AbstractContext_CreateCheckpointDirectory( Context* context ) {
       /* Only the master process creates the directory */      
       if ( self->rank == 0 ) {
          char*                  writePathString = NULL;
-         Stg_asprintf( &writePathString, "%s/Checkpoint%.5u/", self->checkpointWritePath, self->timeStep );
+         Stg_asprintf( &writePathString, "%s/data.%.5u/", self->checkpointWritePath, self->timeStep );
          if ( ! Stg_DirectoryExists( writePathString ) ) {
             Bool ret;
             if ( Stg_FileExists( writePathString ) )
