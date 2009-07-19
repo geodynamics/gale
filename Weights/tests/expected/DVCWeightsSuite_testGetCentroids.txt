@@ -1,0 +1,32 @@
+data->pList[0]:
+		 coords: (x, y, z) = (0.000000, 0.000000, 0.000000)
+		 centroids: (cx, cy, cz) = (-0.071429, -0.071429 -0.071429)
+		 weight = 7.000000
+data->pList[1]:
+		 coords: (x, y, z) = (0.000000, 0.000000, 0.000000)
+		 centroids: (cx, cy, cz) = (0.000000, 0.000000 0.000000)
+		 weight = 0.000000
+data->pList[2]:
+		 coords: (x, y, z) = (0.000000, 0.000000, 0.000000)
+		 centroids: (cx, cy, cz) = (0.000000, 0.000000 0.000000)
+		 weight = 0.000000
+data->pList[3]:
+		 coords: (x, y, z) = (0.000000, 0.000000, 0.000000)
+		 centroids: (cx, cy, cz) = (0.000000, 0.000000 0.000000)
+		 weight = 0.000000
+data->pList[4]:
+		 coords: (x, y, z) = (0.000000, 0.000000, 0.000000)
+		 centroids: (cx, cy, cz) = (0.000000, 0.000000 0.000000)
+		 weight = 0.000000
+data->pList[5]:
+		 coords: (x, y, z) = (0.000000, 0.000000, 0.000000)
+		 centroids: (cx, cy, cz) = (0.000000, 0.000000 0.000000)
+		 weight = 0.000000
+data->pList[6]:
+		 coords: (x, y, z) = (0.000000, 0.000000, 0.000000)
+		 centroids: (cx, cy, cz) = (0.000000, 0.000000 0.000000)
+		 weight = 0.000000
+data->pList[7]:
+		 coords: (x, y, z) = (0.000000, 0.000000, 0.000000)
+		 centroids: (cx, cy, cz) = (0.500000, 0.500000 0.500000)
+		 weight = 1.000000
