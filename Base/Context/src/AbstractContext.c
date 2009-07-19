@@ -1145,6 +1145,7 @@ void _AbstractContext_LoadTimeInfoFromCheckPoint( Context* self, Index timeStep,
 
 void _AbstractContext_SaveTimeInfo( Context* context ) {
 	AbstractContext*       self = context;	
+	FILE*                  timeInfoFile = NULL;
 	char*                  timeInfoFileName = NULL;
    char*                  timeInfoFileNamePart = NULL;
 	Stream*                errorStr = Journal_Register( Error_Type, self->type );
