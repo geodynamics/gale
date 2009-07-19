@@ -654,6 +654,13 @@ void _DVCWeights_InitialiseStructs( struct chain **bchain, struct particle **pLi
 	 Journal_Firewall( 0 , Journal_Register(Error_Type, "DVC_Weights"),"No memory for pList in '%s'\nCannot continue.\n", __func__);
       }
 
+   /* Initialise all particle values to zero */
+   for (i = 0; i < nump; i++) {
+      (*pList)[i].x = 0; (*pList)[i].y = 0; (*pList)[i].z = 0;
+      (*pList)[i].cx = 0; (*pList)[i].cy = 0; (*pList)[i].cz = 0;
+      (*pList)[i].w = 0;
+      (*pList)[i].index = 0;
+   }
 }
 /** Allocate the internal structs for the bchain (boundary chain) and the plist (particle list) */
 void _DVCWeights_InitialiseStructs2D( struct chain **bchain, struct particle2d **pList, int nump){
