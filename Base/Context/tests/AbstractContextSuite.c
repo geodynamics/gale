@@ -249,8 +249,9 @@ void AbstractContextSuite_TestDefaultEPs( AbstractContextSuiteData* data ) {
    contextEP = (ContextEntryPoint*)AbstractContext_GetEntryPoint( data->ctx, "Context_DumpClass" );
    pcu_check_true( contextEP->hooks->count == 0 );
    contextEP = (ContextEntryPoint*)AbstractContext_GetEntryPoint( data->ctx, "Context_Save" );
-   pcu_check_true( contextEP->hooks->count == 1 );
-   pcu_check_streq( ((Hook*)contextEP->hooks->data[0])->name, "SaveTimeInfo" );
+   pcu_check_true( contextEP->hooks->count == 2 );
+   pcu_check_streq( ((Hook*)contextEP->hooks->data[0])->name, "CreateCheckpointDirectory" );
+   pcu_check_streq( ((Hook*)contextEP->hooks->data[1])->name, "SaveTimeInfo" );
    contextEP = (ContextEntryPoint*)AbstractContext_GetEntryPoint( data->ctx, "Context_SaveClass" );
    pcu_check_true( contextEP->hooks->count == 0 );
 }
