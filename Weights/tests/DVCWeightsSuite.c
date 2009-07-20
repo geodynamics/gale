@@ -57,10 +57,10 @@ typedef struct {
    struct particle2d*   pList2D; /*2D particle List */
    struct chain*        bchain2D;/*2D boundary chain */
    unsigned int         numx,numy,numz;
-   unsigned int         nump;
+   unsigned int         nump,nump2D;
    unsigned int         px, py, pz;
    double               dx,dy,dz;
-   double               da;
+   double               da,da2D;
 } DVCWeightsSuiteData;
 
 
@@ -82,11 +82,13 @@ void DVCWeightsSuite_Setup( DVCWeightsSuiteData* data ) {
    data->py = 2; 
    data->pz = 2;
    data->nump = data->px * data->py * data->pz;
+   data->nump2D = data->px * data->py;
 
    data->dx = (BBXMAX - BBXMIN)/data->numx;
    data->dy = (BBYMAX - BBYMIN)/data->numy;
    data->dz = (BBZMAX - BBZMIN)/data->numz;
    data->da = data->dx*data->dy*data->dz;
+   data->da2D = data->dx*data->dy;
 }
 
 
@@ -158,11 +160,8 @@ void DVCWeightsSuite_TestResetGrid( DVCWeightsSuiteData* data ) {
 }
 
 
-void DVCWeightsSuite_TestCreateVoronoi( DVCWeightsSuiteData* data ) {
+void _DVCWeightsSuite_InitialiseParticleCoords( DVCWeightsSuiteData* data ) {
    int            i,j,k,l;
-
-   _DVCWeights_ConstructGrid(&data->cells, data->numz, data->numy, data->numx, BBXMIN,BBYMIN,BBZMIN,BBXMAX,BBYMAX,BBZMAX);		
-   _DVCWeights_InitialiseStructs( &data->bchain, &data->pList, data->nump);
 
    /*Initialise particle coords */
    l = 0;
@@ -182,13 +181,22 @@ void DVCWeightsSuite_TestCreateVoronoi( DVCWeightsSuiteData* data ) {
       //   data->pList[i].x, data->pList[i].y, data->pList[i].z);
 
    }
+}
 
+
+void DVCWeightsSuite_TestCreateVoronoi( DVCWeightsSuiteData* data ) {
+   int            i;
+
+   _DVCWeights_ConstructGrid(&data->cells, data->numz, data->numy, data->numx, BBXMIN,BBYMIN,BBZMIN,BBXMAX,BBYMAX,BBZMAX);		
+   _DVCWeights_InitialiseStructs( &data->bchain, &data->pList, data->nump);
+
+   _DVCWeightsSuite_InitialiseParticleCoords( data );
    _DVCWeights_CreateVoronoi( &data->bchain, &data->pList, &data->cells, data->dx, data->dy, data->dz,
       data->nump, data->numx, data->numy, data->numz, BBXMIN, BBXMAX, BBYMIN, BBYMAX, BBZMIN, BBZMAX);
    
    /* data->bchain changes */
    for (i = 0; i < data->nump; i++) {
-      pcu_check_true( data->bchain[i].index == 7 );
+      pcu_check_true( data->bchain[i].index == (data->nump-1) );
       pcu_check_true( data->bchain[i].sizeofboundary == 0 );
       pcu_check_true( data->bchain[i].numclaimed == 0 );
       pcu_check_true( data->bchain[i].totalclaimed == 1 );
@@ -216,6 +224,7 @@ void DVCWeightsSuite_TestGetCentroids( DVCWeightsSuiteData* data ) {
 
    _DVCWeights_ConstructGrid(&data->cells, data->numz, data->numy, data->numx, BBXMIN,BBYMIN,BBZMIN,BBXMAX,BBYMAX,BBZMAX);		
    _DVCWeights_InitialiseStructs( &data->bchain, &data->pList, data->nump);
+   _DVCWeightsSuite_InitialiseParticleCoords( data );
    _DVCWeights_CreateVoronoi( &data->bchain, &data->pList, &data->cells, data->dx, data->dy, data->dz,
       data->nump, data->numx, data->numy, data->numz, BBXMIN, BBXMAX, BBYMIN, BBYMAX, BBZMIN, BBZMAX);
 
@@ -225,7 +234,7 @@ void DVCWeightsSuite_TestGetCentroids( DVCWeightsSuiteData* data ) {
       Journal_Printf( stream, "data->pList[%d]:\n", i);
       Journal_Printf( stream, "\t\t coords: (x, y, z) = (%f, %f, %f)\n",
          data->pList[i].x, data->pList[i].y, data->pList[i].z);
-      Journal_Printf( stream, "\t\t centroids: (cx, cy, cz) = (%f, %f %f)\n",
+      Journal_Printf( stream, "\t\t centroids: (cx, cy, cz) = (%f, %f, %f)\n",
          data->pList[i].cx, data->pList[i].cy, data->pList[i].cz);
       Journal_Printf( stream, "\t\t weight = %f\n", data->pList[i].w);
    }
@@ -251,169 +260,167 @@ void DVCWeightsSuite_TestDistanceSquared( DVCWeightsSuiteData* data ) {
 }
 
 
-#if 0
-
 /* 2D Functions */
 
 void DVCWeightsSuite_TestConstructGrid2D( DVCWeightsSuiteData* data ) {
-   int data->numx,data->numy,data->numz;
+   unsigned int   ii=0;
+   Stream*        stream = Journal_Register( Info_Type, "TestConstructGrid2D" );
+   const char*    gridFilename = "DVCWeightsSuite_testConstructGrid2D.txt";
+   char           expectedGridFilename[PCU_PATH_MAX];
    
-   /*Define the resolution */
-   
-   data->numx = 2;
-   data->numy = 2;
+   Stream_RedirectFile( stream, gridFilename );
 
-   Journal_Printf( stream, "size of element:\n\t x = (%f, %f)\n\t y = (%f, %f) \n",
-      BBXMIN, BBXMAX, BBYMIN, BBYMAX);
-   Journal_Printf( stream, "Resolution: \n\t (x, y) = (%d, %d)\n", data->numx, data->numy);
+   _DVCWeights_ConstructGrid2D(&data->cells2D,data->numy,data->numx, BBXMIN,BBYMIN,BBXMAX,BBYMAX);		
    
-      _DVCWeights_ConstructGrid2D(&data->cells2D,data->numy,data->numx, BBXMIN,BBYMIN,BBXMAX,BBYMAX);		
-   
-   /* Print out the grid somehow */
-   for (i = 0; i < (data->numx * data->numy ); i++ ) {
-      Journal_Printf(stream, "data->cells2d[%d]:\tParticle Index: %d \n", 
-            i, data->cells2D[i].p);
+   /* Print out the grid */
+   for (ii = 0; ii < (data->numx * data->numy ); ii++ ) {
+      pcu_check_true( data->cells2D[ii].p == -1 );   /* Particle index: shouldn't be set up yet */
+      pcu_check_true( data->cells2D[ii].done == 0 );
+
+      Journal_Printf(stream, "cell[%d]\n", ii);
       Journal_Printf(stream, " \t\tValues: (N: %d, S: %d, E: %d, W: %d) \n", 
-            data->cells2D[i].N, data->cells2D[i].S, data->cells2D[i].E, data->cells2D[i].W );
-      Journal_Printf(stream, " \t\tCoords: (%f, %f) \t Done = %d\n", 
-            data->cells2D[i].x, data->cells2D[i].y, data->cells[i].done);			
+            data->cells2D[ii].N, data->cells2D[ii].S, data->cells2D[ii].E, data->cells2D[ii].W );
+      Journal_Printf(stream, " \t\tCoords: (%f, %f)\n", 
+            data->cells2D[ii].x, data->cells2D[ii].y );			
    }
+
+   pcu_filename_expected( gridFilename, expectedGridFilename );
+   pcu_check_fileEq( gridFilename, expectedGridFilename );
+   remove( gridFilename );
 }
 
-
 void DVCWeightsSuite_TestInitialiseStructs2D( DVCWeightsSuiteData* data ) {
-   int data->nump;
-   int data->px, data->py;
-   
-   /*Define size of swarm-to-be */
-   data->px = 2;
-   data->py = 2; 
-   data->nump = data->px * data->py ;
-   
-   _DVCWeights_InitialiseStructs2D( &data->bchain2D, &data->pList2D, data->nump);
-   for (i = 0; i < data->nump; i++) {
-      Journal_Printf( stream, "data->bchain2D[%d]: ", i);
-      Journal_Printf( stream, "No of new_claimed_cells = %d, ", 
-         data->bchain2D[i].new_claimed_cells_malloced);
-      Journal_Printf( stream, "No of new_bound_cells = %d\n",
-         data->bchain2D[i].new_bound_cells_malloced);
+   unsigned int   ii;   
+
+   _DVCWeights_InitialiseStructs2D( &data->bchain2D, &data->pList2D, data->nump2D);
+   for (ii = 0; ii < data->nump2D; ii++) {
+      pcu_check_true( data->bchain2D[ii].new_claimed_cells_malloced == DVC_INC );
+      pcu_check_true( data->bchain2D[ii].new_bound_cells_malloced == DVC_INC );
    }
 }
 
    
 void DVCWeightsSuite_TestResetGrid2D( DVCWeightsSuiteData* data ) {
-   Journal_Printf( stream, "data->numz * data->numy = %d\n", data->numz*data->numy);
+   unsigned int   i;
    
+   _DVCWeights_ConstructGrid2D(&data->cells2D,data->numy,data->numx, BBXMIN,BBYMIN,BBXMAX,BBYMAX);
    _DVCWeights_ResetGrid2D(&data->cells2D,data->numx*data->numy);
 
    for ( i = 0; i < data->numx*data->numy; i++) {
-      Journal_Printf( stream, "data->cells2D[%d].p = %d \t data->cells2D[%d].done = %d\n",
-         i, data->cells2D[i].p, i, data->cells2D[i].done);
+      pcu_check_true( data->cells2D[i].p == -1 );
+      pcu_check_true( data->cells2D[i].done == 0 );
    }
 }
 
    
-void DVCWeightsSuite_TestCreateVoronoi2D( DVCWeightsSuiteData* data ) {
-   double dx,dy,dz,da;
+void _DVCWeightsSuite_InitialiseParticleCoords2D( DVCWeightsSuiteData* data ) {
    int i,j,l;
 
-   dx = (BBXMAX - BBXMIN)/data->numx;
-   dy = (BBYMAX - BBYMIN)/data->numy;
-   da = dx*dy;
    /*Initialise particle coords */
    l = 0;
    for(i = 0; i < data->px ;i++){
       for ( j = 0; j < data->py ; j++) {
-            data->pList2D[l].x = (1 + i) / (data->px + 1.0);
-            data->pList2D[l].y = (1 + j) / ( data->py + 1.0);
+         data->pList2D[l].x = (1 + i) / (data->px + 1.0);
+         data->pList2D[l].y = (1 + j) / ( data->py + 1.0);
          l++;
       }
    }
-   for ( i = 0; i < data->nump; i++) {	    
-      Journal_Printf( stream, "data->pList2D[%d]:", i);
-      Journal_Printf( stream, "\t\t coords: (x, y) = (%f, %f)\n",
-         data->pList2D[i].x, data->pList2D[i].y);
+   for ( i = 0; i < data->nump2D; i++) {	    
+      //Journal_Printf( stream, "data->pList2D[%d]:", i);
+      //Journal_Printf( stream, "\t\t coords: (x, y) = (%f, %f)\n",
+      //   data->pList2D[i].x, data->pList2D[i].y);
 
    }
-   Journal_Printf( stream, "\n(dx, dy) = (%f, %f)	da = %f\n\n",
-      dx, dy, da);		
-   _DVCWeights_CreateVoronoi2D( &data->bchain2D, &data->pList2D, &data->cells2D, dx, dy, data->nump, data->numx, data->numy, BBXMIN, BBXMAX, BBYMIN, BBYMAX);
+}
+
+
+void DVCWeightsSuite_TestCreateVoronoi2D( DVCWeightsSuiteData* data ) {
+   int i;
+
+   _DVCWeights_ConstructGrid2D(&data->cells2D,data->numy,data->numx, BBXMIN,BBYMIN,BBXMAX,BBYMAX);
+   _DVCWeights_InitialiseStructs2D( &data->bchain2D, &data->pList2D, data->nump2D);
+
+   _DVCWeightsSuite_InitialiseParticleCoords2D( data );
+   _DVCWeights_CreateVoronoi2D( &data->bchain2D, &data->pList2D, &data->cells2D, data->dx, data->dy,
+      data->nump2D, data->numx, data->numy, BBXMIN, BBXMAX, BBYMIN, BBYMAX);
    
-   /* print out data->bchain changes */
-   for (i = 0; i < data->nump; i++) {
-      Journal_Printf( stream, "data->bchain2D[%d]: \t  index = %d \n",
-            i, data->bchain2D[i].index);
-      Journal_Printf( stream, "\t\t sizeofboundary = %d \n\t\t numclaimed = %d \n",
-            data->bchain2D[i].sizeofboundary, data->bchain2D[i].numclaimed);
-      Journal_Printf( stream, "\t\t totalclaimed = %d\n", data->bchain2D[i].totalclaimed);
-      Journal_Printf( stream, "\t\t new_bound_cells_malloced = %d \n",
-            data->bchain2D[i].new_bound_cells_malloced);
-      Journal_Printf( stream, "\t\t new_claimed_cells_malloced = %d \n",
-            data->bchain2D[i].new_claimed_cells_malloced);
-      Journal_Printf( stream, "\t\t done = %d\n", data->bchain2D[i].done);
+   /* data->bchain2D changes */
+   for (i = 0; i < data->nump2D; i++) {
+      pcu_check_true( data->bchain2D[i].index == (data->nump2D-1) );
+      pcu_check_true( data->bchain2D[i].sizeofboundary == 0 );
+      pcu_check_true( data->bchain2D[i].numclaimed == 0 );
+      pcu_check_true( data->bchain2D[i].totalclaimed == 1 );
+      pcu_check_true( data->bchain2D[i].new_bound_cells_malloced == DVC_INC );
+      pcu_check_true( data->bchain2D[i].new_claimed_cells_malloced == DVC_INC );
+      pcu_check_true( data->bchain2D[i].done == 0 );
    }
-   /* Print out particle values */
-   for (i = 0; i < data->nump; i++) {
-   
-      Journal_Printf( stream, "data->pList2D[%d]:\n", i);
-      Journal_Printf( stream, "\t\t coords: (x, y) = (%f, %f)\n",
-         data->pList2D[i].x, data->pList2D[i].y);
-      Journal_Printf( stream, "\t\t centroids: (cx, cy) = (%f, %f)\n",
-         data->pList2D[i].cx, data->pList2D[i].cy);
-      Journal_Printf( stream, "\t\t weight = %f\n", data->pList2D[i].w);
+   /* particle values */
+   for (i = 0; i < data->nump2D; i++) {
+      pcu_check_true( (data->pList2D[i].cx == 0) && (data->pList2D[i].cy == 0) );
+      pcu_check_true( data->pList2D[i].w == 0 );
    }
 }
 
 
 void DVCWeightsSuite_TestGetCentroids2D( DVCWeightsSuiteData* data ) {
+   unsigned int   i;
+   Stream*        stream = Journal_Register( Info_Type, "TestGetCentroids2D" );
+   const char*    centroidsFilename = "DVCWeightsSuite_testGetCentroids2D.txt";
+   char           expectedCentroidsFilename[PCU_PATH_MAX];
 
-   _DVCWeights_GetCentroids2D( data->cells2D, data->pList2D,data->numy,data->numx,data->nump,da);
-   for (i = 0; i < data->nump; i++) {
-   
+   Stream_RedirectFile( stream, centroidsFilename );
+
+   _DVCWeights_ConstructGrid2D(&data->cells2D,data->numy,data->numx, BBXMIN,BBYMIN,BBXMAX,BBYMAX);
+   _DVCWeights_InitialiseStructs2D( &data->bchain2D, &data->pList2D, data->nump2D);   
+   _DVCWeightsSuite_InitialiseParticleCoords2D( data );
+   _DVCWeights_CreateVoronoi2D( &data->bchain2D, &data->pList2D, &data->cells2D, data->dx, data->dy,
+      data->nump2D, data->numx, data->numy, BBXMIN, BBXMAX, BBYMIN, BBYMAX);
+
+   _DVCWeights_GetCentroids2D( data->cells2D, data->pList2D,data->numy,data->numx,data->nump2D,data->da2D);
+
+   for (i = 0; i < data->nump2D; i++) {
       Journal_Printf( stream, "data->pList2D[%d]:\n", i);
       Journal_Printf( stream, "\t\t coords: (x, y) = (%f, %f)\n",
          data->pList2D[i].x, data->pList2D[i].y);
       Journal_Printf( stream, "\t\t centroids: (cx, cy) = (%f, %f)\n",
          data->pList2D[i].cx, data->pList2D[i].cy);
       Journal_Printf( stream, "\t\t weight = %f\n", data->pList2D[i].w);
-   
    }
+
+   pcu_filename_expected( centroidsFilename, expectedCentroidsFilename );
+   pcu_check_fileEq( centroidsFilename, expectedCentroidsFilename );
+   remove( centroidsFilename );
 }
 
 
 void DVCWeightsSuite_TestDistanceSquared2D( DVCWeightsSuiteData* data ) {
    double particleDistance;		
-   double particle0[3], particle1[3];
+   double particle0[2], particle1[2];
    
-   Journal_Printf( stream, "particle0:\n");
-   Journal_Printf( stream, "\t\t coords: (x, y) = (%f, %f)\n",
-         particle0[0], particle0[1]);
-   Journal_Printf( stream, "particle1:\n");
-   Journal_Printf( stream, "\t\t coords: (x, y) = (%f, %f)\n",
-         particle1[0], particle1[1]);
-   
+   particle0[0] = 0.5;	particle0[1] = 0.5;
+   particle1[0] = 0.25; particle1[1] = 0.25;
+
    particleDistance = _DVCWeights_DistanceSquared2D(
       particle0[0], particle0[1],
       particle1[0], particle1[1] );
-   Journal_Printf( stream, "calculated distance^2 between particles = %f \n", particleDistance);
    
+   pcu_check_true( particleDistance == 0.125 );
 }
-#endif
 
 
 void DVCWeightsSuite( pcu_suite_t* suite ) {
    pcu_suite_setData( suite, DVCWeightsSuiteData );
    pcu_suite_setFixtures( suite, DVCWeightsSuite_Setup, DVCWeightsSuite_Teardown );
    pcu_suite_addTest( suite, DVCWeightsSuite_TestConstructGrid );
+   pcu_suite_addTest( suite, DVCWeightsSuite_TestResetGrid );
    pcu_suite_addTest( suite, DVCWeightsSuite_TestInitialiseStructs );
    pcu_suite_addTest( suite, DVCWeightsSuite_TestCreateVoronoi );
    pcu_suite_addTest( suite, DVCWeightsSuite_TestGetCentroids );
    pcu_suite_addTest( suite, DVCWeightsSuite_TestDistanceSquared );
-#if 0
    pcu_suite_addTest( suite, DVCWeightsSuite_TestConstructGrid2D );
    pcu_suite_addTest( suite, DVCWeightsSuite_TestInitialiseStructs2D );
+   pcu_suite_addTest( suite, DVCWeightsSuite_TestResetGrid2D );
    pcu_suite_addTest( suite, DVCWeightsSuite_TestCreateVoronoi2D );
    pcu_suite_addTest( suite, DVCWeightsSuite_TestGetCentroids2D );
    pcu_suite_addTest( suite, DVCWeightsSuite_TestDistanceSquared2D );
-#endif
 }

@@ -1,0 +1,12 @@
+cell[0]
+ 		Values: (N: 2, S: -2, E: 1, W: -2) 
+ 		Coords: (-0.500000, -0.500000)
+cell[1]
+ 		Values: (N: 3, S: -2, E: -2, W: 0) 
+ 		Coords: (0.500000, -0.500000)
+cell[2]
+ 		Values: (N: -2, S: 0, E: 3, W: -2) 
+ 		Coords: (-0.500000, 0.500000)
+cell[3]
+ 		Values: (N: -2, S: 1, E: -2, W: 2) 
+ 		Coords: (0.500000, 0.500000)

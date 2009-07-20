@@ -1,0 +1,16 @@
+data->pList2D[0]:
+		 coords: (x, y) = (0.333333, 0.333333)
+		 centroids: (cx, cy) = (-0.500000, -0.500000)
+		 weight = 1.000000
+data->pList2D[1]:
+		 coords: (x, y) = (0.333333, 0.666667)
+		 centroids: (cx, cy) = (-0.500000, 0.500000)
+		 weight = 1.000000
+data->pList2D[2]:
+		 coords: (x, y) = (0.666667, 0.333333)
+		 centroids: (cx, cy) = (0.500000, -0.500000)
+		 weight = 1.000000
+data->pList2D[3]:
+		 coords: (x, y) = (0.666667, 0.666667)
+		 centroids: (cx, cy) = (0.500000, 0.500000)
+		 weight = 1.000000
