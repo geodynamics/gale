@@ -314,16 +314,13 @@ void lucColourMap_GetColourFromValue( void* colourMap, double value, lucColour* 
 	Colour_Index  colourCount = self->colourCount;
 	
 	float 	      max, min, centre, sampleValue;
-		
-	/* To get a log scale, transform each value to log10(value) */
-	
+
+ 	/* To get a log scale, transform each value to log10(value) */
 	if (self->logScale == True) {
 		max 	    = log10(self->maximum);
 		min  	    = log10(self->minimum);
-                if(Num_Approx(self->centringValue, 0.0))
-                  centre = 0.5*(max - min);
-                else
-                  centre 	    = log10(self->centringValue);
+        if(Num_Approx(self->centringValue, 0.0)) self->centringValue = 0.5;
+        centre 	    = log10(self->centringValue);
 		sampleValue = log10(value);
 	}
 	else {
@@ -342,10 +339,9 @@ void lucColourMap_GetColourFromValue( void* colourMap, double value, lucColour* 
  	*/
 		
 	if(sampleValue > centre)
-		scaledValue = 0.5 + 0.5 * (value - centre)/(max - centre);
+		scaledValue = 0.5 + 0.5 * (sampleValue - centre)/(max - centre);
 	else
-		scaledValue = 0.5 * (value - min) / (centre - min); 
-	
+		scaledValue = 0.5 * (sampleValue - min) / (centre - min); 
 
 	if (scaledValue <= 0.0 || colourCount == 1) {
 		memcpy( colour, lucColourMap_GetColourFromList( self, 0 ), sizeof(lucColour) );
