@@ -273,8 +273,11 @@ void _lucSDLWindow_Display( void* window ) {
     //if (!self->interactive || !self->isMaster) return;    
   #ifdef HAVE_OSMESA
 	/* Render to SDL using OSMesa output buffer */
-	SDL_BlitSurface(self->buffer,NULL,self->screen,NULL);
-	SDL_Flip(self->screen);
+    if (self->interactive)
+    {
+    	SDL_BlitSurface(self->buffer,NULL,self->screen,NULL);
+	    SDL_Flip(self->screen);
+    }
   #else	
 	/* Swap buffers */
 	SDL_GL_SwapBuffers();
