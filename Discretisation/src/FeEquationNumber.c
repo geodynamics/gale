@@ -300,6 +300,10 @@ void _FeEquationNumber_Init(
    self->ownedMap = STreeMap_New();
    STreeMap_SetItemSize( self->ownedMap, sizeof(int), sizeof(int) );
    STree_SetIntCallbacks( self->ownedMap );
+
+   Stream_SetPrintingRank( self->debug, 0 );
+ 
+
 }
 
 void _FeEquationNumber_Construct( void* feEquationNumber, Stg_ComponentFactory *cf, void* data ){
@@ -2405,6 +2409,8 @@ void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
    inc = IArray_New();
 
    stream = Journal_Register( Info_Type, self->type );
+   Stream_SetPrintingRank( stream, 0 );
+
    Journal_RPrintf( stream, "FeEquationNumber: '%s'\n", self->name );
    Stream_Indent( stream );
    Journal_RPrintf( stream, "Generating equation numbers...\n" );

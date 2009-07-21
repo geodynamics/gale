@@ -63,6 +63,9 @@ double AdvectionDiffusionSLE_CalculateDt( void* advectionDiffusionSLE, FiniteEle
 	
 	Journal_DPrintf( self->debug, "In func: %s\n", __func__ );
 	
+	/*  It would be useful to introduce a limit to the change of step in here ... to prevent timesteps
+		from becoming arbitrarily large in a single step */ 
+	
 	/* Calculate Courant Number */
 	advectionTimestep = AdvectionDiffusionSLE_AdvectiveTimestep( self );
 	diffusionTimestep = AdvectionDiffusionSLE_DiffusiveTimestep( self );
@@ -70,7 +73,7 @@ double AdvectionDiffusionSLE_CalculateDt( void* advectionDiffusionSLE, FiniteEle
 	MPI_Allreduce( &advectionTimestep, &advectionTimestepGlobal, 1, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD );
 	MPI_Allreduce( &diffusionTimestep, &diffusionTimestepGlobal, 1, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD );
 
-	Journal_Printf( self->debug, "%s Dominating. - Advective Timestep = %g - Diffusive Timestep = %g\n", 
+	Journal_DPrintf( self->debug, "%s Dominating. - Advective Timestep = %g - Diffusive Timestep = %g\n", 
 			advectionTimestepGlobal < diffusionTimestepGlobal ? "Advection" : "Diffusion",
 			advectionTimestepGlobal, diffusionTimestepGlobal);
 	
@@ -89,6 +92,8 @@ double AdvectionDiffusionSLE_DiffusiveTimestep( void* advectionDiffusionSLE ) {
 	Journal_DPrintf( self->debug, "In func: %s\n", __func__ );
 	
 	FeVariable_GetMinimumSeparation( self->phiField, &minSeparation, minSeparationEachDim );
+
+	/* This is quite a conservative estimate */
 
 	return self->courantFactor * minSeparation * minSeparation / self->maxDiffusivity;
 }
