@@ -11,7 +11,7 @@
 		<param name="FeVariable">TemperatureField</param>
 	  </struct>
 
-	  <struct name="materialSwarm-dTdZ">
+	  <struct name="materialSwarm-dTdY">
 		<param name="Type">FeSwarmVariable</param>
 		<param name="Swarm">materialSwarm</param>
 		<param name="FeVariable">verticalTemperatureGradientField</param>
@@ -28,7 +28,7 @@
 		<param name="positionRange">False</param>
 	 	<param name="maxPositionZ">2.0</param> 
 	 	<param name="maxPositionX">2.0</param> 
-	 	<param name="ColourVariable">materialSwarm-dTdz</param>
+	 	<param name="ColourVariable">materialSwarm-dTdY</param>
 	 	<param name="ColourMap">HotDotColourMap</param>
 	 	<param name="pointSize">1.0</param>
 	 </struct>
@@ -44,7 +44,7 @@
 		<param name="positionRange">False</param>
 	 	<param name="maxPositionZ">2.0</param> 
 	 	<param name="maxPositionX">2.0</param> 
-	 	<param name="ColourVariable">materialSwarm-dTdz</param>
+	 	<param name="ColourVariable">materialSwarm-dTdY</param>
 	 	<param name="ColourMap">CoolDotColourMap</param>
 	 	<param name="pointSize">1.0</param>
 	 </struct>
