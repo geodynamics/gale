@@ -96,7 +96,7 @@
 			IsChild( ((Stg_Class*) classPtr)->type, (possibleParentType) )
 
 	#define Stg_CheckType( classPtr, possibleParentTypedef ) \
-		(possibleParentTypedef*) Stg_Class_CheckType( classPtr, possibleParentTypedef ## _Type )
+		(possibleParentTypedef*) Stg_Class_CheckType( (classPtr), possibleParentTypedef ## _Type )
 
 	#ifdef DEBUG
 		#define Stg_DCheckType Stg_CheckType
@@ -105,7 +105,7 @@
 			(possibleParentTypedef*) (classPtr)
 	#endif
 
-	Stg_Class* Stg_Class_CheckType( const void* classPtr, const char* possibleParentType );
+	Stg_Class* Stg_Class_CheckType( const void* classPtr, Type possibleParentType );
 
 	void HierarchyTable_PrintParents( void* hierarchyTable, Type childType, Stream* stream ) ;
 	void HierarchyTable_PrintChildren( void* hierarchyTable, Type parentType, Stream* stream ) ;

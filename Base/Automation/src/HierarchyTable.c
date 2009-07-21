@@ -127,7 +127,7 @@ void HierarchyTable_PrintChildren( void* hierarchyTable, Type parentType, Stream
 }
 
 
-Stg_Class* Stg_Class_CheckType( const void* classPtr, const char* possibleParentType ) {
+Stg_Class* Stg_Class_CheckType( const void* classPtr, Type possibleParentType ) {
 	Stg_Class* self = (Stg_Class*) classPtr;
 	/* Check if the pointer is null */
 	Journal_Firewall(
