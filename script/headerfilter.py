@@ -48,15 +48,18 @@ class Input():
             # allows for dictionaries embedded in lists in the dictionary
             metaText = "/** "
             description = (metaFile.dictionary).pop('Description')
-            
+            # description goes at top of Doxygen file with 'brief' statement
             desc2 = description.replace("$", " \\f$ ")
             metaText += "\\brief "+desc2+".  <ul> "
+            # Now cycle through dictionary and parse out all entries into a list
             for key, val in (metaFile.dictionary).iteritems():
+                # If a dictionary entry is a list, parse it out correctly (all dictionaries are embedded in lists)
                 if (isinstance(val, list) == True):
                     if (len(val) <= 0):
                         metaText +=  ""
                     else: 
                         metaText +=  "<li> <b> "+ key +" </b> : \\n <table> "
+                        # Table for dictionary embedded in the dictionary
                         #Basic key search lifted from createHTMLDocuments. It makes sure
                         # all possible table titles and entries are included.
                         keyList = []
@@ -84,19 +87,23 @@ class Input():
                                 metaText+= "<td> " +str(item) + " </td> "
                             metaText += " </tr>"
                         metaText += " </table> \n </li>"
-                                         
+                # Parse out values if they are just a dictionary
+                # This is unlikely to be used.                         
                 elif (isinstance(val, dict) == True):
                     metaText += "<ul> \n "
                     for key2, val2 in val.iteritems():
                         metaText+= " <li> " +key2 + ": "+ val2 +" </li> "
-                    metaText += "</ul> \n "     
+                    metaText += "</ul> \n "   
+                # For example, puts it in verbatim tags to display correctly  
                 elif (key == "Example") :
-                    metaText+= "<li><b> "+key + "</b>: "  +" \\verbatim "+ val +" \\endverbatim " +" </li> \n "
+                    metaText+= "<li><b> "+key + "</b>: "  +" \\verbatim "+ val +" \\endverbatim " +" </li> \n " 
+                # puts LaTeX equations into Doxygen recognisable form.
                 elif (key == "Equation") :
                     metaText += "<li><b> "+key + "</b>: "  + val.replace("$", "\\f$") +" </li> \n "
                 else:
                     metaText+= "<li><b> "+key + "</b>: " + str(val) +" </li> \n "
             metaText += "</ul> */\n "
+            # Now find location to write meta-data and include it. 
             # finding the initial location of the struct for this file
             if self.parentName != "":
 			inheritanceText = " : "+self.parentName
@@ -130,7 +137,7 @@ class Input():
 
     ## This function converts the header information into a C++ format.
     def convertHeaders(self,  text) :
-        #print text
+
         stringStart = -1
         stringEnd = -1
         lineCount = 0
@@ -141,7 +148,7 @@ class Input():
 			if stringStart >= 0:
 				stringEnd =(str(line)).find("\\")
 				if stringEnd >=0:
-					#print line[stringStart: stringStart+10]
+
 					self.lines = [lineCount]
 					self.functionName = ((line[stringStart+10: stringEnd]).lstrip()).rstrip()
 					stringNextStart = -1
@@ -156,7 +163,7 @@ class Input():
 					        stringNextStart = (str(text[len(text)-1])).find("__")
                                                 
 					    if stringNextStart >=0:
-                                                #print "FOUND __ for parent"
+
                                                 if (lineCount + i) < (len(text)-1): 
 						    stringNextEnd =(str(text[lineCount+i])).find("\\")
                                                 else:
@@ -166,7 +173,7 @@ class Input():
 							self.parentName = ((text[lineCount +i][stringNextStart + 2:stringNextEnd]).lstrip()).rstrip()
                                                     else:
                                                         self.parentName = ((text[len(text)-1][stringNextStart + 2:stringNextEnd]).lstrip()).rstrip()
-							#print self.parentName
+
 					    stringNextStart = -1
 					    stringNextEnd = -1
 			stringStart = -1
@@ -181,15 +188,13 @@ class Input():
 			if stringStart >=0:
 				stringEnd = (str(line)).find(myNextString)
 				if stringEnd >=0:
-					#print line
-					#print lineCount
+
+
 					(self.lines).append(lineCount)
 			
 			
 			lineCount = lineCount + 1		
-	#print self.functionName
-	#print self.parentName		
-	#print self.lines
+
 		
 		# Now, if there is text to replace:
         if self.functionName != "":
@@ -200,7 +205,7 @@ class Input():
 				inheritanceText = " : "+self.parentName
 			self.addedText = "struct "+ self.functionName + inheritanceText +"\n {\n "
 			lineNum = -1
-			#print self.lines
+
 			if len(self.lines) == 2:
 				for lineNum in range(self.lines[0]+1, self.lines[1]-1):
 					if self.parentName == "":
@@ -209,11 +214,9 @@ class Input():
 						# add inbetween text removing old parent function line
 						myText = 0
 						myText = text[lineNum].count(self.parentName)
-						#print myText
+
 						if myText ==  0:
 							self.addedText += text[lineNum].split("\\")[0] + "\n "
-				
-				#print self.addedText
 		
 				# replace old text section with new 'addedText'
 				for lines in range(0, self.lines[0]-1):
@@ -222,17 +225,15 @@ class Input():
 
                                 #Add in public: statement just in case.
                                 self.output += "public: \n" 
-				#print lines
-				#print len(text)
-
+				
                 # Find #endif statement and insert bracket before it.
 				for lines in range(self.lines[1]+1, len(text)):
 					if ((text[lines]).find("#endif") >= 0):
-                                           #print "FOUND IT"
+
 					   self.output +=  "};\n" + text[lines]
 					else:
 					    self.output += text[lines]
-				#print "*********"
+
 
                 
 		# if no alterations are needed, then write output to screen as is	
@@ -244,12 +245,12 @@ class Input():
     ## main function to tie all class functions together in a run
     def main(self):  	
 		# Read in files
-		#print self.filename
+
 		self.file = open(self.filename, "r")
 		
 		text = []
 		text = (self.file).readlines()
-		#print text[1]
+
 		self.convertHeaders(text)
                 self.convertTodos(self.output)       
                 self.addMetaFile()
