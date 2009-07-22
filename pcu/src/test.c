@@ -18,6 +18,7 @@
 */
 
 #include <stdlib.h>
+#include <string.h>
 #include <assert.h>
 #include <mpi.h>
 #include "types.h"
@@ -26,7 +27,23 @@
 #include "suite.h"
 #include "listener.h"
 
+/* Need to access this for docstring functions */
+extern pcu_suite_t* pcu_cursuite;
+
 void pcu_test_gathersources( pcu_test_t* test );
+
+
+void pcu_docstring( const char* docString ) {
+   assert( pcu_cursuite );
+   pcu_test_doc( pcu_cursuite->curtest, docString );
+}
+
+void pcu_test_doc( pcu_test_t* test, const char* docString ) {
+   assert( test );
+   assert( docString );
+   
+   test->docString = strdup( docString );
+}
 
 void pcu_test_run( pcu_test_t* test, pcu_listener_t* lsnr ) {
    int rank;

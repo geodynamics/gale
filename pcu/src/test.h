@@ -30,7 +30,14 @@ struct pcu_test_t {
       int nsrcs;
       pcu_source_t* srcs;
       pcu_source_t* lastSrc;
+      const char* docString;
 };
+
+/** Associate a documentation string with the current test (must be called from within a test function) */
+void pcu_docstring( const char* docString );
+
+/** Associate a documentation string with a test. Expected this will be called from function above */
+void pcu_test_doc( pcu_test_t* test, const char* docString );
 
 void pcu_test_run( pcu_test_t* test, pcu_listener_t* lsnr );
 pcu_source_t* pcu_test_addSource( pcu_test_t* test, pcu_source_t* src );

@@ -111,6 +111,9 @@ void _pcu_suite_addTest( pcu_suite_t* suite, pcu_testfunc_t* func, const char* n
    test->next = NULL;
    test->nsrcs = 0;
    test->srcs = NULL;
+   test->lastSrc = NULL;
+   test->docString = NULL; /* Don't document when test created - user needs to call explicit function to
+                              Add a document string */
 
    /* Add the new test. */
    if( suite->tests ) {
@@ -174,6 +177,9 @@ void pcu_suite_clear( pcu_suite_t* suite ) {
          pcu_source_clear( suite->tests->srcs );
          free( suite->tests->srcs );
          suite->tests->srcs = src;
+      }
+      if ( suite->tests->docString ) {
+         free( suite->tests->docString );
       }
 
       tst = suite->tests->next;
