@@ -6,6 +6,7 @@ from createDocument import Project
 from createDocument import Meta
 from createHTMLDocuments import createHTMLDocuments
 from createHTMLDocuments import DivIds
+## find a list of projects in the base directory, and remove obvious non-project listings
 def findProjectDirectories(mainDirectory):
     directory = os.path.realpath(mainDirectory)
     # find a list of projects in the base directory
@@ -25,7 +26,7 @@ def findProjectDirectories(mainDirectory):
     print "Creating Codex pages for projects: ", projList
     return projList
 
-
+## Create a dictionary that contains all data needed to create Codex and Doxygen pages
 def createListDictionary(arg1, arg2, arg3, arg4, directoryPath, docPath):
     dictionary = {}
     # Add items to dictionary
@@ -34,6 +35,7 @@ def createListDictionary(arg1, arg2, arg3, arg4, directoryPath, docPath):
 
     dictionary['docPath'] = docPath
     dictionary['docDataPath'] = os.path.realpath(os.path.join(directoryPath,'StGermain/doc/'))
+    dictionary['docScriptPath'] = os.path.realpath(os.path.join(directoryPath,'StGermain/script/'))
     # Define Codex values
     # Codex Subdir
     dictionary['codexSubDir'] = 'Codex'
@@ -94,12 +96,12 @@ def createListDictionary(arg1, arg2, arg3, arg4, directoryPath, docPath):
     dictionary['doxygenSubDir'] = 'Doxygen'
     dictionary['doxygenSubDirPath'] = os.path.join(dictionary['docPath'], dictionary['doxygenSubDir'])
     dictionary['configPath'] = os.path.join(dictionary['docDataPath'], dictionary['configFile'])
-    dictionary['headerFilterPath'] = dictionary['docDataPath']+"/headerfilter.py"
+    dictionary['headerFilterPath'] = dictionary['docScriptPath']+"/headerfilter.py"
     dictionary['projectNumber'] = 'Bleeding Edge'
     dictionary['configPathNew'] = os.path.join(dictionary['docDataPath'], "Doxyfile.new")
     return dictionary
 
-# Print help statement
+## Print help statement appropriate for 'createDocs.py'
 def printHelpStatement(dictionary):
          print "Help for createDocs.py. This file is designed to be run with scons doc."
          print "Use createHTMLDocs.py for the standalone version. "
@@ -118,7 +120,7 @@ def printHelpStatement(dictionary):
          print "Other defaults: \n"
          print dictionary.items()
 
-# Main file to run component codex creator with defaults built in
+## Main file to run component codex creator with defaults built in
 def createCodex(dictionary):
 
     #Now create the projects.
@@ -152,6 +154,7 @@ def createCodex(dictionary):
     htmlDocuments.copyPictures(dictionary['imagePath'])
     htmlDocuments.copyStylesheets()
 
+## create the doxygen web pages
 def createDoxygen(dictionary):
 
     #Todo: check doxygen exists

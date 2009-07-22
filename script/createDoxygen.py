@@ -5,9 +5,9 @@ import sys, os.path, os, string, subprocess, shutil
 from createDocument import createDocuments
 from createDocs import createListDictionary
 from createDocs import createDoxygen
-
+## Function for specific help statement for running Doxygen ONLY
 def printHelpStatement(dictionary):
-# specific help statement for running Doxygen ONLY
+
          print "Help for createDoxygen.py. This file is designed to be standalone."
          print "To run, type ./createDoxygen.py \n"
          print "To run with input options: "
@@ -50,15 +50,25 @@ if __name__=='__main__':
 
     # Add other dictionary options or reset preset options
     if values[4] != "":
+        print "Read in value"
         mainDictionary['docDataPath'] = os.path.realpath(values[4])
     else:
         mainDictionary['docDataPath'] = os.path.realpath(os.path.join(directoryPath,'StGermain/doc/'))
     # Setup docScriptPath
     if values[4] != "":
+        print "stuff stuff stuff"
         mainDictionary['docScriptPath'] = os.path.join(string.rstrip(os.path.realpath(values[4]), "doc/"), "script/")
     else:
         mainDictionary['docScriptPath'] = os.path.realpath(os.path.join(directoryPath,'StGermain/script/'))
+    print mainDictionary['docDataPath']
+    print mainDictionary['docScriptPath']
+
+    #Reset configPath as necessary:
+    if ((values[1] != "") and (values[4] != "") ):
+        mainDictionary['configPath'] = os.path.join(mainDictionary['docDataPath'], mainDictionary['configFile'])
+        mainDictionary['configPathNew'] = os.path.join(mainDictionary['docDataPath'], "Doxyfile.new")
     # Set up help print statement
+        mainDictionary['headerFilterPath'] = mainDictionary['docScriptPath']+"/headerfilter.py"
     if ((values[1] == "help") or (values[1] == '-h') or (values[1] =='--help') or (values[1] == 'h')):
         printHelpStatement(mainDictionary)
 

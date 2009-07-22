@@ -6,7 +6,7 @@ import createDocument
 from createDocument import createDocuments
 from createDocument import Project
 from createDocument import Meta
-# The createHTMLDocuments class. Inherits from createDocuments. Contains all the information
+## The createHTMLDocuments class. Inherits from createDocuments. Contains all the information
 # needed to create a series of HTML pages documenting the Component Codex. Should be flexible
 # enough to adapt to being used for different displays of the meta files.
 class createHTMLDocuments(createDocuments):
@@ -23,7 +23,7 @@ class createHTMLDocuments(createDocuments):
         self.indexFileName = indexFileName
         self.searchBarType = searchBarType
         self.searchPath = searchPath
-    # Create the HTML Pages.    
+    ## Create the HTML Pages.    
     def createHTMLPages(self) :
         #check output path
         createDocument.checkOutputPath(self.path)
@@ -34,7 +34,7 @@ class createHTMLDocuments(createDocuments):
         #create Index page    
         self.createIndexPage()
 
-    # Creates the HTML Page for each project.    
+    ## Creates the HTML Page for each project.    
     def createHTMLPage(self, count):
         # create div ids list
         self.div = DivIds()
@@ -67,7 +67,7 @@ class createHTMLDocuments(createDocuments):
         page = open(filename,  'w')
         page.write(htmlPage)
         page.close()
-    # The Main page.It's contents are mostly specified by an external file.    
+    ## The Main page.It's contents are mostly specified by an external file.    
     def createIndexPage(self):
         self.div = DivIds()
         self.div.createDivIds('')
@@ -110,7 +110,7 @@ class createHTMLDocuments(createDocuments):
         page = open(filename,  'w')
         page.write(htmlPage)
         page.close()
-    # Extract content from file for main page
+    ## Extract content from file for main page
     def createIndexContent(self):
         text = ''
         if not(self.indexFileName == ''):
@@ -119,7 +119,7 @@ class createHTMLDocuments(createDocuments):
             f.close()
             
         return text
-    # Add a google search bar for specified path.
+    ## Add a google search bar for specified path.
     def addSearchBarGoogle(self,  path):
         text = ''
         text += '<!-- SiteSearch Google: Adds a Google search bar for the Codex.\n' 
@@ -148,7 +148,7 @@ class createHTMLDocuments(createDocuments):
 
 
         return text
-    # Header data for webpages.    
+    ## Header data for webpages.    
     def createHeader(self,  projectName):
         text = '<head>\n<META http-equiv="Content-Type" content="text/html; charset=UTF-8">' 
         text +='<title>' +projectName +' '+ self.name+'</title>\n'
@@ -161,7 +161,7 @@ class createHTMLDocuments(createDocuments):
             
         text += '</head>\n'
         return text
-    # Top menu to appear along very top of webpages.
+    ## Top menu to appear along very top of webpages.
     def createTopMenu(self):
         text = '<div id="'+self.div.toptab+'">\n'
         for webpage in self.externalWebpages:
@@ -169,21 +169,21 @@ class createHTMLDocuments(createDocuments):
 
         text += '</div>\n'
         return text
-    # Specific div from the codex stylesheet
+    ## Specific div from the codex stylesheet
     def createBreadcrumbTrail(self, projectName):
         text ='<div id="'+self.div.breadcrumbtrail+'">\n<h1>\n' 
         text +=        '<a href="'+projectName+'.html'+'">'+ projectName 
         text +=        ' '+self.name+' </a>\n </h1>\n </div>\n'
         return text
         
-    # Specific div from the codex stylesheet for the main page
+    ## Specific div from the codex stylesheet for the main page
     def createIndexBreadcrumbTrail(self):
         text ='<div id="'+self.div.breadcrumbtrail+'">\n<h1>\n' 
         text +=        '<a href="index.html'+'">'
         text +=        ''+self.name+' </a>\n </h1>\n </div>\n'
         return text
 
-    # Create the tabs to navigate between the project pages.
+    ## Create the tabs to navigate between the project pages.
     def createNavitab(self,  projectName):
         text = '<div id="navitab">\n <br>\n '
         if projectName == 'index':
@@ -198,7 +198,7 @@ class createHTMLDocuments(createDocuments):
         text += '\n<hr>\n </div>\n'
         return text
         
-    # Create the footer with contact info, and page creation time.
+    ## Create the footer with contact info, and page creation time.
     def createFooter(self):
         text = '<div id="'+self.div.footer+'">\n' 
         text +=        '<h3>Last updated: '+str(datetime.datetime.today())+'</h3>\n' 
@@ -206,7 +206,7 @@ class createHTMLDocuments(createDocuments):
         text +=        '</div>\n'
         return text
 
-    # Create the sidebar. This searches though all the project metas and attempts to auto-sort
+    ## Create the sidebar. This searches though all the project metas and attempts to auto-sort
     # them into a reasonably sized 2-tier menu system. Not perfect.
     def createSidebar(self,  count):
         # Get out name of each meta file in project
@@ -292,21 +292,21 @@ class createHTMLDocuments(createDocuments):
         text += '</ul>\n'                        
         text += '</div>\n'
         return text
-    # Put small blurb in box at top of webpage. Blurb is given from command line.    
+    ## Put small blurb in box at top of webpage. Blurb is given from command line.    
     def createBlurb(self,  projectName):
         text =        '<div id="'+self.div.desc+'">\n'
         text +=        '<h3> '+projectName+' '+self.name+' </h3>\n' 
         text +=        '<p>'+self.blurb+'<br>\n </p>\n </div>\n<br>\n'
         return text
         
-    # Put small blurb on index page, different from project pages. This is fixed
+    ## Put small blurb on index page, different from project pages. This is fixed
     def createIndexBlurb(self,  blurb):
         text =        '<div id="'+self.div.desc+'">\n'
         text +=        '<h3>'+self.name+'</h3>\n' 
         text +=        '<p>'+blurb+'<br>\n </p>\n </div>\n<br>\n'
         return text 
         
-    # Create the meta-file content part of the pages.    
+    ## Create the meta-file content part of the pages.    
     def createMain(self,  count):
         text = ''
         #create all meta entries for current Project page
@@ -329,7 +329,7 @@ class createHTMLDocuments(createDocuments):
             elif project.metaFlag =='xsd':
                 text += self.createMetaEntryXsd(name, count)
         return text
-    # For the simpler componentInfo entries, can easily fit into this function.    
+    ## For the simpler componentInfo entries, can easily fit into this function.    
     def addSimpleComponentInfo(self, name, value):
                 text = ''
                 text += '<div id="'+unicode(self.div.componentInfo[0])+'">\n'
@@ -338,7 +338,7 @@ class createHTMLDocuments(createDocuments):
                 text += '<div id="'+self.div.componentInfo[2]+'">'+value+'<br>\n'
                 text += '</div>\n</div>\n'        
                 return unicode(text)
-    # Example part of meta component            
+    ## Example part of meta component            
     def addExampleInfo(self,  name,  value):
         text = ''
         text += '<div id="'+self.div.componentInfo[0]+'">\n'
@@ -349,7 +349,7 @@ class createHTMLDocuments(createDocuments):
         text += '<br>\n</div>\n</div>\n</div>\n'
 
         return text
-    # List entry html code    
+    ## List entry html code    
     def addListComponentInfo(self,  name, tableId,  value,  componentName):
         text = ''
         text += '<div id="'+self.div.componentInfo[0]+'">\n'
@@ -420,7 +420,7 @@ class createHTMLDocuments(createDocuments):
         text += '\n</table>\n</div>\n</div>'
         return text
         
-     # Call latex code to convert latex to pictures in html   
+    ## Call latex code to convert latex to pictures in html   
     def addEquationPicturePng(self,  name,  value,  index):
         # add to pics sub-directory 
         picturePath = os.path.normpath(self.path) + '/'+ self.pictureSubDirectoryName
@@ -485,7 +485,7 @@ class createHTMLDocuments(createDocuments):
         
         return pictureName
      
-    # Add equation list value. 
+    ## Add equation list value. 
     def addEquationInfo(self, componentName,  value):
 
         # add proper coding reference
@@ -501,7 +501,7 @@ class createHTMLDocuments(createDocuments):
 
         return text
         
-    # Function Puts the parent info in, and creates a html link to that entry.    
+    ## Function Puts the parent info in, and creates a html link to that entry.    
     def addParentInfoDtd(self, titleName,  nameTitle, parentName):
         myString  = ''
         #search through all projects to find meta with parentName.
@@ -515,7 +515,7 @@ class createHTMLDocuments(createDocuments):
         text  = self.addSimpleComponentInfo(titleName,myString)
         return text
         
-    # Find all children of given meta component.    
+    ## Find all children of given meta component.    
     def addChildrenInfoDtd(self,  titleName,  parentTitle, nameTitle, parentName):
         myString  = '<ul>\n'
         #search through all metas to find meta that list parentName as their parent.
@@ -533,7 +533,7 @@ class createHTMLDocuments(createDocuments):
         text  = self.addSimpleComponentInfo(titleName,myString)
         return text
         
-    # Create the individual meta entry, classic Dtd style.    
+    ## Create the individual meta entry, classic Dtd style.    
     def createMetaEntryDtd(self,  name,  count):
         text =""
         #create individual meta entry
@@ -582,7 +582,7 @@ class createHTMLDocuments(createDocuments):
                     text +=self.addListComponentInfo("Dependencies", 'deptable',  meta.dictionary['Dependencies'],  meta.dictionary['Name'])
         return unicode(text)        
         
-    # Find the parent info for meta component, using xsd.    
+    ## Find the parent info for meta component, using xsd.    
     def addParentInfoXsd(self, titleName,  infoTitle, nameTitle, parentName):
         myString  = ''
         #search through all projects to find meta with parentName.
@@ -596,7 +596,7 @@ class createHTMLDocuments(createDocuments):
         text  = self.addSimpleComponentInfo(titleName,myString)
         return text
         
-    # Find all children of meta component, usiing xsd    
+    ## Find all children of meta component, usiing xsd    
     def addChildrenInfoXsd(self,  titleName,  codeTitle, parentTitle, infoTitle, nameTitle, parentName):
         myString  = '<ul>\n'
         childExists = False
@@ -619,7 +619,7 @@ class createHTMLDocuments(createDocuments):
             text = ""
         return text
 
-    # Create individual meta entry, using new Xsd format.
+    ## Create individual meta entry, using new Xsd format.
     def createMetaEntryXsd(self,  name,  count):
         #create individual meta entry
         text = ''
@@ -669,8 +669,8 @@ class createHTMLDocuments(createDocuments):
                     text +=self.addListComponentInfo("associations", 'deptable',  meta.dictionary['associations'],  meta.dictionary['info']['title'])
         return text        
 
-    # Function adds any scripts needed to be embedded in webpages. This code does not check
-    # if it is genuine java code, just embeds it in <script> tags.
+    ## Function adds any scripts needed to be embedded in webpages. This code does not check
+    # if it is genuine java code, just embeds it in \<script\> tags.
     def addScripts(self):
         #add scripts
         text = ''
@@ -689,7 +689,7 @@ class createHTMLDocuments(createDocuments):
                 print "" + script + " is not a valid file. Not adding."
         return text
     
-    #Copy pictures in pictures directory to new pictures directory. Actually just copies ALL
+    ## Copy pictures in pictures directory to new pictures directory. Actually just copies ALL
     # content from that directory to pictures sub-directory.
     def copyPictures(self,  picPath):
         if not(picPath == ""):
@@ -698,7 +698,7 @@ class createHTMLDocuments(createDocuments):
             os.system('cp '+ os.path.realpath(picPath) + "/* "+ os.path.join(self.path,  self.pictureSubDirectoryName) )
         else:
             print "No Picture directory to copy."
-     # Copy stylesheet files using given paths to the base documentPath directory.       
+    ## Copy stylesheet files using given paths to the base documentPath directory.       
     def copyStylesheets(self):
         # copy stylesheet from current location to documentPath.
         print "Copying Stylesheets from current locations to " + self.path
@@ -710,7 +710,7 @@ class createHTMLDocuments(createDocuments):
 
             os.system('cp '+ os.path.realpath(stylesheet)+" " + newPath)
             
-# DivIds class. List of names associated with types for creating <div> tags in html
+## DivIds class. List of names associated with types for creating \<div\> tags in html
 # This should be converted to a dictionary later for cgreater flexibility in adding
 # webpage div types.
 class DivIds():
@@ -731,7 +731,7 @@ class DivIds():
         self.params =[]
         self.dependencies =[]
         self.codebox =''
-    # Function that assigns names to div types.    
+    ## Function that assigns names to div types.    
     def createDivIds(self,  projectName):
         # TODO: eventually might make this search the stylefile for values, or input from external file or argv,
         # For present, just set them.
@@ -756,7 +756,7 @@ class DivIds():
         else:
             self.desc = 'desc-' + str(projectName)
             
-# Preprocesses input data so that it can be converted into a useful python list.         
+## Preprocesses input data so that it can be converted into a useful python list.         
 def StripTextToList(text,  tier):
     myList = []
     if tier == 1:
@@ -782,7 +782,7 @@ def StripTextToList(text,  tier):
 
     return myList
 
-# Main function run.
+## Main function run.
 if __name__=='__main__':
     from optparse import OptionParser
     #Option parser gives a nice interface to pick the directory to read from
