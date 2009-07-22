@@ -11,14 +11,11 @@ import tokenize
 import string
 from createDocument import Meta
 
-## #######################
-# \file This file is designed to act as a doxygen filter to
+ 
+## Base input class designed to act as a doxygen filter to
 # change Underworld headers to a C++ format to be parsed
 # correctly  into the doxygen html pages, preserving
 # inheritance and class
-#########################
-
-## Base input class
 class Input():
     def __init__(self, filename):
 		self.filename = str(filename)
@@ -51,24 +48,26 @@ class Input():
             # allows for dictionaries embedded in lists in the dictionary
             metaText = "/** "
             description = (metaFile.dictionary).pop('Description')
-            latexNum = description.count("$")
-            # This forces it to 'verbatim" which won't display correctly in latex version
-            # TODO make this section 'latex friendly'
-            for i in range(latexNum/2):
-                description =(description.replace("$", " \\verbatim ", 1)).replace("$", " \\endverbatim ", 1)
-            metaText += "\\brief "+description+".  <ul> "
+            
+            desc2 = description.replace("$", " \\f$ ")
+            metaText += "\\brief "+desc2+".  <ul> "
             for key, val in (metaFile.dictionary).iteritems():
                 if (isinstance(val, list) == True):
                     if (len(val) <= 0):
                         metaText +=  ""
                     else: 
                         metaText +=  "<li> <b> "+ key +" </b> : \\n <table> "
+                        #Basic key search lifted from createHTMLDocuments. It makes sure
+                        # all possible table titles and entries are included.
                         keyList = []
                         for item in val:
                             if (isinstance(item, dict) == True):    
                                 keyListTemp = item.keys()
-                                if len(keyListTemp) > len(keyList) :
-                                    keyList = keyListTemp
+                                for newK in keyListTemp :                                    
+                                    if( keyList.count(newK) == 0 ):
+                                        keyList.append(newK)
+                        keyList.sort()
+                        
                         if len(keyList) > 0 :
                             metaText+= " <tr> \n "
                             for key2 in keyList:
@@ -79,7 +78,7 @@ class Input():
                                 metaText += "<tr>"
                                 for key2 in keyList :
                                     val2 = item.get(key2)
-                                    newVal2 =(val2.replace("$", " \\verbatim ", 1)).replace("$", " \\endverbatim ")
+                                    newVal2 =val2.replace("$", " \\f$ ")
                                     metaText+= " <td> "+ newVal2 +" </td> "                            
                             else:
                                 metaText+= "<td> " +str(item) + " </td> "
@@ -91,8 +90,10 @@ class Input():
                     for key2, val2 in val.iteritems():
                         metaText+= " <li> " +key2 + ": "+ val2 +" </li> "
                     metaText += "</ul> \n "     
-                elif (key == "Example") or (key == "Equation") :
+                elif (key == "Example") :
                     metaText+= "<li><b> "+key + "</b>: "  +" \\verbatim "+ val +" \\endverbatim " +" </li> \n "
+                elif (key == "Equation") :
+                    metaText += "<li><b> "+key + "</b>: "  + val.replace("$", "\\f$") +" </li> \n "
                 else:
                     metaText+= "<li><b> "+key + "</b>: " + str(val) +" </li> \n "
             metaText += "</ul> */\n "
