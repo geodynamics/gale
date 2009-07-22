@@ -104,6 +104,9 @@ static void markArray( void* setItem, void* args ) {
 void SetSuite_TestInsertTraverse( SetSuiteData* data ) {
    unsigned   int_I;
 
+   pcu_docstring( "This test inserts a set of ints into a Set, then tests that a simple function "
+      "when passed to Set_Traverse() is executed properly." );
+
    for( int_I = 0; int_I < NUM_ITEMS; int_I++ ) {
       Set_Insert( data->setA, &int_I );
    }
@@ -118,6 +121,9 @@ void SetSuite_TestInsertTraverse( SetSuiteData* data ) {
 void SetSuite_TestUnion( SetSuiteData* data ) {
    Set*        setC=NULL;
    unsigned    int_I;
+
+   pcu_docstring( "Checks that the Union of two overlapping sets results in a new set that "
+      "contains correct Union of set elements." );
 
    for( int_I = NUM_ITEMS*1/4; int_I < NUM_ITEMS*5/8; int_I++ ) {
       Set_Insert( data->setA, &int_I );

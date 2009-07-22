@@ -54,6 +54,9 @@ void IndexMapSuite_Teardown( IndexMapSuiteData* data ) {
 
 void IndexMapSuite_TestAppendFind( IndexMapSuiteData* data ) {
    Index          idx;
+
+   pcu_docstring( "This test inserts a set of indices to an IndexSet in reverse order, "
+      " then checks they can be found at the correct indices." );
    
    for( idx = 0; idx < 100; idx++ ) {
       IndexMap_Append( data->map, idx + 1, 100 - idx );
