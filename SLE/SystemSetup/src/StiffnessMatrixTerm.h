@@ -77,6 +77,7 @@
 		StiffnessMatrix*                                     stiffnessMatrix;          \
 		/* Data for GNx storage */ \
 	  double                   **GNx; /* store globalDerivative ptr here */ \
+	  double                   *N; /* store array for shape functions here */ \
 		int                      max_nElNodes;  /* holds the maxNumNodes per element */ 
 	
 	struct StiffnessMatrixTerm { __StiffnessMatrixTerm };

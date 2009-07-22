@@ -76,6 +76,7 @@ Bool StgFEM_Assembly_Init( int* argc, char** argv[] ) {
 	Stg_ComponentRegister_Add( componentRegister, IsoviscousStressTensorTerm_Type, "0", _IsoviscousStressTensorTerm_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, PressureGradMatrixTerm_Type, "0", _PressureGradMatrixTerm_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, PressureGradForceTerm_Type, "0", _PressureGradForceTerm_DefaultNew );
+	Stg_ComponentRegister_Add( componentRegister, MassMatrixTerm_Type, "0", _MassMatrixTerm_DefaultNew );
 
 	RegisterParent( ThermalBuoyancyForceTerm_Type,     ForceTerm_Type );
 	RegisterParent( GradientStiffnessMatrixTerm_Type,  StiffnessMatrixTerm_Type );
@@ -84,6 +85,7 @@ Bool StgFEM_Assembly_Init( int* argc, char** argv[] ) {
 	RegisterParent( IsoviscousStressTensorTerm_Type,   StiffnessMatrixTerm_Type );
 	RegisterParent( PressureGradMatrixTerm_Type,   StiffnessMatrixTerm_Type );
 	RegisterParent( PressureGradForceTerm_Type,     ForceTerm_Type );
+	RegisterParent( MassMatrixTerm_Type,   StiffnessMatrixTerm_Type );
 
 	return True;
 }

@@ -59,6 +59,7 @@
 	typedef struct IsoviscousStressTensorTerm		IsoviscousStressTensorTerm;
 	typedef struct PressureGradForceTerm			PressureGradForceTerm;
 	typedef struct PressureGradMatrixTerm			PressureGradMatrixTerm;
+	typedef struct MassMatrixTerm MassMatrixTerm;
 
 	/* output streams: initialised in StgFEM_Assembly_Init() */
 	extern Stream* StgSLE_Assembly_Debug;
