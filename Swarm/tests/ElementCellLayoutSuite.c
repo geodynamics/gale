@@ -119,7 +119,7 @@ void ElementCellLayoutSuite_TestElementCellLayout( ElementCellLayoutSuiteData* d
 	int							procToWatch;
 		
 	if( data->nProcs >= 2 ) {
-		procToWatch = 2;
+		procToWatch = 1;
 	}
 	else {
 		procToWatch = 0;
