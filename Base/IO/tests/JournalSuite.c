@@ -85,8 +85,8 @@ void JournalSuite_Teardown( JournalSuiteData* data ) {
 
    fclose( data->testStdOutFile );
    fclose( data->testStdErrFile );
-   //remove( data->testStdOutFilename );
-   //remove( data->testStdErrFilename );
+   remove( data->testStdOutFilename );
+   remove( data->testStdErrFilename );
 }
 
 
@@ -187,6 +187,7 @@ void JournalSuite_TestPrintBasics( JournalSuiteData* data ) {
    pcu_check_streq( outLine, "WORLDError\n" );
 
    Journal_Enable_NamedStream( Info_Type, "MyInfo", False );
+   Journal_Printf( myInfo, "%s\n", "HELLOInfo2" );
    pcu_check_true( NULL == fgets( outLine, MAXLINE, data->testStdOutFile ));
 
    Journal_Enable_TypedStream( Dump_Type, True );
@@ -201,7 +202,9 @@ void JournalSuite_TestPrintBasics( JournalSuiteData* data ) {
    pcu_check_streq( outLine, "HELLOInfo\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, data->testStdOutFile ));
    pcu_check_streq( outLine, "HELLODump2\n" );
+
    
+   pcu_check_streq( outLine, "HELLODump2\n" );
    stJournal->enable = False;
    Journal_Printf( myDump, "%s\n", "HELLODump3" );
    pcu_check_true( NULL == fgets( outLine, MAXLINE, data->testStdOutFile ));
