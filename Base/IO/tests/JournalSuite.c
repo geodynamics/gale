@@ -182,6 +182,7 @@ void JournalSuite_TestPrintBasics( JournalSuiteData* data ) {
    Journal_Printf( myDump, "%s\n", "HELLODump" );
    pcu_check_true( NULL == fgets( outLine, MAXLINE, data->testStdOutFile ));
    Journal_Printf( myError, "%s\n", "WORLDError" );
+   rewind( data->testStdErrFile );
    pcu_check_true(         fgets( outLine, MAXLINE, data->testStdErrFile ));
    pcu_check_streq( outLine, "WORLDError\n" );
 
@@ -195,10 +196,15 @@ void JournalSuite_TestPrintBasics( JournalSuiteData* data ) {
    /* This stream should have auto-flush set to false. Check first, then flush and check again */
    pcu_check_true( Journal_GetTypedStream(Dump_Type)->_autoFlush == False );
    pcu_check_true( NULL == fgets( outLine, MAXLINE, data->testStdOutFile ));
+   rewind( data->testStdOutFile );
    Stream_Flush( Journal_GetTypedStream(Dump_Type) );
    pcu_check_true(         fgets( outLine, MAXLINE, data->testStdOutFile ));
+   pcu_check_streq( outLine, "HELLOInfo\n" );
+   pcu_check_true(         fgets( outLine, MAXLINE, data->testStdOutFile ));
    pcu_check_streq( outLine, "HELLODump2\n" );
+
    
+   pcu_check_streq( outLine, "HELLODump2\n" );
    stJournal->enable = False;
    Journal_Printf( myDump, "%s\n", "HELLODump3" );
    pcu_check_true( NULL == fgets( outLine, MAXLINE, data->testStdOutFile ));
@@ -220,6 +226,7 @@ void JournalSuite_TestPrintfL( JournalSuiteData* data ) {
    /* Now enable level 2, and try again */
    Stream_SetLevel( myStream, 2 );
    Journal_PrintfL( myStream, 2, "Hello\n" );
+   rewind( data->testStdOutFile );
    pcu_check_true(         fgets( outLine, MAXLINE, data->testStdOutFile ));
    pcu_check_streq( outLine, "Hello\n" );
 }
