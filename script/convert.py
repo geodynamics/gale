@@ -309,6 +309,7 @@ def safecvar( s ):
 	return s.replace( " ", "" ).replace( "-", "" ).replace( "\t", "" ).replace( "\n", "" ).replace( "\"", "" ).replace( "&", "" ).replace( "[", "" ).replace( "]", "" ).replace( "<", "" ).replace( ">", "" ).encode( 'ascii', 'ignore' )
 
 # Convert the python unicode string 's' that is of latex into an ascii string that is safe to put in a C string as a value
+# TODO This is not working as expected. we are still getting warnings.
 def safecvalFromLatex( s ):
 	return safecval( s ).replace( "\\", "\\\\" )
 

@@ -1,0 +1,281 @@
+#!/usr/bin/python
+import os, platform
+import getopt
+import glob
+import os.path
+import shutil
+import string
+import sys
+import token
+import tokenize
+import string
+from createDocument import Meta
+
+ 
+## Base input class designed to act as a doxygen filter to
+# change Underworld headers to a C++ format to be parsed
+# correctly  into the doxygen html pages, preserving
+# inheritance and class
+class Input():
+    def __init__(self, filename):
+		self.filename = str(filename)
+		self.file=""
+		self.output=""
+		self.functionName = ""
+		self.parentName = ""
+		self.variablesString = ""
+		self.lines = []
+		self.addedText=""
+    ## Add any meta file data to comments at top of function  
+    def addMetaFile(self):
+        # check for meta file
+        
+        filename = os.path.realpath(self.filename)
+        nameList = string.rsplit(str(filename), ".")        
+        metaFilename = nameList[0] + ".meta"
+        
+        #open meta file
+        if os.path.isfile(metaFilename):
+            #parse out meta information using Steve's scripts
+            fileData =open(metaFilename)
+            metaText = fileData.read()
+
+            metaFile = Meta(metaText)
+            metaFile.createMetaDictionaryDtd()
+            #print metaFile.dictionary
+
+            # put into C friendly format at top of function
+            # allows for dictionaries embedded in lists in the dictionary
+            metaText = "/** "
+            description = (metaFile.dictionary).pop('Description')
+            # description goes at top of Doxygen file with 'brief' statement
+            desc2 = description.replace("$", " \\f$ ")
+            metaText += "\\brief "+desc2+".  <ul> "
+            # Now cycle through dictionary and parse out all entries into a list
+            for key, val in (metaFile.dictionary).iteritems():
+                # If a dictionary entry is a list, parse it out correctly (all dictionaries are embedded in lists)
+                if (isinstance(val, list) == True):
+                    if (len(val) <= 0):
+                        metaText +=  ""
+                    else: 
+                        metaText +=  "<li> <b> "+ key +" </b> : \\n <table> "
+                        # Table for dictionary embedded in the dictionary
+                        #Basic key search lifted from createHTMLDocuments. It makes sure
+                        # all possible table titles and entries are included.
+                        keyList = []
+                        for item in val:
+                            if (isinstance(item, dict) == True):    
+                                keyListTemp = item.keys()
+                                for newK in keyListTemp :                                    
+                                    if( keyList.count(newK) == 0 ):
+                                        keyList.append(newK)
+                        keyList.sort()
+                        
+                        if len(keyList) > 0 :
+                            metaText+= " <tr> \n "
+                            for key2 in keyList:
+                                metaText += "<th> "+ key2 + "</th>"
+                            metaText += "  </tr> \n "
+                        for item in val:
+                            if (isinstance(item, dict) == True) :
+                                metaText += "<tr>"
+                                for key2 in keyList :
+                                    val2 = item.get(key2)
+                                    newVal2 =val2.replace("$", " \\f$ ")
+                                    metaText+= " <td> "+ newVal2 +" </td> "                            
+                            else:
+                                metaText+= "<td> " +str(item) + " </td> "
+                            metaText += " </tr>"
+                        metaText += " </table> \n </li>"
+                # Parse out values if they are just a dictionary
+                # This is unlikely to be used.                         
+                elif (isinstance(val, dict) == True):
+                    metaText += "<ul> \n "
+                    for key2, val2 in val.iteritems():
+                        metaText+= " <li> " +key2 + ": "+ val2 +" </li> "
+                    metaText += "</ul> \n "   
+                # For example, puts it in verbatim tags to display correctly  
+                elif (key == "Example") :
+                    metaText+= "<li><b> "+key + "</b>: "  +" \\verbatim "+ val +" \\endverbatim " +" </li> \n " 
+                # puts LaTeX equations into Doxygen recognisable form.
+                elif (key == "Equation") :
+                    metaText += "<li><b> "+key + "</b>: "  + val.replace("$", "\\f$") +" </li> \n "
+                else:
+                    metaText+= "<li><b> "+key + "</b>: " + str(val) +" </li> \n "
+            metaText += "</ul> */\n "
+            # Now find location to write meta-data and include it. 
+            # finding the initial location of the struct for this file
+            if self.parentName != "":
+			inheritanceText = " : "+self.parentName
+            else:
+                        inheritanceText = ""
+	    searchText = "struct "+ self.functionName + inheritanceText +"\n {\n "
+            stringNum = (self.output).find(searchText)
+
+            # Now to create new string
+            outText = ""
+            stringEnd = len(self.output)
+            # add in text before stringNum
+            if (stringNum >=0):
+                for i in range(stringNum-1):
+                    outText +=self.output[i]
+                # add in meta text
+                outText += metaText.encode('ascii','xmlcharrefreplace')
+                # add in rest of file
+                for i in range(stringNum, stringEnd-1):
+                    outText += self.output[i]
+                #print outText
+                # save to self.output
+                self.output = outText
+            else:
+                outText =  metaText.encode('ascii','xmlcharrefreplace') + self.output
+
+    ## Convert any "TODO's" into "\todos"
+    def convertTodos(self, text):
+        #search text for Todos
+        self.output = string.replace(text, "TODO", "\\todo")
+
+    ## This function converts the header information into a C++ format.
+    def convertHeaders(self,  text) :
+
+        stringStart = -1
+        stringEnd = -1
+        lineCount = 0
+        for line in text:
+			# find the function Name of the macro:
+			# Find line that starts with: "#define __" and ends with " \"
+			stringStart = (str(line)).find("#define __" )
+			if stringStart >= 0:
+				stringEnd =(str(line)).find("\\")
+				if stringEnd >=0:
+
+					self.lines = [lineCount]
+					self.functionName = ((line[stringStart+10: stringEnd]).lstrip()).rstrip()
+					stringNextStart = -1
+					stringNextEnd = -1
+					stringTemp = ""
+					# find the parentName if one exists:
+					# Find line that starts with "__" and ends with "\\"
+					for i in range(1,15):
+					    if (lineCount + i) < (len(text)-1):
+					        stringNextStart = (str(text[lineCount +i])).find("__")
+					    else:
+					        stringNextStart = (str(text[len(text)-1])).find("__")
+                                                
+					    if stringNextStart >=0:
+
+                                                if (lineCount + i) < (len(text)-1): 
+						    stringNextEnd =(str(text[lineCount+i])).find("\\")
+                                                else:
+                                                    stringNextEnd = (str(text[len(text)-1])).find("\\")
+						if stringNextEnd >= 0:
+                                                    if (lineCount + i) < (len(text)-1):
+							self.parentName = ((text[lineCount +i][stringNextStart + 2:stringNextEnd]).lstrip()).rstrip()
+                                                    else:
+                                                        self.parentName = ((text[len(text)-1][stringNextStart + 2:stringNextEnd]).lstrip()).rstrip()
+
+					    stringNextStart = -1
+					    stringNextEnd = -1
+			stringStart = -1
+			stringEnd = -1
+			
+			#Find line that creates the inherited struct:
+			# Find line that looks like "	struct ",self.functionName," { __",self.FunctionName," };"
+			myString = ""
+			myString = "struct "
+			myNextString = "__"+self.functionName
+			stringStart = (str(line)).find(myString )
+			if stringStart >=0:
+				stringEnd = (str(line)).find(myNextString)
+				if stringEnd >=0:
+
+
+					(self.lines).append(lineCount)
+			
+			
+			lineCount = lineCount + 1		
+
+		
+		# Now, if there is text to replace:
+        if self.functionName != "":
+			# replace all text between lines [a, b] with new struct structure:
+			inheritanceText = ""
+			# if no parent function, add all inbetween text
+			if self.parentName != "":
+				inheritanceText = " : "+self.parentName
+			self.addedText = "struct "+ self.functionName + inheritanceText +"\n {\n "
+			lineNum = -1
+
+			if len(self.lines) == 2:
+				for lineNum in range(self.lines[0]+1, self.lines[1]-1):
+					if self.parentName == "":
+						self.addedText += text[lineNum].split("\\")[0] + "\n "
+					else:
+						# add inbetween text removing old parent function line
+						myText = 0
+						myText = text[lineNum].count(self.parentName)
+
+						if myText ==  0:
+							self.addedText += text[lineNum].split("\\")[0] + "\n "
+		
+				# replace old text section with new 'addedText'
+				for lines in range(0, self.lines[0]-1):
+					self.output += text[lines]
+				self.output += self.addedText
+
+                                #Add in public: statement just in case.
+                                self.output += "public: \n" 
+				
+                # Find #endif statement and insert bracket before it.
+				for lines in range(self.lines[1]+1, len(text)):
+					if ((text[lines]).find("#endif") >= 0):
+
+					   self.output +=  "};\n" + text[lines]
+					else:
+					    self.output += text[lines]
+
+
+                
+		# if no alterations are needed, then write output to screen as is	
+        elif self.functionName == "":
+			for lines in range(0, len(text)):
+				self.output += text[lines] 
+        self.output+="  "
+		
+    ## main function to tie all class functions together in a run
+    def main(self):  	
+		# Read in files
+
+		self.file = open(self.filename, "r")
+		
+		text = []
+		text = (self.file).readlines()
+
+		self.convertHeaders(text)
+                self.convertTodos(self.output)       
+                self.addMetaFile()
+
+		if self.output != "":
+			print "/* *****************************************************************/"
+			print "/* THIS FILE HAS BEEN ALTERED TO LOOK LIKE C++ FOR DOXYGEN PARSING */"
+			print "/* IT IS NOT THE REAL SOURCE CODE. REFER TO CHECKOUTS OF CODE FOR  */"
+			print "/* ACCURATE C CODE DETAILS.                                        */"
+			print "/* *****************************************************************/"	
+			print self.output
+		else:
+			print self.file
+		
+
+    
+## code to run as a standalone from terminal
+if __name__ == "__main__":
+	# script to run function:
+	# sys.argv[1] is the filename to parse.
+	values = sys.argv
+        if len(values)>1:
+	    inputValues = Input(sys.argv[1])
+
+	    inputValues.main()
+        else:
+            print "NO INPUT FILE!!!!!!!!!!!"            
+

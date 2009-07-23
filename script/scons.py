@@ -8,7 +8,7 @@ import stgMetaXsd
 import convert
 
 #
-# Helpful build utilities.
+## \file Helpful build utilities.
 #
 
 def check_dir_target(env, src):
@@ -285,7 +285,7 @@ def loadXML( filename ):
 		raise
 
 
-# Builder for generating meta files (courtesy of Walter Landry).
+## Builder for generating meta files (courtesy of Walter Landry).
 def create_meta(target, source, env):
 	output_file = file( str( target[0] ), 'wb' )
 	xsdDict = loadXML( str( source[0] ) )

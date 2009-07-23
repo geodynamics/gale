@@ -29,9 +29,13 @@ DOXYGENCONFIG: Doxyfile
 
 createHTMLDocuments.py:
 -----------------------
-This is the standalone version. To get help on the input options needed to run this file,
+This is the standalone python script to create the Component Codex web pages. To get help on the input options needed to run this file,
 type 'createHTMLDocuments.py -h' which will give a list of the available options and their default values.
- 
+
+createDoxygen.py:
+-----------------
+This is a standalone python script to be run from this directory.
+it creates just the Doxygen web pages. Type 'createDoxygen.py -h' for a list of available options.
 
 createDocument.py:
 ------------------

@@ -2,7 +2,7 @@
 import os, os.path, sys,  datetime
 import convert,  util,  stgDtd,  stgMetaXsd
 
-# checkOutputPath checks that the value given is a valid path.    
+## checkOutputPath checks that the value given is a valid path.    
 def checkOutputPath(directory):
     #check if path is valid
     if (os.path.isdir(directory)==False):
@@ -10,7 +10,7 @@ def checkOutputPath(directory):
         os.mkdir(directory)
 
 
-# createDocuments is a generic creation class designed to be inherited
+## createDocuments is a generic creation class designed to be inherited
 # by the specific document creation classes. ie createHTMLDocuments or
 # createPDFDocuments etc.
 class createDocuments():
@@ -21,7 +21,7 @@ class createDocuments():
         self.path = os.path.realpath(documentPath)
         self.indexPage = []
 
-# The Project class is an all-inclusive class for all the project content.
+## The Project class is an all-inclusive class for all the project content.
 # This includes the list of associated meta files, it's path, name, metatype etc.
 class Project():
     def __init__(self,  name, path,  metaFlag):
@@ -34,7 +34,7 @@ class Project():
         #check if path is valid
         if (os.path.isdir(self.path)==False):
             sys.exit(self.path + " is not a valid directory.")
-    # This function assigns the metas to the project. It opens all meta files
+    ## This function assigns the metas to the project. It opens all meta files
     # and creates a dictionary based on the metaType specified.
     def assignMetas(self):
         #search path for all .meta files
@@ -59,12 +59,12 @@ class Project():
                     if metaFile.dictionary['Project'] == self.name:
                         self.metas.append(metaFile)                   
         self.metas.sort()
-# The Meta Class is just a glorified dictionary with some functions.
+## The Meta Class is just a glorified dictionary with some functions.
 class Meta():
     def __init__(self,  xmlText):
         self.dictionary = {}
         self.xmlText = str(xmlText)
-    # Create the classic dictionary type.    
+    ## Create the classic dictionary type.    
     def createMetaDictionaryDtd(self):
         
         # Parse DTD
@@ -74,7 +74,7 @@ class Meta():
             print 'Failed to parse as a StGermain DTD'
             raise
         
-    # create the new dictionary type.
+    ## create the new dictionary type.
     def createMetaDictionaryXsd(self):
         self.createMetaDictionaryDtd()
         # Convert DTD-dict to XSD-dict
