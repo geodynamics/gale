@@ -55,13 +55,7 @@
 #include "OpenGlUtil.h"
 
 #include <assert.h>
-#ifdef HAVE_OPENGL_FRAMEWORK
-	#include <OpenGL/gl.h>
-	#include <OpenGL/glu.h>
-#else
-	#include <gl.h>
-	#include <glu.h>
-#endif
+
 #include <string.h>
 
 #ifdef HAVE_GL2PS
@@ -122,11 +116,13 @@ lucRenderingEngineGL* _lucRenderingEngineGL_New(
 void _lucRenderingEngineGL_Init( 
 		lucRenderingEngineGL*                                      self  ) 
 {
+        printf("RENDER INIT\n");
 }
 
 void _lucRenderingEngineGL_Delete( void* renderingEngine ) {
 	lucRenderingEngineGL*  self = (lucRenderingEngineGL*)renderingEngine;
 
+        printf("RENDER DELETE\n");
 	_lucRenderingEngine_Delete( self );
 }
 
@@ -181,8 +177,10 @@ void _lucRenderingEngineGL_Construct( void* renderingEngine, Stg_ComponentFactor
 void _lucRenderingEngineGL_Build( void* renderingEngine, void* data ) {}
 void _lucRenderingEngineGL_Initialise( void* renderingEngine, void* data ) {}
 void _lucRenderingEngineGL_Execute( void* renderingEngine, void* data ) {}
-void _lucRenderingEngineGL_Destroy( void* renderingEngine, void* data ) { lucDeleteFont(); }
-
+void _lucRenderingEngineGL_Destroy( void* renderingEngine, void* data ) 
+{ 
+    lucDeleteFont(); 
+}
 
 void _lucRenderingEngineGL_Render( void* renderingEngine, lucWindow* window, AbstractContext* context ) {
 	lucRenderingEngineGL* self              = (lucRenderingEngineGL*) renderingEngine;
@@ -195,12 +193,15 @@ void _lucRenderingEngineGL_Render( void* renderingEngine, lucWindow* window, Abs
 	Journal_DPrintfL( lucDebug, 2, "In func: %s for %s '%s'\n", __func__, self->type, self->name );
 	Stream_Indent( lucDebug );
 
+    /* Determine if context is double buffered or not and save flag */
+    glGetBooleanv(GL_DOUBLEBUFFER, &self->doubleBuffered);
 	/* Set up OpenGl Colour */
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);	
 	glEnable(GL_COLOR_MATERIAL);
 	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
  	/*	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);  -- Done in the viewport now	*/	
-	glDrawBuffer(GL_BACK_LEFT);
+    glDrawBuffer(self->doubleBuffered ? GL_BACK_LEFT : GL_FRONT_LEFT);
+    GL_Error_Check
 
 	/* Allow Transparency */
 	glEnable (GL_BLEND);
@@ -258,13 +259,13 @@ void _lucRenderingEngineGL_Render( void* renderingEngine, lucWindow* window, Abs
 				lucViewport_Draw( viewport, window, viewportInfo, context );
 				break;
 			case lucStereoToeIn: case lucStereoAsymmetric:
-				glDrawBuffer(GL_BACK_RIGHT);
+                glDrawBuffer(self->doubleBuffered ? GL_BACK_RIGHT : GL_FRONT_RIGHT);
 				viewport->camera->buffer = lucRight;
 
 				lucViewportInfo_SetOpenGLCamera( viewportInfo );
 				lucViewport_Draw( viewport, window, viewportInfo, context );
 
-				glDrawBuffer(GL_BACK_LEFT);
+                glDrawBuffer(self->doubleBuffered ? GL_BACK_LEFT : GL_FRONT_LEFT);
 				viewport->camera->buffer = lucLeft;
 				
 				lucViewportInfo_SetOpenGLCamera( viewportInfo );
@@ -290,6 +291,7 @@ void _lucRenderingEngineGL_Render( void* renderingEngine, lucWindow* window, Abs
 }
 
 void _lucRenderingEngineGL_GetPixelData( void* renderingEngine, lucWindow* window, lucPixel* buffer ) {
+	lucRenderingEngineGL* self              = (lucRenderingEngineGL*) renderingEngine;
 	GLsizei width  = window->width;
 	GLsizei height = window->height;
 	
@@ -297,12 +299,12 @@ void _lucRenderingEngineGL_GetPixelData( void* renderingEngine, lucWindow* windo
 	
 	if ( lucWindow_HasStereoCamera( window ) ) {
 		if ( window->currStereoBuffer == lucRight )
-			glReadBuffer( GL_BACK_RIGHT );
+			glReadBuffer( self->doubleBuffered ? GL_BACK_RIGHT : GL_FRONT_RIGHT );
 		else
-			glReadBuffer( GL_BACK_LEFT );
+			glReadBuffer( self->doubleBuffered ? GL_BACK_LEFT : GL_FRONT_LEFT);
 	}
 	else
-		glReadBuffer( GL_BACK );
+		glReadBuffer( self->doubleBuffered ? GL_BACK : GL_FRONT );
 	
 	/* Actually read the pixels. */
 	glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, buffer); 

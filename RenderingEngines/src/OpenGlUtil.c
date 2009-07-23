@@ -252,6 +252,13 @@ void lucColourMap_SetOpenGLColourFromValue( lucColourMap* cmap, double value ) {
 	lucColour_SetOpenGLColour( &colour );
 }
 
+void lucColourMap_SetOpenGLColourFromScaledValue( lucColourMap* cmap, float scaledValue ) {
+	lucColour colour;
+ 
+	lucColourMap_GetColourFromScaledValue( cmap, scaledValue, &colour);
+	lucColour_SetOpenGLColour( &colour );
+}
+
 void lucColourMap_SetOpenGLColourFromValue_ExplicitOpacity( lucColourMap* cmap, double value, float opacity ) {
 	lucColour colour;
 

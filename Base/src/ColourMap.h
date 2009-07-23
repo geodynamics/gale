@@ -122,10 +122,10 @@
 
 	/** Public Functions */
 	void lucColourMap_GetColourFromValue( void* colourMap, double value, lucColour* colour ) ;
-	void lucColourMap_GetColourFromValue_ExplicitOpacity( void* colourMap, double value, lucColour* colour, float opacity ) ;
+	void lucColourMap_GetColourFromScaledValue( void* colourMap, float scaledValue, lucColour* colour ) ;
 
 	#define lucColourMap_GetColourFromList( self, colour_I ) \
-		(&(self)->colourList[ (colour_I) ])
+		(&(self)->colourList[ colour_I ])
 
 	void lucColourMap_SetMinMax( void* colourMap, double min, double max ) ;
 	void lucColourMap_CalibrateFromVariable( void* colourMap, void* _variable ) ;

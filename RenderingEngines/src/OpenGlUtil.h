@@ -88,6 +88,7 @@ void lucDeleteFont();
 void lucColour_SetOpenGLColour( lucColour* colour ) ;
 void lucColour_SetComplimentaryOpenGLColour( lucColour* colour ) ;
 void lucColourMap_SetOpenGLColourFromValue( lucColourMap* cmap, double value ) ;
+void lucColourMap_SetOpenGLColourFromScaledValue( lucColourMap* cmap, float scaledValue ); 
 void lucColourMap_SetOpenGLColourFromValue_ExplicitOpacity( lucColourMap* cmap, double value, float opacity ) ;
 void lucColourMap_SetOpenGLColourFromRGB( double red, double green, double blue);
 void lucColourMap_SetOpenGLColourFromRGB_ExplicitOpacity( double red, double green, double blue, float opacity );
