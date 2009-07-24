@@ -308,7 +308,6 @@ void lucColourMap_GetColourFromValue( void* colourMap, double value, lucColour* 
 	if (self->logScale == True) {
 		max 	    = log10(self->maximum);
 		min  	    = log10(self->minimum);
-        centre 	    = log10(self->centringValue);
 		sampleValue = log10(value);
 	}
 	else {
@@ -319,18 +318,13 @@ void lucColourMap_GetColourFromValue( void* colourMap, double value, lucColour* 
 	}
 	
     /* Scale value so that it is between 0 and 1 */
-	if(!self->centreOnFixedValue) {
+	if(self->logScale || !self->centreOnFixedValue) {
         scaledValue = (sampleValue - min) / (max - min);
     }
     else
     {
     	/* Scale value so that it is between 0 and 1, taking into account
-    		the fact that centringValue should be at a scaled value 0.5.
-		
-    	   centringValue is set up correctly during max / min if the
-    	 	centreOnFixedValue flag has not been set in the xml file
-     	*/
-		
+    		the fact that centringValue should be at a scaled value 0.5 */
     	if(sampleValue > centre)
     		scaledValue = 0.5 + 0.5 * (sampleValue - centre)/(max - centre);
     	else

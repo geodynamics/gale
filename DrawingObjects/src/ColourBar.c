@@ -196,8 +196,9 @@ void _lucColourBar_Construct( void* drawingObject, Stg_ComponentFactory* cf, voi
 
 	colourMap     =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "ColourMap", lucColourMap, True, data ) ;
 
-    /* Default to 2 tick marks for linear, 4 for logarithmic scale */
+    /* Default to 2 tick marks for linear, 3 for fixed centre, 4 for logarithmic scale */
     int defaultTicks = 2;
+    if (colourMap->centreOnFixedValue) defaultTicks = 3;
     if (colourMap->logScale) defaultTicks = 4;
 	
 	_lucColourBar_Init( 
@@ -318,7 +319,7 @@ void _lucColourBar_Draw( void* drawingObject, lucWindow* window, lucViewportInfo
         }
         else
             /* Default linear scale evenly spaced ticks */
-            scaledPos = i / (self->ticks - 1);
+            scaledPos = (float)i / (self->ticks - 1);
 
         /* Calculate pixel position */
         int xpos = startx + length * scaledPos;
@@ -331,13 +332,24 @@ void _lucColourBar_Draw( void* drawingObject, lucWindow* window, lucViewportInfo
 		
 		/* Compute the tick value */
         if (colourMap->logScale ) {
-            /* Find Value tick value at calculated position 0-1: */
+            /* Reverse calc to find Value tick value at calculated position 0-1: */
             tickValue = log10(colourMap->minimum) + scaledPos * (log10(colourMap->maximum) - log10(colourMap->minimum));
             tickValue = pow( 10.0, tickValue );
         }
         else
-            tickValue = colourMap->minimum + scaledPos * (colourMap->maximum - colourMap->minimum);
-	
+        {
+            /* Reverse scale calc and find value of tick at position 0-1 */
+            if (colourMap->centreOnFixedValue && colourMap->centringValue > 0)
+            {
+            	if (scaledPos > 0.5)
+                    tickValue = (colourMap->maximum - colourMap->centringValue) * (scaledPos - 0.5) / 0.5 + colourMap->centringValue;
+            	else
+                    tickValue = (colourMap->centringValue - colourMap->minimum) * scaledPos / 0.5 + colourMap->minimum;
+            }
+            else
+                tickValue = colourMap->minimum + scaledPos * (colourMap->maximum - colourMap->minimum);
+        }
+ 
         /* Always print end values, print others if flag set */	
 		if (self->printTickValue || i == 0 || i == self->ticks) 
 		{
@@ -346,7 +358,7 @@ void _lucColourBar_Draw( void* drawingObject, lucWindow* window, lucViewportInfo
             else
     			_lucColourBar_WithPrecision( string, self->scientific, self->precision, self->scaleValue, tickValue);
 
-			lucPrint(xpos - 1 - (int) (0.5 * (float)lucStringWidth(string)),  starty + 13, string );
+			lucPrint(xpos - (int) (0.5 * (float)lucStringWidth(string)),  starty + 13, string );
 		}
 	}
 
