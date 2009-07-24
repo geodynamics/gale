@@ -2,7 +2,7 @@
 <!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 
-<param name="Name">CoincidentMapper</param>
+<param name="Name">GaussCoincidentMapper</param>
 <param name="Author">...</param>
 <param name="Organisation">VPAC and MCC</param>
 <param name="Project">PICellerator</param>
@@ -13,7 +13,7 @@
 <param name="Parent">OneToOneMapper</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">A one-to-one mapper that maps integration points to material points at the same coordinates. A simple global to local operation is performed. The weight of the integration point is dependant on the WeightCalculator of the IntegrationPointsSwarm.</param> 
+<param name="Description">A one-to-one mapper that maps integration points to material points at the same coordinates. A simple global to local operation is performed. The integration point swarm is expected to be a gauss swarm.</param> 
 
 <!--Now the interesting stuff-->
 <list name="Params">
@@ -23,6 +23,6 @@
 </list>
 
 <!-- Add an exmaple XML if possible -->
-<param name="Example">Underworld/InputFiles/timingExamples/ExtensionNoVisuals_100x100x50.xml</param>
+<param name="Example"></param>
 
 </StGermainData>
