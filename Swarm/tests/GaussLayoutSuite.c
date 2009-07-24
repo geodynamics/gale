@@ -279,7 +279,7 @@ void GaussLayoutSuite_Test3ParticlePerDim_3D( GaussLayoutSuiteData* data ) {
 	/* Checks that the particule count on each cell are the same. */
 	for( i = 0; i < len; i++ ) {
 		count = data->swarm->cellParticleCountTbl[i];
-		pcu_check_true( count == 27 );
+			pcu_check_true( count == 27 );
 	}	
 	Swarm_GetCellMinMaxCoords( data->swarm, 4, minCell, maxCell );
 	Journal_Printf( stream, "Particle per dim: 3 3 3\n");	
