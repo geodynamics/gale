@@ -267,16 +267,30 @@ class createHTMLDocuments(createDocuments):
                     else:
                         altEndString =string.capitalize(names[finish][0] + names[finish][1])                         
                         nextString =""
+                    # Checking for repitition in sidebar menu options.
+                    # also have to check 'name' is >= 6 chars in length!
                     for k in range(2, 6):
                         if startString == endString:
-                            startString = string.capitalize(startString+ names[start][k])
-                            endString = string.capitalize(endString + names[finish][k])
+                            if (len(names[start]) > k ):
+                                startString = string.capitalize(startString+ names[start][k])
+                            else:
+                                startString = string.capitalize(startString)
+                            if (len(names[finish]) > k ):  
+                                endString = string.capitalize(endString + names[finish][k])
+                            else:
+                                endString = string.capitalize(endString)
                     if (len(startString) < len(newStartString)):
                         startString = newStartString
                     for k in range(2, 6):
                         if altEndString == nextString:
-                            altEndString = string.capitalize(altEndString+ names[start][k])
-                            nextString = string.capitalize(nextString + names[finish][k])
+                            if (len(names[start]) > k ):
+                                altEndString = string.capitalize(altEndString+ names[start][k])
+                            else:
+                                altEndString = string.capitalize(altEndString)
+                            if (len(names[finish]) > k ):
+                                nextString = string.capitalize(nextString + names[finish][k])
+                            else:
+                                nextString = string.capitalize(nextString)
                     if (len(endString) < len(altEndString)):
                         endString = altEndString
                     newStartString = nextString
