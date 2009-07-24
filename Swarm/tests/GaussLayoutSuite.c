@@ -215,8 +215,8 @@ void GaussLayoutSuite_Test2ParticlePerDim_3D( GaussLayoutSuiteData* data ) {
 	
 	/* Checks that the particule count on each cell are the same. */
 	for( i = 0; i < len; i++ ) {
-			count = data->swarm->cellParticleCountTbl[i];
-			pcu_check_true( count == 8 );
+		count = data->swarm->cellParticleCountTbl[i];
+		pcu_check_true( count == 8 );
 	}
 	Swarm_GetCellMinMaxCoords( data->swarm, 4, minCell, maxCell );
 	Journal_Printf( stream, "Particle per dim: 2 2 2\n");	
@@ -278,8 +278,8 @@ void GaussLayoutSuite_Test3ParticlePerDim_3D( GaussLayoutSuiteData* data ) {
 	
 	/* Checks that the particule count on each cell are the same. */
 	for( i = 0; i < len; i++ ) {
-			count = data->swarm->cellParticleCountTbl[i];
-			pcu_check_true( count == 27 );
+		count = data->swarm->cellParticleCountTbl[i];
+		pcu_check_true( count == 27 );
 	}	
 	Swarm_GetCellMinMaxCoords( data->swarm, 4, minCell, maxCell );
 	Journal_Printf( stream, "Particle per dim: 3 3 3\n");	
