@@ -241,7 +241,8 @@ void _IntegrationPointsSwarm_Construct( void* integrationPoints, Stg_ComponentFa
 
 	Journal_Firewall (
 			weights != NULL ||
-			(weights == NULL && Stg_Class_IsInstance( mapper, GaussMapper_Type ) ),
+			(weights == NULL && (Stg_Class_IsInstance( mapper, GaussMapper_Type ) ||
+					     Stg_Class_IsInstance( mapper, GaussCoincidentMapper_Type))),
 			Journal_MyStream( Error_Type, self ),
 			"In func %s, %s which is a %s must either have a %s or use %s\n",
 			__func__,
@@ -462,7 +463,8 @@ void IntegrationPointsSwarm_RemapIntegrationPointsAndRecalculateWeights( void* s
 	}	
 	else {
 		Stream* errorStream = Journal_Register( Error_Type, self->type );
-		Journal_Firewall( Stg_Class_IsInstance( self->mapper, GaussMapper_Type ), errorStream,
+		Journal_Firewall( Stg_Class_IsInstance( self->mapper, GaussMapper_Type ) ||
+				  Stg_Class_IsInstance( self->mapper, GaussCoincidentMapper_Type ), errorStream,
 			"Error - in %s(): for IntegrationPointSwarm \"%s\", no weights calculator provided "
 			"and mapper is not a %s.\n", GaussMapper_Type );
 

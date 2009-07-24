@@ -70,6 +70,7 @@ Bool PICellerator_MaterialPoints_Init( int* argc, char** argv[] ) {
 	Stg_ComponentRegister_Add( componentsRegister, Material_Type,                 "0", _Material_DefaultNew );
 	
 	Stg_ComponentRegister_Add( componentsRegister, CoincidentMapper_Type,         "0", _CoincidentMapper_DefaultNew );
+	Stg_ComponentRegister_Add( componentsRegister, GaussCoincidentMapper_Type,    "0", _GaussCoincidentMapper_DefaultNew );
 	Stg_ComponentRegister_Add( componentsRegister, GaussMapper_Type,              "0", _GaussMapper_DefaultNew );
 	
 	Stg_ComponentRegister_Add( componentsRegister, SwarmAdvector_Type,            "0", _SwarmAdvector_DefaultNew );
@@ -83,6 +84,7 @@ Bool PICellerator_MaterialPoints_Init( int* argc, char** argv[] ) {
 	/* Doing this in alphabetical order to match ls output */
 	RegisterParent( BackgroundParticleLayout_Type,  ParticleLayout_Type );
 	RegisterParent( CoincidentMapper_Type,          OneToOneMapper_Type );
+	RegisterParent( GaussCoincidentMapper_Type,     OneToOneMapper_Type );
 	RegisterParent( PICelleratorContext_Type,       FiniteElementContext_Type );
 	RegisterParent( GaussMapper_Type,               OneToOneMapper_Type );
 	RegisterParent( IntegrationPointMapper_Type,    Stg_Component_Type );
