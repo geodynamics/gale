@@ -49,21 +49,23 @@ struct _Particle {
 };
 
 typedef struct {
-	unsigned			nDims;
-	unsigned			meshSize[3];
-	double				minCrds[3];
-	double				maxCrds[3];
+	unsigned							nDims;
+	unsigned							meshSize[3];
+	double							minCrds[3];
+	double							maxCrds[3];
 	ExtensionManager_Register*	extensionMgr_Register;
-	Mesh*				mesh;
-	ElementCellLayout*		elementCellLayout;
+	Mesh*								mesh;
+	ElementCellLayout*			elementCellLayout;
 	RandomParticleLayout*		randomParticleLayout;
-	Swarm*				swarm;
-	Stream*				stream;
+	Swarm*							swarm;
+	MPI_Comm       				comm;
+   unsigned int   				rank;
+   unsigned int   				nProcs;
 } SwarmSuiteData;
 
 Mesh* SwarmSuite_BuildMesh( unsigned nDims, unsigned* size, double* minCrds, double* maxCrds, ExtensionManager_Register* emReg ) {
 	CartesianGenerator*	gen;
-	Mesh*			mesh;
+	Mesh*						mesh;
 
 	gen = CartesianGenerator_New( "" );
 	CartesianGenerator_SetDimSize( gen, nDims );
@@ -114,19 +116,22 @@ Bool SwarmSuite_TestParticleSearchFunc( Swarm* swarm, Coord coord, Stream* strea
 	}
 	else
 		Journal_Printf( stream, "Coord not found on this processor.\n" );
-
+ 
 	return True;
 
 }
 	
 void SwarmSuite_Setup( SwarmSuiteData* data ) {
+	/* MPI Initializations */
+	data->comm = MPI_COMM_WORLD;  
+   MPI_Comm_rank( data->comm, &data->rank );
+   MPI_Comm_size( data->comm, &data->nProcs );
+
 	data->nDims = 3;
 	data->meshSize[0] = 2; data->meshSize[1] =  3; data->meshSize[2] = 2;
 	data->minCrds[0] = 0.0; data->minCrds[1] = 0.0; data->minCrds[2] = 0.0;
 	data->maxCrds[0] = 300.0; data->maxCrds[1] = 12.0; data->maxCrds[2] = 300.0;
 
-	data->stream = Journal_Register (Info_Type, "myStream");
-	
 	/* Init mesh */
 	data->extensionMgr_Register = ExtensionManager_Register_New();
 	data->mesh = SwarmSuite_BuildMesh( data->nDims, data->meshSize, data->minCrds, data->maxCrds, data->extensionMgr_Register );
@@ -155,49 +160,61 @@ void SwarmSuite_Teardown( SwarmSuiteData* data ) {
 	Stg_Class_Delete( data->extensionMgr_Register );
 }
 
-void SwarmSuite_TestParticleSearch_0( SwarmSuiteData* data ) {
+void SwarmSuite_TestParticleSearch( SwarmSuiteData* data ) {
 	double	coord[3];
+	int		procToWatch;
+	Stream*	stream = Journal_Register (Info_Type, "TestParticleSearch");
+	
+	if( data->nProcs >= 2 ) {
+		procToWatch = 1;
+	}
+	else {
+		procToWatch = 0;
+	}
+	
+	if( data->rank == procToWatch ) {
+		if( data->nProcs == 1 ) {
+			coord[0] = 0.60*( data->maxCrds[0] - data->minCrds[0] );
+			coord[1] = 0.20*( data->maxCrds[1] - data->minCrds[1] );
+			coord[2] = 0.82*( data->maxCrds[2] - data->minCrds[2] );
 
-	coord[0] = 0.60*( data->maxCrds[0] - data->minCrds[0] );
-	coord[1] = 0.20*( data->maxCrds[1] - data->minCrds[1] );
-	coord[2] = 0.82*( data->maxCrds[2] - data->minCrds[2] );
-
-	pcu_check_true( SwarmSuite_TestParticleSearchFunc( data->swarm, coord, data->stream ) );
+			pcu_check_true( SwarmSuite_TestParticleSearchFunc( data->swarm, coord, stream ) );
+		
+			coord[0] = 0.20*( data->maxCrds[0] - data->minCrds[0] );
+			coord[1] = 0.90*( data->maxCrds[1] - data->minCrds[1] );
+			coord[2] = 0.12*( data->maxCrds[2] - data->minCrds[2] );
+			/* According to Dave Lee this is expected to fail .*/
+			pcu_check_true( SwarmSuite_TestParticleSearchFunc( data->swarm, coord, stream )  );
+		}	
+	}
 }
 
-void SwarmSuite_TestParticleSearch_1( SwarmSuiteData* data ) {
-	double	coord[3];
-
-	coord[0] = 0.20*( data->maxCrds[0] - data->minCrds[0] );
-	coord[1] = 0.90*( data->maxCrds[1] - data->minCrds[1] );
-	coord[2] = 0.12*( data->maxCrds[2] - data->minCrds[2] );
-
-	pcu_check_true( SwarmSuite_TestParticleSearchFunc( data->swarm, coord, data->stream ) );
-}
-
-void SwarmSuite_ParticleCoords( SwarmSuiteData* data ) {
-	//FILE*	fp = fopen( "swarmParticleCoords.txt", "w" );
-	Stream*	fp	= Journal_Register( InfoStream_Type, "swarmInfo" );
-
-	//Journal_Printf( data->stream, "\n" );
-	//Swarm_PrintParticleCoords( data->swarm, data->stream );
-
-	Swarm_PrintParticleCoords( data->swarm, fp );
-	//fclose( fp );
-
-	pcu_check_fileEq( "swarmInfo", "./expected/swarmParticleOutput.expected" );
-}
-
-void SwarmSuite_ParticleCoordsByCell( SwarmSuiteData* data ) {
-	Journal_Printf( data->stream, "\n" );
-	Swarm_PrintParticleCoords_ByCell( data->swarm, data->stream );
+void SwarmSuite_TestParticleCoords( SwarmSuiteData* data ) {
+	char 		expected_file[PCU_PATH_MAX];
+	int		procToWatch;
+	Stream*	stream = Journal_Register (Info_Type, "TestParticleCorrds");
+	
+	if( data->nProcs >= 2 ) {
+		procToWatch = 1;
+	}
+	else {
+		procToWatch = 0;
+	}
+	
+	if( data->rank == procToWatch ) {
+		Stream_RedirectFile( stream, "particleCoords.dat" );
+		Swarm_PrintParticleCoords( data->swarm, stream );
+		Journal_Printf( stream, "\n" );
+		Swarm_PrintParticleCoords_ByCell( data->swarm, stream );
+	
+		pcu_filename_expected( "testSwarmOutput.expected", expected_file );
+		pcu_check_fileEq( "particleCoords.dat", expected_file );
+	}
 }
 
 void SwarmSuite( pcu_suite_t* suite ) {
    pcu_suite_setData( suite, SwarmSuiteData );
    pcu_suite_setFixtures( suite, SwarmSuite_Setup, SwarmSuite_Teardown );
-   pcu_suite_addTest( suite, SwarmSuite_TestParticleSearch_0 );
-   pcu_suite_addTest( suite, SwarmSuite_TestParticleSearch_1 );
-   pcu_suite_addTest( suite, SwarmSuite_ParticleCoords );
-   pcu_suite_addTest( suite, SwarmSuite_ParticleCoordsByCell );
+   pcu_suite_addTest( suite, SwarmSuite_TestParticleSearch );
+   pcu_suite_addTest( suite, SwarmSuite_TestParticleCoords );
 }
