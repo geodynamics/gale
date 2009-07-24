@@ -158,6 +158,7 @@ void SwarmSuite_Teardown( SwarmSuiteData* data ) {
 	Stg_Class_Delete( data->elementCellLayout );
 	Stg_Class_Delete( data->mesh );
 	Stg_Class_Delete( data->extensionMgr_Register );
+	remove( "particleCoords.dat" );
 }
 
 void SwarmSuite_TestParticleSearch( SwarmSuiteData* data ) {

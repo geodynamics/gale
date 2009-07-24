@@ -125,7 +125,6 @@ void GaussLayoutSuite_Test1ParticlePerDim_3D( GaussLayoutSuiteData* data ) {
 	Coord 						minCell;
 	Coord 						maxCell;
 	Particle_InCellIndex 	particlesPerDim[3] = {1, 1, 1};
-	unsigned						dim = 3;
 	Stream*						stream;
 	char 							expected_file[PCU_PATH_MAX];
 	
@@ -140,10 +139,10 @@ void GaussLayoutSuite_Test1ParticlePerDim_3D( GaussLayoutSuiteData* data ) {
 	stream = Journal_Register( Info_Type, "1ParticlePerDim_3D" );
 	Stream_RedirectFile( stream, "1ParticlePerDim_3D.dat" );
 	
-	data->gaussParticleLayout = GaussParticleLayout_New( "gaussParticleLayout", dim, particlesPerDim );
+	data->gaussParticleLayout = GaussParticleLayout_New( "gaussParticleLayout", data->nDims, particlesPerDim );
 	/* Configure the swarm */
 	data->swarm = Swarm_New( "testGaussSwarm", data->elementCellLayout, data->gaussParticleLayout, 
-				dim, sizeof(Particle), data->extensionMgr_Register, NULL, MPI_COMM_WORLD, NULL );
+				data->nDims, sizeof(Particle), data->extensionMgr_Register, NULL, MPI_COMM_WORLD, NULL );
 	/* Build the swarm */
 	Stg_Component_Build( data->swarm, 0, False );
 	Stg_Component_Initialise( data->swarm, 0, False );
@@ -176,7 +175,7 @@ void GaussLayoutSuite_Test1ParticlePerDim_3D( GaussLayoutSuiteData* data ) {
 	pcu_check_fileEq( "1ParticlePerDim_3D.dat", expected_file );
 }
 
-void GaussLayoutSuite_Test2ParticlePerDim_3D( GaussLayoutSuiteData* data ) {
+void GaussLayoutSuite_Test2ParticlesPerDim_3D( GaussLayoutSuiteData* data ) {
 	Cell_PointIndex			count;
 	double 						x,y,z;
 	unsigned int				p, i, len;
@@ -185,7 +184,6 @@ void GaussLayoutSuite_Test2ParticlePerDim_3D( GaussLayoutSuiteData* data ) {
 	Coord 						minCell;
 	Coord 						maxCell;
 	Particle_InCellIndex 	particlesPerDim[3] = {2, 2, 2};
-	unsigned						dim = 3;
 	double						xi[8][3];
 	double						coord[8][3];
 	Stream*						stream;
@@ -202,10 +200,10 @@ void GaussLayoutSuite_Test2ParticlePerDim_3D( GaussLayoutSuiteData* data ) {
 	stream = Journal_Register( Info_Type, "2ParticlesPerDim_3D" );
 	Stream_RedirectFile( stream, "2ParticlesPerDim_3D.dat" );
 	
-	data->gaussParticleLayout = GaussParticleLayout_New( "gaussParticleLayout", dim, particlesPerDim );
+	data->gaussParticleLayout = GaussParticleLayout_New( "gaussParticleLayout", data->nDims, particlesPerDim );
 	/* Configure the swarm */
 	data->swarm = Swarm_New( "testGaussSwarm", data->elementCellLayout, data->gaussParticleLayout, 
-				dim, sizeof(Particle), data->extensionMgr_Register, NULL, MPI_COMM_WORLD, NULL );
+				data->nDims, sizeof(Particle), data->extensionMgr_Register, NULL, MPI_COMM_WORLD, NULL );
 	/* Build the swarm */
 	Stg_Component_Build( data->swarm, 0, False );
 	Stg_Component_Initialise( data->swarm, 0, False );
@@ -239,7 +237,7 @@ void GaussLayoutSuite_Test2ParticlePerDim_3D( GaussLayoutSuiteData* data ) {
 }
 
 
-void GaussLayoutSuite_Test3ParticlePerDim_3D( GaussLayoutSuiteData* data ) {
+void GaussLayoutSuite_Test3ParticlesPerDim_3D( GaussLayoutSuiteData* data ) {
 	Cell_PointIndex			count;
 	double		 				x,y,z;
 	unsigned int				p, i, len;
@@ -248,7 +246,6 @@ void GaussLayoutSuite_Test3ParticlePerDim_3D( GaussLayoutSuiteData* data ) {
 	Coord 						minCell;
 	Coord 						maxCell;
 	Particle_InCellIndex 	particlesPerDim[3] = {3, 3, 3};
-	unsigned						dim = 3;
 	double						xi[27][3];
 	double						coord[27][3];
 	Stream*						stream;
@@ -265,10 +262,10 @@ void GaussLayoutSuite_Test3ParticlePerDim_3D( GaussLayoutSuiteData* data ) {
 	stream = Journal_Register( Info_Type, "3ParticlesPerDim_3D" );
 	Stream_RedirectFile( stream, "3ParticlesPerDim_3D.dat" );
 	
-	data->gaussParticleLayout = GaussParticleLayout_New( "gaussParticleLayout", dim, particlesPerDim );
+	data->gaussParticleLayout = GaussParticleLayout_New( "gaussParticleLayout", data->nDims, particlesPerDim );
 	/* Configure the swarm */
 	data->swarm = Swarm_New( "testGaussSwarm", data->elementCellLayout, data->gaussParticleLayout, 
-				dim, sizeof(Particle), data->extensionMgr_Register, NULL, MPI_COMM_WORLD, NULL );
+				data->nDims, sizeof(Particle), data->extensionMgr_Register, NULL, MPI_COMM_WORLD, NULL );
 	/* Build the swarm */
 	Stg_Component_Build( data->swarm, 0, False );
 	Stg_Component_Initialise( data->swarm, 0, False );
@@ -305,6 +302,6 @@ void GaussLayoutSuite( pcu_suite_t* suite ) {
    pcu_suite_setData( suite, GaussLayoutSuiteData );
    pcu_suite_setFixtures( suite, GaussLayoutSuite_Setup, GaussLayoutSuite_Teardown );
    pcu_suite_addTest( suite, GaussLayoutSuite_Test1ParticlePerDim_3D );
-   pcu_suite_addTest( suite, GaussLayoutSuite_Test2ParticlePerDim_3D );
-   pcu_suite_addTest( suite, GaussLayoutSuite_Test3ParticlePerDim_3D );
+   pcu_suite_addTest( suite, GaussLayoutSuite_Test2ParticlesPerDim_3D );
+   pcu_suite_addTest( suite, GaussLayoutSuite_Test3ParticlesPerDim_3D );
 }
