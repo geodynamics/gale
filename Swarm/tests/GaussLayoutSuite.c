@@ -111,6 +111,7 @@ void GaussLayoutSuite_Teardown( GaussLayoutSuiteData* data ) {
 	Stg_Class_Delete( data->swarm );
 	Stg_Class_Delete( data->mesh );
 	Stg_Class_Delete( data->extensionMgr_Register );
+	/* Clean generated output files */
 	remove( "1ParticlePerDim_3D.dat" );
    remove( "2ParticlesPerDim_3D.dat" );
    remove( "3ParticlesPerDim_3D.dat" );
