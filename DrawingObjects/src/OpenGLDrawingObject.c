@@ -120,6 +120,7 @@ lucOpenGLDrawingObject* _lucOpenGLDrawingObject_New(
 void _lucOpenGLDrawingObject_Init( 
 		lucOpenGLDrawingObject*                            self )
 {
+    self->displayList = 0;
 }
 
 void _lucOpenGLDrawingObject_Delete( void* drawingObject ) {
@@ -168,6 +169,7 @@ void _lucOpenGLDrawingObject_Setup( void* drawingObject, void* context ) {
 	lucOpenGLDrawingObject*           self            = (lucOpenGLDrawingObject*)drawingObject;
 
 	/* Create OpenGL list */
+	if (self->displayList) glDeleteLists( self->displayList, 1 );
 	self->displayList = glGenLists( 1 );
 	glNewList( self->displayList, GL_COMPILE);
 
@@ -199,7 +201,8 @@ void _lucOpenGLDrawingObject_Draw( void* drawingObject, lucWindow* window, lucVi
 void _lucOpenGLDrawingObject_CleanUp( void* drawingObject, void* _context ) {
 	lucOpenGLDrawingObject*           self          = (lucOpenGLDrawingObject*)drawingObject;
 	
-	glDeleteLists( self->displayList, 1 );
+	if (self->displayList) glDeleteLists( self->displayList, 1 );
+    self->displayList = 0;
 }
 
 /* Wrappers for virtual functions */
