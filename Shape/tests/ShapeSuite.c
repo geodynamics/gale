@@ -37,7 +37,6 @@ void ShapeSuite_TestBox2D( ShapeSuiteData* data ) {
 	dictionary = context->dictionary;
 	outputPath = Dictionary_GetString( dictionary, "outputPath" );
 	Stream_RedirectFile_WithPrependedPath( stream, outputPath, "test.dat" );
-
 	shape   = (Stg_Shape*) LiveComponentRegister_Get( context->CF->LCRegister, "shape" );
 	assert( shape );
 
