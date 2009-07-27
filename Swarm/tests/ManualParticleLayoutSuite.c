@@ -62,6 +62,7 @@ typedef struct {
 	Dictionary_Entry_Value*    particlePositionsList;
 	Dictionary_Entry_Value*    particlePositionEntry;
 	ManualParticleLayout*		particleLayout;
+	DomainContext*   				context;
 	MPI_Comm       				comm;
    unsigned int   				rank;
    unsigned int   				nProcs;
@@ -70,11 +71,10 @@ typedef struct {
 Mesh* ManualParticleLayoutSuite_BuildMesh( unsigned nDims, unsigned* size, double* minCrds, double* maxCrds, ExtensionManager_Register* emReg ) {
 	CartesianGenerator*	gen;
 	Mesh*			mesh;
-	unsigned		maxDecomp[3] = {1, 0, 1};
 
 	gen = CartesianGenerator_New( "" );
 	CartesianGenerator_SetDimSize( gen, nDims );
-	CartesianGenerator_SetTopologyParams( gen, size, 0, NULL, maxDecomp );
+	CartesianGenerator_SetTopologyParams( gen, size, 0, NULL, NULL );
 	CartesianGenerator_SetGeometryParams( gen, minCrds, maxCrds );
 
 	mesh = Mesh_New( "" );
@@ -90,10 +90,18 @@ Mesh* ManualParticleLayoutSuite_BuildMesh( unsigned nDims, unsigned* size, doubl
 }
 
 void ManualParticleLayoutSuite_Setup( ManualParticleLayoutSuiteData* data ) {
+	Dimension_Index	dim;
+	char					input_file[PCU_PATH_MAX];
+	
 	/* MPI Initializations */
 	data->comm = MPI_COMM_WORLD;  
    MPI_Comm_rank( data->comm, &data->rank );
    MPI_Comm_size( data->comm, &data->nProcs );
+   
+   /* Read in the input xml file. */
+	/*pcu_filename_input( "testManualParticleLayoutInput.xml", input_file );
+	data->context = (DomainContext*)stgMainInitFromXML( input_file, data->comm );
+	dictionary = data->context->dictionary;*/
    
 	data->nDims = 3;
 	data->meshSize[0] = 2;	data->meshSize[1] = 3;	data->meshSize[2] = 2;
@@ -135,6 +143,20 @@ void ManualParticleLayoutSuite_Setup( ManualParticleLayoutSuiteData* data ) {
 	
 	/* Configure the element-cell-layout */
 	data->elementCellLayout = ElementCellLayout_New( "elementCellLayout", data->mesh );
+	
+	/* Build the mesh */
+	Stg_Component_Build( data->mesh, 0, False );
+	Stg_Component_Initialise( data->mesh, 0, False );
+	
+	/* Configure the gauss-particle-layout */
+	data->particleLayout = ManualParticleLayout_New( "manualParticleLayout", data->dictionary );
+	
+	data->swarm = Swarm_New( "testSwarm", data->elementCellLayout, data->particleLayout, dim, sizeof(Particle),
+		data->extensionMgr_Register, NULL, data->comm, NULL );
+	
+	/* Build the swarm */
+	Stg_Component_Build( data->swarm, 0, False );
+	Stg_Component_Initialise( data->swarm, 0, False );
 }
 
 void ManualParticleLayoutSuite_Teardown( ManualParticleLayoutSuiteData* data ) {
@@ -144,7 +166,7 @@ void ManualParticleLayoutSuite_Teardown( ManualParticleLayoutSuiteData* data ) {
 	Stg_Class_Delete( data->swarm );
 	Stg_Class_Delete( data->mesh );
 	Stg_Class_Delete( data->extensionMgr_Register );
-	Stg_Class_Delete( data->dictionary );
+	Stg_Class_Delete( data->dictionary );	
 }
 
 void ManualParticleLayoutSuite_TestManualParticle( ManualParticleLayoutSuiteData* data ) {
@@ -166,28 +188,13 @@ void ManualParticleLayoutSuite_TestManualParticle( ManualParticleLayoutSuiteData
 		procToWatch = 0;
 	}
 	if( data->rank == procToWatch ) printf( "Watching rank: %i\n", data->rank );
-
+	
 	stream = Journal_Register( Info_Type, "ManualParticle" );
-	Stream_RedirectFile( stream, "manualParticle.dat" );
-	
-	/* Build the mesh */
-	Stg_Component_Build( data->mesh, 0, False );
-	Stg_Component_Initialise( data->mesh, 0, False );
-	
-	/* Configure the gauss-particle-layout */
-	data->particleLayout = ManualParticleLayout_New( "manualParticleLayout", data->dictionary );
-	
-	/* Configure the swarm */
-	data->swarm = Swarm_New(  "testSwarm", data->elementCellLayout, data->particleLayout, data->nDims, sizeof(Particle),
-		data->extensionMgr_Register, NULL, data->comm, NULL );
-	
-	/* Build the swarm */
-	Stg_Component_Build( data->swarm, 0, False );
-	Stg_Component_Initialise( data->swarm, 0, False );
 	
 	if( data->rank == procToWatch ) {
 		Stg_Class_Print( data->particleLayout, stream );
 		/* Print out the particles on all cells */
+		Stream_RedirectFile( stream, "manualParticle.dat" );
 		Swarm_PrintParticleCoords_ByCell( data->swarm, stream );
 	}
 }

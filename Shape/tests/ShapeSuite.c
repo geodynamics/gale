@@ -20,7 +20,7 @@ void ShapeSuite_Teardown( ShapeSuiteData* data ) {
 
 void ShapeSuite_TestBox2D( ShapeSuiteData* data ) {
 /** Test Definition: */
-	DomainContext*   context = NULL;;
+	DomainContext*   context = NULL;
 	Dictionary*      dictionary;
 	Stg_Shape*       shape;
 	unsigned         testCoordCount, index;
