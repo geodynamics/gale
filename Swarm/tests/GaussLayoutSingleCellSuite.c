@@ -136,7 +136,7 @@ void GaussLayoutSingleCellSuite_Test1ParticlePerDim_3D( GaussLayoutSingleCellSui
 		printf( "pId=%d : xi = { %f, %f, %f } weight = %f\n",p,x,y,z,w );
 		Journal_Printf( stream, "pId=%d : xi = { %f, %f, %f } weight = %f\n",p,x,y,z,w );	
 	}	
-	pcu_filename_expected( "testGaussLayoutSingleCellOutput1ParticlePerDim.expected", expected_file );
+	pcu_filename_expected( "testGaussLayoutSingleCell1ParticlePerDimOutput.expected", expected_file );
 	pcu_check_fileEq( "1ParticlePerDim_3D.dat", expected_file );
 }
 
@@ -189,7 +189,7 @@ void GaussLayoutSingleCellSuite_Test2ParticlesPerDim_3D( GaussLayoutSingleCellSu
 		printf( "pId=%d : xi = { %f, %f, %f } weight = %f\n",p,x,y,z,w );
 		Journal_Printf( stream, "pId=%d : xi = { %f, %f, %f } weight = %f\n",p,x,y,z,w );	
 	}	
-	pcu_filename_expected( "testGaussLayoutSingleCellOutput2ParticlesPerDim.expected", expected_file );
+	pcu_filename_expected( "testGaussLayoutSingleCell2ParticlesPerDimOutput.expected", expected_file );
 	pcu_check_fileEq( "2ParticlesPerDim_3D.dat", expected_file );
 }
 
@@ -242,7 +242,7 @@ void GaussLayoutSingleCellSuite_Test3ParticlesPerDim_3D( GaussLayoutSingleCellSu
 		printf( "pId=%d : xi = { %f, %f, %f } weight = %f\n",p,x,y,z,w );
 		Journal_Printf( stream, "pId=%d : xi = { %f, %f, %f } weight = %f\n",p,x,y,z,w );	
 	}	
-	pcu_filename_expected( "testGaussLayoutSingleCellOutput3ParticlesPerDim.expected", expected_file );
+	pcu_filename_expected( "testGaussLayoutSingleCell3ParticlesPerDimOutput.expected", expected_file );
 	pcu_check_fileEq( "3ParticlesPerDim_3D.dat", expected_file );
 }
 
