@@ -172,7 +172,7 @@ void GaussLayoutSuite_Test1ParticlePerDim_3D( GaussLayoutSuiteData* data ) {
 		Journal_Printf( stream, "pId=%d : coords = { %.12f, %.12f, %.12f }, xi = { %.12f, %.12f, %.12f }\n", 
 			p, x, y, z, particle->xi[0], particle->xi[1], particle->xi[2] );	
 	}
-	pcu_filename_expected( "testGaussLayoutOutput1ParticlePerDim.expected", expected_file );
+	pcu_filename_expected( "testGaussLayout1ParticlePerDimOutput.expected", expected_file );
 	pcu_check_fileEq( "1ParticlePerDim_3D.dat", expected_file );
 }
 
@@ -233,7 +233,7 @@ void GaussLayoutSuite_Test2ParticlesPerDim_3D( GaussLayoutSuiteData* data ) {
 		Journal_Printf( stream, "pId=%d : coords = { %.12f, %.12f, %.12f }, xi = { %.12f, %.12f, %.12f }\n", 
 			p, x, y, z, particle->xi[0], particle->xi[1], particle->xi[2] );	
 	}
-	pcu_filename_expected( "testGaussLayoutOutput2ParticlesPerDim.expected", expected_file );
+	pcu_filename_expected( "testGaussLayout2ParticlesPerDimOutput.expected", expected_file );
 	pcu_check_fileEq( "2ParticlesPerDim_3D.dat", expected_file );
 }
 
@@ -295,7 +295,7 @@ void GaussLayoutSuite_Test3ParticlesPerDim_3D( GaussLayoutSuiteData* data ) {
 		Journal_Printf( stream, "pId=%d : coords = { %.12f, %.12f, %.12f }, xi = { %.12f, %.12f, %.12f }\n", 
 			p, x, y, z, particle->xi[0], particle->xi[1], particle->xi[2] );	
 	}
-	pcu_filename_expected( "testGaussLayoutOutput3ParticlesPerDim.expected", expected_file );
+	pcu_filename_expected( "testGaussLayout3ParticlesPerDimOutput.expected", expected_file );
 	pcu_check_fileEq( "3ParticlesPerDim_3D.dat", expected_file );
 }
 
