@@ -1126,11 +1126,11 @@ void _AbstractContext_LoadTimeInfoFromCheckPoint( Context* self, Index timeStep,
 	H5Fclose( file );
 	   
 #else	
-   Stg_asprintf( &timeInfoFileName, "%stimeInfo.%.5u.h5", timeInfoFileNamePart, self->restartTimestep );
+   Stg_asprintf( &timeInfoFileName, "%stimeInfo.%.5u.dat", timeInfoFileNamePart, self->restartTimestep );
 	 
 	timeInfoFile = fopen( timeInfoFileName, "r" );
 	Journal_Firewall( NULL != timeInfoFile, errorStr, "Error- in %s(), Couldn't find checkpoint time info file with "
-		"filename \"%s\" - aborting.\n", __func__, timeInfoFileName );
+		"filename \"%s\" (HD5 not enabled) - aborting.\n", __func__, timeInfoFileName );
 
 	/* set currentTime and Dt loaded from file */
 	fscanf( timeInfoFile, "%lg", &self->currentTime );
