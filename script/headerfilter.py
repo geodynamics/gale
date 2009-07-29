@@ -19,6 +19,7 @@ from createDocument import Meta
 class Input():
     def __init__(self, filename):
 		self.filename = str(filename)
+                self.metaFilename = ""
 		self.file=""
 		self.output=""
 		self.functionName = ""
@@ -26,18 +27,24 @@ class Input():
 		self.variablesString = ""
 		self.lines = []
 		self.addedText=""
-    ## Add any meta file data to comments at top of function  
-    def addMetaFile(self):
+   ## A check for meta file existence
+    def checkMetaFile(self):
         # check for meta file
         
         filename = os.path.realpath(self.filename)
         nameList = string.rsplit(str(filename), ".")        
-        metaFilename = nameList[0] + ".meta"
-        
+        self.metaFilename = nameList[0] + ".meta"
+        if os.path.isfile(self.metaFilename):
+            return True
+        else:
+            return False
+
+    ## Add any meta file data to comments at top of function  
+    def addMetaFile(self):
         #open meta file
-        if os.path.isfile(metaFilename):
+        if os.path.isfile(self.metaFilename):
             #parse out meta information using Steve's scripts
-            fileData =open(metaFilename)
+            fileData =open(self.metaFilename)
             metaText = fileData.read()
 
             metaFile = Meta(metaText)
@@ -54,15 +61,14 @@ class Input():
             # Now cycle through dictionary and parse out all entries into a list
             for key, val in (metaFile.dictionary).iteritems():
                 # If a dictionary entry is a list, parse it out correctly (all dictionaries are embedded in lists)
-                if (isinstance(val, list) == True):
-                    if (len(val) <= 0):
-                        metaText +=  ""
-                    else: 
+                if (isinstance(val, list) == True) and len(val) > 0 :
+                    if (len(val) > 0): 
                         metaText +=  "<li> <b> "+ key +" </b> : \\n <table> "
                         # Table for dictionary embedded in the dictionary
                         #Basic key search lifted from createHTMLDocuments. It makes sure
                         # all possible table titles and entries are included.
                         keyList = []
+                        
                         for item in val:
                             if (isinstance(item, dict) == True):    
                                 keyListTemp = item.keys()
@@ -79,26 +85,35 @@ class Input():
                         for item in val:
                             if (isinstance(item, dict) == True) :
                                 metaText += "<tr>"
-                                for key2 in keyList :
-                                    val2 = item.get(key2)
-                                    newVal2 =val2.replace("$", " \\f$ ")
-                                    metaText+= " <td> "+ newVal2 +" </td> "                            
+                                if len(keyList) > 0 :
+                                    for key2 in keyList :
+                                        val2 = item.get(key2, "")
+                                        if len(val2) > 0:
+                                            newVal2 =val2.replace("$", " \\f$ ")
+                                        else:
+                                            newVal2 = val2
+                                        metaText+= " <td> "+ newVal2 +" </td> "                            
                             else:
                                 metaText+= "<td> " +str(item) + " </td> "
                             metaText += " </tr>"
                         metaText += " </table> \n </li>"
+                    else:
+                        metaText += ""
                 # Parse out values if they are just a dictionary
                 # This is unlikely to be used.                         
                 elif (isinstance(val, dict) == True):
-                    metaText += "<ul> \n "
-                    for key2, val2 in val.iteritems():
-                        metaText+= " <li> " +key2 + ": "+ val2 +" </li> "
-                    metaText += "</ul> \n "   
+                    if len(val) > 0 :
+                        metaText += "<ul> \n "
+                        for key2, val2 in val.iteritems():
+                            metaText+= " <li> " +key2 + ": "+ val2 +" </li> "
+                        metaText += "</ul> \n "
+                    else:
+                        metaText += ""   
                 # For example, puts it in verbatim tags to display correctly  
                 elif (key == "Example") :
                     metaText+= "<li><b> "+key + "</b>: "  +" \\verbatim "+ val +" \\endverbatim " +" </li> \n " 
                 # puts LaTeX equations into Doxygen recognisable form.
-                elif (key == "Equation") :
+                elif (key == "Equation") and (len(val) > 0) :
                     metaText += "<li><b> "+key + "</b>: "  + val.replace("$", "\\f$") +" </li> \n "
                 else:
                     metaText+= "<li><b> "+key + "</b>: " + str(val) +" </li> \n "
@@ -145,12 +160,15 @@ class Input():
 			# find the function Name of the macro:
 			# Find line that starts with: "#define __" and ends with " \"
 			stringStart = (str(line)).find("#define __" )
+                        
 			if stringStart >= 0:
+                                
 				stringEnd =(str(line)).find("\\")
 				if stringEnd >=0:
-
+                                        
 					self.lines = [lineCount]
 					self.functionName = ((line[stringStart+10: stringEnd]).lstrip()).rstrip()
+                                        
 					stringNextStart = -1
 					stringNextEnd = -1
 					stringTemp = ""
@@ -178,20 +196,26 @@ class Input():
 					    stringNextEnd = -1
 			stringStart = -1
 			stringEnd = -1
-			
+			stringMiddle = -1
 			#Find line that creates the inherited struct:
 			# Find line that looks like "	struct ",self.functionName," { __",self.FunctionName," };"
 			myString = ""
 			myString = "struct "
+                        myMiddleString = self.functionName
 			myNextString = "__"+self.functionName
 			stringStart = (str(line)).find(myString )
+                        
 			if stringStart >=0:
+                                stringMiddle = (str(line)).find(myMiddleString)
 				stringEnd = (str(line)).find(myNextString)
 				if stringEnd >=0:
-
-
-					(self.lines).append(lineCount)
-			
+                                        
+				    (self.lines).append(lineCount)
+			        elif stringMiddle >=0:
+                                #check next line for remainder of code, just in case it didn't fit on one line.
+                                    stringEnd = (str(text[lineCount+1])).find(myNextString)
+                                    if stringEnd >=0:
+                                        (self.lines).append(lineCount+1)
 			
 			lineCount = lineCount + 1		
 
@@ -205,7 +229,7 @@ class Input():
 				inheritanceText = " : "+self.parentName
 			self.addedText = "struct "+ self.functionName + inheritanceText +"\n {\n "
 			lineNum = -1
-
+                        
 			if len(self.lines) == 2:
 				for lineNum in range(self.lines[0]+1, self.lines[1]-1):
 					if self.parentName == "":
@@ -217,7 +241,7 @@ class Input():
 
 						if myText ==  0:
 							self.addedText += text[lineNum].split("\\")[0] + "\n "
-		
+		                
 				# replace old text section with new 'addedText'
 				for lines in range(0, self.lines[0]-1):
 					self.output += text[lines]
@@ -252,8 +276,9 @@ class Input():
 		text = (self.file).readlines()
 
 		self.convertHeaders(text)
-                self.convertTodos(self.output)       
-                self.addMetaFile()
+                self.convertTodos(self.output)
+                if (self.checkMetaFile() == True):       
+                    self.addMetaFile()
 
 		if self.output != "":
 			print "/* *****************************************************************/"
