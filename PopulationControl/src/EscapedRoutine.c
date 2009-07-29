@@ -129,6 +129,8 @@ void _EscapedRoutine_Init(
 	self->particlesToRemoveDelta = particlesToRemoveDelta;
 
 	self->debug = Journal_Register( Debug_Type, EscapedRoutine_Type ); /* TODO Register Child */
+	self->particlesToRemoveCount = 0;
+	self->particlesToRemoveAlloced = 0;
 }
 
 /*------------------------------------------------------------------------------------------------------------------------
@@ -176,13 +178,17 @@ void _EscapedRoutine_Construct( void* escapedRoutine, Stg_ComponentFactory* cf, 
 void _EscapedRoutine_Build( void* escapedRoutine, void* data ) {
 	EscapedRoutine*	     self          = (EscapedRoutine*) escapedRoutine;
 
-	self->particlesToRemoveList = Memory_Alloc_Array( unsigned, self->particlesToRemoveDelta * 10, "particlesToRemoveList" );
-	
+	self->particlesToRemoveAlloced = self->particlesToRemoveDelta * 10;
+	self->particlesToRemoveList = Memory_Alloc_Array( unsigned, self->particlesToRemoveAlloced,
+		"particlesToRemoveList" );
 }
+
 void _EscapedRoutine_Initialise( void* escapedRoutine, void* data ) {
 }
 void _EscapedRoutine_Execute( void* escapedRoutine, void* data ) {
-	EscapedRoutine_RemoveFromSwarm( escapedRoutine, data );
+	Swarm*               swarm = Stg_CheckType( data, Swarm );
+
+	EscapedRoutine_RemoveFromSwarm( escapedRoutine, swarm );
 }
 
 void _EscapedRoutine_Destroy( void* escapedRoutine, void* data ) {
@@ -253,7 +259,8 @@ void EscapedRoutine_SetParticleToRemove( void* escapedRoutine, Swarm* swarm, Par
 	self->particlesToRemoveCount++;
 }
 
-int _EscapedRoutine_SortParticles( const void* _aParticleInfo, const void* _bParticleInfo ) {
+/* This typedef is required by qsort: the two arguments must be ptrs to particle indexes, as in particlesToRemoveList */
+int _EscapedRoutine_CompareParticles( const void* _aParticleInfo, const void* _bParticleInfo ) {
 	return (*(unsigned*)_aParticleInfo - *(unsigned*)_bParticleInfo );
 }
 
@@ -261,7 +268,7 @@ void EscapedRoutine_SortParticleList( void* escapedRoutine ) {
 	EscapedRoutine*	     self                = (EscapedRoutine*) escapedRoutine;
 
 	qsort( self->particlesToRemoveList, self->particlesToRemoveCount, 
-			sizeof(unsigned), _EscapedRoutine_SortParticles );
+			sizeof(unsigned), _EscapedRoutine_CompareParticles );
 }
 
 void EscapedRoutine_RemoveParticles( void* escapedRoutine, Swarm* swarm ) {
