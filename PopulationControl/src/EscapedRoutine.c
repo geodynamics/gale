@@ -259,6 +259,7 @@ void EscapedRoutine_SetParticleToRemove( void* escapedRoutine, Swarm* swarm, Par
 	self->particlesToRemoveCount++;
 }
 
+/* This typedef is required by qsort: the two arguments must be ptrs to particle indexes, as in particlesToRemoveList */
 int _EscapedRoutine_CompareParticles( const void* _aParticleInfo, const void* _bParticleInfo ) {
 	return (*(unsigned*)_aParticleInfo - *(unsigned*)_bParticleInfo );
 }
