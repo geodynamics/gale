@@ -223,15 +223,17 @@ void Underworld_LinearShapeIC( Node_LocalIndex node_lI, Variable_Index var_I, vo
 
 
 void Underworld_SimpleShapeIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
-	UnderworldContext*      context            = (UnderworldContext*)_context;
-	Dictionary*             dictionary         = context->dictionary;
-	FeMesh*			mesh               = NULL;
-	double*                 result             = (double*) _result;
-	Stg_Shape*              shape;
-	Name                    shapeName;
-	double*                 coord;
-	
-	mesh       = context->temperatureField->feMesh;
+	UnderworldContext* context    = (UnderworldContext*)_context;
+	Dictionary* dictionary = context->dictionary;
+	MeshVariable* meshVar    = NULL;
+	FeMesh* mesh       = NULL;
+	double* result     = (double*) _result;
+	Stg_Shape* shape;
+	Name shapeName;
+	double* coord;
+
+	meshVar = (MeshVariable*)Variable_Register_GetByIndex( context->variable_Register, var_I );
+	mesh = (FeMesh*)meshVar->mesh; assert( mesh != NULL );
 
 	shapeName = Dictionary_GetString( dictionary, "ShapeFemIC" );
 	shape = (Stg_Shape*) LiveComponentRegister_Get( context->CF->LCRegister, shapeName );
@@ -241,7 +243,7 @@ void Underworld_SimpleShapeIC( Node_LocalIndex node_lI, Variable_Index var_I, vo
 	coord = Mesh_GetVertex( mesh, node_lI );
 
 	if ( Stg_Shape_IsCoordInside( shape, coord ) ) 
-		*result = 7.0;
+		*result = 1.0;
 	else 
 		*result = 0.0;
 }
