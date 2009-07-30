@@ -95,12 +95,7 @@ void SpaceFillerParticleLayoutSuite_Setup( SpaceFillerParticleLayoutSuiteData* d
    MPI_Comm_rank( data->comm, &data->rank );
    MPI_Comm_size( data->comm, &data->nProcs );
    
-   /* Read in the input xml file. */
-	/*pcu_filename_input( "testManualParticleLayoutInput.xml", input_file );
-	data->context = (DomainContext*)stgMainInitFromXML( input_file, data->comm );
-	dictionary = data->context->dictionary;*/
-   
-	data->nDims = 3;
+   data->nDims = 3;
 	data->meshSize[0] = 4;	data->meshSize[1] = 2;	data->meshSize[2] = 1;
 	data->minCrds[0] = 0.0; data->minCrds[1] = 0.0; data->minCrds[2] = 0.0;
 	data->maxCrds[0] = 400.0; data->maxCrds[1] = 200.0; data->maxCrds[2] = 100.0;

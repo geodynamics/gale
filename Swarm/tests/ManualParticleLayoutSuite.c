@@ -170,14 +170,9 @@ void ManualParticleLayoutSuite_Teardown( ManualParticleLayoutSuiteData* data ) {
 }
 
 void ManualParticleLayoutSuite_TestManualParticle( ManualParticleLayoutSuiteData* data ) {
-	Cell_PointIndex			count;
 	double 						x,y,z;
 	unsigned int 				p, i, len;
 	int							procToWatch;
-	LocalParticle* 			particle;
-	Coord 						minCell;
-	Coord 						maxCell;
-	Particle_InCellIndex 	particlesPerDim[3] = {1, 1, 1};
 	Stream*						stream;
 	char 							expected_file[PCU_PATH_MAX];
 	
