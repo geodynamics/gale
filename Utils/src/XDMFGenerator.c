@@ -121,8 +121,8 @@ void _XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream
 	Index                var_I = 0;
    Bool                 saveCoords  = Dictionary_GetBool_WithDefault( context->dictionary, "saveCoordsWithFields", False );
    Stream*              errorStream = Journal_Register( Error_Type, CURR_MODULE_NAME );
-   Name                 variableType;
-   Name                 topologyType;
+   Name                 variableType = NULL;
+   Name                 topologyType = NULL;
    
    /** we follow the method in SystemSetup/Context.c to get the mesh info. 
        this method seems unsatisfactory, and may be updated soon JohnMansour 20090626  **/ 
@@ -201,8 +201,7 @@ void _XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream
 		if ( Stg_Class_IsInstance( fieldVar, FeVariable_Type ) ) {
 			feVar = (FeVariable*)fieldVar;
          if ( (feVar->isCheckpointedAndReloaded && context->isDataSave==False) || (feVar->isSavedData && context->isDataSave==True) ){ 
-                  Name   variableType;
-                  Name   centering;
+                  Name   centering = NULL;
                   Index  offset = 0;
                   Index  meshSize = Mesh_GetGlobalSize( feVar->feMesh, 0 );
                   Index  dofCountIndex;
@@ -268,13 +267,13 @@ void _XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream
                               Journal_Printf( stream, "\n" );
                   }
             /**----------------------- END ATTRIBUTES   ------------------------------------------------------------------------------------------------------------------- **/
-            Memory_Free( centering );
+            if(centering) Memory_Free( centering );
             }
       }
    }
                               Journal_Printf( stream, "   </Grid>\n\n" );
-Memory_Free( variableType );
-Memory_Free( topologyType );
+if(variableType) Memory_Free( variableType );
+if(topologyType) Memory_Free( topologyType );
 }
 
 void _XDMFGenerator_WriteSwarmSchema( UnderworldContext* context, Stream* stream ) {
@@ -289,8 +288,8 @@ void _XDMFGenerator_WriteSwarmSchema( UnderworldContext* context, Stream* stream
    Swarm*          currentSwarm;
    SwarmVariable*  swarmVar;
    Name            swarmVarName;
-   Name            variableType;
-   Name            filename_part;
+   Name            variableType = NULL;
+   Name            filename_part = NULL;
    Stream*         errorStream  = Journal_Register( Error_Type, CURR_MODULE_NAME );
 	const int       FINISHED_WRITING_TAG = 100;
 	MPI_Status      status;
@@ -433,11 +432,12 @@ void _XDMFGenerator_WriteSwarmSchema( UnderworldContext* context, Stream* stream
       }
 
                               Journal_Printf( stream, "   </Grid>\n\n" );
+
+   if(variableType)  Memory_Free( variableType );
+   if(filename_part) Memory_Free( filename_part );
       
    }
 
-Memory_Free( variableType );
-Memory_Free( filename_part );
 
 }
 
