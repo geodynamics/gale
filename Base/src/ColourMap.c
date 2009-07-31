@@ -300,9 +300,23 @@ void _lucColourMap_Execute( void* colourMap, void* data ) { }
 void _lucColourMap_Destroy( void* colourMap, void* data ) { }
 
 void lucColourMap_GetColourFromValue( void* colourMap, double value, lucColour* colour ) {
+   /* Scale value to range [0,1] */
+    float scaledValue = lucColourMap_ScaleValue(colourMap, value);
+
+    /* Convert scaled value to colour */
+    lucColourMap_GetColourFromScaledValue(colourMap, scaledValue, colour );
+
+    /* Check for invalid range - set colour to invisible */
+    if (scaledValue < 0) colour->opacity = 0;
+}
+
+float lucColourMap_ScaleValue( void* colourMap, double value ) {
 	lucColourMap* self        = colourMap;
 	float         scaledValue;
 	float 	      max, min, centre, sampleValue;
+
+    /* Colour map range invalid */
+    if (self->maximum == self->minimum) return -1;
 
     /* To get a log scale, transform each value to log10(value) */
 	if (self->logScale == True) {
@@ -318,21 +332,20 @@ void lucColourMap_GetColourFromValue( void* colourMap, double value, lucColour* 
 	}
 	
     /* Scale value so that it is between 0 and 1 */
-	if(self->logScale || !self->centreOnFixedValue) {
+	if (self->logScale || !self->centreOnFixedValue) {
         scaledValue = (sampleValue - min) / (max - min);
     }
     else
     {
     	/* Scale value so that it is between 0 and 1, taking into account
     		the fact that centringValue should be at a scaled value 0.5 */
-    	if(sampleValue > centre)
+    	if (sampleValue > centre)
     		scaledValue = 0.5 + 0.5 * (sampleValue - centre)/(max - centre);
     	else
     		scaledValue = 0.5 * (sampleValue - min) / (centre - min); 
     }
 
-    /* Convert scaled value to colour */
-    lucColourMap_GetColourFromScaledValue(colourMap, scaledValue, colour );
+    return scaledValue;
 }
 
 void lucColourMap_GetColourFromScaledValue( void* colourMap, float scaledValue, lucColour* colour ) 
@@ -382,11 +395,13 @@ void lucColourMap_SetMinMax( void* colourMap, double min, double max ) {
 	lucColourMap* self        = colourMap;
 	double        tolerance   = 1e-10;
 
-	/* Shift max and min if they are too close */
+	/* Shift max and min if they are too close /
 	if (fabs(min - max) < tolerance) {	
 		max += 0.5 * tolerance;
 		min -= 0.5 * tolerance;
 	}
+    Removed, caused attempt to draw colourBar with incorrect values
+    now checked in colour calculations */
 
 	/* Copy to colour map */
 	self->minimum = min;

@@ -59,7 +59,7 @@
 	</struct>	
 </list>
 
-<!-- Add an exmaple XML if possible -->
+<!-- Add an example XML if possible -->
 <param name="Example"><![CDATA[
 	<struct name="StressInvariantVP">
 		<param name="Type">lucViewport</param>

@@ -47,6 +47,18 @@
 		<param name="Default">False</param>
 		<param name="Description">If True, then this colour map can reset the minimum and maximum values to be appropriate to the FieldVariable or SwarmVariable that is is being used to draw, if False, then the original minimum and maximum values are used and never changed.</param>
 	</struct>
+	<struct>
+		<param name="Name">centreOnFixedValue</param>
+		<param name="Type">Bool</param>
+		<param name="Default">False</param>
+		<param name="Description">If True, then colour map will always scale so centringValue is at the centre of the colour range. Ignored if logScale is True.</param>
+	</struct>
+	<struct>
+		<param name="Name">centringValue</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.0</param>
+		<param name="Description">If centreOnFixedValue is True and a value provided here, this value will always be the centre value of the colour map. Ignored if logScale is True.</param>
+	</struct>
 
 </list>
 

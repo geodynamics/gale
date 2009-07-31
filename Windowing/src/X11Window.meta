@@ -20,12 +20,6 @@
 
 <list name="Params">
 	<struct>
-		<param name="Name">xFontName</param>
-		<param name="Type">String</param>
-		<param name="Default">"-adobe-courier-bold-r-normal--14-140-75-75-m-90-iso8859-1"</param>
-		<param name="Description">The name of the font to be used for writing text.</param>
-	</struct>
-	<struct>
 		<param name="Name">host</param>
 		<param name="Type">String</param>
 		<param name="Default">"localhost"</param>
@@ -43,12 +37,7 @@
 		<param name="Default">0</param>
 		<param name="Description">The number of which screen you want the window on.</param>
 	</struct>
-	<struct>
-		<param name="Name">maxIdleTime</param>
-		<param name="Type">Double</param>
-		<param name="Default">600.0</param>
-		<param name="Description">The maximum time that the window can be open without user input. This is so that the user is warned when running the program with interactive turned on but without being aware.</param>
-	</struct>
+
 
 </list>
 
@@ -65,7 +54,11 @@
 		</list>
 		<param name="height">400</param>
 		<param name="width">800</param>
-		<param name="maxIdleTime">1000000</param>
+		<param name="host">localhost</param>
+		<param name="displayNumber">0</param>
+		<param name="displayScreen">0</param>
+		<param name="isTimedOut">true</param>
+		<param name="maxIdleTime">1000</param>
 		<param name="interactive">true</param>
 		<param name="backgroundColour">white</param>
 	</struct>]]>

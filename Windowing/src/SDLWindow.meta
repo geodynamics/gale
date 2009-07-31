@@ -28,7 +28,7 @@
 <!-- Add an exmaple XML if possible -->
 <param name="Example"><![CDATA[
 	<struct name="window">
-		<param name="Type">lucX11Window</param>
+		<param name="Type">lucSDLWindow</param>
 		<param name="RenderingEngine">renderingEngine</param>
 		<list name="OutputFormat">
 			<param>imageOutput</param>
@@ -37,6 +37,8 @@
 		<param name="width">800</param>
 		<param name="interactive">true</param>
 		<param name="backgroundColour">white</param>
+		<param name="isTimedOut">true</param>
+		<param name="maxIdleTime">1000</param>
 	</struct>]]>
 </param>
 

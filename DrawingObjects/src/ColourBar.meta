@@ -53,25 +53,31 @@
 		<param name="Name">scientific</param>
 		<param name="Type">Bool</param>
 		<param name="Default">False</param>
-		<param name="Description">If set to True, the annotation will be in scitnfic mode.</param>
+		<param name="Description">If set to True, the annotation will be in scientific mode.</param>
 	</struct>
 	<struct>
 		<param name="Name">ticks</param>
 		<param name="Type">UnsignedInt</param>
 		<param name="Default">0</param>
-		<param name="Description">Number of ticks to be displayed on the colourbar. If the colourbar is divided in ten segments, it means 9 ticks.</param>
+		<param name="Description">Number of intermediate ticks to be displayed on the colourbar, from 0 to 9, excludes ticks at each end. If 9 intermediate ticks are specified, the colourbar is divided in 10 segments. When using a log scaled colourMap, defaults to 2 to indicate a non-linear scale is being used.</param>
 	</struct>
 	<struct>
 		<param name="Name">printTickValue</param>
 		<param name="Type">Bool</param>
 		<param name="Default">False</param>
-		<param name="Description">If set to True, display the tick values.</param>
+		<param name="Description">If set to True, display the intermediate tick values. First and last are always displayed regardless.</param>
 	</struct>
 	<struct>
 		<param name="Name">scaleValue</param>
 		<param name="Type">float</param>
 		<param name="Default">1.0</param>
 		<param name="Description">Scale the displayed value by multiplying by the scaleValue number.</param>
+	</struct>
+	<struct>
+		<param name="Name">tick1</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.0</param>
+		<param name="Description">Parameters tick1 to tick9 allow the intermediate values where the tick marks and labels are displayed to be specified. The first and last labels are automatically set to maximum and mimimum values of the colourMap, so tick1 becomes the second label, tick2 the third etc up to the number of ticks specified (or the default if not specified). When these values are not provided, nicely spaced values are calculated but these may not be at convenient rounded numeric values.</param>
 	</struct>
 
 

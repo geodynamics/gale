@@ -128,7 +128,8 @@ void _lucColourBar_Init(
 		Bool                                                         scientific,
 		int                                                          ticks,
 		Bool                                                         printTickValue,
-		float                                                        scaleValue )
+		float                                                        scaleValue,
+        double                                                       tickValues[] )
 {
 	self->colourMap = colourMap;
 	self->lengthFactor = lengthFactor;
@@ -140,7 +141,9 @@ void _lucColourBar_Init(
 	self->ticks = ticks;
 	self->printTickValue = printTickValue;
 	self->scaleValue = scaleValue;
-
+    int i;
+    for (i = 0; i < 10; i++)    
+        self->tickValues[i] = tickValues[i];
 }
 
 void _lucColourBar_Delete( void* drawingObject ) {
@@ -188,19 +191,32 @@ void* _lucColourBar_DefaultNew( Name name ) {
 }
 
 void _lucColourBar_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
-	lucColourBar*  self = (lucColourBar*)drawingObject;
-	lucColourMap*    colourMap;
+	lucColourBar*   self = (lucColourBar*)drawingObject;
+	lucColourMap*   colourMap;
+    unsigned int    i, defaultTicks, ticks;
+    double          tickValues[11];
+    char            tickLabel[10];
 
 	/* Construct Parent */
 	_lucDrawingObject_Construct( self, cf, data );
 
 	colourMap     =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "ColourMap", lucColourMap, True, data ) ;
 
-    /* Default to 2 tick marks for linear, 3 for fixed centre, 4 for logarithmic scale */
-    int defaultTicks = 2;
-    if (colourMap->centreOnFixedValue) defaultTicks = 3;
-    if (colourMap->logScale) defaultTicks = 4;
-	
+    /* Default to 0 tick marks for linear, 1 for fixed centre, 2 for logarithmic scale */
+    defaultTicks = 0;
+    if (colourMap->centreOnFixedValue) defaultTicks = 1;
+    if (colourMap->logScale) defaultTicks = 2;
+	ticks = Stg_ComponentFactory_GetUnsignedInt(cf, self->name, "ticks", defaultTicks );
+    if (ticks > 9) ticks = 9;
+
+    /* Load any provided intermediate tick values (tick1-9) */
+    for (i = 1; i < ticks+1; i++) {
+        sprintf(tickLabel, "tick%d", i);
+		tickValues[i] = Stg_ComponentFactory_GetDouble( cf, self->name, tickLabel, colourMap->maximum + 1);
+	}
+    tickValues[0] = colourMap->minimum;
+    tickValues[ticks+1] = colourMap->maximum;
+
 	_lucColourBar_Init( 
 			self, 
 			colourMap,
@@ -210,9 +226,10 @@ void _lucColourBar_Construct( void* drawingObject, Stg_ComponentFactory* cf, voi
 			(float) Stg_ComponentFactory_GetDouble( cf, self->name, "borderWidth", 1 ) ,
 			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "precision", 2 ) ,
 			Stg_ComponentFactory_GetBool(cf, self->name, "scientific", False ),
-   			Stg_ComponentFactory_GetUnsignedInt(cf, self->name, "ticks", defaultTicks ) ,
+   			ticks,
 			Stg_ComponentFactory_GetBool(cf, self->name, "printTickValue", True ),
-			(float) Stg_ComponentFactory_GetDouble(cf, self->name, "scaleValue", 1.0 ) 
+			(float) Stg_ComponentFactory_GetDouble(cf, self->name, "scaleValue", 1.0 ),
+            tickValues
 			);
 }
 
@@ -302,72 +319,97 @@ void _lucColourBar_Draw( void* drawingObject, lucWindow* window, lucViewportInfo
 	startx = (viewportInfo->width - length)/2;
 	starty = viewportInfo->height - self->margin - self->height;
 
-	/* Write scale */
-    lucColour_SetComplimentaryOpenGLColour( &window->backgroundColour );
-	glLineWidth( self->borderWidth );
-    if (self->ticks < 2) self->ticks = 2;   /* Must print start and end of scale */
-	for (i = 0; i < self->ticks; i++){
-        /* Calculate tick position */
-        /* First get scaled position 0-1 */
-        float scaledPos;
-		if (colourMap->logScale)
-        {
-            /* Space ticks based on a logarithmic scale of log(1) to log(11)
-               shows non-linearity while keeping ticks spaced apart enough to read labels */
-            float tickpos = 1.0 + (float)i * (10.0 / (self->ticks-1));
-            scaledPos = (log10(tickpos) / log10(11));
-        }
-        else
-            /* Default linear scale evenly spaced ticks */
-            scaledPos = (float)i / (self->ticks - 1);
+    /* Don't draw if not a valid range */ 
+    if (colourMap->minimum < colourMap->maximum)
+    {
+    	/* Write scale */
+        lucColour_SetComplimentaryOpenGLColour( &window->backgroundColour );
+    	glLineWidth( self->borderWidth );
 
-        /* Calculate pixel position */
-        int xpos = startx + length * scaledPos;
+        /* Update min/max end ticks */
+        self->tickValues[0] = colourMap->minimum;
+        self->tickValues[self->ticks+1] = colourMap->maximum;
 
-        /* Draws the tick */
-		glBegin(GL_LINES);
-			glVertex2i( xpos, starty+5+self->height );
-			glVertex2i( xpos, starty+self->height);
-		glEnd();
-		
-		/* Compute the tick value */
-        if (colourMap->logScale ) {
-            /* Reverse calc to find Value tick value at calculated position 0-1: */
-            tickValue = log10(colourMap->minimum) + scaledPos * (log10(colourMap->maximum) - log10(colourMap->minimum));
-            tickValue = pow( 10.0, tickValue );
-        }
-        else
-        {
-            /* Reverse scale calc and find value of tick at position 0-1 */
-            if (colourMap->centreOnFixedValue && colourMap->centringValue > 0)
+        for (i = 0; i < self->ticks+2; i++){
+            /* Calculate tick position */
+            float scaledPos;
+            if (self->tickValues[i] > colourMap->maximum)
             {
-            	if (scaledPos > 0.5)
-                    tickValue = (colourMap->maximum - colourMap->centringValue) * (scaledPos - 0.5) / 0.5 + colourMap->centringValue;
-            	else
-                    tickValue = (colourMap->centringValue - colourMap->minimum) * scaledPos / 0.5 + colourMap->minimum;
+                /* First get scaled position 0-1 */
+                if (colourMap->logScale)
+                {
+                    /* Space ticks based on a logarithmic scale of log(1) to log(11)
+                       shows non-linearity while keeping ticks spaced apart enough to read labels */
+                    float tickpos = 1.0 + (float)i * (10.0 / (self->ticks+1));
+                    scaledPos = (log10(tickpos) / log10(11));
+                }
+                else
+                    /* Default linear scale evenly spaced ticks */
+                    scaledPos = (float)i / (self->ticks+1);
+
+                /* Compute the tick value */
+                if (colourMap->logScale ) {
+                    /* Reverse calc to find Value tick value at calculated position 0-1: */
+                    tickValue = log10(colourMap->minimum) + scaledPos 
+                              * (log10(colourMap->maximum) - log10(colourMap->minimum));
+                    tickValue = pow( 10.0, tickValue );
+                }
+                else
+                {
+                    /* Reverse scale calc and find value of tick at position 0-1 */
+                    if (colourMap->centreOnFixedValue && colourMap->centringValue > 0)
+                    {
+                        /* Using fixed centre value, even linear scales either side */
+                        if (scaledPos > 0.5)
+                            tickValue = (colourMap->maximum - colourMap->centringValue)
+                                      * (scaledPos - 0.5) / 0.5 + colourMap->centringValue;
+                        else
+                            tickValue = (colourMap->centringValue - colourMap->minimum)
+                                      * scaledPos / 0.5 + colourMap->minimum;
+                    }
+                    else
+                        /* Using even linear scale */
+                        tickValue = colourMap->minimum + scaledPos * (colourMap->maximum - colourMap->minimum);
+                }
             }
             else
-                tickValue = colourMap->minimum + scaledPos * (colourMap->maximum - colourMap->minimum);
+            {
+                /* User specified value */
+                tickValue = self->tickValues[i];
+                /* Calculate scaled position from value */
+                scaledPos = lucColourMap_ScaleValue(colourMap, tickValue);
+                if (scaledPos < 0) scaledPos = 0;
+            }
+
+            /* Calculate pixel position */
+            int xpos = startx + length * scaledPos;
+
+            /* Draws the tick */
+            glBegin(GL_LINES);
+                glVertex2i( xpos, starty+5+self->height );
+                glVertex2i( xpos, starty+self->height);
+            glEnd();
+            
+     
+            /* Always print end values, print others if flag set */	
+            if (self->printTickValue || i == 0 || i == self->ticks+1) 
+            {
+                if ( !self->scientific && fabs(tickValue) < 1.0e-5 )
+                    sprintf( string, "0" );
+                else
+                    _lucColourBar_WithPrecision( string, self->scientific, self->precision, self->scaleValue, tickValue);
+
+                lucPrint(xpos - (int) (0.5 * (float)lucStringWidth(string)),  starty + 13, string );
+            }
         }
- 
-        /* Always print end values, print others if flag set */	
-		if (self->printTickValue || i == 0 || i == self->ticks) 
-		{
-        	if ( !self->scientific && fabs(tickValue) < 1.0e-5 )
-        		sprintf( string, "0" );
-            else
-    			_lucColourBar_WithPrecision( string, self->scientific, self->precision, self->scaleValue, tickValue);
 
-			lucPrint(xpos - (int) (0.5 * (float)lucStringWidth(string)),  starty + 13, string );
-		}
-	}
-
-	/* Draw Colour Bar */
-	for ( pixel_I = 0 ; pixel_I < length ; pixel_I++ ) {
-        value = ((float)pixel_I / length);
-		lucColourMap_SetOpenGLColourFromScaledValue( colourMap, value);
-		glRecti( startx + pixel_I, starty, startx + pixel_I + 1 , starty + height );
-	}
+        /* Draw Colour Bar */
+        for ( pixel_I = 0 ; pixel_I < length ; pixel_I++ ) {
+            value = ((float)pixel_I / length);
+            lucColourMap_SetOpenGLColourFromScaledValue( colourMap, value);
+            glRecti( startx + pixel_I, starty, startx + pixel_I + 1 , starty + height );
+        }
+    }
 
 	/* Draw Box around colour bar */
 	lucColour_SetComplimentaryOpenGLColour( &window->backgroundColour );

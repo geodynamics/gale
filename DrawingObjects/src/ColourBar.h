@@ -56,16 +56,17 @@
 		__lucDrawingObject \
 		/* Virtual functions go here */ \
 		/* Other info */\
-		lucColourMap*                                      colourMap;              \
-		double                                             lengthFactor;           \
-		Pixel_Index                                        height;                 \
-		Pixel_Index                                        margin;                 \
-		float                                              borderWidth;            \
-		int                                                precision;              \
-		Bool                                               scientific;             \
-		int                                                ticks;                  \
-		Bool                                               printTickValue;	   \
-		float                                              scaleValue;             \
+		lucColourMap*                                       colourMap;              \
+		double                                              lengthFactor;           \
+		Pixel_Index                                         height;                 \
+		Pixel_Index                                         margin;                 \
+		float                                               borderWidth;            \
+		int                                                 precision;              \
+		Bool                                                scientific;             \
+		int                                                 ticks;                  \
+		Bool                                                printTickValue;	        \
+		float                                               scaleValue;             \
+        double                                              tickValues[11]; 
 
 	struct lucColourBar { __lucColourBar };
 	

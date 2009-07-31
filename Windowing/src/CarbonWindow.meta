@@ -31,13 +31,6 @@
 		<param name="Default">50</param>
 		<param name="Description">The vertical distance from the top left corner of the screen to the window.</param>
 	</struct>
-	<struct>
-		<param name="Name">maxIdleTime</param>
-		<param name="Type">Double</param>
-		<param name="Default">600.0</param>
-		<param name="Description">The maximum time that the window can be open without user input. This is so that the user is warned when running the program with interactive turned on but without being aware. This feature isn't yet implemented properly for lucCarbonWindow.</param>
-	</struct>
-
 </list>
 
 <list name="Dependencies">
@@ -55,7 +48,8 @@
 		<param name="width">800</param>
 		<param name="offsetX">40</param>
 		<param name="offsetY">90</param>
-		<param name="maxIdleTime">1000000</param>
+		<param name="isTimedOut">true</param>
+		<param name="maxIdleTime">1000</param>
 		<param name="interactive">true</param>
 		<param name="backgroundColour">white</param>
 	</struct>]]>

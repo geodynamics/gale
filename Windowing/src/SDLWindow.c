@@ -315,11 +315,11 @@ Bool _lucSDLWindow_EventProcessor( void* window ) {
 			keyPressed = event.key.keysym.sym;
 			int xpos, ypos;
 			SDL_GetMouseState(&xpos, &ypos);
-			lucWindow_KeyboardEvent( self, keyPressed, xpos, ypos);
+			lucWindow_KeyboardEvent( self, keyPressed, xpos, self->height - ypos);
 			break;
 		case SDL_MOUSEMOTION:
 			if (buttonDown)
-				lucWindow_MouseMotion(self, button , event.motion.x, self->height - event.motion.y);
+				lucWindow_MouseMotion(self, button, event.motion.x, self->height - event.motion.y);
 			else
 				redisplay = False;
 			break;

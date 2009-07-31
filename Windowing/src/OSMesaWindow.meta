@@ -36,6 +36,7 @@
 		<param name="height">400</param>
 		<param name="width">800</param>
 		<param name="backgroundColour">white</param>
+		<param name="interactive">false</param>
 	</struct>]]>
 </param>
 

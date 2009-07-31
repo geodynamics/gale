@@ -195,7 +195,7 @@ void _lucOpenGLDrawingObject_Draw( void* drawingObject, lucWindow* window, lucVi
 
 	/* All that we need to do to visualise this object now is to call the display list
 	 * this should have been created in the setup phase */
-	glCallList( self->displayList );
+	if (self->displayList) glCallList( self->displayList );
 }
 
 void _lucOpenGLDrawingObject_CleanUp( void* drawingObject, void* _context ) {

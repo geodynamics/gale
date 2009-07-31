@@ -122,6 +122,7 @@
 
 	/** Public Functions */
 	void lucColourMap_GetColourFromValue( void* colourMap, double value, lucColour* colour ) ;
+	float lucColourMap_ScaleValue( void* colourMap, double value ) ;
 	void lucColourMap_GetColourFromScaledValue( void* colourMap, float scaledValue, lucColour* colour ) ;
 
 	#define lucColourMap_GetColourFromList( self, colour_I ) \

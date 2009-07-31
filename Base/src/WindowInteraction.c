@@ -251,19 +251,8 @@ void _lucWindowInteraction_MouseMotion( void* windowInteractor, lucWindow* windo
 			lucCamera_RotateTowardsUpDirection( camera, ((double)starty - (double)ypos) * M_PI/180.0 );
 			break;
 		case lucRightButton: 
-		        lucCamera_ChangeFocalPoint( camera, startx, starty, xpos, ypos);
-			/*{
-			XYZ             leftDirection;
-			Dimension_Index dim_I;
-
-			lucCamera_GetLeftDirection( camera, leftDirection );
-			for ( dim_I = 0 ; dim_I < 3 ; dim_I++ ) {
-				camera->focalPoint[ dim_I ] -= 0.01 * ((double)xpos - (double)startx) * leftDirection[ dim_I ];
-				camera->focalPoint[ dim_I ] -= 0.01 * ((double)ypos - (double)starty) * camera->upDirection[ dim_I ];
-			}
-			lucCamera_SetNeedsToDraw( camera );*/
+		    lucCamera_ChangeFocalPoint( camera, startx, starty, xpos, ypos);
 			break;
-		//}
 		case lucMiddleButton:
 			lucCamera_Zoom( camera, 1.0 + ((double)starty - (double)ypos)/10.0 );
 			break;

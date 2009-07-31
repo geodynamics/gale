@@ -357,9 +357,6 @@ void _lucWindow_Initialise( void* window, void* data ) {
 
 	lucSetupRasterFont();
 
-	/* Flag display lists must be created and objects drawn */
-	lucWindow_SetViewportNeedsToSetupFlag( self, True );
-	lucWindow_SetViewportNeedsToDrawFlag( self, True );
 }
 
 void _lucWindow_Execute( void* window, void* data ) { 
@@ -489,6 +486,10 @@ void lucWindow_Resize( void* window ) {
 
     self->resized = False;
      _lucWindow_Initialise(self, self->context);	/* Reset font stuff */
+
+	/* Flag display lists must be created and objects drawn */
+//	lucWindow_SetViewportNeedsToSetupFlag( self, True );
+	lucWindow_SetViewportNeedsToDrawFlag( self, True );
 }
 
 void lucWindow_Dump( void* window, AbstractContext* context ) {
