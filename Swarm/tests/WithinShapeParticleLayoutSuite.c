@@ -106,6 +106,8 @@ void WithinShapeParticleLayoutSuite_Teardown( WithinShapeParticleLayoutSuiteData
 	Stg_Class_Delete( data->extensionMgr_Register );
 	Stg_Class_Delete( data->elementCellLayout );
 	Stg_Class_Delete( data->particleLayout );
+	remove( "sphere10Particles.dat" );
+	remove( "sphere100Particles.dat" );
 }
 
 void WithinShapeParticleLayoutSuite_TestWithinShapeSphere_10Particles( WithinShapeParticleLayoutSuiteData* data ) {
@@ -156,7 +158,7 @@ void WithinShapeParticleLayoutSuite_TestWithinShapeSphere_10Particles( WithinSha
 		Swarm_PrintParticleCoords_ByCell( data->swarm, stream );
 	}
 	pcu_filename_expected( "testWithinShapeParticleLayout10ParticlesOutput.expected", expected_file );
-	pcu_cheq_streq( "sphere10Particles.data", expected_file );
+	pcu_check_fileEq( "sphere10Particles.dat", expected_file );
 }
 
 void WithinShapeParticleLayoutSuite_TestWithinShapeSphere_100Particles( WithinShapeParticleLayoutSuiteData* data ) {
@@ -207,7 +209,7 @@ void WithinShapeParticleLayoutSuite_TestWithinShapeSphere_100Particles( WithinSh
 		Swarm_PrintParticleCoords_ByCell( data->swarm, stream );
 	}
 	pcu_filename_expected( "testWithinShapeParticleLayout100ParticlesOutput.expected", expected_file );
-	pcu_cheq_streq( "sphere100Particles.data", expected_file );
+	pcu_check_fileEq( "sphere100Particles.dat", expected_file );
 	
 }
 
