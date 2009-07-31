@@ -25,7 +25,7 @@
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
 ** Role:
-**   Tests the SpaceFillerParticleLayoutSuite
+**   Tests the WithinShapeParticleLayoutSuite
 **
 ** $Id: testTemplate.c 3462 2006-02-19 06:53:24Z WalterLandry $
 **
@@ -33,6 +33,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <mpi.h>
 
 #include "pcu/pcu.h"
 #include <StGermain/StGermain.h>
@@ -42,10 +43,10 @@
 #include "StgDomain/Utils/Utils.h"
 #include "StgDomain/Swarm/Swarm.h"
 
-#include "SpaceFillerParticleLayoutSuite.h"
+#include "WithinShapeParticleLayoutSuite.h"
 
 struct _Particle {
-	__IntegrationPoint
+	__GlobalParticle
 };
 
 typedef struct {
@@ -54,17 +55,19 @@ typedef struct {
 	double							minCrds[3];
 	double							maxCrds[3];
 	ExtensionManager_Register*	extensionMgr_Register;
-	Mesh*								mesh;
-	ElementCellLayout*			elementCellLayout;
-	Swarm*							swarm;
-	SpaceFillerParticleLayout*	particleLayout;
-	DomainContext*   				context;
-	MPI_Comm       				comm;
+	WithinShapeParticleLayout* particleLayout;
+	ElementCellLayout*         elementCellLayout;
+	Mesh*                      mesh;
+	Swarm*                     swarm;
+	XYZ                        centre;
+	Stg_Shape*               	shape;
+	MPI_Comm  				 		comm;
    unsigned int   				rank;
-   unsigned int   				nProcs;
-} SpaceFillerParticleLayoutSuiteData;
+   unsigned int					nProcs;
+} WithinShapeParticleLayoutSuiteData;
 
-Mesh* SpaceFillerParticleLayoutSuite_BuildMesh( unsigned nDims, unsigned* size, double* minCrds, double* maxCrds, ExtensionManager_Register* emReg ) {
+Mesh* WithinShapeParticleLayoutSuite_buildMesh( unsigned nDims, unsigned* size, double* minCrds, double* maxCrds, ExtensionManager_Register* emReg )
+{
 	CartesianGenerator*	gen;
 	Mesh*			mesh;
 
@@ -76,7 +79,6 @@ Mesh* SpaceFillerParticleLayoutSuite_BuildMesh( unsigned nDims, unsigned* size, 
 	mesh = Mesh_New( "" );
 	Mesh_SetExtensionManagerRegister( mesh, emReg );
 	Mesh_SetGenerator( mesh, gen );
-	Mesh_SetAlgorithms( mesh, Mesh_RegularAlgorithms_New( "" ) );
 
 	Stg_Component_Build( mesh, NULL, False );
 	Stg_Component_Initialise( mesh, NULL, False );
@@ -86,81 +88,76 @@ Mesh* SpaceFillerParticleLayoutSuite_BuildMesh( unsigned nDims, unsigned* size, 
 	return mesh;
 }
 
-void SpaceFillerParticleLayoutSuite_Setup( SpaceFillerParticleLayoutSuiteData* data ) {
-	Dimension_Index	dim;
-	char					input_file[PCU_PATH_MAX];
-	
-	/* MPI Initializations */
+
+void WithinShapeParticleLayoutSuite_Setup( WithinShapeParticleLayoutSuiteData* data ) {
+	/* MPI Initializations */	
 	data->comm = MPI_COMM_WORLD;  
    MPI_Comm_rank( data->comm, &data->rank );
    MPI_Comm_size( data->comm, &data->nProcs );
-   
-   data->nDims = 3;
-	data->meshSize[0] = 4;	data->meshSize[1] = 2;	data->meshSize[2] = 1;
-	data->minCrds[0] = 0.0; data->minCrds[1] = 0.0; data->minCrds[2] = 0.0;
-	data->maxCrds[0] = 400.0; data->maxCrds[1] = 200.0; data->maxCrds[2] = 100.0;
-	
-	/* Init mesh */
-	data->extensionMgr_Register = ExtensionManager_Register_New();
-	data->mesh = SpaceFillerParticleLayoutSuite_BuildMesh( data->nDims, data->meshSize, data->minCrds, data->maxCrds, data->extensionMgr_Register );
-	
-	/* Configure the element-cell-layout */
-	data->elementCellLayout = ElementCellLayout_New( "elementCellLayout", data->mesh );
-	
-	/* Build the mesh */
-	Stg_Component_Build( data->mesh, 0, False );
-	Stg_Component_Initialise( data->mesh, 0, False );
-	
-	/* Configure the gauss-particle-layout */
-	data->particleLayout = SpaceFillerParticleLayout_New( "spaceFillerParticleLayout", data->nDims, SpaceFillerParticleLayout_Invalid, 20 );
-	
-	data->swarm = Swarm_New( "testSwarm", data->elementCellLayout, data->particleLayout, dim, sizeof(Particle),
-		data->extensionMgr_Register, NULL, data->comm, NULL );
-	
-	/* Build the swarm */
-	Stg_Component_Build( data->swarm, 0, False );
-	Stg_Component_Initialise( data->swarm, 0, False );
+
+	data->nDims = 3;
+	data->meshSize[0] = 5; data->meshSize[1] = 3; data->meshSize[2] = 2;
+	data->minCrds[0] = 0; data->minCrds[1] = 0; data->minCrds[2] = 0;
+	data->maxCrds[0] = 1; data->maxCrds[1] = 1; data->maxCrds[2] = 1;	
 }
 
-void SpaceFillerParticleLayoutSuite_Teardown( SpaceFillerParticleLayoutSuiteData* data ) {
+void WithinShapeParticleLayoutSuite_Teardown( WithinShapeParticleLayoutSuiteData* data ) {
 	/* Destroy stuff */
-	Stg_Class_Delete( data->particleLayout );
-	Stg_Class_Delete( data->elementCellLayout );
-	Stg_Class_Delete( data->swarm );
 	Stg_Class_Delete( data->mesh );
+	Stg_Class_Delete( data->swarm );	
 	Stg_Class_Delete( data->extensionMgr_Register );
-	remove( "spaceFillerParticle.dat" );
+	Stg_Class_Delete( data->elementCellLayout );
 }
 
-void SpaceFillerParticleLayoutSuite_TestSpaceFillerParticle( SpaceFillerParticleLayoutSuiteData* data ) {
-	double 						x,y,z;
-	unsigned int 				p, i, len;
+void WithinShapeParticleLayoutSuite_TestElementCellLayout( WithinShapeParticleLayoutSuiteData* data ) {
+	Particle_InCellIndex 	particlesPerDim[3] = {1, 1, 1};
 	int							procToWatch;
-	Stream*						stream;
-	char 							expected_file[PCU_PATH_MAX];
-	
+	Stream*                 stream;
+		
 	if( data->nProcs >= 2 ) {
 		procToWatch = 1;
 	}
 	else {
 		procToWatch = 0;
 	}
-	if( data->rank == procToWatch ) printf( "Watching rank: %i\n", data->rank );
+
+	/* Init mesh */
+	data->extensionMgr_Register = ExtensionManager_Register_New();
+	data->mesh = WithinShapeParticleLayoutSuite_buildMesh( data->nDims, data->meshSize, data->minCrds, data->maxCrds, data->extensionMgr_Register );
+
+	/* Configure the element-cell-layout */
+	data->elementCellLayout = ElementCellLayout_New( "elementCellLayout", data->mesh );
+
+	/* Build the mesh */
+	Stg_Component_Build( data->mesh, 0, False );
+	Stg_Component_Initialise( data->mesh, 0, False );	
+
+	data->centre[I_AXIS] = data->centre[J_AXIS] = data->centre[K_AXIS] = 0.5;
+	data->shape = (Stg_Shape*)Sphere_New( "testSphere", data->nDims, data->centre, 0, 0, 0, 0.05 );
+
+	/* Configure the gauss-particle-layout */
+	data->particleLayout = WithinShapeParticleLayout_New( "withinShapeParticleLayout", data->nDims, 10, data->shape );
 	
-	stream = Journal_Register( Info_Type, "ManualParticle" );
+	/* Configure the swarm */
+	data->swarm = Swarm_New(  "testSwarm", data->elementCellLayout, data->particleLayout, data->nDims, sizeof(Particle),
+		data->extensionMgr_Register, NULL, data->comm, NULL );
+	
+	/* Build the swarm */
+	Stg_Component_Build( data->swarm, 0, False );
+	Stg_Component_Initialise( data->swarm, 0, False );
+	stream = Journal_Register (Info_Type, "WithinShapeParticleLayout");
 	
 	if( data->rank == procToWatch ) {
 		Stg_Class_Print( data->particleLayout, stream );
 		/* Print out the particles on all cells */
-		Stream_RedirectFile( stream, "spaceFillerParticle.dat" );
+		Stream_RedirectFile( stream, "shapeParticle.dat" );
 		Swarm_PrintParticleCoords_ByCell( data->swarm, stream );
 	}
-	pcu_filename_expected( "testSpaceFillerParticleLayoutOutput.expected", expected_file );
-	pcu_check_fileEq( "spaceFillerParticle.dat", expected_file );
+	
 }
 
-void SpaceFillerParticleLayoutSuite( pcu_suite_t* suite ) {
-   pcu_suite_setData( suite, SpaceFillerParticleLayoutSuiteData );
-   pcu_suite_setFixtures( suite, SpaceFillerParticleLayoutSuite_Setup, SpaceFillerParticleLayoutSuite_Teardown );
-   pcu_suite_addTest( suite, SpaceFillerParticleLayoutSuite_TestSpaceFillerParticle );
+void WithinShapeParticleLayoutSuite( pcu_suite_t* suite ) {
+   pcu_suite_setData( suite, WithinShapeParticleLayoutSuiteData );
+   pcu_suite_setFixtures( suite, WithinShapeParticleLayoutSuite_Setup, WithinShapeParticleLayoutSuite_Teardown );
+   pcu_suite_addTest( suite, WithinShapeParticleLayoutSuite_TestElementCellLayout );
 }
