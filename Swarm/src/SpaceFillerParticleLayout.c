@@ -267,10 +267,10 @@ void _SpaceFillerParticleLayout_InitialiseParticle(
 	Dimension_Index             dim_I;
 	double*                     coord;
 	GlobalParticle*             particle = (GlobalParticle*)_particle;
-
 	/* Note: we have to assume element cell layout to get the full box coords - maybe these
 	should be available as part of all cell layouts */
-	Mesh*			    mesh = ((ElementCellLayout*)swarm->cellLayout)->mesh;
+	ElementCellLayout*          eCellLayout = Stg_CheckType( swarm->cellLayout, ElementCellLayout );
+	Mesh*                       mesh = eCellLayout->mesh;
 
 	Mesh_GetGlobalCoordRange( mesh, minCrd, maxCrd );
 
