@@ -39,6 +39,7 @@
 #include "PICellerator/PopulationControl/PopulationControl.h"
 #include "PICellerator/Weights/Weights.h"
 
+#include "ConstantWeightsSuite.h"
 
 typedef struct {
    DomainContext*       context;
