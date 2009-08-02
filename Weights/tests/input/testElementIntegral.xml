@@ -47,22 +47,14 @@
 				<param>pMovementHandler</param>
 			</list>
 		</struct>
-							  
 	</struct>
-
-	<list name="plugins">
-		<param>testElementIntegral</param>
-	</list>
 	
-	<param name="journal-level.info.Stg_ComponentFactory"> 2 </param>
+   <param name="dim"> 2 </param>
+	<param name="particleCount"> 20 </param>
+
 	<param name="maxTimeSteps"> 1 </param>
 	<param name="dumpEvery"> 1 </param>
 	<param name="outputPath"> ./output </param>
-	<param name="dim"> 2 </param>
-	
-	<param name="particleCount"> 20 </param>
-	<param name="FunctionName"> CircleInterface </param>
-	<param name="SampleSize"> 1000 </param>
 
 	<!-- Mesh Stuff -->
 	<param name="elementResI"> 2 </param>
