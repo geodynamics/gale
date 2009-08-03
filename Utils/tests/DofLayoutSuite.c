@@ -58,22 +58,31 @@ void DofLayoutSuite_Setup( DofLayoutSuiteData* data ) {
 }
 
 void DofLayoutSuite_Teardown( DofLayoutSuiteData* data ) {
+	/* Purge output files */
+	remove( "testBasic.dat" );
+	remove( "testRemap.dat" );
 }
 
-
-void DofLayoutSuite_TestSimple( DofLayoutSuiteData* data ) {
+void DofLayoutSuite_TestBasic( DofLayoutSuiteData* data ) {
 	int	procToWatch;
+	char	expected_file[PCU_PATH_MAX];
+	Stream*	stream = Journal_Register( Info_Type, "DofLayoutBasic" );	
+	MPI_Barrier( data->comm ); /* Ensures copyright info always come first in output */
 
 	procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if( data->rank == procToWatch ) {
 		DofLayout*              dof;
+		DofLayout*              destDof;
                 Variable_Register*      variableRegister;
                 Variable*               var[6];
                 char*                   varName[] = {"x", "y", "z", "vx", "vy", "vz"};
                 Index                   ii, dof_I, var_I;
                 Index                   arraySize = 27;
                 double*                 varArrays[6];
+		int			counts[27];
+
+		Stream_RedirectFile( stream, "testBasic.dat" );
 
 		/* Create variable register */
                 variableRegister = Variable_Register_New();
@@ -101,109 +110,44 @@ void DofLayoutSuite_TestSimple( DofLayoutSuiteData* data ) {
                 Stg_Component_Build(dof, 0, False);
 
                 printf("Simple test:\n");
+		Journal_Printf( stream, "Simple test:\n" );
                 for (ii = 0; ii < arraySize; ii++) {
                         printf("\t%u\n", dof->dofCounts[ii]);
+			Journal_Printf( stream, "\t%u\n", dof->dofCounts[ii] );
 			pcu_check_true( dof->dofCounts[ii] == 6 );
 		}
 			
                 Stg_Class_Delete(dof);
-	}
-}
 
-void DofLayoutSuite_TestAdvanced( DofLayoutSuiteData* data ) {
-	int	procToWatch;
-
-	procToWatch = data->nProcs >=2 ? 1 : 0;
-	
-	if( data->rank == procToWatch ) {
-		DofLayout*              dof;
-                Variable_Register*      variableRegister;
-                Variable*               var[6];
-                char*                   varName[] = {"x", "y", "z", "vx", "vy", "vz"};
-                Index                   ii, dof_I, var_I;
-                Index                   arraySize = 27;
-                double*                 varArrays[6];
-		int			counts[27];
-
-		/* Create variable register */
-                variableRegister = Variable_Register_New();
-
-                /* Create variables */
-                for (var_I = 0; var_I < 6; var_I++) {
-                        varArrays[var_I] = Memory_Alloc_Array_Unnamed( double, arraySize );
-                        var[var_I] = Variable_NewScalar( varName[var_I], Variable_DataType_Double, &arraySize, NULL, (void**)&(varArrays[var_I]), variableRegister );
-                        Stg_Component_Build( var[var_I], 0, False );
-                        Stg_Component_Initialise( var[var_I], 0, False );
-                }
-
-                for (ii = 0; ii < arraySize; ii++) {
-                        for (var_I = 0; var_I < 6; var_I++) {
-                                Variable_SetValueDouble( var[var_I], ii, 0.0 );
-                        }
-                }
-
+		/* Advanced test */
 		for (ii = 0; ii < 27; ii++) counts[ii] = 0;
-
-                /* Advanced test */
-                dof = DofLayout_New( "dofLayout1", variableRegister, arraySize, NULL );
-                for (ii = 0; ii < 12; ii++) {
-                        for (var_I = 0; var_I < 2; var_I++) {
-                                DofLayout_AddDof_ByVarName(dof, varName[var_I], ii);
+		dof = DofLayout_New( "dofLayout1", variableRegister, arraySize, NULL );
+		
+		for (ii = 0; ii < 12; ii++) {
+			for (var_I = 0; var_I < 2; var_I++) {
+				DofLayout_AddDof_ByVarName(dof, varName[var_I], ii);
 				counts[ii]++;
 			}
 		}
-
-                for (ii = 9; ii < 20; ii++) {
-                        for (var_I = 2; var_I < 6; var_I++) {
-                                DofLayout_AddDof_ByVarName(dof, varName[var_I], ii);
+ 
+		for (ii = 9; ii < 20; ii++) {
+			for (var_I = 2; var_I < 6; var_I++) {
+				DofLayout_AddDof_ByVarName(dof, varName[var_I], ii);
 				counts[ii]++;
 			}
 		}
-
-                Stg_Component_Build(dof, 0, False);
-
-                printf("\nAdvanced test:\n");
-                for (ii = 0; ii < arraySize; ii++) {
-                        printf( "\t%u-%u\n", counts[ii], dof->dofCounts[ii] );
+ 
+		Stg_Component_Build(dof, 0, False);
+ 
+		printf("\nAdvanced test:\n");
+		Journal_Printf( stream, "\nAdvanced test:\n" );
+		for (ii = 0; ii < arraySize; ii++) {
+			printf( "\t%u\n", dof->dofCounts[ii] );
+			Journal_Printf( stream, "\t%u\n", dof->dofCounts[ii] );
 			pcu_check_true( counts[ii] == dof->dofCounts[ii] );
 		}
+		Stg_Class_Delete(dof);
 
-                Stg_Class_Delete(dof);
-	}
-}
-
-void DofLayoutSuite_TestCopy( DofLayoutSuiteData* data ) {
-	int	procToWatch;
-
-	procToWatch = data->nProcs >=2 ? 1 : 0;
-	
-	if( data->rank == procToWatch ) {
-		DofLayout*              dof;
-                DofLayout*              destDof;
-                Variable_Register*      variableRegister;
-                Variable*               var[6];
-                char*                   varName[] = {"x", "y", "z", "vx", "vy", "vz"};
-                Index                   ii, dof_I, var_I;
-                Index                   arraySize = 27;
-                double*                 varArrays[6];
-
-		/* Create variable register */
-                variableRegister = Variable_Register_New();
-
-                /* Create variables */
-                for (var_I = 0; var_I < 6; var_I++) {
-                        varArrays[var_I] = Memory_Alloc_Array_Unnamed( double, arraySize );
-                        var[var_I] = Variable_NewScalar( varName[var_I], Variable_DataType_Double, &arraySize, NULL, (void**)&(varArrays[var_I]), variableRegister );
-                        Stg_Component_Build( var[var_I], 0, False );
-                        Stg_Component_Initialise( var[var_I], 0, False );
-                }
-
-                for (ii = 0; ii < arraySize; ii++) {
-                        for (var_I = 0; var_I < 6; var_I++) {
-                                Variable_SetValueDouble( var[var_I], ii, 0.0 );
-                        }
-                }
-                
 		/* Copy test */
                 dof = DofLayout_New( "dofLayout2", variableRegister, arraySize, NULL );
                 destDof = DofLayout_New( "dofLayout3", variableRegister, arraySize, NULL );
@@ -227,8 +171,16 @@ void DofLayoutSuite_TestCopy( DofLayoutSuiteData* data ) {
                 }
 
                 printf("Copy Test: pre copy:\n");
+		Journal_Printf( stream, "Copy Test: pre copy:\n" );
                 for (ii = 0; ii < arraySize; ii++) {
                         printf("\tIndex %d - src %2g,%2g,%2g - dest %2g, %2g, %2g\n", ii,
+				DofLayout_GetValueDouble( dof, ii, 0 ),
+				DofLayout_GetValueDouble( dof, ii, 1 ),
+				DofLayout_GetValueDouble( dof, ii, 2 ),
+				DofLayout_GetValueDouble( destDof, ii, 0 ),
+				DofLayout_GetValueDouble( destDof, ii, 1 ),
+				DofLayout_GetValueDouble( destDof, ii, 2 ) );
+			Journal_Printf( stream, "\tIndex %d - src %2g,%2g,%2g - dest %2g, %2g, %2g\n", ii,
 				DofLayout_GetValueDouble( dof, ii, 0 ),
 				DofLayout_GetValueDouble( dof, ii, 1 ),
 				DofLayout_GetValueDouble( dof, ii, 2 ),
@@ -246,8 +198,16 @@ void DofLayoutSuite_TestCopy( DofLayoutSuiteData* data ) {
                 DofLayout_CopyValues( dof, destDof );
 
                 printf("Copy Test: post copy:\n");
+		Journal_Printf( stream, "Copy Test: post copy:\n" );
                 for (ii = 0; ii < arraySize; ii++) {
                         printf("\tIndex %d - src %2g,%2g,%2g - dest %2g, %2g, %2g\n", ii,
+				DofLayout_GetValueDouble( dof, ii, 0 ),
+				DofLayout_GetValueDouble( dof, ii, 1 ),
+				DofLayout_GetValueDouble( dof, ii, 2 ),
+				DofLayout_GetValueDouble( destDof, ii, 0 ),
+				DofLayout_GetValueDouble( destDof, ii, 1 ),
+				DofLayout_GetValueDouble( destDof, ii, 2 ) );
+			Journal_Printf( stream, "\tIndex %d - src %2g,%2g,%2g - dest %2g, %2g, %2g\n", ii,
 				DofLayout_GetValueDouble( dof, ii, 0 ),
 				DofLayout_GetValueDouble( dof, ii, 1 ),
 				DofLayout_GetValueDouble( dof, ii, 2 ),
@@ -262,10 +222,14 @@ void DofLayoutSuite_TestCopy( DofLayoutSuiteData* data ) {
                 Stg_Class_Delete(destDof);
 
                 printf("Zero Test: all values in src dof should be zero again\n");
-
+		Journal_Printf( stream, "Zero Test: all values in src dof should be zero again\n" );
                 DofLayout_SetAllToZero( dof );
                 for (ii = 0; ii < arraySize; ii++) {
                         printf("\tIndex %d - src %2g,%2g,%2g\n", ii,
+                                DofLayout_GetValueDouble( dof, ii, 0 ),
+                                DofLayout_GetValueDouble( dof, ii, 1 ),
+                                DofLayout_GetValueDouble( dof, ii, 2 ) );
+			Journal_Printf( stream,  "\tIndex %d - src %2g,%2g,%2g\n", ii,
                                 DofLayout_GetValueDouble( dof, ii, 0 ),
                                 DofLayout_GetValueDouble( dof, ii, 1 ),
                                 DofLayout_GetValueDouble( dof, ii, 2 ) );
@@ -282,14 +246,88 @@ void DofLayoutSuite_TestCopy( DofLayoutSuiteData* data ) {
                 for (var_I = 0; var_I < 6; var_I++) {
                         if (var[var_I]) Stg_Class_Delete(var[var_I]);
                         Memory_Free( varArrays[var_I] );
+		}
+		pcu_filename_expected( "testDofLayoutBasicOutput.expected", expected_file );
+		pcu_check_fileEq( "testBasic.dat", expected_file );
+	}
+}
+
+void DofLayoutSuite_TestRemap( DofLayoutSuiteData* data ) {
+	int	procToWatch;
+	char	expected_file[PCU_PATH_MAX];
+	Stream*	stream = Journal_Register( Info_Type, "DofLayoutRemap" );	
+	MPI_Barrier( data->comm ); /* Ensures copyright info always come first in output */
+
+	procToWatch = data->nProcs >=2 ? 1 : 0;
+	
+	if( data->rank == procToWatch ) {
+		DofLayout*              dof;
+                double                  dummyVar;
+                double*                 dummyPtr = &dummyVar;
+                Variable_Register*      variableRegister;
+                Variable*               var[6];
+                char*                   varName[] = {"x", "y", "z", "vx", "vy", "vz"};
+                Index                   i, j;
+                Index                   arraySize = 1;
+                IndexMap*               map;
+
+		Stream_RedirectFile( stream, "testRemap.dat" );
+		
+		/* Create variable register */
+		variableRegister = Variable_Register_New();
+
+		/* Create variables */
+                for (i = 0; i < 6; i++) {
+                        var[i] = Variable_NewScalar( varName[i], Variable_DataType_Double, &arraySize, NULL, (void**)&dummyPtr, 0 );
+                        Variable_Register_Add(variableRegister, var[i]);
                 }
+
+		/* Simple test */
+                dof = DofLayout_New( "dofLayout", variableRegister, 27, NULL );
+                for (i = 0; i < 6; i++) {
+                        for (j = 0; j < 27; j++) {
+                                DofLayout_AddDof_ByVarName(dof, varName[i], j);
+                        }
+                }
+
+		/* Build the IndexMap */
+                map = IndexMap_New();
+                for( i = 0; i < 27; i++ ) {
+                        if( i % 2 == 0 ) {
+       				IndexMap_Append( map, i, i / 2 );
+                        }
+                        else {
+                                IndexMap_Append( map, i, 27 );
+                        }
+                }
+
+		/* Perform remap */
+                DofLayout_Remap( dof, 14, map );
+                Stg_Class_Delete( map );
+                Stg_Component_Build(dof, 0, False);
+
+                printf("Simple test:\n");
+		Journal_Printf( stream, "Simple test:\n" );
+                for (i = 0; i < 14; i++) {
+                        printf("\t%u\n", dof->dofCounts[i]);
+			Journal_Printf( stream, "\t%u\n", dof->dofCounts[i] );
+			pcu_check_true( dof->dofCounts[i] == 6 );
+		}
+
+                Stg_Class_Delete(dof);
+                Stg_Class_Delete(variableRegister);
+
+                for (i = 0; i < 6; i++)
+                        if (var[i]) Stg_Class_Delete(var[i]);
+		
+		pcu_filename_expected( "testDofLayoutRemapOutput.expected", expected_file );
+		pcu_check_fileEq( "testRemap.dat", expected_file );
 	}
 }
 
 void DofLayoutSuite( pcu_suite_t* suite ) {
 	pcu_suite_setData( suite, DofLayoutSuiteData );
 	pcu_suite_setFixtures( suite, DofLayoutSuite_Setup, DofLayoutSuite_Teardown );
-	pcu_suite_addTest( suite, DofLayoutSuite_TestSimple );
-	pcu_suite_addTest( suite, DofLayoutSuite_TestAdvanced );
-	pcu_suite_addTest( suite, DofLayoutSuite_TestCopy );
+	pcu_suite_addTest( suite, DofLayoutSuite_TestBasic );
+	pcu_suite_addTest( suite, DofLayoutSuite_TestRemap );
 }
