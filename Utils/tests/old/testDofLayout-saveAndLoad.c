@@ -119,7 +119,6 @@ int main( int argc, char *argv[] ) {
 				DofLayout_GetValueDouble( dof, ii, 5 ) );
 		}	
 
-
 		/* Cleanup */
 		Stg_Class_Delete(dof);
 
