@@ -159,7 +159,7 @@ MaterialPointsSwarm* _MaterialPointsSwarm_New(
 
 void _MaterialPointsSwarm_Init( 
 		void*                                 swarm,
-		FeMesh*                   mesh,
+		FeMesh*                               mesh,
 		EscapedRoutine*                       escapedRoutine, 
 		Material*                             material,
 		Materials_Register*                   materials_Register )

@@ -127,16 +127,17 @@
 	void* _MaterialPointsSwarm_Copy( void* swarm, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _MaterialPointsSwarm_DefaultNew( Name name ) ;
-void _MaterialPointsSwarm_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+
+	void _MaterialPointsSwarm_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 	void _MaterialPointsSwarm_Build( void* swarm, void* data ) ;
 	void _MaterialPointsSwarm_Initialise( void* swarm, void* data ) ;
 	void _MaterialPointsSwarm_Execute( void* swarm, void* data );
 	void _MaterialPointsSwarm_Destroy( void* swarm, void* data ) ;
 
 
-void _MaterialPointsSwarm_Init( 
+	void _MaterialPointsSwarm_Init( 
 		void*                                 swarm,
-		FeMesh*                   mesh,
+		FeMesh*                               mesh,
 		EscapedRoutine*                       escapedRoutine, 
 		Material*                             material,
 		Materials_Register*                   materials_Register );
