@@ -61,6 +61,7 @@ void DofLayoutSuite_Teardown( DofLayoutSuiteData* data ) {
 	/* Purge output files */
 	remove( "testBasic.dat" );
 	remove( "testRemap.dat" );
+	remove( "testSaveAndLoad.dat" );
 }
 
 void DofLayoutSuite_TestBasic( DofLayoutSuiteData* data ) {
@@ -325,9 +326,81 @@ void DofLayoutSuite_TestRemap( DofLayoutSuiteData* data ) {
 	}
 }
 
+void DofLayoutSuite_TestSaveAndLoad( DofLayoutSuiteData* data ) {
+	int	procToWatch;
+	char	expected_file[PCU_PATH_MAX];
+	Stream*	stream = Journal_Register( Info_Type, "DofLayoutRemap" );	
+	MPI_Barrier( data->comm ); /* Ensures copyright info always come first in output */
+
+	procToWatch = data->nProcs >=2 ? 1 : 0;
+
+	if( data->rank == procToWatch ) {
+		DofLayout*              dof;
+                Variable_Register*      variableRegister;
+                Variable*               var[6];
+                char*                   varName[] = {"x", "y", "z", "vx", "vy", "vz"};
+                Index                   ii, var_I;
+                Index                   arraySize = 27;
+                double*                 varArrays[6];
+	
+		Stream_RedirectFile( stream, "testSaveAndLoad.dat" );
+
+		   /* Create variable register */
+                variableRegister = Variable_Register_New();
+
+                /* Create variables */
+                for (var_I = 0; var_I < 6; var_I++) {
+                        varArrays[var_I] = Memory_Alloc_Array_Unnamed( double, arraySize );
+                        var[var_I] = Variable_NewScalar( varName[var_I], Variable_DataType_Double, &arraySize,
+                                NULL, (void**)&(varArrays[var_I]), variableRegister );
+                        Stg_Component_Build( var[var_I], 0, False );
+                        Stg_Component_Initialise( var[var_I], 0, False );
+                }
+
+                for (ii = 0; ii < arraySize; ii++) {
+                        for (var_I = 0; var_I < 6; var_I++) {
+                                Variable_SetValueDouble( var[var_I], ii, (ii*10 + var_I) );
+                        }
+                }
+
+                /* Simple test */
+                dof = DofLayout_New( "dofLayout", variableRegister, arraySize, NULL );
+                for (ii = 0; ii < arraySize; ii++) {
+                        for (var_I = 0; var_I < 6; var_I++) {
+                                DofLayout_AddDof_ByVarName(dof, varName[var_I], ii);
+                        }
+                }
+                Stg_Component_Build(dof, 0, False);
+
+                DofLayout_SaveAllVariablesToFiles( dof, "testDofSave", data->rank );
+                DofLayout_SetAllToZero( dof );
+                DofLayout_LoadAllVariablesFromFiles( dof, "testDofSave", data->rank );
+
+                for (ii = 0; ii < arraySize; ii++) {
+                        printf("\tIndex %d - %2g,%2g,%2g,%2g,%2g,%2g\n", ii,
+                                DofLayout_GetValueDouble( dof, ii, 0 ),
+                                DofLayout_GetValueDouble( dof, ii, 1 ),
+                                DofLayout_GetValueDouble( dof, ii, 2 ),
+                                DofLayout_GetValueDouble( dof, ii, 3 ),
+                                DofLayout_GetValueDouble( dof, ii, 4 ),
+                                DofLayout_GetValueDouble( dof, ii, 5 ) );
+			Journal_Printf( stream, "\tIndex %d - %2g,%2g,%2g,%2g,%2g,%2g\n", ii,
+                                DofLayout_GetValueDouble( dof, ii, 0 ),
+                                DofLayout_GetValueDouble( dof, ii, 1 ),
+                                DofLayout_GetValueDouble( dof, ii, 2 ),
+                                DofLayout_GetValueDouble( dof, ii, 3 ),
+                                DofLayout_GetValueDouble( dof, ii, 4 ),
+                                DofLayout_GetValueDouble( dof, ii, 5 ) );
+                }
+		pcu_filename_expected( "testDofLayoutSaveAndLoadOutput.expected", expected_file );
+		pcu_check_fileEq( "testSaveAndLoad.dat", expected_file );
+	}
+}
+	
 void DofLayoutSuite( pcu_suite_t* suite ) {
 	pcu_suite_setData( suite, DofLayoutSuiteData );
 	pcu_suite_setFixtures( suite, DofLayoutSuite_Setup, DofLayoutSuite_Teardown );
 	pcu_suite_addTest( suite, DofLayoutSuite_TestBasic );
 	pcu_suite_addTest( suite, DofLayoutSuite_TestRemap );
+	pcu_suite_addTest( suite, DofLayoutSuite_TestSaveAndLoad );
 }
