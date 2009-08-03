@@ -69,7 +69,7 @@
 		Materials_Register*                   materials_Register;   \
 		SwarmVariable*                        particleCoordVariable; /** Set only if a global coord system swarm. */ \
 		SwarmVariable*                        materialIndexVariable; \
-                Bool                                  geomodHack;
+		Bool                                  geomodHack;
 
 	struct MaterialPointsSwarm { __MaterialPointsSwarm };
 	
