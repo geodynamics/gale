@@ -196,7 +196,7 @@ void VTKOutput_particles(IntegrationPointsSwarm*  picswarm,
           ( material->dictionary, "diffusivity", defaultDiffusivity );
         rheology_register=(Rheology_Register*)material->rheology_Register;
 
-        if( rheology_register )
+        if( rheology_register && strcmp( material->name, Material_Type ) )
            rheologyCount = Rheology_Register_GetCount( rheology_register );
         else
            rheologyCount = 0;
@@ -487,6 +487,9 @@ void VTKOutput_fields(void *context, int myRank, int nprocs) {
 
       feVar=(FeVariable*)fieldVar;
 
+      if(!strcmp(feVar->name,"HeightField"))
+        continue;
+
       if(!strcmp(feVar->name,"VelocityField") && self->timeStep==0)
         FeVariable_SyncShadowValues(feVar);
       if(!header_printed)
@@ -498,7 +501,7 @@ void VTKOutput_fields(void *context, int myRank, int nprocs) {
           gen=((CartesianGenerator *)(mesh->generator));
           /* If we got the surface adaptor instead of the cartesian
              mesh generator, go to the mesh generator.  */
-          if(!strcmp(gen->type,"SurfaceAdaptor"))
+          if(!strcmp(gen->type,"SurfaceAdaptor") || !strcmp(gen->type,"FieldVariableSurfaceAdaptor"))
             gen=(CartesianGenerator *)((SurfaceAdaptor *)(gen))->generator;
 
           elGrid=gen->elGrid;
