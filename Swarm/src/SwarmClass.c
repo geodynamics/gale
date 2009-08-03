@@ -1228,6 +1228,8 @@ Particle_Index Swarm_FindClosestParticle( void* _swarm, Dimension_Index dim, dou
 	NeighbourIndex*      neighbourList;
 	Particle_Index       closestParticle_I;
 
+   Journal_Firewall( NULL, Swarm_Error, "\n I am currently broken.  Fix me.  John M. 20090803 \n");
+
 	/* Find cell this coordinate is in */
 	memcpy( testParticle.coord, coord, sizeof(Coord) );
 	/* First specify the particle doesn't have an owning cell yet, so as
