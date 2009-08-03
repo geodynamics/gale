@@ -45,20 +45,20 @@
 #include "SingleCellLayoutSuite.h"
 
 typedef struct {
-	SingleCellLayout*		singleCellLayout;
-	unsigned int			dimExists[3];
-	double***				cellPoints;
-	MPI_Comm       		comm;
-   unsigned int   		rank;
-   unsigned int   		nProcs;
+	SingleCellLayout*	singleCellLayout;
+	unsigned int		dimExists[3];
+	double***		cellPoints;
+	MPI_Comm		comm;
+	unsigned int		rank;
+	unsigned int		nProcs;
 } SingleCellLayoutSuiteData;
 
 
 void SingleCellLayoutSuite_Setup( SingleCellLayoutSuiteData* data ) {
 	/* MPI Initializations */
 	data->comm = MPI_COMM_WORLD;  
-   MPI_Comm_rank( data->comm, &data->rank );
-   MPI_Comm_size( data->comm, &data->nProcs );
+	MPI_Comm_rank( data->comm, &data->rank );
+	MPI_Comm_size( data->comm, &data->nProcs );
 
 	data->dimExists[0] = True; data->dimExists[1] = True; data->dimExists[2] = True;
 
@@ -73,9 +73,9 @@ void SingleCellLayoutSuite_Teardown( SingleCellLayoutSuiteData* data ) {
 }
 
 void SingleCellLayoutSuite_TestSingleCellLayout( SingleCellLayoutSuiteData* data ) {
-	Cell_Index 		cell;
-	int				procToWatch;
-	double*			testCoord;		
+	Cell_Index 	cell;
+	int		procToWatch;
+	double*		testCoord;		
 	
 	MPI_Barrier( data->comm ); /* Ensures copyright info always come first in output */
 
@@ -92,8 +92,8 @@ void SingleCellLayoutSuite_TestSingleCellLayout( SingleCellLayoutSuiteData* data
 		testCoord = Memory_Alloc_Array_Unnamed( double, 3 );
 		
 		for( cell = 0; cell < data->singleCellLayout->_cellLocalCount( data->singleCellLayout ); cell++ ) {
-			Cell_PointIndex			point;
-			Cell_PointIndex			count;
+			Cell_PointIndex	point;
+			Cell_PointIndex	count;
 			
 			count = data->singleCellLayout->_pointCount( data->singleCellLayout, cell );
 			printf( "cellPointTbl  [%2u][0-%u]:\n", cell, count );
@@ -120,7 +120,7 @@ void SingleCellLayoutSuite_TestSingleCellLayout( SingleCellLayoutSuiteData* data
 }
 
 void SingleCellLayoutSuite( pcu_suite_t* suite ) {
-   pcu_suite_setData( suite, SingleCellLayoutSuiteData );
-   pcu_suite_setFixtures( suite, SingleCellLayoutSuite_Setup, SingleCellLayoutSuite_Teardown );
-   pcu_suite_addTest( suite, SingleCellLayoutSuite_TestSingleCellLayout );
+	pcu_suite_setData( suite, SingleCellLayoutSuiteData );
+	pcu_suite_setFixtures( suite, SingleCellLayoutSuite_Setup, SingleCellLayoutSuite_Teardown );
+	pcu_suite_addTest( suite, SingleCellLayoutSuite_TestSingleCellLayout );
 }

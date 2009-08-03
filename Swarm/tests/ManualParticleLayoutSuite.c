@@ -49,23 +49,23 @@ struct _Particle {
 };
 
 typedef struct {
-	unsigned							nDims;
-	unsigned							meshSize[3];
-	double							minCrds[3];
-	double							maxCrds[3];
+	unsigned			nDims;
+	unsigned			meshSize[3];
+	double				minCrds[3];
+	double				maxCrds[3];
 	ExtensionManager_Register*	extensionMgr_Register;
-	Mesh*								mesh;
-	GaussParticleLayout*			gaussParticleLayout;
-	ElementCellLayout*			elementCellLayout;
-	Swarm*							swarm;
-	Dictionary*                dictionary;
-	Dictionary_Entry_Value*    particlePositionsList;
-	Dictionary_Entry_Value*    particlePositionEntry;
+	Mesh*				mesh;
+	GaussParticleLayout*		gaussParticleLayout;
+	ElementCellLayout*		elementCellLayout;
+	Swarm*				swarm;
+	Dictionary*			dictionary;
+	Dictionary_Entry_Value*		particlePositionsList;
+	Dictionary_Entry_Value*		particlePositionEntry;
 	ManualParticleLayout*		particleLayout;
-	DomainContext*   				context;
-	MPI_Comm       				comm;
-   unsigned int   				rank;
-   unsigned int   				nProcs;
+	DomainContext*			context;
+	MPI_Comm			comm;
+	unsigned int			rank;
+	unsigned int			nProcs;
 } ManualParticleLayoutSuiteData;
 
 Mesh* ManualParticleLayoutSuite_BuildMesh( unsigned nDims, unsigned* size, double* minCrds, double* maxCrds, ExtensionManager_Register* emReg ) {
@@ -91,14 +91,14 @@ Mesh* ManualParticleLayoutSuite_BuildMesh( unsigned nDims, unsigned* size, doubl
 
 void ManualParticleLayoutSuite_Setup( ManualParticleLayoutSuiteData* data ) {
 	Dimension_Index	dim;
-	char					input_file[PCU_PATH_MAX];
+	char		input_file[PCU_PATH_MAX];
 	
 	/* MPI Initializations */
 	data->comm = MPI_COMM_WORLD;  
-   MPI_Comm_rank( data->comm, &data->rank );
-   MPI_Comm_size( data->comm, &data->nProcs );
+	MPI_Comm_rank( data->comm, &data->rank );
+	MPI_Comm_size( data->comm, &data->nProcs );
    
-   /* Read in the input xml file. */
+	/* Read in the input xml file. */
 	/*pcu_filename_input( "testManualParticleLayoutInput.xml", input_file );
 	data->context = (DomainContext*)stgMainInitFromXML( input_file, data->comm );
 	dictionary = data->context->dictionary;*/
@@ -170,11 +170,9 @@ void ManualParticleLayoutSuite_Teardown( ManualParticleLayoutSuiteData* data ) {
 }
 
 void ManualParticleLayoutSuite_TestManualParticle( ManualParticleLayoutSuiteData* data ) {
-	double 						x,y,z;
-	unsigned int 				p, i, len;
-	int							procToWatch;
-	Stream*						stream;
-	char 							expected_file[PCU_PATH_MAX];
+	int		procToWatch;
+	Stream*		stream;
+	char		expected_file[PCU_PATH_MAX];
 	
 	if( data->nProcs >= 2 ) {
 		procToWatch = 1;
@@ -195,7 +193,7 @@ void ManualParticleLayoutSuite_TestManualParticle( ManualParticleLayoutSuiteData
 }
 
 void ManualParticleLayoutSuite( pcu_suite_t* suite ) {
-   pcu_suite_setData( suite, ManualParticleLayoutSuiteData );
-   pcu_suite_setFixtures( suite, ManualParticleLayoutSuite_Setup, ManualParticleLayoutSuite_Teardown );
-   pcu_suite_addTest( suite, ManualParticleLayoutSuite_TestManualParticle );
+	pcu_suite_setData( suite, ManualParticleLayoutSuiteData );
+	pcu_suite_setFixtures( suite, ManualParticleLayoutSuite_Setup, ManualParticleLayoutSuite_Teardown );
+	pcu_suite_addTest( suite, ManualParticleLayoutSuite_TestManualParticle );
 }

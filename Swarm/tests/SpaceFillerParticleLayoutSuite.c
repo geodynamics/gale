@@ -49,19 +49,19 @@ struct _Particle {
 };
 
 typedef struct {
-	unsigned							nDims;
-	unsigned							meshSize[3];
-	double							minCrds[3];
-	double							maxCrds[3];
+	unsigned			nDims;
+	unsigned			meshSize[3];
+	double				minCrds[3];
+	double				maxCrds[3];
 	ExtensionManager_Register*	extensionMgr_Register;
-	Mesh*								mesh;
-	ElementCellLayout*			elementCellLayout;
-	Swarm*							swarm;
+	Mesh*				mesh;
+	ElementCellLayout*		elementCellLayout;
+	Swarm*				swarm;
 	SpaceFillerParticleLayout*	particleLayout;
-	DomainContext*   				context;
-	MPI_Comm       				comm;
-   unsigned int   				rank;
-   unsigned int   				nProcs;
+	DomainContext*			context;
+	MPI_Comm			comm;
+	unsigned int			rank;
+	unsigned int			nProcs;
 } SpaceFillerParticleLayoutSuiteData;
 
 Mesh* SpaceFillerParticleLayoutSuite_BuildMesh( unsigned nDims, unsigned* size, double* minCrds, double* maxCrds, ExtensionManager_Register* emReg ) {
@@ -88,14 +88,14 @@ Mesh* SpaceFillerParticleLayoutSuite_BuildMesh( unsigned nDims, unsigned* size, 
 
 void SpaceFillerParticleLayoutSuite_Setup( SpaceFillerParticleLayoutSuiteData* data ) {
 	Dimension_Index	dim;
-	char					input_file[PCU_PATH_MAX];
+	char		input_file[PCU_PATH_MAX];
 	
 	/* MPI Initializations */
 	data->comm = MPI_COMM_WORLD;  
-   MPI_Comm_rank( data->comm, &data->rank );
-   MPI_Comm_size( data->comm, &data->nProcs );
+	MPI_Comm_rank( data->comm, &data->rank );
+	MPI_Comm_size( data->comm, &data->nProcs );
    
-   data->nDims = 3;
+	data->nDims = 3;
 	data->meshSize[0] = 4;	data->meshSize[1] = 2;	data->meshSize[2] = 1;
 	data->minCrds[0] = 0.0; data->minCrds[1] = 0.0; data->minCrds[2] = 0.0;
 	data->maxCrds[0] = 400.0; data->maxCrds[1] = 200.0; data->maxCrds[2] = 100.0;
@@ -133,11 +133,9 @@ void SpaceFillerParticleLayoutSuite_Teardown( SpaceFillerParticleLayoutSuiteData
 }
 
 void SpaceFillerParticleLayoutSuite_TestSpaceFillerParticle( SpaceFillerParticleLayoutSuiteData* data ) {
-	double 						x,y,z;
-	unsigned int 				p, i, len;
-	int							procToWatch;
-	Stream*						stream;
-	char 							expected_file[PCU_PATH_MAX];
+	int	procToWatch;
+	Stream*	stream;
+	char	expected_file[PCU_PATH_MAX];
 	
 	if( data->nProcs >= 2 ) {
 		procToWatch = 1;
@@ -160,7 +158,7 @@ void SpaceFillerParticleLayoutSuite_TestSpaceFillerParticle( SpaceFillerParticle
 }
 
 void SpaceFillerParticleLayoutSuite( pcu_suite_t* suite ) {
-   pcu_suite_setData( suite, SpaceFillerParticleLayoutSuiteData );
-   pcu_suite_setFixtures( suite, SpaceFillerParticleLayoutSuite_Setup, SpaceFillerParticleLayoutSuite_Teardown );
-   pcu_suite_addTest( suite, SpaceFillerParticleLayoutSuite_TestSpaceFillerParticle );
+	pcu_suite_setData( suite, SpaceFillerParticleLayoutSuiteData );
+	pcu_suite_setFixtures( suite, SpaceFillerParticleLayoutSuite_Setup, SpaceFillerParticleLayoutSuite_Teardown );
+	pcu_suite_addTest( suite, SpaceFillerParticleLayoutSuite_TestSpaceFillerParticle );
 }

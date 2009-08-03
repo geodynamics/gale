@@ -46,16 +46,16 @@
 #include "ElementCellLayoutSuite.h"
 
 typedef struct {
-	unsigned							nDims;
-	unsigned							meshSize[3];
-	double							minCrds[3];
-	double							maxCrds[3];
+	unsigned			nDims;
+	unsigned			meshSize[3];
+	double				minCrds[3];
+	double				maxCrds[3];
 	ExtensionManager_Register*	extensionMgr_Register;
-	Mesh*								mesh;
-	ElementCellLayout*			elementCellLayout;
-	MPI_Comm  				 		comm;
-   unsigned int   				rank;
-   unsigned int					nProcs;
+	Mesh*				mesh;
+	ElementCellLayout*		elementCellLayout;
+	MPI_Comm			comm;
+	unsigned int			rank;
+	unsigned int			nProcs;
 } ElementCellLayoutSuiteData;
 
 Mesh* buildMesh( unsigned nDims, unsigned* size, double* minCrds, double* maxCrds, ExtensionManager_Register* emReg ) {
@@ -83,8 +83,8 @@ Mesh* buildMesh( unsigned nDims, unsigned* size, double* minCrds, double* maxCrd
 void ElementCellLayoutSuite_Setup( ElementCellLayoutSuiteData* data ) {
 	/* MPI Initializations */	
 	data->comm = MPI_COMM_WORLD;  
-   MPI_Comm_rank( data->comm, &data->rank );
-   MPI_Comm_size( data->comm, &data->nProcs );
+	MPI_Comm_rank( data->comm, &data->rank );
+	MPI_Comm_size( data->comm, &data->nProcs );
 
 	data->nDims = 3;
 	data->meshSize[0] = 2;
@@ -113,10 +113,10 @@ void ElementCellLayoutSuite_Teardown( ElementCellLayoutSuiteData* data ) {
 }
 
 void ElementCellLayoutSuite_TestElementCellLayout( ElementCellLayoutSuiteData* data ) {
-	Cell_Index					cell;
-	Element_DomainIndex		element;
-	GlobalParticle          testParticle;
-	int							procToWatch;
+	Cell_Index		cell;
+	Element_DomainIndex	element;
+	GlobalParticle		testParticle;
+	int			procToWatch;
 		
 	if( data->nProcs >= 2 ) {
 		procToWatch = 1;
@@ -127,10 +127,10 @@ void ElementCellLayoutSuite_TestElementCellLayout( ElementCellLayoutSuiteData* d
 	
 	if( data->rank == procToWatch ) {
 		for( element = 0; element < Mesh_GetLocalSize( data->mesh, data->nDims ); element++ ) {
-			Cell_PointIndex			point;
-			Cell_PointIndex			count;
-			double***					cellPoints;
-			Bool							result;
+			Cell_PointIndex	point;
+			Cell_PointIndex	count;
+			double***	cellPoints;
+			Bool		result;
 	
 			cell = CellLayout_MapElementIdToCellId( data->elementCellLayout, element );
 
@@ -165,7 +165,7 @@ void ElementCellLayoutSuite_TestElementCellLayout( ElementCellLayoutSuiteData* d
 }
 
 void ElementCellLayoutSuite( pcu_suite_t* suite ) {
-   pcu_suite_setData( suite, ElementCellLayoutSuiteData );
-   pcu_suite_setFixtures( suite, ElementCellLayoutSuite_Setup, ElementCellLayoutSuite_Teardown );
-   pcu_suite_addTest( suite, ElementCellLayoutSuite_TestElementCellLayout );
+	pcu_suite_setData( suite, ElementCellLayoutSuiteData );
+	pcu_suite_setFixtures( suite, ElementCellLayoutSuite_Setup, ElementCellLayoutSuite_Teardown );
+	pcu_suite_addTest( suite, ElementCellLayoutSuite_TestElementCellLayout );
 }

@@ -11,11 +11,11 @@
 #include <assert.h>
 #include <string.h>
 
-const Type StGermain_SingleAttractor_Type = "StGermain_SingleAttractor";
+const Type StgDomain_SingleAttractor_Type = "StgDomain_SingleAttractor";
 
 typedef struct {
 	__Codelet
-} StGermain_SingleAttractor;
+} StgDomain_SingleAttractor;
 
 struct _Particle {
 	__GlobalParticle
@@ -23,7 +23,7 @@ struct _Particle {
 	double  randomColour;
 };
 
-void StGermain_SingleAttractor_UpdatePositions( DomainContext* context ) {
+void StgDomain_SingleAttractor_UpdatePositions( DomainContext* context ) {
 	Cell_LocalIndex			lCell_I;
 	Particle_InCellIndex		cParticle_I;
 	Particle* 	        	currParticle;
@@ -94,7 +94,7 @@ void StGermain_SingleAttractor_UpdatePositions( DomainContext* context ) {
 }
 
 
-void _StGermain_SingleAttractor_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _StgDomain_SingleAttractor_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
 	DomainContext*   context;
 
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
@@ -102,15 +102,15 @@ void _StGermain_SingleAttractor_Construct( void* component, Stg_ComponentFactory
 		Journal_Register( Info_Type, "Context" ),
 		Dictionary_GetUnsignedInt_WithDefault( context->dictionary, "procToWatch", 0 ) );
 	
-	ContextEP_ReplaceAll( context, AbstractContext_EP_Solve, StGermain_SingleAttractor_UpdatePositions );
+	ContextEP_ReplaceAll( context, AbstractContext_EP_Solve, StgDomain_SingleAttractor_UpdatePositions );
 }
 
 
-void* _StGermain_SingleAttractor_DefaultNew( Name name ) {
+void* _StgDomain_SingleAttractor_DefaultNew( Name name ) {
 	return Codelet_New(
-			StGermain_SingleAttractor_Type,
-			_StGermain_SingleAttractor_DefaultNew,
-			_StGermain_SingleAttractor_Construct,
+			StgDomain_SingleAttractor_Type,
+			_StgDomain_SingleAttractor_DefaultNew,
+			_StgDomain_SingleAttractor_Construct,
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,
@@ -118,6 +118,6 @@ void* _StGermain_SingleAttractor_DefaultNew( Name name ) {
 			name );
 	}
 
-Index StGermain_SingleAttractor_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, StGermain_SingleAttractor_Type, "0", _StGermain_SingleAttractor_DefaultNew );
+Index StgDomain_SingleAttractor_Register( PluginsManager* pluginsManager ) {
+	return PluginsManager_Submit( pluginsManager, StgDomain_SingleAttractor_Type, "0", _StgDomain_SingleAttractor_DefaultNew );
 }

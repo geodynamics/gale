@@ -49,24 +49,24 @@ struct _Particle {
 };
 
 typedef struct {
-	unsigned							nDims;
-	unsigned							gaussParticles[3];
-	double							minCrds[3];
-	double							maxCrds[3];
+	unsigned			nDims;
+	unsigned			gaussParticles[3];
+	double				minCrds[3];
+	double				maxCrds[3];
 	ExtensionManager_Register*	extensionMgr_Register;
-	GaussParticleLayout*			gaussParticleLayout;
-	SingleCellLayout*				singleCellLayout;
-	Swarm*							swarm;
-	MPI_Comm       				comm;
-   unsigned int   				rank;
-   unsigned int   				nProcs;
+	GaussParticleLayout*		gaussParticleLayout;
+	SingleCellLayout*		singleCellLayout;
+	Swarm*				swarm;
+	MPI_Comm			comm;
+	unsigned int			rank;
+	unsigned int			nProcs;
 } GaussLayoutSingleCellSuiteData;
 
 void GaussLayoutSingleCellSuite_Setup( GaussLayoutSingleCellSuiteData* data ) {
 	/* MPI Initializations */
 	data->comm = MPI_COMM_WORLD;  
-   MPI_Comm_rank( data->comm, &data->rank );
-   MPI_Comm_size( data->comm, &data->nProcs );
+	MPI_Comm_rank( data->comm, &data->rank );
+	MPI_Comm_size( data->comm, &data->nProcs );
    
 	data->nDims = 3;
 	data->gaussParticles[0] = 2; data->gaussParticles[1] = 1; data->gaussParticles[2] = 3;
@@ -84,22 +84,22 @@ void GaussLayoutSingleCellSuite_Teardown( GaussLayoutSingleCellSuiteData* data )
 	Stg_Class_Delete( data->extensionMgr_Register );
 	/* Clean generated output files */
 	remove( "1ParticlePerDim_3D.dat" );
-   remove( "2ParticlesPerDim_3D.dat" );
-   remove( "3ParticlesPerDim_3D.dat" );
+	remove( "2ParticlesPerDim_3D.dat" );
+	remove( "3ParticlesPerDim_3D.dat" );
 }
 
 void GaussLayoutSingleCellSuite_Test1ParticlePerDim_3D( GaussLayoutSingleCellSuiteData* data ) {
-	Cell_PointIndex			count;
-	double 						x,y,z,w;
-	unsigned int 				p, i, len;
-	int							procToWatch;
-	LocalParticle* 			particle;
-	Coord 						minCell;
-	Coord 						maxCell;
-	Stream*						stream;
-	Particle_InCellIndex 	particlesPerDim[3] = {1, 1, 1};
-	Bool							dimExists[] = { True, True, True };	
-	char 							expected_file[PCU_PATH_MAX];
+	Cell_PointIndex		count;
+	double			x,y,z,w;
+	unsigned int		p, i, len;
+	int			procToWatch;
+	LocalParticle*		particle;
+	Coord			minCell;
+	Coord			maxCell;
+	Stream*			stream;
+	Particle_InCellIndex	particlesPerDim[3] = {1, 1, 1};
+	Bool			dimExists[] = { True, True, True };	
+	char			expected_file[PCU_PATH_MAX];
 	
 	if( data->nProcs >= 2 ) {
 		procToWatch = 1;
@@ -142,17 +142,17 @@ void GaussLayoutSingleCellSuite_Test1ParticlePerDim_3D( GaussLayoutSingleCellSui
 
 
 void GaussLayoutSingleCellSuite_Test2ParticlesPerDim_3D( GaussLayoutSingleCellSuiteData* data ) {
-	Cell_PointIndex			count;
-	double 						x,y,z,w;
-	unsigned int 				p, i, len;
-	int							procToWatch;
-	LocalParticle* 			particle;
-	Coord 						minCell;
-	Coord 						maxCell;
-	Stream*						stream;
-	Particle_InCellIndex 	particlesPerDim[3] = {2, 2, 2};
-	Bool							dimExists[] = { True, True, True };	
-	char 							expected_file[PCU_PATH_MAX];
+	Cell_PointIndex		count;
+	double			x,y,z,w;
+	unsigned int		p, i, len;
+	int			procToWatch;
+	LocalParticle*		particle;
+	Coord			minCell;
+	Coord			maxCell;
+	Stream*			stream;
+	Particle_InCellIndex	particlesPerDim[3] = {2, 2, 2};
+	Bool			dimExists[] = { True, True, True };	
+	char 			expected_file[PCU_PATH_MAX];
 	
 	if( data->nProcs >= 2 ) {
 		procToWatch = 1;
@@ -195,17 +195,17 @@ void GaussLayoutSingleCellSuite_Test2ParticlesPerDim_3D( GaussLayoutSingleCellSu
 
 
 void GaussLayoutSingleCellSuite_Test3ParticlesPerDim_3D( GaussLayoutSingleCellSuiteData* data ) {
-	Cell_PointIndex			count;
-	double 						x,y,z,w;
-	unsigned int 				p, i, len;
-	int							procToWatch;
-	LocalParticle* 			particle;
-	Coord 						minCell;
-	Coord 						maxCell;
-	Stream*						stream;
-	Particle_InCellIndex 	particlesPerDim[3] = {3, 3, 3};
-	Bool							dimExists[] = { True, True, True };	
-	char 							expected_file[PCU_PATH_MAX];
+	Cell_PointIndex		count;
+	double			x,y,z,w;
+	unsigned int		p, i, len;
+	int			procToWatch;
+	LocalParticle*		particle;
+	Coord			minCell;
+	Coord			maxCell;
+	Stream*			stream;
+	Particle_InCellIndex	particlesPerDim[3] = {3, 3, 3};
+	Bool			dimExists[] = { True, True, True };	
+	char			expected_file[PCU_PATH_MAX];
 	
 	if( data->nProcs >= 2 ) {
 		procToWatch = 1;
@@ -248,9 +248,9 @@ void GaussLayoutSingleCellSuite_Test3ParticlesPerDim_3D( GaussLayoutSingleCellSu
 
 
 void GaussLayoutSingleCellSuite( pcu_suite_t* suite ) {
-   pcu_suite_setData( suite, GaussLayoutSingleCellSuiteData );
-   pcu_suite_setFixtures( suite, GaussLayoutSingleCellSuite_Setup, GaussLayoutSingleCellSuite_Teardown );
-   pcu_suite_addTest( suite, GaussLayoutSingleCellSuite_Test1ParticlePerDim_3D );
+	pcu_suite_setData( suite, GaussLayoutSingleCellSuiteData );
+	pcu_suite_setFixtures( suite, GaussLayoutSingleCellSuite_Setup, GaussLayoutSingleCellSuite_Teardown );
+	pcu_suite_addTest( suite, GaussLayoutSingleCellSuite_Test1ParticlePerDim_3D );
 	pcu_suite_addTest( suite, GaussLayoutSingleCellSuite_Test2ParticlesPerDim_3D );
 	pcu_suite_addTest( suite, GaussLayoutSingleCellSuite_Test3ParticlesPerDim_3D );
 }

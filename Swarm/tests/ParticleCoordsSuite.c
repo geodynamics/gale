@@ -50,11 +50,11 @@ struct _Particle {
 
 typedef struct {
 	ExtensionManager_Register*	extensionMgr_Register;
-	Variable_Register* 			variable_Register;
-	Swarm*							swarm;
-	MPI_Comm       				comm;
-   unsigned int   				rank;
-   unsigned int   				nProcs;
+	Variable_Register*		variable_Register;
+	Swarm*				swarm;
+	MPI_Comm			comm;
+	unsigned int			rank;
+	unsigned int			nProcs;
 } ParticleCoordsSuiteData;
 
 void ParticleCoordsSuite_Setup( ParticleCoordsSuiteData* data ) {
@@ -62,8 +62,8 @@ void ParticleCoordsSuite_Setup( ParticleCoordsSuiteData* data ) {
 
 	/* MPI Initializations */
 	data->comm = MPI_COMM_WORLD;  
-   MPI_Comm_rank( data->comm, &data->rank );
-   MPI_Comm_size( data->comm, &data->nProcs );
+	MPI_Comm_rank( data->comm, &data->rank );
+	MPI_Comm_size( data->comm, &data->nProcs );
 
 	data->extensionMgr_Register = ExtensionManager_Register_New();   
 	data->variable_Register = Variable_Register_New();
@@ -77,12 +77,12 @@ void ParticleCoordsSuite_Teardown( ParticleCoordsSuiteData* data ) {
 }
 
 void ParticleCoordsSuite_TestLineParticle( ParticleCoordsSuiteData* data ) {
-	int							procToWatch;
-	Stream*						stream;
-	Dictionary*        		dictionary;
-	DomainContext*    		context;
-	char 							input_file[PCU_PATH_MAX];
-	char 							expected_file[PCU_PATH_MAX];
+	int		procToWatch;
+	Stream*		stream;
+	Dictionary*	dictionary;
+	DomainContext*	context;
+	char		input_file[PCU_PATH_MAX];
+	char		expected_file[PCU_PATH_MAX];
 	
 	if( data->nProcs >= 2 ) {
 		procToWatch = 1;
@@ -114,7 +114,7 @@ void ParticleCoordsSuite_TestLineParticle( ParticleCoordsSuiteData* data ) {
 }
 
 void ParticleCoordsSuite( pcu_suite_t* suite ) {
-   pcu_suite_setData( suite, ParticleCoordsSuiteData );
-   pcu_suite_setFixtures( suite, ParticleCoordsSuite_Setup, ParticleCoordsSuite_Teardown );
-   pcu_suite_addTest( suite, ParticleCoordsSuite_TestLineParticle );
+	pcu_suite_setData( suite, ParticleCoordsSuiteData );
+	pcu_suite_setFixtures( suite, ParticleCoordsSuite_Setup, ParticleCoordsSuite_Teardown );
+	pcu_suite_addTest( suite, ParticleCoordsSuite_TestLineParticle );
 }

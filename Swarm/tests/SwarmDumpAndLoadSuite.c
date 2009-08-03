@@ -52,26 +52,26 @@ struct _Particle {
 };
 
 typedef struct {
-	unsigned							nDims;
-	unsigned							meshSize[3];
-	double							minCrds[3];
-	double							maxCrds[3];
+	unsigned			nDims;
+	unsigned			meshSize[3];
+	double				minCrds[3];
+	double				maxCrds[3];
 	ExtensionManager_Register*	extensionMgr_Register;
-	Mesh*								mesh;
-	Swarm*							swarm;
-	ElementCellLayout*			elementCellLayout;
+	Mesh*				mesh;
+	Swarm*				swarm;
+	ElementCellLayout*		elementCellLayout;
 	RandomParticleLayout*		randomParticleLayout;
 	ParticleMovementHandler		*movementHandler;
-	Dictionary*						dictionary;
-	DomainContext*   				context;
-	MPI_Comm       				comm;
-   unsigned int   				rank;
-   unsigned int   				nProcs;
+	Dictionary*			dictionary;
+	DomainContext*			context;
+	MPI_Comm			comm;
+	unsigned int			rank;
+	unsigned int			nProcs;
 } SwarmDumpAndLoadSuiteData;
 
 Mesh* SwarmDumpAndLoadSuite_BuildMesh( unsigned nDims, unsigned* size, double* minCrds, double* maxCrds, ExtensionManager_Register* emReg ) {
 	CartesianGenerator*	gen;
-	Mesh*						mesh;
+	Mesh*			mesh;
 
 	gen = CartesianGenerator_New( "" );
 	CartesianGenerator_SetDimSize( gen, nDims );
@@ -99,12 +99,11 @@ Mesh* SwarmDumpAndLoadSuite_BuildMesh( unsigned nDims, unsigned* size, double* m
 }
 
 
-void SwarmDumpAndLoadSuite_UpdateParticlePositionsTowardsAttractor( Swarm* swarm, Coord attractorPoint, Processor_Index rank, Processor_Index procToWatch )
-{
-	Cell_LocalIndex			lCell_I;
-	Particle_InCellIndex		cParticle_I;
-	Particle*					currParticle;
-	Index							dim_I;
+void SwarmDumpAndLoadSuite_UpdateParticlePositionsTowardsAttractor( Swarm* swarm, Coord attractorPoint, Processor_Index rank, Processor_Index procToWatch ) {
+	Cell_LocalIndex		lCell_I;
+	Particle_InCellIndex	cParticle_I;
+	Particle*		currParticle;
+	Index			dim_I;
 
 	for ( lCell_I=0; lCell_I < swarm->cellLocalCount; lCell_I++ ) {
 		if( rank == procToWatch ) {
@@ -140,14 +139,14 @@ void SwarmDumpAndLoadSuite_UpdateParticlePositionsTowardsAttractor( Swarm* swarm
 }
 void SwarmDumpAndLoadSuite_Setup( SwarmDumpAndLoadSuiteData* data ) {
 	Dimension_Index	dim;
-	char					input_file[PCU_PATH_MAX];
+	char		input_file[PCU_PATH_MAX];
 	
 	/* MPI Initializations */
 	data->comm = MPI_COMM_WORLD;  
-   MPI_Comm_rank( data->comm, &data->rank );
-   MPI_Comm_size( data->comm, &data->nProcs );
+	MPI_Comm_rank( data->comm, &data->rank );
+	MPI_Comm_size( data->comm, &data->nProcs );
    
-   data->nDims = 3;
+	data->nDims = 3;
 	data->meshSize[0] = 32;	data->meshSize[1] = 32;	data->meshSize[2] = 32;
 	data->minCrds[0] = 0.0; data->minCrds[1] = 0.0; data->minCrds[2] = 0.0;
 	data->maxCrds[0] = 1.0; data->maxCrds[1] = 1.0; data->maxCrds[2] = 1.0;
@@ -199,21 +198,19 @@ void SwarmDumpAndLoadSuite_Teardown( SwarmDumpAndLoadSuiteData* data ) {
 }
 
 void SwarmDumpAndLoadSuite_TestSwarmDumpAndLoad( SwarmDumpAndLoadSuiteData* data ) {
-	double 					x,y,z;
-	int						procToWatch;
-	unsigned int 			p, i, len;
-	Stream*					stream;
-	Index						dim_I;
-	Index						timeStep;
-	Coord						attractorPoint;
-	Particle_Index			lParticle_I = 0;
-	AbstractContext*		context = NULL;
-	SwarmDump*				swarmDumper = NULL;
-	Swarm*					newSwarm = NULL;
-	Swarm*					swarmList[1];
+	int			procToWatch;
+	Stream*			stream;
+	Index			dim_I;
+	Index			timeStep;
+	Coord			attractorPoint;
+	Particle_Index		lParticle_I = 0;
+	AbstractContext*	context = NULL;
+	SwarmDump*		swarmDumper = NULL;
+	Swarm*			newSwarm = NULL;
+	Swarm*			swarmList[1];
 	FileParticleLayout*	fileParticleLayout = NULL;
-	char 						expected_file[PCU_PATH_MAX];
-	char              	output_file[PCU_PATH_MAX];
+	char 			expected_file[PCU_PATH_MAX];
+	char			output_file[PCU_PATH_MAX];
 	
 	if( data->nProcs >= 2 ) {
 		procToWatch = 1;
@@ -280,7 +277,7 @@ void SwarmDumpAndLoadSuite_TestSwarmDumpAndLoad( SwarmDumpAndLoadSuiteData* data
 }
 
 void SwarmDumpAndLoadSuite( pcu_suite_t* suite ) {
-   pcu_suite_setData( suite, SwarmDumpAndLoadSuiteData );
-   pcu_suite_setFixtures( suite, SwarmDumpAndLoadSuite_Setup, SwarmDumpAndLoadSuite_Teardown );
-   pcu_suite_addTest( suite, SwarmDumpAndLoadSuite_TestSwarmDumpAndLoad );
+	pcu_suite_setData( suite, SwarmDumpAndLoadSuiteData );
+	pcu_suite_setFixtures( suite, SwarmDumpAndLoadSuite_Setup, SwarmDumpAndLoadSuite_Teardown );
+	pcu_suite_addTest( suite, SwarmDumpAndLoadSuite_TestSwarmDumpAndLoad );
 }

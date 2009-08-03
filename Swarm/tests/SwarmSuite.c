@@ -49,23 +49,23 @@ struct _Particle {
 };
 
 typedef struct {
-	unsigned							nDims;
-	unsigned							meshSize[3];
-	double							minCrds[3];
-	double							maxCrds[3];
+	unsigned			nDims;
+	unsigned			meshSize[3];
+	double				minCrds[3];
+	double				maxCrds[3];
 	ExtensionManager_Register*	extensionMgr_Register;
-	Mesh*								mesh;
-	ElementCellLayout*			elementCellLayout;
+	Mesh*				mesh;
+	ElementCellLayout*		elementCellLayout;
 	RandomParticleLayout*		randomParticleLayout;
-	Swarm*							swarm;
-	MPI_Comm       				comm;
-   unsigned int   				rank;
-   unsigned int   				nProcs;
+	Swarm*				swarm;
+	MPI_Comm			comm;
+	unsigned int			rank;
+	unsigned int			nProcs;
 } SwarmSuiteData;
 
 Mesh* SwarmSuite_BuildMesh( unsigned nDims, unsigned* size, double* minCrds, double* maxCrds, ExtensionManager_Register* emReg ) {
 	CartesianGenerator*	gen;
-	Mesh*						mesh;
+	Mesh*			mesh;
 
 	gen = CartesianGenerator_New( "" );
 	CartesianGenerator_SetDimSize( gen, nDims );
@@ -124,8 +124,8 @@ Bool SwarmSuite_TestParticleSearchFunc( Swarm* swarm, Coord coord, Stream* strea
 void SwarmSuite_Setup( SwarmSuiteData* data ) {
 	/* MPI Initializations */
 	data->comm = MPI_COMM_WORLD;  
-   MPI_Comm_rank( data->comm, &data->rank );
-   MPI_Comm_size( data->comm, &data->nProcs );
+	MPI_Comm_rank( data->comm, &data->rank );
+	MPI_Comm_size( data->comm, &data->nProcs );
 
 	data->nDims = 3;
 	data->meshSize[0] = 2; data->meshSize[1] =  3; data->meshSize[2] = 2;
@@ -163,7 +163,7 @@ void SwarmSuite_Teardown( SwarmSuiteData* data ) {
 
 void SwarmSuite_TestParticleSearch( SwarmSuiteData* data ) {
 	double	coord[3];
-	int		procToWatch;
+	int	procToWatch;
 	Stream*	stream = Journal_Register (Info_Type, "TestParticleSearch");
 	
 	if( data->nProcs >= 2 ) {
@@ -191,8 +191,8 @@ void SwarmSuite_TestParticleSearch( SwarmSuiteData* data ) {
 }
 
 void SwarmSuite_TestParticleCoords( SwarmSuiteData* data ) {
-	char 		expected_file[PCU_PATH_MAX];
-	int		procToWatch;
+	char 	expected_file[PCU_PATH_MAX];
+	int	procToWatch;
 	Stream*	stream = Journal_Register (Info_Type, "TestParticleCorrds");
 	
 	if( data->nProcs >= 2 ) {
@@ -214,8 +214,8 @@ void SwarmSuite_TestParticleCoords( SwarmSuiteData* data ) {
 }
 
 void SwarmSuite( pcu_suite_t* suite ) {
-   pcu_suite_setData( suite, SwarmSuiteData );
-   pcu_suite_setFixtures( suite, SwarmSuite_Setup, SwarmSuite_Teardown );
-   pcu_suite_addTest( suite, SwarmSuite_TestParticleSearch );
-   pcu_suite_addTest( suite, SwarmSuite_TestParticleCoords );
+	pcu_suite_setData( suite, SwarmSuiteData );
+	pcu_suite_setFixtures( suite, SwarmSuite_Setup, SwarmSuite_Teardown );
+	pcu_suite_addTest( suite, SwarmSuite_TestParticleSearch );
+	pcu_suite_addTest( suite, SwarmSuite_TestParticleCoords );
 }
