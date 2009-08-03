@@ -135,7 +135,6 @@ void GaussLayoutSuite_Test1ParticlePerDim_3D( GaussLayoutSuiteData* data ) {
 	else {
 		procToWatch = 0;
 	}
-	if( data->rank == procToWatch ) printf( "Watching rank: %i\n", data->rank );
 
 	stream = Journal_Register( Info_Type, "1ParticlePerDim_3D" );
 	Stream_RedirectFile( stream, "1ParticlePerDim_3D.dat" );
@@ -167,8 +166,6 @@ void GaussLayoutSuite_Test1ParticlePerDim_3D( GaussLayoutSuiteData* data ) {
 		y = 0.5 * ( maxCell[1] - minCell[1] ) * ( particle->xi[1] + 1.0 ) + minCell[1];
 		z = 0.5 * ( maxCell[2] - minCell[2] ) * ( particle->xi[2] + 1.0 ) + minCell[2];
 		
-		printf( "pId=%d : coords = { %.12f, %.12f, %.12f }, xi = { %.12f, %.12f, %.12f }\n", 
-			p, x, y, z, particle->xi[0], particle->xi[1], particle->xi[2] );
 		Journal_Printf( stream, "pId=%d : coords = { %.12f, %.12f, %.12f }, xi = { %.12f, %.12f, %.12f }\n", 
 			p, x, y, z, particle->xi[0], particle->xi[1], particle->xi[2] );	
 	}
@@ -196,7 +193,6 @@ void GaussLayoutSuite_Test2ParticlesPerDim_3D( GaussLayoutSuiteData* data ) {
 	else {
 		procToWatch = 0;
 	}
-	if( data->rank == procToWatch ) printf( "Watching rank: %i\n", data->rank );
 
 	stream = Journal_Register( Info_Type, "2ParticlesPerDim_3D" );
 	Stream_RedirectFile( stream, "2ParticlesPerDim_3D.dat" );
@@ -228,8 +224,6 @@ void GaussLayoutSuite_Test2ParticlesPerDim_3D( GaussLayoutSuiteData* data ) {
 		y = 0.5 * ( maxCell[1] - minCell[1] ) * ( particle->xi[1] + 1.0 ) + minCell[1];
 		z = 0.5 * ( maxCell[2] - minCell[2] ) * ( particle->xi[2] + 1.0 ) + minCell[2];
 		
-		printf( "pId=%d : coords = { %.12f, %.12f, %.12f }, xi = { %.12f, %.12f, %.12f }\n", 
-			p, x, y, z, particle->xi[0], particle->xi[1], particle->xi[2] );
 		Journal_Printf( stream, "pId=%d : coords = { %.12f, %.12f, %.12f }, xi = { %.12f, %.12f, %.12f }\n", 
 			p, x, y, z, particle->xi[0], particle->xi[1], particle->xi[2] );	
 	}
@@ -258,7 +252,6 @@ void GaussLayoutSuite_Test3ParticlesPerDim_3D( GaussLayoutSuiteData* data ) {
 	else {
 		procToWatch = 0;
 	}
-	if( data->rank == procToWatch ) printf( "Watching rank: %i\n", data->rank );
 	
 	stream = Journal_Register( Info_Type, "3ParticlesPerDim_3D" );
 	Stream_RedirectFile( stream, "3ParticlesPerDim_3D.dat" );
@@ -290,8 +283,6 @@ void GaussLayoutSuite_Test3ParticlesPerDim_3D( GaussLayoutSuiteData* data ) {
 		y = 0.5 * ( maxCell[1] - minCell[1] ) * ( particle->xi[1] + 1.0 ) + minCell[1];
 		z = 0.5 * ( maxCell[2] - minCell[2] ) * ( particle->xi[2] + 1.0 ) + minCell[2];
 		
-		printf( "pId=%d : coords = { %.12f, %.12f, %.12f }, xi = { %.12f, %.12f, %.12f }\n", 
-			p, x, y, z, particle->xi[0], particle->xi[1], particle->xi[2] );
 		Journal_Printf( stream, "pId=%d : coords = { %.12f, %.12f, %.12f }, xi = { %.12f, %.12f, %.12f }\n", 
 			p, x, y, z, particle->xi[0], particle->xi[1], particle->xi[2] );	
 	}

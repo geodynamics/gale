@@ -107,7 +107,6 @@ void GaussLayoutSingleCellSuite_Test1ParticlePerDim_3D( GaussLayoutSingleCellSui
 	else {
 		procToWatch = 0;
 	}
-	if( data->rank == procToWatch ) printf( "Watching rank: %i\n", data->rank );
 	
 	/* Configure the element-cell-layout */
 	data->singleCellLayout = SingleCellLayout_New( "singleCellLayout", dimExists, NULL, NULL );
@@ -133,7 +132,6 @@ void GaussLayoutSingleCellSuite_Test1ParticlePerDim_3D( GaussLayoutSingleCellSui
 		y = ((IntegrationPoint*)Swarm_ParticleInCellAt( data->swarm, 0, p ))->xi[1]; 
 		z = ((IntegrationPoint*)Swarm_ParticleInCellAt( data->swarm, 0, p ))->xi[2]; 	
 		w = ((IntegrationPoint*)Swarm_ParticleInCellAt( data->swarm, 0, p ))->weight;
-		printf( "pId=%d : xi = { %f, %f, %f } weight = %f\n",p,x,y,z,w );
 		Journal_Printf( stream, "pId=%d : xi = { %f, %f, %f } weight = %f\n",p,x,y,z,w );	
 	}	
 	pcu_filename_expected( "testGaussLayoutSingleCell1ParticlePerDimOutput.expected", expected_file );
@@ -160,7 +158,6 @@ void GaussLayoutSingleCellSuite_Test2ParticlesPerDim_3D( GaussLayoutSingleCellSu
 	else {
 		procToWatch = 0;
 	}
-	if( data->rank == procToWatch ) printf( "Watching rank: %i\n", data->rank );
 	
 	/* Configure the element-cell-layout */
 	data->singleCellLayout = SingleCellLayout_New( "singleCellLayout", dimExists, NULL, NULL );
@@ -186,7 +183,6 @@ void GaussLayoutSingleCellSuite_Test2ParticlesPerDim_3D( GaussLayoutSingleCellSu
 		y = ((IntegrationPoint*)Swarm_ParticleInCellAt( data->swarm, 0, p ))->xi[1]; 
 		z = ((IntegrationPoint*)Swarm_ParticleInCellAt( data->swarm, 0, p ))->xi[2]; 	
 		w = ((IntegrationPoint*)Swarm_ParticleInCellAt( data->swarm, 0, p ))->weight;
-		printf( "pId=%d : xi = { %f, %f, %f } weight = %f\n",p,x,y,z,w );
 		Journal_Printf( stream, "pId=%d : xi = { %f, %f, %f } weight = %f\n",p,x,y,z,w );	
 	}	
 	pcu_filename_expected( "testGaussLayoutSingleCell2ParticlesPerDimOutput.expected", expected_file );
@@ -213,8 +209,6 @@ void GaussLayoutSingleCellSuite_Test3ParticlesPerDim_3D( GaussLayoutSingleCellSu
 	else {
 		procToWatch = 0;
 	}
-	if( data->rank == procToWatch ) printf( "Watching rank: %i\n", data->rank );
-	
 	/* Configure the element-cell-layout */
 	data->singleCellLayout = SingleCellLayout_New( "singleCellLayout", dimExists, NULL, NULL );
 	
@@ -239,7 +233,6 @@ void GaussLayoutSingleCellSuite_Test3ParticlesPerDim_3D( GaussLayoutSingleCellSu
 		y = ((IntegrationPoint*)Swarm_ParticleInCellAt( data->swarm, 0, p ))->xi[1]; 
 		z = ((IntegrationPoint*)Swarm_ParticleInCellAt( data->swarm, 0, p ))->xi[2]; 	
 		w = ((IntegrationPoint*)Swarm_ParticleInCellAt( data->swarm, 0, p ))->weight;
-		printf( "pId=%d : xi = { %f, %f, %f } weight = %f\n",p,x,y,z,w );
 		Journal_Printf( stream, "pId=%d : xi = { %f, %f, %f } weight = %f\n",p,x,y,z,w );	
 	}	
 	pcu_filename_expected( "testGaussLayoutSingleCell3ParticlesPerDimOutput.expected", expected_file );

@@ -137,27 +137,20 @@ void ElementCellLayoutSuite_TestElementCellLayout( ElementCellLayoutSuiteData* d
 			pcu_check_true( cell == element );
 
 			count = data->elementCellLayout->_pointCount( data->elementCellLayout, cell );
-			printf( "cellPointTbl  [%2u][0-%u]:\n", cell, count );
 			cellPoints = Memory_Alloc_Array( double**, count, "cellPoints" );
 			/* for the element cell layout, the elements map to cells as 1:1, as such the "points" which define the cell as the
 			 * same as the "nodes" which define the element */
 			data->elementCellLayout->_initialisePoints( data->elementCellLayout, cell, count, cellPoints );
-			for( point = 0; point < count; point++ ) {
-				printf( "\t{%.3g %.3g %.3g}\n", (*cellPoints[point])[0], (*cellPoints[point])[1], (*cellPoints[point])[2] );
-			}
-			printf( "\n" );
 
 			testParticle.coord[0] = ( (*cellPoints[0])[0] + (*cellPoints[1])[0] ) / 2;
 			testParticle.coord[1] = ( (*cellPoints[0])[1] + (*cellPoints[2])[1] ) / 2;
 			testParticle.coord[2] = ( (*cellPoints[0])[2] + (*cellPoints[4])[2] ) / 2;
 			pcu_check_true( CellLayout_IsInCell( data->elementCellLayout, cell, &testParticle ) );
-			printf( "%d\n", result );
 
 			testParticle.coord[0] = (*cellPoints[count-2])[0] + 1;
 			testParticle.coord[1] = (*cellPoints[count-2])[1] + 1;
 			testParticle.coord[2] = (*cellPoints[count-2])[2] + 1;
 			pcu_check_true( !CellLayout_IsInCell( data->elementCellLayout, cell, &testParticle ) );
-			printf( "%d\n", result );
 
 			Memory_Free( cellPoints );
 		}
