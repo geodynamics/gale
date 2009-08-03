@@ -79,7 +79,7 @@ env.PCUTest('tests/testStgDomain', suites,
             PROJECT="StgDomain")
 
 # Build plugins.
-dirs = Split('libStgDomain/Toolbox')
+dirs = Split('libStgDomain/Toolbox Swarm/tests/SingleAttractor')
 for d in dirs:
 
     name = 'StgDomain_' + d.split('/')[-1] + 'module'
