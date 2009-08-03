@@ -227,7 +227,7 @@ void _lucColourMap_Print( void* colourMap, Stream* stream ) {
 		lucColour_SetTerminalColours( &black, &colourFromValue, stream );
 		Journal_Printf( stream, " " );
 	}
-	lucColour_SetTerminalColours( &black, &white, stream );
+	lucColour_SetTerminalColours( &white, &black, stream );
 	Journal_Printf( stream, "\n" );
 
 	/* Print Scale For Colour Map */
@@ -300,23 +300,22 @@ void _lucColourMap_Execute( void* colourMap, void* data ) { }
 void _lucColourMap_Destroy( void* colourMap, void* data ) { }
 
 void lucColourMap_GetColourFromValue( void* colourMap, double value, lucColour* colour ) {
-   /* Scale value to range [0,1] */
+	lucColourMap* self        = colourMap;
+
+    /* Scale value to range [0,1] */
     float scaledValue = lucColourMap_ScaleValue(colourMap, value);
 
     /* Convert scaled value to colour */
     lucColourMap_GetColourFromScaledValue(colourMap, scaledValue, colour );
 
     /* Check for invalid range - set colour to invisible */
-    if (scaledValue < 0) colour->opacity = 0;
+    if (self->maximum == self->minimum) colour->opacity = 0;
 }
 
 float lucColourMap_ScaleValue( void* colourMap, double value ) {
 	lucColourMap* self        = colourMap;
 	float         scaledValue;
 	float 	      max, min, centre, sampleValue;
-
-    /* Colour map range invalid */
-    if (self->maximum == self->minimum) return -1;
 
     /* To get a log scale, transform each value to log10(value) */
 	if (self->logScale == True) {

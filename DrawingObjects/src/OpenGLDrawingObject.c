@@ -168,9 +168,10 @@ void _lucOpenGLDrawingObject_Destroy( void* drawingObject, void* data ) {}
 void _lucOpenGLDrawingObject_Setup( void* drawingObject, void* context ) {
 	lucOpenGLDrawingObject*           self            = (lucOpenGLDrawingObject*)drawingObject;
 
-	/* Create OpenGL list */
-	if (self->displayList) glDeleteLists( self->displayList, 1 );
-	self->displayList = glGenLists( 1 );
+    /* Generate a display list id */
+	if (!self->displayList)	self->displayList = glGenLists( 1 );
+
+	/* Create/replace OpenGL display list */
 	glNewList( self->displayList, GL_COMPILE);
 
 	/* Run the virtual function for building the display list - 

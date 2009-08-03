@@ -134,6 +134,7 @@ void _lucMeshViewer_Init(
 	lucColour_FromString( &self->localColour, localColourName );
 	lucColour_FromString( &self->shadowColour, shadowColourName );
 	lucColour_FromString( &self->vacantColour, vacantColourName );
+    self->lineWidth = lineWidth;
 	
 	assert( Stg_Class_IsInstance( mesh, Mesh_Type ) );
 
@@ -613,7 +614,7 @@ void lucMeshViewer_RenderEdges_WithInc( lucMeshViewer* self, vertexFuncType* ver
 		vertexFunc( Mesh_GetVertex( self->mesh, incVerts[0] ) );
 		vertexFunc( Mesh_GetVertex( self->mesh, incVerts[1] ) );
 	}
-	glEnd();
+    glEnd();
 	glEnable(GL_LIGHTING);
 
 	NewClass_Delete( inc );

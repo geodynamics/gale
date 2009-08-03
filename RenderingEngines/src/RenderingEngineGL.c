@@ -114,15 +114,11 @@ lucRenderingEngineGL* _lucRenderingEngineGL_New(
 }
 
 void _lucRenderingEngineGL_Init( 
-		lucRenderingEngineGL*                                      self  ) 
-{
-        printf("RENDER INIT\n");
-}
+		lucRenderingEngineGL*                                      self  ) {}
 
 void _lucRenderingEngineGL_Delete( void* renderingEngine ) {
 	lucRenderingEngineGL*  self = (lucRenderingEngineGL*)renderingEngine;
 
-        printf("RENDER DELETE\n");
 	_lucRenderingEngine_Delete( self );
 }
 

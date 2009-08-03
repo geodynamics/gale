@@ -378,7 +378,6 @@ void _lucColourBar_Draw( void* drawingObject, lucWindow* window, lucViewportInfo
                 tickValue = self->tickValues[i];
                 /* Calculate scaled position from value */
                 scaledPos = lucColourMap_ScaleValue(colourMap, tickValue);
-                if (scaledPos < 0) scaledPos = 0;
             }
 
             /* Calculate pixel position */
