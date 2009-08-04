@@ -91,17 +91,11 @@ Mesh* ManualParticleLayoutSuite_BuildMesh( unsigned nDims, unsigned* size, doubl
 
 void ManualParticleLayoutSuite_Setup( ManualParticleLayoutSuiteData* data ) {
 	Dimension_Index	dim;
-	char		input_file[PCU_PATH_MAX];
 	
 	/* MPI Initializations */
 	data->comm = MPI_COMM_WORLD;  
 	MPI_Comm_rank( data->comm, &data->rank );
 	MPI_Comm_size( data->comm, &data->nProcs );
-   
-	/* Read in the input xml file. */
-	/*pcu_filename_input( "testManualParticleLayoutInput.xml", input_file );
-	data->context = (DomainContext*)stgMainInitFromXML( input_file, data->comm );
-	dictionary = data->context->dictionary;*/
    
 	data->nDims = 3;
 	data->meshSize[0] = 2;	data->meshSize[1] = 3;	data->meshSize[2] = 2;
@@ -167,6 +161,8 @@ void ManualParticleLayoutSuite_Teardown( ManualParticleLayoutSuiteData* data ) {
 	Stg_Class_Delete( data->mesh );
 	Stg_Class_Delete( data->extensionMgr_Register );
 	Stg_Class_Delete( data->dictionary );	
+	/* Purge output files */
+	remove( "manualParticle.dat" );
 }
 
 void ManualParticleLayoutSuite_TestManualParticle( ManualParticleLayoutSuiteData* data ) {
