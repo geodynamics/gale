@@ -218,7 +218,7 @@ void _ShapeFeVariable_Initialise( void* shapeFeVariable, void* data ) {
 	Stg_Component_Initialise( self->shape, data, False );
 	_FeVariable_Initialise( self, data );
 
-	/* Set up the basic "level set" describiing if nodes are inside the shape or not */
+	/* Set up the basic "level set" describing if nodes are inside the shape or not */
 	for ( node_dI = 0; node_dI < Mesh_GetDomainSize( self->feMesh, MT_VERTEX ); node_dI++ ) {
 		if ( True == Stg_Shape_IsCoordInside( self->shape, Mesh_GetVertex( self->feMesh, node_dI ) ) ) {
 /* 			set value = 1 */

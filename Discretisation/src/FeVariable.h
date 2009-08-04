@@ -327,8 +327,13 @@
 	/** Reads in everything to initialise a built FeVariable from a file */
 	void FeVariable_ReadFromFile( void* feVariable, const char* filename );
 
-	/** Reads in everything from a FeVariable file defined on a seperate mesh */
-	void FeVariable_InterpolateFromFile( void* feVariable, const char* filename );
+	/** Reads in everything to initialise a built FeVariable from a file. 
+	    This function also performs required interpolation where simulation 
+	    mesh resolution does not match file mesh resolution
+	    you must provide the feVariable which is being initialised, the filename of the checkpointed feVariable
+	    from which interpolation is being performed, and its corresponding mesh filename */
+	void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, const char* feVarFilename, const char* meshFilename );
+
 	/** Evaluates Spatial Derivatives using shape functions */
 	Bool FeVariable_InterpolateDerivativesAt( void* variable, double* globalCoord, double* value ) ;
 	

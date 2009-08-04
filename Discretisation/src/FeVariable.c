@@ -42,6 +42,7 @@
 #include <mpi.h>
 #include <StGermain/StGermain.h>
 #include <StgDomain/StgDomain.h>
+#include <StgFEM/StgFEM.h>
 #include "units.h"
 #include "types.h"
 #include "ElementType.h"
@@ -353,7 +354,7 @@ void _FeVariable_Init(
 
 	if ( templateFeVariable )
 		self->templateFeVariable = Stg_CheckType( templateFeVariable, FeVariable );
-	if( !self->isReferenceSolution ) {
+	if( !isReferenceSolution ) {
 		if ( self->templateFeVariable ) {
 			self->eqNum = self->templateFeVariable->eqNum;
 		}
@@ -631,7 +632,6 @@ void _FeVariable_Initialise( void* variable, void* data ) {
 		FeVariable_ReadFromFile( self, filename );
 
 		Memory_Free( filename );
-		Memory_Free( inputPathString );
 		Stream_UnIndentBranch( StgFEM_Debug );
 		return;
 	}
@@ -653,17 +653,24 @@ void _FeVariable_Initialise( void* variable, void* data ) {
 			 
 #ifdef READ_HDF5
 			Stg_asprintf( &filename, "%s%s.%.5u.h5", inputPathString, self->name, context->restartTimestep );
+         if (!context->interpolateRestart)
+            FeVariable_ReadFromFile( self, filename );
+         else {
+            char * meshFilename = NULL;
+            Stg_asprintf( &meshFilename, "%sMesh.%.5u.h5", inputPathString, context->restartTimestep );
+            FeVariable_InterpolateFromFile( self, context, filename, meshFilename );
+            Memory_Free( meshFilename );
+         }
+			
 #else
 			Stg_asprintf( &filename, "%s%s.%.5u.dat", inputPathString, self->name, context->restartTimestep );
 #endif
-			FeVariable_ReadFromFile( self, filename );
-			/** TODO: maybe we want a mechanism in future to over-ride the checkpointed ICs in certain regions too
-			so the user can introduce new phenomena into the model */
 
 			Memory_Free( filename );
-			Memory_Free( inputPathString );
+			
 		}
 	}
+	Memory_Free( inputPathString );
 	Stream_UnIndent( self->debug );
 
    /** also include check to see if this fevariable should be checkpointed, just incase it didn't go through the fieldvariable construct phase */ 
@@ -2378,7 +2385,9 @@ void FeVariable_ReadFromFile( void* feVariable, const char* filename ) {
                ( (sizes[0] == res[0]) && (sizes[1] == res[1]) ), 
                errorStr,
                "\n\nError in %s for %s '%s'\n"
-               "Size of mesh (%u,%u) for checkpoint file (%s) does not correspond to simulation mesh size (%u, %u).\n", 
+               "Size of mesh (%u,%u) for checkpoint file (%s) does not correspond to simulation mesh size (%u,%u).\n\n"
+               "If you would like to interpolate checkpoint data to simulation mesh size\n"
+               "    please re-launch using '--interpolateRestart=1' flag\n\n", 
                __func__, self->type, self->name, 
                (unsigned int) res[0], (unsigned int) res[1],
                filename,
@@ -2388,7 +2397,9 @@ void FeVariable_ReadFromFile( void* feVariable, const char* filename ) {
                ( (sizes[0] == res[0]) && (sizes[1] == res[1]) && (sizes[2] == res[2]) ), 
                errorStr,
                "\n\nError in %s for %s '%s'\n"
-               "Size of mesh (%u,%u,%u) for checkpoint file (%s) does not correspond to simulation mesh size (%u,%u,%u).\n", 
+               "Size of mesh (%u,%u,%u) for checkpoint file (%s) does not correspond to simulation mesh size (%u,%u,%u).\n\n"
+               "If you would like to interpolate checkpoint data to simulation mesh size\n"
+               "    please re-launch using '--interpolateRestart=1' flag\n\n", 
                __func__, self->type, self->name, 
                (unsigned int) res[0], (unsigned int) res[1], (unsigned int) res[2],
                filename,
@@ -2468,6 +2479,12 @@ void FeVariable_ReadFromFile( void* feVariable, const char* filename ) {
 		}
 	}   
    Memory_Free( buf );
+
+   /** Close all handles */
+   H5Dclose( fileData );
+   H5Sclose( memSpace );
+   H5Sclose( fileSpace );
+   H5Fclose( file );
    
 #else   
 
@@ -2536,3 +2553,270 @@ void FeVariable_ReadFromFile( void* feVariable, const char* filename ) {
 	/** Sync shadow values now, as all procs should have required input */
 	FeVariable_SyncShadowValues( self );
 }
+
+
+void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, const char* feVarFilename, const char* meshFilename ){
+#ifdef READ_HDF5
+	FeVariable*                    self = (FeVariable*)feVariable;
+   CartesianGenerator*            gen;
+   C0Generator*                   C0gen;
+   FeMesh                         *feMesh, *C0feMesh, *elementMesh;
+   DofLayout*                     dofs;
+   FeEquationNumber*              eqNum;
+   Variable_Register*             varReg;
+   int                            maxDecomp[3] = {0, 1, 1};
+   static int                     arraySize;
+   static double*                 arrayPtrs[2];
+   Variable*                      var;
+   VariableCondition*             bcs;
+   ConditionFunction_Register*    cfReg;
+   Dictionary*                    dict;
+   XML_IO_Handler*                ioHandler;
+   FeVariable*                    feVar;
+   int                            n_i;
+   hid_t                          file, fileSpace, fileData, error;
+   unsigned                       totalNodes, ii;
+   FeCheckpointFileVersion        ver;
+   hid_t                          attrib_id, group_id;
+   herr_t                         status;
+   int                            res[3];
+	Stream*                        errorStr = Journal_Register( Error_Type, self->type );
+   int                            checkVer;
+   int                            ndims;
+   unsigned*                      sizes;
+	double			                crdMin[3], crdMax[3];
+	double*                        value;
+	unsigned		                   nDomainVerts;
+	static double*		             arrayPtr;
+   Name			                   varName[9];
+
+   /** Open the file and data set. */
+	file = H5Fopen( meshFilename, H5F_ACC_RDONLY, H5P_DEFAULT );
+	
+	Journal_Firewall(	file >= 0, errorStr,
+		"Error in %s for %s '%s' - Cannot open file %s.\n", 
+		__func__, self->type, self->name, meshFilename );
+
+   /** get the file attributes to sanity and version checks */
+   #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+      group_id  = H5Gopen(file, "/");
+      attrib_id = H5Aopen_name(group_id, "checkpoint file version");
+   #else
+      group_id  = H5Gopen(file, "/", H5P_DEFAULT);
+      attrib_id = H5Aopen(group_id, "checkpoint file version", H5P_DEFAULT);
+   #endif
+   /** if this attribute does not exist (attrib_id < 0) then we assume MeshCHECKPOINT_V1 which is not supported  */
+   if(attrib_id < 0)
+      Journal_Firewall(NULL, 
+                  errorStr,"\nError in %s for %s '%s' \n\n Interpolation restart not supported for Version 1 Checkpoint files \n\n", __func__, self->type, self->name );
+
+   /** check for known checkpointing version type */
+
+   status = H5Aread(attrib_id, H5T_NATIVE_INT, &checkVer);
+   H5Aclose(attrib_id);
+   if(checkVer != 2)
+      Journal_Firewall( (0), errorStr,
+         "\n\nError in %s for %s '%s'\n"
+         "Unknown checkpoint version (%u) for checkpoint file (%s).\n", 
+         __func__, self->type, self->name, (unsigned int) checkVer, meshFilename);
+
+   /** check for correct number of dimensions */
+
+   #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+      attrib_id = H5Aopen_name(group_id, "dimensions");
+   #else
+      attrib_id = H5Aopen(group_id, "dimensions", H5P_DEFAULT);
+   #endif
+   status = H5Aread(attrib_id, H5T_NATIVE_INT, &ndims);
+   H5Aclose(attrib_id);      
+   Journal_Firewall( (ndims == self->dim), errorStr,
+      "\n\nError in %s for %s '%s'\n"
+      "Number of dimensions (%u) for checkpoint file (%s) does not correspond to simulation dimensions (%u).\n", 
+      __func__, self->type, self->name, (unsigned int) ndims, meshFilename,
+      self->dim);
+
+   /** check for correct mesh size if expecting a cartesian mesh*/
+   
+   #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+      attrib_id = H5Aopen_name(group_id, "mesh resolution");
+   #else
+      attrib_id = H5Aopen(group_id, "mesh resolution", H5P_DEFAULT);
+   #endif
+   status = H5Aread(attrib_id, H5T_NATIVE_INT, &res);
+   H5Aclose(attrib_id);
+
+   /** Read in minimum coord. */
+   #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+      fileData = H5Dopen( file, "/min" );
+   #else
+      fileData = H5Dopen( file, "/min", H5P_DEFAULT );
+   #endif
+   H5Dread( fileData, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, &crdMin );
+   H5Dclose( fileData );
+      
+   /** Read in maximum coord. */
+   #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+      fileData = H5Dopen( file, "/max" );
+   #else
+      fileData = H5Dopen( file, "/max", H5P_DEFAULT );
+   #endif
+   H5Dread( fileData, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, &crdMax );
+   H5Dclose( fileData );
+
+   /** Close all handles */
+   H5Gclose(group_id);
+   H5Fclose( file );
+
+   /** create a cartesian mesh generator which will be required for the fevariable creation */
+   gen = CartesianGenerator_New( "" );
+   /** use the feVariable dimension size for mesh generator */
+   CartesianGenerator_SetDimSize( gen, self->dim );
+   /** use the element size read in from the checkpoint file for the new mesh generator */
+   CartesianGenerator_SetTopologyParams( gen, (unsigned*)res, 0, NULL, NULL );
+	/** use the feVariable's mesh's generator's crdMin and crdMax (which have been previously read in from checkpointed mesh file  */
+   CartesianGenerator_SetGeometryParams( gen, &crdMin, &crdMax );
+   /** set it so that the generator does not read in the mesh from a file - we will 
+              explicitly do this after we build the feMesh using the provided mesh checkpoint file */
+   gen->readFromFile = False;
+   /** create a feMesh */
+   feMesh = FeMesh_New( "" );
+   /** set feMesh to use generator we just created  */
+   Mesh_SetGenerator( feMesh, gen );
+   /** set the feMesh family to be the same as that of the feVariable we are initialising/interpolating ie constant, linear, etc 
+       unless we are initialising a constant mesh, in which case we set the element family to linear, and the mesh will be used 
+       as the elementMesh for the C0 generator */
+   if (!strcmp(self->feMesh->generator->type, CartesianGenerator_Type)){
+      FeMesh_SetElementFamily( feMesh, self->feMesh->feElFamily );
+      /** set periodicity according to current simulation */
+      gen->periodic[0] = ((CartesianGenerator*)self->feMesh->generator)->periodic[0];
+      gen->periodic[1] = ((CartesianGenerator*)self->feMesh->generator)->periodic[1];
+      gen->periodic[2] = ((CartesianGenerator*)self->feMesh->generator)->periodic[2];
+   } else if (!strcmp(self->feMesh->generator->type, C0Generator_Type)){
+      FeMesh_SetElementFamily( feMesh, "linear" );
+      /** set periodicity according to current simulation */
+      gen->periodic[0] = ((CartesianGenerator*)((C0Generator*)self->feMesh->generator)->elMesh)->periodic[0];
+      gen->periodic[1] = ((CartesianGenerator*)((C0Generator*)self->feMesh->generator)->elMesh)->periodic[1];
+      gen->periodic[2] = ((CartesianGenerator*)((C0Generator*)self->feMesh->generator)->elMesh)->periodic[2];
+   } else
+      Journal_Firewall(NULL, errorStr,"\nError in %s for %s '%s' \n\n Interpolation restart not supported for this mesh type \n\n", __func__, self->type, self->name );
+
+   /** now build the mesh, then read in the required coordinates from the given file */
+   Stg_Component_Build( feMesh, NULL, False );
+   CartesianGenerator_ReadFromHDF5(  gen, (Mesh*) feMesh, meshFilename );
+
+   /** where we are dealing with a constant mesh feVariable, we have to build a new C0 mesh */ 
+   if (!strcmp(self->feMesh->generator->type, C0Generator_Type)){
+      elementMesh = feMesh;
+      /** create the C0 generator */
+      C0gen = C0Generator_New( "" );
+      /** set it's element mesh to the feMesh create just above */
+      C0Generator_SetElementMesh( C0gen, (void*) elementMesh );
+      /** create a new feMesh */
+      C0feMesh = FeMesh_New( "" );
+      /** set feMesh to use generator we just created, and set its type to constant mesh  */
+      Mesh_SetGenerator( C0feMesh, C0gen );
+      FeMesh_SetElementFamily( C0feMesh, self->feMesh->feElFamily );
+      /** now build the mesh, which will generate the mesh using the provided generator */
+      Stg_Component_Build( C0feMesh, NULL, False );
+      /** reset the feMesh pointer to point to this C0 mesh */
+      feMesh = C0feMesh;
+   }
+   Stg_Component_Initialise( feMesh, NULL, False );
+   /** get the number of mesh vertices stored locally */   
+   nDomainVerts = Mesh_GetDomainSize( feMesh, MT_VERTEX );   
+
+   varReg = Variable_Register_New();
+   if (self->fieldComponentCount == 1){
+      var = Variable_NewScalar( "interpolation_temp_scalar", 
+                                 Variable_DataType_Double,
+                                 &nDomainVerts,
+                                 NULL,
+                                 &arrayPtr,
+                                 varReg );
+   }
+   else {
+      unsigned var_I;
+		for( var_I = 0; var_I < self->fieldComponentCount; var_I++ )
+			Stg_asprintf( &varName[var_I], "%s-loaded-Component-%d", self->name, var_I );
+      var = Variable_NewVector( "interpolation_temp_vector", 
+                                 Variable_DataType_Double,
+                                 self->fieldComponentCount,
+                                 &nDomainVerts,
+                                 NULL,
+                                 (void**)&arrayPtr,
+                                 varReg, 
+                                 varName[0], varName[1], varName[2], varName[3], varName[4],
+                                 varName[5], varName[6], varName[7], varName[8] );
+   }
+   Variable_Register_Add( varReg, var);
+   var->allocateSelf = True;   
+   Stg_Component_Build( var, NULL, False );
+
+   dofs = DofLayout_New( "interpolation_temp_dof", varReg, nDomainVerts, feMesh );
+	if( self->fieldComponentCount == 1 )
+		DofLayout_AddAllFromVariableArray( dofs, 1, &var );
+	else {
+      unsigned   var_I, node_I;
+      Variable*  variable;
+		for( var_I = 0; var_I < self->fieldComponentCount; var_I++ ) {
+			variable = Variable_Register_GetByName( varReg, varName[var_I] );
+			variable->arrayPtrPtr = &var->arrayPtr;
+
+			for( node_I = 0; node_I < nDomainVerts; node_I++ )
+				DofLayout_AddDof_ByVarName( dofs, varName[var_I], node_I );
+
+			Memory_Free( varName[var_I] );
+      }
+   }
+   Stg_Component_Build( dofs, NULL, False );
+   Stg_Component_Initialise( dofs, NULL, False );
+
+   feVar = FeVariable_New( "interpolation_temp_fevar", 
+                                               feMesh, 
+                                                 NULL, 
+                                                 dofs, 
+                                                 NULL, 
+                                                 NULL, 
+                                                 NULL, 
+                            self->fieldComponentCount, 
+                                                False, 
+                                                 True, 
+                                                False, 
+                                             NULL );
+   Stg_Component_Build( feVar, context, False );
+   /** not sure why these aren't being set correctly, so a little (tri/ha)ckery */
+   feVar->fieldComponentCount = self->fieldComponentCount;
+   feVar->dim = self->dim;
+   FeVariable_ReadFromFile( feVar, feVarFilename );
+   feVar->_syncShadowValues( feVar );
+
+   totalNodes = Mesh_GetLocalSize( self->feMesh, MT_VERTEX );
+   value      = Memory_Alloc_Array( double, self->fieldComponentCount, "interValue" );
+         
+   /** step through nodes, interpolating the required values from our newly created feVariable */
+   for( ii=0; ii<totalNodes; ii++ ) {
+      unsigned dof_I;
+      feVar->_interpolateValueAt( feVar, Mesh_GetVertex( self->feMesh, ii ), value);
+      FeVariable_SetValueAtNode( self, ii, value);
+   }
+   Memory_Free( value );
+
+   /** our work is done, so we clean up after ourselves */
+   _FeVariable_Delete(feVar);
+   _DofLayout_Delete(dofs);
+   _Variable_Delete(var);
+   _Variable_Register_Delete(varReg);
+   _FeMesh_Delete(feMesh);
+   if (!strcmp(self->feMesh->generator->type, C0Generator_Type)){
+      _C0Generator_Delete(C0gen);
+      _FeMesh_Delete(elementMesh);
+   }
+   _CartesianGenerator_Delete(gen);
+
+#else
+   Journal_Firewall(!context->interpolateRestart 
+               NULL, 
+               errorStream,"\n\n Interpolation restart not supported for ASCII checkpoint files \n\n");
+#endif   
+}
+
