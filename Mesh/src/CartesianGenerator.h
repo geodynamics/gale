@@ -82,6 +82,8 @@
 		Comm*		comm;								\
 		Bool		regular;							\
 		Bool		periodic[3];							\
+		/* read cartesian mesh data from checkpoint file? */                            \
+		Bool		readFromFile;							\
 		unsigned	maxDecompDims;							\
 		unsigned*	minDecomp;							\
 		unsigned*	maxDecomp;							\
@@ -100,18 +102,6 @@
                 double          contactGeom[3];
 
 	struct CartesianGenerator { __CartesianGenerator };
-
-	/* Checkpoint file version enum */
-	typedef enum MeshCheckpointFileVersion {
-                MeshCHECKPOINT_V1 = 1,      /** Original checkpointing format   */
-                MeshCHECKPOINT_V2           /** * No longer store nodes within checkpoint files
-                                            * now store attributes including
-                                                 checkpoint version
-                                                 number of dimensions
-                                                 cartesion mesh size
-                                            * now store mesh connectivity for xmdf generator
-                                            * mesh vertex hdf group renamed to 'vertices' (from 'data') */
-	} MeshCheckpointFileVersion;
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Constructors
@@ -232,5 +222,7 @@
 	void CartesianGenerator_Destruct( CartesianGenerator* self );
 	void CartesianGenerator_DestructTopology( CartesianGenerator* self );
 	void CartesianGenerator_DestructGeometry( CartesianGenerator* self );
+	void CartesianGenerator_ReadFromHDF5(  CartesianGenerator* self, Mesh* mesh, char* filename );
+	void CartesianGenerator_ReadFromASCII( CartesianGenerator* self, Mesh* mesh, char* filename );
 
 #endif /* __Domain_Mesh_CartesianGenerator_h__ */

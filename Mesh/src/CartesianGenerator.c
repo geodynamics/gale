@@ -149,6 +149,9 @@ void _CartesianGenerator_Init( CartesianGenerator* self ) {
 	self->range = NULL;
 	self->vertOrigin = NULL;
 	self->vertRange = NULL;
+   
+   /* set load from checkpoint to false by default */
+   self->readFromFile = False;
 }
 
 
@@ -304,24 +307,29 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
 
 		restartTimestep = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "restartTimestep", 0 );	
 		if( restartTimestep ) {
-         char*  meshReadFileName;
-         char*  meshReadFileNamePart;   
+         char*   meshReadFileName;
+         char*   meshReadFileNamePart;   
+#ifdef READ_HDF5
+         hid_t   attrib_id, group_id;
+         herr_t  status;
 
          meshReadFileNamePart = Context_GetCheckPointReadPrefixString( context );
 
-#ifdef WRITE_HDF5
          Stg_asprintf( &meshReadFileName, "%sMesh.%.5u.h5", meshReadFileNamePart, restartTimestep );
 	      
-	      /* Read in minimum coord. */
+	      /** Read in minimum coord. */
 	      file = H5Fopen( meshReadFileName, H5F_ACC_RDONLY, H5P_DEFAULT );
 	      
 	      if( !file ) {
+            /** file not found, so don't load from checkpoint */
+            self->readFromFile = False;
 				Journal_Printf( errorStream, 
 					"Warning - Couldn't find checkpoint mesh file with filename \"%s\".\n", 
 					meshReadFileName );
 			}
 			else {
-			
+         int res[self->nDims];
+
          #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
 	         fileData = H5Dopen( file, "/min" );
          #else
@@ -330,7 +338,7 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
 	         H5Dread( fileData, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, crdMin );
 	         H5Dclose( fileData );
 	         
-	         /* Read in maximum coord. */
+	         /** Read in maximum coord. */
          #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
 	         fileData = H5Dopen( file, "/max" );
          #else
@@ -338,11 +346,74 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
          #endif
 	         H5Dread( fileData, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, crdMax );
 	         H5Dclose( fileData );
-	         
-	         H5Fclose( file );
-	      }
+
+            /** get the file attributes  */
+         #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+            group_id  = H5Gopen(file, "/");
+            attrib_id = H5Aopen_name(group_id, "checkpoint file version");
+         #else
+            group_id  = H5Gopen(file, "/", H5P_DEFAULT);
+            attrib_id = H5Aopen(group_id, "checkpoint file version", H5P_DEFAULT);
+         #endif
+
+         /** check for correct mesh size */
+      
+         #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+            attrib_id = H5Aopen_name(group_id, "mesh resolution");
+         #else
+            attrib_id = H5Aopen(group_id, "mesh resolution", H5P_DEFAULT);
+         #endif
+         status = H5Aread(attrib_id, H5T_NATIVE_INT, &res);
+         H5Aclose(attrib_id);
+   
+         if(self->nDims == 2){
+            if( !( (size[0] == res[0]) && (size[1] == res[1]) )){
+               if (context->interpolateRestart)
+                  self->readFromFile = False;
+               else
+                  Journal_Firewall( 
+                     NULL, 
+                     errorStream,
+                     "\n\nError in %s for %s '%s'\n"
+                     "Size of mesh (%u,%u) for checkpoint file (%s) does not correspond to simulation mesh size (%u,%u).\n\n"
+                     "If you would like to interpolate checkpoint data to simulation mesh size\n"
+                     "    please re-launch using '--interpolateRestart=1' flag\n\n", 
+                     __func__, self->type, self->name, 
+                     (unsigned int) res[0], (unsigned int) res[1],
+                     meshReadFileName,
+                     (unsigned int) size[0], (unsigned int) size[1]);
+            }
+         } else {
+            if( !( (size[0] == res[0]) && (size[1] == res[1]) && (size[2] == res[2]) )){
+               if (context->interpolateRestart)
+                  self->readFromFile = False;
+               else
+                  Journal_Firewall( 
+                     NULL, 
+                     errorStream,
+                     "\n\nError in %s for %s '%s'\n"
+                     "Size of mesh (%u,%u,%u) for checkpoint file (%s) does not correspond to simulation mesh size (%u,%u,%u).\n\n"
+                     "If you would like to interpolate checkpoint data to simulation mesh size\n"
+                     "    please re-launch using '--interpolateRestart=1' flag\n\n", 
+                     __func__, self->type, self->name, 
+                     (unsigned int) res[0], (unsigned int) res[1], (unsigned int) res[2],
+                     meshReadFileName,
+                     (unsigned int) size[0], (unsigned int) size[1], (unsigned int) size[2]);
+               }
+            }
+
+         H5Gclose(group_id);
+         H5Fclose( file );
+         
+         }            
 	      
-#else	
+	      
+#else
+         Journal_Firewall(!context->interpolateRestart 
+                     NULL, 
+                     errorStream,"\n\n Interpolation restart not supported for ASCII checkpoint files \n\n");
+
+         meshReadFileNamePart = Context_GetCheckPointReadPrefixString( context );
 	      Stg_asprintf( &meshReadFileName, "%sMesh.%.5u.dat", meshReadFileNamePart, restartTimestep );
 	        
 			FILE* meshFile = fopen( meshReadFileName, "r" );	
@@ -354,6 +425,8 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
 				meshReadFileName );*/
 
 			if( meshFile == 0 ) {
+            /* file not found, so don't load from checkpoint */
+            self->readFromFile = False;            
 				Journal_Printf( errorStream, 
 					"Warning - Couldn't find checkpoint mesh file with filename \"%s\".\n", 
 					meshReadFileName );
@@ -2038,26 +2111,7 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
 	Sync*			      sync;
 	AbstractContext* 	context = (AbstractContext*)data;
 	Index			      meshStrLen;
-	Stream*			   errorStream = Journal_Register( Error_Type, self->type );
-	int			      rank, nRanks;
 	
-#ifdef READ_HDF5
-	hid_t             file, fileSpace, fileData;
-	hsize_t           start[2], count[2], size[2], maxSize[2];   
-	hid_t             memSpace, error;
-	double            buf[4];
-   Node_LocalIndex   lNode_I = 0;
-	Node_GlobalIndex  gNode_I = 0;
-   int               totalVerts, ii;
-   hid_t             props;
-#else
-	int               proc_I;
-	Node_LocalIndex   lNode_I = 0;
-	Node_GlobalIndex  gNode_I = 0;
-	FILE*             inputFile;
-	char              lineString[MAX_LINE_LENGTH];
-#endif
-
 	assert( self );
 	assert( mesh );
 
@@ -2070,322 +2124,46 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
 					 mesh->topo->nDims, 
 					 "Mesh::verts" );
 
-	if( context && context->restartTimestep && context->timeStep == context->restartTimestep ) {
+	if( context && context->restartTimestep && context->timeStep == context->restartTimestep && self->readFromFile) {
       char*  meshReadFileName;
       char*  meshReadFileNamePart;   
 
-		/* Loading from checkpoint */
-
-		MPI_Comm_rank( self->mpiComm, &rank );
-		MPI_Comm_size( self->mpiComm, &nRanks );
-
       meshReadFileNamePart = Context_GetCheckPointReadPrefixString( context );
-
 #ifdef READ_HDF5
       Stg_asprintf( &meshReadFileName, "%sMesh.%.5u.h5", meshReadFileNamePart, context->restartTimestep );
-
       Journal_Printf( stream, "... loading from file %s.\n", meshReadFileName );
-		
-      /* Open the file and data set. */
-	   file = H5Fopen( meshReadFileName, H5F_ACC_RDONLY, H5P_DEFAULT );
-		
-	   if( file < 0 ) {
-			Journal_Printf( errorStream, 
-				"Warning - Couldn't find checkpoint mesh file with filename \"%s\".\n", 
-				meshReadFileName );
-			
-			Grid*			      grid;
-			unsigned*		   inds;
-	      double*			   steps;
-	      unsigned          d_i;
-	
-			/* Build grid and space for indices. */
-	      grid = self->vertGrid;
-	      inds = Memory_Alloc_Array_Unnamed( unsigned, mesh->topo->nDims );
-
-	      /* Calculate steps. */
-	      steps = Memory_Alloc_Array_Unnamed( double, mesh->topo->nDims );
-	      for( d_i = 0; d_i < mesh->topo->nDims; d_i++ )
-		      steps[d_i] = self->crdMax[d_i] - self->crdMin[d_i];
-		
-			CartesianGenerator_CalcGeom( self, mesh, sync, grid, inds, steps );
-			
-			/* Free resources. */
-	      FreeArray( inds );
-	      FreeArray( steps );
-		}
-		else {
-         unsigned int noffset;
-         MeshCheckpointFileVersion ver;
-         hid_t   attrib_id, group_id;
-         herr_t  status;
-         char* verticeName;
-
-         /** get the file attributes to sanity and version checks */
-         #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
-            group_id  = H5Gopen(file, "/");
-            attrib_id = H5Aopen_name(group_id, "checkpoint file version");
-         #else
-            group_id  = H5Gopen(file, "/", H5P_DEFAULT);
-            attrib_id = H5Aopen(group_id, "checkpoint file version", H5P_DEFAULT);
-         #endif
-         /** if this attribute does not exist (attrib_id < 0) then we assume MeshCHECKPOINT_V1 and continue without checking attributes */
-         if(attrib_id < 0)
-            ver = MeshCHECKPOINT_V1;
-         else {
-            int checkVer;
-            int ndims;
-            int res[self->nDims];
-            unsigned*  sizes;
-      
-            /** check for known checkpointing version type */
-      
-            status = H5Aread(attrib_id, H5T_NATIVE_INT, &checkVer);
-            H5Aclose(attrib_id);
-            if(checkVer == 2)
-               ver = MeshCHECKPOINT_V2;
-            else
-               Journal_Firewall( (0), errorStream,
-                  "\n\nError in %s for %s '%s'\n"
-                  "Unknown checkpoint version (%u) for checkpoint file (%s).\n", 
-                  __func__, self->type, self->name, (unsigned int) checkVer, meshReadFileName);
-      
-            /** check for correct number of dimensions */
-      
-            #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
-               attrib_id = H5Aopen_name(group_id, "dimensions");
-            #else
-               attrib_id = H5Aopen(group_id, "dimensions", H5P_DEFAULT);
-            #endif
-            status = H5Aread(attrib_id, H5T_NATIVE_INT, &ndims);
-            H5Aclose(attrib_id);      
-            Journal_Firewall( (ndims == self->nDims), errorStream,
-               "\n\nError in %s for %s '%s'\n"
-               "Number of dimensions (%u) for checkpoint file (%s) does not correspond to simulation dimensions (%u).\n", 
-               __func__, self->type, self->name, (unsigned int) ndims, meshReadFileName,
-               self->nDims);
-      
-            /** check for correct mesh size */
-            
-            #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
-               attrib_id = H5Aopen_name(group_id, "mesh resolution");
-            #else
-               attrib_id = H5Aopen(group_id, "mesh resolution", H5P_DEFAULT);
-            #endif
-            status = H5Aread(attrib_id, H5T_NATIVE_INT, &res);
-            H5Aclose(attrib_id);
-
-            sizes = Grid_GetSizes( self->elGrid ); /** global no. of elements in each dim */
-            if(self->nDims == 2)
-               Journal_Firewall( 
-                  ( (sizes[0] == res[0]) && (sizes[1] == res[1]) ), 
-                  errorStream,
-                  "\n\nError in %s for %s '%s'\n"
-                  "Size of mesh (%u,%u) for checkpoint file (%s) does not correspond to simulation mesh size (%u, %u).\n", 
-                  __func__, self->type, self->name, 
-                  (unsigned int) res[0], (unsigned int) res[1],
-                  meshReadFileName,
-                  (unsigned int) sizes[0], (unsigned int) sizes[1]);
-            else
-               Journal_Firewall( 
-                  ( (sizes[0] == res[0]) && (sizes[1] == res[1]) && (sizes[2] == res[2]) ), 
-                  errorStream,
-                  "\n\nError in %s for %s '%s'\n"
-                  "Size of mesh (%u,%u,%u) for checkpoint file (%s) does not correspond to simulation mesh size (%u,%u,%u).\n", 
-                  __func__, self->type, self->name, 
-                  (unsigned int) res[0], (unsigned int) res[1], (unsigned int) res[2],
-                  meshReadFileName,
-                  (unsigned int) sizes[0], (unsigned int) sizes[1], (unsigned int) sizes[2]);
-         }
-         H5Gclose(group_id);
-         
-         /** account for different versions of checkpointing */
-         switch ( ver ) {
-            case MeshCHECKPOINT_V1:
-               noffset = 1;
-               Stg_asprintf( &verticeName, "/data" );
-               break;
-            case MeshCHECKPOINT_V2:
-               noffset = 0;
-               Stg_asprintf( &verticeName, "/vertices" );
-               break;
-            default:
-               Journal_Firewall( 0, errorStream,
-                  "Error: in %s: unknown checkpoint file version.\n",
-                  __func__ ); 
-         }
-      	
-	      /* Prepare to read vertices from file */		
-         #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
-	      fileData = H5Dopen( file, verticeName );
-         #else
-	      fileData = H5Dopen( file, verticeName, H5P_DEFAULT );
-         #endif
-	      fileSpace = H5Dget_space( fileData );
-         Memory_Free( verticeName );
-         start[1] = 0;
-	      count[0] = 1;
-	      count[1] = mesh->topo->nDims + noffset;
-         memSpace = H5Screate_simple( 2, count, NULL );
-         totalVerts = Mesh_GetGlobalSize( mesh, 0 );
-
-         /* Get size of dataspace to check consistency */
-         H5Sget_simple_extent_dims( fileSpace, size, maxSize ); 
-
-         Journal_Firewall( 
-            (maxSize[0] == totalVerts), 
-            errorStream,
-            "\n\nError in %s for %s '%s'\n"
-            "Number of mesh vertices (%u) stored in %s does not correspond to total number of requested mesh vertices (%u).\n", 
-            __func__, 
-            self->type, 
-            self->name, 
-            (unsigned int)maxSize[0],
-            meshReadFileName,
-            totalVerts);
-
-	      for( ii=0; ii<totalVerts; ii++ ) {   
-	         start[0] = ii;
-                  
-            H5Sselect_hyperslab( fileSpace, H5S_SELECT_SET, start, NULL, count, NULL );
-            H5Sselect_all( memSpace );
-            
-            error = H5Dread( fileData, H5T_NATIVE_DOUBLE, memSpace, fileSpace, H5P_DEFAULT, buf );
-            gNode_I = ii;
-
-            Journal_Firewall( 
-               error >= 0, 
-               errorStream,
-               "\n\nError in %s for %s '%s' - Cannot read data in %s.\n", 
-               __func__, 
-               self->type, 
-               self->name, 
-               meshReadFileName );
-            
-            if( Mesh_GlobalToDomain( mesh, MT_VERTEX, gNode_I, &lNode_I ) && 
-		          lNode_I < Mesh_GetLocalSize( mesh, MT_VERTEX ) )
-		      {
-			      double *vert;
-
-			      vert = Mesh_GetVertex( mesh, lNode_I );
-			      vert[0] = buf[0 + noffset];
-               vert[1] = buf[1 + noffset];
-			      if( mesh->topo->nDims ==3 )
-				      vert[2] = buf[2 + noffset];
-		      }
-	      }
-	   	      
-	      /* Close handles */
-	      H5Sclose( memSpace );
-	      H5Sclose( fileSpace );
-	      H5Dclose( fileData );
-	      H5Fclose( file );
-	   }
-	   
+      CartesianGenerator_ReadFromHDF5( self, mesh, meshReadFileName );
 #else
       Stg_asprintf( &meshReadFileName, "%sMesh.%.5u.dat", meshReadFileNamePart, context->restartTimestep );
-      
       Journal_Printf( stream, "... loading from file %s.\n", meshReadFileName );
-      
-      /* This loop used to stop 2 processors trying to open the file at the same time, which
-	   * seems to cause problems */
-	   for ( proc_I = 0; proc_I < nRanks; proc_I++ ) {
-		   MPI_Barrier( self->mpiComm );
-		   if ( proc_I == rank ) {
-			   /* Do the following since in parallel on some systems, the file
-			    * doesn't get re-opened at the start automatically. */
-			   inputFile = fopen( meshReadFileName, "r" );
-
-			   /*if ( !inputFile ) {
-				   Stream*    errorStr = Journal_Register( Error_Type, self->type );
-				   Journal_Firewall( 0, errorStr, "Error- in %s(): Couldn't find mesh checkpoint file with "
-					   "filename \"%s\" - aborting.\n", __func__, meshReadFileName );
-					
-			   }*/
-			   
-			   /* If the file was not found, calculate mesh coordinates (so old checkpoint files can be used) */
-		      if( !inputFile ) {
-			      Journal_Printf( errorStream, 
-				      "Warning - Couldn't find mesh checkpoint file with filename \"%s\".\n", 
-				      meshReadFileName );
-			
-			      Grid*			      grid;
-			      unsigned*		   inds;
-	            double*			   steps;
-	            unsigned          d_i;
-	      
-			      /* Build grid and space for indices. */
-	            grid = self->vertGrid;
-	            inds = Memory_Alloc_Array_Unnamed( unsigned, mesh->topo->nDims );
-
-	            /* Calculate steps. */
-	            steps = Memory_Alloc_Array_Unnamed( double, mesh->topo->nDims );
-	            for( d_i = 0; d_i < mesh->topo->nDims; d_i++ )
-		            steps[d_i] = self->crdMax[d_i] - self->crdMin[d_i];
-		
-			      CartesianGenerator_CalcGeom( self, mesh, sync, grid, inds, steps );
-			      
-			      /* Free resources. */
-	            FreeArray( inds );
-	            FreeArray( steps );
-	            
-	            return;
-		      }
-		      
-			   rewind( inputFile );
-		   }
-	   }
-	   
-		fgets( lineString, MAX_LINE_LENGTH, inputFile );
-      fgets( lineString, MAX_LINE_LENGTH, inputFile );
-	
-      while ( !feof(inputFile) ) {
-		   fscanf( inputFile, "%u ", &gNode_I );
-		   if( Mesh_GlobalToDomain( mesh, MT_VERTEX, gNode_I, &lNode_I ) && 
-		       lNode_I < Mesh_GetLocalSize( mesh, MT_VERTEX ) )
-		   {
-			   double crds[3];
-			   double *vert;
-
-			   fscanf( inputFile, "%lg %lg %lg ", crds, crds + 1, crds + 2 );
-			   vert = Mesh_GetVertex( mesh, lNode_I );
-			   vert[0] = crds[0];
-			   if( self->nDims >= 2 )
-				   vert[1] = crds[1];
-			   if( self->nDims >=3 )
-				   vert[2] = crds[2];
-		   }
-		   else {
-			   fgets( lineString, MAX_LINE_LENGTH, inputFile );
-		   }
-		}   
+      CartesianGenerator_ReadFromASCII( self, mesh, meshReadFileName);      
 #endif
+      Memory_Free( meshReadFileName );
+      Memory_Free( meshReadFileNamePart );
       Mesh_Sync( mesh );
       
-		Memory_Free( meshReadFileName );
-      Memory_Free( meshReadFileNamePart );
-	}
-	else {
-	   Grid*			      grid;
-		unsigned*		   inds;
-	   double*			   steps;
-	   unsigned          d_i;
-	      
-	   /* Build grid and space for indices. */
-	   grid = self->vertGrid;
-	   inds = Memory_Alloc_Array_Unnamed( unsigned, mesh->topo->nDims );
+	} else { 
+      Grid*			      grid;
+      unsigned*		   inds;
+      double*			   steps;
+      unsigned          d_i;
 
-	   /* Calculate steps. */
-	   steps = Memory_Alloc_Array_Unnamed( double, mesh->topo->nDims );
-	   for( d_i = 0; d_i < mesh->topo->nDims; d_i++ )
-		   steps[d_i] = self->crdMax[d_i] - self->crdMin[d_i];
-		
-		CartesianGenerator_CalcGeom( self, mesh, sync, grid, inds, steps );
-		
-		/* Free resources. */
-	   FreeArray( inds );
-	   FreeArray( steps );
+      /* Build grid and space for indices. */
+      grid = self->vertGrid;
+      inds = Memory_Alloc_Array_Unnamed( unsigned, mesh->topo->nDims );
+
+      /* Calculate steps. */
+      steps = Memory_Alloc_Array_Unnamed( double, mesh->topo->nDims );
+      for( d_i = 0; d_i < mesh->topo->nDims; d_i++ )
+         steps[d_i] = self->crdMax[d_i] - self->crdMin[d_i];
+   
+      CartesianGenerator_CalcGeom( self, mesh, sync, grid, inds, steps );
+      
+      /* Free resources. */
+      FreeArray( inds );
+      FreeArray( steps );
 	}
+
 
 	MPI_Barrier( self->mpiComm );
 	Journal_Printf( stream, "... done.\n" );
@@ -2462,4 +2240,235 @@ void CartesianGenerator_DestructGeometry( CartesianGenerator* self ) {
 
 	FreeArray( self->crdMin );
 	FreeArray( self->crdMax );
+}
+
+void CartesianGenerator_ReadFromHDF5(  CartesianGenerator* self, Mesh* mesh, char* filename ){
+	hid_t             file, fileSpace, fileData;
+	hsize_t           start[2], count[2], size[2], maxSize[2];   
+	hid_t             memSpace, error;
+	double            buf[4];
+   Node_LocalIndex   lNode_I = 0;
+	Node_GlobalIndex  gNode_I = 0;
+   int               totalVerts, ii;
+   hid_t             props;
+   unsigned int noffset;
+   MeshCheckpointFileVersion ver;
+   hid_t   attrib_id, group_id;
+   herr_t  status;
+   char* verticeName;
+	Stream*			   errorStream = Journal_Register( Error_Type, self->type );   
+
+   /* Open the file and data set. */
+   file = H5Fopen( filename, H5F_ACC_RDONLY, H5P_DEFAULT );
+
+   /** get the file attributes to sanity and version checks */
+   #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+      group_id  = H5Gopen(file, "/");
+      attrib_id = H5Aopen_name(group_id, "checkpoint file version");
+   #else
+      group_id  = H5Gopen(file, "/", H5P_DEFAULT);
+      attrib_id = H5Aopen(group_id, "checkpoint file version", H5P_DEFAULT);
+   #endif
+   /** if this attribute does not exist (attrib_id < 0) then we assume MeshCHECKPOINT_V1 and continue without checking attributes */
+   if(attrib_id < 0)
+      ver = MeshCHECKPOINT_V1;
+   else {
+      int checkVer;
+      int ndims;
+      int res[self->nDims];
+      unsigned*  sizes;
+
+      /** check for known checkpointing version type */
+
+      status = H5Aread(attrib_id, H5T_NATIVE_INT, &checkVer);
+      H5Aclose(attrib_id);
+      if(checkVer == 2)
+         ver = MeshCHECKPOINT_V2;
+      else
+         Journal_Firewall( (0), errorStream,
+            "\n\nError in %s for %s '%s'\n"
+            "Unknown checkpoint version (%u) for checkpoint file (%s).\n", 
+            __func__, self->type, self->name, (unsigned int) checkVer, filename);
+
+      /** check for correct number of dimensions */
+
+      #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+         attrib_id = H5Aopen_name(group_id, "dimensions");
+      #else
+         attrib_id = H5Aopen(group_id, "dimensions", H5P_DEFAULT);
+      #endif
+      status = H5Aread(attrib_id, H5T_NATIVE_INT, &ndims);
+      H5Aclose(attrib_id);      
+      Journal_Firewall( (ndims == self->nDims), errorStream,
+         "\n\nError in %s for %s '%s'\n"
+         "Number of dimensions (%u) for checkpoint file (%s) does not correspond to simulation dimensions (%u).\n", 
+         __func__, self->type, self->name, (unsigned int) ndims, filename,
+         self->nDims);
+
+      /** check for correct mesh size */
+      
+      #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+         attrib_id = H5Aopen_name(group_id, "mesh resolution");
+      #else
+         attrib_id = H5Aopen(group_id, "mesh resolution", H5P_DEFAULT);
+      #endif
+      status = H5Aread(attrib_id, H5T_NATIVE_INT, &res);
+      H5Aclose(attrib_id);
+
+      sizes = Grid_GetSizes( self->elGrid ); /** global no. of elements in each dim */
+      if(self->nDims == 2)
+         Journal_Firewall( 
+            ( (sizes[0] == res[0]) && (sizes[1] == res[1]) ), 
+            errorStream,
+            "\n\nError in %s for %s '%s'\n"
+            "Size of mesh (%u,%u) for checkpoint file (%s) does not correspond to simulation mesh size (%u, %u).\n", 
+            __func__, self->type, self->name, 
+            (unsigned int) res[0], (unsigned int) res[1],
+            filename,
+            (unsigned int) sizes[0], (unsigned int) sizes[1]);
+      else
+         Journal_Firewall( 
+            ( (sizes[0] == res[0]) && (sizes[1] == res[1]) && (sizes[2] == res[2]) ), 
+            errorStream,
+            "\n\nError in %s for %s '%s'\n"
+            "Size of mesh (%u,%u,%u) for checkpoint file (%s) does not correspond to simulation mesh size (%u,%u,%u).\n", 
+            __func__, self->type, self->name, 
+            (unsigned int) res[0], (unsigned int) res[1], (unsigned int) res[2],
+            filename,
+            (unsigned int) sizes[0], (unsigned int) sizes[1], (unsigned int) sizes[2]);
+   }
+   H5Gclose(group_id);
+   
+   /** account for different versions of checkpointing */
+   switch ( ver ) {
+      case MeshCHECKPOINT_V1:
+         noffset = 1;
+         Stg_asprintf( &verticeName, "/data" );
+         break;
+      case MeshCHECKPOINT_V2:
+         noffset = 0;
+         Stg_asprintf( &verticeName, "/vertices" );
+         break;
+      default:
+         Journal_Firewall( 0, errorStream,
+            "Error: in %s: unknown checkpoint file version.\n",
+            __func__ ); 
+   }
+   
+   /* Prepare to read vertices from file */		
+   #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+   fileData = H5Dopen( file, verticeName );
+   #else
+   fileData = H5Dopen( file, verticeName, H5P_DEFAULT );
+   #endif
+   fileSpace = H5Dget_space( fileData );
+   Memory_Free( verticeName );
+   start[1] = 0;
+   count[0] = 1;
+   count[1] = mesh->topo->nDims + noffset;
+   memSpace = H5Screate_simple( 2, count, NULL );
+   totalVerts = Mesh_GetGlobalSize( mesh, 0 );
+
+   /* Get size of dataspace to check consistency */
+   H5Sget_simple_extent_dims( fileSpace, size, maxSize ); 
+
+   Journal_Firewall( 
+      (maxSize[0] == totalVerts), 
+      errorStream,
+      "\n\nError in %s for %s '%s'\n"
+      "Number of mesh vertices (%u) stored in %s does not correspond to total number of requested mesh vertices (%u).\n", 
+      __func__, 
+      self->type, 
+      self->name, 
+      (unsigned int)maxSize[0],
+      filename,
+      totalVerts);
+
+   for( ii=0; ii<totalVerts; ii++ ) {   
+      start[0] = ii;
+            
+      H5Sselect_hyperslab( fileSpace, H5S_SELECT_SET, start, NULL, count, NULL );
+      H5Sselect_all( memSpace );
+      
+      error = H5Dread( fileData, H5T_NATIVE_DOUBLE, memSpace, fileSpace, H5P_DEFAULT, buf );
+      gNode_I = ii;
+
+      Journal_Firewall( 
+         error >= 0, 
+         errorStream,
+         "\n\nError in %s for %s '%s' - Cannot read data in %s.\n", 
+         __func__, 
+         self->type, 
+         self->name, 
+         filename );
+      
+      if( Mesh_GlobalToDomain( mesh, MT_VERTEX, gNode_I, &lNode_I ) && 
+          lNode_I < Mesh_GetLocalSize( mesh, MT_VERTEX ) )
+      {
+         double *vert;
+
+         vert = Mesh_GetVertex( mesh, lNode_I );
+         vert[0] = buf[0 + noffset];
+         vert[1] = buf[1 + noffset];
+         if( mesh->topo->nDims ==3 )
+            vert[2] = buf[2 + noffset];
+      }
+   }
+         
+   /* Close handles */
+   H5Sclose( memSpace );
+   H5Sclose( fileSpace );
+   H5Dclose( fileData );
+   H5Fclose( file );
+   
+}
+
+void CartesianGenerator_ReadFromASCII( CartesianGenerator* self, Mesh* mesh, char* filename ){
+   int               proc_I;
+	Node_LocalIndex   lNode_I = 0;
+	Node_GlobalIndex  gNode_I = 0;
+	FILE*             inputFile;
+	char              lineString[MAX_LINE_LENGTH];
+	int			      rank, nRanks;
+
+   MPI_Comm_rank( self->mpiComm, &rank );
+   MPI_Comm_size( self->mpiComm, &nRanks );
+
+   /* This loop used to stop 2 processors trying to open the file at the same time, which
+   * seems to cause problems */
+   for ( proc_I = 0; proc_I < nRanks; proc_I++ ) {
+      MPI_Barrier( self->mpiComm );
+      if ( proc_I == rank ) {
+         /* Do the following since in parallel on some systems, the file
+          * doesn't get re-opened at the start automatically. */
+         inputFile = fopen( filename, "r" );
+
+         rewind( inputFile );
+      }
+   }
+   
+   fgets( lineString, MAX_LINE_LENGTH, inputFile );
+   fgets( lineString, MAX_LINE_LENGTH, inputFile );
+
+   while ( !feof(inputFile) ) {
+      fscanf( inputFile, "%u ", &gNode_I );
+      if( Mesh_GlobalToDomain( mesh, MT_VERTEX, gNode_I, &lNode_I ) && 
+          lNode_I < Mesh_GetLocalSize( mesh, MT_VERTEX ) )
+      {
+         double crds[3];
+         double *vert;
+
+         fscanf( inputFile, "%lg %lg %lg ", crds, crds + 1, crds + 2 );
+         vert = Mesh_GetVertex( mesh, lNode_I );
+         vert[0] = crds[0];
+         if( self->nDims >= 2 )
+            vert[1] = crds[1];
+         if( self->nDims >=3 )
+            vert[2] = crds[2];
+      }
+      else {
+         fgets( lineString, MAX_LINE_LENGTH, inputFile );
+      }
+   }
+
 }

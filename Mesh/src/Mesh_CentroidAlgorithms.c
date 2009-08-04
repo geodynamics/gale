@@ -102,8 +102,6 @@ void _Mesh_CentroidAlgorithms_Init( Mesh_CentroidAlgorithms* self ) {
 void _Mesh_CentroidAlgorithms_Delete( void* centroidAlgorithms ) {
 	Mesh_CentroidAlgorithms*	self = (Mesh_CentroidAlgorithms*)centroidAlgorithms;
 
-	NewClass_Delete( self->incArray );
-
 	/* Delete the parent. */
 	_Mesh_Algorithms_Delete( self );
 }

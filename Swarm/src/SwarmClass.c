@@ -477,8 +477,7 @@ void* _Swarm_Copy( void* swarm, void* dest, Bool deep, Name nameExt, PtrMap* ptr
 		newSwarm->cellLayout = (CellLayout*)Stg_Class_Copy( self->cellLayout, NULL, deep, nameExt, map );
 		newSwarm->particleLayout = (ParticleLayout*)Stg_Class_Copy( self->particleLayout, NULL, deep, nameExt, map );
 		newSwarm->debug = (Stream*)Stg_Class_Copy( self->debug, NULL, deep, nameExt, map );
-		newSwarm->particleExtensionMgr = (ExtensionManager*)Stg_Class_Copy( self->particleExtensionMgr, NULL, deep, nameExt, map 
-);
+		newSwarm->particleExtensionMgr = (ExtensionManager*)Stg_Class_Copy( self->particleExtensionMgr, NULL, deep, nameExt, map );
 		newSwarm->commHandlerList = (Stg_ObjectList*)Stg_Class_Copy( self->commHandlerList, NULL, deep, nameExt, map );
 		
 		/* Arrays */
@@ -1283,7 +1282,7 @@ Particle_InCellIndex Swarm_FindClosestParticleInCell( void* swarm, Cell_DomainIn
 	double               minDistance         = HUGE_VAL;
 	double               distanceToParticle;
 
-	/* TODO: need to reconsideer - gauss particle layout should be allowed, but not swarms that have no local
+	/* TODO: need to reconsider - gauss particle layout should be allowed, but not swarms that have no local
 	 * co-ordinates */
 	/*
 	Journal_Firewall(
