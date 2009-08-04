@@ -126,9 +126,13 @@
 		char*					outputPath; \
 		char*					checkpointReadPath; \
 		char*					checkpointWritePath; \
+		/** user set bool to determine whether checkpoint (or data) files should be placed in a per timestep directory */ \
 		Bool                                    checkpointAppendStep;      \
+		/** user set bool to determine whether checkpoint restarts should interpolate to new 
+		         resolution (where resolution is different from checkpoints) */ \
+		Bool                                    interpolateRestart;      \
 		Bool                                    loadFromCheckPoint;      \
-		/* Bool to determine whether we are storing a full checkpoint (for restart) or only data for analysis */ \
+		/** Bool to determine whether we are storing a full checkpoint (for restart) or only data for analysis */ \
 		Bool                                    isDataSave;      \
 		unsigned int                            restartTimestep;         \
 		char*                                   checkPointPrefixString;  \

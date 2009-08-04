@@ -224,6 +224,8 @@ void _AbstractContext_Init(
 		Dictionary_GetDefault( self->dictionary, "checkpointWritePath", Dictionary_Entry_Value_FromString( self->checkpointWritePath ) ) ) );
 	self->checkpointAppendStep = Dictionary_Entry_Value_AsBool( 
 		Dictionary_GetDefault( self->dictionary, "checkpointAppendStep", Dictionary_Entry_Value_FromBool( False ) ) ) ;
+	self->interpolateRestart = Dictionary_Entry_Value_AsBool( 
+		Dictionary_GetDefault( self->dictionary, "interpolateRestart", Dictionary_Entry_Value_FromBool( False ) ) ) ;
 
 	if ( self->rank == 0 ) {
 		if ( ! Stg_DirectoryExists( self->outputPath ) ) {
