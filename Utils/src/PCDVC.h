@@ -80,7 +80,27 @@
               //  int upT; 
               //  int lowT;
 
-#define __PCDVC __DVCWeights MaterialPointsSwarm* materialPointsSwarm; double upperT; double lowerT; Bool splitInInterfaceCells; int maxDeletions; int maxSplits; Bool Inflow; double CentPosRatio; int ParticlesPerCell; double Threshold;
+#define __PCDVC \
+        __DVCWeights \
+	MaterialPointsSwarm*  materialPointsSwarm;   \
+	double                upperT;                \
+	double                lowerT;                \
+	Bool                  splitInInterfaceCells; \
+	Bool                  deleteInInterfaceCells; \
+	int                   maxDeletions;          \
+	int                   maxSplits;             \
+	Bool                  Inflow;                \
+	double                CentPosRatio;          \
+	int                   ParticlesPerCell;      \
+	double                Threshold;             \
+	/* we also need to store some parameters, as everything is turned up      */          \
+	/* for interpolation restarts (which may require significant repopulation */          \
+	/* and after the first timestep needs to be set back to correct values    */          \
+	int                   maxDeletions_orig;          \
+	int                   maxSplits_orig;             \
+	Bool                  Inflow_orig;                \
+	Bool                  splitInInterfaceCells_orig; \
+	Bool                  deleteInInterfaceCells_orig;
 
 struct PCDVC { __PCDVC };
 
@@ -108,7 +128,7 @@ struct deleteParticle{
 		WeightsCalculator_CalculateFunction*  _calculate,
 		Name                                  name );
 
-	void _PCDVC_Init( void* pcdvc, MaterialPointsSwarm* mps, double upT, double lowT, int maxDeletions, int maxSplits, Bool splitInInterfaceCells, int *res, Bool Inflow, double CentPosRatio, int ParticlesPerCell, double Threshold ) ;
+	void _PCDVC_Init( void* pcdvc, MaterialPointsSwarm* mps, double upT, double lowT, int maxDeletions, int maxSplits, Bool splitInInterfaceCells, Bool deleteInInterfaceCells, int *res, Bool Inflow, double CentPosRatio, int ParticlesPerCell, double Threshold ) ;
 	void PCDVC_InitAll( void* pcdvc, Dimension_Index dim ) ;
 
 

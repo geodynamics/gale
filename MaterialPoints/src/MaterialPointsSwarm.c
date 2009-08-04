@@ -326,13 +326,104 @@ void _MaterialPointsSwarm_Initialise( void* swarm, void* data ) {
 		Stg_Component_Initialise( self->swarmVars[var_I], data , False );
 	}
 
-	/* if loading from checkpoint, particle materials etc have already been loaded in Swarm_Build() - 
-	 * thus nothing to do here */
-	if ( context && (True == context->loadFromCheckPoint) ) {
+	/** if loading from checkpoint, particle materials etc have already been loaded in Swarm_Build() - */ 
+	/** possibly need to check for empty cells (and populate) if performing a interpolation restart */
+   if ( context && (True == context->loadFromCheckPoint) && (True == context->interpolateRestart) ){
+      if ( True == self->isSwarmTypeToCheckPointAndReload ) {	   
+         Particle_InCellIndex cParticle_I         = 0;
+         Particle_InCellIndex particle_I          = 0;
+         GlobalParticle*      particle            = NULL;
+         double               minDistance         = HUGE_VAL;
+         double               distanceToParticle;
+         Dimension_Index      dim = self->dim;
+         Cell_DomainIndex     dCell_I;
+         Cell_LocalIndex      lCell_I;
+         Cell_DomainIndex     belongsToCell_I = 0;
+         MaterialPoint*       matNewParticle;
+         MaterialPoint*       matParticleToSplit;
+         Particle_Index       matNewParticle_IndexOnCPU;
+         Coord                xi;
+         Coord                coord;
+         unsigned             nEmptyCells = 0;
+         Index*				   cellID = NULL;
+         Index*				   particleCPUID = NULL;
+         unsigned             count;
+         unsigned             ii;
+         
+         /** first determine how many local cells are empty */
+         for( lCell_I = 0 ; lCell_I < self->cellLocalCount ; lCell_I++ )
+            if (self->cellParticleCountTbl[lCell_I] == 0) nEmptyCells++;
+
+         /** create arrays which will be later used to populate cells */
+         cellID        = Memory_Alloc_Array( Index, nEmptyCells, "Cell ID for cell to be populated" );
+         particleCPUID = Memory_Alloc_Array( Index, nEmptyCells, "particle ID for particle to populate cell" );
+
+         count = 0;
+         for( lCell_I = 0 ; lCell_I < self->cellLocalCount ; lCell_I++ ) {
+            minDistance = HUGE_VAL;
+            if (self->cellParticleCountTbl[lCell_I] == 0) {
+               /** select the centre of the current cell */
+               xi[0] = 0;  xi[1] = 0;  xi[2] = 0;
+               /** get global coord */
+               FeMesh_CoordLocalToGlobal( self->mesh, lCell_I, xi, coord );
+      
+               for( dCell_I = 0 ; dCell_I < self->cellDomainCount ; dCell_I++ ) {
+                  /** Loop over particles find closest to cell centre */
+                  for( cParticle_I = 0 ; cParticle_I < self->cellParticleCountTbl[dCell_I] ; cParticle_I++ ) {
+                     particle = (GlobalParticle*)Swarm_ParticleInCellAt( self, dCell_I, cParticle_I );
+               
+                     /** Calculate distance to particle */
+                     distanceToParticle = 
+                        (particle->coord[ I_AXIS ] - coord[ I_AXIS ]) * 
+                        (particle->coord[ I_AXIS ] - coord[ I_AXIS ]) +
+                        (particle->coord[ J_AXIS ] - coord[ J_AXIS ]) * 
+                        (particle->coord[ J_AXIS ] - coord[ J_AXIS ]) ;
+               
+                     if (dim == 3) {
+                        distanceToParticle += 
+                           (particle->coord[ K_AXIS ] - coord[ K_AXIS ]) * 
+                           (particle->coord[ K_AXIS ] - coord[ K_AXIS ]) ;
+                     }
+                     /** Don't do square root here because it is unnessesary: i.e. a < b <=> sqrt(a) < sqrt(b) */
+                        
+                     /** Check if this is the closest particle */
+                     if (minDistance > distanceToParticle) {
+                        particle_I       = cParticle_I;
+                        minDistance      = distanceToParticle;
+                        belongsToCell_I  = dCell_I;
+                     }
+                  }
+               }
+
+               /** create new particle which will be placed at centre of empty cell */
+               matNewParticle      = (MaterialPoint*) Swarm_CreateNewParticle( self, &matNewParticle_IndexOnCPU );
+               /** grab closest particle, which we will copy */
+               matParticleToSplit  = (MaterialPoint*) Swarm_ParticleInCellAt( self, belongsToCell_I, particle_I );
+               /** copy */
+               memcpy( matNewParticle, matParticleToSplit, self->particleExtensionMgr->finalSize );
+               /** set the owningCell to the cellDomainCount so that its owningCell will be reinitialised (not sure if necessary) */ 
+               matNewParticle->owningCell = self->cellDomainCount;
+               /** Copy new global position (cell centre) to coord on new mat particle */
+               memcpy( matNewParticle->coord, coord, sizeof(Coord) );
+               
+               /** we now store the required information to populate empty cells */
+               /** note that cells are not populated at this point, as this may interfere
+                   with the 0th order interpolation we are performing */ 
+               cellID[count]        = lCell_I;
+               particleCPUID[count] = matNewParticle_IndexOnCPU;
+               count++;
+      
+            }
+         }
+         /** populate empty cells */ 
+         for(ii = 0 ; ii < count ; ii++)
+            Swarm_AddParticleToCell( self, cellID[ii], particleCPUID[ii] );
+         Memory_Free( cellID );
+         Memory_Free( particleCPUID );
+      }
 		/* TODO: print info / debug message */
-	}
-	/* else for a normal run, lay out the particle->material mappings based on user defined materials */
-	else {
+	} else {
+	   /* else for a normal run, lay out the particle->material mappings based on user defined materials */
 		/* Setup the material properties */
 		if ( self->material == NULL ) {
 			/* Do it by the layout of all known materials */

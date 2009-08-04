@@ -169,23 +169,23 @@ PCDVC* _PCDVC_New(
 	return self;
 }
 
-void _PCDVC_Init( void* pcdvc, MaterialPointsSwarm* mps,  double upT, double lowT, int maxDeletions, int maxSplits, Bool splitInInterfaceCells, int *res, Bool Inflow, double CentPosRatio, int ParticlesPerCell, double Thresh ) {
+void _PCDVC_Init( void* pcdvc, MaterialPointsSwarm* mps,  double upT, double lowT, int maxDeletions, int maxSplits, Bool splitInInterfaceCells, Bool deleteInInterfaceCells, int *res, Bool Inflow, double CentPosRatio, int ParticlesPerCell, double Thresh ) {
 	PCDVC* self = (PCDVC*)pcdvc;
 	
 	self->materialPointsSwarm = mps;
 	self->upperT = upT;
 	self->lowerT = lowT;
-	self->maxDeletions = maxDeletions;
-	self->maxSplits = maxSplits;
+	self->maxDeletions = self->maxDeletions_orig = maxDeletions;
+	self->maxSplits    = self->maxSplits_orig    = maxSplits;
+	self->Inflow       = self->Inflow_orig       = Inflow;
 	self->resX = res[I_AXIS];
 	self->resY = res[J_AXIS];
 	self->resZ = res[K_AXIS];
-	self->splitInInterfaceCells = splitInInterfaceCells;
-	self->Inflow = Inflow;
+	self->splitInInterfaceCells = self->splitInInterfaceCells_orig = splitInInterfaceCells;
+   self->deleteInInterfaceCells = self->deleteInInterfaceCells_orig = deleteInInterfaceCells;
 	self->Threshold = Thresh;
 	self->CentPosRatio = CentPosRatio;
 	self->ParticlesPerCell = ParticlesPerCell;
-
 }
 
 void PCDVC_InitAll( void* pcdvc, Dimension_Index dim ) {
@@ -247,6 +247,7 @@ void _PCDVC_Construct( void* pcdvc, Stg_ComponentFactory* cf, void *data ) {
 	int resolution[3];
 	int maxD, maxS;
 	Bool splitInInterfaceCells;
+   Bool deleteInInterfaceCells;
 	Bool Inflow;
 	double CentPosRatio;
 	int ParticlesPerCell;
@@ -262,7 +263,8 @@ void _PCDVC_Construct( void* pcdvc, Stg_ComponentFactory* cf, void *data ) {
 	lowT = Stg_ComponentFactory_GetDouble( cf, self->name, "lowerT", 0.6 );
 	maxD = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "maxDeletions", 2);
 	maxS = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "maxSplits", 3);
-	splitInInterfaceCells = Stg_ComponentFactory_GetBool( cf, self->name, "splitInInterfaceCells", False);
+	splitInInterfaceCells  = Stg_ComponentFactory_GetBool( cf, self->name, "splitInInterfaceCells", False);
+   deleteInInterfaceCells = Stg_ComponentFactory_GetBool( cf, self->name, "deleteInInterfaceCells", False);
 	defaultResolution = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolution", 10 );
 	resolution[ I_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolutionX", defaultResolution );
 	resolution[ J_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolutionY", defaultResolution );
@@ -282,7 +284,7 @@ void _PCDVC_Construct( void* pcdvc, Stg_ComponentFactory* cf, void *data ) {
 	      Journal_Printf( stream,"On Proc %d: In func %s(): WARNING!! lowT and upT have been reset to some more reasonable values. (lowT = 0.6, upT = 25) now!",materialPointsSwarm->myRank, __func__);
 	}
 
-	_PCDVC_Init( self, materialPointsSwarm,  upT, lowT, maxD, maxS, splitInInterfaceCells, resolution, Inflow, CentPosRatio, ParticlesPerCell, Thresh );
+	_PCDVC_Init( self, materialPointsSwarm,  upT, lowT, maxD, maxS, splitInInterfaceCells, deleteInInterfaceCells, resolution, Inflow, CentPosRatio, ParticlesPerCell, Thresh );
 }
 
 void _PCDVC_Build( void* pcdvc, void* data ) {
@@ -291,6 +293,18 @@ void _PCDVC_Build( void* pcdvc, void* data ) {
 }
 void _PCDVC_Initialise( void* pcdvc, void* data ) {
 	PCDVC*	self = (PCDVC*)pcdvc;
+	AbstractContext* context = (AbstractContext*)data;
+   /** for interpolation restart, we need to set these values high to ensure correct population of */
+   /** integration point swarms                                                                    */
+   /** these parameters will be reset to correct values after first timestep                       */
+   if ( context && (True == context->loadFromCheckPoint) && (True == context->interpolateRestart) ){
+      self->maxDeletions           = 999999;
+      self->maxSplits              = 999999;
+      self->Inflow                 = True;
+      self->splitInInterfaceCells  = True;
+      self->deleteInInterfaceCells = True;
+   }
+   
 	_DVCWeights_Initialise( self, data );
 }
 void _PCDVC_Execute( void* pcdvc, void* data ) {
@@ -765,7 +779,8 @@ void _PCDVC_Calculate3D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
 	int Count;
 	int matTypeFirst;
 	int matType;
-	Bool splitInInterfaceCells = self->splitInInterfaceCells;
+	Bool splitInInterfaceCells  = self->splitInInterfaceCells;
+   Bool deleteInInterfaceCells = self->deleteInInterfaceCells;
 	Bool Inflow = self->Inflow;
 	double Thresh = self->Threshold;
 	int ParticlesPerCell = self->ParticlesPerCell;
@@ -1020,11 +1035,9 @@ void _PCDVC_Calculate3D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
 	for(i=0;i<nump;i++){
 	      matType = IntegrationPointMapper_GetMaterialIndexAt(intSwarm->mapper,intSwarm->cellParticleTbl[ lCell_I ][ i ]);
 	      if(matType != matTypeFirst){
-		    maxDeletions = 0; /* no deletions in an interface cell */
+		    if(!deleteInInterfaceCells) maxDeletions = 0; /* no deletions in an interface cell */
 		    /* this may be inadequate...we may need to do something in the neighbouring cells to interface cells as well */
-		    if(!splitInInterfaceCells){
-			  maxSplits = 0;
-		    }
+		    if(!splitInInterfaceCells)  maxSplits    = 0;
 		    break;
 	      }
 	}
@@ -1198,7 +1211,8 @@ void _PCDVC_Calculate2D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
 	int Count;
 	int matTypeFirst;
 	int matType;
-	Bool splitInInterfaceCells = self->splitInInterfaceCells;
+	Bool splitInInterfaceCells  = self->splitInInterfaceCells;
+   Bool deleteInInterfaceCells = self->deleteInInterfaceCells;
 	Bool Inflow = self->Inflow;
 	double Thresh = self->Threshold;
 	int ParticlesPerCell = self->ParticlesPerCell;
@@ -1222,11 +1236,6 @@ void _PCDVC_Calculate2D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
 	numy = self->resY;
 
 	nump_orig = nump = cParticleCount = intSwarm->cellParticleCountTbl[lCell_I];
-
-	/* need a struct for the deletList because we must sort it bu indexOnCPU and delete in reverse order
-           so we don't have the potential problem of  deleting a particle from the list that points to the last particle on the swarm */
-	deleteList = (struct deleteParticle*)malloc(nump*sizeof(struct deleteParticle));/* I don't think I am going to let you delete more than half the particles in a given cell */
-	splitList  = (Particle_Index*)malloc(nump*sizeof(Particle_Index));
 
 	Journal_Firewall( nump , Journal_Register(Error_Type, "PCDVC"), "Error in %s: Problem has an under resolved cell (Cell Id = %d), add more particles to your model\n", __func__, lCell_I );
 
@@ -1438,15 +1447,17 @@ void _PCDVC_Calculate2D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
 	for(i=0;i<nump;i++){
 	      matType = IntegrationPointMapper_GetMaterialIndexAt(intSwarm->mapper,intSwarm->cellParticleTbl[ lCell_I ][ i ]);
 	      if(matType != matTypeFirst){
-		    maxDeletions = 0; /* no deletions in an interface cell */
+		    if(!deleteInInterfaceCells) maxDeletions = 0; /* no deletions in an interface cell */
 		    /* this may be inadequate...we may need to do something in the neighbouring cells to interface cells as well */
-		    if(!splitInInterfaceCells){
-			  maxSplits = 0;
-		    }
+		    if(!splitInInterfaceCells)  maxSplits    = 0;
 		    //printf("------- FOUND an Interface Cell!! --------------\n");
 		    break;
 	      }
 	}
+	/* need a struct for the deletList because we must sort it bu indexOnCPU and delete in reverse order
+           so we don't have the potential problem of  deleting a particle from the list that points to the last particle on the swarm */
+	splitList  = (Particle_Index*)malloc(nump*sizeof(Particle_Index));	
+	deleteList = (struct deleteParticle*)malloc(nump*sizeof(struct deleteParticle));/* I don't think I am going to let you delete more than half the particles in a given cell */	
 	for(i=0;i<nump;i++){
 	      if(pList[i].w > maxW){ /* maxW = pList[i].w; maxI = i;*/ splitList[splitCount] = i; splitCount++;}
 	      if(pList[i].w < minW){
@@ -1465,7 +1476,8 @@ void _PCDVC_Calculate2D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
 	      printf("indices are indexWithinCell %d indexOnCPU %d\n",deleteList[i].indexWithinCell,deleteList[i].indexOnCPU);
 	}
 */
-	if(maxDeletions > nump-4){ maxDeletions = nump/2;}
+
+   if(maxDeletions > nump-4){ maxDeletions = Inflow ? nump - 4 : nump/2;}
 
 	/* we now have our lists of particles to delete and split */
 	Count = maxSplits > splitCount ? splitCount : maxSplits;
@@ -1584,18 +1596,25 @@ void _PCDVC_Calculate( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ){
       /* it might be nice to report the total deletions and splits as well as the final population here */
       /* One could set the parameters to be too aggressive and cause "swarm thrashing" where many particles
          are being created and destroyed while maintaining some population that it has converged on */
-      if(lCell_I == 0){
 
 /*
-	   Journal_Printf( stream, "\nOn Proc %d: In func %s(): for swarm \"%s\" Population is %d\n", swarm->myRank, __func__, swarm->name, swarm->particleLocalCount );
-	   Journal_Printf( stream, "On Proc %d: In func %s(): for swarm \"%s\" Population is %d\n\n", matSwarm->myRank,__func__, matSwarm->name, matSwarm->particleLocalCount );
+      if(lCell_I == 0){
+         Journal_Printf( stream, "\nOn Proc %d: In func %s(): for swarm \"%s\" Population is %d\n", swarm->myRank, __func__, swarm->name, swarm->particleLocalCount );
+         Journal_Printf( stream, "On Proc %d: In func %s(): for swarm \"%s\" Population is %d\n\n", matSwarm->myRank,__func__, matSwarm->name, matSwarm->particleLocalCount );
+      }      
 */
-      }
-      if(dim == 3){
+      if(dim == 3)
 	    _PCDVC_Calculate3D( pcdvc, _swarm, lCell_I);
-      }
-      else {
+      else
 	    _PCDVC_Calculate2D( pcdvc, _swarm, lCell_I);
+
+      /* reset the below parameters incase they were originally set for interpolation restarts */
+      if(lCell_I == swarm->cellLocalCount - 1){
+         self->maxDeletions           = self->maxDeletions_orig;
+         self->maxSplits              = self->maxSplits_orig;
+         self->Inflow                 = self->Inflow_orig;
+         self->splitInInterfaceCells  = self->splitInInterfaceCells_orig;
+         self->deleteInInterfaceCells = self->deleteInInterfaceCells_orig;
       }
 
 }
