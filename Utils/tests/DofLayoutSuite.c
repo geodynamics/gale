@@ -65,12 +65,16 @@ void DofLayoutSuite_Teardown( DofLayoutSuiteData* data ) {
 }
 
 void DofLayoutSuite_TestBasic( DofLayoutSuiteData* data ) {
-	int	procToWatch;
 	char	expected_file[PCU_PATH_MAX];
+	int	procToWatch;
 	Stream*	stream = Journal_Register( Info_Type, "DofLayoutBasic" );	
-	MPI_Barrier( data->comm ); /* Ensures copyright info always come first in output */
 
-	procToWatch = data->nProcs >=2 ? 1 : 0;
+	if( data->nProcs >= 2 ) {
+                procToWatch = 1;
+        }
+        else {
+                procToWatch = 0;
+        }
 
 	if( data->rank == procToWatch ) {
 		DofLayout*              dof;
@@ -110,10 +114,8 @@ void DofLayoutSuite_TestBasic( DofLayoutSuiteData* data ) {
 
                 Stg_Component_Build(dof, 0, False);
 
-                printf("Simple test:\n");
 		Journal_Printf( stream, "Simple test:\n" );
                 for (ii = 0; ii < arraySize; ii++) {
-                        printf("\t%u\n", dof->dofCounts[ii]);
 			Journal_Printf( stream, "\t%u\n", dof->dofCounts[ii] );
 			pcu_check_true( dof->dofCounts[ii] == 6 );
 		}
@@ -140,10 +142,8 @@ void DofLayoutSuite_TestBasic( DofLayoutSuiteData* data ) {
  
 		Stg_Component_Build(dof, 0, False);
  
-		printf("\nAdvanced test:\n");
 		Journal_Printf( stream, "\nAdvanced test:\n" );
 		for (ii = 0; ii < arraySize; ii++) {
-			printf( "\t%u\n", dof->dofCounts[ii] );
 			Journal_Printf( stream, "\t%u\n", dof->dofCounts[ii] );
 			pcu_check_true( counts[ii] == dof->dofCounts[ii] );
 		}
@@ -171,16 +171,8 @@ void DofLayoutSuite_TestBasic( DofLayoutSuiteData* data ) {
                         }
                 }
 
-                printf("Copy Test: pre copy:\n");
 		Journal_Printf( stream, "Copy Test: pre copy:\n" );
                 for (ii = 0; ii < arraySize; ii++) {
-                        printf("\tIndex %d - src %2g,%2g,%2g - dest %2g, %2g, %2g\n", ii,
-				DofLayout_GetValueDouble( dof, ii, 0 ),
-				DofLayout_GetValueDouble( dof, ii, 1 ),
-				DofLayout_GetValueDouble( dof, ii, 2 ),
-				DofLayout_GetValueDouble( destDof, ii, 0 ),
-				DofLayout_GetValueDouble( destDof, ii, 1 ),
-				DofLayout_GetValueDouble( destDof, ii, 2 ) );
 			Journal_Printf( stream, "\tIndex %d - src %2g,%2g,%2g - dest %2g, %2g, %2g\n", ii,
 				DofLayout_GetValueDouble( dof, ii, 0 ),
 				DofLayout_GetValueDouble( dof, ii, 1 ),
@@ -198,16 +190,8 @@ void DofLayoutSuite_TestBasic( DofLayoutSuiteData* data ) {
 
                 DofLayout_CopyValues( dof, destDof );
 
-                printf("Copy Test: post copy:\n");
 		Journal_Printf( stream, "Copy Test: post copy:\n" );
                 for (ii = 0; ii < arraySize; ii++) {
-                        printf("\tIndex %d - src %2g,%2g,%2g - dest %2g, %2g, %2g\n", ii,
-				DofLayout_GetValueDouble( dof, ii, 0 ),
-				DofLayout_GetValueDouble( dof, ii, 1 ),
-				DofLayout_GetValueDouble( dof, ii, 2 ),
-				DofLayout_GetValueDouble( destDof, ii, 0 ),
-				DofLayout_GetValueDouble( destDof, ii, 1 ),
-				DofLayout_GetValueDouble( destDof, ii, 2 ) );
 			Journal_Printf( stream, "\tIndex %d - src %2g,%2g,%2g - dest %2g, %2g, %2g\n", ii,
 				DofLayout_GetValueDouble( dof, ii, 0 ),
 				DofLayout_GetValueDouble( dof, ii, 1 ),
@@ -222,14 +206,9 @@ void DofLayoutSuite_TestBasic( DofLayoutSuiteData* data ) {
 
                 Stg_Class_Delete(destDof);
 
-                printf("Zero Test: all values in src dof should be zero again\n");
 		Journal_Printf( stream, "Zero Test: all values in src dof should be zero again\n" );
                 DofLayout_SetAllToZero( dof );
                 for (ii = 0; ii < arraySize; ii++) {
-                        printf("\tIndex %d - src %2g,%2g,%2g\n", ii,
-                                DofLayout_GetValueDouble( dof, ii, 0 ),
-                                DofLayout_GetValueDouble( dof, ii, 1 ),
-                                DofLayout_GetValueDouble( dof, ii, 2 ) );
 			Journal_Printf( stream,  "\tIndex %d - src %2g,%2g,%2g\n", ii,
                                 DofLayout_GetValueDouble( dof, ii, 0 ),
                                 DofLayout_GetValueDouble( dof, ii, 1 ),
@@ -254,13 +233,17 @@ void DofLayoutSuite_TestBasic( DofLayoutSuiteData* data ) {
 }
 
 void DofLayoutSuite_TestRemap( DofLayoutSuiteData* data ) {
-	int	procToWatch;
 	char	expected_file[PCU_PATH_MAX];
+	int	procToWatch;
 	Stream*	stream = Journal_Register( Info_Type, "DofLayoutRemap" );	
-	MPI_Barrier( data->comm ); /* Ensures copyright info always come first in output */
 
-	procToWatch = data->nProcs >=2 ? 1 : 0;
-	
+	if( data->nProcs >= 2 ) {
+                procToWatch = 1;
+        }
+        else {
+                procToWatch = 0;
+        }
+
 	if( data->rank == procToWatch ) {
 		DofLayout*              dof;
                 double                  dummyVar;
@@ -310,7 +293,6 @@ void DofLayoutSuite_TestRemap( DofLayoutSuiteData* data ) {
                 printf("Simple test:\n");
 		Journal_Printf( stream, "Simple test:\n" );
                 for (i = 0; i < 14; i++) {
-                        printf("\t%u\n", dof->dofCounts[i]);
 			Journal_Printf( stream, "\t%u\n", dof->dofCounts[i] );
 			pcu_check_true( dof->dofCounts[i] == 6 );
 		}
@@ -327,13 +309,17 @@ void DofLayoutSuite_TestRemap( DofLayoutSuiteData* data ) {
 }
 
 void DofLayoutSuite_TestSaveAndLoad( DofLayoutSuiteData* data ) {
-	int	procToWatch;
 	char	expected_file[PCU_PATH_MAX];
+	int	procToWatch;
 	Stream*	stream = Journal_Register( Info_Type, "DofLayoutRemap" );	
-	MPI_Barrier( data->comm ); /* Ensures copyright info always come first in output */
 
-	procToWatch = data->nProcs >=2 ? 1 : 0;
-
+	if( data->nProcs >= 2 ) {
+                procToWatch = 1;
+        }
+        else {
+                procToWatch = 0;
+        }
+	
 	if( data->rank == procToWatch ) {
 		DofLayout*              dof;
                 Variable_Register*      variableRegister;
@@ -377,13 +363,6 @@ void DofLayoutSuite_TestSaveAndLoad( DofLayoutSuiteData* data ) {
                 DofLayout_LoadAllVariablesFromFiles( dof, "testDofSave", data->rank );
 
                 for (ii = 0; ii < arraySize; ii++) {
-                        printf("\tIndex %d - %2g,%2g,%2g,%2g,%2g,%2g\n", ii,
-                                DofLayout_GetValueDouble( dof, ii, 0 ),
-                                DofLayout_GetValueDouble( dof, ii, 1 ),
-                                DofLayout_GetValueDouble( dof, ii, 2 ),
-                                DofLayout_GetValueDouble( dof, ii, 3 ),
-                                DofLayout_GetValueDouble( dof, ii, 4 ),
-                                DofLayout_GetValueDouble( dof, ii, 5 ) );
 			Journal_Printf( stream, "\tIndex %d - %2g,%2g,%2g,%2g,%2g,%2g\n", ii,
                                 DofLayout_GetValueDouble( dof, ii, 0 ),
                                 DofLayout_GetValueDouble( dof, ii, 1 ),
