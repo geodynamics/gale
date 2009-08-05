@@ -178,14 +178,12 @@ void SwarmSuite_TestParticleSearch( SwarmSuiteData* data ) {
 			coord[0] = 0.60*( data->maxCrds[0] - data->minCrds[0] );
 			coord[1] = 0.20*( data->maxCrds[1] - data->minCrds[1] );
 			coord[2] = 0.82*( data->maxCrds[2] - data->minCrds[2] );
-
 			pcu_check_true( SwarmSuite_TestParticleSearchFunc( data->swarm, coord, stream ) );
 		
 			coord[0] = 0.20*( data->maxCrds[0] - data->minCrds[0] );
 			coord[1] = 0.90*( data->maxCrds[1] - data->minCrds[1] );
 			coord[2] = 0.12*( data->maxCrds[2] - data->minCrds[2] );
-			/* According to Dave Lee this is expected to fail, will ignore this test for now. */
-			/* pcu_check_true( SwarmSuite_TestParticleSearchFunc( data->swarm, coord, stream )  ); */
+			pcu_check_true( SwarmSuite_TestParticleSearchFunc( data->swarm, coord, stream )  );
 		}	
 	}
 }

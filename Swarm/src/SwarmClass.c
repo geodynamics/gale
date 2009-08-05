@@ -1227,8 +1227,6 @@ Particle_Index Swarm_FindClosestParticle( void* _swarm, Dimension_Index dim, dou
 	NeighbourIndex*      neighbourList;
 	Particle_Index       closestParticle_I;
 
-   Journal_Firewall( NULL, Swarm_Error, "\n I am currently broken.  Fix me.  John M. 20090803 \n");
-
 	/* Find cell this coordinate is in */
 	memcpy( testParticle.coord, coord, sizeof(Coord) );
 	/* First specify the particle doesn't have an owning cell yet, so as
@@ -1247,7 +1245,7 @@ Particle_Index Swarm_FindClosestParticle( void* _swarm, Dimension_Index dim, dou
 	closestParticle_I = swarm->cellParticleTbl[ lCell_I ][ cParticle_I ];
 
 	/* Find neighbours to this cell - TODO This Assumes ElementCellLayout */
-	Mesh_GetIncidence( ((ElementCellLayout*)swarm->cellLayout)->mesh, dim, lCell_I, MT_VERTEX, swarm->incArray );
+	Mesh_GetIncidence( ((ElementCellLayout*)swarm->cellLayout)->mesh, dim, lCell_I, dim, swarm->incArray );
 	neighbourCount = IArray_GetSize( swarm->incArray );
 	neighbourList = IArray_GetPtr( swarm->incArray );
 
@@ -1255,8 +1253,7 @@ Particle_Index Swarm_FindClosestParticle( void* _swarm, Dimension_Index dim, dou
 	for ( neighbour_I = 0 ; neighbour_I < neighbourCount ; neighbour_I++ ) {
 		lCell_I = neighbourList[ neighbour_I ];
 
-		/* TODO - Be more clever than checking every particle in this cell */
-		if( lCell_I < swarm->cellDomainCount ) { /* dave - 05.09.07 */
+		if( lCell_I < swarm->cellDomainCount ) {
 			cParticle_I = Swarm_FindClosestParticleInCell( swarm, lCell_I, dim, coord, &distanceToParticle );
 
 			/* Check to see if closest particle in this cell is closest to this coord */
