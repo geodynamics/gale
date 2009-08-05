@@ -2556,8 +2556,9 @@ void FeVariable_ReadFromFile( void* feVariable, const char* filename ) {
 
 
 void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, const char* feVarFilename, const char* meshFilename ){
-#ifdef READ_HDF5
 	FeVariable*                    self = (FeVariable*)feVariable;
+   Stream*                        errorStr = Journal_Register( Error_Type, self->type );   
+#ifdef READ_HDF5
    CartesianGenerator*            gen;
    C0Generator*                   C0gen;
    FeMesh                         *feMesh, *C0feMesh, *elementMesh;
@@ -2580,7 +2581,6 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
    hid_t                          attrib_id, group_id;
    herr_t                         status;
    int                            res[3];
-	Stream*                        errorStr = Journal_Register( Error_Type, self->type );
    int                            checkVer;
    int                            ndims;
    unsigned*                      sizes;
@@ -2814,9 +2814,8 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
    _CartesianGenerator_Delete(gen);
 
 #else
-   Journal_Firewall(!context->interpolateRestart 
-               NULL, 
-               errorStream,"\n\n Interpolation restart not supported for ASCII checkpoint files \n\n");
+   Journal_Firewall(!context->interpolateRestart, 
+               errorStr,"\n\n Interpolation restart not supported for ASCII checkpoint files \n\n");
 #endif   
 }
 
