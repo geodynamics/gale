@@ -409,8 +409,7 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
 	      
 	      
 #else
-         Journal_Firewall(!context->interpolateRestart 
-                     NULL, 
+         Journal_Firewall(!context->interpolateRestart,  
                      errorStream,"\n\n Interpolation restart not supported for ASCII checkpoint files \n\n");
 
          meshReadFileNamePart = Context_GetCheckPointReadPrefixString( context );
@@ -2242,6 +2241,7 @@ void CartesianGenerator_DestructGeometry( CartesianGenerator* self ) {
 	FreeArray( self->crdMax );
 }
 
+#ifdef READ_HDF5
 void CartesianGenerator_ReadFromHDF5(  CartesianGenerator* self, Mesh* mesh, char* filename ){
 	hid_t             file, fileSpace, fileData;
 	hsize_t           start[2], count[2], size[2], maxSize[2];   
@@ -2422,6 +2422,7 @@ void CartesianGenerator_ReadFromHDF5(  CartesianGenerator* self, Mesh* mesh, cha
    H5Fclose( file );
    
 }
+#endif
 
 void CartesianGenerator_ReadFromASCII( CartesianGenerator* self, Mesh* mesh, char* filename ){
    int               proc_I;
