@@ -864,13 +864,13 @@ void _FiniteElementContext_DumpMeshHDF5( void* context, char* filename ) {
          nodeList   = IArray_GetPtr(  iarray );
          
          for( node_I = 0 ; node_I < nodesPerEl ; node_I++ )
-            buf_int[node_I] = nodeList[node_I];
+            buf_int[node_I] = Mesh_DomainToGlobal( mesh, MT_VERTEX, nodeList[node_I] );
          /* some reordering is required to account for standard node ordering */ 
-         buf_int[3] = nodeList[2];
-         buf_int[2] = nodeList[3];
+         buf_int[3] = Mesh_DomainToGlobal( mesh, MT_VERTEX, nodeList[2] );
+         buf_int[2] = Mesh_DomainToGlobal( mesh, MT_VERTEX, nodeList[3] );
          if( nDims == 3 ) {
-            buf_int[7] = nodeList[6];
-            buf_int[6] = nodeList[7];
+            buf_int[7] = Mesh_DomainToGlobal( mesh, MT_VERTEX, nodeList[6] );
+            buf_int[6] = Mesh_DomainToGlobal( mesh, MT_VERTEX, nodeList[7] );
          }
          /* select the region of dataspace to write to  */
          start[1] = 0;
