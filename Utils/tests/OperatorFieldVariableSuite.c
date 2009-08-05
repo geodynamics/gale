@@ -211,6 +211,7 @@ void OperatorFieldVariableSuite_TestOperator( OperatorFieldVariableSuiteData* da
 
 		/* Clean Up */
 		Stg_Class_Delete(fV_Register);
+		remove( "operatorFieldVariable.dat" );
 	}
 }
 	
