@@ -49,28 +49,28 @@ struct _Particle {
 };
 
 typedef struct {
-	unsigned			nDims;
-	unsigned			meshSize[3];
-	double				minCrds[3];
-	double				maxCrds[3];
+	unsigned							nDims;
+	unsigned							meshSize[3];
+	double							minCrds[3];
+	double							maxCrds[3];
 	ExtensionManager_Register*	extensionMgr_Register;
-	Mesh*				mesh;
-	GaussParticleLayout*		gaussParticleLayout;
-	ElementCellLayout*		elementCellLayout;
-	Swarm*				swarm;
-	Dictionary*			dictionary;
+	Mesh*								mesh;
+	GaussParticleLayout*			gaussParticleLayout;
+	ElementCellLayout*			elementCellLayout;
+	Swarm*							swarm;
+	Dictionary*						dictionary;
 	Dictionary_Entry_Value*		particlePositionsList;
 	Dictionary_Entry_Value*		particlePositionEntry;
 	ManualParticleLayout*		particleLayout;
-	DomainContext*			context;
-	MPI_Comm			comm;
-	unsigned int			rank;
-	unsigned int			nProcs;
+	DomainContext*					context;
+	MPI_Comm							comm;
+	unsigned int					rank;
+	unsigned int					nProcs;
 } ManualParticleLayoutSuiteData;
 
 Mesh* ManualParticleLayoutSuite_BuildMesh( unsigned nDims, unsigned* size, double* minCrds, double* maxCrds, ExtensionManager_Register* emReg ) {
 	CartesianGenerator*	gen;
-	Mesh*			mesh;
+	Mesh*						mesh;
 
 	gen = CartesianGenerator_New( "" );
 	CartesianGenerator_SetDimSize( gen, nDims );
@@ -167,7 +167,7 @@ void ManualParticleLayoutSuite_Teardown( ManualParticleLayoutSuiteData* data ) {
 
 void ManualParticleLayoutSuite_TestManualParticle( ManualParticleLayoutSuiteData* data ) {
 	int		procToWatch;
-	Stream*		stream;
+	Stream*	stream;
 	char		expected_file[PCU_PATH_MAX];
 	
 	if( data->nProcs >= 2 ) {
@@ -176,8 +176,6 @@ void ManualParticleLayoutSuite_TestManualParticle( ManualParticleLayoutSuiteData
 	else {
 		procToWatch = 0;
 	}
-	if( data->rank == procToWatch ) printf( "Watching rank: %i\n", data->rank );
-	
 	stream = Journal_Register( Info_Type, "ManualParticle" );
 	
 	if( data->rank == procToWatch ) {

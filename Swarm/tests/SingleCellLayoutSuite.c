@@ -47,8 +47,8 @@
 typedef struct {
 	SingleCellLayout*	singleCellLayout;
 	unsigned int		dimExists[3];
-	double***		cellPoints;
-	MPI_Comm		comm;
+	double***			cellPoints;
+	MPI_Comm				comm;
 	unsigned int		rank;
 	unsigned int		nProcs;
 } SingleCellLayoutSuiteData;
@@ -73,8 +73,8 @@ void SingleCellLayoutSuite_Teardown( SingleCellLayoutSuiteData* data ) {
 }
 
 void SingleCellLayoutSuite_TestSingleCellLayout( SingleCellLayoutSuiteData* data ) {
-	Cell_Index 	cell;
-	int		procToWatch;
+	Cell_Index	cell;
+	int			procToWatch;
 	double*		testCoord;		
 	
 	MPI_Barrier( data->comm ); /* Ensures copyright info always come first in output */
@@ -86,8 +86,6 @@ void SingleCellLayoutSuite_TestSingleCellLayout( SingleCellLayoutSuiteData* data
 		procToWatch = 0;
 	}
 	
-	if( data->rank == procToWatch ) printf( "Watching rank: %i\n", data->rank );
-	
 	if( data->rank == procToWatch ) {
 		testCoord = Memory_Alloc_Array_Unnamed( double, 3 );
 		
@@ -96,14 +94,8 @@ void SingleCellLayoutSuite_TestSingleCellLayout( SingleCellLayoutSuiteData* data
 			Cell_PointIndex	count;
 			
 			count = data->singleCellLayout->_pointCount( data->singleCellLayout, cell );
-			printf( "cellPointTbl  [%2u][0-%u]:\n", cell, count );
 			data->cellPoints = Memory_Alloc_Array( double**, count, "cellsPoints" );
 			data->singleCellLayout->_initialisePoints( data->singleCellLayout, cell, count, data->cellPoints );
-			for( point = 0; point < count; point++ ) {
-				printf( "\t{%.3g %.3g %.3g}\n", (*data->cellPoints[point])[I_AXIS], (*data->cellPoints[point])[J_AXIS], 
-					(*data->cellPoints[point])[K_AXIS] );
-			}
-			printf( "\n" );
 		}
 		pcu_check_true( CellLayout_MapElementIdToCellId( data->singleCellLayout, 0 ) == 0 );
 		pcu_check_true( CellLayout_MapElementIdToCellId( data->singleCellLayout, 5 ) == 0 );

@@ -46,22 +46,22 @@
 #include "ElementCellLayoutSuite.h"
 
 typedef struct {
-	unsigned			nDims;
-	unsigned			meshSize[3];
-	double				minCrds[3];
-	double				maxCrds[3];
+	unsigned							nDims;
+	unsigned							meshSize[3];
+	double							minCrds[3];
+	double							maxCrds[3];
 	ExtensionManager_Register*	extensionMgr_Register;
-	Mesh*				mesh;
-	ElementCellLayout*		elementCellLayout;
-	MPI_Comm			comm;
-	unsigned int			rank;
-	unsigned int			nProcs;
+	Mesh*								mesh;
+	ElementCellLayout*			elementCellLayout;
+	MPI_Comm							comm;
+	unsigned int					rank;
+	unsigned int					nProcs;
 } ElementCellLayoutSuiteData;
 
 Mesh* buildMesh( unsigned nDims, unsigned* size, double* minCrds, double* maxCrds, ExtensionManager_Register* emReg ) {
 	CartesianGenerator*	gen;
-	Mesh*			mesh;
-	unsigned		maxDecomp[3] = {1, 0, 1};
+	Mesh*						mesh;
+	unsigned					maxDecomp[3] = {1, 0, 1};
 
 	gen = CartesianGenerator_New( "" );
 	CartesianGenerator_SetDimSize( gen, nDims );
@@ -113,24 +113,16 @@ void ElementCellLayoutSuite_Teardown( ElementCellLayoutSuiteData* data ) {
 }
 
 void ElementCellLayoutSuite_TestElementCellLayout( ElementCellLayoutSuiteData* data ) {
-	Cell_Index		cell;
+	Cell_Index				cell;
 	Element_DomainIndex	element;
-	GlobalParticle		testParticle;
-	int			procToWatch;
+	GlobalParticle			testParticle;
 		
-	if( data->nProcs >= 2 ) {
-		procToWatch = 1;
-	}
-	else {
-		procToWatch = 0;
-	}
-	
-	if( data->rank == procToWatch ) {
+	if( data->rank == 0 ) {
 		for( element = 0; element < Mesh_GetLocalSize( data->mesh, data->nDims ); element++ ) {
 			Cell_PointIndex	point;
 			Cell_PointIndex	count;
-			double***	cellPoints;
-			Bool		result;
+			double***			cellPoints;
+			Bool					result;
 	
 			cell = CellLayout_MapElementIdToCellId( data->elementCellLayout, element );
 

@@ -49,17 +49,17 @@ struct _Particle {
 };
 
 typedef struct {
-	unsigned			nDims;
-	unsigned			gaussParticles[3];
-	double				minCrds[3];
-	double				maxCrds[3];
+	unsigned							nDims;
+	unsigned							gaussParticles[3];
+	double							minCrds[3];
+	double							maxCrds[3];
 	ExtensionManager_Register*	extensionMgr_Register;
-	GaussParticleLayout*		gaussParticleLayout;
-	SingleCellLayout*		singleCellLayout;
-	Swarm*				swarm;
-	MPI_Comm			comm;
-	unsigned int			rank;
-	unsigned int			nProcs;
+	GaussParticleLayout*			gaussParticleLayout;
+	SingleCellLayout*				singleCellLayout;
+	Swarm*							swarm;
+	MPI_Comm							comm;
+	unsigned int					rank;
+	unsigned int					nProcs;
 } GaussLayoutSingleCellSuiteData;
 
 void GaussLayoutSingleCellSuite_Setup( GaussLayoutSingleCellSuiteData* data ) {
@@ -90,153 +90,136 @@ void GaussLayoutSingleCellSuite_Teardown( GaussLayoutSingleCellSuiteData* data )
 
 void GaussLayoutSingleCellSuite_Test1ParticlePerDim_3D( GaussLayoutSingleCellSuiteData* data ) {
 	Cell_PointIndex		count;
-	double			x,y,z,w;
-	unsigned int		p, i, len;
-	int			procToWatch;
-	LocalParticle*		particle;
-	Coord			minCell;
-	Coord			maxCell;
-	Stream*			stream;
+	double					x,y,z,w;
+	unsigned int			p, i, len;
+	LocalParticle*			particle;
+	Coord						minCell;
+	Coord						maxCell;
+	Stream*					stream;
 	Particle_InCellIndex	particlesPerDim[3] = {1, 1, 1};
-	Bool			dimExists[] = { True, True, True };	
-	char			expected_file[PCU_PATH_MAX];
+	Bool						dimExists[] = { True, True, True };	
+	char						expected_file[PCU_PATH_MAX];
 	
-	if( data->nProcs >= 2 ) {
-		procToWatch = 1;
-	}
-	else {
-		procToWatch = 0;
-	}
+	if( data->rank == 0 ) {	
+		/* Configure the element-cell-layout */
+		data->singleCellLayout = SingleCellLayout_New( "singleCellLayout", dimExists, NULL, NULL );
 	
-	/* Configure the element-cell-layout */
-	data->singleCellLayout = SingleCellLayout_New( "singleCellLayout", dimExists, NULL, NULL );
+		/* Configure the gauss-particle-layout */
+		data->gaussParticleLayout = GaussParticleLayout_New( "gaussParticleLayout", data->nDims , particlesPerDim );
 	
-	/* Configure the gauss-particle-layout */
-	data->gaussParticleLayout = GaussParticleLayout_New( "gaussParticleLayout", data->nDims , particlesPerDim );
-	
-	/* Configure the swarm */
-	data->swarm = Swarm_New( "testGaussSwarmSingleCell", data->singleCellLayout, data->gaussParticleLayout, data->nDims,
-		sizeof(Particle), data->extensionMgr_Register, NULL, data->comm, NULL );
+		/* Configure the swarm */
+		data->swarm = Swarm_New( "testGaussSwarmSingleCell", data->singleCellLayout, data->gaussParticleLayout, data->nDims,
+			sizeof(Particle), data->extensionMgr_Register, NULL, data->comm, NULL );
 		
-	/* Build the swarm */
-	Stg_Component_Build( data->swarm, 0, False );
-	Stg_Component_Initialise( data->swarm, 0, False );
+		/* Build the swarm */
+		Stg_Component_Build( data->swarm, 0, False );
+		Stg_Component_Initialise( data->swarm, 0, False );
 
-	count = data->swarm->cellParticleCountTbl[0];
+		count = data->swarm->cellParticleCountTbl[0];
 	 
-	stream = Journal_Register( Info_Type, "1ParticlePerDim_3D" );
-	Stream_RedirectFile( stream, "1ParticlePerDim_3D.dat" );
+		stream = Journal_Register( Info_Type, "1ParticlePerDim_3D" );
+		Stream_RedirectFile( stream, "1ParticlePerDim_3D.dat" );
 	
-	for( p = 0; p < count; p++ ) {
-		x = ((IntegrationPoint*)Swarm_ParticleInCellAt( data->swarm, 0, p ))->xi[0]; 
-		y = ((IntegrationPoint*)Swarm_ParticleInCellAt( data->swarm, 0, p ))->xi[1]; 
-		z = ((IntegrationPoint*)Swarm_ParticleInCellAt( data->swarm, 0, p ))->xi[2]; 	
-		w = ((IntegrationPoint*)Swarm_ParticleInCellAt( data->swarm, 0, p ))->weight;
-		Journal_Printf( stream, "pId=%d : xi = { %f, %f, %f } weight = %f\n",p,x,y,z,w );	
-	}	
-	pcu_filename_expected( "testGaussLayoutSingleCell1ParticlePerDimOutput.expected", expected_file );
-	pcu_check_fileEq( "1ParticlePerDim_3D.dat", expected_file );
+		for( p = 0; p < count; p++ ) {
+			x = ((IntegrationPoint*)Swarm_ParticleInCellAt( data->swarm, 0, p ))->xi[0]; 
+			y = ((IntegrationPoint*)Swarm_ParticleInCellAt( data->swarm, 0, p ))->xi[1]; 
+			z = ((IntegrationPoint*)Swarm_ParticleInCellAt( data->swarm, 0, p ))->xi[2]; 	
+			w = ((IntegrationPoint*)Swarm_ParticleInCellAt( data->swarm, 0, p ))->weight;
+			Journal_Printf( stream, "pId=%d : xi = { %f, %f, %f } weight = %f\n",p,x,y,z,w );	
+		}	
+		pcu_filename_expected( "testGaussLayoutSingleCell1ParticlePerDimOutput.expected", expected_file );
+		pcu_check_fileEq( "1ParticlePerDim_3D.dat", expected_file );
+	}
 }
 
 
 void GaussLayoutSingleCellSuite_Test2ParticlesPerDim_3D( GaussLayoutSingleCellSuiteData* data ) {
 	Cell_PointIndex		count;
-	double			x,y,z,w;
-	unsigned int		p, i, len;
-	int			procToWatch;
-	LocalParticle*		particle;
-	Coord			minCell;
-	Coord			maxCell;
-	Stream*			stream;
+	double					x,y,z,w;
+	unsigned int			p, i, len;
+	LocalParticle*			particle;
+	Coord						minCell;
+	Coord						maxCell;
+	Stream*					stream;
 	Particle_InCellIndex	particlesPerDim[3] = {2, 2, 2};
-	Bool			dimExists[] = { True, True, True };	
-	char 			expected_file[PCU_PATH_MAX];
+	Bool						dimExists[] = { True, True, True };	
+	char 						expected_file[PCU_PATH_MAX];
 	
-	if( data->nProcs >= 2 ) {
-		procToWatch = 1;
-	}
-	else {
-		procToWatch = 0;
-	}
+	if( data->rank == 0 ) {	
+		/* Configure the element-cell-layout */
+		data->singleCellLayout = SingleCellLayout_New( "singleCellLayout", dimExists, NULL, NULL );
 	
-	/* Configure the element-cell-layout */
-	data->singleCellLayout = SingleCellLayout_New( "singleCellLayout", dimExists, NULL, NULL );
-	
-	/* Configure the gauss-particle-layout */
-	data->gaussParticleLayout = GaussParticleLayout_New( "gaussParticleLayout", data->nDims , particlesPerDim );
-	
-	/* Configure the swarm */
-	data->swarm = Swarm_New( "testGaussSwarmSingleCell", data->singleCellLayout, data->gaussParticleLayout, data->nDims,
-		sizeof(Particle), data->extensionMgr_Register, NULL, data->comm, NULL );
+		/* Configure the gauss-particle-layout */
+		data->gaussParticleLayout = GaussParticleLayout_New( "gaussParticleLayout", data->nDims , particlesPerDim );
 		
-	/* Build the swarm */
-	Stg_Component_Build( data->swarm, 0, False );
-	Stg_Component_Initialise( data->swarm, 0, False );
+		/* Configure the swarm */
+		data->swarm = Swarm_New( "testGaussSwarmSingleCell", data->singleCellLayout, data->gaussParticleLayout, data->nDims,
+			sizeof(Particle), data->extensionMgr_Register, NULL, data->comm, NULL );
+		
+		/* Build the swarm */
+		Stg_Component_Build( data->swarm, 0, False );
+		Stg_Component_Initialise( data->swarm, 0, False );
 
-	count = data->swarm->cellParticleCountTbl[0];
-	 
-	stream = Journal_Register( Info_Type, "2ParticlesPerDim_3D" );
-	Stream_RedirectFile( stream, "2ParticlesPerDim_3D.dat" );
+		count = data->swarm->cellParticleCountTbl[0];
+		 
+		stream = Journal_Register( Info_Type, "2ParticlesPerDim_3D" );
+		Stream_RedirectFile( stream, "2ParticlesPerDim_3D.dat" );
 	
-	for( p = 0; p < count; p++ ) {
-		x = ((IntegrationPoint*)Swarm_ParticleInCellAt( data->swarm, 0, p ))->xi[0]; 
-		y = ((IntegrationPoint*)Swarm_ParticleInCellAt( data->swarm, 0, p ))->xi[1]; 
-		z = ((IntegrationPoint*)Swarm_ParticleInCellAt( data->swarm, 0, p ))->xi[2]; 	
-		w = ((IntegrationPoint*)Swarm_ParticleInCellAt( data->swarm, 0, p ))->weight;
-		Journal_Printf( stream, "pId=%d : xi = { %f, %f, %f } weight = %f\n",p,x,y,z,w );	
-	}	
-	pcu_filename_expected( "testGaussLayoutSingleCell2ParticlesPerDimOutput.expected", expected_file );
-	pcu_check_fileEq( "2ParticlesPerDim_3D.dat", expected_file );
+		for( p = 0; p < count; p++ ) {
+			x = ((IntegrationPoint*)Swarm_ParticleInCellAt( data->swarm, 0, p ))->xi[0]; 
+			y = ((IntegrationPoint*)Swarm_ParticleInCellAt( data->swarm, 0, p ))->xi[1]; 
+			z = ((IntegrationPoint*)Swarm_ParticleInCellAt( data->swarm, 0, p ))->xi[2]; 	
+			w = ((IntegrationPoint*)Swarm_ParticleInCellAt( data->swarm, 0, p ))->weight;
+			Journal_Printf( stream, "pId=%d : xi = { %f, %f, %f } weight = %f\n",p,x,y,z,w );	
+		}	
+		pcu_filename_expected( "testGaussLayoutSingleCell2ParticlesPerDimOutput.expected", expected_file );
+		pcu_check_fileEq( "2ParticlesPerDim_3D.dat", expected_file );
+	}
 }
 
 
 void GaussLayoutSingleCellSuite_Test3ParticlesPerDim_3D( GaussLayoutSingleCellSuiteData* data ) {
 	Cell_PointIndex		count;
-	double			x,y,z,w;
-	unsigned int		p, i, len;
-	int			procToWatch;
-	LocalParticle*		particle;
-	Coord			minCell;
-	Coord			maxCell;
-	Stream*			stream;
+	double					x,y,z,w;
+	unsigned int			p, i, len;
+	LocalParticle*			particle;
+	Coord						minCell;
+	Coord						maxCell;
+	Stream*					stream;
 	Particle_InCellIndex	particlesPerDim[3] = {3, 3, 3};
-	Bool			dimExists[] = { True, True, True };	
-	char			expected_file[PCU_PATH_MAX];
-	
-	if( data->nProcs >= 2 ) {
-		procToWatch = 1;
-	}
-	else {
-		procToWatch = 0;
-	}
-	/* Configure the element-cell-layout */
-	data->singleCellLayout = SingleCellLayout_New( "singleCellLayout", dimExists, NULL, NULL );
-	
-	/* Configure the gauss-particle-layout */
-	data->gaussParticleLayout = GaussParticleLayout_New( "gaussParticleLayout", data->nDims , particlesPerDim );
-	
-	/* Configure the swarm */
-	data->swarm = Swarm_New( "testGaussSwarmSingleCell", data->singleCellLayout, data->gaussParticleLayout, data->nDims,
-		sizeof(Particle), data->extensionMgr_Register, NULL, data->comm, NULL );
-		
-	/* Build the swarm */
-	Stg_Component_Build( data->swarm, 0, False );
-	Stg_Component_Initialise( data->swarm, 0, False );
+	Bool						dimExists[] = { True, True, True };	
+	char						expected_file[PCU_PATH_MAX];
 
-	count = data->swarm->cellParticleCountTbl[0];
-	 
-	stream = Journal_Register( Info_Type, "3ParticlesPerDim_3D" );
-	Stream_RedirectFile( stream, "3ParticlesPerDim_3D.dat" );
+	if( data->rank == 0 ) {	
+		/* Configure the element-cell-layout */
+		data->singleCellLayout = SingleCellLayout_New( "singleCellLayout", dimExists, NULL, NULL );
 	
-	for( p = 0; p < count; p++ ) {
-		x = ((IntegrationPoint*)Swarm_ParticleInCellAt( data->swarm, 0, p ))->xi[0]; 
-		y = ((IntegrationPoint*)Swarm_ParticleInCellAt( data->swarm, 0, p ))->xi[1]; 
-		z = ((IntegrationPoint*)Swarm_ParticleInCellAt( data->swarm, 0, p ))->xi[2]; 	
-		w = ((IntegrationPoint*)Swarm_ParticleInCellAt( data->swarm, 0, p ))->weight;
-		Journal_Printf( stream, "pId=%d : xi = { %f, %f, %f } weight = %f\n",p,x,y,z,w );	
-	}	
-	pcu_filename_expected( "testGaussLayoutSingleCell3ParticlesPerDimOutput.expected", expected_file );
-	pcu_check_fileEq( "3ParticlesPerDim_3D.dat", expected_file );
+		/* Configure the gauss-particle-layout */
+		data->gaussParticleLayout = GaussParticleLayout_New( "gaussParticleLayout", data->nDims , particlesPerDim );
+	
+		/* Configure the swarm */
+		data->swarm = Swarm_New( "testGaussSwarmSingleCell", data->singleCellLayout, data->gaussParticleLayout, data->nDims,
+			sizeof(Particle), data->extensionMgr_Register, NULL, data->comm, NULL );
+		
+		/* Build the swarm */
+		Stg_Component_Build( data->swarm, 0, False );
+		Stg_Component_Initialise( data->swarm, 0, False );
+	
+		count = data->swarm->cellParticleCountTbl[0];
+	 
+		stream = Journal_Register( Info_Type, "3ParticlesPerDim_3D" );
+		Stream_RedirectFile( stream, "3ParticlesPerDim_3D.dat" );
+	
+		for( p = 0; p < count; p++ ) {
+			x = ((IntegrationPoint*)Swarm_ParticleInCellAt( data->swarm, 0, p ))->xi[0]; 
+			y = ((IntegrationPoint*)Swarm_ParticleInCellAt( data->swarm, 0, p ))->xi[1]; 
+			z = ((IntegrationPoint*)Swarm_ParticleInCellAt( data->swarm, 0, p ))->xi[2]; 	
+			w = ((IntegrationPoint*)Swarm_ParticleInCellAt( data->swarm, 0, p ))->weight;
+			Journal_Printf( stream, "pId=%d : xi = { %f, %f, %f } weight = %f\n",p,x,y,z,w );	
+		}	
+		pcu_filename_expected( "testGaussLayoutSingleCell3ParticlesPerDimOutput.expected", expected_file );
+		pcu_check_fileEq( "3ParticlesPerDim_3D.dat", expected_file );
+	}
 }
 
 

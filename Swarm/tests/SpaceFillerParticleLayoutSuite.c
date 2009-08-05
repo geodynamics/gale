@@ -49,24 +49,24 @@ struct _Particle {
 };
 
 typedef struct {
-	unsigned			nDims;
-	unsigned			meshSize[3];
-	double				minCrds[3];
-	double				maxCrds[3];
+	unsigned							nDims;
+	unsigned							meshSize[3];
+	double							minCrds[3];
+	double							maxCrds[3];
 	ExtensionManager_Register*	extensionMgr_Register;
-	Mesh*				mesh;
-	ElementCellLayout*		elementCellLayout;
-	Swarm*				swarm;
+	Mesh*								mesh;
+	ElementCellLayout*			elementCellLayout;
+	Swarm*							swarm;
 	SpaceFillerParticleLayout*	particleLayout;
-	DomainContext*			context;
-	MPI_Comm			comm;
-	unsigned int			rank;
-	unsigned int			nProcs;
+	DomainContext*					context;
+	MPI_Comm							comm;
+	unsigned int					rank;
+	unsigned int					nProcs;
 } SpaceFillerParticleLayoutSuiteData;
 
 Mesh* SpaceFillerParticleLayoutSuite_BuildMesh( unsigned nDims, unsigned* size, double* minCrds, double* maxCrds, ExtensionManager_Register* emReg ) {
 	CartesianGenerator*	gen;
-	Mesh*			mesh;
+	Mesh*						mesh;
 
 	gen = CartesianGenerator_New( "" );
 	CartesianGenerator_SetDimSize( gen, nDims );
@@ -87,8 +87,7 @@ Mesh* SpaceFillerParticleLayoutSuite_BuildMesh( unsigned nDims, unsigned* size, 
 }
 
 void SpaceFillerParticleLayoutSuite_Setup( SpaceFillerParticleLayoutSuiteData* data ) {
-	Dimension_Index	dim;
-	char		input_file[PCU_PATH_MAX];
+	char	input_file[PCU_PATH_MAX];
 	
 	/* MPI Initializations */
 	data->comm = MPI_COMM_WORLD;  
@@ -99,6 +98,30 @@ void SpaceFillerParticleLayoutSuite_Setup( SpaceFillerParticleLayoutSuiteData* d
 	data->meshSize[0] = 4;	data->meshSize[1] = 2;	data->meshSize[2] = 1;
 	data->minCrds[0] = 0.0; data->minCrds[1] = 0.0; data->minCrds[2] = 0.0;
 	data->maxCrds[0] = 400.0; data->maxCrds[1] = 200.0; data->maxCrds[2] = 100.0;
+}
+
+void SpaceFillerParticleLayoutSuite_Teardown( SpaceFillerParticleLayoutSuiteData* data ) {
+	/* Destroy stuff */
+	Stg_Class_Delete( data->particleLayout );
+	Stg_Class_Delete( data->elementCellLayout );
+	Stg_Class_Delete( data->swarm );
+	Stg_Class_Delete( data->mesh );
+	Stg_Class_Delete( data->extensionMgr_Register );
+	remove( "spaceFillerParticle.dat" );
+}
+
+void SpaceFillerParticleLayoutSuite_TestSpaceFillerParticle( SpaceFillerParticleLayoutSuiteData* data ) {
+	Dimension_Index	dim;
+	int					procToWatch;
+	Stream*				stream;
+	char					expected_file[PCU_PATH_MAX];
+
+	if( data->nProcs >= 2 ) {
+		procToWatch = 1;
+	}
+	else {
+		procToWatch = 0;
+	}
 	
 	/* Init mesh */
 	data->extensionMgr_Register = ExtensionManager_Register_New();
@@ -120,31 +143,6 @@ void SpaceFillerParticleLayoutSuite_Setup( SpaceFillerParticleLayoutSuiteData* d
 	/* Build the swarm */
 	Stg_Component_Build( data->swarm, 0, False );
 	Stg_Component_Initialise( data->swarm, 0, False );
-}
-
-void SpaceFillerParticleLayoutSuite_Teardown( SpaceFillerParticleLayoutSuiteData* data ) {
-	/* Destroy stuff */
-	Stg_Class_Delete( data->particleLayout );
-	Stg_Class_Delete( data->elementCellLayout );
-	Stg_Class_Delete( data->swarm );
-	Stg_Class_Delete( data->mesh );
-	Stg_Class_Delete( data->extensionMgr_Register );
-	remove( "spaceFillerParticle.dat" );
-}
-
-void SpaceFillerParticleLayoutSuite_TestSpaceFillerParticle( SpaceFillerParticleLayoutSuiteData* data ) {
-	int	procToWatch;
-	Stream*	stream;
-	char	expected_file[PCU_PATH_MAX];
-	
-	if( data->nProcs >= 2 ) {
-		procToWatch = 1;
-	}
-	else {
-		procToWatch = 0;
-	}
-	if( data->rank == procToWatch ) printf( "Watching rank: %i\n", data->rank );
-	
 	stream = Journal_Register( Info_Type, "ManualParticle" );
 	
 	if( data->rank == procToWatch ) {
@@ -152,9 +150,9 @@ void SpaceFillerParticleLayoutSuite_TestSpaceFillerParticle( SpaceFillerParticle
 		/* Print out the particles on all cells */
 		Stream_RedirectFile( stream, "spaceFillerParticle.dat" );
 		Swarm_PrintParticleCoords_ByCell( data->swarm, stream );
+		pcu_filename_expected( "testSpaceFillerParticleLayoutOutput.expected", expected_file );
+		pcu_check_fileEq( "spaceFillerParticle.dat", expected_file );
 	}
-	pcu_filename_expected( "testSpaceFillerParticleLayoutOutput.expected", expected_file );
-	pcu_check_fileEq( "spaceFillerParticle.dat", expected_file );
 }
 
 void SpaceFillerParticleLayoutSuite( pcu_suite_t* suite ) {

@@ -49,13 +49,13 @@
 
 typedef struct {
 	ExtensionManager_Register*	extensionMgr_Register;
-	SwarmVariable_Register* 	swarmVariable_Register;
-	Dictionary*			dictionary;
-	DomainContext*			context;
-	Name				outputPath;
-	MPI_Comm			comm;
-	unsigned int			rank;
-	unsigned int			nProcs;
+	SwarmVariable_Register*		swarmVariable_Register;
+	Dictionary*						dictionary;
+	DomainContext*					context;
+	Name								outputPath;
+	MPI_Comm							comm;
+	unsigned int					rank;
+	unsigned int					nProcs;
 } SwarmOutputSuiteData;
 
 double SwarmOutputSuite_Dt( void* context ) {
@@ -66,10 +66,10 @@ void _SwarmOutputSuite_SetDt( void* context, double dt ) {
 }
 
 void SwarmOutputSuite_MoveParticles( AbstractContext* context ) {
-	Swarm*		swarm = (Swarm*) LiveComponentRegister_Get( context->CF->LCRegister, "swarm" );
-	Particle_Index	lParticle_I;
+	Swarm*				swarm = (Swarm*) LiveComponentRegister_Get( context->CF->LCRegister, "swarm" );
+	Particle_Index		lParticle_I;
 	GlobalParticle*	particle;
-	double		x,y;
+	double				x,y;
 
 	for ( lParticle_I = 0 ; lParticle_I < swarm->particleLocalCount; lParticle_I++ ) {
 		particle = (GlobalParticle*)Swarm_ParticleAt( swarm, lParticle_I );
@@ -85,7 +85,7 @@ void SwarmOutputSuite_MoveParticles( AbstractContext* context ) {
 
 void SwarmOutputSuite_Setup( SwarmOutputSuiteData* data ) {
 	Dimension_Index	dim;
-	char		input_file[PCU_PATH_MAX];
+	char					input_file[PCU_PATH_MAX];
 	
 	/* MPI Initializations */
 	data->comm = MPI_COMM_WORLD;  

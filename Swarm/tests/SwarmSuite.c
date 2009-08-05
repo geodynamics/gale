@@ -49,23 +49,23 @@ struct _Particle {
 };
 
 typedef struct {
-	unsigned			nDims;
-	unsigned			meshSize[3];
-	double				minCrds[3];
-	double				maxCrds[3];
+	unsigned							nDims;
+	unsigned							meshSize[3];
+	double							minCrds[3];
+	double							maxCrds[3];
 	ExtensionManager_Register*	extensionMgr_Register;
-	Mesh*				mesh;
-	ElementCellLayout*		elementCellLayout;
+	Mesh*								mesh;
+	ElementCellLayout*			elementCellLayout;
 	RandomParticleLayout*		randomParticleLayout;
-	Swarm*				swarm;
-	MPI_Comm			comm;
-	unsigned int			rank;
-	unsigned int			nProcs;
+	Swarm*							swarm;
+	MPI_Comm							comm;
+	unsigned int					rank;
+	unsigned int					nProcs;
 } SwarmSuiteData;
 
 Mesh* SwarmSuite_BuildMesh( unsigned nDims, unsigned* size, double* minCrds, double* maxCrds, ExtensionManager_Register* emReg ) {
 	CartesianGenerator*	gen;
-	Mesh*			mesh;
+	Mesh*						mesh;
 
 	gen = CartesianGenerator_New( "" );
 	CartesianGenerator_SetDimSize( gen, nDims );
@@ -86,10 +86,10 @@ Mesh* SwarmSuite_BuildMesh( unsigned nDims, unsigned* size, double* minCrds, dou
 }
 
 Bool SwarmSuite_TestParticleSearchFunc( Swarm* swarm, Coord coord, Stream* stream ) {
-	double              distance;
-	Particle_Index      closestParticle_I;
-	Particle_Index      lParticle_I;
-	GlobalParticle*     particle;
+	double				distance;
+	Particle_Index		closestParticle_I;
+	Particle_Index		lParticle_I;
+	GlobalParticle*	particle;
 
 	Journal_Printf( stream, "Testing coord %g %g %g\n", coord[ I_AXIS ], coord[ J_AXIS ], coord[ K_AXIS ] );
 

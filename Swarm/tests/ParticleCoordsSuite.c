@@ -49,67 +49,64 @@ struct _Particle {
 };
 
 typedef struct {
-	ExtensionManager_Register*	extensionMgr_Register;
-	Variable_Register*		variable_Register;
-	Swarm*				swarm;
-	MPI_Comm			comm;
-	unsigned int			rank;
-	unsigned int			nProcs;
+	MPI_Comm	comm;
+	unsigned int	rank;
+	unsigned int	nProcs;
 } ParticleCoordsSuiteData;
 
 void ParticleCoordsSuite_Setup( ParticleCoordsSuiteData* data ) {
-	char input_file[PCU_PATH_MAX];
-
 	/* MPI Initializations */
 	data->comm = MPI_COMM_WORLD;  
 	MPI_Comm_rank( data->comm, &data->rank );
 	MPI_Comm_size( data->comm, &data->nProcs );
-
-	data->extensionMgr_Register = ExtensionManager_Register_New();   
-	data->variable_Register = Variable_Register_New();
 }
 
 void ParticleCoordsSuite_Teardown( ParticleCoordsSuiteData* data ) {
-	/* Destroy stuff */
-	Stg_Class_Delete( data->swarm );
-	Stg_Class_Delete( data->extensionMgr_Register );
-	Stg_Class_Delete( data->variable_Register );
 }
 
 void ParticleCoordsSuite_TestLineParticle( ParticleCoordsSuiteData* data ) {
-	int		procToWatch;
-	Stream*		stream;
-	Dictionary*	dictionary;
-	DomainContext*	context;
-	char		input_file[PCU_PATH_MAX];
-	char		expected_file[PCU_PATH_MAX];
-	
-	if( data->nProcs >= 2 ) {
+	ExtensionManager_Register*	extensionMgr_Register;
+	Variable_Register*			variable_Register;
+	Swarm*							swarm;
+	Stream*							stream;
+	Dictionary*						dictionary;
+	DomainContext*					context;
+	int								procToWatch;
+	char								input_file[PCU_PATH_MAX];
+	char								expected_file[PCU_PATH_MAX];
+
+	if( data->nProcs >=2 ) {
 		procToWatch = 1;
 	}
 	else {
 		procToWatch = 0;
 	}
-	if( data->rank == procToWatch ) printf( "Watching rank: %i\n", data->rank );
+
+	/* Registers */
+	extensionMgr_Register = ExtensionManager_Register_New();   
+	variable_Register = Variable_Register_New();
 
 	/* read in the xml input file */
 	pcu_filename_input( "testLineParticleLayout.xml", input_file );
 	context = (DomainContext*)stgMainInitFromXML( input_file, data->comm );
 	dictionary = context->dictionary;
+	stream = Journal_Register( Info_Type, "LinearParticleStream" );
 
-	stream = Journal_Register( Info_Type, "ParticleCoords" );
-	procToWatch = Dictionary_GetUnsignedInt( dictionary, "procToWatch" );
-	
 	if( data->rank == procToWatch ) {
-		Stream_RedirectFile_WithPrependedPath( stream, Dictionary_GetString( dictionary, "outputPath" ), "output.dat" );
+		Stream_RedirectFile( stream, "linearParticle.dat" );
 
-		data->swarm = (Swarm*) LiveComponentRegister_Get( context->CF->LCRegister, "swarm" );
-		pcu_check_true( data->swarm );
+		swarm = (Swarm*) LiveComponentRegister_Get( context->CF->LCRegister, "swarm" );
+		pcu_check_true( swarm );
 
-		Swarm_PrintParticleCoords( data->swarm, stream );
+		Swarm_PrintParticleCoords( swarm, stream );
 
 		pcu_filename_expected( "testLineParticleLayout.0of1.output.dat.expected", expected_file );
-		pcu_check_fileEq( "output/output.dat", expected_file );
+		pcu_check_fileEq( "linearParticle.dat", expected_file );
+
+		/* Destroy stuff */
+		Stg_Class_Delete( swarm );
+		Stg_Class_Delete( extensionMgr_Register );
+		Stg_Class_Delete( variable_Register );
 	}
 }
 
