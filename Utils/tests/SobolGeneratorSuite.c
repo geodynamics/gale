@@ -45,9 +45,9 @@
 #include "SobolGeneratorSuite.h"
 
 typedef struct {
-	MPI_Comm			comm;
-	unsigned			rank;
-	unsigned			nProcs;
+	MPI_Comm	comm;
+	unsigned	rank;
+	unsigned	nProcs;
 } SobolGeneratorSuiteData;
 
 void SobolGeneratorSuite_Setup( SobolGeneratorSuiteData* data ) {
@@ -69,21 +69,21 @@ void SobolGeneratorSuite_Teardown( SobolGeneratorSuiteData* data ) {
 }
 
 void SobolGeneratorSuite_TestSobolGenerator( SobolGeneratorSuiteData* data ) {
-	int		procToWatch;
-	Stream*		stream;
+	int					procToWatch;
+	Stream*				stream;
 	SobolGenerator*	sobolGenerator;
-	Index		index;
-	Index		sobol_I;
-	int		bit_I;
-	char		name[50];
-	double		result;
-	char		rightmostBit_expected[PCU_PATH_MAX];
-	char		generator0_expected[PCU_PATH_MAX];
-	char		generator1_expected[PCU_PATH_MAX];
-	char		generator2_expected[PCU_PATH_MAX];
-	char		generator3_expected[PCU_PATH_MAX];
-	char		generator4_expected[PCU_PATH_MAX];
-	char		generator5_expected[PCU_PATH_MAX];
+	Index					index;
+	Index					sobol_I;
+	int					bit_I;
+	char					name[50];
+	double				result;
+	char					rightmostBit_expected[PCU_PATH_MAX];
+	char					generator0_expected[PCU_PATH_MAX];
+	char					generator1_expected[PCU_PATH_MAX];
+	char					generator2_expected[PCU_PATH_MAX];
+	char					generator3_expected[PCU_PATH_MAX];
+	char					generator4_expected[PCU_PATH_MAX];
+	char					generator5_expected[PCU_PATH_MAX];
 
 	if( data->nProcs >= 2 ) {
 		procToWatch = 1;
@@ -93,54 +93,53 @@ void SobolGeneratorSuite_TestSobolGenerator( SobolGeneratorSuiteData* data ) {
 	}
 
 	if( data->rank == procToWatch ) {
-
 		stream = Journal_Register (Info_Type, "SobolGeneratorStream");
 		Stream_RedirectFile( stream, "RightmostBit.dat" );
 	
-        	Journal_Printf( stream, " *********************** Testing _SobolGenerator_FindRightmostZeroBit *******************\n" );
-        	for ( index = 0 ; index < 30 ; index++ ) {
-        	        for ( bit_I = sizeof( Index ) * 4 - 1 ; bit_I >= 0 ; bit_I-- )
-        	                Journal_Printf( stream, "%u", index & 1 << bit_I ? 1 : 0 );
-        	        Journal_Printf( stream, " number %u: %u\n", index, _SobolGenerator_FindRightmostZeroBit( index ) );
-        	}
-
-        	/* constructor  */
-        	for ( sobol_I = 0 ; sobol_I < 6 ; sobol_I++ ) {
-        	        sprintf( name, "testGenerator%u", sobol_I );
-        	        Stream_RedirectFile( stream, name );
-        	        sobolGenerator = SobolGenerator_NewFromTable( name );
-
-        	        Journal_Printf( stream," ****************** Testing SobolGenerator_GetDirectionalNumber ***************\n" );
-        	        for ( index = 0 ; index < 30 ; index++ )
-        	                SobolGenerator_GetDirectionalNumber( sobolGenerator, index );
-	
-	                /* Checking up to 200000 numbers - this number is arbitary - 
-	                 * it's only limited because we don't want file size to be huge
-	                 * This number is intentionally over 25535 = 2^16 - 1 because there was a time when numbers repeated after this */
-	                for ( index = 0 ; index < 200000 ; index++ ) {
-        	                result = SobolGenerator_GetNextNumber(sobolGenerator);
-	
-        	                assert( fabs( result - SobolGenerator_GetNumberByIndex(sobolGenerator, index)) < 1e-8 );
-
-        	                /* Only dump subset of data - this output criterion is completely arbitary */
-        	                if ( index % 773 == 3 )
-        	                        Journal_Printf( stream, "%.4g\n", result );
-        	        }
-        	        Stg_Class_Delete( sobolGenerator );
+		Journal_Printf( stream, " *********************** Testing _SobolGenerator_FindRightmostZeroBit *******************\n" );
+		for ( index = 0 ; index < 30 ; index++ ) {
+			for ( bit_I = sizeof( Index ) * 4 - 1 ; bit_I >= 0 ; bit_I-- )
+				Journal_Printf( stream, "%u", index & 1 << bit_I ? 1 : 0 );
+			Journal_Printf( stream, " number %u: %u\n", index, _SobolGenerator_FindRightmostZeroBit( index ) );
 		}
-		pcu_filename_expected( "testSobolGeneratorRightmostBit.expected", rightmostBit_expected );
+
+		/* constructor  */
+		for ( sobol_I = 0 ; sobol_I < 6 ; sobol_I++ ) {
+			sprintf( name, "testGenerator%u", sobol_I );
+			Stream_RedirectFile( stream, name );
+			sobolGenerator = SobolGenerator_NewFromTable( name );
+
+			Journal_Printf( stream," ****************** Testing SobolGenerator_GetDirectionalNumber ***************\n" );
+			for ( index = 0 ; index < 30 ; index++ )
+				SobolGenerator_GetDirectionalNumber( sobolGenerator, index );
+	
+			/* Checking up to 200000 numbers - this number is arbitary - 
+			* it's only limited because we don't want file size to be huge
+			* This number is intentionally over 25535 = 2^16 - 1 because there was a time when numbers repeated after this */
+			for ( index = 0 ; index < 200000 ; index++ ) {
+				result = SobolGenerator_GetNextNumber(sobolGenerator);
+	
+				assert( fabs( result - SobolGenerator_GetNumberByIndex(sobolGenerator, index)) < 1e-8 );
+
+				/* Only dump subset of data - this output criterion is completely arbitary */
+				if ( index % 773 == 3 )
+					Journal_Printf( stream, "%.4g\n", result );
+			}
+			Stg_Class_Delete( sobolGenerator );
+		}
+		pcu_filename_expected( "testSobolGeneratorRightmostBitOutput.expected", rightmostBit_expected );
 		pcu_check_fileEq( "RightmostBit.dat", rightmostBit_expected );
-		pcu_filename_expected( "testSobolGenerator0.expected", generator0_expected );
+		pcu_filename_expected( "testSobolGenerator0Output.expected", generator0_expected );
 		pcu_check_fileEq( "testGenerator0", generator0_expected );
-		pcu_filename_expected( "testSobolGenerator1.expected", generator1_expected );
+		pcu_filename_expected( "testSobolGenerator1Output.expected", generator1_expected );
 		pcu_check_fileEq( "testGenerator1", generator1_expected );	
-		pcu_filename_expected( "testSobolGenerator2.expected", generator2_expected );
+		pcu_filename_expected( "testSobolGenerator2Output.expected", generator2_expected );
 		pcu_check_fileEq( "testGenerator2", generator2_expected );
-		pcu_filename_expected( "testSobolGenerator3.expected", generator3_expected );
+		pcu_filename_expected( "testSobolGenerator3Output.expected", generator3_expected );
 		pcu_check_fileEq( "testGenerator3", generator3_expected );
-		pcu_filename_expected( "testSobolGenerator4.expected", generator4_expected );
+		pcu_filename_expected( "testSobolGenerator4Output.expected", generator4_expected );
 		pcu_check_fileEq( "testGenerator4", generator4_expected );
-		pcu_filename_expected( "testSobolGenerator5.expected", generator5_expected );
+		pcu_filename_expected( "testSobolGenerator5Output.expected", generator5_expected );
 		pcu_check_fileEq( "testGenerator5", generator5_expected );
 	}
 }

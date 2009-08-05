@@ -165,21 +165,21 @@ void OperatorFieldVariableSuite_TestOperator( OperatorFieldVariableSuiteData* da
 			StGermain_PrintVector( stream, coord[ index ], 3 );
 
 			Journal_Printf( stream, "velocity = ");
-			FieldVariable_InterpolateValueAt( velocityField, coord[ index ], value );	
+			pcu_check_true( FieldVariable_InterpolateValueAt( velocityField, coord[ index ], value ) );
 			StGermain_PrintVector( stream, value, 3 );
 
 			Journal_Printf( stream, "velocity squared 2d = ");
-			FieldVariable_InterpolateValueAt( velSquared2D, coord[ index ], value );
+			pcu_check_true( FieldVariable_InterpolateValueAt( velSquared2D, coord[ index ], value ) );
 			StGermain_PrintVector( stream, value, 1 );
 			Journal_Printf( stream, "velocity squared 3d = ");
-			FieldVariable_InterpolateValueAt( velSquared3D, coord[ index ], value );
+			pcu_check_true( FieldVariable_InterpolateValueAt( velSquared3D, coord[ index ], value ) );
 			StGermain_PrintVector( stream, value, 1 );
 
 			Journal_Printf( stream, "velocity magnitude 2d = ");
-			FieldVariable_InterpolateValueAt( velMag2D, coord[ index ], value );
+			pcu_check_true( FieldVariable_InterpolateValueAt( velMag2D, coord[ index ], value ) );
 			StGermain_PrintVector( stream, value, 1 );
 			Journal_Printf( stream, "velocity magnitude 3d = ");
-			FieldVariable_InterpolateValueAt( velMag3D, coord[ index ], value );
+			pcu_check_true( FieldVariable_InterpolateValueAt( velMag3D, coord[ index ], value ) );
 			StGermain_PrintVector( stream, value, 1 );
 			Journal_Printf(stream, "\n");
 		}
