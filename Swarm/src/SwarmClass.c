@@ -477,8 +477,7 @@ void* _Swarm_Copy( void* swarm, void* dest, Bool deep, Name nameExt, PtrMap* ptr
 		newSwarm->cellLayout = (CellLayout*)Stg_Class_Copy( self->cellLayout, NULL, deep, nameExt, map );
 		newSwarm->particleLayout = (ParticleLayout*)Stg_Class_Copy( self->particleLayout, NULL, deep, nameExt, map );
 		newSwarm->debug = (Stream*)Stg_Class_Copy( self->debug, NULL, deep, nameExt, map );
-		newSwarm->particleExtensionMgr = (ExtensionManager*)Stg_Class_Copy( self->particleExtensionMgr, NULL, deep, nameExt, map 
-);
+		newSwarm->particleExtensionMgr = (ExtensionManager*)Stg_Class_Copy( self->particleExtensionMgr, NULL, deep, nameExt, map );
 		newSwarm->commHandlerList = (Stg_ObjectList*)Stg_Class_Copy( self->commHandlerList, NULL, deep, nameExt, map );
 		
 		/* Arrays */
@@ -1228,8 +1227,6 @@ Particle_Index Swarm_FindClosestParticle( void* _swarm, Dimension_Index dim, dou
 	NeighbourIndex*      neighbourList;
 	Particle_Index       closestParticle_I;
 
-   Journal_Firewall( NULL, Swarm_Error, "\n I am currently broken.  Fix me.  John M. 20090803 \n");
-
 	/* Find cell this coordinate is in */
 	memcpy( testParticle.coord, coord, sizeof(Coord) );
 	/* First specify the particle doesn't have an owning cell yet, so as
@@ -1248,7 +1245,7 @@ Particle_Index Swarm_FindClosestParticle( void* _swarm, Dimension_Index dim, dou
 	closestParticle_I = swarm->cellParticleTbl[ lCell_I ][ cParticle_I ];
 
 	/* Find neighbours to this cell - TODO This Assumes ElementCellLayout */
-	Mesh_GetIncidence( ((ElementCellLayout*)swarm->cellLayout)->mesh, dim, lCell_I, MT_VERTEX, swarm->incArray );
+	Mesh_GetIncidence( ((ElementCellLayout*)swarm->cellLayout)->mesh, dim, lCell_I, dim, swarm->incArray );
 	neighbourCount = IArray_GetSize( swarm->incArray );
 	neighbourList = IArray_GetPtr( swarm->incArray );
 
@@ -1256,8 +1253,7 @@ Particle_Index Swarm_FindClosestParticle( void* _swarm, Dimension_Index dim, dou
 	for ( neighbour_I = 0 ; neighbour_I < neighbourCount ; neighbour_I++ ) {
 		lCell_I = neighbourList[ neighbour_I ];
 
-		/* TODO - Be more clever than checking every particle in this cell */
-		if( lCell_I < swarm->cellDomainCount ) { /* dave - 05.09.07 */
+		if( lCell_I < swarm->cellDomainCount ) {
 			cParticle_I = Swarm_FindClosestParticleInCell( swarm, lCell_I, dim, coord, &distanceToParticle );
 
 			/* Check to see if closest particle in this cell is closest to this coord */
@@ -1283,7 +1279,7 @@ Particle_InCellIndex Swarm_FindClosestParticleInCell( void* swarm, Cell_DomainIn
 	double               minDistance         = HUGE_VAL;
 	double               distanceToParticle;
 
-	/* TODO: need to reconsideer - gauss particle layout should be allowed, but not swarms that have no local
+	/* TODO: need to reconsider - gauss particle layout should be allowed, but not swarms that have no local
 	 * co-ordinates */
 	/*
 	Journal_Firewall(
