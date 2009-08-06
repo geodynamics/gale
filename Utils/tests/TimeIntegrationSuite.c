@@ -275,16 +275,16 @@ void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_nam
 						error += fabs( Variable_GetValueAtDouble( variable, array_I, 1 ) + 0.5 * array_I * context->currentTime * context->currentTime );
 					}
 					else if ( timeIntegratee->_calculateTimeDeriv == TimeIntegrationSuite_LinearTimeDeriv2 ) {
-							error += fabs( Variable_GetValueAtDouble( variable, array_I, 0 ) + 0.25 * array_I * context->currentTime * context->currentTime );
-							error += fabs( Variable_GetValueAtDouble( variable, array_I, 1 ) - 1.5 * array_I * context->currentTime * context->currentTime );
+						error += fabs( Variable_GetValueAtDouble( variable, array_I, 0 ) + 0.25 * array_I * context->currentTime * context->currentTime );
+						error += fabs( Variable_GetValueAtDouble( variable, array_I, 1 ) - 1.5 * array_I * context->currentTime * context->currentTime );
 					}
 					else if ( timeIntegratee->_calculateTimeDeriv == TimeIntegrationSuite_CubicTimeDeriv ) {
-							error += fabs( Variable_GetValueAtDouble( variable, array_I, 0 ) - 2.0 * array_I * ( 0.25 * pow( context->currentTime, 4.0 ) - pow( context->currentTime, 3.0)/3.0));
-							error += fabs( Variable_GetValueAtDouble( variable, array_I, 1 ) + array_I * ( 0.25 * pow( context->currentTime, 4.0 ) - pow( context->currentTime, 3.0 )/3.0));
+						error += fabs( Variable_GetValueAtDouble( variable, array_I, 0 ) - 2.0 * array_I * ( 0.25 * pow( context->currentTime, 4.0 ) - pow( context->currentTime, 3.0)/3.0));
+						error += fabs( Variable_GetValueAtDouble( variable, array_I, 1 ) + array_I * ( 0.25 * pow( context->currentTime, 4.0 ) - pow( context->currentTime, 3.0 )/3.0));
 					}
 					else if ( timeIntegratee->_calculateTimeDeriv == TimeIntegrationSuite_CubicTimeDeriv2 ) {
-							error += fabs( Variable_GetValueAtDouble( variable, array_I, 0 ) + 0.5 * array_I * ( 0.25 * pow( context->currentTime, 4.0 ) - pow( context->currentTime, 3.0)/3.0));
-							error += fabs( Variable_GetValueAtDouble( variable, array_I, 1 ) - 3.0 * array_I * ( 0.25 * pow( context->currentTime, 4.0 ) - pow( context->currentTime, 3.0 )/3.0));
+						error += fabs( Variable_GetValueAtDouble( variable, array_I, 0 ) + 0.5 * array_I * ( 0.25 * pow( context->currentTime, 4.0 ) - pow( context->currentTime, 3.0)/3.0));
+						error += fabs( Variable_GetValueAtDouble( variable, array_I, 1 ) - 3.0 * array_I * ( 0.25 * pow( context->currentTime, 4.0 ) - pow( context->currentTime, 3.0 )/3.0));
 					}
 					else
 						Journal_Firewall( 0 , Journal_Register( Error_Type, CURR_MODULE_NAME ), "Don't understand _calculateTimeDeriv = %p\n", timeIntegratee->_calculateTimeDeriv );
@@ -325,13 +325,46 @@ void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_nam
 }
 	
 void TimeIntegrationSuite_TestEuler( TimeIntegrationSuiteData* data ) {
-	TimeIntegrationSuite_TestDriver( data, "testIntegrationEuler", "Constant", "Constant2", 1 );
+	int procToWatch;
+
+	if( data->nProcs >= 2 ) {
+      procToWatch = 1;
+   }
+   else {
+      procToWatch = 0;
+   }
+
+	if( data->rank == procToWatch ) {	
+		TimeIntegrationSuite_TestDriver( data, "testIntegrationEuler", "Constant", "Constant2", 1 );
+	}
 }
 void TimeIntegrationSuite_TestRK2( TimeIntegrationSuiteData* data ) {
-	TimeIntegrationSuite_TestDriver( data, "testIntegrationRK2", "Linear", "Linear2", 2 );
+	int procToWatch;
+
+	if( data->nProcs >= 2 ) {
+      procToWatch = 1;
+   }
+   else {
+      procToWatch = 0;
+   }
+
+	if( data->rank == procToWatch ) {	
+		TimeIntegrationSuite_TestDriver( data, "testIntegrationRK2", "Linear", "Linear2", 2 );
+	}
 }
 void TimeIntegrationSuite_TestRK4( TimeIntegrationSuiteData* data ) {
-	TimeIntegrationSuite_TestDriver( data, "testIntegrationRK4", "Cubic", "Cubic2", 4 );
+	int procToWatch;
+
+	if( data->nProcs >= 2 ) {
+      procToWatch = 1;
+   }
+   else {
+      procToWatch = 0;
+   }
+
+	if( data->rank == procToWatch ) {	
+		TimeIntegrationSuite_TestDriver( data, "testIntegrationRK4", "Cubic", "Cubic2", 4 );
+	}
 }
 
 void TimeIntegrationSuite( pcu_suite_t* suite ) {

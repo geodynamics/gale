@@ -101,7 +101,6 @@ void SwarmOutputSuite_Setup( SwarmOutputSuiteData* data ) {
 	data->dictionary = data->context->dictionary;
 	data->outputPath = Dictionary_GetString( data->dictionary, "outputPath" );
 
-	
 	ContextEP_Append( data->context, AbstractContext_EP_Dt, SwarmOutputSuite_Dt );
 	ContextEP_Append( data->context, AbstractContext_EP_Step, SwarmOutputSuite_MoveParticles );
 	
@@ -124,12 +123,9 @@ void SwarmOutputSuite_TestSwarmOutput( SwarmOutputSuiteData* data ) {
 	char	output_file[PCU_PATH_MAX];
 	
 	MPI_Barrier( data->comm );
-	//Stg_Component_Build( data->context, 0 /* dummy */, False );
-	//Stg_Component_Initialise( data->context, 0 /* dummy */, False );
 	printf("Number of timestep: %d", Dictionary_GetUnsignedInt( data->dictionary, "maxTimeSteps" ) );
 
 	AbstractContext_Dump( data->context );
-	//Stg_Component_Execute( data->context, 0 /* dummy */, False );
 }
 
 void SwarmOutputSuite( pcu_suite_t* suite ) {
