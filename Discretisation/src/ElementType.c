@@ -205,29 +205,33 @@ double ElementType_JacobianDeterminantSurface( void* elementType, void* mesh, un
 
 int _ElementType_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* normal ) {
 	ElementType* 	self = (ElementType*)elementType;
-	unsigned	dim_I;
-	int		surfaceIndex, surfaceDim = -1;
-	Bool		topSide = False;
 
-	for( dim_I = 0; dim_I < dim; dim_I++ ) {
-		if( xi[dim_I] < -1.0 + EPS ) {
-			normal[dim_I] = -1.0;
-			surfaceDim = dim_I;
-		}
-		else if( xi[dim_I] > 1.0 - EPS ) {
-			normal[dim_I] = 1.0;
-			surfaceDim = dim_I;
-			topSide = True;
-		}
-		else
-			normal[dim_I] = 0.0;
-	}
-	
-	surfaceIndex = 2 * surfaceDim;
-	if( topSide )
-		surfaceIndex++;
+        memset( normal, 0, sizeof(double) * dim );
 
-	return surfaceIndex;
+        if( xi[J_AXIS] < -1.0 + EPS ) {
+                normal[J_AXIS] = -1.0;
+                return 0;
+        }
+        else if( xi[J_AXIS] > +1.0 - EPS ) {
+                normal[J_AXIS] = +1.0;
+                return 1;
+        }
+        else if( xi[I_AXIS] < -1.0 + EPS ) {
+                normal[I_AXIS] = -1.0;
+                return 2;
+        }
+        else if( xi[I_AXIS] > +1.0 - EPS ) {
+                normal[I_AXIS] = +1.0;
+                return 3;
+        }
+        else if( xi[K_AXIS] < -1.0 + EPS ) {
+                normal[K_AXIS] = -1.0;
+                return 4;
+        }
+        else if( xi[K_AXIS] > +1.0 - EPS ) {
+                normal[K_AXIS] = +1.0;
+                return 5;
+        }
 }
 
 int ElementType_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* normal ) {
