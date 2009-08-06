@@ -4,15 +4,15 @@
 <!--Purpose: Defines a Shape component. Shape is a box defined by 6 positions, 2 for each axis--> 
 	<include>testShape.xml</include>
 
-	<!-- set simulation to run in 2D -->
-	<param name="dim">2</param>
+	<!-- set simulation to run in 3D -->
+	<param name="dim">3</param>
 
 	<struct name="components" mergeType="merge">
 		<struct name="shape">
 			<param name="Type">Box</param>
-			<param name="startX">-0.1</param> <param name="endX">0.2</param>
-			<param name="startY">-0.2</param> <param name="endY">0.0</param>
-			<param name="startZ">-0.5</param> <param name="endZ">0.3</param>
+			<param name="startX">-0.8</param> <param name="endX">-0.2</param>
+			<param name="startY">-0.5</param> <param name="endY">-0.1</param>
+			<param name="startZ">-0.6</param> <param name="endZ">-0.3</param>
 		</struct>
 	</struct>
 
