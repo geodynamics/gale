@@ -79,6 +79,7 @@ void lucViewport2d(Bool enabled, lucViewportInfo* viewportInfo);
 void lucPrintString(const char* str);
 void lucPrintf(int x, int y, const char* fmt, ...);
 void lucPrint(int x, int y, const char* str);
+void lucPrint3d(double x, double y, double z, const char *str);
 void lucSetFontCharset(int charset);
 int lucStringWidth(const char *string);
 void lucSetupRasterFont();

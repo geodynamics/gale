@@ -94,6 +94,7 @@ void lucViewport2d(Bool enabled, lucViewportInfo* viewportInfo)
 		/* If this is not done, than any object displayed after the colour bar will not appear,*/
 		/* because the projection matrix and lookAt point have been altered */
 		lucViewportInfo_SetOpenGLCamera( viewportInfo );
+        //OK: Is this necessary with Push/Pop Matrix? Don't think so...
 	}
 }
 
@@ -108,7 +109,6 @@ void lucPrintString(const char* str)
 	glEnable(GL_TEXTURE_2D);				 					/* Enable Texture Mapping */
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glListBase(fontbase - 32 + (96 * fontcharset));		/* Choose the font and charset */
-
 	glCallLists(strlen(str),GL_UNSIGNED_BYTE, str);		/* Display */
 	glDisable(GL_TEXTURE_2D);									/* Disable Texture Mapping */
 
@@ -117,19 +117,18 @@ void lucPrintString(const char* str)
 	 * as no text is stored in the GL feedback buffer */  
 		gl2psText( A, "Times-Roman", 16);
 	#endif
-	glDisable(GL_TEXTURE_2D);				 					/* Turn off Texture Mapping */
 }
 
 void lucPrintf(int x, int y, const char *fmt, ...)
 {
-	char text[512];
-	va_list		ap;							/* Pointer to arguments list */
-	if (fmt == NULL) return; 		/* No format string */
-	va_start(ap, fmt);						/* Parse format string for variables */
-		vsprintf(text, fmt, ap);			/* Convert symbols */
-	va_end(ap);
+    char    text[512];
+    va_list ap;                 /* Pointer to arguments list */
+    if (fmt == NULL) return;    /* No format string */
+    va_start(ap, fmt);          /* Parse format string for variables */
+    vsprintf(text, fmt, ap);    /* Convert symbols */
+    va_end(ap);
 
-	lucPrint(x, y, text);					/* Print result string */
+    lucPrint(x, y, text);       /* Print result string */
 }
 
 void lucPrint(int x, int y, const char *str)
@@ -139,6 +138,42 @@ void lucPrint(int x, int y, const char *str)
 	glTranslated(x, y, 0);
 	lucPrintString(str);
 	glPopMatrix();
+}
+
+void lucPrint3d(double x, double y, double z, const char *str)
+{
+   	GLdouble modelMatrix[16];
+	GLdouble projMatrix[16];
+	GLint    viewportArray[4];
+	double  xPos, yPos, depth;
+
+	glGetDoublev( GL_MODELVIEW_MATRIX, modelMatrix );
+	glGetDoublev( GL_PROJECTION_MATRIX, projMatrix );
+	glGetIntegerv( GL_VIEWPORT, viewportArray );
+
+	gluProject(x, y, z, 
+		modelMatrix,
+		projMatrix,
+		viewportArray,
+		&xPos,
+		&yPos,
+		&depth
+	);
+
+    /* Print in raster coords */
+ 		/* Set up 2D Viewer the size of the viewport */
+		glDisable( GL_DEPTH_TEST );
+		glPushMatrix();
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glOrtho((GLfloat) 0.0, viewportArray[2], viewportArray[3], (GLfloat) 0.0, -1.0f,1.0f);
+		
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();   
+
+    lucPrint(xPos, yPos, str);
+
+        glPopMatrix();
 }
 
 void lucSetFontCharset(int charset)
