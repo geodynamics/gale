@@ -94,7 +94,6 @@ void lucViewport2d(Bool enabled, lucViewportInfo* viewportInfo)
 		/* If this is not done, than any object displayed after the colour bar will not appear,*/
 		/* because the projection matrix and lookAt point have been altered */
 		lucViewportInfo_SetOpenGLCamera( viewportInfo );
-        //OK: Is this necessary with Push/Pop Matrix? Don't think so...
 	}
 }
 
@@ -106,6 +105,7 @@ void lucPrintString(const char* str)
 	if (fontcharset > FONT_LARGE || fontcharset < FONT_FIXED)		/* Character set valid? */
 		fontcharset = FONT_FIXED;	
 
+    glActiveTexture(GL_TEXTURE0);
 	glEnable(GL_TEXTURE_2D);				 					/* Enable Texture Mapping */
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glListBase(fontbase - 32 + (96 * fontcharset));		/* Choose the font and charset */
@@ -142,6 +142,7 @@ void lucPrint(int x, int y, const char *str)
 
 void lucPrint3d(double x, double y, double z, const char *str)
 {
+    /* Calculate projected screen coords in viewport */
    	GLdouble modelMatrix[16];
 	GLdouble projMatrix[16];
 	GLint    viewportArray[4];
@@ -160,20 +161,33 @@ void lucPrint3d(double x, double y, double z, const char *str)
 		&depth
 	);
 
-    /* Print in raster coords */
- 		/* Set up 2D Viewer the size of the viewport */
-		glDisable( GL_DEPTH_TEST );
-		glPushMatrix();
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		glOrtho((GLfloat) 0.0, viewportArray[2], viewportArray[3], (GLfloat) 0.0, -1.0f,1.0f);
-		
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();   
+    /* Switch to ortho view with 1 unit = 1 pixel and print using calculated screen coords */
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
 
-    lucPrint(xPos, yPos, str);
+	glOrtho((GLfloat) 0.0, viewportArray[2], viewportArray[3], 0.0, -1.0f,1.0f);
 
-        glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();   
+
+    glDisable( GL_DEPTH_TEST );
+
+    /* Print at calculated position, compensating for viewport offset */
+    int xs, ys;
+    xs = (int)(xPos - viewportArray[0]);
+    ys = (int)(viewportArray[3] - yPos - viewportArray[1]);
+    if (depth <= 1.0 && xs > 0 && ys > 0 && xs < viewportArray[2] && ys < viewportArray[3]) 
+        lucPrint(xs, ys, str);  /* Print if in view */
+
+    /* Restore state */
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+
+	glEnable( GL_DEPTH_TEST );
 }
 
 void lucSetFontCharset(int charset)
@@ -208,6 +222,7 @@ void lucSetupRasterFont() {
 	glEnable(GL_BLEND);
 
 	/* create and bind texture */
+    glActiveTexture(GL_TEXTURE0);
 	glGenTextures(1, &texture);	
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glEnable(GL_COLOR_MATERIAL);
@@ -365,7 +380,6 @@ void lucViewportInfo_SetOpenGLCamera( lucViewportInfo* viewportInfo ) {
 
 			gluPerspective( camera->aperture, lucViewportInfo_AspectRatio(viewportInfo), 
 					viewport->nearClipPlane, viewport->farClipPlane );
-				
 			glMatrixMode(GL_MODELVIEW);
 			glLoadIdentity();
 
@@ -400,7 +414,7 @@ void lucViewportInfo_SetOpenGLCamera( lucViewportInfo* viewportInfo ) {
 			if(camera->buffer == lucRight){
 				glMatrixMode (GL_PROJECTION);
 				glLoadIdentity();
-				left = -ratio * wd2 - 0.5* camera->eyeSeparation * ndfl;
+			 	left = -ratio * wd2 - 0.5* camera->eyeSeparation * ndfl;
 				right = ratio * wd2 - 0.5* camera->eyeSeparation * ndfl;
 				top = wd2;
 				bottom = -wd2;
@@ -805,6 +819,49 @@ void luc_DrawRod( Dimension_Index dim , double* pos, double* vector, double scal
 }
 
 void luc_OpenGlDebug_PrintAll( Stream* stream, int debugLevel ) {
+    GLint r, g, b, a, depth, sten, aux, dbl;
+    glGetIntegerv(GL_RED_BITS, &r);
+    glGetIntegerv(GL_GREEN_BITS, &g);
+    glGetIntegerv(GL_BLUE_BITS, &b);
+    glGetIntegerv(GL_ALPHA_BITS, &a);
+    glGetIntegerv(GL_DEPTH_BITS, &depth);
+    glGetIntegerv(GL_STENCIL_BITS, &sten);
+    glGetIntegerv(GL_AUX_BUFFERS, &aux);
+    glGetIntegerv(GL_DOUBLEBUFFER, &dbl);
+    Journal_PrintfL(stream, 2, "framebuffer: rgba %d %d %d %d, depth %d, stencil %d, aux bfr %d, double bfr %d\n",
+        r, g, b, a, depth, sten, aux, dbl);
+
+    GLint a_test, a_func; float a_ref;
+    glGetIntegerv(GL_ALPHA_TEST, &a_test);
+    glGetIntegerv(GL_ALPHA_TEST_FUNC, &a_func);
+    glGetFloatv(GL_ALPHA_TEST_REF, &a_ref);
+    Journal_PrintfL(stream, 2, "alpha testing: %d, func %04x ref %f\n", a_test, a_func, a_ref);
+
+    GLint blend, b_src, b_equ, b_dst;
+    GLfloat b_c[4];
+    glGetIntegerv(GL_BLEND, &blend);
+    glGetIntegerv(GL_BLEND_SRC, &b_src);
+    glGetIntegerv(GL_BLEND_EQUATION, &b_equ);
+    glGetIntegerv(GL_BLEND_DST, &b_dst);
+    glGetFloatv(GL_BLEND_COLOR, b_c);
+    Journal_PrintfL(stream, 2, "blending: %d, src %04x equ %04x dst %04x color %.2f %.2f %.2f %.2f\n",
+        blend, b_src, b_equ, b_dst, b_c[0], b_c[1], b_c[2], b_c[3]);
+
+    GLint logic, logmode, mask[4], cull, cullmode, front, draw;
+    glGetIntegerv(GL_COLOR_LOGIC_OP, &logic);
+    glGetIntegerv(GL_LOGIC_OP_MODE, &logmode);
+    glGetIntegerv(GL_COLOR_WRITEMASK, mask);
+    glGetIntegerv(GL_CULL_FACE, &cull);
+    glGetIntegerv(GL_CULL_FACE_MODE, &cullmode);
+    glGetIntegerv(GL_FRONT_FACE, &front);
+    glGetIntegerv(GL_DRAW_BUFFER, &draw);
+    Journal_PrintfL(stream, 2, "draw env: logic %d logmode %04x, mask %d %d %d %d, cull %d cullmode %04x frontface %04x, drawbuffer %04x\n",
+        logic, logmode, mask[0], mask[1], mask[2], mask[3], cull, cullmode, front, draw);
+        
+    Journal_PrintfL(stream, 2, "GL err was %04x\n", glGetError());
+    Journal_PrintfL(stream, 2, "***\n");
+
+
 	luc_OpenGlDebug( stream, GL_LIST_INDEX, debugLevel);
 	luc_OpenGlDebug( stream, GL_LIST_MODE, debugLevel);
 	luc_OpenGlDebug( stream, GL_MATRIX_MODE, debugLevel);
@@ -830,6 +887,7 @@ void luc_OpenGlDebug( Stream* stream, int mode, int debugLevel){
 	GLfloat    textureEnvColor[4];
 	
 	Journal_PrintfL( stream, 2, "In func %s OpenglMode is is %d\n", __func__, mode);
+	Journal_PrintfL(stream, 2, "GL err was %04x\n", glGetError());
 	
 	if(mode == GL_LIST_INDEX){
 		glGetIntegerv(GL_LIST_INDEX, &listIndex);
@@ -882,14 +940,9 @@ void luc_OpenGlDebug( Stream* stream, int mode, int debugLevel){
 		Journal_PrintfL( stream, debugLevel, "In func %s current raster position valid  is \n %f  \n",__func__, currentRasterPositionValid);
 	}
 	
-	if(mode == GL_TEXTURE_ENV_MODE){
-		glGetFloatv(GL_TEXTURE_ENV_MODE, &textureEnvMode);
-		Journal_PrintfL( stream, debugLevel, "In func %s Texture Env Mode   is \n %f  \n",__func__, textureEnvMode);
-	}
-	
 	if(mode == GL_TEXTURE_ENV_COLOR){
 		glGetFloatv(GL_TEXTURE_ENV_COLOR, textureEnvColor);
 		Journal_PrintfL( stream, debugLevel, "In func %s Texture Env Color is \n %f %f %f %f  \n",__func__, textureEnvColor[0], textureEnvColor[1], textureEnvColor[2], textureEnvColor[3]);
 	} 
-	
+
 }

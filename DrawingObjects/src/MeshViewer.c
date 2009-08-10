@@ -251,10 +251,14 @@ void _lucMeshViewer_Draw( void* drawingObject, lucWindow* window, lucViewportInf
 	lucMeshViewer*          self          = (lucMeshViewer*)drawingObject;
 	lucCamera*               camera        = viewportInfo->viewport->camera;
 	XYZ                      normal;
-	
+
 	StGermain_VectorSubtraction( normal, camera->coord, camera->focalPoint, 3 );
 	glNormal3dv(normal);
 	_lucOpenGLDrawingObject_Draw( self, window, viewportInfo, _context );
+
+	/* Prints the node numbers */
+	if( self->nodeNumbers )
+		lucMeshViewer_PrintAllNodesNumber( self );
 }
 
 void _lucMeshViewer_CleanUp( void* drawingObject, void* context ) {
@@ -349,32 +353,40 @@ void lucMeshViewer_PrintAllElementsNumber( void* drawingObject, Partition_Index 
 
 
 }
+#endif
 
-void lucMeshViewer_PrintAllNodesNumber( void* drawingObject, Partition_Index rank ) {
-	lucMeshViewer*		self = (lucMeshViewer*)drawingObject;
-	double*              coord;
-	char                 nodeNumString[100];
-	Node_LocalIndex      node_lI;
+void lucMeshViewer_PrintAllNodesNumber( void* drawingObject ) {
+	lucMeshViewer* self = (lucMeshViewer*)drawingObject;
+	FeMesh *mesh = (FeMesh*)self->mesh;
+	double* coord;
+	char nodeNumString[100];
+	unsigned node_lI, nodeLocalCount, dim;
 
 	glDisable(GL_LIGHTING); /*if the lighting is not disabled, the colour won't appear for the numbers*/
+    lucSetFontCharset(FONT_SMALL);
 	glColor3f( self->localColour.red, self->localColour.green, self->localColour.blue );
 
+	nodeLocalCount = Mesh_GetLocalSize( self->mesh, MT_VERTEX );
+	dim = Mesh_GetDimSize( self->mesh );
 	/* Prints the node numbers */
-	for ( node_lI = 0; node_lI < self->mesh->nodeLocalCount; node_lI++ ) 
+	for ( node_lI = 0; node_lI < nodeLocalCount; node_lI++ ) 
 	{	
 		sprintf( nodeNumString, "nl%u", node_lI );
-		coord = self->mesh->nodeCoord[node_lI];
-		if ( ((HexaEL*)(self->mesh->layout->elementLayout))->dim == 2)
-			glRasterPos2f( (float)coord[0] + 0.015, (float)coord[1] + 0.015 );		
-		else   
-			glRasterPos3f( (float)coord[0] + 0.015, (float)coord[1] + 0.015, (float)coord[2] + 0.015 );
+		coord = Mesh_GetVertex( self->mesh, node_lI );
+		if ( dim == 2) {
+			/* the magic Owen showed me, JG */
+			lucPrint3d( ((float)coord[0]), ((float)coord[1]), 0, nodeNumString );
+		} else {
+			lucPrint3d( ((float)coord[0]), ((float)coord[1]), (float)coord[2], nodeNumString );
+		}
 
-		lucPrintString( nodeNumString );
 	}
+    lucSetFontCharset(FONT_DEFAULT);
 	glEnable(GL_LIGHTING);
 
 }
 
+#if 0
 void lucMeshViewer_PrintNodeNumber( void* drawingObject, Coord coord, int* nodeNumber ) {
 	lucMeshViewer*	     self = (lucMeshViewer*)drawingObject;
 	char                 nodeNumString[100];
@@ -455,6 +467,7 @@ void lucMeshViewer_RenderLocal( void* drawingObject ) {
 	assert( self->renderEdges );
 
 	/* Shortcuts. */
+	glDisable(GL_LIGHTING); /* lighting is just not set up correctly */
 	mesh = self->mesh;
 
 	/* Pick the correct dimension. */
@@ -463,9 +476,10 @@ void lucMeshViewer_RenderLocal( void* drawingObject ) {
 	else
 		vertexFunc = glVertex2dv;
 
+
 	/* Set color. */
 	lucColour_SetOpenGLColour( &self->localColour );
-
+    
 	/* Render vertices. */
 	if(self->displayNodes){
 		unsigned	nVerts;
@@ -482,15 +496,17 @@ void lucMeshViewer_RenderLocal( void* drawingObject ) {
 	/* Render edges */
 	self->renderEdges( self, vertexFunc );
 
+/* For now we are doing any text printing in the Draw call as fonts have their own display lists and coord system */
 #if 0
 	/* Prints the element numbers */
 	if( self->elementNumbers )
 		lucMeshViewer_PrintAllElementsNumber( self );
+#endif
 
-	/* Prints the node numbers */
+	/* Prints the node numbers /
 	if( self->nodeNumbers )
 		lucMeshViewer_PrintAllNodesNumber( self );
-#endif
+		*/
 }
 
 #if 0
