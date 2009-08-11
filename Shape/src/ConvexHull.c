@@ -145,7 +145,6 @@ void _ConvexHull_Init( void* convexHull, Coord_List vertexList, Index vertexCoun
 	/* 2nd Calculate Normals on faces */
 	/* in 2-D */
 	if( numberOfFaces == 3 ) {
-	printf("THE VERTEXCOUNT IS %d\n", vertexCount);
 		for( vertex_I = 0; vertex_I < vertexCount ; vertex_I++ ) {
 			
 			StGermain_VectorSubtraction(tmpVector1, vertexList[ vertex_I % 3 ], vertexList[ (vertex_I+1) % 3 ], dimensions);
@@ -158,7 +157,6 @@ void _ConvexHull_Init( void* convexHull, Coord_List vertexList, Index vertexCoun
 				if( StGermain_VectorDotProduct(tmpVector3, tmpVector2, dimensions) < 0 )
 				{ tmpVector3[0] = -1*tmpVector3[0]; tmpVector3[1] = -1 * tmpVector3[1]; }
 			
-			printf("vector normal = (%g, %g, %g)\n", tmpVector3[0], tmpVector3[1],  tmpVector3[2] ); 
 			memcpy( self->facesList[ vertex_I ], tmpVector3, sizeof(XYZ) );
 		}
 	}
@@ -169,7 +167,6 @@ void _ConvexHull_Init( void* convexHull, Coord_List vertexList, Index vertexCoun
 
 			if( StGermain_VectorDotProduct(tmpVector3, tmpVector2, dimensions) < 0 ) 
 				{ Vec_Div3D( tmpVector3, tmpVector3, -1.0 ); }
-			printf("vector normal = (%g, %g, %g)\n", tmpVector3[0], tmpVector3[1],  tmpVector3[2] ); 
 			memcpy( self->facesList[ vertex_I ], tmpVector3, sizeof(XYZ) );
 
 		}
@@ -299,7 +296,6 @@ void _ConvexHull_Construct( void* convexHull, Stg_ComponentFactory* cf, void* da
 		coord[ J_AXIS ] = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( optionSet, "y"));
 		
 		coord[ K_AXIS ] = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( optionSet, "z"));
-		Journal_PrintfL( stream, 2, "(%0.3g, %0.3g, %0.3g)\n", coord[ I_AXIS ], coord[ J_AXIS ], coord[ K_AXIS ] );
 		optionSet = optionSet->next;
 	}
 	Stream_UnIndent( stream );
@@ -361,7 +357,7 @@ void _ConvecHull_DistanceFromCenterAxis( void* shape, Coord coord, double* disVe
 	Stg_Shape* self = (Stg_Shape*)shape;
 	Journal_Firewall( False, Journal_Register( Error_Type, self->type ),
 	"Error in function %s: This functions hasn't been implemented.", 
-	"Please inform uderworld-dev@vpac.org you've received this error.\n", __func__ );
+	"Please inform underworld-dev@vpac.org you've received this error.\n", __func__ );
 }
 
 

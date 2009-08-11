@@ -5,7 +5,7 @@
 	<list name="import">
   	<param> StgDomain </param>
   </list>
-	<param name="journal-level.info.Stg_ComponentFactory"> 2 </param>
+	<param name="journal-level.info.Stg_ComponentFactory"> 0 </param>
 	<param name="outputPath"> ./output </param>
 	<param name="dim"> 2 </param>
 	<param name="testCoordCount"> 10000 </param>
