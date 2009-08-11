@@ -50,49 +50,42 @@
 const Type StgFEM_PeakMemory_Type = "StgFEM_PeakMemory";
 
 void StgFEM_PeakMemory_PrintMemoryInfo( AbstractContext* context ) {
-/* to potentially remove...
-	StgFEM_PeakMemory* self = (StgFEM_PeakMemory*)LiveComponentRegister_Get( context->CF->LCRegister, StgFEM_PeakMemory_Type );
-*/
-	SizeT stgMem;
-	size_t laMem;
-	SizeT ave;
+	PetscLogDouble stgPeak, totalMem, petscMem, ave;
 	
-	/* Note: because we don't know which proc is used for writing (at time of writing it was hardcoded to 0), we all-reduce */
-	stgMem = stgMemory->stgCurrentMemory;
-	MPI_Allreduce( &stgMem, &ave, 1, MPI_INT, MPI_SUM, context->communicator );
-	ave /= context->nproc * 1000 * 1000;
+	stgPeak = (PetscLogDouble)stgMemory->stgPeakMemory;
+	MPI_Allreduce( &stgPeak, &ave, 1, MPI_DOUBLE, MPI_SUM, context->communicator );
+	ave /= 1024 * 1024;
 	StgFEM_FrequentOutput_PrintValue( context, ave );
 
-	{
-		PetscScalar	petscMem;
-		PetscErrorCode	ec;
+	PetscMallocGetMaximumUsage( &petscMem );
+	MPI_Allreduce( &petscMem, &ave, 1, MPI_DOUBLE, MPI_SUM, context->communicator );
+	ave /= 1024 * 1024;
+	StgFEM_FrequentOutput_PrintValue( context, ave );
 
-		ec = PetscMallocGetCurrentUsage( &petscMem );
-		CheckPETScError( ec );
-		laMem += (size_t)petscMem;
-	}
-
-	MPI_Allreduce( &laMem, &ave, 1, MPI_INT, MPI_SUM, context->communicator );
-	ave /= context->nproc * 1000 * 1000;
+	PetscMemoryGetMaximumUsage( &totalMem );
+	MPI_Allreduce( &totalMem, &ave, 1, MPI_DOUBLE, MPI_SUM, context->communicator );
+	ave /= 1024 * 1024;
 	StgFEM_FrequentOutput_PrintValue( context, ave );
 }
 
 void _StgFEM_PeakMemory_Construct( void* componment, Stg_ComponentFactory* cf, void* data ) {
-/* to potentially remove ...
-	StgFEM_PeakMemory* self = (StgFEM_PeakMemory*)componment;
-*/
 	AbstractContext* context;
 
+	/* Turn on the magical petsc logging */
+	PetscMemorySetGetMaximumUsage();
+
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
-	
-	/* Initialise Timer */
-/* to potentially remove ...
-	self->initialTime = MPI_Wtime();
-*/
+	StgFEM_FrequentOutput* self = (StgFEM_FrequentOutput*)LiveComponentRegister_Get(
+                  context->CF->LCRegister,
+                  StgFEM_FrequentOutput_Type );
+
+	/* set the stupid stream column width so I don't get "..." behaviour */
+	self->columnWidth = 15;
 	
 	/* Print Header to file */
-	StgFEM_FrequentOutput_PrintString( context, "Stg_Memory" );
-	StgFEM_FrequentOutput_PrintString( context, "LA_Memory" );
+	StgFEM_FrequentOutput_PrintString( context, "StgPeakMem(Mb)" );
+	StgFEM_FrequentOutput_PrintString( context, "PetscMem(Mb)" );
+	StgFEM_FrequentOutput_PrintString( context, "ProgMem(Mb)" );
 	
 	ContextEP_Append( context, AbstractContext_EP_FrequentOutput ,StgFEM_PeakMemory_PrintMemoryInfo );
 }
