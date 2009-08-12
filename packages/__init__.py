@@ -15,4 +15,5 @@ from Cocoa import Cocoa
 from AGL import AGL
 from pcu import pcu
 from stgGlobus import stgGlobus
+from Underworld import Underworld
 from Experimental import Experimental
