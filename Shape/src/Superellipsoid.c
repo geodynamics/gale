@@ -286,5 +286,5 @@ void _Superellipsoid_DistanceFromCenterAxis( void* shape, Coord coord, double* d
 	Stg_Shape* self = (Stg_Shape*)shape;
 	Journal_Firewall( False, Journal_Register( Error_Type, self->type ),
 	"Error in function %s: This functions hasn't been implemented.", 
-	"Please inform uderworld-dev@vpac.org you've received this error.\n", __func__ );
+	"Please inform underworld-dev@vpac.org you've received this error.\n", __func__ );
 }	

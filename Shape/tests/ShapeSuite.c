@@ -22,7 +22,7 @@ void ShapeSuite_Teardown( ShapeSuiteData* data ) {
 }
 
 
-void ShapeSuite_GenerateBox( ShapeSuiteData* data, Dimension_Index dim, char* testFileName ) {
+void ShapeSuite_GeneratePoints( ShapeSuiteData* data, Dimension_Index dim, char* inputFileName ) {
 /** Test Definition: */
 	DomainContext*   context = NULL;
 	Dictionary*      dictionary;
@@ -30,20 +30,19 @@ void ShapeSuite_GenerateBox( ShapeSuiteData* data, Dimension_Index dim, char* te
 	unsigned         testCoordCount, index;
 	Name             outputPath;
 	Coord            coord;
-	Stream*          stream = Journal_Register( Info_Type, testFileName );
+	Stream*          stream = Journal_Register( Info_Type, inputFileName );
 	char xml_input[PCU_PATH_MAX];
 
 	/* read in the xml input file */
-	pcu_filename_input( "testBox.xml", xml_input );
+	pcu_filename_input( inputFileName, xml_input );
 	context = (DomainContext*)stgMainInitFromXML( xml_input, MPI_COMM_WORLD );
 	dictionary = context->dictionary;
 	outputPath = Dictionary_GetString( dictionary, "outputPath" );
-	Stream_RedirectFile_WithPrependedPath( stream, outputPath, testFileName );
-	shape   = (Stg_Shape*) LiveComponentRegister_Get( context->CF->LCRegister, "shape" );
+	Stream_RedirectFile_WithPrependedPath( stream, outputPath, "test.dat" );
+	shape = (Stg_Shape*) LiveComponentRegister_Get( context->CF->LCRegister, "shape" );
 	assert( shape );
 
 	testCoordCount = Dictionary_GetUnsignedInt_WithDefault( dictionary, "testCoordCount", 10000 );
-	//dim = Dictionary_GetUnsignedInt( dictionary, "dim" );
 
 	/* Test to see if random points are in shape */
 	srand48(0);
@@ -63,25 +62,68 @@ void ShapeSuite_GenerateBox( ShapeSuiteData* data, Dimension_Index dim, char* te
 void ShapeSuite_TestBox2D( ShapeSuiteData* data ) {
 	Dimension_Index  dim = 2;
 	char expected_file[PCU_PATH_MAX];
-	ShapeSuite_GenerateBox( data, dim, "test2D.dat" );
+	ShapeSuite_GeneratePoints( data, dim, "testBox2D.xml" );
 	
 	pcu_filename_expected( "testBox2D.expected", expected_file );
-	pcu_check_fileEq( "output/test2D.dat", expected_file );
-	//remove("output/test2D.dat");
+	pcu_check_fileEq( "output/test.dat", expected_file );
+	remove("output/test.dat");
 }
 void ShapeSuite_TestBox3D( ShapeSuiteData* data ) {
 	Dimension_Index  dim = 3;
 	char expected_file[PCU_PATH_MAX];
-	ShapeSuite_GenerateBox( data, dim, "test3D.dat" );
+	ShapeSuite_GeneratePoints( data, dim, "testBox3D.xml" );
 
 	pcu_filename_expected( "testBox3D.expected", expected_file );
-	pcu_check_fileEq( "output/test3D.dat", expected_file );
-	//remove("output/test3D.dat");
+	pcu_check_fileEq( "output/test.dat", expected_file );
+	remove("output/test.dat");
 }
 
+void ShapeSuite_TestSphere2D( ShapeSuiteData* data ) {
+	Dimension_Index  dim = 2;
+	char expected_file[PCU_PATH_MAX];
+	ShapeSuite_GeneratePoints( data, dim, "testSphere2D.xml" );
+
+	pcu_filename_expected( "testSphere2D.expected", expected_file );
+	pcu_check_fileEq( "output/test.dat", expected_file );
+	remove("output/test.dat");
+}
+
+void ShapeSuite_TestSphere3D( ShapeSuiteData* data ) {
+	Dimension_Index  dim = 3;
+	char expected_file[PCU_PATH_MAX];
+	ShapeSuite_GeneratePoints( data, dim, "testSphere3D.xml" );
+
+	pcu_filename_expected( "testSphere3D.expected", expected_file );
+	pcu_check_fileEq( "output/test.dat", expected_file );
+	remove("output/test.dat");
+}
+
+void ShapeSuite_TestConvexHull2D( ShapeSuiteData* data ) {
+	Dimension_Index  dim = 2;
+	char expected_file[PCU_PATH_MAX];
+	ShapeSuite_GeneratePoints( data, dim, "testConvexHull2D.xml" );
+
+	pcu_filename_expected( "testConvexHull2D.expected", expected_file );
+	pcu_check_fileEq( "output/test.dat", expected_file );
+	remove("output/test.dat");
+}
+
+void ShapeSuite_TestConvexHull3D( ShapeSuiteData* data ) {
+	Dimension_Index  dim = 3;
+	char expected_file[PCU_PATH_MAX];
+	ShapeSuite_GeneratePoints( data, dim, "testConvexHull3D.xml" );
+
+	pcu_filename_expected( "testConvexHull3D.expected", expected_file );
+	pcu_check_fileEq( "output/test.dat", expected_file );
+	remove("output/test.dat");
+}
 void ShapeSuite( pcu_suite_t* suite ) {
    pcu_suite_setData( suite, ShapeSuiteData );
    pcu_suite_setFixtures( suite, ShapeSuite_Setup, ShapeSuite_Teardown );
    pcu_suite_addTest( suite, ShapeSuite_TestBox2D );
    pcu_suite_addTest( suite, ShapeSuite_TestBox3D );
+   pcu_suite_addTest( suite, ShapeSuite_TestSphere2D );
+   pcu_suite_addTest( suite, ShapeSuite_TestSphere3D );
+   pcu_suite_addTest( suite, ShapeSuite_TestConvexHull2D );
+   pcu_suite_addTest( suite, ShapeSuite_TestConvexHull3D );
 }

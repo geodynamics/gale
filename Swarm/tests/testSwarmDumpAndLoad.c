@@ -250,7 +250,7 @@ int main( int argc, char* argv[] ) {
 		NULL,
 		0,
 		0,
-		CommWorld,
+		data->comm,
 		dictionary );
 
 	swarmList[0] = swarm;

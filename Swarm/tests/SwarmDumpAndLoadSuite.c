@@ -52,18 +52,6 @@ struct _Particle {
 };
 
 typedef struct {
-	unsigned							nDims;
-	unsigned							meshSize[3];
-	double							minCrds[3];
-	double							maxCrds[3];
-	ExtensionManager_Register*	extensionMgr_Register;
-	Mesh*								mesh;
-	Swarm*							swarm;
-	ElementCellLayout*			elementCellLayout;
-	RandomParticleLayout*		randomParticleLayout;
-	ParticleMovementHandler		*movementHandler;
-	Dictionary*						dictionary;
-	DomainContext*					context;
 	MPI_Comm							comm;
 	unsigned int					rank;
 	unsigned int					nProcs;
@@ -107,7 +95,7 @@ void SwarmDumpAndLoadSuite_UpdateParticlePositionsTowardsAttractor( Swarm* swarm
 
 	for ( lCell_I=0; lCell_I < swarm->cellLocalCount; lCell_I++ ) {
 		if( rank == procToWatch ) {
-			/*printf("\tUpdating Particles positions in local cell %d:\n", lCell_I );*/
+			//printf("\tUpdating Particles positions in local cell %d:\n", lCell_I );
 		}	
 		for ( cParticle_I=0; cParticle_I < swarm->cellParticleCountTbl[lCell_I]; cParticle_I++ ) {
 			Coord movementVector = {0,0,0};
@@ -117,7 +105,7 @@ void SwarmDumpAndLoadSuite_UpdateParticlePositionsTowardsAttractor( Swarm* swarm
 			currParticle = (Particle*)Swarm_ParticleInCellAt( swarm, lCell_I, cParticle_I );
 			oldCoord = &currParticle->coord;
 			if( rank == procToWatch ) {
-				/*printf("\t\tUpdating particleInCell %d:\n", cParticle_I );*/
+				//printf("\t\tUpdating particleInCell %d:\n", cParticle_I );
 			}	
 
 			for ( dim_I=0; dim_I < 3; dim_I++ ) {
@@ -126,9 +114,7 @@ void SwarmDumpAndLoadSuite_UpdateParticlePositionsTowardsAttractor( Swarm* swarm
 			}
 
 			if( rank == procToWatch ) {
-				/*printf("\t\tChanging its coords from (%f,%f,%f) to (%f,%f,%f):\n",
-					(*oldCoord)[0], (*oldCoord)[1], (*oldCoord)[2],
-					newParticleCoord[0], newParticleCoord[1], newParticleCoord[2] );*/
+				//printf("\t\tChanging its coords from (%f,%f,%f) to (%f,%f,%f):\n", (*oldCoord)[0], (*oldCoord)[1], (*oldCoord)[2], newParticleCoord[0], newParticleCoord[1], newParticleCoord[2] );
 			}		
 
 			for ( dim_I=0; dim_I < 3; dim_I++ ) {
@@ -138,80 +124,45 @@ void SwarmDumpAndLoadSuite_UpdateParticlePositionsTowardsAttractor( Swarm* swarm
 	}
 }
 void SwarmDumpAndLoadSuite_Setup( SwarmDumpAndLoadSuiteData* data ) {
-	Dimension_Index	dim;
-	char					input_file[PCU_PATH_MAX];
 	
 	/* MPI Initializations */
 	data->comm = MPI_COMM_WORLD;  
 	MPI_Comm_rank( data->comm, &data->rank );
 	MPI_Comm_size( data->comm, &data->nProcs );
    
-	data->nDims = 3;
-	data->meshSize[0] = 32;	data->meshSize[1] = 32;	data->meshSize[2] = 32;
-	data->minCrds[0] = 0.0; data->minCrds[1] = 0.0; data->minCrds[2] = 0.0;
-	data->maxCrds[0] = 1.0; data->maxCrds[1] = 1.0; data->maxCrds[2] = 1.0;
-
-	/* Dictionary */
-	data->dictionary = Dictionary_New();
-	Dictionary_Add( data->dictionary, "particlesPerCell", Dictionary_Entry_Value_FromUnsignedInt( 1 ) );
-	Dictionary_Add( data->dictionary, "seed", Dictionary_Entry_Value_FromUnsignedInt( 13 ) );
-	Dictionary_Add( data->dictionary, "shadowDepth", Dictionary_Entry_Value_FromUnsignedInt( 1 ) );
-	Dictionary_Add( data->dictionary, "outputPath", Dictionary_Entry_Value_FromString( "./output" ) );
-	
-	/* Init mesh */
-	data->extensionMgr_Register = ExtensionManager_Register_New();
-	data->mesh = SwarmDumpAndLoadSuite_BuildMesh( data->nDims, data->meshSize, data->minCrds, data->maxCrds, data->extensionMgr_Register );
-	
-	/* Configure the element-cell-layout */
-	data->elementCellLayout = ElementCellLayout_New( "elementCellLayout", data->mesh );
-	
-	/* Build the mesh */
-	Stg_Component_Build( data->mesh, 0, False );
-	Stg_Component_Initialise( data->mesh, 0, False );
-	
-	/* Configure the random-particle-layout */
-	data->randomParticleLayout = RandomParticleLayout_New( "randomParticleLayout", 1, 13 );
-
-	/* Configure the swarm */	
-	data->swarm = Swarm_New( "testSwarm", data->elementCellLayout, data->randomParticleLayout, 3, sizeof(Particle),
-		data->extensionMgr_Register, NULL, data->comm, NULL );
-
-	data->movementHandler = ParticleMovementHandler_New( "movementHandler", True );
-	Swarm_AddCommHandler( data->swarm, data->movementHandler );
-	
-	/* Build the mesh */
-	Stg_Component_Build( data->mesh, 0, False );
-	Stg_Component_Initialise( data->mesh, 0, False );
-
-	/* Build the swarm */
-	Stg_Component_Build( data->swarm, 0, False );
-	Stg_Component_Initialise( data->swarm, 0, False );
 }
 
 void SwarmDumpAndLoadSuite_Teardown( SwarmDumpAndLoadSuiteData* data ) {
 	/* Destroy stuff */
-	Stg_Class_Delete( data->randomParticleLayout );
-	Stg_Class_Delete( data->elementCellLayout );
-	Stg_Class_Delete( data->swarm );
-	Stg_Class_Delete( data->mesh );
-	Stg_Class_Delete( data->extensionMgr_Register );
 }
 
 void SwarmDumpAndLoadSuite_TestSwarmDumpAndLoad( SwarmDumpAndLoadSuiteData* data ) {
-	int						procToWatch;
-	Stream*					stream;
-	Index						dim_I;
-	Index						timeStep;
-	Coord						attractorPoint;
-	Particle_Index			lParticle_I = 0;
-	AbstractContext*		context = NULL;
-	SwarmDump*				swarmDumper = NULL;
-	Swarm*					newSwarm = NULL;
-	Swarm*					swarmList[1];
-	FileParticleLayout*	fileParticleLayout = NULL;
-	char 						expected_file[PCU_PATH_MAX];
-	char						output_file[PCU_PATH_MAX];
-	
+	unsigned							nDims;
+	unsigned							meshSize[3];
+	double							minCrds[3];
+	double							maxCrds[3];
+	ExtensionManager_Register*	extensionMgr_Register;
+	SwarmVariable_Register*		swarmVariable_Register;
+	Mesh*								mesh;
+	Swarm*							swarm;
+	ElementCellLayout*			elementCellLayout;
+	RandomParticleLayout*		randomParticleLayout;
+	ParticleMovementHandler		*movementHandler;
+	Dictionary*						dictionary;
+	int								procToWatch;
+	Stream*							stream;
+	Index								dim_I;
+	Index								timeStep;
+	Coord								attractorPoint;
+	Particle_Index					lParticle_I = 0;
+	AbstractContext*				context = NULL;
+	SwarmDump*						swarmDumper = NULL;
+	Swarm*							newSwarm = NULL;
+	Swarm*							swarmList[1];
+	FileParticleLayout*			fileParticleLayout = NULL;
+	Index 							errorCount = 0;
+	char								output_file[PCU_PATH_MAX];
+
 	if( data->nProcs >= 2 ) {
 		procToWatch = 1;
 	}
@@ -220,16 +171,56 @@ void SwarmDumpAndLoadSuite_TestSwarmDumpAndLoad( SwarmDumpAndLoadSuiteData* data
 	}
 	if( data->rank == procToWatch ) printf( "Watching rank: %i\n", data->rank );
 	
-	stream = Journal_Register( Info_Type, "SwarmADumpAndLoad" );
+	nDims = 3;
+	meshSize[0] = 32;	meshSize[1] = 32;	meshSize[2] = 32;
+	minCrds[0] = 0.0; minCrds[1] = 0.0; minCrds[2] = 0.0;
+	maxCrds[0] = 1.0; maxCrds[1] = 1.0; maxCrds[2] = 1.0;
+
+	/* Dictionary */
+	dictionary = Dictionary_New();
+	Dictionary_Add( dictionary, "particlesPerCell", Dictionary_Entry_Value_FromUnsignedInt( 1 ) );
+	Dictionary_Add( dictionary, "seed", Dictionary_Entry_Value_FromUnsignedInt( 13 ) );
+	Dictionary_Add( dictionary, "shadowDepth", Dictionary_Entry_Value_FromUnsignedInt( 1 ) );
+	
+	/* Init mesh */
+	extensionMgr_Register = ExtensionManager_Register_New();
+	swarmVariable_Register = SwarmVariable_Register_New( NULL );
+	mesh = SwarmDumpAndLoadSuite_BuildMesh( nDims, meshSize, minCrds, maxCrds, extensionMgr_Register );
+	
+	/* Configure the element-cell-layout */
+	elementCellLayout = ElementCellLayout_New( "elementCellLayout", mesh );
+	
+	/* Configure the random-particle-layout */
+	randomParticleLayout = RandomParticleLayout_New( "randomParticleLayout", 1, 13 );
+
+	/* Configure the swarm */	
+	swarm = Swarm_New( "testSwarm", elementCellLayout, randomParticleLayout, 3, sizeof(Particle), extensionMgr_Register, NULL, data->comm, NULL );
+	
+	movementHandler = ParticleMovementHandler_New( "movementHandler", True );
+	Swarm_AddCommHandler( swarm, movementHandler );
+	Stream_Enable( Journal_Register( Info_Type, ParticleMovementHandler_Type ), False );
+
+	/* Build the mesh, swarm */
+	Stg_Component_Build( mesh, 0, False );
+	Stg_Component_Build( swarm, 0, False );
+	
+	/* Initialize the mesh, swarm */
+	Stg_Component_Initialise( mesh, 0, False );
+	Stg_Component_Initialise( swarm, 0, False );
+
+	/* Stream */
+	stream = Journal_Register( Info_Type, "SwarmADumpAndLoadStream" );
+
+
 	
 	for ( dim_I=0; dim_I < 3; dim_I++ ) {
-		attractorPoint[dim_I] = ( data->maxCrds[dim_I] - data->minCrds[dim_I] ) / 3;
+		attractorPoint[dim_I] = ( maxCrds[dim_I] - minCrds[dim_I] ) / 3;
 	}
 	if( data->rank == procToWatch ) {
 		printf("Calculated attractor point is at (%f,%f,%f):\n", attractorPoint[0], attractorPoint[1], attractorPoint[2] );
 	}
-	for ( lParticle_I = 0; lParticle_I < data->swarm->particleLocalCount; lParticle_I++ ) {
-		data->swarm->particles[lParticle_I].testValue = rand() % 1000;
+	for ( lParticle_I = 0; lParticle_I < swarm->particleLocalCount; lParticle_I++ ) {
+		swarm->particles[lParticle_I].testValue = rand() % 1000;
 	}
 	/* Start a sample app, where each timestep we move the particles towards the attractor point */
 	for ( timeStep=1; timeStep <= 2; timeStep++ ) {
@@ -237,10 +228,12 @@ void SwarmDumpAndLoadSuite_TestSwarmDumpAndLoad( SwarmDumpAndLoadSuiteData* data
 			printf("\nStarting timestep %d:\n", timeStep );
 		}	
 
-		SwarmDumpAndLoadSuite_UpdateParticlePositionsTowardsAttractor( data->swarm, attractorPoint, data->rank, procToWatch );
-	
-		Swarm_UpdateAllParticleOwners( data->swarm );
+		SwarmDumpAndLoadSuite_UpdateParticlePositionsTowardsAttractor( swarm, attractorPoint, data->rank, procToWatch );
+		Swarm_UpdateAllParticleOwners( swarm );
 	}
+
+	Dictionary_Add( dictionary, "outputPath", Dictionary_Entry_Value_FromString( "./output" ) );
+
 	/* Now we dump the swarm values, then create a new swarm and load the dumped values onto it,
 		and check to see that they're the same */
 	context = _AbstractContext_New( 
@@ -261,18 +254,65 @@ void SwarmDumpAndLoadSuite_TestSwarmDumpAndLoad( SwarmDumpAndLoadSuiteData* data
 		0,
 		0,
 		data->comm,
-		data->dictionary );
+		dictionary );
 
-	swarmList[0] = data->swarm;
+   Stg_ObjectList_ClassAppend( context->CF->registerRegister, (void*)extensionMgr_Register, "ExtensionManager_Register" );
+   Stg_ObjectList_ClassAppend( context->CF->registerRegister, (void*)swarmVariable_Register, "SwarmVariable_Register" );
+	
+	swarmList[0] = swarm;
 	swarmDumper = SwarmDump_New( "swarmDumper", context, swarmList, 1, True );
 	SwarmDump_Execute( swarmDumper, context );
 
-	sprintf( output_file, "%s/%s.%05d.dat", context->outputPath, data->swarm->name, context->timeStep ); 
+	sprintf( output_file, "%s/%s.%05d.dat", context->outputPath, swarm->name, context->timeStep ); 
 	fileParticleLayout = FileParticleLayout_New( "fileParticleLayout", output_file );
-	newSwarm = Swarm_New( "testSwarm2", data->elementCellLayout, fileParticleLayout, 3, sizeof(Particle),
-		data->extensionMgr_Register, NULL, data->comm, NULL );
+	newSwarm = Swarm_New( "testSwarm2", elementCellLayout, fileParticleLayout, 3, sizeof(Particle), extensionMgr_Register, NULL, data->comm, NULL );
 	Stg_Component_Build( newSwarm, 0, False );
 	Stg_Component_Initialise( newSwarm, 0, False );
+
+	assert( newSwarm->particleLocalCount == swarm->particleLocalCount );
+
+	if( data->rank == procToWatch ) {
+		printf( "\nComparing the %d local Particles between old and new swarms:\n", swarm->particleLocalCount );
+		for ( lParticle_I = 0; lParticle_I < swarm->particleLocalCount; lParticle_I++ ) {
+			if ( ( swarm->particles[lParticle_I].coord[I_AXIS] != newSwarm->particles[lParticle_I].coord[I_AXIS] )
+				|| ( swarm->particles[lParticle_I].coord[J_AXIS] != newSwarm->particles[lParticle_I].coord[J_AXIS] )
+				|| ( swarm->particles[lParticle_I].coord[K_AXIS] != newSwarm->particles[lParticle_I].coord[K_AXIS] ) ) {
+				printf( "Error: Co-ords at particle %d don't match between old and new swarms.\n", lParticle_I );
+				errorCount++;
+			}
+
+			if ( swarm->particles[lParticle_I].owningCell != newSwarm->particles[lParticle_I].owningCell ) {
+				printf( "Error: owningCell at particle %d doesn't match between old and new swarms.\n", lParticle_I );
+				errorCount++;
+         }
+
+			if ( ( swarm->particles[lParticle_I].xi[I_AXIS] != newSwarm->particles[lParticle_I].xi[I_AXIS] )
+				|| ( swarm->particles[lParticle_I].xi[J_AXIS] != newSwarm->particles[lParticle_I].xi[J_AXIS] )
+				|| ( swarm->particles[lParticle_I].xi[K_AXIS] != newSwarm->particles[lParticle_I].xi[K_AXIS] ) ) {
+				printf( "Error: Xi values at particle %d don't match between old and new swarms.\n", lParticle_I );
+				errorCount++;
+			}
+
+			if ( swarm->particles[lParticle_I].testValue != newSwarm->particles[lParticle_I].testValue ) {
+				printf( "Error: testValue at particle %d doesn't match between old and new swarms.\n", lParticle_I );
+				errorCount++;
+			}
+		}
+
+		if ( 0 == errorCount ) {
+			printf( "\tPassed: swarms are identical.\n" );
+		}
+		else {
+			printf( "\tFailed: %d differences detected.\n", errorCount );
+      }
+   }
+	/* Destroy stuff */
+   Stg_Class_Delete( swarm );
+   Stg_Class_Delete( randomParticleLayout );
+   Stg_Class_Delete( elementCellLayout );
+   Stg_Class_Delete( mesh );
+   Stg_Class_Delete( extensionMgr_Register );
+   Stg_Class_Delete( dictionary );
 
 }
 
