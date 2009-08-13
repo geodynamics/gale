@@ -17,7 +17,7 @@
 tau_xx, tau_yy, tau_xy in 2D
 tau_xx, tau_yy, tau_zz, tau_xy, tau_xz, tau_yz in 3D
 </param>
-<param name="Equation">The stored stress tensor is calculated by: $$\tau = 2 \eta D $$ where $\eta$ is the constitutive matrix and $D$ is the strain rate tensor.</param>
+<param name="Equation">The stored stress tensor is calculated by: $\tau = 2 \eta D $ where $\eta$ is the constitutive matrix and $D$ is the strain rate tensor.</param>
 
 <!--Now the interesting stuff-->
 
