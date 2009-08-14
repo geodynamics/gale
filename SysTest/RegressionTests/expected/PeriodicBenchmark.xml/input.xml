@@ -49,27 +49,6 @@
       <element type="param" name="Type">CartesianGenerator</element>
       <element type="param" name="mesh">linearMesh</element>
       <element type="param" name="dims">dim</element>
-      <element type="list" name="enabledDims">
-        <element type="param">0</element>
-        <element type="param">1</element>
-        <element type="param">2</element>
-      </element>
-      <element type="list" name="enabledIncidence">
-        <element type="param">0</element>
-        <element type="param">0</element>
-        <element type="param">0</element>
-        <element type="param">1</element>
-        <element type="param">0</element>
-        <element type="param">2</element>
-        <element type="param">1</element>
-        <element type="param">0</element>
-        <element type="param">1</element>
-        <element type="param">2</element>
-        <element type="param">2</element>
-        <element type="param">0</element>
-        <element type="param">2</element>
-        <element type="param">1</element>
-      </element>
     </element>
     <element type="struct" name="velocity">
       <element type="param" name="Type">MeshVariable</element>
