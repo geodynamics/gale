@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+        <list name="import">
+                <param> Underworld </param>
+        </list>
+
+	<include> Underworld/BaseApps/ThermalConvectionPIC.xml </include>
+	
+	<list name="plugins" mergeType="merge">
+		<!-- Output Plugins -->
+		<param>StgFEM_FrequentOutput</param>	
+		<param>Underworld_Nusselt</param>	
+		<param>Underworld_Vrms</param>	
+		<param>StgFEM_CPUTime</param>	
+	</list>
+	
+	
+
+	<struct name="components" mergeType="merge">
+		<struct name="temperatureDependence">
+			<param name="Type">Arrhenius</param>
+			<param name="TemperatureField">TemperatureField</param>
+			<param name="eta0">1.0e-6</param>
+			<param name="activationEnergy">27.63102112</param>
+		</struct>
+		<struct name="shape">
+			<param name="Type">Everywhere</param>
+		</struct>		
+		<struct name="material">
+			<param name="Type">RheologyMaterial</param>
+			<param name="Shape">shape</param>
+			<param name="Rheology">temperatureDependence</param>
+		</struct>	
+	</struct>
+
+	<!-- Simulation control -->
+	<param name="maxTimeSteps"> 2 </param>
+	<param name="outputPath"> ./output </param>
+	<param name="dumpEvery"> 1 </param>	
+	<param name="checkpointEvery"> 0 </param>
+
+        <!--   choose what to checkpoint
+	<list name="FieldVariablesToCheckpoint">
+		<param>VelocityField</param>
+		<param>VelocityGradientsField</param>
+	</list>
+	-->
+
+        <!--  restart from a previous checkpoint 
+        <param name="restartTimestep"> 10 </param>
+         -->
+	
+	<param name="Ra"> 1e6 </param>	
+	<param name="RaC"> 0 </param>	
+	
+	<param name="courantFactor"> 0.25 </param>	
+	
+	<!-- Journal Control -->
+	<param name="journal.info.Context-verbose">True</param>
+	<param name="journal-level.info.Stg_ComponentFactory">2</param>
+	<param name="journal-level.info.lucInfo">2</param>
+	<param name="journal-level.debug.lucDebug">1</param>
+	<param name="journal-enable-branch.debug.lucDebug">t</param>
+	<param name="journal.debug">f</param>
+	<param name="journal-enable-branch.debug.StgFEM">t</param>
+	<param name="journal-level-branch.debug.StgFEM"> 2 </param>	
+	<param name="journal.debug.Plugin"> t </param>	
+	
+	<!-- Geometry & Mesh setup -->
+	<param name="dim"> 2 </param>
+	<param name="elementResI"> 32 </param>
+	<param name="elementResJ"> 32 </param>
+	<param name="elementResK"> 1 </param>
+	<param name="shadowDepth"> 1 </param>
+	<param name="minX"> 0.0 </param>
+	<param name="minY"> 0.0 </param>
+	<param name="minZ"> 0.0 </param>
+	<param name="maxX"> 1.0 </param>
+	<param name="maxY"> 1.0 </param>
+	<param name="maxZ"> 1.0 </param>
+	<param name="allowUnbalancing"> True </param>
+	
+	<!-- Swarm parameters -->
+	<param name="particleLayoutType"> random </param>
+	<param name="particlesPerCell"> 20 </param>
+	<param name="seed"> 13 </param>
+	
+
+	<!-- Set up BCs and ICs -->
+	<include> Underworld/VariableConditions/temperatureBCs.xml </include>
+	<include> Underworld/VariableConditions/temperatureICs.sinusoid.xml </include>
+	<include> Underworld/VariableConditions/velocityBCs.freeslip.xml </include>
+
+	<!-- Integration Scheme configuration -->
+
+	<!-- Viewport stuff -->
+	<include>Underworld/Viewports/TemperatureContoursVP.xml</include>
+	<include>Underworld/Viewports/StrainRateInvariantVP.xml</include>
+	<include>glucifer/window.xml</include>
+	<struct name="components" mergeType="merge">
+		<struct name="window" mergeType="merge">
+			<param name="Viewport">TemperatureContoursVP StrainRateInvariantVP</param>
+		</struct>
+	</struct>
+
+</StGermainData>
