@@ -150,37 +150,60 @@ void _MeshGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* cf, vo
 	MeshGenerator_SetDimSize( self, nDims );
 	enabledDimsList = Dictionary_Get( dict, "enabledDims" );
 	enabledIncList = Dictionary_Get( dict, "enabledIncidence" );
-	if( enabledDimsList || enabledIncList ) {
-		unsigned	d_i;
 
-		memset( self->enabledDims, 0, (nDims + 1) * sizeof(Bool) );
-		for( d_i = 0; d_i <= nDims; d_i++ )
-			memset( self->enabledInc[d_i], 0, (nDims + 1) * sizeof(Bool) );
-	}
-	if( enabledDimsList ) {
-		unsigned	nEnabledDims;
-		unsigned	dim;
-		unsigned	d_i;
+    /* Clear dims/incidence flags */
+    unsigned    d_i;
+    memset( self->enabledDims, 0, (nDims + 1) * sizeof(Bool) );
+    for( d_i = 0; d_i <= nDims; d_i++ )
+        memset( self->enabledInc[d_i], 0, (nDims + 1) * sizeof(Bool) );
 
-		nEnabledDims = Dictionary_Entry_Value_GetCount( enabledDimsList );
-		for( d_i = 0; d_i < nEnabledDims; d_i++ ) {
-			dim = Dictionary_Entry_Value_AsUnsignedInt( Dictionary_Entry_Value_GetElement( enabledDimsList, d_i ) );
-			MeshGenerator_SetDimState( self, dim, True );
-		}
-	}
-	if( enabledIncList ) {
-		unsigned	nEnabledInc;
-		unsigned	fromDim, toDim;
-		unsigned	d_i;
+    if( enabledDimsList ) {
+        unsigned    dim;
+        unsigned    nEnabledDims;
+        nEnabledDims = Dictionary_Entry_Value_GetCount( enabledDimsList );
+        for( d_i = 0; d_i < nEnabledDims; d_i++ ) {
+            dim = Dictionary_Entry_Value_AsUnsignedInt( Dictionary_Entry_Value_GetElement( enabledDimsList, d_i ) );
+            if (dim > nDims + 1)
+                Journal_Printf(Mesh_Warning, "Warning - in %s: *** Skipping out of range dimension: %d\n", __func__, dim);
+            else
+                MeshGenerator_SetDimState( self, dim, True );
+        }
+    }
+    else
+    {
+        /* Default to all dimensions enabled */
+        for( d_i = 0; d_i < nDims + 1; d_i++ ) 
+            MeshGenerator_SetDimState( self, d_i, True );
+    }
 
-		nEnabledInc = Dictionary_Entry_Value_GetCount( enabledIncList );
-		assert( nEnabledInc % 2 == 0 );
-		for( d_i = 0; d_i < nEnabledInc; d_i += 2 ) {
-			fromDim = Dictionary_Entry_Value_AsUnsignedInt( Dictionary_Entry_Value_GetElement( enabledIncList, d_i ) );
-			toDim = Dictionary_Entry_Value_AsUnsignedInt( Dictionary_Entry_Value_GetElement( enabledIncList, d_i + 1 ) );
-			MeshGenerator_SetIncidenceState( self, fromDim, toDim, True );
-		}
-	}
+    if( enabledIncList ) {
+        unsigned    nEnabledInc;
+        unsigned    fromDim, toDim;
+        nEnabledInc = Dictionary_Entry_Value_GetCount( enabledIncList );
+        assert( nEnabledInc % 2 == 0 );
+        for( d_i = 0; d_i < nEnabledInc; d_i += 2 ) {
+            fromDim = Dictionary_Entry_Value_AsUnsignedInt( Dictionary_Entry_Value_GetElement( enabledIncList, d_i ) );
+            toDim = Dictionary_Entry_Value_AsUnsignedInt( Dictionary_Entry_Value_GetElement( enabledIncList, d_i + 1 ) );
+            if (fromDim > nDims || toDim > nDims) 
+                Journal_Printf( Mesh_Warning, "Warning - in %s: *** Skipping out of range incidence: %d to %d\n", 
+                            __func__ , fromDim, toDim);
+            else
+                MeshGenerator_SetIncidenceState( self, fromDim, toDim, True );
+        }
+    }
+    else
+    {
+        /* Default incidence setup 0->1,2,3  1->0,2  2->0,1  3->0 */
+        MeshGenerator_SetIncidenceState( self, 0, 0, True );
+        for( d_i = 1; d_i <= nDims; d_i ++ ) {
+            MeshGenerator_SetIncidenceState( self, 0, d_i, True );
+            MeshGenerator_SetIncidenceState( self, d_i, 0, True );
+        }
+        if (nDims >= 2) {
+            MeshGenerator_SetIncidenceState( self, 1, 2, True );
+            MeshGenerator_SetIncidenceState( self, 2, 1, True );
+        }
+    }
 }
 
 void _MeshGenerator_Build( void* meshGenerator, void* data ) {
