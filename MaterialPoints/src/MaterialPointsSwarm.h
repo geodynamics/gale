@@ -62,7 +62,7 @@
 	#define __MaterialPointsSwarm \
 		__Swarm \
 		\
-		FeMesh*                   mesh;                 \
+		FeMesh*                               mesh;                 \
 		SwarmAdvector*                        swarmAdvector;        \
 		EscapedRoutine*                       escapedRoutine;       \
 		Material*                             material;             /**< For material assignment */ \
@@ -79,20 +79,20 @@
 	*/
 	
 	MaterialPointsSwarm* MaterialPointsSwarm_New(
-		Name                                  name,
-		void*                                 cellLayout,
-		void*                                 particleLayout,
-		Dimension_Index                       dim,
-		SizeT                                 particleSize,
-		Particle_InCellIndex                  cellParticleTblDelta,
-		double                                extraParticlesFactor,
-		FeMesh*                   	      mesh,
-		EscapedRoutine*                       escapedRoutine, 
-		Material*                             material,
-		Variable_Register*                    swarmVariable_Register,
-		ExtensionManager_Register*            extensionMgr_Register,
-		Materials_Register*                   materials_Register,		
-		MPI_Comm                              comm);
+		Name                                            name,
+		void*                                           cellLayout,
+		void*                                           particleLayout,
+		Dimension_Index                                 dim,
+		SizeT                                           particleSize,
+		Particle_InCellIndex                            cellParticleTblDelta,
+		double                                          extraParticlesFactor,
+		FeMesh*                   	                     mesh,
+		EscapedRoutine*                                 escapedRoutine, 
+		Material*                                       material,
+		Variable_Register*                              swarmVariable_Register,
+		ExtensionManager_Register*                      extensionMgr_Register,
+		Materials_Register*                             materials_Register,		
+		MPI_Comm                                        comm);
 		
 	MaterialPointsSwarm* _MaterialPointsSwarm_New(
 		SizeT                                           _sizeOfSelf, 
@@ -114,8 +114,12 @@
 		SizeT                                           particleSize,
 		Particle_InCellIndex                            cellParticleTblDelta, 
 		double                                          extraParticlesFactor,
-		ExtensionManager_Register*                      extensionMgr_Register,
+		FeMesh*                   	                     mesh,
+		EscapedRoutine*                                 escapedRoutine, 
+		Material*                                       material,
 		Variable_Register*                              swarmVariable_Register,
+		ExtensionManager_Register*                      extensionMgr_Register,
+		Materials_Register*                             materials_Register,		
 		MPI_Comm                                        comm);
 
 	void _MaterialPointsSwarm_Delete( void* swarm );
