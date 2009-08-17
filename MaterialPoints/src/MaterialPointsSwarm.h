@@ -84,8 +84,6 @@
 		void*                                           particleLayout,
 		Dimension_Index                                 dim,
 		SizeT                                           particleSize,
-		Particle_InCellIndex                            cellParticleTblDelta,
-		double                                          extraParticlesFactor,
 		FeMesh*                   	                     mesh,
 		EscapedRoutine*                                 escapedRoutine, 
 		Material*                                       material,
