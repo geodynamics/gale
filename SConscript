@@ -108,4 +108,4 @@ for d in dirs:
                           LIBS=libs)
 
 # Install XML input files.
-env.Install(env['build_dir'] + '/lib/StGermain/PICellerator', Glob('Apps/src/*.xml'))
+env.Install('/lib/StGermain/PICellerator', Glob('Apps/src/*.xml'))
