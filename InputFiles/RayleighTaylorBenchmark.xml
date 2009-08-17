@@ -80,11 +80,11 @@
          -->
 
 	<!-- general decomposition parameters -->
-	<param name="dim"> 3 </param>
+	<param name="dim"> 2 </param>
 	<!-- mesh parameters -->
-	<param name="elementResI"> 16 </param>
-	<param name="elementResJ"> 16 </param>
-	<param name="elementResK"> 8 </param>
+	<param name="elementResI"> 64 </param>
+	<param name="elementResJ"> 64 </param>
+	<param name="elementResK"> 1 </param>
 
 	<param name="shadowDepth"> 1 </param>
 	<param name="minX"> 0.0 </param>
@@ -112,10 +112,11 @@
 	<!-- Visualisation stuff -->
 	<include>Underworld/Viewports/ParticleDensityVP.xml</include>
 	<include>Underworld/Viewports/StrainRateInvariantVP.xml</include>
+	<include>Underworld/Viewports/LinearMeshVP.xml</include>
 	<include>glucifer/window.xml</include>
 	<struct name="components" mergeType="merge">
 		<struct name="window" mergeType="merge">
-			<param name="Viewport">ParticleDensityVP StrainRateInvariantVP</param>
+			<param name="Viewport">ParticleDensityVP StrainRateInvariantVP LinearMeshVP</param>
 		</struct>
 	</struct>
 
