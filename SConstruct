@@ -63,8 +63,10 @@ out, err = subp.communicate()
 res = subp.wait()
 if res:
     print "Failed to extract hg revision number."
-    sys.exit()
-env.AppendUnique(CPPDEFINES=[("VERSION", env["ESCAPE"]('"' + out.split()[0].strip() + '"'))])
+    hg_ver = 'unknown'
+else:
+    hg_ver = out.split()[0].strip()
+env.AppendUnique(CPPDEFINES=[("VERSION", env["ESCAPE"]('"' + hg_ver + '"'))])
 
 # Need to insert some 'HAVE_*' definitions based on what packages we
 # found during configuration.
