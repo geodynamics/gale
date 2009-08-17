@@ -1421,7 +1421,7 @@ SwarmVariable* Swarm_NewScalarVariable(
 	Journal_Firewall(
 		dataOffset < ExtensionManager_GetFinalSize( self->particleExtensionMgr ),
 		Journal_MyStream( Error_Type, self ),
-		"Error in func %s - Attempting to create a SwarmVariable on an extension that does not exists.\n"
+		"Error in func %s - Failed to create Variable from extension: data offset within particle structure provided was invalid.\n"
 		"\t%s %s\n"
 		"\tdataOffset = %d, particle size = %d\n",
 		__func__,
