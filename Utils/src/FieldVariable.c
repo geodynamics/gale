@@ -308,7 +308,29 @@ void _FieldVariable_Construct( void* fieldVariable, Stg_ComponentFactory* cf, vo
 	else {
 		/* If there's no special list, just checkpoint/reload everything. */
 		isCheckpointedAndReloaded = True;
-	}	
+	}
+   feVarsList = NULL;
+   /** also include check to see if this fevariable should be saved for analysis purposes */ 
+   feVarsList = Dictionary_Get( cf->rootDict, "fieldVariablesToSave" );
+   if ( NULL == feVarsList ) {
+      feVarsList = Dictionary_Get( cf->rootDict, "FieldVariablesToSave" );
+   }
+   if (feVarsList != NULL ) {
+      Index                    listLength = Dictionary_Entry_Value_GetCount( feVarsList );
+      Index                    var_I = 0;
+      Dictionary_Entry_Value*  feVarDictValue = NULL;
+      char*                    fieldVariableName;
+   
+      for ( var_I = 0; var_I < listLength; var_I++ ) {
+         feVarDictValue = Dictionary_Entry_Value_GetElement( feVarsList, var_I );
+         fieldVariableName = Dictionary_Entry_Value_AsString( feVarDictValue ); 
+         if ( 0 == strcmp( self->name, fieldVariableName ) ) {
+            self->isSavedData = True;
+            break;
+         }
+      }
+   }
+
 	
 	_FieldVariable_Init( self, fieldComponentCount, dim, isCheckpointedAndReloaded, 
 		MPI_COMM_WORLD, fV_Register );
