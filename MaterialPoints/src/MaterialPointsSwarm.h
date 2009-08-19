@@ -62,14 +62,14 @@
 	#define __MaterialPointsSwarm \
 		__Swarm \
 		\
-		FeMesh*                   mesh;                 \
+		FeMesh*                               mesh;                 \
 		SwarmAdvector*                        swarmAdvector;        \
 		EscapedRoutine*                       escapedRoutine;       \
 		Material*                             material;             /**< For material assignment */ \
 		Materials_Register*                   materials_Register;   \
 		SwarmVariable*                        particleCoordVariable; /** Set only if a global coord system swarm. */ \
 		SwarmVariable*                        materialIndexVariable; \
-                Bool                                  geomodHack;
+		Bool                                  geomodHack;
 
 	struct MaterialPointsSwarm { __MaterialPointsSwarm };
 	
@@ -79,20 +79,18 @@
 	*/
 	
 	MaterialPointsSwarm* MaterialPointsSwarm_New(
-		Name                                  name,
-		void*                                 cellLayout,
-		void*                                 particleLayout,
-		Dimension_Index                       dim,
-		SizeT                                 particleSize,
-		Particle_InCellIndex                  cellParticleTblDelta,
-		double                                extraParticlesFactor,
-		FeMesh*                   	      mesh,
-		EscapedRoutine*                       escapedRoutine, 
-		Material*                             material,
-		Variable_Register*                    swarmVariable_Register,
-		ExtensionManager_Register*            extensionMgr_Register,
-		Materials_Register*                   materials_Register,		
-		MPI_Comm                              comm);
+		Name                                            name,
+		void*                                           cellLayout,
+		void*                                           particleLayout,
+		Dimension_Index                                 dim,
+		SizeT                                           particleSize,
+		FeMesh*                   	                     mesh,
+		EscapedRoutine*                                 escapedRoutine, 
+		Material*                                       material,
+		Variable_Register*                              swarmVariable_Register,
+		ExtensionManager_Register*                      extensionMgr_Register,
+		Materials_Register*                             materials_Register,		
+		MPI_Comm                                        comm);
 		
 	MaterialPointsSwarm* _MaterialPointsSwarm_New(
 		SizeT                                           _sizeOfSelf, 
@@ -114,8 +112,12 @@
 		SizeT                                           particleSize,
 		Particle_InCellIndex                            cellParticleTblDelta, 
 		double                                          extraParticlesFactor,
-		ExtensionManager_Register*                      extensionMgr_Register,
+		FeMesh*                   	                     mesh,
+		EscapedRoutine*                                 escapedRoutine, 
+		Material*                                       material,
 		Variable_Register*                              swarmVariable_Register,
+		ExtensionManager_Register*                      extensionMgr_Register,
+		Materials_Register*                             materials_Register,		
 		MPI_Comm                                        comm);
 
 	void _MaterialPointsSwarm_Delete( void* swarm );
@@ -127,16 +129,17 @@
 	void* _MaterialPointsSwarm_Copy( void* swarm, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _MaterialPointsSwarm_DefaultNew( Name name ) ;
-void _MaterialPointsSwarm_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+
+	void _MaterialPointsSwarm_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 	void _MaterialPointsSwarm_Build( void* swarm, void* data ) ;
 	void _MaterialPointsSwarm_Initialise( void* swarm, void* data ) ;
 	void _MaterialPointsSwarm_Execute( void* swarm, void* data );
 	void _MaterialPointsSwarm_Destroy( void* swarm, void* data ) ;
 
 
-void _MaterialPointsSwarm_Init( 
+	void _MaterialPointsSwarm_Init( 
 		void*                                 swarm,
-		FeMesh*                   mesh,
+		FeMesh*                               mesh,
 		EscapedRoutine*                       escapedRoutine, 
 		Material*                             material,
 		Materials_Register*                   materials_Register );
