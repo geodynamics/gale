@@ -205,6 +205,11 @@ class Package:
         libs = utils.conv.to_list(libs)
         for l in libs:
             if not [p for p in utils.path.find(l, dirs, prefixes, suffixes)]:
+                # Need to log that we couldn't find the library on disk.
+                log = open('config.log', 'a')
+                log.write('While configuring %s:\n'%repr(self.name))
+                log.write('  Failed to find library %s on disk.\n'%repr(l))
+                log.close()
                 return False
         return True
 
