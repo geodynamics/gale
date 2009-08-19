@@ -117,6 +117,89 @@ void ShapeSuite_TestConvexHull3D( ShapeSuiteData* data ) {
 	pcu_check_fileEq( "output/test.dat", expected_file );
 	remove("output/test.dat");
 }
+
+void ShapeSuite_TestUnion2D( ShapeSuiteData* data ) {
+	Dimension_Index  dim = 2;
+	char expected_file[PCU_PATH_MAX];
+	ShapeSuite_GeneratePoints( data, dim, "testUnion2D.xml" );
+
+	pcu_filename_expected( "testUnion2D.expected", expected_file );
+	pcu_check_fileEq( "output/test.dat", expected_file );
+	remove("output/test.dat");
+}
+
+void ShapeSuite_TestUnion3D( ShapeSuiteData* data ) {
+	Dimension_Index  dim = 3;
+	char expected_file[PCU_PATH_MAX];
+	ShapeSuite_GeneratePoints( data, dim, "testUnion3D.xml" );
+
+	pcu_filename_expected( "testUnion3D.expected", expected_file );
+	pcu_check_fileEq( "output/test.dat", expected_file );
+	remove("output/test.dat");
+}
+
+void ShapeSuite_TestUnion2DSingleNOT( ShapeSuiteData* data ) {
+	Dimension_Index  dim = 2;
+	char expected_file[PCU_PATH_MAX];
+	ShapeSuite_GeneratePoints( data, dim, "testUnion2DSingleNot.xml" );
+
+	pcu_filename_expected( "testUnion2DSingleNot.expected", expected_file );
+	pcu_check_fileEq( "output/test.dat", expected_file );
+	remove("output/test.dat");
+}
+
+void ShapeSuite_TestUnion3DSingleNOT( ShapeSuiteData* data ) {
+	Dimension_Index  dim = 3;
+	char expected_file[PCU_PATH_MAX];
+	ShapeSuite_GeneratePoints( data, dim, "testUnion3DSingleNot.xml" );
+
+	pcu_filename_expected( "testUnion3DSingleNot.expected", expected_file );
+	pcu_check_fileEq( "output/test.dat", expected_file );
+	remove("output/test.dat");
+}
+
+void ShapeSuite_TestIntersection2D( ShapeSuiteData* data ) {
+	Dimension_Index  dim = 2;
+	char expected_file[PCU_PATH_MAX];
+	ShapeSuite_GeneratePoints( data, dim, "testIntersection2D.xml" );
+
+	pcu_filename_expected( "testIntersection2D.expected", expected_file );
+	pcu_check_fileEq( "output/test.dat", expected_file );
+	remove("output/test.dat");
+}
+
+void ShapeSuite_TestIntersection3D( ShapeSuiteData* data ) {
+	Dimension_Index  dim = 3;
+	char expected_file[PCU_PATH_MAX];
+	ShapeSuite_GeneratePoints( data, dim, "testIntersection3D.xml" );
+
+	pcu_filename_expected( "testIntersection3D.expected", expected_file );
+	pcu_check_fileEq( "output/test.dat", expected_file );
+	remove("output/test.dat");
+}
+
+void ShapeSuite_TestSuperellipsoid2D( ShapeSuiteData* data ) {
+	Dimension_Index  dim = 2;
+	char expected_file[PCU_PATH_MAX];
+	ShapeSuite_GeneratePoints( data, dim, "testSuperellipsoid2D.xml" );
+
+	pcu_filename_expected( "testSuperellipsoid2D.expected", expected_file );
+	pcu_check_fileEq( "output/test.dat", expected_file );
+	remove("output/test.dat");
+}
+
+void ShapeSuite_TestSuperellipsoid3D( ShapeSuiteData* data ) {
+	Dimension_Index  dim = 3;
+	char expected_file[PCU_PATH_MAX];
+	ShapeSuite_GeneratePoints( data, dim, "testSuperellipsoid3D.xml" );
+
+	pcu_filename_expected( "testSuperellipsoid3D.expected", expected_file );
+	pcu_check_fileEq( "output/test.dat", expected_file );
+	remove("output/test.dat");
+}
+
+
+
 void ShapeSuite( pcu_suite_t* suite ) {
    pcu_suite_setData( suite, ShapeSuiteData );
    pcu_suite_setFixtures( suite, ShapeSuite_Setup, ShapeSuite_Teardown );
@@ -126,4 +209,12 @@ void ShapeSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, ShapeSuite_TestSphere3D );
    pcu_suite_addTest( suite, ShapeSuite_TestConvexHull2D );
    pcu_suite_addTest( suite, ShapeSuite_TestConvexHull3D );
+   pcu_suite_addTest( suite, ShapeSuite_TestUnion2D );
+   pcu_suite_addTest( suite, ShapeSuite_TestUnion3D );
+   pcu_suite_addTest( suite, ShapeSuite_TestUnion2DSingleNOT );
+   pcu_suite_addTest( suite, ShapeSuite_TestUnion3DSingleNOT );
+   pcu_suite_addTest( suite, ShapeSuite_TestIntersection2D );
+   pcu_suite_addTest( suite, ShapeSuite_TestIntersection3D );
+   pcu_suite_addTest( suite, ShapeSuite_TestSuperellipsoid2D );
+   pcu_suite_addTest( suite, ShapeSuite_TestSuperellipsoid3D );
 }

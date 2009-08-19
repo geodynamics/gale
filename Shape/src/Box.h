@@ -56,6 +56,15 @@
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Constructors
 	*/
+   Box* Box_New(
+		Name                                  name,
+		Dimension_Index                       dim,
+		XYZ                                   centre, 
+		double                                alpha,
+		double                                beta,
+		double                                gamma,
+		XYZ                                   width );
+
 	Box* _Box_New(
 		SizeT                                 _sizeOfSelf, 
 		Type                                  type,
