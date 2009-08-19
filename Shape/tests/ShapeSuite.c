@@ -88,6 +88,16 @@ void ShapeSuite_TestSphere2D( ShapeSuiteData* data ) {
 	remove("output/test.dat");
 }
 
+void ShapeSuite_TestSphere2D_Invert( ShapeSuiteData* data ) {
+	Dimension_Index  dim = 2;
+	char expected_file[PCU_PATH_MAX];
+	ShapeSuite_GeneratePoints( data, dim, "testSphere-invert.xml" );
+
+	pcu_filename_expected( "testSphere2D-invert.expected", expected_file );
+	pcu_check_fileEq( "output/test.dat", expected_file );
+	remove("output/test.dat");
+}
+
 void ShapeSuite_TestSphere3D( ShapeSuiteData* data ) {
 	Dimension_Index  dim = 3;
 	char expected_file[PCU_PATH_MAX];
@@ -178,6 +188,26 @@ void ShapeSuite_TestIntersection3D( ShapeSuiteData* data ) {
 	remove("output/test.dat");
 }
 
+void ShapeSuite_TestCylinder( ShapeSuiteData* data ) {
+	Dimension_Index  dim = 2;
+	char expected_file[PCU_PATH_MAX];
+	ShapeSuite_GeneratePoints( data, dim, "testCylinder.xml" );
+
+	pcu_filename_expected( "testCylinder.expected", expected_file );
+	pcu_check_fileEq( "output/test.dat", expected_file );
+	remove("output/test.dat");
+}
+
+void ShapeSuite_TestPolygonShape2D( ShapeSuiteData* data ) {
+	Dimension_Index  dim = 2;
+	char expected_file[PCU_PATH_MAX];
+	ShapeSuite_GeneratePoints( data, dim, "testPolygonShape.xml" );
+
+	pcu_filename_expected( "testPolygonShape2D.expected", expected_file );
+	pcu_check_fileEq( "output/test.dat", expected_file );
+	remove("output/test.dat");
+}
+
 void ShapeSuite_TestSuperellipsoid2D( ShapeSuiteData* data ) {
 	Dimension_Index  dim = 2;
 	char expected_file[PCU_PATH_MAX];
@@ -198,14 +228,13 @@ void ShapeSuite_TestSuperellipsoid3D( ShapeSuiteData* data ) {
 	remove("output/test.dat");
 }
 
-
-
 void ShapeSuite( pcu_suite_t* suite ) {
    pcu_suite_setData( suite, ShapeSuiteData );
    pcu_suite_setFixtures( suite, ShapeSuite_Setup, ShapeSuite_Teardown );
    pcu_suite_addTest( suite, ShapeSuite_TestBox2D );
    pcu_suite_addTest( suite, ShapeSuite_TestBox3D );
    pcu_suite_addTest( suite, ShapeSuite_TestSphere2D );
+   pcu_suite_addTest( suite, ShapeSuite_TestSphere2D_Invert );
    pcu_suite_addTest( suite, ShapeSuite_TestSphere3D );
    pcu_suite_addTest( suite, ShapeSuite_TestConvexHull2D );
    pcu_suite_addTest( suite, ShapeSuite_TestConvexHull3D );
@@ -215,6 +244,8 @@ void ShapeSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, ShapeSuite_TestUnion3DSingleNOT );
    pcu_suite_addTest( suite, ShapeSuite_TestIntersection2D );
    pcu_suite_addTest( suite, ShapeSuite_TestIntersection3D );
+   pcu_suite_addTest( suite, ShapeSuite_TestCylinder );
+   pcu_suite_addTest( suite, ShapeSuite_TestPolygonShape2D );
    pcu_suite_addTest( suite, ShapeSuite_TestSuperellipsoid2D );
    pcu_suite_addTest( suite, ShapeSuite_TestSuperellipsoid3D );
 }
