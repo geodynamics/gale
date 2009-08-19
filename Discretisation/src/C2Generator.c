@@ -160,7 +160,7 @@ void C2Generator_SetTopologyParams( void* meshGenerator, unsigned* sizes,
 	FreeArray( vertSizes );
 }
 
-void C2Generator_GenElementVertexInc( void* meshGenerator, MeshTopology* topo, Grid*** grids ) {
+void C2Generator_GenElementVertexInc( void* meshGenerator, IGraph* topo, Grid*** grids ) {
 	C2Generator*	self = (C2Generator*)meshGenerator;
 	Stream*		stream = Journal_Register( Info_Type, self->type );
 	unsigned*	incEls;
@@ -276,12 +276,187 @@ void C2Generator_GenElementVertexInc( void* meshGenerator, MeshTopology* topo, G
 	Stream_UnIndent( stream );
 }
 
-void C2Generator_GenFaceVertexInc( void* meshGenerator, MeshTopology* topo, Grid*** grids ) {
-	abort();
+void C2Generator_GenFaceVertexInc( void* meshGenerator, IGraph* topo, Grid*** grids ) {
+	C2Generator*	self 		= (C2Generator*)meshGenerator;
+	Stream*		stream;
+	unsigned	face_i;
+	unsigned	gFace;
+	unsigned	verts[9];
+	unsigned*	dimInds		= Memory_Alloc_Array( unsigned, topo->nDims, "edgeDimensionIndices" );
+
+	stream = Journal_Register( Info_Type, self->type );
+	Journal_Printf( stream, "Generating face-vertex types...\n" );
+	Stream_Indent( stream );
+
+	for( face_i = 0; face_i < topo->remotes[MT_FACE]->nDomains; face_i++ ) {
+		gFace = Sync_DomainToGlobal( topo->remotes[MT_FACE], face_i );
+
+		if( gFace < grids[2][0]->nPoints ) {
+			Grid_Lift( grids[2][0], gFace, dimInds );
+
+			dimInds[0] *= 2;
+			dimInds[1] *= 2;
+			if( topo->nDims == 3 )
+				dimInds[2] *= 2;
+
+			verts[0] = Grid_Project( grids[0][0], dimInds );
+			dimInds[0]++;
+			verts[1] = Grid_Project( grids[0][0], dimInds );
+			dimInds[0]++;
+			verts[2] = Grid_Project( grids[0][0], dimInds );
+			dimInds[0] -= 2; dimInds[1]++;
+			verts[3] = Grid_Project( grids[0][0], dimInds );
+			dimInds[0]++;
+			verts[4] = Grid_Project( grids[0][0], dimInds );
+			dimInds[0]++;
+			verts[5] = Grid_Project( grids[0][0], dimInds );
+			dimInds[0] -= 2; dimInds[1]++;
+			verts[6] = Grid_Project( grids[0][0], dimInds );
+			dimInds[0]++;
+			verts[7] = Grid_Project( grids[0][0], dimInds );
+			dimInds[0]++;
+			verts[8] = Grid_Project( grids[0][0], dimInds );
+			dimInds[0] -= 2; dimInds[1] -= 2;
+		}
+		else if( topo->nDims == 3 && gFace < grids[2][0]->nPoints + grids[2][1]->nPoints ) {
+			Grid_Lift( grids[2][1], gFace - grids[2][0]->nPoints, dimInds );
+
+			dimInds[0] *= 2;
+			dimInds[1] *= 2;
+			if( topo->nDims == 3 )
+				dimInds[2] *= 2;
+
+			verts[0] = Grid_Project( grids[0][0], dimInds );
+			dimInds[0]++;
+			verts[1] = Grid_Project( grids[0][0], dimInds );
+			dimInds[0]++;
+			verts[2] = Grid_Project( grids[0][0], dimInds );
+			dimInds[0] -= 2; dimInds[2]++;
+			verts[3] = Grid_Project( grids[0][0], dimInds );
+			dimInds[0]++;
+			verts[4] = Grid_Project( grids[0][0], dimInds );
+			dimInds[0]++;
+			verts[5] = Grid_Project( grids[0][0], dimInds );
+			dimInds[0] -= 2; dimInds[2]++;
+			verts[6] = Grid_Project( grids[0][0], dimInds );
+			dimInds[0]++;
+			verts[7] = Grid_Project( grids[0][0], dimInds );
+			dimInds[0]++;
+			verts[8] = Grid_Project( grids[0][0], dimInds );
+			dimInds[0] -= 2; dimInds[2] -= 2;
+		}
+		else if( topo->nDims == 3 && gFace < grids[2][0]->nPoints + grids[2][1]->nPoints + grids[2][2]->nPoints ) {
+			Grid_Lift( grids[2][2], gFace - grids[2][0]->nPoints - grids[2][1]->nPoints, dimInds );
+
+			dimInds[0] *= 2;
+			dimInds[1] *= 2;
+			if( topo->nDims == 3 )
+				dimInds[2] *= 2;
+
+			verts[0] = Grid_Project( grids[0][0], dimInds );
+			dimInds[1]++;
+			verts[1] = Grid_Project( grids[0][0], dimInds );
+			dimInds[1]++;
+			verts[2] = Grid_Project( grids[0][0], dimInds );
+			dimInds[1] -= 2; dimInds[2]++;
+			verts[3] = Grid_Project( grids[0][0], dimInds );
+			dimInds[1]++;
+			verts[4] = Grid_Project( grids[0][0], dimInds );
+			dimInds[1]++;
+			verts[5] = Grid_Project( grids[0][0], dimInds );
+			dimInds[1] -= 2; dimInds[2]++;
+			verts[6] = Grid_Project( grids[0][0], dimInds );
+			dimInds[1]++;
+			verts[7] = Grid_Project( grids[0][0], dimInds );
+			dimInds[1]++;
+			verts[8] = Grid_Project( grids[0][0], dimInds );
+			dimInds[1] -= 2; dimInds[2] -= 2;
+		}
+
+		CartesianGenerator_MapToDomain( (CartesianGenerator*)self, (Sync*)IGraph_GetDomain( topo, MT_VERTEX ), 9, verts );
+		IGraph_SetIncidence( topo, MT_FACE, face_i, MT_VERTEX, 9, verts );
+	}
+
+	Memory_Free( dimInds );	
+
+	MPI_Barrier( self->mpiComm );
+	
+	Journal_Printf( stream, "... done.\n" );
+	Stream_UnIndent( stream );
 }
 
-void C2Generator_GenEdgeVertexInc( void* meshGenerator, MeshTopology* topo, Grid*** grids ) {
-	abort();
+void C2Generator_GenEdgeVertexInc( void* meshGenerator, IGraph* topo, Grid*** grids ) {
+	C2Generator*	self 		= (C2Generator*)meshGenerator;
+	Sync*		sync		= IGraph_GetDomain( topo, MT_EDGE );
+	Stream*		stream;
+	unsigned	edge_i;
+	unsigned	gEdge;
+	unsigned	verts[3];
+	unsigned*	dimInds		= Memory_Alloc_Array( unsigned, topo->nDims, "edgeDimensionIndices" );
+
+	stream = Journal_Register( Info_Type, self->type );
+	Journal_Printf( stream, "Generating edge-vertex incidence...\n" );
+	Stream_Indent( stream );
+
+	for( edge_i = 0; edge_i < Sync_GetNumDomains( sync ); edge_i++ ) {
+		gEdge = Sync_DomainToGlobal( sync, edge_i );
+
+		if( gEdge < grids[1][0]->nPoints ) {
+			Grid_Lift( grids[1][0], gEdge, dimInds );
+
+			dimInds[0] *= 2;
+			dimInds[1] *= 2;
+			if( topo->nDims == 3 )
+				dimInds[2] *= 2;
+
+			verts[0] = Grid_Project( grids[0][0], dimInds );
+			dimInds[0]++;
+			verts[1] = Grid_Project( grids[0][0], dimInds );
+			dimInds[0]++;
+			verts[2] = Grid_Project( grids[0][0], dimInds );
+			dimInds[0] -= 2;
+		}
+		else if( gEdge < grids[1][0]->nPoints + grids[1][1]->nPoints ) {
+			Grid_Lift( grids[1][1], gEdge - grids[1][0]->nPoints, dimInds );
+
+			dimInds[0] *= 2;
+			dimInds[1] *= 2;
+			if( topo->nDims == 3 )
+				dimInds[2] *= 2;
+
+			verts[0] = Grid_Project( grids[0][0], dimInds );
+			dimInds[1]++;
+			verts[1] = Grid_Project( grids[0][0], dimInds );
+			dimInds[1]++;
+			verts[2] = Grid_Project( grids[0][0], dimInds );
+			dimInds[1] -= 2;
+		}
+		else if( topo->nDims == 3 && gEdge < grids[1][0]->nPoints + grids[1][1]->nPoints + grids[1][2]->nPoints ) {
+			Grid_Lift( grids[1][2], gEdge - grids[1][0]->nPoints - grids[1][1]->nPoints, dimInds );
+
+			dimInds[0] *= 2;
+			dimInds[1] *= 2;
+			if( topo->nDims == 3 )
+				dimInds[2] *= 2;
+
+			verts[0] = Grid_Project( grids[0][0], dimInds );
+			dimInds[2]++;
+			verts[1] = Grid_Project( grids[0][0], dimInds );
+			dimInds[2]++;
+			verts[2] = Grid_Project( grids[0][0], dimInds );
+			dimInds[2] -= 2;
+		}
+
+		CartesianGenerator_MapToDomain( (CartesianGenerator*)self, (Sync*)IGraph_GetDomain( topo, MT_VERTEX ), 3, verts );
+		IGraph_SetIncidence( topo, MT_EDGE, edge_i, MT_VERTEX, 3, verts );
+	}
+
+	Memory_Free( dimInds );
+
+	MPI_Barrier( self->mpiComm );
+
+	Journal_Printf( stream, "... done.\n" );
+	Stream_UnIndent( stream );
 }
 
 void C2Generator_GenElementTypes( void* meshGenerator, Mesh* mesh ) {

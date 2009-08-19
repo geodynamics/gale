@@ -85,9 +85,9 @@
 
 	void C2Generator_SetTopologyParams( void* meshGenerator, unsigned* sizes, 
 					    unsigned maxDecompDims, unsigned* minDecomp, unsigned* maxDecomp );
-	void C2Generator_GenElementVertexInc( void* meshGenerator, MeshTopology* topo, Grid*** grids );
-	void C2Generator_GenFaceVertexInc( void* meshGenerator, MeshTopology* topo, Grid*** grids );
-	void C2Generator_GenEdgeVertexInc( void* meshGenerator, MeshTopology* topo, Grid*** grids );
+	void C2Generator_GenElementVertexInc( void* meshGenerator, IGraph* topo, Grid*** grids );
+	void C2Generator_GenFaceVertexInc( void* meshGenerator, IGraph* topo, Grid*** grids );
+	void C2Generator_GenEdgeVertexInc( void* meshGenerator, IGraph* topo, Grid*** grids );
 	void C2Generator_GenElementTypes( void* meshGenerator, Mesh* mesh );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
