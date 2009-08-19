@@ -60,6 +60,12 @@ typedef struct {
    Variable_Register*            svRegister;
    ExtensionManager_Register*    eRegister;
    Materials_Register*           mRegister;
+   Dictionary*                   matDict1;
+   Dictionary*                   matDict2;
+   Stg_Shape*                    shape1;
+   Stg_Shape*                    shape2;
+   Material*                     mat1;
+   Material*                     mat2;
 } MaterialComponentsSuiteData;
 
 
@@ -90,11 +96,31 @@ FeMesh* buildFeMesh( unsigned nDims, unsigned* size,
 }
 
 
+void MaterialComponentsSuite_BuildInitSwarmBasics( MaterialComponentsSuiteData* data ) {
+   Index    var_I;
+
+   /* Mesh will already be initialised */
+   /* Manually do the basic Swarm building and initialising */
+   _Swarm_Build( data->mpSwarm, NULL );
+   for( var_I = 0 ; var_I < data->mpSwarm->nSwarmVars ; var_I++ ) {
+		Stg_Component_Build( data->mpSwarm->swarmVars[var_I], NULL , False );
+	}
+   _Swarm_Initialise( data->mpSwarm, NULL );
+   for( var_I = 0 ; var_I < data->mpSwarm->nSwarmVars ; var_I++ ) {
+		Stg_Component_Initialise( data->mpSwarm->swarmVars[var_I], NULL , False );
+	}
+}
+
+
 void MaterialComponentsSuite_Setup( MaterialComponentsSuiteData* data ) {
    unsigned    dim = 3;
    unsigned    meshSize[3] = {3, 3, 3};
    double      minCrds[3] = {0.0, 0.0, 0.0};
    double      maxCrds[3] = {1.0, 1.0, 1.0};
+   XYZ         boxCentre = {0.25,0.25,0.25};
+   XYZ         boxWidth = {0.1,0.1,0.1};
+   XYZ         sphereCentre = {0.75,0.75,0.75};
+   double      sphereRadius = 0.1;
 
    data->svRegister = Variable_Register_New();
    data->eRegister = ExtensionManager_Register_New();
@@ -118,6 +144,15 @@ void MaterialComponentsSuite_Setup( MaterialComponentsSuiteData* data ) {
       data->eRegister,
       data->mRegister,
       MPI_COMM_WORLD );
+
+   data->shape1 = (Stg_Shape*)Box_New( "boxShape", dim, boxCentre, 0, 0, 0, boxWidth );
+   data->shape2 = (Stg_Shape*)Sphere_New( "sphereShape", dim, sphereCentre, 0, 0, 0, sphereRadius );
+   data->matDict1 = Dictionary_New();
+   data->matDict2 = Dictionary_New();
+   data->mat1 = Material_New( "mat1", data->shape1, data->matDict1, data->mRegister );
+   data->mat2 = Material_New( "mat2", data->shape2, data->matDict2, data->mRegister );
+
+   MaterialComponentsSuite_BuildInitSwarmBasics( data );
 }
 
 
@@ -126,17 +161,23 @@ void MaterialComponentsSuite_Teardown( MaterialComponentsSuiteData* data ) {
    Stg_Class_Delete( data->cellLayout );
    Stg_Class_Delete( data->particleLayout );
    Stg_Class_Delete( data->feMesh );
-   Stg_Class_Delete( data->mRegister );
    Stg_Class_Delete( data->eRegister );
    Stg_Class_Delete( data->svRegister );
+   Stg_Class_Delete( data->mRegister );
+   Stg_Class_Delete( data->mat1 );
+   Stg_Class_Delete( data->mat2 );
+   Stg_Class_Delete( data->matDict1 );
+   Stg_Class_Delete( data->matDict2 );
+   Stg_Class_Delete( data->shape1 );
+   Stg_Class_Delete( data->shape2 );
 }
 
 
 /*Tests*/
-void MaterialComponentsSuite_TestBuildInit( MaterialComponentsSuiteData* data ) {
-   /* Mesh will already be initialised */
-   Stg_Component_Build( data->mpSwarm, 0, False );
-   Stg_Component_Initialise( data->mpSwarm, 0, False );
+void MaterialComponentsSuite_TestRegisterSetup( MaterialComponentsSuiteData* data ) {
+
+   pcu_check_true( data->mRegister != NULL );
+   
 }
 
 
@@ -149,5 +190,5 @@ void MaterialComponentsSuite_TestBuildInit( MaterialComponentsSuiteData* data ) 
 void MaterialComponentsSuite( pcu_suite_t* suite ) {
    pcu_suite_setData( suite, MaterialComponentsSuiteData );
    pcu_suite_setFixtures( suite, MaterialComponentsSuite_Setup, MaterialComponentsSuite_Teardown );
-   pcu_suite_addTest( suite, MaterialComponentsSuite_TestBuildInit );
+   pcu_suite_addTest( suite, MaterialComponentsSuite_TestRegisterSetup );
 }
