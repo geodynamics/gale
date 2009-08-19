@@ -51,6 +51,12 @@
 	/* Textual name of this class */
 	extern const Type Swarm_Type;
 
+	/** Default extra factor to malloc for particles array. This is because the number of particles on each process
+	   may increase due to advection, splitting/merging etc, and we want to avoid reallocing if possible. */
+	extern const double       DEFAULT_EXTRA_PARTICLES_FACTOR;
+	extern const unsigned int MINIMUM_PARTICLES_ARRAY_DELTA;
+	extern const unsigned int DEFAULT_CELL_PARTICLE_TBL_DELTA;
+
 	/* Swarm information */
 	#define __Swarm \
 		/* General info */ \

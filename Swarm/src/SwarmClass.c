@@ -71,9 +71,9 @@ const Name defaultSwarmParticleCommHandlerName = "defaultSwarmPHandlerName";
 
 /** Default extra factor to malloc for particles array. This is because the number of particles on each process
 may increase due to advection, splitting/merging etc, and we want to avoid reallocing if possible. */
-static const double       DEFAULT_EXTRA_PARTICLES_FACTOR = 0.05;
-static const unsigned int MINIMUM_PARTICLES_ARRAY_DELTA = 100;
-static const unsigned int DEFAULT_CELL_PARTICLE_TBL_DELTA = 4;
+const double       DEFAULT_EXTRA_PARTICLES_FACTOR = 0.05;
+const unsigned int MINIMUM_PARTICLES_ARRAY_DELTA = 100;
+const unsigned int DEFAULT_CELL_PARTICLE_TBL_DELTA = 4;
 
 /* --- Function Definitions --- */
 
@@ -1419,7 +1419,7 @@ SwarmVariable* Swarm_NewScalarVariable(
 	Journal_Firewall(
 		dataOffset < ExtensionManager_GetFinalSize( self->particleExtensionMgr ),
 		Journal_MyStream( Error_Type, self ),
-		"Error in func %s - Attempting to create a SwarmVariable on an extension that does not exists.\n"
+		"Error in func %s - Failed to create Variable from extension: data offset within particle structure provided was invalid.\n"
 		"\t%s %s\n"
 		"\tdataOffset = %d, particle size = %d\n",
 		__func__,
