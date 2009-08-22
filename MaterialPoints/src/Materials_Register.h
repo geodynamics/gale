@@ -87,8 +87,7 @@
 	#define Materials_Register_GetByName( self, materialName ) \
 		( (Material*) NamedObject_Register_GetByName( self, materialName ) ) 
 	
-	#define Materials_Register_GetByIndex( self, materialIndex ) \
-		( (Material*) NamedObject_Register_GetByIndex( self, materialIndex ) )
+	Material* Materials_Register_GetByIndex( Materials_Register* self, Index materialIndex );
 
 	#define Materials_Register_GetCount( self ) \
 		self->objects->count
