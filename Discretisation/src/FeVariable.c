@@ -673,48 +673,51 @@ void _FeVariable_Initialise( void* variable, void* data ) {
 	Memory_Free( inputPathString );
 	Stream_UnIndent( self->debug );
 
-   /** also include check to see if this fevariable should be checkpointed, just incase it didn't go through the fieldvariable construct phase */ 
-   feVarsList = Dictionary_Get( context->dictionary, "fieldVariablesToCheckpoint" );
-   if ( NULL == feVarsList ) {
-      feVarsList = Dictionary_Get( context->dictionary, "FieldVariablesToCheckpoint" );
-   }
-   if (feVarsList != NULL ) {
-      Index                    listLength = Dictionary_Entry_Value_GetCount( feVarsList );
-      Index                    var_I = 0;
-      Dictionary_Entry_Value*  feVarDictValue = NULL;
-      char*                    fieldVariableName;
+	if( context ) {
+   		/** also include check to see if this fevariable should be checkpointed, just incase it didn't go through the 
+		fieldvariable construct phase */ 
+		feVarsList = Dictionary_Get( context->dictionary, "fieldVariablesToCheckpoint" );
+		if ( NULL == feVarsList ) {
+		feVarsList = Dictionary_Get( context->dictionary, "FieldVariablesToCheckpoint" );
+		}
+		if (feVarsList != NULL ) {
+			Index                    listLength = Dictionary_Entry_Value_GetCount( feVarsList );
+			Index                    var_I = 0;
+			Dictionary_Entry_Value*  feVarDictValue = NULL;
+			char*                    fieldVariableName;
    
-      for ( var_I = 0; var_I < listLength; var_I++ ) {
-         feVarDictValue = Dictionary_Entry_Value_GetElement( feVarsList, var_I );
-         fieldVariableName = Dictionary_Entry_Value_AsString( feVarDictValue ); 
-         if ( 0 == strcmp( self->name, fieldVariableName ) ) {
-            self->isCheckpointedAndReloaded = True;
-            break;
-         }
-      }
-   }
+			for ( var_I = 0; var_I < listLength; var_I++ ) {
+				feVarDictValue = Dictionary_Entry_Value_GetElement( feVarsList, var_I );
+				fieldVariableName = Dictionary_Entry_Value_AsString( feVarDictValue ); 
+				if ( 0 == strcmp( self->name, fieldVariableName ) ) {
+					self->isCheckpointedAndReloaded = True;
+					break;
+				}
+			}
+		}
 
-   feVarsList = NULL;
-   /** also include check to see if this fevariable should be saved for analysis purposes */ 
-   feVarsList = Dictionary_Get( context->dictionary, "fieldVariablesToSave" );
-   if ( NULL == feVarsList ) {
-      feVarsList = Dictionary_Get( context->dictionary, "FieldVariablesToSave" );
-   }
-   if (feVarsList != NULL ) {
-      Index                    listLength = Dictionary_Entry_Value_GetCount( feVarsList );
-      Index                    var_I = 0;
-      Dictionary_Entry_Value*  feVarDictValue = NULL;
-      char*                    fieldVariableName;
+		feVarsList = NULL;
+		/** also include check to see if this fevariable should be saved for analysis purposes */ 
+		feVarsList = Dictionary_Get( context->dictionary, "fieldVariablesToSave" );
+		if ( NULL == feVarsList ) {
+			feVarsList = Dictionary_Get( context->dictionary, "FieldVariablesToSave" );	
+		}
+		if (feVarsList != NULL ) {
+			Index                    listLength = Dictionary_Entry_Value_GetCount( feVarsList );
+			Index                    var_I = 0;
+			Dictionary_Entry_Value*  feVarDictValue = NULL;
+			char*                    fieldVariableName;
    
-      for ( var_I = 0; var_I < listLength; var_I++ ) {
-         feVarDictValue = Dictionary_Entry_Value_GetElement( feVarsList, var_I );
-         fieldVariableName = Dictionary_Entry_Value_AsString( feVarDictValue ); 
-         if ( 0 == strcmp( self->name, fieldVariableName ) ) {
-            self->isSavedData = True;
-            break;
-         }
-      }
-   }
+			for ( var_I = 0; var_I < listLength; var_I++ ) {
+				feVarDictValue = Dictionary_Entry_Value_GetElement( feVarsList, var_I );
+				fieldVariableName = Dictionary_Entry_Value_AsString( feVarDictValue ); 
+				if ( 0 == strcmp( self->name, fieldVariableName ) ) {
+					self->isSavedData = True;
+					break;
+				}
+			}
+		}
+	}
    
 	if ( self->bcs ) {
 		Stg_Component_Initialise( self->bcs, data, False );
