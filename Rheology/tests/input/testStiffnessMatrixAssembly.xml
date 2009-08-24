@@ -6,8 +6,10 @@
 	<include> Underworld/BaseApps/LidDrivenFEM.xml </include>
 	
 	<list name="plugins" mergeType="merge">
+	<!-- commenting out these guys for now, should be deleted in future
 		<param>Underworld_testStiffnessMatrixAssembly</param>
 		<param>testStiffnessMatrixCompare</param>
+		-->
 	</list>
 
 	<!-- Simulation control -->
@@ -19,11 +21,11 @@
 
 	
 	<!-- Journal Control -->
-	<param name="journal.info.Context-verbose">True</param>
-	<param name="journal-level.info.Stg_ComponentFactory">2</param>
-	<param name="journal.debug">t</param>
-	<param name="journal-enable-branch.debug.StgFEM">t</param>
-	<param name="journal-level-branch.debug.StgFEM"> 2 </param>	
+	<param name="journal.info.Context-verbose">False</param>
+	<param name="journal-level.info.Stg_ComponentFactory">0</param>
+	<param name="journal.debug">f</param>
+	<param name="journal-enable-branch.debug.StgFEM">f</param>
+	<param name="journal-level-branch.debug.StgFEM"> 0 </param>	
 	
 	<!-- Geometry & Mesh setup -->
 	<param name="dim"> 2 </param>
