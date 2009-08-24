@@ -476,10 +476,8 @@ void lucContour_DrawContour(
 	glEnd();
 
   /* print the isovalue "near" the last isovalue */
-  glRasterPos2d( writePos[0], writePos[1] );
-
   sprintf( numberStr, "%g", isovalue );
-  lucPrintString( numberStr );
+  lucPrint( writePos[0], writePos[1], numberStr);
   rememberCoord= 0;
 
 	glEnable(GL_LIGHTING);

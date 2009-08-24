@@ -234,13 +234,13 @@ void _lucAxis_Construct( void* axis, Stg_ComponentFactory* cf, void* data ) {
 	lucColour_FromString( &self->colourY, colourNameY );
 	lucColour_FromString( &self->colourZ, colourNameZ );
 	
-	origin[I_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "originX", -0.25 );
-	origin[J_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "originY", 0.0 );
-	origin[K_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "originZ", 0.0 );
+	origin[I_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "originX", -0.05 );
+	origin[J_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "originY", -0.05 );
+	origin[K_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "originZ", -0.05 );
 	
        	lucAxis_InitAll( self, 
 	                origin,
-			Stg_ComponentFactory_GetDouble( cf, self->name, "length", 0.25 ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, "length", 0.2 ),
 		        self->colourX,
 			self->colourY,
 			self->colourZ);
@@ -283,7 +283,7 @@ void _lucAxis_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* vie
 	   The size of the arrow is a fifth of the total length */
 	arrowHeadLength = rodLength/5.0;
 
-	textSpacing = arrowHeadLength;
+	textSpacing = 0; //arrowHeadLength;
 	 
 	if (dim == 2) {
 	        /* Drawing the X axis, default is the RED color */
@@ -298,8 +298,7 @@ void _lucAxis_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* vie
 			glVertex2f( self->origin[I_AXIS] + rodLength - arrowHeadLength, self->origin[J_AXIS] - arrowHeadLength/2.0);
 			glVertex2f( self->origin[I_AXIS] + rodLength - arrowHeadLength, self->origin[J_AXIS] + arrowHeadLength/2.0);
 		glEnd();
-		glRasterPos2f( self->origin[I_AXIS] + rodLength + textSpacing, self->origin[J_AXIS] );
-		lucPrintString( "X" );
+		lucPrint(self->origin[I_AXIS] + rodLength + textSpacing, self->origin[J_AXIS], "X");
 		
 		/* Drawing the Y axis, default is the GREEN color */
 		lucColour_SetOpenGLColour( &self->colourY );
@@ -313,8 +312,7 @@ void _lucAxis_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* vie
 			glVertex2f( self->origin[I_AXIS] + arrowHeadLength/2.0, self->origin[J_AXIS] + rodLength - arrowHeadLength);
 			glVertex2f( self->origin[I_AXIS] - arrowHeadLength/2.0, self->origin[J_AXIS] + rodLength - arrowHeadLength);
 		glEnd();
-		glRasterPos2f( self->origin[I_AXIS], self->origin[J_AXIS] + rodLength + textSpacing );	
-		lucPrintString( "Y" );
+		lucPrint(self->origin[I_AXIS], self->origin[J_AXIS] + rodLength + arrowHeadLength, "Y");
 	}
 	else if ( dim == 3 ) {
 		/* Drawing the X axis, by default using the RED color */
@@ -334,8 +332,7 @@ void _lucAxis_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* vie
 			glVertex3f( self->origin[I_AXIS] + rodLength, self->origin[J_AXIS] , self->origin[K_AXIS] );
 		glEnd(); 
 		
-		glRasterPos3f( self->origin[I_AXIS] + rodLength + textSpacing, self->origin[J_AXIS], self->origin[K_AXIS] );
-		lucPrintString( "X" );
+		lucPrint3d( self->origin[I_AXIS] + rodLength + textSpacing, self->origin[J_AXIS], self->origin[K_AXIS], "X");
 		
 		/* Drawing the Y axis, by default using the GREEN color */
 		lucColour_SetOpenGLColour( &self->colourY );
@@ -352,9 +349,8 @@ void _lucAxis_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* vie
 			glVertex3f(  self->origin[I_AXIS], self->origin[J_AXIS] , self->origin[K_AXIS]  ); 
 			glVertex3f(  self->origin[I_AXIS], self->origin[J_AXIS] + rodLength , self->origin[K_AXIS]  );
 		glEnd();
-		
-		glRasterPos3f( self->origin[I_AXIS], self->origin[J_AXIS]+ rodLength + textSpacing, self->origin[K_AXIS] );
-		lucPrintString( "Y" );
+
+		lucPrint3d( self->origin[I_AXIS], self->origin[J_AXIS]+ rodLength + arrowHeadLength, self->origin[K_AXIS], "Y");
 		
 		
 		/* Drawing the Z axis, by default using the BLUE color */
@@ -371,8 +367,8 @@ void _lucAxis_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* vie
 			glVertex3f(  self->origin[I_AXIS], self->origin[J_AXIS] , self->origin[K_AXIS] ); 
 			glVertex3f( self->origin[I_AXIS], self->origin[J_AXIS] , self->origin[K_AXIS] + rodLength );
 		glEnd(); 
-		glRasterPos3f( self->origin[I_AXIS], self->origin[J_AXIS] , self->origin[K_AXIS] + rodLength + textSpacing );
-		lucPrintString( "Z" );
+
+		lucPrint3d( self->origin[I_AXIS], self->origin[J_AXIS] , self->origin[K_AXIS] + rodLength + textSpacing, "Z");
 	}
 	/* Put back settings */
 	glEnable(GL_LIGHTING);
