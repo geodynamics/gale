@@ -49,8 +49,8 @@
 			<param name="compositeEachObject">t</param>
 			<list name="DrawingObject">
 				<param>tempContoursTitle</param>
-				<param>temperatureContours</param>
 				<param>temperatureMap</param>
+				<param>temperatureContours</param>
 				<param>border</param>
 				<param>temperatureColourBar</param>
 			</list>
