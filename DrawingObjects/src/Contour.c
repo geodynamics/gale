@@ -337,7 +337,7 @@ void lucContour_DrawContour(
 	glEnable(GL_BLEND);
 	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-
+    glDisable(GL_DEPTH_TEST); /* Depth test messes up line anti-aliasing, needs checking on multiple procs */
 	glBegin(GL_LINES);
 
 	/* Start marching rectangles */
@@ -481,6 +481,7 @@ void lucContour_DrawContour(
   rememberCoord= 0;
 
 	glEnable(GL_LIGHTING);
+    glEnable(GL_DEPTH_TEST);
 
 	/* Clean up */
 	Memory_Free(array);
