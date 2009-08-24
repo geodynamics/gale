@@ -148,6 +148,9 @@ void Grid_SetSizes( void* grid, unsigned* sizes ) {
 	if( self->nDims ) {
 		unsigned	d_i;
 
+      if(self->sizes) FreeArray( self->sizes );
+      if(self->basis) FreeArray( self->basis );
+		   
 		self->sizes = Memory_Alloc_Array( unsigned, self->nDims, "Grid::sizes" );
 		self->basis = Memory_Alloc_Array( unsigned, self->nDims, "Grid::basis" );
 		memcpy( self->sizes, sizes, self->nDims * sizeof(unsigned) );
