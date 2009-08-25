@@ -49,6 +49,7 @@
 #include "types.h"
 #include "ColourMap.h"
 #include "X11Colours.h"
+#include "float.h"
 
 #include <string.h>
 #include <assert.h>
@@ -391,9 +392,9 @@ void lucColourMap_GetColourFromScaledValue( void* colourMap, float scaledValue, 
 }
 
 void lucColourMap_SetMinMax( void* colourMap, double min, double max ) {
-	lucColourMap* self        = colourMap;
-	double        tolerance   = 1e-10;
-
+	lucColourMap* self       = colourMap;
+	double        tolerance  = 1e-10;
+   Stream*       stream     = Journal_Register( InfoStream_Type, self->type );
 	/* Shift max and min if they are too close /
 	if (fabs(min - max) < tolerance) {	
 		max += 0.5 * tolerance;
@@ -405,6 +406,16 @@ void lucColourMap_SetMinMax( void* colourMap, double min, double max ) {
 	/* Copy to colour map */
 	self->minimum = min;
 	self->maximum = max;
+	if(self->logScale){
+	   if(self->minimum <= FLT_MIN ) {
+	      self->minimum =  FLT_MIN;
+	      Journal_DPrintf( stream, "\n WARNING: Field used for logscale colourmap possibly contains non-positive values. \n" );
+	   }
+	   if(self->maximum <= FLT_MIN ) {
+	      self->maximum =  FLT_MIN;
+	      Journal_DPrintf( stream, "\n WARNING: Field used for logscale colourmap possibly contains non-positive values. \n" );
+	   }
+	}
 	
     /* If a centringValue has been imposed on a dynamic problem it should
         force the max / min to contain it correctly */
