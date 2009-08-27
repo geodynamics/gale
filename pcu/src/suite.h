@@ -29,6 +29,7 @@ struct pcu_suite_t {
       pcu_test_t* curtest;
       pcu_listener_t* lsnr;
       pcu_suite_t* next;
+      int nsubsuites;
       pcu_suite_t* subsuites;
 
       pcu_fixture_t* setup;
@@ -41,7 +42,8 @@ void _pcu_suite_setFixtures( pcu_suite_t* suite,
 			     pcu_fixture_t* setup, pcu_fixture_t* teardown );
 void _pcu_suite_addTest( pcu_suite_t* suite, pcu_testfunc_t* func, const char* name );
 void _pcu_suite_addSubSuite( pcu_suite_t* suite, const char* name,
-                             void (initfunc)( pcu_suite_t* ) );
+                             void (initfunc)( pcu_suite_t* ),
+                             const char* moduleDir );
 void _pcu_suite_setData( pcu_suite_t* suite, int size );
 void pcu_suite_clear( pcu_suite_t* suite );
 
