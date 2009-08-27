@@ -223,7 +223,6 @@ void DofLayoutSuite_TestBasic( DofLayoutSuiteData* data ) {
 		/* Cleanup */
 
 		Stg_Class_Delete(variableRegister);
-		Stg_Class_Delete(dictionary);
 
 		for (var_I = 0; var_I < 6; var_I++) {
 			if (var[var_I]) Stg_Class_Delete(var[var_I]);
@@ -302,7 +301,6 @@ void DofLayoutSuite_TestRemap( DofLayoutSuiteData* data ) {
 
 		Stg_Class_Delete(dof);
 		Stg_Class_Delete(variableRegister);
-		Stg_Class_Delete(dictionary);
 
 		for (i = 0; i < 6; i++)
 			if (var[i]) Stg_Class_Delete(var[i]);
