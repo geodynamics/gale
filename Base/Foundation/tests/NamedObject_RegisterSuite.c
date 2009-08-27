@@ -90,6 +90,9 @@ void NamedObject_RegisterSuite_Teardown( NamedObject_RegisterSuiteData* data ) {
 void NamedObject_RegisterSuite_TestAdd( NamedObject_RegisterSuiteData* data ) {
    Index ii;
 
+   pcu_docstring( "Tests a series of new objects can be added to a register, and the register's data "
+      "fields are updated correctly" );
+
    for (ii=0; ii < data->testObjectsCount; ii++ ) {
       NamedObject_Register_Add( data->reg, data->testObjects[ii] );
    }
@@ -103,6 +106,8 @@ void NamedObject_RegisterSuite_TestAdd( NamedObject_RegisterSuiteData* data ) {
 
 void NamedObject_RegisterSuite_TestGetFunctions( NamedObject_RegisterSuiteData* data ) {
    Index ii;
+
+   pcu_docstring( "Tests objects can be searched and got from the register, by both name and index." );
 
    for (ii=0; ii < data->testObjectsCount; ii++ ) {
       NamedObject_Register_Add( data->reg, data->testObjects[ii] );
