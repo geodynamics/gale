@@ -224,8 +224,131 @@ void CompositeVCSuite_TestCompositeVC( CompositeVCSuiteData* data ) {
 	FreeObject( mesh );
 }
 
+void CompositeVCSuite_TestCompositeVCDictionary( CompositeVCSuiteData* data ) {
+	Stream*								stream;
+	Dictionary*							dictionary;
+	XML_IO_Handler*					io_handler;
+	unsigned								nDims = 3;
+	unsigned								meshSize[3] = {2, 2, 2};
+	unsigned								procToWatch;
+	double								minCrds[3] = {0.0, 0.0, 0.0};
+	double								maxCrds[3] = {1.0, 1.0, 1.0};
+	Mesh*									mesh;
+	Variable*							var[7];
+	Variable_Register*				variable_Register;
+	CompositeVC*						cvc;
+	ConditionFunction*				quadCF;
+	ConditionFunction*				expCF;
+	ConditionFunction_Register*	conFunc_Register;
+	ExtensionManager_Register*		extensionMgr_Register;
+	double*								array[7];
+	char*									varName[] = {"x", "y", "z", "vx", "vy", "vz", "temp"};
+	char									input_file[PCU_PATH_MAX];
+	char									expected_file[PCU_PATH_MAX];
+	unsigned								nDomains;
+	Index									i, j, k;
+
+	procToWatch = data->nProcs >=2 ? 1 : 0;
+
+   io_handler = XML_IO_Handler_New();
+
+ 	stream = Journal_Register( Info_Type, "CompositeVCDictionaryStream" );
+   Stream_RedirectFile( stream, "testCompositeVCDictionary.dat" );
+
+   dictionary = Dictionary_New();
+   Dictionary_Add(dictionary, "outputPath", Dictionary_Entry_Value_FromString("./output"));
+	
+	/* Input file */
+	pcu_filename_input( "compositeVC.xml", input_file );
+   IO_Handler_ReadAllFromFile(io_handler, input_file, dictionary);
+   fflush(stdout);
+
+	extensionMgr_Register = ExtensionManager_Register_New();
+
+	/* Create a mesh. */
+	mesh = (Mesh*) buildMesh( nDims, meshSize, minCrds, maxCrds, extensionMgr_Register );
+	nDomains = Mesh_GetDomainSize( mesh, MT_VERTEX );
+
+	/* Create CF stuff */
+	quadCF = ConditionFunction_New(CompositeVCSuite_quadratic, "quadratic");
+	expCF = ConditionFunction_New(CompositeVCSuite_exponential, "exponential");
+	conFunc_Register = ConditionFunction_Register_New();
+	ConditionFunction_Register_Add(conFunc_Register, quadCF);
+	ConditionFunction_Register_Add(conFunc_Register, expCF);
+
+	/* Create variable register */
+	variable_Register = Variable_Register_New();
+
+	/* Create variables */
+	for (i = 0; i < 6; i++) {
+		array[i] = Memory_Alloc_Array( double, 3*3*3, "array[i]" );
+		var[i] = Variable_NewScalar( varName[i], Variable_DataType_Double, &nDomains, NULL, (void**)&array[i], 0 );
+ 		Variable_Register_Add(variable_Register, var[i]);
+	}
+	array[6] = Memory_Alloc_Array( double, 3*3*3*5, "array[6]" );
+	var[6] = Variable_NewVector( varName[6], Variable_DataType_Double, 5, &nDomains, NULL, (void**)&array[6], 0 );
+	Variable_Register_Add(variable_Register, var[6]);
+	Variable_Register_BuildAll(variable_Register);
+
+	/* Create CompositeVC */
+	cvc = CompositeVC_New( "CompositeVC", variable_Register, conFunc_Register, dictionary, mesh );
+	Stg_Component_Build( cvc, 0, False );
+
+	for (j = 0; j < 6; j++)
+		memset(array[j], 0, sizeof(double)*3*3*3);
+	memset(array[6], 0, sizeof(double)*3*3*3*5);
+	VariableCondition_Apply(cvc, NULL);
+
+	if (data->rank == procToWatch) {
+		for (j = 0; j < 6; j++) {
+			Journal_Printf( stream, "\nvar[%u]: %.2lf", j, array[j][0] );
+			for (k = 1; k < 3*3*3; k++)
+				Journal_Printf( stream, ", %.2lf", array[j][k] );
+		}
+
+		Journal_Printf( stream, "\nvar[7]: %.2lf", array[6][0] );
+		for (j = 1; j < 3*3*3*5; j++)
+			Journal_Printf( stream, ", %.2lf", array[6][j] );
+		Journal_Printf( stream, "\n\n" );
+
+		for (j = 0; j < 7; j++) {
+			for (k = 0; k < 27; k++)
+				Journal_Printf( stream, "%s ", VariableCondition_IsCondition(cvc, k, j) ? "True " : "False" );
+			Journal_Printf( stream, "\n" );
+		} Journal_Printf( stream, "\n" );
+
+		for (j = 0; j < 7; j++) {
+			for (k = 0; k < 27; k++) {
+				VariableCondition_ValueIndex  valIndex;
+            valIndex = VariableCondition_GetValueIndex(cvc, k, j);
+				if (valIndex != (unsigned)-1)
+					Journal_Printf( stream, "%03u ", valIndex );
+				else
+               Journal_Printf( stream, "XXX " );
+			} Journal_Printf( stream, "\n" );
+		} Journal_Printf( stream, "\n" );
+
+		pcu_filename_expected( "testCompositeVC-dictionary.expected", expected_file );
+		pcu_check_fileEq( "testCompositeVCDictionary.dat", expected_file );
+		remove( "testCompositeVCDictionary.dat" );
+	}
+
+	Stg_Class_Delete(cvc);
+	Stg_Class_Delete(variable_Register);
+	for (i = 0; i < 7; i++) {
+		Stg_Class_Delete(var[i]);
+ 		if (array[i]) Memory_Free(array[i]);
+ 	}
+	Stg_Class_Delete(conFunc_Register);
+	Stg_Class_Delete(quadCF);
+	Stg_Class_Delete(expCF);
+	Stg_Class_Delete(dictionary);
+	FreeObject( mesh );
+}
+
 void CompositeVCSuite( pcu_suite_t* suite ) {
 	pcu_suite_setData( suite, CompositeVCSuiteData );
    pcu_suite_setFixtures( suite, CompositeVCSuite_Setup, CompositeVCSuite_Teardown );
    pcu_suite_addTest( suite, CompositeVCSuite_TestCompositeVC );
+   pcu_suite_addTest( suite, CompositeVCSuite_TestCompositeVCDictionary );
 }

@@ -1,0 +1,25 @@
+
+var[0]: 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+var[1]: 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+var[2]: 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
+var[3]: 2.00, 2.00, 2.00, 20.00, 0.00, 30.00, 20.00, 0.00, 30.00, 2.00, 2.00, 2.00, 20.00, 0.00, 30.00, 20.00, 0.00, 30.00, 2.00, 2.00, 2.00, 20.00, 2.00, 30.00, 20.00, 2.00, 30.00
+var[4]: 3.00, 3.00, 3.00, 20.00, 0.00, 30.00, 20.00, 0.00, 30.00, 3.00, 3.00, 3.00, 20.00, 0.00, 30.00, 20.00, 0.00, 30.00, 3.00, 3.00, 3.00, 20.00, 3.00, 30.00, 20.00, 3.00, 30.00
+var[5]: 1.00, 1.00, 1.00, 20.00, 0.00, 30.00, 20.00, 0.00, 30.00, 1.00, 1.00, 1.00, 20.00, 0.00, 30.00, 20.00, 0.00, 30.00, 1.00, 1.00, 1.00, 20.00, 1.00, 30.00, 20.00, 1.00, 30.00
+var[7]: 5.00, 6.00, 7.00, 8.00, 9.00, 5.00, 6.00, 7.00, 8.00, 9.00, 5.00, 6.00, 7.00, 8.00, 9.00, 5.00, 6.00, 7.00, 8.00, 9.00, 5.00, 6.00, 7.00, 8.00, 9.00, 5.00, 6.00, 7.00, 8.00, 9.00, 5.00, 6.00, 7.00, 8.00, 9.00, 5.00, 6.00, 7.00, 8.00, 9.00, 5.00, 6.00, 7.00, 8.00, 9.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 5.00, 6.00, 7.00, 8.00, 9.00, 5.00, 6.00, 7.00, 8.00, 9.00, 5.00, 6.00, 7.00, 8.00, 9.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 5.00, 6.00, 7.00, 8.00, 9.00, 5.00, 6.00, 7.00, 8.00, 9.00, 5.00, 6.00, 7.00, 8.00, 9.00
+
+False False False False False False False False False False False False False False False False False False False False False False False False False False False 
+False False False False False False False False False False False False False False False False False False False False False False False False False False False 
+False False False False False False False False False False False False False False False False False False False False False False False False False False False 
+True  True  True  True  False True  True  False True  True  True  True  True  False True  True  False True  True  True  True  True  True  True  True  True  True  
+True  True  True  True  False True  True  False True  True  True  True  True  False True  True  False True  True  True  True  True  True  True  True  True  True  
+True  True  True  True  False True  True  False True  True  True  True  True  False True  True  False True  True  True  True  True  True  True  True  True  True  
+True  True  True  True  True  True  True  True  True  False False False False False False True  True  True  False False False False False False True  True  True  
+
+XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX 
+XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX 
+XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX XXX 
+011 011 011 004 XXX 007 004 XXX 007 011 011 011 004 XXX 007 004 XXX 007 011 011 011 004 000 007 004 000 007 
+012 012 012 005 XXX 008 005 XXX 008 012 012 012 005 XXX 008 005 XXX 008 012 012 012 005 001 008 005 001 008 
+013 013 013 006 XXX 009 006 XXX 009 013 013 013 006 XXX 009 006 XXX 009 013 013 013 006 002 009 006 002 009 
+003 003 003 003 003 003 010 010 010 XXX XXX XXX XXX XXX XXX 010 010 010 XXX XXX XXX XXX XXX XXX 010 010 010 
+
