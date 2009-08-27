@@ -120,7 +120,7 @@ void DofLayoutSuite_TestBasic( DofLayoutSuiteData* data ) {
 			pcu_check_true( dof->dofCounts[ii] == 6 );
 		}
 			
-                Stg_Class_Delete(dof);
+		Stg_Class_Delete(dof);
 
 		/* Advanced test */
 		for (ii = 0; ii < 27; ii++) counts[ii] = 0;
@@ -223,19 +223,22 @@ void DofLayoutSuite_TestBasic( DofLayoutSuiteData* data ) {
 		/* Cleanup */
 
 		Stg_Class_Delete(variableRegister);
+		Stg_Class_Delete(dictionary);
+
 		for (var_I = 0; var_I < 6; var_I++) {
 			if (var[var_I]) Stg_Class_Delete(var[var_I]);
 				Memory_Free( varArrays[var_I] );
 		}
 		pcu_filename_expected( "testDofLayoutBasicOutput.expected", expected_file );
 		pcu_check_fileEq( "testBasic.dat", expected_file );
+		remove( "testBasic.dat" );
 	}
 }
 
 void DofLayoutSuite_TestRemap( DofLayoutSuiteData* data ) {
-	char	expected_file[PCU_PATH_MAX];
-	int	procToWatch;
-	Stream*	stream = Journal_Register( Info_Type, "DofLayoutRemap" );	
+	char			expected_file[PCU_PATH_MAX];
+	int			procToWatch;
+	Stream*		stream = Journal_Register( Info_Type, "DofLayoutRemap" );	
 
 	if( data->nProcs >= 2 ) {
 		procToWatch = 1;
@@ -299,19 +302,21 @@ void DofLayoutSuite_TestRemap( DofLayoutSuiteData* data ) {
 
 		Stg_Class_Delete(dof);
 		Stg_Class_Delete(variableRegister);
+		Stg_Class_Delete(dictionary);
 
 		for (i = 0; i < 6; i++)
 			if (var[i]) Stg_Class_Delete(var[i]);
 		
 		pcu_filename_expected( "testDofLayoutRemapOutput.expected", expected_file );
 		pcu_check_fileEq( "testRemap.dat", expected_file );
+		remove( "testRemap.dat" );
 	}
 }
 
 void DofLayoutSuite_TestSaveAndLoad( DofLayoutSuiteData* data ) {
-	char	expected_file[PCU_PATH_MAX];
-	int	procToWatch;
-	Stream*	stream = Journal_Register( Info_Type, "DofLayoutRemap" );	
+	char			expected_file[PCU_PATH_MAX];
+	int			procToWatch;
+	Stream*		stream = Journal_Register( Info_Type, "DofLayoutRemap" );	
 
 	if( data->nProcs >= 2 ) {
 		procToWatch = 1;
@@ -370,8 +375,12 @@ void DofLayoutSuite_TestSaveAndLoad( DofLayoutSuiteData* data ) {
 				DofLayout_GetValueDouble( dof, ii, 4 ),
 				DofLayout_GetValueDouble( dof, ii, 5 ) );
 		}
+		Stg_Class_Delete(dof);
+		Stg_Class_Delete(variableRegister);
+
 		pcu_filename_expected( "testDofLayoutSaveAndLoadOutput.expected", expected_file );
 		pcu_check_fileEq( "testSaveAndLoad.dat", expected_file );
+		remove( "testSaveAndLoad.dat" );
 	}
 }
 	
