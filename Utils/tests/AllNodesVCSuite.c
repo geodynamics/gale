@@ -161,6 +161,7 @@ void AllNodesVCSuite_TestAllNodesVC( AllNodesVCSuiteData* data ) {
    VariableCondition_Apply(vc, NULL);
 
 	if (data->rank == procToWatch) {
+		Journal_Printf( stream,"Testing for %s\n", vcKey);
 		for (j = 0; j < 6; j++) {
 			Journal_Printf( stream, "\nvar[%u]: %.2lf", j, array[j][0]) ;
 			for (k = 1; k < nDomains; k++)
