@@ -22,6 +22,8 @@
 
 typedef enum { PCU_RUNNER_FAILS, PCU_RUNNER_ALLPASS } PCU_Runner_Status;
 
+extern int PCU_PRINT_DOCS;
+
 void pcu_runner_init( int argc, char* argv[] );
 void pcu_runner_finalise();
 PCU_Runner_Status pcu_runner_run( pcu_listener_t* lsnr );

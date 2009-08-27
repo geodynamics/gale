@@ -54,7 +54,7 @@ int main( int argc, char* argv[] ) {
    pcu_runner_init( argc, argv );%s
 
 %s
-   lsnr = pcu_textoutput_create();
+   lsnr = pcu_textoutput_create( PCU_PRINT_DOCS );
    result = pcu_runner_run( lsnr );
    pcu_textoutput_destroy( lsnr );
 %s

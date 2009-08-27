@@ -34,6 +34,8 @@ pcu_suite_t* pcu_cursuite;
 int pcu_nnames;
 char** pcu_names;
 
+int PCU_PRINT_DOCS=0;
+
 void pcu_runner_searchHierarchy( pcu_suite_t* suite );
 
 void pcu_runner_init( int argc, char* argv[] ) {
@@ -43,8 +45,16 @@ void pcu_runner_init( int argc, char* argv[] ) {
    pcu_cursuite = NULL;
 
    /* Extract suite names from the command line. */
-   pcu_nnames = argc - 1;
-   pcu_names = argv + 1;
+   if ( argc > 1 && 0 == strcmp( argv[1], "--withDocs" ) ) {
+      pcu_nnames = argc - 2;
+      pcu_names = argv + 2;
+      PCU_PRINT_DOCS = 1;
+   }
+   else {
+      pcu_nnames = argc - 1;
+      pcu_names = argv + 1;
+   }
+
 }
 
 void pcu_runner_finalise() {
@@ -107,6 +117,7 @@ void _pcu_runner_addSuite( const char* name,
    suite->curtest = NULL;
    suite->lsnr = NULL;
    suite->next = NULL;
+   suite->nsubsuites = 0;
    suite->subsuites = NULL;
    suite->setup = NULL;
    suite->teardown = NULL;
