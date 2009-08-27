@@ -92,6 +92,15 @@ void* _Materials_Register_Copy( void* _materialsRegister, void* dest, Bool deep,
 }
 
 
+Material* Materials_Register_GetByIndex( Materials_Register* self, Index materialIndex ) {
+	if ( UNDEFINED_MATERIAL == materialIndex ) {
+		return NULL;
+	}
+
+	return (Material*) NamedObject_Register_GetByIndex( self, materialIndex );
+}
+
+
 void Materials_Register_SetupSwarm( void* materialRegister, MaterialPointsSwarm* swarm )
 {
 	Materials_Register* self = (Materials_Register*)materialRegister;

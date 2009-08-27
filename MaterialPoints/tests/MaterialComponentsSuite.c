@@ -97,7 +97,9 @@ FeMesh* buildFeMesh( unsigned nDims, unsigned* size,
 
 
 void MaterialComponentsSuite_BuildInitSwarmBasics( MaterialComponentsSuiteData* data ) {
-   Index    var_I;
+   Index             var_I;
+   Particle_Index    pI;
+   MaterialPoint*    matPoint;
 
    /* Mesh will already be initialised */
    /* Manually do the basic Swarm building and initialising */
@@ -109,6 +111,11 @@ void MaterialComponentsSuite_BuildInitSwarmBasics( MaterialComponentsSuiteData* 
    for( var_I = 0 ; var_I < data->mpSwarm->nSwarmVars ; var_I++ ) {
 		Stg_Component_Initialise( data->mpSwarm->swarmVars[var_I], NULL , False );
 	}
+   /* Pre-set the swarm particle material indexes to undefined, as in the build function */
+   for ( pI = 0; pI < data->mpSwarm->particleLocalCount; pI++ ) {
+      matPoint = (MaterialPoint*)Swarm_ParticleAt( data->mpSwarm, pI );
+      matPoint->materialIndex = UNDEFINED_MATERIAL;
+   }
 }
 
 
@@ -125,6 +132,10 @@ void MaterialComponentsSuite_Setup( MaterialComponentsSuiteData* data ) {
    data->svRegister = Variable_Register_New();
    data->eRegister = ExtensionManager_Register_New();
    data->mRegister = Materials_Register_New();
+
+   /* Turn off the journal to avoid debug messages about parsing */
+   Journal_Enable_TypedStream( Debug_Type, False );
+   Journal_Enable_TypedStream( Info_Type, False );
 
    data->feMesh = buildFeMesh( dim, meshSize, minCrds, maxCrds, data->eRegister );
 
@@ -177,13 +188,63 @@ void MaterialComponentsSuite_Teardown( MaterialComponentsSuiteData* data ) {
 void MaterialComponentsSuite_TestRegisterSetup( MaterialComponentsSuiteData* data ) {
 
    pcu_check_true( data->mRegister != NULL );
-   
+
+   pcu_check_true( data->mRegister->objects->count == 2 );
+   pcu_check_true( (Material*)NamedObject_Register_GetByIndex( data->mRegister, 0 ) == data->mat1 );
+   pcu_check_true( (Material*)NamedObject_Register_GetByIndex( data->mRegister, 1 ) == data->mat2 );
 }
 
 
-// Test a basic MP swarm can be created, with an MP register pointing to a set of materials
-// Test the basic access functions: eg the MPS_GetMaterialOn
 // Material: Test the M_Layout function works correctly
+void MaterialComponentsSuite_TestMaterialLayout( MaterialComponentsSuiteData* data ) {
+   Particle_Index    pI;
+   MaterialPoint*    matPoint;
+
+   for ( pI = 0; pI < data->mpSwarm->particleLocalCount; pI++ ) {
+      matPoint = (MaterialPoint*)Swarm_ParticleAt( data->mpSwarm, pI );
+      pcu_check_true( matPoint->materialIndex == UNDEFINED_MATERIAL );
+   }
+
+   Material_Layout( data->mat1, data->mpSwarm );
+   Material_Layout( data->mat2, data->mpSwarm );
+
+   for ( pI = 0; pI < data->mpSwarm->particleLocalCount; pI++ ) {
+      matPoint = (MaterialPoint*)Swarm_ParticleAt( data->mpSwarm, pI );
+      if ( Stg_Shape_IsCoordInside( data->shape1, matPoint->coord ) ) {
+         pcu_check_true( matPoint->materialIndex == 0 );
+      }
+      if ( Stg_Shape_IsCoordInside( data->shape2, matPoint->coord ) ) {
+         pcu_check_true( matPoint->materialIndex == 1 );
+      }
+      else {
+         pcu_check_true( matPoint->materialIndex == UNDEFINED_MATERIAL );
+      }
+   }
+}
+
+
+void MaterialComponentsSuite_TestLayoutGeometry( MaterialComponentsSuiteData* data ) {
+   Particle_Index    pI;
+   MaterialPoint*    matPoint;
+
+   /* Similar to above test, should lay out all materials */
+   _Materials_Register_LayoutGeometry( data->mRegister, data->mpSwarm );
+   
+   for ( pI = 0; pI < data->mpSwarm->particleLocalCount; pI++ ) {
+      matPoint = (MaterialPoint*)Swarm_ParticleAt( data->mpSwarm, pI );
+      if ( Stg_Shape_IsCoordInside( data->shape1, matPoint->coord ) ) {
+         pcu_check_true( matPoint->materialIndex == 0 );
+      }
+      if ( Stg_Shape_IsCoordInside( data->shape2, matPoint->coord ) ) {
+         pcu_check_true( matPoint->materialIndex == 1 );
+      }
+      else {
+         pcu_check_true( matPoint->materialIndex == UNDEFINED_MATERIAL );
+      }
+   }
+}
+
+// Test the basic access functions: eg the MPS_GetMaterialOn
 // M_Register: Test the multiple layout and extension functions work correctly. 
 
 
@@ -191,4 +252,6 @@ void MaterialComponentsSuite( pcu_suite_t* suite ) {
    pcu_suite_setData( suite, MaterialComponentsSuiteData );
    pcu_suite_setFixtures( suite, MaterialComponentsSuite_Setup, MaterialComponentsSuite_Teardown );
    pcu_suite_addTest( suite, MaterialComponentsSuite_TestRegisterSetup );
+   pcu_suite_addTest( suite, MaterialComponentsSuite_TestMaterialLayout );
+   pcu_suite_addTest( suite, MaterialComponentsSuite_TestLayoutGeometry );
 }

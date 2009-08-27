@@ -57,6 +57,8 @@
 
 const Type Material_Type = "Material";
 
+const Index UNDEFINED_MATERIAL = (unsigned)-1;
+
 /* Public Constructor */
 Material* Material_New( 
 		Name                                            name,

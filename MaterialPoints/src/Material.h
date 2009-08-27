@@ -46,6 +46,8 @@
 	/* Textual name of this class */
 	extern const Type Material_Type;
 	
+   extern const Index UNDEFINED_MATERIAL;
+
 	/* Material information */
 	#define __Material \
 		__Stg_Component \
