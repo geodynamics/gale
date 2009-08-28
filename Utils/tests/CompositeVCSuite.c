@@ -330,7 +330,7 @@ void CompositeVCSuite_TestCompositeVCDictionary( CompositeVCSuiteData* data ) {
 
 		pcu_filename_expected( "testCompositeVC-dictionary.expected", expected_file );
 		pcu_check_fileEq( "testCompositeVCDictionary.dat", expected_file );
-		//remove( "testCompositeVCDictionary.dat" );
+		remove( "testCompositeVCDictionary.dat" );
 	}
 
 	Stg_Class_Delete(cvc);

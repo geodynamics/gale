@@ -45,7 +45,7 @@
 #include "SwarmSuite.h"
 
 struct _Particle {
-	__IntegrationPoint
+	__GlobalParticle
 };
 
 typedef struct {
