@@ -144,6 +144,9 @@ void Grid_SetSizes( void* grid, unsigned* sizes ) {
 	}
 #endif
 
+	KillArray( self->sizes );
+	KillArray( self->basis );
+
 	/* Copy the sizes, allocate arrays and build basis. */
 	if( self->nDims ) {
 		unsigned	d_i;
