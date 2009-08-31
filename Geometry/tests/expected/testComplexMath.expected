@@ -1,5 +1,3 @@
-StGermain Framework revision 3839. Copyright (C) 2003-2005 VPAC.
-
 ----------------- Testing Complex Journal Printing Macro -----------------
 x = 1.0000000 + 2.0000000 i
 y = -1.5000000 + 3.0000000 i
@@ -71,4 +69,3 @@ x = -5.0000000 + 7.0000000 i
 dest = -1.0000000 + 0.0000000 i
 dest = -5.0000000 + 7.0000000 i
 dest = 0.0000000 + 0.0000000 i
-

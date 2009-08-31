@@ -3,13 +3,12 @@
 ** Copyright (C), 2003, Victorian Partnership for Advanced Computing (VPAC) Ltd, 110 Victoria Street, Melbourne, 3053, Australia.
 **
 ** Authors:
-**	Stevan M. Quenette, Senior Software Engineer, VPAC. (steve@vpac.org)
-**	Patrick D. Sunter, Software Engineer, VPAC. (pds@vpac.org)
-**	Luke J. Hodkinson, Computational Engineer, VPAC. (lhodkins@vpac.org)
-**	Siew-Ching Tan, Software Engineer, VPAC. (siew@vpac.org)
-**	Alan H. Lo, Computational Engineer, VPAC. (alan@vpac.org)
-**	Raquibul Hassan, Computational Engineer, VPAC. (raq@vpac.org)
-**	Robert B. Turnbull, Monash Cluster Computing. (Robert.Turnbull@sci.monash.edu.au)
+**   Stevan M. Quenette, Senior Software Engineer, VPAC. (steve@vpac.org)
+**   Patrick D. Sunter, Software Engineer, VPAC. (pds@vpac.org)
+**   Luke J. Hodkinson, Computational Engineer, VPAC. (lhodkins@vpac.org)
+**   Siew-Ching Tan, Software Engineer, VPAC. (siew@vpac.org)
+**   Alan H. Lo, Computational Engineer, VPAC. (alan@vpac.org)
+**   Raquibul Hassan, Computational Engineer, VPAC. (raq@vpac.org)
 **
 **  This library is free software; you can redistribute it and/or
 **  modify it under the terms of the GNU Lesser General Public
@@ -25,16 +24,25 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testComplexMath.c 3847 2006-10-11 02:38:21Z KathleenHumble $
+** Role:
+**   Tests the ComplexMathSuite
+**
+** $Id: testTemplate.c 3462 2006-02-19 06:53:24Z WalterLandry $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#include <mpi.h>
-#include "StGermain/StGermain.h"
-
-#include "StgDomain/Geometry/Geometry.h"
-
 #include <stdio.h>
+#include <stdlib.h>
+
+#include "pcu/pcu.h"
+#include <StGermain/StGermain.h> 
+#include "StgDomain/Geometry/Geometry.h"
+#include "StgDomain/Shape/Shape.h"
+#include "StgDomain/Mesh/Mesh.h" 
+#include "StgDomain/Utils/Utils.h"
+#include "StgDomain/Swarm/Swarm.h"
+
+#include "ComplexMathSuite.h"
 
 #undef Journal_PrintCmplx
 /** Print a complex number.
@@ -44,44 +52,43 @@ Will use %.5f formatting */
 
 #define TESTCOMPLEXMATH_TOL 1e-15
 
-int main( int argc, char* argv[] ) {
-	MPI_Comm CommWorld;
-	int rank;
-	int numProcessors;
-	int procToWatch;
-	
-	/* Initialise MPI, get world info */
-	MPI_Init( &argc, &argv );
-	MPI_Comm_dup( MPI_COMM_WORLD, &CommWorld );
-	MPI_Comm_size( CommWorld, &numProcessors );
-	MPI_Comm_rank( CommWorld, &rank );
-	
-	StGermain_Init( &argc, &argv );
-	
-	StgDomainGeometry_Init( &argc, &argv );
-	MPI_Barrier( CommWorld ); /* Ensures copyright info always come first in output */
-	
-	if( argc >= 2 ) {
-		procToWatch = atoi( argv[1] );
-	}
-	else {
-		procToWatch = 0;
-	}
+typedef struct {
+	MPI_Comm			comm;
+	unsigned int	rank;
+	unsigned int	nProcs;
+} ComplexMathSuiteData;
 
-	if( rank == procToWatch ) {
-		Cmplx x = {1, 2};
-		Cmplx y = {-1.5, 3};
-		Cmplx u = {-1.5, -3};
-		Cmplx v = {1.5, -3};
-		Cmplx i = {0, 1};
-		Cmplx minus_i = {0, -1};
-		Cmplx e = {M_E, 0};
-		Cmplx ipi = {0, M_PI};
-		Cmplx dest;
-		double mod, theta;
-		Stream* stream = Journal_Register( InfoStream_Type, "ComplexMath" );
+void ComplexMathSuite_Setup( ComplexMathSuiteData* data ) {
+	/* MPI Initializations */
+	data->comm = MPI_COMM_WORLD;
+	MPI_Comm_rank( data->comm, &data->rank );
+	MPI_Comm_size( data->comm, &data->nProcs );
+}
+
+void ComplexMathSuite_Teardown( ComplexMathSuiteData* data ) {
+}
+
+void ComplexMathSuite_TestComplexMath( ComplexMathSuiteData* data ) {
+	unsigned	procToWatch;
+	procToWatch = data->nProcs >=2 ? 1 : 0;
+	
+	if (data->rank == procToWatch) {
+		Cmplx		x = {1, 2};
+		Cmplx		y = {-1.5, 3};
+		Cmplx		u = {-1.5, -3};
+		Cmplx		v = {1.5, -3};
+		Cmplx		i = {0, 1};
+		Cmplx		minus_i = {0, -1};
+		Cmplx		e = {M_E, 0};
+		Cmplx		ipi = {0, M_PI};
+		Cmplx		dest;
+		double	mod, theta;
+		Stream*	stream = Journal_Register( InfoStream_Type, "ComplexMathStream" );
+		char		expected_file[PCU_PATH_MAX];
+
+		Stream_RedirectFile( stream, "testComplexMath.dat" );
 		
-		Journal_Printf(stream, "\n----------------- Testing Complex Journal Printing Macro -----------------\n" );
+		Journal_Printf(stream, "----------------- Testing Complex Journal Printing Macro -----------------\n" );
 		Journal_PrintCmplx( stream, x );	
 		Journal_PrintCmplx( stream, y );	
 		Journal_PrintCmplx( stream, u );	
@@ -220,15 +227,14 @@ int main( int argc, char* argv[] ) {
 		Cmplx_Zero( dest );
 		Journal_PrintCmplx( stream, dest );	
 
+		pcu_filename_expected( "testComplexMath.expected", expected_file );
+		pcu_check_fileEq( "testComplexMath.dat", expected_file );
+		remove( "testComplexMath.dat" );
 	}
-	
-	printf("\n");
-	StgDomainGeometry_Finalise();
-	
-	StGermain_Finalise();
-	
-	/* Close off MPI */
-	MPI_Finalize();
-	
-	return 0;
+}
+
+void ComplexMathSuite( pcu_suite_t* suite ) {
+	pcu_suite_setData( suite, ComplexMathSuiteData );
+   pcu_suite_setFixtures( suite, ComplexMathSuite_Setup, ComplexMathSuite_Teardown );
+   pcu_suite_addTest( suite, ComplexMathSuite_TestComplexMath );
 }

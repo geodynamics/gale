@@ -1,5 +1,3 @@
-StGermain Framework revision 3750. Copyright (C) 2003-2005 VPAC.
-
 ****************************************
 Check StGermain_nSymmetricTensorVectorComponents function
 Number of unique components of symmetric tensor of dimension 2 is 3
@@ -194,12 +192,12 @@ symmTensor[ST2D_01] = 60
 symmTensor[ST2D_11] = 50
 Test Mapping functions for Full Tensor using TensorArray_TensorMap
 
-(0,0): 0  = 0	(0,1): 1  = 1
-(1,0): 2  = 2	(1,1): 3  = 3
+(0,0): 0  = 0  (0,1): 1  = 1
+(1,0): 2  = 2  (1,1): 3  = 3
 Test Mapping functions for Symmetric Tensor using SymmetricTensor_TensorMap
 
-(0,0): 0  = 0	(0,1): 2  = 2
-(1,0): 2  = 2	(1,1): 1  = 1
+(0,0): 0  = 0  (0,1): 2  = 2
+(1,0): 2  = 2  (1,1): 1  = 1
 3-D
 The full tensor:
 tensorArray - 
@@ -234,14 +232,14 @@ symmTensor[ST3D_12] = 140
 symmTensor[ST3D_22] = 110
 Test Mapping functions for Full Tensor using TensorArray_TensorMap
 
-(0,0): 0  = 0	(0,1): 1  = 1	(0,2): 2  = 2
-(1,0): 3  = 3	(1,1): 4  = 4	(1,2): 5  = 5
-(2,0): 6  = 6	(2,1): 7  = 7	(2,2): 8  = 8
+(0,0): 0  = 0  (0,1): 1  = 1  (0,2): 2  = 2
+(1,0): 3  = 3  (1,1): 4  = 4  (1,2): 5  = 5
+(2,0): 6  = 6  (2,1): 7  = 7  (2,2): 8  = 8
 Test Mapping functions for Symmetric Tensor using SymmetricTensor_TensorMap
 
-(0,0): 0  = 0	(0,1): 3  = 3	(0,2): 4  = 4
-(1,0): 3  = 3	(1,1): 1  = 1	(1,2): 5  = 5
-(2,0): 4  = 4	(2,1): 5  = 5	(2,2): 2  = 2
+(0,0): 0  = 0  (0,1): 3  = 3  (0,2): 4  = 4
+(1,0): 3  = 3  (1,1): 1  = 1  (1,2): 5  = 5
+(2,0): 4  = 4  (2,1): 5  = 5  (2,2): 2  = 2
 
 /*************************************/
 Test function EigenvectorList_Sort
@@ -284,7 +282,7 @@ eigenvectorList[1].eigenvalue = -1
 eigenvectorList[0].vector = { 0.89443, -0.44721 }
 eigenvectorList[1].vector = { 0.44721, 0.89443 }
 
-/****************    Test Eigenvector 2 	**********************/
+/****************    Test Eigenvector 2   **********************/
 Same test as above - but using Numerical Recipies function
 
 eigenvectorList[0].eigenvalue = -6

@@ -1,4 +1,3 @@
-StGermain Framework revision 3927. Copyright (C) 2003-2005 VPAC.
 Basic tests:
 d = { 1, 1, 1 }
 d = { 2, 0.5, 1.5 }
@@ -1143,4 +1142,3 @@ volume = 2.43
 ****************************
 Check StGermain_AverageCoord 
 D - {11.666667, 5.300000, 7.033333}
-

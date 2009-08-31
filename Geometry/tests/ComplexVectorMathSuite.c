@@ -3,14 +3,12 @@
 ** Copyright (C), 2003, Victorian Partnership for Advanced Computing (VPAC) Ltd, 110 Victoria Street, Melbourne, 3053, Australia.
 **
 ** Authors:
-**	Stevan M. Quenette, Senior Software Engineer, VPAC. (steve@vpac.org)
-**	Patrick D. Sunter, Software Engineer, VPAC. (pds@vpac.org)
-**	Luke J. Hodkinson, Computational Engineer, VPAC. (lhodkins@vpac.org)
-**	Siew-Ching Tan, Software Engineer, VPAC. (siew@vpac.org)
-**	Alan H. Lo, Computational Engineer, VPAC. (alan@vpac.org)
-**	Raquibul Hassan, Computational Engineer, VPAC. (raq@vpac.org)
-**	Robert B. Turnbull, Monash Cluster Computing. (Robert.Turnbull@sci.monash.edu.au)
-**	Kathleen M. Humble, Computational Scientist, VPAC. (khumble@vpac.org)
+**   Stevan M. Quenette, Senior Software Engineer, VPAC. (steve@vpac.org)
+**   Patrick D. Sunter, Software Engineer, VPAC. (pds@vpac.org)
+**   Luke J. Hodkinson, Computational Engineer, VPAC. (lhodkins@vpac.org)
+**   Siew-Ching Tan, Software Engineer, VPAC. (siew@vpac.org)
+**   Alan H. Lo, Computational Engineer, VPAC. (alan@vpac.org)
+**   Raquibul Hassan, Computational Engineer, VPAC. (raq@vpac.org)
 **
 **  This library is free software; you can redistribute it and/or
 **  modify it under the terms of the GNU Lesser General Public
@@ -26,53 +24,66 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: testVectorMath.c 3462 2006-02-19 06:53:24Z WalterLandry $
+** Role:
+**   Tests the ComplexVectorMathSuite
+**
+** $Id: testTemplate.c 3462 2006-02-19 06:53:24Z WalterLandry $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#include <mpi.h>
-#include "StGermain/StGermain.h"
-
-#include "StgDomain/Geometry/Geometry.h"
-
 #include <stdio.h>
+#include <stdlib.h>
 
+#include "pcu/pcu.h"
+#include <StGermain/StGermain.h> 
+#include "StgDomain/Geometry/Geometry.h"
+#include "StgDomain/Shape/Shape.h"
+#include "StgDomain/Mesh/Mesh.h" 
+#include "StgDomain/Utils/Utils.h"
+#include "StgDomain/Swarm/Swarm.h"
 
-int main( int argc, char* argv[] ) {
-	MPI_Comm CommWorld;
-	int rank;
-	int numProcessors;
-	int procToWatch;
-	Stream* stream;
-	
-	/* Initialise MPI, get world info */
-	MPI_Init( &argc, &argv );
-	MPI_Comm_dup( MPI_COMM_WORLD, &CommWorld );
-	MPI_Comm_size( CommWorld, &numProcessors );
-	MPI_Comm_rank( CommWorld, &rank );
-	
-	StGermain_Init( &argc, &argv );
-	
-	StgDomainGeometry_Init( &argc, &argv );
-	MPI_Barrier( CommWorld ); /* Ensures copyright info always come first in output */
+#include "ComplexVectorMathSuite.h"
 
-	stream = Journal_Register( Info_Type, "ComplexVectorMath" );
-	
-	if( argc >= 2 ) {
-		procToWatch = atoi( argv[1] );
-	}
-	else {
-		procToWatch = 0;
-	}
-	if( rank == procToWatch ) {
+#undef Journal_PrintCmplx
+/** Print a complex number.
+Will use %.5f formatting */
+#define Journal_PrintCmplx( stream, self ) \
+                Journal_Printf( stream, #self " = %.7f %c %.7f i\n", (self)[ REAL_PART ], (self)[ IMAG_PART ] >= 0.0 ? '+' : '-', fabs( (self)[ IMAG_PART ] ) )
+
+typedef struct {
+	MPI_Comm			comm;
+	unsigned int	rank;
+	unsigned int	nProcs;
+} ComplexVectorMathSuiteData;
+
+void ComplexVectorMathSuite_Setup( ComplexVectorMathSuiteData* data ) {
+	/* MPI Initializations */
+	data->comm = MPI_COMM_WORLD;
+	MPI_Comm_rank( data->comm, &data->rank );
+	MPI_Comm_size( data->comm, &data->nProcs );
+}
+
+void ComplexVectorMathSuite_Teardown( ComplexVectorMathSuiteData* data ) {
+}
+
+void ComplexVectorMathSuite_TestComplexVectorMath( ComplexVectorMathSuiteData* data ) {
+	unsigned		procToWatch;
+	Stream*		stream = Journal_Register( Info_Type, "VectorMathStream" );
+	char			expected_file[PCU_PATH_MAX];
+
+	procToWatch = data->nProcs >=2 ? 1 : 0;
+
+	if (data->rank == procToWatch) {
 		CoordC	a, b, c;
 		CoordC	d = { {1.0, 1.0}, {1.0, 0.0}, {0.0, 1.0} };
 		CoordC	e = { {1.0, 0.0}, {2.0, 2.0}, {-3.0, -1.0} };
-		Cmplx value = {1.0, 1.0}; 
-		Cmplx c1 = {1.0, 0.0};
-		Cmplx c2 = {2.0, 1.0};
-		Cmplx c3 = {1.5, 1.0};
-		
+		Cmplx		value = {1.0, 1.0}; 
+		Cmplx		c1 = {1.0, 0.0};
+		Cmplx		c2 = {2.0, 1.0};
+		Cmplx		c3 = {1.5, 1.0};
+
+		Stream_RedirectFile( stream, "testComplexVectorMath.dat" );
+
 		Journal_Printf( stream,  "Basic tests:\n" );
 		Journal_Printf( stream, "d = \n");
 		Journal_PrintCmplx( stream, d[0]);
@@ -178,7 +189,6 @@ int main( int argc, char* argv[] ) {
 		Journal_PrintCmplx( stream, b[1]);
 		Journal_PrintCmplx( stream, b[2]);
 	
-
 		Journal_Printf( stream,  "|b| = %g\n", ComplexVector_Mag(b));
 		
 		Journal_Printf( stream,  "a  = \n");
@@ -191,27 +201,26 @@ int main( int argc, char* argv[] ) {
 		Journal_PrintCmplx( stream, a[0]);
 		Journal_PrintCmplx( stream, a[1]);
 		Journal_PrintCmplx( stream, a[2]);
-		
-
 	}
-	if( rank == procToWatch ) {
+	
+	if (data->rank == procToWatch) {
 		#define STG_COMPLEXVECTOR_TOL 1e-16;
 		
-		Cmplx i[] = {{1.00000000, 0.000000000},{0.00000000, 0.000000000},{0.000000000, 0.00000000}};
-		Cmplx j[] = {{0.00000000, 0.00000000},{1.0000000, 0.00000000},{0.00000000, 0.0000000}};
-		Cmplx k[] = {{0.00000000, 0.000000000},{0.00000000, 0.000000000},{1.000000000, 0.000000000}};
-		Cmplx A[] = {{7.4, 1.0}, {  2, 0.0}, {  5, 1.0}, { 1, 0.0}, {  3, 2.0}, {  -42, 0.0}};
-		Cmplx B[] = {{  4, 2.0}, {2.3, 0.0}, {5.8, 0.0}, { 6, 0.0}, {-12, 0.0}, {39289, 0.0}};
-		Cmplx C[] = {{23, 0.0}, {  5, 0.0}, {-14, 0.0}, {32, 0.0}, {-21, 1.0}, {	78, 0.0}};
-		Cmplx D[] = {{23, 0.0}, {  5, 0.0}, {-14, 0.0}, {32, 0.0}, {-21, 0.0}, {   78, 0.0}};
-		double angle;
-		Cmplx **matrix;
-		Cmplx vector[6], differenceVector[6];
-		Cmplx *coordList[4];
-		int d;
-		double realVector[3], tolerance;
-		Cmplx dotProductResult;
-		Cmplx value;
+		Cmplx		i[] = {{1.00000000, 0.000000000},{0.00000000, 0.000000000},{0.000000000, 0.00000000}};
+		Cmplx		j[] = {{0.00000000, 0.00000000},{1.0000000, 0.00000000},{0.00000000, 0.0000000}};
+		Cmplx		k[] = {{0.00000000, 0.000000000},{0.00000000, 0.000000000},{1.000000000, 0.000000000}};
+		Cmplx		A[] = {{7.4, 1.0}, {  2, 0.0}, {  5, 1.0}, { 1, 0.0}, {  3, 2.0}, {  -42, 0.0}};
+		Cmplx		B[] = {{  4, 2.0}, {2.3, 0.0}, {5.8, 0.0}, { 6, 0.0}, {-12, 0.0}, {39289, 0.0}};
+		Cmplx		C[] = {{23, 0.0}, {  5, 0.0}, {-14, 0.0}, {32, 0.0}, {-21, 1.0}, {	78, 0.0}};
+		Cmplx		D[] = {{23, 0.0}, {  5, 0.0}, {-14, 0.0}, {32, 0.0}, {-21, 0.0}, {   78, 0.0}};
+		double	angle;
+		Cmplx		**matrix;
+		Cmplx		vector[6], differenceVector[6];
+		Cmplx		*coordList[4];
+		int		d;
+		double	realVector[3], tolerance;
+		Cmplx		dotProductResult;
+		Cmplx		value;
 		
 		tolerance = STG_COMPLEXVECTOR_TOL;
 		
@@ -233,10 +242,8 @@ int main( int argc, char* argv[] ) {
 		StGermain_PrintNamedComplexVector( stream, i, 3 );
 		StGermain_PrintNamedComplexVector( stream, j, 3 );
 		StGermain_PrintNamedComplexVector( stream, k, 3 );
-
 		
 		angle = M_PI / 2.0;
-	
 		
 		Journal_Printf(stream, "Axis Rotation\n");				
 		StGermain_RotateCoordinateAxisComplex( k, I_AXIS, angle, vector ) ;
@@ -291,7 +298,6 @@ int main( int argc, char* argv[] ) {
 			Journal_Printf( stream, "Answer not within tolerance %g of expected result: ", tolerance);
 			StGermain_PrintNamedComplexVector( stream, k, 3);
 		}
-
 		
 		Journal_Printf(stream, "Angle Rotation\n");
 		StGermain_RotateComplexVector(i, 0.0, angle, 0.0, vector );
@@ -329,7 +335,6 @@ int main( int argc, char* argv[] ) {
 			StGermain_PrintNamedComplexVector( stream, i, 3);
 		}
 
-		
 		Journal_Printf(stream, "Angle Rotation\n");
 		StGermain_RotateComplexVector( j, 0.0, 0.0, angle, vector );
 		Journal_Printf( stream, "J Rotated %g radians around K axis - \n", angle); 
@@ -348,7 +353,6 @@ int main( int argc, char* argv[] ) {
 			StGermain_PrintNamedComplexVector( stream, i, 3);
 		}
 
-	
 		angle = M_PI / 4.0;
 
 		StGermain_RotateComplexVector(i, 0.0, angle, angle, vector );
@@ -401,7 +405,6 @@ int main( int argc, char* argv[] ) {
 		Journal_Printf( stream, "dim = %d dot product = %2.3f + %2.3f i\n",
 			d, dotProductResult[0], dotProductResult[1] );
 		}
-		
 
 		/* Check Cross Product */
 		/* Tested against http://www.engplanet.com/redirect.html?3859 */
@@ -411,7 +414,6 @@ int main( int argc, char* argv[] ) {
 		StGermain_ComplexVectorCrossProduct( vector, A, B );
 		StGermain_PrintNamedComplexVector( stream, vector, 3 );
 
-
 		/* Checking centroid function */
 		Journal_Printf( stream, "\n****************************\n");
 		Journal_Printf( stream, "Checking centroid function\n");
@@ -419,7 +421,6 @@ int main( int argc, char* argv[] ) {
 			StGermain_ComplexTriangleCentroid( vector, A, B, C, d );
 			StGermain_PrintNamedComplexVector( stream, vector, d );
 		}
-
 
 		/* Check Normalisation Function */
 		Journal_Printf( stream, "\n****************************\n");
@@ -513,19 +514,16 @@ int main( int argc, char* argv[] ) {
 		ComplexVector_ToVector(matrix[0], 3, realVector) ;
 		StGermain_PrintNamedVector(stream, realVector, 3);
 
-		
+		pcu_filename_expected( "testComplexVectorMath.expected", expected_file );
+		pcu_check_fileEq( "testComplexVectorMath.dat", expected_file );
+		//remove( "testComplexVectorMath.dat" );
+
 		Memory_Free( matrix );
-
-
 	}
-	
-	Journal_Printf( stream, "\n");
-	StgDomainGeometry_Finalise();
-	
-	StGermain_Finalise();
-	
-	/* Close off MPI */
-	MPI_Finalize();
-	
-	return 0;
+}
+
+void ComplexVectorMathSuite( pcu_suite_t* suite ) {
+	pcu_suite_setData( suite, ComplexVectorMathSuiteData );
+   pcu_suite_setFixtures( suite, ComplexVectorMathSuite_Setup, ComplexVectorMathSuite_Teardown );
+   pcu_suite_addTest( suite, ComplexVectorMathSuite_TestComplexVectorMath );
 }
