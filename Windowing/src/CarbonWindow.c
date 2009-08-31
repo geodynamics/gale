@@ -235,6 +235,14 @@ void _lucCarbonWindow_Destroy( void* window, void* data ) {
 void _lucCarbonWindow_Display( void* window ) {
 	lucCarbonWindow*        self = (lucCarbonWindow*) window; 
 	
+	/* Set the current window's context as active */
+	if ( self->isMaster && self->interactive) {
+		aglSetCurrentContext (self->graphicsContext);
+		aglUpdateContext (self->graphicsContext);
+	}
+	else
+		CGLSetCurrentContext (self->graphicsContext);
+	
 	/* Run the parent function to display window... */
 	lucWindow_Display(window);	
 
