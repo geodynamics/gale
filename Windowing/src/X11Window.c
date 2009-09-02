@@ -222,7 +222,10 @@ void _lucX11Window_Execute( void* window, void* data ) {
 
     /* Make sure we are using the correct context - for multiple windows */
 	if (self->interactive && self->isMaster)
+    {
 		glXMakeCurrent( self->display, self->win, self->glxcontext);
+        XSetInputFocus(self->display, self->win, RevertToParent, CurrentTime);
+    }
     else 
         glXMakeCurrent( self->display, self->glxpmap, self->glxcontext);
 
