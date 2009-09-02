@@ -65,6 +65,12 @@
 /* Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 const Type lucSDLWindow_Type = "lucSDLWindow";
 
+/* Globals required to store maximum window size as SDL only allows a single actual window to be open */
+int SDL_widthMax = 0;
+int SDL_heightMax = 0;
+SDL_Surface *screen = NULL;
+int SDL_useCount = 0;
+
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
 lucSDLWindow* _lucSDLWindow_New( 
 		SizeT                                           sizeOfSelf,
@@ -161,48 +167,52 @@ void _lucSDLWindow_Construct( void* window, Stg_ComponentFactory* cf, void* data
 } 
 
 void _lucSDLWindow_Build( void* window, void* data ) {
+	lucSDLWindow*     self      = (lucSDLWindow*)window;
+
 	/* Run the parent function to build window... */
 	_lucWindow_Build(window, data);	
+
+    /* Save largest window dimensions required */
+    if (self->width > SDL_widthMax) SDL_widthMax = self->width; 
+    if (self->height > SDL_heightMax) SDL_heightMax = self->height; 
 }
 
 void _lucSDLWindow_Initialise( void* window, void* data ) {
-	
 	lucSDLWindow*     self      = (lucSDLWindow*)window;
 
 	/* Initialise SDL Video subsystem */
-	if( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_TIMER ) < 0 ) { 
-		Journal_Printf( lucError, "In func %s: Unable to initialize SDL: %s\n", __func__, SDL_GetError() );
-		abort();
-	}
+    if( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_TIMER ) < 0 ) { 
+        Journal_Printf( lucError, "In func %s: Unable to initialize SDL: %s\n", __func__, SDL_GetError() );
+        abort();
+    }
 
-    SDL_WM_SetCaption( self->title, NULL );
     putenv("SDL_VIDEO_CENTERED=1");
-	
+    
     const SDL_VideoInfo *pSDLVideoInfo = SDL_GetVideoInfo();
 
     if( !pSDLVideoInfo )
     {
-		Journal_Printf( lucError, "In func %s: SDL_GetVideoInfo() failed. SDL Error: %s\n", __func__, SDL_GetError() );
+        Journal_Printf( lucError, "In func %s: SDL_GetVideoInfo() failed. SDL Error: %s\n", __func__, SDL_GetError() );
         SDL_Quit();
         exit(1);
     }
 
-	/*** SDL will use OSMesa as the OpenGL implementation if it is present, by copying the OSMesa output
- 	 *** to the SDL display. This allows SDL on-screen and OSMesa off-screen rendering available in the same binary.
-	 *** For this to work, OSMesa must be linked without/before any other OpenGL implementations. */
+    /*** SDL will use OSMesa as the OpenGL implementation if it is present, by copying the OSMesa output
+     *** to the SDL display. This allows SDL on-screen and OSMesa off-screen rendering available in the same binary.
+     *** For this to work, OSMesa must be linked without/before any other OpenGL implementations. */
   #ifdef HAVE_OSMESA
-	Journal_Printf( Journal_MyStream( Info_Type, self ), "*** Using OSMesa library for OpenGL graphics in SDL Window ***.\n" );
-	self->osMesaContext = OSMesaCreateContextExt( GL_RGBA, 16, 1, 0, NULL );    /* 16 bit depth, 1 bit stencil */
-	if (!self->osMesaContext) {
-		Journal_Printf( lucError, "In func %s: OSMesaCreateContext failed!\n", __func__);
-		abort();
-	}
-	if( pSDLVideoInfo->hw_available ) 	/* Hardware surfaces enabled? */
-		self->sdlFlags = SDL_RESIZABLE | SDL_HWSURFACE | SDL_DOUBLEBUF;
-	else
-		self->sdlFlags = SDL_RESIZABLE | SDL_SWSURFACE;
+    Journal_Printf( Journal_MyStream( Info_Type, self ), "*** Using OSMesa library for OpenGL graphics in SDL Window ***.\n" );
+    self->osMesaContext = OSMesaCreateContextExt( GL_RGBA, 16, 1, 0, NULL );    /* 16 bit depth, 1 bit stencil */
+    if (!self->osMesaContext) {
+        Journal_Printf( lucError, "In func %s: OSMesaCreateContext failed!\n", __func__);
+        abort();
+    }
+    if( pSDLVideoInfo->hw_available ) 	/* Hardware surfaces enabled? */
+        self->sdlFlags = SDL_RESIZABLE | SDL_HWSURFACE | SDL_DOUBLEBUF;
+    else
+        self->sdlFlags = SDL_RESIZABLE | SDL_SWSURFACE;
   #else
-   	self->sdlFlags = SDL_OPENGL | SDL_RESIZABLE;
+    self->sdlFlags = SDL_OPENGL | SDL_RESIZABLE;
     /* set opengl attributes */
     SDL_GL_SetAttribute(SDL_GL_RED_SIZE,        8);
     SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE,      8);
@@ -213,34 +223,36 @@ void _lucSDLWindow_Initialise( void* window, void* data ) {
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER,    1);
   #endif
 
-	/* Create display */	
+    /* Create display */	
     lucSDLWindow_CreateWindow(self);
-	
-	if (self->interactive && self->isMaster)
-    	/* Install 1sec idle timer */
-    	self->timer = SDL_AddTimer(1000, lucSDLWindow_IdleTimer, self);
-	else
-    {
-      #ifdef HAVE_OSMESA  
-        SDL_Quit(); /* Don't need SDL */
-      #else
-        //SDL_WM_IconifyWindow();
-      #endif
-    }
+    
+    if (self->interactive && self->isMaster)
+        /* Install 1sec idle timer */
+        self->timer = SDL_AddTimer(1000, lucSDLWindow_IdleTimer, self);
 
-	/* NOTE: we still want Ctrl-C to work, so we undo the SDL redirections */
+    /* NOTE: we still want Ctrl-C to work, so we undo the SDL redirections */
     signal(SIGINT, SIG_DFL);
     signal(SIGQUIT, SIG_DFL);
-	
+
 	/* Run the parent function to init window... */
 	_lucWindow_Initialise(window, data);	
 
 	/* Refresh display */
-	_lucSDLWindow_Display(window);
+	//_lucSDLWindow_Display(window);
 }
 
 void _lucSDLWindow_Execute( void* window, void* data ) {
+	lucSDLWindow*   self = (lucSDLWindow*)window;
 
+    /* Update title */
+    SDL_WM_SetCaption( self->title, NULL );
+  #ifdef HAVE_OSMESA
+    OSMesaMakeCurrent( self->osMesaContext, self->buffer->pixels, GL_UNSIGNED_BYTE, self->width, self->height );
+    Journal_DPrintfL( lucDebug, 2, "OSMesa make current %d,%d\n", self->width, self->height);
+  #else
+    /* Clear background */
+		self->renderingEngine->_clear(self, window, False);
+  #endif
 	/* Run the parent function to execute the window... */
 	_lucWindow_Execute(window, data);	
 }
@@ -270,11 +282,15 @@ void _lucSDLWindow_Display( void* window ) {
 	/* Run the parent function to display window... */
 	lucWindow_Display(window);	
 
-    //if (!self->interactive || !self->isMaster) return;    
   #ifdef HAVE_OSMESA
-	/* Render to SDL using OSMesa output buffer */
+	/* Render in SDL using OSMesa output buffer */
     if (self->interactive)
     {
+        SDL_PixelFormat *fmt = self->screen->format;
+        lucColour *c = &self->backgroundColour;
+        SDL_FillRect(self->screen, NULL, SDL_MapRGBA(fmt, (Uint8)(c->red * 255), (Uint8)(c->green * 255), 
+                                                          (Uint8)(c->blue * 255), (Uint8)(c->opacity * 255)));
+        Journal_DPrintfL( lucDebug, 2, "SDL BLIT SURFACE src %d,%d to dst %d,%d\n\n", self->buffer->w, self->buffer->h, self->screen->w, self->screen->h);
     	SDL_BlitSurface(self->buffer,NULL,self->screen,NULL);
 	    SDL_Flip(self->screen);
     }
@@ -336,13 +352,11 @@ Bool _lucSDLWindow_EventProcessor( void* window ) {
 			if (!self->interactive) 
 			{
 				/* Interactive mode switched off */
+                Journal_DPrintfL( lucDebug, 2, "Interactive mode OFF\n");
 				lucWindow_SetViewportNeedsToDrawFlag( self, True );
 	    		SDL_RemoveTimer(self->timer);
                 #ifdef HAVE_OSMESA
                     lucSDLWindow_DeleteWindow(window);
-                    SDL_Quit();
-                #else
-                    SDL_WM_IconifyWindow();
                 #endif
 				self->quitEventLoop = True;
                 self->resized = True;
@@ -380,7 +394,9 @@ void _lucSDLWindow_Resize( void* window ) {
 
     /* Recreate in new dimensions */
     lucSDLWindow_CreateWindow(self);
-
+  #ifdef HAVE_OSMESA
+    if (!self->interactive) return; /* Interactive switched off, no need to redo viewports */
+  #endif
 	/* Run the parent function to resize window viewports... */
 	lucWindow_Resize(window);	
 }
@@ -405,17 +421,11 @@ Uint32 lucSDLWindow_IdleTimer(Uint32 interval, void* param) {
 void lucSDLWindow_CreateWindow( void* window ) {
 
 	lucSDLWindow* self = (lucSDLWindow*)window;
+    Journal_DPrintfL( lucDebug, 2, "*** Create window %d,%d (%s)\n", self->width, self->height, self->name);
+    if (self->width > SDL_widthMax) SDL_widthMax = self->width; 
+    if (self->height > SDL_heightMax) SDL_heightMax = self->height; 
 
   #ifdef HAVE_OSMESA
-    if (!self->interactive || !self->isMaster)
-    {
-        /* Switch to OSMesa only */
-	    self->pixelBuffer = Memory_Alloc_Array( lucAlphaPixel, self->width * self->height, "OSMesa pixelBuffer" );
-    	self->osMesaContext = OSMesaCreateContextExt( OSMESA_RGBA, 16, 1, 0, NULL); /* 16 bit depth, 1 bit stencil */
-    	OSMesaMakeCurrent( self->osMesaContext, self->pixelBuffer, GL_UNSIGNED_BYTE, self->width, self->height );
-        return; 
-    }
-
     /* SDL interprets each pixel as a 32-bit number, so our masks depend on the byte order */
 	Uint32 rmask, gmask, bmask, amask;
 	#if SDL_BYTEORDER == SDL_BIG_ENDIAN 
@@ -434,32 +444,50 @@ void lucSDLWindow_CreateWindow( void* window ) {
 		abort();
    	}
 	OSMesaPixelStore(OSMESA_Y_UP,0);
+    if (!self->interactive || !self->isMaster) return;  /* No SDL window required */
   #endif
 
     /* Create our rendering surface */
-    self->screen = SDL_SetVideoMode( self->width, self->height, 32, self->sdlFlags );
-    if( !self->screen)
+    if (screen == NULL || screen->w < SDL_widthMax || screen->h < SDL_heightMax) 
     {
-		Journal_Printf( lucError, "In func %s: Call to SDL_SetVideoMode() failed! - SDL_Error: %s\n", __func__, SDL_GetError() );
-        SDL_Quit();
-		abort();
-	}
+        if (screen != NULL) SDL_FreeSurface(self->screen);
+        
+        screen = SDL_SetVideoMode( SDL_widthMax, SDL_heightMax, 32, self->sdlFlags );
+        Journal_DPrintfL( lucDebug, 2, "SDL SET VIDEO %d,%d\n\n", SDL_widthMax, SDL_heightMax);
+        if (!screen)
+        {
+            Journal_Printf( lucError, "In func %s: Call to SDL_SetVideoMode() failed! - SDL_Error: %s\n", __func__, SDL_GetError() );
+            SDL_Quit();
+            abort();
+        }
+    }
+    self->screen = screen;
+    SDL_useCount++;;
 }
 
 void lucSDLWindow_DeleteWindow(void *window) {
 	lucSDLWindow* self = (lucSDLWindow*)window;
 
-    if (self->screen) SDL_FreeSurface(self->screen);
-
   #ifdef HAVE_OSMESA
     /* free the image buffer */
     if (self->buffer) SDL_FreeSurface(self->buffer);
-    if (self->pixelBuffer) Memory_Free( self->pixelBuffer );
   #endif
 
-    self->screen = NULL;
+    /* Decrement usage count, free if no longer needed */
+    if (self->screen) 
+    {
+        SDL_useCount--;
+        if (SDL_useCount < 1)
+        { 
+            SDL_FreeSurface(self->screen);
+            SDL_Quit();
+            screen = NULL;
+        }
+    }
+
     self->buffer = NULL;
-    self->pixelBuffer = NULL;
+    self->screen = NULL;
+	Journal_DPrintfL( lucDebug, 2, "Delete Window %s in %s\n", self->name, __func__);
 }
 
 #endif

@@ -185,8 +185,9 @@ void _lucWindow_Init(
 	self->startx = 0;
 	self->starty = 0;
 	
-	self->title = Memory_Alloc_Array( char, 100, "title string" );
-	strcpy(self->title, " gLucifer Interactive Output ");
+	self->title = Memory_Alloc_Array( char, 500, "title string" );
+	strcpy(self->title, " gLucifer output: ");
+	strcat(self->title, self->name);
 }
 		
 void _lucWindow_Delete( void* window ) {
@@ -355,6 +356,7 @@ void _lucWindow_Build( void* window, void* data ) {
 void _lucWindow_Initialise( void* window, void* data ) {
 	lucWindow*           self            = (lucWindow*)window;
 
+    lucDeleteFont(); 
 	lucSetupRasterFont();
 
 }
@@ -436,6 +438,7 @@ void _lucWindow_Destroy( void* window, void* data ) {
 
 	lucWindow_CleanUp( window, data );
 	Memory_Free(self->title);
+    lucDeleteFont(); 
 }
 
 void lucWindow_Display( void* window )
@@ -488,7 +491,7 @@ void lucWindow_Resize( void* window ) {
      _lucWindow_Initialise(self, self->context);	/* Reset font stuff */
 
 	/* Flag display lists must be created and objects drawn */
-//	lucWindow_SetViewportNeedsToSetupFlag( self, True );
+	lucWindow_SetViewportNeedsToSetupFlag( self, True );
 	lucWindow_SetViewportNeedsToDrawFlag( self, True );
 }
 

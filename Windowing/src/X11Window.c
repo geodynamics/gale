@@ -218,6 +218,14 @@ void _lucX11Window_Initialise( void* window, void* data ) {
 }
 
 void _lucX11Window_Execute( void* window, void* data ) {
+	lucX11Window*        self = (lucX11Window*) window; 
+
+    /* Make sure we are using the correct context - for multiple windows */
+	if (self->interactive && self->isMaster)
+		glXMakeCurrent( self->display, self->win, self->glxcontext);
+    else 
+        glXMakeCurrent( self->display, self->glxpmap, self->glxcontext);
+
 	/* Run the parent function to execute the window... */
 	_lucWindow_Execute(window, data);	
 }
@@ -581,6 +589,7 @@ void lucX11Window_CloseInteractiveWindow( lucX11Window* self ) {
 
 	XDestroyWindow( self->display , self->win );
 	self->win = 0;
+    self->glxcontext = NULL;
 
 	lucDebug_PrintFunctionEnd( self, 1 );
 }
@@ -593,6 +602,7 @@ void lucX11Window_CloseBackgroundWindow( lucX11Window* self ) {
 	self->glxpmap = 0;
 	XFreePixmap(self->display, self->pmap);
 	self->pmap = 0;
+    self->glxcontext = NULL;
 
 	lucDebug_PrintFunctionEnd( self, 1 );
 }

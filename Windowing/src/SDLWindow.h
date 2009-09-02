@@ -64,7 +64,6 @@
 		SDL_Surface*										screen;					\
 		SDL_Surface*										buffer;					\
 		void*                                               osMesaContext;			\
-		lucAlphaPixel*                                      pixelBuffer;            \
 		SDL_TimerID											timer;					\
         void*                                               osBuffer;               \
 

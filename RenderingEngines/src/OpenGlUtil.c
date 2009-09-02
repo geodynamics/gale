@@ -50,13 +50,8 @@
 
 #include "types.h"
 #include "OpenGlUtil.h"
-#ifdef HAVE_OPENGL_FRAMEWORK
-	#include <OpenGL/gl.h>
-	#include <OpenGL/glu.h>
-#else
-	#include <gl.h>
-	#include <glu.h>
-#endif
+#include <gl.h>
+#include <glu.h>
 #include <string.h>
 
 #include  "font.h"
@@ -276,8 +271,10 @@ void lucBuildFont(int glyphsize, int columns, int startidx, int stopidx)
 void lucDeleteFont()
 {
 	/* Delete fonts */
-	glDeleteLists(fontbase, GLYPHS);
-    glDeleteTextures(1, &texture);
+    if (fontbase >= 0) glDeleteLists(fontbase, GLYPHS);
+    fontbase = -1;
+    if (texture) glDeleteTextures(1, &texture);
+    texture = 0;
 }
 
 void lucColour_SetOpenGLColour( lucColour* colour ) {

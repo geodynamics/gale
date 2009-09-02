@@ -173,10 +173,7 @@ void _lucRenderingEngineGL_Construct( void* renderingEngine, Stg_ComponentFactor
 void _lucRenderingEngineGL_Build( void* renderingEngine, void* data ) {}
 void _lucRenderingEngineGL_Initialise( void* renderingEngine, void* data ) {}
 void _lucRenderingEngineGL_Execute( void* renderingEngine, void* data ) {}
-void _lucRenderingEngineGL_Destroy( void* renderingEngine, void* data ) 
-{ 
-    lucDeleteFont(); 
-}
+void _lucRenderingEngineGL_Destroy( void* renderingEngine, void* data ) {}
 
 void _lucRenderingEngineGL_Render( void* renderingEngine, lucWindow* window, AbstractContext* context ) {
 	lucRenderingEngineGL* self              = (lucRenderingEngineGL*) renderingEngine;
@@ -271,7 +268,7 @@ void _lucRenderingEngineGL_Render( void* renderingEngine, lucWindow* window, Abs
 		viewportInfo->needsToDraw = False;
 
 		Stream_UnIndent( lucDebug );
-		Journal_DPrintfL( lucDebug, 2, "Finised loop.\n" );
+		Journal_DPrintfL( lucDebug, 2, "Finished loop.\n" );
 
 		#ifdef HAVE_GL2PS		
 			state = gl2psEndViewport();
@@ -335,13 +332,11 @@ void _lucRenderingEngineGL_Clear( void* renderingEngineGL, lucWindow* window, Bo
 		glViewport(0, 0, window->width, window->height);
 		glScissor(0, 0, window->width, window->height);
 	}
-    else
-    {
-    	glEnable (GL_SCISSOR_TEST);
-    	glClearColor(window->backgroundColour.red, window->backgroundColour.green,
-            		window->backgroundColour.blue, window->backgroundColour.opacity );
-        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-    }
+    
+    glEnable (GL_SCISSOR_TEST);
+    glClearColor(window->backgroundColour.red, window->backgroundColour.green,
+                 window->backgroundColour.blue, window->backgroundColour.opacity );
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 }
 
 Index lucRenderingEngineGL_MapBufferIdToRank( void* renderingEngineGL, Index bufferId, Index mergeCount ) {

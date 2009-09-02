@@ -180,6 +180,10 @@ void _lucOSMesaWindow_Initialise( void* window, void* data ) {
 }
 
 void _lucOSMesaWindow_Execute( void* window, void* data ) {
+    /* Make sure we are using the correct context when more than one are created */
+	lucOSMesaWindow*     self      = (lucOSMesaWindow*)window;
+	OSMesaMakeCurrent( self->osMesaContext, self->pixelBuffer, GL_UNSIGNED_BYTE, self->width, self->height );
+
 	/* Run the parent function to execute window... */
 	_lucWindow_Execute(window, data);	
 }
