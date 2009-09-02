@@ -62,13 +62,8 @@
 #include "Init.h"
 
 #include <assert.h>
-#ifdef HAVE_OPENGL_FRAMEWORK
-	#include <OpenGL/gl.h>
-	#include <OpenGL/glu.h>
-#else
-	#include <gl.h>
-	#include <glu.h>
-#endif
+#include <gl.h>
+#include <glu.h>
 
 
 const Type lucViewport_Type = "lucViewport";
