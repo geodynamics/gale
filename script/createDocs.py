@@ -97,8 +97,14 @@ def createListDictionary(arg1, arg2, arg3, arg4, directoryPath, docPath):
     dictionary['doxygenSubDirPath'] = os.path.join(dictionary['docPath'], dictionary['doxygenSubDir'])
     dictionary['configPath'] = os.path.join(dictionary['docDataPath'], dictionary['configFile'])
     dictionary['headerFilterPath'] = dictionary['docScriptPath']+"/headerfilter.py"
+    # All the following values are contained within 'docDataPath':
+    dictionary['htmlHeader'] = "header.html"
+    dictionary['htmlFooter'] =  "footer.html"
+    dictionary['htmlStylesheet'] =  "customdoxygen.css"
+    dictionary['htmlImagesPath'] = "doxyimage/"
     dictionary['projectNumber'] = 'Bleeding Edge'
-    dictionary['configPathNew'] = os.path.join(dictionary['docDataPath'], "Doxyfile.new")
+    dictionary['configNew'] =  "Doxyfile.new"
+    dictionary['htmlDir'] = "html/"
     return dictionary
 
 ## Print help statement appropriate for 'createDocs.py'
@@ -203,10 +209,18 @@ def createDoxygen(dictionary):
             newLine = "FILTER_PATTERNS = *.h="+dictionary['headerFilterPath']
             print "Found FILTER_PATTERNS: "
             print newLine
-
-        #HTML_STYLESHEET        =
-        #HTML_FOOTER            =
-        #HTML_HEADER            =
+        elif ((line.find("HTML_STYLESHEET") != -1) and (line.find("=") != -1)):
+            newLine = "HTML_STYLESHEET = "+dictionary['docDataPath']+"/"+dictionary['htmlStylesheet']
+            print "Found HTML_STYLESHEET: "
+            print newLine
+        elif ((line.find("HTML_FOOTER") != -1) and (line.find("=") != -1)):
+            newLine = "HTML_FOOTER = "+dictionary['docDataPath']+"/"+dictionary['htmlFooter']
+            print "Found HTML_FOOTER: "
+            print newLine
+        elif ((line.find("HTML_HEADER") != -1) and (line.find("=") != -1)):
+            newLine = "HTML_HEADER = "+dictionary['docDataPath']+"/"+dictionary['htmlHeader']
+            print "Found HTML_HEADER: "
+            print newLine
 
         else:
             newLine = line
@@ -216,18 +230,31 @@ def createDoxygen(dictionary):
     
     #write new doxyfile
     
-    doxyfileNew = open(dictionary['configPathNew'], 'w')
+    doxyfileNew = open(os.path.join(dictionary['docDataPath'],dictionary['configNew']), 'w')
     doxyfileNew.write(newDoxyfileString)
     doxyfileNew.close()
     
+    # copy pics to new directory
+    copyPics(os.path.join(dictionary['docDataPath'],dictionary['htmlImagesPath']), os.path.join(dictionary['doxygenSubDirPath'],dictionary['htmlDir']))    
+
     #run doxygen ( this command checks PATH for doxygen.
     print "Creating Doxygen documentation for " + str(dictionary['configPath'])
-    print " using modified file: "+str(dictionary['configPathNew']) 
+    print " using modified file: "+str(os.path.join(dictionary['docDataPath'],dictionary['configNew'])) 
     print "Output located in " + dictionary['doxygenSubDirPath'] 
-    os.execlp('doxygen',  'doxygen', str(dictionary['configPathNew']) )
+    os.execlp('doxygen',  'doxygen', str(os.path.join(dictionary['docDataPath'],dictionary['configNew'])) )
+
+
 
     #remove temporary Doxyfile
-    os.remove(dictionary['configPathNew'])
+    os.remove(str(os.path.join(dictionary['docDataPath'],dictionary['configNew'])))
+
+## Basic copy function for directory contents. Is not recursive.
+def copyPics(pathFrom, pathTo):
+    print "Copying content of directory of pictures :" + os.path.realpath(pathFrom) + "/* to directory: " + os.path.realpath(pathTo) 
+    createDocument.checkOutputPath(pathTo)
+    # Copy everything there to the moment
+    os.system('cp '+ os.path.realpath(pathFrom) + "/* "+os.path.realpath(pathTo) )
+    
    
 if __name__=='__main__':
     values = sys.argv

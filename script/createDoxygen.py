@@ -66,9 +66,13 @@ if __name__=='__main__':
     #Reset configPath as necessary:
     if ((values[1] != "") and (values[4] != "") ):
         mainDictionary['configPath'] = os.path.join(mainDictionary['docDataPath'], mainDictionary['configFile'])
-        mainDictionary['configPathNew'] = os.path.join(mainDictionary['docDataPath'], "Doxyfile.new")
-    # Set up help print statement
+    # reset the location of the headerfilter file
         mainDictionary['headerFilterPath'] = mainDictionary['docScriptPath']+"/headerfilter.py"
+
+
+
+
+    # Set up help print statement
     if ((values[1] == "help") or (values[1] == '-h') or (values[1] =='--help') or (values[1] == 'h')):
         printHelpStatement(mainDictionary)
 
