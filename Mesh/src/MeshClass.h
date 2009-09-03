@@ -79,6 +79,10 @@
 		ExtensionManager*		info;		\
 								\
 		MeshGenerator*			generator;	\
+		/* should mesh be stored and reloaded ? */                    \
+		Bool                            isCheckpointedAndReloaded;    \
+		/* determines if mesh requires storing (it may already have been stored) */ \
+		Bool                            requiresCheckpointing;        \
 		ExtensionManager_Register*	emReg;
 
 	struct Mesh { __Mesh };

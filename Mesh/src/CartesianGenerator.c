@@ -315,7 +315,9 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
 
          meshReadFileNamePart = Context_GetCheckPointReadPrefixString( context );
 
-         Stg_asprintf( &meshReadFileName, "%sMesh.%.5u.h5", meshReadFileNamePart, restartTimestep );
+         /** assumption: that the generator only generates one mesh, or that the information in that mesh's checkpoint
+         file is valid for all meshes being generated TODO: generalise **/
+         Stg_asprintf( &meshReadFileName, "%sMesh.%s.%.5u.h5", meshReadFileNamePart, self->meshes[0]->name, restartTimestep );
 	      
 	      /** Read in minimum coord. */
 	      file = H5Fopen( meshReadFileName, H5F_ACC_RDONLY, H5P_DEFAULT );

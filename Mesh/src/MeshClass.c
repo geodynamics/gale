@@ -108,6 +108,9 @@ void _Mesh_Init( Mesh* self ) {
 
 	self->generator = NULL;
 	self->emReg = NULL;
+
+	self->isCheckpointedAndReloaded = False;
+	self->requiresCheckpointing     = False;
 }
 
 
