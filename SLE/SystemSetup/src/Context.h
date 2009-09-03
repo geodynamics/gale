@@ -188,9 +188,9 @@
    void _FiniteElementContext_SaveMesh( void* context );
    
    #ifdef WRITE_HDF5
-	void _FiniteElementContext_DumpMeshHDF5( void* context, char* filename );
+	void _FiniteElementContext_DumpMeshHDF5( void* context );
    #else
-	void _FiniteElementContext_DumpMeshAscii( void* context, char* filename );
+	void _FiniteElementContext_DumpMeshAscii( void* context );
    #endif
 
 #endif /* __StgFEM_SLE_SystemSetup_Context_h__ */
