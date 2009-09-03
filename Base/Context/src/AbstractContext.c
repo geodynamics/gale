@@ -1145,8 +1145,8 @@ void _AbstractContext_LoadTimeInfoFromCheckPoint( Context* self, Index timeStep,
 }
 		
 
-void _AbstractContext_SaveTimeInfo( Context* context ) {
-	AbstractContext*       self = context;	
+void _AbstractContext_SaveTimeInfo( void* context ) {
+	AbstractContext*       self = (AbstractContext*) context;
 	FILE*                  timeInfoFile = NULL;
 	char*                  timeInfoFileName = NULL;
    char*                  timeInfoFileNamePart = NULL;
@@ -1190,7 +1190,7 @@ void _AbstractContext_SaveTimeInfo( Context* context ) {
 	#endif
 	      
 	props = H5Pcreate( H5P_DATASET_XFER );
-	H5Dwrite( fileData, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, props, &(context->currentTime) );
+	H5Dwrite( fileData, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, props, &(self->currentTime) );
 	H5Pclose( props );
 	H5Dclose( fileData );
 	H5Sclose( fileSpace );
@@ -1221,7 +1221,7 @@ void _AbstractContext_SaveTimeInfo( Context* context ) {
 	#endif
 	      
 	props = H5Pcreate( H5P_DATASET_XFER );
-	H5Dwrite( fileData, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, props, &(context->nproc) );
+	H5Dwrite( fileData, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, props, &(self->nproc) );
 	H5Pclose( props );
 	H5Dclose( fileData );
 	H5Sclose( fileSpace );
@@ -1241,7 +1241,7 @@ void _AbstractContext_SaveTimeInfo( Context* context ) {
 	}
 
 	/* set currentTime and Dt loaded from file */
-	fprintf( timeInfoFile, "%lg ", context->currentTime );
+	fprintf( timeInfoFile, "%lg ", self->currentTime );
 	fprintf( timeInfoFile, "%lg\n", AbstractContext_Dt( context ) );
 	fclose( timeInfoFile );
 #endif
@@ -1253,7 +1253,7 @@ void _AbstractContext_SaveTimeInfo( Context* context ) {
 
 
 Bool AbstractContext_CheckPointExists( void* context, Index timeStep ) {
-	AbstractContext*       self = context;	
+	AbstractContext*       self = (AbstractContext*) context;	
 	char*                  timeInfoFileName = NULL;
 	char*                  timeInfoFileNamePart = NULL;   
 	struct stat            statInfo;
@@ -1279,7 +1279,7 @@ Bool AbstractContext_CheckPointExists( void* context, Index timeStep ) {
 }
 
 char* Context_GetCheckPointReadPrefixString( void* context ) {
-	AbstractContext*       self = context;	
+	AbstractContext*       self = (AbstractContext*) context;	
 	Index                  readStrLen = 0;
 	char*                  readPathString = NULL;
 
@@ -1303,7 +1303,7 @@ char* Context_GetCheckPointReadPrefixString( void* context ) {
 }
 
 char* Context_GetCheckPointWritePrefixString( void* context ) {
-	AbstractContext*       self = context;	
+	AbstractContext*       self = (AbstractContext*) context;	
 	Index                  writeStrLen = 0;
 	char*                  writePathString = NULL;
 
@@ -1326,8 +1326,8 @@ char* Context_GetCheckPointWritePrefixString( void* context ) {
 	return writePathString;
 }
 
-void _AbstractContext_CreateCheckpointDirectory( Context* context ) {
-	AbstractContext*       self = context;	
+void _AbstractContext_CreateCheckpointDirectory( void* context ) {
+	AbstractContext*       self = (AbstractContext*) context;	
    /* if we are creating individual directories for each checkpoint timestep, first create the directory if it doesn't exist. */
    if ( self->checkpointAppendStep ) {
       /* Only the master process creates the directory */      

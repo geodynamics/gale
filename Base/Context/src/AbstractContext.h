@@ -306,6 +306,6 @@
 	void _AbstractContext_Step( Context* context, double dt );
 	
 	void _AbstractContext_LoadTimeInfoFromCheckPoint( Context* self, Index timeStep, double* dtLoadedFromFile );
-	void _AbstractContext_SaveTimeInfo( Context* context );
-	void _AbstractContext_CreateCheckpointDirectory( Context* context );
+	void _AbstractContext_SaveTimeInfo( void* context );
+	void _AbstractContext_CreateCheckpointDirectory( void* context );
 #endif /* __Base_Context_AbstractContext_h__ */
