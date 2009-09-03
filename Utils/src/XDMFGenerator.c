@@ -112,7 +112,8 @@ void XDMFGenerator_GenerateAll( void* _context ) {
 void _XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream ) {
    FieldVariable*       fieldVar = NULL;
    FeVariable*          feVar    = NULL;
-   Mesh*                mesh;
+   Mesh*                mesh     = NULL;
+   FeMesh*              feMesh   = NULL;
    unsigned             nDims;
    unsigned             totalVerts;
    Index                maxNodes;
@@ -123,157 +124,168 @@ void _XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream
    Stream*              errorStream = Journal_Register( Error_Type, CURR_MODULE_NAME );
    Name                 variableType = NULL;
    Name                 topologyType = NULL;
-   
-   /** we follow the method in SystemSetup/Context.c to get the mesh info. 
-       this method seems unsatisfactory, and may be updated soon JohnMansour 20090626  **/ 
-   fieldVar = FieldVariable_Register_GetByIndex( context->fieldVariable_Register, 0 );
-   if ( Stg_Class_IsInstance( fieldVar, FeVariable_Type ) ) {
-      feVar  = (FeVariable*)fieldVar;
-      mesh   = (Mesh*)feVar->feMesh;
-      
-      nDims             = Mesh_GetDimSize( mesh );
-      totalVerts        = Mesh_GetGlobalSize( mesh, 0 );
-      elementGlobalSize = FeMesh_GetElementGlobalSize(mesh);
+   unsigned             componentCount = LiveComponentRegister_GetCount(stgLiveComponentRegister);
+   unsigned             compI;
+   Stg_Component*       stgComp;
 
-      /* get connectivity array size */
-      if (mesh->nElTypes == 1)
-         maxNodes = FeMesh_GetElementNodeSize( mesh, 0);
-      else {
-         /* determine the maximum number of nodes each element has */
-         maxNodes = 0;
-         for ( gElement_I = 0 ; gElement_I < FeMesh_GetElementGlobalSize(mesh); gElement_I++ ) {
-            unsigned numNodes;
-            numNodes = FeMesh_GetElementNodeSize( mesh, gElement_I);
-            if( maxNodes < numNodes ) maxNodes = numNodes;
+   /** search for entire live component register for feMesh types  **/
+   for( compI = 0 ; compI < componentCount ; compI++){
+      stgComp = LiveComponentRegister_At( stgLiveComponentRegister, compI );
+      /* check that component is of type FeMesh, and that its element family is linear */
+      if ( Stg_Class_IsInstance( stgComp, FeMesh_Type ) && !strcmp( ((FeMesh*)stgComp)->feElFamily, "linear" ) ) {
+         mesh   = (  Mesh*)stgComp;
+         feMesh = (FeMesh*)stgComp;
+
+         nDims             = Mesh_GetDimSize( mesh );
+         totalVerts        = Mesh_GetGlobalSize( mesh, 0 );
+         elementGlobalSize = FeMesh_GetElementGlobalSize(mesh);
+
+         /* get connectivity array size */
+         if (mesh->nElTypes == 1)
+            maxNodes = FeMesh_GetElementNodeSize( mesh, 0);
+         else {
+            /* determine the maximum number of nodes each element has */
+            maxNodes = 0;
+            for ( gElement_I = 0 ; gElement_I < FeMesh_GetElementGlobalSize(mesh); gElement_I++ ) {
+               unsigned numNodes;
+               numNodes = FeMesh_GetElementNodeSize( mesh, gElement_I);
+               if( maxNodes < numNodes ) maxNodes = numNodes;
+            }
+         }
+         /** now write all the xdmf geometry info **/
+         /**----------------------- START GEOMETRY   ------------------------------------------------------------------------------------------------------------------- **/
+         if(         maxNodes == 4 ){
+            Stg_asprintf( &topologyType, "Quadrilateral" );
+         } else if ( maxNodes == 8  ) {
+            Stg_asprintf( &topologyType, "Hexahedron" );
+         } else {
+            Journal_DPrintf( errorStream, "\n\n Error: number of element nodes %u not supported by XDMF generator...\n should be 4 (2D quadrilateral) " 
+                                    "or should be 8 (3D hexahedron). \n\n", maxNodes );
+            Stg_asprintf( &topologyType, "UNKNOWN_POSSIBLY_ERROR" );
+         }
+         /** first create the grid which is applicable to the checkpointed fevariables **/
+                                 Journal_Printf( stream, "   <Grid Name=\"FEM_Grid_%s\">\n\n", feMesh->name);
+                                 Journal_Printf( stream, "      <Time Value=\"%f\" />\n\n", context->currentTime );
+         /** now print out topology info, only quadrilateral elements are supported at the moment **/
+                                 Journal_Printf( stream, "         <Topology Type=\"%s\" NumberOfElements=\"%u\"> \n", topologyType, elementGlobalSize );
+                                 Journal_Printf( stream, "            <DataItem Format=\"HDF\" DataType=\"Int\"  Dimensions=\"%u %u\">Mesh.%s.%05d.h5:/connectivity</DataItem>\n", elementGlobalSize, maxNodes, feMesh->name, context->timeStep );
+                                 Journal_Printf( stream, "         </Topology>\n\n" );
+                                 Journal_Printf( stream, "         <Geometry Type=\"XYZ\">\n" );
+
+         Stg_asprintf( &variableType, "NumberType=\"Float\" Precision=\"8\"" );                              
+         if(         nDims == 2 ){
+            /** note that for 2d, we feed back a quasi 3d array, with the 3rd Dof zeroed.  so in effect we always work in 3d.
+                this is done because paraview in particular seems to do everything in 3d, and if you try and give it a 2d vector 
+                or array, it complains.... and hence the verbosity of the following 2d definitions**/
+                                 Journal_Printf( stream, "            <DataItem ItemType=\"Function\"  Dimensions=\"%u 3\" Function=\"JOIN($0, $1, 0*$1)\">\n", totalVerts );
+                                 Journal_Printf( stream, "               <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" Name=\"XCoords\">\n", totalVerts );
+                                 Journal_Printf( stream, "                  <DataItem Dimensions=\"3 2\" Format=\"XML\"> 0 0 1 1 %u 1 </DataItem>\n", totalVerts );
+                                 Journal_Printf( stream, "                  <DataItem Format=\"HDF\" %s Dimensions=\"%u 2\">Mesh.%s.%05d.h5:/vertices</DataItem>\n", variableType, totalVerts, feMesh->name,  context->timeStep );
+                                 Journal_Printf( stream, "               </DataItem>\n" );
+                                 Journal_Printf( stream, "               <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" Name=\"YCoords\">\n", totalVerts );
+                                 Journal_Printf( stream, "                  <DataItem Dimensions=\"3 2\" Format=\"XML\"> 0 1 1 1 %u 1 </DataItem>\n", totalVerts );
+                                 Journal_Printf( stream, "                  <DataItem Format=\"HDF\" %s Dimensions=\"%u 2\">Mesh.%s.%05d.h5:/vertices</DataItem>\n", variableType, totalVerts, feMesh->name, context->timeStep );
+                                 Journal_Printf( stream, "               </DataItem>\n" );
+                                 Journal_Printf( stream, "            </DataItem>\n" );
+         } else if ( nDims == 3 ) {
+            /** in 3d we simply feed back the 3d hdf5 array, nice and easy **/
+                                 Journal_Printf( stream, "            <DataItem Format=\"HDF\" %s Dimensions=\"%u 3\">Mesh.%s.%05d.h5:/vertices</DataItem>\n", variableType, totalVerts, feMesh->name, context->timeStep );
+         } else {
+            Journal_DPrintf( errorStream, "\n\n Error: Mesh vertex location is not of dofCount 2 or 3.\n\n" );
+         }
+                                 Journal_Printf( stream, "         </Geometry>\n\n" );
+         /**----------------------- FINISH GEOMETRY  ------------------------------------------------------------------------------------------------------------------- **/
+
+
+      /** now write FeVariable data **/   
+      for ( var_I = 0; var_I < context->fieldVariable_Register->objects->count; var_I++ ) {
+         fieldVar = FieldVariable_Register_GetByIndex( context->fieldVariable_Register, var_I );
+
+         if ( Stg_Class_IsInstance( fieldVar, FeVariable_Type ) ) {
+            feVar = (FeVariable*)fieldVar;
+            if ( (feVar->isCheckpointedAndReloaded && context->isDataSave==False) || (feVar->isSavedData && context->isDataSave==True) ){
+               FeMesh* feVarMesh = NULL;
+               /** check what type of generator was used to know where elementMesh is **/
+               if( Stg_Class_IsInstance( feVar->feMesh->generator, C0Generator_Type))        feVarMesh = ((C0Generator*)feVar->feMesh->generator)->elMesh;
+               if( Stg_Class_IsInstance( feVar->feMesh->generator, CartesianGenerator_Type)) feVarMesh = feVar->feMesh;
+               /** make sure that the fevariable femesh is the same as that used above for the geometry definition, if so proceed **/
+               if( feVarMesh == feMesh ){
+                     Name   centering = NULL;
+                     Index  offset = 0;
+                     Index  meshSize = Mesh_GetGlobalSize( feVar->feMesh, 0 );
+                     Index  dofCountIndex;
+                     Index  dofAtEachNodeCount;
+
+               /**----------------------- START ATTRIBUTES ------------------------------------------------------------------------------------------------------------------- **/
+                     /** if coordinates are being stored with feVariable, account for this **/
+                     if( saveCoords) offset = nDims; 
+                     /** all feVariables are currently stored as doubles **/
+                     Stg_asprintf( &variableType, "NumberType=\"Float\" Precision=\"8\"" );
+                     /** determine whether feVariable data is cell centered (like Pressure), or on the nodes (like Velocity) **/
+                     if(        meshSize == elementGlobalSize ){
+                        Stg_asprintf( &centering, "Cell" );
+                     } else if( meshSize == totalVerts ) {
+                        Stg_asprintf( &centering, "Node" );
+                     } else {
+                        /* unknown/unsupported type */
+                        Stg_asprintf( &centering, "UNKNOWN_POSSIBLY_ERROR" );
+                     }
+                     /** how many degrees of freedom does the fevariable have? **/
+                     dofAtEachNodeCount = feVar->fieldComponentCount;
+                     if (        dofAtEachNodeCount == 1 ) {
+                                 Journal_Printf( stream, "         <Attribute Type=\"Scalar\" Center=\"%s\" Name=\"%s\">\n", centering,  feVar->name);
+                                 Journal_Printf( stream, "            <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" >\n", meshSize );
+                                 Journal_Printf( stream, "               <DataItem Dimensions=\"3 2\" Format=\"XML\"> 0 %u 1 1 %u 1 </DataItem>\n", offset, meshSize );
+                                 Journal_Printf( stream, "               <DataItem Format=\"HDF\" %s Dimensions=\"%u %u\">%s.%05d.h5:/data</DataItem>\n", variableType, meshSize, (offset + dofAtEachNodeCount), feVar->name, context->timeStep);
+                                 Journal_Printf( stream, "            </DataItem>\n" );
+                                 Journal_Printf( stream, "         </Attribute>\n\n" );
+                     } else if ( dofAtEachNodeCount == 2 ){
+                        /** note that for 2d, we feed back a quasi 3d array, with the 3rd Dof zeroed.  so in effect we always work in 3d.
+                            this is done because paraview in particular seems to do everything in 3d, and if you try and give it a 2d vector 
+                            or array, it complains.... and hence the verbosity of the following 2d definitions **/
+                                 Journal_Printf( stream, "         <Attribute Type=\"Vector\" Center=\"%s\" Name=\"%s\">\n", centering,  feVar->name);
+                                 Journal_Printf( stream, "            <DataItem ItemType=\"Function\"  Dimensions=\"%u 3\" Function=\"JOIN($0, $1, 0*$1)\">\n", meshSize );
+                                 Journal_Printf( stream, "               <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" Name=\"XValue\">\n", meshSize );
+                                 Journal_Printf( stream, "                  <DataItem Dimensions=\"3 2\" Format=\"XML\"> 0 %u 1 1 %u 1 </DataItem>\n", offset, meshSize );
+                                 Journal_Printf( stream, "                  <DataItem Format=\"HDF\" %s Dimensions=\"%u %u\">%s.%05d.h5:/data</DataItem>\n", variableType, meshSize, (offset + dofAtEachNodeCount), feVar->name, context->timeStep);
+                                 Journal_Printf( stream, "               </DataItem>\n" );
+                                 Journal_Printf( stream, "               <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" Name=\"YValue\">\n", meshSize );
+                                 Journal_Printf( stream, "                  <DataItem Dimensions=\"3 2\" Format=\"XML\"> 0 %u 1 1 %u 1 </DataItem>\n", (offset+1), meshSize );
+                                 Journal_Printf( stream, "                  <DataItem Format=\"HDF\" %s Dimensions=\"%u %u\">%s.%05d.h5:/data</DataItem>\n", variableType, meshSize, (offset + dofAtEachNodeCount), feVar->name, context->timeStep);
+                                 Journal_Printf( stream, "               </DataItem>\n" );
+                                 Journal_Printf( stream, "            </DataItem>\n" );
+                                 Journal_Printf( stream, "         </Attribute>\n\n" );
+                     } else if ( dofAtEachNodeCount == 3 ) {
+                        /** in 3d we simply feed back the 3d hdf5 array, nice and easy **/
+                                 Journal_Printf( stream, "         <Attribute Type=\"Vector\" Center=\"%s\" Name=\"%s\">\n", centering,  feVar->name);
+                                 Journal_Printf( stream, "            <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 3\" >\n", meshSize );
+                                 Journal_Printf( stream, "               <DataItem Dimensions=\"3 2\" Format=\"XML\"> 0 %u 1 1 %u 3 </DataItem>\n", offset, meshSize );
+                                 Journal_Printf( stream, "               <DataItem Format=\"HDF\" %s Dimensions=\"%u %u\">%s.%05d.h5:/data</DataItem>\n", variableType, meshSize, (offset + dofAtEachNodeCount), feVar->name, context->timeStep);
+                                 Journal_Printf( stream, "            </DataItem>\n" );
+                                 Journal_Printf( stream, "         </Attribute>\n\n" );
+                     } else {
+                        /** where there are more than 3 components, we write each one out as a scalar **/
+                        for(dofCountIndex = 0 ; dofCountIndex < dofAtEachNodeCount ; ++dofCountIndex){
+                                 Journal_Printf( stream, "         <Attribute Type=\"Scalar\" Center=\"%s\" Name=\"%s-Component-%u\">\n", centering,  feVar->name, dofCountIndex);
+                                 Journal_Printf( stream, "            <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" >\n", meshSize );
+                                 Journal_Printf( stream, "               <DataItem Dimensions=\"3 2\" Format=\"XML\"> 0 %u 1 1 %u 1 </DataItem>\n", (offset+dofCountIndex), meshSize );
+                                 Journal_Printf( stream, "               <DataItem Format=\"HDF\" %s Dimensions=\"%u %u\">%s.%05d.h5:/data</DataItem>\n", variableType, meshSize, (offset + dofAtEachNodeCount), feVar->name, context->timeStep);
+                                 Journal_Printf( stream, "            </DataItem>\n" );
+                                 Journal_Printf( stream, "         </Attribute>\n" );
+                        }
+                                 Journal_Printf( stream, "\n" );
+                     }
+               /**----------------------- END ATTRIBUTES   ------------------------------------------------------------------------------------------------------------------- **/
+               if(centering) Memory_Free( centering );
+               }
+               }
          }
       }
-      /** now write all the xdmf geometry info **/
-      /**----------------------- START GEOMETRY   ------------------------------------------------------------------------------------------------------------------- **/
-      if(         maxNodes == 4 ){
-         Stg_asprintf( &topologyType, "Quadrilateral" );
-      } else if ( maxNodes == 8  ) {
-         Stg_asprintf( &topologyType, "Hexahedron" );
-      } else {
-         Journal_DPrintf( errorStream, "\n\n Error: number of element nodes %u not supported...\n should be 4 (2D quadrilateral) " 
-                                 "or should be 8 (3D hexahedron). \n\n", maxNodes );
-         Stg_asprintf( &topologyType, "UNKNOWN_POSSIBLY_ERROR" );
-      }
-      /** first create the grid which is applicable to the checkpointed fevariables **/
-                              Journal_Printf( stream, "   <Grid Name=\"FeVariable_Grid\">\n\n" );
-                              Journal_Printf( stream, "      <Time Value=\"%f\" />\n\n", context->currentTime );
-      /** now print out topology info, only quadrilateral elements are supported at the moment **/
-                              Journal_Printf( stream, "         <Topology Type=\"%s\" NumberOfElements=\"%u\"> \n", topologyType, elementGlobalSize );
-                              Journal_Printf( stream, "            <DataItem Format=\"HDF\" DataType=\"Int\"  Dimensions=\"%u %u\">Mesh.%05d.h5:/connectivity</DataItem>\n", elementGlobalSize, maxNodes, context->timeStep );
-                              Journal_Printf( stream, "         </Topology>\n\n" );
-                              Journal_Printf( stream, "         <Geometry Type=\"XYZ\">\n" );
-
-      Stg_asprintf( &variableType, "NumberType=\"Float\" Precision=\"8\"" );                              
-      if(         nDims == 2 ){
-         /** note that for 2d, we feed back a quasi 3d array, with the 3rd Dof zeroed.  so in effect we always work in 3d.
-             this is done because paraview in particular seems to do everything in 3d, and if you try and give it a 2d vector 
-             or array, it complains.... and hence the verbosity of the following 2d definitions**/
-                              Journal_Printf( stream, "            <DataItem ItemType=\"Function\"  Dimensions=\"%u 3\" Function=\"JOIN($0, $1, 0*$1)\">\n", totalVerts );
-                              Journal_Printf( stream, "               <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" Name=\"XCoords\">\n", totalVerts );
-                              Journal_Printf( stream, "                  <DataItem Dimensions=\"3 2\" Format=\"XML\"> 0 0 1 1 %u 1 </DataItem>\n", totalVerts );
-                              Journal_Printf( stream, "                  <DataItem Format=\"HDF\" %s Dimensions=\"%u 2\">Mesh.%05d.h5:/vertices</DataItem>\n", variableType, totalVerts, context->timeStep );
-                              Journal_Printf( stream, "               </DataItem>\n" );
-                              Journal_Printf( stream, "               <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" Name=\"YCoords\">\n", totalVerts );
-                              Journal_Printf( stream, "                  <DataItem Dimensions=\"3 2\" Format=\"XML\"> 0 1 1 1 %u 1 </DataItem>\n", totalVerts );
-                              Journal_Printf( stream, "                  <DataItem Format=\"HDF\" %s Dimensions=\"%u 2\">Mesh.%05d.h5:/vertices</DataItem>\n", variableType, totalVerts, context->timeStep );
-                              Journal_Printf( stream, "               </DataItem>\n" );
-                              Journal_Printf( stream, "            </DataItem>\n" );
-      } else if ( nDims == 3 ) {
-         /** in 3d we simply feed back the 3d hdf5 array, nice and easy **/
-                              Journal_Printf( stream, "            <DataItem Format=\"HDF\" %s Dimensions=\"%u 3\">Mesh.%05d.h5:/vertices</DataItem>\n", variableType, totalVerts, context->timeStep );
-      } else {
-         Journal_DPrintf( errorStream, "\n\n Error: Mesh vertex location is not of dofCount 2 or 3.\n\n" );
-      }
-                              Journal_Printf( stream, "         </Geometry>\n\n" );
-      /**----------------------- FINISH GEOMETRY  ------------------------------------------------------------------------------------------------------------------- **/
-                
-                              
-   }
-
-   /** now write FeVariable data **/   
-	for ( var_I = 0; var_I < context->fieldVariable_Register->objects->count; var_I++ ) {
-		fieldVar = FieldVariable_Register_GetByIndex( context->fieldVariable_Register, var_I );
-
-		if ( Stg_Class_IsInstance( fieldVar, FeVariable_Type ) ) {
-			feVar = (FeVariable*)fieldVar;
-         if ( (feVar->isCheckpointedAndReloaded && context->isDataSave==False) || (feVar->isSavedData && context->isDataSave==True) ){ 
-                  Name   centering = NULL;
-                  Index  offset = 0;
-                  Index  meshSize = Mesh_GetGlobalSize( feVar->feMesh, 0 );
-                  Index  dofCountIndex;
-                  Index  dofAtEachNodeCount;
-
-            /**----------------------- START ATTRIBUTES ------------------------------------------------------------------------------------------------------------------- **/
-                  /** if coordinates are being stored with feVariable, account for this **/
-                  if( saveCoords) offset = nDims; 
-                  /** all feVariables are currently stored as doubles **/
-                  Stg_asprintf( &variableType, "NumberType=\"Float\" Precision=\"8\"" );
-                  /** determine whether feVariable data is cell centered (like Pressure), or on the nodes (like Velocity) **/
-                  if(        meshSize == elementGlobalSize ){
-                     Stg_asprintf( &centering, "Cell" );
-                  } else if( meshSize == totalVerts ) {
-                     Stg_asprintf( &centering, "Node" );
-                  } else {
-                     /* unknown/unsupported type */
-                     Stg_asprintf( &centering, "UNKNOWN_POSSIBLY_ERROR" );
-                  }
-                  /** how many degrees of freedom does the fevariable have? **/
-                  dofAtEachNodeCount = feVar->fieldComponentCount;
-                  if (        dofAtEachNodeCount == 1 ) {
-                              Journal_Printf( stream, "         <Attribute Type=\"Scalar\" Center=\"%s\" Name=\"%s\">\n", centering,  feVar->name);
-                              Journal_Printf( stream, "            <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" >\n", meshSize );
-                              Journal_Printf( stream, "               <DataItem Dimensions=\"3 2\" Format=\"XML\"> 0 %u 1 1 %u 1 </DataItem>\n", offset, meshSize );
-                              Journal_Printf( stream, "               <DataItem Format=\"HDF\" %s Dimensions=\"%u %u\">%s.%05d.h5:/data</DataItem>\n", variableType, meshSize, (offset + dofAtEachNodeCount), feVar->name, context->timeStep);
-                              Journal_Printf( stream, "            </DataItem>\n" );
-                              Journal_Printf( stream, "         </Attribute>\n\n" );
-                  } else if ( dofAtEachNodeCount == 2 ){
-                     /** note that for 2d, we feed back a quasi 3d array, with the 3rd Dof zeroed.  so in effect we always work in 3d.
-                         this is done because paraview in particular seems to do everything in 3d, and if you try and give it a 2d vector 
-                         or array, it complains.... and hence the verbosity of the following 2d definitions **/
-                              Journal_Printf( stream, "         <Attribute Type=\"Vector\" Center=\"%s\" Name=\"%s\">\n", centering,  feVar->name);
-                              Journal_Printf( stream, "            <DataItem ItemType=\"Function\"  Dimensions=\"%u 3\" Function=\"JOIN($0, $1, 0*$1)\">\n", meshSize );
-                              Journal_Printf( stream, "               <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" Name=\"XValue\">\n", meshSize );
-                              Journal_Printf( stream, "                  <DataItem Dimensions=\"3 2\" Format=\"XML\"> 0 %u 1 1 %u 1 </DataItem>\n", offset, meshSize );
-                              Journal_Printf( stream, "                  <DataItem Format=\"HDF\" %s Dimensions=\"%u %u\">%s.%05d.h5:/data</DataItem>\n", variableType, meshSize, (offset + dofAtEachNodeCount), feVar->name, context->timeStep);
-                              Journal_Printf( stream, "               </DataItem>\n" );
-                              Journal_Printf( stream, "               <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" Name=\"YValue\">\n", meshSize );
-                              Journal_Printf( stream, "                  <DataItem Dimensions=\"3 2\" Format=\"XML\"> 0 %u 1 1 %u 1 </DataItem>\n", (offset+1), meshSize );
-                              Journal_Printf( stream, "                  <DataItem Format=\"HDF\" %s Dimensions=\"%u %u\">%s.%05d.h5:/data</DataItem>\n", variableType, meshSize, (offset + dofAtEachNodeCount), feVar->name, context->timeStep);
-                              Journal_Printf( stream, "               </DataItem>\n" );
-                              Journal_Printf( stream, "            </DataItem>\n" );
-                              Journal_Printf( stream, "         </Attribute>\n\n" );
-                  } else if ( dofAtEachNodeCount == 3 ) {
-                     /** in 3d we simply feed back the 3d hdf5 array, nice and easy **/
-                              Journal_Printf( stream, "         <Attribute Type=\"Vector\" Center=\"%s\" Name=\"%s\">\n", centering,  feVar->name);
-                              Journal_Printf( stream, "            <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 3\" >\n", meshSize );
-                              Journal_Printf( stream, "               <DataItem Dimensions=\"3 2\" Format=\"XML\"> 0 %u 1 1 %u 3 </DataItem>\n", offset, meshSize );
-                              Journal_Printf( stream, "               <DataItem Format=\"HDF\" %s Dimensions=\"%u %u\">%s.%05d.h5:/data</DataItem>\n", variableType, meshSize, (offset + dofAtEachNodeCount), feVar->name, context->timeStep);
-                              Journal_Printf( stream, "            </DataItem>\n" );
-                              Journal_Printf( stream, "         </Attribute>\n\n" );
-                  } else {
-                     /** where there are more than 3 components, we write each one out as a scalar **/
-                     for(dofCountIndex = 0 ; dofCountIndex < dofAtEachNodeCount ; ++dofCountIndex){
-                              Journal_Printf( stream, "         <Attribute Type=\"Scalar\" Center=\"%s\" Name=\"%s-Component-%u\">\n", centering,  feVar->name, dofCountIndex);
-                              Journal_Printf( stream, "            <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" >\n", meshSize );
-                              Journal_Printf( stream, "               <DataItem Dimensions=\"3 2\" Format=\"XML\"> 0 %u 1 1 %u 1 </DataItem>\n", (offset+dofCountIndex), meshSize );
-                              Journal_Printf( stream, "               <DataItem Format=\"HDF\" %s Dimensions=\"%u %u\">%s.%05d.h5:/data</DataItem>\n", variableType, meshSize, (offset + dofAtEachNodeCount), feVar->name, context->timeStep);
-                              Journal_Printf( stream, "            </DataItem>\n" );
-                              Journal_Printf( stream, "         </Attribute>\n" );
-                     }
-                              Journal_Printf( stream, "\n" );
-                  }
-            /**----------------------- END ATTRIBUTES   ------------------------------------------------------------------------------------------------------------------- **/
-            if(centering) Memory_Free( centering );
-            }
+                                 Journal_Printf( stream, "   </Grid>\n\n" );
+      if(variableType) Memory_Free( variableType );
+      if(topologyType) Memory_Free( topologyType );
       }
    }
-                              Journal_Printf( stream, "   </Grid>\n\n" );
-if(variableType) Memory_Free( variableType );
-if(topologyType) Memory_Free( topologyType );
 }
 
 void _XDMFGenerator_WriteSwarmSchema( UnderworldContext* context, Stream* stream ) {
