@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 import os, os.path, sys,  datetime,  string,  math,  subprocess
 #Modules created for this project
 import convert,  util

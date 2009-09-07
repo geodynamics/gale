@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 import createHTMLDocuments, createDocument
 import sys, os.path, os, string, subprocess, shutil
 from createDocument import createDocuments
