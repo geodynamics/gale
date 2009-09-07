@@ -3,12 +3,12 @@
 ** Copyright (C), 2003, Victorian Partnership for Advanced Computing (VPAC) Ltd, 110 Victoria Street, Melbourne, 3053, Australia.
 **
 ** Authors:
-**	Stevan M. Quenette, Senior Software Engineer, VPAC. (steve@vpac.org)
-**	Patrick D. Sunter, Software Engineer, VPAC. (pds@vpac.org)
-**	Luke J. Hodkinson, Computational Engineer, VPAC. (lhodkins@vpac.org)
-**	Siew-Ching Tan, Software Engineer, VPAC. (siew@vpac.org)
-**	Alan H. Lo, Computational Engineer, VPAC. (alan@vpac.org)
-**	Raquibul Hassan, Computational Engineer, VPAC. (raq@vpac.org)
+**   Stevan M. Quenette, Senior Software Engineer, VPAC. (steve@vpac.org)
+**   Patrick D. Sunter, Software Engineer, VPAC. (pds@vpac.org)
+**   Luke J. Hodkinson, Computational Engineer, VPAC. (lhodkins@vpac.org)
+**   Siew-Ching Tan, Software Engineer, VPAC. (siew@vpac.org)
+**   Alan H. Lo, Computational Engineer, VPAC. (alan@vpac.org)
+**   Raquibul Hassan, Computational Engineer, VPAC. (raq@vpac.org)
 **
 **  This library is free software; you can redistribute it and/or
 **  modify it under the terms of the GNU Lesser General Public
@@ -25,43 +25,27 @@
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
 ** Role:
-**	Tests that particles can be successfully moved between cells. The problem is set up with a 
-**	"gravitational attractor" in the exact middle of the domain - all particles are sucked in
-**	towards it each timestep.
+**   Tests the ShadowSyncSuite
 **
-** Assumptions:
-**	None as yet.
-**
-** Comments:
-**	None as yet.
-**
-** $Id: testSwarmParticleAdvection.c 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: testSwarm.c 3462 2006-02-19 06:53:24Z WalterLandry $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#include <mpi.h>
-#include <StGermain/StGermain.h>
-
-#include <StgDomain/Geometry/Geometry.h>
-#include <StgDomain/Shape/Shape.h>
-#include <StgDomain/Mesh/Mesh.h>
-#include <StgDomain/Utils/Utils.h>
-#include <StgDomain/Swarm/Swarm.h>
-
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <assert.h>
-#include <unistd.h>
 
+#include "pcu/pcu.h"
+#include <StGermain/StGermain.h>
+#include "StgDomain/Geometry/Geometry.h"
+#include "StgDomain/Shape/Shape.h"
+#include "StgDomain/Mesh/Mesh.h"
+#include "StgDomain/Utils/Utils.h"
+#include "StgDomain/Swarm/Swarm.h"
 
-struct _Node {
-	Coord				coord;
-};
+#include "ShadowSyncSuite.h"
 
-struct _Element {
-	Coord				coord;
-};
+/* silly stgermain, I must define this */
+#define CURR_MODULE_NAME "DomainContext.c"
 
 struct _Particle {
 	__GlobalParticle
@@ -69,62 +53,55 @@ struct _Particle {
 	double  randomColour;
 };
 
-double Dt( void* context ) {
-	return 2.0;
+typedef struct {
+	MPI_Comm	comm;
+	unsigned	rank;
+	unsigned	nProcs;
+} ShadowSyncSuiteData;
+
+void ShadowSyncSuite_ValidateShadowing( DomainContext* context );
+
+double ShadowSyncSuite_Dt( void* context ) {
+   return 2.0;
 }
 
-void ValidateShadowing( void *dummy, void* context );
 
-/** Global so other funcs can use */
-Index procToWatch = 0;
+void ShadowSyncSuite_Setup( ShadowSyncSuiteData* data ) {
+	/* MPI Initializations */
+	data->comm = MPI_COMM_WORLD;  
+	MPI_Comm_rank( data->comm, &data->rank );
+	MPI_Comm_size( data->comm, &data->nProcs );
+}
 
-int main( int argc, char* argv[] ) {
-	DomainContext*          context;
-	MPI_Comm			CommWorld;
-	int				rank;
-	int				numProcessors;
-	Dictionary*			dictionary;
-	Dictionary*                     componentDict;
-	Stg_ComponentFactory*           cf;
-	XML_IO_Handler*                 ioHandler;
-	ExtensionManager_Register*      extensionMgr_Register;
-	SwarmVariable_Register*         swarmVariable_Register;
-	Stream*                         stream;
-	Swarm*                          swarm = NULL;
-	Particle                        particle;
-	Particle*                       currParticle = NULL;
-	Particle_Index                  lParticle_I = 0;
-	Dimension_Index                 dim_I = 0;
-	char*                           directory;
+void ShadowSyncSuite_Teardown( ShadowSyncSuiteData* data ) {
+}
+
+void ShadowSyncSuite_TestShadowSync( ShadowSyncSuiteData* data ) {
+	DomainContext*					context;
+	Dictionary*						dictionary;
+	Dictionary*						componentDict;
+	Stg_ComponentFactory*		cf;
+	XML_IO_Handler*				ioHandler;
+	ExtensionManager_Register*	extensionMgr_Register;
+	SwarmVariable_Register*		swarmVariable_Register;
+	Stream*							stream;
+	Swarm*							swarm = NULL;
+	Particle							particle;
+	Particle*						currParticle = NULL;
+	Particle_Index					lParticle_I = 0;
+	Dimension_Index				dim_I = 0;
+	char								input_file[PCU_PATH_MAX];
+	unsigned							procToWatch;
+
+	procToWatch = data->nProcs >=2 ? 1 : 0;
 	
-	/* Initialise MPI, get world info */
-	MPI_Init( &argc, &argv );
-	MPI_Comm_dup( MPI_COMM_WORLD, &CommWorld );
-	MPI_Comm_size( CommWorld, &numProcessors );
-	MPI_Comm_rank( CommWorld, &rank );
-	
-	StGermain_Init( &argc, &argv );
-	
-	StgDomainGeometry_Init( &argc, &argv );
-	StgDomainShape_Init( &argc, &argv );
-	StgDomainMesh_Init( &argc, &argv );
-	StgDomainUtils_Init( &argc, &argv );
-	StgDomainSwarm_Init( &argc, &argv );
-	MPI_Barrier( CommWorld ); /* Ensures copyright info always come first in output */
-
-	/* Add the StGermain path to the global xml path dictionary */
-	directory = Memory_Alloc_Array( char, 200, "xmlDirectory" ) ;
-	sprintf(directory, "%s%s", LIB_DIR, "/StGermain" );
-	XML_IO_Handler_AddDirectory( "StGermain", directory  );
-	Memory_Free(directory);
-	/* Add the plugin path to the global plugin list */
-	ModulesManager_AddDirectory( "StGermain", LIB_DIR );
-
-	stream = Journal_Register (Info_Type, "myStream");
-
+	stream = Journal_Register (Info_Type, "SingleAttractorStream");
 	dictionary = Dictionary_New();
 	ioHandler = XML_IO_Handler_New();
-	IO_Handler_ReadAllFromCommandLine( ioHandler, argc, argv, dictionary );
+
+	/* Read input xml file */
+	pcu_filename_input( "testSwarmParticleShadowSync.xml", input_file );
+	IO_Handler_ReadAllFromFile( ioHandler, input_file, dictionary );
 
 	/* TODO: temporary hack until Al gets the journal read from file going again */
 	if ( False == Dictionary_GetBool_WithDefault( dictionary, "particleCommInfo", True ) ) {
@@ -138,20 +115,9 @@ int main( int argc, char* argv[] ) {
 	Stream_EnableBranch( Swarm_Debug, True );
 	Stream_SetLevelBranch( Swarm_Debug, 3 );
 
-	if( argc >= 2 ) {
-		procToWatch = atoi( argv[1] );
-	}
-	else {
-		procToWatch = 0;
-	}
-	if( rank == procToWatch ) printf( "Watching rank: %i\n", rank );
 	Stream_SetPrintingRank( Journal_Register( InfoStream_Type, "Context" ), procToWatch);
-	/* For plugins to read */
 	Dictionary_Add( dictionary, "procToWatch", Dictionary_Entry_Value_FromUnsignedInt( procToWatch ) );
 	
-/* Construction phase -------------------------------------------------------------------------------------------*/
-	
-	/* Create the Context */
 	context = DomainContext_New(
 			"context",
 			0,
@@ -211,28 +177,17 @@ int main( int argc, char* argv[] ) {
 		currParticle->randomColour = ( (double)  rand() ) / RAND_MAX;
 	}
 	
-	if( rank == procToWatch ) {
-          /* Print( swarm, stream ); */
-	}	
-
 	Stg_Component_Build( context, 0 /* dummy */, False );
 	Stg_Component_Initialise( context, 0 /* dummy */, False );
 	
-	/* +++ RUN PHASE +++ */
 	AbstractContext_Dump( context );
+	ContextEP_ReplaceAll( context, AbstractContext_EP_Dt, ShadowSyncSuite_Dt );
+	ContextEP_Append( context, AbstractContext_EP_Sync, ShadowSyncSuite_ValidateShadowing );
 
-	ContextEP_ReplaceAll( context, AbstractContext_EP_Dt, Dt );
-
-	ContextEP_Append( context, AbstractContext_EP_Sync, ValidateShadowing );
 	Stg_Component_Execute( context, 0 /* dummy */, False );
 	Stg_Component_Destroy( context, 0 /* dummy */, False );
 
-	/* Delete stuff */
-	/* Deleting the component factory automatically deletes all components in it */
-	/* TODO: should the component factory be renamed a comp. manager? Since it deletes */
-	/* 	components as well? */
-
-	if( rank == procToWatch ) {
+	if( data->rank == procToWatch ) {
 		Journal_Printf( Journal_Register( Info_Type, "success" ), "Shadow particle validation: passed\n" );
 	}
 
@@ -243,43 +198,33 @@ int main( int argc, char* argv[] ) {
 	/* Input/Output stuff */
 	Stg_Class_Delete( dictionary );
 	Stg_Class_Delete( ioHandler );
-	
-	StgDomainSwarm_Finalise();
-	StgDomainUtils_Finalise();
-	StgDomainMesh_Finalise();
-	StgDomainShape_Finalise();
-	StgDomainGeometry_Finalise();
-	
-	StGermain_Finalise();
-	
-	/* Close off MPI */
-	MPI_Finalize();
-
-	return 0; /* success */
 }
 
-int listCompareFunction( void *a, void *b ){
-	if( a>b )
-		return 1;
-	else if( a<b )
-		return -1;
-	else
-		return 0;
+void ShadowSyncSuite( pcu_suite_t* suite ) {
+	pcu_suite_setData( suite, ShadowSyncSuiteData );
+	pcu_suite_setFixtures( suite, ShadowSyncSuite_Setup, ShadowSyncSuite_Teardown );
+	pcu_suite_addTest( suite, ShadowSyncSuite_TestShadowSync );
 }
 
-void listDeleteFunction( void *a ){
-
+int ShadowSyncSuite_listCompareFunction( void *a, void *b ){
+   if( a>b )
+      return 1;
+   else if( a<b )
+      return -1;
+   else
+      return 0;
 }
 
-void ValidateShadowing( void *dummy, void* context ) {
-	DomainContext *self = (DomainContext*)context;
-	Swarm*                          swarm = (Swarm*) LiveComponentRegister_Get( self->CF->LCRegister, "swarm" );
+void ShadowSyncSuite_listDeleteFunction( void *a ){
+}
+
+void ShadowSyncSuite_ValidateShadowing( DomainContext* context ) {
+	DomainContext	*self = context;
+	Swarm*			swarm = (Swarm*) LiveComponentRegister_Get( self->CF->LCRegister, "swarm" );
 
 	Swarm_UpdateAllParticleOwners( swarm );
 
-	return 0;
-	if(swarm->nProc > 1)
-	{
+	if(swarm->nProc > 1) {
 		int ii = 0, jj = 0;
 		ShadowInfo*			cellShadowInfo = CellLayout_GetShadowInfo( swarm->cellLayout );
 		ProcNbrInfo*		procNbrInfo = cellShadowInfo->procNbrInfo;
@@ -287,8 +232,8 @@ void ValidateShadowing( void *dummy, void* context ) {
 		{
 			MemoryPool *requestPool = MemoryPool_New( MPI_Request, 100, 10 );
 			MemoryPool *particlePool = MemoryPool_NewFunc( swarm->particleExtensionMgr->finalSize, 100, 10 );
-			LinkedList *list = LinkedList_New( listCompareFunction, NULL, NULL, listDeleteFunction, LINKEDLIST_UNSORTED );
-			LinkedList *particleList= LinkedList_New( listCompareFunction, NULL, NULL, listDeleteFunction, LINKEDLIST_UNSORTED );
+			LinkedList *list = LinkedList_New( ShadowSyncSuite_listCompareFunction, NULL, NULL, ShadowSyncSuite_listDeleteFunction, LINKEDLIST_UNSORTED );
+			LinkedList *particleList = LinkedList_New( ShadowSyncSuite_listCompareFunction, NULL, NULL, ShadowSyncSuite_listDeleteFunction, LINKEDLIST_UNSORTED );
 			LinkedListIterator *iter = LinkedListIterator_New( list );
 			void *data = NULL;
 
@@ -381,10 +326,10 @@ void ValidateShadowing( void *dummy, void* context ) {
 							}
 						}
 					}
-					Journal_Firewall( found, swarm->debug, "Shadow particle validation failed" );
+					pcu_check_true( found == 1 );
+					pcu_check_true( Journal_Firewall( found, swarm->debug, "Shadow particle validation failed" ) );
 				}
 			}
-			
 			Stg_Class_Delete( list );
 			Stg_Class_Delete( iter );
 			Stg_Class_Delete( requestPool );
@@ -393,4 +338,5 @@ void ValidateShadowing( void *dummy, void* context ) {
 		}
 	}
 }
+
 

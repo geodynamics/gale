@@ -1,6 +1,3 @@
-StGermain Framework revision 4125. Copyright (C) 2003-2005 VPAC.
-Run until 5 timeSteps have been run
-TimeStep = 1, Start time = 0 + 2 prev timeStep dt
 Calculated attractor point is at (0.333333,0.333333,0.333333):
 Timestep 1 - Implosive mode
 	Updating Particles positions in local cell 0:
@@ -435,7 +432,6 @@ Timestep 1 - Implosive mode
 	Updating Particles positions in local cell 143:
 		Updating particleInCell 0:
 		Changing its coords from (0.975714,0.989690,0.582861) to (0.761587,0.770904,0.499685):
-TimeStep = 2, Start time = 2 + 2 prev timeStep dt
 Calculated attractor point is at (0.333333,0.333333,0.333333):
 Timestep 2 - Implosive mode
 	Updating Particles positions in local cell 0:
@@ -870,7 +866,6 @@ Timestep 2 - Implosive mode
 	Updating Particles positions in local cell 141:
 	Updating Particles positions in local cell 142:
 	Updating Particles positions in local cell 143:
-TimeStep = 3, Start time = 4 + 2 prev timeStep dt
 Calculated attractor point is at (0.333333,0.333333,0.333333):
 Timestep 3 - Implosive mode
 	Updating Particles positions in local cell 0:
@@ -1305,7 +1300,6 @@ Timestep 3 - Implosive mode
 	Updating Particles positions in local cell 141:
 	Updating Particles positions in local cell 142:
 	Updating Particles positions in local cell 143:
-TimeStep = 4, Start time = 6 + 2 prev timeStep dt
 Calculated attractor point is at (0.333333,0.333333,0.333333):
 Timestep 4 - Implosive mode
 	Updating Particles positions in local cell 0:
@@ -1740,7 +1734,6 @@ Timestep 4 - Implosive mode
 	Updating Particles positions in local cell 141:
 	Updating Particles positions in local cell 142:
 	Updating Particles positions in local cell 143:
-TimeStep = 5, Start time = 8 + 2 prev timeStep dt
 Calculated attractor point is at (0.333333,0.333333,0.333333):
 Timestep 5 - Implosive mode
 	Updating Particles positions in local cell 0:
