@@ -71,6 +71,14 @@ Bool StgFEM_Discretisation_Init( int* argc, char** argv[] ) {
 	StgFEM_Debug = Journal_Register( DebugStream_Type, "StgFEM" );
 	StgFEM_Discretisation_Debug = Stream_RegisterChild( StgFEM_Debug, "Discretisation" );
 	StgFEM_Warning = Journal_Register( ErrorStream_Type, "StgFEM" );
+
+	elementType_Register = ElementType_Register_New( "elementType_Register" );
+	ElementType_Register_Add( elementType_Register, (ElementType*)ConstantElementType_New( "constantElementType" ) );
+	ElementType_Register_Add( elementType_Register, (ElementType*)BilinearElementType_New( "bilinearElementType" ) );
+	ElementType_Register_Add( elementType_Register, (ElementType*)TrilinearElementType_New( "trilinearElementType" ) );
+	ElementType_Register_Add( elementType_Register, (ElementType*)LinearTriangleElementType_New( "linearElementType" ) );
+	ElementType_Register_Add( elementType_Register, (ElementType*)Biquadratic_New( "biquadraticElementType" ) );
+	ElementType_Register_Add( elementType_Register, (ElementType*)Triquadratic_New( "triquadraticElementType" ) );
 	
 	Stg_ComponentRegister_Add( componentRegister, FeVariable_Type,         "0", FeVariable_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, LinkedDofInfo_Type,      "0", LinkedDofInfo_DefaultNew );
@@ -93,7 +101,6 @@ Bool StgFEM_Discretisation_Init( int* argc, char** argv[] ) {
 	RegisterParent( BilinearElementType_Type,          ElementType_Type );
 	RegisterParent( TrilinearElementType_Type,         ElementType_Type );
 	RegisterParent( Biquadratic_Type, 		Biquadratic_Type );
-	/* i'm assuming this is ok - doesn't seem to complain without it though - dave, 29.05.07 */
 	RegisterParent( Triquadratic_Type,		Triquadratic_Type );
 	RegisterParent( P1_Type, 			P1_Type );
 	RegisterParent( RegularTrilinear_Type,			TrilinearElementType_Type );

@@ -182,36 +182,13 @@ void _FiniteElementContext_Init( FiniteElementContext* self ) {
 	/* Set up stream preferences */
 	Journal_Enable_NamedStream( InfoStream_Type, "StgFEM_VerboseConfig", False );
 
-
-		
-
 	/* register this current stream (the context) as a child of the FE stream */
 	/* TODO: Want to be able to recombine this with the Abs context's debug stream at some stage */
 	self->isConstructed = True;
 	self->debug = Stream_RegisterChild( StgFEM_Debug, FiniteElementContext_Type );
 	
-	self->dt = 0.0f;
-	self->prevTimestepDt = 0.0;
-	self->limitTimeStepIncreaseRate = Dictionary_GetBool_WithDefault( self->dictionary, "limitTimeStepIncreaseRate", False );
-	self->maxTimeStepIncreasePercentage = Dictionary_GetDouble_WithDefault( self->dictionary,
-		"maxTimeStepIncreasePercentage", 10.0 );
-	Journal_Firewall( self->maxTimeStepIncreasePercentage >= 0, errorStream,
-		"Error - in %s(): maxTimeStepIncreasePercentage must be >= 0\n", __func__ );
-
-        self->maxTimeStepSize = Dictionary_GetDouble_WithDefault(
-           self->dictionary, "maxTimeStepSize", 0.0 );
-                                                                  
-	
 	/* set up s.l.e list */
 	self->slEquations = Stg_ObjectList_New();
-
-	/* Set up the element type register and add basic types */
-	self->elementType_Register = ElementType_Register_New(defaultFiniteElementContextETypeRegisterName);
-	ElementType_Register_Add( self->elementType_Register, (ElementType*)ConstantElementType_New("constantElementType") );
-	ElementType_Register_Add( self->elementType_Register, (ElementType*)BilinearElementType_New("bilinearElementType") );
-	ElementType_Register_Add( self->elementType_Register, (ElementType*)TrilinearElementType_New("trilinearElementType") );
-	ElementType_Register_Add( self->elementType_Register, (ElementType*)LinearTriangleElementType_New("linearElementType") );
-	Stg_ObjectList_ClassAppend( self->register_Register, (void*)self->elementType_Register, "ElementType_Register" );
 
 	/* Create Entry Point for Calculating timestep */
 	self->calcDtEP = EntryPoint_New( FiniteElementContext_EP_CalcDt, EntryPoint_Minimum_VoidPtr_CastType );
@@ -277,7 +254,6 @@ void _FiniteElementContext_Init( FiniteElementContext* self ) {
 		FiniteElementContext_Type );
 }
 
-
 /* Virtual Functions -------------------------------------------------------------------------------------------------------------*/
 
 void _FiniteElementContext_Delete( void* context ) {
@@ -287,7 +263,6 @@ void _FiniteElementContext_Delete( void* context ) {
 
 	Stream_IndentBranch( StgFEM_Debug );
 	Journal_DPrintfL( self->debug, 2, "Deleting the element type register (and hence all element types).\n" );
-	Stg_Class_Delete( self->elementType_Register );
 	Journal_DPrintfL( self->debug, 2, "Deleting all SLEs and the SLE list.\n" );
 	Stg_ObjectList_DeleteAllObjects( self->slEquations ); 
 	Stg_Class_Delete( self->slEquations ); 
@@ -309,9 +284,6 @@ void _FiniteElementContext_Print( void* context, Stream* stream ) {
 
 	Journal_Printf( (void*) stream, "\tslEquations (ptr): %p\n", self->slEquations );
 	Stg_Class_Print( self->slEquations, stream );
-
-	Journal_Printf( (void*) stream, "\telementType_Register (ptr): %p\n", self->elementType_Register );
-	Stg_Class_Print( self->elementType_Register, stream );
 }
 
 
@@ -342,26 +314,24 @@ SystemLinearEquations* FiniteElementContext_GetSLE_Func( void* context, Name sle
 
 void _FiniteElementContext_Construct( void* context, Stg_ComponentFactory* cf, void* data ){
 	FiniteElementContext *self = (FiniteElementContext*) context;
-	int componentIndex = 0;
+	Stream*  errorStream = Journal_Register( Error_Type, self->type );
+
+	_DomainContext_Construct( context, cf, data );
+	_FiniteElementContext_Init( self );
 
 	self->dictionary = cf->rootDict;
 
-/* I don't think this is needed any more...
-	_AbstractContext_Init( (AbstractContext*)self, 0, 0, MPI_COMM_WORLD );
-	_DomainContext_Init( (DomainContext*)self );*/
-	_FiniteElementContext_Init( self );
-	
-	componentIndex = Stg_ObjectList_GetIndex( cf->LCRegister->componentList, self->name );
-	
-	Journal_Firewall( 
-		!componentIndex, 
-		Journal_Register( Error_Type, self->type ), 
-		"Context should be the first component in the 'components' list..!" );
+	self->dt = 0.0f;
+	self->prevTimestepDt = 0.0;
+	self->limitTimeStepIncreaseRate = Dictionary_GetBool_WithDefault( self->dictionary, "limitTimeStepIncreaseRate", False );
+	self->maxTimeStepIncreasePercentage = Dictionary_GetDouble_WithDefault( self->dictionary,
+		"maxTimeStepIncreasePercentage", 10.0 );
+	Journal_Firewall( self->maxTimeStepIncreasePercentage >= 0, errorStream,
+		"Error - in %s(): maxTimeStepIncreasePercentage must be >= 0\n", __func__ );
 
-	self->CF = cf;
-	self->CF->registerRegister = self->register_Register;
+        self->maxTimeStepSize = Dictionary_GetDouble_WithDefault(
+           self->dictionary, "maxTimeStepSize", 0.0 );
 }
-
 
 void _FiniteElementContext_Build( void* context ) {
 	FiniteElementContext* self = (FiniteElementContext*)context;

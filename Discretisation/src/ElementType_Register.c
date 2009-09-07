@@ -55,6 +55,7 @@
 /* Textual name of this class */
 const Type ElementType_Register_Type = "ElementType_Register";
 
+ElementType_Register* elementType_Register = 0;
 
 void* ElementType_Register_DefaultNew( Name name ) {
 	return (void*) _ElementType_Register_New( 
@@ -214,7 +215,11 @@ void _ElementType_Register_Print( void* elementType_Register, Stream* stream ) {
 }
 
 void _ElementType_Register_Construct( void* elementType_Register, Stg_ComponentFactory *cf, void* data ){
+	ElementType_Register*	self = (ElementType_Register*)elementType_Register;
 	
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
+	if( !self->context ) 
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
 }
 	
 void _ElementType_Register_Build( void* elementType_Register, void *data ){

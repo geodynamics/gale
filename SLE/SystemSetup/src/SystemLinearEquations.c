@@ -441,10 +441,12 @@ void _SystemLinearEquations_Construct( void* sle, Stg_ComponentFactory* cf, void
 	self->xtol           = Stg_ComponentFactory_GetDouble( cf, self->name, "picard_xtol", 1.0e-8 );
 	self->picard_monitor = Stg_ComponentFactory_GetBool(   cf, self->name, "picard_ActivateMonitor", False );
 	
-	entryPointRegister = Stg_ObjectList_Get( cf->registerRegister, "EntryPoint_Register" );
-	assert( entryPointRegister );
-
 	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, False, data );
+	if( !context )
+		context = Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data );
+
+	entryPointRegister = context->entryPoint_Register;
+	assert( entryPointRegister );
 
 	if( isNonLinear ) {
 		SNESCreate( context->communicator, &nlSolver );

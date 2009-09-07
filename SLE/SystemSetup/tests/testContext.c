@@ -123,7 +123,6 @@ int main( int argc, char* argv[] )
 	if ( componentDict == NULL ) {
 		componentDict = Dictionary_New();
 	}
-	context->CF = Stg_ComponentFactory_New( dictionary, componentDict, context->register_Register );
 	
 	/* This is where we'd normally construct components if it was real main.
 		instead, we'll just set the dt function so we can test it */

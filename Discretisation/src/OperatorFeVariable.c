@@ -409,13 +409,15 @@ void _OperatorFeVariable_Construct( void* feVariable, Stg_ComponentFactory* cf, 
 	Dictionary_Entry_Value* list;
 	Index                   feVariableCount = 0;
 	Index                   feVariable_I;
-	FieldVariable_Register* fV_Register     = Stg_ObjectList_Get( cf->registerRegister, "FieldVariable_Register" );
+	FieldVariable_Register* fV_Register;     
 	Name                    feVariableName;
 	Name                    operatorName;
 	FeVariable**            feVariableList;
 	
 	/* Construct Parent */
 	_FieldVariable_Construct( self, cf, data );
+
+	fV_Register = self->context->fieldVariable_Register;
 
 	operatorName = Stg_ComponentFactory_GetString( cf, self->name, "Operator", "" );
 
@@ -494,13 +496,12 @@ void _OperatorFeVariable_Build( void* feVariable, void* data ) {
 
 void _OperatorFeVariable_Initialise( void* feVariable, void* data ) {
 	OperatorFeVariable*     self = (OperatorFeVariable*) feVariable;
-   DomainContext*          context = (DomainContext*)data;
+	DomainContext*          context = self->context;
 	Index                   feVariable_I;
-   Dictionary_Entry_Value* feVarsList = NULL;
+	Dictionary_Entry_Value* feVarsList = NULL;
 
 	for ( feVariable_I = 0 ; feVariable_I < self->feVariableCount ; feVariable_I++ ) 
 		Stg_Component_Initialise( self->feVariableList[ feVariable_I ] , data, False );
-
 
    /* also include check to see if this fevariable should be checkpointed, just incase it didn't go through the fieldvariable construct phase */ 
    feVarsList = Dictionary_Get( context->dictionary, "fieldVariablesToCheckpoint" );

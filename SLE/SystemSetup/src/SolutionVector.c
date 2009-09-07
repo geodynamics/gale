@@ -47,6 +47,7 @@
 #include "units.h"
 #include "types.h"
 #include "shortcuts.h"
+#include "Context.h"
 #include "SolutionVector.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -264,7 +265,11 @@ void _SolutionVector_Construct( void* solutionVector, Stg_ComponentFactory* cf, 
 {
 	SolutionVector*    self = (SolutionVector*)solutionVector;
 	FeVariable*        feVariable = NULL;
-	
+
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, False, data );
+	if( !self->context )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data );
+
 	feVariable = Stg_ComponentFactory_ConstructByKey( cf, self->name, "FeVariable", FeVariable, True, data ) ;
 	_SolutionVector_Init( self, MPI_COMM_WORLD, (FeVariable*)feVariable );
 }

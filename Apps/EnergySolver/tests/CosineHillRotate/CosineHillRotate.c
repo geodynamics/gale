@@ -103,7 +103,7 @@ void _CosineHillRotate_Construct( void* analyticSolution, Stg_ComponentFactory* 
 	/* Create Condition Functions */
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
 	condFunc = ConditionFunction_New( CosineHillRotate_TemperatureBC, "Temperature_CosineHill" );
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 }
 
 void _CosineHillRotate_Build( void* analyticSolution, void* data ) {

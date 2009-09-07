@@ -47,6 +47,7 @@
 #include "units.h"
 #include "types.h"
 #include "shortcuts.h"
+#include "Context.h"
 #include "ForceTerm.h"
 #include "SolutionVector.h"
 #include "ForceVector.h"
@@ -217,6 +218,9 @@ void _ForceTerm_Construct( void* forceTerm, Stg_ComponentFactory* cf, void* data
 	Stg_Component*  extraInfo;
 	ForceVector*    forceVector;
 
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, False, data );
+	if( !self->context )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data );
 
 	forceVector =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "ForceVector", ForceVector,   True,  data ) ;
 	swarm       =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm",       Swarm,         True,  data ) ;

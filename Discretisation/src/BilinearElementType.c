@@ -195,9 +195,7 @@ void _BilinearElementType_Print( void* elementType, Stream* stream ) {
 	Journal_Printf( stream, ")\n", self );
 }
 
-void _BilinearElementType_Construct( void* elementType, Stg_ComponentFactory *cf, void* data ){
-	
-}
+void _BilinearElementType_Construct( void* elementType, Stg_ComponentFactory *cf, void* data ) { }
 	
 void _BilinearElementType_Initialise( void* elementType, void *data ){
 	BilinearElementType*	self	= (BilinearElementType*) elementType;

@@ -69,6 +69,7 @@
 	/** SLE_Solver class contents */
 	#define __SLE_Solver \
 		__Stg_Component \
+		FiniteElementContext*		   context;          \
 		ExtensionManager*                  extensionManager; \
 		\
 		/* Virtual info */ \

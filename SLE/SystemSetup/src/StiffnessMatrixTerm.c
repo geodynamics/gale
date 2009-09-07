@@ -47,6 +47,7 @@
 #include "units.h"
 #include "types.h"
 #include "shortcuts.h"
+#include "Context.h"
 #include "StiffnessMatrixTerm.h"
 #include "SolutionVector.h"
 #include "StiffnessMatrix.h"
@@ -221,6 +222,10 @@ void _StiffnessMatrixTerm_Construct( void* stiffnessMatrixTerm, Stg_ComponentFac
 	Swarm*                     swarm              = NULL;
 	Stg_Component*             extraInfo;
 	StiffnessMatrix*           stiffnessMatrix;
+
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, False, data );
+	if( !self->context )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data );
 
 	stiffnessMatrix = Stg_ComponentFactory_ConstructByKey( cf, self->name, "StiffnessMatrix", StiffnessMatrix, True,  data ) ;
 	swarm           = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm",           Swarm,           True,  data ) ;

@@ -307,7 +307,11 @@ void _FeEquationNumber_Init(
 }
 
 void _FeEquationNumber_Construct( void* feEquationNumber, Stg_ComponentFactory *cf, void* data ){
+	FeEquationNumber* self = (FeEquationNumber*) feEquationNumber;
 	
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
+	if( !self->context ) 
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
 }
 	
 void _FeEquationNumber_Execute( void* feEquationNumber, void *data ){

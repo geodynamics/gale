@@ -156,8 +156,7 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 	Dictionary*			pluginDict  		=  Dictionary_Entry_Value_AsDictionary( dictEntryVal );
 	Dictionary_Entry_Value*		fieldList;
 	Dictionary_Entry_Value*		swarmVarList		= Dictionary_Get( dict, "NumericSwarmVariableNames" );
-	FieldVariable_Register* 	fV_Register     	= Stg_ObjectList_Get( cf->registerRegister, "FieldVariable_Register" );
-	FieldVariable_Register* 	sW_Register     	= Stg_ObjectList_Get( cf->registerRegister, "SwarmVariable_Register" );
+	FieldVariable_Register* 	fV_Register;
 	Index				feVariable_I, referenceFieldCount;
 	Index				swarmVar_I;
 	Name        fieldName;
@@ -165,11 +164,15 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 	Hook*				physicsTestHook;
 	Stream*     errStream = Journal_Register( Error_Type, "FieldTests" );
 
-	Journal_Firewall( pluginDict != NULL , errStream,
-			"\nError in %s: No pluginData xml was defined ... aborting\n", __func__ );
+	Journal_Firewall( pluginDict != NULL , errStream, "\nError in %s: No pluginData xml was defined ... aborting\n", __func__ );
+
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
+	if( !self->context ) 
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
+
+	fV_Register = self->context->fieldVariable_Register;
 
 	fieldList = Dictionary_Get( pluginDict, "NumericFields" );
-	//self->fieldCount = fieldList ? Dictionary_Entry_Value_GetCount( fieldList ) : 0;
 	self->fieldCount = fieldList ? Dictionary_Entry_Value_GetCount( fieldList ) / 2 : 0;
 
 	if( self->fieldCount ) {
@@ -242,7 +245,6 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 	self->testTimestep          = Dictionary_GetInt_WithDefault( pluginDict, "testTimestep", 0 );
 	self->referenceSolnFromFile = Dictionary_Entry_Value_AsBool( Dictionary_Get( pluginDict, "useReferenceSolutionFromFile" ) );
 	self->appendToAnalysisFile  = Dictionary_GetBool_WithDefault( pluginDict, "appendToAnalysisFile", False ) ;
-	self->context               = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
 
 	/* for the physics test */
 	self->expectedFileName = Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "expectedFileName" ) );

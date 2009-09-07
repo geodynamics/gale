@@ -46,6 +46,7 @@
 #include "units.h"
 #include "types.h"
 #include "shortcuts.h"
+#include "Context.h"
 #include "SLE_Solver.h"
 
 #include <assert.h>
@@ -178,6 +179,10 @@ void _SLE_Solver_Construct( void* sleSolver, Stg_ComponentFactory* cf, void* dat
 	SLE_Solver*		self = (SLE_Solver*)sleSolver;
 	Bool            useStatSolve;
 	int             nStatReps;
+
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, False, data );
+	if( !self->context )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data );
 
 	useStatSolve = Stg_ComponentFactory_GetBool( cf, self->name, "statSolve", False );
 	nStatReps = Stg_ComponentFactory_GetInt( cf, self->name, "statReps", 0 );

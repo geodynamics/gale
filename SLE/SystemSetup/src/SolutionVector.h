@@ -59,13 +59,14 @@
 		/* General info */ \
 		__Stg_Component \
 		\
+		FiniteElementContext*			context; \
 		/* Virtual info */ \
 		\
 		/* StiffnessMatrix info */ \
-		Stream*						debug; \
-		Vec    						vector; \
-		MPI_Comm					comm; \
-		FeVariable*					feVariable; /** need to get # of global unconstrained dofs */\
+		Stream*					debug; \
+		Vec    					vector; \
+		MPI_Comm				comm; \
+		FeVariable*				feVariable; /** need to get # of global unconstrained dofs */\
 
 	struct SolutionVector { __SolutionVector };
 	

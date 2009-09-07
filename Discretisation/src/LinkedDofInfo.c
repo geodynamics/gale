@@ -195,6 +195,10 @@ void _LinkedDofInfo_Construct( void* linkedDofInfo, Stg_ComponentFactory *cf, vo
 
 	dictionary = Dictionary_GetDictionary( cf->componentDict, self->name );
 	
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
+	if( !self->context ) 
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
+
 	mesh      = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Mesh",         Mesh,      True, data );
 	dofLayout = Stg_ComponentFactory_ConstructByKey( cf, self->name, DofLayout_Type, DofLayout, True, data );
 

@@ -46,6 +46,7 @@
 #include "units.h"
 #include "types.h"
 #include "shortcuts.h"
+#include "Context.h"
 #include "SolutionVector.h"
 #include "ForceVector.h"
 #include "ForceTerm.h"
@@ -296,7 +297,7 @@ void _ForceVector_Construct( void* forceVector, Stg_ComponentFactory* cf, void* 
 	
 	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
 
-	entryPointRegister = Stg_ObjectList_Get( cf->registerRegister, "EntryPoint_Register" );
+	entryPointRegister = (void*)self->context->entryPoint_Register;
 	assert( entryPointRegister );
 	
 	_ForceVector_Init( self, dim, entryPointRegister );
@@ -318,9 +319,6 @@ void _ForceVector_Build( void* forceVector, void* data ) {
 	
 	/* Allocate the vector */
 	Journal_DPrintfL( self->debug, 2, "Allocating the L.A. Force Vector with %d local entries.\n", self->localSize );
-//	self->vector = (Vector*)PETScVector_New( "" );
-	//Vector_SetComm( self->vector, self->comm );
-	//Vector_SetLocalSize( self->vector, self->localSize );
 	VecCreate( self->comm, &self->vector );
 	VecSetSizes( self->vector, (PetscInt)self->localSize, PETSC_DECIDE );
 	VecSetFromOptions( self->vector );

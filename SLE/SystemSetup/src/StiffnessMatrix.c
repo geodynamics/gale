@@ -52,6 +52,7 @@
 #include "units.h"
 #include "types.h"
 #include "shortcuts.h"
+#include "Context.h"
 #include "StiffnessMatrix.h"
 #include "StiffnessMatrixTerm.h"
 #include "SystemLinearEquations.h"
@@ -254,8 +255,6 @@ void _StiffnessMatrix_Init(
 	EntryPoint_Register_Add( self->entryPoint_Register, self->assembleStiffnessMatrix );
 
 	self->stiffnessMatrixTermList = Stg_ObjectList_New();
-	/* dave - 02.02.09 */
-	self->operatorFunctionList = Stg_ObjectList_New();
 
 	/* Set default function for Global Stiffness Matrix Assembly */
 	EP_ReplaceAll( self->assembleStiffnessMatrix, __StiffnessMatrix_NewAssemble );
@@ -290,8 +289,6 @@ void _StiffnessMatrix_Delete( void* stiffnessMatrix ) {
 	
 	Journal_DPrintf( self->debug, "In %s - for matrix %s\n", __func__, self->name );
 	FreeObject( self->stiffnessMatrixTermList );
-	/* dave - 02.02.09 */
-	FreeObject( self->operatorFunctionList );
 	FreeArray( self->_assembleStiffnessMatrixEPName );
 	FreeArray( self->diagonalNonZeroIndices );
 	FreeArray( self->offDiagonalNonZeroIndices );
@@ -446,12 +443,16 @@ void _StiffnessMatrix_Construct( void* stiffnessMatrix, Stg_ComponentFactory* cf
 	Bool             isNonLinear;
 	Bool             allowZeroElementContributions;
 	
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, False, data );
+	if( !self->context )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data );
+
 	rowVar             = Stg_ComponentFactory_ConstructByKey( cf, self->name, "RowVariable",        FeVariable,    True, data );
 	colVar             = Stg_ComponentFactory_ConstructByKey( cf, self->name, "ColumnVariable",     FeVariable,    True, data );
 	fVector            = Stg_ComponentFactory_ConstructByKey( cf, self->name, "RHS",                ForceVector,   False, data );
 	applicationDepInfo = Stg_ComponentFactory_ConstructByKey( cf, self->name, "ApplicationDepInfo", Stg_Component, False, data);
 	
-	entryPointRegister = Stg_ObjectList_Get( cf->registerRegister, "EntryPoint_Register" );
+	entryPointRegister = self->context->entryPoint_Register; 
 	assert( entryPointRegister );
 	
 	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );

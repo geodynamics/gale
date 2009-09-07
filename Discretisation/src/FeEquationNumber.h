@@ -93,6 +93,7 @@
 		/* General info */ \
 		__Stg_Component \
 		\
+		DomainContext*				context; \
 		/* FeEquationNumber info */ \
 		Stream*					debug; \
 		/** Stream for debugging LM. (usually only need I.D.) */ \

@@ -70,7 +70,7 @@
 		double*                toleranceList;              \
 		Swarm*                 integrationSwarm;           \
 		LiveComponentRegister* LC_Register;                \
-		AbstractContext*       context;                    \
+		DomainContext*         context;                    \
 		AnalyticSolution_SolutionFunction* _getAnalyticVelocity; \
 		AnalyticSolution_SolutionFunction* _getAnalyticPressure; \
 		AnalyticSolution_SolutionFunction* _getAnalyticTotalStress; \

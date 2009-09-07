@@ -73,6 +73,7 @@
 		/* General info */ \
 		__Stg_Component \
 		\
+		FiniteElementContext*				context;			\
 		/* Virtual info */ \
 		StiffnessMatrix_CalculateNonZeroEntriesFunction* _calculateNonZeroEntries; \
 		\
@@ -89,8 +90,6 @@
 		Bool                                              allowZeroElementContributions;  \
 		EntryPoint_Register*                              entryPoint_Register;            \
 		Stg_ObjectList*                                   stiffnessMatrixTermList;        \
-		/* dave - 02.002.09 */ \
-		Stg_ObjectList*					  operatorFunctionList;		  \
 		FeEntryPoint*                                     assembleStiffnessMatrix;        \
 		Name                                              _assembleStiffnessMatrixEPName; \
 		MPI_Comm                                          comm;                           \

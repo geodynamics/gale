@@ -45,6 +45,7 @@
 #include "units.h"
 #include "types.h"
 #include "shortcuts.h"
+#include "ElementType_Register.h"
 #include "Finalise.h"
 
 #include "FeVariable.h"
@@ -55,6 +56,8 @@ Bool StgFEM_Discretisation_Finalise( void ) {
 	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 	
 	Stream_IndentBranch( StgFEM_Debug );
+
+	Stg_Class_Delete( elementType_Register );	
 
 	PetscFinalize();
 	

@@ -180,7 +180,10 @@ void _AnalyticSolution_Construct( void* analyticSolution, Stg_ComponentFactory* 
 	Swarm*            integrationSwarm;
 	Bool              verboseMode;
 
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
+	if( !self->context )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
+
 	integrationSwarm = Stg_ComponentFactory_ConstructByName( cf, "gaussSwarm", Swarm, True, data ); 
 	verboseMode = Stg_ComponentFactory_GetRootDictBool( cf, "analyticSolutionVerbose", False );
 

@@ -337,9 +337,9 @@ void _AdvectionDiffusionSLE_Construct( void* sle, Stg_ComponentFactory* cf, void
 	_SystemLinearEquations_Construct( self, cf, data );
 
 	/* Get Registers */
-	variable_Register = Stg_ObjectList_Get( cf->registerRegister, "Variable_Register" );
+	variable_Register = self->context->variable_Register; 
 	assert( variable_Register );
-	fieldVariable_Register = Stg_ObjectList_Get( cf->registerRegister, "FieldVariable_Register" );
+	fieldVariable_Register = self->context->fieldVariable_Register; 
 	assert( fieldVariable_Register );
 
 	/* Get Dependency Stg_Components */

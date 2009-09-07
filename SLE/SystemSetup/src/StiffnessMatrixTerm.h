@@ -67,6 +67,7 @@
 		/* General info */ \
 		__Stg_Component \
 		\
+		FiniteElementContext*				     context;                  \
 		/* Virtual info */ \
 		StiffnessMatrixTerm_AssembleElementFunction*         _assembleElement;         \
 		\

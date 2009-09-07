@@ -65,6 +65,7 @@
 		/* General info */ \
 		__Stg_Component \
 		\
+		FiniteElementContext*			  context;		  \
 		/* Virtual info */ \
 		ForceTerm_AssembleElementFunction*         _assembleElement;         \
 		\

@@ -57,19 +57,20 @@
 	#define __LinkedDofInfo \
 		__Stg_Component \
 		\
-		Dictionary*	dictionary; \
+		DomainContext*		context; \
+		Dictionary*		dictionary; \
 		/** A mesh that this indo is based around */ \
-		Mesh*		mesh; \
+		Mesh*			mesh; \
 		/** A DofLayout that this info is based around */ \
-		DofLayout*	dofLayout; \
+		DofLayout*		dofLayout; \
 		/** an array of ints, specifying for each local dof whether it is linked, and if so where to */ \
-		int**		linkedDofTbl; \
+		int**			linkedDofTbl; \
 		/** count of how many linked dof sets are active */ \
-		Index		linkedDofSetsCount; \
-		Index		linkedDofSetsSize; \
-		Index		linkedDofSetsDelta; \
+		Index			linkedDofSetsCount; \
+		Index			linkedDofSetsSize; \
+		Index			linkedDofSetsDelta; \
 		/** For each linked dof set, records the eq num they all map to */ \
-		int*		eqNumsOfLinkedDofs; \
+		int*			eqNumsOfLinkedDofs; \
 
 	struct LinkedDofInfo { __LinkedDofInfo };
 

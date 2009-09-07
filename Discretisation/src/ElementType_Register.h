@@ -54,12 +54,16 @@
 	
 	/* Textual name of this class */
 	extern const Type ElementType_Register_Type;
+
+	/* global default instantiation of this register (created in Init.c) */
+	extern ElementType_Register* elementType_Register;
 	
 	/* ElementType_Register info */
 	#define __ElementType_Register \
 		/* General info */ \
 		__Stg_Component \
 		\
+		DomainContext*			        context; \
 		/* Virtual info */ \
 		\
 		/* ElementType_Register info */ \

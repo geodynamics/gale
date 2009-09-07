@@ -110,7 +110,7 @@ Index StgFEM_FeVariableList_Register( PluginsManager* pluginsManager ) {
 }
 
 void StgFEM_FeVariableList_PrintVariables( void* _context ){
-        AbstractContext*        context         = (AbstractContext*) _context;
+        DomainContext*          context         = (DomainContext*) _context;
         Stream*                 stream;
         FieldVariable_Register* fV_Register;
         Index                   variablecount;
@@ -124,7 +124,7 @@ void StgFEM_FeVariableList_PrintVariables( void* _context ){
         stream                          = self->stream;
 
         /* Get FeVariable Register*/
-        fV_Register                     = Stg_ObjectList_Get( context->CF->registerRegister, "FieldVariable_Register" );
+        fV_Register                     = context->fieldVariable_Register; 
         variablecount                   = (Index) fV_Register->objects->count;
         
         /* Print header material */

@@ -67,7 +67,6 @@
 		\
 		/* FiniteElementContext info */ \
 		SystemLinearEquationList*           slEquations;             \
-		ElementType_Register*               elementType_Register;    \
 		double                              prevTimestepDt;          \
 		Bool                                limitTimeStepIncreaseRate; \
 		double                              maxTimeStepIncreasePercentage; \
