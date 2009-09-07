@@ -160,7 +160,7 @@ void _DensityField_Construct( void* densityField, Stg_ComponentFactory* cf, void
 	/*_FieldVariable_Construct( self, cf, data );*/
 
 	buoyancyForceTerm = Stg_ComponentFactory_ConstructByKey( cf, self->name, "BuoyancyForceTerm", BuoyancyForceTerm, True, data );
-	variable_Register      = (Variable_Register*) Stg_ObjectList_Get( cf->registerRegister, "Variable_Register" );
+	variable_Register      = self->context->variable_Register; 
 	assert( variable_Register );
 
 	_DensityField_Init( self, buoyancyForceTerm, variable_Register );

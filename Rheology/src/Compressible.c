@@ -140,15 +140,18 @@ void* _Compressible_DefaultNew( Name name ) {
 
 
 void _Compressible_Construct( void* compressible, Stg_ComponentFactory* cf, void* data ){
-	Compressible*    self = (Compressible*)compressible;
-	FeMesh*		 geometryMesh;
-	Materials_Register* materials_Register;
+	Compressible*    	self = (Compressible*)compressible;
+	FeMesh*		 	geometryMesh;
+	Materials_Register* 	materials_Register;
+	PICelleratorContext*	context;
 
 	_StiffnessMatrixTerm_Construct( self, cf, data );
 
 	geometryMesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "GeometryMesh", FeMesh, True, data );
 
-	materials_Register = Stg_ObjectList_Get( cf->registerRegister, "Materials_Register" );
+	context = (PICelleratorContext*)self->context;
+	assert( Stg_CheckType( context, PICelleratorContext ) );
+	materials_Register = context->materials_Register; 
 	assert( materials_Register );
 
 	_Compressible_Init( 

@@ -239,20 +239,21 @@ void _ConstitutiveMatrix_Construct( void* constitutiveMatrix, Stg_ComponentFacto
 	ConstitutiveMatrix*         self          = (ConstitutiveMatrix*)constitutiveMatrix;
 	Dimension_Index             dim;
 	Materials_Register*         materialsRegister;
-	FiniteElementContext*       context;
-  Bool                        storeConstitutiveMatrix;
+	Bool                        storeConstitutiveMatrix;
+	PICelleratorContext*	    context;
 
 	_StiffnessMatrixTerm_Construct( self, cf, data );
 	
-	materialsRegister = Stg_ObjectList_Get( cf->registerRegister, "Materials_Register" );
+	context = (PICelleratorContext*)self->context;
+	assert( Stg_CheckType( context, PICelleratorContext ) );
+	materialsRegister = context->materials_Register; 
 	assert( materialsRegister );
 
 	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
 
-	context = (FiniteElementContext*)Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data );
-  storeConstitutiveMatrix = Stg_ComponentFactory_GetBool( cf, self->name, "storeConstitutiveMatrix", False );
+	storeConstitutiveMatrix = Stg_ComponentFactory_GetBool( cf, self->name, "storeConstitutiveMatrix", False );
 
-	_ConstitutiveMatrix_Init( self, dim, storeConstitutiveMatrix, context, materialsRegister );
+	_ConstitutiveMatrix_Init( self, dim, storeConstitutiveMatrix, (FiniteElementContext*)context, materialsRegister );
 }
 
 void _ConstitutiveMatrix_Build( void* constitutiveMatrix, void* data ) {

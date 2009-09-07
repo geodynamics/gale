@@ -78,7 +78,7 @@ RadiogenicHeatingTerm* _RadiogenicHeatingTerm_New(
 
 void _RadiogenicHeatingTerm_Init( 
 		RadiogenicHeatingTerm*                              self, 
-		AbstractContext*                                    context,
+		FiniteElementContext*                               context,
 		Materials_Register*                                 materials_Register )
 {
 	self->context             = context;
@@ -133,15 +133,15 @@ void* _RadiogenicHeatingTerm_DefaultNew( Name name ) {
 
 void _RadiogenicHeatingTerm_Construct( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
 	RadiogenicHeatingTerm*      self             = (RadiogenicHeatingTerm*)forceTerm;
-	AbstractContext*            context;
+	PICelleratorContext*        context;
 	Materials_Register*         materials_Register;
 
 	/* Construct Parent */
 	_ForceTerm_Construct( self, cf, data );
 
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ) ;
-
-	materials_Register = Stg_ObjectList_Get( cf->registerRegister, "Materials_Register" );
+	context = (PICelleratorContext*)self->context;
+	assert( Stg_CheckType( context, PICelleratorContext ) );
+	materials_Register = context->materials_Register; 
 	assert( materials_Register );
 
 	_RadiogenicHeatingTerm_Init( self, context, materials_Register );

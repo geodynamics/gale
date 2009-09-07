@@ -62,6 +62,7 @@
 	#define __Rheology \
 		/* Macro defining parent goes here - This means you can cast this class as its parent */ \
 		__Stg_Component \
+		PICelleratorContext*				    context;				    \
 		/* Virtual functions go here */ \
 		Rheology_ModifyConstitutiveMatrixFunction*          _modifyConstitutiveMatrix;              \
 		/* Other info */ \

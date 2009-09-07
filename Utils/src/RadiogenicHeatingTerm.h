@@ -24,7 +24,6 @@
 		/* Virtual functions go here */ \
 		\
 		/* RadiogenicHeatingTerm info */ \
-		AbstractContext*                                    context;                           \
 		Materials_Register*                                 materials_Register;                \
 		ExtensionInfo_Index                                 materialExtHandle;
 

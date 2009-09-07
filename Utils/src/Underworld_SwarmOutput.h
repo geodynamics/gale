@@ -56,6 +56,7 @@
 	#define __Underworld_SwarmOutput \
 		/* Macro defining parent goes here - This means you can cast this class as its parent */ \
 		__Stg_Component \
+		UnderworldContext*        context; \
 		/* Virtual Info */\
 		Underworld_SwarmOutput_GetFeVariableValues* _getFeValuesFunc; \
 		Underworld_SwarmOutput_PrintStandardFormat* _printFunc; \

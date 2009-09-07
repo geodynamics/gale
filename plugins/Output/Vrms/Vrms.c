@@ -55,13 +55,13 @@
 const Type Underworld_Vrms_Type = "Underworld_Vrms";
 
 void _Underworld_Vrms_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
-	UnderworldContext*  context;
+	UnderworldContext*  	context;
 
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
 
 	Underworld_Vrms_PrintHeaderToFile( context );
-	ContextEP_Append( context, AbstractContext_EP_ConstructExtensions, Underworld_Vrms_Setup );
-	ContextEP_Append( context, AbstractContext_EP_FrequentOutput     , Underworld_Vrms_Dump );
+	ContextEP_Append( context, AbstractContext_EP_Build,          Underworld_Vrms_Setup );
+	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, Underworld_Vrms_Dump );
 }
 
 void _Underworld_Vrms_Build( void* component, void* data ) {
@@ -105,9 +105,7 @@ void Underworld_Vrms_Setup( void* _context ) {
 
 	Underworld_Vrms* self;
 
-	self = (Underworld_Vrms*)LiveComponentRegister_Get(
-					context->CF->LCRegister,
-					Underworld_Vrms_Type );
+	self = (Underworld_Vrms*)LiveComponentRegister_Get( context->CF->LCRegister, Underworld_Vrms_Type );
 
 	Journal_Firewall( 
 			context->gaussSwarm != NULL, 
@@ -123,6 +121,7 @@ void Underworld_Vrms_Setup( void* _context ) {
 			"VelocitySquaredField", 
 			context->velocityField, 
 			"VectorSquare" );
+	self->velocitySquaredField->context = context;
 }
 
 /* Integrate Every Step and dump to file */

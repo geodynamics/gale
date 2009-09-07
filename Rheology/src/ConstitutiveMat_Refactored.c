@@ -217,14 +217,14 @@ void _ConstitutiveMat_Refactored_Construct( void* constitutiveMatrix, Stg_Compon
 	ConstitutiveMat_Refactored*         self          = (ConstitutiveMat_Refactored*)constitutiveMatrix;
 	Dimension_Index             dim;
 	Materials_Register*         materialsRegister;
-	FiniteElementContext*       context;
+	PICelleratorContext*        context;
 
-	materialsRegister = Stg_ObjectList_Get( cf->registerRegister, "Materials_Register" );
+	context = Stg_ComponentFactory_ConstructByName( cf, "context", PICelleratorContext, True, data );
+
+	materialsRegister = context->materials_Register;
 	assert( materialsRegister );
 
 	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
-
-	context = (FiniteElementContext*)Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data );
 
 	_ConstitutiveMat_Refactored_Init( self, dim, context, materialsRegister );
 }

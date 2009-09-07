@@ -123,6 +123,10 @@ void* _Rheology_Copy( void* rheology, void* dest, Bool deep, Name nameExt, PtrMa
 void _Rheology_Construct( void* rheology, Stg_ComponentFactory* cf, void* data ){
 	Rheology*           self                 = (Rheology*)rheology;
 
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", PICelleratorContext, False, data );
+	if( !self->context ) 
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", PICelleratorContext, True, data );
+
 	_Rheology_Init( self );
 }
 

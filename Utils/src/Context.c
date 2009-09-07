@@ -67,8 +67,8 @@ void* _UnderworldContext_DefaultNew( Name name ) {
 		_UnderworldContext_Print,
 		NULL, 
 		_UnderworldContext_DefaultNew,
-		_AbstractContext_Construct,
-		_AbstractContext_Build,
+		_UnderworldContext_Construct,
+		_UnderworldContext_Build,
 		_AbstractContext_Initialise,
 		_AbstractContext_Execute,
 		_AbstractContext_Destroy,
@@ -77,16 +77,16 @@ void* _UnderworldContext_DefaultNew( Name name ) {
 		False,
 		0,
 		0,
-		0,
+		MPI_COMM_WORLD,
 		NULL );
 }
 
 UnderworldContext* UnderworldContext_New( 
-		Name                        name,
-		double						start,
-		double						stop,
-		MPI_Comm					communicator,
-		Dictionary*					dictionary )
+		Name                    name,
+		double			start,
+		double			stop,
+		MPI_Comm		communicator,
+		Dictionary*		dictionary )
 {
 	return _UnderworldContext_New(
 		sizeof(UnderworldContext),
@@ -95,8 +95,8 @@ UnderworldContext* UnderworldContext_New(
 		_UnderworldContext_Print,
 		NULL, 
 		_UnderworldContext_DefaultNew,
-		_AbstractContext_Construct,
-		_AbstractContext_Build,
+		_UnderworldContext_Construct,
+		_UnderworldContext_Build,
 		_AbstractContext_Initialise,
 		_AbstractContext_Execute,
 		_AbstractContext_Destroy,
@@ -164,7 +164,6 @@ UnderworldContext* _UnderworldContext_New(
 	return self;
 }
 
-
 void _UnderworldContext_Init( UnderworldContext* self ) {
 	self->isConstructed = True;
 	self->Vrms = 0.0;
@@ -172,20 +171,33 @@ void _UnderworldContext_Init( UnderworldContext* self ) {
 			   "Underworld App Assign Pointers",
 			   UnderworldContext_AssignPointers,
 			   "Underworld_App_Construct" );
-
-   /* always generate XDMF files when we generate HDF5 checkpoints */
-#ifdef WRITE_HDF5
-if( Dictionary_Entry_Value_AsBool( Dictionary_GetDefault( self->dictionary, "generateXDMF", Dictionary_Entry_Value_FromBool( True ) ) ) ){
-      ContextEP_Append( self, AbstractContext_EP_Save, XDMFGenerator_GenerateAll );
-      ContextEP_Append( self, AbstractContext_EP_DataSave, XDMFGenerator_GenerateAll );
 }
-#endif
-   
-
-}
-
 
 /* Virtual Functions -------------------------------------------------------------------------------------------------------------*/
+
+void _UnderworldContext_Construct( void* context, Stg_ComponentFactory* cf, void* data ) {
+	UnderworldContext* self = (UnderworldContext*)context;
+
+	_UnderworldContext_Init( self );
+	_PICelleratorContext_Construct( context, cf, data );
+
+	/* always generate XDMF files when we generate HDF5 checkpoints */
+#ifdef WRITE_HDF5
+	if( Dictionary_Entry_Value_AsBool( Dictionary_GetDefault( self->dictionary, "generateXDMF", Dictionary_Entry_Value_FromBool( True ) ) ) ){
+		ContextEP_Append( self, AbstractContext_EP_Save, XDMFGenerator_GenerateAll );
+		ContextEP_Append( self, AbstractContext_EP_DataSave, XDMFGenerator_GenerateAll );
+	}
+#endif
+}
+
+void _UnderworldContext_Build( void* context, void* data ) {
+	UnderworldContext* self = (UnderworldContext*)context;
+
+	self->gaussSwarm = Stg_ComponentFactory_ConstructByKey( self->CF, self->name, "GaussSwarm", Swarm, False, data );
+	self->velocityField = Stg_ComponentFactory_ConstructByKey( self->CF, self->name, "VelocityField", FeVariable, False, data );
+
+	_AbstractContext_Build( context, data );
+}
 
 void _UnderworldContext_Delete( void* context ) {
 	UnderworldContext* self = (UnderworldContext*)context;
@@ -195,7 +207,6 @@ void _UnderworldContext_Delete( void* context ) {
 	/* Stg_Class_Delete parent */
 	_PICelleratorContext_Delete( self );
 }
-
 
 void _UnderworldContext_Print( void* context, Stream* stream ) {
 	UnderworldContext* self = (UnderworldContext*)context;
@@ -257,11 +268,11 @@ void UnderworldContext_AssignPointers( void* context, void* ptrToContext ) {
 	self->constitutiveMatrix = (ConstitutiveMatrix*) LiveComponentRegister_Get( self->CF->LCRegister, "constitutiveMatrix" );
 	
 	/* Swarms */
-	self->gaussSwarm     = (Swarm*) LiveComponentRegister_Get( self->CF->LCRegister, "gaussSwarm" );
+	//self->gaussSwarm     = (Swarm*) LiveComponentRegister_Get( self->CF->LCRegister, "gaussSwarm" );
 	self->picIntegrationPoints = (IntegrationPointsSwarm*) LiveComponentRegister_Get( self->CF->LCRegister, "picIntegrationPoints" );
 
 	/* Get copy of fields from register */
-	self->velocityField             = (FeVariable*) FieldVariable_Register_GetByName( fV_Register, "VelocityField" );
+	//self->velocityField             = (FeVariable*) FieldVariable_Register_GetByName( fV_Register, "VelocityField" );
 	self->velocityGradientsField    = (FeVariable*) FieldVariable_Register_GetByName( fV_Register, "VelocityGradientsField" );
 	self->strainRateField           = (FeVariable*) FieldVariable_Register_GetByName( fV_Register, "StrainRateField" );
 	self->strainRateInvField        = (FeVariable*) FieldVariable_Register_GetByName( fV_Register, "StrainRateInvariantField" );

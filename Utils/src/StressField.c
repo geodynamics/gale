@@ -165,11 +165,11 @@ void* _StressField_DefaultNew( Name name ) {
 
 void StressField_NonLinearUpdate( void* _sle, void* _ctx ) {
    SystemLinearEquations* sle = (SystemLinearEquations*)_sle;
-   AbstractContext* ctx = (AbstractContext*)_ctx;
+   DomainContext* ctx = (DomainContext*)_ctx;
    FieldVariable_Register* fieldVar_Register;
    StressField* stressVar;
 
-   fieldVar_Register = Stg_ObjectList_Get( ctx->register_Register, "FieldVariable_Register" );
+   fieldVar_Register = ctx->fieldVariable_Register;
    stressVar = (StressField*)FieldVariable_Register_GetByName( fieldVar_Register, "StressField" );
    ParticleFeVariable_Update( stressVar );
 }
@@ -190,7 +190,7 @@ void _StressField_Construct( void* stressField, Stg_ComponentFactory* cf, void* 
 
 	strainRateField =  Stg_ComponentFactory_ConstructByKey( cf,  self->name, "StrainRateField", FeVariable, True, data );
 	constitutiveMatrix = Stg_ComponentFactory_ConstructByKey( cf, self->name, "ConstitutiveMatrix", ConstitutiveMatrix, True, data );
-	variable_Register      = (Variable_Register*) Stg_ObjectList_Get( cf->registerRegister, "Variable_Register" );
+	variable_Register = self->context->variable_Register; 
 	assert( variable_Register );
 
 	stressVariableName = Stg_ComponentFactory_GetString( cf, self->name, "StressVariable", "Stress" );

@@ -159,7 +159,7 @@ void _ViscosityField_Construct( void* viscosityField, Stg_ComponentFactory* cf, 
 	/*_FieldVariable_Construct( self, cf, data );*/
 
 	constitutiveMatrix = Stg_ComponentFactory_ConstructByKey( cf, self->name, "ConstitutiveMatrix", ConstitutiveMatrix, True, data );
-	variable_Register      = (Variable_Register*) Stg_ObjectList_Get( cf->registerRegister, "Variable_Register" );
+	variable_Register      = self->context->variable_Register; 
 	assert( variable_Register );
 
 	_ViscosityField_Init( self, constitutiveMatrix, variable_Register );

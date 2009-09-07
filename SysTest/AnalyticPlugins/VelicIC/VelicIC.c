@@ -143,9 +143,9 @@ void _Underworld_VelicIC_Construct( void* component, Stg_ComponentFactory* cf, v
 	context = (AbstractContext*)Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
 	
 	condFunc = ConditionFunction_New( Underworld_VelicIC_Sinusoidal, "VelicIC_Sinusoidal");
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	condFunc = ConditionFunction_New( Underworld_VelicIC_Hyperbolic, "VelicIC_Hyperbolic");
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 }	
 
 void* _Underworld_VelicIC_DefaultNew( Name name ) {

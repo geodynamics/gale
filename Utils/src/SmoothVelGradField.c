@@ -96,11 +96,11 @@ void* _SmoothVelGradField_Copy( void* _self, void* dest, Bool deep, Name nameExt
 
 void SmoothVelGradField_NonLinearUpdate( void* _sle, void* _ctx ) {
    SystemLinearEquations* sle = (SystemLinearEquations*)_sle;
-   AbstractContext* ctx = (AbstractContext*)_ctx;
+   DomainContext* ctx = (DomainContext*)_ctx;
    FieldVariable_Register* fieldVar_Register;
    SmoothVelGradField* preVar;
 
-   fieldVar_Register = Stg_ObjectList_Get( ctx->register_Register, "FieldVariable_Register" );
+   fieldVar_Register = ctx->fieldVariable_Register;
    preVar = (SmoothVelGradField*)FieldVariable_Register_GetByName( fieldVar_Register, "VelocityGradientsField" );
    ParticleFeVariable_Update( preVar );
 }
@@ -113,7 +113,7 @@ void _SmoothVelGradField_Construct( void* _self, Stg_ComponentFactory* cf, void*
    /* Construct Parent */
    _ParticleFeVariable_Construct( self, cf, data );
 
-   variable_Register = (Variable_Register*)Stg_ObjectList_Get( cf->registerRegister, "Variable_Register" );
+   variable_Register = self->context->variable_Register;
    assert( variable_Register );
 
    self->velField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "VelocityField",

@@ -83,10 +83,10 @@
 	/* Constructors ----------------------------------------------------------------------------------------------------*/
 	
 	/** Constructor */
-	void* _UnderworldContext_DefaultNew( );
+	void* _UnderworldContext_DefaultNew( Name name );
 	
 	UnderworldContext* UnderworldContext_New( 
-		Name						name,
+		Name			    name,
 		double                      start,
 		double                      stop,
 		MPI_Comm                    communicator,
@@ -118,6 +118,10 @@
 	void _UnderworldContext_Init( UnderworldContext* self );
 
 	/* Virtual Functions -----------------------------------------------------------------------------------------------*/
+
+	void _UnderworldContext_Construct( void* context, Stg_ComponentFactory* cf, void* data );
+
+	void _UnderworldContext_Build( void* context, void* data );
 	
 	/* Stg_Class_Delete implementation */
 	void _UnderworldContext_Delete( void* context );

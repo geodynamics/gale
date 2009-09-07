@@ -46,7 +46,7 @@
 #ifndef __Underworld_Utils_types_h__
 #define __Underworld_Utils_types_h__
 	
-	typedef struct UnderworldContext             UnderworldContext;
+	typedef struct UnderworldContext		UnderworldContext;
 	typedef struct PressureTemperatureOutput     PressureTemperatureOutput;
 	typedef struct Underworld_SwarmOutput              Underworld_SwarmOutput;
 	typedef struct RadiogenicHeatingTerm         RadiogenicHeatingTerm;
