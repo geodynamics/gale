@@ -78,7 +78,6 @@ Bool PICellerator_MaterialPoints_Init( int* argc, char** argv[] ) {
 
 	Stg_ComponentRegister_Add( componentsRegister, PeriodicBoundariesManager_Type,"0", _PeriodicBoundariesManager_DefaultNew );
 	
-	/* dave, 18.09.07 */
 	Stg_ComponentRegister_Add( componentsRegister, SwarmVariableField_Type,"0", _SwarmVariableField_DefaultNew );
 
 	/* Doing this in alphabetical order to match ls output */

@@ -156,6 +156,12 @@ void* _BackgroundParticleLayout_DefaultNew( Name name ) {
 			False );
 }
 void  _BackgroundParticleLayout_Construct( void* component, Stg_ComponentFactory* cf, void* data )  {
+	BackgroundParticleLayout*	self = (BackgroundParticleLayout*)component;
+
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
+	if( !self->context )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
+
 	_BackgroundParticleLayout_Init( component, GlobalCoordSystem, False );
 }
 

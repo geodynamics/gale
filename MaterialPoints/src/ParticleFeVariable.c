@@ -208,7 +208,9 @@ void _ParticleFeVariable_Construct( void* materialFeVariable, Stg_ComponentFacto
 	FeMesh*     mesh;
 
 	swarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm", IntegrationPointsSwarm, True, data );
-	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, False, data );
+	if( !context )
+		context = Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data );
 	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Mesh", FeMesh, True, data );
 
 	/* Construct Parent */

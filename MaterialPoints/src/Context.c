@@ -64,7 +64,7 @@ void* _PICelleratorContext_DefaultNew( Name name ) {
 		_PICelleratorContext_Print,
 		NULL, 
 		_PICelleratorContext_DefaultNew,
-		_AbstractContext_Construct,
+		_PICelleratorContext_Construct,
 		_AbstractContext_Build,
 		_AbstractContext_Initialise,
 		_AbstractContext_Execute,
@@ -74,7 +74,7 @@ void* _PICelleratorContext_DefaultNew( Name name ) {
 		False,
 		0,
 		0,
-		0,
+		MPI_COMM_WORLD,
 		NULL );
 }
 
@@ -92,7 +92,7 @@ PICelleratorContext* PICelleratorContext_New(
 		_PICelleratorContext_Print,
 		NULL, 
 		_PICelleratorContext_DefaultNew,
-		_AbstractContext_Construct,
+		_PICelleratorContext_Construct,
 		_AbstractContext_Build,
 		_AbstractContext_Initialise,
 		_AbstractContext_Execute,
@@ -167,7 +167,6 @@ void _PICelleratorContext_Init( void* context ) {
 	self->isConstructed = True;
 
 	self->materials_Register = Materials_Register_New();
-	Stg_ObjectList_ClassAppend( self->register_Register, (void*)self->materials_Register, "Materials_Register" );
 
 	ContextEP_Prepend( self, AbstractContext_EP_ConstructExtensions, PICelleratorContext_CreateDefaultMaterial );
 
@@ -229,5 +228,6 @@ void PICelleratorContext_CreateDefaultMaterial( void* context ) {
 void _PICelleratorContext_Construct( void* context, Stg_ComponentFactory *cf, void* data ){
 	PICelleratorContext* self = (PICelleratorContext*) context;
 	
-	_PICelleratorContext_Init( self );	
+	_FiniteElementContext_Construct( context, cf, data );
+	_PICelleratorContext_Init( self );
 }

@@ -279,10 +279,11 @@ void* _MaterialPointsSwarm_DefaultNew( Name name ) {
 
 void _MaterialPointsSwarm_Construct( void* swarm, Stg_ComponentFactory* cf, void* data ) {
 	MaterialPointsSwarm*	        self          = (MaterialPointsSwarm*) swarm;
-	FeMesh*             mesh;
+	FeMesh*             		mesh;
 	EscapedRoutine*                 escapedRoutine;
 	Material*                       material;
 	Materials_Register*             materials_Register;
+	PICelleratorContext*		context;
 
 	_Swarm_Construct( self, cf, data );
 
@@ -290,7 +291,9 @@ void _MaterialPointsSwarm_Construct( void* swarm, Stg_ComponentFactory* cf, void
 	escapedRoutine   = Stg_ComponentFactory_ConstructByKey( cf, self->name, "EscapedRoutine",     EscapedRoutine,     False, data );
 	material         = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Material",           Material,           False, data );
 
-	materials_Register = Stg_ObjectList_Get( cf->registerRegister, "Materials_Register" );
+	context = (PICelleratorContext*)self->context;
+	assert( Stg_CheckType( context, PICelleratorContext ) );
+	materials_Register = context->materials_Register; 
 	assert( materials_Register );
 
 	_MaterialPointsSwarm_Init(

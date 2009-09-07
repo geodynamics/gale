@@ -169,6 +169,10 @@ void _EscapedRoutine_Construct( void* escapedRoutine, Stg_ComponentFactory* cf, 
 	Dimension_Index      dim;
 	Particle_Index       particlesToRemoveDelta;
 
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
+	if( !self->context ) 
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
+
 	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
 	particlesToRemoveDelta = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "particlesToRemoveDelta", 20 );
 

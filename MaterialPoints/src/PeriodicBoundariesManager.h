@@ -67,6 +67,7 @@
 
 	#define __PeriodicBoundariesManager \
 		__Stg_Component \
+		PICelleratorContext*	context; \
 		\
 		Dictionary*		dictionary; \
 		Mesh*			mesh; \

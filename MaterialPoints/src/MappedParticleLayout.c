@@ -156,7 +156,13 @@ void* _MappedParticleLayout_DefaultNew( Name name ) {
 			LocalCoordSystem,
 			False );
 }
-void  _MappedParticleLayout_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {}
+void  _MappedParticleLayout_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+	MappedParticleLayout*		self = (MappedParticleLayout*)component;
+
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
+	if( !self->context )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
+}
 void  _MappedParticleLayout_Build( void* component, void* data ) {}
 void  _MappedParticleLayout_Initialise( void* component, void* data ) {}
 void  _MappedParticleLayout_Execute( void* component, void* data ) {}

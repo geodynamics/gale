@@ -63,6 +63,7 @@
 		/* General info */ \
 		__Stg_Component \
 		/* Virtual Info */\
+		FiniteElementContext*		      context;		 \
 		WeightsCalculator_CalculateFunction*  _calculate;        \
 		/* Other Info */\
 		double                                cellLocalVolume;   \

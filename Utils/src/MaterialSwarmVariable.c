@@ -191,11 +191,13 @@ void* _MaterialSwarmVariable_DefaultNew( Name name ) {
 void _MaterialSwarmVariable_Construct( void* swarmVariable, Stg_ComponentFactory* cf, void* data ) {
 	MaterialSwarmVariable*      self             = (MaterialSwarmVariable*)swarmVariable;
 	Materials_Register*         materials_Register;
+	PICelleratorContext*	    context	     = (PICelleratorContext*)self->context;
 
 	/* Construct Parent */
 	_SwarmVariable_Construct( self, cf, data );
 
-	materials_Register = Stg_ObjectList_Get( cf->registerRegister, "Materials_Register" );
+	assert( Stg_CheckType( context, PICelleratorContext ) );
+	materials_Register = context->materials_Register;
 	assert( materials_Register );
 
 	abort( );

@@ -108,6 +108,8 @@
 	void _PICelleratorContext_Init( void* context );
 
 	/* Virtual Functions -----------------------------------------------------------------------------------------------*/
+
+	void _PICelleratorContext_Construct( void* context, Stg_ComponentFactory* cf, void* data );
 	
 	/* Stg_Class_Delete implementation */
 	void _PICelleratorContext_Delete( void* context );

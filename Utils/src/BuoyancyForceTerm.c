@@ -210,7 +210,8 @@ void _BuoyancyForceTerm_Construct( void* forceTerm, Stg_ComponentFactory* cf, vo
 	unsigned		    nDims;
 	Dictionary_Entry_Value*	    direcList;
 	double*			    direc;
-	unsigned		d_i;
+	unsigned		    d_i;
+	PICelleratorContext*	    context;
 
 	/* Construct Parent */
 	_ForceTerm_Construct( self, cf, data );
@@ -239,7 +240,9 @@ void _BuoyancyForceTerm_Construct( void* forceTerm, Stg_ComponentFactory* cf, vo
 	else
 		direc = NULL;
 
-	materials_Register = Stg_ObjectList_Get( cf->registerRegister, "Materials_Register" );
+	context = (PICelleratorContext*)self->context;
+	assert( Stg_CheckType( context, PICelleratorContext ) );
+	materials_Register = context->materials_Register;
 	assert( materials_Register );
 
 	_BuoyancyForceTerm_Init( self, temperatureField, gravity, adjust, materials_Register );
@@ -259,11 +262,7 @@ void _BuoyancyForceTerm_Build( void* forceTerm, void* data ) {
 	AbstractContext*                 context;
 	Stg_ComponentFactory*            cf;
 
-	/* Get Component Factory if we can */
-	if ( Stg_Class_IsInstance( data, AbstractContext_Type ) ) {
-		context = (AbstractContext*) data;
-		cf = context->CF;
-	}
+	cf = self->context->CF;
 
 	_ForceTerm_Build( self, data );
 
@@ -279,14 +278,8 @@ void _BuoyancyForceTerm_Build( void* forceTerm, void* data ) {
 		material = Materials_Register_GetByIndex( materials_Register, material_I );
 		materialExt = ExtensionManager_GetFunc( material->extensionMgr, material, self->materialExtHandle );
 
-		if ( cf ) {
-			materialExt->density = Stg_ComponentFactory_GetDouble( cf, material->name, "density", 0.0 );
-			materialExt->alpha   = Stg_ComponentFactory_GetDouble( cf, material->name, "alpha",   0.0 );
-		}
-		else {
-			materialExt->density = Dictionary_GetDouble_WithDefault( material->dictionary, "density", 0.0 );
-			materialExt->alpha   = Dictionary_GetDouble_WithDefault( material->dictionary, "alpha",   0.0 );
-		}
+		materialExt->density = Stg_ComponentFactory_GetDouble( cf, material->name, "density", 0.0 );
+		materialExt->alpha   = Stg_ComponentFactory_GetDouble( cf, material->name, "alpha",   0.0 );
 	}
 	
 	/* Create Swarm Variables of each material swarm this ip swarm is mapped against */

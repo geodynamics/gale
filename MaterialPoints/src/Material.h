@@ -52,6 +52,7 @@
 	#define __Material \
 		__Stg_Component \
 		\
+		PICelleratorContext*		      context;          \
 		Dictionary*                           dictionary;       \
 		Stg_Shape*                            shape;            \
 		Material_Index                        index;            /**< The index inside the Materials_Register */ \

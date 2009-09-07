@@ -52,6 +52,7 @@
 
 #include "MaterialPoints.h"
 #include "Material.h"
+#include "Context.h"
 
 #include <assert.h>
 #include <string.h>
@@ -229,6 +230,7 @@ void _IntegrationPointsSwarm_Construct( void* integrationPoints, Stg_ComponentFa
 	IntegrationPointMapper*         mapper;
 	Materials_Register*             materials_Register;
 	Bool                            recalculateWeights;
+	PICelleratorContext*		context;
 
 	/* This will also call _Swarm_Init */
 	_Swarm_Construct( self, cf, data );
@@ -252,7 +254,9 @@ void _IntegrationPointsSwarm_Construct( void* integrationPoints, Stg_ComponentFa
 			WeightsCalculator_Type,
 			GaussMapper_Type );
 	
-	materials_Register = Stg_ObjectList_Get( cf->registerRegister, "Materials_Register" );
+	context = (PICelleratorContext*)self->context;
+	assert( Stg_CheckType( context, PICelleratorContext ) );
+	materials_Register = context->materials_Register;
 	assert( materials_Register );
 
 	_IntegrationPointsSwarm_Init( self, mesh, timeIntegrator, weights, mapper, materials_Register, recalculateWeights );

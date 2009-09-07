@@ -51,6 +51,7 @@
 #include <PICellerator/Weights/Weights.h>
 
 #include "types.h"
+#include "Context.h"
 #include "PeriodicBoundariesManager.h"
 
 #include <string.h>
@@ -181,6 +182,10 @@ void _PeriodicBoundariesManager_Construct( void* periodicBCsManager, Stg_Compone
 	Dictionary*			dictionary = NULL;
 	Mesh*				mesh = NULL;
 	Swarm*                          swarm = NULL;
+
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", PICelleratorContext, False, data );
+	if( !self->context ) 
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", PICelleratorContext, True, data );
 
 	dictionary = Dictionary_GetDictionary( cf->componentDict, self->name );
 	mesh =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "mesh", Mesh,  True, data  ) ;

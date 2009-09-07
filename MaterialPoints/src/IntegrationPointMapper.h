@@ -81,6 +81,7 @@
 	#define __IntegrationPointMapper \
 		__Stg_Component \
 		\
+		PICelleratorContext*						context; \
 		/* Virtual functions */ \
 		IntegrationPointMapper_MapFunction*                             _map; \
 		IntegrationPointMapper_GetMaterialPointsSwarmsFunction*         _getMaterialPointsSwarms; \

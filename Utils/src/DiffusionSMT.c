@@ -165,13 +165,15 @@ void* _DiffusionSMT_DefaultNew( Name name ) {
 
 void _DiffusionSMT_Construct( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) {
     DiffusionSMT*            self             = (DiffusionSMT*)matrixTerm;
+    PICelleratorContext*     context	      = (PICelleratorContext*)self->context;
 
     /* Construct Parent */
     _StiffnessMatrixTerm_Construct( self, cf, data );
 
     _DiffusionSMT_Init( self );
 
-    self->materials_Register = Stg_ObjectList_Get( cf->registerRegister, "Materials_Register" );
+    assert( Stg_CheckType( context, PICelleratorContext ) );
+    self->materials_Register = context->materials_Register;
 }
 
 void _DiffusionSMT_Build( void* matrixTerm, void* data ) {

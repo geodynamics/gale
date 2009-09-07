@@ -146,6 +146,10 @@ void _IntegrationPointMapper_Construct( void* mapper, Stg_ComponentFactory* cf, 
 
 	IntegrationPointsSwarm* integrationSwarm;
 
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", PICelleratorContext, False, data );
+	if( !self->context ) 
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", PICelleratorContext, True, data );
+
 	integrationSwarm = Stg_ComponentFactory_ConstructByKey( 
 				cf, 
 				self->name, 

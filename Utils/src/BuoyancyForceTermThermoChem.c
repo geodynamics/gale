@@ -211,6 +211,7 @@ void _BuoyancyForceTermThermoChem_Construct( void* forceTerm, Stg_ComponentFacto
 	double                      RaC;
 	Bool                        adjust;
 	Materials_Register*         materials_Register;
+	PICelleratorContext*	    context;
 
 	/* Construct Parent */
 	_ForceTerm_Construct( self, cf, data );
@@ -220,7 +221,9 @@ void _BuoyancyForceTermThermoChem_Construct( void* forceTerm, Stg_ComponentFacto
 	RaC              = Stg_ComponentFactory_GetDouble( cf, self->name, "RaC", 0.0 );
 	adjust           = Stg_ComponentFactory_GetBool( cf, self->name, "adjust", False );
 
-	materials_Register = Stg_ObjectList_Get( cf->registerRegister, "Materials_Register" );
+	context = (PICelleratorContext*)self->context;
+	assert( Stg_CheckType( context, PICelleratorContext ) );
+	materials_Register = context->materials_Register; 
 	assert( materials_Register );
 
 	_BuoyancyForceTermThermoChem_Init( self, temperatureField, RaT, RaC, adjust, materials_Register );

@@ -45,6 +45,7 @@
 #include <mpi.h>
 #include <StGermain/StGermain.h>
 #include <StgDomain/StgDomain.h>
+#include <StgFEM/StgFEM.h>
 
 #include "types.h"
 #include "WeightsCalculator.h"
@@ -154,6 +155,10 @@ void* _WeightsCalculator_Copy( void* weightsCalculator, void* dest, Bool deep, N
 void _WeightsCalculator_Construct( void* weightsCalculator, Stg_ComponentFactory* cf, void* data ) {
 	WeightsCalculator*	 self          = (WeightsCalculator*) weightsCalculator;
 	Dimension_Index      dim;
+
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, False, data );
+	if( !self->context ) 
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data );
 
 	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
 

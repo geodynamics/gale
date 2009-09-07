@@ -165,10 +165,9 @@ void _SwarmVariableField_Construct( void* swarmVariableField, Stg_ComponentFacto
 	SwarmVariableField*     	self		= (SwarmVariableField*)swarmVariableField;
 	SwarmVariable*			swarmVar;
 	IntegrationPointsSwarm* 	integrationSwarm;
-	FiniteElementContext*		context;
 	Variable_Register*		variable_Register;
 
-	variable_Register = (Variable_Register*) Stg_ObjectList_Get( cf->registerRegister, "Variable_Register" );
+	variable_Register = self->context->variable_Register; 
 
 	/* Construct Parent */
 	_ParticleFeVariable_Construct( self, cf, data );
@@ -182,12 +181,8 @@ void _SwarmVariableField_Construct( void* swarmVariableField, Stg_ComponentFacto
 	integrationSwarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm", IntegrationPointsSwarm, True, NULL );
 	assert( integrationSwarm );
 
-	context = (FiniteElementContext*) Stg_ComponentFactory_ConstructByKey( cf, self->name, "context", FiniteElementContext, True, data );
-	
-	assert( context );
-
 	_SwarmVariableField_Init( self, swarmVar, variable_Register );
-	_ParticleFeVariable_Init( self, integrationSwarm, context );
+	_ParticleFeVariable_Init( self, integrationSwarm, self->context );
 }
 
 void _SwarmVariableField_Build( void* swarmVariableField, void* data ) {

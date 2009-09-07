@@ -209,9 +209,13 @@ void _Material_Construct( void* material, Stg_ComponentFactory* cf, void* data )
 	Stg_Shape*            shape;
 	Materials_Register*   materials_Register;
 
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", PICelleratorContext, False, data );
+	if( !self->context ) 
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", PICelleratorContext, True, data );
+
 	materialDictionary = Dictionary_GetDictionary( cf->componentDict, self->name );
 	shape =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "Shape", Stg_Shape,  True, data  ) ;
-	materials_Register = Stg_ObjectList_Get( cf->registerRegister, "Materials_Register" );
+	materials_Register = self->context->materials_Register;
 
 	_Material_Init( self, shape, materialDictionary, materials_Register );
 }

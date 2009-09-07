@@ -62,6 +62,7 @@
 	#define __EscapedRoutine \
 		/* General info */ \
 		__Stg_Component \
+		DomainContext*				context; \
 		/* Virtual Info */\
 		EscapedRoutine_SelectFunction*		_select; \
 		/* Other Info */\
