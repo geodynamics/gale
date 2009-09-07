@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 import libxml2, sys, os, string, optparse, math
 
