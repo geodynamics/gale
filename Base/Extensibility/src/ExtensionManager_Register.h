@@ -46,6 +46,9 @@
 
 	/** Textual name of this class */
 	extern const Type ExtensionManager_Register_Type;
+
+	/* global default instantiation of the register (created in Init.c) */
+	extern ExtensionManager_Register* extensionMgr_Register;
 	
 	/** ExtensionManager_Register class contents */
 	#define __ExtensionManager_Register \

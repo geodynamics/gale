@@ -32,10 +32,10 @@
 #include "Base/Foundation/Foundation.h"
 #include "Base/IO/IO.h"
 #include "Base/Container/Container.h"
+#include "Base/Automation/Automation.h"
 
 #include "types.h"
 #include "shortcuts.h"
-#include "Stg_Component.h"
 #include "Variable.h"
 #include "Variable_Register.h"
 

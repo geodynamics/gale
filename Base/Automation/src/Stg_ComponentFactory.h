@@ -139,7 +139,6 @@
 		Stg_ComponentFactory_ConstructByListFunc*                constructByList; \
 		\
 		/* Class info */ \
-		Stg_ObjectList*                                          registerRegister; \
 		Dictionary*                                              rootDict; \
 		Dictionary*                                              componentDict; \
 		LiveComponentRegister*                                   LCRegister;    \
@@ -172,13 +171,11 @@
 		Stg_ComponentFactory_ConstructByNameWithKeyFallbackFunc* constructByNameWithKeyFallback,
 		Stg_ComponentFactory_ConstructByListFunc*                constructByList,
 		Dictionary*                                              rootDict,
-		Dictionary*                                              componentDict,
-		Stg_ObjectList*                                          registerRegister );
+		Dictionary*                                              componentDict );
 	
 	Stg_ComponentFactory* Stg_ComponentFactory_New( 
 		Dictionary*                                              rootDict,
-		Dictionary*                                              componentDict,
-		Stg_ObjectList*                                          registerRegister );
+		Dictionary*                                              componentDict );
 
 	void _Stg_ComponentFactory_Init( Stg_ComponentFactory *self );
 	
@@ -202,6 +199,14 @@
 	void Stg_ComponentFactory_CreateComponents( Stg_ComponentFactory *self );
 	
 	void Stg_ComponentFactory_ConstructComponents( Stg_ComponentFactory* self, void* data );
+
+	void Stg_ComponentFactory_BuildComponents( Stg_ComponentFactory* self, void* data );
+
+	void Stg_ComponentFactory_InitialiseComponents( Stg_ComponentFactory* self, void* data );
+
+	void Stg_ComponentFactory_ExecuteComponents( Stg_ComponentFactory* self, void* data );
+
+	void Stg_ComponentFactory_DestroyComponents( Stg_ComponentFactory* self, void* data );
 	
 	Dictionary_Entry_Value* _Stg_ComponentFactory_GetDictionaryValue( 
 			void* cf, Name componentName, Dictionary_Entry_Key key, Dictionary_Entry_Value* defaultVal ) ;

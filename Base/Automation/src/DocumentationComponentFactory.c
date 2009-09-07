@@ -62,7 +62,7 @@ const Type DocumentationComponentFactory_Type = "DocumentationComponentFactory";
 ** Constructor
 */
 	
-DocumentationComponentFactory* DocumentationComponentFactory_New( Stg_ObjectList* registerRegister ) {
+DocumentationComponentFactory* DocumentationComponentFactory_New( ) {
 	DocumentationComponentFactory *self = NULL;
 
 	self = _DocumentationComponentFactory_New( 
@@ -84,8 +84,7 @@ DocumentationComponentFactory* DocumentationComponentFactory_New( Stg_ObjectList
 			_DocumentationComponentFactory_ConstructByName,
 			_DocumentationComponentFactory_ConstructByKey,
 			_DocumentationComponentFactory_ConstructByNameWithKeyFallback,
-			_DocumentationComponentFactory_ConstructByList,
-			registerRegister );
+			_DocumentationComponentFactory_ConstructByList );
 
 	return self;
 }
@@ -110,8 +109,7 @@ DocumentationComponentFactory* _DocumentationComponentFactory_New(
 		Stg_ComponentFactory_ConstructByNameFunc*                constructByName,
 		Stg_ComponentFactory_ConstructByKeyFunc*                 constructByKey,
 		Stg_ComponentFactory_ConstructByNameWithKeyFallbackFunc* constructByNameWithKeyFallback,
-		Stg_ComponentFactory_ConstructByListFunc*                constructByList,
-		Stg_ObjectList*                                          registerRegister )
+		Stg_ComponentFactory_ConstructByListFunc*                constructByList )
 {
 	DocumentationComponentFactory *self = NULL;
 
@@ -137,8 +135,7 @@ DocumentationComponentFactory* _DocumentationComponentFactory_New(
 			constructByNameWithKeyFallback,
 			constructByList,
 			NULL,
-			NULL,
-			registerRegister );
+			NULL );
 
 	return self;
 }

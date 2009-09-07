@@ -90,6 +90,7 @@
 		/* General info */ \
 		__Stg_Component \
 		\
+		AbstractContext*				context; \
 		/* Virtual info */ \
 		VariableCondition_BuildSelfFunc*		_buildSelf; \
 		VariableCondition_PrintConciseFunc*		_printConcise; \

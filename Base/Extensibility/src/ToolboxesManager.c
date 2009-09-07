@@ -42,6 +42,7 @@
 #include "ToolboxesManager.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 /* Textual name of this class */
 const Type ToolboxesManager_Type = "ToolboxesManager";
@@ -58,6 +59,7 @@ ToolboxesManager* ToolboxesManager_New( int* argc, char*** argv ) {
 		_ToolboxesManager_LoadToolbox,
 		_ToolboxesManager_UnloadToolbox,
 		Toolbox_Factory,
+		_ToolboxesManager_CheckContext,
 		argc,
 		argv );
 }
@@ -72,6 +74,7 @@ ToolboxesManager* _ToolboxesManager_New(
 		ModulesManager_LoadModuleFunction*	_loadModule,
 		ModulesManager_UnloadModuleFunction*	_unloadModule,
 		ModulesManager_ModuleFactoryFunction*   _moduleFactory,
+		ModulesManager_CheckContextFunction*	_checkContext,
 		int*					argc,
 		char***					argv )
 {
@@ -88,7 +91,8 @@ ToolboxesManager* _ToolboxesManager_New(
 		_getModulesList, 
 		_loadModule, 
 		_unloadModule,
-		_moduleFactory );
+		_moduleFactory,
+		_checkContext );
 	
 	/* General info */
 	
@@ -168,6 +172,11 @@ Bool _ToolboxesManager_UnloadToolbox( void* toolboxesManager, Module* toolbox ) 
 	
 	((Toolbox*)toolbox)->Finalise( self );
     
+	return True;
+}
+
+/* toolboxes do not need to be associated with contexts, so just return true */
+Bool _ToolboxesManager_CheckContext( void* toolboxesManager, void* _dictionary, Name moduleName, Name contextName ) {
 	return True;
 }
 

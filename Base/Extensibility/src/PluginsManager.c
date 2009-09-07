@@ -56,7 +56,8 @@ PluginsManager* PluginsManager_New( void ) {
 		_PluginsManager_GetPluginsList,
 		_PluginsManager_LoadPlugin,
 		_PluginsManager_UnloadPlugin,
-		Plugin_Factory );
+		Plugin_Factory,
+		_PluginsManager_CheckContext );
 }
 
 PluginsManager* _PluginsManager_New(
@@ -68,7 +69,8 @@ PluginsManager* _PluginsManager_New(
 		ModulesManager_GetModulesListFunction*  _getModulesList,
 		ModulesManager_LoadModuleFunction*	_loadModule,
 		ModulesManager_UnloadModuleFunction*	_unloadModule,
-		ModulesManager_ModuleFactoryFunction*   _moduleFactory )
+		ModulesManager_ModuleFactoryFunction*   _moduleFactory,
+		ModulesManager_CheckContextFunction*	_checkContext )
 {
 	PluginsManager* self;
 	
@@ -83,7 +85,8 @@ PluginsManager* _PluginsManager_New(
 		_getModulesList, 
 		_loadModule, 
 		_unloadModule,
-		_moduleFactory );
+		_moduleFactory,
+		_checkContext );
 	
 	/* General info */
 	
@@ -140,3 +143,19 @@ Bool _PluginsManager_UnloadPlugin( void* pluginsManager, Module* plugin ) {
 	
 	return True;
 }
+
+Bool _PluginsManager_CheckContext( void* pluginsManager, void* _dictionary, Name pluginName, Name contextName ) {
+	PluginsManager* 	self 		= (PluginsManager*)pluginsManager;
+	Dictionary*		dict		= (Dictionary*)_dictionary;
+	Dictionary*		pluginDict;
+	Name			componentName;
+
+	pluginDict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dict, "pluginContexts" ) );
+	componentName = Dictionary_GetString_WithDefault( pluginDict, pluginName, "context" );
+	
+	if( !strcmp( componentName, contextName ) )
+		return True;
+
+	return False;
+}
+

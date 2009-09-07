@@ -50,6 +50,7 @@
 	typedef Bool                    (ModulesManager_LoadModuleFunction)     ( void* modulesManager, Module* module );
 	typedef Bool                    (ModulesManager_UnloadModuleFunction)   ( void* modulesManager, Module* module );
 	typedef Module*                 (ModulesManager_ModuleFactoryFunction)  ( Name name, Stg_ObjectList* directories );
+	typedef Bool			(ModulesManager_CheckContextFunction)	( void* modulesManager, void* dictionary, Name moduleName, Name contextName );
 
 	/* Modules info */
 	#define __ModulesManager \
@@ -61,6 +62,7 @@
 		ModulesManager_LoadModuleFunction*     _loadModule; \
 		ModulesManager_UnloadModuleFunction*   _unloadModule; \
 		ModulesManager_ModuleFactoryFunction*  _moduleFactory; \
+		ModulesManager_CheckContextFunction*   _checkContext; \
 		\
 		/* Modules info */ \
 		Stg_ObjectList* modules; \
@@ -81,7 +83,8 @@
 		ModulesManager_GetModulesListFunction*  _getModulesList,
 		ModulesManager_LoadModuleFunction*	_loadModule,
 		ModulesManager_UnloadModuleFunction*	_unloadModule,
-		ModulesManager_ModuleFactoryFunction*   _moduleFactory );
+		ModulesManager_ModuleFactoryFunction*   _moduleFactory,
+		ModulesManager_CheckContextFunction*	_checkContext );
 	
 	/* Initialisation implementation */
 	void _ModulesManager_Init( void* modulesManager );
@@ -94,9 +97,13 @@
 	
 	/** Get the modules list from the dictionary */
 	Dictionary_Entry_Value* ModulesManager_GetModulesList( void* modulesManager, void* dictionary );
+
+	/** check that a given module is associated with a given context (from the XML) - always true for toolboxes, 
+	    whereas plugins are associated with a specific context */
+	Bool ModulesManager_CheckContext(void* modulesManager, void* dictionary, Name moduleName, Name contextName );
 	
 	/** Load the specified modules from the dictionary attaching the codelets (components) */ 
-	void ModulesManager_Load( void* modulesManager, void* dictionary );
+	void ModulesManager_Load( void* modulesManager, void* dictionary, Name contextName );
 
 	/** Load a module attaching the codelet (component) */
 	Bool ModulesManager_LoadModule( void* modulesManager, Name moduleName );

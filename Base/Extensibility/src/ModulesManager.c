@@ -79,7 +79,8 @@ ModulesManager* _ModulesManager_New(
 		ModulesManager_GetModulesListFunction*  _getModulesList,
 		ModulesManager_LoadModuleFunction*	_loadModule,
 		ModulesManager_UnloadModuleFunction*	_unloadModule,
-		ModulesManager_ModuleFactoryFunction*   _moduleFactory )
+		ModulesManager_ModuleFactoryFunction*   _moduleFactory,
+		ModulesManager_CheckContextFunction*	_checkContext )
 {
 	ModulesManager* self;
 	
@@ -94,6 +95,7 @@ ModulesManager* _ModulesManager_New(
 	self->_loadModule = _loadModule;
 	self->_unloadModule = _unloadModule;
 	self->_moduleFactory = _moduleFactory;
+	self->_checkContext = _checkContext;
 	
 	_ModulesManager_Init( self );
 	
@@ -169,7 +171,6 @@ void _ModulesManager_Print( void* modulesManager, Stream* stream ) {
 	}
 }
 
-
 Dictionary_Entry_Value* ModulesManager_GetModulesList( void* modulesManager, void* _dictionary ) {
 	ModulesManager*			self = (ModulesManager*)modulesManager;
 	Dictionary*			dictionary = (Dictionary*)_dictionary;
@@ -177,10 +178,16 @@ Dictionary_Entry_Value* ModulesManager_GetModulesList( void* modulesManager, voi
 	return self->_getModulesList( self, dictionary );
 }
 
+Bool ModulesManager_CheckContext( void* modulesManager, void* _dictionary, Name moduleName, Name contextName ) {
+	ModulesManager*			self 		= (ModulesManager*)modulesManager;
+	Dictionary*			dictionary 	= (Dictionary*)_dictionary;
 
-void ModulesManager_Load( void* modulesManager, void* _dictionary ) {
-	ModulesManager*			self = (ModulesManager*)modulesManager;
-	Dictionary*			dictionary = (Dictionary*)_dictionary;
+	return self->_checkContext( self, dictionary, moduleName, contextName );
+}
+
+void ModulesManager_Load( void* modulesManager, void* _dictionary, Name contextName ) {
+	ModulesManager*			self 		= (ModulesManager*)modulesManager;
+	Dictionary*			dictionary 	= (Dictionary*)_dictionary;
 	unsigned int			entryCount;
 	unsigned int			entry_I;
 	Dictionary_Entry_Value*		modulesVal;
@@ -251,6 +258,9 @@ void ModulesManager_Load( void* modulesManager, void* _dictionary ) {
 	for( entry_I = 0; entry_I < entryCount; entry_I++ ) {
 		Name		moduleName;
 		moduleName = Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( modulesVal, entry_I ) );
+
+		if( !ModulesManager_CheckContext( self, dictionary, moduleName, contextName ) )
+			continue;
 
 		if ( ! ModulesManager_LoadModule( self, moduleName ) ) {
 			Journal_Firewall(

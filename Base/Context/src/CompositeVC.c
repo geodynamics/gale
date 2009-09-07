@@ -32,16 +32,18 @@
 #include "Base/Foundation/Foundation.h"
 #include "Base/IO/IO.h"
 #include "Base/Container/Container.h"
+#include "Base/Automation/Automation.h"
+#include "Base/Extensibility/Extensibility.h"
 
 #include "types.h"
-#include "shortcuts.h"
-#include "Stg_Component.h"
-#include "Stg_ComponentFactory.h"
-#include "LiveComponentRegister.h"
 #include "Variable.h"
 #include "Variable_Register.h"
 #include "VariableCondition.h"
 #include "VariableCondition_Register.h"
+#include "ConditionFunction.h"
+#include "ConditionFunction_Register.h"
+#include "ContextEntryPoint.h"
+#include "AbstractContext.h"
 #include "CompositeVC.h"
 
 #include <string.h>
@@ -352,10 +354,14 @@ void _CompositeVC_Construct( void* compositeVC, Stg_ComponentFactory* cf, void* 
         /* Need to store this so we can get at components
            later on when using the fucked up 'ReadDictionary' function. */
         self->cf = cf;
+
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !self->context )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
 	
-	variableRegister = (void*)Stg_ObjectList_Get( cf->registerRegister, "Variable_Register" );
+	variableRegister = self->context->variable_Register;
 	assert( variableRegister );
-	conditionFunctionRegister = (void*)Stg_ObjectList_Get( cf->registerRegister, "ConditionFunction_Register" );
+	conditionFunctionRegister = condFunc_Register; 
 	assert( conditionFunctionRegister );
 	
 	vcName = Stg_ComponentFactory_GetString( cf, self->name, "vcName", self->name );

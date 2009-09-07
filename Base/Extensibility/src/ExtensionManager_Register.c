@@ -47,13 +47,14 @@
 /* Textual name of this class */
 const Type ExtensionManager_Register_Type = "ExtensionManager_Register";
 
+ExtensionManager_Register* extensionMgr_Register = 0;
 
 ExtensionManager_Register* ExtensionManager_Register_New( void ) {
 	return _ExtensionManager_Register_New( sizeof(ExtensionManager_Register), ExtensionManager_Register_Type, _ExtensionManager_Register_Delete, _ExtensionManager_Register_Print, NULL );
 }
 
-void ExtensionManager_Register_Init( void* extensionMgr_Register ) {
-	ExtensionManager_Register* self = (ExtensionManager_Register*)extensionMgr_Register;
+void ExtensionManager_Register_Init( void* extensionManager_Register ) {
+	ExtensionManager_Register* self = (ExtensionManager_Register*)extensionManager_Register;
 	
 	/* General info */
 	self->type = ExtensionManager_Register_Type;
@@ -92,8 +93,8 @@ ExtensionManager_Register* _ExtensionManager_Register_New(
 	return self;
 }
 
-void _ExtensionManager_Register_Init( void* extensionMgr_Register ) {
-	ExtensionManager_Register* self = (ExtensionManager_Register*)extensionMgr_Register;
+void _ExtensionManager_Register_Init( void* extensionManager_Register ) {
+	ExtensionManager_Register* self = (ExtensionManager_Register*)extensionManager_Register;
 	
 	/* General and Virtual info should already be set */
 	
@@ -101,8 +102,8 @@ void _ExtensionManager_Register_Init( void* extensionMgr_Register ) {
 	self->extensions = Stg_ObjectList_New();
 }
 
-void _ExtensionManager_Register_Delete( void* extensionMgr_Register ) {
-	ExtensionManager_Register* self = (ExtensionManager_Register*)extensionMgr_Register;
+void _ExtensionManager_Register_Delete( void* extensionManager_Register ) {
+	ExtensionManager_Register* self = (ExtensionManager_Register*)extensionManager_Register;
 	
 	/* Assumes ownerships of the element types */
 	Stg_Class_Delete( self->extensions );
@@ -111,8 +112,8 @@ void _ExtensionManager_Register_Delete( void* extensionMgr_Register ) {
 	_Stg_Class_Delete( self );
 }
 
-void _ExtensionManager_Register_Print( void* extensionMgr_Register, Stream* stream ) {
-	ExtensionManager_Register* self = (ExtensionManager_Register*)extensionMgr_Register;
+void _ExtensionManager_Register_Print( void* extensionManager_Register, Stream* stream ) {
+	ExtensionManager_Register* self = (ExtensionManager_Register*)extensionManager_Register;
 	
 	/* General info */
 	Journal_Printf( (void*) stream, "ExtensionManager_Register (ptr): %p\n", self );
@@ -129,20 +130,20 @@ void _ExtensionManager_Register_Print( void* extensionMgr_Register, Stream* stre
 	Stg_Class_Print( self->extensions, stream );
 }
 
-ExtensionManager_Index ExtensionManager_Register_Add( void* extensionMgr_Register, void* extension ) {
-	ExtensionManager_Register*	self = (ExtensionManager_Register*)extensionMgr_Register;
+ExtensionManager_Index ExtensionManager_Register_Add( void* extensionManager_Register, void* extension ) {
+	ExtensionManager_Register*	self = (ExtensionManager_Register*)extensionManager_Register;
 	
 	return Stg_ObjectList_Append( self->extensions, extension );
 }
 
-ExtensionManager_Index ExtensionManager_Register_GetExtensionHandle( void* extensionMgr_Register, Name toGet ) {
-	ExtensionManager_Register*	self = (ExtensionManager_Register*)extensionMgr_Register;
+ExtensionManager_Index ExtensionManager_Register_GetExtensionHandle( void* extensionManager_Register, Name toGet ) {
+	ExtensionManager_Register*	self = (ExtensionManager_Register*)extensionManager_Register;
 	
 	return Stg_ObjectList_GetIndex( self->extensions, toGet );
 }
 
-ExtensionManager* _ExtensionManager_Register_GetExtension( void* extensionMgr_Register, ExtensionManager_Index handle ) {
-	ExtensionManager_Register*	self = (ExtensionManager_Register*)extensionMgr_Register;
+ExtensionManager* _ExtensionManager_Register_GetExtension( void* extensionManager_Register, ExtensionManager_Index handle ) {
+	ExtensionManager_Register*	self = (ExtensionManager_Register*)extensionManager_Register;
 	
 	return ExtensionManager_Register_GetExtension( self, handle );
 }

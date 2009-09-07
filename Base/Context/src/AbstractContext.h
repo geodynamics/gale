@@ -165,14 +165,10 @@
 		EntryPoint_Index			dataSaveK; \
 		EntryPoint_Index			dataSaveClassK; \
 		\
-		Stg_ObjectList*				objectList; \
-		ConditionFunction_Register*		condFunc_Register; \
 		Variable_Register*			variable_Register; \
 		Pointer_Register*			pointer_Register; \
 		EntryPoint_Register*			entryPoint_Register; \
-		ExtensionManager_Register*		extensionMgr_Register; \
 		ExtensionManager*			extensionMgr; \
-		Register_Register*			register_Register; \
 		Stg_ComponentFactory*			CF; \
 		PluginsManager*				plugins;
 
@@ -204,12 +200,7 @@
 		Dictionary*					dictionary );
 	
 	/* Initialisation implementation */
-	void _AbstractContext_Init( 
-		AbstractContext* 		self,
-		double				startTime,
-		double				stopTime,
-		MPI_Comm			communicator );
-	
+	void _AbstractContext_Init( AbstractContext* self );
 	
 	/* Stg_Class_Delete implementation */
 	void _AbstractContext_Delete( void* abstractContext );
@@ -278,9 +269,6 @@
 	/* function to error if no hooks to an entrypoint defined */
 	void AbstractContext_ErrorIfNoHooks( void* context, EntryPoint_Index epIndex, const char* caller );
 	
-	void AbstractContext_BuildAllLiveComponents( void* context ) ;
-	void AbstractContext_InitialiseAllLiveComponents( void* context ) ;
-
 	Bool AbstractContext_CheckPointExists( void* context, Index timeStep );
 
 	/* Works out the prefix string to use for reading checkpoint files (input path + C.P. prefix)
@@ -295,7 +283,7 @@
 	
 	
 	/* Default construction hook, and overrides for the EP to handle the context/ptrToContext synchronisation */
-	void _AbstractContext_Construct_Hook( void* context, void* ptrToContext );
+	void _AbstractContext_Construct_Hook( void* _context, void* data );
 	Func_Ptr _AbstractContext_Construct_EP_GetRun( void* entryPoint );
 	void _AbstractContext_Construct_EP_Run( void* entryPoint, void* data0, void* data1 );
 	

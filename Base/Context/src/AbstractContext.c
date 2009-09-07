@@ -39,6 +39,8 @@
 #include "units.h"
 #include "types.h"
 #include "shortcuts.h"
+#include "Variable.h"
+#include "Variable_Register.h"
 #include "AbstractContext.h"
 #include "ContextEntryPoint.h"
 #include "DictionaryCheck.h"
@@ -120,29 +122,20 @@ AbstractContext* _AbstractContext_New(
 	/* General info */
 	self->dictionary = dictionary;
 
-	Journal_Firewall( self->dictionary->count,
-		       	Journal_Register( Error_Type, "Error Stream" ),
-			"Error in %s: The dictionary is empty, meaning no input parameters have been feed into your program. Perhaps you've forgot to pass any input files ( or command-line arguments ) in.\n", __func__); 	
-	
 	/* Virtual info */
+	self->CF = 0; /* gets built in stgMain and passed in during the construct phase */
 	self->_setDt = _setDt;
+	self->startTime = startTime;
+	self->stopTime = stopTime;
+	self->communicator = communicator;
 	
-	if( initFlag ){
-		_AbstractContext_Init( self, startTime, stopTime, communicator );
-	}
+	_AbstractContext_Init( self );
 	
 	return self;
 }
 
-void _AbstractContext_Init(
-		AbstractContext* 		self,
-		double				startTime,
-		double				stopTime,
-		MPI_Comm			communicator )
-{
+void _AbstractContext_Init( AbstractContext* self ) {
 	Stream* debug = Journal_Register( DebugStream_Type, AbstractContext_Type );
-	Dictionary_Entry_Value* dictEntryVal = NULL;
-	Dictionary *componentDict = NULL;
 	char buf[80];
 
 #ifdef READ_HDF5
@@ -159,8 +152,6 @@ void _AbstractContext_Init(
 	/* General and Virtual info should already be set */
 	
 	/* AbstractContext info */
-	self->isConstructed = True;
-	self->communicator = communicator;
 	MPI_Comm_rank( self->communicator, &self->rank );
 	MPI_Comm_size( self->communicator, &self->nproc );
 	self->debug = debug;
@@ -185,17 +176,247 @@ void _AbstractContext_Init(
 	}
 	
 	/* Set up the registers and managers */
-	self->CF = 0; /* gets built later */
-	self->objectList = Stg_ObjectList_New();
-	self->condFunc_Register = ConditionFunction_Register_New();
 	self->variable_Register = Variable_Register_New();
-	self->extensionMgr_Register = ExtensionManager_Register_New();
 	self->extensionMgr = ExtensionManager_New_OfExistingObject( self->type, self );
-	ExtensionManager_Register_Add( self->extensionMgr_Register, self->extensionMgr );
+	ExtensionManager_Register_Add( extensionMgr_Register, self->extensionMgr );
 	self->pointer_Register = Stg_ObjectList_New();
-	self->register_Register = Stg_ObjectList_New();
 	self->plugins = PluginsManager_New();
 	
+	/* Build the entryPoint table */
+	self->entryPoint_Register = EntryPoint_Register_New(); 
+	/* For the construct EP, override the run function such that the context/ptrToContext remain in sync in the loop. */
+	self->constructK = Context_AddEntryPoint( 
+		self, 
+		ContextEntryPoint_New( AbstractContext_EP_Construct, EntryPoint_2VoidPtr_CastType ) );
+	AbstractContext_GetEntryPoint( self, AbstractContext_EP_Construct )->_getRun = _AbstractContext_Construct_EP_GetRun;
+	AbstractContext_GetEntryPoint( self, AbstractContext_EP_Construct )->run = 
+		EntryPoint_GetRun( AbstractContext_GetEntryPoint( self, AbstractContext_EP_Construct ) );
+	self->constructExtensionsK = Context_AddEntryPoint( 
+		self, 
+		ContextEntryPoint_New( AbstractContext_EP_ConstructExtensions, EntryPoint_VoidPtr_CastType ) );
+	self->buildK = Context_AddEntryPoint( 
+		self, 
+		ContextEntryPoint_New( AbstractContext_EP_Build, EntryPoint_VoidPtr_CastType ) );
+	self->initialiseK = Context_AddEntryPoint( 
+		self, 
+		ContextEntryPoint_New( AbstractContext_EP_Initialise, EntryPoint_VoidPtr_CastType ) );
+	self->executeK = Context_AddEntryPoint( 
+		self, 
+		ContextEntryPoint_New( AbstractContext_EP_Execute, EntryPoint_VoidPtr_CastType ) );
+	self->destroyK = Context_AddEntryPoint( 
+		self, 
+		ContextEntryPoint_New( AbstractContext_EP_Destroy, EntryPoint_VoidPtr_CastType ) );
+	self->destroyExtensionsK = Context_AddEntryPoint( 
+		self, 
+		ContextEntryPoint_New( AbstractContext_EP_DestroyExtensions, EntryPoint_VoidPtr_CastType ) );
+	
+	self->dtK = Context_AddEntryPoint( 
+		self, 
+		ContextEntryPoint_New( AbstractContext_EP_Dt, ContextEntryPoint_Dt_CastType ) );
+	self->stepK = Context_AddEntryPoint( 
+		self, 
+		ContextEntryPoint_New( AbstractContext_EP_Step, ContextEntryPoint_Step_CastType ) );
+	self->updateClassK = Context_AddEntryPoint( 
+		self, 
+		ContextEntryPoint_New( AbstractContext_EP_UpdateClass, EntryPoint_Class_VoidPtr_CastType ) );
+	self->solveK = Context_AddEntryPoint( 
+		self, 
+		ContextEntryPoint_New( AbstractContext_EP_Solve, EntryPoint_VoidPtr_CastType ) );
+	self->postSolveK = Context_AddEntryPoint( 
+		self, 
+		ContextEntryPoint_New( AbstractContext_EP_PostSolvePreUpdate, EntryPoint_VoidPtr_CastType ) );
+	self->syncK = Context_AddEntryPoint( 
+		self, 
+		ContextEntryPoint_New( AbstractContext_EP_Sync, EntryPoint_VoidPtr_CastType ) );
+	self->frequentOutputK =	Context_AddEntryPoint( 
+		self, 
+		ContextEntryPoint_New( AbstractContext_EP_FrequentOutput, EntryPoint_VoidPtr_CastType ) );
+	self->dumpK = Context_AddEntryPoint( 
+		self, 
+		ContextEntryPoint_New( AbstractContext_EP_Dump, EntryPoint_VoidPtr_CastType ) );
+	self->dumpClassK = Context_AddEntryPoint( 
+		self, 
+		ContextEntryPoint_New( AbstractContext_EP_DumpClass, EntryPoint_Class_VoidPtr_CastType ) );
+	self->saveK = Context_AddEntryPoint( 
+		self, 
+		ContextEntryPoint_New( AbstractContext_EP_Save, EntryPoint_VoidPtr_CastType ) );
+	self->saveClassK = Context_AddEntryPoint( 
+		self, 
+		ContextEntryPoint_New( AbstractContext_EP_SaveClass, EntryPoint_Class_VoidPtr_CastType ) );
+	self->dataSaveK = Context_AddEntryPoint( 
+		self, 
+		ContextEntryPoint_New( AbstractContext_EP_DataSave, EntryPoint_VoidPtr_CastType ) );
+	self->dataSaveClassK = Context_AddEntryPoint( 
+		self, 
+		ContextEntryPoint_New( AbstractContext_EP_DataSaveClass, EntryPoint_Class_VoidPtr_CastType ) );
+	
+	/* add initial hooks */
+	EntryPoint_Append(
+		AbstractContext_GetEntryPoint( self, AbstractContext_EP_Construct ),
+		"default",
+		(Func_Ptr)_AbstractContext_Construct_Hook,
+		AbstractContext_Type );
+	EntryPoint_Append( 
+		AbstractContext_GetEntryPoint( self, AbstractContext_EP_Execute ),
+		"default", 
+		(Func_Ptr)_AbstractContext_Execute_Hook, 
+		AbstractContext_Type );
+	EntryPoint_Append( 
+		AbstractContext_GetEntryPoint( self, AbstractContext_EP_Step ),
+		"default", 
+		(Func_Ptr)_AbstractContext_Step, 
+		AbstractContext_Type );
+	EntryPoint_Append( 
+		AbstractContext_GetEntryPoint( self, AbstractContext_EP_Save ),
+		"SaveTimeInfo", 
+		(Func_Ptr)_AbstractContext_SaveTimeInfo, 
+		AbstractContext_Type );
+	EntryPoint_Prepend_AlwaysFirst( 
+		AbstractContext_GetEntryPoint( self, AbstractContext_EP_Save ),
+		"CreateCheckpointDirectory", 
+		(Func_Ptr)_AbstractContext_CreateCheckpointDirectory, 
+		AbstractContext_Type );
+	EntryPoint_Prepend_AlwaysFirst( 
+		AbstractContext_GetEntryPoint( self, AbstractContext_EP_DataSave ),
+		"CreateCheckpointDirectory", 
+		(Func_Ptr)_AbstractContext_CreateCheckpointDirectory, 
+		AbstractContext_Type );
+}
+
+void _AbstractContext_Delete( void* abstractContext ) {
+	AbstractContext* self = (AbstractContext*)abstractContext;
+
+	Stg_Class_Delete( self->variable_Register );
+	Stg_Class_Delete( self->entryPoint_Register );
+
+	Memory_Free( self->experimentName );
+	Memory_Free( self->outputPath );
+	Memory_Free( self->checkpointReadPath );
+	Memory_Free( self->checkpointWritePath );
+	
+	Stg_Class_Delete( self->plugins );
+	
+	/* Stg_Class_Delete parent */
+	_Stg_Component_Delete( self );
+}
+
+void _AbstractContext_Print( void* abstractContext, Stream* stream ) {
+	AbstractContext* self = (AbstractContext*)abstractContext;
+	
+	/* General info */
+	Journal_Printf( (void*) stream, "AbstractContext (ptr)(%p):\n", self );
+	Journal_Printf( (void*) stream, "\tdictionary (ptr): %p\n", self->dictionary );
+	
+	/* Virtual info */
+	Journal_Printf( (void*) stream, "\t_setDt (ptr): %p\n", self->_setDt );
+	
+	/* AbstractContext info */
+	Journal_Printf( (void*) stream, "\tcommunicator: %i\n", self->communicator );
+	Journal_Printf( (void*) stream, "\tstartTime: %g\n", self->startTime );
+	Journal_Printf( (void*) stream, "\tstopTime: %g\n", self->stopTime );
+	Journal_Printf( (void*) stream, "\tcurrentTime: %g\n", self->currentTime );
+	Journal_Printf( (void*) stream, "\ttimeStep: %u\n", self->timeStep );
+	Journal_Printf( (void*) stream, "\ttimeStepSinceJobRestart: %u\n", self->timeStepSinceJobRestart );
+	Journal_Printf( (void*) stream, "\tmaxTimeSteps: %u\n", self->maxTimeSteps );
+	Journal_Printf( (void*) stream, "\tfinalTimeStep: %u\n", self->finalTimeStep );
+	Journal_Printf( (void*) stream, "\toutputEvery: %u\n", self->frequentOutputEvery );
+	Journal_Printf( (void*) stream, "\tdumpEvery: %u\n", self->dumpEvery );
+	Journal_Printf( (void*) stream, "\tcheckpointEvery: %u\n", self->checkpointEvery );
+   Journal_Printf( (void*) stream, "\tsaveDataEvery: %u\n", self->saveDataEvery );
+	Journal_Printf( (void*) stream, "\tcheckpointAtTimeInc: %g\n", self->checkpointAtTimeInc );
+
+	if( self->outputPath ) {
+		Journal_Printf( (void*) stream, "\toutputPath: %s\n", self->outputPath );
+	}
+	else {
+		Journal_Printf( (void*) stream, "\toutputPath: (null)\n" );
+	}
+
+	if( self->checkpointReadPath ) {
+		Journal_Printf( (void*) stream, "\tcheckpointReadPath: %s\n", self->checkpointReadPath );
+	}
+	else {
+		Journal_Printf( (void*) stream, "\tcheckpointReadPath: (null)\n" );
+	}
+
+	if( self->checkpointWritePath ) {
+		Journal_Printf( (void*) stream, "\tcheckpointWritePath: %s\n", self->checkpointWritePath );
+	}
+	else {
+		Journal_Printf( (void*) stream, "\tcheckpointWritePath: (null)\n" );
+	}
+
+	Journal_Printf( stream, "\tloadFromCheckPoint: %u\n", self->loadFromCheckPoint );
+	Journal_Printf( stream, "\trestartTimestep: %u\n", self->restartTimestep );
+	Journal_Printf( stream, "\tcheckPointPrefixString: %s\n", self->checkPointPrefixString );
+	
+	Stg_Class_Print( self->entryPoint_Register, stream );
+	
+	Journal_Printf( (void*) stream, "\tconstructK: %u\n", self->constructK );
+	Journal_Printf( (void*) stream, "\tconstructExtensionsK: %u\n", self->constructExtensionsK );
+	Journal_Printf( (void*) stream, "\tbuildK: %u\n", self->buildK );
+	Journal_Printf( (void*) stream, "\tinitialiseK: %u\n", self->initialiseK );
+	Journal_Printf( (void*) stream, "\texecuteK: %u\n", self->executeK );
+	Journal_Printf( (void*) stream, "\tdestroyK: %u\n", self->destroyK );
+	Journal_Printf( (void*) stream, "\tdestroyExtensionsK: %u\n", self->destroyExtensionsK );
+	
+	Journal_Printf( (void*) stream, "\tdt: %u\n", self->dtK );
+	Journal_Printf( (void*) stream, "\tstepK: %u\n", self->stepK );
+	Journal_Printf( (void*) stream, "\tsolveK: %u\n", self->solveK );
+	Journal_Printf( (void*) stream, "\tsyncK: %u\n", self->syncK );
+	
+	/* Print parent */
+	_Stg_Class_Print( self, stream );
+}
+
+
+/* Construct EP override stuff ****************************************************************************************************/
+
+
+Func_Ptr _AbstractContext_Construct_EP_GetRun( void* entryPoint ) {
+	EntryPoint* self = (EntryPoint*)entryPoint;
+	
+	switch( self->castType ) {
+		case EntryPoint_2VoidPtr_CastType:
+			return (void*) _AbstractContext_Construct_EP_Run;
+		
+		default:
+			return _EntryPoint_GetRun( self );
+	}
+	return 0;
+}
+
+void _AbstractContext_Construct_EP_Run( void* entryPoint, void* data0, void* data1 ) {
+	EntryPoint*		self = (EntryPoint*)entryPoint;
+	Hook_Index		hookIndex;
+	AbstractContext* 	context = (AbstractContext*)data0;
+	
+	#ifdef USE_PROFILE
+		Stg_CallGraph_Push( stgCallGraph, _EntryPoint_Run_2VoidPtr, self->name );
+	#endif
+	
+	for( hookIndex = 0; hookIndex < self->hooks->count; hookIndex++ ) {
+		((EntryPoint_2VoidPtr_Cast*)((Hook*)self->hooks->data[hookIndex])->funcPtr)( context, NULL );
+		
+		self = KeyHandle( context, context->constructK );
+	}
+	
+	#ifdef USE_PROFILE
+		Stg_CallGraph_Pop( stgCallGraph );
+	#endif
+}
+
+
+/* Component stuff ****************************************************************************************************************/
+
+
+void _AbstractContext_Construct( void* context, Stg_ComponentFactory* cf, void* data ) {
+	AbstractContext* 	self = (AbstractContext*)context;
+	Dictionary_Entry_Value* dictEntryVal = NULL;
+	double			startTime, stopTime;
+	
+	Journal_Printf( self->debug, "In: %s\n", __func__ );
+
 	/* Main input parameters */
 	self->frequentOutputEvery = Dictionary_Entry_Value_AsUnsignedInt( 
 		Dictionary_GetDefault( self->dictionary, "outputEvery", Dictionary_Entry_Value_FromUnsignedInt( 1 ) ) );
@@ -306,6 +527,7 @@ void _AbstractContext_Init(
 
 	/* Note: these try for deprecated keys "start", "end" and "stop" as well as new ones "startTime" and
 		"stopTime" - Main.PatrickSunter - 4 November 2004 */
+	startTime = stopTime = 0;
 	dictEntryVal = Dictionary_Get( self->dictionary, "start" );
 	if ( NULL == dictEntryVal ) {
 		dictEntryVal = Dictionary_GetDefault( self->dictionary, "startTime",
@@ -355,302 +577,19 @@ void _AbstractContext_Init(
 		self->loadFromCheckPoint = False;
 	}
 
-	/* Build the entryPoint table */
-	self->entryPoint_Register = EntryPoint_Register_New(); 
-	/* For the construct EP, override the run function such that the context/ptrToContext remain in sync in the loop. */
-	self->constructK = Context_AddEntryPoint( 
-		self, 
-		ContextEntryPoint_New( AbstractContext_EP_Construct, EntryPoint_2VoidPtr_CastType ) );
-	AbstractContext_GetEntryPoint( self, AbstractContext_EP_Construct )->_getRun = _AbstractContext_Construct_EP_GetRun;
-	AbstractContext_GetEntryPoint( self, AbstractContext_EP_Construct )->run = 
-		EntryPoint_GetRun( AbstractContext_GetEntryPoint( self, AbstractContext_EP_Construct ) );
-	self->constructExtensionsK = Context_AddEntryPoint( 
-		self, 
-		ContextEntryPoint_New( AbstractContext_EP_ConstructExtensions, EntryPoint_VoidPtr_CastType ) );
-	self->buildK = Context_AddEntryPoint( 
-		self, 
-		ContextEntryPoint_New( AbstractContext_EP_Build, EntryPoint_VoidPtr_CastType ) );
-	self->initialiseK = Context_AddEntryPoint( 
-		self, 
-		ContextEntryPoint_New( AbstractContext_EP_Initialise, EntryPoint_VoidPtr_CastType ) );
-	self->executeK = Context_AddEntryPoint( 
-		self, 
-		ContextEntryPoint_New( AbstractContext_EP_Execute, EntryPoint_VoidPtr_CastType ) );
-	self->destroyK = Context_AddEntryPoint( 
-		self, 
-		ContextEntryPoint_New( AbstractContext_EP_Destroy, EntryPoint_VoidPtr_CastType ) );
-	self->destroyExtensionsK = Context_AddEntryPoint( 
-		self, 
-		ContextEntryPoint_New( AbstractContext_EP_DestroyExtensions, EntryPoint_VoidPtr_CastType ) );
-	
-	self->dtK = Context_AddEntryPoint( 
-		self, 
-		ContextEntryPoint_New( AbstractContext_EP_Dt, ContextEntryPoint_Dt_CastType ) );
-	self->stepK = Context_AddEntryPoint( 
-		self, 
-		ContextEntryPoint_New( AbstractContext_EP_Step, ContextEntryPoint_Step_CastType ) );
-	self->updateClassK = Context_AddEntryPoint( 
-		self, 
-		ContextEntryPoint_New( AbstractContext_EP_UpdateClass, EntryPoint_Class_VoidPtr_CastType ) );
-	self->solveK = Context_AddEntryPoint( 
-		self, 
-		ContextEntryPoint_New( AbstractContext_EP_Solve, EntryPoint_VoidPtr_CastType ) );
-	self->postSolveK = Context_AddEntryPoint( 
-		self, 
-		ContextEntryPoint_New( AbstractContext_EP_PostSolvePreUpdate, EntryPoint_VoidPtr_CastType ) );
-	self->syncK = Context_AddEntryPoint( 
-		self, 
-		ContextEntryPoint_New( AbstractContext_EP_Sync, EntryPoint_VoidPtr_CastType ) );
-	self->frequentOutputK =	Context_AddEntryPoint( 
-		self, 
-		ContextEntryPoint_New( AbstractContext_EP_FrequentOutput, EntryPoint_VoidPtr_CastType ) );
-	self->dumpK = Context_AddEntryPoint( 
-		self, 
-		ContextEntryPoint_New( AbstractContext_EP_Dump, EntryPoint_VoidPtr_CastType ) );
-	self->dumpClassK = Context_AddEntryPoint( 
-		self, 
-		ContextEntryPoint_New( AbstractContext_EP_DumpClass, EntryPoint_Class_VoidPtr_CastType ) );
-	self->saveK = Context_AddEntryPoint( 
-		self, 
-		ContextEntryPoint_New( AbstractContext_EP_Save, EntryPoint_VoidPtr_CastType ) );
-	self->saveClassK = Context_AddEntryPoint( 
-		self, 
-		ContextEntryPoint_New( AbstractContext_EP_SaveClass, EntryPoint_Class_VoidPtr_CastType ) );
-	self->dataSaveK = Context_AddEntryPoint( 
-		self, 
-		ContextEntryPoint_New( AbstractContext_EP_DataSave, EntryPoint_VoidPtr_CastType ) );
-	self->dataSaveClassK = Context_AddEntryPoint( 
-		self, 
-		ContextEntryPoint_New( AbstractContext_EP_DataSaveClass, EntryPoint_Class_VoidPtr_CastType ) );
-	
-	/* add initial hooks */
-	EntryPoint_Append( 
-		AbstractContext_GetEntryPoint( self, AbstractContext_EP_Construct ),
-		"default", 
-		(Func_Ptr)_AbstractContext_Construct_Hook, 
-		AbstractContext_Type );
-	EntryPoint_Append( 
-		AbstractContext_GetEntryPoint( self, AbstractContext_EP_Execute ),
-		"default", 
-		(Func_Ptr)_AbstractContext_Execute_Hook, 
-		AbstractContext_Type );
-	EntryPoint_Append( 
-		AbstractContext_GetEntryPoint( self, AbstractContext_EP_Step ),
-		"default", 
-		(Func_Ptr)_AbstractContext_Step, 
-		AbstractContext_Type );
-	EntryPoint_Append( 
-		AbstractContext_GetEntryPoint( self, AbstractContext_EP_Save ),
-		"SaveTimeInfo", 
-		(Func_Ptr)_AbstractContext_SaveTimeInfo, 
-		AbstractContext_Type );
-	EntryPoint_Prepend_AlwaysFirst( 
-		AbstractContext_GetEntryPoint( self, AbstractContext_EP_Save ),
-		"CreateCheckpointDirectory", 
-		(Func_Ptr)_AbstractContext_CreateCheckpointDirectory, 
-		AbstractContext_Type );
-	EntryPoint_Prepend_AlwaysFirst( 
-		AbstractContext_GetEntryPoint( self, AbstractContext_EP_DataSave ),
-		"CreateCheckpointDirectory", 
-		(Func_Ptr)_AbstractContext_CreateCheckpointDirectory, 
-		AbstractContext_Type );
-
-	Stg_ObjectList_ClassAppend( self->register_Register, (void*)self->extensionMgr_Register, "ExtensionManager_Register" );
-	Stg_ObjectList_ClassAppend( self->register_Register, (void*)self->variable_Register,     "Variable_Register" );
-	Stg_ObjectList_ClassAppend( self->register_Register, (void*)self->condFunc_Register,     "ConditionFunction_Register" );
-	Stg_ObjectList_ClassAppend( self->register_Register, (void*)self->entryPoint_Register,   "EntryPoint_Register" );
-	Stg_ObjectList_ClassAppend( self->register_Register, (void*)self->pointer_Register,      "Pointer_Register" );
-	
-	componentDict = Dictionary_GetDictionary( self->dictionary, "components" );
-
-	/* Add functions to make sure all the live components are built and initialised */
-	EntryPoint_Append( 
-		Context_GetEntryPoint( self, AbstractContext_EP_Build ),
-		"BuildAllLiveComponents", 
-		AbstractContext_BuildAllLiveComponents, 
-		AbstractContext_Type );
-	EntryPoint_Append( 
-		Context_GetEntryPoint( self, AbstractContext_EP_Initialise ),
-		"InitialiseAllLiveComponents", 
-		AbstractContext_InitialiseAllLiveComponents, 
-		AbstractContext_Type );
-
 	/* Check if we have been provided a constant to multiply our calculated dt values by. */
 	self->dtFactor = Dictionary_GetDouble_WithDefault( self->dictionary, "timestepFactor", 1.0 );
-}
 
-void _AbstractContext_Delete( void* abstractContext ) {
-	AbstractContext* self = (AbstractContext*)abstractContext;
+	/* construct entry point */
+	KeyCall( self, self->constructK, EntryPoint_2VoidPtr_CallCast* )( KeyHandle( self, self->constructK ), self, self );
 
-	Stg_Class_Delete( self->objectList );
-	Stg_Class_Delete( self->condFunc_Register );
-	Stg_Class_Delete( self->variable_Register );
+	/* Load the plugins desired by this context (dictionary) */
+	ModulesManager_Load( self->plugins, self->dictionary, self->name );
 
-	Stg_Class_Delete( self->entryPoint_Register );
+	/* Construct the list of plugins. now that the contexts are generated from XML this doesn't (and shouldn't) do anything */
+	ModulesManager_ConstructModules( self->plugins, cf, data );
 
-	Memory_Free( self->experimentName );
-	Memory_Free( self->outputPath );
-	Memory_Free( self->checkpointReadPath );
-	Memory_Free( self->checkpointWritePath );
-	
-	Stg_Class_Delete( self->extensionMgr_Register );
-	Stg_Class_Delete( self->plugins );
-	
-	/* Stg_Class_Delete parent */
-	_Stg_Component_Delete( self );
-}
-
-void _AbstractContext_Print( void* abstractContext, Stream* stream ) {
-	AbstractContext* self = (AbstractContext*)abstractContext;
-	
-	/* General info */
-	Journal_Printf( (void*) stream, "AbstractContext (ptr)(%p):\n", self );
-	Journal_Printf( (void*) stream, "\tdictionary (ptr): %p\n", self->dictionary );
-	
-	/* Virtual info */
-	Journal_Printf( (void*) stream, "\t_setDt (ptr): %p\n", self->_setDt );
-	
-	/* AbstractContext info */
-	Journal_Printf( (void*) stream, "\tcommunicator: %i\n", self->communicator );
-	Journal_Printf( (void*) stream, "\tstartTime: %g\n", self->startTime );
-	Journal_Printf( (void*) stream, "\tstopTime: %g\n", self->stopTime );
-	Journal_Printf( (void*) stream, "\tcurrentTime: %g\n", self->currentTime );
-	Journal_Printf( (void*) stream, "\ttimeStep: %u\n", self->timeStep );
-	Journal_Printf( (void*) stream, "\ttimeStepSinceJobRestart: %u\n", self->timeStepSinceJobRestart );
-	Journal_Printf( (void*) stream, "\tmaxTimeSteps: %u\n", self->maxTimeSteps );
-	Journal_Printf( (void*) stream, "\tfinalTimeStep: %u\n", self->finalTimeStep );
-	Journal_Printf( (void*) stream, "\toutputEvery: %u\n", self->frequentOutputEvery );
-	Journal_Printf( (void*) stream, "\tdumpEvery: %u\n", self->dumpEvery );
-	Journal_Printf( (void*) stream, "\tcheckpointEvery: %u\n", self->checkpointEvery );
-   Journal_Printf( (void*) stream, "\tsaveDataEvery: %u\n", self->saveDataEvery );
-	Journal_Printf( (void*) stream, "\tcheckpointAtTimeInc: %g\n", self->checkpointAtTimeInc );
-
-	if( self->outputPath ) {
-		Journal_Printf( (void*) stream, "\toutputPath: %s\n", self->outputPath );
-	}
-	else {
-		Journal_Printf( (void*) stream, "\toutputPath: (null)\n" );
-	}
-
-	if( self->checkpointReadPath ) {
-		Journal_Printf( (void*) stream, "\tcheckpointReadPath: %s\n", self->checkpointReadPath );
-	}
-	else {
-		Journal_Printf( (void*) stream, "\tcheckpointReadPath: (null)\n" );
-	}
-
-	if( self->checkpointWritePath ) {
-		Journal_Printf( (void*) stream, "\tcheckpointWritePath: %s\n", self->checkpointWritePath );
-	}
-	else {
-		Journal_Printf( (void*) stream, "\tcheckpointWritePath: (null)\n" );
-	}
-
-	Journal_Printf( stream, "\tloadFromCheckPoint: %u\n", self->loadFromCheckPoint );
-	Journal_Printf( stream, "\trestartTimestep: %u\n", self->restartTimestep );
-	Journal_Printf( stream, "\tcheckPointPrefixString: %s\n", self->checkPointPrefixString );
-	
-	Stg_Class_Print( self->entryPoint_Register, stream );
-	
-	Journal_Printf( (void*) stream, "\tconstructK: %u\n", self->constructK );
-	Journal_Printf( (void*) stream, "\tconstructExtensionsK: %u\n", self->constructExtensionsK );
-	Journal_Printf( (void*) stream, "\tbuildK: %u\n", self->buildK );
-	Journal_Printf( (void*) stream, "\tinitialiseK: %u\n", self->initialiseK );
-	Journal_Printf( (void*) stream, "\texecuteK: %u\n", self->executeK );
-	Journal_Printf( (void*) stream, "\tdestroyK: %u\n", self->destroyK );
-	Journal_Printf( (void*) stream, "\tdestroyExtensionsK: %u\n", self->destroyExtensionsK );
-	
-	Journal_Printf( (void*) stream, "\tdt: %u\n", self->dtK );
-	Journal_Printf( (void*) stream, "\tstepK: %u\n", self->stepK );
-	Journal_Printf( (void*) stream, "\tsolveK: %u\n", self->solveK );
-	Journal_Printf( (void*) stream, "\tsyncK: %u\n", self->syncK );
-	
-	Stg_Class_Print( self->extensionMgr_Register, stream );
-	
-	/* Print parent */
-	_Stg_Class_Print( self, stream );
-}
-
-
-/* Construct EP override stuff ****************************************************************************************************/
-
-
-Func_Ptr _AbstractContext_Construct_EP_GetRun( void* entryPoint ) {
-	EntryPoint* self = (EntryPoint*)entryPoint;
-	
-	switch( self->castType ) {
-		case EntryPoint_2VoidPtr_CastType:
-			return (void*) _AbstractContext_Construct_EP_Run;
-		
-		default:
-			return _EntryPoint_GetRun( self );
-	}
-	return 0;
-}
-
-void _AbstractContext_Construct_EP_Run( void* entryPoint, void* data0, void* data1 ) {
-	/* This func should be _EntryPoint_Run_2VoidPtr, but with the synchronisation of context from ptrToContext after each
-	 * hook. */
-	EntryPoint*		self = (EntryPoint*)entryPoint;
-	Hook_Index		hookIndex;
-	AbstractContext* 	context = (AbstractContext*)data0;
-	AbstractContext**	ptrToContext = (AbstractContext**)data1;
-	
-	
-	#ifdef USE_PROFILE
-		Stg_CallGraph_Push( stgCallGraph, _EntryPoint_Run_2VoidPtr, self->name );
-	#endif
-	
-	for( hookIndex = 0; hookIndex < self->hooks->count; hookIndex++ ) {
-		((EntryPoint_2VoidPtr_Cast*)((Hook*)self->hooks->data[hookIndex])->funcPtr)( context, ptrToContext );
-		
-		/* BIG difference to default run function... we need to "re-sync" the context with the potentially new one. Once
-		    again this is only a HACK due to the implemented contexts NOT being extensions! What's also important, is
-		    that the list of things added to this "the contruct" entry point may have changed, but changed on this "new"
-		    context... need to "re-self" this EP. */
-		context = *ptrToContext;
-		self = KeyHandle( context, context->constructK );
-	             /*context->entryPoint_Register */
-	}
-	
-	#ifdef USE_PROFILE
-		Stg_CallGraph_Pop( stgCallGraph );
-	#endif
-}
-
-
-/* Component stuff ****************************************************************************************************************/
-
-
-void _AbstractContext_Construct( void* context, Stg_ComponentFactory* cf, void* ptrToContext ) {
-	AbstractContext* 	self = (AbstractContext*)context;
-	AbstractContext**	ptrToSelf = (AbstractContext**)ptrToContext;
-	Bool			isConstructed;
-	
-	Journal_Printf( self->debug, "In: %s\n", __func__ );
-	Journal_Firewall( 
-		self == *ptrToSelf, 
-		Journal_Register( Error_Type, AbstractContext_Type ), 
-		"ptrToContext is assumed to point to context\n" );
-
-	#ifdef DEBUG
-		Context_WarnIfNoHooks( self, self->buildK, __func__  );
-	#endif
-	
-	/* Pre-mark the phase as complete as a default hook will attempt to build all live components (including this again) */
-	isConstructed = self->isConstructed;
-	self->isConstructed = True;
-
-	/* Construct all the components. There should be quite few in there right now, however, the context will do a toolbox
-		and plugin load, which will add more and their dependencies. The toolboxes will be forced to construct within 
-		here*/
-	KeyCall( self, self->constructK, EntryPoint_2VoidPtr_CallCast* )( KeyHandle(self,self->constructK), self, ptrToSelf );
-	self = *ptrToSelf;
-
-	/* Construct the list of plugins. This wont reconstruct the components already constructed in the last step. By seperating
-		the plugins contstruction out of the component construction EP gives an opportunity to do a wrap up before
-		plugins start. The toolboxes will already be constructed by this stage. */
-	ModulesManager_ConstructModules( self->plugins, self->CF, ptrToSelf );
+	self->CF = cf;
 
 	/* Extensions are the last thing we want to do */
 	KeyCall( self, self->constructExtensionsK, EntryPoint_VoidPtr_CallCast* )( KeyHandle(self,self->constructExtensionsK), self );
@@ -661,7 +600,7 @@ void _AbstractContext_Construct( void* context, Stg_ComponentFactory* cf, void* 
 	if ( True == Dictionary_GetBool_WithDefault( self->dictionary, "showJournalStatus", False ) ) {
 		Journal_PrintConcise();	
 	}	
-	self->isConstructed = isConstructed;
+	self->isConstructed = True;
 }
 
 
@@ -858,84 +797,11 @@ void AbstractContext_DataSave( void* context ) {
 			KeyHandle(self,self->dataSaveClassK), self );
 }
 
-
-void AbstractContext_BuildAllLiveComponents( void* context ) {
-	AbstractContext*       self = (AbstractContext*) context;	
-	
-	/* Build all on Live Stg_Component Register */
-	if ( self->CF && self->CF->LCRegister )
-		LiveComponentRegister_BuildAll( self->CF->LCRegister, self );
-}
-
-
-void AbstractContext_InitialiseAllLiveComponents( void* context ) {
-	AbstractContext*       self = (AbstractContext*) context;	
-	
-	/* Build all on Live Stg_Component Register */
-	if ( self->CF && self->CF->LCRegister )
-		LiveComponentRegister_InitialiseAll( self->CF->LCRegister, self );
-}
-
-
 /* Context hooks ******************************************************************************************************************/
 
+void _AbstractContext_Construct_Hook( void* _context, void* data ) {
 
-void _AbstractContext_Construct_Hook( void* context, void* ptrToContext ) {
-	AbstractContext*		self = (AbstractContext*)context;
-	AbstractContext**		ptrToSelf;
-	Dictionary*			componentDict;
-	int				index; /* needs to be signed */
-	
-	Journal_Printf( self->debug, "In: %s\n", __func__ );
-	
-	/* Obtain the components info from the global dictionary. Check that the dictionary has unique entry names. */
-	if( (componentDict = Dictionary_GetDictionary( self->dictionary, AbstractContext_Dict_Components )) == NULL ) { 
-		componentDict = Dictionary_New();
-	}
-	CheckDictionaryKeys( componentDict, "Component dictionary must have unique names\n" );
-	
-	/* The component factory should be specific to this context, so create it here unless is already exists (i.e. desired
-	   behaviour has been purposely overridden). Add ourself to the global live register. */
-	if( !self->CF ) {
-		self->CF = Stg_ComponentFactory_New( self->dictionary, componentDict, self->register_Register );
-	}
-	LiveComponentRegister_Add( self->CF->LCRegister, (Stg_Component*)self );
-	
-	/* Boot up the toolboxes desired by this context (dictionary) */
-	ModulesManager_Load( stgToolboxesManager, self->dictionary );
-	/* SPECIAL BIT!
-	   Now that the toolboxes are loaded, now "contruct" each toolbox, ensuring that we "RE-construct" the context in the 
-	   reverse order of the toolboxes. Ensuring that only the first (i.e. largest context) toolbox builds a new context.
-	   NOTE: This mechanism completely sucks! The way Contexts are replaced is crap but works for now. It shows that
-	   Context's should be implemented as extensions! */
-	ptrToSelf = (AbstractContext**)ptrToContext;
-	for( index = stgToolboxesManager->modules->count - 1; index >= 0; index-- ) {
-		Module* module = (Module*)Stg_ObjectList_At( stgToolboxesManager->modules, index );
-		char*   mangledName = Module_MangledName( module );
-		
-		/* Contruct toolbox */
-		Journal_Firewall(
-			ModulesManager_ConstructModule( stgToolboxesManager, mangledName, self->CF, ptrToSelf ),
-			Journal_Register( Error_Type, AbstractContext_Type ),
-			"Error: Toolbox %s (mangled name: %s) could not be constructed."
-				" Ensure it has a valid construction function.\n",
-				module->name, mangledName );
-		
-		/* Swap self to the new one*/
-		if( self !=  *ptrToSelf ) {
-			self = *ptrToSelf;
-		}
-		
-		Memory_Free( mangledName );
-	}
-		
-	/* Load the plugins desired by this context (dictionary) */
-	ModulesManager_Load( self->plugins, self->dictionary );
-
-	Stg_ComponentFactory_CreateComponents( self->CF );
-	Stg_ComponentFactory_ConstructComponents( self->CF, ptrToSelf );
 }
-
 
 void _AbstractContext_Execute_Hook( Context* context ) {
 	AbstractContext*   self = (AbstractContext*)context;

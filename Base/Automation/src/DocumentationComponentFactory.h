@@ -52,7 +52,7 @@
 	** Constructor
 	*/
 	/* Creation implementation */
-	DocumentationComponentFactory* DocumentationComponentFactory_New( Stg_ObjectList* registerRegister );
+	DocumentationComponentFactory* DocumentationComponentFactory_New( );
 	
 	DocumentationComponentFactory* _DocumentationComponentFactory_New( 
 		SizeT                                                    _sizeOfSelf,
@@ -73,8 +73,7 @@
 		Stg_ComponentFactory_ConstructByNameFunc*                constructByName,
 		Stg_ComponentFactory_ConstructByKeyFunc*                 constructByKey,
 		Stg_ComponentFactory_ConstructByNameWithKeyFallbackFunc* constructByNameWithKeyFallback,
-		Stg_ComponentFactory_ConstructByListFunc*                constructByList,
-		Stg_ObjectList*                                          registerRegister );
+		Stg_ComponentFactory_ConstructByListFunc*                constructByList );
 	
 	/*-----------------------------------------------------------------------------------------------------------------
 	** Virtual functions

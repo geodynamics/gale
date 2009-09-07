@@ -49,55 +49,71 @@
 
 
 void stgMain( Dictionary* dictionary, MPI_Comm communicator ) {
-	AbstractContext* context;
+	Stg_ComponentFactory*	cf;
 
-	context = stgMainInit( dictionary, communicator );
-	stgMainLoop( context );
-	stgMainDestroy( context );
+	cf = stgMainInit( dictionary, communicator );
+	stgMainLoop( cf );
+	stgMainDestroy( cf );
+
+	Stg_Class_Delete( cf );
 }
 
-AbstractContext* stgMainInit( Dictionary* dictionary, MPI_Comm communicator ) {
-	AbstractContext*		context = NULL;
+/* TODO: need to find a way to add different communicators for different contexts */
+Stg_ComponentFactory* stgMainInit( Dictionary* dictionary, MPI_Comm communicator ) {
+	Stg_ComponentFactory* 		cf;
+	Dictionary*			componentDict;
+	Stg_Component*			component;
+	AbstractContext*		context;
+	unsigned			component_I;
+
+	if( ( componentDict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, "components" ) ) ) == NULL )
+		componentDict = Dictionary_New();
+	
+	CheckDictionaryKeys( componentDict, "Component dictionary must have unique names\n" );
+	cf = Stg_ComponentFactory_New( dictionary, componentDict );
+
+	/* Instantion phase -------------------------------------------------------------------------------------------------*/
+	Stg_ComponentFactory_CreateComponents( cf );
+
+	/* Assign the dictionary, componentFactory & the communicator for the contexts */
+	/* TODO: if different contexts require different communicators, then StG. components will be required for these, and 
+	 * they should be passed in from the XML */
+	/* Also, this is a little hacky, as nothing is known about the other layers of StG or their associated contexts here */
+	for( component_I = 0; component_I < LiveComponentRegister_GetCount( cf->LCRegister ); component_I++ ) {
+		component = LiveComponentRegister_At( cf->LCRegister, component_I );
+		if( !strcmp( component->type, "DomainContext" ) ||
+		    !strcmp( component->type, "FiniteElementContext" ) ||
+		    !strcmp( component->type, "PICelleratorContext" ) ||
+		    !strcmp( component->type, "UnderworldContext" ) ) {
+			Journal_Firewall( dictionary->count,
+		       		Journal_Register( Error_Type, "Error Stream" ),
+				"Error in %s: The dictionary is empty, meaning no input parameters have been feed into your program. Perhaps you've forgot to pass any input files ( or command-line arguments ) in.\n", __func__); 	
+	
+			context = (AbstractContext*)component;
+			context->dictionary = dictionary;
+			context->CF = cf;
+			context->communicator = communicator;
+		}
+	}
 	
 	/* Construction phase -----------------------------------------------------------------------------------------------*/
-	context = _AbstractContext_New( 
-			sizeof(AbstractContext),
-	       	        AbstractContext_Type,
-	                _AbstractContext_Delete,
-	                _AbstractContext_Print,
-	                NULL,
-	                NULL,
-	                _AbstractContext_Construct,
-	                _AbstractContext_Build,
-	                _AbstractContext_Initialise,
-	                _AbstractContext_Execute,
-	                _AbstractContext_Destroy,
-	                "context",
-	                True,
-	                NULL,
-	                0,
-	                0,
-	                communicator,
-	                dictionary );
-
-	/* Construction phase -----------------------------------------------------------------------------------------------*/
-	Stg_Component_Construct( context, 0 /* dummy */, &context, True );
+	Stg_ComponentFactory_ConstructComponents( cf, NULL );
 	
 	/* Building phase ---------------------------------------------------------------------------------------------------*/
-	Stg_Component_Build( context, 0 /* dummy */, False );
+	Stg_ComponentFactory_BuildComponents( cf, NULL );
 	
 	/* Initialisaton phase ----------------------------------------------------------------------------------------------*/
-	Stg_Component_Initialise( context, 0 /* dummy */, False );
+	Stg_ComponentFactory_InitialiseComponents( cf, NULL );
 
-	return context;
+	return cf;
 }
 
 
-AbstractContext* stgMainInitFromXML( char* xmlInputFilename, MPI_Comm communicator ) {
-   AbstractContext*  context = NULL;
-   Dictionary*       dictionary = NULL;
-   Bool              result;
-   XML_IO_Handler*   ioHandler;
+Stg_ComponentFactory* stgMainInitFromXML( char* xmlInputFilename, MPI_Comm communicator ) {
+   Dictionary*       		dictionary = NULL;
+   Bool              		result;
+   XML_IO_Handler*   		ioHandler;
+   Stg_ComponentFactory*	cf;
 
    dictionary = Dictionary_New();
    ioHandler = XML_IO_Handler_New();
@@ -105,27 +121,27 @@ AbstractContext* stgMainInitFromXML( char* xmlInputFilename, MPI_Comm communicat
    /* In case the user has put any journal configuration in the XML, read here */
    Journal_ReadFromDictionary( dictionary );
 
-   context = stgMainInit( dictionary, communicator );
+   Stg_ComponentFactory_SetComponentDictionary( cf, Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, "components" ) ) );
+
+   cf = stgMainInit( dictionary, communicator );
    
    /* We don't need the XML IO handler again (however don't delete the dictionary as it's 
     * 'owned' by the context from hereon */
    Stg_Class_Delete( ioHandler );
 
-   return context;
+   return cf;
 }
 
 	
-void stgMainLoop( AbstractContext* context ) {
+void stgMainLoop( Stg_ComponentFactory* cf ) {
 	/* Run (Solve) phase ------------------------------------------------------------------------------------------------*/
-	AbstractContext_Dump( context );
-	Stg_Component_Execute( context, 0 /* dummy */, False );
+	Stg_ComponentFactory_ExecuteComponents( cf, NULL );
 }
 
-
-void stgMainDestroy( AbstractContext* context ) {
+/* TODO previously StG didn't go through and destroy everything - doing so causes a bunch of double frees. need to fix this... */
+void stgMainDestroy( Stg_ComponentFactory* cf ) {
 	/* Destruct phase ---------------------------------------------------------------------------------------------------*/
-	Stg_Component_Destroy( context, 0 /* dummy */, False );
-	Stg_Class_Delete( context );
+	//Stg_Class_Delete( cf );
 }
 
 void stgImportToolbox( Dictionary* dictionary, char* toolboxName ) {

@@ -44,6 +44,7 @@
 
 const Type ConditionFunction_Register_Type = "ConditionFunction_Register";
 
+ConditionFunction_Register* condFunc_Register = 0;
 
 /*--------------------------------------------------------------------------------------------------------------------------
 ** Constructor

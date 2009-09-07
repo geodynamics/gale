@@ -82,7 +82,7 @@
 	
 	/** Textual name of this class */
 	extern const Type Stg_ObjectList_Type;
-	
+
 	extern const int DEFAULT_LIST_INITIAL_SIZE;
 	extern const int DEFAULT_LIST_DELTA;
 

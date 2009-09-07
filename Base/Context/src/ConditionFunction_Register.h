@@ -27,100 +27,96 @@
 */
 /** \file
 **  Role:
-**	Instantiates the Variable_Register such that there is only one set of DOF descriptions (for example, all the nodes have the same
+**	Instantiates the ConditionFunction_Register such that there is only one set of DOF descriptions (for example, all the nodes have the same
 **	DOF configuration).
 **
 ** Assumptions:
-**	All "adding" is done before the Variable_Register_Build(...), which will be done in the mesh's initialisation.
+**	All "adding" is done before the ConditionFunction_Register_Build(...), which will be done in the mesh's initialisation.
 **
 ** Comments:
-**	You "add" DOF descriptors by using the Variable_Register_Add( variable_Register, name, offset ), where the "name" is the
+**	You "add" DOF descriptors by using the ConditionFunction_Register_Add( variable_Register, name, offset ), where the "name" is the
 **	textual name for the DOF that will be used in the I/O of the DOF (e.g. for initial and boundary conditions), and "offset" is
 **	the memory offset of the DOF in the construct that it will be used (e.g. node.vel[0]-node ).
 **
-** $Id: Variable_Register.h 4081 2007-04-27 06:20:07Z LukeHodkinson $
+** $Id: ConditionFunction_Register.h 3462 2006-02-19 06:53:24Z WalterLandry $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Automation_Variable_Register_h__
-#define __Base_Automation_Variable_Register_h__
+#ifndef __Base_Automation_ConditionFunction_Register_h__
+#define __Base_Automation_ConditionFunction_Register_h__
 	
 	
-	extern const Type Variable_Register_Type;
+	extern const Type ConditionFunction_Register_Type;
+
+	/* Global default instantiation of the register, created in Init.c */
+	extern ConditionFunction_Register* condFunc_Register;	
 	
-	
-	#define __Variable_Register \
+	#define __ConditionFunction_Register \
 		/* General info */ \
 		__Stg_Class \
 		\
 		/* Virtual info */ \
 		\
 		/* Stg_Class info */ \
-		/** Total number of variables counted */ \
-		Variable_Index                          count; \
-		SizeT                                   _size; \
-		SizeT                                   _delta; \
-		Variable**                              _variable; \
-		Stream*					errorStream;
+		ConditionFunction_Index			count; \
+		SizeT					_size; \
+		SizeT					_delta; \
+		ConditionFunction**			_cf; \
 		
-	struct _Variable_Register { __Variable_Register };
+	struct _ConditionFunction_Register { __ConditionFunction_Register };
 	
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Constructor
 	*/
-	Variable_Register*	Variable_Register_New(void);
 	
-	void			Variable_Register_Init(Variable_Register* self);
+	ConditionFunction_Register*	ConditionFunction_Register_New(void);
 	
-	Variable_Register*	_Variable_Register_New( 
-					SizeT			_sizeOfSelf,
-					Type			type,
-					Stg_Class_DeleteFunction*	_delete,
-					Stg_Class_PrintFunction*	_print, 
-					Stg_Class_CopyFunction*	_copy );
+	void				ConditionFunction_Register_Init(ConditionFunction_Register* self);
+	
+	ConditionFunction_Register*	_ConditionFunction_Register_New( 
+						SizeT			_sizeOfSelf,
+						Type			type,
+						Stg_Class_DeleteFunction*	_delete,
+						Stg_Class_PrintFunction*	_print,
+						Stg_Class_CopyFunction*	_copy );
 		
-	void			_Variable_Register_Init(void* variable_Register);
+	void				_ConditionFunction_Register_Init(void* conditionFunction_Register);
 	
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** General virtual functions
 	*/
 	
-	void	_Variable_Register_Delete(void* variable_Register);
+	void	_ConditionFunction_Register_Delete( void* conditionFunction_Register );
 	
-	void	_Variable_Register_Print(void* variable_Register, Stream* stream);
-
-	void*	_Variable_Register_Copy( void* vr, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void	_ConditionFunction_Register_Print( void* conditionFunction_Register, Stream* stream );
+	
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Macros
 	*/
-	
-	
+
+
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Virtual functions
 	*/
-	
-	
+
+
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Build functions
 	*/
 	
-	/* Add a variable... do before building */
-	Variable_Index	Variable_Register_Add(void* variable_Register, Variable* variable);
-	
-	void		Variable_Register_BuildAll(void* variable_Register);
+	ConditionFunction_Index	ConditionFunction_Register_Add(void* conditionFunction_Register, ConditionFunction* cf);
 	
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
-	** Public Functions & Macros
+	** Functions
 	*/
 	
-	Variable_Index	Variable_Register_GetIndex(void* variable_Register, Name name);
+	ConditionFunction_Index	ConditionFunction_Register_GetIndex(void* conditionFunction_Register, Name name);
 
-	Variable*	Variable_Register_GetByName(void* variable_Register, Name name);
+	void ConditionFunction_Register_PrintNameOfEachFunc( void* conditionFunction_Register, Stream* stream );
 
-	Variable*	Variable_Register_GetByIndex( void* variable_Register, Variable_Index varIndex);	
 	
-#endif /* __Base_Automation_Variable_Register_h__ */
+#endif /* __Base_Automation_ConditionFunction_Register_h__ */

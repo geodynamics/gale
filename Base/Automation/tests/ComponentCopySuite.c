@@ -359,7 +359,7 @@ void ComponentCopySuite_TestCopy( ComponentCopySuiteData* data ) {
 
    Dictionary_AddFromDictionary( data->dict, "components", componentsDictionary );
 
-   cf = Stg_ComponentFactory_New( data->dict, componentsDictionary, Stg_ObjectList_New() );
+   cf = Stg_ComponentFactory_New( data->dict, componentsDictionary );
    Stream_Enable( cf->infoStream, False );
 
    Stg_ComponentFactory_CreateComponents( cf );

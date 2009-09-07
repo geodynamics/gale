@@ -80,8 +80,7 @@ Stg_ComponentFactory* _Stg_ComponentFactory_New(
 		Stg_ComponentFactory_ConstructByNameWithKeyFallbackFunc* constructByNameWithKeyFallback,
 		Stg_ComponentFactory_ConstructByListFunc*                constructByList,
 		Dictionary*                                              rootDict,
-		Dictionary*                                              componentDict,
-		Stg_ObjectList*                                          registerRegister )
+		Dictionary*                                              componentDict )
 {
 	Stg_ComponentFactory *self = NULL;
 
@@ -107,7 +106,6 @@ Stg_ComponentFactory* _Stg_ComponentFactory_New(
 
 	self->rootDict = rootDict;
 	self->componentDict = componentDict;
-	self->registerRegister = registerRegister;
 	self->infoStream = Journal_Register( InfoStream_Type, self->type );
 	Stream_SetPrintingRank( self->infoStream, 0 );
 	Stream_SetAutoFlush( self->infoStream, True );
@@ -117,15 +115,10 @@ Stg_ComponentFactory* _Stg_ComponentFactory_New(
 	return self;
 }
 	
-Stg_ComponentFactory* Stg_ComponentFactory_New( 
-		Dictionary*                                          rootDict,
-		Dictionary*                                          componentDict,
-		Stg_ObjectList*                                      registerRegister )
-{
+Stg_ComponentFactory* Stg_ComponentFactory_New( Dictionary* rootDict, Dictionary* componentDict ) {
 	Stg_ComponentFactory *self = NULL;
 
 	assert( rootDict );
-	assert( registerRegister );
 	self = _Stg_ComponentFactory_New( sizeof( Stg_ComponentFactory ), 
 					Stg_ComponentFactory_Type,
 					_Stg_ComponentFactory_Delete,
@@ -146,8 +139,7 @@ Stg_ComponentFactory* Stg_ComponentFactory_New(
 					_Stg_ComponentFactory_ConstructByNameWithKeyFallback,
 					_Stg_ComponentFactory_ConstructByList,
 					rootDict,
-					componentDict,
-					registerRegister );
+					componentDict );
 
 	return self;
 }
@@ -222,13 +214,20 @@ void Stg_ComponentFactory_CreateComponents( Stg_ComponentFactory *self ) {
 	if( self->componentDict ){
 		Journal_Printf( stream, "\nCreating Stg_Components from the component-list\n\n" );
 		Stream_Indent( stream );
-	
+
+		/* add the contexts to the live component register first (so these get constructed/built/initialised first) */	
 		for( component_I = 0; component_I < Dictionary_GetCount( self->componentDict ) ; component_I++ ){
 			componentDictEntry = self->componentDict->entryPtr[ component_I ];
 
 			currComponentDict  = Dictionary_Entry_Value_AsDictionary( componentDictEntry->value );
 			componentType      = Dictionary_GetString( currComponentDict, "Type" );
 			componentName      = componentDictEntry->key;
+
+			if( strcmp( componentType, "DomainContext" ) && 
+			    strcmp( componentType, "FiniteElementContext" ) &&
+			    strcmp( componentType, "PICelleratorContext" ) &&
+			    strcmp( componentType, "UnderworldContext" ) )
+				continue;
 
 			Journal_Firewall( 
 					LiveComponentRegister_Get( self->LCRegister, componentName ) == NULL,
@@ -245,8 +244,39 @@ void Stg_ComponentFactory_CreateComponents( Stg_ComponentFactory *self ) {
 					Stg_ComponentRegister_Get_ComponentRegister(), componentType, "0" );
 
 			/* Add to register */
-			LiveComponentRegister_Add( self->LCRegister,
-					componentConstructorFunction( componentName ) );
+			LiveComponentRegister_Add( self->LCRegister, componentConstructorFunction( componentName ) );
+		}
+
+		/* now add the rest of the components */	
+		for( component_I = 0; component_I < Dictionary_GetCount( self->componentDict ) ; component_I++ ){
+			componentDictEntry = self->componentDict->entryPtr[ component_I ];
+
+			currComponentDict  = Dictionary_Entry_Value_AsDictionary( componentDictEntry->value );
+			componentType      = Dictionary_GetString( currComponentDict, "Type" );
+			componentName      = componentDictEntry->key;
+
+			if( !strcmp( componentType, "DomainContext" ) ||
+			    !strcmp( componentType, "FiniteElementContext" ) ||
+			    !strcmp( componentType, "PICelleratorContext" ) ||
+			    !strcmp( componentType, "UnderworldContext" ) )
+				continue;
+
+			Journal_Firewall( 
+					LiveComponentRegister_Get( self->LCRegister, componentName ) == NULL,
+					Journal_Register( Error_Type, self->type ),
+					"Error in func %s: Trying to instantiate two components with the name of '%s'\n"
+					"Each component's name must be unique.\n",
+					__func__, componentName );
+
+			/* Print Message */
+			Journal_Printf( stream, "Instantiating %s as %s\n", componentType, componentName );
+			
+			/* Get Default Constructor for this type */
+			componentConstructorFunction = Stg_ComponentRegister_AssertGet( 
+					Stg_ComponentRegister_Get_ComponentRegister(), componentType, "0" );
+
+			/* Add to register */
+			LiveComponentRegister_Add( self->LCRegister, componentConstructorFunction( componentName ) );
 		}
 		Stream_UnIndent( stream );
 	}
@@ -256,10 +286,6 @@ void Stg_ComponentFactory_CreateComponents( Stg_ComponentFactory *self ) {
 }
 
 void Stg_ComponentFactory_ConstructComponents( Stg_ComponentFactory* self, void* data ) {
-	Dictionary_Entry*                      componentDictEntry           = NULL;
-	Dictionary*                            currComponentDict            = NULL;
-	Type                                   componentType                = NULL;
-	Name                                   componentName                = NULL;
 	Stg_Component*                         component                    = NULL;
 	Index                                  component_I;
 	Stream*                                stream;
@@ -272,17 +298,119 @@ void Stg_ComponentFactory_ConstructComponents( Stg_ComponentFactory* self, void*
 		Journal_Printf( stream, "\nConstructing Stg_Components from the live-component register\n\n" );
 		Stream_Indent( stream );
 	
-		for( component_I = 0; component_I < Dictionary_GetCount( self->componentDict ) ; component_I++ ){
-			componentDictEntry = self->componentDict->entryPtr[ component_I ];
-
-			currComponentDict  = Dictionary_Entry_Value_AsDictionary( componentDictEntry->value );
-			componentType      = Dictionary_GetString( currComponentDict, "Type" );
-			componentName      = componentDictEntry->key;
-
+		for( component_I = 0; component_I < LiveComponentRegister_GetCount( self->LCRegister ); component_I++ ){
 			/* Grab component from register */
-			component = LiveComponentRegister_Get( self->LCRegister, componentName );
+			component = LiveComponentRegister_At( self->LCRegister, component_I );
 			if( component && !component->isConstructed ){
 				Stg_Component_Construct( component, self, data, True );
+			}
+		}
+		Stream_UnIndent( stream );
+	}
+	else{
+		Journal_Printf( stream, "No Stg_ComponentList found..!\n" );
+	}
+}
+
+void Stg_ComponentFactory_BuildComponents( Stg_ComponentFactory* self, void* data ) {
+	Stg_Component*                         component                    = NULL;
+	Index                                  component_I;
+	Stream*                                stream;
+	
+	assert( self );
+	
+	stream = self->infoStream;
+
+	if( self->componentDict ){
+		Journal_Printf( stream, "\nBuilding Stg_Components from the live-component register\n\n" );
+		Stream_Indent( stream );
+	
+		for( component_I = 0; component_I < LiveComponentRegister_GetCount( self->LCRegister ); component_I++ ){
+			/* Grab component from register */
+			component = LiveComponentRegister_At( self->LCRegister, component_I );
+			if( component && !component->isBuilt ){
+				Stg_Component_Build( component, data, True );
+			}
+		}
+		Stream_UnIndent( stream );
+	}
+	else{
+		Journal_Printf( stream, "No Stg_ComponentList found..!\n" );
+	}
+}
+
+void Stg_ComponentFactory_InitialiseComponents( Stg_ComponentFactory* self, void* data ) {
+	Stg_Component*                         component                    = NULL;
+	Index                                  component_I;
+	Stream*                                stream;
+	
+	assert( self );
+	
+	stream = self->infoStream;
+
+	if( self->componentDict ){
+		Journal_Printf( stream, "\nInitialising Stg_Components from the live-component register\n\n" );
+		Stream_Indent( stream );
+	
+		for( component_I = 0; component_I < LiveComponentRegister_GetCount( self->LCRegister ); component_I++ ){
+			/* Grab component from register */
+			component = LiveComponentRegister_At( self->LCRegister, component_I );
+			if( component && !component->isInitialised ){
+				Stg_Component_Initialise( component, data, True );
+			}
+		}
+		Stream_UnIndent( stream );
+	}
+	else{
+		Journal_Printf( stream, "No Stg_ComponentList found..!\n" );
+	}
+}
+
+void Stg_ComponentFactory_ExecuteComponents( Stg_ComponentFactory* self, void* data ) {
+	Stg_Component*                         component                    = NULL;
+	Index                                  component_I;
+	Stream*                                stream;
+	
+	assert( self );
+	
+	stream = self->infoStream;
+
+	if( self->componentDict ){
+		Journal_Printf( stream, "\nExecuting Stg_Components from the live-component register\n\n" );
+		Stream_Indent( stream );
+	
+		for( component_I = 0; component_I < LiveComponentRegister_GetCount( self->LCRegister ); component_I++ ){
+			/* Grab component from register */
+			component = LiveComponentRegister_At( self->LCRegister, component_I );
+			if( component && !component->hasExecuted ){
+				Stg_Component_Execute( component, data, True );
+			}
+		}
+		Stream_UnIndent( stream );
+	}
+	else{
+		Journal_Printf( stream, "No Stg_ComponentList found..!\n" );
+	}
+}
+
+void Stg_ComponentFactory_DestroyComponents( Stg_ComponentFactory* self, void* data ) {
+	Stg_Component*                         component                    = NULL;
+	Index                                  component_I;
+	Stream*                                stream;
+	
+	assert( self );
+	
+	stream = self->infoStream;
+
+	if( self->componentDict ){
+		Journal_Printf( stream, "\nDestroying Stg_Components from the live-component register\n\n" );
+		Stream_Indent( stream );
+	
+		for( component_I = 0; component_I < LiveComponentRegister_GetCount( self->LCRegister ); component_I++ ){
+			/* Grab component from register */
+			component = LiveComponentRegister_At( self->LCRegister, component_I );
+			if( component && !component->isDestroyed ){
+				Stg_Component_Destroy( component, data, True );
 			}
 		}
 		Stream_UnIndent( stream );

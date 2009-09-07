@@ -154,6 +154,8 @@ int main( int argc, char* argv[] ) {
 	Stg_ObjectList*                 listAllTopics;
 	char*                           listTopic;
 	Stg_ObjectList*                 listTopics;
+	Dictionary*			componentDict;
+	Stg_ComponentFactory*		cf;
 
 	/* Initialise PETSc, get world info */
 	MPI_Init( &argc, &argv );
@@ -166,9 +168,8 @@ int main( int argc, char* argv[] ) {
 		Py_Initialize();
 	#endif	
 	MPI_Barrier( CommWorld ); /* Ensures copyright info always come first in output */
-	
-	
-	/* Create the application's dictionary & read input */
+
+	/* Create the application's dictionary and read input */
 	dictionary = Dictionary_New();
 	ioHandler = XML_IO_Handler_New();
 	IO_Handler_ReadAllFromCommandLine( ioHandler, argc, argv, dictionary );
@@ -193,8 +194,8 @@ int main( int argc, char* argv[] ) {
 		Dictionary* metadata;
 		Index i;
 
-		ModulesManager_Load( stgToolboxesManager, dictionary );
-		ModulesManager_Load( plugins, dictionary );
+		ModulesManager_Load( stgToolboxesManager, dictionary, "" );
+		ModulesManager_Load( plugins, dictionary, "context" );
 
 		/* "--help" parameter */
 		if( helpTopic ) {
@@ -240,11 +241,16 @@ int main( int argc, char* argv[] ) {
 	}
 	else {  /* ... run the app */
 		Index i;
-		AbstractContext* context;
+		PluginsManager* lucPluginManager = PluginsManager_New();
+
+		/* the lucPlugin is not associated with a given context, as other plugins are, so load it in manually, assuming it exists */
+		ModulesManager_Load( lucPluginManager, dictionary, "lucPluginContext" );
+
+		ModulesManager_Load( stgToolboxesManager, dictionary, "" );
 
 		/* Magic happens here! */
-		context = stgMainInit( dictionary, CommWorld );
-		stgMainLoop( context );
+		cf = stgMainInit( dictionary, CommWorld );
+		stgMainLoop( cf );
 
 		/* "--list" parameters */
 		for( i = 0; i < Stg_ObjectList_Count( listTopics ); i++ ) {
@@ -272,9 +278,8 @@ int main( int argc, char* argv[] ) {
 			}
 		}
 
-		stgMainDestroy( context );
+		stgMainDestroy( cf );
 	}
-	
 
 	/* Close off everything */
 	Stg_Class_Delete( listAllTopics );
