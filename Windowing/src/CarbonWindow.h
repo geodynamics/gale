@@ -45,7 +45,7 @@
 #ifdef HAVE_CARBON
 
 #include <Carbon/Carbon.h>
-
+#include <AGL/agl.h>
 #ifndef __lucCarbonWindow_h__
 #define __lucCarbonWindow_h__
 
@@ -62,7 +62,9 @@
 		Pixel_Index                                        offsetY;                  \
 		void*                                              graphicsContext;          \
 		Bool                                               windowIsVisible;          \
-		/* Stuff for interactive windows */ \
+		/* Pixel buffer for background windows */									 \
+		AGLPbuffer										   PixelBuffer;				 \
+		/* Stuff for interactive windows */											 \
 		EventHandlerUPP                                    handler;                  \
         EventLoopIdleTimerUPP                              timerHandler;             \
         EventLoopTimerRef								   timer;                    \
@@ -107,10 +109,8 @@
 	Bool _lucCarbonWindow_EventProcessor( void* window ) ;
 	void _lucCarbonWindow_Resize( void* window );
 
-	void lucCarbonWindow_CreateInteractiveWindow( void* window ) ;
-	void lucCarbonWindow_CreateBackgroundWindow( void* window ) ;
-	void lucCarbonWindow_DestroyInteractiveWindow( void* window ) ;
-	void lucCarbonWindow_DestroyBackgroundWindow( void* window ) ;
+	void lucCarbonWindow_CreateWindow( void* window ) ;
+	void lucCarbonWindow_DestroyWindow( void* window ) ;
 	
 	void lucCarbonWindow_Draw( void* window ) ;
 	pascal void lucCarbonWindow_IdleTimer(EventLoopTimerRef inTimer, EventLoopIdleTimerMessage inState, void * inUserData);

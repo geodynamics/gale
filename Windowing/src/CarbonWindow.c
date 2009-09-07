@@ -188,12 +188,7 @@ void _lucCarbonWindow_Initialise( void* window, void* data ) {
 	lucCarbonWindow*     self      = (lucCarbonWindow*)window;
 		
 	/* Create the window...  */
-	if ( self->isMaster && self->interactive ) {
-		lucCarbonWindow_CreateInteractiveWindow( self );
-	}
-	else {
-		lucCarbonWindow_CreateBackgroundWindow( self );
-	}	
+	lucCarbonWindow_CreateWindow( self );
 
 	/* Run the parent function to init window... */
 	_lucWindow_Initialise(window, data);	
@@ -207,12 +202,8 @@ void _lucCarbonWindow_Execute( void* window, void* data ) {
 	lucCarbonWindow*        self = (lucCarbonWindow*) window; 
 	
 	/* Set the current window's context as active */
-	if ( self->isMaster && self->interactive) {
-		aglSetCurrentContext (self->graphicsContext);
-		aglUpdateContext (self->graphicsContext);
-	}
-	else
-		CGLSetCurrentContext (self->graphicsContext);
+	aglSetCurrentContext (self->graphicsContext);
+	aglUpdateContext (self->graphicsContext);
 	
 	/* Post a dummy event, hack to ensure waiting events are processed in continuous mode */
 	if (_lucCarbonWindow_EventsWaiting(window) == 0)
@@ -234,10 +225,7 @@ void _lucCarbonWindow_Destroy( void* window, void* data ) {
 	_lucWindow_Destroy(window, data);	
 	
 	/* Destroy the window...  */
-	if ( self->window )
-		lucCarbonWindow_DestroyInteractiveWindow( self );
-	else 
-		lucCarbonWindow_DestroyBackgroundWindow( self );
+	lucCarbonWindow_DestroyWindow( self );
 }
 
 /* Window Virtuals */
@@ -247,9 +235,8 @@ void _lucCarbonWindow_Display( void* window ) {
 	/* Run the parent function to display window... */
 	lucWindow_Display(window);	
 
-	/* Swap buffers if interactive */
-	if ( self->isMaster && self->interactive)
-		aglSwapBuffers(self->graphicsContext);
+	/* Swap buffers */
+	aglSwapBuffers(self->graphicsContext);
 }
 
 int _lucCarbonWindow_EventsWaiting( void* window ) {
@@ -287,7 +274,7 @@ void _lucCarbonWindow_Resize( void* window ) {
 	lucWindow_Resize(window);	
 }
 
-void lucCarbonWindow_CreateInteractiveWindow( void* window ) {
+void lucCarbonWindow_CreateWindow( void* window ) {
 	lucCarbonWindow*        self = (lucCarbonWindow*) window; 
 	AGLPixelFormat          format;		/* OpenGL pixel format */
 	int                     winattrs;	/* Window attributes */
@@ -318,157 +305,73 @@ void lucCarbonWindow_CreateInteractiveWindow( void* window ) {
 	lucDebug_PrintFunctionBegin( self, 1 );
 
 	/* Create the window...  */
-	self->graphicsContext = NULL;
-
-	SetRect(&rect, (int)self->offsetX, (int) self->offsetY, (int) (self->width + self->offsetX), (int) (self->height + self->offsetY) );
-
-	winattrs = kWindowStandardHandlerAttribute | kWindowCloseBoxAttribute |
-		     kWindowCollapseBoxAttribute | kWindowFullZoomAttribute |
-		     kWindowResizableAttribute | kWindowLiveResizeAttribute;
-	winattrs &= GetAvailableWindowAttributes(kDocumentWindowClass);
-
-	CreateNewWindow(kDocumentWindowClass, winattrs, &rect, &self->window);
-	SetWTitle(self->window, (unsigned char*)self->title);
-//	SetWindowTitleWithCFString(self->window, CFSTR(self->title));
-
-	self->handler = NewEventHandlerUPP(lucCarbonWindow_EventHandler);
-	InstallWindowEventHandler(self->window, self->handler, sizeof(events) / sizeof(events[0]), events, self, 0L);
-
-    self->timerHandler = NewEventLoopIdleTimerUPP(lucCarbonWindow_IdleTimer);
-    InstallEventLoopIdleTimer(GetMainEventLoop(), kEventDurationSecond * 2, kEventDurationSecond * 1, self->timerHandler, self, &self->timer);
-
-	GetCurrentProcess(&psn);
-	/* this is a secret undocumented Mac function that allows code that isn't part of a bundle to be a foreground operation */
-	CPSEnableForegroundOperation( &psn ); 
-	SetFrontProcess( &psn );
-
-	/* Show Window */
-	ShowWindow(self->window);
-	SelectWindow(self->window);
-
-	/* Create the OpenGL context and bind it to the window.  */
+	if ( self->isMaster && self->interactive )
+	{	
+		SetRect(&rect, (int)self->offsetX, (int) self->offsetY, (int) (self->width + self->offsetX), (int) (self->height + self->offsetY) );
+		
+		winattrs = kWindowStandardHandlerAttribute | kWindowCloseBoxAttribute |
+		kWindowCollapseBoxAttribute | kWindowFullZoomAttribute |
+		kWindowResizableAttribute | kWindowLiveResizeAttribute;
+		winattrs &= GetAvailableWindowAttributes(kDocumentWindowClass);
+		
+		CreateNewWindow(kDocumentWindowClass, winattrs, &rect, &self->window);
+		SetWTitle(self->window, (unsigned char*)self->title);
+		//	SetWindowTitleWithCFString(self->window, CFSTR(self->title));
+		
+		self->handler = NewEventHandlerUPP(lucCarbonWindow_EventHandler);
+		InstallWindowEventHandler(self->window, self->handler, sizeof(events) / sizeof(events[0]), events, self, 0L);
+		
+		self->timerHandler = NewEventLoopIdleTimerUPP(lucCarbonWindow_IdleTimer);
+		InstallEventLoopIdleTimer(GetMainEventLoop(), kEventDurationSecond * 2, kEventDurationSecond * 1, self->timerHandler, self, &self->timer);
+		
+		GetCurrentProcess(&psn);
+		/* this is a secret undocumented Mac function that allows code that isn't part of a bundle to be a foreground operation */
+		CPSEnableForegroundOperation( &psn ); 
+		SetFrontProcess( &psn );
+		
+		/* Show Window */
+		ShowWindow(self->window);
+		SelectWindow(self->window);
+	}
+	
+	/* Create the OpenGL context and bind it to the window or pixelbuffer.  */
 	format = aglChoosePixelFormat(NULL, 0, attributes);
+	self->graphicsContext = NULL;
 	self->graphicsContext = aglCreateContext(format, NULL);
 	assert( self->graphicsContext );
 	aglDestroyPixelFormat(format);
+
+	if ( self->isMaster && self->interactive )
+	{
+		aglSetDrawable(self->graphicsContext, GetWindowPort(self->window));
+	}
+	else
+	{
+		aglCreatePBuffer(self->width, self->height, GL_TEXTURE_RECTANGLE_EXT, GL_RGBA, 0, &self->PixelBuffer);
+		aglSetPBuffer(self->graphicsContext, self->PixelBuffer, 0, 0, 0);
+	}
 	
-	aglSetDrawable(self->graphicsContext, GetWindowPort(self->window));
 	aglSetCurrentContext(self->graphicsContext);
-
 }
 
-/* Steps taken from http://gemma.apple.com/documentation/GraphicsImaging/Conceptual/OpenGL-MacProgGuide/OpenGLProg_MacOSX.pdf */
 
-void lucCarbonWindow_CreateBackgroundWindow( void* window ) {
-	lucCarbonWindow*        self       = (lucCarbonWindow*) window; 
-
-	GLint                   numPixelFormats;
-	CGLContextObj           contextObj;
-	lucAlphaPixel*          memBuffer;
-	CGLPixelFormatObj       pixelFormatObj;
-	CGLPBufferObj           pBuffer;
-	CGLError 				cglReturnValue;
-	
-	
-	/* Step 1:
-	 * Sets up an array of pixel format attributes 
-	 * - an offscreen drawable object and a color buffer with a size of 32 bytes. 
-	 * Note that the list must be terminated by NULL. */
-	
-	/* Note: the apple document referred to above was recently updated */
-	
-	CGLPixelFormatAttribute attribs[] = 	{
-		kCGLPFAOffScreen,
-		kCGLPFAColorSize, 32,
-		kCGLPFADepthSize, 16,
-		kCGLPFAStencilSize, 1,
-		0
-	} ;
-	
-
-	/* Step 2 - Creates a pixel format object that has the specified renderer and buffer attributes. */
-	cglReturnValue = CGLChoosePixelFormat (attribs, &pixelFormatObj, &numPixelFormats);
-		
-	if(cglReturnValue != kCGLNoError) 
-		Journal_DPrintf( lucDebug,"Error setting up background window (Step 2): %s\n", CGLErrorString(cglReturnValue));
-		
-		
-
-	/* Step 3 - Creates a CGL context using the newly created pixel format object. */
-	cglReturnValue = CGLCreateContext (pixelFormatObj, NULL, &contextObj); /* Step 3 */
-	if(cglReturnValue != kCGLNoError) 
-		Journal_DPrintf( lucDebug,"Error setting up background window (Step 3): %s\n", CGLErrorString(cglReturnValue));	
-
-	cglReturnValue = CGLDestroyPixelFormat (pixelFormatObj);
-	if(cglReturnValue != kCGLNoError) 
-		Journal_DPrintf( lucDebug,"Error setting up background window (Step 3): %s\n", CGLErrorString(cglReturnValue));	
-	
-
-	/* Step 4a - Sets the current context to the newly created offscreen CGL context. */
-	cglReturnValue = CGLSetCurrentContext (contextObj);
-	if(cglReturnValue != kCGLNoError) 
-		Journal_DPrintf( lucDebug,"Error setting up background window (Step 4a): %s\n", CGLErrorString(cglReturnValue));
-		
-	/* Step 4b - Create Pixel Buffer */
-	cglReturnValue = CGLCreatePBuffer( self->width, self->height, GL_TEXTURE_RECTANGLE_EXT, GL_RGBA, 0, &pBuffer );
-	if(cglReturnValue != kCGLNoError) 
-		Journal_DPrintf( lucDebug,"Error setting up background window (Step 4b): %s\n", CGLErrorString(cglReturnValue));
-	
-	cglReturnValue = CGLSetPBuffer( contextObj, pBuffer, 0, 0, 0 );
-	if(cglReturnValue != kCGLNoError) 
-		Journal_DPrintf( lucDebug,"Error setting up background window (Step 4b): %s\n", CGLErrorString(cglReturnValue));
-
-	/* Step 5 - Allocates memory for the offscreen drawable object. */
-	memBuffer = Memory_Alloc_Array( lucAlphaPixel, self->width * self->height, "Image Buffer" );
-
-	/* Step 6 - 
-	 * Binds the CGL context to the newly allocated offscreen memory buffer. 
-	 * You need to specify the width and height of the offscreen buffer (in pixels), 
-	 * the number of bytes per row, and a pointer to the block of memory you want to render the context into.
-	 * The number of bytes per row must be at least the width times the bytes per pixels. */
-	
-	cglReturnValue = CGLSetOffScreen (contextObj, (GLsizei) self->width, (GLsizei) self->height, (GLsizei) self->width * sizeof(lucAlphaPixel), memBuffer);
-	if(cglReturnValue != kCGLNoError) 
-		Journal_DPrintf( lucDebug,"Error setting up background window (Step 6): %s", CGLErrorString(cglReturnValue));
-
-	/* Set pointer to graphics context on my object */
-	self->graphicsContext = contextObj;
-	
-	self->window = 0;
-}
-
-void lucCarbonWindow_DestroyInteractiveWindow( void* window ) {
+void lucCarbonWindow_DestroyWindow( void* window ) {
 	lucCarbonWindow*        self      = (lucCarbonWindow*) window; 
 
-	DisposeEventHandlerUPP( self->handler ); 
-    if (self->timer != NULL) RemoveEventLoopTimer( self->timer );
-    DisposeEventLoopIdleTimerUPP( self->timerHandler ); 
-	DisposeWindow( self->window );
-
+	if ( self->window )
+	{
+		DisposeEventHandlerUPP( self->handler ); 
+		if (self->timer != NULL) RemoveEventLoopTimer( self->timer );
+		DisposeEventLoopIdleTimerUPP( self->timerHandler ); 
+		DisposeWindow( self->window );
+	}
+	else
+		aglDestroyPBuffer(self->PixelBuffer);
+	
 	aglSetDrawable( self->graphicsContext, 0 );
 	aglSetCurrentContext( 0 );
 	aglDestroyContext( self->graphicsContext );
 	self->graphicsContext = NULL;
-}
-
-void lucCarbonWindow_DestroyBackgroundWindow( void* window ) {
-	lucCarbonWindow*        self      = (lucCarbonWindow*) window; 
-
-	CGLContextObj contextObj = (CGLContextObj) self->graphicsContext;
-	CGLPBufferObj pBuffer;
-	CGLError cglReturnValue;
-	GLenum face;
-	GLint level;
-	GLint screen;
-	
-	cglReturnValue = CGLGetPBuffer( contextObj, &pBuffer, &face, &level, &screen ) ;		
-	if(cglReturnValue != kCGLNoError)
-		Journal_DPrintf( lucDebug,"Error cleaning up background window: %s", CGLErrorString(cglReturnValue));
-	
-	CGLDestroyPBuffer (pBuffer);
-	CGLSetCurrentContext (NULL);
-	CGLClearDrawable (contextObj);
-	CGLDestroyContext (contextObj);		
 }
 
 static pascal OSStatus lucCarbonWindow_EventHandler(EventHandlerCallRef nextHandler, EventRef event, void* userData) {
