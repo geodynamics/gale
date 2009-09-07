@@ -51,6 +51,18 @@ class PETSc(Package):
                     vars = {}
                     sysconfig.parse_makefile(petscconf, vars)
                     flags = sysconfig.expand_makefile_vars(vars['PACKAGES_LIBS'], vars)
+                    if 'X11_INCLUDE' in vars:
+                        flags += ' ' + sysconfig.expand_makefile_vars(str(vars['X11_INCLUDE']), vars)
+                    if 'MPI_INCLUDE' in vars:
+                        flags += ' ' + sysconfig.expand_makefile_vars(str(vars['MPI_INCLUDE']), vars)
+                    if 'BLASLAPACK_INCLUDE' in vars:
+                        flags += sysconfig.expand_makefile_vars(str(vars['BLASLAPACK_INCLUDE']), vars)
+                    if 'PCC_LINKER_FLAGS' in vars:
+                        flags += ' ' + sysconfig.expand_makefile_vars(str(vars['PCC_LINKER_FLAGS']), vars)
+                    if 'PCC_FLAGS' in vars:
+                        flags += ' ' + sysconfig.expand_makefile_vars(str(vars['PCC_FLAGS']), vars)
+                    if 'PCC_LINKER_LIBS' in vars:
+                        flags += ' ' + sysconfig.expand_makefile_vars(str(vars['PCC_LINKER_LIBS']), vars)
                     flag_dict = env.ParseFlags(flags)
                     if 'LIBS' in flag_dict:
                         extra_libs = flag_dict['LIBS']
