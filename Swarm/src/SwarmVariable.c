@@ -210,6 +210,10 @@ void _SwarmVariable_Construct( void* swarmVariable, Stg_ComponentFactory* cf, vo
 	Variable*               variable;
 	Index                   dofCount;
 
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !self->context )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+
 	swarm    =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "Swarm", Swarm, True, data  ) ;
 	variable =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "Variable", Variable,  False, data  ) ;
 	dofCount = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "dofCount", 0 );

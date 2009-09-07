@@ -209,16 +209,19 @@ void* _SwarmOutput_DefaultNew( Name name ) {
 void _SwarmOutput_Construct( void* swarmOutput, Stg_ComponentFactory* cf, void* data ) {
 	SwarmOutput*	        self         = (SwarmOutput*)swarmOutput;
 	Swarm*                  swarm;
-	AbstractContext*        context;
 	Name                    baseFilename;
+	AbstractContext*	context;
+
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !self->context )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
 
 	swarm        =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "Swarm", Swarm, True, data  ) ;
-	context      =  Stg_ComponentFactory_ConstructByName(  cf,  "context", AbstractContext,  True, data ) ;
 	baseFilename = Stg_ComponentFactory_GetString( cf, self->name, "baseFilename", self->name );
 
 	_SwarmOutput_Init( 
 			self,
-			context,
+			(AbstractContext*)self->context,
 			swarm, 
 			baseFilename, 
 			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "columnWidth", 12 ), 

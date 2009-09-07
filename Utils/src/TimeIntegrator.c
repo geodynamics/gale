@@ -38,6 +38,7 @@
 #include <StgDomain/Mesh/Mesh.h>
 
 #include "types.h"
+#include "DomainContext.h"
 #include "TimeIntegrator.h"
 #include "TimeIntegratee.h"
 
@@ -206,13 +207,15 @@ void _TimeIntegrator_Construct( void* timeIntegrator, Stg_ComponentFactory* cf, 
 	/** Default for order changed to 2nd order (was 1st order) by Pat Sunter, 10 May 2006 */
 	order          = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "order", 2 );
 	simultaneous   = Stg_ComponentFactory_GetBool( cf, self->name, "simultaneous", False );
-	
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
 
-	entryPoint_Register = Stg_ObjectList_Get( cf->registerRegister, "EntryPoint_Register" );
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
+	if( !self->context )	
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
+
+	entryPoint_Register = self->context->entryPoint_Register; 
 	assert( entryPoint_Register );
 
-	_TimeIntegrator_Init( self, order, simultaneous, entryPoint_Register, context );
+	_TimeIntegrator_Init( self, order, simultaneous, entryPoint_Register, (AbstractContext*)self->context );
 }
 
 void _TimeIntegrator_Build( void* timeIntegrator, void* data ) {
@@ -324,7 +327,7 @@ void _TimeIntegrator_ExecuteEuler( void* timeIntegrator, void* data ) {
 
 void _TimeIntegrator_ExecuteRK2( void* timeIntegrator, void* data ) {
 	TimeIntegrator*        self            = (TimeIntegrator*) timeIntegrator;
-	AbstractContext*       context         = (AbstractContext*) data;
+	AbstractContext*       context         = (AbstractContext*) self->context;
 	Index                  integratee_I;   
 	Index                  integrateeCount = TimeIntegrator_GetCount( self );
 	double                 dt              = AbstractContext_Dt( context );

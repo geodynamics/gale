@@ -48,6 +48,7 @@
 		/* General info */ \
 		__Stg_Component \
 		\
+		DomainContext*			       context;			\
 		Stream*                                debug;                   \
 		Stream*                                info;                   \
 		NamedObject_Register*                  integrateeRegister;      \

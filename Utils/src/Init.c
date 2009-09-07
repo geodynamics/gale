@@ -50,6 +50,8 @@ Bool StgDomainUtils_Init( int* argc, char** argv[] ) {
 	VariableCondition_Register_Add( variableCondition_Register, InnerWallVC_Type, InnerWallVC_Factory );
 	VariableCondition_Register_Add( variableCondition_Register, MeshShapeVC_Type, MeshShapeVC_Factory );
 	
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), DomainContext_Type, 
+				   "0", (void* (*)(Name))DomainContext_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), AllElementsVC_Type, 
 				   "0", (void* (*)(Name))AllElementsVC_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), AllNodesVC_Type, 
@@ -94,7 +96,6 @@ Bool StgDomainUtils_Init( int* argc, char** argv[] ) {
 				   "0", (void*  (*)(Name))_ShapeAdvector_DefaultNew );
 
 	RegisterParent( DomainContext_Type,    AbstractContext_Type );
-
 	RegisterParent( Operator_Type,                 Stg_Object_Type );
 	RegisterParent( AllElementsVC_Type,            VariableCondition_Type );
 	RegisterParent( AllNodesVC_Type,               VariableCondition_Type );

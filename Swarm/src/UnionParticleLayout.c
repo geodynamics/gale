@@ -184,6 +184,10 @@ void _UnionParticleLayout_Construct( void* unionParticleLayout, Stg_ComponentFac
 	GlobalParticleLayout** particleLayoutList;
 	Index                  particleLayoutCount;
 
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !self->context )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+
 	particleLayoutList = Stg_ComponentFactory_ConstructByList( 
 		cf, 
 		self->name, 

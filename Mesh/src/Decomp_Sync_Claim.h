@@ -53,6 +53,7 @@
 		/* General info */				\
 		__Stg_Component					\
 								\
+		AbstractContext*		context;	\
 		/* Virtual info */				\
 		Decomp_Sync_Claim_SelectFunc*	selectFunc;	\
 								\

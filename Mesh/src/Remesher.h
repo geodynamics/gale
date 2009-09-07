@@ -49,6 +49,7 @@ typedef void (Remesher_RemeshFunc)( void* _self );
 /* Class contents. */
 #define __Remesher                              \
   __Stg_Component                               \
+  AbstractContext*  context;			\
   Remesher_RemeshFunc*	remeshFunc;		\
   Mesh* mesh;
 

@@ -83,6 +83,7 @@
 		/* General info */ \
 		__Stg_Component \
 		\
+		DomainContext*					   context;			\
 		/* Virtual info */ \
 		FieldVariable_InterpolateValueAtFunction*          _interpolateValueAt; \
 		FieldVariable_GetValueFunction*                    _getMinGlobalFieldMagnitude; \

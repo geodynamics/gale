@@ -145,6 +145,11 @@ void _Mesh_Print( void* mesh, Stream* stream ) {
 }
 
 void _Mesh_Construct( void* mesh, Stg_ComponentFactory* cf, void* data ) {
+	Mesh*			self = (Mesh*)mesh;
+
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !self->context )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
 }
 
 void _Mesh_Build( void* mesh, void* data ) {

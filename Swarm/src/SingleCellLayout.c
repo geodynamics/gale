@@ -280,6 +280,10 @@ void _SingleCellLayout_Construct( void* singleCellLayout, Stg_ComponentFactory* 
 	XYZ               min;
 	XYZ               max;
 
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !self->context )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+
 	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
 
 	dimExists[ I_AXIS ] = Stg_ComponentFactory_GetBool( cf, self->name, "dimExistsI", True );

@@ -147,7 +147,9 @@ void _LinearSpaceAdaptor_Construct( void* adaptor, Stg_ComponentFactory* cf, voi
 	assert( self );
 	assert( cf );
 
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, True, data );
+	if( !context )
+		context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
 	self->loadFromCheckPoint = context->loadFromCheckPoint;
 
 	if( self->loadFromCheckPoint )

@@ -36,6 +36,7 @@
 #include <StgDomain/Mesh/Mesh.h>
 
 #include "types.h"
+#include "DomainContext.h"
 #include "WallVC.h"
 #include "RegularMeshUtils.h"
 
@@ -573,9 +574,12 @@ void _WallVC_Build(  void* wallVC, void* data ) {
 ** Virtual functions
 */
 
-void _WallVC_Construct( void* wallVC, Stg_ComponentFactory* cf, void* data )
-{
-	
+void _WallVC_Construct( void* wallVC, Stg_ComponentFactory* cf, void* data ) {
+	WallVC*			self = (WallVC*)wallVC;
+
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );	
+	if( !self->context )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
 }
 
 void _WallVC_BuildSelf(  void* wallVC, void* data ) {

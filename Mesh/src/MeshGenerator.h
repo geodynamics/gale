@@ -53,6 +53,7 @@
 		/* General info */				\
 		__Stg_Component					\
 								\
+		AbstractContext*		context;	\
 		/* Virtual info */				\
 		MeshGenerator_SetDimSizeFunc*	setDimSizeFunc;	\
 		MeshGenerator_GenerateFunc*	generateFunc;	\

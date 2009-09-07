@@ -132,6 +132,11 @@ void _Mesh_Algorithms_Print( void* algorithms, Stream* stream ) {
 }
 
 void _Mesh_Algorithms_Construct( void* algorithms, Stg_ComponentFactory* cf, void* data ) {
+	Mesh_Algorithms*	self = (Mesh_Algorithms*)algorithms;
+
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !self->context )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
 }
 
 void _Mesh_Algorithms_Build( void* algorithms, void* data ) {

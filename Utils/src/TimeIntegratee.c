@@ -37,6 +37,7 @@
 #include <StgDomain/Mesh/Mesh.h>
 
 #include "types.h"
+#include "DomainContext.h"
 #include "TimeIntegrator.h"
 #include "TimeIntegratee.h"
 #include "FieldVariable.h"
@@ -190,6 +191,10 @@ void _TimeIntegratee_Construct( void* timeIntegratee, Stg_ComponentFactory* cf, 
 	Variable*               variable                = NULL;
 	TimeIntegrator*         timeIntegrator          = NULL;
 	Bool                    allowFallbackToFirstOrder = False;
+
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
+	if( !self->context )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
 	
 	variable       =  Stg_ComponentFactory_ConstructByKey( cf, self->name, Variable_Type,       Variable,       False, data ) ;
 	timeIntegrator =  Stg_ComponentFactory_ConstructByKey( cf, self->name, TimeIntegrator_Type, TimeIntegrator, True, data ) ;

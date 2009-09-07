@@ -68,6 +68,7 @@
 
 	#define __ParticleCommHandler \
 		__Stg_Component \
+		AbstractContext*			context; \
 		/* Virtual info */ \
 		ParticleCommHandler_AllocateOutgoingCountArrays						*allocateOutgoingCountArrays; \
 		ParticleCommHandler_AllocateOutgoingParticleArrays						*allocateOutgoingParticleArrays; \

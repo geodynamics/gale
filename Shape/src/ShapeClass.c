@@ -171,6 +171,10 @@ void _Stg_Shape_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) {
 	Bool            invert        = False;
 	double          alpha, beta, gamma;
 
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !self->context )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+
 	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
 	
 	centre[ I_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "CentreX", 0.0 );

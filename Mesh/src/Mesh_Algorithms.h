@@ -62,6 +62,7 @@
 		/* General info */								\
 		__Stg_Component									\
 												\
+		AbstractContext*				context;			\
 		/* Virtual info */								\
 		Mesh_Algorithms_SetMeshFunc*			setMeshFunc;			\
 		Mesh_Algorithms_UpdateFunc*			updateFunc;			\

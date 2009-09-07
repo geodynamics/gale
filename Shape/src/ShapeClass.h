@@ -53,6 +53,7 @@
 	#define __Stg_Shape \
 		/* General info */ \
 		__Stg_Component \
+		AbstractContext*                      context;             \
 		/* Virtual Info */                                         \
 		Stg_Shape_IsCoordInsideFunction*      _isCoordInside;      \
 		Stg_Shape_CalculateVolumeFunction*    _calculateVolume;    \

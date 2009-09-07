@@ -269,8 +269,12 @@ void _FieldVariable_Construct( void* fieldVariable, Stg_ComponentFactory* cf, vo
 	Index                   fieldComponentCount;
 	Bool                    isCheckpointedAndReloaded;
 	Dictionary_Entry_Value* feVarsList = NULL;
+
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
+	if( !self->context )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
 	
-	fV_Register = (FieldVariable_Register*) Stg_ObjectList_Get( cf->registerRegister, "FieldVariable_Register" );
+	fV_Register = self->context->fieldVariable_Register; 
 	assert( fV_Register );
 
 	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );

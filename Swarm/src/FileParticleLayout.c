@@ -195,6 +195,10 @@ void _FileParticleLayout_Construct( void* particleLayout, Stg_ComponentFactory *
    FileParticleLayout* self     = (FileParticleLayout*) particleLayout;
    Name                filename;
 
+   self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+   if( !self->context )
+      self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+
    filename = Stg_ComponentFactory_GetString( cf, self->name, "filename", "Swarm.dat" );
    
    _FileParticleLayout_Init( self, filename );

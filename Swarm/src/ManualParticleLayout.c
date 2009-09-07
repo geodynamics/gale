@@ -186,6 +186,10 @@ void _ManualParticleLayout_Construct( void* manualParticleLayout, Stg_ComponentF
 	ManualParticleLayout*      self       = (ManualParticleLayout*) manualParticleLayout;
 	Dictionary*                dictionary;
 	
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !self->context )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+
 	dictionary = Dictionary_GetDictionary( cf->componentDict, self->name );
 
 	_ManualParticleLayout_Init( self, dictionary );

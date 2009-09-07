@@ -118,6 +118,10 @@ void _Remesher_Construct( void* remesher, Stg_ComponentFactory* cf, void* data )
    assert( cf );
    assert( cf->componentDict );
 
+   self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+   if( !self->context )
+      self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+
    self->mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "mesh", Mesh, True, data );
 }
 

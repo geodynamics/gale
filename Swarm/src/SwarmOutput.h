@@ -50,6 +50,7 @@
 		/* General info */ \
 		__Stg_Component \
 		\
+		AbstractContext*				   context;		  \
 		/* Virtual info */ \
 		SwarmOutput_PrintHeaderFunction*                   _printHeader;          \
 		SwarmOutput_PrintDataFunction*                     _printData;            \

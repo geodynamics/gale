@@ -190,6 +190,10 @@ void _GaussParticleLayout_Construct( void* gaussParticleLayout, Stg_ComponentFac
 	Particle_InCellIndex   defaultVal;
 	Dimension_Index        dim;
 
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !self->context )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+
 	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
 
 	defaultVal = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "gaussParticles", 2 );

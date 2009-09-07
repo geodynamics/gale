@@ -400,8 +400,12 @@ void _Delaunay_Construct( void* delaunay, Stg_ComponentFactory* cf, void* data )
 	int numSites = 0;
 
 	self = (Delaunay*) delaunay;
+
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !self->context )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
 	
-	pointerRegister = Stg_ObjectList_Get( cf->registerRegister, "Pointer_Register" );
+	pointerRegister = self->context->pointer_Register; 
 	
 	assert( pointerRegister );
 

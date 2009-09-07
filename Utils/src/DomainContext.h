@@ -50,9 +50,11 @@
 		\
 		/* DomainContext info */ \
 		FieldVariable_Register*             fieldVariable_Register; \
-		Dimension_Index	                    dim;						\
+		Dimension_Index	                    dim;		    \
 		
 	struct DomainContext { __DomainContext };
+
+	DomainContext* DomainContext_DefaultNew( Name name );
 	
 	DomainContext* DomainContext_New( 
 		Name                                        name,
@@ -86,6 +88,8 @@
 	void 						_DomainContext_Init( DomainContext* self );
 
 	/* Virtual Functions ------------------------------------------------------------------------------------------------*/
+
+	void						_DomainContext_Construct( void* context, Stg_ComponentFactory* cf, void* data );
 	
 	/* Stg_Class_Delete implementation */
 	void						_DomainContext_Delete( void* context );

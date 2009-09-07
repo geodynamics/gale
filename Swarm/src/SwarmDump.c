@@ -189,11 +189,13 @@ void* _SwarmDump_DefaultNew( Name name ) {
 void _SwarmDump_Construct( void* swarmDump, Stg_ComponentFactory* cf, void* data ) {
         SwarmDump*                  self         = (SwarmDump*)swarmDump;
         Swarm**                 swarmList;
-        AbstractContext*        context;
         Bool                    newFileEachTime;
         Index                   swarmCount;
 
-        context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ) ;
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !self->context )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+
         swarmList = Stg_ComponentFactory_ConstructByList( 
                 cf, 
                 self->name, 
@@ -207,7 +209,7 @@ void _SwarmDump_Construct( void* swarmDump, Stg_ComponentFactory* cf, void* data
 
         _SwarmDump_Init( 
                         self,
-                        context,
+                        (AbstractContext*)self->context,
                         swarmList,
                         swarmCount,
                         newFileEachTime );

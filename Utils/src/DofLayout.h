@@ -56,6 +56,7 @@
 		/* General info */ \
 		__Stg_Component \
 		\
+		DomainContext*		context;	   \
 		/* Virtual info */ \
 		\
 		/* Stg_Class info */ \

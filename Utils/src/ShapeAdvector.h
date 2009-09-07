@@ -46,6 +46,7 @@
 	#define __ShapeAdvector \
 		/* General info */ \
 		__Stg_Component \
+		DomainContext*			      context;		    \
 		/* Virtual Info */\
 		/* Other Info */\
 		Stg_Shape*                            shape;                \

@@ -142,11 +142,15 @@ void _MeshVariable_Construct( void* meshVariable, Stg_ComponentFactory* cf, void
 	assert( componentDict );
 	thisComponentDict = Dictionary_GetDictionary( componentDict, self->name );
 	assert( thisComponentDict );
+
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !self->context )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
 	
 	/* Grab Registers */
-	variableRegister = Stg_ObjectList_Get( cf->registerRegister, "Variable_Register" );
+	variableRegister = self->context->variable_Register;
 	assert( variableRegister );
-	pointerRegister = Stg_ObjectList_Get( cf->registerRegister, "Pointer_Register" );
+	pointerRegister = self->context->pointer_Register;
 	assert( pointerRegister );
 
 	/* Construct the mesh. */

@@ -222,6 +222,10 @@ void _SpaceFillerParticleLayout_Construct( void* spaceFillerParticleLayout, Stg_
 	Particle_Index             totalInitialParticles;
 	double                     averageInitialParticlesPerCell;
 	
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !self->context )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+
 	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
 
 	totalInitialParticles = Stg_ComponentFactory_GetUnsignedInt( 

@@ -36,6 +36,7 @@
 #include <StgDomain/Mesh/Mesh.h>
 
 #include "types.h"
+#include "DomainContext.h"
 #include "ShapeAdvector.h"
 #include "TimeIntegrator.h"
 #include "TimeIntegratee.h"
@@ -185,6 +186,10 @@ void _ShapeAdvector_Construct( void* shapeAdvector, Stg_ComponentFactory* cf, vo
 	Stg_Shape*                  shape;
 	TimeIntegrator*             timeIntegrator;
 	Bool                        allowFallbackToFirstOrder = False;
+
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
+	if( !self->context )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
 
 	timeIntegrator = Stg_ComponentFactory_ConstructByKey( cf, self->name, "TimeIntegrator", TimeIntegrator, True, data  ) ;
 	velocityField  = Stg_ComponentFactory_ConstructByKey( cf, self->name, "VelocityField", FieldVariable, True, data  ) ;

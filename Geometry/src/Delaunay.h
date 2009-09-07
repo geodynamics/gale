@@ -63,6 +63,7 @@
 	/** Delaunay class contents (see Delaunay) */
 	#define __Delaunay \
 		__Stg_Component \
+		AbstractContext*		context; \
 		Dictionary			*dictionary; \
 		MemoryPool			*qp; \
 		MemoryPool			*vp; \

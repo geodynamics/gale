@@ -62,7 +62,7 @@ DomainContext* DomainContext_New(
 			_DomainContext_Print,
 			NULL,
 			NULL,
-			_AbstractContext_Construct,
+			_DomainContext_Construct,
 			_AbstractContext_Build,
 			_AbstractContext_Initialise,
 			_AbstractContext_Execute,
@@ -74,6 +74,28 @@ DomainContext* DomainContext_New(
 			stop,
 			MPI_COMM_WORLD,
 			dictionary );
+}
+
+DomainContext* DomainContext_DefaultNew( Name name ) {
+		return _DomainContext_New(
+			sizeof(DomainContext),
+			DomainContext_Type,
+			_DomainContext_Delete,
+			_DomainContext_Print,
+			NULL,
+			NULL,
+			_DomainContext_Construct,
+			_AbstractContext_Build,
+			_AbstractContext_Initialise,
+			_AbstractContext_Execute,
+			_AbstractContext_Destroy,
+			name,
+			False,
+			_DomainContext_SetDt,
+			0,
+			0,
+			MPI_COMM_WORLD,
+			NULL );
 }
 
 DomainContext* _DomainContext_New( 
@@ -125,7 +147,6 @@ DomainContext* _DomainContext_New(
 	
 	if( initFlag ){
 		_DomainContext_Init( self );
-		
 	}
 	
 	return self;
@@ -136,13 +157,22 @@ void _DomainContext_Init( DomainContext* self ) {
 
 	self->isConstructed = True;
 	self->fieldVariable_Register = FieldVariable_Register_New();
-
-	Stg_ObjectList_ClassAppend( self->register_Register, (void*)self->fieldVariable_Register, "FieldVariable_Register" );
-	self->dim = Dictionary_GetUnsignedInt_WithDefault( self->dictionary, "dim", 2 );
 }
 
 
 /* Virtual Functions -------------------------------------------------------------------------------------------------------------*/
+
+void _DomainContext_Construct( void* context, Stg_ComponentFactory* cf, void* data ) {
+	DomainContext* self = (DomainContext*)context;
+
+	/* Check if we have been provided a constant to multiply our calculated dt values by. */
+	self->dtFactor = Dictionary_GetDouble_WithDefault( self->dictionary, "timestepFactor", 1.0 );
+
+	self->dim = Dictionary_GetUnsignedInt_WithDefault( self->dictionary, "dim", 2 );
+
+	_DomainContext_Init( self );
+	_AbstractContext_Construct( context, cf, data );
+}
 
 void _DomainContext_Delete( void* context ) {
 	DomainContext* self = (DomainContext*)context;

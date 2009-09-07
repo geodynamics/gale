@@ -51,6 +51,7 @@
 	/* ParticleLayout information */
 	#define __ParticleLayout \
 		__Stg_Component \
+		AbstractContext*				context; \
 		/* virtual information */ \
 		ParticleLayout_SetInitialCountsFunction*	_setInitialCounts; \
 		ParticleLayout_InitialiseParticlesFunction*	_initialiseParticles; \

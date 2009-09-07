@@ -123,6 +123,10 @@ void _MeshGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* cf, vo
 	/* Set the communicator to a default. */
 	MeshGenerator_SetMPIComm( self, MPI_COMM_WORLD );
 
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !self->context )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+
 	/* Read the individual mesh if specified. */
 	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "mesh", Mesh, False, data );
 	if( mesh )

@@ -678,10 +678,11 @@ void _Swarm_Construct( void* swarm, Stg_ComponentFactory* cf, void* data ) {
 	Dimension_Index         dim;
 	Type                    particleType;
 	Variable_Register*      variable_Register        = NULL;
-	AbstractContext*        context 		 = NULL;
 	VariableCondition* 	ic            		 = NULL;
 
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !self->context )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
 
 	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
 	
@@ -690,9 +691,9 @@ void _Swarm_Construct( void* swarm, Stg_ComponentFactory* cf, void* data ) {
 	cellLayout =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  CellLayout_Type, CellLayout,  True, data ) ;
 	particleLayout =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  ParticleLayout_Type, ParticleLayout, True, data );
 	
-	extensionManagerRegister = Stg_ObjectList_Get( cf->registerRegister, "ExtensionManager_Register" );
+	extensionManagerRegister = extensionMgr_Register; 
 	assert( extensionManagerRegister );
-	variable_Register = Stg_ObjectList_Get( cf->registerRegister, "Variable_Register" );
+	variable_Register = self->context->variable_Register; 
 	assert( variable_Register );
 	
 	cellParticleTblDelta = 
@@ -738,7 +739,7 @@ void _Swarm_Construct( void* swarm, Stg_ComponentFactory* cf, void* data ) {
 			extraParticlesFactor,
 			extensionManagerRegister,
 			variable_Register,
-			context->communicator,
+			self->context->communicator,
 			ic );
 }
 

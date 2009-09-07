@@ -188,6 +188,9 @@ void _ParticleMovementHandler_Execute( void* pCommsHandler, void *data ){
 	ParticleCommHandler*	self = (ParticleCommHandler*)pCommsHandler;
 	Swarm					*swarm = (Swarm*)data;
 
+	if( !swarm || !Stg_CheckType( swarm, Swarm ) )
+		return;
+
 	self->swarm = swarm;
 	self->_commFunction( self );	
 }

@@ -50,6 +50,7 @@
 		/* General info */ \
 		__Stg_Component \
 		\
+		AbstractContext*				   context; \
 		/* Virtual info */ \
 		SwarmVariable_ValueAtFunction*                     _valueAt; \
 		SwarmVariable_GetGlobalValueFunction*              _getMinGlobalMagnitude; \

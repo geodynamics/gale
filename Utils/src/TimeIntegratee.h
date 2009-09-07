@@ -51,6 +51,7 @@
 		/* General info */ \
 		__Stg_Component \
 		\
+		DomainContext*				   context;		 \
 		/* Virtual info */ \
 		TimeIntegratee_CalculateTimeDerivFunction* _calculateTimeDeriv;  \
 		TimeIntegratee_IntermediateFunction*       _intermediate;  \

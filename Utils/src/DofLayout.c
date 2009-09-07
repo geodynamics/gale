@@ -36,6 +36,7 @@
 #include <StgDomain/Mesh/Mesh.h>
 
 #include "types.h"
+#include "DomainContext.h"
 #include "DofLayout.h"
 
 #include <stdlib.h>
@@ -299,10 +300,14 @@ void _DofLayout_Construct( void* dofLayout, Stg_ComponentFactory* cf, void* data
 	thisComponentDict = Dictionary_GetDictionary( cf->componentDict, self->name );
 	assert( thisComponentDict );
 
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
+	if( !self->context )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
+
 	/* Get the mesh. */
 	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "mesh", Mesh, True, data );
 
-	variableRegister = (void*)Stg_ObjectList_Get( cf->registerRegister, "Variable_Register" );
+	variableRegister = self->context->variable_Register; 
 	assert( variableRegister );
 
 	if (( list = Dictionary_Get( thisComponentDict, "BaseVariables" ) )) {

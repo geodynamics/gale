@@ -62,6 +62,7 @@
 		/* General info */ \
 		__Stg_Component\
 		\
+		AbstractContext*			context; \
 		/* Virtual info */ \
 		CellLayout_CellCountFunction*		_cellLocalCount; \
 		CellLayout_CellCountFunction*		_cellShadowCount; \

@@ -317,17 +317,20 @@ void* _SwarmShapeVC_DefaultNew( Name name ) {
 }
 
 void _SwarmShapeVC_Construct( void* variableCondition, Stg_ComponentFactory* cf, void* data ) {
-	SwarmShapeVC*	self    		= (SwarmShapeVC*)variableCondition;
-	void*		conFunc_Register 	= NULL;
-	void*		variable_Register 	= NULL;
+	SwarmShapeVC*		self    		= (SwarmShapeVC*)variableCondition;
+	void*			conFunc_Register 	= NULL;
+	void*			variable_Register 	= NULL;
+	AbstractContext*	context;
 
 	self = Stg_ComponentFactory_ConstructByName( cf, self->name, SwarmShapeVC, False, data );
 
-	conFunc_Register = (void*)Stg_ObjectList_Get( cf->registerRegister, "ConditionFunction_Register" );
-	assert( conFunc_Register );
 	self->conFunc_Register = conFunc_Register; 
 	
-	variable_Register = (void*)Stg_ObjectList_Get( cf->registerRegister, "Variable_Register" );
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !self->context )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+
+	variable_Register = self->context->variable_Register; 
 	assert( variable_Register );
 	self->variable_Register = variable_Register;
 
