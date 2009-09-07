@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 from mercurial import hg, ui, util
 import urllib2
