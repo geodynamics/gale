@@ -131,13 +131,11 @@ void SwarmOutputSuite_TestSwarmOutput( SwarmOutputSuiteData* data ) {
 	componentDict = Dictionary_GetDictionary( dictionary, "components" );
 	assert( componentDict );
 
-	cf = context->CF = Stg_ComponentFactory_New( dictionary, componentDict, context->register_Register );
+	cf = context->CF = Stg_ComponentFactory_New( dictionary, componentDict );
 	LiveComponentRegister_Add( cf->LCRegister, (Stg_Component*) context );
 
 	extensionMgr_Register = ExtensionManager_Register_New();
 	swarmVariable_Register = SwarmVariable_Register_New( NULL );
-	Stg_ObjectList_ClassAppend( cf->registerRegister, (void*)extensionMgr_Register, "ExtensionManager_Register" );
-	Stg_ObjectList_ClassAppend( cf->registerRegister, (void*)swarmVariable_Register, "SwarmVariable_Register" );
 
 	Stg_ComponentFactory_CreateComponents( cf );
 	Stg_ComponentFactory_ConstructComponents( cf, 0 /* dummy */ );
