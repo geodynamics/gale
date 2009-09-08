@@ -27,7 +27,6 @@ class PETSc(Package):
 
         # Try to find PETSc information.
         extra_libs = []
-        okay = False
         if loc[0]:
             bmake_dir = os.path.join(loc[0], 'bmake')
             # If we don't alrady have an arch, try read it.
@@ -46,38 +45,49 @@ class PETSc(Package):
                     loc[1].append(os.path.dirname(petscconf))
                     # Add arch to the library directory.
                     loc[2][0] = os.path.join(loc[2][0], self.arch)
-                    # Add additional libraries.
-                    from distutils import sysconfig
-                    vars = {}
-                    sysconfig.parse_makefile(petscconf, vars)
-                    flags = sysconfig.expand_makefile_vars(vars['PACKAGES_LIBS'], vars)
-                    if 'X11_INCLUDE' in vars:
-                        flags += ' ' + sysconfig.expand_makefile_vars(str(vars['X11_INCLUDE']), vars)
-                    if 'MPI_INCLUDE' in vars:
-                        flags += ' ' + sysconfig.expand_makefile_vars(str(vars['MPI_INCLUDE']), vars)
-                    if 'BLASLAPACK_INCLUDE' in vars:
-                        flags += sysconfig.expand_makefile_vars(str(vars['BLASLAPACK_INCLUDE']), vars)
-                    if 'PCC_LINKER_FLAGS' in vars:
-                        flags += ' ' + sysconfig.expand_makefile_vars(str(vars['PCC_LINKER_FLAGS']), vars)
-                    if 'PCC_FLAGS' in vars:
-                        flags += ' ' + sysconfig.expand_makefile_vars(str(vars['PCC_FLAGS']), vars)
-                    if 'PCC_LINKER_LIBS' in vars:
-                        flags += ' ' + sysconfig.expand_makefile_vars(str(vars['PCC_LINKER_LIBS']), vars)
-                    flag_dict = env.ParseFlags(flags)
-                    if 'LIBS' in flag_dict:
-                        extra_libs = flag_dict['LIBS']
-                        del flag_dict['LIBS']
-                    env.MergeFlags(flag_dict)
-                    okay = True
 
-        env.AppendUnique(CPPPATH=loc[1])
-        env.AppendUnique(LIBPATH=loc[2])
-        env.AppendUnique(RPATH=loc[2])
-
-        # Add the libraries.
+        # Can we locate static or shared libs?
         libs = ['petscsnes', 'petscksp', 'petscdm',
                 'petscmat', 'petscvec', 'petsc']
-        if self.find_libraries(loc[2], libs):
+        lib_types = self.find_libraries(loc[2], libs)
+        if lib_types is not None:
+
+            # Add basic environment.
+            env.AppendUnique(CPPPATH=loc[1])
+            env.AppendUnique(LIBPATH=loc[2])
+            env.AppendUnique(RPATH=loc[2])
+            
+            # Add additional libraries.
+            from distutils import sysconfig
+            vars = {}
+            sysconfig.parse_makefile(petscconf, vars)
+            flags = sysconfig.expand_makefile_vars(vars['PACKAGES_LIBS'], vars)
+            
+            # Static libs? i.e. no shared libs.
+            if lib_types[1] is None:
+                # Add a bunch of extra jazz.
+                if 'X11_INCLUDE' in vars:
+                    flags += ' ' + sysconfig.expand_makefile_vars(str(vars['X11_INCLUDE']), vars)
+                if 'MPI_INCLUDE' in vars:
+                    flags += ' ' + sysconfig.expand_makefile_vars(str(vars['MPI_INCLUDE']), vars)
+                if 'BLASLAPACK_INCLUDE' in vars:
+                    flags += sysconfig.expand_makefile_vars(str(vars['BLASLAPACK_INCLUDE']), vars)
+                if 'PCC_LINKER_FLAGS' in vars:
+                    flags += ' ' + sysconfig.expand_makefile_vars(str(vars['PCC_LINKER_FLAGS']), vars)
+                if 'PCC_FLAGS' in vars:
+                    flags += ' ' + sysconfig.expand_makefile_vars(str(vars['PCC_FLAGS']), vars)
+                if 'PCC_LINKER_LIBS' in vars:
+                    flags += ' ' + sysconfig.expand_makefile_vars(str(vars['PCC_LINKER_LIBS']), vars)
+
+            # Use SCons to parse the flags.
+            flag_dict = env.ParseFlags(flags)
+            # Keep the libs for a bit later.
+            if 'LIBS' in flag_dict:
+                extra_libs = flag_dict['LIBS']
+                del flag_dict['LIBS']
+            env.MergeFlags(flag_dict)
+
+            # Add libs and return.
             env.PrependUnique(LIBS=libs)
             env.AppendUnique(LIBS=extra_libs)
             yield env

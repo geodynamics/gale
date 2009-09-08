@@ -188,30 +188,53 @@ class Package:
         return val
 
     def find_libraries(self, dirs, libs):
-        # If no directories were given, return okay.
+        # If no directories were given, return failure.
         if not dirs:
-            return True
+            return None
 
-        prefixes = ['lib']
-        suffixes = ['.a']
+        # Define the prefixes and suffixes for shared and static
+        # libraries.
+        static_prefixes = ['lib']
+        shared_prefixes = ['lib']
+        static_suffixes = ['.a']
+        shared_suffixes = []
         if platform.system() == 'Linux':
-            suffixes += ['.so']
+            shared_suffixes += ['.so']
         if platform.system() == 'Darwin':
-            suffixes += ['.dylib']
+            shared_suffixes += ['.dylib']
         if platform.system() == 'Windows':
-            prefixes += ['']
-            suffixes += ['.dll']
+            static_prefixes += ['']
+            shared_prefixes += ['']
+            shared_suffixes += ['.dll']
 
         libs = utils.conv.to_list(libs)
+        static_paths = []
+        shared_paths = []
         for l in libs:
-            if not [p for p in utils.path.find(l, dirs, prefixes, suffixes)]:
-                # Need to log that we couldn't find the library on disk.
+            cur_static_paths = [p for p in utils.path.find(l, dirs,
+                                                           static_prefixes,
+                                                           static_suffixes)]
+            cur_shared_paths = [p for p in utils.path.find(l, dirs,
+                                                           shared_prefixes,
+                                                           shared_suffixes)]
+            if not cur_static_paths:
+                static_paths = None
                 log = open('config.log', 'a')
-                log.write('While configuring %s:\n'%repr(self.name))
-                log.write('  Failed to find library %s on disk.\n'%repr(l))
+                log.write('  Failed to find library %s while looking in %s.\n'%(repr(l), repr(dirs)))
                 log.close()
-                return False
-        return True
+            elif static_paths is not None:
+                static_paths += cur_static_paths
+            
+            if not cur_shared_paths:
+                shared_paths = None
+                log = open('config.log', 'a')
+                log.write('  Failed to find library %s while looking in %s.\n'%(repr(l), repr(dirs)))
+            elif shared_paths is not None:
+                shared_paths += cur_shared_paths
+
+        if static_paths is None and shared_paths is None:
+            return None
+        return (static_paths, shared_paths)
 
     def _gen_extended_locations(self, loc):
         for inc, lib in self.gen_base_extensions():
@@ -259,9 +282,19 @@ class Package:
                 yield ('', [inc_dir], [lib_dir])
 
             else:
+                # Try a set of default locations for this system.
+                bases = []
+                if platform.system() == 'Linux':
+                    bases += ['/usr', '/usr/local']
+                if platform.system() == 'Darwin':
+                    bases += ['/sw']
+                if platform.system() == 'Windows':
+                    pass
+                for b in bases:
+                    for loc in self._gen_extended_locations((b, [], [])):
+                        yield loc
                 # Finally try an empty search followed by locations
                 # specific to the package.
-                yield ('', [], [])
                 for loc in self.gen_locations():
                     if loc is None:
                         continue
