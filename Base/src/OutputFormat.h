@@ -53,6 +53,7 @@
 
 	#define __lucOutputFormat                                         \
 		__Stg_Component                                           \
+		AbstractContext*				   context;		     \
 		/* Virtual Functions */ \
 		lucOutputFormat_OutputFunction*                    _output;                  \
 		/* Other Info */   \

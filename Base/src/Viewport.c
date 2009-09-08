@@ -273,6 +273,10 @@ void _lucViewport_Construct( void* viewport, Stg_ComponentFactory* cf, void* dat
 
 	/* TODO Construct Parent */
 
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !self->context ) 
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+
 	camera =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "Camera", lucCamera, True, data ) ;
 
 	drawingObjectList = Stg_ComponentFactory_ConstructByList( 

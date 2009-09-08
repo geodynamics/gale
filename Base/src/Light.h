@@ -55,6 +55,7 @@
 
 	#define __lucLight                                  \
 		__Stg_Component                                 \
+		AbstractContext*		 context; \
 		Light_Index 		         index;\
 		int                              model; \
 		int                              material;\

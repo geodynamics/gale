@@ -281,6 +281,10 @@ void* _lucColourMap_DefaultNew( Name name ) {
 void _lucColourMap_Construct( void* colourMap, Stg_ComponentFactory* cf, void* data ) {
 	lucColourMap* self             = (lucColourMap*) colourMap;
 
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !self->context ) 
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+
 	_lucColourMap_Init( 
 			self, 
 			Stg_ComponentFactory_GetString( cf, self->name, "colours", "Blue;White;Red"), 

@@ -52,6 +52,7 @@
 
 	#define __lucViewport                                         \
 		__Stg_Component                                           \
+		AbstractContext*				   context; 		     \
 		lucCamera*                                         camera;                   \
 		lucDrawingObject_Register*                         drawingObject_Register;   \
 		lucLight_Register*                         	   light_Register;           \

@@ -59,6 +59,7 @@
 	#define __lucWindowInteraction                                      \
 		/* Parent macro */ \
 		__Stg_Component                                                      \
+		AbstractContext*				   context;	     \
 		/* Virtual functions go here */ \
 		lucWindowInteraction_MouseMotionFunction*          _mouseMotion;     \
 		lucWindowInteraction_MouseClickFunction*           _mouseClick;      \

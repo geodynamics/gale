@@ -247,6 +247,10 @@ void _lucLight_Construct( void* light, Stg_ComponentFactory* cf, void* data ) {
 	Name                    materialName;
 	float                   lmodel_ambient[4]; 
 	
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !self->context ) 
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+
 	glEnable(GL_LIGHTING);
 
 	/* Spot values */

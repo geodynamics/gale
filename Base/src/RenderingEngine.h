@@ -61,6 +61,7 @@
 
 	#define __lucRenderingEngine                           \
 		__Stg_Component                                   \
+		AbstractContext*				   context;		    \
 		/* Virtual Functions */ \
 		lucRenderingEngine_RenderFunction*                 _render;                 \
 		lucRenderingEngine_ClearFunction*				   _clear;					\

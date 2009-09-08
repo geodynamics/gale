@@ -150,7 +150,13 @@ void* _lucInputFormat_Copy( void* inputFormat, void* dest, Bool deep, Name nameE
 	return (void*) newInputFormat;
 }
 
-void _lucInputFormat_Construct( void* inputFormat, Stg_ComponentFactory* cf, void* data ) {}
+void _lucInputFormat_Construct( void* inputFormat, Stg_ComponentFactory* cf, void* data ) {
+	lucInputFormat*        self               = (lucInputFormat*) inputFormat; 
+
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !self->context ) 
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+}
 void _lucInputFormat_Build( void* inputFormat, void* data ) { }
 void _lucInputFormat_Initialise( void* inputFormat, void* data ) { }
 void _lucInputFormat_Execute( void* inputFormat, void* data ) { }

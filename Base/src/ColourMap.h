@@ -59,6 +59,7 @@
 
 	#define __lucColourMap                \
 		__Stg_Component			\
+		AbstractContext*				   context;      \
 		Colour_Index                                       colourCount;  \
 		lucColour*                                         colourList;   \
 		double                                             minimum;      \

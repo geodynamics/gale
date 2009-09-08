@@ -57,6 +57,7 @@
 	#define __lucDrawingObject                           \
 		/* Macro defining parent goes here - This means you can cast this class as its parent */ \
 		__Stg_Component                                   \
+		AbstractContext*				   context;		       \
 		/* Virtual Functions */ \
 		lucDrawingObject_SetupFunction*                    _setup;                     \
 		lucDrawingObject_DrawFunction*                     _draw;                      \

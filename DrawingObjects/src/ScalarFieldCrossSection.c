@@ -231,7 +231,7 @@ void _lucScalarFieldCrossSection_Construct( void* drawingObject, Stg_ComponentFa
 
 void _lucScalarFieldCrossSection_Build( void* drawingObject, void* data ) {
 	lucScalarFieldCrossSection*     self        = (lucScalarFieldCrossSection*)drawingObject;
-	AbstractContext*                context     = Stg_CheckType( data, AbstractContext );
+	AbstractContext*                context     = self->context;
 	Stg_ComponentFactory*           cf          = context->CF;
 	Stream*                         errorStream = Journal_Register( Error_Type, self->type );
 

@@ -263,7 +263,6 @@ void _lucWindow_Construct( void* window, Stg_ComponentFactory* cf, void* data ) 
 	Viewport_Index           viewportCount;
 	lucOutputFormat**        outputFormatList;
 	OutputFormat_Index       outputFormatCount;
-	AbstractContext*         context;
 	lucRenderingEngine*      renderingEngine;
 	Pixel_Index              width;
 	Pixel_Index              height;
@@ -314,7 +313,10 @@ void _lucWindow_Construct( void* window, Stg_ComponentFactory* cf, void* data ) 
 		
 	/* The window needs information about the context so that it can attach itself 
 	 * onto the AbstractContext_EP_DumpClass entry point. */
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !self->context ) 
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+
 
 	renderingEngine = Stg_ComponentFactory_ConstructByKey( cf, self->name, "RenderingEngine", lucRenderingEngine, True, data );
 
@@ -327,7 +329,7 @@ void _lucWindow_Construct( void* window, Stg_ComponentFactory* cf, void* data ) 
 			outputFormatCount,
 			windowInteractionList,
 			windowInteractionCount,
-			context,
+			self->context,
 			width,
 			height,
 			Stg_ComponentFactory_GetString( cf, self->name, "backgroundColour", "white" ),
@@ -349,7 +351,6 @@ void _lucWindow_Construct( void* window, Stg_ComponentFactory* cf, void* data ) 
 void _lucWindow_Build( void* window, void* data ) {
 	/* Save context and master flag */
 	lucWindow*  self = (lucWindow*)window;
-	self->context   = (AbstractContext*) data;
 	self->isMaster = (self->context->rank == MASTER);
 }
 

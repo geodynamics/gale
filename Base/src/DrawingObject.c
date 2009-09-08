@@ -150,6 +150,10 @@ void* _lucDrawingObject_Copy( void* drawingObject, void* dest, Bool deep, Name n
 void _lucDrawingObject_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ) {
 	lucDrawingObject*        self            = (lucDrawingObject*) drawingObject ;
 
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !self->context ) 
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	
 	_lucDrawingObject_Init( self );
 }
 

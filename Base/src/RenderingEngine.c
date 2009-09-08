@@ -146,6 +146,10 @@ void* _lucRenderingEngine_Copy( void* renderingEngine, void* dest, Bool deep, Na
 void _lucRenderingEngine_Construct( void* renderingEngine, Stg_ComponentFactory* cf, void* data ) {
 	lucRenderingEngine*        self            = (lucRenderingEngine*) renderingEngine ;
 
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !self->context ) 
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+
 	_lucRenderingEngine_Init( self );
 }
 

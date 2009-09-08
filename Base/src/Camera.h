@@ -53,6 +53,7 @@
 
 	#define __lucCamera                                  \
 		__Stg_Component                                 \
+		AbstractContext*				   context;		 \
 		lucCamera*                                         originalCamera;       \
 		FieldVariable*                                     centreFieldVariable;  \
 		Coord                                              coord;                \

@@ -260,6 +260,10 @@ void _lucCamera_Construct( void* camera, Stg_ComponentFactory* cf, void* data ) 
 	lucStereoType          stereoType;
 	Name                   stereoTypeName;
 
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !self->context ) 
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	
   #define DTOR 0.0174532925
 	focalPoint[I_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "focalPointX", 0.0 );
 	focalPoint[J_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "focalPointY", 0.0 );

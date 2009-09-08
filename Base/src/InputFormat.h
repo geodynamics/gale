@@ -53,6 +53,7 @@
 
 	#define __lucInputFormat                                         \
 		__Stg_Component                                           \
+		AbstractContext*				 context;  \
 		/* Virtual Functions */ \
 		lucInputFormat_InputFunction*                    _input;   \
 		/* Other Info */   \
