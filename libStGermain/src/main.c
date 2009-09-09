@@ -158,7 +158,7 @@ void stgMainLoop( Stg_ComponentFactory* cf ) {
 /* TODO previously StG didn't go through and destroy everything - doing so causes a bunch of double frees. need to fix this... */
 void stgMainDestroy( Stg_ComponentFactory* cf ) {
 	/* Destruct phase ---------------------------------------------------------------------------------------------------*/
-	//Stg_Class_Delete( cf );
+	Stg_ComponentFactory_DestroyComponents( cf, NULL );
 }
 
 void stgImportToolbox( Dictionary* dictionary, char* toolboxName ) {
