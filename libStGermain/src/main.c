@@ -135,9 +135,7 @@ Stg_ComponentFactory* stgMainInitFromXML( char* xmlInputFilename, MPI_Comm commu
 	
 void stgMainLoop( Stg_ComponentFactory* cf ) {
 	/* Run (Solve) phase ------------------------------------------------------------------------------------------------*/
-/*
-	Stg_ComponentFactory_ExecuteComponents( cf, NULL );
-*/
+	/* do this by running the contexts, which manage the entry points which call the _Execute() funcs for the other components */
 	unsigned component_i;
 	Stg_Component* component;
 	AbstractContext* context;
@@ -155,7 +153,6 @@ void stgMainLoop( Stg_ComponentFactory* cf ) {
 	}
 }
 
-/* TODO previously StG didn't go through and destroy everything - doing so causes a bunch of double frees. need to fix this... */
 void stgMainDestroy( Stg_ComponentFactory* cf ) {
 	/* Destruct phase ---------------------------------------------------------------------------------------------------*/
 	Stg_ComponentFactory_DestroyComponents( cf, NULL );
