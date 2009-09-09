@@ -36,6 +36,8 @@ class Package:
         self.result = None
         self.headers = []
         # We need a list of library paths to ignore.
+        self.system_inc_dirs = [os.path.normpath('/usr/include'),
+                                os.path.normpath('/usr/local/include')]
         self.system_lib_dirs = [os.path.normpath('/usr/lib'),
                                 os.path.normpath('/usr/local/lib')]
         # Setup the dependencies and options.
@@ -85,7 +87,7 @@ class Package:
         as include paths, library paths and rpaths.
         """
         env = self.env.Clone()
-        env.AppendUnique(CPPPATH=loc[1])
+        env.AppendUnique(CPPPATH=[l for l in loc[1] if l not in self.system_inc_dirs])
         env.AppendUnique(LIBPATH=[l for l in loc[2] if l not in self.system_lib_dirs])
         env.AppendUnique(RPATH=[l for l in loc[2] if l not in self.system_lib_dirs])
         yield env
@@ -213,6 +215,8 @@ class Package:
         libs = utils.conv.to_list(libs)
         static_paths = []
         shared_paths = []
+        static_failed = []
+        shared_failed = []
         for l in libs:
             cur_static_paths = [p for p in utils.path.find(l, dirs,
                                                            static_prefixes,
@@ -222,20 +226,23 @@ class Package:
                                                            shared_suffixes)]
             if not cur_static_paths:
                 static_paths = None
-                log = open('config.log', 'a')
-                log.write('  Failed to find library %s while looking in %s.\n'%(repr(l), repr(dirs)))
-                log.close()
+                static_failed += [l]
             elif static_paths is not None:
                 static_paths += cur_static_paths
             
             if not cur_shared_paths:
                 shared_paths = None
-                log = open('config.log', 'a')
-                log.write('  Failed to find library %s while looking in %s.\n'%(repr(l), repr(dirs)))
+                shared_failed += [l]
             elif shared_paths is not None:
                 shared_paths += cur_shared_paths
 
         if static_paths is None and shared_paths is None:
+            log = open('config.log', 'a')
+            log.write('  Failed to find static or shared libraries for %s.\n'%repr(self.name))
+            log.write('  Static missing: %s\n'%repr(static_failed))
+            log.write('  Shared missing: %s\n'%repr(shared_failed))
+            log.write('  Looked in: %s\n'%repr(dirs))
+            log.close()
             return None
         return (static_paths, shared_paths)
 

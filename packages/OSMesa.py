@@ -4,15 +4,13 @@ from config import Package
 class OSMesa(Package):
 
     def gen_locations(self):
-        yield ('/usr', [], [])
         yield ('/usr', [], ['/usr/X11R6'])
         yield ('/usr/X11R6', [], [])
-        yield ('/usr/local', [], [])
 
     def gen_base_extensions(self):
         for e in Package.gen_base_extensions(self):
             yield e
-            yield ([os.path.join(h, 'GL') for h in e[0]], e[1])
+            yield (e[0] + [os.path.join(h, 'GL') for h in e[0]], e[1])
 
     def gen_envs(self, loc):
         for env in Package.gen_envs(self, loc):
