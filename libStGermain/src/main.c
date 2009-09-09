@@ -135,7 +135,24 @@ Stg_ComponentFactory* stgMainInitFromXML( char* xmlInputFilename, MPI_Comm commu
 	
 void stgMainLoop( Stg_ComponentFactory* cf ) {
 	/* Run (Solve) phase ------------------------------------------------------------------------------------------------*/
+/*
 	Stg_ComponentFactory_ExecuteComponents( cf, NULL );
+*/
+	unsigned component_i;
+	Stg_Component* component;
+	AbstractContext* context;
+	
+	for( component_i = 0; component_i < LiveComponentRegister_GetCount( cf->LCRegister ); component_i++ ) {
+		component = LiveComponentRegister_At( cf->LCRegister, component_i );
+		if( !strcmp( component->type, "DomainContext" ) ||
+		    !strcmp( component->type, "FiniteElementContext" ) ||
+		    !strcmp( component->type, "PICelleratorContext" ) ||
+		    !strcmp( component->type, "UnderworldContext" ) ) {
+			context = (AbstractContext*)component;
+			AbstractContext_Dump( context );
+			Stg_Component_Execute( context, 0, True );
+		}
+	}
 }
 
 /* TODO previously StG didn't go through and destroy everything - doing so causes a bunch of double frees. need to fix this... */

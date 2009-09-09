@@ -288,12 +288,12 @@
 	void _AbstractContext_Construct_EP_Run( void* entryPoint, void* data0, void* data1 );
 	
 	/* Default construction hook */
-	void _AbstractContext_Execute_Hook( Context* context );
+	void _AbstractContext_Execute_Hook( void* _context );
 	
 	/* Step the solver implementation */
-	void _AbstractContext_Step( Context* context, double dt );
+	void _AbstractContext_Step( void* _context, double dt );
 	
-	void _AbstractContext_LoadTimeInfoFromCheckPoint( Context* self, Index timeStep, double* dtLoadedFromFile );
-	void _AbstractContext_SaveTimeInfo( Context* context );
-	void _AbstractContext_CreateCheckpointDirectory( Context* context );
+	void _AbstractContext_LoadTimeInfoFromCheckPoint( void* _context, Index timeStep, double* dtLoadedFromFile );
+	void _AbstractContext_SaveTimeInfo( void* _context );
+	void _AbstractContext_CreateCheckpointDirectory( void* _context );
 #endif /* __Base_Context_AbstractContext_h__ */

@@ -570,7 +570,7 @@ void _AbstractContext_Construct( void* context, Stg_ComponentFactory* cf, void* 
 		double dtFromFile;
 		self->loadFromCheckPoint = True;
 		self->timeStep = self->restartTimestep;
-		_AbstractContext_LoadTimeInfoFromCheckPoint( self, self->restartTimestep, &dtFromFile );
+		_AbstractContext_LoadTimeInfoFromCheckPoint( (void*)self, self->restartTimestep, &dtFromFile );
 		self->nextCheckpointTime += self->currentTime;
 	}
 	else {
@@ -697,10 +697,7 @@ EntryPoint_Index AbstractContext_AddEntryPoint(
 }
 
 
-EntryPoint* AbstractContext_GetEntryPoint( 
-		void*				abstractContext,
-		const Name			entryPointName )
-{
+EntryPoint* AbstractContext_GetEntryPoint( void* abstractContext, const Name entryPointName ) {
 	AbstractContext*	self = (AbstractContext*)abstractContext;
 	EntryPoint_Index	ep_I;
 
@@ -803,8 +800,8 @@ void _AbstractContext_Construct_Hook( void* _context, void* data ) {
 
 }
 
-void _AbstractContext_Execute_Hook( Context* context ) {
-	AbstractContext*   self = (AbstractContext*)context;
+void _AbstractContext_Execute_Hook( void* _context ) {
+	AbstractContext*   self = (AbstractContext*)_context;
 	double             dt = 0;
 	double             dtLoadedFromFile = 0;
 	
@@ -850,7 +847,7 @@ void _AbstractContext_Execute_Hook( Context* context ) {
 			at the end of the step we were restarting from, which should be equivalent to the
 			call here - and that calculation may be dependent on the solver info for that step,
 			so we need to reload it here */
-			_AbstractContext_LoadTimeInfoFromCheckPoint( self, self->restartTimestep, &dtLoadedFromFile );
+			_AbstractContext_LoadTimeInfoFromCheckPoint( (void*)self, self->restartTimestep, &dtLoadedFromFile );
 			dt = dtLoadedFromFile;
 		}	
 		else {
@@ -903,8 +900,8 @@ void _AbstractContext_Execute_Hook( Context* context ) {
 }
 
 
-void _AbstractContext_Step( Context* context, double dt ) {
-	AbstractContext* self = (AbstractContext*)context;
+void _AbstractContext_Step( void* _context, double dt ) {
+	AbstractContext* self = (AbstractContext*)_context;
 	
 	/* This will make it clear where the timestep starts when several procs
 	 * running. Figure this 1 synchronisation is ok since we are likely to
@@ -930,7 +927,8 @@ void _AbstractContext_Step( Context* context, double dt ) {
 }
 
 
-void _AbstractContext_LoadTimeInfoFromCheckPoint( Context* self, Index timeStep, double* dtLoadedFromFile ) {
+void _AbstractContext_LoadTimeInfoFromCheckPoint( void* _context, Index timeStep, double* dtLoadedFromFile ) {
+	AbstractContext*       self = (AbstractContext*)_context;
 	char*                  timeInfoFileName = NULL;
 	char*                  timeInfoFileNamePart = NULL;
 	FILE*                  timeInfoFile;		
@@ -1011,8 +1009,8 @@ void _AbstractContext_LoadTimeInfoFromCheckPoint( Context* self, Index timeStep,
 }
 		
 
-void _AbstractContext_SaveTimeInfo( Context* context ) {
-	AbstractContext*       self = context;	
+void _AbstractContext_SaveTimeInfo( void* _context ) {
+	AbstractContext*       self = (AbstractContext*)_context;	
 	FILE*                  timeInfoFile = NULL;
 	char*                  timeInfoFileName = NULL;
    char*                  timeInfoFileNamePart = NULL;
@@ -1056,7 +1054,7 @@ void _AbstractContext_SaveTimeInfo( Context* context ) {
 	#endif
 	      
 	props = H5Pcreate( H5P_DATASET_XFER );
-	H5Dwrite( fileData, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, props, &(context->currentTime) );
+	H5Dwrite( fileData, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, props, &(self->currentTime) );
 	H5Pclose( props );
 	H5Dclose( fileData );
 	H5Sclose( fileSpace );
@@ -1066,12 +1064,11 @@ void _AbstractContext_SaveTimeInfo( Context* context ) {
 	#if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
 	fileData = H5Dcreate( file, "/Dt", H5T_NATIVE_DOUBLE, fileSpace, H5P_DEFAULT );
 	#else
-	fileData = H5Dcreate( file, "/Dt", H5T_NATIVE_DOUBLE, fileSpace,
-	                            H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+	fileData = H5Dcreate( file, "/Dt", H5T_NATIVE_DOUBLE, fileSpace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
 	#endif
 	      
 	props = H5Pcreate( H5P_DATASET_XFER );
-	Dt = AbstractContext_Dt( context );
+	Dt = AbstractContext_Dt( self );
 	H5Dwrite( fileData, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, props, &Dt );
 	H5Pclose( props );
 	H5Dclose( fileData );
@@ -1087,7 +1084,7 @@ void _AbstractContext_SaveTimeInfo( Context* context ) {
 	#endif
 	      
 	props = H5Pcreate( H5P_DATASET_XFER );
-	H5Dwrite( fileData, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, props, &(context->nproc) );
+	H5Dwrite( fileData, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, props, &(self->nproc) );
 	H5Pclose( props );
 	H5Dclose( fileData );
 	H5Sclose( fileSpace );
@@ -1107,8 +1104,8 @@ void _AbstractContext_SaveTimeInfo( Context* context ) {
 	}
 
 	/* set currentTime and Dt loaded from file */
-	fprintf( timeInfoFile, "%lg ", context->currentTime );
-	fprintf( timeInfoFile, "%lg\n", AbstractContext_Dt( context ) );
+	fprintf( timeInfoFile, "%lg ", self->currentTime );
+	fprintf( timeInfoFile, "%lg\n", AbstractContext_Dt( self ) );
 	fclose( timeInfoFile );
 #endif
 	
@@ -1192,8 +1189,8 @@ char* Context_GetCheckPointWritePrefixString( void* context ) {
 	return writePathString;
 }
 
-void _AbstractContext_CreateCheckpointDirectory( Context* context ) {
-	AbstractContext*       self = context;	
+void _AbstractContext_CreateCheckpointDirectory( void* _context ) {
+	AbstractContext*       self = (AbstractContext*)_context;	
    /* if we are creating individual directories for each checkpoint timestep, first create the directory if it doesn't exist. */
    if ( self->checkpointAppendStep ) {
       /* Only the master process creates the directory */      
