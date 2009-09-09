@@ -202,6 +202,9 @@ class Package:
             shared_suffixes += ['.so']
         if platform.system() == 'Darwin':
             shared_suffixes += ['.dylib']
+        if platform.system().find('CYGWIN') != -1:
+            shared_suffixes += ['.dll']
+            static_suffixes += ['.dll.a']
         if platform.system() == 'Windows':
             static_prefixes += ['']
             shared_prefixes += ['']
@@ -284,7 +287,7 @@ class Package:
             else:
                 # Try a set of default locations for this system.
                 bases = []
-                if platform.system() == 'Linux':
+                if platform.system() == 'Linux' or platform.system().find('CYGWIN') != -1:
                     bases += ['/usr', '/usr/local']
                 if platform.system() == 'Darwin':
                     bases += ['/sw']
