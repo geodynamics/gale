@@ -59,6 +59,12 @@ def PrintSummary(env):
 def generate(env, options=[]):
     import platform
 
+    # Print out an inital log file line with the options used.
+    conf = env.Configure()
+    if conf.logstream != None:
+        conf.logstream.write('\nConfiguring using:\n  ' + ' '.join(sys.argv) + '\n')
+    conf.Finish()
+
     # Add the options to SCons.
     env['cfg_options'] = options
     for o in options:
