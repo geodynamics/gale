@@ -177,6 +177,7 @@ void TestDump( void* context ) {
 }
 
 void AbstractContextSuite_Setup( AbstractContextSuiteData* data ) {
+   Stg_ComponentFactory* cf;
    MPI_Comm       CommWorld;
    Index          ii;
 
@@ -187,6 +188,8 @@ void AbstractContextSuite_Setup( AbstractContextSuiteData* data ) {
    Dictionary_Add( data->dict, "dumpEvery", Dictionary_Entry_Value_FromUnsignedInt( 2 ) );
    Dictionary_Add( data->dict, "maxTimeSteps", Dictionary_Entry_Value_FromUnsignedInt( 10 ) );
    
+   cf = Stg_ComponentFactory_New( data->dict, NULL );
+
    for (ii=0; ii < MAX_TIME_STEPS; ii++) {
       GLOBAL_COMP_VALUE[ii] = 0.0;
    }
@@ -199,6 +202,7 @@ void AbstractContextSuite_Setup( AbstractContextSuiteData* data ) {
       0, 
       CommWorld, 
       data->dict );
+   _AbstractContext_Construct( data->ctx, cf, NULL );
 
    Stream_Enable( data->ctx->info, False );
 }
@@ -219,11 +223,11 @@ void AbstractContextSuite_TestDefaultEPs( AbstractContextSuiteData* data ) {
    contextEP = (ContextEntryPoint*)AbstractContext_GetEntryPoint( data->ctx, "Context_ConstructExtensions" );
    pcu_check_true( contextEP->hooks->count == 0 );
    contextEP = (ContextEntryPoint*)AbstractContext_GetEntryPoint( data->ctx, "Context_Build" );
-   pcu_check_true( contextEP->hooks->count == 1 );
-   pcu_check_streq( ((Hook*)contextEP->hooks->data[0])->name, "BuildAllLiveComponents" );
+   pcu_check_true( contextEP->hooks->count == 0 );
+   //pcu_check_streq( ((Hook*)contextEP->hooks->data[0])->name, "BuildAllLiveComponents" );
    contextEP = (ContextEntryPoint*)AbstractContext_GetEntryPoint( data->ctx, "Context_Initialise" );
-   pcu_check_true( contextEP->hooks->count == 1 );
-   pcu_check_streq( ((Hook*)contextEP->hooks->data[0])->name, "InitialiseAllLiveComponents" );
+   pcu_check_true( contextEP->hooks->count == 0 );
+   //pcu_check_streq( ((Hook*)contextEP->hooks->data[0])->name, "InitialiseAllLiveComponents" );
    contextEP = (ContextEntryPoint*)AbstractContext_GetEntryPoint( data->ctx, "Context_Execute" );
    pcu_check_true( contextEP->hooks->count == 1 );
    pcu_check_streq( ((Hook*)contextEP->hooks->data[0])->name, "default" );
@@ -279,10 +283,8 @@ void AbstractContextSuite_TestRunBasic( AbstractContextSuiteData* data ) {
    pcu_check_true( data->ctx->solve2HookCalled == 10 );
    pcu_check_true( data->ctx->syncHookCalled == 10 );
    pcu_check_true( data->ctx->outputHookCalled == 10 );
-   pcu_check_true( data->ctx->dumpHookCalled == 
-      10/Dictionary_GetUnsignedInt(data->dict, "dumpEvery" ) );
-   pcu_check_true( data->ctx->checkpointHookCalled == 
-      10/Dictionary_GetUnsignedInt(data->dict, "checkpointEvery" ) );
+   pcu_check_true( data->ctx->dumpHookCalled == 10/Dictionary_GetUnsignedInt(data->dict, "dumpEvery" ) );
+   pcu_check_true( data->ctx->checkpointHookCalled == 10/Dictionary_GetUnsignedInt(data->dict, "checkpointEvery" ) );
 
    Stg_Component_Destroy( data->ctx, 0 /* dummy */, False );
 }
@@ -307,6 +309,7 @@ void AbstractContextSuite_TestRunNoDtDefined( AbstractContextSuiteData* data ) {
 
 
 void AbstractContextSuite_TestRestartFromCheckpoint( AbstractContextSuiteData* data ) {
+   Stg_ComponentFactory* cf;
    MPI_Comm CommWorld;
 
    ContextEP_ReplaceAll( data->ctx, AbstractContext_EP_Build, TestBuild );
@@ -325,6 +328,7 @@ void AbstractContextSuite_TestRestartFromCheckpoint( AbstractContextSuiteData* d
    Dictionary_Set( data->dict, "maxTimeSteps", Dictionary_Entry_Value_FromUnsignedInt( 20 ) );
    Dictionary_Set( data->dict, "restartTimestep", Dictionary_Entry_Value_FromUnsignedInt( 5 ) );
    MPI_Comm_dup( MPI_COMM_WORLD, &CommWorld );
+   cf = Stg_ComponentFactory_New( data->dict, NULL );
 
    data->ctx = TestContext_New( 
       "context", 
@@ -332,6 +336,7 @@ void AbstractContextSuite_TestRestartFromCheckpoint( AbstractContextSuiteData* d
       0, 
       CommWorld, 
       data->dict );
+   _AbstractContext_Construct( data->ctx, cf, NULL );
    Stream_Enable( data->ctx->info, False );
 
    /* add hooks to existing entry points */

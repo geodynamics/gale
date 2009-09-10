@@ -587,7 +587,8 @@ void _AbstractContext_Construct( void* context, Stg_ComponentFactory* cf, void* 
 	ModulesManager_Load( self->plugins, self->dictionary, self->name );
 
 	/* Construct the list of plugins. now that the contexts are generated from XML this doesn't (and shouldn't) do anything */
-	ModulesManager_ConstructModules( self->plugins, cf, data );
+	if( self->plugins->codelets->count )
+		ModulesManager_ConstructModules( self->plugins, cf, data );
 
 	self->CF = cf;
 
