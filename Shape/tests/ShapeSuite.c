@@ -36,8 +36,11 @@ void ShapeSuite_GeneratePoints( ShapeSuiteData* data, Dimension_Index dim, char*
 
 	/* read in the xml input file */
 	pcu_filename_input( inputFileName, xml_input );
-	cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD );
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, NULL );
+	cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, NULL );
+	context = LiveComponentRegister_Get( cf->LCRegister, "context" ); 
+	//context = DomainContext_DefaultNew( "context" );
+	//cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, context );
+
 	dictionary = context->dictionary;
 	outputPath = Dictionary_GetString( dictionary, "outputPath" );
 	Stream_RedirectFile_WithPrependedPath( stream, outputPath, "test.dat" );

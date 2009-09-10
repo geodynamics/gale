@@ -66,14 +66,15 @@ void ParticleCoordsSuite_Teardown( ParticleCoordsSuiteData* data ) {
 
 void ParticleCoordsSuite_TestLineParticle( ParticleCoordsSuiteData* data ) {
 	ExtensionManager_Register*	extensionMgr_Register;
-	Variable_Register*			variable_Register;
-	Swarm*							swarm;
-	Stream*							stream;
-	Dictionary*						dictionary;
-	DomainContext*					context;
-	int								procToWatch;
-	char								input_file[PCU_PATH_MAX];
-	char								expected_file[PCU_PATH_MAX];
+	Variable_Register*		variable_Register;
+	Swarm*				swarm;
+	Stream*				stream;
+	Dictionary*			dictionary;
+	DomainContext*			context;
+	int				procToWatch;
+	char				input_file[PCU_PATH_MAX];
+	char				expected_file[PCU_PATH_MAX];
+	Stg_ComponentFactory*		cf;
 
 	if( data->nProcs >=2 ) {
 		procToWatch = 1;
@@ -88,7 +89,8 @@ void ParticleCoordsSuite_TestLineParticle( ParticleCoordsSuiteData* data ) {
 
 	/* read in the xml input file */
 	pcu_filename_input( "testLineParticleLayout.xml", input_file );
-	context = (DomainContext*)stgMainInitFromXML( input_file, data->comm );
+	cf = stgMainInitFromXML( input_file, data->comm, NULL );
+	context = LiveComponentRegister_At( cf->LCRegister, "context" );
 	dictionary = context->dictionary;
 	stream = Journal_Register( Info_Type, "LinearParticleStream" );
 
