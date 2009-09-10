@@ -45,11 +45,11 @@
 	void stgMain( Dictionary* dictionary, MPI_Comm CommWorld );
 
 	/** The StGermain main initialisation */
-	Stg_ComponentFactory* stgMainInit( Dictionary* dictionary, MPI_Comm communicator );
+	Stg_ComponentFactory* stgMainInit( Dictionary* dictionary, MPI_Comm communicator, void* _context );
 
 	/** Initialise the context, from a particular XML file. This saves the user manipulating
 	  * an IO_Handler and dictionary to get the data into the context. Useful for test code. */
-	Stg_ComponentFactory* stgMainInitFromXML( char* xmlInputFilename, MPI_Comm communicator );
+	Stg_ComponentFactory* stgMainInitFromXML( char* xmlInputFilename, MPI_Comm communicator, void* _context );
 
 	/** The StGermain main loop */
 	void stgMainLoop( Stg_ComponentFactory* cf );

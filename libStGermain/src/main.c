@@ -51,7 +51,7 @@
 void stgMain( Dictionary* dictionary, MPI_Comm communicator ) {
 	Stg_ComponentFactory*	cf;
 
-	cf = stgMainInit( dictionary, communicator );
+	cf = stgMainInit( dictionary, communicator, NULL );
 	stgMainLoop( cf );
 	stgMainDestroy( cf );
 
@@ -59,7 +59,7 @@ void stgMain( Dictionary* dictionary, MPI_Comm communicator ) {
 }
 
 /* TODO: need to find a way to add different communicators for different contexts */
-Stg_ComponentFactory* stgMainInit( Dictionary* dictionary, MPI_Comm communicator ) {
+Stg_ComponentFactory* stgMainInit( Dictionary* dictionary, MPI_Comm communicator, void* _context ) {
 	Stg_ComponentFactory* 		cf;
 	Dictionary*			componentDict;
 	Stg_Component*			component;
@@ -71,6 +71,14 @@ Stg_ComponentFactory* stgMainInit( Dictionary* dictionary, MPI_Comm communicator
 	
 	CheckDictionaryKeys( componentDict, "Component dictionary must have unique names\n" );
 	cf = Stg_ComponentFactory_New( dictionary, componentDict );
+
+	if( _context ) {
+		context = (AbstractContext*)_context;
+		context->CF = cf;
+		context->dictionary = dictionary;
+		context->communicator = communicator;
+		LiveComponentRegister_Add( cf->LCRegister, (void*)context );
+	}
 
 	/* Instantion phase -------------------------------------------------------------------------------------------------*/
 	Stg_ComponentFactory_CreateComponents( cf );
@@ -109,7 +117,7 @@ Stg_ComponentFactory* stgMainInit( Dictionary* dictionary, MPI_Comm communicator
 }
 
 
-Stg_ComponentFactory* stgMainInitFromXML( char* xmlInputFilename, MPI_Comm communicator ) {
+Stg_ComponentFactory* stgMainInitFromXML( char* xmlInputFilename, MPI_Comm communicator, void* _context ) {
    Dictionary*       		dictionary = NULL;
    Bool              		result;
    XML_IO_Handler*   		ioHandler;
@@ -121,7 +129,7 @@ Stg_ComponentFactory* stgMainInitFromXML( char* xmlInputFilename, MPI_Comm commu
    /* In case the user has put any journal configuration in the XML, read here */
    Journal_ReadFromDictionary( dictionary );
 
-   cf = stgMainInit( dictionary, communicator );
+   cf = stgMainInit( dictionary, communicator, _context );
    
    /* We don't need the XML IO handler again (however don't delete the dictionary as it's 
     * 'owned' by the context from hereon */

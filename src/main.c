@@ -249,7 +249,7 @@ int main( int argc, char* argv[] ) {
 		ModulesManager_Load( stgToolboxesManager, dictionary, "" );
 
 		/* Magic happens here! */
-		cf = stgMainInit( dictionary, CommWorld );
+		cf = stgMainInit( dictionary, CommWorld, NULL );
 		stgMainLoop( cf );
 
 		/* "--list" parameters */
