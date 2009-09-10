@@ -24,6 +24,7 @@ void ShapeSuite_Teardown( ShapeSuiteData* data ) {
 
 void ShapeSuite_GeneratePoints( ShapeSuiteData* data, Dimension_Index dim, char* inputFileName ) {
 /** Test Definition: */
+	Stg_ComponentFactory* cf;
 	DomainContext*   context = NULL;
 	Dictionary*      dictionary;
 	Stg_Shape*       shape;
@@ -35,7 +36,8 @@ void ShapeSuite_GeneratePoints( ShapeSuiteData* data, Dimension_Index dim, char*
 
 	/* read in the xml input file */
 	pcu_filename_input( inputFileName, xml_input );
-	context = (DomainContext*)stgMainInitFromXML( xml_input, MPI_COMM_WORLD );
+	cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD );
+	context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, NULL );
 	dictionary = context->dictionary;
 	outputPath = Dictionary_GetString( dictionary, "outputPath" );
 	Stream_RedirectFile_WithPrependedPath( stream, outputPath, "test.dat" );
