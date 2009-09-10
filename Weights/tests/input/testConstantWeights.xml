@@ -10,6 +10,10 @@
 	<include>testElementIntegral.xml</include>
 	
 	<struct name="components" mergeType="merge">
+		<struct name="context">
+			<param name="Type">DomainContext</param>
+		</struct>
+
 		<struct name="weights">
 			<param name="Type">ConstantWeights</param>
 		</struct>		

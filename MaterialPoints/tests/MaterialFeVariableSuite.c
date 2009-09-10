@@ -42,20 +42,21 @@
 
 typedef struct {
    PICelleratorContext* context;
+   Stg_ComponentFactory* cf;
 } MaterialFeVariableSuiteData;
 
 void MaterialFeVariableSuite_Setup( MaterialFeVariableSuiteData* data ) {
-   char              xmlInputFilename[PCU_PATH_MAX];
+   char              	 	xmlInputFilename[PCU_PATH_MAX];
 
    pcu_filename_input( "testMaterialFeVariable.xml", xmlInputFilename );
-   data->context = (PICelleratorContext*)stgMainInitFromXML( xmlInputFilename, MPI_COMM_WORLD );
+   data->cf = (PICelleratorContext*)stgMainInitFromXML( xmlInputFilename, MPI_COMM_WORLD, NULL );
 
-   stgMainLoop( (AbstractContext*)data->context );
+   stgMainLoop( data->cf );
 } 
 
 
 void MaterialFeVariableSuite_Teardown( MaterialFeVariableSuiteData* data ) {
-   stgMainDestroy( (AbstractContext*)data->context );
+   stgMainDestroy( data->cf );
 }
 
 

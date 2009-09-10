@@ -57,6 +57,7 @@ void UpdateParticlePositionsToLeft( Swarm* swarm );
 
 typedef struct {
    PICelleratorContext*       context;
+   Stg_ComponentFactory*	cf;
 } PeriodicBoundariesManagerSuiteData;
 
 
@@ -64,12 +65,13 @@ void PeriodicBoundariesManagerSuite_Setup( PeriodicBoundariesManagerSuiteData* d
    char              xmlInputFilename[PCU_PATH_MAX];
 
    pcu_filename_input( "testPeriodicBoundariesManager.xml", xmlInputFilename );
-   data->context = (PICelleratorContext*)stgMainInitFromXML( xmlInputFilename, MPI_COMM_WORLD );
+   data->cf = stgMainInitFromXML( xmlInputFilename, MPI_COMM_WORLD, NULL );
+   data->context = LiveComponentRegister_Get( data->cf->LCRegister, "context" );
 } 
 
 
 void PeriodicBoundariesManagerSuite_Teardown( PeriodicBoundariesManagerSuiteData* data ) {
-   stgMainDestroy( (AbstractContext*)data->context );
+   stgMainDestroy( data->cf );
 }
 
 

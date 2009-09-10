@@ -44,6 +44,7 @@
 
 typedef struct {
    DomainContext*       context;
+   Stg_ComponentFactory* cf;
 } IterativeWeightsSuiteData;
 
 
@@ -51,12 +52,12 @@ void IterativeWeightsSuite_Setup( IterativeWeightsSuiteData* data ) {
    char              xmlInputFilename[PCU_PATH_MAX];
 
    pcu_filename_input( "testIterativeWeights.xml", xmlInputFilename );
-   data->context = (DomainContext*)stgMainInitFromXML( xmlInputFilename, MPI_COMM_WORLD );
+   data->cf = stgMainInitFromXML( xmlInputFilename, MPI_COMM_WORLD, NULL );
 } 
 
 
 void IterativeWeightsSuite_Teardown( IterativeWeightsSuiteData* data ) {
-   stgMainDestroy( (AbstractContext*)data->context );
+   stgMainDestroy( data->cf );
 }
 
 

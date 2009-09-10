@@ -8,6 +8,10 @@
 	</list>
 
    <struct name="components" mergeType="merge">
+      <struct name="context">
+          <param name="Type">DomainContext</param>
+      </struct>
+
       <struct name="cellLayout">
          <param name="Type">SingleCellLayout</param>
       </struct>

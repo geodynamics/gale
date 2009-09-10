@@ -47,6 +47,7 @@ struct _Particle {
 
 typedef struct {
    DomainContext*          context;
+   Stg_ComponentFactory*   cf;
    Swarm*                  swarm;
    EscapedRoutine*         escRoutine;
 } EscapedRoutineSuiteData;
@@ -56,7 +57,8 @@ void EscapedRoutineSuite_Setup( EscapedRoutineSuiteData* data ) {
    Particle_Index    lParticle_I=0;
 
    pcu_filename_input( "EscapedRoutineSuite.xml", xmlInputFilename );
-   data->context = (DomainContext*)stgMainInitFromXML( xmlInputFilename, MPI_COMM_WORLD );
+   data->cf = stgMainInitFromXML( xmlInputFilename, MPI_COMM_WORLD, NULL );
+   data->context = LiveComponentRegister_Get( data->cf->LCRegister, "context" );
    data->swarm = (Swarm*) LiveComponentRegister_Get( data->context->CF->LCRegister, "swarm" );
    data->escRoutine = (EscapedRoutine*) LiveComponentRegister_Get( data->context->CF->LCRegister, "escapedRoutine" );
 
@@ -68,7 +70,7 @@ void EscapedRoutineSuite_Setup( EscapedRoutineSuiteData* data ) {
 } 
 
 void EscapedRoutineSuite_Teardown( EscapedRoutineSuiteData* data ) {
-   stgMainDestroy( (AbstractContext*)data->context );
+   stgMainDestroy( data->cf );
 }
 
 

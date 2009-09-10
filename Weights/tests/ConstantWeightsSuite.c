@@ -42,7 +42,8 @@
 #include "ConstantWeightsSuite.h"
 
 typedef struct {
-   DomainContext*       context;
+   Stg_ComponentFactory* 	cf;
+   DomainContext*       	context;
 } ConstantWeightsSuiteData;
 
 void ConstantFunction( void* feVariable, Element_DomainIndex dElement_I, Coord xi, double* value ) {
@@ -209,12 +210,13 @@ void ConstantWeightsSuite_Setup( ConstantWeightsSuiteData* data ) {
    char              xmlInputFilename[PCU_PATH_MAX];
 
    pcu_filename_input( "testConstantWeights.xml", xmlInputFilename );
-   data->context = (DomainContext*)stgMainInitFromXML( xmlInputFilename, MPI_COMM_WORLD );
+   data->cf = stgMainInitFromXML( xmlInputFilename, MPI_COMM_WORLD, NULL );
+   data->context = LiveComponentRegister_Get( data->cf->LCRegister, "context" );
 } 
 
 
 void ConstantWeightsSuite_Teardown( ConstantWeightsSuiteData* data ) {
-   stgMainDestroy( (AbstractContext*)data->context );
+   stgMainDestroy( data->cf );
 }
 
 

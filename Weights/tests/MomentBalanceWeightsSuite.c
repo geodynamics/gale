@@ -44,6 +44,7 @@
 
 typedef struct {
    DomainContext*       context;
+   Stg_ComponentFactory* cf;
 } MomentBalanceWeightsSuiteData;
 
 
@@ -51,7 +52,8 @@ void MomentBalanceWeightsSuite_Setup( MomentBalanceWeightsSuiteData* data ) {
    char              xmlInputFilename[PCU_PATH_MAX];
 
    pcu_filename_input( "testMomentBalanceWeights.xml", xmlInputFilename );
-   data->context = (DomainContext*)stgMainInitFromXML( xmlInputFilename, MPI_COMM_WORLD );
+   data->cf = stgMainInitFromXML( xmlInputFilename, MPI_COMM_WORLD, NULL );
+   data->context = LiveComponentRegister_Get( data->cf->LCRegister, "context" );
 } 
 
 
