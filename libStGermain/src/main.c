@@ -121,8 +121,6 @@ Stg_ComponentFactory* stgMainInitFromXML( char* xmlInputFilename, MPI_Comm commu
    /* In case the user has put any journal configuration in the XML, read here */
    Journal_ReadFromDictionary( dictionary );
 
-   Stg_ComponentFactory_SetComponentDictionary( cf, Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, "components" ) ) );
-
    cf = stgMainInit( dictionary, communicator );
    
    /* We don't need the XML IO handler again (however don't delete the dictionary as it's 
@@ -156,6 +154,9 @@ void stgMainLoop( Stg_ComponentFactory* cf ) {
 void stgMainDestroy( Stg_ComponentFactory* cf ) {
 	/* Destruct phase ---------------------------------------------------------------------------------------------------*/
 	Stg_ComponentFactory_DestroyComponents( cf, NULL );
+	cf->LCRegister->componentList->count = 0;
+	Stg_Class_Delete( cf->LCRegister->componentList );
+	_Stg_Class_Delete( cf );
 }
 
 void stgImportToolbox( Dictionary* dictionary, char* toolboxName ) {
