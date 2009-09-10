@@ -14,6 +14,7 @@
 
 typedef struct {
 	UnderworldContext* context;
+	Stg_ComponentFactory* cf;
 	StiffnessMatrix* stiffnessMatrix;
 } ArrheniusSuiteData;
 
@@ -25,7 +26,8 @@ void ArrheniusSuite_Setup( ArrheniusSuiteData* data ) {
 
 	/* read in the xml input file */
 	pcu_filename_input( "testArrhenius2D.xml", xml_input );
-	data->context = (UnderworldContext*)stgMainInitFromXML( xml_input, MPI_COMM_WORLD );
+	data->cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, NULL );
+	data->context = LiveComponentRegister_Get( data->cf, "context" );
 	dictionary = data->context->dictionary;
 
 	/* Assemble */

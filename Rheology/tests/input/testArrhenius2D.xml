@@ -10,6 +10,10 @@
 	<param name="StiffnessMatrixCompareFilename">./testArrhenius2D.matrix</param>
 
 	<struct name="components" mergeType="merge">
+		<struct name="context">
+			<param name="Type">UnderworldContext</param>
+		</struct>
+
 		<struct name="rheology">
 			<param name="Type">Arrhenius</param>
 			<param name="TemperatureField">TemperatureField</param>
