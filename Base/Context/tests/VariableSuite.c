@@ -38,6 +38,8 @@
 #include "StGermain/Base/IO/IO.h"
 #include "StGermain/Base/Container/Container.h"
 #include "StGermain/Base/Automation/Automation.h"
+#include "StGermain/Base/Extensibility/Extensibility.h"
+#include "StGermain/Base/Context/Context.h"
 #include "VariableSuite.h"
 
 typedef double VectorD[3];

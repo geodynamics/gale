@@ -38,6 +38,8 @@
 #include "StGermain/Base/IO/IO.h"
 #include "StGermain/Base/Container/Container.h"
 #include "StGermain/Base/Automation/Automation.h"
+#include "StGermain/Base/Extensibility/Extensibility.h"
+#include "StGermain/Base/Context/Context.h"
 #include "SetVC_Suite.h"
 
 /* Note that these params below must match up with setVC.xml input file for the test to work */
