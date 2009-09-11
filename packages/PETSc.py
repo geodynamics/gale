@@ -27,6 +27,7 @@ class PETSc(Package):
 
         # Try to find PETSc information.
         extra_libs = []
+        petscconf = None
         if loc[0]:
             bmake_dir = os.path.join(loc[0], 'bmake')
             # If we don't alrady have an arch, try read it.
@@ -36,14 +37,7 @@ class PETSc(Package):
                     inf = open(petscconf)
                     self.arch = inf.readline().split('=')[1].strip()
                 except:
-                    pass
-
-            if self.arch is None:
-                # If we still can't find any information, try the
-                # version 3 info.
-                petscconf = os.path.join(loc[0], 'conf', 'petscvariables')
-                inf = open(petscconf)
-                
+                    petscconf = None
 
             if self.arch is not None:
                 petscconf = os.path.join(bmake_dir, self.arch, 'petscconf')
@@ -57,7 +51,7 @@ class PETSc(Package):
                     petscconf = None
 
             # Try PETSc 3 information.
-            else:
+            if not petscconf:
                 petscconf = os.path.join(loc[0], 'conf', 'petscvariables')
                 if not os.path.exists(petscconf):
                     petscconf = None
