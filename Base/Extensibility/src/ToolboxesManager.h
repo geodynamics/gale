@@ -114,5 +114,4 @@
 	   function. */
 	Bool ToolboxesManager_IsInitialised( void* toolboxesManager, char* label );
 
-
 #endif /* __Base_Extensibility_ToolboxesManager_h__ */

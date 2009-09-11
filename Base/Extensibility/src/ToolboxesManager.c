@@ -122,8 +122,13 @@ void _ToolboxesManager_Delete( void* toolboxesManager ) {
 	self->_initialisedCount = 0;
 	self->initialised = 0;
 	
+	Stg_ObjectList_DeleteAllObjects( self->codelets );
+	Stg_Class_Delete( self->codelets );
+	ModulesManager_Unload( self ); 
+	Stg_Class_Delete( self->modules );
+	
 	/* Delete parent */
-	_ModulesManager_Delete( self );
+	_Stg_Class_Delete( self );
 }
 
 void _ToolboxesManager_Print( void* toolboxesManager, Stream* stream ) {
@@ -210,3 +215,4 @@ Bool ToolboxesManager_IsInitialised( void* initRegister, char* label ) {
 	}
 	return False;
 }
+

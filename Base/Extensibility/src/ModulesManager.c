@@ -38,6 +38,7 @@
 #include "shortcuts.h"
 #include "Module.h"
 #include "ModulesManager.h"
+#include "ToolboxesManager.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -419,7 +420,9 @@ Index ModulesManager_Submit(
 	
 		codeletInstance = defaultNew( codeletName );
 		result = Stg_ObjectList_Append( self->codelets, codeletInstance );
-		if( LiveComponentRegister_GetLiveComponentRegister() ) {
+
+		/* only submit if not a toolbox */
+		if( LiveComponentRegister_GetLiveComponentRegister() && strcmp( self->type, ToolboxesManager_Type ) ) {
 			LiveComponentRegister_Add( LiveComponentRegister_GetLiveComponentRegister(), codeletInstance );
 		}
 		
