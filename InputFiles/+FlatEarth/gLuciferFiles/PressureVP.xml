@@ -11,7 +11,7 @@
 		<param name="Swarm">materialSwarm</param>
 		<param name="FeVariable">PressureField</param>
 	</struct>
-		
+	
 	 <struct name="pressureParticleDots">
 	 	<param name="Type">lucSwarmViewer</param>
 	 	<param name="Swarm">materialSwarm</param>
@@ -26,7 +26,7 @@
 	 	<param name="ColourMap">pressureColourMap</param>
 	 	<param name="pointSize">2.0</param>
 	 </struct>
-			
+		
 			
 		<struct name="pressureTitle" mergeType="replace">
 			<param name="Type">lucTitle</param>
@@ -37,13 +37,15 @@
 			<param name="colours">Black Purple DarkRed Orange Yellow</param>
 			<param name="dynamicRange">true</param>
 		</struct>
+		
 		<!-- Drawing Objects -->
 		<struct name="pressureMap">
 			<param name="Type">lucScalarField</param>
 			<param name="FieldVariable">PressureField</param>
 			<param name="ColourMap">pressureColourMap</param>
-			<param name="cullFace"> False </param>
+			<param name="resolution">128</param>
 		</struct>
+		
 		<struct name="border" mergeType="replace">
 			<param name="Type">lucFieldVariableBorder</param>
 			<param name="FieldVariable">PressureField</param>
@@ -53,13 +55,13 @@
 			<param name="ColourMap">pressureColourMap</param>
 		</struct>
 		<!-- Put these althogether in a viewport -->
-		<struct name="PressureVP">
+		<struct name="FlatEarthPressureVP">
 			<param name="Type">lucViewport</param>
 			<param name="Camera">flatEarthPerspectiveViewCamera1</param>
+			<param name="compositeEachObject">t</param>
 			<list name="DrawingObject">
-				<param>pressureTitle</param>
-				<param>pressureMap</param>
-				<!--><param>pressureParticleDots</param>-->
+				<!--><param>pressureMap</param> -->
+				<param>pressureParticleDots</param>
 				<param>border</param>
 				<param>pressureColourBar</param>
 			</list>

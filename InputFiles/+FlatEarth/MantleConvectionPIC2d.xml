@@ -87,9 +87,25 @@
 			<param name="activationEnergy">27.63102112</param>
 		</struct>
 		
+		<struct name="temperatureDependence2">
+			<param name="Type">Arrhenius</param>
+			<param name="TemperatureField">TemperatureField</param>
+			<param name="eta0">1.0e-3</param>
+			<param name="activationEnergy">27.63102112</param>
+		</struct>
+		
 		<struct name="shape">
 			<param name="Type">Everywhere</param>
 		</struct>		
+		
+		
+		<struct name="box-shape">
+			<param name="Type">Box</param>
+			<param name="startX"> -0.5 </param> <param name="endX"> 0.5 </param>
+			<param name="startZ"> -0.5 </param> <param name="endZ"> 0.5 </param>
+			<param name="startY"> 0.90 </param> <param name="endY"> maxY </param>
+		</struct>
+		
 		
 		<struct name="material">
 			<param name="Type">RheologyMaterial</param>
@@ -98,6 +114,17 @@
 			<param name="alpha">   1.0 </param>
 			<list name="Rheology">
 				<param> temperatureDependence </param>
+				<!--><param> yielding </param> -->       <!-- Not needed for the isoviscous run -->
+			</list>
+		</struct>	
+	
+		<struct name="light-material">
+			<param name="Type">RheologyMaterial</param>
+			<param name="Shape">box-shape</param>
+			<param name="density"> 0.0 </param>
+			<param name="alpha">   1.0 </param>
+			<list name="Rheology">
+				<param> temperatureDependence2 </param>
 				<!--><param> yielding </param> -->       <!-- Not needed for the isoviscous run -->
 			</list>
 		</struct>	
@@ -139,7 +166,7 @@
 	
 
 	<!-- Simulation control -->
-	<param name="maxTimeSteps"> 2 </param>
+	<param name="maxTimeSteps"> 5 </param>
 	<param name="outputPath"> ./output </param>
 	<param name="dumpEvery"> 1 </param>	
 	<param name="checkpointEvery"> 0 </param>
@@ -195,22 +222,28 @@
 
 	<!-- Integration Scheme configuration -->
 
+
+
+
 	<!-- Viewport stuff -->
-	<include> ./gLuciferFiles/Cameras3D-4x4x1.xml</include>
+	<include> ./gLuciferFiles/Cameras2D-1x1.xml</include>
+	<include> ./gLuciferFiles/FlatEarthBoxWindow.xml</include>
+	<include> ./gLuciferFiles/ParticleHasYieldedVP.xml</include>
+	<include> ./gLuciferFiles/ParticleMaterialVP.xml</include>
 	<include> ./gLuciferFiles/TemperatureAndVelocityArrowsVP.xml </include>
+	
+	<!--
 	<include> ./gLuciferFiles/TemperatureIsosurfaceVP.xml </include>
 	<include> ./gLuciferFiles/StrainRateInvariantVP.xml </include> 
-	<!--><include>Underworld/Viewports/ParticleDensityVP.xml</include> -->
-	<include> ./gLuciferFiles/REPStressVP.xml</include>
-	<include> ./gLuciferFiles/ParticleHasYieldedVP.xml</include>
-	<include> ./gLuciferFiles/FlatEarthBoxWindow.xml</include>
+	<include>Underworld/Viewports/ParticleDensityVP.xml</include> -->
+	<include> ./gLuciferFiles/REPStressVP.xml</include> -->
 	
 	<!-- Add this  -->
 	<struct name="components" mergeType="merge">
 		<struct name="FlatEarthBoxView1" mergeType="merge">
 			<list name="Viewport" mergeType="replace">
 				<param>FlatEarthTemperatureAndVelocityArrowsVP FlatEarthVerticalTemperatureGradientVP</param>
-				<param>FlatEarthParticleHasYieldedVP recoveredPressureVP </param>
+				<param>FlatEarthParticleHasYieldedVP ParticleMaterialVP </param>
 			</list>
 		</struct>
 	</struct>
