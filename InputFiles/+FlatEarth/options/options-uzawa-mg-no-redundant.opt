@@ -14,12 +14,17 @@
 -ksp_converged_reason
 -ksp_rtol 1.0e-4
 
-
 # Define MG preconditioner.
-
--A11_ksp_rtol 1.0e-4
 
 -pc_mg_smoothup 2
 -pc_mg smoothdown 2
 -A11_pc_mg_smoothup 2
 -A11_pc_mg_smoothdown 2 
+-A11_ksp_rtol 1.0e-4
+
+# This may help on very highly decomposed problems
+-mg_coarse_ksp_type cg
+-mg_coarse_ksp_max_it 100
+-mg_coarse_ksp_rtol 1.0e-5
+-mg_coarse_pc_type bjacobi
+-mg_coarse_sub_pc_type cholesky

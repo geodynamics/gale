@@ -66,10 +66,10 @@
 			<param name="Type">lucViewport</param>
 			<param name="Camera">flatEarthPerspectiveViewCamera1</param>
 			<list name="DrawingObject">
+				<param>border</param>
 				<param>strainRateInvMap</param>
 				<!--><param>strainRateMaterialDots</param> -->
 				<param>strainRateInvTitle</param> 
-				<param>border</param>
 				<param>strainRateInvColourBar</param> 
 			</list>
 		</struct>

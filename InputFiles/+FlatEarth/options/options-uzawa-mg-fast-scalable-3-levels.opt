@@ -1,0 +1,54 @@
+#
+# NOTE: The number of multigrid levels needs to be added as an
+# option to the input XML file as follows:
+#
+#   <include>Experimental/MultigridForRegular.xml</include>
+#   <param name="mgLevels">2</param>
+#
+
+# -help
+
+# Refers to the outer iteration 
+
+-ksp_type fgmres
+-ksp_converged_reason
+-ksp_rtol 1.0e-4
+
+# Define MG preconditioner.
+
+-A11_pc_mg_smoothup 2
+-A11_pc_mg_smoothdown 2
+-A11_ksp_rtol 1.0e-4
+-A11_ksp_converged_reason
+
+-pc_mg_smoothup 2
+-pc_mg smoothdown 2
+
+# This combination of smoothing at high v. low levels gives
+# reasonable MG scaling for many problems (fixed iterations for different resolutions, O(N) time)
+#
+
+#
+# Let high level(s) be handled by standard smoothing, other levels by something more aggressive
+# You may need to see if your problem scales best with one, two, three high levels of SOR and the rest cg
+# It's not clear to me at the moment (LM) !!
+# 
+
+-mg_levels_7_ksp_type richardson
+-mg_levels_6_ksp_type richardson
+-mg_levels_5_ksp_type richardson
+-mg_levels_4_ksp_type richardson
+-mg_levels_3_ksp_type richardson
+
+# Let low levels be more aggressively solved (cg, *res, symmlq)
+
+-mg_levels_ksp_type cg
+-mg_levels_ksp_max_its 3
+-mg_levels_pc_type sor
+-mg_levels_pc_sub_type ilu
+
+-mg_coarse_ksp_type cg
+-mg_coarse_ksp_max_it 100
+-mg_coarse_ksp_rtol 1.0e-4
+-mg_coarse_pc_type bjacobi
+-mg_coarse_sub_pc_type cholesky
