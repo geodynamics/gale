@@ -18,7 +18,20 @@
 		<param>StgFEM_CPUTime</param>	
 	</list>
 
+	<struct name="pluginContexts" mergeType="merge">
+		<param name="StgFEM_FrequentOutput">context</param>
+		<param name="Underworld_Nusselt">context</param>
+		<param name="Underworld_Vrms">context</param>
+		<param name="StgFEM_CPUTime">context</param>
+	</struct>
+
 	<struct name="components" mergeType="merge">
+		<struct name="context">
+			<param name="Type">UnderworldContext</param>
+			<param name="GaussSwarm">gaussSwarm</param>
+			<param name="VelocityField">VelocityField</param>
+		</struct>
+
 		<!-- Shape Stuff -->
 		<struct name="backgroundShape">
 			<param name="Type">Everywhere</param>
@@ -83,7 +96,7 @@
 	</struct>
 
 	<!-- Simulation control -->
-	<param name="maxTimeSteps"> 200000 </param>
+	<param name="maxTimeSteps">     10 </param>
 	<param name="outputPath"> ./output </param>
 	<param name="dumpEvery"> 1 </param>	
 	<param name="checkpointEvery"> 0 </param>
@@ -131,6 +144,7 @@
 	<!-- Integration Scheme configuration -->
 
 	<!-- Visualisation stuff -->
+<!--
 	<include>Underworld/Viewports/StrainRateInvariantVP.xml</include>
 	<include>glucifer/window.xml</include>
 	<struct name="components" mergeType="merge">
@@ -138,5 +152,6 @@
 			<param name="Viewport">StrainRateInvariantVP</param>
 		</struct>
 	</struct>
+-->
  
 </StGermainData>
