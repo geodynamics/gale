@@ -60,9 +60,8 @@ class PETSc(Package):
                     petscconf = os.path.join(loc[0], self.arch, 'conf', 'petscvariables')
                     if os.path.exists(petscconf):
                         loc[1].append(os.path.join(loc[0], self.arch, 'include'))
-                        while len(loc[2]):
-                            loc[2].pop()
-                        loc[2].append(os.path.join(loc[0], self.arch, 'lib'))
+                        loc[1].append(os.path.join(loc[0], 'include'))
+                        loc[2][0] = os.path.join(loc[0], self.arch, 'lib')
                     else:
                         petscconf = None
 
