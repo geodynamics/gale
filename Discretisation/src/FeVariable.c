@@ -593,9 +593,9 @@ void _FeVariable_Construct( void* variable, Stg_ComponentFactory* cf, void* data
 }
 
 void _FeVariable_Initialise( void* variable, void* data ) {
-	FeVariable*              self = (FeVariable*)variable;
-	DomainContext*   context = self->context; 
-	char*                    inputPathString = NULL;
+	FeVariable* 	self = (FeVariable*)variable;
+	DomainContext*	context = self->context; 
+	char*				inputPathString = NULL;
    Dictionary_Entry_Value* feVarsList = NULL;
 	
 	Journal_DPrintf( self->debug, "In %s- for %s:\n", __func__, self->name );
