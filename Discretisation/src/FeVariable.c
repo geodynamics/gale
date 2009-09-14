@@ -594,7 +594,7 @@ void _FeVariable_Construct( void* variable, Stg_ComponentFactory* cf, void* data
 
 void _FeVariable_Initialise( void* variable, void* data ) {
 	FeVariable*              self = (FeVariable*)variable;
-	DomainContext*   context = (DomainContext*)data;
+	DomainContext*   context = context; 
 	char*                    inputPathString = NULL;
    Dictionary_Entry_Value* feVarsList = NULL;
 	
@@ -643,8 +643,8 @@ void _FeVariable_Initialise( void* variable, void* data ) {
 	
 		if ( self->ics && !(context && (True == context->loadFromCheckPoint) && (True == self->isCheckpointedAndReloaded)) ) {
 			Journal_DPrintf( self->debug, "regular (non-restart) mode -> applying ICs specified in XML/constructor\n" );
-			Stg_Component_Initialise( self->ics, data, False );
-			VariableCondition_Apply( self->ics, data );
+			Stg_Component_Initialise( self->ics, context, False );
+			VariableCondition_Apply( self->ics, context );
 		}
 		else {
 			char * filename = NULL;
@@ -720,9 +720,9 @@ void _FeVariable_Initialise( void* variable, void* data ) {
 	}
    
 	if ( self->bcs ) {
-		Stg_Component_Initialise( self->bcs, data, False );
+		Stg_Component_Initialise( self->bcs, context, False );
 		Journal_DPrintf( self->debug, "applying the B.C.s for this Variable.\n" ); 
-		VariableCondition_Apply( self->bcs, data );
+		VariableCondition_Apply( self->bcs, context );
 	}
 
 	Stream_UnIndentBranch( StgFEM_Debug );
