@@ -27,7 +27,7 @@ void ArrheniusSuite_Setup( ArrheniusSuiteData* data ) {
 	/* read in the xml input file */
 	pcu_filename_input( "testArrhenius2D.xml", xml_input );
 	data->cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, NULL );
-	data->context = LiveComponentRegister_Get( data->cf, "context" );
+	data->context = (UnderworldContext*)LiveComponentRegister_Get( data->cf->LCRegister, "context" );
 	dictionary = data->context->dictionary;
 
 	/* Assemble */
