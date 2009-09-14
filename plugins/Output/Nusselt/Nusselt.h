@@ -56,7 +56,7 @@
 	} Underworld_Nusselt;
 
 	Index Underworld_Nusselt_Register( PluginsManager* pluginsManager );
-	void Underworld_Nusselt_Setup( UnderworldContext* context ) ;
+	void Underworld_Nusselt_Setup( void* context ) ;
 	void Underworld_Nusselt_Output( UnderworldContext* context ) ;
 
 #endif

@@ -12,6 +12,11 @@
 		<param>Underworld_Ra_Scaling</param>	
 	</list>
 
+	<struct name="pluginContexts" mergeType="merge">
+		<param name="StgFEM_StandardConditionFunctions">context</param>
+		<param name="Underworld_Ra_Scaling">context</param>
+	</struct>
+
 	<!-- Component Stuff -->
 	<include>StgFEM/ConstantMesh.xml           </include>
 	<include>StgFEM/LinearMesh.xml             </include>

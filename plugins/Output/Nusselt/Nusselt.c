@@ -60,7 +60,7 @@ void _Underworld_Nusselt_Construct( void* component, Stg_ComponentFactory* cf, v
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
 
 	/* Add functions to entry points */
-	Underworld_Nusselt_Setup( context );
+	ContextEP_Append( context, AbstractContext_EP_Build,          Underworld_Nusselt_Setup );
 	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, Underworld_Nusselt_Output );
 }
 
@@ -92,7 +92,8 @@ Index Underworld_Nusselt_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( pluginsManager, Underworld_Nusselt_Type, "0", _Underworld_Nusselt_DefaultNew );
 }
 
-void Underworld_Nusselt_Setup( UnderworldContext* context ) {
+void Underworld_Nusselt_Setup( void* _context ) {
+	UnderworldContext*		     context		       = (UnderworldContext*)_context;
 	FieldVariable_Register*              fV_Register               = context->fieldVariable_Register;
 	FieldVariable*                       temperatureGradientsField;
 	FieldVariable*                       velocityField;
@@ -100,9 +101,7 @@ void Underworld_Nusselt_Setup( UnderworldContext* context ) {
 
 	Underworld_Nusselt* self;
 
-	self = (Underworld_Nusselt*)LiveComponentRegister_Get(
-					context->CF->LCRegister,
-					Underworld_Nusselt_Type );
+	self = (Underworld_Nusselt*)LiveComponentRegister_Get( context->CF->LCRegister, Underworld_Nusselt_Type );
 	
 	StgFEM_FrequentOutput_PrintString( context, "Nusselt" );
 
