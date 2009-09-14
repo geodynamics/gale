@@ -181,10 +181,7 @@ void _AdvDiffMulticorrector_Construct( void* solver, Stg_ComponentFactory* cf, v
 
 	_AdvDiffMulticorrector_Init( self, gamma, multiCorrectorIterations );
 
-	//self->matrixSolver = Stg_ComponentFactory_ConstructByKey( cf, self->name, "matrixSolver", MatrixSolver, 
-	//							  False, data );
 	if( self->matrixSolver == PETSC_NULL ) {
-		//self->matrixSolver = (MatrixSolver*)PETScMatrixSolver_New( "" );
 		KSPCreate( MPI_COMM_WORLD, &self->matrixSolver );
 	}
 }
@@ -206,9 +203,6 @@ void _AdvDiffMulticorrector_Execute( void* solver, void* data ) {
 }
 
 void _AdvDiffMulticorrector_Destroy( void* solver, void* data ) {
-        AdvectionDiffusionSLE* sle    = Stg_CheckType( data, AdvectionDiffusionSLE );
-
-        __AdvDiffResidualForceTerm_FreeLocalMemory( sle );
 	_SLE_Solver_Destroy( solver, data );
 }
 
@@ -220,8 +214,6 @@ void _AdvDiffMulticorrector_SolverSetup( void* solver, void* data ) {
 
 	if ( self->matrixSolver && Stg_Class_IsInstance( sle->massMatrix, StiffnessMatrix_Type ) ) {
 		StiffnessMatrix* massMatrix = Stg_CheckType( sle->massMatrix, StiffnessMatrix );
-		//MatrixSolver_SetMatrix( self->matrixSolver, massMatrix->matrix );
-		//KSPSetOperators( self->matrixSolver, ((PETScMatrix*)massMatrix->matrix)->petscMat, ((PETScMatrix*)massMatrix->matrix)->petscMat, DIFFERENT_NONZERO_PATTERN );
 		KSPSetOperators( self->matrixSolver, massMatrix->matrix, massMatrix->matrix, DIFFERENT_NONZERO_PATTERN );
 	}
 }

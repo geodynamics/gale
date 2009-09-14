@@ -594,7 +594,7 @@ void _FeVariable_Construct( void* variable, Stg_ComponentFactory* cf, void* data
 
 void _FeVariable_Initialise( void* variable, void* data ) {
 	FeVariable*              self = (FeVariable*)variable;
-	DomainContext*   context = context; 
+	DomainContext*   	 context = self->context; 
 	char*                    inputPathString = NULL;
    Dictionary_Entry_Value* feVarsList = NULL;
 	
