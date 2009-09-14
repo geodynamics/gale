@@ -10,6 +10,10 @@
 	<list name="plugins" mergeType="Replace">
 		<param>StgFEM_StandardConditionFunctions</param>	
 	</list>
+	
+	<struct name="pluginContexts" mergeType="merge">
+		<param name="StgFEM_StandardConditionFunctions">context</param>
+	</struct>
 
 	<!-- Component Stuff -->
 	<include>StgFEM/ConstantMesh.xml           </include>
