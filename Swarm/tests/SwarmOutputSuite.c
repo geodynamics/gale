@@ -48,9 +48,9 @@
 #define CURR_MODULE_NAME "SwarmOutputSuite"
 
 typedef struct {
-	MPI_Comm			comm;
-	unsigned int			rank;
-	unsigned int			nProcs;
+	MPI_Comm comm;
+	unsigned rank;
+	unsigned nProcs;
 } SwarmOutputSuiteData;
 
 double SwarmOutputSuite_Dt( void* context ) {
@@ -61,10 +61,10 @@ void _SwarmOutputSuite_SetDt( void* context, double dt ) {
 }
 
 void SwarmOutputSuite_MoveParticles( AbstractContext* context ) {
-	Swarm*		swarm = (Swarm*) LiveComponentRegister_Get( context->CF->LCRegister, "swarm" );
-	Particle_Index	lParticle_I;
+	Swarm*				swarm = (Swarm*) LiveComponentRegister_Get( context->CF->LCRegister, "swarm" );
+	Particle_Index		lParticle_I;
 	GlobalParticle*	particle;
-	double		x,y;
+	double				x,y;
 
 	for ( lParticle_I = 0 ; lParticle_I < swarm->particleLocalCount; lParticle_I++ ) {
 		particle = (GlobalParticle*)Swarm_ParticleAt( swarm, lParticle_I );
@@ -95,8 +95,8 @@ void SwarmOutputSuite_Teardown( SwarmOutputSuiteData* data ) {
 void SwarmOutputSuite_TestSwarmOutput( SwarmOutputSuiteData* data ) {
 	Dictionary*						dictionary;
 	Dictionary*						componentDict;
-	Stg_ComponentFactory*		cf;
 	XML_IO_Handler*				io_Handler;
+	Stg_ComponentFactory*		cf;
 	DomainContext*					context;
 	ExtensionManager_Register*	extensionMgr_Register;
 	SwarmVariable_Register*		swarmVariable_Register;
@@ -105,25 +105,12 @@ void SwarmOutputSuite_TestSwarmOutput( SwarmOutputSuiteData* data ) {
 	char								output_filename[PCU_PATH_MAX], expected_filename[PCU_PATH_MAX];
 	Index								steps, i;
 
-	/* Dictionary */
-	dictionary = Dictionary_New();
-	io_Handler = XML_IO_Handler_New();
-
-	/* read in the xml input file */
 	pcu_filename_input( "testSwarmOutput.xml", input_file );
-	IO_Handler_ReadAllFromFile(io_Handler, input_file, dictionary);
-   fflush(stdout);
+	cf = stgMainInitFromXML( input_file, data->comm, NULL );
+	context = (DomainContext*) LiveComponentRegister_Get( cf->LCRegister, "context" );
+	dictionary = context->dictionary;
 
 	Journal_ReadFromDictionary( dictionary );
-
-	/* Construction phase -------------------------------------------------------------------------------------------*/
-   /* Create the Context */
-	context = DomainContext_New(
-		"context",
-		0,
-		0,
-		data->comm,
-		dictionary );
 
 	ContextEP_Append( context, AbstractContext_EP_Dt, SwarmOutputSuite_Dt );
 	ContextEP_Append( context, AbstractContext_EP_Step, SwarmOutputSuite_MoveParticles );
@@ -131,23 +118,12 @@ void SwarmOutputSuite_TestSwarmOutput( SwarmOutputSuiteData* data ) {
 	componentDict = Dictionary_GetDictionary( dictionary, "components" );
 	assert( componentDict );
 
-	cf = context->CF = Stg_ComponentFactory_New( dictionary, componentDict );
-	LiveComponentRegister_Add( cf->LCRegister, (Stg_Component*) context );
-
 	extensionMgr_Register = ExtensionManager_Register_New();
 	swarmVariable_Register = SwarmVariable_Register_New( NULL );
-
-	Stg_ComponentFactory_CreateComponents( cf );
-	Stg_ComponentFactory_ConstructComponents( cf, 0 /* dummy */ );
-
-	LiveComponentRegister_BuildAll( cf->LCRegister, context );
-	LiveComponentRegister_InitialiseAll( cf->LCRegister, context );
-
-	Stg_Component_Build( context, 0 /* dummy */, False );
-	Stg_Component_Initialise( context, 0 /* dummy */, False );
+	
 	AbstractContext_Dump( context );
-	Stg_Component_Execute( context, 0 /* dummy */, False );
-	Stg_Component_Destroy( context, 0 /* dummy */, False );
+	Stg_Component_Execute( context, 0, False );
+	Stg_Component_Destroy( context, 0, False );
 
 	steps = Dictionary_GetUnsignedInt( dictionary, "maxTimeSteps" );
 	for (i = 0; i < steps; i++){

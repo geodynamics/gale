@@ -44,7 +44,7 @@
 
 #include "TimeIntegrationSuite.h"
 
-#define  CURR_MODULE_NAME "TimeIntegrationSuite"
+#define  CURR_MODULE_NAME "TimeIntegrationSuite.c"
 
 typedef struct {
 	MPI_Comm	comm;
@@ -144,68 +144,49 @@ void TimeIntegrationSuite_Setup( TimeIntegrationSuiteData* data ) {
 void TimeIntegrationSuite_Teardown( TimeIntegrationSuiteData* data ) {
 }
 
-void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_name, char *_DerivName0, char *_DerivName1, int _order   ) {
-	int					procToWatch;
-	Stream*				stream;
-	XML_IO_Handler*	ioHandler;
-   Dictionary*			dictionary;
-   TimeIntegrator*	timeIntegrator;
-   TimeIntegratee*	timeIntegratee;
-   TimeIntegratee*	timeIntegrateeList[2];
-   DomainContext*		context;
-   Variable*			variable;
-   Variable*			variableList[2];
-   double*				array;
-   double*				array2;
-   Index					size0	= 11;
-   Index					size1	= 7;
-	Index					array_I;
-   Index					timestep	= 0;
-   Index					maxTimesteps	= 10;
-	Bool					simultaneous;
-   unsigned				order;
-   double				error	= 0.0;
-   Name					derivName;
-   double				tolerance	= 0.001;
-   Index					integratee_I;
-   Index					integrateeCount	= 2;
-	char					expected_file[PCU_PATH_MAX];
+void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_name, char *_DerivName0, char *_DerivName1, int _order ) {
+	Stg_ComponentFactory*	cf;
+	int							procToWatch;
+	Stream*						stream;
+	XML_IO_Handler*			ioHandler;
+   Dictionary*					dictionary;
+   TimeIntegrator*			timeIntegrator;
+   TimeIntegratee*			timeIntegratee;
+   TimeIntegratee*			timeIntegrateeList[2];
+   DomainContext*				context;
+   Variable*					variable;
+   Variable*					variableList[2];
+   double*						array;
+   double*						array2;
+   Index							size0	= 11;
+   Index							size1	= 7;
+	Index							array_I;
+   Index							timestep	= 0;
+   Index							maxTimesteps	= 10;
+	Bool							simultaneous;
+   unsigned						order;
+   double						error	= 0.0;
+   Name							derivName;
+   double						tolerance	= 0.001;
+   Index							integratee_I;
+   Index							integrateeCount	= 2;
+	char							expected_file[PCU_PATH_MAX];
+
+	procToWatch = data->nProcs >= 2 ? 1 : 0;
 
 	stream = Journal_Register( Info_Type, "EulerStream" );
 	Stream_RedirectFile( stream, _name );
 
-	if( data->nProcs >= 2 ) {
-		procToWatch = 1;
-	}
-	else {
-		procToWatch = 0;
-	}
-
 	if( data->rank == procToWatch ) {
-		/* Create Context */
 		dictionary = Dictionary_New();
 		Dictionary_Add(dictionary, "outputPath", Dictionary_Entry_Value_FromString("./output"));
 		Dictionary_Add(dictionary, "DerivName0", Dictionary_Entry_Value_FromString(_DerivName0));
 		Dictionary_Add(dictionary, "DerivName1", Dictionary_Entry_Value_FromString(_DerivName1));
-		context = _DomainContext_New(
-			sizeof(DomainContext),
-			DomainContext_Type,
-			_DomainContext_Delete,
-			_DomainContext_Print,
-			NULL,
-			NULL,
-			NULL,
-			NULL,
-			NULL,
-			NULL,
-			NULL,
-			"discretisationContext",
-			True,
-			NULL,
-			0,0,
-			data->comm, dictionary );
-		ContextEP_Append( context, AbstractContext_EP_Dt, TimeIntegrationSuite_GetDt );
 
+		context = DomainContext_DefaultNew( "context" );
+		cf = stgMainInit( dictionary, data->comm, context );
+      
+		ContextEP_Append( context, AbstractContext_EP_Dt, TimeIntegrationSuite_GetDt );
 		Journal_Printf( stream, "!!! info %d\n", Stream_IsEnable( Journal_Register( Info_Type, "TimeIntegrator" ) ) );
 
 		/* Create Stuff */
@@ -214,8 +195,11 @@ void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_nam
 		variableList[0]			= Variable_NewVector( "testVariable",  Variable_DataType_Double, 2, &size0, NULL, (void**)&array, NULL );
 		variableList[1]			= Variable_NewVector( "testVariable2", Variable_DataType_Double, 2, &size1, NULL, (void**)&array2, NULL );
 		timeIntegrator				= TimeIntegrator_New( "testTimeIntegrator", order, simultaneous, NULL, NULL );
+		timeIntegrator->context	= context;
 		timeIntegrateeList[0]	= TimeIntegratee_New( "testTimeIntegratee0", timeIntegrator, variableList[0], 0, NULL, True );
 		timeIntegrateeList[1]	= TimeIntegratee_New( "testTimeIntegratee1", timeIntegrator, variableList[1], 0, NULL, True );
+		timeIntegrateeList[0]->context = context;
+		timeIntegrateeList[1]->context = context;
 
 		derivName = Dictionary_GetString( dictionary, "DerivName0" );
 		timeIntegrateeList[0]->_calculateTimeDeriv = TimeIntegrationSuite_GetFunctionPtr( derivName );
@@ -314,6 +298,7 @@ void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_nam
 		pcu_check_fileEq( _name, expected_file );
 
 		/* Destroy stuff */
+		Stream_CloseAndFreeFile( stream );
 		Memory_Free( array );
 		Memory_Free( array2 );
 		Stg_Class_Delete( variable );
@@ -325,42 +310,27 @@ void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_nam
 }
 	
 void TimeIntegrationSuite_TestEuler( TimeIntegrationSuiteData* data ) {
-	int procToWatch;
+	unsigned procToWatch;
 
-	if( data->nProcs >= 2 ) {
-      procToWatch = 1;
-   }
-   else {
-      procToWatch = 0;
-   }
+	procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if( data->rank == procToWatch ) {	
 		TimeIntegrationSuite_TestDriver( data, "testIntegrationEuler", "Constant", "Constant2", 1 );
 	}
 }
 void TimeIntegrationSuite_TestRK2( TimeIntegrationSuiteData* data ) {
-	int procToWatch;
+	unsigned procToWatch;
 
-	if( data->nProcs >= 2 ) {
-      procToWatch = 1;
-   }
-   else {
-      procToWatch = 0;
-   }
+	procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if( data->rank == procToWatch ) {	
 		TimeIntegrationSuite_TestDriver( data, "testIntegrationRK2", "Linear", "Linear2", 2 );
 	}
 }
 void TimeIntegrationSuite_TestRK4( TimeIntegrationSuiteData* data ) {
-	int procToWatch;
+	unsigned procToWatch;
 
-	if( data->nProcs >= 2 ) {
-      procToWatch = 1;
-   }
-   else {
-      procToWatch = 0;
-   }
+	procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if( data->rank == procToWatch ) {	
 		TimeIntegrationSuite_TestDriver( data, "testIntegrationRK4", "Cubic", "Cubic2", 4 );

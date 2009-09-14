@@ -5,6 +5,9 @@
    </list>
 	<include>testParticleCoords.xml</include>
 	<struct name="components" mergeType="merge">
+		<struct name="context">
+			<param name="Type">DomainContext</param>
+		</struct>
 		<struct name="particleLayout">
 			<param name="Type">SpaceFillerParticleLayout</param>
 			<param name="totalInitialParticles">5</param>

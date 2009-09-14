@@ -237,7 +237,7 @@ void _SwarmOutput_Build( void* swarmOutput, void* data ) {
 
 void _SwarmOutput_Initialise( void* swarmOutput, void* data ) {
 	SwarmOutput*	 self                = (SwarmOutput*)     swarmOutput;
-	AbstractContext* context             = (AbstractContext*) data;
+	AbstractContext* context             = self->context;
 	Swarm*           swarm               = self->swarm;
 	Variable*        globalIndexVariable = self->globalIndexVariable;
 	Particle_Index   lParticle_I;
