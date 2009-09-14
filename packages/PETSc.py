@@ -39,18 +39,25 @@ class PETSc(Package):
                 except:
                     petscconf = None
 
+            # If we were able to find a architecture.
             if self.arch is not None:
+                # Try PETSc 2.x
                 petscconf = os.path.join(bmake_dir, self.arch, 'petscconf')
-                # Does it exist?
                 if os.path.exists(petscconf):
-                    # Add the include directories.
                     loc[1].append(os.path.dirname(petscconf))
-                    # Add arch to the library directory.
                     loc[2][0] = os.path.join(loc[2][0], self.arch)
+                # Try PETSc 3 uninstalled.
                 else:
-                    petscconf = None
+                    petscconf = os.path.join(loc[0], self.arch, 'conf', 'petscvariables')
+                    if os.path.exists(petscconf):
+                        loc[1].append(os.path.join(loc[0], self.arch, 'include'))
+                        while len(loc[2]):
+                            loc[2].pop()
+                        loc[2].append(os.path.join(loc[0], self.arch, 'lib'))
+                    else:
+                        petscconf = None
 
-            # Try PETSc 3 information.
+            # Try PETSc 3 installed information.
             if not petscconf:
                 petscconf = os.path.join(loc[0], 'conf', 'petscvariables')
                 if not os.path.exists(petscconf):
