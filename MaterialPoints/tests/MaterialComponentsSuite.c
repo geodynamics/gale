@@ -28,6 +28,13 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+/*******************
+** Note: this test is currently designed to test the 3 components MaterialPointsSwarm, Material, and Materials_Register.
+**  The reason is that their design and implementation is very tightly coupled (especially during Build and Init phases).
+** 
+********************/
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -187,19 +194,26 @@ void MaterialComponentsSuite_Teardown( MaterialComponentsSuiteData* data ) {
 /*Tests*/
 void MaterialComponentsSuite_TestRegisterSetup( MaterialComponentsSuiteData* data ) {
 
+   pcu_docstring( "This test simply checks that the Material_Register associated to a test MP_Swarm is correctly set-up as part of the "
+      "Swarm's Build phase (performed already in test suite setup." );
+
    pcu_check_true( data->mRegister != NULL );
 
-   pcu_check_true( data->mRegister->objects->count == 2 );
-   pcu_check_true( (Material*)NamedObject_Register_GetByIndex( data->mRegister, 0 ) == data->mat1 );
-   pcu_check_true( (Material*)NamedObject_Register_GetByIndex( data->mRegister, 1 ) == data->mat2 );
+   pcu_check_true( Materials_Register_GetCount( data->mRegister ) == 2 );
+   pcu_check_true( Materials_Register_GetByIndex( data->mRegister, 0 ) == data->mat1 );
+   pcu_check_true( Materials_Register_GetByIndex( data->mRegister, 1 ) == data->mat2 );
+
+
 }
 
 
-// Material: Test the M_Layout function works correctly
 void MaterialComponentsSuite_TestMaterialLayout( MaterialComponentsSuiteData* data ) {
    Particle_Index    pI;
    MaterialPoint*    matPoint;
 
+   pcu_docstring( "Tests that 2 given materials can be successfully 'layed out' - that is, the particles of a swarm have their materialIndex"
+      "correctly updated to index the right material in the material register, thus setting up an ownership relationship." );
+   
    for ( pI = 0; pI < data->mpSwarm->particleLocalCount; pI++ ) {
       matPoint = (MaterialPoint*)Swarm_ParticleAt( data->mpSwarm, pI );
       pcu_check_true( matPoint->materialIndex == UNDEFINED_MATERIAL );
@@ -227,7 +241,8 @@ void MaterialComponentsSuite_TestLayoutGeometry( MaterialComponentsSuiteData* da
    Particle_Index    pI;
    MaterialPoint*    matPoint;
 
-   /* Similar to above test, should lay out all materials */
+   pcu_docstring( "Similar to TestMaterialLayout, checks that all materials in a register can be 'layed out' correctly - ie the individual"
+      "Particles in a MaterialPointSwarm updated to index the correct material in the register." );
    _Materials_Register_LayoutGeometry( data->mRegister, data->mpSwarm );
    
    for ( pI = 0; pI < data->mpSwarm->particleLocalCount; pI++ ) {
@@ -244,8 +259,45 @@ void MaterialComponentsSuite_TestLayoutGeometry( MaterialComponentsSuiteData* da
    }
 }
 
-// Test the basic access functions: eg the MPS_GetMaterialOn
-// M_Register: Test the multiple layout and extension functions work correctly. 
+void MaterialComponentsSuite_TestGetMaterial( MaterialComponentsSuiteData* data ) {
+   Particle_Index    pI;
+   MaterialPoint*    matPoint;
+   Material*         material = NULL;
+   Material*         materialOn = NULL;
+   Material_Index    matIndex;
+
+   pcu_docstring( "Tests that after a layout has been performed, the material that a particle belongs to can be successfully looked up."
+      "Thus requires TestLayoutGeometry to pass beforehand." );
+
+   _Materials_Register_LayoutGeometry( data->mRegister, data->mpSwarm );
+
+   for ( pI = 0; pI < data->mpSwarm->particleLocalCount; pI++ ) {
+      matPoint = (MaterialPoint*)Swarm_ParticleAt( data->mpSwarm, pI );
+      material = MaterialPointsSwarm_GetMaterialAt( data->mpSwarm, pI );
+      materialOn = MaterialPointsSwarm_GetMaterialOn( data->mpSwarm, matPoint );
+      matIndex = MaterialPointsSwarm_GetMaterialIndexAt( data->mpSwarm, pI );
+
+      if ( Stg_Shape_IsCoordInside( data->shape1, matPoint->coord ) ) {
+         pcu_check_true( material == data->mat1 );
+         pcu_check_true( materialOn == data->mat1 );
+         pcu_check_true( matIndex == 0 );
+      }
+      else if ( Stg_Shape_IsCoordInside( data->shape2, matPoint->coord ) ) {
+         pcu_check_true( material == data->mat2 );
+         pcu_check_true( materialOn == data->mat2 );
+         pcu_check_true( matIndex == 1 );
+      }
+      else {
+         pcu_check_true( NULL == material );
+         pcu_check_true( NULL == materialOn );
+         pcu_check_true( UNDEFINED_MATERIAL == matIndex );
+      }
+   }
+}
+
+
+// M_Register: Test the extension functions work correctly
+// M_Register: assign particle properties. 
 
 
 void MaterialComponentsSuite( pcu_suite_t* suite ) {
@@ -254,4 +306,5 @@ void MaterialComponentsSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, MaterialComponentsSuite_TestRegisterSetup );
    pcu_suite_addTest( suite, MaterialComponentsSuite_TestMaterialLayout );
    pcu_suite_addTest( suite, MaterialComponentsSuite_TestLayoutGeometry );
+   pcu_suite_addTest( suite, MaterialComponentsSuite_TestGetMaterial );
 }
