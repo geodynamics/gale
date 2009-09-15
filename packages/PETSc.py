@@ -1,4 +1,4 @@
-import os
+import os, sys
 from config import Package
 from MPI import MPI
 
@@ -120,7 +120,31 @@ class PETSc(Package):
             yield env
 
     def check(self, conf, env):
-        return conf.CheckLibWithHeader(None,
+        call = "PetscInitialize(NULL, NULL, NULL, NULL);\nPetscFinalize();"
+        
+        if not conf.CheckLibWithHeader(None,
                                        ['mpi.h', 'petsc.h', 'petscvec.h', 'petscmat.h',
                                         'petscksp.h', 'petscsnes.h'], 'c',
-                                       autoadd=0)
+                                       call=call,
+                                       autoadd=0):
+            return False
+
+        # Check if we can build PETSc into a shared library.
+        if env['shared_libs'] and \
+               not conf.CheckSharedLibWithHeader(None,
+                                                 ['mpi.h', 'petsc.h', 'petscvec.h', 'petscmat.h',
+                                                  'petscksp.h', 'petscsnes.h'], 'c',
+                                                 call=call,
+                                                 autoadd=0):
+            print '\n\nThe PETSc located in:'
+            print '  %s'%repr(self.location[0])
+            print 'is usable, but could not be linked into a shared library.'
+            print 'This is most likely due to PETSc not being compiled with'
+            print 'position independant code enabled. Either rebuild PETSc'
+            print 'with the configuration option \'--with-pic=1\' if you are'
+            print 'sure you need shared libraries, or reconfigure StGermain'
+            print 'with the \'--shared-libs=0\' option.\n'
+            sys.exit()
+            return False
+
+        return True

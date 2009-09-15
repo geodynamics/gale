@@ -137,7 +137,8 @@ class Package:
                 conf = env.Configure(
                     custom_tests={
                         'CheckLibs': checks.CheckLibs,
-                        'CheckLibsWithHeader': checks.CheckLibsWithHeader
+                        'CheckLibsWithHeader': checks.CheckLibsWithHeader,
+                        'CheckSharedLibWithHeader': checks.CheckSharedLibWithHeader
                         }
                     )
 
