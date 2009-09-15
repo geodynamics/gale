@@ -14,9 +14,23 @@
 		<param>StgFEM_FrequentOutput</param>	
 		<param>Underworld_Vrms</param>	
 		<param>StgFEM_CPUTime</param>
+		<param>lucPlugin</param>
 	</list>
 
+	<struct name="lucPluginContext">context</struct>
+	<struct name="pluginContexts" mergeType="merge">
+		<param name="StgFEM_FrequentOutput">context</param>
+		<param name="Underworld_Vrms">context</param>
+		<param name="StgFEM_CPUTime">context</param>
+		<param name="lucPlugin">lucPluginContext</param>
+	</struct>
+
 	<struct name="components" mergeType="merge">
+		<struct name="context">
+			<param name="Type">UnderworldContext</param>
+			<param name="GaussSwarm">gaussSwarm</param> 
+			<param name="VelocityField">VelocityField</param>
+		</struct>
 		<!-- Shape Stuff -->
 		<struct name="upperMantleShape">
 			<param name="Type">Everywhere</param>
@@ -147,7 +161,7 @@
 	<param name="journal-enable-branch.debug.lucDebug">f</param>
 
 	<!-- general simulation parameters -->
-	<param name="maxTimeSteps"> -1 </param>
+	<param name="maxTimeSteps"> -1  </param>
 	<param name="dumpEvery"> 1 </param>
 	<param name="outputPath"> ./output/ </param>
 	<param name="gravity"> 1.0 </param>
