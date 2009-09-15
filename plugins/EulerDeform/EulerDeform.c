@@ -75,10 +75,9 @@ void* _Underworld_EulerDeform_DefaultNew( Name name ) {
 
 
 void _Underworld_EulerDeform_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+	Codelet*		ed		= (Codelet*)component;
 	UnderworldContext*	uwCtx;
 	EulerDeform_Context*	edCtx;
-	Dictionary_Entry_Value*	edDict;
-	Dictionary_Entry_Value*	sysLst;
 
 	assert( component );
 	assert( cf );
@@ -86,31 +85,42 @@ void _Underworld_EulerDeform_Construct( void* component, Stg_ComponentFactory* c
 	Journal_DPrintf( Underworld_Debug, "In: %s( void* )\n", __func__ );
 
 	/* Retrieve context. */
-	uwCtx = (UnderworldContext*)Stg_ComponentFactory_ConstructByName( 
-		cf,
-		"context", 
-		UnderworldContext, 
-		True,
-		data );
+	uwCtx = (UnderworldContext*)Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data );
+	ed->context = uwCtx;
 
 	/* Create new context. */
-	EulerDeform_ContextHandle = ExtensionManager_Add( uwCtx->extensionMgr, 
-							  Underworld_EulerDeform_Type,
-							  sizeof(EulerDeform_Context) );
-	edCtx = ExtensionManager_Get( uwCtx->extensionMgr, 
-				      uwCtx, 
-				      EulerDeform_ContextHandle );
+	EulerDeform_ContextHandle = ExtensionManager_Add( uwCtx->extensionMgr, Underworld_EulerDeform_Type, sizeof(EulerDeform_Context) );
+	edCtx = ExtensionManager_Get( uwCtx->extensionMgr, uwCtx, EulerDeform_ContextHandle );
 	memset( edCtx, 0, sizeof(EulerDeform_Context) );
 	edCtx->ctx = (AbstractContext*)uwCtx;
+
+	/* Grab the ArtDisplacementField from the dictionary */
+	edCtx->artDField = Stg_ComponentFactory_ConstructByName( cf, "ArtDisplacementField", FeVariable, False, data );
+}
+
+
+void _Underworld_EulerDeform_Build( void* component, void* data ) {
+	Codelet*		ed	= (Codelet*)component;
+	UnderworldContext*	uwCtx	= (UnderworldContext*)ed->context;
+	//UnderworldContext*	uwCtx 	= (UnderworldContext*)data;
+	EulerDeform_Context*	edCtx;
+	Variable*		crdVar;
+	TimeIntegratee*		crdAdvector;
+	Stg_Component*		tiData[2];
+	unsigned		sys_i;
+	Dictionary_Entry_Value*	edDict;
+	Dictionary_Entry_Value*	sysLst;
+
+	assert( component );
+	assert( uwCtx );
+
+	edCtx = ExtensionManager_Get( uwCtx->extensionMgr, uwCtx, EulerDeform_ContextHandle );
 
 	/* Get the dictionary. */
 	edDict = Dictionary_Get( uwCtx->dictionary, "EulerDeform" );
 	if( !edDict ) {
 		return;
 	}
-
-	/* Grab the ArtDisplacementField from the dictionary */
-	edCtx->artDField = Stg_ComponentFactory_ConstructByName( cf, "ArtDisplacementField", FeVariable, False, data );
 
 	/* Read system list. */
 	sysLst = Dictionary_Entry_Value_GetMember( edDict, "systems" );
@@ -139,10 +149,10 @@ void _Underworld_EulerDeform_Construct( void* component, Stg_ComponentFactory* c
 			meshName = Dictionary_GetString( sysDict, "mesh" );
 			remesherName = Dictionary_GetString( sysDict, "remesher" );
 			if( strcmp( remesherName, "" ) )
-				sys->remesher = Stg_ComponentFactory_ConstructByName( cf, remesherName, Remesher, True, data );
+				sys->remesher = Stg_ComponentFactory_ConstructByName( uwCtx->CF, remesherName, Remesher, True, data );
 			name = Dictionary_GetString(sysDict, "displacementField");
 			if(strcmp(name, ""))
-			    sys->dispField = Stg_ComponentFactory_ConstructByName(cf, name, FeVariable, True, data);
+			    sys->dispField = Stg_ComponentFactory_ConstructByName( uwCtx->CF, name, FeVariable, True, data );
 			else
 			    sys->dispField = NULL;
 			velFieldName = Dictionary_GetString( sysDict, "velocityField" );
@@ -150,8 +160,8 @@ void _Underworld_EulerDeform_Construct( void* component, Stg_ComponentFactory* c
 			sys->wrapTop = Dictionary_GetBool_WithDefault( sysDict, "wrapTop", False );
 			sys->wrapBottom = Dictionary_GetBool_WithDefault( sysDict, "wrapBottom", False );
 			sys->wrapLeft = Dictionary_GetBool_WithDefault( sysDict, "wrapLeft", False );
-			sys->mesh = Stg_ComponentFactory_ConstructByName( cf, meshName, Mesh, True, data );
-			sys->velField = Stg_ComponentFactory_ConstructByName( cf, velFieldName, FieldVariable, True, data );
+			sys->mesh = Stg_ComponentFactory_ConstructByName( uwCtx->CF, meshName, Mesh, True, data );
+			sys->velField = Stg_ComponentFactory_ConstructByName( uwCtx->CF, velFieldName, FieldVariable, True, data );
 
 			sys->staticTop = Dictionary_GetBool_WithDefault( sysDict, "staticTop", False );
 			sys->staticBottom = Dictionary_GetBool_WithDefault( sysDict, "staticBottom", False );
@@ -178,48 +188,20 @@ void _Underworld_EulerDeform_Construct( void* component, Stg_ComponentFactory* c
 					char*		varName;
 
 					/* Get the dictionary for this field tuple. */
-					varDict = Dictionary_Entry_Value_AsDictionary( 
-						Dictionary_Entry_Value_GetElement( varLst, var_i ) );
+					varDict = Dictionary_Entry_Value_AsDictionary( Dictionary_Entry_Value_GetElement( varLst, var_i ) );
 					assert( varDict );
 
 					/* Get the field and its variable. */
 					varName = Dictionary_GetString( varDict, "field" );
-					sys->fields[var_i] = Stg_ComponentFactory_ConstructByName( 
-						cf, 
-						varName, 
-						FieldVariable, 
-						True, 
-						data ); 
+					sys->fields[var_i] = Stg_ComponentFactory_ConstructByName( uwCtx->CF, varName, FieldVariable, True, data ); 
 #if 0
 					varName = Dictionary_GetString( varDict, "variable" );
-					sys->vars[var_i] = Stg_ComponentFactory_ConstructByName( 
-						cf, 
-						varName, 
-						Variable, 
-						True, 
-						data ); 
+					sys->vars[var_i] = Stg_ComponentFactory_ConstructByName( uwCtx->CF, varName, Variable, True, data ); 
 #endif
 				}
 			}
 		}
 	}
-}
-
-
-void _Underworld_EulerDeform_Build( void* component, void* data ) {
-	UnderworldContext*	uwCtx = (UnderworldContext*)data;
-	EulerDeform_Context*	edCtx;
-	Variable*		crdVar;
-	TimeIntegratee*		crdAdvector;
-	Stg_Component*		tiData[2];
-	unsigned		sys_i;
-
-	assert( component );
-	assert( uwCtx );
-
-	edCtx = ExtensionManager_Get( uwCtx->extensionMgr, 
-				      uwCtx, 
-				      EulerDeform_ContextHandle );
 
 	for( sys_i = 0; sys_i < edCtx->nSystems; sys_i++ ) {
 		EulerDeform_System*	sys = edCtx->systems + sys_i;
@@ -265,7 +247,8 @@ void _Underworld_EulerDeform_Build( void* component, void* data ) {
 
 
 void _Underworld_EulerDeform_Destroy( void* component, void* data ) {
-	UnderworldContext*	uwCtx = (UnderworldContext*)data;
+	Codelet*		ed	= (Codelet*)component;
+	UnderworldContext*	uwCtx 	= (UnderworldContext*)ed->context;
 
 	assert( component );
 	assert( uwCtx );
