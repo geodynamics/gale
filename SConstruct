@@ -52,7 +52,7 @@ env.AppendUnique(RPATH=env.Dir(env['build_dir'] + '/lib').abspath)
 # If we have no shared libraries, include a pre-processor definition to
 # prevent modules from trying to load dynamically.
 if not env['shared_libs']:
-    env.AppendUnique(CPPDEFINES=['NOSHARED', 'SINGLE_EXE'])
+    env.AppendUnique(CPPDEFINES=['NOSHARED'])
 
 # Need to extract some kind of hg version number.
 subp = subprocess.Popen("hg identify",
@@ -88,6 +88,7 @@ Export('env')
 SConscript('StGermain/SConscript',
            variant_dir=env['build_dir'] + '/StGermain',
            duplicate=0)
+env.Prepend(LIBS=['pcu'])
 env.Prepend(LIBS=['StGermain'])
 
 SConscript('StgDomain/SConscript',
@@ -115,6 +116,15 @@ if env['with_glucifer']:
                variant_dir=env['build_dir'] + '/gLucifer',
                duplicate=0)
     env.Prepend(LIBS=['glucifer'])
+
+#
+# Build static version of StGermain.
+#
+
+if env['static_libs']:
+    env.Program('bin/StGermain',
+                ['StGermain/src/main.c',
+                 File(env['build_dir'] + '/StGermain/stg_static_modules.c').abspath])
 
 # Adding in documentation.
 env.Alias("doc", None, env.Action(File("StGermain/script/createDocs.py").abspath))
