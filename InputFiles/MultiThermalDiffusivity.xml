@@ -43,9 +43,25 @@ appropriate parameters and their values if you use this xml from production runs
 		<param>StgFEM_CPUTime</param>	
 		<param>Underworld_MaterialThermalDiffusivity</param>	
 		<param>Underworld_ShapeFemIC</param>	
+		<param>lucPlugin</param>
 	</list>
+	
+	<struct name="lucPluginContext">context</struct>	
+	<struct name="pluginContexts" mergeType="merge">
+		<param name="StgFEM_FrequentOutput">context</param>
+		<param name="Underworld_Nusselt">context</param>
+		<param name="Underworld_Vrms">context</param>
+		<param name="StgFEM_CPUTime">context</param>
+		<param name="Underworld_MaterialThermalDiffusivity">context</param>
+		<param name="Underworld_ShapeFemIC">context</param>
+		<param name="lucPlugin">lucPluginContext</param>
+	</struct>
 
 	<struct name="components" mergeType="merge">
+		<struct name="context">
+			<param name="Type">UnderworldContext</param>
+			<param name="GaussSwarm">gaussSwarm</param>
+		</struct>
 		<struct name="isotropicViscosity">
 			<param name="Type">MaterialViscosity</param>
 			<param name="eta0">1.0</param>
@@ -138,7 +154,7 @@ appropriate parameters and their values if you use this xml from production runs
 	</struct>
 
 	<!-- Simulation control -->
-	<param name="maxTimeSteps"> 300 </param>
+	<param name="maxTimeSteps"> 10 </param>
 	<param name="outputPath"> ./output/MultiThermalDiffusivity </param>
 	<param name="dumpEvery"> 1 </param>	
 	<param name="checkpointEvery"> 0 </param>

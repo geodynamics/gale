@@ -68,7 +68,7 @@ double Underworld_MaterialThermalDiffusivity_GetDiffusivityFromIntPoint( void* _
 	return Variable_GetValueDouble( residualForceTerm->diffusivityVariable, materialRef->particle_I );
 }
 
-void Underworld_MaterialThermalDiffusivity_Setup( UnderworldContext* context ) {
+void Underworld_MaterialThermalDiffusivity_Setup( void* _context ) {
 	/* 
 	 * Role:
 	 * 1) create a new variable on the material Swarm, called thermalDiffusivity.
@@ -81,7 +81,7 @@ void Underworld_MaterialThermalDiffusivity_Setup( UnderworldContext* context ) {
 	 *	AdvDiffResidualForceTerm setup and execution is compatible with it
 	 */
 
-
+	UnderworldContext*		context = (UnderworldContext*) _context;
 	AdvectionDiffusionSLE*    energySLE           = context->energySLE;
         /* TODO: This assumes OneToOne mapping of intPoints to matPoints, should be fixed in future */
 	OneToOneMapper*           mapper              = (OneToOneMapper*)context->picIntegrationPoints->mapper;
@@ -94,8 +94,6 @@ void Underworld_MaterialThermalDiffusivity_Setup( UnderworldContext* context ) {
 
 	assert( energySLE );
 	assert( materialSwarm );
-
-	 	
 
 	/* Add Material Extension */
 	particleExtHandle = ExtensionManager_Add( materialSwarm->particleExtensionMgr, 
