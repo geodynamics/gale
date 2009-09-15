@@ -17,7 +17,19 @@
 		<param>StgFEM_CPUTime</param>	
 	</list>
 
+	<struct name="pluginContexts" mergeType="merge">
+		<param name="StgFEM_FrequentOutput">context</param>
+		<param name="Underworld_Nusselt">context</param>
+		<param name="Underworld_Vrms">context</param>
+		<param name="StgFEM_CPUTime">context</param>
+	</struct>
+
 	<struct name="components" mergeType="merge">
+		<struct name="context">
+			<param name="Type">UnderworldContext</param>
+			<param name="GaussSwarm">gaussSwarm</param>
+			<param name="VelocityField">VelocityField</param>
+		</struct>
 		<struct name="temperatureDependence">
 			<param name="Type">FrankKamenetskii</param>
 			<param name="TemperatureField">TemperatureField</param>
