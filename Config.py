@@ -96,6 +96,7 @@ def generate(env, options=[]):
     env.AddMethod(SaveConfig)
     env.AddMethod(PrintSummary)
     env['packages'] = {}
+    env['save_vars'] = []
 
 def exists(env):
     return True
