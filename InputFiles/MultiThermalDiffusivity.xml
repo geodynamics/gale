@@ -61,6 +61,8 @@ appropriate parameters and their values if you use this xml from production runs
 		<struct name="context">
 			<param name="Type">UnderworldContext</param>
 			<param name="GaussSwarm">gaussSwarm</param>
+			<param name="IntegrationSwarm">picIntegrationPoints</param>
+			<param name="VelocityField">VelocityField</param>
 		</struct>
 		<struct name="isotropicViscosity">
 			<param name="Type">MaterialViscosity</param>

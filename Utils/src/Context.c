@@ -194,6 +194,7 @@ void _UnderworldContext_Build( void* context, void* data ) {
 	UnderworldContext* self = (UnderworldContext*)context;
 
 	self->gaussSwarm = Stg_ComponentFactory_ConstructByKey( self->CF, self->name, "GaussSwarm", Swarm, False, data );
+	self->picIntegrationPoints = Stg_ComponentFactory_ConstructByKey( self->CF, self->name, "IntegrationSwarm", IntegrationPointsSwarm, False, data );
 	self->velocityField = Stg_ComponentFactory_ConstructByKey( self->CF, self->name, "VelocityField", FeVariable, False, data );
 
 	_AbstractContext_Build( context, data );
@@ -269,7 +270,7 @@ void UnderworldContext_AssignPointers( void* context, void* ptrToContext ) {
 	
 	/* Swarms */
 	//self->gaussSwarm     = (Swarm*) LiveComponentRegister_Get( self->CF->LCRegister, "gaussSwarm" );
-	self->picIntegrationPoints = (IntegrationPointsSwarm*) LiveComponentRegister_Get( self->CF->LCRegister, "picIntegrationPoints" );
+	//self->picIntegrationPoints = (IntegrationPointsSwarm*) LiveComponentRegister_Get( self->CF->LCRegister, "picIntegrationPoints" );
 
 	/* Get copy of fields from register */
 	//self->velocityField             = (FeVariable*) FieldVariable_Register_GetByName( fV_Register, "VelocityField" );

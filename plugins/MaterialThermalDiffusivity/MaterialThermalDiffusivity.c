@@ -81,7 +81,7 @@ void Underworld_MaterialThermalDiffusivity_Setup( void* _context ) {
 	 *	AdvDiffResidualForceTerm setup and execution is compatible with it
 	 */
 
-	UnderworldContext*		context = (UnderworldContext*) _context;
+	UnderworldContext*	  context = (UnderworldContext*) _context;
 	AdvectionDiffusionSLE*    energySLE           = context->energySLE;
         /* TODO: This assumes OneToOne mapping of intPoints to matPoints, should be fixed in future */
 	OneToOneMapper*           mapper              = (OneToOneMapper*)context->picIntegrationPoints->mapper;
@@ -177,8 +177,8 @@ void _Underworld_MaterialThermalDiffusivity_Construct( void* component, Stg_Comp
 	context = (UnderworldContext*)Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
 
 	/* Add functions to entry points */
-	ContextEP_Append( context, AbstractContext_EP_ConstructExtensions, Underworld_MaterialThermalDiffusivity_Setup );
-	ContextEP_Append( context, AbstractContext_EP_Initialise,          Underworld_MaterialThermalDiffusivity_Assign );
+	ContextEP_Append( context, AbstractContext_EP_Build,      Underworld_MaterialThermalDiffusivity_Setup );
+	ContextEP_Append( context, AbstractContext_EP_Initialise, Underworld_MaterialThermalDiffusivity_Assign );
 
 }
 
