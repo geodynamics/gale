@@ -196,7 +196,7 @@ void* _CompareFeVariableAgainstReferenceSolution_DefaultNew( Name name ) {
 }
 
 
-Index _StgFEM_CompareFeVariableAgainstReferenceSolution_Register( PluginsManager* pluginsManager ) {
+Index StgFEM_CompareFeVariableAgainstReferenceSolution_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( 
 			pluginsManager, 
 			CompareFeVariableAgainstReferenceSolution_Type, 

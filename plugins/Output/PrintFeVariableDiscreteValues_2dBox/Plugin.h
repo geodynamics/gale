@@ -60,7 +60,7 @@
 
 	extern const char* PRINT_FE_VARIABLE_DISCRETE_VALUES_2D_BOX_TAG;
 	
-	Index _StgFEM_PrintFeVariableDiscreteValues_2dBox_Register( PluginsManager* pluginsManager );
+	Index StgFEM_PrintFeVariableDiscreteValues_2dBox_Register( PluginsManager* pluginsManager );
 	void PrintFeVariableDiscreteValues_2dBox( void* _context );
 
 #endif	

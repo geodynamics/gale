@@ -1,27 +1,42 @@
 import os
 Import('env')
 
+#
 # Need to make a copy because SCons uses the environment
 # at it's final state, so StGermain ends up depending on
 # StgDomain, etc.
+#
+
 env = env.Clone()
 
+#
 # Inside each project we will be accessing headers without the
 # project name as a prefix, so we need to let SCons know how to
 # find those headers.
+#
+
 env.Append(CPPPATH=env['build_dir'] + '/include/StgFEM')
 
+#
 # Need to include the StgFEM library for binaries/plugins.
+#
+
 libs = ['StgFEM'] + env.get('LIBS', [])
 
+#
 # Keep a list of all the objects we build so we can make a library
 # afterwards.
+#
+
 objs = []
 suites = []
 tst_exp = []
 tst_input = []
 
+#
 # Process each directory uniformly.
+#
+
 dirs = Split('Discretisation SLE/SystemSetup SLE/ProvidedSystems/AdvectionDiffusion ' \
                  'SLE/ProvidedSystems/AdvDiff_CharGalerkin SLE/ProvidedSystems/Energy ' \
                  'SLE/ProvidedSystems/StokesFlow SLE/ProvidedSystems SLE ' \
@@ -117,54 +132,113 @@ for d in dirs:
                           LIBS=libs)
 
     # If we are building static libs we need to construct a C file
-    # registering each plugin.
+    # mapping the plugin's name to its register function.
     if env['static_libs']:
-        pl_regs += [name[:-6] + '_Register(pluginsManager);']
+        pl_regs += [name]
 
     # Keep track of all the plugin objects.
     pl_objs += cur_objs
 
 #
-# Build libraries.
+# Build shared library.
 #
 
-# Shared library.
 if env['shared_libs']:
     env.SharedLibrary('lib/StgFEM', objs)
 
-# Static library.
-if env['static_libs']:
-    # Need to include all the plugins aswell.
-    l = env.StaticLibrary(env['build_dir'] + '/lib/StgFEM', objs + pl_objs)
-    env.Install(env['prefix'] + '/lib', l)
-
-"""
 #
-# Build static binary.
+# Write the static registry code and build the static library.
 #
 
 if env['static_libs']:
 
-    # Select an appropriate name.
-    if env['shared_libs']:
-        name = 'StgFEM_static'
-    else:
-        name = 'StgFEM'
+    reg_c = '#include <StGermain/StGermain.h>\n\n'
+    reg_c += 'extern int stg_num_modules;\n'
+    reg_c += 'extern char **stg_module_names;\n'
+    reg_c += 'extern int *stg_num_module_syms;\n'
+    reg_c += 'extern char ***stg_module_syms;\n\n'
+    reg_c += 'extern void ***stg_module_funcs;\n\n'
+    for n in pl_regs:
+        n = n[:-6]
+        reg_c += 'extern void (%s_MetaAsDictionary)();\n'%n
+        reg_c += 'extern void (%s_GetName)();\n'%n
+        reg_c += 'extern void (%s_Register)();\n'%n
+        if n.find('Toolbox') != -1:
+            reg_c += 'extern void (%s_Initialise)();\n'%n
+            reg_c += 'extern void (%s_Finalise)();\n'%n
+    reg_c += '\n'
 
-    # Build the registry code.
-    reg_code = '#include <StGermain/StGermain.h>\n\n'
-    reg_code += 'void register_plugins(PluginsManager *pluginsManager) {\n'
-    reg_code += '  ' + '\n  '.join(pl_regs)
-    reg_code += '\n}\n'
-    reg_filename = os.path.join(env['build_dir'], 'StgFEM', 'reg.c')
+    reg_c += 'void stgfem_register_static_modules() {\n'
+    reg_c += '   int new_num = stg_num_modules + %d;\n\n'%len(pl_regs)
+    
+    reg_c += '   stg_module_names = (char**)realloc(stg_module_names, new_num*sizeof(char*));\n'
+    for i in range(len(pl_regs)):
+        n = pl_regs[i][:-6]
+        reg_c += '   stg_module_names[stg_num_modules + %d] = (char*)"%s";\n'%(i, n)
+        
+    reg_c += '\n   stg_num_module_syms = (int*)realloc(stg_num_module_syms, new_num*sizeof(int));\n'
+    for i in range(len(pl_regs)):
+        n = pl_regs[i][:-6]
+        if n.find('Toolbox') != -1:
+            num_syms = 5
+        else:
+            num_syms = 1
+        reg_c += '   stg_num_module_syms[stg_num_modules + %d] = %d;\n'%(i, num_syms)
+
+    reg_c += '\n   stg_module_syms = (char***)realloc(stg_module_syms, new_num*sizeof(char**));\n'
+    for i in range(len(pl_regs)):
+        n = pl_regs[i][:-6]
+        if n.find('Toolbox') != -1:
+            num_syms = 5
+        else:
+            num_syms = 1
+        reg_c += '   stg_module_syms[stg_num_modules + %d] = (char**)malloc(%d*sizeof(char*));\n'%(i, num_syms)
+        reg_c += '   stg_module_syms[stg_num_modules + %d][0] = (char*)"%s_Register";\n'%(i, n)
+        if n.find('Toolbox') != -1:
+            reg_c += '   stg_module_syms[stg_num_modules + %d][1] = (char*)"%s_MetaAsDictionary";\n'%(i, n)
+            reg_c += '   stg_module_syms[stg_num_modules + %d][2] = (char*)"%s_GetName";\n'%(i, n)
+            reg_c += '   stg_module_syms[stg_num_modules + %d][3] = (char*)"%s_Initialise";\n'%(i, n)
+            reg_c += '   stg_module_syms[stg_num_modules + %d][4] = (char*)"%s_Finalise";\n'%(i, n)
+
+    reg_c += '\n   stg_module_funcs = (void***)realloc(stg_module_funcs, new_num*sizeof(void**));\n'
+    for i in range(len(pl_regs)):
+        n = pl_regs[i][:-6]
+        if n.find('Toolbox') != -1:
+            num_syms = 5
+        else:
+            num_syms = 1
+        reg_c += '   stg_module_funcs[stg_num_modules + %d] = (void**)malloc(%d*sizeof(void*));\n'%(i, num_syms)
+        reg_c += '   stg_module_funcs[stg_num_modules + %d][0] = (void*)%s_Register;\n'%(i, n)
+        if n.find('Toolbox') != -1:
+            reg_c += '   stg_module_funcs[stg_num_modules + %d][1] = (void*)%s_MetaAsDictionary;\n'%(i, n)
+            reg_c += '   stg_module_funcs[stg_num_modules + %d][2] = (void*)%s_GetName;\n'%(i, n)
+            reg_c += '   stg_module_funcs[stg_num_modules + %d][3] = (void*)%s_Initialise;\n'%(i, n)
+            reg_c += '   stg_module_funcs[stg_num_modules + %d][4] = (void*)%s_Finalise;\n'%(i, n)
+
+    reg_c += '\n   stg_num_modules += %d;\n'%len(pl_regs)
+    reg_c += '}\n'
+
+    reg_filename = os.path.join(env['build_dir'], 'StgFEM', 'stgfem_static_modules.c')
+    if not os.path.exists(os.path.dirname(reg_filename)):
+        os.makedirs(os.path.dirname(reg_filename))
     reg_file = open(reg_filename, 'w')
-    reg_file.write(reg_code)
+    reg_file.write(reg_c)
     reg_file.close()
     reg_obj = env.Object(reg_filename)
 
-    # Build the static library.
-    env.Program('bin/' + name, ['src/main_static.c', reg_obj])
-"""
+    # Add our register function to the StGermain module file.
+    f = open(File(env['build_dir'] + '/StGermain/stg_static_modules.c').abspath, 'r')
+    txt = f.readlines()
+    f.close()
+    txt.insert(-2, '   stgfem_register_static_modules();\n')
+    txt.insert(0, 'void stgfem_register_static_modules();\n')
+    f = open(File(env['build_dir'] + '/StGermain/stg_static_modules.c').abspath, 'w')
+    f.writelines(txt)
+    f.close()
+
+    # Static library.
+    l = env.StaticLibrary(env['build_dir'] + '/lib/StgFEM', objs + pl_objs + reg_obj)
+    env.Install(env['prefix'] + '/lib', l)
 
 #
 # Test runner program.
@@ -182,5 +256,8 @@ env.PCUTest('tests/testStgFEM', suites,
             PCU_INPUT=tst_input,
             PROJECT="StgFEM")
 
+#
 # Install XML input files.
+#
+
 env.Install('lib/StGermain/StgFEM', Glob('Apps/StgFEM_Components/*.xml'))

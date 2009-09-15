@@ -74,7 +74,7 @@ void* _StgFEM_PrintFeVariableDiscreteValues_2dBox_DefaultNew( Name name ) {
 			name );
 }
 
-Index _StgFEM_PrintFeVariableDiscreteValues_2dBox_Register( PluginsManager* pluginsManager ) {
+Index StgFEM_PrintFeVariableDiscreteValues_2dBox_Register( PluginsManager* pluginsManager ) {
 	Journal_DPrintf( StgFEM_Debug, "In: %s( void* )\n", __func__ );
 
 	return PluginsManager_Submit( pluginsManager, StgFEM_PrintFeVariableDiscreteValues_2dBox_Type, "0", _StgFEM_PrintFeVariableDiscreteValues_2dBox_DefaultNew );
