@@ -509,16 +509,17 @@ void FieldTest_BuildAnalyticField( void* fieldTest, Index field_I ) {
 		/* we're dealing with a tensor, so use invariant */
 		tmpName = Stg_Object_AppendSuffix( self->referenceFieldList[field_I], "Invariant" );
 		self->referenceMagFieldList[field_I] = OperatorFeVariable_NewUnary( tmpName, self->referenceFieldList[field_I], "SymmetricTensor_Invariant" );
+		self->referenceMagFieldList[field_I]->context = context;
 	} else {
 		/* we're dealing with a vector, so use magnitude */
 		tmpName = Stg_Object_AppendSuffix( self->referenceFieldList[field_I], "Magnitude" );
 		self->referenceMagFieldList[field_I] = OperatorFeVariable_NewUnary( tmpName, self->referenceFieldList[field_I], "Magnitude" );
+		self->referenceMagFieldList[field_I]->context = context;
 	}
 
 	Memory_Free( tmpName );
 	Stg_Component_Build( self->referenceMagFieldList[field_I], context, False );
-	self->referenceMagFieldList[field_I]->_operator = Operator_NewFromName( self->referenceMagFieldList[field_I]->operatorName, 
-							self->referenceFieldList[field_I]->fieldComponentCount, context->dim );
+	self->referenceMagFieldList[field_I]->_operator = Operator_NewFromName( self->referenceMagFieldList[field_I]->operatorName, self->referenceFieldList[field_I]->fieldComponentCount, context->dim );
 	self->referenceMagFieldList[field_I]->fieldComponentCount = self->referenceMagFieldList[field_I]->_operator->resultDofs;
 	_OperatorFeVariable_SetFunctions( self->referenceMagFieldList[field_I] );
 
@@ -601,10 +602,12 @@ void FieldTest_BuildErrField( void* fieldTest, Index field_I ) {
 		/* we're dealing with a tensor, so use invariant */
 		tmpName = Stg_Object_AppendSuffix( self->errorFieldList[field_I], "Invariant" );
 		self->errorMagFieldList[field_I] = OperatorFeVariable_NewUnary( tmpName, self->errorFieldList[field_I], "SymmetricTensor_Invariant" );
+		self->errorMagFieldList[field_I]->context = context;
 	} else {
 		/* we're dealing with a vector, so use magnitude */
 		tmpName = Stg_Object_AppendSuffix( self->errorFieldList[field_I], "Magnitude" );
 		self->errorMagFieldList[field_I] = OperatorFeVariable_NewUnary( tmpName, self->errorFieldList[field_I], "Magnitude" );
+		self->errorMagFieldList[field_I]->context = context;
 	}
 	Memory_Free( tmpName );
 	Stg_Component_Build( self->errorMagFieldList[field_I], context, False );
@@ -1123,11 +1126,8 @@ void FieldTest_ElementErrAnalyticFromField( void* fieldTest, Index field_I, Inde
 		analyticSolution( self, globalCoord, analytic );
 		FieldVariable_InterpolateValueAt( numericField, globalCoord, numeric );
 
-		detJac = ElementType_JacobianDeterminant( elType, elementMesh, el_I, xi, nDims );
-
 		for( dof_I = 0; dof_I < numDofs; dof_I++ ) {
-			elErrorSq[dof_I] += ( numeric[dof_I] - analytic[dof_I] ) * ( numeric[dof_I] - analytic[dof_I] ) 
-					    * weight * detJac;
+			elErrorSq[dof_I] += ( numeric[dof_I] - analytic[dof_I] ) * ( numeric[dof_I] - analytic[dof_I] ) * weight * detJac;
 			elNormSq[dof_I]  += analytic[dof_I] * analytic[dof_I] * weight * detJac;
 		}
 	}
