@@ -92,7 +92,7 @@ void _Underworld_solB_Construct( void* analyticSolution, Stg_ComponentFactory* c
 	
 	_Underworld_solB_Init( self, sigma, Z, wavenumberY, n );
 
-	isCorrectInput = _checkInputParams( self );
+	isCorrectInput = solB_checkInputParams( self );
 	Journal_Firewall( isCorrectInput , Journal_Register( Error_Type, "Analytic_solB" ),
 			"Error in function %s: Bad Input parameters, solution check valid values in .tex documentation\n",
 			__func__ );
@@ -112,7 +112,7 @@ void _Underworld_solB_Build( void* analyticSolution, void* data ) {
 	self->_analyticSolutionList[3] = Underworld_solB_StressFunction;
 }
 
-Bool _checkInputParams( Underworld_solB* self ) {
+Bool solB_checkInputParams( Underworld_solB* self ) {
 	return ( 
 			( self->sigma > 0.0 ) && ( self->Z > 0.0 ) &&
 			( self->km > 0.0 )    && ( self->n > 0 )  

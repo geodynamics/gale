@@ -82,7 +82,7 @@ void _Velic_solS_Init( Velic_solS* self, double _eta, int _n ) {
 	self->_eta = _eta;
 	self->_n = _n;
 	
-	isCorrectInput = _checkInputParams( self );
+	isCorrectInput = solS_checkInputParams( self );
 	Journal_Firewall( isCorrectInput , Journal_Register( Error_Type, "Velic_solS" ),
 			"Error in function %s: Bad Input parameters, solution check valid values in .tex documentation\n",
 			__func__ );
@@ -116,7 +116,7 @@ void _Velic_solS_Construct( void* analyticSolution, Stg_ComponentFactory* cf, vo
         _Velic_solS_Init( self, _eta, _n );
 }
 
-Bool _checkInputParams( Velic_solS* self ) {
+Bool solS_checkInputParams( Velic_solS* self ) {
 	return ( 
 			( self->_eta > 0.0 ) && ( self->_n > 0.0 )
 		);

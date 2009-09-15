@@ -67,5 +67,5 @@
 		double vel[], double* presssure, 
 		double total_stress[], double strain_rate[] );
 
-	Bool _checkInputParams( Velic_solS* self );
+	Bool solS_checkInputParams( Velic_solS* self );
 #endif

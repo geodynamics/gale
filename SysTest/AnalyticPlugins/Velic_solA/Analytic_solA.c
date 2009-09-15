@@ -92,7 +92,7 @@ void _Underworld_solA_Construct( void* analyticSolution, Stg_ComponentFactory* c
 	
 	_Underworld_solA_Init( self, sigma, Z, wavenumberY, n );
 
-	isCorrectInput = _checkInputParams( self );
+	isCorrectInput = solA_checkInputParams( self );
 	Journal_Firewall( isCorrectInput , Journal_Register( Error_Type, "solA" ),
 			"Error in function %s: Bad Input parameters, solution check valid values in .tex documentation\n",
 			__func__ );
@@ -113,7 +113,7 @@ void _Underworld_solA_Build( void* analyticSolution, void* data ) {
 
 }
 
-Bool _checkInputParams( Underworld_solA* self ) {
+Bool solA_checkInputParams( Underworld_solA* self ) {
 	return ( 
 			( self->sigma > 0.0 ) && ( self->Z > 0.0 ) &&
 			( self->km > 0.0 )    && ( self->n > 0 )  
