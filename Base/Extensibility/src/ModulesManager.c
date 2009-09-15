@@ -192,9 +192,7 @@ void ModulesManager_Load( void* modulesManager, void* _dictionary ) {
 	Index newEnvPathLength = 0;
 	Index dir_I;
 	
-#ifdef SINGLE_EXE
-	SingleRegister();
-#else
+#ifndef NOSHARED
 	if( dictionary ) {
 		Dictionary_Entry_Value* localLibDirList = Dictionary_Get( dictionary, "LD_LIBRARY_PATH" );
 		if( localLibDirList ) {
@@ -238,6 +236,7 @@ void ModulesManager_Load( void* modulesManager, void* _dictionary ) {
 			newEnvPath );
 		Memory_Free( newEnvPath );
 	}
+#endif
 
 	modulesVal = ModulesManager_GetModulesList( self, dictionary );
 	
@@ -253,6 +252,7 @@ void ModulesManager_Load( void* modulesManager, void* _dictionary ) {
 		moduleName = Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( modulesVal, entry_I ) );
 
 		if ( ! ModulesManager_LoadModule( self, moduleName ) ) {
+#ifndef NOSHARED
 			Journal_Firewall(
 				0,
 				Journal_Register( Info_Type, self->type ),
@@ -269,8 +269,21 @@ void ModulesManager_Load( void* modulesManager, void* _dictionary ) {
 				"For more help visit http://csd.vpac.org/twiki/bin/view/Stgermain/FrequentlyAskedQuestions#Plugins_Won_t_Load_in_Parallel\n",
 				moduleName, moduleName, moduleName, moduleName, self->type );
 		}
+#else
+			Journal_Firewall(
+				0,
+				Journal_Register( Info_Type, self->type ),
+				"Error. Unable to load module %s\n"
+				"As this is a static build, it is likely that the requested\n"
+				"module was not built into the binaries.\n"
+				"You can get more information about what went wrong by adding the following two lines to your input file:\n"
+				"	<param name=\"journal.debug\">true</param>\n"
+				"	<param name=\"journal.debug.%s\">true</param>\n"
+				"For more help visit http://csd.vpac.org/twiki/bin/view/Stgermain/FrequentlyAskedQuestions#Plugins_Won_t_Load_in_Parallel\n",
+				moduleName, moduleName, moduleName, moduleName, self->type );
+		}
+#endif
 	}
-#endif /* ifdef SINGLE_EXE */
 }
 
 Bool ModulesManager_LoadModule( void* modulesManager, Name moduleName ) {

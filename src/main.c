@@ -166,6 +166,11 @@ int main( int argc, char* argv[] ) {
 		Py_Initialize();
 	#endif	
 	MPI_Barrier( CommWorld ); /* Ensures copyright info always come first in output */
+
+
+#ifdef NOSHARED
+	register_static_modules();
+#endif
 	
 	
 	/* Create the application's dictionary & read input */
