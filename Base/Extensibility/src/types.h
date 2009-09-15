@@ -53,7 +53,6 @@
 	typedef struct ExtensionManager			ExtensionManager;
 	typedef struct ExtensionManager_Register	ExtensionManager_Register;
 	typedef struct EntryPoint_Register		EntryPoint_Register;
-	typedef struct Codelet				Codelet;
 	typedef struct Module				Module;
 	typedef struct Plugin				Plugin;
 	typedef struct Toolbox				Toolbox;

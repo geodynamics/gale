@@ -45,6 +45,7 @@
 	#include "units.h"
 	#include "types.h"
 	#include "shortcuts.h"
+	#include "Codelet.h"
 	#include "Variable.h"
 	#include "Variable_Register.h"
 	#include "VariableCondition.h"

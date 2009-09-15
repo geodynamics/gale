@@ -41,9 +41,11 @@
 #include "Base/IO/IO.h"
 #include "Base/Container/Container.h"
 #include "Base/Automation/Automation.h"
+#include "Base/Extensibility/Extensibility.h"
 
 #include "types.h"
 #include "shortcuts.h"
+#include "AbstractContext.h"
 #include "Codelet.h"
 
 #include <stdio.h>

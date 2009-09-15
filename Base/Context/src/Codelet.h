@@ -36,15 +36,17 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Extensibility_Codelet_h__
-#define __Base_Extensibility_Codelet_h__
+#ifndef __Base_Context_Codelet_h__
+#define __Base_Context_Codelet_h__
 	
 	/* Textual name of this class */
 	extern const Type Codelet_Type;
 
 	/* Codelets info */
 	#define __Codelet \
-		__Stg_Component 
+		__Stg_Component \
+		\
+		AbstractContext* context;
 		
 	struct Codelet { __Codelet };
 

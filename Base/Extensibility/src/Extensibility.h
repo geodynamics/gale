@@ -51,7 +51,6 @@
 	#include "ClassHook.h"
 	#include "EntryPoint.h"
 	#include "EntryPoint_Register.h"
-	#include "Codelet.h"
 	#include "Module.h"
 	#include "Plugin.h"
 	#include "ModulesManager.h"

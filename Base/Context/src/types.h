@@ -43,6 +43,7 @@
 #define __Base_Context_types_h__
 	
 	/* types/classes */
+	typedef struct Codelet				Codelet;
 	typedef struct _SetVC				SetVC;
 	typedef struct _CompositeVC			CompositeVC;
 	typedef struct DynamicVC			DynamicVC;
