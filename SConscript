@@ -14,6 +14,7 @@ env = env.Clone()
 #
 
 SConscript('pcu/SConscript', exports='env')
+env.Prepend(LIBS=['pcu'])
 
 #
 # Inside each project we will be accessing headers without the
@@ -143,7 +144,7 @@ if env['static_libs']:
 # FlattenXML, StGermain and test runner programs.
 #
 
-libs = ['StGermain'] + ['pcu'] + env.get('LIBS', [])
+libs = ['StGermain'] + env.get('LIBS', [])
 env.Program('bin/FlattenXML', 'Base/FlattenXML/src/main.c', LIBS=libs)
 if env['shared_libs']:
     env.Program('bin/StGermain', 'src/main.c', LIBS=libs)
