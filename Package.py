@@ -201,7 +201,7 @@ class Package:
         shared_prefixes = ['lib']
         static_suffixes = ['.a']
         shared_suffixes = []
-        if platform.system() == 'Linux':
+        if platform.system() in ['Linux', 'Darwin']:
             shared_suffixes += ['.so']
         if platform.system() == 'Darwin':
             shared_suffixes += ['.dylib']
@@ -295,7 +295,7 @@ class Package:
             else:
                 # Try a set of default locations for this system.
                 bases = []
-                if platform.system() == 'Linux' or platform.system().find('CYGWIN') != -1:
+                if platform.system() in ['Linux', 'Darwin'] or platform.system().find('CYGWIN') != -1:
                     bases += ['/usr', '/usr/local']
                 if platform.system() == 'Darwin':
                     bases += ['/sw']
