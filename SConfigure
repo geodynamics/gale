@@ -6,7 +6,7 @@ from config import packages, cc
 #
 
 options = [
-    ('--prefix', 'prefix', 'Installation prefix.', '/usr/local'),
+    ('--prefix', 'prefix', 'Installation prefix.', None),
     ('--build-dir', 'build_dir', 'Sandbox location.', 'build'),
     ('--build-type', 'build_type', 'Build type (debug or optimised)', 'debug'),
     ('--lib-type', 'lib_type', 'Library type (shared or static)', 'shared'),
@@ -37,6 +37,7 @@ env.Tool('config', toolpath=['config'], options=options)
 #
 
 env.UsePackage(packages.libXML2)
+env.UsePackage(packages.PETSc)
 env.UsePackage(packages.HDF5)
 env.UsePackage(packages.OSMesa)
 env.UsePackage(packages.OpenGL)
@@ -47,7 +48,6 @@ env.UsePackage(packages.Cocoa)
 env.UsePackage(packages.libPNG)
 env.UsePackage(packages.libJPEG)
 env.UsePackage(packages.libFAME)
-env.UsePackage(packages.PETSc)
 
 #
 # Perform configuration.
@@ -57,6 +57,9 @@ if not (GetOption('help') or GetOption('clean')):
 
     if env.get('CC', None) is not None:
         cc.apply_cc(env, env['CC'])
+
+    if env.get('prefix', None) is None:
+        env['prefix'] = env.GetLaunchDir()
 
     if env.get('eptiming', None):
         env.MergeFlags('-DENABLE_STGERMAIN_LOG')

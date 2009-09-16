@@ -30,12 +30,6 @@ env["INST_BUILD_DIR"] = env["build_dir"]
 env["INST_PREFIX"] = env["prefix"]
 env.Default(env["build_dir"])
 
-# Scan command line targets to see if the user has specified any directories
-# they want singled out to be built alone.<
-env['dir_target'] = ARGUMENTS.get('target', '')
-if len(env['dir_target']) and env['dir_target'][-1] == os.path.sep:
-    env['dir_target'] = env['dir_target'][:-1]
-
 # Add the build directory's include path.
 env.AppendUnique(CPPPATH=env['build_dir'] + '/include')
 
@@ -137,4 +131,4 @@ filename = env['build_dir'] + '/lib/pkgconfig/stgermain.pc'
 env.Dist("underworld-%s"%env.GetOption("dist_version"),
          ["configure.py", "SConstruct", "config", "script", "StGermain",
           "StgDomain", "StgFEM", "PICellerator", "Underworld",
-          "gLucifer"])
+          "Experimental", "gLucifer"])
