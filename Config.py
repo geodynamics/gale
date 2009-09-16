@@ -59,6 +59,9 @@ def PrintSummary(env):
 def generate(env, options=[]):
     import platform
 
+    # Setup basic flags.
+    env['save_vars'] = []
+
     # Print out an inital log file line with the options used.
     conf = env.Configure()
     if conf.logstream != None:
@@ -96,7 +99,6 @@ def generate(env, options=[]):
     env.AddMethod(SaveConfig)
     env.AddMethod(PrintSummary)
     env['packages'] = {}
-    env['save_vars'] = []
 
 def exists(env):
     return True
