@@ -84,4 +84,6 @@
 	void  _Codelet_Execute( void* codelet, void* data );
 	void  _Codelet_Destroy( void* codelet, void* data );
 
+	Dictionary* Codelet_GetPluginDictionary( void* codelet, Dictionary* rootDict );
+
 #endif

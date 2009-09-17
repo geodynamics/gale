@@ -80,6 +80,7 @@
 		ModulesManager_UnloadModuleFunction*	_unloadModule,
 		ModulesManager_ModuleFactoryFunction*   _moduleFactory,
 		ModulesManager_CheckContextFunction*	_checkContext,
+		ModulesManager_GetModuleNameFunction*	_getModuleName,
 		int*					argc,
 		char***					argv );
 
@@ -101,7 +102,9 @@
 	/** Exactly what to do to unload the toolbox */
 	Bool _ToolboxesManager_UnloadToolbox( void* toolboxesManager, Module* toolbox );
 
-	Bool _ToolboxesManager_CheckContext( void* toolboxesManager, void* dictionary, Name moduleName, Name contextName );
+	Bool _ToolboxesManager_CheckContext( void* toolboxesManager, Dictionary_Entry_Value* modulesVal, unsigned int entry_I, Name contextName );
+
+	Name _ToolboxesManager_GetModuleName( void* toolboxesManager, Dictionary_Entry_Value* moduleVal, unsigned int entry_I );
 
 	#define ToolboxesManager_Submit ModulesManager_Submit
 

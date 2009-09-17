@@ -57,7 +57,8 @@ PluginsManager* PluginsManager_New( void ) {
 		_PluginsManager_LoadPlugin,
 		_PluginsManager_UnloadPlugin,
 		Plugin_Factory,
-		_PluginsManager_CheckContext );
+		_PluginsManager_CheckContext,
+		_PluginsManager_GetModuleName );
 }
 
 PluginsManager* _PluginsManager_New(
@@ -70,7 +71,8 @@ PluginsManager* _PluginsManager_New(
 		ModulesManager_LoadModuleFunction*	_loadModule,
 		ModulesManager_UnloadModuleFunction*	_unloadModule,
 		ModulesManager_ModuleFactoryFunction*   _moduleFactory,
-		ModulesManager_CheckContextFunction*	_checkContext )
+		ModulesManager_CheckContextFunction*	_checkContext,
+		ModulesManager_GetModuleNameFunction*	_getModuleName )
 {
 	PluginsManager* self;
 	
@@ -86,7 +88,8 @@ PluginsManager* _PluginsManager_New(
 		_loadModule, 
 		_unloadModule,
 		_moduleFactory,
-		_checkContext );
+		_checkContext,
+		_getModuleName );
 	
 	/* General info */
 	
@@ -144,18 +147,37 @@ Bool _PluginsManager_UnloadPlugin( void* pluginsManager, Module* plugin ) {
 	return True;
 }
 
-Bool _PluginsManager_CheckContext( void* pluginsManager, void* _dictionary, Name pluginName, Name contextName ) {
+Bool _PluginsManager_CheckContext( void* pluginsManager, Dictionary_Entry_Value* modulesVal, unsigned int entry_I, Name contextName ) {
 	PluginsManager* 	self 		= (PluginsManager*)pluginsManager;
-	Dictionary*		dict		= (Dictionary*)_dictionary;
+	Dictionary_Entry_Value*	pluginDEV	= Dictionary_Entry_Value_GetElement( modulesVal, entry_I );
 	Dictionary*		pluginDict;
 	Name			componentName;
 
-	pluginDict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dict, "pluginContexts" ) );
-	componentName = Dictionary_GetString_WithDefault( pluginDict, pluginName, "context" );
-	
+	pluginDict = Dictionary_Entry_Value_AsDictionary( pluginDEV );
+	if( !pluginDict )
+		return False;
+
+	componentName = Dictionary_GetString_WithDefault( pluginDict, "Context", "context" );
+
 	if( !strcmp( componentName, contextName ) )
 		return True;
 
 	return False;
 }
+
+Name _PluginsManager_GetModuleName( void* pluginsManager, Dictionary_Entry_Value* moduleVal, unsigned int entry_I ) {
+	PluginsManager* 	self 		= (PluginsManager*)pluginsManager;
+	Dictionary_Entry_Value*	pluginDEV	= Dictionary_Entry_Value_GetElement( moduleVal, entry_I );
+	Dictionary*		pluginDict;
+	Name			pluginName;
+
+	pluginDict = Dictionary_Entry_Value_AsDictionary( pluginDEV );
+	if( !pluginDict )
+		return "";
+	
+	pluginName = Dictionary_GetString( pluginDict, "Type" );
+
+	return pluginName;	
+}
+
 

@@ -81,7 +81,8 @@ ModulesManager* _ModulesManager_New(
 		ModulesManager_LoadModuleFunction*	_loadModule,
 		ModulesManager_UnloadModuleFunction*	_unloadModule,
 		ModulesManager_ModuleFactoryFunction*   _moduleFactory,
-		ModulesManager_CheckContextFunction*	_checkContext )
+		ModulesManager_CheckContextFunction*	_checkContext,
+		ModulesManager_GetModuleNameFunction*	_getModuleName  )
 {
 	ModulesManager* self;
 	
@@ -97,6 +98,7 @@ ModulesManager* _ModulesManager_New(
 	self->_unloadModule = _unloadModule;
 	self->_moduleFactory = _moduleFactory;
 	self->_checkContext = _checkContext;
+	self->_getModuleName = _getModuleName;
 	
 	_ModulesManager_Init( self );
 	
@@ -179,11 +181,16 @@ Dictionary_Entry_Value* ModulesManager_GetModulesList( void* modulesManager, voi
 	return self->_getModulesList( self, dictionary );
 }
 
-Bool ModulesManager_CheckContext( void* modulesManager, void* _dictionary, Name moduleName, Name contextName ) {
+Bool ModulesManager_CheckContext( void* modulesManager, Dictionary_Entry_Value* modulesVal, unsigned int entry_I, Name contextName ) {
 	ModulesManager*			self 		= (ModulesManager*)modulesManager;
-	Dictionary*			dictionary 	= (Dictionary*)_dictionary;
 
-	return self->_checkContext( self, dictionary, moduleName, contextName );
+	return self->_checkContext( self, modulesVal, entry_I, contextName );
+}
+
+Name ModulesManager_GetModuleName( void* modulesManager, Dictionary_Entry_Value* moduleVal, unsigned int entry_I ) {
+	ModulesManager*			self 		= (ModulesManager*)modulesManager;
+
+	return self->_getModuleName( self, moduleVal, entry_I );
 }
 
 void ModulesManager_Load( void* modulesManager, void* _dictionary, Name contextName ) {
@@ -258,9 +265,10 @@ void ModulesManager_Load( void* modulesManager, void* _dictionary, Name contextN
 	
 	for( entry_I = 0; entry_I < entryCount; entry_I++ ) {
 		Name		moduleName;
-		moduleName = Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( modulesVal, entry_I ) );
+		moduleName = ModulesManager_GetModuleName( self, modulesVal, entry_I );
+		//moduleName = Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( modulesVal, entry_I ) );
 
-		if( !ModulesManager_CheckContext( self, dictionary, moduleName, contextName ) )
+		if( !ModulesManager_CheckContext( self, modulesVal, entry_I, contextName ) )
 			continue;
 
 		if ( ! ModulesManager_LoadModule( self, moduleName ) ) {

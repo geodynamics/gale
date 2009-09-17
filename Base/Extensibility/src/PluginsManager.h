@@ -74,7 +74,8 @@
 		ModulesManager_LoadModuleFunction*	_loadModule,
 		ModulesManager_UnloadModuleFunction*	_unloadModule,
 		ModulesManager_ModuleFactoryFunction*   _moduleFactory,
-		ModulesManager_CheckContextFunction*	_checkContext );
+		ModulesManager_CheckContextFunction*	_checkContext,
+		ModulesManager_GetModuleNameFunction*	_getModuleName );
 	
 	/* Initialisation implementation */
 	void _PluginsManager_Init( void* pluginsManager );
@@ -94,7 +95,9 @@
 	/** Exactly what to do to unload the plugin */
 	Bool _PluginsManager_UnloadPlugin( void* pluginsManager, Module* plugin );
 
-	Bool _PluginsManager_CheckContext( void* pluginsManager, void* dictionary, Name pluginName, Name contextName );
+	Bool _PluginsManager_CheckContext( void* pluginsManager, Dictionary_Entry_Value* modulesVal, unsigned int entry_I, Name contextName );
+
+	Name _PluginsManager_GetModuleName( void* pluginsManager, Dictionary_Entry_Value* moduleVal, unsigned int entry_I );
 
 	#define PluginsManager_Submit ModulesManager_Submit
 	

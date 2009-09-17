@@ -136,3 +136,36 @@ void  _Codelet_Execute( void* codelet, void* data ) {
 void  _Codelet_Destroy( void* codelet, void* data ) {
 
 }
+
+Dictionary* Codelet_GetPluginDictionary( void* codelet, Dictionary* rootDict ) {
+	Codelet*		self		= (Codelet*)codelet;
+	Dictionary_Entry_Value*	pluginsDEV	= Dictionary_Get( rootDict, "plugins" );
+	Dictionary*		pluginDict;
+	unsigned		pluginIndex;
+	Name			pluginType;
+	
+	for( pluginIndex = 0; pluginIndex < Dictionary_Entry_Value_GetCount( pluginsDEV ); pluginIndex++ ) {
+		pluginDict = Dictionary_Entry_Value_AsDictionary( Dictionary_Entry_Value_GetElement( pluginsDEV, pluginIndex ) );
+		pluginType = Dictionary_GetString( pluginDict, "Type" );
+		if( !strcmp( self->type, pluginType ) )
+			return pluginDict;	
+	}
+#if 0
+	Dictionary_Entry*	pluginsDictEntry;
+	Dictionary*		currPluginDict;
+	Name			pluginType;
+	Name			contextName;
+	
+	/* find the index for this plugin in the plugins dictionary */
+	for( pluginIndex = 0; pluginIndex < Dictionary_GetCount( pluginsDict ); pluginIndex++ ) {
+		pluginsDictEntry = pluginsDict->entryPtr[pluginIndex];
+		currPluginDict = Dictionary_Entry_Value_AsDictionary( pluginsDictEntry->value );
+		pluginType = Dictionary_GetString( currPluginDict, "Type" );
+		/* check to see if this entry in the plugins dictionary is the corresponding entry for this plugin */
+		if( !strcmp( pluginType, self->type ) )
+			return currPluginDict;
+	}
+#endif
+
+	return NULL;
+}

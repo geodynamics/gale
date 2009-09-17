@@ -60,6 +60,7 @@ ToolboxesManager* ToolboxesManager_New( int* argc, char*** argv ) {
 		_ToolboxesManager_UnloadToolbox,
 		Toolbox_Factory,
 		_ToolboxesManager_CheckContext,
+		_ToolboxesManager_GetModuleName,
 		argc,
 		argv );
 }
@@ -75,6 +76,7 @@ ToolboxesManager* _ToolboxesManager_New(
 		ModulesManager_UnloadModuleFunction*	_unloadModule,
 		ModulesManager_ModuleFactoryFunction*   _moduleFactory,
 		ModulesManager_CheckContextFunction*	_checkContext,
+		ModulesManager_GetModuleNameFunction*	_getModuleName,
 		int*					argc,
 		char***					argv )
 {
@@ -92,7 +94,8 @@ ToolboxesManager* _ToolboxesManager_New(
 		_loadModule, 
 		_unloadModule,
 		_moduleFactory,
-		_checkContext );
+		_checkContext,
+		_getModuleName );
 	
 	/* General info */
 	
@@ -181,8 +184,12 @@ Bool _ToolboxesManager_UnloadToolbox( void* toolboxesManager, Module* toolbox ) 
 }
 
 /* toolboxes do not need to be associated with contexts, so just return true */
-Bool _ToolboxesManager_CheckContext( void* toolboxesManager, void* _dictionary, Name moduleName, Name contextName ) {
+Bool _ToolboxesManager_CheckContext( void* toolboxesManager, Dictionary_Entry_Value* modulesVal, unsigned int entry_I, Name contextName ) {
 	return True;
+}
+
+Name _ToolboxesManager_GetModuleName( void* toolboxesManager, Dictionary_Entry_Value* moduleVal, unsigned int entry_I ) {
+	return Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( moduleVal, entry_I ) );
 }
 
 Index ToolboxesManager_SetInitialised( void* initRegister, char* label ) {

@@ -549,8 +549,7 @@ void _AbstractContext_Construct( void* context, Stg_ComponentFactory* cf, void* 
 	/* Note: these try for deprecated key "maxLoops" as well as new one "maxTimeSteps" - Main.PatrickSunter - 4 November 2004 */
 	dictEntryVal = Dictionary_Get( self->dictionary, "maxLoops" );
 	if ( NULL == dictEntryVal ) {
-		dictEntryVal = Dictionary_GetDefault( self->dictionary, "maxTimeSteps",
-			Dictionary_Entry_Value_FromUnsignedInt( 0 ) );
+		dictEntryVal = Dictionary_GetDefault( self->dictionary, "maxTimeSteps", Dictionary_Entry_Value_FromUnsignedInt( 0 ) );
 	}
 	self->maxTimeSteps = Dictionary_Entry_Value_AsUnsignedInt( dictEntryVal );
 
@@ -586,10 +585,6 @@ void _AbstractContext_Construct( void* context, Stg_ComponentFactory* cf, void* 
 	/* Load the plugins desired by this context (dictionary) */
 	ModulesManager_Load( self->plugins, self->dictionary, self->name );
 
-	/* Construct the list of plugins. now that the contexts are generated from XML this doesn't (and shouldn't) do anything */
-	if( self->plugins->codelets->count )
-		ModulesManager_ConstructModules( self->plugins, cf, data );
-
 	self->CF = cf;
 
 	/* Extensions are the last thing we want to do */
@@ -618,6 +613,12 @@ void _AbstractContext_Build( void* context, void* data ) {
 	/* Pre-mark the phase as complete as a default hook will attempt to build all live components (including this again) */
 	isBuilt = self->isBuilt;
 	self->isBuilt = True;
+
+	/* Construct the list of plugins. do this in the build phase se that we know that any components required by the plugins 
+	 * have already been constructed */
+	if( self->plugins->codelets->count )
+		ModulesManager_ConstructModules( self->plugins, self->CF, data );
+
 	KeyCall( self, self->buildK, EntryPoint_VoidPtr_CallCast* )( KeyHandle(self,self->buildK), self );
 	self->isBuilt = isBuilt;
 }
