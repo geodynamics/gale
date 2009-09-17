@@ -55,13 +55,50 @@
 const Type Underworld_Nusselt_Type = "Underworld_Nusselt";
 
 void _Underworld_Nusselt_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
-	UnderworldContext* context;
+	Underworld_Nusselt*	self 		= (Underworld_Nusselt*)component;
+	Dictionary*		pluginDict	= Codelet_GetPluginDictionary( component, cf->rootDict );
+	UnderworldContext*	context;
+	FieldVariable_Register* fV_Register;
+	FieldVariable*          temperatureGradientsField;
+	FieldVariable*          velocityField;
+	FieldVariable*          temperatureField;
 
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
+	self->context = Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString( pluginDict, "Context" ), UnderworldContext, True, data );
+	self->gaussSwarm = Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString( pluginDict, "GaussSwarm" ), Swarm, True, data );
+
+	StgFEM_FrequentOutput_PrintString( self->context, "Nusselt" );
+
+	context = (UnderworldContext*)self->context;
+	fV_Register = context->fieldVariable_Register;
+	/* Create Some FeVariables to calculate nusselt number */
+	temperatureField          = FieldVariable_Register_GetByName( fV_Register, "TemperatureField" );
+	velocityField             = FieldVariable_Register_GetByName( fV_Register, "VelocityField" );
+	temperatureGradientsField = FieldVariable_Register_GetByName( fV_Register, "TemperatureGradientsField" );
+	
+	self->advectiveHeatFluxField = OperatorFeVariable_NewBinary(  
+			"AdvectiveHeatFluxField",
+			temperatureField, 
+			velocityField, 
+			"VectorScale" );
+
+	self->temperatureTotalDerivField = OperatorFeVariable_NewBinary(  
+			"TemperatureTotalDerivField",
+			self->advectiveHeatFluxField, 
+			temperatureGradientsField, 
+			"Subtraction" );
+	
+	self->temperatureVertDerivField = (FeVariable*) OperatorFeVariable_NewUnary(  
+			"VerticalAdvectiveHeatFluxField",
+			self->temperatureTotalDerivField, 
+			"TakeSecondComponent" );
+
+	/* Add the variables to register so we can checkpoint & examine if necessary */
+	FieldVariable_Register_Add( fV_Register, self->advectiveHeatFluxField );
+	FieldVariable_Register_Add( fV_Register, self->temperatureTotalDerivField );
+	FieldVariable_Register_Add( fV_Register, self->temperatureVertDerivField );
 
 	/* Add functions to entry points */
-	ContextEP_Append( context, AbstractContext_EP_Build,          Underworld_Nusselt_Setup );
-	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, Underworld_Nusselt_Output );
+	ContextEP_Append( self->context, AbstractContext_EP_FrequentOutput, Underworld_Nusselt_Output );
 }
 
 void _Underworld_Nusselt_Build( void* component, void* data ) {
@@ -92,66 +129,16 @@ Index Underworld_Nusselt_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( pluginsManager, Underworld_Nusselt_Type, "0", _Underworld_Nusselt_DefaultNew );
 }
 
-void Underworld_Nusselt_Setup( void* _context ) {
-	UnderworldContext*		     context		       = (UnderworldContext*)_context;
-	FieldVariable_Register*              fV_Register               = context->fieldVariable_Register;
-	FieldVariable*                       temperatureGradientsField;
-	FieldVariable*                       velocityField;
-	FieldVariable*                       temperatureField;
-
+void Underworld_Nusselt_Output( UnderworldContext* context ) {
 	Underworld_Nusselt* self;
 
 	self = (Underworld_Nusselt*)LiveComponentRegister_Get( context->CF->LCRegister, Underworld_Nusselt_Type );
-	
-	StgFEM_FrequentOutput_PrintString( context, "Nusselt" );
-
-	Journal_Firewall( 
-			context->gaussSwarm != NULL, 
-			Underworld_Error,
-			"Cannot find gauss swarm. Cannot use %s.\n", CURR_MODULE_NAME );
-
-	/* Create Some FeVariables to calculate nusselt number */
-	temperatureField          = FieldVariable_Register_GetByName( fV_Register, "TemperatureField" );
-	velocityField             = FieldVariable_Register_GetByName( fV_Register, "VelocityField" );
-	temperatureGradientsField = FieldVariable_Register_GetByName( fV_Register, "TemperatureGradientsField" );
-	
-	self->advectiveHeatFluxField = OperatorFeVariable_NewBinary(  
-			"AdvectiveHeatFluxField",
-			temperatureField, 
-			velocityField, 
-			"VectorScale" );
-
-	self->temperatureTotalDerivField = OperatorFeVariable_NewBinary(  
-			"TemperatureTotalDerivField",
-			self->advectiveHeatFluxField, 
-			temperatureGradientsField, 
-			"Subtraction" );
-	
-	self->temperatureVertDerivField = (FeVariable*) OperatorFeVariable_NewUnary(  
-			"VerticalAdvectiveHeatFluxField",
-			self->temperatureTotalDerivField, 
-			"TakeSecondComponent" );
-
-	/* Add the variables to register so we can checkpoint & examine if necessary */
-	FieldVariable_Register_Add( fV_Register, self->advectiveHeatFluxField );
-	FieldVariable_Register_Add( fV_Register, self->temperatureTotalDerivField );
-	FieldVariable_Register_Add( fV_Register, self->temperatureVertDerivField );
-
-}
-
-void Underworld_Nusselt_Output( UnderworldContext* context ) {
-
-	Underworld_Nusselt* self;
-
-	self = (Underworld_Nusselt*)LiveComponentRegister_Get(
-				context->CF->LCRegister,
-				Underworld_Nusselt_Type );
 
 	/* This performs in integral given in the first half of equation 23 in 
 	 *  Moresi, L. N. and Solomatov, V. S.,  
 	 *  Numerical investigation of 2d convection with extremely large viscosity variations,  
 	 *  Phys. Fluids, 1995, Volume 7, pp 2154-2162. */
-	self->nusseltNumber = FeVariable_AverageTopLayer( self->temperatureVertDerivField, context->gaussSwarm, J_AXIS );
+	self->nusseltNumber = FeVariable_AverageTopLayer( self->temperatureVertDerivField, self->gaussSwarm, J_AXIS );
 
 	StgFEM_FrequentOutput_PrintValue( context, self->nusseltNumber );
 }
