@@ -12,6 +12,7 @@
 
 	<include>Underworld/BaseApps/RayleighTaylor.xml</include>
 
+	<param name="lucPluginContext">context</param>
 	<list name="plugins" mergeType="merge">
 		<struct>
 			<param name="Type">StgFEM_FrequentOutput</param>
