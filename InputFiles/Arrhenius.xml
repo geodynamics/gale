@@ -8,7 +8,8 @@
         </list>
 
 	<include> Underworld/BaseApps/ThermalConvection.xml </include>
-	
+
+<!--	
 	<list name="plugins" mergeType="merge">
 		<!-- Output Plugins -->
 		<param>StgFEM_FrequentOutput</param>	
@@ -23,6 +24,7 @@
 		<param name="Underworld_Vrms">context</param>
 		<param name="StgFEM_CPUTime">context</param>
 	</struct>
+-->
 
 	<struct name="components" mergeType="merge">'
 		<struct name="context">

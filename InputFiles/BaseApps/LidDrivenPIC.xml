@@ -7,8 +7,16 @@
 		<param>Underworld</param>
 	</list>
 
+<!--
 	<list name="plugins" mergeType="Replace">
 		<param>StgFEM_StandardConditionFunctions</param>	
+	</list>
+-->
+	<list name="plugins" mergeType="merge">
+		<struct>
+			<param name="Type">StgFEM_StandardConditionFunctions</param>	
+			<param name="Context">context</param>
+		</struct>
 	</list>
 
 	<!-- Component Stuff -->

@@ -55,13 +55,19 @@
 const Type Underworld_Vrms_Type = "Underworld_Vrms";
 
 void _Underworld_Vrms_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
-	UnderworldContext*  	context;
+	Underworld_Vrms*	self 		= (Underworld_Vrms*)component;
+	Dictionary*		pluginDict	= Codelet_GetPluginDictionary( component, cf->rootDict );
 
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
+	self->context = Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString( pluginDict, "Context" ), UnderworldContext, True, data );
+	self->gaussSwarm = Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString( pluginDict, "GaussSwarm" ), Swarm, True, data );
+	self->velocityField = Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString( pluginDict, "VelocityField" ), FeVariable, True, data );
 
-	Underworld_Vrms_PrintHeaderToFile( context );
-	ContextEP_Append( context, AbstractContext_EP_Build,          Underworld_Vrms_Setup );
-	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, Underworld_Vrms_Dump );
+	/* Create new Field Variable */
+	self->velocitySquaredField = OperatorFeVariable_NewUnary( "VelocitySquaredField", self->velocityField, "VectorSquare" );
+	self->velocitySquaredField->context = self->context;
+
+	Underworld_Vrms_PrintHeaderToFile( self->context );
+	ContextEP_Append( self->context, AbstractContext_EP_FrequentOutput, Underworld_Vrms_Dump );
 }
 
 void _Underworld_Vrms_Build( void* component, void* data ) {
@@ -98,30 +104,6 @@ void* _Underworld_Vrms_DefaultNew( Name name ) {
 
 Index Underworld_Vrms_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( pluginsManager, Underworld_Vrms_Type, "0", _Underworld_Vrms_DefaultNew );
-}
-
-void Underworld_Vrms_Setup( void* _context ) {
-	UnderworldContext*                context       = (UnderworldContext*) _context;
-
-	Underworld_Vrms* self;
-
-	self = (Underworld_Vrms*)LiveComponentRegister_Get( context->CF->LCRegister, Underworld_Vrms_Type );
-
-	Journal_Firewall( 
-			context->gaussSwarm != NULL, 
-			Underworld_Error,
-			"Cannot find gauss swarm. Cannot use %s.\n", CURR_MODULE_NAME );
-	Journal_Firewall( 
-			context->velocityField != NULL, 
-			Underworld_Error,
-			"Cannot find velocityField. Cannot use %s.\n", CURR_MODULE_NAME );
-
-	/* Create new Field Variable */
-	self->velocitySquaredField = OperatorFeVariable_NewUnary( 
-			"VelocitySquaredField", 
-			context->velocityField, 
-			"VectorSquare" );
-	self->velocitySquaredField->context = context;
 }
 
 /* Integrate Every Step and dump to file */

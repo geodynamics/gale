@@ -12,8 +12,8 @@
 
 	<include>Underworld/BaseApps/RayleighTaylor.xml</include>
 
+<!--
 	<list name="plugins" mergeType="merge">
-		<!-- Output Plugins -->
 		<param>StgFEM_FrequentOutput</param>	
 		<param>Underworld_Vrms</param>	
 		<param>StgFEM_CPUTime</param>
@@ -27,12 +27,33 @@
 		<param name="StgFEM_CPUTime">context</param>
 		<param name="lucPlugin">lucPluginContext</param>
 	</struct>
+	<param name="lucPluginContext">context</param>
+-->
+
+	<list name="plugins" mergeType="merge">
+		<struct>
+			<param name="Type">StgFEM_FrequentOutput</param>
+			<param name="Context">context</param>
+		</struct>
+		<struct>
+			<param name="Type">Underworld_Vrms</param>
+			<param name="Context">context</param>
+			<param name="GaussSwarm">gaussSwarm</param>
+			<param name="VelocityField">VelocityField</param>
+		</struct>
+		<struct>
+			<param name="Type">StgFEM_CPUTime</param>
+			<param name="Context">context</param>
+		</struct>
+		<struct>
+			<param name="Type">lucPlugin</param>
+			<param name="Context">lucPluginContext</param>
+		</struct>
+	</list>
 
 	<struct name="components" mergeType="merge">
 		<struct name="context">
 			<param name="Type">UnderworldContext</param>
-			<param name="GaussSwarm">gaussSwarm</param>
-			<param name="VelocityField">VelocityField</param>
 		</struct>
 
 		<struct name="backgroundViscosity">
