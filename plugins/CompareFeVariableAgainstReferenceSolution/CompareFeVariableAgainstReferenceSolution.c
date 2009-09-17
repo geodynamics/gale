@@ -56,7 +56,6 @@ void _CompareFeVariableAgainstReferenceSolution_Delete( void* compareFeVariable 
 
 typedef struct {
 	__Codelet
-	AbstractContext*         context;
 	Stg_ComponentFactory*    cf;
 
 	char*                    referencePath;

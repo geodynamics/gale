@@ -56,18 +56,20 @@ void StgFEM_CPUTime_PrintTimeInfo( AbstractContext* context ) {
 }
 
 void _StgFEM_CPUTime_Construct( void* componment, Stg_ComponentFactory* cf, void* data ) {
-	StgFEM_CPUTime* self = (StgFEM_CPUTime*)componment;
-	AbstractContext* context;
+	StgFEM_CPUTime* self 		= (StgFEM_CPUTime*)componment;
+	Dictionary*	pluginDict	= Codelet_GetPluginDictionary( self, cf->rootDict );
 
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
+	self->context = Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString( pluginDict, "Context" ), AbstractContext, True, data );
+	if( !self->context )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
 	
 	/* Initialise Timer */
 	self->initialTime = MPI_Wtime();
 
 	/* Print Header to file */
-	StgFEM_FrequentOutput_PrintString( context, "CPU_Time" );
+	StgFEM_FrequentOutput_PrintString( self->context, "CPU_Time" );
 	
-	ContextEP_Append( context, AbstractContext_EP_FrequentOutput ,StgFEM_CPUTime_PrintTimeInfo );
+	ContextEP_Append( self->context, AbstractContext_EP_FrequentOutput ,StgFEM_CPUTime_PrintTimeInfo );
 }
 
 void* _StgFEM_CPUTime_DefaultNew( Name name ) {

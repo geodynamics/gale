@@ -59,8 +59,10 @@ void _StgFEM_FrequentOutput_Construct( void* component, Stg_ComponentFactory* cf
 	Name                               frequentOutputFilename;
 	Bool                               fileOpened;
 	Stream*                            errorStream  = Journal_Register( Error_Type, CURR_MODULE_NAME );
+	Dictionary*			   pluginDict	= Codelet_GetPluginDictionary( self, cf->rootDict );
 
-	context = (AbstractContext*)Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
+	context = Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString( pluginDict, "Context" ), AbstractContext, True, data );
+	self->context = context;
 	dictionary = context->dictionary;
 	
 	ContextEP_Append( context, AbstractContext_EP_Initialise, StgFEM_FrequentOutput_PrintNewLine );

@@ -50,10 +50,13 @@
 const Type StgFEM_StandardConditionFunctions_Type = "StgFEM_StandardConditionFunctions";
 
 void _StgFEM_StandardConditionFunctions_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+	Codelet*		self		= (Codelet*)component;
 	AbstractContext*        context;
 	ConditionFunction*      condFunc;
+	Dictionary*		pluginDict	= Codelet_GetPluginDictionary( component, cf->rootDict );
 
-	context = (AbstractContext*)Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
+	context = (AbstractContext*)Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString( pluginDict, "Context" ), AbstractContext, True, data );
+	self->context = context;
 	
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SolidBodyRotation, "Velocity_SolidBodyRotation" );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
