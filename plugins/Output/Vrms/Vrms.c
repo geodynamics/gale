@@ -118,15 +118,13 @@ void Underworld_Vrms_Dump( void* _context ) {
 
 	Underworld_Vrms* self;
 
-	self = (Underworld_Vrms*)LiveComponentRegister_Get(
-					context->CF->LCRegister,
-					Underworld_Vrms_Type );
+	self = (Underworld_Vrms*)LiveComponentRegister_Get( context->CF->LCRegister, Underworld_Vrms_Type );
 
 	mesh = (Mesh*)self->velocitySquaredField->feMesh;
 	Mesh_GetGlobalCoordRange( mesh, minCrd, maxCrd );
 	
 	/* Sum integral */
-	integral = FeVariable_Integrate( self->velocitySquaredField, context->gaussSwarm );
+	integral = FeVariable_Integrate( self->velocitySquaredField, self->gaussSwarm );
 
 	/* Get Volume of Mesh - TODO Make general for irregular meshes */
 	volume = ( maxCrd[ I_AXIS ] - minCrd[ I_AXIS ] ) * 

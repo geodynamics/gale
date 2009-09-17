@@ -12,24 +12,6 @@
 
 	<include>Underworld/BaseApps/RayleighTaylor.xml</include>
 
-<!--
-	<list name="plugins" mergeType="merge">
-		<param>StgFEM_FrequentOutput</param>	
-		<param>Underworld_Vrms</param>	
-		<param>StgFEM_CPUTime</param>
-		<param>lucPlugin</param>
-	</list>
-
-	<param name="lucPluginContext">context</param>
-	<struct name="pluginContexts" mergeType="merge">
-		<param name="StgFEM_FrequentOutput">context</param>
-		<param name="Underworld_Vrms">context</param>
-		<param name="StgFEM_CPUTime">context</param>
-		<param name="lucPlugin">lucPluginContext</param>
-	</struct>
-	<param name="lucPluginContext">context</param>
--->
-
 	<list name="plugins" mergeType="merge">
 		<struct>
 			<param name="Type">StgFEM_FrequentOutput</param>
