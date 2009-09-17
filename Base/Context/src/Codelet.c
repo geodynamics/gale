@@ -150,22 +150,6 @@ Dictionary* Codelet_GetPluginDictionary( void* codelet, Dictionary* rootDict ) {
 		if( !strcmp( self->type, pluginType ) )
 			return pluginDict;	
 	}
-#if 0
-	Dictionary_Entry*	pluginsDictEntry;
-	Dictionary*		currPluginDict;
-	Name			pluginType;
-	Name			contextName;
-	
-	/* find the index for this plugin in the plugins dictionary */
-	for( pluginIndex = 0; pluginIndex < Dictionary_GetCount( pluginsDict ); pluginIndex++ ) {
-		pluginsDictEntry = pluginsDict->entryPtr[pluginIndex];
-		currPluginDict = Dictionary_Entry_Value_AsDictionary( pluginsDictEntry->value );
-		pluginType = Dictionary_GetString( currPluginDict, "Type" );
-		/* check to see if this entry in the plugins dictionary is the corresponding entry for this plugin */
-		if( !strcmp( pluginType, self->type ) )
-			return currPluginDict;
-	}
-#endif
 
 	return NULL;
 }
