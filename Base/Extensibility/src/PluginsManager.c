@@ -150,14 +150,8 @@ Bool _PluginsManager_UnloadPlugin( void* pluginsManager, Module* plugin ) {
 Bool _PluginsManager_CheckContext( void* pluginsManager, Dictionary_Entry_Value* modulesVal, unsigned int entry_I, Name contextName ) {
 	PluginsManager* 	self 		= (PluginsManager*)pluginsManager;
 	Dictionary_Entry_Value*	pluginDEV	= Dictionary_Entry_Value_GetElement( modulesVal, entry_I );
-	Dictionary*		pluginDict;
-	Name			componentName;
-
-	pluginDict = Dictionary_Entry_Value_AsDictionary( pluginDEV );
-	if( !pluginDict )
-		return False;
-
-	componentName = Dictionary_GetString_WithDefault( pluginDict, "Context", "context" );
+	Dictionary*		pluginDict 	= Dictionary_Entry_Value_AsDictionary( pluginDEV );
+	Name			componentName 	= Dictionary_GetString_WithDefault( pluginDict, "Context", "context" );
 
 	if( !strcmp( componentName, contextName ) )
 		return True;
@@ -168,14 +162,8 @@ Bool _PluginsManager_CheckContext( void* pluginsManager, Dictionary_Entry_Value*
 Name _PluginsManager_GetModuleName( void* pluginsManager, Dictionary_Entry_Value* moduleVal, unsigned int entry_I ) {
 	PluginsManager* 	self 		= (PluginsManager*)pluginsManager;
 	Dictionary_Entry_Value*	pluginDEV	= Dictionary_Entry_Value_GetElement( moduleVal, entry_I );
-	Dictionary*		pluginDict;
-	Name			pluginName;
-
-	pluginDict = Dictionary_Entry_Value_AsDictionary( pluginDEV );
-	if( !pluginDict )
-		return "";
-	
-	pluginName = Dictionary_GetString( pluginDict, "Type" );
+	Dictionary*		pluginDict 	= Dictionary_Entry_Value_AsDictionary( pluginDEV );
+	Name			pluginName 	= Dictionary_GetString( pluginDict, "Type" );
 
 	return pluginName;	
 }
