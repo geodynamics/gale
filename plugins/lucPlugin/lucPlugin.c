@@ -196,11 +196,13 @@ void lucPlugin_VisualOnlyRun( Context* _context ) {
 
 
 void _lucPlugin_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+	Codelet*	self		= (Codelet*)component;
+	Dictionary*	pluginDict	= Codelet_GetPluginDictionary( component, cf->rootDict );
 
 	AbstractContext* context;
 
-
-	context = (AbstractContext*)Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
+	context = (AbstractContext*)Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString( pluginDict, "Context" ), AbstractContext, True, data );
+	self->context = context;
 	//glucifer_Init();
 
 	if ( Dictionary_GetBool( context->dictionary, "printGluciferComponents" ) ) {
