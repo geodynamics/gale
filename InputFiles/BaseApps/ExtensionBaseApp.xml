@@ -8,8 +8,14 @@
 	</list>
 
 	<list name="plugins" mergeType="Replace">
-		<param>Underworld_EulerDeform</param>
-		<param>StgFEM_StandardConditionFunctions</param>
+		<struct>
+			<param name="Type">Underworld_EulerDeform</param>
+			<param name="Context">context</param>
+		</struct>
+		<struct>
+			<param name="Type">StgFEM_StandardConditionFunctions</param>
+			<param name="Context">context</param>
+		</struct>
 	</list>
 
 	<!-- Component Stuff -->

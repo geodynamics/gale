@@ -3,32 +3,42 @@
 
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 
-        <list name="import">
-                <param> Underworld </param>
-        </list>
-
-	<include> Underworld/BaseApps/ThermalConvection.xml </include>
-	
-	<list name="plugins" mergeType="merge">
-		<!-- Output Plugins -->
-		<param>StgFEM_FrequentOutput</param>	
-		<param>Underworld_Nusselt</param>	
-		<param>Underworld_Vrms</param>	
-		<param>StgFEM_CPUTime</param>	
+	<list name="import">
+		<param> Underworld </param>
 	</list>
 
-	<struct name="pluginContexts" mergeType="merge">
-		<param name="StgFEM_FrequentOutput">context</param>
-		<param name="Underworld_Nusselt">context</param>
-		<param name="Underworld_Vrms">context</param>
-		<param name="StgFEM_CPUTime">context</param>
-	</struct>
+	<include> Underworld/BaseApps/ThermalConvection.xml </include>
+
+	<param name="lucPluginContext">context</param>	
+	<list name="plugins" mergeType="merge">
+		<struct>
+			<param name="Type">StgFEM_FrequentOutput</param>
+			<param name="Context">context</param>	
+		</struct>
+		<struct>
+			<param name="Type">Underworld_Nusselt</param>	
+			<param name="Context">context</param>
+			<param name="GaussSwarm">gaussSwarm</param>
+		</struct>
+		<struct>
+			<param name="Type">Underworld_Vrms</param>	
+			<param name="Context">context</param>
+			<param name="GaussSwarm">gaussSwarm</param>
+			<param name="VelocityField">VelocityField</param>
+		</struct>
+		<struct>
+			<param name="Type">StgFEM_CPUTime</param>	
+			<param name="Context">context</param>
+		</struct>
+		<struct>
+			<param name="Type">lucPlugin</param>
+			<param name="Context">lucPluginContext</param>
+		</struct>
+	</list>
 
 	<struct name="components" mergeType="merge">
 		<struct name="context">
 			<param name="Type">UnderworldContext</param>
-			<param name="GaussSwarm">gaussSwarm</param>
-			<param name="VelocityField">VelocityField</param>
 		</struct>
 
 		<struct name="rheology">
@@ -55,19 +65,18 @@
 	<param name="dumpEvery"> 1 </param>	
 	<param name="checkpointEvery"> 0 </param>
 
-        <!--   choose what to checkpoint
+	<!--   choose what to checkpoint
 	<list name="FieldVariablesToCheckpoint">
 		<param>VelocityField</param>
 		<param>VelocityGradientsField</param>
 	</list>
 	-->
 
-        <!--  restart from a previous checkpoint 
-        <param name="restartTimestep"> 10 </param>
-         -->
+	<!--  restart from a previous checkpoint 
+	<param name="restartTimestep"> 10 </param>
+	-->
 	
 	<param name="Ra"> 1e7 </param>	
-	
 	<param name="courantFactor"> 0.25 </param>	
 	
 	<!-- Journal Control -->
@@ -103,7 +112,6 @@
 	<param name="particlesPerCell"> 20 </param>
 
 	<!-- Visualisation stuff -->
-<!--
 	<include>Underworld/Viewports/TemperatureAndVelocityArrowsVP.xml</include>
 	<include>glucifer/window.xml</include>
 	<struct name="components" mergeType="merge">
@@ -111,6 +119,5 @@
 			<param name="Viewport">TemperatureAndVelocityArrowsVP</param>
 		</struct>
 	</struct>
--->
  
 </StGermainData>

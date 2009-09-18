@@ -9,30 +9,37 @@
 
 	<include> Underworld/BaseApps/ThermalConvectionPIC.xml </include>
 	
+	<param name="lucPluginContext">context</param>
 	<list name="plugins" mergeType="merge">
-		<!-- Output Plugins -->
-		<param>StgFEM_FrequentOutput</param>	
-		<param>Underworld_Nusselt</param>	
-		<param>Underworld_Vrms</param>	
-		<param>StgFEM_CPUTime</param>	
-		<param>lucPlugin</param>
+		<struct>
+			<param name="Type">StgFEM_FrequentOutput</param>	
+			<param name="Context">context</param>
+		</struct>
+		<struct>
+			<param name="Type">Underworld_Nusselt</param>	
+			<param name="Context">context</param>
+			<param name="GaussSwarm">gaussSwarm</param>
+		</struct>
+		<struct>
+			<param name="Type">Underworld_Vrms</param>	
+			<param name="Context">context</param>
+			<param name="GaussSwarm">gaussSwarm</param>
+			<param name="VelocityField">VelocityField</param>
+		</struct>
+		<struct>
+			<param name="Type">StgFEM_CPUTime</param>	
+			<param name="Context">context</param>
+		</struct>
+		<struct>
+			<param name="Type">lucPlugin</param>
+			<param name="Context">lucPluginContext</param>
+		</struct>
 	</list>
-
-	<struct name="lucPluginContext">context</struct>
-	<struct name="pluginContexts" mergeType="merge">
-		<param name="StgFEM_FrequentOutput">context</param>
-		<param name="Underworld_Nusselt">context</param>
-		<param name="Underworld_Vrms">context</param>
-		<param name="StgFEM_CPUTime">context</param>
-		<param name="lucPlugin">lucPluginContext</param>
-	</struct>
 
 	<struct name="components" mergeType="merge">
 		<struct name="context">
 			<param name="Type">UnderworldContext</param>
-			<param name="GaussSwarm">gaussSwarm</param>
-			<param name="IntegrationSwarm">picIntegrationPoints</param>
-			<param name="VelocityField">VelocityField</param>
+			<!--<param name="IntegrationSwarm">picIntegrationPoints</param>-->
 		</struct>
 		<struct name="director">
 			<param name="Type">Director</param>
@@ -135,7 +142,6 @@
 			<param name="Type">lucColourMap</param>
 			<param name="colours">Yellow Black</param>
 		</struct>
-		<!-- Drawing Objects -->
 		<struct name="alignmentDrawingObject">
 			<param name="Type">lucSwarmViewer</param>
 			<param name="Swarm">materialSwarm</param>
@@ -159,6 +165,5 @@
 		<struct name="window" mergeType="merge">
 			<param name="Viewport">TemperatureAndVelocityArrowsVP VelocityMagnitudeVP AlignmentVP</param>
 		</struct>
-	</struct>
- 
+	</struct>  
 </StGermainData>

@@ -1,14 +1,14 @@
-<!-- Rayleigh-Taylor app input file -->
-<!-- 	Rayleigh-Taylor convection benchmark as detailed in
-	P.E. van Keken et al, 'A comparison of methods for 
-	the modelling of thermochemical convection', JGR, 1997	-->
+<!--	Rayleigh-Taylor app input file -->
+<!--	Rayleigh-Taylor convection benchmark as detailed in
+		P.E. van Keken et al, 'A comparison of methods for 
+		the modelling of thermochemical convection', JGR, 1997	-->
 
 <!-- DTD to validate against -->
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 
-        <list name="import">
-                <param> Underworld </param>
-        </list>
+	<list name="import">
+  		<param> Underworld </param>
+	</list>
 
 	<include>Underworld/BaseApps/RayleighTaylor.xml</include>
 
@@ -38,7 +38,6 @@
 		<struct name="context">
 			<param name="Type">UnderworldContext</param>
 		</struct>
-
 		<struct name="backgroundViscosity">
 			<param name="Type">MaterialViscosity</param>
 			<param name="eta0">1.0</param>
@@ -52,7 +51,6 @@
 			<param name="density">1.0</param>
 			<param name="Rheology">backgroundViscosity</param>
 		</struct>
-
 		<struct name="lightLayerShape">
 			<param name="Type">BelowCosinePlane</param>
 			<param name="offset">0.2</param>
@@ -87,16 +85,16 @@
 	<param name="gravity"> 1.0 </param>
 	<param name="checkpointEvery"> 0 </param>
 
-        <!--   choose what to checkpoint
+	<!--   choose what to checkpoint
 	<list name="FieldVariablesToCheckpoint">
 		<param>VelocityField</param>
 		<param>VelocityGradientsField</param>
 	</list>
 	-->
 
-        <!--  restart from a previous checkpoint 
-        <param name="restartTimestep"> 10 </param>
-         -->
+  	<!--  restart from a previous checkpoint 
+  	<param name="restartTimestep"> 10 </param>
+  	-->
 
 	<!-- general decomposition parameters -->
 	<param name="dim"> 2 </param>
@@ -131,7 +129,7 @@
 	<!-- Visualisation stuff -->
 	<include>Underworld/Viewports/ParticleDensityVP.xml</include>
 	<include>Underworld/Viewports/StrainRateInvariantVP.xml</include>
-	<include>window.xml</include>
+	<include>glucifer/window.xml</include>
 	<struct name="components" mergeType="merge">
 		<struct name="window" mergeType="merge">
 			<param name="Viewport">ParticleDensityVP StrainRateInvariantVP</param>
