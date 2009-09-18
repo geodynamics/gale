@@ -150,8 +150,14 @@ Bool _PluginsManager_UnloadPlugin( void* pluginsManager, Module* plugin ) {
 Bool _PluginsManager_CheckContext( void* pluginsManager, Dictionary_Entry_Value* modulesVal, unsigned int entry_I, Name contextName ) {
 	PluginsManager* 	self 		= (PluginsManager*)pluginsManager;
 	Dictionary_Entry_Value*	pluginDEV	= Dictionary_Entry_Value_GetElement( modulesVal, entry_I );
-	Dictionary*		pluginDict 	= Dictionary_Entry_Value_AsDictionary( pluginDEV );
-	Name			componentName 	= Dictionary_GetString_WithDefault( pluginDict, "Context", "context" );
+	Dictionary*		pluginDict;
+	Name			componentName;
+
+	pluginDict = Dictionary_Entry_Value_AsDictionary( pluginDEV );
+	if( !pluginDict )
+		return False;
+
+	componentName = Dictionary_GetString_WithDefault( pluginDict, "Context", "context" );
 
 	if( !strcmp( componentName, contextName ) )
 		return True;

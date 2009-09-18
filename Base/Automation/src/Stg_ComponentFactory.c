@@ -278,6 +278,7 @@ void Stg_ComponentFactory_CreateComponents( Stg_ComponentFactory *self ) {
 			/* Add to register */
 			LiveComponentRegister_Add( self->LCRegister, componentConstructorFunction( componentName ) );
 		}
+
 		Stream_UnIndent( stream );
 	}
 	else{
