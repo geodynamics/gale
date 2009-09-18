@@ -89,14 +89,9 @@ Stg_ComponentFactory* stgMainInit( Dictionary* dictionary, MPI_Comm communicator
 	/* Also, this is a little hacky, as nothing is known about the other layers of StG or their associated contexts here */
 	for( component_I = 0; component_I < LiveComponentRegister_GetCount( cf->LCRegister ); component_I++ ) {
 		component = LiveComponentRegister_At( cf->LCRegister, component_I );
-		if( !strcmp( component->type, "DomainContext" ) ||
-		    !strcmp( component->type, "FiniteElementContext" ) ||
-		    !strcmp( component->type, "PICelleratorContext" ) ||
-		    !strcmp( component->type, "UnderworldContext" ) ) {
-			Journal_Firewall( dictionary->count,
-		       		Journal_Register( Error_Type, "Error Stream" ),
-				"Error in %s: The dictionary is empty, meaning no input parameters have been feed into your program. Perhaps you've forgot to pass any input files ( or command-line arguments ) in.\n", __func__); 	
-	
+		if( Stg_CheckContext( component, AbstractContext ) ) { 
+			Journal_Firewall( dictionary->count, Journal_Register( Error_Type, "Error Stream" ), 
+				 "Error in %s: The dictionary is empty, meaning no input parameters have been feed into your program. Perhaps you've forgot to pass any input files ( or command-line arguments ) in.\n", __func__); 	
 			context = (AbstractContext*)component;
 			context->dictionary = dictionary;
 			context->CF = cf;
@@ -148,10 +143,7 @@ void stgMainLoop( Stg_ComponentFactory* cf ) {
 	
 	for( component_i = 0; component_i < LiveComponentRegister_GetCount( cf->LCRegister ); component_i++ ) {
 		component = LiveComponentRegister_At( cf->LCRegister, component_i );
-		if( !strcmp( component->type, "DomainContext" ) ||
-		    !strcmp( component->type, "FiniteElementContext" ) ||
-		    !strcmp( component->type, "PICelleratorContext" ) ||
-		    !strcmp( component->type, "UnderworldContext" ) ) {
+		if( Stg_CheckContext( component, AbstractContext ) ) { 
 			context = (AbstractContext*)component;
 			AbstractContext_Dump( context );
 			Stg_Component_Execute( context, 0, True );
