@@ -39,8 +39,8 @@ void _pcu_check_fileEq( const char* const fileName1, const char* const fileName2
    char*          ret1;
    char*          ret2;
    unsigned int   ii=0;
-   char           exprString[1000];
-   char           msgString[1000];
+   char           exprString[5000];
+   char           msgString[5000];
    unsigned int   file2LineLen = 0;
 
    MPI_Comm_rank( MPI_COMM_WORLD, &rank );
