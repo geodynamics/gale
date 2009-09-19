@@ -14,10 +14,13 @@ class PETSc(Package):
                   action='store', help='PETSc architecture.')
 
     def gen_locations(self):
-        yield ('/usr/local', ['/usr/local/include'], ['/usr/local/lib'])
-        yield ('/usr/local', ['/usr/local/include'], ['/usr/local/lib64'])
-        yield ('/usr/local', ['/usr/local/include/petsc'], ['/usr/local/lib'])
-        yield ('/usr/local', ['/usr/local/include/petsc'], ['/usr/local/lib64'])
+        yield ('/usr/local', [], [])
+        yield ('/usr/lib/petsc', [], [])
+
+    def gen_base_extensions(self):
+        for e in Package.gen_base_extensions(self):
+            yield e
+            yield ([os.path.join(i, 'petsc') for i in e[0]], e[1])
 
     def gen_envs(self, loc):
         env = self.env.Clone()
