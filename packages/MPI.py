@@ -3,16 +3,26 @@ from config import Package
 
 class MPI(Package):
 
-    def gen_locations(self):
-        yield ('', ['/usr/include/mpi'], [])
-        yield ('', ['/usr/local/include'], ['/usr/local/lib'])
-        yield ('', ['/usr/local/include/mpi'], ['/usr/local/lib'])
+    def __init__(self, name, env, **kw):
+        Package.__init__(self, name, env, **kw)
+        self.try_compilers = True
+
+    def gen_base_extensions(self):
+        for e in Package.gen_base_extensions(self):
+            yield e
+            yield ([os.path.join(i, 'mpi') for i in e[0]], e[1])
 
     def gen_envs(self, loc):
 	# If we've been given an MPI compiler just try that.
 	if os.path.basename(self.env['CC']) in ['mpicc', 'mpicxx']:
             yield self.env.Clone()
             return
+
+        # If flagged to do so, try standard MPI compilers.
+        if self.try_compilers:
+            env = self.env.Clone()
+            env['CC'] = 'mpicc'
+            yield env
 
         for env in Package.gen_envs(self, loc):
 

@@ -14,7 +14,6 @@ class PETSc(Package):
                   action='store', help='PETSc architecture.')
 
     def gen_locations(self):
-        yield ('/usr/local', [], [])
         yield ('/usr/lib/petsc', [], [])
 
     def gen_base_extensions(self):
