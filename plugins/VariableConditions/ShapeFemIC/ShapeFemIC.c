@@ -55,39 +55,49 @@
 #include <stdio.h>
 #include <assert.h>
 
+#define STD   1
+#define PM    2
+
 const Type Underworld_ShapeFemIC_Type = "Underworld_ShapeFemIC";
 typedef struct {
 	__Codelet
 } Underworld_ShapeFemIC;
 
 
+
 void Underworld_LinearShapeIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
 
   UnderworldContext*       context            = (UnderworldContext*)_context;
+
   Dictionary*              theDictionary      = context->dictionary;
   FeMesh*	           theMesh            = NULL;
   double*                  result             = (double*) _result;
   Stg_Shape*               shape;
   Name                     shapeName;
   double*                  coord;
-
   Dictionary_Entry_Value*  shapeSpecs;	
   Index                    numSpecs = 0;
   Index	                   shapeSpec_I;
   Dictionary_Entry_Value*  shapeSpec = NULL;
   Dictionary*	           shapeSpecDict;
-  double                   ox,oy;
-  double                   gx,gy,gz;
-  double                   xp,yp,zp;    
-  double                   dx,dy,dz;  
-  double                   x,y,z;
-  double                   T0;
-  double                   az;
-  double                   p1x,p1y,p1z,p2x,p2y,p2z;
-  double                   a,b,c,d;
-  double                   ux,uy,uz,nu;
-  double                   gx2,gy2,gz2,T02;
-  double                   alphax,alphay,alphaz;
+
+  int setup;
+  /* STD config */
+  double gz, p1x, p1y, p1z, p2x, p2y, p2z, z, ux, uy, uz, nu, d, zp;
+  double gx, gy, T0, x, y, az, xp, yp;
+  double ox, oy;
+  /* PM config */
+  double ox1,oy1,T1,H1,gy1;
+  double ox2,oy2,T2,H2,gy2;
+  double T1u, T1l;
+  double T2u, T2l;
+  double Tmu, Tml;
+  double o1ux, o1uy;
+  double o1lx, o1ly;
+  double o2ux, o2uy;
+  double o2lx, o2ly;
+  double omuy, omly;
+  double alpha, beta, W;
 
   theMesh = context->temperatureField->feMesh;
 
@@ -111,111 +121,110 @@ void Underworld_LinearShapeIC( Node_LocalIndex node_lI, Variable_Index var_I, vo
 
     if( Stg_Shape_IsCoordInside( shape, coord ) ) {
 
-      /* -- Basic configuration -- */
+      setup = Dictionary_GetInt_WithDefault( shapeSpecDict, "setup", STD );
 
-      /* rotation angle */
-      az = Dictionary_GetDouble_WithDefault( shapeSpecDict, "rotation", 0.0 );
-      /* gradient in each direction */
-      gx = Dictionary_GetDouble_WithDefault( shapeSpecDict, "gradientx", 0.0 );
-      gy = Dictionary_GetDouble_WithDefault( shapeSpecDict, "gradienty", 0.0 );
-      gz = Dictionary_GetDouble_WithDefault( shapeSpecDict, "gradientz", 0.0 );
-      /* origin (2D case) */
-      ox = Dictionary_GetDouble_WithDefault( shapeSpecDict, "originx", 0.0 );
-      oy = Dictionary_GetDouble_WithDefault( shapeSpecDict, "originy", 0.0 );
-      /* two points defining the rotational axis (3D case) First point is the origin */
-      p1x = Dictionary_GetDouble_WithDefault( shapeSpecDict, "p1x", 0.0 );
-      p1y = Dictionary_GetDouble_WithDefault( shapeSpecDict, "p1y", 0.0 );
-      p1z = Dictionary_GetDouble_WithDefault( shapeSpecDict, "p1z", 0.0 );
-      p2x = Dictionary_GetDouble_WithDefault( shapeSpecDict, "p2x", 0.0 );
-      p2y = Dictionary_GetDouble_WithDefault( shapeSpecDict, "p2y", 0.0 );
-      p2z = Dictionary_GetDouble_WithDefault( shapeSpecDict, "p2z", 1.0 );
-      /* value of the field at origin */
-      T0 = Dictionary_GetDouble_WithDefault( shapeSpecDict, "valueAtOrigin", 0.0 );
+      switch( setup ) {
+      case STD:
+	/* rotation angle */
+	az = Dictionary_GetDouble_WithDefault( shapeSpecDict, "rotation", 0.0 );
+	/* gradient in each direction */
+	gx = Dictionary_GetDouble_WithDefault( shapeSpecDict, "gradientx", 0.0 );
+	gy = Dictionary_GetDouble_WithDefault( shapeSpecDict, "gradienty", 0.0 );
+	/* value of the field at origin */
+	T0 = Dictionary_GetDouble_WithDefault( shapeSpecDict, "valueAtOrigin", 0.0 );
 
-      /*  -- Advanced configuration -- */
+	x = coord[I_AXIS];
+	y = coord[J_AXIS];
+	az = az/180.0*M_PI;
 
-      /* second gradient in each direction */
-      gx2 = Dictionary_GetDouble_WithDefault( shapeSpecDict, "gradientx2", gx );
-      gy2 = Dictionary_GetDouble_WithDefault( shapeSpecDict, "gradienty2", gy );
-      gz2 = Dictionary_GetDouble_WithDefault( shapeSpecDict, "gradientz2", gz );
-      /* point to impose 2nd gradients (relative to origin) */
-      dx = Dictionary_GetDouble_WithDefault( shapeSpecDict, "distancex", 0.0 );
-      dy = Dictionary_GetDouble_WithDefault( shapeSpecDict, "distancey", 0.0 );
-      dz = Dictionary_GetDouble_WithDefault( shapeSpecDict, "distancez", 0.0 );      
-      /* value of the field at origin + [dx,dy,dz] */
-      T02 = Dictionary_GetDouble_WithDefault( shapeSpecDict, "valueAtOrigin2", T0 );
+	switch( theMesh->topo->nDims ) {
+	case 2: 
+	  /* origin */
+	  ox = Dictionary_GetDouble_WithDefault( shapeSpecDict, "originx", 0.0 );
+	  oy = Dictionary_GetDouble_WithDefault( shapeSpecDict, "originy", 0.0 );
+	  /* rotations and translations */
+	  xp = (x-ox)*cos(az) - (y-oy)*sin(az);
+	  yp = (x-ox)*sin(az) + (y-oy)*cos(az);
+	  /* compute value at the point */
+	  *result = T0 + xp*gx + yp*gy; 
+	  break;
+	
+	case 3: 
+	  gz = Dictionary_GetDouble_WithDefault( shapeSpecDict, "gradientz", 0.0 );
+	  /* two points defining the rotational axis (3D case) First point is the origin */
+	  p1x = Dictionary_GetDouble_WithDefault( shapeSpecDict, "p1x", 0.0 );
+	  p1y = Dictionary_GetDouble_WithDefault( shapeSpecDict, "p1y", 0.0 );
+	  p1z = Dictionary_GetDouble_WithDefault( shapeSpecDict, "p1z", 0.0 );
+	  p2x = Dictionary_GetDouble_WithDefault( shapeSpecDict, "p2x", 0.0 );
+	  p2y = Dictionary_GetDouble_WithDefault( shapeSpecDict, "p2y", 0.0 );
+	  p2z = Dictionary_GetDouble_WithDefault( shapeSpecDict, "p2z", 1.0 );
 
-      x = coord[I_AXIS];
-      y = coord[J_AXIS];
-      az = az/180.0*M_PI;
+	  z   = coord[K_AXIS];
 
-      /* 2D case*/
-      if( theMesh->topo->nDims == 2 ) {
-	/* rotations and translations */
-	xp = (x-ox)*cos(az) - (y-oy)*sin(az);
-	yp = (x-ox)*sin(az) + (y-oy)*cos(az);
+	  /* unit axis of rotation */
+	  ux = p1x-p2x;
+	  uy = p1y-p2y;
+	  uz = p1z-p2z;
+	  nu = sqrt(ux*ux + uy*uy + uz*uz);
 
-	/* compute gradients and values at origin*/
-	if( dx != 0 ) 
-	  alphax = xp/dx;
-	else
-	  alphax = 0;
+	  ux /= nu;
+	  uy /= nu;
+	  uz /= nu;
+	  
+	  /* Rotate and translate */
+	  d = sqrt( uy*uy + uz*uz );
+	  xp = cos(az)*( -uy*(y-p1y) - uz*(z-p1z) ) - sin(az)*( uz/d*(y-p1y) - uy/ux*(z-p1z) );
+	  yp = sin(az)*( -uy*(y-p1y) - uz*(z-p1z) ) + cos(az)*( uz/d*(y-p1y) - uy/ux*(z-p1z) );
+	  zp = d*uy/ux*(y-p1y) + d*uz/ux*(z-p1z);
 
-	if( dy != 0 ) 
-	  alphay = yp/dy;
-	else
-	  alphay = 0;
+	  /* compute value at the point */
+	  *result = T0 + xp*gx + yp*gy + zp*gz; 
+	  break;	
+	}
+	break;
 
-	gx = gx*(1.0-alphay) + gx2*alphay;
-	gy = gy*(1.0-alphax) + gy2*alphax;
-	T0 = T0*(1.0-alphax) + T02*alphax;
+      case PM:
+	/* Advanced config */
+	ox1 = Dictionary_GetDouble_WithDefault( shapeSpecDict, "originx1", 0.0 );
+	oy1 = Dictionary_GetDouble_WithDefault( shapeSpecDict, "originy1", 0.0 );
+	gy1 = Dictionary_GetDouble_WithDefault( shapeSpecDict, "gradienty1", 0.0 );
+	T1 = Dictionary_GetDouble_WithDefault( shapeSpecDict, "valueAtOrigin1", 0.0 );
+	H1 = Dictionary_GetDouble_WithDefault( shapeSpecDict, "height1", 0.0 );
 
-	/* compute value at the point */
-	*result = T0 + xp*gx + yp*gy; 
-      } 
+	ox2 = Dictionary_GetDouble_WithDefault( shapeSpecDict, "originx2", 0.0 );
+	oy2 = Dictionary_GetDouble_WithDefault( shapeSpecDict, "originy2", 0.0 );
+	gy2 = Dictionary_GetDouble_WithDefault( shapeSpecDict, "gradienty2", 0.0 );
+	T2 = Dictionary_GetDouble_WithDefault( shapeSpecDict, "valueAtOrigin2", 0.0 );
+	H2 = Dictionary_GetDouble_WithDefault( shapeSpecDict, "height2", 0.0 );
 
-	/* 3D case */
-      if( theMesh->topo->nDims == 3 ) {
- 	z   = coord[K_AXIS];
+	x = coord[I_AXIS];
+	y = coord[J_AXIS];
 
-	/* unit axis of rotation */
-	ux = p1x-p2x;
-	uy = p1y-p2y;
-	uz = p1z-p2z;
-	nu = sqrt(ux*ux + uy*uy + uz*uz);
-	ux /= nu;
-	uy /= nu;
-	uz /= nu;
+	T1u = T1;
+	T1l = T1 + H1 * gy1;
+	T2u = T2;
+	T2l = T2 + H2 * gy2;
 
-	/* Rotational magic */
-	d = sqrt( uy*uy + uz*uz );
-	xp = cos(az)*( -uy*(y-p1y) - uz*(z-p1z) ) - sin(az)*( uz/d*(y-p1y) - uy/ux*(z-p1z) );
-	yp = sin(az)*( -uy*(y-p1y) - uz*(z-p1z) ) + cos(az)*( uz/d*(y-p1y) - uy/ux*(z-p1z) );
-	zp = d*uy/ux*(y-p1y) + d*uz/ux*(z-p1z);
+	o1ux = ox1;
+	o1uy = oy1;
+	o1ly = oy1 + H1;
+            
+	o2ux = ox2;
+	o2uy = oy2;
+	o2ly = oy2 + H2;
 
-	/* compute gradients and values at origin*/
-	if( dx != 0 ) 
-	  alphax = xp/dx;
-	else
-	  alphax = 0;
+	W = o2ux - o1ux;
+	alpha = (x - o1ux) / W;
+            
+	Tmu = (1-alpha)*T1u + alpha*T2u;
+	Tml = (1-alpha)*T1l + alpha*T2l;            
+	omuy = (1-alpha)*o1uy + alpha*o2uy;
+	omly = (1-alpha)*o1ly + alpha*o2ly;
+            
+	beta = (y - omuy) / (omly - omuy);
 
-	if( dy != 0 ) 
-	  alphay = yp/dy;
-	else
-	  alphay = 0;
-
-	if( dx != 0 ) 
-	  alphax = xp/dx;
-	else
-	  alphax = 0;
-
-	gx = gx*(1.0-alphax) + gx2*alphax;
-	gy = gy*(1.0-alphay) + gy2*alphay;
-	gz = gz*(1.0-alphaz) + gz2*alphaz;
-	T0 = T0*(1.0-alphax) + T02*alphax;
-
-	/* compute value at the point */
-	*result = T0 + xp*gx + yp*gy + zp*gz; 
+	*result = (1-beta)*Tmu + beta*Tml;
+	break;
       }
     }
   }
@@ -299,11 +308,11 @@ void _Underworld_ShapeFemIC_Construct( void* component, Stg_ComponentFactory* cf
 	context = (UnderworldContext*)Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
 	
 	condFunc = ConditionFunction_New( Underworld_SimpleShapeIC, "Inside1_Outside0_ShapeIC" );
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	condFunc = ConditionFunction_New( Underworld_GaussianIC, "GaussianIC" );
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	condFunc = ConditionFunction_New( Underworld_LinearShapeIC, "linearShapeIC" );
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 }
 
 void* _Underworld_ShapeFemIC_DefaultNew( Name name ) {
