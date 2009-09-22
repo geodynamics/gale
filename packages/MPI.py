@@ -18,8 +18,13 @@ class MPI(Package):
             yield self.env.Clone()
             return
 
-        # If flagged to do so, try standard MPI compilers.
-        if self.try_compilers:
+        # If flagged to do so, try standard MPI compilers, unless
+        # we were given other options to use.
+        if self.try_compilers and \
+                self.get_option('mpi_dir') is None and \
+                self.get_option('mpi_inc_dir') is None and \
+                self.get_option('mpi_lib_dir') is None and \
+                self.get_option('mpi_libs') is None:
             env = self.env.Clone()
             env['CC'] = 'mpicc'
             yield env
