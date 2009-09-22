@@ -346,8 +346,8 @@ void _MaterialPointsSwarm_Initialise( void* swarm, void* data ) {
 
 	/** if loading from checkpoint, particle materials etc have already been loaded in Swarm_Build() - */ 
 	/** possibly need to check for empty cells (and populate) if performing a interpolation restart */
-   if ( context && (True == context->loadFromCheckPoint) && (True == context->interpolateRestart) ){
-      if ( True == self->isSwarmTypeToCheckPointAndReload ) {	   
+   if ( context && (True == context->loadFromCheckPoint)  ){
+      if ( True == self->isSwarmTypeToCheckPointAndReload && (True == context->interpolateRestart) ) {	   
          Particle_InCellIndex cParticle_I         = 0;
          Particle_InCellIndex particle_I          = 0;
          GlobalParticle*      particle            = NULL;
