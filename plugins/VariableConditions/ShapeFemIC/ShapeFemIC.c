@@ -308,11 +308,11 @@ void _Underworld_ShapeFemIC_Construct( void* component, Stg_ComponentFactory* cf
 	context = (UnderworldContext*)Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
 	
 	condFunc = ConditionFunction_New( Underworld_SimpleShapeIC, "Inside1_Outside0_ShapeIC" );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 	condFunc = ConditionFunction_New( Underworld_GaussianIC, "GaussianIC" );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 	condFunc = ConditionFunction_New( Underworld_LinearShapeIC, "linearShapeIC" );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 }
 
 void* _Underworld_ShapeFemIC_DefaultNew( Name name ) {
