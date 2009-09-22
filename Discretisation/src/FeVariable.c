@@ -657,7 +657,10 @@ void _FeVariable_Initialise( void* variable, void* data ) {
             FeVariable_ReadFromFile( self, filename );
          else {
             char * meshFilename = NULL;
-            Stg_asprintf( &meshFilename, "%sMesh.%.5u.h5", inputPathString, context->restartTimestep );
+            if (!strcmp(self->feMesh->generator->type, CartesianGenerator_Type))
+               Stg_asprintf( &meshFilename, "%sMesh.%s.%.5u.h5", inputPathString, self->feMesh->name, context->restartTimestep );
+            else
+               Stg_asprintf( &meshFilename, "%sMesh.%s.%.5u.h5", inputPathString, ((C0Generator*)(self->feMesh->generator))->elMesh->name, context->restartTimestep );
             FeVariable_InterpolateFromFile( self, context, filename, meshFilename );
             Memory_Free( meshFilename );
          }
