@@ -91,8 +91,9 @@ class PETSc(Package):
                 sysconfig.parse_makefile(petscconf, vars)
                 flags = sysconfig.expand_makefile_vars(vars['PACKAGES_LIBS'], vars)
             
-                # Static libs? i.e. no shared libs.
-                if lib_types[1] is None:
+                # Static libs? i.e. no shared libs. Must also do this if we are
+                # linking static libraries.
+                if lib_types[1] is None or self.static:
                     # Add a bunch of extra jazz.
                     if 'X11_INCLUDE' in vars:
                         flags += ' ' + sysconfig.expand_makefile_vars(str(vars['X11_INCLUDE']), vars)

@@ -29,6 +29,8 @@ class Package:
     ('/usr/local', ['/usr/local/include'], ['/usr/lib', '/usr/lib64'])
     """
 
+    static = False
+
     def __init__(self, name, env, **kw):
         self.name = name
         self.env = env
