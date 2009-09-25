@@ -415,7 +415,8 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
                      errorStream,"\n\n Interpolation restart not supported for ASCII checkpoint files \n\n");
 
          meshReadFileNamePart = Context_GetCheckPointReadPrefixString( context );
-	      Stg_asprintf( &meshReadFileName, "%sMesh.%.5u.dat", meshReadFileNamePart, restartTimestep );
+
+         Stg_asprintf( &meshReadFileName, "%sMesh.%s.%.5u.dat", meshReadFileNamePart, self->meshes[0]->name, restartTimestep );
 	        
 			FILE* meshFile = fopen( meshReadFileName, "r" );	
 			/*Journal_Firewall( 
@@ -433,16 +434,16 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
 					meshReadFileName );
 			}
 			else {
-				
+				self->readFromFile = True;
 				/* Read min and max coords from file */
 		      if(self->nDims==2)
-                  fscanf( meshFile, "Min: %.15g %.15g 0\n", &crdMin[0], &crdMin[1] );
+                  fscanf( meshFile, "Min: %lg %lg 0\n", &crdMin[0], &crdMin[1] );
             else
-                  fscanf( meshFile, "Min: %.15g %.15g %.15g\n", &crdMin[0], &crdMin[1], &crdMin[2] );
+                  fscanf( meshFile, "Min: %lg %lg %lg\n", &crdMin[0], &crdMin[1], &crdMin[2] );
 		      if(self->nDims==2)
-                  fscanf( meshFile, "Max: %.15g %.15g 0\n", &crdMax[0], &crdMax[1] );
+                  fscanf( meshFile, "Max: %lg %lg 0\n", &crdMax[0], &crdMax[1] );
             else
-                  fscanf( meshFile, "Max: %.15g %.15g %.15g\n", &crdMax[0], &crdMax[1], &crdMax[2] );
+                  fscanf( meshFile, "Max: %lg %lg %lg\n", &crdMax[0], &crdMax[1], &crdMax[2] );
             
 				fclose( meshFile );
 			}
@@ -2131,11 +2132,11 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
 
       meshReadFileNamePart = Context_GetCheckPointReadPrefixString( context );
 #ifdef READ_HDF5
-      Stg_asprintf( &meshReadFileName, "%sMesh.%.5u.h5", meshReadFileNamePart, context->restartTimestep );
+      Stg_asprintf( &meshReadFileName, "%sMesh.%s.%.5u.h5", meshReadFileNamePart, self->meshes[0]->name, context->restartTimestep );
       Journal_Printf( stream, "... loading from file %s.\n", meshReadFileName );
       CartesianGenerator_ReadFromHDF5( self, mesh, meshReadFileName );
 #else
-      Stg_asprintf( &meshReadFileName, "%sMesh.%.5u.dat", meshReadFileNamePart, context->restartTimestep );
+      Stg_asprintf( &meshReadFileName, "%sMesh.%s.%.5u.dat", meshReadFileNamePart, self->meshes[0]->name, context->restartTimestep );
       Journal_Printf( stream, "... loading from file %s.\n", meshReadFileName );
       CartesianGenerator_ReadFromASCII( self, mesh, meshReadFileName);      
 #endif
