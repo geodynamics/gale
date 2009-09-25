@@ -43,7 +43,7 @@
 <list name="Dependencies">
 	<struct>
 		<param name="Essential">True</param>
-		<param name="Name">ConstantElementMesh</param>
+		<param name="Name">ConstantMesh</param>
 		<param name="Type">Mesh</param>
 		<param name="Description">Constant element mesh for storing the element-wise error field.</param>
 	</struct>

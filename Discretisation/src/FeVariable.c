@@ -667,6 +667,7 @@ void _FeVariable_Initialise( void* variable, void* data ) {
 			
 #else
 			Stg_asprintf( &filename, "%s%s.%.5u.dat", inputPathString, self->name, context->restartTimestep );
+			FeVariable_ReadFromFile( self, filename );
 #endif
 
 			Memory_Free( filename );

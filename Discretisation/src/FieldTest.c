@@ -252,12 +252,12 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 
 	/* set up the entry point */
 	generateErrorFields = Hook_New( "Generate error fields hook", FieldTest_GenerateErrFields, self->name );
-	_EntryPoint_AppendHook( Context_GetEntryPoint( self->context, AbstractContext_EP_Solve ), generateErrorFields );
+	_EntryPoint_AppendHook( Context_GetEntryPoint( self->context, AbstractContext_EP_FrequentOutput ), generateErrorFields );
 
 	/* entry point for the fisix test func */
 	if( strlen(self->expectedFileName) > 1 ) {
 		physicsTestHook = Hook_New( "Physics test hook", FieldTest_EvaluatePhysicsTest, self->name );
-		_EntryPoint_AppendHook( Context_GetEntryPoint( self->context, AbstractContext_EP_Solve ), physicsTestHook );
+		_EntryPoint_AppendHook( Context_GetEntryPoint( self->context, AbstractContext_EP_FrequentOutput ), physicsTestHook );
 	}
 
 	self->LCRegister = cf->LCRegister;
@@ -320,10 +320,14 @@ void _FieldTest_Initialise( void* fieldTest, void* data ) {
 		char *referenceSolnFileName;
 		for( field_I = 0; field_I < self->fieldCount; field_I++ ) {
 			/* create the name of the reference file, the apprendix is handled by FieldTest_LoadReferenceSolutionFromFile */
-			referenceSolnFileName = Memory_Alloc_Array_Unnamed( char, strlen((char*)self->referenceSolnPath) + 1 + strlen((char*)self->numericFieldList[field_I]->name) + 1 + 5 + strlen(".h5\0") );
-			//sprintf( referenceSolnFileName, "/%s.%.5d", self->numericFieldList[field_I]->name, self->testTimestep );
+			referenceSolnFileName = Memory_Alloc_Array_Unnamed( char, strlen((char*)self->referenceSolnPath) + 1 + strlen((char*)self->numericFieldList[field_I]->name) + 1 + 5 + strlen(".h5x\0") );
+#ifdef READ_HDF5
 			sprintf( referenceSolnFileName, "%s/%s.%.5d.h5", self->referenceSolnPath, self->numericFieldList[field_I]->name, self->testTimestep );
+#else
+			sprintf( referenceSolnFileName, "%s/%s.%.5d.dat", self->referenceSolnPath, self->numericFieldList[field_I]->name, self->testTimestep );
+#endif
 			FeVariable_ReadFromFile( self->referenceFieldList[field_I], referenceSolnFileName );
+
 	/*		FieldTest_LoadReferenceSolutionFromFile( self->referenceFieldList[field_I],
 																								referenceSolnFileName,
 																								self->referenceSolnPath, self->context ); */
