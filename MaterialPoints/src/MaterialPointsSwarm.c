@@ -335,9 +335,11 @@ void _MaterialPointsSwarm_Build( void* swarm, void* data ) {
 
 }
 void _MaterialPointsSwarm_Initialise( void* swarm, void* data ) {
-	MaterialPointsSwarm*	self = (MaterialPointsSwarm*) swarm;
-	AbstractContext* context = (AbstractContext*)data;
-	Index            var_I=0;
+	MaterialPointsSwarm*    self = (MaterialPointsSwarm*) swarm;
+	AbstractContext*        context = (AbstractContext*)data;
+	Index                   var_I=0;
+	Particle_Index          lParticle_I=0;
+	MaterialPoint*          matPoint=NULL;
 	
 	_Swarm_Initialise( self, data );
 	for( var_I = 0 ; var_I < self->nSwarmVars ; var_I++ ) {
@@ -434,16 +436,15 @@ void _MaterialPointsSwarm_Initialise( void* swarm, void* data ) {
             }
          }
          /** populate empty cells */ 
-         for(ii = 0 ; ii < count ; ii++)
-            Swarm_AddParticleToCell( self, cellID[ii], particleCPUID[ii] );
+         for(ii = 0 ; ii < count ; ii++) {
+		Swarm_AddParticleToCell( self, cellID[ii], particleCPUID[ii] );
+	}
          Memory_Free( cellID );
          Memory_Free( particleCPUID );
       }
 	/* TODO: print info / debug message */
 	}
 	else {
-		Particle_Index          lParticle_I=0;
-		MaterialPoint*		matPoint=NULL;
 
 		/* Beforehand, set each particle to have UNDEFINED_MATERIAL */
 		for ( lParticle_I = 0; lParticle_I < self->particleLocalCount; lParticle_I++ ) {
@@ -463,7 +464,24 @@ void _MaterialPointsSwarm_Initialise( void* swarm, void* data ) {
 					self->swarmVariable_Register->variable_Register );
 		}
 	}
+	/* ensure all particles have been allocated to a material during Layout process
+	 * (if not, you may wish to include a backgroundLayout in the application's XML */
+	for ( lParticle_I = 0; lParticle_I < self->particleLocalCount; lParticle_I++ ) {
+		matPoint = (MaterialPoint*)Swarm_ParticleAt( self, lParticle_I );
+		Journal_Firewall(
+			matPoint->materialIndex != UNDEFINED_MATERIAL,
+			Journal_MyStream( Error_Type, self ),
+			"In func %s: MaterialPoint '%d' not allocated to a Material after Layout.\n"
+			"Coord = {%g, %g, %g}\n",
+			__func__,
+			lParticle_I,
+			matPoint->coord[ I_AXIS ],
+			matPoint->coord[ J_AXIS ],
+			matPoint->coord[ K_AXIS ] );
+	}
 }
+
+
 void _MaterialPointsSwarm_Execute( void* swarm, void* data ) {
 	MaterialPointsSwarm*	self = (MaterialPointsSwarm*)swarm;
 	
@@ -493,7 +511,7 @@ void _MaterialPointsSwarm_UpdateHook( void* timeIntegrator, void* swarm ) {
 			materialPoint = (MaterialPoint*)Swarm_ParticleAt( self, point_I );
 			cell = materialPoint->owningCell;
 			Journal_Firewall(
-					 cell < FeMesh_GetElementDomainSize( mesh ), 
+				cell < FeMesh_GetElementDomainSize( mesh ), 
 				Journal_MyStream( Error_Type, self ),
 				"In func %s: MaterialPoint '%d' outside element. Coord = {%g, %g, %g}\n",
 				__func__,
