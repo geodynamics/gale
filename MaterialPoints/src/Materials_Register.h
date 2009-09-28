@@ -117,6 +117,13 @@
 	 *  the same name as the variable. */
 	void Variable_Register_SetAllVariablesFromDictionary( void* _variable_Register, Index index, Dictionary* dictionary );
 
+	/** Private function useful for printing status updates during property assigning process. */
+	void _Materials_Register_PrintParticleAssignUpdate(  
+		void*                   materialRegister,
+		MaterialPointsSwarm*    swarm,
+		Particle_Index          lParticle_I,
+		Stream*                 stream,
+		Bool*                   firstStatusPrint );
 
 #endif
 

@@ -161,15 +161,10 @@ void Materials_Register_AssignParticleProperties(
 	Particle_Index      particleLocalCount = swarm->particleLocalCount;
 	Particle_Index      particleGlobalCount = 0;
 	Stream*             stream = Journal_Register( Info_Type, self->type );
+	Processor_Index     formerStreamPrintingRank;
 	double              setupStartTime = 0;
 	double              setupTime = 0, tmin, tmax;
-	Processor_Index     formerStreamPrintingRank;
-	unsigned int        numberOfCompletionPrintIncrements=10;
-	double              completionRatioIncrement= 1 / (double)numberOfCompletionPrintIncrements;
-	double              nextCompletionRatioToPrint=0;
-	Particle_Index      nextCompletedParticleCountToPrint=0;
-	Particle_Index      nextPlusOneCompletedParticleCountToPrint=0;
-	char                *title;
+	Bool                firstStatusPrint = True;
 
         formerStreamPrintingRank = Stream_GetPrintingRank( stream );
         Stream_SetPrintingRank( stream, 0 );
@@ -182,48 +177,15 @@ void Materials_Register_AssignParticleProperties(
 		particleGlobalCount );
 	Stream_Indent( stream );
 
-	nextCompletionRatioToPrint = completionRatioIncrement;
-	nextCompletedParticleCountToPrint = ceil(particleLocalCount * nextCompletionRatioToPrint - 0.001 );
-
 	for ( lParticle_I = 0 ; lParticle_I < particleLocalCount ; lParticle_I++ ) {
 		material = MaterialPointsSwarm_GetMaterialAt( swarm, lParticle_I );
 
-		Journal_Firewall( 
-				material != NULL, 
-				Journal_Register( Error_Type, self->type ),
-				"In func %s: Cannot find material for particle '%u'\n", 
-				__func__, 
-				lParticle_I );
-	
-		/* Loop through material's dictionary assigning values to the variables of this particle */
-		Variable_Register_SetAllVariablesFromDictionary( variableRegister, lParticle_I, material->dictionary );
-
-		
-		if ( /*(swarm->myRank == 0) && */ ((lParticle_I+1) >= nextCompletedParticleCountToPrint ) ) {
-/* 			 TODO: parallelise : non-master CPUs send a non-blocking update to the master to report */
-/* 			 status. Master does blocking receive on all updates before printing */
-
-			/* Special case for really small swarms, or really small increments - may cross more than one
-				at once */
-			nextPlusOneCompletedParticleCountToPrint = ceil(( particleLocalCount
-				* (nextCompletionRatioToPrint + completionRatioIncrement )) - 0.001 );
-
-			while ( (lParticle_I+1) >= nextPlusOneCompletedParticleCountToPrint )
-			{
-				nextCompletionRatioToPrint += completionRatioIncrement;
-				nextPlusOneCompletedParticleCountToPrint = ceil(( particleLocalCount
-					* (nextCompletionRatioToPrint + completionRatioIncrement )) - 0.001 );
-				if ( nextCompletionRatioToPrint >= 1.0 ) {
-					nextCompletionRatioToPrint = 1.0;
-					break;
-				}
-			}
-			Journal_Printf( stream, "done %.0f%% (%u particles)...\n", 
-				(nextCompletionRatioToPrint * 100),
-				lParticle_I+1 );
-			nextCompletionRatioToPrint += completionRatioIncrement;
-			nextCompletedParticleCountToPrint = ceil(particleLocalCount * nextCompletionRatioToPrint - 0.001);
+		if ( material ) {
+			/* Loop through material's dictionary assigning values to the variables of this particle */
+			Variable_Register_SetAllVariablesFromDictionary( variableRegister, lParticle_I, material->dictionary );
 		}
+
+		_Materials_Register_PrintParticleAssignUpdate( self, swarm, lParticle_I, stream, &firstStatusPrint );
 	}
 
 	Stream_UnIndent( stream );
@@ -241,6 +203,53 @@ void Materials_Register_AssignParticleProperties(
 }
 
 
+void _Materials_Register_PrintParticleAssignUpdate(  
+		void*                   materialRegister,
+		MaterialPointsSwarm*    swarm,
+		Particle_Index          lParticle_I,
+		Stream*                 stream,
+		Bool*                   firstStatusPrint )
+{
+	unsigned int               numberOfCompletionPrintIncrements=10;
+	double                     completionRatioIncrement= 1 / (double)numberOfCompletionPrintIncrements;
+	static double              nextCompletionRatioToPrint=0;
+	static Particle_Index      nextCompletedParticleCountToPrint=0;
+	static Particle_Index      nextPlusOneCompletedParticleCountToPrint=0;
+
+	if (firstStatusPrint) {
+		nextCompletionRatioToPrint = completionRatioIncrement;
+		nextCompletedParticleCountToPrint = ceil(swarm->particleLocalCount * nextCompletionRatioToPrint - 0.001 );
+		nextPlusOneCompletedParticleCountToPrint=0;
+	}
+
+	if ( /*(swarm->myRank == 0) && */ ((lParticle_I+1) >= nextCompletedParticleCountToPrint ) ) {
+		/* TODO: parallelise : non-master CPUs send a non-blocking update to the master to report */
+		/* status. Master does blocking receive on all updates before printing */
+
+		/* Special case for really small swarms, or really small increments - may cross more than one
+			at once */
+		nextPlusOneCompletedParticleCountToPrint = ceil(( swarm->particleLocalCount
+			* (nextCompletionRatioToPrint + completionRatioIncrement )) - 0.001 );
+
+		while ( (lParticle_I+1) >= nextPlusOneCompletedParticleCountToPrint )
+		{
+			nextCompletionRatioToPrint += completionRatioIncrement;
+			nextPlusOneCompletedParticleCountToPrint = ceil(( swarm->particleLocalCount
+				* (nextCompletionRatioToPrint + completionRatioIncrement )) - 0.001 );
+			if ( nextCompletionRatioToPrint >= 1.0 ) {
+				nextCompletionRatioToPrint = 1.0;
+				break;
+			}
+		}
+		Journal_Printf( stream, "done %.0f%% (%u particles)...\n", 
+			(nextCompletionRatioToPrint * 100),
+			lParticle_I+1 );
+		nextCompletionRatioToPrint += completionRatioIncrement;
+		nextCompletedParticleCountToPrint = ceil(swarm->particleLocalCount * nextCompletionRatioToPrint - 0.001);
+	}
+}
+
+
 void Variable_SetValueFromDictionary( void* _variable, Index index, Dictionary* dictionary ) {
 	Variable*          variable = (Variable*)_variable;
 
@@ -255,7 +264,7 @@ void Variable_SetValueFromDictionary( void* _variable, Index index, Dictionary* 
 			Variable_SetValueShort( variable, index, Dictionary_GetUnsignedInt( dictionary, variable->name ));
 			break;
 		case Variable_DataType_Int:
-			Variable_SetValueShort( variable, index, Dictionary_GetInt( dictionary, variable->name ));
+			Variable_SetValueInt( variable, index, Dictionary_GetInt( dictionary, variable->name ));
 			break;
 		case Variable_DataType_Float:
 			Variable_SetValueFloat(  variable, index, Dictionary_GetDouble( dictionary, variable->name ));
