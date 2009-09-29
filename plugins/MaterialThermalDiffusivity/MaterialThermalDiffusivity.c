@@ -172,14 +172,15 @@ typedef struct {
 } Underworld_MaterialThermalDiffusivity;
 
 void _Underworld_MaterialThermalDiffusivity_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
-	UnderworldContext* context;
+	UnderworldContext								context;
+	Underworld_MaterialThermalDiffusivity*	self = (Underworld_MaterialThermalDiffusivity*)component;
+	Dictionary*										pluginDict = Codelet_GetPluginDictionary( component, cf->rootDict );
 
-	context = (UnderworldContext*)Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
+	self->context = Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString( pluginDict, "Context" ), UnderworldContext, True, data ); 
 
 	/* Add functions to entry points */
-	ContextEP_Append( context, AbstractContext_EP_Build,      Underworld_MaterialThermalDiffusivity_Setup );
-	ContextEP_Append( context, AbstractContext_EP_Initialise, Underworld_MaterialThermalDiffusivity_Assign );
-
+	ContextEP_Append( self->context, AbstractContext_EP_Build,      Underworld_MaterialThermalDiffusivity_Setup );
+	ContextEP_Append( self->context, AbstractContext_EP_Initialise, Underworld_MaterialThermalDiffusivity_Assign );
 }
 
 void* _Underworld_MaterialThermalDiffusivity_DefaultNew( Name name ) {
@@ -192,12 +193,8 @@ void* _Underworld_MaterialThermalDiffusivity_DefaultNew( Name name ) {
 			_Codelet_Execute,
 			_Codelet_Destroy,
 			name );
-	}
+}
 
 Index Underworld_MaterialThermalDiffusivity_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( 
-			pluginsManager, 
-			Underworld_MaterialThermalDiffusivity_Type, 
-			"0",
-			_Underworld_MaterialThermalDiffusivity_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, Underworld_MaterialThermalDiffusivity_Type, "0", _Underworld_MaterialThermalDiffusivity_DefaultNew );
 }

@@ -55,13 +55,13 @@
 const Type Underworld_Nusselt_Type = "Underworld_Nusselt";
 
 void _Underworld_Nusselt_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
-	Underworld_Nusselt*	self 		= (Underworld_Nusselt*)component;
-	Dictionary*		pluginDict	= Codelet_GetPluginDictionary( component, cf->rootDict );
-	UnderworldContext*	context;
-	FieldVariable_Register* fV_Register;
-	FieldVariable*          temperatureGradientsField;
-	FieldVariable*          velocityField;
-	FieldVariable*          temperatureField;
+	Underworld_Nusselt*		self = (Underworld_Nusselt*)component;
+	Dictionary*					pluginDict = Codelet_GetPluginDictionary( component, cf->rootDict );
+	UnderworldContext*		context;
+	FieldVariable_Register*	fV_Register;
+	FieldVariable*				temperatureGradientsField;
+	FieldVariable*				velocityField;
+	FieldVariable*				temperatureField;
 
 	self->context = Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString( pluginDict, "Context" ), UnderworldContext, True, data );
 	self->gaussSwarm = Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString( pluginDict, "GaussSwarm" ), Swarm, True, data );
