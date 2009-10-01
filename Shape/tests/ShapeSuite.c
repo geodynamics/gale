@@ -13,14 +13,7 @@ typedef struct {
 void ShapeSuite_Setup( ShapeSuiteData* data ) { }
 
 void ShapeSuite_Teardown( ShapeSuiteData* data ) {
-	//Stg_Component_Destroy( data->context, 0 /* dummy */, False );
-	//Stg_Class_Delete( data->context );
-	/* remove generated dat file */
-	//if( remove("output/test.dat") != 0 ) { pcu_assert(0); }
-	//if( remove("output/input.xml") != 0 ) { pcu_assert(0); }
-	//remove("output/input.xml");
 }
-
 
 void ShapeSuite_GeneratePoints( ShapeSuiteData* data, Dimension_Index dim, char* inputFileName ) {
 /** Test Definition: */
