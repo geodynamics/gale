@@ -165,7 +165,6 @@ void SingleAttractorSuite_TestSingleAttractor( SingleAttractorSuiteData* data ) 
 	LiveComponentRegister_BuildAll( cf->LCRegister, context );
 	LiveComponentRegister_InitialiseAll( cf->LCRegister, context );
 
-	/* for each particle, set a random colour */
 	for ( lParticle_I=0; lParticle_I < swarm->particleLocalCount; lParticle_I++ ) {
 		currParticle = (Particle*)Swarm_ParticleAt( swarm, lParticle_I );
 		for ( dim_I=0; dim_I < 3; dim_I++ ) {
@@ -174,8 +173,8 @@ void SingleAttractorSuite_TestSingleAttractor( SingleAttractorSuiteData* data ) 
 		currParticle->randomColour = ( (double)  rand() ) / RAND_MAX;
 	}
 	
-	Stg_Component_Build( context, 0 /* dummy */, False );
-	Stg_Component_Initialise( context, 0 /* dummy */, False );
+	Stg_Component_Build( context, 0, False );
+	Stg_Component_Initialise( context, 0, False );
 	
 	AbstractContext_Dump( context );
 	ContextEP_ReplaceAll( context, AbstractContext_EP_Dt, SingleAttractorSuite_Dt );
@@ -183,8 +182,8 @@ void SingleAttractorSuite_TestSingleAttractor( SingleAttractorSuiteData* data ) 
 	ContextEP_Append( context, AbstractContext_EP_Save, SingleAttractorSuite_SaveSwarms );
 	ContextEP_ReplaceAll( context, AbstractContext_EP_Solve, SingleAttractorSuite_SingleAttractor );
 
-	Stg_Component_Execute( context, 0 /* dummy */, False );
-	Stg_Component_Destroy( context, 0 /* dummy */, False );
+	Stg_Component_Execute( context, 0, False );
+	Stg_Component_Destroy( context, 0, False );
 
 	pcu_filename_expected( "testSwarmParticleAdvectionSingleAttractor.expected", expected_file );
 	pcu_check_fileEq( "testSingleAttractor.dat", expected_file );

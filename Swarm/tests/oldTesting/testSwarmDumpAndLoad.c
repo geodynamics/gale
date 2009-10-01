@@ -250,12 +250,12 @@ int main( int argc, char* argv[] ) {
 		NULL,
 		0,
 		0,
-		data->comm,
+		CommWorld,
 		dictionary );
 
 	swarmList[0] = swarm;
 	swarmDumper = SwarmDump_New( "swarmDumper", context, swarmList, 1, True );
-	SwarmDump_Execute( swarmDumper, (DomainContext*)context );
+	SwarmDump_Execute( swarmDumper, context );
 
 	sprintf( filename, "%s/%s.%05d.dat", context->outputPath, swarm->name, context->timeStep ); 
 	fileParticleLayout = FileParticleLayout_New( "fileParticleLayout", filename );

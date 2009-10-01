@@ -130,9 +130,7 @@ void ShadowSyncSuite_TestShadowSync( ShadowSyncSuiteData* data ) {
 	assert( componentDict );
 
 	cf = context->CF = Stg_ComponentFactory_New( dictionary, componentDict, context->register_Register );
-
 	LiveComponentRegister_Add( cf->LCRegister, (Stg_Component*) context );
-	ModulesManager_Load( context->plugins, dictionary );
 
 	extensionMgr_Register = ExtensionManager_Register_New();
 	swarmVariable_Register = SwarmVariable_Register_New( NULL );
@@ -140,8 +138,7 @@ void ShadowSyncSuite_TestShadowSync( ShadowSyncSuiteData* data ) {
 	Stg_ObjectList_ClassAppend( cf->registerRegister, (void*)swarmVariable_Register, "SwarmVariable_Register" );
 
 	Stg_ComponentFactory_CreateComponents( cf );
-	Stg_ComponentFactory_ConstructComponents( cf, 0 /* dummy */ );
-	ModulesManager_ConstructModules( context->plugins, context->CF, 0 /* dummy */ );
+	Stg_ComponentFactory_ConstructComponents( cf, 0 );
 
 	KeyCall( context, context->constructExtensionsK, EntryPoint_VoidPtr_CallCast* )( KeyHandle(context,context->constructExtensionsK), context );
 

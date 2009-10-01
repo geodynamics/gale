@@ -37,8 +37,8 @@
 	<param name="maxX">1.0</param> 
 	<param name="maxY">1.0</param>
 	<param name="maxZ">1.0</param>
-	<param name="elementResI">12</param>
-	<param name="elementResJ">12</param>
+	<param name="elementResI">4</param>
+	<param name="elementResJ">4</param>
 	<param name="elementResK">1</param>
 
 	<param name="movementSpeedDivisor">3</param>

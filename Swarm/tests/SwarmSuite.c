@@ -166,12 +166,7 @@ void SwarmSuite_TestParticleSearch( SwarmSuiteData* data ) {
 	int	procToWatch;
 	Stream*	stream = Journal_Register (Info_Type, "TestParticleSearch");
 	
-	if( data->nProcs >= 2 ) {
-		procToWatch = 1;
-	}
-	else {
-		procToWatch = 0;
-	}
+	procToWatch = data->nProcs >=2 ? 1 : 0;
 	
 	if( data->rank == procToWatch ) {
 		if( data->nProcs == 1 ) {
@@ -193,12 +188,7 @@ void SwarmSuite_TestParticleCoords( SwarmSuiteData* data ) {
 	int	procToWatch;
 	Stream*	stream = Journal_Register (Info_Type, "TestParticleCorrds");
 	
-	if( data->nProcs >= 2 ) {
-		procToWatch = 1;
-	}
-	else {
-		procToWatch = 0;
-	}
+	procToWatch = data->nProcs >=2 ? 1 : 0;	
 	
 	if( data->rank == procToWatch ) {
 		Stream_RedirectFile( stream, "particleCoords.dat" );

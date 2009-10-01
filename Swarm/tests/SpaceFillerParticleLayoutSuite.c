@@ -87,8 +87,6 @@ Mesh* SpaceFillerParticleLayoutSuite_BuildMesh( unsigned nDims, unsigned* size, 
 }
 
 void SpaceFillerParticleLayoutSuite_Setup( SpaceFillerParticleLayoutSuiteData* data ) {
-	char	input_file[PCU_PATH_MAX];
-	
 	/* MPI Initializations */
 	data->comm = MPI_COMM_WORLD;  
 	MPI_Comm_rank( data->comm, &data->rank );
@@ -112,16 +110,11 @@ void SpaceFillerParticleLayoutSuite_Teardown( SpaceFillerParticleLayoutSuiteData
 
 void SpaceFillerParticleLayoutSuite_TestSpaceFillerParticle( SpaceFillerParticleLayoutSuiteData* data ) {
 	Dimension_Index	dim;
-	int					procToWatch;
 	Stream*				stream;
+	int					procToWatch;
 	char					expected_file[PCU_PATH_MAX];
 
-	if( data->nProcs >= 2 ) {
-		procToWatch = 1;
-	}
-	else {
-		procToWatch = 0;
-	}
+	procToWatch = data->nProcs >=2 ? 1 : 0;
 	
 	/* Init mesh */
 	data->extensionMgr_Register = ExtensionManager_Register_New();
@@ -150,6 +143,7 @@ void SpaceFillerParticleLayoutSuite_TestSpaceFillerParticle( SpaceFillerParticle
 		/* Print out the particles on all cells */
 		Stream_RedirectFile( stream, "spaceFillerParticle.dat" );
 		Swarm_PrintParticleCoords_ByCell( data->swarm, stream );
+
 		pcu_filename_expected( "testSpaceFillerParticleLayoutOutput.expected", expected_file );
 		pcu_check_fileEq( "spaceFillerParticle.dat", expected_file );
 	}

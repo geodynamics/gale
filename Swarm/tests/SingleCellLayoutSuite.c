@@ -61,15 +61,65 @@ void SingleCellLayoutSuite_Setup( SingleCellLayoutSuiteData* data ) {
 	MPI_Comm_size( data->comm, &data->nProcs );
 
 	data->dimExists[0] = True; data->dimExists[1] = True; data->dimExists[2] = True;
-
 	/* Configure the single-cell-layout */
 	data->singleCellLayout = SingleCellLayout_New( "singleCellLayout", data->dimExists, NULL, NULL );
 }
 
 void SingleCellLayoutSuite_Teardown( SingleCellLayoutSuiteData* data ) {
-	/* Destroy stuff */
-	Memory_Free( data->cellPoints );
-	Stg_Class_Delete( data->singleCellLayout );
+}
+
+void SingleCellLayoutSuite_Driver( SingleCellLayoutSuiteData* data ) {
+	Cell_Index  cell;
+
+	for( cell = 0; cell < data->singleCellLayout->_cellLocalCount( data->singleCellLayout ); cell++ ) {
+		Cell_PointIndex point;
+		Cell_PointIndex count;
+
+		count = data->singleCellLayout->_pointCount( data->singleCellLayout, cell );
+		data->cellPoints = Memory_Alloc_Array( double**, count, "cellsPoints" );
+		data->singleCellLayout->_initialisePoints( data->singleCellLayout, cell, count, data->cellPoints );
+	}
+}
+
+void SingleCellLayoutSuite_TestMapElement( SingleCellLayoutSuiteData* data ) {
+	int procToWatch;
+
+	procToWatch = data->nProcs >=2 ? 1 : 0;
+
+	if( data->rank == procToWatch ) {
+		SingleCellLayoutSuite_Driver( data );
+		
+		pcu_check_true( CellLayout_MapElementIdToCellId( data->singleCellLayout, 0 ) == 0 );
+      pcu_check_true( CellLayout_MapElementIdToCellId( data->singleCellLayout, 5 ) == 0 );
+      pcu_check_true( CellLayout_MapElementIdToCellId( data->singleCellLayout, 100 ) == 0 );
+      pcu_check_true( CellLayout_CellOf( data->singleCellLayout, data->cellPoints[0] ) == 0 );
+
+		Memory_Free( data->cellPoints );
+		Stg_Class_Delete( data->singleCellLayout );	
+	}
+}
+
+void SingleCellLayoutSuite_TestIsInCell( SingleCellLayoutSuiteData* data ) {
+	int		procToWatch;
+	double*	testCoord;		
+
+	procToWatch = data->nProcs >=2 ? 1 : 0;
+
+	if( data->rank == procToWatch ) {
+		SingleCellLayoutSuite_Driver( data );
+		testCoord = Memory_Alloc_Array_Unnamed( double, 3 );
+		
+		testCoord[0] = testCoord[1] = testCoord[2] = 0;
+		pcu_check_true( CellLayout_IsInCell( data->singleCellLayout, 0, &testCoord ) );
+		testCoord[0] = testCoord[1] = testCoord[2] = 1;
+		pcu_check_true( CellLayout_IsInCell( data->singleCellLayout, 0, &testCoord ) );
+		testCoord[0] = testCoord[1] = testCoord[2] = 2;
+		pcu_check_true( !CellLayout_IsInCell( data->singleCellLayout, 0, &testCoord ) );
+	
+		Memory_Free( testCoord );
+		Memory_Free( data->cellPoints );
+		Stg_Class_Delete( data->singleCellLayout );	
+	}
 }
 
 void SingleCellLayoutSuite_TestSingleCellLayout( SingleCellLayoutSuiteData* data ) {
@@ -77,14 +127,7 @@ void SingleCellLayoutSuite_TestSingleCellLayout( SingleCellLayoutSuiteData* data
 	int			procToWatch;
 	double*		testCoord;		
 	
-	MPI_Barrier( data->comm ); /* Ensures copyright info always come first in output */
-
-	if( data->nProcs >= 2 ) {
-		procToWatch = 1;
-	}
-	else {
-		procToWatch = 0;
-	}
+	procToWatch = data->nProcs >=2 ? 1 : 0;
 	
 	if( data->rank == procToWatch ) {
 		testCoord = Memory_Alloc_Array_Unnamed( double, 3 );
@@ -101,6 +144,7 @@ void SingleCellLayoutSuite_TestSingleCellLayout( SingleCellLayoutSuiteData* data
 		pcu_check_true( CellLayout_MapElementIdToCellId( data->singleCellLayout, 5 ) == 0 );
 		pcu_check_true( CellLayout_MapElementIdToCellId( data->singleCellLayout, 100 ) == 0 );
 		pcu_check_true( CellLayout_CellOf( data->singleCellLayout, data->cellPoints[0] ) == 0 );
+
 		testCoord[0] = testCoord[1] = testCoord[2] = 0;
 		pcu_check_true( CellLayout_IsInCell( data->singleCellLayout, 0, &testCoord ) );
 		testCoord[0] = testCoord[1] = testCoord[2] = 1;
@@ -114,5 +158,6 @@ void SingleCellLayoutSuite_TestSingleCellLayout( SingleCellLayoutSuiteData* data
 void SingleCellLayoutSuite( pcu_suite_t* suite ) {
 	pcu_suite_setData( suite, SingleCellLayoutSuiteData );
 	pcu_suite_setFixtures( suite, SingleCellLayoutSuite_Setup, SingleCellLayoutSuite_Teardown );
-	pcu_suite_addTest( suite, SingleCellLayoutSuite_TestSingleCellLayout );
+	pcu_suite_addTest( suite, SingleCellLayoutSuite_TestMapElement );
+	pcu_suite_addTest( suite, SingleCellLayoutSuite_TestIsInCell );
 }

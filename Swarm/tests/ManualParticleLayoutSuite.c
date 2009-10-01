@@ -62,7 +62,6 @@ typedef struct {
 	Dictionary_Entry_Value*		particlePositionsList;
 	Dictionary_Entry_Value*		particlePositionEntry;
 	ManualParticleLayout*		particleLayout;
-	DomainContext*					context;
 	MPI_Comm							comm;
 	unsigned int					rank;
 	unsigned int					nProcs;

@@ -112,12 +112,7 @@ void GaussLayoutSuite_Test1ParticlePerDim_3D( GaussLayoutSuiteData* data ) {
 	int								procToWatch;
 	char								expected_file[PCU_PATH_MAX];
 
-	if( data->nProcs >= 2 ) {
-		procToWatch = 1;
-	}
-	else {
-		procToWatch = 0;
-	}
+	procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	/* Init mesh */
 	extensionMgr_Register = ExtensionManager_Register_New();
@@ -193,12 +188,7 @@ void GaussLayoutSuite_Test2ParticlesPerDim_3D( GaussLayoutSuiteData* data ) {
 	int								procToWatch;
 	char								expected_file[PCU_PATH_MAX];
 
-	if( data->nProcs >= 2 ) {
-		procToWatch = 1;
-	}
-	else {
-		procToWatch = 0;
-	}
+	procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	/* Init mesh */
 	extensionMgr_Register = ExtensionManager_Register_New();
@@ -275,12 +265,7 @@ void GaussLayoutSuite_Test3ParticlesPerDim_3D( GaussLayoutSuiteData* data ) {
 	int								procToWatch;
 	char								expected_file[PCU_PATH_MAX];
 	
-	if( data->nProcs >= 2 ) {
-		procToWatch = 1;
-	}
-	else {
-		procToWatch = 0;
-	}
+	procToWatch = data->nProcs >=2 ? 1 : 0;
 		
 	/* Init mesh */
 	extensionMgr_Register = ExtensionManager_Register_New();

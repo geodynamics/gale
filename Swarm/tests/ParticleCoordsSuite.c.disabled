@@ -49,9 +49,9 @@ struct _Particle {
 };
 
 typedef struct {
-	MPI_Comm	comm;
-	unsigned int	rank;
-	unsigned int	nProcs;
+	MPI_Comm comm;
+	unsigned rank;
+	unsigned nProcs;
 } ParticleCoordsSuiteData;
 
 void ParticleCoordsSuite_Setup( ParticleCoordsSuiteData* data ) {
@@ -75,12 +75,7 @@ void ParticleCoordsSuite_TestLineParticle( ParticleCoordsSuiteData* data ) {
 	char								input_file[PCU_PATH_MAX];
 	char								expected_file[PCU_PATH_MAX];
 
-	if( data->nProcs >=2 ) {
-		procToWatch = 1;
-	}
-	else {
-		procToWatch = 0;
-	}
+	procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	/* Registers */
 	extensionMgr_Register = ExtensionManager_Register_New();   
@@ -107,6 +102,7 @@ void ParticleCoordsSuite_TestLineParticle( ParticleCoordsSuiteData* data ) {
 		Stg_Class_Delete( swarm );
 		Stg_Class_Delete( extensionMgr_Register );
 		Stg_Class_Delete( variable_Register );
+		Stg_Class_Delete( context );
 	}
 }
 
