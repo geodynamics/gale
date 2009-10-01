@@ -271,3 +271,9 @@ env.Install('lib/StGermain/Underworld/BaseApps', Glob('InputFiles/BaseApps/*.xml
 env.Install('lib/StGermain/Underworld/VariableConditions',
             Glob('InputFiles/VariableConditions/*.xml'))
 env.Install('lib/StGermain/Underworld/Viewports', Glob('InputFiles/Viewports/*.xml'))
+
+#
+# Setup the system tests.
+#
+
+env.PCUSysTest('SysTest/RegressionTests/checkpointTest.pl Arrhenius.xml')
