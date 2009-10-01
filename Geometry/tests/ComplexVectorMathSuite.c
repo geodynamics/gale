@@ -51,9 +51,9 @@ Will use %.5f formatting */
                 Journal_Printf( stream, #self " = %.7f %c %.7f i\n", (self)[ REAL_PART ], (self)[ IMAG_PART ] >= 0.0 ? '+' : '-', fabs( (self)[ IMAG_PART ] ) )
 
 typedef struct {
-	MPI_Comm			comm;
-	unsigned int	rank;
-	unsigned int	nProcs;
+	MPI_Comm comm;
+	unsigned rank;
+	unsigned nProcs;
 } ComplexVectorMathSuiteData;
 
 void ComplexVectorMathSuite_Setup( ComplexVectorMathSuiteData* data ) {
@@ -66,10 +66,10 @@ void ComplexVectorMathSuite_Setup( ComplexVectorMathSuiteData* data ) {
 void ComplexVectorMathSuite_Teardown( ComplexVectorMathSuiteData* data ) {
 }
 
-void ComplexVectorMathSuite_TestComplexVectorMath( ComplexVectorMathSuiteData* data ) {
-	unsigned		procToWatch;
-	Stream*		stream = Journal_Register( Info_Type, "VectorMathStream" );
-	char			expected_file[PCU_PATH_MAX];
+void ComplexVectorMathSuite_TestComplexVectorMathBasic( ComplexVectorMathSuiteData* data ) {
+	unsigned	procToWatch;
+	Stream*	stream = Journal_Register( Info_Type, "VectorMathBasicStream" );
+	char		expected_file[PCU_PATH_MAX];
 
 	procToWatch = data->nProcs >=2 ? 1 : 0;
 
@@ -82,7 +82,7 @@ void ComplexVectorMathSuite_TestComplexVectorMath( ComplexVectorMathSuiteData* d
 		Cmplx		c2 = {2.0, 1.0};
 		Cmplx		c3 = {1.5, 1.0};
 
-		Stream_RedirectFile( stream, "testComplexVectorMath.dat" );
+		Stream_RedirectFile( stream, "testComplexVectorMathBasic.dat" );
 
 		Journal_Printf( stream,  "Basic tests:\n" );
 		Journal_Printf( stream, "d = \n");
@@ -201,8 +201,20 @@ void ComplexVectorMathSuite_TestComplexVectorMath( ComplexVectorMathSuiteData* d
 		Journal_PrintCmplx( stream, a[0]);
 		Journal_PrintCmplx( stream, a[1]);
 		Journal_PrintCmplx( stream, a[2]);
+
+		pcu_filename_expected( "testComplexVectorMathBasic.expected", expected_file );
+		pcu_check_fileEq( "testComplexVectorMathBasic.dat", expected_file );
+		remove( "testComplexVectorMathBasic.dat" );
 	}
-	
+}
+
+void ComplexVectorMathSuite_TestComplexVectorMathOperations( ComplexVectorMathSuiteData* data ) {
+	unsigned	procToWatch;
+	Stream*	stream = Journal_Register( Info_Type, "VectorMathOperationsStream" );
+	char		expected_file[PCU_PATH_MAX];
+
+	procToWatch = data->nProcs >=2 ? 1 : 0;
+
 	if (data->rank == procToWatch) {
 		#define STG_COMPLEXVECTOR_TOL 1e-16;
 		
@@ -222,13 +234,15 @@ void ComplexVectorMathSuite_TestComplexVectorMath( ComplexVectorMathSuiteData* d
 		Cmplx		dotProductResult;
 		Cmplx		value;
 		
+		Stream_RedirectFile( stream, "testComplexVectorMathOperations.dat" );
+
 		tolerance = STG_COMPLEXVECTOR_TOL;
 		
 		coordList[0] = A;
 		coordList[1] = B;
 		coordList[2] = C;
 		coordList[3] = D;
-		Journal_Printf( stream, "\n****************************\n");
+		Journal_Printf( stream, "****************************\n");
 		Journal_Printf(stream, "Vectors - A, B, C, and D\n");
 		
 		StGermain_PrintNamedComplexVector( stream, A, 6 );
@@ -252,8 +266,7 @@ void ComplexVectorMathSuite_TestComplexVectorMath( ComplexVectorMathSuiteData* d
 		Cmplx_Subtract(vector[1], j[1], differenceVector[1]);
 		Cmplx_Subtract(vector[2], j[2], differenceVector[2]);
 		
-		if ( (Cmplx_Modulus(differenceVector[0]) < tolerance) && 
-			 (Cmplx_Modulus(differenceVector[1]) < tolerance) &&
+		if ( (Cmplx_Modulus(differenceVector[0]) < tolerance) && (Cmplx_Modulus(differenceVector[1]) < tolerance) &&
 			 (Cmplx_Modulus(differenceVector[2]) < tolerance) ) {
 			Journal_Printf( stream, "Answer within tolerance %g of expected result: ", tolerance);
 			StGermain_PrintNamedComplexVector( stream, j, 3);
@@ -270,8 +283,7 @@ void ComplexVectorMathSuite_TestComplexVectorMath( ComplexVectorMathSuiteData* d
 		Cmplx_Subtract(vector[1], j[1], differenceVector[1]);
 		Cmplx_Subtract(vector[2], j[2], differenceVector[2]);
 		
-		if ( (Cmplx_Modulus(differenceVector[0]) < tolerance) && 
-			 (Cmplx_Modulus(differenceVector[1]) < tolerance) &&
+		if ( (Cmplx_Modulus(differenceVector[0]) < tolerance) && (Cmplx_Modulus(differenceVector[1]) < tolerance) &&
 			 (Cmplx_Modulus(differenceVector[2]) < tolerance) ) {
 			Journal_Printf( stream, "Answer within tolerance %g of expected result: ", tolerance);
 			StGermain_PrintNamedComplexVector( stream, j, 3);
@@ -288,8 +300,7 @@ void ComplexVectorMathSuite_TestComplexVectorMath( ComplexVectorMathSuiteData* d
 		Cmplx_Subtract(vector[1], k[1], differenceVector[1]);
 		Cmplx_Subtract(vector[2], k[2], differenceVector[2]);
 		
-		if ( (Cmplx_Modulus(differenceVector[0]) < tolerance) && 
-			 (Cmplx_Modulus(differenceVector[1]) < tolerance) &&
+		if ( (Cmplx_Modulus(differenceVector[0]) < tolerance) && (Cmplx_Modulus(differenceVector[1]) < tolerance) &&
 			 (Cmplx_Modulus(differenceVector[2]) < tolerance) ) {
 			Journal_Printf( stream, "Answer within tolerance %g of expected result: ", tolerance);
 			StGermain_PrintNamedComplexVector( stream, k, 3);
@@ -306,8 +317,7 @@ void ComplexVectorMathSuite_TestComplexVectorMath( ComplexVectorMathSuiteData* d
 		Cmplx_Subtract(vector[1], k[1], differenceVector[1]);
 		Cmplx_Subtract(vector[2], k[2], differenceVector[2]);
 		
-		if ( (Cmplx_Modulus(differenceVector[0]) < tolerance) && 
-			 (Cmplx_Modulus(differenceVector[1]) < tolerance) &&
+		if ( (Cmplx_Modulus(differenceVector[0]) < tolerance) && (Cmplx_Modulus(differenceVector[1]) < tolerance) &&
 			 (Cmplx_Modulus(differenceVector[2]) < tolerance) ) {
 			Journal_Printf( stream, "Answer within tolerance %g of expected result: ", tolerance);
 			StGermain_PrintNamedComplexVector( stream, k, 3);
@@ -324,8 +334,7 @@ void ComplexVectorMathSuite_TestComplexVectorMath( ComplexVectorMathSuiteData* d
 		Cmplx_Subtract(vector[1], i[1], differenceVector[1]);
 		Cmplx_Subtract(vector[2], i[2], differenceVector[2]);
 		
-		if ( (Cmplx_Modulus(differenceVector[0]) < tolerance) && 
-			 (Cmplx_Modulus(differenceVector[1]) < tolerance) &&
+		if ( (Cmplx_Modulus(differenceVector[0]) < tolerance) && (Cmplx_Modulus(differenceVector[1]) < tolerance) &&
 			 (Cmplx_Modulus(differenceVector[2]) < tolerance) ) {
 			Journal_Printf( stream, "Answer within tolerance %g of expected result: ", tolerance);
 			StGermain_PrintNamedComplexVector( stream, i, 3);
@@ -342,8 +351,7 @@ void ComplexVectorMathSuite_TestComplexVectorMath( ComplexVectorMathSuiteData* d
 		Cmplx_Subtract(vector[1], i[1], differenceVector[1]);
 		Cmplx_Subtract(vector[2], i[2], differenceVector[2]);
 		
-		if ( (Cmplx_Modulus(differenceVector[0]) < tolerance) && 
-			 (Cmplx_Modulus(differenceVector[1]) < tolerance) &&
+		if ( (Cmplx_Modulus(differenceVector[0]) < tolerance) && (Cmplx_Modulus(differenceVector[1]) < tolerance) &&
 			 (Cmplx_Modulus(differenceVector[2]) < tolerance) ) {
 			Journal_Printf( stream, "Answer within tolerance %g of expected result: ", tolerance);
 			StGermain_PrintNamedComplexVector( stream, i, 3);
@@ -369,7 +377,6 @@ void ComplexVectorMathSuite_TestComplexVectorMath( ComplexVectorMathSuiteData* d
 		Journal_Printf( stream, "K Rotated %g radians around I axis "
 		"and %g radians around J axis: \n", angle, angle); 
 		StGermain_PrintNamedComplexVector( stream, vector, 3 );
-
 
 		/* Check addition function */
 		Journal_Printf( stream, "\n****************************\n");
@@ -514,9 +521,9 @@ void ComplexVectorMathSuite_TestComplexVectorMath( ComplexVectorMathSuiteData* d
 		ComplexVector_ToVector(matrix[0], 3, realVector) ;
 		StGermain_PrintNamedVector(stream, realVector, 3);
 
-		pcu_filename_expected( "testComplexVectorMath.expected", expected_file );
-		pcu_check_fileEq( "testComplexVectorMath.dat", expected_file );
-		//remove( "testComplexVectorMath.dat" );
+		pcu_filename_expected( "testComplexVectorMathOperations.expected", expected_file );
+		pcu_check_fileEq( "testComplexVectorMathOperations.dat", expected_file );
+		remove( "testComplexVectorMathOperations.dat" );
 
 		Memory_Free( matrix );
 	}
@@ -525,5 +532,6 @@ void ComplexVectorMathSuite_TestComplexVectorMath( ComplexVectorMathSuiteData* d
 void ComplexVectorMathSuite( pcu_suite_t* suite ) {
 	pcu_suite_setData( suite, ComplexVectorMathSuiteData );
    pcu_suite_setFixtures( suite, ComplexVectorMathSuite_Setup, ComplexVectorMathSuite_Teardown );
-   pcu_suite_addTest( suite, ComplexVectorMathSuite_TestComplexVectorMath );
+   pcu_suite_addTest( suite, ComplexVectorMathSuite_TestComplexVectorMathBasic );
+   pcu_suite_addTest( suite, ComplexVectorMathSuite_TestComplexVectorMathOperations );
 }

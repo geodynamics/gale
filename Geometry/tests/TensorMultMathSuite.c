@@ -47,9 +47,9 @@
 #define TENSORMULTMATH_TEST_ERROR 1e-05
 
 typedef struct {
-	MPI_Comm			comm;
-	unsigned int	rank;
-	unsigned int	nProcs;
+	MPI_Comm comm;
+	unsigned rank;
+	unsigned nProcs;
 } TensorMultMathSuiteData;
 
 void TensorMultMathSuite_Setup( TensorMultMathSuiteData* data ) {
@@ -119,15 +119,9 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		Journal_PrintTensorArray( stream, tensorResult, 2); 
 
 		Journal_Printf( stream, "3-D\n");    
-		tensorArray[FT3D_00] = 0.5;
-		tensorArray[FT3D_01] = 10; 
-		tensorArray[FT3D_02] = 20; 
-		tensorArray[FT3D_10] = 30; 
-		tensorArray[FT3D_11] = 40; 
-		tensorArray[FT3D_12] = 50; 
-		tensorArray[FT3D_20] = 60; 
-		tensorArray[FT3D_21] = 70; 
-		tensorArray[FT3D_22] = 80;
+		tensorArray[FT3D_00] = 0.5; tensorArray[FT3D_01] = 10; tensorArray[FT3D_02] = 20; 
+		tensorArray[FT3D_10] = 30; tensorArray[FT3D_11] = 40; tensorArray[FT3D_12] = 50; 
+		tensorArray[FT3D_20] = 60; tensorArray[FT3D_21] = 70; tensorArray[FT3D_22] = 80;
 
 		Journal_PrintTensorArray( stream, tensorArray, 3);
 		TensorArray_Transpose(tensorArray, 3, tensorResult);
@@ -137,10 +131,8 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		Journal_Printf( stream, "Test function TensorArray_Add \n\n");
 
 		Journal_Printf( stream, "2-D\n");
-		tensorArray2[FT2D_00] = 5;
-		tensorArray2[FT2D_01] = 6;
-		tensorArray2[FT2D_10] = 7;
-		tensorArray2[FT2D_11] = 8;
+		tensorArray2[FT2D_00] = 5; tensorArray2[FT2D_01] = 6;
+		tensorArray2[FT2D_10] = 7; tensorArray2[FT2D_11] = 8;
 
 		Journal_PrintTensorArray( stream, tensorArray, 2);
 		Journal_PrintTensorArray( stream, tensorArray2, 2);
@@ -148,15 +140,9 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		Journal_PrintTensorArray( stream, tensorResult, 2);
 
 		Journal_Printf( stream, "3-D\n");
-		tensorArray2[FT3D_00] = 5;
-		tensorArray2[FT3D_01] = 1;
-		tensorArray2[FT3D_02] = 2;
-		tensorArray2[FT3D_10] = 3;
-		tensorArray2[FT3D_11] = 4;
-		tensorArray2[FT3D_12] = 5;
-		tensorArray2[FT3D_20] = 6;
-		tensorArray2[FT3D_21] = 7;
-		tensorArray2[FT3D_22] = 8;
+		tensorArray2[FT3D_00] = 5; tensorArray2[FT3D_01] = 1; tensorArray2[FT3D_02] = 2;
+		tensorArray2[FT3D_10] = 3; tensorArray2[FT3D_11] = 4; tensorArray2[FT3D_12] = 5;
+		tensorArray2[FT3D_20] = 6; tensorArray2[FT3D_21] = 7; tensorArray2[FT3D_22] = 8;
 
 		Journal_PrintTensorArray( stream, tensorArray, 3);
 		Journal_PrintTensorArray( stream, tensorArray2, 3);
@@ -167,10 +153,8 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		Journal_Printf( stream, "Test function TensorArray_Subtract \n\n");
 
 		Journal_Printf( stream, "2-D\n");
-		tensorArray2[FT2D_00] = 5;
-		tensorArray2[FT2D_01] = 6;
-		tensorArray2[FT2D_10] = 7;
-		tensorArray2[FT2D_11] = 8;
+		tensorArray2[FT2D_00] = 5; tensorArray2[FT2D_01] = 6;
+		tensorArray2[FT2D_10] = 7; tensorArray2[FT2D_11] = 8;
 
 		Journal_PrintTensorArray( stream, tensorArray, 2);
 		Journal_PrintTensorArray( stream, tensorArray2, 2);
@@ -178,15 +162,9 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		Journal_PrintTensorArray( stream, tensorResult, 2);
 
 		Journal_Printf( stream, "3-D\n");
-		tensorArray2[FT3D_00] = 50;
-		tensorArray2[FT3D_01] = 1;
-		tensorArray2[FT3D_02] = 2;
-		tensorArray2[FT3D_10] = 3;
-		tensorArray2[FT3D_11] = 4;
-		tensorArray2[FT3D_12] = 5;
-		tensorArray2[FT3D_20] = 6;
-		tensorArray2[FT3D_21] = 7;
-		tensorArray2[FT3D_22] = 8;
+		tensorArray2[FT3D_00] = 50; tensorArray2[FT3D_01] = 1; tensorArray2[FT3D_02] = 2;
+		tensorArray2[FT3D_10] = 3; tensorArray2[FT3D_11] = 4; tensorArray2[FT3D_12] = 5;
+		tensorArray2[FT3D_20] = 6; tensorArray2[FT3D_21] = 7; tensorArray2[FT3D_22] = 8;
 
 		Journal_PrintTensorArray( stream, tensorArray, 3);
 		Journal_PrintTensorArray( stream, tensorArray2, 3);
@@ -198,15 +176,11 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		Journal_Printf( stream, "Solutions tested against: http://www.uni-bonn.de/~manfear/matrixcalc.php");
 		Journal_Printf( stream, "2-D\n");
 
-		tensorArray[FT2D_00] = 1;
-		tensorArray[FT2D_01] = 2;
-		tensorArray[FT2D_10] = 3;
-		tensorArray[FT2D_11] = 4;
+		tensorArray[FT2D_00] = 1; tensorArray[FT2D_01] = 2;
+		tensorArray[FT2D_10] = 3; tensorArray[FT2D_11] = 4;
 
-		tensorArray2[FT2D_00] = 5;
-		tensorArray2[FT2D_01] = 6;
-		tensorArray2[FT2D_10] = 7;
-		tensorArray2[FT2D_11] = 8;
+		tensorArray2[FT2D_00] = 5; tensorArray2[FT2D_01] = 6;
+		tensorArray2[FT2D_10] = 7; tensorArray2[FT2D_11] = 8;
 
 		Journal_PrintTensorArray( stream, tensorArray, 2);
 		Journal_PrintTensorArray( stream, tensorArray2, 2);
@@ -214,25 +188,13 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		Journal_PrintTensorArray( stream, tensorResult, 2);
 
 		Journal_Printf( stream, "3-D\n");
-		tensorArray[FT3D_00] = 1;
-		tensorArray[FT3D_01] = 2;
-		tensorArray[FT3D_02] = 3;
-		tensorArray[FT3D_10] = 4;
-		tensorArray[FT3D_11] = 5;
-		tensorArray[FT3D_12] = 6;
-		tensorArray[FT3D_20] = 7;
-		tensorArray[FT3D_21] = 8;
-		tensorArray[FT3D_22] = 9;
+		tensorArray[FT3D_00] = 1; tensorArray[FT3D_01] = 2; tensorArray[FT3D_02] = 3;
+		tensorArray[FT3D_10] = 4; tensorArray[FT3D_11] = 5; tensorArray[FT3D_12] = 6;
+		tensorArray[FT3D_20] = 7; tensorArray[FT3D_21] = 8; tensorArray[FT3D_22] = 9;
 
-		tensorArray2[FT3D_00] = 10;
-		tensorArray2[FT3D_01] = 11;
-		tensorArray2[FT3D_02] = 12;
-		tensorArray2[FT3D_10] = 13;
-		tensorArray2[FT3D_11] = 14;
-		tensorArray2[FT3D_12] = 15;
-		tensorArray2[FT3D_20] = 16;
-		tensorArray2[FT3D_21] = 17;
-		tensorArray2[FT3D_22] = 18;
+		tensorArray2[FT3D_00] = 10; tensorArray2[FT3D_01] = 11; tensorArray2[FT3D_02] = 12;
+		tensorArray2[FT3D_10] = 13; tensorArray2[FT3D_11] = 14; tensorArray2[FT3D_12] = 15;
+		tensorArray2[FT3D_20] = 16; tensorArray2[FT3D_21] = 17; tensorArray2[FT3D_22] = 18;
 
 		Journal_PrintTensorArray( stream, tensorArray, 3);
 		Journal_PrintTensorArray( stream, tensorArray2, 3);
@@ -244,10 +206,8 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		Journal_Printf( stream, "Solutions tested against: http://www.uni-bonn.de/~manfear/matrixcalc.php");
 
 		Journal_Printf( stream, "2-D\n");
-		tensorArray[FT2D_00] = 1;
-		tensorArray[FT2D_01] = 2;
-		tensorArray[FT2D_10] = 3;
-		tensorArray[FT2D_11] = 4;
+		tensorArray[FT2D_00] = 1; tensorArray[FT2D_01] = 2;
+		tensorArray[FT2D_10] = 3; tensorArray[FT2D_11] = 4;
 
 		Journal_PrintTensorArray( stream, tensorArray, 2);
 		TensorArray_MultiplyByRightTranspose(tensorArray, 2, symmTensorResult);
@@ -255,15 +215,9 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		Journal_PrintSymmetricTensor( stream, symmTensorResult, 2);
 
 		Journal_Printf( stream, "3-D\n");
-		tensorArray[FT3D_00] = 1;
-		tensorArray[FT3D_01] = 2;
-		tensorArray[FT3D_02] = 3;
-		tensorArray[FT3D_10] = 4;
-		tensorArray[FT3D_11] = 5;
-		tensorArray[FT3D_12] = 6;
-		tensorArray[FT3D_20] = 7;
-		tensorArray[FT3D_21] = 8;
-		tensorArray[FT3D_22] = 9;
+		tensorArray[FT3D_00] = 1; tensorArray[FT3D_01] = 2; tensorArray[FT3D_02] = 3;
+		tensorArray[FT3D_10] = 4; tensorArray[FT3D_11] = 5; tensorArray[FT3D_12] = 6;
+		tensorArray[FT3D_20] = 7; tensorArray[FT3D_21] = 8; tensorArray[FT3D_22] = 9;
 
 		Journal_PrintTensorArray( stream, tensorArray, 3);
 		TensorArray_MultiplyByRightTranspose(tensorArray, 3, symmTensorResult);
@@ -275,10 +229,8 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		Journal_Printf( stream, "Solutions tested against: http://www.uni-bonn.de/~manfear/matrixcalc.php");
 
 		Journal_Printf( stream, "2-D\n");
-		tensorArray[FT2D_00] = 1;
-		tensorArray[FT2D_01] = 2;
-		tensorArray[FT2D_10] = 3;
-		tensorArray[FT2D_11] = 4;
+		tensorArray[FT2D_00] = 1; tensorArray[FT2D_01] = 2;
+		tensorArray[FT2D_10] = 3; tensorArray[FT2D_11] = 4;
 
 		Journal_PrintTensorArray( stream, tensorArray, 2);
 		TensorArray_MultiplyByLeftTranspose(tensorArray, 2, symmTensorResult);
@@ -286,15 +238,9 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		Journal_PrintSymmetricTensor( stream, symmTensorResult, 2);
 
 		Journal_Printf( stream, "3-D\n");
-		tensorArray[FT3D_00] = 1;
-		tensorArray[FT3D_01] = 2;
-		tensorArray[FT3D_02] = 3;
-		tensorArray[FT3D_10] = 4;
-		tensorArray[FT3D_11] = 5;
-		tensorArray[FT3D_12] = 6;
-		tensorArray[FT3D_20] = 7;
-		tensorArray[FT3D_21] = 8;
-		tensorArray[FT3D_22] = 9;
+		tensorArray[FT3D_00] = 1; tensorArray[FT3D_01] = 2; tensorArray[FT3D_02] = 3;
+		tensorArray[FT3D_10] = 4; tensorArray[FT3D_11] = 5; tensorArray[FT3D_12] = 6;
+		tensorArray[FT3D_20] = 7; tensorArray[FT3D_21] = 8; tensorArray[FT3D_22] = 9;
 
 		Journal_PrintTensorArray( stream, tensorArray, 3);
 		TensorArray_MultiplyByLeftTranspose(tensorArray, 3, symmTensorResult);
@@ -306,14 +252,10 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		Journal_Printf( stream, "Solutions tested against: http://www.uni-bonn.de/~manfear/matrixcalc.php");
 
 		Journal_Printf( stream, "2-D\n");
-		tensorArray[FT2D_00] = 1;
-		tensorArray[FT2D_01] = 2;
-		tensorArray[FT2D_10] = 3;
-		tensorArray[FT2D_11] = 4;
+		tensorArray[FT2D_00] = 1; tensorArray[FT2D_01] = 2;
+		tensorArray[FT2D_10] = 3; tensorArray[FT2D_11] = 4;
 
-		symmTensor[ST2D_00] = 5;
-		symmTensor[ST2D_01] = 6;
-      symmTensor[ST2D_11] = 7;
+		symmTensor[ST2D_00] = 5; symmTensor[ST2D_01] = 6; symmTensor[ST2D_11] = 7;
 
 		Journal_PrintTensorArray( stream, tensorArray, 2);
 		Journal_PrintSymmetricTensor( stream, symmTensor, 2);
@@ -321,22 +263,12 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		Journal_PrintTensorArray( stream, tensorResult, 2);
 
 		Journal_Printf( stream, "3-D\n");
-		tensorArray[FT3D_00] = 1;
-		tensorArray[FT3D_01] = 2;
-		tensorArray[FT3D_02] = 3;
-		tensorArray[FT3D_10] = 4;
-		tensorArray[FT3D_11] = 5;
-		tensorArray[FT3D_12] = 6;
-		tensorArray[FT3D_20] = 7;
-		tensorArray[FT3D_21] = 8;
-		tensorArray[FT3D_22] = 9;
+		tensorArray[FT3D_00] = 1; tensorArray[FT3D_01] = 2; tensorArray[FT3D_02] = 3;
+		tensorArray[FT3D_10] = 4; tensorArray[FT3D_11] = 5; tensorArray[FT3D_12] = 6;
+		tensorArray[FT3D_20] = 7; tensorArray[FT3D_21] = 8; tensorArray[FT3D_22] = 9;
 
-		symmTensor[ST3D_00] = 10;
-		symmTensor[ST3D_01] = 11;
-		symmTensor[ST3D_02] = 12;
-		symmTensor[ST3D_11] = 13;
-		symmTensor[ST3D_12] = 14;
-      symmTensor[ST3D_22] = 15;
+		symmTensor[ST3D_00] = 10; symmTensor[ST3D_01] = 11; symmTensor[ST3D_02] = 12;
+		symmTensor[ST3D_11] = 13; symmTensor[ST3D_12] = 14; symmTensor[ST3D_22] = 15;
 
 		Journal_PrintTensorArray( stream, tensorArray, 3);
 		Journal_PrintSymmetricTensor( stream, symmTensor, 3);
@@ -348,13 +280,10 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		Journal_Printf( stream, "Solutions tested against: http://www.uni-bonn.de/~manfear/matrixcalc.php");
 
 		Journal_Printf( stream, "2-D\n");
-		tensorArray[FT2D_00] = 1;
-		tensorArray[FT2D_01] = 2;
-		tensorArray[FT2D_10] = 3;
-		tensorArray[FT2D_11] = 4;
+		tensorArray[FT2D_00] = 1; tensorArray[FT2D_01] = 2;
+		tensorArray[FT2D_10] = 3; tensorArray[FT2D_11] = 4;
 
-		vector[0] = 5;
-		vector[1] = 6;
+		vector[0] = 5; vector[1] = 6;
 
 		Journal_PrintTensorArray( stream, tensorArray, 2);
 		StGermain_PrintNamedVector( stream, vector, 2);
@@ -362,19 +291,11 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		StGermain_PrintNamedVector( stream, vectorResult, 2);
 
 		Journal_Printf( stream, "3-D\n");
-		tensorArray[FT3D_00] = 1;
-		tensorArray[FT3D_01] = 2;
-		tensorArray[FT3D_02] = 3;
-		tensorArray[FT3D_10] = 4;
-		tensorArray[FT3D_11] = 5;
-		tensorArray[FT3D_12] = 6;
-		tensorArray[FT3D_20] = 7;
-		tensorArray[FT3D_21] = 8;
-		tensorArray[FT3D_22] = 9;
+		tensorArray[FT3D_00] = 1; tensorArray[FT3D_01] = 2; tensorArray[FT3D_02] = 3;
+		tensorArray[FT3D_10] = 4; tensorArray[FT3D_11] = 5; tensorArray[FT3D_12] = 6;
+		tensorArray[FT3D_20] = 7; tensorArray[FT3D_21] = 8; tensorArray[FT3D_22] = 9;
 
-		vector[0] = 10;
-		vector[1] = 11;
-		vector[2] = 12;
+		vector[0] = 10; vector[1] = 11; vector[2] = 12;
 
 		Journal_PrintTensorArray( stream, tensorArray, 3);
 		StGermain_PrintNamedVector( stream, vector, 3);
@@ -386,13 +307,10 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		Journal_Printf( stream, "Solutions tested against: http://www.uni-bonn.de/~manfear/matrixcalc.php");
 
 		Journal_Printf( stream, "2-D\n");
-		tensorArray[FT2D_00] = 1;
-		tensorArray[FT2D_01] = 2;
-		tensorArray[FT2D_10] = 3;
-		tensorArray[FT2D_11] = 4;
+		tensorArray[FT2D_00] = 1; tensorArray[FT2D_01] = 2;
+		tensorArray[FT2D_10] = 3; tensorArray[FT2D_11] = 4;
 
-		vector[0] = 5;
-		vector[1] = 6;
+		vector[0] = 5; vector[1] = 6;
 
 		Journal_PrintTensorArray( stream, tensorArray, 2);
 		StGermain_PrintNamedVector( stream, vector, 2);
@@ -400,19 +318,11 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		StGermain_PrintNamedVector( stream, vectorResult, 2);
 
 		Journal_Printf( stream, "3-D\n");
-		tensorArray[FT3D_00] = 1;
-		tensorArray[FT3D_01] = 2;
-		tensorArray[FT3D_02] = 3;
-		tensorArray[FT3D_10] = 4;
-		tensorArray[FT3D_11] = 5;
-		tensorArray[FT3D_12] = 6;
-		tensorArray[FT3D_20] = 7;
-		tensorArray[FT3D_21] = 8;
-		tensorArray[FT3D_22] = 9;
+		tensorArray[FT3D_00] = 1; tensorArray[FT3D_01] = 2; tensorArray[FT3D_02] = 3;
+		tensorArray[FT3D_10] = 4; tensorArray[FT3D_11] = 5; tensorArray[FT3D_12] = 6;
+		tensorArray[FT3D_20] = 7; tensorArray[FT3D_21] = 8; tensorArray[FT3D_22] = 9;
 
-		vector[0] = 10;
-		vector[1] = 11;
-		vector[2] = 12;
+		vector[0] = 10; vector[1] = 11; vector[2] = 12;
 
 		Journal_PrintTensorArray( stream, tensorArray, 3);
 		StGermain_PrintNamedVector( stream, vector, 3);
@@ -424,10 +334,8 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		Journal_Printf( stream, "Solutions tested against: http://www.bluebit.gr/matrix-calculator/");
 
 		Journal_Printf( stream, "2-D\n");
-		tensorArray[FT2D_00] = 1;
-		tensorArray[FT2D_01] = 2;
-		tensorArray[FT2D_10] = 3;
-		tensorArray[FT2D_11] = 4;
+		tensorArray[FT2D_00] = 1; tensorArray[FT2D_01] = 2;
+		tensorArray[FT2D_10] = 3; tensorArray[FT2D_11] = 4;
 
 		Journal_PrintTensorArray( stream, tensorArray, 2);
 		result = TensorArray_CalcDeterminant(tensorArray, 2);
@@ -435,15 +343,9 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		Journal_PrintValue( stream, result);
 
 		Journal_Printf( stream, "3-D\n");
-		tensorArray[FT3D_00] = 1;
-		tensorArray[FT3D_01] = 2;
-		tensorArray[FT3D_02] = 3;
-		tensorArray[FT3D_10] = 30;
-		tensorArray[FT3D_11] = 22;
-		tensorArray[FT3D_12] = 4;
-		tensorArray[FT3D_20] = 5;
-		tensorArray[FT3D_21] = 7;
-		tensorArray[FT3D_22] = 9;
+		tensorArray[FT3D_00] = 1; tensorArray[FT3D_01] = 2; tensorArray[FT3D_02] = 3;
+		tensorArray[FT3D_10] = 30; tensorArray[FT3D_11] = 22; tensorArray[FT3D_12] = 4;
+		tensorArray[FT3D_20] = 5; tensorArray[FT3D_21] = 7; tensorArray[FT3D_22] = 9;
 
 		Journal_PrintTensorArray( stream, tensorArray, 3);
 		result = TensorArray_CalcDeterminant(tensorArray, 3);
@@ -457,15 +359,11 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 
 		tensorMultMathTest_Flag = True;
 
-		tensorArray[FT2D_00] = 1;
-		tensorArray[FT2D_01] = 2;
-		tensorArray[FT2D_10] = 3;
-		tensorArray[FT2D_11] = 4;
+		tensorArray[FT2D_00] = 1; tensorArray[FT2D_01] = 2;
+		tensorArray[FT2D_10] = 3; tensorArray[FT2D_11] = 4;
 
-		tensorCompare[FT2D_00] = -2;
-		tensorCompare[FT2D_01] =  1;
-		tensorCompare[FT2D_10] =  1.5;
-		tensorCompare[FT2D_11] = -0.5;
+		tensorCompare[FT2D_00] = -2; tensorCompare[FT2D_01] = 1;
+		tensorCompare[FT2D_10] = 1.5; tensorCompare[FT2D_11] = -0.5;
 
 		Journal_PrintTensorArray( stream, tensorArray, 2);
 		result = TensorArray_CalcDeterminant(tensorArray, 2);
@@ -496,15 +394,9 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 
 		tensorMultMathTest_Flag = True;
 
-		tensorArray[FT3D_00] = 1;
-		tensorArray[FT3D_01] = 2;
-		tensorArray[FT3D_02] = 3;
-		tensorArray[FT3D_10] = 30;
-		tensorArray[FT3D_11] = 22;
-		tensorArray[FT3D_12] = 4;
-		tensorArray[FT3D_20] = 5;
-		tensorArray[FT3D_21] = 7;
-		tensorArray[FT3D_22] = 9;
+		tensorArray[FT3D_00] = 1; tensorArray[FT3D_01] = 2; tensorArray[FT3D_02] = 3;
+		tensorArray[FT3D_10] = 30; tensorArray[FT3D_11] = 22; tensorArray[FT3D_12] = 4;
+		tensorArray[FT3D_20] = 5; tensorArray[FT3D_21] = 7; tensorArray[FT3D_22] = 9;
 
 		tensorCompare[FT3D_00] = -5.666666666666667;
 		tensorCompare[FT3D_01] = -0.100000000000000;
@@ -549,15 +441,11 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 
 		tensorMultMathTest_Flag = True;		
 		
-		tensorArray[FT2D_00] = 1;
-		tensorArray[FT2D_01] = 2;
-		tensorArray[FT2D_10] = 3;
-		tensorArray[FT2D_11] = 4;
+		tensorArray[FT2D_00] = 1; tensorArray[FT2D_01] = 2;
+		tensorArray[FT2D_10] = 3; tensorArray[FT2D_11] = 4;
 
-		tensorCompare[FT2D_00] = -2;
-		tensorCompare[FT2D_01] =  1;
-		tensorCompare[FT2D_10] =  1.5;
-		tensorCompare[FT2D_11] = -0.5;
+		tensorCompare[FT2D_00] = -2; tensorCompare[FT2D_01] =  1;
+		tensorCompare[FT2D_10] =  1.5; tensorCompare[FT2D_11] = -0.5;
 		
 		Journal_PrintTensorArray( stream, tensorArray, 2);	
 		TensorArray_CalcInverse(tensorArray, 2, tensorResult);
@@ -587,15 +475,9 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 
 		tensorMultMathTest_Flag = True;
 
-		tensorArray[FT3D_00] = 1;
-		tensorArray[FT3D_01] = 2;
-		tensorArray[FT3D_02] = 3;
-		tensorArray[FT3D_10] = 30;
-		tensorArray[FT3D_11] = 22;
-		tensorArray[FT3D_12] = 4;
-		tensorArray[FT3D_20] = 5;
-		tensorArray[FT3D_21] = 7;
-		tensorArray[FT3D_22] = 9;
+		tensorArray[FT3D_00] = 1; tensorArray[FT3D_01] = 2; tensorArray[FT3D_02] = 3;
+		tensorArray[FT3D_10] = 30; tensorArray[FT3D_11] = 22; tensorArray[FT3D_12] = 4;
+		tensorArray[FT3D_20] = 5; tensorArray[FT3D_21] = 7; tensorArray[FT3D_22] = 9;
 
 		tensorCompare[FT3D_00] = -5.666666666666667;
 		tensorCompare[FT3D_01] = -0.1;
@@ -637,15 +519,11 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		Journal_Printf( stream, "Hand verified\n");
 
 		Journal_Printf( stream, "2-D\n");
-		tensorArray[FT2D_00] = 1;
-		tensorArray[FT2D_01] = 2;
-		tensorArray[FT2D_10] = 3;
-		tensorArray[FT2D_11] = 4;
+		tensorArray[FT2D_00] = 1; tensorArray[FT2D_01] = 2;
+		tensorArray[FT2D_10] = 3; tensorArray[FT2D_11] = 4;
 
-		tensorArray2[FT2D_00] = 5;
-		tensorArray2[FT2D_01] = 6;
-		tensorArray2[FT2D_10] = 7;
-		tensorArray2[FT2D_11] = 8;
+		tensorArray2[FT2D_00] = 5; tensorArray2[FT2D_01] = 6;
+		tensorArray2[FT2D_10] = 7; tensorArray2[FT2D_11] = 8;
 		
 		Journal_PrintTensorArray( stream, tensorArray, 2);	
 		Journal_PrintTensorArray( stream, tensorArray2, 2);	
@@ -654,25 +532,13 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		Journal_PrintValue( stream, result);
 		
 		Journal_Printf( stream, "3-D\n");
-		tensorArray[FT3D_00] = 1;
-		tensorArray[FT3D_01] = 2;
-		tensorArray[FT3D_02] = 3;
-		tensorArray[FT3D_10] = 4;
-		tensorArray[FT3D_11] = 5;
-		tensorArray[FT3D_12] = 6;
-		tensorArray[FT3D_20] = 7;
-		tensorArray[FT3D_21] = 8;
-		tensorArray[FT3D_22] = 9;
+		tensorArray[FT3D_00] = 1; tensorArray[FT3D_01] = 2; tensorArray[FT3D_02] = 3;
+		tensorArray[FT3D_10] = 4; tensorArray[FT3D_11] = 5; tensorArray[FT3D_12] = 6;
+		tensorArray[FT3D_20] = 7; tensorArray[FT3D_21] = 8; tensorArray[FT3D_22] = 9;
 		
-		tensorArray2[FT3D_00] = 11;
-		tensorArray2[FT3D_01] = 12;
-		tensorArray2[FT3D_02] = 13;
-		tensorArray2[FT3D_10] = 14;
-		tensorArray2[FT3D_11] = 15;
-		tensorArray2[FT3D_12] = 16;
-		tensorArray2[FT3D_20] = 17;
-		tensorArray2[FT3D_21] = 18;
-		tensorArray2[FT3D_22] = 19;
+		tensorArray2[FT3D_00] = 11; tensorArray2[FT3D_01] = 12; tensorArray2[FT3D_02] = 13;
+		tensorArray2[FT3D_10] = 14; tensorArray2[FT3D_11] = 15; tensorArray2[FT3D_12] = 16;
+		tensorArray2[FT3D_20] = 17; tensorArray2[FT3D_21] = 18; tensorArray2[FT3D_22] = 19;
 		
 		Journal_PrintTensorArray( stream, tensorArray, 3);	
 		Journal_PrintTensorArray( stream, tensorArray2, 3);	
@@ -684,13 +550,9 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		Journal_Printf( stream, "Test function SymmetricTensor_DoubleContraction \n\n");
 		Journal_Printf( stream, "Hand verified\n");
 		Journal_Printf( stream, "2-D\n");		
-		symmTensor[ST2D_00] = 1;
-		symmTensor[ST2D_01] = 2;
-		symmTensor[ST2D_11] = 4;
+		symmTensor[ST2D_00] = 1; symmTensor[ST2D_01] = 2; symmTensor[ST2D_11] = 4;
 
-		symmTensor2[ST2D_00] = 10;
-		symmTensor2[ST2D_01] = 20;
-		symmTensor2[ST2D_11] = 40;
+		symmTensor2[ST2D_00] = 10; symmTensor2[ST2D_01] = 20; symmTensor2[ST2D_11] = 40;
 
 		Journal_PrintSymmetricTensor( stream, symmTensor, 2);
 		Journal_PrintSymmetricTensor( stream, symmTensor2, 2);
@@ -699,19 +561,11 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		Journal_PrintValue( stream, result);
 
 		Journal_Printf( stream, "3-D\n");
-		symmTensor[ST3D_00] = 1;
-		symmTensor[ST3D_01] = 2;
-		symmTensor[ST3D_02] = 3;
-		symmTensor[ST3D_11] = 4;
-		symmTensor[ST3D_12] = 5;
-		symmTensor[ST3D_22] = 6;
+		symmTensor[ST3D_00] = 1; symmTensor[ST3D_01] = 2; symmTensor[ST3D_02] = 3;
+		symmTensor[ST3D_11] = 4; symmTensor[ST3D_12] = 5; symmTensor[ST3D_22] = 6;
 
-		symmTensor2[ST3D_00] = 10;
-		symmTensor2[ST3D_01] = 20;
-		symmTensor2[ST3D_02] = 30;
-		symmTensor2[ST3D_11] = 40;
-		symmTensor2[ST3D_12] = 50;
-		symmTensor2[ST3D_22] = 60;
+		symmTensor2[ST3D_00] = 10; symmTensor2[ST3D_01] = 20; symmTensor2[ST3D_02] = 30;
+		symmTensor2[ST3D_11] = 40; symmTensor2[ST3D_12] = 50; symmTensor2[ST3D_22] = 60;
 		
 		Journal_PrintSymmetricTensor( stream, symmTensor, 3);
 		Journal_PrintSymmetricTensor( stream, symmTensor2, 3);
@@ -732,10 +586,8 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		nonSquareMatrixA[0][2] = 2; nonSquareMatrixA[1][2] =  6;		
 		nonSquareMatrixA[0][3] = 3; nonSquareMatrixA[1][3] =  7;
 		
-		nonSquareMatrixA[2][0] = 8;		
-		nonSquareMatrixA[2][1] = 9;
-		nonSquareMatrixA[2][2] = 10;
-		nonSquareMatrixA[2][3] = 11;
+		nonSquareMatrixA[2][0] = 8; nonSquareMatrixA[2][1] = 9;
+		nonSquareMatrixA[2][2] = 10; nonSquareMatrixA[2][3] = 11;
 		/* Matrix B */
 		nonSquareMatrixB[0][0] = 0; nonSquareMatrixB[1][0] =  2;
 		nonSquareMatrixB[0][1] = 1; nonSquareMatrixB[1][1] =  3;
