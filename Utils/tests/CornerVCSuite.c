@@ -214,7 +214,6 @@ void CornerVCSuite_TestCornerVC( CornerVCSuiteData* data ) {
 	FreeObject( mesh );
 }
 
-
 void CornerVCSuite( pcu_suite_t* suite ) {
 	pcu_suite_setData( suite, CornerVCSuiteData );
    pcu_suite_setFixtures( suite, CornerVCSuite_Setup, CornerVCSuite_Teardown );

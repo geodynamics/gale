@@ -58,14 +58,6 @@ void SobolGeneratorSuite_Setup( SobolGeneratorSuiteData* data ) {
 }
 
 void SobolGeneratorSuite_Teardown( SobolGeneratorSuiteData* data ) {
-	/* Purge output files */
-	remove( "RightmostBit.dat" );
-	remove( "testGenerator0" );
-	remove( "testGenerator1" );
-	remove( "testGenerator2" );
-	remove( "testGenerator3" );
-	remove( "testGenerator4" );
-	remove( "testGenerator5" );
 }
 
 void SobolGeneratorSuite_TestSobolGenerator( SobolGeneratorSuiteData* data ) {
@@ -85,12 +77,7 @@ void SobolGeneratorSuite_TestSobolGenerator( SobolGeneratorSuiteData* data ) {
 	char					generator4_expected[PCU_PATH_MAX];
 	char					generator5_expected[PCU_PATH_MAX];
 
-	if( data->nProcs >= 2 ) {
-		procToWatch = 1;
-	}
-	else {
-		procToWatch = 0;
-	}
+	procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if( data->rank == procToWatch ) {
 		stream = Journal_Register (Info_Type, "SobolGeneratorStream");
@@ -141,6 +128,14 @@ void SobolGeneratorSuite_TestSobolGenerator( SobolGeneratorSuiteData* data ) {
 		pcu_check_fileEq( "testGenerator4", generator4_expected );
 		pcu_filename_expected( "testSobolGenerator5Output.expected", generator5_expected );
 		pcu_check_fileEq( "testGenerator5", generator5_expected );
+
+		remove( "RightmostBit.dat" );
+		remove( "testGenerator0" );
+		remove( "testGenerator1" );
+		remove( "testGenerator2" );
+		remove( "testGenerator3" );
+		remove( "testGenerator4" );
+		remove( "testGenerator5" );
 	}
 }
 

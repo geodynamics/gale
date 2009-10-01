@@ -48,6 +48,7 @@ typedef struct {
 	MPI_Comm	comm;
 	unsigned	rank;
 	unsigned	nProcs;
+	Stream*	stream; 	
 } OperatorFieldVariableSuiteData;
 
 /* Simulate Solid Body Rotation */
@@ -82,141 +83,246 @@ void OperatorFieldVariableSuite_dummyGetMinAndMaxGlobalCoords( void* sdVariable,
    return ;
 }
 
-
 void OperatorFieldVariableSuite_Setup( OperatorFieldVariableSuiteData* data ) {
 	/* MPI Initializations */
 	data->comm = MPI_COMM_WORLD;
 	MPI_Comm_rank( data->comm, &data->rank );
 	MPI_Comm_size( data->comm, &data->nProcs );
+
+	data->stream = Journal_Register( Info_Type, "OperatorFieldVariableStream" );
+	Stream_RedirectFile( data->stream, "operatorFieldVariable.dat" );
 }
 
 void OperatorFieldVariableSuite_Teardown( OperatorFieldVariableSuiteData* data ) {
 }
 
-void OperatorFieldVariableSuite_TestOperator( OperatorFieldVariableSuiteData* data ) {
+FieldVariable* OperatorFieldVariableSuite_GenerateVelocityField( OperatorFieldVariableSuiteData* data, FieldVariable_Register* fV_Register ) {
+	return _FieldVariable_New(
+		sizeof(FieldVariable),
+		FieldVariable_Type,
+  		_FieldVariable_Delete,
+		_FieldVariable_Print,
+		_FieldVariable_Copy,
+		(Stg_Component_DefaultConstructorFunction*)FieldVariable_DefaultNew,
+		_FieldVariable_Construct,
+		_FieldVariable_Build,
+		_FieldVariable_Initialise,
+		_FieldVariable_Execute,
+		_FieldVariable_Destroy,
+		"Velocity",
+		True,
+		OperatorFieldVariableSuite_dummyInterpolateValueAt,
+		OperatorFieldVariableSuite_dummyGetMinGlobalValue,
+		OperatorFieldVariableSuite_dummyGetMaxGlobalValue,
+		OperatorFieldVariableSuite_dummyGetMinAndMaxLocalCoords,
+		OperatorFieldVariableSuite_dummyGetMinAndMaxGlobalCoords,
+		3,
+		3,
+		False,
+     	data->comm,
+		fV_Register );
+}
+
+void OperatorFieldVariableSuite_TestVelocitySquared2D( OperatorFieldVariableSuiteData* data ) {
 	int							procToWatch;
-	Stream*						stream; 	
 	FieldVariable_Register*	fV_Register;
    FieldVariable*				velocityField;
    OperatorFieldVariable*	velSquared2D;
+   double						coord[3][3] = {{ 0.4 , 2.0 , 7.0 }, { -0.2 , 6.0 , 2.0 },{ 0.3 , -2.0 , -13.0 }} ;
+   double						value[3];
+   Index							index;
+   Coord                 	min, max;
+
+	Journal_Enable_NamedStream( Info_Type, CartesianGenerator_Type, False );
+
+	procToWatch = data->nProcs >=2 ? 1 : 0;
+
+	if( data->rank == procToWatch ) {
+		fV_Register = FieldVariable_Register_New();
+		velocityField = OperatorFieldVariableSuite_GenerateVelocityField( data, fV_Register );
+
+		velSquared2D = OperatorFieldVariable_NewUnary( "VelocitySquaredField2D", velocityField, "VectorSquare" );
+ 		velSquared2D->_operator->operandDofs = 2;
+
+		Journal_Printf( data->stream , "===Testing Velocity Squared 2D===\n" );
+
+		for ( index = 0 ; index < 3 ; index++ ) {
+			Journal_Printf( data->stream, "coord = ");
+			StGermain_PrintVector( data->stream, coord[ index ], 3 );
+
+			Journal_Printf( data->stream, "velocity = ");
+			pcu_check_true( FieldVariable_InterpolateValueAt( velocityField, coord[ index ], value ) );
+			StGermain_PrintVector( data->stream, value, 3 );
+
+			Journal_Printf( data->stream, "velocity squared 2d = ");
+			pcu_check_true( FieldVariable_InterpolateValueAt( velSquared2D, coord[ index ], value ) );
+			StGermain_PrintVector( data->stream, value, 1 );
+		}
+
+		Journal_Printf( data->stream , "testing min max local coords:\n" );
+		Journal_Printf( data->stream, "velocity:\n");
+		FieldVariable_GetMinAndMaxLocalCoords( velocityField, min, max );
+		StGermain_PrintNamedVector( data->stream, min, 3 );
+		StGermain_PrintNamedVector( data->stream, max, 3 );
+
+		Journal_Printf( data->stream, "velocity squared 2d = \n");
+		FieldVariable_GetMinAndMaxLocalCoords( velSquared2D, min, max );
+		StGermain_PrintNamedVector( data->stream, min, 3 );
+		StGermain_PrintNamedVector( data->stream, max, 3 );
+
+		Journal_Printf( data->stream , "testing min max global coords:\n" );
+		Journal_Printf( data->stream, "velocity:\n");
+		FieldVariable_GetMinAndMaxGlobalCoords( velocityField, min, max );
+		StGermain_PrintNamedVector( data->stream, min, 3 );
+		StGermain_PrintNamedVector( data->stream, max, 3 );
+
+		Journal_Printf( data->stream, "velocity squared 2d = \n");
+		FieldVariable_GetMinAndMaxGlobalCoords( velSquared2D, min, max );
+		StGermain_PrintNamedVector( data->stream, min, 3 );
+		StGermain_PrintNamedVector( data->stream, max, 3 );
+
+		Journal_Printf(data->stream, "\n");
+		Stg_Class_Delete(fV_Register);
+	}
+}
+
+void OperatorFieldVariableSuite_TestVelocitySquared3D( OperatorFieldVariableSuiteData* data ) {
+	int							procToWatch;
+	FieldVariable_Register*	fV_Register;
+   FieldVariable*				velocityField;
    OperatorFieldVariable*	velSquared3D;
+   double						coord[3][3] = {{ 0.4 , 2.0 , 7.0 }, { -0.2 , 6.0 , 2.0 },{ 0.3 , -2.0 , -13.0 }} ;
+   double						value[3];
+   Index							index;
+   Coord                 	min, max;
+
+	Journal_Enable_NamedStream( Info_Type, CartesianGenerator_Type, False );
+
+	procToWatch = data->nProcs >=2 ? 1 : 0;
+
+	if( data->rank == procToWatch ) {
+		fV_Register = FieldVariable_Register_New();
+		velocityField = OperatorFieldVariableSuite_GenerateVelocityField( data, fV_Register );
+
+		velSquared3D = OperatorFieldVariable_NewUnary( "VelocitySquaredField3D", velocityField, "VectorSquare" );
+
+		Journal_Printf( data->stream , "===Testing Velocity Squared 3D===\n" );
+
+		for ( index = 0 ; index < 3 ; index++ ) {
+			Journal_Printf( data->stream, "coord = ");
+			StGermain_PrintVector( data->stream, coord[ index ], 3 );
+
+			Journal_Printf( data->stream, "velocity = ");
+			pcu_check_true( FieldVariable_InterpolateValueAt( velocityField, coord[ index ], value ) );
+			StGermain_PrintVector( data->stream, value, 3 );
+
+			Journal_Printf( data->stream, "velocity squared 3d = ");
+			pcu_check_true( FieldVariable_InterpolateValueAt( velSquared3D, coord[ index ], value ) );
+			StGermain_PrintVector( data->stream, value, 1 );
+		}
+		Journal_Printf(data->stream, "\n");
+		Stg_Class_Delete(fV_Register);
+	}
+}
+	
+void OperatorFieldVariableSuite_TestVelocityMagnitude2D( OperatorFieldVariableSuiteData* data ) {
+	int							procToWatch;
+	FieldVariable_Register*	fV_Register;
+   FieldVariable*				velocityField;
    OperatorFieldVariable*	velMag2D;
+   double						coord[3][3] = {{ 0.4 , 2.0 , 7.0 }, { -0.2 , 6.0 , 2.0 },{ 0.3 , -2.0 , -13.0 }} ;
+   double						value[3];
+   Index							index;
+   Coord                 	min, max;
+
+	Journal_Enable_NamedStream( Info_Type, CartesianGenerator_Type, False );
+
+	procToWatch = data->nProcs >=2 ? 1 : 0;
+
+	if( data->rank == procToWatch ) {
+		fV_Register = FieldVariable_Register_New();
+		velocityField = OperatorFieldVariableSuite_GenerateVelocityField( data, fV_Register );
+
+		velMag2D = OperatorFieldVariable_NewUnary( "VelocityMagnitudeField2D", velocityField, "Magnitude" );
+		velMag2D->_operator->operandDofs = 2;
+
+		Journal_Printf( data->stream , "===Testing Velocity Magnitude 2D===\n" );
+
+		for ( index = 0 ; index < 3 ; index++ ) {
+			Journal_Printf( data->stream, "coord = ");
+			StGermain_PrintVector( data->stream, coord[ index ], 3 );
+
+			Journal_Printf( data->stream, "velocity = ");
+			pcu_check_true( FieldVariable_InterpolateValueAt( velocityField, coord[ index ], value ) );
+			StGermain_PrintVector( data->stream, value, 3 );
+
+			Journal_Printf( data->stream, "velocity magnitude 2d = ");
+			pcu_check_true( FieldVariable_InterpolateValueAt( velMag2D, coord[ index ], value ) );
+			StGermain_PrintVector( data->stream, value, 1 );
+		}
+		Journal_Printf(data->stream, "\n");
+		Stg_Class_Delete(fV_Register);
+	}
+}
+
+void OperatorFieldVariableSuite_TestVelocityMagnitude3D( OperatorFieldVariableSuiteData* data ) {
+	int							procToWatch;
+	FieldVariable_Register*	fV_Register;
+   FieldVariable*				velocityField;
    OperatorFieldVariable*	velMag3D;
    double						coord[3][3] = {{ 0.4 , 2.0 , 7.0 }, { -0.2 , 6.0 , 2.0 },{ 0.3 , -2.0 , -13.0 }} ;
    double						value[3];
    Index							index;
    Coord                 	min, max;
-	char							expected_file[PCU_PATH_MAX];
 
 	Journal_Enable_NamedStream( Info_Type, CartesianGenerator_Type, False );
-	stream = Journal_Register( Info_Type, "OperatorFieldVariableStream" );
-	Stream_RedirectFile( stream, "operatorFieldVariable.dat" );
 
-	if( data->nProcs >= 2 ) {
-		procToWatch = 1;
-	}
-	else {
-		procToWatch = 0;
-	}
+	procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if( data->rank == procToWatch ) {
 		fV_Register = FieldVariable_Register_New();
-
-		/* constructor  */
-		velocityField = _FieldVariable_New(
-			sizeof(FieldVariable),
-			FieldVariable_Type,
-  			_FieldVariable_Delete,
-			_FieldVariable_Print,
-			_FieldVariable_Copy,
-			(Stg_Component_DefaultConstructorFunction*)FieldVariable_DefaultNew,
-			_FieldVariable_Construct,
-			_FieldVariable_Build,
-			_FieldVariable_Initialise,
-			_FieldVariable_Execute,
-			_FieldVariable_Destroy,
-			"Velocity",
-			True,
-			OperatorFieldVariableSuite_dummyInterpolateValueAt,
-			OperatorFieldVariableSuite_dummyGetMinGlobalValue,
-			OperatorFieldVariableSuite_dummyGetMaxGlobalValue,
-			OperatorFieldVariableSuite_dummyGetMinAndMaxLocalCoords,
-			OperatorFieldVariableSuite_dummyGetMinAndMaxGlobalCoords,
-			3,
-			3,
-			False,
-         data->comm,
-			fV_Register );
-
-		/* Construct Unary Operator Field Variables */
-		velSquared2D = OperatorFieldVariable_NewUnary( "VelocitySquaredField2D", velocityField, "VectorSquare" );
- 		velSquared2D->_operator->operandDofs = 2;
-
-		velSquared3D = OperatorFieldVariable_NewUnary( "VelocitySquaredField3D", velocityField, "VectorSquare" );
-
-		velMag2D = OperatorFieldVariable_NewUnary( "VelocityMagnitudeField2D", velocityField, "Magnitude" );
-		velMag2D->_operator->operandDofs = 2;
-
+		velocityField = OperatorFieldVariableSuite_GenerateVelocityField( data, fV_Register );
+		
 		velMag3D = OperatorFieldVariable_NewUnary( "VelocityMagnitudeField3D", velocityField, "Magnitude" );
 
-		/* Do Interpolations */
+		Journal_Printf( data->stream , "===Testing Velocity Magnitude 3D===\n" );
+
 		for ( index = 0 ; index < 3 ; index++ ) {
-			Journal_Printf( stream, "coord = ");
-			StGermain_PrintVector( stream, coord[ index ], 3 );
+			Journal_Printf( data->stream, "coord = ");
+			StGermain_PrintVector( data->stream, coord[ index ], 3 );
 
-			Journal_Printf( stream, "velocity = ");
+			Journal_Printf( data->stream, "velocity = ");
 			pcu_check_true( FieldVariable_InterpolateValueAt( velocityField, coord[ index ], value ) );
-			StGermain_PrintVector( stream, value, 3 );
+			StGermain_PrintVector( data->stream, value, 3 );
 
-			Journal_Printf( stream, "velocity squared 2d = ");
-			pcu_check_true( FieldVariable_InterpolateValueAt( velSquared2D, coord[ index ], value ) );
-			StGermain_PrintVector( stream, value, 1 );
-			Journal_Printf( stream, "velocity squared 3d = ");
-			pcu_check_true( FieldVariable_InterpolateValueAt( velSquared3D, coord[ index ], value ) );
-			StGermain_PrintVector( stream, value, 1 );
-
-			Journal_Printf( stream, "velocity magnitude 2d = ");
-			pcu_check_true( FieldVariable_InterpolateValueAt( velMag2D, coord[ index ], value ) );
-			StGermain_PrintVector( stream, value, 1 );
-			Journal_Printf( stream, "velocity magnitude 3d = ");
+			Journal_Printf( data->stream, "velocity magnitude 3d = ");
 			pcu_check_true( FieldVariable_InterpolateValueAt( velMag3D, coord[ index ], value ) );
-			StGermain_PrintVector( stream, value, 1 );
-			Journal_Printf(stream, "\n");
+			StGermain_PrintVector( data->stream, value, 1 );
 		}
+		Journal_Printf(data->stream, "\n");
+		Stg_Class_Delete(fV_Register);
+	}
+}
 
-		Journal_Printf( stream , "testing min max local coords:\n" );
-		Journal_Printf( stream, "velocity:\n");
-		FieldVariable_GetMinAndMaxLocalCoords( velocityField, min, max );
-		StGermain_PrintNamedVector( stream, min, 3 );
-		StGermain_PrintNamedVector( stream, max, 3 );
+void OperatorFieldVariableSuite_TestOutputFile( OperatorFieldVariableSuiteData* data ) {
+	int procToWatch;
+	char expected_file[PCU_PATH_MAX];
 
-		Journal_Printf( stream, "velocity squared 2d = \n");
-		FieldVariable_GetMinAndMaxLocalCoords( velSquared2D, min, max );
-		StGermain_PrintNamedVector( stream, min, 3 );
-		StGermain_PrintNamedVector( stream, max, 3 );
+	procToWatch = data->nProcs >=2 ? 1 : 0;
 
-		Journal_Printf( stream , "testing min max global coords:\n" );
-		Journal_Printf( stream, "velocity:\n");
-		FieldVariable_GetMinAndMaxGlobalCoords( velocityField, min, max );
-		StGermain_PrintNamedVector( stream, min, 3 );
-		StGermain_PrintNamedVector( stream, max, 3 );
-
-		Journal_Printf( stream, "velocity squared 2d = \n");
-		FieldVariable_GetMinAndMaxGlobalCoords( velSquared2D, min, max );
-		StGermain_PrintNamedVector( stream, min, 3 );
-		StGermain_PrintNamedVector( stream, max, 3 );
-
+	if( data->rank == procToWatch ) {
 		pcu_filename_expected( "testOperatorFieldVariableOutput.expected", expected_file );
 		pcu_check_fileEq( "operatorFieldVariable.dat", expected_file );
-
-		/* Clean Up */
-		Stg_Class_Delete(fV_Register);
 		remove( "operatorFieldVariable.dat" );
 	}
 }
-	
+
 void OperatorFieldVariableSuite( pcu_suite_t* suite ) {
 	pcu_suite_setData( suite, OperatorFieldVariableSuiteData );
 	pcu_suite_setFixtures( suite, OperatorFieldVariableSuite_Setup, OperatorFieldVariableSuite_Teardown );
-	pcu_suite_addTest( suite, OperatorFieldVariableSuite_TestOperator );
+	pcu_suite_addTest( suite, OperatorFieldVariableSuite_TestVelocitySquared2D );
+	pcu_suite_addTest( suite, OperatorFieldVariableSuite_TestVelocitySquared3D );
+	pcu_suite_addTest( suite, OperatorFieldVariableSuite_TestVelocityMagnitude2D );
+	pcu_suite_addTest( suite, OperatorFieldVariableSuite_TestVelocityMagnitude3D );
+	pcu_suite_addTest( suite, OperatorFieldVariableSuite_TestOutputFile );
 }

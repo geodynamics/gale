@@ -174,12 +174,7 @@ void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_nam
 	stream = Journal_Register( Info_Type, "EulerStream" );
 	Stream_RedirectFile( stream, _name );
 
-	if( data->nProcs >= 2 ) {
-		procToWatch = 1;
-	}
-	else {
-		procToWatch = 0;
-	}
+	procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if( data->rank == procToWatch ) {
 		/* Create Context */
@@ -320,6 +315,7 @@ void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_nam
 		Stg_Class_Delete( timeIntegrator );
 		Stg_Class_Delete( timeIntegrateeList[0] );
 		Stg_Class_Delete( timeIntegrateeList[1] );
+		Stg_Class_Delete( context );
 		remove( _name );
 	}
 }
@@ -327,12 +323,7 @@ void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_nam
 void TimeIntegrationSuite_TestEuler( TimeIntegrationSuiteData* data ) {
 	int procToWatch;
 
-	if( data->nProcs >= 2 ) {
-      procToWatch = 1;
-   }
-   else {
-      procToWatch = 0;
-   }
+	procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if( data->rank == procToWatch ) {	
 		TimeIntegrationSuite_TestDriver( data, "testIntegrationEuler", "Constant", "Constant2", 1 );
@@ -341,12 +332,7 @@ void TimeIntegrationSuite_TestEuler( TimeIntegrationSuiteData* data ) {
 void TimeIntegrationSuite_TestRK2( TimeIntegrationSuiteData* data ) {
 	int procToWatch;
 
-	if( data->nProcs >= 2 ) {
-      procToWatch = 1;
-   }
-   else {
-      procToWatch = 0;
-   }
+	procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if( data->rank == procToWatch ) {	
 		TimeIntegrationSuite_TestDriver( data, "testIntegrationRK2", "Linear", "Linear2", 2 );
@@ -355,12 +341,7 @@ void TimeIntegrationSuite_TestRK2( TimeIntegrationSuiteData* data ) {
 void TimeIntegrationSuite_TestRK4( TimeIntegrationSuiteData* data ) {
 	int procToWatch;
 
-	if( data->nProcs >= 2 ) {
-      procToWatch = 1;
-   }
-   else {
-      procToWatch = 0;
-   }
+	procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if( data->rank == procToWatch ) {	
 		TimeIntegrationSuite_TestDriver( data, "testIntegrationRK4", "Cubic", "Cubic2", 4 );
