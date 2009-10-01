@@ -57,15 +57,21 @@ void ArrheniusSuite_TestStiffnessMatrix2D( ArrheniusSuiteData* data ) {
 	double tolerance = Dictionary_GetDouble_WithDefault( dictionary, "StiffnessMatrixCompareTolerance", 1e-4 );
 	PetscReal matrixNorm, errorNorm, test;
 
+	/* get filename of expected matrix */
 	pcu_filename_expected( filename, expected_file );
+	/* setup Petsc binary viewer */
 	PetscViewerBinaryOpen(MPI_COMM_WORLD, expected_file, FILE_MODE_READ, &bviewer);
+	/* load matrix into expected */
 	MatLoad(bviewer, MATAIJ, &expected);
 
+	/* calc norm of expected */
 	MatNorm( expected, NORM_FROBENIUS, &matrixNorm );
+	/* calc error norm = expected - current matrix */
 	MatAXPY(expected, -1, (stiffnessMatrix->matrix) , SAME_NONZERO_PATTERN);
 	MatNorm( expected, NORM_FROBENIUS, &errorNorm );
 
 	assert( matrixNorm != 0 );
+	/* check relative difference is less than tolerance */
 	test = errorNorm / matrixNorm;
 
 	pcu_check_lt( test, tolerance );
