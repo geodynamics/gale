@@ -69,6 +69,11 @@
 	#include "SystemLinearEquations.h"
 	#include "SLE_Solver.h"
 
+	#include "MultigridSolver.h"
+	#include "PETScMGSolver.h"
+	#include "MGOpGenerator.h"
+	#include "SROpGenerator.h"
+
 	#include "Context.h"
 
 	#include "Init.h"

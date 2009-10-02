@@ -67,6 +67,15 @@ Bool StgFEM_SLE_SystemSetup_Init( int* argc, char** argv[] ) {
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), StiffnessMatrixTerm_Type, "0", _StiffnessMatrixTerm_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), SystemLinearEquations_Type, "0", _SystemLinearEquations_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), ForceTerm_Type, "0", _ForceTerm_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), 
+				   MultigridSolver_Type, "0", 
+				   (Stg_Component_DefaultConstructorFunction*)MultigridSolver_New );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), 
+				   SROpGenerator_Type, "0", 
+				   (Stg_Component_DefaultConstructorFunction*)SROpGenerator_New );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), 
+				   PETScMGSolver_Type, "0", 
+				   (Stg_Component_DefaultConstructorFunction*)PETScMGSolver_New );
 
 	RegisterParent( SystemLinearEquations_Type,    Stg_Component_Type );
 	RegisterParent( SLE_Solver_Type,               Stg_Component_Type );
@@ -77,6 +86,10 @@ Bool StgFEM_SLE_SystemSetup_Init( int* argc, char** argv[] ) {
 	RegisterParent( ForceTerm_Type,                Stg_Component_Type );
 	RegisterParent( Assembler_Type, Stg_Class_Type );
 	RegisterParent( FiniteElementContext_Type,     DomainContext_Type );
+	RegisterParent( PETScMGSolver_Type, Stg_Component_Type );
+	RegisterParent( MultigridSolver_Type, Stg_Component_Type );
+	RegisterParent( MGOpGenerator_Type, Stg_Component_Type );
+	RegisterParent( SROpGenerator_Type, MGOpGenerator_Type);
 
 	return True;
 }
