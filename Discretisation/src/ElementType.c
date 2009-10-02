@@ -361,11 +361,11 @@ void _ElementType_ConvertGlobalCoordToElLocal(
 			elLocalCoord[ K_AXIS ] += xiIncrement[ K_AXIS ];
 
 		/* Check for convergence */
-		maxResidual = xiIncrement[ I_AXIS ];
-		if ( maxResidual < xiIncrement[ J_AXIS ] )
-			maxResidual = xiIncrement[ J_AXIS ];
-		if ( dim == 3 && maxResidual < xiIncrement[ K_AXIS ] )
-			maxResidual = xiIncrement[ K_AXIS ];
+		maxResidual = fabs( xiIncrement[ I_AXIS ] );
+		if ( maxResidual < fabs( xiIncrement[ J_AXIS ] ) )
+			maxResidual = fabs( xiIncrement[ J_AXIS ] );
+		if ( dim == 3 && maxResidual < fabs( xiIncrement[ K_AXIS ] ) )
+			maxResidual = fabs( xiIncrement[ K_AXIS ] );
 
 		if ( maxResidual < tolerance )
 			break;
