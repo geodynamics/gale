@@ -650,14 +650,20 @@ void _FiniteElementContext_DumpMeshHDF5( void* context, FeMesh* mesh ) {
    int                     buf_int[5];
    MPI_Status              status;
    int                     confirmation = 0;
-	Stream*                 errorStr = Journal_Register( Error_Type, self->type );
+   Stream*                 errorStr = Journal_Register( Error_Type, self->type );
    Element_LocalIndex      lElement_I;
    Element_GlobalIndex     gElement_I;
    Index                   maxNodes;
    IArray*                 iarray = IArray_New();
    unsigned                fVar_I;
-	char*                   filename = NULL;
-	char*                   meshSaveFileNamePart = NULL;
+   char*                   filename = NULL;
+   char*                   meshSaveFileNamePart = NULL;
+
+   /* don't dump irregular meshes, as havn't accounted for their connectivity yet...
+    * TODO: this is a hack, as we don't know about the IrregularQuadGenerator yet in StgFEM. Need to account
+    * for unstructured meshes at some point in the future... dave 01.10.09 */
+   if( !strcmp( mesh->generator->type, "IrregularQuadGenerator" ) )
+      return;
 
    meshSaveFileNamePart = Context_GetCheckPointWritePrefixString( context );
 
