@@ -289,7 +289,8 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
 		assert( Dictionary_Entry_Value_GetCount( maxList ) >= self->nDims );
 		crdMin = Memory_Alloc_Array_Unnamed( double, 3 );
 		crdMax = Memory_Alloc_Array_Unnamed( double, 3 );
-		for( d_i = 0; d_i < self->nDims; d_i++ ) {	
+		for( d_i = 0; d_i < self->nDims; d_i++ ) {
+		   double maxVal;
 			tmp = Dictionary_Entry_Value_GetElement( minList, d_i );
 			rootKey = Dictionary_Entry_Value_AsString( tmp );
 
@@ -303,6 +304,14 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
 			if( !Stg_StringIsNumeric( rootKey ) )
 				tmp = Dictionary_Get( cf->rootDict, rootKey );
 			crdMax[d_i] = Dictionary_Entry_Value_AsDouble( tmp );
+			/* test to ensure provided domain is valid */
+			maxVal =  (abs(crdMax[d_i]) > abs(crdMin[d_i])) ? abs(crdMax[d_i]) : abs(crdMin[d_i]);
+			if( maxVal == 0 ) maxVal = 1;  /* if maxVal is zero, then both numbers must be zero, set to one as next test will fail */
+         Journal_Firewall( ( ( (crdMax[d_i] - crdMin[d_i])/maxVal) > 1E-10 ), errorStream,
+                     "\n\nError in %s for %s '%s'\n\n"
+                     "Dimension of domain (min = %f, max = %f) for component number %u is not valid.\n\n", 
+                     __func__, self->type, self->name, 
+                     crdMin[d_i], crdMax[d_i], d_i);
 		}
 
 		restartTimestep = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "restartTimestep", 0 );	
