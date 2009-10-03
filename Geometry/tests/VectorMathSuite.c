@@ -45,9 +45,9 @@
 #include "VectorMathSuite.h"
 
 typedef struct {
-	MPI_Comm			comm;
-	unsigned int	rank;
-	unsigned int	nProcs;
+	MPI_Comm comm;
+	unsigned rank;
+	unsigned nProcs;
 } VectorMathSuiteData;
 
 void VectorMathSuite_Setup( VectorMathSuiteData* data ) {
