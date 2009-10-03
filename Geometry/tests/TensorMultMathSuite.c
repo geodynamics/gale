@@ -62,30 +62,16 @@ void TensorMultMathSuite_Setup( TensorMultMathSuiteData* data ) {
 void TensorMultMathSuite_Teardown( TensorMultMathSuiteData* data ) {
 }
 
-void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
-	unsigned	procToWatch;
-	procToWatch = data->nProcs >=2 ? 1 : 0;
-	
-	if (data->rank == procToWatch) {
-		SymmetricTensor	symmTensor, symmTensor2, symmTensorResult;
-		TensorArray			tensorArray, tensorArray2, tensorResult, tensorCompare, tensorDiff;
-		XYZ					vector, vectorResult;
-		double				result, errorValue;
-		Dimension_Index	row, col;
-		Bool					tensorMultMathTest_Flag;
-		double				**nonSquareMatrixA, **nonSquareMatrixB;
-		double				**nonSquareMatrixResult, **nonSquareMatrixAT;
-		double				solutionVector[4], solutionVectorCompare[4];
-		Bool					error_flag;
-		Stream*				stream = Journal_Register( InfoStream_Type, "TensorMultMath" );
-		char					expected_file[PCU_PATH_MAX];
+void TensorMultMathSuite_TestTensorArrayIdentity( TensorMultMathSuiteData* data ) {
+	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
 
-      #define STG_TENSORMULTMATHTEST_ERROR 1.0e-14;
-		Stream_RedirectFile( stream, "testTensorMultMath.dat" );
-    
-		errorValue = STG_TENSORMULTMATHTEST_ERROR;
-		Journal_Printf( stream, "%g", errorValue);
-		Journal_Printf(stream, "\n/*******************    Test 1   ************************/\n");
+	if (data->rank == procToWatch) {
+		TensorArray	tensorArray;
+		Stream*		stream = Journal_Register( InfoStream_Type, "TensorArrayIdentity" );
+		char			expected_file[PCU_PATH_MAX];
+
+		Stream_RedirectFile( stream, "testTensorArrayIdentity.dat" );
+		Journal_Printf( stream, "*******************    Test 1   ************************\n");
 		Journal_Printf( stream, "Test TensorArray Identity\n\n");
     
 		Journal_Printf( stream, "2-D\n");
@@ -95,8 +81,24 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		Journal_Printf( stream, "3-D\n");
 		TensorArray_Identity(3, tensorArray );
 		Journal_PrintTensorArray( stream, tensorArray, 3); 
-    
-		Journal_Printf(stream, "\n/*******************    Test 2   ************************/\n");
+
+		pcu_filename_expected( "testTensorMultMathArrayIdentity.expected", expected_file );
+		pcu_check_fileEq( "testTensorArrayIdentity.dat", expected_file );
+		remove( "testTensorArrayIdentity.dat" );
+	}
+}
+
+void TensorMultMathSuite_TestSymmetricTensorIdentity( TensorMultMathSuiteData* data ) {
+	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+
+	if (data->rank == procToWatch) {
+		SymmetricTensor	symmTensor;
+		Stream*		stream = Journal_Register( InfoStream_Type, "SymmetricTensorIdentity" );
+		char			expected_file[PCU_PATH_MAX];
+
+		Stream_RedirectFile( stream, "testSymmetricTensorIdentity.dat" );
+
+		Journal_Printf(stream, "*******************    Test 2   ************************\n");
 		Journal_Printf( stream, "Test SymmetricTensor Identity\n\n");
     
 		Journal_Printf( stream, "2-D\n");
@@ -106,8 +108,24 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		Journal_Printf( stream, "3-D\n");
 		SymmetricTensor_Identity(3, symmTensor );
 		Journal_PrintSymmetricTensor( stream, symmTensor, 3); 
-    
-		Journal_Printf(stream, "\n/*******************    Test 3   ************************/\n");
+
+		pcu_filename_expected( "testTensorMultMathSymmetricTensorIdentity.expected", expected_file );
+		pcu_check_fileEq( "testSymmetricTensorIdentity.dat", expected_file );
+		remove( "testSymmetricTensorIdentity.dat" );
+	}
+}
+
+void TensorMultMathSuite_TestTensorArrayTranspose( TensorMultMathSuiteData* data ) {
+	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+
+	if (data->rank == procToWatch) {
+		TensorArray	tensorArray, tensorResult;
+		Stream*		stream = Journal_Register( InfoStream_Type, "TensorArrayTranspose" );
+		char			expected_file[PCU_PATH_MAX];
+
+		Stream_RedirectFile( stream, "testTensorArrayTranspose.dat" );
+
+		Journal_Printf(stream, "*******************    Test 3   ************************\n");
 		Journal_Printf( stream, "Test function TensorArray_Transpose \n\n");
 		Journal_Printf( stream, "2-D\n");    
 		tensorArray[FT2D_00] = 0.7;
@@ -127,7 +145,23 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		TensorArray_Transpose(tensorArray, 3, tensorResult);
 		Journal_PrintTensorArray( stream, tensorResult, 3);
 
-		Journal_Printf(stream, "\n/*******************    Test 4   ************************/\n");
+		pcu_filename_expected( "testTensorMultTranspose.expected", expected_file );
+		pcu_check_fileEq( "testTensorArrayTranspose.dat", expected_file );
+		remove( "testTensorArrayTranspose.dat" );
+	}
+}
+
+void TensorMultMathSuite_TestTensorArrayAdd( TensorMultMathSuiteData* data ) {
+	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+
+	if (data->rank == procToWatch) {
+		TensorArray	tensorArray, tensorArray2, tensorResult;
+		Stream*		stream = Journal_Register( InfoStream_Type, "TensorArrayAdd" );
+		char			expected_file[PCU_PATH_MAX];
+
+		Stream_RedirectFile( stream, "testTensorArrayAdd.dat" );
+
+		Journal_Printf( stream, "*******************    Test 4   ************************\n");
 		Journal_Printf( stream, "Test function TensorArray_Add \n\n");
 
 		Journal_Printf( stream, "2-D\n");
@@ -149,7 +183,23 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		TensorArray_Add(tensorArray, tensorArray2, 3, tensorResult);
 		Journal_PrintTensorArray( stream, tensorResult, 3);
 
-		Journal_Printf(stream, "\n/*******************    Test 5   ************************/\n");
+		pcu_filename_expected( "testTensorMultAdd.expected", expected_file );
+		pcu_check_fileEq( "testTensorArrayAdd.dat", expected_file );
+		remove( "testTensorArrayAdd.dat" );
+	}
+}
+
+void TensorMultMathSuite_TestTensorArraySubstract( TensorMultMathSuiteData* data ) {
+	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+
+	if (data->rank == procToWatch) {
+		TensorArray	tensorArray, tensorArray2, tensorResult;
+		Stream*		stream = Journal_Register( InfoStream_Type, "TensorArraySubstract" );
+		char			expected_file[PCU_PATH_MAX];
+
+		Stream_RedirectFile( stream, "testTensorArraySubstract.dat" );
+
+		Journal_Printf(stream, "*******************    Test 5   ************************\n");
 		Journal_Printf( stream, "Test function TensorArray_Subtract \n\n");
 
 		Journal_Printf( stream, "2-D\n");
@@ -171,7 +221,23 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		TensorArray_Subtract(tensorArray, tensorArray2, 3, tensorResult);
 		Journal_PrintTensorArray( stream, tensorResult, 3);
 
-		Journal_Printf(stream, "\n/*******************    Test 6   ************************/\n");
+		pcu_filename_expected( "testTensorMultSubstract.expected", expected_file );
+		pcu_check_fileEq( "testTensorArraySubstract.dat", expected_file );
+		remove( "testTensorArraySubstract.dat" );
+	}
+}
+
+void TensorMultMathSuite_TestTensorArrayMultiplyByTensorArray( TensorMultMathSuiteData* data ) {
+	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+
+	if (data->rank == procToWatch) {
+		TensorArray	tensorArray, tensorArray2, tensorResult;
+		Stream*		stream = Journal_Register( InfoStream_Type, "TensorArrayMultiplyByTensorArray" );
+		char			expected_file[PCU_PATH_MAX];
+
+		Stream_RedirectFile( stream, "testTensorArrayMultiplyByTensorArray.dat" );
+
+		Journal_Printf(stream, "*******************    Test 6   ************************\n");
 		Journal_Printf( stream, "Test function TensorArray_MultiplyByTensorArray \n\n");
 		Journal_Printf( stream, "Solutions tested against: http://www.uni-bonn.de/~manfear/matrixcalc.php");
 		Journal_Printf( stream, "2-D\n");
@@ -201,7 +267,24 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		TensorArray_MultiplyByTensorArray(tensorArray, tensorArray2, 3, tensorResult);
 		Journal_PrintTensorArray( stream, tensorResult, 3);
 
-		Journal_Printf(stream, "\n/*******************    Test 7   ************************/\n");
+		pcu_filename_expected( "testTensorMultMultiplyByTensorArray.expected", expected_file );
+		pcu_check_fileEq( "testTensorArrayMultiplyByTensorArray.dat", expected_file );
+		remove( "testTensorArrayMultiplyByTensorArray.dat" );
+	}
+}
+
+void TensorMultMathSuite_TestTensorArrayMultiplyByRightTranspose( TensorMultMathSuiteData* data ) {
+	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+
+	if (data->rank == procToWatch) {
+		SymmetricTensor	symmTensorResult;
+		TensorArray			tensorArray;
+		Stream*				stream = Journal_Register( InfoStream_Type, "TensorArrayMultiplyByRightTranspose" );
+		char					expected_file[PCU_PATH_MAX];
+
+		Stream_RedirectFile( stream, "testTensorArrayMultiplyByRightTranspose.dat" );
+
+		Journal_Printf(stream, "*******************    Test 7   ************************\n");
 		Journal_Printf( stream, "Test function TensorArray_MultiplyByRightTranspose \n\n");
 		Journal_Printf( stream, "Solutions tested against: http://www.uni-bonn.de/~manfear/matrixcalc.php");
 
@@ -224,7 +307,24 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		Journal_Printf( stream, "The answer, A * A^T = \n");
 		Journal_PrintSymmetricTensor( stream, symmTensorResult, 3);
 
-		Journal_Printf(stream, "\n/*******************    Test 8   ************************/\n");
+		pcu_filename_expected( "testTensorMultMultiplyByRightTranspose.expected", expected_file );
+		pcu_check_fileEq( "testTensorArrayMultiplyByRightTranspose.dat", expected_file );
+		remove( "testTensorArrayMultiplyByRightTranspose.dat" );
+	}
+}
+
+void TensorMultMathSuite_TestTensorArrayMultiplyByLeftTranspose( TensorMultMathSuiteData* data ) {
+	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+
+	if (data->rank == procToWatch) {
+		SymmetricTensor	symmTensorResult;
+		TensorArray			tensorArray;
+		Stream*				stream = Journal_Register( InfoStream_Type, "TensorArrayMultiplyByLeftTranspose" );
+		char					expected_file[PCU_PATH_MAX];
+
+		Stream_RedirectFile( stream, "testTensorArrayMultiplyByLeftTranspose.dat" );
+
+		Journal_Printf(stream, "*******************    Test 8   ************************\n");
 		Journal_Printf( stream, "Test function TensorArray_MultiplyByLeftTranspose \n\n");
 		Journal_Printf( stream, "Solutions tested against: http://www.uni-bonn.de/~manfear/matrixcalc.php");
 
@@ -247,7 +347,24 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		Journal_Printf( stream, "The answer, A^T * A = \n");
 		Journal_PrintSymmetricTensor( stream, symmTensorResult, 3);
 
-		Journal_Printf(stream, "\n/*******************    Test 9   ************************/\n");
+		pcu_filename_expected( "testTensorMultMultiplyByLeftTranspose.expected", expected_file );
+		pcu_check_fileEq( "testTensorArrayMultiplyByLeftTranspose.dat", expected_file );
+		remove( "testTensorArrayMultiplyByLeftTranspose.dat" );
+	}
+}
+
+void TensorMultMathSuite_TestTensorArrayMultiplyBySymmetricTensor( TensorMultMathSuiteData* data ) {
+	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+
+	if (data->rank == procToWatch) {
+		SymmetricTensor	symmTensor;
+		TensorArray			tensorArray, tensorResult;
+		Stream*				stream = Journal_Register( InfoStream_Type, "TensorArrayMultiplyBySymmetricTensor" );
+		char					expected_file[PCU_PATH_MAX];
+
+		Stream_RedirectFile( stream, "testTensorArrayMultiplyBySymemtricTensor.dat" );
+
+		Journal_Printf(stream, "*******************    Test 9   ************************\n");
 		Journal_Printf( stream, "Test function TensorArray_MultiplyBySymmetricTensor \n\n");
 		Journal_Printf( stream, "Solutions tested against: http://www.uni-bonn.de/~manfear/matrixcalc.php");
 
@@ -275,7 +392,24 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		TensorArray_MultiplyBySymmetricTensor(tensorArray, symmTensor, 3, tensorResult);
 		Journal_PrintTensorArray( stream, tensorResult, 3);
 
-		Journal_Printf(stream, "\n/*******************    Test 10   ************************/\n");
+		pcu_filename_expected( "testTensorMultMultiplyBySymmetricTensor.expected", expected_file );
+		pcu_check_fileEq( "testTensorArrayMultiplyBySymemtricTensor.dat", expected_file );
+		remove( "testTensorArrayMultiplyBySymemtricTensor.dat" );
+	}
+}
+
+void TensorMultMathSuite_TestTensorArrayMultiplyByLeftVector( TensorMultMathSuiteData* data ) {
+	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+
+	if (data->rank == procToWatch) {
+		XYZ					vector, vectorResult;
+		TensorArray			tensorArray;
+		Stream*				stream = Journal_Register( InfoStream_Type, "TensorArrayMultiplyByLeftVector" );
+		char					expected_file[PCU_PATH_MAX];
+
+		Stream_RedirectFile( stream, "testTensorArrayMultiplyByLeftVector.dat" );
+
+		Journal_Printf(stream, "*******************    Test 10   ************************\n");
 		Journal_Printf( stream, "Test function TensorArray_MultiplyByLeftVector \n\n");
 		Journal_Printf( stream, "Solutions tested against: http://www.uni-bonn.de/~manfear/matrixcalc.php");
 
@@ -302,7 +436,24 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		TensorArray_MultiplyByLeftVector(tensorArray, vector, 3, vectorResult);
 		StGermain_PrintNamedVector( stream, vectorResult, 3);
 
-		Journal_Printf(stream, "\n/*******************    Test 11   ************************/\n");
+		pcu_filename_expected( "testTensorMultMultiplyByLeftVector.expected", expected_file );
+		pcu_check_fileEq( "testTensorArrayMultiplyByLeftVector.dat", expected_file );
+		remove( "testTensorArrayMultiplyByLeftVector.dat" );
+	}
+}
+
+void TensorMultMathSuite_TestTensorArrayMultiplyByRightVector( TensorMultMathSuiteData* data ) {
+	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+
+	if (data->rank == procToWatch) {
+		XYZ					vector, vectorResult;
+		TensorArray			tensorArray;
+		Stream*				stream = Journal_Register( InfoStream_Type, "TensorArrayMultiplyByRightVector" );
+		char					expected_file[PCU_PATH_MAX];
+
+		Stream_RedirectFile( stream, "testTensorArrayMultiplyByRightVector.dat" );
+
+		Journal_Printf(stream, "*******************    Test 11   ************************\n");
 		Journal_Printf( stream, "Test function TensorArray_MultiplyByRightVector \n\n");
 		Journal_Printf( stream, "Solutions tested against: http://www.uni-bonn.de/~manfear/matrixcalc.php");
 
@@ -329,7 +480,24 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		TensorArray_MultiplyByRightVector(tensorArray, vector, 3, vectorResult);
 		StGermain_PrintNamedVector( stream, vectorResult, 3);
 
-		Journal_Printf(stream, "\n/*******************    Test 12   ************************/\n");
+		pcu_filename_expected( "testTensorMultMultiplyByRightVector.expected", expected_file );
+		pcu_check_fileEq( "testTensorArrayMultiplyByRightVector.dat", expected_file );
+		remove( "testTensorArrayMultiplyByRightVector.dat" );
+	}
+}
+
+void TensorMultMathSuite_TestCalcDeterminant( TensorMultMathSuiteData* data ) {
+	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+
+	if (data->rank == procToWatch) {
+		TensorArray			tensorArray;
+		double				result;
+		Stream*				stream = Journal_Register( InfoStream_Type, "CalcDeterminant" );
+		char					expected_file[PCU_PATH_MAX];
+
+		Stream_RedirectFile( stream, "testCalcDeterminant.dat" );
+
+		Journal_Printf(stream, "*******************    Test 12   ************************\n");
 		Journal_Printf( stream, "Test function TensorArray_CalcDeterminant \n\n");
 		Journal_Printf( stream, "Solutions tested against: http://www.bluebit.gr/matrix-calculator/");
 
@@ -352,7 +520,29 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		Journal_Printf( stream, "Determinant = \n");
 		Journal_PrintValue( stream, result);
 
-		Journal_Printf(stream, "\n/*******************    Test 13   ************************/\n");
+		pcu_filename_expected( "testTensorMultCalcDeterminant.expected", expected_file );
+		pcu_check_fileEq( "testCalcDeterminant.dat", expected_file );
+		remove( "testCalcDeterminant.dat" );
+	}
+}
+
+void TensorMultMathSuite_TestCalcInverseWithDeterminant( TensorMultMathSuiteData* data ) {
+	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+
+	if (data->rank == procToWatch) {
+		TensorArray			tensorArray, tensorResult, tensorCompare, tensorDiff;
+		double				result, errorValue;
+		Dimension_Index	row, col;
+		Bool					tensorMultMathTest_Flag;
+		Stream*				stream = Journal_Register( InfoStream_Type, "CalcInverseWithDeterminant" );
+		char					expected_file[PCU_PATH_MAX];
+
+		Stream_RedirectFile( stream, "testCalcInverseWithDeterminant.dat" );
+
+      #define STG_TENSORMULTMATHTEST_ERROR 1.0e-14;
+		errorValue = STG_TENSORMULTMATHTEST_ERROR;
+
+		Journal_Printf(stream, "*******************    Test 13   ************************\n");
 		Journal_Printf( stream, "Test function TensorArray_CalcInverseWithDeterminant \n\n");
 
 		Journal_Printf( stream, "2-D\n");
@@ -398,14 +588,10 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		tensorArray[FT3D_10] = 30; tensorArray[FT3D_11] = 22; tensorArray[FT3D_12] = 4;
 		tensorArray[FT3D_20] = 5; tensorArray[FT3D_21] = 7; tensorArray[FT3D_22] = 9;
 
-		tensorCompare[FT3D_00] = -5.666666666666667;
-		tensorCompare[FT3D_01] = -0.100000000000000;
-		tensorCompare[FT3D_02] =  1.933333333333333;
-		tensorCompare[FT3D_10] =  8.333333333333333;
-		tensorCompare[FT3D_11] =  0.200000000000000;
-		tensorCompare[FT3D_12] = -2.866666666666667;
-		tensorCompare[FT3D_20] = -3.333333333333333;
-		tensorCompare[FT3D_21] = -0.100000000000000;
+		tensorCompare[FT3D_00] = -5.666666666666667; tensorCompare[FT3D_01] = -0.100000000000000;
+		tensorCompare[FT3D_02] =  1.933333333333333; tensorCompare[FT3D_10] =  8.333333333333333;
+		tensorCompare[FT3D_11] =  0.200000000000000; tensorCompare[FT3D_12] = -2.866666666666667;
+		tensorCompare[FT3D_20] = -3.333333333333333; tensorCompare[FT3D_21] = -0.100000000000000;
 		tensorCompare[FT3D_22] =  1.266666666666667;
 
 		Journal_PrintTensorArray( stream, tensorArray, 3);
@@ -433,7 +619,29 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
       Journal_Printf( stream, "Inverse of tensor:\n");
       Journal_PrintTensorArray( stream, tensorCompare, 3);
 
-		Journal_Printf(stream, "\n/*******************    Test 14   ************************/\n");
+		pcu_filename_expected( "testTensorMultCalcInverseWithDeterminant.expected", expected_file );
+		pcu_check_fileEq( "testCalcInverseWithDeterminant.dat", expected_file );
+		remove( "testCalcInverseWithDeterminant.dat" );
+	}
+}
+
+void TensorMultMathSuite_TestCalcInverse( TensorMultMathSuiteData* data ) {
+	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+
+	if (data->rank == procToWatch) {
+		TensorArray			tensorArray, tensorResult, tensorCompare, tensorDiff;
+		double				errorValue;
+		Dimension_Index	row, col;
+		Bool					tensorMultMathTest_Flag;
+		Stream*				stream = Journal_Register( InfoStream_Type, "CalcInverse" );
+		char					expected_file[PCU_PATH_MAX];
+
+		Stream_RedirectFile( stream, "testCalcInverse.dat" );
+
+      #define STG_TENSORMULTMATHTEST_ERROR 1.0e-14;
+		errorValue = STG_TENSORMULTMATHTEST_ERROR;
+
+		Journal_Printf(stream, "*******************    Test 14   ************************\n");
 		Journal_Printf( stream, "Test function TensorArray_CalcInverse \n\n");
 		Journal_Printf( stream, "Solutions tested against: http://www.bluebit.gr/matrix-calculator/");		
 
@@ -479,14 +687,10 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		tensorArray[FT3D_10] = 30; tensorArray[FT3D_11] = 22; tensorArray[FT3D_12] = 4;
 		tensorArray[FT3D_20] = 5; tensorArray[FT3D_21] = 7; tensorArray[FT3D_22] = 9;
 
-		tensorCompare[FT3D_00] = -5.666666666666667;
-		tensorCompare[FT3D_01] = -0.1;
-		tensorCompare[FT3D_02] =  1.933333333333333;
-		tensorCompare[FT3D_10] =  8.333333333333333;
-		tensorCompare[FT3D_11] =  0.200000000000;
-		tensorCompare[FT3D_12] = -2.866666666666667;
-		tensorCompare[FT3D_20] = -3.333333333333333;
-		tensorCompare[FT3D_21] = -0.1;
+		tensorCompare[FT3D_00] = -5.666666666666667; tensorCompare[FT3D_01] = -0.1;
+		tensorCompare[FT3D_02] =  1.933333333333333; tensorCompare[FT3D_10] =  8.333333333333333;
+		tensorCompare[FT3D_11] =  0.200000000000; tensorCompare[FT3D_12] = -2.866666666666667;
+		tensorCompare[FT3D_20] = -3.333333333333333; tensorCompare[FT3D_21] = -0.1;
 		tensorCompare[FT3D_22] =  1.266666666666667;
 		
 		Journal_PrintTensorArray( stream, tensorArray, 3);	
@@ -514,7 +718,24 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		Journal_Printf( stream, "Inverse of tensor:\n");
 		Journal_PrintTensorArray( stream, tensorCompare, 3);
 
-		Journal_Printf(stream, "\n/*******************    Test 15   ************************/\n");
+		pcu_filename_expected( "testTensorMultCalcInverse.expected", expected_file );
+		pcu_check_fileEq( "testCalcInverse.dat", expected_file );
+		remove( "testCalcInverse.dat" );
+	}
+}
+
+void TensorMultMathSuite_TestTensorArrayDoubleContraction( TensorMultMathSuiteData* data ) {
+	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+
+	if (data->rank == procToWatch) {
+		TensorArray			tensorArray, tensorArray2;
+		double				result;
+		Stream*				stream = Journal_Register( InfoStream_Type, "TensorArrayDoubleContraction" );
+		char					expected_file[PCU_PATH_MAX];
+
+		Stream_RedirectFile( stream, "testTADoubleContraction.dat" );
+
+		Journal_Printf(stream, "*******************    Test 15   ************************\n");
 		Journal_Printf( stream, "Test function TensorArray_DoubleContraction \n\n");
 		Journal_Printf( stream, "Hand verified\n");
 
@@ -545,8 +766,26 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		result = TensorArray_DoubleContraction(tensorArray, tensorArray2, 3);
 		Journal_Printf( stream, "Double Contraction = \n");
 		Journal_PrintValue( stream, result);
-		
-		Journal_Printf(stream, "\n/*******************    Test 16   ************************/\n");
+
+		pcu_filename_expected( "testTensorMultTADoubleContraction.expected", expected_file );
+		pcu_check_fileEq( "testTADoubleContraction.dat", expected_file );
+		remove( "testTADoubleContraction.dat" );
+	}
+}
+
+void TensorMultMathSuite_TestSymmetricTensorDoubleContraction( TensorMultMathSuiteData* data ) {
+	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+
+	if (data->rank == procToWatch) {
+		SymmetricTensor	symmTensor, symmTensor2;
+		TensorArray			tensorArray, tensorArray2;
+		double				result;
+		Stream*				stream = Journal_Register( InfoStream_Type, "SymmetricTensorDoubleContraction" );
+		char					expected_file[PCU_PATH_MAX];
+
+		Stream_RedirectFile( stream, "testSTDoubleContraction.dat" );
+
+		Journal_Printf(stream, "*******************    Test 16   ************************\n");
 		Journal_Printf( stream, "Test function SymmetricTensor_DoubleContraction \n\n");
 		Journal_Printf( stream, "Hand verified\n");
 		Journal_Printf( stream, "2-D\n");		
@@ -573,7 +812,24 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		Journal_Printf( stream, "Double Contraction = \n");
 		Journal_PrintValue( stream, result);
 
-		Journal_Printf(stream, "\n/*******************    Test 17   ************************/\n");
+		pcu_filename_expected( "testTensorMultSTDoubleContraction.expected", expected_file );
+		pcu_check_fileEq( "testSTDoubleContraction.dat", expected_file );
+		remove( "testSTDoubleContraction.dat" );
+	}
+}
+
+void TensorMultMathSuite_TestPrintNonSquareMatrix( TensorMultMathSuiteData* data ) {
+	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+
+	if (data->rank == procToWatch) {
+		double	**nonSquareMatrixA, **nonSquareMatrixB;
+		double	**nonSquareMatrixResult, **nonSquareMatrixAT;
+		Stream*	stream = Journal_Register( InfoStream_Type, "PrintNonSquareMatrix" );
+		char		expected_file[PCU_PATH_MAX];
+
+		Stream_RedirectFile( stream, "testPrintNonSquareMatrix.dat" );
+
+		Journal_Printf(stream, "*******************    Test 17   ************************\n");
 		Journal_Printf( stream, "Test function Journal_PrintNonSquareMatrix \n\n");
 
 		nonSquareMatrixA = Memory_Alloc_2DArray(double, 3, 4, "NonSquareMatrixA" );
@@ -598,18 +854,98 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 		Journal_PrintNonSquareMatrix(stream, nonSquareMatrixA, 3, 4);
 		Journal_PrintNonSquareMatrix(stream, nonSquareMatrixB, 4, 2);
 
-		Journal_Printf(stream, "\n/*******************    Test 18   ************************/\n");
+		pcu_filename_expected( "testTensorMultPrintNonSquareMatrix.expected", expected_file );
+		pcu_check_fileEq( "testPrintNonSquareMatrix.dat", expected_file );
+		remove( "testPrintNonSquareMatrix.dat" );
+
+		Memory_Free(nonSquareMatrixA);
+		Memory_Free(nonSquareMatrixB);
+		Memory_Free(nonSquareMatrixAT);
+		Memory_Free(nonSquareMatrixResult);
+	}
+}
+
+void TensorMultMathSuite_TestNonSquareMatrixTranspose( TensorMultMathSuiteData* data ) {
+	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+
+	if (data->rank == procToWatch) {
+		double	**nonSquareMatrixA, **nonSquareMatrixB;
+		double	**nonSquareMatrixResult, **nonSquareMatrixAT;
+		Stream*	stream = Journal_Register( InfoStream_Type, "NonSquareMatrixTranspose" );
+		char		expected_file[PCU_PATH_MAX];
+
+		Stream_RedirectFile( stream, "testNonSquareMatrixTranspose.dat" );
+
+		Journal_Printf(stream, "*******************    Test 18   ************************\n");
 		Journal_Printf( stream, "Test function NonSquareMatrix_Transpose \n\n");
 
+		nonSquareMatrixA = Memory_Alloc_2DArray(double, 3, 4, "NonSquareMatrixA" );
+		nonSquareMatrixB = Memory_Alloc_2DArray(double, 4, 2, "NonSquareMatrixB" );
+		nonSquareMatrixAT = Memory_Alloc_2DArray(double, 4, 3, "NonSquareMatrixAT" );
+		nonSquareMatrixResult = Memory_Alloc_2DArray(double, 3, 2, "NonSquareMatrixResult" );
+		/* Matrix A */
+		nonSquareMatrixA[0][0] = 0; nonSquareMatrixA[1][0] =  4;
+		nonSquareMatrixA[0][1] = 1; nonSquareMatrixA[1][1] =  5;
+		nonSquareMatrixA[0][2] = 2; nonSquareMatrixA[1][2] =  6;		
+		nonSquareMatrixA[0][3] = 3; nonSquareMatrixA[1][3] =  7;
+		
+		nonSquareMatrixA[2][0] = 8; nonSquareMatrixA[2][1] = 9;
+		nonSquareMatrixA[2][2] = 10; nonSquareMatrixA[2][3] = 11;
+		/* Matrix B */
+		nonSquareMatrixB[0][0] = 0; nonSquareMatrixB[1][0] =  2;
+		nonSquareMatrixB[0][1] = 1; nonSquareMatrixB[1][1] =  3;
+		
+		nonSquareMatrixB[2][0] = 4; nonSquareMatrixB[3][0] =  6;
+		nonSquareMatrixB[2][1] = 5; nonSquareMatrixB[3][1] =  7;
+
 		Journal_PrintNonSquareMatrix(stream, nonSquareMatrixA, 3, 4);
-		
 		NonSquareMatrix_Transpose( nonSquareMatrixA, 3, 4, nonSquareMatrixAT);
-		
 		Journal_PrintNonSquareMatrix(stream, nonSquareMatrixAT, 4, 3);
 
-		Journal_Printf(stream, "\n/*******************    Test 19   ************************/\n");
+		pcu_filename_expected( "testTensorMultNonSquareMatrixTranspose.expected", expected_file );
+		pcu_check_fileEq( "testNonSquareMatrixTranspose.dat", expected_file );
+		remove( "testNonSquareMatrixTranspose.dat" );
+
+		Memory_Free(nonSquareMatrixA);
+		Memory_Free(nonSquareMatrixB);
+		Memory_Free(nonSquareMatrixAT);
+		Memory_Free(nonSquareMatrixResult);
+	}
+}
+
+void TensorMultMathSuite_TestMultiplicationByNonSquareMatrix( TensorMultMathSuiteData* data ) {
+	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+
+	if (data->rank == procToWatch) {
+		double	**nonSquareMatrixA, **nonSquareMatrixB;
+		double	**nonSquareMatrixResult, **nonSquareMatrixAT;
+		Stream*	stream = Journal_Register( InfoStream_Type, "MultiplicationByNonSquareMatrix" );
+		char		expected_file[PCU_PATH_MAX];
+
+		Stream_RedirectFile( stream, "testMultiplicationByNonSquareMatrix.dat" );
+
+		Journal_Printf(stream, "*******************    Test 19   ************************\n");
 		Journal_Printf( stream, "Test function NonSquareMatrix_MultiplicationByNonSquareMatrix \n\n");
 		
+		nonSquareMatrixA = Memory_Alloc_2DArray(double, 3, 4, "NonSquareMatrixA" );
+		nonSquareMatrixB = Memory_Alloc_2DArray(double, 4, 2, "NonSquareMatrixB" );
+		nonSquareMatrixAT = Memory_Alloc_2DArray(double, 4, 3, "NonSquareMatrixAT" );
+		nonSquareMatrixResult = Memory_Alloc_2DArray(double, 3, 2, "NonSquareMatrixResult" );
+		/* Matrix A */
+		nonSquareMatrixA[0][0] = 0; nonSquareMatrixA[1][0] =  4;
+		nonSquareMatrixA[0][1] = 1; nonSquareMatrixA[1][1] =  5;
+		nonSquareMatrixA[0][2] = 2; nonSquareMatrixA[1][2] =  6;		
+		nonSquareMatrixA[0][3] = 3; nonSquareMatrixA[1][3] =  7;
+		
+		nonSquareMatrixA[2][0] = 8; nonSquareMatrixA[2][1] = 9;
+		nonSquareMatrixA[2][2] = 10; nonSquareMatrixA[2][3] = 11;
+		/* Matrix B */
+		nonSquareMatrixB[0][0] = 0; nonSquareMatrixB[1][0] =  2;
+		nonSquareMatrixB[0][1] = 1; nonSquareMatrixB[1][1] =  3;
+		
+		nonSquareMatrixB[2][0] = 4; nonSquareMatrixB[3][0] =  6;
+		nonSquareMatrixB[2][1] = 5; nonSquareMatrixB[3][1] =  7;
+
 		Journal_PrintNonSquareMatrix(stream, nonSquareMatrixA, 3, 4);
 		Journal_PrintNonSquareMatrix(stream, nonSquareMatrixB, 4, 2);
 
@@ -618,11 +954,51 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 
 		Journal_PrintNonSquareMatrix(stream, nonSquareMatrixResult, 3, 2);
 
-		Journal_Printf(stream, "\n/*******************    Test 20   ************************/\n");
+		pcu_filename_expected( "testTensorMultMultiplicationByNonSquareMatrix.expected", expected_file );
+		pcu_check_fileEq( "testMultiplicationByNonSquareMatrix.dat", expected_file );
+		remove( "testMultiplicationByNonSquareMatrix.dat" );
+
+		Memory_Free(nonSquareMatrixA);
+		Memory_Free(nonSquareMatrixB);
+		Memory_Free(nonSquareMatrixAT);
+		Memory_Free(nonSquareMatrixResult);
+	}
+}
+
+void TensorMultMathSuite_TestMatrixVectorMultiplication( TensorMultMathSuiteData* data ) {
+	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+
+	if (data->rank == procToWatch) {
+		XYZ		vector;
+		Bool		tensorMultMathTest_Flag, error_flag;
+		double	**nonSquareMatrixA, **nonSquareMatrixAT;
+		double	solutionVector[4], solutionVectorCompare[4];
+		Dimension_Index	row;
+		Stream*	stream = Journal_Register( InfoStream_Type, "MatrixVectorMultiplication" );
+		char		expected_file[PCU_PATH_MAX];
+
+      #define STG_TENSORMULTMATHTEST_ERROR 1.0e-14;
+		Stream_RedirectFile( stream, "testMatrixVectorMultiplication.dat" );
+
+		Journal_Printf(stream, "*******************    Test 20   ************************\n");
 		Journal_Printf( stream, "Test function NonSquareMatrix_MatrixVectorMultiplication \n\n");
 		Journal_Printf( stream, "Tested against solutions at http://www.uni-bonn.de/~manfear/solve_lineq.php\n\n");
+
+		nonSquareMatrixA = Memory_Alloc_2DArray(double, 3, 4, "NonSquareMatrixA" );
+		nonSquareMatrixAT = Memory_Alloc_2DArray(double, 4, 3, "NonSquareMatrixAT" );
+		/* Matrix A */
+		nonSquareMatrixA[0][0] = 0; nonSquareMatrixA[1][0] =  4;
+		nonSquareMatrixA[0][1] = 1; nonSquareMatrixA[1][1] =  5;
+		nonSquareMatrixA[0][2] = 2; nonSquareMatrixA[1][2] =  6;		
+		nonSquareMatrixA[0][3] = 3; nonSquareMatrixA[1][3] =  7;
+		
+		nonSquareMatrixA[2][0] = 8; nonSquareMatrixA[2][1] = 9;
+		nonSquareMatrixA[2][2] = 10; nonSquareMatrixA[2][3] = 11;
+
+		NonSquareMatrix_Transpose( nonSquareMatrixA, 3, 4, nonSquareMatrixAT);
 		
 		vector[0] = 1; vector[1] = 2; vector[2] = 3;
+
 		solutionVectorCompare[0] = 32; solutionVectorCompare[1] = 38;
 		solutionVectorCompare[2] = 44; solutionVectorCompare[3] = 50;
 
@@ -646,19 +1022,36 @@ void TensorMultMathSuite_TestTensorMultMath( TensorMultMathSuiteData* data ) {
 			StGermain_PrintNamedVector(stream, solutionVectorCompare, 4);
 		}
 
-		pcu_filename_expected( "testTensorMultMath.expected", expected_file );
-		pcu_check_fileEq( "testTensorMultMath.dat", expected_file );
-		remove( "testTensorMultMath.dat" );
-		
+		pcu_filename_expected( "testTensorMultMatrixVectorMultiplication.expected", expected_file );
+		pcu_check_fileEq( "testMatrixVectorMultiplication.dat", expected_file );
+		remove( "testMatrixVectorMultiplication.dat" );
+
 		Memory_Free(nonSquareMatrixA);
-		Memory_Free(nonSquareMatrixB);
 		Memory_Free(nonSquareMatrixAT);
-		Memory_Free(nonSquareMatrixResult);
 	}
 }
 
 void TensorMultMathSuite( pcu_suite_t* suite ) {
 	pcu_suite_setData( suite, TensorMultMathSuiteData );
    pcu_suite_setFixtures( suite, TensorMultMathSuite_Setup, TensorMultMathSuite_Teardown );
-   pcu_suite_addTest( suite, TensorMultMathSuite_TestTensorMultMath );
+   pcu_suite_addTest( suite, TensorMultMathSuite_TestTensorArrayIdentity );
+   pcu_suite_addTest( suite, TensorMultMathSuite_TestSymmetricTensorIdentity );
+   pcu_suite_addTest( suite, TensorMultMathSuite_TestTensorArrayTranspose );
+   pcu_suite_addTest( suite, TensorMultMathSuite_TestTensorArrayAdd );
+   pcu_suite_addTest( suite, TensorMultMathSuite_TestTensorArraySubstract );
+   pcu_suite_addTest( suite, TensorMultMathSuite_TestTensorArrayMultiplyByTensorArray );
+   pcu_suite_addTest( suite, TensorMultMathSuite_TestTensorArrayMultiplyByRightTranspose );
+   pcu_suite_addTest( suite, TensorMultMathSuite_TestTensorArrayMultiplyByLeftTranspose );
+   pcu_suite_addTest( suite, TensorMultMathSuite_TestTensorArrayMultiplyBySymmetricTensor );
+   pcu_suite_addTest( suite, TensorMultMathSuite_TestTensorArrayMultiplyByRightVector );
+   pcu_suite_addTest( suite, TensorMultMathSuite_TestTensorArrayMultiplyByLeftVector );
+   pcu_suite_addTest( suite, TensorMultMathSuite_TestCalcDeterminant );
+   pcu_suite_addTest( suite, TensorMultMathSuite_TestCalcInverseWithDeterminant );
+   pcu_suite_addTest( suite, TensorMultMathSuite_TestCalcInverse );
+   pcu_suite_addTest( suite, TensorMultMathSuite_TestTensorArrayDoubleContraction );
+   pcu_suite_addTest( suite, TensorMultMathSuite_TestSymmetricTensorDoubleContraction );
+   pcu_suite_addTest( suite, TensorMultMathSuite_TestPrintNonSquareMatrix );
+   pcu_suite_addTest( suite, TensorMultMathSuite_TestNonSquareMatrixTranspose );
+   pcu_suite_addTest( suite, TensorMultMathSuite_TestMultiplicationByNonSquareMatrix );
+   pcu_suite_addTest( suite, TensorMultMathSuite_TestMatrixVectorMultiplication );
 }
