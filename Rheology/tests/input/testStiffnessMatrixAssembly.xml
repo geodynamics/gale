@@ -5,13 +5,6 @@
 
 	<include> Underworld/BaseApps/LidDrivenFEM.xml </include>
 	
-	<list name="plugins" mergeType="merge">
-	<!-- commenting out these guys for now, should be deleted in future
-		<param>Underworld_testStiffnessMatrixAssembly</param>
-		<param>testStiffnessMatrixCompare</param>
-		-->
-	</list>
-
 	<!-- Simulation control -->
 	<param name="outputPath"> ./output </param> 
 	<param name="maxTimeSteps"> 1 </param> 
