@@ -88,16 +88,16 @@
 	<param name="dumpEvery"> 1 </param>	
 	<param name="checkpointEvery"> 0 </param>
 
-        <!--   choose what to checkpoint
+  	<!--   choose what to checkpoint
 	<list name="FieldVariablesToCheckpoint">
 		<param>VelocityField</param>
 		<param>VelocityGradientsField</param>
 	</list>
 	-->
 
-        <!--  restart from a previous checkpoint 
-        <param name="restartTimestep"> 10 </param>
-         -->
+  	<!--  restart from a previous checkpoint 
+  	<param name="restartTimestep"> 10 </param>
+  	-->
 
 	<!-- Non-linear stuff -->
 	<param name="nonLinearMaxIterations"> 500 </param>	
