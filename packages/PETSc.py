@@ -56,14 +56,14 @@ class PETSc(Package):
                 petscconf = os.path.join(bmake_dir, self.arch, 'petscconf')
                 if os.path.exists(petscconf):
                     loc[1].append(os.path.dirname(petscconf))
-                    loc[2][0] = os.path.join(loc[2][0], self.arch)
+                    loc[2].append(os.path.join(loc[2][0], self.arch))
                 # Try PETSc 3 uninstalled.
                 else:
                     petscconf = os.path.join(loc[0], self.arch, 'conf', 'petscvariables')
                     if os.path.exists(petscconf):
                         loc[1].append(os.path.join(loc[0], self.arch, 'include'))
                         loc[1].append(os.path.join(loc[0], 'include'))
-                        loc[2][0] = os.path.join(loc[0], self.arch, 'lib')
+                        loc[2].append(os.path.join(loc[0], self.arch, 'lib'))
                     else:
                         petscconf = None
 
