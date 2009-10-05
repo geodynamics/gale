@@ -317,7 +317,8 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
 		restartTimestep = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "restartTimestep", 0 );	
 		if( restartTimestep ) {
          char*   meshReadFileName;
-         char*   meshReadFileNamePart;   
+         char*   meshReadFileNamePart;
+         self->readFromFile = True;
 #ifdef READ_HDF5
          hid_t   attrib_id, group_id;
          herr_t  status;
@@ -415,10 +416,9 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
 
          H5Gclose(group_id);
          H5Fclose( file );
-         
-         }            
-	      
-	      
+
+         }
+
 #else
          Journal_Firewall(!context->interpolateRestart,  
                      errorStream,"\n\n Interpolation restart not supported for ASCII checkpoint files \n\n");
@@ -443,7 +443,6 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
 					meshReadFileName );
 			}
 			else {
-				self->readFromFile = True;
 				/* Read min and max coords from file */
 		      if(self->nDims==2)
                   fscanf( meshFile, "Min: %lg %lg 0\n", &crdMin[0], &crdMin[1] );
