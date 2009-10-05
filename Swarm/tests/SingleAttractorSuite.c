@@ -49,8 +49,8 @@
 
 struct _Particle {
 	__GlobalParticle
-	double  velocity[3];
-	double  randomColour;
+	double velocity[3];
+	double randomColour;
 };
 
 void SingleAttractorSuite_SaveSwarms( void* context );
@@ -75,18 +75,18 @@ void SingleAttractorSuite_Teardown( SingleAttractorSuiteData* data ) {
 }
 
 void SingleAttractorSuite_TestSingleAttractor( SingleAttractorSuiteData* data ) {
-	Dictionary*						dictionary;
-	Dictionary*               	componentDict;
-	Stg_ComponentFactory*     	cf;
-	Stream*                   	stream;
-	Swarm*                    	swarm = NULL;
-	Particle                  	particle;
-	Particle*                 	currParticle = NULL;
-	Particle_Index            	lParticle_I = 0;
-	Dimension_Index           	dim_I = 0;
-	DomainContext*					context;
-	char								input_file[PCU_PATH_MAX];
-	char								expected_file[PCU_PATH_MAX];
+	Dictionary*					dictionary;
+	Dictionary*					componentDict;
+	Stg_ComponentFactory*	cf;
+	Stream*						stream;
+	Swarm*						swarm = NULL;
+	Particle						particle;
+	Particle*					currParticle = NULL;
+	Particle_Index				lParticle_I = 0;
+	Dimension_Index			dim_I = 0;
+	DomainContext*				context;
+	char							input_file[PCU_PATH_MAX];
+	char							expected_file[PCU_PATH_MAX];
 
 	stream = Journal_Register (Info_Type, "SingleAttractorStream");
 	pcu_filename_input( "testSwarmParticleAdvectionSingleAttractor.xml", input_file );
@@ -149,7 +149,7 @@ void SingleAttractorSuite_TestSingleAttractor( SingleAttractorSuiteData* data ) 
 
 	pcu_filename_expected( "testSwarmParticleAdvectionSingleAttractor.expected", expected_file );
 	pcu_check_fileEq( "testSingleAttractor.dat", expected_file );
-	//remove( "testSingleAttractor.dat" );
+	remove( "testSingleAttractor.dat" );
 
    Stg_Class_Delete( cf );
    Stg_Class_Delete( dictionary );

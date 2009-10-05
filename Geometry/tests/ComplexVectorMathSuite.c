@@ -516,7 +516,7 @@ void ComplexVectorMathSuite_TestComplexVectorMath( ComplexVectorMathSuiteData* d
 
 		pcu_filename_expected( "testComplexVectorMath.expected", expected_file );
 		pcu_check_fileEq( "testComplexVectorMath.dat", expected_file );
-		//remove( "testComplexVectorMath.dat" );
+		remove( "testComplexVectorMath.dat" );
 
 		Memory_Free( matrix );
 	}
