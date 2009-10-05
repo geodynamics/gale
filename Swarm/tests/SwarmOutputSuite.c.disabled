@@ -79,64 +79,57 @@ void SwarmOutputSuite_MoveParticles( AbstractContext* context ) {
 }
 
 void SwarmOutputSuite_Setup( SwarmOutputSuiteData* data ) {
-	Dimension_Index	dim;
-	char					input_file[PCU_PATH_MAX];
-	
 	/* MPI Initializations */
 	data->comm = MPI_COMM_WORLD;  
 	MPI_Comm_rank( data->comm, &data->rank );
 	MPI_Comm_size( data->comm, &data->nProcs );
-
 }
 
 void SwarmOutputSuite_Teardown( SwarmOutputSuiteData* data ) {
 }
 
 void SwarmOutputSuite_TestSwarmOutput( SwarmOutputSuiteData* data ) {
-	Dictionary*						dictionary;
-	Dictionary*						componentDict;
-	XML_IO_Handler*				io_Handler;
-	Stg_ComponentFactory*		cf;
-	DomainContext*					context;
-	ExtensionManager_Register*	extensionMgr_Register;
-	SwarmVariable_Register*		swarmVariable_Register;
-	char								expected_file[PCU_PATH_MAX];
-	char								input_file[PCU_PATH_MAX];
-	char								output_filename[PCU_PATH_MAX], expected_filename[PCU_PATH_MAX];
-	Index								steps, i;
+	int procToWatch = data->nProcs > 1 ? 1 : 0;
 
-	pcu_filename_input( "testSwarmOutput.xml", input_file );
-	cf = stgMainInitFromXML( input_file, data->comm, NULL );
-	context = (DomainContext*) LiveComponentRegister_Get( cf->LCRegister, "context" );
-	dictionary = context->dictionary;
+	if( data->rank == procToWatch ) {
+		Dictionary*					dictionary;
+		Dictionary*					componentDict;
+		XML_IO_Handler*			io_Handler;
+		Stg_ComponentFactory*	cf;
+		DomainContext*				context;
+		char							expected_file[PCU_PATH_MAX];
+		char							input_file[PCU_PATH_MAX];
+		char							output_filename[PCU_PATH_MAX], expected_filename[PCU_PATH_MAX];
+		Index							steps, i;
 
-	Journal_ReadFromDictionary( dictionary );
+		pcu_filename_input( "testSwarmOutput.xml", input_file );
+		cf = stgMainInitFromXML( input_file, data->comm, NULL );
+		context = (DomainContext*) LiveComponentRegister_Get( cf->LCRegister, "context" );
+		dictionary = context->dictionary;
 
-	ContextEP_Append( context, AbstractContext_EP_Dt, SwarmOutputSuite_Dt );
-	ContextEP_Append( context, AbstractContext_EP_Step, SwarmOutputSuite_MoveParticles );
+		Journal_ReadFromDictionary( dictionary );
 
-	componentDict = Dictionary_GetDictionary( dictionary, "components" );
-	assert( componentDict );
+		ContextEP_ReplaceAll( context, AbstractContext_EP_Dt, SwarmOutputSuite_Dt );
+		ContextEP_Append( context, AbstractContext_EP_Step, SwarmOutputSuite_MoveParticles );
 
-	extensionMgr_Register = ExtensionManager_Register_New();
-	swarmVariable_Register = SwarmVariable_Register_New( NULL );
-	
-	AbstractContext_Dump( context );
-	Stg_Component_Execute( context, 0, False );
-	Stg_Component_Destroy( context, 0, False );
+		componentDict = Dictionary_GetDictionary( dictionary, "components" );
+		assert( componentDict );
 
-	steps = Dictionary_GetUnsignedInt( dictionary, "maxTimeSteps" );
-	for (i = 0; i < steps; i++){
-		sprintf( expected_filename, "testSwarmOutput.swarmOutput.%05u.dat.expected", i );
-		sprintf( output_filename, "output/swarmOutput.%05u.dat", i );
-		pcu_filename_expected( expected_filename, expected_file );
-		pcu_check_fileEq( output_filename, expected_file );
+		stgMainBuildAndInitialise( cf );
+
+		AbstractContext_Dump( context );
+		Stg_Component_Execute( context, 0, False );
+		Stg_Component_Destroy( context, 0, False );
+
+		steps = Dictionary_GetUnsignedInt( dictionary, "maxTimeSteps" );
+		for (i = 0; i < steps; i++){
+			sprintf( expected_filename, "testSwarmOutput.swarmOutput.%05u.dat.expected", i );
+			sprintf( output_filename, "output/swarmOutput.%05u.dat", i );
+			pcu_filename_expected( expected_filename, expected_file );
+			pcu_check_fileEq( output_filename, expected_file );
+		}
+		Stg_Class_Delete( cf );
 	}
-
-	/* Destroy stuff */
-   LiveComponentRegister_DeleteAll( cf->LCRegister ); 
-	Stg_Class_Delete( extensionMgr_Register );
-	Stg_Class_Delete( swarmVariable_Register );
 }
 
 void SwarmOutputSuite( pcu_suite_t* suite ) {

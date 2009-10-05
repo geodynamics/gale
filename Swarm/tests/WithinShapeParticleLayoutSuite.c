@@ -50,18 +50,9 @@ struct _Particle {
 };
 
 typedef struct {
-	ExtensionManager_Register*	extensionMgr_Register;
-	WithinShapeParticleLayout*	particleLayout;
-	ElementCellLayout*			elementCellLayout;
-	Mesh*								mesh;
-	Swarm*							swarm;
-	unsigned							nDims;
-	unsigned							meshSize[3];
-	double							minCrds[3];
-	double							maxCrds[3];
 	MPI_Comm							comm;
-	unsigned int					rank;
-	unsigned int					nProcs;
+	unsigned							rank;
+	unsigned							nProcs;
 } WithinShapeParticleLayoutSuiteData;
 
 Mesh* WithinShapeParticleLayoutSuite_buildMesh( unsigned nDims, unsigned* size, double* minCrds, double* maxCrds, ExtensionManager_Register* emReg ) {
@@ -92,129 +83,78 @@ void WithinShapeParticleLayoutSuite_Setup( WithinShapeParticleLayoutSuiteData* d
 	MPI_Comm_rank( data->comm, &data->rank );
 	MPI_Comm_size( data->comm, &data->nProcs );
 
-	data->nDims = 3;
-	data->meshSize[0] = 5; data->meshSize[1] = 3; data->meshSize[2] = 2;
-	data->minCrds[0] = 0; data->minCrds[1] = 0; data->minCrds[2] = 0;
-	data->maxCrds[0] = 1; data->maxCrds[1] = 1; data->maxCrds[2] = 1;	
 }
 
 void WithinShapeParticleLayoutSuite_Teardown( WithinShapeParticleLayoutSuiteData* data ) {
-	/* Destroy stuff */
-	Stg_Class_Delete( data->mesh );
-	Stg_Class_Delete( data->swarm );	
-	Stg_Class_Delete( data->extensionMgr_Register );
-	Stg_Class_Delete( data->elementCellLayout );
-	Stg_Class_Delete( data->particleLayout );
-	remove( "sphere10Particles.dat" );
-	remove( "sphere100Particles.dat" );
 }
 
-void WithinShapeParticleLayoutSuite_TestWithinShapeSphere_10Particles( WithinShapeParticleLayoutSuiteData* data ) {
-	XYZ			centre;
-	Stg_Shape*	shape;
-	int			procToWatch;
-	int			particleCount = 10;
-	Stream*		stream;
-	char			expected_file[PCU_PATH_MAX];
+void WithinShapeParticleLayoutSuite_TestWithinShapeSphere( WithinShapeParticleLayoutSuiteData* data ) {
+	ExtensionManager_Register*	extensionMgr_Register;
+	WithinShapeParticleLayout*	particleLayout;
+	ElementCellLayout*			elementCellLayout;
+	Mesh*								mesh;
+	Swarm*							swarm;
+	unsigned							nDims;
+	unsigned							meshSize[3];
+	double							minCrds[3];
+	double							maxCrds[3];
+	XYZ								centre;
+	Stg_Shape*						shape;
+	int								procToWatch;
+	int								particleCount = 10;
+	Stream*							stream;
+	char								expected_file[PCU_PATH_MAX];
 	
-	if( data->nProcs >= 2 ) {
-		procToWatch = 1;
-	}
-	else {
-		procToWatch = 0;
-	}
+	nDims = 3;
+	meshSize[0] = 5; meshSize[1] = 3; meshSize[2] = 2;
+	minCrds[0] = 0; minCrds[1] = 0; minCrds[2] = 0;
+	maxCrds[0] = 1; maxCrds[1] = 1; maxCrds[2] = 1;	
 
 	/* Init mesh */
-	data->extensionMgr_Register = ExtensionManager_Register_New();
-	data->mesh = WithinShapeParticleLayoutSuite_buildMesh( data->nDims, data->meshSize, data->minCrds, data->maxCrds, data->extensionMgr_Register );
+	extensionMgr_Register = ExtensionManager_Register_New();
+	mesh = WithinShapeParticleLayoutSuite_buildMesh( nDims, meshSize, minCrds, maxCrds, extensionMgr_Register );
 
 	/* Configure the element-cell-layout */
-	data->elementCellLayout = ElementCellLayout_New( "elementCellLayout", data->mesh );
+	elementCellLayout = ElementCellLayout_New( "elementCellLayout", mesh );
 
 	/* Build the mesh */
-	Stg_Component_Build( data->mesh, 0, False );
-	Stg_Component_Initialise( data->mesh, 0, False );	
+	Stg_Component_Build( mesh, 0, False );
+	Stg_Component_Initialise( mesh, 0, False );	
 
 	centre[I_AXIS] = centre[J_AXIS] = centre[K_AXIS] = 0.5;
-	shape = (Stg_Shape*)Sphere_New( "testSphere", data->nDims, centre, 0, 0, 0, 0.05 );
+	shape = (Stg_Shape*)Sphere_New( "testSphere", nDims, centre, 0, 0, 0, 0.05 );
 
 	/* Configure the gauss-particle-layout */
-	data->particleLayout = WithinShapeParticleLayout_New( "withinShapeParticleLayoutSphere", data->nDims, particleCount, shape );
+	particleLayout = WithinShapeParticleLayout_New( "withinShapeParticleLayoutSphere", nDims, particleCount, shape );
 	
 	/* Configure the swarm */
-	data->swarm = Swarm_New(  "testSwarm", data->elementCellLayout, data->particleLayout, data->nDims, sizeof(Particle),
-	data->extensionMgr_Register, NULL, data->comm, NULL );
+	swarm = Swarm_New(  "testSwarm", elementCellLayout, particleLayout, nDims, sizeof(Particle),
+	extensionMgr_Register, NULL, data->comm, NULL );
 	
 	/* Build the swarm */
-	Stg_Component_Build( data->swarm, 0, False );
-	Stg_Component_Initialise( data->swarm, 0, False );
-	stream = Journal_Register (Info_Type, "WithinShapeParticleLayoutSphere");
-	
+	Stg_Component_Build( swarm, 0, False );
+	Stg_Component_Initialise( swarm, 0, False );
+
 	if( data->rank == procToWatch ) {
-		Stg_Class_Print( data->particleLayout, stream );
-		/* Print out the particles on all cells */
+		stream = Journal_Register (Info_Type, "WithinShape10Particles");
 		Stream_RedirectFile( stream, "sphere10Particles.dat" );
-		Swarm_PrintParticleCoords_ByCell( data->swarm, stream );
+
+		/* Print out the particles on all cells */
+		Swarm_PrintParticleCoords_ByCell( swarm, stream );
 		pcu_filename_expected( "testWithinShapeParticleLayout10ParticlesOutput.expected", expected_file );
 		pcu_check_fileEq( "sphere10Particles.dat", expected_file );
+
+		Stg_Class_Delete( mesh );
+		Stg_Class_Delete( swarm );	
+		Stg_Class_Delete( extensionMgr_Register );
+		Stg_Class_Delete( elementCellLayout );
+		Stg_Class_Delete( particleLayout );
+		remove( "sphere10Particles.dat" );
 	}
-}
-
-void WithinShapeParticleLayoutSuite_TestWithinShapeSphere_100Particles( WithinShapeParticleLayoutSuiteData* data ) {
-	XYZ			centre;
-	Stg_Shape*	shape;
-	int			procToWatch;
-	int			particleCount = 100;
-	Stream*		stream;
-	char			expected_file[PCU_PATH_MAX];
-		
-	if( data->nProcs >= 2 ) {
-		procToWatch = 1;
-	}
-	else {
-		procToWatch = 0;
-	}
-
-	/* Init mesh */
-	data->extensionMgr_Register = ExtensionManager_Register_New();
-	data->mesh = WithinShapeParticleLayoutSuite_buildMesh( data->nDims, data->meshSize, data->minCrds, data->maxCrds, data->extensionMgr_Register );
-
-	/* Configure the element-cell-layout */
-	data->elementCellLayout = ElementCellLayout_New( "elementCellLayout", data->mesh );
-
-	/* Build the mesh */
-	Stg_Component_Build( data->mesh, 0, False );
-	Stg_Component_Initialise( data->mesh, 0, False );	
-
-	centre[I_AXIS] = centre[J_AXIS] = centre[K_AXIS] = 0.5;
-	shape = (Stg_Shape*)Sphere_New( "testSphere", data->nDims, centre, 0, 0, 0, 0.05 );
-
-	/* Configure the gauss-particle-layout */
-	data->particleLayout = WithinShapeParticleLayout_New( "withinShapeParticleLayoutBox", data->nDims, particleCount, shape );
-	
-	/* Configure the swarm */
-	data->swarm = Swarm_New(  "testSwarm", data->elementCellLayout, data->particleLayout, data->nDims, sizeof(Particle),
-	data->extensionMgr_Register, NULL, data->comm, NULL );
-	
-	/* Build the swarm */
-	Stg_Component_Build( data->swarm, 0, False );
-	Stg_Component_Initialise( data->swarm, 0, False );
-	stream = Journal_Register (Info_Type, "WithinShapeParticleLayoutBox");
-	
-	if( data->rank == procToWatch ) {
-		Stg_Class_Print( data->particleLayout, stream );
-		/* Print out the particles on all cells */
-		Stream_RedirectFile( stream, "sphere100Particles.dat" );
-		Swarm_PrintParticleCoords_ByCell( data->swarm, stream );
-		pcu_filename_expected( "testWithinShapeParticleLayout100ParticlesOutput.expected", expected_file );
-		pcu_check_fileEq( "sphere100Particles.dat", expected_file );
-	}
-	
 }
 
 void WithinShapeParticleLayoutSuite( pcu_suite_t* suite ) {
 	pcu_suite_setData( suite, WithinShapeParticleLayoutSuiteData );
 	pcu_suite_setFixtures( suite, WithinShapeParticleLayoutSuite_Setup, WithinShapeParticleLayoutSuite_Teardown );
-	pcu_suite_addTest( suite, WithinShapeParticleLayoutSuite_TestWithinShapeSphere_10Particles );
-	pcu_suite_addTest( suite, WithinShapeParticleLayoutSuite_TestWithinShapeSphere_100Particles );
+	pcu_suite_addTest( suite, WithinShapeParticleLayoutSuite_TestWithinShapeSphere );
 }

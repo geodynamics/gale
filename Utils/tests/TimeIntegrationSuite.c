@@ -184,7 +184,8 @@ void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_nam
 		Dictionary_Add(dictionary, "DerivName1", Dictionary_Entry_Value_FromString(_DerivName1));
 
 		context = DomainContext_DefaultNew( "context" );
-		cf = stgMainInit( dictionary, data->comm, context );
+		cf = stgMainConstruct( dictionary, data->comm, context );
+		stgMainBuildAndInitialise( cf );
       
 		ContextEP_Append( context, AbstractContext_EP_Dt, TimeIntegrationSuite_GetDt );
 		Journal_Printf( stream, "!!! info %d\n", Stream_IsEnable( Journal_Register( Info_Type, "TimeIntegrator" ) ) );

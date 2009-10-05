@@ -49,13 +49,13 @@ struct _Particle {
 };
 
 typedef struct {
-	unsigned			nDims;
-	unsigned			meshSize[3];
-	double			minCrds[3];
-	double			maxCrds[3];
-	MPI_Comm			comm;
-	unsigned int	rank;
-	unsigned int	nProcs;
+	unsigned nDims;
+	unsigned meshSize[3];
+	double minCrds[3];
+	double maxCrds[3];
+	MPI_Comm comm;
+	unsigned rank;
+	unsigned nProcs;
 } GaussLayoutSuiteData;
 
 Mesh* GaussLayoutSuite_BuildMesh( unsigned nDims, unsigned* size, double* minCrds, double* maxCrds, ExtensionManager_Register* emReg ) {
@@ -96,48 +96,41 @@ void GaussLayoutSuite_Teardown( GaussLayoutSuiteData* data ) {
 }
 
 void GaussLayoutSuite_Test1ParticlePerDim_3D( GaussLayoutSuiteData* data ) {
-	ExtensionManager_Register*	extensionMgr_Register;
-	Mesh*								mesh;
-	GaussParticleLayout*			gaussParticleLayout;
-	ElementCellLayout*			elementCellLayout;
-	Swarm*							swarm;
-	Cell_PointIndex				count;
-	double							x,y,z;
-	unsigned int					p, i, len;
-	LocalParticle*					particle;
-	Coord								minCell;
-	Coord								maxCell;
-	Particle_InCellIndex			particlesPerDim[3] = {1, 1, 1};
-	Stream*							stream;
-	int								procToWatch;
-	char								expected_file[PCU_PATH_MAX];
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
-	if( data->nProcs >= 2 ) {
-		procToWatch = 1;
-	}
-	else {
-		procToWatch = 0;
-	}
-
-	/* Init mesh */
-	extensionMgr_Register = ExtensionManager_Register_New();
-	mesh = GaussLayoutSuite_BuildMesh( data->nDims, data->meshSize, data->minCrds, data->maxCrds, extensionMgr_Register );
-	
-	/* Configure the element-cell-layout */
-	elementCellLayout = ElementCellLayout_New( "elementCellLayout", mesh );
-	gaussParticleLayout = GaussParticleLayout_New( "gaussParticleLayout", data->nDims, particlesPerDim );
-
-	/* Configure the swarm */
-	swarm = Swarm_New( "testGaussSwarm", elementCellLayout, gaussParticleLayout, data->nDims, sizeof(Particle), extensionMgr_Register, NULL, data->comm, NULL );
-
-	/* Build the swarm */
-	Stg_Component_Build( swarm, 0, False );
-	Stg_Component_Initialise( swarm, 0, False );
-
-	stream = Journal_Register( Info_Type, "1ParticlePerDim_3D" );
-	
 	if( data->rank == procToWatch ) {	
+		ExtensionManager_Register*	extensionMgr_Register;
+		Mesh*								mesh;
+		GaussParticleLayout*			gaussParticleLayout;
+		ElementCellLayout*			elementCellLayout;
+		Swarm*							swarm;
+		Cell_PointIndex				count;
+		double							x,y,z;
+		unsigned int					p, i, len;
+		LocalParticle*					particle;
+		Coord								minCell;
+		Coord								maxCell;
+		Particle_InCellIndex			particlesPerDim[3] = {1, 1, 1};
+		Stream*							stream;
+		char								expected_file[PCU_PATH_MAX];
+
+		stream = Journal_Register( Info_Type, "1ParticlePerDim_3D" );
 		Stream_RedirectFile( stream, "1ParticlePerDim_3D.dat" );
+
+		/* Init mesh */
+		extensionMgr_Register = ExtensionManager_Register_New();
+		mesh = GaussLayoutSuite_BuildMesh( data->nDims, data->meshSize, data->minCrds, data->maxCrds, extensionMgr_Register );
+	
+		/* Configure the element-cell-layout */
+		elementCellLayout = ElementCellLayout_New( "elementCellLayout", mesh );
+		gaussParticleLayout = GaussParticleLayout_New( "gaussParticleLayout", data->nDims, particlesPerDim );
+
+		/* Configure the swarm */
+		swarm = Swarm_New( "testGaussSwarm", elementCellLayout, gaussParticleLayout, data->nDims, sizeof(Particle), extensionMgr_Register, NULL, data->comm, NULL );
+
+		/* Build the swarm */
+		Stg_Component_Build( swarm, 0, False );
+		Stg_Component_Initialise( swarm, 0, False );
 	
 		len = (int) sizeof( swarm->cellParticleCountTbl );
 		count = 0;
@@ -175,50 +168,43 @@ void GaussLayoutSuite_Test1ParticlePerDim_3D( GaussLayoutSuiteData* data ) {
 }
 
 void GaussLayoutSuite_Test2ParticlesPerDim_3D( GaussLayoutSuiteData* data ) {
-	ExtensionManager_Register*	extensionMgr_Register;
-	Mesh*								mesh;
-	GaussParticleLayout*			gaussParticleLayout;
-	ElementCellLayout*			elementCellLayout;
-	Swarm*							swarm;
-	Cell_PointIndex				count;
-	double							x,y,z;
-	unsigned int					p, i, len;
-	LocalParticle*					particle;
-	Coord								minCell;
-	Coord								maxCell;
-	Particle_InCellIndex			particlesPerDim[3] = {2, 2, 2};
-	double							xi[8][3];
-	double							coord[8][3];
-	Stream*							stream;
-	int								procToWatch;
-	char								expected_file[PCU_PATH_MAX];
-
-	if( data->nProcs >= 2 ) {
-		procToWatch = 1;
-	}
-	else {
-		procToWatch = 0;
-	}
-
-	/* Init mesh */
-	extensionMgr_Register = ExtensionManager_Register_New();
-	mesh = GaussLayoutSuite_BuildMesh( data->nDims, data->meshSize, data->minCrds, data->maxCrds, extensionMgr_Register );
-	
-	/* Configure the element-cell-layout */
-	elementCellLayout = ElementCellLayout_New( "elementCellLayout", mesh );
-	gaussParticleLayout = GaussParticleLayout_New( "gaussParticleLayout", data->nDims, particlesPerDim );
-
-	/* Configure the swarm */
-	swarm = Swarm_New( "testGaussSwarm", elementCellLayout, gaussParticleLayout, data->nDims, sizeof(Particle), extensionMgr_Register, NULL, data->comm, NULL );
-
-	/* Build the swarm */
-	Stg_Component_Build( swarm, 0, False );
-	Stg_Component_Initialise( swarm, 0, False );
-	
-	stream = Journal_Register( Info_Type, "2ParticlesPerDim_3D" );
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if( data->rank == procToWatch ) {	
+		ExtensionManager_Register*	extensionMgr_Register;
+		Mesh*								mesh;
+		GaussParticleLayout*			gaussParticleLayout;
+		ElementCellLayout*			elementCellLayout;
+		Swarm*							swarm;
+		Cell_PointIndex				count;
+		double							x,y,z;
+		unsigned int					p, i, len;
+		LocalParticle*					particle;
+		Coord								minCell;
+		Coord								maxCell;
+		Particle_InCellIndex			particlesPerDim[3] = {2, 2, 2};
+		double							xi[8][3];
+		double							coord[8][3];
+		Stream*							stream;
+		char								expected_file[PCU_PATH_MAX];
+
+		stream = Journal_Register( Info_Type, "2ParticlesPerDim_3D" );
 		Stream_RedirectFile( stream, "2ParticlesPerDim_3D.dat" );
+
+		/* Init mesh */
+		extensionMgr_Register = ExtensionManager_Register_New();
+		mesh = GaussLayoutSuite_BuildMesh( data->nDims, data->meshSize, data->minCrds, data->maxCrds, extensionMgr_Register );
+	
+		/* Configure the element-cell-layout */
+		elementCellLayout = ElementCellLayout_New( "elementCellLayout", mesh );
+		gaussParticleLayout = GaussParticleLayout_New( "gaussParticleLayout", data->nDims, particlesPerDim );
+
+		/* Configure the swarm */
+		swarm = Swarm_New( "testGaussSwarm", elementCellLayout, gaussParticleLayout, data->nDims, sizeof(Particle), extensionMgr_Register, NULL, data->comm, NULL );
+
+		/* Build the swarm */
+		Stg_Component_Build( swarm, 0, False );
+		Stg_Component_Initialise( swarm, 0, False );
 	
 		len = (int) sizeof( swarm->cellParticleCountTbl );
 		count = 0;
@@ -257,51 +243,44 @@ void GaussLayoutSuite_Test2ParticlesPerDim_3D( GaussLayoutSuiteData* data ) {
 
 
 void GaussLayoutSuite_Test3ParticlesPerDim_3D( GaussLayoutSuiteData* data ) {
-	ExtensionManager_Register*	extensionMgr_Register;
-	Mesh*								mesh;
-	GaussParticleLayout*			gaussParticleLayout;
-	ElementCellLayout*			elementCellLayout;
-	Swarm*							swarm;
-	Cell_PointIndex				count;
-	double							x,y,z;
-	unsigned int					p, i, len;
-	LocalParticle*					particle;
-	Coord								minCell;
-	Coord								maxCell;
-	Particle_InCellIndex			particlesPerDim[3] = {3, 3, 3};
-	double							xi[27][3];
-	double							coord[27][3];
-	Stream*							stream;
-	int								procToWatch;
-	char								expected_file[PCU_PATH_MAX];
-	
-	if( data->nProcs >= 2 ) {
-		procToWatch = 1;
-	}
-	else {
-		procToWatch = 0;
-	}
-		
-	/* Init mesh */
-	extensionMgr_Register = ExtensionManager_Register_New();
-	mesh = GaussLayoutSuite_BuildMesh( data->nDims, data->meshSize, data->minCrds, data->maxCrds, extensionMgr_Register );
-	
-	/* Configure the element-cell-layout */
-	elementCellLayout = ElementCellLayout_New( "elementCellLayout", mesh );
-	gaussParticleLayout = GaussParticleLayout_New( "gaussParticleLayout", data->nDims, particlesPerDim );
-
-	/* Configure the swarm */
-	swarm = Swarm_New( "testGaussSwarm", elementCellLayout, gaussParticleLayout, data->nDims, sizeof(Particle), extensionMgr_Register, NULL, data->comm, NULL );
-	
-	/* Build the swarm */
-	Stg_Component_Build( swarm, 0, False );
-	Stg_Component_Initialise( swarm, 0, False );
-			
-	stream = Journal_Register( Info_Type, "3ParticlesPerDim_3D" );
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if( data->rank == procToWatch ) {	
+		ExtensionManager_Register*	extensionMgr_Register;
+		Mesh*								mesh;
+		GaussParticleLayout*			gaussParticleLayout;
+		ElementCellLayout*			elementCellLayout;
+		Swarm*							swarm;
+		Cell_PointIndex				count;
+		double							x,y,z;
+		unsigned int					p, i, len;
+		LocalParticle*					particle;
+		Coord								minCell;
+		Coord								maxCell;
+		Particle_InCellIndex			particlesPerDim[3] = {3, 3, 3};
+		double							xi[27][3];
+		double							coord[27][3];
+		Stream*							stream;
+		char								expected_file[PCU_PATH_MAX];
+
+		stream = Journal_Register( Info_Type, "3ParticlesPerDim_3D" );
 		Stream_RedirectFile( stream, "3ParticlesPerDim_3D.dat" );
+
+		/* Init mesh */
+		extensionMgr_Register = ExtensionManager_Register_New();
+		mesh = GaussLayoutSuite_BuildMesh( data->nDims, data->meshSize, data->minCrds, data->maxCrds, extensionMgr_Register );
 	
+		/* Configure the element-cell-layout */
+		elementCellLayout = ElementCellLayout_New( "elementCellLayout", mesh );
+		gaussParticleLayout = GaussParticleLayout_New( "gaussParticleLayout", data->nDims, particlesPerDim );
+
+		/* Configure the swarm */
+		swarm = Swarm_New( "testGaussSwarm", elementCellLayout, gaussParticleLayout, data->nDims, sizeof(Particle), extensionMgr_Register, NULL, data->comm, NULL );
+		
+		/* Build the swarm */
+		Stg_Component_Build( swarm, 0, False );
+		Stg_Component_Initialise( swarm, 0, False );
+			
 		len = (int) sizeof( swarm->cellParticleCountTbl );
 		count = 0;
 		

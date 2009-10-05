@@ -58,14 +58,6 @@ void SobolGeneratorSuite_Setup( SobolGeneratorSuiteData* data ) {
 }
 
 void SobolGeneratorSuite_Teardown( SobolGeneratorSuiteData* data ) {
-	/* Purge output files */
-	remove( "RightmostBit.dat" );
-	remove( "testGenerator0" );
-	remove( "testGenerator1" );
-	remove( "testGenerator2" );
-	remove( "testGenerator3" );
-	remove( "testGenerator4" );
-	remove( "testGenerator5" );
 }
 
 void SobolGeneratorSuite_TestSobolGenerator( SobolGeneratorSuiteData* data ) {
@@ -85,12 +77,7 @@ void SobolGeneratorSuite_TestSobolGenerator( SobolGeneratorSuiteData* data ) {
 	char					generator4_expected[PCU_PATH_MAX];
 	char					generator5_expected[PCU_PATH_MAX];
 
-	if( data->nProcs >= 2 ) {
-		procToWatch = 1;
-	}
-	else {
-		procToWatch = 0;
-	}
+	procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if( data->rank == procToWatch ) {
 		stream = Journal_Register (Info_Type, "SobolGeneratorStream");
@@ -129,18 +116,25 @@ void SobolGeneratorSuite_TestSobolGenerator( SobolGeneratorSuiteData* data ) {
 		}
 		pcu_filename_expected( "testSobolGeneratorRightmostBitOutput.expected", rightmostBit_expected );
 		pcu_check_fileEq( "RightmostBit.dat", rightmostBit_expected );
+		remove( "RightmostBit.dat" );
 		pcu_filename_expected( "testSobolGenerator0Output.expected", generator0_expected );
 		pcu_check_fileEq( "testGenerator0", generator0_expected );
+		remove( "testGenerator0" );
 		pcu_filename_expected( "testSobolGenerator1Output.expected", generator1_expected );
 		pcu_check_fileEq( "testGenerator1", generator1_expected );	
+		remove( "testGenerator1" );
 		pcu_filename_expected( "testSobolGenerator2Output.expected", generator2_expected );
 		pcu_check_fileEq( "testGenerator2", generator2_expected );
+		remove( "testGenerator2" );
 		pcu_filename_expected( "testSobolGenerator3Output.expected", generator3_expected );
 		pcu_check_fileEq( "testGenerator3", generator3_expected );
+		remove( "testGenerator3" );
 		pcu_filename_expected( "testSobolGenerator4Output.expected", generator4_expected );
 		pcu_check_fileEq( "testGenerator4", generator4_expected );
+		remove( "testGenerator4" );
 		pcu_filename_expected( "testSobolGenerator5Output.expected", generator5_expected );
 		pcu_check_fileEq( "testGenerator5", generator5_expected );
+		remove( "testGenerator5" );
 	}
 }
 
