@@ -49,6 +49,7 @@
 			<param name="Type">lucScalarField</param>
 			<param name="FieldVariable">StrainRateInvariantField</param>
 			<param name="ColourMap">strainRateInvColourMap</param>
+			<param name="cullFace"> False </param>
 		</struct> -->
 		
 		<struct name="border" mergeType="replace">
