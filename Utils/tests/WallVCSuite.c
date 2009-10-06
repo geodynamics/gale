@@ -137,7 +137,7 @@ void WallVCSuite_TestWallVC( WallVCSuiteData* data ) {
    extensionMgr_Register = ExtensionManager_Register_New(); 
 
 	/* Create a mesh. */
-	mesh = (Mesh*) buildMesh( nDims, meshSize, minCrds, maxCrds, extensionMgr_Register );
+	mesh = (Mesh*) WallVCSuite_buildMesh( nDims, meshSize, minCrds, maxCrds, extensionMgr_Register );
    nDomains = Mesh_GetDomainSize( mesh, MT_VERTEX );
 
 	/* Create CF stuff */

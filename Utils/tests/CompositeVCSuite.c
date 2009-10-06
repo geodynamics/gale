@@ -137,7 +137,7 @@ void CompositeVCSuite_TestCompositeVC( CompositeVCSuiteData* data ) {
    extensionMgr_Register = ExtensionManager_Register_New(); 
 
  	/* Create a mesh. */
-   mesh = (Mesh*) buildMesh( nDims, meshSize, minCrds, maxCrds, extensionMgr_Register );
+   mesh = (Mesh*) CompositeVCSuite_buildMesh( nDims, meshSize, minCrds, maxCrds, extensionMgr_Register );
    nDomains = Mesh_GetDomainSize( mesh, MT_VERTEX );
 
    /* Create CF stuff */
@@ -266,7 +266,7 @@ void CompositeVCSuite_TestCompositeVCDictionary( CompositeVCSuiteData* data ) {
 	extensionMgr_Register = ExtensionManager_Register_New();
 
 	/* Create a mesh. */
-	mesh = (Mesh*) buildMesh( nDims, meshSize, minCrds, maxCrds, extensionMgr_Register );
+	mesh = (Mesh*) CompositeVCSuite_buildMesh( nDims, meshSize, minCrds, maxCrds, extensionMgr_Register );
 	nDomains = Mesh_GetDomainSize( mesh, MT_VERTEX );
 
 	/* Create CF stuff */
