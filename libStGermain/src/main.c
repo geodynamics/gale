@@ -51,7 +51,7 @@
 void stgMain( Dictionary* dictionary, MPI_Comm communicator ) {
 	Stg_ComponentFactory*	cf;
 
-	cf = stgMainInit( dictionary, communicator, NULL );
+	cf = stgMainConstruct( dictionary, communicator, NULL );
 	stgMainLoop( cf );
 	stgMainDestroy( cf );
 
@@ -59,12 +59,12 @@ void stgMain( Dictionary* dictionary, MPI_Comm communicator ) {
 }
 
 /* TODO: need to find a way to add different communicators for different contexts */
-Stg_ComponentFactory* stgMainInit( Dictionary* dictionary, MPI_Comm communicator, void* _context ) {
-	Stg_ComponentFactory* 		cf;
-	Dictionary*			componentDict;
-	Stg_Component*			component;
-	AbstractContext*		context;
-	unsigned			component_I;
+Stg_ComponentFactory* stgMainConstruct( Dictionary* dictionary, MPI_Comm communicator, void* _context ) {
+	Stg_ComponentFactory*	cf;
+	Dictionary*					componentDict;
+	Stg_Component*				component;
+	AbstractContext*			context;
+	unsigned						component_I;
 
 	if( ( componentDict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, "components" ) ) ) == NULL )
 		componentDict = Dictionary_New();
@@ -98,19 +98,19 @@ Stg_ComponentFactory* stgMainInit( Dictionary* dictionary, MPI_Comm communicator
 			context->communicator = communicator;
 		}
 	}
-	
 	/* Construction phase -----------------------------------------------------------------------------------------------*/
 	Stg_ComponentFactory_ConstructComponents( cf, NULL );
 	
+	return cf;
+}
+
+void stgMainBuildAndInitialise( Stg_ComponentFactory* cf ) {
 	/* Building phase ---------------------------------------------------------------------------------------------------*/
 	Stg_ComponentFactory_BuildComponents( cf, NULL );
 	
 	/* Initialisaton phase ----------------------------------------------------------------------------------------------*/
 	Stg_ComponentFactory_InitialiseComponents( cf, NULL );
-
-	return cf;
 }
-
 
 Stg_ComponentFactory* stgMainInitFromXML( char* xmlInputFilename, MPI_Comm communicator, void* _context ) {
    Dictionary*       		dictionary = NULL;
@@ -124,7 +124,7 @@ Stg_ComponentFactory* stgMainInitFromXML( char* xmlInputFilename, MPI_Comm commu
    /* In case the user has put any journal configuration in the XML, read here */
    Journal_ReadFromDictionary( dictionary );
 
-   cf = stgMainInit( dictionary, communicator, _context );
+   cf = stgMainConstruct( dictionary, communicator, _context );
    
    /* We don't need the XML IO handler again (however don't delete the dictionary as it's 
     * 'owned' by the context from hereon */
