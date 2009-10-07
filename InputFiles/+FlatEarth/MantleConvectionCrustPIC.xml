@@ -15,6 +15,10 @@
 		<param>StgFEM_FrequentOutput</param>	
 		<param>Underworld_Nusselt</param>	
 		<param>Underworld_Vrms</param>	
+		<param>Underworld_BoundaryLayers</param>	
+		<param>Underworld_MaxTemperature</param>	
+		<param>Underworld_MaxVelocity</param>	
+		<param>Underworld_Mobility</param>	
 		<param>StgFEM_CPUTime</param>	
 		<param>Experimental_PressureCalibration</param>
 		
@@ -258,29 +262,8 @@
 	<include> Underworld/VariableConditions/temperatureBCs.xml </include>
 	<include> Underworld/VariableConditions/temperatureICs.sinusoid.xml </include>
 	<include> Underworld/VariableConditions/velocityBCs.freeslip.xml </include>
-
-	<!-- Integration Scheme configuration -->
-
-	<!-- Visualization - include one of these files on the command line -->
-	<!--
-	<include> ./gLuciferFiles/Cameras2D-1x1.xml</include>
 	
-	<include> ./gLuciferFiles/FlatEarthBoxWindow.xml</include>
-	<include> ./gLuciferFiles/ParticleHasYieldedVP.xml</include>
-	<include> ./gLuciferFiles/ParticleMaterialVP.xml</include>
-	<include> ./gLuciferFiles/TemperatureAndVelocityArrowsVP.xml </include>
-	<include> ./gLuciferFiles/TemperatureIsosurfaceVP.xml </include>
-	<include> ./gLuciferFiles/StrainRateInvariantVP.xml </include> 
-	<include>Underworld/Viewports/ParticleDensityVP.xml</include> 
-	<include> ./gLuciferFiles/REPStressVP.xml</include> 
-	
-	<struct name="components" mergeType="merge">
-		<struct name="FlatEarthBoxView1" mergeType="merge">
-			<list name="Viewport" mergeType="replace">
-				<param>FlatEarthTemperatureAndVelocityArrowsVP FlatEarthVerticalTemperatureGradientVP</param>
-				<param>FlatEarthParticleHasYieldedVP ParticleMaterialVP </param>
-			</list>
-		</struct>
-	</struct>
-	-->
+	<!-- NOTE: he periodic boundary conditions from the BaseApps directory will override the boundary conditions -->
+
+
 </StGermainData>
