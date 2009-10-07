@@ -1,0 +1,13 @@
+Printing coords of all local particles, cell-by-cell:
+	Local Cell   0:
+	Local Cell   1:
+		part. InCell   0 (local index      0): (    0.4,     0.3,     0.2)
+	Local Cell   2:
+	Local Cell   3:
+		part. InCell   0 (local index      2): (    0.8,     0.1,     0.3)
+		part. InCell   1 (local index      3): (    0.9,     0.4,     0.1)
+	Local Cell   4:
+	Local Cell   5:
+	Local Cell   6:
+		part. InCell   0 (local index      1): (    0.7,     0.6,     0.5)
+	Local Cell   7:

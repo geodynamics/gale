@@ -49,20 +49,6 @@ struct _Particle {
 };
 
 typedef struct {
-	unsigned							nDims;
-	unsigned							meshSize[3];
-	double							minCrds[3];
-	double							maxCrds[3];
-	ExtensionManager_Register*	extensionMgr_Register;
-	Mesh*								mesh;
-	GaussParticleLayout*			gaussParticleLayout;
-	ElementCellLayout*			elementCellLayout;
-	Swarm*							swarm;
-	Dictionary*						dictionary;
-	Dictionary_Entry_Value*		particlePositionsList;
-	Dictionary_Entry_Value*		particlePositionEntry;
-	ManualParticleLayout*		particleLayout;
-	DomainContext*					context;
 	MPI_Comm							comm;
 	unsigned int					rank;
 	unsigned int					nProcs;
@@ -90,99 +76,102 @@ Mesh* ManualParticleLayoutSuite_BuildMesh( unsigned nDims, unsigned* size, doubl
 }
 
 void ManualParticleLayoutSuite_Setup( ManualParticleLayoutSuiteData* data ) {
-	Dimension_Index	dim;
-	
 	/* MPI Initializations */
 	data->comm = MPI_COMM_WORLD;  
 	MPI_Comm_rank( data->comm, &data->rank );
 	MPI_Comm_size( data->comm, &data->nProcs );
-   
-	data->nDims = 3;
-	data->meshSize[0] = 2;	data->meshSize[1] = 3;	data->meshSize[2] = 2;
-	data->minCrds[0] = 0.0; data->minCrds[1] = 0.0; data->minCrds[2] = 0.0;
-	data->maxCrds[0] = 300.0; data->maxCrds[1] = 12.0; data->maxCrds[2] = 300.0;
-	
-	/* Dictionary Initialization */
-	data->dictionary = Dictionary_New();
-	data->particlePositionsList = Dictionary_Entry_Value_NewList();
-	Dictionary_Add( data->dictionary, "manualParticlePositions", data->particlePositionsList );
-	
-	data->particlePositionEntry = Dictionary_Entry_Value_NewStruct();
-	Dictionary_Entry_Value_AddElement( data->particlePositionsList, data->particlePositionEntry );
-	Dictionary_Entry_Value_AddMember( data->particlePositionEntry, "x", Dictionary_Entry_Value_FromDouble( 0.4 ) );
-	Dictionary_Entry_Value_AddMember( data->particlePositionEntry, "y", Dictionary_Entry_Value_FromDouble( 0.3 ) );
-	Dictionary_Entry_Value_AddMember( data->particlePositionEntry, "z", Dictionary_Entry_Value_FromDouble( 0.2 ) );
-	
-	data->particlePositionEntry = Dictionary_Entry_Value_NewStruct();
-	Dictionary_Entry_Value_AddElement( data->particlePositionsList, data->particlePositionEntry );
-	Dictionary_Entry_Value_AddMember( data->particlePositionEntry, "x", Dictionary_Entry_Value_FromDouble( 0.7 ) );
-	Dictionary_Entry_Value_AddMember( data->particlePositionEntry, "y", Dictionary_Entry_Value_FromDouble( 0.6 ) );
-	Dictionary_Entry_Value_AddMember( data->particlePositionEntry, "z", Dictionary_Entry_Value_FromDouble( 0.5 ) );
-	
-	data->particlePositionEntry = Dictionary_Entry_Value_NewStruct();
-	Dictionary_Entry_Value_AddElement( data->particlePositionsList, data->particlePositionEntry );
-	Dictionary_Entry_Value_AddMember( data->particlePositionEntry, "x", Dictionary_Entry_Value_FromDouble( 0.8 ) );
-	Dictionary_Entry_Value_AddMember( data->particlePositionEntry, "y", Dictionary_Entry_Value_FromDouble( 0.1 ) );
-	Dictionary_Entry_Value_AddMember( data->particlePositionEntry, "z", Dictionary_Entry_Value_FromDouble( 0.3 ) );
-	
-	data->particlePositionEntry = Dictionary_Entry_Value_NewStruct();
-	Dictionary_Entry_Value_AddElement( data->particlePositionsList, data->particlePositionEntry );
-	Dictionary_Entry_Value_AddMember( data->particlePositionEntry, "x", Dictionary_Entry_Value_FromDouble( 0.9 ) );
-	Dictionary_Entry_Value_AddMember( data->particlePositionEntry, "y", Dictionary_Entry_Value_FromDouble( 0.4 ) );
-	Dictionary_Entry_Value_AddMember( data->particlePositionEntry, "z", Dictionary_Entry_Value_FromDouble( 0.1 ) );
-	
-	/* Init mesh */
-	data->extensionMgr_Register = ExtensionManager_Register_New();
-	data->mesh = ManualParticleLayoutSuite_BuildMesh( data->nDims, data->meshSize, data->minCrds, data->maxCrds, data->extensionMgr_Register );
-	
-	/* Configure the element-cell-layout */
-	data->elementCellLayout = ElementCellLayout_New( "elementCellLayout", data->mesh );
-	
-	/* Build the mesh */
-	Stg_Component_Build( data->mesh, 0, False );
-	Stg_Component_Initialise( data->mesh, 0, False );
-	
-	/* Configure the gauss-particle-layout */
-	data->particleLayout = ManualParticleLayout_New( "manualParticleLayout", data->dictionary );
-	
-	data->swarm = Swarm_New( "testSwarm", data->elementCellLayout, data->particleLayout, dim, sizeof(Particle),
-		data->extensionMgr_Register, NULL, data->comm, NULL );
-	
-	/* Build the swarm */
-	Stg_Component_Build( data->swarm, 0, False );
-	Stg_Component_Initialise( data->swarm, 0, False );
 }
 
 void ManualParticleLayoutSuite_Teardown( ManualParticleLayoutSuiteData* data ) {
-	/* Destroy stuff */
-	Stg_Class_Delete( data->particleLayout );
-	Stg_Class_Delete( data->elementCellLayout );
-	Stg_Class_Delete( data->swarm );
-	Stg_Class_Delete( data->mesh );
-	Stg_Class_Delete( data->extensionMgr_Register );
-	Stg_Class_Delete( data->dictionary );	
-	/* Purge output files */
-	remove( "manualParticle.dat" );
 }
 
 void ManualParticleLayoutSuite_TestManualParticle( ManualParticleLayoutSuiteData* data ) {
-	int		procToWatch;
-	Stream*	stream;
-	char		expected_file[PCU_PATH_MAX];
-	
-	if( data->nProcs >= 2 ) {
-		procToWatch = 1;
-	}
-	else {
-		procToWatch = 0;
-	}
-	stream = Journal_Register( Info_Type, "ManualParticle" );
+	unsigned							nDims = 3;
+	unsigned							meshSize[3] = {4, 2, 1};
+	double							minCrds[3] = {0.0, 0.0, 0.0};
+	double							maxCrds[3] = {1.0, 1.0, 1.0};
+	ExtensionManager_Register*	extensionMgr_Register;
+	Mesh*								mesh;
+	GaussParticleLayout*			gaussParticleLayout;
+	ElementCellLayout*			elementCellLayout;
+	Swarm*							swarm;
+	Dictionary*						dictionary;
+	Dictionary_Entry_Value*		particlePositionsList;
+	Dictionary_Entry_Value*		particlePositionEntry;
+	Dimension_Index				dim;
+	ManualParticleLayout*		particleLayout;
+	int								procToWatch = data->nProcs > 1 ? 1 : 0;
+	Stream*							stream;
+	char								expected_file[PCU_PATH_MAX];
 	
 	if( data->rank == procToWatch ) {
-		Stg_Class_Print( data->particleLayout, stream );
+		stream = Journal_Register( Info_Type, "ManualParticle" );
+
+		/* Dictionary Initialization */
+		dictionary = Dictionary_New();
+		particlePositionsList = Dictionary_Entry_Value_NewList();
+		Dictionary_Add( dictionary, "manualParticlePositions", particlePositionsList );
+	
+		particlePositionEntry = Dictionary_Entry_Value_NewStruct();
+		Dictionary_Entry_Value_AddElement( particlePositionsList, particlePositionEntry );
+		Dictionary_Entry_Value_AddMember( particlePositionEntry, "x", Dictionary_Entry_Value_FromDouble( 0.4 ) );
+		Dictionary_Entry_Value_AddMember( particlePositionEntry, "y", Dictionary_Entry_Value_FromDouble( 0.3 ) );
+		Dictionary_Entry_Value_AddMember( particlePositionEntry, "z", Dictionary_Entry_Value_FromDouble( 0.2 ) );
+	
+		particlePositionEntry = Dictionary_Entry_Value_NewStruct();
+		Dictionary_Entry_Value_AddElement( particlePositionsList, particlePositionEntry );
+		Dictionary_Entry_Value_AddMember( particlePositionEntry, "x", Dictionary_Entry_Value_FromDouble( 0.7 ) );
+		Dictionary_Entry_Value_AddMember( particlePositionEntry, "y", Dictionary_Entry_Value_FromDouble( 0.6 ) );
+		Dictionary_Entry_Value_AddMember( particlePositionEntry, "z", Dictionary_Entry_Value_FromDouble( 0.5 ) );
+	
+		particlePositionEntry = Dictionary_Entry_Value_NewStruct();
+		Dictionary_Entry_Value_AddElement( particlePositionsList, particlePositionEntry );
+		Dictionary_Entry_Value_AddMember( particlePositionEntry, "x", Dictionary_Entry_Value_FromDouble( 0.8 ) );
+		Dictionary_Entry_Value_AddMember( particlePositionEntry, "y", Dictionary_Entry_Value_FromDouble( 0.1 ) );
+		Dictionary_Entry_Value_AddMember( particlePositionEntry, "z", Dictionary_Entry_Value_FromDouble( 0.3 ) );
+	
+		particlePositionEntry = Dictionary_Entry_Value_NewStruct();
+		Dictionary_Entry_Value_AddElement( particlePositionsList, particlePositionEntry );
+		Dictionary_Entry_Value_AddMember( particlePositionEntry, "x", Dictionary_Entry_Value_FromDouble( 0.9 ) );
+		Dictionary_Entry_Value_AddMember( particlePositionEntry, "y", Dictionary_Entry_Value_FromDouble( 0.4 ) );
+		Dictionary_Entry_Value_AddMember( particlePositionEntry, "z", Dictionary_Entry_Value_FromDouble( 0.1 ) );
+	
+		/* Init mesh */
+		extensionMgr_Register = ExtensionManager_Register_New();
+		mesh = ManualParticleLayoutSuite_BuildMesh( nDims, meshSize, minCrds, maxCrds, extensionMgr_Register );
+	
+		/* Configure the element-cell-layout */
+		elementCellLayout = ElementCellLayout_New( "elementCellLayout", mesh );
+	
+		/* Build the mesh */
+		Stg_Component_Build( mesh, 0, False );
+		Stg_Component_Initialise( mesh, 0, False );
+	
+		/* Configure the gauss-particle-layout */
+		particleLayout = ManualParticleLayout_New( "manualParticleLayout", dictionary );
+	
+		swarm = Swarm_New( "manualParticleSwarm", elementCellLayout, particleLayout, dim, sizeof(Particle),
+			extensionMgr_Register, NULL, data->comm, NULL );
+	
+		/* Build the swarm */
+		Stg_Component_Build( swarm, 0, False );
+		Stg_Component_Initialise( swarm, 0, False );
+
+		Stg_Class_Print( particleLayout, stream );
+
 		/* Print out the particles on all cells */
-		Stream_RedirectFile( stream, "manualParticle.dat" );
-		Swarm_PrintParticleCoords_ByCell( data->swarm, stream );
+		Stream_RedirectFile( stream, "testManualParticle.dat" );
+		Swarm_PrintParticleCoords_ByCell( swarm, stream );
+		pcu_filename_expected( "testManualParticleLayoutOutput.expected", expected_file );
+		pcu_check_fileEq( "testManualParticle.dat", expected_file );
+
+		Stg_Class_Delete( extensionMgr_Register );
+		Stg_Component_Destroy( particleLayout, NULL, True );
+		Stg_Component_Destroy( elementCellLayout, NULL, True );
+		Stg_Component_Destroy( mesh, NULL, True );
+		Stg_Component_Destroy( swarm, NULL, True );
+		Stg_Class_Delete( dictionary );	
+		remove( "testManualParticle.dat" );
 	}
 }
 
