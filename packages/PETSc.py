@@ -42,13 +42,16 @@ class PETSc(Package):
                     petscconf = None
 
             # Try looking for it the PETSc 3 uninstalled way.
-            items = os.listdir(loc[0])
-            for i in items:
-                i = os.path.join(loc[0], i)
-                if os.path.isdir(i):
-                    if os.path.exists(os.path.join(i, 'conf', 'petscvariables')):
-                        self.arch = os.path.basename(i)
-                        break
+            try:
+                items = os.listdir(loc[0])
+                for i in items:
+                    i = os.path.join(loc[0], i)
+                    if os.path.isdir(i):
+                        if os.path.exists(os.path.join(i, 'conf', 'petscvariables')):
+                            self.arch = os.path.basename(i)
+                            break
+            except:
+                pass
 
             # If we were able to find a architecture.
             if self.arch is not None:
