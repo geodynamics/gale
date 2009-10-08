@@ -41,7 +41,9 @@ class Package:
         self.system_inc_dirs = [os.path.normpath('/usr/include'),
                                 os.path.normpath('/usr/local/include')]
         self.system_lib_dirs = [os.path.normpath('/usr/lib'),
-                                os.path.normpath('/usr/local/lib')]
+                                os.path.normpath('/usr/lib64'),
+                                os.path.normpath('/usr/local/lib'),
+                                os.path.normpath('/usr/local/lib64')]
         # Setup the dependencies and options.
         self.setup_dependencies()
         self.setup_options()
