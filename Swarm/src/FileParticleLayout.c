@@ -196,8 +196,13 @@ void _FileParticleLayout_Construct( void* particleLayout, Stg_ComponentFactory *
    Name                filename;
 
    self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+
    if( !self->context )
       self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+
+#ifdef READ_HDF5
+	self->checkpointnfiles = self->context->checkpointnproc > 0 ? self->context->checkpointnproc : 1;
+#endif
 
    filename = Stg_ComponentFactory_GetString( cf, self->name, "filename", "Swarm.dat" );
    
@@ -240,15 +245,15 @@ void _FileParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm ) 
    Stream_IndentBranch( Swarm_Debug ); 
 
 #ifdef READ_HDF5
-   self->lastParticleIndex  = Memory_Alloc_Array( Index, swarm->checkpointnfiles, "lastParticleIndex" );
+   self->lastParticleIndex  = Memory_Alloc_Array( Index, self->checkpointnfiles, "lastParticleIndex" );
    self->totalInitialParticles = 0;
-   for( ii = 1 ; ii <= swarm->checkpointnfiles ; ii++ ){
+   for( ii = 1 ; ii <= self->checkpointnfiles ; ii++ ){
       char* filenameTemp = NULL;
       /* Open the swarm checkpointing file */
-      if(swarm->checkpointnfiles == 1)
+      if(self->checkpointnfiles == 1)
          Stg_asprintf( &filenameTemp, "%s.h5", filename );
       else 
-         Stg_asprintf( &filenameTemp, "%s.%dof%d.h5", filename, ii, swarm->checkpointnfiles );
+         Stg_asprintf( &filenameTemp, "%s.%dof%d.h5", filename, ii, self->checkpointnfiles );
       
       file = H5Fopen( filenameTemp, H5F_ACC_RDONLY, H5P_DEFAULT );
       Journal_Firewall( file >= 0,
@@ -358,7 +363,7 @@ void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm
    SwarmVariable*         swarmVar;
    Index                  swarmVar_I;
    char                   dataSpaceName[1024];
-   hid_t                  file[swarm->checkpointnfiles];
+   hid_t                  file[self->checkpointnfiles];
    Index                  ii, jj, kk;
    hid_t                  group_id, attrib_id;
    int                    nParticles;
@@ -366,23 +371,23 @@ void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm
      
    /* Allocate space to store arrays of dataspaces */   
    assert( swarm->swarmVariable_Register );  
-   self->fileData  = Memory_Alloc_2DArray( hid_t, swarm->swarmVariable_Register->objects->count, swarm->checkpointnfiles, "fileData" );
-   self->fileSpace = Memory_Alloc_2DArray( hid_t, swarm->swarmVariable_Register->objects->count, swarm->checkpointnfiles, "fileSpace" );
+   self->fileData  = Memory_Alloc_2DArray( hid_t, swarm->swarmVariable_Register->objects->count, self->checkpointnfiles, "fileData" );
+   self->fileSpace = Memory_Alloc_2DArray( hid_t, swarm->swarmVariable_Register->objects->count, self->checkpointnfiles, "fileSpace" );
    /* set these spaces to null initially */
    for( jj = 0 ; jj < swarm->swarmVariable_Register->objects->count ; jj++)
-      for( kk = 0 ; kk < swarm->checkpointnfiles ; kk++){
+      for( kk = 0 ; kk < self->checkpointnfiles ; kk++){
          self->fileData [jj][kk] = NULL;
          self->fileSpace[jj][kk] = NULL;
       }
       
    /* Open the files */
-   for( ii = 1 ; ii <= swarm->checkpointnfiles ; ii++ ){
+   for( ii = 1 ; ii <= self->checkpointnfiles ; ii++ ){
       char*  filenameTemp = NULL;
       /* Open the swarm checkpointing file */
-      if(swarm->checkpointnfiles == 1)
+      if(self->checkpointnfiles == 1)
          Stg_asprintf( &filenameTemp, "%s.h5", self->filename );
       else 
-         Stg_asprintf( &filenameTemp, "%s.%dof%d.h5", self->filename, ii, swarm->checkpointnfiles );
+         Stg_asprintf( &filenameTemp, "%s.%dof%d.h5", self->filename, ii, self->checkpointnfiles );
 
       file[ii-1] = H5Fopen( filenameTemp, H5F_ACC_RDONLY, H5P_DEFAULT );
       Journal_Firewall( 
@@ -435,7 +440,7 @@ void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm
    _GlobalParticleLayout_InitialiseParticles( self, _swarm );
 
    /* Close dataspaces and the file */
-   for( ii = 1 ; ii <= swarm->checkpointnfiles ; ii++ ){
+   for( ii = 1 ; ii <= self->checkpointnfiles ; ii++ ){
       for( swarmVar_I = 0; swarmVar_I < swarm->swarmVariable_Register->objects->count; swarmVar_I++ ) {
          swarmVar = SwarmVariable_Register_GetByIndex( swarm->swarmVariable_Register, swarmVar_I );
          if( swarmVar->isCheckpointedAndReloaded ) {
@@ -486,7 +491,7 @@ void _FileParticleLayout_InitialiseParticle(
    hid_t             memSpace; 
 
    /* find out which file particle is contained within */
-   for( ii = 1 ; ii <= swarm->checkpointnfiles ; ii++ ){
+   for( ii = 1 ; ii <= self->checkpointnfiles ; ii++ ){
       if( newParticle_I < self->lastParticleIndex[ii-1]) break;
    }
    self->start[0] = newParticle_I;

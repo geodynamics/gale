@@ -289,7 +289,6 @@ void* _Swarm_ParticleAt( void* swarm, Particle_Index dParticle_I ) {
 	return (void*)Swarm_ParticleAt( self, dParticle_I );
 }
 
-
 void _Swarm_Delete( void* swarm ) {
 	Swarm*			self = (Swarm*)swarm;
 	Cell_LocalIndex		cell_I;
@@ -338,11 +337,10 @@ void _Swarm_Delete( void* swarm ) {
 	NewClass_Delete( self->incArray );
 
 	Swarm_Register_RemoveIndex( Swarm_Register_GetSwarm_Register(), self->swarmReg_I );
-	
+
 	/* Stg_Class_Delete parent class */
 	_Stg_Component_Delete( self );
 }
-
 
 void _Swarm_Print( void* swarm, Stream* stream ) {
 	Swarm* self = (Swarm*)swarm;
@@ -1652,7 +1650,7 @@ void Swarm_ReplaceCurrentParticleLayoutWithFileParticleLayout( void* swarm, void
 
    swarmFileNamePart = Context_GetCheckPointReadPrefixString( context );
 #ifdef READ_HDF5
-   self->checkpointnfiles = context->checkpointnproc;
+   //self->checkpointnfiles = context->checkpointnproc;
 	Stg_asprintf( &swarmFileName, "%s%s.%05d", swarmFileNamePart, self->name, context->restartTimestep );
 #else
 	Stg_asprintf( &swarmFileName, "%s%s.%05d.dat", swarmFileNamePart, self->name, context->restartTimestep );
