@@ -289,6 +289,7 @@ void* _Swarm_ParticleAt( void* swarm, Particle_Index dParticle_I ) {
 	return (void*)Swarm_ParticleAt( self, dParticle_I );
 }
 
+
 void _Swarm_Delete( void* swarm ) {
 	Swarm*			self = (Swarm*)swarm;
 	Cell_LocalIndex		cell_I;
@@ -337,10 +338,11 @@ void _Swarm_Delete( void* swarm ) {
 	NewClass_Delete( self->incArray );
 
 	Swarm_Register_RemoveIndex( Swarm_Register_GetSwarm_Register(), self->swarmReg_I );
-
+	
 	/* Stg_Class_Delete parent class */
 	_Stg_Component_Delete( self );
 }
+
 
 void _Swarm_Print( void* swarm, Stream* stream ) {
 	Swarm* self = (Swarm*)swarm;
@@ -676,11 +678,10 @@ void _Swarm_Construct( void* swarm, Stg_ComponentFactory* cf, void* data ) {
 	Dimension_Index         dim;
 	Type                    particleType;
 	Variable_Register*      variable_Register        = NULL;
+	AbstractContext*        context 		 = NULL;
 	VariableCondition* 	ic            		 = NULL;
 
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-	if( !self->context )
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
 
 	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
 	
@@ -689,9 +690,9 @@ void _Swarm_Construct( void* swarm, Stg_ComponentFactory* cf, void* data ) {
 	cellLayout =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  CellLayout_Type, CellLayout,  True, data ) ;
 	particleLayout =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  ParticleLayout_Type, ParticleLayout, True, data );
 	
-	extensionManagerRegister = extensionMgr_Register; 
+	extensionManagerRegister = Stg_ObjectList_Get( cf->registerRegister, "ExtensionManager_Register" );
 	assert( extensionManagerRegister );
-	variable_Register = self->context->variable_Register; 
+	variable_Register = Stg_ObjectList_Get( cf->registerRegister, "Variable_Register" );
 	assert( variable_Register );
 	
 	cellParticleTblDelta = 
@@ -737,7 +738,7 @@ void _Swarm_Construct( void* swarm, Stg_ComponentFactory* cf, void* data ) {
 			extraParticlesFactor,
 			extensionManagerRegister,
 			variable_Register,
-			self->context->communicator,
+			context->communicator,
 			ic );
 }
 
@@ -1346,12 +1347,12 @@ void Swarm_PrintParticleCoords( void* swarm, Stream* stream ) {
 
 
 void Swarm_PrintParticleCoords_ByCell( void* swarm, Stream* stream ) {
-	Swarm* 			self = (Swarm*)swarm;
-	Cell_Index		lCell_I=0;
+	Swarm*					self = (Swarm*)swarm;
+	Cell_Index				lCell_I=0;
 	Particle_InCellIndex	cParticle_I=0;
-	Particle_Index		lParticle_I=0;
-	GlobalParticle*         currParticle = NULL;
-	double*			coord = NULL;
+	Particle_Index			lParticle_I=0;
+	GlobalParticle*		currParticle = NULL;
+	double*					coord = NULL;
 	
 	Journal_Printf( stream, "Printing coords of all local particles, cell-by-cell:\n" );
 	
@@ -1650,7 +1651,7 @@ void Swarm_ReplaceCurrentParticleLayoutWithFileParticleLayout( void* swarm, void
 
    swarmFileNamePart = Context_GetCheckPointReadPrefixString( context );
 #ifdef READ_HDF5
-   //self->checkpointnfiles = context->checkpointnproc;
+   self->checkpointnfiles = context->checkpointnproc;
 	Stg_asprintf( &swarmFileName, "%s%s.%05d", swarmFileNamePart, self->name, context->restartTimestep );
 #else
 	Stg_asprintf( &swarmFileName, "%s%s.%05d.dat", swarmFileNamePart, self->name, context->restartTimestep );

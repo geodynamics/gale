@@ -62,7 +62,6 @@
 		/* General info */ \
 		__Stg_Component \
 		\
-		AbstractContext*		context; \
 		/* Virtual info */ \
 		\
 		/* General info */ \
@@ -134,7 +133,7 @@
 						\
 		IArray*				incArray; \
 		/** number of files previous checkpoint stored across */ \
-		/**Index                           checkpointnfiles;\ */ \
+		Index                           checkpointnfiles;\
 								 \
 	        int                             expanding;
 
