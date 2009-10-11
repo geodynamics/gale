@@ -107,11 +107,13 @@ void ParticleCoordsSuite_TestLineParticle( ParticleCoordsSuiteData* data ) {
 		pcu_check_fileEq( "linearParticle.dat", expected_file );
 
 		/* Destroy stuff */
-		Stg_Class_Delete( swarm );
 		Stg_Class_Delete( extensionMgr_Register );
 		Stg_Class_Delete( variable_Register );
+		Stg_Class_Delete( swarm );
 		remove( "linearParticle.dat" );
 	}
+
+	stgMainDestroy( cf );
 }
 
 void ParticleCoordsSuite( pcu_suite_t* suite ) {

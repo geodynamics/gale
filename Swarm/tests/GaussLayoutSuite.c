@@ -157,11 +157,11 @@ void GaussLayoutSuite_TestDriver( GaussLayoutSuiteData* data, char* name,  char*
 		pcu_check_fileEq( output, expected_file );
 
 		/* Destroy stuff */
-		Stg_Class_Delete( gaussParticleLayout );
-		Stg_Class_Delete( elementCellLayout );
-		Stg_Class_Delete( swarm );
-		Stg_Class_Delete( mesh );
 		Stg_Class_Delete( extensionMgr_Register );
+		Stg_Component_Destroy( gaussParticleLayout, NULL, True );
+		Stg_Component_Destroy( elementCellLayout, NULL, True );
+		Stg_Component_Destroy( swarm, NULL, True );
+		Stg_Component_Destroy( mesh, NULL, True );
 		remove( output );
 	}
 }

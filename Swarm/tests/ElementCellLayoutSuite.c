@@ -58,7 +58,7 @@ typedef struct {
 	unsigned int					nProcs;
 } ElementCellLayoutSuiteData;
 
-Mesh* buildMesh( unsigned nDims, unsigned* size, double* minCrds, double* maxCrds, ExtensionManager_Register* emReg ) {
+Mesh* ElementCellLayout_BuildMesh( unsigned nDims, unsigned* size, double* minCrds, double* maxCrds, ExtensionManager_Register* emReg ) {
 	CartesianGenerator*	gen;
 	Mesh*						mesh;
 	unsigned					maxDecomp[3] = {1, 0, 1};
@@ -99,7 +99,7 @@ void ElementCellLayoutSuite_Setup( ElementCellLayoutSuiteData* data ) {
 
 	/* Init mesh */
 	data->extensionMgr_Register = ExtensionManager_Register_New();
-	data->mesh = buildMesh( data->nDims, data->meshSize, data->minCrds, data->maxCrds, data->extensionMgr_Register );
+	data->mesh = ElementCellLayout_BuildMesh( data->nDims, data->meshSize, data->minCrds, data->maxCrds, data->extensionMgr_Register );
 	
 	/* Configure the element-cell-layout */
 	data->elementCellLayout = ElementCellLayout_New( "elementCellLayout", data->mesh );
@@ -107,17 +107,18 @@ void ElementCellLayoutSuite_Setup( ElementCellLayoutSuiteData* data ) {
 
 void ElementCellLayoutSuite_Teardown( ElementCellLayoutSuiteData* data ) {
 	/* Destroy stuff */
-	Stg_Class_Delete( data->elementCellLayout );
-	Stg_Class_Delete( data->mesh );
 	Stg_Class_Delete( data->extensionMgr_Register );
+	Stg_Component_Destroy( data->elementCellLayout, NULL, True );
+	Stg_Component_Destroy( data->mesh, NULL, True );
 }
 
 void ElementCellLayoutSuite_TestElementCellLayout( ElementCellLayoutSuiteData* data ) {
+	int						procToWatch = data->nProcs > 1 ? 1 : 0;
 	Cell_Index				cell;
 	Element_DomainIndex	element;
 	GlobalParticle			testParticle;
 		
-	if( data->rank == 0 ) {
+	if( data->rank == procToWatch ) {
 		for( element = 0; element < Mesh_GetLocalSize( data->mesh, data->nDims ); element++ ) {
 			Cell_PointIndex	point;
 			Cell_PointIndex	count;

@@ -49,9 +49,9 @@ struct _Particle {
 };
 
 typedef struct {
-	MPI_Comm							comm;
-	unsigned int					rank;
-	unsigned int					nProcs;
+	MPI_Comm comm;
+	unsigned rank;
+	unsigned nProcs;
 } ManualParticleLayoutSuiteData;
 
 Mesh* ManualParticleLayoutSuite_BuildMesh( unsigned nDims, unsigned* size, double* minCrds, double* maxCrds, ExtensionManager_Register* emReg ) {
