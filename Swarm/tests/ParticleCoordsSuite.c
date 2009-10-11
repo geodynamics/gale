@@ -50,8 +50,8 @@ struct _Particle {
 
 typedef struct {
 	MPI_Comm	comm;
-	unsigned int	rank;
-	unsigned int	nProcs;
+	unsigned rank;
+	unsigned nProcs;
 } ParticleCoordsSuiteData;
 
 void ParticleCoordsSuite_Setup( ParticleCoordsSuiteData* data ) {
@@ -71,17 +71,10 @@ void ParticleCoordsSuite_TestLineParticle( ParticleCoordsSuiteData* data ) {
 	Stream*							stream;
 	Dictionary*						dictionary;
 	DomainContext*					context;
-	int								procToWatch;
+	int								procToWatch = data->nProcs > 1 ? 1 : 0;
 	char								input_file[PCU_PATH_MAX];
 	char								expected_file[PCU_PATH_MAX];
 	Stg_ComponentFactory*		cf;
-
-	if( data->nProcs >=2 ) {
-		procToWatch = 1;
-	}
-	else {
-		procToWatch = 0;
-	}
 
 	/* Registers */
 	extensionMgr_Register = ExtensionManager_Register_New();   

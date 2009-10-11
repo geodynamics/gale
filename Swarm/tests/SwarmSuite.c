@@ -118,7 +118,6 @@ Bool SwarmSuite_TestParticleSearchFunc( Swarm* swarm, Coord coord, Stream* strea
 		Journal_Printf( stream, "Coord not found on this processor.\n" );
  
 	return True;
-
 }
 	
 void SwarmSuite_Setup( SwarmSuiteData* data ) {
@@ -158,20 +157,12 @@ void SwarmSuite_Teardown( SwarmSuiteData* data ) {
 	Stg_Class_Delete( data->elementCellLayout );
 	Stg_Class_Delete( data->mesh );
 	Stg_Class_Delete( data->extensionMgr_Register );
-	remove( "particleCoords.dat" );
 }
 
 void SwarmSuite_TestParticleSearch( SwarmSuiteData* data ) {
 	double	coord[3];
-	int	procToWatch;
+	int		procToWatch = data->nProcs > 1 ? 1 : 0;
 	Stream*	stream = Journal_Register (Info_Type, "TestParticleSearch");
-	
-	if( data->nProcs >= 2 ) {
-		procToWatch = 1;
-	}
-	else {
-		procToWatch = 0;
-	}
 	
 	if( data->rank == procToWatch ) {
 		if( data->nProcs == 1 ) {
@@ -189,25 +180,19 @@ void SwarmSuite_TestParticleSearch( SwarmSuiteData* data ) {
 }
 
 void SwarmSuite_TestParticleCoords( SwarmSuiteData* data ) {
-	char 	expected_file[PCU_PATH_MAX];
-	int	procToWatch;
+	char		expected_file[PCU_PATH_MAX];
+	int		procToWatch = data->nProcs > 1 ? 1 : 0;
 	Stream*	stream = Journal_Register (Info_Type, "TestParticleCorrds");
 	
-	if( data->nProcs >= 2 ) {
-		procToWatch = 1;
-	}
-	else {
-		procToWatch = 0;
-	}
-	
 	if( data->rank == procToWatch ) {
-		Stream_RedirectFile( stream, "particleCoords.dat" );
+		Stream_RedirectFile( stream, "testParticleCoords.dat" );
 		Swarm_PrintParticleCoords( data->swarm, stream );
 		Journal_Printf( stream, "\n" );
 		Swarm_PrintParticleCoords_ByCell( data->swarm, stream );
 	
 		pcu_filename_expected( "testSwarmOutput.expected", expected_file );
-		pcu_check_fileEq( "particleCoords.dat", expected_file );
+		pcu_check_fileEq( "testParticleCoords.dat", expected_file );
+		remove( "testPparticleCoords.dat" );
 	}
 }
 
