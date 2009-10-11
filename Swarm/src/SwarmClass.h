@@ -62,6 +62,7 @@
 		/* General info */ \
 		__Stg_Component \
 		\
+		AbstractContext*		context; \
 		/* Virtual info */ \
 		\
 		/* General info */ \
