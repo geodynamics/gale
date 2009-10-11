@@ -347,8 +347,6 @@ void _FeEquationNumber_Delete( void* feEquationNumber ) {
    if( self->ownedMap ) {
       NewClass_Delete( self->ownedMap );
    }
-
-   NewClass_Delete( self->ownedMap );
 	
    /* Stg_Class_Delete parent */
    _Stg_Class_Delete( self );
