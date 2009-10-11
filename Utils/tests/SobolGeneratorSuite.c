@@ -118,10 +118,10 @@ void SobolGeneratorSuite_TestSobolGenerator( SobolGeneratorSuiteData* data ) {
 			pcu_check_fileEq( output_file, expected_file ); 
 
 			remove( output_file );
-			remove( "RightmostBit.dat" );
 
 			Stg_Class_Delete( sobolGenerator );
 		}
+		remove( "testSobolGeneratorRightmostBit.dat" );
 	}
 }
 
