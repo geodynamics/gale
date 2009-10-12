@@ -47,11 +47,14 @@ typedef struct {
 
 void MaterialFeVariableSuite_Setup( MaterialFeVariableSuiteData* data ) {
    char              	 	xmlInputFilename[PCU_PATH_MAX];
+	PICelleratorContext*		context;
 
    pcu_filename_input( "testMaterialFeVariable.xml", xmlInputFilename );
-   data->cf = (PICelleratorContext*)stgMainInitFromXML( xmlInputFilename, MPI_COMM_WORLD, NULL );
+   data->cf = stgMainInitFromXML( xmlInputFilename, MPI_COMM_WORLD, NULL );
+	data->context = (PICelleratorContext*)LiveComponentRegister_Get( data->cf->LCRegister, "context" );
+	stgMainBuildAndInitialise( data->cf );
 
-   stgMainLoop( data->cf );
+	stgMainLoop( data->cf );
 } 
 
 
