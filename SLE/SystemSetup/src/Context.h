@@ -113,7 +113,6 @@
 	void  _FiniteElementContext_Init( FiniteElementContext* self );
 
 	/* Virtual Functions -----------------------------------------------------------------------------------------------------*/
-	void _FiniteElementContext_Construct( void* context, Stg_ComponentFactory* cf, void* data );
 	
 	/* Stg_Class_Delete implementation */
 	void _FiniteElementContext_Delete( void* context );

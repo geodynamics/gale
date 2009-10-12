@@ -79,10 +79,10 @@ void* FiniteElementContext_DefaultNew( Name name )
 		NULL,
 		FiniteElementContext_DefaultNew,
 		_FiniteElementContext_Construct,
-		_FiniteElementContext_Build,
-		_FiniteElementContext_Initialise,
-		_FiniteElementContext_Execute,
-		_FiniteElementContext_Destroy,
+		_AbstractContext_Build,
+		_AbstractContext_Initialise,
+		_AbstractContext_Execute,
+		_AbstractContext_Destroy,
 		name,
 		False,
 		_FiniteElementContext_SetDt,
@@ -254,13 +254,6 @@ void _FiniteElementContext_Init( FiniteElementContext* self ) {
 		FiniteElementContext_Type );
 }
 
-void _FiniteElementContext_Construct( void* context, Stg_ComponentFactory* cf, void* data ) {
-	FiniteElementContext* context = (FiniteElementContext*)self;
-
-	_FiniteElementContext_Init( context );
-
-	_DomainContext_Construct( context, cf, data );
-}
 
 /* Virtual Functions -------------------------------------------------------------------------------------------------------------*/
 
