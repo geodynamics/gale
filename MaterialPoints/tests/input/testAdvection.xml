@@ -10,6 +10,13 @@
 	<param name="timeIntegratorOrder">1</param>
 	
 	<struct name="components" mergeType="merge">
+		<struct name="everywhere">
+			<param name="Type">Everywhere</param>
+		</struct>
+		<struct name="genericMaterial">
+			<param name="Type">Material</param>
+			<param name="Shape">everywhere</param>
+		</struct>
 		<struct name="elementCellLayout">
 			<param name="Type">ElementCellLayout</param>
 			<param name="Mesh">linearMesh</param>

@@ -81,6 +81,7 @@ void check( PICelleratorContext* context ) {
 	double		  depthErrorTolerance  = Dictionary_GetDouble( dictionary, "depthErrorTolerance" );
 	double		  radiusErrorTolerance = Dictionary_GetDouble( dictionary, "radiusErrorTolerance" );
 	double		  thetaErrorTolerance  = Dictionary_GetDouble( dictionary, "thetaErrorTolerance" );
+	double		  theta;
 
 	/* Add original pos to particle */
 	materialPointsSwarm = (MaterialPointsSwarm*) LiveComponentRegister_Get( context->CF->LCRegister, "materialPointsSwarm" );
@@ -103,7 +104,11 @@ void check( PICelleratorContext* context ) {
 
 		maxDepthError  = MAX( maxDepthError,  fabs( originalCoord[ K_AXIS ] - coord[ K_AXIS ] ) );
 		maxRadiusError = MAX( maxRadiusError, fabs( currentRadius - originalRadius ) );
-		maxThetaError  = MAX( maxThetaError,  StGermain_AngleBetweenVectors( analyticCoord, coord, 2 ) );
+
+		theta = StGermain_AngleBetweenVectors( analyticCoord, coord, 2 );
+		if( theta > maxThetaError )
+			maxThetaError = theta;
+		//maxThetaError  = MAX( maxThetaError, theta );
 	}
 
 	MPI_Allreduce( &maxDepthError,  &maxDepthErrorGlobal,  1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD );
@@ -131,8 +136,8 @@ void AdvectionSuite_Euler( AdvectionSuiteData* data ) {
 	matSwarm = (MaterialPointsSwarm*)LiveComponentRegister_Get( context->CF->LCRegister, "materialPointsSwarm" );
 	handle = ExtensionManager_Add( matSwarm->particleExtensionMgr, CURR_MODULE_NAME, sizeof(Coord) );
 
-	//stgMainBuildAndInitialise( cf );
 	Stg_ComponentFactory_BuildComponents( cf, NULL );
+	Stg_ComponentFactory_InitialiseComponents( cf, NULL );
 
 	for( particle_i = 0; particle_i < matSwarm->particleLocalCount; particle_i++ ) {
 		particle = (GlobalParticle*)Swarm_ParticleAt( matSwarm, particle_i );
@@ -165,6 +170,7 @@ void AdvectionSuite_RK2( AdvectionSuiteData* data ) {
 	handle = ExtensionManager_Add( matSwarm->particleExtensionMgr, CURR_MODULE_NAME, sizeof(Coord) );
 
 	Stg_ComponentFactory_BuildComponents( cf, NULL );
+	Stg_ComponentFactory_InitialiseComponents( cf, NULL );
 
 	for( particle_i = 0; particle_i < matSwarm->particleLocalCount; particle_i++ ) {
 		particle = (GlobalParticle*)Swarm_ParticleAt( matSwarm, particle_i );
@@ -197,6 +203,7 @@ void AdvectionSuite_RK4( AdvectionSuiteData* data ) {
 	handle = ExtensionManager_Add( matSwarm->particleExtensionMgr, CURR_MODULE_NAME, sizeof(Coord) );
 
 	Stg_ComponentFactory_BuildComponents( cf, NULL );
+	Stg_ComponentFactory_InitialiseComponents( cf, NULL );
 
 	for( particle_i = 0; particle_i < matSwarm->particleLocalCount; particle_i++ ) {
 		particle = (GlobalParticle*)Swarm_ParticleAt( matSwarm, particle_i );
