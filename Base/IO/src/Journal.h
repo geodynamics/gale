@@ -103,6 +103,8 @@
 	/** Deallocates the Journal singleton. */
 	void Journal_Delete( );
 
+	/** Purge all the streams */
+	void Journal_Purge();
 
 	/** Reads entries from the the given dictionary object to create/configure streams in Journal. */
 	void Journal_ReadFromDictionary( Dictionary* dictionary );

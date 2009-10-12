@@ -803,6 +803,7 @@ void _Stg_ObjectList_DeleteAllObjects( void* namedObjectList ) {
 			self->data[objectIndex] = 0;
 		}
 	}
+	self->count = 0;
 }
 
 
