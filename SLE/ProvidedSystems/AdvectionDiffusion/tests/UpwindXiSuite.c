@@ -60,40 +60,34 @@ void UpwindXiSuite_Test( UpwindXiSuiteData* data ) {
 	double  dPerceltNumber = 0.5;
 	double  perceltNumber;
 	char	expectedFile[PCU_PATH_MAX];
-	int	rank, size, rank_i;
+	int	rank;
+	char	outputFilename[100];
 
 	MPI_Comm_rank( MPI_COMM_WORLD, &rank );
-	MPI_Comm_size( MPI_COMM_WORLD, &size );
+	sprintf( outputFilename, "output_%2d.dat", rank );
 
-	for( rank_i = 0; rank_i < size; rank_i++ ) {
-		if( rank_i == rank ) {
-			/* Create Data File */
-			dataStream    = Journal_Register( Info_Type, "DataStream" );
-			Stream_RedirectFile( dataStream, "output.dat" );
+	dataStream    = Journal_Register( Info_Type, "DataStream" );
+	Stream_RedirectFile( dataStream, outputFilename );
 		
-			Journal_Printf( dataStream, "# File to compare code with Brooks, Hughes 1982 - Fig 3.3\n");
-			Journal_Printf( dataStream, "# Integration rule for the optimal upwind scheme, doubly asymptotic approximation and critical approximation.\n");
-			Journal_Printf( dataStream, "# Plot using line:\n");
-			Journal_Printf( dataStream, "# plot \"%s\" using 1:2 title \"Exact\" with line, ", "output.dat" );
-			Journal_Printf( dataStream, "\"%s\" using 1:3 title \"DoublyAsymptoticAssumption\" with line, ", "output.dat" );
-			Journal_Printf( dataStream, "\"%s\" using 1:4 title \"CriticalAssumption\" with line\n", "output.dat" );
+	Journal_Printf( dataStream, "# File to compare code with Brooks, Hughes 1982 - Fig 3.3\n");
+	Journal_Printf( dataStream, "# Integration rule for the optimal upwind scheme, doubly asymptotic approximation and critical approximation.\n");
+	Journal_Printf( dataStream, "# Plot using line:\n");
+	Journal_Printf( dataStream, "# plot \"%s\" using 1:2 title \"Exact\" with line, ", "output.dat" );
+	Journal_Printf( dataStream, "\"%s\" using 1:3 title \"DoublyAsymptoticAssumption\" with line, ", "output.dat" );
+	Journal_Printf( dataStream, "\"%s\" using 1:4 title \"CriticalAssumption\" with line\n", "output.dat" );
 
-			Journal_Printf( dataStream, "# Perclet Number \t Exact \t DoublyAsymptoticAssumption \t CriticalAssumption\n" );
-			for ( perceltNumber = minPercletNumber ; perceltNumber < maxPercletNumber ; perceltNumber += dPerceltNumber )
-				Journal_Printf( dataStream, "%0.3g \t\t %0.3g \t\t %0.3g \t\t %0.3g\n", 
-						perceltNumber, 
-						AdvDiffResidualForceTerm_UpwindXiExact( NULL, perceltNumber),
-						AdvDiffResidualForceTerm_UpwindXiDoublyAsymptoticAssumption( NULL, perceltNumber),
-						AdvDiffResidualForceTerm_UpwindXiCriticalAssumption( NULL, perceltNumber) );
+	Journal_Printf( dataStream, "# Perclet Number \t Exact \t DoublyAsymptoticAssumption \t CriticalAssumption\n" );
+	for ( perceltNumber = minPercletNumber ; perceltNumber < maxPercletNumber ; perceltNumber += dPerceltNumber )
+		Journal_Printf( dataStream, "%0.3g \t\t %0.3g \t\t %0.3g \t\t %0.3g\n", 
+				perceltNumber, 
+				AdvDiffResidualForceTerm_UpwindXiExact( NULL, perceltNumber),
+				AdvDiffResidualForceTerm_UpwindXiDoublyAsymptoticAssumption( NULL, perceltNumber),
+				AdvDiffResidualForceTerm_UpwindXiCriticalAssumption( NULL, perceltNumber) );
 
-			pcu_filename_expected( "UpwindXi.expected", expectedFile );
-			pcu_check_fileEq( "output.dat", expectedFile );
-			remove( "output.dat" );
-			Journal_Purge( );
-		}
-
-		MPI_Barrier( MPI_COMM_WORLD );
-	}
+	pcu_filename_expected( "UpwindXi.expected", expectedFile );
+	pcu_check_fileEq( outputFilename, expectedFile );
+	remove( outputFilename );
+	Journal_Purge( );
 }
 
 void UpwindXiSuite( pcu_suite_t* suite ) {
