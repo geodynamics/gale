@@ -78,11 +78,11 @@ void* FiniteElementContext_DefaultNew( Name name )
 		_FiniteElementContext_Print,
 		NULL,
 		FiniteElementContext_DefaultNew,
-		_AbstractContext_Construct,
-		_AbstractContext_Build,
-		_AbstractContext_Initialise,
-		_AbstractContext_Execute,
-		_AbstractContext_Destroy,
+		_FiniteElementContext_Construct,
+		_FiniteElementContext_Build,
+		_FiniteElementContext_Initialise,
+		_FiniteElementContext_Execute,
+		_FiniteElementContext_Destroy,
 		name,
 		False,
 		_FiniteElementContext_SetDt,
@@ -106,7 +106,7 @@ FiniteElementContext*				FiniteElementContext_New(
 		_FiniteElementContext_Print,
 		NULL,
 		FiniteElementContext_DefaultNew,
-		_AbstractContext_Construct,
+		_FiniteElementContext_Construct,
 		_AbstractContext_Build,
 		_AbstractContext_Initialise,
 		_AbstractContext_Execute,
@@ -252,6 +252,14 @@ void _FiniteElementContext_Init( FiniteElementContext* self ) {
 		"saveMesh",
 		_FiniteElementContext_SaveMesh,
 		FiniteElementContext_Type );
+}
+
+void _FiniteElementContext_Construct( void* context, Stg_ComponentFactory* cf, void* data ) {
+	FiniteElementContext* context = (FiniteElementContext*)self;
+
+	_FiniteElementContext_Init( context );
+
+	_DomainContext_Construct( context, cf, data );
 }
 
 /* Virtual Functions -------------------------------------------------------------------------------------------------------------*/
