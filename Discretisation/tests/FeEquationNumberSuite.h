@@ -1,5 +1,5 @@
-#ifndef StgDomain_FeEquationNumberSuite_h
-#define StgDomain_FeEquationNumberSuite_h
+#ifndef StgFEM_FeEquationNumberSuite_h
+#define StgFEM_FeEquationNumberSuite_h
 
 void FeEquationNumberSuite( pcu_suite_t* suite );
 
