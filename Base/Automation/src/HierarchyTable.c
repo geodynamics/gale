@@ -126,21 +126,6 @@ void HierarchyTable_PrintChildren( void* hierarchyTable, Type parentType, Stream
 	Stream_UnIndent( stream );
 }
 
-Bool Stg_Context_CheckTypeFromChild( const void* classPtr, Type possibleParentType ) {
-	Stg_Class* self = (Stg_Class*) classPtr;
-	/* Check if the pointer is null */
-	Journal_Firewall(
-		self != NULL,
-		Journal_Register( Error_Type, HierarchyTable_Type ),
-		"Error doing type checking against possibleParentType %s - pointer is NULL.\n",
-		possibleParentType );
-
-	return( Stg_Class_IsInstance( self, possibleParentType ) );
-}
-
-Bool Stg_Context_CheckTypeFromChildType( Type childType, Type possibleParentType ) {
-	return( IsChild( childType, possibleParentType ) );
-}
 
 Stg_Class* Stg_Class_CheckType( const void* classPtr, Type possibleParentType ) {
 	Stg_Class* self = (Stg_Class*) classPtr;

@@ -49,74 +49,55 @@
 
 
 void stgMain( Dictionary* dictionary, MPI_Comm communicator ) {
-	Stg_ComponentFactory*	cf;
+	AbstractContext* context;
 
-	cf = stgMainConstruct( dictionary, communicator, NULL );
-	stgMainLoop( cf );
-	stgMainDestroy( cf );
-
-	Stg_Class_Delete( cf );
+	context = stgMainInit( dictionary, communicator );
+	stgMainLoop( context );
+	stgMainDestroy( context );
 }
 
-/* TODO: need to find a way to add different communicators for different contexts */
-Stg_ComponentFactory* stgMainConstruct( Dictionary* dictionary, MPI_Comm communicator, void* _context ) {
-	Stg_ComponentFactory*	cf;
-	Dictionary*					componentDict;
-	Stg_Component*				component;
-	AbstractContext*			context;
-	unsigned						component_I;
-
-	if( ( componentDict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, "components" ) ) ) == NULL )
-		componentDict = Dictionary_New();
+AbstractContext* stgMainInit( Dictionary* dictionary, MPI_Comm communicator ) {
+	AbstractContext*		context = NULL;
 	
-	CheckDictionaryKeys( componentDict, "Component dictionary must have unique names\n" );
-	cf = Stg_ComponentFactory_New( dictionary, componentDict );
-
-	if( _context ) {
-		context = (AbstractContext*)_context;
-		context->CF = cf;
-		context->dictionary = dictionary;
-		context->communicator = communicator;
-		LiveComponentRegister_Add( cf->LCRegister, (void*)context );
-	}
-
-	/* Instantion phase -------------------------------------------------------------------------------------------------*/
-	Stg_ComponentFactory_CreateComponents( cf );
-
-	/* Assign the dictionary, componentFactory & the communicator for the contexts */
-	/* TODO: if different contexts require different communicators, then StG. components will be required for these, and 
-	 * they should be passed in from the XML */
-	/* Also, this is a little hacky, as nothing is known about the other layers of StG or their associated contexts here */
-	for( component_I = 0; component_I < LiveComponentRegister_GetCount( cf->LCRegister ); component_I++ ) {
-		component = LiveComponentRegister_At( cf->LCRegister, component_I );
-		if( Stg_CheckContextFromChild( component, AbstractContext ) ) { 
-			Journal_Firewall( dictionary->count, Journal_Register( Error_Type, "Error Stream" ), 
-				 "Error in %s: The dictionary is empty, meaning no input parameters have been feed into your program. Perhaps you've forgot to pass any input files ( or command-line arguments ) in.\n", __func__); 	
-			context = (AbstractContext*)component;
-			context->dictionary = dictionary;
-			context->CF = cf;
-			context->communicator = communicator;
-		}
-	}
 	/* Construction phase -----------------------------------------------------------------------------------------------*/
-	Stg_ComponentFactory_ConstructComponents( cf, NULL );
-	
-	return cf;
-}
+	context = _AbstractContext_New( 
+			sizeof(AbstractContext),
+	       	        AbstractContext_Type,
+	                _AbstractContext_Delete,
+	                _AbstractContext_Print,
+	                NULL,
+	                NULL,
+	                _AbstractContext_Construct,
+	                _AbstractContext_Build,
+	                _AbstractContext_Initialise,
+	                _AbstractContext_Execute,
+	                _AbstractContext_Destroy,
+	                "context",
+	                True,
+	                NULL,
+	                0,
+	                0,
+	                communicator,
+	                dictionary );
 
-void stgMainBuildAndInitialise( Stg_ComponentFactory* cf ) {
+	/* Construction phase -----------------------------------------------------------------------------------------------*/
+	Stg_Component_Construct( context, 0 /* dummy */, &context, True );
+	
 	/* Building phase ---------------------------------------------------------------------------------------------------*/
-	Stg_ComponentFactory_BuildComponents( cf, NULL );
+	Stg_Component_Build( context, 0 /* dummy */, False );
 	
 	/* Initialisaton phase ----------------------------------------------------------------------------------------------*/
-	Stg_ComponentFactory_InitialiseComponents( cf, NULL );
+	Stg_Component_Initialise( context, 0 /* dummy */, False );
+
+	return context;
 }
 
-Stg_ComponentFactory* stgMainInitFromXML( char* xmlInputFilename, MPI_Comm communicator, void* _context ) {
-   Dictionary*       		dictionary = NULL;
-   Bool              		result;
-   XML_IO_Handler*   		ioHandler;
-   Stg_ComponentFactory*	cf;
+
+AbstractContext* stgMainInitFromXML( char* xmlInputFilename, MPI_Comm communicator ) {
+   AbstractContext*  context = NULL;
+   Dictionary*       dictionary = NULL;
+   Bool              result;
+   XML_IO_Handler*   ioHandler;
 
    dictionary = Dictionary_New();
    ioHandler = XML_IO_Handler_New();
@@ -124,39 +105,27 @@ Stg_ComponentFactory* stgMainInitFromXML( char* xmlInputFilename, MPI_Comm commu
    /* In case the user has put any journal configuration in the XML, read here */
    Journal_ReadFromDictionary( dictionary );
 
-   cf = stgMainConstruct( dictionary, communicator, _context );
+   context = stgMainInit( dictionary, communicator );
    
    /* We don't need the XML IO handler again (however don't delete the dictionary as it's 
     * 'owned' by the context from hereon */
    Stg_Class_Delete( ioHandler );
 
-   return cf;
+   return context;
 }
 
 	
-void stgMainLoop( Stg_ComponentFactory* cf ) {
+void stgMainLoop( AbstractContext* context ) {
 	/* Run (Solve) phase ------------------------------------------------------------------------------------------------*/
-	/* do this by running the contexts, which manage the entry points which call the _Execute() funcs for the other components */
-	unsigned component_i;
-	Stg_Component* component;
-	AbstractContext* context;
-	
-	for( component_i = 0; component_i < LiveComponentRegister_GetCount( cf->LCRegister ); component_i++ ) {
-		component = LiveComponentRegister_At( cf->LCRegister, component_i );
-		if( Stg_CheckContextFromChild( component, AbstractContext ) ) { 
-			context = (AbstractContext*)component;
-			AbstractContext_Dump( context );
-			Stg_Component_Execute( context, 0, True );
-		}
-	}
+	AbstractContext_Dump( context );
+	Stg_Component_Execute( context, 0 /* dummy */, False );
 }
 
-void stgMainDestroy( Stg_ComponentFactory* cf ) {
+
+void stgMainDestroy( AbstractContext* context ) {
 	/* Destruct phase ---------------------------------------------------------------------------------------------------*/
-	Stg_ComponentFactory_DestroyComponents( cf, NULL );
-	cf->LCRegister->componentList->count = 0;
-	Stg_Class_Delete( cf->LCRegister->componentList );
-	_Stg_Class_Delete( cf );
+	Stg_Component_Destroy( context, 0 /* dummy */, False );
+	Stg_Class_Delete( context );
 }
 
 void stgImportToolbox( Dictionary* dictionary, char* toolboxName ) {
