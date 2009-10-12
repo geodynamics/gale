@@ -72,7 +72,7 @@ PCU_Runner_Status pcu_runner_run( pcu_listener_t* lsnr ) {
       cur = cur->next;
    }
 
-   if ( pcu_nsuites > 1 ) {
+   if ( pcu_nsuites >= 1 ) {
       printf( "-----------------------------------------------------------\n" );
       printf( "Total passes: %d/%d\n", totalPasses, totalTests );
    }
