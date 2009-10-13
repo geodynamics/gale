@@ -8,6 +8,13 @@
 	<include>StgFEM/TimeIntegrator.xml</include>
 	
 	<struct name="components" mergeType="merge">
+		<struct name="everywhere">
+			<param name="Type">Everywhere</param>
+		</struct>
+		<struct name="material">
+			<param name="Type">Material</param>
+			<param name="Shape">everywhere</param>
+		</struct>
 		<struct name="elementCellLayout">
 			<param name="Type">ElementCellLayout</param>
 			<param name="Mesh">linearMesh</param>
@@ -49,7 +56,7 @@
 		</struct>
 	</struct>
 	
-   <param name="dim"> 2 </param>
+	<param name="dim"> 2 </param>
 	<param name="particleCount"> 20 </param>
 
 	<param name="maxTimeSteps"> 1 </param>
