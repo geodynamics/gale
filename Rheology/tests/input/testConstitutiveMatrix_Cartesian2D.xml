@@ -3,8 +3,11 @@
 
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 
-	<include> ../../InputFiles/BaseApps/LidDrivenFEM.xml </include>
+	<include> Underworld/BaseApps/LidDrivenFEM.xml </include>
 	<struct name="components" mergeType="merge">
+		<struct name="context">
+			<param name="Type">UnderworldContext</param>
+		</struct>
 		<struct name="rheology">
 			<param name="Type">MaterialViscosity</param>
 			<param name="eta0">1.0</param>
