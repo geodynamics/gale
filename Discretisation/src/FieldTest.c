@@ -154,6 +154,8 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 	Dictionary*			dict			= cf->rootDict;
 	Dictionary_Entry_Value*		dictEntryVal		= Dictionary_Get( dict, "pluginData" );
 	Dictionary*			pluginDict  		=  Dictionary_Entry_Value_AsDictionary( dictEntryVal );
+	/* get the pluginDict from the xml, needed for rejig */
+	Dictionary*		pluginDict2	= Codelet_GetPluginDictionary( self, cf->rootDict );
 	Dictionary_Entry_Value*		fieldList;
 	Dictionary_Entry_Value*		swarmVarList		= Dictionary_Get( dict, "NumericSwarmVariableNames" );
 	FieldVariable_Register* 	fV_Register;
@@ -166,7 +168,7 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 
 	Journal_Firewall( pluginDict != NULL , errStream, "\nError in %s: No pluginData xml was defined ... aborting\n", __func__ );
 
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
+	self->context = Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString( pluginDict2, "Context" ), DomainContext, False, data );
 	if( !self->context ) 
 		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
 
