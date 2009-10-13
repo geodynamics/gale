@@ -184,3 +184,5 @@ env.PCUTest('tests/testStgFEM', suites,
 
 # Install XML input files.
 env.Install('lib/StGermain/StgFEM', Glob('Apps/StgFEM_Components/*.xml'))
+
+#env.PCUSysTest('SysTest/RegressionTests/testAll.sh')
