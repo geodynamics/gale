@@ -81,8 +81,7 @@ void printstatus( pcu_listener_t* lsnr, pcu_suite_t* suite, int final ) {
       return;
 
    printf( "Running suite '%s', passes: %d/%d%s", 
-	   suite->name, suite->npassed, suite->ntests, 
-	   final ? "\n" : "\r" );
+	   suite->name, suite->npassed, suite->ntests, "\n" );
 }
 
 void printsources( pcu_listener_t* lsnr, pcu_suite_t* suite ) {
