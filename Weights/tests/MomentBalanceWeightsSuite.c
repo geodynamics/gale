@@ -36,66 +36,64 @@
 #include <StGermain/StGermain.h>
 #include <StgDomain/StgDomain.h>
 #include <StgFEM/StgFEM.h>
-#include "PICellerator/PopulationControl/PopulationControl.h"
-#include "PICellerator/Weights/Weights.h"
+#include <PICellerator/PICellerator.h>
 
 #include "ConstantWeightsSuite.h"
-#include "IterativeWeightsSuite.h"
+#include "MomentBalanceWeightsSuite.h"
 
 typedef struct {
-   DomainContext*       context;
+   PICelleratorContext*       context;
    Stg_ComponentFactory* cf;
-} IterativeWeightsSuiteData;
+} MomentBalanceWeightsSuiteData;
 
 
-void IterativeWeightsSuite_Setup( IterativeWeightsSuiteData* data ) {
+void MomentBalanceWeightsSuite_Setup( MomentBalanceWeightsSuiteData* data ) {
    char              xmlInputFilename[PCU_PATH_MAX];
 
-   pcu_filename_input( "testIterativeWeights.xml", xmlInputFilename );
+   pcu_filename_input( "testMomentBalanceWeights.xml", xmlInputFilename );
    data->cf = stgMainInitFromXML( xmlInputFilename, MPI_COMM_WORLD, NULL );
+   data->context = LiveComponentRegister_Get( data->cf->LCRegister, "context" );
+   stgMainBuildAndInitialise( data->cf );
 } 
 
 
-void IterativeWeightsSuite_Teardown( IterativeWeightsSuiteData* data ) {
+void MomentBalanceWeightsSuite_Teardown( MomentBalanceWeightsSuiteData* data ) {
    stgMainDestroy( data->cf );
 }
 
 
-void IterativeWeightsSuite_TestElementIntegral_Circle( IterativeWeightsSuiteData* data ) {
+void MomentBalanceWeightsSuite_TestElementIntegral_Circle( MomentBalanceWeightsSuiteData* data ) {
    WeightsSuite_TestElementIntegral( data->context, "CircleInterface", 1000,
       0.000001, /* --mean-tolerance */
       0.000001, /* --standardDeviation-tolerance */
-      0.10172, /* --mean-expectedValue */
-      0.070065 /* --standardDeviation-expectedValue */ );
+      0.097814, /* --mean-expectedValue */
+      0.068607 /* --standardDeviation-expectedValue */ );
 }
 
 
-void IterativeWeightsSuite_TestElementIntegral_Exponential( IterativeWeightsSuiteData* data ) {
+void MomentBalanceWeightsSuite_TestElementIntegral_Exponential( MomentBalanceWeightsSuiteData* data ) {
    WeightsSuite_TestElementIntegral( data->context, "ExponentialInterface", 1000,
       0.000001, /* --mean-tolerance */
       0.000001, /* --standardDeviation-tolerance */
-      0.088927, /* --mean-expectedValue */
-      0.06681 /* --standardDeviation-expectedValue */ );
+      0.094671, /* --mean-expectedValue */
+      0.075287 /* --standardDeviation-expectedValue */ );
 }
 
 
-void IterativeWeightsSuite_TestElementIntegral_Polynomial( IterativeWeightsSuiteData* data ) {
+void MomentBalanceWeightsSuite_TestElementIntegral_Polynomial( MomentBalanceWeightsSuiteData* data ) {
    WeightsSuite_TestElementIntegral( data->context, "PolynomialFunction", 1000,
       0.000001, /* --mean-tolerance */
       0.000001, /* --standardDeviation-tolerance */
-      0.017526, /* --mean-expectedValue */
-      0.013522 /* --standardDeviation-expectedValue */ );
+      0.016697, /* --mean-expectedValue */
+      0.013041 /* --standardDeviation-expectedValue */ );
 }
 
 
-void IterativeWeightsSuite( pcu_suite_t* suite ) {
-   pcu_suite_setData( suite, IterativeWeightsSuiteData );
-   pcu_suite_setFixtures( suite, IterativeWeightsSuite_Setup, IterativeWeightsSuite_Teardown );
-   pcu_suite_addTest( suite, IterativeWeightsSuite_TestElementIntegral_Circle );
-/* TEMPORARILY disable multiple tests until Toolbox/Context issue sorted out (See tickets #70,#71
- in StGermain trac) -- PatrickSunter, 19 Aug 2009 */
-#if 0
-   pcu_suite_addTest( suite, IterativeWeightsSuite_TestElementIntegral_Exponential );
-   pcu_suite_addTest( suite, IterativeWeightsSuite_TestElementIntegral_Polynomial );
-#endif
+void MomentBalanceWeightsSuite( pcu_suite_t* suite ) {
+   pcu_suite_setData( suite, MomentBalanceWeightsSuiteData );
+   pcu_suite_setFixtures( suite, MomentBalanceWeightsSuite_Setup, MomentBalanceWeightsSuite_Teardown );
+   pcu_suite_addTest( suite, MomentBalanceWeightsSuite_TestElementIntegral_Circle );
+   pcu_suite_addTest( suite, MomentBalanceWeightsSuite_TestElementIntegral_Exponential );
+   pcu_suite_addTest( suite, MomentBalanceWeightsSuite_TestElementIntegral_Polynomial );
 }
+
