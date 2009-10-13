@@ -7,9 +7,12 @@
 	<include> StgFEM/TemperatureField.xml </include>
 	<include> Underworld/VariableConditions/temperatureICs.sinusoid.xml </include>
 	
-	<param name="StiffnessMatrixCompareFilename">./expected/testFrankKamenetskiiBackground2D.0of1.matrix</param>
+	<param name="StiffnessMatrixCompareFilename">./testFrankKamenetskii2D.matrix</param>
 
 	<struct name="components" mergeType="merge">
+		<struct name="context">
+			<param name="Type">UnderworldContext</param>
+		</struct>
 		<struct name="rheology">
 			<param name="Type">FrankKamenetskii</param>
 			<param name="TemperatureField">TemperatureField</param>
