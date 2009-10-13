@@ -91,7 +91,7 @@ void circleInterface( void* feVariable, Element_DomainIndex dElement_I, Coord xi
    *value = (double) (x*x + y*y <= 1.0);
 }
 
-void ConstantWeightsSuite_TestElementIntegral(
+void WeightsSuite_TestElementIntegral(
       PICelleratorContext* context,
       Name           funcName,
       Index          count,   // was SampleSize - defaults to 5000
@@ -204,7 +204,7 @@ void ConstantWeightsSuite_Teardown( ConstantWeightsSuiteData* data ) {
 }
 
 void ConstantWeightsSuite_CircleInterface( ConstantWeightsSuiteData* data ) {
-   ConstantWeightsSuite_TestElementIntegral( data->context, "CircleInterface", 1000,
+   WeightsSuite_TestElementIntegral( data->context, "CircleInterface", 1000,
       0.000001, /* --mean-tolerance */
       0.000001, /* --standardDeviation-tolerance */
       0.091215, /* --mean-expectedValue */
@@ -212,7 +212,7 @@ void ConstantWeightsSuite_CircleInterface( ConstantWeightsSuiteData* data ) {
 }
    
 void ConstantWeightsSuite_ExponentialInterface( ConstantWeightsSuiteData* data ) {
-   ConstantWeightsSuite_TestElementIntegral( data->context, "ExponentialInterface", 1000,
+   WeightsSuite_TestElementIntegral( data->context, "ExponentialInterface", 1000,
       0.000001, /* --mean-tolerance */
       0.000001, /* --standardDeviation-tolerance */
       0.155483, /* --mean-expectedValue */
@@ -220,7 +220,7 @@ void ConstantWeightsSuite_ExponentialInterface( ConstantWeightsSuiteData* data )
 }
    
 void ConstantWeightsSuite_PolynomialFunction( ConstantWeightsSuiteData* data ) {
-   ConstantWeightsSuite_TestElementIntegral( data->context, "PolynomialFunction", 1000,
+   WeightsSuite_TestElementIntegral( data->context, "PolynomialFunction", 1000,
       0.000001, /* --mean-tolerance */
       0.000001, /* --standardDeviation-tolerance */
       0.017475, /* --mean-expectedValue */
