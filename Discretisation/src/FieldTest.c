@@ -322,7 +322,7 @@ void _FieldTest_Initialise( void* fieldTest, void* data ) {
 		char *referenceSolnFileName;
 		for( field_I = 0; field_I < self->fieldCount; field_I++ ) {
 			/* create the name of the reference file, the apprendix is handled by FieldTest_LoadReferenceSolutionFromFile */
-			referenceSolnFileName = Memory_Alloc_Array_Unnamed( char, strlen((char*)self->referenceSolnPath) + 1 + strlen((char*)self->numericFieldList[field_I]->name) + 1 + 5 + strlen(".h5\0") );
+			referenceSolnFileName = Memory_Alloc_Array_Unnamed( char, strlen((char*)self->referenceSolnPath) + 1 + strlen((char*)self->numericFieldList[field_I]->name) + 1 + 5 + strlen(".h5\0") + 10 );
 			//sprintf( referenceSolnFileName, "/%s.%.5d", self->numericFieldList[field_I]->name, self->testTimestep );
 			sprintf( referenceSolnFileName, "%s/%s.%.5d.h5", self->referenceSolnPath, self->numericFieldList[field_I]->name, self->testTimestep );
 			FeVariable_ReadFromFile( self->referenceFieldList[field_I], referenceSolnFileName );
@@ -1046,7 +1046,7 @@ void FieldTest_ElementErrReferenceFromField( void* fieldTest, Index field_I, Ind
 	Index			constantElNode		= lElement_I;
 	double*			coord			= Mesh_GetVertex( self->constantMesh, constantElNode );
 	unsigned		nDims			= Mesh_GetDimSize( referenceMesh );
-	Index			el_I;
+	Index			el_I, elementMeshElem;
 	ElementType*		elType;
 	Swarm*			intSwarm		= self->integrationSwarm;
 	Index			cell_I;
@@ -1062,7 +1062,8 @@ void FieldTest_ElementErrReferenceFromField( void* fieldTest, Index field_I, Ind
 
 	/* don't assume that the constant error field mesh & reference field mesh necessarily map 1:1 */
 	Mesh_SearchElements( referenceMesh, coord, &el_I );
-	elType = FeMesh_GetElementType( elementMesh, el_I );
+	Mesh_SearchElements( elementMesh, coord, &elementMeshElem );
+	elType = FeMesh_GetElementType( elementMesh, elementMeshElem );
 
 	cell_I = CellLayout_MapElementIdToCellId( intSwarm->cellLayout, el_I );
 	cellParticleCount = intSwarm->cellParticleCountTbl[cell_I];
@@ -1076,7 +1077,7 @@ void FieldTest_ElementErrReferenceFromField( void* fieldTest, Index field_I, Ind
 		FieldVariable_InterpolateValueAt( referenceField, globalCoord, reference );
 		FieldVariable_InterpolateValueAt( numericField,   globalCoord, numeric   );
 
-		detJac = ElementType_JacobianDeterminant( elType, elementMesh, el_I, xi, nDims );
+		detJac = ElementType_JacobianDeterminant( elType, elementMesh, elementMeshElem, xi, nDims );
 
 		for( dof_I = 0; dof_I < numDofs; dof_I++ ) {
 			elErrorSq[dof_I] += ( numeric[dof_I] - reference[dof_I] ) * ( numeric[dof_I] - reference[dof_I] ) 
