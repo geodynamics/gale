@@ -43,7 +43,7 @@ void ContextSuite_TestContext( ContextSuiteData* data ) {
 	
 	cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, NULL );
     stgMainBuildAndInitialise(cf);
-    data->context = LiveComponentRegister_Get( cf->LCRegister, "context" ); 
+    data->context = (FiniteElementContext*)LiveComponentRegister_Get( cf->LCRegister, "context" ); 
 
     data->context->info = stream;  /* Redirect output to test data stream */
 
