@@ -66,13 +66,13 @@
 		</struct>
 	</list>
 	
-	<param name="journal.info.Context-verbose">true</param>
-	<param name="journal-level.info.Stg_ComponentFactory"> 2 </param>
-	<param name="journal.info.lucInfo">true</param>
+	<param name="journal.info.Context-verbose">f</param>
+	<param name="journal-level.info.Stg_ComponentFactory"> 0 </param>
+	<param name="journal.info.lucInfo">f</param>
 	<param name="journal-level.info.lucInfo"> 2 </param>
 	<param name="journal.debug">f</param>
 	<param name="journal-enable-branch.debug.StgFEM">f</param>
-	<param name="journal-level-branch.debug.StgFEM"> 2 </param>
+	<param name="journal-level-branch.debug.StgFEM"> 0 </param>
 
 	<param name="maxTimeSteps"> 10 </param>
 	<param name="dumpEvery"> 1 </param>

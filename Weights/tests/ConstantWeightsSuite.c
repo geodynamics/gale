@@ -184,6 +184,8 @@ void WeightsSuite_TestElementIntegral(
    mean = errorSum / (double) count;
    standardDeviation = sqrt( errorSquaredSum / (double) count - mean * mean );
 
+   printf( "Func: %s - Mean = %g; SD = %g\n", funcName, mean, standardDeviation );
+
    /* compare the mean and standard deviation */
    differenceMean = fabs(mean - expectedMean);
    differenceStdDev = fabs(standardDeviation - expectedStdDev);
@@ -196,6 +198,8 @@ void ConstantWeightsSuite_Setup( ConstantWeightsSuiteData* data ) {
    pcu_filename_input( "testConstantWeights.xml", xmlInputFilename );
    data->cf = stgMainInitFromXML( xmlInputFilename, MPI_COMM_WORLD, NULL );
    data->context = LiveComponentRegister_Get( data->cf->LCRegister, "context" );
+//   Stg_ComponentFactory_BuildComponents( data->cf, NULL );
+   
    stgMainBuildAndInitialise( data->cf );
 }
 
@@ -203,7 +207,38 @@ void ConstantWeightsSuite_Teardown( ConstantWeightsSuiteData* data ) {
    Stg_ComponentFactory_DestroyComponents( data->cf, NULL );
 }
 
-void ConstantWeightsSuite_CircleInterface( ConstantWeightsSuiteData* data ) {
+void ConstantWeightsSuite_TestElementIntegral_ConstantFunction( ConstantWeightsSuiteData* data ) {
+   WeightsSuite_TestElementIntegral( data->context, "ConstantFunction", 1000,
+      1e-10, /* --mean-tolerance */
+      1e-10, /* --standardDeviation-tolerance */
+      2.96059e-16, /* --mean-expectedValue */
+      4.98509e-23 /* --standardDeviation-expectedValue */ );
+}
+void ConstantWeightsSuite_TestElementIntegral_LinearFunction ( ConstantWeightsSuiteData* data ) {
+   WeightsSuite_TestElementIntegral( data->context, "LinearFunction", 1000,
+      0.000001, /* --mean-tolerance */
+      0.000001, /* --standardDeviation-tolerance */
+      0.119677, /* --mean-expectedValue */
+      0.0921005 /* --standardDeviation-expectedValue */ );
+}
+
+void ConstantWeightsSuite_TestElementIntegral_QuadraticFunction ( ConstantWeightsSuiteData* data ) {
+   WeightsSuite_TestElementIntegral( data->context, "QuadraticFunction", 1000,
+      0.000001, /* --mean-tolerance */
+      0.000001, /* --standardDeviation-tolerance */
+      0.0840621, /* --mean-expectedValue */
+      0.0627759 /* --standardDeviation-expectedValue */ );
+}
+
+void ConstantWeightsSuite_TestElementIntegral_PolynomialFunction ( ConstantWeightsSuiteData* data ) {
+   WeightsSuite_TestElementIntegral( data->context, "PolynomialFunction", 1000,
+      0.000001, /* --mean-tolerance */
+      0.000001, /* --standardDeviation-tolerance */
+      0.0174753, /* --mean-expectedValue */
+      0.0137385 /* --standardDeviation-expectedValue */ );
+}
+
+void ConstantWeightsSuite_TestElementIntegral_CircleInterface( ConstantWeightsSuiteData* data ) {
    WeightsSuite_TestElementIntegral( data->context, "CircleInterface", 1000,
       0.000001, /* --mean-tolerance */
       0.000001, /* --standardDeviation-tolerance */
@@ -211,7 +246,7 @@ void ConstantWeightsSuite_CircleInterface( ConstantWeightsSuiteData* data ) {
       0.066458 /* --standardDeviation-expectedValue */ );
 }
    
-void ConstantWeightsSuite_ExponentialInterface( ConstantWeightsSuiteData* data ) {
+void ConstantWeightsSuite_TestElementIntegral_ExponentialInterface( ConstantWeightsSuiteData* data ) {
    WeightsSuite_TestElementIntegral( data->context, "ExponentialInterface", 1000,
       0.000001, /* --mean-tolerance */
       0.000001, /* --standardDeviation-tolerance */
@@ -219,18 +254,13 @@ void ConstantWeightsSuite_ExponentialInterface( ConstantWeightsSuiteData* data )
       0.116796 /* --standardDeviation-expectedValue */ );
 }
    
-void ConstantWeightsSuite_PolynomialFunction( ConstantWeightsSuiteData* data ) {
-   WeightsSuite_TestElementIntegral( data->context, "PolynomialFunction", 1000,
-      0.000001, /* --mean-tolerance */
-      0.000001, /* --standardDeviation-tolerance */
-      0.017475, /* --mean-expectedValue */
-      0.013738 /* --standardDeviation-expectedValue */ );
-}
-
 void ConstantWeightsSuite( pcu_suite_t* suite ) {
    pcu_suite_setData( suite, ConstantWeightsSuiteData );
    pcu_suite_setFixtures( suite, ConstantWeightsSuite_Setup, ConstantWeightsSuite_Teardown );
-   pcu_suite_addTest( suite, ConstantWeightsSuite_CircleInterface );
-   pcu_suite_addTest( suite, ConstantWeightsSuite_ExponentialInterface );
-   pcu_suite_addTest( suite, ConstantWeightsSuite_PolynomialFunction );
+   pcu_suite_addTest( suite, ConstantWeightsSuite_TestElementIntegral_ConstantFunction );
+   pcu_suite_addTest( suite, ConstantWeightsSuite_TestElementIntegral_LinearFunction );
+   pcu_suite_addTest( suite, ConstantWeightsSuite_TestElementIntegral_QuadraticFunction );
+   pcu_suite_addTest( suite, ConstantWeightsSuite_TestElementIntegral_PolynomialFunction );
+   pcu_suite_addTest( suite, ConstantWeightsSuite_TestElementIntegral_ExponentialInterface );
+   pcu_suite_addTest( suite, ConstantWeightsSuite_TestElementIntegral_CircleInterface );
 }
