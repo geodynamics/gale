@@ -84,7 +84,8 @@ void Underworld_MaterialThermalDiffusivity_Setup( void* _context ) {
 	UnderworldContext*	  context = (UnderworldContext*) _context;
 	AdvectionDiffusionSLE*    energySLE           = context->energySLE;
         /* TODO: This assumes OneToOne mapping of intPoints to matPoints, should be fixed in future */
-	OneToOneMapper*           mapper              = (OneToOneMapper*)context->picIntegrationPoints->mapper;
+	IntegrationPointsSwarm*	  picIntegrationPoints = (IntegrationPointsSwarm*)LiveComponentRegister_Get( context->CF->LCRegister, "picIntegrationPoints" );
+	OneToOneMapper*           mapper              = (OneToOneMapper*)picIntegrationPoints->mapper;
 
 	MaterialPointsSwarm*      materialSwarm = mapper->materialSwarm;
 	ExtensionInfo_Index       particleExtHandle;
@@ -109,7 +110,7 @@ void Underworld_MaterialThermalDiffusivity_Setup( void* _context ) {
 	residual = energySLE->residual;
 	residualForceTerm = Stg_CheckType( Stg_ObjectList_At( residual->forceTermList, 0 ), AdvDiffResidualForceTerm );
 	residualForceTerm->diffusivityVariable = swarmVariable->variable;
-	residualForceTerm->integrationSwarm    = (Swarm*) context->picIntegrationPoints;
+	residualForceTerm->integrationSwarm    = (Swarm*) picIntegrationPoints;
 	/* Important that this function is defined here, but is used in 
 	 * StgFEM/SLE/ProvidedSystems/AdvectionDiffusion/src/Residual.c
 	 * see its _AdvDiffResidualForceTerm_AssembleElement for details
