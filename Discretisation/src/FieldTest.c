@@ -1013,8 +1013,8 @@ void FieldTest_GenerateErrFields( void* _context, void* data ) {
 			FeVariable_SetValueAtNode( errorField, lElement_I, elError );
 		}
 	
-		MPI_Allreduce( &lAnalyticSq, &gAnalyticSq, numDofs, MPI_DOUBLE, MPI_SUM, self->referenceFieldList[field_I]->communicator );
-		MPI_Allreduce( &lErrorSq,    &gErrorSq,    numDofs, MPI_DOUBLE, MPI_SUM, self->referenceFieldList[field_I]->communicator );
+		MPI_Allreduce( lAnalyticSq, gAnalyticSq, numDofs, MPI_DOUBLE, MPI_SUM, self->referenceFieldList[field_I]->communicator );
+		MPI_Allreduce( lErrorSq,    gErrorSq,    numDofs, MPI_DOUBLE, MPI_SUM, self->referenceFieldList[field_I]->communicator );
 
 		for( dof_I = 0; dof_I < numDofs; dof_I++ ) {
 			self->gAnalyticSq[field_I][dof_I] = gAnalyticSq[dof_I];
@@ -1124,6 +1124,8 @@ void FieldTest_ElementErrAnalyticFromField( void* fieldTest, Index field_I, Inde
 		cParticle = (IntegrationPoint*) Swarm_ParticleInCellAt( intSwarm, cell_I, cParticle_I );
 		xi	  = cParticle->xi;
 		weight    = cParticle->weight;
+
+		detJac = ElementType_JacobianDeterminant( elType, elementMesh, el_I, xi, nDims );
 
 		FeMesh_CoordLocalToGlobal( elementMesh, el_I, xi, globalCoord );
 		analyticSolution( self, globalCoord, analytic );
