@@ -1397,7 +1397,7 @@
 
 		</struct>
 			
-		<struct name="MVWindowMovie">
+		<!--struct name="MVWindowMovie">
 			<param name="Type">lucEncoderLibfame</param>
 			<param name="Window">MVWindow</param>
 		</struct>
@@ -1410,7 +1410,7 @@
 		<struct name="MVSideWindowMovie">
 			<param name="Type">lucEncoderLibfame</param>
 			<param name="Window">MVSideWindow</param>
-		</struct>
+		</struct-->
 
 
 	</struct>

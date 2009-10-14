@@ -139,10 +139,10 @@
 		</list>
 	</struct>
 	
-	<struct name="movie">
+	<!--struct name="movie">
 		<param name="Type">lucEncoderLibfame</param>
 		<param name="Window">PerspectiveWindow</param>
-	</struct>
+	</struct-->
 	
 	<struct name="TopDownWindow">
 		<param name="Type">lucDefaultWindow</param>
@@ -157,10 +157,10 @@
 		</list>
 	</struct>
 	
-	<struct name="movie2">
+	<!--struct name="movie2">
 		<param name="Type">lucEncoderLibfame</param>
 		<param name="Window">TopDownWindow</param>
-	</struct>
+	</struct-->
 	
 	
 </struct>

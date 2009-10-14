@@ -2450,7 +2450,7 @@
 			</list>
 		</struct>
 
-		<!-- making movies -->
+		<!-- making movies >
 		<struct name="CutOutBlocks1Movie">
 			<param name="Type">lucEncoderLibfame</param>
 			<param name="Window">CutOutBlocks1</param>
@@ -2469,7 +2469,7 @@
 		<struct name="CutOutBlocks4Movie">
 			<param name="Type">lucEncoderLibfame</param>
 			<param name="Window">CutOutBlocks4</param>
-		</struct>
+		</struct-->
  
 	</struct>
 </StGermainData>

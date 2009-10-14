@@ -169,10 +169,10 @@
 			<param>FrontView PerspectiveView</param>		
 		</list>
 	</struct>
-	<struct name="movie">
+	<!--struct name="movie">
 		<param name="Type">lucEncoderLibfame</param>
 		<param name="Window">window</param>
-	</struct>	
+	</struct-->
 </struct>
 
 </StGermainData>
