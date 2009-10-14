@@ -776,11 +776,12 @@ static void _XML_IO_Handler_ValidateFile( XML_IO_Handler* self, const char* file
 	xmlTextReaderPtr reader;
 	int ret, valid;
 
+	#ifdef LIBXML_VERSION 
+	#if LIBXML_VERSION == 20631
+
 	reader = xmlNewTextReaderFilename( filename );
 
 	if ( reader != NULL ) {
-	#ifdef LIBXML_VERSION 
-	#if LIBXML_VERSION == 20631
 
 		xmlNodePtr cur = NULL;
 		cur = xmlDocGetRootElement( self->currDoc );
@@ -822,11 +823,13 @@ static void _XML_IO_Handler_ValidateFile( XML_IO_Handler* self, const char* file
 		if (ret !=0) {
 			fprintf( stderr, "%s : failed to parse\n", filename );
 		}
-	#endif
-	#endif
 	} else {
 		fprintf( stderr, "unable to open %s\n", filename );
 	}
+	xmlFreeTextReader( reader );
+	#endif
+	#endif
+    //xmlFree ( reader );
 }
 
 static void _XML_IO_Handler_OpenFile( XML_IO_Handler* self, const char* filename ) {
@@ -970,6 +973,7 @@ Bool _XML_IO_Handler_CheckNameSpace( XML_IO_Handler* self, xmlNodePtr curNode )
 				}
 			}
 		}
+        xmlFree( nsArray );
 	}
 	
 	Memory_Free( correctNameSpace );
@@ -1040,7 +1044,8 @@ static void _XML_IO_Handler_ParseNodes( XML_IO_Handler* self, xmlNodePtr cur, Di
 				
 			_XML_IO_Handler_AddSearchPath( self, (char*)tmp );
 
-			Memory_Free( tmp );
+            xmlFree( path );
+			//free( tmp );
 		}
 		else if	( (0 == xmlStrcmp( cur->name, (const xmlChar *) INCLUDE_TAG ) ) &&
 			( cur->ns == self->currNameSpace ) )
@@ -1139,6 +1144,7 @@ static void _XML_IO_Handler_ParseElement( XML_IO_Handler* self, xmlNodePtr cur, 
 		( cur->ns == self->currNameSpace ) ) {
 		_XML_IO_Handler_ParseStruct( self, cur, parent, mergeType, source );
 	}
+    xmlFree( name );
 }
 
 static void _XML_IO_Handler_ParseComponents( XML_IO_Handler* self, xmlNodePtr cur, Dictionary_Entry_Value* parent, 
@@ -1382,6 +1388,7 @@ static void _XML_IO_Handler_ParseColumnDefinitions( XML_IO_Handler* self, xmlNod
 	ColumnInfo columnInfo[MAX_COLUMNS], int* const numColumnsPtr )
 {
 	char* stringPtr;
+
 	/* read any column definitions */
 	while ( (XML_ELEMENT_NODE == cur->type) &&
 		(0 == xmlStrcmp( cur->name, (const xmlChar *) COLUMN_DEFINITION_TAG ) ) &&
