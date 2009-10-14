@@ -116,7 +116,7 @@ double GetReferenceHeight( UnderworldContext* context ) {
 }
 
 double GetTopWallVelocity( UnderworldContext* context ) {
-	FeVariable*         velocityField = context->velocityField;
+	FeVariable*         velocityField = (FeVariable*) LiveComponentRegister_Get( context->CF->LCRegister, "velocityField" );
 	double              y   = GetReferenceHeight( context );
 	double              V_a = GetRightWallVelocity( context );
 	double              V_b = GetLeftWallVelocity( context );
@@ -142,7 +142,7 @@ double GetTopWallVelocity( UnderworldContext* context ) {
 }
 
 double GetBottomWallVelocity( UnderworldContext* context ) {
-	FeVariable*         velocityField = context->velocityField;
+	FeVariable*         velocityField = (FeVariable*) LiveComponentRegister_Get( context->CF->LCRegister, "velocityField" );
 	double              y   = GetReferenceHeight( context );
 	double              V_a = GetRightWallVelocity( context );
 	double              V_b = GetLeftWallVelocity( context );

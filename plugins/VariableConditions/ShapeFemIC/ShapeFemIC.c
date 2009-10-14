@@ -64,6 +64,7 @@ typedef struct {
 void Underworld_LinearShapeIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
 
   UnderworldContext*       context            = (UnderworldContext*)_context;
+  FeVariable*		   temperatureField   = (FeVariable*)LiveComponentRegister_Get( context->CF->LCRegister, "temperatureField" );
   Dictionary*              theDictionary      = context->dictionary;
   FeMesh*	           theMesh            = NULL;
   double*                  result             = (double*) _result;
@@ -89,7 +90,7 @@ void Underworld_LinearShapeIC( Node_LocalIndex node_lI, Variable_Index var_I, vo
   double                   gx2,gy2,gz2,T02;
   double                   alphax,alphay,alphaz;
 
-  theMesh = context->temperatureField->feMesh;
+  theMesh = temperatureField->feMesh;
 
   shapeSpecs = Dictionary_Get( theDictionary, "linearShapeIC" );
   numSpecs = Dictionary_Entry_Value_GetCount( shapeSpecs );
@@ -250,6 +251,7 @@ void Underworld_SimpleShapeIC( Node_LocalIndex node_lI, Variable_Index var_I, vo
 
 void Underworld_GaussianIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
 	UnderworldContext*      context            = (UnderworldContext*)_context;
+  	FeVariable*		temperatureField   = (FeVariable*)LiveComponentRegister_Get( context->CF->LCRegister, "temperatureField" );
 	Dictionary*             dictionary         = context->dictionary;
 	FeMesh*			mesh               = NULL;
 	double*                 result             = (double*) _result;
@@ -260,7 +262,7 @@ void Underworld_GaussianIC( Node_LocalIndex node_lI, Variable_Index var_I, void*
 	double                  amplitude, width;
 	double                  rSq;
 	
-	mesh       = context->temperatureField->feMesh;
+	mesh       = temperatureField->feMesh;
 
 	amplitude = Dictionary_GetDouble_WithDefault( dictionary, "GaussianIC-Amplitude", 1.0 );
 	width = Dictionary_GetDouble_WithDefault( dictionary, "GaussianIC-Width", 1e-2 );

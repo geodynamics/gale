@@ -155,7 +155,7 @@ void MeshAdvectionCorrection_EulerDeformCorrection( FeVariable *artDField, doubl
 void MeshAdvectionCorrection( void* sle, void* data ) {
 	UnderworldContext*                                      context                 = (UnderworldContext*) data;
 	Underworld_MeshAdvectionCorrection_ContextExt*          plugin;
-	FeVariable*                                             velocityField           = context->velocityField;
+	FeVariable*		velocityField 	= (FeVariable*) LiveComponentRegister_Get( context->CF->LCRegister, "velocityField" );
 	double dt = context->dt;
 	double *artVelocity, *oldVelocity;
 	int lNodeCount;

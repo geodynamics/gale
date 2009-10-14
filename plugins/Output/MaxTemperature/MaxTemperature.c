@@ -80,7 +80,7 @@ Index Underworld_MaxTemperature_Register( PluginsManager* pluginsManager ) {
 
 void Underworld_MaxTemperature_Output( void* _context ) {
 	UnderworldContext* context       = (UnderworldContext*) _context;
-	FeVariable*        temperatureFe = context->temperatureField;
+	FeVariable*        temperatureFe = (FeVariable*)LiveComponentRegister_Get( context->CF->LCRegister, "temperatureField" );
 	double             maxTemp;
 
 	maxTemp = _FeVariable_GetMaxGlobalFieldMagnitude( temperatureFe );

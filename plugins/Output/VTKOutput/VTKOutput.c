@@ -89,11 +89,12 @@ void VTKOutput_fields(void *context, int myRank, int nprocs);
 void VTKOutput( void* _context ) {
 	UnderworldContext*	context = (UnderworldContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
+	IntegrationPointsSwarm*	picIntegrationPoints = (IntegrationPointsSwarm*)LiveComponentRegister_Get( context->CF->LCRegister, "picIntegrationPoints" );
 
         int myRank, nprocs;
         MPI_Comm comm;
 
-        comm = Comm_GetMPIComm( Mesh_GetCommTopology( context->picIntegrationPoints->mesh, MT_VERTEX ) );
+        comm = Comm_GetMPIComm( Mesh_GetCommTopology( picIntegrationPoints->mesh, MT_VERTEX ) );
 
 	MPI_Comm_rank( comm, (int*)&myRank );
         MPI_Comm_size( comm, (int*)&nprocs );
@@ -104,7 +105,7 @@ void VTKOutput( void* _context ) {
 	
         /* Write the particles and then all of the fields. */
 
-        VTKOutput_particles(context->picIntegrationPoints,
+        VTKOutput_particles(picIntegrationPoints,
                             Dictionary_GetDouble_WithDefault
                             (dictionary,"defaultDiffusivity",1.0),
                             Dictionary_GetInt_WithDefault

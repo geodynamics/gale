@@ -287,11 +287,17 @@ void perform_integrals( UnderworldContext *context, double *B, double *w_bar, do
 	double **GNx;
 	double _sum_vol, sum_vol;
 	
+	FeVariable *velocityField, *temperatureField;
+	Swarm* gaussSwarm;
 	
 	ctx = (Underworld_BuoyancyIntegrals_CTX*)LiveComponentRegister_Get(
 			context->CF->LCRegister,
 			Underworld_BuoyancyIntegrals_Type );
 	
+	velocityField = (FeVariable*)LiveComponentRegister_Get( context->CF->LCRegister, "velocityField" );
+	temperatureField = (FeVariable*)LiveComponentRegister_Get( context->CF->LCRegister, "temperatureField" );
+	gaussSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "gaussSwarm" );
+
 	/* initialise values to compute */
 	*B = *w_bar = *y_b = -1.0;
 	*int_w_bar_dt = ctx->int_w_bar_dt;
@@ -324,22 +330,22 @@ void perform_integrals( UnderworldContext *context, double *B, double *w_bar, do
 	
 	/* assuming all elements are the same */
 	dim = ctx->dim;
-	elementType = FeMesh_GetElementType( context->velocityField->feMesh, 0 );
+	elementType = FeMesh_GetElementType( velocityField->feMesh, 0 );
 	elementNodeCount = elementType->nodeCount;
 	GNx = Memory_Alloc_2DArray( double, dim, elementNodeCount, "Global Shape Function Derivatives for mayhem" );
 
-	mesh = context->temperatureField->feMesh;
+	mesh = temperatureField->feMesh;
 	
 	
 	_sum_T = _sum_vT = _sum_yT = 0.0;
 	_sum_vol = 0.0;
 	
-	ngp = context->gaussSwarm->particleLocalCount;
+	ngp = gaussSwarm->particleLocalCount;
 	n_elements = FeMesh_GetElementLocalSize( mesh );
 	//	printf("n_elements = %d \n", n_elements );
 	
 	for( e=0; e<n_elements; e++ ) {
-		cell_I = CellLayout_MapElementIdToCellId( context->gaussSwarm->cellLayout, e );
+		cell_I = CellLayout_MapElementIdToCellId( gaussSwarm->cellLayout, e );
 		elementType = FeMesh_GetElementType( mesh, e );
 		
 		sum_T  = 0.0;
@@ -350,7 +356,7 @@ void perform_integrals( UnderworldContext *context, double *B, double *w_bar, do
 		i_T = i_v = i_vT = i_y = 0.0;
 		
 		for( p=0; p<ngp; p++ ) {
-			ip = (IntegrationPoint*)Swarm_ParticleInCellAt( context->gaussSwarm, cell_I, p );
+			ip = (IntegrationPoint*)Swarm_ParticleInCellAt( gaussSwarm, cell_I, p );
 			xi = ip->xi;
 			weight = ip->weight;
 			
@@ -359,8 +365,8 @@ void perform_integrals( UnderworldContext *context, double *B, double *w_bar, do
 					mesh, e,
 					xi, dim, &det_jac, GNx );
 			
-			FeVariable_InterpolateFromMeshLocalCoord( context->temperatureField, mesh, e, xi, &i_T );
-			FeVariable_InterpolateFromMeshLocalCoord( context->velocityField,    mesh, e, xi, velocity );
+			FeVariable_InterpolateFromMeshLocalCoord( temperatureField, mesh, e, xi, &i_T );
+			FeVariable_InterpolateFromMeshLocalCoord( velocityField,    mesh, e, xi, velocity );
 			
 			i_v = velocity[1];
 			i_vT = i_v * i_T;
@@ -416,6 +422,7 @@ void eval_temperature( UnderworldContext *context, double y_b, double *temp_b )
 	double global_coord[3];
 	InterpolationResult result;
 	double T;
+	FeVariable* temperatureField;
 
 	T = -66.99;
 	
@@ -423,6 +430,7 @@ void eval_temperature( UnderworldContext *context, double y_b, double *temp_b )
 			context->CF->LCRegister,
 			Underworld_BuoyancyIntegrals_Type );
 	
+	temperatureField = (FeVariable*)LiveComponentRegister_Get( context->CF->LCRegister, "temperatureField" );
 	/* Get x_b, and z_b from xml */
 	/* "cylinder" z_b = CentreZ (0.5), x_b = CentreX (1.0) */
 	if (ctx->dim==3){
@@ -435,7 +443,7 @@ void eval_temperature( UnderworldContext *context, double y_b, double *temp_b )
 		global_coord[1] = y_b;
 	}
 
-	result = FieldVariable_InterpolateValueAt( ctx->temperatureField, global_coord, &T );
+	result = FieldVariable_InterpolateValueAt( temperatureField, global_coord, &T );
 	MPI_Allreduce ( &T, temp_b, 1, MPI_DOUBLE, MPI_MAX, context->communicator );
 
 }
@@ -490,6 +498,7 @@ void Underworld_BuoyancyIntegrals_Output( UnderworldContext *context )
 	double B, w_bar, y_b, int_w_bar_dt;
 	double temp_b; /* the temperature at (x_b,y_b,z_b) */
 	double temp_max;
+	FeVariable* temperatureField;
 	
 	perform_integrals( context, &B, &w_bar, &y_b, &int_w_bar_dt );
 	eval_temperature( context, y_b, &temp_b );
@@ -498,6 +507,7 @@ void Underworld_BuoyancyIntegrals_Output( UnderworldContext *context )
 			context->CF->LCRegister,
 			Underworld_BuoyancyIntegrals_Type );
 	
+	temperatureField = (FeVariable*)LiveComponentRegister_Get( context->CF->LCRegister, "temperatureField" );
 	
 	StgFEM_FrequentOutput_PrintValue( context, B );
 	StgFEM_FrequentOutput_PrintValue( context, w_bar );
@@ -509,7 +519,7 @@ void Underworld_BuoyancyIntegrals_Output( UnderworldContext *context )
 	StgFEM_FrequentOutput_PrintValue( context, int_w_bar_dt );
 	StgFEM_FrequentOutput_PrintValue( context, temp_b );
 	
-	temp_max = _FeVariable_GetMaxGlobalFieldMagnitude( ctx->temperatureField );
+	temp_max = _FeVariable_GetMaxGlobalFieldMagnitude( temperatureField );
 	StgFEM_FrequentOutput_PrintValue( context, temp_max );
 	
 	

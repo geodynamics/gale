@@ -193,10 +193,6 @@ void _UnderworldContext_Construct( void* context, Stg_ComponentFactory* cf, void
 void _UnderworldContext_Build( void* context, void* data ) {
 	UnderworldContext* self = (UnderworldContext*)context;
 
-	self->gaussSwarm = Stg_ComponentFactory_ConstructByKey( self->CF, self->name, "GaussSwarm", Swarm, False, data );
-	self->picIntegrationPoints = Stg_ComponentFactory_ConstructByKey( self->CF, self->name, "IntegrationSwarm", IntegrationPointsSwarm, False, data );
-	self->velocityField = Stg_ComponentFactory_ConstructByKey( self->CF, self->name, "VelocityField", FeVariable, False, data );
-
 	_AbstractContext_Build( context, data );
 }
 
@@ -222,19 +218,6 @@ void _UnderworldContext_Print( void* context, Stream* stream ) {
 	Journal_PrintPointer( stream, self->energySLE );
 	Journal_PrintPointer( stream, self->compositionSLE );
 	Journal_PrintPointer( stream, self->constitutiveMatrix );
-	
-	Journal_PrintPointer( stream, self->gaussSwarm );
-	
-	Journal_PrintPointer( stream, self->velocityField );
-	Journal_PrintPointer( stream, self->velocityGradientsField );
-	Journal_PrintPointer( stream, self->strainRateField );
-	Journal_PrintPointer( stream, self->strainRateInvField );
-	Journal_PrintPointer( stream, self->pressureField );
-	Journal_PrintPointer( stream, self->temperatureField );
-	Journal_PrintPointer( stream, self->temperatureGradientsField );
-	Journal_PrintPointer( stream, self->viscosityField );
-	Journal_PrintPointer( stream, self->stressField );
-	Journal_PrintPointer( stream, self->stressInvField );
 }
 
 
@@ -268,24 +251,5 @@ void UnderworldContext_AssignPointers( void* context, void* ptrToContext ) {
 	self->compositionSLE = (AdvectionDiffusionSLE*) LiveComponentRegister_Get( self->CF->LCRegister, "CompositionEqn" );
 	self->constitutiveMatrix = (ConstitutiveMatrix*) LiveComponentRegister_Get( self->CF->LCRegister, "constitutiveMatrix" );
 	
-	/* Swarms */
-	//self->gaussSwarm     = (Swarm*) LiveComponentRegister_Get( self->CF->LCRegister, "gaussSwarm" );
-	//self->picIntegrationPoints = (IntegrationPointsSwarm*) LiveComponentRegister_Get( self->CF->LCRegister, "picIntegrationPoints" );
-
-	/* Get copy of fields from register */
-	//self->velocityField             = (FeVariable*) FieldVariable_Register_GetByName( fV_Register, "VelocityField" );
-	self->velocityGradientsField    = (FeVariable*) FieldVariable_Register_GetByName( fV_Register, "VelocityGradientsField" );
-	self->strainRateField           = (FeVariable*) FieldVariable_Register_GetByName( fV_Register, "StrainRateField" );
-	self->strainRateInvField        = (FeVariable*) FieldVariable_Register_GetByName( fV_Register, "StrainRateInvariantField" );
-	
-	self->pressureField             = (FeVariable*) FieldVariable_Register_GetByName( fV_Register, "PressureField" );
-	
-	self->temperatureField          = (FeVariable*) FieldVariable_Register_GetByName( fV_Register, "TemperatureField" );
-	self->temperatureGradientsField = (FeVariable*) FieldVariable_Register_GetByName( fV_Register, "TemperatureGradientsField" );
-	
-	self->viscosityField            = (FeVariable*) FieldVariable_Register_GetByName( fV_Register, "ViscosityField" );
-	self->stressField               = (FeVariable*) FieldVariable_Register_GetByName( fV_Register, "StressField" );
-	self->stressInvField            = (FeVariable*) FieldVariable_Register_GetByName( fV_Register, "StressInvField" );
-
 	Stream_UnIndentBranch( StgFEM_Debug );
 }
