@@ -1985,7 +1985,7 @@
 			</list>
 		</struct>
 
-		<!-- making Movies -->	
+		<!-- making Movies >	
 		
 		<struct name="PSXYProfileCrustPerspWindowMovie">
 			<param name="Type">lucEncoderLibfame</param>
@@ -2007,7 +2007,7 @@
 		<struct name="PSXYSideWindow4Movie">
 			<param name="Type">lucEncoderLibfame</param>
 			<param name="Window">PSXYSideWindow</param>
-		</struct>
+		</struct-->
  
 	</struct>
 
