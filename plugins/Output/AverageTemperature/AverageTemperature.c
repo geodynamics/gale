@@ -80,9 +80,9 @@ Index Underworld_AverageTemperature_Register( PluginsManager* pluginsManager ) {
 
 void Underworld_AverageTemperature_Output( void* _context ) {
 	UnderworldContext* context       = (UnderworldContext*) _context;
-	FeVariable*        temperatureFe = context->temperatureField;
+	FeVariable*        temperatureFe = (FeVariable*) LiveComponentRegister_Get( context->CF->LCRegister, "temperatureField" );
 	FeMesh*		   mesh         = temperatureFe->feMesh;
-	IntegrationPointsSwarm* swarm    = (IntegrationPointsSwarm*)context->gaussSwarm;
+	IntegrationPointsSwarm* swarm    = (IntegrationPointsSwarm*)LiveComponentRegister_Get( context->CF->LCRegister, "gaussSwarm" );
 	IntegrationPoint*  particle;
 	ElementType*       elementType;
 	Element_LocalIndex lElement_I, lCell_I;

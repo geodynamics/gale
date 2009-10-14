@@ -62,21 +62,7 @@
 		AdvectionDiffusionSLE*         energySLE;                     \
 		AdvectionDiffusionSLE*         compositionSLE;                \
 		ConstitutiveMatrix*            constitutiveMatrix;            \
-		/* Swarms */ \
-		Swarm*                         gaussSwarm;                    \
-		IntegrationPointsSwarm*        picIntegrationPoints;          \
-		/* FeVariables */ \
-		FeVariable*                    velocityField;                 \
-		FeVariable*                    velocityGradientsField;        \
-		FeVariable*                    strainRateField;               \
-		FeVariable*                    strainRateInvField;            \
-		FeVariable*                    pressureField;                 \
-		FeVariable*                    temperatureField;              \
-		FeVariable*                    temperatureGradientsField;     \
-		FeVariable*                    viscosityField;                \
-		FeVariable*                    stressField;                   \
-		FeVariable*                    stressInvField;                \
-		double						   Vrms;						  \
+		double						   Vrms;      \
 		
 	struct UnderworldContext { __UnderworldContext };
 	

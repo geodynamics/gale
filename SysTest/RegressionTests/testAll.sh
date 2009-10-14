@@ -1,6 +1,12 @@
+./checkpointTest.pl Anisotropic.xml
 ./checkpointTest.pl Arrhenius.xml
+./checkpointTest.pl ArrheniusPIC.xml
 ./checkpointTest.pl DepthDependentViscosity.xml
 ./checkpointTest.pl Extension.xml
+./checkpointTest.pl FrankKamenetskii.xml
+./checkpointTest.pl InternalHeating.xml
+./checkpointTest.pl MobileLid.xml
+./checkpointTest.pl MultiComponent.xml
 ./checkpointTest.pl NonNewtonian.xml
 #./checkpointTest.pl PeriodicBenchmark.xml
 ./checkpointTest.pl RayleighTaylorBenchmark.xml
