@@ -1034,7 +1034,7 @@
 			</list>
 		</struct>
  
-		<!-- making Movies -->	
+		<!-- making Movies >	
 		<struct name="PSZYProfileCrustPerspWindowMovie">
 			<param name="Type">lucEncoderLibfame</param>
 			<param name="Window">PSZYProfileCrustPerspWindow</param>
@@ -1055,7 +1055,7 @@
 		<struct name="PSZYFrontWindowMovie">
 			<param name="Type">lucEncoderLibfame</param>
 			<param name="Window">PSZYFrontWindow</param>
-		</struct>
+		</struct-->
  
 
 	</struct>

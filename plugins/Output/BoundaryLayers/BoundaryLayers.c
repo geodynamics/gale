@@ -175,11 +175,11 @@ double Underworld_BoundaryLayers_InternalTemperature( UnderworldContext* context
 	double              internalTemperature;
 	double              integral               = 0.0;
 	double              integralGlobal         = 0.0;
-	Swarm*              gaussSwarm             = context->gaussSwarm;
+	Swarm*              gaussSwarm             = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "gaussSwarm" );
 	IntegrationPoint*   particle;
 	double              bottomLayerHeight;
 	double              topLayerHeight;
-	FeVariable*         temperatureField       = context->temperatureField;
+	FeVariable*         temperatureField       = (FeVariable*) LiveComponentRegister_Get( context->CF->LCRegister, "temperatureField" );
 	FeMesh*		    mesh                   = temperatureField->feMesh;
 	Element_LocalIndex  lElement_I;
 	Node_LocalIndex    	nodeAtElementBottom;

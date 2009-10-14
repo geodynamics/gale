@@ -102,6 +102,8 @@ Index Underworld_Mobility_Register( PluginsManager* pluginsManager ) {
 
 void Underworld_Mobility_Setup( void* _context ) {
 	UnderworldContext*                context       = (UnderworldContext*) _context;
+	Swarm* gaussSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "gaussSwarm" );
+	FeVariable* velocityField = (FeVariable*)LiveComponentRegister_Get( context->CF->LCRegister, "velocityField" );
 
 	Underworld_Mobility* self;
 
@@ -110,24 +112,22 @@ void Underworld_Mobility_Setup( void* _context ) {
 					Underworld_Mobility_Type );
 
 	Journal_Firewall( 
-			context->gaussSwarm != NULL, 
+			gaussSwarm != NULL, 
 			Underworld_Error,
 			"Cannot find gauss swarm. Cannot use %s.\n", CURR_MODULE_NAME );
 	Journal_Firewall( 
-			context->velocityField != NULL, 
+			velocityField != NULL, 
 			Underworld_Error,
 			"Cannot find velocityField. Cannot use %s.\n", CURR_MODULE_NAME );
 
 	/* Create new Field Variable */
-	self->velocitySquaredField = OperatorFeVariable_NewUnary( 
-			"VelocitySquaredField", 
-			context->velocityField, 
-			"VectorSquare" );
+	self->velocitySquaredField = OperatorFeVariable_NewUnary( "VelocitySquaredField", velocityField, "VectorSquare" );
 }
 
 /* Integrate Every Step and dump to file */
 void Underworld_Mobility_Dump( void* _context ) {
 	UnderworldContext*                   context       = (UnderworldContext*) _context;
+	Swarm* gaussSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "gaussSwarm" );
 	Mesh*			   	     mesh;
 	double		    	  	     maxCrd[3], minCrd[3];
 	double                               integral;
@@ -147,8 +147,8 @@ void Underworld_Mobility_Dump( void* _context ) {
 	Mesh_GetGlobalCoordRange( mesh, minCrd, maxCrd );
 	
 	/* Sum integral */
-	integral        = FeVariable_Integrate( self->velocitySquaredField, context->gaussSwarm );
-	topLayerAverage = FeVariable_AverageTopLayer( self->velocitySquaredField, context->gaussSwarm, J_AXIS );
+	integral        = FeVariable_Integrate( self->velocitySquaredField, gaussSwarm );
+	topLayerAverage = FeVariable_AverageTopLayer( self->velocitySquaredField, gaussSwarm, J_AXIS );
 	/* Get Volume of Mesh - TODO Make general for irregular meshes */
 	volume = ( maxCrd[ I_AXIS ] - minCrd[ I_AXIS ] ) * 
 		( maxCrd[ J_AXIS ] - minCrd[ J_AXIS ] );

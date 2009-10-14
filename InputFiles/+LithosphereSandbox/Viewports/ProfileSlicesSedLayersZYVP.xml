@@ -457,7 +457,7 @@
 			</list>
 		</struct>
 			
-		<struct name="PSSLZYProfileWindowMovie">
+		<!--struct name="PSSLZYProfileWindowMovie">
 			<param name="Type">lucEncoderLibfame</param>
 			<param name="Window">PSSLZYProfileWindow</param>
 		</struct>
@@ -469,7 +469,7 @@
 		<struct name="PSSLZYFrontWindowMovie">
 			<param name="Type">lucEncoderLibfame</param>
 			<param name="Window">PSSLZYFrontWindow</param>
-		</struct>
+		</struct-->
  
 	</struct>
 
