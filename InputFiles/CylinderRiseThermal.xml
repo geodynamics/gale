@@ -12,22 +12,50 @@
 	<include>StgFEM/TemperatureField.xml</include>
 	<include>StgFEM/TempAdvDiff.xml</include>
 
+	<param name="lucPluginContext">context</param>	
 	<list name="plugins" mergeType="merge">
 			
-		<param>Underworld_ShapeFemIC</param>	
+		<struct>
+			<param name="Type">Underworld_ShapeFemIC</param>	
+			<param name="Context">context</param>
+		</struct>
 
 		<!-- Output Plugins -->
-		<param>StgFEM_FrequentOutput</param>	
-		<param>Underworld_Vrms</param>	
-		<param>StgFEM_CPUTime</param>
-		<param>Underworld_MaxVelocity</param>
-                <param>Underworld_MaxTemperature</param>
+		<struct>
+			<param name="Type">StgFEM_FrequentOutput</param>	
+			<param name="Context">context</param>
+		</struct>
+		<struct>
+			<param name="Type">Underworld_Vrms</param>	
+			<param name="Context">context</param>
+			<param name="GaussSwarm">gaussSwarm</param>
+			<param name="VelocityField">VelocityField</param>
+		</struct>
+		<struct>
+			<param name="Type">StgFEM_CPUTime</param>	
+			<param name="Context">context</param>
+		</struct>
+		<struct>
+			<param name="Type">Underworld_MaxVelocity</param>	
+			<param name="Context">context</param>
+		</struct>
+		<struct>
+			<param name="Type">Underworld_MaxTemperature</param>	
+			<param name="Context">context</param>
+		</struct>
+		<struct>
+			<param name="Type">lucPlugin</param>
+			<param name="Context">lucPluginContext</param>
+		</struct>
 	</list>
 
 	<param name="gravity">1e5</param>
 	<param name="defaultDiffusivity">0.0001</param>
 
 	<struct name="components" mergeType="merge">
+		<struct name="context">
+			<param name="Type">UnderworldContext</param>
+		</struct>
 		<!-- Shape Definitions -->
 		<struct name="backgroundShape">
 			<param name="Type">Everywhere</param>
@@ -149,12 +177,13 @@
 	<param name="CentroidMaterial">cylinderMaterial</param>
 
 	<!-- Visualisation stuff -->
+    <!--
 	<include>Underworld/Viewports/CylinderRiseThermalVP.xml</include>
 	<include>glucifer/window.xml</include>
 	<struct name="components" mergeType="merge">
 		<struct name="window" mergeType="merge">
 			<param name="Viewport">CylinderRiseThermalVP</param>
 		</struct>
-	</struct>
+	</struct>-->
 
 </StGermainData>	

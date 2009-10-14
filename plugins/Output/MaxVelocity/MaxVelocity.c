@@ -180,7 +180,7 @@ void Underworld_MaxVelocity_Output( void* _context ) {
  */
 
 	UnderworldContext* context       = (UnderworldContext*) _context;
-	FeVariable*        velocityFe    = (FeVariable*) LiveComponentRegister_Get( context->CF->LCRegister, "velocityField" );
+	FeVariable*        velocityFe    = (FeVariable*) LiveComponentRegister_Get( context->CF->LCRegister, "VelocityField" );
 	double             maxVel;
 
 	/* Find the max field component */
