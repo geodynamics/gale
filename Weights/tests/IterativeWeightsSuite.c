@@ -61,8 +61,37 @@ void IterativeWeightsSuite_Teardown( IterativeWeightsSuiteData* data ) {
    stgMainDestroy( data->cf );
 }
 
+void IterativeWeightsSuite_TestElementIntegral_ConstantFunction( IterativeWeightsSuiteData* data ) {
+   WeightsSuite_TestElementIntegral( data->context, "ConstantFunction", 1000,
+      1e-10, /* --mean-tolerance */
+      1e-10, /* --standardDeviation-tolerance */
+      0.0, /* --mean-expectedValue */
+      0.0 /* --standardDeviation-expectedValue */ );
+}
+void IterativeWeightsSuite_TestElementIntegral_LinearFunction ( IterativeWeightsSuiteData* data ) {
+   WeightsSuite_TestElementIntegral( data->context, "LinearFunction", 1000,
+      0.000001, /* --mean-tolerance */
+      0.000001, /* --standardDeviation-tolerance */
+      0.0, /* --mean-expectedValue */
+      0.0 /* --standardDeviation-expectedValue */ );
+}
+void IterativeWeightsSuite_TestElementIntegral_QuadraticFunction ( IterativeWeightsSuiteData* data ) {
+   WeightsSuite_TestElementIntegral( data->context, "QuadraticFunction", 1000,
+      0.000001, /* --mean-tolerance */
+      0.000001, /* --standardDeviation-tolerance */
+      0.0840621, /* --mean-expectedValue */
+      0.0627759 /* --standardDeviation-expectedValue */ );
+}
 
-void IterativeWeightsSuite_TestElementIntegral_Circle( IterativeWeightsSuiteData* data ) {
+void IterativeWeightsSuite_TestElementIntegral_PolynomialFunction( IterativeWeightsSuiteData* data ) {
+   WeightsSuite_TestElementIntegral( data->context, "PolynomialFunction", 1000,
+      0.000001, /* --mean-tolerance */
+      0.000001, /* --standardDeviation-tolerance */
+      0.017526, /* --mean-expectedValue */
+      0.013522 /* --standardDeviation-expectedValue */ );
+}
+
+void IterativeWeightsSuite_TestElementIntegral_CircleInterface( IterativeWeightsSuiteData* data ) {
    WeightsSuite_TestElementIntegral( data->context, "CircleInterface", 1000,
       0.000001, /* --mean-tolerance */
       0.000001, /* --standardDeviation-tolerance */
@@ -71,7 +100,7 @@ void IterativeWeightsSuite_TestElementIntegral_Circle( IterativeWeightsSuiteData
 }
 
 
-void IterativeWeightsSuite_TestElementIntegral_Exponential( IterativeWeightsSuiteData* data ) {
+void IterativeWeightsSuite_TestElementIntegral_ExponentialInterface( IterativeWeightsSuiteData* data ) {
    WeightsSuite_TestElementIntegral( data->context, "ExponentialInterface", 1000,
       0.000001, /* --mean-tolerance */
       0.000001, /* --standardDeviation-tolerance */
@@ -80,19 +109,15 @@ void IterativeWeightsSuite_TestElementIntegral_Exponential( IterativeWeightsSuit
 }
 
 
-void IterativeWeightsSuite_TestElementIntegral_Polynomial( IterativeWeightsSuiteData* data ) {
-   WeightsSuite_TestElementIntegral( data->context, "PolynomialFunction", 1000,
-      0.000001, /* --mean-tolerance */
-      0.000001, /* --standardDeviation-tolerance */
-      0.017526, /* --mean-expectedValue */
-      0.013522 /* --standardDeviation-expectedValue */ );
-}
 
 
 void IterativeWeightsSuite( pcu_suite_t* suite ) {
    pcu_suite_setData( suite, IterativeWeightsSuiteData );
    pcu_suite_setFixtures( suite, IterativeWeightsSuite_Setup, IterativeWeightsSuite_Teardown );
-   pcu_suite_addTest( suite, IterativeWeightsSuite_TestElementIntegral_Circle );
-   pcu_suite_addTest( suite, IterativeWeightsSuite_TestElementIntegral_Exponential );
-   pcu_suite_addTest( suite, IterativeWeightsSuite_TestElementIntegral_Polynomial );
+   pcu_suite_addTest( suite, IterativeWeightsSuite_TestElementIntegral_ConstantFunction );
+   pcu_suite_addTest( suite, IterativeWeightsSuite_TestElementIntegral_LinearFunction );
+   pcu_suite_addTest( suite, IterativeWeightsSuite_TestElementIntegral_QuadraticFunction );
+   pcu_suite_addTest( suite, IterativeWeightsSuite_TestElementIntegral_PolynomialFunction );
+   pcu_suite_addTest( suite, IterativeWeightsSuite_TestElementIntegral_CircleInterface );
+   pcu_suite_addTest( suite, IterativeWeightsSuite_TestElementIntegral_ExponentialInterface );
 }

@@ -62,7 +62,39 @@ void MomentBalanceWeightsSuite_Teardown( MomentBalanceWeightsSuiteData* data ) {
 }
 
 
-void MomentBalanceWeightsSuite_TestElementIntegral_Circle( MomentBalanceWeightsSuiteData* data ) {
+
+
+void MomentBalanceWeightsSuite_TestElementIntegral_ConstantFunction( MomentBalanceWeightsSuiteData* data ) {
+   WeightsSuite_TestElementIntegral( data->context, "ConstantFunction", 1000,
+      1e-10, /* --mean-tolerance */
+      1e-10, /* --standardDeviation-tolerance */
+      0.0, /* --mean-expectedValue */
+      0.0 /* --standardDeviation-expectedValue */ );
+}
+void MomentBalanceWeightsSuite_TestElementIntegral_LinearFunction ( MomentBalanceWeightsSuiteData* data ) {
+   WeightsSuite_TestElementIntegral( data->context, "LinearFunction", 1000,
+      0.000001, /* --mean-tolerance */
+      0.000001, /* --standardDeviation-tolerance */
+      0.0, /* --mean-expectedValue */
+      0.0 /* --standardDeviation-expectedValue */ );
+}
+void MomentBalanceWeightsSuite_TestElementIntegral_QuadraticFunction ( MomentBalanceWeightsSuiteData* data ) {
+   WeightsSuite_TestElementIntegral( data->context, "QuadraticFunction", 1000,
+      0.000001, /* --mean-tolerance */
+      0.000001, /* --standardDeviation-tolerance */
+      0.0840621, /* --mean-expectedValue */
+      0.0627759 /* --standardDeviation-expectedValue */ );
+}
+
+void MomentBalanceWeightsSuite_TestElementIntegral_PolynomialFunction( MomentBalanceWeightsSuiteData* data ) {
+   WeightsSuite_TestElementIntegral( data->context, "PolynomialFunction", 1000,
+      0.000001, /* --mean-tolerance */
+      0.000001, /* --standardDeviation-tolerance */
+      0.016697, /* --mean-expectedValue */
+      0.013041 /* --standardDeviation-expectedValue */ );
+}
+
+void MomentBalanceWeightsSuite_TestElementIntegral_CircleInterface( MomentBalanceWeightsSuiteData* data ) {
    WeightsSuite_TestElementIntegral( data->context, "CircleInterface", 1000,
       0.000001, /* --mean-tolerance */
       0.000001, /* --standardDeviation-tolerance */
@@ -71,7 +103,7 @@ void MomentBalanceWeightsSuite_TestElementIntegral_Circle( MomentBalanceWeightsS
 }
 
 
-void MomentBalanceWeightsSuite_TestElementIntegral_Exponential( MomentBalanceWeightsSuiteData* data ) {
+void MomentBalanceWeightsSuite_TestElementIntegral_ExponentialInterface( MomentBalanceWeightsSuiteData* data ) {
    WeightsSuite_TestElementIntegral( data->context, "ExponentialInterface", 1000,
       0.000001, /* --mean-tolerance */
       0.000001, /* --standardDeviation-tolerance */
@@ -79,21 +111,14 @@ void MomentBalanceWeightsSuite_TestElementIntegral_Exponential( MomentBalanceWei
       0.075287 /* --standardDeviation-expectedValue */ );
 }
 
-
-void MomentBalanceWeightsSuite_TestElementIntegral_Polynomial( MomentBalanceWeightsSuiteData* data ) {
-   WeightsSuite_TestElementIntegral( data->context, "PolynomialFunction", 1000,
-      0.000001, /* --mean-tolerance */
-      0.000001, /* --standardDeviation-tolerance */
-      0.016697, /* --mean-expectedValue */
-      0.013041 /* --standardDeviation-expectedValue */ );
-}
-
-
 void MomentBalanceWeightsSuite( pcu_suite_t* suite ) {
    pcu_suite_setData( suite, MomentBalanceWeightsSuiteData );
    pcu_suite_setFixtures( suite, MomentBalanceWeightsSuite_Setup, MomentBalanceWeightsSuite_Teardown );
-   pcu_suite_addTest( suite, MomentBalanceWeightsSuite_TestElementIntegral_Circle );
-   pcu_suite_addTest( suite, MomentBalanceWeightsSuite_TestElementIntegral_Exponential );
-   pcu_suite_addTest( suite, MomentBalanceWeightsSuite_TestElementIntegral_Polynomial );
+   pcu_suite_addTest( suite, MomentBalanceWeightsSuite_TestElementIntegral_ConstantFunction );
+   pcu_suite_addTest( suite, MomentBalanceWeightsSuite_TestElementIntegral_LinearFunction );
+   pcu_suite_addTest( suite, MomentBalanceWeightsSuite_TestElementIntegral_QuadraticFunction );
+   pcu_suite_addTest( suite, MomentBalanceWeightsSuite_TestElementIntegral_PolynomialFunction );
+   pcu_suite_addTest( suite, MomentBalanceWeightsSuite_TestElementIntegral_CircleInterface );
+   pcu_suite_addTest( suite, MomentBalanceWeightsSuite_TestElementIntegral_ExponentialInterface );
 }
 
