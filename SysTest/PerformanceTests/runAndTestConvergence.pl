@@ -283,7 +283,7 @@ sub generateConvergence {
 	
 	# remove the old file
 	$command = "rm $cvgFile";
-#	`$command`;
+	`$command`;
 	return $datFile;
 }
 
