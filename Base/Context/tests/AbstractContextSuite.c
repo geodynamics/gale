@@ -353,7 +353,7 @@ void AbstractContextSuite_TestRestartFromCheckpoint( AbstractContextSuiteData* d
    /* As a fairly simple test of basic CP infrastructure, we know that the timesteps should equal
     *  run1_ts + run2_ts, and computed value should equal 1.1 to power (run1_ts + run2_ts) */  
    pcu_check_true( data->ctx->timeStep == (5 + 20) );
-   pcu_check_true( data->ctx->computedValue == pow( 1.1, (5 + 20) ) );
+   pcu_check_true( abs(data->ctx->computedValue - pow( 1.1, (5 + 20) )) < 1e-8 );
 
    Stg_Component_Destroy( data->ctx, 0 /* dummy */, False );
 }
