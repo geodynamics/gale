@@ -57,7 +57,7 @@
 #include <stdio.h>
 
 Bool Underworld_Finalise( void ) {
-	if( !ToolboxesManager_IsInitialised( stgToolboxesManager, "Underworld" ) ) {
+	if( ToolboxesManager_IsInitialised( stgToolboxesManager, "Underworld" ) ) {
 		Underworld_Utils_Finalise();
 		Underworld_Rheology_Finalise();
 		
