@@ -50,7 +50,7 @@
 #include <stdio.h>
 
 Bool StgFEM_Finalise( void ) {
-	if( !ToolboxesManager_IsInitialised( stgToolboxesManager, "StgFEM" ) ) {
+	if( ToolboxesManager_IsInitialised( stgToolboxesManager, "StgFEM" ) ) {
 		Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 		
 		Stream_IndentBranch( StgFEM_Debug );
