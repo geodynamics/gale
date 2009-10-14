@@ -35,7 +35,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: CosineHillRotate.c 968 2007-10-23 07:53:39Z JulianGiordani $
+** $Id: HomogeneousNaturalBCs.c 967 2007-10-23 05:27:09Z JulianGiordani $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -43,32 +43,45 @@
 #include <StgDomain/StgDomain.h>
 #include <StgFEM/StgFEM.h>
 
-const Type CosineHillRotate_Type = "CosineHillRotate";
+const Type HomogeneousNaturalBCs_Type = "HomogeneousNaturalBCs";
 
 typedef struct { 
 	__FieldTest
+	double angle;
 	FeVariable* temperatureField;
-	double      hillHeight;
-	double      hillDiameter;
-	Coord       rotationCentre;
-} CosineHillRotate;
+} HomogeneousNaturalBCs;
 
-void CosineHillRotate_TemperatureFunction( void* analyticSolution, double* coord, double* temperature ) {
-	CosineHillRotate *self = (CosineHillRotate*)analyticSolution;
-	double distanceFromCentre = StGermain_DistanceBetweenPoints( self->rotationCentre, coord, 2 );
+
+void HomogeneousNaturalBCs_Velocity_SkewToMesh( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	DomainContext*	context = (DomainContext*)_context;
+	HomogeneousNaturalBCs*  self    = Stg_ComponentFactory_ConstructByName( 
+		context->CF, 
+		HomogeneousNaturalBCs_Type, 
+		HomogeneousNaturalBCs, 
+		True,
+		0 );
+	double*                 result  = (double*) _result;
 	
-	if (distanceFromCentre < self->hillDiameter ) 
-		*temperature = self->hillHeight * (0.5 + 0.5 * cos( 2.0 * M_PI/self->hillDiameter * distanceFromCentre + M_PI ) );
-	else
-		*temperature = 0.0;
+	result[ I_AXIS ] =  cos( self->angle );
+	result[ J_AXIS ] =  sin( self->angle );
 }
 
-void CosineHillRotate_TemperatureBC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+
+void HomogeneousNaturalBCs_TemperatureFunction( void* analyticSolution, double* coord, double* temperature ) {
+	HomogeneousNaturalBCs *self = (HomogeneousNaturalBCs*)analyticSolution;
+
+	if ( coord[ J_AXIS ] < tan( self->angle ) * coord[ I_AXIS ] + 0.25 )
+		*temperature = 1.0;
+	else 
+		*temperature = 0.0;
+}
+	
+void HomogeneousNaturalBCs_TemperatureBC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
 	DomainContext*	context    = (DomainContext*)_context;
-	CosineHillRotate*  self       = Stg_ComponentFactory_ConstructByName( 
+	HomogeneousNaturalBCs*  self       = Stg_ComponentFactory_ConstructByName( 
 		context->CF, 
-		CosineHillRotate_Type, 
-		CosineHillRotate, 
+		HomogeneousNaturalBCs_Type, 
+		HomogeneousNaturalBCs, 
 		True,
 		0 );
 	FeVariable*             feVariable = NULL;
@@ -80,48 +93,49 @@ void CosineHillRotate_TemperatureBC( Node_LocalIndex node_lI, Variable_Index var
 	mesh       = feVariable->feMesh;
 	coord = Mesh_GetVertex( mesh, node_lI );
 
-	CosineHillRotate_TemperatureFunction( self, coord, result );
+	HomogeneousNaturalBCs_TemperatureFunction( self, coord, result );
 }
 
-void _CosineHillRotate_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
-	CosineHillRotate* self = (CosineHillRotate*)analyticSolution;
+void _HomogeneousNaturalBCs_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+	HomogeneousNaturalBCs* self = (HomogeneousNaturalBCs*)analyticSolution;
+	AbstractContext*       context;
 	ConditionFunction*     condFunc;
 
 	_FieldTest_Construct( self, cf, data );
 
-	/* Read values from dictionary */
-	self->hillHeight       = Stg_ComponentFactory_GetRootDictDouble( cf, "CosineHillHeight"  , 1.0 );
-	self->hillDiameter     = Stg_ComponentFactory_GetRootDictDouble( cf, "CosineHillDiameter", 1.0 );
-	self->rotationCentre[ I_AXIS ] = Stg_ComponentFactory_GetRootDictDouble( cf, "SolidBodyRotationCentreX" , 0.0 );
-	self->rotationCentre[ J_AXIS ] = Stg_ComponentFactory_GetRootDictDouble( cf, "SolidBodyRotationCentreY" , 0.0 );
-	self->rotationCentre[ K_AXIS ] = Stg_ComponentFactory_GetRootDictDouble( cf, "SolidBodyRotationCentreZ" , 0.0 );
+	self->angle = StGermain_DegreeToRadian (Stg_ComponentFactory_GetRootDictDouble( cf, "VelocitySkewAngle", 45.0 ) );
 
 	/* Create Condition Functions */
-	condFunc = ConditionFunction_New( CosineHillRotate_TemperatureBC, "Temperature_CosineHill" );
+/*
+	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
+*/
+	condFunc = ConditionFunction_New( HomogeneousNaturalBCs_Velocity_SkewToMesh, "Velocity_SkewToMesh" );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+	condFunc = ConditionFunction_New( HomogeneousNaturalBCs_TemperatureBC, "Temperature_StepFunction" );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 }
 
-void _CosineHillRotate_Build( void* analyticSolution, void* data ) {
-	CosineHillRotate* self = (CosineHillRotate*)analyticSolution;	
+void _HomogeneousNaturalBCs_Build( void* analyticSolution, void* data ) {
+	HomogeneousNaturalBCs* self = (HomogeneousNaturalBCs*)analyticSolution;	
 
 	_FieldTest_Build( self, data );
 
 	/* here we assign the memory and the func ptr for analytic sols */
 	self->_analyticSolutionList = Memory_Alloc_Array_Unnamed( FieldTest_AnalyticSolutionFunc*, 1 );
 	/* this order MUST be consistent with the xml file definition */
-	self->_analyticSolutionList[0] = CosineHillRotate_TemperatureFunction;
+	self->_analyticSolutionList[0] = HomogeneousNaturalBCs_TemperatureFunction;
 }
 
-void* _CosineHillRotate_DefaultNew( Name name ) {
+void* _HomogeneousNaturalBCs_DefaultNew( Name name ) {
 	return (void*) _FieldTest_New( 
-			sizeof(CosineHillRotate),
-			CosineHillRotate_Type,
+			sizeof(HomogeneousNaturalBCs),
+			HomogeneousNaturalBCs_Type,
 			_FieldTest_Delete,
 			_FieldTest_Print,
 			_FieldTest_Copy,
-			_CosineHillRotate_DefaultNew,
-			_CosineHillRotate_Construct,
-			_CosineHillRotate_Build,
+			_HomogeneousNaturalBCs_DefaultNew,
+			_HomogeneousNaturalBCs_Construct,
+			_HomogeneousNaturalBCs_Build,
 			_FieldTest_Initialise,
 			_FieldTest_Execute,
 			_FieldTest_Destroy,
@@ -129,8 +143,8 @@ void* _CosineHillRotate_DefaultNew( Name name ) {
 }
 
 /* This function is automatically run by StGermain when this plugin is loaded. The name must be "<plugin-name>_Register". */
-Index StgFEM_CosineHillRotate_Register( PluginsManager* pluginsManager ) {
+Index StgFEM_HomogeneousNaturalBCs_Register( PluginsManager* pluginsManager ) {
 	/* A plugin is only properly registered once it returns the handle provided when submitting a codelet to StGermain. */
-	return PluginsManager_Submit( pluginsManager, CosineHillRotate_Type, "0", _CosineHillRotate_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, HomogeneousNaturalBCs_Type, "0", _HomogeneousNaturalBCs_DefaultNew );
 }
 

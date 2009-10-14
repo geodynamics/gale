@@ -86,6 +86,7 @@ dirs = ['libStgFEM/Toolbox',
      'plugins/Output/PrintFeVariableDiscreteValues_2dBox',
      'plugins/StandardConditionFunctions',
      'SysTest/AnalyticPlugins/CosineHillRotate',
+     'SysTest/AnalyticPlugins/HomogeneousNaturalBCs',
      'Apps/TempDiffusion/tests/LinearTemperatureField',
      'Apps/StokesMomentumUzawa/tests/LinearVelocityAnalytic',
      'Apps/StokesMomentumUzawa/tests/LidDrivenIsoviscousAnalytic',
@@ -185,4 +186,4 @@ env.PCUTest('tests/testStgFEM', suites,
 # Install XML input files.
 env.Install('lib/StGermain/StgFEM', Glob('Apps/StgFEM_Components/*.xml'))
 
-#env.PCUSysTest('SysTest/RegressionTests/testAll.sh')
+#env.PCUSysTest('SysTest/PerformanceTests/testAll.sh')

@@ -87,7 +87,7 @@ void UpwindXiSuite_Test( UpwindXiSuiteData* data ) {
 	pcu_filename_expected( "UpwindXi.expected", expectedFile );
 	pcu_check_fileEq( outputFilename, expectedFile );
 	remove( outputFilename );
-	Journal_Purge( );
+	/*Journal_Purge( );*/
 }
 
 void UpwindXiSuite( pcu_suite_t* suite ) {
