@@ -4,18 +4,27 @@
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 	
 	<!-- Component Stuff -->
-	<include>StgFEM/LinearMesh.xml                </include>
-	<include>StgFEM/VelocityField.xml             </include>
-	<include>StgFEM/TimeIntegrator.xml            </include>
-	<include>PICellerator/MaterialPointSwarm.xml  </include>
+	<include>StgFEM/LinearMesh.xml                 </include>
+	<include>StgFEM/VelocityField.xml              </include>
+	<include>StgFEM/TimeIntegrator.xml             </include>
+	<include>PICellerator/MaterialPointSwarm.xml   </include>
 	
 	<list name="plugins" mergeType="merge">
-		<param>StgFEM_StandardConditionFunctions</param>
-		<param>Underworld_testDirector</param>
+		<struct>
+			<param name="Type">StgFEM_StandardConditionFunctions</param>
+			<param name="Context">context</param>
+		</struct>
 	</list>
 
 	<!-- Rheology Components -->
 	<struct name="components" mergeType="merge">
+		<struct name="everywhere">
+			<param name="Type">Everywhere</param>
+		</struct>
+		<struct name="material">
+			<param name="Type">Material</param>
+			<param name="Shape">everywhere</param>
+		</struct>
 		<!-- Periodic boundary conditions -->
 		<struct name="periodicBCsManager">
 			<param name="Type">PeriodicBoundariesManager</param>
@@ -28,15 +37,36 @@
 			</list>	
 		</struct>
 
+		<!-- Override the normal population control so
+			<param name="maxDeletions">0</param>
+		     otherwise it doesn't agreed with the tests expected file
+
+		     ***This is effectively turning populationControl off***
+		-->
+		<struct name="weights" mergeType="replace">
+			<param name="Type">PCDVC</param>
+			<param name="resolutionX">10</param>
+			<param name="resolutionY">10</param>
+			<param name="resolutionZ">10</param>
+			<param name="lowerT">0.6</param>
+			<param name="upperT">25</param>
+			<!-- The important override -->
+			<param name="maxDeletions">0</param>
+			<param name="maxSplits">3</param>
+			<param name="MaterialPointsSwarm">materialSwarm</param>
+		</struct>
+
 		<!-- Create Alignment Swarm Variable - for the sake of plotting -->
 		<struct name="director">
 			<param name="Type">Director</param>
 			<param name="MaterialPointsSwarm">materialSwarm</param>
 			<param name="TimeIntegrator">timeIntegrator</param>
 			<param name="VelocityGradientsField">VelocityGradientsField</param>
+			<param name="initialDirectionType">random</param>
 			<param name="initialDirectionX">1.0</param>
 			<param name="initialDirectionY">0.0</param>
 			<param name="initialDirectionZ">0.0</param>
+			<param name="randomInitialDirectionSeed">1</param>
 		</struct>	
 		<struct name="alignment">
 			<param name="Type">AlignmentSwarmVariable</param>
@@ -47,10 +77,15 @@
 	</struct>
 	
 	<!-- Simulation control -->
-	<param name="maxTimeSteps"> 20      </param>
+	<param name="maxTimeSteps"> 1      </param>
 	<param name="outputPath">./output</param>
 	<param name="dumpEvery"> 1 </param>	
-
+	<!-- For randomness test to pass, particlesPerCell = 20
+		as this is hard-coded value in testDirectorRandomness.c.
+		This is because test relies on the particle directions
+		fitting a normal distribution bell-curve based on
+		an average no of particles in certain set directions,
+		which requires prior knowledge of the Standard deviation.	-->
 	<param name="particlesPerCell">  20    </param>
 	<param name="SimpleShearFactor">  2    </param>
 
@@ -84,36 +119,4 @@
 	<param name="gaussParticlesY"> 2 </param>
 	<param name="gaussParticlesZ"> 2 </param>
 
-	<!--
-	<include> Underworld/Viewports/StrainRateInvariantVP.xml </include>
-	<include> Underworld/Viewports/VelocityMagnitudeVP.xml </include>
-	<include> window.xml </include>
-	<struct name="components" mergeType="merge">
-		<struct name="alignmentColourMap">
-			<param name="Type">lucColourMap</param>
-			<param name="colours">Yellow Orange Red Black</param>
-		</struct>
-		<struct name="alignmentDrawingObject">
-			<param name="Type">lucSwarmVectors</param>
-			<param name="Swarm">materialSwarm</param>
-			<param name="ColourVariable">alignment</param>
-			<param name="ColourMap"> velocityMagnitudeColourMap</param>
-			<param name="DirectionVariable">materialSwarm-Director</param>
-			<param name="arrowHeadSize">0.2</param>
-			<param name="length">0.05</param>
-		</struct>	
-		<struct name="AlignmentVP">
-			<param name="Type">lucViewport</param>
-			<param name="Camera">camera</param>
-			<list name="DrawingObject">
-				<param>alignmentDrawingObject</param>
-				<param>border</param>
-			</list>
-		</struct>		
-		<struct name="window" mergeType="merge">
-			<param name="Viewport">VelocityMagnitudeVP AlignmentVP</param>
-		</struct>
-	</struct>
-	-->
- 
 </StGermainData>

@@ -290,7 +290,7 @@ void _Director_Initialise( void* director, void* data ) {
 		}
 		else if (self->initialDirectionType == INIT_DIR_RANDOM){
 			/* create random directions for each particle */
-			srand( self->randomInitialDirectionSeed );
+			srand( self->randomInitialDirectionSeed * (1 + self->context->rank) );
 			
 			for ( lParticle_I = 0 ; lParticle_I < particleLocalCount ; lParticle_I++ ) {
 				normal = Variable_GetPtrDouble( self->variable, lParticle_I );

@@ -4,11 +4,10 @@
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 	
 	<!-- Component Stuff -->
-	<include>StgFEM/LinearMesh.xml                 </include>
-	<include>StgFEM/ElementLayout.xml              </include>
-	<include>StgFEM/VelocityField.xml              </include>
-	<include>StgFEM/TimeIntegrator.xml             </include>
-	<include>PICellerator/MaterialPointSwarm.xml   </include>
+	<include>StgFEM/LinearMesh.xml                </include>
+	<include>StgFEM/VelocityField.xml             </include>
+	<include>StgFEM/TimeIntegrator.xml            </include>
+	<include>PICellerator/MaterialPointSwarm.xml  </include>
 	
 	<list name="plugins" mergeType="merge">
 		<struct>
@@ -22,7 +21,7 @@
 		<!-- Periodic boundary conditions -->
 		<struct name="periodicBCsManager">
 			<param name="Type">PeriodicBoundariesManager</param>
-			<param name="Geometry">geometry</param>
+			<param name="mesh">linearMesh</param>
 			<param name="Swarm">materialSwarm</param>
 			<param name="TimeIntegrator">timeIntegrator</param>
 			
@@ -81,8 +80,9 @@
 		<struct name="ball1">
 			<param name="Type">Material</param>
 			<param name="Shape">ballShape1</param>
-			<param name="randomInitialDirection">True</param>
-			<param name="randomInitialDirectionSeed">3</param>
+			<param name="initialDirectionX">0.0</param>
+			<param name="initialDirectionY">1.0</param>
+			<param name="initialDirectionZ">0.0</param>
 			
 		</struct>
 		<struct name="ball2">
@@ -99,7 +99,7 @@
 	<param name="outputPath">./output</param>
 	<param name="dumpEvery"> 1 </param>	
 
-	<param name="particlesPerCell">  2    </param>
+	<param name="particlesPerCell">  20    </param>
 	<param name="SimpleShearFactor">  2    </param>
 
 	<!-- Journal Control -->
@@ -132,4 +132,36 @@
 	<param name="gaussParticlesY"> 2 </param>
 	<param name="gaussParticlesZ"> 2 </param>
 
+<!--
+	<include> Underworld/Viewports/StrainRateInvariantVP.xml </include>
+	<include> Underworld/Viewports/VelocityMagnitudeVP.xml </include>
+	<include> window.xml </include>
+	<struct name="components" mergeType="merge">
+		<struct name="alignmentColourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours">Orange Red Black</param>
+		</struct>
+		<struct name="alignmentDrawingObject">
+			<param name="Type">lucSwarmVectors</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">alignment</param>
+			<param name="ColourMap"> alignmentColourMap</param>
+			<param name="DirectionVariable">materialSwarm-Director</param>
+			<param name="arrowHeadSize">0.2</param>
+			<param name="length">0.05</param>
+		</struct>	
+		<struct name="AlignmentVP">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">camera</param>
+			<list name="DrawingObject">
+				<param>alignmentDrawingObject</param>
+				<param>border</param>
+			</list>
+		</struct>		
+		<struct name="window" mergeType="merge">
+			<param name="Viewport">VelocityMagnitudeVP AlignmentVP </param>
+		</struct>
+	</struct>
+-->
+ 
 </StGermainData>
