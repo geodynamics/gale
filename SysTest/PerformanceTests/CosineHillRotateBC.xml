@@ -108,7 +108,8 @@
 	<param name="allowUnbalancing"> True </param>
 
 	<param name="maxTimeSteps">0</param>
-	<param name="stopTime">8</param>
+	<param name="stopTime">10</param>
+	<param name="maxTimeStepSize">0.0125</param>
 
 	<param name="defaultDiffusivity"> 1.0e-6 </param>
 

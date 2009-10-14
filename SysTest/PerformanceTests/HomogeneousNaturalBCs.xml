@@ -32,7 +32,8 @@
 	
 	<!-- Simulation control -->
 	<param name="maxTimeSteps"> 0 </param>
-	<param name="stopTime"> 2.6 </param>
+	<param name="stopTime"> 3 </param>
+	<param name="maxTimeStepSize">0.0125</param>
 	<param name="outputEvery"> 1 </param>
 	<param name="dumpEvery"> 5 </param>
 	<param name="outputPath"> ./output </param>
