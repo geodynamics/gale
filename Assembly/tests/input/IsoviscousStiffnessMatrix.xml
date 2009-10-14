@@ -20,6 +20,13 @@
 		<param>testStiffnessMatrixCompare</param>
 	</list>
 
+    <struct name="components" mergeType="merge">
+        <struct name="context">
+            <param name="Type">FiniteElementContext</param>
+        </struct>
+    </struct>
+
+    <param name="StiffnessMatrixCompareFilename">testIsoviscousSiffness.matrix</param>
 	<!-- Simulation control -->
 	<param name="outputPath"> ./output </param>
 	<param name="maxTimeSteps"> 1 </param>
