@@ -265,8 +265,8 @@ void _Director_Initialise( void* director, void* data ) {
 	Particle_Index                  particleLocalCount = self->variable->arraySize;
 	double*                         normal;
 	Dimension_Index                 dim_I;
-	AbstractContext*                context = (AbstractContext*)data;
-	
+	AbstractContext*                context = (AbstractContext*)self->context;
+
 	/* Initialise Parent */
 	_TimeIntegratee_Initialise( self, data );
 
@@ -289,16 +289,38 @@ void _Director_Initialise( void* director, void* data ) {
 			}	
 		}
 		else if (self->initialDirectionType == INIT_DIR_RANDOM){
+			Particle_Index	gParticle_I;
+			unsigned	approxGlobalParticleCount = particleLocalCount * self->materialPointsSwarm->nProc;
+			unsigned	startIndex = particleLocalCount * self->materialPointsSwarm->myRank;
+			double		norm[3];
+
 			/* create random directions for each particle */
-			srand( self->randomInitialDirectionSeed * (1 + self->context->rank) );
-			
+			srand( self->randomInitialDirectionSeed );
+
+			lParticle_I = 0;
+			for( gParticle_I = 0; gParticle_I < approxGlobalParticleCount; gParticle_I++ ) {
+				for ( dim_I = 0; dim_I < self->materialPointsSwarm->dim; dim_I++ ) {
+					norm[dim_I] = ( (float) rand() - RAND_MAX/2 ) / RAND_MAX;
+				}	
+				if( gParticle_I >= startIndex ) {
+					normal = Variable_GetPtrDouble( self->variable, lParticle_I );
+					for ( dim_I = 0; dim_I < self->materialPointsSwarm->dim; dim_I++ ) {
+						normal[dim_I] = norm[dim_I];
+					}
+					lParticle_I++;
+				}
+				if( lParticle_I >= particleLocalCount )
+					break;
+			}
+/*
 			for ( lParticle_I = 0 ; lParticle_I < particleLocalCount ; lParticle_I++ ) {
 				normal = Variable_GetPtrDouble( self->variable, lParticle_I );
 				for ( dim_I = 0; dim_I < self->materialPointsSwarm->dim; dim_I++ ) {
 					normal[dim_I] = ( (float) rand() - RAND_MAX/2 ) / RAND_MAX;
 				}	
 				StGermain_VectorNormalise( normal, self->materialPointsSwarm->dim );
-			}	
+			}
+*/
 		}
 		else if (self->initialDirectionType == INIT_DIR_PER_MAT) {
 			/* Assign initial direction based on material
@@ -363,18 +385,42 @@ void _Director_Initialise( void* director, void* data ) {
 			locate all random particles, and set their director */
 			for (material_I = 0; material_I < materialsCount; material_I++) {
 				if (randomInitialDirections[material_I] == True) {
+					//Particle_Index	gParticle_I;
+					//unsigned	approxGlobalParticleCount = 2 * particleLocalCount * self->materialPointsSwarm->nProc;
+					//unsigned	startIndex = 2 * particleLocalCount * self->materialPointsSwarm->myRank;
+					//double		norm[3];
+
+
+#if 0
+					srand( self->randomInitialDirectionSeed );
+					lParticle_I = 0;
+					for( gParticle_I = 0; gParticle_I < approxGlobalParticleCount; gParticle_I++ ) {
+						for ( dim_I = 0; dim_I < self->materialPointsSwarm->dim; dim_I++ ) {
+							norm[dim_I] = ( (float) rand() - RAND_MAX/2 ) / RAND_MAX;
+						}	
+						if( gParticle_I >= startIndex ) {
+							normal = Variable_GetPtrDouble( self->variable, lParticle_I );
+							for ( dim_I = 0; dim_I < self->materialPointsSwarm->dim; dim_I++ ) {
+								normal[dim_I] = norm[dim_I];
+							}
+							lParticle_I++;
+						}
+						if( lParticle_I >= particleLocalCount )
+							break;
+					}
+#endif
+					/* create random directions for each particle */
 					srand(randomInitialDirectionSeeds[material_I]);
 					for ( lParticle_I = 0 ; lParticle_I < particleLocalCount ; lParticle_I++ ){
-					materialOfParticle = MaterialPointsSwarm_GetMaterialIndexAt(
-						self->materialPointsSwarm, 
-						lParticle_I );
+						materialOfParticle = MaterialPointsSwarm_GetMaterialIndexAt( self->materialPointsSwarm, lParticle_I );
 						if (materialOfParticle == material_I){
 							normal = Variable_GetPtrDouble( self->variable, lParticle_I );
 							for ( dim_I = 0; dim_I < self->materialPointsSwarm->dim; dim_I++ ) {
 								normal[dim_I] = ( (float) rand() - RAND_MAX/2 ) / RAND_MAX;
 							}	
 							/* Normalising the direction vector */
-							StGermain_VectorNormalise( normal, self->materialPointsSwarm->dim );						}
+							StGermain_VectorNormalise( normal, self->materialPointsSwarm->dim );
+						}
 					}
 				}
 			}

@@ -65,6 +65,9 @@ void test( UnderworldContext* context ) {
 	double                  angle                  = 0.5 * M_PI - atan(1.0/(2.0*time) );
 	XYZ                     velocity;
 	double                  analyticAlignmentValue = 1.0 - cos( angle );
+	double			gError;
+	int			particleGlobalCount;
+	int rank;
 
 	swarm = alignment->swarm;
 	director = alignment->director;
@@ -78,9 +81,13 @@ void test( UnderworldContext* context ) {
 
 		error += fabs( alignmentValue - analyticAlignmentValue );
 	}
-	error /= (double) swarm->particleLocalCount;
+	MPI_Allreduce( &error, &gError, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
+	MPI_Allreduce( &swarm->particleLocalCount, &particleGlobalCount, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD );
 
-	pcu_check_true( error < TOLERANCE );
+	//error /= (double) swarm->particleLocalCount;
+	//pcu_check_true( error < TOLERANCE );
+	gError /= particleGlobalCount;
+	pcu_check_true( gError < TOLERANCE );
 }
 
 void testRandom( UnderworldContext* context ) {
@@ -105,9 +112,6 @@ void testRandom( UnderworldContext* context ) {
 	int                     gCircleAngleCounts[36] 	= {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 	int			gCircleAngleSum;
 
-int rank, rank_i;
-MPI_Comm_rank(MPI_COMM_WORLD,&rank);
-	
 	swarm = alignment->swarm;
 	director = alignment->director;
 
@@ -116,9 +120,8 @@ MPI_Comm_rank(MPI_COMM_WORLD,&rank);
 		SwarmVariable_ValueAt( director->directorSwarmVariable, lParticle_I, normal );
 		/* Calculate dot product between normal and (0,1), then get an angle */
 
-printf( "%d: particle[%d] normal: [%e,%e]\n", rank, lParticle_I, normal[0], normal[1] );
-
 		dotProduct = normal[0] * 0 + normal[1] * 1;
+
 		angleBetween = acos( dotProduct ) * 180 / M_PI; 
 		if ( normal[0] > 0 ) {
 			circleAngle = angleBetween;
@@ -128,21 +131,10 @@ printf( "%d: particle[%d] normal: [%e,%e]\n", rank, lParticle_I, normal[0], norm
 		}
 		circleAngleCounts[ (int)(circleAngle+0.5) / 10 ] += 1;
 	}
-for( ii=0; ii<36; ii++ )
-  MPI_Allreduce( &circleAngleCounts[ii], &gCircleAngleCounts[ii], 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD );
-	//MPI_Allreduce( circleAngleCounts, gCircleAngleCounts, 36, MPI_INT, MPI_SUM, MPI_COMM_WORLD );
+	MPI_Allreduce( circleAngleCounts, gCircleAngleCounts, 36, MPI_INT, MPI_SUM, MPI_COMM_WORLD );
 
 	circleAngleAverage = (double)swarm->particleLocalCount / 36;
 	MPI_Allreduce( &circleAngleAverage, &gCircleAngleAverage, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
-
-for( rank_i=0; rank_i<2; rank_i++ ) {
-  if( rank_i == rank ) {
-    printf( "%d: angle avg. - local:\t%e\tglobal:%e\n", rank, circleAngleAverage, gCircleAngleAverage );
-    for( ii=0; ii<36; ii++ )
-      printf( "%d: angle counts[%2d] - local:\t%d\tglobal:\t%d\n", rank, ii, circleAngleCounts[ii], gCircleAngleCounts[ii] );
-  }
-  MPI_Barrier( MPI_COMM_WORLD );
-}
 
 	/*NB. This definition is determined based on a set no. of particlesPerCell. Currently this value is = 20 */
 	#define TheoreticalStandardDeviation 13.64
@@ -155,20 +147,16 @@ for( rank_i=0; rank_i<2; rank_i++ ) {
         circleAngleSum = 0;
 	for ( ii =0; ii < 36; ii++ ) {	
 		if (( gCircleAngleCounts[ii] < circleAngleLowerBound )|| (gCircleAngleCounts[ii] > circleAngleUpperBound)) {
-			circleErrorFlag = True;			
+			circleErrorFlag = True;
 		}
 		//circleAngleSum = ((circleAngleAverage - circleAngleCounts[ii]) * 
 		//				(circleAngleAverage - circleAngleCounts[ii])) + circleAngleSum;
 		circleAngleSum = ((gCircleAngleAverage - gCircleAngleCounts[ii]) * 
 						(gCircleAngleAverage - gCircleAngleCounts[ii])) + circleAngleSum;
 	}
-	//MPI_Allreduce( &circleAngleSum, &gCircleAngleSum, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD );
 	/* Calculate standard deviation */
-	//circleAngleStdDev = sqrt(gCircleAngleSum / (36-1));
 	circleAngleStdDev = sqrt(circleAngleSum / (36-1));
 
-printf( "%d: std. dev: %e\n", rank, circleAngleStdDev );
-	
 	pcu_check_true( fabs( circleAngleStdDev - TheoreticalStandardDeviation ) < RANDOM_DIRECTOR_ERROR );
 	pcu_check_true( !circleErrorFlag );	
 }
@@ -191,7 +179,6 @@ void testPerMaterial( UnderworldContext* context ) {
 	XYZ*                    matDirectionVectors;
 	double                  angle;
 	Bool			angleFailure		= False;
-	Material*		material;
 	
 	swarm = alignment->swarm;
 	director = alignment->director;
@@ -216,13 +203,59 @@ void testPerMaterial( UnderworldContext* context ) {
 		/* get particle's material type */
 		material_I = MaterialPointsSwarm_GetMaterialIndexAt( swarm, lParticle_I );
 
-material = Materials_Register_GetByIndex( materials_Register, material_I );
 		/* get particle's initialDirection */
 		SwarmVariable_ValueAt( director->directorSwarmVariable, lParticle_I, testVector );
 		/* check that angle is within error bar of correct value */
 		angle = StGermain_AngleBetweenVectors(matDirectionVectors[material_I],testVector, swarm->dim);
 	
 		if( fabs(angle) > ANGLE_ERROR )
+			angleFailure = True;
+	}
+
+	pcu_check_true( !angleFailure );
+}
+
+void testPerMaterial2( UnderworldContext* context ) {
+	AlignmentSwarmVariable* alignment              = (AlignmentSwarmVariable*) LiveComponentRegister_Get( context->CF->LCRegister, "alignment" );
+	Materials_Register*     materials_Register     = context->materials_Register;
+	Director*               director;
+	Particle_Index          lParticle_I;
+	Swarm*                  swarm;
+	XYZ                     testVector;
+	Material_Index          materialsCount;
+	int                     material_I;
+	XYZ*                    matDirectionVectors;
+	double                  angle;
+	Bool			angleFailure		= False;
+	
+	swarm = alignment->swarm;
+	director = alignment->director;
+	materialsCount = Materials_Register_GetCount( materials_Register);
+	
+	matDirectionVectors = Memory_Alloc_Array(XYZ, DIR_TEST_NUM_MAT, "materialDirectionVectors");
+
+	/* Define vectors */
+	matDirectionVectors[0][DIR_X_AXIS] = 1.0; matDirectionVectors[0][DIR_Y_AXIS] = 0.0; matDirectionVectors[0][DIR_Z_AXIS] = 0.0;
+	matDirectionVectors[1][DIR_X_AXIS] = 0.0; matDirectionVectors[1][DIR_Y_AXIS] = 1.0; matDirectionVectors[1][DIR_Z_AXIS] = 0.0;
+	matDirectionVectors[2][DIR_X_AXIS] = 1.0; matDirectionVectors[2][DIR_Y_AXIS] = 1.0; matDirectionVectors[2][DIR_Z_AXIS] = 0.0;
+	/* normalise the vectors */
+	matDirectionVectors[2][DIR_X_AXIS] /= pow( 2.0, 0.5 );
+	matDirectionVectors[2][DIR_Y_AXIS] /= pow( 2.0, 0.5 );
+	
+	for ( lParticle_I = 0 ; lParticle_I < swarm->particleLocalCount ; lParticle_I++ ) {
+		/* get particle's material type */
+		material_I = MaterialPointsSwarm_GetMaterialIndexAt( swarm, lParticle_I );
+
+		/* get particle's initialDirection */
+		SwarmVariable_ValueAt( director->directorSwarmVariable, lParticle_I, testVector );
+		/* check that angle is within error bar of correct value */
+		angle = StGermain_AngleBetweenVectors(matDirectionVectors[material_I],testVector, swarm->dim);
+	
+		/* the '1' material has a random normal vector, so the angle between this and the test vector should be non-zero */
+		if( material_I == 1 && fabs(angle) < ANGLE_ERROR )
+			angleFailure = True;
+
+		if( material_I != 1 && fabs(angle) > ANGLE_ERROR )
 			angleFailure = True;
 	}
 
@@ -286,7 +319,7 @@ void DirectorSuite_TestPerMaterial2( DirectorSuiteData* data ) {
 	pcu_filename_input( "testDirectorPerMaterial2.xml", xml_input );
 	context = _UnderworldContext_DefaultNew( "context" );
 	cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, context );
-	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, testPerMaterial );
+	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, testPerMaterial2 );
 	stgMainBuildAndInitialise( cf );
 	stgMainLoop( cf );
 	stgMainDestroy( cf );
@@ -295,8 +328,8 @@ void DirectorSuite_TestPerMaterial2( DirectorSuiteData* data ) {
 void DirectorSuite( pcu_suite_t* suite ) {
    pcu_suite_setData( suite, DirectorSuiteData );
    pcu_suite_setFixtures( suite, DirectorSuite_Setup, DirectorSuite_Teardown );
-   pcu_suite_addTest( suite, DirectorSuite_Test );
-   //pcu_suite_addTest( suite, DirectorSuite_TestRandom );
+   pcu_suite_addTest( suite, DirectorSuite_Test ); /* parallel bug */
+   pcu_suite_addTest( suite, DirectorSuite_TestRandom ); /* parallel bug */
    pcu_suite_addTest( suite, DirectorSuite_TestPerMaterial );
    pcu_suite_addTest( suite, DirectorSuite_TestPerMaterial2 );
 }

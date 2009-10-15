@@ -5,7 +5,6 @@
 	
 	<!-- Component Stuff -->
 	<include>StgFEM/LinearMesh.xml                 </include>
-	<include>StgFEM/ElementLayout.xml              </include>
 	<include>StgFEM/VelocityField.xml              </include>
 	<include>StgFEM/TimeIntegrator.xml             </include>
 	<include>PICellerator/MaterialPointSwarm.xml   </include>
@@ -25,6 +24,7 @@
 			<param name="Geometry">geometry</param>
 			<param name="Swarm">materialSwarm</param>
 			<param name="TimeIntegrator">timeIntegrator</param>
+			<param name="mesh">linearMesh</param>
 			
 			<list name="PeriodicBoundaries">
 				<param>I_AXIS</param>
@@ -99,7 +99,7 @@
 	<param name="outputPath">./output</param>
 	<param name="dumpEvery"> 1 </param>	
 
-	<param name="particlesPerCell">  2    </param>
+	<param name="particlesPerCell">  20    </param>
 	<param name="SimpleShearFactor">  2    </param>
 
 	<!-- Journal Control -->
