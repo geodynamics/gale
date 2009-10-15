@@ -137,14 +137,18 @@ void lucPlugin_VisualOnlyRun( Context* _context ) {
 
                swarmFileNamePart = Context_GetCheckPointReadPrefixString( (AbstractContext*)context );
                #ifdef READ_HDF5
-                  swarm->checkpointnfiles = context->checkpointnproc;
                   Stg_asprintf( &swarmFileName, "%s%s.%05d", swarmFileNamePart, swarm->name, context->restartTimestep );
                #else
                   Stg_asprintf( &swarmFileName, "%s%s.%05d.dat", swarmFileNamePart, swarm->name, context->restartTimestep );
                #endif
                
-					((FileParticleLayout*)swarm->particleLayout)->filename = swarmFileName;
-               
+					((FileParticleLayout*)swarm->particleLayout)->filename         = swarmFileName;
+					/* set to one incase reading ascii */
+					((FileParticleLayout*)swarm->particleLayout)->checkpointnfiles = 1;
+					/* now check if using hdf5 */ 
+					#ifdef READ_HDF5
+					((FileParticleLayout*)swarm->particleLayout)->checkpointnfiles = _FileParticleLayout_GetFileCountFromTimeInfoFile( context );
+				        #endif
 					/* Need to re-build & initialise the particles in case the number of particles changed
 					due to pop. control */
 					Memory_Free( swarm->cellParticleCountTbl );
