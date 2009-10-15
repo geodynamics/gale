@@ -78,9 +78,9 @@ void _Underworld_solA_Init( Underworld_solA* self, double sigma, double Z, doubl
 }
 
 void _Underworld_solA_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
-	Underworld_solA* 		self = (Underworld_solA*) analyticSolution;
-	Bool                     isCorrectInput = True;
-	double                   sigma, Z, wavenumberY, n;
+	Underworld_solA*	self = (Underworld_solA*) analyticSolution;
+	Bool					isCorrectInput = True;
+	double				sigma, Z, wavenumberY, n;
 	
 	/* Construct Parent */
 	_FieldTest_Construct( self, cf, data );
@@ -115,9 +115,9 @@ void _Underworld_solA_Build( void* analyticSolution, void* data ) {
 
 Bool _checkInputParams( Underworld_solA* self ) {
 	return ( 
-			( self->sigma > 0.0 ) && ( self->Z > 0.0 ) &&
-			( self->km > 0.0 )    && ( self->n > 0 )  
-		);
+		( self->sigma > 0.0 ) && ( self->Z > 0.0 ) &&
+		( self->km > 0.0 )    && ( self->n > 0 )  
+	);
 }
 
 void* _Underworld_solA_DefaultNew( Name name ) {

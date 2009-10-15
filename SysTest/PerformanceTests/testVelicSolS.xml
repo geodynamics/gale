@@ -7,11 +7,29 @@
 
 	<list name="plugins" mergeType="merge">
 		<!-- Output Plugins -->
-		<param>StgFEM_FrequentOutput</param>	
-		<param>Underworld_Nusselt</param>	
-		<param>Underworld_Vrms</param>	
-		<param>StgFEM_CPUTime</param>	
-		<param>Underworld_Velic_solS</param>
+		<struct>
+			<param name="Type">StgFEM_FrequentOutput</param>	
+			<param name="Context">context</param>	
+		</struct>
+		<struct>
+         <param name="Type">Underworld_Nusselt</param>
+         <param name="Context">context</param>
+         <param name="GaussSwarm">gaussSwarm</param>
+      </struct>
+		<struct>
+			<param name="Type">Underworld_Vrms</param>	
+			<param name="Context">context</param>	
+			<param name="VelocityField">VelocityField</param>	
+			<param name="GaussSwarm">gaussSwarm</param>	
+		</struct>
+		<struct>
+			<param name="Type">StgFEM_CPUTime</param>	
+			<param name="Context">context</param>	
+		</struct>
+		<struct>
+			<param name="Type">Underworld_Velic_solS</param>	
+			<param name="Context">context</param>	
+		</struct>
 	</list>
 
 	<struct name="pluginData">
@@ -32,8 +50,8 @@
 
 	<!-- Velic_solS Parameters 
 		****** Warning wavenumberX must equal sinusoidalLidWavenumber ******
-	      otherwise this test dies
-	-->
+	      otherwise this test dies -->
+
 	<!-- solS_eta MUST be 1.0 -->
 	<param name="solS_eta"> 1.0 </param>
 	<param name="wavenumberX">1</param>
@@ -41,6 +59,9 @@
 	<param name="sinusoidalLidWavenumber">1</param>
 
 	<struct name="components" mergeType="merge">
+		<struct name="context">
+			<param name="Type">UnderworldContext</param>
+		</struct>
 		<struct name="Viscosity">
 			<param name="Type">MaterialViscosity</param>
 			<param name="eta0">solS_eta</param>
