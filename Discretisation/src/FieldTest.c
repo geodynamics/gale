@@ -882,8 +882,12 @@ void _FieldTest_DumpToAnalysisFile( FieldTest* self, Stream* analysisStream ) {
 		}
 		Journal_Printf( analysisStream, "%.8e ", error );
 #endif
-		for( dof_I = 0; dof_I < numDofs; dof_I++ ) 
-			Journal_RPrintf( analysisStream, "%.8e ", self->gErrorNorm[field_I][dof_I] );
+		for( dof_I = 0; dof_I < numDofs; dof_I++ ) {
+			if(self->normalise)
+				Journal_RPrintf( analysisStream, "%.8e ", self->gErrorNorm[field_I][dof_I] );
+			else
+				Journal_RPrintf( analysisStream, "%.8e ", self->gErrorSq[field_I][dof_I] );
+		}
 
 	}
 }
