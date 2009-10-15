@@ -3,5 +3,5 @@
 # everything after will be passed as a command line arg
 np 1 --elementResI=10 --elementResJ=10
 np 1 --elementResI=20 --elementResJ=20
+np 1 --elementResI=30 --elementResJ=30
 np 1 --elementResI=40 --elementResJ=40
-np 1 --elementResI=80 --elementResJ=80

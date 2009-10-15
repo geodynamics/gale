@@ -1,7 +1,0 @@
-# this line is a comment
-# np x, where x is the number of procs to run test
-# everything after will be passed as a command line arg
-np 4 --elementResI=10 --elementResJ=10 --defaultDiffusivity=0.5 --A=0.1
-np 4 --elementResI=20 --elementResJ=20 --defaultDiffusivity=0.5 --A=0.1
-np 4 --elementResI=40 --elementResJ=40 --defaultDiffusivity=0.5 --A=0.1
-np 4 --elementResI=80 --elementResJ=80 --defaultDiffusivity=0.5 --A=0.1
