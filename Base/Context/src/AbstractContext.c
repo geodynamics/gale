@@ -447,6 +447,8 @@ void _AbstractContext_Construct( void* context, Stg_ComponentFactory* cf, void* 
 		Dictionary_GetDefault( self->dictionary, "checkpointAppendStep", Dictionary_Entry_Value_FromBool( False ) ) ) ;
 	self->interpolateRestart = Dictionary_Entry_Value_AsBool( 
 		Dictionary_GetDefault( self->dictionary, "interpolateRestart", Dictionary_Entry_Value_FromBool( False ) ) ) ;
+	self->outputFlattenedXML = Dictionary_Entry_Value_AsBool( 
+		Dictionary_GetDefault( self->dictionary, "outputFlattenedXML", Dictionary_Entry_Value_FromBool( True ) ) ) ;
 
 	if ( self->rank == 0 ) {
 		if ( ! Stg_DirectoryExists( self->outputPath ) ) {
@@ -483,7 +485,7 @@ void _AbstractContext_Construct( void* context, Stg_ComponentFactory* cf, void* 
 		}
 	}
 
-	if ( self->rank == 0 ) {
+	if ( self->rank == 0 && self->outputFlattenedXML) {
 		XML_IO_Handler* ioHandler;
 		char*       inputfileRecord;
 		char*       inputfileRecordWithDateTimeStamp;
@@ -977,20 +979,7 @@ void _AbstractContext_LoadTimeInfoFromCheckPoint( void* _context, Index timeStep
 	   
 	H5Sclose( fileSpace );
 	H5Dclose( fileData );
-	   
-	/* Read previous nproc from file */
-	#if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
-	fileData = H5Dopen( file, "/nproc" );
-	#else
-	fileData = H5Dopen( file, "/nproc", H5P_DEFAULT );
-	#endif
-	fileSpace = H5Dget_space( fileData );
-	   
-	H5Dread( fileData, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &(self->checkpointnproc) );
-	   
-	H5Sclose( fileSpace );
-	H5Dclose( fileData );
-	
+
 	H5Fclose( file );
 	   
 #else	
