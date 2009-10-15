@@ -119,7 +119,12 @@ void _ToolboxesManager_Init( void* toolboxesManager, int* argc, char*** argv ) {
 
 void _ToolboxesManager_Delete( void* toolboxesManager ) {
 	ToolboxesManager*         self = (ToolboxesManager*)toolboxesManager;
+  unsigned count;
 
+  /* free all strings, defining loaded Toolboxes */
+  for( count = 0 ; count < self->_initialisedCount ; count++ ) {
+    Memory_Free( self->initialised[count] );
+  }
 	Memory_Free( self->initialised );
 	self->_initialisedSize = 0;
 	self->_initialisedCount = 0;
