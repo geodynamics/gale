@@ -18,6 +18,12 @@
 	    <param name="Context">context</param>
 	  </struct>
 	</list>
+
+	<struct name="components" mergeType="merge">
+	  <struct name="context">
+	    <param name="Type">FiniteElementContext</param>
+	  </struct>
+	</struct>
 	
 	<param name="journal-level.info.Stg_ComponentFactory"> 2 </param>
 	<param name="journal.debug">f</param>
@@ -25,7 +31,6 @@
 	<param name="journal-level-branch.debug.StgFEM"> 1 </param>
 	
 	<!-- Simulation control -->
-	<param name="maxTimeSteps"> 50 </param>
 	<param name="outputEvery"> 1 </param>
 	<param name="dumpEvery"> 5 </param>
 	<param name="outputPath"> ./output </param>
@@ -57,16 +62,28 @@
 
 	<!-- See Brooks, Hughes 1982 - Section 3.4.2 -->
 	<list name="plugins" mergeType="merge">
-		<param>StgFEM_CosineHillRotate</param>
+	  <struct>
+	    <param name="Type">StgFEM_CosineHillRotate</param>
+	    <param name="Context">context</param>
+	  </struct>
 	</list>
+	<struct name="pluginData">
+		<list name="NumericFields">
+			<param>TemperatureField</param> <param>0</param>
+		</list> 
+		<param name="IntegrationSwarm">gaussSwarm</param>
+		<param name="ConstantMesh">constantMesh</param>
+		<param name="ElementMesh">linearMesh</param>
+		<param name="normaliseByAnalyticSolution">false</param>
+		<param name="useReferenceSolutionFromFile">false</param>
+		<param name="appendToAnalysisFile">true</param>
+		<param name="Context">context</param>
+	</struct>
 
 	<param name="TemperatureField-Tolerance">0.035</param>
 	
 
 	<struct name="components" mergeType="merge">
-	  <struct name="context">
-	    <param name="Type">FiniteElementContext</param>
-	  </struct>
 		<struct name="initialConditionShape">
 			<param name="Type">Box</param>
 			<param name="startX"> -0.01 </param> <param name="endX"> 0.01 </param>
@@ -90,7 +107,9 @@
 	<param name="maxZ"> 0.5 </param>
 	<param name="allowUnbalancing"> True </param>
 
-	<param name="maxTimeSteps"> 100 </param>
+	<param name="maxTimeSteps"> 0 </param>
+	<param name="stopTime">10</param>
+	<param name="maxTimeStepSize">0.0125</param>
 
 	<param name="defaultDiffusivity"> 1.0e-6 </param>
 

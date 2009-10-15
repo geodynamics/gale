@@ -24,17 +24,17 @@
 	    <param name="Type">FiniteElementContext</param>
 	  </struct>
 	</struct>
-	
+
 	<param name="journal-level.info.Stg_ComponentFactory"> 2 </param>
 	<param name="journal.debug">f</param>
 	<param name="journal-enable-branch.debug.StgFEM">f</param>
 	<param name="journal-level-branch.debug.StgFEM"> 1 </param>
-	
+
 	<!-- Simulation control -->
 	<param name="outputEvery"> 1 </param>
 	<param name="dumpEvery"> 5 </param>
 	<param name="outputPath"> ./output </param>
-	
+
 	<!-- Geometry & Mesh setup -->
 	<param name="dim"> 2 </param>
 	<param name="shadowDepth"> 1 </param>
@@ -52,18 +52,17 @@
 	<param name="gaussParticlesX"> 2 </param>
 	<param name="gaussParticlesY"> 2 </param>
 	<param name="gaussParticlesZ"> 2 </param>
-	
+
 	<include>StgFEM/LinearMesh.xml</include>
 	<include>StgFEM/ConstantMesh.xml</include>
 	<include>StgFEM/VelocityField.xml</include>
 	<include>StgFEM/TemperatureField.xml</include>
 	<include>StgFEM/GaussSwarm.xml</include>
 	<include>StgFEM/TempAdvDiff.xml</include>
-
-	<!-- See Brooks, Hughes 1982 - Section 3.4.2 -->
+	
 	<list name="plugins" mergeType="merge">
 	  <struct>
-	    <param name="Type">StgFEM_CosineHillRotate</param>
+	    <param name="Type">StgFEM_AdvDiffSteadyState1D</param>
 	    <param name="Context">context</param>
 	  </struct>
 	</list>
@@ -80,120 +79,90 @@
 		<param name="Context">context</param>
 	</struct>
 
-	<param name="TemperatureField-Tolerance">0.035</param>
-	
+	<param name="defaultDiffusivity"> 1 </param>
+	<param name="A"> 0.5 </param>
+	<param name="B"> 0.0 </param>
+	<param name="c"> 0.0 </param>
+	<param name="TemperatureField-Tolerance"> 1e-5 </param>
 
-	<struct name="components" mergeType="merge">
-		<struct name="initialConditionShape">
-			<param name="Type">Box</param>
-			<param name="startX"> -0.01 </param> <param name="endX"> 0.01 </param>
-			<param name="startY"> -1e9 </param> <param name="endY"> 0.01 </param>
-			<param name="startZ"> -1e9 </param> <param name="endZ"> 1e9 </param>
-		</struct>
-	</struct>
-
-	<!-- See Brooks, Hughes 1982 - Section 3.4.2 -->
-	<!-- Geometry & Mesh setup -->
+	<param name="maxTimeSteps"> 0 </param>
+	<param name="stopTime">0.8</param>
+	<param name="maxTimeStepSize">0.0125</param>
 	<param name="dim"> 2 </param>
 	<param name="shadowDepth"> 1 </param>
 	<param name="elementResI"> 10 </param>
 	<param name="elementResJ"> 10 </param>
-	<param name="meshSizeK"> 1 </param>
-	<param name="minX"> -0.5 </param>
-	<param name="minY"> -0.5 </param>
-	<param name="minZ"> -0.5 </param>
-	<param name="maxX"> 0.5 </param>
-	<param name="maxY"> 0.5 </param>
-	<param name="maxZ"> 0.5 </param>
+	<param name="elementResK"> 10 </param>
+	<param name="minX"> 0.0f </param>
+	<param name="minY"> 0.0f </param>
+	<param name="minZ"> 0.0f </param>
+	<param name="maxX"> 1.0f </param>
+	<param name="maxY"> 1.0f </param>
+	<param name="maxZ"> 1.0f </param>
 	<param name="allowUnbalancing"> True </param>
 
-	<param name="maxTimeSteps">0</param>
-	<param name="stopTime">10</param>
-	<param name="maxTimeStepSize">0.0125</param>
-
-	<param name="defaultDiffusivity"> 1.0e-6 </param>
-
-	<!-- Cosine Hill Parameters -->
-	<param name="CosineHillHeight">   1.0  </param>
-	<param name="CosineHillDiameter"> 0.5  </param>
-	<param name="CosineHillCentreX">  0.0  </param>
-	<param name="CosineHillCentreY"> -0.25 </param>
-	<param name="CosineHillCentreZ">  0.0  </param>
-
-	<struct name="velocityICs">
-		<param name="type">CompositeVC</param>
-		<list name="vcList">
-			<struct>
-				<param name="type">AllNodesVC</param>
-				<list name="variables">
-					<struct>
-						<param name="name">velocity</param>
-						<param name="type">func</param>
-						<param name="value">Velocity_SolidBodyRotation</param>
-					</struct>
-				</list>
-			</struct>
-		</list>
+	<struct name="components" mergeType="merge">
+		<struct name="middleNodesShape">
+			<param name="Type">Box</param>
+			<param name="startX"> -1e9 </param> <param name="endX"> 1e9 </param>
+			<param name="startY"> 0.49 </param> <param name="endY"> 0.51 </param>
+			<param name="startZ"> -1e9 </param> <param name="endZ"> 1e9 </param>
+		</struct>
 	</struct>
 
-	<struct name="temperatureBCs">
+	<struct name="velocityICs" mergeType="replace">
 		<param name="type">CompositeVC</param>
 		<list name="vcList">
 			<struct>
-				<param name="type"> MeshShapeVC </param>
-				<param name="Shape"> initialConditionShape </param>
+				<param name="type"> AllNodesVC </param>
 				<list name="variables">
 					<struct>
-						<param name="name">temperature</param>
-						<param name="type">func</param>
-						<param name="value"> Temperature_CosineHill</param>
-					</struct>
-				</list>
-			</struct>
-			<struct>
-				<param name="type"> WallVC </param>
-				<param name="wall"> right </param>
-				<list name="variables">
-					<struct>
-						<param name="name">temperature</param>
-						<param name="type">double</param>
-						<param name="value"> 0 </param>
+						<param name="name">vy</param>
+						<param name="type"> value </param>
+						<param name="value"> 1.0 </param>
 					</struct>
 				</list>
 			</struct>			
+		</list>
+	</struct>
+
+	<struct name="temperatureBCs" mergeType="replace">
+		<param name="type">CompositeVC</param>
+		<list name="vcList">
 			<struct>
 				<param name="type"> WallVC </param>
 				<param name="wall"> bottom </param>
 				<list name="variables">
 					<struct>
 						<param name="name">temperature</param>
-						<param name="type">double</param>
-						<param name="value"> 0 </param>
+						<param name="type"> func </param>
+						<param name="value"> AnalyticSolutionFunction </param>
 					</struct>
 				</list>
-			</struct>
+			</struct>	
+			<struct>
+				<param name="type"> MeshShapeVC </param>
+				<param name="Shape"> middleNodesShape </param>
+				<list name="variables">
+					<struct>
+						<param name="name">temperature</param>
+						<param name="type"> func </param>
+						<param name="value"> AnalyticSolutionFunction </param>
+					</struct>
+				</list>
+			</struct>			
 			<struct>
 				<param name="type"> WallVC </param>
 				<param name="wall"> top </param>
 				<list name="variables">
 					<struct>
 						<param name="name">temperature</param>
-						<param name="type">double</param>
-						<param name="value"> 0 </param>
+						<param name="type"> func </param>
+						<param name="value"> AnalyticSolutionFunction </param>
 					</struct>
 				</list>
 			</struct>				
-			<struct>
-				<param name="type"> WallVC </param>
-				<param name="wall"> left </param>
-				<list name="variables">
-					<struct>
-						<param name="name">temperature</param>
-						<param name="type">double</param>
-						<param name="value"> 0 </param>
-					</struct>
-				</list>
-			</struct>
 		</list>
-	</struct>
+	</struct>			
+
 </StGermainData>
