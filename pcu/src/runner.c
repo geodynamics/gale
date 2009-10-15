@@ -74,7 +74,7 @@ PCU_Runner_Status pcu_runner_run( pcu_listener_t* lsnr ) {
 
    if ( pcu_nsuites >= 1 ) {
       printf( "-----------------------------------------------------------\n" );
-      printf( "Total passes: %d/%d\n", totalPasses, totalTests );
+      printf( "[PCU] Total passes: %d/%d\n", totalPasses, totalTests );
    }
 
    if ( totalPasses == totalTests ) {
