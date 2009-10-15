@@ -520,6 +520,10 @@ void _StiffnessMatrix_Build( void* stiffnessMatrix, void* data ) {
 	
 	if( self->columnVariable )
 		Stg_Component_Build( self->columnVariable, data, False );
+
+   /* ensure the rhs vector is built */
+   Stg_Component_Build( self->rhs, data, False );
+
 	
 /* 	if( self->useShellMatrix ) */
 /* 		Stg_Component_Build( self->shellMatrix, data, False ); */
@@ -592,6 +596,9 @@ void _StiffnessMatrix_Initialise( void* stiffnessMatrix, void* data ) {
 	
 	if( self->columnVariable )
 		Stg_Component_Initialise( self->columnVariable, data, False );
+
+   /* ensure the rhs vector is built */
+   Stg_Component_Initialise( self->rhs, data, False );
 
 /* 	if( self->useShellMatrix ) */
 /* 		Stg_Component_Initialise( self->shellMatrix, data, False ); */
