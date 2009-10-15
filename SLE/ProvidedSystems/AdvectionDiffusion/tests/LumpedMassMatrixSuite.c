@@ -237,7 +237,7 @@ void LumpedMassMatrixSuite_TestLumpedMassMatrix( LumpedMassMatrixSuiteData* data
 		PetscViewerSetType( viewer, PETSC_VIEWER_BINARY );
 
 		pcu_filename_expected( "testLumpedMassMatrix.expected", expected_file );
-		PetscViewerBinaryOpen( MPI_COMM_WORLD, "testLumpedMassMatrix.dat", FILE_MODE_READ, &viewer );
+		PetscViewerBinaryOpen( MPI_COMM_WORLD, expected_file, FILE_MODE_READ, &viewer );
 	
 		VecLoad( viewer, VECMPI, &expectedMatrix );	
 
