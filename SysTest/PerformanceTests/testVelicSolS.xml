@@ -45,7 +45,7 @@
 		<param name="useReferenceSolutionFromFile">false</param>
 		<param name="appendToAnalysisFile">false</param>
 		<param name="epsilon">1e-3</param>
-		<param name="context">context</param>
+		<param name="Context">context</param>
 	</struct>
 
 	<!-- Velic_solS Parameters 
