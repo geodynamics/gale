@@ -12,7 +12,7 @@
 	<list name="plugins" mergeType="merge">
 		<!-- Output Plugins -->
 		<struct>
-			<param name="Type">StgFEM_FrequentOutput</param>	
+			<param name="Type">StgFEM_FrequentOutput</param>
 			<param name="Context">context</param>
 		</struct>
 		<struct>
@@ -21,13 +21,13 @@
 			<param name="GaussSwarm">gaussSwarm</param>
 		</struct>
 		<struct>
-			<param name="Type">Underworld_Vrms</param>	
+			<param name="Type">Underworld_Vrms</param>
 			<param name="Context">context</param>
 			<param name="GaussSwarm">gaussSwarm</param>
 			<param name="VelocityField">VelocityField</param>
 		</struct>
 		<struct>
-			<param name="Type">StgFEM_CPUTime</param>	
+			<param name="Type">StgFEM_CPUTime</param>
 			<param name="Context">context</param>
 		</struct>
 	</list>
