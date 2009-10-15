@@ -119,7 +119,6 @@
 		unsigned int				dumpEvery; \
 		unsigned int				checkpointEvery; \
 		unsigned int				saveDataEvery; \
-		unsigned int				checkpointnproc; \
 		double				        checkpointAtTimeInc; \
 		double				        nextCheckpointTime; \
 		Name                                    experimentName; \
@@ -134,6 +133,8 @@
 		Bool                                    loadFromCheckPoint;      \
 		/** Bool to determine whether we are storing a full checkpoint (for restart) or only data for analysis */ \
 		Bool                                    isDataSave;      \
+		/** flattened XML output can be disabled if desired (default True) */ \
+		Bool                                    outputFlattenedXML;      \
 		unsigned int                            restartTimestep;         \
 		char*                                   checkPointPrefixString;  \
 		Stream*					info; \
