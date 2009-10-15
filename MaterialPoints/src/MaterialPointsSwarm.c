@@ -340,9 +340,16 @@ void _MaterialPointsSwarm_Initialise( void* swarm, void* data ) {
 	MaterialPointsSwarm*	self 	= (MaterialPointsSwarm*) swarm;
 	AbstractContext* 	context = (AbstractContext*)self->context;
 	Index            	var_I	= 0;
-	
+	Particle_Index          lParticle_I=0;
+	MaterialPoint*		matPoint=NULL;
+
 	_Swarm_Initialise( self, data );
 
+	/* Beforehand, set each particle to have UNDEFINED_MATERIAL */
+	for ( lParticle_I = 0; lParticle_I < self->particleLocalCount; lParticle_I++ ) {
+		matPoint = (MaterialPoint*)Swarm_ParticleAt( self, lParticle_I );
+		matPoint->materialIndex = UNDEFINED_MATERIAL;
+	}
 	/* Now setup the material properties */
    	if( !( context && (True == context->loadFromCheckPoint) && (True == context->interpolateRestart) ) ) {
 		if( self->material == NULL ) {
@@ -459,6 +466,7 @@ void _MaterialPointsSwarm_Initialise( void* swarm, void* data ) {
       }
 	/* TODO: print info / debug message */
 	}
+#if 0
 	else {
 		Particle_Index          lParticle_I=0;
 		MaterialPoint*		matPoint=NULL;
@@ -468,7 +476,6 @@ void _MaterialPointsSwarm_Initialise( void* swarm, void* data ) {
 			matPoint = (MaterialPoint*)Swarm_ParticleAt( self, lParticle_I );
 			matPoint->materialIndex = UNDEFINED_MATERIAL;
 		}
-#if 0
 		/* Now setup the material properties */
 		if ( self->material == NULL ) {
 			/* Do it by the layout of all known materials */
@@ -481,8 +488,8 @@ void _MaterialPointsSwarm_Initialise( void* swarm, void* data ) {
 					self, 
 					self->swarmVariable_Register->variable_Register );
 		}
-#endif
 	}
+#endif
 }
 void _MaterialPointsSwarm_Execute( void* swarm, void* data ) {
 	MaterialPointsSwarm*	self = (MaterialPointsSwarm*)swarm;
