@@ -3,8 +3,12 @@
 
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
  	
+    <param name="lucPluginContext">context</param>
 	<list name="plugins" mergeType="merge">
-		<param>lucPlugin</param>
+        <struct>
+            <param name="Type">lucPlugin</param>
+            <param name="Context">lucPluginContext</param>
+        </struct>
 	</list>
 	<struct name="components" mergeType="merge">
 		<struct name="renderingEngine">
