@@ -135,9 +135,12 @@ void LumpedMassMatrixSuite_TestLumpedMassMatrix( LumpedMassMatrixSuiteData* data
 	unsigned							dimExists[] = { True, True, False };
 	/* Mass Matrix Stuff */
 	ForceVector*					massMatrix;
+	Vec								copyMatrix;
+	Vec								expectedMatrix;
+	PetscViewer						viewer;
+	PetscTruth						flg;
 	LumpedMassMatrixForceTerm*	massMatrixForceTerm;
 	Particle_InCellIndex			particlesPerDim[] = {2,2,2};
-	PetscViewer						viewer;
 	char								expected_file[PCU_PATH_MAX];
 
 	stream = Journal_Register (Info_Type, "LumpedMassMatrixStream");
@@ -210,7 +213,7 @@ void LumpedMassMatrixSuite_TestLumpedMassMatrix( LumpedMassMatrixSuiteData* data
 
 	/* Build */
 	Stg_Component_Build( feMesh, context, False );
-	Variable_Register_BuildAll(variableRegister);
+	Variable_Register_BuildAll( variableRegister );
 	Stg_Component_Build( wallVC, context, False );
 	Stg_Component_Build( dofs, context, False);
 	Stg_Component_Build( feVariable, context, False );
@@ -227,28 +230,28 @@ void LumpedMassMatrixSuite_TestLumpedMassMatrix( LumpedMassMatrixSuiteData* data
 	Stg_Component_Initialise( massMatrix, context, False );
 
 	/* Assemble */
-	ForceVector_Assemble( massMatrix );
+	if( data->rank == 0 ) {
+		ForceVector_Assemble( massMatrix );
 
-	PetscViewerCreate( MPI_COMM_WORLD, &viewer );
-	PetscViewerSetType( viewer, PETSC_VIEWER_ASCII );
-	PetscViewerASCIIOpen( MPI_COMM_WORLD, "testLumpedMassMatrix.dat", &viewer );
-	/* Print out vector */
-	VecView( massMatrix->vector, viewer );
+		PetscViewerCreate( MPI_COMM_WORLD, &viewer );
+		PetscViewerSetType( viewer, PETSC_VIEWER_BINARY );
 
-	/* Try out optimised one */
-	VecSet( massMatrix->vector, 0.0 );
+		pcu_filename_expected( "testLumpedMassMatrix.expected", expected_file );
+		PetscViewerBinaryOpen( MPI_COMM_WORLD, "testLumpedMassMatrix.dat", FILE_MODE_READ, &viewer );
 	
-	/* Assemble */
-	ForceTerm_SetAssembleElementFunction( massMatrixForceTerm, _LumpedMassMatrixForceTerm_AssembleElement_Box );
-	ForceVector_Assemble( massMatrix );
+		VecLoad( viewer, VECMPI, &expectedMatrix );	
 
-	/* Print out vector */
-	VecView( massMatrix->vector, viewer );
+		/* Try out optimised one */
+		VecSet( massMatrix->vector, 0.0 );
 	
-	/* Check that the vector data is what we expected */
-	pcu_filename_expected( "testLumpedMassMatrix.expected", expected_file );
-	pcu_check_fileEq( "testLumpedMassMatrix.dat", expected_file );
-	remove ( "testLumpedMassMatrix.dat" );
+		/* Assemble */
+		ForceTerm_SetAssembleElementFunction( massMatrixForceTerm, _LumpedMassMatrixForceTerm_AssembleElement_Box );
+		ForceVector_Assemble( massMatrix );
+
+		/* Check vector */
+		VecEqual( (Vec)massMatrix->vector, expectedMatrix, &flg );
+		pcu_check_true( flg );
+	}
 
 	/* Destroy stuff */
 	Stg_Class_Delete( massMatrix );
