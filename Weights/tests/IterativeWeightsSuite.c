@@ -70,8 +70,8 @@ void IterativeWeightsSuite_TestElementIntegral_ConstantFunction( IterativeWeight
 }
 void IterativeWeightsSuite_TestElementIntegral_LinearFunction ( IterativeWeightsSuiteData* data ) {
    WeightsSuite_TestElementIntegral( data->context, "LinearFunction", 1000,
-      0.000001, /* --mean-tolerance */
-      0.000001, /* --standardDeviation-tolerance */
+      1e-4, /* --mean-tolerance */
+      1e-4, /* --standardDeviation-tolerance */
       0.0, /* --mean-expectedValue */
       0.0 /* --standardDeviation-expectedValue */ );
 }
@@ -79,15 +79,15 @@ void IterativeWeightsSuite_TestElementIntegral_QuadraticFunction ( IterativeWeig
    WeightsSuite_TestElementIntegral( data->context, "QuadraticFunction", 1000,
       0.000001, /* --mean-tolerance */
       0.000001, /* --standardDeviation-tolerance */
-      0.0840621, /* --mean-expectedValue */
-      0.0627759 /* --standardDeviation-expectedValue */ );
+      0.0430721, /* --mean-expectedValue */
+      0.0326016 /* --standardDeviation-expectedValue */ );
 }
 
 void IterativeWeightsSuite_TestElementIntegral_PolynomialFunction( IterativeWeightsSuiteData* data ) {
    WeightsSuite_TestElementIntegral( data->context, "PolynomialFunction", 1000,
       0.000001, /* --mean-tolerance */
       0.000001, /* --standardDeviation-tolerance */
-      0.017526, /* --mean-expectedValue */
+      0.0175259, /* --mean-expectedValue */
       0.013522 /* --standardDeviation-expectedValue */ );
 }
 

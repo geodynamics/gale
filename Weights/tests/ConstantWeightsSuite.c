@@ -163,8 +163,8 @@ void WeightsSuite_TestElementIntegral(
             "Cannot understand function name '%s'\n", funcName );
 
    for ( loop_I = 0 ; loop_I < count ; loop_I++ ) {
-      /* Layout Particles */
       Swarm_Random_Seed( (long) loop_I );
+      /* Layout Particles */
       _Swarm_InitialiseParticles( materialSwarm, data );
 
       _IntegrationPointsSwarm_UpdateHook( NULL, integrationSwarm );
@@ -184,7 +184,7 @@ void WeightsSuite_TestElementIntegral(
    mean = errorSum / (double) count;
    standardDeviation = sqrt( errorSquaredSum / (double) count - mean * mean );
 
-   printf( "Func: %s - Mean = %g; SD = %g\n", funcName, mean, standardDeviation );
+   //printf( "Func: %s - Mean = %g; SD = %g\n", funcName, mean, standardDeviation );
 
    /* compare the mean and standard deviation */
    differenceMean = fabs(mean - expectedMean);
