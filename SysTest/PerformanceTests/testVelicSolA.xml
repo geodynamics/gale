@@ -53,8 +53,6 @@
 		<struct name="context">
 			<param name="Type">UnderworldContext</param>
 		</struct>
-	<!--
-		-->
 		<struct name="Viscosity">
 			<param name="Type">MaterialViscosity</param>
 			<param name="eta0">solA_Z</param>

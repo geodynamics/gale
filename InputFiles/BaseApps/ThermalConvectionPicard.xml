@@ -8,7 +8,10 @@
 	</list>
 
 	<list name="plugins" mergeType="Replace">
-		<param>StgFEM_StandardConditionFunctions</param>	
+        <struct>
+		    <param name="Type">StgFEM_StandardConditionFunctions</param>	
+            <param name="Context">context</param>
+        </struct>
 	</list>
 
 	<!-- Component Stuff -->

@@ -7,14 +7,25 @@
 
 	<list name="plugins" mergeType="merge">
 		<!-- Output Plugins -->
-		<param>StgFEM_FrequentOutput</param>	
-		<param>Underworld_Vrms</param>	
-		<param>StgFEM_CPUTime</param>
-		<param>Underworld_Velic_solCx</param>
+		<struct>
+			<param name="Type">StgFEM_FrequentOutput</param>	
+			<param name="Context">context</param>	
+		</struct>
+		<struct>
+			<param name="Type">Underworld_Vrms</param>	
+			<param name="Context">context</param>	
+			<param name="VelocityField">VelocityField</param>	
+			<param name="GaussSwarm">gaussSwarm</param>	
+		</struct>
+		<struct>
+			<param name="Type">StgFEM_CPUTime</param>	
+			<param name="Context">context</param>	
+		</struct>
+		<struct>
+			<param name="Type">Underworld_Velic_solCx</param>	
+			<param name="Context">context</param>	
+		</struct>
 	</list>
-
-  <!-- to disable scaling check --> 
-  <param name="Ra_ScalingCheck">false</param>
 
 	<struct name="pluginData">
 		<list name="NumericFields">
@@ -29,7 +40,7 @@
 		<param name="useReferenceSolutionFromFile">false</param>
 		<param name="appendToAnalysisFile">false</param>
 		<param name="epsilon">1e-3</param>
-		<param name="context">context</param>
+		<param name="Context">context</param>
 	</struct>
 
 	<struct name="temperatureICs" mergeType="replace">
@@ -48,18 +59,10 @@
 		</list>
 	</struct>
 
-	<param name="Ra"> 1 </param>	
-	<param name="courantFactor"> 0.25 </param>
-	<!--
-		I don't know if the courantFactor is vital or unimportant
-	-->
-	<param name="solCx_etaA">100</param>
-	<param name="solCx_etaB">1</param>
-	<param name="solCx_xc">0.5</param>
-	<param name="solCx_n">2.0</param>
-	<param name="wavenumberY">2.0</param>
-
 	<struct name="components" mergeType="merge">
+		<struct name="context">
+			<param name="Type">UnderworldContext</param>
+		</struct>	
 		<struct name="rheologyA">
 			<param name="Type">MaterialViscosity</param>
 			<param name="eta0">solCx_etaA</param>
@@ -74,7 +77,6 @@
 			<param name="Shape">shapeA</param>
 			<param name="Rheology">rheologyA</param>
 		</struct>
-
 		<struct name="rheologyB">
 			<param name="Type">MaterialViscosity</param>
 			<param name="eta0">solCx_etaB</param>
@@ -90,6 +92,18 @@
 			<param name="Rheology">rheologyB</param>
 		</struct>
 	</struct>
+
+	<!-- to disable scaling check --> 
+	<param name="Ra_ScalingCheck">false</param>
+	<param name="Ra"> 1 </param>	
+	<param name="courantFactor"> 0.25 </param>
+
+	<!-- I don't know if the courantFactor is vital or unimportant -->
+	<param name="solCx_etaA">100</param>
+	<param name="solCx_etaB">1</param>
+	<param name="solCx_xc">0.5</param>
+	<param name="solCx_n">2.0</param>
+	<param name="wavenumberY">2.0</param>
 
 	<param name="journal.info.Context-verbose">true</param>
 	<param name="journal.debug.Plugins">true</param>
