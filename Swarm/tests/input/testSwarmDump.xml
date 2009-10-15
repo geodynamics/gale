@@ -13,6 +13,7 @@
 			<param name="totalInitialParticles">10000</param>
 		</struct>
 	</struct>
+	<param name="outputFlattenedXML">False</param>
 	<param name="maxTimeSteps">1</param> 
 	<param name="minX">0.0</param> 
 	<param name="minY">0.0</param> 

@@ -387,7 +387,7 @@ void SwarmDump_DumpToHDF5( SwarmDump* self, Swarm* swarm, const char* filename )
             //status = H5Pset_fletcher32(props);
    
             /* Create a new dataspace */
-            sprintf( dataSpaceName, "/%s", swarmVar->name );
+            sprintf( dataSpaceName, "/%s", swarmVar->name + strlen(swarm->name)+1 );
             if( swarmVar->variable->dataTypes[0] == Variable_DataType_Int ) {
                /* Allocate space for the values to be written to file */
                int** value = Memory_Alloc_2DArray( int, swarm->particleLocalCount, swarmVar->dofCount, "swarmVariableValue" );

@@ -1,0 +1,240 @@
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**
+** Copyright (C), 2003, Victorian Partnership for Advanced Computing (VPAC) Ltd, 110 Victoria Street, Melbourne, 3053, Australia.
+**
+** Authors:
+**   Stevan M. Quenette, Senior Software Engineer, VPAC. (steve@vpac.org)
+**   Patrick D. Sunter, Software Engineer, VPAC. (pds@vpac.org)
+**   Luke J. Hodkinson, Computational Engineer, VPAC. (lhodkins@vpac.org)
+**   Siew-Ching Tan, Software Engineer, VPAC. (siew@vpac.org)
+**   Alan H. Lo, Computational Engineer, VPAC. (alan@vpac.org)
+**   Raquibul Hassan, Computational Engineer, VPAC. (raq@vpac.org)
+**
+**  This library is free software; you can redistribute it and/or
+**  modify it under the terms of the GNU Lesser General Public
+**  License as published by the Free Software Foundation; either
+**  version 2.1 of the License, or (at your option) any later version.
+**
+**  This library is distributed in the hope that it will be useful,
+**  but WITHOUT ANY WARRANTY; without even the implied warranty of
+**  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+**  Lesser General Public License for more details.
+**
+**  You should have received a copy of the GNU Lesser General Public
+**  License along with this library; if not, write to the Free Software
+**  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+**
+** Role:
+**      Tests that particles can be saved to file, then re-loaded onto a new context with exactly
+**      the same positions and values.
+**
+** $Id: testTemplate.c 3462 2006-02-19 06:53:24Z WalterLandry $
+**
+**~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "pcu/pcu.h"
+#include <StGermain/StGermain.h>
+#include "StgDomain/Geometry/Geometry.h"
+#include "StgDomain/Shape/Shape.h"
+#include "StgDomain/Mesh/Mesh.h"
+#include "StgDomain/Utils/Utils.h"
+#include "StgDomain/Swarm/Swarm.h"
+
+#include "SwarmDumpAndLoadSuite.h"
+
+#define CURR_MODULE_NAME "DomainContext.c"
+
+struct _Particle {
+        __IntegrationPoint;
+};
+
+typedef struct {
+   MPI_Comm comm;
+   unsigned rank;
+   unsigned nProcs;
+} SwarmDumpAndLoadSuiteData;
+
+void SwarmDumpAndLoadSuite_UpdateParticlePositionsTowardsAttractor( DomainContext* context );
+
+void SwarmDumpAndLoadSuite_Setup( SwarmDumpAndLoadSuiteData* data ) {
+   /* MPI Initializations */
+   data->comm = MPI_COMM_WORLD;  
+   MPI_Comm_rank( data->comm, &data->rank );
+   MPI_Comm_size( data->comm, &data->nProcs );
+}
+
+void SwarmDumpAndLoadSuite_Teardown( SwarmDumpAndLoadSuiteData* data ) {   
+}
+
+void SwarmDumpAndLoadSuite_TestSwarmDumpAndLoad( SwarmDumpAndLoadSuiteData* data ) {
+   int                     procToWatch;
+   int                     ii;
+   Swarm*                  swarm;
+   Swarm*                  newSwarm = NULL;
+   Swarm*                  swarmList[1];
+   SwarmDump*              swarmDumper = NULL;
+   DomainContext*          context;
+   Dictionary*             dictionary;
+   Stg_ComponentFactory*   cf;
+   Stream*                 stream;
+   FileParticleLayout*     fileParticleLayout = NULL;
+   char                    input_file[PCU_PATH_MAX];
+   char                    output_file[PCU_PATH_MAX];
+   char                    outputInput_file[PCU_PATH_MAX];
+   char                    filenameTemp[PCU_PATH_MAX];   
+   Cell_LocalIndex         lCell_I;
+   double                  diffSumX, diffSumY, diffSumZ;
+   double                  totSumX, totSumY, totSumZ;
+   double                  gdiffSumX, gdiffSumY, gdiffSumZ;
+   double                  gtotSumX, gtotSumY, gtotSumZ;
+   double                  tolerance = 1e-5;
+   Particle_InCellIndex    cParticle_I;
+   IntegrationPoint integrationPoint;
+   SwarmVariable* posVariable;
+   SwarmVariable* posVariableNew;
+   stream = Journal_Register (Info_Type, "SwarmDumpStream");
+   
+   Journal_Enable_TypedStream( DebugStream_Type, False );
+   Stream_EnableBranch( Swarm_Debug, False );
+   
+   Stream_Enable( Journal_Register( Info_Type, ParticleCommHandler_Type ), False );
+   Stream_Enable( Journal_Register( Info_Type, SwarmDump_Type ), False );
+   
+   pcu_filename_input( "testSwarmDump.xml", input_file );
+   /* setup from XML */
+   cf = stgMainInitFromXML( input_file, data->comm, NULL );
+   context = (DomainContext*) LiveComponentRegister_Get( cf->LCRegister, "context" );
+   
+   dictionary = context->dictionary;
+
+   swarm = (Swarm*) LiveComponentRegister_Get( context->CF->LCRegister, "swarm" );
+   /* create a swarmVariable, as this will be required for the HDF5 checkpointing (else it doesn't know about the required variable to save) */   
+   posVariable = Swarm_NewVectorVariable(swarm, "Position", GetOffsetOfMember( integrationPoint, xi ),Variable_DataType_Double, swarm->dim, "PositionX", "PositionY", "PositionZ" );
+   posVariable->isCheckpointedAndReloaded = True;
+   Stg_Component_Build( posVariable, data, False );
+   
+   stgMainBuildAndInitialise( cf );
+   /* advect particles */
+   SwarmDumpAndLoadSuite_UpdateParticlePositionsTowardsAttractor(context);
+   Swarm_UpdateAllParticleOwners( swarm );
+   swarmList[0] = swarm;
+   swarmDumper = SwarmDump_New( "SwarmDumpSuiteDumper", context, swarmList, 1, True );
+   /* dump swarm */
+   SwarmDump_Execute( swarmDumper, context );
+   /* create a barrier, as other procs may try to read from files even though they are not created yet */
+   MPI_Barrier( data->comm );
+#ifdef READ_HDF5
+   sprintf( output_file, "%s/%s.%05d", context->outputPath, swarm->name, context->timeStep );
+#else
+   sprintf( output_file, "%s/%s.%05d.dat", context->outputPath, swarm->name, context->timeStep );
+#endif
+   /* create a fileParticleLayout to load files from file */
+   fileParticleLayout = FileParticleLayout_New( "fileParticleLayout", output_file, data->nProcs );
+   Stg_Component_Construct( fileParticleLayout, cf, 0, False );
+   
+   newSwarm = Swarm_New( "testSwarm2", (ElementCellLayout*) LiveComponentRegister_Get( context->CF->LCRegister, "elementCellLayout" ),
+                        fileParticleLayout, 3, sizeof(Particle), extensionMgr_Register, Variable_Register_New(), data->comm, NULL );
+   /* as with for the swarmDump,  create a swarmVariable, as this will be required for the HDF5 checkpointing (else it doesn't know about the required variable to save) */   
+   posVariableNew = Swarm_NewVectorVariable( newSwarm, "Position", GetOffsetOfMember( integrationPoint, xi ), Variable_DataType_Double, newSwarm->dim, "PositionX", "PositionY", "PositionZ" );
+   posVariableNew->isCheckpointedAndReloaded = True;
+   Stg_Component_Build( posVariableNew, data, False );
+   
+   Stg_Component_Build( newSwarm, 0, False );
+   Stg_Component_Initialise( newSwarm, 0, False );
+   
+   /* now check that two swarms coincide */
+   diffSumX = 0;
+   diffSumY = 0;
+   diffSumZ = 0;
+   totSumX  = 0;
+   totSumY  = 0;
+   totSumZ  = 0;
+   pcu_check_true(swarm->particleLocalCount == newSwarm->particleLocalCount);
+
+   for ( cParticle_I=0; cParticle_I < swarm->particleLocalCount; cParticle_I++ ) {
+      pcu_check_true( swarm->particles[cParticle_I].owningCell == newSwarm->particles[cParticle_I].owningCell);
+      diffSumX += pow(swarm->particles[cParticle_I].xi[0] - newSwarm->particles[cParticle_I].xi[0], 2);
+      diffSumY += pow(swarm->particles[cParticle_I].xi[1] - newSwarm->particles[cParticle_I].xi[1], 2);
+      diffSumZ += pow(swarm->particles[cParticle_I].xi[2] - newSwarm->particles[cParticle_I].xi[2], 2);
+      totSumX  += pow(swarm->particles[cParticle_I].xi[0], 2);
+      totSumY  += pow(swarm->particles[cParticle_I].xi[1], 2);
+      totSumZ  += pow(swarm->particles[cParticle_I].xi[2], 2);
+   }
+
+   MPI_Allreduce( &diffSumX, &gdiffSumX, 1, MPI_DOUBLE, MPI_SUM, swarm->comm );
+   MPI_Allreduce( &diffSumY, &gdiffSumY, 1, MPI_DOUBLE, MPI_SUM, swarm->comm );
+   MPI_Allreduce( &diffSumZ, &gdiffSumZ, 1, MPI_DOUBLE, MPI_SUM, swarm->comm );
+   MPI_Allreduce(  &totSumX,  &gtotSumX, 1, MPI_DOUBLE, MPI_SUM, swarm->comm );
+   MPI_Allreduce(  &totSumY,  &gtotSumY, 1, MPI_DOUBLE, MPI_SUM, swarm->comm );
+   MPI_Allreduce(  &totSumZ,  &gtotSumZ, 1, MPI_DOUBLE, MPI_SUM, swarm->comm );
+   
+   pcu_check_true( gdiffSumX/gtotSumX < tolerance );
+   pcu_check_true( gdiffSumY/gtotSumY < tolerance );
+   pcu_check_true( gdiffSumZ/gtotSumZ < tolerance );
+
+   /* remove files */
+   if( data->rank == 0 ){
+#ifdef READ_HDF5
+         for(ii = 0 ; ii < data->nProcs ; ii++){
+            /* get the swarm checkpointing filename */
+            if(data->nProcs == 1)
+               sprintf( filenameTemp, "%s.h5", output_file );
+            else 
+               sprintf( filenameTemp, "%s.%dof%d.h5", output_file, ii+1, data->nProcs );
+            remove(filenameTemp);
+         }
+#else
+      remove(output_file);
+#endif   
+      remove(context->outputPath);
+   }
+   
+   stgMainDestroy( cf );
+
+}
+
+void SwarmDumpAndLoadSuite( pcu_suite_t* suite ) {
+   pcu_suite_setData( suite, SwarmDumpAndLoadSuiteData );
+   pcu_suite_setFixtures( suite, SwarmDumpAndLoadSuite_Setup, SwarmDumpAndLoadSuite_Teardown );
+   pcu_suite_addTest( suite, SwarmDumpAndLoadSuite_TestSwarmDumpAndLoad );
+}
+
+void SwarmDumpAndLoadSuite_UpdateParticlePositionsTowardsAttractor( DomainContext* context ) {
+   Cell_LocalIndex         lCell_I;
+   Particle_InCellIndex    cParticle_I;
+   Particle*               currParticle;
+   Index                   dim_I;
+   Mesh*                   mesh = (Mesh*) LiveComponentRegister_Get( context->CF->LCRegister, "mesh-linear" );
+   Swarm*                  swarm = (Swarm*) LiveComponentRegister_Get( context->CF->LCRegister, "swarm" );
+   Stream*                 stream = Journal_Register( Info_Type, "updateParticlePositions" );
+   Coord                   attractorPoint;
+   double                  minCrds[3], maxCrds[3];
+
+   Mesh_GetGlobalCoordRange( mesh, minCrds, maxCrds );
+
+   for ( dim_I=0; dim_I < 3; dim_I++ ) 
+      attractorPoint[dim_I] = ( maxCrds[dim_I] - minCrds[dim_I] ) / 3;
+
+   for ( lCell_I=0; lCell_I < swarm->cellLocalCount; lCell_I++ ) {
+      for ( cParticle_I=0; cParticle_I < swarm->cellParticleCountTbl[lCell_I]; cParticle_I++ ) {
+         Coord movementVector = {0,0,0};
+         Coord newParticleCoord = {0,0,0};
+         Coord* oldCoord;
+         
+         currParticle = (Particle*)Swarm_ParticleInCellAt( swarm, lCell_I, cParticle_I );
+         oldCoord = &currParticle->xi;
+         
+         for ( dim_I=0; dim_I < 3; dim_I++ ) {
+            movementVector[dim_I] = ( attractorPoint[dim_I] - (*oldCoord)[dim_I] ) / 3;
+            newParticleCoord[dim_I] = (*oldCoord)[dim_I] + movementVector[dim_I];
+         }
+
+         for ( dim_I=0; dim_I < 3; dim_I++ ) {
+            currParticle->xi[dim_I] = newParticleCoord[dim_I];
+         }
+      }
+   }
+}

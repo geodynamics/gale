@@ -133,8 +133,6 @@
 		Index                           swarmReg_I; /**< Own index inside the Swarm_Register */ \
 						\
 		IArray*				incArray; \
-		/** number of files previous checkpoint stored across */ \
-		Index                           checkpointnfiles;\
 								 \
 	        int                             expanding;
 

@@ -56,20 +56,24 @@
 		hid_t** fileSpace; \
 		Index* lastParticleIndex; \
 		hsize_t start[2]; \
-		hsize_t count[2];
+		hsize_t count[2]; \
+		/** number of files previous checkpoint stored across */ \
+		Index                           checkpointnfiles;		
 #else
 	#define __FileParticleLayout \
 		__GlobalParticleLayout \
 		\
-		Name                                             filename;    \
-		FILE*                                            file;        \
-		Stream*                                          errorStream;
+		Name       filename;    \
+		FILE*      file;        \
+		Stream*    errorStream; \
+		/** number of files previous checkpoint stored across */ \
+		Index      checkpointnfiles;
 #endif
 
 	struct FileParticleLayout { __FileParticleLayout };
 	
 	/* Create a new FileParticleLayout and initialise */
-	FileParticleLayout* FileParticleLayout_New( Name name, Name filename );
+	FileParticleLayout* FileParticleLayout_New( Name name, Name filename, Index checkpointnfiles );
 
 	/* Creation implementation / Virtual constructor */
 	FileParticleLayout* _FileParticleLayout_New( 
@@ -89,9 +93,10 @@
 		GlobalParticleLayout_InitialiseParticleFunction* _initialiseParticle,
 		Name                                             name,
 		Bool                                             initFlag,
+		Index                                            checkpointnfiles,
 		Name                                             filename );
 	
-	void _FileParticleLayout_Init( void* particleLayout, Name filename );
+	void _FileParticleLayout_Init( void* particleLayout, Name filename, Index checkpointnfiles );
 	
 	/* 'Stg_Class' Stuff */
 	void _FileParticleLayout_Delete( void* particleLayout );
@@ -113,5 +118,7 @@
 	void _FileParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm ) ;
 	void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm ) ;
 	void _FileParticleLayout_InitialiseParticle( void* particleLayout, void* swarm, Particle_Index newParticle_I, void* particle);
+	/* small routine to find out number of files fileParticleLayout is stored across, which maybe have been stored in the timeInfo checkpoint file */ 
+	Index _FileParticleLayout_GetFileCountFromTimeInfoFile( void* context );
 
 #endif /* __Domain_Swarm_FileParticleLayout_h__ */

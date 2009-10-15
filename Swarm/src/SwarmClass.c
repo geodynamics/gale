@@ -414,17 +414,6 @@ void _Swarm_Print( void* swarm, Stream* stream ) {
 		for( cParticle_I = 0; cParticle_I < self->cellParticleCountTbl[cell_I]; cParticle_I++ ) {
 			dParticle_I = self->cellParticleTbl[cell_I][cParticle_I];
 			Journal_Printf( swarmStream, "\t\t\t(part. index) %d\n", dParticle_I );
-			/* TODO: should probably handle this by having a particle print E.P.
-			   which the swarm holds, which can be extended to print the 
-			   particles correctly.
-			   Check how the mesh handles this for elements and nodes... */
-			#if 0
-			Journal_Printf( swarmStream, "\t\t\t(ptr) %p\n", Swarm_ParticleAt( self, dParticle_I ) );
-			Journal_Printf( swarmStream, "\t\t\t%g %g %g\n", 
-				(*(Coord*)Swarm_ParticleAt( self, cell_I, particle_I ))[0], 
-				(*(Coord*)Swarm_ParticleAt( self, cell_I, particle_I ))[1], 
-				(*(Coord*)Swarm_ParticleAt( self, cell_I, particle_I ))[2] );
-			#endif	
 		}
 		Journal_Printf( swarmStream, "\n" );
 	}
@@ -1566,7 +1555,7 @@ void Swarm_Realloc( void* swarm ) {
 			self->particlesArraySize );
 
 	/*
-	** FUCK: NEED TO UPDATE THINGS IF ARRAYS ARE REALLOC'D
+	** NEED TO UPDATE THINGS IF ARRAYS ARE REALLOC'D
 	*/
 	for( v_i = 0; v_i < self->nSwarmVars; v_i++ ) {
 		if( self->swarmVars[v_i]->variable )
@@ -1647,12 +1636,12 @@ void Swarm_ReplaceCurrentParticleLayoutWithFileParticleLayout( void* swarm, void
 	char*                name = NULL;
 	char*                swarmFileName     = NULL;
 	char*                swarmFileNamePart = NULL;
+	Index                checkpointnfiles;
 
 	Stg_asprintf( &name, "%s-fileParticleLayout", self->name );
 
    swarmFileNamePart = Context_GetCheckPointReadPrefixString( context );
 #ifdef READ_HDF5
-   self->checkpointnfiles = context->checkpointnproc;
 	Stg_asprintf( &swarmFileName, "%s%s.%05d", swarmFileNamePart, self->name, context->restartTimestep );
 #else
 	Stg_asprintf( &swarmFileName, "%s%s.%05d.dat", swarmFileNamePart, self->name, context->restartTimestep );
@@ -1674,8 +1663,15 @@ void Swarm_ReplaceCurrentParticleLayoutWithFileParticleLayout( void* swarm, void
 	* PatrickSunter - 13 June 2006
 	*/
 	Stg_Class_Delete( self->particleLayout );
+	/* find out how many files fileparticlelayout is stored across.. currently for this function we assume we are reading from checkpoints.. TODO generalise */
+	/* set to one incase reading ascii */
+	checkpointnfiles = 1;
+	/* now check if using hdf5 */ 
+	#ifdef READ_HDF5
+	checkpointnfiles = _FileParticleLayout_GetFileCountFromTimeInfoFile( context );
+	#endif
 
-	self->particleLayout = (ParticleLayout*)FileParticleLayout_New( name, swarmFileName );
+	self->particleLayout = (ParticleLayout*)FileParticleLayout_New( name, swarmFileName, checkpointnfiles );
 
    Memory_Free( name );
    Memory_Free( swarmFileName );
