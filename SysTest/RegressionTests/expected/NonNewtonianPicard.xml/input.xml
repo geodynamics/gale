@@ -485,8 +485,8 @@
   <element type="param" name="pressureMesh">constantMesh</element>
   <element type="list" name="FieldVariablesToCheckpoint">
     <element type="param">VelocityField</element>
-    <element type="param">TemperatureField</element>
-    <element type="param">TemperatureField-phiDotField</element>
+    <element type="param">PressureField</element>
+    <element type="param">VelocityGradientsField</element>
   </element>
   <element type="param" name="maxTimeSteps">10</element>
   <element type="param" name="outputPath">./expected/NonNewtonianPicard.xml</element>
