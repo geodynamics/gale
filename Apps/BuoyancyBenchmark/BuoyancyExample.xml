@@ -8,9 +8,18 @@
 	</list>
 
 	<list name="plugins" mergeType="Replace">
-		<!--param>Underworld_MovingMesh</param-->
-		<param>StgFEM_StandardConditionFunctions</param>	
-		<!--param>Experimental_PressureCalibration</param-->	
+		<struct>
+			<param name="Type">StgFEM_FrequentOutput</param>
+			<param name="Context">context</param>
+		</struct>
+		<struct>
+			<param name="Type">StgFEM_CPUTime</param>
+			<param name="Context">context</param>
+		</struct>
+    <struct>
+			<param name="Type">PICellerator_AnalyticPressure</param>
+			<param name="Context">context</param>
+		</struct>
 	</list>
 
 	<!--param name="extensionReferenceHeight">maxY</param-->
@@ -26,15 +35,26 @@
 	<include>PICellerator/StokesFlowUzawa.xml </include>
 	<!--include>Underworld/StokesFlowUzawaCompressible.xml </include-->
 
-	<list name="plugins" mergeType="merge">
-		<!-- Output Plugins -->
-		<param>StgFEM_FrequentOutput</param>	
-		<param>StgFEM_CPUTime</param>
-	</list>
-        <param name="gravity">9.81</param>
+  <param name="gravity">9.81</param>
+
+  <struct name="pluginData">
+		<list name="NumericFields">
+			<param>PressureField</param> <param>0</param>
+		</list> 
+		<param name="IntegrationSwarm">gaussSwarm</param>
+		<param name="ConstantMesh">constantMesh</param>
+		<param name="ElementMesh">linearMesh</param>
+		<param name="normaliseByAnalyticSolution">true</param>
+		<param name="useReferenceSolutionFromFile">false</param>
+		<param name="appendToAnalysisFile">false</param>
+		<param name="Context">context</param>
+	</struct>
 
 	<!-- Rheology Components -->
 	<struct name="components" mergeType="merge">
+    <struct name="context">
+			<param name="Type">PICelleratorContext</param>
+		</struct>
 		<struct name="buoyancyForceTerm">
 			<param name="Type">BuoyancyForceTerm</param>
 			<param name="ForceVector">mom_force</param>
@@ -80,9 +100,9 @@
 			<param name="density">1.36</param>
 		</struct>
 
-                <struct name="materialSwarmParticleLayout" mergeType="replace">
-		         <param name="Type">GaussParticleLayout</param>
-		</struct>
+  <struct name="materialSwarmParticleLayout" mergeType="replace">
+    <param name="Type">GaussParticleLayout</param>
+  </struct>
 										
 	</struct>
 
@@ -109,7 +129,7 @@
 	<param name="elementResJ"> 50 </param>
 	<param name="elementResK"> 1 </param>
 	<param name="shadowDepth"> 1 </param>
-   	<param name="minX"> 0.0 </param>
+  <param name="minX"> 0.0 </param>
 	<param name="minY"> 0.0 </param>
 	<param name="minZ"> 0.0 </param>
 	<param name="maxX"> 1.0 </param>
@@ -118,7 +138,7 @@
 	<param name="allowUnbalancing"> True </param>
 
 	<!-- Set up BCs and ICs -->
-        <include>velocityBCs.freeslip.xml</include>
+  <include>PICellerator/velocityBCs.freeslip.xml</include>
 	
 </StGermainData>
 

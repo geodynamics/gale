@@ -83,8 +83,9 @@ env.PCUTest('tests/testPICellerator', suites,
             PROJECT="PICellerator")
 
 # Build plugins.
-dirs = Split('libPICellerator/Toolbox plugins/CalculateParticleDisplacement ' \
-                 'plugins/Output/MaterialCentroid')
+dirs = ['libPICellerator/Toolbox plugins/CalculateParticleDisplacement',
+        'plugins/Output/MaterialCentroid',
+        'SysTest/AnalyticPlugins/AnalyticPressure' ]
 for d in dirs:
 
     name = 'PICellerator_' + d.split('/')[-1] + 'module'
