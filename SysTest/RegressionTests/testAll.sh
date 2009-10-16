@@ -25,3 +25,7 @@
 ./analyticTest.pl AnalyticSinusoid.xml -optionsFile as-np-1.dat
 ./analyticTest.pl AnalyticSinusoid.xml -optionsFile as-np-2.dat
 ./analyticTest.pl AnalyticSinusoid.xml -optionsFile as-np-4.dat
+./analyticTest.pl TempDiffusion.xml -optionsFile np-1.dat
+./analyticTest.pl TempDiffusion.xml -optionsFile np-2.dat
+./analyticTest.pl TempDiffusion.xml -optionsFile np-4.dat
+./analyticTest.pl TempDiffusion.xml -optionsFile np-8.dat
