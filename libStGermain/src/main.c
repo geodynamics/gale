@@ -155,7 +155,7 @@ void stgMainDestroy( Stg_ComponentFactory* cf ) {
 	/* Destruct phase ---------------------------------------------------------------------------------------------------*/
 	Stg_ComponentFactory_DestroyComponents( cf, NULL );
 	cf->LCRegister->componentList->count = 0;
-	Stg_Class_Delete( cf->LCRegister->componentList );
+	Stg_Class_Delete( cf->LCRegister );
 	_Stg_Class_Delete( cf );
 }
 
