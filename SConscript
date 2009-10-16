@@ -110,7 +110,8 @@ dirs = ['libUnderworld/Toolbox',
         'SysTest/AnalyticPlugins/Velic_solCx',
         'SysTest/AnalyticPlugins/Velic_solHA',
         'SysTest/AnalyticPlugins/Velic_solKz',
-        'SysTest/AnalyticPlugins/Velic_solS']
+        'SysTest/AnalyticPlugins/Velic_solS',
+        'SysTest/AnalyticPlugins/LateralViscosityAnalytic']
 for d in dirs:
 
     name = 'Underworld_' + d.split('/')[-1] + 'module'
