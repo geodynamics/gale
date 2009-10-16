@@ -87,9 +87,10 @@ dirs = ['libStgFEM/Toolbox',
      'plugins/StandardConditionFunctions',
      'SysTest/AnalyticPlugins/CosineHillRotate',
      'SysTest/AnalyticPlugins/HomogeneousNaturalBCs',
-     'Apps/TempDiffusion/tests/LinearTemperatureField',
-     'Apps/StokesMomentumUzawa/tests/LinearVelocityAnalytic',
-     'Apps/StokesMomentumUzawa/tests/LidDrivenIsoviscousAnalytic',
+     'SysTest/AnalyticPlugins/AdvDiffSteadyState1D',
+     'SysTest/AnalyticPlugins/LidDrivenIsoviscousAnalytic',
+     'SysTest/AnalyticPlugins/LinearVelocityAnalytic',
+     'SysTest/AnalyticPlugins/LinearTemperatureField',
      'Apps/StokesMomentumUzawa/tests/SimpleShearAnalytic',
      'Apps/StokesMomentumUzawa/tests/LidDrivenStokesAnalytic']
 pl_objs = []
