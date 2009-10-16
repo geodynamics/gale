@@ -22,6 +22,8 @@ typedef struct {
 
 const Type NonNewtonianShearSolution_Type = "NonNewtonianShearSolution";
 
+double NonNewtonianShearSolution_Dt( FiniteElementContext* context ) { return 0.01; }
+
 void NonNewtonianShearSolution_VelocityFunction( void* analyticSolution, double* coord, double* velocity ) {
 	NonNewtonianShearSolution*   self = (NonNewtonianShearSolution*)analyticSolution;
 	double                       height;
@@ -127,6 +129,7 @@ void _NonNewtonianShearSolution_Construct( void* analyticSolution, Stg_Component
 
 	/* Set Velocity Stuff */
 	EP_AppendClassHook( Context_GetEntryPoint( context, AbstractContext_EP_UpdateClass ), NonNewtonianShearSolution_UpdateVelocityBC, self );
+	EP_AppendClassHook( Context_GetEntryPoint( context, FiniteElementContext_EP_CalcDt ), NonNewtonianShearSolution_Dt, context );
 	self->velocityTopOfBox = Stg_ComponentFactory_GetRootDictDouble( cf, "velocityTopOfBox", 0.5 );
 }
 
