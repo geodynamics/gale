@@ -83,8 +83,7 @@ env.PCUTest('tests/testPICellerator', suites,
             PROJECT="PICellerator")
 
 # Build plugins.
-dirs = ['libPICellerator/Toolbox',
-        'plugins/CalculateParticleDisplacement',
+dirs = ['libPICellerator/Toolbox', 'plugins/CalculateParticleDisplacement',
         'plugins/Output/MaterialCentroid',
         'SysTest/AnalyticPlugins/AnalyticPressure' ]
 for d in dirs:
