@@ -1,0 +1,1 @@
+./lidDrivenAnalytic.xml --AnalyticVelocityWavenumber=1 --journal-level.info.StG_FEM_CompareFeVariables=1 --maxTimeSteps=2
