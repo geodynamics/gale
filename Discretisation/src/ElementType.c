@@ -123,8 +123,6 @@ void _ElementType_Init(
 
 void _ElementType_Destroy( void* elementType, void* data ){
 	ElementType* self = (ElementType*)elementType;
-
-	Stg_Component_Destroy( self, data, False );
 }
 
 void _ElementType_Delete( void* elementType ) {

@@ -174,7 +174,8 @@ void _ElementType_Register_Delete( void* elementType_Register ) {
 		ElementType_Index elementType_I;
 		
 		for( elementType_I = 0; elementType_I < self->count; elementType_I++ ) {
-			_Stg_Object_Delete( self->elementType[elementType_I] );
+      self->elementType[elementType_I]->_destroy( self->elementType[elementType_I], NULL );
+      self->elementType[elementType_I]->_delete( self->elementType[elementType_I] );
 		}
 		
 		Memory_Free( self->elementType );
