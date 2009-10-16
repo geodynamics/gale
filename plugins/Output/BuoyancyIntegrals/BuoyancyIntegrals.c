@@ -294,7 +294,7 @@ void perform_integrals( UnderworldContext *context, double *B, double *w_bar, do
 			context->CF->LCRegister,
 			Underworld_BuoyancyIntegrals_Type );
 	
-	velocityField = (FeVariable*)LiveComponentRegister_Get( context->CF->LCRegister, "velocityField" );
+	velocityField = (FeVariable*)LiveComponentRegister_Get( context->CF->LCRegister, "VelocityField" );
 	temperatureField = (FeVariable*)LiveComponentRegister_Get( context->CF->LCRegister, "temperatureField" );
 	gaussSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "gaussSwarm" );
 

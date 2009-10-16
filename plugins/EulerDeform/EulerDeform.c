@@ -155,7 +155,7 @@ void _Underworld_EulerDeform_Build( void* component, void* data ) {
 			    sys->dispField = Stg_ComponentFactory_ConstructByName( uwCtx->CF, name, FeVariable, True, data );
 			else
 			    sys->dispField = NULL;
-			velFieldName = Dictionary_GetString( sysDict, "velocityField" );
+			velFieldName = Dictionary_GetString( sysDict, "VelocityField" );
 			sys->interval = Dictionary_GetInt_WithDefault( sysDict, "interval", -1 );
 			sys->wrapTop = Dictionary_GetBool_WithDefault( sysDict, "wrapTop", False );
 			sys->wrapBottom = Dictionary_GetBool_WithDefault( sysDict, "wrapBottom", False );

@@ -6,31 +6,7 @@
 	<include> Underworld/BaseApps/LidDrivenPIC.xml </include>
 	
 	<list name="plugins" mergeType="merge">
-
-
-
 		<struct>
-			<param name="Type">StgFEM_FrequentOutput</param>
-			<param name="Context">context</param>
-		</struct>
-		
-		<!--
-		<struct>
-			<param name="Type">Underworld_testYieldCriterion</param>
-			<param name="Context">context</param>
-		</struct>
-		-->
-		<struct>
-			<param name="Type">StgFEM_CPUTime</param>
-			<param name="Context">context</param>
-		</struct>
-		<struct>
-			<param name="Type">Underworld_Vrms</param>
-			<param name="Context">context</param>
-			<param name="GaussSwarm">gaussSwarm</param>
-			<param name="VelocityField">VelocityField</param>
-		</struct>
-				<struct>
 			<param name="Type">Underworld_EulerDeform</param>
 			<param name="Context">context</param>
 		</struct>
@@ -47,11 +23,11 @@
 		<list name="systems">
 			<struct>
 				<param name="mesh"> constantMesh </param>
-				<param name="velocityField"> VelocityField </param>
+				<param name="VelocityField"> VelocityField </param>
 			</struct>
 			<struct>
 				<param name="mesh"> linearMesh </param>
-				<param name="velocityField"> VelocityField </param>
+				<param name="VelocityField"> VelocityField </param>
 			</struct>
 		</list>
 	</struct>
@@ -87,7 +63,7 @@
 	</struct>
 
 	<!-- Simulation control -->
-	<param name="maxTimeSteps"> 15 </param>
+	<param name="maxTimeSteps"> 14 </param>
 	<param name="outputPath"> ./output </param>
 	<param name="dumpEvery"> 1 </param>	
 
@@ -114,10 +90,12 @@
 	<param name="maxY"> 1.0 </param>
 	<param name="maxZ"> 1.0 </param>
 	<param name="allowUnbalancing"> True </param>
-	
+	<param name="outputFlattenedXML">false</param>	
 	<param name="particlesPerCell"> 20 </param>
 
 	<!-- Set up BCs and ICs -->
+	<param name="leftWallVelocity" > +0.5 </param>
+	<param name="rightWallVelocity"> -0.5 </param>
 	<include> ./velocityBCs.incompressible.xml </include>
  
 	<!--

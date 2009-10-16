@@ -103,7 +103,7 @@ Index Underworld_Mobility_Register( PluginsManager* pluginsManager ) {
 void Underworld_Mobility_Setup( void* _context ) {
 	UnderworldContext*                context       = (UnderworldContext*) _context;
 	Swarm* gaussSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "gaussSwarm" );
-	FeVariable* velocityField = (FeVariable*)LiveComponentRegister_Get( context->CF->LCRegister, "velocityField" );
+	FeVariable* velocityField = (FeVariable*)LiveComponentRegister_Get( context->CF->LCRegister, "VelocityField" );
 
 	Underworld_Mobility* self;
 

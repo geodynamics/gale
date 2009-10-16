@@ -6,6 +6,9 @@
 	<include>testYieldCriterion.xml</include>
 
 	<struct name="components" mergeType="merge">
+		<struct name="context">
+			<param name="Type">UnderworldContext</param>
+		</struct>
 		<struct name="uzawa" mergeType="merge">
 			<param name="tolerance" mergeType="replace">1.0e-4</param>
 		</struct>

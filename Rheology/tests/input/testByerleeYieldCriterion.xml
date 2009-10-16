@@ -6,6 +6,9 @@
 	<include>testYieldCriterion.xml</include>
 
 	<struct name="components" mergeType="merge">
+		<struct name="context">
+			<param name="Type">UnderworldContext</param>
+		</struct>	
 		<!-- these parameters mean that the top half of the box should yield -->
 		<struct name="yieldRheology">
 			<param name="Type">Byerlee</param>
@@ -13,7 +16,6 @@
 			<param name="FeMesh">linearMesh</param>
 			<param name="cohesion">2</param>
 			<param name="depthCoefficient">0.533333333333333</param>
-		</struct>	
+		</struct>
 	</struct>
-
 </StGermainData>
