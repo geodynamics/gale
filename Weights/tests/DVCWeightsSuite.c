@@ -107,33 +107,49 @@ void DVCWeightsSuite_Teardown( DVCWeightsSuiteData* data ) {
 
 /* Do the testing of the 3D functions*/
 void DVCWeightsSuite_TestConstructGrid( DVCWeightsSuiteData* data ) {
+   FILE *fp;
    unsigned int   ii=0;
-   Stream*        stream = Journal_Register( Info_Type, "TestConstructGrid" );
    const char*    gridFilename = "DVCWeightsSuite_testConstructGrid.txt";
    char           expectedGridFilename[PCU_PATH_MAX];
-   
+   //int passed=0;
+   char line[100];
+   float x,y,z,dx,dy,dz;
+   int N,S,E,W,U,D;
+   float tol=1e-6;
    /* We'll use an expected file for this test, as visual checking of the correct parameters is probably
     *  most logical way to maintain it */
-   Stream_RedirectFile( stream, gridFilename );
 
    _DVCWeights_ConstructGrid(&data->cells, data->numz, data->numy, data->numx, BBXMIN,BBYMIN,BBZMIN,BBXMAX,BBYMAX,BBZMAX);		
-   
-   /* Print out the grid */
-   for (ii = 0; ii < (data->numx * data->numy * data->numz); ii++ ) {
-      pcu_check_true( data->cells[ii].p == -1 );   /* Particle index: shouldn't be set up yet */
-      pcu_check_true( data->cells[ii].done == 0 );
-
-      Journal_Printf(stream, "cell[%d]\n", ii);
-      Journal_Printf(stream, " \t\tValues: (N: %d, S: %d, E: %d, W: %d, U: %d, D: %d) \n", 
-            data->cells[ii].N, data->cells[ii].S, data->cells[ii].E, data->cells[ii].W,
-            data->cells[ii].U, data->cells[ii].D );
-      Journal_Printf(stream, " \t\tCoords: (%f, %f,%f) \n", 
-            data->cells[ii].x, data->cells[ii].y, data->cells[ii].z );
+   pcu_filename_expected( gridFilename, expectedGridFilename );/* get the expected filename to open */
+   fp=fopen(expectedGridFilename,"r");
+   if(!fp){
+     pcu_check_true(0);
+     Journal_Firewall( 0 , Journal_Register(Error_Type, "DVCWeightsSuite_TestConstructGrid"),"expected test File %s Not Found in function %s\n" ,expectedGridFilename, __func__);
    }
-
-   pcu_filename_expected( gridFilename, expectedGridFilename );
-   pcu_check_fileEq( gridFilename, expectedGridFilename );
-   remove( gridFilename );
+   else{
+     /* Print out the grid */
+     for (ii = 0; ii < (data->numx * data->numy * data->numz); ii++ ) {
+       pcu_check_true( data->cells[ii].p == -1 );   /* Particle index: shouldn't be set up yet */
+       pcu_check_true( data->cells[ii].done == 0 );
+       fgets(line,100,fp);  fgets(line,100,fp);
+       sscanf(line,"\t\tValues: (N: %d, S: %d, E: %d, W: %d, U: %d, D: %d)\n",&N,&S,&E,&W,&U,&D);
+       pcu_check_true( data->cells[ii].N == N );
+       pcu_check_true( data->cells[ii].S == S );
+       pcu_check_true( data->cells[ii].E == E );
+       pcu_check_true( data->cells[ii].W == W );
+       pcu_check_true( data->cells[ii].U == U );
+       pcu_check_true( data->cells[ii].D == D );
+       fgets(line,100,fp);
+       sscanf(line,"\t\tCoords: ( %f, %f, %f)\n",&x,&y,&z);
+       dx = (data->cells[ii].x - x)*(data->cells[ii].x - x); 
+       dy = (data->cells[ii].y - y)*(data->cells[ii].y - y); 
+       dz = (data->cells[ii].z - z)*(data->cells[ii].z - z); 
+       pcu_check_true( dx < tol );
+       pcu_check_true( dy < tol );
+       pcu_check_true( dz < tol );
+     }
+   }
+   fclose(fp);
 }
 
 
@@ -241,16 +257,17 @@ void DVCWeightsSuite_TestCreateVoronoi( DVCWeightsSuiteData* data ) {
 
 
 void DVCWeightsSuite_TestGetCentroids( DVCWeightsSuiteData* data ) {
+   FILE *fp;
    unsigned int   i;
-   Stream*        stream = Journal_Register( Info_Type, "TestGetCentroids" );
    const char*    centroidsFilename = "DVCWeightsSuite_testGetCentroids.txt";
    char           expectedCentroidsFilename[PCU_PATH_MAX];
-   
+   char line[100];
+   float x,y,z,dx,dy,dz;
+   float tol=1e-6;
    /* We'll use an expected file for this test, as visual checking of the correct parameters is probably
     *  most logical way to maintain it */
-   Stream_RedirectFile( stream, centroidsFilename );
-
-   _DVCWeights_ConstructGrid(&data->cells, data->numz, data->numy, data->numx, BBXMIN,BBYMIN,BBZMIN,BBXMAX,BBYMAX,BBZMAX);		
+   
+   _DVCWeights_ConstructGrid(&data->cells, data->numz, data->numy, data->numx, BBXMIN,BBYMIN,BBZMIN,BBXMAX,BBYMAX,BBZMAX);
    _DVCWeights_InitialiseStructs( &data->bchain, &data->pList, data->nump);
    _DVCWeightsSuite_InitialiseParticleCoords( data );
    _DVCWeights_CreateVoronoi( &data->bchain, &data->pList, &data->cells, data->dx, data->dy, data->dz,
@@ -258,18 +275,41 @@ void DVCWeightsSuite_TestGetCentroids( DVCWeightsSuiteData* data ) {
 
    _DVCWeights_GetCentroids( data->cells, data->pList,data->numz,data->numy,data->numx,data->nump,data->da);
 
-   for (i = 0; i < data->nump; i++) {
-      Journal_Printf( stream, "data->pList[%d]:\n", i);
-      Journal_Printf( stream, "\t\t coords: (x, y, z) = (%f, %f, %f)\n",
-         data->pList[i].x, data->pList[i].y, data->pList[i].z);
-      Journal_Printf( stream, "\t\t centroids: (cx, cy, cz) = (%f, %f, %f)\n",
-         data->pList[i].cx, data->pList[i].cy, data->pList[i].cz);
-      Journal_Printf( stream, "\t\t weight = %f\n", data->pList[i].w);
+   pcu_filename_expected(centroidsFilename, expectedCentroidsFilename);/* get the expected filename to open */
+   fp=fopen(expectedCentroidsFilename,"r");
+   if(!fp){
+     pcu_check_true(0);
+     Journal_Firewall( 0 , Journal_Register(Error_Type, "DVCWeightsSuite_TestGetCentroids"),"expected test File %s Not Found in function %s\n" ,expectedCentroidsFilename, __func__);
    }
+   else{
+     for (i = 0; i < data->nump; i++) {
+       fgets(line,100,fp);
+    
+       fgets(line,100,fp);
+       sscanf(line,"\t\tcoords: (x, y, z) = ( %f, %f, %f)\n",&x,&y,&z);
+       dx = (data->pList[i].x -x)*(data->pList[i].x -x);
+       dy = (data->pList[i].y -y)*(data->pList[i].y -y);
+       dz = (data->pList[i].z -z)*(data->pList[i].z -z);
+       pcu_check_true( dx < tol );
+       pcu_check_true( dy < tol );
+       pcu_check_true( dz < tol );
 
-   pcu_filename_expected( centroidsFilename, expectedCentroidsFilename );
-   pcu_check_fileEq( centroidsFilename, expectedCentroidsFilename );
-   remove( centroidsFilename );
+       fgets(line,100,fp);
+       sscanf(line,"\t\tcentroids: (cx, cy, cz) = ( %f, %f, %f)\n",&x,&y,&z);
+       dx = (data->pList[i].cx -x)*(data->pList[i].cx -x);
+       dy = (data->pList[i].cy -y)*(data->pList[i].cy -y);
+       dz = (data->pList[i].cz -z)*(data->pList[i].cz -z);
+       pcu_check_true( dx < tol );
+       pcu_check_true( dy < tol );
+       pcu_check_true( dz < tol );
+       
+       fgets(line,100,fp);
+       sscanf(line,"\t\tweight = %f\n",&x);
+       dx = (data->pList[i].w -x)*(data->pList[i].w -x);
+       pcu_check_true( dx < tol );
+     }
+   }
+   fclose(fp);
 }
 
 
@@ -291,30 +331,43 @@ void DVCWeightsSuite_TestDistanceSquared( DVCWeightsSuiteData* data ) {
 /* 2D Functions */
 
 void DVCWeightsSuite_TestConstructGrid2D( DVCWeightsSuiteData* data ) {
+   FILE *fp;
    unsigned int   ii=0;
-   Stream*        stream = Journal_Register( Info_Type, "TestConstructGrid2D" );
    const char*    gridFilename = "DVCWeightsSuite_testConstructGrid2D.txt";
    char           expectedGridFilename[PCU_PATH_MAX];
-   
-   Stream_RedirectFile( stream, gridFilename );
+   char line[100];
+   float x,y,dx,dy;
+   int N,S,E,W;
+   float tol=1e-6;
 
    _DVCWeights_ConstructGrid2D(&data->cells2D,data->numy,data->numx, BBXMIN,BBYMIN,BBXMAX,BBYMAX);		
-   
-   /* Print out the grid */
-   for (ii = 0; ii < (data->numx * data->numy ); ii++ ) {
-      pcu_check_true( data->cells2D[ii].p == -1 );   /* Particle index: shouldn't be set up yet */
-      pcu_check_true( data->cells2D[ii].done == 0 );
 
-      Journal_Printf(stream, "cell[%d]\n", ii);
-      Journal_Printf(stream, " \t\tValues: (N: %d, S: %d, E: %d, W: %d) \n", 
-            data->cells2D[ii].N, data->cells2D[ii].S, data->cells2D[ii].E, data->cells2D[ii].W );
-      Journal_Printf(stream, " \t\tCoords: (%f, %f)\n", 
-            data->cells2D[ii].x, data->cells2D[ii].y );			
+   pcu_filename_expected( gridFilename, expectedGridFilename );/* get the expected filename to open */
+   fp=fopen(expectedGridFilename,"r");
+   if(!fp){
+     pcu_check_true(0);
+     Journal_Firewall( 0 , Journal_Register(Error_Type, "DVCWeightsSuite_TestConstructGrid2D"),"expected test File %s Not Found in function %s\n" ,expectedGridFilename, __func__);
    }
-
-   pcu_filename_expected( gridFilename, expectedGridFilename );
-   pcu_check_fileEq( gridFilename, expectedGridFilename );
-   remove( gridFilename );
+   else{
+     /* Print out the grid */
+     for (ii = 0; ii < (data->numx * data->numy); ii++ ) {
+       pcu_check_true( data->cells2D[ii].p == -1 );   /* Particle index: shouldn't be set up yet */
+       pcu_check_true( data->cells2D[ii].done == 0 );
+       fgets(line,100,fp);  fgets(line,100,fp);
+       sscanf(line,"\t\tValues: (N: %d, S: %d, E: %d, W: %d)\n",&N,&S,&E,&W);
+       pcu_check_true( data->cells2D[ii].N == N );
+       pcu_check_true( data->cells2D[ii].S == S );
+       pcu_check_true( data->cells2D[ii].E == E );
+       pcu_check_true( data->cells2D[ii].W == W );
+       fgets(line,100,fp);
+       sscanf(line,"\t\tCoords: ( %f, %f)\n",&x,&y);
+       dx = (data->cells2D[ii].x - x)*(data->cells2D[ii].x - x); 
+       dy = (data->cells2D[ii].y - y)*(data->cells2D[ii].y - y); 
+       pcu_check_true( dx < tol );
+       pcu_check_true( dy < tol );
+     }
+   }
+   fclose(fp);
 }
 
 void DVCWeightsSuite_TestInitialiseStructs2D( DVCWeightsSuiteData* data ) {
@@ -407,12 +460,13 @@ void DVCWeightsSuite_TestCreateVoronoi2D( DVCWeightsSuiteData* data ) {
 
 
 void DVCWeightsSuite_TestGetCentroids2D( DVCWeightsSuiteData* data ) {
+   FILE *fp;
    unsigned int   i;
-   Stream*        stream = Journal_Register( Info_Type, "TestGetCentroids2D" );
    const char*    centroidsFilename = "DVCWeightsSuite_testGetCentroids2D.txt";
    char           expectedCentroidsFilename[PCU_PATH_MAX];
-
-   Stream_RedirectFile( stream, centroidsFilename );
+   char line[100];
+   float x,y,dx,dy;
+   float tol=1e-6;
 
    _DVCWeights_ConstructGrid2D(&data->cells2D,data->numy,data->numx, BBXMIN,BBYMIN,BBXMAX,BBYMAX);
    _DVCWeights_InitialiseStructs2D( &data->bchain2D, &data->pList2D, data->nump2D);   
@@ -422,18 +476,38 @@ void DVCWeightsSuite_TestGetCentroids2D( DVCWeightsSuiteData* data ) {
 
    _DVCWeights_GetCentroids2D( data->cells2D, data->pList2D,data->numy,data->numx,data->nump2D,data->da2D);
 
-   for (i = 0; i < data->nump2D; i++) {
-      Journal_Printf( stream, "data->pList2D[%d]:\n", i);
-      Journal_Printf( stream, "\t\t coords: (x, y) = (%f, %f)\n",
-         data->pList2D[i].x, data->pList2D[i].y);
-      Journal_Printf( stream, "\t\t centroids: (cx, cy) = (%f, %f)\n",
-         data->pList2D[i].cx, data->pList2D[i].cy);
-      Journal_Printf( stream, "\t\t weight = %f\n", data->pList2D[i].w);
-   }
-
    pcu_filename_expected( centroidsFilename, expectedCentroidsFilename );
-   pcu_check_fileEq( centroidsFilename, expectedCentroidsFilename );
-   remove( centroidsFilename );
+    fp=fopen(expectedCentroidsFilename,"r");
+   if(!fp){
+     pcu_check_true(0);
+     Journal_Firewall( 0 , Journal_Register(Error_Type, "DVCWeightsSuite_TestGetCentroids2D"),"expected test File %s Not Found in function %s\n" ,expectedCentroidsFilename, __func__);
+   }
+   else{
+
+     for (i = 0; i < data->nump2D; i++) {
+       fgets(line,100,fp);
+    
+       fgets(line,100,fp);
+       sscanf(line,"\t\tcoords: (x, y) = ( %f, %f)\n",&x,&y);
+       dx = (data->pList2D[i].x -x)*(data->pList2D[i].x -x);
+       dy = (data->pList2D[i].y -y)*(data->pList2D[i].y -y);
+       pcu_check_true( dx < tol );
+       pcu_check_true( dy < tol );
+
+       fgets(line,100,fp);
+       sscanf(line,"\t\tcentroids: (cx, cy) = ( %f, %f)\n",&x,&y);
+       dx = (data->pList2D[i].cx -x)*(data->pList2D[i].cx -x);
+       dy = (data->pList2D[i].cy -y)*(data->pList2D[i].cy -y);
+       pcu_check_true( dx < tol );
+       pcu_check_true( dy < tol );
+       
+       fgets(line,100,fp);
+       sscanf(line,"\t\tweight = %f\n",&x);
+       dx = (data->pList2D[i].w -x)*(data->pList2D[i].w -x);
+       pcu_check_true( dx < tol );
+     }
+   }
+   fclose(fp);
 }
 
 
