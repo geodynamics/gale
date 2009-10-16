@@ -2335,6 +2335,7 @@ static Dictionary_MergeType _XML_IO_Handler_GetMergeType( XML_IO_Handler* self, 
 				XML_IO_Handler_MergeTypeMap[defaultMergeType] );
 			mergeType = defaultMergeType;
 		}
+    Memory_Free( spaceStrippedMergeType );
 	}
 	else {
 		mergeType = defaultMergeType;
