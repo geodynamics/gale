@@ -96,7 +96,7 @@ void ParticleCoordsSuite_TestLineParticle( ParticleCoordsSuiteData* data ) {
 
 		Swarm_PrintParticleCoords( swarm, stream );
 
-		pcu_filename_expected( "testLineParticleLayout.0of1.output.dat.expected", expected_file );
+		pcu_filename_expected( "testLineParticleLayoutOutput.expected", expected_file );
 		pcu_check_fileEq( "linearParticle.dat", expected_file );
 
 		/* Destroy stuff */
