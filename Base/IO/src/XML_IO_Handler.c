@@ -826,7 +826,6 @@ static void _XML_IO_Handler_ValidateFile( XML_IO_Handler* self, const char* file
 	} else {
 		fprintf( stderr, "unable to open %s\n", filename );
 	}
-	xmlFreeTextReader( reader );
 	#endif
 	#endif
     //xmlFree ( reader );
