@@ -1,0 +1,398 @@
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**
+** Copyright (C), 2003-2006, Victorian Partnership for Advanced Computing (VPAC) Ltd, 110 Victoria Street,
+**	Melbourne, 3053, Australia.
+**
+** Primary Contributing Organisations:
+**	Victorian Partnership for Advanced Computing Ltd, Computational Software Development - http://csd.vpac.org
+**	Australian Computational Earth Systems Simulator - http://www.access.edu.au
+**	Monash Cluster Computing - http://www.mcc.monash.edu.au
+**	Computational Infrastructure for Geodynamics - http://www.geodynamics.org
+**
+** Contributors:
+**	Patrick D. Sunter, Software Engineer, VPAC. (pds@vpac.org)
+**	Robert Turnbull, Research Assistant, Monash University. (robert.turnbull@sci.monash.edu.au)
+**	Stevan M. Quenette, Senior Software Engineer, VPAC. (steve@vpac.org)
+**	David May, PhD Student, Monash University (david.may@sci.monash.edu.au)
+**	Louis Moresi, Associate Professor, Monash University. (louis.moresi@sci.monash.edu.au)
+**	Luke J. Hodkinson, Computational Engineer, VPAC. (lhodkins@vpac.org)
+**	Alan H. Lo, Computational Engineer, VPAC. (alan@vpac.org)
+**	Raquibul Hassan, Computational Engineer, VPAC. (raq@vpac.org)
+**	Julian Giordani, Research Assistant, Monash University. (julian.giordani@sci.monash.edu.au)
+**	Vincent Lemiale, Postdoctoral Fellow, Monash University. (vincent.lemiale@sci.monash.edu.au)
+**
+**  This library is free software; you can redistribute it and/or
+**  modify it under the terms of the GNU Lesser General Public
+**  License as published by the Free Software Foundation; either
+**  version 2.1 of the License, or (at your option) any later version.
+**
+**  This library is distributed in the hope that it will be useful,
+**  but WITHOUT ANY WARRANTY; without even the implied warranty of
+**  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+**  Lesser General Public License for more details.
+**
+**  You should have received a copy of the GNU Lesser General Public
+**  License along with this library; if not, write to the Free Software
+**  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+**
+** $Id: testSUPGShapeFunc.c.removed 985 2007-11-21 00:20:24Z MirkoVelic $
+**
+**~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+#include <mpi.h>
+#include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
+#include "StgFEM/Discretisation/Discretisation.h"
+#include "StgFEM/SLE/LinearAlgebra/LinearAlgebra.h"
+#include "StgFEM/SLE/SystemSetup/SystemSetup.h"
+#include "StgFEM/SLE/ProvidedSystems/AdvectionDiffusion/AdvectionDiffusion.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct Node Node;
+typedef struct Element Element;
+
+struct Node {
+	double velocity[3];
+};
+
+struct Element {
+	__FiniteElement_Element
+};
+
+struct _Particle {
+	Coord coord;
+};
+
+void PutParticlesOnBoundary( Swarm* swarm, double value, Dimension_Index boundaryAxis, Dimension_Index valueAxis ) {
+	Particle_InCellIndex       cParticle_I;
+	for ( cParticle_I = 0 ; cParticle_I < swarm->cellParticleCountTbl[ 0 ] ; cParticle_I++ ) {
+		IntegrationPoint*          particle = (IntegrationPoint*)Swarm_ParticleInCellAt( swarm, 0, cParticle_I );
+
+		particle->xi[boundaryAxis] = 2.0 * (double)cParticle_I/(double)(swarm->cellParticleCountTbl[ 0 ] - 1) - 1.0;
+		particle->xi[valueAxis]    = value;
+	}
+}
+void CheckShapeFunc( AdvectionDiffusionSLE* advDiffSLE, AdvDiffResidualForceTerm* residualForceTerm, Swarm* gaussSwarm, Element_Index lElement_I, Dimension_Index dim, FeMesh* feMesh, Stream* stream ) {
+	double**                   shapeFunc;
+	Node_Index                 nodeCount;
+	ElementType*               elementType;
+	Particle_InCellIndex       cParticle_I;
+	Cell_Index                 cell_I;
+	IntegrationPoint*          particle;
+	double                     Ni[8];
+	Node_DomainIndex           node_I;
+
+	shapeFunc = AdvDiffResidualForceTerm_BuildSUPGShapeFunctions( residualForceTerm, advDiffSLE, gaussSwarm, lElement_I, dim );
+
+	/* Print Shape Funcions */
+	cell_I = CellLayout_MapElementIdToCellId( gaussSwarm->cellLayout, lElement_I );
+	elementType = FeMesh_GetElementType( feMesh, lElement_I );
+	nodeCount = elementType->nodeCount;
+	for ( node_I = 0 ; node_I < nodeCount ; node_I++ ) {
+		unsigned	nodeInd;
+
+		nodeInd = (node_I == 2) ? 3 : (node_I == 3) ? 2 : node_I;
+		for ( cParticle_I = 0 ; cParticle_I < gaussSwarm->cellParticleCountTbl[ cell_I ] ; cParticle_I++ ) {
+			particle = (IntegrationPoint*)Swarm_ParticleInCellAt( gaussSwarm, cell_I, cParticle_I );
+
+			ElementType_EvaluateShapeFunctionsAt( elementType, particle->xi, Ni );
+
+			Journal_Printf( stream, "%12.6g %12.6g %12.6g %12.6g %12.6g\n", (double)node_I, particle->xi[0], particle->xi[1], shapeFunc[ cParticle_I ][ nodeInd ], Ni[ nodeInd ] );
+		}
+	}
+}
+
+
+FeMesh* buildFeMesh( unsigned nDims, unsigned* size, 
+		     double* minCrds, double* maxCrds, 
+		     ExtensionManager_Register* emReg, 
+		     ElementType_Register* etReg )
+{
+	CartesianGenerator*	gen;
+	FeMesh*			feMesh;
+	unsigned		maxDecomp[3] = {0, 1, 1};
+
+	gen = CartesianGenerator_New( "" );
+	gen->shadowDepth = 0;
+	CartesianGenerator_SetDimSize( gen, nDims );
+	CartesianGenerator_SetTopologyParams( gen, size, 0, NULL, maxDecomp );
+	CartesianGenerator_SetGeometryParams( gen, minCrds, maxCrds );
+
+	feMesh = FeMesh_New( "" );
+	Mesh_SetExtensionManagerRegister( feMesh, emReg );
+	Mesh_SetGenerator( feMesh, gen );
+	FeMesh_SetElementFamily( feMesh, "linear" );
+
+	Mesh_SetTopologyDataSize( feMesh, MT_VERTEX, sizeof(Node) );
+	Mesh_SetTopologyDataSize( feMesh, nDims, sizeof(Element) );
+
+	Stg_Component_Build( feMesh, NULL, False );
+	Stg_Component_Initialise( feMesh, NULL, False );
+
+	return feMesh;
+}
+
+
+int main( int argc, char* argv[] ) {
+	MPI_Comm                   CommWorld;
+	int                        rank;
+	int                        numProcessors;
+	int                        procToWatch;
+	Dictionary*                dictionary;
+
+	unsigned	nDims = 2;
+	unsigned	meshSize[3] = {6, 6, 0};
+	double		minCrds[3] = {0.0, 0.0, 0.0};
+	double		maxCrds[3] = {1.2, 2.2, 1.2};
+	FeMesh*		feMesh;
+	unsigned	nDomainVerts;
+	Node*		nodes;
+
+	DofLayout*                 dofs;
+	ElementType_Register*      elementType_Register;
+	ExtensionManager_Register* extensionMgr_Register;
+	FeVariable*                feVariable;
+	Variable_Register*         variableRegister;
+	DomainContext*     context;
+	Node_DomainIndex           node_I;
+	Stream*	                   stream;
+	/* Swarm Stuff */
+	Swarm*                     gaussSwarm;
+	CellLayout*                singleCellLayout;
+	ParticleLayout*            gaussParticleLayout;
+	Dimension_Index            dimExists[] = {True,True,False};
+	/* Advection Diffusion Stuff */
+	AdvectionDiffusionSLE*     advDiffSLE;
+	Element_LocalIndex         lElement_I;
+	Particle_InCellIndex       particlesPerDim[] = {2,2,2};
+	ForceVector*               residual;
+	AdvDiffResidualForceTerm*  residualForceTerm;
+	
+	/* Initialise MPI, get world info */
+	MPI_Init( &argc, &argv );
+	MPI_Comm_dup( MPI_COMM_WORLD, &CommWorld );
+	MPI_Comm_size( CommWorld, &numProcessors );
+	MPI_Comm_rank( CommWorld, &rank );
+	
+	StGermain_Init( &argc, &argv );
+	StgDomain_Init( &argc, &argv );
+	StgFEM_Discretisation_Init( &argc, &argv );
+	StgFEM_SLE_SystemSetup_Init( &argc, &argv );
+	StgFEM_SLE_ProvidedSystems_AdvectionDiffusion_Init( &argc, &argv );
+	MPI_Barrier( CommWorld ); /* Ensures copyright info always come first in output */
+	
+	stream = Journal_Register (Info_Type, "myStream");
+	Stream_RedirectFile( stream, "output/output.dat" );
+
+	if( argc >= 2 ) {
+		procToWatch = atoi( argv[1] );
+	}
+	else {
+		procToWatch = 0;
+	}
+	if( rank == procToWatch ) printf( "Watching rank: %i\n", rank );
+	
+	/* Read input */
+	dictionary = Dictionary_New();
+	Dictionary_Add( dictionary, "rank", Dictionary_Entry_Value_FromUnsignedInt( rank ) );
+	Dictionary_Add( dictionary, "numProcessors", Dictionary_Entry_Value_FromUnsignedInt( numProcessors ) );
+	Dictionary_Add( dictionary, "gaussParticlesX", Dictionary_Entry_Value_FromUnsignedInt( 2 ) );
+	Dictionary_Add( dictionary, "gaussParticlesY", Dictionary_Entry_Value_FromUnsignedInt( 2 ) );
+	
+	/* Create Context */
+	context = _DomainContext_New( 
+			sizeof(DomainContext), 
+			DomainContext_Type, 
+			_DomainContext_Delete, 
+			_DomainContext_Print,
+			NULL,
+			NULL,
+			NULL,
+			NULL,
+			NULL,
+			NULL,
+			NULL,
+			"domainContext",
+			True,
+			NULL,
+			0,0,
+			CommWorld, dictionary );
+	
+	/* create the layout, dof and mesh to use */
+	extensionMgr_Register = ExtensionManager_Register_New();
+	elementType_Register = ElementType_Register_New("elementTypeRegister");
+	ElementType_Register_Add( elementType_Register, (ElementType*)ConstantElementType_New("constantElementType") );
+	ElementType_Register_Add( elementType_Register, (ElementType*)BilinearElementType_New("BilinearElementType") );
+	ElementType_Register_Add( elementType_Register, (ElementType*)TrilinearElementType_New("TrilinearElementType") );
+
+	feMesh = buildFeMesh( nDims, meshSize, minCrds, maxCrds, 
+			      extensionMgr_Register, elementType_Register );
+	nDomainVerts = Mesh_GetDomainSize( feMesh, MT_VERTEX );
+	nodes = Mesh_GetTopologyData( feMesh, MT_VERTEX );
+	
+	/* Create variable register */
+	variableRegister = Variable_Register_New();
+	
+	/* Create variables */
+	Variable_NewVector( 
+		"velocity", 
+		Variable_DataType_Double, 
+		3, 
+		&nDomainVerts, 
+		NULL, 
+		(void**)&nodes, 
+		variableRegister, 
+		"vx", 
+		"vy", 
+		"vz" );
+
+
+	dofs = DofLayout_New( "dofLayout", variableRegister, nDomainVerts, NULL );
+	for (node_I = 0; node_I < nDomainVerts; node_I++) {
+		DofLayout_AddDof_ByVarName(dofs, "vx", node_I);
+		DofLayout_AddDof_ByVarName(dofs, "vy", node_I);
+	}
+	
+	/* Create the finite element field variable*/
+	feVariable    = FeVariable_New( "VelocityField", feMesh, NULL, dofs, NULL, NULL, NULL, context->dim, False, 
+		StgFEM_Native_ImportExportType, StgFEM_Native_ImportExportType, NULL, NULL,
+		False, False, context->fieldVariable_Register );
+
+	/* Swarm stuff */
+	if ( context->dim == 3 ) 
+		dimExists[K_AXIS] = True;
+
+	/* setup layout for swarm */
+	singleCellLayout    = (CellLayout*)     SingleCellLayout_New( "SingleCellLayout", dimExists, NULL, NULL );
+	gaussParticleLayout = (ParticleLayout*) GaussParticleLayout_New( "GaussParticleLayout", context->dim, particlesPerDim );
+
+	/* construct swarm */
+	gaussSwarm = Swarm_New(  
+			"gaussSwarm",
+			singleCellLayout, 
+			gaussParticleLayout,
+			context->dim,
+			sizeof(IntegrationPoint), 
+			context->extensionMgr_Register, 
+			context->variable_Register, 
+			context->communicator,
+		        NULL	);
+
+	residual = ForceVector_New( 
+			"residual",
+			feVariable,
+			context->dim,
+			context->entryPoint_Register,
+			MPI_COMM_WORLD );
+
+	residualForceTerm = AdvDiffResidualForceTerm_New( 
+			"residualForceTerm",
+			residual,
+			gaussSwarm,
+			NULL,
+			feVariable,
+			NULL /* Diffusivity Variable */,
+			1.0,
+			Exact );
+	
+	/* Create Advection Diffusion Solver */
+	advDiffSLE = AdvectionDiffusionSLE_New( 
+			"TestSLE",
+			NULL,
+			NULL,
+			False,
+			0,
+			0,
+			False,
+			context->entryPoint_Register,
+			context->communicator,
+			feVariable, /* phi field */
+			residual /* Residual Solution Vector */,
+			NULL /* Mass Matrix */,
+			context->dim,
+			0.5,
+			variableRegister,
+			context->fieldVariable_Register );
+			
+	/* Build and initialise system */
+	Stg_Component_Build(dofs, 0, False);
+	Stg_Component_Build( feVariable, 0, False );
+	/* Build Swarm */
+	Stg_Component_Build( singleCellLayout, 0, False );
+	Stg_Component_Build( gaussParticleLayout, 0, False );
+	Stg_Component_Build( gaussSwarm, 0, False );
+	Stg_Component_Build( feMesh, 0, False );
+	Variable_Register_BuildAll(variableRegister);
+	FeEquationNumber_BuildLocationMatrix( feVariable->eqNum );
+
+	Stg_Component_Initialise( feMesh, 0, False );
+	Stg_Component_Initialise( singleCellLayout, 0, False );
+	Stg_Component_Initialise( gaussParticleLayout, 0, False );
+	Stg_Component_Initialise( gaussSwarm, 0, False );
+	Stg_Component_Initialise(dofs, 0, False);
+	Stg_Component_Initialise( feVariable, 0, False );
+	Variable_Update( Variable_Register_GetByName( variableRegister, "vx" ) );
+	Variable_Update( Variable_Register_GetByName( variableRegister, "vy" ) );
+	
+	lElement_I = 0;
+
+	Journal_Printf(stream, "#Checking pure diffusion\n");
+	/* Apply some arbitrary initial conditions */
+	for ( node_I = 0; node_I < nDomainVerts; node_I++ ) {
+		unsigned	d_i;
+
+		for( d_i = 0; d_i < Mesh_GetDimSize( feMesh ); d_i++ ) {
+			nodes[node_I].velocity[d_i] = 0.0;
+		}
+	}
+	residualForceTerm->defaultDiffusivity = 1.0;
+	CheckShapeFunc( advDiffSLE, residualForceTerm, gaussSwarm, lElement_I, context->dim, feMesh, stream );
+	
+	Journal_Printf(stream, "#Checking pure advection vx = 1.0\n");
+	for ( node_I = 0; node_I < nDomainVerts; node_I++ ) {
+		unsigned	d_i;
+
+		nodes[node_I].velocity[0] = 1.0;
+		for( d_i = 1; d_i < Mesh_GetDimSize( feMesh ); d_i++ ) {
+			nodes[node_I].velocity[d_i] = 0.0;
+		}
+	}
+	residualForceTerm->defaultDiffusivity = 0.0;
+	CheckShapeFunc( advDiffSLE, residualForceTerm, gaussSwarm, lElement_I, context->dim, feMesh, stream );
+	
+	Journal_Printf(stream, "#Checking pure advection vy = 1.0\n");
+	for ( node_I = 0; node_I < nDomainVerts; node_I++ ) {
+		unsigned	d_i;
+
+		for( d_i = 0; d_i < Mesh_GetDimSize( feMesh ); d_i++ ) {
+			if( d_i == 1 )
+				nodes[node_I].velocity[d_i] = 1.0;
+			else
+				nodes[node_I].velocity[d_i] = 0.0;
+		}
+	}
+	residualForceTerm->defaultDiffusivity = 0.0;
+	CheckShapeFunc( advDiffSLE, residualForceTerm, gaussSwarm, lElement_I, context->dim, feMesh, stream );
+
+	/* Destroy stuff */
+	Stg_Class_Delete( gaussSwarm );
+	Stg_Class_Delete( residual );
+	Stg_Class_Delete( residualForceTerm );
+	Stg_Class_Delete( feMesh );
+	Stg_Class_Delete( elementType_Register );
+	Stg_Class_Delete( extensionMgr_Register );
+	Stg_Class_Delete( dofs );
+	Stg_Class_Delete( dictionary );
+	
+	StgFEM_SLE_SystemSetup_Finalise();
+	StgFEM_Discretisation_Finalise();
+	StgDomain_Finalise();
+	StGermain_Finalise();
+	
+	/* Close off MPI */
+	MPI_Finalize();
+	
+	return 0; /* success */
+}

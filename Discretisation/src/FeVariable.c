@@ -657,13 +657,17 @@ void _FeVariable_Initialise( void* variable, void* data ) {
             FeVariable_ReadFromFile( self, filename );
          else {
             char * meshFilename = NULL;
-            Stg_asprintf( &meshFilename, "%sMesh.%.5u.h5", inputPathString, context->restartTimestep );
+            if (!strcmp(self->feMesh->generator->type, CartesianGenerator_Type))
+               Stg_asprintf( &meshFilename, "%sMesh.%s.%.5u.h5", inputPathString, self->feMesh->name, context->restartTimestep );
+            else
+               Stg_asprintf( &meshFilename, "%sMesh.%s.%.5u.h5", inputPathString, ((C0Generator*)(self->feMesh->generator))->elMesh->name, context->restartTimestep );
             FeVariable_InterpolateFromFile( self, context, filename, meshFilename );
             Memory_Free( meshFilename );
          }
 			
 #else
 			Stg_asprintf( &filename, "%s%s.%.5u.dat", inputPathString, self->name, context->restartTimestep );
+			FeVariable_ReadFromFile( self, filename );
 #endif
 
 			Memory_Free( filename );
@@ -2050,7 +2054,8 @@ void FeVariable_SaveToFile( void* feVariable, const char* filename, Bool saveCoo
 	MPI_Status        status;
    Stream*           errorStr = Journal_Register( Error_Type, self->type );
    const int         FINISHED_WRITING_TAG = 100;
-   int               confirmation = 0;   
+   int               confirmation = 0;
+   MeshGenerator*    theGenerator;
    
 #ifdef WRITE_HDF5
    hid_t             file, fileSpace, fileData;
@@ -2120,9 +2125,15 @@ void FeVariable_SaveToFile( void* feVariable, const char* filename, Bool saveCoo
       H5Aclose(attrib_id);
       H5Gclose(group_id);
       H5Sclose(attribData_id);
-       
+      
+      /** get the generator */
+      if( Stg_Class_IsInstance( self->feMesh->generator, MeshAdaptor_Type )) 
+         theGenerator = ((MeshAdaptor*)self->feMesh->generator)->generator;
+      else 
+         theGenerator = self->feMesh->generator;
+
       /** store the mesh resolution if mesh is cartesian */
-      if ( !strcmp( self->feMesh->generator->type, "CartesianGenerator" ) ) {
+      if ( Stg_Class_IsInstance( theGenerator, CartesianGenerator_Type ) ) {
          a_dims = self->dim;
          grid   = (Grid**) Mesh_GetExtension( self->feMesh, Grid*, "elementGrid" );	
          sizes  =          Grid_GetSizes( *grid ); /** global no. of elements in each dim */
@@ -2292,6 +2303,7 @@ void FeVariable_ReadFromFile( void* feVariable, const char* filename ) {
 	int                nDims;
 	Bool               savedCoords = False;
 	Stream*            errorStr = Journal_Register( Error_Type, self->type );
+   MeshGenerator*    theGenerator;
 	
 #ifdef READ_HDF5
    hid_t                   file, fileSpace, fileData, error;
@@ -2370,8 +2382,14 @@ void FeVariable_ReadFromFile( void* feVariable, const char* filename ) {
          __func__, self->type, self->name, (unsigned int) ndims, filename,
          self->dim);
 
+      /** get the generator */
+      if( Stg_Class_IsInstance( self->feMesh->generator, MeshAdaptor_Type )) 
+         theGenerator = ((MeshAdaptor*)self->feMesh->generator)->generator;
+      else 
+         theGenerator = self->feMesh->generator;
+
       /** check for correct mesh size if expecting a cartesian mesh*/
-      if ( !strcmp( self->feMesh->generator->type, "CartesianGenerator" ) ) {
+      if ( Stg_Class_IsInstance( theGenerator, CartesianGenerator_Type ) ) {
          
          #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
             attrib_id = H5Aopen_name(group_id, "mesh resolution");

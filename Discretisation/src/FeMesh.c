@@ -128,6 +128,11 @@ void _FeMesh_Construct( void* feMesh, Stg_ComponentFactory* cf, void* data ) {
 
 	family = Stg_ComponentFactory_GetString( cf, self->name, "elementType", "linear" );
 	FeMesh_SetElementFamily( self, family );
+   /* checkpoint non-constant meshes */
+   if ( strcmp( self->feElFamily, "constant" ) ){
+      self->isCheckpointedAndReloaded = True;
+      self->requiresCheckpointing     = True;
+   }
 
 	self->elementMesh = Stg_ComponentFactory_GetBool( cf, self->name, "isElementMesh", False );
 }

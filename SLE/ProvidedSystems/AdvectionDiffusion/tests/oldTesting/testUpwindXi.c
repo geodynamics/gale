@@ -35,26 +35,50 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id:  $
+** $Id: testUpwindXi.c 964 2007-10-11 08:03:06Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
-
 #include <mpi.h>
-
 #include <StGermain/StGermain.h>
 #include <StgDomain/StgDomain.h>
-#include <StgFEM/StgFEM.h>
-#include "Context.h"
 
+#include "StgFEM/Discretisation/Discretisation.h"
+#include "StgFEM/SLE/SystemSetup/SystemSetup.h"
+#include "StgFEM/SLE/ProvidedSystems/AdvectionDiffusion/AdvectionDiffusion.h"
 
-void MultiGrid_Context_Print( void* _feCtx ) {
-#if 0
-	MultiGrid_Context*	self = (MultiGrid_Context*)_feCtx;
-	
-	/* TODO */
-#endif
+int main( int argc, char* argv[] ) {
+	Stream* dataStream;
+	double  minPercletNumber = -15.0;
+	double  maxPercletNumber = 15.0;
+	double  dPerceltNumber = 0.5;
+	double  perceltNumber;
+	char*   dataFileName = "./output/output.dat";
+
+	MPI_Init( &argc, &argv );
+	StGermain_Init( &argc, &argv );
+
+	/* Create Data File */
+	dataStream    = Journal_Register( Info_Type, "DataStream" );
+	Stream_RedirectFile( dataStream, dataFileName );
+
+	Journal_Printf( dataStream, "# File to compare code with Brooks, Hughes 1982 - Fig 3.3\n");
+	Journal_Printf( dataStream, "# Integration rule for the optimal upwind scheme, doubly asymptotic approximation and critical approximation.\n");
+	Journal_Printf( dataStream, "# Plot using line:\n");
+	Journal_Printf( dataStream, "# plot \"%s\" using 1:2 title \"Exact\" with line, ", dataFileName );
+	Journal_Printf( dataStream, "\"%s\" using 1:3 title \"DoublyAsymptoticAssumption\" with line, ", dataFileName );
+	Journal_Printf( dataStream, "\"%s\" using 1:4 title \"CriticalAssumption\" with line\n", dataFileName );
+
+	Journal_Printf( dataStream, "# Perclet Number \t Exact \t DoublyAsymptoticAssumption \t CriticalAssumption\n" );
+	for ( perceltNumber = minPercletNumber ; perceltNumber < maxPercletNumber ; perceltNumber += dPerceltNumber )
+		Journal_Printf( dataStream, "%0.3g \t\t %0.3g \t\t %0.3g \t\t %0.3g\n", 
+				perceltNumber, 
+				AdvDiffResidualForceTerm_UpwindXiExact( NULL, perceltNumber),
+				AdvDiffResidualForceTerm_UpwindXiDoublyAsymptoticAssumption( NULL, perceltNumber),
+				AdvDiffResidualForceTerm_UpwindXiCriticalAssumption( NULL, perceltNumber) );
+
+	StGermain_Finalise();
+	MPI_Finalize();
+
+	return EXIT_SUCCESS;
 }
