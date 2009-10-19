@@ -159,6 +159,35 @@ int Stg_ComponentRegister_AddFunc(
 	return 1;
 }
 
+Bool Stg_ComponentRegister_RemoveEntry(
+		Stg_ComponentRegister* self,
+		Name                   componentType,
+		Name                   version ) 
+{
+  	BTreeNode *node = NULL;
+	Stg_ComponentRegisterElement *element = NULL;
+	SearchCriteria sc;
+
+	assert( self );
+	
+	sc.type = componentType;
+	sc.version = version;
+	
+	BTree_SetCompareFunction( self->constructors, constructorElementCompareFunction1 );
+	node = BTree_FindNode( self->constructors, (void*)(&sc) );
+	BTree_SetCompareFunction( self->constructors, constructorElementCompareFunction );
+	if( node ){
+		element = (Stg_ComponentRegisterElement*) node->data;
+		if( element ){
+         /* Delete tree node (calls DeleteFunction of element)*/
+         BTree_DeleteNode( self->constructors, node );
+         return True;
+      }
+	}
+
+	return False;
+}
+
 Stg_Component_DefaultConstructorFunction* Stg_ComponentRegister_Get( 
 		Stg_ComponentRegister* self,
 		Name                   componentType,

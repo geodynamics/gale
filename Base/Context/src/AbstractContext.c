@@ -668,6 +668,8 @@ void _AbstractContext_Destroy( void* context, void* data ) {
 	
 	Journal_Printf( self->debug, "In: %s\n", __func__ );
 
+   PluginsManager_RemoveAllFromComponentRegister( self->plugins ); 
+
 	/* Pre-mark the phase as complete as a default hook will attempt to initialise all live components (including this again) */
 	isDestroyed = self->isDestroyed;
 	self->isDestroyed = True;

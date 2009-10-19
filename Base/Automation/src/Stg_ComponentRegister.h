@@ -115,6 +115,12 @@
 		Stg_ComponentRegister_AddFunc( self, componentType, version, func, componentType ##_MetaAsDictionary ); \
 	}
 
+   /* Remove and free a component in the register */
+   Bool Stg_ComponentRegister_RemoveEntry(
+      Stg_ComponentRegister* self,
+      Name                   componentType,
+      Name                   version );
+
 	Stg_Component_DefaultConstructorFunction* Stg_ComponentRegister_Get( 
 			Stg_ComponentRegister* self,
 			Name                   componentType,

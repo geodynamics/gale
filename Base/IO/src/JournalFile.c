@@ -85,6 +85,8 @@ void _JournalFile_Init(
 
 void _JournalFile_Delete( void* journalFile )
 {
+   /* Close if opened */
+   JournalFile_Close( journalFile );
 	_Stg_Object_Delete( journalFile );
 }
 void _JournalFile_Print( void* journalFile, Stream* stream )

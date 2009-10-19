@@ -91,10 +91,13 @@
 
 	/** Exactly what to do to load the plugin */
 	Bool _PluginsManager_LoadPlugin( void* pluginsManager, Module* plugin );
-	
+
 	/** Exactly what to do to unload the plugin */
 	Bool _PluginsManager_UnloadPlugin( void* pluginsManager, Module* plugin );
 
+	/** Remove all plugins from register */
+   void PluginsManager_RemoveAllFromComponentRegister( void* pluginsManager );
+	
 	Bool _PluginsManager_CheckContext( void* pluginsManager, Dictionary_Entry_Value* modulesVal, unsigned int entry_I, Name contextName );
 
 	Name _PluginsManager_GetModuleName( void* pluginsManager, Dictionary_Entry_Value* moduleVal, unsigned int entry_I );

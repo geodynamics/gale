@@ -132,7 +132,6 @@ Dictionary_Entry_Value* _PluginsManager_GetPluginsList( void* pluginsManager, vo
 	return pluginsList;
 }
 
-
 Bool _PluginsManager_LoadPlugin( void* pluginsManager, Module* plugin ) {
 	PluginsManager* self = (PluginsManager*)pluginsManager;
 	
@@ -145,6 +144,19 @@ Bool _PluginsManager_UnloadPlugin( void* pluginsManager, Module* plugin ) {
 	/*PluginsManager* self = (PluginsManager*)pluginsManager;*/
 	
 	return True;
+}
+
+void PluginsManager_RemoveAllFromComponentRegister( void* pluginsManager ) {
+	PluginsManager* self = (PluginsManager*)pluginsManager;
+	
+   Stg_ComponentRegister * componentRegister = Stg_ComponentRegister_Get_ComponentRegister();
+
+   int i;
+   for (i=0; i<Stg_ObjectList_Count(self->codelets); i++)
+   {
+      Stg_Object *codelet = self->codelets->data[i];
+      Stg_ComponentRegister_RemoveEntry(componentRegister, codelet->type, "0");
+   }
 }
 
 Bool _PluginsManager_CheckContext( void* pluginsManager, Dictionary_Entry_Value* modulesVal, unsigned int entry_I, Name contextName ) {
