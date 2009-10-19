@@ -389,10 +389,14 @@ void _FeVariable_Delete( void* variable ) {
 	Stream_IndentBranch( StgFEM_Debug );
 	if( self->eqNum && ( NULL == self->templateFeVariable ) ) {
 		Stg_Class_Delete( self->eqNum );
+      self->eqNum = NULL;
 	}
 	/** feMesh bc and doflayout are purposely not deleted */
 
-	NewClass_Delete( self->inc );
+   if( self->inc == NULL ) {
+      NewClass_Delete( self->inc );
+      self->inc = NULL;
+   }
 
 	/** Stg_Class_Delete parent*/
 	_Stg_Component_Delete( self );
