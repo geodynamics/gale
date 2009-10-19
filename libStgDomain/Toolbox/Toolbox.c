@@ -46,6 +46,7 @@
 #include "Toolbox.h"
 
 
+
 const Type StgDomain_Toolbox_Type = "StgDomain_Toolbox";
 
 void _StgDomain_Toolbox_Construct( void* component, Stg_ComponentFactory* cf, void* data )  {

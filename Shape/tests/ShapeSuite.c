@@ -16,7 +16,6 @@ void ShapeSuite_Setup( ShapeSuiteData* data ) {
 void ShapeSuite_Teardown( ShapeSuiteData* data ) {
 }
 
-
 void ShapeSuite_GeneratePoints( ShapeSuiteData* data, Dimension_Index dim, char* inputFileName ) {
 /** Test Definition: */
 	Stg_ComponentFactory* cf;

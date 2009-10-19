@@ -45,9 +45,9 @@
 #include "PlaneSuite.h"
 
 typedef struct {
-	MPI_Comm			comm;
-	unsigned int	rank;
-	unsigned int	nProcs;
+	MPI_Comm comm;
+	unsigned rank;
+	unsigned nProcs;
 } PlaneSuiteData;
 
 void PlaneSuite_Setup( PlaneSuiteData* data ) {
@@ -60,12 +60,24 @@ void PlaneSuite_Setup( PlaneSuiteData* data ) {
 void PlaneSuite_Teardown( PlaneSuiteData* data ) {
 }
 
-void PlaneSuite_TestPlane( PlaneSuiteData* data ) {
-	Stream*	stream;
-	char		expected_file[PCU_PATH_MAX];
-	unsigned	procToWatch;
+void PlaneSuite_TestDistanceToPoint( PlaneSuiteData* data ) {
+	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	
+   if( data->rank == procToWatch ) {
+		Coord axisA = { 1.0, 0.3, 0.0 };
+		Coord axisB = { -0.3, 1.0, 0.0 };
+		Coord point1 = { 0.0, 0.0, 2.0 };
+		Coord point2 = { 20.0, 100.0, 6.0 };
+		Plane a;
 
-	procToWatch = data->nProcs >=2 ? 1 : 0;
+		Plane_CalcFromVec( a, axisA, axisB, point1 );
+		pcu_check_true( a[0] == 0 && a[1] == -0 && a[2] == 1 && a[3] == 2 );
+		pcu_check_true( Plane_DistanceToPoint( a, point2 ) == 4 );
+	}
+}
+
+void PlaneSuite_TestPointIsInFront( PlaneSuiteData* data ) {
+	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
 	
    if( data->rank == procToWatch ) {
 		Coord axisA = { 1.0, 0.3, 0.0 };
@@ -77,7 +89,6 @@ void PlaneSuite_TestPlane( PlaneSuiteData* data ) {
 
 		Plane_CalcFromVec( a, axisA, axisB, point1 );
 		pcu_check_true( a[0] == 0 && a[1] == -0 && a[2] == 1 && a[3] == 2 );
-		pcu_check_true( Plane_DistanceToPoint( a, point2 ) == 4 );
 		pcu_check_true( Plane_PointIsInFront( a, point2 ) );
 		pcu_check_true( !Plane_PointIsInFront( a, point3 ) );
 	}
@@ -86,5 +97,6 @@ void PlaneSuite_TestPlane( PlaneSuiteData* data ) {
 void PlaneSuite( pcu_suite_t* suite ) {
 	pcu_suite_setData( suite, PlaneSuiteData );
    pcu_suite_setFixtures( suite, PlaneSuite_Setup, PlaneSuite_Teardown );
-   pcu_suite_addTest( suite, PlaneSuite_TestPlane );
+   pcu_suite_addTest( suite, PlaneSuite_TestDistanceToPoint );
+   pcu_suite_addTest( suite, PlaneSuite_TestPointIsInFront );
 }

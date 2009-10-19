@@ -117,7 +117,7 @@ void SwarmOutputSuite_TestSwarmOutput( SwarmOutputSuiteData* data ) {
 
 		componentDict = Dictionary_GetDictionary( dictionary, "components" );
 		assert( componentDict );
-
+`
 		AbstractContext_Dump( context );
 		Stg_Component_Execute( context, 0, False );
 

@@ -45,9 +45,9 @@
 #include "LineSuite.h"
 
 typedef struct {
-	MPI_Comm			comm;
-	unsigned int	rank;
-	unsigned int	nProcs;
+	MPI_Comm comm;
+	unsigned rank;
+	unsigned nProcs;
 } LineSuiteData;
 
 void LineSuite_Setup( LineSuiteData* data ) {

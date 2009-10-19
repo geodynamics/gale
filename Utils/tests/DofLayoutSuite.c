@@ -58,10 +58,6 @@ void DofLayoutSuite_Setup( DofLayoutSuiteData* data ) {
 }
 
 void DofLayoutSuite_Teardown( DofLayoutSuiteData* data ) {
-	/* Purge output files */
-	remove( "testBasic.dat" );
-	remove( "testRemap.dat" );
-	remove( "testSaveAndLoad.dat" );
 }
 
 void DofLayoutSuite_TestBasic( DofLayoutSuiteData* data ) {
@@ -69,12 +65,7 @@ void DofLayoutSuite_TestBasic( DofLayoutSuiteData* data ) {
 	int		procToWatch;
 	Stream*	stream = Journal_Register( Info_Type, "DofLayoutBasic" );	
 
-	if( data->nProcs >= 2 ) {
-		procToWatch = 1;
-	}
-	else {
-		procToWatch = 0;
-	}
+	procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if( data->rank == procToWatch ) {
 		DofLayout*				dof;
@@ -235,16 +226,11 @@ void DofLayoutSuite_TestBasic( DofLayoutSuiteData* data ) {
 }
 
 void DofLayoutSuite_TestRemap( DofLayoutSuiteData* data ) {
-	char			expected_file[PCU_PATH_MAX];
-	int			procToWatch;
-	Stream*		stream = Journal_Register( Info_Type, "DofLayoutRemap" );	
+	char		expected_file[PCU_PATH_MAX];
+	int		procToWatch;
+	Stream*	stream = Journal_Register( Info_Type, "DofLayoutRemap" );	
 
-	if( data->nProcs >= 2 ) {
-		procToWatch = 1;
-	}
-	else {
-		procToWatch = 0;
-	}
+	procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if( data->rank == procToWatch ) {
 		DofLayout*				dof;
@@ -312,16 +298,11 @@ void DofLayoutSuite_TestRemap( DofLayoutSuiteData* data ) {
 }
 
 void DofLayoutSuite_TestSaveAndLoad( DofLayoutSuiteData* data ) {
-	char			expected_file[PCU_PATH_MAX];
-	int			procToWatch;
-	Stream*		stream = Journal_Register( Info_Type, "DofLayoutRemap" );	
+	char		expected_file[PCU_PATH_MAX];
+	int		procToWatch;
+	Stream*	stream = Journal_Register( Info_Type, "DofLayoutRemap" );	
 
-	if( data->nProcs >= 2 ) {
-		procToWatch = 1;
-	}
-	else {
-		procToWatch = 0;
-	}
+	procToWatch = data->nProcs >=2 ? 1 : 0;
 	
 	if( data->rank == procToWatch ) {
 		DofLayout*				dof;

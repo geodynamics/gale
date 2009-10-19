@@ -208,7 +208,6 @@ void AllNodesVCSuite_TestAllNodesVC( AllNodesVCSuiteData* data ) {
    FreeObject( mesh );
 }
 
-
 void AllNodesVCSuite( pcu_suite_t* suite ) {
 	pcu_suite_setData( suite, AllNodesVCSuiteData );
    pcu_suite_setFixtures( suite, AllNodesVCSuite_Setup, AllNodesVCSuite_Teardown );
