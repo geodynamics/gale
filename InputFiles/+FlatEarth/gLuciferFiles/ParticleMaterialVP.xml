@@ -13,6 +13,7 @@
 			<param name="maximum">3</param>
 		</struct>
 		
+		<!--
 			<struct name="materialSwarm-Temperature">
 				<param name="Type">FeSwarmVariable</param>
 				<param name="Swarm">materialSwarm</param>
@@ -24,6 +25,7 @@
 					<param name="Swarm">materialSwarm</param>
 					<param name="FeVariable">StrainRateInvariantField</param>
 			</struct>
+		-->	
 
 		<struct name="particleMaterial0VariableColourMap">
 			<param name="Type">lucColourMap</param>
@@ -106,7 +108,7 @@
 		<!-- Viewport -->
 		<struct name="ParticleMaterialVP">
 			<param name="Type">lucViewport</param>
-			<param name="Camera">camera</param>
+			<param name="Camera">flatEarthPerspectiveViewCamera1</param>
 			<list name="DrawingObject">
 				<param>particleMaterialTitle</param>
 				<param>particleMaterialDots0</param>

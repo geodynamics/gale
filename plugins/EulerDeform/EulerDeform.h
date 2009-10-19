@@ -29,7 +29,7 @@
 	extern const char*	EULERDEFORM_PLUGIN_TAG;
 
 
-	Index _Underworld_EulerDeform_Register( PluginsManager* pluginsMgr );
+	Index Underworld_EulerDeform_Register( PluginsManager* pluginsMgr );
 
 	void* _Underworld_EulerDeform_DefaultNew( Name name );
 

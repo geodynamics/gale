@@ -122,7 +122,7 @@
 	<include>glucifer/window.xml</include>
 	<struct name="components" mergeType="merge">
 		<struct name="window" mergeType="merge">
-			<param name="Viewport">TemperatureContoursVP StrainRateInvariantVP</param>
+			<param name="Viewport">TemperatureContoursVP </param>
 		</struct>
 	</struct>
 

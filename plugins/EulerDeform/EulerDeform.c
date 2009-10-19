@@ -50,7 +50,7 @@ const Type		Underworld_EulerDeform_Type = "EulerDeform";
 ExtensionInfo_Index	EulerDeform_ContextHandle;
 
 
-Index _Underworld_EulerDeform_Register( PluginsManager* pluginsMgr ) {
+Index Underworld_EulerDeform_Register( PluginsManager* pluginsMgr ) {
 	return PluginsManager_Submit( pluginsMgr, 
 				      Underworld_EulerDeform_Type, 
 				      "0", 

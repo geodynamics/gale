@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<list name="plugins" mergeType="merge">
+		<param>lucPlugin</param>
+	</list>
+
+	<struct name="components" mergeType="merge">
+		<!-- setting up several default camera angles -->
+		
+		
+		<struct name="flatEarthPerspectiveViewCamera1">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">0.0</param>
+			<param name="coordY">0.5</param>
+			<param name="coordZ">2.0</param>
+			<param name="focalPointX">0</param>
+			<param name="focalPointY">0.5</param>
+			<param name="focalPointZ">0</param>
+			<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+			<param name="stereoType">Mono</param>
+			<param name="eyeSeparation">0.2</param>
+			<param name="focalLength">1</param>
+		</struct>
+	
+
+	</struct>
+</StGermainData>
+
+
+

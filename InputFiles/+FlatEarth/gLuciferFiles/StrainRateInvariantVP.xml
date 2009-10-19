@@ -49,6 +49,7 @@
 			<param name="Type">lucScalarField</param>
 			<param name="FieldVariable">StrainRateInvariantField</param>
 			<param name="ColourMap">strainRateInvColourMap</param>
+			<param name="cullFace"> False </param>
 		</struct> -->
 		
 		<struct name="border" mergeType="replace">
@@ -66,10 +67,10 @@
 			<param name="Type">lucViewport</param>
 			<param name="Camera">flatEarthPerspectiveViewCamera1</param>
 			<list name="DrawingObject">
-				<!--><param>strainRateInvMap</param>-->
-				<param>strainRateMaterialDots</param> 
-				<param>strainRateInvTitle</param> 
 				<param>border</param>
+				<param>strainRateInvMap</param>
+				<!--><param>strainRateMaterialDots</param> -->
+				<param>strainRateInvTitle</param> 
 				<param>strainRateInvColourBar</param> 
 			</list>
 		</struct>

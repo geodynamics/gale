@@ -25,5 +25,5 @@
 		double sigma, double Z, int n, double km,
 		double* velocity, double* pressure, double* Tstress, double* strainRate );
 
-	Bool _checkInputParams( Underworld_solB* self );
+	Bool solB_checkInputParams( Underworld_solB* self );
 #endif

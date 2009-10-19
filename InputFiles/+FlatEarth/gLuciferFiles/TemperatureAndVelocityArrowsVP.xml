@@ -105,7 +105,7 @@
 		<struct name="velocityArrowsLeft" mergeType="replace">
 			<param name="Type">lucVectorArrowCrossSection</param>
 			<param name="VectorVariable">VelocityField</param>
-			<param name="crossSection"> x=-2.0 </param>
+			<param name="crossSection"> x=-1.0 </param>
 			<param name="Colour">black</param>
 			<param name="resolutionX">64</param>	
 			<param name="resolutionY">16</param>	
@@ -118,7 +118,7 @@
 		<struct name="velocityArrowsRight" mergeType="replace">
 			<param name="Type">lucVectorArrowCrossSection</param>
 			<param name="VectorVariable">VelocityField</param>
-			<param name="crossSection"> x=2.0 </param>
+			<param name="crossSection"> x=1.0 </param>
 			<param name="Colour">black</param>
 			<param name="resolutionX">64</param>	
 			<param name="resolutionY">16</param>	
@@ -130,7 +130,7 @@
 		<struct name="velocityArrowsFront" mergeType="replace">
 			<param name="Type">lucVectorArrowCrossSection</param>
 			<param name="VectorVariable">VelocityField</param>
-			<param name="crossSection"> z=2.0 </param>
+			<param name="crossSection"> z=1.0 </param>
 			<param name="Colour">black</param>
 			<param name="resolutionX">64</param>	
 			<param name="resolutionY">16</param>	
@@ -142,7 +142,7 @@
 		<struct name="velocityArrowsBack" mergeType="replace">
 			<param name="Type">lucVectorArrowCrossSection</param>
 			<param name="VectorVariable">VelocityField</param>
-			<param name="crossSection"> z=-2.0 </param>
+			<param name="crossSection"> z=-1.0 </param>
 			<param name="Colour">black</param>
 			<param name="resolutionX">64</param>	
 			<param name="resolutionY">16</param>	
@@ -157,9 +157,9 @@
 			<param name="VectorVariable">VelocityField</param>
 			<param name="crossSection"> y=1.0 </param>
 			<param name="Colour">black</param>
-			<param name="resolutionX">64</param>	
+			<param name="resolutionX">32</param>	
 			<param name="resolutionY">16</param>	
-			<param name="resolutionZ">64</param>	
+			<param name="resolutionZ">32</param>	
 			<param name="arrowHeadSize">0.3</param>	
 			<param name="lengthScale">0.1</param>	
 		</struct>
@@ -204,6 +204,8 @@
 				<param>velocityArrowsRight</param>
 				<param>velocityArrowsBottom</param>
 				<param>velocityArrowsBack</param>
+				<param>velocityArrowsTop</param>
+				<param>velocityArrowsFront</param>
 				<param>tempandVelTitle</param>
 				<param>temperatureColourBar</param>
 			</list>

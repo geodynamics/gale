@@ -1,0 +1,25 @@
+#
+# NOTE: The number of multigrid levels needs to be added as an
+# option to the input XML file as follows:
+#
+#   <include>Experimental/MultigridForRegular.xml</include>
+#   <param name="mgLevels">2</param>
+#
+
+# -help
+
+# Refers to the outer iteration 
+
+-ksp_type fgmres
+-ksp_converged_reason
+-ksp_rtol 1.0e-4
+
+
+# Define MG preconditioner.
+
+-A11_ksp_rtol 1.0e-4
+
+-pc_mg_smoothup 2
+-pc_mg smoothdown 2
+-A11_pc_mg_smoothup 2
+-A11_pc_mg_smoothdown 2 

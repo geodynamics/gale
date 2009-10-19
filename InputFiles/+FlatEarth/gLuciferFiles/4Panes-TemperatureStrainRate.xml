@@ -2,10 +2,19 @@
 <!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
 
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
- 	
+
 	<list name="plugins" mergeType="merge">
 		<param>lucPlugin</param>
 	</list>
+
+<!-- Include the Camera setup for your geometry on the command line with this file e.g. Camera2D-1x1.xml -->
+
+	
+	<include> ./gLuciferFiles/ParticleHasYieldedVP.xml</include>
+	<include> ./gLuciferFiles/ParticleMaterialVP.xml</include>
+	<include> ./gLuciferFiles/TemperatureAndVelocityArrowsVP.xml </include>
+	<include> ./gLuciferFiles/StrainRateInvariantVP.xml </include> 
+	
 	<struct name="components" mergeType="merge">
 		<struct name="renderingEngine">
 			<param name="Type">lucRenderingEngineGL</param>
@@ -15,7 +24,7 @@
 			<param name="Type">lucOutputPNG</param>
 		</struct>
 		
-		<struct name="FlatEarthBoxView1">
+		<struct name="FlatEarthBox-TemperatureStrainRate">
 			<param name="Type">lucDefaultWindow</param>
 			<param name="RenderingEngine">renderingEngine</param>
 			<list name="OutputFormat">
@@ -26,28 +35,11 @@
 			<param name="backgroundColour">white</param>
 			<param name="interactive"> False </param>
 			<param name="xFontName">-adobe-helvetica-bold-r-normal--14-140-75-75-p-82-iso8859-1</param>
+			<list name="Viewport" mergeType="replace">
+				<param> FlatEarthTemperatureAndVelocityArrowsVP FlatEarthVerticalTemperatureGradientVP</param>
+				<param> StrainRateInvariantVP ParticleMaterialVP </param>
+			</list>
 		</struct>
-
-	
-	
-	
-	
-	
-	
-	
-	
-	
-		<!-- If you want to add the movie functionality please add
-		 	 glucifer/BuildMovies.xml to your setup. The default behaviour is	
-			 to not make movies due to the difficulty in specifying a standard
-			 approach to building them 
-		
-		<struct name="movie">
-			<param name="Type">lucEncoderLibfame</param>
-			<param name="Window">window</param>
-		</struct>	-->
 	</struct>
-	
-	<!-- this parameter will be used as the default by all lucWindow objects -->
 
 </StGermainData>

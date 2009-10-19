@@ -62,7 +62,8 @@ const Type Underworld_BoundaryLayers_Type = "Underworld_BoundaryLayers";
 void _Underworld_BoundaryLayers_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext* context;
 
-	printf("AKJFHQEIUH)@$UFKAJSDHRF\nKJASHRFOPUEH\nsaljkdh9\n9)#@$\n213\n\n");
+	/*printf("AKJFHQEIUH)@$UFKAJSDHRF\nKJASHRFOPUEH\nsaljkdh9\n9)#@$\n213\n\n"); The coordinates of the California Moon ??   */ 
+	
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
 
 	/* Add functions to entry points */
@@ -72,7 +73,7 @@ void _Underworld_BoundaryLayers_Construct( void* component, Stg_ComponentFactory
 }
 
 void* _Underworld_BoundaryLayers_DefaultNew( Name name ) {
-	printf("2  AKJFHQEIUH)@$UFKAJSDHRF\nKJASHRFOPUEH\nsaljkdh9\n9)#@$\n213\n\n");
+	/* printf("2  AKJFHQEIUH)@$UFKAJSDHRF\nKJASHRFOPUEH\nsaljkdh9\n9)#@$\n213\n\n"); */
 	return _Codelet_New(
 		sizeof(Underworld_BoundaryLayers),
 		Underworld_BoundaryLayers_Type,
