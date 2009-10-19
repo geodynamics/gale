@@ -31,14 +31,6 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "pcu/pcu.h"
-#include <StGermain/StGermain.h>
-#include <StgDomain/StgDomain.h>
-#include <StgFEM/StgFEM.h>
-#include <PICellerator/PICellerator.h>
 #include "ConstantWeightsSuite.h"
 
 typedef struct {
