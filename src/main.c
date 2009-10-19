@@ -169,7 +169,13 @@ int main( int argc, char* argv[] ) {
 	#endif	
 	MPI_Barrier( CommWorld ); /* Ensures copyright info always come first in output */
 
-	/* Create the application's dictionary and read input */
+
+#ifdef NOSHARED
+	register_static_modules();
+#endif
+	
+	
+	/* Create the application's dictionary & read input */
 	dictionary = Dictionary_New();
 	ioHandler = XML_IO_Handler_New();
 	IO_Handler_ReadAllFromCommandLine( ioHandler, argc, argv, dictionary );

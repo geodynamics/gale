@@ -19,6 +19,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 #include <mpi.h>
 #include "types.h"
 #include "listener.h"
@@ -27,6 +28,8 @@
 #include "textoutput.h"
 #include "test.h"
 #include "source.h"
+
+extern int PCU_PRINT_DOCS;
 
 typedef struct {
       int rank;
@@ -54,7 +57,7 @@ void pcu_textoutput_testend( pcu_listener_t* lsnr, pcu_test_t* test ) {
 void pcu_textoutput_checkdone( pcu_listener_t* lsnr, pcu_source_t* src ) {
 }
 
-pcu_listener_t* pcu_textoutput_create() {
+pcu_listener_t* pcu_textoutput_create( int printdocs ) {
    pcu_listener_t* lsnr;
 
    lsnr = (pcu_listener_t*)malloc( sizeof(pcu_listener_t) );
@@ -64,8 +67,10 @@ pcu_listener_t* pcu_textoutput_create() {
    lsnr->testend = pcu_textoutput_testend;
    lsnr->checkdone = pcu_textoutput_checkdone;
    lsnr->data = malloc( sizeof(textoutputdata_t) );
+   assert( printdocs == 1 || printdocs == 0 );
+   lsnr->printdocs = printdocs;
    MPI_Comm_rank( MPI_COMM_WORLD, 
-		  &((textoutputdata_t*)lsnr->data)->rank );
+        &((textoutputdata_t*)lsnr->data)->rank );
 
    return lsnr;
 }
@@ -94,6 +99,20 @@ void printsources( pcu_listener_t* lsnr, pcu_suite_t* suite ) {
    nfails = 0;
    test = suite->tests;
    while( test ) {
+      if( lsnr->printdocs ) {
+         if (test->globalresult ) {
+            printf( " * (P) Test %s: ", test->name );
+         }
+         else {
+            printf( " * (F) Test %s: ", test->name );
+         }
+         if ( test->docString ) {
+            printf( "%s\n", test->docString );
+         }
+         else {
+            printf( "(undocumented)\n" );
+         }
+      }
       src = test->srcs;
       while( src ) {
 	 if( !src->result ) {

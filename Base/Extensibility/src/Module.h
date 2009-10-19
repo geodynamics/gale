@@ -63,7 +63,8 @@
 		Module_GetMetadataFunction* GetMetadata; \
 		Module_GetNameFunction*     GetName; \
 		Module_GetVersionFunction*  GetVersion; \
-		Dictionary*                 _meta;
+		Dictionary*                 _meta; \
+                char*                       mangledName;
 		
 	struct Module { __Module };
 

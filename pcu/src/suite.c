@@ -19,6 +19,8 @@
 
 #include <stdlib.h>
 #include <assert.h>
+#include <string.h>
+#include <stdio.h>
 #include "types.h"
 #include "listener.h"
 #include "test.h"
@@ -105,7 +107,7 @@ void _pcu_suite_addTest( pcu_suite_t* suite, pcu_testfunc_t* func, const char* n
 
    /* Create the new test. */
    test = (pcu_test_t*)malloc( sizeof(pcu_test_t) );
-   test->name = name;
+   test->name = strdup( name );
    test->suite = suite;
    test->func = func;
    test->next = NULL;
@@ -129,7 +131,8 @@ void _pcu_suite_addTest( pcu_suite_t* suite, pcu_testfunc_t* func, const char* n
 }
 
 void _pcu_suite_addSubSuite( pcu_suite_t* suite, const char* name,
-                             void (initfunc)( pcu_suite_t* ) )
+                             void (initfunc)( pcu_suite_t* ),
+                             const char* moduleDir )
 {
    pcu_suite_t* subsuite;
 
@@ -137,13 +140,15 @@ void _pcu_suite_addSubSuite( pcu_suite_t* suite, const char* name,
 
    /* Setup the new suite. */
    subsuite = (pcu_suite_t*)malloc( sizeof(pcu_suite_t) );
-   subsuite->name = name;
+   subsuite->name = strdup( name );
+   subsuite->moduleDir = strdup( moduleDir );
    subsuite->ntests = 0;
    subsuite->tests = NULL;
    subsuite->npassed = 0;
    subsuite->curtest = NULL;
    subsuite->lsnr = NULL;
    subsuite->next = NULL;
+   subsuite->nsubsuites = 0;
    subsuite->subsuites = NULL;
    subsuite->setup = NULL;
    subsuite->teardown = NULL;
@@ -161,6 +166,8 @@ void _pcu_suite_addSubSuite( pcu_suite_t* suite, const char* name,
    }
    else
      suite->subsuites = subsuite;
+
+   suite->nsubsuites++;
 }
 
 void pcu_suite_clear( pcu_suite_t* suite ) {
@@ -178,6 +185,7 @@ void pcu_suite_clear( pcu_suite_t* suite ) {
          free( suite->tests->srcs );
          suite->tests->srcs = src;
       }
+      free( suite->tests->name );
       if ( suite->tests->docString ) {
          free( suite->tests->docString );
       }
@@ -201,3 +209,4 @@ void pcu_suite_clear( pcu_suite_t* suite ) {
       suite->data = NULL;
    }
 }
+

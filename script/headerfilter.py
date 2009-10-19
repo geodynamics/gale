@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 import os, platform
 import getopt
 import glob
@@ -114,7 +114,10 @@ class Input():
                     metaText+= "<li><b> "+key + "</b>: "  +" \\verbatim "+ val +" \\endverbatim " +" </li> \n " 
                 # puts LaTeX equations into Doxygen recognisable form.
                 elif (key == "Equation") and (len(val) > 0) :
-                    metaText += "<li><b> "+key + "</b>: "  + val.replace("$", "\\f$") +" </li> \n "
+                    newVal = val
+                    while (newVal.count("$") > 0):
+                        newVal = (newVal.replace("$", "\\f[", 1)).replace("$", "\\f]", 1)
+                    metaText += "<li><b> "+key + "</b>: "  + newVal +" </li> \n "
                 else:
                     metaText+= "<li><b> "+key + "</b>: " + str(val) +" </li> \n "
             metaText += "</ul> */\n "

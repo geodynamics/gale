@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 import os, os.path, sys,  datetime
 import convert,  util,  stgDtd,  stgMetaXsd
 

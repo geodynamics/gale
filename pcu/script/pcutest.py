@@ -54,7 +54,7 @@ int main( int argc, char* argv[] ) {
    pcu_runner_init( argc, argv );%s
 
 %s
-   lsnr = pcu_textoutput_create();
+   lsnr = pcu_textoutput_create( PCU_PRINT_DOCS );
    result = pcu_runner_run( lsnr );
    pcu_textoutput_destroy( lsnr );
 %s
@@ -79,8 +79,10 @@ int main( int argc, char* argv[] ) {
     return File(target.abspath)
 
 def generate(env, **kw):
-    env.SetDefault(PCUTEST_TARGET="check")
-#     builder = Builder(action=["python", 
+    env.SetDefault(PCUALL_TARGET="check")
+    env.SetDefault(PCUUNIT_TARGET="unit")
+    env.SetDefault(PCUSYSTEST_TARGET="systest")
+    # Make the 'all' target point to everything.
 
     def PCUSuite(env, target, source, **kw):
         """Create an object/header pair out of a
@@ -108,12 +110,26 @@ def generate(env, **kw):
         objs = env.StaticObject(os.path.splitext(prog_src.abspath)[0], prog_src) + objs
         libs = multiget([kw, env], 'LIBS', []) + ["pcu"]
         test = env.Program(target[0], objs, LIBS=libs)
-        runner = env.Action(test[0].abspath)
-        env.Alias(env["PCUTEST_TARGET"], [exps, inputs, test], runner)
-        env.AlwaysBuild(env["PCUTEST_TARGET"])
+        runner = env.Action('-' + test[0].abspath)
+        env.Alias(env["PCUUNIT_TARGET"], [exps, inputs, test], runner)
+        env.AlwaysBuild(env["PCUUNIT_TARGET"])
+        env.Alias(env['PCUALL_TARGET'], env['PCUUNIT_TARGET'])
         return test
 
-    env.Append(BUILDERS={"PCUSuite": PCUSuite, "PCUTest": PCUTest})
+    def PCUSysTest(env, target, source, **kw):
+        script = File(source[0].split()[0]).srcnode().abspath
+        script_dir = os.path.dirname(script)
+        script = os.path.basename(script)
+        args = source[0].split()[1:]
+
+        runner = env.Action('-./' + script + ' ' + ' '.join(args), chdir=script_dir)
+        env.Alias(env["PCUSYSTEST_TARGET"], [], runner)
+        env.AlwaysBuild(env["PCUSYSTEST_TARGET"])
+        env.Alias(env['PCUALL_TARGET'], env['PCUSYSTEST_TARGET'])
+        return None
+
+    env.Append(BUILDERS={"PCUSuite": PCUSuite, "PCUTest": PCUTest,
+                         'PCUSysTest': PCUSysTest})
 
 def exists(env):
     # Should probably have this search for the pcu

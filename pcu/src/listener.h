@@ -27,6 +27,7 @@ struct pcu_listener_t {
       pcu_testentry_t* testend;
       pcu_checkentry_t* checkdone;
       void* data;
+      int printdocs;
 };
 
 #endif

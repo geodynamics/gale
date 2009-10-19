@@ -5,7 +5,7 @@ import SConfig
 SConscript('config/SConfig/SConscript')
 
 #
-# CUSTOMISE THE ENVIRONMENT HERE..
+# CUSTOMISE THE ENVIRONMENT HERE.
 #
 
 env = Environment(ENV=os.environ)
