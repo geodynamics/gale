@@ -2610,7 +2610,7 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
 	double								crdMin[3], crdMax[3];
 	double*								value;
 	unsigned								nDomainVerts;
-	double*								arrayPtr;
+	static double*						arrayPtr;
    Name									varName[9];
 
    /** Open the file and data set. */
