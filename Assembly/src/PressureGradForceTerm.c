@@ -114,18 +114,18 @@ PressureGradForceTerm* _PressureGradForceTerm_New(
 }
 
 void _PressureGradForceTerm_Init( 
-		PressureGradForceTerm*                              self, 
-		FeVariable*                                         pressureField, 
-		FeVariable*					    gradField )
+	PressureGradForceTerm*	self, 
+	FeVariable*					pressureField, 
+	FeVariable*					gradField )
 {
 	self->asmb = Assembler_New();
 	Assembler_SetCallbacks( self->asmb, 
-				NULL, 
-				NULL, 
-				(Assembler_CallbackType*)PressureGradForceTerm_RowCB, 
-				(Assembler_CallbackType*)PressureGradForceTerm_ColCB, 
-				(Assembler_CallbackType*)PressureGradForceTerm_ColCB, 
-				self );
+		NULL, 
+		NULL, 
+		(Assembler_CallbackType*)PressureGradForceTerm_RowCB, 
+		(Assembler_CallbackType*)PressureGradForceTerm_ColCB, 
+		(Assembler_CallbackType*)PressureGradForceTerm_ColCB, 
+		self );
 	self->pressureField = pressureField;
 	self->gradField = gradField;
 	self->forceVec = NULL;
@@ -134,11 +134,11 @@ void _PressureGradForceTerm_Init(
 }
 
 void PressureGradForceTerm_InitAll( 
-		void*                                               forceTerm,
-		ForceVector*                                        forceVector,
-		Swarm*                                              integrationSwarm,
-		FeVariable*                                         pressureField, 
-		FeVariable*					    gradField )
+	void*				forceTerm,
+	ForceVector*	forceVector,
+	Swarm*			integrationSwarm,
+	FeVariable*		pressureField, 
+	FeVariable*		gradField )
 {
 	PressureGradForceTerm* self = (PressureGradForceTerm*) forceTerm;
 

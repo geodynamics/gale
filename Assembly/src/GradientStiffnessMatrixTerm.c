@@ -160,7 +160,7 @@ void* _GradientStiffnessMatrixTerm_DefaultNew( Name name ) {
 }
 
 void _GradientStiffnessMatrixTerm_Construct( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) {
-	GradientStiffnessMatrixTerm*            self             = (GradientStiffnessMatrixTerm*)matrixTerm;
+	GradientStiffnessMatrixTerm* self = (GradientStiffnessMatrixTerm*)matrixTerm;
 
 	/* Construct Parent */
 	_StiffnessMatrixTerm_Construct( self, cf, data );
@@ -169,13 +169,13 @@ void _GradientStiffnessMatrixTerm_Construct( void* matrixTerm, Stg_ComponentFact
 }
 
 void _GradientStiffnessMatrixTerm_Build( void* matrixTerm, void* data ) {
-	GradientStiffnessMatrixTerm*             self             = (GradientStiffnessMatrixTerm*)matrixTerm;
+	GradientStiffnessMatrixTerm* self = (GradientStiffnessMatrixTerm*)matrixTerm;
 
 	_StiffnessMatrixTerm_Build( self, data );
 }
 
 void _GradientStiffnessMatrixTerm_Initialise( void* matrixTerm, void* data ) {
-	GradientStiffnessMatrixTerm*             self             = (GradientStiffnessMatrixTerm*)matrixTerm;
+	GradientStiffnessMatrixTerm* self = (GradientStiffnessMatrixTerm*)matrixTerm;
 
 	_StiffnessMatrixTerm_Initialise( self, data );
 }

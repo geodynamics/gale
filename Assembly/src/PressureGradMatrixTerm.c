@@ -112,17 +112,17 @@ PressureGradMatrixTerm* _PressureGradMatrixTerm_New(
 }
 
 void _PressureGradMatrixTerm_Init( 
-		PressureGradMatrixTerm*                             self, 
-		FeVariable*                                         gradField )
+		PressureGradMatrixTerm*	self, 
+		FeVariable*					gradField )
 {
 	self->assm = Assembler_New();
 	Assembler_SetCallbacks( self->assm, 
-				NULL, 
-				NULL, 
-				(Assembler_CallbackType*)PressureGradMatrixTerm_RowCB, 
-				(Assembler_CallbackType*)PressureGradMatrixTerm_ColCB, 
-				(Assembler_CallbackType*)PressureGradMatrixTerm_ColCB, 
-				self );
+		NULL, 
+		NULL, 
+		(Assembler_CallbackType*)PressureGradMatrixTerm_RowCB, 
+		(Assembler_CallbackType*)PressureGradMatrixTerm_ColCB, 
+		(Assembler_CallbackType*)PressureGradMatrixTerm_ColCB, 
+		self );
 	self->gradField = gradField;
 	self->stiffMat = NULL;
 	self->elStiffMat = NULL;
@@ -130,10 +130,10 @@ void _PressureGradMatrixTerm_Init(
 }
 
 void PressureGradMatrixTerm_InitAll( 
-		void*                                               matrixTerm,
-		StiffnessMatrix*                                        stiffMat,
-		Swarm*                                              integrationSwarm,
-		FeVariable*                                         gradField )
+		void*					matrixTerm,
+		StiffnessMatrix*	stiffMat,
+		Swarm*				integrationSwarm,
+		FeVariable*			gradField )
 {
 	PressureGradMatrixTerm* self = (PressureGradMatrixTerm*) matrixTerm;
 
@@ -174,8 +174,8 @@ void* _PressureGradMatrixTerm_DefaultNew( Name name ) {
 }
 
 void _PressureGradMatrixTerm_Construct( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) {
-	PressureGradMatrixTerm*            self             = (PressureGradMatrixTerm*)matrixTerm;
-	FeVariable*                 gradField;
+	PressureGradMatrixTerm*	self = (PressureGradMatrixTerm*)matrixTerm;
+	FeVariable*					gradField;
 
 	/* Construct Parent */
 	_StiffnessMatrixTerm_Construct( self, cf, data );
@@ -186,7 +186,7 @@ void _PressureGradMatrixTerm_Construct( void* matrixTerm, Stg_ComponentFactory* 
 }
 
 void _PressureGradMatrixTerm_Build( void* matrixTerm, void* data ) {
-	PressureGradMatrixTerm*             self             = (PressureGradMatrixTerm*)matrixTerm;
+	PressureGradMatrixTerm* self = (PressureGradMatrixTerm*)matrixTerm;
 
 	_StiffnessMatrixTerm_Build( self, data );
 	Stg_Component_Build( self->gradField, data, False );
@@ -195,7 +195,7 @@ void _PressureGradMatrixTerm_Build( void* matrixTerm, void* data ) {
 }
 
 void _PressureGradMatrixTerm_Initialise( void* matrixTerm, void* data ) {
-	PressureGradMatrixTerm*             self             = (PressureGradMatrixTerm*)matrixTerm;
+	PressureGradMatrixTerm* self = (PressureGradMatrixTerm*)matrixTerm;
 
 	_StiffnessMatrixTerm_Initialise( self, data );
 	Stg_Component_Initialise( self->gradField, data, False );
@@ -209,13 +209,13 @@ void _PressureGradMatrixTerm_Destroy( void* matrixTerm, void* data ) {
 	_StiffnessMatrixTerm_Destroy( matrixTerm, data );
 }
 
-
-void _PressureGradMatrixTerm_AssembleElement( void* matrixTerm,
-					      StiffnessMatrix* stiffMat, 
-					      Element_LocalIndex lElement_I, 
-					      SystemLinearEquations* sle, 
-					      FiniteElementContext* context, 
-					      double** elStiffMat )
+void _PressureGradMatrixTerm_AssembleElement(
+	 void*						matrixTerm,
+	StiffnessMatrix*			stiffMat, 
+	Element_LocalIndex		lElement_I, 
+	SystemLinearEquations*	 sle, 
+	FiniteElementContext*	context, 
+	double**						elStiffMat )
 {
 	PressureGradMatrixTerm* self = (PressureGradMatrixTerm*)matrixTerm;
 

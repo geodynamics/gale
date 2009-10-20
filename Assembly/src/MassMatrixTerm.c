@@ -111,23 +111,20 @@ MassMatrixTerm* _MassMatrixTerm_New(
     return self;
 }
 
-void _MassMatrixTerm_Init( 
-    MassMatrixTerm*                             self, 
-    FeVariable*                                 field )
-{
+void _MassMatrixTerm_Init( MassMatrixTerm* self, FeVariable* field ) {
     self->field = field;
 }
 
 void MassMatrixTerm_InitAll( 
-    void*                                               matrixTerm,
-    StiffnessMatrix*                                        stiffMat,
-    Swarm*                                              integrationSwarm,
-    FeVariable*                                         field )
+	void*					matrixTerm,
+	StiffnessMatrix*	stiffMat,
+	Swarm*				integrationSwarm,
+	FeVariable*			field )
 {
-    MassMatrixTerm* self = (MassMatrixTerm*) matrixTerm;
+	MassMatrixTerm* self = (MassMatrixTerm*) matrixTerm;
 
-    StiffnessMatrixTerm_InitAll( self, stiffMat, integrationSwarm, NULL );
-    _MassMatrixTerm_Init( self, field );
+	StiffnessMatrixTerm_InitAll( self, stiffMat, integrationSwarm, NULL );
+	_MassMatrixTerm_Init( self, field );
 }
 
 void _MassMatrixTerm_Delete( void* matrixTerm ) {
@@ -197,22 +194,23 @@ void _MassMatrixTerm_Destroy( void* matrixTerm, void* data ) {
 }
 
 
-void _MassMatrixTerm_AssembleElement( void* matrixTerm,
-				      StiffnessMatrix* stiffMat, 
-				      Element_LocalIndex lElement_I, 
-				      SystemLinearEquations* sle, 
-				      FiniteElementContext* context, 
-				      double** elStiffMat )
+void _MassMatrixTerm_AssembleElement(
+	void*							matrixTerm,
+	StiffnessMatrix*			stiffMat, 
+	Element_LocalIndex		lElement_I, 
+	SystemLinearEquations*	sle, 
+	FiniteElementContext*	context, 
+	double**						elStiffMat )
 {
-    MassMatrixTerm*       self         = Stg_CheckType( matrixTerm, MassMatrixTerm );
-    StiffnessMatrix *stiffnessMatrix = self->stiffnessMatrix;
-    Swarm*                              swarm        = self->integrationSwarm;
-    FeVariable*                         variable1    = stiffnessMatrix->rowVariable;
-    Dimension_Index                     dim          = stiffnessMatrix->dim;
-    int num_node_dofs = self->field->fieldComponentCount;
-    IntegrationPoint*                   currIntegrationPoint;
-    double*                             xi;
-    double                              weight;
+	MassMatrixTerm*       self         = Stg_CheckType( matrixTerm, MassMatrixTerm );
+	StiffnessMatrix *stiffnessMatrix = self->stiffnessMatrix;
+	Swarm*                              swarm        = self->integrationSwarm;
+	FeVariable*                         variable1    = stiffnessMatrix->rowVariable;
+	Dimension_Index                     dim          = stiffnessMatrix->dim;
+	int num_node_dofs = self->field->fieldComponentCount;
+	IntegrationPoint*                   currIntegrationPoint;
+	double*                             xi;
+	double                              weight;
     Particle_InCellIndex                cParticle_I, cellParticleCount;
     Index                               nodesPerEl;
     Index                               i,j, k;

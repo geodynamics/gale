@@ -110,9 +110,7 @@ LaplacianStiffnessMatrixTerm* _LaplacianStiffnessMatrixTerm_New(
 	return self;
 }
 
-void _LaplacianStiffnessMatrixTerm_Init( 
-		LaplacianStiffnessMatrixTerm*                                    self )
-{
+void _LaplacianStiffnessMatrixTerm_Init( LaplacianStiffnessMatrixTerm* self ) {
 }
 
 void LaplacianStiffnessMatrixTerm_InitAll( 
@@ -185,7 +183,6 @@ void _LaplacianStiffnessMatrixTerm_Execute( void* matrixTerm, void* data ) {
 void _LaplacianStiffnessMatrixTerm_Destroy( void* matrixTerm, void* data ) {
 	_StiffnessMatrixTerm_Destroy( matrixTerm, data );
 }
-
 
 void _LaplacianStiffnessMatrixTerm_AssembleElement( 
 		void*                                              matrixTerm,

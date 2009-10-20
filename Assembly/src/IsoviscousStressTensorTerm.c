@@ -112,18 +112,15 @@ IsoviscousStressTensorTerm* _IsoviscousStressTensorTerm_New(
 	return self;
 }
 
-void _IsoviscousStressTensorTerm_Init( 
-		IsoviscousStressTensorTerm*                         self,
-		double                                              viscosity )
-{
+void _IsoviscousStressTensorTerm_Init( IsoviscousStressTensorTerm* self, double viscosity ) {
 	self->viscosity = viscosity;
 }
 
 void IsoviscousStressTensorTerm_InitAll( 
-		void*                                               matrixTerm,
-		StiffnessMatrix*                                    stiffnessMatrix,
-		Swarm*                                              integrationSwarm,
-		double                                              viscosity )
+	void*					matrixTerm,
+	StiffnessMatrix*	stiffnessMatrix,
+	Swarm*				integrationSwarm,
+	double				viscosity )
 {
 	IsoviscousStressTensorTerm* self = (IsoviscousStressTensorTerm*) matrixTerm;
 
