@@ -2581,46 +2581,42 @@ void FeVariable_ReadFromFile( void* feVariable, const char* filename ) {
 
 
 void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, const char* feVarFilename, const char* meshFilename ){
-	FeVariable*                    self = (FeVariable*)feVariable;
-   Stream*                        errorStr = Journal_Register( Error_Type, self->type );   
+	FeVariable*							self = (FeVariable*)feVariable;
+   Stream*								errorStr = Journal_Register( Error_Type, self->type );   
 #ifdef READ_HDF5
-   CartesianGenerator*            gen;
-   C0Generator*                   C0gen;
-   FeMesh                         *feMesh, *C0feMesh, *elementMesh;
-   DofLayout*                     dofs;
-   FeEquationNumber*              eqNum;
-   Variable_Register*             varReg;
-   int                            maxDecomp[3] = {0, 1, 1};
-   static int                     arraySize;
-   static double*                 arrayPtrs[2];
-   Variable*                      var;
-   VariableCondition*             bcs;
-   ConditionFunction_Register*    cfReg;
-   Dictionary*                    dict;
-   XML_IO_Handler*                ioHandler;
-   FeVariable*                    feVar;
-   int                            n_i;
-   hid_t                          file, fileSpace, fileData, error;
-   unsigned                       totalNodes, ii;
-   FeCheckpointFileVersion        ver;
-   hid_t                          attrib_id, group_id;
-   herr_t                         status;
-   int                            res[3];
-   int                            checkVer;
-   int                            ndims;
-   unsigned*                      sizes;
-	double			                crdMin[3], crdMax[3];
-	double*                        value;
-	unsigned		                   nDomainVerts;
-	static double*		             arrayPtr;
-   Name			                   varName[9];
+   CartesianGenerator*				gen;
+   C0Generator*						C0gen;
+   FeMesh								*feMesh, *C0feMesh, *elementMesh;
+   DofLayout*							dofs;
+   FeEquationNumber*					eqNum;
+   Variable_Register*				varReg;
+   int									maxDecomp[3] = {0, 1, 1};
+   Variable*							var;
+   VariableCondition*				bcs;
+   ConditionFunction_Register*	cfReg;
+   Dictionary*							dict;
+   XML_IO_Handler*					ioHandler;
+   FeVariable*							feVar;
+	int									n_i;
+   hid_t									file, fileSpace, fileData, error;
+   unsigned								totalNodes, ii;
+   FeCheckpointFileVersion			ver;
+   hid_t									attrib_id, group_id;
+   herr_t								status;
+   int									res[3];
+   int									checkVer;
+   int									ndims;
+   unsigned*							sizes;
+	double								crdMin[3], crdMax[3];
+	double*								value;
+	unsigned								nDomainVerts;
+	double*								arrayPtr;
+   Name									varName[9];
 
    /** Open the file and data set. */
 	file = H5Fopen( meshFilename, H5F_ACC_RDONLY, H5P_DEFAULT );
 	
-	Journal_Firewall(	file >= 0, errorStr,
-		"Error in %s for %s '%s' - Cannot open file %s.\n", 
-		__func__, self->type, self->name, meshFilename );
+	Journal_Firewall(	file >= 0, errorStr, "Error in %s for %s '%s' - Cannot open file %s.\n", __func__, self->type, self->name, meshFilename );
 
    /** get the file attributes to sanity and version checks */
    #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
@@ -2632,18 +2628,15 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
    #endif
    /** if this attribute does not exist (attrib_id < 0) then we assume MeshCHECKPOINT_V1 which is not supported  */
    if(attrib_id < 0)
-      Journal_Firewall(NULL, 
-                  errorStr,"\nError in %s for %s '%s' \n\n Interpolation restart not supported for Version 1 Checkpoint files \n\n", __func__, self->type, self->name );
+      Journal_Firewall(NULL, errorStr,"\nError in %s for %s '%s' \n\n Interpolation restart not supported for Version 1 Checkpoint files \n\n", __func__, self->type, self->name );
 
    /** check for known checkpointing version type */
 
    status = H5Aread(attrib_id, H5T_NATIVE_INT, &checkVer);
    H5Aclose(attrib_id);
    if(checkVer != 2)
-      Journal_Firewall( (0), errorStr,
-         "\n\nError in %s for %s '%s'\n"
-         "Unknown checkpoint version (%u) for checkpoint file (%s).\n", 
-         __func__, self->type, self->name, (unsigned int) checkVer, meshFilename);
+      Journal_Firewall( (0), errorStr, "\n\nError in %s for %s '%s'\n" "Unknown checkpoint version (%u) for checkpoint file (%s).\n", __func__,
+			 self->type, self->name, (unsigned int) checkVer, meshFilename);
 
    /** check for correct number of dimensions */
 
