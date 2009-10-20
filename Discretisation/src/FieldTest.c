@@ -940,9 +940,9 @@ void FieldTest_GenerateErrFields( void* _context, void* data ) {
 	FieldTest*		self			= fieldTestSingleton;
 	FeVariable*		errorField;
 	Index			lMeshSize, lElement_I;
-	double			elErrorSq[3], elNormSq[3], elError[3];
-	double			lAnalyticSq[3], gAnalyticSq[3];
-	double			lErrorSq[3], gErrorSq[3];
+	double			elErrorSq[9], elNormSq[9], elError[9];
+	double			lAnalyticSq[9], gAnalyticSq[9];
+	double			lErrorSq[9], gErrorSq[9];
 	Bool			normalise		= self->normalise;
 	Index			numDofs, dof_I, fieldCount;
 	Index			field_I;
@@ -1062,7 +1062,7 @@ void FieldTest_ElementErrReferenceFromField( void* fieldTest, Index field_I, Ind
 	double			*xi, weight;
 	double			globalCoord[3];
 	double			detJac;
-	double			reference[3], numeric[3];
+	double			reference[9], numeric[9];
 	Index			numDofs			= numericField->fieldComponentCount;
 	Index			dof_I;
 
@@ -1111,7 +1111,7 @@ void FieldTest_ElementErrAnalyticFromField( void* fieldTest, Index field_I, Inde
 	double			*xi, weight;
 	double			globalCoord[3];
 	double			detJac;
-	double			analytic[3], numeric[3];
+	double			analytic[9], numeric[9];
 	Index			numDofs			= numericField->fieldComponentCount;
 	Index			dof_I;
 	/* corresponding analytic solution function for this feVariable, as assigned in the plugin */
