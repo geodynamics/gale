@@ -131,6 +131,18 @@ void _FieldTest_Delete( void* fieldTest ) {
 		Memory_Free( self->analyticSolnForFeVarKey );
 		Memory_Free( self->_analyticSolutionList );
 	}
+
+	if( self->swarmVarCount ) {
+	   Index swarmVar_I;
+		for( swarmVar_I = 0; swarmVar_I < self->swarmVarCount; swarmVar_I++ ) 
+			Memory_Free(self->swarmVarNameList[swarmVar_I]); 
+		Memory_Free( self->swarmVarNameList );
+	}
+	
+	Memory_Free( self->referenceSolnPath );
+	Memory_Free( self->expectedFileName );
+	Memory_Free( self->expectedFilePath );
+	Memory_Free( self->dumpExpectedFileName );
 	
 	/* Stg_Class_Delete parent*/
 	_Stg_Component_Delete( self );
@@ -202,8 +214,8 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 		for( feVariable_I = 0; feVariable_I < self->fieldCount; feVariable_I++ ) {
 			/* read in the FeVariable from the tuple */
 			fieldName = ( fieldList ) ? 
-				    Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( fieldList, 2 * feVariable_I ) ) :
-				    Dictionary_GetString( pluginDict, "FeVariable" );
+				    StG_Strdup( Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( fieldList, 2 * feVariable_I ) ) ):
+				    StG_Strdup( Dictionary_GetString( pluginDict, "FeVariable" ) );
 			
 			self->numericFieldList[feVariable_I] = (FeVariable*) FieldVariable_Register_GetByName( fV_Register, fieldName );
 
@@ -223,6 +235,7 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 			/* ...and the corresponding analytic function ptr index - these have to be consistent with how they're ordered in the plugin */
 			self->analyticSolnForFeVarKey[feVariable_I] = Dictionary_Entry_Value_AsUnsignedInt( 
 									Dictionary_Entry_Value_GetElement( fieldList, 2 * feVariable_I + 1 ) );
+			Memory_Free( fieldName );
 		}
 	}
 
@@ -236,12 +249,12 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 	
 		for( swarmVar_I = 0; swarmVar_I < self->swarmVarCount; swarmVar_I++ ) {
 			self->swarmVarNameList[swarmVar_I] = ( swarmVarList ) ? 
-					Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( swarmVarList, swarmVar_I ) ) :
-					Dictionary_GetString( pluginDict, "SwarmVariable" );
+					StG_Strdup( Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( swarmVarList, swarmVar_I ) ) ):
+					StG_Strdup( Dictionary_GetString( pluginDict, "SwarmVariable" ) );
 		}	
 	}
 	
-	self->referenceSolnPath     = Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "referenceSolutionFilePath" ) );
+	self->referenceSolnPath     = StG_Strdup( Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "referenceSolutionFilePath" ) ) );
 	self->normalise             = Dictionary_Entry_Value_AsBool( Dictionary_Get( pluginDict, "normaliseByAnalyticSolution" ) );
 	self->epsilon               = Dictionary_Entry_Value_AsDouble( Dictionary_Get( pluginDict, "epsilon" ) );
 	self->testTimestep          = Dictionary_GetInt_WithDefault( pluginDict, "testTimestep", 0 );
@@ -249,9 +262,9 @@ void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data
 	self->appendToAnalysisFile  = Dictionary_GetBool_WithDefault( pluginDict, "appendToAnalysisFile", False ) ;
 
 	/* for the physics test */
-	self->expectedFileName = Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "expectedFileName" ) );
-	self->expectedFilePath = Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "expectedFilePath" ) );
-	self->dumpExpectedFileName = Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "expectedOutputFileName" ) );
+	self->expectedFileName     = StG_Strdup( Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "expectedFileName" ) ) );
+	self->expectedFilePath     = StG_Strdup( Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "expectedFilePath" ) ) );
+	self->dumpExpectedFileName = StG_Strdup( Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "expectedOutputFileName" ) ) );
 	self->expectedPass     = False;
 
 	/* set up the entry point */
@@ -940,9 +953,9 @@ void FieldTest_GenerateErrFields( void* _context, void* data ) {
 	FieldTest*		self			= fieldTestSingleton;
 	FeVariable*		errorField;
 	Index			lMeshSize, lElement_I;
-	double			elErrorSq[3], elNormSq[3], elError[3];
-	double			lAnalyticSq[3], gAnalyticSq[3];
-	double			lErrorSq[3], gErrorSq[3];
+	double			elErrorSq[9], elNormSq[9], elError[9];
+	double			lAnalyticSq[9], gAnalyticSq[9];
+	double			lErrorSq[9], gErrorSq[9];
 	Bool			normalise		= self->normalise;
 	Index			numDofs, dof_I, fieldCount;
 	Index			field_I;
@@ -1062,7 +1075,7 @@ void FieldTest_ElementErrReferenceFromField( void* fieldTest, Index field_I, Ind
 	double			*xi, weight;
 	double			globalCoord[3];
 	double			detJac;
-	double			reference[3], numeric[3];
+	double			reference[9], numeric[9];
 	Index			numDofs			= numericField->fieldComponentCount;
 	Index			dof_I;
 
@@ -1111,7 +1124,7 @@ void FieldTest_ElementErrAnalyticFromField( void* fieldTest, Index field_I, Inde
 	double			*xi, weight;
 	double			globalCoord[3];
 	double			detJac;
-	double			analytic[3], numeric[3];
+	double			analytic[9], numeric[9];
 	Index			numDofs			= numericField->fieldComponentCount;
 	Index			dof_I;
 	/* corresponding analytic solution function for this feVariable, as assigned in the plugin */
