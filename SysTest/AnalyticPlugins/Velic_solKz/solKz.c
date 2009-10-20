@@ -11,7 +11,7 @@ void _Velic_solKz(
 		double vel[], double* presssure, 
 		double total_stress[], double strain_rate[] );
 
-
+#ifndef NOSHARED
 int main( int argc, char **argv )
 {
 	int i,j;
@@ -42,7 +42,7 @@ int main( int argc, char **argv )
 	
 	return 0;
 }
-
+#endif
 
 
 

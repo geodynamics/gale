@@ -208,6 +208,7 @@ void _XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream
                /** check what type of generator was used to know where elementMesh is **/
                if( Stg_Class_IsInstance( feVar->feMesh->generator, C0Generator_Type))        feVarMesh = ((C0Generator*)feVar->feMesh->generator)->elMesh;
                if( Stg_Class_IsInstance( feVar->feMesh->generator, CartesianGenerator_Type)) feVarMesh = feVar->feMesh;
+               if( Stg_Class_IsInstance( feVar->feMesh->generator, MeshAdaptor_Type))        feVarMesh = feVar->feMesh;
                /** make sure that the fevariable femesh is the same as that used above for the geometry definition, if so proceed **/
                if( feVarMesh == feMesh ){
                      Name   centering = NULL;

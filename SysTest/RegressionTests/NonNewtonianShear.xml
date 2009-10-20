@@ -52,7 +52,7 @@
 		<param name="IntegrationSwarm">gaussSwarm</param>
 		<param name="ConstantMesh">constantMesh</param>
 		<param name="ElementMesh">linearMesh</param>
-		<param name="normaliseByAnalyticSolution">False</param>
+		<param name="normaliseByAnalyticSolution">false</param>
 		<param name="useReferenceSolutionFromFile">False</param>
 		<param name="appendToAnalysisFile">False</param>
 		<param name="Context">context</param>
@@ -136,7 +136,7 @@
 	<param name="particlesPerCell">  20    </param>
 
 	<!-- Non-linear stuff -->
-	<param name="nonLinearMaxIterations"> 50 </param>	
+	<param name="nonLinearMaxIterations"> 5000 </param>	
 	<param name="nonLinearTolerance"> 1e-6 </param>	
 	
 	<!-- Geometry & Mesh setup -->

@@ -6,6 +6,8 @@
 void _Velic_solutionA( double* pos, 
 		double sigma, double Z, int n, double km,
 		double* velocity, double* pressure, double* Tstress, double* strainRate );
+
+#ifndef NOSHARED
 int main() {
 	double sigma = 1.0;
 	double Z = 1.0;
@@ -34,6 +36,7 @@ int main() {
 
 	return 0;
 }
+#endif
 
 void _Velic_solutionA( double* pos, 
 		double sigma, double Z, int n, double km,

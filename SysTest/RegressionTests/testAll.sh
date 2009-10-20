@@ -10,3 +10,12 @@
 ./checkpointTest.pl NonNewtonian.xml
 #./checkpointTest.pl PeriodicBenchmark.xml
 ./checkpointTest.pl RayleighTaylorBenchmark.xml
+
+./analyticTest.pl NonNewtonianShear.xml -optionsFile np-1.dat
+./analyticTest.pl NonNewtonianShear.xml -optionsFile np-2.dat
+./analyticTest.pl NonNewtonianShear.xml -optionsFile np-4.dat
+./analyticTest.pl NonNewtonianShear.xml -optionsFile np-8.dat
+./analyticTest.pl Trubitsyn2006Isoviscous.xml -optionsFile np-1.dat
+./analyticTest.pl Trubitsyn2006Isoviscous.xml -optionsFile np-2.dat
+./analyticTest.pl Trubitsyn2006Isoviscous.xml -optionsFile np-4.dat
+./analyticTest.pl Trubitsyn2006Isoviscous.xml -optionsFile np-8.dat

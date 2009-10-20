@@ -15,6 +15,10 @@
 		<param>StgFEM_FrequentOutput</param>	
 		<param>Underworld_Nusselt</param>	
 		<param>Underworld_Vrms</param>	
+		<param>Underworld_BoundaryLayers</param>	
+		<param>Underworld_MaxTemperature</param>	
+		<param>Underworld_MaxVelocity</param>	
+		<param>Underworld_Mobility</param>	
 		<param>StgFEM_CPUTime</param>	
 		<param>Experimental_PressureCalibration</param>
 		
@@ -79,6 +83,13 @@
 		     	<param name="Operator">SymmetricTensor_Invariant</param>
 			<param name="FeVariable">recoveredDeviatoricStressField</param>
 		</struct>
+		
+		<!-- I think we only need one of these to add heating to all materials -->
+		<struct name="internalHeatingTerm">
+			<param name="Type">RadiogenicHeatingTerm</param>
+			<param name="ForceVector">residual</param>
+			<param name="Swarm">gaussSwarm</param>
+		</struct>	
 
 		<struct name="temperatureDependence">
 			<param name="Type">Arrhenius</param>
@@ -87,9 +98,23 @@
 			<param name="activationEnergy">27.63102112</param>
 		</struct>
 		
+		<struct name="temperatureDependence2">
+			<param name="Type">Arrhenius</param>
+			<param name="TemperatureField">TemperatureField</param>
+			<param name="eta0">1.0e-3</param>
+			<param name="activationEnergy">27.63102112</param>
+		</struct>
+		
 		<struct name="shape">
 			<param name="Type">Everywhere</param>
 		</struct>		
+			
+		<struct name="box-shape">
+			<param name="Type">Box</param>
+			<param name="startX"> cBlockX1 </param> <param name="endX"> cBlockX2 </param>
+			<param name="startZ"> cBlockZ1 </param> <param name="endZ"> cBlockZ2 </param>
+			<param name="startY"> cBlockY1 </param> <param name="endY"> cBlockY2 </param>
+		</struct>
 		
 		<struct name="material">
 			<param name="Type">RheologyMaterial</param>
@@ -100,6 +125,42 @@
 				<param> temperatureDependence </param>
 				<!--><param> yielding </param> -->       <!-- Not needed for the isoviscous run -->
 			</list>
+			<list name="heatingElements">
+			     <struct>
+                    <param name="Q">0.0</param>
+                    <param name="lambda">0.0</param>                    
+                </struct>
+ 			    <!-- And to add another one ... 
+ 				<struct>
+                    <param name="Q">1.0</param>
+                    <param name="lambda">0.0</param>                    
+                </struct>
+				-->
+           </list>		
+		</struct>	
+	
+		<struct name="light-material">
+			<param name="Type">RheologyMaterial</param>
+			<param name="Shape">box-shape</param>
+			<param name="density"> 0.0 </param>
+			<param name="alpha">   1.0 </param>
+			<list name="Rheology">
+				<param> temperatureDependence2 </param>
+				<!--><param> yielding </param> -->       <!-- Not needed for the isoviscous run -->
+			</list>
+			<list name="heatingElements">
+			    <struct>
+                    <param name="Q">0.0</param>
+                    <param name="lambda">0.0</param>                    
+                </struct>
+ 			    <!-- And to add another one ... 
+ 				<struct>
+                    <param name="Q">0.0</param>
+                    <param name="lambda">0.0</param>                    
+                </struct>
+				-->
+           </list>		
+			
 		</struct>	
 	
 		
@@ -139,7 +200,7 @@
 	
 
 	<!-- Simulation control -->
-	<param name="maxTimeSteps"> 2 </param>
+	<param name="maxTimeSteps"> 5 </param>
 	<param name="outputPath"> ./output </param>
 	<param name="dumpEvery"> 1 </param>	
 	<param name="checkpointEvery"> 0 </param>
@@ -157,7 +218,7 @@
 	
 	<param name="gravity"> 1e6 </param>	
 	
-	<param name="courantFactor"> 0.75 </param>	
+	<param name="courantFactor"> 0.5 </param>	
 	
 	<!-- Integration Scheme configuration -->
 	<param name="particlesPerCell"> 10 </param>
@@ -187,32 +248,22 @@
 	<param name="maxY">  1.0 </param>
 	<param name="maxZ">  1.0 </param>
 	<param name="allowUnbalancing"> True </param>
+	
+	<!-- "Continent" block shape -->
+	
+	<param name="cBlockX1"> -0.5 </param>
+	<param name="cBlockX2">  0.5 </param>
+	<param name="cBlockZ1"> -0.5 </param>
+	<param name="cBlockZ2">  0.5 </param>
+	<param name="cBlockY1">  0.9 </param>
+	<param name="cBlockY2">  1.0 </param>
 
 	<!-- Set up BCs and ICs -->
 	<include> Underworld/VariableConditions/temperatureBCs.xml </include>
 	<include> Underworld/VariableConditions/temperatureICs.sinusoid.xml </include>
 	<include> Underworld/VariableConditions/velocityBCs.freeslip.xml </include>
-
-	<!-- Integration Scheme configuration -->
-
-	<!-- Viewport stuff -->
-	<include> ./gLuciferFiles/Cameras3D-4x4x1.xml</include>
-	<include> ./gLuciferFiles/TemperatureAndVelocityArrowsVP.xml </include>
-	<include> ./gLuciferFiles/TemperatureIsosurfaceVP.xml </include>
-	<include> ./gLuciferFiles/StrainRateInvariantVP.xml </include> 
-	<!--><include>Underworld/Viewports/ParticleDensityVP.xml</include> -->
-	<include> ./gLuciferFiles/REPStressVP.xml</include>
-	<include> ./gLuciferFiles/ParticleHasYieldedVP.xml</include>
-	<include> ./gLuciferFiles/FlatEarthBoxWindow.xml</include>
 	
-	<!-- Add this  -->
-	<struct name="components" mergeType="merge">
-		<struct name="FlatEarthBoxView1" mergeType="merge">
-			<list name="Viewport" mergeType="replace">
-				<param>FlatEarthTemperatureAndVelocityArrowsVP FlatEarthVerticalTemperatureGradientVP</param>
-				<param>FlatEarthParticleHasYieldedVP recoveredPressureVP </param>
-			</list>
-		</struct>
-	</struct>
+	<!-- NOTE: he periodic boundary conditions from the BaseApps directory will override the boundary conditions -->
+
 
 </StGermainData>

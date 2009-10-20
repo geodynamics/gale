@@ -94,7 +94,10 @@ void VTKOutput( void* _context ) {
         int myRank, nprocs;
         MPI_Comm comm;
 
-        comm = Comm_GetMPIComm( Mesh_GetCommTopology( picIntegrationPoints->mesh, MT_VERTEX ) );
+	if(context->picIntegrationPoints)
+	    comm = Comm_GetMPIComm( Mesh_GetCommTopology( context->picIntegrationPoints->mesh, MT_VERTEX ) );
+	else
+	    comm = MPI_COMM_WORLD;
 
 	MPI_Comm_rank( comm, (int*)&myRank );
         MPI_Comm_size( comm, (int*)&nprocs );
@@ -105,13 +108,15 @@ void VTKOutput( void* _context ) {
 	
         /* Write the particles and then all of the fields. */
 
-        VTKOutput_particles(picIntegrationPoints,
-                            Dictionary_GetDouble_WithDefault
-                            (dictionary,"defaultDiffusivity",1.0),
-                            Dictionary_GetInt_WithDefault
-                            (dictionary,"particleStepping",1),
-                            context->outputPath, context->timeStep,
-                            context->dim,myRank,nprocs);
+	if(context->picIntegrationPoints) {
+	    VTKOutput_particles(context->picIntegrationPoints,
+				Dictionary_GetDouble_WithDefault
+				(dictionary,"defaultDiffusivity",1.0),
+				Dictionary_GetInt_WithDefault
+				(dictionary,"particleStepping",1),
+				context->outputPath, context->timeStep,
+				context->dim,myRank,nprocs);
+	}
         VTKOutput_fields(context,myRank,nprocs);
 }
 
