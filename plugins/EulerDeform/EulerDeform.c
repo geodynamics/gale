@@ -161,7 +161,10 @@ void _Underworld_EulerDeform_Build( void* component, void* data ) {
 			sys->wrapBottom = Dictionary_GetBool_WithDefault( sysDict, "wrapBottom", False );
 			sys->wrapLeft = Dictionary_GetBool_WithDefault( sysDict, "wrapLeft", False );
 			sys->mesh = Stg_ComponentFactory_ConstructByName( uwCtx->CF, meshName, Mesh, True, data );
-			sys->velField = Stg_ComponentFactory_ConstructByName( uwCtx->CF, velFieldName, FieldVariable, True, data );
+			/* This line is currently not working, have to manually set the velocity field name.
+				This should be fixed once this plugin has been converted to a component. */
+			/*sys->velField = Stg_ComponentFactory_ConstructByName( uwCtx->CF, velFieldName, FieldVariable, True, data );*/
+			sys->velField = Stg_ComponentFactory_ConstructByName( uwCtx->CF, "VelocityField", FieldVariable, True, data );
 
 			sys->staticTop = Dictionary_GetBool_WithDefault( sysDict, "staticTop", False );
 			sys->staticBottom = Dictionary_GetBool_WithDefault( sysDict, "staticBottom", False );
@@ -169,8 +172,7 @@ void _Underworld_EulerDeform_Build( void* component, void* data ) {
 			sys->staticRight = Dictionary_GetBool_WithDefault( sysDict, "staticRight", False );
 			sys->staticFront = Dictionary_GetBool_WithDefault( sysDict, "staticFront", False );
 			sys->staticBack = Dictionary_GetBool_WithDefault( sysDict, "staticBack", False );
-			sys->staticSides = sys->staticTop || sys->staticBottom
-                          || sys->staticRight || sys->staticLeft || sys->staticFront || sys->staticBack;
+			sys->staticSides = sys->staticTop || sys->staticBottom || sys->staticRight || sys->staticLeft || sys->staticFront || sys->staticBack;
 
 			sys->contactRight = Dictionary_GetBool_WithDefault( sysDict, "contactRight", False );
 			sys->contactLeft = Dictionary_GetBool_WithDefault( sysDict, "contactLeft", False );
