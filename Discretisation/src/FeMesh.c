@@ -42,25 +42,27 @@
 /* Textual name of this class */
 const Type FeMesh_Type = "FeMesh";
 
-
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Constructors
 */
 
 FeMesh* FeMesh_New( Name name ) {
 	return _FeMesh_New( sizeof(FeMesh), 
-			  FeMesh_Type, 
-			  _FeMesh_Delete, 
-			  _FeMesh_Print, 
-			  NULL, 
-			  (void* (*)(Name))_FeMesh_New, 
-			  _FeMesh_Construct, 
-			  _FeMesh_Build, 
-			  _FeMesh_Initialise, 
-			  _FeMesh_Execute, 
-			  _FeMesh_Destroy, 
-			  name, 
-			  NON_GLOBAL );
+		FeMesh_Type, 
+		_FeMesh_Delete, 
+		_FeMesh_Print, 
+		NULL, 
+		(void* (*)(Name))_FeMesh_New, 
+		_FeMesh_Construct, 
+		_FeMesh_Build, 
+		_FeMesh_Initialise, 
+		_FeMesh_Execute, 
+		_FeMesh_Destroy, 
+		name, 
+		NON_GLOBAL,
+		NULL,
+		NULL,
+		False);
 }
 
 FeMesh* _FeMesh_New( FEMESH_DEFARGS ) {
@@ -73,12 +75,12 @@ FeMesh* _FeMesh_New( FEMESH_DEFARGS ) {
 	/* Virtual info */
 
 	/* FeMesh info */
-	_FeMesh_Init( self );
+	_FeMesh_Init( self, elType, family, elementMesh );
 
 	return self;
 }
 
-void _FeMesh_Init( FeMesh* self ) {
+void _FeMesh_Init( FeMesh* self, ElementType* elType, const char* family, Bool elementMesh ) {
 	Stream*	stream;
 
 	assert( self && Stg_CheckType( self, FeMesh ) );
@@ -86,8 +88,16 @@ void _FeMesh_Init( FeMesh* self ) {
 	stream = Journal_Register( Info_Type, self->type );
 	Stream_SetPrintingRank( stream, 0 );
 
-	self->feElType = NULL;
-	self->feElFamily = NULL;
+	self->feElType = elType;
+	self->feElFamily = family;
+	self->elementMesh = elementMesh;
+
+   /* checkpoint non-constant meshes */
+   if ( self->feElFamily && strcmp( self->feElFamily, "constant" ) ){
+      self->isCheckpointedAndReloaded = True;
+      self->requiresCheckpointing     = True;
+   }
+	
 	self->inc = IArray_New();
 }
 
@@ -119,22 +129,15 @@ void _FeMesh_Print( void* feMesh, Stream* stream ) {
 }
 
 void _FeMesh_Construct( void* feMesh, Stg_ComponentFactory* cf, void* data ) {
-	FeMesh*		self = (FeMesh*)feMesh;
+	FeMesh*	self = (FeMesh*)feMesh;
 	char*		family;
 
 	assert( self );
 
 	_Mesh_Construct( self, cf, data );
 
-	family = Stg_ComponentFactory_GetString( cf, self->name, "elementType", "linear" );
-	FeMesh_SetElementFamily( self, family );
-   /* checkpoint non-constant meshes */
-   if ( strcmp( self->feElFamily, "constant" ) ){
-      self->isCheckpointedAndReloaded = True;
-      self->requiresCheckpointing     = True;
-   }
-
-	self->elementMesh = Stg_ComponentFactory_GetBool( cf, self->name, "isElementMesh", False );
+	_FeMesh_Init( self, NULL, Stg_ComponentFactory_GetString( cf, self->name, "elementType", "linear" ), 
+		Stg_ComponentFactory_GetBool( cf, self->name, "isElementMesh", False ) );
 }
 
 void _FeMesh_Build( void* feMesh, void* data ) {

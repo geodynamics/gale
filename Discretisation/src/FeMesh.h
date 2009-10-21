@@ -66,14 +66,17 @@
 	*/
 
 	#define FEMESH_DEFARGS	\
-		MESH_DEFARGS
+		MESH_DEFARGS, \
+		ElementType* elType, \
+		const char* family, \
+		Bool elementMesh
 
 	#define FEMESH_PASSARGS	\
 		MESH_PASSARGS
 
 	FeMesh* FeMesh_New( Name name );
 	FeMesh* _FeMesh_New( FEMESH_DEFARGS );
-	void _FeMesh_Init( FeMesh* self );
+	void _FeMesh_Init( FeMesh* self, ElementType* elType, const char* family, Bool elementMesh );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Virtual functions
