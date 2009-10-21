@@ -50,7 +50,7 @@
 #include "types.h"
 #include "Materials_Register.h"
 #include "Material.h"
-#include "Context.h"
+#include "PICelleratorContext.h"
 
 /* Textual name of this class */
 const Type PICelleratorContext_Type = "PICelleratorContext";

@@ -52,7 +52,7 @@
 
 #include "MaterialPoints.h"
 #include "Material.h"
-#include "Context.h"
+#include "PICelleratorContext.h"
 
 #include <assert.h>
 #include <string.h>

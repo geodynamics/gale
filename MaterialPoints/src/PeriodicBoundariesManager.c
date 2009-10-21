@@ -51,7 +51,7 @@
 #include <PICellerator/Weights/Weights.h>
 
 #include "types.h"
-#include "Context.h"
+#include "PICelleratorContext.h"
 #include "PeriodicBoundariesManager.h"
 
 #include <string.h>

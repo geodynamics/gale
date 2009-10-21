@@ -70,7 +70,7 @@
 	/* dave 21.09.07 */
 	#include "SwarmVariableField.h"
 
-	#include "Context.h"
+	#include "PICelleratorContext.h"
 	#include "Init.h"
 	#include "Finalise.h"
 
