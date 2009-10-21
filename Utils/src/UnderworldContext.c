@@ -52,7 +52,7 @@
 #include <Underworld/Rheology/Rheology.h>
 
 #include "types.h"
-#include "Context.h"
+#include "UnderworldContext.h"
 #include "XDMFGenerator.h"
 
 /* Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */

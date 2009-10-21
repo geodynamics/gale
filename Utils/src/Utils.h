@@ -47,7 +47,7 @@
 #define __Underworld_Utils_h__
 
 	#include "types.h"
-	#include "Context.h"
+	#include "UnderworldContext.h"
 	#include "StressField.h"
 	#include "NodalPressureField.h"
 	#include "SmoothVelGradField.h"
