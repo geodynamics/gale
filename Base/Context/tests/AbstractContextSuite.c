@@ -208,7 +208,6 @@ void AbstractContextSuite_Setup( AbstractContextSuiteData* data ) {
 }
 
 void AbstractContextSuite_Teardown( AbstractContextSuiteData* data ) {
-   Stg_Class_Delete( data->ctx );
    Stg_Class_Delete( data->dict );
 }
 
@@ -322,8 +321,6 @@ void AbstractContextSuite_TestRestartFromCheckpoint( AbstractContextSuiteData* d
    Stg_Component_Execute( data->ctx, 0 /* dummy */, False );
    Stg_Component_Destroy( data->ctx, 0 /* dummy */, False );
 
-   Stg_Class_Delete( data->ctx );
-   
    /* ReBuild the context */
    Dictionary_Set( data->dict, "maxTimeSteps", Dictionary_Entry_Value_FromUnsignedInt( 20 ) );
    Dictionary_Set( data->dict, "restartTimestep", Dictionary_Entry_Value_FromUnsignedInt( 5 ) );

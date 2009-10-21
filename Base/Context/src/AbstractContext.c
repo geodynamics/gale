@@ -558,7 +558,6 @@ void _AbstractContext_Construct( void* context, Stg_ComponentFactory* cf, void* 
 	self->finalTimeStep = Dictionary_GetUnsignedInt_WithDefault( self->dictionary, "finalTimeStep", 0 );
 	self->gracefulQuit = False;
 
-
 	/* TODO: does this need to be read from checkpoint file??? */
 	self->currentTime = self->startTime;
 	self->timeStep = 0;
@@ -668,14 +667,16 @@ void _AbstractContext_Destroy( void* context, void* data ) {
 	
 	Journal_Printf( self->debug, "In: %s\n", __func__ );
 
+	/* Pre-mark the phase as complete as a default hook will attempt to initialise all live components (including this again) */
    PluginsManager_RemoveAllFromComponentRegister( self->plugins ); 
 
-	/* Pre-mark the phase as complete as a default hook will attempt to initialise all live components (including this again) */
-	isDestroyed = self->isDestroyed;
-	self->isDestroyed = True;
-	KeyCall( self, self->destroyExtensionsK, EntryPoint_VoidPtr_CallCast* )( KeyHandle(self,self->destroyExtensionsK), self );
-	KeyCall( self, self->destroyK, EntryPoint_VoidPtr_CallCast* )( KeyHandle(self,self->destroyK), self );
-	self->isDestroyed = isDestroyed;
+ 	isDestroyed = self->isDestroyed;
+  	self->isDestroyed = True;
+  	KeyCall( self, self->destroyExtensionsK, EntryPoint_VoidPtr_CallCast* )( KeyHandle(self,self->destroyExtensionsK), self );
+  	KeyCall( self, self->destroyK, EntryPoint_VoidPtr_CallCast* )( KeyHandle(self,self->destroyK), self );
+  	self->isDestroyed = isDestroyed;
+
+   _AbstractContext_Delete( context );
 }
 
 
