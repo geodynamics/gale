@@ -141,19 +141,19 @@ Bool _PluginsManager_LoadPlugin( void* pluginsManager, Module* plugin ) {
 }
 
 Bool _PluginsManager_UnloadPlugin( void* pluginsManager, Module* plugin ) {
-	/*PluginsManager* self = (PluginsManager*)pluginsManager;*/
+	PluginsManager* self = (PluginsManager*)pluginsManager;
+
+	ModulesManager_Unload( self );
 	
 	return True;
 }
 
 void PluginsManager_RemoveAllFromComponentRegister( void* pluginsManager ) {
-	PluginsManager* self = (PluginsManager*)pluginsManager;
-	
-   Stg_ComponentRegister * componentRegister = Stg_ComponentRegister_Get_ComponentRegister();
+	PluginsManager*			self = (PluginsManager*)pluginsManager;
+   Stg_ComponentRegister*	componentRegister = Stg_ComponentRegister_Get_ComponentRegister();
+   Index							i;
 
-   int i;
-   for (i=0; i<Stg_ObjectList_Count(self->codelets); i++)
-   {
+   for (i=0; i<Stg_ObjectList_Count(self->codelets); i++) {
       Stg_Object *codelet = self->codelets->data[i];
       Stg_ComponentRegister_RemoveEntry(componentRegister, codelet->type, "0");
    }
