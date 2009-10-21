@@ -46,7 +46,7 @@
 #include "units.h"
 #include "types.h"
 #include "shortcuts.h"
-#include "Context.h"
+#include "FiniteElementContext.h"
 #include "SolutionVector.h"
 #include "ForceVector.h"
 #include "ForceTerm.h"

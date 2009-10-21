@@ -48,7 +48,7 @@
 #include "StiffnessMatrix.h"
 #include "SolutionVector.h"
 #include "ForceVector.h"
-#include "Context.h"
+#include "FiniteElementContext.h"
 
 
 /* Textual name of this class */

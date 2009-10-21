@@ -52,7 +52,7 @@
 #include "units.h"
 #include "types.h"
 #include "shortcuts.h"
-#include "Context.h"
+#include "FiniteElementContext.h"
 #include "StiffnessMatrix.h"
 #include "StiffnessMatrixTerm.h"
 #include "SystemLinearEquations.h"

@@ -46,7 +46,7 @@
 #include "units.h"
 #include "types.h"
 #include "shortcuts.h"
-#include "Context.h"
+#include "FiniteElementContext.h"
 #include "SLE_Solver.h"
 
 #include <assert.h>

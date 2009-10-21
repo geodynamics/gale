@@ -62,11 +62,7 @@ MassMatrixTerm* MassMatrixTerm_New(
 {
     MassMatrixTerm* self = (MassMatrixTerm*) _MassMatrixTerm_DefaultNew( name );
 
-    MassMatrixTerm_InitAll( 
-	self,
-	stiffMat,
-	integrationSwarm,
-	field );
+    MassMatrixTerm_InitAll( self, stiffMat, integrationSwarm, field );
 
     return self;
 }
