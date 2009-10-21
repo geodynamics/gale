@@ -12,7 +12,7 @@
 /* silly stgermain, I must define this */
 #define CURR_MODULE_NAME "UnderworldContext.c"
 
-const Type Underworld_testYieldCriterion_Type = "Underworld_testYieldCriterion";
+const Type Underworld_testVonMisesYielding_Type = "Underworld_testVonMisesYielding";
 
 /* Define plugin structure */
 typedef struct {
@@ -22,28 +22,28 @@ typedef struct {
 	XYZ                   min;
 	XYZ                   max;
 	Bool                  hasYielded;
-} Underworld_testYieldCriterion;
+} Underworld_testVonMisesYielding;
 
 /* define global vars .... that's very ugly, but it's only a pcu test */
-Underworld_testYieldCriterion globalSelf;
+Underworld_testVonMisesYielding globalSelf;
 
 typedef struct {
-} YieldCriterionSuiteData;
+} VonMisesYieldingSuiteData;
 
-void YieldCriterionSuite_Setup( YieldCriterionSuiteData* data ) { 
+void VonMisesYieldingSuite_Setup( VonMisesYieldingSuiteData* data ) { 
 }
 
-void YieldCriterionSuite_Teardown( YieldCriterionSuiteData* data ) {
+void VonMisesYieldingSuite_Teardown( VonMisesYieldingSuiteData* data ) {
 }
 
-double Underworld_testYieldCriterion_dt( FiniteElementContext* context ) {
+double Underworld_testVonMisesYielding_dt( FiniteElementContext* context ) {
 	if ( context->currentTime >= 0.65 ) {
 		return 0.01;
 	}
 	return HUGE_VAL;
 }
 
-void testYieldCriterion_HasYielded( 
+void testVonMisesYielding_HasYielded( 
 		void*                            yieldRheology,
 		ConstitutiveMatrix*              constitutiveMatrix,
 		MaterialPointsSwarm*             materialPointsSwarm,
@@ -74,8 +74,8 @@ void testYieldCriterion_HasYielded(
 }
 
 
-void Underworld_testYieldCriterion_Check( FiniteElementContext* context ) {
-	Stream* stream = Journal_Register( Dump_Type, Underworld_testYieldCriterion_Type );
+void Underworld_testVonMisesYielding_Check( FiniteElementContext* context ) {
+	Stream* stream = Journal_Register( Dump_Type, Underworld_testVonMisesYielding_Type );
 
    if(context->rank == 0){
       /* Don't do anything if nothing has yielded yet */
@@ -85,7 +85,7 @@ void Underworld_testYieldCriterion_Check( FiniteElementContext* context ) {
    
       /* Set the stream to point to our output file (so we can do a diff on it later) */
       Stream_Enable( stream, True );
-      Stream_RedirectFile_WithPrependedPath( stream, context->outputPath, "testYieldCriterion.dat" );
+      Stream_RedirectFile_WithPrependedPath( stream, context->outputPath, "testVonMisesYielding.dat" );
    
       Journal_Printf( stream, "Material yielded at time %12.4g (step %u) within:\n", context->currentTime, context->timeStep ); 
    
@@ -99,7 +99,7 @@ void Underworld_testYieldCriterion_Check( FiniteElementContext* context ) {
    }
 }
 
-void Underworld_testYieldCriterion_Check_Sync( FiniteElementContext* context ) {
+void Underworld_testVonMisesYielding_Check_Sync( FiniteElementContext* context ) {
    Coord mins;
    Coord maxs;
    
@@ -126,67 +126,8 @@ void Underworld_testYieldCriterion_Check_Sync( FiniteElementContext* context ) {
       globalSelf.max[ K_AXIS ] = maxs[ K_AXIS ];
 }
 
-void YieldCriterionSuite_Byerlee2D( YieldCriterionSuiteData* data ) {
-	UnderworldContext* context;
-	Dictionary*					dictionary;
-	YieldRheology*          yieldRheology;
-	Stg_ComponentFactory*	cf;
-	char							expected_file[PCU_PATH_MAX];
-	char							*filename;
-	double						tolerance;
-	char							xml_input[PCU_PATH_MAX];
 
-	/* read in the xml input file */
-	pcu_filename_input( "testByerleeYieldCriterion.xml", xml_input );
-	cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, NULL );
-	context = (UnderworldContext*)LiveComponentRegister_Get( cf->LCRegister, "context" );
-	dictionary = context->dictionary;
-
-	stgMainBuildAndInitialise( cf );
-
-
-	/* get pointer to the mesh */
-	globalSelf.mesh = Stg_ComponentFactory_ConstructByName( cf, "linearMesh", FeMesh, True, NULL ); 
-	
-	/* Get a pointer the yield rheology that we are trying to test */
-	yieldRheology = (YieldRheology*) LiveComponentRegister_Get( context->CF->LCRegister, "yieldRheology" );
-	
-	/* Store the pointer to the original 'HasYielded' function */
-	globalSelf.realHasYieldedFunction = yieldRheology->_hasYielded;
-
-	/* Reset this function pointer with our own */
-	yieldRheology->_hasYielded = testYieldCriterion_HasYielded;
-
-	/* Get Calculation after one step */
-	context->maxTimeSteps = 1;
-
-	ContextEP_Append( context, AbstractContext_EP_Step, Underworld_testYieldCriterion_Check_Sync );
-	ContextEP_Append( context, AbstractContext_EP_Step, Underworld_testYieldCriterion_Check );
-
-	EP_AppendClassHook( Context_GetEntryPoint( context, FiniteElementContext_EP_CalcDt ), 
-			Underworld_testYieldCriterion_dt, context );
-
-	globalSelf.min[ I_AXIS ] = HUGE_VAL;
-	globalSelf.min[ J_AXIS ] = HUGE_VAL;
-	globalSelf.min[ K_AXIS ] = HUGE_VAL;
-	globalSelf.max[ I_AXIS ] = -HUGE_VAL;
-	globalSelf.max[ J_AXIS ] = -HUGE_VAL;
-	globalSelf.max[ K_AXIS ] = -HUGE_VAL;
-
-	stgMainLoop( cf );
-
-	MPI_Barrier( context->communicator );
-	pcu_filename_expected( "testByerleeYieldCriterion.expected", expected_file );
-	pcu_check_fileEq( "output/testYieldCriterion.dat", expected_file );
-   if(context->rank == 0){
-      remove("output/testYieldCriterion.dat");
-      remove("output");
-   }
-
-	stgMainDestroy( cf );
-
-}
-void YieldCriterionSuite_VonMises2D( YieldCriterionSuiteData* data ) {
+void VonMisesYieldingSuite_VonMises2D( VonMisesYieldingSuiteData* data ) {
 	UnderworldContext* context;
 	Dictionary*					dictionary;
 	YieldRheology*          yieldRheology;
@@ -204,7 +145,6 @@ void YieldCriterionSuite_VonMises2D( YieldCriterionSuiteData* data ) {
 
 	stgMainBuildAndInitialise( cf );
 
-
 	/* get pointer to the mesh */
 	globalSelf.mesh = Stg_ComponentFactory_ConstructByName( cf, "linearMesh", FeMesh, True, NULL ); 
 	
@@ -215,12 +155,11 @@ void YieldCriterionSuite_VonMises2D( YieldCriterionSuiteData* data ) {
 	globalSelf.realHasYieldedFunction = yieldRheology->_hasYielded;
 
 	/* Reset this function pointer with our own */
-	yieldRheology->_hasYielded = testYieldCriterion_HasYielded;
+	yieldRheology->_hasYielded = testVonMisesYielding_HasYielded;
 
-   ContextEP_Append( context, AbstractContext_EP_Step, Underworld_testYieldCriterion_Check_Sync );
-	ContextEP_Append( context, AbstractContext_EP_Step, Underworld_testYieldCriterion_Check );
-	EP_AppendClassHook( Context_GetEntryPoint( context, FiniteElementContext_EP_CalcDt ), 
-			Underworld_testYieldCriterion_dt, context );
+   ContextEP_Append( context, AbstractContext_EP_Step, Underworld_testVonMisesYielding_Check_Sync );
+	ContextEP_Append( context, AbstractContext_EP_Step, Underworld_testVonMisesYielding_Check );
+	EP_AppendClassHook( Context_GetEntryPoint( context, FiniteElementContext_EP_CalcDt ), Underworld_testVonMisesYielding_dt, context );
 
 	globalSelf.min[ I_AXIS ] =  HUGE_VAL;
 	globalSelf.min[ J_AXIS ] =  HUGE_VAL;
@@ -233,19 +172,18 @@ void YieldCriterionSuite_VonMises2D( YieldCriterionSuiteData* data ) {
 
 	MPI_Barrier( context->communicator );
 	pcu_filename_expected( "testVonMisesYieldCriterion.expected", expected_file );
-	pcu_check_fileEq( "output/testYieldCriterion.dat", expected_file );
+	pcu_check_fileEq( "output/testVonMisesYielding.dat", expected_file );
+
 	if(context->rank == 0){
-      remove("output/testYieldCriterion.dat");
+      remove("output/testVonMisesYielding.dat");
       remove("output");
    }
 
 	stgMainDestroy( cf );
-
 }
 
-void YieldCriterionSuite( pcu_suite_t* suite ) {
-   pcu_suite_setData( suite, YieldCriterionSuiteData );
-   pcu_suite_setFixtures( suite, YieldCriterionSuite_Setup, YieldCriterionSuite_Teardown );
-   pcu_suite_addTest( suite, YieldCriterionSuite_VonMises2D );
-   pcu_suite_addTest( suite, YieldCriterionSuite_Byerlee2D );
+void VonMisesYieldingSuite( pcu_suite_t* suite ) {
+   pcu_suite_setData( suite, VonMisesYieldingSuiteData );
+   pcu_suite_setFixtures( suite, VonMisesYieldingSuite_Setup, VonMisesYieldingSuite_Teardown );
+   pcu_suite_addTest( suite, VonMisesYieldingSuite_VonMises2D );
 }
