@@ -46,13 +46,33 @@
 
 	/*struct Stg_Component_DefaultConstructorFunction;*/
 	#define __Stg_ComponentRegisterElement \
+		__Stg_Object						\
 		Type								componentType; \
 		Stg_Component_DefaultConstructorFunction*			defaultConstructor; \
 		Stg_Component_MetaAsDictionaryFunction*                         metadata; \
 		Name								version;
 
 	struct Stg_ComponentRegisterElement{ __Stg_ComponentRegisterElement };
+
+	extern const Type Stg_ComponentRegisterElement_Type;
+
+	/** ComponentRegisterElement Constructor interface. */
+	Stg_ComponentRegisterElement* Stg_ComponentRegisterElement_New(
+		Type			type,
+		Stg_Class_DeleteFunction*	_delete,
+		Stg_Class_PrintFunction*	_print,
+      Type        componentType,
+		Stg_Component_DefaultConstructorFunction*		defaultConstructor,
+		Stg_Component_MetaAsDictionaryFunction*      metadata,
+		Name								version
+      );
 	
+   	/** Stg_Class_Delete interface. */
+   	void _Stg_ComponentRegisterElement_Delete( void* element );
+
+   	/** Print interaface. */
+	   void _Stg_ComponentRegisterElement_Print( void* element, Stream* paramStream );	
+
 	/* Stg_ComponentRegister information */
 	#define __Stg_ComponentRegister \
 		/* General info */ \
@@ -61,7 +81,8 @@
 		/* Virtual info */ \
 		\
 		/* Stg_ComponentRegister info */ \
-		BTree									*constructors; \
+		Stg_ObjectList*									constructors;  \
+      Stream*                                   debugStream;   \
 	
 	struct Stg_ComponentRegister { __Stg_ComponentRegister };
 	
@@ -149,16 +170,9 @@
 		Name                   version );
 	void Stg_ComponentRegister_PrintAllTypes( void* componentRegister, void* stream );
 
-	/* Functions for iterating through the component element list ------------------------------------------------------------*/
-
-	/** Obtain an iterator to the component element list */
-	BTreeIterator* Stg_ComponentRegister_GetIterator();
-
-	/** Initialise the iterator to the first component element in the list */
-	Stg_ComponentRegisterElement* Stg_ComponentRegisterIterator_First( BTreeIterator* iterator );
-
-	/** Step to the next component element in the list */
-	Stg_ComponentRegisterElement* Stg_ComponentRegisterIterator_Next( BTreeIterator* iterator );
+	/* Functions for iterating through the component element list ---------------------------------------------------*/
+   int Stg_ComponentRegister_GetCount( void* componentRegister );
+   Stg_ComponentRegisterElement* Stg_ComponentRegister_GetByIndex( void* componentRegister, int index );
 
 	/** Obtain the component type from the component list element */
 	Type Stg_ComponentRegisterElement_GetType( Stg_ComponentRegisterElement* element );

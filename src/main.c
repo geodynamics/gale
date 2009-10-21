@@ -63,16 +63,16 @@ static void deleteListArgItem( void* ptr ) {
 typedef void (ForEachFunc) ( Stream* stream, Type componentType );
 
 static void forEachComponent( Stream* stream, ForEachFunc* forEach ) {
-	BTreeIterator* i;
+   int i;
+	Stg_ComponentRegister* cr;
 	Stg_ComponentRegisterElement* cre;
 
-	i = Stg_ComponentRegister_GetIterator( Stg_ComponentRegister_Get_ComponentRegister() );
-	for( cre = Stg_ComponentRegisterIterator_First( i ); cre != NULL; cre = Stg_ComponentRegisterIterator_Next( i ) ) {
+	cr = Stg_ComponentRegister_Get_ComponentRegister();
+	for(i = 0; i < Stg_ComponentRegister_GetCount(cr); i++) {
+      cre = Stg_ComponentRegister_GetByIndex(cr, i);
 		Type componentType = Stg_ComponentRegisterElement_GetType( cre );
 		forEach( stream, componentType );
 	}
-
-	Stg_Class_Delete( i );
 }
 
 static void forEachLiveComponent( Stream* stream, ForEachFunc* forEach ) {
