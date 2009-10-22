@@ -345,13 +345,18 @@ void _MaterialPointsSwarm_Initialise( void* swarm, void* data ) {
 
 	_Swarm_Initialise( self, data );
 
-	/* Beforehand, set each particle to have UNDEFINED_MATERIAL */
-	for ( lParticle_I = 0; lParticle_I < self->particleLocalCount; lParticle_I++ ) {
-		matPoint = (MaterialPoint*)Swarm_ParticleAt( self, lParticle_I );
-		matPoint->materialIndex = UNDEFINED_MATERIAL;
+	for( var_I = 0 ; var_I < self->nSwarmVars ; var_I++ ) {
+		Stg_Component_Initialise( self->swarmVars[var_I], data , False );
 	}
+
 	/* Now setup the material properties */
-   	if( !( context && (True == context->loadFromCheckPoint) && (True == context->interpolateRestart) ) ) {
+   if(  False == context->loadFromCheckPoint ) {
+
+      /* Beforehand, set each particle to have UNDEFINED_MATERIAL */
+      for ( lParticle_I = 0; lParticle_I < self->particleLocalCount; lParticle_I++ ) {
+         matPoint = (MaterialPoint*)Swarm_ParticleAt( self, lParticle_I );
+         matPoint->materialIndex = UNDEFINED_MATERIAL;
+      }
 		if( self->material == NULL ) {
 			/* Do it by the layout of all known materials */
 			Materials_Register_SetupSwarm( self->materials_Register, self );
@@ -365,14 +370,11 @@ void _MaterialPointsSwarm_Initialise( void* swarm, void* data ) {
 		}
 	}
 
-	for( var_I = 0 ; var_I < self->nSwarmVars ; var_I++ ) {
-		Stg_Component_Initialise( self->swarmVars[var_I], data , False );
-	}
 
 	/** if loading from checkpoint, particle materials etc have already been loaded in Swarm_Build() - */ 
 	/** possibly need to check for empty cells (and populate) if performing a interpolation restart */
-   if ( context && (True == context->loadFromCheckPoint) && (True == context->interpolateRestart) ){
-      if ( True == self->isSwarmTypeToCheckPointAndReload ) {	   
+   if ( True == context->loadFromCheckPoint ){
+      if ( (True == self->isSwarmTypeToCheckPointAndReload) && (True == context->interpolateRestart) ) {	   
          Particle_InCellIndex cParticle_I         = 0;
          Particle_InCellIndex particle_I          = 0;
          GlobalParticle*      particle            = NULL;
