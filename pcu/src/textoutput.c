@@ -32,18 +32,18 @@
 extern int PCU_PRINT_DOCS;
 
 typedef struct {
-      int rank;
+	int rank;
 } textoutputdata_t;
 
 void printstatus( pcu_listener_t* lsnr, pcu_suite_t* suite, int final );
 void printsources( pcu_listener_t* lsnr, pcu_suite_t* suite );
 
 void pcu_textoutput_suitebegin( pcu_listener_t* lsnr, pcu_suite_t* suite ) {
-   printstatus( lsnr, suite, 0 );
+   /*printstatus( lsnr, suite, 0 );*/
 }
 
 void pcu_textoutput_suiteend( pcu_listener_t* lsnr, pcu_suite_t* suite ) {
-   printstatus( lsnr, suite, 1 );
+   /*printstatus( lsnr, suite, 1 );*/
    printsources( lsnr, suite );
 }
 

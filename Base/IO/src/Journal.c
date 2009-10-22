@@ -137,15 +137,13 @@ void Journal_Delete() {
 	Memory_Free( stJournal );
 }
 
-
 void Journal_Purge() {
 	int i;
 	
 	Stg_ObjectList_DeleteAllObjects( stJournal->_typedStreams );
-	for ( i = 0; i < stJournal->_files->count; ++i )
-	{
-		if ( !JournalFile_Close( (JournalFile*) stJournal->_files->data[i] ) )
-		{
+
+	for ( i = 0; i < stJournal->_files->count; ++i ) {
+		if ( !JournalFile_Close( (JournalFile*) stJournal->_files->data[i] ) ) {
 			/* TODO: warning can't close */
 		}
 	}
