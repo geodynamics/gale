@@ -104,7 +104,8 @@ void WithinShapeParticleLayoutSuite_TestWithinShapeSphere( WithinShapeParticleLa
 	int								particleCount = 10;
 	Stream*							stream;
 	char								expected_file[PCU_PATH_MAX];
-	
+
+	procToWatch = data->nProcs > 1 ? 1 : 0;	
 
 	if( data->rank == procToWatch ) {
 		stream = Journal_Register (Info_Type, "WithinShape10Particles");
@@ -142,7 +143,7 @@ void WithinShapeParticleLayoutSuite_TestWithinShapeSphere( WithinShapeParticleLa
 
 		/* Print out the particles on all cells */
 		Swarm_PrintParticleCoords_ByCell( swarm, stream );
-		pcu_filename_expected( "testWithinShapeParticleLayout10ParticlesOutput.expected", expected_file );
+		pcu_filename_expected( "testWithinShapeParticleLayoutOutput.expected", expected_file );
 		pcu_check_fileEq( "sphere10Particles.dat", expected_file );
 		remove( "sphere10Particles.dat" );
 
