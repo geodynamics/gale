@@ -102,15 +102,11 @@ void WithinShapeParticleLayoutSuite_TestWithinShapeSphere( WithinShapeParticleLa
 	Stg_Shape*						shape;
 	int								procToWatch;
 	int								particleCount = 10;
-	Stream*							stream;
-	char								expected_file[PCU_PATH_MAX];
+	Index								i;
 
 	procToWatch = data->nProcs > 1 ? 1 : 0;	
 
 	if( data->rank == procToWatch ) {
-		stream = Journal_Register (Info_Type, "WithinShape10Particles");
-		Stream_RedirectFile( stream, "sphere10Particles.dat" );
-
 		nDims = 3;
 		meshSize[0] = 5; meshSize[1] = 3; meshSize[2] = 2;
 		minCrds[0] = 0; minCrds[1] = 0; minCrds[2] = 0;
@@ -141,11 +137,19 @@ void WithinShapeParticleLayoutSuite_TestWithinShapeSphere( WithinShapeParticleLa
 		Stg_Component_Build( swarm, 0, False );
 		Stg_Component_Initialise( swarm, 0, False );
 
-		/* Print out the particles on all cells */
-		Swarm_PrintParticleCoords_ByCell( swarm, stream );
-		pcu_filename_expected( "testWithinShapeParticleLayoutOutput.expected", expected_file );
-		pcu_check_fileEq( "sphere10Particles.dat", expected_file );
-		remove( "sphere10Particles.dat" );
+		pcu_check_true( swarm->cellDomainCount == 30 );
+		pcu_check_true( swarm->cellLocalCount == 30 );
+		pcu_check_true( swarm->particleLocalCount == 10 );
+		pcu_check_true( swarm->particles[0].owningCell );
+		pcu_check_true( swarm->particles[1].owningCell );
+		pcu_check_true( swarm->particles[3].owningCell );
+		pcu_check_true( swarm->particles[4].owningCell );
+		pcu_check_true( swarm->particles[7].owningCell );
+		pcu_check_true( swarm->particles[8].owningCell );
+		pcu_check_true( swarm->particles[2].owningCell );
+		pcu_check_true( swarm->particles[5].owningCell );
+		pcu_check_true( swarm->particles[6].owningCell );
+		pcu_check_true( swarm->particles[9].owningCell );
 
 		Stg_Class_Delete( extensionMgr_Register );
 		Stg_Component_Destroy( elementCellLayout, NULL, True );
