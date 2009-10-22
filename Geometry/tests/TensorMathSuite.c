@@ -99,6 +99,8 @@ void TensorMathSuite_TestSymmetricTensorVectorComponents( TensorMathSuiteData* d
 		pcu_filename_expected( "testTensorMathSymmetricTensorVectorComponents.expected", expected_file );
 		pcu_check_fileEq( "testTensorMathSymmetricTensorVectorComponents.dat", expected_file );
 		remove( "testTensorMathSymmetricTensorVectorComponents.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -127,6 +129,8 @@ void TensorMathSuite_TestJournalPrintTensorArray( TensorMathSuiteData* data ) {
 		pcu_filename_expected( "testTensorMathJournalPrintTensorArray.expected", expected_file );
 		pcu_check_fileEq( "testTensorMathJournalPrintTensorArray.dat", expected_file );
 		remove( "testTensorMathJournalPrintTensorArray.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -176,6 +180,8 @@ void TensorMathSuite_TestTensorToTensorArrayFunction( TensorMathSuiteData* data 
 		pcu_filename_expected( "testTensorMathArrayFunction.expected", expected_file );
 		pcu_check_fileEq( "testTensorMathArrayFunction.dat", expected_file );
 		remove( "testTensorMathArrayFunction.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -216,6 +222,7 @@ void TensorMathSuite_TestMathArrayToMatrix( TensorMathSuiteData* data ) {
 		remove( "testTensorMathArrayToMatrix.dat" );
 
       Memory_Free( tensor );
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -262,6 +269,7 @@ void TensorMathSuite_TestSymmetricTensorToMatrix( TensorMathSuiteData* data ) {
 		remove( "testTensorMathSymmetricTensorToMatrix.dat" );
 
       Memory_Free( tensor );
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -304,6 +312,7 @@ void TensorMathSuite_TestGetAntisymmetricPart( TensorMathSuiteData* data ) {
 		remove( "testTensorMathGetAntisymmetricPart.dat" );
 
       Memory_Free( tensor );
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -346,6 +355,7 @@ void TensorMathSuite_TestGetSymmetricPart( TensorMathSuiteData* data ) {
 		remove( "testTensorMathGetSymmetricPart.dat" );
 
       Memory_Free( tensor );
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -390,6 +400,7 @@ void TensorMathSuite_Test2ndInvariant( TensorMathSuiteData* data ) {
 		remove( "testTensorMath2ndInvariant.dat" );
 
       Memory_Free( tensor );
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -429,6 +440,7 @@ void TensorMathSuite_TestVectorTensorVector( TensorMathSuiteData* data ) {
 		remove( "testTensorMathVectorTensorVector.dat" );
 
       Memory_Free( tensor );
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -459,6 +471,8 @@ void TensorMathSuite_TestZeroTensor( TensorMathSuiteData* data ) {
 		pcu_filename_expected( "testTensorMathZeroTensor.expected", expected_file );
 		pcu_check_fileEq( "testTensorMathZeroTensor.dat", expected_file );
 		remove( "testTensorMathZeroTensor.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -503,6 +517,8 @@ void TensorMathSuite_TestMatrixDeterminant( TensorMathSuiteData* data ) {
 		pcu_filename_expected( "testTensorMathMatrixDeterminant.expected", expected_file );
 		pcu_check_fileEq( "testTensorMathMatrixDeterminant.dat", expected_file );
 		remove( "testTensorMathMatrixDeterminant.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -524,6 +540,8 @@ void TensorMathSuite_TestCubicSolver( TensorMathSuiteData* data ) {
 		pcu_filename_expected( "testTensorMathCubicSolver.expected", expected_file );
 		pcu_check_fileEq( "testTensorMathCubicSolver.dat", expected_file );
 		remove( "testTensorMathCubicSolver.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -646,6 +664,8 @@ void TensorMathSuite_TestMappingFunctions( TensorMathSuiteData* data ) {
 		pcu_filename_expected( "testTensorMathMappingFunctions.expected", expected_file );
 		pcu_check_fileEq( "testTensorMathMappingFunctions.dat", expected_file );
 		remove( "testTensorMathMappingFunctions.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -721,6 +741,8 @@ void TensorMathSuite_TestEigenVectorListSort( TensorMathSuiteData* data ) {
 		pcu_filename_expected( "testTensorMathEigenVectorListSort.expected", expected_file );
 		pcu_check_fileEq( "testTensorMathEigenVectorListSort.dat", expected_file );
 		remove( "testTensorMathEigenVectorListSort.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -754,6 +776,8 @@ void TensorMathSuite_TestEigenVector1( TensorMathSuiteData* data ) {
 		pcu_filename_expected( "testTensorMathEigenVector1.expected", expected_file );
 		pcu_check_fileEq( "testTensorMathEigenVector1.dat", expected_file );
 		remove( "testTensorMathEigenVector1.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -781,6 +805,8 @@ void TensorMathSuite_TestEigenVector2( TensorMathSuiteData* data ) {
 		pcu_filename_expected( "testTensorMathEigenVector2.expected", expected_file );
 		pcu_check_fileEq( "testTensorMathEigenVector2.dat", expected_file );
 		remove( "testTensorMathEigenVector2.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -816,6 +842,8 @@ void TensorMathSuite_TestEigenVector3( TensorMathSuiteData* data ) {
 		pcu_filename_expected( "testTensorMathEigenVector3.expected", expected_file );
 		pcu_check_fileEq( "testTensorMathEigenVector3.dat", expected_file );
 		remove( "testTensorMathEigenVector3.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -888,6 +916,8 @@ void TensorMathSuite_TestEigenVector4( TensorMathSuiteData* data ) {
 		pcu_filename_expected( "testTensorMathEigenVector4.expected", expected_file );
 		pcu_check_fileEq( "testTensorMathEigenVector4.dat", expected_file );
 		remove( "testTensorMathEigenVector4.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
