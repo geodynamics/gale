@@ -197,8 +197,8 @@ void TensorMultMathSuite_TestTensorArrayAdd( TensorMultMathSuiteData* data ) {
 		Journal_PrintTensorArray( stream, tensorResult, 3);
 
 		pcu_filename_expected( "testTensorMultAdd.expected", expected_file );
-		//pcu_check_fileEq( "testTensorArrayAdd.dat", expected_file );
-		//remove( "testTensorArrayAdd.dat" );
+		pcu_check_fileEq( "testTensorArrayAdd.dat", expected_file );
+		remove( "testTensorArrayAdd.dat" );
 
 		Stream_CloseAndFreeFile( stream );
 	}
@@ -244,8 +244,8 @@ void TensorMultMathSuite_TestTensorArraySubstract( TensorMultMathSuiteData* data
 		Journal_PrintTensorArray( stream, tensorResult, 3);
 
 		pcu_filename_expected( "testTensorMultSubstract.expected", expected_file );
-		//pcu_check_fileEq( "testTensorArraySubstract.dat", expected_file );
-		//remove( "testTensorArraySubstract.dat" );
+		pcu_check_fileEq( "testTensorArraySubstract.dat", expected_file );
+		remove( "testTensorArraySubstract.dat" );
 
 		Stream_CloseAndFreeFile( stream );
 	}
