@@ -735,7 +735,7 @@ void _Swarm_Construct( void* swarm, Stg_ComponentFactory* cf, void* data ) {
 
 void _Swarm_Build( void* swarm, void* data ) {
 	Swarm* self = (Swarm*)swarm;
-	AbstractContext* context = (AbstractContext*)data;
+	AbstractContext* context = self->context;
 	
 	Journal_DPrintf( self->debug, "In %s(): for swarm \"%s\" (of type %s)\n", __func__, self->name, self->type ); 
 	Stream_IndentBranch( Swarm_Debug );
@@ -791,7 +791,7 @@ void _Swarm_Build( void* swarm, void* data ) {
 			
 void _Swarm_Initialise( void* swarm, void* data ) {
 	Swarm* self = (Swarm*)swarm;
-	AbstractContext* context = (AbstractContext*)data; 
+	AbstractContext* context = self->context; 
 	
 	Journal_DPrintf( self->debug, "In %s(): for swarm \"%s\" (of type %s)\n", __func__, self->name, self->type ); 
 	Stream_IndentBranch( Swarm_Debug );
@@ -805,7 +805,7 @@ void _Swarm_Initialise( void* swarm, void* data ) {
 	 * as can have a swarm initial condition without requiring a checkpointed
 	 * solution. Dave 08.11.07
 	 */
-	if( self->ics && context ) {
+	if( self->ics ) {
 		Journal_DPrintf( self->debug, "applying the ICs for this swarm.\n" );
 		Stream_Indent( self->debug );
 		Stg_Component_Initialise( self->ics, data, False );
