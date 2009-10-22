@@ -805,7 +805,7 @@ void _Swarm_Initialise( void* swarm, void* data ) {
 	 * as can have a swarm initial condition without requiring a checkpointed
 	 * solution. Dave 08.11.07
 	 */
-	if( self->ics && context ) {
+	if( self->ics ) {
 		Journal_DPrintf( self->debug, "applying the ICs for this swarm.\n" );
 		Stream_Indent( self->debug );
 		Stg_Component_Initialise( self->ics, data, False );
