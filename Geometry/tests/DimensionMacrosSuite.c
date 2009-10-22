@@ -124,6 +124,8 @@ void DimensionMacrosSuite_TestDimensionMacros( DimensionMacrosSuiteData* data ) 
 	pcu_filename_expected( "testDimensionMacros.expected", expected_file );
 	pcu_check_fileEq( "testDimensionMacros.dat", expected_file );
 	remove( "testDimensionMacros.dat" );
+
+	Stream_CloseAndFreeFile( stream );
 }
 
 void DimensionMacrosSuite( pcu_suite_t* suite ) {

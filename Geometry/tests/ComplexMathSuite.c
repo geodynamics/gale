@@ -90,6 +90,8 @@ void ComplexMathSuite_TestComplexJournalPrintingMacro( ComplexMathSuiteData* dat
 		pcu_filename_expected( "testComplexJournalPrintingMacro.expected", expected_file );
 		pcu_check_fileEq( "testComplexMathPrintingMacro.dat", expected_file );
 		remove( "testComplexMathPrintingMacro.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -113,6 +115,8 @@ void ComplexMathSuite_TestAddition( ComplexMathSuiteData* data ) {
 		pcu_filename_expected( "testComplexMathAddition.expected", expected_file );
 		pcu_check_fileEq( "testComplexMathAddition.dat", expected_file );
 		remove( "testComplexMathAddition.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -136,6 +140,8 @@ void ComplexMathSuite_TestSubtraction( ComplexMathSuiteData* data ) {
 		pcu_filename_expected( "testComplexMathSubtraction.expected", expected_file );
 		pcu_check_fileEq( "testComplexMathSubtraction.dat", expected_file );
 		remove( "testComplexMathSubtraction.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -159,6 +165,8 @@ void ComplexMathSuite_TestMultiplication( ComplexMathSuiteData* data ) {
 		pcu_filename_expected( "testComplexMathMultiplication.expected", expected_file );
 		pcu_check_fileEq( "testComplexMathMultiplication.dat", expected_file );
 		remove( "testComplexMathMultiplication.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -182,6 +190,8 @@ void ComplexMathSuite_TestDivision( ComplexMathSuiteData* data ) {
 		pcu_filename_expected( "testComplexMathDivision.expected", expected_file );
 		pcu_check_fileEq( "testComplexMathDivision.dat", expected_file );
 		remove( "testComplexMathDivision.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -219,6 +229,8 @@ void ComplexMathSuite_TestRealNumber( ComplexMathSuiteData* data ) {
 		pcu_filename_expected( "testComplexMathRealNumber.expected", expected_file );
 		pcu_check_fileEq( "testComplexMathRealNumber.dat", expected_file );
 		remove( "testComplexMathRealNumber.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -242,6 +254,8 @@ void ComplexMathSuite_TestConjugate( ComplexMathSuiteData* data ) {
 		pcu_filename_expected( "testComplexMathConjugate.expected", expected_file );
 		pcu_check_fileEq( "testComplexMathConjugate.dat", expected_file );
 		remove( "testComplexMathConjugate.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -284,6 +298,8 @@ void ComplexMathSuite_TestPolar( ComplexMathSuiteData* data ) {
 		pcu_filename_expected( "testComplexMathPolar.expected", expected_file );
 		pcu_check_fileEq( "testComplexMathPolar.dat", expected_file );
 		remove( "testComplexMathPolar.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -319,6 +335,8 @@ void ComplexMathSuite_TestPower( ComplexMathSuiteData* data ) {
 		pcu_filename_expected( "testComplexMathPower.expected", expected_file );
 		pcu_check_fileEq( "testComplexMathPower.dat", expected_file );
 		remove( "testComplexMathPower.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -349,6 +367,8 @@ void ComplexMathSuite_TestBeautifulEquation( ComplexMathSuiteData* data ) {
 		pcu_filename_expected( "testComplexMathBeautifulEquation.expected", expected_file );
 		pcu_check_fileEq( "testComplexMathBeautifulEquation.dat", expected_file );
 		remove( "testComplexMathBeautifulEquation.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -389,6 +409,8 @@ void ComplexMathSuite_TestExponential( ComplexMathSuiteData* data ) {
 		pcu_filename_expected( "testComplexMathExponential.expected", expected_file );
 		pcu_check_fileEq( "testComplexMathExponential.dat", expected_file );
 		remove( "testComplexMathExponential.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -417,6 +439,8 @@ void ComplexMathSuite_TestCopyAndZero( ComplexMathSuiteData* data ) {
 		pcu_filename_expected( "testComplexMathCopyAndZero.expected", expected_file );
 		pcu_check_fileEq( "testComplexMathCopyAndZero.dat", expected_file );
 		remove( "testComplexMathCopyAndZero.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 

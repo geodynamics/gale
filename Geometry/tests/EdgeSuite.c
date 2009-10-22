@@ -99,6 +99,8 @@ void EdgeSuite_TestEdge( EdgeSuiteData* data ) {
 		pcu_check_fileEq( "testEdge.dat", expected_file );
 		remove( "testEdge.dat" );
 
+		Stream_CloseAndFreeFile( stream );
+
 		if( edge ) Memory_Free( edge );
 		if( edgeFace ) Memory_Free( edgeFace );
 	}

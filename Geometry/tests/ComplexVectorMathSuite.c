@@ -205,6 +205,8 @@ void ComplexVectorMathSuite_TestComplexVectorMathBasic( ComplexVectorMathSuiteDa
 		pcu_filename_expected( "testComplexVectorMathBasic.expected", expected_file );
 		pcu_check_fileEq( "testComplexVectorMathBasic.dat", expected_file );
 		remove( "testComplexVectorMathBasic.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -526,6 +528,7 @@ void ComplexVectorMathSuite_TestComplexVectorMathOperations( ComplexVectorMathSu
 		remove( "testComplexVectorMathOperations.dat" );
 
 		Memory_Free( matrix );
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
