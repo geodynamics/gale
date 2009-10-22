@@ -757,6 +757,11 @@ void TensorMathSuite_TestEigenVector1( TensorMathSuiteData* data ) {
 
 		Stream_RedirectFile( stream, "testTensorMathEigenVector1.dat" );
 
+		eigenvectorList[0].eigenvalue = 4; eigenvectorList[1].eigenvalue = -1; eigenvectorList[2].eigenvalue = 1;
+		eigenvectorList[0].vector[0] = 0.577; eigenvectorList[0].vector[1] = 0.577; eigenvectorList[0].vector[2] = 0.577;
+		eigenvectorList[1].vector[0] = -0.707; eigenvectorList[1].vector[1] = 0; eigenvectorList[1].vector[2] = 0.707;
+		eigenvectorList[2].vector[0] = 0.408; eigenvectorList[2].vector[1] = -0.816; eigenvectorList[2].vector[2] = 0.408;
+
 		Journal_Printf(stream, "****************    Test Eigenvector 1   *********************\n");
 		Journal_Printf( stream, "2D Case from Kresig, p. 371f\n\n");
 		symmTensor[0] = -5;
@@ -792,8 +797,16 @@ void TensorMathSuite_TestEigenVector2( TensorMathSuiteData* data ) {
 
 		Stream_RedirectFile( stream, "testTensorMathEigenVector2.dat" );
 
+		eigenvectorList[0].eigenvalue = 4; eigenvectorList[1].eigenvalue = -1; eigenvectorList[2].eigenvalue = 1;
+		eigenvectorList[0].vector[0] = 0.577; eigenvectorList[0].vector[1] = 0.577; eigenvectorList[0].vector[2] = 0.577;
+		eigenvectorList[1].vector[0] = -0.707; eigenvectorList[1].vector[1] = 0; eigenvectorList[1].vector[2] = 0.707;
+		eigenvectorList[2].vector[0] = 0.408; eigenvectorList[2].vector[1] = -0.816; eigenvectorList[2].vector[2] = 0.408;
+
 		Journal_Printf( stream, "****************    Test Eigenvector 2   **********************\n");
 		Journal_Printf( stream, "Same test as above - but using Numerical Recipies function\n\n");
+		symmTensor[0] = -5;
+		symmTensor[1] = -2;
+		symmTensor[2] = 2;
 
 		SymmetricTensor_CalcAllEigenvectorsJacobi( symmTensor, 2, eigenvectorList );
 
@@ -820,6 +833,11 @@ void TensorMathSuite_TestEigenVector3( TensorMathSuiteData* data ) {
 		char					expected_file[PCU_PATH_MAX];
 
 		Stream_RedirectFile( stream, "testTensorMathEigenVector3.dat" );
+
+		eigenvectorList[0].eigenvalue = 4; eigenvectorList[1].eigenvalue = -1; eigenvectorList[2].eigenvalue = 1;
+		eigenvectorList[0].vector[0] = 0.577; eigenvectorList[0].vector[1] = 0.577; eigenvectorList[0].vector[2] = 0.577;
+		eigenvectorList[1].vector[0] = -0.707; eigenvectorList[1].vector[1] = 0; eigenvectorList[1].vector[2] = 0.707;
+		eigenvectorList[2].vector[0] = 0.408; eigenvectorList[2].vector[1] = -0.816; eigenvectorList[2].vector[2] = 0.408;
 
 		Journal_Printf( stream, "****************    Test Eigenvector 3   *********************\n");
 		Journal_Printf( stream, "3D Case -tested on 3/11/04, against: \n");
@@ -861,6 +879,11 @@ void TensorMathSuite_TestEigenVector4( TensorMathSuiteData* data ) {
 		char					expected_file[PCU_PATH_MAX];
 
 		Stream_RedirectFile( stream, "testTensorMathEigenVector4.dat" );
+
+		eigenvectorList[0].eigenvalue = 4; eigenvectorList[1].eigenvalue = -1; eigenvectorList[2].eigenvalue = 1;
+		eigenvectorList[0].vector[0] = 0.577; eigenvectorList[0].vector[1] = 0.577; eigenvectorList[0].vector[2] = 0.577;
+		eigenvectorList[1].vector[0] = -0.707; eigenvectorList[1].vector[1] = 0; eigenvectorList[1].vector[2] = 0.707;
+		eigenvectorList[2].vector[0] = 0.408; eigenvectorList[2].vector[1] = -0.816; eigenvectorList[2].vector[2] = 0.408;
 
 		Journal_Printf( stream, "****************    Test Eigenvector 4   *********************\n");
 		Journal_Printf( stream, "Same test as above - but using Numerical Recipies function\n\n");
