@@ -50,6 +50,7 @@
 
 #include <glucifer/Base/Base.h>
 #include <glucifer/RenderingEngines/RenderingEngines.h>
+#include <glucifer/Base/CrossSection.h>
 
 #include "types.h"
 #include "OpenGLDrawingObject.h"
@@ -192,22 +193,19 @@ void _lucEigenvectors_BuildDisplayList( void* drawingObject, void* _context ) {
 	lucEigenvectors*       self            = (lucEigenvectors*)drawingObject;
 	DomainContext* context         = (DomainContext*) _context;
 	Dimension_Index        dim             = context->dim;
+   lucCrossSection          crossSection;
 
-	if ( dim == 2 ) {
-		_lucEigenvectorsCrossSection_DrawCrossSection( self, dim, 0.0, K_AXIS );
+	if ( dim == 2 )
+   {
+      _lucEigenvectorsCrossSection_DrawCrossSection( self, dim, lucCrossSection_Set(&crossSection, 0.0, K_AXIS, False));
 	}
-	else {
-		Coord             globalMin;
-		Coord             globalMax;
-		double            dz;
-		double            depth;
-
-		FieldVariable_GetMinAndMaxGlobalCoords( self->tensorField, globalMin, globalMax );
-	
-		dz = (globalMax[K_AXIS] - globalMin[K_AXIS])/(double)self->resolution[ K_AXIS ];
-
-		for ( depth = globalMin[ K_AXIS ] + dz * 0.5 ; depth < globalMax[ K_AXIS ] ; depth += dz) {
-			_lucEigenvectorsCrossSection_DrawCrossSection( self, dim, depth, K_AXIS );
+	else 
+   {
+		double dz = 1/(double)self->resolution[ K_AXIS ];
+      crossSection.axis = K_AXIS;
+      crossSection.interpolate = True;
+		for ( crossSection.value = 0.0 ; crossSection.value < 1.0+dz ; crossSection.value += dz) {
+		   _lucEigenvectorsCrossSection_DrawCrossSection( self, dim, &crossSection);
 		}
 	}
 }

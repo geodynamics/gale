@@ -52,6 +52,8 @@
 #include <glucifer/Base/Base.h>
 #include <glucifer/RenderingEngines/RenderingEngines.h>
 
+#include <glucifer/Base/CrossSection.h>
+
 #include "types.h"
 #include "OpenGLDrawingObject.h"
 #include "VectorArrowCrossSection.h"
@@ -123,8 +125,7 @@ void _lucVectorArrowCrossSection_Init(
 		Bool                                                         dynamicRange,
 		double                                                       lengthScale,
 		float                                                        lineWidth,
-		double                                                       crossSectionValue,
-		Axis                                                         crossSectionAxis ) 
+		lucCrossSection*                                             crossSection)
 {
 	Stream* errorStream   = Journal_MyStream( Error_Type, self );
 
@@ -139,14 +140,12 @@ void _lucVectorArrowCrossSection_Init(
 	self->dynamicRange = dynamicRange;
 	self->lengthScale = lengthScale;
 	self->lineWidth = lineWidth;
-	
-	self->crossSectionValue = crossSectionValue;
-	self->crossSectionAxis = crossSectionAxis;
+	self->crossSection = crossSection;
 }
 
 void _lucVectorArrowCrossSection_Delete( void* drawingObject ) {
 	lucVectorArrowCrossSection*  self = (lucVectorArrowCrossSection*)drawingObject;
-
+   lucCrossSection_Delete(self->crossSection);
 	_lucOpenGLDrawingObject_Delete( self );
 }
 
@@ -194,10 +193,7 @@ void _lucVectorArrowCrossSection_Construct( void* drawingObject, Stg_ComponentFa
 	FieldVariable*   vectorVariable;
 	Index            defaultResolution;
 	IJK              resolution;
-	double           value               = 0.0;
-	Axis             axis                = 0;
-	char             axisChar;
-	Name             crossSectionName;
+   lucCrossSection* crossSection;
 
 	/* Construct Parent */
 	_lucOpenGLDrawingObject_Construct( self, cf, data );
@@ -209,12 +205,6 @@ void _lucVectorArrowCrossSection_Construct( void* drawingObject, Stg_ComponentFa
 	resolution[ J_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolutionY", defaultResolution );
 	resolution[ K_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolutionZ", defaultResolution );
 			
-	crossSectionName = Stg_ComponentFactory_GetString( cf, self->name, "crossSection", "" );
-	if ( sscanf( crossSectionName, "%c=%lf", &axisChar, &value ) == 2 ) {
-		if ( toupper( axisChar ) >= 'X' )
-			axis = toupper( axisChar ) - 'X';
-	}
-	
 	_lucVectorArrowCrossSection_Init( 
 			self, 
 			vectorVariable,
@@ -225,8 +215,7 @@ void _lucVectorArrowCrossSection_Construct( void* drawingObject, Stg_ComponentFa
 			Stg_ComponentFactory_GetBool( cf, self->name, "dynamicRange", True ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "lengthScale", 0.3 ),
 			(float) Stg_ComponentFactory_GetDouble( cf, self->name, "lineWidth", 1.0 ),
-			value,
-			axis );
+			lucCrossSection_Read(cf, self->name));
 }
 
 void _lucVectorArrowCrossSection_Build( void* drawingObject, void* data ) {}
@@ -257,12 +246,13 @@ void _lucVectorArrowCrossSection_BuildDisplayList( void* drawingObject, void* _c
 	lucVectorArrowCrossSection*       self            = (lucVectorArrowCrossSection*)drawingObject;
 	DomainContext*            context         = (DomainContext*) _context;
 
-	_lucVectorArrowCrossSection_DrawCrossSection( self, context->dim, self->crossSectionValue, self->crossSectionAxis );
+	_lucVectorArrowCrossSection_DrawCrossSection( self, context->dim, self->crossSection );
 }
 
-void _lucVectorArrowCrossSection_DrawCrossSection( void* drawingObject, Dimension_Index dim, double crossSectionValue, Axis axis ) {
+void _lucVectorArrowCrossSection_DrawCrossSection( void* drawingObject, Dimension_Index dim, lucCrossSection* crossSection ) {
 	lucVectorArrowCrossSection*  self           = (lucVectorArrowCrossSection*)drawingObject;
 	FieldVariable*    vectorVariable = self->vectorVariable;
+   Axis              axis = crossSection->axis;
 	Axis              aAxis          = (axis == I_AXIS ? J_AXIS : I_AXIS);
 	Axis              bAxis          = (axis == K_AXIS ? J_AXIS : K_AXIS);
 	Coord             pos;
@@ -305,7 +295,9 @@ void _lucVectorArrowCrossSection_DrawCrossSection( void* drawingObject, Dimensio
 	dA = (globalMax[ aAxis ] - globalMin[ aAxis ])/(double)self->resolution[ aAxis ];
 	dB = (globalMax[ bAxis ] - globalMin[ bAxis ])/(double)self->resolution[ bAxis ];
 	
-	pos[axis] = crossSectionValue;
+	pos[axis] = lucCrossSection_GetValue(crossSection, globalMin[axis], globalMax[axis]);
+	Journal_DPrintf( self->debugStream, "-- Drawing cross section on axis %d at value %lf\n", axis, pos[axis]);
+	fprintf( stderr, "-- Drawing cross section on axis %d at value %lf\n", axis, pos[axis]);
 
 	for ( pos[ aAxis ] = globalMin[ aAxis ] + dA * 0.5 ; pos[ aAxis ] < globalMax[ aAxis ] ; pos[ aAxis ] += dA ) {
 		for ( pos[ bAxis ] = globalMin[ bAxis ] + dB * 0.5 ; pos[ bAxis ] < globalMax[ bAxis ] ; pos[ bAxis ] += dB ) {

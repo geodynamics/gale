@@ -52,6 +52,8 @@
 #include <glucifer/Base/Base.h>
 #include <glucifer/RenderingEngines/RenderingEngines.h>
 
+#include <glucifer/Base/CrossSection.h>
+
 #include "types.h"
 #include "OpenGLDrawingObject.h"
 #include "ScalarFieldCrossSection.h"
@@ -114,8 +116,7 @@ void _lucScalarFieldCrossSection_Init(
 		Name                                                         fieldVariableName,
 		lucColourMap*                                                colourMap,
 		IJK                                                          resolution,
-		double                                                       crossSectionValue,
-		Axis                                                         crossSectionAxis,
+		lucCrossSection*                                             crossSection,
 		XYZ                                                          minCropValues,
 		XYZ                                                          maxCropValues ) 
 {
@@ -123,15 +124,15 @@ void _lucScalarFieldCrossSection_Init(
 	self->fieldVariableName = fieldVariableName;
 	self->colourMap = colourMap;
 	memcpy( self->resolution, resolution, sizeof(IJK) );
-	self->crossSectionValue = crossSectionValue;
-	self->crossSectionAxis = crossSectionAxis;
 	memcpy( self->minCropValues, minCropValues, sizeof(XYZ) );
 	memcpy( self->maxCropValues, maxCropValues, sizeof(XYZ) );
+	self->crossSection = crossSection;
 }
 
 void _lucScalarFieldCrossSection_Delete( void* drawingObject ) {
 	lucScalarFieldCrossSection*  self = (lucScalarFieldCrossSection*)drawingObject;
 
+   lucCrossSection_Delete(self->crossSection);
 	_lucOpenGLDrawingObject_Delete( self );
 }
 
@@ -179,10 +180,7 @@ void _lucScalarFieldCrossSection_Construct( void* drawingObject, Stg_ComponentFa
 	lucColourMap*    colourMap;
 	Index            defaultResolution;
 	IJK              resolution;
-	char             axisChar;
-	double           value               = 0.0;
-	Axis             axis                = 0;
-	Name             crossSectionName;
+   lucCrossSection* crossSection;
 	Name             fieldVariableName;
 	XYZ              minCropValues;
 	XYZ              maxCropValues;
@@ -204,12 +202,6 @@ void _lucScalarFieldCrossSection_Construct( void* drawingObject, Stg_ComponentFa
 	resolution[ J_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolutionY", defaultResolution );
 	resolution[ K_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolutionZ", defaultResolution );
 			
-	crossSectionName = Stg_ComponentFactory_GetString( cf, self->name, "crossSection", "" );
-	if ( sscanf( crossSectionName, "%c=%lf", &axisChar, &value ) == 2 ) {
-		if ( toupper( axisChar ) >= 'X' )
-			axis = toupper( axisChar ) - 'X';
-	}
-
 	/* Get Values with which to crop the cross section */
 	minCropValues[ I_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "minCropX", -HUGE_VAL );
 	minCropValues[ J_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "minCropY", -HUGE_VAL );
@@ -223,8 +215,7 @@ void _lucScalarFieldCrossSection_Construct( void* drawingObject, Stg_ComponentFa
 			fieldVariableName,
 			colourMap,
 			resolution,
-			value,
-			axis,
+			lucCrossSection_Read(cf, self->name),
 			minCropValues,
 			maxCropValues );
 }
@@ -268,14 +259,15 @@ void _lucScalarFieldCrossSection_CleanUp( void* drawingObject, void* _context ) 
 
 void _lucScalarFieldCrossSection_BuildDisplayList( void* drawingObject, void* _context ) {
 	lucScalarFieldCrossSection*       self            = (lucScalarFieldCrossSection*)drawingObject;
-	lucScalarFieldCrossSection_DrawCrossSection( self, self->crossSectionValue, self->crossSectionAxis );
+	lucScalarFieldCrossSection_DrawCrossSection( self, self->crossSection );
 }
 
 #define FUDGE_FACTOR 0.0001
 
-void lucScalarFieldCrossSection_DrawCrossSection( void* drawingObject, double crossSectionValue, Axis axis ) {
+void lucScalarFieldCrossSection_DrawCrossSection( void* drawingObject, lucCrossSection* crossSection ) {
 	lucScalarFieldCrossSection*       self            = (lucScalarFieldCrossSection*)drawingObject;
 	FieldVariable* fieldVariable = self->fieldVariable;
+   Axis           axis = crossSection->axis;
 	Axis           aAxis;
 	Axis           bAxis;
 	Coord          min;
@@ -302,25 +294,26 @@ void lucScalarFieldCrossSection_DrawCrossSection( void* drawingObject, double cr
 	aResolution = self->resolution[ aAxis ];
 	bResolution = self->resolution[ bAxis ];
 	
-	Journal_DPrintfL( self->debugStream, 2, 
-			"%s called on field %s, with res[A] as %u, res[B] as %u, axis of cross section as %d, crossSectionValue as %g\n",
-			__func__, fieldVariable->name, aResolution, bResolution, axis, crossSectionValue );
-	
 	FieldVariable_GetMinAndMaxLocalCoords( fieldVariable, min, max );
+
 	/* Crop the size of the cros-section that you wish to draw */
 	for ( dim_I = 0 ; dim_I < fieldVariable->dim ; dim_I++ ) {
 		min[ dim_I ] = MAX( self->minCropValues[ dim_I ], min[ dim_I ]);
 		max[ dim_I ] = MIN( self->maxCropValues[ dim_I ], max[ dim_I ]);
 	}
 
+	/* Find position of cross section */
+	pos[axis] = lucCrossSection_GetValue(crossSection, min[axis], max[axis]);
+	Journal_DPrintfL( self->debugStream, 2, 
+			"%s called on field %s, with res[A] as %u, res[B] as %u, axis of cross section as %d, crossSection value as %g\n",
+			__func__, fieldVariable->name, aResolution, bResolution, axis, pos[axis]);
+	
+
 	/* Create normal */
 	normal[axis]  = 1.0;
 	normal[aAxis] = 0.0;
 	normal[bAxis] = 0.0;
 	glNormal3fv( normal );
-
-	/* Find position of cross - section */
-	pos[axis] = crossSectionValue;
 
 	aLength = (max[aAxis] - min[aAxis])/(double)aResolution;
 	bLength = (max[bAxis] - min[bAxis])/(double)bResolution;

@@ -43,6 +43,7 @@
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+#include <glucifer/Base/CrossSection.h>
 
 #ifndef __lucVectorArrowCrossSection_h__
 #define __lucVectorArrowCrossSection_h__
@@ -64,8 +65,7 @@
 		Bool                                               dynamicRange;           \
 		double                                             lengthScale;            \
 		float                                              lineWidth;              \
-		double                                             crossSectionValue;      \
-		Axis                                               crossSectionAxis;
+      lucCrossSection*                                   crossSection;           \
 
 	struct lucVectorArrowCrossSection { __lucVectorArrowCrossSection };
 	
@@ -105,6 +105,6 @@
 	void _lucVectorArrowCrossSection_CleanUp( void* drawingObject, void* _context ) ;
 
 	void _lucVectorArrowCrossSection_BuildDisplayList( void* drawingObject, void* _context ) ;
-	void _lucVectorArrowCrossSection_DrawCrossSection( void* drawingObject, Dimension_Index dim, double crossSectionValue, Axis axis );
+	void _lucVectorArrowCrossSection_DrawCrossSection( void* drawingObject, Dimension_Index dim, lucCrossSection* crossSection );
 
 #endif

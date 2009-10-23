@@ -51,6 +51,8 @@
 #include <glucifer/Base/Base.h>
 #include <glucifer/RenderingEngines/RenderingEngines.h>
 
+#include <glucifer/Base/CrossSection.h>
+
 #include "types.h"
 #include "OpenGLDrawingObject.h"
 #include "EigenvectorsCrossSection.h"
@@ -131,8 +133,7 @@ void _lucEigenvectorsCrossSection_Init(
 		Name                                                         leastColourForNegativeName,
 		Name                                                         middleColourForNegativeName,
 		Name                                                         greatestColourForNegativeName,
-		double                                                       crossSectionValue,
-		Axis                                                         crossSectionAxis ) 
+		lucCrossSection*                                             crossSection)
 {
 	Stream* errorStream         = Journal_MyStream( Error_Type, self );
 	self->tensorField = tensorField;
@@ -169,13 +170,13 @@ void _lucEigenvectorsCrossSection_Init(
 	self->plotEigenValue = plotEigenValue;
 	self->scaleEigenValue = scaleEigenValue;
 
-	self->crossSectionValue = crossSectionValue;
-	self->crossSectionAxis = crossSectionAxis;
+	self->crossSection = crossSection;
 }
 
 void _lucEigenvectorsCrossSection_Delete( void* drawingObject ) {
 	lucEigenvectorsCrossSection*  self = (lucEigenvectorsCrossSection*)drawingObject;
 
+   lucCrossSection_Delete(self->crossSection);
 	_lucOpenGLDrawingObject_Delete( self );
 }
 
@@ -223,10 +224,7 @@ void _lucEigenvectorsCrossSection_Construct( void* drawingObject, Stg_ComponentF
 	FieldVariable*   tensorField;
 	Index            defaultResolution;
 	IJK              resolution;
-	double           value               = 0.0;
-	Axis             axis                = 0;
-	char             axisChar;
-	Name             crossSectionName;
+   lucCrossSection* crossSection;
 
 	/* Construct Parent */
 	_lucOpenGLDrawingObject_Construct( self, cf, data );
@@ -238,12 +236,6 @@ void _lucEigenvectorsCrossSection_Construct( void* drawingObject, Stg_ComponentF
 	resolution[ J_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolutionY", defaultResolution );
 	resolution[ K_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolutionZ", defaultResolution );
 			
-	crossSectionName = Stg_ComponentFactory_GetString( cf, self->name, "crossSection", "" );
-	if ( sscanf( crossSectionName, "%c=%lf", &axisChar, &value ) == 2 ) {
-		if ( toupper( axisChar ) >= 'X' )
-			axis = toupper( axisChar ) - 'X';
-	}
-	
 	_lucEigenvectorsCrossSection_Init( 
 			self, 
 			tensorField,
@@ -263,8 +255,7 @@ void _lucEigenvectorsCrossSection_Construct( void* drawingObject, Stg_ComponentF
 			Stg_ComponentFactory_GetString( cf, self->name, "leastColourForNegative", "black" ),
 			Stg_ComponentFactory_GetString( cf, self->name, "middleColourForNegative", "black" ),
 			Stg_ComponentFactory_GetString( cf, self->name, "greatestColourForNegative", "black" ),
-			value, 
-			axis );
+			lucCrossSection_Read(cf, self->name));
 }
 
 void _lucEigenvectorsCrossSection_Build( void* drawingObject, void* data ) {}
@@ -295,12 +286,13 @@ void _lucEigenvectorsCrossSection_BuildDisplayList( void* drawingObject, void* _
 	lucEigenvectorsCrossSection*       self            = (lucEigenvectorsCrossSection*)drawingObject;
 	DomainContext*            context         = (DomainContext*) _context;
 
-	_lucEigenvectorsCrossSection_DrawCrossSection( self, context->dim, self->crossSectionValue, self->crossSectionAxis );
+	_lucEigenvectorsCrossSection_DrawCrossSection( self, context->dim, self->crossSection );
 }
 
-void _lucEigenvectorsCrossSection_DrawCrossSection( void* drawingObject, Dimension_Index dim, double crossSectionValue, Axis axis ) {
+void _lucEigenvectorsCrossSection_DrawCrossSection( void* drawingObject, Dimension_Index dim, lucCrossSection* crossSection ) {
 	lucEigenvectorsCrossSection*  self           = (lucEigenvectorsCrossSection*)drawingObject;
 	FieldVariable*    tensorField    = self->tensorField;
+   Axis              axis = crossSection->axis;
 	Axis              aAxis          = (axis == I_AXIS ? J_AXIS : I_AXIS);
 	Axis              bAxis          = (axis == K_AXIS ? J_AXIS : K_AXIS);
 	Coord             pos;
@@ -321,7 +313,8 @@ void _lucEigenvectorsCrossSection_DrawCrossSection( void* drawingObject, Dimensi
 	dA = (globalMax[ aAxis ] - globalMin[ aAxis ])/(double)self->resolution[ aAxis ];
 	dB = (globalMax[ bAxis ] - globalMin[ bAxis ])/(double)self->resolution[ bAxis ];
 	
-	pos[axis] = crossSectionValue;
+	pos[axis] = lucCrossSection_GetValue(crossSection, globalMin[axis], globalMax[axis]);
+	Journal_DPrintf( self->debugStream, "-- Drawing cross section on axis %d at value %lf\n", axis, pos[axis]);
 
 	for ( pos[ aAxis ] = globalMin[ aAxis ] + dA * 0.5 ; pos[ aAxis ] < globalMax[ aAxis ] ; pos[ aAxis ] += dA ) {
 		for ( pos[ bAxis ] = globalMin[ bAxis ] + dB * 0.5 ; pos[ bAxis ] < globalMax[ bAxis ] ; pos[ bAxis ] += dB ) {

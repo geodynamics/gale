@@ -43,6 +43,7 @@
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+#include <glucifer/Base/CrossSection.h>
 
 #ifndef __lucScalarFieldCrossSection_h__
 #define __lucScalarFieldCrossSection_h__
@@ -60,8 +61,7 @@
 		Name                                               fieldVariableName;      \
 		lucColourMap*                                      colourMap;              \
 		IJK                                                resolution;             \
-		double                                             crossSectionValue;      \
-		Axis                                               crossSectionAxis;       \
+      lucCrossSection*                                   crossSection;           \
 		XYZ                                                minCropValues;          \
 		XYZ                                                maxCropValues;          \
 
@@ -104,7 +104,7 @@
 
 	void _lucScalarFieldCrossSection_BuildDisplayList( void* drawingObject, void* _context ) ;
 
-	void lucScalarFieldCrossSection_DrawCrossSection( void* drawingObject, double crossSectionValue, Axis axis );
+   void lucScalarFieldCrossSection_DrawCrossSection( void* drawingObject, lucCrossSection* crossSection );
 	Bool lucScalarFieldCrossSection_PlotColouredVertex( void* drawingObject, Coord interpolationCoord, Coord plotCoord ) ;
 
 #endif
