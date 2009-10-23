@@ -521,6 +521,7 @@ void FieldTest_BuildAnalyticField( void* fieldTest, Index field_I ) {
 
 	self->referenceFieldList[field_I] = FeVariable_New( tmpName, referenceMesh, referenceMesh, referenceDofLayout, NULL, NULL, NULL, 
 							Mesh_GetDimSize( referenceMesh ), False, False, False, context->fieldVariable_Register );
+	self->referenceFieldList[field_I]->context = context;
 	/* so that the eqnation numbers don't get built for this guy */
 	self->referenceFieldList[field_I]->buildEqNums = False;
 
@@ -538,7 +539,8 @@ void FieldTest_BuildAnalyticField( void* fieldTest, Index field_I ) {
 
 	Memory_Free( tmpName );
 	Stg_Component_Build( self->referenceMagFieldList[field_I], context, False );
-	self->referenceMagFieldList[field_I]->_operator = Operator_NewFromName( self->referenceMagFieldList[field_I]->operatorName, self->referenceFieldList[field_I]->fieldComponentCount, context->dim );
+	self->referenceMagFieldList[field_I]->_operator = Operator_NewFromName( self->referenceMagFieldList[field_I]->operatorName, 
+										self->referenceFieldList[field_I]->fieldComponentCount, context->dim );
 	self->referenceMagFieldList[field_I]->fieldComponentCount = self->referenceMagFieldList[field_I]->_operator->resultDofs;
 	_OperatorFeVariable_SetFunctions( self->referenceMagFieldList[field_I] );
 
