@@ -85,6 +85,8 @@ void TensorMultMathSuite_TestTensorArrayIdentity( TensorMultMathSuiteData* data 
 		pcu_filename_expected( "testTensorMultMathArrayIdentity.expected", expected_file );
 		pcu_check_fileEq( "testTensorArrayIdentity.dat", expected_file );
 		remove( "testTensorArrayIdentity.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -112,6 +114,8 @@ void TensorMultMathSuite_TestSymmetricTensorIdentity( TensorMultMathSuiteData* d
 		pcu_filename_expected( "testTensorMultMathSymmetricTensorIdentity.expected", expected_file );
 		pcu_check_fileEq( "testSymmetricTensorIdentity.dat", expected_file );
 		remove( "testSymmetricTensorIdentity.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -127,11 +131,11 @@ void TensorMultMathSuite_TestTensorArrayTranspose( TensorMultMathSuiteData* data
 
 		Journal_Printf(stream, "*******************    Test 3   ************************\n");
 		Journal_Printf( stream, "Test function TensorArray_Transpose \n\n");
+
 		Journal_Printf( stream, "2-D\n");    
-		tensorArray[FT2D_00] = 0.7;
-		tensorArray[FT2D_01] = 1;
-		tensorArray[FT2D_10] = 2;
-		tensorArray[FT2D_11] = 3;
+		tensorArray[FT2D_00] = 0.7; tensorArray[FT2D_01] = 1;
+		tensorArray[FT2D_10] = 2; tensorArray[FT2D_11] = 3;
+
 		Journal_PrintTensorArray( stream, tensorArray, 2); 
 		TensorArray_Transpose(tensorArray, 2, tensorResult);
 		Journal_PrintTensorArray( stream, tensorResult, 2); 
@@ -148,6 +152,8 @@ void TensorMultMathSuite_TestTensorArrayTranspose( TensorMultMathSuiteData* data
 		pcu_filename_expected( "testTensorMultTranspose.expected", expected_file );
 		pcu_check_fileEq( "testTensorArrayTranspose.dat", expected_file );
 		remove( "testTensorArrayTranspose.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -165,6 +171,9 @@ void TensorMultMathSuite_TestTensorArrayAdd( TensorMultMathSuiteData* data ) {
 		Journal_Printf( stream, "Test function TensorArray_Add \n\n");
 
 		Journal_Printf( stream, "2-D\n");
+		tensorArray[FT2D_00] = 0.7; tensorArray[FT2D_01] = 1;
+		tensorArray[FT2D_10] = 2; tensorArray[FT2D_11] = 3;
+
 		tensorArray2[FT2D_00] = 5; tensorArray2[FT2D_01] = 6;
 		tensorArray2[FT2D_10] = 7; tensorArray2[FT2D_11] = 8;
 
@@ -174,6 +183,10 @@ void TensorMultMathSuite_TestTensorArrayAdd( TensorMultMathSuiteData* data ) {
 		Journal_PrintTensorArray( stream, tensorResult, 2);
 
 		Journal_Printf( stream, "3-D\n");
+		tensorArray[FT3D_00] = 0.5; tensorArray[FT3D_01] = 10; tensorArray[FT3D_02] = 20; 
+		tensorArray[FT3D_10] = 30; tensorArray[FT3D_11] = 40; tensorArray[FT3D_12] = 50; 
+		tensorArray[FT3D_20] = 60; tensorArray[FT3D_21] = 70; tensorArray[FT3D_22] = 80;
+
 		tensorArray2[FT3D_00] = 5; tensorArray2[FT3D_01] = 1; tensorArray2[FT3D_02] = 2;
 		tensorArray2[FT3D_10] = 3; tensorArray2[FT3D_11] = 4; tensorArray2[FT3D_12] = 5;
 		tensorArray2[FT3D_20] = 6; tensorArray2[FT3D_21] = 7; tensorArray2[FT3D_22] = 8;
@@ -186,6 +199,8 @@ void TensorMultMathSuite_TestTensorArrayAdd( TensorMultMathSuiteData* data ) {
 		pcu_filename_expected( "testTensorMultAdd.expected", expected_file );
 		pcu_check_fileEq( "testTensorArrayAdd.dat", expected_file );
 		remove( "testTensorArrayAdd.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -203,6 +218,9 @@ void TensorMultMathSuite_TestTensorArraySubstract( TensorMultMathSuiteData* data
 		Journal_Printf( stream, "Test function TensorArray_Subtract \n\n");
 
 		Journal_Printf( stream, "2-D\n");
+		tensorArray[FT2D_00] = 0.7; tensorArray[FT2D_01] = 1;
+		tensorArray[FT2D_10] = 2; tensorArray[FT2D_11] = 3;
+
 		tensorArray2[FT2D_00] = 5; tensorArray2[FT2D_01] = 6;
 		tensorArray2[FT2D_10] = 7; tensorArray2[FT2D_11] = 8;
 
@@ -212,6 +230,10 @@ void TensorMultMathSuite_TestTensorArraySubstract( TensorMultMathSuiteData* data
 		Journal_PrintTensorArray( stream, tensorResult, 2);
 
 		Journal_Printf( stream, "3-D\n");
+		tensorArray[FT3D_00] = 0.5; tensorArray[FT3D_01] = 10; tensorArray[FT3D_02] = 20; 
+		tensorArray[FT3D_10] = 30; tensorArray[FT3D_11] = 40; tensorArray[FT3D_12] = 50; 
+		tensorArray[FT3D_20] = 60; tensorArray[FT3D_21] = 70; tensorArray[FT3D_22] = 80;
+
 		tensorArray2[FT3D_00] = 50; tensorArray2[FT3D_01] = 1; tensorArray2[FT3D_02] = 2;
 		tensorArray2[FT3D_10] = 3; tensorArray2[FT3D_11] = 4; tensorArray2[FT3D_12] = 5;
 		tensorArray2[FT3D_20] = 6; tensorArray2[FT3D_21] = 7; tensorArray2[FT3D_22] = 8;
@@ -224,6 +246,8 @@ void TensorMultMathSuite_TestTensorArraySubstract( TensorMultMathSuiteData* data
 		pcu_filename_expected( "testTensorMultSubstract.expected", expected_file );
 		pcu_check_fileEq( "testTensorArraySubstract.dat", expected_file );
 		remove( "testTensorArraySubstract.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -270,6 +294,8 @@ void TensorMultMathSuite_TestTensorArrayMultiplyByTensorArray( TensorMultMathSui
 		pcu_filename_expected( "testTensorMultMultiplyByTensorArray.expected", expected_file );
 		pcu_check_fileEq( "testTensorArrayMultiplyByTensorArray.dat", expected_file );
 		remove( "testTensorArrayMultiplyByTensorArray.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -310,6 +336,8 @@ void TensorMultMathSuite_TestTensorArrayMultiplyByRightTranspose( TensorMultMath
 		pcu_filename_expected( "testTensorMultMultiplyByRightTranspose.expected", expected_file );
 		pcu_check_fileEq( "testTensorArrayMultiplyByRightTranspose.dat", expected_file );
 		remove( "testTensorArrayMultiplyByRightTranspose.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -350,6 +378,8 @@ void TensorMultMathSuite_TestTensorArrayMultiplyByLeftTranspose( TensorMultMathS
 		pcu_filename_expected( "testTensorMultMultiplyByLeftTranspose.expected", expected_file );
 		pcu_check_fileEq( "testTensorArrayMultiplyByLeftTranspose.dat", expected_file );
 		remove( "testTensorArrayMultiplyByLeftTranspose.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -395,6 +425,8 @@ void TensorMultMathSuite_TestTensorArrayMultiplyBySymmetricTensor( TensorMultMat
 		pcu_filename_expected( "testTensorMultMultiplyBySymmetricTensor.expected", expected_file );
 		pcu_check_fileEq( "testTensorArrayMultiplyBySymemtricTensor.dat", expected_file );
 		remove( "testTensorArrayMultiplyBySymemtricTensor.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -439,6 +471,8 @@ void TensorMultMathSuite_TestTensorArrayMultiplyByLeftVector( TensorMultMathSuit
 		pcu_filename_expected( "testTensorMultMultiplyByLeftVector.expected", expected_file );
 		pcu_check_fileEq( "testTensorArrayMultiplyByLeftVector.dat", expected_file );
 		remove( "testTensorArrayMultiplyByLeftVector.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -483,6 +517,8 @@ void TensorMultMathSuite_TestTensorArrayMultiplyByRightVector( TensorMultMathSui
 		pcu_filename_expected( "testTensorMultMultiplyByRightVector.expected", expected_file );
 		pcu_check_fileEq( "testTensorArrayMultiplyByRightVector.dat", expected_file );
 		remove( "testTensorArrayMultiplyByRightVector.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -523,6 +559,8 @@ void TensorMultMathSuite_TestCalcDeterminant( TensorMultMathSuiteData* data ) {
 		pcu_filename_expected( "testTensorMultCalcDeterminant.expected", expected_file );
 		pcu_check_fileEq( "testCalcDeterminant.dat", expected_file );
 		remove( "testCalcDeterminant.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -622,6 +660,8 @@ void TensorMultMathSuite_TestCalcInverseWithDeterminant( TensorMultMathSuiteData
 		pcu_filename_expected( "testTensorMultCalcInverseWithDeterminant.expected", expected_file );
 		pcu_check_fileEq( "testCalcInverseWithDeterminant.dat", expected_file );
 		remove( "testCalcInverseWithDeterminant.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -721,6 +761,8 @@ void TensorMultMathSuite_TestCalcInverse( TensorMultMathSuiteData* data ) {
 		pcu_filename_expected( "testTensorMultCalcInverse.expected", expected_file );
 		pcu_check_fileEq( "testCalcInverse.dat", expected_file );
 		remove( "testCalcInverse.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -770,6 +812,8 @@ void TensorMultMathSuite_TestTensorArrayDoubleContraction( TensorMultMathSuiteDa
 		pcu_filename_expected( "testTensorMultTADoubleContraction.expected", expected_file );
 		pcu_check_fileEq( "testTADoubleContraction.dat", expected_file );
 		remove( "testTADoubleContraction.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -815,6 +859,8 @@ void TensorMultMathSuite_TestSymmetricTensorDoubleContraction( TensorMultMathSui
 		pcu_filename_expected( "testTensorMultSTDoubleContraction.expected", expected_file );
 		pcu_check_fileEq( "testSTDoubleContraction.dat", expected_file );
 		remove( "testSTDoubleContraction.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -862,6 +908,8 @@ void TensorMultMathSuite_TestPrintNonSquareMatrix( TensorMultMathSuiteData* data
 		Memory_Free(nonSquareMatrixB);
 		Memory_Free(nonSquareMatrixAT);
 		Memory_Free(nonSquareMatrixResult);
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -910,6 +958,8 @@ void TensorMultMathSuite_TestNonSquareMatrixTranspose( TensorMultMathSuiteData* 
 		Memory_Free(nonSquareMatrixB);
 		Memory_Free(nonSquareMatrixAT);
 		Memory_Free(nonSquareMatrixResult);
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -949,8 +999,7 @@ void TensorMultMathSuite_TestMultiplicationByNonSquareMatrix( TensorMultMathSuit
 		Journal_PrintNonSquareMatrix(stream, nonSquareMatrixA, 3, 4);
 		Journal_PrintNonSquareMatrix(stream, nonSquareMatrixB, 4, 2);
 
-		NonSquareMatrix_MultiplicationByNonSquareMatrix(nonSquareMatrixA, 3, 4, 
-			nonSquareMatrixB, 4,2, nonSquareMatrixResult );
+		NonSquareMatrix_MultiplicationByNonSquareMatrix(nonSquareMatrixA, 3, 4, nonSquareMatrixB, 4,2, nonSquareMatrixResult );
 
 		Journal_PrintNonSquareMatrix(stream, nonSquareMatrixResult, 3, 2);
 
@@ -962,6 +1011,8 @@ void TensorMultMathSuite_TestMultiplicationByNonSquareMatrix( TensorMultMathSuit
 		Memory_Free(nonSquareMatrixB);
 		Memory_Free(nonSquareMatrixAT);
 		Memory_Free(nonSquareMatrixResult);
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -1007,6 +1058,7 @@ void TensorMultMathSuite_TestMatrixVectorMultiplication( TensorMultMathSuiteData
 		
 		NonSquareMatrix_MatrixVectorMultiplication( nonSquareMatrixAT, 4, 3, vector, 3, solutionVector );
 		error_flag = False;
+
 		for ( row = 0; row < 4; row++ ) {
 			if (fabs(solutionVector[row] - solutionVectorCompare[row]) > TENSORMULTMATH_TEST_ERROR ) {
 				error_flag = True;
@@ -1028,6 +1080,8 @@ void TensorMultMathSuite_TestMatrixVectorMultiplication( TensorMultMathSuiteData
 
 		Memory_Free(nonSquareMatrixA);
 		Memory_Free(nonSquareMatrixAT);
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 

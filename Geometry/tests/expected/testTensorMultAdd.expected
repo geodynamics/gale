@@ -3,14 +3,14 @@ Test function TensorArray_Add
 
 2-D
 tensorArray - 
-    0.5          10     
-     20          30     
+    0.7           1     
+      2           3     
 tensorArray2 - 
       5           6     
       7           8     
 tensorResult - 
-    5.5          16     
-     27          38     
+    5.7           7     
+      9          11     
 3-D
 tensorArray - 
     0.5          10          20     
