@@ -162,24 +162,11 @@ void ParallelDelaunay_Init(
 	self->attributes = Memory_Alloc_Unnamed( DelaunayAttributes );
 	memcpy( self->attributes, attr, sizeof( DelaunayAttributes ) );
 	self->attributes->BuildBoundingTriangle = 0;
-	
-	self->dictionary = dictionary;
-	self->numSites = numSites;
-	self->numInputSites = numSites;
-	self->points = sites;
-	self->leftProc = 0;
-	self->rightProc = 0;
-	self->haloSites[0] = NULL;
-	self->haloSites[1] = NULL;
-	self->localTriangulation = NULL;
-	self->rank = rank;
-	self->numProcs = numProcs;
-	self->comm = comm;
-	
+
 	_Stg_Class_Init( (Stg_Class*)self );
 	_Stg_Object_Init( (Stg_Object*)self, name, NON_GLOBAL );
 	_Stg_Component_Init( (Stg_Component*)self );
-	_ParallelDelaunay_Init( self );
+	_ParallelDelaunay_Init( self, sites, 0, 0, rank, numProcs, comm, numSites, numSites, dictionary, True );
 }
 
 /** Creation implementation */
@@ -216,19 +203,7 @@ ParallelDelaunay* _ParallelDelaunay_New(
 	self = (ParallelDelaunay*)_Delaunay_New( _sizeOfSelf, type, _delete, _print, _copy, _defaultConstructor,
 			_construct, _build, _initialise, _execute, _destroy, name, True, dictionary, sites, numSites, 0, myAttr );
 	
-	self->points = sites;
-	self->leftProc = 0;
-	self->rightProc = 0;
-	self->haloSites[0] = NULL;
-	self->haloSites[1] = NULL;
-	self->localTriangulation = NULL;
-	self->rank = rank;
-	self->numProcs = numProcs;
-	self->comm = comm;
-	
-	if( initFlag ){
-		_ParallelDelaunay_Init( self );
-	}
+	_ParallelDelaunay_Init( self, sites, 0, 0, rank, numProcs, comm, numSites, numSites, dictionary, initFlag );
 
 	return self;
 }
@@ -263,14 +238,30 @@ int ParallelDelaunayBtreeCompareFunction( void *a, void *b )
 #define LOAD_TAG 1
 #define DATA_TAG 1<<1
 #define NEW_SITE_FACTOR 100
-void _ParallelDelaunay_Init( ParallelDelaunay* self )
+void _ParallelDelaunay_Init( ParallelDelaunay* self, CoordF* points, int leftProc, int rightProc, int rank, int numProcs, MPI_Comm* comm, int numSites, int numInputSites, Dictionary* dictionary, Bool initFlag )
 {
 	assert( self );
 
-	self->numHaloSites[0] = 0;
-	self->numHaloSites[1] = 0;
-	self->sitePool = MemoryPool_New( Site, NEW_SITE_FACTOR, NEW_SITE_FACTOR );
-	self->coordPool = MemoryPool_New( CoordF, NEW_SITE_FACTOR, NEW_SITE_FACTOR );
+	self->points = points;
+	self->leftProc = leftProc;
+	self->rightProc = rightProc;
+	self->haloSites[0] = NULL;
+	self->haloSites[1] = NULL;
+	self->localTriangulation = NULL;
+	self->rank = rank;
+	self->numProcs = numProcs;
+	self->comm = comm;
+
+	self->dictionary = dictionary;
+	self->numSites = numSites;
+	self->numInputSites = numInputSites;
+	
+    if (initFlag) {
+	    self->numHaloSites[0] = 0;
+	    self->numHaloSites[1] = 0;
+	    self->sitePool = MemoryPool_New( Site, NEW_SITE_FACTOR, NEW_SITE_FACTOR );
+	    self->coordPool = MemoryPool_New( CoordF, NEW_SITE_FACTOR, NEW_SITE_FACTOR );
+    }
 }
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -519,7 +510,7 @@ void _ParallelDelaunay_Execute( void* pd, void* data )
 
 void _ParallelDelaunay_Destroy( void* pd, void* data )
 {
-	
+    _ParallelDelaunay_Delete( pd );
 }
 
 #define onCurrentProc( pd, id ) ( id < (pd->processorLoad[pd->rank]+pd->localTriangulation->idOffset) )

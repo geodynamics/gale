@@ -121,7 +121,8 @@
 		MPI_Comm					*comm,
 		DelaunayAttributes			*attr );
 	
-	void _ParallelDelaunay_Init( ParallelDelaunay* self );
+	//void _ParallelDelaunay_Init( ParallelDelaunay* self );
+    void _ParallelDelaunay_Init( ParallelDelaunay* self, CoordF* points, int leftProc, int rightProc, int rank, int numProcs, MPI_Comm* comm, int numSites, int numInputSites, Dictionary* dictionary, Bool initFlag );
 	
 	
 	/*--------------------------------------------------------------------------------------------------------------------------

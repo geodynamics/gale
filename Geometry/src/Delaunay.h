@@ -138,7 +138,8 @@
 		int							idOffset,
 		DelaunayAttributes			*attr );
 	
-	void _Delaunay_Init( Delaunay* self );
+	//void _Delaunay_Init( Delaunay* self );
+    void _Delaunay_Init( Delaunay* self, CoordF* points, DelaunayAttributes* attr, int numSites, int idOffset, Dictionary* dictionary, Bool initFlag );
 	
 	
 	/*--------------------------------------------------------------------------------------------------------------------------

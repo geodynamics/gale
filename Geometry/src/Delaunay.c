@@ -153,38 +153,10 @@ void Delaunay_Init(
 	self->_execute = _Delaunay_Execute;
 	self->_destroy = _Delaunay_Destroy;
 
-	self->attributes = attr;
-	self->dictionary = dictionary;
-	
-	if( self->attributes->BuildBoundingTriangle ){
-		self->numSites = numSites + 3;
-	}
-	else{
-		self->numSites = numSites;
-	}
-	
-	self->numInputSites = numSites;
-	self->idOffset = idOffset;
-	
-	if( sites != NULL ){
-		self->sites = Memory_Alloc_Array_Unnamed( Site, self->numSites );
-		memset( self->boundingTriangle, 0, sizeof( self->boundingTriangle ) );
-
-		for( i=0; i<self->numSites; i++ ){
-			if( i < self->numInputSites ){
-				self->sites[i].coord = &(sites[i]);
-			}
-			else{
-				self->sites[i].coord = &(self->boundingTriangle[i%3]);
-			}
-			self->sites[i].id = i + self->idOffset;
-		}
-	}
-
 	_Stg_Class_Init( (Stg_Class*)self );
 	_Stg_Object_Init( (Stg_Object*)self, name, NON_GLOBAL );
 	_Stg_Component_Init( (Stg_Component*)self );
-	_Delaunay_Init( self );
+	_Delaunay_Init( self, sites, attr, numSites, idOffset, dictionary, True );
 }
 
 /** Creation implementation */
@@ -214,16 +186,7 @@ Delaunay* _Delaunay_New(
 	self = (Delaunay*)_Stg_Component_New( _sizeOfSelf, type, _delete, _print, _copy, _defaultConstructor,
 			_construct, _build, _initialise, _execute, _destroy, name, NON_GLOBAL );
 
-	self->points = sites;
-	self->attributes = attr;
-	self->dictionary = dictionary;
-
-	self->numInputSites = numSites;
-	self->idOffset = idOffset;
-	
-	if( initFlag ){
-		_Delaunay_Init( self );
-	}
+	_Delaunay_Init( self, sites, attr, numSites, idOffset, dictionary, initFlag );
 
 	return self;
 }
@@ -257,7 +220,7 @@ void Delaunay_FindMinMax( Site *sites, int count, float *minX, float *minY, floa
 	}
 }
 
-void _Delaunay_Init( Delaunay* self )
+void _Delaunay_Init( Delaunay* self, CoordF* points, DelaunayAttributes* attr, int numSites, int idOffset, Dictionary* dictionary, Bool initFlag  )
 {
 	float maxX, minX, maxY, minY;
 	float centreX, centreY;
@@ -267,47 +230,58 @@ void _Delaunay_Init( Delaunay* self )
 	
 	assert( self );
 	
-	sites = self->points;
-	
+	self->dictionary = dictionary;
+	self->points = points;
+	self->attributes = attr;
+	self->idOffset = idOffset;
+
 	if( self->attributes->BuildBoundingTriangle ){
-		self->numSites = self->numInputSites + 3;
+		self->numSites = numSites + 3;
 	}
 	else{
-		self->numSites = self->numInputSites;
-	}
-
-	if( sites != NULL ){
-		self->sites = Memory_Alloc_Array_Unnamed( Site, self->numSites );
-		memset( self->boundingTriangle, 0, sizeof( self->boundingTriangle ) );
-
-		for( i=0; i<self->numSites; i++ ){
-			if( i < self->numInputSites ){
-				self->sites[i].coord = &(sites[i]);
-			}
-			else{
-				self->sites[i].coord = &(self->boundingTriangle[i%3]);
-			}
-			self->sites[i].id = i + self->idOffset;
-		}
+		self->numSites = numSites;
 	}
 	
-	centreX = 0; centreY = 0; 
+	self->numInputSites = numSites;
+
+
+	sites = self->points;
 	
-	Delaunay_FindMinMax( self->sites, self->numSites, &minX, &minY, &maxX, &maxY );
+    if (initFlag) {
 
-	radius = (sqrt((maxX - minX) * (maxX - minX) + (maxY - minY) * (maxY - minY)));
+	    if( sites != NULL ){
+		    self->sites = Memory_Alloc_Array_Unnamed( Site, self->numSites );
+		    memset( self->boundingTriangle, 0, sizeof( self->boundingTriangle ) );
+
+		    for( i=0; i<self->numSites; i++ ){
+			    if( i < self->numInputSites ){
+				    self->sites[i].coord = &(sites[i]);
+			    }
+			    else{
+				    self->sites[i].coord = &(self->boundingTriangle[i%3]);
+			    }
+			    self->sites[i].id = i + self->idOffset;
+		    }
+	    }
+	
+	    centreX = 0; centreY = 0; 
+	
+	    Delaunay_FindMinMax( self->sites, self->numSites, &minX, &minY, &maxX, &maxY );
+
+	    radius = (sqrt((maxX - minX) * (maxX - minX) + (maxY - minY) * (maxY - minY)));
 			
-	centreX = minX + (maxX - minX) / 2.0f;
-	centreY = minY + (maxY - minY) / 2.0f;
+	    centreX = minX + (maxX - minX) / 2.0f;
+	    centreY = minY + (maxY - minY) / 2.0f;
 
-	self->boundingTriangle[0][0] = centreX - tan(PI/3.0f)*radius;
-	self->boundingTriangle[0][1] = centreY - radius;
+	    self->boundingTriangle[0][0] = centreX - tan(PI/3.0f)*radius;
+	    self->boundingTriangle[0][1] = centreY - radius;
 
-	self->boundingTriangle[1][0] = centreX + tan(PI/3.0f)*radius;
-	self->boundingTriangle[1][1] = centreY - radius;
+	    self->boundingTriangle[1][0] = centreX + tan(PI/3.0f)*radius;
+	    self->boundingTriangle[1][1] = centreY - radius;
 			
-	self->boundingTriangle[2][0] = centreX;
-	self->boundingTriangle[2][1] = centreY + radius/cos(PI/3.0f);
+	    self->boundingTriangle[2][0] = centreX;
+	    self->boundingTriangle[2][1] = centreY + radius/cos(PI/3.0f);
+    }
 }
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -414,25 +388,8 @@ void _Delaunay_Construct( void* delaunay, Stg_ComponentFactory* cf, void* data )
 
 	numSites = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "numSites", 0 );
 
-	assert( points );
-	assert( attr );
-	assert( numSites );
-	
-	self->dictionary = cf->rootDict;
-	self->points = points;
-	self->attributes = attr;
+	_Delaunay_Init( self, points, attr, numSites, idOffset, cf->rootDict, True );
 
-	if( self->attributes->BuildBoundingTriangle ){
-		self->numSites = numSites + 3;
-	}
-	else{
-		self->numSites = numSites;
-	}
-	
-	self->numInputSites = numSites;
-	self->idOffset = idOffset;
-
-	_Delaunay_Init( self );
 	_Delaunay_Build( self, NULL );
 }
 
@@ -485,7 +442,7 @@ void _Delaunay_Execute( void* delaunay, void* data )
 
 void _Delaunay_Destroy( void* delaunay, void* data )
 {
-	
+    _Delaunay_Delete( delaunay );
 }
 
 	/*--------------------------------------------------------------------------------------------------------------------------
