@@ -130,7 +130,7 @@ void SpaceFillerParticleLayoutSuite_TestSpaceFillerParticle( SpaceFillerParticle
 		remove( "spaceFillerParticle.dat" );
 
 		Stg_Class_Delete( extensionMgr_Register );
-		Stg_Component_Destroy( mesh, NULL, True );
+		/*Stg_Component_Destroy( mesh, NULL, True );*/
 		Stg_Component_Destroy( elementCellLayout, NULL, True );
 		Stg_Component_Destroy( particleLayout, NULL, True );
 		Stg_Component_Destroy( swarm, NULL, True );

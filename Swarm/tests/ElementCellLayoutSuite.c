@@ -109,7 +109,7 @@ void ElementCellLayoutSuite_Teardown( ElementCellLayoutSuiteData* data ) {
 	/* Destroy stuff */
 	Stg_Class_Delete( data->extensionMgr_Register );
 	Stg_Component_Destroy( data->elementCellLayout, NULL, True );
-	Stg_Component_Destroy( data->mesh, NULL, True );
+	/*Stg_Component_Destroy( data->mesh, NULL, True );*/
 }
 
 void ElementCellLayoutSuite_TestElementCellLayout( ElementCellLayoutSuiteData* data ) {

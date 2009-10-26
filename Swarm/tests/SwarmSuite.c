@@ -155,7 +155,7 @@ void SwarmSuite_Teardown( SwarmSuiteData* data ) {
 	Stg_Class_Delete( data->swarm );
 	Stg_Class_Delete( data->randomParticleLayout );
 	Stg_Class_Delete( data->elementCellLayout );
-	Stg_Class_Delete( data->mesh );
+	/*Stg_Class_Delete( data->mesh );*/
 	Stg_Class_Delete( data->extensionMgr_Register );
 }
 

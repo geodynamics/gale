@@ -161,7 +161,7 @@ void GaussLayoutSuite_TestDriver( GaussLayoutSuiteData* data, char* name,  char*
 		Stg_Component_Destroy( gaussParticleLayout, NULL, True );
 		Stg_Component_Destroy( elementCellLayout, NULL, True );
 		Stg_Component_Destroy( swarm, NULL, True );
-		Stg_Component_Destroy( mesh, NULL, True );
+		/*Stg_Component_Destroy( mesh, NULL, True );*/
 		remove( output );
 	}
 }
