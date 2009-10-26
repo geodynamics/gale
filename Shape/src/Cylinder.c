@@ -256,6 +256,8 @@ void _Cylinder_Execute( void* cylinder, void* data ) {
 }
 void _Cylinder_Destroy( void* cylinder, void* data ) {
 	Cylinder*	self = (Cylinder*)cylinder;
+
+    _Cylinder_Delete( self );
 	
 	_Stg_Shape_Destroy( self, data );
 }

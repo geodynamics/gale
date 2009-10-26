@@ -312,6 +312,8 @@ void _PolygonShape_Execute( void* polygon, void* data ) {
 }
 void _PolygonShape_Destroy( void* polygon, void* data ) {
 	PolygonShape*	self = (PolygonShape*)polygon;
+    
+    _PolygonShape_Delete( self );
 	
 	_Stg_Shape_Destroy( self, data );
 }

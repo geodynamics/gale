@@ -263,11 +263,13 @@ void _Union_Construct( void* combination, Stg_ComponentFactory* cf, void* data )
 void _Union_Build( void* combination, void* data ) {
 	Union*	self = (Union*)combination;
 
+    Stg_Component_Build( self->shapeList, data, False );
 	_Stg_Shape_Build( self, data );
 }
 void _Union_Initialise( void* combination, void* data ) {
 	Union*	self = (Union*)combination;
 	
+    Stg_Component_Initialise( self->shapeList, data, False );
 	_Stg_Shape_Initialise( self, data );
 }
 void _Union_Execute( void* combination, void* data ) {
@@ -278,6 +280,8 @@ void _Union_Execute( void* combination, void* data ) {
 void _Union_Destroy( void* combination, void* data ) {
 	Union*	self = (Union*)combination;
 	
+    Stg_Component_Destroy( self->shapeList, data, False );
+    _Union_Delete( self );
 	_Stg_Shape_Destroy( self, data );
 }
 

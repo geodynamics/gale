@@ -247,6 +247,7 @@ void _BelowPlane_Execute( void* belowPlane, void* data ) {
 void _BelowPlane_Destroy( void* belowPlane, void* data ) {
 	BelowPlane*	self = (BelowPlane*)belowPlane;
 	
+    _BelowPlane_Delete( self );
 	_Stg_Shape_Destroy( self, data );
 }
 

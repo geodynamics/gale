@@ -249,6 +249,8 @@ void _Box_Execute( void* shape, void* data ) {
 }
 void _Box_Destroy( void* shape, void* data ) {
 	Box*	self = (Box*)shape;
+    
+    _Box_Delete( self );
 	
 	_Stg_Shape_Destroy( self, data );
 }

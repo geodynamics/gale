@@ -228,6 +228,8 @@ void _PythonShape_Execute( void* pythonShape, void* data ) {
 }
 void _PythonShape_Destroy( void* pythonShape, void* data ) {
 	PythonShape*	self = (PythonShape*)pythonShape;
+
+    _PythonShape_Delete( self );
 	
 	_Stg_Shape_Destroy( self, data );
 }

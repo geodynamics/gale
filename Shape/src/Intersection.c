@@ -288,6 +288,8 @@ void _Intersection_Execute( void* intersection, void* data ) {
 }
 void _Intersection_Destroy( void* intersection, void* data ) {
 	Intersection*	self = (Intersection*)intersection;
+    
+    _Intersection_Delete( self );
 	
 	_Stg_Shape_Destroy( self, data );
 }

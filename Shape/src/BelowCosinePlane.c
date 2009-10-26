@@ -246,6 +246,8 @@ void _BelowCosinePlane_Execute( void* belowPlane, void* data ) {
 }
 void _BelowCosinePlane_Destroy( void* belowPlane, void* data ) {
 	BelowCosinePlane*	self = (BelowCosinePlane*)belowPlane;
+    
+    _BelowCosinePlane_Delete( self );
 	
 	_Stg_Shape_Destroy( self, data );
 }

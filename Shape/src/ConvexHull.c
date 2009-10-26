@@ -321,6 +321,8 @@ void _ConvexHull_Execute( void* convexHull, void* data ) {
 }
 void _ConvexHull_Destroy( void* convexHull, void* data ) {
 	ConvexHull*	self = (ConvexHull*)convexHull;
+    
+    _ConvexHull_Delete( self );
 	
 	_Stg_Shape_Destroy( self, data );
 }
