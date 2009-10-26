@@ -220,6 +220,8 @@ void _MeshGenerator_Execute( void* meshGenerator, void* data ) {
 }
 
 void _MeshGenerator_Destroy( void* meshGenerator, void* data ) {
+	MeshGenerator*		self = (MeshGenerator*)meshGenerator;
+    _MeshGenerator_Delete( self );
 }
 
 void MeshGenerator_SetFullIncidence( void* meshGenerator ) {

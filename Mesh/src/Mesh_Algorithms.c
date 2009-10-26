@@ -140,15 +140,26 @@ void _Mesh_Algorithms_Construct( void* algorithms, Stg_ComponentFactory* cf, voi
 }
 
 void _Mesh_Algorithms_Build( void* algorithms, void* data ) {
+	Mesh_Algorithms*	self = (Mesh_Algorithms*)algorithms;
+    Stg_Component_Build( self->mesh, data, False );
+    Stg_Component_Build( self->tree, data, False );
 }
 
 void _Mesh_Algorithms_Initialise( void* algorithms, void* data ) {
+	Mesh_Algorithms*	self = (Mesh_Algorithms*)algorithms;
+    Stg_Component_Initialise( self->mesh, data, False );
+    Stg_Component_Initialise( self->tree, data, False );
 }
 
 void _Mesh_Algorithms_Execute( void* algorithms, void* data ) {
 }
 
 void _Mesh_Algorithms_Destroy( void* algorithms, void* data ) {
+	Mesh_Algorithms*	self = (Mesh_Algorithms*)algorithms;
+    Stg_Component_Destroy( self->mesh, data, False );
+    Stg_Component_Destroy( self->tree, data, False );
+
+    _Mesh_Algorithms_Delete ( self );
 }
 
 void _Mesh_Algorithms_SetMesh( void* algorithms, void* mesh ) {

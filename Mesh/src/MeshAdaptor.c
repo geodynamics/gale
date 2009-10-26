@@ -113,17 +113,30 @@ void _MeshAdaptor_Construct( void* adaptor, Stg_ComponentFactory* cf, void* data
 	}
 }
 
-void _MeshAdaptor_Build( void* adaptor, void* data ) {
-	_MeshGenerator_Build( adaptor, data );
+void _MeshAdaptor_Build( void* _adaptor, void* data ) {
+    MeshAdaptor*      self = (MeshAdaptor*)_adaptor;
+	_MeshGenerator_Build( self, data );
+    Stg_Component_Build( self->generator, data, False );
+    Stg_Component_Build( self->srcMesh, data, False );
 }
 
-void _MeshAdaptor_Initialise( void* adaptor, void* data ) {
+void _MeshAdaptor_Initialise( void* _adaptor, void* data ) {
+    MeshAdaptor*      self = (MeshAdaptor*)_adaptor;
+	_MeshGenerator_Initialise( self, data );
+    Stg_Component_Initialise( self->generator, data, False );
+    Stg_Component_Initialise( self->srcMesh, data, False );
+   
 }
 
 void _MeshAdaptor_Execute( void* adaptor, void* data ) {
+    _MeshGenerator_Execute( adaptor, data );
 }
 
-void _MeshAdaptor_Destroy( void* adaptor, void* data ) {
+void _MeshAdaptor_Destroy( void* _adaptor, void* data ) {
+    MeshAdaptor*      self = (MeshAdaptor*)_adaptor;
+	_MeshGenerator_Destroy( self, data );
+    Stg_Component_Destroy( self->generator, data, False );
+    Stg_Component_Destroy( self->srcMesh, data, False );
 }
 
 /*--------------------------------------------------------------------------------------------------------------------------

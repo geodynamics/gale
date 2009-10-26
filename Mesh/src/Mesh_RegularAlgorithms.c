@@ -124,15 +124,20 @@ void _Mesh_RegularAlgorithms_Construct( void* algorithms, Stg_ComponentFactory* 
 }
 
 void _Mesh_RegularAlgorithms_Build( void* algorithms, void* data ) {
+    _Mesh_Algorithms_Build( algorithms, data );
 }
 
 void _Mesh_RegularAlgorithms_Initialise( void* algorithms, void* data ) {
+    _Mesh_Algorithms_Initialise( algorithms, data );
 }
 
 void _Mesh_RegularAlgorithms_Execute( void* algorithms, void* data ) {
+    _Mesh_Algorithms_Execute( algorithms, data );
 }
 
 void _Mesh_RegularAlgorithms_Destroy( void* algorithms, void* data ) {
+    _Mesh_RegularAlgorithms_Delete( algorithms );
+    _Mesh_Algorithms_Destroy( algorithms, data );
 }
 
 void Mesh_RegularAlgorithms_SetMesh( void* algorithms, void* mesh ) {

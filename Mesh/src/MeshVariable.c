@@ -233,12 +233,20 @@ void _MeshVariable_Build( void* meshVariable, void* data ) {
 }
 
 void _MeshVariable_Initialise( void* meshVariable, void* data ) {
+	MeshVariable*	self = (MeshVariable*)meshVariable;
+
+    Stg_Component_Initialise( self->mesh, data, False );
 }
 
 void _MeshVariable_Execute( void* meshVariable, void* data ) {
 }
 
 void _MeshVariable_Destroy( void* meshVariable, void* data ) {
+	MeshVariable*	self = (MeshVariable*)meshVariable;
+
+    Stg_Component_Destroy( self->mesh, data, False );
+
+    _MeshVariable_Delete( self ); 
 }
 
 

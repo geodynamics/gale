@@ -198,13 +198,20 @@ void _SurfaceAdaptor_Build( void* adaptor, void* data ) {
 void _SurfaceAdaptor_Initialise( void* adaptor, void* data ) {
    SurfaceAdaptor* self = (SurfaceAdaptor*)adaptor;
 
-   _MeshAdaptor_Initialise( adaptor, data );
+   _MeshAdaptor_Initialise( self, data );
 }
 
 void _SurfaceAdaptor_Execute( void* adaptor, void* data ) {
+   SurfaceAdaptor* self = (SurfaceAdaptor*)adaptor;
+
+   _MeshAdaptor_Execute( self, data );
 }
 
 void _SurfaceAdaptor_Destroy( void* adaptor, void* data ) {
+   SurfaceAdaptor* self = (SurfaceAdaptor*)adaptor;
+
+   _MeshAdaptor_Destroy( self, data );
+   _SurfaceAdaptor_Delete( self );
 }
 
 /*--------------------------------------------------------------------------------------------------------------------------

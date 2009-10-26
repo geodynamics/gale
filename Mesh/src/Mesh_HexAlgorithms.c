@@ -115,18 +115,30 @@ void _Mesh_HexAlgorithms_Print( void* hexAlgorithms, Stream* stream ) {
 }
 
 void _Mesh_HexAlgorithms_Construct( void* hexAlgorithms, Stg_ComponentFactory* cf, void* data ) {
+
+	Mesh_HexAlgorithms*	self = (Mesh_HexAlgorithms*)hexAlgorithms;
+	_Mesh_Algorithms_Construct( self, cf, data );
 }
 
 void _Mesh_HexAlgorithms_Build( void* hexAlgorithms, void* data ) {
+	Mesh_HexAlgorithms*	self = (Mesh_HexAlgorithms*)hexAlgorithms;
+	_Mesh_Algorithms_Build( self, data );
 }
 
 void _Mesh_HexAlgorithms_Initialise( void* hexAlgorithms, void* data ) {
+	Mesh_HexAlgorithms*	self = (Mesh_HexAlgorithms*)hexAlgorithms;
+	_Mesh_Algorithms_Initialise( self, data );
 }
 
 void _Mesh_HexAlgorithms_Execute( void* hexAlgorithms, void* data ) {
+	Mesh_HexAlgorithms*	self = (Mesh_HexAlgorithms*)hexAlgorithms;
+	_Mesh_Algorithms_Execute( self, data );
 }
 
 void _Mesh_HexAlgorithms_Destroy( void* hexAlgorithms, void* data ) {
+	Mesh_HexAlgorithms*	self = (Mesh_HexAlgorithms*)hexAlgorithms;
+	_Mesh_Algorithms_Destroy( self, data );
+    _Mesh_HexAlgorithms_Delete( self );
 }
 
 

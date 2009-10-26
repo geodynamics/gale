@@ -243,6 +243,8 @@ void _LinearSpaceAdaptor_Execute( void* adaptor, void* data ) {
 }
 
 void _LinearSpaceAdaptor_Destroy( void* adaptor, void* data ) {
+	LinearSpaceAdaptor*	self = (LinearSpaceAdaptor*)adaptor;
+    _LinearSpaceAdaptor_Delete( self );
 }
 
 /*--------------------------------------------------------------------------------------------------------------------------
