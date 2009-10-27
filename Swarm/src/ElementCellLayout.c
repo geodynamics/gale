@@ -293,8 +293,6 @@ void _ElementCellLayout_Destroy( void *elementCellLayout, void *data ){
 	ElementCellLayout* self = (ElementCellLayout*)elementCellLayout;
 
 	Stg_Component_Destroy( self->mesh, data, False );
-
-    _ElementCellLayout_Delete( self );
 }
 
 Cell_Index _ElementCellLayout_CellLocalCount( void* elementCellLayout ) {

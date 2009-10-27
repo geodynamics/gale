@@ -210,8 +210,6 @@ void _Mesh_Execute( void* mesh, void* data ) {
 }
 
 void _Mesh_Destroy( void* mesh, void* data ) {
-	Mesh*	self = (Mesh*)mesh;
-    _Mesh_Delete( self );
 }
 
 

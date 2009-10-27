@@ -102,7 +102,7 @@ void ParticleCoordsSuite_TestLineParticle( ParticleCoordsSuiteData* data ) {
 		/* Destroy stuff */
 		Stg_Class_Delete( extensionMgr_Register );
 		Stg_Class_Delete( variable_Register );
-		Stg_Class_Delete( swarm );
+
 		remove( "linearParticle.dat" );
 	}
 

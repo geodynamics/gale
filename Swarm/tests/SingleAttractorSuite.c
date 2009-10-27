@@ -152,7 +152,7 @@ void SingleAttractorSuite_TestSingleAttractor( SingleAttractorSuiteData* data ) 
 	remove( "testSingleAttractor.dat" );
 
    Stg_Class_Delete( dictionary );
-   Stg_Class_Delete( swarm );
+
    stgMainDestroy( cf );
 }
 

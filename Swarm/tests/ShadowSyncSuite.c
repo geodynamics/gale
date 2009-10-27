@@ -153,7 +153,7 @@ void ShadowSyncSuite_TestShadowSync( ShadowSyncSuiteData* data ) {
 	}
 
 	Stg_Class_Delete( dictionary );
-	Stg_Class_Delete( swarm );
+
 	stgMainDestroy( cf );
 }
 
