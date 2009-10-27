@@ -40,80 +40,84 @@
 **
 */
 /** \file
-**  Role:
-**
-** Assumptions:
-**
-** Comments:
-**
-** $Id: ConstantWeights.h 374 2006-10-12 08:59:41Z SteveQuenette $
-**
-**~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+ **  Role:
+ **
+ ** Assumptions:
+ **
+ ** Comments:
+ **
+ ** $Id: ConstantWeights.h 374 2006-10-12 08:59:41Z SteveQuenette $
+ **
+ **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #ifndef __PICellerator_Weights_ConstantWeightsClass_h__
 #define __PICellerator_Weights_ConstantWeightsClass_h__
 
-	/* Textual name of this class */
-	extern const Type ConstantWeights_Type;
+/* Textual name of this class */
+extern const Type ConstantWeights_Type;
 
-	/* ConstantWeights information */
-	#define __ConstantWeights \
-		/* General info */ \
-		__WeightsCalculator \
-		/* Virtual Info */\
-		\
+/* ConstantWeights information */
+#define __ConstantWeights                       \
+    /* General info */                          \
+    __WeightsCalculator                         \
+                                                \
+    /* Virtual Info */                          \
+                                                \
 
-	struct ConstantWeights { __ConstantWeights };
+struct ConstantWeights { __ConstantWeights };
+
 	
+/*---------------------------------------------------------------------------------------------------------------------
+** Constructors
+*/
+
+ConstantWeights* ConstantWeights_New( Name name, int dim );
+
+ConstantWeights* _ConstantWeights_New(
+    SizeT                                 _sizeOfSelf, 
+    Type                                  type,
+    Stg_Class_DeleteFunction*             _delete,
+    Stg_Class_PrintFunction*              _print,
+    Stg_Class_CopyFunction*               _copy, 
+    Stg_Component_DefaultConstructorFunction* _defaultConstructor,
+    Stg_Component_ConstructFunction*      _construct,
+    Stg_Component_BuildFunction*          _build,
+    Stg_Component_InitialiseFunction*     _initialise,
+    Stg_Component_ExecuteFunction*        _execute,
+    Stg_Component_DestroyFunction*        _destroy,		
+    WeightsCalculator_CalculateFunction*  _calculate,
+    Name                                  name,
+    Bool                                  initFlag,
+    int                                   dim );
+
+void _ConstantWeights_Init( void* constantWeights );
+
+
+/* Stg_Class_Delete ConstantWeights implementation */
+void _ConstantWeights_Delete( void* constantWeights );
+void _ConstantWeights_Print( void* constantWeights, Stream* stream );
+#define ConstantWeights_Copy( self )                                    \
+    (ConstantWeights*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
+#define ConstantWeights_DeepCopy( self )                                \
+    (ConstantWeights*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
+void* _ConstantWeights_Copy( void* constantWeights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
-	/*---------------------------------------------------------------------------------------------------------------------
-	** Constructors
-	*/
-	ConstantWeights* ConstantWeights_New( Name name, Dimension_Index dim ) ;
-	ConstantWeights* _ConstantWeights_New(
-		SizeT                                 _sizeOfSelf, 
-		Type                                  type,
-		Stg_Class_DeleteFunction*             _delete,
-		Stg_Class_PrintFunction*              _print,
-		Stg_Class_CopyFunction*               _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*      _construct,
-		Stg_Component_BuildFunction*          _build,
-		Stg_Component_InitialiseFunction*     _initialise,
-		Stg_Component_ExecuteFunction*        _execute,
-		Stg_Component_DestroyFunction*        _destroy,		
-		WeightsCalculator_CalculateFunction*  _calculate,
-		Name                                  name );
-
-	void _ConstantWeights_Init( void* constantWeights  ) ;
-	void ConstantWeights_InitAll( void* constantWeights, Dimension_Index dim ) ;
-
-
-	/* Stg_Class_Delete ConstantWeights implementation */
-	void _ConstantWeights_Delete( void* constantWeights );
-	void _ConstantWeights_Print( void* constantWeights, Stream* stream );
-	#define ConstantWeights_Copy( self ) \
-		(ConstantWeights*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
-	#define ConstantWeights_DeepCopy( self ) \
-		(ConstantWeights*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _ConstantWeights_Copy( void* constantWeights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
-	
-	void* _ConstantWeights_DefaultNew( Name name ) ;
+void* _ConstantWeights_DefaultNew( Name name ) ;
 void _ConstantWeights_Construct( void* constantWeights, Stg_ComponentFactory* cf, void* data ) ;
-	void _ConstantWeights_Build( void* constantWeights, void* data ) ;
-	void _ConstantWeights_Initialise( void* constantWeights, void* data ) ;
-	void _ConstantWeights_Execute( void* constantWeights, void* data );
-	void _ConstantWeights_Destroy( void* constantWeights, void* data ) ;
+void _ConstantWeights_Build( void* constantWeights, void* data ) ;
+void _ConstantWeights_Initialise( void* constantWeights, void* data ) ;
+void _ConstantWeights_Execute( void* constantWeights, void* data );
+void _ConstantWeights_Destroy( void* constantWeights, void* data ) ;
 	
 		
-	void _ConstantWeights_Calculate( void* constantWeights, void* _swarm, Cell_LocalIndex lCell_I ) ;
-	/*---------------------------------------------------------------------------------------------------------------------
-	** Private functions
-	*/
+void _ConstantWeights_Calculate( void* constantWeights, void* _swarm, Cell_LocalIndex lCell_I ) ;
+/*---------------------------------------------------------------------------------------------------------------------
+** Private functions
+*/
 	
-	/*---------------------------------------------------------------------------------------------------------------------
-	** Public functions
-	*/
+/*---------------------------------------------------------------------------------------------------------------------
+** Public functions
+*/
 	
 	
 #endif 

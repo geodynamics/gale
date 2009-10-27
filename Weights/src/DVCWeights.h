@@ -54,216 +54,219 @@
 #ifndef __PICellerator_Weights_DVCWeightsClass_h__
 #define __PICellerator_Weights_DVCWeightsClass_h__
 
-	/* Textual name of this class */
-	extern const Type DVCWeights_Type;
+/* Textual name of this class */
+extern const Type DVCWeights_Type;
 
-	/* DVCWeights information */
-	#define __DVCWeights \
-		/* General info */ \
-		__WeightsCalculator \
-		/* Virtual Info */\
-		/* Parameters that are passed in */ \
-                int resX; \
-                int resY; \
-                int resZ;
+/* DVCWeights information */
+#define __DVCWeights                            \
+    /* General info */                          \
+    __WeightsCalculator                         \
+                                                \
+    /* Virtual Info */                          \
+    /* Parameters that are passed in */         \
+    int resX;                                   \
+    int resY;                                   \
+    int resZ;
 
-	struct DVCWeights { __DVCWeights };
+struct DVCWeights { __DVCWeights };
 	
 #define DVC_INC 150
 	
 struct cell{
-  int p;/*particle index number*/
-  int index;
-  int N;
-  int S;
-  int E;
-  int W;
-  int U;
-  int D;
-  double x;
-  double y;
-  double z;
-  int done;
+    int p;/*particle index number*/
+    int index;
+    int N;
+    int S;
+    int E;
+    int W;
+    int U;
+    int D;
+    double x;
+    double y;
+    double z;
+    int done;
 };
 struct cell2d{
-  int p;/* particle index number */
-  int index;
-  int N;
-  int S;
-  int E;
-  int W;
-  double x;
-  double y;
-  int done;
+    int p;/* particle index number */
+    int index;
+    int N;
+    int S;
+    int E;
+    int W;
+    double x;
+    double y;
+    int done;
 };
 struct chain{
-  int p;/*particle index number*/
-  int index;/*cell number in grid*/
-  int sizeofboundary; /* number of cells on boundary so far */
-  int numclaimed;
-  int totalclaimed;
-  int new_bound_cells_malloced;
-  int new_claimed_cells_malloced; 
-  int *new_bound_cells;
-  int *new_claimed_cells;
-  int done;
+    int p;/*particle index number*/
+    int index;/*cell number in grid*/
+    int sizeofboundary; /* number of cells on boundary so far */
+    int numclaimed;
+    int totalclaimed;
+    int new_bound_cells_malloced;
+    int new_claimed_cells_malloced; 
+    int *new_bound_cells;
+    int *new_claimed_cells;
+    int done;
 };
 struct particle{
-  double x;
-  double y;
-  double z;
-  double cx;
-  double cy;
-  double cz;
-  double w;
-  int index;
+    double x;
+    double y;
+    double z;
+    double cx;
+    double cy;
+    double cz;
+    double w;
+    int index;
 };
 struct particle2d{
-  double x;
-  double y;
-  double cx;
-  double cy;
-  double w;
-  int index;
+    double x;
+    double y;
+    double cx;
+    double cy;
+    double w;
+    int index;
 };
 /* Private function prototypes in 3D */
-	void   _DVCWeights_GetCentroids(	
-				struct cell *cells,
-				struct particle *pList,
-				int n,
-				int m, 
-				int l,
-				int nump,
-				double vol);
-	void   _DVCWeights_ClaimCells(
-				struct chain **bchain,
-				struct cell **cells,
-				struct particle **pList,
-				int p_i);
-	void   _DVCWeights_UpdateBchain(
-				struct chain **bchain,
-				struct cell **cells,
-				int p_i);
-	void   _DVCWeights_ResetGrid(struct cell **cells, int n );
+void   _DVCWeights_GetCentroids(	
+    struct cell *cells,
+    struct particle *pList,
+    int n,
+    int m, 
+    int l,
+    int nump,
+    double vol);
+void   _DVCWeights_ClaimCells(
+    struct chain **bchain,
+    struct cell **cells,
+    struct particle **pList,
+    int p_i);
+void   _DVCWeights_UpdateBchain(
+    struct chain **bchain,
+    struct cell **cells,
+    int p_i);
+void   _DVCWeights_ResetGrid(struct cell **cells, int n );
 
-	double _DVCWeights_DistanceSquared(
-				double x0, double y0, double z0, 
-				double x1, double y1, double z1);
-        double _DVCWeights_DistanceTest(double x0, double y0, double z0, 
-                                        double x1, double y1, double z1,
-                                        double x2, double y2, double z2);	
-	void   _DVCWeights_ConstructGrid(
-				struct cell **cell_list, 
-				int n, int m, int l,
-		    	double x0, double y0, double z0,
-				double x1, double y1, double z1);
-	void   _DVCWeights_InitialiseStructs( 
-				struct chain **bchain, 
-				struct particle **pList, 
-				int nump);
-	void   _DVCWeights_CreateVoronoi( 
-				struct chain **bchain, 
-				struct particle **pList, 
-				struct cell **cells, 
-		     	double dx, double dy, double dz,
-		     	int nump,
-		     	int numx, int numy, int numz, 
-		     	double BBXMIN, double BBXMAX, 
-		     	double BBYMIN, double BBYMAX,
-		     	double BBZMIN, double BBZMAX);
+double _DVCWeights_DistanceSquared(
+    double x0, double y0, double z0, 
+    double x1, double y1, double z1);
+double _DVCWeights_DistanceTest(double x0, double y0, double z0, 
+                                double x1, double y1, double z1,
+                                double x2, double y2, double z2);	
+void   _DVCWeights_ConstructGrid(
+    struct cell **cell_list, 
+    int n, int m, int l,
+    double x0, double y0, double z0,
+    double x1, double y1, double z1);
+void   _DVCWeights_InitialiseStructs( 
+    struct chain **bchain, 
+    struct particle **pList, 
+    int nump);
+void   _DVCWeights_CreateVoronoi( 
+    struct chain **bchain, 
+    struct particle **pList, 
+    struct cell **cells, 
+    double dx, double dy, double dz,
+    int nump,
+    int numx, int numy, int numz, 
+    double BBXMIN, double BBXMAX, 
+    double BBYMIN, double BBYMAX,
+    double BBZMIN, double BBZMAX);
 /* Private function prototypes in 2D */
-	void   _DVCWeights_GetCentroids2D( 
-				struct cell2d *cells, 
-				struct particle2d *pList,
-				int n, 
-				int m, 
-				int nump,
-				double vol);
-	void   _DVCWeights_ClaimCells2D(
-				struct chain **bchain,
-				struct cell2d **cells,
-				struct particle2d **pList,
-				int p_i);
-	void   _DVCWeights_UpdateBchain2D(
-				struct chain **bchain,
-				struct cell2d **cells,
-				int p_i);
-	void   _DVCWeights_ResetGrid2D(struct cell2d **cells, int n );
-	double _DVCWeights_DistanceSquared2D(double x0, double y0, double x1, double y1);
-	double _DVCWeights_DistanceTest2D(double x0, double y0,
-					  double x1, double y1,
-					  double x2, double y2);
-	void   _DVCWeights_ConstructGrid2D(
-				struct cell2d **cell_list, 
-				int m, int l,
-				double x0, double y0,
-				double x1, double y1);
-	void   _DVCWeights_InitialiseStructs2D( 
-				struct chain **bchain, 
-				struct particle2d **pList, 
-				int nump);
-	void   _DVCWeights_CreateVoronoi2D( 
-				struct chain **bchain, 
-				struct particle2d **pList, 
-				struct cell2d **cells, 
-				double dx, double dy,
-				int nump,
-				int numx, int numy,
-				double BBXMIN, double BBXMAX, 
-				double BBYMIN, double BBYMAX);
+void   _DVCWeights_GetCentroids2D( 
+    struct cell2d *cells, 
+    struct particle2d *pList,
+    int n, 
+    int m, 
+    int nump,
+    double vol);
+void   _DVCWeights_ClaimCells2D(
+    struct chain **bchain,
+    struct cell2d **cells,
+    struct particle2d **pList,
+    int p_i);
+void   _DVCWeights_UpdateBchain2D(
+    struct chain **bchain,
+    struct cell2d **cells,
+    int p_i);
+void   _DVCWeights_ResetGrid2D(struct cell2d **cells, int n );
+double _DVCWeights_DistanceSquared2D(double x0, double y0, double x1, double y1);
+double _DVCWeights_DistanceTest2D(double x0, double y0,
+                                  double x1, double y1,
+                                  double x2, double y2);
+void   _DVCWeights_ConstructGrid2D(
+    struct cell2d **cell_list, 
+    int m, int l,
+    double x0, double y0,
+    double x1, double y1);
+void   _DVCWeights_InitialiseStructs2D( 
+    struct chain **bchain, 
+    struct particle2d **pList, 
+    int nump);
+void   _DVCWeights_CreateVoronoi2D( 
+    struct chain **bchain, 
+    struct particle2d **pList, 
+    struct cell2d **cells, 
+    double dx, double dy,
+    int nump,
+    int numx, int numy,
+    double BBXMIN, double BBXMAX, 
+    double BBYMIN, double BBYMAX);
 
-	void   _DVCWeights_Calculate2D( 
-				void* dvcWeights, 
-				void* _swarm, 
-				Cell_LocalIndex lCell_I );
-	void   _DVCWeights_Calculate3D( 
-				void* dvcWeights, 
-				void* _swarm, 
-				Cell_LocalIndex lCell_I );
-
-
-	/*---------------------------------------------------------------------------------------------------------------------
-	** Constructors
-	*/
-	DVCWeights* DVCWeights_New( Name name, Dimension_Index dim ) ;
-	DVCWeights* _DVCWeights_New(
-		SizeT                                 _sizeOfSelf, 
-		Type                                  type,
-		Stg_Class_DeleteFunction*             _delete,
-		Stg_Class_PrintFunction*              _print,
-		Stg_Class_CopyFunction*               _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*      _construct,
-		Stg_Component_BuildFunction*          _build,
-		Stg_Component_InitialiseFunction*     _initialise,
-		Stg_Component_ExecuteFunction*        _execute,
-		Stg_Component_DestroyFunction*        _destroy,		
-		WeightsCalculator_CalculateFunction*  _calculate,
-		Name                                  name );
-
-	void _DVCWeights_Init( void* dvcWeights, int *res ) ;
-	void DVCWeights_InitAll( void* dvcWeights, Dimension_Index dim ) ;
+void   _DVCWeights_Calculate2D( 
+    void* dvcWeights, 
+    void* _swarm, 
+    Cell_LocalIndex lCell_I );
+void   _DVCWeights_Calculate3D( 
+    void* dvcWeights, 
+    void* _swarm, 
+    Cell_LocalIndex lCell_I );
 
 
-	/* Stg_Class_Delete DVCWeights implementation */
-	void _DVCWeights_Delete( void* dvcWeights );
-	void _DVCWeights_Print( void* dvcWeights, Stream* stream );
-	#define DVCWeights_Copy( self ) \
-		(DVCWeights*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
-	#define DVCWeights_DeepCopy( self ) \
-		(DVCWeights*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _DVCWeights_Copy( void* dvcWeights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+/*---------------------------------------------------------------------------------------------------------------------
+** Constructors
+*/
+DVCWeights* DVCWeights_New( Name name, Dimension_Index dim, int *res ) ;
+
+DVCWeights* _DVCWeights_New(
+    SizeT                                 _sizeOfSelf, 
+    Type                                  type,
+    Stg_Class_DeleteFunction*             _delete,
+    Stg_Class_PrintFunction*              _print,
+    Stg_Class_CopyFunction*               _copy, 
+    Stg_Component_DefaultConstructorFunction* _defaultConstructor,
+    Stg_Component_ConstructFunction*      _construct,
+    Stg_Component_BuildFunction*          _build,
+    Stg_Component_InitialiseFunction*     _initialise,
+    Stg_Component_ExecuteFunction*        _execute,
+    Stg_Component_DestroyFunction*        _destroy,		
+    WeightsCalculator_CalculateFunction*  _calculate,
+    Name                                  name,
+    Bool                                  initFlag,
+    int                                   dim,
+    int*                                  res );
+
+void _DVCWeights_Init( void* dvcWeights, int *res ) ;
+
+/* Stg_Class_Delete DVCWeights implementation */
+void _DVCWeights_Delete( void* dvcWeights );
+void _DVCWeights_Print( void* dvcWeights, Stream* stream );
+#define DVCWeights_Copy( self )                                         \
+    (DVCWeights*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
+#define DVCWeights_DeepCopy( self )                                     \
+    (DVCWeights*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
+void* _DVCWeights_Copy( void* dvcWeights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
-	void* _DVCWeights_DefaultNew( Name name ) ;
+void* _DVCWeights_DefaultNew( Name name ) ;
 
-	void _DVCWeights_Construct( void* dvcWeights, Stg_ComponentFactory* cf, void* data ) ;
+void _DVCWeights_Construct( void* dvcWeights, Stg_ComponentFactory* cf, void* data ) ;
 
-	void _DVCWeights_Build( void* dvcWeights, void* data ) ;
-	void _DVCWeights_Initialise( void* dvcWeights, void* data ) ;
-	void _DVCWeights_Execute( void* dvcWeights, void* data );
-	void _DVCWeights_Destroy( void* dvcWeights, void* data ) ;
+void _DVCWeights_Build( void* dvcWeights, void* data ) ;
+void _DVCWeights_Initialise( void* dvcWeights, void* data ) ;
+void _DVCWeights_Execute( void* dvcWeights, void* data );
+void _DVCWeights_Destroy( void* dvcWeights, void* data ) ;
 	
 		
-	void _DVCWeights_Calculate( void* dvcWeights, void* _swarm, Cell_LocalIndex lCell_I ) ;
+void _DVCWeights_Calculate( void* dvcWeights, void* _swarm, Cell_LocalIndex lCell_I ) ;
 
 #endif

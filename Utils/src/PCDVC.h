@@ -68,94 +68,117 @@
 #ifndef __PICellerator_Weights_PCDVCClass_h__
 #define __PICellerator_Weights_PCDVCClass_h__
 
-	/* Textual name of this class */
-	extern const Type PCDVC_Type;
+/* Textual name of this class */
+extern const Type PCDVC_Type;
 
-	/* PCDVC information */
-     //   #define __PCDVC 
-                /* Who's my daddy */ 
-            //    __DVCWeights 
-		/* My Data structures */ 
-             //  MaterialPointsSwarm* materialPointsSwarm; 
-              //  int upT; 
-              //  int lowT;
+/* PCDVC information */
+//   #define __PCDVC 
+/* Who's my daddy */ 
+//    __DVCWeights 
+/* My Data structures */ 
+//  MaterialPointsSwarm* materialPointsSwarm; 
+//  int upT; 
+//  int lowT;
 
-#define __PCDVC \
-        __DVCWeights \
-	MaterialPointsSwarm*  materialPointsSwarm;   \
-	double                upperT;                \
-	double                lowerT;                \
-	Bool                  splitInInterfaceCells; \
-	Bool                  deleteInInterfaceCells; \
-	int                   maxDeletions;          \
-	int                   maxSplits;             \
-	Bool                  Inflow;                \
-	double                CentPosRatio;          \
-	int                   ParticlesPerCell;      \
-	double                Threshold;             \
-	/* we also need to store some parameters, as everything is turned up      */          \
-	/* for interpolation restarts (which may require significant repopulation */          \
-	/* and after the first timestep needs to be set back to correct values    */          \
-	int                   maxDeletions_orig;          \
-	int                   maxSplits_orig;             \
-	Bool                  Inflow_orig;                \
-	Bool                  splitInInterfaceCells_orig; \
-	Bool                  deleteInInterfaceCells_orig;
+#define __PCDVC                                                         \
+    __DVCWeights                                                        \
+                                                                        \
+    MaterialPointsSwarm*  materialPointsSwarm;                          \
+    double                upperT;                                       \
+    double                lowerT;                                       \
+    Bool                  splitInInterfaceCells;                        \
+    Bool                  deleteInInterfaceCells;                       \
+    int                   maxDeletions;                                 \
+    int                   maxSplits;                                    \
+    Bool                  Inflow;                                       \
+    double                CentPosRatio;                                 \
+    int                   ParticlesPerCell;                             \
+    double                Threshold;                                    \
+    /* we also need to store some parameters, as everything is turned up      */ \
+    /* for interpolation restarts (which may require significant repopulation */ \
+    /* and after the first timestep needs to be set back to correct values    */ \
+    int                   maxDeletions_orig;                            \
+    int                   maxSplits_orig;                               \
+    Bool                  Inflow_orig;                                  \
+    Bool                  splitInInterfaceCells_orig;                   \
+    Bool                  deleteInInterfaceCells_orig;
 
 struct PCDVC { __PCDVC };
 
 struct deleteParticle{
-      Particle_Index indexWithinCell;
-      Particle_Index indexOnCPU;
+    Particle_Index indexWithinCell;
+    Particle_Index indexOnCPU;
 };
 
-	/*---------------------------------------------------------------------------------------------------------------------
-	** Constructors
-	*/
-	PCDVC* PCDVC_New( Name name, Dimension_Index dim ) ;
-	PCDVC* _PCDVC_New(
-		SizeT                                 _sizeOfSelf, 
-		Type                                  type,
-		Stg_Class_DeleteFunction*             _delete,
-		Stg_Class_PrintFunction*              _print,
-		Stg_Class_CopyFunction*               _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*      _construct,
-		Stg_Component_BuildFunction*          _build,
-		Stg_Component_InitialiseFunction*     _initialise,
-		Stg_Component_ExecuteFunction*        _execute,
-		Stg_Component_DestroyFunction*        _destroy,		
-		WeightsCalculator_CalculateFunction*  _calculate,
-		Name                                  name );
-
-	void _PCDVC_Init( void* pcdvc, MaterialPointsSwarm* mps, double upT, double lowT, int maxDeletions, int maxSplits, Bool splitInInterfaceCells, Bool deleteInInterfaceCells, int *res, Bool Inflow, double CentPosRatio, int ParticlesPerCell, double Threshold ) ;
-	void PCDVC_InitAll( void* pcdvc, Dimension_Index dim ) ;
+/*---------------------------------------------------------------------------------------------------------------------
+** Constructors
+*/
+PCDVC* PCDVC_New( Name name, Dimension_Index dim, int* res,
+                  MaterialPointsSwarm* mps, double upT, double lowT,
+                  int maxDeletions, int maxSplits, Bool splitInInterfaceCells,
+                  Bool deleteInInterfaceCells, Bool Inflow, double CentPosRatio,
+                  int ParticlesPerCell, double Threshold ) ;
 
 
-	/* Stg_Class_Delete PCDVC implementation */
-	void _PCDVC_Delete( void* pcdvc );
-	void _PCDVC_Print( void* pcdvc, Stream* stream );
-	#define PCDVC_Copy( self ) \
-		(PCDVC*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
-	#define PCDVC_DeepCopy( self ) \
-		(PCDVC*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _PCDVC_Copy( void* pcdvc, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+PCDVC* _PCDVC_New(
+    SizeT                                 _sizeOfSelf, 
+    Type                                  type,
+    Stg_Class_DeleteFunction*             _delete,
+    Stg_Class_PrintFunction*              _print,
+    Stg_Class_CopyFunction*               _copy, 
+    Stg_Component_DefaultConstructorFunction* _defaultConstructor,
+    Stg_Component_ConstructFunction*      _construct,
+    Stg_Component_BuildFunction*          _build,
+    Stg_Component_InitialiseFunction*     _initialise,
+    Stg_Component_ExecuteFunction*        _execute,
+    Stg_Component_DestroyFunction*        _destroy,		
+    WeightsCalculator_CalculateFunction*  _calculate,
+    Name                                  name,
+    Bool                                  initFlag,
+    int                                   dim,
+    int*                                  res,
+    MaterialPointsSwarm*                  mps,
+    double                                upT,
+    double                                lowT,
+    int maxDeletions,
+    int maxSplits,
+    Bool splitInInterfaceCells,
+    Bool deleteInInterfaceCells,
+    Bool Inflow,
+    double CentPosRatio,
+    int ParticlesPerCell,
+    double Threshold );
+
+void _PCDVC_Init( void* pcdvc, MaterialPointsSwarm* mps, double upT, double lowT,
+                  int maxDeletions, int maxSplits, Bool splitInInterfaceCells,
+                  Bool deleteInInterfaceCells, Bool Inflow, double CentPosRatio,
+                  int ParticlesPerCell, double Threshold ) ;
+
+
+/* Stg_Class_Delete PCDVC implementation */
+void _PCDVC_Delete( void* pcdvc );
+void _PCDVC_Print( void* pcdvc, Stream* stream );
+#define PCDVC_Copy( self )                                      \
+    (PCDVC*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
+#define PCDVC_DeepCopy( self )                                  \
+    (PCDVC*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
+void* _PCDVC_Copy( void* pcdvc, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
-	void* _PCDVC_DefaultNew( Name name ) ;
+void* _PCDVC_DefaultNew( Name name ) ;
 
-	void _PCDVC_Construct( void* pcdvc, Stg_ComponentFactory* cf, void* data ) ;
+void _PCDVC_Construct( void* pcdvc, Stg_ComponentFactory* cf, void* data ) ;
 
-	void _PCDVC_Build( void* pcdvc, void* data ) ;
-	void _PCDVC_Initialise( void* pcdvc, void* data ) ;
-	void _PCDVC_Execute( void* pcdvc, void* data );
-	void _PCDVC_Destroy( void* pcdvc, void* data ) ;
-        MaterialPointRef* getIntParticleMaterialRef_PointingToMaterialParticle( IntegrationPointsSwarm*  intSwarm, Particle_Index matLastParticle_IndexOnCPU );
-        void splitIntParticleByIndexWithinCell( IntegrationPointsSwarm* intSwarm,  MaterialPointsSwarm* matSwarm, Cell_LocalIndex lCell_I, Particle_Index intParticleToSplit_IndexOnCPU, Coord xi );
-        void deleteIntParticleByIndexWithinCell( IntegrationPointsSwarm* intSwarm,  MaterialPointsSwarm* matSwarm,  Cell_LocalIndex lCell_I, Particle_Index intParticleToSplit_IndexWithinCell );
-        void deleteIntParticleByIndexOnCPU( IntegrationPointsSwarm* intSwarm,  MaterialPointsSwarm* matSwarm, Particle_Index intParticleToSplit_IndexWithinCell );
-        void splitIntParticleByIndexOnCPU( IntegrationPointsSwarm* intSwarm,  MaterialPointsSwarm* matSwarm, Particle_Index intParticleToSplit_IndexOnCPU, Coord xi );
-        void _PCDVC_Calculate3D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I );
-        void _PCDVC_Calculate2D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I );	
-	void _PCDVC_Calculate( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) ;
+void _PCDVC_Build( void* pcdvc, void* data ) ;
+void _PCDVC_Initialise( void* pcdvc, void* data ) ;
+void _PCDVC_Execute( void* pcdvc, void* data );
+void _PCDVC_Destroy( void* pcdvc, void* data ) ;
+MaterialPointRef* getIntParticleMaterialRef_PointingToMaterialParticle( IntegrationPointsSwarm*  intSwarm, Particle_Index matLastParticle_IndexOnCPU );
+void splitIntParticleByIndexWithinCell( IntegrationPointsSwarm* intSwarm,  MaterialPointsSwarm* matSwarm, Cell_LocalIndex lCell_I, Particle_Index intParticleToSplit_IndexOnCPU, Coord xi );
+void deleteIntParticleByIndexWithinCell( IntegrationPointsSwarm* intSwarm,  MaterialPointsSwarm* matSwarm,  Cell_LocalIndex lCell_I, Particle_Index intParticleToSplit_IndexWithinCell );
+void deleteIntParticleByIndexOnCPU( IntegrationPointsSwarm* intSwarm,  MaterialPointsSwarm* matSwarm, Particle_Index intParticleToSplit_IndexWithinCell );
+void splitIntParticleByIndexOnCPU( IntegrationPointsSwarm* intSwarm,  MaterialPointsSwarm* matSwarm, Particle_Index intParticleToSplit_IndexOnCPU, Coord xi );
+void _PCDVC_Calculate3D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I );
+void _PCDVC_Calculate2D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I );	
+void _PCDVC_Calculate( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) ;
 
 #endif

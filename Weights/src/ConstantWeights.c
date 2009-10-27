@@ -62,159 +62,171 @@ const Type ConstantWeights_Type = "ConstantWeights";
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Constructors
 */
-ConstantWeights* ConstantWeights_New( Name name, Dimension_Index dim ) {
-	ConstantWeights* self = (ConstantWeights*) _ConstantWeights_DefaultNew( name );
 
-	ConstantWeights_InitAll( self, dim );
-
-	return self;
+ConstantWeights* ConstantWeights_New( Name name, int dim ) {
+    return _ConstantWeights_New(
+        sizeof(ConstantWeights),
+        ConstantWeights_Type,
+        _ConstantWeights_Delete,
+        _ConstantWeights_Print,
+        _ConstantWeights_Copy,
+        _ConstantWeights_DefaultNew,
+        _ConstantWeights_Construct,
+        _ConstantWeights_Build,
+        _ConstantWeights_Initialise,
+        _ConstantWeights_Execute,
+        _ConstantWeights_Destroy,
+        _ConstantWeights_Calculate,
+        name,
+        True,
+        dim );
 }
 
 ConstantWeights* _ConstantWeights_New(
-		SizeT                                 _sizeOfSelf, 
-		Type                                  type,
-		Stg_Class_DeleteFunction*             _delete,
-		Stg_Class_PrintFunction*              _print,
-		Stg_Class_CopyFunction*               _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*      _construct,
-		Stg_Component_BuildFunction*          _build,
-		Stg_Component_InitialiseFunction*     _initialise,
-		Stg_Component_ExecuteFunction*        _execute,
-		Stg_Component_DestroyFunction*        _destroy,		
-		WeightsCalculator_CalculateFunction*  _calculate,
-		Name                                  name )
+    SizeT                                 _sizeOfSelf, 
+    Type                                  type,
+    Stg_Class_DeleteFunction*             _delete,
+    Stg_Class_PrintFunction*              _print,
+    Stg_Class_CopyFunction*               _copy, 
+    Stg_Component_DefaultConstructorFunction* _defaultConstructor,
+    Stg_Component_ConstructFunction*      _construct,
+    Stg_Component_BuildFunction*          _build,
+    Stg_Component_InitialiseFunction*     _initialise,
+    Stg_Component_ExecuteFunction*        _execute,
+    Stg_Component_DestroyFunction*        _destroy,		
+    WeightsCalculator_CalculateFunction*  _calculate,
+    Name                                  name,
+    Bool                                  initFlag,
+    int                                   dim )
 {
-	ConstantWeights* self;
-	
-	/* Allocate memory */
-	assert( _sizeOfSelf >= sizeof(ConstantWeights) );
-	self = (ConstantWeights*)_WeightsCalculator_New( 
-			_sizeOfSelf,
-			type,
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,		
-			_calculate,
-			name );
+    ConstantWeights* self;
+
+    /* Allocate memory */
+    assert( _sizeOfSelf >= sizeof(ConstantWeights) );
+    self = (ConstantWeights*)_WeightsCalculator_New( 
+        _sizeOfSelf,
+        type,
+        _delete,
+        _print,
+        _copy,
+        _defaultConstructor,
+        _construct,
+        _build,
+        _initialise,
+        _execute,
+        _destroy,		
+        _calculate,
+        name,
+        initFlag,
+        dim );
 
 	
-	/* General info */
+    /* General info */
 
-	/* Virtual Info */
-	
-	return self;
+    /* Virtual Info */
+
+    if(initFlag)
+        _ConstantWeights_Init( self );
+
+    return self;
 }
 
 void _ConstantWeights_Init( void* constantWeights  ) {
-	ConstantWeights* self = (ConstantWeights*)constantWeights;
-	
-	self->isConstructed = True;
-
+    ConstantWeights* self = (ConstantWeights*)constantWeights;
 }
 
-void ConstantWeights_InitAll( void* constantWeights, Dimension_Index dim ) {
-	ConstantWeights* self = (ConstantWeights*)constantWeights;
-
-	WeightsCalculator_InitAll( self, dim );
-	_ConstantWeights_Init( self );
-}
 
 /*------------------------------------------------------------------------------------------------------------------------
 ** Virtual functions
 */
 
 void _ConstantWeights_Delete( void* constantWeights ) {
-	ConstantWeights* self = (ConstantWeights*)constantWeights;
+    ConstantWeights* self = (ConstantWeights*)constantWeights;
 	
-	/* Delete parent */
-	_WeightsCalculator_Delete( self );
+    /* Delete parent */
+    _WeightsCalculator_Delete( self );
 }
 
 
 void _ConstantWeights_Print( void* constantWeights, Stream* stream ) {
-	ConstantWeights* self = (ConstantWeights*)constantWeights;
+    ConstantWeights* self = (ConstantWeights*)constantWeights;
 	
-	/* Print parent */
-	_WeightsCalculator_Print( self, stream );
+    /* Print parent */
+    _WeightsCalculator_Print( self, stream );
 }
 
 
 
 void* _ConstantWeights_Copy( void* constantWeights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
-	ConstantWeights*	self = (ConstantWeights*)constantWeights;
-	ConstantWeights*	newConstantWeights;
+    ConstantWeights*	self = (ConstantWeights*)constantWeights;
+    ConstantWeights*	newConstantWeights;
 	
-	newConstantWeights = (ConstantWeights*)_WeightsCalculator_Copy( self, dest, deep, nameExt, ptrMap );
+    newConstantWeights = (ConstantWeights*)_WeightsCalculator_Copy( self, dest, deep, nameExt, ptrMap );
 	
-	return (void*)newConstantWeights;
+    return (void*)newConstantWeights;
 }
 
 void* _ConstantWeights_DefaultNew( Name name ) {
-	return (void*) _ConstantWeights_New(
-			sizeof(ConstantWeights),
-			ConstantWeights_Type,
-			_ConstantWeights_Delete,
-			_ConstantWeights_Print,
-			_ConstantWeights_Copy,
-			_ConstantWeights_DefaultNew,
-			_ConstantWeights_Construct,
-			_ConstantWeights_Build,
-			_ConstantWeights_Initialise,
-			_ConstantWeights_Execute,
-			_ConstantWeights_Destroy,
-			_ConstantWeights_Calculate,
-			name );
+    return (void*) _ConstantWeights_New(
+        sizeof(ConstantWeights),
+        ConstantWeights_Type,
+        _ConstantWeights_Delete,
+        _ConstantWeights_Print,
+        _ConstantWeights_Copy,
+        _ConstantWeights_DefaultNew,
+        _ConstantWeights_Construct,
+        _ConstantWeights_Build,
+        _ConstantWeights_Initialise,
+        _ConstantWeights_Execute,
+        _ConstantWeights_Destroy,
+        _ConstantWeights_Calculate,
+        name,
+        False,
+        0 );
 }
 
 
 void _ConstantWeights_Construct( void* constantWeights, Stg_ComponentFactory* cf, void* data ) {
-	ConstantWeights*	     self          = (ConstantWeights*) constantWeights;
+    ConstantWeights*	     self          = (ConstantWeights*) constantWeights;
 
-	_WeightsCalculator_Construct( self, cf, data );
+    _WeightsCalculator_Construct( self, cf, data );
 	
-	_ConstantWeights_Init( self );
+    _ConstantWeights_Init( self );
 }
 
 void _ConstantWeights_Build( void* constantWeights, void* data ) {
-	ConstantWeights*	self = (ConstantWeights*)constantWeights;
+    ConstantWeights*	self = (ConstantWeights*)constantWeights;
 
-	_WeightsCalculator_Build( self, data );
+    _WeightsCalculator_Build( self, data );
 }
 void _ConstantWeights_Initialise( void* constantWeights, void* data ) {
-	ConstantWeights*	self = (ConstantWeights*)constantWeights;
+    ConstantWeights*	self = (ConstantWeights*)constantWeights;
 	
-	_WeightsCalculator_Initialise( self, data );
+    _WeightsCalculator_Initialise( self, data );
 }
 void _ConstantWeights_Execute( void* constantWeights, void* data ) {
-	ConstantWeights*	self = (ConstantWeights*)constantWeights;
+    ConstantWeights*	self = (ConstantWeights*)constantWeights;
 	
-	_WeightsCalculator_Execute( self, data );
+    _WeightsCalculator_Execute( self, data );
 }
 void _ConstantWeights_Destroy( void* constantWeights, void* data ) {
-	ConstantWeights*	self = (ConstantWeights*)constantWeights;
+    ConstantWeights*	self = (ConstantWeights*)constantWeights;
 	
-	_WeightsCalculator_Destroy( self, data );
+    _WeightsCalculator_Destroy( self, data );
 }
 
 /*-------------------------------------------------------------------------------------------------------------------------
 ** Private Functions
 */
 void _ConstantWeights_Calculate( void* constantWeights, void* _swarm, Cell_LocalIndex lCell_I ) {
-	ConstantWeights*             self            = (ConstantWeights*)  constantWeights;
-	Swarm*                       swarm           = (Swarm*) _swarm;
-	double                       weight;
-	Particle_InCellIndex         cParticleCount;
+    ConstantWeights*             self            = (ConstantWeights*)  constantWeights;
+    Swarm*                       swarm           = (Swarm*) _swarm;
+    double                       weight;
+    Particle_InCellIndex         cParticleCount;
 		
-	cParticleCount = swarm->cellParticleCountTbl[lCell_I];
-	weight = self->cellLocalVolume / (double) cParticleCount;
-	WeightsCalculator_SetWeightsValueAllInCell( self, swarm, lCell_I, weight );
+    cParticleCount = swarm->cellParticleCountTbl[lCell_I];
+    weight = self->cellLocalVolume / (double) cParticleCount;
+    WeightsCalculator_SetWeightsValueAllInCell( self, swarm, lCell_I, weight );
 }
 
 /*-------------------------------------------------------------------------------------------------------------------------
