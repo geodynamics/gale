@@ -154,7 +154,7 @@ void StiffnessMatrixSuite_TestStiffnessMatrix( StiffnessMatrixSuiteData* data ) 
   Stg_Component_Destroy( mat, NULL, True );
   _Stg_Component_Delete( feVar );
   _Stg_Component_Delete( vec );
-  _Stg_Component_Delete( mat );
+  /*_Stg_Component_Delete( mat );*/
   Stg_Class_Delete( ep_reg );
 }
 

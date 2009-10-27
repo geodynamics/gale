@@ -545,39 +545,37 @@ void _StiffnessMatrix_Build( void* stiffnessMatrix, void* data ) {
 	StiffnessMatrix_CalcNonZeros( self );
 	
 	Journal_DPrintf( self->debug, "row(%s) localSize = %d : col(%s) localSize = %d \n", self->rowVariable->name,
-			 self->rowLocalSize, self->columnVariable->name, self->colLocalSize );
+		self->rowLocalSize, self->columnVariable->name, self->colLocalSize );
 	
-/* 	assert( self->nonZeroCount ); */
+	/* assert( self->nonZeroCount ); */
 
 	StiffnessMatrix_RefreshMatrix( self );
 
 	Journal_DPrintf( self->debug, "Matrix allocated.\n" );
 
 	Assembler_SetVariables( self->zeroBCsAsm, self->rowVariable, self->columnVariable );
-	Assembler_SetCallbacks( self->zeroBCsAsm, 
-				NULL, 
-				StiffnessMatrix_ZeroBCsAsm_RowR, NULL, 
-				StiffnessMatrix_ZeroBCsAsm_ColR, NULL, 
-				self );
+	Assembler_SetCallbacks( self->zeroBCsAsm, NULL, StiffnessMatrix_ZeroBCsAsm_RowR, NULL, 
+		StiffnessMatrix_ZeroBCsAsm_ColR, NULL, 
+		self );
 	Assembler_SetVariables( self->bcAsm, self->rowVariable, self->columnVariable );
 	Assembler_SetCallbacks( self->bcAsm, 
-				NULL, 
-				NULL, NULL, 
-				StiffnessMatrix_BCAsm_ColR, NULL, 
-				self );
+		NULL, 
+		NULL, NULL, 
+		StiffnessMatrix_BCAsm_ColR, NULL, 
+		self );
 	Assembler_SetVariables( self->transBCAsm, self->columnVariable, self->rowVariable );
 	Assembler_SetCallbacks( self->transBCAsm, 
-				NULL, 
-				NULL, NULL, 
-				StiffnessMatrix_TransBCAsm_ColR, NULL, 
-				self );
+		NULL, 
+		NULL, NULL, 
+		StiffnessMatrix_TransBCAsm_ColR, NULL, 
+		self );
 	if( self->rowVariable == self->columnVariable ) {
 		Assembler_SetVariables( self->diagBCsAsm, self->rowVariable, self->columnVariable );
 		Assembler_SetCallbacks( self->diagBCsAsm, 
-					NULL, 
-					StiffnessMatrix_DiagBCsAsm_RowR, NULL, 
-					NULL, NULL, 
-					self );
+			NULL, 
+			StiffnessMatrix_DiagBCsAsm_RowR, NULL, 
+			NULL, NULL, 
+			self );
 	}
 
 	Stream_UnIndentBranch( StgFEM_Debug );
@@ -607,6 +605,10 @@ void _StiffnessMatrix_Execute( void* stiffnessMatrix, void* data ) {
 }
 
 void _StiffnessMatrix_Destroy( void* stiffnessMatrix, void* data ) {
+	StiffnessMatrix* self = (StiffnessMatrix*)stiffnessMatrix;
+	/* Now the destroy function also calls the delete function
+		Child components destroy functions will call this function */
+	_StiffnessMatrix_Delete( self );
 }
 
 void StiffnessMatrix_CalculateNonZeroEntries( void* stiffnessMatrix ) {
@@ -1367,8 +1369,8 @@ inline void StiffMatAssLog_AccumulateTime_ParallelAssembly( struct StiffMatAss_L
 
 inline void StiffMatAssLog_AccumulateTime_ElementInsertion( struct StiffMatAss_Log *log )
 {
-        log->dt_el_insert = MPI_Wtime() - log->t0_el_insert;
-        log->element_insertion_TIME = log->element_insertion_TIME + log->dt_el_insert;
+	log->dt_el_insert = MPI_Wtime() - log->t0_el_insert;
+	log->element_insertion_TIME = log->element_insertion_TIME + log->dt_el_insert;
 }
 
 inline void StiffMatAssLog_GetOperatorDimensions( struct StiffMatAss_Log *log, Mat matrix )
@@ -1379,7 +1381,7 @@ inline void StiffMatAssLog_GetOperatorDimensions( struct StiffMatAss_Log *log, M
 
 void StiffMatAssLog_Delete( struct StiffMatAss_Log** _log )
 {
-        struct StiffMatAss_Log *log = *_log;
+	struct StiffMatAss_Log *log = *_log;
 
 	if( log->ass_type != NULL ) free( log->ass_type );
 	free( log );
