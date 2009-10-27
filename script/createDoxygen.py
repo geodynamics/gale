@@ -1,4 +1,3 @@
-<<<<<<< /home/kathleen/stgUnderworldENewWork/StGermain/script/createDoxygen.py
 #!/usr/bin/python
 # The following documentation is designed to sit at the top of the main doxygen page!
 ## \mainpage 
@@ -18,15 +17,13 @@
 ## Contains the Todo page - a list of extracted Todo's from all the code base; 
 ## and The Deprecated List, which contains deprecated classes, functions and files. 
 
-=======
-#!/usr/bin/env python
->>>>>>> /tmp/createDoxygen.py~other.TjlB7X
 import createDocs
 import createHTMLDocuments, createDocument
 import sys, os.path, os, string, subprocess, shutil
 from createDocument import createDocuments
 from createDocs import createListDictionary
 from createDocs import createDoxygen
+
 ## Function for specific help statement for running Doxygen ONLY
 def printHelpStatement(dictionary):
 
