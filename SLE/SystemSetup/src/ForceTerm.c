@@ -225,6 +225,7 @@ void _ForceTerm_Construct( void* forceTerm, Stg_ComponentFactory* cf, void* data
 	forceVector =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "ForceVector", ForceVector,   True,  data ) ;
 	swarm       =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm",       Swarm,         True,  data ) ;
 	extraInfo   =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "ExtraInfo",   Stg_Component, False, data ) ;
+
 	_ForceTerm_Init( self, forceVector, swarm, extraInfo );
 }
 
@@ -261,6 +262,10 @@ void _ForceTerm_Execute( void* forceTerm, void* data ) {
 }
 
 void _ForceTerm_Destroy( void* forceTerm, void* data ) {
+	ForceTerm* self = (ForceTerm*)forceTerm;
+	/* Now the destroy function also calls the delete function
+	Child components destroy functions will call this function */
+	_ForceTerm_Delete( self );
 }
 
 void ForceTerm_AssembleElement( 
