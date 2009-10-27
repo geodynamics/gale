@@ -640,7 +640,7 @@ void _AbstractContext_Destroy( void* context, void* data ) {
   	KeyCall( self, self->destroyK, EntryPoint_VoidPtr_CallCast* )( KeyHandle(self,self->destroyK), self );
   	self->isDestroyed = isDestroyed;
 
-   _AbstractContext_Delete( context );
+   /*_AbstractContext_Delete( context );*/
 }
 
 
