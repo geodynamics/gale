@@ -90,7 +90,6 @@ BilinearElementType* BilinearElementType_New( Name name ) {
 		_ElementType_SurfaceNormal, _BilinearElementType_NodeCount );
 }
 
-
 BilinearElementType* _BilinearElementType_New( 
 		SizeT								_sizeOfSelf,
 		Type								type,
@@ -195,7 +194,8 @@ void _BilinearElementType_Print( void* elementType, Stream* stream ) {
 	Journal_Printf( stream, ")\n", self );
 }
 
-void _BilinearElementType_Construct( void* elementType, Stg_ComponentFactory *cf, void* data ) { }
+void _BilinearElementType_Construct( void* elementType, Stg_ComponentFactory *cf, void* data ) {
+}
 	
 void _BilinearElementType_Initialise( void* elementType, void *data ){
 	BilinearElementType*	self	= (BilinearElementType*) elementType;
@@ -206,13 +206,9 @@ void _BilinearElementType_Initialise( void* elementType, void *data ){
 	self->faceNodes[1][0] = 2; self->faceNodes[1][1] = 3;
 	self->faceNodes[2][0] = 0; self->faceNodes[2][1] = 2;
 	self->faceNodes[3][0] = 1; self->faceNodes[3][1] = 3;
-
-
-
 }
 	
 void _BilinearElementType_Execute( void* elementType, void *data ){
-	
 }
 	
 void _BilinearElementType_Destroy( void* elementType, void *data ){
@@ -221,8 +217,6 @@ void _BilinearElementType_Destroy( void* elementType, void *data ){
 	Memory_Free( self->faceNodes );	
 	Memory_Free( self->evaluatedShapeFunc );
 	Memory_Free( self->GNi );
-
-
 
 	_ElementType_Destroy( self, data );
 }
@@ -235,7 +229,6 @@ void _BilinearElementType_Build( void* elementType, void *data ) {
 }
 
 /*
-
  - Shape function definitions
  - Local node numbering convention for billinear element (xi, eta)
  - Local coordinate domain spans  -1 <= xi,eta <= 1

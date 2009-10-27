@@ -228,7 +228,7 @@ void _AnalyticSolution_Initialise( void* analyticSolution, void* data ) {
 
 /* This function is called when the 'Update' phase happens */
 void AnalyticSolution_Update( void* analyticSolution ) {
-	AnalyticSolution*                            self = (AnalyticSolution*) analyticSolution;
+	AnalyticSolution* self = (AnalyticSolution*) analyticSolution;
 
 	self->_initialise( self, NULL );
 }

@@ -606,9 +606,6 @@ void _StiffnessMatrix_Execute( void* stiffnessMatrix, void* data ) {
 
 void _StiffnessMatrix_Destroy( void* stiffnessMatrix, void* data ) {
 	StiffnessMatrix* self = (StiffnessMatrix*)stiffnessMatrix;
-	/* Now the destroy function also calls the delete function
-		Child components destroy functions will call this function */
-	_StiffnessMatrix_Delete( self );
 }
 
 void StiffnessMatrix_CalculateNonZeroEntries( void* stiffnessMatrix ) {

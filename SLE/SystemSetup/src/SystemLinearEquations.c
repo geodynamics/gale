@@ -213,8 +213,8 @@ void _SystemLinearEquations_Init(
 	Stg_asprintf( &self->nlConvergedEPName, "%s-nlConvergedEP", self->name );
 	self->nlConvergedEP = EntryPoint_New( self->nlConvergedEPName, EntryPoint_2VoidPtr_CastType );
 	/* END LUKE'S FRICTIONAL BCS BIT */
-        self->nlFormJacobian = False;
-        self->nlCurIterate = PETSC_NULL;
+	self->nlFormJacobian = False;
+	self->nlCurIterate = PETSC_NULL;
 	
 	/* Initialise MG stuff. */
 	self->mgEnabled = False;
@@ -287,10 +287,10 @@ void _SystemLinearEquations_Delete( void* sle ) {
 	Stream_IndentBranch( StgFEM_Debug );
 	
 	/* BEGIN LUKE'S FRICTIONAL BCS BIT */
-        Memory_Free( self->nlSetupEPName );
+	Memory_Free( self->nlSetupEPName );
 	Memory_Free( self->nlEPName );
 	Memory_Free( self->postNlEPName );
-        Memory_Free( self->nlConvergedEPName );
+	Memory_Free( self->nlConvergedEPName );
 	/* END LUKE'S FRICTIONAL BCS BIT */
 	Memory_Free( self->executeEPName );
 	

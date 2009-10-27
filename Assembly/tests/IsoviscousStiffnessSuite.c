@@ -118,7 +118,6 @@ void IsoviscousStiffness2D( IsoviscousStiffnessData* data ) {
 	PetscViewerDestroy(parallelViewer);
 	*/
 
-
 	stgMainDestroy( cf );
 }
 

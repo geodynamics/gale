@@ -263,9 +263,6 @@ void _ForceTerm_Execute( void* forceTerm, void* data ) {
 
 void _ForceTerm_Destroy( void* forceTerm, void* data ) {
 	ForceTerm* self = (ForceTerm*)forceTerm;
-	/* Now the destroy function also calls the delete function
-	Child components destroy functions will call this function */
-	_ForceTerm_Delete( self );
 }
 
 void ForceTerm_AssembleElement( 
