@@ -138,7 +138,6 @@ void _Mesh_HexAlgorithms_Execute( void* hexAlgorithms, void* data ) {
 void _Mesh_HexAlgorithms_Destroy( void* hexAlgorithms, void* data ) {
 	Mesh_HexAlgorithms*	self = (Mesh_HexAlgorithms*)hexAlgorithms;
 	_Mesh_Algorithms_Destroy( self, data );
-    _Mesh_HexAlgorithms_Delete( self );
 }
 
 

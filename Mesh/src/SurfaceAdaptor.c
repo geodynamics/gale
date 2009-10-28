@@ -211,7 +211,6 @@ void _SurfaceAdaptor_Destroy( void* adaptor, void* data ) {
    SurfaceAdaptor* self = (SurfaceAdaptor*)adaptor;
 
    _MeshAdaptor_Destroy( self, data );
-   _SurfaceAdaptor_Delete( self );
 }
 
 /*--------------------------------------------------------------------------------------------------------------------------

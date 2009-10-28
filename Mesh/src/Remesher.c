@@ -161,10 +161,6 @@ void _Remesher_Destroy( void* remesher, void* data ) {
 
    Stg_Component_Destroy( self->remeshFunc, data, False );   
    Stg_Component_Destroy( self->mesh, data, False );   
-
-   _Remesher_Delete( self );
-
-   /* TODO: If delete deletes, what does destroy do? */
 }
 
 

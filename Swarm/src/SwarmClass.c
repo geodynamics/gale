@@ -293,7 +293,7 @@ void* _Swarm_ParticleAt( void* swarm, Particle_Index dParticle_I ) {
 void _Swarm_Delete( void* swarm ) {
 	Swarm*			self = (Swarm*)swarm;
 	Cell_LocalIndex		cell_I;
-	
+		
 	Stg_ObjectList_DeleteAllObjects( self->commHandlerList );
 	Stg_Class_Delete( self->commHandlerList );
 

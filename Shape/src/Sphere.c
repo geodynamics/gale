@@ -223,7 +223,6 @@ void _Sphere_Execute( void* sphere, void* data ) {
 void _Sphere_Destroy( void* sphere, void* data ) {
 	Sphere*	self = (Sphere*)sphere;
 	
-    _Sphere_Delete( self );
 	_Stg_Shape_Destroy( self, data );
 }
 

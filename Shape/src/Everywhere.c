@@ -199,7 +199,6 @@ void _Everywhere_Execute( void* everywhere, void* data ) {
 void _Everywhere_Destroy( void* everywhere, void* data ) {
 	Everywhere*	self = (Everywhere*)everywhere;
     
-    _Everywhere_Delete( self );
 	_Stg_Shape_Destroy( self, data );
 }
 

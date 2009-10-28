@@ -245,8 +245,6 @@ void _MeshVariable_Destroy( void* meshVariable, void* data ) {
 	MeshVariable*	self = (MeshVariable*)meshVariable;
 
     Stg_Component_Destroy( self->mesh, data, False );
-
-    _MeshVariable_Delete( self ); 
 }
 
 

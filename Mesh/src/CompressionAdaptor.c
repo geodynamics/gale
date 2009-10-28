@@ -156,7 +156,6 @@ void _CompressionAdaptor_Execute( void* adaptor, void* data ) {
 
 void _CompressionAdaptor_Destroy( void* adaptor, void* data ) {
 	_MeshAdaptor_Destroy( adaptor, data );
-    _CompressionAdaptor_Delete( adaptor );
 }
 
 /*--------------------------------------------------------------------------------------------------------------------------

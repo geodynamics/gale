@@ -278,7 +278,6 @@ void _Union_Execute( void* combination, void* data ) {
 void _Union_Destroy( void* combination, void* data ) {
 	Union*	self = (Union*)combination;
 	
-    _Union_Delete( self );
 	_Stg_Shape_Destroy( self, data );
 }
 

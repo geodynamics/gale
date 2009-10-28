@@ -136,7 +136,6 @@ void _Mesh_RegularAlgorithms_Execute( void* algorithms, void* data ) {
 }
 
 void _Mesh_RegularAlgorithms_Destroy( void* algorithms, void* data ) {
-    _Mesh_RegularAlgorithms_Delete( algorithms );
     _Mesh_Algorithms_Destroy( algorithms, data );
 }
 

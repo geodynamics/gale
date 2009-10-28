@@ -240,7 +240,6 @@ void _Superellipsoid_Execute( void* superellipsoid, void* data ) {
 void _Superellipsoid_Destroy( void* superellipsoid, void* data ) {
 	Superellipsoid*	self = (Superellipsoid*)superellipsoid;
 	
-    _Superellipsoid_Delete( self );
 	_Stg_Shape_Destroy( self, data );
 }
 

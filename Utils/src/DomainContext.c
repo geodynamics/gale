@@ -186,6 +186,11 @@ void _DomainContext_Delete( void* context ) {
 	_AbstractContext_Delete( self );
 }
 
+void _DomainContext_Destroy( void* context ) {
+	DomainContext* self = (DomainContext*)context;
+	
+	_AbstractContext_Destroy( self, 0 );
+}
 
 void _DomainContext_Print( void* context, Stream* stream ) {
 	DomainContext* self = (DomainContext*)context;

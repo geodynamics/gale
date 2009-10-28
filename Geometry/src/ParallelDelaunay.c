@@ -508,9 +508,7 @@ void _ParallelDelaunay_Execute( void* pd, void* data )
 	}	
 }
 
-void _ParallelDelaunay_Destroy( void* pd, void* data )
-{
-    _ParallelDelaunay_Delete( pd );
+void _ParallelDelaunay_Destroy( void* pd, void* data ) { 
 }
 
 #define onCurrentProc( pd, id ) ( id < (pd->processorLoad[pd->rank]+pd->localTriangulation->idOffset) )

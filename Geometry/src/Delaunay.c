@@ -430,24 +430,18 @@ void _Delaunay_Build( void* delaunay, void* data )
 	Delaunay_FindNeighbours( self );
 }
 
-void _Delaunay_Initialise( void* delaunay, void* data )
-{
-	
+void _Delaunay_Initialise( void* delaunay, void* data ) {
 }
 
-void _Delaunay_Execute( void* delaunay, void* data )
-{
-	
+void _Delaunay_Execute( void* delaunay, void* data ) {
 }
 
-void _Delaunay_Destroy( void* delaunay, void* data )
-{
-    _Delaunay_Delete( delaunay );
+void _Delaunay_Destroy( void* delaunay, void* data ) {
 }
 
-	/*--------------------------------------------------------------------------------------------------------------------------
-	** Private Member functions
-	*/
+/*--------------------------------------------------------------------------------------------------------------------------
+** Private Member functions
+*/
 
 /* Function for heap sorting the input points in ascending x-coordinate */
 void Delaunay_SortSites(Site *sites, int numSites )

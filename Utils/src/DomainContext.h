@@ -93,6 +93,7 @@
 	
 	/* Stg_Class_Delete implementation */
 	void						_DomainContext_Delete( void* context );
+	void						_DomainContext_Destroy( void* context );
 	
 	/* Print implementation */
 	void						_DomainContext_Print( void* context, Stream* stream );

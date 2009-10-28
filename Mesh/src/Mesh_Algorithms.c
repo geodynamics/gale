@@ -158,8 +158,6 @@ void _Mesh_Algorithms_Destroy( void* algorithms, void* data ) {
 	Mesh_Algorithms*	self = (Mesh_Algorithms*)algorithms;
     Stg_Component_Destroy( self->mesh, data, False );
     Stg_Component_Destroy( self->tree, data, False );
-
-    _Mesh_Algorithms_Delete ( self );
 }
 
 void _Mesh_Algorithms_SetMesh( void* algorithms, void* mesh ) {
