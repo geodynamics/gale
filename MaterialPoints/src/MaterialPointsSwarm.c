@@ -74,29 +74,34 @@ MaterialPointsSwarm* MaterialPointsSwarm_New(
 		Materials_Register*                   materials_Register,		
 		MPI_Comm                              comm) 
 {
-	MaterialPointsSwarm* self = (MaterialPointsSwarm*) _MaterialPointsSwarm_DefaultNew( name );
-	
-	self->particleSize = particleSize;
-
-	/* 	MaterialPointsSwarm_InitAll */
-	_Swarm_Init(  	(Swarm*)self, 
-			cellLayout, 
-			particleLayout, 
-			dim, 
-			DEFAULT_CELL_PARTICLE_TBL_DELTA,
-			DEFAULT_EXTRA_PARTICLES_FACTOR,
-			extensionMgr_Register,
-			swarmVariable_Register, 
-			comm,
-			NULL );
-
-	_MaterialPointsSwarm_Init(	self, 
-					mesh, 
-					escapedRoutine, 
-					material, 
-					materials_Register);
-
-	return self;
+  return _MaterialPointsSwarm_New(
+      sizeof(MaterialPointsSwarm),
+      MaterialPointsSwarm_Type,
+      _MaterialPointsSwarm_Delete,
+      _MaterialPointsSwarm_Print,
+      _MaterialPointsSwarm_Copy,
+      _MaterialPointsSwarm_DefaultNew,
+      _MaterialPointsSwarm_Construct,
+      _MaterialPointsSwarm_Build,
+      _MaterialPointsSwarm_Initialise,
+      _MaterialPointsSwarm_Execute,
+      _MaterialPointsSwarm_Destroy,
+      name,
+      True,
+      cellLayout,			/* cellLayout */
+      particleLayout,                   /* particleLayout */
+      dim,                      /* dim */
+      particleSize,  /* particleSize */
+      DEFAULT_CELL_PARTICLE_TBL_DELTA,                      /* cellParticleTblDelta */
+      DEFAULT_EXTRA_PARTICLES_FACTOR,                    /* extraParticlesFactor */
+      mesh,                   /* mesh */
+      escapedRoutine,                   /* escapedRoutine */
+      material,                   /* material */
+      swarmVariable_Register,                   /* swarmVariable_Register */
+      extensionMgr_Register,                   /* extensionMgr_Register */
+      materials_Register,                   /* materials_Register */
+      comm                       /* comm */
+      );
 }
 
 

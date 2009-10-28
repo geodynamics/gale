@@ -80,7 +80,7 @@ IntegrationPointsSwarm* IntegrationPointsSwarm_New(
 		Materials_Register*                   materials_Register,
 		MPI_Comm                              comm)
 {
-	IntegrationPointsSwarm* self = _IntegrationPointsSwarm_New(
+    return _IntegrationPointsSwarm_New(
 			sizeof(IntegrationPointsSwarm),
 			IntegrationPointsSwarm_Type,
 			_IntegrationPointsSwarm_Delete,
@@ -110,7 +110,6 @@ IntegrationPointsSwarm* IntegrationPointsSwarm_New(
 			materials_Register,
 			comm
 			);
-	return self;
 }
 
 
