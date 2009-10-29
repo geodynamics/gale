@@ -79,7 +79,7 @@
 	void _GradientStiffnessMatrixTerm_Print( void* matrixTerm, Stream* stream );
 
 	void* _GradientStiffnessMatrixTerm_DefaultNew( Name name ) ;
-void _GradientStiffnessMatrixTerm_Construct( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) ;
+void _GradientStiffnessMatrixTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) ;
 	void _GradientStiffnessMatrixTerm_Build( void* matrixTerm, void* data ) ;
 	void _GradientStiffnessMatrixTerm_Initialise( void* matrixTerm, void* data ) ;
 	void _GradientStiffnessMatrixTerm_Execute( void* matrixTerm, void* data ) ;

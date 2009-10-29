@@ -127,7 +127,7 @@
 	void _FiniteElementContext_CalcNewDt( void* context, double dt );
 	
 	/* Construct EntryPoint hook */
-	void _FiniteElementContext_Construct( void* context, Stg_ComponentFactory* cf, void* data );
+	void _FiniteElementContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, void* data );
 	
 	/* Build EntryPoint hook */
 	void _FiniteElementContext_Build( void* context );

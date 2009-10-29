@@ -85,7 +85,7 @@
 	void _PressureGradMatrixTerm_Print( void* matrixTerm, Stream* stream );
 
 	void* _PressureGradMatrixTerm_DefaultNew( Name name ) ;
-	void _PressureGradMatrixTerm_Construct( void* matrixTerm, Stg_ComponentFactory* cf, void* data );
+	void _PressureGradMatrixTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data );
 	void _PressureGradMatrixTerm_Build( void* matrixTerm, void* data ) ;
 	void _PressureGradMatrixTerm_Initialise( void* matrixTerm, void* data ) ;
 	void _PressureGradMatrixTerm_Execute( void* matrixTerm, void* data ) ;

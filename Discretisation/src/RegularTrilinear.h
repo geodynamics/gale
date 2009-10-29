@@ -77,7 +77,7 @@
 
 	void _RegularTrilinear_Delete( void* elementType );
 	void _RegularTrilinear_Print( void* elementType, Stream* stream );
-	void _RegularTrilinear_Construct( void* elementType, Stg_ComponentFactory* cf, void* data );
+	void _RegularTrilinear_AssignFromXML( void* elementType, Stg_ComponentFactory* cf, void* data );
 	void _RegularTrilinear_Build( void* elementType, void* data );
 	void _RegularTrilinear_Initialise( void* elementType, void* data );
 	void _RegularTrilinear_Execute( void* elementType, void* data );

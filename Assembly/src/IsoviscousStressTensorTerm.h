@@ -81,7 +81,7 @@
 	void _IsoviscousStressTensorTerm_Print( void* matrixTerm, Stream* stream );
 
 	void* _IsoviscousStressTensorTerm_DefaultNew( Name name ) ;
-void _IsoviscousStressTensorTerm_Construct( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) ;
+void _IsoviscousStressTensorTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) ;
 	void _IsoviscousStressTensorTerm_Build( void* matrixTerm, void* data ) ;
 	void _IsoviscousStressTensorTerm_Initialise( void* matrixTerm, void* data ) ;
 	void _IsoviscousStressTensorTerm_Execute( void* matrixTerm, void* data ) ;

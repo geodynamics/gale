@@ -77,7 +77,7 @@
 
 	void _FeMesh_Algorithms_Delete( void* algorithms );
 	void _FeMesh_Algorithms_Print( void* algorithms, Stream* stream );
-	void _FeMesh_Algorithms_Construct( void* algorithms, Stg_ComponentFactory* cf, void* data );
+	void _FeMesh_Algorithms_AssignFromXML( void* algorithms, Stg_ComponentFactory* cf, void* data );
 	void _FeMesh_Algorithms_Build( void* algorithms, void* data );
 	void _FeMesh_Algorithms_Initialise( void* algorithms, void* data );
 	void _FeMesh_Algorithms_Execute( void* algorithms, void* data );

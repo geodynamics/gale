@@ -96,12 +96,12 @@ void HomogeneousNaturalBCs_TemperatureBC( Node_LocalIndex node_lI, Variable_Inde
 	HomogeneousNaturalBCs_TemperatureFunction( self, coord, result );
 }
 
-void _HomogeneousNaturalBCs_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _HomogeneousNaturalBCs_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	HomogeneousNaturalBCs* self = (HomogeneousNaturalBCs*)analyticSolution;
 	AbstractContext*       context;
 	ConditionFunction*     condFunc;
 
-	_FieldTest_Construct( self, cf, data );
+	_FieldTest_AssignFromXML( self, cf, data );
 
 	self->angle = StGermain_DegreeToRadian (Stg_ComponentFactory_GetRootDictDouble( cf, "VelocitySkewAngle", 45.0 ) );
 
@@ -134,7 +134,7 @@ void* _HomogeneousNaturalBCs_DefaultNew( Name name ) {
 			_FieldTest_Print,
 			_FieldTest_Copy,
 			_HomogeneousNaturalBCs_DefaultNew,
-			_HomogeneousNaturalBCs_Construct,
+			_HomogeneousNaturalBCs_AssignFromXML,
 			_HomogeneousNaturalBCs_Build,
 			_FieldTest_Initialise,
 			_FieldTest_Execute,

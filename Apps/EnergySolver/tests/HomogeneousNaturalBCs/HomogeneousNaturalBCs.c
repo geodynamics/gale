@@ -96,12 +96,12 @@ void HomogeneousNaturalBCs_TemperatureBC( Node_LocalIndex node_lI, Variable_Inde
 	HomogeneousNaturalBCs_TemperatureFunction( self, feVariable, coord, result );
 }
 
-void _HomogeneousNaturalBCs_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _HomogeneousNaturalBCs_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	HomogeneousNaturalBCs* self = (HomogeneousNaturalBCs*)analyticSolution;
 	AbstractContext*       context;
 	ConditionFunction*     condFunc;
 
-	_AnalyticSolution_Construct( self, cf, data );
+	_AnalyticSolution_AssignFromXML( self, cf, data );
 
 	self->temperatureField = Stg_ComponentFactory_ConstructByName( cf, "TemperatureField", FeVariable, True, data ); 
 	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, self->temperatureField, HomogeneousNaturalBCs_TemperatureFunction );
@@ -130,7 +130,7 @@ void* _HomogeneousNaturalBCs_DefaultNew( Name name ) {
 			_AnalyticSolution_Print,
 			_AnalyticSolution_Copy,
 			_HomogeneousNaturalBCs_DefaultNew,
-			_HomogeneousNaturalBCs_Construct,
+			_HomogeneousNaturalBCs_AssignFromXML,
 			_HomogeneousNaturalBCs_Build,
 			_AnalyticSolution_Initialise,
 			_AnalyticSolution_Execute,

@@ -62,7 +62,7 @@ void* Stokes_SLE_PenaltySolver_DefaultNew( Name name ) {
 		_Stokes_SLE_PenaltySolver_Print, 
 		_Stokes_SLE_PenaltySolver_Copy,
 		Stokes_SLE_PenaltySolver_DefaultNew,
-		_Stokes_SLE_PenaltySolver_Construct,
+		_Stokes_SLE_PenaltySolver_AssignFromXML,
 		_Stokes_SLE_PenaltySolver_Build,
 		_SLE_Solver_Initialise,
 		_SLE_Solver_Execute,
@@ -184,10 +184,10 @@ void _Stokes_SLE_PenaltySolver_Build( void* solver, void* stokesSLE ) {
 	Stream_UnIndentBranch( StgFEM_Debug );
 }
 
-void _Stokes_SLE_PenaltySolver_Construct( void* solver, Stg_ComponentFactory* cf, void* data ) {
+void _Stokes_SLE_PenaltySolver_AssignFromXML( void* solver, Stg_ComponentFactory* cf, void* data ) {
 	Stokes_SLE_PenaltySolver* self         = (Stokes_SLE_PenaltySolver*) solver;
 
-	_SLE_Solver_Construct( self, cf, data );
+	_SLE_Solver_AssignFromXML( self, cf, data );
 	
 	_Stokes_SLE_PenaltySolver_Init( self );
 }

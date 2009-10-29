@@ -2566,13 +2566,13 @@ void ColumnViscosityAnalytic_StressFunction( void* analyticSolution, FeVariable*
 	stress[2] = 2*n*M_PI*sin(n*M_PI*y) * u4; /* xy stress */
 }
 
-void _ColumnViscosityAnalytic_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _ColumnViscosityAnalytic_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	ColumnViscosityAnalytic* self = (ColumnViscosityAnalytic*)analyticSolution;
 	AbstractContext*         context;
 	ConditionFunction*       condFunc;
 
 	/* Construct Parent */
-	_AnalyticSolution_Construct( self, cf, data );
+	_AnalyticSolution_AssignFromXML( self, cf, data );
 
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
 	
@@ -2618,7 +2618,7 @@ void* _ColumnViscosityAnalytic_DefaultNew( Name name ) {
 			_AnalyticSolution_Print,
 			_AnalyticSolution_Copy,
 			_ColumnViscosityAnalytic_DefaultNew,
-			_ColumnViscosityAnalytic_Construct,
+			_ColumnViscosityAnalytic_AssignFromXML,
 			_ColumnViscosityAnalytic_Build, 
 			_AnalyticSolution_Initialise,
 			_AnalyticSolution_Execute,

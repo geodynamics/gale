@@ -66,7 +66,7 @@ void* BilinearInnerElType_DefaultNew( Name name ) {
 			_BilinearInnerElType_Print,
 			NULL, 
 			BilinearInnerElType_DefaultNew,
-			_BilinearInnerElType_Construct,
+			_BilinearInnerElType_AssignFromXML,
 			_BilinearInnerElType_Build,
 			_BilinearInnerElType_Initialise,
 			_BilinearInnerElType_Execute,
@@ -83,7 +83,7 @@ void* BilinearInnerElType_DefaultNew( Name name ) {
 
 BilinearInnerElType* BilinearInnerElType_New( Name name ) {
 	return _BilinearInnerElType_New( sizeof(BilinearInnerElType), BilinearInnerElType_Type, _BilinearInnerElType_Delete,
-		_BilinearInnerElType_Print, NULL, BilinearInnerElType_DefaultNew, _BilinearInnerElType_Construct, _BilinearInnerElType_Build,
+		_BilinearInnerElType_Print, NULL, BilinearInnerElType_DefaultNew, _BilinearInnerElType_AssignFromXML, _BilinearInnerElType_Build,
 		_BilinearInnerElType_Initialise, _BilinearInnerElType_Execute, _BilinearInnerElType_Destroy, name, True, _BilinearInnerElType_SF_allNodes, 
 		_BilinearInnerElType_SF_allLocalDerivs_allNodes, _ElementType_ConvertGlobalCoordToElLocal, _ElementType_JacobianDeterminantSurface,
 		_BilinearInnerElType_SurfaceNormal, _BilinearInnerElType_NodeCount );
@@ -190,7 +190,7 @@ void _BilinearInnerElType_Print( void* elementType, Stream* stream ) {
 	Journal_Printf( stream, ")\n", self );
 }
 
-void _BilinearInnerElType_Construct( void* elementType, Stg_ComponentFactory *cf, void* data ){
+void _BilinearInnerElType_AssignFromXML( void* elementType, Stg_ComponentFactory *cf, void* data ){
 	
 }
 	

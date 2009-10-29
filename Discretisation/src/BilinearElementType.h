@@ -107,7 +107,7 @@
 	void _BilinearElementType_Print( void* elementType, Stream* stream );
 	
 	/* Bilinear element type build implementation */
-	void _BilinearElementType_Construct( void* elementType, Stg_ComponentFactory *cf, void* data );
+	void _BilinearElementType_AssignFromXML( void* elementType, Stg_ComponentFactory *cf, void* data );
 	
 	void _BilinearElementType_Build( void* elementType, void* data );
 	

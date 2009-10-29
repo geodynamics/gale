@@ -260,7 +260,7 @@ void* _Stokes_SLE_DefaultNew( Name name ) {
 		_Stokes_SLE_Print,
 		_SystemLinearEquations_Copy,
 		_Stokes_SLE_DefaultNew,
-		_Stokes_SLE_Construct,
+		_Stokes_SLE_AssignFromXML,
 		_SystemLinearEquations_Build,
 		_SystemLinearEquations_Initialise,
 		_SystemLinearEquations_Execute,
@@ -273,7 +273,7 @@ void* _Stokes_SLE_DefaultNew( Name name ) {
 		name );
 }
 
-void _Stokes_SLE_Construct( void* sle, Stg_ComponentFactory* cf, void* data ) {
+void _Stokes_SLE_AssignFromXML( void* sle, Stg_ComponentFactory* cf, void* data ) {
 	Stokes_SLE*       self = (Stokes_SLE*)sle;
 	StiffnessMatrix*  kStiffMat;
 	StiffnessMatrix*  gStiffMat;
@@ -285,7 +285,7 @@ void _Stokes_SLE_Construct( void* sle, Stg_ComponentFactory* cf, void* data ) {
 	ForceVector*      hForceVec;
 
 	/* Construct Parent */
-	_SystemLinearEquations_Construct( self, cf, data );
+	_SystemLinearEquations_AssignFromXML( self, cf, data );
 
 	kStiffMat =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "StressTensorMatrix",    StiffnessMatrix, True, data );
 	gStiffMat =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "GradientMatrix",        StiffnessMatrix, True, data );

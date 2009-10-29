@@ -86,7 +86,7 @@ void* StiffnessMatrix_DefaultNew( Name name )
 		_StiffnessMatrix_Print, 
 		_StiffnessMatrix_Copy,
 		StiffnessMatrix_DefaultNew,
-		_StiffnessMatrix_Construct,
+		_StiffnessMatrix_AssignFromXML,
 		_StiffnessMatrix_Build, 
 		_StiffnessMatrix_Initialise,
 		_StiffnessMatrix_Execute,
@@ -125,7 +125,7 @@ StiffnessMatrix* StiffnessMatrix_New(
 		_StiffnessMatrix_Print, 
 		_StiffnessMatrix_Copy,
 		StiffnessMatrix_DefaultNew,
-		_StiffnessMatrix_Construct,
+		_StiffnessMatrix_AssignFromXML,
 		_StiffnessMatrix_Build, 
 		_StiffnessMatrix_Initialise,
 		_StiffnessMatrix_Execute,
@@ -429,7 +429,7 @@ void* _StiffnessMatrix_Copy( void* stiffnessMatrix, void* dest, Bool deep, Name 
 	return (void*)newStiffnessMatrix;
 }
 
-void _StiffnessMatrix_Construct( void* stiffnessMatrix, Stg_ComponentFactory* cf, void* data ) {
+void _StiffnessMatrix_AssignFromXML( void* stiffnessMatrix, Stg_ComponentFactory* cf, void* data ) {
 	StiffnessMatrix* self               = (StiffnessMatrix*)stiffnessMatrix;
 	Stream*		 stream;
 	FeVariable*      rowVar             = NULL;

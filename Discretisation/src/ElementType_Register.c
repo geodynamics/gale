@@ -65,7 +65,7 @@ void* ElementType_Register_DefaultNew( Name name ) {
 			_ElementType_Register_Print, 
 			NULL,
 			ElementType_Register_DefaultNew,
-			_ElementType_Register_Construct,
+			_ElementType_Register_AssignFromXML,
 			_ElementType_Register_Build,
 			_ElementType_Register_Initialise,
 			_ElementType_Register_Execute,
@@ -78,7 +78,7 @@ ElementType_Register* ElementType_Register_New( Name name ) {
 	return _ElementType_Register_New( sizeof(ElementType_Register), ElementType_Register_Type,
 			_ElementType_Register_Delete, _ElementType_Register_Print, NULL,
 			ElementType_Register_DefaultNew,
-			_ElementType_Register_Construct,
+			_ElementType_Register_AssignFromXML,
 			_ElementType_Register_Build,
 			_ElementType_Register_Initialise,
 			_ElementType_Register_Execute,
@@ -101,7 +101,7 @@ void ElementType_Register_Init( void* elementType_Register, Name name ) {
 	self->_print = _ElementType_Register_Print;
 	self->_copy = NULL;
 	self->_defaultConstructor = ElementType_Register_DefaultNew;
-	self->_construct = _ElementType_Register_Construct;
+	self->_construct = _ElementType_Register_AssignFromXML;
 	self->_build = _ElementType_Register_Build;
 	self->_initialise = _ElementType_Register_Initialise;
 	self->_execute = _ElementType_Register_Execute;
@@ -215,7 +215,7 @@ void _ElementType_Register_Print( void* elementType_Register, Stream* stream ) {
 	Journal_Printf( stream, "\t]\n" );
 }
 
-void _ElementType_Register_Construct( void* elementType_Register, Stg_ComponentFactory *cf, void* data ){
+void _ElementType_Register_AssignFromXML( void* elementType_Register, Stg_ComponentFactory *cf, void* data ){
 	ElementType_Register*	self = (ElementType_Register*)elementType_Register;
 	
 	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );

@@ -251,8 +251,8 @@
 	/** Stg_Component_Build() implementation */
 	void _FeVariable_Build( void* variable, void* data );
 	
-	/** Stg_Component_Construct() implementation */
-	void _FeVariable_Construct( void* variable, Stg_ComponentFactory* cf, void* data );
+	/** Stg_Component_AssignFromXML() implementation */
+	void _FeVariable_AssignFromXML( void* variable, Stg_ComponentFactory* cf, void* data );
 	
 	/** Stg_Component_Initialise() implementation */
 	void _FeVariable_Initialise( void* variable, void* data );

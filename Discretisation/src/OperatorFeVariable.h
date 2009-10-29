@@ -156,7 +156,7 @@
 	void* _OperatorFeVariable_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) ;
 	
 	/* 'Stg_Component' Virtual Implementations */
-void _OperatorFeVariable_Construct( void* feVariable, Stg_ComponentFactory* cf, void* data ) ;
+void _OperatorFeVariable_AssignFromXML( void* feVariable, Stg_ComponentFactory* cf, void* data ) ;
 	void _OperatorFeVariable_Build( void* feVariable, void* data ) ;
 	void _OperatorFeVariable_Execute( void* variable, void* data ) ;
 	void _OperatorFeVariable_Destroy( void* variable, void* data ) ;

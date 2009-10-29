@@ -152,7 +152,7 @@ void* _PressureGradForceTerm_DefaultNew( Name name ) {
 		_PressureGradForceTerm_Print,
 		NULL,
 		_PressureGradForceTerm_DefaultNew,
-		_PressureGradForceTerm_Construct,
+		_PressureGradForceTerm_AssignFromXML,
 		_PressureGradForceTerm_Build,
 		_PressureGradForceTerm_Initialise,
 		_PressureGradForceTerm_Execute,
@@ -161,13 +161,13 @@ void* _PressureGradForceTerm_DefaultNew( Name name ) {
 		name );
 }
 
-void _PressureGradForceTerm_Construct( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
+void _PressureGradForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
 	PressureGradForceTerm*            self             = (PressureGradForceTerm*)forceTerm;
 	FeVariable*                 pressureField;
 	FeVariable*                 gradField;
 
 	/* Construct Parent */
-	_ForceTerm_Construct( self, cf, data );
+	_ForceTerm_AssignFromXML( self, cf, data );
 
 	pressureField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "PressureField", FeVariable, True, data ) ;
 	gradField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "PressureGradField", FeVariable, True, data ) ;

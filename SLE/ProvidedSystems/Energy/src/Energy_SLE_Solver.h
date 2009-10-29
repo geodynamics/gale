@@ -120,7 +120,7 @@
 	
 	void _Energy_SLE_Solver_Initialise( void* sleSolver, void* standardSLE );
 	
-	void _Energy_SLE_Solver_Construct( void* sleSolver, Stg_ComponentFactory* cf, void* data );
+	void _Energy_SLE_Solver_AssignFromXML( void* sleSolver, Stg_ComponentFactory* cf, void* data );
 	
 	void _Energy_SLE_Solver_Execute( void* sleSolver, void* data );
 	

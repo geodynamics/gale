@@ -189,7 +189,7 @@
 	void _StiffnessMatrix_Build( void* stiffnessMatrix, void* data );
 	
 	/* Construct */
-	void _StiffnessMatrix_Construct( void* stiffnessMatrix, Stg_ComponentFactory* cf, void* data );
+	void _StiffnessMatrix_AssignFromXML( void* stiffnessMatrix, Stg_ComponentFactory* cf, void* data );
 	
 	/* Initialisation implementation */
 	void _StiffnessMatrix_Initialise( void* stiffnessMatrix, void* data );

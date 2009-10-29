@@ -81,7 +81,7 @@ void* SolutionVector_DefaultNew( Name name ) {
 		_SolutionVector_Print, 
 		_SolutionVector_Copy,
 		SolutionVector_DefaultNew,
-		_SolutionVector_Construct,
+		_SolutionVector_AssignFromXML,
 		_SolutionVector_Build, 
 		_SolutionVector_Initialise, 
 		_SolutionVector_Execute, 
@@ -104,7 +104,7 @@ SolutionVector* SolutionVector_New(
 		_SolutionVector_Print, 
 		_SolutionVector_Copy,
 		SolutionVector_DefaultNew,
-		_SolutionVector_Construct,
+		_SolutionVector_AssignFromXML,
 		_SolutionVector_Build, 
 		_SolutionVector_Initialise, 
 		_SolutionVector_Execute, 
@@ -261,7 +261,7 @@ void* _SolutionVector_Copy( void* solutionVector, void* dest, Bool deep, Name na
 }
 
 
-void _SolutionVector_Construct( void* solutionVector, Stg_ComponentFactory* cf, void* data ) 
+void _SolutionVector_AssignFromXML( void* solutionVector, Stg_ComponentFactory* cf, void* data ) 
 {
 	SolutionVector*    self = (SolutionVector*)solutionVector;
 	FeVariable*        feVariable = NULL;

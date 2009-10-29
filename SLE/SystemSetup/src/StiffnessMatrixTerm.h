@@ -116,7 +116,7 @@
 	
 	/* 'Stg_Component' Virtual Functions */
 	void* _StiffnessMatrixTerm_DefaultNew( Name name );
-	void _StiffnessMatrixTerm_Construct( void* stiffnessMatrixTerm, Stg_ComponentFactory* cf, void* data );
+	void _StiffnessMatrixTerm_AssignFromXML( void* stiffnessMatrixTerm, Stg_ComponentFactory* cf, void* data );
 	void _StiffnessMatrixTerm_Build( void* stiffnessMatrixTerm, void* data );
 	void _StiffnessMatrixTerm_Initialise( void* stiffnessMatrixTerm, void* data );
 	void _StiffnessMatrixTerm_Execute( void* stiffnessMatrixTerm, void* data );

@@ -175,7 +175,7 @@ void _SLE_Solver_Build( void* sleSolver, void* data ) {
 	/* Do nothing by default */
 }
 
-void _SLE_Solver_Construct( void* sleSolver, Stg_ComponentFactory* cf, void* data ) {
+void _SLE_Solver_AssignFromXML( void* sleSolver, Stg_ComponentFactory* cf, void* data ) {
 	SLE_Solver*		self = (SLE_Solver*)sleSolver;
 	Bool            useStatSolve;
 	int             nStatReps;

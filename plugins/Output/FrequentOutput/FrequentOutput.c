@@ -51,7 +51,7 @@
 
 const Type StgFEM_FrequentOutput_Type = "StgFEM_FrequentOutput";
 
-void _StgFEM_FrequentOutput_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _StgFEM_FrequentOutput_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	StgFEM_FrequentOutput*            self         = (StgFEM_FrequentOutput*) component;
 	AbstractContext*                   context;
 	Dictionary*                        dictionary;
@@ -112,7 +112,7 @@ void* _StgFEM_FrequentOutput_DefaultNew( Name name ) {
 			_Codelet_Print,
 			_Codelet_Copy,
 			_StgFEM_FrequentOutput_DefaultNew,
-			_StgFEM_FrequentOutput_Construct,
+			_StgFEM_FrequentOutput_AssignFromXML,
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,

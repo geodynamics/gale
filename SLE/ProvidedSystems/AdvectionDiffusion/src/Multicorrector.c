@@ -157,7 +157,7 @@ void* _AdvDiffMulticorrector_DefaultNew( Name name ) {
 		_AdvDiffMulticorrector_Print,
 		NULL,
 		_AdvDiffMulticorrector_DefaultNew,
-		_AdvDiffMulticorrector_Construct,
+		_AdvDiffMulticorrector_AssignFromXML,
 		_AdvDiffMulticorrector_Build,
 		_AdvDiffMulticorrector_Initialise,
 		_AdvDiffMulticorrector_Execute,
@@ -168,13 +168,13 @@ void* _AdvDiffMulticorrector_DefaultNew( Name name ) {
 		name );
 }
 
-void _AdvDiffMulticorrector_Construct( void* solver, Stg_ComponentFactory* cf, void* data ) {
+void _AdvDiffMulticorrector_AssignFromXML( void* solver, Stg_ComponentFactory* cf, void* data ) {
 	AdvDiffMulticorrector*                     self             = (AdvDiffMulticorrector*)solver;
 	double                                     gamma;
 	Iteration_Index                            multiCorrectorIterations;
 
 	/* Construct Parent */
-	_SLE_Solver_Construct( self, cf, data );
+	_SLE_Solver_AssignFromXML( self, cf, data );
 
 	gamma = Stg_ComponentFactory_GetDouble( cf, self->name, "gamma", 0.5 );
 	multiCorrectorIterations = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "multiCorrectorIterations", 2 );

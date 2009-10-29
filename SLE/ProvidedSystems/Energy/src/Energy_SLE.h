@@ -127,6 +127,6 @@
 
 	/* 'Stg_Component' Virtual Functions */
 	void* _Energy_SLE_DefaultNew( Name name );
-	void _Energy_SLE_Construct( void* sle, Stg_ComponentFactory* cf, void* data );
+	void _Energy_SLE_AssignFromXML( void* sle, Stg_ComponentFactory* cf, void* data );
 
 #endif

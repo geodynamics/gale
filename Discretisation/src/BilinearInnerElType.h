@@ -107,7 +107,7 @@
 	void _BilinearInnerElType_Print( void* elementType, Stream* stream );
 	
 	/* Bilinear inner element type build implementation */
-	void _BilinearInnerElType_Construct( void* elementType, Stg_ComponentFactory *cf, void* data );
+	void _BilinearInnerElType_AssignFromXML( void* elementType, Stg_ComponentFactory *cf, void* data );
 	
 	void _BilinearInnerElType_Build( void* elementType, void* data );
 	

@@ -134,7 +134,7 @@ void* _LumpedMassMatrixForceTerm_DefaultNew( Name name ) {
 		_LumpedMassMatrixForceTerm_Print,
 		NULL,
 		_LumpedMassMatrixForceTerm_DefaultNew,
-		_LumpedMassMatrixForceTerm_Construct,
+		_LumpedMassMatrixForceTerm_AssignFromXML,
 		_LumpedMassMatrixForceTerm_Build,
 		_LumpedMassMatrixForceTerm_Initialise,
 		_LumpedMassMatrixForceTerm_Execute,
@@ -143,11 +143,11 @@ void* _LumpedMassMatrixForceTerm_DefaultNew( Name name ) {
 		name );
 }
 
-void _LumpedMassMatrixForceTerm_Construct( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
+void _LumpedMassMatrixForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
 	LumpedMassMatrixForceTerm*            self             = (LumpedMassMatrixForceTerm*)forceTerm;
 
 	/* Construct Parent */
-	_ForceTerm_Construct( self, cf, data );
+	_ForceTerm_AssignFromXML( self, cf, data );
 
 	_LumpedMassMatrixForceTerm_Init( self );
 }

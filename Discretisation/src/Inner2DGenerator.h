@@ -78,7 +78,7 @@
 
 	void _Inner2DGenerator_Delete( void* generator );
 	void _Inner2DGenerator_Print( void* generator, Stream* stream );
-	void _Inner2DGenerator_Construct( void* generator, Stg_ComponentFactory* cf, void* data );
+	void _Inner2DGenerator_AssignFromXML( void* generator, Stg_ComponentFactory* cf, void* data );
 	void _Inner2DGenerator_Build( void* generator, void* data );
 	void _Inner2DGenerator_Initialise( void* generator, void* data );
 	void _Inner2DGenerator_Execute( void* generator, void* data );

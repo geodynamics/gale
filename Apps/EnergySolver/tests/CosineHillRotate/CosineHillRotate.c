@@ -83,12 +83,12 @@ void CosineHillRotate_TemperatureBC( Node_LocalIndex node_lI, Variable_Index var
 	CosineHillRotate_TemperatureFunction( self, feVariable, coord, result );
 }
 
-void _CosineHillRotate_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _CosineHillRotate_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	CosineHillRotate* self = (CosineHillRotate*)analyticSolution;
 	AbstractContext*       context;
 	ConditionFunction*     condFunc;
 
-	_AnalyticSolution_Construct( self, cf, data );
+	_AnalyticSolution_AssignFromXML( self, cf, data );
 
 	self->temperatureField = Stg_ComponentFactory_ConstructByName( cf, "TemperatureField", FeVariable, True, data ); 
 	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, self->temperatureField, CosineHillRotate_TemperatureFunction );
@@ -120,7 +120,7 @@ void* _CosineHillRotate_DefaultNew( Name name ) {
 			_AnalyticSolution_Print,
 			_AnalyticSolution_Copy,
 			_CosineHillRotate_DefaultNew,
-			_CosineHillRotate_Construct,
+			_CosineHillRotate_AssignFromXML,
 			_CosineHillRotate_Build,
 			_AnalyticSolution_Initialise,
 			_AnalyticSolution_Execute,

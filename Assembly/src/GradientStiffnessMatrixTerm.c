@@ -138,7 +138,7 @@ void* _GradientStiffnessMatrixTerm_DefaultNew( Name name ) {
 		_GradientStiffnessMatrixTerm_Print,
 		NULL,
 		_GradientStiffnessMatrixTerm_DefaultNew,
-		_GradientStiffnessMatrixTerm_Construct,
+		_GradientStiffnessMatrixTerm_AssignFromXML,
 		_GradientStiffnessMatrixTerm_Build,
 		_GradientStiffnessMatrixTerm_Initialise,
 		_GradientStiffnessMatrixTerm_Execute,
@@ -147,11 +147,11 @@ void* _GradientStiffnessMatrixTerm_DefaultNew( Name name ) {
 		name );
 }
 
-void _GradientStiffnessMatrixTerm_Construct( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) {
+void _GradientStiffnessMatrixTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) {
 	GradientStiffnessMatrixTerm* self = (GradientStiffnessMatrixTerm*)matrixTerm;
 
 	/* Construct Parent */
-	_StiffnessMatrixTerm_Construct( self, cf, data );
+	_StiffnessMatrixTerm_AssignFromXML( self, cf, data );
 
 	_GradientStiffnessMatrixTerm_Init( self );
 }

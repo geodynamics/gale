@@ -58,7 +58,7 @@ SROpGenerator* SROpGenerator_New( Name name ) {
 				   _SROpGenerator_Print, 
 				   NULL, 
 				   (void* (*)(Name))SROpGenerator_New, 
-				   _SROpGenerator_Construct, 
+				   _SROpGenerator_AssignFromXML, 
 				   _SROpGenerator_Build, 
 				   _SROpGenerator_Initialise, 
 				   _SROpGenerator_Execute, 
@@ -124,7 +124,7 @@ void _SROpGenerator_Print( void* srOpGenerator, Stream* stream ) {
 	_MGOpGenerator_Print( self, stream );
 }
 
-void _SROpGenerator_Construct( void* srOpGenerator, Stg_ComponentFactory* cf, void* data ) {
+void _SROpGenerator_AssignFromXML( void* srOpGenerator, Stg_ComponentFactory* cf, void* data ) {
 	SROpGenerator*	self = (SROpGenerator*)srOpGenerator;
 	FeVariable*	var;
 

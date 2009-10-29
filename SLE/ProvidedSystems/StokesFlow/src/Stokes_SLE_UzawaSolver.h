@@ -164,7 +164,7 @@
 	/** Stg_Component_Build() implementations: allocates the 2 MatrixSolvers and additional Vectors */
 	void _Stokes_SLE_UzawaSolver_Build( void* solver, void* stokesSLE );
 	
-	void _Stokes_SLE_UzawaSolver_Construct( void* solver, Stg_ComponentFactory* cf, void* data );
+	void _Stokes_SLE_UzawaSolver_AssignFromXML( void* solver, Stg_ComponentFactory* cf, void* data );
 	
 	void _Stokes_SLE_UzawaSolver_Initialise( void* solver, void* stokesSLE ) ;
 	

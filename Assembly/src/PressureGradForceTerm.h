@@ -87,7 +87,7 @@
 	void _PressureGradForceTerm_Print( void* forceTerm, Stream* stream );
 
 	void* _PressureGradForceTerm_DefaultNew( Name name ) ;
-	void _PressureGradForceTerm_Construct( void* forceTerm, Stg_ComponentFactory* cf, void* data );
+	void _PressureGradForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data );
 	void _PressureGradForceTerm_Build( void* forceTerm, void* data ) ;
 	void _PressureGradForceTerm_Initialise( void* forceTerm, void* data ) ;
 	void _PressureGradForceTerm_Execute( void* forceTerm, void* data ) ;

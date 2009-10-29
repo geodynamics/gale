@@ -136,7 +136,7 @@ void* _DivergenceMatrixTerm_DefaultNew( Name name ) {
       _DivergenceMatrixTerm_Print,
       NULL,
       _DivergenceMatrixTerm_DefaultNew,
-      _DivergenceMatrixTerm_Construct,
+      _DivergenceMatrixTerm_AssignFromXML,
       _DivergenceMatrixTerm_Build,
       _DivergenceMatrixTerm_Initialise,
       _DivergenceMatrixTerm_Execute,
@@ -145,11 +145,11 @@ void* _DivergenceMatrixTerm_DefaultNew( Name name ) {
       name );
 }
 
-void _DivergenceMatrixTerm_Construct( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) {
+void _DivergenceMatrixTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) {
    DivergenceMatrixTerm* self = (DivergenceMatrixTerm*)matrixTerm;
 
    /* Construct Parent */
-   _StiffnessMatrixTerm_Construct( self, cf, data );
+   _StiffnessMatrixTerm_AssignFromXML( self, cf, data );
 
    _DivergenceMatrixTerm_Init( self );
 }

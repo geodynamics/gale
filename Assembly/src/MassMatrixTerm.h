@@ -81,7 +81,7 @@
 	void _MassMatrixTerm_Print( void* matrixTerm, Stream* stream );
 
 	void* _MassMatrixTerm_DefaultNew( Name name ) ;
-	void _MassMatrixTerm_Construct( void* matrixTerm, Stg_ComponentFactory* cf, void* data );
+	void _MassMatrixTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data );
 	void _MassMatrixTerm_Build( void* matrixTerm, void* data ) ;
 	void _MassMatrixTerm_Initialise( void* matrixTerm, void* data ) ;
 	void _MassMatrixTerm_Execute( void* matrixTerm, void* data ) ;

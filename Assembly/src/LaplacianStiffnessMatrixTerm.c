@@ -134,7 +134,7 @@ void* _LaplacianStiffnessMatrixTerm_DefaultNew( Name name ) {
 		_LaplacianStiffnessMatrixTerm_Print,
 		NULL,
 		_LaplacianStiffnessMatrixTerm_DefaultNew,
-		_LaplacianStiffnessMatrixTerm_Construct,
+		_LaplacianStiffnessMatrixTerm_AssignFromXML,
 		_LaplacianStiffnessMatrixTerm_Build,
 		_LaplacianStiffnessMatrixTerm_Initialise,
 		_LaplacianStiffnessMatrixTerm_Execute,
@@ -143,11 +143,11 @@ void* _LaplacianStiffnessMatrixTerm_DefaultNew( Name name ) {
 		name );
 }
 
-void _LaplacianStiffnessMatrixTerm_Construct( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) {
+void _LaplacianStiffnessMatrixTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) {
 	LaplacianStiffnessMatrixTerm*            self             = (LaplacianStiffnessMatrixTerm*)matrixTerm;
 
 	/* Construct Parent */
-	_StiffnessMatrixTerm_Construct( self, cf, data );
+	_StiffnessMatrixTerm_AssignFromXML( self, cf, data );
 
 	_LaplacianStiffnessMatrixTerm_Init( self );
 }

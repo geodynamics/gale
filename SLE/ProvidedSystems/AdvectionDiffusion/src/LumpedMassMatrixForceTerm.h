@@ -79,7 +79,7 @@
 	void _LumpedMassMatrixForceTerm_Print( void* residual, Stream* stream );
 
 	void* _LumpedMassMatrixForceTerm_DefaultNew( Name name ) ;
-void _LumpedMassMatrixForceTerm_Construct( void* residual, Stg_ComponentFactory* cf, void* data ) ;
+void _LumpedMassMatrixForceTerm_AssignFromXML( void* residual, Stg_ComponentFactory* cf, void* data ) ;
 	void _LumpedMassMatrixForceTerm_Build( void* residual, void* data ) ;
 	void _LumpedMassMatrixForceTerm_Initialise( void* residual, void* data ) ;
 	void _LumpedMassMatrixForceTerm_Execute( void* residual, void* data ) ;

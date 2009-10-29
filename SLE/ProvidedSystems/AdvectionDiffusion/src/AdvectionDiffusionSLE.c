@@ -309,7 +309,7 @@ void* _AdvectionDiffusionSLE_DefaultNew( Name name ) {
 		_AdvectionDiffusionSLE_Print, 
 		_AdvectionDiffusionSLE_Copy,
 		_AdvectionDiffusionSLE_DefaultNew,
-		_AdvectionDiffusionSLE_Construct,
+		_AdvectionDiffusionSLE_AssignFromXML,
 		_AdvectionDiffusionSLE_Build,
 		_AdvectionDiffusionSLE_Initialise,
 		_AdvectionDiffusionSLE_Execute,
@@ -322,7 +322,7 @@ void* _AdvectionDiffusionSLE_DefaultNew( Name name ) {
 		name );
 }
 
-void _AdvectionDiffusionSLE_Construct( void* sle, Stg_ComponentFactory* cf, void* data ) {
+void _AdvectionDiffusionSLE_AssignFromXML( void* sle, Stg_ComponentFactory* cf, void* data ) {
 	AdvectionDiffusionSLE*            self                   = (AdvectionDiffusionSLE*) sle;
 	Stream*                           error                  = Journal_Register( Error_Type, self->type );
 	FeVariable*                       phiField;
@@ -334,7 +334,7 @@ void _AdvectionDiffusionSLE_Construct( void* sle, Stg_ComponentFactory* cf, void
 	Variable_Register*                variable_Register;
 
 	/* Construct Parent */
-	_SystemLinearEquations_Construct( self, cf, data );
+	_SystemLinearEquations_AssignFromXML( self, cf, data );
 
 	/* Get Registers */
 	variable_Register = self->context->variable_Register; 

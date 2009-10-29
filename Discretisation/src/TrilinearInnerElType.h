@@ -107,7 +107,7 @@
 	void _TrilinearInnerElType_Print( void* elementType, Stream* stream );
 	
 	/* Trilinear inner element type build implementation */
-	void _TrilinearInnerElType_Construct( void* elementType, Stg_ComponentFactory *cf, void* data );
+	void _TrilinearInnerElType_AssignFromXML( void* elementType, Stg_ComponentFactory *cf, void* data );
 	
 	void _TrilinearInnerElType_Build( void* elementType, void *data );
 	

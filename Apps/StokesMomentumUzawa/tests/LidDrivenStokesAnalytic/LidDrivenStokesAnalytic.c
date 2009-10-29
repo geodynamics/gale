@@ -122,12 +122,12 @@ void StgFEM_LidDrivenStokesAnalytic_PressureFunction( void* data, double* coord,
 	*pressure = - 2.0 * n * M_PI * cos( n * M_PI * x ) * ( C * exp( n * M_PI * y ) + D * exp( - n * M_PI * y ) );
 }
 
-void _StgFEM_LidDrivenStokesAnalytic_Construct( void* codelet, Stg_ComponentFactory* cf, void* data ) {
+void _StgFEM_LidDrivenStokesAnalytic_AssignFromXML( void* codelet, Stg_ComponentFactory* cf, void* data ) {
 	StgFEM_LidDrivenStokesAnalytic *self = (StgFEM_LidDrivenStokesAnalytic*)codelet;
 	
 	unsigned int* waveSpeed;
 
-	_FieldTest_Construct( self, cf, data );
+	_FieldTest_AssignFromXML( self, cf, data );
 
 	/* Set constants */
 	*waveSpeed = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "sinusoidalLidWavenumber", 1 );
@@ -159,7 +159,7 @@ void* _StgFEM_LidDrivenStokesAnalytic_DefaultNew( Name name ) {
 			_FieldTest_Print,
 			_FieldTest_Copy,
 			_StgFEM_LidDrivenStokesAnalytic_DefaultNew,
-			_StgFEM_LidDrivenStokesAnalytic_Construct,
+			_StgFEM_LidDrivenStokesAnalytic_AssignFromXML,
 			_StgFEM_LidDrivenStokesAnalytic_Build, 
 			_FieldTest_Initialise,
 			_FieldTest_Execute,

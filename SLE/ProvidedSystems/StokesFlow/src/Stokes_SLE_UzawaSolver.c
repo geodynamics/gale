@@ -66,7 +66,7 @@ void* _Stokes_SLE_UzawaSolver_DefaultNew( Name name ) {
 		_Stokes_SLE_UzawaSolver_Print, 
 		_Stokes_SLE_UzawaSolver_Copy,
 		_Stokes_SLE_UzawaSolver_DefaultNew,
-		_Stokes_SLE_UzawaSolver_Construct,
+		_Stokes_SLE_UzawaSolver_AssignFromXML,
 		_Stokes_SLE_UzawaSolver_Build,
 		_Stokes_SLE_UzawaSolver_Initialise,
 		_SLE_Solver_Execute,
@@ -276,7 +276,7 @@ void _Stokes_SLE_UzawaSolver_Build( void* solver, void* stokesSLE ) {
 	Stream_UnIndentBranch( StgFEM_Debug );
 }
 
-void _Stokes_SLE_UzawaSolver_Construct( void* solver, Stg_ComponentFactory* cf, void* data ) {
+void _Stokes_SLE_UzawaSolver_AssignFromXML( void* solver, Stg_ComponentFactory* cf, void* data ) {
 	Stokes_SLE_UzawaSolver* self         = (Stokes_SLE_UzawaSolver*) solver;
 	double                  tolerance;
 	Iteration_Index         maxUzawaIterations, minUzawaIterations;
@@ -284,7 +284,7 @@ void _Stokes_SLE_UzawaSolver_Construct( void* solver, Stg_ComponentFactory* cf, 
 	Bool                    useAbsoluteTolerance;
 	Bool                    monitor;
 
-	_SLE_Solver_Construct( self, cf, data );
+	_SLE_Solver_AssignFromXML( self, cf, data );
 
 	tolerance            = Stg_ComponentFactory_GetDouble( cf, self->name, "tolerance", 1.0e-5 );
 	maxUzawaIterations   = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "maxIterations", 1000 );

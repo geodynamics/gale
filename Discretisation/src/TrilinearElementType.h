@@ -107,7 +107,7 @@
 	void _TrilinearElementType_Print( void* elementType, Stream* stream );
 	
 	/* Trilinear element type build implementation */
-	void _TrilinearElementType_Construct( void* elementType, Stg_ComponentFactory *cf, void* data );
+	void _TrilinearElementType_AssignFromXML( void* elementType, Stg_ComponentFactory *cf, void* data );
 	
 	void _TrilinearElementType_Build( void* elementType, void *data );
 	

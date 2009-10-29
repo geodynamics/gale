@@ -64,7 +64,7 @@ void* LinkedDofInfo_DefaultNew( Name name ) {
 				_LinkedDofInfo_Print, 
 				_LinkedDofInfo_Copy, 
 				LinkedDofInfo_DefaultNew,
-				_LinkedDofInfo_Construct,
+				_LinkedDofInfo_AssignFromXML,
 				_LinkedDofInfo_Build,
 				_LinkedDofInfo_Initialise,
 				_LinkedDofInfo_Execute,
@@ -85,7 +85,7 @@ LinkedDofInfo* LinkedDofInfo_New(
 {
 	return _LinkedDofInfo_New( sizeof(LinkedDofInfo), LinkedDofInfo_Type, _LinkedDofInfo_Delete,
 		_LinkedDofInfo_Print, _LinkedDofInfo_Copy, (Stg_Component_DefaultConstructorFunction*)LinkedDofInfo_DefaultNew,
-		_LinkedDofInfo_Construct, (Stg_Component_BuildFunction*)_LinkedDofInfo_Build,
+		_LinkedDofInfo_AssignFromXML, (Stg_Component_BuildFunction*)_LinkedDofInfo_Build,
 		(Stg_Component_InitialiseFunction*)_LinkedDofInfo_Initialise,
 		_LinkedDofInfo_Execute, _LinkedDofInfo_Destroy, name, True, mesh, dofLayout, dictionary );
 }
@@ -187,7 +187,7 @@ void _LinkedDofInfo_Print( void* linkedDofInfo, Stream* stream ) {
 	Stream_UnIndent( stream );
 }
 
-void _LinkedDofInfo_Construct( void* linkedDofInfo, Stg_ComponentFactory *cf, void* data ){
+void _LinkedDofInfo_AssignFromXML( void* linkedDofInfo, Stg_ComponentFactory *cf, void* data ){
 	LinkedDofInfo*	self = (LinkedDofInfo*)linkedDofInfo;
 	Dictionary* dictionary;
 	Mesh*		mesh = NULL;

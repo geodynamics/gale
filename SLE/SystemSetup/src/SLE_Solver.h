@@ -128,7 +128,7 @@
 	/** Stg_Component_Build() implementation: does nothing by default as some solvers may not need it. */
 	void _SLE_Solver_Build( void* sleSolver, void* data );
 	
-	void _SLE_Solver_Construct( void* sleSolver, Stg_ComponentFactory* cf, void* data );
+	void _SLE_Solver_AssignFromXML( void* sleSolver, Stg_ComponentFactory* cf, void* data );
 
 	/** Stg_Component_Initialise() implementation: does nothing by default as some solvers may not neet it. */
 	void _SLE_Solver_Initialise( void* sleSolver, void* data );

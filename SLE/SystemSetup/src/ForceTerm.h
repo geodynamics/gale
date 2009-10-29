@@ -115,7 +115,7 @@
 	
 	/* 'Stg_Component' Virtual Functions */
 	void* _ForceTerm_DefaultNew( Name name );
-	void _ForceTerm_Construct( void* forceTerm, Stg_ComponentFactory* cf, void* data );
+	void _ForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data );
 	void _ForceTerm_Build( void* forceTerm, void* data );
 	void _ForceTerm_Initialise( void* forceTerm, void* data );
 	void _ForceTerm_Execute( void* forceTerm, void* data );

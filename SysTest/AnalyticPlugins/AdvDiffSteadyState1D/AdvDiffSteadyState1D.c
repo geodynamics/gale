@@ -129,12 +129,12 @@ void _AdvDiffSteadyState1D_Build( void* analyticSolution, void* data ) {
 	}
 }
 
-void _AdvDiffSteadyState1D_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _AdvDiffSteadyState1D_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	AdvDiffSteadyState1D*  self = (AdvDiffSteadyState1D*)analyticSolution;
 	AbstractContext*       context;
 	ConditionFunction*     condFunc;
 
-	_FieldTest_Construct( self, cf, data );
+	_FieldTest_AssignFromXML( self, cf, data );
 
 	self->residual = Stg_ComponentFactory_ConstructByName( cf, "defaultResidualForceTerm", AdvDiffResidualForceTerm, True, data );
 
@@ -156,7 +156,7 @@ void* _AdvDiffSteadyState1D_DefaultNew( Name name ) {
 			_FieldTest_Print,
 			_FieldTest_Copy,
 			_AdvDiffSteadyState1D_DefaultNew,
-			_AdvDiffSteadyState1D_Construct,
+			_AdvDiffSteadyState1D_AssignFromXML,
 			_AdvDiffSteadyState1D_Build,
 			_FieldTest_Initialise,
 			_FieldTest_Execute,

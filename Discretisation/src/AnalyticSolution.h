@@ -121,7 +121,7 @@
 	void _AnalyticSolution_Build( void* analyticSolution, void* data );
 	
 	/* Construct implementation */
-	void _AnalyticSolution_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data );
+	void _AnalyticSolution_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data );
 	
 	/* Initialisation implementation */
 	void _AnalyticSolution_Initialise( void* analyticSolution, void* data );

@@ -70,12 +70,12 @@ void _SimpleShearAnalytic_Build( void* analyticSolution, void* data ) {
 	_AnalyticSolution_Build( self, data );
 }
 
-void _SimpleShearAnalytic_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _SimpleShearAnalytic_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	SimpleShearAnalytic *self = (SimpleShearAnalytic*)analyticSolution;
 	FeVariable*       velocityField;
 	FeVariable*       pressureField;
 
-	_AnalyticSolution_Construct( self, cf, data );
+	_AnalyticSolution_AssignFromXML( self, cf, data );
 
 	velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data ); 
 	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, velocityField, SimpleShearAnalytic_VelocityFunction );
@@ -96,7 +96,7 @@ void* _SimpleShearAnalytic_DefaultNew( Name name ) {
 			_AnalyticSolution_Print,
 			_AnalyticSolution_Copy,
 			_SimpleShearAnalytic_DefaultNew,
-			_SimpleShearAnalytic_Construct,
+			_SimpleShearAnalytic_AssignFromXML,
 			_SimpleShearAnalytic_Build,
 			_AnalyticSolution_Initialise,
 			_AnalyticSolution_Execute,

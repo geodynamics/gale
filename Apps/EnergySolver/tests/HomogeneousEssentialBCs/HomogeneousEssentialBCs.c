@@ -101,12 +101,12 @@ void HomogeneousEssentialBCs_TemperatureBC( Node_LocalIndex node_lI, Variable_In
 	HomogeneousEssentialBCs_TemperatureFunction( self, feVariable, coord, result );
 }
 
-void _HomogeneousEssentialBCs_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _HomogeneousEssentialBCs_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	HomogeneousEssentialBCs* self = (HomogeneousEssentialBCs*)analyticSolution;
 	AbstractContext*       context;
 	ConditionFunction*     condFunc;
 
-	_AnalyticSolution_Construct( self, cf, data );
+	_AnalyticSolution_AssignFromXML( self, cf, data );
 
 	self->temperatureField = Stg_ComponentFactory_ConstructByName( cf, "TemperatureField", FeVariable, True, data ); 
 	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, self->temperatureField, HomogeneousEssentialBCs_TemperatureFunction );
@@ -135,7 +135,7 @@ void* _HomogeneousEssentialBCs_DefaultNew( Name name ) {
 			_AnalyticSolution_Print,
 			_AnalyticSolution_Copy,
 			_HomogeneousEssentialBCs_DefaultNew,
-			_HomogeneousEssentialBCs_Construct,
+			_HomogeneousEssentialBCs_AssignFromXML,
 			_HomogeneousEssentialBCs_Build,
 			_AnalyticSolution_Initialise,
 			_AnalyticSolution_Execute,

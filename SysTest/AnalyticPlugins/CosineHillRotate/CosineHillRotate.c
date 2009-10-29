@@ -83,11 +83,11 @@ void CosineHillRotate_TemperatureBC( Node_LocalIndex node_lI, Variable_Index var
 	CosineHillRotate_TemperatureFunction( self, coord, result );
 }
 
-void _CosineHillRotate_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _CosineHillRotate_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	CosineHillRotate* self = (CosineHillRotate*)analyticSolution;
 	ConditionFunction*     condFunc;
 
-	_FieldTest_Construct( self, cf, data );
+	_FieldTest_AssignFromXML( self, cf, data );
 
 	/* Read values from dictionary */
 	self->hillHeight       = Stg_ComponentFactory_GetRootDictDouble( cf, "CosineHillHeight"  , 1.0 );
@@ -120,7 +120,7 @@ void* _CosineHillRotate_DefaultNew( Name name ) {
 			_FieldTest_Print,
 			_FieldTest_Copy,
 			_CosineHillRotate_DefaultNew,
-			_CosineHillRotate_Construct,
+			_CosineHillRotate_AssignFromXML,
 			_CosineHillRotate_Build,
 			_FieldTest_Initialise,
 			_FieldTest_Execute,

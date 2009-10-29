@@ -57,7 +57,7 @@ const Type TrilinearElementType_Type = "TrilinearElementType";
 
 void* TrilinearElementType_DefaultNew( Name name ) {
 	return _TrilinearElementType_New( sizeof(TrilinearElementType), TrilinearElementType_Type, _TrilinearElementType_Delete,
-		_TrilinearElementType_Print, NULL, TrilinearElementType_DefaultNew, _TrilinearElementType_Construct,
+		_TrilinearElementType_Print, NULL, TrilinearElementType_DefaultNew, _TrilinearElementType_AssignFromXML,
 		_TrilinearElementType_Build, _TrilinearElementType_Initialise, _TrilinearElementType_Execute, _TrilinearElementType_Destroy,
 		name, False, _TrilinearElementType_SF_allNodes, 
 		_TrilinearElementType_SF_allLocalDerivs_allNodes, _ElementType_ConvertGlobalCoordToElLocal,
@@ -66,7 +66,7 @@ void* TrilinearElementType_DefaultNew( Name name ) {
 
 TrilinearElementType* TrilinearElementType_New( Name name ) {
 	return _TrilinearElementType_New( sizeof(TrilinearElementType), TrilinearElementType_Type, _TrilinearElementType_Delete,
-		_TrilinearElementType_Print, NULL, TrilinearElementType_DefaultNew, _TrilinearElementType_Construct,
+		_TrilinearElementType_Print, NULL, TrilinearElementType_DefaultNew, _TrilinearElementType_AssignFromXML,
 		_TrilinearElementType_Build, _TrilinearElementType_Initialise, _TrilinearElementType_Execute, _TrilinearElementType_Destroy,
 		name, True, _TrilinearElementType_SF_allNodes, 
 		_TrilinearElementType_SF_allLocalDerivs_allNodes, _ElementType_ConvertGlobalCoordToElLocal,
@@ -173,7 +173,7 @@ void _TrilinearElementType_Print( void* elementType, Stream* stream ) {
 	/* TrilinearElementType info */
 }
 
-void _TrilinearElementType_Construct( void* elementType, Stg_ComponentFactory *cf, void* data ){
+void _TrilinearElementType_AssignFromXML( void* elementType, Stg_ComponentFactory *cf, void* data ){
 	
 }
 	

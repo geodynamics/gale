@@ -138,7 +138,7 @@
 	
 	void _SolutionVector_Build( void* solutionVector, void* data );
 	
-	void _SolutionVector_Construct( void* solutionVector, Stg_ComponentFactory* cf, void* data );
+	void _SolutionVector_AssignFromXML( void* solutionVector, Stg_ComponentFactory* cf, void* data );
 	
 	/* Initialisation implementation */
 	void _SolutionVector_Initialise( void* solutionVector, void* data );

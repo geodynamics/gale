@@ -77,7 +77,7 @@
 
 	void _Biquadratic_Delete( void* elementType );
 	void _Biquadratic_Print( void* elementType, Stream* stream );
-	void _Biquadratic_Construct( void* elementType, Stg_ComponentFactory* cf, void* data );
+	void _Biquadratic_AssignFromXML( void* elementType, Stg_ComponentFactory* cf, void* data );
 	void _Biquadratic_Build( void* elementType, void* data );
 	void _Biquadratic_Initialise( void* elementType, void* data );
 	void _Biquadratic_Execute( void* elementType, void* data );

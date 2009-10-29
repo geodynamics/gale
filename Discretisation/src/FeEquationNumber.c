@@ -167,7 +167,7 @@ void* FeEquationNumber_DefaultNew( Name name )
    return _FeEquationNumber_New( sizeof(FeEquationNumber), FeEquationNumber_Type, _FeEquationNumber_Delete,
                                  _FeEquationNumber_Print, _FeEquationNumber_Copy,
                                  (Stg_Component_DefaultConstructorFunction*)FeEquationNumber_DefaultNew,
-                                 _FeEquationNumber_Construct, (Stg_Component_BuildFunction*)_FeEquationNumber_Build, 
+                                 _FeEquationNumber_AssignFromXML, (Stg_Component_BuildFunction*)_FeEquationNumber_Build, 
                                  (Stg_Component_InitialiseFunction*)_FeEquationNumber_Initialise,
                                  _FeEquationNumber_Execute, _FeEquationNumber_Destroy, name, False, NULL, NULL, NULL, NULL );
 }
@@ -182,7 +182,7 @@ FeEquationNumber* FeEquationNumber_New(
    return _FeEquationNumber_New( sizeof(FeEquationNumber), FeEquationNumber_Type, _FeEquationNumber_Delete,
                                  _FeEquationNumber_Print, _FeEquationNumber_Copy, 
                                  (Stg_Component_DefaultConstructorFunction*)FeEquationNumber_DefaultNew,
-                                 _FeEquationNumber_Construct, (Stg_Component_BuildFunction*)_FeEquationNumber_Build, 
+                                 _FeEquationNumber_AssignFromXML, (Stg_Component_BuildFunction*)_FeEquationNumber_Build, 
                                  (Stg_Component_InitialiseFunction*)_FeEquationNumber_Initialise,
                                  _FeEquationNumber_Execute, _FeEquationNumber_Destroy, name, True, mesh, dofLayout, bcs, linkedDofInfo );
 }
@@ -207,7 +207,7 @@ void FeEquationNumber_Init(
    self->_print = _FeEquationNumber_Print;
    self->_copy = _FeEquationNumber_Copy;
    self->_defaultConstructor = (Stg_Component_DefaultConstructorFunction*)FeEquationNumber_DefaultNew;
-   self->_construct = _FeEquationNumber_Construct;
+   self->_construct = _FeEquationNumber_AssignFromXML;
    self->_build = (Stg_Component_BuildFunction*)_FeEquationNumber_Build;
    self->_initialise = (Stg_Component_InitialiseFunction*)_FeEquationNumber_Initialise;
    self->_execute = _FeEquationNumber_Execute;
@@ -306,7 +306,7 @@ void _FeEquationNumber_Init(
 
 }
 
-void _FeEquationNumber_Construct( void* feEquationNumber, Stg_ComponentFactory *cf, void* data ){
+void _FeEquationNumber_AssignFromXML( void* feEquationNumber, Stg_ComponentFactory *cf, void* data ){
 	FeEquationNumber* self = (FeEquationNumber*) feEquationNumber;
 	
 	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );

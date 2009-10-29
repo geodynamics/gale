@@ -57,7 +57,7 @@ Triquadratic* Triquadratic_New( Name name ) {
 				  _Triquadratic_Print,
 				  NULL,
 				  (void* (*)(Name))_Triquadratic_New,
-				  _Triquadratic_Construct,
+				  _Triquadratic_AssignFromXML,
 				  _Triquadratic_Build,
 				  _Triquadratic_Initialise,
 				  _Triquadratic_Execute,
@@ -116,7 +116,7 @@ void _Triquadratic_Print( void* elementType, Stream* stream ) {
 	_ElementType_Print( self, stream );
 }
 
-void _Triquadratic_Construct( void* elementType, Stg_ComponentFactory* cf, void* data ) {
+void _Triquadratic_AssignFromXML( void* elementType, Stg_ComponentFactory* cf, void* data ) {
 }
 
 void _Triquadratic_Build( void* elementType, void* data ) {

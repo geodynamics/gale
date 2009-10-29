@@ -54,7 +54,7 @@ RegularTrilinear* RegularTrilinear_New( Name name ) {
 				      _RegularTrilinear_Print, 
 				      NULL, 
 				      (void* (*)(Name))_RegularTrilinear_New, 
-				      _RegularTrilinear_Construct, 
+				      _RegularTrilinear_AssignFromXML, 
 				      _RegularTrilinear_Build, 
 				      _RegularTrilinear_Initialise, 
 				      _RegularTrilinear_Execute, 
@@ -112,7 +112,7 @@ void _RegularTrilinear_Print( void* elementType, Stream* stream ) {
 	_TrilinearElementType_Print( self, stream );
 }
 
-void _RegularTrilinear_Construct( void* elementType, Stg_ComponentFactory* cf, void* data ) {
+void _RegularTrilinear_AssignFromXML( void* elementType, Stg_ComponentFactory* cf, void* data ) {
 }
 
 void _RegularTrilinear_Build( void* elementType, void* data ) {

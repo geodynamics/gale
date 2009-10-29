@@ -80,7 +80,7 @@ void _DivergenceMatrixTerm_Delete( void* matrixTerm );
 void _DivergenceMatrixTerm_Print( void* matrixTerm, Stream* stream );
 
 void* _DivergenceMatrixTerm_DefaultNew( Name name ) ;
-void _DivergenceMatrixTerm_Construct( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) ;
+void _DivergenceMatrixTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) ;
 void _DivergenceMatrixTerm_Build( void* matrixTerm, void* data ) ;
 void _DivergenceMatrixTerm_Initialise( void* matrixTerm, void* data ) ;
 void _DivergenceMatrixTerm_Execute( void* matrixTerm, void* data ) ;

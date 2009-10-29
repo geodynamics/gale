@@ -54,7 +54,7 @@ Inner2DGenerator* Inner2DGenerator_New( Name name ) {
 				 _Inner2DGenerator_Print, 
 				 NULL, 
 				 (void* (*)(Name))_Inner2DGenerator_New, 
-				 _Inner2DGenerator_Construct, 
+				 _Inner2DGenerator_AssignFromXML, 
 				 _Inner2DGenerator_Build, 
 				 _Inner2DGenerator_Initialise, 
 				 _Inner2DGenerator_Execute, 
@@ -110,14 +110,14 @@ void _Inner2DGenerator_Print( void* generator, Stream* stream ) {
 	_MeshGenerator_Print( self, stream );
 }
 
-void _Inner2DGenerator_Construct( void* generator, Stg_ComponentFactory* cf, void* data ) {
+void _Inner2DGenerator_AssignFromXML( void* generator, Stg_ComponentFactory* cf, void* data ) {
 	Inner2DGenerator*	self = (Inner2DGenerator*)generator;
 	Mesh*		elMesh;
 
 	assert( self );
 	assert( cf );
 
-	_MeshGenerator_Construct( self, cf, data );
+	_MeshGenerator_AssignFromXML( self, cf, data );
 
 	elMesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "elementMesh", Mesh, True, data );
 	Inner2DGenerator_SetElementMesh( self, elMesh );

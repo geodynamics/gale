@@ -50,7 +50,7 @@
 
 const Type StgFEM_FeVariableList_Type = "StgFEM_FeVariableList";
 
-void _StgFEM_FeVariableList_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _StgFEM_FeVariableList_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
         StgFEM_FeVariableList*        self         = (StgFEM_FeVariableList*) component;
         AbstractContext*                context;
         Dictionary*                     dictionary;
@@ -97,7 +97,7 @@ void* _StgFEM_FeVariableList_DefaultNew( Name name ) {
                         _Codelet_Print,
                         _Codelet_Copy,
                         _StgFEM_FeVariableList_DefaultNew,
-                        _StgFEM_FeVariableList_Construct,
+                        _StgFEM_FeVariableList_AssignFromXML,
                         _Codelet_Build,
                         _Codelet_Initialise,
                         _Codelet_Execute,

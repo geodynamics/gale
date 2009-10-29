@@ -198,7 +198,7 @@
 	/** Print implementation */
 	void _FeEquationNumber_Print( void* feEquationNumber, Stream* stream );
 	
-	void _FeEquationNumber_Construct( void* feEquationNumber, Stg_ComponentFactory *cf, void* data );
+	void _FeEquationNumber_AssignFromXML( void* feEquationNumber, Stg_ComponentFactory *cf, void* data );
 	
 	void _FeEquationNumber_Execute( void* feEquationNumber, void *data );
 	
