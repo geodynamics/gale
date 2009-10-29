@@ -303,7 +303,7 @@ void Stg_ComponentFactory_ConstructComponents( Stg_ComponentFactory* self, void*
 			/* Grab component from register */
 			component = LiveComponentRegister_At( self->LCRegister, component_I );
 			if( component && !component->isConstructed ){
-				Stg_Component_Construct( component, self, data, True );
+				Stg_Component_AssignFromXML( component, self, data, True );
 			}
 		}
 		Stream_UnIndent( stream );
@@ -654,7 +654,7 @@ Stg_Component* _Stg_ComponentFactory_ConstructByName( void* cf, Name componentNa
 		if ( !component->isConstructed ) {
 			Journal_Printf( stream, "%s has not been constructed yet. Constructing now.\n", componentName );
 			Stream_Indent( stream );
-			Stg_Component_Construct( component, self, data, True );
+			Stg_Component_AssignFromXML( component, self, data, True );
 			Stream_UnIndent( stream );
 		}
 
@@ -765,7 +765,7 @@ Stg_Component* _Stg_ComponentFactory_ConstructByNameWithKeyFallback(
 		if ( !component->isConstructed ) {
 			Journal_Printf( stream, "%s has not been constructed yet. Constructing now.\n", componentTrialName );
 			Stream_Indent( stream );
-			Stg_Component_Construct( component, self, data, True );
+			Stg_Component_AssignFromXML( component, self, data, True );
 			Stream_UnIndent( stream );
 		}
 	}

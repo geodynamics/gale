@@ -480,7 +480,7 @@ void ModulesManager_ConstructModules( void* modulesManager, Stg_ComponentFactory
 	int i;
 
 	for( i = 0; i < self->codelets->count; ++i ) {
-		Stg_Component_Construct( self->codelets->data[i], cf, data, False );
+		Stg_Component_AssignFromXML( self->codelets->data[i], cf, data, False );
 	}
 }
 
@@ -494,7 +494,7 @@ Bool ModulesManager_ConstructModule( void* modulesManager, Name moduleName, Stg_
 	if( codelet == NULL )
 		return False;
 	else
-		Stg_Component_Construct( codelet, cf, data, False );
+		Stg_Component_AssignFromXML( codelet, cf, data, False );
 
 	return True;
 }

@@ -117,7 +117,7 @@ void _DynamicVC_Print( void* vc, Stream* stream );
 
 void* _DynamicVC_Copy( void* vc, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 
-void _DynamicVC_Construct( void* vc, Stg_ComponentFactory* cf, void* data );
+void _DynamicVC_AssignFromXML( void* vc, Stg_ComponentFactory* cf, void* data );
 
 void _DynamicVC_Build( void* vc, void* data );
 

@@ -58,8 +58,8 @@
 #endif
 
 /* AbstractContext entry point names */
-Type AbstractContext_EP_Construct =		        "Context_Construct";
-Type AbstractContext_EP_ConstructExtensions = 	"Context_ConstructExtensions";
+Type AbstractContext_EP_AssignFromXML =		        "Context_Construct";
+Type AbstractContext_EP_AssignFromXMLExtensions = 	"Context_ConstructExtensions";
 Type AbstractContext_EP_Build = 		        "Context_Build";
 Type AbstractContext_EP_Initialise =	     	"Context_Initialise";
 Type AbstractContext_EP_Execute =		        "Context_Execute";
@@ -187,11 +187,11 @@ void _AbstractContext_Init( AbstractContext* self ) {
 	/* Build the entryPoint table */
 	self->entryPoint_Register = EntryPoint_Register_New(); 
 	/* For the construct EP, override the run function such that the context/ptrToContext remain in sync in the loop. */
-	self->constructK = Context_AddEntryPoint( self, ContextEntryPoint_New( AbstractContext_EP_Construct, EntryPoint_2VoidPtr_CastType ) );
-	AbstractContext_GetEntryPoint( self, AbstractContext_EP_Construct )->_getRun = _AbstractContext_Construct_EP_GetRun;
-	AbstractContext_GetEntryPoint( self, AbstractContext_EP_Construct )->run = EntryPoint_GetRun( AbstractContext_GetEntryPoint( self, AbstractContext_EP_Construct ) );
+	self->constructK = Context_AddEntryPoint( self, ContextEntryPoint_New( AbstractContext_EP_AssignFromXML, EntryPoint_2VoidPtr_CastType ) );
+	AbstractContext_GetEntryPoint( self, AbstractContext_EP_AssignFromXML )->_getRun = _AbstractContext_Construct_EP_GetRun;
+	AbstractContext_GetEntryPoint( self, AbstractContext_EP_AssignFromXML )->run = EntryPoint_GetRun( AbstractContext_GetEntryPoint( self, AbstractContext_EP_AssignFromXML ) );
 
-	self->constructExtensionsK = Context_AddEntryPoint( self, ContextEntryPoint_New( AbstractContext_EP_ConstructExtensions, EntryPoint_VoidPtr_CastType ) );
+	self->constructExtensionsK = Context_AddEntryPoint( self, ContextEntryPoint_New( AbstractContext_EP_AssignFromXMLExtensions, EntryPoint_VoidPtr_CastType ) );
 	self->buildK = Context_AddEntryPoint( self, ContextEntryPoint_New( AbstractContext_EP_Build, EntryPoint_VoidPtr_CastType ) );
 	self->initialiseK = Context_AddEntryPoint( self, ContextEntryPoint_New( AbstractContext_EP_Initialise, EntryPoint_VoidPtr_CastType ) );
 	self->executeK = Context_AddEntryPoint( self, ContextEntryPoint_New( AbstractContext_EP_Execute, EntryPoint_VoidPtr_CastType ) );
@@ -214,7 +214,7 @@ void _AbstractContext_Init( AbstractContext* self ) {
 	
 	/* add initial hooks */
 	EntryPoint_Append(
-		AbstractContext_GetEntryPoint( self, AbstractContext_EP_Construct ),
+		AbstractContext_GetEntryPoint( self, AbstractContext_EP_AssignFromXML ),
 		"default",
 		(Func_Ptr)_AbstractContext_Construct_Hook,
 		AbstractContext_Type );
@@ -374,7 +374,7 @@ void _AbstractContext_Construct_EP_Run( void* entryPoint, void* data0, void* dat
 /* Component stuff ****************************************************************************************************************/
 
 
-void _AbstractContext_Construct( void* context, Stg_ComponentFactory* cf, void* data ) {
+void _AbstractContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, void* data ) {
 	AbstractContext* 	self = (AbstractContext*)context;
 	Dictionary_Entry_Value* dictEntryVal = NULL;
 	double			startTime, stopTime;

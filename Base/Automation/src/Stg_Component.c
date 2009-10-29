@@ -187,7 +187,7 @@ void* _Stg_Component_Copy( void* component, void* dest, Bool deep, Name nameExt,
 	return newComponent;
 }
 
-void Stg_Component_Construct( void* component, Stg_ComponentFactory* cf, void* data, Bool force ) {
+void Stg_Component_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data, Bool force ) {
 	Stg_Component* self   = (Stg_Component*)component;
 
 	assert( self );

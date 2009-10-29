@@ -81,7 +81,7 @@ CompositeVC* CompositeVC_New(
 		_CompositeVC_Print,
 		_CompositeVC_Copy,
 		(Stg_Component_DefaultConstructorFunction*)CompositeVC_DefaultNew,
-		_CompositeVC_Construct,
+		_CompositeVC_AssignFromXML,
 		_CompositeVC_Build,
 		_VariableCondition_Initialise,
 		_VariableCondition_Execute,
@@ -113,7 +113,7 @@ CompositeVC* CompositeVC_DefaultNew( Name name )
 		_CompositeVC_Print,
 		_CompositeVC_Copy,
 		(Stg_Component_DefaultConstructorFunction*)CompositeVC_DefaultNew,
-		_CompositeVC_Construct,
+		_CompositeVC_AssignFromXML,
 		_CompositeVC_Build,
 		_VariableCondition_Initialise,
 		_VariableCondition_Execute,
@@ -341,7 +341,7 @@ void _CompositeVC_ReadDictionary( void* compositeVC, void* dictionary ) {
 	}
 }
 
-void _CompositeVC_Construct( void* compositeVC, Stg_ComponentFactory* cf, void* data ) {
+void _CompositeVC_AssignFromXML( void* compositeVC, Stg_ComponentFactory* cf, void* data ) {
 	CompositeVC* self                      = (CompositeVC*)compositeVC;
 	void*        variableRegister          = NULL;
 	void*        conditionFunctionRegister = NULL;

@@ -324,7 +324,7 @@ void DocumentationComponentFactory_DocumentType( void* cf, Name typeName ) {
 
 	Journal_Printf( stream, "Parent - %s\n", GetParent( type ) );
 
-	Stg_Component_Construct( component, (Stg_ComponentFactory*)self, 0 /* dummy */, True );
+	Stg_Component_AssignFromXML( component, (Stg_ComponentFactory*)self, 0 /* dummy */, True );
 
 	Stg_Class_Delete( component );
 	Stream_UnIndent( self->infoStream );

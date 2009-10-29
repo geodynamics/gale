@@ -59,8 +59,8 @@
 	} CheckpointFileFormat;
 	
 	/* AbstractContext entry point names */
-	extern Type AbstractContext_EP_Construct;
-	extern Type AbstractContext_EP_ConstructExtensions;
+	extern Type AbstractContext_EP_AssignFromXML;
+	extern Type AbstractContext_EP_AssignFromXMLExtensions;
 	extern Type AbstractContext_EP_Build;
 	extern Type AbstractContext_EP_Initialise;
 	extern Type AbstractContext_EP_Execute;
@@ -214,7 +214,7 @@
 	
 	
 	/* Construct the context ... connect and validate component connections, and initialise non-bulk internal values */
-	void _AbstractContext_Construct( void* context, Stg_ComponentFactory* cf, void* data );
+	void _AbstractContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, void* data );
 	
 	/* Build the context ... allocates memory (builds arrays) */
 	void _AbstractContext_Build( void* context, void* data );

@@ -51,7 +51,7 @@ void LocalPlugin1_Function( void* context ) {
 	printf( "LocalPlugin2 value: %d\n", *ext2 );
 }
 
-void _LocalPlugin1_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _LocalPlugin1_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	MockContext* context = (MockContext*)Stg_ComponentFactory_ConstructByName(cf, "context", Stg_Component, True, data );
 	
 	EP_Append( context->ep, LocalPlugin1_Function );
@@ -61,7 +61,7 @@ void* _LocalPlugin1_DefaultNew( Name name ) {
 	return Codelet_New(
 			LocalPlugin1_Type,
 			_LocalPlugin1_DefaultNew,
-			_LocalPlugin1_Construct,
+			_LocalPlugin1_AssignFromXML,
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,

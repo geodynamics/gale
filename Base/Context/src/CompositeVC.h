@@ -152,7 +152,7 @@
 	
 	void				_CompositeVC_Build( void* compositeVC, void* data );
 	
-	void				_CompositeVC_Construct( void* compositeVC, Stg_ComponentFactory* cf, void* data );
+	void				_CompositeVC_AssignFromXML( void* compositeVC, Stg_ComponentFactory* cf, void* data );
 	
 	void				_CompositeVC_ReadDictionary( void* compositeVC, void* dictionary );
 	

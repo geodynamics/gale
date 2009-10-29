@@ -290,7 +290,7 @@
 	/** Execution implementation */
 	void _Variable_Execute( void* variable, void* data );
 	
-	void _Variable_Construct( void* variable, Stg_ComponentFactory* cf, void* data );
+	void _Variable_AssignFromXML( void* variable, Stg_ComponentFactory* cf, void* data );
 	
 	void _Variable_Destroy( void* variable, void* data );
 	

@@ -202,7 +202,7 @@ void AbstractContextSuite_Setup( AbstractContextSuiteData* data ) {
       0, 
       CommWorld, 
       data->dict );
-   _AbstractContext_Construct( data->ctx, cf, NULL );
+   _AbstractContext_AssignFromXML( data->ctx, cf, NULL );
 
    Stream_Enable( data->ctx->info, False );
 }
@@ -333,7 +333,7 @@ void AbstractContextSuite_TestRestartFromCheckpoint( AbstractContextSuiteData* d
       0, 
       CommWorld, 
       data->dict );
-   _AbstractContext_Construct( data->ctx, cf, NULL );
+   _AbstractContext_AssignFromXML( data->ctx, cf, NULL );
    Stream_Enable( data->ctx->info, False );
 
    /* add hooks to existing entry points */

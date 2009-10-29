@@ -205,7 +205,7 @@
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Build functions
 	*/
-	void				_VariableCondition_Construct( void* variableCondition, Stg_ComponentFactory* cf, void* d );
+	void				_VariableCondition_AssignFromXML( void* variableCondition, Stg_ComponentFactory* cf, void* d );
 	void				_VariableCondition_Build( void* variableCondition, void* data );
 	void				_VariableCondition_Initialise( void* variableCondition, void* data );
 	void				_VariableCondition_Execute( void* variableCondition, void* data );

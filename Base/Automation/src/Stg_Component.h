@@ -143,7 +143,7 @@
 		(Stg_Component*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	
 	/** Contruct the component. Configure/setup the component. */
-	void Stg_Component_Construct( void* component, Stg_ComponentFactory* cf, void* data, Bool force );
+	void Stg_Component_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data, Bool force );
 	
 	/** Build the component: Take the configuration and instantiate the component (do all main mallocs, etc). */
 	void Stg_Component_Build( void* component, void* data, Bool force );

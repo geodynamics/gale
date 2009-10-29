@@ -338,7 +338,7 @@ void* _VariableCondition_Copy( void* variableCondition, void* dest, Bool deep, N
 ** Build functions
 */
 
-void _VariableCondition_Construct( void* variableCondition, Stg_ComponentFactory* cf, void* data ) {
+void _VariableCondition_AssignFromXML( void* variableCondition, Stg_ComponentFactory* cf, void* data ) {
    VariableCondition* self = (VariableCondition*)variableCondition;
 }
 

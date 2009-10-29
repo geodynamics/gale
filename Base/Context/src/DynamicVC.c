@@ -75,7 +75,7 @@ DynamicVC* DynamicVC_New( Name name,
 			       _DynamicVC_Print, 
 			       _DynamicVC_Copy,
 			       (Stg_Component_DefaultConstructorFunction*)DynamicVC_DefaultNew,
-			       _DynamicVC_Construct,
+			       _DynamicVC_AssignFromXML,
 			       _DynamicVC_Build,
 			       _DynamicVC_Initialise,
 			       _DynamicVC_Execute,
@@ -104,7 +104,7 @@ DynamicVC* DynamicVC_DefaultNew( Name name ) {
 					   _DynamicVC_Print, 
 					   _DynamicVC_Copy,
 					   (Stg_Component_DefaultConstructorFunction*)DynamicVC_DefaultNew,
-					   _VariableCondition_Construct,
+					   _VariableCondition_AssignFromXML,
 					   _VariableCondition_Build,
 					   _VariableCondition_Initialise,
 					   _VariableCondition_Execute,
@@ -242,7 +242,7 @@ void _DynamicVC_Init( void* vc ) {
 ** General virtual functions
 */
 
-void _DynamicVC_Construct( void* vc, Stg_ComponentFactory* cf, void* data ) {
+void _DynamicVC_AssignFromXML( void* vc, Stg_ComponentFactory* cf, void* data ) {
 }
 
 void _DynamicVC_Build( void* vc, void* data ) {

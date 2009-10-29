@@ -52,7 +52,7 @@
 	
 	extern char Context_Python_Construct__name__[];
 	extern char Context_Python_Construct__doc__[];
-	PyObject* Context_Python_Construct( PyObject* self, PyObject* args );
+	PyObject* Context_Python_AssignFromXML( PyObject* self, PyObject* args );
 	
 	extern char Context_Python_Build__name__[];
 	extern char Context_Python_Build__doc__[];

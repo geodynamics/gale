@@ -45,7 +45,7 @@ const Type MockContext_Type = "MockContext";
 void* _MockContext_DefaultNew( Name name ) {
 	return NULL;
 }
-void _MockContext_Construct( void* c, Stg_ComponentFactory* cf, void* data ) {
+void _MockContext_AssignFromXML( void* c, Stg_ComponentFactory* cf, void* data ) {
 
 }
 void _MockContext_Build( void* c, void* data ) {
@@ -71,7 +71,7 @@ MockContext* MockContext_New( Dictionary* dictionary ) {
 		NULL,
 		NULL,
 		_MockContext_DefaultNew,
-		_MockContext_Construct,
+		_MockContext_AssignFromXML,
 		_MockContext_Build,
 		_MockContext_Initialise,
 		_MockContext_Execute,

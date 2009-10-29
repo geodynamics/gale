@@ -76,7 +76,7 @@ void* Stg_ComponentA_NewDefault( Name name );
 void Stg_ComponentA_Delete( void* class );
 void Stg_ComponentA_Print( void* class, Stream* s );
 void* Stg_ComponentA_Copy( void* self, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
-void Stg_ComponentA_Construct( void* component, Stg_ComponentFactory* cf, void* data );
+void Stg_ComponentA_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data );
 void Stg_ComponentA_Build( void* component, void* data );
 void Stg_ComponentA_Initialise( void* component, void* data );
 void Stg_ComponentA_Execute( void* component, void* data );
@@ -91,7 +91,7 @@ void* Stg_ComponentA_NewDefault( Name name )
 		Stg_ComponentA_Print,
 		Stg_ComponentA_Copy,
 		Stg_ComponentA_NewDefault,
-		Stg_ComponentA_Construct,
+		Stg_ComponentA_AssignFromXML,
 		Stg_ComponentA_Build,
 		Stg_ComponentA_Initialise,
 		Stg_ComponentA_Execute,
@@ -128,7 +128,7 @@ void* Stg_ComponentA_Copy( void* class, void* dest, Bool deep, Name nameExt, Ptr
 	
 	return newCopy;
 }
-void Stg_ComponentA_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void Stg_ComponentA_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	Stg_ComponentA* self = (Stg_ComponentA*)component;
 
 	self->b =  Stg_ComponentFactory_ConstructByName(  cf,  "b", Stg_ComponentB,  True, data  ) ;
@@ -161,7 +161,7 @@ void* Stg_ComponentB_NewDefault( Name name );
 void Stg_ComponentB_Delete( void* class );
 void Stg_ComponentB_Print( void* class, Stream* s );
 void* Stg_ComponentB_Copy( void* self, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
-void Stg_ComponentB_Construct( void* component, Stg_ComponentFactory* cf, void* data );
+void Stg_ComponentB_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data );
 void Stg_ComponentB_Build( void* component, void* data );
 void Stg_ComponentB_Initialise( void* component, void* data );
 void Stg_ComponentB_Execute( void* component, void* data );
@@ -176,7 +176,7 @@ void* Stg_ComponentB_NewDefault( Name name )
 		Stg_ComponentB_Print,
 		Stg_ComponentB_Copy,
 		Stg_ComponentB_NewDefault,
-		Stg_ComponentB_Construct,
+		Stg_ComponentB_AssignFromXML,
 		Stg_ComponentB_Build,
 		Stg_ComponentB_Initialise,
 		Stg_ComponentB_Execute,
@@ -205,7 +205,7 @@ void* Stg_ComponentB_Copy( void* class, void* dest, Bool deep, Name nameExt, Ptr
 	
 	return newCopy;
 }
-void Stg_ComponentB_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void Stg_ComponentB_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 }
 void Stg_ComponentB_Build( void* component, void* data ) {
 }
@@ -230,7 +230,7 @@ void* Stg_ComponentC_NewDefault( Name name );
 void Stg_ComponentC_Delete( void* class );
 void Stg_ComponentC_Print( void* class, Stream* s );
 void* Stg_ComponentC_Copy( void* self, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
-void Stg_ComponentC_Construct( void* component, Stg_ComponentFactory* cf, void* data );
+void Stg_ComponentC_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data );
 void Stg_ComponentC_Build( void* component, void* data );
 void Stg_ComponentC_Initialise( void* component, void* data );
 void Stg_ComponentC_Execute( void* component, void* data );
@@ -245,7 +245,7 @@ void* Stg_ComponentC_NewDefault( Name name )
 		Stg_ComponentC_Print,
 		Stg_ComponentC_Copy,
 		Stg_ComponentC_NewDefault,
-		Stg_ComponentC_Construct,
+		Stg_ComponentC_AssignFromXML,
 		Stg_ComponentC_Build,
 		Stg_ComponentC_Initialise,
 		Stg_ComponentC_Execute,
@@ -279,7 +279,7 @@ void* Stg_ComponentC_Copy( void* class, void* dest, Bool deep, Name nameExt, Ptr
 
 	return newCopy;
 }
-void Stg_ComponentC_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void Stg_ComponentC_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	Stg_ComponentC* self = (Stg_ComponentC*)component;
 
 	self->b =  Stg_ComponentFactory_ConstructByName(  cf,  "b", Stg_ComponentB,  True, data  ) ;

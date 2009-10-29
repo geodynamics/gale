@@ -79,7 +79,7 @@ Variable* Variable_New(
 		_Variable_Print, 
 		_Variable_Copy,
 		(Stg_Component_DefaultConstructorFunction*)Variable_DefaultNew,
-		_Variable_Construct,
+		_Variable_AssignFromXML,
 		_Variable_Build, 
 		_Variable_Initialise, 
 		_Variable_Execute, 
@@ -111,7 +111,7 @@ Variable* Variable_DefaultNew( Name name )
 		_Variable_Print, 
 		_Variable_Copy,
 		(Stg_Component_DefaultConstructorFunction*)Variable_DefaultNew,
-		_Variable_Construct,
+		_Variable_AssignFromXML,
 		_Variable_Build, 
 		_Variable_Initialise, 
 		_Variable_Execute, 
@@ -154,7 +154,7 @@ Variable* Variable_NewScalar(
 		_Variable_Print, 
 		_Variable_Copy,
 		(Stg_Component_DefaultConstructorFunction*)Variable_DefaultNew,
-		_Variable_Construct,
+		_Variable_AssignFromXML,
 		_Variable_Build, 
 		_Variable_Initialise, 
 		_Variable_Execute,
@@ -211,7 +211,7 @@ Variable* Variable_NewVector(
 		_Variable_Print, 
 		_Variable_Copy, 
 		(Stg_Component_DefaultConstructorFunction*)Variable_DefaultNew,
-		_Variable_Construct,
+		_Variable_AssignFromXML,
 		_Variable_Build, 
 		_Variable_Initialise, 
 		_Variable_Execute, 
@@ -259,7 +259,7 @@ Variable* Variable_NewVector2(
 		_Variable_Print, 
 		_Variable_Copy, 
 		(void*)Variable_DefaultNew,
-		_Variable_Construct,
+		_Variable_AssignFromXML,
 		_Variable_Build, 
 		_Variable_Initialise, 
 		_Variable_Execute, 
@@ -933,7 +933,7 @@ void _Variable_Initialise( void* variable, void* data ) {
 void _Variable_Execute( void* variable, void* data ) {
 }
 
-void _Variable_Construct( void* variable, Stg_ComponentFactory* cf, void* data ) {
+void _Variable_AssignFromXML( void* variable, Stg_ComponentFactory* cf, void* data ) {
 	Variable*           self              = (Variable*) variable;
 	SizeT			    dataOffsets[]     = { 0 };
 	Variable_DataType	dataTypes[]       = { 0 };		/* Init value later */
