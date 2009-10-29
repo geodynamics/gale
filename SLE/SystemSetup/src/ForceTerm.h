@@ -103,12 +103,7 @@
 		ForceVector*                              forceVector,
 		Swarm*                                    integrationSwarm,
 		Stg_Component*                            extraInfo );
-	void ForceTerm_InitAll(
-		void*                                     forceTerm,
-		ForceVector*                              forceVector,
-		Swarm*                                    integrationSwarm,
-		Stg_Component*                            extraInfo );
-	
+
 	/* 'Stg_Class' Virtual Functions */
 	void _ForceTerm_Delete( void* forceTerm );
 	void _ForceTerm_Print( void* forceTerm, Stream* stream );

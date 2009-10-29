@@ -75,11 +75,6 @@
 		ForceTerm_AssembleElementFunction*                  _assembleElement,
 		Name                                                name );
 	
-	void LumpedMassMatrixForceTerm_InitAll( 
-		void*                                               forceTerm,
-		ForceVector*                                        forceVector,
-		Swarm*                                              integrationSwarm );
-
 	void _LumpedMassMatrixForceTerm_Delete( void* residual );
 	void _LumpedMassMatrixForceTerm_Print( void* residual, Stream* stream );
 

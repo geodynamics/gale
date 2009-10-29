@@ -118,15 +118,9 @@ AdvDiffResidualForceTerm* AdvDiffResidualForceTerm_New(
 {
 	AdvDiffResidualForceTerm* self = (AdvDiffResidualForceTerm*) _AdvDiffResidualForceTerm_DefaultNew( name );
 
-	AdvDiffResidualForceTerm_InitAll( 
-			self,
-			forceVector,
-			integrationSwarm,
-			sle,
-			velocityField,
-			diffusivityVariable,
-			defaultDiffusivity,
-			upwindFuncType );
+	self->isConstructed = True;
+	_ForceTerm_Init( self, forceVector, integrationSwarm, sle );
+	_AdvDiffResidualForceTerm_Init( self, velocityField, diffusivityVariable, defaultDiffusivity, upwindFuncType );
 
 	return self;
 }
@@ -184,22 +178,6 @@ void _AdvDiffResidualForceTerm_Init(
 	self->diffusivityVariable = diffusivityVariable;
 	self->defaultDiffusivity  = defaultDiffusivity;
 	self->upwindParamType    = upwindFuncType;
-}
-
-void AdvDiffResidualForceTerm_InitAll( 
-		void*                                               residual,
-		ForceVector*                                        forceVector,
-		Swarm*                                              integrationSwarm,
-		Stg_Component*                                      sle, 
-		FeVariable*                                         velocityField,
-		Variable*                                           diffusivityVariable,
-		double                                              defaultDiffusivity,
-		AdvDiffResidualForceTerm_UpwindParamFuncType        upwindFuncType )
-{
-	AdvDiffResidualForceTerm* self = (AdvDiffResidualForceTerm*) residual;
-
-	ForceTerm_InitAll( self, forceVector, integrationSwarm, sle );
-	_AdvDiffResidualForceTerm_Init( self, velocityField, diffusivityVariable, defaultDiffusivity, upwindFuncType );
 }
 
 void _AdvDiffResidualForceTerm_Delete( void* residual ) {

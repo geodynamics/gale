@@ -69,7 +69,7 @@ ForceTerm* ForceTerm_New(
 {
 	ForceTerm* self = (ForceTerm*) _ForceTerm_DefaultNew( name );
 
-	ForceTerm_InitAll( self, forceVector, integrationSwarm, extraInfo );
+	_ForceTerm_Init( self, forceVector, integrationSwarm, extraInfo );
 
 	return self;
 }
@@ -129,16 +129,6 @@ void _ForceTerm_Init(
 	self->integrationSwarm = integrationSwarm;	
 
 	ForceVector_AddForceTerm( forceVector, self );
-}
-
-void ForceTerm_InitAll(
-		void*                                     forceTerm,
-		ForceVector*                              forceVector,
-		Swarm*                                    integrationSwarm,
-		Stg_Component*                            extraInfo )
-{
-	ForceTerm* self = (ForceTerm*)forceTerm;
-	_ForceTerm_Init( self, forceVector, integrationSwarm, extraInfo );
 }
 
 

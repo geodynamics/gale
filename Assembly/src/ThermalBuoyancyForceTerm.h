@@ -79,13 +79,6 @@
 		ForceTerm_AssembleElementFunction*                  _assembleElement,		
 		Name                                                name );
 	
-	void ThermalBuoyancyForceTerm_InitAll( 
-		void*                                               forceTerm,
-		ForceVector*                                        forceVector,
-		Swarm*                                              integrationSwarm,
-		FeVariable*                                         temperatureField,
-		double                                              rayleighNumber );
-
 	void _ThermalBuoyancyForceTerm_Delete( void* residual );
 	void _ThermalBuoyancyForceTerm_Print( void* residual, Stream* stream );
 

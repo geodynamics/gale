@@ -101,16 +101,6 @@
 		AdvDiffResidualForceTerm_UpwindParamFunction*       _upwindParam,
 		Name                                                name );
 	
-	void AdvDiffResidualForceTerm_InitAll( 
-		void*                                               residual,
-		ForceVector*                                        forceVector,
-		Swarm*                                              integrationSwarm,
-		Stg_Component*                                      sle, 
-		FeVariable*                                         velocityField,
-		Variable*                                           diffusivityVariable,
-		double                                              defaultDiffusivity,
-		AdvDiffResidualForceTerm_UpwindParamFuncType        upwindFuncType );
-
 	void _AdvDiffResidualForceTerm_Delete( void* residual );
 	void _AdvDiffResidualForceTerm_Print( void* residual, Stream* stream );
 

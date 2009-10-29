@@ -83,13 +83,6 @@
 		ForceTerm_AssembleElementFunction*                  _assembleElement,		
 		Name                                                name );
 	
-	void PressureGradForceTerm_InitAll( 
-		void*                                               forceTerm,
-		ForceVector*                                        forceVector,
-		Swarm*                                              integrationSwarm,
-		FeVariable*                                         pressureField, 
-		FeVariable*					    gradField );
-
 	void _PressureGradForceTerm_Delete( void* forceTerm );
 	void _PressureGradForceTerm_Print( void* forceTerm, Stream* stream );
 

@@ -63,13 +63,9 @@ PressureGradForceTerm* PressureGradForceTerm_New(
 {
 	PressureGradForceTerm* self = (PressureGradForceTerm*) _PressureGradForceTerm_DefaultNew( name );
 
-	PressureGradForceTerm_InitAll( 
-			self,
-			forceVector,
-			integrationSwarm,
-			pressureField, 
-			gradField );
-
+	self->isConstructed = True;
+	_ForceTerm_Init( self, forceVector, integrationSwarm, NULL );
+	_PressureGradForceTerm_Init( self, pressureField, gradField );
 	return self;
 }
 
@@ -131,19 +127,6 @@ void _PressureGradForceTerm_Init(
 	self->forceVec = NULL;
 	self->elForceVec = NULL;
 	self->factor = 0.0;
-}
-
-void PressureGradForceTerm_InitAll( 
-	void*				forceTerm,
-	ForceVector*	forceVector,
-	Swarm*			integrationSwarm,
-	FeVariable*		pressureField, 
-	FeVariable*		gradField )
-{
-	PressureGradForceTerm* self = (PressureGradForceTerm*) forceTerm;
-
-	ForceTerm_InitAll( self, forceVector, integrationSwarm, NULL );
-	_PressureGradForceTerm_Init( self, pressureField, gradField );
 }
 
 void _PressureGradForceTerm_Delete( void* forceTerm ) {

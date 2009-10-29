@@ -62,10 +62,9 @@ LumpedMassMatrixForceTerm* LumpedMassMatrixForceTerm_New(
 {
 	LumpedMassMatrixForceTerm* self = (LumpedMassMatrixForceTerm*) _LumpedMassMatrixForceTerm_DefaultNew( name );
 
-	LumpedMassMatrixForceTerm_InitAll( 
-			self,
-			forceVector,
-			integrationSwarm );
+	self->isConstructed = True;
+	_ForceTerm_Init( self, forceVector, integrationSwarm, NULL );
+	_LumpedMassMatrixForceTerm_Init( self );
 
 	return self;
 }
@@ -111,17 +110,6 @@ LumpedMassMatrixForceTerm* _LumpedMassMatrixForceTerm_New(
 }
 
 void _LumpedMassMatrixForceTerm_Init( LumpedMassMatrixForceTerm* self ) {
-}
-
-void LumpedMassMatrixForceTerm_InitAll( 
-		void*                                               forceTerm,
-		ForceVector*                                        forceVector,
-		Swarm*                                              integrationSwarm )
-{
-	LumpedMassMatrixForceTerm* self = (LumpedMassMatrixForceTerm*) forceTerm;
-
-	ForceTerm_InitAll( self, forceVector, integrationSwarm, NULL );
-	_LumpedMassMatrixForceTerm_Init( self );
 }
 
 void _LumpedMassMatrixForceTerm_Delete( void* forceTerm ) {
