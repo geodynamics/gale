@@ -66,46 +66,12 @@ const Type IterativeWeights_Type = "IterativeWeights";
 ** Constructors
 */
 
-IterativeWeights* _IterativeWeights_New(
-    SizeT                                 _sizeOfSelf, 
-    Type                                  type,
-    Stg_Class_DeleteFunction*             _delete,
-    Stg_Class_PrintFunction*              _print,
-    Stg_Class_CopyFunction*               _copy, 
-    Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-    Stg_Component_ConstructFunction*      _construct,
-    Stg_Component_BuildFunction*          _build,
-    Stg_Component_InitialiseFunction*     _initialise,
-    Stg_Component_ExecuteFunction*        _execute,
-    Stg_Component_DestroyFunction*        _destroy,		
-    WeightsCalculator_CalculateFunction*  _calculate,
-    Name                                  name,
-    int                                   dim,
-    WeightsCalculator*                    initialWeights,
-    Iteration_Index                       maxIterations,
-    double                                tolerance,
-    double                                alpha )
-{
+IterativeWeights* _IterativeWeights_New( ITERATIVEWEIGHTS_DEFARGS ) {
     IterativeWeights* self;
 
     /* Allocate memory */
-    assert( _sizeOfSelf >= sizeof(IterativeWeights) );
-    self = (IterativeWeights*)_ConstantWeights_New( 
-        _sizeOfSelf,
-        type,
-        _delete,
-        _print,
-        _copy,
-        _defaultConstructor,
-        _construct,
-        _build,
-        _initialise,
-        _execute,
-        _destroy,		
-        _calculate,
-        name,
-        dim );
-
+    assert( sizeOfSelf >= sizeof(IterativeWeights) );
+    self = (IterativeWeights*)_ConstantWeights_New( CONSTANTWEIGHTS_PASSARGS );
 	
     /* General info */
 
@@ -182,9 +148,10 @@ void* _IterativeWeights_DefaultNew( Name name ) {
         _IterativeWeights_Build,
         _IterativeWeights_Initialise,
         _IterativeWeights_Execute,
-        _IterativeWeights_Destroy,
-        _IterativeWeights_Calculate,
+        NULL,
         name,
+        NON_GLOBAL,
+        _IterativeWeights_Calculate,
         0, NULL, 0, 0.0, 0.0);
 }
 
@@ -221,11 +188,6 @@ void _IterativeWeights_Execute( void* iterativeWeights, void* data ) {
     IterativeWeights*	self = (IterativeWeights*)iterativeWeights;
 	
     _ConstantWeights_Execute( self, data );
-}
-void _IterativeWeights_Destroy( void* iterativeWeights, void* data ) {
-    IterativeWeights*	self = (IterativeWeights*)iterativeWeights;
-	
-    _ConstantWeights_Destroy( self, data );
 }
 
 /*-------------------------------------------------------------------------------------------------------------------------

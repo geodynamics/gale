@@ -50,44 +50,12 @@ VolumeWeights* VolumeWeights_New( Name name, Dimension_Index dim, Stg_Shape* sha
     _VolumeWeights_Init( self, shape, mesh );
 }
 
-VolumeWeights* _VolumeWeights_New(
-    SizeT                                 _sizeOfSelf, 
-    Type                                  type,
-    Stg_Class_DeleteFunction*             _delete,
-    Stg_Class_PrintFunction*              _print,
-    Stg_Class_CopyFunction*               _copy, 
-    Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-    Stg_Component_ConstructFunction*      _construct,
-    Stg_Component_BuildFunction*          _build,
-    Stg_Component_InitialiseFunction*     _initialise,
-    Stg_Component_ExecuteFunction*        _execute,
-    Stg_Component_DestroyFunction*        _destroy,		
-    WeightsCalculator_CalculateFunction*  _calculate,
-    Name                                  name,
-    int dim,
-    Stg_Shape* shape, 
-    FeMesh* mesh )
-{
+VolumeWeights* _VolumeWeights_New( VOLUMEWEIGHTS_DEFARGS ) {
     VolumeWeights* self;
 	
     /* Allocate memory */
-    assert( _sizeOfSelf >= sizeof(VolumeWeights) );
-    self = (VolumeWeights*)_WeightsCalculator_New( 
-        _sizeOfSelf,
-        type,
-        _delete,
-        _print,
-        _copy,
-        _defaultConstructor,
-        _construct,
-        _build,
-        _initialise,
-        _execute,
-        _destroy,		
-        _calculate,
-        name,
-        dim );
-
+    assert( sizeOfSelf >= sizeof(VolumeWeights) );
+    self = (VolumeWeights*)_WeightsCalculator_New( WEIGHTSCALCULATOR_PASSARGS );
 	
     /* General info */
 
@@ -146,9 +114,10 @@ void* _VolumeWeights_DefaultNew( Name name ) {
         _VolumeWeights_Build,
         _VolumeWeights_Initialise,
         _VolumeWeights_Execute,
-        _VolumeWeights_Destroy,
-        _VolumeWeights_Calculate,
+        NULL,
         name,
+        NON_GLOBAL,
+        _VolumeWeights_Calculate,
         0, NULL, NULL );
 }
 
@@ -186,11 +155,6 @@ void _VolumeWeights_Execute( void* weights, void* data ) {
     VolumeWeights*	self = (VolumeWeights*)weights;
 	
     _WeightsCalculator_Execute( self, data );
-}
-void _VolumeWeights_Destroy( void* weights, void* data ) {
-    VolumeWeights*	self = (VolumeWeights*)weights;
-	
-    _WeightsCalculator_Destroy( self, data );
 }
 
 /*-------------------------------------------------------------------------------------------------------------------------

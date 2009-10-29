@@ -4,14 +4,14 @@
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
 **
-** 		* Redistributions of source code must retain the above copyright notice, 
-** 			this list of conditions and the following disclaimer.
-** 		* Redistributions in binary form must reproduce the above copyright 
-**			notice, this list of conditions and the following disclaimer in the 
-**			documentation and/or other materials provided with the distribution.
-** 		* Neither the name of the Monash University nor the names of its contributors 
-**			may be used to endorse or promote products derived from this software 
-**			without specific prior written permission.
+**              * Redistributions of source code must retain the above copyright notice, 
+**                      this list of conditions and the following disclaimer.
+**              * Redistributions in binary form must reproduce the above copyright 
+**                      notice, this list of conditions and the following disclaimer in the 
+**                      documentation and/or other materials provided with the distribution.
+**              * Neither the name of the Monash University nor the names of its contributors 
+**                      may be used to endorse or promote products derived from this software 
+**                      without specific prior written permission.
 **
 ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 ** "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, 
@@ -26,13 +26,13 @@
 **
 **
 ** Contact:
-*%		Louis Moresi - Louis.Moresi@sci.monash.edu.au
+*%              Louis Moresi - Louis.Moresi@sci.monash.edu.au
 *%
 ** Author:
 **              Mirko Velic - Mirko.Velic@sci.monash.edu.au
 **
 **  Assumptions:
-**  	 I am assuming that the xi's (local coords) on the IntegrationPoint particles
+**       I am assuming that the xi's (local coords) on the IntegrationPoint particles
 **       are precalculated somewhere and get reset based on material PIC positions each time step.
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -69,9 +69,9 @@ extern const Type DVCWeights_Type;
     int resZ;
 
 struct DVCWeights { __DVCWeights };
-	
+        
 #define DVC_INC 150
-	
+        
 struct cell{
     int p;/*particle index number*/
     int index;
@@ -128,7 +128,7 @@ struct particle2d{
     int index;
 };
 /* Private function prototypes in 3D */
-void   _DVCWeights_GetCentroids(	
+void   _DVCWeights_GetCentroids(        
     struct cell *cells,
     struct particle *pList,
     int n,
@@ -152,7 +152,7 @@ double _DVCWeights_DistanceSquared(
     double x1, double y1, double z1);
 double _DVCWeights_DistanceTest(double x0, double y0, double z0, 
                                 double x1, double y1, double z1,
-                                double x2, double y2, double z2);	
+                                double x2, double y2, double z2);       
 void   _DVCWeights_ConstructGrid(
     struct cell **cell_list, 
     int n, int m, int l,
@@ -226,24 +226,18 @@ void   _DVCWeights_Calculate3D(
 /*---------------------------------------------------------------------------------------------------------------------
 ** Constructors
 */
+
+#define DVCWEIGHTS_DEFARGS \
+    WEIGHTSCALCULATOR_DEFARGS, \
+        int *res
+
+#define DVCWEIGHTS_PASSARGS \
+    WEIGHTSCALCULATOR_PASSARGS, \
+        res
+
 DVCWeights* DVCWeights_New( Name name, Dimension_Index dim, int *res ) ;
 
-DVCWeights* _DVCWeights_New(
-    SizeT                                 _sizeOfSelf, 
-    Type                                  type,
-    Stg_Class_DeleteFunction*             _delete,
-    Stg_Class_PrintFunction*              _print,
-    Stg_Class_CopyFunction*               _copy, 
-    Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-    Stg_Component_ConstructFunction*      _construct,
-    Stg_Component_BuildFunction*          _build,
-    Stg_Component_InitialiseFunction*     _initialise,
-    Stg_Component_ExecuteFunction*        _execute,
-    Stg_Component_DestroyFunction*        _destroy,		
-    WeightsCalculator_CalculateFunction*  _calculate,
-    Name                                  name,
-    int                                   dim,
-    int*                                  res );
+DVCWeights* _DVCWeights_New( DVCWEIGHTS_DEFARGS );
 
 void _DVCWeights_Init( void* dvcWeights, int *res ) ;
 
@@ -255,7 +249,7 @@ void _DVCWeights_Print( void* dvcWeights, Stream* stream );
 #define DVCWeights_DeepCopy( self )                                     \
     (DVCWeights*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
 void* _DVCWeights_Copy( void* dvcWeights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
-	
+        
 void* _DVCWeights_DefaultNew( Name name ) ;
 
 void _DVCWeights_Construct( void* dvcWeights, Stg_ComponentFactory* cf, void* data ) ;
@@ -263,9 +257,8 @@ void _DVCWeights_Construct( void* dvcWeights, Stg_ComponentFactory* cf, void* da
 void _DVCWeights_Build( void* dvcWeights, void* data ) ;
 void _DVCWeights_Initialise( void* dvcWeights, void* data ) ;
 void _DVCWeights_Execute( void* dvcWeights, void* data );
-void _DVCWeights_Destroy( void* dvcWeights, void* data ) ;
-	
-		
+        
+                
 void _DVCWeights_Calculate( void* dvcWeights, void* _swarm, Cell_LocalIndex lCell_I ) ;
 
 #endif

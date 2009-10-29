@@ -4,14 +4,14 @@
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
 **
-** 		* Redistributions of source code must retain the above copyright notice, 
-** 			this list of conditions and the following disclaimer.
-** 		* Redistributions in binary form must reproduce the above copyright 
-**			notice, this list of conditions and the following disclaimer in the 
-**			documentation and/or other materials provided with the distribution.
-** 		* Neither the name of the Monash University nor the names of its contributors 
-**			may be used to endorse or promote products derived from this software 
-**			without specific prior written permission.
+**              * Redistributions of source code must retain the above copyright notice, 
+**                      this list of conditions and the following disclaimer.
+**              * Redistributions in binary form must reproduce the above copyright 
+**                      notice, this list of conditions and the following disclaimer in the 
+**                      documentation and/or other materials provided with the distribution.
+**              * Neither the name of the Monash University nor the names of its contributors 
+**                      may be used to endorse or promote products derived from this software 
+**                      without specific prior written permission.
 **
 ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 ** "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, 
@@ -26,18 +26,18 @@
 **
 **
 ** Contact:
-*%		Louis Moresi - Louis.Moresi@sci.monash.edu.au
+*%              Louis Moresi - Louis.Moresi@sci.monash.edu.au
 *%
 ** Author:
 **              Mirko Velic - Mirko.Velic@sci.monash.edu.au
 **
 **  Assumptions:
-**  	 I am assuming that the xi's (local coords) on the IntegrationPoint particles
+**       I am assuming that the xi's (local coords) on the IntegrationPoint particles
 **       are precalculated somewhere and get reset based on material PIC positions each time step.
 **
 **  Notes:
 **         The DVCWeights class should really be a class the next level up here.
-**	   We should be able to swap out the WeightsCalculator_CalculateAll function instead of just setting
+**         We should be able to swap out the WeightsCalculator_CalculateAll function instead of just setting
 **                 a pointer inside that function 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -87,43 +87,13 @@ DVCWeights* DVCWeights_New( Name name, Dimension_Index dim, int *res ) {
     _DVCWeights_Init( self, res );
 }
 
-DVCWeights* _DVCWeights_New(
-    SizeT                                 _sizeOfSelf, 
-    Type                                  type,
-    Stg_Class_DeleteFunction*             _delete,
-    Stg_Class_PrintFunction*              _print,
-    Stg_Class_CopyFunction*               _copy, 
-    Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-    Stg_Component_ConstructFunction*      _construct,
-    Stg_Component_BuildFunction*          _build,
-    Stg_Component_InitialiseFunction*     _initialise,
-    Stg_Component_ExecuteFunction*        _execute,
-    Stg_Component_DestroyFunction*        _destroy,		
-    WeightsCalculator_CalculateFunction*  _calculate,
-    Name                                  name,
-    int                                   dim,
-    int*                                  res )
-{
+DVCWeights* _DVCWeights_New( DVCWEIGHTS_DEFARGS ) {
     DVCWeights* self;
-	
+        
     /* Allocate memory */
-    assert( _sizeOfSelf >= sizeof(DVCWeights) );
-    self = (DVCWeights*)_WeightsCalculator_New( 
-        _sizeOfSelf,
-        type,
-        _delete,
-        _print,
-        _copy,
-        _defaultConstructor,
-        _construct,
-        _build,
-        _initialise,
-        _execute,
-        _destroy,
-        _calculate,
-        name,
-        dim );
-	
+    assert( sizeOfSelf >= sizeof(DVCWeights) );
+    self = (DVCWeights*)_WeightsCalculator_New( WEIGHTSCALCULATOR_PASSARGS );
+        
     /* General info */
 
     /* Virtual Info */
@@ -160,9 +130,9 @@ void _DVCWeights_Print( void* dvcWeights, Stream* stream ) {
 
 
 void* _DVCWeights_Copy( void* dvcWeights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
-    DVCWeights*	self = (DVCWeights*)dvcWeights;
-    DVCWeights*	newDVCWeights;
-	
+    DVCWeights* self = (DVCWeights*)dvcWeights;
+    DVCWeights* newDVCWeights;
+        
     newDVCWeights = (DVCWeights*)_WeightsCalculator_Copy( self, dest, deep, nameExt, ptrMap );
     return (void*)newDVCWeights;
 }
@@ -179,16 +149,17 @@ void* _DVCWeights_DefaultNew( Name name ) {
         _DVCWeights_Build,
         _DVCWeights_Initialise,
         _DVCWeights_Execute,
-        _DVCWeights_Destroy,
-        _DVCWeights_Calculate,
+        NULL,
         name,
+        NON_GLOBAL,
+        _DVCWeights_Calculate,
         0, NULL );
 }
 
 
 void _DVCWeights_Construct( void* dvcWeights, Stg_ComponentFactory* cf, void *data ) {
 
-    DVCWeights*	     self          = (DVCWeights*) dvcWeights;
+    DVCWeights*      self          = (DVCWeights*) dvcWeights;
 
     int defaultResolution;
     int resolution[3];
@@ -204,20 +175,16 @@ void _DVCWeights_Construct( void* dvcWeights, Stg_ComponentFactory* cf, void *da
 }
 
 void _DVCWeights_Build( void* dvcWeights, void* data ) {
-    DVCWeights*	self = (DVCWeights*)dvcWeights;
+    DVCWeights* self = (DVCWeights*)dvcWeights;
     _WeightsCalculator_Build( self, data );
 }
 void _DVCWeights_Initialise( void* dvcWeights, void* data ) {
-    DVCWeights*	self = (DVCWeights*)dvcWeights;
+    DVCWeights* self = (DVCWeights*)dvcWeights;
     _WeightsCalculator_Initialise( self, data );
 }
 void _DVCWeights_Execute( void* dvcWeights, void* data ) {
-    DVCWeights*	self = (DVCWeights*)dvcWeights;
+    DVCWeights* self = (DVCWeights*)dvcWeights;
     _WeightsCalculator_Execute( self, data );
-}
-void _DVCWeights_Destroy( void* dvcWeights, void* data ) {
-    DVCWeights*	self = (DVCWeights*)dvcWeights;
-    _WeightsCalculator_Destroy( self, data );
 }
 
 /*-------------------------------------------------------------------------------------------------------------------------
@@ -306,7 +273,7 @@ void _DVCWeights_ClaimCells(struct chain **bbchain,struct cell **ccells,struct p
                 bchain->new_claimed_cells_malloced += DVC_INC;
                 temp = (int *)realloc( bchain->new_bound_cells, (bchain->new_bound_cells_malloced + DVC_INC)*sizeof(int) );
                 bchain->new_bound_cells = temp;
-                bchain->new_bound_cells_malloced += DVC_INC;	  
+                bchain->new_bound_cells_malloced += DVC_INC;      
             }
             /* end of bit needed for mallocing */
             bchain->new_claimed_cells[count] = cell_num0;
@@ -326,7 +293,7 @@ void _DVCWeights_ClaimCells(struct chain **bbchain,struct cell **ccells,struct p
                 x0 = cells[cell_num0].x;
                 y0 = cells[cell_num0].y;
                 z0 = cells[cell_num0].z;
-	
+        
                 dist1 = _DVCWeights_DistanceTest(x0,y0,z0,x1,y1,z1,x2,y2,z2);
                 if(dist1 > 0.0){
                     bchain->new_claimed_cells[count] = cell_num0;
@@ -364,7 +331,7 @@ void _DVCWeights_ClaimCells2D(struct chain **bbchain,struct cell2d **ccells,stru
                 bchain->new_claimed_cells_malloced += DVC_INC;
                 temp = (int *)realloc( bchain->new_bound_cells, (bchain->new_bound_cells_malloced + DVC_INC)*sizeof(int) );
                 bchain->new_bound_cells = temp;
-                bchain->new_bound_cells_malloced += DVC_INC;	  
+                bchain->new_bound_cells_malloced += DVC_INC;      
             }
             /* end of bit needed for mallocing */
             bchain->new_claimed_cells[count] = cell_num0;
@@ -381,7 +348,7 @@ void _DVCWeights_ClaimCells2D(struct chain **bbchain,struct cell2d **ccells,stru
                 y1 = (*pList)[cells[cell_num0].p].y;
                 x0 = cells[cell_num0].x;
                 y0 = cells[cell_num0].y;
-	
+        
                 dist1 = _DVCWeights_DistanceTest2D(x0,y0,x1,y1,x2,y2);
                 if(dist1 > 0.0){
                     bchain->new_claimed_cells[count] = cell_num0;
@@ -443,7 +410,7 @@ void _DVCWeights_UpdateBchain(struct chain **bbchain,struct cell **ccells,int p_
             // as done
             if(cell_num1 != -2){
                 if(cells[cell_num1].p != p_i && cells[cell_num1].done != 1){
-                    /* This is the bit needed for mallocing */	   
+                    /* This is the bit needed for mallocing */     
                     /* do a test here to see if we need to realloc bchain->new_claimed_cells and bchain->new_bound_cells */
                     if( count > bchain->new_bound_cells_malloced - 1 ){
                         temp = (int *)realloc( bchain->new_claimed_cells, (bchain->new_claimed_cells_malloced + DVC_INC)*sizeof(int) );
@@ -494,7 +461,7 @@ void _DVCWeights_UpdateBchain2D(struct chain **bbchain,struct cell2d **ccells,in
             // as done
             if(cell_num1 != -2){
                 if(cells[cell_num1].p != p_i && cells[cell_num1].done != 1){
-                    /* This is the bit needed for mallocing */	   
+                    /* This is the bit needed for mallocing */     
                     /* do a test here to see if we need to realloc bchain->new_claimed_cells and bchain->new_bound_cells */
                     if( count > bchain->new_bound_cells_malloced - 1 ){
                         temp = (int *)realloc( bchain->new_claimed_cells, (bchain->new_claimed_cells_malloced + DVC_INC)*sizeof(int) );
@@ -749,15 +716,15 @@ void _DVCWeights_CreateVoronoi2D( struct chain **bchain, struct particle2d **pLi
     for(i=0;i<nump;i++){
         k = ((*pList)[i].x - BBXMIN)/dx;
         j = ((*pList)[i].y - BBYMIN)/dy;
-	/* If particle is on the border exactly, make sure it is
-	   put in a valid cell inside the element */
-	if (k == numx){
+        /* If particle is on the border exactly, make sure it is
+           put in a valid cell inside the element */
+        if (k == numx){
             k--;
-	}
-	if ( j == numy) {
+        }
+        if ( j == numy) {
             j--;
-	}
-	
+        }
+        
         (*cells)[k+j*numx].p = i; //particle number i
       
         (*bchain)[i].numclaimed = 1;// number of most recently claimed cells
@@ -816,7 +783,7 @@ void _DVCWeights_Calculate3D( void* dvcWeights, void* _swarm, Cell_LocalIndex lC
     dy = (BBYMAX - BBYMIN)/numy;
     dz = (BBZMAX - BBZMIN)/numz;
     da = dx*dy*dz;
-	
+        
     // Construct the grid for the Voronoi cells only once.
     // If we wanted to call this function again during a job with a different resolution
     // then we should destroy the grid once we have looped through the whole mesh.
@@ -829,24 +796,24 @@ void _DVCWeights_Calculate3D( void* dvcWeights, void* _swarm, Cell_LocalIndex lC
         visited++;
         _DVCWeights_ConstructGrid(&cells,numz,numy,numx,BBXMIN,BBYMIN,BBZMIN,BBXMAX,BBYMAX,BBZMAX);
     }
-	
-	
+        
+        
     // init the data structures
     _DVCWeights_InitialiseStructs( &bchain, &pList, nump);
     _DVCWeights_ResetGrid(&cells,numz*numy*numx);
-	
+        
     particle = (IntegrationPoint**)malloc(nump*sizeof(IntegrationPoint*));
-	
+        
     // initialize the particle positions to be the local coordinates of the material swarm particles
     // I am assuming the xi's (local coords) are precalculated somewhere and get reset based on material
     // positions each time step.
     for(i=0;i<nump;i++){
-	      
+              
         particle[i] = (IntegrationPoint*) Swarm_ParticleInCellAt( swarm, lCell_I, i );
         pList[i].x = particle[i]->xi[0];
         pList[i].y = particle[i]->xi[1];
         pList[i].z = particle[i]->xi[2];
-	      
+              
     }
     _DVCWeights_CreateVoronoi( &bchain, &pList, &cells, dx, dy, dz, nump, numx, numy, numz, BBXMIN, BBXMAX, BBYMIN, BBYMAX, BBZMIN, BBZMAX);
     _DVCWeights_GetCentroids( cells, pList,numz,numy,numx,nump,da);
@@ -859,7 +826,7 @@ void _DVCWeights_Calculate3D( void* dvcWeights, void* _swarm, Cell_LocalIndex lC
         particle[i]->xi[2] = pList[i].cz;
         particle[i]->weight = pList[i].w;
 
-    }	
+    }   
     for(k=0;k<nump;k++){
         free(bchain[k].new_claimed_cells);
         free(bchain[k].new_bound_cells);
@@ -899,7 +866,7 @@ void _DVCWeights_Calculate2D( void* dvcWeights, void* _swarm, Cell_LocalIndex lC
     dx = (BBXMAX - BBXMIN)/numx;
     dy = (BBYMAX - BBYMIN)/numy;
     da = dx*dy;
-	
+        
     // Construct the grid for the Voronoi cells only once.
     // If we wanted to call this function again during a job with a different resolution
     // then we should destroy the grid once we have looped through the whole mesh.
@@ -912,23 +879,23 @@ void _DVCWeights_Calculate2D( void* dvcWeights, void* _swarm, Cell_LocalIndex lC
         visited++;
         _DVCWeights_ConstructGrid2D(&cells,numy,numx,BBXMIN,BBYMIN,BBXMAX,BBYMAX);
     }
-	
-	
+        
+        
     // init the data structures
     _DVCWeights_InitialiseStructs2D( &bchain, &pList, nump);
     _DVCWeights_ResetGrid2D(&cells,numy*numx);
-	
+        
     particle = (IntegrationPoint**)malloc(nump*sizeof(IntegrationPoint*));
-	
+        
     // initialize the particle positions to be the local coordinates of the material swarm particles
     // I am assuming the xi's (local coords) are precalculated somewhere and get reset based on material
     // positions each time step.
     for(i=0;i<nump;i++){
-	      
+              
         particle[i] = (IntegrationPoint*) Swarm_ParticleInCellAt( swarm, lCell_I, i );
         pList[i].x = particle[i]->xi[0];
         pList[i].y = particle[i]->xi[1];
-	      
+              
     }
     _DVCWeights_CreateVoronoi2D( &bchain, &pList, &cells, dx, dy, nump, numx, numy, BBXMIN, BBXMAX, BBYMIN, BBYMAX);
     _DVCWeights_GetCentroids2D( cells, pList,numy,numx,nump,da);
@@ -940,7 +907,7 @@ void _DVCWeights_Calculate2D( void* dvcWeights, void* _swarm, Cell_LocalIndex lC
         particle[i]->xi[1] = pList[i].cy;
         particle[i]->weight = pList[i].w;
 
-    }	
+    }   
     for(k=0;k<nump;k++){
         free(bchain[k].new_claimed_cells);
         free(bchain[k].new_bound_cells);

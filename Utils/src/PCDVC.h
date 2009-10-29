@@ -4,14 +4,14 @@
 ** Redistribution and use in source and binary forms, with or without modification,
 ** are permitted provided that the following conditions are met:
 **
-** 		* Redistributions of source code must retain the above copyright notice, 
-** 			this list of conditions and the following disclaimer.
-** 		* Redistributions in binary form must reproduce the above copyright 
-**			notice, this list of conditions and the following disclaimer in the 
-**			documentation and/or other materials provided with the distribution.
-** 		* Neither the name of the Monash University nor the names of its contributors 
-**			may be used to endorse or promote products derived from this software 
-**			without specific prior written permission.
+**              * Redistributions of source code must retain the above copyright notice, 
+**                      this list of conditions and the following disclaimer.
+**              * Redistributions in binary form must reproduce the above copyright 
+**                      notice, this list of conditions and the following disclaimer in the 
+**                      documentation and/or other materials provided with the distribution.
+**              * Neither the name of the Monash University nor the names of its contributors 
+**                      may be used to endorse or promote products derived from this software 
+**                      without specific prior written permission.
 **
 ** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
 ** "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, 
@@ -26,7 +26,7 @@
 **
 **
 ** Contact:
-*%		Louis Moresi - Louis.Moresi@sci.monash.edu.au
+*%              Louis Moresi - Louis.Moresi@sci.monash.edu.au
 *%
 ** Author:
 **              Mirko Velic - Mirko.Velic@sci.monash.edu.au
@@ -34,12 +34,12 @@
 **              Julian Giordani - julian.giordani@sci.monash.edu.au
 **
 **  Assumptions:
-**  	 I am assuming that the xi's (local coords) on the IntegrationPoint particles
+**       I am assuming that the xi's (local coords) on the IntegrationPoint particles
 **       are precalculated somewhere and get reset based on material PIC positions each time step.
 **
 **  Notes:
 **         The PCDVC class should really be a class the next level up here.
-**	   We should be able to swap out the WeightsCalculator_CalculateAll function instead of just setting
+**         We should be able to swap out the WeightsCalculator_CalculateAll function instead of just setting
 **                 a pointer inside that function.
 **
 **         If the function  getIntParticleMaterialRef_PointingToMaterialParticle ever gets called
@@ -113,6 +113,27 @@ struct deleteParticle{
 /*---------------------------------------------------------------------------------------------------------------------
 ** Constructors
 */
+
+#define PCDVC_DEFARGS                                   \
+    DVCWEIGHTS_DEFARGS,                                 \
+        MaterialPointsSwarm*                  mps,      \
+        double                                upT,      \
+        double                                lowT,     \
+        int maxDeletions,                               \
+        int maxSplits,                                  \
+        Bool splitInInterfaceCells,                     \
+        Bool deleteInInterfaceCells,                    \
+        Bool Inflow,                                    \
+        double CentPosRatio,                            \
+        int ParticlesPerCell,                           \
+        double Threshold
+
+#define PCDVC_PASSARGS                                                  \
+    DVCWEIGHTS_PASSARGS,                                                \
+        mps, upT, lowT, maxDeletions, maxSplits, splitInInterfaceCells, \
+        deleteInInterfaceCells, Inflow, CentPosRatio, ParticlesPerCell, \
+        Threshold
+
 PCDVC* PCDVC_New( Name name, Dimension_Index dim, int* res,
                   MaterialPointsSwarm* mps, double upT, double lowT,
                   int maxDeletions, int maxSplits, Bool splitInInterfaceCells,
@@ -120,33 +141,7 @@ PCDVC* PCDVC_New( Name name, Dimension_Index dim, int* res,
                   int ParticlesPerCell, double Threshold ) ;
 
 
-PCDVC* _PCDVC_New(
-    SizeT                                 _sizeOfSelf, 
-    Type                                  type,
-    Stg_Class_DeleteFunction*             _delete,
-    Stg_Class_PrintFunction*              _print,
-    Stg_Class_CopyFunction*               _copy, 
-    Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-    Stg_Component_ConstructFunction*      _construct,
-    Stg_Component_BuildFunction*          _build,
-    Stg_Component_InitialiseFunction*     _initialise,
-    Stg_Component_ExecuteFunction*        _execute,
-    Stg_Component_DestroyFunction*        _destroy,		
-    WeightsCalculator_CalculateFunction*  _calculate,
-    Name                                  name,
-    int                                   dim,
-    int*                                  res,
-    MaterialPointsSwarm*                  mps,
-    double                                upT,
-    double                                lowT,
-    int maxDeletions,
-    int maxSplits,
-    Bool splitInInterfaceCells,
-    Bool deleteInInterfaceCells,
-    Bool Inflow,
-    double CentPosRatio,
-    int ParticlesPerCell,
-    double Threshold );
+PCDVC* _PCDVC_New( PCDVC_DEFARGS );
 
 void _PCDVC_Init( void* pcdvc, MaterialPointsSwarm* mps, double upT, double lowT,
                   int maxDeletions, int maxSplits, Bool splitInInterfaceCells,
@@ -162,7 +157,7 @@ void _PCDVC_Print( void* pcdvc, Stream* stream );
 #define PCDVC_DeepCopy( self )                                  \
     (PCDVC*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
 void* _PCDVC_Copy( void* pcdvc, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
-	
+        
 void* _PCDVC_DefaultNew( Name name ) ;
 
 void _PCDVC_Construct( void* pcdvc, Stg_ComponentFactory* cf, void* data ) ;
@@ -170,14 +165,13 @@ void _PCDVC_Construct( void* pcdvc, Stg_ComponentFactory* cf, void* data ) ;
 void _PCDVC_Build( void* pcdvc, void* data ) ;
 void _PCDVC_Initialise( void* pcdvc, void* data ) ;
 void _PCDVC_Execute( void* pcdvc, void* data );
-void _PCDVC_Destroy( void* pcdvc, void* data ) ;
 MaterialPointRef* getIntParticleMaterialRef_PointingToMaterialParticle( IntegrationPointsSwarm*  intSwarm, Particle_Index matLastParticle_IndexOnCPU );
 void splitIntParticleByIndexWithinCell( IntegrationPointsSwarm* intSwarm,  MaterialPointsSwarm* matSwarm, Cell_LocalIndex lCell_I, Particle_Index intParticleToSplit_IndexOnCPU, Coord xi );
 void deleteIntParticleByIndexWithinCell( IntegrationPointsSwarm* intSwarm,  MaterialPointsSwarm* matSwarm,  Cell_LocalIndex lCell_I, Particle_Index intParticleToSplit_IndexWithinCell );
 void deleteIntParticleByIndexOnCPU( IntegrationPointsSwarm* intSwarm,  MaterialPointsSwarm* matSwarm, Particle_Index intParticleToSplit_IndexWithinCell );
 void splitIntParticleByIndexOnCPU( IntegrationPointsSwarm* intSwarm,  MaterialPointsSwarm* matSwarm, Particle_Index intParticleToSplit_IndexOnCPU, Coord xi );
 void _PCDVC_Calculate3D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I );
-void _PCDVC_Calculate2D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I );	
+void _PCDVC_Calculate2D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I );  
 void _PCDVC_Calculate( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) ;
 
 #endif

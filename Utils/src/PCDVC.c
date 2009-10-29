@@ -137,56 +137,15 @@ PCDVC* PCDVC_New( Name name, Dimension_Index dim, int* res,
                  Inflow, CentPosRatio, ParticlesPerCell, Threshold );
 }
 
-PCDVC* _PCDVC_New(
-    SizeT                                 _sizeOfSelf, 
-    Type                                  type,
-    Stg_Class_DeleteFunction*             _delete,
-    Stg_Class_PrintFunction*              _print,
-    Stg_Class_CopyFunction*               _copy, 
-    Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-    Stg_Component_ConstructFunction*      _construct,
-    Stg_Component_BuildFunction*          _build,
-    Stg_Component_InitialiseFunction*     _initialise,
-    Stg_Component_ExecuteFunction*        _execute,
-    Stg_Component_DestroyFunction*        _destroy,		
-    WeightsCalculator_CalculateFunction*  _calculate,
-    Name                                  name,
-    int                                   dim,
-    int*                                  res,
-    MaterialPointsSwarm*                  mps,
-    double                                upT,
-    double                                lowT,
-    int maxDeletions,
-    int maxSplits,
-    Bool splitInInterfaceCells,
-    Bool deleteInInterfaceCells,
-    Bool Inflow,
-    double CentPosRatio,
-    int ParticlesPerCell,
-    double Threshold )
-{
+PCDVC* _PCDVC_New( PCDVC_DEFARGS ) {
     PCDVC* self;
-	
+
     /* Allocate memory */
-    assert( _sizeOfSelf >= sizeof(PCDVC) );
+    assert( sizeOfSelf >= sizeof(PCDVC) );
 
     /* Initialise the parent class. Every class has a parent, bar Stg_Component, which needs to be called */
-    self = (PCDVC*)_DVCWeights_New( 
-        _sizeOfSelf,
-        type,
-        _delete,
-        _print,
-        _copy,
-        _defaultConstructor,
-        _construct,
-        _build,
-        _initialise,
-        _execute,
-        _destroy,		
-        _calculate,
-        name,
-        dim, res );
-	
+    self = (PCDVC*)_DVCWeights_New( DVCWEIGHTS_PASSARGS );
+
     /* General info */
 
     /* Virtual Info */
@@ -253,9 +212,10 @@ void* _PCDVC_DefaultNew( Name name ) {
         _PCDVC_Build,
         _PCDVC_Initialise,
         _PCDVC_Execute,
-        _PCDVC_Destroy,
-        _PCDVC_Calculate,
+        NULL,
         name,
+        NON_GLOBAL,
+        _PCDVC_Calculate,
         0, NULL, NULL, 0.0, 0.0, 0, 0, False, False, False,
         0.0, 0, 0.0 );
 }
@@ -330,10 +290,7 @@ void _PCDVC_Execute( void* pcdvc, void* data ) {
     PCDVC*	self = (PCDVC*)pcdvc;
     _DVCWeights_Execute( self, data );
 }
-void _PCDVC_Destroy( void* pcdvc, void* data ) {
-    PCDVC*	self = (PCDVC*)pcdvc;
-    _DVCWeights_Destroy( self, data );
-}
+
 
 /*-------------------------------------------------------------------------------------------------------------------------
 ** Private Functions

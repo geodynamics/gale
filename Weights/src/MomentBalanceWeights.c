@@ -1,28 +1,28 @@
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 **
 ** Copyright (C), 2003-2006, Victorian Partnership for Advanced Computing (VPAC) Ltd, 110 Victoria Street,
-**	Melbourne, 3053, Australia.
+**      Melbourne, 3053, Australia.
 ** Copyright (c) 2005-2006, Monash Cluster Computing, Building 28, Monash University Clayton Campus,
-**	Victoria, 3800, Australia
+**      Victoria, 3800, Australia
 **
 ** Primary Contributing Organisations:
-**	Victorian Partnership for Advanced Computing Ltd, Computational Software Development - http://csd.vpac.org
-**	Australian Computational Earth Systems Simulator - http://www.access.edu.au
-**	Monash Cluster Computing - http://www.mcc.monash.edu.au
+**      Victorian Partnership for Advanced Computing Ltd, Computational Software Development - http://csd.vpac.org
+**      Australian Computational Earth Systems Simulator - http://www.access.edu.au
+**      Monash Cluster Computing - http://www.mcc.monash.edu.au
 **
 ** Contributors:
-**	Robert Turnbull, Research Assistant, Monash University. (robert.turnbull@sci.monash.edu.au)
-**	Patrick D. Sunter, Software Engineer, VPAC. (patrick@vpac.org)
-**	Alan H. Lo, Computational Engineer, VPAC. (alan@vpac.org)
-**	Stevan M. Quenette, Senior Software Engineer, VPAC. (steve@vpac.org)
-**	David May, PhD Student, Monash University (david.may@sci.monash.edu.au)
-**	Vincent Lemiale, Postdoctoral Fellow, Monash University. (vincent.lemiale@sci.monash.edu.au)
-**	Julian Giordani, Research Assistant, Monash University. (julian.giordani@sci.monash.edu.au)
-**	Louis Moresi, Associate Professor, Monash University. (louis.moresi@sci.monash.edu.au)
-**	Luke J. Hodkinson, Computational Engineer, VPAC. (lhodkins@vpac.org)
-**	Raquibul Hassan, Computational Engineer, VPAC. (raq@vpac.org)
-**	David Stegman, Postdoctoral Fellow, Monash University. (david.stegman@sci.monash.edu.au)
-**	Wendy Sharples, PhD Student, Monash University (wendy.sharples@sci.monash.edu.au)
+**      Robert Turnbull, Research Assistant, Monash University. (robert.turnbull@sci.monash.edu.au)
+**      Patrick D. Sunter, Software Engineer, VPAC. (patrick@vpac.org)
+**      Alan H. Lo, Computational Engineer, VPAC. (alan@vpac.org)
+**      Stevan M. Quenette, Senior Software Engineer, VPAC. (steve@vpac.org)
+**      David May, PhD Student, Monash University (david.may@sci.monash.edu.au)
+**      Vincent Lemiale, Postdoctoral Fellow, Monash University. (vincent.lemiale@sci.monash.edu.au)
+**      Julian Giordani, Research Assistant, Monash University. (julian.giordani@sci.monash.edu.au)
+**      Louis Moresi, Associate Professor, Monash University. (louis.moresi@sci.monash.edu.au)
+**      Luke J. Hodkinson, Computational Engineer, VPAC. (lhodkins@vpac.org)
+**      Raquibul Hassan, Computational Engineer, VPAC. (raq@vpac.org)
+**      David Stegman, Postdoctoral Fellow, Monash University. (david.stegman@sci.monash.edu.au)
+**      Wendy Sharples, PhD Student, Monash University (wendy.sharples@sci.monash.edu.au)
 **
 **  This library is free software; you can redistribute it and/or
 **  modify it under the terms of the GNU Lesser General Public
@@ -72,42 +72,12 @@ MomentBalanceWeights* MomentBalanceWeights_New( Name name, Dimension_Index dim, 
     _MomentBalanceWeights_Init( self, backupWeights );
 }
 
-MomentBalanceWeights* _MomentBalanceWeights_New(
-    SizeT                                 _sizeOfSelf, 
-    Type                                  type,
-    Stg_Class_DeleteFunction*             _delete,
-    Stg_Class_PrintFunction*              _print,
-    Stg_Class_CopyFunction*               _copy, 
-    Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-    Stg_Component_ConstructFunction*      _construct,
-    Stg_Component_BuildFunction*          _build,
-    Stg_Component_InitialiseFunction*     _initialise,
-    Stg_Component_ExecuteFunction*        _execute,
-    Stg_Component_DestroyFunction*        _destroy,
-    WeightsCalculator_CalculateFunction*  _calculate,
-    Name                                  name,
-    int                                   dim,
-    WeightsCalculator*                    backupWeights )
-{
+MomentBalanceWeights* _MomentBalanceWeights_New( MOMENTBALANCEWEIGHTS_DEFARGS ) {
     MomentBalanceWeights* self;
 
     /* Allocate memory */
-    assert( _sizeOfSelf >= sizeof(MomentBalanceWeights) );
-    self = (MomentBalanceWeights*)_WeightsCalculator_New( 
-        _sizeOfSelf,
-        type,
-        _delete,
-        _print,
-        _copy,
-        _defaultConstructor,
-        _construct,
-        _build,
-        _initialise,
-        _execute,
-        _destroy,		
-        _calculate,
-        name,
-        dim );
+    assert( sizeOfSelf >= sizeof(MomentBalanceWeights) );
+    self = (MomentBalanceWeights*)_WeightsCalculator_New( WEIGHTSCALCULATOR_PASSARGS ); 
 
     /* General info */
 
@@ -127,11 +97,11 @@ void _MomentBalanceWeights_Init( void* momentBalanceWeights, WeightsCalculator* 
         self->backupWeights = (WeightsCalculator*) ConstantWeights_New( "backupWeights", self->dim );
         self->freeBackupWeights = True;
     }
-	
+        
     Journal_Firewall( self->dim == 2, 
                       Journal_Register( Error_Type, self->type ),
                       "%s only works in 2D.\n", self->type );
-	
+        
 }
 
 /*------------------------------------------------------------------------------------------------------------------------
@@ -143,7 +113,7 @@ void _MomentBalanceWeights_Delete( void* momentBalanceWeights ) {
 
     if ( self->freeBackupWeights )
         Stg_Class_Delete( self->backupWeights );
-	
+        
     /* Delete parent */
     _WeightsCalculator_Delete( self );
 }
@@ -151,17 +121,17 @@ void _MomentBalanceWeights_Delete( void* momentBalanceWeights ) {
 
 void _MomentBalanceWeights_Print( void* momentBalanceWeights, Stream* stream ) {
     MomentBalanceWeights* self = (MomentBalanceWeights*)momentBalanceWeights;
-	
+        
     /* Print parent */
     _WeightsCalculator_Print( self, stream );
 }
 
 void* _MomentBalanceWeights_Copy( void* momentBalanceWeights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
-    MomentBalanceWeights*	self = (MomentBalanceWeights*)momentBalanceWeights;
-    MomentBalanceWeights*	newMomentBalanceWeights;
-	
+    MomentBalanceWeights*       self = (MomentBalanceWeights*)momentBalanceWeights;
+    MomentBalanceWeights*       newMomentBalanceWeights;
+        
     newMomentBalanceWeights = (MomentBalanceWeights*)_WeightsCalculator_Copy( self, dest, deep, nameExt, ptrMap );
-	
+        
     return (void*)newMomentBalanceWeights;
 }
 
@@ -177,14 +147,15 @@ void* _MomentBalanceWeights_DefaultNew( Name name ) {
         _MomentBalanceWeights_Build,
         _MomentBalanceWeights_Initialise,
         _MomentBalanceWeights_Execute,
-        _MomentBalanceWeights_Destroy,
-        _MomentBalanceWeights_Calculate,
+        NULL,
         name,
+        NON_GLOBAL,
+        _MomentBalanceWeights_Calculate,
         0, NULL );
 }
 
 void _MomentBalanceWeights_Construct( void* momentBalanceWeights, Stg_ComponentFactory* cf, void* data ) {
-    MomentBalanceWeights*	     self          = (MomentBalanceWeights*) momentBalanceWeights;
+    MomentBalanceWeights*            self          = (MomentBalanceWeights*) momentBalanceWeights;
     WeightsCalculator*           backupWeights;
 
     _WeightsCalculator_Construct( self, cf, data );
@@ -195,26 +166,20 @@ void _MomentBalanceWeights_Construct( void* momentBalanceWeights, Stg_ComponentF
 }
 
 void _MomentBalanceWeights_Build( void* momentBalanceWeights, void* data ) {
-    MomentBalanceWeights*	self = (MomentBalanceWeights*)momentBalanceWeights;
+    MomentBalanceWeights*       self = (MomentBalanceWeights*)momentBalanceWeights;
 
     _WeightsCalculator_Build( self, data );
 }
 void _MomentBalanceWeights_Initialise( void* momentBalanceWeights, void* data ) {
-    MomentBalanceWeights*	self = (MomentBalanceWeights*)momentBalanceWeights;
-	
+    MomentBalanceWeights*       self = (MomentBalanceWeights*)momentBalanceWeights;
+        
     _WeightsCalculator_Initialise( self, data );
 }
 void _MomentBalanceWeights_Execute( void* momentBalanceWeights, void* data ) {
-    MomentBalanceWeights*	self = (MomentBalanceWeights*)momentBalanceWeights;
-	
+    MomentBalanceWeights*       self = (MomentBalanceWeights*)momentBalanceWeights;
+        
     _WeightsCalculator_Execute( self, data );
 }
-void _MomentBalanceWeights_Destroy( void* momentBalanceWeights, void* data ) {
-    MomentBalanceWeights*	self = (MomentBalanceWeights*)momentBalanceWeights;
-	
-    _WeightsCalculator_Destroy( self, data );
-}
-
 
 
 /*-------------------------------------------------------------------------------------------------------------------------
@@ -258,7 +223,7 @@ void _MomentBalanceWeights_Calculate( void* momentBalanceWeights, void* _swarm, 
     double                       m;
     IntegrationPoint*            particle;
     double                       a,b,c;
-		
+                
     /* First Step -
      * Assume all weights are constant in quadrants - i.e.                  
      * -------------
@@ -331,7 +296,7 @@ void _MomentBalanceWeights_Calculate( void* momentBalanceWeights, void* _swarm, 
 
     /* We take the solution which will always give a positive n */
     n = (-b + sqrt( b*b - 4.0 * a * c ))/(2.0 * a);
-		
+                
     m = ( n * region[ REGION_B ].x + region[ REGION_C ].x)/
         ( n * region[ REGION_A ].x + region[ REGION_D ].x);
 
@@ -376,10 +341,10 @@ void _MomentBalanceWeights_Calculate3D( void* momentBalanceWeights, void* _swarm
     double*                      xi;
     double                       n;
     double                       m;
-/*	double                       q; */
+/*      double                       q; */
     IntegrationPoint*            particle;
     double                       a,b,c;
-		
+                
     /* First Step -
      * Assume all weights are constant in octants - i.e.                  
      * -FRONT-FACE--
@@ -463,8 +428,8 @@ void _MomentBalanceWeights_Calculate3D( void* momentBalanceWeights, void* _swarm
      *
      *   n^2 ( q^2(X_E Y_F + X_F Y_E) + q(X_E Y_B + X_B Y_E + X_A Y_F + X_F Y_A) + (X_B Y_A + X_A Y_B) )
      * + n   ( q^2( X_G Y_E - X_E Y_G + X_H Y_F - X_F Y_H ) + 
-     * 				+ q ( X_H Y_B - X_B Y_H + X_D Y_F - X_F Y_D + X_C Y_E - Y_C X_E + X_G Y_A - X_A Y_G )
-     * 				( X_C Y_A - X_A Y_C ) + (X_D Y_B - X_B Y_D) )
+     *                          + q ( X_H Y_B - X_B Y_H + X_D Y_F - X_F Y_D + X_C Y_E - Y_C X_E + X_G Y_A - X_A Y_G )
+     *                          ( X_C Y_A - X_A Y_C ) + (X_D Y_B - X_B Y_D) )
      * - ( q^2( X_H Y_G + X_G Y_H ) + q( X_G Y_D + X_D Y_G + X_H Y_C + X_C Y_H ) + X_D Y_C + X_C Y_D ) = 0
      *
      * and
@@ -482,7 +447,7 @@ void _MomentBalanceWeights_Calculate3D( void* momentBalanceWeights, void* _swarm
 
     /* We take the solution which will always give a positive n */
     n = (-b + sqrt( b*b - 4.0 * a * c ))/(2.0 * a);
-		
+                
     m = ( n * region[ REGION_B ].x + region[ REGION_C ].x)/
         ( n * region[ REGION_A ].x + region[ REGION_D ].x);
 
