@@ -177,7 +177,7 @@ void ConstitutiveMatrix_InitAll(
 {
 	ConstitutiveMatrix* self = (ConstitutiveMatrix*)constitutiveMatrix;
 
-	StiffnessMatrixTerm_InitAll( self, stiffnessMatrix, swarm, NULL );
+	_StiffnessMatrixTerm_Init( self, stiffnessMatrix, swarm, NULL );
 	_ConstitutiveMatrix_Init( self, dim, False, context, materials_Register );
 }
 

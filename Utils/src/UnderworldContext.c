@@ -205,6 +205,12 @@ void _UnderworldContext_Delete( void* context ) {
 	_PICelleratorContext_Delete( self );
 }
 
+void _UnderworldContext_Destroy( void* context ) {
+	UnderworldContext* self = (UnderworldContext*)context;
+	
+	_PICelleratorContext_Destroy( self );
+}
+
 void _UnderworldContext_Print( void* context, Stream* stream ) {
 	UnderworldContext* self = (UnderworldContext*)context;
 	
