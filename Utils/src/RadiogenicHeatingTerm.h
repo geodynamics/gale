@@ -55,7 +55,7 @@
 	void _RadiogenicHeatingTerm_Print( void* forceTerm, Stream* stream );
 
 	void* _RadiogenicHeatingTerm_DefaultNew( Name name ) ;
-void _RadiogenicHeatingTerm_Construct( void* forceTerm, Stg_ComponentFactory* cf, void* data ) ;
+void _RadiogenicHeatingTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) ;
 	void _RadiogenicHeatingTerm_Build( void* forceTerm, void* data ) ;
 	void _RadiogenicHeatingTerm_Initialise( void* forceTerm, void* data ) ;
 	void _RadiogenicHeatingTerm_Execute( void* forceTerm, void* data ) ;

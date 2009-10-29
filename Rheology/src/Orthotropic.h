@@ -96,7 +96,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _Orthotropic_DefaultNew( Name name ) ;
-	void _Orthotropic_Construct( void* rheology, Stg_ComponentFactory* cf, void* data );
+	void _Orthotropic_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
 
 	void _Orthotropic_ModifyConstitutiveMatrix( 
 		void*                                              rheology, 

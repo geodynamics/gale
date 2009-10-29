@@ -54,7 +54,7 @@
 
 const Type Underworld_Nusselt_Type = "Underworld_Nusselt";
 
-void _Underworld_Nusselt_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_Nusselt_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	Underworld_Nusselt*		self = (Underworld_Nusselt*)component;
 	Dictionary*					pluginDict = Codelet_GetPluginDictionary( component, cf->rootDict );
 	UnderworldContext*		context;
@@ -117,7 +117,7 @@ void* _Underworld_Nusselt_DefaultNew( Name name ) {
 		_Codelet_Print,
 		_Codelet_Copy,
 		_Underworld_Nusselt_DefaultNew,
-		_Underworld_Nusselt_Construct,
+		_Underworld_Nusselt_AssignFromXML,
 		_Underworld_Nusselt_Build,
 		_Codelet_Initialise,
 		_Codelet_Execute,

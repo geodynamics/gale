@@ -152,7 +152,7 @@ void* _Underworld_SwarmOutput_DefaultNew( Name name ) {
 			_Underworld_SwarmOutput_Print,
 			_Underworld_SwarmOutput_Copy,
 			_Underworld_SwarmOutput_DefaultNew,
-			_Underworld_SwarmOutput_Construct,
+			_Underworld_SwarmOutput_AssignFromXML,
 			_Underworld_SwarmOutput_Build,
 			_Underworld_SwarmOutput_Initialise,
 			_Underworld_SwarmOutput_Execute,
@@ -173,7 +173,7 @@ void _Underworld_SwarmOutput( Underworld_SwarmOutput* self,
 	EP_AppendClassHook( Context_GetEntryPoint( context, AbstractContext_EP_SaveClass ), _Underworld_SwarmOutput_Execute, self );
 }
 
-void _Underworld_SwarmOutput_Construct( void* uwSwarmOutput, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_SwarmOutput_AssignFromXML( void* uwSwarmOutput, Stg_ComponentFactory* cf, void* data ) {
 	Underworld_SwarmOutput*  self          = (Underworld_SwarmOutput*) uwSwarmOutput;
 
 	PICelleratorContext*    context;

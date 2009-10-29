@@ -112,7 +112,7 @@ void* _OrthotropicAligned_DefaultNew( Name name ) {
 		_Rheology_Print,
 		_Rheology_Copy,
 		_OrthotropicAligned_DefaultNew,
-		_OrthotropicAligned_Construct,
+		_OrthotropicAligned_AssignFromXML,
 		_Rheology_Build,
 		_Rheology_Initialise,
 		_Rheology_Execute,
@@ -121,7 +121,7 @@ void* _OrthotropicAligned_DefaultNew( Name name ) {
 		name );
 }
 
-void _OrthotropicAligned_Construct( void* rheology, Stg_ComponentFactory* cf, void* data ){
+void _OrthotropicAligned_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
 	OrthotropicAligned*     self = (OrthotropicAligned*)rheology;
         /*	Director*        director; */
 	double viscosity1;
@@ -132,7 +132,7 @@ void _OrthotropicAligned_Construct( void* rheology, Stg_ComponentFactory* cf, vo
 	double viscosity6;
 
 	/* Construct Parent */
-	_Rheology_Construct( self, cf, data );
+	_Rheology_AssignFromXML( self, cf, data );
 	
         /*	director =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "Director", Director,  True  ) ; */
 	viscosity1 = Stg_ComponentFactory_GetDouble( cf, self->name, "viscosity1",  True );

@@ -77,7 +77,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _MaterialViscosity_DefaultNew( Name name ) ;
-	void _MaterialViscosity_Construct( void* rheology, Stg_ComponentFactory* cf, void* data );
+	void _MaterialViscosity_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
 
 	void _MaterialViscosity_ModifyConstitutiveMatrix( 
 		void*                                              rheology, 

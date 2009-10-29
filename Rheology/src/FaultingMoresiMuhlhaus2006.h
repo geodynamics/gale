@@ -124,7 +124,7 @@
 	
 	/* 'Stg_Component' implementations */
 	void* _FaultingMoresiMuhlhaus2006_DefaultNew( Name name ) ;
-	void _FaultingMoresiMuhlhaus2006_Construct( void* rheology, Stg_ComponentFactory* cf, void* data );
+	void _FaultingMoresiMuhlhaus2006_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
 
 	void _FaultingMoresiMuhlhaus2006_Build( void* rheology, void* data );
 	void _FaultingMoresiMuhlhaus2006_Initialise( void* rheology, void* data ) ;

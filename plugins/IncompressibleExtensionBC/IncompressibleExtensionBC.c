@@ -224,7 +224,7 @@ void IncompressibleExtensionBC_BottomCondition( Node_LocalIndex node_lI, Variabl
 	*result = GetBottomWallVelocity( context );
 }
 
-void _Underworld_IncompressibleExtensionBC_Construct( void* self, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_IncompressibleExtensionBC_AssignFromXML( void* self, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext*  context  = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data );
 	ConditionFunction*  condFunc;
 
@@ -253,7 +253,7 @@ void* _Underworld_IncompressibleExtensionBC_DefaultNew( Name name ) {
 	return Codelet_New(
 			Underworld_IncompressibleExtensionBC_Type,
 			_Underworld_IncompressibleExtensionBC_DefaultNew,
-			_Underworld_IncompressibleExtensionBC_Construct, /* SQ NOTE: Used to be a construct extensions. */
+			_Underworld_IncompressibleExtensionBC_AssignFromXML, /* SQ NOTE: Used to be a construct extensions. */
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,

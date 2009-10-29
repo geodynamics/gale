@@ -52,7 +52,7 @@ void _SmoothVelGradField_Delete( void* _self );
 void _SmoothVelGradField_Print( void* _self, Stream* stream );
 void* _SmoothVelGradField_Copy( void* _self, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
-void _SmoothVelGradField_Construct( void* _self, Stg_ComponentFactory* cf, void* data ) ;
+void _SmoothVelGradField_AssignFromXML( void* _self, Stg_ComponentFactory* cf, void* data ) ;
 void _SmoothVelGradField_Build( void* _self, void* data ) ;
 void _SmoothVelGradField_Initialise( void* _self, void* data ) ;
 void _SmoothVelGradField_Execute( void* _self, void* data ) ;

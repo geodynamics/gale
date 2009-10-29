@@ -57,7 +57,7 @@ MPI_Datatype Localisation_MPI_Datatype;
 
 const Type Underworld_Localisation_Type = "Underworld_Localisation";
 
-void _Underworld_Localisation_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_Localisation_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
         UnderworldContext* context;
 
         context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
@@ -82,7 +82,7 @@ void* _Underworld_Localisation_DefaultNew( Name name ) {
                 _Codelet_Print,
                 _Codelet_Copy,
                 _Underworld_Localisation_DefaultNew,
-                _Underworld_Localisation_Construct,
+                _Underworld_Localisation_AssignFromXML,
                 _Underworld_Localisation_Build,
                 _Codelet_Initialise,
                 _Codelet_Execute,

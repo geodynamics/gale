@@ -136,7 +136,7 @@ void Underworld_VelicIC_Hyperbolic( Node_LocalIndex node_lI, Variable_Index var_
 
 
 
-void _Underworld_VelicIC_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_VelicIC_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	AbstractContext*        context;
 	ConditionFunction*      condFunc;
 
@@ -152,7 +152,7 @@ void* _Underworld_VelicIC_DefaultNew( Name name ) {
 	return Codelet_New(
 		Underworld_VelicIC_Type,
 		_Underworld_VelicIC_DefaultNew,
-		_Underworld_VelicIC_Construct,
+		_Underworld_VelicIC_AssignFromXML,
 		_Codelet_Build,
 		_Codelet_Initialise,
 		_Codelet_Execute,

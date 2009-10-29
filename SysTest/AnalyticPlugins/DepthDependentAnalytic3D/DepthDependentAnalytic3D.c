@@ -221,14 +221,14 @@ void _DepthDependentAnalytic3D_PressureFunction( void* analyticSolution, double*
 }
 
 
-void _DepthDependentAnalytic3D_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _DepthDependentAnalytic3D_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	DepthDependentAnalytic3D*         self           = (DepthDependentAnalytic3D*)analyticSolution;
 	AbstractContext*        context;
 	ConditionFunction*      condFunc;
 	char*                   viscosityType;
 	
 	/* Construct Parent */
-	_FieldTest_Construct( self, cf, data );
+	_FieldTest_AssignFromXML( self, cf, data );
 
 	/* Add temperature initial condition */
 	condFunc = ConditionFunction_New( DepthDependentAnalytic3D_TemperatureIC, "DepthDependentAnalytic3D_TemperatureIC" );
@@ -287,7 +287,7 @@ void* _DepthDependentAnalytic3D_DefaultNew( Name name ) {
 			_FieldTest_Print,
 			_FieldTest_Copy,
 			_DepthDependentAnalytic3D_DefaultNew,
-			_DepthDependentAnalytic3D_Construct,
+			_DepthDependentAnalytic3D_AssignFromXML,
 			_DepthDependentAnalytic3D_Build,
 			_FieldTest_Initialise,
 			_FieldTest_Execute,

@@ -53,7 +53,7 @@ const Type Underworld_MaxTemperature_Type = "Underworld_MaxTemperature";
 void Underworld_MaxTemperature_PrintHeaderToFile( void* context );
 void Underworld_MaxTemperature_Output( void* _context );
 
-void _Underworld_MaxTemperature_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_MaxTemperature_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext*  context;
 
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data );
@@ -66,7 +66,7 @@ void* _Underworld_MaxTemperature_DefaultNew( Name name ) {
 	return Codelet_New(
 		Underworld_MaxTemperature_Type,
 		_Underworld_MaxTemperature_DefaultNew,
-		_Underworld_MaxTemperature_Construct,
+		_Underworld_MaxTemperature_AssignFromXML,
 		_Codelet_Build,
 		_Codelet_Initialise,
 		_Codelet_Execute,

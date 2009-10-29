@@ -55,7 +55,7 @@
 Index Underworld_BuoyancyIntegrals_Register( PluginsManager *pluginsManager );
 void* _Underworld_BuoyancyIntegrals_DefaultNew( Name name );
 void _Underworld_BuoyancyIntegrals_CTX_Delete( void *component );
-void _Underworld_BuoyancyIntegrals_Construct( void *component, Stg_ComponentFactory *cf, void *data );
+void _Underworld_BuoyancyIntegrals_AssignFromXML( void *component, Stg_ComponentFactory *cf, void *data );
 void Underworld_BuoyancyIntegrals_Output( UnderworldContext *context );
 void Underworld_BuoyancyIntegrals_Setup( void* _context );
 
@@ -93,7 +93,7 @@ void* _Underworld_BuoyancyIntegrals_DefaultNew( Name name )
 	_Codelet_Print,
 			_Codelet_Copy,
 			_Underworld_BuoyancyIntegrals_DefaultNew,
-			_Underworld_BuoyancyIntegrals_Construct,
+			_Underworld_BuoyancyIntegrals_AssignFromXML,
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,
@@ -109,7 +109,7 @@ void _Underworld_BuoyancyIntegrals_CTX_Delete( void *component )
 }
 
 
-void _Underworld_BuoyancyIntegrals_Construct( void *component, Stg_ComponentFactory *cf, void *data ) 
+void _Underworld_BuoyancyIntegrals_AssignFromXML( void *component, Stg_ComponentFactory *cf, void *data ) 
 {
 	UnderworldContext *context;
 	Underworld_BuoyancyIntegrals_CTX *ctx;
@@ -120,7 +120,7 @@ void _Underworld_BuoyancyIntegrals_Construct( void *component, Stg_ComponentFact
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
 	
 	/* Add functions to entry points */
-	ContextEP_Append( context, AbstractContext_EP_ConstructExtensions, Underworld_BuoyancyIntegrals_Setup );
+	ContextEP_Append( context, AbstractContext_EP_AssignFromXMLExtensions, Underworld_BuoyancyIntegrals_Setup );
 	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, Underworld_BuoyancyIntegrals_Output );
 	
 	

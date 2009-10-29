@@ -109,7 +109,7 @@ void* _FrankKamenetskii_DefaultNew( Name name ) {
 		_Rheology_Print,
 		_Rheology_Copy,
 		_FrankKamenetskii_DefaultNew,
-		_FrankKamenetskii_Construct,
+		_FrankKamenetskii_AssignFromXML,
 		_Rheology_Build,
 		_Rheology_Initialise,
 		_Rheology_Execute,
@@ -118,12 +118,12 @@ void* _FrankKamenetskii_DefaultNew( Name name ) {
 		name );
 }
 
-void _FrankKamenetskii_Construct( void* rheology, Stg_ComponentFactory* cf, void* data ){
+void _FrankKamenetskii_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
 	FrankKamenetskii*  self = (FrankKamenetskii*)rheology;
 	FeVariable* temperatureField;
 
 	/* Construct Parent */
-	_Rheology_Construct( self, cf, data );
+	_Rheology_AssignFromXML( self, cf, data );
 	
 	/* TODO: KeyFallback soon to be deprecated/updated */
 	temperatureField = Stg_ComponentFactory_ConstructByNameWithKeyFallback( 

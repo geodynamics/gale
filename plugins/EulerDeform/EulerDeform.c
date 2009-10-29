@@ -65,7 +65,7 @@ void* _Underworld_EulerDeform_DefaultNew( Name name ) {
 			     _Codelet_Print, 
 			     _Codelet_Copy, 
 			     _Underworld_EulerDeform_DefaultNew, 
-			     _Underworld_EulerDeform_Construct, 
+			     _Underworld_EulerDeform_AssignFromXML, 
 			     _Underworld_EulerDeform_Build, 
 			     _Codelet_Initialise, 
 			     _Codelet_Execute, 
@@ -74,7 +74,7 @@ void* _Underworld_EulerDeform_DefaultNew( Name name ) {
 }
 
 
-void _Underworld_EulerDeform_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_EulerDeform_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	Codelet*		ed		= (Codelet*)component;
 	UnderworldContext*	uwCtx;
 	EulerDeform_Context*	edCtx;

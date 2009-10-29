@@ -120,7 +120,7 @@ void* _Rheology_Copy( void* rheology, void* dest, Bool deep, Name nameExt, PtrMa
 	return (void*) self;
 }
 
-void _Rheology_Construct( void* rheology, Stg_ComponentFactory* cf, void* data ){
+void _Rheology_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
 	Rheology*           self                 = (Rheology*)rheology;
 
 	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", PICelleratorContext, False, data );

@@ -172,7 +172,7 @@ typedef struct {
 	__Codelet
 } Underworld_MaterialThermalDiffusivity;
 
-void _Underworld_MaterialThermalDiffusivity_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_MaterialThermalDiffusivity_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext								context;
 	Underworld_MaterialThermalDiffusivity*	self = (Underworld_MaterialThermalDiffusivity*)component;
 	Dictionary*										pluginDict = Codelet_GetPluginDictionary( component, cf->rootDict );
@@ -188,7 +188,7 @@ void* _Underworld_MaterialThermalDiffusivity_DefaultNew( Name name ) {
 	return Codelet_New(
 			Underworld_MaterialThermalDiffusivity_Type, 
 			_Underworld_MaterialThermalDiffusivity_DefaultNew,
-			_Underworld_MaterialThermalDiffusivity_Construct,
+			_Underworld_MaterialThermalDiffusivity_AssignFromXML,
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,

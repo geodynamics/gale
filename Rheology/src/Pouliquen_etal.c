@@ -196,7 +196,7 @@ void* _Pouliquen_etal_DefaultNew( Name name ) {
 			_YieldRheology_Print,
 			_YieldRheology_Copy,
 			_Pouliquen_etal_DefaultNew,
-			_Pouliquen_etal_Construct,
+			_Pouliquen_etal_AssignFromXML,
 			_Pouliquen_etal_Build,
 			_Pouliquen_etal_Initialise,
 			_YieldRheology_Execute,
@@ -208,7 +208,7 @@ void* _Pouliquen_etal_DefaultNew( Name name ) {
 			name );
 }
 
-void _Pouliquen_etal_Construct( void* pouliquen_etal, Stg_ComponentFactory* cf, void* data ){
+void _Pouliquen_etal_AssignFromXML( void* pouliquen_etal, Stg_ComponentFactory* cf, void* data ){
 	Pouliquen_etal*          self           = (Pouliquen_etal*)pouliquen_etal;
 	FeVariable*             pressureField;
 	FeVariable*             strainRateInvField;
@@ -216,7 +216,7 @@ void _Pouliquen_etal_Construct( void* pouliquen_etal, Stg_ComponentFactory* cf, 
 	FiniteElementContext*   context;
 
 	/* Construct Parent */
-	_VonMises_Construct( self, cf, data );
+	_VonMises_AssignFromXML( self, cf, data );
 	
 	pressureField      = (FeVariable *) 
 			Stg_ComponentFactory_ConstructByKey( cf, self->name, "PressureField", FeVariable, True, data );

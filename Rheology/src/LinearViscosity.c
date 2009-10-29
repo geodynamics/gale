@@ -125,7 +125,7 @@ void* _LinearViscosity_DefaultNew( Name name ) {
 		_Rheology_Print,
 		_Rheology_Copy,
 		_LinearViscosity_DefaultNew,
-		_LinearViscosity_Construct,
+		_LinearViscosity_AssignFromXML,
 		_Rheology_Build,
 		_Rheology_Initialise,
 		_Rheology_Execute,
@@ -134,11 +134,11 @@ void* _LinearViscosity_DefaultNew( Name name ) {
 		name );
 }
 
-void _LinearViscosity_Construct( void* rheology, Stg_ComponentFactory* cf, void* data ){
+void _LinearViscosity_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
 	LinearViscosity*  self                   = (LinearViscosity*)rheology;
 
 	/* Construct Parent */
-	_Rheology_Construct( self, cf, data );
+	_Rheology_AssignFromXML( self, cf, data );
 	
 	_LinearViscosity_Init( 
 			self, 

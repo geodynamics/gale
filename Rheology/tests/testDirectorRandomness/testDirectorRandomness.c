@@ -111,7 +111,7 @@ typedef struct {
 	__Codelet
 } Underworld_testDirectorRandomness;
 
-void _Underworld_testDirectorRandomness_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_testDirectorRandomness_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	FiniteElementContext*   context;
 	Stream*                 stream                 = Journal_Register( Info_Type, CURR_MODULE_NAME );
 
@@ -127,7 +127,7 @@ void* _Underworld_testDirectorRandomness_DefaultNew( Name name ) {
 	return Codelet_New(
 			Underworld_testDirectorRandomness_Type,
 			_Underworld_testDirectorRandomness_DefaultNew,
-			_Underworld_testDirectorRandomness_Construct,
+			_Underworld_testDirectorRandomness_AssignFromXML,
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,

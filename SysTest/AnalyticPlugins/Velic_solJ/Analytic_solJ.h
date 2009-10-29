@@ -23,7 +23,7 @@
 
 	Index Underworld_Velic_solJ_Register( PluginsManager* pluginsManager );
 	void* _Velic_solJ_DefaultNew( Name name );
-	void _Velic_solJ_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data );
+	void _Velic_solJ_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data );
 	void _Velic_solJ_Init( Velic_solJ* self, double sigmaA, double sigmaB, double etaB, double etaA, double dxB, double dxA, double x0B, double x0A, double zc );
 
 	void Velic_solJ_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* pressure );

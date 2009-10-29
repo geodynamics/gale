@@ -39,7 +39,7 @@
 
 const Type Underworld_Shfl_Type = "Underworld_Shfl";
 
-void _Underworld_Shfl_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_Shfl_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext* context;
 
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
@@ -57,7 +57,7 @@ void* _Underworld_Shfl_DefaultNew( Name name ) {
 		_Codelet_Print,
 		_Codelet_Copy,
 		_Underworld_Shfl_DefaultNew,
-		_Underworld_Shfl_Construct,
+		_Underworld_Shfl_AssignFromXML,
 		_Codelet_Build,
 		_Codelet_Initialise,
 		_Codelet_Execute,

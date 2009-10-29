@@ -173,13 +173,13 @@ typedef struct {
 	__Codelet
 } testMovingMesh;
 
-void _testMovingMesh_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _testMovingMesh_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	DomainContext* context;
 	Stream*                stream               = Journal_Register( Info_Type, CURR_MODULE_NAME );
 
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data ); 
 
-	ContextEP_Append( context, AbstractContext_EP_ConstructExtensions, construct );
+	ContextEP_Append( context, AbstractContext_EP_AssignFromXMLExtensions, construct );
 	ContextEP_Append( context, AbstractContext_EP_Initialise, storeOriginalPos );
 	ContextEP_Prepend( context, AbstractContext_EP_Step, check );
 	EP_AppendClassHook( Context_GetEntryPoint( context, FiniteElementContext_EP_CalcDt ), dt, context );
@@ -193,7 +193,7 @@ void* _testMovingMesh_DefaultNew( Name name ) {
 	return Codelet_New(
 			testMovingMesh_Type,
 			_testMovingMesh_DefaultNew,
-			_testMovingMesh_Construct,
+			_testMovingMesh_AssignFromXML,
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,

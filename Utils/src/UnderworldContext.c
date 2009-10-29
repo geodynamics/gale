@@ -67,7 +67,7 @@ void* _UnderworldContext_DefaultNew( Name name ) {
 		_UnderworldContext_Print,
 		NULL, 
 		_UnderworldContext_DefaultNew,
-		_UnderworldContext_Construct,
+		_UnderworldContext_AssignFromXML,
 		_UnderworldContext_Build,
 		_AbstractContext_Initialise,
 		_AbstractContext_Execute,
@@ -95,7 +95,7 @@ UnderworldContext* UnderworldContext_New(
 		_UnderworldContext_Print,
 		NULL, 
 		_UnderworldContext_DefaultNew,
-		_UnderworldContext_Construct,
+		_UnderworldContext_AssignFromXML,
 		_UnderworldContext_Build,
 		_AbstractContext_Initialise,
 		_AbstractContext_Execute,
@@ -167,7 +167,7 @@ UnderworldContext* _UnderworldContext_New(
 void _UnderworldContext_Init( UnderworldContext* self ) {
 	self->isConstructed = True;
 	self->Vrms = 0.0;
-	EntryPoint_Append_AlwaysLast( Context_GetEntryPoint( self, AbstractContext_EP_Construct ),
+	EntryPoint_Append_AlwaysLast( Context_GetEntryPoint( self, AbstractContext_EP_AssignFromXML ),
 			   "Underworld App Assign Pointers",
 			   UnderworldContext_AssignPointers,
 			   "Underworld_App_Construct" );
@@ -175,11 +175,11 @@ void _UnderworldContext_Init( UnderworldContext* self ) {
 
 /* Virtual Functions -------------------------------------------------------------------------------------------------------------*/
 
-void _UnderworldContext_Construct( void* context, Stg_ComponentFactory* cf, void* data ) {
+void _UnderworldContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext* self = (UnderworldContext*)context;
 
 	_UnderworldContext_Init( self );
-	_PICelleratorContext_Construct( context, cf, data );
+	_PICelleratorContext_AssignFromXML( context, cf, data );
 
 	/* always generate XDMF files when we generate HDF5 checkpoints */
 #ifdef WRITE_HDF5

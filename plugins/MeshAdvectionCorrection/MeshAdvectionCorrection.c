@@ -197,7 +197,7 @@ void MeshAdvectionCorrection( void* sle, void* data ) {
 	Memory_Free( oldVelocity );
 }
 
-void _Underworld_MeshAdvectionCorrection_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_MeshAdvectionCorrection_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext*                                      context = 
 	Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
 	Underworld_MeshAdvectionCorrection_ContextExt*       plugin;
@@ -236,7 +236,7 @@ void* _Underworld_MeshAdvectionCorrection_DefaultNew( Name name ) {
 	return Codelet_New(
 			Underworld_MeshAdvectionCorrection_Type,
 			_Underworld_MeshAdvectionCorrection_DefaultNew,
-			_Underworld_MeshAdvectionCorrection_Construct, /* SQ NOTE: Used to be a construct extensions. */
+			_Underworld_MeshAdvectionCorrection_AssignFromXML, /* SQ NOTE: Used to be a construct extensions. */
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,

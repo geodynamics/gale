@@ -80,7 +80,7 @@ MultiRheologyMaterial* MultiRheologyMaterial_New(
 		_RheologyMaterial_Print,
 		_RheologyMaterial_Copy,
 		_MultiRheologyMaterial_DefaultNew,
-		_MultiRheologyMaterial_Construct,
+		_MultiRheologyMaterial_AssignFromXML,
 		_RheologyMaterial_Build,
 		_RheologyMaterial_Initialise,
 		_RheologyMaterial_Execute,
@@ -107,7 +107,7 @@ void* _MultiRheologyMaterial_DefaultNew( Name name ) {
 		_RheologyMaterial_Print,
 		_RheologyMaterial_Copy,
 		_MultiRheologyMaterial_DefaultNew,
-		_MultiRheologyMaterial_Construct,
+		_MultiRheologyMaterial_AssignFromXML,
 		_RheologyMaterial_Build,
 		_RheologyMaterial_Initialise,
 		_RheologyMaterial_Execute,
@@ -190,7 +190,7 @@ MultiRheologyMaterial* _MultiRheologyMaterial_New(
 }
 
 
-void _MultiRheologyMaterial_Construct( void* material, Stg_ComponentFactory* cf, void* data ){
+void _MultiRheologyMaterial_AssignFromXML( void* material, Stg_ComponentFactory* cf, void* data ){
 	MultiRheologyMaterial*  self = (MultiRheologyMaterial*)material;
 	Rheology***             rheologyListList;
 	Rheology_Index*         rheologyCountList;
@@ -205,7 +205,7 @@ void _MultiRheologyMaterial_Construct( void* material, Stg_ComponentFactory* cf,
 	Stream*                 stream             = cf->infoStream;
 
 	/* Construct Parent */
-	_Material_Construct( self, cf, data );
+	_Material_AssignFromXML( self, cf, data );
 	_RheologyMaterial_Init( 
 		self, 
 		NULL, 

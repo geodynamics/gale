@@ -51,7 +51,7 @@ void _NodalPressureField_Delete( void* _self );
 void _NodalPressureField_Print( void* _self, Stream* stream );
 void* _NodalPressureField_Copy( void* _self, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
-void _NodalPressureField_Construct( void* _self, Stg_ComponentFactory* cf, void* data ) ;
+void _NodalPressureField_AssignFromXML( void* _self, Stg_ComponentFactory* cf, void* data ) ;
 void _NodalPressureField_Build( void* _self, void* data ) ;
 void _NodalPressureField_Initialise( void* _self, void* data ) ;
 void _NodalPressureField_Execute( void* _self, void* data ) ;

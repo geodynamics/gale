@@ -123,7 +123,7 @@
 	
 	/* 'Stg_Component' implementations */
 	void* _YieldRheology_DefaultNew( Name name ) ;
-	void _YieldRheology_Construct( void* rheology, Stg_ComponentFactory* cf, void* data );
+	void _YieldRheology_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
 	void _YieldRheology_Build( void* rheology, void* data );
 	void _YieldRheology_Initialise( void* rheology, void* data );
 	void _YieldRheology_Execute( void* rheology, void* data );

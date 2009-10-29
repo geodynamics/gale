@@ -105,7 +105,7 @@
 
 	/* Virtual Functions -----------------------------------------------------------------------------------------------*/
 
-	void _UnderworldContext_Construct( void* context, Stg_ComponentFactory* cf, void* data );
+	void _UnderworldContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, void* data );
 
 	void _UnderworldContext_Build( void* context, void* data );
 	

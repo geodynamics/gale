@@ -39,7 +39,7 @@
 
 const Type Underworld_Nusselt_deltaT_Type = "Underworld_Nusselt_deltaT";
 
-void _Underworld_Nusselt_deltaT_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_Nusselt_deltaT_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext* context;
 
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
@@ -64,7 +64,7 @@ void* _Underworld_Nusselt_deltaT_DefaultNew( Name name ) {
 		_Codelet_Print,
 		_Codelet_Copy,
 		_Underworld_Nusselt_deltaT_DefaultNew,
-		_Underworld_Nusselt_deltaT_Construct,
+		_Underworld_Nusselt_deltaT_AssignFromXML,
 		_Underworld_Nusselt_deltaT_Build,
 		_Codelet_Initialise,
 		_Codelet_Execute,

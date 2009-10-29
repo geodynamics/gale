@@ -56,7 +56,7 @@
 	void _DensityField_Print( void* variable, Stream* stream );
 	void* _DensityField_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
-	void _DensityField_Construct( void* variable, Stg_ComponentFactory* cf, void* data ) ;
+	void _DensityField_AssignFromXML( void* variable, Stg_ComponentFactory* cf, void* data ) ;
 	void _DensityField_Build( void* variable, void* data ) ;
 	void _DensityField_Initialise( void* variable, void* data ) ;
 	void _DensityField_Execute( void* variable, void* data ) ;

@@ -84,7 +84,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _StoreStress_DefaultNew( Name name ) ;
-	void _StoreStress_Construct( void* rheology, Stg_ComponentFactory* cf, void* data );
+	void _StoreStress_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
 	void _StoreStress_Initialise( void* rheology, void* data );
 
 	void _StoreStress_ModifyConstitutiveMatrix( 

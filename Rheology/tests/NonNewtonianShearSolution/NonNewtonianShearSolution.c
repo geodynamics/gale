@@ -102,12 +102,12 @@ void NonNewtonianShearSolution_VelocityBC( Node_LocalIndex node_lI, Variable_Ind
 	*result = self->velocityTopOfBox;
 }
 
-void _NonNewtonianShearSolution_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _NonNewtonianShearSolution_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	NonNewtonianShearSolution* self = (NonNewtonianShearSolution*)analyticSolution;
 	FiniteElementContext*          context;
 
 	/* Construct parent */
-	_AnalyticSolution_Construct( self, cf, data );
+	_AnalyticSolution_AssignFromXML( self, cf, data );
 	context = Stg_CheckType( self->context, FiniteElementContext );
 	
 	ConditionFunction_Register_Add( context->condFunc_Register, 
@@ -156,7 +156,7 @@ void* _NonNewtonianShearSolution_DefaultNew( Name name ) {
 			_AnalyticSolution_Print,
 			_AnalyticSolution_Copy,
 			_NonNewtonianShearSolution_DefaultNew,
-			_NonNewtonianShearSolution_Construct,
+			_NonNewtonianShearSolution_AssignFromXML,
 			_NonNewtonianShearSolution_Build,
 			_AnalyticSolution_Initialise,
 			_AnalyticSolution_Execute,

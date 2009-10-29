@@ -166,7 +166,7 @@ void* _PressureTemperatureOutput_DefaultNew( Name name ) {
 			_PressureTemperatureOutput_Print,
 			_PressureTemperatureOutput_Copy,
 			_PressureTemperatureOutput_DefaultNew,
-			_PressureTemperatureOutput_Construct,
+			_PressureTemperatureOutput_AssignFromXML,
 			_PressureTemperatureOutput_Build,
 			_PressureTemperatureOutput_Initialise,
 			_PressureTemperatureOutput_Execute,
@@ -177,12 +177,12 @@ void* _PressureTemperatureOutput_DefaultNew( Name name ) {
 }
 
 
-void _PressureTemperatureOutput_Construct( void* swarmOutput, Stg_ComponentFactory* cf, void* data ) {
+void _PressureTemperatureOutput_AssignFromXML( void* swarmOutput, Stg_ComponentFactory* cf, void* data ) {
 	PressureTemperatureOutput*  self          = (PressureTemperatureOutput*) swarmOutput;
 	FeVariable*                 pressureField;
 	FeVariable*                 temperatureField;
 
-	_SwarmOutput_Construct( self, cf, data );
+	_SwarmOutput_AssignFromXML( self, cf, data );
 
 	pressureField    = Stg_ComponentFactory_ConstructByKey( cf, self->name, "PressureField",    FeVariable, True, data ) ;
 	temperatureField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "TemperatureField", FeVariable, True, data ) ;

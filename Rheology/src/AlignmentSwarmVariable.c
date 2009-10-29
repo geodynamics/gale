@@ -123,7 +123,7 @@ void* _AlignmentSwarmVariable_DefaultNew( Name name ) {
 		_SwarmVariable_Print,
 		_SwarmVariable_Copy,
 		_AlignmentSwarmVariable_DefaultNew,
-		_AlignmentSwarmVariable_Construct,
+		_AlignmentSwarmVariable_AssignFromXML,
 		_SwarmVariable_Build,
 		_AlignmentSwarmVariable_Initialise,
 		_SwarmVariable_Execute,
@@ -134,13 +134,13 @@ void* _AlignmentSwarmVariable_DefaultNew( Name name ) {
 		name );
 }
 
-void _AlignmentSwarmVariable_Construct( void* druckerPrager, Stg_ComponentFactory* cf, void* data ){
+void _AlignmentSwarmVariable_AssignFromXML( void* druckerPrager, Stg_ComponentFactory* cf, void* data ){
 	AlignmentSwarmVariable*   self           = (AlignmentSwarmVariable*)druckerPrager;
 	FeVariable*               velocityField;
 	Director*                 director;
 
 	/* Construct Parent */
-	_SwarmVariable_Construct( self, cf, data );
+	_SwarmVariable_AssignFromXML( self, cf, data );
 
 	/* Construct 'AlignmentSwarmVariable' stuff */
 	velocityField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "VelocityField", FeVariable, True, data ) ;

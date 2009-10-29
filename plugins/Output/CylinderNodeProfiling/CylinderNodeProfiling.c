@@ -127,7 +127,7 @@ void Experimental_NodeTempProfile( PICelleratorContext* context ) {
 #endif
 }
 
-void _Experimental_CylinderNodeProfiling_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _Experimental_CylinderNodeProfiling_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 
 	AbstractContext* context;
 	FeVariable*  temperatureField  = Stg_ComponentFactory_ConstructByName( cf, "TemperatureField", FeVariable, True, data );
@@ -146,7 +146,7 @@ void* _Experimental_CylinderNodeProfiling_DefaultNew( Name name ) {
 			_Codelet_Print,
 			_Codelet_Copy,
 			_Experimental_CylinderNodeProfiling_DefaultNew,
-			_Experimental_CylinderNodeProfiling_Construct,
+			_Experimental_CylinderNodeProfiling_AssignFromXML,
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,

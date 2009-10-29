@@ -80,7 +80,7 @@
 	
 	/* 'Stg_Component' implementations */
 	void* _BuiterStrainWeakening_DefaultNew( Name name ) ;
-	void _BuiterStrainWeakening_Construct( void* rheology, Stg_ComponentFactory* cf, void* data );
+	void _BuiterStrainWeakening_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
 	void _BuiterStrainWeakening_Build( void* strainWeakening, void* data ) ;
 	void _BuiterStrainWeakening_Initialise( void* strainWeakening, void* data ) ;
 

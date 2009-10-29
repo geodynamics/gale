@@ -102,13 +102,13 @@ void _Velic_solKz_Build( void* analyticSolution, void* data ) {
 	self->_analyticSolutionList[3] = Velic_solKz_StressFunction;
 }
 
-void _Velic_solKz_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _Velic_solKz_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	Velic_solKz* self = (Velic_solKz*) analyticSolution;
 	double                   sigma, m, B, twiceB, km;
 	int                      n;
 
 	/* Construct Parent */
-	_FieldTest_Construct( self, cf, data );
+	_FieldTest_AssignFromXML( self, cf, data );
 
 	sigma = Stg_ComponentFactory_GetRootDictDouble( cf, "solKz_sigma", 1.0 );
 	twiceB = Stg_ComponentFactory_GetRootDictDouble( cf, "solKz_twiceB", 2.0 );
@@ -130,7 +130,7 @@ void* _Velic_solKz_DefaultNew( Name name ) {
 			_FieldTest_Print,
 			_FieldTest_Copy,
 			_Velic_solKz_DefaultNew,
-			_Velic_solKz_Construct,
+			_Velic_solKz_AssignFromXML,
 			_Velic_solKz_Build,
 			_FieldTest_Initialise,
 			_FieldTest_Execute,

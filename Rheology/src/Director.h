@@ -94,7 +94,7 @@
 	
 	/* 'Stg_Component' implementations */
 	void* _Director_DefaultNew( Name name );
-	void _Director_Construct( void* director, Stg_ComponentFactory* cf, void* data );
+	void _Director_AssignFromXML( void* director, Stg_ComponentFactory* cf, void* data );
 	void _Director_Build( void* director, void* data );
 	void _Director_Initialise( void* director, void* data );
 	

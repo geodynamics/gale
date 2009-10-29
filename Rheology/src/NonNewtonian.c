@@ -111,7 +111,7 @@ void* _NonNewtonian_DefaultNew( Name name ) {
 		_Rheology_Print,
 		_Rheology_Copy,
 		_NonNewtonian_DefaultNew,
-		_NonNewtonian_Construct,
+		_NonNewtonian_AssignFromXML,
 		_Rheology_Build,
 		_Rheology_Initialise,
 		_Rheology_Execute,
@@ -120,12 +120,12 @@ void* _NonNewtonian_DefaultNew( Name name ) {
 		name );
 }
 
-void _NonNewtonian_Construct( void* rheology, Stg_ComponentFactory* cf, void* data ){
+void _NonNewtonian_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
 	NonNewtonian*  self = (NonNewtonian*)rheology;
 	FeVariable*    strainRateInvField;
 
 	/* Construct Parent */
-	_Rheology_Construct( self, cf, data );
+	_Rheology_AssignFromXML( self, cf, data );
 	
 	/* TODO: 'Keyfallback' soon to be deprecated/updated */
 	strainRateInvField = Stg_ComponentFactory_ConstructByNameWithKeyFallback( 

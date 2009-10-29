@@ -132,7 +132,7 @@ void* _ViscosityField_DefaultNew( Name name ) {
 		_ViscosityField_Print,
 		_ViscosityField_Copy,
 		_ViscosityField_DefaultNew,
-		_ViscosityField_Construct,
+		_ViscosityField_AssignFromXML,
 		_ViscosityField_Build, 
 		_ViscosityField_Initialise,
 		_ViscosityField_Execute,
@@ -148,15 +148,15 @@ void* _ViscosityField_DefaultNew( Name name ) {
 		name );
 }
 
-void _ViscosityField_Construct( void* viscosityField, Stg_ComponentFactory* cf, void* data ){
+void _ViscosityField_AssignFromXML( void* viscosityField, Stg_ComponentFactory* cf, void* data ){
 	ViscosityField*          self              = (ViscosityField*) viscosityField;
 	ConstitutiveMatrix*   constitutiveMatrix;
 	Variable_Register*    variable_Register;
 
 	/* Construct Parent */
-	_ParticleFeVariable_Construct( self, cf, data );
+	_ParticleFeVariable_AssignFromXML( self, cf, data );
 
-	/*_FieldVariable_Construct( self, cf, data );*/
+	/*_FieldVariable_AssignFromXML( self, cf, data );*/
 
 	constitutiveMatrix = Stg_ComponentFactory_ConstructByKey( cf, self->name, "ConstitutiveMatrix", ConstitutiveMatrix, True, data );
 	variable_Register      = self->context->variable_Register; 

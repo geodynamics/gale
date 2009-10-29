@@ -213,7 +213,7 @@ void* _ConstitutiveMat_Refactored_Copy( void* constitutiveMatrix, void* dest, Bo
 	return (void*)newConstitutiveMat_Refactored;
 }
 
-void _ConstitutiveMat_Refactored_Construct( void* constitutiveMatrix, Stg_ComponentFactory* cf, void* data ) {
+void _ConstitutiveMat_Refactored_AssignFromXML( void* constitutiveMatrix, Stg_ComponentFactory* cf, void* data ) {
 	ConstitutiveMat_Refactored*         self          = (ConstitutiveMat_Refactored*)constitutiveMatrix;
 	Dimension_Index             dim;
 	Materials_Register*         materialsRegister;

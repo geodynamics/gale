@@ -145,7 +145,7 @@ void* _MohrCoulomb_DefaultNew( Name name ) {
 		_YieldRheology_Print,
 		_YieldRheology_Copy,
 		_MohrCoulomb_DefaultNew,
-		_MohrCoulomb_Construct,
+		_MohrCoulomb_AssignFromXML,
 		_MohrCoulomb_Build,
 		_MohrCoulomb_Initialise,
 		_YieldRheology_Execute,
@@ -157,7 +157,7 @@ void* _MohrCoulomb_DefaultNew( Name name ) {
 		name );
 }
 
-void _MohrCoulomb_Construct( void* rheology, Stg_ComponentFactory* cf,
+void _MohrCoulomb_AssignFromXML( void* rheology, Stg_ComponentFactory* cf,
                              void *data ){
 	MohrCoulomb*   self           = (MohrCoulomb*)rheology;
 	FeVariable*                   pressureField;
@@ -165,7 +165,7 @@ void _MohrCoulomb_Construct( void* rheology, Stg_ComponentFactory* cf,
 	FeVariable*                   strainRateField;
 	
 	/* Construct Parent */
-	_YieldRheology_Construct( self, cf, data );
+	_YieldRheology_AssignFromXML( self, cf, data );
 
 	/* Make sure that there is strain weakening */
 	Journal_Firewall(

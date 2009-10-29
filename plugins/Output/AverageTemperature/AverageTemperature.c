@@ -53,7 +53,7 @@ const Type Underworld_AverageTemperature_Type = "Underworld_AverageTemperature";
 void Underworld_AverageTemperature_PrintHeaderToFile( void* context );
 void Underworld_AverageTemperature_Output( void* _context );
 
-void _Underworld_AverageTemperature_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_AverageTemperature_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext*  context;
 
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data );
@@ -66,7 +66,7 @@ void* _Underworld_AverageTemperature_DefaultNew( Name name ) {
 	return Codelet_New(
 		Underworld_AverageTemperature_Type,
 		_Underworld_AverageTemperature_DefaultNew,
-		_Underworld_AverageTemperature_Construct,
+		_Underworld_AverageTemperature_AssignFromXML,
 		_Codelet_Build,
 		_Codelet_Initialise,
 		_Codelet_Execute,

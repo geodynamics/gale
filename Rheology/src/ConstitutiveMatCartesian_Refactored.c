@@ -169,7 +169,7 @@ void* _ConstitutiveMatCartesian_Refactored_DefaultNew( Name name ) {
 		_ConstitutiveMatCartesian_Refactored_Print,
 		NULL,
 		_ConstitutiveMatCartesian_Refactored_DefaultNew,
-		_ConstitutiveMatCartesian_Refactored_Construct,
+		_ConstitutiveMatCartesian_Refactored_AssignFromXML,
 		_ConstitutiveMatCartesian_Refactored_Build,
 		_ConstitutiveMatCartesian_Refactored_Initialise,
 		_ConstitutiveMatCartesian_Refactored_Execute,
@@ -183,11 +183,11 @@ void* _ConstitutiveMatCartesian_Refactored_DefaultNew( Name name ) {
 		name );
 }
 
-void _ConstitutiveMatCartesian_Refactored_Construct( void* constitutiveMatrix, Stg_ComponentFactory* cf, void* data ) {
+void _ConstitutiveMatCartesian_Refactored_AssignFromXML( void* constitutiveMatrix, Stg_ComponentFactory* cf, void* data ) {
 	ConstitutiveMatCartesian_Refactored*            self             = (ConstitutiveMatCartesian_Refactored*)constitutiveMatrix;
 
 	/* Construct Parent */
-	_ConstitutiveMat_Refactored_Construct( self, cf, data );
+	_ConstitutiveMat_Refactored_AssignFromXML( self, cf, data );
 
 	_ConstitutiveMatCartesian_Refactored_Init( self );
 }

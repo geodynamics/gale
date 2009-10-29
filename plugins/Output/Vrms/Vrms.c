@@ -54,7 +54,7 @@
 
 const Type Underworld_Vrms_Type = "Underworld_Vrms";
 
-void _Underworld_Vrms_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_Vrms_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	Underworld_Vrms*	self 		= (Underworld_Vrms*)component;
 	Dictionary*		pluginDict	= Codelet_GetPluginDictionary( component, cf->rootDict );
 
@@ -94,7 +94,7 @@ void* _Underworld_Vrms_DefaultNew( Name name ) {
 		_Codelet_Print,
 		_Codelet_Copy,
 		_Underworld_Vrms_DefaultNew,
-		_Underworld_Vrms_Construct,
+		_Underworld_Vrms_AssignFromXML,
 		_Underworld_Vrms_Build,
 		_Underworld_Vrms_Initialise,
 		_Codelet_Execute,

@@ -80,7 +80,7 @@
 	
 	/* 'Stg_Component' implementations */
 	void* _AlignmentSwarmVariable_DefaultNew( Name name ) ;
-	void _AlignmentSwarmVariable_Construct( void* alignment, Stg_ComponentFactory* cf, void* data );
+	void _AlignmentSwarmVariable_AssignFromXML( void* alignment, Stg_ComponentFactory* cf, void* data );
 	void _AlignmentSwarmVariable_Initialise( void* alignment, void* data ) ;
 
 	/* 'SwarmVariable Virtual Implementations */

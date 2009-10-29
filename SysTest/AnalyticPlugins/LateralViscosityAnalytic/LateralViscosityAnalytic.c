@@ -399,12 +399,12 @@ void _LateralViscosityAnalytic_VelocityFunction( void* analyticSolution, double*
 	velocity[ J_AXIS ] = 2.0 * kx * sin( ky * y ) * sumY[ REAL_PART ]; 
 }
 
-void _LateralViscosityAnalytic_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _LateralViscosityAnalytic_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	LateralViscosityAnalytic*         self           = (LateralViscosityAnalytic*)analyticSolution;
 	ConditionFunction*      condFunc;
 	
 	/* Construct Parent */
-	_FieldTest_Construct( self, cf, data );
+	_FieldTest_AssignFromXML( self, cf, data );
 
 	/* Add temperature initial condition */
 	condFunc = ConditionFunction_New( LateralViscosityAnalytic_TemperatureIC, "LateralViscosityAnalytic_TemperatureIC" );
@@ -436,7 +436,7 @@ void* _LateralViscosityAnalytic_DefaultNew( Name name ) {
 			_FieldTest_Print,
 			_FieldTest_Copy,
 			_LateralViscosityAnalytic_DefaultNew,
-			_LateralViscosityAnalytic_Construct,
+			_LateralViscosityAnalytic_AssignFromXML,
 			_LateralViscosityAnalytic_Build,
 			_FieldTest_Initialise,
 			_FieldTest_Execute,

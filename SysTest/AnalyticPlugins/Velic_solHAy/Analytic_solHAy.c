@@ -86,7 +86,7 @@ void _Velic_solHAy_Init( Velic_solHAy* self, double sigma, double eta, double dx
 	self->y0 = y0;
 }
 
-void _Velic_solHAy_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _Velic_solHAy_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	Velic_solHAy* self = (Velic_solHAy*) analyticSolution;
 	FeVariable*              velocityField;
 	FeVariable*              pressureField;
@@ -97,7 +97,7 @@ void _Velic_solHAy_Construct( void* analyticSolution, Stg_ComponentFactory* cf, 
 	double                   sigma, eta, dx, dy, x0, y0;
 
 	/* Construct Parent */
-	_AnalyticSolution_Construct( self, cf, data );
+	_AnalyticSolution_AssignFromXML( self, cf, data );
 
 	/* Create Analytic Fields */
 	velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data );
@@ -141,7 +141,7 @@ void* _Velic_solHAy_DefaultNew( Name name ) {
 			_AnalyticSolution_Print,
 			_AnalyticSolution_Copy,
 			_Velic_solHAy_DefaultNew,
-			_Velic_solHAy_Construct,
+			_Velic_solHAy_AssignFromXML,
 			_AnalyticSolution_Build,
 			_AnalyticSolution_Initialise,
 			_AnalyticSolution_Execute,

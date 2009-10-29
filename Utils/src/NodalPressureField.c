@@ -53,7 +53,7 @@ void* _NodalPressureField_DefaultNew( Name name ) {
       _NodalPressureField_Print,
       _NodalPressureField_Copy,
       _NodalPressureField_DefaultNew,
-      _NodalPressureField_Construct,
+      _NodalPressureField_AssignFromXML,
       _NodalPressureField_Build, 
       _NodalPressureField_Initialise,
       _NodalPressureField_Execute,
@@ -104,13 +104,13 @@ void NodalPressureField_NonLinearUpdate( void* _sle, void* _ctx ) {
    ParticleFeVariable_Update( preVar );
 }
 
-void _NodalPressureField_Construct( void* _self, Stg_ComponentFactory* cf, void* data ){
+void _NodalPressureField_AssignFromXML( void* _self, Stg_ComponentFactory* cf, void* data ){
    NodalPressureField* self = (NodalPressureField*) _self;
    Variable_Register* variable_Register;
    SystemLinearEquations* sle;
 
    /* Construct Parent */
-   _ParticleFeVariable_Construct( self, cf, data );
+   _ParticleFeVariable_AssignFromXML( self, cf, data );
 
    variable_Register = self->variable_Register; 
    assert( variable_Register );

@@ -15,7 +15,7 @@
 
 	Index Underworld_Velic_solHA_Register( PluginsManager* pluginsManager );
 	void* _Velic_solHA_DefaultNew( Name name );
-	void _Velic_solHA_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data );
+	void _Velic_solHA_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data );
 	void _Velic_solHA_Init( Velic_solHA* self, double sigma, double eta, double dx, double dy, double x0, double y0 );
 
 	void Velic_solHA_PressureFunction( void* analyticSolution, double* coord, double* pressure );

@@ -95,7 +95,7 @@
 	void* _Underworld_SwarmOutput_Copy( void* swarmOutput, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _Underworld_SwarmOutput_DefaultNew( Name name ) ;
-void _Underworld_SwarmOutput_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+void _Underworld_SwarmOutput_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 	void _Underworld_SwarmOutput_Build( void* swarmOutput, void* data ) ;
 	void _Underworld_SwarmOutput_Initialise( void* swarmOutput, void* data ) ;
 	void _Underworld_SwarmOutput_Execute( void* swarmOutput, void* data );

@@ -218,12 +218,12 @@ double Underworld_ConvectionData_XZPlaneVrms( UnderworldContext* context, double
 
 }
 	
-void _Underworld_ConvectionData_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_ConvectionData_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext*  context;
 
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data );
 
-	ContextEP_Append( context, AbstractContext_EP_ConstructExtensions, Underworld_ConvectionData_Setup );
+	ContextEP_Append( context, AbstractContext_EP_AssignFromXMLExtensions, Underworld_ConvectionData_Setup );
 	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, Underworld_ConvectionData_Dump );
 }
 
@@ -243,7 +243,7 @@ void* _Underworld_ConvectionData_DefaultNew( Name name ) {
 		_Codelet_Print,
 		_Codelet_Copy,
 		_Underworld_ConvectionData_DefaultNew,
-		_Underworld_ConvectionData_Construct,
+		_Underworld_ConvectionData_AssignFromXML,
 		_Codelet_Build,
 		_Codelet_Initialise,
 		_Codelet_Execute,

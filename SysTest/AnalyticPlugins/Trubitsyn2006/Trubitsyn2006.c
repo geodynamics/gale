@@ -225,7 +225,7 @@ void _Trubitsyn2006_StreamFunction( void* analyticSolution, double* coord, doubl
 }
 
 
-void _Trubitsyn2006_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _Trubitsyn2006_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	Trubitsyn2006*         self           = (Trubitsyn2006*)analyticSolution;
 	AbstractContext*        context;
 	ConditionFunction*      condFunc;
@@ -233,7 +233,7 @@ void _Trubitsyn2006_Construct( void* analyticSolution, Stg_ComponentFactory* cf,
 	Dictionary*		pluginDict	= Codelet_GetPluginDictionary(self, cf->rootDict);
 	
 	/* Construct Parent */
-	_FieldTest_Construct( self, cf, data );
+	_FieldTest_AssignFromXML( self, cf, data );
 
 	self->velocityField = Stg_ComponentFactory_ConstructByName(
 	    cf, Dictionary_GetString(pluginDict, "VelocityField"), FeVariable, True, data);
@@ -310,7 +310,7 @@ void* _Trubitsyn2006_DefaultNew( Name name ) {
 			_FieldTest_Print,
 			_FieldTest_Copy,
 			_Trubitsyn2006_DefaultNew,
-			_Trubitsyn2006_Construct,
+			_Trubitsyn2006_AssignFromXML,
 			_Trubitsyn2006_Build,
 			_Trubitsyn2006_Initialise,
 			_FieldTest_Execute,

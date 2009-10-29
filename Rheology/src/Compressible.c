@@ -129,7 +129,7 @@ void* _Compressible_DefaultNew( Name name ) {
 		_Compressible_Print,
 		NULL,
 		_Compressible_DefaultNew,
-		_Compressible_Construct,
+		_Compressible_AssignFromXML,
 		_Compressible_Build,
 		_Compressible_Initialise,
 		_Compressible_Execute,
@@ -139,13 +139,13 @@ void* _Compressible_DefaultNew( Name name ) {
 }
 
 
-void _Compressible_Construct( void* compressible, Stg_ComponentFactory* cf, void* data ){
+void _Compressible_AssignFromXML( void* compressible, Stg_ComponentFactory* cf, void* data ){
 	Compressible*    	self = (Compressible*)compressible;
 	FeMesh*		 	geometryMesh;
 	Materials_Register* 	materials_Register;
 	PICelleratorContext*	context;
 
-	_StiffnessMatrixTerm_Construct( self, cf, data );
+	_StiffnessMatrixTerm_AssignFromXML( self, cf, data );
 
 	geometryMesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "GeometryMesh", FeMesh, True, data );
 

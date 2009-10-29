@@ -19,7 +19,7 @@
 	Index Underworld_Velic_solCA_Register( PluginsManager* pluginsManager );
 	void* _Velic_solCA_DefaultNew( Name name );
 	void _Velic_solCA_Init( Velic_solCA* self, double sigma, double eta, double dx, double x0 ); 
-	void _Velic_solCA_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data );
+	void _Velic_solCA_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data );
 
 	void Velic_solCA_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* pressure );
 	void Velic_solCA_VelocityFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* velocity );

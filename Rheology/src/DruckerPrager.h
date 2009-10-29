@@ -100,7 +100,7 @@
 	
 	/* 'Stg_Component' implementations */
 	void* _DruckerPrager_DefaultNew( Name name ) ;
-	void _DruckerPrager_Construct( void* rheology, Stg_ComponentFactory* cf, void* data );
+	void _DruckerPrager_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
 
 	void _DruckerPrager_Build( void* rheology, void* data );
 	void _DruckerPrager_Initialise( void* rheology, void* data ) ;

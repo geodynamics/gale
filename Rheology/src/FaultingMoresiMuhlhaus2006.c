@@ -230,7 +230,7 @@ void* _FaultingMoresiMuhlhaus2006_DefaultNew( Name name ) {
 		_YieldRheology_Print,
 		_YieldRheology_Copy,
 		_FaultingMoresiMuhlhaus2006_DefaultNew,
-		_FaultingMoresiMuhlhaus2006_Construct,
+		_FaultingMoresiMuhlhaus2006_AssignFromXML,
 		_FaultingMoresiMuhlhaus2006_Build,
 		_FaultingMoresiMuhlhaus2006_Initialise,
 		_YieldRheology_Execute,
@@ -242,7 +242,7 @@ void* _FaultingMoresiMuhlhaus2006_DefaultNew( Name name ) {
 		name );
 }
 
-void _FaultingMoresiMuhlhaus2006_Construct( void* rheology, Stg_ComponentFactory* cf, void* data ){
+void _FaultingMoresiMuhlhaus2006_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
 	FaultingMoresiMuhlhaus2006*   self           = (FaultingMoresiMuhlhaus2006*)rheology;
 	FeVariable*                   pressureField;
 	MaterialPointsSwarm*          materialPointsSwarm;
@@ -251,7 +251,7 @@ void _FaultingMoresiMuhlhaus2006_Construct( void* rheology, Stg_ComponentFactory
 	Director*                     director;
 	
 	/* Construct Parent */
-	_YieldRheology_Construct( self, cf, data );
+	_YieldRheology_AssignFromXML( self, cf, data );
 
 	/* Make sure that there is strain weakening */
 	Journal_Firewall(

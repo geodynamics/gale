@@ -117,7 +117,7 @@ void* _Orthotropic_DefaultNew( Name name ) {
 		_Rheology_Print,
 		_Rheology_Copy,
 		_Orthotropic_DefaultNew,
-		_Orthotropic_Construct,
+		_Orthotropic_AssignFromXML,
 		_Rheology_Build,
 		_Rheology_Initialise,
 		_Rheology_Execute,
@@ -126,7 +126,7 @@ void* _Orthotropic_DefaultNew( Name name ) {
 		name );
 }
 
-void _Orthotropic_Construct( void* rheology, Stg_ComponentFactory* cf, void* data ){
+void _Orthotropic_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
 
 	Orthotropic*     self = (Orthotropic*)rheology;
 	double C11;
@@ -141,7 +141,7 @@ void _Orthotropic_Construct( void* rheology, Stg_ComponentFactory* cf, void* dat
 	double n[3], m[3], q[3];
 
 	/* Construct Parent */
-	_Rheology_Construct( self, cf, data );
+	_Rheology_AssignFromXML( self, cf, data );
 	
 	/* get parameters */
 	/*******************************************************************

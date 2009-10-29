@@ -15,7 +15,7 @@ const Type Underworld_OutputForSPModel_Type = "Underworld_OutputForSPModel";
 FILE *iFile, *oFile;
 unsigned outputTimestep=0;
 Index Underworld_OutputForSPModel_Register( PluginsManager* pluginsManager );
-void _Underworld_OutputForSPModel_Construct( void* component, Stg_ComponentFactory* cf, void* data );
+void _Underworld_OutputForSPModel_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data );
 void* _Underworld_OutputForSPModel_DefaultNew( Name name );
 void Underworld_OutputForSPModelDo( UnderworldContext* context );
 
@@ -303,7 +303,7 @@ void* _Underworld_OutputForSPModel_DefaultNew( Name name ) {
 	return Codelet_New( 
 			Underworld_OutputForSPModel_Type,
 			_Underworld_OutputForSPModel_DefaultNew,
-			_Underworld_OutputForSPModel_Construct,
+			_Underworld_OutputForSPModel_AssignFromXML,
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,
@@ -311,7 +311,7 @@ void* _Underworld_OutputForSPModel_DefaultNew( Name name ) {
 			name );
 }
 
-void _Underworld_OutputForSPModel_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_OutputForSPModel_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext* context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data );
 
 	outputTimestep = Dictionary_GetUnsignedInt_WithDefault( context->dictionary, "OutputForSPModel_OutputTimestep", 10 );

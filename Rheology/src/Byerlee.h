@@ -82,7 +82,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _Byerlee_DefaultNew( Name name ) ;
-	void _Byerlee_Construct( void* rheology, Stg_ComponentFactory* cf, void* data );
+	void _Byerlee_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
 
 	/* 'YieldRheology' implementations */
 	double _Byerlee_GetYieldCriterion( 

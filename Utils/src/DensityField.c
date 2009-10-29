@@ -133,7 +133,7 @@ void* _DensityField_DefaultNew( Name name ) {
 		_DensityField_Print,
 		_DensityField_Copy,
 		_DensityField_DefaultNew,
-		_DensityField_Construct,
+		_DensityField_AssignFromXML,
 		_DensityField_Build, 
 		_DensityField_Initialise,
 		_DensityField_Execute,
@@ -149,15 +149,15 @@ void* _DensityField_DefaultNew( Name name ) {
 		name );
 }
 
-void _DensityField_Construct( void* densityField, Stg_ComponentFactory* cf, void* data ){
+void _DensityField_AssignFromXML( void* densityField, Stg_ComponentFactory* cf, void* data ){
 	DensityField*          self              = (DensityField*) densityField;
 	BuoyancyForceTerm*   buoyancyForceTerm;
 	Variable_Register*    variable_Register;
 
 	/* Construct Parent */
-	_ParticleFeVariable_Construct( self, cf, data );
+	_ParticleFeVariable_AssignFromXML( self, cf, data );
 
-	/*_FieldVariable_Construct( self, cf, data );*/
+	/*_FieldVariable_AssignFromXML( self, cf, data );*/
 
 	buoyancyForceTerm = Stg_ComponentFactory_ConstructByKey( cf, self->name, "BuoyancyForceTerm", BuoyancyForceTerm, True, data );
 	variable_Register      = self->context->variable_Register; 

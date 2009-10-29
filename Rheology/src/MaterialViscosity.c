@@ -112,7 +112,7 @@ void* _MaterialViscosity_DefaultNew( Name name ) {
 		_Rheology_Print,
 		_Rheology_Copy,
 		_MaterialViscosity_DefaultNew,
-		_MaterialViscosity_Construct,
+		_MaterialViscosity_AssignFromXML,
 		_Rheology_Build,
 		_Rheology_Initialise,
 		_Rheology_Execute,
@@ -121,11 +121,11 @@ void* _MaterialViscosity_DefaultNew( Name name ) {
 		name );
 }
 
-void _MaterialViscosity_Construct( void* rheology, Stg_ComponentFactory* cf, void* data ){
+void _MaterialViscosity_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
 	MaterialViscosity*  self = (MaterialViscosity*)rheology;
 
 	/* Construct Parent */
-	_Rheology_Construct( self, cf, data );
+	_Rheology_AssignFromXML( self, cf, data );
 	
 	_MaterialViscosity_Init( self, Stg_ComponentFactory_GetDouble( cf, self->name, "eta0", 1.0 ) );
 }

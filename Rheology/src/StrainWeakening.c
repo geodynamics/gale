@@ -202,7 +202,7 @@ void* _StrainWeakening_DefaultNew( Name name ) {
 		_TimeIntegratee_Print,
 		_TimeIntegratee_Copy,
 		_StrainWeakening_DefaultNew,
-		_StrainWeakening_Construct,
+		_StrainWeakening_AssignFromXML,
 		_StrainWeakening_Build,
 		_StrainWeakening_Initialise,
 		_TimeIntegratee_Execute,
@@ -213,7 +213,7 @@ void* _StrainWeakening_DefaultNew( Name name ) {
 		name );
 }
 
-void _StrainWeakening_Construct( void* strainWeakening, Stg_ComponentFactory* cf, void* data ){
+void _StrainWeakening_AssignFromXML( void* strainWeakening, Stg_ComponentFactory* cf, void* data ){
 	StrainWeakening*        self           = (StrainWeakening*) strainWeakening;
 	MaterialPointsSwarm*    materialPointsSwarm;
 	double                  healingRate;
@@ -229,7 +229,7 @@ void _StrainWeakening_Construct( void* strainWeakening, Stg_ComponentFactory* cf
 	Stg_Shape*              initialStrainShape;
 
 	/* Construct Parent */
-	_TimeIntegratee_Construct( self, cf, data );
+	_TimeIntegratee_AssignFromXML( self, cf, data );
 	
 	materialPointsSwarm     = Stg_ComponentFactory_ConstructByKey(
 		cf, 

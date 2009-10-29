@@ -111,7 +111,7 @@ void* _Arrhenius_DefaultNew( Name name ) {
 		_Rheology_Print,
 		_Rheology_Copy,
 		_Arrhenius_DefaultNew,
-		_Arrhenius_Construct,
+		_Arrhenius_AssignFromXML,
 		_Rheology_Build,
 		_Rheology_Initialise,
 		_Rheology_Execute,
@@ -120,12 +120,12 @@ void* _Arrhenius_DefaultNew( Name name ) {
 		name );
 }
 
-void _Arrhenius_Construct( void* rheology, Stg_ComponentFactory* cf, void* data ){
+void _Arrhenius_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
 	Arrhenius*     self = (Arrhenius*)rheology;
 	FeVariable*    temperatureField;
 
 	/* Construct Parent */
-	_Rheology_Construct( self, cf, data );
+	_Rheology_AssignFromXML( self, cf, data );
 	
 	/* TODO: 'KeyFallback' soon to be deprecated/updated */
 	temperatureField = Stg_ComponentFactory_ConstructByNameWithKeyFallback(

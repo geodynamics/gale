@@ -90,7 +90,7 @@ void _Velic_solHy_Init( Velic_solHy* self, double etaA, double etaB, double xc, 
 			"Error: In func %s. The input parameters you supplied to the analytic Solution are incorrect.\nValid range of xc values is [0,1]. Currently it is %f\n", __func__, self->xc );
 }
 
-void _Velic_solHy_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _Velic_solHy_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	Velic_solHy* self = (Velic_solHy*) analyticSolution;
 	FeVariable*              velocityField;
 	FeVariable*              pressureField;
@@ -102,7 +102,7 @@ void _Velic_solHy_Construct( void* analyticSolution, Stg_ComponentFactory* cf, v
 	int                      n;
 
 	/* Construct Parent */
-	_AnalyticSolution_Construct( self, cf, data );
+	_AnalyticSolution_AssignFromXML( self, cf, data );
 
 	/* Create Analytic Fields */
 	velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data );
@@ -145,7 +145,7 @@ void* _Velic_solHy_DefaultNew( Name name ) {
 			_AnalyticSolution_Print,
 			_AnalyticSolution_Copy,
 			_Velic_solHy_DefaultNew,
-			_Velic_solHy_Construct,
+			_Velic_solHy_AssignFromXML,
 			_AnalyticSolution_Build,
 			_AnalyticSolution_Initialise,
 			_AnalyticSolution_Execute,

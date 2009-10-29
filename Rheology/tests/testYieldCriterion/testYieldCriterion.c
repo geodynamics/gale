@@ -97,7 +97,7 @@ void Underworld_testYieldCriterion_Check( FiniteElementContext* context ) {
 	}
 }
 
-void _Underworld_testYieldCriterion_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_testYieldCriterion_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	YieldRheology*          yieldRheology;
 	Underworld_testYieldCriterion* self;
 
@@ -140,7 +140,7 @@ void* _Underworld_testYieldCriterion_DefaultNew( Name name ) {
 			_Codelet_Print,
 			_Codelet_Copy,
 			_Underworld_testYieldCriterion_DefaultNew,
-			_Underworld_testYieldCriterion_Construct,
+			_Underworld_testYieldCriterion_AssignFromXML,
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,

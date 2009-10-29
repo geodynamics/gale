@@ -99,7 +99,7 @@
 	
 	/* 'Stg_Component' implementations */
 	void* _MohrCoulomb_DefaultNew( Name name ) ;
-	void _MohrCoulomb_Construct( void* rheology, Stg_ComponentFactory* cf,
+	void _MohrCoulomb_AssignFromXML( void* rheology, Stg_ComponentFactory* cf,
                                      void *data );
 
 	void _MohrCoulomb_Build( void* rheology, void* data );

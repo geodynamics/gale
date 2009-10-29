@@ -121,7 +121,7 @@
 	void* _ConstitutiveMat_Refactored_Copy( void* constitutiveMatrix, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* 'Stg_Component' Virtual Functions */
-	void _ConstitutiveMat_Refactored_Construct( void* constitutiveMatrix, Stg_ComponentFactory* cf, void* data );
+	void _ConstitutiveMat_Refactored_AssignFromXML( void* constitutiveMatrix, Stg_ComponentFactory* cf, void* data );
 	void _ConstitutiveMat_Refactored_Build( void* constitutiveMatrix, void* data );
 	void _ConstitutiveMat_Refactored_Initialise( void* constitutiveMatrix, void* data );
 	void _ConstitutiveMat_Refactored_Execute( void* constitutiveMatrix, void* data );

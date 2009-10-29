@@ -60,7 +60,7 @@
 
 	Index Underworld_Velic_solS_Register( PluginsManager* pluginsManager );
 	void* _Underworld_solS_DefaultNew( Name name );
-	void _Underworld_solS_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data );
+	void _Underworld_solS_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data );
 	void _Underworld_solS_Init( Underworld_solS* self, double eta, int _n );
 
 	void Underworld_solS_PressureFunction( void* analyticSolution, double* coord, double* pressure );

@@ -20,7 +20,7 @@
 
 	Index Underworld_Velic_solDA_Register( PluginsManager* pluginsManager );
 	void* _Velic_solDA_DefaultNew( Name name );
-	void _Velic_solDA_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data );
+	void _Velic_solDA_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data );
 	void _Velic_solDA_Init( Velic_solDA* self, double sigma, double etaA, double etaB, double zc, double dx, double x0 );
 
 	void Velic_solDA_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* pressure );

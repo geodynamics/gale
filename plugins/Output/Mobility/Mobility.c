@@ -54,13 +54,13 @@
 
 const Type Underworld_Mobility_Type = "Underworld_Mobility";
 
-void _Underworld_Mobility_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_Mobility_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext*  context;
 
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
 
 	Underworld_Mobility_PrintHeaderToFile( context );
-	ContextEP_Append( context, AbstractContext_EP_ConstructExtensions, Underworld_Mobility_Setup );
+	ContextEP_Append( context, AbstractContext_EP_AssignFromXMLExtensions, Underworld_Mobility_Setup );
 	ContextEP_Append( context, AbstractContext_EP_FrequentOutput     , Underworld_Mobility_Dump );
 }
 
@@ -88,7 +88,7 @@ void* _Underworld_Mobility_DefaultNew( Name name ) {
 		_Codelet_Print,
 		_Codelet_Copy,
 		_Underworld_Mobility_DefaultNew,
-		_Underworld_Mobility_Construct,
+		_Underworld_Mobility_AssignFromXML,
 		_Underworld_Mobility_Build,
 		_Underworld_Mobility_Initialise,
 		_Codelet_Execute,

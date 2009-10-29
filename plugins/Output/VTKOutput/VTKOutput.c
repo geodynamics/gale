@@ -52,7 +52,7 @@
 
 const Type Underworld_VTKOutput_Type = "Underworld_VTKOutput";
 
-void _Underworld_VTKOutput_Construct( void* component, Stg_ComponentFactory* cf, void *data ) {
+void _Underworld_VTKOutput_AssignFromXML( void* component, Stg_ComponentFactory* cf, void *data ) {
 	UnderworldContext* context;
 
 	context = (UnderworldContext*)Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data );
@@ -65,7 +65,7 @@ void* _Underworld_VTKOutput_DefaultNew( Name name ) {
 	return Codelet_New(
 			Underworld_VTKOutput_Type,
 			_Underworld_VTKOutput_DefaultNew,
-			_Underworld_VTKOutput_Construct,
+			_Underworld_VTKOutput_AssignFromXML,
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,

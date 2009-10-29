@@ -182,7 +182,7 @@ void* _Director_DefaultNew( Name name ) {
 		_TimeIntegratee_Print,
 		_TimeIntegratee_Copy,
 		_Director_DefaultNew,
-		_Director_Construct,
+		_Director_AssignFromXML,
 		_Director_Build,
 		_Director_Initialise,
 		_TimeIntegratee_Execute,
@@ -192,7 +192,7 @@ void* _Director_DefaultNew( Name name ) {
 		name );
 }
 
-void _Director_Construct( void* director, Stg_ComponentFactory* cf, void* data ){
+void _Director_AssignFromXML( void* director, Stg_ComponentFactory* cf, void* data ){
 	Director*               self           = (Director*)director;
 	MaterialPointsSwarm*    materialPointsSwarm;
 	FeVariable*             velGradField;
@@ -200,7 +200,7 @@ void _Director_Construct( void* director, Stg_ComponentFactory* cf, void* data )
 	InitialDirectionType    initialDirectionType;
 	
 	/* Construct Parent */
-	_TimeIntegratee_Construct( self, cf, data );
+	_TimeIntegratee_AssignFromXML( self, cf, data );
 	
 	/* Construct 'Director' stuff */
 	/* TODO: 'KeyFallback' soon to be deprecated/updated */

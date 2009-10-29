@@ -144,7 +144,7 @@ void* _BuiterStrainWeakening_DefaultNew( Name name ) {
 		_TimeIntegratee_Print,
 		_TimeIntegratee_Copy,
 		_BuiterStrainWeakening_DefaultNew,
-		_BuiterStrainWeakening_Construct,
+		_BuiterStrainWeakening_AssignFromXML,
 		_BuiterStrainWeakening_Build,
 		_BuiterStrainWeakening_Initialise,
 		_TimeIntegratee_Execute,
@@ -155,11 +155,11 @@ void* _BuiterStrainWeakening_DefaultNew( Name name ) {
 		name );
 }
 
-void _BuiterStrainWeakening_Construct( void* strainWeakening, Stg_ComponentFactory* cf, void* data ){
+void _BuiterStrainWeakening_AssignFromXML( void* strainWeakening, Stg_ComponentFactory* cf, void* data ){
 	BuiterStrainWeakening*        self           = (BuiterStrainWeakening*) strainWeakening;
 
 	/* Construct Parent */
-	_StrainWeakening_Construct( self, cf, data );
+	_StrainWeakening_AssignFromXML( self, cf, data );
 }
 
 void _BuiterStrainWeakening_Build( void* strainWeakening, void* data ) {

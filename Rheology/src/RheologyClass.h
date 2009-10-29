@@ -107,7 +107,7 @@
 	
 	/* 'Stg_Component' implementations */
 	void* _Rheology_DefaultNew( Name name ) ;
-	void _Rheology_Construct( void* rheology, Stg_ComponentFactory* cf, void* data );
+	void _Rheology_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
 	void _Rheology_Build( void* rheology, void* data );
 	void _Rheology_Initialise( void* rheology, void* data );
 	void _Rheology_Execute( void* rheology, void* data );

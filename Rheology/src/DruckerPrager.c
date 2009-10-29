@@ -176,7 +176,7 @@ void* _DruckerPrager_DefaultNew( Name name ) {
 			_YieldRheology_Print,
 			_YieldRheology_Copy,
 			_DruckerPrager_DefaultNew,
-			_DruckerPrager_Construct,
+			_DruckerPrager_AssignFromXML,
 			_DruckerPrager_Build,
 			_DruckerPrager_Initialise,
 			_YieldRheology_Execute,
@@ -188,14 +188,14 @@ void* _DruckerPrager_DefaultNew( Name name ) {
 			name );
 }
 
-void _DruckerPrager_Construct( void* druckerPrager, Stg_ComponentFactory* cf, void* data ){
+void _DruckerPrager_AssignFromXML( void* druckerPrager, Stg_ComponentFactory* cf, void* data ){
 	DruckerPrager*          self           = (DruckerPrager*)druckerPrager;
 	FeVariable*             pressureField;
 	MaterialPointsSwarm*    materialPointsSwarm;
 	FiniteElementContext*   context;
 
 	/* Construct Parent */
-	_VonMises_Construct( self, cf, data );
+	_VonMises_AssignFromXML( self, cf, data );
 	
 	pressureField      = (FeVariable *) 
             Stg_ComponentFactory_ConstructByKey( cf, self->name, "PressureField", FeVariable, False, data );

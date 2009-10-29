@@ -153,7 +153,7 @@ void* _StoreStress_DefaultNew( Name name ) {
 		_Rheology_Print,
 		_Rheology_Copy,
 		_StoreStress_DefaultNew,
-		_StoreStress_Construct,
+		_StoreStress_AssignFromXML,
 		_Rheology_Build,
 		_Rheology_Initialise,
 		_Rheology_Execute,
@@ -162,13 +162,13 @@ void* _StoreStress_DefaultNew( Name name ) {
 		name );
 }
 
-void _StoreStress_Construct( void* rheology, Stg_ComponentFactory* cf, void* data ){
+void _StoreStress_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
 	StoreStress*              self              = (StoreStress*)rheology;
 	MaterialPointsSwarm*      materialPointsSwarm;
 	FeVariable*               strainRateField;
 
 	/* Construct Parent */
-	_Rheology_Construct( self, cf, data );
+	_Rheology_AssignFromXML( self, cf, data );
 
 	materialPointsSwarm = Stg_ComponentFactory_ConstructByKey( 
 		cf, 

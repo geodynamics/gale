@@ -403,13 +403,13 @@ void _LateralViscosityAnalytic_VelocityFunction( void* analyticSolution, FeVaria
 
 }
 
-void _LateralViscosityAnalytic_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _LateralViscosityAnalytic_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	LateralViscosityAnalytic*         self           = (LateralViscosityAnalytic*)analyticSolution;
 	AbstractContext*        context;
 	ConditionFunction*      condFunc;
 	
 	/* Construct Parent */
-	_AnalyticSolution_Construct( self, cf, data );
+	_AnalyticSolution_AssignFromXML( self, cf, data );
 
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
 	
@@ -441,7 +441,7 @@ void* _LateralViscosityAnalytic_DefaultNew( Name name ) {
 			_AnalyticSolution_Print,
 			_AnalyticSolution_Copy,
 			_LateralViscosityAnalytic_DefaultNew,
-			_LateralViscosityAnalytic_Construct,
+			_LateralViscosityAnalytic_AssignFromXML,
 			_LateralViscosityAnalytic_Build,
 			_AnalyticSolution_Initialise,
 			_AnalyticSolution_Execute,

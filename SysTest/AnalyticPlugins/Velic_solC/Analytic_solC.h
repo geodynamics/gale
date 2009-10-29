@@ -17,7 +17,7 @@
 
 	void* _Velic_solC_DefaultNew( Name name );
 	void _Velic_solC_Init( Velic_solC* self, double sigma, double eta, double x_c );
-	void _Velic_solC_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data );
+	void _Velic_solC_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data );
 
 	void Velic_solC_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* pressure );
 	void Velic_solC_VelocityFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* velocity );

@@ -99,13 +99,13 @@ void _Velic_solHA_Build( void* analyticSolution, void* data ) {
 	self->_analyticSolutionList[3] = Velic_solHA_StressFunction;
 }
 
-void _Velic_solHA_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _Velic_solHA_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	Velic_solHA* self = (Velic_solHA*) analyticSolution;
 	double                   sigma, eta, dx, dy, x0, y0;
 	double                   startX, endX, startY, endY;
 
 	/* Construct Parent */
-	_FieldTest_Construct( self, cf, data );
+	_FieldTest_AssignFromXML( self, cf, data );
 
 	sigma = Stg_ComponentFactory_GetRootDictDouble( cf, "solHA_sigma", 1.0 );
 	eta = Stg_ComponentFactory_GetRootDictDouble( cf, "solHA_eta", 1.0 );
@@ -133,7 +133,7 @@ void* _Velic_solHA_DefaultNew( Name name ) {
 			_FieldTest_Print,
 			_FieldTest_Copy,
 			_Velic_solHA_DefaultNew,
-			_Velic_solHA_Construct,
+			_Velic_solHA_AssignFromXML,
 			_Velic_solHA_Build,
 			_FieldTest_Initialise,
 			_FieldTest_Execute,

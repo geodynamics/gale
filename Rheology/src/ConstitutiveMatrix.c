@@ -235,14 +235,14 @@ void* _ConstitutiveMatrix_Copy( void* constitutiveMatrix, void* dest, Bool deep,
 	return (void*)newConstitutiveMatrix;
 }
 
-void _ConstitutiveMatrix_Construct( void* constitutiveMatrix, Stg_ComponentFactory* cf, void* data ) {
+void _ConstitutiveMatrix_AssignFromXML( void* constitutiveMatrix, Stg_ComponentFactory* cf, void* data ) {
 	ConstitutiveMatrix*         self          = (ConstitutiveMatrix*)constitutiveMatrix;
 	Dimension_Index             dim;
 	Materials_Register*         materialsRegister;
 	Bool                        storeConstitutiveMatrix;
 	PICelleratorContext*	    context;
 
-	_StiffnessMatrixTerm_Construct( self, cf, data );
+	_StiffnessMatrixTerm_AssignFromXML( self, cf, data );
 	
 	context = (PICelleratorContext*)self->context;
 	assert( Stg_CheckType( context, PICelleratorContext ) );

@@ -125,7 +125,7 @@
 	
 	/* 'Stg_Component' implementations */
 	void* _StrainWeakening_DefaultNew( Name name ) ;
-	void _StrainWeakening_Construct( void* rheology, Stg_ComponentFactory* cf, void* data );
+	void _StrainWeakening_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
 	void _StrainWeakening_Build( void* strainWeakening, void* data ) ;
 	void _StrainWeakening_Initialise( void* strainWeakening, void* data ) ;
 	

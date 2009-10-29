@@ -147,7 +147,7 @@ void* _StressField_DefaultNew( Name name ) {
 		_StressField_Print,
 		_StressField_Copy,
 		_StressField_DefaultNew,
-		_StressField_Construct,
+		_StressField_AssignFromXML,
 		_StressField_Build, 
 		_StressField_Initialise,
 		_StressField_Execute,
@@ -174,7 +174,7 @@ void StressField_NonLinearUpdate( void* _sle, void* _ctx ) {
    ParticleFeVariable_Update( stressVar );
 }
 
-void _StressField_Construct( void* stressField, Stg_ComponentFactory* cf, void* data ){
+void _StressField_AssignFromXML( void* stressField, Stg_ComponentFactory* cf, void* data ){
 	StressField*          self              = (StressField*) stressField;
 	FeVariable*           strainRateField;
 	ConstitutiveMatrix*   constitutiveMatrix;
@@ -184,9 +184,9 @@ void _StressField_Construct( void* stressField, Stg_ComponentFactory* cf, void* 
         SystemLinearEquations* sle;
 
 	/* Construct Parent */
-	_ParticleFeVariable_Construct( self, cf, data );
+	_ParticleFeVariable_AssignFromXML( self, cf, data );
 
-	/* _FieldVariable_Construct( self, cf, data ); */
+	/* _FieldVariable_AssignFromXML( self, cf, data ); */
 
 	strainRateField =  Stg_ComponentFactory_ConstructByKey( cf,  self->name, "StrainRateField", FeVariable, True, data );
 	constitutiveMatrix = Stg_ComponentFactory_ConstructByKey( cf, self->name, "ConstitutiveMatrix", ConstitutiveMatrix, True, data );

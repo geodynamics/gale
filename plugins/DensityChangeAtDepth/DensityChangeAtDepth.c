@@ -136,7 +136,7 @@ void Underworld_DensityChange_Setup( UnderworldContext* context ) {
 	self->bftExt = materialExt;
 }
 
-void _Underworld_DensityChange_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_DensityChange_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext* context;
 
 	context = (UnderworldContext*)Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
@@ -155,7 +155,7 @@ void* _Underworld_DensityChange_DefaultNew( Name name ) {
 			_Codelet_Print, 
 			_Codelet_Copy, 
 			_Underworld_DensityChange_DefaultNew,
-			_Underworld_DensityChange_Construct,
+			_Underworld_DensityChange_AssignFromXML,
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,

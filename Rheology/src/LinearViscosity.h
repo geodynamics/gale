@@ -42,7 +42,7 @@
 	
 	/* 'Stg_Component' implementations */
 	void* _LinearViscosity_DefaultNew( Name name ) ;
-	void _LinearViscosity_Construct( void* rheology, Stg_ComponentFactory* cf, void* data );
+	void _LinearViscosity_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
 
 	void _LinearViscosity_ModifyConstitutiveMatrix( 
 		void*                                              rheology, 

@@ -106,7 +106,7 @@ void* _RadiogenicHeatingTerm_DefaultNew( Name name ) {
 		_RadiogenicHeatingTerm_Print,
 		NULL,
 		_RadiogenicHeatingTerm_DefaultNew,
-		_RadiogenicHeatingTerm_Construct,
+		_RadiogenicHeatingTerm_AssignFromXML,
 		_RadiogenicHeatingTerm_Build,
 		_RadiogenicHeatingTerm_Initialise,
 		_RadiogenicHeatingTerm_Execute,
@@ -115,13 +115,13 @@ void* _RadiogenicHeatingTerm_DefaultNew( Name name ) {
 		name );
 }
 
-void _RadiogenicHeatingTerm_Construct( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
+void _RadiogenicHeatingTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
 	RadiogenicHeatingTerm*      self             = (RadiogenicHeatingTerm*)forceTerm;
 	PICelleratorContext*        context;
 	Materials_Register*         materials_Register;
 
 	/* Construct Parent */
-	_ForceTerm_Construct( self, cf, data );
+	_ForceTerm_AssignFromXML( self, cf, data );
 
 	context = (PICelleratorContext*)self->context;
 	assert( Stg_CheckType( context, PICelleratorContext ) );

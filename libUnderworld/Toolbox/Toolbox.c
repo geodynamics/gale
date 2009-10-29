@@ -50,14 +50,14 @@
 
 const Type Underworld_Toolbox_Type = "Underworld_Toolbox";
 
-void _Underworld_Toolbox_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_Toolbox_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 }
 
 void* _Underworld_Toolbox_DefaultNew( Name name ) {
 	return Codelet_New(
 			Underworld_Toolbox_Type,
 			_Underworld_Toolbox_DefaultNew,
-			_Underworld_Toolbox_Construct,
+			_Underworld_Toolbox_AssignFromXML,
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,

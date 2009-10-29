@@ -81,7 +81,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _Arrhenius_DefaultNew( Name name ) ;
-	void _Arrhenius_Construct( void* rheology, Stg_ComponentFactory* cf, void* data );
+	void _Arrhenius_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
 
 	void _Arrhenius_ModifyConstitutiveMatrix( 
 		void*                                              rheology, 

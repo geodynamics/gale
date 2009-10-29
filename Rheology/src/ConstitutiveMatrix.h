@@ -128,7 +128,7 @@
 	void* _ConstitutiveMatrix_Copy( void* constitutiveMatrix, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* 'Stg_Component' Virtual Functions */
-	void _ConstitutiveMatrix_Construct( void* constitutiveMatrix, Stg_ComponentFactory* cf, void* data );
+	void _ConstitutiveMatrix_AssignFromXML( void* constitutiveMatrix, Stg_ComponentFactory* cf, void* data );
 	void _ConstitutiveMatrix_Build( void* constitutiveMatrix, void* data );
 	void _ConstitutiveMatrix_Initialise( void* constitutiveMatrix, void* data );
 	void _ConstitutiveMatrix_Execute( void* constitutiveMatrix, void* data );

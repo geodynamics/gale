@@ -108,7 +108,7 @@ typedef struct {
 	__Codelet
 } Underworld_testDirectorPerMaterial;
 
-void _Underworld_testDirectorPerMaterial_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_testDirectorPerMaterial_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	FiniteElementContext*   context;
 	Stream*                 stream                 = Journal_Register( Info_Type, CURR_MODULE_NAME );
 
@@ -124,7 +124,7 @@ void* _Underworld_testDirectorPerMaterial_DefaultNew( Name name ) {
 	return Codelet_New(
 			Underworld_testDirectorPerMaterial_Type,
 			_Underworld_testDirectorPerMaterial_DefaultNew,
-			_Underworld_testDirectorPerMaterial_Construct,
+			_Underworld_testDirectorPerMaterial_AssignFromXML,
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,

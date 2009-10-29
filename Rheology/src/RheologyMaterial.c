@@ -76,7 +76,7 @@ RheologyMaterial* RheologyMaterial_New(
 		_RheologyMaterial_Print, 
 		_RheologyMaterial_Copy,
 		_RheologyMaterial_DefaultNew,
-		_RheologyMaterial_Construct,
+		_RheologyMaterial_AssignFromXML,
 		_RheologyMaterial_Build, 
 		_RheologyMaterial_Initialise,
 		_RheologyMaterial_Execute,
@@ -100,7 +100,7 @@ void* _RheologyMaterial_DefaultNew( Name name ) {
 		_RheologyMaterial_Print, 
 		_RheologyMaterial_Copy,
 		_RheologyMaterial_DefaultNew,
-		_RheologyMaterial_Construct,
+		_RheologyMaterial_AssignFromXML,
 		_RheologyMaterial_Build, 
 		_RheologyMaterial_Initialise,
 		_RheologyMaterial_Execute,
@@ -173,14 +173,14 @@ RheologyMaterial* _RheologyMaterial_New(
 }
 
 
-void _RheologyMaterial_Construct( void* rheologyMaterial, Stg_ComponentFactory* cf, void* data ){
+void _RheologyMaterial_AssignFromXML( void* rheologyMaterial, Stg_ComponentFactory* cf, void* data ){
 	RheologyMaterial*           self                 = (RheologyMaterial*)rheologyMaterial;
 	Rheology**                  rheologyList;
 	Rheology_Index              rheologyCount;
 	Compressible*               compressible;
 	Bool			    isCompressible;
 
-	_Material_Construct( self, cf, data );
+	_Material_AssignFromXML( self, cf, data );
 
 	rheologyList = Stg_ComponentFactory_ConstructByList( 
 		cf, 

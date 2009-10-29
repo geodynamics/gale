@@ -54,7 +54,7 @@ void* _SmoothVelGradField_DefaultNew( Name name ) {
       _SmoothVelGradField_Print,
       _SmoothVelGradField_Copy,
       _SmoothVelGradField_DefaultNew,
-      _SmoothVelGradField_Construct,
+      _SmoothVelGradField_AssignFromXML,
       _SmoothVelGradField_Build, 
       _SmoothVelGradField_Initialise,
       _SmoothVelGradField_Execute,
@@ -105,13 +105,13 @@ void SmoothVelGradField_NonLinearUpdate( void* _sle, void* _ctx ) {
    ParticleFeVariable_Update( preVar );
 }
 
-void _SmoothVelGradField_Construct( void* _self, Stg_ComponentFactory* cf, void* data ){
+void _SmoothVelGradField_AssignFromXML( void* _self, Stg_ComponentFactory* cf, void* data ){
    SmoothVelGradField* self = (SmoothVelGradField*) _self;
    Variable_Register* variable_Register;
    SystemLinearEquations* sle;
 
    /* Construct Parent */
-   _ParticleFeVariable_Construct( self, cf, data );
+   _ParticleFeVariable_AssignFromXML( self, cf, data );
 
    variable_Register = self->context->variable_Register;
    assert( variable_Register );

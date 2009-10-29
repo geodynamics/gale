@@ -111,13 +111,13 @@ void _Underworld_solCx_Build( void* analyticSolution, void* data ) {
 	self->_analyticSolutionList[3] = Velic_solCx_StressFunction;
 }
 
-void _Underworld_solCx_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_solCx_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	Velic_solCx* self = (Velic_solCx*) analyticSolution;
 	double etaA, etaB, xc;
 	int n;
 
 	/* Construct Parent */
-	_FieldTest_Construct( self, cf, data );
+	_FieldTest_AssignFromXML( self, cf, data );
 
 	etaA = Stg_ComponentFactory_GetRootDictDouble( cf, "solCx_etaA", 1.0 );
 	etaB = Stg_ComponentFactory_GetRootDictDouble( cf, "solCx_etaB", 2.0 );
@@ -135,7 +135,7 @@ void* _Underworld_solCx_DefaultNew( Name name ) {
 			_FieldTest_Print,
 			_FieldTest_Copy,
 			_Underworld_solCx_DefaultNew,
-			_Underworld_solCx_Construct,
+			_Underworld_solCx_AssignFromXML,
 			_Underworld_solCx_Build,
 			_FieldTest_Initialise,
 			_FieldTest_Execute,

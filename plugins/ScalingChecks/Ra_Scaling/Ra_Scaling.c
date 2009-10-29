@@ -102,7 +102,7 @@ void _Ra_CheckScalings_Func( void* context, void* ptrToContext ) {
   }
 }
 
-void _Underworld_Ra_Scaling_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_Ra_Scaling_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext* context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
 	
 	Bool checkScaling = Stg_ComponentFactory_GetRootDictBool( cf, "Ra_ScalingCheck", True ); 
@@ -125,7 +125,7 @@ void* _Underworld_Ra_Scaling_DefaultNew( Name name ) {
 	return Codelet_New(
 			Underworld_Ra_Scaling_Type,
 			_Underworld_Ra_Scaling_DefaultNew,
-			_Underworld_Ra_Scaling_Construct, /* SQ NOTE: Used to be a construct extensions. */
+			_Underworld_Ra_Scaling_AssignFromXML, /* SQ NOTE: Used to be a construct extensions. */
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,

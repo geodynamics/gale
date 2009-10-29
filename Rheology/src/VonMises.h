@@ -86,7 +86,7 @@
 	
 	/* 'Stg_Component' implementations */
 	void* _VonMises_DefaultNew( Name name ) ;
-	void _VonMises_Construct( void* rheology, Stg_ComponentFactory* cf, void* data );
+	void _VonMises_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
 
 	/* 'YieldRheology' implementations */
 	double _VonMises_GetYieldCriterion( 

@@ -102,7 +102,7 @@
 	void _ConstitutiveMatrixCartesian_Print( void* constitutiveMatrix, Stream* stream );
 
 	void* _ConstitutiveMatrixCartesian_DefaultNew( Name name ) ;
-void _ConstitutiveMatrixCartesian_Construct( void* constitutiveMatrix, Stg_ComponentFactory* cf, void* data ) ;
+void _ConstitutiveMatrixCartesian_AssignFromXML( void* constitutiveMatrix, Stg_ComponentFactory* cf, void* data ) ;
 	void _ConstitutiveMatrixCartesian_Build( void* constitutiveMatrix, void* data ) ;
 	void _ConstitutiveMatrixCartesian_Initialise( void* constitutiveMatrix, void* data ) ;
 	void _ConstitutiveMatrixCartesian_Execute( void* constitutiveMatrix, void* data ) ;

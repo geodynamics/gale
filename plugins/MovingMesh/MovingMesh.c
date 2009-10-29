@@ -56,7 +56,7 @@
 /* Each component type needs a unique identifier (as a string for us to read and as an integer for realtime comparisions) */
 const Type Underworld_MovingMesh_Type = "Underworld_MovingMesh";
 
-void _Underworld_MovingMesh_Construct( void* meshExtender, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_MovingMesh_AssignFromXML( void* meshExtender, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext*  context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data );
 	MeshExtender*       self = (MeshExtender*) meshExtender;
 	Dimension_Index     dim_I = 0;
@@ -542,7 +542,7 @@ void* _Underworld_MovingMesh_DefaultNew( Name name ) {
 			_Codelet_Print, 
 			_Codelet_Copy,
 			_Underworld_MovingMesh_DefaultNew,
-			_Underworld_MovingMesh_Construct, /* SQ NOTE: Used to be a construct extensions. */
+			_Underworld_MovingMesh_AssignFromXML, /* SQ NOTE: Used to be a construct extensions. */
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,

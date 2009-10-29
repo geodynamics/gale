@@ -109,7 +109,7 @@ void* _Anisotropic_DefaultNew( Name name ) {
 		_Rheology_Print,
 		_Rheology_Copy,
 		_Anisotropic_DefaultNew,
-		_Anisotropic_Construct,
+		_Anisotropic_AssignFromXML,
 		_Rheology_Build,
 		_Rheology_Initialise,
 		_Rheology_Execute,
@@ -118,12 +118,12 @@ void* _Anisotropic_DefaultNew( Name name ) {
 		name );
 }
 
-void _Anisotropic_Construct( void* rheology, Stg_ComponentFactory* cf, void* data ){
+void _Anisotropic_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
 	Anisotropic*     self = (Anisotropic*)rheology;
 	Director*        director;
 
 	/* Construct Parent */
-	_Rheology_Construct( self, cf, data );
+	_Rheology_AssignFromXML( self, cf, data );
 	
 	director =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "Director", Director,  True, data ) ;
 

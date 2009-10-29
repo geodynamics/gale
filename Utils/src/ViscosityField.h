@@ -56,7 +56,7 @@
 	void _ViscosityField_Print( void* variable, Stream* stream );
 	void* _ViscosityField_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
-	void _ViscosityField_Construct( void* variable, Stg_ComponentFactory* cf, void* data ) ;
+	void _ViscosityField_AssignFromXML( void* variable, Stg_ComponentFactory* cf, void* data ) ;
 	void _ViscosityField_Build( void* variable, void* data ) ;
 	void _ViscosityField_Initialise( void* variable, void* data ) ;
 	void _ViscosityField_Execute( void* variable, void* data ) ;

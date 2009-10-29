@@ -33,7 +33,7 @@
 
 	void* _Underworld_EulerDeform_DefaultNew( Name name );
 
-	void _Underworld_EulerDeform_Construct( void* component, Stg_ComponentFactory* cf, void* data );
+	void _Underworld_EulerDeform_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data );
 
 	void _Underworld_EulerDeform_Build( void* component, void* data );
 

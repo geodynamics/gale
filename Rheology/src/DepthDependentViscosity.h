@@ -39,7 +39,7 @@
 	
 	/* 'Stg_Component' implementations */
 	void* _DepthDependentViscosity_DefaultNew( Name name ) ;
-	void _DepthDependentViscosity_Construct( void* rheology, Stg_ComponentFactory* cf, void* data );
+	void _DepthDependentViscosity_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
 
 	void _DepthDependentViscosity_ModifyConstitutiveMatrix( 
 		void*                                              rheology, 

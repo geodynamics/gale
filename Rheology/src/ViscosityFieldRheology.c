@@ -107,7 +107,7 @@ void* _ViscosityFieldRheology_DefaultNew( Name name ) {
 		_Rheology_Print,
 		_Rheology_Copy,
 		_ViscosityFieldRheology_DefaultNew,
-		_ViscosityFieldRheology_Construct,
+		_ViscosityFieldRheology_AssignFromXML,
 		_ViscosityFieldRheology_Build,
 		_Rheology_Initialise,
 		_Rheology_Execute,
@@ -116,11 +116,11 @@ void* _ViscosityFieldRheology_DefaultNew( Name name ) {
 		name );
 }
 
-void _ViscosityFieldRheology_Construct( void* rheology, Stg_ComponentFactory* cf, void* data ){
+void _ViscosityFieldRheology_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
 	ViscosityFieldRheology*     self = (ViscosityFieldRheology*)rheology;
 
 	/* Construct Parent */
-	_Rheology_Construct( self, cf, data );
+	_Rheology_AssignFromXML( self, cf, data );
 	
 	_ViscosityFieldRheology_Init( self, 
 		Stg_ComponentFactory_GetString( cf, self->name, "ViscosityField", "ViscosityField" ) );

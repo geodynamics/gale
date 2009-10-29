@@ -108,7 +108,7 @@
 	
 	/* 'Stg_Component' implementations */
 	void* _Pouliquen_etal_DefaultNew( Name name ) ;
-	void _Pouliquen_etal_Construct( void* rheology, Stg_ComponentFactory* cf, void* data );
+	void _Pouliquen_etal_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
 
 	void _Pouliquen_etal_Build( void* rheology, void* data );
 	void _Pouliquen_etal_Initialise( void* rheology, void* data ) ;

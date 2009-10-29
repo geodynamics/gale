@@ -167,12 +167,12 @@ void* _YieldRheology_Copy( void* rheology, void* dest, Bool deep, Name nameExt, 
 	return (void*) self;
 }
 
-void _YieldRheology_Construct( void* rheology, Stg_ComponentFactory* cf, void* data ){
+void _YieldRheology_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
 	YieldRheology*           self                 = (YieldRheology*)rheology;
 	StrainWeakening*         strainWeakening;
 	MaterialPointsSwarm*  materialPoints;
 	
-	_Rheology_Construct( self, cf, data );
+	_Rheology_AssignFromXML( self, cf, data );
 
 	strainWeakening =  Stg_ComponentFactory_ConstructByKey( 
 		cf, 

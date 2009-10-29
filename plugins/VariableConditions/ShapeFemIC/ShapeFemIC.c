@@ -303,7 +303,7 @@ void Underworld_GaussianIC( Node_LocalIndex node_lI, Variable_Index var_I, void*
 
 }
 
-void _Underworld_ShapeFemIC_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_ShapeFemIC_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	ConditionFunction*      condFunc;
 	UnderworldContext*      context;
 
@@ -321,7 +321,7 @@ void* _Underworld_ShapeFemIC_DefaultNew( Name name ) {
 	return Codelet_New(
 		Underworld_ShapeFemIC_Type,
 		_Underworld_ShapeFemIC_DefaultNew,
-		_Underworld_ShapeFemIC_Construct,
+		_Underworld_ShapeFemIC_AssignFromXML,
 		_Codelet_Build,
 		_Codelet_Initialise,
 		_Codelet_Execute,

@@ -78,7 +78,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _Anisotropic_DefaultNew( Name name ) ;
-	void _Anisotropic_Construct( void* rheology, Stg_ComponentFactory* cf, void* data );
+	void _Anisotropic_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
 
 	void _Anisotropic_ModifyConstitutiveMatrix( 
 		void*                                              rheology, 

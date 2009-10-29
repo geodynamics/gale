@@ -112,7 +112,7 @@ void* _DepthDependentViscosity_DefaultNew( Name name ) {
 		_Rheology_Print,
 		_Rheology_Copy,
 		_DepthDependentViscosity_DefaultNew,
-		_DepthDependentViscosity_Construct,
+		_DepthDependentViscosity_AssignFromXML,
 		_Rheology_Build,
 		_Rheology_Initialise,
 		_Rheology_Execute,
@@ -121,7 +121,7 @@ void* _DepthDependentViscosity_DefaultNew( Name name ) {
 		name );
 }
 
-void _DepthDependentViscosity_Construct( void* rheology, Stg_ComponentFactory* cf, void* data ){
+void _DepthDependentViscosity_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
 	DepthDependentViscosity*  self                   = (DepthDependentViscosity*)rheology;
 	FeMesh*  		  feMesh;
 	Axis                      variationAxis          = 0;
@@ -129,7 +129,7 @@ void _DepthDependentViscosity_Construct( void* rheology, Stg_ComponentFactory* c
 	Stream*                   errorStream            = Journal_Register( Error_Type, self->type );
 
 	/* Construct Parent */
-	_Rheology_Construct( self, cf, data );
+	_Rheology_AssignFromXML( self, cf, data );
 	
 	feMesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Mesh", FeMesh, True, data ) ;
 

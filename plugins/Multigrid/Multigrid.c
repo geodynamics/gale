@@ -88,7 +88,7 @@ void Underworld_Multigrid_SolverSetup( void* _solver, void* _stokesSLE ) {
 }
 
 
-void Underworld_Multigrid_Construct( void* _self, Stg_ComponentFactory* cf, void* data ) {
+void Underworld_Multigrid_AssignFromXML( void* _self, Stg_ComponentFactory* cf, void* data ) {
    Underworld_Multigrid* self = (Underworld_Multigrid*)_self;
    UnderworldContext* ctx;
 
@@ -127,7 +127,7 @@ void* Underworld_Multigrid_New( Name name ) {
                         _Codelet_Print,
                         _Codelet_Copy,
                         Underworld_Multigrid_New,
-                        Underworld_Multigrid_Construct,
+                        Underworld_Multigrid_AssignFromXML,
                         Underworld_Multigrid_Build,
                         Underworld_Multigrid_Initialise,
                         _Codelet_Execute,

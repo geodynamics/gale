@@ -105,7 +105,7 @@
 		Rheology_Index                                     rheologyCount,
 		Compressible*                                      compressible );
 
-	void _RheologyMaterial_Construct( void* rheologyMaterial, Stg_ComponentFactory* cf, void* data );
+	void _RheologyMaterial_AssignFromXML( void* rheologyMaterial, Stg_ComponentFactory* cf, void* data );
 
 	void _RheologyMaterial_Init(
 		void*                                              rheologyMaterial,

@@ -77,13 +77,13 @@ void _Underworld_solB_Init( Underworld_solB* self, double sigma, double Z, doubl
 	self->n     = n;	
 }
 
-void _Underworld_solB_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_solB_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	Underworld_solB* 		self = (Underworld_solB*) analyticSolution;
 	Bool                     isCorrectInput = True;
 	double                   sigma, Z, wavenumberY, n;
 
 	/* Construct Parent */
-	_FieldTest_Construct( self, cf, data );
+	_FieldTest_AssignFromXML( self, cf, data );
 
 	sigma = Stg_ComponentFactory_GetRootDictDouble( cf, "solB_sigma", 1.0 );
 	Z = Stg_ComponentFactory_GetRootDictDouble( cf, "solB_Z", 1.0 );
@@ -126,7 +126,7 @@ void* _Underworld_solB_DefaultNew( Name name ) {
 			_FieldTest_Print,
 			_FieldTest_Copy,
 			_Underworld_solB_DefaultNew,
-			_Underworld_solB_Construct,
+			_Underworld_solB_AssignFromXML,
 			_Underworld_solB_Build,
 			_FieldTest_Initialise,
 			_FieldTest_Execute,

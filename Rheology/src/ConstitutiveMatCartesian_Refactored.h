@@ -98,7 +98,7 @@
 	void _ConstitutiveMatCartesian_Refactored_Print( void* constitutiveMatrix, Stream* stream );
 
 	void* _ConstitutiveMatCartesian_Refactored_DefaultNew( Name name ) ;
-	void _ConstitutiveMatCartesian_Refactored_Construct( void* constitutiveMatrix, Stg_ComponentFactory* cf, void* data ) ;
+	void _ConstitutiveMatCartesian_Refactored_AssignFromXML( void* constitutiveMatrix, Stg_ComponentFactory* cf, void* data ) ;
 	void _ConstitutiveMatCartesian_Refactored_Build( void* constitutiveMatrix, void* data ) ;
 	void _ConstitutiveMatCartesian_Refactored_Initialise( void* constitutiveMatrix, void* data ) ;
 	void _ConstitutiveMatCartesian_Refactored_Execute( void* constitutiveMatrix, void* data ) ;

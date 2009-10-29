@@ -131,7 +131,7 @@ void* _VonMises_DefaultNew( Name name ) {
 		_YieldRheology_Print,
 		_YieldRheology_Copy,
 		_VonMises_DefaultNew,
-		_VonMises_Construct,
+		_VonMises_AssignFromXML,
 		_YieldRheology_Build,
 		_YieldRheology_Initialise,
 		_YieldRheology_Execute,
@@ -143,12 +143,12 @@ void* _VonMises_DefaultNew( Name name ) {
 		name );
 }
 
-void _VonMises_Construct( void* rheology, Stg_ComponentFactory* cf, void* data ){
+void _VonMises_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
 	VonMises*          self           = (VonMises*)rheology;
 	FeVariable*        strainRateField;
 
 	/* Construct Parent */
-	_YieldRheology_Construct( self, cf, data );
+	_YieldRheology_AssignFromXML( self, cf, data );
 	
 	strainRateField = Stg_ComponentFactory_ConstructByKey(  
 			cf, self->name, "StrainRateField", FeVariable, False, data );

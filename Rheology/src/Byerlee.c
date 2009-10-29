@@ -119,7 +119,7 @@ void* _Byerlee_DefaultNew( Name name ) {
 		_YieldRheology_Print,
 		_YieldRheology_Copy,
 		_Byerlee_DefaultNew,
-		_Byerlee_Construct,
+		_Byerlee_AssignFromXML,
 		_YieldRheology_Build,
 		_YieldRheology_Initialise, 
 		_YieldRheology_Execute,
@@ -131,12 +131,12 @@ void* _Byerlee_DefaultNew( Name name ) {
 		name );
 }
 
-void _Byerlee_Construct( void* rheology, Stg_ComponentFactory* cf, void* data ){
+void _Byerlee_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
 	Byerlee*            self           = (Byerlee*)rheology;
 	FeMesh*		    mesh;
 
 	/* Construct Parent */
-	_VonMises_Construct( self, cf, data );
+	_VonMises_AssignFromXML( self, cf, data );
 	/* TODO: "KeyFallback' soon to be deprecated/updated */
 	/*
 	geometry = Stg_ComponentFactory_ConstructByNameWithKeyFallback(

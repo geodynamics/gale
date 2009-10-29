@@ -196,7 +196,7 @@ void* _ConstitutiveMatrixCartesian_DefaultNew( Name name ) {
 		_ConstitutiveMatrixCartesian_Print,
 		NULL,
 		_ConstitutiveMatrixCartesian_DefaultNew,
-		_ConstitutiveMatrixCartesian_Construct,
+		_ConstitutiveMatrixCartesian_AssignFromXML,
 		_ConstitutiveMatrixCartesian_Build,
 		_ConstitutiveMatrixCartesian_Initialise,
 		_ConstitutiveMatrixCartesian_Execute,
@@ -211,11 +211,11 @@ void* _ConstitutiveMatrixCartesian_DefaultNew( Name name ) {
 		name );
 }
 
-void _ConstitutiveMatrixCartesian_Construct( void* constitutiveMatrix, Stg_ComponentFactory* cf, void* data ) {
+void _ConstitutiveMatrixCartesian_AssignFromXML( void* constitutiveMatrix, Stg_ComponentFactory* cf, void* data ) {
 	ConstitutiveMatrixCartesian*            self             = (ConstitutiveMatrixCartesian*)constitutiveMatrix;
 
 	/* Construct Parent */
-	_ConstitutiveMatrix_Construct( self, cf, data );
+	_ConstitutiveMatrix_AssignFromXML( self, cf, data );
 
 	_ConstitutiveMatrixCartesian_Init( self );
 }

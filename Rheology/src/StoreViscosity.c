@@ -127,7 +127,7 @@ void* _StoreVisc_DefaultNew( Name name ) {
 		_Rheology_Print,
 		_Rheology_Copy,
 		_StoreVisc_DefaultNew,
-		_StoreVisc_Construct,
+		_StoreVisc_AssignFromXML,
 		_Rheology_Build,
 		_Rheology_Initialise,
 		_Rheology_Execute,
@@ -136,12 +136,12 @@ void* _StoreVisc_DefaultNew( Name name ) {
 		name );
 }
 
-void _StoreVisc_Construct( void* rheology, Stg_ComponentFactory* cf, void* data ){
+void _StoreVisc_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
 	StoreVisc*              self              = (StoreVisc*)rheology;
 	MaterialPointsSwarm* materialPointsSwarm;
 
 	/* Construct Parent */
-	_Rheology_Construct( self, cf, data );
+	_Rheology_AssignFromXML( self, cf, data );
 
 	materialPointsSwarm = Stg_ComponentFactory_ConstructByKey( 
 		cf, 

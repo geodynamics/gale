@@ -101,7 +101,7 @@
 		Index                                              rheologyListCount
 		);
 
-	void _MultiRheologyMaterial_Construct( void* material, Stg_ComponentFactory* cf, void* data );
+	void _MultiRheologyMaterial_AssignFromXML( void* material, Stg_ComponentFactory* cf, void* data );
 
 	void _MultiRheologyMaterial_Init( 
 		MultiRheologyMaterial*  self, 

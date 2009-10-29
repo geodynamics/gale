@@ -95,14 +95,14 @@ void _Underworld_solS_Build( void* analyticSolution, void* data ) {
 	self->_analyticSolutionList[3] = Underworld_solS_StressFunction;
 }
 
-void _Underworld_solS_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_solS_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	Underworld_solS*	self = (Underworld_solS*) analyticSolution;
 	Bool					isCorrectInput = True;
 	double				_eta;
 	int					_n;
 
 	/* Construct Parent */
-	_FieldTest_Construct( self, cf, data );
+	_FieldTest_AssignFromXML( self, cf, data );
 	
 	_eta = Stg_ComponentFactory_GetRootDictDouble( cf, "solS_eta", 1.0 );
 	_n = Stg_ComponentFactory_GetRootDictInt( cf, "sinusoidalLidWavenumber", 1 );
@@ -129,7 +129,7 @@ void* _Underworld_solS_DefaultNew( Name name ) {
 			_FieldTest_Print,
 			_FieldTest_Copy,
 			_Underworld_solS_DefaultNew,
-			_Underworld_solS_Construct,
+			_Underworld_solS_AssignFromXML,
 			_Underworld_solS_Build,
 			_FieldTest_Initialise,
 			_FieldTest_Execute,

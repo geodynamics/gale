@@ -59,7 +59,7 @@
 
 const Type Underworld_BoundaryLayers_Type = "Underworld_BoundaryLayers";
 
-void _Underworld_BoundaryLayers_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_BoundaryLayers_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext* context;
 
 	/*printf("AKJFHQEIUH)@$UFKAJSDHRF\nKJASHRFOPUEH\nsaljkdh9\n9)#@$\n213\n\n"); The coordinates of the California Moon ??   */ 
@@ -81,7 +81,7 @@ void* _Underworld_BoundaryLayers_DefaultNew( Name name ) {
 		_Codelet_Print,
 		_Codelet_Copy,
 		_Underworld_BoundaryLayers_DefaultNew,
-		_Underworld_BoundaryLayers_Construct,
+		_Underworld_BoundaryLayers_AssignFromXML,
 		_Codelet_Build,
 		_Codelet_Initialise,
 		_Codelet_Execute,

@@ -88,7 +88,7 @@
 	void* _PressureTemperatureOutput_Copy( void* swarmOutput, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _PressureTemperatureOutput_DefaultNew( Name name ) ;
-void _PressureTemperatureOutput_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+void _PressureTemperatureOutput_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 	void _PressureTemperatureOutput_Build( void* swarmOutput, void* data ) ;
 	void _PressureTemperatureOutput_Initialise( void* swarmOutput, void* data ) ;
 	void _PressureTemperatureOutput_Execute( void* swarmOutput, void* data );

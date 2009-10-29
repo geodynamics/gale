@@ -82,7 +82,7 @@
 	
 	/* 'Stg_Component' implementations */
 	void* _Compressible_DefaultNew( Name name ) ;
-	void _Compressible_Construct( void* rheology, Stg_ComponentFactory* cf, void* data );
+	void _Compressible_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
 	void _Compressible_Build( void* compressible, void* data );
 	void _Compressible_Initialise( void* compressible, void* data );
 	void _Compressible_Execute( void* compressible, void* data );
