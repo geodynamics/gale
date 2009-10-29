@@ -78,7 +78,7 @@ GaussCoincidentMapper* GaussCoincidentMapper_New(
         _GaussCoincidentMapper_Print,
         _GaussCoincidentMapper_Copy,
         _GaussCoincidentMapper_DefaultNew,
-        _GaussCoincidentMapper_Construct,
+        _GaussCoincidentMapper_AssignFromXML,
         _GaussCoincidentMapper_Build,
         _GaussCoincidentMapper_Initialise,
         _GaussCoincidentMapper_Execute,
@@ -105,7 +105,7 @@ void* _GaussCoincidentMapper_DefaultNew( Name name ) {
         _GaussCoincidentMapper_Print,
         _GaussCoincidentMapper_Copy,
         _GaussCoincidentMapper_DefaultNew,
-        _GaussCoincidentMapper_Construct,
+        _GaussCoincidentMapper_AssignFromXML,
         _GaussCoincidentMapper_Build,
         _GaussCoincidentMapper_Initialise,
         _GaussCoincidentMapper_Execute,
@@ -172,8 +172,8 @@ GaussCoincidentMapper* _GaussCoincidentMapper_New(
     return result;
 }
 
-void _GaussCoincidentMapper_Construct( void* mapper, Stg_ComponentFactory* cf, void* data ) {
-    _OneToOneMapper_Construct( mapper, cf, data );
+void _GaussCoincidentMapper_AssignFromXML( void* mapper, Stg_ComponentFactory* cf, void* data ) {
+    _OneToOneMapper_AssignFromXML( mapper, cf, data );
 }
 
 void _GaussCoincidentMapper_Init(

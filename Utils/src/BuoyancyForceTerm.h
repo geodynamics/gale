@@ -108,7 +108,7 @@
 	void _BuoyancyForceTerm_Print( void* forceTerm, Stream* stream );
 
 	void* _BuoyancyForceTerm_DefaultNew( Name name ) ;
-void _BuoyancyForceTerm_Construct( void* forceTerm, Stg_ComponentFactory* cf, void* data ) ;
+void _BuoyancyForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) ;
 	void _BuoyancyForceTerm_Build( void* forceTerm, void* data ) ;
 	void _BuoyancyForceTerm_Initialise( void* forceTerm, void* data ) ;
 	void _BuoyancyForceTerm_Execute( void* forceTerm, void* data ) ;

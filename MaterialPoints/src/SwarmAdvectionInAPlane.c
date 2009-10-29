@@ -179,7 +179,7 @@ void* _SwarmAdvectionInAPlane_DefaultNew( Name name ) {
 			_SwarmAdvectionInAPlane_Print,
 			_SwarmAdvectionInAPlane_Copy,
 			_SwarmAdvectionInAPlane_DefaultNew,
-			_SwarmAdvectionInAPlane_Construct,
+			_SwarmAdvectionInAPlane_AssignFromXML,
 			/* Just use the normal parent's implementation for next few, apart from new TimeDeriv function */
 			_SwarmAdvector_Build,
 			_SwarmAdvector_Initialise,
@@ -191,10 +191,10 @@ void* _SwarmAdvectionInAPlane_DefaultNew( Name name ) {
 }
 
 
-void _SwarmAdvectionInAPlane_Construct( void* swarmAdvector, Stg_ComponentFactory* cf, void* data) {
+void _SwarmAdvectionInAPlane_AssignFromXML( void* swarmAdvector, Stg_ComponentFactory* cf, void* data) {
 	SwarmAdvectionInAPlane*	            self          = (SwarmAdvectionInAPlane*) swarmAdvector;
 	int							whichaxis;
-	_SwarmAdvector_Construct( self, cf, data );
+	_SwarmAdvector_AssignFromXML( self, cf, data );
 	/* Everything except whichaxis constructed by parent already */
 	whichaxis = Stg_ComponentFactory_GetInt( cf, self->name, "whichaxis",  1 );
 	_SwarmAdvectionInAPlane_Init( self, whichaxis );

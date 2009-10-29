@@ -106,7 +106,7 @@ void _ManyToOneMapper_Print( void* mapper, Stream* stream );
 void* _ManyToOneMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 void* _ManyToOneMapper_DefaultNew( Name name );
-void _ManyToOneMapper_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+void _ManyToOneMapper_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 void _ManyToOneMapper_Build( void* mapper, void* data ) ;
 void _ManyToOneMapper_Initialise( void* mapper, void* data ) ;
 void _ManyToOneMapper_Execute( void* mapper, void* data );

@@ -49,14 +49,14 @@
 
 const Type PICellerator_Toolbox_Type = "PICellerator_Toolbox";
 
-void _PICellerator_Toolbox_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _PICellerator_Toolbox_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 }
 
 void* _PICellerator_Toolbox_DefaultNew( Name name ) {
 	return Codelet_New(
 			PICellerator_Toolbox_Type,
 			_PICellerator_Toolbox_DefaultNew,
-			_PICellerator_Toolbox_Construct,
+			_PICellerator_Toolbox_AssignFromXML,
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,

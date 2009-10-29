@@ -145,7 +145,7 @@ void* _DVCWeights_DefaultNew( Name name ) {
         _DVCWeights_Print,
         _DVCWeights_Copy,
         _DVCWeights_DefaultNew,
-        _DVCWeights_Construct,
+        _DVCWeights_AssignFromXML,
         _DVCWeights_Build,
         _DVCWeights_Initialise,
         _DVCWeights_Execute,
@@ -157,14 +157,14 @@ void* _DVCWeights_DefaultNew( Name name ) {
 }
 
 
-void _DVCWeights_Construct( void* dvcWeights, Stg_ComponentFactory* cf, void *data ) {
+void _DVCWeights_AssignFromXML( void* dvcWeights, Stg_ComponentFactory* cf, void *data ) {
 
     DVCWeights*      self          = (DVCWeights*) dvcWeights;
 
     int defaultResolution;
     int resolution[3];
 
-    _WeightsCalculator_Construct( self, cf, data );
+    _WeightsCalculator_AssignFromXML( self, cf, data );
 
     defaultResolution = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolution", 10 );
     resolution[ I_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolutionX", defaultResolution );

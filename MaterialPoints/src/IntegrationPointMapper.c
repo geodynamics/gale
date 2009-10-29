@@ -142,7 +142,7 @@ void* _IntegrationPointMapper_Copy( void* mapper, void* dest, Bool deep, Name na
     return newCopy;
 }
 
-void _IntegrationPointMapper_Construct( void* mapper, Stg_ComponentFactory* cf, void* data ) {
+void _IntegrationPointMapper_AssignFromXML( void* mapper, Stg_ComponentFactory* cf, void* data ) {
     IntegrationPointMapper* self = (IntegrationPointMapper*)mapper;
 
     IntegrationPointsSwarm* integrationSwarm;

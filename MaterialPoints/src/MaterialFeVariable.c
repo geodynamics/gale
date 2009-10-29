@@ -158,7 +158,7 @@ void* _MaterialFeVariable_DefaultNew( Name name ) {
 		_MaterialFeVariable_Print,
 		_MaterialFeVariable_Copy,
 		_MaterialFeVariable_DefaultNew,
-		_MaterialFeVariable_Construct,
+		_MaterialFeVariable_AssignFromXML,
 		_MaterialFeVariable_Build, 
 		_MaterialFeVariable_Initialise,
 		_MaterialFeVariable_Execute,
@@ -174,16 +174,16 @@ void* _MaterialFeVariable_DefaultNew( Name name ) {
 		name );
 }
 
-void _MaterialFeVariable_Construct( void* materialFeVariable, Stg_ComponentFactory* cf, void* data ){
+void _MaterialFeVariable_AssignFromXML( void* materialFeVariable, Stg_ComponentFactory* cf, void* data ){
 	MaterialFeVariable*   self              = (MaterialFeVariable*) materialFeVariable;
 	Material*             material;
 	
 	material = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Material", Material, True, data );
 
 	/* Construct Parent */
-	_ParticleFeVariable_Construct( self, cf, data );
+	_ParticleFeVariable_AssignFromXML( self, cf, data );
 
-	_FieldVariable_Construct( self, cf, data );
+	_FieldVariable_AssignFromXML( self, cf, data );
 	_MaterialFeVariable_Init( self, material );
 }
 

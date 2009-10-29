@@ -102,7 +102,7 @@ void _GaussCoincidentMapper_Print( void* mapper, Stream* stream );
 void* _GaussCoincidentMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 void* _GaussCoincidentMapper_DefaultNew( Name name );
-void _GaussCoincidentMapper_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+void _GaussCoincidentMapper_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 void _GaussCoincidentMapper_Build( void* mapper, void* data ) ;
 void _GaussCoincidentMapper_Initialise( void* mapper, void* data ) ;
 void _GaussCoincidentMapper_Execute( void* mapper, void* data );

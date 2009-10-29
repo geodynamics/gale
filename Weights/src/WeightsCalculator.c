@@ -116,7 +116,7 @@ void* _WeightsCalculator_Copy( void* weightsCalculator, void* dest, Bool deep, N
 
 
 
-void _WeightsCalculator_Construct( void* weightsCalculator, Stg_ComponentFactory* cf, void* data ) {
+void _WeightsCalculator_AssignFromXML( void* weightsCalculator, Stg_ComponentFactory* cf, void* data ) {
     WeightsCalculator*   self          = (WeightsCalculator*) weightsCalculator;
     Dimension_Index      dim;
 

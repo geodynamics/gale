@@ -137,7 +137,7 @@ void* _BackgroundParticleLayout_DefaultNew( Name name ) {
         _BackgroundParticleLayout_Print,
         _BackgroundParticleLayout_Copy,
         _BackgroundParticleLayout_DefaultNew,
-        _BackgroundParticleLayout_Construct,
+        _BackgroundParticleLayout_AssignFromXML,
         _BackgroundParticleLayout_Build,
         _BackgroundParticleLayout_Initialise,
         _BackgroundParticleLayout_Execute,
@@ -149,7 +149,7 @@ void* _BackgroundParticleLayout_DefaultNew( Name name ) {
         GlobalCoordSystem,
         False );
 }
-void  _BackgroundParticleLayout_Construct( void* component, Stg_ComponentFactory* cf, void* data )  {
+void  _BackgroundParticleLayout_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data )  {
     BackgroundParticleLayout*	self = (BackgroundParticleLayout*)component;
 
     self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );

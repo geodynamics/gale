@@ -88,7 +88,7 @@ void _DiffusionSMT_Delete( void* matrixTerm );
 void _DiffusionSMT_Print( void* matrixTerm, Stream* stream );
 
 void* _DiffusionSMT_DefaultNew( Name name ) ;
-void _DiffusionSMT_Construct( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) ;
+void _DiffusionSMT_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) ;
 void _DiffusionSMT_Build( void* matrixTerm, void* data ) ;
 void _DiffusionSMT_Initialise( void* matrixTerm, void* data ) ;
 void _DiffusionSMT_Execute( void* matrixTerm, void* data ) ;

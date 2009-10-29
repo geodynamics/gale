@@ -98,7 +98,7 @@ void _IterativeWeights_Print( void* iterativeWeights, Stream* stream );
 void* _IterativeWeights_Copy( void* iterativeWeights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
         
 void* _IterativeWeights_DefaultNew( Name name ) ;
-void _IterativeWeights_Construct( void* iterativeWeights, Stg_ComponentFactory* cf, void* data ) ;
+void _IterativeWeights_AssignFromXML( void* iterativeWeights, Stg_ComponentFactory* cf, void* data ) ;
 void _IterativeWeights_Build( void* iterativeWeights, void* data ) ;
 void _IterativeWeights_Initialise( void* iterativeWeights, void* data ) ;
 void _IterativeWeights_Execute( void* iterativeWeights, void* data );

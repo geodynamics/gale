@@ -112,7 +112,7 @@
 		Swarm*            swarm,
 		Dictionary*       dictionary );
 		
-	void _PeriodicBoundariesManager_Construct( void* periodicBCsManager, Stg_ComponentFactory* cf, void* data );
+	void _PeriodicBoundariesManager_AssignFromXML( void* periodicBCsManager, Stg_ComponentFactory* cf, void* data );
 	
 	void _PeriodicBoundariesManager_Delete( void* context );
 

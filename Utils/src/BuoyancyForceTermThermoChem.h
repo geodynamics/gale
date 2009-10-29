@@ -116,7 +116,7 @@
 	void _BuoyancyForceTermThermoChem_Print( void* forceTerm, Stream* stream );
 
 	void* _BuoyancyForceTermThermoChem_DefaultNew( Name name ) ;
-void _BuoyancyForceTermThermoChem_Construct( void* forceTerm, Stg_ComponentFactory* cf, void* data ) ;
+void _BuoyancyForceTermThermoChem_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) ;
 	void _BuoyancyForceTermThermoChem_Build( void* forceTerm, void* data ) ;
 	void _BuoyancyForceTermThermoChem_Initialise( void* forceTerm, void* data ) ;
 	void _BuoyancyForceTermThermoChem_Execute( void* forceTerm, void* data ) ;

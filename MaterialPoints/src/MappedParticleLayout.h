@@ -43,7 +43,7 @@ void _MappedParticleLayout_Print( void* particleLayout, Stream* stream );
 void* _MappedParticleLayout_Copy( void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 void* _MappedParticleLayout_DefaultNew( Name name );
-void  _MappedParticleLayout_Construct( void* component, Stg_ComponentFactory* cf, void* data );
+void  _MappedParticleLayout_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data );
 void  _MappedParticleLayout_Build( void* component, void* data );
 void  _MappedParticleLayout_Initialise( void* component, void* data );
 void  _MappedParticleLayout_Execute( void* component, void* data );

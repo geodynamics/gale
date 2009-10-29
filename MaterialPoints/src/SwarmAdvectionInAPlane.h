@@ -106,7 +106,7 @@
 	void* _SwarmAdvectionInAPlane_Copy( void* materialSwarm, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _SwarmAdvectionInAPlane_DefaultNew( Name name ) ;
-void _SwarmAdvectionInAPlane_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+void _SwarmAdvectionInAPlane_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 	void _SwarmAdvectionInAPlane_Build( void* materialSwarm, void* data ) ;
 	void _SwarmAdvectionInAPlane_Initialise( void* materialSwarm, void* data ) ;
 	void _SwarmAdvectionInAPlane_Execute( void* materialSwarm, void* data );

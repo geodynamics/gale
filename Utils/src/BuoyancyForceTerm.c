@@ -168,7 +168,7 @@ void* _BuoyancyForceTerm_DefaultNew( Name name ) {
 		_BuoyancyForceTerm_Print,
 		NULL,
 		_BuoyancyForceTerm_DefaultNew,
-		_BuoyancyForceTerm_Construct,
+		_BuoyancyForceTerm_AssignFromXML,
 		_BuoyancyForceTerm_Build,
 		_BuoyancyForceTerm_Initialise,
 		_BuoyancyForceTerm_Execute,
@@ -178,7 +178,7 @@ void* _BuoyancyForceTerm_DefaultNew( Name name ) {
 		name );
 }
 
-void _BuoyancyForceTerm_Construct( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
+void _BuoyancyForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
 	BuoyancyForceTerm*          self             = (BuoyancyForceTerm*)forceTerm;
 	Dictionary*		dict;
 	Dictionary_Entry_Value*	tmp;
@@ -194,7 +194,7 @@ void _BuoyancyForceTerm_Construct( void* forceTerm, Stg_ComponentFactory* cf, vo
 	PICelleratorContext*	    context;
 
 	/* Construct Parent */
-	_ForceTerm_Construct( self, cf, data );
+	_ForceTerm_AssignFromXML( self, cf, data );
 
 	dict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( cf->componentDict, self->name ) );
 	temperatureField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "TemperatureField", FeVariable, False, data ) ;

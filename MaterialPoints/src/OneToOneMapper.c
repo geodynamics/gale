@@ -147,11 +147,11 @@ void* _OneToOneMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, P
     return newCopy;
 }
 
-void _OneToOneMapper_Construct( void* mapper, Stg_ComponentFactory* cf, void* data ) {
+void _OneToOneMapper_AssignFromXML( void* mapper, Stg_ComponentFactory* cf, void* data ) {
     OneToOneMapper* self = (OneToOneMapper*)mapper;
     MaterialPointsSwarm* materialSwarm;
 
-    _IntegrationPointMapper_Construct( self, cf, data );
+    _IntegrationPointMapper_AssignFromXML( self, cf, data );
 
     materialSwarm = Stg_ComponentFactory_ConstructByKey( 
         cf, 

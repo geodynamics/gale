@@ -93,7 +93,7 @@ void _MomentBalanceWeights_Print( void* momentBalanceWeights, Stream* stream );
 void* _MomentBalanceWeights_Copy( void* momentBalanceWeights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
         
 void* _MomentBalanceWeights_DefaultNew( Name name ) ;
-void _MomentBalanceWeights_Construct( void* momentBalanceWeights, Stg_ComponentFactory* cf, void* data ) ;
+void _MomentBalanceWeights_AssignFromXML( void* momentBalanceWeights, Stg_ComponentFactory* cf, void* data ) ;
 void _MomentBalanceWeights_Build( void* momentBalanceWeights, void* data ) ;
 void _MomentBalanceWeights_Initialise( void* momentBalanceWeights, void* data ) ;
 void _MomentBalanceWeights_Execute( void* momentBalanceWeights, void* data );

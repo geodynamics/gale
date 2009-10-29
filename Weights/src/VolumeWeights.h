@@ -75,7 +75,7 @@ void _VolumeWeights_Print( void* weights, Stream* stream );
 void* _VolumeWeights_Copy( void* weights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
         
 void* _VolumeWeights_DefaultNew( Name name ) ;
-void _VolumeWeights_Construct( void* weights, Stg_ComponentFactory* cf, void* data ) ;
+void _VolumeWeights_AssignFromXML( void* weights, Stg_ComponentFactory* cf, void* data ) ;
 void _VolumeWeights_Build( void* weights, void* data ) ;
 void _VolumeWeights_Initialise( void* weights, void* data ) ;
 void _VolumeWeights_Execute( void* weights, void* data );

@@ -109,7 +109,7 @@ void MaterialCentroid( PICelleratorContext* context ) {
 }
 
 
-void _PICellerator_MaterialCentroid_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _PICellerator_MaterialCentroid_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 
 	AbstractContext* context;
 
@@ -126,7 +126,7 @@ void* _PICellerator_MaterialCentroid_DefaultNew( Name name ) {
 			_Codelet_Print,
 			_Codelet_Copy,
 			_PICellerator_MaterialCentroid_DefaultNew,
-			_PICellerator_MaterialCentroid_Construct,
+			_PICellerator_MaterialCentroid_AssignFromXML,
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,

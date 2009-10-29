@@ -128,7 +128,7 @@ void* _ConstantWeights_DefaultNew( Name name ) {
         _ConstantWeights_Print,
         _ConstantWeights_Copy,
         _ConstantWeights_DefaultNew,
-        _ConstantWeights_Construct,
+        _ConstantWeights_AssignFromXML,
         _ConstantWeights_Build,
         _ConstantWeights_Initialise,
         _ConstantWeights_Execute,
@@ -140,10 +140,10 @@ void* _ConstantWeights_DefaultNew( Name name ) {
 }
 
 
-void _ConstantWeights_Construct( void* constantWeights, Stg_ComponentFactory* cf, void* data ) {
+void _ConstantWeights_AssignFromXML( void* constantWeights, Stg_ComponentFactory* cf, void* data ) {
     ConstantWeights*         self          = (ConstantWeights*) constantWeights;
 
-    _WeightsCalculator_Construct( self, cf, data );
+    _WeightsCalculator_AssignFromXML( self, cf, data );
         
     _ConstantWeights_Init( self );
 }

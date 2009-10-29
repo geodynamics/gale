@@ -208,7 +208,7 @@ void* _PCDVC_DefaultNew( Name name ) {
         _PCDVC_Print,
         _PCDVC_Copy,
         _PCDVC_DefaultNew,
-        _PCDVC_Construct,
+        _PCDVC_AssignFromXML,
         _PCDVC_Build,
         _PCDVC_Initialise,
         _PCDVC_Execute,
@@ -221,7 +221,7 @@ void* _PCDVC_DefaultNew( Name name ) {
 }
 
 
-void _PCDVC_Construct( void* pcdvc, Stg_ComponentFactory* cf, void *data ) {
+void _PCDVC_AssignFromXML( void* pcdvc, Stg_ComponentFactory* cf, void *data ) {
 
     PCDVC*	     self          = (PCDVC*) pcdvc;
     MaterialPointsSwarm*       materialPointsSwarm;
@@ -234,7 +234,7 @@ void _PCDVC_Construct( void* pcdvc, Stg_ComponentFactory* cf, void *data ) {
     int ParticlesPerCell;
     double Thresh;
 
-    _DVCWeights_Construct( self, cf, data );
+    _DVCWeights_AssignFromXML( self, cf, data );
 
     materialPointsSwarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, "MaterialPointsSwarm", MaterialPointsSwarm, True, data );
     Stream*  stream = Journal_Register( Info_Type, materialPointsSwarm->type );

@@ -97,7 +97,7 @@
 	void _SwarmVariableField_Print( void* swarmVariable, Stream* stream );
 
 	void* _SwarmVariableField_DefaultNew( Name name ) ;
-	void _SwarmVariableField_Construct( void* swarmVariable, Stg_ComponentFactory* cf, void* data ) ;
+	void _SwarmVariableField_AssignFromXML( void* swarmVariable, Stg_ComponentFactory* cf, void* data ) ;
 	void _SwarmVariableField_Build( void* swarmVariable, void* data ) ;
 	void _SwarmVariableField_Initialise( void* swarmVariable, void* data ) ;
 	void _SwarmVariableField_Execute( void* swarmVariable, void* data ) ;

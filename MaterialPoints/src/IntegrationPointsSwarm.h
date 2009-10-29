@@ -132,7 +132,7 @@
 		MPI_Comm                                        comm
 		);
 
-	void _IntegrationPointsSwarm_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+	void _IntegrationPointsSwarm_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 
 	void _IntegrationPointsSwarm_Init(
 		void*                                           swarm,

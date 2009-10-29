@@ -94,7 +94,7 @@ void _ConstantWeights_Print( void* constantWeights, Stream* stream );
 void* _ConstantWeights_Copy( void* constantWeights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
         
 void* _ConstantWeights_DefaultNew( Name name ) ;
-void _ConstantWeights_Construct( void* constantWeights, Stg_ComponentFactory* cf, void* data ) ;
+void _ConstantWeights_AssignFromXML( void* constantWeights, Stg_ComponentFactory* cf, void* data ) ;
 void _ConstantWeights_Build( void* constantWeights, void* data ) ;
 void _ConstantWeights_Initialise( void* constantWeights, void* data ) ;
 void _ConstantWeights_Execute( void* constantWeights, void* data );

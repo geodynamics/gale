@@ -160,7 +160,7 @@ void* _PCDVC_Copy( void* pcdvc, void* dest, Bool deep, Name nameExt, PtrMap* ptr
         
 void* _PCDVC_DefaultNew( Name name ) ;
 
-void _PCDVC_Construct( void* pcdvc, Stg_ComponentFactory* cf, void* data ) ;
+void _PCDVC_AssignFromXML( void* pcdvc, Stg_ComponentFactory* cf, void* data ) ;
 
 void _PCDVC_Build( void* pcdvc, void* data ) ;
 void _PCDVC_Initialise( void* pcdvc, void* data ) ;

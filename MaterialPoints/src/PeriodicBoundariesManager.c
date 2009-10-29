@@ -71,7 +71,7 @@ void* _PeriodicBoundariesManager_DefaultNew( Name name ) {
 		_PeriodicBoundariesManager_Print,
 		NULL, 
 		_PeriodicBoundariesManager_DefaultNew,
-		_PeriodicBoundariesManager_Construct,
+		_PeriodicBoundariesManager_AssignFromXML,
 		_PeriodicBoundariesManager_Build,
 		_PeriodicBoundariesManager_Initialise,
 		_PeriodicBoundariesManager_Execute,
@@ -96,7 +96,7 @@ PeriodicBoundariesManager* PeriodicBoundariesManager_New(
 		_PeriodicBoundariesManager_Print,
 		_PeriodicBoundariesManager_Copy, 
 		_PeriodicBoundariesManager_DefaultNew,
-		_PeriodicBoundariesManager_Construct,
+		_PeriodicBoundariesManager_AssignFromXML,
 		_PeriodicBoundariesManager_Build,
 		_PeriodicBoundariesManager_Initialise,
 		_PeriodicBoundariesManager_Execute,
@@ -177,7 +177,7 @@ void _PeriodicBoundariesManager_Init(
 }
 
 
-void _PeriodicBoundariesManager_Construct( void* periodicBCsManager, Stg_ComponentFactory* cf, void* data ) {
+void _PeriodicBoundariesManager_AssignFromXML( void* periodicBCsManager, Stg_ComponentFactory* cf, void* data ) {
 	PeriodicBoundariesManager*	self = (PeriodicBoundariesManager*)periodicBCsManager;
 	Dictionary*			dictionary = NULL;
 	Mesh*				mesh = NULL;

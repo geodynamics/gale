@@ -55,7 +55,7 @@
 
 const Type PICellerator_CalculateParticleDisplacement_Type = "PICellerator_CalculateParticleDisplacement";
 
-void _PICellerator_CalculateParticleDisplacement_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _PICellerator_CalculateParticleDisplacement_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	CalculateParticleDisplacementPlugin*  self = (CalculateParticleDisplacementPlugin*)component;
 	DomainContext*                context;
 	MaterialPointsSwarm*                  materialPointsSwarm;
@@ -175,7 +175,7 @@ void* _PICellerator_CalculateParticleDisplacement_DefaultNew( Name name ) {
 			_Codelet_Print,
 			_Codelet_Copy,
 			_PICellerator_CalculateParticleDisplacement_DefaultNew,
-			_PICellerator_CalculateParticleDisplacement_Construct,
+			_PICellerator_CalculateParticleDisplacement_AssignFromXML,
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,

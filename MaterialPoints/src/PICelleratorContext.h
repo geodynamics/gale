@@ -109,7 +109,7 @@
 
 	/* Virtual Functions -----------------------------------------------------------------------------------------------*/
 
-	void _PICelleratorContext_Construct( void* context, Stg_ComponentFactory* cf, void* data );
+	void _PICelleratorContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, void* data );
 	
 	/* Stg_Class_Delete implementation */
 	void _PICelleratorContext_Delete( void* context );
@@ -123,7 +123,7 @@
 	/* Set the dt */
 	void _PICelleratorContext_SetDt( void* context, double dt );
 
-	void _PICelleratorContext_Construct( void* context, Stg_ComponentFactory* cf, void* data );
+	void _PICelleratorContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, void* data );
 	
 	/* Public functions -----------------------------------------------------------------------------------------------*/
 	void PICelleratorContext_CreateDefaultMaterial( void* context ) ;

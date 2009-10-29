@@ -101,7 +101,7 @@ void _WeightsCalculator_Print( void* self, Stream* stream );
     (WeightsCalculator*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
 void* _WeightsCalculator_Copy( void* self, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
         
-void _WeightsCalculator_Construct( void* self, Stg_ComponentFactory* cf, void* data ) ;
+void _WeightsCalculator_AssignFromXML( void* self, Stg_ComponentFactory* cf, void* data ) ;
 void _WeightsCalculator_Build( void* self, void* data ) ;
 void _WeightsCalculator_Initialise( void* self, void* data ) ;
 void _WeightsCalculator_Execute( void* self, void* data );

@@ -78,7 +78,7 @@ CoincidentMapper* CoincidentMapper_New(
         _CoincidentMapper_Print,
         _CoincidentMapper_Copy,
         _CoincidentMapper_DefaultNew,
-        _CoincidentMapper_Construct,
+        _CoincidentMapper_AssignFromXML,
         _CoincidentMapper_Build,
         _CoincidentMapper_Initialise,
         _CoincidentMapper_Execute,
@@ -105,7 +105,7 @@ void* _CoincidentMapper_DefaultNew( Name name ) {
         _CoincidentMapper_Print,
         _CoincidentMapper_Copy,
         _CoincidentMapper_DefaultNew,
-        _CoincidentMapper_Construct,
+        _CoincidentMapper_AssignFromXML,
         _CoincidentMapper_Build,
         _CoincidentMapper_Initialise,
         _CoincidentMapper_Execute,
@@ -172,8 +172,8 @@ CoincidentMapper* _CoincidentMapper_New(
     return result;
 }
 
-void _CoincidentMapper_Construct( void* mapper, Stg_ComponentFactory* cf, void* data ) {
-    _OneToOneMapper_Construct( mapper, cf, data );
+void _CoincidentMapper_AssignFromXML( void* mapper, Stg_ComponentFactory* cf, void* data ) {
+    _OneToOneMapper_AssignFromXML( mapper, cf, data );
 }
 
 void _CoincidentMapper_Init(

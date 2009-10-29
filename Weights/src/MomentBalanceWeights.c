@@ -143,7 +143,7 @@ void* _MomentBalanceWeights_DefaultNew( Name name ) {
         _MomentBalanceWeights_Print,
         _MomentBalanceWeights_Copy,
         _MomentBalanceWeights_DefaultNew,
-        _MomentBalanceWeights_Construct,
+        _MomentBalanceWeights_AssignFromXML,
         _MomentBalanceWeights_Build,
         _MomentBalanceWeights_Initialise,
         _MomentBalanceWeights_Execute,
@@ -154,11 +154,11 @@ void* _MomentBalanceWeights_DefaultNew( Name name ) {
         0, NULL );
 }
 
-void _MomentBalanceWeights_Construct( void* momentBalanceWeights, Stg_ComponentFactory* cf, void* data ) {
+void _MomentBalanceWeights_AssignFromXML( void* momentBalanceWeights, Stg_ComponentFactory* cf, void* data ) {
     MomentBalanceWeights*            self          = (MomentBalanceWeights*) momentBalanceWeights;
     WeightsCalculator*           backupWeights;
 
-    _WeightsCalculator_Construct( self, cf, data );
+    _WeightsCalculator_AssignFromXML( self, cf, data );
 
     backupWeights =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "BackupWeights", WeightsCalculator, False, data );
 

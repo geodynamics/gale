@@ -102,7 +102,7 @@ void _CoincidentMapper_Print( void* mapper, Stream* stream );
 void* _CoincidentMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 void* _CoincidentMapper_DefaultNew( Name name );
-void _CoincidentMapper_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+void _CoincidentMapper_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 void _CoincidentMapper_Build( void* mapper, void* data ) ;
 void _CoincidentMapper_Initialise( void* mapper, void* data ) ;
 void _CoincidentMapper_Execute( void* mapper, void* data );

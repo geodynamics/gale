@@ -104,7 +104,7 @@ void _OneToOneMapper_Print( void* mapper, Stream* stream );
     (OneToOneMapper*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
 void* _OneToOneMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
-void _OneToOneMapper_Construct( void* shape, Stg_ComponentFactory* cf, void* data );
+void _OneToOneMapper_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data );
 void _OneToOneMapper_Build( void* mapper, void* data ) ;
 void _OneToOneMapper_Initialise( void* mapper, void* data );
 void _OneToOneMapper_Execute( void* mapper, void* data );

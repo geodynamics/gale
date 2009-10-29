@@ -169,12 +169,12 @@ void* _ManyToOneMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, 
     return newCopy;
 }
 
-void _ManyToOneMapper_Construct( void* mapper, Stg_ComponentFactory* cf, void* data ) {
+void _ManyToOneMapper_AssignFromXML( void* mapper, Stg_ComponentFactory* cf, void* data ) {
     ManyToOneMapper* self = (ManyToOneMapper*)mapper;
     MaterialPointsSwarm** materialSwarms;
     int i;
 	
-    _IntegrationPointMapper_Construct( self, cf, data );
+    _IntegrationPointMapper_AssignFromXML( self, cf, data );
 
     materialSwarms = (MaterialPointsSwarm**)Stg_ComponentFactory_ConstructByList( 
         cf, 

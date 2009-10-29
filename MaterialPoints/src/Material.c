@@ -75,7 +75,7 @@ Material* Material_New(
 			_Material_Print, 
 			_Material_Copy, 
 			_Material_DefaultNew, 
-			_Material_Construct, 
+			_Material_AssignFromXML, 
 			_Material_Build, 
 			_Material_Initialise, 
 			_Material_Execute, 
@@ -97,7 +97,7 @@ void* _Material_DefaultNew( Name name ) {
 			_Material_Print, 
 			_Material_Copy, 
 			_Material_DefaultNew, 
-			_Material_Construct, 
+			_Material_AssignFromXML, 
 			_Material_Build, 
 			_Material_Initialise, 
 			_Material_Execute, 
@@ -203,7 +203,7 @@ void* _Material_Copy( void* material, void* dest, Bool deep, Name nameExt, PtrMa
 }
 
 
-void _Material_Construct( void* material, Stg_ComponentFactory* cf, void* data ) {
+void _Material_AssignFromXML( void* material, Stg_ComponentFactory* cf, void* data ) {
 	Material*             self               = (Material*) material;
 	Dictionary*           materialDictionary;
 	Stg_Shape*            shape;

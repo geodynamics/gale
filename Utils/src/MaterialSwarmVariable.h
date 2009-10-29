@@ -96,7 +96,7 @@
 	void _MaterialSwarmVariable_Print( void* swarmVariable, Stream* stream );
 
 	void* _MaterialSwarmVariable_DefaultNew( Name name ) ;
-void _MaterialSwarmVariable_Construct( void* swarmVariable, Stg_ComponentFactory* cf, void* data ) ;
+void _MaterialSwarmVariable_AssignFromXML( void* swarmVariable, Stg_ComponentFactory* cf, void* data ) ;
 	void _MaterialSwarmVariable_Build( void* swarmVariable, void* data ) ;
 	void _MaterialSwarmVariable_Initialise( void* swarmVariable, void* data ) ;
 	void _MaterialSwarmVariable_Execute( void* swarmVariable, void* data ) ;

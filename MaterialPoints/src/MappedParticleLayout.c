@@ -138,7 +138,7 @@ void* _MappedParticleLayout_DefaultNew( Name name ) {
         _MappedParticleLayout_Print,
         _MappedParticleLayout_Copy,
         _MappedParticleLayout_DefaultNew,
-        _MappedParticleLayout_Construct,
+        _MappedParticleLayout_AssignFromXML,
         _MappedParticleLayout_Build,
         _MappedParticleLayout_Initialise,
         _MappedParticleLayout_Execute,
@@ -150,7 +150,7 @@ void* _MappedParticleLayout_DefaultNew( Name name ) {
         LocalCoordSystem,
         False );
 }
-void  _MappedParticleLayout_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void  _MappedParticleLayout_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
     MappedParticleLayout*		self = (MappedParticleLayout*)component;
 
     self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );

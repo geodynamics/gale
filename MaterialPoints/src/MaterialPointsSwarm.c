@@ -81,7 +81,7 @@ MaterialPointsSwarm* MaterialPointsSwarm_New(
       _MaterialPointsSwarm_Print,
       _MaterialPointsSwarm_Copy,
       _MaterialPointsSwarm_DefaultNew,
-      _MaterialPointsSwarm_Construct,
+      _MaterialPointsSwarm_AssignFromXML,
       _MaterialPointsSwarm_Build,
       _MaterialPointsSwarm_Initialise,
       _MaterialPointsSwarm_Execute,
@@ -258,7 +258,7 @@ void* _MaterialPointsSwarm_DefaultNew( Name name ) {
 			_MaterialPointsSwarm_Print,
 			_MaterialPointsSwarm_Copy,
 			_MaterialPointsSwarm_DefaultNew,
-			_MaterialPointsSwarm_Construct,
+			_MaterialPointsSwarm_AssignFromXML,
 			_MaterialPointsSwarm_Build,
 			_MaterialPointsSwarm_Initialise,
 			_MaterialPointsSwarm_Execute,
@@ -282,7 +282,7 @@ void* _MaterialPointsSwarm_DefaultNew( Name name ) {
 }
 
 
-void _MaterialPointsSwarm_Construct( void* swarm, Stg_ComponentFactory* cf, void* data ) {
+void _MaterialPointsSwarm_AssignFromXML( void* swarm, Stg_ComponentFactory* cf, void* data ) {
 	MaterialPointsSwarm*	        self          = (MaterialPointsSwarm*) swarm;
 	FeMesh*             		mesh;
 	EscapedRoutine*                 escapedRoutine;
@@ -290,7 +290,7 @@ void _MaterialPointsSwarm_Construct( void* swarm, Stg_ComponentFactory* cf, void
 	Materials_Register*             materials_Register;
 	PICelleratorContext*		context;
 
-	_Swarm_Construct( self, cf, data );
+	_Swarm_AssignFromXML( self, cf, data );
 
 	mesh             = Stg_ComponentFactory_ConstructByKey( cf, self->name, "FeMesh", FeMesh, True, data );
 	escapedRoutine   = Stg_ComponentFactory_ConstructByKey( cf, self->name, "EscapedRoutine",     EscapedRoutine,     False, data );

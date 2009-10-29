@@ -1720,11 +1720,11 @@ void _AnalyticBlock_PressureFunction( void* analyticSolution, FeVariable* analyt
 
 }
 
-void _AnalyticBlock_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _AnalyticBlock_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	AnalyticBlock*           self           = (AnalyticBlock*)analyticSolution;
 
 	/* Construct Parent */
-	_AnalyticSolution_Construct( self, cf, data );
+	_AnalyticSolution_AssignFromXML( self, cf, data );
 
 	/* Create Analytic Fields */
 	self->velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data ); 
@@ -1756,7 +1756,7 @@ void* _AnalyticBlock_DefaultNew( Name name ) {
 			_AnalyticSolution_Print,
 			_AnalyticSolution_Copy,
 			_AnalyticBlock_DefaultNew,
-			_AnalyticBlock_Construct,
+			_AnalyticBlock_AssignFromXML,
 			_AnalyticBlock_Build,
 			_AnalyticSolution_Initialise,
 			_AnalyticSolution_Execute,

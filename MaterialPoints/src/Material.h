@@ -87,7 +87,7 @@
 		Dictionary*                                     materialDictionary,
 		Materials_Register*                             materialRegister );
 
-	void _Material_Construct( void* material, Stg_ComponentFactory* cf, void* data );
+	void _Material_AssignFromXML( void* material, Stg_ComponentFactory* cf, void* data );
 
 	void _Material_Init( 
 		void*                                           material, 	

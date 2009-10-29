@@ -110,7 +110,7 @@
 	void* _SwarmAdvector_Copy( void* materialSwarm, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _SwarmAdvector_DefaultNew( Name name ) ;
-void _SwarmAdvector_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+void _SwarmAdvector_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 	void _SwarmAdvector_Build( void* materialSwarm, void* data ) ;
 	void _SwarmAdvector_Initialise( void* materialSwarm, void* data ) ;
 	void _SwarmAdvector_Execute( void* materialSwarm, void* data );

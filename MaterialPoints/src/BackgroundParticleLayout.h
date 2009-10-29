@@ -43,7 +43,7 @@ void _BackgroundParticleLayout_Print( void* particleLayout, Stream* stream );
 void* _BackgroundParticleLayout_Copy( void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 void* _BackgroundParticleLayout_DefaultNew( Name name );
-void  _BackgroundParticleLayout_Construct( void* component, Stg_ComponentFactory* cf, void* data );
+void  _BackgroundParticleLayout_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data );
 void  _BackgroundParticleLayout_Build( void* component, void* data );
 void  _BackgroundParticleLayout_Initialise( void* component, void* data );
 void  _BackgroundParticleLayout_Execute( void* component, void* data );

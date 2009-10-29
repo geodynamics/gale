@@ -110,7 +110,7 @@ void* _VolumeWeights_DefaultNew( Name name ) {
         _VolumeWeights_Print,
         _VolumeWeights_Copy,
         _VolumeWeights_DefaultNew,
-        _VolumeWeights_Construct,
+        _VolumeWeights_AssignFromXML,
         _VolumeWeights_Build,
         _VolumeWeights_Initialise,
         _VolumeWeights_Execute,
@@ -122,12 +122,12 @@ void* _VolumeWeights_DefaultNew( Name name ) {
 }
 
 
-void _VolumeWeights_Construct( void* weights, Stg_ComponentFactory* cf, void* data ) {
+void _VolumeWeights_AssignFromXML( void* weights, Stg_ComponentFactory* cf, void* data ) {
     VolumeWeights*	     self          = (VolumeWeights*) weights;
     Stg_Shape*           shape;
     FeMesh*  mesh;
 
-    _WeightsCalculator_Construct( self, cf, data );
+    _WeightsCalculator_AssignFromXML( self, cf, data );
 
     shape = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Shape", Stg_Shape, True, data );
     mesh  = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Mesh", FeMesh, True, data );

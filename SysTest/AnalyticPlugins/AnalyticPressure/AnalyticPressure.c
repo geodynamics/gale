@@ -57,11 +57,11 @@ void _PICellerator_AnalyticPressure_PressureFunction( void* _self, double* coord
   *pressure = y * density * gravity;
 }
 
-void _AnalyticPressure_Construct( void* _self, Stg_ComponentFactory* cf, void* data ) {
+void _AnalyticPressure_AssignFromXML( void* _self, Stg_ComponentFactory* cf, void* data ) {
   AnalyticPressure* 		self = (AnalyticPressure*) _self;
 
   /* Construct Parent */
-  _FieldTest_Construct( self, cf, data );
+  _FieldTest_AssignFromXML( self, cf, data );
 
     /* Create Analytic Fields */
   self->density  = Stg_ComponentFactory_GetDouble( cf, "layer", "density", 0.0 );
@@ -89,7 +89,7 @@ void* _AnalyticPressure_DefaultNew( Name name ) {
     _FieldTest_Print,
     _FieldTest_Copy,
     _AnalyticPressure_DefaultNew,
-    _AnalyticPressure_Construct,
+    _AnalyticPressure_AssignFromXML,
     _AnalyticPressure_Build,
     _FieldTest_Initialise,
     _FieldTest_Execute,

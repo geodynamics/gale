@@ -136,7 +136,7 @@
 	void _ParticleFeVariable_Print( void* variable, Stream* stream );
 	void* _ParticleFeVariable_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
-	void _ParticleFeVariable_Construct( void* variable, Stg_ComponentFactory* cf, void* data );
+	void _ParticleFeVariable_AssignFromXML( void* variable, Stg_ComponentFactory* cf, void* data );
 	void _ParticleFeVariable_Build( void* variable, void* data );
 	void _ParticleFeVariable_Initialise( void* variable, void* data );
 	void _ParticleFeVariable_Execute( void* variable, void* data );

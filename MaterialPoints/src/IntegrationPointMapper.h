@@ -127,7 +127,7 @@ void _IntegrationPointMapper_Print( void* mapper, Stream* stream );
     (IntegrationPointMapper*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
 void* _IntegrationPointMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
-void _IntegrationPointMapper_Construct( void* mapper, Stg_ComponentFactory* cf, void* data ) ;
+void _IntegrationPointMapper_AssignFromXML( void* mapper, Stg_ComponentFactory* cf, void* data ) ;
 void _IntegrationPointMapper_Build( void* mapper, void* data ) ;
 void _IntegrationPointMapper_Initialise( void* mapper, void* data ) ;
 void _IntegrationPointMapper_Execute( void* mapper, void* data );

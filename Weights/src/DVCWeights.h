@@ -252,7 +252,7 @@ void* _DVCWeights_Copy( void* dvcWeights, void* dest, Bool deep, Name nameExt, P
         
 void* _DVCWeights_DefaultNew( Name name ) ;
 
-void _DVCWeights_Construct( void* dvcWeights, Stg_ComponentFactory* cf, void* data ) ;
+void _DVCWeights_AssignFromXML( void* dvcWeights, Stg_ComponentFactory* cf, void* data ) ;
 
 void _DVCWeights_Build( void* dvcWeights, void* data ) ;
 void _DVCWeights_Initialise( void* dvcWeights, void* data ) ;

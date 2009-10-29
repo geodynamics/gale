@@ -144,7 +144,7 @@ void* _IterativeWeights_DefaultNew( Name name ) {
         _IterativeWeights_Print,
         _IterativeWeights_Copy,
         _IterativeWeights_DefaultNew,
-        _IterativeWeights_Construct,
+        _IterativeWeights_AssignFromXML,
         _IterativeWeights_Build,
         _IterativeWeights_Initialise,
         _IterativeWeights_Execute,
@@ -156,14 +156,14 @@ void* _IterativeWeights_DefaultNew( Name name ) {
 }
 
 
-void _IterativeWeights_Construct( void* iterativeWeights, Stg_ComponentFactory* cf, void* data ) {
+void _IterativeWeights_AssignFromXML( void* iterativeWeights, Stg_ComponentFactory* cf, void* data ) {
     IterativeWeights*	     self          = (IterativeWeights*) iterativeWeights;
     WeightsCalculator*       initialWeights;
     Iteration_Index          maxIterations;
     double                   tolerance;
     double                   alpha;
 
-    _ConstantWeights_Construct( self, cf, data );
+    _ConstantWeights_AssignFromXML( self, cf, data );
 
     initialWeights =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "InitialWeights", WeightsCalculator, False, data );
 

@@ -140,7 +140,7 @@ void* _DiffusionSMT_DefaultNew( Name name ) {
 	_DiffusionSMT_Print,
 	NULL,
 	_DiffusionSMT_DefaultNew,
-	_DiffusionSMT_Construct,
+	_DiffusionSMT_AssignFromXML,
 	_DiffusionSMT_Build,
 	_DiffusionSMT_Initialise,
 	_DiffusionSMT_Execute,
@@ -149,12 +149,12 @@ void* _DiffusionSMT_DefaultNew( Name name ) {
 	name );
 }
 
-void _DiffusionSMT_Construct( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) {
+void _DiffusionSMT_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) {
     DiffusionSMT*            self             = (DiffusionSMT*)matrixTerm;
     PICelleratorContext*     context	      = (PICelleratorContext*)self->context;
 
     /* Construct Parent */
-    _StiffnessMatrixTerm_Construct( self, cf, data );
+    _StiffnessMatrixTerm_AssignFromXML( self, cf, data );
 
     _DiffusionSMT_Init( self );
 

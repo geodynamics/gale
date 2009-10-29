@@ -177,7 +177,7 @@ void* _MaterialSwarmVariable_DefaultNew( Name name ) {
 		_MaterialSwarmVariable_Print,
 		NULL,
 		_MaterialSwarmVariable_DefaultNew,
-		_MaterialSwarmVariable_Construct,
+		_MaterialSwarmVariable_AssignFromXML,
 		_MaterialSwarmVariable_Build,
 		_MaterialSwarmVariable_Initialise,
 		_MaterialSwarmVariable_Execute,
@@ -188,13 +188,13 @@ void* _MaterialSwarmVariable_DefaultNew( Name name ) {
 		name );
 }
 
-void _MaterialSwarmVariable_Construct( void* swarmVariable, Stg_ComponentFactory* cf, void* data ) {
+void _MaterialSwarmVariable_AssignFromXML( void* swarmVariable, Stg_ComponentFactory* cf, void* data ) {
 	MaterialSwarmVariable*      self             = (MaterialSwarmVariable*)swarmVariable;
 	Materials_Register*         materials_Register;
 	PICelleratorContext*	    context	     = (PICelleratorContext*)self->context;
 
 	/* Construct Parent */
-	_SwarmVariable_Construct( self, cf, data );
+	_SwarmVariable_AssignFromXML( self, cf, data );
 
 	assert( Stg_CheckType( context, PICelleratorContext ) );
 	materials_Register = context->materials_Register;

@@ -171,7 +171,7 @@ void* _BuoyancyForceTermThermoChem_DefaultNew( Name name ) {
 		_BuoyancyForceTermThermoChem_Print,
 		NULL,
 		_BuoyancyForceTermThermoChem_DefaultNew,
-		_BuoyancyForceTermThermoChem_Construct,
+		_BuoyancyForceTermThermoChem_AssignFromXML,
 		_BuoyancyForceTermThermoChem_Build,
 		_BuoyancyForceTermThermoChem_Initialise,
 		_BuoyancyForceTermThermoChem_Execute,
@@ -182,7 +182,7 @@ void* _BuoyancyForceTermThermoChem_DefaultNew( Name name ) {
 		name );
 }
 
-void _BuoyancyForceTermThermoChem_Construct( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
+void _BuoyancyForceTermThermoChem_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
 	BuoyancyForceTermThermoChem*          self             = (BuoyancyForceTermThermoChem*)forceTerm;
 	FeVariable*                 temperatureField;
 	double                      RaT;
@@ -192,7 +192,7 @@ void _BuoyancyForceTermThermoChem_Construct( void* forceTerm, Stg_ComponentFacto
 	PICelleratorContext*	    context;
 
 	/* Construct Parent */
-	_ForceTerm_Construct( self, cf, data );
+	_ForceTerm_AssignFromXML( self, cf, data );
 
 	temperatureField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "TemperatureField", FeVariable, False, data ) ;
 	RaT              = Stg_ComponentFactory_GetDouble( cf, self->name, "RaT", 0.0 );

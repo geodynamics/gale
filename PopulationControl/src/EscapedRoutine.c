@@ -110,7 +110,7 @@ void* _EscapedRoutine_DefaultNew( Name name ) {
 			_EscapedRoutine_Print,
 			_EscapedRoutine_Copy,
 			_EscapedRoutine_DefaultNew,
-			_EscapedRoutine_Construct,
+			_EscapedRoutine_AssignFromXML,
 			_EscapedRoutine_Build,
 			_EscapedRoutine_Initialise,
 			_EscapedRoutine_Execute,
@@ -164,7 +164,7 @@ void* _EscapedRoutine_Copy( void* escapedRoutine, void* dest, Bool deep, Name na
 	return (void*)newEscapedRoutine;
 }
 
-void _EscapedRoutine_Construct( void* escapedRoutine, Stg_ComponentFactory* cf, void* data ) {
+void _EscapedRoutine_AssignFromXML( void* escapedRoutine, Stg_ComponentFactory* cf, void* data ) {
 	EscapedRoutine*	     self          = (EscapedRoutine*) escapedRoutine;
 	Dimension_Index      dim;
 	Particle_Index       particlesToRemoveDelta;

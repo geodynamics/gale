@@ -87,7 +87,7 @@
 	void _MaterialFeVariable_Print( void* variable, Stream* stream );
 	void* _MaterialFeVariable_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
-	void _MaterialFeVariable_Construct( void* variable, Stg_ComponentFactory* cf, void* data );
+	void _MaterialFeVariable_AssignFromXML( void* variable, Stg_ComponentFactory* cf, void* data );
 	void _MaterialFeVariable_Build( void* variable, void* data );
 	void _MaterialFeVariable_Initialise( void* variable, void* data );
 	void _MaterialFeVariable_Execute( void* variable, void* data );

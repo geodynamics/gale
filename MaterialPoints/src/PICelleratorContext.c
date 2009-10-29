@@ -64,7 +64,7 @@ void* _PICelleratorContext_DefaultNew( Name name ) {
 		_PICelleratorContext_Print,
 		NULL, 
 		_PICelleratorContext_DefaultNew,
-		_PICelleratorContext_Construct,
+		_PICelleratorContext_AssignFromXML,
 		_AbstractContext_Build,
 		_AbstractContext_Initialise,
 		_AbstractContext_Execute,
@@ -92,7 +92,7 @@ PICelleratorContext* PICelleratorContext_New(
 		_PICelleratorContext_Print,
 		NULL, 
 		_PICelleratorContext_DefaultNew,
-		_PICelleratorContext_Construct,
+		_PICelleratorContext_AssignFromXML,
 		_AbstractContext_Build,
 		_AbstractContext_Initialise,
 		_AbstractContext_Execute,
@@ -168,7 +168,7 @@ void _PICelleratorContext_Init( void* context ) {
 
 	self->materials_Register = Materials_Register_New();
 
-	ContextEP_Prepend( self, AbstractContext_EP_ConstructExtensions, PICelleratorContext_CreateDefaultMaterial );
+	ContextEP_Prepend( self, AbstractContext_EP_AssignFromXMLExtensions, PICelleratorContext_CreateDefaultMaterial );
 
 /* 	 TODO want to append an EP to the end of the time integration that makes sure that after all integration  */
 /* 	 swarms have been updated, each element has at least one integration point from one swarm in it, or else */
@@ -230,9 +230,9 @@ void PICelleratorContext_CreateDefaultMaterial( void* context ) {
 	}
 }
 
-void _PICelleratorContext_Construct( void* context, Stg_ComponentFactory *cf, void* data ){
+void _PICelleratorContext_AssignFromXML( void* context, Stg_ComponentFactory *cf, void* data ){
 	PICelleratorContext* self = (PICelleratorContext*) context;
 	
-	_FiniteElementContext_Construct( context, cf, data );
+	_FiniteElementContext_AssignFromXML( context, cf, data );
 	_PICelleratorContext_Init( self );
 }

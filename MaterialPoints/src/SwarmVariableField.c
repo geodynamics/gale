@@ -144,7 +144,7 @@ void* _SwarmVariableField_DefaultNew( Name name ) {
 			_SwarmVariableField_Print,
 			NULL,
 			_SwarmVariableField_DefaultNew,
-			_SwarmVariableField_Construct,
+			_SwarmVariableField_AssignFromXML,
 			_SwarmVariableField_Build,
 			_SwarmVariableField_Initialise,
 			_SwarmVariableField_Execute,
@@ -161,7 +161,7 @@ void* _SwarmVariableField_DefaultNew( Name name ) {
 			name );
 }
 
-void _SwarmVariableField_Construct( void* swarmVariableField, Stg_ComponentFactory* cf, void* data ) {
+void _SwarmVariableField_AssignFromXML( void* swarmVariableField, Stg_ComponentFactory* cf, void* data ) {
 	SwarmVariableField*     	self		= (SwarmVariableField*)swarmVariableField;
 	SwarmVariable*			swarmVar;
 	IntegrationPointsSwarm* 	integrationSwarm;
@@ -170,7 +170,7 @@ void _SwarmVariableField_Construct( void* swarmVariableField, Stg_ComponentFacto
 	variable_Register = self->context->variable_Register; 
 
 	/* Construct Parent */
-	_ParticleFeVariable_Construct( self, cf, data );
+	_ParticleFeVariable_AssignFromXML( self, cf, data );
 
 	// TODO: just get the textual name here - see gLucifer's SwarmPlotter DrawignObject 
 	self->swarmVarName = Stg_ComponentFactory_GetString( cf, self->name, "swarmVariable", "" );

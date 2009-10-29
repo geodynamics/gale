@@ -87,7 +87,7 @@ IntegrationPointsSwarm* IntegrationPointsSwarm_New(
 			_IntegrationPointsSwarm_Print,
 			_IntegrationPointsSwarm_Copy,
 			_IntegrationPointsSwarm_DefaultNew,
-			_IntegrationPointsSwarm_Construct,
+			_IntegrationPointsSwarm_AssignFromXML,
 			_IntegrationPointsSwarm_Build,
 			_IntegrationPointsSwarm_Initialise,
 			_IntegrationPointsSwarm_Execute,
@@ -121,7 +121,7 @@ void* _IntegrationPointsSwarm_DefaultNew( Name name ) {
 			_IntegrationPointsSwarm_Print,
 			_IntegrationPointsSwarm_Copy,
 			_IntegrationPointsSwarm_DefaultNew,
-			_IntegrationPointsSwarm_Construct,
+			_IntegrationPointsSwarm_AssignFromXML,
 			_IntegrationPointsSwarm_Build,
 			_IntegrationPointsSwarm_Initialise,
 			_IntegrationPointsSwarm_Execute,
@@ -221,7 +221,7 @@ IntegrationPointsSwarm* _IntegrationPointsSwarm_New(
 }
 
 
-void _IntegrationPointsSwarm_Construct( void* integrationPoints, Stg_ComponentFactory* cf, void* data ) {
+void _IntegrationPointsSwarm_AssignFromXML( void* integrationPoints, Stg_ComponentFactory* cf, void* data ) {
 	IntegrationPointsSwarm*	        self          = (IntegrationPointsSwarm*) integrationPoints;
 	FeMesh*             		mesh;
 	TimeIntegrator*                 timeIntegrator;
@@ -232,7 +232,7 @@ void _IntegrationPointsSwarm_Construct( void* integrationPoints, Stg_ComponentFa
 	PICelleratorContext*		context;
 
 	/* This will also call _Swarm_Init */
-	_Swarm_Construct( self, cf, data );
+	_Swarm_AssignFromXML( self, cf, data );
 
 	mesh           = Stg_ComponentFactory_ConstructByKey( cf, self->name, "FeMesh", FeMesh, True, data );
 	timeIntegrator = Stg_ComponentFactory_ConstructByKey( cf, self->name, "TimeIntegrator", TimeIntegrator, True, data );
@@ -306,7 +306,7 @@ void _IntegrationPointsSwarm_Init(
 		"Zeta" );
 
 	if ( timeIntegrator ) {
-		/* Assuming this is called from _IntegrationPointsSwarm_Construct, it would have always called construct
+		/* Assuming this is called from _IntegrationPointsSwarm_AssignFromXML, it would have always called construct
 		 * on the mapper which in turn would have constructed any MaterialPointsSwarms with it.
 		 * The MaterialPointsSwarms would have already appended their update routines to the EP, and hence this
 		 * ensures that the _IntegrationPointsSwarm_UpdateHook will always be called last */

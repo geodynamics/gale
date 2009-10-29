@@ -118,7 +118,7 @@ void* _GaussMapper_DefaultNew( Name name ) {
         _GaussMapper_Print,
         _GaussMapper_Copy,
         _GaussMapper_DefaultNew,
-        _GaussMapper_Construct,
+        _GaussMapper_AssignFromXML,
         _GaussMapper_Build,
         _GaussMapper_Initialise,
         _GaussMapper_Execute,
@@ -133,10 +133,10 @@ void* _GaussMapper_DefaultNew( Name name ) {
         NULL );
 }
 
-void _GaussMapper_Construct( void* mapper, Stg_ComponentFactory* cf, void* data ) {
+void _GaussMapper_AssignFromXML( void* mapper, Stg_ComponentFactory* cf, void* data ) {
     GaussMapper* self = (GaussMapper*)mapper;
 	
-    _OneToOneMapper_Construct( mapper, cf, data );
+    _OneToOneMapper_AssignFromXML( mapper, cf, data );
 
     /* Validate assumptions on the layouts the swarms use */
 	

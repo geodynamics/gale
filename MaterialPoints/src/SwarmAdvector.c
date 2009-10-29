@@ -218,7 +218,7 @@ void* _SwarmAdvector_DefaultNew( Name name ) {
 			_SwarmAdvector_Print,
 			_SwarmAdvector_Copy,
 			_SwarmAdvector_DefaultNew,
-			_SwarmAdvector_Construct,
+			_SwarmAdvector_AssignFromXML,
 			_SwarmAdvector_Build,
 			_SwarmAdvector_Initialise,
 			_SwarmAdvector_Execute,
@@ -229,13 +229,13 @@ void* _SwarmAdvector_DefaultNew( Name name ) {
 }
 
 
-void _SwarmAdvector_Construct( void* swarmAdvector, Stg_ComponentFactory* cf, void* data ) {
+void _SwarmAdvector_AssignFromXML( void* swarmAdvector, Stg_ComponentFactory* cf, void* data ) {
 	SwarmAdvector*	            self          = (SwarmAdvector*) swarmAdvector;
 	FeVariable*                 velocityField;
 	MaterialPointsSwarm*        swarm;
 	PeriodicBoundariesManager*  periodicBCsManager;
 
-	_TimeIntegratee_Construct( self, cf, data );
+	_TimeIntegratee_AssignFromXML( self, cf, data );
 
 	velocityField      = Stg_ComponentFactory_ConstructByKey( cf, self->name, "VelocityField", FeVariable,  True, data );
 	swarm              = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm",  MaterialPointsSwarm, True, data );

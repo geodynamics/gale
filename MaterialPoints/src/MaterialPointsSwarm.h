@@ -130,7 +130,7 @@
 	
 	void* _MaterialPointsSwarm_DefaultNew( Name name ) ;
 
-	void _MaterialPointsSwarm_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+	void _MaterialPointsSwarm_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 	void _MaterialPointsSwarm_Build( void* swarm, void* data ) ;
 	void _MaterialPointsSwarm_Initialise( void* swarm, void* data ) ;
 	void _MaterialPointsSwarm_Execute( void* swarm, void* data );

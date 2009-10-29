@@ -76,7 +76,7 @@ void _GaussMapper_Print( void* mapper, Stream* stream );
 void* _GaussMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 void* _GaussMapper_DefaultNew( Name name );
-void _GaussMapper_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+void _GaussMapper_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 void _GaussMapper_Build( void* mapper, void* data ) ;
 void _GaussMapper_Initialise( void* mapper, void* data ) ;
 void _GaussMapper_Execute( void* mapper, void* data );

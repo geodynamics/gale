@@ -201,7 +201,7 @@ void* _ParticleFeVariable_Copy( void* feVariable, void* dest, Bool deep, Name na
 	return NULL;
 }
 
-void _ParticleFeVariable_Construct( void* materialFeVariable, Stg_ComponentFactory* cf, void* data ){
+void _ParticleFeVariable_AssignFromXML( void* materialFeVariable, Stg_ComponentFactory* cf, void* data ){
 	ParticleFeVariable*     self            = (ParticleFeVariable*) materialFeVariable;
 	IntegrationPointsSwarm* swarm;
 	FiniteElementContext*   context;
@@ -214,7 +214,7 @@ void _ParticleFeVariable_Construct( void* materialFeVariable, Stg_ComponentFacto
 	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Mesh", FeMesh, True, data );
 
 	/* Construct Parent */
-	_FieldVariable_Construct( self, cf, data );
+	_FieldVariable_AssignFromXML( self, cf, data );
 	_FeVariable_Init( (FeVariable*)self, mesh, NULL, NULL, NULL, NULL, NULL, NULL, False, False );
 	_ParticleFeVariable_Init( self, swarm, context );
 }
